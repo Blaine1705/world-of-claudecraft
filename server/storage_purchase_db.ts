@@ -330,6 +330,7 @@ DROP INDEX IF EXISTS storage_purchases_character_pending;
 DO $storage_purchase_status_constraint$
 DECLARE
   status_constraint text;
+  removed_refused bigint;
 BEGIN
   SELECT pg_get_constraintdef(oid) INTO status_constraint
     FROM pg_constraint
@@ -337,6 +338,14 @@ BEGIN
      AND conrelid = 'storage_purchases'::regclass;
   IF status_constraint IS NULL OR status_constraint LIKE '%refused%' THEN
     DELETE FROM storage_purchases WHERE status = 'refused';
+    -- Production ships this table with the closed constraint, so only a dev
+    -- database that ran the feature branch can hold refused rows; the ADD
+    -- CONSTRAINT below validates existing rows and would abort boot on them.
+    GET DIAGNOSTICS removed_refused = ROW_COUNT;
+    IF removed_refused > 0 THEN
+      RAISE NOTICE 'storage_purchases: removed % legacy refused row(s) before installing the closed status constraint',
+        removed_refused;
+    END IF;
     IF status_constraint IS NOT NULL THEN
       ALTER TABLE storage_purchases DROP CONSTRAINT storage_purchases_status_allowed;
     END IF;
@@ -721,6 +730,10 @@ BEGIN
   END IF;
 END;
 $storage_purchase_trigger_guard$;
+
+-- SET LOCAL lasts until COMMIT, not statement end: restore the session default
+-- so the rest of the boot transaction runs on the ordinary search_path.
+SET LOCAL search_path TO DEFAULT;
 `.replaceAll('"__woc_storage_purchase_schema__"', schema);
 }
 

@@ -64,6 +64,7 @@ import {
 } from './community_test_accounts';
 import { CONCURRENT_INDEX_MIGRATIONS } from './concurrent_indexes';
 import { CONTENT_MODERATION_SCHEMA } from './content_moderation_db';
+import { backendCancelViaPool } from './db_transaction_deadline';
 import type { RankedDeedsAccount } from './deeds_board';
 import { DISCORD_SCHEMA } from './discord_db';
 import { enqueueLinkChange } from './discord_link_changes';
@@ -237,17 +238,14 @@ export const DB_STATEMENT_TIMEOUT_MS = 15_000;
 // leaderboard / board / metrics aggregates and the final character save, plus the
 // on-demand admin reads: the sessions-by-day chart, the client perf summary, and
 // the account-detail playtime aggregate), applied via runWithStatementTimeout.
-// Bounded so even an exempted scan that goes runaway still dies rather than
-// pinning a pooled client indefinitely.
+// Bounded so a runaway exempted scan still dies instead of pinning a pooled client.
 export const DB_HEAVY_STATEMENT_TIMEOUT_MS = CHARACTER_SAVE_STATEMENT_TIMEOUT_MS;
 
-// Client-side backstop timeout per connection. query_timeout is enforced in the
-// driver, NOT the database, so a SET LOCAL cannot lift it: it MUST sit strictly
-// above the heaviest server-side allowance or it would kill the very queries
-// runWithStatementTimeout raises DB_HEAVY_STATEMENT_TIMEOUT_MS for. The server-side
-// statement_timeout is the real working limit; this only catches a black-holed
-// server that accepted a query and then never answers (so no server-side timer
-// ever fires), one layer outside the heavy allowance.
+// Client-side (driver) backstop per connection; SET LOCAL cannot lift it, so it
+// MUST sit strictly above the heaviest server-side allowance
+// (runWithStatementTimeout's DB_HEAVY_STATEMENT_TIMEOUT_MS). The server-side
+// statement_timeout is the working limit; this only catches a black-holed server
+// that accepted a query and never answers, so no server-side timer ever fires.
 export const DB_QUERY_TIMEOUT_MS = CHARACTER_SAVE_TRANSACTION_TIMEOUT_MS;
 
 export const pool = new Pool({
@@ -258,15 +256,15 @@ export const pool = new Pool({
   query_timeout: DB_QUERY_TIMEOUT_MS,
 });
 
-// An idle pooled client can emit 'error' with no query in flight (a backend
-// termination, a dropped TCP connection). Unhandled, pg re-emits it on the Pool
-// where it becomes an uncaught exception that crashes the realm process. Swallow
-// it to a logged, counted event; pg discards the broken client and the next
-// checkout transparently opens a fresh one. Dev-channel English is fine here (a
-// log, never player text). The real pg Pool is an EventEmitter; a few db-layer
-// unit tests replace it with a minimal fake that omits .on, so guard the
-// registration by capability rather than force every such fake to grow the event
-// surface (the real registration is exercised in tests/server/tunables.test.ts).
+// Character saves ride this wrapper: on deadline expiry pg_cancel_backend drops held locks.
+const cancelSaveBackend = backendCancelViaPool(pool);
+const beginSaveTx = (c: Parameters<typeof beginCharacterSaveTx>[0], op: string, s?: AbortSignal) =>
+  beginCharacterSaveTx(c, op, s, cancelSaveBackend);
+
+// An idle pooled client can emit 'error' with no query in flight (backend death, dropped
+// TCP); unhandled, pg re-emits it on the Pool as an uncaught exception crashing the realm.
+// Swallow to a logged, counted event; pg discards the client, the next checkout opens a
+// fresh one. The .on guard tolerates minimal pool fakes; registration: tunables.test.ts.
 let poolClientErrorCount = 0;
 if (typeof pool.on === 'function') {
   pool.on('error', (err) => {
@@ -1377,15 +1375,12 @@ export async function ensureSchema(): Promise<void> {
     // After SCHEMA: every marketplace table FKs accounts(id), and the custody
     // model rides characters + world_state (the escrow combined save).
     await client.query(WOC_MARKET_SCHEMA);
-    // Seed the chat-filter word lists + config on first boot only (idempotent).
-    // Runs under the same advisory lock so concurrent realm boots don't race.
+    // Seed chat-filter defaults once (idempotent), under the same advisory lock.
     await seedChatFilterDefaults(client);
-    // Partitioned World Market backfill. Runs inside this same
-    // advisory-lock transaction (so a concurrent realm boot cannot race it) and
-    // AFTER the schema modules exist. It splits any surviving pre-scoping
-    // 'market' blob per seller realm, RETAINS the legacy row as a rollback
-    // artifact, and records a marker row so every later boot is a no-op. See
-    // server/market_backfill.ts.
+    // Partitioned World Market backfill: runs inside this same advisory-lock
+    // transaction (a concurrent realm boot cannot race it), after the schema
+    // modules exist. It splits any surviving pre-scoping 'market' blob per
+    // seller realm, keeps the legacy row, and marks itself done (market_backfill.ts).
     const marketBackfillDryRun = process.env.MARKET_BACKFILL_DRY_RUN === '1';
     const backfill = await runMarketBackfill({
       client,
@@ -1395,9 +1390,8 @@ export async function ensureSchema(): Promise<void> {
     });
     if (marketBackfillDryRun) {
       // Deliberate halt: the runner logged the per-realm plan and wrote nothing
-      // (no partitions, no marker). Stop the boot so an operator can inspect the
-      // plan before applying. The ROLLBACK in the catch is harmless: the DDL is
-      // idempotent and the dry run wrote nothing.
+      // (no partitions, no marker), so an operator can inspect before applying.
+      // The catch's ROLLBACK is harmless: idempotent DDL, nothing written.
       throw new Error(
         'MARKET_BACKFILL_DRY_RUN halted boot after computing the market backfill plan: no changes were written and the boot was stopped deliberately, unset MARKET_BACKFILL_DRY_RUN to apply',
       );
@@ -1407,22 +1401,26 @@ export async function ensureSchema(): Promise<void> {
         `[market-backfill] applied for realm ${REALM} (legacyRowFound=${backfill.legacyRowFound})`,
       );
     }
-    // Apply storage purchase parent triggers last, so first-rollout table locks
-    // are held only for this final fragment before COMMIT.
+    // Storage purchase parent triggers land late so their first-rollout table
+    // locks are held only briefly before COMMIT.
     await client.query(STORAGE_PURCHASE_SCHEMA);
-    // The first durable-ledger ceiling install takes a SHARE ROW EXCLUSIVE lock
-    // while it seeds an exact row count. Keep it as the final schema fragment so
-    // that lock is held across no unrelated boot work. Later boots validate the
-    // trigger/counter shape without taking the ledger table lock or scanning it.
-    const bankLedgerGrowthBudget = await client.query(BANK_LEDGER_GROWTH_BUDGET_SCHEMA);
+    // The first durable-ledger ceiling install locks the ledger while seeding
+    // an exact row count; keep it the final fragment so nothing else waits.
+    await client.query(BANK_LEDGER_GROWTH_BUDGET_SCHEMA);
+    // Readback issued separately before COMMIT (a multi-statement query returns
+    // an ARRAY of results, so the fragment's trailing SELECT is unreadable) and
+    // schema-qualified: boot always applies the fragment's default 'public'.
+    const bankLedgerGrowthBudget = await client.query(
+      'SELECT committed_rows, hard_limit_rows FROM public.bank_ledger_growth_budget WHERE singleton = TRUE',
+    );
     observeBankLedgerGrowthBudget(
       bankLedgerGrowthBudget.rows[0]?.committed_rows,
       bankLedgerGrowthBudget.rows[0]?.hard_limit_rows,
     );
     await client.query('COMMIT');
-    // Open the market write gate only AFTER a successful COMMIT, so no market
-    // write can land before the marker is durable. Opens on the no-op path too
-    // (backfill.ran === false, i.e. the marker already existed).
+    // Open the market write gate only AFTER a successful COMMIT (also on the
+    // no-op path where the marker already existed): no market write lands
+    // before the marker is durable.
     openMarketWriteGate();
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
@@ -3446,7 +3444,7 @@ export async function saveCharacterState(
     leaseNonce,
   );
   const client = await pool.connect();
-  const transaction = await beginCharacterSaveTx(client, 'character save', signal);
+  const transaction = await beginSaveTx(client, 'character save', signal);
   let ledgerWrite: BankLedgerBatchWriteResult | undefined;
   try {
     await lockSaveEffectAccounts(transaction, storageEffects, ledger);
@@ -3503,7 +3501,7 @@ export async function saveCharacterAndMarketState(
   const guildReplay = prepareGuildBankReceiptReplay(guildBanks ?? [], ledger?.batches ?? []);
   const cleanState = sanitizeRemovedZone1Content(state).state;
   const client = await pool.connect();
-  const transaction = await beginCharacterSaveTx(client, 'character and market save', signal);
+  const transaction = await beginSaveTx(client, 'character and market save', signal);
   let ledgerWrite: BankLedgerBatchWriteResult | undefined;
   try {
     await lockSaveEffectAccounts(transaction, storageEffects, ledger);
@@ -3595,7 +3593,7 @@ export async function saveCharacterAndGuildBankState(
   const guildReplay = prepareGuildBankReceiptReplay(guildBanks, ledger?.batches ?? []);
   const cleanState = sanitizeRemovedZone1Content(state).state;
   const client = await pool.connect();
-  const transaction = await beginCharacterSaveTx(client, 'character and guild bank save', signal);
+  const transaction = await beginSaveTx(client, 'character and guild bank save', signal);
   let ledgerWrite: BankLedgerBatchWriteResult | undefined;
   try {
     await lockSaveEffectAccounts(transaction, storageEffects, ledger);
@@ -4721,7 +4719,9 @@ export interface BankLedgerRow {
     // sees a clean, self-consistent book.
     | 'counterparty_orphan'
     // Materials Vault stock consumed IN PLACE by a completed craft or enchant
-    // (Bank Storage Phase 04, server/bank_ledger.ts recordVaultCraftConsume).
+    // (Bank Storage Phase 04, server/bank_ledger.ts
+    // buildVaultCraftConsumeLedgerRows via the bank_ledger_session.ts
+    // reservation journal).
     // Vault-only: it replays as a removal like a withdraw, but the materials
     // went into the craft, never through the bags, so it is a distinct op on
     // purpose (a dupe investigation must tell the two apart). Like the

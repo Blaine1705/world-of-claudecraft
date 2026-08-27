@@ -36,6 +36,27 @@ const h = vi.hoisted(() => {
     ) {
       return Promise.reject(new Error('large account index build interrupted'));
     }
+    // Mirror node-postgres: a simple query carrying several top-level
+    // statements resolves to an ARRAY of per-statement results (dollar-quoted
+    // bodies are not statement boundaries). ensureSchema once read `.rows[0]`
+    // off a multi-statement fragment; the flat-object fake kept that green
+    // while every real boot threw, so the distinction must materialize here.
+    const topLevel = String(sql).replace(/\$([A-Za-z_][A-Za-z0-9_]*)?\$[\s\S]*?\$\1\$/g, "''");
+    const statements = topLevel.split(';').filter((part) => part.trim().length > 0);
+    if (statements.length > 1) {
+      return Promise.resolve(statements.map(() => ({ rows: [], rowCount: 0 })));
+    }
+    // The growth-budget gauge readback (a single-statement SELECT): seed the
+    // counters so the wiring test can assert they reach the observer.
+    if (
+      String(sql).includes('FROM public.bank_ledger_growth_budget') &&
+      String(sql).includes('singleton = TRUE')
+    ) {
+      return Promise.resolve({
+        rows: [{ committed_rows: '7', hard_limit_rows: '10000000' }],
+        rowCount: 1,
+      });
+    }
     // The invalid-carcass check for the post-commit metrics index build; a test
     // flips the flag to exercise the repair arm. Checked before the to_regclass
     // arm because the check SQL also resolves the index via to_regclass.
@@ -77,7 +98,17 @@ vi.mock('pg', () => ({
     };
   }),
 }));
+// Spy on the growth-budget observer (real behavior preserved) so the wiring
+// test can assert the seeded readback counters actually reach the gauge.
+vi.mock('../server/bank_ledger_growth_budget', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../server/bank_ledger_growth_budget')>();
+  return {
+    ...actual,
+    observeBankLedgerGrowthBudget: vi.fn(actual.observeBankLedgerGrowthBudget),
+  };
+});
 
+import { observeBankLedgerGrowthBudget } from '../server/bank_ledger_growth_budget';
 import {
   BANK_LEDGER_ACCOUNT_BROAD_RETIRE_SQL,
   BANK_LEDGER_ACCOUNT_FK_INDEX_SQL,
@@ -425,6 +456,65 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(applied).toContain('CREATE INDEX IF NOT EXISTS storage_purchases_character');
     expect(applied).toContain('CREATE INDEX IF NOT EXISTS storage_purchases_account');
     expect(applied).toContain('DROP INDEX IF EXISTS storage_purchases_refused');
+
+    // The one new DDL fragment carrying destructive statements. Allowlist each
+    // permitted statement EXACTLY, then hold the remainder (SQL comments
+    // stripped: prose like "Drop only after..." is not a statement) to the
+    // same no-destructive-DDL bar its sibling fragments get above.
+    const storageDdl = h.calls.find((sql) =>
+      sql.includes('CREATE TABLE IF NOT EXISTS storage_purchases'),
+    );
+    expect(storageDdl).toBeDefined();
+    const allowedDestructive = [
+      "DELETE FROM storage_purchases WHERE status = 'refused';",
+      'DROP INDEX IF EXISTS storage_purchases_character_pending;',
+      'DROP INDEX IF EXISTS storage_purchases_refused;',
+      'DROP INDEX IF EXISTS storage_purchases_one_pending_per_character;',
+      'DROP INDEX storage_purchases_one_open_per_character;',
+      'ALTER TABLE storage_purchases DROP CONSTRAINT storage_purchases_status_allowed;',
+      'ALTER TABLE storage_purchases DROP CONSTRAINT storage_purchases_claim_pair;',
+      'DROP TRIGGER IF EXISTS storage_purchase_guard_character_delete ON characters;',
+      'DROP TRIGGER IF EXISTS storage_purchase_guard_account_delete ON accounts;',
+      'DROP TRIGGER IF EXISTS storage_purchase_guard_consumed_key ON storage_purchases;',
+      'DROP TRIGGER IF EXISTS storage_purchase_archive_applied ON storage_purchases;',
+    ];
+    let remainder = (storageDdl as string).replace(/--[^\n]*/g, '');
+    for (const statement of allowedDestructive) {
+      // Exactly the allowed count (one each): split-join stripped EVERY copy,
+      // so a DUPLICATED destructive statement used to pass this bar. Count on
+      // the comment-stripped text and remove only the single allowance.
+      const occurrences = remainder.split(statement).length - 1;
+      expect(occurrences, `allowlisted destructive statement count: ${statement}`).toBe(1);
+      remainder = remainder.replace(statement, '');
+    }
+    expect(remainder).not.toMatch(/\b(?:DROP|TRUNCATE|DELETE\s+FROM|ALTER\s+COLUMN)\b/i);
+  });
+
+  it('reads the growth-budget counters back with a dedicated single-statement query', async () => {
+    // The fragment ends in a SELECT, but node-postgres answers the whole
+    // multi-statement fragment with an ARRAY of results, so ensureSchema must
+    // issue the gauge readback as its own query (inside the boot transaction,
+    // before COMMIT) and feed the observer from THAT result.
+    vi.mocked(observeBankLedgerGrowthBudget).mockClear();
+    await ensureSchema();
+    const fragmentIndex = h.calls.findIndex(
+      (sql) =>
+        sql.includes('bank_ledger_growth_budget') && sql.includes('CREATE TABLE IF NOT EXISTS'),
+    );
+    expect(fragmentIndex).toBeGreaterThanOrEqual(0);
+    const readbackIndex = h.calls.findIndex(
+      (sql, index) =>
+        index > fragmentIndex &&
+        sql.includes(
+          'SELECT committed_rows, hard_limit_rows FROM public.bank_ledger_growth_budget',
+        ) &&
+        sql.includes('singleton = TRUE'),
+    );
+    expect(readbackIndex).toBeGreaterThan(fragmentIndex);
+    expect(readbackIndex).toBeLessThan(h.calls.indexOf('COMMIT'));
+    // The fake answers the single-statement readback with these seeded
+    // counters; the observer receiving them proves the wiring end to end.
+    expect(observeBankLedgerGrowthBudget).toHaveBeenCalledWith('7', '10000000');
   });
 
   it('applies the UA analytics schemas (progress events, attribution, ad spend)', async () => {
@@ -833,6 +923,14 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(bankLedgerBroadAccount?.createSql).not.toContain('WHERE');
     expect(bankLedgerBroadAccount?.checkSql).toBe(BANK_LEDGER_ACCOUNT_INVALID_INDEX_CHECK_SQL);
     expect(bankLedgerBroadAccount?.dropSql).toBe(BANK_LEDGER_ACCOUNT_INVALID_INDEX_DROP_SQL);
+    // The toBe pins above compare against the same constants production
+    // assigns, so both sides move together. Pin the load-bearing scraps as
+    // LITERALS: losing `AND NOT i.indisvalid` from the carcass check would
+    // let the repair path DROP a perfectly VALID index with this suite green.
+    expect(bankLedgerBroadAccount?.checkSql).toContain("to_regclass('bank_ledger_account_recent')");
+    expect(bankLedgerBroadAccount?.checkSql).toContain('AND NOT i.indisvalid');
+    expect(bankLedgerBroadAccount?.dropSql).toContain('DROP INDEX CONCURRENTLY IF EXISTS');
+    expect(bankLedgerBroadAccount?.dropSql).toContain('bank_ledger_account_recent');
     expect(bankLedgerBroadAccount?.retireSql).toBeUndefined();
     // The admin economy-oversight per-account bank_ledger reader
     // (largeGoldMovementsForAccount): equality column + trailing id DESC, the
@@ -867,6 +965,7 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(BANK_LEDGER_ACCOUNT_FK_INVALID_INDEX_CHECK_SQL).toContain(
       "to_regclass('bank_ledger_account_fk')",
     );
+    expect(BANK_LEDGER_ACCOUNT_FK_INVALID_INDEX_CHECK_SQL).toContain('AND NOT i.indisvalid');
     expect(BANK_LEDGER_ACCOUNT_FK_INVALID_INDEX_DROP_SQL).toBe(
       'DROP INDEX CONCURRENTLY IF EXISTS bank_ledger_account_fk',
     );

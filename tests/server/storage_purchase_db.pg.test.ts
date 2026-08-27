@@ -482,11 +482,16 @@ d('storage_purchases against real PostgreSQL', () => {
   it('keeps the open index and every trigger catalog row stable on a steady-state second boot', async () => {
     const readTriggerIdentity = () =>
       pool.query(
+        // Scoped to THIS suite's schema: the catalog is database-wide, and a
+        // sibling pg suite's ensureSchema leaves the same-named triggers on
+        // public, which would double the identity rows on a shared dev DB.
         `SELECT c.relname, t.tgname, t.oid::text AS oid, t.xmin::text AS xmin
            FROM pg_trigger t
            JOIN pg_class c ON c.oid = t.tgrelid
+           JOIN pg_namespace n ON n.oid = c.relnamespace
           WHERE NOT t.tgisinternal
             AND t.tgname LIKE 'storage_purchase_%'
+            AND n.nspname = '${SCHEMA}'
           ORDER BY c.relname, t.tgname`,
       );
     const readIndexIdentity = () =>
@@ -540,9 +545,11 @@ d('storage_purchases against real PostgreSQL', () => {
               p.proname
          FROM pg_trigger t
          JOIN pg_class c ON c.oid = t.tgrelid
+         JOIN pg_namespace n ON n.oid = c.relnamespace
          JOIN pg_proc p ON p.oid = t.tgfoid
         WHERE NOT t.tgisinternal
           AND t.tgname LIKE 'storage_purchase_%'
+          AND n.nspname = '${SCHEMA}'
         ORDER BY c.relname, t.tgname`,
     );
     expect(definitions.rows).toEqual([

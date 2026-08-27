@@ -86,6 +86,12 @@ describe('the DDL', () => {
     const folded = STORAGE_PURCHASE_SCHEMA.replace(/\s+/g, ' ');
     expect(folded).toContain('SET LOCAL search_path = "public", pg_catalog, pg_temp;');
     expect(count(folded, 'SET search_path = pg_catalog, "public", pg_temp')).toBe(3);
+    // SET LOCAL survives to COMMIT, not statement end: the fragment must END
+    // by restoring the session default so the rest of the boot transaction
+    // (ensureSchema runs later fragments on the same client) is unaffected.
+    expect(STORAGE_PURCHASE_SCHEMA.trimEnd().endsWith('SET LOCAL search_path TO DEFAULT;')).toBe(
+      true,
+    );
     expect(count(STORAGE_PURCHASE_SCHEMA, 'CREATE TABLE IF NOT EXISTS storage_purchases')).toBe(1);
     expect(
       count(
@@ -183,6 +189,13 @@ describe('the DDL', () => {
     expect(count(folded, "DELETE FROM storage_purchases WHERE status = 'refused';")).toBe(1);
     expect(folded).toContain(
       "IF status_constraint IS NULL OR status_constraint LIKE '%refused%' THEN DELETE FROM storage_purchases WHERE status = 'refused';",
+    );
+    // The dev-only converge announces what it removed: the DELETE is needed
+    // (the ADD CONSTRAINT below it validates existing rows and would abort
+    // boot on legacy refused rows) but must never be silent.
+    expect(folded).toContain('GET DIAGNOSTICS removed_refused = ROW_COUNT;');
+    expect(folded).toContain(
+      "RAISE NOTICE 'storage_purchases: removed % legacy refused row(s) before installing the closed status constraint', removed_refused;",
     );
     expect(folded).toContain("CHECK (status IN ('pending', 'applied', 'unresolved'))");
     expect(folded).toContain(
