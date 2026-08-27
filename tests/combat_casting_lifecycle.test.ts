@@ -148,6 +148,28 @@ describe('casting_lifecycle: timed cast start -> progress -> finish', () => {
     expect(secondTarget.hp).toBe(secondHp0);
   });
 
+  it('cancels a plain timed (non-channel) hostile cast the instant its locked target dies', () => {
+    const { sim, p, meta } = makeSim('mage', 12);
+    const mob = spawnTarget(sim, p, 12, 6);
+    sim.drainEvents();
+    castAbility(sim.ctx, 'fireball', p.id);
+    expect(p.castingAbility).toBe('fireball');
+    expect(p.castTargetId).toBe(mob.id);
+    expect(p.castRemaining).toBeGreaterThan(1); // well short of the 1.5s cast's natural finish
+
+    handleDeath(sim.ctx, mob, p); // another source (an AoE, a DoT tick, ...) kills it mid-cast
+    updateCasting(sim.ctx, p, meta); // the very next tick catches it, no waiting for a pulse
+
+    expect(p.castingAbility).toBeNull(); // interrupted immediately, never ran to completion
+    expect(p.castTargetId).toBeNull();
+    expect(p.castRemaining).toBe(0);
+    const stops = sim
+      .drainEvents()
+      .filter((e: any) => e.type === 'castStop' && e.entityId === p.id);
+    expect(stops.some((e: any) => e.success === false)).toBe(true); // a genuine cancel
+    expect(sim.ctx.pendingProjectiles.length).toBe(0); // the cast never resolved into a hit
+  });
+
   it('resolves a completed friendly heal against the target locked at cast start', () => {
     const { sim, p, meta } = makeSim('priest', 12);
     const ally = sim.entities.get(sim.addPlayer('warrior', 'Ally')) as AnyEntity;
