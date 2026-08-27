@@ -109,26 +109,32 @@ describe('Ignivar fire beam VFX', () => {
     };
     compile(outer.material as THREE.Material);
     compile(veil.material as THREE.Material);
+    // The v2 thermal look (the restored raid presentation): brighter flame
+    // body layers, an additive white-hot core strip, and a boundary that stays
+    // ABOVE the old readability floor so the lethal lane never fades.
     expect((floor.material as THREE.Material).opacity).toBeLessThanOrEqual(0.08);
-    expect((outer.material as THREE.Material).opacity).toBeLessThanOrEqual(0.055);
-    expect((veil.material as THREE.Material).opacity).toBeLessThanOrEqual(0.045);
-    expect((core.material as THREE.Material).opacity).toBeLessThanOrEqual(0.15);
-    expect((boundary.material as THREE.Material).opacity).toBeGreaterThanOrEqual(0.38);
-    expect((boundary.material as THREE.Material).opacity).toBeLessThanOrEqual(0.46);
+    expect((outer.material as THREE.Material).opacity).toBeLessThanOrEqual(0.2);
+    expect((veil.material as THREE.Material).opacity).toBeLessThanOrEqual(0.14);
+    expect((core.material as THREE.Material).opacity).toBeLessThanOrEqual(0.38);
+    expect((boundary.material as THREE.Material).opacity).toBeGreaterThanOrEqual(0.46);
+    expect((boundary.material as THREE.Material).opacity).toBeLessThanOrEqual(0.54);
     expect((floor.material as THREE.Material).blending).toBe(THREE.NormalBlending);
     expect((outer.material as THREE.Material).blending).toBe(THREE.NormalBlending);
     expect((veil.material as THREE.Material).blending).toBe(THREE.NormalBlending);
-    expect((core.material as THREE.Material).blending).toBe(THREE.NormalBlending);
+    expect((core.material as THREE.Material).blending).toBe(THREE.AdditiveBlending);
     expect((boundary.material as THREE.Material).blending).toBe(THREE.NormalBlending);
     const flames = beam.getObjectByName(IGNIVAR_FIRE_BEAM_FLAMES_NAME) as THREE.InstancedMesh;
     const embers = beam.getObjectByName(IGNIVAR_FIRE_BEAM_EMBERS_NAME) as THREE.Points;
-    expect((flames.material as THREE.Material).opacity).toBeLessThanOrEqual(0.12);
-    expect((embers.material as THREE.Material).opacity).toBeLessThanOrEqual(0.2);
+    expect((flames.material as THREE.Material).opacity).toBeLessThanOrEqual(0.34);
+    expect((embers.material as THREE.Material).opacity).toBeLessThanOrEqual(0.46);
     const additiveLayers = beam.children.filter((child) => {
       const layerMaterial = (child as THREE.Mesh).material as THREE.Material | undefined;
       return layerMaterial?.blending === THREE.AdditiveBlending;
     });
-    expect(additiveLayers.map((layer) => layer.name)).toEqual([IGNIVAR_FIRE_BEAM_EMBERS_NAME]);
+    expect(additiveLayers.map((layer) => layer.name)).toEqual([
+      IGNIVAR_FIRE_BEAM_CORE_NAME,
+      IGNIVAR_FIRE_BEAM_EMBERS_NAME,
+    ]);
     const corePositions = core.geometry.getAttribute('position') as THREE.BufferAttribute;
     let coreMaxHeight = 0;
     let coreMaxHalfWidth = 0;
