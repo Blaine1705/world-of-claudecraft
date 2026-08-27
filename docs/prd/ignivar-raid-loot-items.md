@@ -50,7 +50,7 @@ design targets for the tuning pass.
 
 ### Warrior
 
-**Slagbreaker Battlegear** (`slagbreaker`), arms (Battlecraft), mail. 2 pieces: Redhand gains a third charge. 4 pieces: Redhand strikes reduce Maiming Strike's remaining cooldown by 1.5 sec, and Maiming Strike deals 15% more damage to targets wearing your Gaping Wounds.
+**Slagbreaker Battlegear** (`slagbreaker`), arms (Battlecraft), mail. 2 pieces: Redhand empowers your next Maiming Strike by 30 percent per stack instead of 20. 4 pieces: Casting Redhand reduces Breachmaker's remaining cooldown by 3 sec.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
@@ -60,7 +60,7 @@ design targets for the tuning pass.
 | Slagbreaker Gauntlets (`slagbreaker_gloves`) | gloves | 270 | Str 11, Sta 6 | none | crit 60, haste 25 |
 | Slagbreaker Legguards (`slagbreaker_legs`) | legs | 345 | Str 15, Sta 7 | none | crit 60, haste 25 |
 
-**Emberfury Harness** (`emberfury`), fury (Bloodrush), mail. 2 pieces: Bloodletting generates 6 additional rage while you are Enraged. 4 pieces: Spending 80 rage on Red Harvest refunds both Twinstrike charges and extends your Enrage by 2 sec.
+**Emberfury Harness** (`emberfury`), fury (Bloodrush), mail. 2 pieces: Your Enrage lasts 6 sec instead of 4. 4 pieces: Bloodletting always Enrages you, and its healing rises to 8 percent of your maximum health.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
@@ -70,7 +70,7 @@ design targets for the tuning pass.
 | Emberfury Gauntlets (`emberfury_gloves`) | gloves | 270 | Str 11, Sta 6 | none | haste 60, crit 25 |
 | Emberfury Legguards (`emberfury_legs`) | legs | 345 | Str 15, Sta 7 | none | haste 60, crit 25 |
 
-**Forgewall Aegis** (`forgewall`), prot (Ironguard), mail. 2 pieces: Iron Resolve converts rage at 5 absorb per point instead of 4. 4 pieces: Blocking an attack grants 3 rage, and a Revenge made free by a dodge or parry strikes one additional target.
+**Forgewall Aegis** (`forgewall`), prot (Ironguard), mail. 2 pieces: Iron Resolve converts rage at 5 absorb per point instead of 4. 4 pieces: Casting Shieldcrack reduces Iron Resolve's remaining cooldown by 2 sec.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
@@ -82,7 +82,7 @@ design targets for the tuning pass.
 
 ### Paladin
 
-**Dawnforged Vestments** (`dawnforged`), holy (Sunmender), mail. 2 pieces: Radiant Chorus arms Radiant Resonance after healing a single injured ally. Damage taken no longer delays your spellcasting. 4 pieces: Consuming an Ascension charge refunds 2 Devotion, and Dawn's Embrace cast under Radiant Resonance leaves a heal over time for 30% of its amount over 6 sec.
+**Dawnforged Vestments** (`dawnforged`), holy (Sunmender), mail. 2 pieces: Beacon of Light copies 55 percent of your direct heals. Damage taken no longer delays your spellcasting. 4 pieces: Radiant Resonance's empowered Dawn's Embrace is instant.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
@@ -92,7 +92,7 @@ design targets for the tuning pass.
 | Dawnforged Gauntlets (`dawnforged_gloves`) | gloves | 270 | Int 9, Spi 8 | Healing Power 18 | haste 60, crit 25 |
 | Dawnforged Legguards (`dawnforged_legs`) | legs | 345 | Int 11, Spi 11 | Healing Power 25 | haste 60, crit 25 |
 
-**Oathpyre Bastion** (`oathpyre`), protection (Faithwarden), mail. 2 pieces: Vowkeeper Strike's Solar Reprisal chance rises to 30%, and to 40% when it follows a block. 4 pieces: Sunward Disc bounces to one additional target, and each impact during Bastion Rite grants an absorb equal to 2% of your maximum health.
+**Oathpyre Bastion** (`oathpyre`), protection (Faithwarden), mail. 2 pieces: Vowkeeper Strike's chance to arm Solar Reprisal rises to 30 percent, and blocking an attack arms it 40 percent of the time. 4 pieces: Consuming Solar Reprisal shields you for 6 percent of your maximum health for 10 sec.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
@@ -102,7 +102,7 @@ design targets for the tuning pass.
 | Oathpyre Gauntlets (`oathpyre_gloves`) | gloves | 270 | Str 8, Sta 9 | none | crit 60, haste 25 |
 | Oathpyre Legguards (`oathpyre_legs`) | legs | 345 | Str 10, Sta 12 | none | crit 60, haste 25 |
 
-**Zealfire Warplate** (`zealfire`), retribution (Dawnreaver), mail. 2 pieces: Final Edict and Dawnfall cut each other's remaining cooldown by 3 sec instead of 2. 4 pieces: Sun God's Verdict needs one fewer inscription, and resolving it grants 2 Devotion.
+**Zealfire Warplate** (`zealfire`), retribution (Dawnreaver), mail. 2 pieces: Final Edict and Dawnfall cut each other's remaining cooldown by 3 sec instead of 2. 4 pieces: Hammer of Wrath cast under Dawn's Wrath strikes 40 percent harder, up from 20.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
@@ -114,7 +114,7 @@ design targets for the tuning pass.
 
 ### Hunter
 
-**Packlord's Emberhide** (`packlord_emberhide`), beast_mastery (Packlord), leather. 2 pieces: Pack Command grants 2 Pack Ferocity when your pet's strike critically hits. 4 pieces: Unleash Beast's pet frenzy lasts 12 sec, and Bestial Wrath doubles the damage bonus of your next Unleash Beast.
+**Packlord's Emberhide** (`packlord_emberhide`), beast_mastery (Packlord), leather. 2 pieces: Pack Command's cooldown is reduced to 3 sec. 4 pieces: Pack Command's chance to reset Stampede's cooldown rises to 30 percent.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
@@ -124,7 +124,7 @@ design targets for the tuning pass.
 | Packlord's Grips (`packlord_emberhide_gloves`) | gloves | 150 | Agi 11, Sta 6 | none | crit 60, haste 25 |
 | Packlord's Breeches (`packlord_emberhide_legs`) | legs | 195 | Agi 15, Sta 7 | none | crit 60, haste 25 |
 
-**Coldsight Trackers** (`coldsight_trackers`), marksmanship (Coldsight), leather. 2 pieces: Measured Shot restores 5 additional focus. 4 pieces: Aimed Shot critical strikes extend Cold Focus by 1.5 sec, and Rapid Fire's channel restores 30 focus over its duration.
+**Coldsight Trackers** (`coldsight_trackers`), marksmanship (Coldsight), leather. 2 pieces: Measured Shot restores 5 additional Focus. 4 pieces: Long Draw critical strikes extend Cold Focus by 2 sec, up to 6 sec per window.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
@@ -134,7 +134,7 @@ design targets for the tuning pass.
 | Coldsight Grips (`coldsight_trackers_gloves`) | gloves | 150 | Agi 11, Sta 6 | none | crit 60, haste 25 |
 | Coldsight Breeches (`coldsight_trackers_legs`) | legs | 195 | Agi 15, Sta 7 | none | crit 60, haste 25 |
 
-**Slagsnare Trappings** (`slagsnare`), survival (Fieldcraft), leather. 2 pieces: Gutting Strike generates 20 focus against targets carrying your Bloodhook wound. 4 pieces: Woundrend spent at 3 Hunting Momentum keeps the stacks when it strikes a Bloodhook wound. Cannot occur more than once every 10 sec.
+**Slagsnare Trappings** (`slagsnare`), survival (Fieldcraft), leather. 2 pieces: Gutting Strike generates 20 Focus. 4 pieces: Woundrend that consumes 3 Hunting Momentum preserves them. Cannot occur more than once every 8 sec.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
@@ -146,7 +146,7 @@ design targets for the tuning pass.
 
 ### Rogue
 
-**Cinderfang Shroud** (`cinderfang`), assassination (Knifework), leather. 2 pieces: Venom Dart extends your venom wound by 8 sec and awards a combo point. 4 pieces: Venomrend's fresh wound begins at ritual stage 2, and its energy return rises to 30.
+**Cinderfang Shroud** (`cinderfang`), assassination (Knifework), leather. 2 pieces: Venom Ritual's energy refund rises to 20 per builder. 4 pieces: Venom Dart's cooldown is reduced to 4 sec.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
@@ -156,7 +156,7 @@ design targets for the tuning pass.
 | Cinderfang Grips (`cinderfang_gloves`) | gloves | 150 | Agi 11, Sta 6 | none | crit 60, haste 25 |
 | Cinderfang Breeches (`cinderfang_legs`) | legs | 195 | Agi 15, Sta 7 | none | crit 60, haste 25 |
 
-**Smolderstrike Leathers** (`smolderstrike`), combat (Thuggery), leather. 2 pieces: Redline stays open for 10 sec. 4 pieces: Lights Out delivered at full Redline depth refunds 20 sec of Mirrored Blades' cooldown, and its energy return rises to 40.
+**Smolderstrike Leathers** (`smolderstrike`), combat (Thuggery), leather. 2 pieces: Haymaker hits 20 percent harder. 4 pieces: Lights Out refunds 6 sec of Mirrored Blades' remaining cooldown.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
@@ -166,7 +166,7 @@ design targets for the tuning pass.
 | Smolderstrike Grips (`smolderstrike_gloves`) | gloves | 150 | Agi 11, Sta 6 | none | haste 60, crit 25 |
 | Smolderstrike Breeches (`smolderstrike_legs`) | legs | 195 | Agi 15, Sta 7 | none | haste 60, crit 25 |
 
-**Ashveil Garb** (`ashveil`), subtlety (Skulduggery), leather. 2 pieces: Openers used from Duskveil bank 2 Gloam. 4 pieces: The Shadow Veil opened at 3 Gloam lasts 9 sec and arms a second doubled Lurker's Strike.
+**Ashveil Garb** (`ashveil`), subtlety (Skulduggery), leather. 2 pieces: Lurker's Strike hits 25 percent harder. 4 pieces: Your Veiled Edge strike hits for triple, up from double.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
@@ -178,7 +178,7 @@ design targets for the tuning pass.
 
 ### Priest
 
-**Creed of Embers Vestments** (`emberscreed`), discipline (Doctrine), cloth. 2 pieces: Your Doctrine link converts 40% of your damage into healing. Damage taken no longer delays your spellcasting. 4 pieces: When your Psalm of Warding is fully consumed, your next Scouring Hymn is instant and free.
+**Creed of Embers Vestments** (`emberscreed`), discipline (Doctrine), cloth. 2 pieces: Your Doctrine link converts 10 percent more of your Holy damage into healing. Damage taken no longer delays your spellcasting. 4 pieces: When your Psalm of Warding is fully consumed, your next Scouring Hymn within 10 sec is instant. Cannot occur more than once every 15 sec.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
@@ -188,7 +188,7 @@ design targets for the tuning pass.
 | Creed of Embers Handwraps (`emberscreed_gloves`) | gloves | 75 | Int 9, Spi 8 | Healing Power 18 | haste 60, crit 25 |
 | Creed of Embers Leggings (`emberscreed_legs`) | legs | 95 | Int 11, Spi 11 | Healing Power 25 | haste 60, crit 25 |
 
-**Benison Dawnweave** (`benison_dawnweave`), holy (Benison), cloth. 2 pieces: Seraphic Vigil watches for allies falling below 50% health instead of 35%. Damage taken no longer delays your spellcasting. 4 pieces: When Seraphic Vigil fires, your next Choirmend costs half as much and casts 30% faster.
+**Benison Dawnweave** (`benison_dawnweave`), holy (Benison), cloth. 2 pieces: Seraphic Vigil's rescue heals for 270, up from 180. Damage taken no longer delays your spellcasting. 4 pieces: When Seraphic Vigil triggers, its ally is also mended for 15 percent of their maximum health over 10 sec.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
@@ -198,7 +198,7 @@ design targets for the tuning pass.
 | Dawnweave Handwraps (`benison_dawnweave_gloves`) | gloves | 75 | Int 9, Spi 8 | Healing Power 18 | crit 60, haste 25 |
 | Dawnweave Leggings (`benison_dawnweave_legs`) | legs | 95 | Int 11, Spi 11 | Healing Power 25 | crit 60, haste 25 |
 
-**Vesperash Shroud** (`vesperash`), shadow (Vespers), cloth. 2 pieces: Mindfracture grants 2 Gloomtithe. Damage taken no longer delays your spellcasting. 4 pieces: Summoning your Tithefiend at 5 Gloomtithe resets Mindfracture's cooldown, and the fiend returns twice as much mana per hit.
+**Vesperash Shroud** (`vesperash`), shadow (Vespers), cloth. 2 pieces: Call Tithefiend's cooldown is reduced by 6 sec. Damage taken no longer delays your spellcasting. 4 pieces: Calling your Tithefiend resets Mindfracture's cooldown, and the fiend returns twice as much mana per hit.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
@@ -210,7 +210,7 @@ design targets for the tuning pass.
 
 ### Shaman
 
-**Stormkindled Regalia** (`stormkindled`), elemental (Thundercall), mail. 2 pieces: Unleash Weapon on Pyrebrand grants 3 Thunder. Damage taken no longer delays your spellcasting. 4 pieces: Venting a full 5-Thunder Earthen Jolt makes your next Arc Bolt instant and grants 1 Thunder.
+**Stormkindled Regalia** (`stormkindled`), elemental (Thundercall), mail. 2 pieces: Unleash Weapon on Pyrebrand grants 3 Thunder. Damage taken no longer delays your spellcasting. 4 pieces: Earthen Jolt's bonus per Thunder rises to 30 percent.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
@@ -220,7 +220,7 @@ design targets for the tuning pass.
 | Stormkindled Gauntlets (`stormkindled_gloves`) | gloves | 270 | Int 11, Spi 6 | Spell Damage 10 | crit 60, haste 25 |
 | Stormkindled Legguards (`stormkindled_legs`) | legs | 345 | Int 15, Spi 7 | Spell Damage 14 | crit 60, haste 25 |
 
-**Warspirit Emberscale** (`warspirit_emberscale`), enhancement (Warspirit), mail. 2 pieces: Ancestral Strike advances your cadence 3 steps. 4 pieces: Consuming Stormcast fires one additional Galeheart Echo at 50% damage, and Stormsurge's chance rises to 35%.
+**Warspirit Emberscale** (`warspirit_emberscale`), enhancement (Warspirit), mail. 2 pieces: Ancestral Strike advances your cadence 3 steps. 4 pieces: Ancestral Strike hits 30 percent harder.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
@@ -230,7 +230,7 @@ design targets for the tuning pass.
 | Emberscale Gauntlets (`warspirit_emberscale_gloves`) | gloves | 270 | Agi 11, Sta 6 | none | haste 60, crit 25 |
 | Emberscale Legguards (`warspirit_emberscale_legs`) | legs | 345 | Agi 15, Sta 7 | none | haste 60, crit 25 |
 
-**Stonehearth Bastion** (`stonehearth`), enhancement (Warspirit), off-tank, mail. 2 pieces: Stonebound's damage penalty softens to 5%. 4 pieces: While Stonebound, every completed cadence grants an absorb equal to 4% of your maximum health, stacking up to 12%.
+**Stonehearth Bastion** (`stonehearth`), enhancement (Warspirit), off-tank, mail. 2 pieces: While Stonebound, Stormcast Mending Waters costs no mana and heals 25 percent more. 4 pieces: While Stonebound, completing a cadence heals you for 3 percent of your maximum health.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
@@ -240,7 +240,7 @@ design targets for the tuning pass.
 | Stonehearth Gauntlets (`stonehearth_gloves`) | gloves | 270 | Agi 8, Sta 9 | none | crit 60, haste 25 |
 | Stonehearth Legguards (`stonehearth_legs`) | legs | 345 | Agi 10, Sta 12 | none | crit 60, haste 25 |
 
-**Springmender Scale** (`springmender`), restoration (Spiritmend), mail. 2 pieces: Mending Waters deposits 65% of its healing as Mending Current. Damage taken no longer delays your spellcasting. 4 pieces: Cascading Mend reaches a fourth ally and harvests Mending Currents at 150%.
+**Springmender Scale** (`springmender`), restoration (Spiritmend), mail. 2 pieces: Tidecall's cooldown is reduced by 4 sec. Damage taken no longer delays your spellcasting. 4 pieces: Cascading Mend reaches a fourth ally and harvests Mending Currents at 150 percent.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
@@ -252,17 +252,17 @@ design targets for the tuning pass.
 
 ### Mage
 
-**Chronoweave Vestments** (`chronoweave`), arcane (Chronomancy), cloth. 2 pieces: Temporal Echo converts 50% of your single-target Arcane damage into healing. Damage taken no longer delays your spellcasting. 4 pieces: While at 4 Arcane Charges, Aether Surge's chance to arm Aether Rush doubles to 50%.
+**Aetherweave Vestments** (`chronoweave`), arcane (Chronomancy), cloth. 2 pieces: Temporal Echo converts 50 percent of your single-target Arcane damage into healing. Damage taken no longer delays your spellcasting. 4 pieces: Temporal Cascade's cooldown is reduced by 5 sec.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
-| Chronoweave Hood (`chronoweave_helmet`) | helmet | 90 | Int 11, Spi 10 | Healing Power 25 | haste 60, crit 25 |
-| Chronoweave Mantle (`chronoweave_shoulder`) | shoulder | 80 | Int 9, Spi 9 | Healing Power 18 | haste 60, crit 25 |
-| Chronoweave Robe (`chronoweave_chest`) | chest | 105 | Int 13, Spi 12 | Healing Power 25 | haste 60, crit 25 |
-| Chronoweave Handwraps (`chronoweave_gloves`) | gloves | 75 | Int 9, Spi 8 | Healing Power 18 | haste 60, crit 25 |
-| Chronoweave Leggings (`chronoweave_legs`) | legs | 95 | Int 11, Spi 11 | Healing Power 25 | haste 60, crit 25 |
+| Aetherweave Hood (`chronoweave_helmet`) | helmet | 90 | Int 11, Spi 10 | Healing Power 25 | haste 60, crit 25 |
+| Aetherweave Mantle (`chronoweave_shoulder`) | shoulder | 80 | Int 9, Spi 9 | Healing Power 18 | haste 60, crit 25 |
+| Aetherweave Robe (`chronoweave_chest`) | chest | 105 | Int 13, Spi 12 | Healing Power 25 | haste 60, crit 25 |
+| Aetherweave Handwraps (`chronoweave_gloves`) | gloves | 75 | Int 9, Spi 8 | Healing Power 18 | haste 60, crit 25 |
+| Aetherweave Leggings (`chronoweave_legs`) | legs | 95 | Int 11, Spi 11 | Healing Power 25 | haste 60, crit 25 |
 
-**Pyroclast Regalia** (`pyroclast`), fire (Pyromancy), cloth. 2 pieces: Phoenix Trance instantly refills every recharging Cinderfall charge instead of one. Damage taken no longer delays your spellcasting. 4 pieces: A Pyrelance spent on Hot Streak leaves its Ignite burning 50% hotter.
+**Pyroclast Regalia** (`pyroclast`), fire (Pyromancy), cloth. 2 pieces: Scald always critically strikes targets at or below 50 percent health. Damage taken no longer delays your spellcasting. 4 pieces: Your Fire spells' critical strikes outside Phoenix Trance reduce its remaining cooldown by 2 sec.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
@@ -272,7 +272,7 @@ design targets for the tuning pass.
 | Pyroclast Handwraps (`pyroclast_gloves`) | gloves | 75 | Int 11, Spi 6 | Spell Damage 10 | crit 60, haste 25 |
 | Pyroclast Leggings (`pyroclast_legs`) | legs | 95 | Int 15, Spi 7 | Spell Damage 14 | crit 60, haste 25 |
 
-**Frostquench Weave** (`frostquench`), frost (Cryomancy), cloth. 2 pieces: Rimelance critical strikes bank a second Icicle. Damage taken no longer delays your spellcasting. 4 pieces: Glacial Spike grants 2 Fingers of Frost, and an Ice Lance spent on Winter's Chill shaves 2 sec off Winterlash's cooldown.
+**Frostquench Weave** (`frostquench`), frost (Cryomancy), cloth. 2 pieces: Rimelance critical strikes bank a second Icicle, up to the maximum of 5. Damage taken no longer delays your spellcasting. 4 pieces: Winterlash plants 3 Winter's Chill charges, up from 2.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
@@ -284,7 +284,7 @@ design targets for the tuning pass.
 
 ### Warlock
 
-**Hexthread Shroud** (`hexthread`), affliction (Hexcraft), cloth. 2 pieces: Your Maledict Gaze strikes every 2 sec instead of every 2.5. Damage taken no longer delays your spellcasting. 4 pieces: A Sentence passed at 80 or more Condemnation refunds 25, and each Fate Thread adds 8% to its damage.
+**Hexthread Shroud** (`hexthread`), affliction (Hexcraft), cloth. 2 pieces: Needle of Fate grants 2 additional Condemnation. Damage taken no longer delays your spellcasting. 4 pieces: Passing Sentence refunds 10 Condemnation.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
@@ -294,7 +294,7 @@ design targets for the tuning pass.
 | Hexthread Handwraps (`hexthread_gloves`) | gloves | 75 | Int 11, Spi 6 | Spell Damage 10 | haste 60, crit 25 |
 | Hexthread Leggings (`hexthread_legs`) | legs | 95 | Int 15, Spi 7 | Spell Damage 14 | haste 60, crit 25 |
 
-**Gravebrand Regalia** (`gravebrand`), demonology (Necromancy), cloth. 2 pieces: Essence Reap creates a second Soul Fragment on critical strikes. Damage taken no longer delays your spellcasting. 4 pieces: Reaping Command costs 1 Soul Fragment, and detonating your Ossuary Mark grants 2 Soul Fragments.
+**Gravebrand Regalia** (`gravebrand`), demonology (Necromancy), cloth. 2 pieces: Reaping Command's cooldown is reduced by 2 sec. Damage taken no longer delays your spellcasting. 4 pieces: Reaping Command's unison strikes deal 25 percent more damage.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
@@ -304,7 +304,7 @@ design targets for the tuning pass.
 | Gravebrand Handwraps (`gravebrand_gloves`) | gloves | 75 | Int 11, Spi 6 | Spell Damage 10 | crit 60, haste 25 |
 | Gravebrand Leggings (`gravebrand_legs`) | legs | 95 | Int 15, Spi 7 | Spell Damage 14 | crit 60, haste 25 |
 
-**Ruincaller Vestments** (`ruincaller`), destruction (Ruination), cloth. 2 pieces: Conflagrate gains a third charge. Damage taken no longer delays your spellcasting. 4 pieces: Ruinbolt spends every banked Wrack, dealing 12% more damage for each point beyond the third.
+**Ruincaller Vestments** (`ruincaller`), destruction (Ruination), cloth. 2 pieces: Conflagrate holds 3 charges. Damage taken no longer delays your spellcasting. 4 pieces: Ruinbolt strikes 20 percent harder.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
@@ -316,7 +316,7 @@ design targets for the tuning pass.
 
 ### Druid
 
-**Moonscorch Raiment** (`moonscorch`), balance (Moongrove), leather. 2 pieces: Moonseed extends Lunar Tempest by 9 sec. Damage taken no longer delays your spellcasting. 4 pieces: Moonsurge also restores 35 mana, and Sunwake leaves 1 Moontide banked after it spends the tide.
+**Moonscorch Raiment** (`moonscorch`), balance (Moongrove), leather. 2 pieces: Moonseed may extend Lunar Tempest twice per application, to a maximum of 12 sec. Damage taken no longer delays your spellcasting. 4 pieces: Moonsurge and Sunwake strike 25 percent harder.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
@@ -326,7 +326,7 @@ design targets for the tuning pass.
 | Moonscorch Grips (`moonscorch_gloves`) | gloves | 150 | Int 11, Spi 6 | Spell Damage 10 | crit 60, haste 25 |
 | Moonscorch Breeches (`moonscorch_legs`) | legs | 195 | Int 15, Spi 7 | Spell Damage 14 | crit 60, haste 25 |
 
-**Wildfang Emberhide** (`wildfang_emberhide`), feral (Wildfang), cat, leather. 2 pieces: Redharvest's energy return rises by 15. 4 pieces: Redharvest leaves your Flense bleed ticking when it cashes out your wounds. Cannot occur more than once every 20 sec.
+**Wildfang Emberhide** (`wildfang_emberhide`), feral (Wildfang), cat, leather. 2 pieces: Redharvest restores 45 energy, up from 30. 4 pieces: Redharvest plants a fresh Flense on the target.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
@@ -336,7 +336,7 @@ design targets for the tuning pass.
 | Wildfang Grips (`wildfang_emberhide_gloves`) | gloves | 150 | Agi 11, Sta 6 | none | crit 60, haste 25 |
 | Wildfang Breeches (`wildfang_emberhide_legs`) | legs | 195 | Agi 15, Sta 7 | none | crit 60, haste 25 |
 
-**Cinderbark Ward** (`cinderbark`), feral (Wildfang), bear tank, leather. 2 pieces: Sweeping Claws banks Old Blood for every enemy struck. 4 pieces: Marrowbreak's emergency shield grows to 25% of your maximum health and refunds 25 rage.
+**Cinderbark Ward** (`cinderbark`), feral (Wildfang), bear tank, leather. 2 pieces: Sweeping Claws has a 30 percent chance to bank an additional Old Blood. 4 pieces: Marrowbreak hits 30 percent harder, and its emergency guard no longer replaces the strike.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
@@ -346,7 +346,7 @@ design targets for the tuning pass.
 | Cinderbark Grips (`cinderbark_gloves`) | gloves | 150 | Agi 8, Sta 9 | none | crit 60, haste 25 |
 | Cinderbark Breeches (`cinderbark_legs`) | legs | 195 | Agi 10, Sta 12 | none | crit 60, haste 25 |
 
-**Grovespring Raiment** (`grovespring`), restoration (Groveheart), leather. 2 pieces: Swiftmend does not consume the effect it feeds on. Cannot occur more than once every 20 sec. Damage taken no longer delays your spellcasting. 4 pieces: Overbloom harvests 75% of your remaining effects and immediately banks 1 Verdance.
+**Grovespring Raiment** (`grovespring`), restoration (Groveheart), leather. 2 pieces: Swiftmend consumes only your own Wildbloom or Second Bloom and heals 25 percent more. Damage taken no longer delays your spellcasting. 4 pieces: Overbloom harvests 75 percent of your remaining effects and banks 1 Verdance afterward.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|

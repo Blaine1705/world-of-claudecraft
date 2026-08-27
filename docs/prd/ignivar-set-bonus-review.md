@@ -139,6 +139,45 @@ Vesperash 4pc, Wildfang 2pc, Ruincaller 2pc (retuned).
   and bear sets share the spec id, so a gating decision is needed
   before the two feral sets can differ.
 
+## Rewrite rounds 2 and 3 (2026-08-28): RESOLVED
+
+The rewrite ran exactly as specified below and is COMPLETE. All 58
+bonuses in the plan doc and catalog are now the verified final set.
+Provenance: a main-loop redesign against this review's evidence, six
+per-class adversarial verifications, two delta verifications over
+post-verification changes, and a final targeted pass over the last
+redesigns. Roughly 25 further kills and corrections happened across
+those rounds. New failure classes discovered and now part of the
+checklist's living practice:
+
+14. Constants mirrored into aura VALUES read by dynamic HUD prints:
+    bend per wearer by baking the value into the aura at grant time and
+    make the combat read use the aura, never the constant (the Dawn's
+    Wrath and Veiled Edge pattern).
+15. Consume-before-damage ordering: resources consumed at cast commit
+    are invisible to damage-time reads (Desolation).
+16. Charge models delete cooldown entries: cooldownRefund is a hard
+    no-op beside bonusCharges rows (Twin Covenant).
+17. Probe-rotation zero-press: a bonus on a button the reference
+    rotation never presses pays nothing measurable (Bonecrush, second
+    veil strike; Scald and elemental Unleash accepted as disclosed
+    probe gaps with same-change harness cases).
+18. Derived-constant coupling: a proc rate can be a named input to an
+    owner-derived cost (Aether Surge's 14); check def comments.
+19. Additive accumulators: printed percents overstate delivered value
+    beside large per-ability baselines; print the delivered number or
+    size the modifier to deliver the printed one (Warspirit 0.48).
+20. Symbolic vs literal test pins: wearer-scoped bends leave symbolic
+    pins green; only literal string/value pins move, and copy edits for
+    wearer-scoped bonuses must NOT touch base tooltips.
+
+Two final-round redesigns (Dawnforged 4pc instant empowered Dawn's
+Embrace; Cinderbark 2pc chance-banked Old Blood) reuse twice-verified
+patterns and carry their verification notes in the catalog; every
+other bonus has two to four independent hostile reads. The set
+formerly named Chronoweave Vestments is now Aetherweave Vestments (the
+old name collided with the arcane mastery).
+
 ## Process for the rewrite
 
 Class by class: draft each replacement directly against this review's
