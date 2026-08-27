@@ -12,33 +12,39 @@ export const pending: Record<string, readonly string[]> = {
   "es": [
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
-    "hudChrome.wocMarket.walletUsdBalance"
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "es_ES": [
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
-    "hudChrome.wocMarket.walletUsdBalance"
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "fr_FR": [
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
-    "hudChrome.wocMarket.walletUsdBalance"
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "fr_CA": [
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
-    "hudChrome.wocMarket.walletUsdBalance"
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "en_CA": [],
   "it_IT": [
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
-    "hudChrome.wocMarket.walletUsdBalance"
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "de_DE": [
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
-    "hudChrome.wocMarket.walletUsdBalance"
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "zh_CN": [
     "hudChrome.wocMarket.walletUsdBalance"
@@ -55,7 +61,8 @@ export const pending: Record<string, readonly string[]> = {
   "pt_BR": [
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
-    "hudChrome.wocMarket.walletUsdBalance"
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "ru_RU": [
     "hudChrome.wocMarket.walletUsdBalance"
@@ -63,41 +70,49 @@ export const pending: Record<string, readonly string[]> = {
   "cs_CZ": [
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
-    "hudChrome.wocMarket.walletUsdBalance"
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "nl_NL": [
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
-    "hudChrome.wocMarket.walletUsdBalance"
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "pl_PL": [
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
-    "hudChrome.wocMarket.walletUsdBalance"
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "id_ID": [
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
-    "hudChrome.wocMarket.walletUsdBalance"
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "tr_TR": [
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
-    "hudChrome.wocMarket.walletUsdBalance"
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "sv_SE": [
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
-    "hudChrome.wocMarket.walletUsdBalance"
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "vi_VN": [
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
-    "hudChrome.wocMarket.walletUsdBalance"
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ],
   "da_DK": [
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
-    "hudChrome.wocMarket.walletUsdBalance"
+    "hudChrome.wocMarket.walletUsdBalance",
+    "hudChrome.wocMarket.walletUsdUnknown"
   ]
 };

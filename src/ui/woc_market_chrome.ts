@@ -306,7 +306,7 @@ function wocWalletBalanceHtml(wallet: WalletConnectionView, tokensPerUsd: number
       ? t('hudChrome.wocMarket.walletUsdBalance', {
           amount: usdDollarsText(wallet.balance / tokensPerUsd),
         })
-      : t('hudChrome.dailyRewards.unknown');
+      : t('hudChrome.wocMarket.walletUsdUnknown');
   return `<span class="wm-wallet-balance"><strong>${esc(tokens)}</strong><span>${esc(usd)}</span></span>`;
 }
 

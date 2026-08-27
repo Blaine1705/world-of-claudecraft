@@ -301,11 +301,17 @@ describe('woc_market_chrome: the standing banners', () => {
         tokensPerUsd,
       });
       expect(html).toContain('15,625 $WOC');
-      expect(html).toContain(t('hudChrome.dailyRewards.unknown'));
+      expect(html).toContain(t('hudChrome.wocMarket.walletUsdUnknown'));
       expect(html).not.toContain('$2.00');
       expect(html).not.toContain(' USD');
     },
   );
+
+  it('owns the unusable-rate fallback instead of borrowing Daily Rewards copy', () => {
+    const src = readFileSync(new URL('../src/ui/woc_market_chrome.ts', import.meta.url), 'utf8');
+    expect(src).toContain("t('hudChrome.wocMarket.walletUsdUnknown')");
+    expect(src).not.toContain("t('hudChrome.dailyRewards.unknown')");
+  });
 
   it('pins the desktop left-of-button columns and the one-column touch stack', () => {
     const componentsCss = readFileSync(
