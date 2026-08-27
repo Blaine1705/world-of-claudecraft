@@ -479,8 +479,15 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   },
   // --- bags (kind:'bag', equip into one of the 4 bag sockets for +bagSlots
   // pooled inventory capacity; the 16-slot backpack is implicit). Tiered by
-  // quality: common bags are vendor goods, uncommon drops from beasts, rare
-  // and epic from dungeon bosses. See src/sim/bags.ts for the capacity rules. ---
+  // quality: common bags are vendor goods, uncommon drop from beasts, rare
+  // and epic come from dungeon bosses and world drops, and the materials-only
+  // satchels (materialsOnly: true, feeding the second pool; see their own
+  // section below) run a parallel ladder. Two deliberate tiering calls, not
+  // drift: the 16-slot rare wayfarers_backpack out-slots the 14-slot epic
+  // mistcallers_duffel, the classic-era rare-large-bag shape, kept
+  // intentionally alongside the epic; and sellValue follows QUALITY tier,
+  // not slot count, so the epic duffel vendors above the larger rare, also
+  // intentional. See src/sim/bags.ts for the capacity rules. ---
   linen_pouch: {
     id: 'linen_pouch',
     name: 'Linen Pouch',

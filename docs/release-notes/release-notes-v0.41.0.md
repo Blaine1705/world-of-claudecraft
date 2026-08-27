@@ -76,8 +76,11 @@ Seven new bags, four of them reagent satchels:
 | Loombound Reagent Satchel | 24 | Materials only | Tailoring |
 
 The Loombound Reagent Satchel is the largest bag in the game. Both of the unique bags have
-Reliquary pages telling you where they come from. Item tooltips now name a materials-only bag as
-such, so the restriction is legible before you buy or craft one.
+Reliquary pages telling you where they come from: the Necromancer's Reagent Satchel joins the
+Gravewyrm Sanctum page and the Wayfarer's Backpack joins Spoils of the Realm. Because those two
+pages already shipped, a page you had completed shows as incomplete again until you find the new
+bag. Item tooltips now name a materials-only bag as such, so the restriction is legible before
+you buy or craft one.
 
 ## Reading your space at a glance
 
