@@ -7751,6 +7751,9 @@ export const ko_KR: EnTranslations = {
     "buyConfirmCancel": "취소"
   },
   "crucibleShop": {
+    "browse": "인장 교환",
+    "browseAria": "{name}에게 도가니 인장 교환",
+    "empty": "내 직업으로 교환할 수 있는 세트 부위가 없습니다.",
     "balance": "보유한 인장: {list}",
     "noSigils": "도가니 인장을 갖고 있지 않습니다.",
     "price": "{sigil} 1개",

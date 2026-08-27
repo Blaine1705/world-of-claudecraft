@@ -1122,6 +1122,13 @@ export const en = {
     // title/close reuse the vendor keys; only the sigil-specific strings live
     // here. {list} is the viewer's held sigils with counts; {sigil} is the
     // one token a row costs.
+    // The gossip-dialog row label: its OWN copy (never "Browse Goods"), since
+    // a redemption counter is not a goods grid.
+    browse: 'Redeem Sigils',
+    browseAria: 'Redeem Crucible sigils with {name}',
+    // The zero-rows arm of the shop grid; unreachable while every class has
+    // sets, but a silently empty panel is the worse failure mode.
+    empty: 'No set pieces are redeemable for your class.',
     balance: 'Your sigils: {list}',
     noSigils: 'You hold no Crucible sigils.',
     price: '1 {sigil}',

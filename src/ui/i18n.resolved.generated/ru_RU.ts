@@ -7751,6 +7751,9 @@ export const ru_RU: EnTranslations = {
     "buyConfirmCancel": "Отмена"
   },
   "crucibleShop": {
+    "browse": "Обменять печати",
+    "browseAria": "Обменять печати Горнила у {name}",
+    "empty": "Для вашего класса нет доступных частей комплекта.",
     "balance": "Ваши печати: {list}",
     "noSigils": "У вас нет печатей Горнила.",
     "price": "1 x {sigil}",

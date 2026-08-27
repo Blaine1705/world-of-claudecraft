@@ -98,12 +98,10 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     // appends (Robe sigils, shields) live in HEROIC_BOSS_LOOT; the weapon
     // groups join at the end with the weapon wave. APPEND-only, never reorder.
     loot: [
-      // Plain copper, no heroicCopper: only a registered heroic finale boss
-      // may carry the heroic money base (tests/heroic_finale_gold.test.ts),
-      // the Inner Crucible has no heroic tuning record yet, and the normal
-      // base already equals the shared 20g raid base so the substitution
-      // would be a no-op anyway.
-      { copper: 200000, chance: 1 },
+      // Varkhul is the Inner Crucible's registered heroic finale boss
+      // (dungeon_difficulty.ts), so his money entry carries the shared raid
+      // heroic base like Ignivar's (tests/heroic_finale_gold.test.ts).
+      { copper: 200000, heroicCopper: NYTHRAXIS_HEROIC_COPPER, chance: 1 },
       { itemId: 'sigil_anvil_legs', chance: 0.34, rollGroup: 'varkhul_sigil_legging' },
       { itemId: 'sigil_ember_legs', chance: 0.33, rollGroup: 'varkhul_sigil_legging' },
       { itemId: 'sigil_tempest_legs', chance: 0.33, rollGroup: 'varkhul_sigil_legging' },

@@ -84,7 +84,16 @@ export function renderCrucibleVendorWindow(
     );
     goodsGrid.appendChild(row);
   }
-  if (view.rows.length > 0) el.appendChild(goodsGrid);
+  if (view.rows.length > 0) {
+    el.appendChild(goodsGrid);
+  } else {
+    // Unreachable while every class has sets, but a silently empty panel is
+    // the worse failure mode than an explicit line.
+    const empty = document.createElement('div');
+    empty.className = 'vendor-section-title';
+    empty.textContent = t('crucibleShop.empty');
+    el.appendChild(empty);
+  }
 
   el.querySelector('[data-close]')?.addEventListener('click', () => deps.onClose());
   el.style.display = 'block';

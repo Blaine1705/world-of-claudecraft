@@ -482,7 +482,9 @@ export class QuestDialogController {
       html += `<button type="button" class="qd-list-item" data-heroic-shop="1" aria-label="${esc(t('questUi.dialog.browseGoodsAria', { name: npcName }))}">${heroicMarkIconHtml()} ${esc(t('questUi.dialog.browseGoods'))}</button>`;
     }
     if (hasCrucibleVendor) {
-      html += `<button type="button" class="qd-list-item" data-crucible-shop="1" aria-label="${esc(t('questUi.dialog.browseGoodsAria', { name: npcName }))}"><span class="gold">${svgIcon('crafting')}</span> ${esc(t('questUi.dialog.browseGoods'))}</button>`;
+      // Its OWN label and accessible name (the hasWarfareVendor rule): a sigil
+      // redemption counter never reads as generic "Browse Goods".
+      html += `<button type="button" class="qd-list-item" data-crucible-shop="1" aria-label="${esc(t('crucibleShop.browseAria', { name: npcName }))}"><span class="gold">${svgIcon('crafting')}</span> ${esc(t('crucibleShop.browse'))}</button>`;
     }
     if (hasWarfareVendor) {
       // Its OWN label and accessible name: this row sits beside the generic

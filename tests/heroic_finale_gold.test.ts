@@ -27,7 +27,11 @@ const NORMAL_ROLL_MIN = 9000; // ceil(15000 * 0.6)
 const NORMAL_ROLL_MAX = 21000; // ceil(15000 * 1.4)
 // The raid-tier finales: both pay the shared 20g heroic base and the 15g
 // normal base (the Ignivar development raid mirrors the Nythraxis wiring).
-const RAID_FINALE_DUNGEON_IDS = new Set(['nythraxis_boss_arena', 'ignivar_raid_arena']);
+const RAID_FINALE_DUNGEON_IDS = new Set([
+  'nythraxis_boss_arena',
+  'ignivar_raid_arena',
+  'ignivar_inner_crucible',
+]);
 // The full normal-mode finale money ladder, pinned so a single-boss retune
 // (up or down) is a deliberate edit here, not a drive-by.
 const NORMAL_FINALE_COPPER: Record<string, number> = {
@@ -38,6 +42,7 @@ const NORMAL_FINALE_COPPER: Record<string, number> = {
   wildheart_basin: 15000,
   nythraxis_boss_arena: 150000,
   ignivar_raid_arena: 150000,
+  ignivar_inner_crucible: 200000,
 };
 
 function copperEntries(loot: LootEntry[] | undefined) {

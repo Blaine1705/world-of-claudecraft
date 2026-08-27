@@ -12247,7 +12247,9 @@ const RULES: Rule[] = [
     build: (m) => tSim('error.heroicMarksNeeded', { marks: m[1], name: locItem(m[2]) }),
   },
   {
-    re: /^You need a (.+) to buy (.+)\.$/,
+    // Anchored on the sigil naming vocabulary so a future unrelated
+    // "You need a X to buy Y." emit cannot be shadowed by this rule.
+    re: /^You need a (.+ Sigil of the .+) to buy (.+)\.$/,
     build: (m) => tSim('error.sigilNeeded', { sigil: locItem(m[1]), name: locItem(m[2]) }),
   },
   {

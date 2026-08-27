@@ -363,4 +363,20 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     finalBossId: 'ignivar_herald_of_the_last_flame',
     marksPerParticipant: 3,
   },
+  // The Inner Crucible inherits the raid claim's difficulty from the arena
+  // (instances/dungeons.ts), so without its own record a heroic run would
+  // reach a VANILLA Varkhul while still collecting his heroic-only loot
+  // appends: free loot for zero extra difficulty. The multipliers mirror the
+  // arena's provisional values above and stay provisional with them.
+  ignivar_inner_crucible: {
+    id: 'ignivar_inner_crucible',
+    difficulty: 'heroic',
+    level: 22,
+    healthMultiplier: 2.5,
+    damageMultiplier: 2,
+    addDamageMultiplier: 2,
+    armorMultiplier: 1.2,
+    finalBossId: 'varkhul_forgefather_of_the_last_flame',
+    marksPerParticipant: 3,
+  },
 };

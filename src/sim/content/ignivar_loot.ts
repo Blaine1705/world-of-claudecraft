@@ -24,10 +24,14 @@
 // unregistered set id folds to nothing everywhere by design.
 //
 // Sigils: 15 redemption tokens (5 tier slots x 3 balanced-mixed class
-// groups, one mail + one leather + one cloth class each). Kind 'tool',
-// soulbound, noDiscard, the heroic_mark pattern; one sigil buys any one
-// matching-slot set piece for the holder's class at the Crucible
-// Quartermaster (CRUCIBLE_VENDOR_STOCK).
+// groups, one mail + one leather + one cloth class each). Kind 'tool' and
+// soulbound like heroic_mark, but deliberately NOT noDiscard: unlike the
+// universal mark, a sigil is class-locked, and the loot path does not gate
+// need/greed or FFA pickup on class, so a wrong-class looter must be able
+// to destroy the token or it wedges a bag slot forever (soulbound blocks
+// trade, mail, market, and sale). One sigil buys any one matching-slot set
+// piece for the holder's class at the Crucible Quartermaster
+// (CRUCIBLE_VENDOR_STOCK).
 
 import type { ItemDef, NpcDef } from '../types';
 
@@ -2469,7 +2473,6 @@ export const IGNIVAR_SIGIL_ITEMS: Record<string, ItemDef> = {
     stackSize: 20,
     sellValue: 0,
     soulbound: true,
-    noDiscard: true,
     requiredClass: ['warrior', 'druid', 'mage'],
   },
   sigil_ember_helmet: {
@@ -2480,7 +2483,6 @@ export const IGNIVAR_SIGIL_ITEMS: Record<string, ItemDef> = {
     stackSize: 20,
     sellValue: 0,
     soulbound: true,
-    noDiscard: true,
     requiredClass: ['paladin', 'hunter', 'priest'],
   },
   sigil_tempest_helmet: {
@@ -2491,7 +2493,6 @@ export const IGNIVAR_SIGIL_ITEMS: Record<string, ItemDef> = {
     stackSize: 20,
     sellValue: 0,
     soulbound: true,
-    noDiscard: true,
     requiredClass: ['shaman', 'rogue', 'warlock'],
   },
   sigil_anvil_shoulder: {
@@ -2502,7 +2503,6 @@ export const IGNIVAR_SIGIL_ITEMS: Record<string, ItemDef> = {
     stackSize: 20,
     sellValue: 0,
     soulbound: true,
-    noDiscard: true,
     requiredClass: ['warrior', 'druid', 'mage'],
   },
   sigil_ember_shoulder: {
@@ -2513,7 +2513,6 @@ export const IGNIVAR_SIGIL_ITEMS: Record<string, ItemDef> = {
     stackSize: 20,
     sellValue: 0,
     soulbound: true,
-    noDiscard: true,
     requiredClass: ['paladin', 'hunter', 'priest'],
   },
   sigil_tempest_shoulder: {
@@ -2524,7 +2523,6 @@ export const IGNIVAR_SIGIL_ITEMS: Record<string, ItemDef> = {
     stackSize: 20,
     sellValue: 0,
     soulbound: true,
-    noDiscard: true,
     requiredClass: ['shaman', 'rogue', 'warlock'],
   },
   sigil_anvil_chest: {
@@ -2535,7 +2533,6 @@ export const IGNIVAR_SIGIL_ITEMS: Record<string, ItemDef> = {
     stackSize: 20,
     sellValue: 0,
     soulbound: true,
-    noDiscard: true,
     requiredClass: ['warrior', 'druid', 'mage'],
   },
   sigil_ember_chest: {
@@ -2546,7 +2543,6 @@ export const IGNIVAR_SIGIL_ITEMS: Record<string, ItemDef> = {
     stackSize: 20,
     sellValue: 0,
     soulbound: true,
-    noDiscard: true,
     requiredClass: ['paladin', 'hunter', 'priest'],
   },
   sigil_tempest_chest: {
@@ -2557,7 +2553,6 @@ export const IGNIVAR_SIGIL_ITEMS: Record<string, ItemDef> = {
     stackSize: 20,
     sellValue: 0,
     soulbound: true,
-    noDiscard: true,
     requiredClass: ['shaman', 'rogue', 'warlock'],
   },
   sigil_anvil_gloves: {
@@ -2568,7 +2563,6 @@ export const IGNIVAR_SIGIL_ITEMS: Record<string, ItemDef> = {
     stackSize: 20,
     sellValue: 0,
     soulbound: true,
-    noDiscard: true,
     requiredClass: ['warrior', 'druid', 'mage'],
   },
   sigil_ember_gloves: {
@@ -2579,7 +2573,6 @@ export const IGNIVAR_SIGIL_ITEMS: Record<string, ItemDef> = {
     stackSize: 20,
     sellValue: 0,
     soulbound: true,
-    noDiscard: true,
     requiredClass: ['paladin', 'hunter', 'priest'],
   },
   sigil_tempest_gloves: {
@@ -2590,7 +2583,6 @@ export const IGNIVAR_SIGIL_ITEMS: Record<string, ItemDef> = {
     stackSize: 20,
     sellValue: 0,
     soulbound: true,
-    noDiscard: true,
     requiredClass: ['shaman', 'rogue', 'warlock'],
   },
   sigil_anvil_legs: {
@@ -2601,7 +2593,6 @@ export const IGNIVAR_SIGIL_ITEMS: Record<string, ItemDef> = {
     stackSize: 20,
     sellValue: 0,
     soulbound: true,
-    noDiscard: true,
     requiredClass: ['warrior', 'druid', 'mage'],
   },
   sigil_ember_legs: {
@@ -2612,7 +2603,6 @@ export const IGNIVAR_SIGIL_ITEMS: Record<string, ItemDef> = {
     stackSize: 20,
     sellValue: 0,
     soulbound: true,
-    noDiscard: true,
     requiredClass: ['paladin', 'hunter', 'priest'],
   },
   sigil_tempest_legs: {
@@ -2623,7 +2613,6 @@ export const IGNIVAR_SIGIL_ITEMS: Record<string, ItemDef> = {
     stackSize: 20,
     sellValue: 0,
     soulbound: true,
-    noDiscard: true,
     requiredClass: ['shaman', 'rogue', 'warlock'],
   },
 };

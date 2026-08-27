@@ -7751,6 +7751,9 @@ export const ja_JP: EnTranslations = {
     "buyConfirmCancel": "キャンセル"
   },
   "crucibleShop": {
+    "browse": "印章を交換する",
+    "browseAria": "{name}と坩堝の印章を交換する",
+    "empty": "あなたのクラスで交換できるセット装備はありません。",
     "balance": "所持している印章: {list}",
     "noSigils": "坩堝の印章を持っていません。",
     "price": "{sigil} 1個",

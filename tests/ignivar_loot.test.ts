@@ -6,6 +6,7 @@
 // program appears only where authored, and Healing Power never rides a damage
 // identity.
 import { describe, expect, it } from 'vitest';
+import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
 import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import {
   CRUCIBLE_VENDOR_STOCK,
@@ -19,6 +20,7 @@ import {
   IGNIVAR_SIGIL_ITEMS,
   IGNIVAR_WEAPON_ITEMS,
 } from '../src/sim/content/ignivar_loot';
+import { ITEM_SETS } from '../src/sim/content/item_sets';
 import { WEAPON_TYPE_BY_ITEM } from '../src/sim/content/weapon_skin_rules';
 import { ITEMS, MOBS } from '../src/sim/data';
 import {
@@ -124,6 +126,21 @@ describe('ignivar loot: the 29 sets', () => {
     }
   });
 
+  it('the 29 set ids are deliberately ABSENT from ITEM_SETS (Phase A)', () => {
+    // The set: tags ship before their bonuses: an unregistered set id folds to
+    // nothing everywhere by design, and this pin is the forcing function that
+    // distinguishes that deliberate Phase A state from a typo'd id. The Phase B
+    // bonus change INVERTS this assertion when it registers the 29 sets
+    // (docs/prd/ignivar-set-bonus-final.md).
+    const setIds = new Set(
+      Object.values(IGNIVAR_SET_ITEMS).flatMap((item) => (item.set ? [item.set] : [])),
+    );
+    expect(setIds.size).toBe(29);
+    for (const setId of setIds) {
+      expect(ITEM_SETS[setId], `${setId} must stay unregistered until Phase B`).toBeUndefined();
+    }
+  });
+
   it('set pieces carry the 60/25 crit+haste rating pair and never Hit', () => {
     for (const item of Object.values(IGNIVAR_SET_ITEMS)) {
       const ratings = [item.critRating ?? 0, item.hasteRating ?? 0].sort((a, b) => b - a);
@@ -139,7 +156,10 @@ describe('ignivar loot: sigils and redemption stock', () => {
       expect(sigil.kind, sigil.id).toBe('tool');
       expect(sigil.quality, sigil.id).toBe('epic');
       expect(sigil.soulbound, sigil.id).toBe(true);
-      expect(sigil.noDiscard, sigil.id).toBe(true);
+      // Deliberately discardable, UNLIKE heroic_mark: the class lock plus the
+      // ungated loot path means a wrong-class looter must be able to destroy
+      // the token, or soulbound + noDiscard wedges a bag slot forever.
+      expect(sigil.noDiscard, sigil.id).toBeUndefined();
       expect(sigil.stackSize, sigil.id).toBe(20);
       const group = sigil.id.split('_')[1];
       expect(sigil.requiredClass, sigil.id).toEqual(SIGIL_GROUPS[group]);
@@ -327,6 +347,17 @@ describe('ignivar loot: the boss drop tables', () => {
       'loop_of_quiet_springs',
     ]);
     for (const [name, group] of groups) expect(group.sum, name).toBeCloseTo(1, 6);
+  });
+
+  it('the Inner Crucible is a registered heroic room, so the Varkhul appends are LIVE', () => {
+    // The wing inherits the raid claim's difficulty from the arena
+    // (instances/dungeons.ts), so the heroic-only appends below fire on a
+    // heroic run. This pin keeps the tuning record and the loot appends in
+    // lockstep: without the record a heroic run would reach a vanilla Varkhul
+    // while still collecting the appends (free loot for zero difficulty).
+    const tuning = HEROIC_DUNGEON_TUNING.ignivar_inner_crucible;
+    expect(tuning).toBeDefined();
+    expect(tuning?.finalBossId).toBe('varkhul_forgefather_of_the_last_flame');
   });
 
   it('Heroic appends pay the Robe sigil on both bosses and the shields on Varkhul', () => {

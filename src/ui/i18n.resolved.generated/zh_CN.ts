@@ -7751,6 +7751,9 @@ export const zh_CN: EnTranslations = {
     "buyConfirmCancel": "取消"
   },
   "crucibleShop": {
+    "browse": "兑换印记",
+    "browseAria": "与{name}兑换熔炉印记",
+    "empty": "你的职业没有可兑换的套装部件。",
     "balance": "你持有的印记: {list}",
     "noSigils": "你没有持有任何熔炉印记。",
     "price": "1枚{sigil}",

@@ -79,6 +79,19 @@ describe('crucible quartermaster: buy path', () => {
     ).toBe(true);
   });
 
+  it('redemptions repeat: each buy debits exactly one sigil from the stack', () => {
+    const sim = raidSim('warrior');
+    standAtVendor(sim);
+    sim.addItem('sigil_anvil_helmet', 3, sim.playerId);
+    sim.drainEvents();
+
+    sim.buyCrucibleVendorItem('slagbreaker_helmet', sim.playerId);
+    sim.buyCrucibleVendorItem('slagbreaker_helmet', sim.playerId);
+
+    expect(sim.countItem('slagbreaker_helmet', sim.playerId)).toBe(2);
+    expect(sim.countItem('sigil_anvil_helmet', sim.playerId)).toBe(1);
+  });
+
   it('refuses without the matching sigil (a different slot sigil does not pay)', () => {
     const sim = raidSim('warrior');
     standAtVendor(sim);

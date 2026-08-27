@@ -7751,6 +7751,9 @@ export const sv_SE: EnTranslations = {
     "buyConfirmCancel": "Avbryt"
   },
   "crucibleShop": {
+    "browse": "Redeem Sigils",
+    "browseAria": "Redeem Crucible sigils with {name}",
+    "empty": "No set pieces are redeemable for your class.",
     "balance": "Your sigils: {list}",
     "noSigils": "You hold no Crucible sigils.",
     "price": "1 {sigil}",

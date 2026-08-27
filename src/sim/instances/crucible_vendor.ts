@@ -42,19 +42,21 @@ export function buyCrucibleVendorItem(ctx: SimContext, itemId: string, pid?: num
     ctx.error(meta.entityId, 'That item is not for sale.');
     return;
   }
-  // Class gate: the shop only redeems pieces the buyer's class can wear, so a
-  // sigil can never turn into a set piece for another class. The refusal reuses
-  // the established equip-gate line (error.cannotEquip in sim_i18n.ts).
-  if (def.requiredClass && !def.requiredClass.includes(meta.cls)) {
-    ctx.error(meta.entityId, 'You cannot equip that.');
-    return;
-  }
   if (p.dead) {
     ctx.error(meta.entityId, "You can't do that while dead.");
     return;
   }
   if (!crucibleVendorInRange(ctx, p)) {
     ctx.error(meta.entityId, 'Too far away.');
+    return;
+  }
+  // Class gate: the shop only redeems pieces the buyer's class can wear, so a
+  // sigil can never turn into a set piece for another class (the shared-group
+  // sigil makes the cross-class conversion reachable without this). Below the
+  // range check to match buyHeroicVendorItem's refusal ladder. The refusal
+  // reuses the established equip-gate line (error.cannotEquip in sim_i18n.ts).
+  if (def.requiredClass && !def.requiredClass.includes(meta.cls)) {
+    ctx.error(meta.entityId, 'You cannot equip that.');
     return;
   }
   if (ctx.countItem(entry.sigilId, meta.entityId) < 1) {

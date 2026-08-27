@@ -7751,6 +7751,9 @@ export const vi_VN: EnTranslations = {
     "buyConfirmCancel": "Hủy bỏ"
   },
   "crucibleShop": {
+    "browse": "Redeem Sigils",
+    "browseAria": "Redeem Crucible sigils with {name}",
+    "empty": "No set pieces are redeemable for your class.",
     "balance": "Your sigils: {list}",
     "noSigils": "You hold no Crucible sigils.",
     "price": "1 {sigil}",

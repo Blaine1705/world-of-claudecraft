@@ -7751,6 +7751,9 @@ export const en_XA: EnTranslations = {
     "buyConfirmCancel": "[Çáñçéļ]"
   },
   "crucibleShop": {
+    "browse": "[Ŕéðééɱ Šíĝíļš]",
+    "browseAria": "[Ŕéðééɱ Çŕúçíƀļé šíĝíļš ŵíţĥ {name}]",
+    "empty": "[Ñó šéţ þíéçéš áŕé ŕéðééɱáƀļé ƒóŕ ýóúŕ çļášš.]",
     "balance": "[Ýóúŕ šíĝíļš: {list}]",
     "noSigils": "[Ýóú ĥóļð ñó Çŕúçíƀļé šíĝíļš.]",
     "price": "[1 {sigil}]",

@@ -783,11 +783,13 @@ Varkhul encounter prop.
 ## Boss loot tables: one tier, spread across Normal and Heroic
 
 Implemented: both bosses now ship these tables (dungeons.ts loot arrays plus
-the HEROIC_BOSS_LOOT appends, pinned by tests/ignivar_loot.test.ts), with one
-recorded deviation: Varkhul carries plain copper because only a registered
-heroic finale boss may carry the heroic money base, and the Inner Crucible has
-no heroic tuning record yet, so Varkhul's heroic-only appends stay dormant
-until the raid branch adds that record. Settled 2026-08-27: this raid has NO
+the HEROIC_BOSS_LOOT appends, pinned by tests/ignivar_loot.test.ts). The
+Inner Crucible carries its own heroic tuning record (provisional multipliers
+mirroring the arena's) because the wing inherits the raid claim's difficulty
+from the arena, so without it a heroic run would reach a vanilla Varkhul
+while still collecting his heroic-only appends. Varkhul is therefore a
+registered heroic finale boss and carries the shared raid heroic money base
+like Ignivar. Settled 2026-08-27: this raid has NO
 heroic item-level layer. Instead the single ilvl-35 table spreads across
 the two difficulties: Normal pays four of the five sigil slots (enough for
 the 4-piece bonus), the off-set armor, and the smaller weapons; Heroic
@@ -831,11 +833,14 @@ promoted Warden minibosses take over groups when it lands (below).
 
 ### Varkhul, heroic-only appends
 
+The shipped append order (parity-sensitive; the code is the authority) is
+robe sigils, shields, weapons:
+
 | Group | Entries | Chance each |
 |---|---|---|
 | varkhul_h_sigil_robe | Robe Sigil of the Anvil / Ember / Tempest | 1/3 each |
-| varkhul_h_weapon | Heart of the End Greatblade, Forgefire Spire, Staff of the Last Spring | 1/3 each |
 | varkhul_h_shields | Bulwark of the Inner Crucible, Ember Warden's Barrier | 0.5 each |
+| varkhul_h_weapon | Heart of the End Greatblade, Forgefire Spire, Staff of the Last Spring | 1/3 each |
 
 A Normal kill pays five guaranteed drops (two sigils, one off-set piece or
 weapon, one jewelry piece, copper); a Heroic kill pays seven or eight. A
