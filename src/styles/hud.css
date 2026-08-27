@@ -3845,6 +3845,19 @@
        the horizontal strip packs its buttons flush (owner request). */
     gap: 0;
   }
+  /* The daily-rewards chest's 46px box plus its 14px column spacing
+     inflated its row to 60px, floating the row's top edge 30px above the
+     30px buttons: exactly the seam the rows-touch rule above closes. In
+     the strip it takes a standard 30px slot and its art (overflow is
+     visible on the button) simply pokes past the box. */
+  body.menu-rail-horizontal #daily-rewards-button {
+    height: 30px;
+    margin-bottom: 0;
+  }
+  body.menu-rail-horizontal #daily-rewards-button .daily-rewards-icon {
+    width: 44px;
+    height: 44px;
+  }
   .micro-btn {
     width: 34px;
     height: 30px;

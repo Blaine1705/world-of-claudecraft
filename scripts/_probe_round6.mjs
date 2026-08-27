@@ -54,15 +54,31 @@ const rail = await page.evaluate(() => {
   }
   const a = document.getElementById('side-buttons-col-a').getBoundingClientRect();
   const b = document.getElementById('side-buttons-col-b').getBoundingClientRect();
+  // The BUTTON bands, not just the containers: a tall child (the daily
+  // rewards chest) once inflated its row, floating the row's top edge 30px
+  // above its own 30px buttons while the container seam still measured 0.
+  const band = (col) => {
+    const kids = [...col.children].filter((k) => k.offsetParent !== null);
+    return {
+      top: Math.min(...kids.map((k) => k.getBoundingClientRect().top)),
+      bottom: Math.max(...kids.map((k) => k.getBoundingClientRect().bottom)),
+    };
+  };
+  const bandA = band(document.getElementById('side-buttons-col-a'));
+  const bandB = band(document.getElementById('side-buttons-col-b'));
   return {
     colGaps: [...new Set(cols.map((c) => getComputedStyle(c).columnGap))],
     maxSeam: Math.max(...seams),
     rowSeam: Math.abs(b.top - a.bottom),
+    bandSeam: bandB.top - bandA.bottom,
   };
 });
 check(
-  'horizontal menu buttons pack flush: no per-item gap, rows touch',
-  rail.colGaps.every((g) => g === '0px' || g === 'normal') && rail.maxSeam <= 0 && rail.rowSeam < 1,
+  'horizontal menu buttons pack flush: no per-item gap, button rows touch',
+  rail.colGaps.every((g) => g === '0px' || g === 'normal') &&
+    rail.maxSeam <= 0 &&
+    rail.rowSeam < 1 &&
+    rail.bandSeam <= 0,
   rail,
 );
 await page.screenshot({ path: 'tmp/round6_horizontal_menu.png' });
