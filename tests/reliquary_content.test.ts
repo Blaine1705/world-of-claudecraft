@@ -803,6 +803,19 @@ describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
     .filter((bossId) => catalogueableHeroicIds(HEROIC_BOSS_LOOT[bossId]).length > 0)
     .sort();
 
+  /** The SOURCE_PENDING_RULING pattern for whole bosses: a visible maintainer
+   *  decision that a boss's heroic page is deliberately deferred, never an
+   *  accident. Both pins below stay bidirectional: a pended boss must still be
+   *  a live GEAR_BOSSES member (the row cannot rot after a retune) and must
+   *  have NO page yet (authoring the page forces the row out of this ledger). */
+  const HEROIC_PAGE_PENDING: Record<string, string> = {
+    // The Crucible raid ships behind a development-only entrance; its pages
+    // land with the launch pass (docs/prd/ignivar-raid-loot.md).
+    ignivar_herald_of_the_last_flame: 'development-only raid; pages land with the launch pass',
+    varkhul_forgefather_of_the_last_flame:
+      'development-only raid; pages land with the launch pass',
+  };
+
   it('carves out only auto-generated heroic variants, never a bespoke heroic unique', () => {
     // Positive control: the carve-out predicate really fires on the live variant id.
     expect(isHeroicVariantId('heroic_duskwhisper')).toBe(true);
@@ -828,11 +841,16 @@ describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
   });
 
   it('RELIQUARY_HEROIC_GEAR lists every catalogue-able HEROIC_BOSS_LOOT id', () => {
+    // The pending ledger only defers live gear bosses; a stale row reds here.
+    for (const bossId of Object.keys(HEROIC_PAGE_PENDING)) {
+      expect(GEAR_BOSSES, `${bossId} pended but not a live gear boss`).toContain(bossId);
+    }
+    const AUTHORED_BOSSES = GEAR_BOSSES.filter((b) => HEROIC_PAGE_PENDING[b] === undefined);
     // Bidirectional first: the loop below walks live bosses, so a stale
     // RELIQUARY_HEROIC_GEAR key for a removed boss would sit unnoticed as
     // dead data without this pin.
-    expect(Object.keys(RELIQUARY_HEROIC_GEAR).sort()).toEqual(GEAR_BOSSES);
-    for (const bossId of GEAR_BOSSES) {
+    expect(Object.keys(RELIQUARY_HEROIC_GEAR).sort()).toEqual(AUTHORED_BOSSES);
+    for (const bossId of AUTHORED_BOSSES) {
       const liveGear = catalogueableHeroicIds(HEROIC_BOSS_LOOT[bossId]);
       const authored = [
         ...(RELIQUARY_HEROIC_GEAR[bossId as keyof typeof RELIQUARY_HEROIC_GEAR] ?? []),
@@ -857,6 +875,12 @@ describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
   it('every HEROIC_BOSS_LOOT boss with catalogue-able gear has a mapped heroic page', () => {
     expect(GEAR_BOSSES.length).toBeGreaterThan(0);
     for (const bossId of GEAR_BOSSES) {
+      if (HEROIC_PAGE_PENDING[bossId] !== undefined) {
+        // The other bidirectional arm: a pended boss that gains its page must
+        // leave the ledger in the same change.
+        expect(HEROIC_PAGE_BY_BOSS[bossId], `${bossId} paged AND pended`).toBeUndefined();
+        continue;
+      }
       expect(HEROIC_PAGE_BY_BOSS[bossId], `page map for ${bossId}`).toBeDefined();
     }
   });
@@ -1607,9 +1631,15 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
 
 describe('Reliquary growth sweeps (new content must page or opt out)', () => {
   it('every dungeon whose mobs carry rare+ loot maps to a normal-difficulty page', () => {
-    // No exclusions today: add a `dungeonId: 'rationale'` row here only when a
-    // dungeon's rare+ drops deliberately stay out of the museum.
-    const EXCLUDED_DUNGEONS: Record<string, string> = {};
+    // Add a `dungeonId: 'rationale'` row here only when a dungeon's rare+
+    // drops deliberately stay out of the museum.
+    const EXCLUDED_DUNGEONS: Record<string, string> = {
+      // The Crucible raid ships behind a development-only entrance; its
+      // Reliquary pages land with the raid's launch pass
+      // (docs/prd/ignivar-raid-loot.md), not before players can reach it.
+      ignivar_raid_arena: 'development-only raid; pages land with the launch pass',
+      ignivar_inner_crucible: 'development-only raid; pages land with the launch pass',
+    };
     const pageByDungeon = new Map<string, string>();
     for (const page of RELIQUARY_PAGES) {
       const src = page.clearSource;
