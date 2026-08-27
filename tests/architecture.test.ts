@@ -2292,6 +2292,7 @@ const UI_DOM_MODULES = [
   'src/ui/wiki_link.ts',
   'src/ui/window_drag.ts',
   'src/ui/window_resize.ts',
+  'src/ui/woc_market_link.ts',
 ].map((rel) => join(repoRoot, rel));
 
 // The sweep's domain: every src/ui module the other two sweeps do NOT already

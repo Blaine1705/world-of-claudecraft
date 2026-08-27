@@ -8524,6 +8524,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.loading': '正在加载交易所...',
   'hudChrome.wocMarket.loadFailed': '无法连接交易所，请稍后再试。',
   'hudChrome.wocMarket.disabledRealm': '本服务器未开放 $WOC 交易所。',
+  'hudChrome.wocMarket.browserOnlyConfirmTitle': '在浏览器中打开 $WOC 交易所？',
+  'hudChrome.wocMarket.browserOnlyConfirmBody':
+    '$WOC 交易所仅在 World of ClaudeCraft 的浏览器版本中提供。即将在浏览器中打开 World of ClaudeCraft，你可以在那里登录并打开交易所，游戏会继续在这里运行。',
+  'hudChrome.wocMarket.browserOnlyConfirmOpen': '在浏览器中打开',
+  'hudChrome.wocMarket.browserOnlyConfirmCancel': '取消',
   'hudChrome.wocMarket.pausedBanner': '交易已暂停。拍卖倒计时照常进行；新的挂单、出价、报价和付款需等交易恢复后再进行，已发出的付款仍会照常结算。',
   'hudChrome.wocMarket.walletBanner': '绑定并验证钱包后即可在交易所出价、购买或出售。',
   'hudChrome.wocMarket.walletBannerCta': '连接钱包',

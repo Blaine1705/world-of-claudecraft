@@ -140,7 +140,15 @@ const MONOLITHS: MonolithRow[] = [
     // resolvers stay out in src/ui/hud_voice_cues.ts, and the merged file lands
     // below the batch-side pin above. Pinned to the exact merged count, keeping
     // the zero-headroom posture.
-    ceiling: 18482,
+    // Raised 18482 -> 18527 (+45) for the $WOC Exchange wrapped-DESKTOP-shell
+    // browser hand-off: attachWocMarketBrowserOnlyNotice, the shared
+    // revealWocMarketLauncher extraction, attachWocMarket's browser-only-flag
+    // reset, and toggleWocMarket's switch over the pure decision
+    // wocMarketToggleAction (src/ui/woc_market_link.ts), which carries the
+    // actual state-machine logic and its own test coverage so hud.ts keeps
+    // only thin delegators. Maintainer decision prepared for PR review; exact
+    // count, any further growth reds again.
+    ceiling: 18527,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

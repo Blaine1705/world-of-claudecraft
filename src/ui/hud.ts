@@ -775,6 +775,7 @@ import { makeWindowFocus } from './window_focus';
 import { installWindowResize, markResizableWindow } from './window_resize';
 import { stackedWindowsVisible } from './window_stack_state_core';
 import { wocBalanceChipHtml } from './woc_balance_chip';
+import { promptWocMarketBrowserVisit, wocMarketToggleAction } from './woc_market_link';
 import { type WocMarketHooks, WocMarketWindow } from './woc_market_window';
 import { installWorldDropTarget } from './world_drop_target';
 import { formatXp, type XpBarView, xpBarView } from './xp_bar';
@@ -5122,9 +5123,12 @@ export class Hud {
   });
   // The $WOC Exchange window (docs/prd/woc/marketplace.md): online, browser-web
   // only. Openable only once main.ts attaches the hooks (attachWocMarket); the
-  // launcher button stays hidden until then, so Steam/Electron/Capacitor and
-  // offline play never see the surface.
+  // launcher button stays hidden until then, so offline play never sees the
+  // surface. A wrapped shell (Steam/Electron/Capacitor) instead reveals the
+  // SAME launcher wired to a browser hand-off (attachWocMarketBrowserOnlyNotice,
+  // src/ui/woc_market_link.ts), so the icon never reads as simply missing.
   private wocMarketHooks: WocMarketHooks | null = null;
+  private wocMarketBrowserOnly = false;
 
   // The trade window and its $WOC arm live in the woc_trade domain
   // (src/ui/hud/woc_trade/); the controller owns the offer state machine and
@@ -16864,14 +16868,49 @@ export class Hud {
    *  reveal its launcher; without this call the surface stays fully absent. */
   attachWocMarket(hooks: WocMarketHooks): void {
     this.wocMarketHooks = hooks;
+    // Clears a browser-only notice this Hud instance may have carried from an
+    // earlier attach attempt, so a later real attach can never be shadowed by
+    // it (wocMarketToggleAction checks browserOnly first).
+    this.wocMarketBrowserOnly = false;
+    this.revealWocMarketLauncher();
+  }
+
+  /** Reveal the SAME launcher on a wrapped DESKTOP shell (Steam/Electron/the
+   *  packaged website build), where the Exchange itself stays fail-closed
+   *  (main.ts, via src/game/woc_market_wiring.ts): toggleWocMarket hands off
+   *  to the browser instead of opening the window, so the icon never reads
+   *  as just missing. Never called for Capacitor native (see the wiring
+   *  module's header). */
+  attachWocMarketBrowserOnlyNotice(): void {
+    this.wocMarketBrowserOnly = true;
+    this.revealWocMarketLauncher();
+  }
+
+  private revealWocMarketLauncher(): void {
     for (const id of ['mm-wocmarket', 'mobile-wocmarket']) {
       document.getElementById(id)?.removeAttribute('hidden');
     }
   }
 
   toggleWocMarket(): void {
-    if (this.wocMarketHooks === null) return;
-    this.wocMarketWindow.toggle();
+    switch (
+      wocMarketToggleAction({
+        browserOnly: this.wocMarketBrowserOnly,
+        hasHooks: this.wocMarketHooks !== null,
+      })
+    ) {
+      case 'handoff':
+        promptWocMarketBrowserVisit({
+          confirm: (title, body, okText, cancelText, onOk) =>
+            this.confirmDialog(title, body, okText, cancelText, onOk),
+        });
+        return;
+      case 'toggle':
+        this.wocMarketWindow.toggle();
+        return;
+      case 'none':
+        return;
+    }
   }
 
   /** Inject the online economy hooks that back the Claudium window (main.ts, online only). */

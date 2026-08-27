@@ -1,8 +1,10 @@
 // The $WOC Exchange attach composition (src/game/woc_market_wiring.ts): the
-// browser-web-only gate, the live wiring of every hook, and the main.ts
+// browser-web-only gate, the live wiring of every hook, the main.ts
 // firewall (main.ts carries one call, never the client construction or the
-// hook object). A gate that quietly attached inside a wrapped shell would ship
-// the exchange to the platforms the PRD keeps fail-closed.
+// hook object), and the wrapped-shell browser-hand-off notice. A gate that
+// quietly attached inside a wrapped shell would ship the exchange to the
+// platforms the PRD keeps fail-closed; a gate that stayed silent there
+// instead of revealing the hand-off notice would just look like a bug.
 import { readFileSync } from 'node:fs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { stripComments } from './helpers/strip_comments';
@@ -22,13 +24,18 @@ vi.mock('../src/net/woc_market_sdk', () => ({
   },
 }));
 
-import { attachWocMarketExchange, wocMarketAttachAllowed } from '../src/game/woc_market_wiring';
+import {
+  attachWocMarketExchange,
+  wocMarketAttachAllowed,
+  wocMarketBrowserHandoffAllowed,
+} from '../src/game/woc_market_wiring';
 import type { WocMarketHooks } from '../src/ui/woc_market_window';
 
 const WEB = { nativeApp: false, desktopApp: false };
 
 function makeDeps() {
   const attached: WocMarketHooks[] = [];
+  let browserOnlyNotices = 0;
   const api = { token: 'tok-1' as string | null, base: 'https://api.example.test' };
   const online = { characterId: 41 };
   let linked: string | null = null;
@@ -49,6 +56,9 @@ function makeDeps() {
     hud: {
       attachWocMarket: (hooks: WocMarketHooks) => {
         attached.push(hooks);
+      },
+      attachWocMarketBrowserOnlyNotice: () => {
+        browserOnlyNotices++;
       },
     },
     api,
@@ -72,6 +82,7 @@ function makeDeps() {
     signCalls,
     messageSignCalls,
     loads: () => loads,
+    browserOnlyNotices: () => browserOnlyNotices,
   };
 }
 
@@ -85,6 +96,18 @@ describe('woc_market_wiring: the browser-web-only gate', () => {
     expect(wocMarketAttachAllowed({ nativeApp: true, desktopApp: false })).toBe(false);
     expect(wocMarketAttachAllowed({ nativeApp: false, desktopApp: true })).toBe(false);
     expect(wocMarketAttachAllowed({ nativeApp: true, desktopApp: true })).toBe(false);
+  });
+
+  it('offers the browser hand-off on the wrapped DESKTOP shell only, never native', () => {
+    // Capacitor native (even alongside a desktop flag) gets neither the real
+    // Exchange nor the hand-off launcher: steering a mobile-app-store build
+    // to an external real-money marketplace is the anti-steering shape those
+    // stores restrict (docs/prd/woc/marketplace.md "Platforms, realms,
+    // configuration"), and that has not had its own counsel review.
+    expect(wocMarketBrowserHandoffAllowed(WEB)).toBe(false);
+    expect(wocMarketBrowserHandoffAllowed({ nativeApp: true, desktopApp: false })).toBe(false);
+    expect(wocMarketBrowserHandoffAllowed({ nativeApp: false, desktopApp: true })).toBe(true);
+    expect(wocMarketBrowserHandoffAllowed({ nativeApp: true, desktopApp: true })).toBe(false);
   });
 
   it('attaches nothing inside a native or desktop shell (fail-closed, per dimension)', () => {
@@ -101,12 +124,34 @@ describe('woc_market_wiring: the browser-web-only gate', () => {
     }
   });
 
+  it('reveals the browser hand-off launcher for the desktop shell only', () => {
+    const desktopOnly = makeDeps();
+    attachWocMarketExchange(desktopOnly.deps, { nativeApp: false, desktopApp: true });
+    // A wrapped-DESKTOP-shell player sees WHY the icon is there instead of it
+    // simply being absent (src/ui/woc_market_link.ts).
+    expect(desktopOnly.browserOnlyNotices()).toBe(1);
+
+    for (const shell of [
+      { nativeApp: true, desktopApp: false },
+      { nativeApp: true, desktopApp: true },
+    ]) {
+      const nativeRig = makeDeps();
+      attachWocMarketExchange(nativeRig.deps, shell);
+      // Capacitor native stays exactly as silent as before this fix: no
+      // launcher, no explanation, no hand-off.
+      expect(nativeRig.browserOnlyNotices()).toBe(0);
+    }
+  });
+
   it('reads the live shell constants when no shell is injected', () => {
-    // client_origin is mocked NATIVE_APP=true above: the default arm must
-    // refuse, proving the default is wired to the constants.
+    // client_origin is mocked NATIVE_APP=true, DESKTOP_APP=false above: the
+    // default arm must refuse the real Exchange (proving the default is
+    // wired to the constants) and must NOT offer the hand-off either, since
+    // nativeApp wins over desktopApp in wocMarketBrowserHandoffAllowed.
     const rig = makeDeps();
     expect(attachWocMarketExchange(rig.deps)).toBe(false);
     expect(rig.attached).toEqual([]);
+    expect(rig.browserOnlyNotices()).toBe(0);
   });
 });
 
@@ -120,6 +165,8 @@ describe('woc_market_wiring: the hook composition on browser web', () => {
     expect(attachWocMarketExchange(rig.deps, WEB)).toBe(true);
     expect(rig.attached.length).toBe(1);
     expect(constructed.length).toBe(1);
+    // The browser build gets the real Exchange, never the browser-hand-off notice.
+    expect(rig.browserOnlyNotices()).toBe(0);
     expect(rig.attached[0].client).toBe(constructed[0]);
     // The token is a getter over the live session (a re-login swaps it), the
     // base is captured once, the same as the inline wiring it replaced.

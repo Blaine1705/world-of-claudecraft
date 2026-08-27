@@ -295,7 +295,17 @@ bank gate on.
 
 - Browser web only (website desktop and mobile web). Electron desktop, Steam,
   and Capacitor iOS/Android stay fail-closed, tighter than the wallet-link
-  gate, matching the proposal's browser-only scope.
+  gate, matching the proposal's browser-only scope: no Exchange UI, wallet
+  code, or trading flow attaches on any of the three. The wrapped desktop
+  shells (Electron and Steam) additionally reveal the SAME `$WOC Exchange`
+  menu launcher shown on browser web, wired instead to a confirm-then-open
+  hand-off into the system browser (`src/ui/woc_market_link.ts`), so the
+  launcher explains the browser-only scope rather than staying silently
+  hidden; this is presentation only, never an attach path. Capacitor
+  iOS/Android gets neither the real Exchange nor this hand-off launcher and
+  stays fully silent: steering a mobile-app-store build to an external
+  real-money marketplace is the anti-steering shape those stores restrict,
+  and that broader step has not had its own counsel review.
 - Listings, custody, and sales history are realm-scoped like the World Market;
   wallets, bonds, strikes, and suspensions are account-scoped.
 - The service is configurable by server: the existing server runs the

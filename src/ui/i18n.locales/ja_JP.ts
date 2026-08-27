@@ -8931,6 +8931,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.loadFailed':
     '取引所に接続できませんでした。しばらくしてからもう一度お試しください。',
   'hudChrome.wocMarket.disabledRealm': 'このレルムでは $WOC 取引所を利用できません。',
+  'hudChrome.wocMarket.browserOnlyConfirmTitle': 'ブラウザで $WOC 取引所を開きますか？',
+  'hudChrome.wocMarket.browserOnlyConfirmBody':
+    '$WOC 取引所は World of ClaudeCraft のブラウザ版でのみ利用できます。ブラウザで World of ClaudeCraft を開きます。そこでログインして取引所を開けます。ゲームはそのまま続行されます。',
+  'hudChrome.wocMarket.browserOnlyConfirmOpen': 'ブラウザで開く',
+  'hudChrome.wocMarket.browserOnlyConfirmCancel': 'キャンセル',
   'hudChrome.wocMarket.pausedBanner':
     '取引は一時停止中です。オークションのカウントダウンは続行されます。新しい出品、入札、オファー、支払いは取引再開まで待機になりますが、すでに送信された支払いはそのまま決済されます。',
   'hudChrome.wocMarket.walletBanner':
