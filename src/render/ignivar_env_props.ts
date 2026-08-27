@@ -8,6 +8,7 @@
 import * as THREE from 'three';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { addRoofDarkness } from './gfx';
 import type { IgnivarEnvPropKey, IgnivarPropPlacement } from './ignivar_dressing_plan_core';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 
@@ -155,6 +156,9 @@ export function prepareIgnivarEnvProps(): Promise<void> {
         const gltf = await loadGltf(url);
         const baked = canonicalGeometry(gltf.scene);
         if (baked) {
+          // Tall props, chains, and the door towers grade into the roof
+          // black with the walls (inert outside the Halls scene state).
+          addRoofDarkness(baked.material);
           templates.set(key, {
             geometry: markSharedGeometry(baked.geometry),
             material: markSharedMaterial(baked.material),

@@ -9,6 +9,7 @@
 // source material never bleeds into the shared kit, and the resolver below is
 // consulted only at the two asset-lookup funnels (emit / emitArenaHideable).
 import * as THREE from 'three';
+import { addRoofDarkness } from './gfx';
 
 /** Structural kinds the Ignivar rooms place, in shipped-file order. Torches,
  *  banners, and props stay on the shared kit on purpose: only the stone
@@ -104,6 +105,10 @@ export function applyIgnivarTilePackEmissive(pack: string, mat: THREE.Material):
       lit.emissive = new THREE.Color(0xffffff);
       lit.emissiveIntensity = 0.34;
     }
+    // The raid rooms' roof darkness rides the same pack materials: the
+    // upper wall courses grade into the roof black (inert outside the
+    // ignivar scene states).
+    addRoofDarkness(mat);
   }
 }
 
