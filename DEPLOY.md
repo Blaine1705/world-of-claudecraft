@@ -575,10 +575,12 @@ For off-box safety, sync the directory to S3 occasionally:
   heavy-jank counts, frame p95 / fps / worst-10s / long-task / render-scale
   histograms, context losses, and perf-doctor suggestion counts, labeled only
   by fixed vocabularies (graphics tier, device class, GPU family, OS family,
-  scene class, suggestion id). The two counter cross products pre-register at
-  zero at boot (house convention, so the jank-share ratio reads 0% rather than
-  "no data" for a healthy cohort); the histograms appear lazily on the first
-  stored report from their cohort. The values are
+  scene class, suggestion id). The whole family follows the exporter's
+  zero-backfill design above: every counter cross product registers at zero and
+  every histogram series is pre-seeded at boot (roughly 600 always-present
+  samples), so the jank-share ratio reads 0% rather than "no data" for a
+  healthy cohort and first post-deploy increments are visible to rate(). The
+  values are
   CLIENT-ATTESTED (the beacon is unauthenticated; the ingest clamps, per-IP
   rate limit, and per-session insert throttle bound the write rate), so
   corroborate a surprising shift against the client_perf_reports table before

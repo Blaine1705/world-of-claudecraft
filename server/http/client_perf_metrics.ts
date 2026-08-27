@@ -156,9 +156,12 @@ export const CLIENT_PERF_WORST10S_BUCKETS_SECONDS = [
   0.0334, 0.05, 0.0667, 0.0834, 0.125, 0.25,
 ] as const;
 export const CLIENT_PERF_FPS_AVG_BUCKETS = [10, 15, 20, 25, 30, 40, 50, 60, 90, 120] as const;
-// Long tasks legitimately run to whole seconds (that is what the observer is
-// for); the tail edges match the multi-second freeze class it corroborates.
-export const CLIENT_PERF_LONG_TASK_BUCKETS_SECONDS = [0.05, 0.1, 0.2, 0.35, 0.5, 1, 2, 5] as const;
+// The top edge sits at the ingest's own clamp: perf_report.ts bounds
+// longTaskP95Ms to 1000ms, so no higher edge is reachable (the multi-second
+// freeze evidence rides raw_summary's browser.longTasks block instead, under
+// its own 60s bound). Raising this tail means raising the ingest clamp in the
+// same change.
+export const CLIENT_PERF_LONG_TASK_BUCKETS_SECONDS = [0.05, 0.1, 0.2, 0.35, 0.5, 1] as const;
 // The governor's floor is 0.3 (perf_report numberIn bound); 1.0 is native.
 export const CLIENT_PERF_RENDER_SCALE_BUCKETS = [0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0] as const;
 
@@ -266,8 +269,13 @@ function osIn(value: string): ClientPerfOsFamily {
     : 'other';
 }
 
-function finiteOrZero(value: number): number {
-  return Number.isFinite(value) ? value : 0;
+// Every observed value routes through this ONE sanitizer, and the jank compare
+// runs on its output, never the raw field: a histogram _sum is treated as
+// monotone by dashboards, so a direct caller's negative finite value must not
+// subtract from it, and an Infinity must neither poison a _sum nor satisfy the
+// jank threshold while its histogram observes zero.
+function observedOrZero(value: number): number {
+  return Number.isFinite(value) && value > 0 ? value : 0;
 }
 
 /**
@@ -337,20 +345,31 @@ export function registerClientPerfMetrics(registry: Registry): ClientPerfMetrics
     registers: [registry],
   });
 
-  // Pre-register the two COUNTER cross products at zero, the registry's house
-  // convention (game_metrics.ts; a Prometheus counter cannot backfill a
-  // scrape): the jank SHARE is a ratio over these two, and a lazily created
-  // numerator makes a healthy cohort read "no data" instead of 0%. The
-  // histograms stay lazy on purpose: they carry no ratio arm and priming them
-  // would be the bulk of the family's scrape payload for no query benefit.
+  // The exporter's zero-backfill design, whole family (game_metrics.ts: "Prom
+  // counters cannot backfill a scrape", histograms pre-seeded with .zero()):
+  // every counter cross product registers at zero and every histogram series
+  // is pre-seeded, so the first post-deploy increment is visible to
+  // increase()/rate() and the jank SHARE reads 0% for a healthy cohort rather
+  // than "no data". The full family is a fixed ~600-sample scrape ceiling,
+  // measured immaterial per scrape.
   for (const gfxTier of CLIENT_PERF_GFX_TIERS) {
     for (const device of CLIENT_PERF_DEVICE_CLASSES) {
-      jankReports.inc({ gfx_tier: gfxTier, device }, 0);
+      const tierDevice = { gfx_tier: gfxTier, device };
+      jankReports.inc(tierDevice, 0);
+      frameP95.zero(tierDevice);
+      fpsAvg.zero(tierDevice);
       for (const gpuFamily of CLIENT_PERF_GPU_FAMILIES) {
-        reports.inc({ gfx_tier: gfxTier, device, gpu_family: gpuFamily }, 0);
+        reports.inc({ ...tierDevice, gpu_family: gpuFamily }, 0);
       }
     }
+    longTask.zero({ gfx_tier: gfxTier });
+    renderScale.zero({ gfx_tier: gfxTier });
   }
+  for (const scene of CLIENT_PERF_SCENE_CLASSES) {
+    for (const device of CLIENT_PERF_DEVICE_CLASSES) worst10s.zero({ scene, device });
+  }
+  for (const os of CLIENT_PERF_OS_FAMILIES) contextLosses.inc({ os }, 0);
+  for (const suggestion of CLIENT_PERF_SUGGESTION_IDS) suggestions.inc({ suggestion }, 0);
 
   return {
     perfReportStored(sample: ClientPerfSample): void {
@@ -368,16 +387,20 @@ export function registerClientPerfMetrics(registry: Registry): ClientPerfMetrics
           ...tierDevice,
           gpu_family: classifyClientPerfGpuFamily(sample.glRendererBucket),
         });
-        frameP95.observe(tierDevice, finiteOrZero(sample.frameP95Ms) / MS_PER_SECOND);
-        fpsAvg.observe(tierDevice, finiteOrZero(sample.fpsAvg));
+        frameP95.observe(tierDevice, observedOrZero(sample.frameP95Ms) / MS_PER_SECOND);
+        fpsAvg.observe(tierDevice, observedOrZero(sample.fpsAvg));
+        const worst10sMs = observedOrZero(sample.worst10sFrameP95Ms);
         worst10s.observe(
           { scene: classifyClientPerfScene(sample.zoneOrScenario), device },
-          finiteOrZero(sample.worst10sFrameP95Ms) / MS_PER_SECOND,
+          worst10sMs / MS_PER_SECOND,
         );
-        if (sample.worst10sFrameP95Ms >= CLIENT_PERF_JANK_THRESHOLD_MS) jankReports.inc(tierDevice);
-        longTask.observe({ gfx_tier: gfxTier }, finiteOrZero(sample.longTaskP95Ms) / MS_PER_SECOND);
-        renderScale.observe({ gfx_tier: gfxTier }, finiteOrZero(sample.effectiveRenderScale));
-        const lost = Math.max(0, Math.floor(finiteOrZero(sample.contextLostCount)));
+        if (worst10sMs >= CLIENT_PERF_JANK_THRESHOLD_MS) jankReports.inc(tierDevice);
+        longTask.observe(
+          { gfx_tier: gfxTier },
+          observedOrZero(sample.longTaskP95Ms) / MS_PER_SECOND,
+        );
+        renderScale.observe({ gfx_tier: gfxTier }, observedOrZero(sample.effectiveRenderScale));
+        const lost = Math.floor(observedOrZero(sample.contextLostCount));
         if (lost > 0) contextLosses.inc({ os: osIn(sample.osFamily) }, lost);
         for (const id of sample.suggestionIds) {
           // The ingest allowlist already filtered these; membership is re-checked

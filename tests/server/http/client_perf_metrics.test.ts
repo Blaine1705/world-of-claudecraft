@@ -165,9 +165,9 @@ describe('vocabulary pins', () => {
       0.0334, 0.05, 0.0667, 0.0834, 0.125, 0.25,
     ]);
     expect([...CLIENT_PERF_FPS_AVG_BUCKETS]).toEqual([10, 15, 20, 25, 30, 40, 50, 60, 90, 120]);
-    expect([...CLIENT_PERF_LONG_TASK_BUCKETS_SECONDS]).toEqual([
-      0.05, 0.1, 0.2, 0.35, 0.5, 1, 2, 5,
-    ]);
+    // Top edge at the ingest's 1000ms longTaskP95Ms clamp: a higher edge is
+    // unreachable and would pin a lie into the contract.
+    expect([...CLIENT_PERF_LONG_TASK_BUCKETS_SECONDS]).toEqual([0.05, 0.1, 0.2, 0.35, 0.5, 1]);
     expect([...CLIENT_PERF_RENDER_SCALE_BUCKETS]).toEqual([0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]);
   });
 });
@@ -247,6 +247,16 @@ describe('registerClientPerfMetrics', () => {
         contextLostCount: -3,
       }),
     );
+    // A negative finite value must not subtract from a monotone _sum, and an
+    // Infinity worst-10s must not satisfy the jank threshold while its
+    // histogram observes zero: the compare runs on the sanitized value.
+    sink.perfReportStored(
+      sample({
+        frameP95Ms: -50,
+        worst10sFrameP95Ms: Number.POSITIVE_INFINITY,
+        fpsAvg: -10,
+      }),
+    );
 
     const text = await registry.metrics();
     expect(text).not.toMatch(/NaN|Infinity/);
@@ -260,13 +270,13 @@ describe('registerClientPerfMetrics', () => {
         /^woc_client_frame_p95_seconds_sum\{gfx_tier="high",device="desktop"\} ([\d.]+)$/m,
       ),
     ).toBe(0);
-    // A NaN worst-10s cannot satisfy the jank threshold (the series exists at
-    // its primed zero).
+    // Neither a NaN nor an Infinity worst-10s satisfies the jank threshold
+    // (the series exists at its primed zero).
     expect(
       value(text, /^woc_client_jank_reports_total\{gfx_tier="high",device="desktop"\} (\d+)$/m),
     ).toBe(0);
-    // A negative loss count never decrements the counter.
-    expect(text).not.toMatch(/^woc_client_context_losses_total\{/m);
+    // A negative loss count never decrements the primed counter.
+    expect(value(text, /^woc_client_context_losses_total\{os="windows"\} (\d+)$/m)).toBe(0);
   });
 
   it('never throws on a malformed direct-caller sample', () => {
@@ -280,12 +290,14 @@ describe('registerClientPerfMetrics', () => {
     ).not.toThrow();
   });
 
-  it('pre-registers the counter cross products at zero so ratios read 0%', async () => {
+  it('zero-backfills the whole family at registration', async () => {
     const registry = new Registry();
     registerClientPerfMetrics(registry);
 
     const text = await registry.metrics();
-    // Both jank-share arms exist before any report; the histograms stay lazy.
+    // Every counter cross product and every histogram series exists from
+    // boot (the exporter's backfill design), so increase()/rate() see the
+    // first post-deploy increment and the jank share reads 0%, not "no data".
     expect(
       value(
         text,
@@ -295,9 +307,22 @@ describe('registerClientPerfMetrics', () => {
     expect(
       value(text, /^woc_client_jank_reports_total\{gfx_tier="low",device="desktop"\} (\d+)$/m),
     ).toBe(0);
-    expect(text).not.toMatch(/^woc_client_frame_p95_seconds_count\{/m);
-    expect(text).not.toMatch(/^woc_client_context_losses_total\{/m);
-    expect(text).not.toMatch(/^woc_client_suggestions_total\{/m);
+    expect(
+      value(
+        text,
+        /^woc_client_frame_p95_seconds_count\{gfx_tier="ultra",device="desktop"\} (\d+)$/m,
+      ),
+    ).toBe(0);
+    expect(
+      value(
+        text,
+        /^woc_client_worst10s_frame_p95_seconds_count\{scene="rift",device="mobile"\} (\d+)$/m,
+      ),
+    ).toBe(0);
+    expect(value(text, /^woc_client_context_losses_total\{os="linux"\} (\d+)$/m)).toBe(0);
+    expect(value(text, /^woc_client_suggestions_total\{suggestion="context-loss"\} (\d+)$/m)).toBe(
+      0,
+    );
   });
 
   it('skips benchmark-source reports entirely', async () => {
@@ -307,15 +332,19 @@ describe('registerClientPerfMetrics', () => {
     sink.perfReportStored(sample({ source: 'benchmark', zoneOrScenario: 'benchmark' }));
 
     const text = await registry.metrics();
-    // The report's own cohort counter stays at its primed zero and no
-    // histogram series appears for it.
+    // Every series stays at its backfilled zero: nothing was observed.
     expect(
       value(
         text,
         /^woc_client_reports_total\{gfx_tier="high",device="desktop",gpu_family="nvidia"\} (\d+)$/m,
       ),
     ).toBe(0);
-    expect(text).not.toMatch(/^woc_client_frame_p95_seconds_count\{/m);
+    expect(
+      value(
+        text,
+        /^woc_client_frame_p95_seconds_count\{gfx_tier="high",device="desktop"\} (\d+)$/m,
+      ),
+    ).toBe(0);
   });
 
   it('never mints labels outside the vocabularies for hostile field values', async () => {
