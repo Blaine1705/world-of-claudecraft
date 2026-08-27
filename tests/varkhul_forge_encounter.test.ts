@@ -60,6 +60,7 @@ import {
   VARKHUL_WORK_FACING,
   VARKHUL_WORK_LOCAL_POS,
 } from '../src/sim/varkhul_forge_intermission';
+import { VARKHUL_SHARED_PYRE_AURA_ID } from '../src/sim/varkhul_shared_pyre';
 import {
   VARKHUL_WORLDFIRE_ABILITY_ID,
   VARKHUL_WORLDFIRE_DAMAGE_MAX_HP,
@@ -129,7 +130,19 @@ describe('Varkhul forge pillars and add intermission', () => {
   it('names his unseen master once when Varkhul dies', () => {
     const { sim, boss } = claimedEncounter(699);
     updateVarkhulEncounter(sim.ctx, boss);
-    expect(boss.varkhul).toBeDefined();
+    const state = boss.varkhul;
+    if (!state) throw new Error('Varkhul state missing');
+    state.makersBrandTimer = 999;
+    state.frontalTimer = 999;
+    state.cinderOrbsTimer = 999;
+    state.forgestormTimer = DT;
+    state.sharedPyreTimer = 999;
+    state.anvilTimer = 999;
+    state.interceptBeamTimer = 999;
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(sim.ctx.groundAoEs.some((effect) => effect.sourceId === boss.id)).toBe(true);
+    sim.player.damageImmune = false;
+    const hpBeforeDeath = sim.player.hp;
 
     boss.dead = true;
     const deathEvents = sim.tick();
@@ -141,6 +154,7 @@ describe('Varkhul forge pillars and add intermission', () => {
       ),
     ).toHaveLength(1);
     expect(boss.varkhul).toBeUndefined();
+    expect(sim.ctx.groundAoEs.some((effect) => effect.sourceId === boss.id)).toBe(false);
     expect(
       sim
         .tick()
@@ -149,6 +163,7 @@ describe('Varkhul forge pillars and add intermission', () => {
             event.type === 'chat' && event.channel === 'yell' && event.text === VARKHUL_DEATH_YELL,
         ),
     ).toHaveLength(0);
+    expect(sim.player.hp).toBe(hpBeforeDeath);
   });
 
   it('keeps the authored boss set-piece in front of the anvil, facing away from the raid', () => {
@@ -225,6 +240,37 @@ describe('Varkhul forge pillars and add intermission', () => {
 
     expect(state.assemblyPhase).toBe('adds');
     expect(Math.hypot(boss.pos.x - work.x, boss.pos.z - work.z)).toBeLessThanOrEqual(0.3);
+    expect(state.assemblyPortalSpawns.length).toBeGreaterThan(0);
+  });
+
+  it("cancels an active Shared Pyre when Master's Assembly starts", () => {
+    const { sim, boss } = claimedEncounter(705);
+    const dps = addEncounterPlayer(sim, boss, 'Assembly Pyre Target');
+    updateVarkhulEncounter(sim.ctx, boss);
+    const state = boss.varkhul;
+    if (!state) throw new Error('Varkhul state missing');
+    state.makersBrandTimer = 999;
+    state.frontalTimer = 999;
+    state.cinderOrbsTimer = 999;
+    state.forgestormTimer = 999;
+    state.sharedPyreTimer = DT;
+    state.anvilTimer = 999;
+    state.interceptBeamTimer = 999;
+
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(state.majorAbility).toBe('sharedPyre');
+    expect(state.sharedPyreTargetId).toBe(dps.id);
+    expect(dps.auras.some((aura) => aura.id === VARKHUL_SHARED_PYRE_AURA_ID)).toBe(true);
+
+    boss.hp = Math.floor(boss.maxHp * 0.5);
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    expect(state.assemblyTriggered).toBe(true);
+    expect(state.majorAbility).toBe('none');
+    expect(state.sharedPyreTargetId).toBeNull();
+    expect(state.sharedPyreRemaining).toBe(0);
+    expect(boss.castingAbility).toBeNull();
+    expect(dps.auras.some((aura) => aura.id === VARKHUL_SHARED_PYRE_AURA_ID)).toBe(false);
     expect(state.assemblyPortalSpawns.length).toBeGreaterThan(0);
   });
 
@@ -1265,6 +1311,7 @@ describe('Varkhul forge pillars and add intermission', () => {
     state.frontalTimer = 10;
     state.cinderOrbsTimer = 10;
     state.forgestormTimer = 10;
+    state.sharedPyreTimer = 10;
     state.anvilTimer = 10;
     state.interceptBeamTimer = 10;
     boss.hp = Math.floor(boss.maxHp * 0.8);
@@ -1276,13 +1323,15 @@ describe('Varkhul forge pillars and add intermission', () => {
       state.frontalTimer,
       state.cinderOrbsTimer,
       state.forgestormTimer,
+      state.sharedPyreTimer,
       state.anvilTimer,
       state.interceptBeamTimer,
-    ]).toEqual([10, 10, 10, 10, 10]);
+    ]).toEqual([10, 10, 10, 10, 10, 10]);
     const majorTimers = () => [
       state.frontalTimer,
       state.cinderOrbsTimer,
       state.forgestormTimer,
+      state.sharedPyreTimer,
       state.anvilTimer,
       state.interceptBeamTimer,
     ];

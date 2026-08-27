@@ -92,6 +92,7 @@ import {
 import { enterDungeon, leaveDungeon } from '../src/sim/instances/dungeons';
 import { Rng } from '../src/sim/rng';
 import { type ResolvedAbility, Sim } from '../src/sim/sim';
+import { revivePlayerAt } from '../src/sim/spirit';
 import {
   DT,
   dist2d,
@@ -2802,6 +2803,147 @@ describe('Ignivar encounter', () => {
             event.type === 'chat' && event.channel === 'yell' && event.text === IGNIVAR_DEATH_YELL,
         ),
     ).toHaveLength(0);
+  });
+
+  it('despawns Ashcaller and cancels armed meteors when Ignivar dies mid-mechanic', () => {
+    const { sim, boss } = claimedEncounter(453);
+    sim.player.devGod = true;
+    boss.hp = Math.floor(boss.maxHp * IGNIVAR_APOCALYPSE_HP_THRESHOLD);
+    updateIgnivarEncounter(sim.ctx, boss);
+    const add = [...sim.entities.values()].find(
+      (entity) => entity.templateId === IGNIVAR_APOCALYPSE_ADD_ID,
+    );
+    if (!add || !boss.ignivar) throw new Error('Apocalypse did not initialize');
+    isolateForgeChains(boss, 999);
+    boss.ignivar.meteorTimer = 0;
+    updateIgnivarEncounter(sim.ctx, boss);
+    expect(sim.activeIgnivarMeteors.length).toBeGreaterThan(0);
+    const impact = boss.ignivar.meteorPoints[0];
+    if (!impact) throw new Error('Falling Cinders did not choose an impact point');
+    boss.ignivar.meteorImpactRemaining = DT;
+    sim.player.pos = { x: impact.x, y: boss.pos.y, z: impact.z };
+    sim.player.prevPos = { ...sim.player.pos };
+    sim.player.devGod = false;
+    sim.player.damageImmune = false;
+    const hpBeforeDeath = sim.player.hp;
+
+    boss.dead = true;
+    sim.tick();
+
+    expect(boss.ignivar).toBeUndefined();
+    expect(sim.entities.has(add.id)).toBe(false);
+    expect(sim.activeIgnivarMeteors).toEqual([]);
+    expect(boss.castingAbility).toBeNull();
+    expect(sim.player.hp).toBe(hpBeforeDeath);
+    sim.tick();
+    expect(sim.player.hp).toBe(hpBeforeDeath);
+  });
+
+  it('clears raid mechanics through a real death and corpse resurrection', () => {
+    const { sim, boss } = claimedEncounter(454);
+    const ally = addEncounterPlayer(sim, boss, 'Living Witness');
+    updateIgnivarEncounter(sim.ctx, boss);
+    isolateForgeChains(boss, 999);
+    const encounterAuraIds = [
+      IGNIVAR_BRAND_AURA_ID,
+      IGNIVAR_MOLTEN_ARMOR_AURA_ID,
+      IGNIVAR_FORGE_CHAINS_AURA_ID,
+    ];
+    applyIgnivarBrand(sim.player, boss);
+    sim.ctx.applyAura(sim.player, {
+      id: IGNIVAR_MOLTEN_ARMOR_AURA_ID,
+      name: 'Molten Armor',
+      kind: 'vuln_source',
+      remaining: IGNIVAR_MOLTEN_ARMOR_DURATION,
+      duration: IGNIVAR_MOLTEN_ARMOR_DURATION,
+      value: IGNIVAR_MOLTEN_ARMOR_PER_STACK,
+      stacks: 1,
+      sourceId: boss.id,
+      school: 'fire',
+      encounterOwned: true,
+    });
+    sim.ctx.applyAura(sim.player, {
+      id: IGNIVAR_FORGE_CHAINS_AURA_ID,
+      name: 'Forge Chains',
+      kind: 'vulnerability',
+      remaining: IGNIVAR_FORGE_CHAINS_DURATION_SECONDS,
+      duration: IGNIVAR_FORGE_CHAINS_DURATION_SECONDS,
+      value: 0,
+      value2: ally.id,
+      sourceId: boss.id,
+      school: 'fire',
+      encounterOwned: true,
+    });
+
+    sim.ctx.dealDamage(
+      boss,
+      sim.player,
+      sim.player.maxHp * 100,
+      false,
+      'fire',
+      'Raid Test Kill',
+      'hit',
+      true,
+    );
+
+    expect(sim.player.dead).toBe(true);
+    expect(sim.player.auras.some((aura) => encounterAuraIds.includes(aura.id))).toBe(false);
+    const state = boss.ignivar;
+    expect(state).toBeDefined();
+
+    sim.releaseSpirit(sim.player.id);
+    const corpse = sim.player.corpsePos;
+    if (!corpse) throw new Error('Raid death did not leave a corpse');
+    sim.player.pos = { ...corpse };
+    sim.player.prevPos = { ...corpse };
+    sim.rebucket(sim.player);
+    sim.resurrectAtCorpse(sim.player.id);
+    updateIgnivarEncounter(sim.ctx, boss);
+
+    expect(sim.player.dead).toBe(false);
+    expect(sim.player.ghost).toBe(false);
+    expect(sim.player.hp).toBe(Math.round(sim.player.maxHp * 0.5));
+    expect(sim.player.auras.some((aura) => encounterAuraIds.includes(aura.id))).toBe(false);
+    expect(boss.ignivar).toBe(state);
+  });
+
+  it('resets a real all-dead wipe and starts the next pull without stale hazards', () => {
+    const { sim, boss } = claimedEncounter(455);
+    const ally = addEncounterPlayer(sim, boss, 'Wipe Witness');
+    updateIgnivarEncounter(sim.ctx, boss);
+    if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
+    const firstState = boss.ignivar;
+    isolateForgeChains(boss, 999);
+    boss.ignivar.meteorTimer = 0;
+    boss.swingTimer = 999;
+    updateIgnivarEncounter(sim.ctx, boss);
+    expect(sim.activeIgnivarMeteors.length).toBeGreaterThan(0);
+
+    sim.ctx.handleDeath(sim.player, boss);
+    sim.ctx.handleDeath(ally, boss);
+    boss.combatExitHoldUntil = sim.ctx.time;
+    updateIgnivarEncounter(sim.ctx, boss);
+
+    expect(boss.ignivar).toBeUndefined();
+    expect(boss.castingAbility).toBeNull();
+    expect(sim.activeIgnivarMeteors).toEqual([]);
+
+    revivePlayerAt(sim.ctx, sim.player.id, { ...boss.pos });
+    revivePlayerAt(sim.ctx, ally.id, { ...boss.pos });
+    boss.inCombat = true;
+    boss.aiState = 'attack';
+    boss.aggroTargetId = sim.player.id;
+    boss.swingTimer = 999;
+    updateIgnivarEncounter(sim.ctx, boss);
+
+    expect(boss.ignivar).toBeDefined();
+    expect(boss.ignivar).not.toBe(firstState);
+    expect(boss.ignivar?.rotatingRaysWindupRemaining).toBe(0);
+    expect(boss.ignivar?.rotatingRaysActiveRemaining).toBe(0);
+    expect(boss.ignivar?.forgeWaveWindupRemaining).toBe(0);
+    expect(boss.ignivar?.forgeWaveActiveRemaining).toBe(0);
+    expect(boss.ignivar?.meteorPoints).toEqual([]);
+    expect(boss.ignivar?.apocalypseTriggered).toBe(false);
   });
 
   it('ticks the frontal cadence during its cast and honors forced-target threat', () => {

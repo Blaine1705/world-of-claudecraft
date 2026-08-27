@@ -56,6 +56,7 @@ import {
 import { IGNIVAR_SECOND_WING_ID } from '../src/sim/ignivar_raid_ids';
 import { enterDungeon, leaveDungeon } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
+import { revivePlayerAt } from '../src/sim/spirit';
 import { DT, type Entity, type PlayerClass, type SimEvent } from '../src/sim/types';
 import {
   VARKHUL_ANVIL_METEOR_CAST_ID,
@@ -719,6 +720,204 @@ describe('Varkhul encounter behavior', () => {
     expect(state.majorAbility).toBe('none');
     expect(state.sharedPyreTargetId).toBeNull();
     expect(target.auras.some((aura) => aura.id === VARKHUL_SHARED_PYRE_AURA_ID)).toBe(false);
+  });
+
+  it('cancels Shared Pyre without raid damage when its marked player dies', () => {
+    const { sim, boss } = claimedEncounter(442);
+    const raiders = [
+      addEncounterPlayer(sim, boss, 'Fallen Pyre'),
+      addEncounterPlayer(sim, boss, 'Living Pyre One'),
+      addEncounterPlayer(sim, boss, 'Living Pyre Two'),
+    ];
+    updateVarkhulEncounter(sim.ctx, boss);
+    const state = isolateMechanics(boss);
+    state.sharedPyreTimer = DT;
+
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    const target =
+      state.sharedPyreTargetId === null ? undefined : sim.entities.get(state.sharedPyreTargetId);
+    if (!target) throw new Error('Shared Pyre did not select a target');
+    const survivors = [sim.player, ...raiders].filter((player) => player.id !== target.id);
+    for (const player of [target, ...survivors]) {
+      player.maxHp = 100_000;
+      player.hp = 100_000;
+      player.damageImmune = false;
+      player.pos = { ...target.pos };
+    }
+    target.dead = true;
+    target.hp = 0;
+    sim.events.length = 0;
+
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    for (const survivor of survivors) expect(survivor.hp).toBe(100_000);
+    expect(
+      sim.events.some(
+        (event) =>
+          event.type === 'spellfx' &&
+          event.ability === VARKHUL_SHARED_PYRE_NAME &&
+          event.fx === 'nova',
+      ),
+    ).toBe(false);
+    expect(state.majorAbility).toBe('none');
+    expect(state.sharedPyreTargetId).toBeNull();
+    expect(boss.castingAbility).toBeNull();
+    expect(target.auras.some((aura) => aura.id === VARKHUL_SHARED_PYRE_AURA_ID)).toBe(false);
+  });
+
+  it('cancels Shared Pyre immediately when its marked player leaves the world', () => {
+    const { sim, boss } = claimedEncounter(446);
+    const raiders = [
+      addEncounterPlayer(sim, boss, 'Departing Pyre'),
+      addEncounterPlayer(sim, boss, 'Remaining Pyre'),
+    ];
+    updateVarkhulEncounter(sim.ctx, boss);
+    const state = isolateMechanics(boss);
+    state.sharedPyreTimer = DT;
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    const targetId = state.sharedPyreTargetId;
+    if (targetId === null) throw new Error('Shared Pyre did not select a target');
+    const remainingBeforeLeave = state.sharedPyreRemaining;
+    expect(remainingBeforeLeave).toBeGreaterThan(DT);
+    sim.entities.delete(targetId);
+    sim.events.length = 0;
+
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    expect(state.majorAbility).toBe('none');
+    expect(state.sharedPyreTargetId).toBeNull();
+    expect(state.sharedPyreRemaining).toBe(0);
+    expect(boss.castingAbility).toBeNull();
+    expect(
+      sim.events.some(
+        (event) => event.type === 'spellfx' && event.ability === VARKHUL_SHARED_PYRE_NAME,
+      ),
+    ).toBe(false);
+    expect(raiders.some((player) => sim.entities.has(player.id))).toBe(true);
+  });
+
+  it('clears raid mechanics through a real death and corpse resurrection', () => {
+    const { sim, boss } = claimedEncounter(443);
+    addEncounterPlayer(sim, boss, 'Living Witness');
+    updateVarkhulEncounter(sim.ctx, boss);
+    const state = isolateMechanics(boss);
+    const encounterAuraIds = [
+      VARKHUL_MAKERS_BRAND_AURA_ID,
+      VARKHUL_RED_HOT_METAL_AURA_ID,
+      VARKHUL_SHARED_PYRE_AURA_ID,
+      VARKHUL_INTERCEPT_BEAM_DEBUFF_AURA_ID,
+    ];
+    sim.ctx.applyAura(sim.player, {
+      id: VARKHUL_MAKERS_BRAND_AURA_ID,
+      name: "Maker's Brand",
+      kind: 'vuln_source',
+      remaining: 30,
+      duration: 30,
+      value: 0.35,
+      sourceId: boss.id,
+      school: 'fire',
+      encounterOwned: true,
+    });
+    sim.ctx.applyAura(sim.player, {
+      id: VARKHUL_RED_HOT_METAL_AURA_ID,
+      name: 'Red-hot Metal',
+      kind: 'dot',
+      remaining: 10,
+      duration: 10,
+      value: 1,
+      sourceId: boss.id,
+      school: 'fire',
+      encounterOwned: true,
+    });
+    sim.ctx.applyAura(sim.player, {
+      id: VARKHUL_SHARED_PYRE_AURA_ID,
+      name: VARKHUL_SHARED_PYRE_NAME,
+      kind: 'vulnerability',
+      remaining: 6,
+      duration: 6,
+      value: 0,
+      stacks: 4,
+      sourceId: boss.id,
+      school: 'fire',
+      encounterOwned: true,
+    });
+    sim.ctx.applyAura(sim.player, {
+      id: VARKHUL_INTERCEPT_BEAM_DEBUFF_AURA_ID,
+      name: VARKHUL_INTERCEPT_BEAM_DEBUFF_NAME,
+      kind: 'vuln_source',
+      remaining: 25,
+      duration: 25,
+      value: VARKHUL_INTERCEPT_BEAM_DEBUFF_DAMAGE_TAKEN,
+      sourceId: boss.id,
+      school: 'fire',
+      encounterOwned: true,
+    });
+
+    sim.ctx.dealDamage(
+      boss,
+      sim.player,
+      sim.player.maxHp * 100,
+      false,
+      'fire',
+      'Raid Test Kill',
+      'hit',
+      true,
+    );
+
+    expect(sim.player.dead).toBe(true);
+    expect(sim.player.auras.some((aura) => encounterAuraIds.includes(aura.id))).toBe(false);
+    expect(boss.varkhul).toBe(state);
+
+    sim.releaseSpirit(sim.player.id);
+    const corpse = sim.player.corpsePos;
+    if (!corpse) throw new Error('Raid death did not leave a corpse');
+    sim.player.pos = { ...corpse };
+    sim.player.prevPos = { ...corpse };
+    sim.rebucket(sim.player);
+    sim.resurrectAtCorpse(sim.player.id);
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    expect(sim.player.dead).toBe(false);
+    expect(sim.player.ghost).toBe(false);
+    expect(sim.player.hp).toBe(Math.round(sim.player.maxHp * 0.5));
+    expect(sim.player.auras.some((aura) => encounterAuraIds.includes(aura.id))).toBe(false);
+    expect(boss.varkhul).toBe(state);
+  });
+
+  it('resets a real all-dead wipe and starts the next pull without stale hazards', () => {
+    const { sim, boss } = claimedEncounter(444);
+    const raider = addEncounterPlayer(sim, boss, 'Wipe Witness');
+    updateVarkhulEncounter(sim.ctx, boss);
+    const firstState = isolateMechanics(boss);
+    firstState.forgestormTimer = DT;
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(sim.ctx.groundAoEs.some((effect) => effect.sourceId === boss.id)).toBe(true);
+
+    sim.ctx.handleDeath(sim.player, boss);
+    sim.ctx.handleDeath(raider, boss);
+    boss.combatExitHoldUntil = sim.ctx.time;
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    expect(boss.varkhul).toBeUndefined();
+    expect(boss.castingAbility).toBeNull();
+    expect(sim.ctx.groundAoEs.some((effect) => effect.sourceId === boss.id)).toBe(false);
+
+    revivePlayerAt(sim.ctx, sim.player.id, { ...boss.pos });
+    revivePlayerAt(sim.ctx, raider.id, { ...boss.pos });
+    boss.inCombat = true;
+    boss.aiState = 'attack';
+    boss.aggroTargetId = sim.player.id;
+    boss.swingTimer = 999;
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    expect(boss.varkhul).toBeDefined();
+    expect(boss.varkhul).not.toBe(firstState);
+    expect(boss.varkhul?.majorAbility).toBe('none');
+    expect(boss.varkhul?.forgestormWaveIndex).toBe(0);
+    expect(boss.varkhul?.sharedPyreTargetId).toBeNull();
+    expect(sim.ctx.groundAoEs.some((effect) => effect.sourceId === boss.id)).toBe(false);
   });
 
   it.each([
