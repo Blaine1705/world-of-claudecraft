@@ -23,6 +23,10 @@ Scope decisions fixed by the maintainer:
   game, plus a full weapon spread: one-handers, two-handers, shields, held
   offhands, spell damage weapons, and healing weapons.
 
+The profession arm of this tier (drop-taught recipes, the crafted
+best-in-slot pieces, and the core reagent economy) is specified in its
+companion doc, docs/prd/ignivar-raid-professions.md.
+
 ## Review of the existing armor sets
 
 All current sets live in src/sim/content/item_sets.ts and resolve through
