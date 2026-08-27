@@ -860,9 +860,14 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   // clamp a drag or resize; chat_window fits the input and keeps the log pinned to the
   // bottom; fiesta forces one reflow to restart a CSS animation, the same documented trick
   // fct_painter uses.
+  // The sixth read is the arrange-mode border hit test (edgeAt): one wrap rect
+  // per pointer press or hover MOVE over the chat box, and only while the
+  // interface is unlocked, which is a deliberate layout mode the player is
+  // holding still in, not combat. It rides the same pointer path the five
+  // drag/resize reads above already take.
   {
     file: 'hud/chat/chat_geometry_controller.ts',
-    reflowAllow: { '.getBoundingClientRect': 5 },
+    reflowAllow: { '.getBoundingClientRect': 6 },
     driverAllow: {},
   },
   {

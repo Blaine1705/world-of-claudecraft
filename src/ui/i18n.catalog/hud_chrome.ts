@@ -355,6 +355,7 @@ export const hudChromeStrings = {
     reset: 'Reset',
     presets: {
       classic: 'Classic Gold',
+      fancyGold: 'Fancy Gold',
       midnight: 'Midnight',
       parchment: 'Parchment',
       highContrast: 'High Contrast',
@@ -828,6 +829,18 @@ export const hudChromeStrings = {
     reset: 'Reset',
     done: 'Done',
     cancel: 'Cancel',
+    // The small plus/minus buttons at the end of the primary bar: plus reveals
+    // the next optional row (secondary, then third), minus hides the topmost
+    // visible one. Same settings as the Interface options checkboxes.
+    showExtraBar: 'Show Another Action Bar',
+    hideExtraBar: 'Hide an Action Bar',
+    // The are-you-sure prompt shown when a captured key is already bound
+    // elsewhere: a key lives on one action at a time, so accepting UNBINDS the
+    // other one. {key} is the key label, {other} the action losing it, and
+    // {action} the one gaining it.
+    conflictTitle: 'Key Already Bound',
+    conflictBody: '{key} is already bound to {other}. Binding it to {action} will unbind {other}.',
+    conflictAccept: 'Rebind Anyway',
     resetConfirmTitle: 'Reset action bar keys?',
     resetConfirmBody:
       'The first bar returns to its default keys. The second and third bars become unbound. This cannot be undone.',
@@ -1359,6 +1372,7 @@ export const hudChromeStrings = {
     // Enabled only while the secondary row is visible. Slots remain reachable
     // through keybinds and the mobile action-ring pages while this row is hidden.
     showThirdActionBar: 'Show Third Action Bar',
+    combineActionBars: 'Combine Action Bars',
     // Interface panel toggle (off by default): strips the black background,
     // border, and keybind label from action-bar slots with no ability or item
     // bound, so an unlearned class's bar reads clean instead of a wall of empty
@@ -2873,12 +2887,82 @@ export const hudChromeStrings = {
   // not be told to drag something a keyboard player operates with arrows.
   // All wordy (M16), so the five non-Latin fills land in this same change.
   interfaceUnlock: {
-    label: 'Interface Frames',
+    label: 'Edit Frames',
     unlock: 'Unlock interface',
     lock: 'Lock interface',
+    // The floating button that appears while the interface is unlocked, so
+    // finishing an arrangement does not mean reopening the options menu.
+    lockAll: 'Lock Interface',
+    // The two guidance notes under the Unlock Interface option row: what shows
+    // while editing (and where extra bars come from), and that the game is
+    // deliberately inert for the duration.
+    barsNote:
+      'Only the action bars you have turned on appear while editing. To place more bars, add them with the plus and minus buttons on the main action bar first.',
+    frozenNote:
+      'While editing, the interface and camera are frozen: buttons and frames are still pictures to arrange, and clicks will not reach the game world.',
     unlockFrame: 'Unlock this frame',
     lockFrame: 'Lock this frame',
     resizeFrame: 'Resize this frame',
+    // Name chips shown on each unlocked frame. Only the frames with no existing
+    // name key mint one here (the unit frames reuse their aria labels, the
+    // buff/debuff rows the target-aura tab names, the cast bar its own aria).
+    // Action Bar / Minimap / Stance Bar are wordy (M16), so their five
+    // non-Latin fills land in this same change; Menu / XP Bar / Chat are not.
+    frameNames: {
+      actionBar1: 'Action Bar',
+      actionBar2: 'Action Bar 2',
+      actionBar3: 'Action Bar 3',
+      menu: 'Menu',
+      minimap: 'Minimap',
+      stanceBar: 'Stance Bar',
+      xpBar: 'XP Bar',
+      chat: 'Chat',
+      actionBarGroup: 'Action Bars',
+      // The unit frames chip plain functional names rather than their lore
+      // aria labels (Your Hero / Your Mark / Your Band), which read as riddles
+      // in an arrangement mode.
+      playerFrame: 'Player',
+      targetFrame: 'Target',
+      partyFrames: 'Party',
+      // The auto-attack swing timer (#swingbar), hidden outside combat like
+      // the cast bar, so its chip is what names the placeholder.
+      swingBar: 'Auto Attack',
+    },
+    // The frames settings dropdown beside the floating Lock Interface button:
+    // a show/hide sub-menu plus the frame-behavior toggles that used to live
+    // in the options window. All wordy (M16): the five non-Latin fills land in
+    // this same change.
+    framesMenu: 'Frames Settings',
+    framesMenuTitle:
+      'Show or hide individual frames. An unticked frame stays hidden until you tick it again or reset to defaults.',
+    showHideFrames: 'Show or Hide Frames',
+    // The aura-row direction toggles in that dropdown (buffsLeftToRight /
+    // debuffsLeftToRight): ticked reads left to right, unticked keeps the
+    // stock right-to-left growth. Wordy (M16): non-Latin fills in this change.
+    buffsLeftToRight: 'Buffs left to right',
+    debuffsLeftToRight: 'Debuffs left to right',
+    // lockPlayerFrameToActionBar: the frame glues to the top of the action
+    // bars and stops being individually movable. Wordy (M16): non-Latin
+    // fills land in this change.
+    lockPlayerFrameToBar: 'Lock Player Frame to Action Bar',
+    // The sample spell name on the edit mode's filled cast-bar preview.
+    previewSpell: 'Example Spell',
+  },
+  // The export/import rows (Frames tab: the frame layout; General tab: every
+  // setting family). All wordy (M16): the five non-Latin fills land in this
+  // same change.
+  transfer: {
+    frameLayout: 'Frame Layout',
+    allSettings: 'All Settings',
+    exportAction: 'Export',
+    importAction: 'Import',
+    copy: 'Copy',
+    copied: 'Copied to clipboard.',
+    copyFailed: 'Copy failed. Select the code and copy it yourself.',
+    applyReload: 'Apply and Reload',
+    pastePlaceholder: 'Paste an exported code here.',
+    invalid: 'That is not a valid export code.',
+    wrongKind: 'That code is a different export type.',
   },
   // Item tooltip: the minimum character level needed to equip a piece (classic
   // "Requires Level N"). Shown red when the viewer is below it. {level} runs

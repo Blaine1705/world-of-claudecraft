@@ -1981,6 +1981,21 @@
     transform: scale(calc(0.82 * var(--mobile-chrome-scale, 1)));
     transform-origin: left top;
   }
+  /* The desktop interface editor's frame-dimension settings
+     (playerFrame/targetFrame Width/Height, movable_frame.ts 'dimensions'
+     mode) stay desktop: this sheet hand-tunes the compact placements around
+     stock metrics (the 300px player band, the 0.82-scaled target frame), the
+     same boundary that keeps desktop-dragged frame POSITIONS from applying on
+     mobile. Pin the vars back to their stock values so a desktop drag cannot
+     widen or thicken these frames into the touch surfaces beside them. */
+  body.mobile-touch #player-frame {
+    --player-frame-width: 612px;
+    --uf-bar-height: 15px;
+  }
+  body.mobile-touch #target-frame {
+    --target-frame-width: 190px;
+    --uf-bar-height: 15px;
+  }
   /* The Seeker chest occupies the shortcut grid's second row. Reserve that
      row before seating actionable unit frames, including the maximum 1.3
      Action Button Size setting, with at least an 8px gap below the 54px chest.

@@ -1,0 +1,74 @@
+// lockPlayerFrameToActionBar (the Frames Settings menu): the player frame
+// glues to the TOP of the action bars. The mechanics live in three places
+// that must stay wired together, so these pin each half at the source level
+// (the live behavior is exercised by scripts/_probe_player_frame_lock.mjs):
+// the frame re-docks into the stack seat and rides INSIDE the combined group
+// whenever the group carries a custom position (following drags, bar 2/3
+// adds and removes, and resolution re-anchors for free), the unlock
+// registration refuses to loosen a locked frame, and the corner move button
+// folds away.
+import { readFileSync } from 'node:fs';
+import { describe, expect, it } from 'vitest';
+import { BOOL_SETTINGS } from '../src/game/settings';
+
+const hudTs = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+const hudCss = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8').replace(
+  /\r\n/g,
+  '\n',
+);
+const mainTs = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
+
+describe('lockPlayerFrameToActionBar wiring', () => {
+  it('is a real bool setting, off by default, applied through main.ts', () => {
+    expect(BOOL_SETTINGS.lockPlayerFrameToActionBar).toEqual({ def: false });
+    expect(mainTs).toContain("case 'lockPlayerFrameToActionBar':");
+    expect(mainTs).toContain('hud.setLockPlayerFrameToActionBar(!!v)');
+  });
+
+  it('the unlock registration refuses to loosen a locked frame', () => {
+    expect(hudTs).toContain(
+      "['playerFrame', this.playerFrameMover, () => !this.playerFrameLockedToBar]",
+    );
+  });
+
+  it('every combined-group position apply re-evaluates the ride', () => {
+    // The group's onPositioned wraps the detacher with the lock re-check, so
+    // a drag move, a re-dock, and a resolution re-anchor all carry the frame.
+    const start = hudTs.indexOf("spec.id === 'actionBarGroup'\n          ? (active: boolean) =>");
+    expect(start).toBeGreaterThan(-1);
+    const wrap = hudTs.slice(start, start + 300);
+    expect(wrap).toContain('detach(active);');
+    expect(wrap).toContain('this.applyPlayerFrameBarLock();');
+  });
+
+  it('turning the lock on drops the applied spot (save kept); off restores it', () => {
+    const start = hudTs.indexOf('setLockPlayerFrameToActionBar(on: boolean)');
+    expect(start).toBeGreaterThan(-1);
+    const body = hudTs.slice(start, hudTs.indexOf('\n  }', start));
+    expect(body).toContain('this.playerFrameMover?.clearAppliedGeometry()');
+    expect(body).toContain('this.playerFrameMover?.restoreSavedPosition()');
+    expect(body).toContain('this.interfaceUnlock.refresh()');
+  });
+
+  it('riding hops keep bar 1 pixel-fixed via the bottom re-anchor', () => {
+    const start = hudTs.indexOf('private applyPlayerFrameBarLock()');
+    expect(start).toBeGreaterThan(-1);
+    const body = hudTs.slice(start, hudTs.indexOf('\n  }', start));
+    expect(body).toContain("group.classList.contains('hud-frame-detached')");
+    expect(body).toContain('group.insertBefore(frame, group.firstChild)');
+    // Both directions of the hop re-anchor, or the bars jump under the cursor.
+    expect(body.match(/reanchorBottom\('actionBarGroup'\)/g)).toHaveLength(2);
+  });
+
+  it('the corner move button folds away while locked', () => {
+    const start = hudCss.indexOf('body.pf-locked-to-bar #player-frame > .tf-move-btn');
+    expect(start).toBeGreaterThan(-1);
+    expect(hudCss.slice(start, hudCss.indexOf('}', start))).toContain('display: none');
+  });
+
+  it('the Frames Settings dropdown lists the toggle', () => {
+    expect(hudTs).toContain(
+      "['lockPlayerFrameToActionBar', 'hudChrome.interfaceUnlock.lockPlayerFrameToBar']",
+    );
+  });
+});

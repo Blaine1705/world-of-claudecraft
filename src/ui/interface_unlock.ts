@@ -26,10 +26,64 @@ export interface UnlockEntry {
   mover: MovableFrame;
   /** Live for this character right now (a pet is out, the bar is enabled). */
   isActive(): boolean;
+  /** Optional show/hide-row override: when present the row is listed while
+   *  `listed()` says so (whatever isActive answers) and its checkbox reads and
+   *  writes THIS state instead of the mover's hidden flag. The optional action
+   *  bars use it: their row toggles the bar's ENABLED setting, the same state
+   *  the on-bar plus/minus drives, so the menu can always offer bars 2 and 3
+   *  while the bars are split. */
+  rowOverride?: {
+    listed(): boolean;
+    value(): boolean;
+    set(checked: boolean): void;
+  };
 }
 
 export interface InterfaceUnlockDeps {
   document: Document;
+  /** Localized label for the floating lock button (t is resolved by the host so
+   *  this module stays free of the i18n import, like the rest of the seam). */
+  lockAllLabel?: () => string;
+  /** Hover tooltip for that button: the reminder that the freeze is the mode
+   *  working as intended, not the game hanging. */
+  lockAllTitle?: () => string;
+  /** Localized label for the frames settings menu button beside it. */
+  framesMenuLabel?: () => string;
+  /** Hover tooltip / accessible name for that menu: what ticking a row does. */
+  framesMenuTitle?: () => string;
+  /** Localized label for the show/hide sub-menu inside the dropdown. */
+  framesSubmenuLabel?: () => string;
+  /** The frame-behavior settings the dropdown renders below the show/hide
+   *  sub-menu (combine bars, hide unused slots, ...). Resolved per rebuild so
+   *  each row's value reflects the live setting; `set` both persists and
+   *  applies (the host wires settings.set + onSettingChange together). */
+  settingToggles?: () => FramesMenuToggle[];
+  /** Discrete numeric settings the dropdown renders after the toggles as
+   *  compact label + select rows (the party columns count). Same resolve-per-
+   *  rebuild and persist-and-apply contract as settingToggles. */
+  settingSelects?: () => FramesMenuSelect[];
+  /** Fired after every flip with the new state (and from relocalize with the
+   *  current one). The host hangs the edit-mode preview samples off it. */
+  onUnlockedChanged?: (unlocked: boolean) => void;
+}
+
+/** One frame-behavior toggle row in the frames settings dropdown. */
+export interface FramesMenuToggle {
+  id: string;
+  label: string;
+  value: boolean;
+  set(value: boolean): void;
+}
+
+/** One discrete numeric row in that dropdown: a label plus a native select
+ *  over its legal values (a slider is options-window furniture; a handful of
+ *  whole numbers reads better as a picker in a compact menu). */
+export interface FramesMenuSelect {
+  id: string;
+  label: string;
+  value: number;
+  options: { value: number; label: string }[];
+  set(value: number): void;
 }
 
 /** Body class the stylesheet gates the unlocked affordances on (the frame
@@ -38,6 +92,14 @@ export const INTERFACE_UNLOCKED_BODY_CLASS = 'interface-unlocked';
 
 export class InterfaceUnlock {
   private unlocked = false;
+  private controls: {
+    bar: HTMLElement;
+    lockBtn: HTMLButtonElement;
+    framesBtn: HTMLButtonElement;
+    menu: HTMLElement;
+  } | null = null;
+  private menuOpen = false;
+  private submenuOpen = false;
   private readonly entries: UnlockEntry[] = [];
 
   constructor(private readonly deps: InterfaceUnlockDeps) {}
@@ -59,8 +121,168 @@ export class InterfaceUnlock {
     return this.unlocked;
   }
 
+  /**
+   * The floating edit controls, built on first unlock and shown only while
+   * unlocked: the "Lock Interface" exit (arranging is a mode the player enters
+   * from the options menu, and leaving it should not mean finding that menu
+   * again, so the mode carries its own exit) plus the frames show/hide menu
+   * beside it. Minted here rather than in the entry documents because they
+   * belong to this coordinator's state, not the stock HUD.
+   */
+  private ensureControls(): NonNullable<InterfaceUnlock['controls']> | null {
+    if (this.controls) return this.controls;
+    const doc = this.deps.document;
+    const host = doc.getElementById('ui');
+    if (!host) return null;
+    const bar = doc.createElement('div');
+    bar.id = 'interface-edit-controls';
+    const lockBtn = doc.createElement('button');
+    lockBtn.type = 'button';
+    lockBtn.id = 'interface-lock-all';
+    lockBtn.className = 'btn';
+    lockBtn.addEventListener('click', () => this.setUnlocked(false));
+    bar.appendChild(lockBtn);
+    const framesBtn = doc.createElement('button');
+    framesBtn.type = 'button';
+    framesBtn.id = 'interface-frames-toggle';
+    framesBtn.className = 'btn';
+    framesBtn.setAttribute('aria-expanded', 'false');
+    framesBtn.setAttribute('aria-controls', 'interface-frames-menu');
+    framesBtn.addEventListener('click', () => this.setFramesMenuOpen(!this.menuOpen));
+    bar.appendChild(framesBtn);
+    const menu = doc.createElement('div');
+    menu.id = 'interface-frames-menu';
+    menu.className = 'panel';
+    menu.hidden = true;
+    bar.appendChild(menu);
+    host.appendChild(bar);
+    this.controls = { bar, lockBtn, framesBtn, menu };
+    return this.controls;
+  }
+
+  /** Open or close the frames show/hide dropdown; opening (re)builds the rows
+   *  so the list always reflects the frames that are live right now. */
+  private setFramesMenuOpen(open: boolean): void {
+    if (!this.controls) return;
+    this.menuOpen = open;
+    if (open) this.rebuildFramesMenu();
+    this.controls.menu.hidden = !open;
+    this.controls.framesBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+
+  /** One checkbox row: the shared shape for both the show/hide list and the
+   *  settings toggles below it. */
+  private checkRow(
+    label: string,
+    checked: boolean,
+    onChange: (checked: boolean) => void,
+  ): HTMLElement {
+    const doc = this.deps.document;
+    const row = doc.createElement('label');
+    row.className = 'frames-menu-row';
+    const box = doc.createElement('input');
+    box.type = 'checkbox';
+    box.checked = checked;
+    box.addEventListener('change', () => onChange(box.checked));
+    row.appendChild(box);
+    const text = doc.createElement('span');
+    text.textContent = label;
+    row.appendChild(text);
+    return row;
+  }
+
+  /** One label + select row (the discrete numeric settings). A <label> like
+   *  checkRow, so clicking the text focuses the control and the row needs no
+   *  separate aria wiring: the label element names the select it wraps. */
+  private selectRow(select: FramesMenuSelect): HTMLElement {
+    const doc = this.deps.document;
+    const row = doc.createElement('label');
+    row.className = 'frames-menu-row frames-menu-select';
+    const text = doc.createElement('span');
+    text.textContent = select.label;
+    row.appendChild(text);
+    const picker = doc.createElement('select');
+    for (const option of select.options) {
+      const el = doc.createElement('option');
+      el.value = String(option.value);
+      el.textContent = option.label;
+      if (option.value === select.value) el.selected = true;
+      picker.appendChild(el);
+    }
+    picker.addEventListener('change', () => select.set(Number(picker.value)));
+    row.appendChild(picker);
+    return row;
+  }
+
+  /** The dropdown body: a show/hide SUB-MENU (one ticked row per LIVE frame; a
+   *  hidden-by-choice frame stays listed, since the menu is the way back), then
+   *  the frame-behavior setting toggles. Rebuilt on open / refresh /
+   *  relocalize rather than patched: the list is cold UI and a dozen-odd rows.
+   *  The sub-menu's expanded state survives the rebuild via `submenuOpen`, so
+   *  flipping a setting does not fold the list a player just opened. */
+  private rebuildFramesMenu(): void {
+    if (!this.controls) return;
+    const doc = this.deps.document;
+    const menu = this.controls.menu;
+    if (this.deps.framesMenuTitle) menu.setAttribute('aria-label', this.deps.framesMenuTitle());
+    while (menu.firstChild) menu.removeChild(menu.firstChild);
+    const sub = doc.createElement('details');
+    sub.className = 'frames-menu-sub';
+    sub.open = this.submenuOpen;
+    sub.addEventListener('toggle', () => {
+      this.submenuOpen = sub.open;
+    });
+    const summary = doc.createElement('summary');
+    summary.textContent = this.deps.framesSubmenuLabel ? this.deps.framesSubmenuLabel() : '';
+    sub.appendChild(summary);
+    const rows = doc.createElement('div');
+    rows.className = 'frames-menu-rows';
+    for (const entry of this.entries) {
+      const name = entry.mover.labelText();
+      if (!name) continue;
+      const override = entry.rowOverride;
+      if (override) {
+        if (!override.listed()) continue;
+        rows.appendChild(this.checkRow(name, override.value(), (checked) => override.set(checked)));
+        continue;
+      }
+      if (!entry.isActive() && !entry.mover.isUserHidden) continue;
+      rows.appendChild(
+        this.checkRow(name, !entry.mover.isUserHidden, (checked) =>
+          entry.mover.setUserHidden(!checked),
+        ),
+      );
+    }
+    sub.appendChild(rows);
+    menu.appendChild(sub);
+    const toggles = this.deps.settingToggles ? this.deps.settingToggles() : [];
+    const selects = this.deps.settingSelects ? this.deps.settingSelects() : [];
+    if (toggles.length > 0 || selects.length > 0) {
+      const settings = doc.createElement('div');
+      settings.className = 'frames-menu-settings';
+      for (const toggle of toggles) {
+        settings.appendChild(this.checkRow(toggle.label, toggle.value, (v) => toggle.set(v)));
+      }
+      for (const select of selects) settings.appendChild(this.selectRow(select));
+      menu.appendChild(settings);
+    }
+  }
+
   setUnlocked(unlocked: boolean): void {
     this.unlocked = unlocked;
+    const controls = unlocked ? this.ensureControls() : this.controls;
+    if (controls) {
+      if (this.deps.lockAllLabel) controls.lockBtn.textContent = this.deps.lockAllLabel();
+      if (this.deps.lockAllTitle) controls.lockBtn.title = this.deps.lockAllTitle();
+      if (this.deps.framesMenuLabel) controls.framesBtn.textContent = this.deps.framesMenuLabel();
+      if (this.deps.framesMenuTitle) controls.framesBtn.title = this.deps.framesMenuTitle();
+      controls.bar.hidden = !unlocked;
+      // Leaving edit mode folds the dropdown too, so re-entering starts clean.
+      if (!unlocked && this.menuOpen) this.setFramesMenuOpen(false);
+      // A refresh while the menu is open re-lists against the new active set
+      // (a bar enabled mid-unlock appears, a folded one drops out).
+      if (unlocked && this.menuOpen) this.rebuildFramesMenu();
+    }
     const candidates: UnlockCandidate[] = this.entries.map((e) => ({
       id: e.id,
       isActive: e.isActive,
@@ -70,6 +292,39 @@ export class InterfaceUnlock {
       entry.mover.setLockState(decisions.get(entry.id) ?? false);
     }
     this.deps.document.body.classList.toggle(INTERFACE_UNLOCKED_BODY_CLASS, unlocked);
+    this.deps.onUnlockedChanged?.(unlocked);
+  }
+
+  /** Re-run the unlock decision for every frame against the CURRENT eligibility,
+   *  without flipping the global flag. A frame that just became live (an action
+   *  bar enabled mid-unlock, the combined group after the option flipped) gains
+   *  its chrome immediately, and one that went inactive loses it. */
+  refresh(): void {
+    if (this.unlocked) this.setUnlocked(true);
+  }
+
+  /** Put one registered frame's bottom edge back where it was (the combined
+   *  action bar group, so plus/minus stacks rows upward from the bottom bar). */
+  reanchorBottom(id: string): void {
+    for (const entry of this.entries) {
+      if (entry.id === id) entry.mover.reanchorBottom();
+    }
+  }
+
+  /** Drop one registered frame's applied geometry while keeping its saved spot,
+   *  so a shape that goes inactive re-docks and returns unchanged later. */
+  clearAppliedGeometry(id: string): void {
+    for (const entry of this.entries) {
+      if (entry.id === id) entry.mover.clearAppliedGeometry();
+    }
+  }
+
+  /** Re-adopt one registered frame's saved spot from storage and apply it: the
+   *  way back after clearAppliedGeometry, when the shape becomes active again. */
+  restoreSavedPosition(id: string): void {
+    for (const entry of this.entries) {
+      if (entry.id === id) entry.mover.restoreSavedPosition();
+    }
   }
 
   /** Lock everything and forget every saved box. Wired to the existing
@@ -89,6 +344,16 @@ export class InterfaceUnlock {
    *  register here too, so their corner-button labels ride the same call. */
   relocalize(): void {
     for (const entry of this.entries) entry.mover.relocalize();
+    const controls = this.controls;
+    if (!controls) return;
+    if (this.deps.lockAllLabel) controls.lockBtn.textContent = this.deps.lockAllLabel();
+    if (this.deps.lockAllTitle) controls.lockBtn.title = this.deps.lockAllTitle();
+    if (this.deps.framesMenuLabel) controls.framesBtn.textContent = this.deps.framesMenuLabel();
+    if (this.deps.framesMenuTitle) controls.framesBtn.title = this.deps.framesMenuTitle();
+    // The dropdown rows are plain resolved text, so an open menu rebuilds once.
+    if (this.menuOpen) this.rebuildFramesMenu();
+    // The preview samples carry t() text too; the hook rebuilds them in place.
+    this.deps.onUnlockedChanged?.(this.unlocked);
   }
 }
 

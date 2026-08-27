@@ -22,19 +22,31 @@ describe('HUD_FRAME_SPECS', () => {
       'actionBar1',
       'actionBar2',
       'actionBar3',
+      'actionBarGroup',
       'castBar',
+      'swingBar',
       'menu',
       'minimap',
       'petFrame',
+      'stanceBar',
+      'xpBar',
+      'buffBar',
+      'debuffBar',
     ]);
     expect(HUD_FRAME_SPECS.map((s) => s.elementId)).toEqual([
       'actionbar',
       'actionbar2',
       'actionbar3',
+      'actionbar-group',
       'castbar',
+      'swingbar',
       'side-buttons',
       'minimap-wrap',
       'pet-frame',
+      'stancebar',
+      'xpbar',
+      'buff-bar',
+      'debuff-bar',
     ]);
     // A duplicated storage key would make two frames overwrite each other's
     // saved box, which is silent and only shows up after a reload.
@@ -42,12 +54,37 @@ describe('HUD_FRAME_SPECS', () => {
     for (const key of HUD_FRAME_STORAGE_KEYS) expect(key.startsWith('woc_hud_frame_')).toBe(true);
   });
 
-  it('marks exactly the frames under the transformed #bottom-bar for re-homing', () => {
-    // The action bars and the pet frame live inside #bottom-bar, whose centering
-    // transform becomes the containing block for absolute positioning; the cast
-    // bar, menu rail and minimap are already #ui children.
+  it('marks exactly the frames that can sit under a transformed ancestor for re-homing', () => {
+    // The action bars, pet frame and XP bar live inside #bottom-bar, whose
+    // centering transform becomes the containing block for absolute positioning;
+    // the buff/debuff rows can be re-parented into the player frame at runtime
+    // (auras-on-frame). The cast bar, menu rail and minimap are already #ui
+    // children, and the detacher is a no-op for a frame already homed there.
     const detaching = HUD_FRAME_SPECS.filter((s) => s.detachToUiRoot).map((s) => s.id);
-    expect(detaching).toEqual(['actionBar1', 'actionBar2', 'actionBar3', 'petFrame']);
+    expect(detaching).toEqual([
+      'actionBar1',
+      'actionBar2',
+      'actionBar3',
+      'actionBarGroup',
+      'petFrame',
+      'stanceBar',
+      'xpBar',
+      'buffBar',
+      'debuffBar',
+    ]);
+  });
+
+  it('reserves box (layout) resize for the frames that genuinely reflow', () => {
+    // Everything else is fixed content (46px slots, a minimap canvas, a
+    // portrait), where stretching one axis only grew empty space.
+    const box = HUD_FRAME_SPECS.filter((s) => s.resizeMode === 'box').map((s) => s.id);
+    expect(box).toEqual(['buffBar', 'debuffBar']);
+  });
+
+  it('names every frame with a label key so no placeholder is anonymous', () => {
+    for (const spec of HUD_FRAME_SPECS) {
+      expect(spec.labelKey, `frame ${spec.id} has no name chip key`).toBeTruthy();
+    }
   });
 
   it('gives every frame a positive fallback size for the hidden-frame clamp', () => {

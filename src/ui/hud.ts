@@ -5,7 +5,12 @@ import type { GraphicsSettingsSnapshot } from '../game/graphics_rebuild_core';
 import { InstanceMusicController } from '../game/instance_music';
 import { type Keybinds, keyCapLabel, keyLabel } from '../game/keybinds';
 import { music } from '../game/music';
-import type { GameSettings, Settings } from '../game/settings';
+import {
+  type GameSettings,
+  type NumericSettingKey,
+  SETTING_RANGES,
+  type Settings,
+} from '../game/settings';
 import { sfx } from '../game/sfx';
 import type { UiEffectsTier } from '../game/ui_effects_profile';
 import {
@@ -121,6 +126,7 @@ import {
   GATHER_CAST_ID,
   type ItemDef,
   isMechWearer,
+  isPetClass,
   MAX_LEVEL,
   MELEE_RANGE,
   MILESTONES,
@@ -359,6 +365,10 @@ import {
 import { isActionBarEditAllowed } from './hud/action_bar/action_bar_lock';
 import { ActionBarPainter, type ActionBarSlotElements } from './hud/action_bar/action_bar_painter';
 import {
+  type ActionBarToggleControl,
+  installActionBarToggle,
+} from './hud/action_bar/action_bar_toggle_controller';
+import {
   ABILITY_ICON_PREFIX,
   type ActionBarView,
   type ActionBarWorldInput,
@@ -367,6 +377,7 @@ import {
   EMPTY_ICON_KEY,
   ITEM_ICON_PREFIX,
 } from './hud/action_bar/action_bar_view';
+import type { ActionBarVisibility } from './hud/action_bar/action_bar_visibility_core';
 import {
   abilityStartsAutoAttack,
   deferAutoAttackUntilCastEnd,
@@ -496,6 +507,7 @@ import {
 import { InspectWindow } from './inspect_window';
 import { InterfaceUnlock, makeUiRootDetacher } from './interface_unlock';
 import { HUD_FRAME_SPECS } from './interface_unlock_core';
+import { InterfaceUnlockPreview } from './interface_unlock_preview';
 import { itemArmorTypeLabelKey } from './item_armor_type';
 import { requiredClassesForTooltip } from './item_class_restriction';
 import { itemStatDeltas } from './item_compare';
@@ -577,7 +589,7 @@ import { MobileMoreDialogController } from './mobile_more_dialog';
 import { MOUNT_DESC_KEYS, mountSpecLines } from './mount_labels';
 import { MountRaceControls } from './mount_race_controls';
 import { MountRaceStrip } from './mount_race_strip';
-import { MovableFrame } from './movable_frame';
+import { type FrameDimension, MovableFrame } from './movable_frame';
 import { NPC_WINDOW_CLOSE_RANGE } from './npc_service_range';
 import { OptionsWindow } from './options_window';
 import {
@@ -1254,6 +1266,10 @@ export class Hud {
   private actionBarView!: ActionBarView;
   private actionBarPainter!: ActionBarPainter;
   private actionBarWorldInput: ActionBarWorldInput | null = null;
+  // The plus/minus optional-row toggle at the end of the primary bar. Installed
+  // in buildActionBar; main.ts applySetting pushes the resolved visibility back
+  // through setActionBarVisibility so the buttons track the options checkboxes.
+  private actionBarToggle: ActionBarToggleControl | null = null;
   // On-bar key-binding mode (issue #1238): null while inactive. Entered from the
   // Key Bindings menu's single "Edit action bar keys" entry (replacing the wall
   // of per-slot rebind rows), it lets a slot click on the live action bar select
@@ -1540,6 +1556,12 @@ export class Hud {
   private xpbarEl = $('#xpbar');
   private xpRestedEl = $('#xpbar .rested');
   private playerFrameEl = $('#player-frame');
+  // The action-bar group box, the anchor lockPlayerFrameToActionBar rides.
+  private actionBarGroupEl = $('#actionbar-group');
+  // lockPlayerFrameToActionBar (Frames Settings menu): while on, the player
+  // frame is glued to the top of the action bars instead of carrying its own
+  // position; setLockPlayerFrameToActionBar owns the mechanics.
+  private playerFrameLockedToBar = false;
   // The party-frames container, resolved once (was re-queried every frame); the
   // keyed-pool party painter owns its children.
   private partyFramesEl = $('#party-frames');
@@ -1912,7 +1934,177 @@ export class Hud {
   // cast bar, menu rail, minimap and pet frame get their movers from the pure
   // frame table, and the three unit frames above join the same toggle so one
   // press loosens the whole HUD.
-  private readonly interfaceUnlock = new InterfaceUnlock({ document });
+  // Sample content for the edit mode's placeholder frames (example buffs,
+  // party members, a mid-cast bar), rebuilt on every unlock flip. The party
+  // sample is rendered by a THROWAWAY instance of the real PartyFramesPainter
+  // over sample members (owner request: identical to a live party, not an
+  // approximation); a fresh writer facet per build keeps the shared elision
+  // caches free of entries for the discarded preview rows.
+  private readonly unlockPreview = new InterfaceUnlockPreview(document, (host) => {
+    const noopWrite = () => {};
+    const writers = makeWriterFacet(
+      new Map(),
+      new Map(),
+      new Map(),
+      new Map(),
+      noopWrite,
+      noopWrite,
+    );
+    const painter = new PartyFramesPainter(writers, host, {
+      classCss,
+      onTarget: noopWrite,
+      onContextMenu: noopWrite,
+      onHover: noopWrite,
+      onTargetPet: noopWrite,
+      petLabel: (name, frac) =>
+        t('hudChrome.partyFrames.petHealth', {
+          name,
+          pct: formatNumber(frac, { style: 'percent', maximumFractionDigits: 0 }),
+        }),
+      chipLabel: () => t('hudChrome.unitFrame.partyChip'),
+      onToggleCollapse: noopWrite,
+      partyAuras: this.partyAurasDeps,
+    });
+    const settings = this.optionsHooks?.settings;
+    const config = {
+      showSelf: settings?.get('partyFrameShowSelf') ?? false,
+      showResource: settings?.get('partyFrameShowResource') ?? true,
+      showAbsorbs: settings?.get('partyFrameShowAbsorbs') ?? true,
+      showAuras: settings?.get('partyFrameShowAuras') ?? true,
+      showPets: settings?.get('partyFrameShowPets') ?? true,
+      presentation: Math.round(settings?.get('partyFrameStyle') ?? 0) as 0 | 1 | 2,
+      healthText: Math.round(settings?.get('partyFrameHealthText') ?? 1) as 0 | 1 | 2 | 3,
+      sort: Math.round(settings?.get('partyFrameSort') ?? 0) as 0 | 1 | 2,
+    };
+    // A full 10-member roster (owner request), so arranging is done against
+    // the largest stack the frame will realistically hold. The player's REAL
+    // party renders first, selected through the exact pipeline the live
+    // frames use, then dummy members pad the roster out to the total.
+    const SAMPLE_TOTAL = 10;
+    const info = this.sim.partyInfo;
+    const pets = config.showPets ? findPetsByOwner(this.sim.entities.values()) : undefined;
+    const real = info
+      ? selectPartyFrameMembers(
+          info,
+          this.sim.playerId,
+          this.sim.player.pos,
+          undefined,
+          config,
+          pets,
+        )
+      : [];
+    const classes = [
+      'warrior',
+      'priest',
+      'rogue',
+      'hunter',
+      'shaman',
+      'mage',
+      'warlock',
+      'paladin',
+      'druid',
+    ] as const;
+    const resourceFor: Record<(typeof classes)[number], ResourceType> = {
+      warrior: 'rage',
+      priest: 'mana',
+      rogue: 'energy',
+      hunter: 'focus',
+      shaman: 'mana',
+      mage: 'mana',
+      warlock: 'mana',
+      paladin: 'mana',
+      druid: 'mana',
+    };
+    const members = [...real];
+    for (let i = real.length; i < SAMPLE_TOTAL; i += 1) {
+      const cls = classes[i % classes.length];
+      members.push({
+        // Negative pids so a sample row key can never collide with a real member.
+        pid: -(i + 1),
+        name: `${t(`classes.${cls}` as TranslationKey)} ${formatNumber(i + 1)}`,
+        cls,
+        level: 20,
+        hp: 100,
+        mhp: 100,
+        res: cls === 'warrior' ? 0 : 100,
+        mres: 100,
+        rtype: resourceFor[cls],
+        x: 0,
+        z: 0,
+        dead: 0,
+        inCombat: 0,
+        group: 1 as const,
+        connected: 1,
+        oor: false,
+      });
+    }
+    painter.sync(members, info?.leader ?? members[0]?.pid ?? 0, false, config);
+  });
+  private readonly interfaceUnlock = new InterfaceUnlock({
+    document,
+    onUnlockedChanged: (unlocked) => this.unlockPreview.setActive(unlocked),
+    lockAllLabel: () => t('hudChrome.interfaceUnlock.lockAll'),
+    lockAllTitle: () => t('hudChrome.interfaceUnlock.frozenNote'),
+    framesMenuLabel: () => t('hudChrome.interfaceUnlock.framesMenu'),
+    framesMenuTitle: () => t('hudChrome.interfaceUnlock.framesMenuTitle'),
+    framesSubmenuLabel: () => t('hudChrome.interfaceUnlock.showHideFrames'),
+    // The frame-behavior settings the dropdown owns (their options-window rows
+    // are gone; see buildInterfaceControls). `set` persists AND applies, the
+    // same pair the options window's own toggle rows drive.
+    settingToggles: () => {
+      const hooks = this.optionsHooks;
+      if (!hooks) return [];
+      const rows = [
+        ['combineActionBars', 'hudChrome.options.combineActionBars'],
+        ['hideUnusedActionSlots', 'hudChrome.options.hideUnusedActionSlots'],
+        ['mouseoverCast', 'hudChrome.options.mouseoverCast'],
+        ['lockActionBars', 'hudChrome.options.lockActionBars'],
+        ['buffsLeftToRight', 'hudChrome.interfaceUnlock.buffsLeftToRight'],
+        ['debuffsLeftToRight', 'hudChrome.interfaceUnlock.debuffsLeftToRight'],
+        ['lockPlayerFrameToActionBar', 'hudChrome.interfaceUnlock.lockPlayerFrameToBar'],
+      ] as const;
+      return rows.map(([key, labelKey]) => ({
+        id: key,
+        label: t(labelKey),
+        value: !!hooks.settings.get(key),
+        set: (value: boolean) => hooks.onSettingChange(key, hooks.settings.set(key, value)),
+      }));
+    },
+    // Party frame columns lives here rather than the options window (owner
+    // request: the sizing knobs moved out of the Frames tab once the editor
+    // gained real-dimension drags; columns is the one discrete leftover).
+    settingSelects: () => {
+      const hooks = this.optionsHooks;
+      if (!hooks) return [];
+      // The discrete party layout knobs live here rather than the options
+      // window (owner request: the sizing sliders left the Frames tab once
+      // the editor gained real-dimension drags; columns and the row spacing
+      // join the editor's own menu as whole-px pickers).
+      const selectFor = (
+        key: 'partyFrameColumns' | 'partyFrameSpacing',
+        labelKey: TranslationKey,
+      ) => {
+        const range = SETTING_RANGES[key];
+        const options: { value: number; label: string }[] = [];
+        for (let value = range.min; value <= range.max; value += 1)
+          options.push({ value, label: formatNumber(value) });
+        return {
+          id: key,
+          label: t(labelKey),
+          value: Math.round(Number(hooks.settings.get(key) ?? range.def)),
+          options,
+          set: (value: number) => hooks.onSettingChange(key, hooks.settings.set(key, value)),
+        };
+      };
+      return [
+        selectFor('partyFrameColumns', 'hudChrome.partyFrames.columns'),
+        selectFor('partyFrameSpacing', 'hudChrome.partyFrames.spacing'),
+      ];
+    },
+  });
+  // The "Combine Action Bars" option: while on, the three rows move as the one
+  // #actionbar-group frame instead of three independent ones.
+  private combineActionBars = false;
   private windowObserver: MutationObserver | null = null;
   private windowZ = 50;
   private localIgnoredNames = new Set<string>();
@@ -2280,6 +2472,7 @@ export class Hud {
       isMobileLayout: () => this.isMobileLayout(),
       hasStorePromoCard: () => this.storePromoCard !== null,
       uiScale: getUiScale,
+      isInterfaceUnlocked: () => this.interfaceUnlock.isUnlocked,
     });
     this.chatWindow = new ChatWindowController({
       document,
@@ -3565,6 +3758,13 @@ export class Hud {
     // position applies, and detaches the player frame, at construction).
     resetFramePositionsOnce(localStorage);
     const isMobileLayout = () => this.isMobileLayout();
+    // The three unit-frame movers resize in 'dimensions' mode: edge drags
+    // walk the frames' real width/height SETTINGS (the raid-frame model the
+    // party sliders established), so bars reflow at crisp text instead of
+    // transform-stretching. A height-axis setting px is BAR thickness for the
+    // player/target frames; the visible height change fans that out over the
+    // hp + resource bar pair, times the frame's content zoom.
+    const UNIT_FRAME_BARS = 2;
     // A live desktop-to-mobile viewport flip must re-home the anchored aura
     // bars (mobile owns its own aura placement), and the flip back re-anchors.
     window.addEventListener('resize', () => this.applyAuraAnchor());
@@ -3574,9 +3774,22 @@ export class Hud {
         storageKey: TARGET_FRAME_POS_KEY,
         unlockLabelKey: 'hudChrome.targetFrame.unlock',
         lockLabelKey: 'hudChrome.targetFrame.lock',
+        resizeLabelKey: 'hudChrome.interfaceUnlock.resizeFrame',
+        frameLabelKey: 'hudChrome.interfaceUnlock.frameNames.targetFrame',
         draggingBodyClass: 'target-frame-dragging',
         fallbackSize: { w: 220, h: 92 },
         isMobileLayout,
+        scalable: true,
+        resizeMode: 'dimensions',
+        dimensions: {
+          width: this.frameDimension('targetFrameWidth', () =>
+            this.numericSetting('targetFrameScale'),
+          ),
+          height: this.frameDimension(
+            'targetFrameHeight',
+            () => this.numericSetting('targetFrameScale') * UNIT_FRAME_BARS,
+          ),
+        },
       });
     }
     if (this.playerFrameEl) {
@@ -3594,9 +3807,22 @@ export class Hud {
         storageKey: PLAYER_FRAME_POS_KEY,
         unlockLabelKey: 'hudChrome.playerFrame.unlock',
         lockLabelKey: 'hudChrome.playerFrame.lock',
+        resizeLabelKey: 'hudChrome.interfaceUnlock.resizeFrame',
+        frameLabelKey: 'hudChrome.interfaceUnlock.frameNames.playerFrame',
         draggingBodyClass: 'player-frame-dragging',
         fallbackSize: { w: 260, h: 84 },
         isMobileLayout,
+        scalable: true,
+        resizeMode: 'dimensions',
+        dimensions: {
+          width: this.frameDimension('playerFrameWidth', () =>
+            this.numericSetting('playerFrameScale'),
+          ),
+          height: this.frameDimension(
+            'playerFrameHeight',
+            () => this.numericSetting('playerFrameScale') * UNIT_FRAME_BARS,
+          ),
+        },
         onPositioned: (active) => this.setPlayerFrameDetached(active),
       });
     }
@@ -3606,9 +3832,14 @@ export class Hud {
       // keybind performs. Pets are ordinary targetable entities, and your own pet
       // stays selectable while DEAD (src/sim/dead_target.ts) so the Revive action on
       // the pet bar below stays reachable from here.
-      this.petFrameEl.addEventListener('click', () => this.targetOwnPet());
+      // While the interface is unlocked the frame is a drag handle, not a
+      // select button: a completed drag would otherwise also select the pet.
+      this.petFrameEl.addEventListener('click', () => {
+        if (!this.interfaceUnlock.isUnlocked) this.targetOwnPet();
+      });
       this.petFrameEl.addEventListener('keydown', (ev: KeyboardEvent) => {
         if (ev.key !== 'Enter' && ev.key !== ' ') return;
+        if (this.interfaceUnlock.isUnlocked) return;
         ev.preventDefault();
         this.targetOwnPet();
       });
@@ -3618,11 +3849,65 @@ export class Hud {
       storageKey: PARTY_FRAME_POS_KEY,
       unlockLabelKey: 'hudChrome.partyFrames.unlock',
       lockLabelKey: 'hudChrome.partyFrames.lock',
+      resizeLabelKey: 'hudChrome.interfaceUnlock.resizeFrame',
+      frameLabelKey: 'hudChrome.interfaceUnlock.frameNames.partyFrames',
       draggingBodyClass: 'party-frame-dragging',
       fallbackSize: { w: 360, h: 240 },
       isMobileLayout,
+      scalable: true,
+      resizeMode: 'dimensions',
+      // Party width/height are PER-ROW settings; the drag factor carries the
+      // live stack's fan-out (columns across, rows down) so the grabbed edge
+      // tracks the pointer over however many frames are showing.
+      dimensions: {
+        width: this.frameDimension(
+          'partyFrameWidth',
+          () => this.numericSetting('partyFrameScale') * this.partyFrameGrid().cols,
+        ),
+        height: this.frameDimension(
+          'partyFrameHeight',
+          () => this.numericSetting('partyFrameScale') * this.partyFrameGrid().rows,
+        ),
+      },
     });
     this.initInterfaceUnlock(isMobileLayout);
+  }
+
+  // resizeMode 'dimensions' plumbing for the movers above: each axis reads
+  // and writes the real SETTING through optionsHooks (persist + live apply
+  // via main.ts applySetting, exactly the options sliders' path), so the
+  // editor drags, the sliders, and the CSS vars stay one source of truth.
+  // Bounds come from SETTING_RANGES, the sliders' own clamp table.
+  private frameDimension(key: NumericSettingKey, factor?: () => number): FrameDimension {
+    const range = SETTING_RANGES[key];
+    return {
+      get: () => Number(this.optionsHooks?.settings.get(key) ?? range.def),
+      set: (value: number) => {
+        const hooks = this.optionsHooks;
+        if (hooks) hooks.onSettingChange(key, hooks.settings.set(key, value));
+      },
+      min: range.min,
+      max: range.max,
+      factor,
+    };
+  }
+
+  private numericSetting(key: NumericSettingKey): number {
+    return Number(this.optionsHooks?.settings.get(key) ?? SETTING_RANGES[key].def);
+  }
+
+  // The live party stack's shape, for the party mover's drag factors. Counts
+  // rendered rows (the edit-mode preview's sample rows included, since those
+  // are what the drag is sized against) and caps columns at the row count.
+  private partyFrameGrid(): { cols: number; rows: number } {
+    // While the edit preview is mounted its sample roster IS the visible
+    // stack (the interface-unlocked CSS folds the live rows wrapper away),
+    // so the drag factors count the preview's rows; the container fallback
+    // covers a gesture with no preview mounted.
+    const scope = this.partyFramesEl.querySelector('.tf-preview-party') ?? this.partyFramesEl;
+    const count = scope.querySelectorAll('.party-frame').length || 1;
+    const cols = Math.max(1, Math.min(count, Math.round(this.numericSetting('partyFrameColumns'))));
+    return { cols, rows: Math.ceil(count / cols) };
   }
 
   // The frames the "Unlock interface" option governs. Each row of the pure table
@@ -3636,44 +3921,119 @@ export class Hud {
       const frame = document.getElementById(spec.elementId);
       if (!frame) continue;
       const detach = makeUiRootDetacher(document, spec, frame);
+      // The combined group is the anchor lockPlayerFrameToActionBar rides:
+      // every position apply (a drag move, a resolution re-anchor, the
+      // detach/re-dock transitions) re-evaluates whether the player frame
+      // should be sitting inside it.
+      const onPositioned =
+        spec.id === 'actionBarGroup'
+          ? (active: boolean) => {
+              detach(active);
+              this.applyPlayerFrameBarLock();
+            }
+          : detach;
       const mover = new MovableFrame({
         frame,
         storageKey: spec.storageKey,
         unlockLabelKey: 'hudChrome.interfaceUnlock.unlockFrame',
         lockLabelKey: 'hudChrome.interfaceUnlock.lockFrame',
         resizeLabelKey: 'hudChrome.interfaceUnlock.resizeFrame',
+        frameLabelKey: spec.labelKey,
         draggingBodyClass: 'hud-frame-dragging',
         fallbackSize: spec.fallbackSize,
         isMobileLayout,
         scalable: true,
+        resizeMode: spec.resizeMode,
         buttonOnlyWhenUnlocked: true,
-        onPositioned: detach,
+        onPositioned,
       });
+      // The optional bars' menu row toggles the bar's ENABLED setting (the
+      // same state the on-bar plus/minus drives), listed whenever the bars are
+      // split, so the Frames Settings menu can turn bar 2 or 3 on, not only
+      // hide a shown one. Combined, the rows fold away with the shape.
+      const optionalBarKey =
+        spec.id === 'actionBar2'
+          ? ('showSecondaryActionBar' as const)
+          : spec.id === 'actionBar3'
+            ? ('showThirdActionBar' as const)
+            : null;
       this.interfaceUnlock.register({
         id: spec.id,
         mover,
         isActive: () => this.isHudFrameActive(spec.id, frame),
+        ...(optionalBarKey
+          ? {
+              rowOverride: {
+                listed: () => !this.combineActionBars,
+                value: () => !!this.optionsHooks?.settings.get(optionalBarKey),
+                set: (checked: boolean) => {
+                  // Re-showing via the menu also clears a stale menu-hide, so
+                  // the ticked bar actually appears.
+                  if (checked) mover.setUserHidden(false);
+                  this.optionsHooks?.onSettingChange(optionalBarKey, checked);
+                },
+              },
+            }
+          : {}),
       });
     }
+    // Like the table rows, the unit frames answer "possible", not "visible":
+    // every class can gain a target and a party, so unlocking always shows their
+    // placeholders (the stylesheet forces an empty/hidden frame visible while
+    // unlocked) and both arrive already unlocked when they fill in mid-unlock.
     const unitFrames: Array<[string, MovableFrame | null, () => boolean]> = [
-      ['playerFrame', this.playerFrameMover, () => true],
-      ['targetFrame', this.targetFrameMover, () => this.targetFrameEl?.style.display !== 'none'],
-      ['partyFrames', this.partyFrameMover, () => this.partyFramesEl.children.length > 0],
+      // A player frame locked to the action bar is not individually movable:
+      // the bars own its spot, so unlocking must not loosen it (its corner
+      // button is hidden by the body.pf-locked-to-bar CSS for the same
+      // reason).
+      ['playerFrame', this.playerFrameMover, () => !this.playerFrameLockedToBar],
+      ['targetFrame', this.targetFrameMover, () => true],
+      ['partyFrames', this.partyFrameMover, () => true],
     ];
     for (const [id, mover, isActive] of unitFrames) {
       if (mover) this.interfaceUnlock.register({ id, mover, isActive });
     }
+    // Every mover applied its saved spot at construction, including the one
+    // action-bar shape that is NOT active right now (combining defaults off
+    // here; the boot apply-all loop flips it through setCombineActionBars,
+    // which restores the group's spot properly). Without this the group kept
+    // its constructor-applied inline position and #ui re-home while inert, so
+    // ticking Combine Action Bars later snapped it to a stale spot, and a
+    // saved group position warped the bars out of the stack at load.
+    this.interfaceUnlock.clearAppliedGeometry('actionBarGroup');
   }
 
-  // Is this frame live for the character right now? The cast bar is the one row
-  // that answers yes while hidden: every class casts, it is simply not casting
-  // this instant, so the unlocked stylesheet shows it as a dimmed placeholder to
-  // be positioned. Everything else reports what the player can actually see.
-  private isHudFrameActive(id: string, frame: HTMLElement): boolean {
-    if (id === 'castBar') return true;
-    if (id === 'actionBar2') return document.body.classList.contains('show-actionbar2');
-    if (id === 'actionBar3') return document.body.classList.contains('show-actionbar3');
-    return frame.style.display !== 'none';
+  // Could this frame EVER appear for this character? Unlocking shows every
+  // possible frame at once (hidden ones as dimmed placeholders the stylesheet
+  // forces visible off .tf-unlocked), so the whole layout is arrangeable in one
+  // session: the cast bar while not casting, the optional action bars while
+  // switched off (they also arrive already unlocked when enabled mid-unlock),
+  // an empty target/party/buff frame. The one class-conditional row is the pet
+  // frame: only a pet class can ever have one, so only a pet class gets its
+  // placeholder.
+  private isHudFrameActive(id: string, _frame: HTMLElement): boolean {
+    // Exactly one action-bar shape is movable at a time: the combined group, or
+    // the rows on their own. Anything else would leave two frames writing the
+    // same block's position. The OPTIONAL rows are movable only while actually
+    // turned on: a switched-off bar stays hidden even while editing (the
+    // options note points players at the plus/minus buttons), and
+    // setActionBarVisibility refreshes the unlock decision when a bar flips.
+    if (id === 'actionBarGroup') return this.combineActionBars;
+    if (id === 'actionBar1') return !this.combineActionBars;
+    if (id === 'actionBar2') {
+      return !this.combineActionBars && document.body.classList.contains('show-actionbar2');
+    }
+    if (id === 'actionBar3') {
+      return !this.combineActionBars && document.body.classList.contains('show-actionbar3');
+    }
+    if (id === 'petFrame') return isPetClass(this.sim.cfg.playerClass);
+    // The stance-style choice bar exists only for the two classes that get one
+    // (warrior stances, paladin auras), mirroring renderStanceBar's own gate.
+    if (id === 'stanceBar') {
+      const cls = this.sim.cfg.playerClass;
+      return cls === 'warrior' || cls === 'paladin';
+    }
+    return true;
   }
 
   /** Toggle every movable HUD frame between locked and unlocked. Returns the new
@@ -3694,8 +4054,23 @@ export class Hud {
   // menu, minimap and pet frame. The doom meter runs its own MovableFrame outside
   // the registry, so it keeps its own line here.
   resetUnitFrames(): void {
+    // The one button that answers "put the interface back the way the base
+    // game ships": lock everything, forget every saved frame box (all the
+    // registered movers: unit frames, action bars and their combined group,
+    // cast bar, menu, minimap, pet, stance bar, XP bar, aura group), and
+    // re-dock the panels that keep their own geometry (chat, meter panels,
+    // target auras, doom meter). Combining the action bars is a layout mode of
+    // this same feature, so it splits back apart too, routed through the
+    // settings seam so the checkbox, persistence and body class stay in sync.
+    // Settings that merely SHOW or HIDE content (the optional bars, the pet
+    // frame, buffs on the player frame) keep the player's choice: they have
+    // their own checkboxes and are not frame layout.
     this.interfaceUnlock.resetAll();
     this.doomMeter.resetPosition();
+    this.chatGeometry.reset();
+    this.meters.resetFrames();
+    this.targetAurasWindow.resetFrame();
+    if (this.combineActionBars) this.optionsHooks?.onSettingChange('combineActionBars', false);
   }
 
   /** Repaint persisted visual-space geometry after a live UI Scale change. */
@@ -3727,6 +4102,58 @@ export class Hud {
     // action-bar stack, holding the pet's controls as well as its health, so it
     // belongs with the bars rather than hanging off the player frame; dragging the
     // player frame elsewhere leaves the pet UI where the player put the bars.
+  }
+
+  // lockPlayerFrameToActionBar: glue the player frame to the top of the
+  // action bars. On: the frame drops its own dragged spot (the save stays in
+  // storage) and re-docks into the stock stack seat directly above the bars,
+  // which the stack's flex column already moves when bar 2 or 3 is added or
+  // removed; the unlock registration and the body class then keep it from
+  // being moved on its own. Off: the frame re-adopts its saved spot.
+  setLockPlayerFrameToActionBar(on: boolean): void {
+    this.playerFrameLockedToBar = on;
+    document.body.classList.toggle('pf-locked-to-bar', on);
+    if (on) {
+      this.playerFrameMover?.clearAppliedGeometry();
+    } else {
+      // Un-ride the group FIRST (the frame may be sitting inside it), then
+      // return to whatever the player had saved.
+      this.applyPlayerFrameBarLock();
+      this.playerFrameMover?.restoreSavedPosition();
+    }
+    this.applyPlayerFrameBarLock();
+    // Re-run the unlock decision so a live edit session drops (or regains)
+    // the frame's chrome with the setting.
+    this.interfaceUnlock.refresh();
+  }
+
+  // The follow half of the lock: whenever the COMBINED group carries a custom
+  // position (class hud-frame-detached), the frame rides INSIDE it as its
+  // first flex child, so a drag, a bar row added or removed, and a resolution
+  // re-anchor all carry the frame with zero extra geometry; whenever the
+  // group is docked (or the bars are split), the stock stack seat already
+  // sits the frame directly above the bars, so it goes home. Re-evaluated
+  // from the group mover's every onPositioned and from the setting flip. The
+  // reanchorBottom after either hop keeps BAR 1 pixel-fixed (the group is
+  // bottom-anchored), absorbing the frame's height into the group's top edge
+  // instead of shoving the bars down or up under the player's cursor.
+  private applyPlayerFrameBarLock(): void {
+    const group = this.actionBarGroupEl;
+    const frame = this.playerFrameEl;
+    const ride =
+      this.playerFrameLockedToBar &&
+      !this.isMobileLayout() &&
+      group.classList.contains('hud-frame-detached');
+    if (ride) {
+      if (frame.parentElement !== group) {
+        frame.classList.remove('pf-detached');
+        group.insertBefore(frame, group.firstChild);
+        this.interfaceUnlock.reanchorBottom('actionBarGroup');
+      }
+    } else if (frame.parentElement === group) {
+      this.setPlayerFrameDetached(false);
+      this.interfaceUnlock.reanchorBottom('actionBarGroup');
+    }
   }
 
   // Buffs on the Player Frame (aurasOnPlayerFrame): reparent the player's own
@@ -5082,6 +5509,8 @@ export class Hud {
     resetUnitFrames: () => this.resetUnitFrames(),
     isInterfaceUnlocked: () => this.isInterfaceUnlocked(),
     toggleInterfaceUnlock: () => this.toggleInterfaceUnlock(),
+    confirmDialog: (title, body, okText, cancelText, onOk) =>
+      this.confirmDialog(title, body, okText, cancelText, onOk),
     getChatTimestamps: () => this.chatTimestamps,
     setChatTimestamps: (on) => {
       this.chatTimestamps = on;
@@ -5351,6 +5780,47 @@ export class Hud {
   // When off, the per-frame update paints the frame hidden.
   setShowPetFrame(on: boolean): void {
     this.showPetFrame = on;
+  }
+
+  // Merge the three action bar rows into ONE movable frame, or split them back
+  // apart (combineActionBars option, driven from main.ts applySetting). The
+  // rows already share the #actionbar-group wrapper in both entry documents, so
+  // nothing is reparented: the body class turns the wrapper from a box-less
+  // `display: contents` passthrough into a real column frame, and the shape
+  // that just went inactive drops its applied geometry (keeping its saved spot
+  // for the way back) so two frames never position the same block at once.
+  setCombineActionBars(on: boolean): void {
+    if (this.combineActionBars === on) return;
+    this.combineActionBars = on;
+    document.body.classList.toggle('combined-action-bars', on);
+    // The retired shape drops its applied geometry (keeping its saved spot in
+    // storage); the shape taking over re-adopts ITS saved spot. Without the
+    // restore, the activated shape kept whatever stale inline position it was
+    // constructed with, which is what made the combined block jump sideways
+    // to an old saved spot the moment the option was ticked.
+    const stale = on ? ['actionBar1', 'actionBar2', 'actionBar3'] : ['actionBarGroup'];
+    const fresh = on ? ['actionBarGroup'] : ['actionBar1', 'actionBar2', 'actionBar3'];
+    for (const id of stale) this.interfaceUnlock.clearAppliedGeometry(id);
+    for (const id of fresh) this.interfaceUnlock.restoreSavedPosition(id);
+    // Re-run the unlock decision so the newly live shape gains its chrome (and
+    // the retired one loses it) without needing a lock/unlock round trip.
+    this.interfaceUnlock.refresh();
+  }
+
+  // Push the resolved optional-row visibility to the on-bar plus/minus toggle,
+  // driven from main.ts applySetting (both the boot apply-all loop and every
+  // later change, whether it came from the options window or the toggle itself).
+  setActionBarVisibility(visibility: ActionBarVisibility): void {
+    this.actionBarToggle?.sync(visibility);
+    // Combined, the group is one positioned block, so a row appearing or
+    // vanishing would otherwise push the bottom bar around under the player's
+    // hand. Pinning the bottom edge makes plus/minus stack rows UPWARD from
+    // bar 1, which is where the buttons themselves live.
+    if (this.combineActionBars) this.interfaceUnlock.reanchorBottom('actionBarGroup');
+    // A bar that flips on or off while the interface is unlocked gains or
+    // sheds its movable chrome immediately: the optional rows are eligible
+    // only while shown, so the unlock decision is stale the moment one flips.
+    this.interfaceUnlock.refresh();
   }
 
   /** Select the player's own pet: the pet frame's click/key action and the targetPet
@@ -7454,6 +7924,25 @@ export class Hud {
       (iconKey) => this.actionBarIconBg(iconKey),
     );
 
+    // The plus/minus optional-row toggle rides the end of the primary bar. Its
+    // clicks route the visibility settings through optionsHooks.onSettingChange,
+    // so main.ts applySetting stays the one resolver (dependency rule, body
+    // classes, persistence) and pushes the result back via setActionBarVisibility.
+    this.actionBarToggle = installActionBarToggle({
+      container: this.actionbarEl,
+      document,
+      // Live settings when hooks are already attached; at first build they are
+      // not yet, which matches the settings defaults (both rows off).
+      initial: {
+        secondary: Boolean(this.optionsHooks?.settings.get('showSecondaryActionBar')),
+        third: Boolean(this.optionsHooks?.settings.get('showThirdActionBar')),
+      },
+      t,
+      apply: (setting, value) => this.optionsHooks?.onSettingChange(setting, value),
+      tooltip: (el, text) =>
+        this.attachTooltip(el, () => `<div class="tt-sub">${esc(text())}</div>`),
+    });
+
     this.buildMobileActionRing();
     this.buildMobileConsumableBar();
   }
@@ -8185,10 +8674,14 @@ export class Hud {
     const knownIds = knownStances.map((k) => k.def.id);
     const activeId = activeStanceBarAbilityId(knownIds, this.sim.player.auras, this.sim.player.id);
     const model = stanceBarView(playerClass, knownIds, activeId);
+    // The rebuild replaces only the .stancebar-group, never the whole subtree:
+    // the bar is a movable HUD frame, so it also hosts the MovableFrame chrome
+    // (corner button, resize grip, name chip), which an innerHTML wipe would
+    // silently destroy the first time the known stance set changed.
     if (!model.visible) {
       bar.style.display = 'none';
       if (this.lastStanceBarSig !== '') {
-        bar.innerHTML = '';
+        bar.querySelector('.stancebar-group')?.remove();
         this.lastStanceBarSig = '';
       }
       return;
@@ -8196,7 +8689,7 @@ export class Hud {
     bar.style.display = 'flex';
     if (model.sig === this.lastStanceBarSig) return;
     this.lastStanceBarSig = model.sig;
-    bar.innerHTML = '';
+    bar.querySelector('.stancebar-group')?.remove();
     const group = document.createElement('div');
     group.className = 'stancebar-group';
     bar.appendChild(group);

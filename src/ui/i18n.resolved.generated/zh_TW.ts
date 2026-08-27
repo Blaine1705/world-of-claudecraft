@@ -760,6 +760,7 @@ export const zh_TW: EnTranslations = {
       "reset": "重設",
       "presets": {
         "classic": "經典金色",
+        "fancyGold": "華麗金色",
         "midnight": "午夜",
         "parchment": "羊皮紙",
         "highContrast": "高對比"
@@ -1017,6 +1018,11 @@ export const zh_TW: EnTranslations = {
       "reset": "重設",
       "done": "完成",
       "cancel": "取消",
+      "showExtraBar": "顯示更多動作列",
+      "hideExtraBar": "隱藏一列動作列",
+      "conflictTitle": "按鍵已被佔用",
+      "conflictBody": "{key} 已綁定到{other}。將其綁定到{action}會解除{other}的綁定。",
+      "conflictAccept": "仍然重新綁定",
       "resetConfirmTitle": "重設動作列按鍵？",
       "resetConfirmBody": "第一列動作列將恢復為預設按鍵，第二列與第三列將變為未綁定狀態。此操作無法復原。"
     },
@@ -1371,6 +1377,7 @@ export const zh_TW: EnTranslations = {
       "itemScoreLine": "評分 {score}",
       "showSecondaryActionBar": "顯示副動作列",
       "showThirdActionBar": "顯示第三動作列",
+      "combineActionBars": "合併動作列",
       "hideUnusedActionSlots": "隱藏未使用的動作欄位",
       "lockActionBars": "鎖定動作列",
       "showTargetOfTarget": "顯示目標的目標",
@@ -2452,12 +2459,50 @@ export const zh_TW: EnTranslations = {
       "label": "重置框體位置"
     },
     "interfaceUnlock": {
-      "label": "介面框體",
+      "label": "編輯框體",
       "unlock": "解鎖介面",
       "lock": "鎖定介面",
+      "lockAll": "鎖定介面",
+      "barsNote": "編輯時只會顯示你已開啟的動作列。若要擺放更多動作列，請先用主動作列上的加減按鈕新增。",
+      "frozenNote": "編輯期間介面和鏡頭會被凍結：按鈕和框體只是待擺放的靜態圖片，點擊不會傳入遊戲世界。",
       "unlockFrame": "解鎖此框體",
       "lockFrame": "鎖定此框體",
-      "resizeFrame": "調整此框體大小"
+      "resizeFrame": "調整此框體大小",
+      "frameNames": {
+        "actionBar1": "動作條",
+        "actionBar2": "動作條 2",
+        "actionBar3": "動作條 3",
+        "menu": "Menu",
+        "minimap": "小地圖",
+        "stanceBar": "姿態欄",
+        "xpBar": "XP Bar",
+        "chat": "Chat",
+        "actionBarGroup": "動作列群組",
+        "playerFrame": "玩家",
+        "targetFrame": "目標",
+        "partyFrames": "隊伍",
+        "swingBar": "自動攻擊"
+      },
+      "framesMenu": "框體設定",
+      "framesMenuTitle": "顯示或隱藏各個框體。取消勾選的框體會一直隱藏，直到你重新勾選或還原預設值。",
+      "showHideFrames": "顯示或隱藏框體",
+      "buffsLeftToRight": "增益從左到右",
+      "debuffsLeftToRight": "減益從左到右",
+      "lockPlayerFrameToBar": "玩家框體鎖定在動作列上方",
+      "previewSpell": "示範法術"
+    },
+    "transfer": {
+      "frameLayout": "框體佈局",
+      "allSettings": "全部設定",
+      "exportAction": "匯出",
+      "importAction": "匯入",
+      "copy": "複製",
+      "copied": "已複製到剪貼簿。",
+      "copyFailed": "複製失敗。請選取代碼後自行複製。",
+      "applyReload": "套用並重新載入",
+      "pastePlaceholder": "在此貼上匯出的代碼。",
+      "invalid": "這不是有效的匯出代碼。",
+      "wrongKind": "該代碼屬於另一種匯出類型。"
     },
     "itemTooltip": {
       "requiresLevel": "需要等級 {level}",

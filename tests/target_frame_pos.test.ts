@@ -1,16 +1,31 @@
 import { describe, expect, it } from 'vitest';
 import {
+  anchorAdjustedPos,
+  anchorAxis,
+  boxFromEdgeDrag,
   clampFrameScale,
   clampTargetFramePos,
+  cursorForFrameEdge,
+  edgeBandFor,
+  FRAME_EDGE_BAND,
+  FRAME_LABEL_CLEARANCE,
   FRAME_SCALE_KEY_FINE_STEP,
   FRAME_SCALE_KEY_STEP,
   FRAME_SCALE_MAX,
   FRAME_SCALE_MIN,
+  type FrameEdge,
+  frameEdgeAtPoint,
+  frameScales,
+  labelBelowFrame,
+  MAX_FRAME_BOX,
+  MIN_FRAME_BOX,
   parseTargetFramePos,
   placeTargetFrame,
+  posFromEdgeResize,
   scaleFromGripDrag,
   scaleFromKeyStep,
   serializeTargetFramePos,
+  sizeFromEdgeDrag,
   TARGET_FRAME_MARGIN,
 } from '../src/ui/target_frame_pos';
 
@@ -226,5 +241,298 @@ describe('scaleFromKeyStep', () => {
     }
     expect(scale).toBe(FRAME_SCALE_MAX);
     expect(presses).toBe(Math.round((FRAME_SCALE_MAX - FRAME_SCALE_MIN) / FRAME_SCALE_KEY_STEP));
+  });
+});
+
+// The desktop-window edge-resize half: which border a pointer is on, the cursor
+// that border shows, the scale an edge drag produces, and where the top-left
+// lands so the OPPOSITE border stays anchored.
+describe('frameEdgeAtPoint', () => {
+  const rect = { left: 100, top: 200, width: 300, height: 120 };
+
+  it('reports null in the frame body and anywhere outside the frame', () => {
+    expect(frameEdgeAtPoint(rect, 250, 260)).toBe(null);
+    // The band is strictly INSIDE the box. An outer halo used to overlap the
+    // frame stacked next to this one (the action bars sit 4px apart), and the
+    // neighbour won the hit test, which left those bars resizable only from
+    // their corners.
+    expect(frameEdgeAtPoint(rect, 99, 260)).toBe(null);
+    expect(frameEdgeAtPoint(rect, 250, 321)).toBe(null);
+  });
+
+  it('reports each side inside its band, and corners where two bands meet', () => {
+    expect(frameEdgeAtPoint(rect, 250, 200 + FRAME_EDGE_BAND)).toBe('n');
+    expect(frameEdgeAtPoint(rect, 250, 320 - FRAME_EDGE_BAND)).toBe('s');
+    expect(frameEdgeAtPoint(rect, 100 + FRAME_EDGE_BAND, 260)).toBe('w');
+    expect(frameEdgeAtPoint(rect, 400 - FRAME_EDGE_BAND, 260)).toBe('e');
+    expect(frameEdgeAtPoint(rect, 102, 202)).toBe('nw');
+    expect(frameEdgeAtPoint(rect, 398, 202)).toBe('ne');
+    expect(frameEdgeAtPoint(rect, 102, 318)).toBe('sw');
+    expect(frameEdgeAtPoint(rect, 398, 318)).toBe('se');
+  });
+
+  it('keeps a graspable middle on a frame thinner than two bands', () => {
+    // A 10px-tall bar (the XP bar) cannot spare 8px at each end AND a middle to
+    // drag from, so the band shrinks to a third of the axis: n at the top, s at
+    // the bottom, and a move strip between them.
+    const thin = { left: 100, top: 200, width: 300, height: 10 };
+    expect(edgeBandFor(thin.height)).toBe(3);
+    expect(frameEdgeAtPoint(thin, 250, 202)).toBe('n');
+    expect(frameEdgeAtPoint(thin, 250, 205)).toBe(null); // the move strip
+    expect(frameEdgeAtPoint(thin, 250, 209)).toBe('s');
+  });
+});
+
+describe('edgeBandFor', () => {
+  it('uses the full band on a frame with room for it', () => {
+    expect(edgeBandFor(300)).toBe(FRAME_EDGE_BAND);
+    expect(edgeBandFor(FRAME_EDGE_BAND * 3)).toBe(FRAME_EDGE_BAND);
+  });
+
+  it('shrinks to a third on a thin frame, never past 1px', () => {
+    expect(edgeBandFor(12)).toBe(4);
+    expect(edgeBandFor(10)).toBe(3);
+    expect(edgeBandFor(2)).toBe(1);
+    expect(edgeBandFor(0)).toBe(FRAME_EDGE_BAND);
+  });
+});
+
+// Side edges are the horizontal-only / vertical-only adjustments: each stretches
+// exactly the axis it owns. Corners (the SE grip included) stay the
+// proportional whole-frame zoom, multiplying both axes by the larger ratio so
+// a stretched frame keeps its chosen aspect.
+describe('sizeFromEdgeDrag', () => {
+  const start = { w: 200, h: 100 };
+  const one = { sx: 1, sy: 1 };
+
+  it('a side edge stretches ONLY its own axis, away-from-body grows', () => {
+    expect(sizeFromEdgeDrag('e', one, start, 100, 0)).toEqual({ sx: 1.5, sy: 1 });
+    expect(sizeFromEdgeDrag('e', one, start, -50, 0)).toEqual({ sx: 0.75, sy: 1 });
+    // A west pull LEFTWARD (negative dx) grows: away from the body.
+    expect(sizeFromEdgeDrag('w', one, start, -100, 0)).toEqual({ sx: 1.5, sy: 1 });
+    expect(sizeFromEdgeDrag('s', one, start, 0, 50)).toEqual({ sx: 1, sy: 1.5 });
+    expect(sizeFromEdgeDrag('n', one, start, 0, -50)).toEqual({ sx: 1, sy: 1.5 });
+    // and the cross axis is ignored entirely
+    expect(sizeFromEdgeDrag('e', one, start, 0, 500)).toEqual({ sx: 1, sy: 1 });
+  });
+
+  it('a corner multiplies BOTH axes by the larger ratio, like the SE grip', () => {
+    expect(sizeFromEdgeDrag('se', one, start, 100, 10)).toEqual({ sx: 1.5, sy: 1.5 });
+    expect(sizeFromEdgeDrag('nw', one, start, -100, -10)).toEqual({ sx: 1.5, sy: 1.5 });
+    const grip = scaleFromGripDrag(1, start, 60, 30);
+    expect(sizeFromEdgeDrag('se', one, start, 60, 30)).toEqual({ sx: grip, sy: grip });
+  });
+
+  it('a corner drag on a stretched frame keeps the stretch ratio', () => {
+    const stretched = { sx: 1.6, sy: 0.8 };
+    const next = sizeFromEdgeDrag('se', stretched, start, 20, 10);
+    expect(next.sx / next.sy).toBeCloseTo(1.6 / 0.8, 9);
+  });
+
+  it('compounds a side stretch onto the axis the frame already carries', () => {
+    const next = sizeFromEdgeDrag('e', { sx: 1.2, sy: 0.9 }, start, 100, 0);
+    expect(next.sx).toBeCloseTo(1.8, 9);
+    expect(next.sy).toBe(0.9);
+  });
+
+  it('clamps each axis into the legal band and survives a degenerate start box', () => {
+    expect(sizeFromEdgeDrag('e', one, start, 100000, 0)).toEqual({ sx: FRAME_SCALE_MAX, sy: 1 });
+    expect(sizeFromEdgeDrag('w', one, start, 100000, 0)).toEqual({ sx: FRAME_SCALE_MIN, sy: 1 });
+    expect(sizeFromEdgeDrag('e', { sx: 1.2, sy: 1.1 }, { w: 0, h: 0 }, 50, 50)).toEqual({
+      sx: 1.2,
+      sy: 1.1,
+    });
+  });
+});
+
+// Box mode survives for the two frames whose contents genuinely re-wrap.
+describe('boxFromEdgeDrag (the reflowing frames)', () => {
+  const start = { w: 200, h: 100 };
+
+  it('stretches only the axis the border owns, as real px', () => {
+    expect(boxFromEdgeDrag('e', start, 100, 0, 1)).toEqual({ w: 300, h: 100 });
+    expect(boxFromEdgeDrag('w', start, -100, 0, 1)).toEqual({ w: 300, h: 100 });
+    expect(boxFromEdgeDrag('s', start, 0, 50, 1)).toEqual({ w: 200, h: 150 });
+    expect(boxFromEdgeDrag('n', start, 0, -50, 1)).toEqual({ w: 200, h: 150 });
+    expect(boxFromEdgeDrag('e', start, 0, 500, 1)).toEqual({ w: 200, h: 100 });
+  });
+
+  it('divides visual travel by the zoom factor into author px', () => {
+    expect(boxFromEdgeDrag('e', start, 100, 0, 2)).toEqual({ w: 250, h: 100 });
+  });
+
+  it('clamps into the sane box band and survives a degenerate factor', () => {
+    expect(boxFromEdgeDrag('w', start, 100000, 0, 1)).toEqual({ w: MIN_FRAME_BOX, h: 100 });
+    expect(boxFromEdgeDrag('e', start, 1e9, 0, 1)).toEqual({ w: MAX_FRAME_BOX, h: 100 });
+    expect(boxFromEdgeDrag('e', start, 100, 0, 0)).toEqual(start);
+    expect(boxFromEdgeDrag('e', start, 100, 0, Number.NaN)).toEqual(start);
+  });
+});
+
+describe('cursorForFrameEdge', () => {
+  it('maps every edge to the window-manager resize cursor for that border', () => {
+    const expected: Record<FrameEdge, string> = {
+      n: 'ns-resize',
+      s: 'ns-resize',
+      e: 'ew-resize',
+      w: 'ew-resize',
+      ne: 'nesw-resize',
+      sw: 'nesw-resize',
+      nw: 'nwse-resize',
+      se: 'nwse-resize',
+    };
+    for (const [edge, cursor] of Object.entries(expected)) {
+      expect(cursorForFrameEdge(edge as FrameEdge)).toBe(cursor);
+    }
+  });
+});
+
+describe('posFromEdgeResize', () => {
+  const start = { left: 100, top: 200, w: 200, h: 100 };
+
+  it('anchors the right border for a west resize and the bottom for a north one', () => {
+    expect(posFromEdgeResize('w', start, { w: 300, h: 100 })).toEqual({ left: 0, top: 200 });
+    expect(posFromEdgeResize('n', start, { w: 200, h: 150 })).toEqual({ left: 100, top: 150 });
+    expect(posFromEdgeResize('nw', start, { w: 300, h: 150 })).toEqual({ left: 0, top: 150 });
+  });
+
+  it('holds the top-left still for east and south resizes (origin is top-left)', () => {
+    expect(posFromEdgeResize('e', start, { w: 300, h: 100 })).toEqual({ left: 100, top: 200 });
+    expect(posFromEdgeResize('s', start, { w: 200, h: 80 })).toEqual({ left: 100, top: 200 });
+    expect(posFromEdgeResize('se', start, { w: 400, h: 200 })).toEqual({ left: 100, top: 200 });
+  });
+
+  it('shrinking from the west walks the top-left right, keeping the right border put', () => {
+    expect(posFromEdgeResize('w', start, { w: 160, h: 100 })).toEqual({ left: 140, top: 200 });
+  });
+});
+
+describe('stretched-box persistence (w/h round-trip)', () => {
+  it('round-trips a stretched frame through the store', () => {
+    const stretched = { left: 40, top: 60, scale: 1.5, w: 700, h: 90 };
+    expect(parseTargetFramePos(serializeTargetFramePos(stretched))).toEqual(stretched);
+    // one axis alone stays one axis alone
+    const wide = { left: 40, top: 60, w: 700 };
+    expect(parseTargetFramePos(serializeTargetFramePos(wide))).toEqual(wide);
+  });
+
+  it('clamps a stored box into the sane band and drops a corrupt axis', () => {
+    expect(parseTargetFramePos(JSON.stringify({ left: 1, top: 2, w: 1, h: 1e9 }))).toEqual({
+      left: 1,
+      top: 2,
+      w: MIN_FRAME_BOX,
+      h: MAX_FRAME_BOX,
+    });
+    expect(parseTargetFramePos(JSON.stringify({ left: 1, top: 2, w: 'x', h: 90 }))).toEqual({
+      left: 1,
+      top: 2,
+      h: 90,
+    });
+  });
+});
+
+// The name chip renders ABOVE the frame, where it never covers the frame's own
+// contents. A frame parked against the viewport top has no room up there, and a
+// chip clipped off-screen is exactly what leaves a frame looking nameless, so
+// those flip below instead.
+describe('labelBelowFrame', () => {
+  it('keeps the chip above a frame with room for it', () => {
+    expect(labelBelowFrame(200)).toBe(false);
+    expect(labelBelowFrame(FRAME_LABEL_CLEARANCE)).toBe(false);
+  });
+
+  it('flips the chip below a frame parked against the viewport top', () => {
+    expect(labelBelowFrame(0)).toBe(true);
+    expect(labelBelowFrame(FRAME_LABEL_CLEARANCE - 1)).toBe(true);
+    // the buff rows and minimap sit at top: 14px, the case that read as nameless
+    expect(labelBelowFrame(14)).toBe(true);
+  });
+});
+
+describe('frameScales + axis persistence', () => {
+  it('resolves axis fields over the uniform field, defaulting to 1', () => {
+    expect(frameScales(null)).toEqual({ sx: 1, sy: 1 });
+    expect(frameScales({ scale: 1.3 })).toEqual({ sx: 1.3, sy: 1.3 });
+    expect(frameScales({ scaleX: 1.5, scaleY: 0.8 })).toEqual({ sx: 1.5, sy: 0.8 });
+    expect(frameScales({ scale: 1.3, scaleX: 1.5 })).toEqual({ sx: 1.5, sy: 1.3 });
+  });
+
+  it('round-trips a side-stretched frame and collapses matching axes to scale', () => {
+    const stretched = { left: 40, top: 60, scaleX: 1.5, scaleY: 0.8 };
+    expect(parseTargetFramePos(serializeTargetFramePos(stretched))).toEqual(stretched);
+    expect(serializeTargetFramePos({ left: 1, top: 2, scaleX: 1.5, scaleY: 1.5 })).toBe(
+      '{"left":1,"top":2,"scale":1.5}',
+    );
+  });
+
+  it('a half-corrupt axis falls back to the uniform field for the missing side', () => {
+    expect(
+      parseTargetFramePos(
+        JSON.stringify({ left: 1, top: 2, scale: 1.2, scaleX: 1.4, scaleY: 'x' }),
+      ),
+    ).toEqual({ left: 1, top: 2, scaleX: 1.4, scaleY: 1.2 });
+  });
+
+  it('clamps stored axis multipliers into the legal band', () => {
+    expect(
+      parseTargetFramePos(JSON.stringify({ left: 1, top: 2, scaleX: 99, scaleY: 0.01 })),
+    ).toEqual({ left: 1, top: 2, scaleX: FRAME_SCALE_MAX, scaleY: FRAME_SCALE_MIN });
+  });
+});
+
+// The viewport re-anchoring behind "the UI does not move when the resolution
+// changes": each axis keeps its distance to whichever of start / center / end
+// it sat closest to when saved, and the saved viewport rides the serializer.
+describe('anchorAxis + anchorAdjustedPos (viewport re-anchoring)', () => {
+  it('keeps the nearest anchor per axis: start, end, or center', () => {
+    // Near the start edge: the absolute offset is the intent.
+    expect(anchorAxis(8, 100, 1600, 1200)).toBe(8);
+    // Near the end edge: the distance to the end is the intent.
+    expect(anchorAxis(1492, 100, 1600, 1200)).toBe(1092);
+    // Dead center: stays centered.
+    expect(anchorAxis(750, 100, 1600, 1200)).toBe(550);
+  });
+
+  it('snaps to center only inside the tight band; a merely-near-mid row keeps its edge', () => {
+    // The centered cast bar (about 15px off center) stays centered.
+    expect(anchorAxis(815, 300, 1920, 1600)).toBe(655);
+    // A debuff row 38px above mid-height is NOT centered: it anchors to its
+    // nearest edge (the top) and stays exactly where it was (issue: the row
+    // was dragged toward center on every resize, tearing it off the minimap).
+    expect(anchorAxis(401, 32, 911, 1080)).toBe(401);
+  });
+
+  it('a tall rail whose lower end is its nearest edge rides the bottom, top intact rule-free', () => {
+    // The ~418px menu rail at top 452 of 1080: its bottom gap (210) is its
+    // nearest edge, so losing 169px of height slides it up by exactly that.
+    // A brief tall-frame special case pinned its TOP instead, and the rail
+    // visibly floated to mid-screen whenever the window gained height.
+    expect(anchorAxis(452, 418, 1080, 911)).toBe(283);
+    expect(anchorAxis(283, 418, 911, 1080)).toBe(452);
+  });
+
+  it('adjusts only when a saved viewport is present and differs', () => {
+    const size = { w: 100, h: 50 };
+    // No saved viewport (an older payload): returned unchanged.
+    expect(anchorAdjustedPos({ left: 700, top: 800 }, size, { w: 1200, h: 700 })).toEqual({
+      left: 700,
+      top: 800,
+    });
+    // Same viewport: untouched.
+    expect(
+      anchorAdjustedPos({ left: 700, top: 820, vw: 1600, vh: 900 }, size, { w: 1600, h: 900 }),
+    ).toEqual({ left: 700, top: 820, vw: 1600, vh: 900 });
+    // A bottom-parked spot rides the bottom edge when the height changes.
+    expect(
+      anchorAdjustedPos({ left: 700, top: 820, vw: 1600, vh: 900 }, size, { w: 1600, h: 700 }),
+    ).toMatchObject({ top: 620 });
+  });
+
+  it('round-trips the saved viewport through the serializer, both fields or neither', () => {
+    expect(
+      parseTargetFramePos(serializeTargetFramePos({ left: 1, top: 2, vw: 1600, vh: 900 })),
+    ).toEqual({ left: 1, top: 2, vw: 1600, vh: 900 });
+    // A lone axis cannot re-anchor honestly, so it is dropped on parse.
+    expect(parseTargetFramePos('{"left":1,"top":2,"vw":1600}')).toEqual({ left: 1, top: 2 });
   });
 });

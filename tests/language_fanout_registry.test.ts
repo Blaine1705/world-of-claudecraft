@@ -372,6 +372,12 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
   readonly reason: string;
 }> = [
   {
+    file: 'movable_frame.ts',
+    memos: ['lastHoverCursor'],
+    reason:
+      'lastHoverCursor elides the inline resize-cursor write on edge hover. Its values are CSS cursor keywords (ew-resize, nwse-resize, ...), which are never localized, and every MovableFrame label already rides the interface_unlock relocalize() fan-out arm. Nothing about this memo holds text.',
+  },
+  {
     file: 'claudium_window.ts',
     memos: ['paintedWalletMarkup'],
     reason:
@@ -614,7 +620,11 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
       // no text); fillGrid rebuilds every cell unconditionally and the
       // existing bags fan-out arm repaints the window wholesale on a locale
       // switch.
-    ).toBe(7);
+      // 8 as of the edge-resize hover: movable_frame's `lastHoverCursor`
+      // elides an inline CSS cursor-keyword write and can never hold text;
+      // the frame's t() labels already ride the interface_unlock
+      // relocalize() arm.
+    ).toBe(8);
   });
 
   it('gives every relocalize() in src/ui a caller in the fan-out', () => {

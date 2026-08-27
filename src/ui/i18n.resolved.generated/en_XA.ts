@@ -760,6 +760,7 @@ export const en_XA: EnTranslations = {
       "reset": "[Ŕéšéţ]",
       "presets": {
         "classic": "[Çļáššíç Ĝóļð]",
+        "fancyGold": "[Ƒáñçý Ĝóļð]",
         "midnight": "[Ɱíðñíĝĥţ]",
         "parchment": "[Þáŕçĥɱéñţ]",
         "highContrast": "[Ĥíĝĥ Çóñţŕášţ]"
@@ -1017,6 +1018,11 @@ export const en_XA: EnTranslations = {
       "reset": "[Ŕéšéţ]",
       "done": "[Ðóñé]",
       "cancel": "[Çáñçéļ]",
+      "showExtraBar": "[Šĥóŵ Áñóţĥéŕ Áçţíóñ Ɓáŕ]",
+      "hideExtraBar": "[Ĥíðé áñ Áçţíóñ Ɓáŕ]",
+      "conflictTitle": "[Ķéý Áļŕéáðý Ɓóúñð]",
+      "conflictBody": "[{key} íš áļŕéáðý ƀóúñð ţó {other}. Ɓíñðíñĝ íţ ţó {action} ŵíļļ úñƀíñð {other}.]",
+      "conflictAccept": "[Ŕéƀíñð Áñýŵáý]",
       "resetConfirmTitle": "[Ŕéšéţ áçţíóñ ƀáŕ ķéýš?]",
       "resetConfirmBody": "[Ţĥé ƒíŕšţ ƀáŕ ŕéţúŕñš ţó íţš ðéƒáúļţ ķéýš. Ţĥé šéçóñð áñð ţĥíŕð ƀáŕš ƀéçóɱé úñƀóúñð. Ţĥíš çáññóţ ƀé úñðóñé.]"
     },
@@ -1371,6 +1377,7 @@ export const en_XA: EnTranslations = {
       "itemScoreLine": "[Šçóŕé {score}]",
       "showSecondaryActionBar": "[Šĥóŵ Šéçóñðáŕý Áçţíóñ Ɓáŕ]",
       "showThirdActionBar": "[Šĥóŵ Ţĥíŕð Áçţíóñ Ɓáŕ]",
+      "combineActionBars": "[Çóɱƀíñé Áçţíóñ Ɓáŕš]",
       "hideUnusedActionSlots": "[Ĥíðé Úñúšéð Áçţíóñ Šļóţš]",
       "lockActionBars": "[Ļóçķ Áçţíóñ Ɓáŕš]",
       "showTargetOfTarget": "[Šĥóŵ Ţáŕĝéţ óƒ Ţáŕĝéţ]",
@@ -2452,12 +2459,50 @@ export const en_XA: EnTranslations = {
       "label": "[Ŕéšéţ Ƒŕáɱé Þóšíţíóñš]"
     },
     "interfaceUnlock": {
-      "label": "[Íñţéŕƒáçé Ƒŕáɱéš]",
+      "label": "[Éðíţ Ƒŕáɱéš]",
       "unlock": "[Úñļóçķ íñţéŕƒáçé]",
       "lock": "[Ļóçķ íñţéŕƒáçé]",
+      "lockAll": "[Ļóçķ Íñţéŕƒáçé]",
+      "barsNote": "[Óñļý ţĥé áçţíóñ ƀáŕš ýóú ĥáʋé ţúŕñéð óñ áþþéáŕ ŵĥíļé éðíţíñĝ. Ţó þļáçé ɱóŕé ƀáŕš, áðð ţĥéɱ ŵíţĥ ţĥé þļúš áñð ɱíñúš ƀúţţóñš óñ ţĥé ɱáíñ áçţíóñ ƀáŕ ƒíŕšţ.]",
+      "frozenNote": "[Ŵĥíļé éðíţíñĝ, ţĥé íñţéŕƒáçé áñð çáɱéŕá áŕé ƒŕóžéñ: ƀúţţóñš áñð ƒŕáɱéš áŕé šţíļļ þíçţúŕéš ţó áŕŕáñĝé, áñð çļíçķš ŵíļļ ñóţ ŕéáçĥ ţĥé ĝáɱé ŵóŕļð.]",
       "unlockFrame": "[Úñļóçķ ţĥíš ƒŕáɱé]",
       "lockFrame": "[Ļóçķ ţĥíš ƒŕáɱé]",
-      "resizeFrame": "[Ŕéšížé ţĥíš ƒŕáɱé]"
+      "resizeFrame": "[Ŕéšížé ţĥíš ƒŕáɱé]",
+      "frameNames": {
+        "actionBar1": "[Áçţíóñ Ɓáŕ]",
+        "actionBar2": "[Áçţíóñ Ɓáŕ 2]",
+        "actionBar3": "[Áçţíóñ Ɓáŕ 3]",
+        "menu": "[Ɱéñú]",
+        "minimap": "[Ɱíñíɱáþ]",
+        "stanceBar": "[Šţáñçé Ɓáŕ]",
+        "xpBar": "[ẊÞ Ɓáŕ]",
+        "chat": "[Çĥáţ]",
+        "actionBarGroup": "[Áçţíóñ Ɓáŕš]",
+        "playerFrame": "[Þļáýéŕ]",
+        "targetFrame": "[Ţáŕĝéţ]",
+        "partyFrames": "[Þáŕţý]",
+        "swingBar": "[Áúţó Áţţáçķ]"
+      },
+      "framesMenu": "[Ƒŕáɱéš Šéţţíñĝš]",
+      "framesMenuTitle": "[Šĥóŵ óŕ ĥíðé íñðíʋíðúáļ ƒŕáɱéš. Áñ úñţíçķéð ƒŕáɱé šţáýš ĥíððéñ úñţíļ ýóú ţíçķ íţ áĝáíñ óŕ ŕéšéţ ţó ðéƒáúļţš.]",
+      "showHideFrames": "[Šĥóŵ óŕ Ĥíðé Ƒŕáɱéš]",
+      "buffsLeftToRight": "[Ɓúƒƒš ļéƒţ ţó ŕíĝĥţ]",
+      "debuffsLeftToRight": "[Ðéƀúƒƒš ļéƒţ ţó ŕíĝĥţ]",
+      "lockPlayerFrameToBar": "[Ļóçķ Þļáýéŕ Ƒŕáɱé ţó Áçţíóñ Ɓáŕ]",
+      "previewSpell": "[Éẋáɱþļé Šþéļļ]"
+    },
+    "transfer": {
+      "frameLayout": "[Ƒŕáɱé Ļáýóúţ]",
+      "allSettings": "[Áļļ Šéţţíñĝš]",
+      "exportAction": "[Éẋþóŕţ]",
+      "importAction": "[Íɱþóŕţ]",
+      "copy": "[Çóþý]",
+      "copied": "[Çóþíéð ţó çļíþƀóáŕð.]",
+      "copyFailed": "[Çóþý ƒáíļéð. Šéļéçţ ţĥé çóðé áñð çóþý íţ ýóúŕšéļƒ.]",
+      "applyReload": "[Áþþļý áñð Ŕéļóáð]",
+      "pastePlaceholder": "[Þášţé áñ éẋþóŕţéð çóðé ĥéŕé.]",
+      "invalid": "[Ţĥáţ íš ñóţ á ʋáļíð éẋþóŕţ çóðé.]",
+      "wrongKind": "[Ţĥáţ çóðé íš á ðíƒƒéŕéñţ éẋþóŕţ ţýþé.]"
     },
     "itemTooltip": {
       "requiresLevel": "[Ŕéɋúíŕéš Ļéʋéļ {level}]",

@@ -409,7 +409,7 @@ import { applyNativeDeviceLanguage } from './ui/native_language';
 import { scheduleNativeUpdateCheck } from './ui/native_update_prompt';
 import { loadNewsInto } from './ui/news_feed';
 import { createMetricsSampler } from './ui/perf_metrics_sampler';
-import { applyPerfOrnamentVars } from './ui/perf_ornament_svg';
+import { applyPerfOrnamentVars, applyWindowOrnamentVars } from './ui/perf_ornament_svg';
 import { PerfOverlay } from './ui/perf_overlay';
 import { type PerfOverlayConfig, PerfOverlayConfigStore } from './ui/perf_overlay_config';
 import { buildPerfOverlayView, FrameMeter } from './ui/perf_overlay_model';
@@ -1346,6 +1346,15 @@ async function startGame(
     const vars = themeStore.cssVars();
     for (const name of Object.keys(vars))
       document.documentElement.style.setProperty(name, vars[name]);
+    // The gilded window frame (components.css "performance overlay gilded
+    // ornament" section) belongs to the Fancy Gold preset, not the default
+    // chrome (owner walked back an always-on rollout): this class is the CSS
+    // gate, toggled live with the rest of the theme so switching presets in
+    // the options window re-frames open windows immediately.
+    document.documentElement.classList.toggle(
+      'fancy-gold-ui',
+      themeStore.get().preset === 'fancyGold',
+    );
   }
   applyTheme();
   // Graphics-tier HUD effects: publish the resolved effect profile (data-fx-level +
@@ -1442,6 +1451,7 @@ async function startGame(
     renderer.onZonePrepared = (zoneId) => hud.queueMapBgPrewarm(zoneId);
     hydrateIcons(); // swap [data-icon] placeholders (micro-menu, mobile bar, meters) for inline SVG
     applyPerfOrnamentVars(); // Performance Overlay window's gilded corner/edge masks
+    applyWindowOrnamentVars(); // the Fancy Gold theme's tinted window frame layers
     applyMinimapOrnamentVars(); // minimap disc's gilded ring
     hud.prewarmStaticUiAssets();
 
@@ -1901,6 +1911,8 @@ async function startGame(
       onClickPick: (x, y, button) => handlePick(x, y, button),
       onAttackMove: (x, y) => handleAttackMove(x, y),
       canUseGameKeys: () => !gameplayInputBlocked(),
+      // The "Unlock interface" arrange mode claims the mouse for frame drags.
+      isCameraLocked: () => hud.isInterfaceUnlocked(),
     },
     keybinds,
   );
@@ -2429,6 +2441,11 @@ async function startGame(
       settings.set('showThirdActionBar', visibility.third);
       document.body.classList.toggle('show-actionbar2', visibility.secondary);
       document.body.classList.toggle('show-actionbar3', visibility.third);
+      hud.setActionBarVisibility(visibility);
+      return;
+    }
+    if (key === 'combineActionBars') {
+      hud.setCombineActionBars(settings.set('combineActionBars', !!value));
       return;
     }
     if (key === 'showTargetOfTarget') {
@@ -2617,6 +2634,18 @@ async function startGame(
       case 'targetFrameScale':
         document.documentElement.style.setProperty('--target-frame-scale', String(v));
         break;
+      case 'playerFrameWidth':
+        document.documentElement.style.setProperty('--player-frame-width', `${v}px`);
+        break;
+      case 'playerFrameHeight':
+        document.documentElement.style.setProperty('--player-frame-height', `${v}px`);
+        break;
+      case 'targetFrameWidth':
+        document.documentElement.style.setProperty('--target-frame-width', `${v}px`);
+        break;
+      case 'targetFrameHeight':
+        document.documentElement.style.setProperty('--target-frame-height', `${v}px`);
+        break;
       case 'partyFrameScale':
         document.documentElement.style.setProperty('--party-frame-scale', String(v));
         break;
@@ -2640,6 +2669,26 @@ async function startGame(
         break;
       case 'aurasOnPlayerFrame':
         hud.setAurasOnPlayerFrame(!!v);
+        break;
+      // Icon flow of the standalone buff/debuff rows (Frames Settings menu):
+      // the stock layout grows right-to-left from its anchor beside the
+      // minimap; 'row' flips a row to read left to right. Vars rather than
+      // classes so the stylesheet's aurasOnPlayerFrame override (a docked
+      // buff row always reads left to right) keeps winning by specificity.
+      case 'buffsLeftToRight':
+        document.documentElement.style.setProperty(
+          '--buff-bar-direction',
+          v ? 'row' : 'row-reverse',
+        );
+        break;
+      case 'debuffsLeftToRight':
+        document.documentElement.style.setProperty(
+          '--debuff-bar-direction',
+          v ? 'row' : 'row-reverse',
+        );
+        break;
+      case 'lockPlayerFrameToActionBar':
+        hud.setLockPlayerFrameToActionBar(!!v);
         break;
       // Graphics-tier HUD effects follow the STATIC preset + the advanced
       // effectsQuality slider. The 3D renderer tier is resolved at renderer

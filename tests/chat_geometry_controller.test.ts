@@ -24,7 +24,7 @@ class MemoryStorage {
 
 function makeHarness(
   initialStorage: Record<string, string> = {},
-  options: { mobile?: boolean } = {},
+  options: { mobile?: boolean; unlocked?: boolean } = {},
 ) {
   const document = new FakeDocument();
   const window = new FakeWindow(1280, 720);
@@ -43,6 +43,7 @@ function makeHarness(
     isMobileLayout: () => options.mobile ?? false,
     hasStorePromoCard: () => false,
     uiScale: () => 1,
+    isInterfaceUnlocked: () => options.unlocked ?? false,
   });
   return { controller, document, window, wrap, tabs, frame, input, storage };
 }
@@ -80,8 +81,10 @@ describe('ChatGeometryController', () => {
 
     expect(harness.wrap.style.left).toBe('280px');
     expect(harness.wrap.style.top).toBe('190px');
+    // Mid-gesture the box is NOT persisted: storage still holds the seeded
+    // spot, upgraded once at init by the legacy viewport-stamp migration.
     expect(harness.storage.getItem('woc_chat_geometry')).toBe(
-      '{"left":100,"top":80,"width":370,"height":184}',
+      '{"left":100,"top":80,"width":370,"height":184,"vw":1280,"vh":720}',
     );
 
     harness.document.dispatchEvent(
@@ -135,5 +138,52 @@ describe('ChatGeometryController', () => {
       expect(element.style.width).toBe('');
       expect(element.style.height).toBe('');
     }
+  });
+});
+
+// While the global "Unlock interface" toggle is on, the whole chat box is a
+// drag handle (its panes are pointer-inert in CSS, so the wrap is the event
+// target); while it is off, a wrap press does nothing and only the tab strip
+// moves the box, the contract that shipped before the toggle existed.
+describe('ChatGeometryController interface unlock', () => {
+  it('drags the box from anywhere on the wrap while unlocked', () => {
+    const harness = makeHarness(
+      { woc_chat_geometry: '{"left":100,"top":80,"width":370,"height":184}' },
+      { unlocked: true },
+    );
+    harness.controller.init();
+
+    harness.wrap.dispatchEvent(
+      pointerEvent('pointerdown', { pointerId: 7, clientX: 120, clientY: 90 }),
+    );
+    harness.document.dispatchEvent(
+      pointerEvent('pointermove', { pointerId: 7, clientX: 300, clientY: 200 }),
+    );
+    expect(harness.wrap.style.left).toBe('280px');
+    expect(harness.wrap.style.top).toBe('190px');
+
+    harness.document.dispatchEvent(
+      pointerEvent('pointerup', { pointerId: 7, clientX: 300, clientY: 200 }),
+    );
+    expect(JSON.parse(harness.storage.getItem('woc_chat_geometry') ?? '{}')).toMatchObject({
+      left: 280,
+      top: 190,
+    });
+  });
+
+  it('keeps the wrap inert while locked (only the tab strip moves the box)', () => {
+    const harness = makeHarness({
+      woc_chat_geometry: '{"left":100,"top":80,"width":370,"height":184}',
+    });
+    harness.controller.init();
+
+    harness.wrap.dispatchEvent(
+      pointerEvent('pointerdown', { pointerId: 7, clientX: 120, clientY: 90 }),
+    );
+    harness.document.dispatchEvent(
+      pointerEvent('pointermove', { pointerId: 7, clientX: 300, clientY: 200 }),
+    );
+    expect(harness.wrap.style.left).toBe('100px');
+    expect(harness.wrap.style.top).toBe('80px');
   });
 });

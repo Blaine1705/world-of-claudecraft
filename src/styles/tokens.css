@@ -436,6 +436,14 @@
     --perf-ornament-edge-left: linear-gradient(transparent, transparent);
     --perf-ornament-edge-right: linear-gradient(transparent, transparent);
     --perf-ornament-gilt: var(--color-gold-700);
+    /* The Fancy Gold theme's gilded window frame (desktop .window.panel
+       under the .fancy-gold-ui root class; components.css):
+       applyWindowOrnamentVars overwrites this with the
+       12-layer tinted composite at boot. Same fallback contract as the
+       --perf-ornament-* masks above: consumed inside a `background-image`
+       list, so it needs a real (invisible) image value before boot, not an
+       unset property that would invalidate the whole declaration. */
+    --window-ornament-frame: linear-gradient(transparent, transparent);
     /* Minimap disc's gilded ring (hud.css "minimap" section /
        minimap_gilded_ornament.ts). Same fallback contract as
        --perf-ornament-gilt above: consumed as a whole `background`, so it
@@ -480,6 +488,10 @@
     --perf-ornament-edge-left: linear-gradient(transparent, transparent) !important;
     --perf-ornament-edge-right: linear-gradient(transparent, transparent) !important;
     --perf-ornament-gilt: var(--color-gold-700) !important;
+    /* The Fancy Gold window frame is cosmetic filigree too, shed the same
+       way (the inline value applyWindowOrnamentVars sets is non-important,
+       so this stylesheet !important wins on the low tier). */
+    --window-ornament-frame: linear-gradient(transparent, transparent) !important;
     /* The minimap ring is purely cosmetic too (never actionable information),
        so it is shed at the low effect tier the same way. */
     --minimap-gilt: var(--color-gold-700) !important;

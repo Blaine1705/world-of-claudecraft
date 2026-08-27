@@ -760,6 +760,7 @@ export const ja_JP: EnTranslations = {
       "reset": "リセット",
       "presets": {
         "classic": "クラシックゴールド",
+        "fancyGold": "ファンシーゴールド",
         "midnight": "ミッドナイト",
         "parchment": "羊皮紙",
         "highContrast": "ハイコントラスト"
@@ -1017,6 +1018,11 @@ export const ja_JP: EnTranslations = {
       "reset": "リセット",
       "done": "完了",
       "cancel": "キャンセル",
+      "showExtraBar": "アクションバーをもう1本表示",
+      "hideExtraBar": "アクションバーを1本隠す",
+      "conflictTitle": "キーは割り当て済み",
+      "conflictBody": "{key} はすでに{other}に割り当てられています。{action}に割り当てると{other}の割り当ては解除されます。",
+      "conflictAccept": "それでも再割り当て",
       "resetConfirmTitle": "アクションバーのキーをリセットしますか？",
       "resetConfirmBody": "1本目のバーはデフォルトのキーに戻り、2本目と3本目のバーは未設定になります。この操作は取り消せません。"
     },
@@ -1371,6 +1377,7 @@ export const ja_JP: EnTranslations = {
       "itemScoreLine": "スコア {score}",
       "showSecondaryActionBar": "セカンダリアクションバーを表示",
       "showThirdActionBar": "3本目のアクションバーを表示",
+      "combineActionBars": "アクションバーをまとめる",
       "hideUnusedActionSlots": "未使用のアクションスロットを非表示",
       "lockActionBars": "アクションバーをロック",
       "showTargetOfTarget": "ターゲットのターゲットを表示",
@@ -2452,12 +2459,50 @@ export const ja_JP: EnTranslations = {
       "label": "フレーム位置をリセット"
     },
     "interfaceUnlock": {
-      "label": "インターフェースフレーム",
+      "label": "フレーム編集",
       "unlock": "インターフェースのロックを解除",
       "lock": "インターフェースをロック",
+      "lockAll": "インターフェースをロック",
+      "barsNote": "編集中はオンにしたアクションバーだけが表示されます。バーを増やして配置したい場合は、先にメインアクションバーのプラス／マイナスボタンで追加してください。",
+      "frozenNote": "編集中はインターフェースとカメラが固定されます。ボタンやフレームは配置用の静止画となり、クリックはゲーム世界には届きません。",
       "unlockFrame": "このフレームのロックを解除",
       "lockFrame": "このフレームをロック",
-      "resizeFrame": "このフレームのサイズを変更"
+      "resizeFrame": "このフレームのサイズを変更",
+      "frameNames": {
+        "actionBar1": "アクションバー",
+        "actionBar2": "アクションバー 2",
+        "actionBar3": "アクションバー 3",
+        "menu": "Menu",
+        "minimap": "ミニマップ",
+        "stanceBar": "スタンスバー",
+        "xpBar": "XP Bar",
+        "chat": "Chat",
+        "actionBarGroup": "アクションバー",
+        "playerFrame": "プレイヤー",
+        "targetFrame": "ターゲット",
+        "partyFrames": "パーティ",
+        "swingBar": "オートアタック"
+      },
+      "framesMenu": "フレーム設定",
+      "framesMenuTitle": "各フレームの表示・非表示を切り替えます。チェックを外したフレームは、再度チェックするか初期設定に戻すまで非表示のままです。",
+      "showHideFrames": "フレームの表示・非表示",
+      "buffsLeftToRight": "バフを左から右へ",
+      "debuffsLeftToRight": "デバフを左から右へ",
+      "lockPlayerFrameToBar": "プレイヤーフレームをアクションバーに固定",
+      "previewSpell": "サンプル呪文"
+    },
+    "transfer": {
+      "frameLayout": "フレーム配置",
+      "allSettings": "すべての設定",
+      "exportAction": "エクスポート",
+      "importAction": "インポート",
+      "copy": "コピー",
+      "copied": "クリップボードにコピーしました。",
+      "copyFailed": "コピーに失敗しました。コードを選択して手動でコピーしてください。",
+      "applyReload": "適用して再読み込み",
+      "pastePlaceholder": "エクスポートしたコードをここに貼り付けてください。",
+      "invalid": "有効なエクスポートコードではありません。",
+      "wrongKind": "このコードは別の種類のエクスポートです。"
     },
     "itemTooltip": {
       "requiresLevel": "必要レベル {level}",
