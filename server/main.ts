@@ -348,6 +348,7 @@ import {
   recordAuthFailure,
   requestIp,
   setRateLimitTier2Store,
+  walletHandoffResultRateLimited,
   walletLinkRateLimited,
   wocBalanceRateLimited,
 } from './ratelimit';
@@ -2496,6 +2497,9 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     if (req.method === 'POST' && url === '/api/desktop-wallet/result') {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
+      if (!walletHandoffResultRateLimited(req, accountId).allowed) {
+        return json(res, 429, { error: 'rate limited' });
+      }
       return handleDesktopWalletHandoffResult(req, res, accountId);
     }
     if (req.method === 'POST' && url === '/api/wallet/link/challenge') {

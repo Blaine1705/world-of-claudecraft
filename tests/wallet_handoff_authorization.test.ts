@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { BrowserWalletSession } from '../src/net/wallet_handoff_browser';
-import { authorizeWalletHandoff } from '../src/wallet_handoff_authorization';
+import { authorizeWalletHandoff, walletHandoffBodyKey } from '../src/wallet_handoff_authorization';
 
 function wallet(address = 'WalletAddress'): BrowserWalletSession {
   return {
@@ -143,5 +143,13 @@ describe('browser wallet handoff authorization', () => {
       }),
     ).rejects.toThrow('invalid wallet challenge');
     expect(session.signMessage).not.toHaveBeenCalled();
+  });
+});
+
+describe('walletHandoffBodyKey', () => {
+  it('maps each kind to its copy: a step-up must NEVER show the payment body', () => {
+    expect(walletHandoffBodyKey('link')).toBe('wallet.browser.linkBody');
+    expect(walletHandoffBodyKey('stepup')).toBe('wallet.browser.stepUpBody');
+    expect(walletHandoffBodyKey('transaction')).toBe('wallet.browser.paymentBody');
   });
 });

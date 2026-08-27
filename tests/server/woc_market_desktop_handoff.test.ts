@@ -3,7 +3,7 @@
 // authorization records, the skip arms that keep unsignable material out of
 // the store, and the best-effort posture (a throwing store never fails the
 // issuing call).
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type {
   DesktopWalletStepUpAuthorization,
   DesktopWalletTransactionAuthorization,
@@ -12,7 +12,12 @@ import type { WocQuoteIntent } from '../../server/woc_market';
 import {
   registerWocQuoteHandoff,
   registerWocStepUpHandoff,
+  resetWocDesktopHandoffWarnLatches,
 } from '../../server/woc_market_desktop_handoff';
+
+beforeEach(() => {
+  resetWocDesktopHandoffWarnLatches();
+});
 
 function signableIntent(over: Partial<WocQuoteIntent> = {}): WocQuoteIntent {
   return {
@@ -77,7 +82,13 @@ describe('registerWocQuoteHandoff', () => {
 
   it('registers nothing without a registrar, an ok intent, a signature need, or the legs', () => {
     const rec = recording();
+    // The no-registrar arm must return BEFORE the try (a swallowed TypeError
+    // would pass vacuously), so the warn spy proves the early return.
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     registerWocQuoteHandoff(undefined, 7, 'w', signableIntent());
+    registerWocStepUpHandoff(undefined, 7, 'w', CHALLENGE);
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
     registerWocQuoteHandoff(rec.registrar, 7, 'w', signableIntent({ ok: false }));
     registerWocQuoteHandoff(rec.registrar, 7, 'w', signableIntent({ signatureRequired: false }));
     registerWocQuoteHandoff(rec.registrar, 7, 'w', signableIntent({ reference: null }));
@@ -92,26 +103,51 @@ describe('registerWocQuoteHandoff', () => {
     expect(rec.transactions[0][1].amountBase).toBeNull();
   });
 
-  it('a throwing store never fails the issuing call (best-effort)', () => {
+  it('a throwing store never fails the issuing call, and the warn latches', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const throwing = {
+      authorizeTransaction: () => {
+        throw new Error('invalid transaction authorization');
+      },
+      authorizeStepUp: () => {},
+    };
     try {
-      expect(() =>
-        registerWocQuoteHandoff(
-          {
-            authorizeTransaction: () => {
-              throw new Error('too many active wallet handoffs');
-            },
-            authorizeStepUp: () => {},
-          },
-          7,
-          'w',
-          signableIntent(),
-        ),
-      ).not.toThrow();
+      expect(() => registerWocQuoteHandoff(throwing, 7, 'w', signableIntent())).not.toThrow();
+      registerWocQuoteHandoff(throwing, 7, 'w', signableIntent());
+      // Two failures, ONE warn: the stuck condition must not flood the log.
       expect(warn).toHaveBeenCalledOnce();
+      // A success re-arms the latch, so a NEW outage logs again.
+      const rec = recording();
+      registerWocQuoteHandoff(rec.registrar, 7, 'w', signableIntent());
+      registerWocQuoteHandoff(throwing, 7, 'w', signableIntent());
+      expect(warn).toHaveBeenCalledTimes(2);
     } finally {
       warn.mockRestore();
     }
+  });
+
+  it('clamps a far-future service expiry to the sanity ceiling', () => {
+    const rec = recording();
+    const nowMs = 1_000_000;
+    registerWocQuoteHandoff(
+      rec.registrar,
+      7,
+      'w',
+      signableIntent({ expiresAtMs: nowMs + 365 * 24 * 60 * 60 * 1000 }),
+      nowMs,
+    );
+    // 10 minutes past the injected clock, never the service's year.
+    expect(rec.transactions[0][1].expiresAtMs).toBe(nowMs + 10 * 60 * 1000);
+    // An honest 90-second quote is never shortened.
+    const rec2 = recording();
+    registerWocQuoteHandoff(
+      rec2.registrar,
+      7,
+      'w',
+      signableIntent({ expiresAtMs: nowMs + 90_000 }),
+      nowMs,
+    );
+    expect(rec2.transactions[0][1].expiresAtMs).toBe(nowMs + 90_000);
   });
 });
 

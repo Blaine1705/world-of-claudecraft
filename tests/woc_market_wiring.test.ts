@@ -405,7 +405,7 @@ describe('woc_market_wiring: main.ts stays a firewall', () => {
     // probe at the attach site; a dropped wire would strand website desktop
     // on the in-renderer wallet, which throws at first sign there.
     expect(main).toMatch(
-      /desktopAuthorize: desktopWalletBrowserHandoffAvailable\(\)\s*\?\s*authorizeWocMarketDesktopHandoff\s*:\s*null/,
+      /desktopAuthorize: desktopWalletBrowserHandoffAvailable\(\)\s*\?\s*wocDesktopAuthorize\s*:\s*null/,
     );
     // The pieces the module now owns must not creep back into the coordinator:
     // the client construction, the direct hook attach, and the shell gate.

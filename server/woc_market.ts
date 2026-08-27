@@ -1056,9 +1056,7 @@ export interface WocMarketDeps {
    *  production this is false and every proof is a real ed25519 signature. */
   stepUpDevSig: boolean;
   /** Desktop browser-signing registrar (the process handoff store). OPTIONAL:
-   *  absent (the rigs, the sweep-only constructions), quotes and step-up
-   *  challenges are simply not signable from the desktop shell; browser web
-   *  is unaffected, so absence can never widen behavior. */
+   *  absent (the rigs), nothing is desktop-signable; never widens behavior. */
   desktopHandoff?: WocDesktopHandoffRegistrar;
   config: WocMarketConfig;
   /** The hot-read cache (H11). OPTIONAL: absent, every read is uncached (the
@@ -1549,8 +1547,7 @@ export class WocMarketService {
     if (!wallet) return refuse('wallet_required');
     const out = await issueStepUpChallengeFlow(this.stepUpCtx(), account, wallet, request);
     if (!out.ok) return refuse(out.reason);
-    // Desktop browser-signing path: the challenge is registered by nonce so
-    // the desktop-wallet handoff can serve its stored message to the browser.
+    // Registered by nonce so the handoff can serve the stored message.
     registerWocStepUpHandoff(this.deps.desktopHandoff, account, wallet, out.challenge);
     return out;
   }
@@ -2202,7 +2199,6 @@ export class WocMarketService {
       // The pending bid lapses on its own TTL; nothing was transferred.
       return refuse('quote_unavailable');
     }
-    registerWocQuoteHandoff(this.deps.desktopHandoff, args.account, wallet, intent);
     // Bounded adoption: a carried figure outside the contract (not a positive
     // integer at or under the bid) refuses rather than persisting a bond the
     // refund accounting would then ride; an ABSENT figure falls back to the
@@ -2231,6 +2227,8 @@ export class WocMarketService {
       // plain contention, retryable, with nothing written.
       return refuse('contended');
     }
+    // Past the CAS only: no signable authorization for a refused quote.
+    registerWocQuoteHandoff(this.deps.desktopHandoff, args.account, wallet, intent, this.now());
     return {
       ok: true,
       // The patched bid mirrors the row the CAS just wrote (reference,
@@ -2376,7 +2374,6 @@ export class WocMarketService {
     if (!intent.ok || intent.reference === null || intent.expiresAtMs === null) {
       return refuse('quote_unavailable');
     }
-    registerWocQuoteHandoff(this.deps.desktopHandoff, account, bid.wallet, intent);
     // Bounded adoption, and the drift path DEMANDS the figure: the service
     // just declared the stored one wrong, so falling back to it would persist
     // a bond the quote disagrees with. The plain path may fall back (an older
@@ -2418,6 +2415,8 @@ export class WocMarketService {
         after !== null && after.status === 'pending_bond' ? 'confirm_in_flight' : 'not_pending',
       );
     }
+    // Past the CAS only: no signable authorization for a refused refresh.
+    registerWocQuoteHandoff(this.deps.desktopHandoff, account, bid.wallet, intent, this.now());
     return { ok: true, bond: intent };
   }
 
@@ -2796,14 +2795,6 @@ export class WocMarketService {
       sellerWallet,
     });
     if (intent.ok && intent.reference !== null && intent.expiresAtMs !== null) {
-      // Desktop browser-signing path: every payable settlement quote (buy-now,
-      // winner, revival) registers so the handoff can resolve it by reference.
-      registerWocQuoteHandoff(
-        this.deps.desktopHandoff,
-        settlement.buyerAccount,
-        settlement.buyerWallet,
-        intent,
-      );
       let retiredPair: { reference: string; signature: string } | null = null;
       if (
         settlement.quoteReference !== null &&
@@ -2841,6 +2832,15 @@ export class WocMarketService {
         intent.amount?.base ?? null,
       );
       if (!stamped) return { ...intent, ok: false, reason: 'settlement_not_open' };
+      // Every payable settlement quote (buy-now, winner, revival) registers
+      // for desktop signing, past the stamp only (no adopted row, no entry).
+      registerWocQuoteHandoff(
+        this.deps.desktopHandoff,
+        settlement.buyerAccount,
+        settlement.buyerWallet,
+        intent,
+        this.now(),
+      );
       if (retiredPair !== null) {
         console.warn(
           `[woc_market] settlement ${settlement.id} retires quote reference ${logSafe(retiredPair.reference)} with recorded signature ${logSafe(retiredPair.signature)}`,

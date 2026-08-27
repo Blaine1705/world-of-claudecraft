@@ -1,8 +1,29 @@
+// One process-local store, which makes the whole desktop signing path
+// SINGLE-REALM by construction: registrations (claudium_proxy, the woc-market
+// service) must land in the same process that serves /api/desktop-wallet/*,
+// and the browser page claims at the shell's baked apiOrigin. Every current
+// deployment runs one realm process per origin, so the constraint holds; a
+// multi-realm split behind one origin would need this store made shared
+// before the desktop signing arms work there (they fail CLOSED until then).
 import { randomBytes as nodeRandomBytes } from 'node:crypto';
+import { recordUsageMetric } from './provider_usage';
 
 export const DESKTOP_WALLET_HANDOFF_TTL_MS = 5 * 60 * 1000;
 const HANDOFF_CODE_BYTES = 32;
 const MAX_ACTIVE_HANDOFFS = 2_000;
+// Per-account slot budget on the authorization maps: an account re-quoting in
+// a loop replaces its own oldest registration instead of crowding the shared
+// map (the Claudium native quote and the Exchange quotes are co-tenants).
+const MAX_AUTHORIZATIONS_PER_ACCOUNT = 8;
+// Transaction handoff entries outlive their quote by this much, for the
+// record-a-late-signature stance the confirm intake takes (server/woc_market.ts
+// records a signature for an expired quote deliberately: the transfer may have
+// left the wallet moments before expiry, and dropping it here would orphan an
+// on-chain payment with no game-side trace). Claiming and completing both ride
+// the entry expiry, so the browser can hand back a signature it broadcast at
+// the quote boundary. Step-up handoffs get no grace: signing moves no funds
+// and the proof verifier enforces the challenge expiry regardless.
+export const DESKTOP_WALLET_TRANSACTION_RECORD_GRACE_MS = 60 * 1000;
 
 export interface DesktopWalletTransactionAuthorization {
   reference: string;
@@ -60,6 +81,11 @@ interface HandoffEntry {
 interface StoreOptions {
   now?: () => number;
   randomBytes?: (size: number) => Uint8Array;
+  /** Observability hook: fired once per authorization-map eviction (either
+   *  map, either the per-account budget or the global cap). The process
+   *  singleton wires the usage-metric counter so cap pressure is a number on
+   *  the ops readout instead of an inference from player reports. */
+  onMetric?: (event: 'authorization_evicted') => void;
 }
 
 export interface DesktopWalletHandoffStore {
@@ -128,13 +154,52 @@ export function createDesktopWalletHandoffStore(
 ): DesktopWalletHandoffStore {
   const now = options.now ?? Date.now;
   const randomBytes = options.randomBytes ?? nodeRandomBytes;
+  const onMetric = options.onMetric;
   const entries = new Map<string, HandoffEntry>();
   const authorizedTransactions = new Map<string, AuthorizedTransaction>();
   const authorizedStepUps = new Map<string, AuthorizedStepUp>();
 
+  // Both features share this keyspace (Claudium native quotes and Exchange
+  // quotes both mint service-unique references), so a cross-feature collision
+  // for one account is a last-write-wins overwrite. The create path only
+  // knows (account, reference), so a feature prefix cannot be reconstructed
+  // there; the collision odds against two independent unique-reference mints
+  // are what carries this, documented rather than engineered away.
   const transactionKey = (accountId: number, reference: string): string =>
     `${accountId}:${reference}`;
   const stepUpKey = (accountId: number, nonce: string): string => `${accountId}:${nonce}`;
+
+  // Bounded insert shared by both authorization maps. A same-key write
+  // replaces in place (a re-quote retiring its predecessor). Otherwise the
+  // writing account's OLDEST authorization goes first at its per-account
+  // budget, and at the global cap the globally oldest entry goes (Map keeps
+  // insertion order) instead of refusing: a refusal would hard-fail the
+  // co-tenant's quote (claudium_proxy turns it into quote-unavailable for
+  // every client), while evicting drops the entry nearest its own expiry.
+  const insertAuthorization = <T extends { accountId: number }>(
+    map: Map<string, T>,
+    key: string,
+    value: T,
+  ): void => {
+    if (!map.has(key)) {
+      let accountCount = 0;
+      let accountOldestKey: string | null = null;
+      for (const [existingKey, existing] of map) {
+        if (existing.accountId !== value.accountId) continue;
+        accountCount++;
+        if (accountOldestKey === null) accountOldestKey = existingKey;
+      }
+      if (accountCount >= MAX_AUTHORIZATIONS_PER_ACCOUNT && accountOldestKey !== null) {
+        map.delete(accountOldestKey);
+        onMetric?.('authorization_evicted');
+      } else if (map.size >= MAX_ACTIVE_HANDOFFS) {
+        const globalOldestKey = map.keys().next().value;
+        if (globalOldestKey !== undefined) map.delete(globalOldestKey);
+        onMetric?.('authorization_evicted');
+      }
+    }
+    map.set(key, value);
+  };
 
   const prune = (): void => {
     const currentTime = now();
@@ -197,9 +262,6 @@ export function createDesktopWalletHandoffStore(
 
     authorizeTransaction(accountId, authorization) {
       prune();
-      if (authorizedTransactions.size >= MAX_ACTIVE_HANDOFFS) {
-        throw handoffError('too many active wallet handoffs');
-      }
       if (
         !authorization.reference ||
         authorization.reference.length > 256 ||
@@ -208,16 +270,17 @@ export function createDesktopWalletHandoffStore(
         !Number.isFinite(authorization.expiresAtMs) ||
         authorization.expiresAtMs <= now()
       ) {
-        throw handoffError('invalid Claudium transaction authorization');
+        throw handoffError('invalid transaction authorization');
       }
-      authorizedTransactions.set(transactionKey(accountId, authorization.reference), {
-        accountId,
-        ...authorization,
-      });
+      insertAuthorization(
+        authorizedTransactions,
+        transactionKey(accountId, authorization.reference),
+        { accountId, ...authorization },
+      );
     },
 
     createTransaction(accountId, ip, request) {
-      prune();
+      // No pre-prune: createEntry prunes, and the expiry is checked inline.
       const authorization = authorizedTransactions.get(
         transactionKey(accountId, request.reference),
       );
@@ -226,7 +289,7 @@ export function createDesktopWalletHandoffStore(
         authorization.expectedAddress !== request.expectedAddress ||
         authorization.expiresAtMs <= now()
       ) {
-        throw handoffError('transaction is not backed by an authorized Claudium quote');
+        throw handoffError('transaction is not backed by an authorized quote');
       }
       return createEntry(
         accountId,
@@ -240,33 +303,34 @@ export function createDesktopWalletHandoffStore(
           amountBase: authorization.amountBase,
           destination: authorization.destination,
         },
-        authorization.expiresAtMs,
+        // The recording grace: see DESKTOP_WALLET_TRANSACTION_RECORD_GRACE_MS.
+        authorization.expiresAtMs + DESKTOP_WALLET_TRANSACTION_RECORD_GRACE_MS,
       );
     },
 
     authorizeStepUp(accountId, authorization) {
       prune();
-      if (authorizedStepUps.size >= MAX_ACTIVE_HANDOFFS) {
-        throw handoffError('too many active wallet handoffs');
-      }
       if (
         !STEPUP_NONCE.test(authorization.nonce) ||
         !authorization.message ||
-        authorization.message.length > 8_192 ||
+        // The real step-up message is a fixed 11-to-16-line template around
+        // 400 to 600 characters with 48-code-point free-text caps; this bound
+        // keeps the map's worst-case memory meaningful, not just finite.
+        authorization.message.length > 2_048 ||
         !authorization.expectedAddress ||
         !Number.isFinite(authorization.expiresAtMs) ||
         authorization.expiresAtMs <= now()
       ) {
         throw handoffError('invalid step-up authorization');
       }
-      authorizedStepUps.set(stepUpKey(accountId, authorization.nonce), {
+      insertAuthorization(authorizedStepUps, stepUpKey(accountId, authorization.nonce), {
         accountId,
         ...authorization,
       });
     },
 
     createStepUp(accountId, ip, request) {
-      prune();
+      // No pre-prune: createEntry prunes, and the expiry is checked inline.
       const authorization = authorizedStepUps.get(stepUpKey(accountId, request.nonce));
       if (
         !authorization ||
@@ -347,11 +411,17 @@ export function createDesktopWalletHandoffStore(
         }
       }
       entry.result = result;
+      // A completed step-up frees its authorization slot: the nonce is
+      // single-use downstream (the proof verifier consumes it), so a second
+      // handoff for it could only produce a signature the market refuses.
+      if (entry.action.kind === 'stepup') {
+        authorizedStepUps.delete(stepUpKey(entry.accountId, entry.action.nonce));
+      }
     },
 
     result(accountId, code) {
-      prune();
       if (!validCode(code)) return { status: 'missing' };
+      prune();
       const entry = entries.get(code);
       if (!entry || entry.accountId !== accountId) return { status: 'missing' };
       if (!entry.result) return { status: 'pending' };
@@ -366,4 +436,6 @@ export function createDesktopWalletHandoffStore(
   };
 }
 
-export const desktopWalletHandoffs = createDesktopWalletHandoffStore();
+export const desktopWalletHandoffs = createDesktopWalletHandoffStore({
+  onMetric: () => recordUsageMetric('wallet.handoff.authorization_evicted'),
+});

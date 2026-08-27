@@ -7,6 +7,18 @@ export type WalletHandoffClaim =
 
 export type WalletHandoffPost = (path: string, body: Record<string, unknown>) => Promise<unknown>;
 
+/** The body-copy key for the chooser card, one per handoff kind. Extracted
+ *  pure so the branch is unit-testable (the page module boots on import):
+ *  a step-up moves no funds, and showing it the payment copy in the external
+ *  browser is exactly the mistake this pins against. */
+export function walletHandoffBodyKey(
+  kind: WalletHandoffClaim['kind'],
+): 'wallet.browser.linkBody' | 'wallet.browser.stepUpBody' | 'wallet.browser.paymentBody' {
+  if (kind === 'link') return 'wallet.browser.linkBody';
+  if (kind === 'stepup') return 'wallet.browser.stepUpBody';
+  return 'wallet.browser.paymentBody';
+}
+
 /** Complete one browser wallet authorization without trusting renderer-supplied payment bytes. */
 export async function authorizeWalletHandoff(input: {
   code: string;

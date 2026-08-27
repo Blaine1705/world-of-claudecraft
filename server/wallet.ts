@@ -27,6 +27,7 @@ import {
   CARD_UPLOAD_POLICY,
   PUBLIC_READ_POLICY,
   rateLimit,
+  WALLET_HANDOFF_RESULT_POLICY,
   WALLET_LINK_POLICY,
   WOC_BALANCE_POLICY,
 } from './http/middleware/rate_limit';
@@ -135,8 +136,9 @@ export async function handleDesktopWalletHandoffCreate(
     // expected signer: a handoff can never be minted for a foreign wallet.
     const linkedWallet = await walletForAccount(accountId);
     if (!linkedWallet || linkedWallet.pubkey !== expectedAddress) {
+      recordUsageMetric('wallet.handoff.create_rejected');
       return json(res, 400, {
-        error: 'transaction wallet does not match the linked account wallet',
+        error: 'wallet does not match the linked account wallet',
         code: 'wallet.handoff_invalid',
       });
     }
@@ -152,6 +154,9 @@ export async function handleDesktopWalletHandoffCreate(
           });
     return json(res, 200, created);
   } catch (error) {
+    // Counted so a persistent unbacked-create condition (a realm/origin
+    // split, a registration outage) is a number on the ops readout.
+    recordUsageMetric('wallet.handoff.create_rejected');
     return handoffFailure(res, error);
   }
 }
@@ -164,9 +169,18 @@ export async function handleDesktopWalletHandoffClaim(
   const body = await readBody(req);
   try {
     const action = desktopWalletHandoffs.claim(body.code, requestIp(req));
-    // Transaction and step-up claims return the full server-registered action
-    // (the signable bytes/message come from the store, never the renderer).
-    if (action.kind === 'transaction' || action.kind === 'stepup') return json(res, 200, action);
+    // Transaction and step-up claims return the server-registered action (the
+    // signable bytes/message come from the store, never the renderer). The
+    // step-up nonce stays server-side: the page signs only the message, which
+    // already embeds the nonce line, so the wire carries nothing it can use.
+    if (action.kind === 'transaction') return json(res, 200, action);
+    if (action.kind === 'stepup') {
+      return json(res, 200, {
+        kind: 'stepup',
+        message: action.message,
+        expectedAddress: action.expectedAddress,
+      });
+    }
     const address = typeof body.address === 'string' ? body.address.trim() : '';
     if (!address) return json(res, 200, { kind: 'link' });
     if (!isSolanaAddress(address)) {
@@ -582,7 +596,9 @@ export const routes: RouteDef[] = [
     method: 'POST',
     path: '/api/desktop-wallet/result',
     surface: 'api',
-    middleware: [activeGuard],
+    // The 1 Hz result poll was the one unmetered arm of the handoff quartet;
+    // the policy admits two concurrent handoffs plus headroom.
+    middleware: [activeGuard, rateLimit(WALLET_HANDOFF_RESULT_POLICY)],
     handler: desktopWalletResultHandler,
   },
   {

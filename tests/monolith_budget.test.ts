@@ -261,11 +261,11 @@ const MONOLITHS: MonolithRow[] = [
     // the ratchet follows the merged file down). Exact count, zero slack.
     // Re-pinned to the exact merged count of the v0.39.3 main back-merge
     // (the utc_day import consolidation shed one line).
-    // Held at 11564 through the desktop-signing round: the wallet-handoff
+    // Down 11564 -> 11563 at the desktop-signing round: the wallet-handoff
     // availability probe and browser authorizer moved to
-    // src/net/desktop_wallet_handoff.ts (thin delegators remain), paying line
-    // for line for the Exchange desktop-signer wiring at the attach site.
-    ceiling: 11564,
+    // src/net/desktop_wallet_handoff.ts (thin hoisted delegators remain),
+    // paying for the Exchange desktop-signer wiring at the attach site.
+    ceiling: 11563,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

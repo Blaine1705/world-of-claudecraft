@@ -21,6 +21,8 @@ export interface WocMarketHooks {
   /** Sign the SERVER-BUILT step-up challenge message (B6/R1) with the linked
    *  wallet (no transaction, no funds). Same contract as the transaction
    *  signer; `stepUpNonce` is the challenge nonce the desktop arm resolves
-   *  the server-stored message by. */
+   *  the server-stored message by. The asymmetry with `reference` above is
+   *  deliberate: a challenge always carries its nonce, while a quote view's
+   *  reference is nullable, so each parameter mirrors its source's truth. */
   signMessageBase58(message: string, stepUpNonce: string): Promise<string>;
 }

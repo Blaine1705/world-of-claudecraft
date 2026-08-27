@@ -3423,9 +3423,7 @@ async function startGame(
       wallet: {
         linkedPubkey: () => linkedWalletPubkey,
         load: loadWallet,
-        desktopAuthorize: desktopWalletBrowserHandoffAvailable()
-          ? authorizeWocMarketDesktopHandoff
-          : null,
+        desktopAuthorize: desktopWalletBrowserHandoffAvailable() ? wocDesktopAuthorize : null,
       },
     }).catch((err) => console.warn('[woc] exchange attach failed', err));
     if (!NATIVE_APP) {
@@ -7979,13 +7977,14 @@ let walletFlowStatus: 'connect' | 'sign' | 'verify' | null = null;
 let walletHiddenNoticeTimeout: number | null = null;
 let desktopWalletBrowserSessionActive = false;
 
-const desktopWalletBrowserHandoffAvailable = () =>
-  desktopWalletHandoffAvailable(DESKTOP_APP, desktopBridge());
-const authorizeDesktopWalletInBrowser = (action: DesktopWalletBrowserAction) =>
-  authorizeDesktopWalletHandoff(action, api, desktopBridge());
-
+function desktopWalletBrowserHandoffAvailable(): boolean {
+  return desktopWalletHandoffAvailable(DESKTOP_APP, DESKTOP_APP ? desktopBridge() : null);
+}
+function authorizeDesktopWalletInBrowser(action: DesktopWalletBrowserAction) {
+  return authorizeDesktopWalletHandoff(action, api, desktopBridge());
+}
 // Exchange signers' desktop arm (woc_market_wiring.ts): handoff + session flag.
-async function authorizeWocMarketDesktopHandoff(action: DesktopWalletBrowserAction) {
+async function wocDesktopAuthorize(action: DesktopWalletBrowserAction) {
   const result = await authorizeDesktopWalletInBrowser(action);
   desktopWalletBrowserSessionActive = true;
   updateWalletButton();

@@ -99,6 +99,15 @@ describe('desktop browser wallet handoff options', () => {
     ]);
   });
 
+  it('authorizes a message-only account for the step-up requirement', async () => {
+    // The accountFor widening: stepup needs SolanaSignMessage only, so the
+    // message-only ACCOUNT must pass selection (a transaction-strict
+    // regression throws 'wallet did not authorize a Solana account' here).
+    registerWallet('Message Wallet', false);
+    const session = await connectBrowserWallet('Message Wallet', 'stepup');
+    expect(session.address).toBe('Message WalletAddress');
+  });
+
   it('rejects a message-only account before transaction authorization begins', async () => {
     registerWallet('Message Wallet', false);
 

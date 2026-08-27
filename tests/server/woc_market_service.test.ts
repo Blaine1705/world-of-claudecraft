@@ -9163,4 +9163,80 @@ describe('desktop handoff registration', () => {
     ]);
     expect(rec.stepUps).toEqual([]);
   });
+
+  it('registers the FINAL refreshed bond quote past the CAS, under the bidder wallet', async () => {
+    const h = twoEpics(makeHarness());
+    const listing = await listEpic(h);
+    const placed = unwrap(
+      await placeBid(h, {
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        amountCents: 5000,
+      }),
+      'placeBid',
+    );
+    // Arm the recorder only for the refresh, and force the production
+    // signable posture on the re-quote alone.
+    const rec = recordingRegistrar();
+    h.deps.desktopHandoff = rec.registrar;
+    const economy = h.deps.economy;
+    h.deps.economy = {
+      ...economy,
+      bondQuote: async (args) => ({
+        ...(await economy.bondQuote(args)),
+        signatureRequired: true,
+      }),
+    };
+    const refreshed = unwrap(
+      await h.service.refreshBondQuote(BUYER_A, placed.bid.id),
+      'refreshBondQuote',
+    );
+    expect(rec.transactions).toEqual([
+      [
+        BUYER_A,
+        expect.objectContaining({
+          reference: refreshed.bond.reference,
+          expectedAddress: 'wallet-a',
+          rail: 'woc',
+          expiresAtMs: refreshed.bond.expiresAtMs,
+        }),
+      ],
+    ]);
+  });
+
+  it('registers the buy-now settlement quote past the stamp (the quoteFor path)', async () => {
+    const h = twoEpics(makeHarness());
+    const listing = await listEpic(h, { format: 'buy_now', buyNowCents: 8000 });
+    const rec = recordingRegistrar();
+    h.deps.desktopHandoff = rec.registrar;
+    const economy = h.deps.economy;
+    h.deps.economy = {
+      ...economy,
+      settlementQuote: async (args) => ({
+        ...(await economy.settlementQuote(args)),
+        signatureRequired: true,
+      }),
+    };
+    const buy = unwrap(
+      await h.service.buyNow({
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        acceptTerms: true,
+      }),
+      'buyNow',
+    );
+    expect(rec.transactions).toEqual([
+      [
+        BUYER_A,
+        expect.objectContaining({
+          reference: buy.quote.reference,
+          expectedAddress: 'wallet-a',
+          rail: 'woc',
+        }),
+      ],
+    ]);
+    expect(buy.quote.reference).not.toBeNull();
+  });
 });
