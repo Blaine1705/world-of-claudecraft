@@ -2,43 +2,47 @@
 //
 // The sets are the epic armor families that drop from the Gravewyrm Sanctum
 // (tier 1) and the Nythraxis raid (tier 2), plus three leveling "haste kit"
-// families assembled from existing world-drop items. Wearing enough pieces of
-// a family grants stacking 2-, 3-, and 4-piece bonuses, resolved in
-// `recalcPlayerStats` (primary stats, attack power, crit, haste, cast pushback
-// immunity). Every epic family's 4-piece tier is a proc (see SetProc):
-// weapon-crit-triggered for the plate and leather archetypes, spell-cast-
-// triggered for the caster archetypes, resolved by combat/set_procs.ts.
+// families assembled from existing world-drop items.
+//
+// THE LINEAGE LADDER (the incumbent retune, docs/prd/ignivar-raid-loot.md):
+// each archetype's tier-1 and tier-2 families count as ONE lineage with
+// breakpoints at 2, 4, and 6 pieces worn ACROSS the lineage: deathlord plus
+// crownforged (Strength), wyrmshadow plus nighttalon (Agility), and
+// necromancers plus soulflame plus stormcallers (caster; the two tier-2 caster
+// families share slots so they can never be worn together). Every lineage
+// unions to exactly seven wearable slots with one overlap, so six pieces is a
+// real commitment (the WARFARE 2/4/7 shape applied to the PvE incumbents).
+// Member families SHARE one bonuses array (the lineage table) and carry a
+// `lineage` tag; `aggregateSetBonuses` sums worn counts across the lineage and
+// applies the shared table exactly once. Tiers stack as before, and the tier-1
+// procs live at the 4-piece tier while the tier-2 procs are the 6-piece
+// capstones, so no named effect was deleted in the retune.
 //
 // The five WARFARE honor families the quartermasters sell (content/pvp_honor.ts)
-// are the one exception to every sentence around this one: they break at 2, 4
-// and 7 pieces rather than 2, 3 and 4, and they are paid entirely in WARFARE
-// rating and PvP-gated effects rather than in stats, so they contribute exactly
-// zero in PvE. See the WARFARE block below and docs/design/warfare.md.
-//
-// Bonuses are keyed by archetype: the plate (Strength) families get attack
-// power then Strength/Stamina; the leather (Agility) families get attack power
-// then Agility/crit; the cloth (caster) families get full spell-pushback
-// immunity (damage taken never delays a cast; NOT physical knockback) at 2
-// pieces and Intellect plus Stamina for tier 1, or Intellect plus Spirit for
-// tier 2, at 3 pieces. Every tier-2 3-piece bonus ALSO grants haste (ONE stat:
-// faster melee and ranged swings AND shorter casts/channels), and the three
-// leveling haste kits grant haste alone at 3 pieces. This file is
-// data-as-code: balance numbers live here, never inline in the engine.
-// `aggregateSetBonuses` is the pure resolver imported by `entity.ts`.
+// break at 2, 4 and 7 pieces of one seven-piece family, and are paid entirely
+// in WARFARE rating and PvP-gated effects rather than in stats, so they
+// contribute exactly zero in PvE. See the WARFARE block below and
+// docs/design/warfare.md. The leveling haste kits keep their single 3-piece
+// tier. This file is data-as-code: balance numbers live here, never inline in
+// the engine. `aggregateSetBonuses` is the pure resolver imported by
+// `entity.ts`.
 
 import type { ItemSet, SetBonusEffect, SetBonusTier, SetProc } from '../types';
 
-// Haste granted by a 3-piece bonus after the global combat-rating conversion:
-// what SET_HASTE_3PC_RATING is worth once recalcPlayerStats converts it. Read
-// only by the tests, deliberately as a literal so it pins the conversion
+// Haste granted by a set tier after the global combat-rating conversion: what
+// SET_HASTE_3PC_RATING is worth once recalcPlayerStats converts it. Read only
+// by the tests, deliberately as a literal so it pins the conversion
 // independently; it must be updated by hand whenever HASTE_RATING_PER_PCT moves.
-export const SET_HASTE_3PC = 0.075;
-export const SET_HASTE_3PC_RATING = 150; // -> 7.5% haste at 20 rating = 1%
+// (The name keeps its historic 3PC suffix: the haste leveling kits still grant
+// it at 3 pieces, while the epic lineages now grant it at their 6-piece
+// capstone; see the retune in docs/prd/ignivar-raid-loot.md.)
+export const SET_HASTE_3PC = 0.04;
+export const SET_HASTE_3PC_RATING = 80; // -> 4% haste at 20 rating = 1%
 export const SET_CRIT_3PC_RATING = 20; // -> +1% crit at 20 rating = 1%
-// The two T2 4-piece bleeds (Bonesplinter, Ragged Gash) are marginal on their own
-// (roughly their 2-piece's flat 40 AP). They now also grant Hit rating so completing
-// the set is worth chasing for Heroic (+3 above-level), where the bleed alone was not.
-export const SET_HIT_4PC_RATING = 60; // -> +6% hit at 10 rating = 1%
+// The lineage capstone bleeds (Bonesplinter, Ragged Gash) are modest on their
+// own; the capstone also grants Hit rating so finishing six pieces is worth
+// chasing for Heroic (+3 above-level) content. Halved in the same retune.
+export const SET_HIT_4PC_RATING = 30; // -> +3% hit at 10 rating = 1%
 
 // The WARFARE honor sets (content/pvp_honor.ts). Every tier is paid in WARFARE
 // rating or in a PvP-gated effect and never in flat stats, which is what makes
@@ -111,101 +115,49 @@ export const SET_WARFARE_ASHSTALKER = 'warfare_ashstalker'; // leather, Agility
 export const SET_WARFARE_CINDERWEAVE = 'warfare_cinderweave'; // cloth, caster
 export const SET_WARFARE_THORNHIDE = 'warfare_thornhide'; // leather, caster
 
-// Archetype bonus tiers. Tiers stack (a 3-piece set grants both the 2- and
-// 3-piece bonuses); cast pushback reduction and knockback resistance
-// max-combine (see the resolver).
-// Every family reaches its 3-piece tier: tier-1 pieces drop in the Gravewyrm
-// Sanctum; tier-2 helms/shoulders drop in the Nythraxis raid and the tier-2
-// gloves/belts from the Thunzharr world boss (content/zone3.ts).
-const STRENGTH_T1_BONUSES: SetBonusTier[] = [
-  { pieces: 2, effect: { ap: 40 }, text: 'Increases attack power by 40.' },
-  { pieces: 3, effect: { str: 15, sta: 15 }, text: 'Increases Strength by 15 and Stamina by 15.' },
+// Lineage ids: the cross-tier archetype ladders (see the header). The id is
+// carried on each member ItemSet's `lineage` field.
+export const LINEAGE_STRENGTH = 'strength_lineage';
+export const LINEAGE_AGILITY = 'agility_lineage';
+export const LINEAGE_CASTER = 'caster_lineage';
+
+// Lineage bonus tiers, at 2, 4, and 6 pieces worn across the lineage. Tiers
+// stack (six pieces grant all three tiers); cast pushback reduction and
+// knockback resistance max-combine (see the resolver). Values are the retuned
+// (roughly halved) magnitudes from docs/prd/ignivar-raid-loot.md: the summed
+// old double-stack paid two near-full packages, and the ladder replaces that
+// with one sized package whose top requires six pieces.
+const STRENGTH_LINEAGE_BONUSES: SetBonusTier[] = [
+  {
+    pieces: 2,
+    effect: { str: 10, sta: 10 },
+    text: 'Increases Strength by 10 and Stamina by 10.',
+  },
   {
     pieces: 4,
     effect: {
+      ap: 25,
       proc: {
         id: 'set_gravemight',
         name: 'Gravemight',
         trigger: 'weaponCrit',
         chance: 0.5,
         aura: 'buff_ap',
-        value: 60,
+        value: 40,
         duration: 10,
         icd: 15,
       },
     },
-    text: 'Your weapon critical strikes have a 50% chance to grant Gravemight, increasing attack power by 60 for 10 sec.',
-  },
-];
-const AGILITY_T1_BONUSES: SetBonusTier[] = [
-  { pieces: 2, effect: { ap: 40 }, text: 'Increases attack power by 40.' },
-  {
-    pieces: 3,
-    effect: { agi: 15, critRating: SET_CRIT_3PC_RATING },
-    text: 'Increases Agility by 15 and critical strike chance by 1%.',
+    text: 'Increases attack power by 25. Your weapon critical strikes have a 50% chance to grant Gravemight, increasing attack power by 40 for 10 sec.',
   },
   {
-    pieces: 4,
+    pieces: 6,
     effect: {
-      proc: {
-        id: 'set_fangrush',
-        name: 'Fangrush',
-        trigger: 'weaponCrit',
-        chance: 0.5,
-        // buff_haste value is a swing-interval divisor (1.25 = 25% faster swings)
-        aura: 'buff_haste',
-        value: 1.25,
-        duration: 8,
-        icd: 15,
-      },
-    },
-    text: 'Your weapon critical strikes have a 50% chance to grant Fangrush, increasing attack speed by 25% for 8 sec.',
-  },
-];
-const CASTER_T1_BONUSES: SetBonusTier[] = [
-  {
-    pieces: 2,
-    effect: { castPushbackReduction: 1, sp: 20 },
-    text: 'Increases spell power by 20. Damage taken no longer delays your spellcasting (100% pushback resistance).',
-  },
-  {
-    pieces: 3,
-    effect: { int: 10, sta: 10 },
-    text: 'Increases Intellect by 10 and Stamina by 10.',
-  },
-  {
-    pieces: 4,
-    effect: {
-      proc: {
-        id: 'set_clearcasting',
-        name: 'Clearcasting',
-        trigger: 'spellCast',
-        chance: 0.1,
-        aura: 'next_cast_free',
-        duration: 12,
-        icd: 4,
-      },
-    },
-    text: 'Your spells have a 10% chance to grant Clearcasting, making your next spell free.',
-  },
-];
-// Tier-2 3-piece tiers carry the tier-1 stats PLUS haste.
-const STRENGTH_T2_BONUSES: SetBonusTier[] = [
-  { pieces: 2, effect: { ap: 40 }, text: 'Increases attack power by 40.' },
-  {
-    pieces: 3,
-    effect: { str: 15, sta: 15, hasteRating: SET_HASTE_3PC_RATING },
-    text: 'Increases Strength by 15, Stamina by 15, and attack and casting speed by 7.5%.',
-  },
-  {
-    pieces: 4,
-    effect: {
+      hasteRating: SET_HASTE_3PC_RATING,
       hitRating: SET_HIT_4PC_RATING,
       // Every weapon crit applies/stacks the bleed (no roll, no icd): with a
       // sustained crit every 8 to 12s the bleed sits at 1 to 2 stacks, peaking
-      // at 3 (24 damage per 2s), roughly the 2-piece's flat 40 AP in
-      // sustained damage while rewarding crit stacking. The added Hit rating is
-      // what makes the set worth completing for Heroic content.
+      // at 15 damage per 2s.
       proc: {
         id: 'set_bonesplinter',
         name: 'Bonesplinter',
@@ -213,31 +165,48 @@ const STRENGTH_T2_BONUSES: SetBonusTier[] = [
         chance: 1,
         applyTo: 'target',
         aura: 'dot',
-        value: 8, // per tick, per stack
+        value: 5, // per tick, per stack
         tickInterval: 2,
         duration: 12,
         maxStacks: 3,
         school: 'physical',
       },
     },
-    text: 'Increases Hit by 6%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 8 damage every 2 sec for 12 sec. Stacks up to 3 times.',
+    text: 'Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 5 damage every 2 sec for 12 sec. Stacks up to 3 times.',
   },
 ];
-const AGILITY_T2_BONUSES: SetBonusTier[] = [
-  { pieces: 2, effect: { ap: 40 }, text: 'Increases attack power by 40.' },
+const AGILITY_LINEAGE_BONUSES: SetBonusTier[] = [
   {
-    pieces: 3,
-    effect: { agi: 15, critRating: SET_CRIT_3PC_RATING, hasteRating: SET_HASTE_3PC_RATING },
-    text: 'Increases Agility by 15, critical strike chance by 1%, and attack and casting speed by 7.5%.',
+    pieces: 2,
+    effect: { agi: 10, critRating: SET_CRIT_3PC_RATING },
+    text: 'Increases Agility by 10 and critical strike chance by 1%.',
   },
   {
     pieces: 4,
     effect: {
+      ap: 25,
+      proc: {
+        id: 'set_fangrush',
+        name: 'Fangrush',
+        trigger: 'weaponCrit',
+        chance: 0.5,
+        // buff_haste value is a swing-interval divisor (1.15 = 15% faster swings)
+        aura: 'buff_haste',
+        value: 1.15,
+        duration: 8,
+        icd: 15,
+      },
+    },
+    text: 'Increases attack power by 25. Your weapon critical strikes have a 50% chance to grant Fangrush, increasing attack speed by 15% for 8 sec.',
+  },
+  {
+    pieces: 6,
+    effect: {
+      hasteRating: SET_HASTE_3PC_RATING,
       hitRating: SET_HIT_4PC_RATING,
-      // Leather crits land more often (the 3-piece adds crit AND haste), so
-      // its bleed ticks lighter than the plate one: more applications, same
-      // sustained value, peaking at 18 damage per 2s at 3 stacks. The added Hit
-      // rating is what makes the set worth completing for Heroic content.
+      // Agility crits land more often (the 2-piece adds crit), so its bleed
+      // ticks lighter than the Strength one: more applications, same sustained
+      // value, peaking at 12 damage per 2s at 3 stacks.
       proc: {
         id: 'set_ragged_gash',
         name: 'Ragged Gash',
@@ -245,42 +214,56 @@ const AGILITY_T2_BONUSES: SetBonusTier[] = [
         chance: 1,
         applyTo: 'target',
         aura: 'dot',
-        value: 6, // per tick, per stack
+        value: 4, // per tick, per stack
         tickInterval: 2,
         duration: 12,
         maxStacks: 3,
         school: 'physical',
       },
     },
-    text: 'Increases Hit by 6%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 6 damage every 2 sec for 12 sec. Stacks up to 3 times.',
+    text: 'Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 4 damage every 2 sec for 12 sec. Stacks up to 3 times.',
   },
 ];
-const CASTER_T2_BONUSES: SetBonusTier[] = [
+const CASTER_LINEAGE_BONUSES: SetBonusTier[] = [
   {
     pieces: 2,
-    effect: { castPushbackReduction: 1, sp: 20 },
-    text: 'Increases spell power by 20. Damage taken no longer delays your spellcasting (100% pushback resistance).',
-  },
-  {
-    pieces: 3,
-    effect: { int: 15, spi: 15, hasteRating: SET_HASTE_3PC_RATING },
-    text: 'Increases Intellect by 15, Spirit by 15, and attack and casting speed by 7.5%.',
+    // Half pushback resistance: full immunity moved to the new raid tier's
+    // caster and healer 2-piece bonuses in the same retune.
+    effect: { int: 10, spi: 10, castPushbackReduction: 0.5 },
+    text: 'Increases Intellect by 10 and Spirit by 10. Damage taken delays your spellcasting half as much (50% pushback resistance).',
   },
   {
     pieces: 4,
     effect: {
+      sp: 12,
+      proc: {
+        id: 'set_clearcasting',
+        name: 'Clearcasting',
+        trigger: 'spellCast',
+        chance: 0.06,
+        aura: 'next_cast_free',
+        duration: 12,
+        icd: 4,
+      },
+    },
+    text: 'Increases spell power by 12. Your spells have a 6% chance to grant Clearcasting, making your next spell free.',
+  },
+  {
+    pieces: 6,
+    effect: {
+      hasteRating: SET_HASTE_3PC_RATING,
       proc: {
         id: 'set_soulblaze',
         name: 'Soulblaze',
         trigger: 'spellCast',
         chance: 0.1,
         aura: 'buff_spellpower',
-        value: 40,
+        value: 25,
         duration: 10,
         icd: 20,
       },
     },
-    text: 'Your spells have a 10% chance to grant Soulblaze, increasing spell power by 40 for 10 sec.',
+    text: 'Increases attack and casting speed by 4%. Your spells have a 10% chance to grant Soulblaze, increasing spell power by 25 for 10 sec.',
   },
 ];
 // The leveling haste kits grant haste alone, and only at 3 pieces:
@@ -377,29 +360,44 @@ export const ITEM_SETS: Record<string, ItemSet> = {
   [SET_DEATHLORD]: {
     id: SET_DEATHLORD,
     name: 'Barrowlord Battlegear',
-    bonuses: STRENGTH_T1_BONUSES,
+    lineage: LINEAGE_STRENGTH,
+    bonuses: STRENGTH_LINEAGE_BONUSES,
   },
   [SET_WYRMSHADOW]: {
     id: SET_WYRMSHADOW,
     name: 'Nightfang Vestments',
-    bonuses: AGILITY_T1_BONUSES,
+    lineage: LINEAGE_AGILITY,
+    bonuses: AGILITY_LINEAGE_BONUSES,
   },
   [SET_NECROMANCERS]: {
     id: SET_NECROMANCERS,
     name: 'Mournweave Raiment',
-    bonuses: CASTER_T1_BONUSES,
+    lineage: LINEAGE_CASTER,
+    bonuses: CASTER_LINEAGE_BONUSES,
   },
   [SET_CROWNFORGED]: {
     id: SET_CROWNFORGED,
     name: 'Bonewrought Regalia',
-    bonuses: STRENGTH_T2_BONUSES,
+    lineage: LINEAGE_STRENGTH,
+    bonuses: STRENGTH_LINEAGE_BONUSES,
   },
-  [SET_NIGHTTALON]: { id: SET_NIGHTTALON, name: 'Direfang Pelt', bonuses: AGILITY_T2_BONUSES },
-  [SET_SOULFLAME]: { id: SET_SOULFLAME, name: 'Wraithfire Regalia', bonuses: CASTER_T2_BONUSES },
+  [SET_NIGHTTALON]: {
+    id: SET_NIGHTTALON,
+    name: 'Direfang Pelt',
+    lineage: LINEAGE_AGILITY,
+    bonuses: AGILITY_LINEAGE_BONUSES,
+  },
+  [SET_SOULFLAME]: {
+    id: SET_SOULFLAME,
+    name: 'Wraithfire Regalia',
+    lineage: LINEAGE_CASTER,
+    bonuses: CASTER_LINEAGE_BONUSES,
+  },
   [SET_STORMCALLERS]: {
     id: SET_STORMCALLERS,
     name: 'Galecall Vestments',
-    bonuses: CASTER_T2_BONUSES,
+    lineage: LINEAGE_CASTER,
+    bonuses: CASTER_LINEAGE_BONUSES,
   },
   [SET_VALE_ARCANIST]: {
     id: SET_VALE_ARCANIST,
@@ -512,11 +510,29 @@ function zeroEffect(): AggregatedSetEffect {
 // than summing past 1. Pure and host-agnostic so a Vitest can drive it directly.
 export function aggregateSetBonuses(counts: Map<string, number>): AggregatedSetEffect {
   const out = zeroEffect();
+  // Fold family counts into lineage counts first, so tier thresholds read the
+  // COMBINED tier-1 plus tier-2 pieces (the 2/4/6 ladder). Each lineage's
+  // shared table applies exactly once, from whichever member set is seen
+  // first; non-lineage families (WARFARE, haste kits) resolve per set.
+  const lineageCounts = new Map<string, number>();
+  for (const [setId, count] of counts) {
+    const lineage = ITEM_SETS[setId]?.lineage;
+    if (lineage !== undefined) {
+      lineageCounts.set(lineage, (lineageCounts.get(lineage) ?? 0) + count);
+    }
+  }
+  const appliedLineages = new Set<string>();
   for (const [setId, count] of counts) {
     const set = ITEM_SETS[setId];
     if (!set) continue;
+    let effectiveCount = count;
+    if (set.lineage !== undefined) {
+      if (appliedLineages.has(set.lineage)) continue;
+      appliedLineages.add(set.lineage);
+      effectiveCount = lineageCounts.get(set.lineage) ?? count;
+    }
     for (const tier of set.bonuses) {
-      if (count < tier.pieces) continue;
+      if (effectiveCount < tier.pieces) continue;
       const e: SetBonusEffect = tier.effect;
       out.str += e.str ?? 0;
       out.agi += e.agi ?? 0;

@@ -10115,39 +10115,27 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Augmente la vitesse d'attaque et d'incantation de 15%.",
   'entities.itemSets.crownforged.name': "Tenue d'apparat Bonewrought",
   'entities.itemSets.crownforged.bonus2': "Augmente la puissance d'attaque de 40.",
-  'entities.itemSets.crownforged.bonus3':
-    "Augmente la force de 15, l'endurance de 15 et la vitesse d'attaque et d'incantation de 15%.",
   'entities.itemSets.deathlord.name': 'Tenue de guerre de Barrowlord',
   'entities.itemSets.deathlord.bonus2': "Augmente la puissance d'attaque de 40.",
-  'entities.itemSets.deathlord.bonus3': "Augmente la force de 15 et l'endurance de 15.",
   'entities.itemSets.greyjaw_stalker.name': 'Équipement du traqueur de Greyjaw',
   'entities.itemSets.greyjaw_stalker.bonus3':
     "Augmente la vitesse d'attaque et d'incantation de 15%.",
   'entities.itemSets.necromancers.name': 'Parure de Mournweave',
   'entities.itemSets.necromancers.bonus2':
     'Augmente la puissance des sorts de 20. Les dégâts subis ne retardent plus vos incantations (100% de résistance au retard des sorts).',
-  'entities.itemSets.necromancers.bonus3': "Augmente l'intelligence de 10 et l'endurance de 10.",
   'entities.itemSets.nighttalon.name': 'Peau de Direfang',
   'entities.itemSets.nighttalon.bonus2': "Augmente la puissance d'attaque de 40.",
-  'entities.itemSets.nighttalon.bonus3':
-    "Augmente l'agilité de 15, les chances de critique de 2% et la vitesse d'attaque et d'incantation de 15%.",
   'entities.itemSets.soulflame.name': "Tenue d'apparat Wraithfire",
   'entities.itemSets.soulflame.bonus2':
     'Augmente la puissance des sorts de 20. Les dégâts subis ne retardent plus vos incantations (100% de résistance au retard des sorts).',
-  'entities.itemSets.soulflame.bonus3':
-    "Augmente l'intelligence de 15, l'esprit de 15 et la vitesse d'attaque et d'incantation de 15%.",
   'entities.itemSets.stormcallers.name': 'Vêtements de Galecall',
   'entities.itemSets.stormcallers.bonus2':
     'Augmente la puissance des sorts de 20. Les dégâts subis ne retardent plus vos incantations (100% de résistance au retard des sorts).',
-  'entities.itemSets.stormcallers.bonus3':
-    "Augmente l'intelligence de 15, l'esprit de 15 et la vitesse d'attaque et d'incantation de 15%.",
   'entities.itemSets.vale_arcanist.name': "Tenue de l'arcaniste du Val",
   'entities.itemSets.vale_arcanist.bonus3':
     "Augmente la vitesse d'attaque et d'incantation de 15%.",
   'entities.itemSets.wyrmshadow.name': 'Vêtements de Nightfang',
   'entities.itemSets.wyrmshadow.bonus2': "Augmente la puissance d'attaque de 40.",
-  'entities.itemSets.wyrmshadow.bonus3':
-    'Augmente l’agilité de 15 et les chances de critique de 2%.',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hud.combat.floatingResist': 'Résisté',

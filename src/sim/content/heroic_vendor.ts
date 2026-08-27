@@ -126,7 +126,7 @@ export const HEROIC_VENDOR_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { str: 6, agi: 6 },
-    hitRating: JEWELRY_RATING, // hybrid melee: Hit
+    hasteRating: JEWELRY_RATING, // hybrid melee: haste (the Hit lane keeps nine_oaths + round_table)
     sellValue: 6000,
   },
   medallion_of_endless_profit: {

@@ -9368,36 +9368,25 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.boundstone_vanguard.bonus3': 'Øger angrebs- og magihastighed med 15%.',
   'entities.itemSets.crownforged.name': 'Bonewrought regalier',
   'entities.itemSets.crownforged.bonus2': 'Øger angrebskraft med 40.',
-  'entities.itemSets.crownforged.bonus3':
-    'Øger styrke med 15, udholdenhed med 15 og angrebs- og magihastighed med 15%.',
   'entities.itemSets.deathlord.name': 'Barrowlord kampudstyr',
   'entities.itemSets.deathlord.bonus2': 'Øger angrebskraft med 40.',
-  'entities.itemSets.deathlord.bonus3': 'Øger styrke med 15 og udholdenhed med 15.',
   'entities.itemSets.greyjaw_stalker.name': 'Gråkæbe-jægerens udstyr',
   'entities.itemSets.greyjaw_stalker.bonus3': 'Øger angrebs- og magihastighed med 15%.',
   'entities.itemSets.necromancers.name': 'Mournweave klæder',
   'entities.itemSets.necromancers.bonus2':
     'Øger magikraft med 20. Skade, du tager, forsinker ikke længere dine besværgelser (100% modstand mod fordrøjelse af besværgelser).',
-  'entities.itemSets.necromancers.bonus3': 'Øger intellekt med 10 og udholdenhed med 10.',
   'entities.itemSets.nighttalon.name': 'Direfang pels',
   'entities.itemSets.nighttalon.bonus2': 'Øger angrebskraft med 40.',
-  'entities.itemSets.nighttalon.bonus3':
-    'Øger smidighed med 15, kritisk chance med 2% og angrebs- og magihastighed med 15%.',
   'entities.itemSets.soulflame.name': 'Wraithfire regalier',
   'entities.itemSets.soulflame.bonus2':
     'Øger magikraft med 20. Skade, du tager, forsinker ikke længere dine besværgelser (100% modstand mod fordrøjelse af besværgelser).',
-  'entities.itemSets.soulflame.bonus3':
-    'Øger intellekt med 15, ånd med 15 og angrebs- og magihastighed med 15%.',
   'entities.itemSets.stormcallers.name': 'Galecall klæder',
   'entities.itemSets.stormcallers.bonus2':
     'Øger magikraft med 20. Skade, du tager, forsinker ikke længere dine besværgelser (100% modstand mod fordrøjelse af besværgelser).',
-  'entities.itemSets.stormcallers.bonus3':
-    'Øger intellekt med 15, ånd med 15 og angrebs- og magihastighed med 15%.',
   'entities.itemSets.vale_arcanist.name': 'Dalarkanistens klæder',
   'entities.itemSets.vale_arcanist.bonus3': 'Øger angrebs- og magihastighed med 15%.',
   'entities.itemSets.wyrmshadow.name': 'Nightfang klæder',
   'entities.itemSets.wyrmshadow.bonus2': 'Øger angrebskraft med 40.',
-  'entities.itemSets.wyrmshadow.bonus3': 'Øger smidighed med 15 og kritisk chance med 2%.',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hud.combat.floatingResist': 'Modstået',

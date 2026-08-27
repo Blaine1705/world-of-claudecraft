@@ -7851,36 +7851,25 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.boundstone_vanguard.bonus3': 'Zvyšuje rychlost útoku a sesílání o 15 %.',
   'entities.itemSets.boundstone_vanguard.name': 'Předvoj spoutaného kamene',
   'entities.itemSets.crownforged.bonus2': 'Zvyšuje sílu útoku o 40.',
-  'entities.itemSets.crownforged.bonus3':
-    'Zvyšuje sílu o 15, výdrž o 15 a rychlost útoku i sesílání o 15 %.',
   'entities.itemSets.crownforged.name': 'Regálie z kosti',
   'entities.itemSets.deathlord.bonus2': 'Zvyšuje sílu útoku o 40.',
-  'entities.itemSets.deathlord.bonus3': 'Zvyšuje sílu o 15 a výdrž o 15.',
   'entities.itemSets.deathlord.name': 'Bojová výbava mohylového pána',
   'entities.itemSets.greyjaw_stalker.bonus3': 'Zvyšuje rychlost útoku a sesílání o 15 %.',
   'entities.itemSets.greyjaw_stalker.name': 'Výbava stopaře Šedočelista',
   'entities.itemSets.necromancers.bonus2':
     'Zvyšuje sílu kouzel o 20. Utrpěné poškození již nezdržuje tvé sesílání kouzel (100% odolnost proti zdržení sesílání).',
-  'entities.itemSets.necromancers.bonus3': 'Zvyšuje intelekt o 10 a výdrž o 10.',
   'entities.itemSets.necromancers.name': 'Oděv smutkotkaní',
   'entities.itemSets.nighttalon.bonus2': 'Zvyšuje sílu útoku o 40.',
-  'entities.itemSets.nighttalon.bonus3':
-    'Zvyšuje obratnost o 15, šanci na kritický zásah o 2 % a rychlost útoku i sesílání o 15 %.',
   'entities.itemSets.nighttalon.name': 'Kožešina děsivého tesáku',
   'entities.itemSets.soulflame.bonus2':
     'Zvyšuje sílu kouzel o 20. Utrpěné poškození již nezdržuje tvé sesílání kouzel (100% odolnost proti zdržení sesílání).',
-  'entities.itemSets.soulflame.bonus3':
-    'Zvyšuje intelekt o 15, ducha o 15 a rychlost útoku i sesílání o 15 %.',
   'entities.itemSets.soulflame.name': 'Regálie přízračného ohně',
   'entities.itemSets.stormcallers.bonus2':
     'Zvyšuje sílu kouzel o 20. Utrpěné poškození již nezdržuje tvé sesílání kouzel (100% odolnost proti zdržení sesílání).',
-  'entities.itemSets.stormcallers.bonus3':
-    'Zvyšuje intelekt o 15, ducha o 15 a rychlost útoku i sesílání o 15 %.',
   'entities.itemSets.stormcallers.name': 'Roucha volání vichru',
   'entities.itemSets.vale_arcanist.bonus3': 'Zvyšuje rychlost útoku a sesílání o 15 %.',
   'entities.itemSets.vale_arcanist.name': 'Regálie arkánisty z údolí',
   'entities.itemSets.wyrmshadow.bonus2': 'Zvyšuje sílu útoku o 40.',
-  'entities.itemSets.wyrmshadow.bonus3': 'Zvyšuje obratnost o 15 a šanci na kritický zásah o 2 %.',
   'entities.itemSets.wyrmshadow.name': 'Roucha nočního tesáku',
   'entities.zones.eastbrook_vale.name': 'Eastbrookské údolí',
   'entities.zones.eastbrook_vale.pois.0.label': 'Eastbrook',

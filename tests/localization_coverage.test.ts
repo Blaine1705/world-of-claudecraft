@@ -991,11 +991,10 @@ describe('i18n Localization Key Coverage', () => {
 
   it('should track item-set names and bonus text in the entity catalog', async () => {
     const itemSetEntries = entityTranslationManifest().filter((entry) => entry.group === 'itemSet');
-    // 7 raid/dungeon families with name+bonus2+bonus3+bonus4 (every epic family
-    // carries a 4-piece proc tier), plus 3 leveling haste kits carrying a
-    // single 3-piece tier (name+bonus3 only).
-    // 7 epic families x (name + bonus2/3/4), 3 haste kits x (name + bonus3), and the
-    // 5 WARFARE families x (name + bonus2/4/7).
+    // 7 raid/dungeon families with name+bonus2+bonus4+bonus6 (the lineage
+    // ladder: every family shares its archetype's 2/4/6 tiers), plus 3
+    // leveling haste kits carrying a single 3-piece tier (name+bonus3 only),
+    // and the 5 WARFARE families x (name + bonus2/4/7).
     expect(itemSetEntries).toHaveLength(7 * 4 + 3 * 2 + 5 * 4);
     expect(missingEntityTranslationsForGroups(['itemSet'])).toHaveLength(0);
 

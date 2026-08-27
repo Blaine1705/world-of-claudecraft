@@ -7405,44 +7405,31 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.boundstone_vanguard.name': '縛石先鋒',
   'entities.itemSets.boundstone_vanguard.bonus3': '攻擊速度和施法速度提高 15%。',
   'entities.itemSets.crownforged.name': '骨鑄戰裝',
-  'entities.itemSets.crownforged.bonus2': '攻擊強度提高 40 點。',
-  'entities.itemSets.crownforged.bonus3':
-    '力量提高 15 點，耐力提高 15 點，攻擊速度和施法速度提高 15%。',
-  'entities.itemSets.crownforged.bonus4':
-    '你的武器致命一擊會使目標產生「骨刺」，每 2 秒流血 8 點傷害，持續 12 秒。最多疊加 3 層。',
+  'entities.itemSets.crownforged.bonus2': '力量提高 10 點，耐力提高 10 點。',
+  'entities.itemSets.crownforged.bonus4': '攻擊強度提高 25 點。你的武器致命一擊有 50% 的機率觸發「墓塚之力」，使攻擊強度提高 40 點，持續 10 秒。',
+  'entities.itemSets.crownforged.bonus6': '攻擊與施法速度提高 4%，命中提高 3%。你的武器致命一擊會使目標產生「骨刺」，每 2 秒流血 5 點傷害，持續 12 秒。最多疊加 3 層。',
   'entities.itemSets.deathlord.name': '塚陵領主戰鬥護甲',
-  'entities.itemSets.deathlord.bonus2': '攻擊強度提高 40 點。',
-  'entities.itemSets.deathlord.bonus3': '力量提高 15 點，耐力提高 15 點。',
-  'entities.itemSets.deathlord.bonus4':
-    '你的武器致命一擊有 50% 的機率觸發「墓塚之力」，使攻擊強度提高 60 點，持續 10 秒。',
+  'entities.itemSets.deathlord.bonus2': '力量提高 10 點，耐力提高 10 點。',
+  'entities.itemSets.deathlord.bonus4': '攻擊強度提高 25 點。你的武器致命一擊有 50% 的機率觸發「墓塚之力」，使攻擊強度提高 40 點，持續 10 秒。',
+  'entities.itemSets.deathlord.bonus6': '攻擊與施法速度提高 4%，命中提高 3%。你的武器致命一擊會使目標產生「骨刺」，每 2 秒流血 5 點傷害，持續 12 秒。最多疊加 3 層。',
   'entities.itemSets.greyjaw_stalker.name': '灰顎追獵者裝備',
   'entities.itemSets.greyjaw_stalker.bonus3': '攻擊速度和施法速度提高 15%。',
   'entities.itemSets.necromancers.name': '哀織法衣',
-  'entities.itemSets.necromancers.bonus2':
-    '法術強度提高 20 點。受到傷害不再延遲你的施法（施法延遲抗性 100%）。',
-  'entities.itemSets.necromancers.bonus3': '智力提高 10 點，耐力提高 10 點。',
-  'entities.itemSets.necromancers.bonus4':
-    '你的法術有 10% 的機率觸發「清晰施法」，使你的下一個法術免費施放。',
+  'entities.itemSets.necromancers.bonus2': '智力提高 10 點，精神提高 10 點。受到傷害對施法的延遲減半（施法延遲抗性 50%）。',
+  'entities.itemSets.necromancers.bonus4': '法術強度提高 12 點。你的法術有 6% 的機率觸發「清晰施法」，使你的下一個法術免費施放。',
+  'entities.itemSets.necromancers.bonus6': '攻擊與施法速度提高 4%。你的法術有 10% 的機率觸發「灼魂之焰」，使法術強度提高 25 點，持續 10 秒。',
   'entities.itemSets.nighttalon.name': '厲牙皮甲',
-  'entities.itemSets.nighttalon.bonus2': '攻擊強度提高 40 點。',
-  'entities.itemSets.nighttalon.bonus3':
-    '敏捷提高 15 點，致命一擊機率提高 2%，攻擊速度和施法速度提高 15%。',
-  'entities.itemSets.nighttalon.bonus4':
-    '你的武器致命一擊會撕開「撕裂傷口」，使目標每 2 秒流血 6 點傷害，持續 12 秒。最多疊加 3 層。',
+  'entities.itemSets.nighttalon.bonus2': '敏捷提高 10 點，致命一擊機率提高 1%。',
+  'entities.itemSets.nighttalon.bonus4': '攻擊強度提高 25 點。你的武器致命一擊有 50% 的機率觸發「獠牙疾襲」，使攻擊速度提高 15%，持續 8 秒。',
+  'entities.itemSets.nighttalon.bonus6': '攻擊與施法速度提高 4%，命中提高 3%。你的武器致命一擊會撕開「撕裂傷口」，使目標每 2 秒流血 4 點傷害，持續 12 秒。最多疊加 3 層。',
   'entities.itemSets.soulflame.name': '怨焰法衣',
-  'entities.itemSets.soulflame.bonus2':
-    '法術強度提高 20 點。受到傷害不再延遲你的施法（施法延遲抗性 100%）。',
-  'entities.itemSets.soulflame.bonus3':
-    '智力提高 15 點，精神提高 15 點，攻擊速度和施法速度提高 15%。',
-  'entities.itemSets.soulflame.bonus4':
-    '你的法術有 10% 的機率觸發「灼魂之焰」，使法術強度提高 40 點，持續 10 秒。',
+  'entities.itemSets.soulflame.bonus2': '智力提高 10 點，精神提高 10 點。受到傷害對施法的延遲減半（施法延遲抗性 50%）。',
+  'entities.itemSets.soulflame.bonus4': '法術強度提高 12 點。你的法術有 6% 的機率觸發「清晰施法」，使你的下一個法術免費施放。',
+  'entities.itemSets.soulflame.bonus6': '攻擊與施法速度提高 4%。你的法術有 10% 的機率觸發「灼魂之焰」，使法術強度提高 25 點，持續 10 秒。',
   'entities.itemSets.stormcallers.name': '喚風法衣',
-  'entities.itemSets.stormcallers.bonus2':
-    '法術強度提高 20 點。受到傷害不再延遲你的施法（施法延遲抗性 100%）。',
-  'entities.itemSets.stormcallers.bonus3':
-    '智力提高 15 點，精神提高 15 點，攻擊速度和施法速度提高 15%。',
-  'entities.itemSets.stormcallers.bonus4':
-    '你的法術有 10% 的機率觸發「灼魂之焰」，使法術強度提高 40 點，持續 10 秒。',
+  'entities.itemSets.stormcallers.bonus2': '智力提高 10 點，精神提高 10 點。受到傷害對施法的延遲減半（施法延遲抗性 50%）。',
+  'entities.itemSets.stormcallers.bonus4': '法術強度提高 12 點。你的法術有 6% 的機率觸發「清晰施法」，使你的下一個法術免費施放。',
+  'entities.itemSets.stormcallers.bonus6': '攻擊與施法速度提高 4%。你的法術有 10% 的機率觸發「灼魂之焰」，使法術強度提高 25 點，持續 10 秒。',
   'entities.itemSets.vale_arcanist.name': '谷地秘法師法衣',
   'entities.itemSets.vale_arcanist.bonus3': '攻擊速度和施法速度提高 15%。',
   'entities.itemSets.warfare_ashstalker.name': '灰燼追獵者裝備',
@@ -7466,10 +7453,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_thornhide.bonus4': '戰爭攻擊等級提高 40，且敵對玩家對你施加的控制效果持續時間縮短 15%。',
   'entities.itemSets.warfare_thornhide.bonus7': '戰爭攻擊與防禦等級提高 80。你的法術有 15% 的機率給予荊棘守護，使閃避提高 15%，持續 6 秒。',
   'entities.itemSets.wyrmshadow.name': '夜牙法衣',
-  'entities.itemSets.wyrmshadow.bonus2': '攻擊強度提高 40 點。',
-  'entities.itemSets.wyrmshadow.bonus3': '敏捷提高 15 點，致命一擊機率提高 2%。',
-  'entities.itemSets.wyrmshadow.bonus4':
-    '你的武器致命一擊有 50% 的機率觸發「獠牙疾襲」，使攻擊速度提高 25%，持續 8 秒。',
+  'entities.itemSets.wyrmshadow.bonus2': '敏捷提高 10 點，致命一擊機率提高 1%。',
+  'entities.itemSets.wyrmshadow.bonus4': '攻擊強度提高 25 點。你的武器致命一擊有 50% 的機率觸發「獠牙疾襲」，使攻擊速度提高 15%，持續 8 秒。',
+  'entities.itemSets.wyrmshadow.bonus6': '攻擊與施法速度提高 4%，命中提高 3%。你的武器致命一擊會撕開「撕裂傷口」，使目標每 2 秒流血 4 點傷害，持續 12 秒。最多疊加 3 層。',
   'hudChrome.itemSoulbound': '靈魂綁定',
   'hudChrome.itemUniqueEquipped': '裝備唯一',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',

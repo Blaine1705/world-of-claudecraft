@@ -9375,36 +9375,25 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.boundstone_vanguard.bonus3': 'Ökar attack- och magihastighet med 15%.',
   'entities.itemSets.crownforged.name': 'Bonewrought-regalier',
   'entities.itemSets.crownforged.bonus2': 'Ökar attackkraft med 40.',
-  'entities.itemSets.crownforged.bonus3':
-    'Ökar styrka med 15, uthållighet med 15 samt attack- och magihastighet med 15%.',
   'entities.itemSets.deathlord.name': 'Barrowlords stridsutrustning',
   'entities.itemSets.deathlord.bonus2': 'Ökar attackkraft med 40.',
-  'entities.itemSets.deathlord.bonus3': 'Ökar styrka med 15 och uthållighet med 15.',
   'entities.itemSets.greyjaw_stalker.name': 'Gråkäftssmygarens utrustning',
   'entities.itemSets.greyjaw_stalker.bonus3': 'Ökar attack- och magihastighet med 15%.',
   'entities.itemSets.necromancers.name': 'Mournweave-skrud',
   'entities.itemSets.necromancers.bonus2':
     'Ökar trollformelskraft med 20. Skada du tar fördröjer inte längre dina besvärjelser (100% motstånd mot fördröjning av besvärjelser).',
-  'entities.itemSets.necromancers.bonus3': 'Ökar intellekt med 10 och uthållighet med 10.',
   'entities.itemSets.nighttalon.name': 'Direfang-päls',
   'entities.itemSets.nighttalon.bonus2': 'Ökar attackkraft med 40.',
-  'entities.itemSets.nighttalon.bonus3':
-    'Ökar smidighet med 15, kritisk chans med 2% samt attack- och magihastighet med 15%.',
   'entities.itemSets.soulflame.name': 'Wraithfire-regalier',
   'entities.itemSets.soulflame.bonus2':
     'Ökar trollformelskraft med 20. Skada du tar fördröjer inte längre dina besvärjelser (100% motstånd mot fördröjning av besvärjelser).',
-  'entities.itemSets.soulflame.bonus3':
-    'Ökar intellekt med 15, ande med 15 samt attack- och magihastighet med 15%.',
   'entities.itemSets.stormcallers.name': 'Galecall-skrud',
   'entities.itemSets.stormcallers.bonus2':
     'Ökar trollformelskraft med 20. Skada du tar fördröjer inte längre dina besvärjelser (100% motstånd mot fördröjning av besvärjelser).',
-  'entities.itemSets.stormcallers.bonus3':
-    'Ökar intellekt med 15, ande med 15 samt attack- och magihastighet med 15%.',
   'entities.itemSets.vale_arcanist.name': 'Dalarkanistens skrud',
   'entities.itemSets.vale_arcanist.bonus3': 'Ökar attack- och magihastighet med 15%.',
   'entities.itemSets.wyrmshadow.name': 'Nightfang-skrud',
   'entities.itemSets.wyrmshadow.bonus2': 'Ökar attackkraft med 40.',
-  'entities.itemSets.wyrmshadow.bonus3': 'Ökar smidighet med 15 och kritisk chans med 2%.',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hud.combat.floatingResist': 'Motstod',

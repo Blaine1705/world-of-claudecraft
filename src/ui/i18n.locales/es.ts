@@ -9696,39 +9696,27 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Aumenta la velocidad de ataque y de lanzamiento en 15%.',
   'entities.itemSets.crownforged.name': 'Equipo de batalla Bonewrought',
   'entities.itemSets.crownforged.bonus2': 'Aumenta el poder de ataque en 40.',
-  'entities.itemSets.crownforged.bonus3':
-    'Aumenta la fuerza en 15, el aguante en 15 y la velocidad de ataque y de lanzamiento en 15%.',
   'entities.itemSets.deathlord.name': 'Equipo de batalla de Barrowlord',
   'entities.itemSets.deathlord.bonus2': 'Aumenta el poder de ataque en 40.',
-  'entities.itemSets.deathlord.bonus3': 'Aumenta la fuerza en 15 y el aguante en 15.',
   'entities.itemSets.greyjaw_stalker.name': 'Equipo del Acechador de Greyjaw',
   'entities.itemSets.greyjaw_stalker.bonus3':
     'Aumenta la velocidad de ataque y de lanzamiento en 15%.',
   'entities.itemSets.necromancers.name': 'Vestiduras de Mournweave',
   'entities.itemSets.necromancers.bonus2':
     'Aumenta el poder de los hechizos en 20. El daño recibido ya no retrasa tus hechizos (100% de resistencia al retraso de lanzamiento).',
-  'entities.itemSets.necromancers.bonus3': 'Aumenta el intelecto en 10 y el aguante en 10.',
   'entities.itemSets.nighttalon.name': 'Atuendo de cuero Direfang',
   'entities.itemSets.nighttalon.bonus2': 'Aumenta el poder de ataque en 40.',
-  'entities.itemSets.nighttalon.bonus3':
-    'Aumenta la agilidad en 15, la probabilidad de crítico en 2% y la velocidad de ataque y de lanzamiento en 15%.',
   'entities.itemSets.soulflame.name': 'Vestiduras de Wraithfire',
   'entities.itemSets.soulflame.bonus2':
     'Aumenta el poder de los hechizos en 20. El daño recibido ya no retrasa tus hechizos (100% de resistencia al retraso de lanzamiento).',
-  'entities.itemSets.soulflame.bonus3':
-    'Aumenta el intelecto en 15, el espíritu en 15 y la velocidad de ataque y de lanzamiento en 15%.',
   'entities.itemSets.stormcallers.name': 'Vestiduras de Galecall',
   'entities.itemSets.stormcallers.bonus2':
     'Aumenta el poder de los hechizos en 20. El daño recibido ya no retrasa tus hechizos (100% de resistencia al retraso de lanzamiento).',
-  'entities.itemSets.stormcallers.bonus3':
-    'Aumenta el intelecto en 15, el espíritu en 15 y la velocidad de ataque y de lanzamiento en 15%.',
   'entities.itemSets.vale_arcanist.name': 'Vestiduras del Arcanista del Valle',
   'entities.itemSets.vale_arcanist.bonus3':
     'Aumenta la velocidad de ataque y de lanzamiento en 15%.',
   'entities.itemSets.wyrmshadow.name': 'Atuendo de Nightfang',
   'entities.itemSets.wyrmshadow.bonus2': 'Aumenta el poder de ataque en 40.',
-  'entities.itemSets.wyrmshadow.bonus3':
-    'Aumenta la agilidad en 15 y la probabilidad de crítico en 2%.',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hud.combat.floatingResist': 'Resistido',

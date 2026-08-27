@@ -1080,6 +1080,11 @@ export interface SetBonusTier {
 export interface ItemSet {
   id: string;
   name: string; // English source
+  // Cross-tier ladder id (content/item_sets.ts LINEAGE_*): families sharing a
+  // lineage SHARE one bonuses array, their worn counts sum, and the resolver
+  // applies the shared table exactly once. Absent for standalone families
+  // (WARFARE, the haste kits).
+  lineage?: string;
   bonuses: SetBonusTier[]; // ascending by `pieces`
 }
 

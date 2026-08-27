@@ -10147,40 +10147,27 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Meningkatkan kecepatan serangan dan rapal sebesar 15%.',
   'entities.itemSets.crownforged.name': 'Regalia Bonewrought',
   'entities.itemSets.crownforged.bonus2': 'Meningkatkan daya serang sebesar 40.',
-  'entities.itemSets.crownforged.bonus3':
-    'Meningkatkan kekuatan sebesar 15, stamina sebesar 15, serta kecepatan serangan dan rapal sebesar 15%.',
   'entities.itemSets.deathlord.name': 'Perlengkapan Tempur Barrowlord',
   'entities.itemSets.deathlord.bonus2': 'Meningkatkan daya serang sebesar 40.',
-  'entities.itemSets.deathlord.bonus3': 'Meningkatkan kekuatan sebesar 15 dan stamina sebesar 15.',
   'entities.itemSets.greyjaw_stalker.name': 'Perlengkapan Penguntit Greyjaw',
   'entities.itemSets.greyjaw_stalker.bonus3':
     'Meningkatkan kecepatan serangan dan rapal sebesar 15%.',
   'entities.itemSets.necromancers.name': 'Jubah Mournweave',
   'entities.itemSets.necromancers.bonus2':
     'Meningkatkan kekuatan sihir sebesar 20. Kerusakan yang diterima tidak lagi menunda perapalan sihirmu (ketahanan penundaan rapalan 100%).',
-  'entities.itemSets.necromancers.bonus3':
-    'Meningkatkan kecerdasan sebesar 10 dan stamina sebesar 10.',
   'entities.itemSets.nighttalon.name': 'Perlengkapan Kulit Direfang',
   'entities.itemSets.nighttalon.bonus2': 'Meningkatkan daya serang sebesar 40.',
-  'entities.itemSets.nighttalon.bonus3':
-    'Meningkatkan kelincahan sebesar 15, peluang kritis sebesar 2%, serta kecepatan serangan dan rapal sebesar 15%.',
   'entities.itemSets.soulflame.name': 'Regalia Wraithfire',
   'entities.itemSets.soulflame.bonus2':
     'Meningkatkan kekuatan sihir sebesar 20. Kerusakan yang diterima tidak lagi menunda perapalan sihirmu (ketahanan penundaan rapalan 100%).',
-  'entities.itemSets.soulflame.bonus3':
-    'Meningkatkan kecerdasan sebesar 15, roh sebesar 15, serta kecepatan serangan dan rapal sebesar 15%.',
   'entities.itemSets.stormcallers.name': 'Jubah Galecall',
   'entities.itemSets.stormcallers.bonus2':
     'Meningkatkan kekuatan sihir sebesar 20. Kerusakan yang diterima tidak lagi menunda perapalan sihirmu (ketahanan penundaan rapalan 100%).',
-  'entities.itemSets.stormcallers.bonus3':
-    'Meningkatkan kecerdasan sebesar 15, roh sebesar 15, serta kecepatan serangan dan rapal sebesar 15%.',
   'entities.itemSets.vale_arcanist.name': 'Perlengkapan Arkanis Lembah',
   'entities.itemSets.vale_arcanist.bonus3':
     'Meningkatkan kecepatan serangan dan rapal sebesar 15%.',
   'entities.itemSets.wyrmshadow.name': 'Jubah Nightfang',
   'entities.itemSets.wyrmshadow.bonus2': 'Meningkatkan daya serang sebesar 40.',
-  'entities.itemSets.wyrmshadow.bonus3':
-    'Meningkatkan kelincahan sebesar 15 dan peluang kritis sebesar 2%.',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hud.combat.floatingResist': 'Ditahan',

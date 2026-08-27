@@ -114,11 +114,25 @@ describe('combat ratings', () => {
     expect(swingMissChance(mob, player)).toBeLessThanOrEqual(0.2); // MOB_VS_PLAYER cap, unchanged
   });
 
-  it('the weak T2 bleed 4-set bonuses now also grant hit rating', () => {
-    const crownforged = aggregateSetBonuses(new Map([['crownforged', 4]]));
-    const nighttalon = aggregateSetBonuses(new Map([['nighttalon', 4]]));
-    expect(crownforged.hitRating).toBe(60);
-    expect(nighttalon.hitRating).toBe(60);
+  it('the lineage bleed capstones grant their halved Hit at 6 pieces, not 4', () => {
+    // The retune: Hit left the 4-piece tier entirely; the 6-piece capstone
+    // pays the halved 30 (3%), the only Hit the old stack still provides.
+    const crownforgedFour = aggregateSetBonuses(new Map([['crownforged', 4]]));
+    expect(crownforgedFour.hitRating).toBe(0);
+    const strengthSix = aggregateSetBonuses(
+      new Map([
+        ['deathlord', 2],
+        ['crownforged', 4],
+      ]),
+    );
+    expect(strengthSix.hitRating).toBe(30);
+    const agilitySix = aggregateSetBonuses(
+      new Map([
+        ['wyrmshadow', 2],
+        ['nighttalon', 4],
+      ]),
+    );
+    expect(agilitySix.hitRating).toBe(30);
   });
 
   it('the heroic marks jewelry carries one combat rating each', async () => {

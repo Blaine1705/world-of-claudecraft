@@ -7705,44 +7705,31 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.boundstone_vanguard.name': '束縛石の前衛',
   'entities.itemSets.boundstone_vanguard.bonus3': '攻撃速度と詠唱速度が15%上昇します。',
   'entities.itemSets.crownforged.name': 'ボーンロートの戦装束',
-  'entities.itemSets.crownforged.bonus2': '攻撃力が40上昇します。',
-  'entities.itemSets.crownforged.bonus3':
-    '筋力が15、スタミナが15上昇し、攻撃速度と詠唱速度が15%上昇します。',
-  'entities.itemSets.crownforged.bonus4':
-    '武器のクリティカルヒットで対象に「ボーンスプリンター」を刻み、2秒ごとに8ダメージの出血を12秒間与えます。最大3回まで累積します。',
+  'entities.itemSets.crownforged.bonus2': '筋力が10、スタミナが10上昇します。',
+  'entities.itemSets.crownforged.bonus4': '攻撃力が25上昇します。武器のクリティカルヒット時に50%の確率で「グレイブマイト」が発動し、攻撃力が10秒間40上昇します。',
+  'entities.itemSets.crownforged.bonus6': '攻撃速度と詠唱速度が4%、命中が3%上昇します。武器のクリティカルヒットで対象に「ボーンスプリンター」を刻み、2秒ごとに5ダメージの出血を12秒間与えます。最大3回まで累積します。',
   'entities.itemSets.deathlord.name': 'バロウロードの戦装束',
-  'entities.itemSets.deathlord.bonus2': '攻撃力が40上昇します。',
-  'entities.itemSets.deathlord.bonus3': '筋力が15、スタミナが15上昇します。',
-  'entities.itemSets.deathlord.bonus4':
-    '武器のクリティカルヒット時に50%の確率で「グレイブマイト」が発動し、攻撃力が10秒間60上昇します。',
+  'entities.itemSets.deathlord.bonus2': '筋力が10、スタミナが10上昇します。',
+  'entities.itemSets.deathlord.bonus4': '攻撃力が25上昇します。武器のクリティカルヒット時に50%の確率で「グレイブマイト」が発動し、攻撃力が10秒間40上昇します。',
+  'entities.itemSets.deathlord.bonus6': '攻撃速度と詠唱速度が4%、命中が3%上昇します。武器のクリティカルヒットで対象に「ボーンスプリンター」を刻み、2秒ごとに5ダメージの出血を12秒間与えます。最大3回まで累積します。',
   'entities.itemSets.greyjaw_stalker.name': 'グレイジョーの追跡者の装備',
   'entities.itemSets.greyjaw_stalker.bonus3': '攻撃速度と詠唱速度が15%上昇します。',
   'entities.itemSets.necromancers.name': 'モーンウィーヴの法衣',
-  'entities.itemSets.necromancers.bonus2':
-    '呪文の威力が20増加します。被ダメージによって詠唱が遅れなくなります（詠唱妨害耐性100%）。',
-  'entities.itemSets.necromancers.bonus3': '知力が10、スタミナが10上昇します。',
-  'entities.itemSets.necromancers.bonus4':
-    '呪文に10%の確率で「クリアキャスティング」が発動し、次の呪文が無償になります。',
+  'entities.itemSets.necromancers.bonus2': '知力が10、精神力が10上昇します。被ダメージによる詠唱の遅れが半分になります（詠唱妨害耐性50%）。',
+  'entities.itemSets.necromancers.bonus4': '呪文の威力が12増加します。呪文に6%の確率で「クリアキャスティング」が発動し、次の呪文が無償になります。',
+  'entities.itemSets.necromancers.bonus6': '攻撃速度と詠唱速度が4%上昇します。呪文に10%の確率で「ソウルブレイズ」が発動し、呪文の威力が10秒間25上昇します。',
   'entities.itemSets.nighttalon.name': 'ダイアファングの革装束',
-  'entities.itemSets.nighttalon.bonus2': '攻撃力が40上昇します。',
-  'entities.itemSets.nighttalon.bonus3':
-    '敏捷性が15、クリティカル率が2%上昇し、攻撃速度と詠唱速度が15%上昇します。',
-  'entities.itemSets.nighttalon.bonus4':
-    '武器のクリティカルヒットで「裂けた傷」を与え、対象に2秒ごとに6ダメージの出血を12秒間与えます。最大3回まで累積します。',
+  'entities.itemSets.nighttalon.bonus2': '敏捷性が10上昇し、クリティカル率が1%上昇します。',
+  'entities.itemSets.nighttalon.bonus4': '攻撃力が25上昇します。武器のクリティカルヒット時に50%の確率で「ファングラッシュ」が発動し、攻撃速度が8秒間15%上昇します。',
+  'entities.itemSets.nighttalon.bonus6': '攻撃速度と詠唱速度が4%、命中が3%上昇します。武器のクリティカルヒットで「裂けた傷」を与え、対象に2秒ごとに4ダメージの出血を12秒間与えます。最大3回まで累積します。',
   'entities.itemSets.soulflame.name': 'レイスファイアの法衣',
-  'entities.itemSets.soulflame.bonus2':
-    '呪文の威力が20増加します。被ダメージによって詠唱が遅れなくなります（詠唱妨害耐性100%）。',
-  'entities.itemSets.soulflame.bonus3':
-    '知力が15、精神力が15上昇し、攻撃速度と詠唱速度が15%上昇します。',
-  'entities.itemSets.soulflame.bonus4':
-    '呪文に10%の確率で「ソウルブレイズ」が発動し、呪文の威力が10秒間40上昇します。',
+  'entities.itemSets.soulflame.bonus2': '知力が10、精神力が10上昇します。被ダメージによる詠唱の遅れが半分になります（詠唱妨害耐性50%）。',
+  'entities.itemSets.soulflame.bonus4': '呪文の威力が12増加します。呪文に6%の確率で「クリアキャスティング」が発動し、次の呪文が無償になります。',
+  'entities.itemSets.soulflame.bonus6': '攻撃速度と詠唱速度が4%上昇します。呪文に10%の確率で「ソウルブレイズ」が発動し、呪文の威力が10秒間25上昇します。',
   'entities.itemSets.stormcallers.name': 'ゲイルコールの法衣',
-  'entities.itemSets.stormcallers.bonus2':
-    '呪文の威力が20増加します。被ダメージによって詠唱が遅れなくなります（詠唱妨害耐性100%）。',
-  'entities.itemSets.stormcallers.bonus3':
-    '知力が15、精神力が15上昇し、攻撃速度と詠唱速度が15%上昇します。',
-  'entities.itemSets.stormcallers.bonus4':
-    '呪文に10%の確率で「ソウルブレイズ」が発動し、呪文の威力が10秒間40上昇します。',
+  'entities.itemSets.stormcallers.bonus2': '知力が10、精神力が10上昇します。被ダメージによる詠唱の遅れが半分になります（詠唱妨害耐性50%）。',
+  'entities.itemSets.stormcallers.bonus4': '呪文の威力が12増加します。呪文に6%の確率で「クリアキャスティング」が発動し、次の呪文が無償になります。',
+  'entities.itemSets.stormcallers.bonus6': '攻撃速度と詠唱速度が4%上昇します。呪文に10%の確率で「ソウルブレイズ」が発動し、呪文の威力が10秒間25上昇します。',
   'entities.itemSets.vale_arcanist.name': '谷の秘術師の装束',
   'entities.itemSets.vale_arcanist.bonus3': '攻撃速度と詠唱速度が15%上昇します。',
   'entities.itemSets.warfare_ashstalker.name': 'アッシュストーカーの装備',
@@ -7766,10 +7753,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.warfare_thornhide.bonus4': 'ウォーフェア攻撃レーティングが40上がり、敵対プレイヤーがあなたにかける行動制御の持続が15%短くなります。',
   'entities.itemSets.warfare_thornhide.bonus7': 'ウォーフェア攻撃・防御レーティングが80上がります。呪文に15%の確率で棘の守りが宿り、回避が6秒間15%上がります。',
   'entities.itemSets.wyrmshadow.name': 'ナイトファングの装束',
-  'entities.itemSets.wyrmshadow.bonus2': '攻撃力が40上昇します。',
-  'entities.itemSets.wyrmshadow.bonus3': '敏捷性が15、クリティカル率が2%上昇します。',
-  'entities.itemSets.wyrmshadow.bonus4':
-    '武器のクリティカルヒット時に50%の確率で「ファングラッシュ」が発動し、攻撃速度が8秒間25%上昇します。',
+  'entities.itemSets.wyrmshadow.bonus2': '敏捷性が10上昇し、クリティカル率が1%上昇します。',
+  'entities.itemSets.wyrmshadow.bonus4': '攻撃力が25上昇します。武器のクリティカルヒット時に50%の確率で「ファングラッシュ」が発動し、攻撃速度が8秒間15%上昇します。',
+  'entities.itemSets.wyrmshadow.bonus6': '攻撃速度と詠唱速度が4%、命中が3%上昇します。武器のクリティカルヒットで「裂けた傷」を与え、対象に2秒ごとに4ダメージの出血を12秒間与えます。最大3回まで累積します。',
   'hudChrome.itemSoulbound': '魂縛',
   'hudChrome.itemUniqueEquipped': '装備ユニーク',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',

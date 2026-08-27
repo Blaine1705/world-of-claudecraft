@@ -9404,37 +9404,25 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.boundstone_vanguard.bonus3': 'Erhöht Angriffs- und Zaubertempo um 15%.',
   'entities.itemSets.crownforged.name': 'Bonewrought-Kriegstracht',
   'entities.itemSets.crownforged.bonus2': 'Erhöht Angriffskraft um 40.',
-  'entities.itemSets.crownforged.bonus3':
-    'Erhöht Stärke um 15, Ausdauer um 15 sowie Angriffs- und Zaubertempo um 15%.',
   'entities.itemSets.deathlord.name': 'Barrowlord-Kriegstracht',
   'entities.itemSets.deathlord.bonus2': 'Erhöht Angriffskraft um 40.',
-  'entities.itemSets.deathlord.bonus3': 'Erhöht Stärke um 15 und Ausdauer um 15.',
   'entities.itemSets.greyjaw_stalker.name': 'Ausrüstung des Greyjaw-Pirschers',
   'entities.itemSets.greyjaw_stalker.bonus3': 'Erhöht Angriffs- und Zaubertempo um 15%.',
   'entities.itemSets.necromancers.name': 'Mournweave-Gewänder',
   'entities.itemSets.necromancers.bonus2':
     'Erhöht Zaubermacht um 20. Erlittener Schaden verzögert Eure Zauber nicht mehr (100% Widerstand gegen Zauberverzögerung).',
-  'entities.itemSets.necromancers.bonus3': 'Erhöht Intelligenz um 10 und Ausdauer um 10.',
   'entities.itemSets.nighttalon.name': 'Direfang-Pelz',
   'entities.itemSets.nighttalon.bonus2': 'Erhöht Angriffskraft um 40.',
-  'entities.itemSets.nighttalon.bonus3':
-    'Erhöht Beweglichkeit um 15, kritische Trefferchance um 2% sowie Angriffs- und Zaubertempo um 15%.',
   'entities.itemSets.soulflame.name': 'Wraithfire-Gewänder',
   'entities.itemSets.soulflame.bonus2':
     'Erhöht Zaubermacht um 20. Erlittener Schaden verzögert Eure Zauber nicht mehr (100% Widerstand gegen Zauberverzögerung).',
-  'entities.itemSets.soulflame.bonus3':
-    'Erhöht Intelligenz um 15, Willenskraft um 15 sowie Angriffs- und Zaubertempo um 15%.',
   'entities.itemSets.stormcallers.name': 'Galecall-Gewänder',
   'entities.itemSets.stormcallers.bonus2':
     'Erhöht Zaubermacht um 20. Erlittener Schaden verzögert Eure Zauber nicht mehr (100% Widerstand gegen Zauberverzögerung).',
-  'entities.itemSets.stormcallers.bonus3':
-    'Erhöht Intelligenz um 15, Willenskraft um 15 sowie Angriffs- und Zaubertempo um 15%.',
   'entities.itemSets.vale_arcanist.name': 'Ornat des Talarkanisten',
   'entities.itemSets.vale_arcanist.bonus3': 'Erhöht Angriffs- und Zaubertempo um 15%.',
   'entities.itemSets.wyrmshadow.name': 'Nightfang-Gewänder',
   'entities.itemSets.wyrmshadow.bonus2': 'Erhöht Angriffskraft um 40.',
-  'entities.itemSets.wyrmshadow.bonus3':
-    'Erhöht Beweglichkeit um 15 und kritische Trefferchance um 2%.',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hud.combat.floatingResist': 'Widerstand',

@@ -553,7 +553,11 @@ import {
 } from './item_instance_tooltip';
 import { itemKindLabel, itemQualityLabel } from './item_kind_label';
 import { itemNameColor } from './item_name_color';
-import { itemSetMemberCounts, itemSetTooltipModel } from './item_set_tooltip_view';
+import {
+  equippedSetTooltipPieces,
+  itemSetMemberCounts,
+  itemSetTooltipModel,
+} from './item_set_tooltip_view';
 import { itemSlotLabel as itemSlotName } from './item_slot_labels';
 import { knownItemDef, ownEntry } from './known_item';
 import { DAWNHOLD_MAP_PAINTER_SPEC, LastKeepMapPainter } from './lastkeep_map_painter';
@@ -6201,11 +6205,7 @@ export class Hud {
   // How many equipped pieces belong to the given set (read from IWorld.equipment
   // so it is identical offline and online).
   private equippedSetPieces(setId: string): number {
-    let n = 0;
-    for (const equippedId of Object.values(this.sim.equipment)) {
-      if (equippedId && ITEMS[equippedId]?.set === setId) n += 1;
-    }
-    return n;
+    return equippedSetTooltipPieces(setId, Object.values(this.sim.equipment));
   }
 
   // Classic tier-set block: the set name with the live (have/total) piece count,

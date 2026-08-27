@@ -9636,37 +9636,25 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Aumenta la velocità d'attacco e di lancio del 15%.",
   'entities.itemSets.crownforged.name': 'Tenuta da battaglia Bonewrought',
   'entities.itemSets.crownforged.bonus2': "Aumenta la potenza d'attacco di 40.",
-  'entities.itemSets.crownforged.bonus3':
-    "Aumenta la forza di 15, la vigoria di 15 e la velocità d'attacco e di lancio del 15%.",
   'entities.itemSets.deathlord.name': 'Tenuta da battaglia di Barrowlord',
   'entities.itemSets.deathlord.bonus2': "Aumenta la potenza d'attacco di 40.",
-  'entities.itemSets.deathlord.bonus3': 'Aumenta la forza di 15 e la vigoria di 15.',
   'entities.itemSets.greyjaw_stalker.name': 'Equipaggiamento del Braccatore di Greyjaw',
   'entities.itemSets.greyjaw_stalker.bonus3': "Aumenta la velocità d'attacco e di lancio del 15%.",
   'entities.itemSets.necromancers.name': 'Vesti Mournweave',
   'entities.itemSets.necromancers.bonus2':
     'Aumenta il potere degli incantesimi di 20. I danni subiti non ritardano più i tuoi incantesimi (100% di resistenza al ritardo di lancio).',
-  'entities.itemSets.necromancers.bonus3': "Aumenta l'intelletto di 10 e la tempra di 10.",
   'entities.itemSets.nighttalon.name': 'Tenuta di cuoio Direfang',
   'entities.itemSets.nighttalon.bonus2': "Aumenta la potenza d'attacco di 40.",
-  'entities.itemSets.nighttalon.bonus3':
-    "Aumenta l'agilità di 15, la probabilità di critico del 2% e la velocità d'attacco e di lancio del 15%.",
   'entities.itemSets.soulflame.name': 'Paramenti Wraithfire',
   'entities.itemSets.soulflame.bonus2':
     'Aumenta il potere degli incantesimi di 20. I danni subiti non ritardano più i tuoi incantesimi (100% di resistenza al ritardo di lancio).',
-  'entities.itemSets.soulflame.bonus3':
-    "Aumenta l'intelletto di 15, lo spirito di 15 e la velocità d'attacco e di lancio del 15%.",
   'entities.itemSets.stormcallers.name': 'Vesti Galecall',
   'entities.itemSets.stormcallers.bonus2':
     'Aumenta il potere degli incantesimi di 20. I danni subiti non ritardano più i tuoi incantesimi (100% di resistenza al ritardo di lancio).',
-  'entities.itemSets.stormcallers.bonus3':
-    "Aumenta l'intelletto di 15, lo spirito di 15 e la velocità d'attacco e di lancio del 15%.",
   'entities.itemSets.vale_arcanist.name': "Tenuta dell'Arcanista della Valle",
   'entities.itemSets.vale_arcanist.bonus3': "Aumenta la velocità d'attacco e di lancio del 15%.",
   'entities.itemSets.wyrmshadow.name': 'Vesti Nightfang',
   'entities.itemSets.wyrmshadow.bonus2': "Aumenta la potenza d'attacco di 40.",
-  'entities.itemSets.wyrmshadow.bonus3':
-    'Aumenta l’agilità di 15 e la probabilità di critico del 2%.',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hud.combat.floatingResist': 'Resistito',

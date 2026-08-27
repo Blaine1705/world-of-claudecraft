@@ -209,7 +209,18 @@ wearable twice. So the retune adopts one rule for the whole ladder:
   4 Hit / 8 crit / 6 haste and stay.
 
 These are live-gear changes like the rest of the retune and ship in the
-same release as the new loot. WARFARE families are untouched (already PvE-inert and
+same release as the new loot.
+
+One measured side effect, accepted deliberately: the WARFARE balance
+harness (tests/warfare_balance_harness.test.ts) checks that PvE gear
+stays within a band of the honor kit in PvP, and the retuned incumbent
+reference now measures below its old floors (armor-only 0.701 against a
+0.8 floor, full kit 0.756 against 0.9, and the legendary arm 0.824
+against 1.0). The harness carries re-pinned INTERIM floors with notes;
+the item-level-35 kits become its PvE reference when they land and the
+original floors return. Until players re-gear, old-set wearers sit
+further behind WARFARE kits in PvP than before, which is the honest
+transitional reality of softening the incumbents. WARFARE families are untouched (already PvE-inert and
 already lineage-shaped). The haste leveling kits keep their single
 3-piece tier and ride the shared haste constant down, which is
 acceptable for leveling gear. Heroic set-tag inheritance stays:
