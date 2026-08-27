@@ -284,3 +284,13 @@ hosts, plus the pinned callback-name list in `tests/sim_context.test.ts`.
 - The facet's member list is pinned by `tests/world_api_parity.test.ts`
   (`FACET_PROFESSIONS`) and exercised by `tests/professions_contracts.test.ts`;
   keep counts out of prose.
+
+## Pure table leaves (no SimContext import)
+
+- `gathering_materials.ts`: the `NODE_MATERIAL_TABLE` zone rows plus `nodeMaterialFor`
+  (the `byZone[zoneId] ?? byZone.eastbrook_vale` fallback), moved out of `gathering.ts`
+  so the eager `material_ids.ts` registry can read it at module evaluation without
+  entering the gathering system's import ring.
+- `salvage_materials.ts`: `SALVAGE_MATERIAL_BY_QUALITY` (frozen), the same extraction
+  for the salvage side; consumed by `salvage.ts` and the material registry derive.
+

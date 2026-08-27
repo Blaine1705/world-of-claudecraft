@@ -78,6 +78,27 @@ export function clampBonusSlots(raw: unknown): number {
   return Math.max(0, Math.min(BANK_MAX_BONUS_SLOTS, Math.floor(Number(raw)) || 0));
 }
 
+/** Bump the runtime-only change signal for the owner-only `bank` wire key
+ *  (PlayerMeta.bankWireRev, the vaultWireRev twin): called from EVERY write to
+ *  meta.bank state a bankInfoFor projection can observe (deposit, withdraw,
+ *  both slot-grant rails, the bonus stamp, and the three socket commands in
+ *  bank_sockets.ts), so the server's snapshot gate (server/bank_wire.ts) can
+ *  skip rebuilding an unchanged projection every tick. Never persisted. */
+export function bumpBankWireRev(meta: { bankWireRev: number }): void {
+  meta.bankWireRev++;
+}
+
+/** Cheap proximity + revision signature for the owner-only `bank` wire (the
+ *  materials_vault vaultInfoWireRevFor twin): null unless the player resolves
+ *  AND stands within reach of a banker, exactly the gate bankInfoFor applies,
+ *  so a null-vs-number flip re-emits on bank open/close and the rev covers
+ *  every mutation between. */
+export function bankInfoWireRevFor(ctx: SimContext, pid: number): number | null {
+  const r = ctx.resolve(pid);
+  if (!r || !nearBanker(ctx, r.e)) return null;
+  return r.meta.bankWireRev;
+}
+
 /** Write the host-stamped bank bonus onto a character, the ONE place that write
  *  happens. Called from addPlayer on BOTH the saved-state and brand-new-character
  *  arms: a first-ever join can already have earned account bonuses. Values are
@@ -88,11 +109,13 @@ export function clampBonusSlots(raw: unknown): number {
  *  and savedBankState do: the bank blob's shape is owned by ONE module, so a future
  *  bonus-slot field lands here once instead of at every writer. */
 export function applyBankBonusStamp(
-  meta: { bank: BankState; bankBonusSources: BankBonusSource[] },
+  meta: { bank: BankState; bankBonusSources: BankBonusSource[]; bankWireRev: number },
   stamp: { bonusSlots: number; sources: readonly BankBonusSource[] },
 ): void {
   meta.bank.bonusSlots = clampBonusSlots(stamp.bonusSlots);
   meta.bankBonusSources = stamp.sources.map((s) => ({ ...s }));
+  // bonusSlots and the breakdown rows both ride bankInfoFor.
+  bumpBankWireRev(meta);
 }
 
 /** The narrow context slice bankPurchasedSlotsFor reads, declared structurally
@@ -381,22 +404,28 @@ export function bankDeposit(
     ctx.error(meta.entityId, 'You cannot store quest items in the bank.');
     return;
   }
-  const result = moveBetweenContainers(
-    meta.inventory,
-    slotIndex,
-    count,
-    meta.bank.inventory,
-    // The socket-derived two-pool split (bankPools), never a flat budget: a
-    // socketed materials-only satchel adds capacity only materials may take,
-    // and countFit inside the move consults the same materials-first
-    // allocation rule the carried bags use (bag_pools.ts).
-    bankPools(meta.bank),
-  );
+  // The socket-derived two-pool split (bankPools), never a flat budget: a
+  // socketed materials-only satchel adds capacity only materials may take,
+  // and countFit inside the move consults the same materials-first
+  // allocation rule the carried bags use (bag_pools.ts). Computed once; the
+  // no_fit refusal below reads the SAME split so line and gate cannot drift.
+  const pools = bankPools(meta.bank);
+  const result = moveBetweenContainers(meta.inventory, slotIndex, count, meta.bank.inventory, pools);
   if (result.refusal === 'no_fit') {
-    ctx.error(meta.entityId, 'Your bank is full.');
+    // Pool-honest refusal: with the two-pool meter on screen, "full" is a lie
+    // when the only room left is materials-only satchel capacity a
+    // non-material item may not take. Same occupancy read as the fit gate
+    // (bag_pools.ts poolOccupancyOf under the shared material taxonomy).
+    const occupancy = poolOccupancyOf(meta.bank.inventory, pools, isMaterialItemId);
+    if (!isMaterialItemId(slot.itemId) && pools.materials - occupancy.materialsUsed > 0) {
+      ctx.error(meta.entityId, 'Only materials fit in the space left in your bank.');
+    } else {
+      ctx.error(meta.entityId, 'Your bank is full.');
+    }
     return;
   }
   if (result.refusal) return; // 'invalid': malformed input (cheat/desync), no player line
+  bumpBankWireRev(meta);
   ctx.onInventoryChangedForQuests(meta);
   // A completed deposit is banker business; the gate above guarantees a banker.
   const bankerId = nearBankerTemplateId(ctx, p);
@@ -435,6 +464,7 @@ export function bankWithdraw(
     return;
   }
   if (result.refusal) return; // 'invalid': malformed input (cheat/desync), no player line
+  bumpBankWireRev(meta);
   ctx.onInventoryChangedForQuests(meta);
   // A completed withdrawal is banker business; the gate above guarantees a banker.
   const bankerId = nearBankerTemplateId(ctx, p);
@@ -469,6 +499,7 @@ export function bankBuySlots(ctx: SimContext, pid?: number): void {
   }
   meta.copper -= price;
   meta.bank.purchasedSlots += BANK_EXPANSION_SLOTS;
+  bumpBankWireRev(meta);
   ctx.notice(meta.entityId, 'You purchase additional bank slots.');
   // A completed expansion is banker business; the gate above guarantees a banker.
   const bankerId = nearBankerTemplateId(ctx, p);
@@ -555,6 +586,7 @@ export function bankGrantStorageSlots(
   const purchasedSlotsBefore = bank.purchasedSlots;
   bank.purchasedSlots += sku.grantSlots;
   bank.appliedStorageKeys.push(purchaseKey);
+  bumpBankWireRev(r.meta);
   // The same notice the gold buy emits (matched by sim_i18n; no new string).
   ctx.notice(meta.entityId, 'You purchase additional bank slots.');
   // purchasedSlots feeds a deed meter, so re-check this player's triggers.

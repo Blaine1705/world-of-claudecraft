@@ -1126,11 +1126,17 @@ export interface SimContext extends SimContextPrimitives, SimContextCallbacks {
 // `storagePrices` is REQUIRED here, deliberately: a host that forgot to wire its
 // resolved table would otherwise silently charge compiled defaults under a live
 // override, so the compiler enforces the wiring (host fakes import
-// DEFAULT_STORAGE_PRICES for it).
-type SimContextHostCallbacks = Omit<SimContextCallbacks, 'reserveVaultConsumption'> &
-  Partial<Pick<SimContextCallbacks, 'reserveVaultConsumption'>>;
-
-export interface SimContextHost extends SimContextPrimitives, SimContextHostCallbacks {
+// DEFAULT_STORAGE_PRICES for it). `reserveVaultConsumption` is required on
+// this seam too, but note precisely which layer enforces what: THIS interface
+// only makes sim-internal context assembly name an admission, and Sim's ctor
+// satisfies it with inertVaultConsumptionAdmission whenever
+// SimConfig.vaultConsumptionAdmission is omitted (the field stays OPTIONAL so
+// offline/headless constructions stay clean). The server wiring is enforced
+// one level up instead: buildRealmSimConfig (server/sim_boot_config.ts) takes
+// the admission as a REQUIRED parameter, so a realm boot that dropped the
+// journal wiring fails to compile there, and a deliberately inert server
+// caller must pass the exported inert constant by name.
+export interface SimContextHost extends SimContextPrimitives, SimContextCallbacks {
   readonly storagePrices: StoragePrices;
 }
 
@@ -1438,7 +1444,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     emit: host.emit,
     error: host.error,
-    reserveVaultConsumption: host.reserveVaultConsumption ?? inertVaultConsumptionAdmission,
+    reserveVaultConsumption: host.reserveVaultConsumption,
     lockoutNowMs: host.lockoutNowMs,
     raidResetMs: host.raidResetMs,
     instanceKeyFor: host.instanceKeyFor,
@@ -1704,4 +1710,22 @@ export function reservePlannedVaultConsumption(
   if (takes.length === 0) return undefined;
   takes.sort((a, b) => (a.itemId < b.itemId ? -1 : a.itemId > b.itemId ? 1 : a.count - b.count));
   return ctx.reserveVaultConsumption(pid, Object.freeze(takes), vaultUpgrades);
+}
+
+/** Settle a planned vault reservation against what the apply loop really moved.
+ *
+ * The reservation is the DURABLE AUDIT RECORD for the whole planned take list,
+ * so it may become durable only when every planned take committed. A shortfall
+ * (consumePlayerVaultStock refusing a take) is reachable only by a bug, but
+ * committing the full list anyway would overclaim rows for units that never
+ * moved; cancel loses rows for the units that DID move, and under-claiming is
+ * the safe direction for an audit record (recording only what committed). */
+export function settleVaultConsumptionReservation(
+  reservation: VaultConsumptionReservation | undefined,
+  plannedTakes: number,
+  movedTakes: number,
+): void {
+  if (!reservation) return;
+  if (movedTakes === plannedTakes) reservation.commit();
+  else reservation.cancel();
 }

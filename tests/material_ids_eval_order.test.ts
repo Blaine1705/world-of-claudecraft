@@ -28,6 +28,58 @@ describe('material_ids evaluation-order probe (pure table leaves keep the regist
     expect(ids.has('copper_ore')).toBe(true);
   });
 
+  it('evaluates cleanly with data.ts as the entry module, and the eager derive is complete', async () => {
+    // The data-first order: material_ids.ts reads ITEMS and ALL_RECIPES from
+    // src/sim/data.ts at module evaluation, so entering the graph through the
+    // merged data module itself is the order most likely to hand the eager
+    // derive a half-evaluated table. (The finding named content/data.ts; the
+    // merged module material_ids actually imports is src/sim/data.ts.)
+    const data = await import('../src/sim/data');
+    expect(Object.keys(data.ITEMS).length).toBeGreaterThan(0);
+    expect(data.ALL_RECIPES.length).toBeGreaterThan(0);
+    const ids = await import('../src/sim/material_ids');
+    const set = ids.materialItemIds();
+    expect(set.size).toBeGreaterThan(0);
+    expect(set.has('copper_ore')).toBe(true);
+    // COMPLETE under this entry order, not merely crash-free or non-empty: a
+    // derive over a half-evaluated table would produce a smaller set without
+    // throwing, so re-derive from the now-fully-evaluated live tables and
+    // require exact agreement.
+    const derivation = await import('../src/sim/material_derivation');
+    const professions = await import('../src/sim/content/professions');
+    const enchants = await import('../src/sim/content/enchants');
+    const gathering = await import('../src/sim/professions/gathering_materials');
+    const grades = await import('../src/sim/professions/material_grades');
+    const salvage = await import('../src/sim/professions/salvage_materials');
+    const rederived = derivation.deriveMaterialItemIds({
+      nodeMaterialTable: gathering.NODE_MATERIAL_TABLE,
+      materialGrades: grades.MATERIAL_GRADES,
+      harvestComponentItems: professions.HARVEST_COMPONENT_ITEMS,
+      harvestComponentSpecimens: professions.HARVEST_COMPONENT_SPECIMENS,
+      salvageMaterialByQuality: salvage.SALVAGE_MATERIAL_BY_QUALITY,
+      recipes: data.ALL_RECIPES,
+      enchants: enchants.ENCHANTS,
+      items: data.ITEMS,
+    });
+    expect([...set].sort()).toEqual([...rederived].sort());
+  });
+
+  it('evaluates cleanly with content/enchants.ts as the entry module', async () => {
+    const mod = await import('../src/sim/content/enchants');
+    expect(Object.keys(mod.ENCHANTS).length).toBeGreaterThan(0);
+    const ids = await import('../src/sim/material_ids');
+    expect(ids.materialItemIds().size).toBeGreaterThan(0);
+    expect(ids.isMaterialItemId('copper_ore')).toBe(true);
+  });
+
+  it('evaluates cleanly with content/professions.ts as the entry module', async () => {
+    const mod = await import('../src/sim/content/professions');
+    expect(Object.keys(mod.HARVEST_COMPONENT_ITEMS).length).toBeGreaterThan(0);
+    const ids = await import('../src/sim/material_ids');
+    expect(ids.materialItemIds().size).toBeGreaterThan(0);
+    expect(ids.isMaterialItemId('copper_ore')).toBe(true);
+  });
+
   it('evaluates cleanly with professions/gathering.ts as the entry module', async () => {
     const mod = await import('../src/sim/professions/gathering');
     expect(Object.keys(mod.NODE_MATERIAL_TABLE).length).toBeGreaterThan(0);

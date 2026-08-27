@@ -44,7 +44,10 @@ describe('material id registry', () => {
 
   it('preserves the complete ReadonlySet iteration contract', () => {
     const ids = materialItemIds();
+    // Floors: an empty set would satisfy every derived toEqual arm below.
+    expect(ids.size).toBeGreaterThan(0);
     const fromIterator = [...ids];
+    expect(fromIterator.length).toBeGreaterThan(0);
     expect([...ids.keys()]).toEqual(fromIterator);
     expect([...ids.values()]).toEqual(fromIterator);
     expect([...ids.entries()]).toEqual(fromIterator.map((id) => [id, id]));
@@ -55,6 +58,7 @@ describe('material id registry', () => {
       expect(owner).toBe(ids);
       visited.push(value);
     });
+    expect(visited.length).toBe(ids.size);
     expect(visited).toEqual(fromIterator);
   });
 });

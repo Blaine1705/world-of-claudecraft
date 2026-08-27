@@ -89,6 +89,12 @@ export const VAULT_UPGRADE_STEP = 40;
  *  seam is a later phase. */
 export const VAULT_UPGRADE_PRICES: readonly number[] = [20000, 50000, 100000, 200000, 400000];
 
+/** GEOMETRY, not a price: the rung count client code may import (the client
+ *  price-table guard bans VAULT_UPGRADE_PRICES itself from the client trees).
+ *  The resolved override ladder is length-stable by construction, so this is
+ *  the one true rung count under every price configuration. */
+export const VAULT_UPGRADE_RUNGS = VAULT_UPGRADE_PRICES.length;
+
 /** The persisted Materials Vault shape. `special` is additive and omitted
  *  while empty so every pre-identity save and every unchanged empty vault
  *  stays byte-identical. Runtime state always materializes it as an array. */
@@ -611,11 +617,15 @@ export function consumePlayerVaultStock(meta: PlayerMeta, itemId: string, count:
  *
  *  The event is the LEDGER RECORD for a tick-driven consumption: the craft
  *  resolves inside sim.tick(), several ticks after its command dispatch, so
- *  the server has no before/after bracket to diff and instead observes this
- *  event (server/game.ts detectActivity, the deeds_records precedent) into
- *  bank_ledger rows (op 'craft_consume'). Offline and headless hosts emit it
- *  too and simply have no observer; it is text-free, so no i18n matcher rule
- *  applies.
+ *  the server has no before/after bracket to diff. The old server observer
+ *  was retired for the reservation journal (the rows are written through the
+ *  pre-reserved consumption admission now), and the server DROPS this event
+ *  from the client relay (server/game.ts routeEvents: no client consumer
+ *  exists). The EMIT stays regardless: it is the conservation sweep's
+ *  expectation source (tests/audit_conservation_vault.test.ts derives what
+ *  must have left the vault from exactly these events). Offline and headless
+ *  hosts emit it too and simply have no observer; it is text-free, so no
+ *  i18n matcher rule applies.
  *
  *  Takes are AGGREGATED per material id and emitted in sorted id order (the
  *  diffVaultOp row discipline: row order is a function of the ids alone,

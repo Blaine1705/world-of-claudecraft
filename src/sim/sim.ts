@@ -274,6 +274,7 @@ import type { GuildBankState, GuildMembership } from './guild_bank';
 import * as guildBankMod from './guild_bank';
 import * as interaction from './interaction';
 import type { ExtractOutcome, ExtractRef } from './inventory_extract';
+import { foldNamedSlotTarget } from './item_copy_ref';
 import {
   boundCraftedRecipeIdOnLoad,
   sanitizeItemInstancePayloadOnLoad,
@@ -1337,7 +1338,9 @@ export interface PlayerMeta {
   // per-material ceiling. Capacity and move math live in materials_vault.ts.
   // Persisted (inside the character save, exactly like inventory/bags/bank).
   vault: MaterialsVaultState;
-  // Runtime-only change signal for the large owner-only vault wire; never persisted.
+  // Runtime-only change signals for the owner-only bank/vault wires (bumped by
+  // every write to meta.bank state / vault state respectively); never persisted.
+  bankWireRev: number;
   vaultWireRev: number;
   // Server-stamped guild membership (guild id + rank), the authorization input
   // the Guild Bank's officer-plus gate reads; written only through
@@ -2726,6 +2729,7 @@ export class Sim {
       bank: emptyBankState(),
       bankBonusSources: [],
       vault: { stock: {}, special: [], upgrades: 0 },
+      bankWireRev: 0,
       vaultWireRev: 0,
       guildMembership: null,
       vendorBuyback: [],
@@ -2923,9 +2927,11 @@ export class Sim {
       // per affected stack, and over-capacity inventories are tolerated rather
       // than truncated, so that count is unbounded. Every instance-carrying
       // container below pushes its drops here; the single warn sits after the
-      // bank load. The Materials Vault deliberately opts OUT: its one drop case
-      // is a wrong-shaped stock, not instance junk, so it warns on its own
-      // accurately-labeled line (a single if, at most one line per load).
+      // bank load. The Materials Vault SHARES the sink: its special slots carry
+      // real instances (identity-preserving stacks), so their junk aggregates
+      // here, and the one wrong-shaped-stock trace rides the same line rather
+      // than minting a second warn channel (the sanitizer's no-sink fallback
+      // exists for callers without an aggregate, see sanitizeVaultState).
       const droppedInstanceJunk: string[] = [];
       for (const [slot, instance] of Object.entries(
         s.equipmentInstance ?? s.equipmentInstances ?? {},
@@ -3071,9 +3077,9 @@ export class Sim {
       meta.bank = sanitizeBankState(s.bank, meta.name, droppedInstanceJunk, player.id);
       // The Materials Vault sanitizes on load too (never destroys stock; a pre-vault
       // save has no `vault` field and sanitizes to the empty locked vault). See
-      // materials_vault.ts sanitizeVaultState. Passing the owner (and no sink) makes
-      // a wholesale-dropped wrong-shaped stock (the one shape tolerance cannot keep)
-      // warn on its own accurately-labeled line, not the item-instance one.
+      // materials_vault.ts sanitizeVaultState. The shared sink aggregates BOTH its
+      // special-slot instance junk and the one wholesale-dropped wrong-shaped-stock
+      // trace into the single per-load line the comment above describes.
       meta.vault = vaultMod.sanitizeVaultState(s.vault, meta.name, droppedInstanceJunk, player.id);
       warnDroppedInstanceKeys(meta.name, droppedInstanceJunk);
       let questRevReset = false;
@@ -7350,8 +7356,7 @@ export class Sim {
   }
 
   feedPet(itemId: string, pidOrTarget?: number | { slotIndex: number }, slotIndex?: number): void {
-    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
-    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    const { pid, named } = foldNamedSlotTarget(pidOrTarget, slotIndex);
     petCommands.feedPet(this.ctx, itemId, pid, named);
   }
 
@@ -8894,8 +8899,7 @@ export class Sim {
     pidOrTarget?: number | { slotIndex: number },
     slotIndex?: number,
   ): void {
-    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
-    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    const { pid, named } = foldNamedSlotTarget(pidOrTarget, slotIndex);
     bagsMod.equipBag(this.ctx, itemId, socket, pid, named);
   }
 
@@ -8909,8 +8913,7 @@ export class Sim {
     pidOrTarget?: number | { slotIndex: number },
     slotIndex?: number,
   ): void {
-    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
-    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    const { pid, named } = foldNamedSlotTarget(pidOrTarget, slotIndex);
     items.discardItem(this.ctx, itemId, count, pid, named);
   }
 
@@ -8920,8 +8923,7 @@ export class Sim {
     pidOrTarget?: number | { slotIndex: number },
     slotIndex?: number,
   ): void {
-    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
-    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    const { pid, named } = foldNamedSlotTarget(pidOrTarget, slotIndex);
     setItemLockedCmd(this.ctx, itemId, locked, pid, named);
   }
 
@@ -8933,8 +8935,7 @@ export class Sim {
   ): void {
     // The disenchantItem shape (see it for the reasoning): position 2 carries the
     // target for an IWorld caller and pid for a sim/server caller.
-    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
-    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    const { pid, named } = foldNamedSlotTarget(pidOrTarget, slotIndex);
     items.equipItem(this.ctx, itemId, pid, targetSlot, named);
   }
 
@@ -8959,8 +8960,7 @@ export class Sim {
     // The aimed equip arm, and the one the UI actually drives (char_window drag
     // to a paperdoll slot), so a gear loadout reaches equip through HERE rather
     // than through the unaimed equipItem.
-    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
-    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    const { pid, named } = foldNamedSlotTarget(pidOrTarget, slotIndex);
     items.equipItem(this.ctx, itemId, pid, slot, named);
   }
 
@@ -8973,8 +8973,7 @@ export class Sim {
     pidOrTarget?: number | { slotIndex: number },
     slotIndex?: number,
   ): ItemUseResult | undefined {
-    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
-    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    const { pid, named } = foldNamedSlotTarget(pidOrTarget, slotIndex);
     return items.useItem(this.ctx, itemId, pid, named);
   }
 
@@ -8994,8 +8993,7 @@ export class Sim {
     pidOrTarget?: number | { slotIndex: number },
     slotIndex?: number,
   ): void {
-    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
-    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    const { pid, named } = foldNamedSlotTarget(pidOrTarget, slotIndex);
     items.sellItem(this.ctx, itemId, count, pid, named);
   }
 
@@ -9389,8 +9387,7 @@ export class Sim {
     // passes the target here, a sim/server caller passes pid. Both arities must
     // stay, because IWorld declares (itemId, target?) while server/game.ts and
     // the RL host call (itemId, pid, slot).
-    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
-    const targetSlotIndex = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    const { pid, named: targetSlotIndex } = foldNamedSlotTarget(pidOrTarget, slotIndex);
     if (refusedWhileDead(this.ctx, pid)) return;
     // Phase 4: salvageItemImpl starts a cast or returns a start-gate denial.
     // On casting:true castStart is the surface; salvageResult lands only from
@@ -9431,8 +9428,7 @@ export class Sim {
     pidOrTarget?: number | { slotIndex: number },
     slotIndex?: number,
   ): RiftForgeResult {
-    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
-    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    const { pid, named } = foldNamedSlotTarget(pidOrTarget, slotIndex);
     return upgradeRiftItemImpl(this.ctx, itemId, pid, named);
   }
 
@@ -9442,8 +9438,7 @@ export class Sim {
     pidOrTarget?: number | { slotIndex: number },
     slotIndex?: number,
   ): RiftForgeResult {
-    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
-    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    const { pid, named } = foldNamedSlotTarget(pidOrTarget, slotIndex);
     return enchantRiftItemImpl(this.ctx, itemId, stat, pid, named);
   }
 
@@ -9453,8 +9448,7 @@ export class Sim {
     pidOrTarget?: number | { slotIndex: number },
     slotIndex?: number,
   ): RiftForgeResult {
-    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
-    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    const { pid, named } = foldNamedSlotTarget(pidOrTarget, slotIndex);
     return socketRiftGemImpl(this.ctx, itemId, gemId, pid, named);
   }
 
@@ -9465,8 +9459,7 @@ export class Sim {
     pidOrTarget?: number | { slotIndex: number },
     slotIndex?: number,
   ): void {
-    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
-    const targetSlotIndex = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    const { pid, named: targetSlotIndex } = foldNamedSlotTarget(pidOrTarget, slotIndex);
     if (refusedWhileDead(this.ctx, pid)) return;
     // Phase 4: start cast or deny; result event only on complete or start deny.
     const result = disenchantItemImpl(this.ctx, itemId, pid, targetSlotIndex);
@@ -10918,6 +10911,10 @@ export class Sim {
     return bankMod.bankInfoFor(this.ctx, pid);
   }
 
+  bankInfoWireRevFor(pid: number): number | null {
+    return bankMod.bankInfoWireRevFor(this.ctx, pid);
+  }
+
   // Thin delegates to the socket free functions (bank_sockets.ts); state rides
   // the same PlayerMeta.bank. bankSocketBag folds the facet's named-slot
   // target into the trailing pid/slotIndex pair, the equipBag idiom.
@@ -10932,14 +10929,7 @@ export class Sim {
     pidOrTarget?: number | { slotIndex: number },
     slotIndex?: number,
   ): void {
-    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
-    // Null-guarded unlike the equipBag fold it copies: this delegate sits on
-    // the shared entry point both hosts call, and `typeof null === 'object'`
-    // would throw here if any caller ever passed a null target (the shipped
-    // phase 07 dispatch parses `msg.slot` into the trailing slotIndex arm, so
-    // today this is defense in depth, not a live wire path).
-    const named =
-      pidOrTarget !== null && typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    const { pid, named } = foldNamedSlotTarget(pidOrTarget, slotIndex);
     bankSocketsMod.bankSocketBag(this.ctx, itemId, socket, pid, named);
   }
 

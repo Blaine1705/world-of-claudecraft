@@ -48,10 +48,74 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/
 // Date.now. This module draws NO rng and mutates nothing.
 
-import { DUNGEON_X_THRESHOLD } from './data';
-import { instanceInfoAt } from './instances/dungeons';
+import { DUNGEON_X_THRESHOLD, DUNGEONS, instanceOrigin, isRiftPos, RIFT_BAND_X_MIN } from './data';
+import {
+  INSTANCE_FOOTPRINT_HALF_WIDTH,
+  instanceInfoAt,
+  WIDE_CLAIM_DUNGEON_ID,
+} from './instances/dungeons';
 import { riftInstanceAtPos } from './rift/runs';
 import type { SimContext } from './sim_context';
+import { NYTHRAXIS_ROOM_RADIUS } from './types';
+
+/** How far WEST of its band origin a dungeon def's claim footprint can reach.
+ *  Built from the SAME exported symbols instances/dungeons.ts builds its two
+ *  claim shapes from (the generic INSTANCE_FOOTPRINT_HALF_WIDTH envelope
+ *  everywhere, plus the WIDE_CLAIM_DUNGEON_ID arena's wider circle,
+ *  NYTHRAXIS_ROOM_RADIUS around a spawn offset), so widening either shape
+ *  moves this estimate with it instead of silently under-estimating and
+ *  failing the gate open. The arena reach is taken over ALL of that def's
+ *  spawns rather than resolving the boss id, which is conservative in the
+ *  only safe direction here: overestimating reach can only disable the fast
+ *  path below (paying the pool scan), never admit a claim. Exported for the
+ *  derived coverage case in tests/craft_from_vault.test.ts, which probes the
+ *  real claim read (instanceInfoAt) one yard west of the edge this predicts
+ *  for every registered def. */
+export function claimWestReach(def: { id: string; spawns: readonly { x: number }[] }): number {
+  if (def.id !== WIDE_CLAIM_DUNGEON_ID) return INSTANCE_FOOTPRINT_HALF_WIDTH;
+  let reach = INSTANCE_FOOTPRINT_HALF_WIDTH;
+  for (const spawn of def.spawns) reach = Math.max(reach, NYTHRAXIS_ROOM_RADIUS - spawn.x);
+  return reach;
+}
+
+// The DERIVED premise behind the geometry fast path: can any REGISTERED
+// dungeon def's claim footprint sit at or west of DUNGEON_X_THRESHOLD? For
+// the shipped layout the answer is false (the westernmost def, index 0, opens
+// its envelope 180 yards east of the threshold), so the fast path below skips
+// the pool scans for every real open-world position. Register a def whose
+// footprint can cross the threshold and the answer flips TRUE on the next
+// evaluation, the fast path disables itself, and the pool scan runs for west
+// positions too: the layout-independence the scans provide is DERIVED from
+// the live defs rather than hand-kept (tests/vault_craft_gate.test.ts's
+// synthetic west dungeon pins exactly this flip). Deliberately computed
+// inline on EVERY call, never memoized: DUNGEONS is not frozen, so any cache
+// key (a def count, say) goes stale fail-OPEN under a count-preserving
+// mutation, and the walk does not need one (measured ~70ns per call over the
+// 9 shipped defs, node micro-run, against the ~2.4us instance-slot walk the
+// fast path exists to skip; the one spawn walk, the arena's, is bounded by
+// its authored spawn list). No clock, no rng.
+function dungeonClaimsCanSitWestOfThreshold(): boolean {
+  return Object.values(DUNGEONS).some(
+    (def) => instanceOrigin(def.index, 0).x - claimWestReach(def) <= DUNGEON_X_THRESHOLD,
+  );
+}
+
+/** The composed fast-path predicate, OUTSIDE vaultDrawBlocked's body so the
+ *  one-occurrence-per-arm source pin in tests/vault_craft_gate.test.ts keeps
+ *  seeing exactly ONE threshold comparison inside the predicate (the final
+ *  backstop): true when `x` is west of the threshold AND no registered claim
+ *  can sit there. The dungeon half is derived from the live defs above; the
+ *  RIFT half is the static band term (RIFT_BAND_X_MIN east of the
+ *  threshold): every rift floor origin's x is pinned to the band, so a rift
+ *  band MOVED west of the threshold disables the fast path by existing
+ *  instead of being silently skipped past. */
+function vaultGateWestFastPath(x: number): boolean {
+  return (
+    x <= DUNGEON_X_THRESHOLD &&
+    RIFT_BAND_X_MIN > DUNGEON_X_THRESHOLD &&
+    !dungeonClaimsCanSitWestOfThreshold()
+  );
+}
 
 /**
  * True when vault reagent draw is REFUSED for `pid` where they stand: the
@@ -84,20 +148,33 @@ export function vaultDrawBlocked(ctx: SimContext, pid: number): boolean {
   // Delve (I2a private party instances): the run registry is per player, so a
   // run torn down a tick before the exit teleport still refuses.
   if (ctx.delveRunForPlayer(pid) !== null) return true;
+  // THE GEOMETRY FAST PATH: for a west-side position, skip the two pool
+  // scans below whenever the DERIVED flag proves no registered dungeon claim
+  // can sit there (dungeonClaimsCanSitWestOfThreshold above). Running the
+  // scans first made every craft-context evaluation pay a full instance-slot
+  // walk in the common case (measured ~2.4us/call, 89% in instanceInfoAt, at
+  // 4 Hz per connected player through the cvault key, whose cadence floor
+  // stays as is: the full event-driven fold is out of scope here, see
+  // CVAULT_WIRE_HZ in server/vault_wire.ts). Because the skip is derived
+  // from the live defs rather than hand-asserted, a future dungeon band
+  // placed west of the threshold re-enables the scans by existing, and the
+  // layout-independence pin in tests/vault_craft_gate.test.ts stays green
+  // against this exact line.
+  //
+  // The rift arm's layout-independence is CONDITIONAL on the fast path's
+  // static band term (RIFT_BAND_X_MIN east of the threshold): isRiftPos moves
+  // with the band, but a band moved west of the threshold reaches its arm
+  // below only because that term disables this skip.
+  if (vaultGateWestFastPath(pos.x)) return false;
   // Dungeon AND raid: instanceInfoAt is the canonical claim-footprint read
   // over the live slot pool (the raid instances are ordinary slots carrying a
   // RAID_ALLOWED_DUNGEON_IDS dungeon id, so one arm covers both). It is
   // position-keyed and does NOT filter freed slots, which is the fail-closed
   // direction here.
   if (instanceInfoAt(ctx, pos) !== null) return true;
-  // Rift (procedural floors): the floor-region read over the live rift pool.
-  //
-  // Both of the arms above are SUBSUMED by the band backstop below for today's
-  // layout (every claim footprint and every floor region is anchored far east
-  // of the threshold), so neither can be the deciding arm right now. They are
-  // the layout-independent statement of the same refusal and they are what
-  // keeps this file honest if a band ever moves; see the header.
-  if (riftInstanceAtPos(ctx, pos) !== null) return true;
+  // Rift (procedural floors): the floor-region read over the live rift pool,
+  // band-guarded as above.
+  if (isRiftPos(pos.x) && riftInstanceAtPos(ctx, pos) !== null) return true;
   // THE GEOMETRY BACKSTOP, one arm rather than seven.
   //
   // Every instanced band in the game sits on the far-east instance plane, and
@@ -157,6 +234,14 @@ export function vaultDrawBlocked(ctx: SimContext, pid: number): boolean {
  * Ungated the same way `consumeVaultStock` is (no rung, no nearBanker, no dead
  * check), for the same reasons: this is the read half of that primitive, and
  * `vaultDrawBlocked` above is the gate that actually applies here.
+ *
+ * DO NOT short-circuit a locked or empty vault to null ahead of the gate: the
+ * null-vs-empty-record distinction is load-bearing on the client. hud.ts
+ * derives its "vault draw blocked here" note from `craftVaultStock === null`
+ * (the buildCraftingView `vaultBlocked` argument), so answering null for an
+ * open-world player who merely has nothing banked would paint the blocked
+ * note across the whole open world. The gate's threshold fast path already
+ * makes the common case a few map probes plus one comparison.
  */
 export function vaultDrawStock(ctx: SimContext, pid: number): Record<string, number> | null {
   if (vaultDrawBlocked(ctx, pid)) return null;

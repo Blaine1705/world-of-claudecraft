@@ -27,7 +27,8 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { bagCapacity } from '../src/sim/bags';
 import { recipeById } from '../src/sim/content/recipes';
-import { DUNGEON_X_THRESHOLD } from '../src/sim/data';
+import { DUNGEON_X_THRESHOLD, DUNGEONS, instanceOrigin, RIFT_X_MIN } from '../src/sim/data';
+import { INSTANCE_FOOTPRINT_HALF_WIDTH, instanceInfoAt } from '../src/sim/instances/dungeons';
 import { consumeVaultStock, type MaterialsVaultState } from '../src/sim/materials_vault';
 import {
   hasRecipeMaterials,
@@ -43,6 +44,7 @@ import { planReagentSourceDraw } from '../src/sim/professions/reagent_sources';
 import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import type { Entity, InvSlot } from '../src/sim/types';
+import { claimWestReach, vaultDrawBlocked } from '../src/sim/vault_craft_gate';
 import {
   leaveBattleground,
   placeInBattleground,
@@ -1546,5 +1548,159 @@ describe('apply-enchant capacity: vault-sourced reagents free NO room', () => {
     expect(vaultOf(sim, pid).arcane_dust).toBe(5); // nothing spent
     expect(sim.countItem(SWORD, pid)).toBe(2); // the victim survives
     expect(meta.inventory.length).toBe(16);
+  });
+});
+
+// PR #3670 hot-path finding: the craft gate's geometry fast path must decide
+// BEFORE the two pool scans (instanceInfoAt walks every instance slot;
+// riftInstanceAtPos walks the rift pool), so the common open-world evaluation
+// (4 Hz per connected player through the cvault key) costs three membership
+// probes plus one comparison. Hand-rolled trap ctx: the pool properties THROW
+// on access, so a regression that re-runs a scan for a west-side position
+// fails loudly rather than silently re-paying the walk.
+describe('vaultDrawBlocked: the geometry fast path precedes the pool scans', () => {
+  const trapCtx = (pos: { x: number; y: number; z: number }): any => ({
+    resolve: () => ({ meta: {}, e: { pos } }),
+    bgMatches: new Map(),
+    arenaMatches: new Map(),
+    delveRunForPlayer: () => null,
+    get instances(): never {
+      throw new Error('instance pool scanned for a west-side position');
+    },
+    get riftInstances(): never {
+      throw new Error('rift pool scanned for a west-side position');
+    },
+  });
+
+  it('never touches the instance or rift pools west of the threshold (boundary inclusive)', () => {
+    expect(vaultDrawBlocked(trapCtx({ x: 0, y: 0, z: 0 }), 1)).toBe(false);
+    expect(vaultDrawBlocked(trapCtx({ x: DUNGEON_X_THRESHOLD, y: 0, z: 0 }), 1)).toBe(false);
+  });
+
+  it('CONTROL: an east-side position still consults the pools (the trap fires)', () => {
+    expect(() => vaultDrawBlocked(trapCtx({ x: DUNGEON_X_THRESHOLD + 1, y: 0, z: 0 }), 1)).toThrow(
+      /instance pool scanned/,
+    );
+  });
+
+  it('DERIVED: registering a west-capable dungeon def re-enables the west-side pool scan', () => {
+    // The fast path re-derives from the live defs on EVERY evaluation, so a
+    // def whose claim footprint can cross the threshold disables it by
+    // existing: the same trap position that never touched the pools above now
+    // consults them. This is the adaptive half of the layout-independence pin
+    // in tests/vault_craft_gate.test.ts (which proves the scan then REFUSES a
+    // claimed west slot through the real Sim).
+    const QA_ID = '__craft_gate_qa_west_dungeon';
+    (DUNGEONS as Record<string, (typeof DUNGEONS)[string]>)[QA_ID] = {
+      ...DUNGEONS.hollow_crypt,
+      id: QA_ID,
+      index: -100,
+      spawns: [],
+    };
+    try {
+      expect(() => vaultDrawBlocked(trapCtx({ x: 0, y: 0, z: 0 }), 1)).toThrow(
+        /instance pool scanned/,
+      );
+    } finally {
+      delete (DUNGEONS as Record<string, (typeof DUNGEONS)[string]>)[QA_ID];
+    }
+    // With the def gone, the per-call derivation clears: the fast path is back.
+    expect(vaultDrawBlocked(trapCtx({ x: 0, y: 0, z: 0 }), 1)).toBe(false);
+  });
+
+  it('the rift arm runs inside the band, and only there (real empty dungeon pool)', () => {
+    // PR #3670 round 2: in the trap ctx above, the east CONTROL throws out of
+    // instanceInfoAt before riftInstanceAtPos is ever reached, so the
+    // riftInstances trap alone never proved the rift arm runs. With a REAL
+    // empty dungeon pool the dungeon arm answers null, and the rift trap must
+    // fire inside the band, stay untouched east of the threshold but west of
+    // the band (the isRiftPos guard), and stay skipped west of the threshold.
+    const riftTrap = (x: number): any => ({
+      resolve: () => ({ meta: {}, e: { pos: { x, y: 0, z: 0 } } }),
+      bgMatches: new Map(),
+      arenaMatches: new Map(),
+      delveRunForPlayer: () => null,
+      instances: [],
+      get riftInstances(): never {
+        throw new Error('rift pool scanned');
+      },
+    });
+    expect(() => vaultDrawBlocked(riftTrap(RIFT_X_MIN), 1)).toThrow(/rift pool scanned/);
+    expect(vaultDrawBlocked(riftTrap(DUNGEON_X_THRESHOLD + 1), 1)).toBe(true);
+    expect(vaultDrawBlocked(riftTrap(0), 1)).toBe(false);
+  });
+
+  it('the membership arms still run BEFORE the fast path: a west-side bg member refuses', () => {
+    // A formed-but-not-teleported match is exactly the frame the membership
+    // arms exist for; an implementation that hoisted the geometry admit above
+    // them would answer false here.
+    const bg = trapCtx({ x: 0, y: 0, z: 0 });
+    bg.bgMatches = new Map([[1, {}]]);
+    expect(vaultDrawBlocked(bg, 1)).toBe(true);
+    const arena = trapCtx({ x: 0, y: 0, z: 0 });
+    arena.arenaMatches = new Map([[1, {}]]);
+    expect(vaultDrawBlocked(arena, 1)).toBe(true);
+    const delve = trapCtx({ x: 0, y: 0, z: 0 });
+    delve.delveRunForPlayer = () => ({});
+    expect(vaultDrawBlocked(delve, 1)).toBe(true);
+  });
+});
+
+// PR #3670 round 2: claimWestReach (the fast path's west-reach envelope) is
+// built from the exported claim-shape symbols in instances/dungeons.ts, and
+// this case keeps the derivation honest against the REAL claim read: for
+// every registered def, nothing even one yard WEST of the edge claimWestReach
+// predicts may sit inside the claim, or the fast-path derivation would
+// under-estimate a west-capable def and fail the gate OPEN. Probes run
+// through instanceInfoAt (the exact read vaultDrawBlocked consumes), never a
+// re-derived formula, over a pool holding ONLY the probed claim so no
+// neighboring slot can answer for it.
+describe('claimWestReach covers the true west reach of every registered claim', () => {
+  it('no def claim reaches west of its predicted edge (1-yard quantum)', () => {
+    const sim = makeSim();
+    const pool = sim.ctx.instances;
+    const template = pool[0];
+    const realSlots = pool.splice(0, pool.length);
+    try {
+      for (const def of Object.values(DUNGEONS)) {
+        const origin = instanceOrigin(def.index, 0);
+        const reach = claimWestReach(def);
+        pool.push({
+          ...template,
+          dungeonId: def.id,
+          slot: 0,
+          partyKey: 'solo:qa_west_reach',
+          exitId: 998,
+          clearedBy: new Set<number>(),
+          enteredBy: new Set<number>(),
+        });
+        // Liveness controls, so the null assertions below cannot pass
+        // vacuously: the rig detects THIS claim at its origin and just inside
+        // the generic envelope's west edge (every def carries at least the
+        // generic arm).
+        expect(instanceInfoAt(sim.ctx, { x: origin.x, y: 0, z: origin.z })?.dungeonId).toBe(def.id);
+        expect(
+          instanceInfoAt(sim.ctx, {
+            x: origin.x - INSTANCE_FOOTPRINT_HALF_WIDTH + 1,
+            y: 0,
+            z: origin.z,
+          })?.dungeonId,
+        ).toBe(def.id);
+        // The decisive bound: one yard west of the predicted edge, swept
+        // across the whole z extent a claim can occupy (both claim shapes are
+        // clipped to |dz| < 250 around the slot origin), nothing is inside.
+        const westX = origin.x - reach - 1;
+        for (let dz = -255; dz <= 255; dz++) {
+          const hit = instanceInfoAt(sim.ctx, { x: westX, y: 0, z: origin.z + dz });
+          if (hit !== null) {
+            expect.fail(`${def.id}: claim reaches x ${westX} (reach ${reach}) at dz ${dz}`);
+          }
+        }
+        pool.pop();
+      }
+    } finally {
+      pool.length = 0;
+      pool.push(...realSlots);
+    }
   });
 });

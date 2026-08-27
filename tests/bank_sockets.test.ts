@@ -833,7 +833,11 @@ describe('two-pool deposits through the real gate', () => {
     const breadIdx = carry(sim, BREAD, 1);
     sim.drainEvents();
     sim.bankDeposit(breadIdx, 1);
-    expect(hasErr(sim.drainEvents(), 'Your bank is full.')).toBe(true);
+    // The pool-honest refusal (PR #3670): the two-pool meter shows free room,
+    // so the line says what kind of room it is instead of claiming "full".
+    expect(hasErr(sim.drainEvents(), 'Only materials fit in the space left in your bank.')).toBe(
+      true,
+    );
     expect(m.bank.inventory.length).toBe(24);
 
     const oreIdx = carry(sim, ORE, 5);
@@ -1200,11 +1204,14 @@ describe('the compounded worst-ordering over-capacity bound (the ceiling lesson)
       expect(info.materialsCapacity).toBe(24 * (s + 1));
       expect(info.generalUsed).toBe(176); // over budget from round 0, tolerated
       expect(info.materialsUsed).toBe(24 * s);
-      // A non-material deposit is refused against the POST-swap general pool.
+      // A non-material deposit is refused against the POST-swap general pool;
+      // the fresh materials headroom is visible, so the pool-honest line rides.
       breadIdx = carry(sim, BREAD, 1);
       sim.drainEvents();
       sim.bankDeposit(breadIdx, 1);
-      expect(hasErr(sim.drainEvents(), 'Your bank is full.')).toBe(true);
+      expect(hasErr(sim.drainEvents(), 'Only materials fit in the space left in your bank.')).toBe(
+        true,
+      );
       m.inventory.splice(
         m.inventory.findIndex((x) => x.itemId === BREAD),
         1,

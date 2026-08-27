@@ -31,7 +31,7 @@
 // Date.now (enforced by tests/architecture.test.ts). This module draws NO rng.
 
 import { addStacked, bagPools, bagsFullError, canAddItem } from './bags';
-import { BANK_BAG_SOCKETS, nearBanker, nearBankerTemplateId } from './bank';
+import { BANK_BAG_SOCKETS, bumpBankWireRev, nearBanker, nearBankerTemplateId } from './bank';
 import { ITEMS } from './data';
 import * as deedsMod from './deeds';
 import {
@@ -70,6 +70,7 @@ export function bankUnlockSocket(ctx: SimContext, pid?: number): void {
   }
   meta.copper -= price;
   meta.bank.unlockedSockets += 1;
+  bumpBankWireRev(meta);
   ctx.notice(meta.entityId, 'You unlock a bank bag socket.');
   // A completed unlock is banker business; the gate above guarantees a banker.
   const bankerId = nearBankerTemplateId(ctx, p);
@@ -172,6 +173,7 @@ export function bankSocketBag(
   // movement, and the hub would inflate reliquary obtain tallies).
   if (old) addStacked(meta.inventory, old, 1);
   meta.bank.socketBags[target] = itemId;
+  bumpBankWireRev(meta);
   ctx.onInventoryChangedForQuests(meta);
   ctx.emit({
     type: 'log',
@@ -212,6 +214,7 @@ export function bankUnsocketBag(ctx: SimContext, socket: number, pid?: number): 
     return;
   }
   meta.bank.socketBags[socket] = null;
+  bumpBankWireRev(meta);
   // Raw addStacked, never the addItem hub (module header).
   addStacked(meta.inventory, itemId, 1);
   ctx.onInventoryChangedForQuests(meta);

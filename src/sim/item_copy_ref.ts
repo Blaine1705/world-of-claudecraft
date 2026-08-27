@@ -191,3 +191,27 @@ export function selectedInventorySlot(
   if (slot.itemId !== itemId || slot.count < 1) return null;
   return slot;
 }
+
+/**
+ * Fold the shared entry points' overloaded trailing pair into (pid, named
+ * slot). Sim's public item commands accept `pidOrTarget` as EITHER a host pid
+ * (server/RL callers) OR the IWorld `{ slotIndex }` target (the UI naming the
+ * exact copy, this module's whole subject), with a trailing `slotIndex` for
+ * the pid arity. Extracted from the fifteen per-delegate copies in sim.ts
+ * (rule of three, several times over), so the fold has ONE definition.
+ *
+ * Null-guarded (the bankSocketBag precedent): these delegates sit on the
+ * shared entry point both hosts call, and `typeof null === 'object'` would
+ * throw on `.slotIndex` if any caller ever passed a null target. No shipped
+ * wire path can (dispatch parses `msg.slot` into the trailing arm), so the
+ * guard is defense in depth, now uniform instead of per-site.
+ */
+export function foldNamedSlotTarget(
+  pidOrTarget: number | { slotIndex: number } | undefined,
+  slotIndex: number | undefined,
+): { pid: number | undefined; named: number | undefined } {
+  const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
+  const named =
+    pidOrTarget !== null && typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+  return { pid, named };
+}

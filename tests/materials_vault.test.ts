@@ -45,7 +45,6 @@ const UPGRADE_NOTICE = 'You upgrade the Materials Vault.';
 const TOO_FAR = 'You are too far from the banker.';
 const LOCKED = 'You have not unlocked the Materials Vault.';
 const NOT_A_MATERIAL = 'Only materials can be stored in the Materials Vault.';
-const CANNOT_STORE = 'That item cannot be stored in the Materials Vault.';
 const NO_HEADROOM = 'Your vault cannot hold any more of that material.';
 const BAGS_FULL = 'Your bags are full.';
 
@@ -1654,7 +1653,6 @@ describe('the sim_i18n rows bind the emitted literals', () => {
     // by some matcher; this pins each row to ITS key, so a key rename or a row
     // shuffled onto the wrong key reddens here with a readable diff.
     expect(tSim('error.vaultOnlyMaterials')).toBe(NOT_A_MATERIAL);
-    expect(tSim('error.vaultCannotStore')).toBe(CANNOT_STORE);
     expect(tSim('error.vaultLocked')).toBe(LOCKED);
     expect(tSim('error.vaultMaterialFull')).toBe(NO_HEADROOM);
     expect(tSim('error.vaultCannotAfford')).toBe('You cannot afford that vault upgrade.');

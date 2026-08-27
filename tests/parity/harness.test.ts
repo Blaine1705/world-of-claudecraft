@@ -171,6 +171,7 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
     expect([...META_EXCLUDE].sort()).toEqual([
       'away',
       'bankBonusSources',
+      'bankWireRev',
       'characterId',
       'craftThrottle',
       'fiestaMods',

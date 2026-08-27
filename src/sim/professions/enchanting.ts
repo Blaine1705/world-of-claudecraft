@@ -72,7 +72,11 @@ import type { Rng } from '../rng';
 // Type-only import (the crafting.ts/commission.ts idiom): PlayerMeta is a
 // shape, never the Sim class, so this module stays host-agnostic.
 import type { PlayerMeta } from '../sim';
-import { reservePlannedVaultConsumption, type SimContext } from '../sim_context';
+import {
+  reservePlannedVaultConsumption,
+  type SimContext,
+  settleVaultConsumptionReservation,
+} from '../sim_context';
 import {
   cloneItemInstancePayload,
   DISENCHANT_CAST_ID,
@@ -867,7 +871,14 @@ function applyEnchantReagentDraw(
   // ONE emission site for all three apply arms: the tick-side ledger record
   // for what just left the vault (see emitVaultCraftConsume). Silent for a
   // bags-only enchant, so the pre-vault event stream is byte-identical.
-  if (drawn.length > 0 && meta) emitVaultCraftConsume(ctx, meta, drawn);
+  if (drawn.length > 0 && meta) {
+    emitVaultCraftConsume(ctx, meta, drawn);
+    // The vault counts toward quest presence (quest_item_presence.ts), so a
+    // vault draw recomputes exactly as the carried removeItem calls above do
+    // (removeItem fires the hook itself; consumePlayerVaultStock does not).
+    // Latent today: no shipped quest names a material (crafting.ts's twin).
+    ctx.onInventoryChangedForQuests(meta);
+  }
   return drawn;
 }
 
@@ -983,7 +994,15 @@ function resolveApplyEnchantWorn(
     return { ok: false, itemId, enchantId, reason: 'busy' };
   }
   const vaultDraws = applyEnchantReagentDraw(ctx, pid, meta, reagentPlans);
-  vaultReservation?.commit();
+  // Commit only when every planned vault take moved, cancel on any shortfall.
+  // The shortfall arm is reachable only by a bug (applyEnchantReagentDraw's
+  // guard note), and under-claiming is the safe direction for the durable
+  // audit record: recording only what committed.
+  settleVaultConsumptionReservation(
+    vaultReservation,
+    reagentPlans.reduce((n, plan) => n + plan.vault.length, 0),
+    vaultDraws.length,
+  );
   meta.equipmentInstance ??= {};
   meta.equipmentInstance[slot] = replacing
     ? // The replace mint: old enchant peeled off exactly, new one applied,
@@ -1113,7 +1132,15 @@ function resolveReplaceEnchantBagged(
   }
   ctx.onInventoryChangedForQuests(meta);
   const vaultDraws = applyEnchantReagentDraw(ctx, pid, meta, reagentPlans);
-  vaultReservation?.commit();
+  // Commit only when every planned vault take moved, cancel on any shortfall.
+  // The shortfall arm is reachable only by a bug (applyEnchantReagentDraw's
+  // guard note), and under-claiming is the safe direction for the durable
+  // audit record: recording only what committed.
+  settleVaultConsumptionReservation(
+    vaultReservation,
+    reagentPlans.reduce((n, plan) => n + plan.vault.length, 0),
+    vaultDraws.length,
+  );
   // silent + callerLogs, exactly like the plain apply mint below: the
   // enchantResult event fires its own dedicated cue (audio.enchant in
   // src/game/audio.ts) and logs the one enchant line. This mint re-grants the
@@ -1268,7 +1295,15 @@ export function resolveApplyEnchant(
     return { ok: false, itemId, enchantId, reason: 'not_held' };
   }
   const vaultDraws = applyEnchantReagentDraw(ctx, pid, meta, reagentPlans);
-  vaultReservation?.commit();
+  // Commit only when every planned vault take moved, cancel on any shortfall.
+  // The shortfall arm is reachable only by a bug (applyEnchantReagentDraw's
+  // guard note), and under-claiming is the safe direction for the durable
+  // audit record: recording only what committed.
+  settleVaultConsumptionReservation(
+    vaultReservation,
+    reagentPlans.reduce((n, plan) => n + plan.vault.length, 0),
+    vaultDraws.length,
+  );
   // The minted payload: the consumed copy's markers plus the enchant's
   // additive bonus and marker (enchantedPayloadFor above, shared with the
   // capacity gate).

@@ -10,6 +10,7 @@ import type {
   CharacterState as CompatCharacterState,
   PetState as CompatPetState,
 } from '../src/sim/sim';
+import { stripComments } from './helpers/strip_comments';
 
 const moduleUrl = new URL('../src/sim/character_state.ts', import.meta.url);
 const simUrl = new URL('../src/sim/sim.ts', import.meta.url);
@@ -25,11 +26,15 @@ describe('character_state type leaf', () => {
 
     const leaf = readFileSync(moduleUrl, 'utf8');
     const sim = readFileSync(simUrl, 'utf8');
-    expect(leaf).toContain('export interface CharacterState');
-    expect(leaf).toContain('export interface PetState');
+    // Positive pins read comment-stripped source so commented-out code cannot
+    // satisfy them; the not.toContain arms stay on the raw read (stronger there).
+    const leafCode = stripComments(leaf);
+    const simCode = stripComments(sim);
+    expect(leafCode).toContain('export interface CharacterState');
+    expect(leafCode).toContain('export interface PetState');
     expect(sim).not.toContain('export interface CharacterState');
     expect(sim).not.toContain('export interface PetState');
-    expect(sim).toMatch(
+    expect(simCode).toMatch(
       /export type \{\s*CharacterState,\s*PetState\s*\} from ['"]\.\/character_state['"]/,
     );
   });

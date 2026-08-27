@@ -6,6 +6,8 @@
 // that boundary. They also prove the callback receives a frozen canonical
 // plan and that offline/headless omission remains an inert success.
 
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it, vi } from 'vitest';
 import { resolveCraftForRecipe } from '../src/sim/professions/crafting';
 import { resolveApplyEnchant } from '../src/sim/professions/enchanting';
@@ -150,6 +152,35 @@ describe('craft vault-consumption admission', () => {
     expect(cancel).not.toHaveBeenCalled();
     expectFrozenCanonicalCall(calls[0], sim.playerId);
     expect(sim.countItem(REVERSE_REAGENT_RECIPE.resultItemId, sim.playerId)).toBe(1);
+  });
+
+  it('cancels (never commits) when the landed vault draw falls short of the plan', () => {
+    // HOSTILE admission handle: the reserve callback itself drains the vault
+    // stock between the plan and the apply loop, so consumePlayerVaultStock
+    // refuses every planned take and the landed draw falls short. Unreachable
+    // from an honest host (nothing runs between plan and apply), but the
+    // reservation is the DURABLE AUDIT RECORD for the planned takes: a full
+    // commit here would book units that never moved, so the resolver must
+    // settle the mismatch as cancel, never commit (recording only what
+    // committed; under-claiming is the safe direction).
+    const commit = vi.fn();
+    const cancel = vi.fn();
+    let sim!: Sim;
+    const admission: VaultConsumptionAdmission = () => {
+      metaOf(sim).vault.stock = {};
+      return { commit, cancel };
+    };
+    sim = makeSim(admission);
+    const meta = metaOf(sim);
+    seedReverseRecipeAttempt(meta, sim);
+
+    const result = resolveCraftForRecipe(sim.ctx, sim.playerId, REVERSE_REAGENT_RECIPE);
+
+    // The unreachable arm never denies the craft; only the audit record is
+    // settled in the safe direction.
+    expect(result.ok).toBe(true);
+    expect(commit).not.toHaveBeenCalled();
+    expect(cancel).toHaveBeenCalledOnce();
   });
 
   it('does not call the host for a bags-only plan', () => {
@@ -308,6 +339,63 @@ describe('enchant vault-consumption admission', () => {
     expect(meta.equipmentInstance.mainhand?.enchant).toBe(MIGHT);
   });
 
+  it('cancels (never commits) a worn apply whose vault draw lands short', () => {
+    // The enchant sibling of the craft mismatch arm above: the hostile
+    // admission drains the stock during reserve, applyEnchantReagentDraw
+    // moves nothing, and the settle must cancel rather than book the full
+    // planned draw. The enchant itself still applies (the arm is unreachable
+    // by construction and never denies).
+    const commit = vi.fn();
+    const cancel = vi.fn();
+    let sim!: Sim;
+    sim = makeSim(() => {
+      metaOf(sim).vault.stock = {};
+      return { commit, cancel };
+    });
+    const meta = metaOf(sim);
+    sim.addItem(SWORD, 1, sim.playerId);
+    sim.equipItemToSlot(SWORD, 'mainhand', sim.playerId);
+    meta.vault.stock = { arcane_dust: 5 };
+    meta.vault.upgrades = 1;
+
+    const result = resolveApplyEnchant(sim.ctx, sim.playerId, SWORD, MIGHT, 'mainhand');
+
+    expect(result.ok).toBe(true);
+    expect(result.ok && result.vaultDraws).toBeFalsy();
+    expect(commit).not.toHaveBeenCalled();
+    expect(cancel).toHaveBeenCalledOnce();
+    expect(meta.equipmentInstance?.mainhand?.enchant).toBe(MIGHT);
+  });
+
+  it('cancels (never commits) a bagged REPLACE whose vault draw lands short', () => {
+    // The #2415 bagged replace arm's sibling of the worn mismatch case above:
+    // the hostile admission drains the stock during reserve, the pinned
+    // enchanted victim is still consumed and re-minted with the new enchant,
+    // and the settle must cancel rather than book the full planned draw.
+    const commit = vi.fn();
+    const cancel = vi.fn();
+    let sim!: Sim;
+    sim = makeSim(() => {
+      metaOf(sim).vault.stock = {};
+      return { commit, cancel };
+    });
+    const meta = metaOf(sim);
+    sim.addItem(SWORD, 1, sim.playerId);
+    sim.addItem('arcane_dust', 5, sim.playerId);
+    // Bags-only first apply: no vault takes, so the hostile host is not called.
+    expect(resolveApplyEnchant(sim.ctx, sim.playerId, SWORD, MIGHT).ok).toBe(true);
+    meta.vault.stock = { arcane_dust: 5 };
+    meta.vault.upgrades = 1;
+
+    const result = resolveApplyEnchant(sim.ctx, sim.playerId, SWORD, AGILITY, undefined, true);
+
+    expect(result.ok).toBe(true);
+    expect(result.ok && result.vaultDraws).toBeFalsy();
+    expect(commit).not.toHaveBeenCalled();
+    expect(cancel).toHaveBeenCalledOnce();
+    expect(meta.inventory.find((slot) => slot.itemId === SWORD)?.instance?.enchant).toBe(AGILITY);
+  });
+
   it('cancels an accepted reservation when a post-reservation victim read no-ops', () => {
     const commit = vi.fn();
     const cancel = vi.fn();
@@ -327,5 +415,76 @@ describe('enchant vault-consumption admission', () => {
     expect(cancel).toHaveBeenCalledOnce();
     expect(meta.inventory).toEqual(beforeInventory);
     expect(meta.vault).toEqual(beforeVault);
+  });
+});
+
+describe('craft quest-recompute gate over the vault pool', () => {
+  it('fires the quest recompute for a vault draw, not only a carried one (source pin)', () => {
+    // LATENT behavior, pinned by source and stated as such: no shipped quest
+    // names a material (quests/quest_item_presence.ts documents this), and on
+    // the craft path the output grant fires its own recompute immediately
+    // after the gate, so no cheap black-box observation distinguishes the
+    // widened gate from the old carried-only one. The vault still counts
+    // toward playerHoldsQuestItem, so a vault-only draw reduces a store quest
+    // presence reads and the gate must cover both pools. Comments are
+    // stripped first so prose mentioning the tokens cannot satisfy the pin,
+    // and the pin is anchored inside resolveCraftForRecipe's consumption
+    // block by the neighboring onInventoryChangedForQuests call.
+    const source = readFileSync(
+      fileURLToPath(new URL('../src/sim/professions/crafting.ts', import.meta.url)),
+      'utf8',
+    )
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/^\s*\/\/.*$/gm, '');
+    const gate =
+      /if \(meta && plans\.some\(\(plan\) => plan\.carried\.length > 0 \|\| plan\.vault\.length > 0\)\) \{\s*ctx\.onInventoryChangedForQuests\?\.\(meta\);/;
+    expect(gate.test(source)).toBe(true);
+  });
+});
+
+describe('enchant quest-recompute over the vault pool', () => {
+  it('fires the quest recompute when an enchant draw takes from the vault (source pin)', async () => {
+    // Same latent standard as the craft pin above: the carried half recomputes
+    // via ctx.removeItem itself; the vault half must fire the hook at the one
+    // shared emission site so a vault-only enchant draw cannot silently shrink
+    // a store quest presence reads (quest_item_presence.ts).
+    const { readFileSync } = await import('node:fs');
+    const { stripComments } = await import('./helpers/strip_comments');
+    const src = stripComments(
+      readFileSync(new URL('../src/sim/professions/enchanting.ts', import.meta.url), 'utf8'),
+    );
+    const emit = 'emitVaultCraftConsume(ctx, meta, drawn);';
+    const site = src.indexOf(emit);
+    expect(site).toBeGreaterThan(-1);
+    // Anchored to the NEXT STATEMENT after the emit (not a fixed character
+    // window, which could silently stop covering the call as the block grows):
+    // in the comment-stripped source the recompute must be what immediately
+    // follows the emission.
+    const nextStatement = src.slice(site + emit.length).trimStart();
+    expect(nextStatement.startsWith('ctx.onInventoryChangedForQuests(meta);')).toBe(true);
+  });
+});
+
+describe('every settle site routes through settleVaultConsumptionReservation', () => {
+  it('all four resolver arms call the shared settle helper (source pin)', async () => {
+    // The four sites are the whole set of vault-consuming resolver arms:
+    // crafting.ts resolveCraftForRecipe, plus enchanting.ts's worn apply,
+    // bagged replace, and bagged apply. The worn, replace, and craft arms
+    // have behavioural hostile-admission coverage above; the bagged apply arm
+    // does not (its rig is the same shape but the arm is unreachable-by-bug
+    // only), so this pin is what keeps any arm from silently losing the
+    // settle rule in a refactor. Comments are stripped first so prose naming
+    // the helper cannot stand in for the call, and the import specifier does
+    // not match (no trailing paren).
+    const { readFileSync } = await import('node:fs');
+    const { stripComments } = await import('./helpers/strip_comments');
+    const count = (file: string): number => {
+      const stripped = stripComments(
+        readFileSync(new URL(`../src/sim/professions/${file}`, import.meta.url), 'utf8'),
+      );
+      return stripped.split('settleVaultConsumptionReservation(').length - 1;
+    };
+    expect(count('crafting.ts')).toBe(1);
+    expect(count('enchanting.ts')).toBe(3);
   });
 });

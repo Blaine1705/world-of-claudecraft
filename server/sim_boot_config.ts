@@ -14,9 +14,15 @@ import { nextRaidResetMs } from './raid_reset';
 import { REALM_RESET_TIME_ZONE } from './realm';
 import { STORAGE_PRICES } from './storage_prices';
 
+// The admission is REQUIRED, deliberately, even though SimConfig's own field
+// is optional (offline Sim constructions omit it and run inert): this seam is
+// where the live realm forgets its wiring, and an optional parameter here let
+// a boot that dropped the journal admission compile and silently skip the
+// durable audit reservation. A caller that MEANS to run inert passes the
+// exported inertVaultConsumptionAdmission by name (src/sim/sim_context.ts).
 export function buildRealmSimConfig(
   perfLap: SimConfig['perfLap'],
-  vaultConsumptionAdmission?: VaultConsumptionAdmission,
+  vaultConsumptionAdmission: VaultConsumptionAdmission,
 ): SimConfig {
   return {
     seed: WORLD_SEED,

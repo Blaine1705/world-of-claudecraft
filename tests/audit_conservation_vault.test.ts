@@ -37,10 +37,14 @@
 //
 // The world drives the offline Sim directly and reproduces the server's
 // dispatch idiom (server/game.ts): each vault COMMAND is bracketed with
-// sim.vaultInfoFor(pid) snapshots handed to recordVaultOp, and each drained
-// vaultCraftConsume event is handed to recordVaultCraftConsume. It never
-// ticks: nothing here needs the clock, and a still world keeps the banker
-// standing where it was put.
+// sim.vaultInfoFor(pid) snapshots handed to recordVaultOp, and craft
+// consumption rides the SAME admission seam production wires
+// (SimConfig.vaultConsumptionAdmission over a REAL bank_ledger_session
+// journal for this owner, the server/sim_boot_config.ts shape), so the sim's
+// craft path itself reserves and commits through the code the live server
+// runs; each craft step then drains the journal outbox's committed batches
+// into the audit row stream. It never ticks: nothing here needs the clock,
+// and a still world keeps the banker standing where it was put.
 //
 // Prices, caps, reagents, and the gold fee are LITERALS, never reads of the
 // tables they check (the tests/materials_vault.test.ts discipline). The
@@ -77,6 +81,7 @@ const store = vi.hoisted(() => {
   };
   return {
     rows,
+    push,
     reset(): void {
       rows.length = 0;
       nextId = 0;
@@ -98,12 +103,11 @@ vi.mock('../server/db', () => ({
 }));
 
 import { auditBank, type BankLedgerAuditRow } from '../scripts/bank_audit.mjs';
+import { bankLedgerIdle, recordVaultOp } from '../server/bank_ledger';
 import {
-  bankLedgerIdle,
-  recordVaultCraftConsume,
-  recordVaultOp,
-  type VaultCraftConsumption,
-} from '../server/bank_ledger';
+  type BankLedgerSessionJournal,
+  createBankLedgerSessionJournal,
+} from '../server/bank_ledger_session';
 import { REALM } from '../server/realm';
 import { bagCapacity } from '../src/sim/bags';
 import { CRAFT_GOLD_SINK_COPPER_PER_BUDGET } from '../src/sim/content/professions';
@@ -117,7 +121,13 @@ import {
 } from '../src/sim/materials_vault';
 import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
-import type { Entity, InvSlot, SimEvent, WorldContent } from '../src/sim/types';
+import type {
+  Entity,
+  InvSlot,
+  SimEvent,
+  VaultConsumptionAdmission,
+  WorldContent,
+} from '../src/sim/types';
 import { completeCraftCast } from './helpers/enchant_family_cast';
 
 // ---------------------------------------------------------------------------
@@ -127,6 +137,19 @@ import { completeCraftCast } from './helpers/enchant_family_cast';
 // ---------------------------------------------------------------------------
 const CHARACTER_ID = 7;
 const WHO = { characterId: CHARACTER_ID, accountId: CHARACTER_ID };
+
+// ---------------------------------------------------------------------------
+// The craft-consumption admission: the PRODUCTION seam, wired the way the
+// server does (server/sim_boot_config.ts passes SimConfig's admission through;
+// server/game.ts builds it over the session's createBankLedgerSessionJournal).
+// The Sim is constructed once per world (and ONCE for the whole reused sweep
+// world), so the admission indirects through the active world's journal.
+// ---------------------------------------------------------------------------
+let activeWorldJournal: BankLedgerSessionJournal | null = null;
+const SWEEP_VAULT_ADMISSION: VaultConsumptionAdmission = (_pid, takes, upgrades) => {
+  if (!activeWorldJournal) throw new Error('vault admission called with no active journal');
+  return activeWorldJournal.reserveVaultConsumption(takes, upgrades);
+};
 
 /** One Gilded Strongbox bursar and no ambient life: Sim construction would
  *  otherwise dominate a several-hundred-seed sweep (the trimmed world
@@ -354,8 +377,14 @@ interface World {
    *  mint is counted the moment it happens, so conservation still accounts for
    *  every sword a craft ever produced. */
   craftedOutputsRemoved: number;
-  /** Every craft_consume row this run expects, in write order. */
+  /** Every craft_consume row this run expects, taken from the sim's own
+   *  vaultCraftConsume events (the expectation source stays in the sim). */
   expectedConsume: { itemId: string; count: number; rung: number }[];
+  /** The REAL reservation journal this world's Sim reserves and commits
+   *  through; its outbox is drained into the store after every craft. */
+  journal: BankLedgerSessionJournal;
+  /** Journal hook failures. Any entry fails the step that produced it. */
+  journalFailures: string[];
 }
 
 function entityOf(sim: Sim, pid: number): Entity {
@@ -388,6 +417,19 @@ function moveToBanker(sim: Sim, pid: number): void {
 
 function makeWorld(seed: number, reusableSim?: Sim): World {
   store.reset();
+  const journalFailures: string[] = [];
+  const journal = createBankLedgerSessionJournal(
+    { realm: REALM, characterId: CHARACTER_ID, accountId: CHARACTER_ID },
+    {
+      onProjectionFailure: (error, surface) => {
+        journalFailures.push(`journal projection failure on ${surface}: ${String(error)}`);
+      },
+      onReservationFailure: (error) => {
+        journalFailures.push(`journal reservation failure: ${String(error)}`);
+      },
+    },
+  );
+  activeWorldJournal = journal;
   const sim =
     reusableSim ??
     new Sim({
@@ -396,6 +438,7 @@ function makeWorld(seed: number, reusableSim?: Sim): World {
       autoEquip: false,
       noPlayer: true,
       world: VAULT_TEST_WORLD,
+      vaultConsumptionAdmission: SWEEP_VAULT_ADMISSION,
     });
   // Reusing the expensive static world must not reuse a prior run's random
   // stream. The property still gets the exact per-seed Sim RNG it had when it
@@ -417,6 +460,8 @@ function makeWorld(seed: number, reusableSim?: Sim): World {
     crafted: 0,
     craftedOutputsRemoved: 0,
     expectedConsume: [],
+    journal,
+    journalFailures,
   };
   // One permanent non-material occupant, so the "only materials" refusal is
   // reachable by an ordinary slot pick rather than needing its own step kind.
@@ -769,7 +814,34 @@ function stepBuy(w: World): string[] {
   return problems;
 }
 
-function stepCraft(w: World): string[] {
+/** Drain the journal outbox's committed batches into the store, mapping each
+ *  serialized outbox row back to the BankLedgerRow shape the store normalizes
+ *  (instanceJson is the outbox's detached instance payload). The module FIFO
+ *  is flushed FIRST so vault-op rows enqueued by earlier steps keep their true
+ *  op order ahead of this craft's rows: the audit replays in id order, and a
+ *  craft_consume row stamped before the deposit that fed it would replay as a
+ *  negative net and a rung regression. */
+async function drainJournalRows(w: World): Promise<string[]> {
+  await bankLedgerIdle();
+  const problems: string[] = [];
+  const snap = w.journal.outbox.snapshot();
+  if (snap.rowCount > 0) {
+    for (const batch of snap.batches) {
+      for (const row of batch.rows) {
+        store.push({
+          ...row,
+          instance: row.instanceJson === null ? null : JSON.parse(row.instanceJson),
+        });
+      }
+    }
+    if (!w.journal.outbox.acknowledge(snap)) {
+      problems.push('the journal outbox refused to acknowledge its own snapshot');
+    }
+  }
+  return problems;
+}
+
+async function stepCraft(w: World): Promise<string[]> {
   const problems: string[] = [];
   const sim = w.sim;
   const p = entityOf(sim, w.pid);
@@ -819,15 +891,12 @@ function stepCraft(w: World): string[] {
     SimEvent,
     { type: 'vaultCraftConsume' }
   >[];
-  // The tick observer's shape (server/game.ts): every vaultCraftConsume the
-  // drain produced is accumulated and handed to the recorder as ONE batch, so
-  // a tick carrying several completed casts costs one insert.
-  const consumptions: VaultCraftConsumption[] = consumes.map((ev) => ({
-    who: WHO,
-    takes: ev.takes,
-    upgrades: ev.upgrades,
-  }));
-  if (consumptions.length > 0) recordVaultCraftConsume(consumptions);
+  // The craft's ledger rows were reserved and committed INSIDE the sim through
+  // the production admission seam (the journal this world was built over);
+  // pull the committed batches into the audit row stream, and surface any
+  // journal hook failure as this step's problem.
+  problems.push(...(await drainJournalRows(w)));
+  problems.push(...w.journalFailures.splice(0, w.journalFailures.length));
 
   if (result.ok) {
     w.crafted += 1;
@@ -904,7 +973,7 @@ function stepCraft(w: World): string[] {
   return problems;
 }
 
-function applyStep(w: World, s: Step): string[] {
+async function applyStep(w: World, s: Step): Promise<string[]> {
   switch (s.k) {
     case 'grant': {
       const detail = grantInto(w, MATERIALS[s.which], s.amt);
@@ -951,7 +1020,7 @@ async function runSteps(seed: number, steps: Step[], reusableSim?: Sim): Promise
   try {
     for (let i = 0; i < steps.length; i++) {
       coverage.steps++;
-      const problems = applyStep(w, steps[i]);
+      const problems = await applyStep(w, steps[i]);
       problems.push(...conservationViolations(w));
       if (problems.length > 0) {
         await bankLedgerIdle();
@@ -979,26 +1048,56 @@ async function runSteps(seed: number, steps: Step[], reusableSim?: Sim): Promise
         `${consumeRows.length} craft_consume rows for ${w.expectedConsume.length} recorded takes`,
       );
     }
-    consumeRows.forEach((row, i) => {
-      const want = w.expectedConsume[i];
-      if (!want) return;
-      if (row.item_id !== want.itemId || row.count !== want.count) {
+    // Two orders meet here, so the comparison is a MULTISET, not positional:
+    // the journal serializes the takes reservePlannedVaultConsumption
+    // canonicalized (itemId then count, code-unit order,
+    // src/sim/sim_context.ts), while the expectation follows the sim event
+    // (emitVaultCraftConsume: aggregated per id, sorted by id). The two agree
+    // on content per craft but nothing pins their relative row positions.
+    // That per-craft agreement PRESUMES no recipe names one material id in
+    // two reagent rows (per-take rows vs per-id aggregation would then split);
+    // the premise holder is the reagent-uniqueness pin in
+    // tests/recipe_economy.test.ts.
+    const consumeKey = (itemId: unknown, count: unknown, rung: unknown): string =>
+      `${String(itemId)} x${String(count)} @rung ${String(rung)}`;
+    const multiset = (keys: string[]): Map<string, number> => {
+      const out = new Map<string, number>();
+      for (const key of keys) out.set(key, (out.get(key) ?? 0) + 1);
+      return out;
+    };
+    const gotConsume = multiset(
+      consumeRows.map((row) => consumeKey(row.item_id, row.count, row.purchased_slots_after)),
+    );
+    const wantConsume = multiset(
+      w.expectedConsume.map((want) => consumeKey(want.itemId, want.count, want.rung)),
+    );
+    for (const [key, count] of wantConsume) {
+      if (gotConsume.get(key) !== count) {
         shape.push(
-          `craft_consume row ${row.id} says ${String(row.item_id)} x${String(row.count)}, the event took ${want.itemId} x${want.count}`,
+          `the events took [${key}] ${count} time(s), the ledger holds ${gotConsume.get(key) ?? 0}`,
         );
       }
-      if (row.purchased_slots_after !== want.rung) {
+    }
+    for (const [key, count] of gotConsume) {
+      if (wantConsume.get(key) !== count) {
         shape.push(
-          `craft_consume row ${row.id} carries rung ${String(row.purchased_slots_after)}, the vault stood at ${want.rung}`,
+          `the ledger holds [${key}] ${count} time(s), the events took ${wantConsume.get(key) ?? 0}`,
         );
       }
+    }
+    for (const row of consumeRows) {
       if (row.instance !== null)
         shape.push(`craft_consume row ${row.id} carries an instance payload`);
       if (row.copper_delta !== 0) shape.push(`craft_consume row ${row.id} carries copper`);
       if (!Number.isInteger(row.count) || Number(row.count) <= 0) {
         shape.push(`craft_consume row ${row.id} has a non-positive or fractional count`);
       }
-    });
+    }
+    // Nothing may sit committed-but-undrained: every craft drained its own
+    // batches, so leftovers mean a commit the audit stream never saw.
+    if (w.journal.outbox.usage.queuedRows !== 0) {
+      shape.push(`${w.journal.outbox.usage.queuedRows} journal rows never reached the audit`);
+    }
     if (shape.length > 0) return fail('the ledger rows are misshapen', shape);
 
     // The independent reconciliation: the reference replayer over the rows the
@@ -1018,6 +1117,10 @@ async function runSteps(seed: number, steps: Step[], reusableSim?: Sim): Promise
     }
     return { ok: true, detail: '', rows: rows.length };
   } finally {
+    // Session-teardown hygiene: release the process-wide outbox budget a
+    // failed run may still hold, and drop the admission's journal pointer.
+    activeWorldJournal = null;
+    w.journal.outbox.discard();
     if (reusableSim) {
       reusableSim.removePlayer(w.pid);
       reusableSim.drainEvents();
@@ -1045,7 +1148,9 @@ async function sweep(seeds: number[]): Promise<{ failures: Failure[]; rows: numb
     autoEquip: false,
     noPlayer: true,
     world: VAULT_TEST_WORLD,
+    vaultConsumptionAdmission: SWEEP_VAULT_ADMISSION,
   });
+  const baselineEntities = sim.entities.size;
   for (const seed of seeds) {
     const steps = genSteps(seed);
     const r = await runSteps(seed, steps, sim);
@@ -1053,6 +1158,17 @@ async function sweep(seeds: number[]): Promise<{ failures: Failure[]; rows: numb
     if (!r.ok) {
       failures.push({ seed, detail: r.detail, steps });
       if (failures.length >= 3) break; // enough evidence; keep the run bounded
+    }
+    // Inter-run cleanliness (cheap forms only): the reused world must come
+    // back to its baseline after removePlayer, or every later seed would run
+    // against a polluted world and the whole sweep's evidence would degrade.
+    if (sim.players.size !== 0 || sim.entities.size !== baselineEntities) {
+      failures.push({
+        seed,
+        detail: `seed ${seed}: the run left residue in the reused world: players=${sim.players.size}, entities=${sim.entities.size} (baseline ${baselineEntities})`,
+        steps,
+      });
+      break;
     }
   }
   return { failures, rows };
@@ -1266,7 +1382,7 @@ describe('the audit arm (mutation check: a dropped or bent row is caught)', () =
         { k: 'craft' }, // the bags hold no reagents, so the vault pays all three
         { k: 'buy' }, // rung 2, so the final row's rung is not the first one
       ];
-      for (const s of scenario) expect(applyStep(w, s)).toEqual([]);
+      for (const step of scenario) expect(await applyStep(w, step)).toEqual([]);
       expect(conservationViolations(w)).toEqual([]);
       await bankLedgerIdle();
       rows = [...store.rows];
@@ -1313,7 +1429,7 @@ describe('the audit arm (mutation check: a dropped or bent row is caught)', () =
     );
     expect(audit(withoutDeposit).map((f) => f.kind)).toContain('ledger_state_mismatch');
 
-    // 2) A LOST craft_consume row: exactly the hole recordVaultCraftConsume
+    // 2) A LOST craft_consume row: exactly the hole the reservation journal
     // exists to prevent, and the reason every crafting character would
     // otherwise reconcile as a permanent mismatch.
     const withoutConsume = rows.filter(
@@ -1353,6 +1469,13 @@ describe('coverage of the property sweep', () => {
     process.stderr.write(
       `\n[vault conservation coverage] runs=${coverage.runs} steps=${coverage.steps} | ${coverage.render()}\n`,
     );
+    // The sweep-shape floor: every seed RAN (the runner counts runs itself,
+    // and only the sweep calls it), and the step total sits above a round
+    // conservative bound. The reference sweep is runs=250 steps=11223; the
+    // step floor sits far below that so benign generator drift cannot flake
+    // it, while a sweep that silently dropped most of its seeds still fails.
+    expect(coverage.runs).toBe(250);
+    expect(coverage.steps).toBeGreaterThan(5000);
     for (const arm of [
       'grant:landed',
       // Deposit: the moving arms and every refusal the ladder can produce.

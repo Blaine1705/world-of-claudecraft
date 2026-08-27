@@ -84,7 +84,11 @@ import {
 import { forceDismount } from '../mounts';
 import { isCataloguedRelicMark, noteReliquaryMark } from '../reliquary';
 import type { PlayerMeta } from '../sim';
-import { reservePlannedVaultConsumption, type SimContext } from '../sim_context';
+import {
+  reservePlannedVaultConsumption,
+  type SimContext,
+  settleVaultConsumptionReservation,
+} from '../sim_context';
 import type { Entity, InvSlot, ItemDef, ItemInstancePayload } from '../types';
 import { CRAFT_CAST_ID, isConsuming } from '../types';
 import { vaultDrawStock } from '../vault_craft_gate';
@@ -883,15 +887,23 @@ export function resolveCraftForRecipe(
     }
   });
   // The host reservation becomes durable only after the exact planned vault
-  // draw has landed. A bags-only craft has no handle and stays allocation-free.
-  vaultReservation?.commit();
+  // draw has landed: commit when every planned take moved, cancel on any
+  // shortfall (see the "recording only what committed" rule above; the
+  // shortfall arm is unreachable-by-construction, and under-claiming is the
+  // safe direction for the durable audit record). A bags-only craft has no
+  // handle and stays allocation-free.
+  const plannedVaultTakes = plans.reduce((n, plan) => n + plan.vault.length, 0);
+  settleVaultConsumptionReservation(vaultReservation, plannedVaultTakes, vaultDraws.length);
   // removeUnlockedFromSlots mutates the array only, unlike ctx.removeItem
   // (which fires this itself): fire it once for the whole reagent consumption,
   // the same one-call-at-the-end contract items.ts's own hand-rolled removal
-  // walks (removePreferFungible, removeVendorSellUnits) follow. A vault-only
-  // draw changes no bag slot, so it skips the fire (unreachable on the
-  // pre-vault release arm, whose plans always carry a carried take).
-  if (meta && plans.some((plan) => plan.carried.length > 0)) {
+  // walks (removePreferFungible, removeVendorSellUnits) follow. The gate
+  // covers BOTH pools: quest presence counts the vault too (quests/
+  // quest_item_presence.ts playerHoldsQuestItem reads meta.vault), so a
+  // vault-only draw reduces a store that presence reads and must recompute
+  // just like a carried draw. Only a craft that drew from neither pool skips
+  // the fire.
+  if (meta && plans.some((plan) => plan.carried.length > 0 || plan.vault.length > 0)) {
     ctx.onInventoryChangedForQuests?.(meta);
   }
   // Jack of All Trades improviser variance roll (#1296): an ADDITIONAL
