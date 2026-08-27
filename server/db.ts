@@ -1286,8 +1286,11 @@ export async function ensureSchema(): Promise<void> {
   const client = new Client({ connectionString: DATABASE_URL });
   // The schema fragments report through RAISE NOTICE (the storage-purchase
   // refused-row sweep names what it removed); node-postgres discards notices
-  // that no listener consumes, so forward them to the boot log.
-  client.on('notice', (notice) => console.warn(`[schema] ${notice.message}`));
+  // that no listener consumes, so forward them to the boot log. The typeof
+  // guard tolerates minimal test fakes, the pool.on idiom above.
+  if (typeof client.on === 'function') {
+    client.on('notice', (notice) => console.warn(`[schema] ${notice.message}`));
+  }
   try {
     // Inside the try so the finally's end() always runs, even on a connect
     // failure (end() on a never-connected client is a harmless no-op).

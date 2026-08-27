@@ -2201,11 +2201,13 @@ describe('the atomic save-and-book, in SQL', () => {
     leaseNonce: 'nonce-1',
   };
 
-  it('passes the exact ledger snapshot as argument seven at both WOC character-save sites', async () => {
+  it('passes the normalized ledger snapshot as argument seven at both WOC character-save sites', async () => {
     // There are exactly two character-only marketplace transactions. Both
-    // must hand the generic save helper the captured object itself: rebuilding
-    // or filtering a mixed prefix breaks receipt identity, while omitting one
-    // site makes that WOC rail commit state without its audit rows.
+    // must hand the generic save helper the captured snapshot NORMALIZED
+    // through the one snapshot-to-effects seam (bankLedgerSaveEffects, the
+    // paid_guild_creation shape): rebuilding or filtering a mixed prefix
+    // breaks receipt identity, while omitting one site makes that WOC rail
+    // commit state without its audit rows.
     const { stripComments } = await import('../helpers/strip_comments');
     const src = stripComments(
       readFileSync(new URL('../../server/woc_market_db.ts', import.meta.url), 'utf8'),
@@ -2215,12 +2217,14 @@ describe('the atomic save-and-book, in SQL', () => {
     );
     expect(calls).toHaveLength(2);
     for (const args of calls) {
-      expect(args.match(/save\.bankLedgerSnapshot/g)).toHaveLength(1);
-      expect(args).toMatch(/save\.storageEffects,\s*save\.bankLedgerSnapshot,/);
+      expect(
+        args.match(
+          /save\.bankLedgerSnapshot \? bankLedgerSaveEffects\(save\.bankLedgerSnapshot\) : undefined/g,
+        ),
+      ).toHaveLength(1);
+      expect(args).toMatch(/save\.storageEffects,\s*save\.bankLedgerSnapshot \?/);
     }
-    expect(
-      calls.filter((args) => /save\.bankLedgerSnapshot,\s*accountLock,/.test(args)),
-    ).toHaveLength(1);
+    expect(calls.filter((args) => /: undefined,\s*accountLock,/.test(args))).toHaveLength(1);
   });
 
   it('persists the fenced character write and the booking in one transaction', async () => {

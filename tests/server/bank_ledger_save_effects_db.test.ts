@@ -42,6 +42,7 @@ import {
   BANK_LEDGER_GROWTH_LIMIT_CONSTRAINT,
   BANK_LEDGER_GROWTH_LIMIT_SQLSTATE,
   BankLedgerGrowthLimitExceeded,
+  bankLedgerGrowthBudgetReadbackSql,
 } from '../../server/bank_ledger_growth_budget';
 import type { SerializedBankLedgerOutboxRow } from '../../server/bank_ledger_outbox';
 import {
@@ -996,14 +997,10 @@ describe('bank ledger receipt schema boot wiring', () => {
     // The growth fragment is followed by ONE single-statement counter readback
     // (multi-statement queries return an ARRAY of results, so db.ts reads the
     // counters back separately), then COMMIT. Pin both so a fragment inserted
-    // between the growth DDL and COMMIT cannot ride in unnoticed.
-    const readback = h.bootCalls.findIndex(
-      (sql) =>
-        typeof sql === 'string' &&
-        sql.includes(
-          'SELECT committed_rows, hard_limit_rows FROM public.bank_ledger_growth_budget',
-        ),
-    );
+    // between the growth DDL and COMMIT cannot ride in unnoticed. The readback
+    // is matched through the SAME exported builder db.ts issues, so the two
+    // cannot drift (the point of exporting it beside the schema builder).
+    const readback = h.bootCalls.indexOf(bankLedgerGrowthBudgetReadbackSql());
     expect(readback).toBe(growthBudget + 1);
     expect(growthBudget).toBe(commit - 2);
   });

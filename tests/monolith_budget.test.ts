@@ -520,7 +520,7 @@ const MONOLITHS: MonolithRow[] = [
     // The release arm DELETES more than this branch adds, so the merged count lands
     // below the branch pin and the ratchet follows it DOWN. Measured on the merged
     // tree, never reconciled by arithmetic. Exact count, zero slack.
-    // Raised +26 at the third-round fixes. The substance went to siblings
+    // Raised +29 at the third-round fixes. The substance went to siblings
     // (db_backend_cancel.ts owns the dedicated cancel side pool;
     // BANK_LEDGER_BATCH_RECEIPTS_VALIDATE_SQL lives with its schema in
     // bank_ledger_batch_db.ts; the readback SQL moved beside its builder in
@@ -528,9 +528,11 @@ const MONOLITHS: MonolithRow[] = [
     // none of those can own: the boot client's RAISE NOTICE forward, the
     // readback issue-and-warn before COMMIT, the post-listen VALIDATE call in
     // the concurrent-index runner, and the delete call-site handing the
-    // dedicated canceller. The raise is this PR's REQUEST, not a settled
-    // ruling: merging is what ratifies it. Exact count, zero slack.
-    ceiling: 4950,
+    // dedicated canceller (plus the typeof guard that keeps the notice
+    // forward tolerant of minimal test fakes, the pool.on idiom). The raise
+    // is this PR's REQUEST, not a settled ruling: merging is what ratifies
+    // it. Exact count, zero slack.
+    ceiling: 4953,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {

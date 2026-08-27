@@ -49,7 +49,8 @@ const h = vi.hoisted(() => {
     // The growth-budget gauge readback (a single-statement SELECT): seed the
     // counters so the wiring test can assert they reach the observer.
     if (
-      String(sql).includes('FROM public.bank_ledger_growth_budget') &&
+      String(sql).includes('.bank_ledger_growth_budget') &&
+      String(sql).includes('SELECT committed_rows') &&
       String(sql).includes('singleton = TRUE')
     ) {
       return Promise.resolve({
@@ -108,7 +109,10 @@ vi.mock('../server/bank_ledger_growth_budget', async (importOriginal) => {
   };
 });
 
-import { observeBankLedgerGrowthBudget } from '../server/bank_ledger_growth_budget';
+import {
+  bankLedgerGrowthBudgetReadbackSql,
+  observeBankLedgerGrowthBudget,
+} from '../server/bank_ledger_growth_budget';
 import {
   BANK_LEDGER_ACCOUNT_BROAD_RETIRE_SQL,
   BANK_LEDGER_ACCOUNT_FK_INDEX_SQL,
@@ -502,13 +506,10 @@ describe('ensureSchema wires every schema module at boot', () => {
         sql.includes('bank_ledger_growth_budget') && sql.includes('CREATE TABLE IF NOT EXISTS'),
     );
     expect(fragmentIndex).toBeGreaterThanOrEqual(0);
+    // Matched through the SAME exported builder db.ts issues (exported beside
+    // the schema builder precisely so the two cannot drift).
     const readbackIndex = h.calls.findIndex(
-      (sql, index) =>
-        index > fragmentIndex &&
-        sql.includes(
-          'SELECT committed_rows, hard_limit_rows FROM public.bank_ledger_growth_budget',
-        ) &&
-        sql.includes('singleton = TRUE'),
+      (sql, index) => index > fragmentIndex && sql === bankLedgerGrowthBudgetReadbackSql(),
     );
     expect(readbackIndex).toBeGreaterThan(fragmentIndex);
     expect(readbackIndex).toBeLessThan(h.calls.indexOf('COMMIT'));
