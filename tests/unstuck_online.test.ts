@@ -164,6 +164,34 @@ function forceIntoBgWallTrap(server: GameServer, match: BgMatch, pid: number): E
   return player;
 }
 
+function forceIntoBgWallContact(server: GameServer, match: BgMatch, pid: number): Entity {
+  const origin = battlegroundOrigin(match.slot);
+  const player = must(server.sim.entities.get(pid), 'wall-contact battleground player');
+  player.pos = server.sim.ctx.groundPos(origin.x - 48.5, origin.z - 133.5);
+  player.prevPos = { ...player.pos };
+  player.facing = -Math.PI / 2;
+  player.prevFacing = player.facing;
+  player.vx = 0;
+  player.vy = 0;
+  player.vz = 0;
+  player.onGround = true;
+  player.jumping = false;
+  player.inCombat = false;
+  player.combatTimer = 999;
+  must(server.sim.meta(pid), 'wall-contact player meta').moveInput.forward = true;
+  server.sim.ctx.rebucket(player);
+  const resolved = resolvePosition(
+    server.sim.cfg.seed,
+    player.pos.x,
+    player.pos.z,
+    PLAYER_BODY_RADIUS,
+  );
+  expect(Math.hypot(resolved.x - player.pos.x, resolved.z - player.pos.z)).toBeLessThanOrEqual(
+    1e-6,
+  );
+  return player;
+}
+
 function inBgGraveyard(server: GameServer, match: BgMatch, pid: number): boolean {
   const origin = battlegroundOrigin(match.slot);
   const plot = BG_GRAVEYARDS[0];
@@ -268,6 +296,36 @@ describe('online unstuck command wiring', () => {
       1e-6,
     );
     expect(player.cooldowns.get(UNSTUCK_COOLDOWN_ID)).toBe(UNSTUCK_SUCCESS_COOLDOWN_SECONDS);
+  });
+
+  it('the Settings command completes for a battleground wall-contact fighter holding movement', () => {
+    const server = new GameServer();
+    const { session } = join(server, 22);
+    const { match, pid } = activeBattlegroundForSession(server, session);
+    const player = forceIntoBgWallContact(server, match, pid);
+
+    send(server, session, { cmd: 'unstuck' });
+
+    expect(server.sim.meta(pid)?.pendingUnstuck).toMatchObject({
+      area: {
+        kind: 'battleground',
+        id: 'thornhollow_fields',
+        instanceId: String(match.id),
+        slot: match.slot,
+      },
+    });
+
+    const events: SimEvent[] = [];
+    for (let i = 0; i < UNSTUCK_COUNTDOWN_SECONDS * 20; i++) events.push(...server.sim.tick());
+
+    expect(events).toContainEqual(
+      expect.objectContaining({ type: 'unstuck', phase: 'completed', pid }),
+    );
+    expect(server.sim.bgMatchFor(pid)).toBe(match);
+    expect(inBgGraveyard(server, match, pid)).toBe(true);
+    expect(player.vx).toBe(0);
+    expect(player.vz).toBe(0);
+    expect(server.sim.meta(pid)?.moveInput.forward).toBe(false);
   });
 
   it('the slash alias pays the command lane (a drained lane refuses it)', () => {

@@ -36,6 +36,7 @@ import {
   moveToGraveyardForUnstuck,
   reviveAtGraveyardForUnstuck,
 } from './spirit';
+import { settleTeleportArrival } from './teleport_arrival';
 import {
   DT,
   type Entity,
@@ -442,11 +443,7 @@ function completeBattlegroundUnstuck(
   ctx.rebucket(p);
   Object.assign(meta.moveInput, emptyMoveInput());
   p.vx = 0;
-  p.vy = 0;
   p.vz = 0;
-  p.jumping = false;
-  p.onGround = true;
-  p.fallStartY = p.pos.y;
   p.targetId = null;
   p.autoAttack = false;
   p.queuedOnSwing = null;
@@ -454,6 +451,7 @@ function completeBattlegroundUnstuck(
   delete p.queuedOnSwingCostMultiplier;
   p.queuedCastAbility = null;
   p.queuedCastAim = null;
+  settleTeleportArrival(p);
   if (!p.dead && !p.ghost) applyUnstuckSickness(ctx, p);
   return unstuckLocationAt(ctx, p.id, p.pos)?.point ?? null;
 }
