@@ -19,6 +19,7 @@ import {
 import { beginCharacterSaveTx, prepareCharacterSaveEffects } from './character_save_transaction';
 import { saveCharacterStateOnClient } from './db';
 import {
+  backendCancelViaPool,
   createDbTransactionDeadline,
   DbTransactionAborted,
   type DbTransactionDeadlineClient,
@@ -37,10 +38,55 @@ export interface PaidGuildCreateDbClient extends DbTransactionDeadlineClient {}
 
 export interface PaidGuildCreateDbPool {
   connect(): Promise<PaidGuildCreateDbClient>;
+  /** Optional so narrow fakes stay valid; with it, a deadline that destroys a
+   * paid-create socket also fires pg_cancel_backend so held locks drop early. */
+  query?(sql: string, values: unknown[]): Promise<unknown>;
 }
 
+/** One admission through the major-background gate; release is idempotent. */
+export interface PaidGuildBackgroundPermit {
+  release(): void;
+}
+
+/** FIFO wait on the realm's ONE major-background database gate. Null means
+ * the signal fired before a permit was granted. */
+export type PaidGuildAcquireBackgroundPermit = (
+  signal?: AbortSignal,
+) => Promise<PaidGuildBackgroundPermit | null>;
+
+// Paid guild creation checks out pool clients for background-shaped work (the
+// atomic create rides the character-save FIFO; receipt reconciliation is
+// retryable), so its checkouts must count against the SAME realm-wide
+// major-producer gate as autosave, storage recovery, and market escrow.
+// Ungated, its in-flight cap (2) stacked ON TOP of the gate's permits and the
+// composition arithmetic exceeded the pool at peak. The gate instance lives in
+// server/main.ts; game.ts builds the deps, so main.ts registers the acquirer
+// here at boot (the configure*Runtime idiom). Unit worlds that construct deps
+// directly may inject deps.acquireBackgroundPermit instead; with NEITHER
+// present, checkouts proceed ungated (DB-mocked worlds only, never production).
+let registeredAcquireBackgroundPermit: PaidGuildAcquireBackgroundPermit | null = null;
+
+export function configurePaidGuildCreateBackgroundGate(
+  acquire: PaidGuildAcquireBackgroundPermit | null,
+): void {
+  registeredAcquireBackgroundPermit = acquire;
+}
+
+/** Bound on the background-permit wait. The create job's FIFO queue timeout
+ * is cleared the moment the queued closure starts (paid_guild_creation.ts),
+ * so an unbounded gate wait here would pin the character's save-FIFO slot
+ * forever under a saturated gate; the sibling escrow path bounds the same
+ * wait (main.ts WOC_ESCROW_BACKGROUND_PERMIT_WAIT_MS) at the same value. */
+export const PAID_GUILD_BACKGROUND_PERMIT_WAIT_MS = 15_000;
 export const PAID_GUILD_RECEIPT_RECONCILE_ATTEMPTS = 3;
 export const PAID_GUILD_RECEIPT_RECONCILE_QUERY_TIMEOUT_MS = 500;
+/** Minimum reconcile budget worth opening a transaction for. The 500ms
+ * deadline is stamped BEFORE the pool checkout, which under load can eat
+ * almost all of it; below this floor a BEGIN would only buy a doomed
+ * few-millisecond SELECT, and three such attempts would convert pure pool
+ * contention into a definitive "no receipt" for a founder who was already
+ * charged. Such an attempt is a retryable acquisition failure instead. */
+export const PAID_GUILD_RECEIPT_MIN_BUDGET_MS = 50;
 export const PAID_GUILD_RECEIPT_SERVER_TIMEOUT_MAX_MS = 400;
 export const PAID_GUILD_RECEIPT_CLEANUP_MARGIN_MS = 25;
 export const PAID_GUILD_RECEIPT_RECONCILE_BACKOFF_MS = 25;
@@ -82,6 +128,9 @@ export interface PaidGuildCreateArgs {
 
 export interface PaidGuildCreateDeps {
   readonly pool: PaidGuildCreateDbPool;
+  /** Overrides the module-registered gate acquirer (unit worlds). Production
+   * wiring goes through configurePaidGuildCreateBackgroundGate in main.ts. */
+  readonly acquireBackgroundPermit?: PaidGuildAcquireBackgroundPermit;
   /** PgSocialDb owns this instance-local cache, so its owner supplies the bust. */
   readonly bustGuildRoster: (guildId: number) => void;
   /** Cache invalidation must not replace a known durability result. */
@@ -145,11 +194,76 @@ function reportCleanupError(deps: PaidGuildCreateDeps, error: unknown): void {
   }
 }
 
+/** Tie the gate permit's lifetime to the pool client's: whichever path
+ * releases the client (deadline destruction included) frees the permit too,
+ * and permit release is idempotent so double-release paths stay safe. */
+function clientWithPermit(
+  client: PaidGuildCreateDbClient,
+  permit: PaidGuildBackgroundPermit,
+): PaidGuildCreateDbClient {
+  return {
+    query: (text: string, values?: unknown[]) => client.query(text, values),
+    release: (error?: Error | boolean) => {
+      try {
+        if (error === undefined) client.release();
+        else client.release(error);
+      } finally {
+        permit.release();
+      }
+    },
+    on: (event: 'error', listener: (error: Error) => void) => client.on(event, listener),
+    removeListener: (event: 'error', listener: (error: Error) => void) =>
+      client.removeListener(event, listener),
+    processID: client.processID,
+  } as PaidGuildCreateDbClient;
+}
+
+/**
+ * Gate-then-checkout: a major-background permit is acquired BEFORE the pool
+ * checkout so paid guild creation composes under the realm's one background
+ * gate instead of stacking its own cap on top of it. A null permit (the
+ * caller's signal fired while queued on the gate) is the same prompt abort a
+ * cancelled checkout answers. On the abort-while-queued checkout path the
+ * permit releases with the rejection; the eventual client is destroyed in the
+ * background and returns to the pool on arrival.
+ */
+async function acquirePaidGuildCreateClient(
+  deps: PaidGuildCreateDeps,
+  signal: AbortSignal | undefined,
+  operation = 'paid guild create',
+): Promise<PaidGuildCreateDbClient> {
+  const acquirePermit = deps.acquireBackgroundPermit ?? registeredAcquireBackgroundPermit;
+  if (!acquirePermit) return acquirePaidGuildCreateCheckout(deps, signal, operation);
+  // Bounded wait: the caller's signal may never fire once the queued create
+  // job has started (its queue timeout is already cleared), so compose it
+  // with a timer-backed abort. A null permit is the ordinary prompt refusal.
+  const waitController = new AbortController();
+  const waitTimer = setTimeout(() => waitController.abort(), PAID_GUILD_BACKGROUND_PERMIT_WAIT_MS);
+  waitTimer.unref();
+  let permit: PaidGuildBackgroundPermit | null;
+  try {
+    permit = await acquirePermit(
+      signal ? AbortSignal.any([signal, waitController.signal]) : waitController.signal,
+    );
+  } finally {
+    clearTimeout(waitTimer);
+  }
+  if (!permit) throw new DbTransactionAborted(operation, false);
+  let client: PaidGuildCreateDbClient;
+  try {
+    client = await acquirePaidGuildCreateCheckout(deps, signal, operation);
+  } catch (error) {
+    permit.release();
+    throw error;
+  }
+  return clientWithPermit(client, permit);
+}
+
 /**
  * Pool checkout has no cancellation API. If abort wins while queued, return
  * promptly and destroy the eventual client so a stale waiter cannot borrow it.
  */
-function acquirePaidGuildCreateClient(
+function acquirePaidGuildCreateCheckout(
   deps: PaidGuildCreateDeps,
   signal: AbortSignal | undefined,
   operation = 'paid guild create',
@@ -233,6 +347,7 @@ function receiptDeadlineClient(
     on: (event: 'error', listener: (error: Error) => void) => client.on(event, listener),
     removeListener: (event: 'error', listener: (error: Error) => void) =>
       client.removeListener(event, listener),
+    processID: client.processID,
   } as PaidGuildCreateDbClient;
 }
 
@@ -254,12 +369,30 @@ async function readPaidGuildReceiptOnce(
   try {
     unownedClient = await acquirePaidGuildCreateClient(deps, controller.signal, operation);
     const client = unownedClient;
+    // The checkout may have consumed most of the deadline. Below the minimum
+    // useful budget, refuse as a retryable acquisition failure (release the
+    // client, let the attempt ladder retry) rather than open a transaction
+    // whose SELECT is doomed by construction.
     const transactionBudgetMs = deadlineAtMs - Date.now();
+    if (transactionBudgetMs < PAID_GUILD_RECEIPT_MIN_BUDGET_MS) {
+      controller.abort();
+      const aborted = new DbTransactionAborted(operation, false);
+      try {
+        client.release(aborted);
+      } catch (releaseError) {
+        reportCleanupError(deps, releaseError);
+      }
+      unownedClient = null;
+      throw aborted;
+    }
     try {
       transaction = createDbTransactionDeadline(receiptDeadlineClient(deps, client), {
         operation,
-        timeoutMs: Math.max(1, transactionBudgetMs),
+        timeoutMs: transactionBudgetMs,
         signal: controller.signal,
+        cancelBackend: deps.pool.query
+          ? backendCancelViaPool({ query: deps.pool.query.bind(deps.pool) })
+          : undefined,
       });
       unownedClient = null;
     } catch (error) {
@@ -270,10 +403,6 @@ async function readPaidGuildReceiptOnce(
       }
       unownedClient = null;
       throw error;
-    }
-    if (transactionBudgetMs <= 0) {
-      controller.abort();
-      throw new DbTransactionAborted(operation, false);
     }
     await transaction.query('BEGIN READ ONLY');
     const remainingMs = deadlineAtMs - Date.now();
@@ -595,7 +724,17 @@ export async function createPaidGuildWithLeaderAtomic(
   let commitIssued = false;
   try {
     const client = await acquirePaidGuildCreateClient(deps, input.signal);
-    transaction = await beginCharacterSaveTx(client, 'paid guild create', input.signal);
+    // Same lock-drop story as db.ts's beginSaveTx wrapper: a destroyed socket
+    // also cancels the backend so held locks drop early.
+    const cancelBackend = deps.pool.query
+      ? backendCancelViaPool({ query: deps.pool.query.bind(deps.pool) })
+      : undefined;
+    transaction = await beginCharacterSaveTx(
+      client,
+      'paid guild create',
+      input.signal,
+      cancelBackend,
+    );
 
     await transaction.query(GUILD_NAME_ADVISORY_LOCK_SQL, [guildNameLockKey(REALM, input.name)]);
     const collision = await transaction.query(GUILD_NAME_COLLISION_SQL, [REALM, input.name, null]);

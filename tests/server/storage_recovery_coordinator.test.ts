@@ -381,16 +381,29 @@ describe('StorageRecoveryCoordinator', () => {
   it('models the healthy done-yield-rescan path inside its scheduler target', async () => {
     const scheduler = fakeScheduler();
     const warn = vi.fn();
-    const scanOccupancyAssumptionMs = 250;
-    const normalPathBudgetMs =
-      STORAGE_RECOVERY_TARGET_DRIVE_DRAIN_MS + scanOccupancyAssumptionMs * 2;
+    // The scan occupancy is DERIVED from the real constants, never invented:
+    // each key costs two scans across SCAN_CONCURRENCY lanes against one
+    // SLOT_OCCUPANCY_TARGET drive across DRIVE_CONCURRENCY lanes, so the scan
+    // side breaks even with the drive drain at TARGET * SCAN/(2*DRIVE).
+    // Half that share keeps drives the binding term, and retuning any of the
+    // constants moves the fixture and the assertions together.
+    const scanOccupancyMs =
+      (STORAGE_RECOVERY_SLOT_OCCUPANCY_TARGET_MS * STORAGE_RECOVERY_SCAN_CONCURRENCY) /
+      (2 * STORAGE_RECOVERY_DRIVE_CONCURRENCY) /
+      2;
+    // Outside the drive drain, the only normal-path time is the pipeline's
+    // two scan ends (the first adoption scan and the last confirming rescan).
+    const normalPathBudgetMs = STORAGE_RECOVERY_TARGET_DRIVE_DRAIN_MS + scanOccupancyMs * 2;
+    // The horizon relation itself, in constants: the derived normal-path
+    // ceiling must clear the warning horizon, or a healthy walk would warn.
+    expect(normalPathBudgetMs).toBeLessThan(STORAGE_RECOVERY_HORIZON_WARNING_MS);
     const scansByCharacter = new Map<number, number>();
     let drivesFinished = 0;
     const coordinator = new StorageRecoveryCoordinator<Row>(
       {
         scan: (characterId) =>
           new Promise<Row | null>((resolve) => {
-            scheduler.scheduler.schedule(scanOccupancyAssumptionMs, () => {
+            scheduler.scheduler.schedule(scanOccupancyMs, () => {
               const scanNumber = (scansByCharacter.get(characterId) ?? 0) + 1;
               scansByCharacter.set(characterId, scanNumber);
               resolve(scanNumber === 1 ? { idempotencyKey: `k${characterId}` } : null);
@@ -834,6 +847,113 @@ describe('StorageRecoveryCoordinator', () => {
     }
     expect(attempts).toHaveLength(8);
     coordinator.reset();
+  });
+
+  it('walks the drive-retry ladder through the pinned literals to its clamped cap', async () => {
+    // random = 1 puts equal jitter at its ceiling, so each scheduled delay is
+    // exactly its ladder base: the walk pins the LITERALS, not a derivation.
+    const scheduler = fakeScheduler(1);
+    const delays: number[] = [];
+    let drives = 0;
+    const coordinator = new StorageRecoveryCoordinator<Row>(
+      {
+        scan: async () => ({ idempotencyKey: 'retry-me' }),
+        reserve: () => true,
+        drive: async () => {
+          drives++;
+          return 'retry';
+        },
+        prepareScan: vi.fn(),
+        release: vi.fn(),
+        warn: vi.fn(),
+      },
+      scheduler.scheduler,
+    );
+    coordinator.kick(9);
+    await tick();
+    const maxBackoffMs = STORAGE_RECOVERY_BACKOFF_MS.at(-1) ?? 0;
+    for (let attempt = 0; attempt < 7; attempt++) {
+      const live = scheduler.timers.filter(
+        (timer) => !timer.cancelled && timer.delay <= maxBackoffMs,
+      );
+      expect(live).toHaveLength(1);
+      delays.push(live[0].delay);
+      scheduler.fireNext();
+      await tick();
+    }
+    expect(delays).toEqual([2_000, 5_000, 15_000, 30_000, 60_000, 60_000, 60_000]);
+    expect(drives).toBe(8);
+    // Every one of the eight 'retry' results scheduled a rung; the walk above
+    // fired the first seven, and the eighth is standing when metrics is read.
+    expect(coordinator.metrics().retriesScheduled).toBe(8);
+    coordinator.reset();
+  });
+
+  it('holds a reserve() refusal on the retry ladder without rescanning until admitted', async () => {
+    const scheduler = fakeScheduler(1);
+    const reserveAnswers = [false, false, true];
+    let scans = 0;
+    let rescanRow: Row | null | undefined;
+    const driveStarts: number[] = [];
+    const prepareScan = vi.fn((_characterId: number, previousRow: Row | null) => {
+      rescanRow = previousRow;
+    });
+    const coordinator = new StorageRecoveryCoordinator<Row>(
+      {
+        scan: async () => {
+          scans++;
+          return scans === 1 ? { idempotencyKey: 'held-row' } : null;
+        },
+        reserve: () => reserveAnswers.shift() ?? true,
+        drive: async () => {
+          driveStarts.push(scheduler.now());
+          return 'done';
+        },
+        prepareScan,
+        release: vi.fn(),
+        warn: vi.fn(),
+      },
+      scheduler.scheduler,
+    );
+    coordinator.kick(5);
+    await tick();
+
+    // The refused reservation consumed no drive slot and no fresh scan: the
+    // known row waits on the ladder's FIRST rung (2s base, jitter ceiling).
+    expect(scans).toBe(1);
+    expect(driveStarts).toEqual([]);
+    expect(coordinator.metrics()).toMatchObject({ retriesScheduled: 1, driveActive: 0 });
+    const maxBackoffMs = STORAGE_RECOVERY_BACKOFF_MS.at(-1) ?? 0;
+    const rung = (): number => {
+      const live = scheduler.timers.filter(
+        (timer) => !timer.cancelled && timer.delay <= maxBackoffMs,
+      );
+      expect(live).toHaveLength(1);
+      return live[0].delay;
+    };
+    expect(rung()).toBe(2_000);
+
+    // A second refusal climbs the SAME ladder a drive retry uses, still
+    // holding the row: no rescan may replace a refused-but-reserved key.
+    scheduler.fireNext();
+    await tick();
+    expect(scans).toBe(1);
+    expect(driveStarts).toEqual([]);
+    expect(coordinator.metrics().retriesScheduled).toBe(2);
+    expect(rung()).toBe(5_000);
+
+    // Admission on the third answer starts the drive with the HELD row and
+    // no third scan; the confirming rescan after 'done' releases the key.
+    scheduler.fireNext();
+    await tick();
+    expect(driveStarts).toHaveLength(1);
+    expect(scans).toBe(1);
+    expect(prepareScan).toHaveBeenCalledWith(5, { idempotencyKey: 'held-row' });
+    expect(rescanRow).toEqual({ idempotencyKey: 'held-row' });
+    scheduler.yieldNext();
+    await tick();
+    expect(scans).toBe(2);
+    expect(coordinator.metrics().tracked).toBe(0);
   });
 
   it('cancels queued and timed work on stop, then drains active work', async () => {

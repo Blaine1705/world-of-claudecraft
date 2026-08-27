@@ -33,8 +33,11 @@ vi.mock('../../server/admin_guilds_read', () => ({
 
 import { DbTransactionAborted } from '../../server/db_transaction_deadline';
 import {
+  configurePaidGuildCreateBackgroundGate,
   createPaidGuildWithLeaderAtomic,
+  PAID_GUILD_BACKGROUND_PERMIT_WAIT_MS,
   PAID_GUILD_RECEIPT_CLEANUP_MARGIN_MS,
+  PAID_GUILD_RECEIPT_MIN_BUDGET_MS,
   PAID_GUILD_RECEIPT_SERVER_TIMEOUT_MAX_MS,
   type PaidGuildCreateArgs,
   type PaidGuildCreateDbClient,
@@ -1127,5 +1130,206 @@ describe('createPaidGuildWithLeaderAtomic', () => {
     ).resolves.toMatchObject({ durability: 'committed', guildId: GUILD_ID });
     expect(cleanupErrors).toEqual([cleanupFailure]);
     expect(mocks.bustAdminGuildListReads).toHaveBeenCalledTimes(1);
+  });
+
+  it('routes every pool checkout through one background permit, released with the client', async () => {
+    // The lost-COMMIT-plus-receipt shape exercises BOTH checkout sites: the
+    // atomic transaction and the reconcile read each acquire their own permit
+    // BEFORE pool.connect and free it when their client is released (the
+    // destructive COMMIT-failure release included).
+    const failure = new Error('socket lost after COMMIT write');
+    const client = new FakeClient({ commitError: failure });
+    const receiptClient = new FakeClient({ receipt: feeReceipt() });
+    const clients: FakeClient[] = [client, receiptClient];
+    const connect = vi.fn(async (): Promise<PaidGuildCreateDbClient> => {
+      mocks.events.push('connect');
+      return clients.shift() ?? new FakeClient();
+    });
+    const acquireBackgroundPermit = vi.fn(async () => {
+      mocks.events.push('permit_acquire');
+      return {
+        release: () => {
+          mocks.events.push('permit_release');
+        },
+      };
+    });
+
+    await expect(
+      createPaidGuildWithLeaderAtomic(
+        { pool: { connect }, bustGuildRoster: vi.fn(), acquireBackgroundPermit },
+        args(),
+      ),
+    ).resolves.toMatchObject({ durability: 'committed', guildId: GUILD_ID });
+
+    expect(acquireBackgroundPermit).toHaveBeenCalledTimes(2);
+    expect(connect).toHaveBeenCalledTimes(2);
+    expect(
+      mocks.events.filter((event) => event === 'connect' || event.startsWith('permit_')),
+    ).toEqual([
+      'permit_acquire',
+      'connect',
+      'permit_release',
+      'permit_acquire',
+      'connect',
+      'permit_release',
+    ]);
+  });
+
+  it('refuses without a pool checkout when the background gate answers null', async () => {
+    const connect = vi.fn(async (): Promise<PaidGuildCreateDbClient> => new FakeClient());
+    const acquireBackgroundPermit = vi.fn(async () => null);
+
+    await expect(
+      createPaidGuildWithLeaderAtomic(
+        { pool: { connect }, bustGuildRoster: vi.fn(), acquireBackgroundPermit },
+        args(),
+      ),
+    ).resolves.toMatchObject({
+      durability: 'not_committed',
+      reason: 'database_error',
+      error: expect.objectContaining({
+        name: 'DbTransactionAborted',
+        commitMayHaveSucceeded: false,
+      }),
+    });
+    expect(connect).not.toHaveBeenCalled();
+  });
+
+  it('refuses at the bounded permit wait instead of pinning the save-FIFO slot forever', async () => {
+    // The queued create job clears its own FIFO queue timeout the moment it
+    // starts, so a gate that never answers must be cut off by the module's own
+    // bound rather than waiting on a caller signal that will never fire.
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'Date'] });
+    expect(PAID_GUILD_BACKGROUND_PERMIT_WAIT_MS).toBe(15_000);
+    const connect = vi.fn(async (): Promise<PaidGuildCreateDbClient> => new FakeClient());
+    // A saturated gate: a permit is granted only if the composed signal never
+    // fires, and a fired signal resolves null (the acquirer contract).
+    const acquireBackgroundPermit = vi.fn(
+      (signal?: AbortSignal) =>
+        new Promise<null>((resolve) => {
+          signal?.addEventListener('abort', () => resolve(null), { once: true });
+        }),
+    );
+
+    try {
+      let settled = false;
+      const outcome = createPaidGuildWithLeaderAtomic(
+        { pool: { connect }, bustGuildRoster: vi.fn(), acquireBackgroundPermit },
+        args(),
+      ).then((result) => {
+        settled = true;
+        return result;
+      });
+
+      await vi.advanceTimersByTimeAsync(PAID_GUILD_BACKGROUND_PERMIT_WAIT_MS - 1);
+      expect(settled).toBe(false);
+
+      await vi.advanceTimersByTimeAsync(1);
+      await expect(outcome).resolves.toMatchObject({
+        durability: 'not_committed',
+        reason: 'database_error',
+        error: expect.objectContaining({
+          name: 'DbTransactionAborted',
+          commitMayHaveSucceeded: false,
+        }),
+      });
+      expect(connect).not.toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('falls back to the module-registered gate acquirer when deps omit one', async () => {
+    // The production shape: game.ts builds { pool, bustGuildRoster } and
+    // main.ts registers the realm gate at boot.
+    const client = new FakeClient();
+    const { deps, connect } = harness(client);
+    const release = vi.fn();
+    const acquire = vi.fn(async () => ({ release }));
+    configurePaidGuildCreateBackgroundGate(acquire);
+    try {
+      await expect(createPaidGuildWithLeaderAtomic(deps, args())).resolves.toMatchObject({
+        durability: 'committed',
+      });
+      expect(acquire).toHaveBeenCalledTimes(1);
+      expect(connect).toHaveBeenCalledTimes(1);
+      expect(release).toHaveBeenCalled();
+    } finally {
+      configurePaidGuildCreateBackgroundGate(null);
+    }
+  });
+
+  it('retries a receipt attempt whose checkout consumed the budget instead of opening a doomed transaction', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'Date'] });
+    expect(PAID_GUILD_RECEIPT_MIN_BUDGET_MS).toBe(50);
+    const failure = new Error('completion unknown');
+    const transactionClient = new FakeClient({ commitError: failure });
+    const slowCheckoutReceipt = new FakeClient({ receipt: feeReceipt() });
+    const provingReceipt = new FakeClient({ receipt: feeReceipt() });
+    let checkout = 0;
+    const connect = vi.fn(async (): Promise<PaidGuildCreateDbClient> => {
+      checkout++;
+      if (checkout === 1) return transactionClient;
+      if (checkout === 2) {
+        // Pool contention eats 460 of the 500ms reconcile deadline BEFORE the
+        // client arrives, leaving 40ms: under the 50ms minimum useful budget.
+        vi.setSystemTime(Date.now() + 460);
+        return slowCheckoutReceipt;
+      }
+      return provingReceipt;
+    });
+
+    try {
+      const outcome = createPaidGuildWithLeaderAtomic(
+        { pool: { connect }, bustGuildRoster: vi.fn() },
+        args(),
+      );
+      // Attempt 1 refuses at checkout; the 25ms attempt-1 backoff then admits
+      // attempt 2, whose receipt read proves the lost COMMIT landed. A
+      // load-induced slow checkout is therefore never converted into a
+      // definitive no-receipt answer for a founder who was already charged.
+      await vi.advanceTimersByTimeAsync(25);
+      await expect(outcome).resolves.toEqual({
+        durability: 'committed',
+        guildId: GUILD_ID,
+        feeBatchKey: 'ledger:guild-create',
+      });
+      // No transaction was opened on the budgetless client: no BEGIN, no
+      // bounds, no SELECT. It was released promptly as a retryable abort.
+      expect(slowCheckoutReceipt.queries).toEqual([]);
+      expect(slowCheckoutReceipt.release).toHaveBeenCalledTimes(1);
+      expect(slowCheckoutReceipt.release.mock.calls[0]?.[0]).toMatchObject({
+        name: 'DbTransactionAborted',
+        commitMayHaveSucceeded: false,
+      });
+      expect(provingReceipt.queries.map((query) => query.kind)).toEqual([
+        'begin',
+        'bounds',
+        'receipt_lookup',
+        'rollback',
+      ]);
+      expect(connect).toHaveBeenCalledTimes(3);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+});
+
+describe('backend cancel wiring (source pins)', () => {
+  it('wires pg_cancel into both paid-guild transaction deadlines', async () => {
+    const { readFileSync } = await import('node:fs');
+    const { stripComments } = await import('../helpers/strip_comments');
+    const src = stripComments(
+      readFileSync(new URL('../../server/guild_create_db.ts', import.meta.url), 'utf8'),
+    );
+    // The receipt-reconcile deadline and the create transaction both cancel the
+    // backend when the deadline destroys the socket, so held locks drop early.
+    // The pool type is connect-only for narrow fakes, so the wiring guards on
+    // the optional query capability before building the cancel hook.
+    expect(src).toContain('cancelBackend: deps.pool.query');
+    expect(src).toContain('backendCancelViaPool({ query: deps.pool.query.bind(deps.pool) })');
+    expect(src).toMatch(
+      /beginCharacterSaveTx\(\s*client,\s*'paid guild create',\s*input\.signal,\s*cancelBackend,?\s*\)/,
+    );
   });
 });

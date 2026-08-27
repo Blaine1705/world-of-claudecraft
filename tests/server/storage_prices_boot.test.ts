@@ -84,7 +84,11 @@ describe('the STORAGE_PRICES boot chain, executed end to end', () => {
     muted();
     const { buildRealmSimConfig } = await import('../../server/sim_boot_config');
     const mod = await import('../../server/storage_prices');
-    const cfg = buildRealmSimConfig(undefined);
+    // The admission parameter is REQUIRED on this seam (a realm boot that
+    // dropped the journal wiring must not compile); this test has no journal,
+    // so it says so with the exported inert constant.
+    const { inertVaultConsumptionAdmission } = await import('../../src/sim/sim_context');
+    const cfg = buildRealmSimConfig(undefined, inertVaultConsumptionAdmission);
     expect(cfg.storagePrices).toStrictEqual({
       vaultUpgrades: [333, 50000, 100000, 200000, 400000],
     });

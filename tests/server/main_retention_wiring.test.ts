@@ -346,40 +346,28 @@ describe('retention sweep wiring in server/main.ts', () => {
     expect(kick).toBeLessThan(handler);
   });
 
-  it('the storage purchase host treats a QUARANTINED session as absent', () => {
-    // server/main.ts builds the two session lookups the purchase flow resolves
-    // a character through. A quarantined session's live state is abandoned and
-    // game.ts saveCharacter refuses its saves outright, so admitting one here
-    // would debit real Claudium against a session that can never persist the
-    // grant. Every other custody wrapper in game.ts already reads
-    // `session.left || session.escrowQuarantined`; these two are the closures
-    // that have to agree with it, and neither is reachable from a unit test
-    // because main.ts boots a server on import.
-    //
-    // Sliced to each closure's OWN body rather than searched file-wide (the
-    // token appears in game.ts too, and a file-wide contains() would pass on
-    // somebody else's guard) and rather than by a fixed character window, which
-    // overruns into the sibling closures below it: if one of those ever grew the
-    // same guard, deleting this one would leave the pin green.
-    const bodyOf = (needle: string): string => {
-      const at = MAIN.indexOf(needle);
-      expect(at, `${needle} is missing from server/main.ts`).toBeGreaterThan(-1);
-      const end = MAIN.indexOf('\n    },', at);
-      expect(end, `${needle} has no closing brace`).toBeGreaterThan(at);
-      return MAIN.slice(at, end);
-    };
-    expect(bodyOf('resolveLiveCharacter: (accountId) => {')).toContain(
-      's.left || s.escrowQuarantined',
+  it('the storage purchase host resolves sessions through the live-character resolver module', () => {
+    // The quarantined-counts-as-absent predicate and the ambiguity rule moved
+    // to server/live_character_resolver.ts, where they are behaviorally
+    // unit-tested (tests/server/live_character_resolver.test.ts). main.ts's
+    // remaining job, pinned here because main.ts boots a server on import, is
+    // to wire the IMPORTED module functions against the live session table,
+    // exactly once each, and to keep the save flags the flow depends on.
+    expect(MAIN).toContain(
+      'resolveLiveCharacter: (accountId) => resolveLiveCharacterFrom(game.clients.values(), accountId)',
     );
-    expect(bodyOf('saveCharacter: (characterId, shouldStart, signal) => {')).toContain(
-      '!s.left && !s.escrowQuarantined',
-    );
-    expect(bodyOf('saveCharacter: (characterId, shouldStart, signal) => {')).toContain(
-      'game.saveCharacter(s, { shouldStart, signal, backgroundDbPermit: true })',
-    );
+    expect(count(MAIN, 'resolveLiveCharacterFrom(')).toBe(1);
 
-    // Exactly one of each, so a second host wiring cannot ship unguarded.
-    expect(count(MAIN, 'resolveLiveCharacter: (accountId) => {')).toBe(1);
+    const saveAt = MAIN.indexOf('saveCharacter: (characterId, shouldStart, signal) => {');
+    expect(saveAt).toBeGreaterThan(-1);
+    const saveEnd = MAIN.indexOf('\n    },', saveAt);
+    expect(saveEnd).toBeGreaterThan(saveAt);
+    const saveBody = MAIN.slice(saveAt, saveEnd);
+    expect(saveBody).toContain('findLiveSessionForCharacter(game.clients.values(), characterId)');
+    expect(saveBody).toContain(
+      'game.saveCharacter(session, { shouldStart, signal, backgroundDbPermit: true })',
+    );
+    expect(count(MAIN, 'findLiveSessionForCharacter(')).toBe(1);
     expect(count(MAIN, 'saveCharacter: (characterId, shouldStart, signal) => {')).toBe(1);
   });
 
@@ -389,10 +377,19 @@ describe('retention sweep wiring in server/main.ts', () => {
     // on the exact live GameServer before the coordinator requests its save.
     const factory = MAIN.indexOf('function storagePurchaseHost()');
     expect(factory).toBeGreaterThan(-1);
-    const body = MAIN.slice(factory, factory + 2500);
+    // End-anchored to the factory's own registration call, never a fixed
+    // character window (a window overruns into the sibling closures below,
+    // exactly what the resolver pin above rejects).
+    const factoryEnd = MAIN.indexOf(
+      'configureStoragePurchaseRuntime(storagePurchaseHost)',
+      factory,
+    );
+    expect(factoryEnd).toBeGreaterThan(factory);
+    const body = MAIN.slice(factory, factoryEnd);
     expect(body).toContain(
       'stageAppliedEffect: (effect) => game.stageStorageAppliedEffect(effect)',
     );
+    expect(count(MAIN, 'stageAppliedEffect:')).toBe(1);
   });
 
   it('shares one major-background database gate across game, market, storage, and metrics', () => {
@@ -405,24 +402,46 @@ describe('retention sweep wiring in server/main.ts', () => {
       'const majorBackgroundDbGate = createBackgroundDbGate(DB_POOL_MAX_CLIENTS)',
     );
     expect(MAIN).toContain('new GameServer(undefined, majorBackgroundDbGate)');
-    expect(MAIN).toContain('const permit = await majorBackgroundDbGate.acquire()');
     expect(MAIN).toContain(
       'acquireBackgroundPermit: (signal) => majorBackgroundDbGate.acquire(signal)',
     );
     expect(MAIN).toContain('tryAcquireBackgroundPermit: () => majorBackgroundDbGate.tryAcquire()');
     expect(MAIN).toContain('backgroundDbGate: () => majorBackgroundDbGate.stats()');
+    // Paid guild creation composes under the SAME gate: game.ts builds the
+    // deps, so the composition root registers the acquirer, exactly once.
+    expect(count(MAIN, 'configurePaidGuildCreateBackgroundGate(')).toBe(1);
+    expect(MAIN).toContain(
+      'configurePaidGuildCreateBackgroundGate((signal) => majorBackgroundDbGate.acquire(signal))',
+    );
 
+    // The escrow enqueue closure: a BOUNDED permit wait (the unbounded form
+    // pinned the character FIFO slot and an escrow-gate hold until the 400s
+    // leak reclaim), and the job NEVER runs on a null permit (the refusal
+    // throw precedes job()).
+    expect(MAIN).toContain('const WOC_ESCROW_BACKGROUND_PERMIT_WAIT_MS = 15_000');
     const custodyStart = MAIN.indexOf('enqueueCharacterWrite: (characterId, job) =>');
     const custodyEnd = MAIN.indexOf('serializeCharacterForPersist:', custodyStart);
     const custody = MAIN.slice(custodyStart, custodyEnd);
     expect(custodyStart).toBeGreaterThan(-1);
     expect(custodyEnd).toBeGreaterThan(custodyStart);
-    expect(custody.indexOf('enqueueCharacterWrite(characterId, async () => {')).toBeLessThan(
-      custody.indexOf('majorBackgroundDbGate.acquire()'),
+    // Whitespace-tolerant (the guild_create pin shape): an indentation-only
+    // reformat must not break the wiring pin.
+    expect(custody).toMatch(
+      /majorBackgroundDbGate\.acquire\(\s*AbortSignal\.timeout\(WOC_ESCROW_BACKGROUND_PERMIT_WAIT_MS\),?\s*\)/,
     );
-    expect(custody.indexOf('majorBackgroundDbGate.acquire()')).toBeLessThan(
+    expect(custody.indexOf('enqueueCharacterWrite(characterId, async () => {')).toBeLessThan(
+      custody.indexOf('majorBackgroundDbGate.acquire('),
+    );
+    expect(custody.indexOf('majorBackgroundDbGate.acquire(')).toBeLessThan(
       custody.indexOf('job()'),
     );
+    const refusal = custody.indexOf(
+      "throw new Error('woc escrow refused: no background database permit')",
+    );
+    expect(refusal).toBeGreaterThan(-1);
+    expect(custody.indexOf('if (!permit)')).toBeGreaterThan(-1);
+    expect(custody.indexOf('if (!permit)')).toBeLessThan(custody.indexOf('job()'));
+    expect(refusal).toBeLessThan(custody.indexOf('job()'));
   });
 
   it('stops admitting storage recovery before the database pool closes', () => {

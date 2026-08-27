@@ -9,7 +9,13 @@
 // a guaranteed interactive reserve; a true reserve requires classifying every
 // checkout or separate priority pools under one connection budget.
 
-export const BACKGROUND_DB_MAJOR_PRODUCER_HEADROOM = 2;
+// Three reserved clients, counted against the pool maximum: two for
+// interactive login/auth/request checkouts, plus one for the process-global
+// bank-ledger FIFO tail (server/bank_ledger.ts), which checks out a pool
+// client OUTSIDE this gate. Without the third reservation the composition
+// arithmetic admits gate permits + the ledger tail = the whole pool, and
+// interactive checkouts eat the full connect timeout at peak.
+export const BACKGROUND_DB_MAJOR_PRODUCER_HEADROOM = 3;
 
 export interface BackgroundDbPermit {
   /** Idempotent: a stale finally block cannot over-release the gate. */
@@ -44,7 +50,11 @@ interface Waiter {
 }
 
 /** At very small operator-configured pools, keep one named-producer lane so
- * durability can still make progress. */
+ * durability can still make progress. At DB_POOL_MAX_CLIENTS=1 the reserve
+ * vanishes entirely: the one named-producer lane IS the only pool client, so
+ * a granted background permit can hold it against interactive checkouts and
+ * the ledger FIFO tail alike. That is accepted (durability beats a reserve
+ * nobody can size at a pool of one); do not "fix" the floor. */
 export function backgroundDbCapacity(
   poolMaxClients: number,
   requestedHeadroom = BACKGROUND_DB_MAJOR_PRODUCER_HEADROOM,

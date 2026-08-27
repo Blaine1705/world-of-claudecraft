@@ -247,6 +247,7 @@ import {
 import { configureGithubContributorsRuntime, topContributors } from './github_contributors';
 import { pruneGitHubOAuthStates } from './github_db';
 import { guildBankLogCacheStats } from './guild_bank_log';
+import { configurePaidGuildCreateBackgroundGate } from './guild_create_db';
 import { createAccessLogSink } from './http/access_log';
 import { setAttackSignalSink } from './http/attack_signals';
 import { registerBusinessMetrics } from './http/business_metrics';
@@ -298,6 +299,7 @@ import {
   readArenaLeaderboard,
   readProjectStats,
 } from './leaderboard';
+import { findLiveSessionForCharacter, resolveLiveCharacterFrom } from './live_character_resolver';
 import { MAX_MAP_SAVE_BYTES } from './maps';
 import {
   mapDeleteCore,
@@ -551,6 +553,10 @@ const DAILY_PRUNE_INTERVAL_MS = 24 * 3600 * 1000;
 // lazily instead of at module load.
 let gameInstance: GameServer | null = null;
 const majorBackgroundDbGate = createBackgroundDbGate(DB_POOL_MAX_CLIENTS);
+// Paid guild creation's pool checkouts (the atomic create and its receipt
+// reconciliation) ride the SAME major-producer gate: game.ts builds the deps,
+// so the composition root registers the acquirer here (one gate instance).
+configurePaidGuildCreateBackgroundGate((signal) => majorBackgroundDbGate.acquire(signal));
 function liveGame(): GameServer {
   // LISTEN uses its own dedicated connection and quota consumes use their own
   // max-two pool. The coordinator cap equals that pool exactly, so it creates
@@ -2914,6 +2920,15 @@ const wocAuthGuardCache = configureWocAuthGuardCache({
 // constructed here, not inside the custody factory, so its stats can ride the
 // ops readout below alongside the counters it complements.
 const wocEscrowGate = createWocEscrowGate();
+// How long an escrow job may wait for its major-background permit INSIDE its
+// character save-FIFO slot. Sized 3x the custody waiter deadline
+// (ESCROW_QUEUE_WAIT_MS, 5s): a permit that arrives while the HTTP caller is
+// still waiting is never self-refused, and past the caller's deadline the job
+// is already cancelled, so this bound only caps how long a settled request's
+// background chain can occupy the FIFO slot and its escrow-gate hold (far
+// under the gate's 400s leak-reclaim ceiling, which was the old effective
+// bound).
+const WOC_ESCROW_BACKGROUND_PERMIT_WAIT_MS = 15_000;
 const wocMarketService = new WocMarketService({
   db: wocMarketDb,
   economy: wocMarketEconomy,
@@ -2930,11 +2945,26 @@ const wocMarketService = new WocMarketService({
       persistMailBlob: () => liveGame().persistMailBlob(),
       enqueueCharacterWrite: (characterId, job) =>
         liveGame().enqueueCharacterWrite(characterId, async () => {
-          const permit = await majorBackgroundDbGate.acquire();
+          // BOUNDED gate wait, and the job NEVER runs without a permit. This
+          // closure runs inside the character's save-FIFO slot while the
+          // custody caller also holds a realm escrow-gate slot, so an
+          // unbounded acquire() here would pin both until the 400s leak
+          // reclaim; four such waits close the realm's listing path. The
+          // custody waiter's 5s deadline (ESCROW_QUEUE_WAIT_MS) has already
+          // refused 'contended' and cancelled the job by the time this bound
+          // can fire (started is only set after the permit grants), so a null
+          // permit loses no work: the throw terminates the settled caller's
+          // background chain and frees the FIFO slot and gate hold.
+          const permit = await majorBackgroundDbGate.acquire(
+            AbortSignal.timeout(WOC_ESCROW_BACKGROUND_PERMIT_WAIT_MS),
+          );
+          if (!permit) {
+            throw new Error('woc escrow refused: no background database permit');
+          }
           try {
             return await job();
           } finally {
-            permit?.release();
+            permit.release();
           }
         }),
       serializeCharacterForPersist: (characterId) =>
@@ -3162,40 +3192,10 @@ configureDiscordRuntime({
 function storagePurchaseHost(): StoragePurchaseHost {
   const game = liveGame();
   return {
-    // The account's ONE live character session. More than one live session
-    // (only GM supervision can create that) is ambiguous and refuses: a
-    // purchase must map to exactly one character at initiation time.
-    //
-    // A QUARANTINED session counts as ABSENT, the same predicate every other
-    // custody wrapper uses (game.ts wocCustodySession and
-    // serializeCharacterForPersist both read `session.left ||
-    // session.escrowQuarantined`). Its live state was abandoned when its escrow
-    // was rolled back and game.ts saveCharacter refuses its saves outright, so
-    // admitting one here would let real Claudium be debited against a session
-    // that can never persist the grant: the apply would mutate an abandoned
-    // blob, the save would return false, and the bounded audit gap the flow
-    // documents would become a certainty for every purchase taken in that
-    // window. Refusing before any money moves is the same answer the market
-    // side gives (`character_invalid`); the ladder still converges at the next
-    // login, which is when a durable blob exists to apply against.
-    //
-    // IT ALSO LOOSENS THE AMBIGUITY REFUSAL, in the one direction that lets a
-    // purchase through where it used to refuse, and that is deliberate rather
-    // than a side effect nobody noticed. An account holding one live session
-    // AND one quarantined session used to answer null (two matches, ambiguous)
-    // and now answers the live one, because a quarantined session is abandoned
-    // and should no more count toward the census than it should be returned
-    // from it. Refusing a purchase because an abandoned session exists is a
-    // false refusal, not a safety property.
-    resolveLiveCharacter: (accountId) => {
-      let found: { characterId: number; pid: number } | null = null;
-      for (const s of game.clients.values()) {
-        if (s.accountId !== accountId || s.left || s.escrowQuarantined) continue;
-        if (found) return null;
-        found = { characterId: s.characterId, pid: s.pid };
-      }
-      return found;
-    },
+    // The quarantined-counts-as-absent predicate and the ambiguity rule live
+    // in server/live_character_resolver.ts (unit-tested there); this closure
+    // only binds the live session table.
+    resolveLiveCharacter: (accountId) => resolveLiveCharacterFrom(game.clients.values(), accountId),
     // O(1) sessionsByCharacterId lookup. Recovery may evict only nonactive
     // work for a character this process no longer owns; the next login safely
     // re-arms its provisional hold and scan.
@@ -3207,18 +3207,12 @@ function storagePurchaseHost(): StoragePurchaseHost {
     grant: (pid, skuId, purchaseKey, dryRun) =>
       bankGrantStorageSlots(game.sim.ctx, pid, skuId, purchaseKey, { dryRun }),
     stageAppliedEffect: (effect) => game.stageStorageAppliedEffect(effect),
-    // Same absence rule as the resolver above. game.saveCharacter already
-    // answers false for a quarantined session, so this changes no outcome for a
-    // single session; it matters when a quarantined session and a live one
-    // share a character id, where taking the first match would answer false for
-    // a character that can in fact save.
+    // Same absence rule as the resolver above (the selection semantics are
+    // documented and unit-tested in server/live_character_resolver.ts).
     saveCharacter: (characterId, shouldStart, signal) => {
-      for (const s of game.clients.values()) {
-        if (s.characterId === characterId && !s.left && !s.escrowQuarantined) {
-          return game.saveCharacter(s, { shouldStart, signal, backgroundDbPermit: true });
-        }
-      }
-      return Promise.resolve(false);
+      const session = findLiveSessionForCharacter(game.clients.values(), characterId);
+      if (!session) return Promise.resolve(false);
+      return game.saveCharacter(session, { shouldStart, signal, backgroundDbPermit: true });
     },
     // The DETAILED variant: the flow needs the transport fact behind an
     // ambiguous answer, which is what lets an outage press settle without
@@ -3830,7 +3824,9 @@ export async function startServer(): Promise<http.Server> {
     // served by bank_ledger_character and add nothing to the guild-only partial
     // index below.
     // Growth is bounded database-wide: one row per successful op, except the
-    // vault sweep (vault_deposit_all), which writes one row per material moved.
+    // vault sweep (vault_deposit_all), which writes one row per distinct
+    // carried slot (crafted/signer identities separate), at most the 112-slot
+    // inventory.
     // The bank_ledger_growth_budget trigger covers EVERY insert writer and
     // enforces the configured hard ceiling (10,000,000 by default) in the same
     // transaction; rolled-back inserts and idempotent retries consume zero.

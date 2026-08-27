@@ -2,6 +2,7 @@ import { EventEmitter } from 'node:events';
 import type { PoolClient, QueryResult, QueryResultRow } from 'pg';
 import { describe, expect, it, vi } from 'vitest';
 import {
+  backendCancelViaPool,
   createDbTransactionDeadline,
   DbTransactionAborted,
   type DbTransactionDeadlineClient,
@@ -486,5 +487,127 @@ describe('database transaction whole-operation deadline', () => {
       createDbTransactionDeadline(client, { timeoutMs: 100, scheduler });
     };
     expect(acceptsPoolClient).toBeTypeOf('function');
+  });
+});
+
+describe('best-effort backend cancellation on socket destruction', () => {
+  const pidClient = (
+    pid: number | undefined,
+    responder?: (text: string) => Promise<QueryResult<QueryResultRow>>,
+  ): FakeClient => {
+    const client = fakeClient(responder);
+    (client as { processID?: number }).processID = pid;
+    return client;
+  };
+  const cancellingOwner = (
+    client: FakeClient,
+    scheduler: FakeScheduler,
+    cancelBackend: (processId: number) => Promise<void>,
+    signal?: AbortSignal,
+  ) =>
+    createDbTransactionDeadline(client, {
+      operation: 'bank save',
+      timeoutMs: 100,
+      scheduler,
+      signal,
+      cancelBackend,
+    });
+
+  it('cancels the detached backend exactly once with its pid on expiry', async () => {
+    const scheduler = new FakeScheduler();
+    const client = pidClient(4242);
+    const cancelBackend = vi.fn(async () => {});
+    const transaction = cancellingOwner(client, scheduler, cancelBackend);
+
+    await transaction.query('BEGIN');
+    scheduler.advance(100);
+
+    expect(cancelBackend).toHaveBeenCalledTimes(1);
+    expect(cancelBackend).toHaveBeenCalledWith(4242);
+    expect(client.releases[0]).toBeInstanceOf(DbTransactionDeadlineExceeded);
+    // A later refused query must not re-cancel: the destruction was one event.
+    await expect(transaction.query('SELECT 1')).rejects.toBeInstanceOf(
+      DbTransactionDeadlineExceeded,
+    );
+    expect(cancelBackend).toHaveBeenCalledTimes(1);
+  });
+
+  it('cancels the detached backend once when an idle abort destroys the socket', async () => {
+    const scheduler = new FakeScheduler();
+    const client = pidClient(77);
+    const cancelBackend = vi.fn(async () => {});
+    const controller = new AbortController();
+    const transaction = cancellingOwner(client, scheduler, cancelBackend, controller.signal);
+
+    await transaction.query('BEGIN');
+    controller.abort();
+
+    expect(cancelBackend).toHaveBeenCalledTimes(1);
+    expect(cancelBackend).toHaveBeenCalledWith(77);
+    expect(client.releases[0]).toBeInstanceOf(DbTransactionAborted);
+    expect(transaction).toBeDefined();
+  });
+
+  it('swallows a rejecting hook without replacing the primary outcome', async () => {
+    const scheduler = new FakeScheduler();
+    const client = pidClient(9);
+    const cancelBackend = vi.fn(async () => {
+      throw new Error('cancellation connection refused');
+    });
+    const transaction = cancellingOwner(client, scheduler, cancelBackend);
+
+    await transaction.query('BEGIN');
+    scheduler.advance(100);
+    // Let the rejected hook promise settle; the swallow must keep the
+    // deadline error causal and raise no unhandled rejection.
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(cancelBackend).toHaveBeenCalledTimes(1);
+    expect(client.releases[0]).toBeInstanceOf(DbTransactionDeadlineExceeded);
+    await expect(transaction.query('SELECT 1')).rejects.toBeInstanceOf(
+      DbTransactionDeadlineExceeded,
+    );
+  });
+
+  it('never cancels when the transaction completes cleanly', async () => {
+    const scheduler = new FakeScheduler();
+    const client = pidClient(4242);
+    const cancelBackend = vi.fn(async () => {});
+    const transaction = cancellingOwner(client, scheduler, cancelBackend);
+
+    await transaction.query('BEGIN');
+    await transaction.commit();
+    transaction.release();
+
+    expect(cancelBackend).not.toHaveBeenCalled();
+    expect(client.releases).toEqual([undefined]);
+  });
+
+  it('backendCancelViaPool cancels only an actively executing backend by pid', async () => {
+    // The state = 'active' guard narrows the pid-reuse window: an idle reused
+    // pid is spared, and the parameter binds the pid rather than interpolating
+    // it. Pin the exact SQL so a reworded cancel is a conscious edit here too.
+    const query = vi.fn(async (): Promise<unknown> => ({ rows: [] }));
+    await backendCancelViaPool({ query })(4242);
+    expect(query).toHaveBeenCalledTimes(1);
+    expect(query).toHaveBeenCalledWith(
+      "SELECT pg_cancel_backend(pid) FROM pg_stat_activity WHERE pid = $1 AND state = 'active'",
+      [4242],
+    );
+  });
+
+  it('skips the hook when the client exposes no backend pid', async () => {
+    const scheduler = new FakeScheduler();
+    const client = pidClient(undefined);
+    const cancelBackend = vi.fn(async () => {});
+    const transaction = cancellingOwner(client, scheduler, cancelBackend);
+
+    await transaction.query('BEGIN');
+    scheduler.advance(100);
+
+    expect(cancelBackend).not.toHaveBeenCalled();
+    expect(client.releases[0]).toBeInstanceOf(DbTransactionDeadlineExceeded);
+    expect(transaction).toBeDefined();
   });
 });

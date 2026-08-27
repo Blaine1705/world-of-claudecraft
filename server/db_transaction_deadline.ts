@@ -1,3 +1,12 @@
+// Destroying the frontend socket does NOT stop the backend: PostgreSQL
+// notices a dead client only between statements, so a statement that started
+// just before the wall deadline keeps holding its locks until its own
+// server-side statement_timeout fires. The optional cancelBackend hook is the
+// active bound: on expiry or abort, after the socket is destroyed, the owner
+// best-effort cancels the detached backend by pid.
+// integration: wire backendCancelViaPool(pool) at the db.ts call sites; until
+// wired, the caller-installed statement_timeout stays the only backstop for
+// the detached backend.
 import type { QueryResult, QueryResultRow } from 'pg';
 
 export interface DbTransactionDeadlineClient {
@@ -8,6 +17,10 @@ export interface DbTransactionDeadlineClient {
   release(error?: Error | boolean): void;
   on(event: 'error', listener: (error: Error) => void): unknown;
   removeListener(event: 'error', listener: (error: Error) => void): unknown;
+  /** node-postgres exposes the backend pid on the live client. Optional so
+   * narrow adapters and unit fakes stay structurally valid; without it the
+   * cancelBackend hook has no target and is skipped. */
+  readonly processID?: number | null;
 }
 
 export interface DbTransactionDeadlineTimer {
@@ -25,6 +38,33 @@ export interface DbTransactionDeadlineOptions {
   operation?: string;
   scheduler?: DbTransactionDeadlineScheduler;
   signal?: AbortSignal;
+  /** Best-effort backend cancellation after the deadline or an abort destroys
+   * the socket (see the module header). Called at most once, with the
+   * client's processID, on a SEPARATE connection owned by the wirer; a
+   * rejection is swallowed and never replaces the transaction's primary
+   * outcome. Never called when the transaction completes cleanly. */
+  cancelBackend?: (processId: number) => Promise<void>;
+}
+
+/** The standard cancelBackend wiring: pg_cancel_backend on a separate
+ * pool-owned connection, so a backend whose frontend socket the deadline
+ * destroyed drops its held locks at the next safe point instead of riding
+ * out the server-side statement_timeout. Same-role backends only. The
+ * state = 'active' guard narrows the pid-reuse window: only an actively
+ * executing backend is cancelled, so a reused pid sitting idle is spared.
+ * Residual window: a reused pid that is ACTIVE inside the sub-second gap
+ * still gets cancelled; that costs its query a 57014 (query_canceled),
+ * never a connection. The protocol-level cancel keyed by the backend secret
+ * would close the window entirely but is not public node-postgres API. */
+export function backendCancelViaPool(pool: {
+  query(sql: string, values: unknown[]): Promise<unknown>;
+}): (processId: number) => Promise<void> {
+  return async (processId) => {
+    await pool.query(
+      "SELECT pg_cancel_backend(pid) FROM pg_stat_activity WHERE pid = $1 AND state = 'active'",
+      [processId],
+    );
+  };
 }
 
 const DEFAULT_SCHEDULER: DbTransactionDeadlineScheduler = {
@@ -82,6 +122,8 @@ export class DbTransactionDeadline {
     this.forceRelease(error);
   };
 
+  private backendCancelRequested = false;
+
   private readonly onAbort = (): void => {
     if (this.released || this.completion !== null) return;
     if (this.scheduler.nowMs() >= this.deadlineAtMs) {
@@ -89,6 +131,7 @@ export class DbTransactionDeadline {
       return;
     }
     this.forceRelease(new DbTransactionAborted(this.operation, this.activePhase === 'commit'));
+    this.requestBackendCancel();
   };
 
   constructor(
@@ -97,6 +140,7 @@ export class DbTransactionDeadline {
     private readonly operation: string,
     private readonly scheduler: DbTransactionDeadlineScheduler,
     private readonly signal?: AbortSignal,
+    private readonly cancelBackend?: (processId: number) => Promise<void>,
   ) {
     if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
       throw new RangeError('transaction deadline timeoutMs must be a positive finite number');
@@ -215,6 +259,26 @@ export class DbTransactionDeadline {
     this.forceRelease(
       new DbTransactionDeadlineExceeded(this.operation, this.timeoutMs, commitMayHaveSucceeded),
     );
+    this.requestBackendCancel();
+  }
+
+  /** Fire the best-effort backend cancellation exactly once after this owner
+   * destroyed the socket on expiry or abort. Skipped without a hook or a pid;
+   * a rejecting or throwing hook is swallowed (the caller-installed
+   * statement_timeout remains the backstop and the primary error stands). */
+  private requestBackendCancel(): void {
+    if (this.backendCancelRequested) return;
+    this.backendCancelRequested = true;
+    if (!this.cancelBackend) return;
+    const pid = this.client.processID;
+    if (typeof pid !== 'number' || !Number.isInteger(pid) || pid <= 0) return;
+    try {
+      this.cancelBackend(pid).catch(() => {
+        // Best-effort only: the detached backend still has its server bounds.
+      });
+    } catch {
+      // A throwing hook must never replace the transaction's primary outcome.
+    }
   }
 
   private forceRelease(error: Error): void {
@@ -260,5 +324,6 @@ export function createDbTransactionDeadline(
     options.operation ?? 'PostgreSQL operation',
     options.scheduler ?? DEFAULT_SCHEDULER,
     options.signal,
+    options.cancelBackend,
   );
 }

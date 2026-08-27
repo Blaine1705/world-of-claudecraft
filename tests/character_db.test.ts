@@ -19,7 +19,11 @@ vi.mock('../server/admin_guilds_read', () => ({
   bustAdminGuildListReads: dbMock.bustGuildList,
 }));
 
-import { CharacterStoragePurchaseOpen } from '../server/character_delete_db';
+import {
+  CharacterStoragePurchaseOpen,
+  DELETE_RESTORE_STATEMENT_TIMEOUT_MS,
+} from '../server/character_delete_db';
+import { CHARACTER_SAVE_STATEMENT_TIMEOUT_MS } from '../server/character_save_transaction';
 import { configureCommunityTestAccounts } from '../server/community_test_accounts';
 import {
   backfillAccountEmailIfEmpty,
@@ -222,14 +226,23 @@ describe('deleteCharacter', () => {
     const character = sql.findIndex((statement) => /FROM characters/.test(statement));
     const purchase = sql.findIndex((statement) => /FROM storage_purchases/.test(statement));
     const deletion = sql.findIndex((statement) => /DELETE FROM characters/.test(statement));
-    expect(sql).toHaveLength(7);
+    expect(sql).toHaveLength(9);
     expect(sql[0]).toBe('BEGIN');
-    expect(sql[1]).toContain("statement_timeout = '15s'");
+    expect(sql[1]).toContain('statement_timeout = 15000');
     expect(sql[1]).toContain("lock_timeout = '2s'");
     expect(sql[1]).toContain("idle_in_transaction_session_timeout = '2s'");
     expect(account).toBeLessThan(character);
     expect(character).toBeLessThan(purchase);
     expect(purchase).toBeLessThan(deletion);
+    // The keep-forever bank_ledger / bank_ledger_batch_receipts cascade rides
+    // ONLY the DELETE under the widened 60s bound (the shared character-save
+    // allowance); the tighter 15s bound is restored immediately after so
+    // COMMIT keeps the transaction's ceiling. Literal ms pins beside the
+    // identity checks, so a drifted constant is a conscious edit here.
+    expect(sql[deletion - 1]).toBe('SET LOCAL statement_timeout = 60000');
+    expect(sql[deletion + 1]).toBe('SET LOCAL statement_timeout = 15000');
+    expect(CHARACTER_SAVE_STATEMENT_TIMEOUT_MS).toBe(60_000);
+    expect(DELETE_RESTORE_STATEMENT_TIMEOUT_MS).toBe(15_000);
     expect(sql.at(-1)).toBe('COMMIT');
     expect(client.release).toHaveBeenCalledOnce();
   });
@@ -1033,5 +1046,32 @@ describe('character roster feed enqueues', () => {
     // Three characters inserted before the failure, all of them rolled back: a feed
     // item here would tell the bot to re-read a roster that does not exist.
     expect(drainLinkChanges()).toEqual([]);
+  });
+});
+
+describe('save-backend cancel wiring (db.ts and character_delete_db.ts source pins)', () => {
+  // A deadline that destroys the save socket must also pg_cancel the backend,
+  // or the accounts/characters/guild_banks locks ride out the full server-side
+  // statement_timeout. The wrapper is the enforcement point: every character
+  // save in db.ts must go through beginSaveTx, which forwards cancelSaveBackend.
+  it('routes every db.ts character save through the cancel-wired wrapper', async () => {
+    const { readFileSync } = await import('node:fs');
+    const { stripComments } = await import('./helpers/strip_comments');
+    const src = stripComments(readFileSync(new URL('../server/db.ts', import.meta.url), 'utf8'));
+    expect(src).toContain('const cancelSaveBackend = backendCancelViaPool(pool);');
+    expect(src).toContain('beginCharacterSaveTx(c, op, s, cancelSaveBackend);');
+    // Exactly one direct call: the wrapper. A new save path calling
+    // beginCharacterSaveTx directly would bypass the cancel wiring.
+    expect(src.split('beginCharacterSaveTx(').length - 1).toBe(1);
+    expect(src.split("beginSaveTx(client, '").length - 1).toBe(3);
+  });
+
+  it('wires backend cancel into the character delete transaction', async () => {
+    const { readFileSync } = await import('node:fs');
+    const { stripComments } = await import('./helpers/strip_comments');
+    const src = stripComments(
+      readFileSync(new URL('../server/character_delete_db.ts', import.meta.url), 'utf8'),
+    );
+    expect(src).toContain('cancelBackend: db.query ? backendCancelViaPool(');
   });
 });

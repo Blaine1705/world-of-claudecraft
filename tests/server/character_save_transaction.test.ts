@@ -105,4 +105,36 @@ describe('bounded character save transaction', () => {
       prepareCharacterSaveEffects(41, [{ ...EFFECT, characterId: 41, realm: 'other' }], undefined),
     ).toThrow(/does not match the character save/);
   });
+
+  it('forwards cancelBackend into the deadline so an abort cancels the save backend', async () => {
+    // The wiring proof for db.ts's beginSaveTx wrapper: the fourth argument must
+    // reach createDbTransactionDeadline, or a deadline-destroyed save backend
+    // keeps its locks for the full server-side statement_timeout.
+    const client = Object.assign(new FakeClient(), { processID: 4242 });
+    const cancelled: number[] = [];
+    const controller = new AbortController();
+    const transaction = await beginCharacterSaveTx(
+      client,
+      'cancel forwarding save',
+      controller.signal,
+      async (pid) => {
+        cancelled.push(pid);
+      },
+    );
+    controller.abort();
+    await Promise.resolve();
+    expect(cancelled).toEqual([4242]);
+    await expect(transaction.query('SELECT 1')).rejects.toThrow();
+  });
+
+  it('never fires cancelBackend on a cleanly completed save transaction', async () => {
+    const client = Object.assign(new FakeClient(), { processID: 4242 });
+    const cancelled: number[] = [];
+    const transaction = await beginCharacterSaveTx(client, 'clean save', undefined, async (pid) => {
+      cancelled.push(pid);
+    });
+    await transaction.rollback();
+    transaction.release();
+    expect(cancelled).toEqual([]);
+  });
 });

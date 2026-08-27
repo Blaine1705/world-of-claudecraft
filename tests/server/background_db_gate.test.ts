@@ -1,17 +1,24 @@
 import { describe, expect, it } from 'vitest';
-import { backgroundDbCapacity, createBackgroundDbGate } from '../../server/background_db_gate';
+import {
+  BACKGROUND_DB_MAJOR_PRODUCER_HEADROOM,
+  backgroundDbCapacity,
+  createBackgroundDbGate,
+} from '../../server/background_db_gate';
 
 describe('background DB gate', () => {
   it('caps named major producers below the default pool maximum', () => {
-    expect(backgroundDbCapacity(10)).toBe(8);
+    // Pool 10 minus the three reserved clients (two interactive, one for the
+    // process-global bank-ledger FIFO tail that checks out OUTSIDE the gate).
+    expect(BACKGROUND_DB_MAJOR_PRODUCER_HEADROOM).toBe(3);
+    expect(backgroundDbCapacity(10)).toBe(7);
     const gate = createBackgroundDbGate(10);
-    const holds = Array.from({ length: 8 }, () => gate.tryAcquire());
+    const holds = Array.from({ length: 7 }, () => gate.tryAcquire());
     expect(holds.every(Boolean)).toBe(true);
     expect(gate.tryAcquire()).toBeNull();
     expect(gate.stats()).toMatchObject({
-      inFlight: 8,
-      max: 8,
-      configuredHeadroom: 2,
+      inFlight: 7,
+      max: 7,
+      configuredHeadroom: 3,
       refused: 1,
     });
     for (const hold of holds) hold?.release();
@@ -19,11 +26,17 @@ describe('background DB gate', () => {
   });
 
   it('keeps one durability lane on undersized pools and reports composition headroom', () => {
+    // At a pool of ONE the reserve vanishes: the single durability lane IS
+    // the only client, so a granted permit can hold it against interactive
+    // checkouts and the ledger tail alike (documented at the capacity floor).
     expect(backgroundDbCapacity(1)).toBe(1);
     expect(backgroundDbCapacity(2)).toBe(1);
+    expect(backgroundDbCapacity(4)).toBe(1);
     expect(createBackgroundDbGate(1).stats()).toMatchObject({ max: 1, configuredHeadroom: 0 });
     expect(createBackgroundDbGate(2).stats()).toMatchObject({ max: 1, configuredHeadroom: 1 });
     expect(createBackgroundDbGate(3).stats()).toMatchObject({ max: 1, configuredHeadroom: 2 });
+    expect(createBackgroundDbGate(4).stats()).toMatchObject({ max: 1, configuredHeadroom: 3 });
+    expect(createBackgroundDbGate(5).stats()).toMatchObject({ max: 2, configuredHeadroom: 3 });
   });
 
   it('grants asynchronous waiters in FIFO order', async () => {
