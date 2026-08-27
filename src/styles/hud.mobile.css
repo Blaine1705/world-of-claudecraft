@@ -5579,14 +5579,18 @@
          THE BAND TERM IS MEASURED, NOT DERIVED, and the first attempt here was
          written from the band's line height and came out 9.4px SHORT of the real
          thing. It is the term no arithmetic can own: the band GROWS with a
-         locale whose refusal copy wraps further. So
+         locale whose refusal copy wraps further AND with the platform font
+         stack (the same ru_RU outage copy wraps one line further on CI's
+         Chromium than on the box that first measured 56px: footer 143.2px
+         against the old 136px reserve). The term carries that extra line. So
          tests/browser/bank_mobile_chrome.browser.test.ts stages the tallest
-         state and asserts this reserve against the MEASURED footer, which is
-         what caught the shortfall and what keeps the number honest. */
+         state on every shipped locale and asserts this reserve against the
+         MEASURED footer, which is what caught both shortfalls and what keeps
+         the number honest. */
       scroll-padding-bottom: calc(
         40px +
         14px +
-        56px +
+        70px +
         var(--spacing-sm) +
         var(--bank-footer-inset)
       );
