@@ -98,11 +98,7 @@ import {
 import { configureAuthRuntime } from './auth_routes';
 import { createBackgroundDbGate } from './background_db_gate';
 import { computeBankBonus } from './bank_entitlements';
-import {
-  BANK_LEDGER_SHUTDOWN_DRAIN_MS,
-  bankLedgerIdle,
-  bankLedgerTailStats,
-} from './bank_ledger';
+import { BANK_LEDGER_SHUTDOWN_DRAIN_MS, bankLedgerIdle, bankLedgerTailStats } from './bank_ledger';
 import { createBankLedgerGrowthMonitor } from './bank_ledger_growth_monitor';
 import { configureBattlegroundRuntime, readBgLeaderboard } from './battleground';
 import {
@@ -112,6 +108,7 @@ import {
   pruneBugReportsBatch,
 } from './bug_report_db';
 import { createCachedRead } from './cached_read';
+import { configureCharacterDeleteBackgroundGate } from './character_delete_db';
 import { characterDeleteHttpRefusal } from './character_delete_http';
 import { bustAllLifetimeXpRankCache } from './character_rank_cache';
 import { characterSheet, SHEET_RECENT_DEEDS, type SheetRank } from './character_sheet';
@@ -153,7 +150,6 @@ import {
   characterCountsByRealm,
   charactersForDeedsBoard,
   chatMuteStatusForAccount,
-  closeBackendCancelPool,
   closeOrphanSessions,
   createAccount,
   createCharacterCapped,
@@ -165,7 +161,6 @@ import {
   findAccount,
   findCharacterReportTargetByName,
   getAccountsCount,
-  getBackendCancelCounts,
   getCharacter,
   getCharacterById,
   getCharactersCount,
@@ -206,6 +201,7 @@ import {
   touchLogin,
   walletForAccount,
 } from './db';
+import { closeBackendCancelPool, getBackendCancelCounts } from './db_backend_cancel';
 import { configureDeedsRuntime } from './deeds';
 import {
   buildDeedsBoardEntries,
@@ -253,7 +249,6 @@ import {
 import { configureGithubContributorsRuntime, topContributors } from './github_contributors';
 import { pruneGitHubOAuthStates } from './github_db';
 import { guildBankLogCacheStats } from './guild_bank_log';
-import { configureCharacterDeleteBackgroundGate } from './character_delete_db';
 import { configurePaidGuildCreateBackgroundGate } from './guild_create_db';
 import { createAccessLogSink } from './http/access_log';
 import { setAttackSignalSink } from './http/attack_signals';

@@ -66,7 +66,7 @@ import {
 } from './community_test_accounts';
 import { CONCURRENT_INDEX_MIGRATIONS } from './concurrent_indexes';
 import { CONTENT_MODERATION_SCHEMA } from './content_moderation_db';
-import { backendCancelViaPool } from './db_transaction_deadline';
+import { cancelDetachedBackend } from './db_backend_cancel';
 import type { RankedDeedsAccount } from './deeds_board';
 import { DISCORD_SCHEMA } from './discord_db';
 import { enqueueLinkChange } from './discord_link_changes';
@@ -258,54 +258,8 @@ export const pool = new Pool({
   query_timeout: DB_QUERY_TIMEOUT_MS,
 });
 
-// Deadline-expiry backend cancels must NOT ride the pool they exist to
-// relieve: a cancel fires at the exact moment (deadline expiry) that signals
-// pool or lock saturation, so through the main pool it could queue behind
-// login checkouts and pin a client for up to the full statement timeout. A
-// max-1 side pool with sub-second bounds decouples it: idle it holds zero
-// connections (the driver's idle timeout releases its one client), and a
-// cancel that cannot connect or run inside its budget is dropped, best-effort
-// by contract (the caller-installed statement_timeout stays the backstop).
-// The transient extra connection is in DEPLOY.md's budget arithmetic.
-export const DB_CANCEL_POOL_CONNECT_TIMEOUT_MS = 500;
-export const DB_CANCEL_STATEMENT_TIMEOUT_MS = 750;
-export const DB_CANCEL_QUERY_TIMEOUT_MS = 1_000;
-const cancelPool = new Pool({
-  connectionString: DATABASE_URL,
-  max: 1,
-  connectionTimeoutMillis: DB_CANCEL_POOL_CONNECT_TIMEOUT_MS,
-  statement_timeout: DB_CANCEL_STATEMENT_TIMEOUT_MS,
-  query_timeout: DB_CANCEL_QUERY_TIMEOUT_MS,
-});
-if (typeof cancelPool.on === 'function') {
-  cancelPool.on('error', (err) => {
-    console.error('pg cancel pool: idle client error (client discarded)', err);
-  });
-}
-let backendCancelRequestCount = 0;
-let backendCancelFailureCount = 0;
-const cancelViaSidePool = backendCancelViaPool(cancelPool);
-/** The one process-wide detached-backend canceller: counted, side-pool-backed,
- * best-effort. Every DbTransactionDeadline cancelBackend hook wires to this. */
-export async function cancelDetachedBackend(processId: number): Promise<void> {
-  backendCancelRequestCount++;
-  try {
-    await cancelViaSidePool(processId);
-  } catch (error) {
-    backendCancelFailureCount++;
-    throw error;
-  }
-}
-/** Lifetime detached-backend cancel attempts and failures (metrics + tests). */
-export function getBackendCancelCounts(): { requested: number; failed: number } {
-  return { requested: backendCancelRequestCount, failed: backendCancelFailureCount };
-}
-/** Shutdown teardown for the cancel side pool (main.ts, beside pool.end()). */
-export async function closeBackendCancelPool(): Promise<void> {
-  await cancelPool.end();
-}
-
-// Character saves ride this wrapper: on deadline expiry pg_cancel_backend drops held locks.
+// Character saves ride this wrapper: on deadline expiry pg_cancel_backend drops
+// held locks through the dedicated side pool (db_backend_cancel.ts).
 const cancelSaveBackend = cancelDetachedBackend;
 const beginSaveTx = (c: Parameters<typeof beginCharacterSaveTx>[0], op: string, s?: AbortSignal) =>
   beginCharacterSaveTx(c, op, s, cancelSaveBackend);
@@ -1462,9 +1416,8 @@ export async function ensureSchema(): Promise<void> {
     await client.query(BANK_LEDGER_GROWTH_BUDGET_SCHEMA);
     // Readback issued separately before COMMIT (a multi-statement query returns
     // an ARRAY of results, so the fragment's trailing SELECT is unreadable).
-    // The SQL is exported beside the schema builder, schema-parameterized the
-    // same way, so the two cannot drift; boot always applies the fragment's
-    // default 'public'.
+    // The SQL is exported beside the schema builder so the two cannot drift;
+    // boot always applies the fragment's default 'public'.
     const bankLedgerGrowthBudget = await client.query(bankLedgerGrowthBudgetReadbackSql());
     const growthGaugeSeeded = observeBankLedgerGrowthBudget(
       bankLedgerGrowthBudget.rows[0]?.committed_rows,
@@ -3420,8 +3373,7 @@ export async function deleteCharacter(
   signal?: AbortSignal,
 ): Promise<boolean> {
   const deleted = await deleteOwnedCharacterRow(
-    // The dedicated canceller, never the main pool: an expiry cancel fires
-    // exactly when the main pool is the saturated thing.
+    // The dedicated canceller, never the main pool (db_backend_cancel.ts).
     { connect: () => pool.connect(), cancelBackend: cancelDetachedBackend },
     accountId,
     characterId,

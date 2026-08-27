@@ -1110,8 +1110,10 @@ describe('auditBank (vault container)', () => {
 
 // ---------------------------------------------------------------------------
 // Vault craft consumption (Bank Storage Phase 04): op 'craft_consume' rows
-// written by the tick-side observer (server/bank_ledger.ts
-// recordVaultCraftConsume), replayed as removals beside deposit/withdraw.
+// written through the reservation journal at admission time
+// (bankLedgerJournal.reserveVaultConsumption; the tick-side
+// recordVaultCraftConsume observer is retired), replayed as removals beside
+// deposit/withdraw.
 // ---------------------------------------------------------------------------
 describe('auditBank (vault craft consumption, Phase 04)', () => {
   it('a history with craft_consume rows reconciles against state.vault with zero findings', () => {

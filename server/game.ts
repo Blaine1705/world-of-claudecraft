@@ -183,7 +183,6 @@ import {
 import { dailyRewardService } from './daily_rewards';
 import type { AccountChatMuteStatus, AccountCosmetics, RequestMetadata } from './db';
 import {
-  cancelDetachedBackend,
   closePlaySession,
   GUILD_BANK_ROW_MAX_BYTES,
   grantAccountMechChroma,
@@ -211,6 +210,7 @@ import {
   touchCharacterLogin,
   walletForAccount,
 } from './db';
+import { cancelDetachedBackend } from './db_backend_cancel';
 import { getDeedBroadcasts } from './deeds_db';
 import {
   deedRecordsIdle,
@@ -238,7 +238,7 @@ import { isUpdateDue } from './entity_update_cadence';
 // Dual fan-out (D21): Steam and Epic reconcile independently.
 import { reconcileOnLogin as reconcileEpicOnLogin } from './epic/mirror';
 import { shouldDeliverCombatEventToViewer } from './event_delivery';
-import { assembleEventsFrame, serializeEventFragments } from './event_frame';
+import { assembleEventsFrame, filterRoutableEvents, serializeEventFragments } from './event_frame';
 import { fishingBandLabel, isKoi, isRodFeeRecipe } from './fishing_telemetry';
 import {
   classifyOnlineGeneralChat,
@@ -364,7 +364,7 @@ import { TickProfiler } from './tick_profiler';
 import { hrtimeToMs, TickRateMeter } from './tick_rate_meter';
 import { maybeTrackDay7Retained, trackLevelMilestoneCapi } from './ua_capi';
 import { recordUnstuckEvent } from './unstuck_records';
-import { CVAULT_WIRE_INTERVAL_TICKS, dispatchVaultCommand, emitVaultSelfKeys } from './vault_wire';
+import { dispatchVaultCommand, emitVaultSelfKeys } from './vault_wire';
 import { holderInfoForPubkey } from './woc_balance';
 import type { CharacterSaveArgs } from './woc_market';
 import { isBackpressureExceeded } from './ws_backpressure';
@@ -1110,12 +1110,12 @@ export interface ClientSession {
   lastBankWirePid: number | null;
   lastBankWireRev: number | null;
   lastBankWirePrice: number | null;
-  // Materials Vault projections: revision-gated, with cvault also cadence-gated.
+  // Materials Vault projections: both signature-gated (cvault on rev + gate).
   lastVaultWirePid: number | null;
   lastVaultWireRev: number | null;
   lastCvaultWirePid: number | null;
   lastCvaultWireRev: number | null;
-  lastCvaultWireTick: number;
+  lastCvaultWireBlocked: boolean | null;
   // set when a command or sim event that can change a heavy self field (bags,
   // gear, quests, talents, stats, ...) lands for this session, so the next
   // snapshot re-diffs those fields. Otherwise they're skipped (see
@@ -3850,7 +3850,7 @@ export class GameServer {
       lastVaultWireRev: null,
       lastCvaultWirePid: null,
       lastCvaultWireRev: null,
-      lastCvaultWireTick: -CVAULT_WIRE_INTERVAL_TICKS,
+      lastCvaultWireBlocked: null,
       selfHeavyDirty: true,
       lastWireRev: -1,
       sentEnts: new Map(),
@@ -9114,8 +9114,7 @@ export class GameServer {
     // gate, the always-available ladder counter and why the two are keyed on
     // DIFFERENT sessions are all documented at the emission in bank_wire.ts.
     emitBankSelfKeys(maybe, this.sim, session, anchorSession);
-    // Revision-gated Materials Vault + cadence-backed craft stock projection.
-    emitVaultSelfKeys(maybe, this.sim, session, anchorSession.pid, this.sim.tickCount);
+    emitVaultSelfKeys(maybe, this.sim, session, anchorSession.pid);
     // guild bank info follows the same pattern with a stricter gate: null
     // unless the player is alive, at a banker, AND stamped into a guild whose
     // book is loaded (sim guildBankInfoFor; ANY rank sees it, the snapshot's
@@ -9778,7 +9777,7 @@ export class GameServer {
   // carries the match-wide `dead` column (see BG_RESPAWN_EVENT). Returns null
   // when no respawn in the batch belongs to a match, so the ordinary batch pays
   // one type comparison per event and allocates nothing.
-  private bgRespawnRefreshPids(events: SimEvent[]): Set<number> | null {
+  private bgRespawnRefreshPids(events: readonly SimEvent[]): Set<number> | null {
     let pids: Set<number> | null = null;
     for (const ev of events) {
       if (ev.type !== BG_RESPAWN_EVENT || ev.pid === undefined) continue;
@@ -9820,25 +9819,13 @@ export class GameServer {
     // batch (dropped for every session and declined in the sim), not per
     // receiving session, so spectators of the target never see them either.
     const suppressedInvites = this.suppressBlockedSocialInvites(events);
-    // vaultCraftConsume is server-side evidence only, with no client consumer
-    // since the reservation journal replaced the observer (see
-    // emitVaultCraftConsume): filter the batch ONCE before serialization, so
-    // consumer-less events are never JSON.stringify'd just to be skipped by
-    // every recipient. DELIBERATE side effect this filter shares with the
-    // per-session skip it replaces: vaultCraftConsume never reaches
-    // botDetector.observeEvent either; the detector reads player-visible
-    // behavior, and this event is duplicate server-side evidence of a craft
-    // the detector already observes through the craft command itself. The
-    // some() guard keeps the common no-craft tick allocation-free.
-    const routableEvents = events.some((ev) => ev.type === 'vaultCraftConsume')
-      ? events.filter((ev) => ev.type !== 'vaultCraftConsume')
-      : events;
+    // Consumer-less events drop ONCE per batch; rationale in event_frame.ts.
+    const routableEvents = filterRoutableEvents(events);
     // Serialize each event exactly once for the whole batch (after the flair stamp
     // above, so the fragment carries the final wire shape). Every recipient's frame is
-    // then assembled by joining the fragments it selects, index-aligned with
+    // assembled by joining the fragments it selects, index-aligned with
     // `routableEvents`, instead of re-stringifying a per-session { t:'events', list }
-    // object. Byte-for-byte
-    // identical to the old per-session JSON.stringify; only the fan-out cost changes.
+    // object: byte-identical to per-session JSON.stringify, only fan-out cost changes.
     // INVARIANT: nothing in the per-session loop below may mutate a SimEvent after this
     // point, or a recipient's fragment would stop matching its event. The one in-loop
     // visitor that takes `ev` is botDetector.observeEvent, an observer that writes the

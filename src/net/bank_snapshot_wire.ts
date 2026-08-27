@@ -184,11 +184,14 @@ export function decodeBankInfoWire(value: unknown): BankInfo | null | undefined 
  * valid record is returned by reference so an own `__proto__` row stays inert
  * data instead of passing through a prototype-setting keyed assignment.
  *
- * There is deliberately no second row-count or key-length ceiling here. The
- * outer snapshot frame already owns the byte bound, while the authoritative
- * load path preserves arbitrary nonempty dormant keys and craftVaultStockFor
- * emits every drawable one. A narrower client-only limit would make the online
- * crafting view disagree with the same saved character in an offline world. */
+ * There is deliberately no second row-count or key-length ceiling here (and
+ * no client-side byte bound exists anywhere on this path: by the time this
+ * decoder runs, JSON.parse of the whole frame has already happened; the only
+ * peer that can send a frame is the authenticated server, which bounds the
+ * payload at the source). The authoritative load path preserves arbitrary
+ * nonempty dormant keys and craftVaultStockFor emits every drawable one, so a
+ * narrower client-only limit would make the online crafting view disagree
+ * with the same saved character in an offline world. */
 export function decodeCraftVaultStockWire(
   value: unknown,
 ): Record<string, number> | null | undefined {

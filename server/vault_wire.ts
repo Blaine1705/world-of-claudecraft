@@ -29,27 +29,22 @@
 //   instanced context flips it to an explicit null on the next evaluation
 //   and the delta elides it while unchanged. Rows are pre-filtered to the
 //   drawable rule, so the payload is bounded by the material set like the
-//   vault key. CADENCE-GATED, unlike vault, because the cost property
-//   inverts (see CVAULT_WIRE_HZ): off-cadence snapshots omit the key, which
-//   the client reads as unchanged.
+//   vault key. SIGNATURE-GATED like vault, on the pair (vaultWireRevFor,
+//   craftVaultDrawBlockedFor): every stock mutation bumps the rev and the
+//   gate probe is a pure position/membership read, so the pair fully
+//   determines whether the projection could have changed, and the expensive
+//   projection clone runs only when it did. (This replaced the earlier 4 Hz
+//   cadence rebuild, which re-cloned the projection for every connected
+//   session four times a second whether or not anything changed; the gate
+//   probe is cheap enough to run every snapshot since the derived west fast
+//   path landed.) Off-signature snapshots omit the key, which the client
+//   reads as unchanged.
 
 import { MAX_INSTANCE_STRING_LENGTH } from '../src/sim/item_instance_load';
-import { DT } from '../src/sim/types';
 import type { VaultInfo, VaultSpecialRef } from '../src/world_api';
 import { buildVaultLedgerRows, recordVaultOp } from './bank_ledger';
 import type { BankLedgerAdmission, BankLedgerAdmissionHandle } from './bank_ledger_admission';
 import { bankVaultLedgerMaxRows } from './bank_vault_ledger_guard';
-
-/** The cvault snapshot cadence. The gate exists because cvault INVERTS the
- *  vault key's cost property: vaultInfoFor is null (cheap) away from a
- *  banker, while craftVaultStockFor is non-null for every open-world player,
- *  so the expensive path (the place-gate pool scans, the drawable clone, the
- *  stringify diff) would otherwise run per player per tick in the COMMON
- *  case. 4 Hz keeps the crafting window's counts fresh within 250ms, well
- *  inside the family's staleness envelope; off-cadence snapshots simply omit
- *  the key (omission means unchanged on the client). */
-export const CVAULT_WIRE_HZ = 4;
-export const CVAULT_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * CVAULT_WIRE_HZ)));
 
 /** The slice of Sim the vault dispatch bodies call; a narrow host interface
  *  so a Vitest drives the bodies without a GameServer. */
@@ -71,11 +66,14 @@ export interface VaultSim {
   vaultBuyUpgrade(pid?: number): void;
 }
 
-/** Narrow snapshot host: cheap revision probes stay separate from the two
- *  potentially large boundary projections they guard. */
+/** Narrow snapshot host: cheap revision/gate probes stay separate from the
+ *  two potentially large boundary projections they guard. */
 export interface VaultSelfWireSim {
   vaultInfoWireRevFor(pid: number): number | null;
   vaultWireRevFor(pid: number): number | null;
+  /** Gate-only probe (no projection clone): the cvault signature's second
+   *  half beside the rev, a pure position/membership read. */
+  craftVaultDrawBlockedFor(pid: number): boolean;
   vaultInfoFor(pid: number): VaultInfo | null;
   craftVaultStockFor(pid: number): Record<string, number> | null;
 }
@@ -86,19 +84,19 @@ export interface VaultSelfWireSession {
   lastVaultWireRev: number | null;
   lastCvaultWirePid: number | null;
   lastCvaultWireRev: number | null;
-  lastCvaultWireTick: number;
+  lastCvaultWireBlocked: boolean | null;
 }
 
 /** Emit the two owner-only vault self keys without rebuilding unchanged
- *  projections. Banker proximity is still probed every snapshot, so vault
- *  open/close is immediate. A live mutation bypasses cvault's 4 Hz cadence;
- *  unchanged context evaluation keeps the existing cadence bound. */
+ *  projections. Both signatures are probed every snapshot, so banker
+ *  proximity flips (vault) and craft-gate flips (cvault) are immediate; the
+ *  projections are cloned only when their signature moved or a fresh
+ *  connection has no lastSent value. */
 export function emitVaultSelfKeys(
   emit: (key: 'vault' | 'cvault', value: unknown) => void,
   sim: VaultSelfWireSim,
   session: VaultSelfWireSession,
   anchorPid: number,
-  tickCount: number,
 ): void {
   const vaultRev = sim.vaultInfoWireRevFor(anchorPid);
   if (
@@ -112,20 +110,19 @@ export function emitVaultSelfKeys(
   }
 
   const cvaultRev = sim.vaultWireRevFor(anchorPid);
-  const changed =
+  const cvaultBlocked = sim.craftVaultDrawBlockedFor(anchorPid);
+  if (
     session.lastSent.cvault === undefined ||
     anchorPid !== session.lastCvaultWirePid ||
-    cvaultRev !== session.lastCvaultWireRev;
-  if (changed) {
-    emit('cvault', sim.craftVaultStockFor(anchorPid));
-    session.lastCvaultWireTick = tickCount;
+    cvaultRev !== session.lastCvaultWireRev ||
+    cvaultBlocked !== session.lastCvaultWireBlocked
+  ) {
+    // A blocked gate IS the null answer craftVaultStockFor would compute, so
+    // the blocked arm never pays the projection call just to learn that.
+    emit('cvault', cvaultBlocked ? null : sim.craftVaultStockFor(anchorPid));
     session.lastCvaultWirePid = anchorPid;
     session.lastCvaultWireRev = cvaultRev;
-  } else if (cvaultWireDue(session, tickCount)) {
-    emit('cvault', sim.craftVaultStockFor(anchorPid));
-    session.lastCvaultWireTick = tickCount;
-    session.lastCvaultWirePid = anchorPid;
-    session.lastCvaultWireRev = cvaultRev;
+    session.lastCvaultWireBlocked = cvaultBlocked;
   }
 }
 
@@ -336,25 +333,4 @@ export function dispatchVaultCommand(
       throw new Error(`unhandled vault command: ${unhandled as string}`);
     }
   }
-}
-
-/** The cvault dueness tracker (a `>=` gate, never tickCount % N, per the
- *  broadcast cadence rule in server/CLAUDE.md): true at most once per
- *  CVAULT_WIRE_INTERVAL_TICKS per session, advancing the session's marker.
- *  Named as a TAKE, not a query: the true arm consumes this interval's turn,
- *  so a second call in the same pass returns false. The comparison keeps the
- *  original inline gate's `>=` form verbatim (its NaN behavior included). */
-function cvaultWireDue(session: { lastCvaultWireTick: number }, tickCount: number): boolean {
-  return tickCount - session.lastCvaultWireTick >= CVAULT_WIRE_INTERVAL_TICKS;
-}
-
-export function takeCvaultWireTurn(
-  session: { lastCvaultWireTick: number },
-  tickCount: number,
-): boolean {
-  if (cvaultWireDue(session, tickCount)) {
-    session.lastCvaultWireTick = tickCount;
-    return true;
-  }
-  return false;
 }

@@ -48,13 +48,7 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/
 // Date.now. This module draws NO rng and mutates nothing.
 
-import {
-  DUNGEON_X_THRESHOLD,
-  DUNGEONS,
-  instanceOriginX,
-  isRiftPos,
-  RIFT_BAND_X_MIN,
-} from './data';
+import { DUNGEON_X_THRESHOLD, DUNGEONS, instanceOriginX, isRiftPos, RIFT_BAND_X_MIN } from './data';
 import {
   INSTANCE_FOOTPRINT_HALF_WIDTH,
   instanceInfoAt,
@@ -164,10 +158,10 @@ export function vaultDrawBlocked(ctx: SimContext, pid: number): boolean {
   // scans below whenever the DERIVED flag proves no registered dungeon claim
   // can sit there (dungeonClaimsCanSitWestOfThreshold above). Running the
   // scans first made every craft-context evaluation pay a full instance-slot
-  // walk in the common case (measured ~2.4us/call, 89% in instanceInfoAt, at
-  // 4 Hz per connected player through the cvault key, whose cadence floor
-  // stays as is: the full event-driven fold is out of scope here, see
-  // CVAULT_WIRE_HZ in server/vault_wire.ts). Because the skip is derived
+  // walk in the common case (measured ~2.4us/call, 89% in instanceInfoAt;
+  // the server now probes this gate EVERY snapshot as the cvault wire
+  // signature's cheap half, server/vault_wire.ts, which is exactly why the
+  // fast path must stay cheap). Because the skip is derived
   // from the live defs rather than hand-asserted, a future dungeon band
   // placed west of the threshold re-enables the scans by existing, and the
   // layout-independence pin in tests/vault_craft_gate.test.ts stays green

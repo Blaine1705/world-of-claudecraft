@@ -425,7 +425,9 @@ describe('craft-from-vault online (Phase 04)', () => {
     completeCraftCast(server.sim as never, pid);
     // The real loop shape: drain the tick's events, route them to clients,
     // then run the tick's ONE observer pass (detectActivity) over the same
-    // batch, which is where recordVaultCraftConsume fires.
+    // batch. (The craft rows themselves persist through the reservation
+    // journal at admission time; the retired recordVaultCraftConsume observer
+    // that once fired here is gone.)
     const events = server.sim.tick();
     // biome-ignore lint/suspicious/noExplicitAny: private server-loop methods driven directly
     (server as any).routeEvents(events);

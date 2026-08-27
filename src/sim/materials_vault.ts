@@ -75,7 +75,7 @@ import { sanitizeRiftGearInstance } from './rift/progression';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { cloneInvSlot, type InvSlot, type ItemInstancePayload } from './types';
-import { vaultDrawStock } from './vault_craft_gate';
+import { vaultDrawBlocked, vaultDrawStock } from './vault_craft_gate';
 
 /** Per-material ceiling the first (unlocking) rung grants. */
 export const VAULT_BASE_CAP = 40;
@@ -679,6 +679,16 @@ export function emitVaultCraftConsume(
  *  rows were copied in. The one place order decides anything is the removal
  *  walk, and that takes its order from an explicit id list
  *  (professions/material_grades.ts materialGradeIds), never from a record. */
+/** Gate-only probe for the cvault wire signature: the SAME predicate
+ *  craftVaultStockFor answers null through, without paying its projection
+ *  clone. The server probes this every snapshot beside vaultWireRevFor, so
+ *  the pair (rev, blocked) fully determines whether the projection could
+ *  have changed (every stock mutation bumps the rev; the gate is a pure
+ *  function of position and membership). */
+export function craftVaultDrawBlockedFor(ctx: SimContext, pid: number): boolean {
+  return vaultDrawBlocked(ctx, pid);
+}
+
 export function craftVaultStockFor(ctx: SimContext, pid: number): Record<string, number> | null {
   const stock = vaultDrawStock(ctx, pid);
   if (!stock) return null;

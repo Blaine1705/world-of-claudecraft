@@ -10967,6 +10967,9 @@ export class Sim {
   craftVaultStockFor(pid: number): Record<string, number> | null {
     return vaultMod.craftVaultStockFor(this.ctx, pid);
   }
+  craftVaultDrawBlockedFor(pid: number): boolean {
+    return vaultMod.craftVaultDrawBlockedFor(this.ctx, pid);
+  }
 
   // -------------------------------------------------------------------------
   // The Guild Bank: the shared guild treasury + item store (Phase 1 foundation)

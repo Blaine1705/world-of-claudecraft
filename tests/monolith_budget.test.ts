@@ -376,7 +376,13 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED again at the PR #3670 review-fix round: the named-slot target
     // fold moved to item_copy_ref.ts, paying for the bankWireRev field and its
     // delegate plus the corrected vault-load comments. Exact count, zero slack.
-    ceiling: 12352,
+    // Raised +3 at the third-round fixes for craftVaultDrawBlockedFor, the
+    // cvault wire signature's gate-only probe: a one-line delegate to the
+    // materials_vault module (which owns the logic), the same thin-consumer
+    // shape as its craftVaultStockFor neighbor. The raise is this PR's
+    // REQUEST, not a settled ruling: merging is what ratifies it. Exact
+    // count, zero slack.
+    ceiling: 12355,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -514,7 +520,17 @@ const MONOLITHS: MonolithRow[] = [
     // The release arm DELETES more than this branch adds, so the merged count lands
     // below the branch pin and the ratchet follows it DOWN. Measured on the merged
     // tree, never reconciled by arithmetic. Exact count, zero slack.
-    ceiling: 4924,
+    // Raised +26 at the third-round fixes. The substance went to siblings
+    // (db_backend_cancel.ts owns the dedicated cancel side pool;
+    // BANK_LEDGER_BATCH_RECEIPTS_VALIDATE_SQL lives with its schema in
+    // bank_ledger_batch_db.ts; the readback SQL moved beside its builder in
+    // bank_ledger_growth_budget.ts); what remains here is coordinator wiring
+    // none of those can own: the boot client's RAISE NOTICE forward, the
+    // readback issue-and-warn before COMMIT, the post-listen VALIDATE call in
+    // the concurrent-index runner, and the delete call-site handing the
+    // dedicated canceller. The raise is this PR's REQUEST, not a settled
+    // ruling: merging is what ratifies it. Exact count, zero slack.
+    ceiling: 4950,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {

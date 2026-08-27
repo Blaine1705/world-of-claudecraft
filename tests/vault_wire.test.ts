@@ -36,11 +36,9 @@ import {
 } from '../server/http/game_signals';
 import { REALM } from '../server/realm';
 import {
-  CVAULT_WIRE_INTERVAL_TICKS,
   decodeVaultSpecialRef,
   dispatchVaultCommand,
   emitVaultSelfKeys,
-  takeCvaultWireTurn,
   type VaultSim,
 } from '../server/vault_wire';
 import { recipeById } from '../src/sim/content/recipes';
@@ -1572,19 +1570,16 @@ describe('materials vault wire round-trip', () => {
 // decisive decode pins the dirtyEveryDeltaField harness cannot carry (its
 // player holds a live delve run, so the gate is closed there by construction).
 //
-// cvault keeps the 4 Hz cadence (CVAULT_WIRE_INTERVAL_TICKS) while unchanged,
-// but a live vault mutation bypasses it so the crafting window never offers
-// already-spent stock. Context-only changes retain the existing <=250ms bound.
+// cvault is SIGNATURE-GATED on (vaultWireRevFor, craftVaultDrawBlockedFor):
+// a live vault mutation bumps the rev and ships the new count on the next
+// snapshot, a gate flip ships the explicit null (or the restored rows) on the
+// next snapshot, and an unchanged pair omits the key entirely, so the
+// crafting window never offers already-spent stock and an idle session never
+// pays a projection rebuild.
 // ---------------------------------------------------------------------------
-function advancePastCvaultCadence(sim: { tick(): unknown }): void {
-  // The exported interval (CVAULT_WIRE_HZ 4 at DT 1/20 = 5 ticks) plus one
-  // tick of margin, imported rather than hardcoded so a cadence retune moves
-  // this harness with it.
-  for (let i = 0; i < CVAULT_WIRE_INTERVAL_TICKS + 1; i++) sim.tick();
-}
 
 describe('craft-from-vault stock delta (cvault)', () => {
-  it('a successful vault mutation bypasses cadence, then unchanged frames stay gated', () => {
+  it('a successful vault mutation ships the new count next snapshot, then unchanged frames elide', () => {
     const server = new GameServer();
     const fw = fakeWs();
     const { sim, pid, meta } = seat(server, fw, 60, 'Cvaultcadence', 0, [['copper_ore', 5]]);
@@ -1594,8 +1589,8 @@ describe('craft-from-vault stock delta (cvault)', () => {
     broadcast(server);
     expect(lastSnap(fw.sent).self.cvault).toEqual({ copper_ore: 4 });
 
-    // Same tick and therefore nowhere near cadence due. The real deposit bumps
-    // the raw revision and must ship the new count immediately.
+    // Same tick. The real deposit bumps the raw revision and must ship the
+    // new count immediately.
     sim.vaultDeposit(itemIndex(sim, pid, 'copper_ore'), 5, pid);
     fw.sent.length = 0;
     broadcast(server);
@@ -1635,11 +1630,10 @@ describe('craft-from-vault stock delta (cvault)', () => {
     expect(client.craftVaultStock).toBe(wireStock);
     expect(client.craftVaultStock).toEqual({ copper_ore: 4 });
 
-    // Unchanged stock on the next EVALUATED snapshot omits the key and the
-    // mirror keeps the SAME instance (omission means unchanged, never "no
-    // vault"); advancing past the cadence makes this the delta elision, not
-    // merely the cadence skip.
-    advancePastCvaultCadence(sim);
+    // Unchanged stock on the next snapshot omits the key and the mirror
+    // keeps the SAME instance (omission means unchanged, never "no vault"):
+    // the (rev, gate) signature did not move, so the projection is elided.
+    sim.tick();
     fw.sent.length = 0;
     broadcast(server);
     const second = lastSnap(fw.sent);
@@ -1745,7 +1739,7 @@ describe('craft-from-vault stock delta (cvault)', () => {
     // instance membership, which is exactly the fail-closed posture it pins.
     p.pos.x = DUNGEON_X_THRESHOLD + 1;
     p.prevPos = { ...p.pos };
-    advancePastCvaultCadence(sim);
+    sim.tick();
     fw.sent.length = 0;
     broadcast(server);
     const gated = lastSnap(fw.sent);
@@ -1755,10 +1749,11 @@ describe('craft-from-vault stock delta (cvault)', () => {
     (client as any).applySnapshot(gated);
     expect(client.craftVaultStock).toBeNull();
 
-    // Walking back out restores the rows on the next evaluated snapshot.
+    // Walking back out restores the rows on the next snapshot: the gate
+    // probe flips the signature without any revision change.
     p.pos.x = home.x;
     p.prevPos = { ...p.pos };
-    advancePastCvaultCadence(sim);
+    sim.tick();
     fw.sent.length = 0;
     broadcast(server);
     // biome-ignore lint/suspicious/noExplicitAny: applySnapshot is a ClientWorld internal
@@ -1793,9 +1788,9 @@ describe('craft-from-vault stock delta (cvault)', () => {
 // GameServer (the narrow VaultSim host interface exists for exactly this; the
 // end-to-end pins above stay authoritative for behavior through the real
 // dispatch). These arms pin the classes the integration run cannot make
-// decisive on its own: per-command shape refusal, the TAKE semantics of the
-// cadence turn (a same-pass second call must lose), and the batch's
-// drain-on-flush (a reused instance must never re-insert prior rows).
+// decisive on its own: per-command shape refusal, the (rev, gate) signature
+// elision, and the batch's drain-on-flush (a reused instance must never
+// re-insert prior rows).
 // ---------------------------------------------------------------------------
 describe('vault_wire module units', () => {
   const calls: string[] = [];
@@ -1869,15 +1864,6 @@ describe('vault_wire module units', () => {
     ]);
   });
 
-  it('takeCvaultWireTurn CONSUMES the turn: a same-pass second call loses', () => {
-    const session = { lastCvaultWireTick: -CVAULT_WIRE_INTERVAL_TICKS };
-    expect(takeCvaultWireTurn(session, 0)).toBe(true);
-    // The build-then-send trap the name warns about: same tick, second call.
-    expect(takeCvaultWireTurn(session, 0)).toBe(false);
-    expect(takeCvaultWireTurn(session, CVAULT_WIRE_INTERVAL_TICKS - 1)).toBe(false);
-    expect(takeCvaultWireTurn(session, CVAULT_WIRE_INTERVAL_TICKS)).toBe(true);
-  });
-
   it('probes revisions every pass but builds vault payloads only on first send, change, or open/close', () => {
     let gatedRev: number | null = 3;
     const rawRev: number | null = 3;
@@ -1886,6 +1872,7 @@ describe('vault_wire module units', () => {
     const sim = {
       vaultInfoWireRevFor: () => gatedRev,
       vaultWireRevFor: () => rawRev,
+      craftVaultDrawBlockedFor: () => false,
       vaultInfoFor: () => {
         vaultBuilds++;
         return {
@@ -1907,7 +1894,7 @@ describe('vault_wire module units', () => {
       lastVaultWireRev: null as number | null,
       lastCvaultWirePid: null as number | null,
       lastCvaultWireRev: null as number | null,
-      lastCvaultWireTick: -CVAULT_WIRE_INTERVAL_TICKS,
+      lastCvaultWireBlocked: null as boolean | null,
     };
     const emitted: [string, unknown][] = [];
     const emit = (key: string, value: unknown): void => {
@@ -1915,40 +1902,42 @@ describe('vault_wire module units', () => {
       emitted.push([key, value]);
     };
 
-    emitVaultSelfKeys(emit, sim, session, 9, 0);
+    emitVaultSelfKeys(emit, sim, session, 9);
     expect(emitted.map(([key]) => key)).toEqual(['vault', 'cvault']);
     expect([vaultBuilds, cvaultBuilds]).toEqual([1, 1]);
 
     emitted.length = 0;
-    emitVaultSelfKeys(emit, sim, session, 9, 1);
+    emitVaultSelfKeys(emit, sim, session, 9);
     expect(emitted).toEqual([]);
     expect([vaultBuilds, cvaultBuilds]).toEqual([1, 1]);
 
     // A retarget is part of the signature even when the two characters happen
     // to share a revision and lastSent remains populated.
-    emitVaultSelfKeys(emit, sim, session, 10, 1);
+    emitVaultSelfKeys(emit, sim, session, 10);
     expect(emitted.map(([key]) => key)).toEqual(['vault', 'cvault']);
     expect([vaultBuilds, cvaultBuilds]).toEqual([2, 2]);
 
     emitted.length = 0;
     gatedRev = null;
-    emitVaultSelfKeys(emit, sim, session, 10, 2);
+    emitVaultSelfKeys(emit, sim, session, 10);
     expect(emitted).toEqual([['vault', null]]);
     expect(vaultBuilds).toBe(2); // closing never builds the large value
 
     emitted.length = 0;
     gatedRev = 3;
-    emitVaultSelfKeys(emit, sim, session, 10, 3);
+    emitVaultSelfKeys(emit, sim, session, 10);
     expect(emitted[0]?.[0]).toBe('vault');
     expect(vaultBuilds).toBe(3);
   });
 
-  it('bypasses cvault cadence on revision or lastSent change, then restores the 4 Hz gate', () => {
+  it('elides cvault while the (rev, gate) signature holds, ships on either half moving', () => {
     let rev = 4;
+    let blocked = false;
     let builds = 0;
     const sim = {
       vaultInfoWireRevFor: () => rev,
       vaultWireRevFor: () => rev,
+      craftVaultDrawBlockedFor: () => blocked,
       vaultInfoFor: () => ({
         stock: {},
         special: [],
@@ -1967,24 +1956,38 @@ describe('vault_wire module units', () => {
       lastVaultWireRev: 4 as number | null,
       lastCvaultWirePid: 9 as number | null,
       lastCvaultWireRev: 4 as number | null,
-      lastCvaultWireTick: 10,
+      lastCvaultWireBlocked: null as boolean | null,
     };
+    const emitted: [string, unknown][] = [];
     const emit = (key: string, value: unknown): void => {
       session.lastSent[key] = JSON.stringify(value ?? null);
+      emitted.push([key, value]);
     };
 
-    emitVaultSelfKeys(emit, sim, session, 9, 11);
+    emitVaultSelfKeys(emit, sim, session, 9);
     expect(builds).toBe(1); // sent.cvault undefined forces a reconnect-style send
 
-    emitVaultSelfKeys(emit, sim, session, 9, 12);
+    // The signature holds: no rebuild, however many passes run (this was the
+    // 4 Hz cadence's unconditional projection rebuild before).
+    for (let pass = 0; pass < 10; pass++) emitVaultSelfKeys(emit, sim, session, 9);
     expect(builds).toBe(1);
+
     rev = 5;
-    emitVaultSelfKeys(emit, sim, session, 9, 12);
-    expect(builds).toBe(2); // mutation bypasses the not-due cadence
-    emitVaultSelfKeys(emit, sim, session, 9, 12 + CVAULT_WIRE_INTERVAL_TICKS - 1);
+    emitVaultSelfKeys(emit, sim, session, 9);
+    expect(builds).toBe(2); // a mutation ships on the very next pass
+
+    // A gate flip ships the EXPLICIT null on the next pass without paying the
+    // projection call at all, and the return trip restores the rows.
+    emitted.length = 0;
+    blocked = true;
+    emitVaultSelfKeys(emit, sim, session, 9);
+    expect(emitted).toEqual([['cvault', null]]);
     expect(builds).toBe(2);
-    emitVaultSelfKeys(emit, sim, session, 9, 12 + CVAULT_WIRE_INTERVAL_TICKS);
-    expect(builds).toBe(3); // unchanged context retains its cadence refresh
+    blocked = false;
+    emitVaultSelfKeys(emit, sim, session, 9);
+    expect(builds).toBe(3);
+    emitVaultSelfKeys(emit, sim, session, 9);
+    expect(builds).toBe(3);
   });
 
   it('stamps cvault trackers only after the emitter accepts the rebuilt value', () => {
@@ -1994,11 +1997,12 @@ describe('vault_wire module units', () => {
       lastVaultWireRev: 8 as number | null,
       lastCvaultWirePid: 9 as number | null,
       lastCvaultWireRev: 7 as number | null,
-      lastCvaultWireTick: 20,
+      lastCvaultWireBlocked: false as boolean | null,
     };
     const sim = {
       vaultInfoWireRevFor: () => 8,
       vaultWireRevFor: () => 8,
+      craftVaultDrawBlockedFor: () => false,
       vaultInfoFor: () => null,
       craftVaultStockFor: () => ({ copper_ore: 8 }),
     };
@@ -2010,26 +2014,27 @@ describe('vault_wire module units', () => {
         sim,
         session,
         9,
-        21,
       ),
     ).toThrow('wire rejected');
     expect(session.lastCvaultWireRev).toBe(7);
-    expect(session.lastCvaultWireTick).toBe(20);
+    expect(session.lastCvaultWireBlocked).toBe(false);
 
+    // The gate-flip arm keeps the same contract: a rejected emit leaves the
+    // blocked tracker unstamped, so the flip re-ships on the next pass.
     session.lastSent.cvault = '{}';
     session.lastCvaultWireRev = 8;
+    const blockedSim = { ...sim, craftVaultDrawBlockedFor: () => true };
     expect(() =>
       emitVaultSelfKeys(
         () => {
-          throw new Error('cadence wire rejected');
+          throw new Error('gate wire rejected');
         },
-        sim,
+        blockedSim,
         session,
         9,
-        20 + CVAULT_WIRE_INTERVAL_TICKS,
       ),
-    ).toThrow('cadence wire rejected');
-    expect(session.lastCvaultWireTick).toBe(20);
+    ).toThrow('gate wire rejected');
+    expect(session.lastCvaultWireBlocked).toBe(false);
   });
 });
 
