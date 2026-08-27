@@ -12,6 +12,7 @@ import { IGNIVAR_SECOND_WING_ID } from '../src/sim/ignivar_raid_ids';
 import { enterDungeon } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
 import { DT, type Entity } from '../src/sim/types';
+import { VARKHUL_SHARED_PYRE_AURA_ID } from '../src/sim/varkhul_shared_pyre';
 
 function encounter(heroic = false): { sim: Sim; boss: Entity } {
   const sim = new Sim({ seed: 9417, playerClass: 'warrior', devCommands: true });
@@ -54,6 +55,7 @@ function armOnlyInterceptBeam(sim: Sim, boss: Entity): NonNullable<Entity['varkh
   state.frontalTimer = 999;
   state.cinderOrbsTimer = 999;
   state.forgestormTimer = 999;
+  state.sharedPyreTimer = 999;
   state.anvilTimer = 999;
   state.interceptBeamTimer = DT;
   return state;
@@ -140,6 +142,31 @@ describe('Varkhul Tempering Ray encounter integration', () => {
     expect(forgeState.majorAbility).toBe('none');
     expect(forgeState.interceptBeamTimer).toBe(1.7);
     expect(forgeState.interceptBeamTargetId).toBeNull();
+  });
+
+  it('runs a due Tempering Ray before Shared Pyre and never starts both together', () => {
+    const { sim, boss } = encounter();
+    const target = addDps(sim, boss, 'Serialized Pyre Smith');
+    const state = armOnlyInterceptBeam(sim, boss);
+    state.sharedPyreTimer = DT;
+
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    expect(state.majorAbility).toBe('interceptBeam');
+    expect(state.interceptBeamTargetId).toBe(target.id);
+    expect(state.sharedPyreTargetId).toBeNull();
+    expect(target.auras.some((aura) => aura.id === VARKHUL_SHARED_PYRE_AURA_ID)).toBe(false);
+
+    state.interceptBeamCastRemaining = DT;
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(state.majorAbility).toBe('none');
+    expect(state.sharedPyreTargetId).toBeNull();
+
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(state.majorAbility).toBe('sharedPyre');
+    expect(state.interceptBeamTargetId).toBeNull();
+    expect(state.sharedPyreTargetId).toBe(target.id);
+    expect(target.auras.some((aura) => aura.id === VARKHUL_SHARED_PYRE_AURA_ID)).toBe(true);
   });
 
   it('fixates a non-tank, follows their movement, and publishes the current interceptor', () => {

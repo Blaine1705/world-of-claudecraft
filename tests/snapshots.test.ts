@@ -38,6 +38,7 @@ import {
 import { MOUNT_RACE_START_PLATFORM, type MountKey } from '../src/sim/content/mounts';
 import { COMBO_RECIPES } from '../src/sim/content/recipes';
 import { BUILTIN_WORLD, DELVES, GATHER_NODES, ITEMS, MOBS } from '../src/sim/data';
+import { IGNIVAR_JUDGMENT_CAST_ID } from '../src/sim/encounters/ignivar';
 import { createMob } from '../src/sim/entity';
 import { emptySaleLog } from '../src/sim/market_sale_log';
 import { MOUNT_RACE_COUNTDOWN_TICKS } from '../src/sim/mount_race';
@@ -46,6 +47,10 @@ import { livePlaytimeSeconds } from '../src/sim/playtime';
 import { noteRelicItemFind, noteRelicObtain } from '../src/sim/reliquary';
 import { Sim } from '../src/sim/sim';
 import { type Aura, DT, type PlayerClass, type WorldContent } from '../src/sim/types';
+import {
+  VARKHUL_SHARED_PYRE_AURA_ID,
+  VARKHUL_SHARED_PYRE_NAME,
+} from '../src/sim/varkhul_shared_pyre';
 import { terrainHeight } from '../src/sim/world';
 import { absorbTotal } from '../src/ui/absorb_bar';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
@@ -6202,6 +6207,106 @@ describe('Consecration snapshot parity', () => {
         rem: 6.5,
       }),
     ]);
+  });
+});
+
+describe('Ignivar raid actionable reconnect state', () => {
+  it('rebuilds and clears Forge Judgment from the authoritative boss cast snapshot', () => {
+    const boss = createMob(
+      9900,
+      MOBS.ignivar_herald_of_the_last_flame,
+      MOBS.ignivar_herald_of_the_last_flame.maxLevel,
+      { x: 3, y: 0, z: 5 },
+    );
+    boss.castingAbility = IGNIVAR_JUDGMENT_CAST_ID;
+    boss.castTotal = 10;
+    boss.castRemaining = 8;
+    boss.channeling = false;
+    boss.facing = 1.25;
+    const client = bareClient(1);
+
+    (client as unknown as SnapshotApplier).applySnapshot({
+      t: 'snap',
+      ents: [JSON.parse(JSON.stringify(wireEntity(boss)))],
+    });
+
+    expect(client.entities.get(boss.id)).toMatchObject({
+      castingAbility: IGNIVAR_JUDGMENT_CAST_ID,
+      castTotal: 10,
+      castRemaining: 8,
+      channeling: false,
+      facing: 1.25,
+    });
+
+    boss.castRemaining = 4;
+    boss.channeling = true;
+    (client as unknown as SnapshotApplier).applySnapshot({
+      t: 'snap',
+      ents: [JSON.parse(JSON.stringify(wireEntity(boss)))],
+    });
+    expect(client.entities.get(boss.id)).toMatchObject({
+      castingAbility: IGNIVAR_JUDGMENT_CAST_ID,
+      castRemaining: 4,
+      channeling: true,
+    });
+
+    boss.castingAbility = null;
+    boss.castTotal = 0;
+    boss.castRemaining = 0;
+    boss.channeling = false;
+    (client as unknown as SnapshotApplier).applySnapshot({
+      t: 'snap',
+      ents: [JSON.parse(JSON.stringify(wireEntity(boss)))],
+    });
+    expect(client.entities.get(boss.id)).toMatchObject({
+      castingAbility: null,
+      castTotal: 0,
+      castRemaining: 0,
+      channeling: false,
+    });
+  });
+
+  it('rebuilds and clears the Shared Pyre target mark after reconnect', () => {
+    const sim = new Sim({ seed: 9900, playerClass: 'priest', world: WIRE_TEST_WORLD });
+    sim.player.auras.push({
+      id: VARKHUL_SHARED_PYRE_AURA_ID,
+      name: VARKHUL_SHARED_PYRE_NAME,
+      kind: 'vulnerability',
+      remaining: 4.5,
+      duration: 6,
+      value: 0,
+      stacks: 5,
+      sourceId: 9901,
+      school: 'fire',
+      encounterOwned: true,
+    });
+    const client = bareClient(999);
+
+    (client as unknown as SnapshotApplier).applySnapshot({
+      t: 'snap',
+      ents: [JSON.parse(JSON.stringify(wireEntity(sim.player)))],
+    });
+
+    expect(client.entities.get(sim.player.id)?.auras).toContainEqual(
+      expect.objectContaining({
+        id: VARKHUL_SHARED_PYRE_AURA_ID,
+        remaining: 4.5,
+        duration: 6,
+        stacks: 5,
+        sourceId: 9901,
+      }),
+    );
+
+    sim.player.auras = [];
+    (client as unknown as SnapshotApplier).applySnapshot({
+      t: 'snap',
+      ents: [JSON.parse(JSON.stringify(wireEntity(sim.player)))],
+    });
+    expect(
+      client.entities
+        .get(sim.player.id)
+        ?.auras.some((aura) => aura.id === VARKHUL_SHARED_PYRE_AURA_ID),
+    ).toBe(false);
   });
 });
 

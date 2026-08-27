@@ -1265,11 +1265,15 @@ function updateSharedPyre(
   boss.castRemaining = st.sharedPyreRemaining;
   const target =
     st.sharedPyreTargetId === null ? undefined : ctx.entities.get(st.sharedPyreTargetId);
+  if (!target || target.dead) {
+    cancelMajorAbility(ctx, boss, st);
+    return;
+  }
   const aura = target?.auras.find(
     (entry) => entry.id === VARKHUL_SHARED_PYRE_AURA_ID && entry.sourceId === boss.id,
   );
   if (aura) aura.remaining = st.sharedPyreRemaining;
-  if (st.sharedPyreRemaining <= CAST_COMPLETE_EPS || !target || target.dead) {
+  if (st.sharedPyreRemaining <= CAST_COMPLETE_EPS) {
     resolveSharedPyre(ctx, boss, st, players);
   }
 }
