@@ -110,8 +110,8 @@ describe('Ignivar fire beam VFX', () => {
     compile(outer.material as THREE.Material);
     compile(veil.material as THREE.Material);
     // The v2 thermal look (PR 3684's restored raid presentation, captured in
-    // that PR's committed docs/screenshots/ignivar-lava-moat set): brighter
-    // flame body layers, an additive white-hot core strip, and a boundary that
+    // that PR's committed ignivar-lava-moat screenshot set): brighter flame
+    // body layers, an additive white-hot core strip, and a boundary that
     // stays ABOVE the old readability floor so the lethal lane never fades.
     expect((floor.material as THREE.Material).opacity).toBeLessThanOrEqual(0.08);
     expect((outer.material as THREE.Material).opacity).toBeLessThanOrEqual(0.2);
