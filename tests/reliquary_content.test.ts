@@ -812,8 +812,7 @@ describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
     // The Crucible raid ships behind a development-only entrance; its pages
     // land with the launch pass (docs/prd/ignivar-raid-loot.md).
     ignivar_herald_of_the_last_flame: 'development-only raid; pages land with the launch pass',
-    varkhul_forgefather_of_the_last_flame:
-      'development-only raid; pages land with the launch pass',
+    varkhul_forgefather_of_the_last_flame: 'development-only raid; pages land with the launch pass',
   };
 
   it('carves out only auto-generated heroic variants, never a bespoke heroic unique', () => {

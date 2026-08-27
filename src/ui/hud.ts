@@ -47,9 +47,8 @@ import {
 import { resolveActionReplacement } from '../sim/combat/action_replacement';
 import { resolveColdsightAbilityForSpec } from '../sim/combat/hunter_coldsight';
 import { resolveHunterSharedAbilityForTalents } from '../sim/combat/hunter_shared';
-import { isNecromancyUndead } from '../sim/combat/necromancy';
 import { warriorParryChance } from '../sim/combat/warrior_hit_table';
-import { DEED_ORDER, DEEDS } from '../sim/content/deeds';
+import { DEEDS } from '../sim/content/deeds';
 import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
 import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
 import { CRUCIBLE_VENDOR_STOCK } from '../sim/content/ignivar_loot';
@@ -124,12 +123,10 @@ import {
   type ItemDef,
   isMechWearer,
   MAX_LEVEL,
-  MILESTONES,
   SALVAGE_CAST_ID,
   type SimEvent,
   TICK_RATE,
   TOOL_RECHARGE_CAST_ID,
-  virtualLevel,
   xpUntilNextPrestige,
 } from '../sim/types';
 import { maxBuyCount } from '../sim/vendor_buy_stack';
@@ -700,11 +697,7 @@ import {
   reliquaryPageName,
 } from './reliquary_i18n';
 import { reliquaryRelicDisplayName } from './reliquary_labels';
-import {
-  buildReliquarySheetModel,
-  reliquarySheetProgressionHtml,
-  selfCuratorStanding,
-} from './reliquary_sheet_view';
+import { selfCuratorStanding } from './reliquary_sheet_view';
 import { ReliquaryTrackerPainter } from './reliquary_tracker_painter';
 import {
   buildReliquaryTrackerViewInto,
@@ -727,7 +720,6 @@ import { localizeServerText } from './server_i18n';
 import {
   localizeAuthoredYellSpeakerName,
   localizeAuthoredYellText,
-  localizeSimAuraName,
   localizeSimText,
   tSim,
 } from './sim_i18n';
@@ -761,7 +753,6 @@ import { recordStoreStackSample } from './store_stack_diag';
 import { nearestSubzone } from './subzone';
 import { swingTimerState } from './swing_timer';
 import { SwingTimerPainter } from './swing_timer_painter';
-import { roleLabel, tTalent } from './talent_i18n';
 import { TalentsWindow } from './talents_window';
 import { targetAuraSourceName } from './target_auras_view';
 import { TargetAurasWindow } from './target_auras_window';

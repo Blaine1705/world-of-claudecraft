@@ -134,7 +134,10 @@ const MONOLITHS: MonolithRow[] = [
     // moving the character-sheet progression views (milestoneName,
     // talentSummaryHtml, progressionHtml) to src/ui/character_progression_view.ts,
     // shrinking the coordinator below the previous pin. Exact count, zero slack.
-    ceiling: 18371,
+    // Lowered 18371 -> 18357: the changed-files biome pass stripped the
+    // unused imports the progression-view extraction and the lineage retune
+    // left behind; the ratchet follows the file down. Exact count, zero slack.
+    ceiling: 18357,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
