@@ -47,14 +47,15 @@ export const EMBER_LAND_LOBES = [
   // volcanic islet the owner's bridge asset will span from the mainland
   // (docs/design/ignivar-entrance/plan.md). The fortress tier plateaus
   // are stamped by FORGEFATHER_ISLE_TERRAIN_EDITS below.
-  { x: 511, z: 2218, r: 25 }, // the isle's body
-  { x: 508, z: 2240, r: 15 }, // ...its north shoulder (the summit's footing,
+  { x: 512, z: 2220, r: 32 }, // the isle's body, grown grand
+  { x: 509, z: 2250, r: 21 }, // ...its north shoulder (the summit's footing,
   // wide enough that the high tiers' rims run out on dry ground)
-  { x: 517, z: 2201, r: 12 }, // ...its south shoulder (the bridgehead beach)
-  { x: 522, z: 2214, r: 10 }, // ...the east beach ramp (bank gradient)
-  { x: 518, z: 2230, r: 10 }, // ...the northeast beach ramp (bank gradient)
-  { x: 503, z: 2212, r: 14 }, // ...the west shoulder, stretched so the
+  { x: 514, z: 2192, r: 16 }, // ...its south shoulder (the south strand)
+  { x: 524, z: 2216, r: 12 }, // ...the east beach ramp (bank gradient)
+  { x: 520, z: 2240, r: 12 }, // ...the northeast beach ramp (bank gradient)
+  { x: 500, z: 2210, r: 15 }, // ...the west shoulder, stretched so the
   // bridgehead beach climbs gently out of the strait (bank gradient)
+  { x: 498, z: 2232, r: 12 }, // ...the northwest beach ramp (bank gradient)
 ] as const;
 export const EMBER_BAYS = [
   { x: 195, z: 1980, r: 50 }, // the west bight
@@ -62,9 +63,11 @@ export const EMBER_BAYS = [
   // the Forgefather's Isle water while still carving the coast above
   { x: 538, z: 2162, r: 46 },
   { x: 205, z: 2230, r: 40 }, // a western cove under the spur
-  // the Forgefather's Strait: pulls the Trollmoot coast inland so the
-  // isle stands offshore (the bridge's water)
-  { x: 488, z: 2212, r: 18 },
+  // the Forgefather's Strait, widened for the grand isle: the Trollmoot
+  // coast pulls further inland (the two eyes) so open water rings every
+  // face and the owner's bridge earns its length
+  { x: 478, z: 2210, r: 24 },
+  { x: 478, z: 2242, r: 14 },
 ] as const;
 
 /** The Forgefather's Isle fortress tiers: flat build plateaus with smooth
@@ -74,19 +77,25 @@ export const EMBER_BAYS = [
  *  bridgehead onto tier one, switchbacks up the south faces. Applied over
  *  the isle lobes; the raid entrance slice furnishes them. */
 export const FORGEFATHER_ISLE_TERRAIN_EDITS: HeightStamp[] = [
-  // the bridgehead terrace: level the strait-side landing to a low dry
-  // beach first (3.3 over the waterline, above the coast sweep's
-  // shore-rooted band), so the climb onto tier one starts from exempt
-  // ground and the approach band's own steps stay small
-  { x: 501, z: 2210, radius: 14, delta: -1, falloff: 'smooth', mode: 'level' },
-  // ...and the northeast landing's twin, under the high tiers' seaward rims
-  { x: 516, z: 2232, radius: 10, delta: -1, falloff: 'smooth', mode: 'level' },
-  { x: 511, z: 2212, radius: 17, delta: 2, falloff: 'smooth', mode: 'level' },
-  { x: 511, z: 2212, radius: 12, delta: 2, falloff: 'flat', mode: 'level' },
-  { x: 509, z: 2221, radius: 15, delta: 6.5, falloff: 'smooth', mode: 'level' },
-  { x: 509, z: 2221, radius: 9.5, delta: 6.5, falloff: 'flat', mode: 'level' },
-  { x: 506, z: 2229, radius: 10.5, delta: 11, falloff: 'smooth', mode: 'level' },
-  { x: 506, z: 2229, radius: 6, delta: 11, falloff: 'flat', mode: 'level' },
-  { x: 504, z: 2236, radius: 6.5, delta: 15, falloff: 'smooth', mode: 'level' },
-  { x: 504, z: 2236, radius: 3, delta: 15, falloff: 'flat', mode: 'level' },
+  // The five fortress tiers first...
+  { x: 513, z: 2206, radius: 22, delta: 2, falloff: 'smooth', mode: 'level' },
+  { x: 513, z: 2206, radius: 16, delta: 2, falloff: 'flat', mode: 'level' },
+  { x: 510, z: 2220, radius: 18, delta: 6.5, falloff: 'smooth', mode: 'level' },
+  { x: 510, z: 2220, radius: 12, delta: 6.5, falloff: 'flat', mode: 'level' },
+  { x: 507, z: 2232, radius: 13.5, delta: 11, falloff: 'smooth', mode: 'level' },
+  { x: 507, z: 2232, radius: 8.5, delta: 11, falloff: 'flat', mode: 'level' },
+  { x: 505, z: 2242, radius: 9.5, delta: 15, falloff: 'smooth', mode: 'level' },
+  { x: 505, z: 2242, radius: 5.5, delta: 15, falloff: 'flat', mode: 'level' },
+  { x: 503, z: 2250, radius: 6, delta: 19, falloff: 'smooth', mode: 'level' },
+  { x: 503, z: 2250, radius: 3, delta: 19, falloff: 'flat', mode: 'level' },
+  // ...then the shore landings LAST, so they carve authoritatively into
+  // the tier flanks (stamps apply in array order; an earlier landing was
+  // silently re-lifted by the tier rims above it). Each levels its shore
+  // band to a low dry terrace (3.3 over the waterline, above the coast
+  // sweep's shore-rooted band), so climbs start from exempt ground.
+  { x: 499, z: 2203, radius: 18, delta: -1, falloff: 'smooth', mode: 'level' }, // bridgehead
+  { x: 514, z: 2239, radius: 7, delta: 7, falloff: 'smooth', mode: 'level' }, // upper east shelf
+  { x: 517, z: 2232, radius: 9, delta: 3.5, falloff: 'smooth', mode: 'level' }, // east mid shelf
+  { x: 521, z: 2239, radius: 10, delta: -1, falloff: 'smooth', mode: 'level' }, // northeast landing
+  { x: 514, z: 2249, radius: 8, delta: -1, falloff: 'smooth', mode: 'level' }, // north landing
 ];
