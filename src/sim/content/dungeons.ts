@@ -98,7 +98,12 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 46,
     moveSpeed: 6.8,
     aggroRadius: 30,
-    loot: [],
+    // The Inner Crucible's finale money entry: Varkhul's room carries its own
+    // heroic claim (HEROIC_DUNGEON_TUNING.ignivar_inner_crucible), so it pays
+    // the raid finale band exactly like Ignivar's arena, heroic substituting on
+    // the same single draw (tests/heroic_finale_gold.test.ts). Item drops are
+    // still to be authored for the development raid tier.
+    loot: [{ copper: 150000, heroicCopper: NYTHRAXIS_HEROIC_COPPER, chance: 1 }],
     scale: 3.2,
     color: 0x9f351c,
   },
