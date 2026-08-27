@@ -1,8 +1,11 @@
 # The Ignivar Raid Entrance: Drakelands Overworld Door
 
-Status: PLAN, for team and owner review. Site selection open: the
-survey below ranks a new-land western headland first, with a
-Drakemaw-saddle alternative on existing ground.
+Status: PLAN, site DECIDED (owner picked it on the zone map): an ISLAND
+in the western cove near (205, 2255), the primary candidate below, with
+the bridge crossing from the Bloodglass shore. The bridge itself is a
+new asset the owner is authoring; it joins the placer's exterior kit
+when it lands. Nearby camps on the shore shift slightly east to clear
+the bridgehead approach.
 
 ## Goal
 
