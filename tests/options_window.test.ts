@@ -187,6 +187,18 @@ describe('options_window: WCAG 2.2 AA', () => {
     expect(painter).toContain('ariaLabel: buttonLabel');
     expect(painter).toContain("ariaLabel: t('hud.options.language')");
   });
+
+  it('keeps bare face and d-pad bindings editable when the cross hotbar is enabled', () => {
+    const controller = painter.slice(
+      painter.indexOf('private renderController(): void {'),
+      painter.indexOf('private renderCrossHotbarRows('),
+    );
+    expect(controller).toContain(
+      'if (crossHotbarOwned && isCrossHotbarModifier(button)) continue;',
+    );
+    expect(controller).not.toContain('isCrossHotbarButton(button)');
+    expect(controller).not.toContain('crossHotbarOwnsButtons');
+  });
 });
 
 describe('options_window: deed-broadcast account row', () => {
