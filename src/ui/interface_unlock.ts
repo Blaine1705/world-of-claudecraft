@@ -62,9 +62,12 @@ export interface InterfaceUnlockDeps {
    *  compact label + select rows (the party columns count). Same resolve-per-
    *  rebuild and persist-and-apply contract as settingToggles. */
   settingSelects?: () => FramesMenuSelect[];
-  /** One-shot actions rendered as buttons at the dropdown's foot (Reset Frame
-   *  Sizes). The menu rebuilds after a run so every row reflects the result. */
-  menuActions?: () => FramesMenuAction[];
+  /** Label for the per-frame size-reset button on every show/hide row. */
+  resetSizeLabel?: () => string;
+  /** Fired after a row's size reset (mover.resetSize already ran), so the
+   *  host can reset that frame's settings-backed sizes (the dimension drags,
+   *  the scale factors) through the same persist-and-apply pair. */
+  onSizeReset?: (id: string) => void;
   /** Fired after every flip with the new state (and from relocalize with the
    *  current one). The host hangs the edit-mode preview samples off it. */
   onUnlockedChanged?: (unlocked: boolean) => void;
@@ -87,13 +90,6 @@ export interface FramesMenuSelect {
   value: number;
   options: { value: number; label: string }[];
   set(value: number): void;
-}
-
-/** One button row at the dropdown's foot: a one-shot action over the frames. */
-export interface FramesMenuAction {
-  id: string;
-  label: string;
-  run(): void;
 }
 
 /** Body class the stylesheet gates the unlocked affordances on (the frame
@@ -247,19 +243,64 @@ export class InterfaceUnlock {
     sub.appendChild(summary);
     const rows = doc.createElement('div');
     rows.className = 'frames-menu-rows';
+    // Each show/hide row is a WRAP holding the checkbox label plus the
+    // per-frame size-reset button (owner request: reset lives per frame, not
+    // as one global action). The button sits OUTSIDE the label on purpose: a
+    // button inside a <label> would also activate the checkbox it labels.
+    const frameRow = (
+      name: string,
+      checked: boolean,
+      onCheck: (on: boolean) => void,
+      id: string,
+      mover: MovableFrame,
+    ) => {
+      const wrap = doc.createElement('div');
+      wrap.className = 'frames-menu-row-wrap';
+      wrap.appendChild(this.checkRow(name, checked, onCheck));
+      if (this.deps.resetSizeLabel) {
+        const reset = doc.createElement('button');
+        reset.type = 'button';
+        reset.className = 'frames-menu-reset';
+        const label = this.deps.resetSizeLabel();
+        reset.textContent = label;
+        // The visible text is the shared action word; the accessible name
+        // carries WHICH frame it resets.
+        reset.setAttribute('aria-label', `${name}: ${label}`);
+        reset.title = `${name}: ${label}`;
+        reset.addEventListener('click', () => {
+          mover.resetSize();
+          this.deps.onSizeReset?.(id);
+          this.rebuildFramesMenu();
+        });
+        wrap.appendChild(reset);
+      }
+      return wrap;
+    };
     for (const entry of this.entries) {
       const name = entry.mover.labelText();
       if (!name) continue;
       const override = entry.rowOverride;
       if (override) {
         if (!override.listed()) continue;
-        rows.appendChild(this.checkRow(name, override.value(), (checked) => override.set(checked)));
+        rows.appendChild(
+          frameRow(
+            name,
+            override.value(),
+            (checked) => override.set(checked),
+            entry.id,
+            entry.mover,
+          ),
+        );
         continue;
       }
       if (!entry.isActive() && !entry.mover.isUserHidden) continue;
       rows.appendChild(
-        this.checkRow(name, !entry.mover.isUserHidden, (checked) =>
-          entry.mover.setUserHidden(!checked),
+        frameRow(
+          name,
+          !entry.mover.isUserHidden,
+          (checked) => entry.mover.setUserHidden(!checked),
+          entry.id,
+          entry.mover,
         ),
       );
     }
@@ -267,27 +308,13 @@ export class InterfaceUnlock {
     menu.appendChild(sub);
     const toggles = this.deps.settingToggles ? this.deps.settingToggles() : [];
     const selects = this.deps.settingSelects ? this.deps.settingSelects() : [];
-    const actions = this.deps.menuActions ? this.deps.menuActions() : [];
-    if (toggles.length > 0 || selects.length > 0 || actions.length > 0) {
+    if (toggles.length > 0 || selects.length > 0) {
       const settings = doc.createElement('div');
       settings.className = 'frames-menu-settings';
       for (const toggle of toggles) {
         settings.appendChild(this.checkRow(toggle.label, toggle.value, (v) => toggle.set(v)));
       }
       for (const select of selects) settings.appendChild(this.selectRow(select));
-      for (const action of actions) {
-        const btn = doc.createElement('button');
-        btn.type = 'button';
-        btn.className = 'frames-menu-action btn';
-        btn.textContent = action.label;
-        // Rebuild after the run so every row reflects the action's result
-        // (a size reset moves the selects and the live frames alike).
-        btn.addEventListener('click', () => {
-          action.run();
-          this.rebuildFramesMenu();
-        });
-        settings.appendChild(btn);
-      }
       menu.appendChild(settings);
     }
   }

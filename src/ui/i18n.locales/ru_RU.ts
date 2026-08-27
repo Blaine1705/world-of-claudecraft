@@ -783,8 +783,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.debuffsLeftToRight': 'Ослабления слева направо',
   'hudChrome.interfaceUnlock.lockPlayerFrameToBar': 'Закрепить фрейм игрока над панелью действий',
   'hudChrome.interfaceUnlock.actionBarsVertical': 'Вертикальные панели действий',
+  'hudChrome.interfaceUnlock.actionBar1Vertical': 'Вертикальная панель команд',
+  'hudChrome.interfaceUnlock.actionBar2Vertical': 'Вертикальная панель команд 2',
+  'hudChrome.interfaceUnlock.actionBar3Vertical': 'Вертикальная панель команд 3',
   'hudChrome.interfaceUnlock.menuRailHorizontal': 'Горизонтальное меню',
-  'hudChrome.interfaceUnlock.resetFrameSizes': 'Сбросить размеры фреймов',
+  'hudChrome.interfaceUnlock.resetFrameSize': 'Сбросить размер',
+  'hudChrome.partyFrames.optionsSection': 'Настройки фреймов группы',
   'hudChrome.interfaceUnlock.framesMenuTitle':
     'Показать или скрыть отдельные фреймы. Снятый флажок скрывает фрейм, пока вы не включите его снова или не сбросите настройки.',
   'hudChrome.interfaceUnlock.previewSpell': 'Пример заклинания',

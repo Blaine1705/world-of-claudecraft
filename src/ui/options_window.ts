@@ -1,4 +1,4 @@
-// Options window painter: owns the #options-menu DOM, the window-local view-state
+﻿// Options window painter: owns the #options-menu DOM, the window-local view-state
 // (which sub-panel is open, the key-capture buffer, the keybind note, the lazily
 // built performance panel), and the open/close lifecycle. It renders the nine
 // sub-panels off the declarative model in options_view.ts and dispatches every
@@ -112,7 +112,7 @@ import {
   withGraphicsDraft,
 } from './options_view';
 import { PerfOverlaySettingsPanel, type PerfSettingsHost } from './perf_overlay_settings';
-import { settingsCard } from './settings_controls';
+import { settingsCard, subhead } from './settings_controls';
 import { exportTransferCode, importTransferCode } from './settings_transfer';
 import type { TransferKind } from './settings_transfer_core';
 import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
@@ -1469,8 +1469,13 @@ export class OptionsWindow {
 
     // Frames leads with the Edit Frames action (the unlock mode): arranging
     // and sizing frames is what this tab is about, so its entry row sits at
-    // the top, above the declarative frame options.
-    if (tab === 'frames') this.interfaceUnlockRow(body);
+    // the top. The declarative rows below it all tune the party frames
+    // (owner request: one labelled subsection), since every non-party knob
+    // moved into the editor's Frames Settings menu.
+    if (tab === 'frames') {
+      this.interfaceUnlockRow(body);
+      subhead(body, t('hudChrome.partyFrames.optionsSection'), 'set-subhead');
+    }
 
     if (hooks)
       this.applyControls(body, interfaceControlsForTab(controls, tab), hooks, (focusKey) => {
@@ -1481,9 +1486,11 @@ export class OptionsWindow {
           this.deps.root().querySelector<HTMLElement>(`[data-setting-key="${focusKey}"]`)?.focus();
       });
 
-    // Frames closes with the unit-frames reset row + the layout export/import.
+    // Frames closes with the layout export/import. (The Reset Frame
+    // Positions row was retired, owner request: the per-frame size resets
+    // live in the editor's Frames Settings menu and the tab's own Reset to
+    // Defaults footer still restores the settings.)
     if (tab === 'frames') {
-      this.unitFramesResetRow(body);
       this.transferRows(body, 'frames');
     }
     // General closes with the all-settings export/import.
@@ -1541,7 +1548,9 @@ export class OptionsWindow {
         'buffsLeftToRight',
         'debuffsLeftToRight',
         'lockPlayerFrameToActionBar',
-        'actionBarsVertical',
+        'actionBar1Vertical',
+        'actionBar2Vertical',
+        'actionBar3Vertical',
         'menuRailHorizontal',
         'combineActionBars',
         'hideUnusedActionSlots',
@@ -1735,22 +1744,6 @@ export class OptionsWindow {
 
   // Reset the movable player + target unit frames back to their stock spots
   // (forgets the saved drag positions and re-docks the player frame). Frames tab.
-  private unitFramesResetRow(body: HTMLElement): void {
-    const framesRow = document.createElement('div');
-    framesRow.className = 'set-row';
-    const framesName = document.createElement('span');
-    framesName.className = 'set-name';
-    framesName.textContent = t('hudChrome.frameReset.label');
-    const framesBtn = document.createElement('button');
-    framesBtn.className = 'btn set-toggle';
-    framesBtn.textContent = t('hudChrome.chatWindow.resetAction');
-    framesBtn.addEventListener('click', () => {
-      audio.click();
-      this.deps.resetUnitFrames();
-    });
-    framesRow.append(framesName, framesBtn);
-    body.append(framesRow);
-  }
 
   // "Unlock interface": one press loosens every movable HUD frame (the three
   // action bars, the cast bar, the menu rail, the minimap and the player / pet
@@ -1780,20 +1773,14 @@ export class OptionsWindow {
     });
     row.append(name, btn);
     body.append(row);
-    // The two guidance notes the arrange mode needs the player to know going
-    // in: only the bars they have turned on will be there to place (the
-    // plus/minus buttons on the main bar add more, and must be used BEFORE
-    // unlocking, since every button is frozen during editing), and the freeze
-    // itself is deliberate rather than a hang.
-    for (const noteKey of [
-      'hudChrome.interfaceUnlock.barsNote',
-      'hudChrome.interfaceUnlock.frozenNote',
-    ] as const) {
-      const note = document.createElement('div');
-      note.className = 'set-note';
-      note.textContent = t(noteKey);
-      body.appendChild(note);
-    }
+    // One guidance note going in: the freeze while editing is deliberate
+    // rather than a hang. (The action-bars note was retired, owner request:
+    // the Frames Settings menu now lists bar 2/3 in both shapes, so the
+    // plus/minus preamble no longer needs explaining here.)
+    const note = document.createElement('div');
+    note.className = 'set-note';
+    note.textContent = t('hudChrome.interfaceUnlock.frozenNote');
+    body.appendChild(note);
   }
 
   // -------------------------------------------------------------------------

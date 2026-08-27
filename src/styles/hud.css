@@ -1920,12 +1920,30 @@
     font: inherit;
     padding: 1px 4px;
   }
-  /* The one-shot action buttons at the dropdown's foot (Reset Frame Sizes):
-     full-width small .btn rows, separated from the toggles above. */
-  .frames-menu-action {
-    margin-top: 4px;
-    width: 100%;
-    font-size: 12px;
+  /* A show/hide row: the checkbox label (grows) plus the per-frame
+     size-reset button, side by side. The button sits OUTSIDE the label so a
+     click can never double as the checkbox's activation. */
+  .frames-menu-row-wrap {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .frames-menu-row-wrap > .frames-menu-row {
+    flex: 1;
+    min-width: 0;
+  }
+  .frames-menu-reset {
+    flex: none;
+    font-size: 11px;
+    padding: 1px 6px;
+    background: #0008;
+    color: inherit;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .frames-menu-reset:hover {
+    background: #ffffff14;
   }
   /* The show/hide sub-menu: a native details/summary fold, styled to read as
      a menu heading, with the frame rows indented beneath it. */
@@ -3336,17 +3354,31 @@
   body.show-actionbar3 #actionbar3 {
     display: flex;
   }
-  /* Vertical action bars (actionBarsVertical, the Frames Settings menu): each
-     bar lays its slots out as a COLUMN, and the combined block sets its
-     columns side by side (bottom-aligned so bar 1 keeps the ground line the
-     plus/minus buttons live on). Everything else (slots, keycaps, toggles,
-     the movable-frame chrome) rides the flex flip unchanged. */
-  body.actionbars-vertical #actionbar,
-  body.actionbars-vertical #actionbar2,
-  body.actionbars-vertical #actionbar3 {
+  /* Vertical action bars (actionBar1/2/3Vertical, the Frames Settings menu,
+     PER BAR): the flipped bar lays its slots out as a COLUMN. The width must
+     be its own (fit-content, centred): a bar docked in #actionbar-stack is a
+     stretched flex item, and a stretched column kept the full 612px stack
+     width, painting its panel background as a huge dark box with the edit
+     outline around it until the frame was moved (owner report). The
+     plus/minus toggle goes back to a ROW on a vertical bar, so the pair sits
+     side by side under the column instead of stacking it taller. */
+  #actionbar.bar-vertical,
+  #actionbar2.bar-vertical,
+  #actionbar3.bar-vertical {
     flex-direction: column;
+    align-self: center;
+    width: fit-content;
   }
-  body.actionbars-vertical.combined-action-bars #actionbar-group {
+  #actionbar.bar-vertical .bar-toggle,
+  #actionbar2.bar-vertical .bar-toggle,
+  #actionbar3.bar-vertical .bar-toggle {
+    flex-direction: row;
+    justify-content: center;
+  }
+  /* The combined block follows bar 1's orientation (body class stamped by
+     main.ts): vertical bars sit side by side, bottom-aligned so bar 1 keeps
+     the ground line the plus/minus buttons live on. */
+  body.combined-bars-vertical.combined-action-bars #actionbar-group {
     flex-direction: row;
     align-items: flex-end;
   }
@@ -3801,6 +3833,9 @@
   body.menu-rail-horizontal #side-buttons {
     flex-direction: column;
     align-items: flex-end;
+    /* The stock 2px sat BETWEEN the two columns; between two stacked rows it
+       read as a stray horizontal seam, so the rows touch (owner request). */
+    gap: 0;
   }
   body.menu-rail-horizontal .side-buttons-col {
     flex-direction: row;

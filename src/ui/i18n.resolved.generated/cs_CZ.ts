@@ -2696,6 +2696,7 @@ export const cs_CZ: EnTranslations = {
     },
     "partyFrames": {
       "section": "Rámečky skupiny a raidu",
+      "optionsSection": "Party Frame Options",
       "unlock": "Přesunout rámečky skupiny a raidu",
       "lock": "Zamknout rámečky skupiny a raidu",
       "style": "Styl rámečku",
@@ -2759,8 +2760,11 @@ export const cs_CZ: EnTranslations = {
       "debuffsLeftToRight": "Debuffs left to right",
       "lockPlayerFrameToBar": "Lock Player Frame to Action Bar",
       "actionBarsVertical": "Vertical Action Bars",
+      "actionBar1Vertical": "Vertical Action Bar",
+      "actionBar2Vertical": "Vertical Action Bar 2",
+      "actionBar3Vertical": "Vertical Action Bar 3",
       "menuRailHorizontal": "Horizontal Menu",
-      "resetFrameSizes": "Reset Frame Sizes",
+      "resetFrameSize": "Reset size",
       "previewSpell": "Example Spell"
     },
     "transfer": {

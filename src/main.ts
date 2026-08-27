@@ -2873,9 +2873,19 @@ async function startGame(
       case 'lockPlayerFrameToActionBar':
         hud.setLockPlayerFrameToActionBar(!!v);
         break;
-      // Orientation flips (Frames Settings menu): pure CSS off body classes.
-      case 'actionBarsVertical':
-        document.body.classList.toggle('actionbars-vertical', !!v);
+      // Orientation flips (Frames Settings menu): pure CSS off element and
+      // body classes. Per-bar vertical stamps the bar's own element; bar 1
+      // additionally stamps the body class the COMBINED block's direction
+      // keys off (the block follows the primary bar's orientation).
+      case 'actionBar1Vertical':
+        document.getElementById('actionbar')?.classList.toggle('bar-vertical', !!v);
+        document.body.classList.toggle('combined-bars-vertical', !!v);
+        break;
+      case 'actionBar2Vertical':
+        document.getElementById('actionbar2')?.classList.toggle('bar-vertical', !!v);
+        break;
+      case 'actionBar3Vertical':
+        document.getElementById('actionbar3')?.classList.toggle('bar-vertical', !!v);
         break;
       case 'menuRailHorizontal':
         document.body.classList.toggle('menu-rail-horizontal', !!v);

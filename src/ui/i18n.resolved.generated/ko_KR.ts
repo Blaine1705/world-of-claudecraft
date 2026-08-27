@@ -2696,6 +2696,7 @@ export const ko_KR: EnTranslations = {
     },
     "partyFrames": {
       "section": "파티 및 공격대 프레임",
+      "optionsSection": "파티 프레임 옵션",
       "unlock": "파티 및 공격대 프레임 이동",
       "lock": "파티 및 공격대 프레임 고정",
       "style": "프레임 스타일",
@@ -2759,8 +2760,11 @@ export const ko_KR: EnTranslations = {
       "debuffsLeftToRight": "디버프 왼쪽에서 오른쪽으로",
       "lockPlayerFrameToBar": "플레이어 프레임을 액션 바에 고정",
       "actionBarsVertical": "액션 바 세로 배치",
+      "actionBar1Vertical": "액션 바 세로 배치",
+      "actionBar2Vertical": "액션 바 2 세로 배치",
+      "actionBar3Vertical": "액션 바 3 세로 배치",
       "menuRailHorizontal": "메뉴 가로 배치",
-      "resetFrameSizes": "프레임 크기 초기화",
+      "resetFrameSize": "크기 초기화",
       "previewSpell": "예시 주문"
     },
     "transfer": {

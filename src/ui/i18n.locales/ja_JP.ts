@@ -786,8 +786,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.debuffsLeftToRight': 'デバフを左から右へ',
   'hudChrome.interfaceUnlock.lockPlayerFrameToBar': 'プレイヤーフレームをアクションバーに固定',
   'hudChrome.interfaceUnlock.actionBarsVertical': 'アクションバーを縦向きに',
+  'hudChrome.interfaceUnlock.actionBar1Vertical': 'アクションバーを縦向きに',
+  'hudChrome.interfaceUnlock.actionBar2Vertical': 'アクションバー 2 を縦向きに',
+  'hudChrome.interfaceUnlock.actionBar3Vertical': 'アクションバー 3 を縦向きに',
   'hudChrome.interfaceUnlock.menuRailHorizontal': 'メニューを横向きに',
-  'hudChrome.interfaceUnlock.resetFrameSizes': 'フレームサイズをリセット',
+  'hudChrome.interfaceUnlock.resetFrameSize': 'サイズをリセット',
+  'hudChrome.partyFrames.optionsSection': 'パーティフレーム設定',
   'hudChrome.interfaceUnlock.framesMenuTitle':
     '各フレームの表示・非表示を切り替えます。チェックを外したフレームは、再度チェックするか初期設定に戻すまで非表示のままです。',
   'hudChrome.interfaceUnlock.previewSpell': 'サンプル呪文',

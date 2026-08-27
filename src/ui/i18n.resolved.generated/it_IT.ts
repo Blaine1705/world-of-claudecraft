@@ -2696,6 +2696,7 @@ export const it_IT: EnTranslations = {
     },
     "partyFrames": {
       "section": "Riquadri gruppo e incursione",
+      "optionsSection": "Party Frame Options",
       "unlock": "Sposta i riquadri di gruppo e incursione",
       "lock": "Blocca i riquadri di gruppo e incursione",
       "style": "Stile riquadri",
@@ -2759,8 +2760,11 @@ export const it_IT: EnTranslations = {
       "debuffsLeftToRight": "Debuffs left to right",
       "lockPlayerFrameToBar": "Lock Player Frame to Action Bar",
       "actionBarsVertical": "Vertical Action Bars",
+      "actionBar1Vertical": "Vertical Action Bar",
+      "actionBar2Vertical": "Vertical Action Bar 2",
+      "actionBar3Vertical": "Vertical Action Bar 3",
       "menuRailHorizontal": "Horizontal Menu",
-      "resetFrameSizes": "Reset Frame Sizes",
+      "resetFrameSize": "Reset size",
       "previewSpell": "Example Spell"
     },
     "transfer": {

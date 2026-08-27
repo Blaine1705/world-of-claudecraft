@@ -2696,6 +2696,7 @@ export const ru_RU: EnTranslations = {
     },
     "partyFrames": {
       "section": "Рамки группы и рейда",
+      "optionsSection": "Настройки фреймов группы",
       "unlock": "Переместить рамки группы и рейда",
       "lock": "Закрепить рамки группы и рейда",
       "style": "Стиль рамок",
@@ -2759,8 +2760,11 @@ export const ru_RU: EnTranslations = {
       "debuffsLeftToRight": "Ослабления слева направо",
       "lockPlayerFrameToBar": "Закрепить фрейм игрока над панелью действий",
       "actionBarsVertical": "Вертикальные панели действий",
+      "actionBar1Vertical": "Вертикальная панель команд",
+      "actionBar2Vertical": "Вертикальная панель команд 2",
+      "actionBar3Vertical": "Вертикальная панель команд 3",
       "menuRailHorizontal": "Горизонтальное меню",
-      "resetFrameSizes": "Сбросить размеры фреймов",
+      "resetFrameSize": "Сбросить размер",
       "previewSpell": "Пример заклинания"
     },
     "transfer": {

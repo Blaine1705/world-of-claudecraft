@@ -95,7 +95,8 @@ check(
   { before: groupBefore, after: groupAfter },
 );
 
-// 2) Reset Frame Sizes: shrink the target frame by drag, then reset.
+// 2) Per-frame size reset: shrink the target frame by drag, then reset via
+// the Target row's own button (the old footer action was replaced).
 await page.evaluate(() => document.getElementById('interface-frames-toggle').click());
 await sleep(150);
 const tRect = await page.evaluate(() => {
@@ -113,10 +114,12 @@ const shrunk = await page.evaluate(
 await page.evaluate(() => document.getElementById('interface-frames-toggle').click());
 await sleep(200);
 await page.evaluate(() => {
-  const btn = [...document.querySelectorAll('#interface-frames-menu .frames-menu-action')].find(
-    (b) => b.textContent === 'Reset Frame Sizes',
-  );
-  btn.click();
+  const sub = document.querySelector('#interface-frames-menu .frames-menu-sub');
+  sub.open = true;
+  const wrap = [
+    ...document.querySelectorAll('#interface-frames-menu .frames-menu-rows .frames-menu-row-wrap'),
+  ].find((w) => w.querySelector('.frames-menu-row span')?.textContent === 'Target');
+  wrap.querySelector('.frames-menu-reset').click();
 });
 await sleep(300);
 const afterReset = await page.evaluate(() => {
@@ -127,7 +130,7 @@ const afterReset = await page.evaluate(() => {
   };
 });
 check(
-  'Reset Frame Sizes returns the dragged target width to stock 190',
+  'the Target row Reset size returns the dragged width to stock 190',
   shrunk < 150 && afterReset.width === 190 && afterReset.bars === '190px',
   { shrunk, ...afterReset },
 );

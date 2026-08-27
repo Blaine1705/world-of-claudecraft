@@ -2696,6 +2696,7 @@ export const zh_CN: EnTranslations = {
     },
     "partyFrames": {
       "section": "队伍和团队框体",
+      "optionsSection": "队伍框体选项",
       "unlock": "移动队伍和团队框体",
       "lock": "锁定队伍和团队框体",
       "style": "框体样式",
@@ -2759,8 +2760,11 @@ export const zh_CN: EnTranslations = {
       "debuffsLeftToRight": "减益从左到右",
       "lockPlayerFrameToBar": "玩家框体锁定在动作条上方",
       "actionBarsVertical": "动作条纵向排列",
+      "actionBar1Vertical": "动作条纵向",
+      "actionBar2Vertical": "动作条 2 纵向",
+      "actionBar3Vertical": "动作条 3 纵向",
       "menuRailHorizontal": "菜单横向排列",
-      "resetFrameSizes": "重置框体尺寸",
+      "resetFrameSize": "重置尺寸",
       "previewSpell": "示例法术"
     },
     "transfer": {

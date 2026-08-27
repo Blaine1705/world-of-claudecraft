@@ -2696,6 +2696,7 @@ export const nl_NL: EnTranslations = {
     },
     "partyFrames": {
       "section": "Groeps- en raidframes",
+      "optionsSection": "Party Frame Options",
       "unlock": "Groeps- en raidframes verplaatsen",
       "lock": "Groeps- en raidframes vergrendelen",
       "style": "Framestijl",
@@ -2759,8 +2760,11 @@ export const nl_NL: EnTranslations = {
       "debuffsLeftToRight": "Debuffs left to right",
       "lockPlayerFrameToBar": "Lock Player Frame to Action Bar",
       "actionBarsVertical": "Vertical Action Bars",
+      "actionBar1Vertical": "Vertical Action Bar",
+      "actionBar2Vertical": "Vertical Action Bar 2",
+      "actionBar3Vertical": "Vertical Action Bar 3",
       "menuRailHorizontal": "Horizontal Menu",
-      "resetFrameSizes": "Reset Frame Sizes",
+      "resetFrameSize": "Reset size",
       "previewSpell": "Example Spell"
     },
     "transfer": {

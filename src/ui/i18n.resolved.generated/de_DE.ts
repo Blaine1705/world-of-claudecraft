@@ -2696,6 +2696,7 @@ export const de_DE: EnTranslations = {
     },
     "partyFrames": {
       "section": "Gruppen- und Schlachtzugsrahmen",
+      "optionsSection": "Party Frame Options",
       "unlock": "Gruppen- und Schlachtzugsrahmen verschieben",
       "lock": "Gruppen- und Schlachtzugsrahmen sperren",
       "style": "Rahmenstil",
@@ -2759,8 +2760,11 @@ export const de_DE: EnTranslations = {
       "debuffsLeftToRight": "Debuffs left to right",
       "lockPlayerFrameToBar": "Lock Player Frame to Action Bar",
       "actionBarsVertical": "Vertical Action Bars",
+      "actionBar1Vertical": "Vertical Action Bar",
+      "actionBar2Vertical": "Vertical Action Bar 2",
+      "actionBar3Vertical": "Vertical Action Bar 3",
       "menuRailHorizontal": "Horizontal Menu",
-      "resetFrameSizes": "Reset Frame Sizes",
+      "resetFrameSize": "Reset size",
       "previewSpell": "Example Spell"
     },
     "transfer": {

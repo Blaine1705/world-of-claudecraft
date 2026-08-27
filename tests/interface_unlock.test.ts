@@ -19,6 +19,7 @@ import type { MovableFrame } from '../src/ui/movable_frame';
 class FakeMover {
   locked: boolean[] = [];
   resets = 0;
+  sizeResets = 0;
   reapplies = 0;
   relocalizes = 0;
   label = 'Frame';
@@ -28,6 +29,9 @@ class FakeMover {
   }
   reset(): void {
     this.resets += 1;
+  }
+  resetSize(): void {
+    this.sizeResets += 1;
   }
   reapplyPosition(): void {
     this.reapplies += 1;
@@ -131,6 +135,7 @@ function harness(
   selects: FramesMenuSelect[] = [],
 ) {
   const { classes, doc, made, uiRoot } = fakeDocument();
+  const sizeResets: string[] = [];
   const unlock = new InterfaceUnlock({
     document: doc,
     framesMenuLabel: () => 'Frames Settings',
@@ -138,6 +143,8 @@ function harness(
     framesSubmenuLabel: () => 'Show or Hide Frames',
     settingToggles: () => toggles,
     settingSelects: () => selects,
+    resetSizeLabel: () => 'Reset size',
+    onSizeReset: (id) => sizeResets.push(id),
   });
   const movers = new Map<string, FakeMover>();
   for (const id of Object.keys(active)) {
@@ -152,12 +159,30 @@ function harness(
   }
   const byId = (id: string) => made.find((el) => el.id === id);
   // The show/hide rows live inside the details sub-menu's rows container:
-  // menu > details(.frames-menu-sub) > [summary, div.frames-menu-rows].
+  // menu > details(.frames-menu-sub) > [summary, div.frames-menu-rows]. Each
+  // entry is a WRAP: [checkRow label (checkbox, span), per-frame reset btn].
   const frameRows = () => byId('interface-frames-menu')?.children[0]?.children[1]?.children ?? [];
+  const rowBox = (wrap: FakeEl | undefined) => wrap?.children[0]?.children[0];
+  const rowName = (wrap: FakeEl | undefined) => wrap?.children[0]?.children[1]?.textContent;
+  const rowReset = (wrap: FakeEl | undefined) => wrap?.children[1];
   const settingRows = () =>
     byId('interface-frames-menu')?.children.find((c) => c.className === 'frames-menu-settings')
       ?.children ?? [];
-  return { unlock, movers, classes, active, made, uiRoot, byId, frameRows, settingRows };
+  return {
+    unlock,
+    movers,
+    classes,
+    active,
+    made,
+    uiRoot,
+    byId,
+    frameRows,
+    settingRows,
+    rowBox,
+    rowName,
+    rowReset,
+    sizeResets,
+  };
 }
 
 describe('InterfaceUnlock', () => {
@@ -254,7 +279,7 @@ describe('InterfaceUnlock frames menu', () => {
   });
 
   it('lists a ticked row per live frame in the sub-menu, keeps a hidden frame listed, skips inactive', () => {
-    const { unlock, movers, byId, frameRows } = harness({
+    const { unlock, movers, byId, frameRows, rowBox, rowName } = harness({
       actionBar1: true,
       minimap: true,
       petFrame: false,
@@ -271,18 +296,18 @@ describe('InterfaceUnlock frames menu', () => {
     expect(sub?.children[0]?.tag).toBe('summary');
     expect(sub?.children[0]?.textContent).toBe('Show or Hide Frames');
     const rows = frameRows();
-    expect(rows.map((r) => r.children[1]?.textContent)).toEqual(['actionBar1', 'minimap']);
+    expect(rows.map((r) => rowName(r))).toEqual(['actionBar1', 'minimap']);
     // The checkbox state mirrors the mover: hidden rides unticked, which is the
     // way back to showing the frame again.
-    expect(rows[0]?.children[0]?.checked).toBe(true);
-    expect(rows[1]?.children[0]?.checked).toBe(false);
+    expect(rowBox(rows[0])?.checked).toBe(true);
+    expect(rowBox(rows[1])?.checked).toBe(false);
   });
 
   it('toggling a row drives the mover hidden state both ways', () => {
-    const { unlock, movers, byId, frameRows } = harness({ actionBar1: true });
+    const { unlock, movers, byId, frameRows, rowBox } = harness({ actionBar1: true });
     unlock.setUnlocked(true);
     byId('interface-frames-toggle')?.fire('click');
-    const box = frameRows()[0]?.children[0];
+    const box = rowBox(frameRows()[0]);
     expect(box).toBeTruthy();
     if (!box) return;
     box.checked = false;
@@ -291,6 +316,25 @@ describe('InterfaceUnlock frames menu', () => {
     box.checked = true;
     box.fire('change');
     expect(movers.get('actionBar1')?.hidden).toBe(false);
+  });
+
+  it('every row carries a per-frame size reset that runs the mover and tells the host', () => {
+    const { unlock, movers, byId, frameRows, rowReset, sizeResets } = harness({
+      actionBar1: true,
+      minimap: true,
+    });
+    unlock.setUnlocked(true);
+    byId('interface-frames-toggle')?.fire('click');
+    const rows = frameRows();
+    // Visible text is the shared action word; the accessible name carries
+    // WHICH frame the button resets.
+    const reset = rowReset(rows[1]);
+    expect(reset?.textContent).toBe('Reset size');
+    expect(reset?.attrs.get('aria-label')).toBe('minimap: Reset size');
+    reset?.fire('click');
+    expect(movers.get('minimap')?.sizeResets).toBe(1);
+    expect(movers.get('actionBar1')?.sizeResets).toBe(0);
+    expect(sizeResets).toEqual(['minimap']);
   });
 
   it('renders the frame-behavior setting toggles below the sub-menu and drives set()', () => {
@@ -395,11 +439,12 @@ describe('InterfaceUnlock frames menu', () => {
     unlock.setUnlocked(true);
     byId('interface-frames-toggle')?.fire('click');
     const rowsOf = () => byId('interface-frames-menu')?.children[0]?.children[1]?.children ?? [];
-    let row = rowsOf().find((r) => r.children[1]?.textContent === 'actionBar2');
+    const nameOf = (wrap: FakeEl) => wrap.children[0]?.children[1]?.textContent;
+    let row = rowsOf().find((r) => nameOf(r) === 'actionBar2');
     expect(row, 'inactive overridden bar still listed').toBeTruthy();
-    expect(row?.children[0]?.checked).toBe(false);
+    expect(row?.children[0]?.children[0]?.checked).toBe(false);
     // Ticking drives set(), not the mover's hidden flag.
-    const box = row?.children[0];
+    const box = row?.children[0]?.children[0];
     if (box) {
       box.checked = true;
       box.fire('change');
@@ -409,7 +454,7 @@ describe('InterfaceUnlock frames menu', () => {
     // Combined (listed() false): the row folds away on the next rebuild.
     barsSplit = false;
     unlock.refresh();
-    row = rowsOf().find((r) => r.children[1]?.textContent === 'actionBar2');
+    row = rowsOf().find((r) => nameOf(r) === 'actionBar2');
     expect(row).toBeUndefined();
   });
 

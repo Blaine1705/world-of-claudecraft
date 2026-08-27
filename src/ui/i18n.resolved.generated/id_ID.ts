@@ -2696,6 +2696,7 @@ export const id_ID: EnTranslations = {
     },
     "partyFrames": {
       "section": "Bingkai Grup dan Raid",
+      "optionsSection": "Party Frame Options",
       "unlock": "Pindahkan bingkai grup dan raid",
       "lock": "Kunci bingkai grup dan raid",
       "style": "Gaya Bingkai",
@@ -2759,8 +2760,11 @@ export const id_ID: EnTranslations = {
       "debuffsLeftToRight": "Debuffs left to right",
       "lockPlayerFrameToBar": "Lock Player Frame to Action Bar",
       "actionBarsVertical": "Vertical Action Bars",
+      "actionBar1Vertical": "Vertical Action Bar",
+      "actionBar2Vertical": "Vertical Action Bar 2",
+      "actionBar3Vertical": "Vertical Action Bar 3",
       "menuRailHorizontal": "Horizontal Menu",
-      "resetFrameSizes": "Reset Frame Sizes",
+      "resetFrameSize": "Reset size",
       "previewSpell": "Example Spell"
     },
     "transfer": {

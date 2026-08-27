@@ -2696,6 +2696,7 @@ export const fr_CA: EnTranslations = {
     },
     "partyFrames": {
       "section": "Cadres de groupe et de raid",
+      "optionsSection": "Party Frame Options",
       "unlock": "Déplacer les cadres de groupe et de raid",
       "lock": "Verrouiller les cadres de groupe et de raid",
       "style": "Style des cadres",
@@ -2759,8 +2760,11 @@ export const fr_CA: EnTranslations = {
       "debuffsLeftToRight": "Debuffs left to right",
       "lockPlayerFrameToBar": "Lock Player Frame to Action Bar",
       "actionBarsVertical": "Vertical Action Bars",
+      "actionBar1Vertical": "Vertical Action Bar",
+      "actionBar2Vertical": "Vertical Action Bar 2",
+      "actionBar3Vertical": "Vertical Action Bar 3",
       "menuRailHorizontal": "Horizontal Menu",
-      "resetFrameSizes": "Reset Frame Sizes",
+      "resetFrameSize": "Reset size",
       "previewSpell": "Example Spell"
     },
     "transfer": {

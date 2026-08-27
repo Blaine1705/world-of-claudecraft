@@ -2075,15 +2075,43 @@ export class Hud {
         ['buffsLeftToRight', 'hudChrome.interfaceUnlock.buffsLeftToRight'],
         ['debuffsLeftToRight', 'hudChrome.interfaceUnlock.debuffsLeftToRight'],
         ['lockPlayerFrameToActionBar', 'hudChrome.interfaceUnlock.lockPlayerFrameToBar'],
-        ['actionBarsVertical', 'hudChrome.interfaceUnlock.actionBarsVertical'],
         ['menuRailHorizontal', 'hudChrome.interfaceUnlock.menuRailHorizontal'],
       ] as const;
-      return rows.map(([key, labelKey]) => ({
-        id: key,
+      const toggles = rows.map(([key, labelKey]) => ({
+        id: key as string,
         label: t(labelKey),
         value: !!hooks.settings.get(key),
         set: (value: boolean) => hooks.onSettingChange(key, hooks.settings.set(key, value)),
       }));
+      // Bar orientation is PER BAR while split (owner request), and one
+      // toggle driving all three while combined, since the block moves and
+      // flips as a single shape then.
+      const barKeys = ['actionBar1Vertical', 'actionBar2Vertical', 'actionBar3Vertical'] as const;
+      if (this.combineActionBars) {
+        toggles.push({
+          id: 'actionBarsVertical',
+          label: t('hudChrome.interfaceUnlock.actionBarsVertical'),
+          value: !!hooks.settings.get('actionBar1Vertical'),
+          set: (value: boolean) => {
+            for (const key of barKeys) hooks.onSettingChange(key, hooks.settings.set(key, value));
+          },
+        });
+      } else {
+        const barLabels = [
+          'hudChrome.interfaceUnlock.actionBar1Vertical',
+          'hudChrome.interfaceUnlock.actionBar2Vertical',
+          'hudChrome.interfaceUnlock.actionBar3Vertical',
+        ] as const;
+        barKeys.forEach((key, i) => {
+          toggles.push({
+            id: key,
+            label: t(barLabels[i]),
+            value: !!hooks.settings.get(key),
+            set: (value: boolean) => hooks.onSettingChange(key, hooks.settings.set(key, value)),
+          });
+        });
+      }
+      return toggles;
     },
     // Party frame columns lives here rather than the options window (owner
     // request: the sizing knobs moved out of the Frames tab once the editor
@@ -2121,33 +2149,24 @@ export class Hud {
     // and the settings-backed sizes (the dimension drags, the per-frame
     // scale factors, the party profile) return to their defaults through
     // the same persist-and-apply pair the sliders use.
-    menuActions: () => {
+    // Per-frame size reset on every show/hide row (owner request; replaces
+    // the earlier single Reset Frame Sizes action): the coordinator already
+    // ran mover.resetSize(); frames whose sizes live in real SETTINGS (the
+    // dimension drags, the scale factors) reset those here through the same
+    // persist-and-apply pair the sliders use.
+    resetSizeLabel: () => t('hudChrome.interfaceUnlock.resetFrameSize'),
+    onSizeReset: (id) => {
       const hooks = this.optionsHooks;
-      if (!hooks) return [];
-      return [
-        {
-          id: 'resetFrameSizes',
-          label: t('hudChrome.interfaceUnlock.resetFrameSizes'),
-          run: () => {
-            const sizeKeys = [
-              'playerFrameScale',
-              'targetFrameScale',
-              'partyFrameScale',
-              'playerFrameWidth',
-              'playerFrameHeight',
-              'targetFrameWidth',
-              'targetFrameHeight',
-              'partyFrameWidth',
-              'partyFrameHeight',
-            ] as const;
-            hooks.settings.reset([...sizeKeys]);
-            for (const key of sizeKeys) hooks.onSettingChange(key, hooks.settings.get(key));
-            // Covers every registered mover: the HUD frame table AND the
-            // three unit frames, which join the same registry.
-            this.interfaceUnlock.resetAllSizes();
-          },
-        },
-      ];
+      if (!hooks) return;
+      const keysFor: Partial<Record<string, readonly NumericSettingKey[]>> = {
+        playerFrame: ['playerFrameScale', 'playerFrameWidth', 'playerFrameHeight'],
+        targetFrame: ['targetFrameScale', 'targetFrameWidth', 'targetFrameHeight'],
+        partyFrames: ['partyFrameScale', 'partyFrameWidth', 'partyFrameHeight'],
+      };
+      const keys = keysFor[id];
+      if (!keys) return;
+      hooks.settings.reset([...keys]);
+      for (const key of keys) hooks.onSettingChange(key, hooks.settings.get(key));
     },
   });
   // The "Combine Action Bars" option: while on, the three rows move as the one

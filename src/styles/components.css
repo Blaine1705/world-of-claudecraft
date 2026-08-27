@@ -13113,6 +13113,18 @@
     margin: 6px 0 2px;
     line-height: 1.4;
   }
+  /* An options-tab subsection header (the Frames tab's Party Frame Options
+     group): the title-font gold treatment the panel titles use, scaled to a
+     row divider. */
+  .set-subhead {
+    font-family: var(--title-font);
+    font-size: 13px;
+    color: var(--gold);
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--color-border-showcase);
+    padding-bottom: 4px;
+    margin: 10px 0 6px;
+  }
   .graphics-controls-disabled {
     opacity: 0.55;
   }

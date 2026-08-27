@@ -2696,6 +2696,7 @@ export const en_XA: EnTranslations = {
     },
     "partyFrames": {
       "section": "[Þáŕţý áñð Ŕáíð Ƒŕáɱéš]",
+      "optionsSection": "[Þáŕţý Ƒŕáɱé Óþţíóñš]",
       "unlock": "[Ɱóʋé þáŕţý áñð ŕáíð ƒŕáɱéš]",
       "lock": "[Ļóçķ þáŕţý áñð ŕáíð ƒŕáɱéš]",
       "style": "[Ƒŕáɱé Šţýļé]",
@@ -2759,8 +2760,11 @@ export const en_XA: EnTranslations = {
       "debuffsLeftToRight": "[Ðéƀúƒƒš ļéƒţ ţó ŕíĝĥţ]",
       "lockPlayerFrameToBar": "[Ļóçķ Þļáýéŕ Ƒŕáɱé ţó Áçţíóñ Ɓáŕ]",
       "actionBarsVertical": "[Ʋéŕţíçáļ Áçţíóñ Ɓáŕš]",
+      "actionBar1Vertical": "[Ʋéŕţíçáļ Áçţíóñ Ɓáŕ]",
+      "actionBar2Vertical": "[Ʋéŕţíçáļ Áçţíóñ Ɓáŕ 2]",
+      "actionBar3Vertical": "[Ʋéŕţíçáļ Áçţíóñ Ɓáŕ 3]",
       "menuRailHorizontal": "[Ĥóŕížóñţáļ Ɱéñú]",
-      "resetFrameSizes": "[Ŕéšéţ Ƒŕáɱé Šížéš]",
+      "resetFrameSize": "[Ŕéšéţ šížé]",
       "previewSpell": "[Éẋáɱþļé Šþéļļ]"
     },
     "transfer": {

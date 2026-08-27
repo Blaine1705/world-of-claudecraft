@@ -768,8 +768,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.debuffsLeftToRight': '减益从左到右',
   'hudChrome.interfaceUnlock.lockPlayerFrameToBar': '玩家框体锁定在动作条上方',
   'hudChrome.interfaceUnlock.actionBarsVertical': '动作条纵向排列',
+  'hudChrome.interfaceUnlock.actionBar1Vertical': '动作条纵向',
+  'hudChrome.interfaceUnlock.actionBar2Vertical': '动作条 2 纵向',
+  'hudChrome.interfaceUnlock.actionBar3Vertical': '动作条 3 纵向',
   'hudChrome.interfaceUnlock.menuRailHorizontal': '菜单横向排列',
-  'hudChrome.interfaceUnlock.resetFrameSizes': '重置框体尺寸',
+  'hudChrome.interfaceUnlock.resetFrameSize': '重置尺寸',
+  'hudChrome.partyFrames.optionsSection': '队伍框体选项',
   'hudChrome.interfaceUnlock.framesMenuTitle':
     '显示或隐藏各个框体。取消勾选的框体会一直隐藏，直到你重新勾选或恢复默认设置。',
   'hudChrome.interfaceUnlock.previewSpell': '示例法术',

@@ -2696,6 +2696,7 @@ export const ja_JP: EnTranslations = {
     },
     "partyFrames": {
       "section": "パーティ・レイドフレーム",
+      "optionsSection": "パーティフレーム設定",
       "unlock": "パーティ・レイドフレームを移動",
       "lock": "パーティ・レイドフレームを固定",
       "style": "フレームスタイル",
@@ -2759,8 +2760,11 @@ export const ja_JP: EnTranslations = {
       "debuffsLeftToRight": "デバフを左から右へ",
       "lockPlayerFrameToBar": "プレイヤーフレームをアクションバーに固定",
       "actionBarsVertical": "アクションバーを縦向きに",
+      "actionBar1Vertical": "アクションバーを縦向きに",
+      "actionBar2Vertical": "アクションバー 2 を縦向きに",
+      "actionBar3Vertical": "アクションバー 3 を縦向きに",
       "menuRailHorizontal": "メニューを横向きに",
-      "resetFrameSizes": "フレームサイズをリセット",
+      "resetFrameSize": "サイズをリセット",
       "previewSpell": "サンプル呪文"
     },
     "transfer": {

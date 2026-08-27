@@ -3492,6 +3492,10 @@ export const hudChromeStrings = {
   },
   partyFrames: {
     section: 'Party and Raid Frames',
+    // The Frames tab's one labelled subsection (options window): every
+    // declarative row there tunes the party frames now. Wordy (M16):
+    // non-Latin fills land in this change.
+    optionsSection: 'Party Frame Options',
     unlock: 'Move party and raid frames',
     lock: 'Lock party and raid frames',
     style: 'Frame Style',
@@ -3602,11 +3606,16 @@ export const hudChromeStrings = {
     // bars and stops being individually movable. Wordy (M16): non-Latin
     // fills land in this change.
     lockPlayerFrameToBar: 'Lock Player Frame to Action Bar',
-    // Orientation flips + the one-shot size reset (all wordy, M16: non-Latin
-    // fills land in this change).
+    // Orientation flips + the per-frame size reset (all wordy, M16:
+    // non-Latin fills land in this change). actionBarsVertical is the ONE
+    // combined-shape toggle; the numbered three are the per-bar rows shown
+    // while the bars are split.
     actionBarsVertical: 'Vertical Action Bars',
+    actionBar1Vertical: 'Vertical Action Bar',
+    actionBar2Vertical: 'Vertical Action Bar 2',
+    actionBar3Vertical: 'Vertical Action Bar 3',
     menuRailHorizontal: 'Horizontal Menu',
-    resetFrameSizes: 'Reset Frame Sizes',
+    resetFrameSize: 'Reset size',
     // The sample spell name on the edit mode's filled cast-bar preview.
     previewSpell: 'Example Spell',
   },
