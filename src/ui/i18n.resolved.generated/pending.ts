@@ -15,7 +15,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
-    "hudChrome.wocMarket.walletUsdUnknown"
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "es_ES": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
@@ -23,7 +24,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
-    "hudChrome.wocMarket.walletUsdUnknown"
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "fr_FR": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
@@ -31,7 +33,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
-    "hudChrome.wocMarket.walletUsdUnknown"
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "fr_CA": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
@@ -39,7 +42,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
-    "hudChrome.wocMarket.walletUsdUnknown"
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "en_CA": [],
   "it_IT": [
@@ -48,7 +52,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
-    "hudChrome.wocMarket.walletUsdUnknown"
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "de_DE": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
@@ -56,7 +61,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
-    "hudChrome.wocMarket.walletUsdUnknown"
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "zh_CN": [
     "hudChrome.wocMarket.walletUsdBalance"
@@ -76,7 +82,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
-    "hudChrome.wocMarket.walletUsdUnknown"
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "ru_RU": [
     "hudChrome.wocMarket.walletUsdBalance"
@@ -87,7 +94,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
-    "hudChrome.wocMarket.walletUsdUnknown"
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "nl_NL": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
@@ -95,7 +103,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
-    "hudChrome.wocMarket.walletUsdUnknown"
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "pl_PL": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
@@ -103,7 +112,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
-    "hudChrome.wocMarket.walletUsdUnknown"
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "id_ID": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
@@ -111,7 +121,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
-    "hudChrome.wocMarket.walletUsdUnknown"
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "tr_TR": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
@@ -119,7 +130,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
-    "hudChrome.wocMarket.walletUsdUnknown"
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "sv_SE": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
@@ -127,7 +139,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
-    "hudChrome.wocMarket.walletUsdUnknown"
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "vi_VN": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
@@ -135,7 +148,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
-    "hudChrome.wocMarket.walletUsdUnknown"
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ],
   "da_DK": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
@@ -143,6 +157,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
-    "hudChrome.wocMarket.walletUsdUnknown"
+    "hudChrome.wocMarket.walletUsdUnknown",
+    "wallet.browser.stepUpBody"
   ]
 };

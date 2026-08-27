@@ -172,6 +172,11 @@ import {
   createCivicServicePlacementsReader,
 } from './civic_service_placements';
 import { applySelfCombatScalars } from './combat_scalar_wire';
+import {
+  type DesktopWalletBrowserAction,
+  type DesktopWalletStatus,
+  parseDesktopWalletHandoffStatus,
+} from './desktop_wallet_handoff';
 import { decodeGuildBankLogFrame, GUILD_BANK_LOG_TTL_MS } from './guild_bank_log_wire';
 import { foldInputAck } from './input_ack';
 import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
@@ -599,7 +604,7 @@ export class Api {
   }
 
   async createDesktopWalletHandoff(
-    action: { kind: 'link' } | { kind: 'transaction'; reference: string; expectedAddress: string },
+    action: DesktopWalletBrowserAction,
   ): Promise<{ code: string; expiresInMs: number }> {
     const data = await this.post(
       '/api/desktop-wallet/create',
@@ -612,55 +617,12 @@ export class Api {
     };
   }
 
-  async desktopWalletHandoffResult(code: string): Promise<
-    | { status: 'missing' | 'pending' }
-    | {
-        status: 'complete';
-        result:
-          | { kind: 'link'; address: string; nonce: string; signature: string }
-          | { kind: 'transaction'; address: string; signature: string };
-      }
-  > {
-    const data = await this.post(
-      '/api/desktop-wallet/result',
-      { code },
-      DESKTOP_API_ORIGIN || this.base,
+  async desktopWalletHandoffResult(code: string): Promise<DesktopWalletStatus> {
+    // Shape validation lives in the handoff module (an unknown or malformed
+    // result kind reads as 'missing', which the poller treats as expired).
+    return parseDesktopWalletHandoffStatus(
+      await this.post('/api/desktop-wallet/result', { code }, DESKTOP_API_ORIGIN || this.base),
     );
-    if (data.status !== 'complete' || !data.result || typeof data.result !== 'object') {
-      return { status: data.status === 'pending' ? 'pending' : 'missing' };
-    }
-    const result = data.result as Record<string, unknown>;
-    if (
-      result.kind === 'link' &&
-      typeof result.address === 'string' &&
-      typeof result.nonce === 'string' &&
-      typeof result.signature === 'string'
-    ) {
-      return {
-        status: 'complete',
-        result: {
-          kind: 'link',
-          address: result.address,
-          nonce: result.nonce,
-          signature: result.signature,
-        },
-      };
-    }
-    if (
-      result.kind === 'transaction' &&
-      typeof result.address === 'string' &&
-      typeof result.signature === 'string'
-    ) {
-      return {
-        status: 'complete',
-        result: {
-          kind: 'transaction',
-          address: result.address,
-          signature: result.signature,
-        },
-      };
-    }
-    return { status: 'missing' };
   }
 
   // ── Persistent session (home-page account portal) ──────────────────────────

@@ -78,7 +78,10 @@ const MONOLITHS: MonolithRow[] = [
     // countdown key's arithmetic to the view core (wocQuoteCountdownSig).
     // Exact count, zero headroom.
     file: 'src/ui/woc_market_window.ts',
-    ceiling: 2487,
+    // Down 2487 -> 2475 at the desktop-signing round: the WocMarketHooks
+    // contract moved to src/ui/woc_market_hooks.ts (wiring, window, and the
+    // trade arm all consume it), paying for the signer-reference plumbing.
+    ceiling: 2475,
     seam: 'a pure view-core module beside it (src/ui/woc_market_view.ts) that this window renders from',
   },
   {
@@ -164,9 +167,9 @@ const MONOLITHS: MonolithRow[] = [
     // plus the one closure that reads it) with no pure logic to extract --
     // the actual selection algorithm moved to src/ui/aura_overflow_priority.ts
     // instead, which is the real fix. Maintainer decision, exact merged count.
-    // The release merge keeps both parent surfaces, so the ratchet follows the
-    // exact merged count.
-    ceiling: 18536,
+    // The release merge keeps both parent surfaces, and the resolved comment
+    // lands two lines lower, so the ratchet follows the exact merged count.
+    ceiling: 18534,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -327,7 +330,13 @@ const MONOLITHS: MonolithRow[] = [
     // The release merge lands below the PR-side parent pin while preserving the
     // alwaysShowAllBuffs dispatch case, so the ratchet follows the exact merged
     // count down.
-    ceiling: 11564,
+    // Down 11564 -> 11563 at the desktop-signing round: the wallet-handoff
+    // availability probe and browser authorizer moved to
+    // src/net/desktop_wallet_handoff.ts (thin hoisted delegators remain),
+    // paying for the Exchange desktop-signer wiring at the attach site.
+    // The v0.41.0 reconcile keeps the alwaysShowAllBuffs dispatch and the
+    // desktop signer extraction, and lands at this exact count.
+    ceiling: 11563,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -416,7 +425,12 @@ const MONOLITHS: MonolithRow[] = [
     // block; no clean branch-owned extraction exists for two field assignments.
     // The merged tree includes both movement-wire and target-swing mirror
     // surfaces, so keep the exact merged count.
-    ceiling: 5961,
+    // Down 5855 -> 5817 at the desktop-signing round: the handoff result
+    // validation moved to src/net/desktop_wallet_handoff.ts
+    // (parseDesktopWalletHandoffStatus), paying for the stepup action kind.
+    // The v0.41.0 reconcile keeps the combat-scalar extraction, movement-wire
+    // mirror, target-swing mirror, and desktop handoff validation. Exact count.
+    ceiling: 5923,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -480,7 +494,11 @@ const MONOLITHS: MonolithRow[] = [
     // Down 4032 -> 3989 at the second round: the stuck-custody monitor
     // vocabulary moved to woc_market_monitor_types.ts (a leaf types module),
     // paying for the seller-history read.
-    ceiling: 3989,
+    // Down 3989 -> 3929 at the desktop-signing round: the economy vocabulary
+    // (quote legs, price/estimate readouts, WocMarketEconomy) moved to
+    // woc_market_economy_types.ts (the monitor-types pattern), paying for the
+    // desktopHandoff registrar dep and its four registration call sites.
+    ceiling: 3929,
     seam: 'a woc_market_<thing>.ts sibling behind WocMarketDeps (the drift-warn split is the template)',
   },
   {

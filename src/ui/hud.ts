@@ -5129,12 +5129,10 @@ export class Hud {
     onVisibilityChange: () => this.syncAnyWindowOpenState(),
     maskPlayerText: (text) => this.maskChat(text),
   });
-  // The $WOC Exchange window (docs/prd/woc/marketplace.md): online, browser-web
-  // only. Openable only once main.ts attaches the hooks (attachWocMarket); the
-  // launcher button stays hidden until then, so offline play never sees the
-  // surface. A wrapped shell (Steam/Electron/Capacitor) instead reveals the
-  // SAME launcher wired to a browser hand-off (attachWocMarketBrowserOnlyNotice,
-  // src/ui/woc_market_link.ts), so the icon never reads as simply missing.
+  // The $WOC Exchange is online-only, browser web + website desktop. Its
+  // launcher stays hidden until main.ts attaches hooks; a denied non-native
+  // desktop shell can instead reveal the SAME launcher wired to a browser
+  // hand-off (attachWocMarketBrowserOnlyNotice, src/ui/woc_market_link.ts).
   private wocMarketHooks: WocMarketHooks | null = null;
   private wocMarketBrowserOnly = false;
 
@@ -16879,8 +16877,8 @@ export class Hud {
     this.refreshDailyRewardsLauncher(true);
   }
 
-  /** Inject the $WOC Exchange hooks (main.ts, online + browser-web only) and
-   *  reveal its launcher; without this call the surface stays fully absent. */
+  /** Inject the $WOC Exchange hooks (main.ts, online, browser web + website
+   *  desktop only) and reveal its launcher; else the surface stays absent. */
   attachWocMarket(hooks: WocMarketHooks): void {
     this.wocMarketHooks = hooks;
     // Clears a browser-only notice this Hud instance may have carried from an
