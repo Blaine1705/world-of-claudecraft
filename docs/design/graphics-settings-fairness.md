@@ -41,7 +41,12 @@ COSMETIC (may be tiered down on lower presets):
 - Minimap redraw smoothness. It is a coarse overview; the 3D world and nameplates carry the
   same signal at full rate.
 - Buff-icon overflow when the bar is full. A buff is active whether or not its icon is on
-  screen, so hiding a buff icon removes no actionable information.
+  screen, so hiding a buff icon removes no actionable information. (2026-08-27: a
+  short-duration buff, e.g. a tank's active-mitigation cooldown, is exempted FIRST when the
+  cap must shed something -- see "The 2026-08-27 short-buff priority pass" below -- and a
+  player may opt fully out of the shed via the "Always Show All Buffs" interface setting,
+  which pays the cap's usual per-frame cost. Neither changes the rule itself: the cap
+  still only ever hides cosmetic icon information, never a mechanical effect.)
 - Portrait and HP-bar redraw smoothness within human reaction tolerance (about 200 ms).
 - Sun-shadow refresh cadence under budget pressure (`src/render/shadow_cadence_core.ts`).
   Under sustained over-budget readings the shadow map updates every other frame instead of
@@ -141,6 +146,27 @@ What each knob does, and why it is gameplay-neutral:
   with a native tooltip (`hudChrome.plurals.buffsHidden`) explaining that those buffs are still
   active. Full tiers never see it (the cap never bites there), and neither does the debuff bar or
   the target strip (their `overflowEl` stays null: neither can ever shed).
+  **The 2026-08-27 short-buff priority pass:** player feedback on the overflow badge (PR #3668)
+  pointed out that an HONEST shed is still a shed: a tank's Raised Guard (2 charges, 6 sec active
+  mitigation, 12 sec recharge) applied AFTER a wall of long-lived raid buffs could still lose its
+  icon to them under the flat first-N cap, hiding the one piece of timing information a tank
+  actually needs from the bar. The selection itself is now priority-ordered, not just honestly
+  reported: `AurasPainter.paint()` delegates the shed decision to
+  `aura_overflow_priority.ts::selectShedSlots`, which keeps `cap` ordinary buffs (exempt slots
+  render on top, unconditionally, exactly as before) but fills that budget with short-duration
+  buffs FIRST (`AuraSlotState.shortDuration`, `auras_view.ts::isShortDurationBuff`, at or under
+  `SHORT_BUFF_PRIORITY_SEC` = 60 sec, the natural gap in the content catalog's selfBuff
+  durations between active-cooldown buffs and raid/world buffs) and only sheds a long-duration
+  buff once every short one already fits. This restores no NEW information a full tier does not
+  already show (a long buff was always the one shed on low; this only changes WHICH long buff,
+  never whether a debuff or an actionable/always-visible buff sheds), so the rule above is
+  unchanged. The same PR also added an opt-out: "Always Show All Buffs"
+  (`game.settings.alwaysShowAllBuffs`, Interface panel, Frames tab, off by default) makes the
+  buff bar's own `AurasPainter` report the 'ultra' tier to `auraVisibleCap` regardless of the
+  real preset (`Hud.buffBarFxTier()`), so the cap never bites for a player who opts in, at the
+  cap's usual per-frame cost. It touches only that one painter instance; every other low-tier
+  knob (FCT, minimap, the debuff bar, the target strip) is unaffected, so this is a player
+  PREFERENCE layered on top of the STATIC preset, never a second preset-like governor.
 - Target frame, hud + `unit_frame_painter.ts`: on low, the target frame BODY (HP / level /
   portrait) refreshes at about 10 Hz; a target SWAP bypasses the throttle
   (`nonSelfRepaintDue`), and the cast bar and the debuffs strip are both painted OUTSIDE the

@@ -76,6 +76,15 @@ describe('isDebuffAura', () => {
 
     expect(isCancelableAura(scriptedStasis)).toBe(false);
   });
+
+  it('id override: Stormsurge Ready is a debuff (not cancelable) despite its shared internal_cd kind', () => {
+    // Player feedback on PR #3668. Every OTHER internal_cd marker stays a
+    // buff, proven alongside as the negative case.
+    expect(isDebuffAura(aura('shaman_stormsurge_ready', 'internal_cd'))).toBe(true);
+    expect(isCancelableAura(aura('shaman_stormsurge_ready', 'internal_cd'))).toBe(false);
+    expect(isDebuffAura(aura('heating_up', 'internal_cd'))).toBe(false);
+    expect(isCancelableAura(aura('heating_up', 'internal_cd'))).toBe(true);
+  });
 });
 
 describe('auraAffectsStats', () => {

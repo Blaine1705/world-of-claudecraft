@@ -15,7 +15,7 @@ type CancelableAura = Pick<Aura, 'id' | 'kind' | 'value'> &
 // with a negative value (an enfeeble / wither drain reuses a buff_* kind but saps
 // the stat). Mirrors the HUD's buff-vs-debuff styling test.
 export function isDebuffAura(a: CancelableAura): boolean {
-  return classifyDebuffAura(a.kind, a.value);
+  return classifyDebuffAura(a.kind, a.value, a.id);
 }
 
 // A player may voluntarily cancel any helpful aura they carry; debuffs never. The

@@ -34,6 +34,7 @@
 import type { UiEffectsTier } from '../game/ui_effects_profile';
 import { auraVisibleCap } from '../game/ui_tier_knobs';
 import { AURA_OVERFLOW_TEXT, type AuraOverflowTextDeps } from './aura_overflow_badge';
+import { selectShedSlots } from './aura_overflow_priority';
 import type { AurasState } from './auras_view';
 import type { PainterHostWriters } from './painter_host';
 
@@ -83,14 +84,6 @@ const OVERFLOW_HIDDEN = 'none';
 // attachTooltip system the pooled aura nodes use: the badge is a single static element,
 // not a per-aura pool entry, so it needs no lazy-build-once closure).
 const TITLE_ATTR = 'title';
-const ALWAYS_VISIBLE_AURA_IDS: ReadonlySet<string> = new Set([
-  'divine_ascension',
-  'shaman_thunder_charges',
-  'shaman_warspirit_cadence',
-  'moontide',
-  'old_blood',
-  'verdance',
-]);
 
 /** What the pool needs from the Hud: the icon-URL resolver, the tooltip renderer, and
  *  the tooltip-attach helper. All injected so a Node test drives the pool without the
@@ -196,6 +189,12 @@ export class AurasPainter {
     }
   }
 
+  // Reused scratch: shedScratch[i] says whether slots[i] is shed THIS frame,
+  // filled by selectShedSlots ahead of the render loop below (grown, never
+  // shrunk, so a steady-state frame allocates no new array; only indices
+  // `< count` are ever read back).
+  private readonly shedScratch: boolean[] = [];
+
   /** Reconcile the pool to this frame's active auras and repaint each in place. Runs
    *  every frame; the elided writers make an unchanged frame cost no DOM mutation. */
   paint(state: AurasState): void {
@@ -203,47 +202,34 @@ export class AurasPainter {
     const { slots, count } = state;
     // On low, cap the number of rendered auras; auras beyond the cap are
     // simply not touched this frame, so the recycle sweep below detaches them. The full
-    // tiers return an infinite cap, so every active aura renders (the unchanged path).
+    // tiers return an infinite cap, so every active aura renders (the unchanged path,
+    // and selectShedSlots is skipped entirely since count <= cap is always true there).
     //
-    // FAIRNESS: the cap sheds BUFF overflow only, never a DEBUFF. The
-    // player buff bar is mode 'all' (buffs + debuffs interleaved in sim-application
-    // order), and persistent raid buffs fill the front slots, so a flat first-N cap would
-    // push a mid-combat boss/mob debuff (DoT / stun / curse) off-screen on low while every
-    // other tier still shows it. With no self-dispel, that icon is the player's only read
-    // of the debuff, so hiding it makes the game worse to play on low. A debuff is the
-    // actionable half of the bar; a buff is cosmetic, so the budget is spent on buffs and a
-    // debuff always renders: slot i is shown when it is a debuff OR fewer than `cap` auras
-    // have rendered so far. When count <= cap (ALWAYS true on the full tiers, where cap is
-    // +Infinity) every aura renders in order, byte-identical to the untiered painter.
-    // Capping the render (not the view) keeps the parity-identical core untouched, so the
-    // same selection applies under a Sim-shaped and a ClientWorld-mirror state. (Scope: a
-    // debuff is anything the core flags isDebuff -- every allowlisted KIND in both worlds,
-    // AND a negative-value buff_* stat-sap. The sap now classifies as a debuff online too
-    // because the wire carries its negative value (server/game.ts sends it sparsely,
-    // src/net/online.ts decodes it), so no sap can ride the low buff budget on either host.
-    // See auras_view.isAuraDebuff.)
+    // FAIRNESS: the cap sheds BUFF overflow only, never a DEBUFF, never an ACTIONABLE
+    // buff (`alwaysRender` / an ALWAYS_VISIBLE_AURA_IDS id, e.g. Divine Ascension), and
+    // -- since the 2026-08-27 priority pass -- a long-lived stat buff sheds before a
+    // short-timed one (`shortDuration`), so a tank's Raised Guard icon never loses its
+    // slot to a raid buff that merely applied earlier in the fight. See
+    // aura_overflow_priority.ts selectShedSlots for the exact exempt/short/long
+    // selection; this is the single per-slot DOM-writing pass over its answer. A debuff
+    // is the actionable half of the bar and a short buff the actively-timed half; a
+    // long buff is the one truly cosmetic case, so the budget is spent there first.
+    // (Scope: a debuff is anything the core flags isDebuff -- every allowlisted KIND in
+    // both worlds, AND a negative-value buff_* stat-sap, AND an id-styled override like
+    // Stormsurge's proc-lockout marker (aura_classify.ts DEBUFF_STYLED_AURA_IDS). The
+    // sap classifies as a debuff online too because the wire carries its negative value
+    // (server/game.ts sends it sparsely, src/net/online.ts decodes it), so no sap can
+    // ride the low buff budget on either host. See auras_view.isAuraDebuff.)
     const cap = auraVisibleCap(this.getFxTier());
     this.ordered.length = 0;
-    let rendered = 0;
     let shed = 0;
+    if (count > cap) {
+      while (this.shedScratch.length < count) this.shedScratch.push(false);
+      shed = selectShedSlots(slots, count, cap, this.shedScratch);
+    }
     for (let i = 0; i < count; i++) {
       const s = slots[i];
-      // Never a debuff, never an id on the always-visible list (Divine Ascension
-      // joined it from #2428), and never an ACTIONABLE buff (`alwaysRender`,
-      // auras_view NEVER_SHED_IDS): the budget rests on buffs being cosmetic; an
-      // aura whose icon IS the affordance is not, and the carried-flag buff is
-      // applied at the pickup so it sorts LAST and a flat first-N cap would shed
-      // it first.
-      if (
-        !s.isDebuff &&
-        !s.alwaysRender &&
-        rendered >= cap &&
-        !ALWAYS_VISIBLE_AURA_IDS.has(s.key)
-      ) {
-        shed++;
-        continue;
-      }
-      rendered++;
+      if (count > cap && this.shedScratch[i]) continue;
       // Resolve the pool key. The common case (a unique aura id this frame) takes the
       // base key directly. If the base key is already claimed THIS frame, this is a
       // second (or later) aura sharing the ability id from a different source; probe

@@ -89,6 +89,21 @@ describe('isDebuffAura', () => {
     expect(isDebuffAura('dot', 0)).toBe(true);
     expect(isDebuffAura('slow', 0.5)).toBe(true);
   });
+
+  it('id override: shaman_stormsurge_ready reads as a debuff on its shared internal_cd kind', () => {
+    // Player feedback on PR #3668: Stormsurge's "cannot proc again until
+    // Ancestral Strike is back on cooldown" marker (shaman_warspirit.ts
+    // STORMSURGE_READY_ID) should read as a debuff, not a buff.
+    expect(isDebuffAura('internal_cd', 1, 'shaman_stormsurge_ready')).toBe(true);
+    // The 2-arg call (no id) is unaffected: every existing caller that has not
+    // been updated to pass an id keeps its prior answer.
+    expect(isDebuffAura('internal_cd', 1)).toBe(false);
+    // The override is per-id, never kind-wide: 'internal_cd' backs a dozen
+    // other class markers (Heating Up, Convergence Mark, Warspirit Cadence)
+    // that must stay buffs even when their id IS passed through.
+    expect(isDebuffAura('internal_cd', 1, 'heating_up')).toBe(false);
+    expect(isDebuffAura('internal_cd', 0, 'shaman_warspirit_cadence')).toBe(false);
+  });
 });
 
 describe('isDispellableAura', () => {
@@ -112,5 +127,20 @@ describe('isDispellableAura', () => {
     };
     expect(isDispellableAura(ascension, true)).toBe(false);
     expect(isDispellableAura(ascension, false)).toBe(false);
+  });
+
+  it('routes the id-styled debuff override through, so an offensive dispel can strip Stormsurge Ready', () => {
+    const stormsurgeReady = {
+      id: 'shaman_stormsurge_ready',
+      kind: 'internal_cd' as const,
+      value: 1,
+      school: 'nature' as const,
+    };
+    // Harmful (per the id override above) + player-removable + non-physical:
+    // a FRIENDLY dispel/cleanse targets it (it strips harm off an ally, and
+    // this reads as harm), an OFFENSIVE one does not (offensive dispel strips
+    // a benefit off an enemy, and this is not styled as one).
+    expect(isDispellableAura(stormsurgeReady, true)).toBe(false);
+    expect(isDispellableAura(stormsurgeReady, false)).toBe(true);
   });
 });

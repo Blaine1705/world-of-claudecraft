@@ -10,6 +10,8 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "guide.settingsPage.ifAlwaysShowAllBuffs",
+    "hudChrome.options.alwaysShowAllBuffs",
     "hudChrome.plurals.buffsHidden.few",
     "hudChrome.plurals.buffsHidden.many",
     "hudChrome.plurals.buffsHidden.one",
@@ -17,6 +19,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unitFrame.buffOverflowLabel"
   ],
   "es_ES": [
+    "guide.settingsPage.ifAlwaysShowAllBuffs",
+    "hudChrome.options.alwaysShowAllBuffs",
     "hudChrome.plurals.buffsHidden.few",
     "hudChrome.plurals.buffsHidden.many",
     "hudChrome.plurals.buffsHidden.one",
@@ -24,6 +28,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unitFrame.buffOverflowLabel"
   ],
   "fr_FR": [
+    "guide.settingsPage.ifAlwaysShowAllBuffs",
+    "hudChrome.options.alwaysShowAllBuffs",
     "hudChrome.plurals.buffsHidden.few",
     "hudChrome.plurals.buffsHidden.many",
     "hudChrome.plurals.buffsHidden.one",
@@ -31,6 +37,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unitFrame.buffOverflowLabel"
   ],
   "fr_CA": [
+    "guide.settingsPage.ifAlwaysShowAllBuffs",
+    "hudChrome.options.alwaysShowAllBuffs",
     "hudChrome.plurals.buffsHidden.few",
     "hudChrome.plurals.buffsHidden.many",
     "hudChrome.plurals.buffsHidden.one",
@@ -39,6 +47,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "guide.settingsPage.ifAlwaysShowAllBuffs",
+    "hudChrome.options.alwaysShowAllBuffs",
     "hudChrome.plurals.buffsHidden.few",
     "hudChrome.plurals.buffsHidden.many",
     "hudChrome.plurals.buffsHidden.one",
@@ -46,6 +56,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unitFrame.buffOverflowLabel"
   ],
   "de_DE": [
+    "guide.settingsPage.ifAlwaysShowAllBuffs",
+    "hudChrome.options.alwaysShowAllBuffs",
     "hudChrome.plurals.buffsHidden.few",
     "hudChrome.plurals.buffsHidden.many",
     "hudChrome.plurals.buffsHidden.one",
@@ -65,6 +77,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unitFrame.buffOverflowLabel"
   ],
   "pt_BR": [
+    "guide.settingsPage.ifAlwaysShowAllBuffs",
+    "hudChrome.options.alwaysShowAllBuffs",
     "hudChrome.plurals.buffsHidden.few",
     "hudChrome.plurals.buffsHidden.many",
     "hudChrome.plurals.buffsHidden.one",
@@ -75,6 +89,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unitFrame.buffOverflowLabel"
   ],
   "cs_CZ": [
+    "guide.settingsPage.ifAlwaysShowAllBuffs",
+    "hudChrome.options.alwaysShowAllBuffs",
     "hudChrome.plurals.buffsHidden.few",
     "hudChrome.plurals.buffsHidden.many",
     "hudChrome.plurals.buffsHidden.one",
@@ -82,6 +98,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unitFrame.buffOverflowLabel"
   ],
   "nl_NL": [
+    "guide.settingsPage.ifAlwaysShowAllBuffs",
+    "hudChrome.options.alwaysShowAllBuffs",
     "hudChrome.plurals.buffsHidden.few",
     "hudChrome.plurals.buffsHidden.many",
     "hudChrome.plurals.buffsHidden.one",
@@ -89,6 +107,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unitFrame.buffOverflowLabel"
   ],
   "pl_PL": [
+    "guide.settingsPage.ifAlwaysShowAllBuffs",
+    "hudChrome.options.alwaysShowAllBuffs",
     "hudChrome.plurals.buffsHidden.few",
     "hudChrome.plurals.buffsHidden.many",
     "hudChrome.plurals.buffsHidden.one",
@@ -96,6 +116,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unitFrame.buffOverflowLabel"
   ],
   "id_ID": [
+    "guide.settingsPage.ifAlwaysShowAllBuffs",
+    "hudChrome.options.alwaysShowAllBuffs",
     "hudChrome.plurals.buffsHidden.few",
     "hudChrome.plurals.buffsHidden.many",
     "hudChrome.plurals.buffsHidden.one",
@@ -103,6 +125,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unitFrame.buffOverflowLabel"
   ],
   "tr_TR": [
+    "guide.settingsPage.ifAlwaysShowAllBuffs",
+    "hudChrome.options.alwaysShowAllBuffs",
     "hudChrome.plurals.buffsHidden.few",
     "hudChrome.plurals.buffsHidden.many",
     "hudChrome.plurals.buffsHidden.one",
@@ -110,6 +134,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unitFrame.buffOverflowLabel"
   ],
   "sv_SE": [
+    "guide.settingsPage.ifAlwaysShowAllBuffs",
+    "hudChrome.options.alwaysShowAllBuffs",
     "hudChrome.plurals.buffsHidden.few",
     "hudChrome.plurals.buffsHidden.many",
     "hudChrome.plurals.buffsHidden.one",
@@ -117,6 +143,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unitFrame.buffOverflowLabel"
   ],
   "vi_VN": [
+    "guide.settingsPage.ifAlwaysShowAllBuffs",
+    "hudChrome.options.alwaysShowAllBuffs",
     "hudChrome.plurals.buffsHidden.few",
     "hudChrome.plurals.buffsHidden.many",
     "hudChrome.plurals.buffsHidden.one",
@@ -124,6 +152,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unitFrame.buffOverflowLabel"
   ],
   "da_DK": [
+    "guide.settingsPage.ifAlwaysShowAllBuffs",
+    "hudChrome.options.alwaysShowAllBuffs",
     "hudChrome.plurals.buffsHidden.few",
     "hudChrome.plurals.buffsHidden.many",
     "hudChrome.plurals.buffsHidden.one",

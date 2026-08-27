@@ -558,6 +558,7 @@ const FRAMES_KEYS = [
   'partyFrameShowPets',
   'partyFrameShowSelf',
   'aurasOnPlayerFrame',
+  'alwaysShowAllBuffs',
   'showTargetOfTarget',
   'showPetFrame',
 ];

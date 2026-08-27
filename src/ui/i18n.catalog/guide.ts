@@ -569,6 +569,8 @@ export const guideStrings = {
       'Whether buffs and debuffs show on the party frames. Matching switches cover resource bars, absorbs, pets, and whether you appear in your own party list.',
     ifAurasOnPlayerFrame:
       'Puts your buffs and debuffs on your own unit frame as well as the aura bar.',
+    ifAlwaysShowAllBuffs:
+      'Shows every active buff even on the Low graphics preset, bypassing its usual buff-icon cap.',
     ifTargetOfTarget:
       'Shows who your target is targeting, the classic way to tell whether the tank still has it.',
     ifPetFrame: 'Shows a frame for your pet.',

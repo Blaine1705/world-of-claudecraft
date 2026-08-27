@@ -125,7 +125,13 @@ const MONOLITHS: MonolithRow[] = [
     // relocalize wiring (the window itself lives in
     // src/ui/hud/guild_board/). Then down one at the controller-tutorial
     // merge. Exact count, zero slack.
-    ceiling: 18488,
+    // Raised 18488 -> 18501 (+13) for the buff-bar priority/opt-out follow-up
+    // to PR #3668 (player feedback): the alwaysShowAllBuffs field, its setter,
+    // and buffBarFxTier() are Hud-owned coordinator state (a per-session flag
+    // plus the one closure that reads it) with no pure logic to extract --
+    // the actual selection algorithm moved to src/ui/aura_overflow_priority.ts
+    // instead, which is the real fix. Maintainer decision, exact merged count.
+    ceiling: 18501,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -250,7 +256,12 @@ const MONOLITHS: MonolithRow[] = [
     // the ratchet follows the merged file down). Exact count, zero slack.
     // Re-pinned to the exact merged count of the v0.39.3 main back-merge
     // (the utc_day import consolidation shed one line).
-    ceiling: 11566,
+    // Raised 11566 -> 11569 (+3) for the alwaysShowAllBuffs case in
+    // applySetting's dispatch switch (PR #3668 follow-up): a single
+    // settings-key case, the same 3-line shape every other boolToggle case in
+    // this switch already takes; the switch itself IS the seam. Maintainer
+    // decision, exact merged count.
+    ceiling: 11569,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

@@ -162,6 +162,7 @@ function slot(over: Partial<AuraSlotState> & { key: string }): AuraSlotState {
     effectHtml: '',
     toggle: false,
     alwaysRender: false,
+    shortDuration: false,
     ...over,
   };
 }
@@ -530,6 +531,35 @@ describe('AurasPainter: static-preset visible-count cap', () => {
       state(slots.map((s, i) => (i === slots.length - 1 ? { ...s, alwaysRender: false } : s))),
     );
     expect(nodes()).toHaveLength(AURA_VISIBLE_CAP_LOW);
+  });
+
+  it('PRIORITY: low sheds a long-duration buff before a short-duration one applied earlier', () => {
+    // Player feedback on PR #3668: a tank's Raised Guard (2-charge, 6 sec active
+    // mitigation, 12 sec recharge) applied AFTER a wall of long-lived raid buffs
+    // used to lose its icon to the flat first-N cap, hiding exactly the timing
+    // information a tank needs to know whether a charge is still up. Build
+    // cap+1 leading long buffs (shortDuration false, the default), then one
+    // short buff last: without priority the short buff (last in application
+    // order) would be the one shed; with it, a long buff sheds in its place.
+    const longBuffs = Array.from({ length: AURA_VISIBLE_CAP_LOW + 1 }, (_, i) =>
+      slot({ key: `raidbuff${i}` }),
+    );
+    const slots = [
+      ...longBuffs,
+      slot({ key: 'raised_guard_dr', name: 'Raised Guard', shortDuration: true }),
+    ];
+    const painter = tierPainter('low');
+    painter.paint(state(slots));
+
+    expect(nodes()).toHaveLength(AURA_VISIBLE_CAP_LOW);
+    // The short buff rendered; a trailing long buff (raidbuff8, the last of the
+    // long-duration set) is the one that shed instead.
+    expect(tooltips.attached.map((a) => a.html())).toContain('Raised Guard|0');
+    expect(
+      calls.some(
+        (c) => c.m === 'setStyleProp' && c.args[1] === `url(raidbuff${AURA_VISIBLE_CAP_LOW})`,
+      ),
+    ).toBe(false);
   });
 
   it('the tiered painter is deterministic: identical painted output by value for the same state', () => {

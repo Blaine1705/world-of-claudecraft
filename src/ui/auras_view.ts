@@ -256,6 +256,11 @@ export interface AuraSlotState {
    *  its icon is an ACTIONABLE affordance rather than cosmetic upkeep
    *  (`NEVER_SHED_IDS`). Debuffs already have this property via `isDebuff`. */
   alwaysRender: boolean;
+  /** Whether this aura's authored duration reads as short enough to prioritize
+   *  when the low graphics tier's buff cap must shed something
+   *  (`isShortDurationBuff`, `aura_overflow_priority.ts`): a long-lived stat buff
+   *  sheds before a short, actively-timed one. */
+  shortDuration: boolean;
 }
 
 /** The whole strip's derived state: the reused slot pool plus the active count. Both
@@ -285,12 +290,18 @@ export interface AurasView {
   tick(entity: AurasEntityInput): AurasState;
 }
 
-/** Whether an aura reads as a debuff: an allowlisted kind, or a negative-value stat
+/** Whether an aura reads as a debuff: an allowlisted kind, a negative-value stat
  *  buff (a buff_* kind whose value saps rather than grants, e.g. a mob stat-sap riding
- *  buff_int/buff_ap with a negative value). Byte-faithful to the old inline
- *  classification, lifted into the core.
+ *  buff_int/buff_ap with a negative value), or an id-allowlisted proc/cooldown
+ *  marker riding a shared buff-coded kind (aura_classify.ts DEBUFF_STYLED_AURA_IDS,
+ *  e.g. Stormsurge's "cannot proc again until Ancestral Strike is back on
+ *  cooldown" marker). Byte-faithful to the old inline classification, lifted into
+ *  the core.
  *
- *  PARITY: the `value < 0` branch fires identically in both worlds. The wire carries the
+ *  PARITY: `aura.id` rides the wire unconditionally already (every AuraInput
+ *  consumer, online and offline, has it), so the id-styled override answers
+ *  identically in both worlds with no new wire field. The `value < 0` branch fires
+ *  identically in both worlds too. The wire carries the
  *  aura value SPARSELY (server/game.ts WireAura sends it only when negative, the sole case
  *  that flips this classification; src/net/online.ts decodes `a.value ?? 0`), so a
  *  negative-value buff_* stat-sap shows the debuff border online and offline, and the
@@ -299,7 +310,7 @@ export interface AurasView {
  *  in both worlds (the kind is on the wire). The end-to-end encode/decode round trip is
  *  pinned in tests/snapshots.test.ts. */
 export function isAuraDebuff(aura: AuraInput): boolean {
-  return classifyDebuffAura(aura.kind, aura.value);
+  return classifyDebuffAura(aura.kind, aura.value, aura.id);
 }
 
 // Expiring-blink threshold (QoL: a DoT/buff about to run out flashes its icon).
@@ -313,6 +324,27 @@ export const EXPIRING_BLINK_FRAC = 0.3;
 export function isAuraExpiring(remaining: number, duration: number | undefined): boolean {
   if (!duration || duration <= 0 || remaining <= 0) return false;
   return remaining <= Math.min(EXPIRING_BLINK_SEC, duration * EXPIRING_BLINK_FRAC);
+}
+
+// Threshold for the buff bar's low-tier overflow cap (auras_painter.ts /
+// aura_overflow_priority.ts): a buff authored at or under this lifetime reads as
+// something the player is actively TIMING (an active-mitigation cooldown like
+// Raised Guard's 6 sec block, an on-use trinket proc, a short elemental_trance-
+// style cooldown) rather than a raid/world buff they will still be wearing in
+// twenty minutes. The content catalog's selfBuff durations cluster from 3 sec up
+// through 60 sec, then jump straight to 1800/3600 sec with nothing in between, so
+// 60 sec sits in that natural gap rather than inventing a balance number. Player
+// feedback on PR #3668: the cap's shed order used to be pure application order,
+// so a short defensive cooldown applied AFTER several long-lived stat buffs could
+// lose its icon to them, hiding exactly the information a tank needed to time
+// their next charge.
+export const SHORT_BUFF_PRIORITY_SEC = 60;
+/** Whether `duration` reads as "short enough to prioritize" (see
+ *  SHORT_BUFF_PRIORITY_SEC above). A missing/zero duration (a toggle/permanent
+ *  aura, or an old server's mirror omitting it) is never short: it degrades to
+ *  the ordinary application-order shed, never to a false priority claim. */
+export function isShortDurationBuff(duration: number | undefined): boolean {
+  return duration !== undefined && duration > 0 && duration <= SHORT_BUFF_PRIORITY_SEC;
 }
 
 function makeSlotState(): AuraSlotState {
@@ -333,6 +365,7 @@ function makeSlotState(): AuraSlotState {
     expiring: false,
     toggle: false,
     alwaysRender: false,
+    shortDuration: false,
   };
 }
 
@@ -416,6 +449,7 @@ export function createAurasView(
         slot.name = deps.auraName(a);
         slot.remaining = a.remaining;
         slot.duration = a.duration;
+        slot.shortDuration = isShortDurationBuff(a.duration);
         slot.sourceId = a.sourceId;
         // The buff bar (mode 'buffs', the player's own auras) offers right-click-cancel;
         // a helpful buff is cancelable, a debuff never. The target debuff strip

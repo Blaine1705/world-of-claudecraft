@@ -3716,6 +3716,14 @@ export class Hud {
     this.applyAuraAnchor();
   }
 
+  // game.settings alwaysShowAllBuffs: bypasses the buff bar's low-tier
+  // overflow cap at its usual per-frame cost. Read by buffBarFxTier() below.
+  private alwaysShowAllBuffs = false;
+
+  setAlwaysShowAllBuffs(on: boolean): void {
+    this.alwaysShowAllBuffs = on;
+  }
+
   private applyAuraAnchor(): void {
     const on = this.aurasOnPlayerFrame && !this.isMobileLayout();
     document.body.classList.toggle('auras-on-frame', on);
@@ -4543,7 +4551,7 @@ export class Hud {
     this.buffBarEl,
     this.buffBarPainterDeps,
     document,
-    () => this.fxTier(),
+    () => this.buffBarFxTier(), // fxTier(), unless "Always Show All Buffs" overrides it
     true, // the buff bar is the one instance that shows the low-tier overflow badge
   );
   private readonly debuffBarPainter = new AurasPainter(
@@ -8272,6 +8280,12 @@ export class Hud {
   // effects), so a missing stamp never silently sheds HUD cost.
   private fxTier(): UiEffectsTier {
     return coerceFxTier(document.documentElement.dataset.fxLevel);
+  }
+
+  // fxTier(), unless alwaysShowAllBuffs overrides it to 'ultra' so
+  // auraVisibleCap never caps -- scoped to ONLY the buff-bar painter below.
+  private buffBarFxTier(): UiEffectsTier {
+    return this.alwaysShowAllBuffs ? 'ultra' : this.fxTier();
   }
 
   private dailyRewardsEnabled(): boolean {
