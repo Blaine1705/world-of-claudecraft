@@ -262,18 +262,21 @@ to both sides.
 |---|---|---|---|
 | Primary stat points (gear + set tiers) | 141 | 136 | old ahead by 5 |
 | Rating points (gear + capstone haste/hit as rating equivalents) | 450 | 595 | new ahead by 145 |
-| Flat plus proc-average attack power (Strength case) | ~47 | ~68 | new ahead by ~20 |
+| Flat plus proc-average attack power (Strength case) | ~47 | engine bonuses (not AP-denominated) | see note |
 | Spell Damage (caster case, affix debut included) | ~22 | ~108 | new ahead by ~86 |
 | Healing Power (healer case) | 0 | ~143 | new ahead outright |
 
 Conclusions:
 
-- **Every archetype prefers the full new kit.** Melee margins are real but
-  not insulting (on the order of five to eight percent of throughput,
-  carried by the ratings step and the stronger bonus package, minus the
-  old bleed). Casters and healers are decisively ahead through the affix
-  debut. Tanks win on stamina budgets, armor, and the ward procs against
-  an old capstone that pays them almost nothing defensive.
+- **Every archetype prefers the full new kit.** The gear itself (budgets,
+  the ratings step, the affix debuts) carries the margin before set
+  bonuses are counted at all: melee roughly break even on gear alone
+  against the best old stack and casters and healers are decisively
+  ahead. The new engine-hooking bonuses are the deliberate tiebreaker:
+  each 2-plus-4 pair is tuned to be worth at least the retired flat
+  package (roughly five to eight percent of spec throughput), so the full
+  new kit wins for every archetype once its bonuses are counted, and the
+  tuning pass measures exactly that.
 - **The old side above is the best case.** It assumes full heroic
   variants; the median raider's mix is weaker, so real margins are wider.
 - **There is a one-swap valley, and it is accepted.** The first new piece
@@ -541,105 +544,114 @@ pieces, which is also where tanks pick up their threat Hit.
 
 ### The sets
 
-Bonus magnitudes below are the design targets; they ride shared per-tier
-constants (like the existing SET_HASTE_3PC_RATING pattern) and get confirmed
-in the tuning pass. Mechanical families keep the proven trigger surface:
-weaponCrit, spellCrit, spellCast, kill.
+Settled by the maintainer (2026-08-27): every bonus hooks the spec's
+UNDERLYING ENGINE (its rotation loop, resource bank, or signature
+mechanic, as implemented by the spec's combat module), never raw stats.
+The 2-piece bends one gear of the engine; the 4-piece changes how the
+spec plays. Every bonus below names only mechanics that exist in the live
+sim (the spec engines in src/sim/combat/ and their exported constants);
+numbers are design targets for the tuning pass, with each 2-plus-4 pair
+sized to be worth roughly five to eight percent of the spec's throughput,
+at least matching the retired flat-stat package it replaces.
 
 **Warrior (mail)**
 
 | Set | Spec | 2-piece | 4-piece |
 |---|---|---|---|
-| Slagbreaker Battlegear (slagbreaker) | arms, Battlecraft | +40 attack power | Slagbreaker's Rend: weapon crits apply a stacking physical bleed (3 stacks, 8 per tick) plus +25 crit rating |
-| Emberfury Harness (emberfury) | fury, Bloodrush | +40 attack power | Furnace Rush: weapon crits grant +50 attack power for 8 s (icd 10 s) |
-| Forgewall Aegis (forgewall) | prot, Ironguard | +25 Stamina | Forgewall: weapon crits grant a 300 absorb shield for 10 s (icd 20 s) |
+| Slagbreaker Battlegear (slagbreaker) | arms, Battlecraft | Redhand gains a third charge. | Redhand strikes reduce Maiming Strike's remaining cooldown by 1.5 sec, and Maiming Strike deals 15% more damage to targets wearing your Gaping Wounds. |
+| Emberfury Harness (emberfury) | fury, Bloodrush | Bloodletting generates 6 additional rage while you are Enraged. | Spending 80 rage on Red Harvest refunds both Twinstrike charges and extends your Enrage by 2 sec. |
+| Forgewall Aegis (forgewall) | prot, Ironguard | Iron Resolve converts rage at 5 absorb per point instead of 4. | Blocking an attack grants 3 rage, and a Revenge made free by a dodge or parry strikes one additional target. |
 
 **Paladin (mail)**
 
 | Set | Spec | 2-piece | 4-piece |
 |---|---|---|---|
-| Dawnforged Vestments (dawnforged) | holy, Sunmender | +25 Healing Power | Dawnlight Grace: heal casts have a 6 percent chance to make the next cast free (icd 15 s) |
-| Oathpyre Bastion (oathpyre) | protection, Faithwarden | +25 Stamina | Oathpyre Ward: weapon crits grant a 300 absorb shield for 10 s (icd 20 s) |
-| Zealfire Warplate (zealfire) | retribution, Dawnreaver | +40 attack power | Zealfire: weapon crits grant +50 attack power for 8 s (icd 10 s) |
+| Dawnforged Vestments (dawnforged) | holy, Sunmender | Radiant Chorus arms Radiant Resonance after healing a single injured ally. Damage taken no longer delays your spellcasting. | Consuming an Ascension charge refunds 2 Devotion, and Dawn's Embrace cast under Radiant Resonance leaves a heal over time for 30% of its amount over 6 sec. |
+| Oathpyre Bastion (oathpyre) | protection, Faithwarden | Vowkeeper Strike's Solar Reprisal chance rises to 30%, and to 40% when it follows a block. | Sunward Disc bounces to one additional target, and each impact during Bastion Rite grants an absorb equal to 2% of your maximum health. |
+| Zealfire Warplate (zealfire) | retribution, Dawnreaver | Final Edict and Dawnfall cut each other's remaining cooldown by 3 sec instead of 2. | Sun God's Verdict needs one fewer inscription, and resolving it grants 2 Devotion. |
 
 **Hunter (leather)**
 
 | Set | Spec | 2-piece | 4-piece |
 |---|---|---|---|
-| Packlord's Emberhide (packlord_emberhide) | beast_mastery, Packlord | +40 attack power | Pack Frenzy: weapon crits grant the pet +15 percent damage for 10 s (icd 12 s) |
-| Coldsight Trackers (coldsight_trackers) | marksmanship, Coldsight | +40 attack power | Coldsight Focus: weapon crits grant +50 attack power for 8 s (icd 10 s) |
-| Slagsnare Trappings (slagsnare) | survival, Fieldcraft | +40 attack power | Slagsnare: weapon crits apply a stacking physical bleed (3 stacks, 8 per tick) plus +25 crit rating |
+| Packlord's Emberhide (packlord_emberhide) | beast_mastery, Packlord | Pack Command grants 2 Pack Ferocity when your pet's strike critically hits. | Unleash Beast's pet frenzy lasts 12 sec, and Bestial Wrath doubles the damage bonus of your next Unleash Beast. |
+| Coldsight Trackers (coldsight_trackers) | marksmanship, Coldsight | Measured Shot restores 5 additional focus. | Aimed Shot critical strikes extend Cold Focus by 1.5 sec, and Rapid Fire's channel restores 30 focus over its duration. |
+| Slagsnare Trappings (slagsnare) | survival, Fieldcraft | Gutting Strike generates 20 focus against targets carrying your Bloodhook wound. | Woundrend spent at 3 Hunting Momentum keeps the stacks when it strikes a Bloodhook wound. Cannot occur more than once every 10 sec. |
 
 **Rogue (leather)**
 
 | Set | Spec | 2-piece | 4-piece |
 |---|---|---|---|
-| Cinderfang Shroud (cinderfang) | assassination, Knifework | +40 attack power | Cinderfang Venom: weapon crits apply a stacking nature dot (3 stacks, 8 per tick) plus +25 crit rating |
-| Smolderstrike Leathers (smolderstrike) | combat, Thuggery | +40 attack power | Smolderstrike: weapon crits grant +7.5 percent haste for 6 s (icd 15 s) |
-| Ashveil Garb (ashveil) | subtlety, Skulduggery | +40 attack power | Ashveil: weapon crits grant +50 attack power for 8 s (icd 10 s) |
+| Cinderfang Shroud (cinderfang) | assassination, Knifework | Venom Dart extends your venom wound by 8 sec and awards a combo point. | Venomrend's fresh wound begins at ritual stage 2, and its energy return rises to 30. |
+| Smolderstrike Leathers (smolderstrike) | combat, Thuggery | Redline stays open for 10 sec. | Lights Out delivered at full Redline depth refunds 20 sec of Mirrored Blades' cooldown, and its energy return rises to 40. |
+| Ashveil Garb (ashveil) | subtlety, Skulduggery | Openers used from Duskveil bank 2 Gloam. | The Shadow Veil opened at 3 Gloam lasts 9 sec and arms a second doubled Lurker's Strike. |
 
 **Priest (cloth)**
 
 | Set | Spec | 2-piece | 4-piece |
 |---|---|---|---|
-| Creed of Embers Vestments (emberscreed) | discipline, Doctrine | +25 Healing Power | Ember Aegis: heal casts have a 6 percent chance to make the next cast free (icd 15 s) |
-| Benison Dawnweave (benison_dawnweave) | holy, Benison | +25 Healing Power | Dawnweave Renewal: heal casts have an 8 percent chance to grant +10 percent healing done for 8 s (icd 15 s) |
-| Vesperash Shroud (vesperash) | shadow, Vespers | +14 Spell Damage | Vesperash Whispers: spell crits grant +25 Spell Damage for 8 s (icd 10 s) |
+| Creed of Embers Vestments (emberscreed) | discipline, Doctrine | Your Doctrine link converts 40% of your damage into healing. Damage taken no longer delays your spellcasting. | When your Psalm of Warding is fully consumed, your next Scouring Hymn is instant and free. |
+| Benison Dawnweave (benison_dawnweave) | holy, Benison | Seraphic Vigil watches for allies falling below 50% health instead of 35%. Damage taken no longer delays your spellcasting. | When Seraphic Vigil fires, your next Choirmend costs half as much and casts 30% faster. |
+| Vesperash Shroud (vesperash) | shadow, Vespers | Mindfracture grants 2 Gloomtithe. Damage taken no longer delays your spellcasting. | Summoning your Tithefiend at 5 Gloomtithe resets Mindfracture's cooldown, and the fiend returns twice as much mana per hit. |
 
 **Shaman (mail)**
 
 | Set | Spec | 2-piece | 4-piece |
 |---|---|---|---|
-| Stormkindled Regalia (stormkindled) | elemental, Thundercall | +14 Spell Damage | Stormkindled Surge: spell crits grant +25 Spell Damage for 8 s (icd 10 s) |
-| Warspirit Emberscale (warspirit_emberscale) | enhancement, Warspirit | +40 attack power | Emberscale Tempo: weapon crits grant +7.5 percent haste for 6 s (icd 15 s) |
-| Stonehearth Bastion (stonehearth) | enhancement, Warspirit (off-tank) | +25 Stamina | Stonehearth Ward: weapon crits grant a 300 absorb shield for 10 s (icd 20 s) |
-| Springmender Scale (springmender) | restoration, Spiritmend | +25 Healing Power | Springmender's Gift: heal casts have a 6 percent chance to make the next cast free (icd 15 s) |
+| Stormkindled Regalia (stormkindled) | elemental, Thundercall | Unleash Weapon on Pyrebrand grants 3 Thunder. Damage taken no longer delays your spellcasting. | Venting a full 5-Thunder Earthen Jolt makes your next Arc Bolt instant and grants 1 Thunder. |
+| Warspirit Emberscale (warspirit_emberscale) | enhancement, Warspirit | Ancestral Strike advances your cadence 3 steps. | Consuming Stormcast fires one additional Galeheart Echo at 50% damage, and Stormsurge's chance rises to 35%. |
+| Stonehearth Bastion (stonehearth) | enhancement, Warspirit (off-tank) | Stonebound's damage penalty softens to 5%. | While Stonebound, every completed cadence grants an absorb equal to 4% of your maximum health, stacking up to 12%. |
+| Springmender Scale (springmender) | restoration, Spiritmend | Mending Waters deposits 65% of its healing as Mending Current. Damage taken no longer delays your spellcasting. | Cascading Mend reaches a fourth ally and harvests Mending Currents at 150%. |
 
 **Mage (cloth)**
 
 | Set | Spec | 2-piece | 4-piece |
 |---|---|---|---|
-| Chronoweave Vestments (chronoweave) | arcane, Chronomancy | +25 Healing Power | Borrowed Time: heal casts have a 6 percent chance to make the next cast free (icd 15 s) |
-| Pyroclast Regalia (pyroclast) | fire, Pyromancy | +14 Spell Damage | Pyroclast Fury: spell crits grant +25 Spell Damage for 8 s (icd 10 s) |
-| Frostquench Weave (frostquench) | frost, Cryomancy | +14 Spell Damage | Frostquench Clarity: spell casts have a 4 percent chance to make the next cast free (icd 15 s) |
+| Chronoweave Vestments (chronoweave) | arcane, Chronomancy | Temporal Echo converts 50% of your single-target Arcane damage into healing. Damage taken no longer delays your spellcasting. | While at 4 Arcane Charges, Aether Surge's chance to arm Aether Rush doubles to 50%. |
+| Pyroclast Regalia (pyroclast) | fire, Pyromancy | Cinderfall gains a second charge. Damage taken no longer delays your spellcasting. | A Pyrelance spent on Hot Streak leaves its Ignite burning 50% hotter. |
+| Frostquench Weave (frostquench) | frost, Cryomancy | Rimelance critical strikes bank a second Icicle. Damage taken no longer delays your spellcasting. | Glacial Spike grants 2 Fingers of Frost, and an Ice Lance spent on Winter's Chill shaves 2 sec off Winterlash's cooldown. |
 
 **Warlock (cloth)**
 
 | Set | Spec | 2-piece | 4-piece |
 |---|---|---|---|
-| Hexthread Shroud (hexthread) | affliction, Hexcraft | +14 Spell Damage | Hexthread Blight: spell crits apply a stacking shadow dot on the target (3 stacks, 8 per tick) |
-| Gravebrand Regalia (gravebrand) | demonology, Necromancy | +14 Spell Damage | Gravebrand Pact: spell crits grant the pet +15 percent damage for 10 s (icd 12 s) |
-| Ruincaller Vestments (ruincaller) | destruction, Ruination | +14 Spell Damage | Ruincaller's Focus: spell crits grant +25 Spell Damage for 8 s (icd 10 s) |
+| Hexthread Shroud (hexthread) | affliction, Hexcraft | Evil Eye lasts 30 sec. Damage taken no longer delays your spellcasting. | A Sentence passed at 80 or more Condemnation refunds 25, and each Fate Thread adds 8% to its damage. |
+| Gravebrand Regalia (gravebrand) | demonology, Necromancy | Essence Reap creates a second Soul Fragment on critical strikes. Damage taken no longer delays your spellcasting. | Reaping Command costs 1 Soul Fragment, and detonating your Ossuary Mark grants 2 Soul Fragments. |
+| Ruincaller Vestments (ruincaller) | destruction, Ruination | Conflagrate gains a third charge. Damage taken no longer delays your spellcasting. | Ruinbolt spends every banked Wrack, dealing 12% more damage for each point beyond the third. |
 
 **Druid (leather)**
 
 | Set | Spec | 2-piece | 4-piece |
 |---|---|---|---|
-| Moonscorch Raiment (moonscorch) | balance, Moongrove | +14 Spell Damage | Moonscorch Insight: spell crits grant +25 Spell Damage for 8 s (icd 10 s) |
-| Wildfang Emberhide (wildfang_emberhide) | feral, Wildfang (cat) | +40 attack power | Wildfang Rend: weapon crits apply a stacking physical bleed (3 stacks, 8 per tick) plus +25 crit rating |
-| Cinderbark Ward (cinderbark) | feral, Wildfang (bear tank) | +25 Stamina | Cinderbark: weapon crits grant +15 percent dodge for 6 s (icd 20 s) |
-| Grovespring Raiment (grovespring) | restoration, Groveheart | +25 Healing Power | Grovespring Bloom: heal casts have an 8 percent chance to grant +10 percent healing done for 8 s (icd 15 s) |
+| Moonscorch Raiment (moonscorch) | balance, Moongrove | Moonseed extends Lunar Tempest by 9 sec. Damage taken no longer delays your spellcasting. | Moonsurge also restores 35 mana, and Sunwake leaves 1 Moontide banked after it spends the tide. |
+| Wildfang Emberhide (wildfang_emberhide) | feral, Wildfang (cat) | Redharvest's energy return rises by 15. | Redharvest leaves your Flense bleed ticking when it cashes out your wounds. Cannot occur more than once every 20 sec. |
+| Cinderbark Ward (cinderbark) | feral, Wildfang (bear tank) | Sweeping Claws banks Old Blood for every enemy struck. | Marrowbreak's emergency shield grows to 25% of your maximum health and refunds 25 rage. |
+| Grovespring Raiment (grovespring) | restoration, Groveheart | Swiftmend does not consume the effect it feeds on. Cannot occur more than once every 20 sec. Damage taken no longer delays your spellcasting. | Overbloom harvests 75% of your remaining effects and immediately banks 1 Verdance. |
 
 Implementation notes for the bonuses:
 
+- **The seam**: SetBonusTier gains an optional TalentEffect payload
+  (src/sim/content/talents.ts), folded into computeTalentModifiers beside
+  the spec baselines. That surface already carries per-ability modifiers
+  (dmgPct, costPct, cooldownPct, castPct, durationFlat, critPct,
+  bonusCharges, addEffects), the global engine buckets, the ProcDef
+  reactive triggers (castNth, spellCrit, shieldConsumed, hotExpired,
+  bigHitTaken) with excludeSpecs gating, and the runtime numeric contract
+  for bespoke hooks, so bonuses like "Redhand gains a third charge" or
+  "Psalm of Warding fully consumed makes the next Scouring Hymn free" are
+  data plus existing plumbing. Where a bonus bends a spec-module constant
+  (a bank size, a refund, a window duration), the module reads the worn
+  bonus through the same modifiers.selected pattern the choice rows use.
 - Every damage caster and healer set's 2-piece ALSO grants full cast
   pushback immunity (castPushbackReduction 1), taking over the utility the
   incumbent caster sets give up in the retune (their 2-piece drops to 50
   percent). Pushback max-combines in the resolver, so wearing old and new
   together never exceeds immunity.
-- "Heal casts" use the existing spellCast trigger; the proc aura kinds all
-  exist today (next_cast_free, buff_ap, buff_haste, buff_spelldmg,
-  buff_healing_done, pet_damage_pct, absorb, dot).
-- Every 4-piece proc needs a color row in SET_PROC_FX_BY_ID
-  (src/render/renderer.ts) or it renders without its swirl.
-- Tank and healer 4-pieces share mechanical families across classes on
-  purpose: 29 fully bespoke mechanics is a tuning surface this phase cannot
-  validate. Flavor names and stat identities differentiate; mechanics come
-  from proven families (bleed/dot, attack power surge, haste surge, spell
-  damage surge, free cast, absorb ward, dodge surge, pet surge, healing
-  done). The Cinderbark dodge proc uses the existing buff_dodge aura kind
-  (the WARFARE Thornguard precedent), giving the Agility tank avoidance
-  where the mail tanks get absorb wards.
+- Bonuses that add a visible proc or aura need their SET_PROC_FX_BY_ID
+  color row (src/render/renderer.ts) and their tooltip text follows
+  docs/design/tooltip-writing.md, resolved values included.
+- Every referenced mechanic is pinned by the spec's own engine tests; each
+  bonus lands test-first against the real engine constant it bends.
 
 ## Tokens and redemption
 
@@ -887,10 +899,12 @@ Each phase is a reviewable commit (or small commit series) with its tests:
    diversification, the vendor jewelry lane fix), their bonus-text and
    set-tooltip updates, and
    ordinary unit pins on the retuned lineage tables and constants.
-4. **Sets**: ITEM_SETS declarations for all 29 families with the shared
-   bonus-family constants; the 145 set-piece ItemDefs in a new
-   src/sim/content/ignivar_loot.ts (data-as-code, large is correct); the 15
-   sigil tokens; vendor stock wiring.
+4. **Sets**: the SetBonusTier TalentEffect payload seam (test-first, a
+   small resolver change), then ITEM_SETS declarations for all 29
+   families with their engine-hooking bonuses, each bonus landing beside
+   a test against the spec-engine constant it bends; the 145 set-piece
+   ItemDefs in a new src/sim/content/ignivar_loot.ts (data-as-code, large
+   is correct); the 15 sigil tokens; vendor stock wiring.
 5. **Off-set, weapons, jewelry, boss tables**: the 42 direct-drop items and
    both bosses' rollGroup tables (Normal plus heroic-only appends, re-cut
    after #3684); budget and progression tests green; the static viability
@@ -924,3 +938,8 @@ Each phase is a reviewable commit (or small commit series) with its tests:
 6. **Retune verification**: no simulation harness. Unit pins on the
    retuned constants, the static viability check re-run when numbers
    move, and post-release verification through the live parse service.
+7. **Set bonuses hook the engine** (2026-08-27): every new-tier 2-piece
+   and 4-piece bonus modifies the spec's underlying engine (rotation
+   loop, resource bank, signature mechanic), never raw stats. The full
+   catalog of 58 bonuses lives in the set tables above and in the item
+   catalog; implementation rides the TalentEffect seam.
