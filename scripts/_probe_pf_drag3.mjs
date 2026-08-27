@@ -16,10 +16,19 @@ const browser = await puppeteer.launch({
   defaultViewport: { width: 1920, height: 1080 },
 });
 const page = await browser.newPage();
-await page.evaluateOnNewDocument(() => { try { const s = JSON.parse(localStorage.getItem('woc_settings') ?? '{}'); s.uiScale = 1.25; localStorage.setItem('woc_settings', JSON.stringify(s)); } catch {} });
+await page.evaluateOnNewDocument(() => {
+  try {
+    const s = JSON.parse(localStorage.getItem('woc_settings') ?? '{}');
+    s.uiScale = 1.25;
+    localStorage.setItem('woc_settings', JSON.stringify(s));
+  } catch {}
+});
 page.on('pageerror', (e) => console.log('PAGEERROR', e.message));
 await page.goto(URL, { waitUntil: 'domcontentloaded' });
-console.log('booted:', await enterOfflineGame(page, { charClass: 'warrior', charName: 'DragProbe' }));
+console.log(
+  'booted:',
+  await enterOfflineGame(page, { charClass: 'warrior', charName: 'DragProbe' }),
+);
 await page.evaluate(() => window.__game.hud.toggleInterfaceUnlock());
 await sleep(300);
 

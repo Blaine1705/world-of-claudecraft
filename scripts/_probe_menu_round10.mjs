@@ -75,28 +75,44 @@ const generalState = await page.evaluate(() => {
   };
 });
 check('General tab: UI Scale row is gone', !generalState.hasUiScale);
-check('General tab: theme preset renders as a dropdown', generalState.themeDropdowns >= 2, generalState.themeDropdowns);
+check(
+  'General tab: theme preset renders as a dropdown',
+  generalState.themeDropdowns >= 2,
+  generalState.themeDropdowns,
+);
 
 // --- Combat tab reset resets ONLY combat keys.
 await clickByText('#options-menu .opt-tab', 'combat');
 await sleep(250);
 await clickByText('#options-menu > button.btn', 'reset to defaults');
 await sleep(300);
-check('Combat reset clears a combat setting', (await setting('stickyTarget')) !== true, await setting('stickyTarget'));
-check('Combat reset leaves General settings alone', (await setting('hudOpacity')) === 0.7 && (await setting('uiScale')) === 1.15, {
-  hudOpacity: await setting('hudOpacity'),
-  uiScale: await setting('uiScale'),
-});
+check(
+  'Combat reset clears a combat setting',
+  (await setting('stickyTarget')) !== true,
+  await setting('stickyTarget'),
+);
+check(
+  'Combat reset leaves General settings alone',
+  (await setting('hudOpacity')) === 0.7 && (await setting('uiScale')) === 1.15,
+  {
+    hudOpacity: await setting('hudOpacity'),
+    uiScale: await setting('uiScale'),
+  },
+);
 
 // --- General tab reset clears uiScale (its off-menu key) + hudOpacity.
 await clickByText('#options-menu .opt-tab', 'general');
 await sleep(250);
 await clickByText('#options-menu > button.btn', 'reset to defaults');
 await sleep(300);
-check('General reset clears hudOpacity + the retired uiScale', (await setting('hudOpacity')) !== 0.7 && (await setting('uiScale')) !== 1.15, {
-  hudOpacity: await setting('hudOpacity'),
-  uiScale: await setting('uiScale'),
-});
+check(
+  'General reset clears hudOpacity + the retired uiScale',
+  (await setting('hudOpacity')) !== 0.7 && (await setting('uiScale')) !== 1.15,
+  {
+    hudOpacity: await setting('hudOpacity'),
+    uiScale: await setting('uiScale'),
+  },
+);
 
 // Back must still work after tab switches + resets.
 await page.click('#options-menu [data-back]');
@@ -129,7 +145,11 @@ const rowsState = () =>
     };
   });
 let rs = await rowsState();
-check('bars 2 + 3 listed while split, unticked (disabled)', rs.bar2?.checked === false && rs.bar3?.checked === false, rs.rows.map((r) => r.name));
+check(
+  'bars 2 + 3 listed while split, unticked (disabled)',
+  rs.bar2?.checked === false && rs.bar3?.checked === false,
+  rs.rows.map((r) => r.name),
+);
 // Tick bar 2: the bar enables (same path as the plus button).
 await page.evaluate(() => {
   const row = [
@@ -149,7 +169,10 @@ await page.evaluate(() => {
   const rows = [
     ...document.querySelectorAll('#interface-frames-menu .frames-menu-settings .frames-menu-row'),
   ];
-  rows.find((r) => /combine/i.test(r.textContent ?? ''))?.querySelector('input')?.click();
+  rows
+    .find((r) => /combine/i.test(r.textContent ?? ''))
+    ?.querySelector('input')
+    ?.click();
 });
 await sleep(300);
 rs = await rowsState();

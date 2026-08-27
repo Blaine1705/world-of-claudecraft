@@ -52,7 +52,10 @@ const clickCombine = () =>
     const rows = [
       ...document.querySelectorAll('#interface-frames-menu .frames-menu-settings .frames-menu-row'),
     ];
-    rows.find((r) => /combine/i.test(r.textContent ?? ''))?.querySelector('input')?.click();
+    rows
+      .find((r) => /combine/i.test(r.textContent ?? ''))
+      ?.querySelector('input')
+      ?.click();
   });
 
 // --- A. Unlock, open dropdown, combine ON.
@@ -64,7 +67,11 @@ await clickCombine();
 await sleep(300);
 let s = await state();
 check('combine ON: body class + persisted setting', s.combinedClass && s.setting === true, s);
-check('combine ON: group gains the unlock chrome, bars lose it', s.groupUnlocked === true && s.bar1Unlocked === false, s);
+check(
+  'combine ON: group gains the unlock chrome, bars lose it',
+  s.groupUnlocked === true && s.bar1Unlocked === false,
+  s,
+);
 
 // --- B. Drag the combined group (grabbed dead center, clear of the 8px
 // resize band along each edge) and lock.
@@ -97,7 +104,11 @@ console.log(
 );
 s = await state();
 check('after reload: bars still combined', s.combinedClass === true && s.setting === true, s);
-check('after reload: dragged spot restored', s.rect !== null && Math.abs(s.rect.top - (before.top - 120)) < 8, s.rect);
+check(
+  'after reload: dragged spot restored',
+  s.rect !== null && Math.abs(s.rect.top - (before.top - 120)) < 8,
+  s.rect,
+);
 
 // --- D. Combine OFF from the dropdown; bars split back.
 await page.evaluate(() => window.__game.hud.toggleInterfaceUnlock());
@@ -114,8 +125,16 @@ check('dropdown reflects the persisted ON state after reload', checkedBefore ===
 await clickCombine();
 await sleep(300);
 s = await state();
-check('combine OFF: class cleared + setting persisted false', !s.combinedClass && s.setting === false, s);
-check('combine OFF: bars regain their own chrome', s.bar1Unlocked === true && s.groupUnlocked === false, s);
+check(
+  'combine OFF: class cleared + setting persisted false',
+  !s.combinedClass && s.setting === false,
+  s,
+);
+check(
+  'combine OFF: bars regain their own chrome',
+  s.bar1Unlocked === true && s.groupUnlocked === false,
+  s,
+);
 
 await browser.close();
 process.exit(fail > 0 ? 1 : 0);

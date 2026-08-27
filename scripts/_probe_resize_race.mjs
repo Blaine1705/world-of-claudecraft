@@ -16,10 +16,7 @@ const browser = await puppeteer.launch({
 });
 const page = await browser.newPage();
 await page.evaluateOnNewDocument(() => {
-  localStorage.setItem(
-    'woc_hud_frame_actionbar2',
-    '{"left":1281,"top":845,"vw":1920,"vh":1080}',
-  );
+  localStorage.setItem('woc_hud_frame_actionbar2', '{"left":1281,"top":845,"vw":1920,"vh":1080}');
   const s = JSON.parse(localStorage.getItem('woc_settings') ?? '{}');
   s.showSecondaryActionBar = true;
   localStorage.setItem('woc_settings', JSON.stringify(s));

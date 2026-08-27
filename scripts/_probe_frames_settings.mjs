@@ -82,7 +82,11 @@ await page.evaluate(() => {
 });
 await sleep(250);
 const backTitle = await optionsTitle();
-check('Back works after a tab switch + setting change', /game menu/i.test(backTitle ?? ''), backTitle);
+check(
+  'Back works after a tab switch + setting change',
+  /game menu/i.test(backTitle ?? ''),
+  backTitle,
+);
 
 // Round trip again: Interface > Combat tab must NOT carry the moved rows.
 await page.evaluate(() => {
@@ -131,12 +135,16 @@ const menuShape = await page.evaluate(() => {
     summary: sub?.querySelector('summary')?.textContent ?? null,
     subOpen: sub?.open ?? null,
     frameRowCount: sub?.querySelectorAll('.frames-menu-row').length ?? 0,
-    settingLabels: [...(menu?.querySelectorAll('.frames-menu-settings .frames-menu-row span') ?? [])].map(
-      (s) => s.textContent,
-    ),
+    settingLabels: [
+      ...(menu?.querySelectorAll('.frames-menu-settings .frames-menu-row span') ?? []),
+    ].map((s) => s.textContent),
   };
 });
-check('show/hide list folds into a sub-menu', menuShape.summary === 'Show or Hide Frames' && menuShape.subOpen === false, menuShape.summary);
+check(
+  'show/hide list folds into a sub-menu',
+  menuShape.summary === 'Show or Hide Frames' && menuShape.subOpen === false,
+  menuShape.summary,
+);
 check('sub-menu holds the frame rows', menuShape.frameRowCount >= 10, menuShape.frameRowCount);
 check(
   'the four moved settings render as dropdown toggles',
@@ -161,7 +169,9 @@ await page.evaluate(() => {
 });
 await sleep(100);
 await page.evaluate(() => {
-  const rows = [...document.querySelectorAll('#interface-frames-menu .frames-menu-settings .frames-menu-row')];
+  const rows = [
+    ...document.querySelectorAll('#interface-frames-menu .frames-menu-settings .frames-menu-row'),
+  ];
   const row = rows.find((r) => /combine/i.test(r.textContent ?? ''));
   row?.querySelector('input')?.click();
 });
@@ -170,18 +180,29 @@ const combined = await page.evaluate(() => ({
   bodyClass: document.body.classList.contains('combined-action-bars'),
   subOpen: document.querySelector('#interface-frames-menu details')?.open ?? null,
   combineChecked: (() => {
-    const rows = [...document.querySelectorAll('#interface-frames-menu .frames-menu-settings .frames-menu-row')];
+    const rows = [
+      ...document.querySelectorAll('#interface-frames-menu .frames-menu-settings .frames-menu-row'),
+    ];
     return rows.find((r) => /combine/i.test(r.textContent ?? ''))?.querySelector('input')?.checked;
   })(),
 }));
 check('combine toggle applies live (body class set)', combined.bodyClass === true);
-check('menu rebuild keeps the sub-menu open + ticked state', combined.subOpen === true && combined.combineChecked === true, combined);
+check(
+  'menu rebuild keeps the sub-menu open + ticked state',
+  combined.subOpen === true && combined.combineChecked === true,
+  combined,
+);
 await page.screenshot({ path: 'tmp/frames_settings_menu.png' });
 
 // Put the setting back so the tester's HUD is unchanged.
 await page.evaluate(() => {
-  const rows = [...document.querySelectorAll('#interface-frames-menu .frames-menu-settings .frames-menu-row')];
-  rows.find((r) => /combine/i.test(r.textContent ?? ''))?.querySelector('input')?.click();
+  const rows = [
+    ...document.querySelectorAll('#interface-frames-menu .frames-menu-settings .frames-menu-row'),
+  ];
+  rows
+    .find((r) => /combine/i.test(r.textContent ?? ''))
+    ?.querySelector('input')
+    ?.click();
 });
 await sleep(200);
 

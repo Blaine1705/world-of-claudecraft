@@ -19,7 +19,15 @@ const browser = await puppeteer.launch({
 });
 const page = await browser.newPage();
 await page.goto(URL, { waitUntil: 'domcontentloaded' });
-console.log('booted:', await enterOfflineGame(page, { charClass: 'warrior', charName: 'DragProbe', gameBootTimeoutMs: 90000, settleMs: 5000 }));
+console.log(
+  'booted:',
+  await enterOfflineGame(page, {
+    charClass: 'warrior',
+    charName: 'DragProbe',
+    gameBootTimeoutMs: 90000,
+    settleMs: 5000,
+  }),
+);
 await page.evaluate(() => window.__game.hud.toggleInterfaceUnlock());
 await sleep(300);
 

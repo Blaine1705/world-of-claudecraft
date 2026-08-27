@@ -34,7 +34,12 @@ const snap = (label) =>
     const cs = getComputedStyle(g);
     return {
       label: l,
-      rect: { left: +r.left.toFixed(1), top: +r.top.toFixed(1), w: +r.width.toFixed(1), h: +r.height.toFixed(1) },
+      rect: {
+        left: +r.left.toFixed(1),
+        top: +r.top.toFixed(1),
+        w: +r.width.toFixed(1),
+        h: +r.height.toFixed(1),
+      },
       parent: g.parentElement?.id || g.parentElement?.tagName,
       pos: cs.position,
       csLeft: cs.left,
@@ -53,7 +58,10 @@ await page.evaluate(() => {
   const rows = [
     ...document.querySelectorAll('#interface-frames-menu .frames-menu-settings .frames-menu-row'),
   ];
-  rows.find((r) => /combine/i.test(r.textContent ?? ''))?.querySelector('input')?.click();
+  rows
+    .find((r) => /combine/i.test(r.textContent ?? ''))
+    ?.querySelector('input')
+    ?.click();
 });
 await sleep(300);
 console.log(JSON.stringify(await snap('combined, pre-grab'), null, 1));

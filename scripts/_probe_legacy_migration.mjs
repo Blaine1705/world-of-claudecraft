@@ -50,7 +50,9 @@ const bars = () =>
   page.evaluate(() => {
     const read = (sel) => {
       const r = document.querySelector(sel)?.getBoundingClientRect();
-      return r ? { top: Math.round(r.top), bottomGap: Math.round(window.innerHeight - r.bottom) } : null;
+      return r
+        ? { top: Math.round(r.top), bottomGap: Math.round(window.innerHeight - r.bottom) }
+        : null;
     };
     return {
       bar2: read('#actionbar2'),
@@ -61,7 +63,11 @@ const bars = () =>
   });
 
 const atFull = await bars();
-check('boot at 1920x1080 renders the bars at their saved spots', atFull.bar2?.top === 845 && atFull.bar3?.top === 845, atFull);
+check(
+  'boot at 1920x1080 renders the bars at their saved spots',
+  atFull.bar2?.top === 845 && atFull.bar3?.top === 845,
+  atFull,
+);
 check(
   'the legacy save was migrated in place (viewport stamp added, spot kept)',
   atFull.stored2 !== null &&
@@ -94,7 +100,11 @@ await page.setViewport({ width: 1920, height: 1080 });
 await page.evaluate(() => window.dispatchEvent(new Event('resize')));
 await sleep(400);
 const backFull = await bars();
-check('back to fullscreen: the exact saved spots return', backFull.bar2?.top === 845 && backFull.bar3?.top === 845, backFull);
+check(
+  'back to fullscreen: the exact saved spots return',
+  backFull.bar2?.top === 845 && backFull.bar3?.top === 845,
+  backFull,
+);
 
 await browser.close();
 process.exit(fail > 0 ? 1 : 0);

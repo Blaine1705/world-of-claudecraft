@@ -18,8 +18,15 @@ const browser = await puppeteer.launch({
 const page = await browser.newPage();
 page.on('pageerror', (e) => console.log('PAGEERROR', e.message));
 await page.goto(URL, { waitUntil: 'domcontentloaded' });
-console.log('booted:', await enterOfflineGame(page, { charClass: 'warrior', charName: 'DragProbe' }));
-await page.evaluate(() => { document.documentElement.style.setProperty('--ui-scale', '1.25'); window.__game.hud.reapplySavedGeometry(); window.__game.hud.toggleInterfaceUnlock(); });
+console.log(
+  'booted:',
+  await enterOfflineGame(page, { charClass: 'warrior', charName: 'DragProbe' }),
+);
+await page.evaluate(() => {
+  document.documentElement.style.setProperty('--ui-scale', '1.25');
+  window.__game.hud.reapplySavedGeometry();
+  window.__game.hud.toggleInterfaceUnlock();
+});
 await sleep(300);
 
 const SEL = '#player-frame';

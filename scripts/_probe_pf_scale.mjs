@@ -88,7 +88,11 @@ await page.mouse.up();
 await sleep(150);
 const clamped = await measure('at right clamp');
 console.log(JSON.stringify(clamped, null, 2));
-console.log('content stops', (1920 - clamped.content.right).toFixed(1), 'px short of the screen edge');
+console.log(
+  'content stops',
+  (1920 - clamped.content.right).toFixed(1),
+  'px short of the screen edge',
+);
 await page.screenshot({ path: 'tmp/pfscale_2_clamped.png' });
 
 await browser.close();

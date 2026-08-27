@@ -3,6 +3,7 @@
 import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH } from './browser_path.mjs';
 import { enterOfflineGame } from './enter_offline_game.mjs';
+
 const URL = process.env.GAME_URL ?? 'http://localhost:5391';
 const browser = await puppeteer.launch({
   executablePath: BROWSER_PATH,

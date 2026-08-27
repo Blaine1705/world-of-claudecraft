@@ -70,7 +70,11 @@ const previews = await page.evaluate(() => ({
   castFill: document.querySelector('#castbar .tf-preview-fill')?.style.width ?? null,
   swingFill: document.querySelector('#swingbar .tf-preview-fill')?.style.width ?? null,
 }));
-check('buff + debuff sample icons render', previews.buffIcons === 4 && previews.debuffIcons === 3, previews);
+check(
+  'buff + debuff sample icons render',
+  previews.buffIcons === 4 && previews.debuffIcons === 3,
+  previews,
+);
 check(
   'party sample: five REAL party-frame rows with names and crests',
   previews.partyRows.length === 5 &&
@@ -79,7 +83,11 @@ check(
   previews.partyRows,
 );
 check('pet sample renders, target sample removed', previews.pet && !previews.target);
-check('cast sample is a filled bar with a spell name', previews.castLabel === 'Example Spell' && previews.castFill === '62%', previews.castLabel);
+check(
+  'cast sample is a filled bar with a spell name',
+  previews.castLabel === 'Example Spell' && previews.castFill === '62%',
+  previews.castLabel,
+);
 check('swing sample is a filled bar', previews.swingFill === '45%', previews.swingFill);
 await page.screenshot({ path: 'tmp/preview_unlocked.png' });
 
@@ -100,21 +108,25 @@ await page.screenshot({ path: 'tmp/preview_unlocked.png' });
     return { left: Math.round(r.left), top: Math.round(r.top) };
   });
   await page.setViewport({ width: 1280, height: 720 });
-// Emulated viewport changes update innerWidth/Height but do NOT dispatch a
-// resize event (a real window transition always does): dispatch it like the
-// real browser would.
-await page.evaluate(() => window.dispatchEvent(new Event('resize')));
+  // Emulated viewport changes update innerWidth/Height but do NOT dispatch a
+  // resize event (a real window transition always does): dispatch it like the
+  // real browser would.
+  await page.evaluate(() => window.dispatchEvent(new Event('resize')));
   await sleep(300);
   const narrow = await page.evaluate(() => {
     const r = document.querySelector('#minimap-wrap').getBoundingClientRect();
     return { left: Math.round(r.left), right: Math.round(r.right) };
   });
-  check('leaving fullscreen clamps the frame into view', narrow.right <= 1280 && narrow.left < wide.left, { wide, narrow });
+  check(
+    'leaving fullscreen clamps the frame into view',
+    narrow.right <= 1280 && narrow.left < wide.left,
+    { wide, narrow },
+  );
   await page.setViewport({ width: 1920, height: 1080 });
-// Emulated viewport changes update innerWidth/Height but do NOT dispatch a
-// resize event (a real window transition always does): dispatch it like the
-// real browser would.
-await page.evaluate(() => window.dispatchEvent(new Event('resize')));
+  // Emulated viewport changes update innerWidth/Height but do NOT dispatch a
+  // resize event (a real window transition always does): dispatch it like the
+  // real browser would.
+  await page.evaluate(() => window.dispatchEvent(new Event('resize')));
   await sleep(300);
   const restored = await page.evaluate(() => {
     const r = document.querySelector('#minimap-wrap').getBoundingClientRect();
@@ -143,10 +155,10 @@ await page.evaluate(() => window.dispatchEvent(new Event('resize')));
     return Math.round(window.innerHeight - r.bottom);
   });
   await page.setViewport({ width: 1920, height: 870 });
-// Emulated viewport changes update innerWidth/Height but do NOT dispatch a
-// resize event (a real window transition always does): dispatch it like the
-// real browser would.
-await page.evaluate(() => window.dispatchEvent(new Event('resize')));
+  // Emulated viewport changes update innerWidth/Height but do NOT dispatch a
+  // resize event (a real window transition always does): dispatch it like the
+  // real browser would.
+  await page.evaluate(() => window.dispatchEvent(new Event('resize')));
   await sleep(300);
   const windowedDist = await page.evaluate(() => {
     const r = document.querySelector('#swingbar').getBoundingClientRect();
@@ -157,16 +169,20 @@ await page.evaluate(() => window.dispatchEvent(new Event('resize')));
     windowedDist,
   });
   await page.setViewport({ width: 1920, height: 1080 });
-// Emulated viewport changes update innerWidth/Height but do NOT dispatch a
-// resize event (a real window transition always does): dispatch it like the
-// real browser would.
-await page.evaluate(() => window.dispatchEvent(new Event('resize')));
+  // Emulated viewport changes update innerWidth/Height but do NOT dispatch a
+  // resize event (a real window transition always does): dispatch it like the
+  // real browser would.
+  await page.evaluate(() => window.dispatchEvent(new Event('resize')));
   await sleep(300);
   const swBack = await page.evaluate(() => {
     const r = document.querySelector('#swingbar').getBoundingClientRect();
     return { left: Math.round(r.left), top: Math.round(r.top) };
   });
-  check('and returns exactly when the height comes back', swBack.left === 300 && swBack.top === 1000, swBack);
+  check(
+    'and returns exactly when the height comes back',
+    swBack.left === 300 && swBack.top === 1000,
+    swBack,
+  );
 }
 
 // --- B. Drag the minimap somewhere distinctive, then lock: previews vanish.
@@ -200,7 +216,11 @@ await sleep(200);
 const code = await page.evaluate(
   () => document.querySelector('#options-menu .transfer-code')?.value ?? '',
 );
-check('export code carries the minimap spot', code.includes('woc_hud_frame_minimap'), code.slice(0, 60));
+check(
+  'export code carries the minimap spot',
+  code.includes('woc_hud_frame_minimap'),
+  code.slice(0, 60),
+);
 
 // --- D. Reset the layout (Frames tab Reset to Defaults), confirm it moved back.
 await clickByText('#options-menu > button.btn', 'reset to defaults');
@@ -209,7 +229,11 @@ const afterReset = await page.evaluate(() => {
   const r = document.querySelector('#minimap-wrap').getBoundingClientRect();
   return { left: Math.round(r.left), top: Math.round(r.top) };
 });
-check('reset moved the minimap off the dragged spot', Math.abs(afterReset.left - dragged.left) > 50, { dragged, afterReset });
+check(
+  'reset moved the minimap off the dragged spot',
+  Math.abs(afterReset.left - dragged.left) > 50,
+  { dragged, afterReset },
+);
 
 // --- E. Import the code back: Apply reloads, the spot returns.
 await clickByText('#options-menu .set-row .set-toggle', 'import');
@@ -269,7 +293,11 @@ await sleep(300);
 const kindMsg = await page.evaluate(
   () => document.querySelector('#options-menu .transfer-pane .set-note')?.textContent ?? '',
 );
-check('a frames code is refused by the settings import', kindMsg.length > 0 && /different/i.test(kindMsg), kindMsg);
+check(
+  'a frames code is refused by the settings import',
+  kindMsg.length > 0 && /different/i.test(kindMsg),
+  kindMsg,
+);
 
 await browser.close();
 process.exit(fail > 0 ? 1 : 0);

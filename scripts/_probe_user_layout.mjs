@@ -95,7 +95,10 @@ const snap = () =>
 const w0 = await snap();
 check(
   'boot at 1920x911: every frame at its saved spot',
-  w0.minimap?.top === 8 && w0.buffs?.top === 365.5 && w0.debuffs?.top === 401.5 && w0.bar2?.top === 845,
+  w0.minimap?.top === 8 &&
+    w0.buffs?.top === 365.5 &&
+    w0.debuffs?.top === 401.5 &&
+    w0.bar2?.top === 845,
   { minimap: w0.minimap?.top, buffs: w0.buffs?.top, bar2: w0.bar2?.top },
 );
 
@@ -111,10 +114,14 @@ check(
 );
 // The tall menu rail's lower end is its nearest edge, so it rides the BOTTOM
 // (owner report: pinning its top floated it to mid-screen in fullscreen).
-check('fullscreen: the menu rail keeps its bottom gap', full.menu?.bottomGap === w0.menu?.bottomGap, {
-  windowed: w0.menu,
-  fullscreen: full.menu,
-});
+check(
+  'fullscreen: the menu rail keeps its bottom gap',
+  full.menu?.bottomGap === w0.menu?.bottomGap,
+  {
+    windowed: w0.menu,
+    fullscreen: full.menu,
+  },
+);
 const HEIGHT_DELTA = 1080 - 911;
 check(
   'fullscreen: the bottom cluster rides the bottom edge (gaps preserved)',
