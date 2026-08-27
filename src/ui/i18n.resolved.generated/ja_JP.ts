@@ -13478,6 +13478,36 @@ export const ja_JP: EnTranslations = {
       "cinder_of_the_first_design": {
         "name": "最初の設計の燃えかす"
       },
+      "forgefathers_warhammer": {
+        "name": "フォージファーザーのウォーハンマー"
+      },
+      "cinderfang_kris": {
+        "name": "シンダーファングのクリス"
+      },
+      "slagrender_cleaver": {
+        "name": "スラグレンダーのクリーバー"
+      },
+      "anvilguard_blade": {
+        "name": "アンヴィルガードのブレード"
+      },
+      "heart_of_the_end_greatblade": {
+        "name": "終焉の心臓のグレートブレード"
+      },
+      "emberflight_longbow": {
+        "name": "エンバーフライトのロングボウ"
+      },
+      "staff_of_the_last_spring": {
+        "name": "最後の泉の杖"
+      },
+      "forgefire_spire": {
+        "name": "フォージファイアのスパイア"
+      },
+      "springtouched_crozier": {
+        "name": "泉触れの司教杖"
+      },
+      "wand_of_quenched_sparks": {
+        "name": "消えた火花のワンド"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },

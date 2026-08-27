@@ -6062,6 +6062,26 @@
         "ps_briny_lure",
         "ps_lustrous_pearl"
       ]
+    },
+    {
+      "batchId": "crucible-raid-weapons-2026-08-28",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "existing painted WebP catalog in public/ui/items/",
+      "commonPrompt": "Painted dark-fantasy MMORPG inventory icon, one centered item, clear silhouette, tactile painted material rendering, atmospheric opaque dark background, top-left key light, complete subject fully in frame, no text, no watermark, no frame, no transparency",
+      "itemIds": [
+        "forgefathers_warhammer",
+        "cinderfang_kris",
+        "slagrender_cleaver",
+        "anvilguard_blade",
+        "heart_of_the_end_greatblade",
+        "emberflight_longbow",
+        "staff_of_the_last_spring",
+        "forgefire_spire",
+        "springtouched_crozier",
+        "wand_of_quenched_sparks"
+      ]
     }
   ]
 }

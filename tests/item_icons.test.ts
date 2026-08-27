@@ -255,7 +255,7 @@ function missingPaintedWaveItemIds(): string[] {
 describe('item webp icons', () => {
   it('has image-backed item ids wired (guards the fixture)', () => {
     expect(ITEM_IMAGE_IDS.size).toBeGreaterThan(0);
-    expect(WEAPON_IMAGE_IDS.size).toBe(123);
+    expect(WEAPON_IMAGE_IDS.size).toBe(133);
   });
 
   it('A) every image-backed item and weapon resolves to a committed, decodable .webp', async () => {
@@ -309,7 +309,9 @@ describe('item webp icons', () => {
     // hide behind the open wave, and A2 above still forces each entry out as
     // its painting lands. When the Crucible wave is fully painted this pin
     // returns to the empty set.
-    expect([...ITEM_ART_PENDING].sort()).toEqual([...IGNIVAR_LOOT_ITEM_IDS].sort());
+    expect([...ITEM_ART_PENDING].sort()).toEqual(
+      [...IGNIVAR_LOOT_ITEM_IDS].filter((id) => ITEMS[id]?.kind !== 'weapon').sort(),
+    );
     // And the inverse: an id with committed art must still win the static url.
     expect(itemImageUrl('linen_pouch')).toBe('/ui/items/linen_pouch.webp');
   });

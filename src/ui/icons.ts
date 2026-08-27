@@ -5293,7 +5293,11 @@ export const UI_ITEM_IMAGE_IDS = new Set<string>(['backpack']);
 // whole debt: 192 non-weapon items behind the development-only Crucible raid,
 // enumerated here until their painted wave lands (the raid itself ships with a
 // dev-only entrance, so no player-facing surface shows a procedural icon yet).
-export const ITEM_ART_PENDING = new Set<string>(IGNIVAR_LOOT_ITEM_IDS);
+// The 10 raid weapons are excluded: weapons never enter this set (guard A2);
+// they ship painted art through WEAPON_IMAGE_IDS like every other weapon.
+export const ITEM_ART_PENDING = new Set<string>(
+  IGNIVAR_LOOT_ITEM_IDS.filter((id) => ITEMS[id]?.kind !== 'weapon'),
+);
 
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */
 export function itemImageUrl(id: string): string | null {

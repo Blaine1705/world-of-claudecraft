@@ -935,6 +935,9 @@ const ITEM_OFFHAND_MODELS: Readonly<Record<string, string>> = {
   highwatch_wallshield: 'shield_square',
   bonewrought_bulwark: 'shield_square',
   pearlward_aegis: 'shield_round', // the first caster (int/spi) shield
+  // Crucible raid shields (content/ignivar_loot.ts): tank wall + healer barrier.
+  bulwark_of_the_inner_crucible: 'shield_square',
+  ember_wardens_barrier: 'shield_round',
 };
 
 function itemModelKey(

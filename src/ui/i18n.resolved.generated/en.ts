@@ -13478,6 +13478,36 @@ export const en: EnTranslations = {
       "cinder_of_the_first_design": {
         "name": "Cinder of the First Design"
       },
+      "forgefathers_warhammer": {
+        "name": "Forgefather's Warhammer"
+      },
+      "cinderfang_kris": {
+        "name": "Cinderfang Kris"
+      },
+      "slagrender_cleaver": {
+        "name": "Slagrender Cleaver"
+      },
+      "anvilguard_blade": {
+        "name": "Anvilguard Blade"
+      },
+      "heart_of_the_end_greatblade": {
+        "name": "Heart of the End Greatblade"
+      },
+      "emberflight_longbow": {
+        "name": "Emberflight Longbow"
+      },
+      "staff_of_the_last_spring": {
+        "name": "Staff of the Last Spring"
+      },
+      "forgefire_spire": {
+        "name": "Forgefire Spire"
+      },
+      "springtouched_crozier": {
+        "name": "Springtouched Crozier"
+      },
+      "wand_of_quenched_sparks": {
+        "name": "Wand of Quenched Sparks"
+      },
       "conjured_water4": {
         "name": "Conjured Springwater"
       },

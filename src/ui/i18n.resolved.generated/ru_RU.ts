@@ -13478,6 +13478,36 @@ export const ru_RU: EnTranslations = {
       "cinder_of_the_first_design": {
         "name": "Уголь первого замысла"
       },
+      "forgefathers_warhammer": {
+        "name": "Боевой молот Праотца-кузнеца"
+      },
+      "cinderfang_kris": {
+        "name": "Крис пеплоклыка"
+      },
+      "slagrender_cleaver": {
+        "name": "Секач шлакодёра"
+      },
+      "anvilguard_blade": {
+        "name": "Клинок стража наковальни"
+      },
+      "heart_of_the_end_greatblade": {
+        "name": "Великий клинок Сердца конца"
+      },
+      "emberflight_longbow": {
+        "name": "Длинный лук Тлеющего полёта"
+      },
+      "staff_of_the_last_spring": {
+        "name": "Посох последнего родника"
+      },
+      "forgefire_spire": {
+        "name": "Шпиль горнового огня"
+      },
+      "springtouched_crozier": {
+        "name": "Посох родникового касания"
+      },
+      "wand_of_quenched_sparks": {
+        "name": "Жезл угасших искр"
+      },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"
       },

@@ -17,7 +17,9 @@ import {
   IGNIVAR_RAID_LOOT_SOURCE_LEVEL,
   IGNIVAR_SET_ITEMS,
   IGNIVAR_SIGIL_ITEMS,
+  IGNIVAR_WEAPON_ITEMS,
 } from '../src/sim/content/ignivar_loot';
+import { WEAPON_TYPE_BY_ITEM } from '../src/sim/content/weapon_skin_rules';
 import { ITEMS, MOBS } from '../src/sim/data';
 import {
   expectedStatBudget,
@@ -27,6 +29,7 @@ import {
   primaryStatSum,
 } from '../src/sim/item_level';
 import type { ItemDef } from '../src/sim/types';
+import { ITEM_WEAPON_VARIANTS } from '../src/ui/weapon_variants';
 
 const TIER_SLOTS = ['helmet', 'shoulder', 'chest', 'gloves', 'legs'] as const;
 
@@ -43,12 +46,13 @@ const gearItems = (): ItemDef[] =>
 
 describe('ignivar loot: catalog shape', () => {
   it('carries the exact authored counts', () => {
-    expect(IGNIVAR_LOOT_ITEM_IDS.length).toBe(192);
+    expect(IGNIVAR_LOOT_ITEM_IDS.length).toBe(202);
     expect(Object.keys(IGNIVAR_SET_ITEMS).length).toBe(29 * 5);
     expect(Object.keys(IGNIVAR_SIGIL_ITEMS).length).toBe(15);
     expect(Object.keys(IGNIVAR_OFFSET_ITEMS).length).toBe(20);
     expect(Object.keys(IGNIVAR_JEWELRY_ITEMS).length).toBe(8);
     expect(Object.keys(IGNIVAR_HELD_ITEMS).length).toBe(4);
+    expect(Object.keys(IGNIVAR_WEAPON_ITEMS).length).toBe(10);
   });
 
   it('merges every id into ITEMS without collisions', () => {
@@ -60,9 +64,9 @@ describe('ignivar loot: catalog shape', () => {
 });
 
 describe('ignivar loot: every gear piece is item level 35 and budget-exact', () => {
-  it('derives ilvl 35 from source 26 + epic + raid for all 177 gear pieces', () => {
+  it('derives ilvl 35 from source 26 + epic + raid for all 187 gear pieces', () => {
     const gear = gearItems();
-    expect(gear.length).toBe(177);
+    expect(gear.length).toBe(187);
     for (const item of gear) {
       expect(itemSourceLevel(item.id), `${item.id} source`).toBe(IGNIVAR_RAID_LOOT_SOURCE_LEVEL);
       expect(itemFromRaid(item.id), `${item.id} raid flag`).toBe(true);
@@ -86,11 +90,16 @@ describe('ignivar loot: every gear piece is item level 35 and budget-exact', () 
       feet: 16,
       neck: 16,
       ring: 15,
+      mainhand: 25,
       offhand: 18,
     };
     for (const item of gearItems()) {
+      const isTwoHand = item.kind === 'weapon' && item.hand === 'twohand';
       const want = expectedStatBudget(item);
-      expect(want, `${item.id} has a derivable budget`).toBe(SLOT_BUDGET[item.slot as string]);
+      expect(want, `${item.id} has a derivable budget`).toBe(
+        // Two-handers carry the TWOHAND_STAT_MULT premium over the mainhand line.
+        isTwoHand ? 33 : SLOT_BUDGET[item.slot as string],
+      );
       expect(primaryStatSum(item), `${item.id} stat sum == budget`).toBe(want);
     }
   });
@@ -178,8 +187,15 @@ describe('ignivar loot: the Hit program and affix directionality', () => {
       'band_of_marked_strikes',
       'circle_of_cinders',
     ]);
+    const HIT_30 = new Set(['cinderfang_kris', 'slagrender_cleaver', 'wand_of_quenched_sparks']);
     for (const item of Object.values(IGNIVAR_LOOT_ITEMS)) {
-      const want = HIT_60.has(item.id) ? 60 : HIT_25.has(item.id) ? 25 : 0;
+      const want = HIT_60.has(item.id)
+        ? 60
+        : HIT_25.has(item.id)
+          ? 25
+          : HIT_30.has(item.id)
+            ? 30
+            : 0;
       expect(item.hitRating ?? 0, item.id).toBe(want);
     }
   });
@@ -201,9 +217,43 @@ describe('ignivar loot: the Hit program and affix directionality', () => {
       }
     }
     // 6 heal sets x 5 + 3 heal waist/feet pairs + 2 heal jewelry + barrier + orb.
-    expect(healPieces).toBe(6 * 5 + 6 + 2 + 2);
+    // ... plus the healing staff and the crozier.
+    expect(healPieces).toBe(6 * 5 + 6 + 2 + 2 + 2);
     // 8 sd sets x 5 + 3 sd waist/feet pairs + 2 sd jewelry + the cinder held.
-    expect(sdPieces).toBe(8 * 5 + 6 + 2 + 1);
+    // ... plus the damage staff and the wand.
+    expect(sdPieces).toBe(8 * 5 + 6 + 2 + 1 + 2);
+  });
+});
+
+describe('ignivar loot: the 10 weapons', () => {
+  it('every weapon rides the ilvl-35 dps curve with its full registration', () => {
+    // weaponDpsBudget(35) = 17.2; two-handers carry the TWOHAND_DPS_MULT
+    // premium (19.78). Damage ranges were authored as round(avg x 0.8) to
+    // round(avg x 1.2), so realized dps sits within rounding of the target.
+    for (const item of Object.values(IGNIVAR_WEAPON_ITEMS)) {
+      expect(item.kind, item.id).toBe('weapon');
+      if (item.kind !== 'weapon') continue;
+      const weapon = item.weapon;
+      expect(weapon, item.id).toBeTruthy();
+      if (!weapon) continue;
+      const dps = (weapon.min + weapon.max) / 2 / weapon.speed;
+      const target = item.hand === 'twohand' ? 17.2 * 1.15 : 17.2;
+      expect(Math.abs(dps - target), `${item.id} dps ${dps} vs ${target}`).toBeLessThan(0.35);
+      // Full weapon registration: a type row (skin eligibility + the guard in
+      // tests/weapon_skins.test.ts) and a held-model variant with painted art.
+      expect(WEAPON_TYPE_BY_ITEM[item.id], `${item.id} type row`).toBeTruthy();
+      expect(ITEM_WEAPON_VARIANTS[item.id], `${item.id} variant row`).toBeTruthy();
+      // Weapons carry the 70/30 rating pair.
+      const ratings = [item.critRating ?? 0, item.hasteRating ?? 0, item.hitRating ?? 0].sort(
+        (a, b) => b - a,
+      );
+      expect(ratings, item.id).toEqual([70, 30, 0]);
+    }
+  });
+
+  it('the longbow is a bow and the kris is a dagger (backstab eligibility)', () => {
+    expect(WEAPON_TYPE_BY_ITEM.emberflight_longbow).toBe('bow');
+    expect(WEAPON_TYPE_BY_ITEM.cinderfang_kris).toBe('dagger');
   });
 });
 
@@ -232,6 +282,7 @@ describe('ignivar loot: the boss drop tables', () => {
       'ignivar_sigil_mantle',
       'ignivar_sigil_grip',
       'ignivar_jewelry',
+      'ignivar_offset',
     ]);
     expect(groups.get('ignivar_sigil_mantle')?.ids).toEqual([
       'sigil_anvil_shoulder',

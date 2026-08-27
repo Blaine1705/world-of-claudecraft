@@ -13478,6 +13478,36 @@ export const zh_CN: EnTranslations = {
       "cinder_of_the_first_design": {
         "name": "初构之烬"
       },
+      "forgefathers_warhammer": {
+        "name": "铸父战锤"
+      },
+      "cinderfang_kris": {
+        "name": "烬牙波刃匕首"
+      },
+      "slagrender_cleaver": {
+        "name": "裂渣劈斧"
+      },
+      "anvilguard_blade": {
+        "name": "砧卫之刃"
+      },
+      "heart_of_the_end_greatblade": {
+        "name": "终末之心巨刃"
+      },
+      "emberflight_longbow": {
+        "name": "烬羽长弓"
+      },
+      "staff_of_the_last_spring": {
+        "name": "终泉法杖"
+      },
+      "forgefire_spire": {
+        "name": "炉火尖塔杖"
+      },
+      "springtouched_crozier": {
+        "name": "泉息牧杖"
+      },
+      "wand_of_quenched_sparks": {
+        "name": "熄火花魔杖"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },

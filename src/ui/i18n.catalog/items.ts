@@ -2645,6 +2645,16 @@ const ITEM_ENTITY_IDS = [
   'ember_wardens_barrier',
   'orb_of_the_last_spring',
   'cinder_of_the_first_design',
+  'forgefathers_warhammer',
+  'cinderfang_kris',
+  'slagrender_cleaver',
+  'anvilguard_blade',
+  'heart_of_the_end_greatblade',
+  'emberflight_longbow',
+  'staff_of_the_last_spring',
+  'forgefire_spire',
+  'springtouched_crozier',
+  'wand_of_quenched_sparks',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2977,6 +2987,16 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   ember_wardens_barrier: "Ember Warden's Barrier",
   orb_of_the_last_spring: 'Orb of the Last Spring',
   cinder_of_the_first_design: 'Cinder of the First Design',
+  forgefathers_warhammer: "Forgefather's Warhammer",
+  cinderfang_kris: 'Cinderfang Kris',
+  slagrender_cleaver: 'Slagrender Cleaver',
+  anvilguard_blade: 'Anvilguard Blade',
+  heart_of_the_end_greatblade: 'Heart of the End Greatblade',
+  emberflight_longbow: 'Emberflight Longbow',
+  staff_of_the_last_spring: 'Staff of the Last Spring',
+  forgefire_spire: 'Forgefire Spire',
+  springtouched_crozier: 'Springtouched Crozier',
+  wand_of_quenched_sparks: 'Wand of Quenched Sparks',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

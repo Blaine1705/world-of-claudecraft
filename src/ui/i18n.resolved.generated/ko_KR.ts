@@ -13478,6 +13478,36 @@ export const ko_KR: EnTranslations = {
       "cinder_of_the_first_design": {
         "name": "최초 설계의 잿불"
       },
+      "forgefathers_warhammer": {
+        "name": "벼림아버지의 전쟁망치"
+      },
+      "cinderfang_kris": {
+        "name": "잿불송곳니 크리스"
+      },
+      "slagrender_cleaver": {
+        "name": "용재절단 도끼"
+      },
+      "anvilguard_blade": {
+        "name": "모루수호 검"
+      },
+      "heart_of_the_end_greatblade": {
+        "name": "종말의 심장 대검"
+      },
+      "emberflight_longbow": {
+        "name": "잿불비상 장궁"
+      },
+      "staff_of_the_last_spring": {
+        "name": "마지막 샘의 지팡이"
+      },
+      "forgefire_spire": {
+        "name": "화로불꽃 첨탑지팡이"
+      },
+      "springtouched_crozier": {
+        "name": "샘닿은 홀장"
+      },
+      "wand_of_quenched_sparks": {
+        "name": "꺼진 불꽃의 마법봉"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },

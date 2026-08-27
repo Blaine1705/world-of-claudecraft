@@ -13478,6 +13478,36 @@ export const en_XA: EnTranslations = {
       "cinder_of_the_first_design": {
         "name": "[Çíñðéŕ óƒ ţĥé Ƒíŕšţ Ðéšíĝñ]"
       },
+      "forgefathers_warhammer": {
+        "name": "[Ƒóŕĝéƒáţĥéŕ'š Ŵáŕĥáɱɱéŕ]"
+      },
+      "cinderfang_kris": {
+        "name": "[Çíñðéŕƒáñĝ Ķŕíš]"
+      },
+      "slagrender_cleaver": {
+        "name": "[Šļáĝŕéñðéŕ Çļéáʋéŕ]"
+      },
+      "anvilguard_blade": {
+        "name": "[Áñʋíļĝúáŕð Ɓļáðé]"
+      },
+      "heart_of_the_end_greatblade": {
+        "name": "[Ĥéáŕţ óƒ ţĥé Éñð Ĝŕéáţƀļáðé]"
+      },
+      "emberflight_longbow": {
+        "name": "[Éɱƀéŕƒļíĝĥţ Ļóñĝƀóŵ]"
+      },
+      "staff_of_the_last_spring": {
+        "name": "[Šţáƒƒ óƒ ţĥé Ļášţ Šþŕíñĝ]"
+      },
+      "forgefire_spire": {
+        "name": "[Ƒóŕĝéƒíŕé Šþíŕé]"
+      },
+      "springtouched_crozier": {
+        "name": "[Šþŕíñĝţóúçĥéð Çŕóžíéŕ]"
+      },
+      "wand_of_quenched_sparks": {
+        "name": "[Ŵáñð óƒ Ɋúéñçĥéð Šþáŕķš]"
+      },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"
       },

@@ -767,6 +767,10 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     { itemId: 'sigil_anvil_chest', chance: 0.34, rollGroup: 'ignivar_h_sigil_robe' },
     { itemId: 'sigil_ember_chest', chance: 0.33, rollGroup: 'ignivar_h_sigil_robe' },
     { itemId: 'sigil_tempest_chest', chance: 0.33, rollGroup: 'ignivar_h_sigil_robe' },
+    { itemId: 'forgefathers_warhammer', chance: 0.25, rollGroup: 'ignivar_h_weapon' },
+    { itemId: 'anvilguard_blade', chance: 0.25, rollGroup: 'ignivar_h_weapon' },
+    { itemId: 'emberflight_longbow', chance: 0.25, rollGroup: 'ignivar_h_weapon' },
+    { itemId: 'springtouched_crozier', chance: 0.25, rollGroup: 'ignivar_h_weapon' },
   ],
   [VARKHUL_BOSS_ID]: [
     { itemId: 'sigil_anvil_chest', chance: 0.34, rollGroup: 'varkhul_h_sigil_robe' },
@@ -774,5 +778,8 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     { itemId: 'sigil_tempest_chest', chance: 0.33, rollGroup: 'varkhul_h_sigil_robe' },
     { itemId: 'bulwark_of_the_inner_crucible', chance: 0.5, rollGroup: 'varkhul_h_shields' },
     { itemId: 'ember_wardens_barrier', chance: 0.5, rollGroup: 'varkhul_h_shields' },
+    { itemId: 'heart_of_the_end_greatblade', chance: 0.34, rollGroup: 'varkhul_h_weapon' },
+    { itemId: 'forgefire_spire', chance: 0.33, rollGroup: 'varkhul_h_weapon' },
+    { itemId: 'staff_of_the_last_spring', chance: 0.33, rollGroup: 'varkhul_h_weapon' },
   ],
 };
