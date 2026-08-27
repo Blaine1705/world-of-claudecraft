@@ -105,7 +105,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.someHiddenByFit",
-    "hudChrome.wocStore.charter.title"
+    "hudChrome.wocStore.charter.title",
+    "wallet.browser.stepUpBody"
   ],
   "es_ES": [
     "apiError.character.delete_busy",
@@ -203,7 +204,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.someHiddenByFit",
-    "hudChrome.wocStore.charter.title"
+    "hudChrome.wocStore.charter.title",
+    "wallet.browser.stepUpBody"
   ],
   "fr_FR": [
     "apiError.character.delete_busy",
@@ -301,7 +303,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.someHiddenByFit",
-    "hudChrome.wocStore.charter.title"
+    "hudChrome.wocStore.charter.title",
+    "wallet.browser.stepUpBody"
   ],
   "fr_CA": [
     "apiError.character.delete_busy",
@@ -399,7 +402,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.someHiddenByFit",
-    "hudChrome.wocStore.charter.title"
+    "hudChrome.wocStore.charter.title",
+    "wallet.browser.stepUpBody"
   ],
   "en_CA": [],
   "it_IT": [
@@ -498,7 +502,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.someHiddenByFit",
-    "hudChrome.wocStore.charter.title"
+    "hudChrome.wocStore.charter.title",
+    "wallet.browser.stepUpBody"
   ],
   "de_DE": [
     "apiError.character.delete_busy",
@@ -596,7 +601,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.someHiddenByFit",
-    "hudChrome.wocStore.charter.title"
+    "hudChrome.wocStore.charter.title",
+    "wallet.browser.stepUpBody"
   ],
   "zh_CN": [
     "hudChrome.wocMarket.walletUsdBalance",
@@ -710,7 +716,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.someHiddenByFit",
-    "hudChrome.wocStore.charter.title"
+    "hudChrome.wocStore.charter.title",
+    "wallet.browser.stepUpBody"
   ],
   "ru_RU": [
     "hudChrome.wocMarket.walletUsdBalance",
@@ -812,7 +819,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.someHiddenByFit",
-    "hudChrome.wocStore.charter.title"
+    "hudChrome.wocStore.charter.title",
+    "wallet.browser.stepUpBody"
   ],
   "nl_NL": [
     "apiError.character.delete_busy",
@@ -910,7 +918,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.someHiddenByFit",
-    "hudChrome.wocStore.charter.title"
+    "hudChrome.wocStore.charter.title",
+    "wallet.browser.stepUpBody"
   ],
   "pl_PL": [
     "apiError.character.delete_busy",
@@ -1008,7 +1017,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.someHiddenByFit",
-    "hudChrome.wocStore.charter.title"
+    "hudChrome.wocStore.charter.title",
+    "wallet.browser.stepUpBody"
   ],
   "id_ID": [
     "apiError.character.delete_busy",
@@ -1106,7 +1116,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.someHiddenByFit",
-    "hudChrome.wocStore.charter.title"
+    "hudChrome.wocStore.charter.title",
+    "wallet.browser.stepUpBody"
   ],
   "tr_TR": [
     "apiError.character.delete_busy",
@@ -1204,7 +1215,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.someHiddenByFit",
-    "hudChrome.wocStore.charter.title"
+    "hudChrome.wocStore.charter.title",
+    "wallet.browser.stepUpBody"
   ],
   "sv_SE": [
     "apiError.character.delete_busy",
@@ -1302,7 +1314,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.someHiddenByFit",
-    "hudChrome.wocStore.charter.title"
+    "hudChrome.wocStore.charter.title",
+    "wallet.browser.stepUpBody"
   ],
   "vi_VN": [
     "apiError.character.delete_busy",
@@ -1400,7 +1413,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.someHiddenByFit",
-    "hudChrome.wocStore.charter.title"
+    "hudChrome.wocStore.charter.title",
+    "wallet.browser.stepUpBody"
   ],
   "da_DK": [
     "apiError.character.delete_busy",
@@ -1498,6 +1512,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocStore.charter.resultContext",
     "hudChrome.wocStore.charter.scope",
     "hudChrome.wocStore.charter.someHiddenByFit",
-    "hudChrome.wocStore.charter.title"
+    "hudChrome.wocStore.charter.title",
+    "wallet.browser.stepUpBody"
   ]
 };

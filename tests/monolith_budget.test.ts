@@ -78,7 +78,10 @@ const MONOLITHS: MonolithRow[] = [
     // countdown key's arithmetic to the view core (wocQuoteCountdownSig).
     // Exact count, zero headroom.
     file: 'src/ui/woc_market_window.ts',
-    ceiling: 2487,
+    // Down 2487 -> 2475 at the desktop-signing round: the WocMarketHooks
+    // contract moved to src/ui/woc_market_hooks.ts (wiring, window, and the
+    // trade arm all consume it), paying for the signer-reference plumbing.
+    ceiling: 2475,
     seam: 'a pure view-core module beside it (src/ui/woc_market_view.ts) that this window renders from',
   },
   {
@@ -402,7 +405,11 @@ const MONOLITHS: MonolithRow[] = [
     // the ratchet follows the merged file down). Exact count, zero slack.
     // Re-pinned to the exact merged count of the v0.39.3 main back-merge
     // (the utc_day import consolidation shed one line).
-    ceiling: 11564,
+    // Down 11564 -> 11563 at the desktop-signing round: the wallet-handoff
+    // availability probe and browser authorizer moved to
+    // src/net/desktop_wallet_handoff.ts (thin hoisted delegators remain),
+    // paying for the Exchange desktop-signer wiring at the attach site.
+    ceiling: 11563,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -492,7 +499,14 @@ const MONOLITHS: MonolithRow[] = [
     // 5939 by folding the four self-key decode blocks into the
     // bank_snapshot_wire sibling. The raise is this PR's REQUEST, not a
     // settled ruling: merging is what ratifies it. Exact count, zero slack.
-    ceiling: 5921,
+    // Re-pinned at the third release/v0.41.0 sync (release tip cb10309ba6, the
+    // Exchange website desktop batch). The release arm LOWERED its own pin
+    // 5855 -> 5817 at the desktop-signing round (the handoff result validation
+    // moved to src/net/desktop_wallet_handoff.ts, paying for the stepup action
+    // kind); this branch's +66 rides on top, so the merged count lands below
+    // the branch pin and the ratchet follows it DOWN. Measured on the merged
+    // tree, never reconciled by arithmetic. Exact count, zero slack.
+    ceiling: 5883,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -574,7 +588,14 @@ const MONOLITHS: MonolithRow[] = [
     // Down 4032 -> 3989 at the second round: the stuck-custody monitor
     // vocabulary moved to woc_market_monitor_types.ts (a leaf types module),
     // paying for the seller-history read.
-    ceiling: 3989,
+    // Down 3989 -> 3929 at the desktop-signing round: the economy vocabulary
+    // (quote legs, price/estimate readouts, WocMarketEconomy) moved to
+    // woc_market_economy_types.ts (the monitor-types pattern), paying for the
+    // desktopHandoff registrar dep and its four registration call sites.
+    // Re-pinned at the third release/v0.41.0 sync into the bank-storage branch:
+    // the merged file lands six lines under the release's own pin, so the
+    // ratchet follows it down. Measured on the merged tree. Exact count.
+    ceiling: 3923,
     seam: 'a woc_market_<thing>.ts sibling behind WocMarketDeps (the drift-warn split is the template)',
   },
   {

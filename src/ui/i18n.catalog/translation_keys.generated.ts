@@ -11559,6 +11559,7 @@ export type TranslationKeyFlat =
   | 'wallet.browser.reviewBody'
   | 'wallet.browser.reviewTitle'
   | 'wallet.browser.safety'
+  | 'wallet.browser.stepUpBody'
   | 'wallet.browser.title'
   | 'wallet.connect'
   | 'wallet.connectApp'

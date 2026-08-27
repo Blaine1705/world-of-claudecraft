@@ -221,6 +221,7 @@ import {
   handleDesktopLoginExchange,
   issueDesktopLoginCode,
 } from './desktop_login';
+import { desktopWalletHandoffs } from './desktop_wallet_handoff';
 import {
   configureDiscordRuntime,
   handleDiscordCallback,
@@ -357,6 +358,7 @@ import {
   recordAuthFailure,
   requestIp,
   setRateLimitTier2Store,
+  walletHandoffResultRateLimited,
   walletLinkRateLimited,
   wocBalanceRateLimited,
 } from './ratelimit';
@@ -2539,6 +2541,9 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
     if (req.method === 'POST' && url === '/api/desktop-wallet/result') {
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
+      if (!walletHandoffResultRateLimited(req, accountId).allowed) {
+        return json(res, 429, { error: 'rate limited' });
+      }
       return handleDesktopWalletHandoffResult(req, res, accountId);
     }
     if (req.method === 'POST' && url === '/api/wallet/link/challenge') {
@@ -2943,6 +2948,9 @@ const wocMarketService = new WocMarketService({
   // The step-up devsig arm rides the SAME double-gated switch as the dev
   // economy: impossible to reach in production, and one truth for "dev".
   stepUpDevSig: wocMarketDevService,
+  // Desktop browser-signing: quotes and step-up challenges pre-register in
+  // the process handoff store so /api/desktop-wallet/create can mint them.
+  desktopHandoff: desktopWalletHandoffs,
   custody: createWocMarketCustody(
     {
       get sim() {
