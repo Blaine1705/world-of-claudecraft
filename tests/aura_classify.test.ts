@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isDebuffAura, isDispellableAura } from '../src/sim/aura_classify';
+import { isDebuffAura, isDebuffDisplayAura, isDispellableAura } from '../src/sim/aura_classify';
 import type { Aura, AuraKind } from '../src/sim/types';
 
 // Every harmful kind the HUD and /targetbuffs treat as a debuff. Keeping this
@@ -89,6 +89,21 @@ describe('isDebuffAura', () => {
     expect(isDebuffAura('dot', 0)).toBe(true);
     expect(isDebuffAura('slow', 0.5)).toBe(true);
   });
+
+  it('keeps shared internal_cd markers non-harmful', () => {
+    expect(isDebuffAura('internal_cd', 1)).toBe(false);
+    expect(isDebuffAura('internal_cd', 0)).toBe(false);
+  });
+
+  it('id display override: shaman_stormsurge_ready uses the debuff surface', () => {
+    // Player feedback on PR #3668: Stormsurge's "cannot proc again until
+    // Ancestral Strike is back on cooldown" marker (shaman_warspirit.ts
+    // STORMSURGE_READY_ID) should use debuff-bar styling, but it is not a
+    // player-removable harmful aura.
+    expect(isDebuffDisplayAura('internal_cd', 1, 'shaman_stormsurge_ready')).toBe(true);
+    expect(isDebuffDisplayAura('internal_cd', 1, 'heating_up')).toBe(false);
+    expect(isDebuffDisplayAura('internal_cd', 0, 'shaman_warspirit_cadence')).toBe(false);
+  });
 });
 
 describe('isDispellableAura', () => {
@@ -112,5 +127,18 @@ describe('isDispellableAura', () => {
     };
     expect(isDispellableAura(ascension, true)).toBe(false);
     expect(isDispellableAura(ascension, false)).toBe(false);
+  });
+
+  it('does not route the Stormsurge Ready display override into dispel eligibility', () => {
+    const stormsurgeReady = {
+      id: 'shaman_stormsurge_ready',
+      kind: 'internal_cd' as const,
+      value: 1,
+      school: 'nature' as const,
+    };
+    // The debuff-bar styling override is visual only. Friendly dispel/cleanse
+    // must not read this personal proc indicator as a harmful effect.
+    expect(isDispellableAura(stormsurgeReady, true)).toBe(false);
+    expect(isDispellableAura(stormsurgeReady, false)).toBe(false);
   });
 });

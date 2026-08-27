@@ -97,6 +97,16 @@ describe('isDebuffAura', () => {
   it('still allows the one player-facing internal_cd exception, Divine Ascension', () => {
     expect(isCancelableAura(aura('divine_ascension', 'internal_cd'))).toBe(true);
   });
+
+  it('keeps Stormsurge Ready non-cancelable without making it a harmful debuff', () => {
+    // Player feedback on PR #3668. Stormsurge is specifically styled on the UI
+    // debuff surface, but the cancel path keeps the generic engine-state answer:
+    // not a harmful debuff, still not player-cancelable unless allowlisted above.
+    expect(isDebuffAura(aura('shaman_stormsurge_ready', 'internal_cd'))).toBe(false);
+    expect(isCancelableAura(aura('shaman_stormsurge_ready', 'internal_cd'))).toBe(false);
+    expect(isDebuffAura(aura('heating_up', 'internal_cd'))).toBe(false);
+    expect(isCancelableAura(aura('heating_up', 'internal_cd'))).toBe(false);
+  });
 });
 
 describe('auraAffectsStats', () => {

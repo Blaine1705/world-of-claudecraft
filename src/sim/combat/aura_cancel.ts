@@ -1,10 +1,8 @@
 // Player-initiated buff cancellation ("right-click a buff to remove it").
 //
 // Pure, host-agnostic decision logic shared by the offline Sim (which mutates the
-// authoritative aura array) and the HUD (which decides which icons render as a
-// debuff and which expose the right-click affordance). Keeping the classification
-// in one leaf means "rendered as a helpful buff" and "right-click cancelable" are
-// provably the same set and can never drift apart.
+// authoritative aura array) and the HUD (which decides which icons expose the
+// right-click affordance).
 import { isDebuffAura as classifyDebuffAura, isPlayerRemovableAura } from '../aura_classify';
 import { DIVINE_ASCENSION_AURA_ID } from '../paladin_devotion';
 import type { Aura } from '../types';
@@ -14,7 +12,7 @@ type CancelableAura = Pick<Aura, 'id' | 'kind' | 'value'> &
 
 // A debuff is anything in the harmful set, OR a stat aura riding a `buff_*` kind
 // with a negative value (an enfeeble / wither drain reuses a buff_* kind but saps
-// the stat). Mirrors the HUD's buff-vs-debuff styling test.
+// the stat). Display-only debuff styling does not count here.
 export function isDebuffAura(a: CancelableAura): boolean {
   return classifyDebuffAura(a.kind, a.value);
 }

@@ -271,6 +271,15 @@ export const BOOL_SETTINGS = {
   // vacated top spot) so incoming debuffs keep one glanceable classic corner.
   // Desktop only; the mobile layout keeps its own aura placement.
   aurasOnPlayerFrame: { def: false },
+  // off by default: bypass the low graphics preset's buff-icon cap
+  // (AURA_VISIBLE_CAP_LOW, src/game/ui_tier_knobs.ts) so every active buff
+  // always renders in #buff-bar, at the cap's per-frame cost. The cap itself
+  // stays the sane default for the weak-device population Low targets; this is
+  // an explicit opt-in for a player who would rather pay that cost than ever
+  // lose a buff icon to it (player feedback on PR #3668). Read by
+  // AurasPainter's getFxTier closure (hud.ts), never by ui_tier_knobs.ts
+  // itself, so no OTHER low-tier knob is affected.
+  alwaysShowAllBuffs: { def: false },
   // on by default: Clique-style mouseover casting. Pressing an action-bar key
   // for a friendly (heal/buff) ability while the cursor is over a party frame
   // casts it on the hovered member without touching the current target (read
