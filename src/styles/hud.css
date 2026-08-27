@@ -3841,6 +3841,9 @@
     flex-direction: row;
     align-items: flex-end;
     width: auto;
+    /* The column's 4px button gap read as spacing BETWEEN items in a row;
+       the horizontal strip packs its buttons flush (owner request). */
+    gap: 0;
   }
   .micro-btn {
     width: 34px;

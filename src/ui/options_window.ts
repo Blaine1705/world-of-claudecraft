@@ -1469,11 +1469,13 @@ export class OptionsWindow {
 
     // Frames leads with the Edit Frames action (the unlock mode): arranging
     // and sizing frames is what this tab is about, so its entry row sits at
-    // the top. The declarative rows below it all tune the party frames
-    // (owner request: one labelled subsection), since every non-party knob
-    // moved into the editor's Frames Settings menu.
+    // the top, with the layout export/import right under it (owner request:
+    // above the party section). The declarative rows below the subhead all
+    // tune the party frames (owner request: one labelled subsection), since
+    // every non-party knob moved into the editor's Frames Settings menu.
     if (tab === 'frames') {
       this.interfaceUnlockRow(body);
+      this.transferRows(body, 'frames');
       subhead(body, t('hudChrome.partyFrames.optionsSection'), 'set-subhead');
     }
 
@@ -1486,13 +1488,10 @@ export class OptionsWindow {
           this.deps.root().querySelector<HTMLElement>(`[data-setting-key="${focusKey}"]`)?.focus();
       });
 
-    // Frames closes with the layout export/import. (The Reset Frame
-    // Positions row was retired, owner request: the per-frame size resets
-    // live in the editor's Frames Settings menu and the tab's own Reset to
-    // Defaults footer still restores the settings.)
-    if (tab === 'frames') {
-      this.transferRows(body, 'frames');
-    }
+    // (The frames tab's Reset Frame Positions row was retired, owner
+    // request: the per-frame size resets live in the editor's Frames
+    // Settings menu and the tab's own Reset to Defaults footer still
+    // restores the settings.)
     // General closes with the all-settings export/import.
     if (tab === 'general') this.transferRows(body, 'settings');
 
