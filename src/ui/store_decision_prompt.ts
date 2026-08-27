@@ -21,17 +21,22 @@ export const STORE_RESULT_EXPIRY_MS = 60_000;
 
 /** The registry Hud's single Escape dispatcher asks (the tap_menu shape), so
  *  Escape stays with closeAll and this module never grows its own key
- *  handler. A Set, insertion-ordered: construction registers, the returned
- *  handle unregisters, so a torn-down owner's panel is never walked again,
- *  and the closeAll rung below can peel the MOST RECENTLY REGISTERED open
- *  result instead of sweeping every registrant. One instance exists in
+ *  handler. A Set of WEAK references, insertion-ordered: construction
+ *  registers, the returned handle unregisters, and holding the panel weakly
+ *  means this module-global registry can never retain a torn-down owner's
+ *  whole object graph (a second Hud construction on the relogin or graphics
+ *  rebuild path would otherwise pin the previous HUD forever through the one
+ *  strong edge here). A plain WeakSet cannot serve: the closeAll rung below
+ *  must WALK the stack topmost-first, and a WeakSet is not iterable. Dead
+ *  refs prune opportunistically during that walk. One instance exists in
  *  production (the Store surface runtime's). */
-const resultPanels = new Set<StoreDecisionPrompts>();
+const resultPanels = new Set<WeakRef<StoreDecisionPrompts>>();
 
 function registerResultPanel(panel: StoreDecisionPrompts): () => void {
-  resultPanels.add(panel);
+  const ref = new WeakRef(panel);
+  resultPanels.add(ref);
   return () => {
-    resultPanels.delete(panel);
+    resultPanels.delete(ref);
   };
 }
 
@@ -39,11 +44,24 @@ function registerResultPanel(panel: StoreDecisionPrompts): () => void {
  *  reporting whether one cleared. Topmost-first and ONE panel only: panels
  *  stack in registration order, and an Escape should dismiss the top of the
  *  stack, never every registrant's result at once (the next Escape takes the
- *  next one). Wired as a closeAll rung in src/ui/hud.ts. */
+ *  next one). Wired as the FIRST closeAll rung in src/ui/hud.ts, and that
+ *  placement is a RECORDED design call: for up to STORE_RESULT_EXPIRY_MS
+ *  after a purchase, Escape dismisses this passive role=status toast before
+ *  anything else, and with nothing else open the first Escape eats the toast
+ *  instead of opening Options (main.ts falls through to toggleOptionsMenu
+ *  only when closeAll returns false). Deliberate: the toast sits topmost and
+ *  eats touches on mobile, so Escape-dismisses-topmost is the consistent
+ *  physical model, accepting that a nonmodal status surface becomes an
+ *  Escape target while visible. */
 export function clearOpenStoreResult(): boolean {
-  const panels = [...resultPanels];
-  for (let i = panels.length - 1; i >= 0; i--) {
-    if (panels[i].clearResult()) return true;
+  const refs = [...resultPanels];
+  for (let i = refs.length - 1; i >= 0; i--) {
+    const panel = refs[i].deref();
+    if (!panel) {
+      resultPanels.delete(refs[i]);
+      continue;
+    }
+    if (panel.clearResult()) return true;
   }
   return false;
 }

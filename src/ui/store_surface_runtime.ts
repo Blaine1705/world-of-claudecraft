@@ -13,10 +13,19 @@ export class StoreSurfaceRuntime {
 
   constructor(private readonly root: () => HTMLElement) {
     // Construction registers the prompts panel with the module Escape
-    // registry. This runtime has no teardown (its owning window lives for the
-    // whole client session), so the unregister handle stays where it was
-    // minted: on the prompts instance (StoreDecisionPrompts.unregister).
+    // registry (which holds it WEAKLY, so even an owner that never calls
+    // dispose() cannot be retained by the registry alone).
     this.prompts = new StoreDecisionPrompts(root);
+  }
+
+  /** Deterministic teardown for an owner that dies before the client session
+   *  does: dismiss any open surface and drop the Escape-registry entry. The
+   *  shipped owner (the daily-rewards window) lives for the whole session and
+   *  relies on the registry's weak references instead; a future shorter-lived
+   *  owner calls this from its own destroy path. */
+  dispose(): void {
+    this.prompts.dismiss(false);
+    this.prompts.unregister();
   }
 
   beginRequest(): number {

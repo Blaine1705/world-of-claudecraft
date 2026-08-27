@@ -7843,17 +7843,17 @@
   #bank-window .bag-filter-bar {
     flex: none;
   }
-  /* ONE toolbar row is the bank phase's CONTRACT (the browser arm pins the
-     shared top edge): the generic .bag-tools wrap exists for the half-width
-     pairings, but here a wider platform font stack (CI's Linux Chromium
-     measures the same labels wider than the box that tuned the row) wrapped
-     the row and stole a 46px band of grid. The bank row forbids the wrap and
-     makes the SEARCH BOX pay instead: a 96px flex basis keeps line fitting
-     from using the input's intrinsic width, and grow returns the slack, so
-     the box shrinks toward its floor exactly when the labels need the room. */
-  #bank-window .bag-tools {
-    flex-wrap: nowrap;
-  }
+  /* The 96px flex BASIS keeps line fitting off the search input's intrinsic
+     width, and grow returns the slack, so the box shrinks toward its
+     min-width floor exactly when the labels need the room. Whether the row
+     may WRAP stays the generic .bag-tools rule's call here: the wrap exists
+     for the half-width pairings, and a desktop bank window resized toward
+     its 220px floor (window_resize_core.ts WINDOW_MIN_WIDTH) in a wordy
+     locale must wrap rather than clip controls off the edge (the search's
+     96px min-width still binds, so the basis alone can never pay a 26-char
+     deposit label at that width). The short-phone ONE-ROW contract lives in
+     hud.mobile.css beside the footer regime it belongs to, pinned by
+     tests/browser/bank_mobile_chrome.browser.test.ts. */
   #bank-window .bag-search {
     flex: 1 1 96px;
   }

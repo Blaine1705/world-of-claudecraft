@@ -21,7 +21,10 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { page } from 'vitest/browser';
 import { BankWindow, type BankWindowDeps } from '../../src/ui/bank_window';
-import { ru_RU } from '../../src/ui/i18n.resolved.generated/ru_RU';
+import type { EnTranslations } from '../../src/ui/i18n.catalog';
+import { en } from '../../src/ui/i18n.resolved.generated/en';
+import { en_XA } from '../../src/ui/i18n.resolved.generated/en_XA';
+import { LOCALE_LOADERS } from '../../src/ui/i18n.resolved.generated/loaders';
 import type { BankInfo } from '../../src/world_api';
 import { cleanup, host, stubDeps } from './_harness';
 
@@ -30,11 +33,24 @@ const CLEARANCE = 2;
 // The touch floor every control in this pane keeps (src/styles/CLAUDE.md).
 const TOUCH_FLOOR = 40;
 
-/** The longest shipped `hudChrome.bank.rungOutage` value, which is ru_RU. Chosen
- *  by MEASURING every locale's rendered band at both profiles rather than by
- *  counting characters: CJK copy is far shorter in characters and taller in
- *  nothing, while ja_JP and the en_XA pseudo-locale tie this one for height. */
-const WORDIEST_OUTAGE_COPY = ru_RU.hudChrome.bank.rungOutage;
+/** Every shipped `hudChrome.bank.rungOutage` value, keyed by locale tag: the
+ *  21 loader locales plus en and the en_XA pseudo-locale. Loaded from the
+ *  generated bundles so a catalog reword or a NEW locale joins the reserve
+ *  arm on the next regen instead of leaving it measuring a pre-picked copy.
+ *  Only a browser can rank these (CJK copy is far shorter in characters and
+ *  taller in nothing), which is why the arm measures every one rather than
+ *  trusting any single wordiest pick. */
+async function allOutageCopies(): Promise<Array<[string, string]>> {
+  const copies: Array<[string, string]> = [
+    ['en', en.hudChrome.bank.rungOutage],
+    ['en_XA', en_XA.hudChrome.bank.rungOutage],
+  ];
+  for (const [tag, load] of Object.entries(LOCALE_LOADERS)) {
+    const mod = (await load()) as unknown as Record<string, EnTranslations>;
+    copies.push([tag, mod[tag].hudChrome.bank.rungOutage]);
+  }
+  return copies;
+}
 
 const PROFILES = [
   { name: '844x390', width: 844, height: 390 },
@@ -283,47 +299,50 @@ for (const profile of PROFILES) {
       expect(reserve).toBeGreaterThanOrEqual(footer.height);
     });
 
-    it('reserves enough for the WORDIEST shipped locale, not just English', () => {
+    it('reserves enough for EVERY shipped locale, measured here, not pre-picked', async () => {
       // The arm above measures the real footer, which is right, but it only ever
       // runs in English, and the band term is the one the sheet's own comment
       // says no arithmetic can own because it GROWS with a locale whose refusal
-      // copy wraps further. That axis had no arm at all.
+      // copy wraps further. This arm stages the outage copy of EVERY shipped
+      // locale (plus en_XA) into the band and asserts the reserve against each
+      // MEASURED footer, so the reserve can never quietly go stale behind a
+      // single hand-picked wordiest locale: the next reword that walks past the
+      // reserve reds here, whichever locale does the walking.
       //
-      // MEASURED across all 21 shipped locales plus the en_XA pseudo-locale, at
-      // both profiles: English is not the worst case. The band grows from 33.5px
-      // to 47.3px and the footer from 117.7px to 131.4px against a 136px reserve,
-      // so the true margin is 4.6px rather than the comfortable slack English
-      // suggests. ru_RU is the longest; ja_JP and en_XA reach the same height.
+      // Honest scope: only the band copy varies; the meter text and buy label
+      // stay English (a full per-locale re-render needs i18n plumbing this
+      // harness lacks), which matches the risk, since the band is the one
+      // footer term the sheet's sum cannot own.
       //
-      // The fixture reads the generated ru_RU bundle directly, so a catalog
-      // reword cannot leave this geometry arm measuring a stale duplicate.
-      //
-      // It does NOT assert that the wordier copy is TALLER here. Measured: in
+      // It does NOT assert that a wordier copy is TALLER than English's. In
       // this harness the English band already wraps to the same bucket, so a
-      // strict growth guard is unsatisfiable and would only ever red. The claim
-      // that matters is the one below: whatever the wordiest catalog value is,
-      // the reserve still covers the footer and the footer stays in the window.
+      // strict growth guard is unsatisfiable; the tallest-staged guard below
+      // proves the wrap really happened for at least one locale.
       const root = openBank(stockedBank(), { granted: false, reason: 'some_unknown_token' });
       const band = root.querySelector('.bank-rung-notice') as HTMLElement | null;
       expect(band, 'the tallest state must actually be staged').not.toBeNull();
-      band!.textContent = WORDIEST_OUTAGE_COPY;
       const reserve = Number.parseFloat(getComputedStyle(root).scrollPaddingBottom);
-      const footer = root.querySelector('.bank-footer')!.getBoundingClientRect();
+      let tallestBand = 0;
+      for (const [tag, copy] of await allOutageCopies()) {
+        band!.textContent = copy;
+        tallestBand = Math.max(tallestBand, band!.getBoundingClientRect().height);
+        const footer = root.querySelector('.bank-footer')!.getBoundingClientRect();
+        expect(
+          reserve,
+          `the scroll reserve must cover the footer under the ${tag} outage copy`,
+        ).toBeGreaterThanOrEqual(footer.height);
+        expect(
+          past(root, '.bank-footer'),
+          `the footer must stay inside the window border under the ${tag} copy`,
+        ).toBeLessThanOrEqual(-CLEARANCE);
+      }
       // Guard the staging, because the interesting failure is a SILENT one: if
-      // the band collapsed to a single line this arm would be measuring a state
-      // the reserve was never at risk from. It must really be wrapped.
+      // every band collapsed to a single line this arm would be measuring a
+      // state the reserve was never at risk from.
       expect(
-        band!.getBoundingClientRect().height,
-        'the band must really have wrapped to more than one line',
+        tallestBand,
+        'the wordiest band must really have wrapped to more than one line',
       ).toBeGreaterThan(TOUCH_FLOOR);
-      expect(
-        reserve,
-        'the scroll reserve must cover the footer at its wordiest, not just in English',
-      ).toBeGreaterThanOrEqual(footer.height);
-      expect(
-        past(root, '.bank-footer'),
-        'the footer must stay inside the window border under the wordiest copy',
-      ).toBeLessThanOrEqual(-CLEARANCE);
     });
 
     it('a repaint that re-focuses the search box does not spend the restored offset', () => {

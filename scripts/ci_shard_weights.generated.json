@@ -2,10 +2,10 @@
   "__provenance": {
     "run": "32621561241",
     "harvested": "2026-08-23",
-    "files": 3191,
+    "files": 3194,
     "mergedLocal": "2026-08-26",
     "mergedFiles": 231,
-    "note": "bank storage PR #3670 local merge: release CI harvest (run 32621561241) kept for shared files; 94 rows for files absent from this tree (the unmerged ignivar raid branch) deleted; the 84 test files this PR adds carry locally measured durations (batched vitest run with the json reporter, per file start/end ms, skipped floor 100ms for the TEST_DATABASE_URL gated pg suites)"
+    "note": "bank storage PR #3670 local merge onto the release/v0.41.0 table: release CI harvest (run 32621561241) values kept verbatim for the 2980 shared rows; relative to that base table this deletes 26 stale rows for files in neither tree (vale cup, camera prompt, legacy skill art, hdr resample, trade woc panel) and adds locally measured rows (batched vitest runs with the json reporter, per file start/end ms, 100ms floor for the TEST_DATABASE_URL gated pg suites): the 87 test files this PR adds, the post-harvest release files carried from the branch's earlier local merges, and the three release-merge arrivals measured at the third-round fixes; an interim fix-round import of the ignivar raid consolidation table (94 absent-file rows) is fully pruned"
   },
   "tests/abilities_command.test.ts": 2582,
   "tests/ability_audio_defers_to_recordings.test.ts": 141,
@@ -545,6 +545,7 @@
   "tests/client_frame_allocations.test.ts": 124,
   "tests/client_pause_input.test.ts": 29,
   "tests/client_perf_reports_db_integration.test.ts": 100,
+  "tests/client_perf_scene_parity.test.ts": 4,
   "tests/client_shell.test.ts": 304,
   "tests/client_snapshot_timer_wire.test.ts": 19,
   "tests/cliff_scree_renderer.test.ts": 309,
@@ -2530,6 +2531,7 @@
   "tests/server/http/characterization.test.ts": 3718,
   "tests/server/http/characterization_admin_oauth_internal.test.ts": 2550,
   "tests/server/http/client_error.test.ts": 5,
+  "tests/server/http/client_perf_metrics.test.ts": 11,
   "tests/server/http/completeness.test.ts": 30,
   "tests/server/http/compose.test.ts": 23,
   "tests/server/http/config.test.ts": 21,
@@ -3047,6 +3049,7 @@
   "tests/wallet_balance.test.ts": 10,
   "tests/wallet_bridge_reason_text.test.ts": 11,
   "tests/wallet_browser.test.ts": 87,
+  "tests/wallet_card_keys.test.ts": 3,
   "tests/wallet_connect.test.ts": 7,
   "tests/wallet_connect_lifecycle.test.ts": 14,
   "tests/wallet_connection_view.test.ts": 14,

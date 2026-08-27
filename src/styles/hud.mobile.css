@@ -5600,10 +5600,12 @@
          stack (the same ru_RU outage copy wraps one line further on CI's
          Chromium than on the box that first measured 56px: footer 143.2px
          against the old 136px reserve). The term carries that extra line. So
-         tests/browser/bank_mobile_chrome.browser.test.ts stages the tallest
-         state on every shipped locale and asserts this reserve against the
-         MEASURED footer, which is what caught both shortfalls and what keeps
-         the number honest. */
+         tests/browser/bank_mobile_chrome.browser.test.ts stages the outage
+         copy from EVERY shipped locale (plus the en_XA pseudo-locale) into
+         the band and asserts this reserve against each MEASURED footer,
+         which is what caught both shortfalls and what keeps the number
+         honest: the next locale reword that walks past this reserve reds
+         that arm, whichever locale does the walking. */
       scroll-padding-bottom: calc(
         40px +
         14px +
@@ -5657,6 +5659,16 @@
     body.mobile-touch #bank-window:has(.bank-footer) .bag-search,
     body.mobile-touch.bank-open #bank-window:has(.bank-footer) .bag-search {
       flex: 1 1 96px;
+    }
+    /* ONE toolbar row is THIS regime's contract (the browser arm pins the
+       shared top edge): CI's Linux Chromium measures the same labels wider
+       than the box that tuned the row, so without the nowrap the row wraps
+       and steals a 46px band of grid. Scoped HERE, on the short-phone footer
+       regime, never on bare #bank-window: a desktop window resized toward
+       its 220px floor must wrap rather than clip controls off the edge. */
+    body.mobile-touch #bank-window:has(.bank-footer) .bag-tools,
+    body.mobile-touch.bank-open #bank-window:has(.bank-footer) .bag-tools {
+      flex-wrap: nowrap;
     }
   }
   /* ---------- mobile deeds (standalone window + tracker) ---------- */

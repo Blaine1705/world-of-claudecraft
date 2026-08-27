@@ -406,11 +406,16 @@ export class VaultTab {
       const partialLabel = t('hudChrome.bank.withdrawQuantityAction', { item: name });
       partial.setAttribute('aria-label', partialLabel);
       // The shared tooltip, not a native title (every sibling control's rule);
-      // re-resolved at show time so a language switch relocalizes it.
+      // re-resolved at show time so a language switch relocalizes it. TWO
+      // lines: the action sentence AND the chip's own visible label, because
+      // the 72px chip ellipsis-caps that label and neither the aria-label nor
+      // the action line repeats its words, so in a longer locale the tooltip
+      // is the one place the elided text is recoverable.
       this.deps.attachTooltip(
         partial,
         () =>
-          `<div class="tt-sub">${esc(t('hudChrome.bank.withdrawQuantityAction', { item: name }))}</div>`,
+          `<div class="tt-sub">${esc(t('hudChrome.bank.withdrawQuantityAction', { item: name }))}</div>` +
+          `<div class="tt-sub">${esc(t('hudChrome.bank.withdrawQuantityInput'))}</div>`,
       );
       partial.innerHTML =
         svgIcon('more') +
