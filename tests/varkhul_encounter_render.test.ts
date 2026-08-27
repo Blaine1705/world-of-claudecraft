@@ -33,6 +33,7 @@ function player(
     remaining?: number;
     duration?: number;
     value?: number;
+    value2?: number;
     charges?: number;
   }>,
 ) {
@@ -52,7 +53,7 @@ describe('Varkhul encounter rendering', () => {
     expect(root.getObjectByName('varkhul-cinder-fire')).toBeDefined();
     expect(root.getObjectByName('ground_fire_aoe__disc')).toBeDefined();
     expect(root.getObjectByName('varkhul-cinder-orb-projectile')).toBeDefined();
-    expect(root.getObjectByName(VARKHUL_SHARED_PYRE_VISUAL_NAME)?.userData.occupancySlots).toBe(5);
+    expect(root.getObjectByName(VARKHUL_SHARED_PYRE_VISUAL_NAME)?.userData.occupancySlots).toBe(4);
   });
 
   it('builds three marked cinder orbs without the removed hammer telegraph', () => {
@@ -106,10 +107,10 @@ describe('Varkhul encounter rendering', () => {
     expect(visual.visible).toBe(false);
   });
 
-  it('shows five Heroic Shared Pyre slots and counts the inclusive soak radius', () => {
+  it('shows four Heroic Shared Pyre slots and counts the inclusive soak radius', () => {
     const group = new THREE.Group();
     const marked = {
-      ...player([{ id: VARKHUL_SHARED_PYRE_AURA_ID, stacks: 5, remaining: 3, duration: 6 }]),
+      ...player([{ id: VARKHUL_SHARED_PYRE_AURA_ID, stacks: 4, remaining: 3, duration: 6 }]),
       id: 1,
       pos: { x: 10, z: 20 },
     };
@@ -130,9 +131,9 @@ describe('Varkhul encounter rendering', () => {
     const visual = group.getObjectByName(VARKHUL_SHARED_PYRE_VISUAL_NAME) as THREE.Group;
     expect(visual.visible).toBe(true);
     expect(visual.userData).toMatchObject({
-      occupancySlots: 5,
+      occupancySlots: 4,
       playersInside: 5,
-      requiredPlayers: 5,
+      requiredPlayers: 4,
       ready: true,
     });
     expect(visual.getObjectByName(IGNIVAR_SOAK_OCCUPANCY_NAME)).toBeDefined();
@@ -142,31 +143,29 @@ describe('Varkhul encounter rendering', () => {
     expect(visual.visible).toBe(false);
   });
 
-  it('rebuilds Shared Pyre occupancy when the same rig changes between Normal and Heroic', () => {
+  it('keeps four Shared Pyre slots when damage pricing changes between difficulties', () => {
     const group = new THREE.Group();
-    const marked = (stacks: number) => ({
-      ...player([{ id: VARKHUL_SHARED_PYRE_AURA_ID, stacks, remaining: 3, duration: 6 }]),
+    const marked = (value2: number) => ({
+      ...player([
+        { id: VARKHUL_SHARED_PYRE_AURA_ID, stacks: 4, value2, remaining: 3, duration: 6 },
+      ]),
       id: 1,
       pos: { x: 0, z: 0 },
     });
 
-    syncVarkhulEncounterVisuals(group, marked(4));
+    syncVarkhulEncounterVisuals(group, marked(1.4));
     const normal = group.getObjectByName(VARKHUL_SHARED_PYRE_VISUAL_NAME) as THREE.Group;
     expect(normal.userData.occupancySlots).toBe(4);
-    syncVarkhulEncounterVisuals(group, marked(5));
+    syncVarkhulEncounterVisuals(group, marked(2));
     const heroic = group.getObjectByName(VARKHUL_SHARED_PYRE_VISUAL_NAME) as THREE.Group;
-    expect(heroic).not.toBe(normal);
-    expect(heroic.userData.occupancySlots).toBe(5);
-    syncVarkhulEncounterVisuals(group, marked(4));
-    const normalAgain = group.getObjectByName(VARKHUL_SHARED_PYRE_VISUAL_NAME) as THREE.Group;
-    expect(normalAgain).not.toBe(heroic);
-    expect(normalAgain.userData.occupancySlots).toBe(4);
+    expect(heroic).toBe(normal);
+    expect(heroic.userData.occupancySlots).toBe(4);
   });
 
   it('forwards the encounter roster through the real compositor for Varkhul occupancy', () => {
     const group = new THREE.Group();
     const marked = {
-      ...player([{ id: VARKHUL_SHARED_PYRE_AURA_ID, stacks: 5, remaining: 3, duration: 6 }]),
+      ...player([{ id: VARKHUL_SHARED_PYRE_AURA_ID, stacks: 4, remaining: 3, duration: 6 }]),
       id: 1,
       pos: { x: 10, z: 20 },
     };
@@ -183,7 +182,7 @@ describe('Varkhul encounter rendering', () => {
 
     expect(group.getObjectByName(VARKHUL_SHARED_PYRE_VISUAL_NAME)?.userData).toMatchObject({
       playersInside: 5,
-      requiredPlayers: 5,
+      requiredPlayers: 4,
       ready: true,
     });
   });
@@ -256,7 +255,7 @@ describe('Varkhul encounter rendering', () => {
   it('disposes all lazily attached Varkhul visuals before a rig is pooled', () => {
     const group = new THREE.Group();
     const marked = player([
-      { id: VARKHUL_SHARED_PYRE_AURA_ID, stacks: 5, remaining: 3, duration: 6 },
+      { id: VARKHUL_SHARED_PYRE_AURA_ID, stacks: 4, remaining: 3, duration: 6 },
     ]);
     group.add(buildVarkhulCinderOrbsTelegraph(), buildVarkhulMakersBrandTelegraph());
     syncVarkhulEncounterVisuals(group, marked);

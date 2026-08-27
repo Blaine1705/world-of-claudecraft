@@ -2474,12 +2474,12 @@ export const es_ES: EnTranslations = {
         "apocalypse": "Apocalipsis: mata a Ignivar Ashcaller antes de que termine su lanzamiento.",
         "judgment": "Juicio de la Forja: identifica el refugio distinto durante el aviso y reuníos dentro de su límite marcado cuando arda el suelo.",
         "finale": "Último Infierno: acaba con Ignivar antes de la aniquilación mientras continúan los meteoros, ataques frontales e Infierno giratorio acelerados.",
-        "heroic": "Heroico: las parejas permanecen juntas durante Cadenas de la Forja y Marca sigue activa dentro de Juicio."
+        "heroic": "Heroico: las parejas permanecen juntas durante Cadenas de la Forja, Marca sigue activa dentro de Juicio y Ola de la Forja empuja más lejos."
       },
       "varkhul": {
         "tanks": "Tanques: cambiad a dos acumulaciones de Marca del Hacedor y mantened a Varkhul a distancia cuerpo a cuerpo.",
         "orbs": "Orbes de ceniza: los jugadores marcados se separan hacia el borde. Sus charcos de fuego persisten y los orbes liberados cruzan la sala.",
-        "pyre": "Pira compartida: solo elige a alguien sin Metal al rojo vivo. Apilad cuatro en Normal o cinco en Heroico dentro del círculo móvil.",
+        "pyre": "Pira compartida: solo elige a alguien sin Metal al rojo vivo. Apilad cuatro jugadores dentro del círculo móvil en cualquier dificultad. Cada plaza ausente inflige un 15% de la salud máxima a toda la banda.",
         "forgestorm": "Tormenta de la Forja: observa los meteoros que caen y sal de cada impacto marcado antes de que aterrice cada una de las tres oleadas.",
         "anvil": "Decreto del Yunque: Varkhul se desplaza hasta la gran forja y la golpea tres veces, dañando a la banda. En heroico también caen meteoros marcados.",
         "ray": "Rayo de temple: otro jugador, normalmente un tanque, intercepta la línea móvil antes de que termine el largo aviso. Quien recibe el golpe sufre Herida templada.",
@@ -2491,6 +2491,7 @@ export const es_ES: EnTranslations = {
     },
     "auraEffect": {
       "sharedPyre": "Deals {total}% of each player's maximum health, divided by the number of players inside the circle ({perPlayer}% each with {players} players).",
+      "varkhulSharedPyre": "Inflige un {total}% de la salud máxima de cada jugador, repartido entre quienes estén dentro del círculo ({perPlayer}% por persona con {players} jugadores). Cada plaza ausente también inflige un {missingPenalty}% de la salud máxima a toda la banda, incluidos los jugadores dentro del círculo.",
       "makersBrand": "For {duration} sec, each stack increases damage taken from Varkhul by {pct}%. Stacks up to {max} times. Tanks should swap at {swap} stacks.",
       "varkhulSentinelsGaze": "The Ember Sentinel pursues you. Keep it away from the raid until it is destroyed.",
       "varkhulMoltenCore": "Carry this core to the forge. Molten Burden deals increasing damage every {interval} sec, from {min}% to {max}% of maximum health.",

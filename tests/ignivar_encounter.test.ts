@@ -74,9 +74,11 @@ import {
   IGNIVAR_FORGE_WAVE_ACTIVE_SECONDS,
   IGNIVAR_FORGE_WAVE_DAMAGE_MAX_HP,
   IGNIVAR_FORGE_WAVE_EVERY,
-  IGNIVAR_FORGE_WAVE_KNOCKBACK,
+  IGNIVAR_FORGE_WAVE_KNOCKBACK_HEROIC,
+  IGNIVAR_FORGE_WAVE_KNOCKBACK_NORMAL,
   IGNIVAR_FORGE_WAVE_RANGE,
   IGNIVAR_FORGE_WAVE_WINDUP_SECONDS,
+  ignivarForgeWaveKnockback,
 } from '../src/sim/ignivar_forge_wave';
 import {
   IGNIVAR_FIRST_METEOR_SECONDS,
@@ -727,7 +729,10 @@ describe('Ignivar encounter', () => {
     expect(IGNIVAR_FORGE_WAVE_WINDUP_SECONDS).toBe(2.5);
     expect(IGNIVAR_FORGE_WAVE_ACTIVE_SECONDS).toBe(3);
     expect(IGNIVAR_FORGE_WAVE_DAMAGE_MAX_HP).toBe(0.35);
-    expect(IGNIVAR_FORGE_WAVE_KNOCKBACK).toBe(4);
+    expect(IGNIVAR_FORGE_WAVE_KNOCKBACK_NORMAL).toBe(4);
+    expect(IGNIVAR_FORGE_WAVE_KNOCKBACK_HEROIC).toBe(6);
+    expect(ignivarForgeWaveKnockback('normal')).toBe(4);
+    expect(ignivarForgeWaveKnockback('heroic')).toBe(6);
     expect(IGNIVAR_MOLTEN_ARMOR_DURATION).toBe(26);
     expect(IGNIVAR_MOLTEN_ARMOR_PER_STACK).toBe(0.35);
     expect(IGNIVAR_FRONTAL_CAST_SECONDS).toBe(3);
@@ -738,7 +743,7 @@ describe('Ignivar encounter', () => {
     expect(IGNIVAR_FIRST_SKYFIRE_SECONDS).toBe(16);
     expect(IGNIVAR_SKYFIRE_EVERY).toBe(20);
     expect(IGNIVAR_SKYFIRE_DAMAGE_MAX_HP).toBe(0.45);
-    expect(IGNIVAR_SKYFIRE_RANGE).toBe(24);
+    expect(IGNIVAR_SKYFIRE_RANGE).toBe(30);
     expect(IGNIVAR_SKYFIRE_HALF_ANGLE).toBe(Math.PI / 10);
     expect(IGNIVAR_SKYFIRE_CONE_COUNT).toBe(3);
     expect(IGNIVAR_FIRST_METEOR_SECONDS).toBe(13);
@@ -821,7 +826,7 @@ describe('Ignivar encounter', () => {
       unsafeHp - Math.ceil(sim.player.maxHp * IGNIVAR_FORGE_WAVE_DAMAGE_MAX_HP),
     );
     const pushedDistance = Math.hypot(sim.player.pos.x - boss.pos.x, sim.player.pos.z - boss.pos.z);
-    expect(pushedDistance).toBeCloseTo(unsafeDistance + IGNIVAR_FORGE_WAVE_KNOCKBACK, 5);
+    expect(pushedDistance).toBeCloseTo(unsafeDistance + IGNIVAR_FORGE_WAVE_KNOCKBACK_NORMAL, 5);
     expect(safe.hp).toBe(safeHp);
     expect(secondUnsafe.hp).toBe(
       secondUnsafeHp - Math.ceil(secondUnsafe.maxHp * IGNIVAR_FORGE_WAVE_DAMAGE_MAX_HP),
@@ -846,6 +851,40 @@ describe('Ignivar encounter', () => {
     expect(boss.castRemaining).toBe(0);
     expect(boss.castTargetId).toBeNull();
     expect(boss.castAim).toBeNull();
+  });
+
+  it('knocks Heroic Forge Wave victims farther than Normal victims', () => {
+    const encounters = [
+      { ...claimedEncounter(8127), expectedKnockback: IGNIVAR_FORGE_WAVE_KNOCKBACK_NORMAL },
+      {
+        ...claimedHeroicEncounter(8127),
+        expectedKnockback: IGNIVAR_FORGE_WAVE_KNOCKBACK_HEROIC,
+      },
+    ];
+
+    for (const { sim, boss, expectedKnockback } of encounters) {
+      updateIgnivarEncounter(sim.ctx, boss);
+      if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
+      boss.ignivar.frontalTimer = 999;
+      boss.ignivar.skyfireTimer = 999;
+      boss.ignivar.rotatingRaysTimer = 999;
+      boss.ignivar.forgeWaveTimer = 0;
+      updateIgnivarEncounter(sim.ctx, boss);
+
+      boss.ignivar.forgeWaveWindupRemaining = 0;
+      boss.ignivar.forgeWaveActiveRemaining =
+        IGNIVAR_FORGE_WAVE_ACTIVE_SECONDS * (1 - 10 / IGNIVAR_FORGE_WAVE_RANGE) + DT;
+      boss.ignivar.forgeWaveFacing = 0;
+      boss.ignivar.forgeWaveRadius = 9;
+      boss.ignivar.forgeWaveHitPlayerIds = [];
+      sim.player.pos = { x: boss.pos.x + 10, y: boss.pos.y, z: boss.pos.z };
+      sim.player.prevPos = { ...sim.player.pos };
+      const distanceBefore = dist2d(boss.pos, sim.player.pos);
+
+      updateIgnivarEncounter(sim.ctx, boss);
+
+      expect(dist2d(boss.pos, sim.player.pos)).toBeCloseTo(distanceBefore + expectedKnockback, 5);
+    }
   });
 
   it.each([
@@ -896,13 +935,13 @@ describe('Ignivar encounter', () => {
         ...shell.flatMap((from) => shell.map((to) => Math.hypot(to.x - from.x, to.z - from.z))),
       );
       expect(IGNIVAR_FORGE_WAVE_RANGE).toBeGreaterThanOrEqual(roomDiameter);
-      expect(IGNIVAR_FORGE_WAVE_KNOCKBACK).toBeLessThan(IGNIVAR_FORGE_WAVE_RANGE / 10);
+      expect(IGNIVAR_FORGE_WAVE_KNOCKBACK_NORMAL).toBeLessThan(IGNIVAR_FORGE_WAVE_RANGE / 10);
       expect(sim.player.hp).toBe(
         hpBefore - Math.ceil(sim.player.maxHp * IGNIVAR_FORGE_WAVE_DAMAGE_MAX_HP),
       );
       expect(
         Math.hypot(sim.player.pos.x - positionBefore.x, sim.player.pos.z - positionBefore.z),
-      ).toBeLessThanOrEqual(IGNIVAR_FORGE_WAVE_KNOCKBACK);
+      ).toBeLessThanOrEqual(IGNIVAR_FORGE_WAVE_KNOCKBACK_NORMAL);
       const localX = sim.player.pos.x - origin.x;
       const localZ = sim.player.pos.z - origin.z;
       expect(polygonContainsPoint(shell, localX, localZ)).toBe(true);
@@ -1212,14 +1251,21 @@ describe('Ignivar encounter', () => {
       addEncounterPlayer(sim, boss, 'Second Gap'),
       addEncounterPlayer(sim, boss, 'Third Gap'),
     ];
+    const outsideRangePlayer = addEncounterPlayer(sim, boss, 'Outside Rain Range');
     for (let index = 0; index < conePlayers.length; index++) {
       const angle = facing + (index * Math.PI * 2) / IGNIVAR_SKYFIRE_CONE_COUNT;
+      const radius = index === 0 ? 25 : index === 1 ? IGNIVAR_SKYFIRE_RANGE : 12;
       conePlayers[index].pos = {
-        x: boss.pos.x + Math.sin(angle) * 12,
+        x: boss.pos.x + Math.sin(angle) * radius,
         y: boss.pos.y,
-        z: boss.pos.z + Math.cos(angle) * 12,
+        z: boss.pos.z + Math.cos(angle) * radius,
       };
     }
+    outsideRangePlayer.pos = {
+      x: boss.pos.x + Math.sin(facing) * (IGNIVAR_SKYFIRE_RANGE + 0.01),
+      y: boss.pos.y,
+      z: boss.pos.z + Math.cos(facing) * (IGNIVAR_SKYFIRE_RANGE + 0.01),
+    };
     for (let index = 0; index < gapPlayers.length; index++) {
       const angle = facing + Math.PI / 3 + (index * Math.PI * 2) / IGNIVAR_SKYFIRE_CONE_COUNT;
       gapPlayers[index].pos = {
@@ -1228,7 +1274,9 @@ describe('Ignivar encounter', () => {
         z: boss.pos.z + Math.cos(angle) * 12,
       };
     }
-    for (const player of [...conePlayers, ...gapPlayers]) player.hp = player.maxHp;
+    for (const player of [...conePlayers, ...gapPlayers, outsideRangePlayer]) {
+      player.hp = player.maxHp;
+    }
     const midCastEvents = sim.tick();
     expect(boss.castingAbility).toBe(IGNIVAR_SKYFIRE_CAST_ID);
     expect(boss.ignivar.skyfireCastRemaining).toBeGreaterThan(DT);
@@ -1275,6 +1323,7 @@ describe('Ignivar encounter', () => {
       );
     }
     for (const player of gapPlayers) expect(player.hp).toBe(player.maxHp);
+    expect(outsideRangePlayer.hp).toBe(outsideRangePlayer.maxHp);
     expect(boss.ignivar.skyfireFacing).toBe(lockedFacing);
     expect(boss.castingAbility).toBeNull();
   });
@@ -2959,8 +3008,8 @@ describe('Ignivar encounter', () => {
     expect(boss.aggroTargetId).toBe(tank.id);
     expect(boss.forcedTargetTimer).toBeLessThan(3);
     if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
+    isolateForgeChains(boss, 999);
     boss.ignivar.frontalTimer = 0;
-    boss.ignivar.meteorTimer = 999;
 
     updateIgnivarEncounter(sim.ctx, boss);
     let sawRelease = false;
@@ -3393,9 +3442,7 @@ describe('Ignivar encounter', () => {
     expect(add.dead).toBe(true);
     const hpBefore = sim.player.hp;
     if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
-    boss.ignivar.brandTimer = 999;
-    boss.ignivar.frontalTimer = 999;
-    boss.ignivar.meteorTimer = 999;
+    isolateForgeChains(boss, 999);
     boss.swingTimer = 999;
 
     const ticksPastOriginalDeadline = Math.round(IGNIVAR_APOCALYPSE_CAST_SECONDS / DT) + 1;

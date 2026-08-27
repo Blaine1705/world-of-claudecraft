@@ -37,8 +37,8 @@ import {
   IGNIVAR_FORGE_WAVE_ACTIVE_SECONDS,
   IGNIVAR_FORGE_WAVE_DAMAGE_MAX_HP,
   IGNIVAR_FORGE_WAVE_EVERY,
-  IGNIVAR_FORGE_WAVE_KNOCKBACK,
   IGNIVAR_FORGE_WAVE_WINDUP_SECONDS,
+  ignivarForgeWaveKnockback,
   ignivarForgeWaveRadius,
   ignivarPointSweptByForgeWave,
 } from '../ignivar_forge_wave';
@@ -112,7 +112,7 @@ export const IGNIVAR_SKYFIRE_CAST_ID = 'Rain of Cinders';
 export const IGNIVAR_SKYFIRE_CAST_SECONDS = 3;
 export const IGNIVAR_SKYFIRE_EVERY = 20;
 export const IGNIVAR_SKYFIRE_DAMAGE_MAX_HP = 0.45;
-export const IGNIVAR_SKYFIRE_RANGE = 24;
+export const IGNIVAR_SKYFIRE_RANGE = 30;
 export const IGNIVAR_SKYFIRE_HALF_ANGLE = Math.PI / 10;
 export const IGNIVAR_SKYFIRE_CONE_COUNT = 3;
 export const IGNIVAR_ROTATING_RAYS_CAST_ID = 'Revolving Inferno';
@@ -1068,6 +1068,8 @@ function updateForgeWave(
   );
   st.forgeWaveRadius = ignivarForgeWaveRadius(st.forgeWaveActiveRemaining);
   boss.castRemaining = st.forgeWaveActiveRemaining;
+  const difficulty = encounterInstance(ctx, boss)?.difficulty ?? 'normal';
+  const knockback = ignivarForgeWaveKnockback(difficulty);
   const alreadyHit = new Set(st.forgeWaveHitPlayerIds);
   for (const player of players) {
     if (alreadyHit.has(player.id)) continue;
@@ -1096,7 +1098,7 @@ function updateForgeWave(
       false,
       true,
     );
-    if (!player.dead) ctx.applyKnockback(boss, player, IGNIVAR_FORGE_WAVE_KNOCKBACK);
+    if (!player.dead) ctx.applyKnockback(boss, player, knockback);
     alreadyHit.add(player.id);
     st.forgeWaveHitPlayerIds.push(player.id);
   }

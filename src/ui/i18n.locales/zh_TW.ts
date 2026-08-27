@@ -7310,6 +7310,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.hot': '每 {interval} 秒恢復 {value} 點生命值',
   'hudChrome.auraEffect.sharedPyre':
     '造成相當於每名玩家最大生命值 {total}% 的傷害，由圈內玩家分攤（{players} 名玩家時每人承受 {perPlayer}%）。',
+  'hudChrome.auraEffect.varkhulSharedPyre':
+    '造成相當於每名玩家最大生命值 {total}% 的傷害，由圈內玩家分攤（{players} 名玩家時每人承受 {perPlayer}%）。每缺少一名玩家，還會對整個團隊（包括圈內玩家）造成最大生命值 {missingPenalty}% 的傷害。',
   'hudChrome.auraEffect.varkhulForgeLink':
     '在啟動的立柱光束抵達鍛爐前將其攔截。未攔截的光束每秒增加6%熱量。普通難度下，已攔截的光束和關閉的立柱會讓鍛爐冷卻；英雄難度下熱量永不降低。達到100%時會觸發致命的鍛爐熔毀。',
   'hudChrome.auraEffect.varkhulCrucibleExposure':
@@ -7345,13 +7347,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.ignivar.finale':
     '最終煉獄: 在團滅前擊殺伊格尼瓦爾，同時應對加速的隕石、正面攻擊與旋轉煉獄。',
   'hudChrome.raidBossGuide.ignivar.heroic':
-    '英雄: 熔爐鎖鏈期間成對玩家必須保持靠近，熔爐審判期間印記仍會持續。',
+    '英雄: 熔爐鎖鏈期間成對玩家必須保持靠近，熔爐審判期間印記仍會持續，且熔爐波會將玩家推得更遠。',
   'hudChrome.raidBossGuide.varkhul.tanks':
     '坦克: 製作者印記達到2層時換坦，並讓瓦爾庫爾保持在近戰範圍內。',
   'hudChrome.raidBossGuide.varkhul.orbs':
     '燼火寶珠: 被標記者分散到房間邊緣。火池會持續存在，釋放的寶珠會穿過房間。',
   'hudChrome.raidBossGuide.varkhul.pyre':
-    '共享柴堆: 只選擇沒有熾熱金屬的玩家。在移動圓圈內，普通需要4人，英雄需要5人。',
+    '共享柴堆: 只選擇沒有熾熱金屬的玩家。無論難度，移動圓圈內都需要4名玩家。每缺少一名玩家，整個團隊都會受到相當於最大生命值15%的傷害。',
   'hudChrome.raidBossGuide.varkhul.forgestorm':
     '熔爐風暴: 觀察墜落的隕石，在三波隕石落地前離開每個標記區域。',
   'hudChrome.raidBossGuide.varkhul.anvil':

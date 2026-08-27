@@ -3158,12 +3158,12 @@ export const hudChromeStrings = {
       finale:
         'Last Inferno: finish Ignivar before the hard wipe while faster meteors, frontals, and Revolving Inferno continue.',
       heroic:
-        'Heroic: paired players stay close during Chains of the Forge, and Brand remains active inside Judgment.',
+        'Heroic: paired players stay close during Chains of the Forge, Brand remains active inside Judgment, and Forge Wave pushes farther.',
     },
     varkhul: {
       tanks: "Tanks: swap at two stacks of Maker's Brand and keep Varkhul in melee range.",
       orbs: 'Cinder Orbs: marked players spread to the room edge. Their fire pools persist and the released orbs cross the room.',
-      pyre: 'Shared Pyre: only a player without Red-hot Metal is selected. Stack four players in Normal or five in Heroic inside the moving circle.',
+      pyre: 'Shared Pyre: only a player without Red-hot Metal is selected. Stack four players inside the moving circle in either difficulty. Each missing player deals 15% of maximum health to the entire raid.',
       forgestorm:
         'Forgestorm: watch the falling meteors and leave every marked impact before each of the three waves lands.',
       anvil:
@@ -3182,6 +3182,8 @@ export const hudChromeStrings = {
   auraEffect: {
     sharedPyre:
       "Deals {total}% of each player's maximum health, divided by the number of players inside the circle ({perPlayer}% each with {players} players).",
+    varkhulSharedPyre:
+      "Deals {total}% of each player's maximum health, divided among players inside the circle ({perPlayer}% each with {players} players). Each missing player also deals {missingPenalty}% of maximum health to the entire raid, including players inside the circle.",
     makersBrand:
       'For {duration} sec, each stack increases damage taken from Varkhul by {pct}%. Stacks up to {max} times. Tanks should swap at {swap} stacks.',
     varkhulSentinelsGaze:

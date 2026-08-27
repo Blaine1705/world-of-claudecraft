@@ -7607,6 +7607,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.hot': '{interval}秒ごとに体力を{value}回復する',
   'hudChrome.auraEffect.sharedPyre':
     '各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。',
+  'hudChrome.auraEffect.varkhulSharedPyre':
+    '各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。不足しているプレイヤー1人につき、サークル内を含むレイド全体が最大体力の{missingPenalty}%のダメージを受ける。',
   'hudChrome.auraEffect.varkhulForgeLink':
     '作動中の柱の光線が鍛冶炉に届く前に遮断する。未遮断の光線は1秒ごとに熱を6%上昇させる。ノーマルでは遮断中と柱の停止中に冷却されるが、ヒロイックでは熱は下がらない。100%で致命的な鍛冶炉メルトダウンが発生する。',
   'hudChrome.auraEffect.varkhulCrucibleExposure':
@@ -7642,13 +7644,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.ignivar.finale':
     '最後の業火: 加速した隕石、前方攻撃、回転する業火に対処しながら全滅前にイグニヴァルを倒す。',
   'hudChrome.raidBossGuide.ignivar.heroic':
-    '英雄: 鍛冶の鎖ではペア同士が近くに留まり、審判中も印が残る。',
+    '英雄: 鍛冶の鎖ではペア同士が近くに留まり、審判中も印が残り、鍛冶波はプレイヤーをさらに遠くへ押し出す。',
   'hudChrome.raidBossGuide.varkhul.tanks':
     'タンク: 創造者の印が2スタックで交代し、ヴァークルを近接範囲に保つ。',
   'hudChrome.raidBossGuide.varkhul.orbs':
     '灰のオーブ: 対象者は部屋の外周へ散開する。炎の床は残り、放たれたオーブは部屋を横切る。',
   'hudChrome.raidBossGuide.varkhul.pyre':
-    '共有の火葬: 赤熱した金属がない対象だけを選ぶ。移動する円内に通常4人、英雄5人で集合する。',
+    '共有の火葬: 赤熱した金属がない対象だけを選ぶ。難易度に関係なく、移動する円内に4人で集合する。1人不足するごとに、レイド全体が最大体力の15%のダメージを受ける。',
   'hudChrome.raidBossGuide.varkhul.forgestorm':
     '鍛冶嵐: 落下する隕石を確認し、3波それぞれが着弾する前に表示された範囲から離れる。',
   'hudChrome.raidBossGuide.varkhul.anvil':

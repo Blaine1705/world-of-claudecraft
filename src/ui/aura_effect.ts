@@ -63,7 +63,7 @@ import {
 import { VARKHUL_ASSEMBLY_BURDEN_TICK_SECONDS } from '../sim/varkhul_assembly';
 import {
   VARKHUL_SHARED_PYRE_AURA_ID,
-  VARKHUL_SHARED_PYRE_REQUIRED_HEROIC,
+  VARKHUL_SHARED_PYRE_RAID_DAMAGE_PER_MISSING,
   VARKHUL_SHARED_PYRE_REQUIRED_NORMAL,
   VARKHUL_SHARED_PYRE_TOTAL_DAMAGE_HEROIC,
   VARKHUL_SHARED_PYRE_TOTAL_DAMAGE_NORMAL,
@@ -159,13 +159,20 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
   if (a.id === VARKHUL_SHARED_PYRE_AURA_ID) {
     const players = Math.max(1, Math.floor(a.stacks ?? VARKHUL_SHARED_PYRE_REQUIRED_NORMAL));
     const total = pctFromFrac(
-      players >= VARKHUL_SHARED_PYRE_REQUIRED_HEROIC
-        ? VARKHUL_SHARED_PYRE_TOTAL_DAMAGE_HEROIC
-        : VARKHUL_SHARED_PYRE_TOTAL_DAMAGE_NORMAL,
+      a.value2 !== undefined && a.value2 > 0
+        ? a.value2
+        : players > VARKHUL_SHARED_PYRE_REQUIRED_NORMAL
+          ? VARKHUL_SHARED_PYRE_TOTAL_DAMAGE_HEROIC
+          : VARKHUL_SHARED_PYRE_TOTAL_DAMAGE_NORMAL,
     );
     return {
-      key: `${KEY}.sharedPyre`,
-      nums: { total, players, perPlayer: round(total / players) },
+      key: `${KEY}.varkhulSharedPyre`,
+      nums: {
+        total,
+        players,
+        perPlayer: round(total / players),
+        missingPenalty: pctFromFrac(VARKHUL_SHARED_PYRE_RAID_DAMAGE_PER_MISSING),
+      },
     };
   }
   if (a.id === VARKHUL_MAKERS_BRAND_AURA_ID) {

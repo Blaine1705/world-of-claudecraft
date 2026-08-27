@@ -1,6 +1,9 @@
 import * as THREE from 'three';
 import { VARKHUL_CINDER_FIRE_RADIUS } from '../sim/varkhul_cinder_orbs';
-import { VARKHUL_SHARED_PYRE_RADIUS } from '../sim/varkhul_shared_pyre';
+import {
+  VARKHUL_SHARED_PYRE_RADIUS,
+  VARKHUL_SHARED_PYRE_REQUIRED_HEROIC,
+} from '../sim/varkhul_shared_pyre';
 import { buildIgnivarSoakTelegraph, syncIgnivarSoakTelegraph } from './ignivar_soak_telegraph';
 import {
   buildVarkhulCinderFire,
@@ -264,7 +267,7 @@ export function buildVarkhulEncounterPrewarmVisual(): THREE.Group {
     buildVarkhulFrontalVisual(),
     buildVarkhulCinderOrbsTelegraph(),
     buildVarkhulMakersBrandTelegraph(),
-    buildVarkhulSharedPyreTelegraph(5),
+    buildVarkhulSharedPyreTelegraph(VARKHUL_SHARED_PYRE_REQUIRED_HEROIC),
     buildVarkhulCinderFire(
       { id: 'prewarm-fire', sourceId: 0, x: 0, z: 0, radius: VARKHUL_CINDER_FIRE_RADIUS },
       0,
