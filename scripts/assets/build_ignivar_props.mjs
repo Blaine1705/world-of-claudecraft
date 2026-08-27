@@ -115,13 +115,28 @@ const ITEMS = [
     tex: 1024,
     emissive: 0.28,
   },
+  // The Lava/ pair replaces the first-drop channel models (2026-08-27).
+  // Both are authored standing upright (lava bed facing front): rotateX
+  // lays them flat so the bed faces up and they read as floor gutters.
+  // hotBoost pre-brightens the beds' hot pixels before ETC1S, which
+  // otherwise crushes the saturated orange gradients to dark crimson (the
+  // known block-compressor trap; whole-file UASTC is not runtime-safe here).
   {
-    src: 'New_Assets_Demi/lava-channel-curved.glb',
+    src: 'New_Assets_Demi/Lava/Lava_Curved.glb',
     name: 'lava_channel_curved',
     tex: 1024,
     emissive: 1.5,
+    rotateX: -90,
+    hotBoost: 1.35,
   },
-  { src: 'New_Assets_Demi/lava-channel.glb', name: 'lava_channel', tex: 1024, emissive: 1.5 },
+  {
+    src: 'New_Assets_Demi/Lava/Lava_Straight.glb',
+    name: 'lava_channel',
+    tex: 1024,
+    emissive: 1.5,
+    rotateX: -90,
+    hotBoost: 1.35,
+  },
   { src: 'New_Assets_Demi/lava-outlet-2.glb', name: 'lava_outlet_2', tex: 1024, emissive: 1.5 },
   { src: 'New_Assets_Demi/lava-outlet.glb', name: 'lava_outlet', tex: 1024, emissive: 1.5 },
   { src: 'New_Assets_Demi/lava-port.glb', name: 'lava_port', tex: 1024, emissive: 1.5 },
@@ -188,6 +203,33 @@ for (const item of ITEMS) {
     meshopt({ encoder: MeshoptEncoder, level: 'high' }),
   );
   const root = doc.getRoot();
+  if (item.hotBoost) {
+    // Feathered per-pixel lift of the hot (lava) range only: the iron stays
+    // put while the bed's oranges go in bright enough that the ETC1S crush
+    // lands them where the artist authored them.
+    for (const tex of root.listTextures()) {
+      const { data, info } = await sharp(Buffer.from(tex.getImage()))
+        .raw()
+        .toBuffer({ resolveWithObject: true });
+      for (let i = 0; i < info.width * info.height; i++) {
+        const at = i * info.channels;
+        const r = data[at];
+        const b = data[at + 2];
+        if (r <= 100 || r <= b * 2) continue;
+        const t = Math.min(1, (r - 100) / 60);
+        const lift = 1 + (item.hotBoost - 1) * t;
+        data[at] = Math.min(255, Math.round(r * lift));
+        data[at + 1] = Math.min(255, Math.round(data[at + 1] * lift));
+      }
+      const boosted = await sharp(data, {
+        raw: { width: info.width, height: info.height, channels: info.channels },
+      })
+        .webp({ quality: 92 })
+        .toBuffer();
+      tex.setImage(new Uint8Array(boosted));
+      tex.setMimeType('image/webp');
+    }
+  }
   if (item.darken) {
     // Bright steel sources read white in the dark forge grades: multiply the
     // albedo down to dark iron before compression.
@@ -199,6 +241,13 @@ for (const item of ITEMS) {
       tex.setImage(new Uint8Array(darkened));
       tex.setMimeType('image/webp');
     }
+  }
+  if (item.rotateX) {
+    // Node-level rotation: the runtime template loader bakes world matrices
+    // into the canonical geometry, so an authored-upright model lies flat.
+    const half = (item.rotateX * Math.PI) / 360;
+    for (const node of root.listNodes())
+      if (node.getMesh()) node.setRotation([Math.sin(half), 0, 0, Math.cos(half)]);
   }
   for (const node of root.listNodes())
     if (node.getName().startsWith('tripo_')) node.setName(item.name);
