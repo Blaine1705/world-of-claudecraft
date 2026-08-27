@@ -782,7 +782,12 @@ Varkhul encounter prop.
 
 ## Boss loot tables: one tier, spread across Normal and Heroic
 
-Both bosses currently ship loot: []. Settled 2026-08-27: this raid has NO
+Implemented: both bosses now ship these tables (dungeons.ts loot arrays plus
+the HEROIC_BOSS_LOOT appends, pinned by tests/ignivar_loot.test.ts), with one
+recorded deviation: Varkhul carries plain copper because only a registered
+heroic finale boss may carry the heroic money base, and the Inner Crucible has
+no heroic tuning record yet, so Varkhul's heroic-only appends stay dormant
+until the raid branch adds that record. Settled 2026-08-27: this raid has NO
 heroic item-level layer. Instead the single ilvl-35 table spreads across
 the two difficulties: Normal pays four of the five sigil slots (enough for
 the 4-piece bonus), the off-set armor, and the smaller weapons; Heroic
