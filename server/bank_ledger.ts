@@ -243,7 +243,12 @@ export function bankLedgerTailStats(): { depth: number; droppedRows: number } {
 /** Chain one insert onto the FIFO when the depth cap admits it. Returns false
  *  on a cap drop (counted here in rows, logged under the shared latch idiom);
  *  the call site then does its own audit-hole accounting, exactly as it would
- *  for a rejected insert. onError must never throw; it is guarded anyway. */
+ *  for a rejected insert, which is deliberately PER SITE: the vault and guild
+ *  arms count incidents on a drop because their REJECTED inserts count
+ *  incidents, while the personal-bank and socket arms have no incident family
+ *  for rejected inserts either, so their drops land in the shared
+ *  dropped_rows gauge alone, the same visibility their failures have. onError
+ *  must never throw; it is guarded anyway. */
 function enqueueOnTail(
   rowCount: number,
   run: () => Promise<void>,

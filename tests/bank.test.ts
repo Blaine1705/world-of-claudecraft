@@ -647,10 +647,10 @@ describe('moveBetweenContainers (container-agnostic guild-bank seam)', () => {
     expect(moveBetweenContainers(src, 0, undefined, dst, { general: 1, materials: 0 })).toEqual({
       moved: 0,
       refusal: 'no_fit',
-      // Room exists for ONE unit (19 -> 20), so the refusal is the payload's
-      // indivisibility, never pool exhaustion; the refusal line must not
-      // blame pool allocation for it.
-      noFitCause: 'instanced_units',
+      // Merge room for ONE unit remains, but ZERO free slots do: partial
+      // byte-equal top-up room is still pool exhaustion, so the pool-honest
+      // lines stay truthful for this shape ('space', never granularity).
+      noFitCause: 'space',
     });
     expect(src).toEqual(srcSnap);
     expect(dst).toEqual(dstSnap);
@@ -660,6 +660,23 @@ describe('moveBetweenContainers (container-agnostic guild-bank seam)', () => {
       moved: 1,
     });
     expect(dst).toEqual([{ itemId: 'wolf_fang', count: 20, instance: { signer: 'Ana' } }]);
+  });
+
+  it('labels granularity only when free slots exist and the payload is indivisible', () => {
+    // The one reachable 'instanced_units' shape: a multi-unit NON-mergeable
+    // payload (charges), which only a tolerated hand-shaped save can carry
+    // (every sim-built charges slot is count 1). Two free slots exist, each
+    // absorbs one unit, three units cannot land whole: granularity, not
+    // space, and the refusal line must not blame pool allocation.
+    const src: InvSlot[] = [{ itemId: 'wolf_fang', count: 3, instance: { charges: { heal: 2 } } }];
+    const dst: InvSlot[] = [];
+    expect(moveBetweenContainers(src, 0, undefined, dst, { general: 2, materials: 0 })).toEqual({
+      moved: 0,
+      refusal: 'no_fit',
+      noFitCause: 'instanced_units',
+    });
+    expect(src).toHaveLength(1);
+    expect(dst).toEqual([]);
   });
 
   it('a differently-signed instanced move still demands its own free destination slot', () => {

@@ -403,14 +403,20 @@ export class VaultTab {
       partial.type = 'button';
       partial.className = 'vault-row-partial';
       partial.setAttribute(FOCUS_KEY_ATTR, vaultFocusKey(model, 'partial'));
+      // Label-in-name (WCAG 2.5.3): the accessible name embeds the chip's
+      // visible label text in every filled locale (the English value leads
+      // with it; the non-Latin fills nest their own withdrawQuantityInput
+      // translation), so voice-control users can speak what they see.
       const partialLabel = t('hudChrome.bank.withdrawQuantityAction', { item: name });
       partial.setAttribute('aria-label', partialLabel);
       // The shared tooltip, not a native title (every sibling control's rule);
       // re-resolved at show time so a language switch relocalizes it. TWO
-      // lines: the action sentence AND the chip's own visible label, because
-      // the 72px chip ellipsis-caps that label and neither the aria-label nor
-      // the action line repeats its words, so in a longer locale the tooltip
-      // is the one place the elided text is recoverable.
+      // lines: the action sentence AND the chip's own visible label. The 72px
+      // chip ellipsis-caps that label in EVERY locale (the English text
+      // already overflows the cap at 11px), and in a locale whose action
+      // translation is still pending the first line falls back to English, so
+      // the second line is what guarantees the elided TRANSLATED label stays
+      // recoverable from the tooltip.
       this.deps.attachTooltip(
         partial,
         () =>

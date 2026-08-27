@@ -3079,7 +3079,7 @@ export const vi_VN: EnTranslations = {
       "withdrawQuantityConfirm": "Rút Ra",
       "vaultRowWithdrawName": "Withdraw {item}",
       "priceChanged": "The price changed before the purchase completed. Review the refreshed price and confirm again.",
-      "withdrawQuantityAction": "Choose withdrawal quantity for {item}",
+      "withdrawQuantityAction": "Quantity to withdraw: {item}",
       "filterGroupAria": "Lọc ngân hàng theo danh mục",
       "sortAria": "Sắp xếp vật phẩm ngân hàng",
       "searchAria": "Tìm vật phẩm ngân hàng theo tên",

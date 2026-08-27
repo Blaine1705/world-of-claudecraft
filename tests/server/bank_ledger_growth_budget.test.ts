@@ -31,13 +31,13 @@ describe('bank ledger durable growth budget', () => {
   it('installs an exact accumulator and deferred commit ceiling under the bootstrap lock', () => {
     const folded = BANK_LEDGER_GROWTH_BUDGET_SCHEMA.replace(/\s+/g, ' ');
     // bank_ledger predates this budget in production, so the first install
-    // seeds over real history. The unlocked warm count runs BEFORE the
-    // insert-blocking lock so the exact locked count re-reads warm cache and
-    // the blocked window shrinks to the warm-scan time.
-    const warmCount = folded.indexOf('PERFORM pg_catalog.count(*) FROM "public".bank_ledger');
+    // seeds over real history with ONE exact count. A warm-up pre-count was
+    // tried and reverted (review round three): the boot transaction already
+    // holds ACCESS EXCLUSIVE on the ledger from the core schema's ADD COLUMN
+    // converges, so there is no unlocked place inside it and a second pass
+    // only lengthened the blocked window (measured 1.85x).
+    expect(folded).not.toContain('PERFORM pg_catalog.count(*)');
     const lock = folded.indexOf('LOCK TABLE "public".bank_ledger IN SHARE ROW EXCLUSIVE MODE');
-    expect(warmCount).toBeGreaterThanOrEqual(0);
-    expect(warmCount).toBeLessThan(lock);
     const createCommitTrigger = folded.indexOf(
       'CREATE CONSTRAINT TRIGGER bank_ledger_growth_budget_commit',
     );
@@ -163,10 +163,14 @@ describe('bank ledger durable growth budget', () => {
       expect(probe).toBeGreaterThanOrEqual(0);
       expect(probe).toBeLessThan(gatedAlter);
     }
-    expect(folded).toContain("o.option_name = 'autovacuum_vacuum_scale_factor'");
+    // The cast lives inside CASE (defined evaluation order), so an unrelated
+    // non-numeric reloption can never reach it and abort boot.
+    expect(folded.split('WHERE CASE o.option_name')).toHaveLength(3);
+    expect(folded).toContain("WHEN 'autovacuum_vacuum_scale_factor'");
     expect(folded).toContain('o.option_value::pg_catalog.numeric = 0');
     expect(folded).toContain('o.option_value::pg_catalog.numeric = 100');
     expect(folded).toContain('o.option_value::pg_catalog.numeric = 1000');
+    expect(folded).toContain('ELSE FALSE END');
   });
 
   it('converts only the trigger fixed identity and exact JSON evidence', () => {

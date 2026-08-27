@@ -3079,7 +3079,7 @@ export const cs_CZ: EnTranslations = {
       "withdrawQuantityConfirm": "Vybrat",
       "vaultRowWithdrawName": "Withdraw {item}",
       "priceChanged": "The price changed before the purchase completed. Review the refreshed price and confirm again.",
-      "withdrawQuantityAction": "Choose withdrawal quantity for {item}",
+      "withdrawQuantityAction": "Quantity to withdraw: {item}",
       "filterGroupAria": "Filtrovat banku podle kategorie",
       "sortAria": "Seřadit předměty v bance",
       "searchAria": "Hledat předměty v bance podle názvu",

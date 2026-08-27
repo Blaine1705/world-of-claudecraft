@@ -40,17 +40,43 @@ const TOUCH_FLOOR = 40;
  *  Only a browser can rank these (CJK copy is far shorter in characters and
  *  taller in nothing), which is why the arm measures every one rather than
  *  trusting any single wordiest pick. */
-async function allOutageCopies(): Promise<Array<[string, string]>> {
-  const copies: Array<[string, string]> = [
-    ['en', en.hudChrome.bank.rungOutage],
-    ['en_XA', en_XA.hudChrome.bank.rungOutage],
+async function allLocaleBundles(): Promise<Array<[string, EnTranslations]>> {
+  const bundles: Array<[string, EnTranslations]> = [
+    ['en', en],
+    ['en_XA', en_XA],
   ];
   for (const [tag, load] of Object.entries(LOCALE_LOADERS)) {
     const mod = (await load()) as unknown as Record<string, EnTranslations>;
-    copies.push([tag, mod[tag].hudChrome.bank.rungOutage]);
+    const bundle = mod[tag];
+    // A regen that renamed a bundle export would otherwise surface as an
+    // opaque undefined-read deep in an arm; name it here instead.
+    if (!bundle) throw new Error(`locale bundle ${tag} did not export itself under its own tag`);
+    bundles.push([tag, bundle]);
   }
-  return copies;
+  return bundles;
 }
+
+/** The DISTINCT shipped values of one bank string, tagged by the first locale
+ *  carrying each. Deduped by value: most Latin locales are byte-identical
+ *  English until the maintainer's release fill lands, so staging duplicates
+ *  buys nothing; deduping keeps each arm one measurement per real string
+ *  while a future fill or reword joins automatically on the next regen. */
+async function distinctBankCopies(
+  pick: (bundle: EnTranslations) => string,
+): Promise<Array<[string, string]>> {
+  const byValue = new Map<string, string>();
+  for (const [tag, bundle] of await allLocaleBundles()) {
+    const copy = pick(bundle);
+    if (!byValue.has(copy)) byValue.set(copy, tag);
+  }
+  return [...byValue.entries()].map(([copy, tag]) => [tag, copy]);
+}
+
+const allOutageCopies = (): Promise<Array<[string, string]>> =>
+  distinctBankCopies((bundle) => bundle.hudChrome.bank.rungOutage);
+
+const allDepositAllCopies = (): Promise<Array<[string, string]>> =>
+  distinctBankCopies((bundle) => bundle.hudChrome.bank.depositAll);
 
 const PROFILES = [
   { name: '844x390', width: 844, height: 390 },
@@ -499,6 +525,35 @@ for (const profile of PROFILES) {
         search!.getBoundingClientRect().width,
         'the search box must stay above its 96px floor',
       ).toBeGreaterThanOrEqual(96);
+    });
+
+    it('the one-row toolbar holds the WORDIEST deposit label without clipping', async () => {
+      // The nowrap regime forbids the wrap that would otherwise absorb a wordy
+      // locale, and the window carries overflow:hidden, so a label the row
+      // cannot fit is CLIPPED, not wrapped: the silent failure mode. Stage the
+      // longest shipped depositAll value into the button (es and es_ES, 30
+      // characters, measured across the generated bundles) and require the
+      // toolbar to still fit its own box at both profiles.
+      const root = openBank(stockedBank());
+      const tools = root.querySelector('.bag-tools') as HTMLElement | null;
+      const deposit = root.querySelector('.bank-deposit-all') as HTMLElement | null;
+      expect(tools).not.toBeNull();
+      expect(deposit).not.toBeNull();
+      let wordiest = '';
+      for (const [, copy] of await allDepositAllCopies()) {
+        if (copy.length > wordiest.length) wordiest = copy;
+      }
+      deposit!.textContent = wordiest;
+      expect(
+        tools!.scrollWidth,
+        `the toolbar must fit the wordiest deposit label ("${wordiest}") without clipping`,
+      ).toBeLessThanOrEqual(tools!.clientWidth);
+      const search = root.querySelector('.bag-search') as HTMLElement | null;
+      const tops = [search!, deposit!].map((el) => el.getBoundingClientRect().top);
+      expect(
+        Math.max(...tops) - Math.min(...tops),
+        'the wordiest label must not force a second row either',
+      ).toBeLessThan(TOUCH_FLOOR / 2);
     });
   });
 }

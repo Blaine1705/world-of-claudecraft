@@ -339,16 +339,18 @@ export interface BankSelfWireSession {
  *  Both ride the caller's delta elision: an unchanged value omits its key
  *  entirely, which the client reads as unchanged and never as absent.
  *
- *  WHY `bpsl` NEEDS NO CADENCE GATE, and the condition under which it would.
- *  It is a SCALAR. `maybe` stringifies unconditionally, before its diff, so the
+ *  WHY `bpsl` NEEDS NO GATE, and the condition under which it would. It is a
+ *  SCALAR. `maybe` stringifies unconditionally, before its diff, so the
  *  build is two Map lookups and the stringify is free; the elision then keeps it
  *  off the wire entirely until the count moves. That is the opposite of `cvault`,
- *  whose 4 Hz gate (CVAULT_WIRE_HZ, server/vault_wire.ts) exists because its
- *  BUILD is expensive in the common case. Widen this key to a record (a
- *  bonus-slot breakdown, a per-rung state, a price join like `bank` does) and
- *  the unconditional stringify stops being free: re-open the cadence question
- *  then, and not before. A gate today would also delay the charter list by up to
- *  a period after a purchase, which is the blindness ruling 17 exists to close.
+ *  whose BUILD is expensive in the common case, which is why cvault carries a
+ *  (revision, gate-probe) signature (emitVaultSelfKeys, server/vault_wire.ts)
+ *  that elides the projection while the pair holds. Widen this key to a
+ *  record (a bonus-slot breakdown, a per-rung state, a price join like `bank`
+ *  does) and the unconditional stringify stops being free: give it a
+ *  signature of its own then, and not before. Any gate that DELAYS rather
+ *  than elides would also delay the charter list after a purchase, which is
+ *  the blindness ruling 17 exists to close.
  *
  *  PARAMETER ORDER IS LOAD-BEARING and only structurally typed: passing
  *  `anchorSession` in the `session` slot type-checks and would leak the

@@ -16,7 +16,7 @@
 // (enforced by tests/architecture.test.ts). This module draws NO rng.
 
 import type { BankBonusSource, BankInfo } from '../world_api';
-import { type PoolCapacity, poolCapacityOf, poolOccupancyOf } from './bag_pools';
+import { freePoolSlots, type PoolCapacity, poolCapacityOf, poolOccupancyOf } from './bag_pools';
 import { addStacked, bagPools, bagsFullError, countFit, instancedCountCap } from './bags';
 import { isKnownStorageSkuId, STORAGE_SKUS } from './content/storage_charters';
 import { ITEMS } from './data';
@@ -268,12 +268,16 @@ export function bankPools(bank: BankState): PoolCapacity {
 }
 
 export type MoveRefusal = 'invalid' | 'no_fit';
-/** Why a 'no_fit' refused: 'space' is genuine pool exhaustion for the request,
- *  'instanced_units' is unit granularity, where SOME units would fit but an
- *  instanced slot moves as one indivisible payload (a non-mergeable payload
- *  absorbs one unit per fresh slot, so free slots can exist while the whole
- *  stack still cannot land). The refusal LINE reads this so it never blames
- *  pool allocation for a granularity refusal. */
+/** Why a 'no_fit' refused: 'space' is pool exhaustion for the request (no
+ *  free slot the item's pool allows; partial byte-equal merge room counts as
+ *  exhaustion, since the remaining SLOTS are what pool allocation is about),
+ *  while 'instanced_units' is unit granularity: free usable slots EXIST, but
+ *  the slot moves as one indivisible payload whose units outnumber what the
+ *  free slots plus merge room can absorb. Every sim-built non-mergeable slot
+ *  carries one unit and lands in any free slot, so 'instanced_units' is
+ *  reachable only through a tolerated hand-shaped save's multi-unit
+ *  non-mergeable stack; the refusal LINE still must not blame pool
+ *  allocation for it. */
 export type NoFitCause = 'space' | 'instanced_units';
 export interface MoveResult {
   moved: number;
@@ -340,9 +344,15 @@ export function moveBetweenContainers(
       slot.craftedRecipeId,
     );
     if (fit < slot.count) {
-      // fit > 0 means room exists for SOME units and only the payload's
-      // indivisibility refused; fit === 0 is genuine exhaustion.
-      return { moved: 0, refusal: 'no_fit', noFitCause: fit > 0 ? 'instanced_units' : 'space' };
+      // Granularity ONLY when a free slot the item's pool allows exists and
+      // the indivisible payload still cannot land whole; partial byte-equal
+      // merge room with zero free slots IS pool exhaustion ('space'), so the
+      // pool-honest refusal lines stay truthful for it.
+      const cause: NoFitCause =
+        freePoolSlots(dest, destPools, slot.itemId, isMaterialItemId) > 0
+          ? 'instanced_units'
+          : 'space';
+      return { moved: 0, refusal: 'no_fit', noFitCause: cause };
     }
     addStacked(dest, slot.itemId, slot.count, slot.instance, slot.craftedRecipeId);
     source.splice(sourceIndex, 1);
@@ -435,20 +445,20 @@ export function bankDeposit(
     pools,
   );
   if (result.refusal === 'no_fit') {
+    // The cause is DISCRIMINATED by the move itself (MoveResult.noFitCause).
+    // 'instanced_units' means free slots EXIST and only the payload's
+    // indivisibility refused, so both pool lines would lie; it gets its own
+    // line (re-localized via src/ui/sim_i18n.ts, every sim literal's rule).
+    if (result.noFitCause === 'instanced_units') {
+      ctx.error(meta.entityId, 'That stack cannot be split to fit the space left in your bank.');
+      return;
+    }
     // Pool-honest refusal: with the two-pool meter on screen, "full" is a lie
     // when the only room left is materials-only satchel capacity a
     // non-material item may not take. Same occupancy read as the fit gate
     // (bag_pools.ts poolOccupancyOf under the shared material taxonomy).
-    // The cause is DISCRIMINATED by the move itself (MoveResult.noFitCause):
-    // an 'instanced_units' refusal means room exists but the indivisible
-    // payload cannot land, so blaming pool allocation ("Only materials fit")
-    // would misread granularity as a materials-space story.
     const occupancy = poolOccupancyOf(meta.bank.inventory, pools, isMaterialItemId);
-    if (
-      result.noFitCause !== 'instanced_units' &&
-      !isMaterialItemId(slot.itemId) &&
-      pools.materials - occupancy.materialsUsed > 0
-    ) {
+    if (!isMaterialItemId(slot.itemId) && pools.materials - occupancy.materialsUsed > 0) {
       ctx.error(meta.entityId, 'Only materials fit in the space left in your bank.');
     } else {
       ctx.error(meta.entityId, 'Your bank is full.');

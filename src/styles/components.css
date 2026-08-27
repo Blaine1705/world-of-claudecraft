@@ -7850,8 +7850,9 @@
      for the half-width pairings, and a desktop bank window resized toward
      its 220px floor (window_resize_core.ts WINDOW_MIN_WIDTH) in a wordy
      locale must wrap rather than clip controls off the edge (the search's
-     96px min-width still binds, so the basis alone can never pay a 26-char
-     deposit label at that width). The short-phone ONE-ROW contract lives in
+     96px min-width still binds, so the basis alone can never pay a 30-char
+     deposit label, the shipped es/es_ES value, at that width). The
+     short-phone ONE-ROW contract lives in
      hud.mobile.css beside the footer regime it belongs to, pinned by
      tests/browser/bank_mobile_chrome.browser.test.ts. */
   #bank-window .bag-search {

@@ -824,7 +824,14 @@ For off-box safety, sync the directory to S3 occasionally:
   deadline-cancel side pool (`woc_db_backend_cancels` counts its use) that opens a
   connection only in the seconds after a transaction wall deadline fires and releases
   it on the driver's idle timeout; count it as one more TRANSIENT connection per realm
-  under load, alongside the boot clients below. That total must stay below the 97
+  under load, alongside the boot clients below, and re-derive the peak with it: at
+  the default of 10 a realm is 13 steady and 14 at cancel peak, so SEVEN realms can
+  peak at 98 against the 97 usable connections and six is the largest count that
+  fits with full peak headroom. The cancel connection is demanded exactly when
+  Postgres is most contended; at `max_connections` the checkout is refused inside
+  its 500ms bound and the cancel is dropped (best-effort by contract, the
+  caller-installed statement timeout stays the backstop), with
+  `woc_db_backend_cancels{measure="failed"}` as the signal. That total must stay below the 97
   usable connections on stock `postgres:16` (`max_connections` 100, 3
   superuser-reserved) with room left for tooling. Eight realms at the default are
   already 104 steady connections and cannot fit. Boot temporarily adds a dedicated
@@ -838,17 +845,20 @@ For off-box safety, sync the directory to S3 occasionally:
   writer, including old binaries and raw SQL, in the inserting transaction and refuses
   the COMMIT that would cross the ceiling. `bank_ledger` PREDATES this release (it has
   been accumulating since 2026-07-06), so the first install of this release seeds over
-  the real production history, never an empty table. The seeding boot warms the table
-  with an unlocked count first, then repeats the exact count under the insert-blocking
-  lock, so the locked window is the WARM scan, not a cold one. Measured on a synthetic
-  ledger at the 10,000,000-row ceiling (roughly 1 GB of heap, dev hardware, PostgreSQL
-  16): the warm parallel count runs in roughly 0.1 to 0.25 seconds; budget a few
-  seconds on the production box, dominated by reading the table once from disk for the
-  warm pass. Deploy the seeding boot with EVERY realm stopped (the standard
-  stop-then-cutover below): a realm left running during the seed stalls its in-flight
-  ledger inserts on the table lock for the locked count's duration, and character
-  saves then die at their 2s `lock_timeout`. Re-seeding after deleting the singleton
-  on a grown ledger pays the same shape and is a maintenance-window operation.
+  the real production history, never an empty table. Know the real blocked window:
+  EVERY boot transaction (steady-state included) holds ACCESS EXCLUSIVE on
+  `bank_ledger` from its first schema fragment to COMMIT (the idempotent ADD COLUMN
+  converges take that lock even as no-ops), which stalls ledger reads AND writes from
+  every other process for the boot transaction's whole duration; the seeding boot
+  extends that one transaction by exactly one exact count. The count is a parallel
+  index-only scan over the primary key (roughly 43 MB of index per 2M rows): measured
+  at the 10,000,000-row ceiling on dev hardware it runs in roughly 0.1 to 0.25
+  seconds warm; budget low seconds cold on the production box. Deploy the seeding
+  boot with EVERY realm stopped (the standard stop-then-cutover below): a realm left
+  running during ANY boot stalls its in-flight ledger inserts and reads on the boot
+  transaction, and character saves then die at their 2s `lock_timeout`. Re-seeding
+  after deleting the singleton on a grown ledger pays the same shape and is a
+  maintenance-window operation.
   Every process sharing `DATABASE_URL` must use
   the same value or boot fails. A first bootstrap that is already over the configured
   value deliberately boots read-capable but refuses every later ledger insert; watch

@@ -5665,10 +5665,30 @@
        than the box that tuned the row, so without the nowrap the row wraps
        and steals a 46px band of grid. Scoped HERE, on the short-phone footer
        regime, never on bare #bank-window: a desktop window resized toward
-       its 220px floor must wrap rather than clip controls off the edge. */
+       its 220px floor must wrap rather than clip controls off the edge.
+       Each selector pair below carries the same deliberate defensive twin as
+       its neighbors in this block: the bare mobile-touch arm already matches
+       when bank-open is present, and the twin keeps the rule alive if the
+       half-width pairing class ever changes how the window mounts. */
     body.mobile-touch #bank-window:has(.bank-footer) .bag-tools,
     body.mobile-touch.bank-open #bank-window:has(.bank-footer) .bag-tools {
       flex-wrap: nowrap;
+    }
+    /* The row's YIELD under nowrap: with the wrap forbidden and the window
+       overflow:hidden, a wordy locale's Deposit-all label (es/es_ES,
+       "Depositar todos los materiales", 30 characters, measured 52px past the
+       row at 740x360 in the browser arm) would otherwise clip off the edge
+       silently. Let the button shrink with an ellipsis instead, the vault
+       chip's own precedent: the full text stays in the DOM, so the
+       accessible name is untruncated, and the search box's 96px floor plus
+       the sort control keep their room. */
+    body.mobile-touch #bank-window:has(.bank-footer) .bank-deposit-all,
+    body.mobile-touch.bank-open #bank-window:has(.bank-footer) .bank-deposit-all {
+      flex: 0 1 auto;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
   }
   /* ---------- mobile deeds (standalone window + tracker) ---------- */

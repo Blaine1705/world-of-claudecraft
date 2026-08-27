@@ -3079,7 +3079,7 @@ export const id_ID: EnTranslations = {
       "withdrawQuantityConfirm": "Tarik",
       "vaultRowWithdrawName": "Withdraw {item}",
       "priceChanged": "The price changed before the purchase completed. Review the refreshed price and confirm again.",
-      "withdrawQuantityAction": "Choose withdrawal quantity for {item}",
+      "withdrawQuantityAction": "Quantity to withdraw: {item}",
       "filterGroupAria": "Saring bank menurut kategori",
       "sortAria": "Urutkan barang bank",
       "searchAria": "Cari barang bank menurut nama",

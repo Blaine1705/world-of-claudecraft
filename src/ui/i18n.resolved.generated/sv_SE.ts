@@ -3079,7 +3079,7 @@ export const sv_SE: EnTranslations = {
       "withdrawQuantityConfirm": "Ta ut",
       "vaultRowWithdrawName": "Withdraw {item}",
       "priceChanged": "The price changed before the purchase completed. Review the refreshed price and confirm again.",
-      "withdrawQuantityAction": "Choose withdrawal quantity for {item}",
+      "withdrawQuantityAction": "Quantity to withdraw: {item}",
       "filterGroupAria": "Filtrera banken efter kategori",
       "sortAria": "Sortera bankföremål",
       "searchAria": "Sök bankföremål efter namn",

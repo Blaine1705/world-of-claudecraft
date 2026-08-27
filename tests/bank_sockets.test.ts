@@ -824,13 +824,13 @@ describe('bankUnsocketBag', () => {
 
 // ---------------------------------------------------------------------------
 describe('two-pool deposits through the real gate', () => {
-  it('a granularity refusal says "full", never the materials line (noFitCause discrimination)', () => {
+  it('partial merge room with zero free slots keeps the pool-honest materials line', () => {
     // An instanced multi-unit stack whose byte-equal bank stack has room for
-    // ONE unit: some units would fit, but the indivisible payload cannot
-    // land whole (moveBetweenContainers noFitCause 'instanced_units').
-    // Materials headroom is ALSO free, which is exactly the shape where the
-    // pool-honest line used to misread granularity as a materials-space
-    // story and tell a non-material depositor "Only materials fit".
+    // ONE unit while the general pool has zero free slots: that is pool
+    // exhaustion (noFitCause 'space'), and with materials headroom free the
+    // truthful refusal for a non-material stays the materials line, exactly
+    // like its fungible sibling below (the two-pool meter shows those free
+    // materials slots on screen).
     const sim = simWithSockets(1);
     const m = meta(sim);
     carry(sim, SATCHEL_8);
@@ -844,8 +844,29 @@ describe('two-pool deposits through the real gate', () => {
     m.inventory[idx] = { itemId: BREAD, count: 3, instance: { signer: 'Ana' } };
     sim.drainEvents();
     sim.bankDeposit(idx);
-    expect(hasErr(sim.drainEvents(), 'Your bank is full.')).toBe(true);
+    expect(hasErr(sim.drainEvents(), 'Only materials fit in the space left in your bank.')).toBe(
+      true,
+    );
     expect(m.bank.inventory.length).toBe(24);
+  });
+
+  it('a true granularity refusal gets its own line, never "full" and never the materials line', () => {
+    // The reachable 'instanced_units' shape at the deposit gate: a
+    // hand-shaped multi-unit charges stack (every sim-built charges slot is
+    // count 1) against a general pool with ONE free slot. One unit would
+    // land; three cannot, and both pool lines would lie (slots are free, and
+    // materials space is irrelevant to the refusal).
+    const sim = simWithSockets(1);
+    const m = meta(sim);
+    for (let i = 0; i < 23; i++) m.bank.inventory.push(fullStack(BREAD));
+    const idx = carry(sim, BREAD, 1);
+    m.inventory[idx] = { itemId: BREAD, count: 3, instance: { charges: { heal: 2 } } };
+    sim.drainEvents();
+    sim.bankDeposit(idx);
+    expect(
+      hasErr(sim.drainEvents(), 'That stack cannot be split to fit the space left in your bank.'),
+    ).toBe(true);
+    expect(m.bank.inventory.length).toBe(23);
   });
 
   it('a non-material is refused while only materials headroom is free; a material lands', () => {

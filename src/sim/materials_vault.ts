@@ -679,16 +679,6 @@ export function emitVaultCraftConsume(
  *  rows were copied in. The one place order decides anything is the removal
  *  walk, and that takes its order from an explicit id list
  *  (professions/material_grades.ts materialGradeIds), never from a record. */
-/** Gate-only probe for the cvault wire signature: the SAME predicate
- *  craftVaultStockFor answers null through, without paying its projection
- *  clone. The server probes this every snapshot beside vaultWireRevFor, so
- *  the pair (rev, blocked) fully determines whether the projection could
- *  have changed (every stock mutation bumps the rev; the gate is a pure
- *  function of position and membership). */
-export function craftVaultDrawBlockedFor(ctx: SimContext, pid: number): boolean {
-  return vaultDrawBlocked(ctx, pid);
-}
-
 export function craftVaultStockFor(ctx: SimContext, pid: number): Record<string, number> | null {
   const stock = vaultDrawStock(ctx, pid);
   if (!stock) return null;
@@ -698,6 +688,17 @@ export function craftVaultStockFor(ctx: SimContext, pid: number): Record<string,
     if (drawable > 0) rows.push([itemId, drawable]);
   }
   return Object.fromEntries(rows);
+}
+
+/** Gate-only probe for the cvault wire signature: the GATE HALF of the
+ *  predicate craftVaultStockFor answers null through (blocked implies null;
+ *  the meta-less `?? null` arm above is the defensive other half), without
+ *  paying its projection clone. The server probes this every snapshot beside
+ *  vaultWireRevFor, so the pair (rev, blocked) fully determines whether the
+ *  projection could have changed (every stock mutation bumps the rev; the
+ *  gate is a pure function of position and membership). */
+export function craftVaultDrawBlockedFor(ctx: SimContext, pid: number): boolean {
+  return vaultDrawBlocked(ctx, pid);
 }
 
 /** Buy the next vault rung for exact copper, non-refundable: rung 0 unlocks the

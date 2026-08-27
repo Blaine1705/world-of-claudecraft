@@ -3079,7 +3079,7 @@ export const zh_CN: EnTranslations = {
       "withdrawQuantityConfirm": "取出",
       "vaultRowWithdrawName": "取出 {item}",
       "priceChanged": "购买完成前价格已发生变化。请查看刷新后的价格并再次确认。",
-      "withdrawQuantityAction": "选择 {item} 的取出数量",
+      "withdrawQuantityAction": "选择 {item} 要取出的数量",
       "filterGroupAria": "按类别筛选银行",
       "sortAria": "排序银行物品",
       "searchAria": "按名称搜索银行物品",

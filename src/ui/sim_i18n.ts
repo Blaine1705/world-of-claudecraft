@@ -47,6 +47,10 @@ const baseEnTable = {
   // non-material deposit refused while only materials-only satchel capacity
   // remains, so "full" would contradict the two-pool meter on screen.
   'error.bankOnlyMaterialsSpace': 'Only materials fit in the space left in your bank.',
+  // The granularity no_fit refusal (src/sim/bank.ts, MoveResult.noFitCause
+  // 'instanced_units'): free slots exist but the indivisible payload cannot
+  // land whole, so both pool lines would lie.
+  'error.bankStackIndivisible': 'That stack cannot be split to fit the space left in your bank.',
   'error.bankCannotAfford': 'You cannot afford that bank expansion.',
   'error.bankMaxSlots': 'Your bank cannot be expanded further.',
   'error.bankTooFar': 'You are too far from the banker.',
@@ -1385,6 +1389,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankQuestItem': 'No puedes guardar objetos de misión en el banco.',
     'error.bankFull': 'Tu banco está lleno.',
     'error.bankOnlyMaterialsSpace': 'En el espacio que queda en tu banco solo caben materiales.',
+    'error.bankStackIndivisible':
+      'Ese montón no se puede dividir para caber en el espacio que queda en tu banco.',
     'error.bankCannotAfford': 'No puedes permitirte esa ampliación del banco.',
     'error.bankMaxSlots': 'Tu banco no se puede ampliar más.',
     'error.bankTooFar': 'Estás demasiado lejos del banquero.',
@@ -1842,6 +1848,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankQuestItem': 'No puedes guardar objetos de misión en el banco.',
     'error.bankFull': 'Tu banco está lleno.',
     'error.bankOnlyMaterialsSpace': 'En el espacio que queda en tu banco solo caben materiales.',
+    'error.bankStackIndivisible':
+      'Ese montón no se puede dividir para caber en el espacio que queda en tu banco.',
     'error.bankCannotAfford': 'No puedes permitirte esa ampliación del banco.',
     'error.bankMaxSlots': 'Tu banco no se puede ampliar más.',
     'error.bankTooFar': 'Estás demasiado lejos del banquero.',
@@ -2313,6 +2321,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankFull': 'Votre banque est pleine.',
     'error.bankOnlyMaterialsSpace':
       "Seuls des matériaux tiennent dans l'espace restant de votre banque.",
+    'error.bankStackIndivisible':
+      "Cette pile ne peut pas être divisée pour tenir dans l'espace restant de votre banque.",
     'error.bankCannotAfford': "Vous n'avez pas les moyens de payer cette extension de banque.",
     'error.bankMaxSlots': 'Votre banque ne peut plus être agrandie.',
     'error.bankTooFar': 'Vous êtes trop loin du banquier.',
@@ -2784,6 +2794,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankFull': 'Votre banque est pleine.',
     'error.bankOnlyMaterialsSpace':
       "Seuls des matériaux tiennent dans l'espace restant de votre banque.",
+    'error.bankStackIndivisible':
+      "Cette pile ne peut pas être divisée pour tenir dans l'espace restant de votre banque.",
     'error.bankCannotAfford': "Vous n'avez pas les moyens de payer cette extension de banque.",
     'error.bankMaxSlots': 'Votre banque ne peut plus être agrandie.',
     'error.bankTooFar': 'Vous êtes trop loin du banquier.',
@@ -3448,6 +3460,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankFull': 'La tua banca è piena.',
     'error.bankOnlyMaterialsSpace':
       "Nello spazio rimasto nella tua banca c'è posto solo per i materiali.",
+    'error.bankStackIndivisible':
+      'Quella pila non può essere divisa per entrare nello spazio rimasto nella tua banca.',
     'error.bankCannotAfford': "Non puoi permetterti quell'ampliamento della banca.",
     'error.bankMaxSlots': 'La tua banca non può essere ampliata oltre.',
     'error.bankTooFar': 'Sei troppo lontano dal banchiere.',
@@ -3914,6 +3928,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankQuestItem': 'Ihr könnt keine Questgegenstände in der Bank lagern.',
     'error.bankFull': 'Eure Bank ist voll.',
     'error.bankOnlyMaterialsSpace': 'In Eurer Bank ist nur noch Platz für Materialien.',
+    'error.bankStackIndivisible':
+      'Dieser Stapel kann nicht geteilt werden, um in den restlichen Platz Eurer Bank zu passen.',
     'error.bankCannotAfford': 'Ihr könnt Euch diese Bankerweiterung nicht leisten.',
     'error.bankMaxSlots': 'Eure Bank kann nicht weiter erweitert werden.',
     'error.bankTooFar': 'Ihr seid zu weit vom Bankier entfernt.',
@@ -4318,6 +4334,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankWithdrawRefused': '该物品无法从公会银行取出。',
     'error.bankFull': '你的银行已满。',
     'error.bankOnlyMaterialsSpace': '你的银行剩余空间只能存放材料。',
+    'error.bankStackIndivisible': '该物品堆无法拆分，放不进你银行的剩余空间。',
     'error.bankCannotAfford': '你无力支付该银行扩展费用。',
     'error.bankMaxSlots': '你的银行无法再扩展了。',
     'error.bankTooFar': '你距离银行家太远。',
@@ -4765,6 +4782,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankWithdrawRefused': '該物品無法從公會銀行取出。',
     'error.bankFull': '你的銀行已滿。',
     'error.bankOnlyMaterialsSpace': '你的銀行剩餘空間只能存放材料。',
+    'error.bankStackIndivisible': '該物品堆無法拆分，放不進你銀行的剩餘空間。',
     'error.bankCannotAfford': '你無力支付該銀行擴充費用。',
     'error.bankMaxSlots': '你的銀行無法再擴充了。',
     'error.bankTooFar': '你距離銀行家太遠。',
@@ -5219,6 +5237,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankWithdrawRefused': '해당 아이템은 길드 은행에서 꺼낼 수 없습니다.',
     'error.bankFull': '은행이 가득 찼습니다.',
     'error.bankOnlyMaterialsSpace': '은행에 남은 공간에는 재료만 보관할 수 있습니다.',
+    'error.bankStackIndivisible': '해당 묶음은 나눌 수 없어 은행에 남은 공간에 넣을 수 없습니다.',
     'error.bankCannotAfford': '그 은행 확장을 구매할 돈이 부족합니다.',
     'error.bankMaxSlots': '은행을 더 이상 확장할 수 없습니다.',
     'error.bankTooFar': '은행원과 너무 멀리 떨어져 있습니다.',
@@ -5684,6 +5703,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankWithdrawRefused': 'そのアイテムはギルド銀行から引き出せません。',
     'error.bankFull': '銀行がいっぱいです。',
     'error.bankOnlyMaterialsSpace': '銀行の残りのスペースには素材しか入りません。',
+    'error.bankStackIndivisible':
+      'そのスタックは分割できないため、銀行の残りのスペースに収まりません。',
     'error.bankCannotAfford': 'その銀行拡張を購入するにはお金が足りません。',
     'error.bankMaxSlots': '銀行をこれ以上拡張できません。',
     'error.bankTooFar': '銀行員から遠すぎます。',
@@ -6189,6 +6210,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.bankQuestItem': 'Você não pode guardar itens de missão no banco.',
     'error.bankFull': 'Seu banco está cheio.',
     'error.bankOnlyMaterialsSpace': 'No espaço restante do seu banco só cabem materiais.',
+    'error.bankStackIndivisible':
+      'Essa pilha não pode ser dividida para caber no espaço restante do seu banco.',
     'error.bankCannotAfford': 'Você não pode pagar por essa expansão do banco.',
     'error.bankMaxSlots': 'Seu banco não pode ser expandido além disso.',
     'error.bankTooFar': 'Você está longe demais do banqueiro.',
@@ -6608,6 +6631,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.guildBankWithdrawRefused': 'Этот предмет нельзя забрать из банка гильдии.',
     'error.bankFull': 'Ваш банк полон.',
     'error.bankOnlyMaterialsSpace': 'В вашем банке осталось место только для материалов.',
+    'error.bankStackIndivisible':
+      'Эту стопку нельзя разделить, чтобы она поместилась в оставшееся место вашего банка.',
     'error.bankCannotAfford': 'У вас недостаточно денег на это расширение банка.',
     'error.bankMaxSlots': 'Ваш банк больше нельзя расширить.',
     'error.bankTooFar': 'Вы слишком далеко от банкира.',

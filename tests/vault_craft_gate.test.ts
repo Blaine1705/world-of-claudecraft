@@ -38,7 +38,7 @@ import {
   RIFT_X_MIN,
 } from '../src/sim/data';
 import { enterDungeon, instanceInfoAt } from '../src/sim/instances/dungeons';
-import { craftVaultStockFor } from '../src/sim/materials_vault';
+import { craftVaultDrawBlockedFor, craftVaultStockFor } from '../src/sim/materials_vault';
 import { Sim } from '../src/sim/sim';
 import type { DungeonDef, Entity, Vec3 } from '../src/sim/types';
 import { vaultDrawBlocked, vaultDrawStock } from '../src/sim/vault_craft_gate';
@@ -362,6 +362,22 @@ describe('vaultDrawBlocked: the footprint arms decide on their own', () => {
     expect(vaultDrawBlocked(sim.ctx, pid)).toBe(true);
   });
 
+  it('a corrupt (NaN) position never binds to its party live delve run', () => {
+    // The regression class the loop's negated continues exist for: NaN fails
+    // BOTH `<= 120` and `> 120`, so a band test written with the bare `>`
+    // sense would fall through and report the corrupt position as inside the
+    // run from anywhere. The membership read must match nothing, and the
+    // gate's own non-finite guard must still refuse ahead of it.
+    const sim = makeSim();
+    const pid = sim.playerId;
+    placeInDelve(sim, pid);
+    const p = entityOf(sim, pid);
+    p.pos.x = Number.NaN;
+    p.pos.z = Number.NaN;
+    expect(sim.delveRunForPlayer(pid)).toBeNull();
+    expect(vaultDrawBlocked(sim.ctx, pid)).toBe(true);
+  });
+
   it('refuses inside a delve run whose box sits west of the threshold', () => {
     // The delve arm's own liveness case. A DelveRun carries its origin as
     // stored state, so the run can be moved without touching content.
@@ -458,6 +474,38 @@ describe('vaultDrawStock and craftVaultStockFor', () => {
 
     expect(vaultDrawStock(sim.ctx, pid)).toBeNull();
     expect(craftVaultStockFor(sim.ctx, pid)).toBeNull();
+  });
+
+  it('craftVaultDrawBlockedFor agrees with the projection over the real gate arms', () => {
+    // The cvault wire signature stands the gate-only probe in for the
+    // projection every snapshot (server/vault_wire.ts): blocked must imply a
+    // null projection and an open-world stocked player must read unblocked
+    // with a non-null projection, over the REAL arms rather than a fake. A
+    // divergence here is exactly the class the hand-written wire fakes
+    // cannot catch.
+    const sim = makeSim();
+    const pid = sim.playerId;
+    stockOf(sim, pid).copper_ore = 5;
+    placeInOpenWorld(sim, pid);
+    expect(craftVaultDrawBlockedFor(sim.ctx, pid)).toBe(false);
+    expect(craftVaultStockFor(sim.ctx, pid)).toEqual({ copper_ore: 5 });
+
+    placeInDungeon(sim, pid);
+    expect(craftVaultDrawBlockedFor(sim.ctx, pid)).toBe(true);
+    expect(craftVaultStockFor(sim.ctx, pid)).toBeNull();
+
+    // A membership arm on a FRESH world (a delve cannot be entered from
+    // inside the dungeon claim above).
+    const delveSim = makeSim();
+    const delvePid = delveSim.playerId;
+    stockOf(delveSim, delvePid).copper_ore = 5;
+    placeInDelve(delveSim, delvePid);
+    expect(craftVaultDrawBlockedFor(delveSim.ctx, delvePid)).toBe(true);
+    expect(craftVaultStockFor(delveSim.ctx, delvePid)).toBeNull();
+
+    // An unresolvable pid is blocked (the fail-closed arm) and null.
+    expect(craftVaultDrawBlockedFor(sim.ctx, 999_999)).toBe(true);
+    expect(craftVaultStockFor(sim.ctx, 999_999)).toBeNull();
   });
 
   it('clones only the drawable rows, filtering every degenerate count', () => {

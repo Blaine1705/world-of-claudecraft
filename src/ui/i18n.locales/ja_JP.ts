@@ -9624,7 +9624,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.priceChanged': '購入が完了する前に価格が変更されました。更新後の価格を確認し、もう一度確定してください。',
   'hudChrome.bank.withdrawQuantityInput': '引き出す数量',
   'hudChrome.bank.withdrawQuantityConfirm': '引き出す',
-  'hudChrome.bank.withdrawQuantityAction': '引き出す{item}の数量を選択',
+  'hudChrome.bank.withdrawQuantityAction': '{item}の引き出す数量を選択',
   'hudChrome.bank.filterGroupAria': '銀行をカテゴリーで絞り込む',
   'hudChrome.bank.sortAria': '銀行のアイテムを並べ替える',
   'hudChrome.bank.searchAria': '名前で銀行のアイテムを検索',

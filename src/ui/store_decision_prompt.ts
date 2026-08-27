@@ -24,15 +24,19 @@ export const STORE_RESULT_EXPIRY_MS = 60_000;
  *  handler. A Set of WEAK references, insertion-ordered: construction
  *  registers, the returned handle unregisters, and holding the panel weakly
  *  means this module-global registry can never retain a torn-down owner's
- *  whole object graph (a second Hud construction on the relogin or graphics
- *  rebuild path would otherwise pin the previous HUD forever through the one
- *  strong edge here). A plain WeakSet cannot serve: the closeAll rung below
+ *  whole object graph (startGame has two call sites and `hud` is
+ *  function-local to it, so a second Hud construction is plausible even
+ *  though today's logout paths reload the page; weakness makes the question
+ *  moot). A plain WeakSet cannot serve: the closeAll rung below
  *  must WALK the stack topmost-first, and a WeakSet is not iterable. Dead
  *  refs prune opportunistically during that walk. One instance exists in
  *  production (the Store surface runtime's). */
 const resultPanels = new Set<WeakRef<StoreDecisionPrompts>>();
 
 function registerResultPanel(panel: StoreDecisionPrompts): () => void {
+  // Unlike the plain Set this replaced, a Set of refs does not dedupe a
+  // double registration of one panel; only the constructor registers, so
+  // that stays unreachable today.
   const ref = new WeakRef(panel);
   resultPanels.add(ref);
   return () => {
@@ -58,6 +62,8 @@ export function clearOpenStoreResult(): boolean {
   for (let i = refs.length - 1; i >= 0; i--) {
     const panel = refs[i].deref();
     if (!panel) {
+      // Intentionally uncovered by tests: exercising this prune needs a real
+      // garbage collection, which no deterministic arm can force.
       resultPanels.delete(refs[i]);
       continue;
     }

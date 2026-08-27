@@ -245,7 +245,8 @@ remove the declaration AND its binding in the same change, then re-run the parit
 - The vault consumption admission (`SimConfig.vaultConsumptionAdmission`) is a HOST
   INPUT the determinism contract is parameterized over, not part of the seeded world: a
   server-side admission refusal early-returns in `resolveCraftForRecipe` BEFORE that
-  path's two output-side rng draws, so a realm whose admission refused draws a different
+  path's output-side rng draw (two draws for a Jack-attuned crafter), so a realm whose
+  admission refused draws a different
   stream tail than an offline replay of the same inputs. Offline and headless hosts wire
   the inert admission (never refuses), so no live parity gate sees the divergence; treat
   "same seed, same world" as holding PER admission behavior, and if that ever stops

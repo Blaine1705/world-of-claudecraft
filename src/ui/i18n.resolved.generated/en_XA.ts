@@ -3079,7 +3079,7 @@ export const en_XA: EnTranslations = {
       "withdrawQuantityConfirm": "[Ŵíţĥðŕáŵ]",
       "vaultRowWithdrawName": "[Ŵíţĥðŕáŵ {item}]",
       "priceChanged": "[Ţĥé þŕíçé çĥáñĝéð ƀéƒóŕé ţĥé þúŕçĥášé çóɱþļéţéð. Ŕéʋíéŵ ţĥé ŕéƒŕéšĥéð þŕíçé áñð çóñƒíŕɱ áĝáíñ.]",
-      "withdrawQuantityAction": "[Çĥóóšé ŵíţĥðŕáŵáļ ɋúáñţíţý ƒóŕ {item}]",
+      "withdrawQuantityAction": "[Ɋúáñţíţý ţó ŵíţĥðŕáŵ: {item}]",
       "filterGroupAria": "[Ƒíļţéŕ ƀáñķ ƀý çáţéĝóŕý]",
       "sortAria": "[Šóŕţ ƀáñķ íţéɱš]",
       "searchAria": "[Šéáŕçĥ ƀáñķ íţéɱš ƀý ñáɱé]",

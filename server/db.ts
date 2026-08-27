@@ -1286,10 +1286,17 @@ export async function ensureSchema(): Promise<void> {
   const client = new Client({ connectionString: DATABASE_URL });
   // The schema fragments report through RAISE NOTICE (the storage-purchase
   // refused-row sweep names what it removed); node-postgres discards notices
-  // that no listener consumes, so forward them to the boot log. The typeof
+  // that no listener consumes, so forward them to the boot log. FILTERED:
+  // the ~400 idempotent IF NOT EXISTS statements each emit an
+  // already-exists-skipping NOTICE on every steady-state boot (codes 42P07
+  // duplicate_table, 42701 duplicate_column, 42P06 duplicate_schema), which
+  // would bury the one report this forward exists to surface. The typeof
   // guard tolerates minimal test fakes, the pool.on idiom above.
   if (typeof client.on === 'function') {
-    client.on('notice', (notice) => console.warn(`[schema] ${notice.message}`));
+    client.on('notice', (notice) => {
+      if (notice.code === '42P07' || notice.code === '42701' || notice.code === '42P06') return;
+      console.warn(`[schema] ${notice.message}`);
+    });
   }
   try {
     // Inside the try so the finally's end() always runs, even on a connect

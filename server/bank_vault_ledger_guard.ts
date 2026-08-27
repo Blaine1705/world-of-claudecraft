@@ -163,6 +163,13 @@ export interface BankVaultLedgerGuardReservation {
 
 interface RealmReservation {
   readonly maxRows: number;
+  /** What the floor-clamped debit actually removed (at most maxRows). The
+   *  credit paths return THIS, never the nominal reservation: while the
+   *  bucket sits at its floor a debit removes less than maxRows, and
+   *  crediting the nominal amount back would mint tokens on every settle and
+   *  refund, climbing the bucket out of overload faster than the refill and
+   *  under-counting the breaches the telemetry exists to surface. */
+  readonly debited: number;
   settled: boolean;
 }
 
@@ -310,9 +317,11 @@ function debitRealmRows(
   // large event must depress it by at most a burst rather than driving it far
   // negative and pinning the breach signal for hours, which would destroy the
   // rate the conversion exists to report. (The matching refill clamps only
-  // the ceiling.)
-  state.rowTokens = Math.max(state.rowTokens - maxRows, -BANK_VAULT_LEDGER_REALM_ROW_BURST);
-  return { maxRows, settled: false };
+  // the ceiling.) The reservation records what the clamp actually removed so
+  // the credit paths cannot over-credit past it.
+  const beforeDebit = state.rowTokens;
+  state.rowTokens = Math.max(beforeDebit - maxRows, -BANK_VAULT_LEDGER_REALM_ROW_BURST);
+  return { maxRows, debited: beforeDebit - state.rowTokens, settled: false };
 }
 
 /** Settle an attempted command: unused rows refund, its command token does not. */
@@ -352,9 +361,11 @@ function settleRealmRows(
   if (!Number.isSafeInteger(actualRows) || actualRows < 0 || actualRows > reservation.maxRows) {
     throw new RangeError('bank-vault realm actual rows exceed the reserved worst case');
   }
+  // Unused rows refund against what was ACTUALLY debited (the clamp may have
+  // removed less than maxRows), so a settle at the floor can never mint.
   state.rowTokens = Math.min(
     BANK_VAULT_LEDGER_REALM_ROW_BURST,
-    state.rowTokens + reservation.maxRows - actualRows,
+    state.rowTokens + Math.max(0, reservation.debited - actualRows),
   );
   reservation.settled = true;
 }
@@ -364,9 +375,10 @@ function refundRealmRows(
   reservation: RealmReservation,
 ): void {
   if (reservation.settled) throw new Error('bank-vault realm reservation already settled');
+  // A full refund restores exactly what the (possibly clamped) debit took.
   state.rowTokens = Math.min(
     BANK_VAULT_LEDGER_REALM_ROW_BURST,
-    state.rowTokens + reservation.maxRows,
+    state.rowTokens + reservation.debited,
   );
   reservation.settled = true;
 }

@@ -3079,7 +3079,7 @@ export const en: EnTranslations = {
       "withdrawQuantityConfirm": "Withdraw",
       "vaultRowWithdrawName": "Withdraw {item}",
       "priceChanged": "The price changed before the purchase completed. Review the refreshed price and confirm again.",
-      "withdrawQuantityAction": "Choose withdrawal quantity for {item}",
+      "withdrawQuantityAction": "Quantity to withdraw: {item}",
       "filterGroupAria": "Filter bank by category",
       "sortAria": "Sort bank items",
       "searchAria": "Search bank items by name",

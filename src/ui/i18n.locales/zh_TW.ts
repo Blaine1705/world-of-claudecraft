@@ -9177,7 +9177,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.priceChanged': '購買完成前價格已變更。請查看刷新後的價格並再次確認。',
   'hudChrome.bank.withdrawQuantityInput': '要取出的數量',
   'hudChrome.bank.withdrawQuantityConfirm': '取出',
-  'hudChrome.bank.withdrawQuantityAction': '選擇 {item} 的取出數量',
+  'hudChrome.bank.withdrawQuantityAction': '選擇 {item} 要取出的數量',
   'hudChrome.bank.filterGroupAria': '依類別篩選銀行',
   'hudChrome.bank.sortAria': '排序銀行物品',
   'hudChrome.bank.searchAria': '依名稱搜尋銀行物品',

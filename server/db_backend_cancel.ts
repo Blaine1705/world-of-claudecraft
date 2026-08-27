@@ -23,24 +23,32 @@ export const DB_CANCEL_POOL_CONNECT_TIMEOUT_MS = 500;
 export const DB_CANCEL_STATEMENT_TIMEOUT_MS = 750;
 export const DB_CANCEL_QUERY_TIMEOUT_MS = 1_000;
 
-let cancelPool: Pool | null = null;
+// Memoized as the IN-FLIGHT promise, never the resolved pool: deadline
+// expiries cluster at exactly the saturation moment that produces them, and
+// a resolved-value memo would let two same-tick first cancels both pass the
+// null check across the dynamic-import await and construct two pools, the
+// second orphaning the first outside closeBackendCancelPool's reach.
+let cancelPoolPromise: Promise<Pool> | null = null;
 
-async function ensureCancelPool(): Promise<Pool> {
-  if (cancelPool) return cancelPool;
-  const { DATABASE_URL } = await import('./db');
-  cancelPool = new Pool({
-    connectionString: DATABASE_URL,
-    max: 1,
-    connectionTimeoutMillis: DB_CANCEL_POOL_CONNECT_TIMEOUT_MS,
-    statement_timeout: DB_CANCEL_STATEMENT_TIMEOUT_MS,
-    query_timeout: DB_CANCEL_QUERY_TIMEOUT_MS,
-  });
-  if (typeof cancelPool.on === 'function') {
-    cancelPool.on('error', (err) => {
-      console.error('pg cancel pool: idle client error (client discarded)', err);
+function ensureCancelPool(): Promise<Pool> {
+  if (cancelPoolPromise) return cancelPoolPromise;
+  cancelPoolPromise = (async () => {
+    const { DATABASE_URL } = await import('./db');
+    const pool = new Pool({
+      connectionString: DATABASE_URL,
+      max: 1,
+      connectionTimeoutMillis: DB_CANCEL_POOL_CONNECT_TIMEOUT_MS,
+      statement_timeout: DB_CANCEL_STATEMENT_TIMEOUT_MS,
+      query_timeout: DB_CANCEL_QUERY_TIMEOUT_MS,
     });
-  }
-  return cancelPool;
+    if (typeof pool.on === 'function') {
+      pool.on('error', (err) => {
+        console.error('pg cancel pool: idle client error (client discarded)', err);
+      });
+    }
+    return pool;
+  })();
+  return cancelPoolPromise;
 }
 
 let backendCancelRequestCount = 0;
@@ -65,5 +73,5 @@ export function getBackendCancelCounts(): { requested: number; failed: number } 
 
 /** Shutdown teardown for the cancel side pool (main.ts, beside pool.end()). */
 export async function closeBackendCancelPool(): Promise<void> {
-  if (cancelPool) await cancelPool.end();
+  if (cancelPoolPromise) await (await cancelPoolPromise).end();
 }

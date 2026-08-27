@@ -58,6 +58,7 @@ const KNOWN_CODES = [
   'body.too_large',
   'body.unsupported_media_type',
   'character.already_in_world',
+  'character.delete_busy',
   'character.delete_confirm',
   'character.storage_purchase_open',
   'character.invalid_appearance',

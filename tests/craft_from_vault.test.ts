@@ -1554,7 +1554,8 @@ describe('apply-enchant capacity: vault-sourced reagents free NO room', () => {
 // PR #3670 hot-path finding: the craft gate's geometry fast path must decide
 // BEFORE the two pool scans (instanceInfoAt walks every instance slot;
 // riftInstanceAtPos walks the rift pool), so the common open-world evaluation
-// (4 Hz per connected player through the cvault key) costs three membership
+// (probed EVERY snapshot per connected player as the cvault wire signature's
+// gate half) costs three membership
 // probes plus one comparison. Hand-rolled trap ctx: the pool properties THROW
 // on access, so a regression that re-runs a scan for a west-side position
 // fails loudly rather than silently re-paying the walk.

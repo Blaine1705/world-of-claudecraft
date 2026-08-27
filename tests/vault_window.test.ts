@@ -428,16 +428,22 @@ describe('the stocked pane', () => {
     expect(full).not.toBeNull();
     const accessibleLabels = partials.map((partial) => partial.getAttribute('aria-label'));
     expect(accessibleLabels).toEqual([
-      'Choose withdrawal quantity for Copper Ore',
-      'Choose withdrawal quantity for Iron Ore',
+      'Quantity to withdraw: Copper Ore',
+      'Quantity to withdraw: Iron Ore',
     ]);
     expect(new Set(accessibleLabels)).toHaveLength(partials.length);
     expect(partials[0].getAttribute('aria-label')).not.toBe(full?.getAttribute('aria-label'));
     // The hover affordance is the SHARED tooltip (deps.attachTooltip, every
     // sibling control's rule), never a native title beside it.
     expect(partials.map((partial) => partial.title)).toEqual(['', '']);
-    expect(h.tooltips.get(partials[0])?.()).toContain('Choose withdrawal quantity for Copper Ore');
-    expect(h.tooltips.get(partials[1])?.()).toContain('Choose withdrawal quantity for Iron Ore');
+    expect(h.tooltips.get(partials[0])?.()).toContain('Quantity to withdraw: Copper Ore');
+    expect(h.tooltips.get(partials[1])?.()).toContain('Quantity to withdraw: Iron Ore');
+    // The tooltip's SECOND line repeats the chip's own visible label: the
+    // 72px chip ellipsis-caps that text, and neither the aria-label nor the
+    // action line above repeats its words, so the tooltip is the one place
+    // the elided text is recoverable.
+    expect(h.tooltips.get(partials[0])?.()).toContain('Quantity to withdraw');
+    expect(h.tooltips.get(partials[1])?.()).toContain('Quantity to withdraw');
     for (const partial of partials) {
       expect(partial.textContent).toContain('Quantity to withdraw');
     }

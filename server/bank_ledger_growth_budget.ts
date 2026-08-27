@@ -92,8 +92,12 @@ CREATE TABLE IF NOT EXISTS "__woc_bank_ledger_growth_schema__".bank_ledger_growt
 -- text: PostgreSQL is free to render '0' as '0.0' (and an operator is free
 -- to write either), and a text-match probe would re-fire the ALTER on every
 -- boot of every realm on such a rendering, the exact churn it exists to
--- avoid. A genuinely drifted or hand-edited VALUE converges once and is then
--- skipped on every later boot (idempotent).
+-- avoid. The numeric cast sits inside CASE, whose evaluation order IS
+-- defined, so an unrelated non-numeric reloption an operator set by hand
+-- (autovacuum_enabled=false, say) can never reach the cast and abort boot;
+-- a bare AND leaves subexpression order to the planner. A genuinely drifted
+-- or hand-edited VALUE converges once and is then skipped on every later
+-- boot (idempotent).
 DO $bank_ledger_growth_reloptions_converge$
 BEGIN
   IF NOT EXISTS (
@@ -102,10 +106,13 @@ BEGIN
      WHERE c.oid = '${pendingRegclass}'::pg_catalog.regclass
        AND (SELECT pg_catalog.count(*)
               FROM pg_catalog.pg_options_to_table(c.reloptions) o
-             WHERE (o.option_name = 'autovacuum_vacuum_scale_factor'
-                    AND o.option_value::pg_catalog.numeric = 0)
-                OR (o.option_name = 'autovacuum_vacuum_threshold'
-                    AND o.option_value::pg_catalog.numeric = 100)) = 2
+             WHERE CASE o.option_name
+                     WHEN 'autovacuum_vacuum_scale_factor'
+                       THEN o.option_value::pg_catalog.numeric = 0
+                     WHEN 'autovacuum_vacuum_threshold'
+                       THEN o.option_value::pg_catalog.numeric = 100
+                     ELSE FALSE
+                   END) = 2
   ) THEN
     ALTER TABLE "__woc_bank_ledger_growth_schema__".bank_ledger_growth_pending
       SET (autovacuum_vacuum_scale_factor = 0, autovacuum_vacuum_threshold = 100);
@@ -116,10 +123,13 @@ BEGIN
      WHERE c.oid = '${budgetRegclass}'::pg_catalog.regclass
        AND (SELECT pg_catalog.count(*)
               FROM pg_catalog.pg_options_to_table(c.reloptions) o
-             WHERE (o.option_name = 'autovacuum_vacuum_scale_factor'
-                    AND o.option_value::pg_catalog.numeric = 0)
-                OR (o.option_name = 'autovacuum_vacuum_threshold'
-                    AND o.option_value::pg_catalog.numeric = 1000)) = 2
+             WHERE CASE o.option_name
+                     WHEN 'autovacuum_vacuum_scale_factor'
+                       THEN o.option_value::pg_catalog.numeric = 0
+                     WHEN 'autovacuum_vacuum_threshold'
+                       THEN o.option_value::pg_catalog.numeric = 1000
+                     ELSE FALSE
+                   END) = 2
   ) THEN
     ALTER TABLE "__woc_bank_ledger_growth_schema__".bank_ledger_growth_budget
       SET (autovacuum_vacuum_scale_factor = 0, autovacuum_vacuum_threshold = 1000);
@@ -310,24 +320,26 @@ BEGIN
   IF NOT budget_initialized THEN
     -- bank_ledger PREDATES this budget (it has shipped since bd51a6986c,
     -- 2026-07-06), so the first production install seeds over weeks of real
-    -- ledger history, never an empty table. The exact COUNT(*) must run under
-    -- the insert-blocking lock, so warm the ledger's heap and visibility-map
-    -- pages with an identical UNLOCKED count first (plain MVCC read, blocks
-    -- nothing); the locked count below then re-reads warm cache and the
-    -- insert-blocked window shrinks to the warm-scan time. Measured at the
-    -- 10M-row ceiling: roughly 1 GB of heap, a warm parallel count in the
-    -- low hundreds of milliseconds (DEPLOY.md, the growth-limit section,
-    -- carries the numbers). The seeding deploy still requires every realm
-    -- stopped: a realm left running stalls its in-flight ledger inserts on
-    -- this lock for the locked count's duration, and character saves die at
-    -- their 2s lock_timeout.
-    PERFORM pg_catalog.count(*)
-      FROM "__woc_bank_ledger_growth_schema__".bank_ledger;
+    -- ledger history, never an empty table. Be precise about the blocked
+    -- window: the boot transaction already holds ACCESS EXCLUSIVE on
+    -- bank_ledger long before this fragment runs (the core SCHEMA's ADD
+    -- COLUMN IF NOT EXISTS converges take it even as no-ops and hold it to
+    -- COMMIT), so ledger reads AND writes from every other process stall
+    -- for the WHOLE boot transaction on every boot, and this seed extends
+    -- that one boot by exactly one count pass. The count is a parallel
+    -- index-only scan over the PK (measured: ~43 MB of index per 2M rows,
+    -- tens of milliseconds warm, low seconds cold at the 10M ceiling on
+    -- modest hardware; DEPLOY.md, the growth-limit section, carries the
+    -- numbers). A warm-up pre-count was tried and REVERTED: inside this
+    -- transaction there is no unlocked place to put it, so it only doubled
+    -- the pass (review round three, measured 1.85x). The seeding deploy
+    -- still requires every realm stopped, the standard stop-then-cutover.
     -- CREATE TRIGGER holds this lock too, but spelling it before COUNT makes
     -- the mixed-release bootstrap boundary explicit and independent of DDL
-    -- lock implementation details. A RE-seed (the singleton deleted over a
-    -- grown ledger) pays the same shape and stays a maintenance-window
-    -- operation.
+    -- lock implementation details (inside THIS transaction it is a formality
+    -- over the stronger lock already held). A RE-seed (the singleton deleted
+    -- over a grown ledger) pays the same shape and stays a
+    -- maintenance-window operation.
     LOCK TABLE "__woc_bank_ledger_growth_schema__".bank_ledger IN SHARE ROW EXCLUSIVE MODE;
     DELETE FROM "__woc_bank_ledger_growth_schema__".bank_ledger_growth_pending;
 

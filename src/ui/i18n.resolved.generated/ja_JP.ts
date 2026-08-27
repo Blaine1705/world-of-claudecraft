@@ -3079,7 +3079,7 @@ export const ja_JP: EnTranslations = {
       "withdrawQuantityConfirm": "引き出す",
       "vaultRowWithdrawName": "{item}を引き出す",
       "priceChanged": "購入が完了する前に価格が変更されました。更新後の価格を確認し、もう一度確定してください。",
-      "withdrawQuantityAction": "引き出す{item}の数量を選択",
+      "withdrawQuantityAction": "{item}の引き出す数量を選択",
       "filterGroupAria": "銀行をカテゴリーで絞り込む",
       "sortAria": "銀行のアイテムを並べ替える",
       "searchAria": "名前で銀行のアイテムを検索",

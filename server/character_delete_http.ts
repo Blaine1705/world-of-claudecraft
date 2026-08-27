@@ -1,7 +1,4 @@
-import {
-  CharacterDeleteQueueSaturated,
-  CharacterStoragePurchaseOpen,
-} from './character_delete_db';
+import { CharacterDeleteQueueSaturated, CharacterStoragePurchaseOpen } from './character_delete_db';
 
 /** Stable legacy-envelope refusal shared by both character DELETE dispatch arms. */
 export const CHARACTER_STORAGE_PURCHASE_OPEN_BODY = {

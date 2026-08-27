@@ -453,11 +453,24 @@ d('bank ledger durable growth budget against real PostgreSQL', () => {
       // boot here) and land the re-added constraint NOT VALID.
       await client.query(batchDb.BANK_LEDGER_BATCH_RECEIPTS_SCHEMA);
       const converged = await client.query(
-        `SELECT convalidated FROM pg_constraint
+        `SELECT oid, convalidated FROM pg_constraint
           WHERE conname = 'bank_ledger_batch_receipts_key_shape'
             AND conrelid = 'bank_ledger_batch_receipts'::regclass`,
       );
-      expect(converged.rows).toEqual([{ convalidated: false }]);
+      expect(converged.rows).toEqual([{ oid: expect.anything(), convalidated: false }]);
+      // Re-applying the schema INSIDE the NOT VALID window must not re-fire
+      // the drop-and-add: the probe matches the definition alone, so keying
+      // it on convalidated again would churn an ACCESS EXCLUSIVE constraint
+      // rebuild on every boot until the post-listen VALIDATE lands.
+      await client.query(batchDb.BANK_LEDGER_BATCH_RECEIPTS_SCHEMA);
+      const midWindow = await client.query(
+        `SELECT oid, convalidated FROM pg_constraint
+          WHERE conname = 'bank_ledger_batch_receipts_key_shape'
+            AND conrelid = 'bank_ledger_batch_receipts'::regclass`,
+      );
+      expect(midWindow.rows).toEqual([
+        { oid: converged.rows[0].oid, convalidated: false },
+      ]);
       // Enforcement of NEW writes is immediate despite NOT VALID.
       await expect(insertReceipt('also!bad')).rejects.toMatchObject({ code: '23514' });
       await expect(insertReceipt('good.key')).resolves.toMatchObject({ rowCount: 1 });
@@ -505,6 +518,12 @@ d('bank ledger durable growth budget against real PostgreSQL', () => {
          inserted_rows BIGINT NOT NULL CHECK (inserted_rows > 0)
        ) WITH (autovacuum_vacuum_scale_factor = 0.0, autovacuum_vacuum_threshold = 100, fillfactor = 70)`,
     );
+    // A hand-tuned NON-NUMERIC reloption rides along: the probe's CASE keeps
+    // the numeric cast away from it, so the boot transaction cannot abort on
+    // "invalid input syntax for type numeric".
+    await pool.query(
+      `ALTER TABLE "${schema}".bank_ledger_growth_pending SET (autovacuum_enabled = false)`,
+    );
     await pool.query(
       `CREATE TABLE "${schema}".bank_ledger_growth_budget (
          singleton BOOLEAN PRIMARY KEY DEFAULT TRUE CHECK (singleton),
@@ -538,6 +557,7 @@ d('bank ledger durable growth budget against real PostgreSQL', () => {
         'autovacuum_vacuum_scale_factor=0.0',
         'autovacuum_vacuum_threshold=100',
         'fillfactor=70',
+        'autovacuum_enabled=false',
       ]),
     );
     expect(await optionsOf('bank_ledger_growth_budget')).toEqual(
