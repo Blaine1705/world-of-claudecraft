@@ -69,6 +69,7 @@ import {
   Placements,
   pendingArenaWallsFor,
 } from './dungeon_arena_walls';
+import { dungeonBannerKind, hangsKitBanners, pickKind } from './dungeon_banner_core';
 import { rectShellWallSegments, stubFaceSegments } from './dungeon_wall_segments';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import { EMISSIVE_LIGHT, sharedUniforms } from './gfx';
@@ -481,19 +482,6 @@ if (typeof window !== 'undefined') registerDeferredPreload(() => ensureDungeonAs
 function hash2(a: number, b: number): number {
   const s = Math.sin(a * 127.1 + b * 311.7) * 43758.5453;
   return s - Math.floor(s);
-}
-
-type WeightedKinds = [name: string, weight: number][];
-
-function pickKind(kinds: WeightedKinds, t: number): string {
-  let total = 0;
-  for (const [, w] of kinds) total += w;
-  let acc = 0;
-  for (const [name, w] of kinds) {
-    acc += w;
-    if (t * total < acc) return name;
-  }
-  return kinds[kinds.length - 1][0];
 }
 
 interface ArenaHideable {
@@ -2008,55 +1996,7 @@ export class DungeonInteriors {
   }
 
   private bannerKind(variant: Variant, t: number): string {
-    if (variant === 'arena_drowned') return this.bannerKind('temple', t);
-    if (variant === 'bastion') {
-      return pickKind(
-        [
-          ['banner_shield_blue', 4],
-          ['banner_blue', 3],
-          ['banner_triple_blue', 3],
-        ],
-        t,
-      );
-    }
-    if (variant === 'sanctum') {
-      return pickKind(
-        [
-          ['banner_green', 4],
-          ['banner_patternC_green', 3],
-          ['banner_triple_green', 3],
-        ],
-        t,
-      );
-    }
-    if (variant === 'temple') {
-      // pale temple hangings, the odd faded-blue choir banner
-      return pickKind(
-        [
-          ['banner_white', 5],
-          ['banner_thin_white', 4],
-          ['banner_blue', 2],
-        ],
-        t,
-      );
-    }
-    if (isDelveVariant(variant)) {
-      // tattered funereal hangings, mostly thin and faded
-      return pickKind(
-        [
-          ['banner_thin_white', 7],
-          ['banner_white', 3],
-        ],
-        t,
-      );
-    }
-    return pickKind(
-      [
-        ['banner_thin_white', 6],
-        ['banner_white', 4],
-      ],
-      t,
-    );
+    return dungeonBannerKind(variant, t, isDelveVariant(variant));
   }
 
   // Side walls run along z at |x| = DUNGEON_WALL_X (8u modules at scale 2,
@@ -2089,7 +2029,11 @@ export class DungeonInteriors {
       for (const seg of segments) {
         const kind = this.wallKind(variant, hash2(side * 13.7, seg.z));
         target.add(kind, seg.x, 0, seg.z, seg.ry, [seg.halfLength / 2, MODULE_SCALE, MODULE_SCALE]);
-        if (i % bannerEvery === 2 && kind !== 'wall_archedwindow_gated') {
+        if (
+          hangsKitBanners(variant) &&
+          i % bannerEvery === 2 &&
+          kind !== 'wall_archedwindow_gated'
+        ) {
           target.add(
             this.bannerKind(variant, hash2(seg.z, side * 7.3)),
             seg.x,
@@ -2117,16 +2061,18 @@ export class DungeonInteriors {
       }
     }
     // back wall banners flank the boss dais
-    const backTarget = arenaWalls?.back.placements ?? p;
-    for (const bx of [-12, -4, 4, 12]) {
-      backTarget.add(
-        this.bannerKind(variant, hash2(bx, layout.zMax)),
-        bx,
-        0,
-        layout.zMax,
-        Math.PI,
-        MODULE_SCALE,
-      );
+    if (hangsKitBanners(variant)) {
+      const backTarget = arenaWalls?.back.placements ?? p;
+      for (const bx of [-12, -4, 4, 12]) {
+        backTarget.add(
+          this.bannerKind(variant, hash2(bx, layout.zMax)),
+          bx,
+          0,
+          layout.zMax,
+          Math.PI,
+          MODULE_SCALE,
+        );
+      }
     }
   }
 
@@ -2162,7 +2108,7 @@ export class DungeonInteriors {
         const upper = ignivarUpperWallKind(hash2(z * 3.1, x));
         target.add(upper, x, DUNGEON_WALL_HEIGHT, z, rot, scale);
       }
-      if (i % bannerEvery === 2 && kind !== 'wall_archedwindow_gated') {
+      if (hangsKitBanners(variant) && i % bannerEvery === 2 && kind !== 'wall_archedwindow_gated') {
         target.add(this.bannerKind(variant, hash2(z, x * 7.3)), x, 0, z, rot, MODULE_SCALE);
       }
       i++;
@@ -2187,10 +2133,12 @@ export class DungeonInteriors {
     for (const pt of layout.pillars) {
       const faceAisle = pt.x < 0 ? Math.PI / 2 : -Math.PI / 2;
       // Ignivar swaps the stone pillar for the authored forge pillar (placed
-      // by the dressing plan); the torch rig stays, pushed out to its face.
+      // by the dressing plan); the torch rig stays, tucked to the pillar's
+      // SHAFT half-width at torch height (the old 1.15 push cleared the base
+      // flange instead and left the bracket floating in the aisle).
       if (variant !== 'ignivar')
         p.add(kind, pt.x, 0, pt.z, faceAisle, [PILLAR_XZ_SCALE, MODULE_SCALE, PILLAR_XZ_SCALE]);
-      this.addPillarTorch(group, p, pt, colors, variant === 'ignivar' ? 1.15 : 0);
+      this.addPillarTorch(group, p, pt, colors, variant === 'ignivar' ? 0.35 : 0);
     }
   }
 

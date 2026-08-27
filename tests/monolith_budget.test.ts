@@ -424,8 +424,10 @@ const MONOLITHS: MonolithRow[] = [
     // the raid consolidation moved the arena-wall occlusion core, the pending-wall builder, and the ignivar tile loaders out; exact count.
     // Re-pinned after the addTorchGlow extraction to torch_glow_decal.ts
     // (shared with the Ignivar dressing glow pools), net of the ignivar
-    // pillar-swap gate. Exact count, zero slack.
-    ceiling: 2770,
+    // pillar-swap gate; then again after the banner picking moved to
+    // dungeon_banner_core.ts (paying for the ignivar banner suppression
+    // gates and the torch-tuck fix). Exact count, zero slack.
+    ceiling: 2718,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
 ];
