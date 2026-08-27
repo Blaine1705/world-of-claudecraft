@@ -156,10 +156,81 @@ describe('the desktop micromenu rail stands back up for the pad, so its mouse mo
   });
 });
 
-describe('the revived micromenu rail stands down the deed/reliquary tracker sharing its corner', () => {
-  it('hides #right-tracker-stack in xhb-mode (it painted over the rail: same top:140px seat, and its compact-tier hit-box extension out-z-indexed the rail)', () => {
-    const body = ruleBody('body\\.mobile-touch\\.xhb-mode #right-tracker-stack');
+describe('the revived micromenu rail stands down the progress trackers sharing its corner, except the live delve run', () => {
+  // Amended per the PR #3658 second re-review: the whole stack used to stand
+  // down here (same top:140px seat as the rail, and the deed/reliquary
+  // compact-tier hit-box extension out-z-indexed it). That blanket hide also
+  // took #delve-tracker with it, which is a live mid-run tracker (objectives,
+  // active affixes), not progress chrome, so a pad player lost it exactly
+  // when a desktop pad player keeps it. Now only deed/reliquary/rift stand
+  // down, and the stack itself re-seats to the left instead.
+  it('hides #deed-tracker and #reliquary-tracker in xhb-mode (progress chrome, no graphics-fairness concern)', () => {
+    const body = ruleBody(
+      'body\\.mobile-touch\\.xhb-mode #deed-tracker,\\s*\\n\\s*' +
+        'body\\.mobile-touch\\.xhb-mode #reliquary-tracker',
+    );
     expect(body.trim()).toBe('display: none;');
+  });
+
+  it('hides #rift-tracker with !important (it sets its own inline display, unlike deed/reliquary which paint via innerHTML alone)', () => {
+    const body = ruleBody('body\\.mobile-touch\\.xhb-mode #rift-tracker');
+    expect(body.trim()).toBe('display: none !important;');
+  });
+
+  it("does NOT hide #delve-tracker: it is a live mid-run tracker, the same class of actionable info #rift-tracker's own comment carves out for graphics tiers", () => {
+    expect(hudMobileCss).not.toMatch(/\.xhb-mode #delve-tracker\s*\{\s*\n?\s*display:\s*none/);
+  });
+
+  // Amended per the PR #3658 third re-review: a flat top-anchor put the
+  // tracker fully inside the XHB band at UI Scale 1.4 (both this stack and
+  // .xhb live inside the zoomed #ui, but only .xhb's own seat moved with
+  // it). Bottom-anchoring by the same kind of flat literal .xhb uses keeps
+  // the two in lockstep at every scale instead.
+  it("re-seats #right-tracker-stack to the left edge (bottom-anchored, not top) instead of standing it down, mirroring #quest-strip's own left-side seat", () => {
+    const body = ruleBody('body\\.mobile-touch\\.xhb-mode #right-tracker-stack');
+    expect(body.trim()).toBe(
+      [
+        'left: max(20px, calc(env(safe-area-inset-left) + 10px));',
+        'right: auto;',
+        'top: auto !important;',
+        'bottom: 172px;',
+        'z-index: 4;',
+      ].join('\n    '),
+    );
+  });
+
+  // The re-seat seats z-index 4, UNDER #party-frames' 5 (hud.css): a duo
+  // delve party (delves cap at 2 players) can expand into this same
+  // corner, and party HP must win the paint order over progress-style
+  // delve info on the rare overlap (graphics-fairness).
+  it("re-seats under #party-frames' z-index so an expanded duo party's HP always paints on top of the tracker on the rare overlap", () => {
+    const body = ruleBody('body\\.mobile-touch\\.xhb-mode #right-tracker-stack');
+    expect(body).toContain('z-index: 4;');
+  });
+
+  // The cap is scale-aware, not a flat px value: a flat cap grows in RENDERED
+  // terms right along with the stack's own zoomed bottom anchor under a high
+  // UI Scale and runs out of room toward #quest-strip, which is NOT zoomed
+  // (a sibling of #ui, so its own real-px footprint never moves). Subtracting
+  // the unzoomed quest-strip budget from --app-vh BEFORE dividing by
+  // --ui-scale is what keeps this positive (not clamped to 0, invisible) at
+  // UI Scale 1.4.
+  it("bounds #delve-tracker's own height in this seat with the app-vh/ui-scale idiom (not a flat px cap), so it stays positive at UI Scale 1.4 instead of clamping to 0 (invisible, the same loss this fix undoes)", () => {
+    const body = ruleBody('body\\.mobile-touch\\.xhb-mode #delve-tracker');
+    expect(body).toContain(
+      'max-height: calc((var(--app-vh, 100vh) - 128px) / var(--ui-scale, 1) - 172px);',
+    );
+    expect(body).toContain('overflow-y: auto;');
+  });
+
+  // pointer-events is none on every tracker in this stack except one
+  // interactive row (hud.css), so without this override the scroll above is
+  // decorative: a touch drag falls through to the canvas instead of moving
+  // scrollTop (confirmed live with a real CDP wheel event, not just a
+  // computed-style check).
+  it('makes #delve-tracker pointer-events: auto in this seat, so the scroll bound above is a real affordance rather than dead overflow:hidden', () => {
+    const body = ruleBody('body\\.mobile-touch\\.xhb-mode #delve-tracker');
+    expect(body).toContain('pointer-events: auto;');
   });
 });
 
