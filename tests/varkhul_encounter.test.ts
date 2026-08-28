@@ -27,8 +27,10 @@ import {
   VARKHUL_FORGESTORM_WARNING_SECONDS,
   VARKHUL_FORGESTORM_WAVES,
   VARKHUL_FRONTAL_CAST_ID,
+  VARKHUL_FRONTAL_CAST_SECONDS,
   VARKHUL_FRONTAL_DAMAGE_MAX_HP_HEROIC,
   VARKHUL_FRONTAL_DAMAGE_MAX_HP_NORMAL,
+  VARKHUL_FRONTAL_RECOVER_SECONDS,
   VARKHUL_INTERCEPT_BEAM_DEBUFF_AURA_ID,
   VARKHUL_INTERCEPT_BEAM_DEBUFF_DAMAGE_TAKEN,
   VARKHUL_INTERCEPT_BEAM_DEBUFF_NAME,
@@ -113,6 +115,10 @@ function isolateMechanics(boss: Entity): NonNullable<Entity['varkhul']> {
   boss.varkhul.sharedPyreTimer = 999;
   boss.varkhul.anvilTimer = 999;
   boss.varkhul.interceptBeamTimer = 999;
+  // The walk-in staging is a mechanic too: it RUNS him to the arena center,
+  // which shifts any geometry a test set up around his spawn. Complete it so
+  // the mechanic under test sees a stationary boss.
+  boss.varkhul.engage.phase = 'done';
   boss.swingTimer = Number.POSITIVE_INFINITY;
   return boss.varkhul;
 }
@@ -677,6 +683,39 @@ describe('Varkhul encounter behavior', () => {
     ).toHaveLength(0);
   });
 
+  it('cues the PowerUp windup one-shot at the start of every Forgestorm wave', () => {
+    const { sim, boss } = claimedEncounter(44);
+    updateVarkhulEncounter(sim.ctx, boss);
+    const state = isolateMechanics(boss);
+    const stormWindups = () =>
+      sim.events.filter(
+        (event) =>
+          event.type === 'spellfx' &&
+          event.fx === 'windup' &&
+          event.ability === VARKHUL_FORGESTORM_CAST_ID,
+      );
+
+    state.forgestormTimer = DT;
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(state.majorAbility).toBe('forgestorm');
+    expect(stormWindups()).toHaveLength(1);
+    expect(stormWindups()[0]).toMatchObject({ sourceId: boss.id, targetId: boss.id });
+
+    // every later wave re-cues the pump; the resolve tick itself adds none
+    state.forgestormWarningRemaining = DT;
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(state.forgestormWaveIndex).toBe(1);
+    expect(stormWindups()).toHaveLength(2);
+    state.forgestormWarningRemaining = DT;
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(state.forgestormWaveIndex).toBe(2);
+    expect(stormWindups()).toHaveLength(3);
+    state.forgestormWarningRemaining = DT;
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(state.majorAbility).toBe('none');
+    expect(stormWindups()).toHaveLength(3);
+  });
+
   it('casts Shared Pyre on a non-tank while preserving Forgestorm as a separate major', () => {
     const { sim, boss } = claimedEncounter(441);
     const raiders = [
@@ -1062,9 +1101,11 @@ describe('Varkhul encounter behavior', () => {
         player.maxHp = 1_000;
         player.hp = 1_000;
       }
-      bait.pos = sim.ctx.groundPos(boss.pos.x + 12, boss.pos.z);
       updateVarkhulEncounter(sim.ctx, boss);
       const state = isolateMechanics(boss);
+      // placed AFTER the staging is neutralized: the engage run on the first
+      // update moves the boss, and the facing pin needs exact geometry
+      bait.pos = sim.ctx.groundPos(boss.pos.x + 12, boss.pos.z);
       state.frontalTimer = DT;
       updateVarkhulEncounter(sim.ctx, boss);
 
@@ -1080,6 +1121,37 @@ describe('Varkhul encounter behavior', () => {
       expect(boss.castingAbility).toBeNull();
     },
   );
+
+  it('stands his ground through the Slam recovery after the frontal, then runs', () => {
+    const { sim, boss } = claimedEncounter(456);
+    updateVarkhulEncounter(sim.ctx, boss, true);
+    const state = isolateMechanics(boss);
+    // park the target far, so any chase movement is unmistakable
+    sim.player.pos = sim.ctx.groundPos(boss.pos.x, boss.pos.z - 30);
+    state.frontalTimer = DT;
+    updateVarkhulEncounter(sim.ctx, boss, true);
+    expect(boss.castingAbility).toBe(VARKHUL_FRONTAL_CAST_ID);
+    state.frontalTimer = 999;
+    const castTicks = Math.ceil(VARKHUL_FRONTAL_CAST_SECONDS / DT) + 1;
+    for (let tick = 0; tick < castTicks && boss.castingAbility; tick++) {
+      updateVarkhulEncounter(sim.ctx, boss, true);
+    }
+    expect(boss.castingAbility).toBeNull();
+    expect(state.frontalRecoverRemaining).toBeCloseTo(VARKHUL_FRONTAL_RECOVER_SECONDS, 5);
+
+    // the recovery window: no chase slide under the stand-back-up animation
+    const held = { ...boss.pos };
+    const recoverTicks = Math.round(VARKHUL_FRONTAL_RECOVER_SECONDS / DT);
+    for (let tick = 0; tick < recoverTicks - 1; tick++) {
+      updateVarkhulEncounter(sim.ctx, boss, true);
+    }
+    expect(boss.pos).toEqual(held);
+    expect(state.frontalRecoverRemaining).toBeGreaterThan(0);
+
+    // and only once it lapses does he run at the target again
+    for (let tick = 0; tick < 4; tick++) updateVarkhulEncounter(sim.ctx, boss, true);
+    expect(Math.hypot(boss.pos.x - held.x, boss.pos.z - held.z)).toBeGreaterThan(0.3);
+  });
 
   it('schedules three dodgeable Heroic meteors after a hammer impact', () => {
     const { sim, boss } = claimedEncounter(455);
