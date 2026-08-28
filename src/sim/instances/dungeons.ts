@@ -325,7 +325,10 @@ export function enterDungeon(
     ctx.error(r.meta.entityId, 'Raid groups cannot enter standard dungeons.');
     return false;
   }
-  if (!party?.raid && raidRequired && !bypass) {
+  // Dev builds (ALLOW_DEV_COMMANDS) let a solo walker board a raid door so
+  // the maintainer can experience the walk-in; the undersized-party
+  // warning below still fires. Production keeps the hard raid gate.
+  if (!party?.raid && raidRequired && !bypass && !ctx.devCommands) {
     ctx.error(r.meta.entityId, 'You must convert your party to a raid group first.');
     return false;
   }

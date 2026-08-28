@@ -173,7 +173,14 @@ const ITEMS = [
     emissive: 1.6,
     hotBoost: 1.35,
   },
-  { src: 'Exterior_Assets/cannon.glb', name: 'cannon', tex: 1024, emissive: 0.6, hotBoost: 1.25 },
+  {
+    src: 'Exterior_Assets/cannon.glb',
+    name: 'cannon',
+    tex: 1024,
+    emissive: 0.6,
+    hotBoost: 1.25,
+    glowFloor: [64, 16, 10],
+  },
   { src: 'Exterior_Assets/dragon_head.glb', name: 'dragon_head', tex: 1024, emissive: 1.5 },
   {
     src: 'Exterior_Assets/dragon_pillar.glb',
@@ -181,6 +188,7 @@ const ITEMS = [
     tex: 1024,
     emissive: 1.2,
     hotBoost: 1.25,
+    glowFloor: [64, 16, 10],
   },
   {
     src: 'Exterior_Assets/fortress_wall.glb',
@@ -188,6 +196,7 @@ const ITEMS = [
     tex: 1024,
     emissive: 0.85,
     hotBoost: 1.25,
+    glowFloor: [64, 16, 10],
   },
   {
     src: 'Exterior_Assets/fountain_base.glb',
@@ -195,13 +204,21 @@ const ITEMS = [
     tex: 1024,
     emissive: 1.0,
   },
-  { src: 'Exterior_Assets/gate.glb', name: 'gate', tex: 1024, emissive: 0.85, hotBoost: 1.25 },
+  {
+    src: 'Exterior_Assets/gate.glb',
+    name: 'gate',
+    tex: 1024,
+    emissive: 0.85,
+    hotBoost: 1.25,
+    glowFloor: [64, 16, 10],
+  },
   {
     src: 'Exterior_Assets/gate_gear.glb',
     name: 'gate_gear',
     tex: 1024,
     emissive: 0.85,
     hotBoost: 1.25,
+    glowFloor: [64, 16, 10],
   },
   // lava_furnace_2: the name lava_furnace is taken by the New_Assets drop
   // (the lava_outlet_2 precedent for a second same-family model)
@@ -230,6 +247,7 @@ const ITEMS = [
     tex: 1024,
     emissive: 0.95,
     hotBoost: 1.25,
+    glowFloor: [64, 16, 10],
   },
   {
     src: 'Exterior_Assets/tower_middle.glb',
@@ -237,6 +255,7 @@ const ITEMS = [
     tex: 1024,
     emissive: 0.95,
     hotBoost: 1.25,
+    glowFloor: [64, 16, 10],
   },
   {
     src: 'Exterior_Assets/tower_pillar.glb',
@@ -244,6 +263,7 @@ const ITEMS = [
     tex: 1024,
     emissive: 0.95,
     hotBoost: 1.25,
+    glowFloor: [64, 16, 10],
   },
   {
     src: 'Exterior_Assets/tower_top.glb',
@@ -251,6 +271,7 @@ const ITEMS = [
     tex: 1024,
     emissive: 0.95,
     hotBoost: 1.25,
+    glowFloor: [64, 16, 10],
   },
 ];
 const SRC_DIR = 'tmp/asset_src/_IGNAR_Environment_Assets';
@@ -354,9 +375,41 @@ for (const item of ITEMS) {
     if (item.emissive) {
       const base = mat.getBaseColorTexture();
       if (base && !mat.getEmissiveTexture()) {
+        if (item.glowFloor) {
+          // The whole piece carries a soft glow: the emissive texture is
+          // the base albedo FLOORED per channel at glowFloor, so dark
+          // masonry emits the floor's warm sheen while authored hot
+          // details keep their extra brightness. (Base-as-emissive alone
+          // leaves near-black stone inert, which read as a pitch-dark
+          // fortress against lamp-lit ground.)
+          const [fr, fg, fb] = item.glowFloor;
+          const { data, info } = await sharp(Buffer.from(base.getImage()))
+            .raw()
+            .toBuffer({ resolveWithObject: true });
+          for (let i = 0; i < info.width * info.height; i++) {
+            const px = i * info.channels;
+            if (data[px] < fr) data[px] = fr;
+            if (data[px + 1] < fg) data[px + 1] = fg;
+            if (data[px + 2] < fb) data[px + 2] = fb;
+          }
+          // The sheen is low-frequency: half-resolution keeps the pieces
+          // inside the per-prop byte budget with no visible cost.
+          const floored = await sharp(data, {
+            raw: { width: info.width, height: info.height, channels: info.channels },
+          })
+            .resize(Math.min(512, info.width))
+            .webp({ quality: 88 })
+            .toBuffer();
+          const glowTex = doc
+            .createTexture(`${item.name}_glow`)
+            .setImage(new Uint8Array(floored))
+            .setMimeType('image/webp');
+          mat.setEmissiveTexture(glowTex);
+        } else {
+          mat.setEmissiveTexture(base);
+        }
         // Spec-valid overdrive: emissiveFactor stays in [0,1], the boost
         // rides KHR_materials_emissive_strength.
-        mat.setEmissiveTexture(base);
         mat.setEmissiveFactor([1, 1, 1]);
         const strengthExt = doc.createExtension(KHRMaterialsEmissiveStrength);
         mat.setExtension(

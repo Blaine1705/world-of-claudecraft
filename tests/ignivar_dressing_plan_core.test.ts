@@ -127,8 +127,11 @@ describe('ignivar dressing plan', () => {
     }
     // Raised from 7_000_000 when the 19-piece Exterior_Assets fortress kit
     // joined the roster (35 to 54 props), re-tightened to the measured
-    // KTX2 total (9_645_164) plus a sliver of rebake headroom.
-    expect(total, 'prop set exceeds the total budget').toBeLessThanOrEqual(9_700_000);
+    // KTX2 total (9_645_164), then raised for the owner-directed fortress
+    // night glow: nine architecture pieces carry a half-resolution floored
+    // emissive texture each (measured total 10_062_736) plus a sliver of
+    // rebake headroom.
+    expect(total, 'prop set exceeds the total budget').toBeLessThanOrEqual(10_150_000);
   });
 
   it('pins the native dims table to the shipped GLBs (canonical long-axis-on-X)', async () => {

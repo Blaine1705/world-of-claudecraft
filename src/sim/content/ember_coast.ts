@@ -341,9 +341,13 @@ export const FORGEFATHER_ISLE_TERRAIN_EDITS: HeightStamp[] = [
   // bank up onto the summit flat with no step past the terrain-wall gate,
   // because the movement kernel reads the raw heightfield even while the
   // body stands on the landing platform above it.
-  { x: 503.05, z: 2245.1, radius: 2.4, delta: 18.6, falloff: 'smooth', mode: 'level' },
-  { x: 503.1, z: 2246.2, radius: 2.8, delta: 18.8, falloff: 'smooth', mode: 'level' },
-  { x: 503.1, z: 2247.8, radius: 2.8, delta: 19.0, falloff: 'smooth', mode: 'level' },
+  // (Held well under the keep landing and the door arch: the raid portal
+  // is translucent, and ground cresting behind it read as a pale wedge
+  // inside the doorway. Everything past the door is inside the keep
+  // drum's collider, so nothing walks this ground.)
+  { x: 503.05, z: 2245.1, radius: 2.4, delta: 18.2, falloff: 'smooth', mode: 'level' },
+  { x: 503.1, z: 2246.2, radius: 2.8, delta: 18.3, falloff: 'smooth', mode: 'level' },
+  { x: 503.1, z: 2247.8, radius: 2.8, delta: 18.5, falloff: 'smooth', mode: 'level' },
   // Stuck-pocket escapes (found by the movement flood scan): the middle
   // court's north-wall strip and the alley between the summit flank and
   // the sea-ring wall each get a walkable way back out. (The old gate
