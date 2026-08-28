@@ -208,6 +208,9 @@ describe('heroic tuning data contract', () => {
       wildheart_basin: [4.0, 17.25, 8.625],
       nythraxis_boss_arena: [3.2, 7.25, 7.25],
       ignivar_raid_arena: [2.5, 2, 2],
+      // The Inner Crucible mirrors the arena's provisional values (the wing
+      // inherits the raid claim's difficulty; see dungeon_difficulty.ts).
+      ignivar_inner_crucible: [2.5, 2, 2],
     });
   });
 

@@ -1745,6 +1745,27 @@ export const NPC_LOOKS: Record<string, NpcLookDef> = {
     worn: kit('mage', { head: 'mage' }),
     props: 'tome',
   },
+  // Quartermaster Bronn Emberward, the Crucible sigil broker: a forge-broad
+  // quartermaster in ember-tempered plate, hammer at hand, the counter he
+  // keeps standing a few paces from the raid door.
+  crucible_quartermaster: {
+    app: {
+      gender: 'male',
+      hair: 'mohawk',
+      ...hair(18, 0.25, 0.2),
+      beard: 'scruff',
+      brows: 'sharp',
+      eyeShape: 'narrow',
+      ...eyes(30, 0.6, 0.4),
+      ...skin(24, 0.45, 0.4),
+      mouth: 'frown',
+      face: face({ jaw: 0.35, brow: 0.3 }),
+      body: body({ shoulders: 0.35, chest: 0.25, hands: 0.2 }),
+      outfit: 'ember',
+    },
+    worn: kit('paladin', { chest: 'knight', arms: 'knight' }),
+    props: 'hammer',
+  },
   // Maelin's Ember Projection: the same archivist carried forward through the
   // forge as living flame; her silhouette holds, her colours burn.
   archivist_maelin_ember_projection: {

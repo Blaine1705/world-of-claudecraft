@@ -124,16 +124,19 @@ describe('itemStatDeltas', () => {
 
   it('surfaces the rating difference between two real epic helmets', () => {
     // The community report scenario: comparing gear that differs in ratings
-    // showed no rating rows at all. crownforged_dreadhelm carries hit rating,
-    // stormcallers_crown carries crit rating.
+    // showed no rating rows at all. The 2/4/6 lineage retune's Hit program
+    // flipped both original helmets to crit 20 (an identical pair surfaces
+    // nothing), so the pair is now crownforged versus soulflame:
+    // crownforged_dreadhelm carries crit rating, soulflame_cowl carries
+    // haste rating (its retuned seed).
     const dreadhelm = ITEMS.crownforged_dreadhelm;
-    const crown = ITEMS.stormcallers_crown;
-    expect(dreadhelm?.hitRating).toBe(20);
-    expect(crown?.critRating).toBe(20);
+    const cowl = ITEMS.soulflame_cowl;
+    expect(dreadhelm?.critRating).toBe(20);
+    expect(cowl?.hasteRating).toBe(20);
     const byStat = Object.fromEntries(
-      itemStatDeltas(dreadhelm, crown).map((d) => [d.stat, d.delta]),
+      itemStatDeltas(dreadhelm, cowl).map((d) => [d.stat, d.delta]),
     );
-    expect(byStat.hitRating).toBe(20);
-    expect(byStat.critRating).toBe(-20);
+    expect(byStat.critRating).toBe(20);
+    expect(byStat.hasteRating).toBe(-20);
   });
 });
