@@ -1239,6 +1239,39 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
     expect(hasErr(evs, 'Your bags are full.')).toBe(false);
   });
 
+  it('a MERGEABLE over-cap withdraw short of slots gets the bags-full line, never the split line', () => {
+    // The deposit arm's mergeable negative (above), mirrored at the withdraw
+    // emit boundary: a hand-shaped over-stackSize MERGEABLE instanced stack
+    // (signer payloads merge; only the load clamp keeps sim-built stacks at
+    // or under cap) in the book, against bags with free slots, but too few
+    // (45 needs 20+20+5: three slots, two exist). The gate reads the
+    // shortfall as pool exhaustion, so the withdraw must emit the pool-honest
+    // full line and must NOT claim the stack cannot be split: a later
+    // re-widening of the granularity cause cannot silently restore the wrong
+    // literal on this arm. The bag filler carries DISTINCT signer payloads,
+    // so nothing tops up and the three fresh slots stay the only landing.
+    const sim = makeOfficerSim();
+    book(sim).inventory.push({ itemId: 'wolf_fang', count: 45, instance: { signer: 'Ana' } });
+    const m = meta(sim);
+    const cap = bagCapacity(m.bags);
+    while (m.inventory.length < cap - 2) {
+      m.inventory.push({
+        itemId: 'wolf_fang',
+        count: 1,
+        instance: { signer: `B${m.inventory.length}` },
+      });
+    }
+    const before = fingerprint(sim);
+    sim.drainEvents();
+    sim.guildBankWithdrawFor(sim.playerId, 0);
+    expect(fingerprint(sim)).toBe(before);
+    const evs = sim.drainEvents();
+    expect(hasErr(evs, 'Your bags are full.')).toBe(true);
+    expect(hasErr(evs, 'That stack cannot be split to fit the space left in your bags.')).toBe(
+      false,
+    );
+  });
+
   it('deposits a partial count, decrements the source, and emits the item notice', () => {
     const sim = makeOfficerSim();
     sim.addItem('wolf_fang', 10);

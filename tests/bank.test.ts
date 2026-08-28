@@ -461,6 +461,33 @@ describe('withdraw rules', () => {
     expect(m.inventory).toEqual(bagBefore);
   });
 
+  it('a MERGEABLE over-cap withdraw short of slots gets the bags-full line, never the split line', () => {
+    // The deposit arm's mergeable negative (above), mirrored at the withdraw
+    // emit boundary: a hand-shaped over-stackSize MERGEABLE instanced stack
+    // (signer payloads merge; only the load clamp keeps sim-built stacks at
+    // or under cap) banked, against bags with free slots, but too few
+    // (45 needs 20+20+5: three slots, two exist). The gate reads the
+    // shortfall as pool exhaustion, so the withdraw must emit the pool-honest
+    // full line and must NOT claim the stack cannot be split: a later
+    // re-widening of the granularity cause cannot silently restore the wrong
+    // literal on this arm.
+    const sim = makeSim();
+    const m = meta(sim);
+    m.bank.inventory = [{ itemId: 'wolf_fang', count: 45, instance: { signer: 'Ana' } }];
+    m.inventory = gearSlots(14); // backpack 16: exactly two free general slots
+    const bankBefore = clone(m.bank.inventory);
+    const bagBefore = clone(m.inventory);
+    sim.drainEvents();
+    sim.bankWithdraw(0);
+    const evs = sim.drainEvents();
+    expect(hasErr(evs, 'Your bags are full.')).toBe(true);
+    expect(hasErr(evs, 'That stack cannot be split to fit the space left in your bags.')).toBe(
+      false,
+    );
+    expect(m.bank.inventory).toEqual(bankBefore); // kept in the bank, not destroyed
+    expect(m.inventory).toEqual(bagBefore);
+  });
+
   it('lands a MATERIAL in satchel headroom and refuses a non-material from the same state', () => {
     // The two-pool split AT the bankWithdraw boundary, discriminated behaviorally.
     // Phase 05 made the destination pools bagPools(meta.bags) instead of a flat

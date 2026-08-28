@@ -879,6 +879,14 @@ describe('the bounded insert FIFO (tail cap)', () => {
     try {
       for (let i = 0; i < BANK_LEDGER_TAIL_MAX_DEPTH; i++) deposit();
       expect(bankLedgerTailStats().depth).toBe(BANK_LEDGER_TAIL_MAX_DEPTH);
+      // The DEPTH cap is the cap that fires below: every queued op above is
+      // a single row, so the rows column sits at exactly the depth, strictly
+      // under its own cap. Without this pin, lowering
+      // BANK_LEDGER_TAIL_MAX_ROWS to or below the depth cap would quietly
+      // turn this into a second rows-cap test and leave the depth cap
+      // untested; it reds here first instead.
+      expect(bankLedgerTailStats().rows).toBe(BANK_LEDGER_TAIL_MAX_DEPTH);
+      expect(BANK_LEDGER_TAIL_MAX_DEPTH).toBeLessThan(BANK_LEDGER_TAIL_MAX_ROWS);
 
       // Past the cap the op is dropped, counted in ROWS (the audit's unit),
       // and the depth stays pinned instead of growing without bound.
