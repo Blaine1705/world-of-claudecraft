@@ -437,10 +437,25 @@ export function handleDevChat(
     return null;
   }
 
-  if (/^\/(?:dev\s+bis|devbis)\s*$/i.test(raw)) {
-    const equipped = equipBestInSlotForDev(ctx, pid);
+  const bisMatch = /^\/(?:dev\s+bis|devbis)(?:\s+(\S+))?\s*$/i.exec(raw);
+  if (bisMatch) {
+    const meta = ctx.players.get(pid);
+    if (!meta) return null;
+    const spec = bisMatch[1] ?? meta.talents.spec ?? null;
+    if (spec && !devKitRole(meta.cls, spec)) {
+      const known = (DEV_KIT_ROLES[meta.cls] ?? []).map((role) => role.spec).join(', ');
+      ctx.error(pid, `[dev] '${spec}' is not a ${meta.cls} spec. Try: ${known}.`);
+      return null;
+    }
+    const equipped = equipBestInSlotForDev(ctx, pid, spec ?? undefined);
     if (equipped === 0) ctx.error(pid, '[dev] Could not outfit best-in-slot gear.');
-    else emitDevLog(ctx, pid, `[dev] Equipped ${equipped} best-in-slot epic pieces.`);
+    else if (spec) {
+      emitDevLog(
+        ctx,
+        pid,
+        `[dev] Equipped the top-parse ${meta.cls} ${spec} loadout: ${equipped} pieces.`,
+      );
+    } else emitDevLog(ctx, pid, `[dev] Equipped ${equipped} best-in-slot epic pieces.`);
     return null;
   }
 
