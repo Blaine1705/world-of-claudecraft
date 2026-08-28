@@ -1541,6 +1541,8 @@ export const tr_TR: EnTranslations = {
       "stickyTarget": "Yere Tıklayınca Hedefi Koru",
       "showItemLevel": "Eşya Seviyesini Göster",
       "showReliquaryTracker": "Emanet Takibini Göster",
+      "confirmVendorSell": "Confirm Before Selling",
+      "confirmVendorSellNote": "Turning this off sells items with a single click and no confirmation, so a shifted bag slot could vendor the wrong item.",
       "itemLevelLine": "Eşya Seviyesi {level}",
       "itemScoreLine": "Puan {score}",
       "showSecondaryActionBar": "İkincil Eylem Çubuğunu Göster",
@@ -4382,7 +4384,13 @@ export const tr_TR: EnTranslations = {
       "upstream": "Epic yanıt vermedi. Birazdan tekrar deneyin."
     },
     "wallet": {
-      "handoff_invalid": "Cüzdan yetkilendirmesi süresi dolmuş veya doğrulanamadı. Tekrar dene."
+      "handoff_invalid": "Cüzdan yetkilendirmesi süresi dolmuş veya doğrulanamadı. Tekrar dene.",
+      "reauth_required": "Bu cüzdan değişikliğini hesap parolanızla onaylayın.",
+      "reauth_two_factor": "Hesabınızda iki adımlı kimlik doğrulama etkin. Onaylamak için kodunuzu girin.",
+      "reauth_no_password": "Önce hesap ayarlarından bir parola belirleyin, sonra tekrar deneyin.",
+      "reauth_bad_signature": "Cüzdan imzası doğrulanamadı. Tekrar deneyin.",
+      "reauth_bad_password": "Parolanız yanlış.",
+      "reauth_bad_two_factor": "Bu kod geçerli değil, tekrar deneyin."
     },
     "ota_updates": {
       "invalid_input": "Geçersiz girdi."
@@ -7308,6 +7316,13 @@ export const tr_TR: EnTranslations = {
     "unlink": "Bağlantıyı Kaldır",
     "unlinkTitle": "Bu hesaptan cüzdan doğrulamasını kaldır",
     "unlinkAria": "Bu hesaptan cüzdan doğrulamasını kaldır",
+    "reauthTitle": "Cüzdan değişikliğini onayla",
+    "reauthUnlinkTitle": "Cüzdan kaldırmayı onayla",
+    "reauthHelp": "Güvenliğiniz için bu değişikliğe izin vermek üzere hesap parolanızı girin.",
+    "reauthNoPassword": "Bu hesap parolasız giriş yapıyor. Önce hesap ayarlarından bir parola belirleyin, sonra tekrar deneyin.",
+    "reauthConfirm": "Onayla",
+    "reauthCancel": "İptal",
+    "reauthClose": "Kapat",
     "signOut": "Bağlantıyı Kes",
     "signOutTitle": "Bu tarayıcıdaki cüzdan uygulamasının bağlantısını kes",
     "signOutAria": "Bu tarayıcıdaki cüzdan uygulamasının bağlantısını kes",

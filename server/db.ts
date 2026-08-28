@@ -64,6 +64,13 @@ import {
   writeMailPartitionsInTransaction,
 } from './mail_db';
 import {
+  advanceCustodyWatermarkIn,
+  confirmBakedCustodyRefs,
+  deleteBakedCustodyRefsIn,
+  MAIL_CUSTODY_PARCELS_SCHEMA,
+  snapshotPendingCustodyRefs,
+} from './mail_custody_overlay';
+import {
   mailPartitionMarkerKey,
   mailStateKey,
   runMailPartitionBackfill,
@@ -1347,6 +1354,11 @@ export async function ensureSchema(): Promise<void> {
     // (idempotent), like the other schema modules.
     await client.query(ACCOUNT_WEALTH_SCHEMA);
     await client.query(SUSPICION_FLAGS_SCHEMA);
+    // The $WOC custody mail overlay (server/mail_custody_overlay.ts): one
+    // durable row per booked parcel until the next full mail-book write
+    // bakes it. No FK on purpose: rows must survive character deletion long
+    // enough for an operator to attribute them.
+    await client.query(MAIL_CUSTODY_PARCELS_SCHEMA);
     // Map editor tables: saved/forked custom maps and uploaded GLB assets.
     // Both FK-reference accounts(id), so they run after SCHEMA. Applied
     // unconditionally (idempotent), like the other schema modules.
@@ -3496,6 +3508,11 @@ export async function saveCharacterAndMarketState(
   // Out-parameter, same contract as saveCharacterAndGuildBankState's.
   results?: GuildBankWriteResult[],
 ): Promise<boolean> {
+  // Custody overlay bake, the saveMailState contract adjusted for partitioned
+  // mail: snapshot at entry before anything awaits, then delete only on the
+  // committed arm below when this transaction actually persisted mail
+  // partitions. The fence-refused false arm and every rollback keep the rows.
+  const bakedCustodyRefs = snapshotPendingCustodyRefs();
   // Gate the escrow flush on the boot backfill just like saveMarketState:
   // this writes the realm-market row, so it must not run before ensureSchema
   // has confirmed the marker and opened the gate. Checked before any pool work.
@@ -3526,15 +3543,13 @@ export async function saveCharacterAndMarketState(
       await client.query('ROLLBACK');
       return false;
     }
-    await client.query(
-      `INSERT INTO world_state (key, data, updated_at) VALUES ($1, $2, now())
-       ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,
-      // Same realm-scoped key loadMarketState/saveMarketState use: the leave
-      // flush must land where the market is read back, or the escrowed listing
-      // is written to a key nothing loads and the item is stranded on next boot.
-      [marketStateKey(REALM), JSON.stringify(market)],
-    );
-    if (mailPartitions.length > 0) {
+    const inTx = (text: string, values: unknown[]) => client.query(text, values);
+    // Same realm-scoped key loadMarketState/saveMarketState use: the leave
+    // flush must land where the market is read back, or the escrowed listing
+    // is written to a key nothing loads and the item is stranded on next boot.
+    await upsertWorldStateRowIn(inTx, marketStateKey(REALM), market);
+    const wroteMailPartitions = mailPartitions.length > 0;
+    if (wroteMailPartitions) {
       // Same writeMailPartitions shape as saveMailPartitions (the periodic
       // autosave path), just inside this transaction's own client instead of
       // the pool, and gated the same way: a leave flush must not persist
@@ -3548,7 +3563,14 @@ export async function saveCharacterAndMarketState(
     // never land for a displaced session, and a failure anywhere rolls back
     // the character, market, mail, and book halves together.
     await writeGuildBankRows(client, guildBanks ?? [], results);
+    // The custody bake and the watermark advance ride the same fenced
+    // transaction as the mail partition write (see saveMailState).
+    if (wroteMailPartitions) {
+      await deleteBakedCustodyRefsIn(inTx, bakedCustodyRefs);
+      await advanceCustodyWatermarkIn(inTx);
+    }
     await client.query('COMMIT');
+    if (wroteMailPartitions) confirmBakedCustodyRefs(bakedCustodyRefs);
     return true;
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
@@ -4432,6 +4454,22 @@ export async function loadWorldState<T>(key: string): Promise<T | null> {
   return (res.rows[0]?.data as T) ?? null;
 }
 
+/** The one world_state upsert shape, shared by the single-statement
+ *  saveWorldState and the in-transaction blob writers
+ *  (saveCharacterAndMarketState, saveMailState): one copy so the
+ *  ON CONFLICT contract cannot drift between them. */
+async function upsertWorldStateRowIn(
+  query: (text: string, values: unknown[]) => Promise<unknown>,
+  key: string,
+  data: unknown,
+): Promise<void> {
+  await query(
+    `INSERT INTO world_state (key, data, updated_at) VALUES ($1, $2, now())
+     ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,
+    [key, JSON.stringify(data)],
+  );
+}
+
 export async function saveWorldState(key: string, data: unknown): Promise<void> {
   // The pre-scoping bare 'market' row is RETAINED as the rollback artifact for
   // the partitioned market backfill (server/market_backfill.ts) and is never
@@ -4447,11 +4485,7 @@ export async function saveWorldState(key: string, data: unknown): Promise<void> 
   if (key.startsWith(MARKET_KEY_PREFIX)) {
     assertMarketWriteGateOpen();
   }
-  await pool.query(
-    `INSERT INTO world_state (key, data, updated_at) VALUES ($1, $2, now())
-     ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,
-    [key, JSON.stringify(data)],
-  );
+  await upsertWorldStateRowIn((text, values) => pool.query(text, values), key, data);
 }
 
 // Boot-ordering write gate for the World Market. Before ensureSchema's
@@ -4587,7 +4621,32 @@ export async function loadMailState(): Promise<MailSave | null> {
 // the marker is set, so a caller here would be writing into the void; it
 // remains a correct, complete whole-book write for whatever still exercises it.
 export async function saveMailState(save: MailSave): Promise<void> {
-  await saveWorldState(mailStateKey(REALM), save);
+  // Custody overlay bake (mail_custody_overlay.ts): the snapshot runs before
+  // anything awaits, and no awaited gap separates the caller's
+  // serializeMail() from this entry, so every snapshotted parcel is inside
+  // `save` or durably collected out of it. The bake DELETE and the
+  // watermark advance ride the SAME transaction as the book upsert: the
+  // blob without a parcel and the row's removal must commit together, or a
+  // failed post-commit delete bracketing a collection could later replay a
+  // collected parcel. Every book write takes this one transactional path
+  // (no refs-empty shortcut) so the watermark keeps advancing on quiet
+  // realms too.
+  const bakedCustodyRefs = snapshotPendingCustodyRefs();
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const inTx = (text: string, values: unknown[]) => client.query(text, values);
+    await upsertWorldStateRowIn(inTx, mailStateKey(REALM), save);
+    await deleteBakedCustodyRefsIn(inTx, bakedCustodyRefs);
+    await advanceCustodyWatermarkIn(inTx);
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
+  confirmBakedCustodyRefs(bakedCustodyRefs);
 }
 
 export async function saveMailPartitions(

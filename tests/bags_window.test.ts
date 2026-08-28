@@ -440,9 +440,11 @@ describe('bags_window: a vendor click confirms before selling anything but true 
       painter.indexOf('private sellBagItem('),
       painter.indexOf('private showSellConfirmPrompt('),
     );
-    expect(body).toContain(
-      'const instant = vendorSellIsInstant(item, slot.instance, slot.craftedRecipeId);',
-    );
+    // The confirmVendorSell setting (a player opt-out) folds into the same
+    // instant gate: off treats every item as instant, restoring the classic
+    // one-click sale.
+    expect(body).toContain('!this.deps.confirmVendorSell()');
+    expect(body).toContain('vendorSellIsInstant(item, slot.instance, slot.craftedRecipeId);');
     expect(body).toContain('!instant');
     expect(body).toContain('this.showSellConfirmPrompt(item, slot)');
     // Ctrl/meta and shift both still confirm a non-instant sale (the review-round
@@ -450,6 +452,10 @@ describe('bags_window: a vendor click confirms before selling anything but true 
     // prompt, never an unconfirmed instant sellItem call, for anything but junk.
     expect(body).toMatch(/if \(instant\)[\s\S]{0,40}sellItem\(slot\.itemId, count\)/);
     expect(body).toContain('this.showSellQuantityPrompt(slot.itemId, heldTotal);');
+    // The full-stack fix: a plain click on a non-instant STACK (count > 1) also
+    // routes through the bulk quantity prompt instead of confirming exactly one
+    // unit at a time (the "can't sell full stacks" regression).
+    expect(body).toContain('!instant && count > 1');
   });
 
   it('the confirm prompt re-resolves the live slot at submit and refuses on a mismatch', () => {

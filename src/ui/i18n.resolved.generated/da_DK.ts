@@ -1541,6 +1541,8 @@ export const da_DK: EnTranslations = {
       "stickyTarget": "Bevar mål ved jordklik",
       "showItemLevel": "Vis genstandsniveau",
       "showReliquaryTracker": "Vis Relikviesporer",
+      "confirmVendorSell": "Confirm Before Selling",
+      "confirmVendorSellNote": "Turning this off sells items with a single click and no confirmation, so a shifted bag slot could vendor the wrong item.",
       "itemLevelLine": "Genstandsniveau {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Vis sekundær handlingslinje",
@@ -4382,7 +4384,13 @@ export const da_DK: EnTranslations = {
       "upstream": "Epic svarede ikke. Prøv igen om et øjeblik."
     },
     "wallet": {
-      "handoff_invalid": "Den pung-godkendelse udløb eller kunne ikke bekræftes. Prøv igen."
+      "handoff_invalid": "Den pung-godkendelse udløb eller kunne ikke bekræftes. Prøv igen.",
+      "reauth_required": "Bekræft denne ændring af pungen med din adgangskode til kontoen.",
+      "reauth_two_factor": "Din konto har to-faktor-godkendelse slået til. Indtast din kode for at bekræfte.",
+      "reauth_no_password": "Opret først en adgangskode i kontoindstillingerne, og prøv igen.",
+      "reauth_bad_signature": "Pungens signatur kunne ikke verificeres. Prøv igen.",
+      "reauth_bad_password": "Din adgangskode er forkert.",
+      "reauth_bad_two_factor": "Den kode er ikke gyldig, prøv igen."
     },
     "ota_updates": {
       "invalid_input": "Ugyldig indtastning."
@@ -7308,6 +7316,13 @@ export const da_DK: EnTranslations = {
     "unlink": "Frakobl",
     "unlinkTitle": "Fjern pung-verificeringen fra denne konto",
     "unlinkAria": "Fjern pung-verificeringen fra denne konto",
+    "reauthTitle": "Bekræft ændring af pung",
+    "reauthUnlinkTitle": "Bekræft fjernelse af pung",
+    "reauthHelp": "Af sikkerhedshensyn skal du indtaste din adgangskode til kontoen for at godkende denne ændring.",
+    "reauthNoPassword": "Denne konto logger ind uden adgangskode. Opret først en adgangskode i kontoindstillingerne, og prøv igen.",
+    "reauthConfirm": "Bekræft",
+    "reauthCancel": "Annuller",
+    "reauthClose": "Luk",
     "signOut": "Afbryd forbindelse",
     "signOutTitle": "Afbryd forbindelsen til pung-appen i denne browser",
     "signOutAria": "Afbryd forbindelsen til pung-appen i denne browser",

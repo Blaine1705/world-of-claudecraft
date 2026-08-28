@@ -12,6 +12,8 @@ export const pending: Record<string, readonly string[]> = {
   "es": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
     "hudChrome.options.alwaysShowAllBuffs",
+    "hudChrome.options.confirmVendorSell",
+    "hudChrome.options.confirmVendorSellNote",
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
@@ -21,6 +23,8 @@ export const pending: Record<string, readonly string[]> = {
   "es_ES": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
     "hudChrome.options.alwaysShowAllBuffs",
+    "hudChrome.options.confirmVendorSell",
+    "hudChrome.options.confirmVendorSellNote",
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
@@ -30,6 +34,8 @@ export const pending: Record<string, readonly string[]> = {
   "fr_FR": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
     "hudChrome.options.alwaysShowAllBuffs",
+    "hudChrome.options.confirmVendorSell",
+    "hudChrome.options.confirmVendorSellNote",
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
@@ -39,6 +45,8 @@ export const pending: Record<string, readonly string[]> = {
   "fr_CA": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
     "hudChrome.options.alwaysShowAllBuffs",
+    "hudChrome.options.confirmVendorSell",
+    "hudChrome.options.confirmVendorSellNote",
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
@@ -49,6 +57,8 @@ export const pending: Record<string, readonly string[]> = {
   "it_IT": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
     "hudChrome.options.alwaysShowAllBuffs",
+    "hudChrome.options.confirmVendorSell",
+    "hudChrome.options.confirmVendorSellNote",
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
@@ -58,6 +68,8 @@ export const pending: Record<string, readonly string[]> = {
   "de_DE": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
     "hudChrome.options.alwaysShowAllBuffs",
+    "hudChrome.options.confirmVendorSell",
+    "hudChrome.options.confirmVendorSellNote",
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
@@ -79,6 +91,8 @@ export const pending: Record<string, readonly string[]> = {
   "pt_BR": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
     "hudChrome.options.alwaysShowAllBuffs",
+    "hudChrome.options.confirmVendorSell",
+    "hudChrome.options.confirmVendorSellNote",
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
@@ -91,6 +105,8 @@ export const pending: Record<string, readonly string[]> = {
   "cs_CZ": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
     "hudChrome.options.alwaysShowAllBuffs",
+    "hudChrome.options.confirmVendorSell",
+    "hudChrome.options.confirmVendorSellNote",
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
@@ -100,6 +116,8 @@ export const pending: Record<string, readonly string[]> = {
   "nl_NL": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
     "hudChrome.options.alwaysShowAllBuffs",
+    "hudChrome.options.confirmVendorSell",
+    "hudChrome.options.confirmVendorSellNote",
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
@@ -109,6 +127,8 @@ export const pending: Record<string, readonly string[]> = {
   "pl_PL": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
     "hudChrome.options.alwaysShowAllBuffs",
+    "hudChrome.options.confirmVendorSell",
+    "hudChrome.options.confirmVendorSellNote",
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
@@ -118,6 +138,8 @@ export const pending: Record<string, readonly string[]> = {
   "id_ID": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
     "hudChrome.options.alwaysShowAllBuffs",
+    "hudChrome.options.confirmVendorSell",
+    "hudChrome.options.confirmVendorSellNote",
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
@@ -127,6 +149,8 @@ export const pending: Record<string, readonly string[]> = {
   "tr_TR": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
     "hudChrome.options.alwaysShowAllBuffs",
+    "hudChrome.options.confirmVendorSell",
+    "hudChrome.options.confirmVendorSellNote",
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
@@ -136,6 +160,8 @@ export const pending: Record<string, readonly string[]> = {
   "sv_SE": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
     "hudChrome.options.alwaysShowAllBuffs",
+    "hudChrome.options.confirmVendorSell",
+    "hudChrome.options.confirmVendorSellNote",
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
@@ -145,6 +171,8 @@ export const pending: Record<string, readonly string[]> = {
   "vi_VN": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
     "hudChrome.options.alwaysShowAllBuffs",
+    "hudChrome.options.confirmVendorSell",
+    "hudChrome.options.confirmVendorSellNote",
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",
@@ -154,6 +182,8 @@ export const pending: Record<string, readonly string[]> = {
   "da_DK": [
     "guide.settingsPage.ifAlwaysShowAllBuffs",
     "hudChrome.options.alwaysShowAllBuffs",
+    "hudChrome.options.confirmVendorSell",
+    "hudChrome.options.confirmVendorSellNote",
     "hudChrome.wocMarket.walletLinkedConnected",
     "hudChrome.wocMarket.walletLinkedDisconnected",
     "hudChrome.wocMarket.walletUsdBalance",

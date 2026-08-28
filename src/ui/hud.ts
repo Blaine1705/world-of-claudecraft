@@ -4671,6 +4671,7 @@ export class Hud {
     resetPetBarSig: () => {
       this.lastPetBarSig = '';
     },
+    confirmVendorSell: () => this.optionsHooks?.settings.get('confirmVendorSell') ?? true,
     isHotbarItemId: (itemId) => this.isHotbarItemId(itemId),
     useGatherTool: (item) => this.gatherToolUseHook?.(item) ?? false,
     setDragAction: (action) => {
@@ -4680,8 +4681,7 @@ export class Hud {
     dragState: this.itemDragState,
     isTouchHud: () => document.body.classList.contains('mobile-touch'),
     markEquipDropTargets: (itemId) => this.charWindow.markDropTargets(itemId),
-    dropOnEquipSlot: (itemId, slot, target) =>
-      this.charWindow.dropOnEquipSlot(itemId, slot, target),
+    dropOnEquipSlot: (...args) => this.charWindow.dropOnEquipSlot(...args),
     dropOnActionSlot: (itemId, slot) => this.placeHotbarItemFromTouch(itemId, slot),
     dropOnActionRingSlot: (itemId, ringIndex) => {
       // Bounded (the phase 14 QA): a stale data-mobile-index past the live

@@ -1541,6 +1541,8 @@ export const pt_BR: EnTranslations = {
       "stickyTarget": "Manter alvo ao clicar no chão",
       "showItemLevel": "Mostrar nível do item",
       "showReliquaryTracker": "Mostrar rastreador de relicário",
+      "confirmVendorSell": "Confirm Before Selling",
+      "confirmVendorSellNote": "Turning this off sells items with a single click and no confirmation, so a shifted bag slot could vendor the wrong item.",
       "itemLevelLine": "Nível do item {level}",
       "itemScoreLine": "Pontuação {score}",
       "showSecondaryActionBar": "Mostrar Barra de Ação Secundária",
@@ -4382,7 +4384,13 @@ export const pt_BR: EnTranslations = {
       "upstream": "A Epic não respondeu. Tente novamente em instantes."
     },
     "wallet": {
-      "handoff_invalid": "Essa autorização de carteira expirou ou não pôde ser verificada. Tente novamente."
+      "handoff_invalid": "Essa autorização de carteira expirou ou não pôde ser verificada. Tente novamente.",
+      "reauth_required": "Confirme esta alteração de carteira com a senha da sua conta.",
+      "reauth_two_factor": "Sua conta tem a autenticação em duas etapas ativada. Digite seu código para confirmar.",
+      "reauth_no_password": "Primeiro defina uma senha nas configurações da conta e tente novamente.",
+      "reauth_bad_signature": "Não foi possível verificar a assinatura da carteira. Tente novamente.",
+      "reauth_bad_password": "Sua senha está incorreta.",
+      "reauth_bad_two_factor": "Esse código não é válido, tente novamente."
     },
     "ota_updates": {
       "invalid_input": "Entrada inválida."
@@ -7308,6 +7316,13 @@ export const pt_BR: EnTranslations = {
     "unlink": "Desvincular",
     "unlinkTitle": "Remover a verificação da carteira desta conta",
     "unlinkAria": "Remover a verificação da carteira desta conta",
+    "reauthTitle": "Confirmar alteração de carteira",
+    "reauthUnlinkTitle": "Confirmar remoção de carteira",
+    "reauthHelp": "Para sua segurança, digite a senha da sua conta para autorizar esta alteração.",
+    "reauthNoPassword": "Esta conta entra sem senha. Primeiro defina uma senha nas configurações da conta e tente novamente.",
+    "reauthConfirm": "Confirmar",
+    "reauthCancel": "Cancelar",
+    "reauthClose": "Fechar",
     "signOut": "Desconectar",
     "signOutTitle": "Desconectar o app da carteira neste navegador",
     "signOutAria": "Desconectar o app da carteira neste navegador",

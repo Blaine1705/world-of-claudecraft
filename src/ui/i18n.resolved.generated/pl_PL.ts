@@ -1541,6 +1541,8 @@ export const pl_PL: EnTranslations = {
       "stickyTarget": "Zachowaj cel po kliknięciu w ziemię",
       "showItemLevel": "Pokaż poziom przedmiotu",
       "showReliquaryTracker": "Pokaż narzędzie do śledzenia relikwiarzy",
+      "confirmVendorSell": "Confirm Before Selling",
+      "confirmVendorSellNote": "Turning this off sells items with a single click and no confirmation, so a shifted bag slot could vendor the wrong item.",
       "itemLevelLine": "Poziom przedmiotu {level}",
       "itemScoreLine": "Ocena {score}",
       "showSecondaryActionBar": "Pokaż dodatkowy pasek akcji",
@@ -4382,7 +4384,13 @@ export const pl_PL: EnTranslations = {
       "upstream": "Epic nie odpowiedział. Spróbuj ponownie za chwilę."
     },
     "wallet": {
-      "handoff_invalid": "Autoryzacja portfela wygasła lub nie mogła zostać zweryfikowana. Spróbuj ponownie."
+      "handoff_invalid": "Autoryzacja portfela wygasła lub nie mogła zostać zweryfikowana. Spróbuj ponownie.",
+      "reauth_required": "Potwierdź tę zmianę portfela hasłem do konta.",
+      "reauth_two_factor": "Twoje konto ma włączone uwierzytelnianie dwuskładnikowe. Wpisz swój kod, aby potwierdzić.",
+      "reauth_no_password": "Najpierw ustaw hasło w ustawieniach konta, a potem spróbuj ponownie.",
+      "reauth_bad_signature": "Nie udało się zweryfikować podpisu portfela. Spróbuj ponownie.",
+      "reauth_bad_password": "Twoje hasło jest nieprawidłowe.",
+      "reauth_bad_two_factor": "Ten kod jest nieprawidłowy, spróbuj ponownie."
     },
     "ota_updates": {
       "invalid_input": "Nieprawidłowe dane."
@@ -7308,6 +7316,13 @@ export const pl_PL: EnTranslations = {
     "unlink": "Odepnij",
     "unlinkTitle": "Usuń weryfikację portfela z tego konta",
     "unlinkAria": "Usuń weryfikację portfela z tego konta",
+    "reauthTitle": "Potwierdź zmianę portfela",
+    "reauthUnlinkTitle": "Potwierdź usunięcie portfela",
+    "reauthHelp": "Dla Twojego bezpieczeństwa wpisz hasło do konta, aby zatwierdzić tę zmianę.",
+    "reauthNoPassword": "To konto loguje się bez hasła. Najpierw ustaw hasło w ustawieniach konta, a potem spróbuj ponownie.",
+    "reauthConfirm": "Potwierdź",
+    "reauthCancel": "Anuluj",
+    "reauthClose": "Zamknij",
     "signOut": "Rozłącz",
     "signOutTitle": "Rozłącz aplikację portfela w tej przeglądarce",
     "signOutAria": "Rozłącz aplikację portfela w tej przeglądarce",
