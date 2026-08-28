@@ -168,9 +168,12 @@ export function collectCalmAnchorPads(): CalmPadRow[] {
   pad('glacierTarn', 50, 1646, 22, 34, false);
   // Dungeon doors: the walk-up entrance in the open world (the instanced
   // interior beyond DUNGEON_X_THRESHOLD is filtered by the world.ts add).
+  // Interior-only rooms (overworldDoor: false) have no walk-up door, so their
+  // placeholder doorPos must not calm open-world ground.
   for (const id in DUNGEONS) {
-    const door = DUNGEONS[id].doorPos;
-    pad('dungeonDoor', door.x, door.z, 7, 15);
+    const dungeon = DUNGEONS[id];
+    if (dungeon.overworldDoor === false) continue;
+    pad('dungeonDoor', dungeon.doorPos.x, dungeon.doorPos.z, 7, 15);
   }
   // Paired overworld portals (the merged table, so every zone's passage
   // gets its two gate mounds plus their landings, each landing sitting
