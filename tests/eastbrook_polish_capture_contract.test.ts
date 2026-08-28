@@ -326,8 +326,11 @@ interface AttributionTargetFixture {
 // Re-minted after the Forgefather strike-route call-site swap in renderer.ts
 // (routeVarkhulForgeHammer replaced the bare forge-hammer dispatch) moved the
 // runtimeRender.renderer leaf. No capture was retaken.
+// Re-minted for the raid encounter tuning PR's nameplate direct-click pick
+// integration in renderer.ts: the runtimeRender.renderer leaf moved. No
+// capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'd29bd4471e533b27c04543c2a4d8e481e059708930aed93a1d65369c10bea268';
+  '5d8f5a693c47ad4237243e48ca8b0ce7b96822026b293a228f2462ae52991168';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
