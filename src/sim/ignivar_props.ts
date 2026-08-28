@@ -60,6 +60,7 @@ export type IgnivarEnvPropKey =
   | 'lava_ramp'
   | 'staircase'
   | 'street_lamp'
+  | 'dungeon_entrance'
   | 'stone_floor'
   | 'tower_base'
   | 'tower_middle'
@@ -140,6 +141,8 @@ export const IGNIVAR_PROP_NATIVE: Record<
   // fixture set (raw GLB dims; the world render normalizes and lights it
   // through src/render/streetlamps.ts, not the env-prop path).
   street_lamp: { len: 1.73, hei: 5.5, dep: 1.24 },
+  // The owner's raid-door facade: a thin upright entrance front.
+  dungeon_entrance: { len: 0.74, hei: 1.0, dep: 0.28 },
   stone_floor: { len: 1.0, hei: 0.08, dep: 1.0 },
   tower_base: { len: 0.97, hei: 1.0, dep: 0.83 },
   tower_middle: { len: 0.7, hei: 1.0, dep: 0.63 },
@@ -381,6 +384,9 @@ export const IGNIVAR_NON_COLLIDING_PROPS: ReadonlySet<IgnivarEnvPropKey> = new S
   // here would be an invisible wall across the flight
   'staircase',
   'street_lamp',
+  // The entrance facade frames a doorway players walk THROUGH: never a
+  // blocker, or its own arch would seal the raid door it dresses.
+  'dungeon_entrance',
 ]);
 
 /** Collider footprint as a fraction of the visual AABB: ornate pillars and

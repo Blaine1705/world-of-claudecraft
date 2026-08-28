@@ -104,6 +104,7 @@ const SCALES = [0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 18, 20, 
  *  lava, torches) for overworld entrance work; new exterior assets (the
  *  Drakelands bridge) join this list as they land. */
 const EXTERIOR_KIT: readonly IgnivarEnvPropKey[] = [
+  'dungeon_entrance',
   'street_lamp',
   'vault_door',
   'square_wall',

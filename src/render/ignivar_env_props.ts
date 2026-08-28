@@ -66,6 +66,7 @@ export const IGNIVAR_ENV_PROP_URLS: Record<IgnivarEnvPropKey, string> = {
   // (placer preview + template only; the world instance renders lit
   // through src/render/streetlamps.ts).
   street_lamp: '/models/props/streetlamp_drakelands_brazier.glb',
+  dungeon_entrance: '/models/dungeon/ignivar_prop_dungeon_entrance.glb',
   stone_floor: '/models/dungeon/ignivar_prop_stone_floor.glb',
   tower_base: '/models/dungeon/ignivar_prop_tower_base.glb',
   tower_middle: '/models/dungeon/ignivar_prop_tower_middle.glb',
@@ -110,6 +111,7 @@ const SHADOW_CASTERS: ReadonlySet<IgnivarEnvPropKey> = new Set([
   'cannon',
   'dragon_head',
   'dragon_pillar',
+  'dungeon_entrance',
   'fortress_wall',
   'fountain_base',
   'gate',

@@ -183,6 +183,15 @@ const ITEMS = [
     glowFloor: [42, 10, 7],
   },
   { src: 'Exterior_Assets/dragon_head.glb', name: 'dragon_head', tex: 1024, emissive: 1.5, glowFloor: [17, 4, 3] },
+  // The owner's raid-door facade (2026-08-29 drop): architecture tier.
+  {
+    src: 'Exterior_Assets/dungeon_entrance.glb',
+    name: 'dungeon_entrance',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
   {
     src: 'Exterior_Assets/dragon_pillar.glb',
     name: 'dragon_pillar',
