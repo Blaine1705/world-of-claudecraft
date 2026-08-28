@@ -2707,7 +2707,9 @@ export const en: EnTranslations = {
       "chestTitle": "Chest",
       "takeLootButton": "Take Loot",
       "takeLootTooltip": "Takes the coins and dropped items. Does not use up the harvest.",
-      "unifiedPressHint": "The interact key loots and harvests in one press, using your town focus."
+      "unifiedPressHint": "The interact key loots and harvests in one press, using your town focus.",
+      "bindConfirmTitle": "Binds when picked up",
+      "bindConfirmBody": "This loot contains an item that will bind to you when taken. A bound item can only be traded to players who shared its drop, and only for a limited time."
     },
     "spellbook": {
       "addToBarAria": "Add {name} to action bar",
@@ -2775,7 +2777,8 @@ export const en: EnTranslations = {
       "riftUpgrade": "Rift upgrade {level}/{max}",
       "riftSockets": "Rift gems {used}/{total}",
       "statEnchanted": "+{value} {stat} (Enchanted)",
-      "enchantedFallback": "Enchanted"
+      "enchantedFallback": "Enchanted",
+      "partyTradeWindow": "You may trade this item to players who shared its drop for the next {time}. Equipping it ends the trade window."
     },
     "materialHint": {
       "fineGrade": "Fine grade. Gathered from a full-tier vein with a tool ranked above the material, and counts as the ordinary version wherever one is required.",
@@ -9672,7 +9675,8 @@ export const en: EnTranslations = {
       "greedAria": "Greed for {item}",
       "passAria": "Pass on {item}",
       "everyonePassed": "Everyone passed on {item}.",
-      "rolled": "{answered}/{total} rolled"
+      "rolled": "{answered}/{total} rolled",
+      "bindsOnPickup": "Binds when picked up"
     }
   },
   "entities": {

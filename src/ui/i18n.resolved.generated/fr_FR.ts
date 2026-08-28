@@ -2707,7 +2707,9 @@ export const fr_FR: EnTranslations = {
       "chestTitle": "Coffre",
       "takeLootButton": "Prendre le butin",
       "takeLootTooltip": "Prend les pièces et les objets lâchés. N'utilise pas la récolte.",
-      "unifiedPressHint": "La touche d'interaction pille et récolte en une seule pression, selon votre focus de bourg."
+      "unifiedPressHint": "La touche d'interaction pille et récolte en une seule pression, selon votre focus de bourg.",
+      "bindConfirmTitle": "Binds when picked up",
+      "bindConfirmBody": "This loot contains an item that will bind to you when taken. A bound item can only be traded to players who shared its drop, and only for a limited time."
     },
     "spellbook": {
       "addToBarAria": "Ajouter {name} à la barre d'action",
@@ -2775,7 +2777,8 @@ export const fr_FR: EnTranslations = {
       "riftUpgrade": "Amélioration de faille {level}/{max}",
       "riftSockets": "Gemmes de faille {used}/{total}",
       "statEnchanted": "+{value} {stat} (Enchanté)",
-      "enchantedFallback": "Enchanté"
+      "enchantedFallback": "Enchanté",
+      "partyTradeWindow": "You may trade this item to players who shared its drop for the next {time}. Equipping it ends the trade window."
     },
     "materialHint": {
       "fineGrade": "Qualité fine. Récolté sur un filon de plein palier avec un outil de rang supérieur au matériau, et compte comme la version ordinaire partout où celle-ci est requise.",
@@ -9672,7 +9675,8 @@ export const fr_FR: EnTranslations = {
       "greedAria": "Cupidité pour {item}",
       "passAria": "Passer pour {item}",
       "everyonePassed": "Tout le monde a passé pour {item}.",
-      "rolled": "{answered}/{total} ont lancé"
+      "rolled": "{answered}/{total} ont lancé",
+      "bindsOnPickup": "Binds when picked up"
     }
   },
   "entities": {

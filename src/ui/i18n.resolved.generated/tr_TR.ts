@@ -2707,7 +2707,9 @@ export const tr_TR: EnTranslations = {
       "chestTitle": "Sandık",
       "takeLootButton": "Yağmayı Al",
       "takeLootTooltip": "Altınları ve düşen eşyaları alır. Toplama hakkını kullanmaz.",
-      "unifiedPressHint": "Etkileşim tuşu, kasaba odağınızı kullanarak tek tuşla yağmalar ve toplar."
+      "unifiedPressHint": "Etkileşim tuşu, kasaba odağınızı kullanarak tek tuşla yağmalar ve toplar.",
+      "bindConfirmTitle": "Binds when picked up",
+      "bindConfirmBody": "This loot contains an item that will bind to you when taken. A bound item can only be traded to players who shared its drop, and only for a limited time."
     },
     "spellbook": {
       "addToBarAria": "{name} yeteneğini eylem çubuğuna ekle",
@@ -2775,7 +2777,8 @@ export const tr_TR: EnTranslations = {
       "riftUpgrade": "Yarık yükseltmesi {level}/{max}",
       "riftSockets": "Yarık mücevherleri {used}/{total}",
       "statEnchanted": "+{value} {stat} (Büyülü)",
-      "enchantedFallback": "Büyülü"
+      "enchantedFallback": "Büyülü",
+      "partyTradeWindow": "You may trade this item to players who shared its drop for the next {time}. Equipping it ends the trade window."
     },
     "materialHint": {
       "fineGrade": "Kaliteli derece. Malzemenin üstünde kademelenmiş bir aletle tam kademeli bir damardan toplanır ve sıradan sürümün gerektiği her yerde onun yerine sayılır.",
@@ -9672,7 +9675,8 @@ export const tr_TR: EnTranslations = {
       "greedAria": "{item} için açgözlülük",
       "passAria": "{item} için pas geç",
       "everyonePassed": "Herkes {item} için pas geçti.",
-      "rolled": "{answered}/{total} zar attı"
+      "rolled": "{answered}/{total} zar attı",
+      "bindsOnPickup": "Binds when picked up"
     }
   },
   "entities": {

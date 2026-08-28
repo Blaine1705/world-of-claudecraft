@@ -2707,7 +2707,9 @@ export const en_XA: EnTranslations = {
       "chestTitle": "[Çĥéšţ]",
       "takeLootButton": "[Ţáķé Ļóóţ]",
       "takeLootTooltip": "[Ţáķéš ţĥé çóíñš áñð ðŕóþþéð íţéɱš. Ðóéš ñóţ úšé úþ ţĥé ĥáŕʋéšţ.]",
-      "unifiedPressHint": "[Ţĥé íñţéŕáçţ ķéý ļóóţš áñð ĥáŕʋéšţš íñ óñé þŕéšš, úšíñĝ ýóúŕ ţóŵñ ƒóçúš.]"
+      "unifiedPressHint": "[Ţĥé íñţéŕáçţ ķéý ļóóţš áñð ĥáŕʋéšţš íñ óñé þŕéšš, úšíñĝ ýóúŕ ţóŵñ ƒóçúš.]",
+      "bindConfirmTitle": "[Ɓíñðš ŵĥéñ þíçķéð úþ]",
+      "bindConfirmBody": "[Ţĥíš ļóóţ çóñţáíñš áñ íţéɱ ţĥáţ ŵíļļ ƀíñð ţó ýóú ŵĥéñ ţáķéñ. Á ƀóúñð íţéɱ çáñ óñļý ƀé ţŕáðéð ţó þļáýéŕš ŵĥó šĥáŕéð íţš ðŕóþ, áñð óñļý ƒóŕ á ļíɱíţéð ţíɱé.]"
     },
     "spellbook": {
       "addToBarAria": "[Áðð {name} ţó áçţíóñ ƀáŕ]",
@@ -2775,7 +2777,8 @@ export const en_XA: EnTranslations = {
       "riftUpgrade": "[Ŕíƒţ úþĝŕáðé {level}/{max}]",
       "riftSockets": "[Ŕíƒţ ĝéɱš {used}/{total}]",
       "statEnchanted": "[+{value} {stat} (Éñçĥáñţéð)]",
-      "enchantedFallback": "[Éñçĥáñţéð]"
+      "enchantedFallback": "[Éñçĥáñţéð]",
+      "partyTradeWindow": "[Ýóú ɱáý ţŕáðé ţĥíš íţéɱ ţó þļáýéŕš ŵĥó šĥáŕéð íţš ðŕóþ ƒóŕ ţĥé ñéẋţ {time}. Éɋúíþþíñĝ íţ éñðš ţĥé ţŕáðé ŵíñðóŵ.]"
     },
     "materialHint": {
       "fineGrade": "[Ƒíñé ĝŕáðé. Ĝáţĥéŕéð ƒŕóɱ á ƒúļļ-ţíéŕ ʋéíñ ŵíţĥ á ţóóļ ŕáñķéð áƀóʋé ţĥé ɱáţéŕíáļ, áñð çóúñţš áš ţĥé óŕðíñáŕý ʋéŕšíóñ ŵĥéŕéʋéŕ óñé íš ŕéɋúíŕéð.]",
@@ -9672,7 +9675,8 @@ export const en_XA: EnTranslations = {
       "greedAria": "[Ĝŕééð ƒóŕ {item}]",
       "passAria": "[Þášš óñ {item}]",
       "everyonePassed": "[Éʋéŕýóñé þáššéð óñ {item}.]",
-      "rolled": "[{answered}/{total} ŕóļļéð]"
+      "rolled": "[{answered}/{total} ŕóļļéð]",
+      "bindsOnPickup": "[Ɓíñðš ŵĥéñ þíçķéð úþ]"
     }
   },
   "entities": {

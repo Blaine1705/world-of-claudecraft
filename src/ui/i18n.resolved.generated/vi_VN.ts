@@ -2707,7 +2707,9 @@ export const vi_VN: EnTranslations = {
       "chestTitle": "Rương",
       "takeLootButton": "Nhặt Chiến Lợi Phẩm",
       "takeLootTooltip": "Nhặt tiền vàng và vật phẩm rơi ra. Không dùng hết lần thu hoạch.",
-      "unifiedPressHint": "Phím tương tác nhặt đồ và thu hoạch trong một lần nhấn, sử dụng trọng tâm thị trấn của bạn."
+      "unifiedPressHint": "Phím tương tác nhặt đồ và thu hoạch trong một lần nhấn, sử dụng trọng tâm thị trấn của bạn.",
+      "bindConfirmTitle": "Binds when picked up",
+      "bindConfirmBody": "This loot contains an item that will bind to you when taken. A bound item can only be traded to players who shared its drop, and only for a limited time."
     },
     "spellbook": {
       "addToBarAria": "Thêm {name} vào thanh kỹ năng",
@@ -2775,7 +2777,8 @@ export const vi_VN: EnTranslations = {
       "riftUpgrade": "Nâng cấp Rạn Nứt {level}/{max}",
       "riftSockets": "Ngọc Rạn Nứt {used}/{total}",
       "statEnchanted": "+{value} {stat} (Đã Pháp Khắc)",
-      "enchantedFallback": "Đã Pháp Khắc"
+      "enchantedFallback": "Đã Pháp Khắc",
+      "partyTradeWindow": "You may trade this item to players who shared its drop for the next {time}. Equipping it ends the trade window."
     },
     "materialHint": {
       "fineGrade": "Phẩm cấp hảo hạng. Thu được từ mạch đủ bậc bằng công cụ xếp trên nguyên liệu, và được tính như bản thường ở bất cứ đâu cần đến.",
@@ -9672,7 +9675,8 @@ export const vi_VN: EnTranslations = {
       "greedAria": "Tham Lam giành {item}",
       "passAria": "Bỏ qua {item}",
       "everyonePassed": "Mọi người đều bỏ qua {item}.",
-      "rolled": "Đã tung {answered}/{total}"
+      "rolled": "Đã tung {answered}/{total}",
+      "bindsOnPickup": "Binds when picked up"
     }
   },
   "entities": {

@@ -251,7 +251,11 @@ const MONOLITHS: MonolithRow[] = [
     // buyCrucibleVendorItem delegation to instances/crucible_vendor.ts (the
     // buyHeroicVendorItem shape exactly); the logic itself lives in the
     // instances module. Exact merged count, zero slack.
-    ceiling: 12458,
+    // Plus 5 for the partyTradeMsRemaining IWorld facet delegate (the BoP
+    // party trade window countdown): a one-line clock read against
+    // lockoutNowMs; the window logic itself lives in loot/bop_trade_window.ts.
+    // Thin facet wiring with no clean extraction. Exact count, zero slack.
+    ceiling: 12463,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -347,7 +351,10 @@ const MONOLITHS: MonolithRow[] = [
     // clean extraction. Exact count.
     // Plus 3 for the buyCrucibleVendorItem command mirror (the
     // buyHeroicVendorItem shape exactly). Exact count, zero slack.
-    ceiling: 5810,
+    // Plus 4 for the partyTradeMsRemaining IWorld facet delegate (the BoP
+    // party trade window countdown vs Date.now(), riftEventMsRemaining's
+    // clock). Thin facet wiring with no clean extraction. Exact count.
+    ceiling: 5814,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

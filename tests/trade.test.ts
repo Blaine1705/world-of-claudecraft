@@ -539,9 +539,14 @@ describe('trade module (direct, no Sim)', () => {
     const body = src.slice(start, end);
     // Both sides of the swap resolve through the one walk definition: the
     // gives leave a scratch of the receiver's own bags, the receives are the
-    // giver's walk over the giver's scratch.
-    expect(body).toContain('shippedOfferUnits(ctx, gives, meta.entityId, scratchOwn)');
-    expect(body).toContain('shippedOfferUnits(ctx, receives, giver.entityId, scratchGiver)');
+    // giver's walk over the giver's scratch. Each walk names its RECIPIENT
+    // (the BoP party-trade window resolves the soulbound skip against it).
+    expect(body).toContain(
+      'shippedOfferUnits(ctx, gives, meta.entityId, giver.entityId, scratchOwn)',
+    );
+    expect(body).toContain(
+      'shippedOfferUnits(ctx, receives, giver.entityId, meta.entityId, scratchGiver)',
+    );
     // Exactly two walk calls, and the model must CONSUME the second one's
     // return: a fork that keeps both calls but iterates its own hand-rolled
     // walk (presence pins alone cannot see that) fails the count, the

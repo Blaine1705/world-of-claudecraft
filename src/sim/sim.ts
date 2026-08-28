@@ -9672,6 +9672,11 @@ export class Sim {
     return socketRiftGemImpl(this.ctx, itemId, gemId, pid, named);
   }
 
+  // IWorldInventory: the BoP window countdown against the clock that stamped it.
+  partyTradeMsRemaining(untilMs: number): number {
+    return Math.max(0, untilMs - this.lockoutNowMs());
+  }
+
   // Enchanting profession commands (IWorldProfessions): same thin-
   // delegate/stash-result/emit shape as salvageItem/craftItem above.
   disenchantItem(

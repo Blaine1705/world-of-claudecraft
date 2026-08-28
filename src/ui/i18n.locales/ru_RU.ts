@@ -719,6 +719,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Забирает монеты и выпавшие предметы. Возможность сбора не расходуется.',
   'hudChrome.loot.unifiedPressHint':
     'Клавиша взаимодействия одним нажатием забирает добычу и собирает компоненты, следуя фокусу города.',
+  'hudChrome.loot.bindConfirmTitle': 'Персональный при получении',
+  'hudChrome.loot.bindConfirmBody':
+    'Среди этой добычи есть предмет, который станет персональным, когда вы его возьмёте. Персональный предмет можно передать только игрокам, разделившим эту добычу, и только в течение ограниченного времени.',
   'hudChrome.itemTooltip.requiresLevel': 'Требуется уровень {level}',
   'hudChrome.spellbook.addToBarAria': 'Добавить {name} на панель действий',
   'hudChrome.spellbook.removeFromBarAria': 'Убрать {name} с панели действий',
@@ -3056,6 +3059,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.lootRoll.passAria': 'Пас: {item}',
   'itemUi.lootRoll.everyonePassed': 'Все отказались от {item}.',
   'itemUi.lootRoll.rolled': '{answered}/{total} бросили',
+  'itemUi.lootRoll.bindsOnPickup': 'Персональный при получении',
   'entities.abilities.heroic_strike.name': 'Удар разорителя',
   'entities.abilities.heroic_strike.description':
     'Мощная атака, увеличивающая урон в ближнем бою на {damage}. Срабатывает при следующем взмахе оружием.',
@@ -12048,6 +12052,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.itemLockedLine': 'Заблокировано',
   'hudChrome.bags.unlockItem': 'Разблокировать предмет',
   'hudChrome.itemTooltip.enchantedFallback': 'Зачаровано',
+  'hudChrome.itemTooltip.partyTradeWindow':
+    'Вы можете передать этот предмет игрокам, разделившим эту добычу, ещё в течение {time}. Надев предмет, вы завершите период обмена.',
   'devCommand.actions.kit.description':
     'Надеть комплект уровня 20 (до Sanctum) для выбранной специализации, сначала сумки. Только снаряжение.',
   'devCommand.actions.kit.label': 'Экипировать комплект свежего 20 уровня',

@@ -723,6 +723,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '돈과 떨어진 아이템을 가져갑니다. 채집 기회는 소모되지 않습니다.',
   'hudChrome.loot.unifiedPressHint':
     '상호작용 키를 한 번 누르면 마을 집중에 따라 전리품 획득과 채집을 함께 수행합니다.',
+  'hudChrome.loot.bindConfirmTitle': '획득 시 귀속',
+  'hudChrome.loot.bindConfirmBody':
+    '이 전리품에는 가져가면 자신에게 귀속되는 아이템이 있습니다. 귀속된 아이템은 같은 전리품을 함께 획득한 플레이어와만, 제한된 시간 동안만 거래할 수 있습니다.',
   'hudChrome.itemTooltip.requiresLevel': '필요 레벨 {level}',
   'hudChrome.spellbook.addToBarAria': '{name}을(를) 행동 단축바에 추가',
   'hudChrome.spellbook.removeFromBarAria': '{name}을(를) 행동 단축바에서 제거',
@@ -3007,6 +3010,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.lootRoll.passAria': '{item} 포기',
   'itemUi.lootRoll.everyonePassed': '모두 {item}을(를) 포기했습니다.',
   'itemUi.lootRoll.rolled': '{answered}/{total} 굴림 완료',
+  'itemUi.lootRoll.bindsOnPickup': '획득 시 귀속',
   'entities.abilities.heroic_strike.name': '약탈자의 일격',
   'entities.abilities.heroic_strike.description':
     '강력한 공격으로 근접 피해가 {damage}만큼 증가합니다. 다음 무기 공격 시 발동됩니다.',
@@ -11832,6 +11836,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.itemLockedLine': '잠김',
   'hudChrome.bags.unlockItem': '아이템 잠금 해제',
   'hudChrome.itemTooltip.enchantedFallback': '마법부여됨',
+  'hudChrome.itemTooltip.partyTradeWindow':
+    '앞으로 {time} 동안 이 아이템을 같은 전리품을 함께 획득한 플레이어와 거래할 수 있습니다. 착용하면 거래 기간이 끝납니다.',
   'devCommand.actions.kit.description':
     '특성에 맞는 성소 입장 전 20레벨 사전 설정 장비를 가방부터 착용합니다. 장비만 해당됩니다.',
   'devCommand.actions.kit.label': '20레벨 초기 장비 세트 착용',

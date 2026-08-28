@@ -2707,7 +2707,9 @@ export const zh_CN: EnTranslations = {
       "chestTitle": "宝箱",
       "takeLootButton": "拾取战利品",
       "takeLootTooltip": "收取金币和掉落的物品。不会用掉采集机会。",
-      "unifiedPressHint": "按一次互动键即可同时拾取战利品并按城镇专注进行采集。"
+      "unifiedPressHint": "按一次互动键即可同时拾取战利品并按城镇专注进行采集。",
+      "bindConfirmTitle": "拾取后绑定",
+      "bindConfirmBody": "这批战利品中有一件物品在拾取后将与你绑定。绑定的物品只能在限定时间内交易给共同获得该掉落的玩家。"
     },
     "spellbook": {
       "addToBarAria": "将{name}添加到动作条",
@@ -2775,7 +2777,8 @@ export const zh_CN: EnTranslations = {
       "riftUpgrade": "裂隙强化 {level}/{max}",
       "riftSockets": "裂隙宝石 {used}/{total}",
       "statEnchanted": "+{value} {stat}（附魔）",
-      "enchantedFallback": "已附魔"
+      "enchantedFallback": "已附魔",
+      "partyTradeWindow": "在接下来的{time}内，你可以将此物品交易给共同获得该掉落的玩家。装备后交易期限即告结束。"
     },
     "materialHint": {
       "fineGrade": "优质品级。以等级高于该材料的工具在满级矿脉采集所得，在任何需要普通版本的地方均可替代使用。",
@@ -9672,7 +9675,8 @@ export const zh_CN: EnTranslations = {
       "greedAria": "贪婪 {item}",
       "passAria": "放弃 {item}",
       "everyonePassed": "所有人都放弃了 {item}。",
-      "rolled": "{answered}/{total} 已投骰"
+      "rolled": "{answered}/{total} 已投骰",
+      "bindsOnPickup": "拾取后绑定"
     }
   },
   "entities": {

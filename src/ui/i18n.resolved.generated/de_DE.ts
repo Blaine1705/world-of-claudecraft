@@ -2707,7 +2707,9 @@ export const de_DE: EnTranslations = {
       "chestTitle": "Truhe",
       "takeLootButton": "Beute nehmen",
       "takeLootTooltip": "Nimmt die Münzen und fallen gelassenen Gegenstände. Nutzt nicht die Verwertung auf.",
-      "unifiedPressHint": "Die Interaktionstaste plündert und verwertet in einem Druck, mit deinem Stadtfokus."
+      "unifiedPressHint": "Die Interaktionstaste plündert und verwertet in einem Druck, mit deinem Stadtfokus.",
+      "bindConfirmTitle": "Binds when picked up",
+      "bindConfirmBody": "This loot contains an item that will bind to you when taken. A bound item can only be traded to players who shared its drop, and only for a limited time."
     },
     "spellbook": {
       "addToBarAria": "{name} zur Aktionsleiste hinzufügen",
@@ -2775,7 +2777,8 @@ export const de_DE: EnTranslations = {
       "riftUpgrade": "Riss-Aufwertung {level}/{max}",
       "riftSockets": "Riss-Edelsteine {used}/{total}",
       "statEnchanted": "+{value} {stat} (Verzaubert)",
-      "enchantedFallback": "Verzaubert"
+      "enchantedFallback": "Verzaubert",
+      "partyTradeWindow": "You may trade this item to players who shared its drop for the next {time}. Equipping it ends the trade window."
     },
     "materialHint": {
       "fineGrade": "Feine Güte. An einer Ader voller Stufe mit einem Werkzeug über dem Rang des Materials gesammelt; zählt überall dort als die gewöhnliche Version, wo diese verlangt wird.",
@@ -9672,7 +9675,8 @@ export const de_DE: EnTranslations = {
       "greedAria": "Gier für {item}",
       "passAria": "Bei {item} passen",
       "everyonePassed": "Alle passen bei {item}.",
-      "rolled": "{answered}/{total} gewürfelt"
+      "rolled": "{answered}/{total} gewürfelt",
+      "bindsOnPickup": "Binds when picked up"
     }
   },
   "entities": {

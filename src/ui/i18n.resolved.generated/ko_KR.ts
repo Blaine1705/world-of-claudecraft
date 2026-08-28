@@ -2707,7 +2707,9 @@ export const ko_KR: EnTranslations = {
       "chestTitle": "상자",
       "takeLootButton": "전리품 가져가기",
       "takeLootTooltip": "돈과 떨어진 아이템을 가져갑니다. 채집 기회는 소모되지 않습니다.",
-      "unifiedPressHint": "상호작용 키를 한 번 누르면 마을 집중에 따라 전리품 획득과 채집을 함께 수행합니다."
+      "unifiedPressHint": "상호작용 키를 한 번 누르면 마을 집중에 따라 전리품 획득과 채집을 함께 수행합니다.",
+      "bindConfirmTitle": "획득 시 귀속",
+      "bindConfirmBody": "이 전리품에는 가져가면 자신에게 귀속되는 아이템이 있습니다. 귀속된 아이템은 같은 전리품을 함께 획득한 플레이어와만, 제한된 시간 동안만 거래할 수 있습니다."
     },
     "spellbook": {
       "addToBarAria": "{name}을(를) 행동 단축바에 추가",
@@ -2775,7 +2777,8 @@ export const ko_KR: EnTranslations = {
       "riftUpgrade": "균열 강화 {level}/{max}",
       "riftSockets": "균열 보석 {used}/{total}",
       "statEnchanted": "+{value} {stat} (마법부여)",
-      "enchantedFallback": "마법부여됨"
+      "enchantedFallback": "마법부여됨",
+      "partyTradeWindow": "앞으로 {time} 동안 이 아이템을 같은 전리품을 함께 획득한 플레이어와 거래할 수 있습니다. 착용하면 거래 기간이 끝납니다."
     },
     "materialHint": {
       "fineGrade": "상급 등급입니다. 해당 재료보다 높은 등급의 도구로 만렙 채집지에서 캐낸 것이며, 일반 등급이 필요한 곳 어디에서나 대신 사용됩니다.",
@@ -9672,7 +9675,8 @@ export const ko_KR: EnTranslations = {
       "greedAria": "{item} 탐욕",
       "passAria": "{item} 포기",
       "everyonePassed": "모두 {item}을(를) 포기했습니다.",
-      "rolled": "{answered}/{total} 굴림 완료"
+      "rolled": "{answered}/{total} 굴림 완료",
+      "bindsOnPickup": "획득 시 귀속"
     }
   },
   "entities": {

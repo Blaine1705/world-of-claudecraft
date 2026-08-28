@@ -2707,7 +2707,9 @@ export const da_DK: EnTranslations = {
       "chestTitle": "Kiste",
       "takeLootButton": "Tag bytte",
       "takeLootTooltip": "Tager mønterne og droppede genstande. Bruger ikke høsten op.",
-      "unifiedPressHint": "Interaktionstast plyndrer og høster i ét tryk ved hjælp af dit byfokus."
+      "unifiedPressHint": "Interaktionstast plyndrer og høster i ét tryk ved hjælp af dit byfokus.",
+      "bindConfirmTitle": "Binds when picked up",
+      "bindConfirmBody": "This loot contains an item that will bind to you when taken. A bound item can only be traded to players who shared its drop, and only for a limited time."
     },
     "spellbook": {
       "addToBarAria": "Tilføj {name} til handlingslinjen",
@@ -2775,7 +2777,8 @@ export const da_DK: EnTranslations = {
       "riftUpgrade": "Rift-opgradering {level}/{max}",
       "riftSockets": "Rift-juveler {used}/{total}",
       "statEnchanted": "+{value} {stat} (Fortryllet)",
-      "enchantedFallback": "Fortryllet"
+      "enchantedFallback": "Fortryllet",
+      "partyTradeWindow": "You may trade this item to players who shared its drop for the next {time}. Equipping it ends the trade window."
     },
     "materialHint": {
       "fineGrade": "Fin kvalitet. Indsamlet fra en åre på fuldt niveau med et værktøj, der rangerer over materialet, og tæller som den ordinære version, hvor end en sådan kræves.",
@@ -9672,7 +9675,8 @@ export const da_DK: EnTranslations = {
       "greedAria": "Grådighed efter {item}",
       "passAria": "Stå over {item}",
       "everyonePassed": "Alle stod over {item}.",
-      "rolled": "{answered}/{total} har slået"
+      "rolled": "{answered}/{total} har slået",
+      "bindsOnPickup": "Binds when picked up"
     }
   },
   "entities": {

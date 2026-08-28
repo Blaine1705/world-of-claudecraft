@@ -2707,7 +2707,9 @@ export const ja_JP: EnTranslations = {
       "chestTitle": "宝箱",
       "takeLootButton": "戦利品を取る",
       "takeLootTooltip": "お金とドロップしたアイテムを受け取ります。採取の機会は消費しません。",
-      "unifiedPressHint": "相互作用キーを一度押すだけで、町のフォーカスに従って戦利品の回収と採取を同時に行います。"
+      "unifiedPressHint": "相互作用キーを一度押すだけで、町のフォーカスに従って戦利品の回収と採取を同時に行います。",
+      "bindConfirmTitle": "拾うと魂縛される",
+      "bindConfirmBody": "この戦利品には、取得すると自分に魂縛されるアイテムが含まれています。魂縛されたアイテムは、同じドロップを分かち合ったプレイヤーとの間でのみ、限られた時間だけ取引できます。"
     },
     "spellbook": {
       "addToBarAria": "{name}をアクションバーに追加",
@@ -2775,7 +2777,8 @@ export const ja_JP: EnTranslations = {
       "riftUpgrade": "リフト強化 {level}/{max}",
       "riftSockets": "リフト宝石 {used}/{total}",
       "statEnchanted": "+{value} {stat}（エンチャント）",
-      "enchantedFallback": "エンチャント済み"
+      "enchantedFallback": "エンチャント済み",
+      "partyTradeWindow": "このアイテムはあと{time}の間、同じドロップを分かち合ったプレイヤーと取引できます。装備すると取引期間は終了します。"
     },
     "materialHint": {
       "fineGrade": "上質な等級。素材より上位の道具で満位の採取地から採ったもので、通常版が求められる場所ではそのまま代用できます。",
@@ -9672,7 +9675,8 @@ export const ja_JP: EnTranslations = {
       "greedAria": "{item}を強欲",
       "passAria": "{item}をパス",
       "everyonePassed": "全員が{item}をパスしました。",
-      "rolled": "{answered}/{total} がロール済み"
+      "rolled": "{answered}/{total} がロール済み",
+      "bindsOnPickup": "拾うと魂縛される"
     }
   },
   "entities": {

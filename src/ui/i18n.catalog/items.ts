@@ -3040,6 +3040,10 @@ const itemNamesEn = {
       passAria: 'Pass on {item}',
       everyonePassed: 'Everyone passed on {item}.',
       rolled: '{answered}/{total} rolled',
+      // Bind-on-pickup note on the roll prompt (loot_roll_controller.ts): the
+      // player is deciding whether to roll, so the binding consequence has to
+      // be visible BEFORE they win, the classic roll-dialog warning.
+      bindsOnPickup: 'Binds when picked up',
     },
   },
   entities: {

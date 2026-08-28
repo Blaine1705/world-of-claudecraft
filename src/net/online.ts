@@ -4172,6 +4172,10 @@ export class ClientWorld implements IWorld {
     if (target === undefined) this.cmd({ cmd: 'rift_socket_gem', item: itemId, gem: gemId });
     else this.cmd({ cmd: 'rift_socket_gem', item: itemId, gem: gemId, slot: target.slotIndex });
   }
+  // IWorldInventory: server-stamped untilMs vs Date.now(), riftEventMsRemaining's clock.
+  partyTradeMsRemaining(untilMs: number): number {
+    return Math.max(0, untilMs - Date.now());
+  }
   get bagCapacity(): number {
     return bagCapacity(this.bags);
   }

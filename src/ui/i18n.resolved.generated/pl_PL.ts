@@ -2707,7 +2707,9 @@ export const pl_PL: EnTranslations = {
       "chestTitle": "Skrzynia",
       "takeLootButton": "Weź łup",
       "takeLootTooltip": "Bierze monety i wypadłe przedmioty. Nie zużywa zebranych zasobów.",
-      "unifiedPressHint": "Klawisz interakcji bierze łup i zbiera zasoby jednym naciśnięciem, korzystając z priorytetów miasta."
+      "unifiedPressHint": "Klawisz interakcji bierze łup i zbiera zasoby jednym naciśnięciem, korzystając z priorytetów miasta.",
+      "bindConfirmTitle": "Binds when picked up",
+      "bindConfirmBody": "This loot contains an item that will bind to you when taken. A bound item can only be traded to players who shared its drop, and only for a limited time."
     },
     "spellbook": {
       "addToBarAria": "Dodaj {name} do paska akcji",
@@ -2775,7 +2777,8 @@ export const pl_PL: EnTranslations = {
       "riftUpgrade": "Ulepszenie Szczeliny {level}/{max}",
       "riftSockets": "Klejnoty Szczeliny {used}/{total}",
       "statEnchanted": "+{value} {stat} (Zaklęty)",
-      "enchantedFallback": "Zaklęty"
+      "enchantedFallback": "Zaklęty",
+      "partyTradeWindow": "You may trade this item to players who shared its drop for the next {time}. Equipping it ends the trade window."
     },
     "materialHint": {
       "fineGrade": "Gatunek wyborny. Zebrany z żyły o pełnym poziomie narzędziem wyższej rangi niż sam materiał; liczy się jako zwykła wersja wszędzie tam, gdzie jest ona wymagana.",
@@ -9672,7 +9675,8 @@ export const pl_PL: EnTranslations = {
       "greedAria": "Chciwość na {item}",
       "passAria": "Pasuj na {item}",
       "everyonePassed": "Wszyscy spasowali na {item}.",
-      "rolled": "{answered}/{total} rzuciło"
+      "rolled": "{answered}/{total} rzuciło",
+      "bindsOnPickup": "Binds when picked up"
     }
   },
   "entities": {

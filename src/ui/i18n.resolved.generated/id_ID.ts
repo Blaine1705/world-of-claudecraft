@@ -2707,7 +2707,9 @@ export const id_ID: EnTranslations = {
       "chestTitle": "Peti",
       "takeLootButton": "Ambil Jarahan",
       "takeLootTooltip": "Mengambil koin dan barang yang jatuh. Tidak menggunakan kesempatan panen.",
-      "unifiedPressHint": "Tombol interaksi menjarah dan memanen dalam satu tekanan, menggunakan fokus kotamu."
+      "unifiedPressHint": "Tombol interaksi menjarah dan memanen dalam satu tekanan, menggunakan fokus kotamu.",
+      "bindConfirmTitle": "Binds when picked up",
+      "bindConfirmBody": "This loot contains an item that will bind to you when taken. A bound item can only be traded to players who shared its drop, and only for a limited time."
     },
     "spellbook": {
       "addToBarAria": "Tambahkan {name} ke bilah aksi",
@@ -2775,7 +2777,8 @@ export const id_ID: EnTranslations = {
       "riftUpgrade": "Peningkatan Rift {level}/{max}",
       "riftSockets": "Permata Rift {used}/{total}",
       "statEnchanted": "+{value} {stat} (Dimantrai)",
-      "enchantedFallback": "Dimantrai"
+      "enchantedFallback": "Dimantrai",
+      "partyTradeWindow": "You may trade this item to players who shared its drop for the next {time}. Equipping it ends the trade window."
     },
     "materialHint": {
       "fineGrade": "Mutu halus. Dikumpulkan dari urat tingkat penuh dengan alat berperingkat di atas materialnya, dan dihitung sebagai versi biasa di mana pun versi biasa dibutuhkan.",
@@ -9672,7 +9675,8 @@ export const id_ID: EnTranslations = {
       "greedAria": "Tamak untuk {item}",
       "passAria": "Lewati {item}",
       "everyonePassed": "Semua orang melewatkan {item}.",
-      "rolled": "{answered}/{total} sudah melempar dadu"
+      "rolled": "{answered}/{total} sudah melempar dadu",
+      "bindsOnPickup": "Binds when picked up"
     }
   },
   "entities": {

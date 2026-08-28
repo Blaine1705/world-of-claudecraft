@@ -53,6 +53,7 @@ import type {
   MasterLootThreshold,
 } from '../types';
 import { dist2d, PARTY_XP_RANGE } from '../types';
+import { bopPartyTradeInstance } from './bop_trade_window';
 import { LOOT_FFA_DELAY } from './loot_ffa';
 
 // How long (seconds) a need-greed roll stays open before it auto-resolves. Sole
@@ -458,6 +459,27 @@ function startMasterLootRoll(ctx: SimContext, itemId: string, mob: Entity): bool
   return true;
 }
 
+// The one grant every award arm below routes through. A SOULBOUND drop with
+// anyone else in the drop-moment candidate snapshot is granted as an instanced
+// copy carrying the bind-on-pickup party trade window (bop_trade_window.ts):
+// tradeable only with the players who were loot-eligible at the exact kill
+// moment, until the window expires or the copy is equipped. Everything else
+// stays the plain force-add grant these sites always used. `eligibleNames` is
+// the kill-time snapshot (roll.candidateNames / partyLootCandidatesForMob,
+// both backed by mob.lootRecipientIds), never the current roster.
+function grantAwardedLootItem(
+  ctx: SimContext,
+  itemId: string,
+  pid: number,
+  eligibleNames: readonly string[],
+): void {
+  const instance = ITEMS[itemId]?.soulbound
+    ? bopPartyTradeInstance(ctx.lockoutNowMs(), eligibleNames)
+    : undefined;
+  if (instance) ctx.addItemInstance(itemId, instance, pid, 1);
+  else ctx.addItem(itemId, 1, pid);
+}
+
 // Rotates a common/junk drop over the kill-time eligible party members
 // (`partyLootCandidatesForMob`, backed by `mob.lootRecipientIds`), never the
 // loot-time in-range set: that is the fairness point. Mirrors
@@ -471,7 +493,12 @@ function tryAwardItemByRoundRobin(ctx: SimContext, itemId: string, mob: Entity):
   if (!party) return false;
   const winner = candidates[party.lootTurn % candidates.length];
   party.lootTurn++;
-  ctx.addItem(itemId, 1, winner.entityId);
+  grantAwardedLootItem(
+    ctx,
+    itemId,
+    winner.entityId,
+    candidates.map((candidate) => candidate.name),
+  );
   return true;
 }
 
@@ -491,7 +518,12 @@ export function awardSharedLootItem(
   if (startNeedGreedRoll(ctx, itemId, mob)) return true;
   if (tryAwardItemByRoundRobin(ctx, itemId, mob)) return true;
   if (!ctx.canAddItem(itemId, 1, looter.entityId)) return false;
-  ctx.addItem(itemId, 1, looter.entityId);
+  grantAwardedLootItem(
+    ctx,
+    itemId,
+    looter.entityId,
+    partyLootCandidatesForMob(ctx, mob).map((candidate) => candidate.name),
+  );
   return true;
 }
 
@@ -736,7 +768,7 @@ export function assignMasterLoot(
         text: `${r.meta.name} assigned [[i:${roll.itemId}]] to ${targetName}.`,
         pid,
       });
-    ctx.addItem(roll.itemId, 1, targets[0]);
+    grantAwardedLootItem(ctx, roll.itemId, targets[0], [...roll.candidateNames.values()]);
     return;
   }
   convertMasterRollToNeedGreed(ctx, roll, targets);
@@ -882,7 +914,7 @@ export function resolveLootRoll(ctx: SimContext, roll: PendingLootRoll): void {
       });
     return;
   }
-  ctx.addItem(roll.itemId, 1, winner.pid);
+  grantAwardedLootItem(ctx, roll.itemId, winner.pid, [...roll.candidateNames.values()]);
 }
 
 // Whether `pid` is a currently-connected player the loot hub's addItem/resolve

@@ -969,3 +969,35 @@ Each phase is a reviewable commit (or small commit series) with its tests:
    loop, resource bank, signature mechanic), never raw stats. The full
    catalog of 58 bonuses lives in the set tables above and in the item
    catalog; implementation rides the TalentEffect seam.
+
+## Binding rules: the party trade window (maintainer directives, 2026-08-29)
+
+Implemented alongside the soulbound rulings above:
+
+- Every SOULBOUND item awarded from party boss loot (need/greed win,
+  master-loot assignment, round-robin, or a shared direct pickup) is
+  granted as an instanced copy carrying a 2 hour bind-on-pickup trade
+  window (`src/sim/loot/bop_trade_window.ts`,
+  `ItemInstancePayload.partyTrade`).
+- Eligibility is the loot-candidate snapshot at the EXACT drop moment
+  (the kill-time `lootRecipientIds` set), never the current roster:
+  joining the party after the kill grants nothing, leaving it loses
+  nothing. The window rides the copy through trades, so a recipient can
+  pass it on within the same deadline, still only inside that snapshot.
+- Equipping the copy ends the window immediately and permanently
+  (`items.ts equipmentPayloadFor` strips the payload on the bag-to-worn
+  bridge). Mail, market, vendor, and guild bank stay hard-blocked by
+  `def.soulbound`; the trade offer path is the one channel the window
+  opens.
+- The clock is `ctx.lockoutNowMs()` (the raid-lockout clock), so the
+  deadline survives server restarts; the client counts down via the
+  `partyTradeMsRemaining` IWorld facet member.
+- Player-facing surfaces: a gold tooltip line under Soulbound with the
+  remaining span, a "Binds when picked up" note on need/greed and
+  master-loot prompts, and a confirm dialog on Take Loot when the
+  visible loot contains a soulbound item.
+- Vendor-bought tier gear (the Crucible Quartermaster) binds at purchase
+  with NO window: the buyer chose the piece; there is no shared drop.
+
+Pinned by `tests/bop_trade_window.test.ts`, `tests/bop_party_trade.test.ts`,
+and the award describes in `tests/loot_roll.test.ts`.

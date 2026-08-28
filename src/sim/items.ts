@@ -106,8 +106,16 @@ export type VendorRemovedUnit = InventoryUnit;
 
 function equipmentPayloadFor(unit: EquippedInventoryUnit): ItemInstancePayload | undefined {
   if (!unit.instance && unit.craftedRecipeId === undefined) return undefined;
+  // Equipping ends the bind-on-pickup party trade window for good: the worn
+  // payload never carries it, so the copy returned to bags on unequip
+  // (returnEquippedItemToBags) is permanently window-free. Strip on a clone;
+  // the consumed bag unit's own payload is never mutated.
+  const { partyTrade: _partyTrade, ...instance } = unit.instance
+    ? cloneItemInstancePayload(unit.instance)
+    : ({} as ItemInstancePayload);
+  if (Object.keys(instance).length === 0 && unit.craftedRecipeId === undefined) return undefined;
   return {
-    ...(unit.instance ? cloneItemInstancePayload(unit.instance) : {}),
+    ...instance,
     ...(unit.craftedRecipeId === undefined ? {} : { craftedRecipeId: unit.craftedRecipeId }),
   };
 }
@@ -298,10 +306,16 @@ export function removeSellUnitsFromInventory(
   count: number,
   skip?: (instance: ItemInstancePayload) => boolean,
   deprioritize?: (instance: ItemInstancePayload) => boolean,
+  // `skip` above deliberately sees INSTANCED slots only (mail/market escrow
+  // pass `() => true` to mean "plain stock only", and the vendor predicate
+  // derefs its argument), so a walk that must exclude plain stacks opts in
+  // here instead. Sole consumer: the trade offer's soulbound arm, where only
+  // window-carrying instanced copies may ever ship.
+  skipPlainStacks = false,
 ): VendorRemovedUnit[] {
   const consumed: VendorRemovedUnit[] = [];
   let left = count;
-  for (let i = inventory.length - 1; i >= 0 && left > 0; i--) {
+  for (let i = inventory.length - 1; i >= 0 && left > 0 && !skipPlainStacks; i--) {
     const s = inventory[i];
     if (s.itemId !== itemId || s.instance) continue;
     const take = Math.min(s.count, left);

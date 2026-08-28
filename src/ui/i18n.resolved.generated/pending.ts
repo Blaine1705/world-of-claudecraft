@@ -271,7 +271,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.makersBrand",
     "hudChrome.auraEffect.sharedPyre",
     "hudChrome.auraEffect.varkhulMoltenCore",
-    "hudChrome.auraEffect.varkhulSentinelsGaze"
+    "hudChrome.auraEffect.varkhulSentinelsGaze",
+    "hudChrome.itemTooltip.partyTradeWindow",
+    "hudChrome.loot.bindConfirmBody",
+    "hudChrome.loot.bindConfirmTitle",
+    "itemUi.lootRoll.bindsOnPickup"
   ],
   "es_ES": [
     "crucibleShop.balance",
@@ -535,7 +539,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.makersBrand",
     "hudChrome.auraEffect.sharedPyre",
     "hudChrome.auraEffect.varkhulMoltenCore",
-    "hudChrome.auraEffect.varkhulSentinelsGaze"
+    "hudChrome.auraEffect.varkhulSentinelsGaze",
+    "hudChrome.itemTooltip.partyTradeWindow",
+    "hudChrome.loot.bindConfirmBody",
+    "hudChrome.loot.bindConfirmTitle",
+    "itemUi.lootRoll.bindsOnPickup"
   ],
   "fr_FR": [
     "crucibleShop.balance",
@@ -807,6 +815,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.varkhulMoltenCore",
     "hudChrome.auraEffect.varkhulSentinelsGaze",
     "hudChrome.auraEffect.varkhulSharedPyre",
+    "hudChrome.itemTooltip.partyTradeWindow",
+    "hudChrome.loot.bindConfirmBody",
+    "hudChrome.loot.bindConfirmTitle",
     "hudChrome.raidBossGuide.button",
     "hudChrome.raidBossGuide.close",
     "hudChrome.raidBossGuide.ignivar.apocalypse",
@@ -841,7 +852,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
     "hudChrome.varkhulCallout.worldfireConsumed",
-    "hudChrome.varkhulWaveStatus"
+    "hudChrome.varkhulWaveStatus",
+    "itemUi.lootRoll.bindsOnPickup"
   ],
   "fr_CA": [
     "crucibleShop.balance",
@@ -1113,6 +1125,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.varkhulMoltenCore",
     "hudChrome.auraEffect.varkhulSentinelsGaze",
     "hudChrome.auraEffect.varkhulSharedPyre",
+    "hudChrome.itemTooltip.partyTradeWindow",
+    "hudChrome.loot.bindConfirmBody",
+    "hudChrome.loot.bindConfirmTitle",
     "hudChrome.raidBossGuide.button",
     "hudChrome.raidBossGuide.close",
     "hudChrome.raidBossGuide.ignivar.apocalypse",
@@ -1147,7 +1162,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
     "hudChrome.varkhulCallout.worldfireConsumed",
-    "hudChrome.varkhulWaveStatus"
+    "hudChrome.varkhulWaveStatus",
+    "itemUi.lootRoll.bindsOnPickup"
   ],
   "en_CA": [],
   "it_IT": [
@@ -1420,6 +1436,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.varkhulMoltenCore",
     "hudChrome.auraEffect.varkhulSentinelsGaze",
     "hudChrome.auraEffect.varkhulSharedPyre",
+    "hudChrome.itemTooltip.partyTradeWindow",
+    "hudChrome.loot.bindConfirmBody",
+    "hudChrome.loot.bindConfirmTitle",
     "hudChrome.raidBossGuide.button",
     "hudChrome.raidBossGuide.close",
     "hudChrome.raidBossGuide.ignivar.apocalypse",
@@ -1454,7 +1473,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
     "hudChrome.varkhulCallout.worldfireConsumed",
-    "hudChrome.varkhulWaveStatus"
+    "hudChrome.varkhulWaveStatus",
+    "itemUi.lootRoll.bindsOnPickup"
   ],
   "de_DE": [
     "crucibleShop.balance",
@@ -1726,6 +1746,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.varkhulMoltenCore",
     "hudChrome.auraEffect.varkhulSentinelsGaze",
     "hudChrome.auraEffect.varkhulSharedPyre",
+    "hudChrome.itemTooltip.partyTradeWindow",
+    "hudChrome.loot.bindConfirmBody",
+    "hudChrome.loot.bindConfirmTitle",
     "hudChrome.raidBossGuide.button",
     "hudChrome.raidBossGuide.close",
     "hudChrome.raidBossGuide.ignivar.apocalypse",
@@ -1760,7 +1783,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
     "hudChrome.varkhulCallout.worldfireConsumed",
-    "hudChrome.varkhulWaveStatus"
+    "hudChrome.varkhulWaveStatus",
+    "itemUi.lootRoll.bindsOnPickup"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -2036,6 +2060,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.varkhulMoltenCore",
     "hudChrome.auraEffect.varkhulSentinelsGaze",
     "hudChrome.auraEffect.varkhulSharedPyre",
+    "hudChrome.itemTooltip.partyTradeWindow",
+    "hudChrome.loot.bindConfirmBody",
+    "hudChrome.loot.bindConfirmTitle",
     "hudChrome.raidBossGuide.button",
     "hudChrome.raidBossGuide.close",
     "hudChrome.raidBossGuide.ignivar.apocalypse",
@@ -2070,7 +2097,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
     "hudChrome.varkhulCallout.worldfireConsumed",
-    "hudChrome.varkhulWaveStatus"
+    "hudChrome.varkhulWaveStatus",
+    "itemUi.lootRoll.bindsOnPickup"
   ],
   "ru_RU": [],
   "cs_CZ": [
@@ -2343,6 +2371,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.varkhulMoltenCore",
     "hudChrome.auraEffect.varkhulSentinelsGaze",
     "hudChrome.auraEffect.varkhulSharedPyre",
+    "hudChrome.itemTooltip.partyTradeWindow",
+    "hudChrome.loot.bindConfirmBody",
+    "hudChrome.loot.bindConfirmTitle",
     "hudChrome.raidBossGuide.button",
     "hudChrome.raidBossGuide.close",
     "hudChrome.raidBossGuide.ignivar.apocalypse",
@@ -2377,7 +2408,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
     "hudChrome.varkhulCallout.worldfireConsumed",
-    "hudChrome.varkhulWaveStatus"
+    "hudChrome.varkhulWaveStatus",
+    "itemUi.lootRoll.bindsOnPickup"
   ],
   "nl_NL": [
     "crucibleShop.balance",
@@ -2649,6 +2681,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.varkhulMoltenCore",
     "hudChrome.auraEffect.varkhulSentinelsGaze",
     "hudChrome.auraEffect.varkhulSharedPyre",
+    "hudChrome.itemTooltip.partyTradeWindow",
+    "hudChrome.loot.bindConfirmBody",
+    "hudChrome.loot.bindConfirmTitle",
     "hudChrome.raidBossGuide.button",
     "hudChrome.raidBossGuide.close",
     "hudChrome.raidBossGuide.ignivar.apocalypse",
@@ -2683,7 +2718,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
     "hudChrome.varkhulCallout.worldfireConsumed",
-    "hudChrome.varkhulWaveStatus"
+    "hudChrome.varkhulWaveStatus",
+    "itemUi.lootRoll.bindsOnPickup"
   ],
   "pl_PL": [
     "crucibleShop.balance",
@@ -2955,6 +2991,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.varkhulMoltenCore",
     "hudChrome.auraEffect.varkhulSentinelsGaze",
     "hudChrome.auraEffect.varkhulSharedPyre",
+    "hudChrome.itemTooltip.partyTradeWindow",
+    "hudChrome.loot.bindConfirmBody",
+    "hudChrome.loot.bindConfirmTitle",
     "hudChrome.raidBossGuide.button",
     "hudChrome.raidBossGuide.close",
     "hudChrome.raidBossGuide.ignivar.apocalypse",
@@ -2989,7 +3028,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
     "hudChrome.varkhulCallout.worldfireConsumed",
-    "hudChrome.varkhulWaveStatus"
+    "hudChrome.varkhulWaveStatus",
+    "itemUi.lootRoll.bindsOnPickup"
   ],
   "id_ID": [
     "crucibleShop.balance",
@@ -3261,6 +3301,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.varkhulMoltenCore",
     "hudChrome.auraEffect.varkhulSentinelsGaze",
     "hudChrome.auraEffect.varkhulSharedPyre",
+    "hudChrome.itemTooltip.partyTradeWindow",
+    "hudChrome.loot.bindConfirmBody",
+    "hudChrome.loot.bindConfirmTitle",
     "hudChrome.raidBossGuide.button",
     "hudChrome.raidBossGuide.close",
     "hudChrome.raidBossGuide.ignivar.apocalypse",
@@ -3295,7 +3338,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
     "hudChrome.varkhulCallout.worldfireConsumed",
-    "hudChrome.varkhulWaveStatus"
+    "hudChrome.varkhulWaveStatus",
+    "itemUi.lootRoll.bindsOnPickup"
   ],
   "tr_TR": [
     "crucibleShop.balance",
@@ -3567,6 +3611,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.varkhulMoltenCore",
     "hudChrome.auraEffect.varkhulSentinelsGaze",
     "hudChrome.auraEffect.varkhulSharedPyre",
+    "hudChrome.itemTooltip.partyTradeWindow",
+    "hudChrome.loot.bindConfirmBody",
+    "hudChrome.loot.bindConfirmTitle",
     "hudChrome.raidBossGuide.button",
     "hudChrome.raidBossGuide.close",
     "hudChrome.raidBossGuide.ignivar.apocalypse",
@@ -3601,7 +3648,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
     "hudChrome.varkhulCallout.worldfireConsumed",
-    "hudChrome.varkhulWaveStatus"
+    "hudChrome.varkhulWaveStatus",
+    "itemUi.lootRoll.bindsOnPickup"
   ],
   "sv_SE": [
     "crucibleShop.balance",
@@ -3873,6 +3921,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.varkhulMoltenCore",
     "hudChrome.auraEffect.varkhulSentinelsGaze",
     "hudChrome.auraEffect.varkhulSharedPyre",
+    "hudChrome.itemTooltip.partyTradeWindow",
+    "hudChrome.loot.bindConfirmBody",
+    "hudChrome.loot.bindConfirmTitle",
     "hudChrome.raidBossGuide.button",
     "hudChrome.raidBossGuide.close",
     "hudChrome.raidBossGuide.ignivar.apocalypse",
@@ -3907,7 +3958,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
     "hudChrome.varkhulCallout.worldfireConsumed",
-    "hudChrome.varkhulWaveStatus"
+    "hudChrome.varkhulWaveStatus",
+    "itemUi.lootRoll.bindsOnPickup"
   ],
   "vi_VN": [
     "crucibleShop.balance",
@@ -4179,6 +4231,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.varkhulMoltenCore",
     "hudChrome.auraEffect.varkhulSentinelsGaze",
     "hudChrome.auraEffect.varkhulSharedPyre",
+    "hudChrome.itemTooltip.partyTradeWindow",
+    "hudChrome.loot.bindConfirmBody",
+    "hudChrome.loot.bindConfirmTitle",
     "hudChrome.raidBossGuide.button",
     "hudChrome.raidBossGuide.close",
     "hudChrome.raidBossGuide.ignivar.apocalypse",
@@ -4213,7 +4268,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
     "hudChrome.varkhulCallout.worldfireConsumed",
-    "hudChrome.varkhulWaveStatus"
+    "hudChrome.varkhulWaveStatus",
+    "itemUi.lootRoll.bindsOnPickup"
   ],
   "da_DK": [
     "crucibleShop.balance",
@@ -4485,6 +4541,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auraEffect.varkhulMoltenCore",
     "hudChrome.auraEffect.varkhulSentinelsGaze",
     "hudChrome.auraEffect.varkhulSharedPyre",
+    "hudChrome.itemTooltip.partyTradeWindow",
+    "hudChrome.loot.bindConfirmBody",
+    "hudChrome.loot.bindConfirmTitle",
     "hudChrome.raidBossGuide.button",
     "hudChrome.raidBossGuide.close",
     "hudChrome.raidBossGuide.ignivar.apocalypse",
@@ -4519,6 +4578,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.varkhulCallout.worldfireBegins",
     "hudChrome.varkhulCallout.worldfireClosing",
     "hudChrome.varkhulCallout.worldfireConsumed",
-    "hudChrome.varkhulWaveStatus"
+    "hudChrome.varkhulWaveStatus",
+    "itemUi.lootRoll.bindsOnPickup"
   ]
 };

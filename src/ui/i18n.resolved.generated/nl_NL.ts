@@ -2707,7 +2707,9 @@ export const nl_NL: EnTranslations = {
       "chestTitle": "Kist",
       "takeLootButton": "Buit Nemen",
       "takeLootTooltip": "Neemt de munten en gevallen voorwerpen. Verbruikt de oogst niet.",
-      "unifiedPressHint": "De interactietoets berooft en oogst in een keer, op basis van je stadsfocus."
+      "unifiedPressHint": "De interactietoets berooft en oogst in een keer, op basis van je stadsfocus.",
+      "bindConfirmTitle": "Binds when picked up",
+      "bindConfirmBody": "This loot contains an item that will bind to you when taken. A bound item can only be traded to players who shared its drop, and only for a limited time."
     },
     "spellbook": {
       "addToBarAria": "{name} toevoegen aan actiebalk",
@@ -2775,7 +2777,8 @@ export const nl_NL: EnTranslations = {
       "riftUpgrade": "Rift-verbetering {level}/{max}",
       "riftSockets": "Riftjuwelen {used}/{total}",
       "statEnchanted": "+{value} {stat} (Betoverd)",
-      "enchantedFallback": "Betoverd"
+      "enchantedFallback": "Betoverd",
+      "partyTradeWindow": "You may trade this item to players who shared its drop for the next {time}. Equipping it ends the trade window."
     },
     "materialHint": {
       "fineGrade": "Fijne kwaliteit. Verzameld uit een grondstoffenpunt op volle rang met gereedschap boven de rang van het materiaal, en telt overal waar de gewone versie vereist is als die versie.",
@@ -9672,7 +9675,8 @@ export const nl_NL: EnTranslations = {
       "greedAria": "Hebzucht voor {item}",
       "passAria": "{item} passeren",
       "everyonePassed": "Iedereen passeerde {item}.",
-      "rolled": "{answered}/{total} geworpen"
+      "rolled": "{answered}/{total} geworpen",
+      "bindsOnPickup": "Binds when picked up"
     }
   },
   "entities": {

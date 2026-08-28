@@ -1270,6 +1270,14 @@ export interface ItemInstancePayload {
    *  (items.ts): this is an optional mark the owner sets on an otherwise
    *  ordinary copy. */
   locked?: boolean;
+  /** Bind-on-pickup party trade window (src/sim/loot/bop_trade_window.ts): a
+   *  soulbound copy awarded from party boss loot stays tradeable until
+   *  `untilMs` (the ctx.lockoutNowMs() clock), but only with the characters
+   *  named in `eligible`, the loot-candidate snapshot at the exact drop
+   *  moment. Equipping the copy strips this field (items.ts
+   *  equipmentPayloadFor), ending the window for good. Additive and
+   *  JSONB-safe: an absent or expired window is an ordinary soulbound copy. */
+  partyTrade?: { untilMs: number; eligible: string[] };
   /** Long-term Rift gear progression. `rolled.stats` is the authoritative
    * aggregate bonus consumed by recalcPlayerStats; this record explains how it
    * was earned and lets forge operations rebuild it deterministically. */
@@ -1307,6 +1315,9 @@ export function cloneItemInstancePayload(src: ItemInstancePayload): ItemInstance
       ...(src.rift.enchant && { enchant: { ...src.rift.enchant } }),
       gems: [...src.rift.gems],
     };
+  }
+  if (src.partyTrade) {
+    instance.partyTrade = { ...src.partyTrade, eligible: [...src.partyTrade.eligible] };
   }
   return instance;
 }

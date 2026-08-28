@@ -2707,7 +2707,9 @@ export const pt_BR: EnTranslations = {
       "chestTitle": "Baú",
       "takeLootButton": "Pegar Saque",
       "takeLootTooltip": "Pega as moedas e os itens largados. Não usa a coleta.",
-      "unifiedPressHint": "A tecla de interação saqueia e coleta em um único clique, usando seu foco da cidade."
+      "unifiedPressHint": "A tecla de interação saqueia e coleta em um único clique, usando seu foco da cidade.",
+      "bindConfirmTitle": "Binds when picked up",
+      "bindConfirmBody": "This loot contains an item that will bind to you when taken. A bound item can only be traded to players who shared its drop, and only for a limited time."
     },
     "spellbook": {
       "addToBarAria": "Adicionar {name} à barra de ação",
@@ -2775,7 +2777,8 @@ export const pt_BR: EnTranslations = {
       "riftUpgrade": "Aprimoramento da fenda {level}/{max}",
       "riftSockets": "Gemas da fenda {used}/{total}",
       "statEnchanted": "+{value} {stat} (Encantado)",
-      "enchantedFallback": "Encantado"
+      "enchantedFallback": "Encantado",
+      "partyTradeWindow": "You may trade this item to players who shared its drop for the next {time}. Equipping it ends the trade window."
     },
     "materialHint": {
       "fineGrade": "Grau fino. Coletado de um veio de nível pleno com uma ferramenta de nível acima do material, e conta como a versão comum sempre que uma for exigida.",
@@ -9672,7 +9675,8 @@ export const pt_BR: EnTranslations = {
       "greedAria": "Ganância por {item}",
       "passAria": "Passar em {item}",
       "everyonePassed": "Todos passaram em {item}.",
-      "rolled": "{answered}/{total} rolaram"
+      "rolled": "{answered}/{total} rolaram",
+      "bindsOnPickup": "Binds when picked up"
     }
   },
   "entities": {

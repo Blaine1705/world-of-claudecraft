@@ -722,6 +722,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'お金とドロップしたアイテムを受け取ります。採取の機会は消費しません。',
   'hudChrome.loot.unifiedPressHint':
     '相互作用キーを一度押すだけで、町のフォーカスに従って戦利品の回収と採取を同時に行います。',
+  'hudChrome.loot.bindConfirmTitle': '拾うと魂縛される',
+  'hudChrome.loot.bindConfirmBody':
+    'この戦利品には、取得すると自分に魂縛されるアイテムが含まれています。魂縛されたアイテムは、同じドロップを分かち合ったプレイヤーとの間でのみ、限られた時間だけ取引できます。',
   'hudChrome.itemTooltip.requiresLevel': '必要レベル {level}',
   'hudChrome.spellbook.addToBarAria': '{name}をアクションバーに追加',
   'hudChrome.spellbook.removeFromBarAria': '{name}をアクションバーから削除',
@@ -3030,6 +3033,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.lootRoll.passAria': '{item}をパス',
   'itemUi.lootRoll.everyonePassed': '全員が{item}をパスしました。',
   'itemUi.lootRoll.rolled': '{answered}/{total} がロール済み',
+  'itemUi.lootRoll.bindsOnPickup': '拾うと魂縛される',
   'entities.abilities.heroic_strike.name': '略奪者の一撃',
   'entities.abilities.heroic_strike.description':
     '強力な攻撃で近接ダメージが {damage} 増加します。次のスイングで発動します。',
@@ -11858,6 +11862,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.itemLockedLine': 'ロック中',
   'hudChrome.bags.unlockItem': 'アイテムのロック解除',
   'hudChrome.itemTooltip.enchantedFallback': 'エンチャント済み',
+  'hudChrome.itemTooltip.partyTradeWindow':
+    'このアイテムはあと{time}の間、同じドロップを分かち合ったプレイヤーと取引できます。装備すると取引期間は終了します。',
   'devCommand.actions.kit.description':
     '指定したスペック向けのSanctum以前レベル20プリセットを装備します (バッグを先に)。装備品のみです。',
   'devCommand.actions.kit.label': '新規20キットを装備',

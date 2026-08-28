@@ -704,6 +704,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.loot.takeLootButton': '拾取战利品',
   'hudChrome.loot.takeLootTooltip': '收取金币和掉落的物品。不会用掉采集机会。',
   'hudChrome.loot.unifiedPressHint': '按一次互动键即可同时拾取战利品并按城镇专注进行采集。',
+  'hudChrome.loot.bindConfirmTitle': '拾取后绑定',
+  'hudChrome.loot.bindConfirmBody':
+    '这批战利品中有一件物品在拾取后将与你绑定。绑定的物品只能在限定时间内交易给共同获得该掉落的玩家。',
   'hudChrome.itemTooltip.requiresLevel': '需要等级 {level}',
   'hudChrome.spellbook.addToBarAria': '将{name}添加到动作条',
   'hudChrome.spellbook.removeFromBarAria': '从动作条移除{name}',
@@ -2908,6 +2911,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.lootRoll.passAria': '放弃 {item}',
   'itemUi.lootRoll.everyonePassed': '所有人都放弃了 {item}。',
   'itemUi.lootRoll.rolled': '{answered}/{total} 已投骰',
+  'itemUi.lootRoll.bindsOnPickup': '拾取后绑定',
   'entities.abilities.heroic_strike.name': '劫掠打击',
   'entities.abilities.heroic_strike.description':
     '一次强力攻击，使近战伤害提高 {damage}。在你的下一次挥击时触发。',
@@ -11315,6 +11319,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.itemLockedLine': '已锁定',
   'hudChrome.bags.unlockItem': '解锁物品',
   'hudChrome.itemTooltip.enchantedFallback': '已附魔',
+  'hudChrome.itemTooltip.partyTradeWindow':
+    '在接下来的{time}内，你可以将此物品交易给共同获得该掉落的玩家。装备后交易期限即告结束。',
   'devCommand.actions.kit.description': '为该专精穿上圣所前20级预设装备，背包优先。仅限装备。',
   'devCommand.actions.kit.label': '装备新晋20级预设',
   'devCommand.fields.spec': '专精',

@@ -2707,7 +2707,9 @@ export const it_IT: EnTranslations = {
       "chestTitle": "Scrigno",
       "takeLootButton": "Prendi il bottino",
       "takeLootTooltip": "Prende le monete e gli oggetti caduti. Non consuma la raccolta.",
-      "unifiedPressHint": "Il tasto interagisci raccoglie il bottino e raccoglie in una sola pressione, usando il tuo focus nella citta."
+      "unifiedPressHint": "Il tasto interagisci raccoglie il bottino e raccoglie in una sola pressione, usando il tuo focus nella citta.",
+      "bindConfirmTitle": "Binds when picked up",
+      "bindConfirmBody": "This loot contains an item that will bind to you when taken. A bound item can only be traded to players who shared its drop, and only for a limited time."
     },
     "spellbook": {
       "addToBarAria": "Aggiungi {name} alla barra azioni",
@@ -2775,7 +2777,8 @@ export const it_IT: EnTranslations = {
       "riftUpgrade": "Potenziamento dello squarcio {level}/{max}",
       "riftSockets": "Gemme dello squarcio {used}/{total}",
       "statEnchanted": "+{value} {stat} (Incantato)",
-      "enchantedFallback": "Incantato"
+      "enchantedFallback": "Incantato",
+      "partyTradeWindow": "You may trade this item to players who shared its drop for the next {time}. Equipping it ends the trade window."
     },
     "materialHint": {
       "fineGrade": "Grado pregiato. Raccolto da un filone di pieno livello con uno strumento di rango superiore al materiale, e vale come la versione ordinaria ovunque ne venga richiesta una.",
@@ -9672,7 +9675,8 @@ export const it_IT: EnTranslations = {
       "greedAria": "Brama per {item}",
       "passAria": "Passa su {item}",
       "everyonePassed": "Tutti hanno passato su {item}.",
-      "rolled": "{answered}/{total} hanno tirato"
+      "rolled": "{answered}/{total} hanno tirato",
+      "bindsOnPickup": "Binds when picked up"
     }
   },
   "entities": {

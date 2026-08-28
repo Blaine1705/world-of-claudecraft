@@ -2707,7 +2707,9 @@ export const es: EnTranslations = {
       "chestTitle": "Cofre",
       "takeLootButton": "Tomar botín",
       "takeLootTooltip": "Toma las monedas y los objetos caídos. No consume la recolección.",
-      "unifiedPressHint": "La tecla de interacción saquea y recolecta en una sola pulsación, usando tu enfoque de pueblo."
+      "unifiedPressHint": "La tecla de interacción saquea y recolecta en una sola pulsación, usando tu enfoque de pueblo.",
+      "bindConfirmTitle": "Binds when picked up",
+      "bindConfirmBody": "This loot contains an item that will bind to you when taken. A bound item can only be traded to players who shared its drop, and only for a limited time."
     },
     "spellbook": {
       "addToBarAria": "Añadir {name} a la barra de acción",
@@ -2775,7 +2777,8 @@ export const es: EnTranslations = {
       "riftUpgrade": "Mejora de brecha {level}/{max}",
       "riftSockets": "Gemas de brecha {used}/{total}",
       "statEnchanted": "+{value} {stat} (Encantado)",
-      "enchantedFallback": "Encantado"
+      "enchantedFallback": "Encantado",
+      "partyTradeWindow": "You may trade this item to players who shared its drop for the next {time}. Equipping it ends the trade window."
     },
     "materialHint": {
       "fineGrade": "Calidad fina. Recolectada de una veta de nivel completo con una herramienta de rango superior al material, y cuenta como la versión ordinaria dondequiera que se pida una.",
@@ -9672,7 +9675,8 @@ export const es: EnTranslations = {
       "greedAria": "Codicia por {item}",
       "passAria": "Pasar por {item}",
       "everyonePassed": "Todos pasaron por {item}.",
-      "rolled": "{answered}/{total} han tirado"
+      "rolled": "{answered}/{total} han tirado",
+      "bindsOnPickup": "Binds when picked up"
     }
   },
   "entities": {

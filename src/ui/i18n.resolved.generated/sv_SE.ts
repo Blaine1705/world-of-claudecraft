@@ -2707,7 +2707,9 @@ export const sv_SE: EnTranslations = {
       "chestTitle": "Kista",
       "takeLootButton": "Ta byte",
       "takeLootTooltip": "Tar mynten och fallna föremål. Använder inte upp skörden.",
-      "unifiedPressHint": "Interagera-tangenten plundrar och skördar i ett tryck, med ditt stadsfokus."
+      "unifiedPressHint": "Interagera-tangenten plundrar och skördar i ett tryck, med ditt stadsfokus.",
+      "bindConfirmTitle": "Binds when picked up",
+      "bindConfirmBody": "This loot contains an item that will bind to you when taken. A bound item can only be traded to players who shared its drop, and only for a limited time."
     },
     "spellbook": {
       "addToBarAria": "Lägg till {name} i handlingsfältet",
@@ -2775,7 +2777,8 @@ export const sv_SE: EnTranslations = {
       "riftUpgrade": "Revuppgradering {level}/{max}",
       "riftSockets": "Revstenar {used}/{total}",
       "statEnchanted": "+{value} {stat} (Förtrollad)",
-      "enchantedFallback": "Förtrollad"
+      "enchantedFallback": "Förtrollad",
+      "partyTradeWindow": "You may trade this item to players who shared its drop for the next {time}. Equipping it ends the trade window."
     },
     "materialHint": {
       "fineGrade": "Fin kvalitet. Bruten ur en åder av full nivå med ett verktyg som rankar över materialet, och räknas som den vanliga versionen varhelst en sådan krävs.",
@@ -9672,7 +9675,8 @@ export const sv_SE: EnTranslations = {
       "greedAria": "Girighet för {item}",
       "passAria": "Avstå från {item}",
       "everyonePassed": "Alla avstod från {item}.",
-      "rolled": "{answered}/{total} har rullat"
+      "rolled": "{answered}/{total} har rullat",
+      "bindsOnPickup": "Binds when picked up"
     }
   },
   "entities": {

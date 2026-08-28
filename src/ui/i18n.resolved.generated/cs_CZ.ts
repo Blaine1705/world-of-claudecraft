@@ -2707,7 +2707,9 @@ export const cs_CZ: EnTranslations = {
       "chestTitle": "Truhla",
       "takeLootButton": "Sebrat kořist",
       "takeLootTooltip": "Sebrat veškerou kořist",
-      "unifiedPressHint": "Stiskni pro sebrání"
+      "unifiedPressHint": "Stiskni pro sebrání",
+      "bindConfirmTitle": "Binds when picked up",
+      "bindConfirmBody": "This loot contains an item that will bind to you when taken. A bound item can only be traded to players who shared its drop, and only for a limited time."
     },
     "spellbook": {
       "addToBarAria": "Přidat {name} na akční lištu",
@@ -2775,7 +2777,8 @@ export const cs_CZ: EnTranslations = {
       "riftUpgrade": "Vylepšení trhliny {level}/{max}",
       "riftSockets": "Trhlinové drahokamy {used}/{total}",
       "statEnchanted": "+{value} {stat} (okouzleno)",
-      "enchantedFallback": "Okouzlený"
+      "enchantedFallback": "Okouzlený",
+      "partyTradeWindow": "You may trade this item to players who shared its drop for the next {time}. Equipping it ends the trade window."
     },
     "materialHint": {
       "fineGrade": "Jemná jakost. Sesbírána z naleziště plné úrovně nástrojem vyššího stupně, než je materiál, a počítá se jako běžná verze všude, kde je běžná verze potřeba.",
@@ -9672,7 +9675,8 @@ export const cs_CZ: EnTranslations = {
       "greedAria": "Chamtivost pro {item}",
       "passAria": "Vzdát se nároku na {item}",
       "everyonePassed": "Všichni se vzdali nároku na {item}.",
-      "rolled": "{answered}/{total} hodilo"
+      "rolled": "{answered}/{total} hodilo",
+      "bindsOnPickup": "Binds when picked up"
     }
   },
   "entities": {
