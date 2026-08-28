@@ -123,7 +123,6 @@ import {
 } from './game/interactions';
 import { createIntroLogoOverlay } from './game/intro_logo_overlay';
 import { Keybinds } from './game/keybinds';
-import { createKtx2RestoreUploadQueueCoordinator } from './game/ktx2_restore_upload_queue';
 import {
   type KeyboardTurnArgs,
   newKeyboardTurnState,
@@ -131,6 +130,7 @@ import {
   stepKeyboardTurnFacing,
 } from './game/keyboard_turn_facing';
 import { applyMobileKeyboardViewport } from './game/keyboard_viewport_applier';
+import { createKtx2RestoreUploadQueueCoordinator } from './game/ktx2_restore_upload_queue';
 import { shouldUseStaticBackdrop } from './game/landing_backdrop';
 import { createLandingThemeAudio } from './game/landing_theme';
 import {
@@ -1295,7 +1295,8 @@ async function startGame(
   // The world and socket stay live, but every client-frame owner pauses while
   // the renderer is recycled. The frame loop also clears its offline backlog.
   let graphicsRebuildPaused = false;
-  const ktx2RestoreUploadQueue = createKtx2RestoreUploadQueueCoordinator<Renderer['backgroundGpuWork']>();
+  const ktx2RestoreUploadQueue =
+    createKtx2RestoreUploadQueueCoordinator<Renderer['backgroundGpuWork']>();
   let hud!: Hud;
   const baseEntryDiagnostics = (): EntryDiagnostics => {
     const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
@@ -3051,7 +3052,7 @@ async function startGame(
         world.player.pos.z,
         ARRIVAL_NEIGHBOR_STREAM_RADIUS,
         (done, total) => setLoadingProgressRange(done, total, 65, 88),
-    ),
+      ),
     prewarmRenderer: async (next) => {
       await next.prewarmInitialScene();
       await next.farVistaReady();
