@@ -104,7 +104,6 @@ import {
 } from './game/graphics_rebuild_crash_guard';
 import { Input } from './game/input';
 import { InputActivityMeter, installInputActivityTracking } from './game/input_activity';
-import { currentInputHintMode } from './game/input_hint_mode';
 import { stopAutorunForInteraction } from './game/interaction_autorun';
 import {
   activePvpOpponentIds,

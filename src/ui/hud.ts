@@ -393,7 +393,6 @@ import {
   type AimPoint,
   quickAimPoint,
   shouldUseGroundAim,
-  smartSeedPoint,
   XHB_ONLY_AIM_SLOT,
 } from './hud/action_bar/ground_aim';
 import {

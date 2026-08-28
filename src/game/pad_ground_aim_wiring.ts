@@ -3,7 +3,6 @@
 // a firewall). Pure math lives in pad_ground_aim.ts; this module only binds it
 // to the injected world, input, and Hud facets.
 
-import type { Entity } from '../sim/types';
 import { currentInputHintMode } from './input_hint_mode';
 import {
   activePvpOpponentIds,

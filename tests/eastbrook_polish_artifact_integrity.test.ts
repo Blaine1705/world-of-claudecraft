@@ -2180,9 +2180,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    // Re-minted for the PR 3676 placement-aim round: the first-order composite
-    // follows renderer.ts, then this second-order seal follows the swept
-    // evidence bytes. No capture was retaken.
+      // Re-minted for the PR 3676 placement-aim round: the first-order composite
+      // follows renderer.ts, then this second-order seal follows the swept
+      // evidence bytes. No capture was retaken.
     ).toBe('a8fb43fe5259cda9b218fc2918bc54d99bc307cadaed6e752289ce58c74078c8');
   });
 
