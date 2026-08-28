@@ -1477,11 +1477,11 @@ async function startGame(
   const autoLoot = new AutoLoot();
   const perf = createPerfMonitor(null, DESKTOP_APP);
   canvas.addEventListener('webglcontextlost', () => {
-    // Start re-transcoding released KTX2 mip chains NOW: the restored (or
-    // recycled) context re-uploads from texture.mipmaps, and the sooner the
-    // worker starts the shorter any stub-black window. Fires for in-place GPU
-    // loss AND the graphics-rebuild recycle (both dispatch on this canvas).
-    ktx2MipsOnContextLost();
+    // Start re-transcoding released KTX2 mip chains NOW: the restored (or recycled) context
+    // re-uploads from texture.mipmaps, and the sooner the worker starts the shorter any
+    // stub-black window. Fires for in-place GPU loss AND the graphics-rebuild recycle (both
+    // dispatch on this canvas); paces re-uploads through the current renderer's queue, none yet.
+    ktx2MipsOnContextLost(rendererReady ? renderer.backgroundGpuWork : undefined);
     entryDiagnostics.checkpoint('webgl-context-lost', {
       ...renderEntryDiagnostics(),
       contextLost: rendererReady ? renderer.perfStats().contextLost + 1 : 1,
