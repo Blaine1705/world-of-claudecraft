@@ -21,6 +21,8 @@ vi.mock('../server/admin_guilds_read', () => ({
 
 import {
   CHARACTER_DELETE_PERMIT_SUB_CAP,
+  CHARACTER_DELETE_VERIFY_LOCK_TIMEOUT_MS,
+  CHARACTER_DELETE_VERIFY_SQL,
   CharacterDeleteClientGone,
   CharacterDeleteQueueSaturated,
   CharacterStoragePurchaseOpen,
@@ -283,6 +285,11 @@ describe('deleteCharacter', () => {
     expect(client.query.mock.calls.map((call) => call[0])).toContain('ROLLBACK');
     expect(client.release).toHaveBeenCalledOnce();
     expect(dbMock.bustGuildList).not.toHaveBeenCalled();
+    // A NON-ambiguous rollback skips the verify checkout entirely: the one
+    // connect is the transaction's own. Dropping the ambiguity guard on the
+    // resolver would double pool checkouts under exactly the saturation the
+    // delete gate exists to bound, and only this count sees it.
+    expect(dbMock.connect).toHaveBeenCalledTimes(1);
   });
 
   it('composes under the registered background gate: permit before checkout, released after the client', async () => {
@@ -627,10 +634,24 @@ describe('deleteCharacter', () => {
       // remaining ambiguity carrier now that no caller signal reaches it.
       await vi.advanceTimersByTimeAsync(65_000);
       await expect(done).resolves.toBe(true);
-      const [sql, params] = verifyClient.query.mock.calls.at(-1) ?? [];
-      expect(String(sql)).toMatch(/SELECT 1 FROM characters/);
-      expect(params).toEqual([42, 7, REALM]);
+      // The verify WAITS the hung COMMIT out instead of racing it: its read
+      // runs FOR UPDATE inside its own bounded transaction (a plain SELECT's
+      // READ COMMITTED snapshot sees the deleted-but-uncommitted row as
+      // present and answers "not landed" for a delete that then commits).
+      const sql = verifyClient.query.mock.calls.map((call) => String(call[0]));
+      expect(sql[0]).toBe('BEGIN');
+      expect(sql[1]).toContain(`lock_timeout = ${CHARACTER_DELETE_VERIFY_LOCK_TIMEOUT_MS}`);
+      expect(sql[1]).toContain(`statement_timeout = ${DELETE_RESTORE_STATEMENT_TIMEOUT_MS}`);
+      const read = verifyClient.query.mock.calls.find((call) =>
+        /SELECT 1 FROM characters/.test(String(call[0])),
+      );
+      expect(String(read?.[0])).toBe(CHARACTER_DELETE_VERIFY_SQL);
+      expect(String(read?.[0])).toContain('FOR UPDATE');
+      expect(read?.[1]).toEqual([42, 7, REALM]);
+      expect(sql.at(-1)).toBe('ROLLBACK');
       expect(verifyClient.release).toHaveBeenCalledOnce();
+      // A clean verify returns the client to the pool, never discards it.
+      expect(verifyClient.release.mock.calls[0]).toEqual([]);
       expect(dbMock.bustGuildList).toHaveBeenCalledOnce();
       expect(drainLinkChanges()).toHaveLength(1);
     } finally {
@@ -643,7 +664,13 @@ describe('deleteCharacter', () => {
     try {
       const txClient = hungCommitClient();
       const verifyClient = clientStub();
-      verifyClient.query.mockResolvedValue({ rows: [{ found: 1 }], rowCount: 1 });
+      // Row present ONLY on the verify read: BEGIN/SET LOCAL/ROLLBACK keep
+      // their empty results, so the present answer is the SELECT's own.
+      verifyClient.query.mockImplementation(async (sql: string) =>
+        /SELECT 1 FROM characters/.test(sql)
+          ? { rows: [{ found: 1 }], rowCount: 1 }
+          : { rows: [], rowCount: 0 },
+      );
       dbMock.connect.mockResolvedValueOnce(txClient).mockResolvedValueOnce(verifyClient);
       // Attach the rejection handler BEFORE advancing the clock (the CI
       // unhandled-rejection rule the sibling tests follow).
@@ -656,6 +683,78 @@ describe('deleteCharacter', () => {
       await failed;
       // The row survived, so the failure stands and no success side runs.
       expect(verifyClient.release).toHaveBeenCalledOnce();
+      expect(dbMock.bustGuildList).not.toHaveBeenCalled();
+      expect(drainLinkChanges()).toHaveLength(0);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('bounds the verify lock wait UNDER its statement bound', () => {
+    // The wait must expire as a coded 55P03 lock_not_available, which the
+    // resolver's catch maps to honest ambiguity; with the statement bound at
+    // or under the lock bound, statement_timeout fires first and cancels the
+    // read without saying WHY. The pg suite drives the live semantics; this
+    // ordering is the always-run half.
+    expect(CHARACTER_DELETE_VERIFY_LOCK_TIMEOUT_MS).toBeLessThan(
+      DELETE_RESTORE_STATEMENT_TIMEOUT_MS,
+    );
+  });
+
+  it('propagates the ambiguity when the verify CHECKOUT itself rejects', async () => {
+    // One of the resolver's two catch-and-return-false error arms: flipping
+    // it to true would run the world-state purge for a delete that never
+    // provably landed. The pool refusing a second client under exactly the
+    // saturation that expired the wall is the realistic shape.
+    vi.useFakeTimers();
+    try {
+      const txClient = hungCommitClient();
+      dbMock.connect
+        .mockResolvedValueOnce(txClient)
+        .mockRejectedValueOnce(new Error('pool exhausted'));
+      const failed = expect(deleteCharacter(7, 42)).rejects.toMatchObject({
+        name: 'DbTransactionDeadlineExceeded',
+        commitMayHaveSucceeded: true,
+      });
+      await vi.advanceTimersByTimeAsync(0);
+      await vi.advanceTimersByTimeAsync(65_000);
+      await failed;
+      expect(dbMock.bustGuildList).not.toHaveBeenCalled();
+      expect(drainLinkChanges()).toHaveLength(0);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('propagates the ambiguity when the verify READ rejects, discarding the verify client', async () => {
+    // The other error arm: a lock_timeout expiry (the hung COMMIT outlasting
+    // the bounded wait) rejects the verify read. The ORIGINAL ambiguity must
+    // stand (never the verify error), and the client, mid-transaction in an
+    // unknown state, must be DISCARDED (release with an error), not returned
+    // to the pool; dropping that release leaks a client on every
+    // ambiguous-commit-plus-failed-verify.
+    vi.useFakeTimers();
+    try {
+      const txClient = hungCommitClient();
+      const verifyClient = clientStub();
+      verifyClient.query.mockImplementation(async (sql: string) => {
+        if (/SELECT 1 FROM characters/.test(sql)) {
+          throw Object.assign(new Error('canceling statement due to lock timeout'), {
+            code: '55P03',
+          });
+        }
+        return { rows: [], rowCount: 0 };
+      });
+      dbMock.connect.mockResolvedValueOnce(txClient).mockResolvedValueOnce(verifyClient);
+      const failed = expect(deleteCharacter(7, 42)).rejects.toMatchObject({
+        name: 'DbTransactionDeadlineExceeded',
+        commitMayHaveSucceeded: true,
+      });
+      await vi.advanceTimersByTimeAsync(0);
+      await vi.advanceTimersByTimeAsync(65_000);
+      await failed;
+      expect(verifyClient.release).toHaveBeenCalledOnce();
+      expect(verifyClient.release.mock.calls[0][0]).toBeInstanceOf(Error);
       expect(dbMock.bustGuildList).not.toHaveBeenCalled();
       expect(drainLinkChanges()).toHaveLength(0);
     } finally {

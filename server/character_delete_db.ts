@@ -307,14 +307,46 @@ export async function deleteOwnedCharacterRow(
   }
 }
 
+/** Bounded lock wait for the ambiguity verify read below, under the tight
+ * 15s statement bound so an expired wait keeps its own honest 55P03
+ * (lock_not_available) instead of an ambiguous statement cancel. */
+export const CHARACTER_DELETE_VERIFY_LOCK_TIMEOUT_MS = 10_000;
+
+/** The verify read, FOR UPDATE on purpose (see ambiguousCommitLanded): a
+ * plain SELECT would RACE the hung COMMIT it is verifying. Exported so the
+ * pg suite drives this exact statement against real PostgreSQL. */
+export const CHARACTER_DELETE_VERIFY_SQL =
+  'SELECT 1 FROM characters WHERE id = $1 AND account_id = $2 AND realm = $3 FOR UPDATE';
+
+const verifyReleaseError = (error: unknown): Error =>
+  error instanceof Error ? error : new Error('character delete verify failed');
+
 /**
  * The commit-ambiguity resolver, the guild_create_db reconcile precedent: on
  * an error carrying commitMayHaveSucceeded, a fresh read decides whether the
- * COMMIT landed. The row gone proves it did (this transaction held the row
- * FOR UPDATE, so no rival delete could have removed it first) and the delete
- * reports success so every success-side effect runs. The row still present,
- * or the verify read itself failing, leaves the original failure standing:
- * the refusal stays retryable, and a retry re-answers honestly either way.
+ * COMMIT landed. The row gone proves the delete is durable and the caller's
+ * success side (link change, admin busts, the world-state purge) must run;
+ * what the lock does NOT prove is WHOSE commit removed it: after this
+ * transaction's rollback a rival retry can land the delete before this read,
+ * and then both requests run the (idempotent) success side, which is the
+ * right answer either way. The row still present, or the verify itself
+ * failing, leaves the original failure standing: the refusal stays
+ * retryable, and a retry re-answers honestly.
+ *
+ * The read WAITS the in-flight transaction out instead of racing it: a READ
+ * COMMITTED snapshot taken while the hung COMMIT is still applying sees the
+ * deleted-but-uncommitted row as PRESENT, so a plain SELECT here answered
+ * "not landed" for a delete that then committed, the client's retry got a
+ * 404, and the world-state purge never ran (permanent orphaned market
+ * listings and Ravenpost mail), widest exactly under the contention that
+ * expired the wall mid-COMMIT. FOR UPDATE queues behind the deleting
+ * backend's row lock until that commit resolves and then answers
+ * definitively either way: a committed delete fails the EvalPlanQual
+ * recheck and returns zero rows; an abort locks the surviving row and
+ * returns it. The wait is bounded by lock_timeout in its own transaction;
+ * an expiry propagates the ambiguity honestly, exactly like a failed
+ * checkout. Runs while the delete permit is still held, so the wait rides
+ * the delete's own admission and never stacks over the sub-cap.
  */
 async function ambiguousCommitLanded(
   db: CharacterDeletePool,
@@ -334,16 +366,27 @@ async function ambiguousCommitLanded(
     // Unresolved ambiguity: the original failure is the honest answer.
     return false;
   }
+  let landed: boolean;
   try {
-    const row = await verify.query(
-      'SELECT 1 FROM characters WHERE id = $1 AND account_id = $2 AND realm = $3',
-      [characterId, accountId, realm],
-    );
-    return (row.rowCount ?? 0) === 0;
-  } catch {
+    await verify.query('BEGIN');
+    await verify.query(`SET LOCAL statement_timeout = ${DELETE_RESTORE_STATEMENT_TIMEOUT_MS};
+      SET LOCAL lock_timeout = ${CHARACTER_DELETE_VERIFY_LOCK_TIMEOUT_MS}`);
+    const row = await verify.query(CHARACTER_DELETE_VERIFY_SQL, [characterId, accountId, realm]);
+    landed = (row.rowCount ?? 0) === 0;
+  } catch (error) {
     // Same posture as a failed checkout: propagate the original ambiguity.
+    // The client may hold an open (possibly aborted) transaction, so it is
+    // DISCARDED rather than returned to the pool.
+    verify.release(verifyReleaseError(error));
     return false;
-  } finally {
-    verify.release();
   }
+  try {
+    await verify.query('ROLLBACK');
+    verify.release();
+  } catch (error) {
+    // The answer above is already definitive; a failed cleanup only means
+    // this client cannot go back to the pool.
+    verify.release(verifyReleaseError(error));
+  }
+  return landed;
 }
