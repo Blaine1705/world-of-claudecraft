@@ -136,6 +136,21 @@ describe('classifyDiff', () => {
     expect(plan.generic).toHaveLength(0);
   });
 
+  it('maps controller option changes to remapped desktop and mobile evidence', () => {
+    const plan = classifyDiff(['src/game/gamepad_bindings.ts']);
+    expect(plan.specific.map((t: { key: string }) => t.key)).toEqual([
+      'controller-options-button-layout',
+    ]);
+    expect(plan.specific[0].variants.map((v: { key: string }) => v.key)).toEqual([
+      'desktop',
+      'mobile',
+    ]);
+    const captureSource = plan.specific[0].capture.toString();
+    expect(captureSource).toContain('[aria-label="Cross"]');
+    expect(captureSource).toContain('buttons[1]?.click()');
+    expect(captureSource).toContain('#tutorial-greeting');
+  });
+
   it('maps the player tooltip view to its focused hover target', () => {
     const plan = classifyDiff(['src/ui/player_tooltip_view.ts']);
     expect(plan.isVisual).toBe(true);

@@ -53,6 +53,23 @@ const lowGraphicsSeed = async (page) => {
   );
 };
 
+// Controller layout evidence needs the cross hotbar enabled, PlayStation glyphs,
+// and the reported remap already staged: Cross jumps while Triangle is unbound.
+// Seed before boot so both the manager and the options painter read one state.
+const controllerRemapSeed = async (page) => {
+  await lowGraphicsSeed(page);
+  await page.evaluateOnNewDocument(
+    `try {
+       const settingsKey = 'woc_settings';
+       const settings = JSON.parse(localStorage.getItem(settingsKey) || '{}');
+       settings.gamepadCrossHotbar = true;
+       settings.gamepadGlyphStyle = 2;
+       localStorage.setItem(settingsKey, JSON.stringify(settings));
+       localStorage.setItem('woc_gamepad', JSON.stringify({ 0: 'jump', 3: 'none' }));
+     } catch {}`,
+  );
+};
+
 // --- The touch HUD tiers -----------------------------------------------------
 // The touch rework ships two visibly different layouts and pr_screenshots'
 // `mobile: true` emulation is one fixed phone box, so a tier frame restates its
@@ -5864,6 +5881,48 @@ export const TARGETS = [
         document
           .querySelector('[data-focus-key="shadowQuality:1"]')
           ?.scrollIntoView({ block: 'center' });
+      });
+      return { clip: '#options-menu' };
+    },
+  },
+  {
+    key: 'controller-options-button-layout',
+    label: 'Controller options panel (remapped face-button layout)',
+    when: ['ui/options_window', 'game/gamepad_bindings', 'game/gamepad_map'],
+    variants: [
+      { key: 'desktop', beforeLoad: controllerRemapSeed },
+      { key: 'mobile', mobile: true, beforeLoad: controllerRemapSeed },
+    ],
+    async capture(page) {
+      // Fresh offline characters can surface the one-time greeting after the
+      // shared entry helper has returned. Close both its choice and note forms
+      // through their real buttons so they cannot cover the settings evidence.
+      await pollForSize(page, '#tutorial-greeting', 32, 250);
+      for (let i = 0; i < 3; i++) {
+        await page.evaluate(() => {
+          const greeting = document.querySelector('#tutorial-greeting');
+          const close = greeting?.querySelector('[data-close], [data-skip]');
+          if (close instanceof HTMLElement) close.click();
+        });
+        await wait(300);
+      }
+      await page.evaluate(() => {
+        const hud = window.__game?.hud;
+        if (!hud) return;
+        const win = document.querySelector('#options-menu');
+        if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
+        hud.toggleOptionsMenu();
+        // Controller is the second button on the offline main options menu.
+        const buttons = Array.from(document.querySelectorAll('#options-menu .opt-btn'));
+        buttons[1]?.click();
+      });
+      const open = await pollForSize(page, '#options-menu .set-rows');
+      if (!open) return {};
+      await page.evaluate(() => {
+        const heading = document.querySelector('#options-menu .kb-cat');
+        const cross = document.querySelector('#options-menu [aria-label="Cross"]');
+        if (heading) heading.scrollIntoView({ block: 'start' });
+        else if (cross) cross.closest('.set-row')?.scrollIntoView({ block: 'start' });
       });
       return { clip: '#options-menu' };
     },

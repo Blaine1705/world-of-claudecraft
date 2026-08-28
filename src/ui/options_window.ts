@@ -21,7 +21,7 @@
 
 import { syncAppViewport } from '../game/app_viewport';
 import { audio } from '../game/audio';
-import { CROSS_HOTBAR_TRIGGERS, isCrossHotbarButton } from '../game/cross_hotbar';
+import { isCrossHotbarModifier } from '../game/cross_hotbar';
 import { desktopDisplayModeSupported } from '../game/desktop_display_mode_sync';
 import { desktopGpuPrefSupported } from '../game/desktop_gpu_pref_sync';
 import { desktopDiscordPresenceSupported } from '../game/discord_presence';
@@ -1842,16 +1842,12 @@ export class OptionsWindow {
     if (hooks) {
       const opts = this.gamepadActionOptions();
       const kind = hooks.gamepad.kind();
-      // While the cross hotbar is on it OWNS the d-pad and both triggers: the
-      // triggers are its modifiers and the d-pad is four of its cells (plus HUD
-      // navigation on a bare press). Listing them here as freely rebindable is a
-      // lie the panel used to tell, so they are dropped from the flat list and
-      // the cross-hotbar section below is where those buttons are configured.
+      // Only the triggers lose their bare flat bindings while the cross hotbar is
+      // on: they are held modifiers. Face and d-pad buttons remain ordinary
+      // remappable actions until a trigger is held, so keep those rows visible.
       const crossHotbarOwned = hooks.settings.get('gamepadCrossHotbar');
       for (const { button, action } of hooks.gamepad.entries()) {
-        const isModifier =
-          button === CROSS_HOTBAR_TRIGGERS.left || button === CROSS_HOTBAR_TRIGGERS.right;
-        if (crossHotbarOwned && (isCrossHotbarButton(button) || isModifier)) continue;
+        if (crossHotbarOwned && isCrossHotbarModifier(button)) continue;
         const row = document.createElement('div');
         row.className = 'set-row';
         const name = document.createElement('span');
@@ -1874,12 +1870,6 @@ export class OptionsWindow {
         );
         row.append(name, dd);
         body.appendChild(row);
-      }
-      if (crossHotbarOwned) {
-        const owned = document.createElement('div');
-        owned.className = 'set-note';
-        owned.textContent = t('hudChrome.controller.crossHotbarOwnsButtons');
-        body.appendChild(owned);
       }
       const reset = document.createElement('button');
       reset.type = 'button';
