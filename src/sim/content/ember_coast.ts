@@ -135,9 +135,12 @@ export const FORGEFATHER_STAIR_RAMPS: readonly StairRampBand[] = [
   { link: true, axis: 'z', b0: 500.57, b1: 506.13, a0: 2237.15, a1: 2238.55, h0: 15.34, h1: 14.7 },
   // the keep stair: landing court (15.34) up to the summit flat (19.0,
   // bare terrain: the summit pads take over past the band)
+  // (The keep flight tops at 18.85, a hair UNDER its landing mesh at
+  // 18.89, so feet ride the stone and the summit pads' raw ground stays
+  // hidden beneath the landing.)
   { link: true, axis: 'z', b0: 500.27, b1: 505.83, a0: 2237.0, a1: 2238.4, h0: 14.7, h1: 15.34 },
-  { axis: 'z', b0: 500.27, b1: 505.83, a0: 2238.4, a1: 2243.65, h0: 15.34, h1: 19.0 },
-  { axis: 'z', b0: 500.27, b1: 505.83, a0: 2243.65, a1: 2244.4, h0: 19.0, h1: 19.0 },
+  { axis: 'z', b0: 500.27, b1: 505.83, a0: 2238.4, a1: 2243.65, h0: 15.34, h1: 18.85 },
+  { axis: 'z', b0: 500.27, b1: 505.83, a0: 2243.65, a1: 2244.4, h0: 18.85, h1: 18.85 },
   // the quay stair: waterside quay (plates -1.86) up through the gate (2.64)
   { link: true, axis: 'x', b0: 2196.23, b1: 2204.67, a0: 491.15, a1: 492.55, h0: -2.5, h1: -1.86 },
   { axis: 'x', b0: 2196.23, b1: 2204.67, a0: 492.55, a1: 500.0, h0: -1.86, h1: 2.64 },
@@ -322,8 +325,8 @@ export const FORGEFATHER_ISLE_TERRAIN_EDITS: HeightStamp[] = [
   // bank up onto the summit flat with no step past the terrain-wall gate,
   // because the movement kernel reads the raw heightfield even while the
   // body stands on the landing platform above it.
-  { x: 503.05, z: 2245.1, radius: 2.4, delta: 18.75, falloff: 'smooth', mode: 'level' },
-  { x: 503.1, z: 2246.2, radius: 2.8, delta: 18.98, falloff: 'smooth', mode: 'level' },
+  { x: 503.05, z: 2245.1, radius: 2.4, delta: 18.6, falloff: 'smooth', mode: 'level' },
+  { x: 503.1, z: 2246.2, radius: 2.8, delta: 18.8, falloff: 'smooth', mode: 'level' },
   { x: 503.1, z: 2247.8, radius: 2.8, delta: 19.0, falloff: 'smooth', mode: 'level' },
   // Stuck-pocket escapes (found by the movement flood scan): the middle
   // court's north-wall strip and the alley between the summit flank and

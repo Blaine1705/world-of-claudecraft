@@ -1284,8 +1284,12 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     id: IGNIVAR_FORGE_APPROACH_ID,
     name: 'Halls of the First Tempering',
     index: 10,
-    doorPos: { x: 0, z: 0 },
-    overworldDoor: false,
+    // The raid's overworld entrance: the Forgefather's Isle keep tower's
+    // south face, at the top of the keep stair (the owner's chosen spot).
+    // Walking into the keep's doorway boards the forge-lift down into the
+    // Halls; the lift-shaft dressing at the interior's entry end sells the
+    // descent (ignivarApproachPropPlan).
+    doorPos: { x: 503.05, z: 2243.7 },
     guideVisible: false,
     entry: { x: 0, z: -50 },
     exitOffset: { x: 0, z: -54 },
@@ -1328,8 +1332,8 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     ],
     interior: 'ignivar_approach',
     suggestedPlayers: 10,
-    enterText: 'Hammerfall echoes through the Halls of the First Tempering.',
-    leaveText: 'You step away from the first forge and breathe freely again.',
+    enterText: 'The forge-lift shudders and sinks; hammerfall rises to meet you.',
+    leaveText: 'The lift hauls you back into the open air of the keep.',
   },
   [IGNIVAR_RAID_ARENA_ID]: {
     id: IGNIVAR_RAID_ARENA_ID,

@@ -62,7 +62,9 @@ beforeAll(() => {
   // pollute the movement measurements.
   for (const e of (sim as any).entities.values()) {
     if (e === sim.player) continue;
-    if (typeof e.hp !== 'number') continue;
+    // Mobs only: sweeping every hp-bearing entity also carried off the
+    // raid DOOR object, which un-wired the door leg below.
+    if (e.kind !== 'mob') continue;
     if (Math.hypot(e.pos.x - 490, e.pos.z - 2225) < 150) {
       e.pos.x -= 3000;
       e.prevPos = { ...e.pos };
@@ -138,6 +140,28 @@ describe('forgefather fortress live-kernel route', () => {
       sim.player.pos.z,
       `stalled at (${sim.player.pos.x.toFixed(2)}, ${sim.player.pos.y.toFixed(2)}, ${sim.player.pos.z.toFixed(2)})`,
     ).toBeLessThan(2218);
+  });
+
+  it('walking into the keep face trips the raid door trigger', () => {
+    // The owner's chosen raid entrance: the keep tower's south face at the
+    // top of the keep stair. Walking north into the doorway must reach the
+    // door trigger: a raid group zones in, and a solo walker gets the
+    // convert-to-raid refusal, which equally proves the trigger fired.
+    seat(503.05, 2242.4, 19.3);
+    sim.player.facing = 0;
+    let doorReached = false;
+    for (let i = 0; i < 80 && !doorReached; i++) {
+      const meta = (sim as any).players.get(sim.player.id);
+      Object.assign(meta.moveInput, input({ forward: true }));
+      sim.player.hp = sim.player.maxHp;
+      for (const ev of sim.tick() as Array<{ type: string; text?: string }>)
+        if (ev.type === 'error' && String(ev.text ?? '').includes('raid group')) doorReached = true;
+      if (sim.player.pos.x > 1000) doorReached = true;
+    }
+    expect(
+      doorReached,
+      `door never triggered; body at (${sim.player.pos.x.toFixed(1)}, ${sim.player.pos.z.toFixed(1)})`,
+    ).toBe(true);
   });
 
   it('is never penned at the reported stuck spot (503, 2226)', () => {

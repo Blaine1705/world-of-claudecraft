@@ -204,6 +204,16 @@ export function ignivarApproachPropPlacements(layout: DungeonLayout): IgnivarPro
     at('chain', -20, 24, 5.3, 8, 12, true),
     at('chain', 4, 40, 0.7, 7, 13),
     at('chain', -10, 46, 1.9, 8, 11),
+    // The forge-lift shaft the overworld keep door lowers you into: caged
+    // gearwork and hoist chains around the entry end (all past the z-50
+    // door-dressing line, outside the corridor contract), so arriving
+    // reads as stepping off the freight lift the Forgefather left running.
+    at('gear_wall_rusty', -7.2, -52.8, 135 * DEG, 10),
+    at('gear_wall_rusty', 7.2, -52.8, 225 * DEG, 10),
+    at('gear_machine', -10.6, -53.4, 45 * DEG, 8),
+    at('chain_hanging', -3.2, -51.4, 0.4, 8, 10),
+    at('chain_hanging', 3.2, -51.4, -0.4, 8, 10, true),
+    at('chain_link', 0, -52.4, 90 * DEG, 6),
   ];
   // The centre torch pillars ride the layout so they stay glued to the
   // torch rigs dungeon.ts places at the same points.
