@@ -243,15 +243,28 @@ remove the declaration AND its binding in the same change, then re-run the parit
   the global draw order and forks the world. Don't reorder `tick()` or a loop casually;
   the parity gate's draw-order log catches it.
 - The vault consumption admission (`SimConfig.vaultConsumptionAdmission`) is a HOST
-  INPUT the determinism contract is parameterized over, not part of the seeded world: a
-  server-side admission refusal early-returns in `resolveCraftForRecipe` BEFORE that
-  path's output-side rng draw (two draws for a Jack-attuned crafter), so a realm whose
-  admission refused draws a different
-  stream tail than an offline replay of the same inputs. Offline and headless hosts wire
-  the inert admission (never refuses), so no live parity gate sees the divergence; treat
-  "same seed, same world" as holding PER admission behavior, and if that ever stops
-  being acceptable, move the refusal after the draws rather than teaching replays about
-  the journal.
+  INPUT the determinism contract is parameterized over, not part of the seeded world.
+  It is consulted at FOUR sites, and a server-side refusal forks each differently: in
+  `resolveCraftForRecipe` the refusal early-returns BEFORE that path's output-side rng
+  draw (two draws for a Jack-attuned crafter), so a realm whose admission refused draws
+  a different stream tail than an offline replay of the same inputs; the three
+  enchant-apply arms in `professions/enchanting.ts` (the worn apply, the bagged
+  replace, the plain bagged apply) sit on paths with ZERO post-admission draws
+  (enchanting's only rng draws are on the disenchant path), so a refusal there never
+  shifts the stream but still forks persisted character state against the inert
+  replay. Offline and headless hosts wire the inert admission (never refuses), so no
+  live parity gate sees the divergence; treat "same seed, same world" as holding PER
+  admission behavior, and if that ever stops being acceptable, move the crafting
+  refusal after the draws rather than teaching replays about the journal. The
+  carve-out is PINNED, not just documented:
+  `tests/vault_admission_determinism.test.ts` runs the same seed twice (inert vs
+  refusing admission) per shape and asserts the divergence is exactly this: the
+  crafting refusal draws nothing, leaves persisted character state byte-identical, and
+  skips exactly one draw (two for a Jack-attuned crafter), with the streams back in
+  lockstep after replaying the skipped draws and staying in lockstep over further
+  ticks; the enchant-apply refusal skips ZERO draws (the streams never diverge) and
+  forks persisted state only. If that pin fails, the divergence widened or narrowed:
+  change this paragraph and the pin together, in the same change.
 
 ## sim.ts coordinator map (what `tick()` does, in order)
 `tick()` reads as a linear registry of system calls routed through `this.ctx`, in phase

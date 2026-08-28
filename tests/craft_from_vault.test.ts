@@ -27,7 +27,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { bagCapacity } from '../src/sim/bags';
 import { recipeById } from '../src/sim/content/recipes';
-import { DUNGEON_X_THRESHOLD, DUNGEONS, instanceOrigin, RIFT_X_MIN } from '../src/sim/data';
+import { DUNGEON_X_THRESHOLD, DUNGEONS, instanceOrigin, QUESTS, RIFT_X_MIN } from '../src/sim/data';
 import { INSTANCE_FOOTPRINT_HALF_WIDTH, instanceInfoAt } from '../src/sim/instances/dungeons';
 import { consumeVaultStock, type MaterialsVaultState } from '../src/sim/materials_vault';
 import {
@@ -1326,6 +1326,109 @@ describe('apply-enchant draws carried-then-vault, grade-blind', () => {
   });
 });
 
+// ---------------------------------------------------------------------------
+// The quest hook on a vault-only draw: the consumption comments in
+// professions/crafting.ts and professions/enchanting.ts, pinned behaviorally.
+// A vault-only draw must leave a collect objective on the reagent UNCHANGED
+// (the hook's recompute reads ctx.countItem, which walks CARRIED inventory
+// only) while still firing the hook for its wireRev bump (the dirty flag that
+// makes hosts re-send the derived state whose inputs just moved). Each vault
+// is seeded ABOVE the requirement so stock survives the draw: a recompute
+// that started counting vault stock would find plenty at the post-draw fire,
+// credit the objective, and fail the unchanged pin.
+// ---------------------------------------------------------------------------
+describe('a vault-only draw and the quest hook', () => {
+  const COLLECT_QUEST = '__vault_only_collect';
+
+  /** The bank.test.ts synthetic-collect idiom: register a throwaway quest
+   *  over the reagent, run, always deregister. */
+  function withCollectQuest(sim: Sim, itemId: string, run: () => void): void {
+    QUESTS[COLLECT_QUEST] = {
+      ...QUESTS.q_widows,
+      id: COLLECT_QUEST,
+      objectives: [{ type: 'collect', itemId, count: 5, label: 'Reagent' }],
+    };
+    try {
+      metaOf(sim).questLog.set(COLLECT_QUEST, {
+        questId: COLLECT_QUEST,
+        counts: [0],
+        state: 'active',
+      });
+      run();
+    } finally {
+      delete QUESTS[COLLECT_QUEST];
+    }
+  }
+
+  function progressEvents(sim: Sim) {
+    return sim
+      .drainEvents()
+      .filter((ev) => ev.type === 'questProgress' && ev.questId === COLLECT_QUEST);
+  }
+
+  it('crafting: the collect objective stays untouched while wireRev bumps', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const m = metaOf(sim, pid);
+    seedVault(sim, { spider_leg: 20 }, pid); // 1 needed, 19 survive the draw
+    withCollectQuest(sim, 'spider_leg', () => {
+      sim.drainEvents();
+      const revBefore = m.wireRev;
+      // Premise: the draw is VAULT-ONLY (zero carried copies to satisfy it).
+      expect(sim.countItem('spider_leg', pid)).toBe(0);
+
+      expect(resolveCraft(sim.ctx, pid, JERKY).ok).toBe(true);
+
+      // The vault paid for the craft, exactly the one-unit draw (20 -> 19).
+      expect(m.vault.stock.spider_leg).toBe(19);
+      // Unchanged: carried spider_leg is 0 before and after, and the 19
+      // units still in the vault must not credit the objective.
+      expect(m.questLog.get(COLLECT_QUEST)).toMatchObject({ counts: [0], state: 'active' });
+      expect(progressEvents(sim)).toEqual([]);
+      // Exactly TWO bumps, one per hook fire: the reagent-consumption fire
+      // (the vault-only arm under pin) plus the output grant's own
+      // ctx.addItem fire. The exact count is the decisive form here:
+      // dropping the vault-only fire still leaves the output fire, so a
+      // bare greater-than would survive that regression.
+      expect(m.wireRev).toBe(revBefore + 2);
+      // Positive control: the synthetic wiring CAN credit, so the unchanged
+      // pin above is not vacuous (a dead quest would also read unchanged).
+      grant(sim, 'spider_leg', 1, pid);
+      expect(m.questLog.get(COLLECT_QUEST)).toMatchObject({ counts: [1] });
+    });
+  });
+
+  it('enchanting: the collect objective stays untouched while wireRev bumps', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const m = metaOf(sim, pid);
+    grant(sim, SWORD, 1, pid);
+    sim.equipItemToSlot(SWORD, 'mainhand', pid);
+    seedVault(sim, { arcane_dust: 12 }, pid); // 5 needed, 7 survive the draw
+    withCollectQuest(sim, 'arcane_dust', () => {
+      sim.drainEvents();
+      const revBefore = m.wireRev;
+      // Premise: the draw is VAULT-ONLY (zero carried copies to satisfy it).
+      expect(sim.countItem('arcane_dust', pid)).toBe(0);
+
+      expect(resolveApplyEnchant(sim.ctx, pid, SWORD, ENCHANT, 'mainhand').ok).toBe(true);
+
+      // The vault paid for the enchant, exactly the five-unit draw (12 -> 7).
+      expect(m.vault.stock.arcane_dust).toBe(7);
+      expect(m.questLog.get(COLLECT_QUEST)).toMatchObject({ counts: [0], state: 'active' });
+      expect(progressEvents(sim)).toEqual([]);
+      // Exactly ONE bump: the worn arm mutates no bag slot (reagents leave
+      // the vault, the payload lands on the worn copy), so the vault-draw
+      // ledger fire in applyEnchantReagentDraw is the only hook fire on this
+      // path. Dropping it leaves wireRev at revBefore, which is exactly the
+      // regression this pin exists to catch.
+      expect(m.wireRev).toBe(revBefore + 1);
+      grant(sim, 'arcane_dust', 1, pid);
+      expect(m.questLog.get(COLLECT_QUEST)).toMatchObject({ counts: [1] });
+    });
+  });
+});
+
 // The apply-enchant start gate is a hand-copied transcription of the
 // resolver's deny arms (the professions_admission_drift.test.ts contract), and
 // the vault added a new way for the two to disagree: a cast that starts on
@@ -1556,9 +1659,12 @@ describe('apply-enchant capacity: vault-sourced reagents free NO room', () => {
 // riftInstanceAtPos walks the rift pool), so the common open-world evaluation
 // (probed EVERY snapshot per connected player as the cvault wire signature's
 // gate half) costs three membership
-// probes plus one comparison. Hand-rolled trap ctx: the pool properties THROW
-// on access, so a regression that re-runs a scan for a west-side position
-// fails loudly rather than silently re-paying the walk.
+// probes plus one comparison. The round-4 hoist extends the same economy to
+// the east side: the geometry backstop now answers AHEAD of the scans, so a
+// session standing inside an instance refuses at one comparison instead of
+// walking the slot pool every broadcast. Hand-rolled trap ctx: the pool
+// properties THROW on access, so a regression that re-runs a scan on either
+// side fails loudly rather than silently re-paying the walk.
 describe('vaultDrawBlocked: the geometry fast path precedes the pool scans', () => {
   const trapCtx = (pos: { x: number; y: number; z: number }): any => ({
     resolve: () => ({ meta: {}, e: { pos } }),
@@ -1578,10 +1684,19 @@ describe('vaultDrawBlocked: the geometry fast path precedes the pool scans', () 
     expect(vaultDrawBlocked(trapCtx({ x: DUNGEON_X_THRESHOLD, y: 0, z: 0 }), 1)).toBe(false);
   });
 
-  it('CONTROL: an east-side position still consults the pools (the trap fires)', () => {
-    expect(() => vaultDrawBlocked(trapCtx({ x: DUNGEON_X_THRESHOLD + 1, y: 0, z: 0 }), 1)).toThrow(
-      /instance pool scanned/,
-    );
+  it('the hoisted backstop answers the east side without touching the pools (round 4)', () => {
+    // Before the round-4 hoist this was the trap's positive CONTROL: an
+    // east-side position walked the instance pool, so the trap fired. The
+    // hoist moves the geometry backstop AHEAD of the two scans (east of the
+    // threshold every scan outcome already ended in true, so the order is
+    // behavior-identical), and an east-side position now refuses at one
+    // comparison with the pools untouched: a regression that moves the
+    // backstop back below the scans THROWS the trap here instead of
+    // returning. The trap mechanism keeps its positive control in the
+    // DERIVED case below, which still forces a real pool consultation (and a
+    // throw) by registering a west-capable def.
+    expect(vaultDrawBlocked(trapCtx({ x: DUNGEON_X_THRESHOLD + 1, y: 0, z: 0 }), 1)).toBe(true);
+    expect(vaultDrawBlocked(trapCtx({ x: 200_000, y: 0, z: 0 }), 1)).toBe(true);
   });
 
   it('DERIVED: registering a west-capable dungeon def re-enables the west-side pool scan', () => {
@@ -1609,13 +1724,19 @@ describe('vaultDrawBlocked: the geometry fast path precedes the pool scans', () 
     expect(vaultDrawBlocked(trapCtx({ x: 0, y: 0, z: 0 }), 1)).toBe(false);
   });
 
-  it('the rift arm runs inside the band, and only there (real empty dungeon pool)', () => {
-    // PR #3670 round 2: in the trap ctx above, the east CONTROL throws out of
-    // instanceInfoAt before riftInstanceAtPos is ever reached, so the
-    // riftInstances trap alone never proved the rift arm runs. With a REAL
-    // empty dungeon pool the dungeon arm answers null, and the rift trap must
-    // fire inside the band, stay untouched east of the threshold but west of
-    // the band (the isRiftPos guard), and stay skipped west of the threshold.
+  it('the rift pool stays untouched on BOTH sides of the threshold (round 4 hoist)', () => {
+    // PR #3670 round 2 proved the rift arm ran inside the band by trapping
+    // riftInstances behind a REAL empty dungeon pool. The round-4 hoist
+    // retires that reachability ON PURPOSE: east of the threshold the
+    // backstop answers before any scan, and west of it the isRiftPos band
+    // guard is false while the band sits east, so with the shipped constants
+    // no input reaches riftInstanceAtPos at all. The arm stays for the
+    // layout move that would make it load-bearing again (a rift band west of
+    // the threshold disables the fast path by existing); its keepers are the
+    // one-occurrence source pin and the band-alignment pins in
+    // tests/vault_craft_gate.test.ts. What this trap pins now: no rift-pool
+    // walk on ANY side of the threshold in the shipped layout, the in-band
+    // east case included.
     const riftTrap = (x: number): any => ({
       resolve: () => ({ meta: {}, e: { pos: { x, y: 0, z: 0 } } }),
       bgMatches: new Map(),
@@ -1626,7 +1747,11 @@ describe('vaultDrawBlocked: the geometry fast path precedes the pool scans', () 
         throw new Error('rift pool scanned');
       },
     });
-    expect(() => vaultDrawBlocked(riftTrap(RIFT_X_MIN), 1)).toThrow(/rift pool scanned/);
+    // Positive control for the trap MECHANISM itself: the getter really
+    // throws when touched (the code path that would touch it is unreachable
+    // by design now, so the direct read is the only honest control left).
+    expect(() => riftTrap(0).riftInstances).toThrow(/rift pool scanned/);
+    expect(vaultDrawBlocked(riftTrap(RIFT_X_MIN), 1)).toBe(true); // the backstop, not the scan
     expect(vaultDrawBlocked(riftTrap(DUNGEON_X_THRESHOLD + 1), 1)).toBe(true);
     expect(vaultDrawBlocked(riftTrap(0), 1)).toBe(false);
   });
