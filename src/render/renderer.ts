@@ -9450,13 +9450,14 @@ export class Renderer {
           // callback marks the rank dirty whenever it does.
           const view = buildBattleground(o, this.sim.cfg.seed, {
             lowGfx: this.lowGfx,
-            // The raw registry on purpose: buildBgFieldLights already hides
-            // each light (battleground.ts) and its release path splices, which
-            // an append-only sink cannot express.
+            // The raw registry on purpose: buildBgFieldLights (battleground.ts) hides
+            // each light and its release path splices, which an append-only sink cannot express.
             fireLights: this.fireLights,
             onFireLightsChanged: () => {
               this.lightRankDirty = true;
             },
+            // Gate each streamed field piece's shader links (the dungeon interiors' seam).
+            compileGate: this.asyncCompileSupported ? (t) => this.compileGate(t) : undefined,
           });
           this.scene.add(view.group);
           this.bgViews.set(i, view);
