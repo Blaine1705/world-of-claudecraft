@@ -70,6 +70,69 @@ export const EMBER_BAYS = [
   { x: 478, z: 2242, r: 14 },
 ] as const;
 
+/** The staircase GLB's nose line, measured from the shipped model: a flat
+ *  top landing over the first 12.5% of the length, then tread noses
+ *  descending at 0.845 per yd to ground zero at the bottom end (native
+ *  landing height 0.74 at scale 1). Walking bodies climb each placed
+ *  staircase on REAL standable tread platforms derived from the same
+ *  numbers (src/sim/forgefather_fortress.ts staircaseTreadColliders); the
+ *  stamps below only sculpt a cosmetic under-bank riding `clear` beneath
+ *  the nose line, so the solid stair wedge always meets ground instead of
+ *  spanning a void and no rock ever pokes up through the treads. `clear`
+ *  absorbs the level-stamp cascade's uphill bias (later stamps win, so a
+ *  marching ramp settles above its targets by roughly a third of its
+ *  radius times the grade); the wedge is solid to its base plane, so a
+ *  bank sitting anywhere under the noses is fully hidden. Three stamp
+ *  lanes cover the stair's width; the lead-in holds the lower court's
+ *  walk surface so ground beside the buried bottom steps never dips. */
+export const STAIR_GRADE = 0.845; // nose-line slope, yd of rise per yd of run
+export const STAIR_LANDING_HEIGHT = 0.74; // native top-landing height at scale 1
+export const STAIR_LANDING_START = 0.875; // the landing begins at this length fraction
+const RAMP_STEP = 0.75; // stamp spacing along the climb
+
+interface StairRampSpec {
+  x: number; // the staircase placement's centre...
+  z: number;
+  ryDeg: number; // ...its yaw in degrees...
+  scale: number;
+  y: number; // ...and its seated base height (the nose line's bottom end)
+  courtLow: number; // the lower court's walk surface (its floor-plate top)
+  clear: number; // bank target depth under the nose line (pre-bias)
+  lanes: readonly number[]; // lateral lane offsets covering the stair width
+  radius: number;
+  lead?: number; // distance from the bottom end where stamping begins
+}
+
+function stairRampStamps(spec: StairRampSpec): HeightStamp[] {
+  const rad = (spec.ryDeg * Math.PI) / 180;
+  const ux = -Math.cos(rad); // climb direction, bottom end toward the top
+  const uz = Math.sin(rad);
+  const bottomX = spec.x - (ux * spec.scale) / 2;
+  const bottomZ = spec.z - (uz * spec.scale) / 2;
+  const landingD = spec.scale * STAIR_LANDING_START;
+  const landingH = spec.y + STAIR_LANDING_HEIGHT * spec.scale;
+  const crossD = (spec.courtLow + spec.clear - spec.y) / STAIR_GRADE;
+  const start = spec.lead ?? Math.max(0, crossD - 0.9);
+  const steps = Math.ceil((landingD - start) / RAMP_STEP);
+  const round = (value: number) => Math.round(value * 100) / 100;
+  const out: HeightStamp[] = [];
+  for (let i = 0; i <= steps; i++) {
+    const d = start + ((landingD - start) * i) / steps;
+    const nose = Math.min(landingH, spec.y + STAIR_GRADE * d);
+    const delta = round(Math.max(spec.courtLow - 0.05, nose - spec.clear));
+    for (const lane of spec.lanes)
+      out.push({
+        x: round(bottomX + ux * d - uz * lane),
+        z: round(bottomZ + uz * d + ux * lane),
+        radius: spec.radius,
+        delta,
+        falloff: 'smooth',
+        mode: 'level',
+      });
+  }
+  return out;
+}
+
 /** The Forgefather's Isle fortress tiers: flat build plateaus with smooth
  *  approach ramps (the quay-pad idiom, stacked). Each tier's centre drifts
  *  north of the one below, so every tier keeps a broad south-facing
@@ -106,62 +169,102 @@ export const FORGEFATHER_ISLE_TERRAIN_EDITS: HeightStamp[] = [
   { x: 508, z: 2219, radius: 9, delta: 6.3, falloff: 'flat', mode: 'level' },
   { x: 504.3, z: 2241.2, radius: 8, delta: 14.7, falloff: 'smooth', mode: 'level' }, // upper landing
   { x: 504.3, z: 2241.2, radius: 5, delta: 14.7, falloff: 'flat', mode: 'level' },
-  // ...and the stair ramps: each placed staircase dresses a real
-  // terrain ramp (stairs are walk-over props, never colliders), so the
-  // climb is the ground itself. Dense riser ladders, one stamp per
-  // 1.2 yd with sub-step height differences, tuned by the route probe
-  // against MAX_STEP_HEIGHT.
-  // the bailey stair, tier one up to the middle court
-  { x: 507.8, z: 2203.5, radius: 2.4, delta: 2.64, falloff: 'smooth', mode: 'level' },
-  { x: 507.8, z: 2204.7, radius: 2.4, delta: 3.25, falloff: 'smooth', mode: 'level' },
-  { x: 507.8, z: 2205.8, radius: 2.4, delta: 3.86, falloff: 'smooth', mode: 'level' },
-  { x: 507.8, z: 2207.0, radius: 2.4, delta: 4.47, falloff: 'smooth', mode: 'level' },
-  { x: 507.8, z: 2208.2, radius: 2.4, delta: 5.08, falloff: 'smooth', mode: 'level' },
-  { x: 507.8, z: 2209.3, radius: 2.4, delta: 5.69, falloff: 'smooth', mode: 'level' },
-  { x: 507.8, z: 2210.5, radius: 2.4, delta: 6.3, falloff: 'smooth', mode: 'level' },
-  // the court stair, middle court up to tier three
-  { x: 504.1, z: 2216.5, radius: 2.4, delta: 6.94, falloff: 'smooth', mode: 'level' },
-  { x: 504.1, z: 2217.6, radius: 2.4, delta: 7.52, falloff: 'smooth', mode: 'level' },
-  { x: 504.1, z: 2218.8, radius: 2.4, delta: 8.1, falloff: 'smooth', mode: 'level' },
-  { x: 504.1, z: 2219.9, radius: 2.4, delta: 8.68, falloff: 'smooth', mode: 'level' },
-  { x: 504.1, z: 2221.0, radius: 2.4, delta: 9.26, falloff: 'smooth', mode: 'level' },
-  { x: 504.1, z: 2222.1, radius: 2.4, delta: 9.84, falloff: 'smooth', mode: 'level' },
-  { x: 504.1, z: 2223.3, radius: 2.4, delta: 10.42, falloff: 'smooth', mode: 'level' },
-  { x: 504.1, z: 2224.4, radius: 2.4, delta: 11.0, falloff: 'smooth', mode: 'level' },
-  // the upper stair, tier three up to the landing
-  { x: 503.35, z: 2230.0, radius: 2.4, delta: 11.64, falloff: 'smooth', mode: 'level' },
-  { x: 503.35, z: 2231.1, radius: 2.4, delta: 12.05, falloff: 'smooth', mode: 'level' },
-  { x: 503.35, z: 2232.2, radius: 2.4, delta: 12.46, falloff: 'smooth', mode: 'level' },
-  { x: 503.35, z: 2233.3, radius: 2.4, delta: 12.87, falloff: 'smooth', mode: 'level' },
-  { x: 503.35, z: 2234.4, radius: 2.4, delta: 13.28, falloff: 'smooth', mode: 'level' },
-  { x: 503.35, z: 2235.6, radius: 2.4, delta: 13.7, falloff: 'smooth', mode: 'level' },
-  { x: 503.35, z: 2236.7, radius: 2.4, delta: 14.11, falloff: 'smooth', mode: 'level' },
-  { x: 503.35, z: 2237.8, radius: 2.4, delta: 14.52, falloff: 'smooth', mode: 'level' },
-  { x: 503.35, z: 2238.9, radius: 2.4, delta: 14.93, falloff: 'smooth', mode: 'level' },
-  { x: 503.35, z: 2240.0, radius: 2.4, delta: 15.34, falloff: 'smooth', mode: 'level' },
-  // the keep stair, landing up to the summit court
-  { x: 503.05, z: 2242.0, radius: 2.4, delta: 15.34, falloff: 'smooth', mode: 'level' },
-  { x: 503.05, z: 2243.2, radius: 2.4, delta: 15.95, falloff: 'smooth', mode: 'level' },
-  { x: 503.05, z: 2244.3, radius: 2.4, delta: 16.56, falloff: 'smooth', mode: 'level' },
-  { x: 503.05, z: 2245.5, radius: 2.4, delta: 17.17, falloff: 'smooth', mode: 'level' },
-  { x: 503.05, z: 2246.7, radius: 2.4, delta: 17.78, falloff: 'smooth', mode: 'level' },
-  { x: 503.05, z: 2247.8, radius: 2.4, delta: 18.39, falloff: 'smooth', mode: 'level' },
-  { x: 503.05, z: 2249.0, radius: 2.4, delta: 19.0, falloff: 'smooth', mode: 'level' },
-  // the quay stair, waterside quay up through the gate
-  { x: 493.5, z: 2200.5, radius: 2.4, delta: -1.86, falloff: 'smooth', mode: 'level' },
-  { x: 494.6, z: 2200.5, radius: 2.4, delta: -1.3, falloff: 'smooth', mode: 'level' },
-  { x: 495.8, z: 2200.5, radius: 2.4, delta: -0.74, falloff: 'smooth', mode: 'level' },
-  { x: 496.9, z: 2200.5, radius: 2.4, delta: -0.17, falloff: 'smooth', mode: 'level' },
-  { x: 498.0, z: 2200.5, radius: 2.4, delta: 0.39, falloff: 'smooth', mode: 'level' },
-  { x: 499.1, z: 2200.5, radius: 2.4, delta: 0.95, falloff: 'smooth', mode: 'level' },
-  { x: 500.2, z: 2200.5, radius: 2.4, delta: 1.51, falloff: 'smooth', mode: 'level' },
-  { x: 501.4, z: 2200.5, radius: 2.4, delta: 2.08, falloff: 'smooth', mode: 'level' },
-  { x: 502.5, z: 2200.5, radius: 2.4, delta: 2.64, falloff: 'smooth', mode: 'level' },
+  // ...and the stair ramps: each placed staircase dresses a smooth ramp
+  // generated from its own nose line (stairRampStamps above), so every
+  // flight is climbable ground with no rock above the treads.
+  // the bailey stair, forecourt plates up to the middle court
+  ...stairRampStamps({
+    x: 507.8,
+    z: 2207.2,
+    ryDeg: 90,
+    scale: 9,
+    y: 0.33,
+    courtLow: 2.64,
+    clear: 1.9,
+    lanes: [-2.7, 2.7, 0],
+    radius: 3.2,
+  }),
+  // the court stair, middle court up to tier three (the lead-in bridges
+  // the gap from the court plates' north edge)
+  ...stairRampStamps({
+    x: 504.1,
+    z: 2221.4,
+    ryDeg: 90,
+    scale: 9,
+    y: 5.03,
+    courtLow: 6.94,
+    clear: 1.9,
+    lanes: [-2.7, 2.7, 0],
+    radius: 3.2,
+    lead: 2.0,
+  }),
+  // the upper stair, tier three up to the landing court
+  ...stairRampStamps({
+    x: 503.35,
+    z: 2234.15,
+    ryDeg: 90,
+    scale: 6,
+    y: 10.95,
+    courtLow: 11.64,
+    clear: 1.5,
+    lanes: [-1.9, 1.9, 0],
+    radius: 2.6,
+  }),
+  // the keep stair, landing court up to the summit...
+  ...stairRampStamps({
+    x: 503.05,
+    z: 2242.4,
+    ryDeg: 90,
+    scale: 6,
+    y: 14.61,
+    courtLow: 15.34,
+    clear: 1.5,
+    lanes: [-1.9, 1.9, 0],
+    radius: 2.6,
+  }),
+  // ...plus the summit pad filling the saddle between the keep stair's
+  // top landing and the summit court's flat
+  { x: 503.1, z: 2246.2, radius: 2.8, delta: 18.98, falloff: 'smooth', mode: 'level' },
+  { x: 503.1, z: 2247.8, radius: 2.8, delta: 19.0, falloff: 'smooth', mode: 'level' },
+  // the quay stair, waterside quay up through the gate (the lead-in
+  // bridges the gap from the quay plates' east edge)
+  ...stairRampStamps({
+    x: 497.05,
+    z: 2200.45,
+    ryDeg: 180,
+    scale: 9,
+    y: -3.97,
+    courtLow: -1.86,
+    clear: 1.9,
+    lanes: [-2.7, 2.7, 0],
+    radius: 3.2,
+    lead: 0.75,
+  }),
+  // the mainland shore stair, bridge deck up the dune toward the road...
+  ...stairRampStamps({
+    x: 443.75,
+    z: 2183.35,
+    ryDeg: 270,
+    scale: 7,
+    y: -3.38,
+    courtLow: -1.63,
+    clear: 1.6,
+    lanes: [-2.2, 2.2, 0],
+    radius: 2.8,
+    lead: 1.0,
+  }),
+  // ...and its dune apron: the shore dune dips right at the stair's top
+  // end, so one pad keeps the step off the landing inside the step limit.
+  { x: 443.8, z: 2178.5, radius: 2.5, delta: 1.55, falloff: 'smooth', mode: 'level' },
   // Stuck-pocket escapes (found by the movement flood scan): the gate
   // passage pocket, the middle court's north-wall strip, and the alley
   // between the summit flank and the sea-ring wall each get a walkable
   // way back out.
   { x: 500.5, z: 2203.5, radius: 3, delta: -0.3, falloff: 'smooth', mode: 'level' },
+  // ...the north-wall strip's channel notch graded flat, so the walk east
+  // onto the shelf ladder never crosses a steepness-gated cell...
+  { x: 511.5, z: 2227.2, radius: 2, delta: 6.4, falloff: 'smooth', mode: 'level' },
+  { x: 512.8, z: 2227.2, radius: 2, delta: 6.7, falloff: 'smooth', mode: 'level' },
   { x: 513.3, z: 2227.6, radius: 2.2, delta: 6.8, falloff: 'smooth', mode: 'level' },
   { x: 514.3, z: 2229.4, radius: 2.2, delta: 7.2, falloff: 'smooth', mode: 'level' },
   { x: 514.3, z: 2231.4, radius: 2.2, delta: 7.1, falloff: 'smooth', mode: 'level' },

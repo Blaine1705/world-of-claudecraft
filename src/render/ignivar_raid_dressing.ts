@@ -43,8 +43,13 @@ export function ensureIgnivarRaidDressingAssets(interior: string): Promise<void>
 
 /** Baked additive floor pools under the molten props (the addTorchGlow
  *  recipe: no new lights, the light census stays frozen). Skipped on the low
- *  tier like every other glow decal. */
-const PROP_GLOW_POOLS: Partial<Record<IgnivarEnvPropKey, { color: number; scale: number }>> = {
+ *  tier like every other glow decal. Interior pools sit on the room floor
+ *  (y 0 placements only, so a raised prop never mints a floating disc);
+ *  `atPlacementY` pools ride their placement's own height instead, for the
+ *  exterior pieces whose world y IS their standing surface. */
+const PROP_GLOW_POOLS: Partial<
+  Record<IgnivarEnvPropKey, { color: number; scale: number; atPlacementY?: boolean }>
+> = {
   firepit: { color: 0xff7a2e, scale: 0.75 },
   lava_face: { color: 0xff4316, scale: 0.85 },
   anvil: { color: 0xff5c1e, scale: 1.25 },
@@ -56,6 +61,9 @@ const PROP_GLOW_POOLS: Partial<Record<IgnivarEnvPropKey, { color: number; scale:
   lava_furnace_2: { color: 0xff4316, scale: 0.8 },
   lava_pillar: { color: 0xff5c1e, scale: 0.7 },
   lava_ramp: { color: 0xff4316, scale: 0.9 },
+  // ...and the strait bridge's rail fires: each pool rides its rail's own
+  // deck height, washing the crossing in soft firelight
+  bridge_rail: { color: 0xff7a2e, scale: 0.5, atPlacementY: true },
 };
 
 export function addPropGlowPools(
@@ -68,7 +76,19 @@ export function addPropGlowPools(
   if (lowGfx || typeof document === 'undefined') return;
   for (const placement of placements) {
     const pool = PROP_GLOW_POOLS[placement.key];
-    if (!pool || placement.y !== 0) continue;
+    if (!pool) continue;
+    if (pool.atPlacementY) {
+      addTorchGlowDecal(
+        group,
+        placement.x,
+        placement.z,
+        pool.color,
+        placement.y + 0.09,
+        pool.scale,
+      );
+      continue;
+    }
+    if (placement.y !== 0) continue;
     addTorchGlowDecal(group, placement.x, placement.z, pool.color, 0.07, pool.scale);
   }
 }

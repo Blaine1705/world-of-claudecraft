@@ -1,33 +1,42 @@
 // The Forgefather's Isle walkability gate: the full route from the
 // mainland shore over the bridge to the summit court climbs within
-// MAX_STEP_HEIGHT at every yard, and a flood of the isle's movement graph
-// (up-steps bounded, drops free, water traversable) finds no reachable
-// cell that cannot return: no player gets stuck anywhere in the fortress.
-// Both scans mirror supportHeightAt's terrain-vs-deck max rule; re-tune
-// the ember_coast.ts stamps if a fortress or terrain change reds this.
+// MAX_STEP_HEIGHT at every yard AND inside the movement kernel's terrain
+// steepness gate (PLAYER_MAX_CLIMB_SLOPE over 1-yard cells, the arm the
+// first bake missed: stamp rims passed the step check but read as cliffs),
+// and a flood of the isle's movement graph (up-steps bounded, steep dry
+// cells refused, drops free, water traversable) finds no reachable cell
+// that cannot return: no player gets stuck anywhere in the fortress.
+// Walk support comes from the REAL fortress collider set, so the deck
+// plates and the staircase tread platforms carry the walker exactly as
+// supportHeightAt does in game; re-tune the ember_coast.ts stamps or the
+// staircase seatings if a fortress or terrain change reds this.
 import { describe, expect, it } from 'vitest';
+import type { ObbCollider } from '../src/sim/colliders';
 import {
   FORGEFATHER_FORTRESS_PLACEMENTS,
-  FORTRESS_STANDABLE_KEYS,
+  forgefatherFortressColliders,
 } from '../src/sim/forgefather_fortress';
 import { IGNIVAR_NON_COLLIDING_PROPS, IGNIVAR_PROP_NATIVE } from '../src/sim/ignivar_props';
+import { PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import { MAX_STEP_HEIGHT } from '../src/sim/physics/character';
-import { terrainHeight } from '../src/sim/world';
+import { terrainHeight, terrainSteepness } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
+
+const STANDABLES = (forgefatherFortressColliders(WORLD_SEED) as ObbCollider[]).filter(
+  (collider) => collider.standable === true,
+);
 
 function walkHeight(x: number, z: number): number {
   let h = terrainHeight(x, z, WORLD_SEED);
-  for (const p of FORGEFATHER_FORTRESS_PLACEMENTS) {
-    if (!FORTRESS_STANDABLE_KEYS.has(p.key)) continue;
-    const native = IGNIVAR_PROP_NATIVE[p.key];
-    const dx = x - p.x;
-    const dz = z - p.z;
-    const cos = Math.cos(-p.ry);
-    const sin = Math.sin(-p.ry);
+  for (const c of STANDABLES) {
+    const dx = x - c.x;
+    const dz = z - c.z;
+    const cos = Math.cos(-c.rot);
+    const sin = Math.sin(-c.rot);
     const lx = dx * cos + dz * sin;
     const lz = -dx * sin + dz * cos;
-    if (Math.abs(lx) <= (native.len * p.scale) / 2 && Math.abs(lz) <= (native.dep * p.scale) / 2) {
-      const top = p.y + native.hei * p.scale;
+    if (Math.abs(lx) <= c.hw && Math.abs(lz) <= c.hd) {
+      const top = c.moveTopY as number;
       if (top > h && top - h < 40) h = Math.max(h, top);
     }
   }
@@ -35,10 +44,12 @@ function walkHeight(x: number, z: number): number {
 }
 
 describe('forgefather fortress walkability', () => {
-  it('the shore-to-summit route climbs within the step limit at every yard', () => {
+  it('the shore-to-summit route climbs within the step and steepness limits at every yard', () => {
     const route: Array<[string, number, number]> = [];
     const seg = (name: string, x0: number, z0: number, x1: number, z1: number) => {
-      const steps = Math.ceil(Math.hypot(x1 - x0, z1 - z0));
+      // Half-yard sampling: a real movement tick advances ~0.35 yd, so a
+      // coarser walk straddles two stair treads and reads a double rise.
+      const steps = Math.ceil(Math.hypot(x1 - x0, z1 - z0) * 2);
       for (let i = 0; i <= steps; i++)
         route.push([name, x0 + ((x1 - x0) * i) / steps, z0 + ((z1 - z0) * i) / steps]);
     };
@@ -64,6 +75,13 @@ describe('forgefather fortress walkability', () => {
       const h = walkHeight(x, z);
       if (prev !== null && h - prev > MAX_STEP_HEIGHT + 0.01)
         bad.push(`${name} (${x.toFixed(1)}, ${z.toFixed(1)}): rise ${(h - prev).toFixed(2)}`);
+      // The steepness gate reads terrain only where terrain IS the support:
+      // a walker on a deck or tread platform is carried over the cell.
+      if (h <= terrainHeight(x, z, WORLD_SEED) + 0.01) {
+        const steep = terrainSteepness(Math.round(x), Math.round(z), WORLD_SEED);
+        if (steep > PLAYER_MAX_CLIMB_SLOPE)
+          bad.push(`${name} (${x.toFixed(1)}, ${z.toFixed(1)}): steepness ${steep.toFixed(2)}`);
+      }
       prev = h;
     }
     expect(bad, bad.slice(0, 12).join('; ')).toEqual([]);
@@ -76,33 +94,25 @@ describe('forgefather fortress walkability', () => {
     const Z1 = 2266;
     const W = X1 - X0 + 1;
     const H = Z1 - Z0 + 1;
-    const blockers = FORGEFATHER_FORTRESS_PLACEMENTS.filter((p) => {
-      if (FORTRESS_STANDABLE_KEYS.has(p.key) || IGNIVAR_NON_COLLIDING_PROPS.has(p.key))
-        return false;
-      const ground = terrainHeight(p.x, p.z, WORLD_SEED);
-      if (p.y > ground + 2.5) return false;
-      return p.y + IGNIVAR_PROP_NATIVE[p.key].hei * p.scale >= ground + 0.5;
-    });
+    const blockers = (forgefatherFortressColliders(WORLD_SEED) as ObbCollider[]).filter(
+      (collider) => !collider.standable,
+    );
     const blocked = (x: number, z: number): boolean => {
       for (const b of blockers) {
-        const native = IGNIVAR_PROP_NATIVE[b.key];
         const dx = x - b.x;
         const dz = z - b.z;
-        const cos = Math.cos(-b.ry);
-        const sin = Math.sin(-b.ry);
+        const cos = Math.cos(-b.rot);
+        const sin = Math.sin(-b.rot);
         const lx = dx * cos + dz * sin;
         const lz = -dx * sin + dz * cos;
-        if (
-          Math.abs(lx) <= (native.len * b.scale) / 2 + 0.4 &&
-          Math.abs(lz) <= (native.dep * b.scale) / 2 + 0.4
-        )
-          return true;
+        if (Math.abs(lx) <= b.hw + 0.4 && Math.abs(lz) <= b.hd + 0.4) return true;
       }
       return false;
     };
     const hts = new Float64Array(W * H);
     const wet = new Uint8Array(W * H);
     const solid = new Uint8Array(W * H);
+    const cliff = new Uint8Array(W * H); // dry terrain too steep to walk onto
     for (let ix = 0; ix < W; ix++)
       for (let iz = 0; iz < H; iz++) {
         const x = X0 + ix;
@@ -111,11 +121,29 @@ describe('forgefather fortress walkability', () => {
         hts[i] = walkHeight(x, z);
         wet[i] = hts[i] < -4.25 ? 1 : 0;
         solid[i] = blocked(x, z) ? 1 : 0;
+        cliff[i] =
+          !wet[i] &&
+          hts[i] <= terrainHeight(x, z, WORLD_SEED) + 0.01 &&
+          terrainSteepness(x, z, WORLD_SEED) > PLAYER_MAX_CLIMB_SLOPE
+            ? 1
+            : 0;
+      }
+    const onTerrain = new Uint8Array(W * H);
+    for (let ix = 0; ix < W; ix++)
+      for (let iz = 0; iz < H; iz++) {
+        const i = ix + iz * W;
+        onTerrain[i] = hts[i] <= terrainHeight(X0 + ix, Z0 + iz, WORLD_SEED) + 0.01 ? 1 : 0;
       }
     const canStep = (a: number, b: number): boolean => {
-      if (solid[b]) return false;
+      if (solid[b] || cliff[b]) return false;
       if (wet[b]) return true;
-      return hts[b] - Math.max(hts[a], -4.25) <= MAX_STEP_HEIGHT + 0.01 || wet[a] === 1;
+      if (wet[a]) return true;
+      // Terrain-to-terrain hops follow the slope gate (a smooth grade is
+      // walkable up to PLAYER_MAX_CLIMB_SLOPE per yard); any hop involving
+      // a deck or tread platform is a collider step under MAX_STEP_HEIGHT.
+      const limit =
+        onTerrain[a] && onTerrain[b] ? PLAYER_MAX_CLIMB_SLOPE + 0.01 : MAX_STEP_HEIGHT + 0.01;
+      return hts[b] - Math.max(hts[a], -4.25) <= limit;
     };
     const flood = (seed: number, reverse: boolean): Uint8Array => {
       const seen = new Uint8Array(W * H);
@@ -156,5 +184,29 @@ describe('forgefather fortress walkability', () => {
           traps.push(`(${X0 + ix}, ${Z0 + iz}) h${hts[i].toFixed(1)}`);
       }
     expect(traps, traps.slice(0, 12).join('; ')).toEqual([]);
+  });
+
+  it('every staircase emits ascending tread platforms inside the step limit', () => {
+    const stairs = FORGEFATHER_FORTRESS_PLACEMENTS.filter((p) => p.key === 'staircase');
+    expect(stairs.length).toBe(6);
+    expect(IGNIVAR_NON_COLLIDING_PROPS.has('staircase')).toBe(true);
+    for (const s of stairs) {
+      const halfDep = (IGNIVAR_PROP_NATIVE.staircase.dep * s.scale) / 2;
+      const treads = STANDABLES.filter(
+        (c) =>
+          c.rot === s.ry && c.hd === halfDep && Math.hypot(c.x - s.x, c.z - s.z) <= s.scale / 2,
+      ).sort((a, b) => (a.moveTopY as number) - (b.moveTopY as number));
+      expect(treads.length, `stair at (${s.x}, ${s.z})`).toBe(11);
+      let prev = s.y;
+      for (const tread of treads) {
+        const top = tread.moveTopY as number;
+        expect(top - prev, `tread rise at (${s.x}, ${s.z})`).toBeLessThanOrEqual(MAX_STEP_HEIGHT);
+        // The top tread and the landing share the flight's crest height.
+        expect(top).toBeGreaterThanOrEqual(prev);
+        prev = top;
+      }
+      // The flight tops out at the stair's landing height.
+      expect(prev).toBeCloseTo(s.y + 0.74 * s.scale, 5);
+    }
   });
 });
