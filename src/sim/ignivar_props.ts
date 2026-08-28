@@ -257,11 +257,14 @@ export function ignivarCruciblePropPlacements(_layout: DungeonLayout): IgnivarPr
     at('chain', 24, 14, 4.8, 8, 12),
     at('chain_hanging', -5.5, 25, 0.5, 8, 10),
     at('chain_hanging', 5.5, 25, -0.5, 8, 10),
-    // The forge-anchor dressing: the anvil the boss works pre-pull, seated
-    // beside the assembly forge at (0, 22) under the hook chains. The one
-    // deliberate floor placement inside the fighting circle; the clearance
-    // contracts carve out the forge-anchor radius for exactly this.
-    at('anvil', 5.2, 20.9, 225 * DEG, 8),
+    // The forge-anchor dressing (re-baked from the /placer export,
+    // 2026-08-28): the assembly forge stands at the north face of the
+    // fighting circle with the anvil the boss works squared up at its
+    // front, both under the hook chains. The deliberate floor placements
+    // inside the fighting circle; the clearance contracts carve out the
+    // forge-anchor radius for exactly this.
+    at('anvil', 1.2, 22.9, 180 * DEG, 10),
+    at('forge', 0.8, 26.7, 180 * DEG, 13),
     // East wall: furnace bank flanking the steam pipe stack.
     at('steam_pipes', 39.25, -2.5, 270 * DEG, 15),
     at('lava_furnace', 37.5, -10.5, 270 * DEG, 15),

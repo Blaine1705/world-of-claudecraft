@@ -42,7 +42,6 @@ import {
   type WallStub,
 } from '../sim/dungeon_layout';
 import { polygonContainsPoint, polygonXAtZ } from '../sim/geometry2d';
-import { ignivarArenaFloorTileCenterHasStone } from '../sim/ignivar_arena';
 import {
   authoredLiftAt,
   authoredWallSegments,
@@ -71,7 +70,13 @@ import {
   pendingArenaWallsFor,
 } from './dungeon_arena_walls';
 import { dungeonBannerKind, hangsKitBanners } from './dungeon_banner_core';
-import { dungeonFloorKind, dungeonFloorQuadKind, dungeonWallKind } from './dungeon_tile_kind_core';
+import {
+  dungeonFloorKind,
+  dungeonFloorQuadKind,
+  dungeonWallKind,
+  floorModuleTouchesRoomShell,
+  ignivarMoatCarvesFloorCell,
+} from './dungeon_tile_kind_core';
 import { addTorchFire, type TorchFireTuning } from './dungeon_torch_rig';
 import { rectShellWallSegments, stubFaceSegments } from './dungeon_wall_segments';
 import { attachSceneGroupGated } from './gated_scene_attach';
@@ -834,7 +839,7 @@ export class DungeonInteriors {
           return group;
         }
 
-        this.placeFloor(p, layout, variant);
+        this.placeFloor(p, layout, variant, interior);
         this.placeWalls(p, layout, variant, arenaWalls);
         this.placePillarsAndTorches(group, p, layout, variant, torch);
         this.placeTombs(p, layout, variant);
@@ -1564,37 +1569,31 @@ export class DungeonInteriors {
   }
 
   // 4u tile grid covering the room (x -24..24, z just past both end walls)
-  private placeFloor(p: Placements, layout: DungeonLayout, variant: Variant): void {
+  private placeFloor(p: Placements, layout: DungeonLayout, variant: Variant, interior: string) {
     const quarter = Math.PI / 2;
     // Default the floor to the inner wall face so wider rooms (delve |x|=25)
     // are not left with a bare strip between the aisle floor and the side walls.
     const floorHalfX = layout.floorHalfX ?? (layout.wallX ?? DUNGEON_WALL_X) - 1;
     const poly = layout.shellPolygon;
+    // Room-shape decisions live in dungeon_tile_kind_core.ts (shell mask + moat carve).
+    const inShell = (cx: number, cz: number, hw: number, hd: number): boolean =>
+      floorModuleTouchesRoomShell(interior, poly, cx, cz, hw, hd);
     for (let z = layout.zMin - 2; z <= layout.zMax + 2; z += FLOOR_CELL) {
       for (let x = -floorHalfX; x <= floorHalfX; x += FLOOR_CELL) {
-        // Polygon shell: mask the rectangular grid down to the authored room
-        // outline (same grid stepping and tile-kind logic, just skip cells
-        // whose own center falls outside the polygon). Boundary tiles will
-        // stair-step; accepted for this kit.
-        if (poly && !polygonContainsPoint(poly, x, z)) continue;
-        // Ignivar's lethal mask consumes the exact union of these 4x4 floor
-        // tiles. Decide authoring from the same pure center predicate; the
-        // dedicated bridge decks are emitted by ignivar_lava_moat.ts.
-        if (variant === 'ignivar' && !ignivarArenaFloorTileCenterHasStone(x, z)) continue;
+        if (!inShell(x, z, FLOOR_CELL / 2, FLOOR_CELL / 2)) continue;
+        if (ignivarMoatCarvesFloorCell(interior, x, z)) continue;
         let kind = this.floorKind(variant, hash2(x * 1.31, z));
         if (kind === 'grate' && Math.abs(x) < 4) kind = 'floor_tile_large'; // keep pits off the walk aisle
         if (kind === 'grate') {
-          // floor_tile_grate is 4x2: a pair fills the cell, test each half's own center
-          if (!poly || polygonContainsPoint(poly, x, z - 1))
-            p.add('floor_tile_grate', x, FLOOR_Y, z - 1);
-          if (!poly || polygonContainsPoint(poly, x, z + 1))
-            p.add('floor_tile_grate', x, FLOOR_Y, z + 1);
+          // floor_tile_grate is 4x2: a pair fills the cell, test each half's own footprint
+          if (inShell(x, z - 1, FLOOR_CELL / 2, 1)) p.add('floor_tile_grate', x, FLOOR_Y, z - 1);
+          if (inShell(x, z + 1, FLOOR_CELL / 2, 1)) p.add('floor_tile_grate', x, FLOOR_Y, z + 1);
           continue;
         }
         if (kind === 'quad') {
           for (const dx of [-1, 1]) {
             for (const dz of [-1, 1]) {
-              if (poly && !polygonContainsPoint(poly, x + dx, z + dz)) continue;
+              if (!inShell(x + dx, z + dz, 1, 1)) continue;
               const sub = this.floorQuadKind(variant, hash2(x + dx, z + dz));
               const rot = Math.floor(hash2(z + dz, x + dx) * 4) * quarter;
               p.add(sub, x + dx, FLOOR_Y, z + dz, rot);
