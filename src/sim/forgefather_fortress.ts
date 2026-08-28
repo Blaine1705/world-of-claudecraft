@@ -201,10 +201,23 @@ export const FORTRESS_STANDABLE_KEYS: ReadonlySet<IgnivarEnvPropKey> = new Set([
  *  shipped GLB's nose line (constants shared with the under-bank generator
  *  in src/sim/content/ember_coast.ts). Each tread is a narrow STANDABLE
  *  platform, so a walking body climbs the real steps through the physics
- *  step-up (the Beacon-stair parkour lane): every rise stays under
- *  MAX_STEP_HEIGHT at the placed scales, and the terrain below is only a
- *  cosmetic bank tucked beneath the solid stair wedge. */
+ *  step-up: every rise stays under MAX_STEP_HEIGHT at the placed scales,
+ *  and the terrain below is only a cosmetic bank tucked beneath the solid
+ *  stair wedge. These are the game's first stacked collider flights (the
+ *  Old Beacon's spiral climbs a terrain lift field instead); the live
+ *  kernel walks them in tests/forgefather_fortress_route.test.ts. */
 const STAIR_TREADS = 10;
+
+/** The round tower pieces collide as CIRCLES at their drum radius: a
+ *  square OBB overhangs a cylinder's wall by 41% at the corners, and the
+ *  two bailey-flanking towers' squares pinched that stair's corridor to
+ *  0.34yd, parking every climb at a tread face. Radius is the mean of the
+ *  two footprint axes' halves (the drum, buttress trim averaged in). */
+export const FORTRESS_CYLINDRICAL_KEYS: ReadonlySet<IgnivarEnvPropKey> = new Set([
+  'tower_base',
+  'tower_middle',
+  'tower_pillar',
+]);
 
 function staircaseTreadColliders(placement: IgnivarPropPlacement): Collider[] {
   const scale = placement.scale;
@@ -277,6 +290,15 @@ export function forgefatherFortressColliders(seed: number): Collider[] {
     // full-height OBB has no top, so a buried mass would otherwise blanket
     // the walkable ground above it.
     if (placement.y + native.hei * placement.scale < ground + 0.5) continue;
+    if (FORTRESS_CYLINDRICAL_KEYS.has(placement.key)) {
+      colliders.push({
+        type: 'circle',
+        x: placement.x,
+        z: placement.z,
+        r: ((native.len + native.dep) * placement.scale * footprint) / 4,
+      });
+      continue;
+    }
     colliders.push({
       type: 'obb',
       x: placement.x,

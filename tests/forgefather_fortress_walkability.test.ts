@@ -19,7 +19,7 @@ import {
 import { IGNIVAR_NON_COLLIDING_PROPS, IGNIVAR_PROP_NATIVE } from '../src/sim/ignivar_props';
 import { PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import { MAX_STEP_HEIGHT } from '../src/sim/physics/character';
-import { terrainHeight, terrainSteepness } from '../src/sim/world';
+import { terrainDownhill, terrainHeight, terrainSteepness } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
 const STANDABLES = (forgefatherFortressColliders(WORLD_SEED) as ObbCollider[]).filter(
@@ -94,13 +94,17 @@ describe('forgefather fortress walkability', () => {
     const Z1 = 2266;
     const W = X1 - X0 + 1;
     const H = Z1 - Z0 + 1;
-    const blockers = (forgefatherFortressColliders(WORLD_SEED) as ObbCollider[]).filter(
+    const blockers = forgefatherFortressColliders(WORLD_SEED).filter(
       (collider) => !collider.standable,
     );
     const blocked = (x: number, z: number): boolean => {
       for (const b of blockers) {
         const dx = x - b.x;
         const dz = z - b.z;
+        if (b.type === 'circle') {
+          if (Math.hypot(dx, dz) <= b.r + 0.4) return true;
+          continue;
+        }
         const cos = Math.cos(-b.rot);
         const sin = Math.sin(-b.rot);
         const lx = dx * cos + dz * sin;
@@ -184,6 +188,34 @@ describe('forgefather fortress walkability', () => {
           traps.push(`(${X0 + ix}, ${Z0 + iz}) h${hts[i].toFixed(1)}`);
       }
     expect(traps, traps.slice(0, 12).join('; ')).toEqual([]);
+  });
+
+  it('no walk cell can strip control with no slide to escape by (the freeze-spot rule)', () => {
+    // The movement kernel's steepness strip reads the RAW heightfield. A
+    // platform-CARRIED body (feet > ground + 0.5) is exempt by the kernel's
+    // platform-carry clearance; what must never exist is a walkable cell
+    // whose support sits close enough to steep sliding ground to strip
+    // input while a collider still pins the body in place (the tier-three
+    // trench bug). Mirror the kernel's exact arms here.
+    const frozen: string[] = [];
+    for (let x = 430; x <= 535; x++)
+      for (let z = 2178; z <= 2266; z++) {
+        const walk = walkHeight(x, z);
+        const terr = terrainHeight(x, z, WORLD_SEED);
+        if (walk <= terr + 0.01) continue; // terrain-supported: slides free
+        if (walk > terr + 0.5) continue; // platform-carried: kernel exempts
+        if (walk < -4.25) continue;
+        // Submerged ground under a deck reads through the waterline-clamped
+        // ride arm in the engine, never the raw seabed gradient.
+        if (terr < -4.3) continue;
+        const steep = terrainSteepness(x, z, WORLD_SEED);
+        if (steep <= PLAYER_MAX_CLIMB_SLOPE) continue;
+        // The kernel's second arm: the strip fires only where an ACTUAL
+        // downhill exists at the exact position.
+        if (terrainDownhill(x, z, WORLD_SEED) === null) continue;
+        frozen.push(`(${x}, ${z}) walk ${walk.toFixed(1)} steep ${steep.toFixed(2)}`);
+      }
+    expect(frozen, frozen.slice(0, 12).join('; ')).toEqual([]);
   });
 
   it('every staircase emits ascending tread platforms inside the step limit', () => {

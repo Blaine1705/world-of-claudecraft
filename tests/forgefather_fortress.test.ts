@@ -8,6 +8,7 @@ import { describe, expect, it } from 'vitest';
 import type { ObbCollider } from '../src/sim/colliders';
 import {
   FORGEFATHER_FORTRESS_PLACEMENTS,
+  FORTRESS_CYLINDRICAL_KEYS,
   FORTRESS_STANDABLE_KEYS,
   forgefatherFortressColliders,
 } from '../src/sim/forgefather_fortress';
@@ -54,11 +55,12 @@ describe('forgefather fortress bake', () => {
   });
 
   it('blockers match the ground-standing solid placements exactly', () => {
-    const colliders = (forgefatherFortressColliders(WORLD_SEED) as ObbCollider[]).filter(
+    const colliders = forgefatherFortressColliders(WORLD_SEED).filter(
       (collider) => !collider.standable,
     );
     const expected = FORGEFATHER_FORTRESS_PLACEMENTS.filter(
       (placement) =>
+        placement.key !== 'staircase' &&
         !FORTRESS_STANDABLE_KEYS.has(placement.key) &&
         !IGNIVAR_NON_COLLIDING_PROPS.has(placement.key) &&
         placement.y <=
@@ -71,8 +73,23 @@ describe('forgefather fortress bake', () => {
     for (const placement of expected) {
       const native = IGNIVAR_PROP_NATIVE[placement.key];
       const footprint = IGNIVAR_PROP_COLLIDER_FOOTPRINT[placement.key] ?? 1;
+      // The round tower drums collide as circles at their mean-axis radius;
+      // every other solid keeps its silhouette-shaped OBB.
+      if (FORTRESS_CYLINDRICAL_KEYS.has(placement.key)) {
+        const match = colliders.find(
+          (collider) =>
+            collider.type === 'circle' &&
+            collider.x === placement.x &&
+            collider.z === placement.z &&
+            Math.abs(collider.r - ((native.len + native.dep) * placement.scale * footprint) / 4) <
+              1e-9,
+        );
+        expect(match, `${placement.key} circle at (${placement.x}, ${placement.z})`).toBeDefined();
+        continue;
+      }
       const match = colliders.find(
         (collider) =>
+          collider.type === 'obb' &&
           collider.x === placement.x &&
           collider.z === placement.z &&
           collider.rot === placement.ry &&
@@ -86,7 +103,7 @@ describe('forgefather fortress bake', () => {
   });
 
   it('walk-over trim and aerial stack members never block', () => {
-    const blockers = (forgefatherFortressColliders(WORLD_SEED) as ObbCollider[]).filter(
+    const blockers = forgefatherFortressColliders(WORLD_SEED).filter(
       (collider) => !collider.standable,
     );
     for (const placement of FORGEFATHER_FORTRESS_PLACEMENTS) {
@@ -113,7 +130,9 @@ describe('forgefather fortress bake', () => {
       if (twinBlocks) continue;
       const hit = blockers.find(
         (collider) =>
-          collider.x === placement.x && collider.z === placement.z && collider.rot === placement.ry,
+          collider.x === placement.x &&
+          collider.z === placement.z &&
+          (collider.type === 'circle' || collider.rot === placement.ry),
       );
       expect(hit, `${placement.key} at (${placement.x}, ${placement.z}) must not block`).toBe(
         undefined,

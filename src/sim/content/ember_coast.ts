@@ -165,8 +165,14 @@ export const FORGEFATHER_ISLE_TERRAIN_EDITS: HeightStamp[] = [
   // src/sim/forgefather_fortress.ts): ground leveled flush under the placed
   // floor plates. The tier-one and south-bailey floors already sit on their
   // tiers' own flats.
-  { x: 508, z: 2219, radius: 13, delta: 6.3, falloff: 'smooth', mode: 'level' }, // middle court
-  { x: 508, z: 2219, radius: 9, delta: 6.3, falloff: 'flat', mode: 'level' },
+  // The middle court's pair sits SOUTH-SHRUNK on purpose: its old r13/r9
+  // discs at (508, 2219) applied after the tier-three stamps and re-leveled
+  // tier three's ground under the court plates down toward 6.3, digging a
+  // 3-5yd trench that hard-stuck a walker standing on the plates above it
+  // (the movement kernel's steepness and terrain-wall gates read the RAW
+  // heightfield even under a platform-stander).
+  { x: 508, z: 2216.5, radius: 11, delta: 6.3, falloff: 'smooth', mode: 'level' }, // middle court
+  { x: 508, z: 2216.5, radius: 7, delta: 6.3, falloff: 'flat', mode: 'level' },
   { x: 504.3, z: 2241.2, radius: 8, delta: 14.7, falloff: 'smooth', mode: 'level' }, // upper landing
   { x: 504.3, z: 2241.2, radius: 5, delta: 14.7, falloff: 'flat', mode: 'level' },
   // ...and the stair ramps: each placed staircase dresses a smooth ramp
@@ -222,8 +228,11 @@ export const FORGEFATHER_ISLE_TERRAIN_EDITS: HeightStamp[] = [
     lanes: [-1.9, 1.9, 0],
     radius: 2.6,
   }),
-  // ...plus the summit pad filling the saddle between the keep stair's
-  // top landing and the summit court's flat
+  // ...plus the summit pads: the raw ground grades from the keep flight's
+  // bank up onto the summit flat with no step past the terrain-wall gate,
+  // because the movement kernel reads the raw heightfield even while the
+  // body stands on the landing platform above it.
+  { x: 503.05, z: 2245.1, radius: 2.4, delta: 18.75, falloff: 'smooth', mode: 'level' },
   { x: 503.1, z: 2246.2, radius: 2.8, delta: 18.98, falloff: 'smooth', mode: 'level' },
   { x: 503.1, z: 2247.8, radius: 2.8, delta: 19.0, falloff: 'smooth', mode: 'level' },
   // the quay stair, waterside quay up through the gate (the lead-in
@@ -235,7 +244,7 @@ export const FORGEFATHER_ISLE_TERRAIN_EDITS: HeightStamp[] = [
     scale: 9,
     y: -3.97,
     courtLow: -1.86,
-    clear: 1.9,
+    clear: 2.0,
     lanes: [-2.7, 2.7, 0],
     radius: 3.2,
     lead: 0.75,
@@ -256,6 +265,12 @@ export const FORGEFATHER_ISLE_TERRAIN_EDITS: HeightStamp[] = [
   // ...and its dune apron: the shore dune dips right at the stair's top
   // end, so one pad keeps the step off the landing inside the step limit.
   { x: 443.8, z: 2178.5, radius: 2.5, delta: 1.55, falloff: 'smooth', mode: 'level' },
+  // ...and its west flank softened: the shore chunk meshes at the coarse
+  // LOD bands (2.6/6.5yd), and chords over the burial band's shoulder rode
+  // up to 1.35yd across the flight's silhouette; sinking the shoulder puts
+  // the rendered chords under the tread line at every LOD.
+  { x: 440.3, z: 2185.5, radius: 2, delta: -3.0, falloff: 'smooth', mode: 'level' },
+  { x: 440.3, z: 2183.8, radius: 2, delta: -2.4, falloff: 'smooth', mode: 'level' },
   // Stuck-pocket escapes (found by the movement flood scan): the gate
   // passage pocket, the middle court's north-wall strip, and the alley
   // between the summit flank and the sea-ring wall each get a walkable
@@ -273,6 +288,17 @@ export const FORGEFATHER_ISLE_TERRAIN_EDITS: HeightStamp[] = [
   { x: 519.5, z: 2236.5, radius: 2.4, delta: 1.2, falloff: 'smooth', mode: 'level' },
   { x: 518.5, z: 2234, radius: 2.4, delta: 2.5, falloff: 'smooth', mode: 'level' },
   { x: 516, z: 2244.8, radius: 2.2, delta: 3.2, falloff: 'smooth', mode: 'level' },
+  // Deck-edge understamps: wherever a walk deck floats within half a yard
+  // of steep raw ground, the kernel's steep-strip can fire while the deck
+  // pins the body (the freeze-spot rule in the walkability gate). Sinking
+  // the roofed ground under those edges past the platform-carry clearance
+  // hands the stander the kernel's deck exemption; every dip is under a
+  // deck plate, invisible.
+  { x: 449.5, z: 2198.6, radius: 2, delta: -2.3, falloff: 'smooth', mode: 'level' },
+  { x: 450.2, z: 2200.2, radius: 1.8, delta: -2.4, falloff: 'smooth', mode: 'level' },
+  { x: 497, z: 2208.5, radius: 2.2, delta: -2.6, falloff: 'smooth', mode: 'level' },
+  { x: 507, z: 2244, radius: 1.8, delta: 14.6, falloff: 'smooth', mode: 'level' },
+  { x: 507.3, z: 2254, radius: 1.8, delta: -2.2, falloff: 'smooth', mode: 'level' },
   // ...and the sea-pool postern: the walled pool and its keep-side alley
   // are droppable-into by design (off the summit flank), and their one
   // walkable way out runs south along the keep's east face. The flood
