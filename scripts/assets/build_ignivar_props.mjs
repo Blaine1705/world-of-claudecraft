@@ -1,12 +1,14 @@
-// Build the Ignivar raid dressing props (beams, pillars, gear walls, the
-// vault door, reactor, firepit, the Inner Crucible forge and anvil, roof
-// chains) from the maintainer's Tripo drop in tmp/asset_src, at the
-// willowfen fidelity recipe: weld + BOUNDED simplify (small error so the
-// gear filigree survives; ratio chosen per item from a triangle target,
-// with a second looser pass where the tight bound stops short), prune,
-// dedup, per-item webp texture sizing, meshopt. GEAR201v.glb is a
-// byte-identical duplicate of GEAR MACHINE 1v.glb (same node UUID and
-// texture hash) and is deliberately not an item: one shipped asset.
+// Build the Ignivar raid dressing props (beams, pillars, the vault door,
+// reactor, the Inner Crucible forge and anvil, roof chains, the lava and
+// steam machinery) from the maintainer's Tripo drop in tmp/asset_src, at
+// the willowfen fidelity recipe: weld + BOUNDED simplify (small error so
+// the gear filigree survives; ratio chosen per item from a triangle
+// target, with a second looser pass where the tight bound stops short),
+// prune, dedup, per-item webp texture sizing, meshopt. Only props with a
+// live placement in src/sim/ignivar_props.ts are items: every wired prop
+// downloads for every player at world entry, so an unplaced prop is pure
+// dead weight (tests/ignivar_dressing_plan_core.test.ts pins the rule,
+// and the rest of the drop stays in tmp/asset_src for a later pass).
 // Every prop re-shares its baseColor as an emissive map (zero extra texture
 // bytes): a faint 0.28 self-light on the plain metals so their detail reads
 // in the dim forge grades (the tile-kit carrier trick), and a strong
@@ -29,39 +31,10 @@ import sharp from 'sharp';
 const ITEMS = [
   { src: '_Outter_Walls/Beam_Large_v02.glb', name: 'beam', target: 1400, tex: 512, emissive: 0.28 },
   {
-    src: '_Outter_Walls/Curved_Wall.glb',
-    name: 'curved_wall',
-    target: 9000,
-    tex: 512,
-    emissive: 0.28,
-  },
-  { src: '_Outter_Walls/Firepitv1.glb', name: 'firepit', tex: 512, emissive: 1.6 },
-  {
-    src: '_Outter_Walls/GEAR%20MACHINE%201v.glb',
-    name: 'gear_machine',
-    target: 12000,
-    tex: 1024,
-    emissive: 0.28,
-  },
-  {
     src: '_Outter_Walls/GEAR%20VAULT%20DOOR.glb',
     name: 'vault_door',
     target: 12000,
     tex: 1024,
-    emissive: 0.28,
-  },
-  {
-    src: '_Outter_Walls/PERFECTGEARWALL.glb',
-    name: 'gear_wall',
-    target: 12000,
-    tex: 1024,
-    emissive: 0.28,
-  },
-  {
-    src: '_Outter_Walls/PIller_01.glb',
-    name: 'pillar_broad',
-    target: 6000,
-    tex: 512,
     emissive: 0.28,
   },
   { src: '_Outter_Walls/Pillar_Large.glb', name: 'pillar_slim', tex: 512, emissive: 0.28 },
@@ -92,17 +65,8 @@ const ITEMS = [
   { src: '_Roof/Chain_Hanging.glb', name: 'chain_hanging', tex: 512, darken: 0.45 },
   // The New_Assets drop (2026-08-27) arrives pre-decimated (1k-3k tris), so
   // no simplify targets: weld only, texture sizing and the emissive pass.
-  {
-    src: 'New_Assets/Control_Machine.glb',
-    name: 'control_machine',
-    tex: 1024,
-    emissive: 1.0,
-  },
-  { src: 'New_Assets/Furnace_Small.glb', name: 'furnace_small', tex: 1024, emissive: 1.4 },
-  { src: 'New_Assets/Gear+Pile.glb', name: 'gear_pile', tex: 512, emissive: 0.28 },
   { src: 'New_Assets/Lava_Furnace.glb', name: 'lava_furnace', tex: 1024, emissive: 1.5 },
   { src: 'New_Assets/Press+Machine.glb', name: 'press_machine', tex: 1024, emissive: 1.4 },
-  { src: 'New_Assets/Shelf.glb', name: 'shelf', tex: 1024, emissive: 0.28 },
   { src: 'New_Assets/Square+Wall.glb', name: 'square_wall', tex: 1024, emissive: 0.28 },
   // The New_Assets_Demi drop (2026-08-27): same pre-decimated contract
   // (~1k tris, single mesh, 1024 atlas). Lava carriers run hot, steam
@@ -137,23 +101,14 @@ const ITEMS = [
     rotateX: -90,
     hotBoost: 1.35,
   },
-  { src: 'New_Assets_Demi/lava-outlet-2.glb', name: 'lava_outlet_2', tex: 1024, emissive: 1.5 },
   { src: 'New_Assets_Demi/lava-outlet.glb', name: 'lava_outlet', tex: 1024, emissive: 1.5 },
   { src: 'New_Assets_Demi/lava-port.glb', name: 'lava_port', tex: 1024, emissive: 1.5 },
-  {
-    src: 'New_Assets_Demi/pressure-device.glb',
-    name: 'pressure_device',
-    tex: 1024,
-    emissive: 1.0,
-  },
-  { src: 'New_Assets_Demi/radiator.glb', name: 'radiator', tex: 1024, emissive: 0.28 },
   {
     src: 'New_Assets_Demi/steam-machine-round.glb',
     name: 'steam_machine_round',
     tex: 1024,
     emissive: 1.0,
   },
-  { src: 'New_Assets_Demi/steam-machine.glb', name: 'steam_machine', tex: 1024, emissive: 1.0 },
   { src: 'New_Assets_Demi/steam-pipes.glb', name: 'steam_pipes', tex: 1024, emissive: 0.28 },
 ];
 const SRC_DIR = 'tmp/asset_src/_IGNAR_Environment_Assets';
