@@ -343,8 +343,12 @@ interface AttributionTargetFixture {
 // Re-minted for the rickshaw mount merge into release/v0.41.0: renderer.ts
 // keeps the release self-render extraction while adding the Bonebound Rickshaw
 // mount wiring. No capture was retaken.
+// Re-minted for resolving PR #3693 on top of the current v0.41 batch: the
+// batch-side renderer/entity-view policy leaves combine with the low-tier NaN
+// output-scrub patch hash and Eastbrook asset evidence inputs. No capture was
+// retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '0e5883c2040bc919fadb1cbabb71b83341a909a28575ffdd8fe1e94558eb9f43';
+  '9bec199ec370911d7035d0c513156ee7c5417e1759d4e14a1e9aa7ec5b3e5fec';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
