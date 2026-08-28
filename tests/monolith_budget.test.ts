@@ -136,7 +136,13 @@ const MONOLITHS: MonolithRow[] = [
     // Plus 1 for the Exchange's Solana wallet card: the ONE line is the
     // onWalletUiChange fan-out onto wocMarketWindow.onWalletChanged(), the
     // Claudium panel's existing arm. Exact count.
-    ceiling: 18488,
+    // Raised at the PR #3284 v0.41.0 sync merge, then partially taken back
+    // by the review-round extraction: the frames-menu toggle/select tables,
+    // the reset-key table, and the party-sample roster builder moved to the
+    // pure core interface_unlock_menu_core.ts. What remains on coordinator
+    // state (dimension-mode mover wiring, the edit-preview painter closure,
+    // the player-frame bar lock) is the live-hooks half. Exact merged count.
+    ceiling: 19002,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -264,11 +270,13 @@ const MONOLITHS: MonolithRow[] = [
     // the ratchet follows the merged file down). Exact count, zero slack.
     // Re-pinned to the exact merged count of the v0.39.3 main back-merge
     // (the utc_day import consolidation shed one line).
-    // Lowered by the movement-harness extractions (snapshot_alpha,
-    // input_echo_tracker, self_motion_gate) on one side and the
-    // desktop-signing wallet-handoff hoist on the other; the ratchet
+    // Two threads meet at this count: the movement-harness extractions
+    // (snapshot_alpha, input_echo_tracker, self_motion_gate) lowered one
+    // side, while the PR #3284 sync merge raised the other for the
+    // interface-editor applySetting arms (folding those behind a src/game/
+    // settings-application seam stays flagged follow-up work). The ratchet
     // follows the merged file. Exact count, zero slack.
-    ceiling: 11547,
+    ceiling: 11613,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
