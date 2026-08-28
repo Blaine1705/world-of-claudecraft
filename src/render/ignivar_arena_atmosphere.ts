@@ -24,11 +24,14 @@ export const IGNIVAR_ARENA_LIGHTING = Object.freeze({
   fogNear: 34,
   fogFar: 112,
   sunColor: 0xff9d48,
-  sunIntensity: 0.98,
+  // Room-light lift: the ambient legs (key, hemisphere, IBL) run 30% over
+  // the first sunset-forge grade (0.98 / 0.43 / 0.1), matching the approach
+  // hall's lift; torches and fog stay authored.
+  sunIntensity: 1.27,
   hemiSkyColor: 0x93422a,
   hemiGroundColor: 0x280d06,
-  hemiIntensity: 0.43,
-  envIntensity: 0.1,
+  hemiIntensity: 0.56,
+  envIntensity: 0.13,
   rimIntensity: 1.05,
   rimColor: 0xffa45c,
   forgeLightColor: 0xff6a24,

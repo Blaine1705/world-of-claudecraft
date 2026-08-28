@@ -1942,6 +1942,7 @@ export function tintedMaterial(
   shapeKey: string,
   selfIllumination = 0,
   envMapIntensity?: number,
+  matte = false,
 ): THREE.Material {
   // A source with no color property (the weapon-skin fresnel shell's
   // ShaderMaterial) has nothing this factory can tint, lift, or polish.
@@ -1952,7 +1953,12 @@ export function tintedMaterial(
   // shapeKey: a mounted clone is shared only among meshes of one program
   // shape (material_program_shape_core.ts); single-shape callers (the far
   // bake) pass nothing.
-  const key = `${src.uuid}|${tint ?? 'n'}|${tint === null ? 0 : strength}|${GFX.standardMaterials ? 's' : 'l'}|${skinTex ? skinTex.uuid : 'n'}|${emisTex ? emisTex.uuid : 'n'}|${role}|${mount}|${shapeKey}|${selfIllumination}|${envMapIntensity ?? 'n'}`;
+  // matte partitions the key even on the low tier, where the Lambert
+  // derivation ignores it: a matte and a non-matte def sharing one source
+  // material would mint two identical Lambert clones there. Accepted, since
+  // no GLB is shared across matte and non-matte defs today, and keying on
+  // the derivation INPUTS keeps the key honest if the derivation changes.
+  const key = `${src.uuid}|${tint ?? 'n'}|${tint === null ? 0 : strength}|${GFX.standardMaterials ? 's' : 'l'}|${skinTex ? skinTex.uuid : 'n'}|${emisTex ? emisTex.uuid : 'n'}|${role}|${mount}|${shapeKey}|${selfIllumination}|${envMapIntensity ?? 'n'}|${matte ? 'm' : 'n'}`;
   const build = () =>
     buildTintedClone(
       src as THREE.MeshStandardMaterial,
@@ -1963,6 +1969,7 @@ export function tintedMaterial(
       role,
       selfIllumination,
       envMapIntensity,
+      matte,
     );
   if (claims) {
     if (claims.has(key)) {
@@ -1995,6 +2002,7 @@ function buildTintedClone(
   role: MaterialRole,
   selfIllumination: number,
   envMapIntensity?: number,
+  matte = false,
 ): THREE.Material {
   const src: THREE.Material = s;
   let mat: THREE.MeshStandardMaterial | THREE.MeshLambertMaterial | THREE.MeshBasicMaterial;
@@ -2082,7 +2090,18 @@ function buildTintedClone(
     // key light) and others at 1.0 (dead flat); the band keeps every character
     // in one coherent painted-surface response without touching metalness.
     const std = mat as THREE.MeshStandardMaterial;
-    std.roughness = Math.min(Math.max(std.roughness, 0.55), 0.9);
+    if (matte) {
+      // VisualDef.matte: fully diffuse. Zero the metalness AND drop both PBR
+      // response maps: the scalars only multiply the sampled texels, so a
+      // metallic or low-roughness texel would re-gloss the body under the
+      // scalar-only form.
+      std.metalness = 0;
+      std.roughness = 1;
+      std.metalnessMap = null;
+      std.roughnessMap = null;
+    } else {
+      std.roughness = Math.min(Math.max(std.roughness, 0.55), 0.9);
+    }
     if (selfIllumination > 0 && std.map && !std.emissiveMap) {
       std.emissiveMap = std.map;
       std.emissive.set(0xffffff);
@@ -2153,6 +2172,7 @@ export function applyMaterials(
           shapeKey,
           role === 'body' ? (def.selfIllumination ?? 0) : 0,
           role === 'body' ? def.envMapIntensity : undefined,
+          role === 'body' && (def.matte ?? false),
         ),
       );
     } else {
@@ -2168,6 +2188,7 @@ export function applyMaterials(
         shapeKey,
         role === 'body' ? (def.selfIllumination ?? 0) : 0,
         role === 'body' ? def.envMapIntensity : undefined,
+        role === 'body' && (def.matte ?? false),
       );
     }
     attachSharedDepthMaterials(mesh, mesh.material);
@@ -2206,6 +2227,7 @@ export function tintedFarMaterials(
       '',
       isBody[i] ? (def.selfIllumination ?? 0) : 0,
       isBody[i] ? def.envMapIntensity : undefined,
+      isBody[i] && (def.matte ?? false),
     ),
   );
 }

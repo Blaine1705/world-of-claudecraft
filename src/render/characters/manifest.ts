@@ -149,6 +149,12 @@ export interface VisualDef {
   selfIllumination?: number;
   /** Optional per-visual multiplier for scene environment reflections. */
   envMapIntensity?: number;
+  /** Force a fully diffuse surface response on the body materials: zero
+   *  metalness, full roughness, and the metallic/roughness maps dropped, so
+   *  the key/hemisphere/torch lights cannot lay a specular sheen over the
+   *  albedo. For rigs whose authored PBR response reads as gloss under an
+   *  interior light rig (the Ignivar raid roster). */
+  matte?: boolean;
   /** KayKit chars ship every accessory visible: non-skinned mesh nodes to KEEP.
    *  undefined = keep everything (creature GLBs have no accessories). */
   show?: string[];
@@ -2419,6 +2425,10 @@ export const VISUALS: Record<string, VisualDef> = {
     // under the sunset forge rig the boost read as a milky IBL sheen, so the
     // boss keeps a lower ember glow and the stock envMapIntensity of 1.
     selfIllumination: 0.14,
+    // The contributor atlas ships metallicFactor 1 with a metallic-roughness
+    // texture, which lays a specular sheen over the whole body under the
+    // forge key light; matte keeps the albedo readable instead.
+    matte: true,
     clips: IGNIVAR,
     walkRef: 1.6,
     runRef: 3.2,
@@ -2429,7 +2439,12 @@ export const VISUALS: Record<string, VisualDef> = {
     height: 1.8,
     yaw: 0,
     selfIllumination: 0.16,
-    envMapIntensity: 1.3,
+    // One of its two materials ships metallicFactor 1 plus a metallic-
+    // roughness texture; matte kills that metallic response so the ash robes
+    // stay diffuse under the raid rooms' key light. The old 1.3 boost here
+    // was dead config: three overwrites per-material envMapIntensity with
+    // scene.environmentIntensity for materials lit by scene.environment.
+    matte: true,
     clips: IGNIVAR_HEART,
     attackTimeScale: 6,
     deathTimeScale: 3,
@@ -2440,10 +2455,13 @@ export const VISUALS: Record<string, VisualDef> = {
     yaw: 0,
     // The three automata (this def and the two below) carried 0.18 plus an
     // envMapIntensity of 1.35 as a readability crutch for the near-black
-    // rooms; against the daylight environment map that boost was most of the
-    // white sheen on their gunmetal. The sunset forge rig lights them now, so
-    // they keep only a whisper of glow and the stock envMapIntensity of 1.
+    // rooms (a knob three ignores under scene.environment, see the boss defs
+    // above). The sunset forge rig lights them now, so they keep only a
+    // whisper of glow. Their GLBs already ship metalness 0 with no MR maps,
+    // so matte here lifts the authored 0.85 roughness to 1, flattening the
+    // key light's remaining dielectric highlight so the gunmetal paint reads.
     selfIllumination: 0.08,
+    matte: true,
     clips: IGNIVAR_CRUCIBLE_WARDEN,
   },
   mob_ignivar_ember_sentinel: {
@@ -2451,6 +2469,7 @@ export const VISUALS: Record<string, VisualDef> = {
     height: 2.3,
     yaw: 0,
     selfIllumination: 0.08,
+    matte: true,
     clips: IGNIVAR_EMBER_SENTINEL,
   },
   mob_ignivar_cinder_artificer: {
@@ -2458,6 +2477,7 @@ export const VISUALS: Record<string, VisualDef> = {
     height: 2.1,
     yaw: 0,
     selfIllumination: 0.08,
+    matte: true,
     clips: IGNIVAR_CINDER_ARTIFICER,
   },
   mob_varkhul_forgefather: {
@@ -2472,8 +2492,15 @@ export const VISUALS: Record<string, VisualDef> = {
     // The smith atlas is near-black leather and iron; the add-tier grade
     // (0.18/1.35) reads as a silhouette in the Crucible. Match the Ignivar
     // colossus furnace grade instead so the bronze and beard stay legible.
+    // The smith atlas ships metalness 0 with no MR maps at authored
+    // roughness 1, which the body clamp used to pull DOWN to 0.9 gloss;
+    // matte holds it at 1, and that roughness step is the visible de-sheen.
+    // The old 1.6 boost was dead config (three overwrites per-material
+    // envMapIntensity with scene.environmentIntensity under scene env), so
+    // deleting it changes nothing on screen; the brightened room rig
+    // carries legibility.
     selfIllumination: 0.22,
-    envMapIntensity: 1.6,
+    matte: true,
     clips: VARKHUL_FORGEFATHER,
     // planted-foot naturals measured off the shipped clips (63.4 and 166.2
     // raw units/s at rawHeight 88.48, scaled by height 3 x mob scale 3.2)
