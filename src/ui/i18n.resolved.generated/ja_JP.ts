@@ -2765,6 +2765,7 @@ export const ja_JP: EnTranslations = {
       "actionBar3Vertical": "アクションバー 3 を縦向きに",
       "menuRailHorizontal": "メニューを横向きに",
       "snapToGrid": "Snap to Grid",
+      "previewMemberName": "{className} {number}",
       "resetFrameSize": "サイズをリセット",
       "resetFrameSizeFor": "{name}のサイズをリセット",
       "previewSpell": "サンプル呪文"

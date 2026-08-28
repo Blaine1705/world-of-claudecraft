@@ -845,7 +845,7 @@ export const vi_VN: EnTranslations = {
       "reset": "Đặt Lại",
       "presets": {
         "classic": "Vàng Cổ Điển",
-        "fancyGold": "Fancy Gold",
+        "fancyGold": "Fancy Gold (WIP)",
         "midnight": "Nửa Đêm",
         "parchment": "Giấy Da",
         "highContrast": "Tương Phản Cao"
@@ -2765,6 +2765,7 @@ export const vi_VN: EnTranslations = {
       "actionBar3Vertical": "Vertical Action Bar 3",
       "menuRailHorizontal": "Horizontal Menu",
       "snapToGrid": "Snap to Grid",
+      "previewMemberName": "{className} {number}",
       "resetFrameSize": "Reset size",
       "resetFrameSizeFor": "Reset size for {name}",
       "previewSpell": "Example Spell"

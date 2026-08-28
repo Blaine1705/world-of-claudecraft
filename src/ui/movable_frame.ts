@@ -41,6 +41,7 @@ import {
   snapFrameCoord,
   snapFrameSize,
   snapScaleToGrid,
+  stepCoordToGridLine,
   type TargetFramePos,
 } from './target_frame_pos';
 import { getUiScale } from './ui_scale';
@@ -96,6 +97,11 @@ export interface MovableFrameConfig {
     width?: FrameDimension;
     height?: FrameDimension;
   };
+  /** Whether the arrange-mode Snap to Grid setting is on (drags land on the
+   *  shared FRAME_SNAP_GRID and resizes quantize to the same pitch). Absent
+   *  means never snap: the same optional-dep shape the chat controller's
+   *  snapToGrid takes. */
+  snapToGrid?: () => boolean;
 }
 
 /** One settings-backed axis for resizeMode 'dimensions'. `factor` converts one
@@ -121,14 +127,13 @@ const HIDDEN_STORAGE_SUFFIX = '_hidden';
  *  transition's window metrics to settle. */
 const RESIZE_SETTLE_MS = 200;
 
-/** Whether the arrange-mode Snap to Grid setting is on: one provider for
- *  every frame, wired once by hud (which owns the live settings hooks),
- *  rather than a callback threaded through seventeen configs. Null until
- *  wired; snapping stays off then. */
-let frameSnapEnabled: (() => boolean) | null = null;
-
-export function setFrameSnapToGridProvider(provider: () => boolean): void {
-  frameSnapEnabled = provider;
+/** One shared listener set per Document (see MovableFrame.registryFor):
+ *  the registered frames, the coalesced resize settle timer, and the count
+ *  of live gestures the pointermove fan-out gates on. */
+interface FrameDispatchEntry {
+  frames: Set<MovableFrame>;
+  settleTimer?: ReturnType<typeof setTimeout>;
+  active: number;
 }
 
 type MoveGesture = { kind: 'move'; pointerId: number; grabX: number; grabY: number };
@@ -195,8 +200,34 @@ export class MovableFrame {
   private pos: TargetFramePos | null = null;
   private unlocked = false;
   private userHidden = false;
-  private gesture: MoveGesture | ScaleGesture | StretchGesture | DimensionGesture | null = null;
+  private gestureState: MoveGesture | ScaleGesture | StretchGesture | DimensionGesture | null =
+    null;
+
+  /** The gesture accessor keeps the dispatch entry's live-gesture counter in
+   *  step with every assignment site, so the shared pointermove fan-out can
+   *  return before touching any frame while nothing is being dragged. */
+  private get gesture(): MoveGesture | ScaleGesture | StretchGesture | DimensionGesture | null {
+    return this.gestureState;
+  }
+
+  private set gesture(next: MoveGesture | ScaleGesture | StretchGesture | DimensionGesture | null) {
+    this.entry.active += (next ? 1 : 0) - (this.gestureState ? 1 : 0);
+    this.gestureState = next;
+  }
+
+  /** Leave the shared dispatcher: the registry is otherwise append-only, and
+   *  a torn-down frame (a test document, a future rebuilt HUD) must not keep
+   *  receiving fanned-out events. */
+  dispose(): void {
+    this.gesture = null;
+    this.entry.frames.delete(this);
+  }
+
+  private readonly entry: FrameDispatchEntry;
   private lastHoverCursor = '';
+  /** The edge that cursor was set FOR: opposite edges share a cursor, so the
+   *  elision above must compare both (see setHoverCursor). */
+  private lastHoverEdge: FrameEdge | undefined;
   /** One shared document/window listener set per Document for EVERY frame
    *  (review finding on PR #3284): with ~17 instances, per-instance
    *  registration meant every pointermove ran seventeen DOM dispatches and a
@@ -205,19 +236,17 @@ export class MovableFrame {
    *  gesture guards keep the fan-out cheap. Keyed per Document (a WeakMap)
    *  so test harnesses that stub a fresh document per case each get their
    *  own armed listeners and registry. */
-  private static readonly registries = new WeakMap<
-    Document,
-    { frames: Set<MovableFrame>; settleTimer?: ReturnType<typeof setTimeout> }
-  >();
+  private static readonly registries = new WeakMap<Document, FrameDispatchEntry>();
 
-  private static registryFor(doc: Document): Set<MovableFrame> {
+  private static registryFor(doc: Document): FrameDispatchEntry {
     const existing = MovableFrame.registries.get(doc);
-    if (existing) return existing.frames;
-    const entry: { frames: Set<MovableFrame>; settleTimer?: ReturnType<typeof setTimeout> } = {
-      frames: new Set<MovableFrame>(),
-    };
+    if (existing) return existing;
+    const entry: FrameDispatchEntry = { frames: new Set<MovableFrame>(), active: 0 };
     MovableFrame.registries.set(doc, entry);
     doc.addEventListener('pointermove', (ev) => {
+      // The live-gesture counter (kept by the `gesture` accessor) lets an
+      // idle mouse move over a locked HUD return without touching a frame.
+      if (entry.active <= 0) return;
       for (const frame of entry.frames) frame.onPointerMove(ev as PointerEvent);
     });
     const end = (ev: Event) => {
@@ -225,7 +254,9 @@ export class MovableFrame {
     };
     doc.addEventListener('pointerup', end);
     doc.addEventListener('pointercancel', end);
-    window.addEventListener('resize', () => {
+    // The document's OWN window (falling back to the module global for bare
+    // test documents), so a second Document never re-arms the first's.
+    (doc.defaultView ?? window).addEventListener('resize', () => {
       // Once now and once after the metrics settle: a resize event fired
       // mid-transition (an OS fullscreen exit, emulated viewports) can still
       // observe the OLD innerWidth/Height, making the re-anchor a silent
@@ -239,7 +270,7 @@ export class MovableFrame {
       clearTimeout(entry.settleTimer);
       entry.settleTimer = setTimeout(rederiveAll, RESIZE_SETTLE_MS);
     });
-    return entry.frames;
+    return entry;
   }
   /** Bottom edge (visual px) at the last applyPos, for reanchorBottom(). */
   private lastBottom: number | null = null;
@@ -331,7 +362,8 @@ export class MovableFrame {
     }
     // One SHARED listener set per document dispatches pointer and resize
     // events over every registered frame (see registryFor above).
-    MovableFrame.registryFor(document).add(this);
+    this.entry = MovableFrame.registryFor(document);
+    this.entry.frames.add(this);
 
     let saved: string | null = null;
     try {
@@ -746,7 +778,7 @@ export class MovableFrame {
     // provider hud wires), a dragged box lands on the shared grid and a
     // resize quantizes the frame's visual size to the same pitch, so
     // frames align without pixel hunting.
-    const snap = frameSnapEnabled?.() ?? false;
+    const snap = this.cfg.snapToGrid?.() ?? false;
     if (g.kind === 'move') {
       const left = ev.clientX - g.grabX;
       const top = ev.clientY - g.grabY;
@@ -907,8 +939,12 @@ export class MovableFrame {
   }
 
   private setHoverCursor(cursor: string, edge?: FrameEdge): void {
-    if (cursor === this.lastHoverCursor) return;
+    // Elided on BOTH halves: opposite edges share a cursor (n and s are both
+    // ns-resize), so a cursor-only guard kept the old side's highlight
+    // painted after a jump across the frame (review round three).
+    if (cursor === this.lastHoverCursor && edge === this.lastHoverEdge) return;
     this.lastHoverCursor = cursor;
+    this.lastHoverEdge = edge;
     // '' clears the inline value, handing the cursor back to the stylesheet's
     // move affordance on the frame body.
     this.cfg.frame.style.cursor = cursor;
@@ -958,11 +994,23 @@ export class MovableFrame {
     ev.preventDefault();
     ev.stopPropagation();
     this.ensurePos();
+    // With Snap to Grid on the coarse step walks grid LINES (a 10px step
+    // could never land on the 16px pitch, locking keyboard-only players out
+    // of the feature); Shift stays the 1px fine step and bypasses the grid.
+    const snap = !ev.shiftKey && (this.cfg.snapToGrid?.() ?? false);
     const step = ev.shiftKey ? 1 : 10;
+    const left = this.pos?.left ?? 0;
+    const top = this.pos?.top ?? 0;
     this.pos = {
       ...this.pos,
-      left: (this.pos?.left ?? 0) + direction.left * step,
-      top: (this.pos?.top ?? 0) + direction.top * step,
+      left:
+        snap && direction.left !== 0
+          ? stepCoordToGridLine(left, direction.left as 1 | -1)
+          : left + direction.left * step,
+      top:
+        snap && direction.top !== 0
+          ? stepCoordToGridLine(top, direction.top as 1 | -1)
+          : top + direction.top * step,
     };
     this.applyPos();
     this.persistPos();
@@ -994,6 +1042,27 @@ export class MovableFrame {
     // that was side-stretched keeps its chosen aspect while the keyboard walks
     // its overall size, since each axis takes the same additive step.
     const { sx, sy } = frameScales(this.pos);
+    const snap = !ev.shiftKey && (this.cfg.snapToGrid?.() ?? false);
+    if (snap) {
+      // Step the frame's VISUAL width to the next grid line and give both
+      // axes the shared ratio, so the keyboard reaches exactly the sizes a
+      // snapped grip drag does (Shift keeps the fine scale step above).
+      const width = this.cfg.frame.getBoundingClientRect().width;
+      if (width > 0 && sx > 0) {
+        const ratio =
+          clampFrameScale(stepCoordToGridLine(width, direction as 1 | -1) / (width / sx)) / sx;
+        this.pos = {
+          ...this.pos,
+          left: this.pos?.left ?? 0,
+          top: this.pos?.top ?? 0,
+          scaleX: clampFrameScale(sx * ratio),
+          scaleY: clampFrameScale(sy * ratio),
+        };
+        this.applyPos();
+        this.persistPos();
+        return;
+      }
+    }
     this.pos = {
       ...this.pos,
       left: this.pos?.left ?? 0,
@@ -1024,12 +1093,23 @@ export class MovableFrame {
     if (!dim) return;
     ev.preventDefault();
     ev.stopPropagation();
+    const current = dim.get();
+    // With Snap to Grid on the coarse step walks the axis's VISUAL extent
+    // (setting px times its factor and the UI scale) to the next grid line,
+    // matching a snapped edge drag; Shift stays the 1px fine setting step.
+    const snap = !ev.shiftKey && (this.cfg.snapToGrid?.() ?? false);
+    const factor = (dim.factor?.() ?? 1) * getUiScale();
+    if (snap && factor > 0) {
+      const nextVisual = stepCoordToGridLine(current * factor, step.dir);
+      const next = clampFrameDimension(nextVisual / factor, dim.min, dim.max);
+      if (next !== current) dim.set(next);
+      return;
+    }
     const size = ev.shiftKey
       ? 1
       : step.axis === 'width'
         ? DIMENSION_KEY_STEP_W
         : DIMENSION_KEY_STEP_H;
-    const current = dim.get();
     const next = clampFrameDimension(current + step.dir * size, dim.min, dim.max);
     if (next !== current) dim.set(next);
   }

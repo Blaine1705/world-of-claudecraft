@@ -1,7 +1,9 @@
 // lockPlayerFrameToActionBar (the Frames Settings menu): the player frame
 // glues to the TOP of the action bars. The mechanics live in three places
 // that must stay wired together, so these pin each half at the source level
-// (the live behavior is exercised by scripts/_probe_player_frame_lock.mjs):
+// (a manual verification script for the live behavior exists at
+// scripts/_probe_player_frame_lock.mjs; nothing runs it automatically, it
+// must be run by hand against a dev server):
 // the frame re-docks into the stack seat and rides INSIDE the combined group
 // whenever the group carries a custom position (following drags, bar 2/3
 // adds and removes, and resolution re-anchors for free), the unlock

@@ -92,6 +92,20 @@ export function snapFrameSize(value: number, grid: number = FRAME_SNAP_GRID): nu
   return Math.max(grid, snapFrameCoord(value, grid));
 }
 
+/** The arrow-key half of Snap to Grid: step a coordinate or size to the NEXT
+ *  grid line in the pressed direction. A value already on a line moves one
+ *  full cell; an off-grid value lands on the nearest line that way, so a
+ *  keyboard-only player reaches exactly the same positions a snapped drag
+ *  does (Shift stays the 1px fine step and bypasses this). */
+export function stepCoordToGridLine(
+  value: number,
+  dir: 1 | -1,
+  grid: number = FRAME_SNAP_GRID,
+): number {
+  if (!Number.isFinite(value) || grid <= 0) return value;
+  return dir > 0 ? Math.floor(value / grid) * grid + grid : Math.ceil(value / grid) * grid - grid;
+}
+
 /** Snap a ZOOM gesture the same way: the scale whose visual extent lands on
  *  the grid. `startVisual` and `startScale` are the gesture-start pair (the
  *  measured size and the scale it was measured under), `nextScale` the

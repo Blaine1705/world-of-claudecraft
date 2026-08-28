@@ -845,7 +845,7 @@ export const id_ID: EnTranslations = {
       "reset": "Atur Ulang",
       "presets": {
         "classic": "Emas Klasik",
-        "fancyGold": "Fancy Gold",
+        "fancyGold": "Fancy Gold (WIP)",
         "midnight": "Tengah Malam",
         "parchment": "Perkamen",
         "highContrast": "Kontras Tinggi"
@@ -2765,6 +2765,7 @@ export const id_ID: EnTranslations = {
       "actionBar3Vertical": "Vertical Action Bar 3",
       "menuRailHorizontal": "Horizontal Menu",
       "snapToGrid": "Snap to Grid",
+      "previewMemberName": "{className} {number}",
       "resetFrameSize": "Reset size",
       "resetFrameSizeFor": "Reset size for {name}",
       "previewSpell": "Example Spell"

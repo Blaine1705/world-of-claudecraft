@@ -62,6 +62,30 @@ describe('settings_transfer_core', () => {
     expect(transferKeyAllowed('settings', 'woc_settings')).toBe(true);
   });
 
+  it('admits every key on the FRAME_KEYS allowlist for the frames kind', () => {
+    // The full literal list from src/ui/settings_transfer_core.ts, pinned as
+    // literals HERE on purpose: each is a persisted surface a frames-layout
+    // import may write, so dropping one from the source allowlist (silently
+    // orphaning that surface on import) fails this test instead of passing.
+    const frameKeys = [
+      'woc_player_frame_pos',
+      'woc_target_frame_pos',
+      'woc_party_frame_pos',
+      'woc_chat_geometry',
+      'woc_meters_frame',
+      'woc_meters_frame_heal',
+      'woc_meters_frame_threat',
+      'woc_meters_detached',
+      'woc_target_auras_frame',
+      'woc_warlock_doom_frame_pos',
+    ] as const;
+    for (const key of frameKeys) {
+      expect(transferKeyAllowed('frames', key), key).toBe(true);
+    }
+    // And the boundary holds: a non-frame settings-family key stays refused.
+    expect(transferKeyAllowed('frames', 'woc_keybinds')).toBe(false);
+  });
+
   it('rejects garbage as format, the reverse kind as kind, and a hollow code as empty', () => {
     expect(parseTransferCode('frames', 'not json')).toEqual({ ok: false, reason: 'format' });
     expect(parseTransferCode('frames', '{"data":{}}')).toEqual({ ok: false, reason: 'format' });

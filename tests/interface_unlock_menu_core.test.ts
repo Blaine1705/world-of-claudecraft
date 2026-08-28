@@ -179,6 +179,12 @@ describe('buildPartySampleMembers', () => {
       oor: false,
     }) as PartyFrameMember;
 
+  it('is the owner-requested 10-member preview roster', () => {
+    // Every other assertion here compares against the constant, so pin the
+    // literal once or a drifted roster size keeps the whole suite green.
+    expect(PARTY_SAMPLE_TOTAL).toBe(10);
+  });
+
   it('pads an empty party to the full sample roster with negative pids', () => {
     const members = buildPartySampleMembers([]);
     expect(members).toHaveLength(PARTY_SAMPLE_TOTAL);

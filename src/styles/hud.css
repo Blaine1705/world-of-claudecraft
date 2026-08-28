@@ -1603,13 +1603,14 @@
     display: block;
   }
   /* While a frame is unlocked its grip is a primary affordance, not passive
-     chrome: bigger and brighter than the stock 16px hatch at 0.45 opacity,
-     which live play-testing found hard to discover and grab. The chat grip
-     joins in arrange mode. */
+     chrome: the full 24px target at raised opacity and the game-styled
+     resize cursor (live play-testing found the dim hatch hard to discover
+     and grab). The chat grip joins in arrange mode; its LOCKED-mode base is
+     already 24px since it is an always-on focusable control. */
   .tf-unlocked > .mf-resize-grip,
   body.interface-unlocked .chat-resize-grip {
-    width: 22px;
-    height: 22px;
+    width: 24px;
+    height: 24px;
     opacity: 0.85;
     cursor: var(--cursor-resize-nwse, nwse-resize);
   }
@@ -4258,8 +4259,8 @@
     position: absolute;
     right: 0;
     bottom: 0;
-    width: 16px;
-    height: 16px;
+    width: 24px;
+    height: 24px;
     cursor: nwse-resize;
     z-index: 3;
     opacity: 0.45;

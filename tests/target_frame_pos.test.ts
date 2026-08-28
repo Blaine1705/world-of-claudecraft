@@ -30,6 +30,7 @@ import {
   snapFrameCoord,
   snapFrameSize,
   snapScaleToGrid,
+  stepCoordToGridLine,
   TARGET_FRAME_MARGIN,
 } from '../src/ui/target_frame_pos';
 
@@ -81,6 +82,24 @@ describe('snapFrameSize', () => {
     expect(snapFrameSize(3)).toBe(16);
     expect(snapFrameSize(0)).toBe(16);
     expect(snapFrameSize(Number.NaN)).toBeNaN();
+  });
+});
+
+describe('stepCoordToGridLine', () => {
+  it('steps to the next grid line in the pressed direction', () => {
+    expect(stepCoordToGridLine(105, 1)).toBe(112);
+    expect(stepCoordToGridLine(105, -1)).toBe(96);
+    // A value already on a line moves one full cell, so repeated presses
+    // keep walking instead of sticking.
+    expect(stepCoordToGridLine(112, 1)).toBe(128);
+    expect(stepCoordToGridLine(112, -1)).toBe(96);
+    expect(stepCoordToGridLine(8, -1)).toBe(0);
+  });
+
+  it('honors an explicit grid and refuses degenerate inputs', () => {
+    expect(stepCoordToGridLine(13, 1, 10)).toBe(20);
+    expect(stepCoordToGridLine(13, 1, 0)).toBe(13);
+    expect(stepCoordToGridLine(Number.NaN, 1)).toBeNaN();
   });
 });
 

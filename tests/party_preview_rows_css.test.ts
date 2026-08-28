@@ -10,12 +10,16 @@
 // never the hidden live rows.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { stripComments } from './helpers/strip_comments';
 
-const hudCss = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8').replace(
-  /\r\n/g,
-  '\n',
+// Both sources are stripped so a pin can never match commented-out code. The
+// shared helper fits the CSS too: block comments (the only CSS comment form)
+// are blanked in place, and its TS line-comment arm is inert here because the
+// sheet's only '//' runs sit inside ':'-guarded data-URI protocol text.
+const hudCss = stripComments(
+  readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8').replace(/\r\n/g, '\n'),
 );
-const hudTs = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+const hudTs = stripComments(readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8'));
 
 describe('edit-mode party preview replaces the live rows (no N + 10 stack)', () => {
   it('folds the LIVE rows wrapper away while the interface is unlocked, direct child only', () => {

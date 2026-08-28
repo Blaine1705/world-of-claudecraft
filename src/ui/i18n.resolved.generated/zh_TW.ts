@@ -2765,6 +2765,7 @@ export const zh_TW: EnTranslations = {
       "actionBar3Vertical": "動作條 3 縱向",
       "menuRailHorizontal": "選單橫向排列",
       "snapToGrid": "Snap to Grid",
+      "previewMemberName": "{className} {number}",
       "resetFrameSize": "重置尺寸",
       "resetFrameSizeFor": "重置{name}的尺寸",
       "previewSpell": "示範法術"

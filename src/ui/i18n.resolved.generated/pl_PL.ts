@@ -845,7 +845,7 @@ export const pl_PL: EnTranslations = {
       "reset": "Resetuj",
       "presets": {
         "classic": "Klasyczne złoto",
-        "fancyGold": "Fancy Gold",
+        "fancyGold": "Fancy Gold (WIP)",
         "midnight": "Północ",
         "parchment": "Pergamin",
         "highContrast": "Wysoki kontrast"
@@ -2765,6 +2765,7 @@ export const pl_PL: EnTranslations = {
       "actionBar3Vertical": "Vertical Action Bar 3",
       "menuRailHorizontal": "Horizontal Menu",
       "snapToGrid": "Snap to Grid",
+      "previewMemberName": "{className} {number}",
       "resetFrameSize": "Reset size",
       "resetFrameSizeFor": "Reset size for {name}",
       "previewSpell": "Example Spell"

@@ -386,9 +386,9 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
 }> = [
   {
     file: 'movable_frame.ts',
-    memos: ['lastBottom', 'lastHoverCursor'],
+    memos: ['lastBottom', 'lastHoverCursor', 'lastHoverEdge'],
     reason:
-      'lastHoverCursor elides the inline resize-cursor write on edge hover. Its values are CSS cursor values (the game-styled var(--cursor-resize-*) tokens with their keyword fallbacks), which are never localized. lastBottom retains the frame bottom edge in visual px for reanchorBottom, a pure coordinate. Every MovableFrame label already rides the interface_unlock relocalize() fan-out arm; neither memo holds text.',
+      'lastHoverCursor elides the inline resize-cursor write on edge hover. Its values are CSS cursor values (the game-styled var(--cursor-resize-*) tokens with their keyword fallbacks), which are never localized. lastHoverEdge is the FrameEdge id that cursor was set for (opposite edges share a cursor, so the elision compares both); an edge id is never text. lastBottom retains the frame bottom edge in visual px for reanchorBottom, a pure coordinate. Every MovableFrame label already rides the interface_unlock relocalize() fan-out arm; no memo holds text.',
   },
   {
     file: 'map_semantic_accessibility_core.ts',

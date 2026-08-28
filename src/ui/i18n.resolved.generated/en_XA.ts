@@ -845,7 +845,7 @@ export const en_XA: EnTranslations = {
       "reset": "[Ŕéšéţ]",
       "presets": {
         "classic": "[Çļáššíç Ĝóļð]",
-        "fancyGold": "[Ƒáñçý Ĝóļð]",
+        "fancyGold": "[Ƒáñçý Ĝóļð (ŴÍÞ)]",
         "midnight": "[Ɱíðñíĝĥţ]",
         "parchment": "[Þáŕçĥɱéñţ]",
         "highContrast": "[Ĥíĝĥ Çóñţŕášţ]"
@@ -2765,6 +2765,7 @@ export const en_XA: EnTranslations = {
       "actionBar3Vertical": "[Ʋéŕţíçáļ Áçţíóñ Ɓáŕ 3]",
       "menuRailHorizontal": "[Ĥóŕížóñţáļ Ɱéñú]",
       "snapToGrid": "[Šñáþ ţó Ĝŕíð]",
+      "previewMemberName": "[{className} {number}]",
       "resetFrameSize": "[Ŕéšéţ šížé]",
       "resetFrameSizeFor": "[Ŕéšéţ šížé ƒóŕ {name}]",
       "previewSpell": "[Éẋáɱþļé Šþéļļ]"

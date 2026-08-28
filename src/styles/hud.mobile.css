@@ -7825,7 +7825,20 @@
   body.mobile-touch .tf-frame-label,
   body.mobile-touch .tf-preview-unit,
   body.mobile-touch .tf-preview-bars,
+  body.mobile-touch .tf-edge-glow,
+  body.mobile-touch #interface-grid-overlay,
   body.mobile-touch .chat-move-btn {
     display: none;
+  }
+  /* The unlocked-state dressing itself, for the mid-session layout flip: a
+     desktop session that entered edit mode and then shrank into the touch
+     layout would otherwise keep dashed outlines and touch-action: none on
+     every frame with no visible editor to leave the mode by (the toggle
+     refuses to ENTER on touch; this covers arriving with it already on). */
+  body.mobile-touch .tf-unlocked,
+  body.mobile-touch.interface-unlocked #chatlog-wrap {
+    outline: none;
+    touch-action: auto;
+    cursor: auto;
   }
 }

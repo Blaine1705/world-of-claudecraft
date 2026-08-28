@@ -7,6 +7,7 @@ import {
   MIN_FRAME_BOX,
   snapFrameCoord,
   snapFrameSize,
+  stepCoordToGridLine,
 } from '../../target_frame_pos';
 import {
   anchorAdjustedChatBox,
@@ -78,8 +79,11 @@ export class ChatGeometryController {
     startY: number;
     startBottom: number;
   } | null = null;
-  /** Elides the inline border-hover cursor write (a CSS keyword, never text). */
+  /** Elides the inline border-hover cursor write (a CSS value, never text). */
   private hoverCursor = '';
+  /** The edge that cursor was set FOR: opposite edges share a cursor, so the
+   *  hover elision compares both. */
+  private hoverEdge: FrameEdge | null = null;
   /** Coalesces the trailing post-resize re-derive (CHAT_RESIZE_SETTLE_MS). */
   private resizeSettleTimer: ReturnType<typeof setTimeout> | undefined;
   /** The wrap's box for the arrange-mode border hit test, derived from the
@@ -175,8 +179,12 @@ export class ChatGeometryController {
       if (event.target === grip) return;
       const edge = this.edgeAt(event, wrap, tabs);
       const cursor = edge ? cursorForFrameEdge(edge) : '';
-      if (cursor !== this.hoverCursor) {
+      // Elided on BOTH halves: opposite edges share a cursor, so a
+      // cursor-only guard kept the old side's highlight painted after a
+      // jump across the box (review round three).
+      if (cursor !== this.hoverCursor || edge !== this.hoverEdge) {
         this.hoverCursor = cursor;
+        this.hoverEdge = edge;
         wrap.style.cursor = cursor;
         // The same per-side highlight every MovableFrame border wears
         // (data-resize-edge, painted by the stylesheet): a cursor change
@@ -471,11 +479,20 @@ export class ChatGeometryController {
     event.stopPropagation();
     this.ensureGeometry(wrap, tabs);
     if (!this.chatBox) return;
+    // With Snap to Grid on the coarse step walks grid LINES (mirroring
+    // MovableFrame's keyboard); Shift stays the 1px fine step.
+    const snap = !event.shiftKey && (this.deps.snapToGrid?.() ?? false);
     const step = event.shiftKey ? CHAT_KEY_STEP_FINE : CHAT_KEY_STEP;
     this.chatBox = {
       ...this.chatBox,
-      left: this.chatBox.left + direction.left * step,
-      top: this.chatBox.top + direction.top * step,
+      left:
+        snap && direction.left !== 0
+          ? stepCoordToGridLine(this.chatBox.left, direction.left as 1 | -1)
+          : this.chatBox.left + direction.left * step,
+      top:
+        snap && direction.top !== 0
+          ? stepCoordToGridLine(this.chatBox.top, direction.top as 1 | -1)
+          : this.chatBox.top + direction.top * step,
     };
     this.apply();
     this.persist();
@@ -499,10 +516,14 @@ export class ChatGeometryController {
     event.stopPropagation();
     this.ensureGeometry(wrap, tabs);
     if (!this.chatBox) return;
+    const snap = !event.shiftKey && (this.deps.snapToGrid?.() ?? false);
     const size = event.shiftKey ? CHAT_KEY_STEP_FINE : CHAT_KEY_STEP;
+    const next = snap
+      ? stepCoordToGridLine(this.chatBox[step.axis], step.dir)
+      : this.chatBox[step.axis] + step.dir * size;
     this.chatBox = {
       ...this.chatBox,
-      [step.axis]: Math.max(MIN_FRAME_BOX, this.chatBox[step.axis] + step.dir * size),
+      [step.axis]: Math.max(MIN_FRAME_BOX, next),
     };
     this.apply();
     this.persist();
@@ -595,15 +616,19 @@ export class ChatGeometryController {
       this.deps.hasStorePromoCard() ? (width) => storePromoReservedHeight(width, scale) : 0,
     );
     this.chatBox = { ...placement.geo, vw: viewport.w, vh: viewport.h };
-    const { css } = placement;
+    const { css, geo } = placement;
     // The applied placement IS the wrap's box (left/top on the wrap, the tab
     // chrome above the frame), so the border hit-test cache derives from it
-    // with no layout read.
+    // with no layout read. It caches the VISUAL half (placement.geo, the
+    // space pointer clientX/Y and getBoundingClientRect report), never the
+    // author-space css the #ui zoom re-multiplies: at any UI Scale other
+    // than 1 those spaces diverge and the edge bands would land wrong
+    // (review round three, blocker 1).
     this.wrapRect = {
-      left: css.left,
-      top: css.top,
-      width: css.width,
-      height: css.height + chromeHeight,
+      left: geo.left,
+      top: geo.top,
+      width: geo.width,
+      height: geo.height + chromeHeight,
     };
     wrap.style.left = `${css.left}px`;
     wrap.style.top = `${css.top}px`;

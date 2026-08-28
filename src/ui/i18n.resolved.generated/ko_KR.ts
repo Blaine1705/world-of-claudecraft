@@ -2765,6 +2765,7 @@ export const ko_KR: EnTranslations = {
       "actionBar3Vertical": "액션 바 3 세로 배치",
       "menuRailHorizontal": "메뉴 가로 배치",
       "snapToGrid": "Snap to Grid",
+      "previewMemberName": "{className} {number}",
       "resetFrameSize": "크기 초기화",
       "resetFrameSizeFor": "{name} 크기 초기화",
       "previewSpell": "예시 주문"

@@ -10,10 +10,14 @@
 // stylesheet regardless of the toggle, so its sample mirrors THAT.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { stripComments } from './helpers/strip_comments';
 
-const hudCss = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8').replace(
-  /\r\n/g,
-  '\n',
+// Stripped so a pin can never match commented-out CSS. The shared helper fits
+// this sheet: block comments (the only CSS comment form) are blanked in place,
+// and its TS line-comment arm is inert here because the sheet's only '//' runs
+// sit inside ':'-guarded data-URI protocol text.
+const hudCss = stripComments(
+  readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8').replace(/\r\n/g, '\n'),
 );
 
 function block(selector: string): string {

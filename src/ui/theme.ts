@@ -113,14 +113,18 @@ export const THEME_PRESETS: Record<PresetId, ThemeKnobs> = {
     rage: '#ff3030',
     energy: '#ffe000',
   },
-  // "Fancy Gold": the hand-gilded look. Selecting it does two things: these
-  // knobs retune the whole UI's palette, and applyTheme (main.ts) stamps the
-  // .fancy-gold-ui root class that turns on the gilded filigree window frame
-  // (perf_ornament_svg.ts + components.css); every other preset keeps the
-  // classic flat panels. Accent/border are drawn from the same
-  // --color-gold-* ramp the filigree paints with (accent = gold-400's warm
-  // gilt, border = gold-700's deep leaf), over a warm near-black panel, so
-  // the general chrome reads as one hand-gilded set with the ornament.
+  // "Fancy Gold": the hand-gilded look. WORK IN PROGRESS (owner decision):
+  // the preset is selectable and labelled "(WIP)" in the options menu while
+  // the gilded treatment is still being iterated on; expect its palette and
+  // ornament coverage to change, and do not pin new work to its current
+  // values. Selecting it does two things: these knobs retune the whole UI's
+  // palette, and applyTheme (main.ts) stamps the .fancy-gold-ui root class
+  // that turns on the gilded filigree window frame (perf_ornament_svg.ts +
+  // components.css); every other preset keeps the classic flat panels.
+  // Accent/border are drawn from the same --color-gold-* ramp the filigree
+  // paints with (accent = gold-400's warm gilt, border = gold-700's deep
+  // leaf), over a warm near-black panel, so the general chrome reads as one
+  // hand-gilded set with the ornament.
   fancyGold: {
     accent: '#f0c86d',
     border: '#926321',

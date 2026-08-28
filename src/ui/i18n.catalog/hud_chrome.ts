@@ -520,7 +520,7 @@ export const hudChromeStrings = {
     reset: 'Reset',
     presets: {
       classic: 'Classic Gold',
-      fancyGold: 'Fancy Gold',
+      fancyGold: 'Fancy Gold (WIP)',
       midnight: 'Midnight',
       parchment: 'Parchment',
       highContrast: 'High Contrast',
@@ -3616,6 +3616,7 @@ export const hudChromeStrings = {
     actionBar3Vertical: 'Vertical Action Bar 3',
     menuRailHorizontal: 'Horizontal Menu',
     snapToGrid: 'Snap to Grid',
+    previewMemberName: '{className} {number}',
     resetFrameSize: 'Reset size',
     // The per-frame accessible name for that button ({name} is the frame name).
     resetFrameSizeFor: 'Reset size for {name}',

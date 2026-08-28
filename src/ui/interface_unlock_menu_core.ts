@@ -176,7 +176,12 @@ export function buildPartySampleMembers(
     members.push({
       // Negative pids so a sample row key can never collide with a real member.
       pid: -(i + 1),
-      name: `${t(`classes.${cls}` as TranslationKey)} ${formatNumber(i + 1)}`,
+      // One interpolated key, not concatenation: a locale can reorder the
+      // class name and the ordinal.
+      name: t('hudChrome.interfaceUnlock.previewMemberName', {
+        className: t(`classes.${cls}` as TranslationKey),
+        number: formatNumber(i + 1),
+      }),
       cls,
       level: 20,
       hp: 100,

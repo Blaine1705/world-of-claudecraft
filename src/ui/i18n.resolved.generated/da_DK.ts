@@ -845,7 +845,7 @@ export const da_DK: EnTranslations = {
       "reset": "Nulstil",
       "presets": {
         "classic": "Klassisk guld",
-        "fancyGold": "Fancy Gold",
+        "fancyGold": "Fancy Gold (WIP)",
         "midnight": "Midnat",
         "parchment": "Pergament",
         "highContrast": "Høj kontrast"
@@ -2765,6 +2765,7 @@ export const da_DK: EnTranslations = {
       "actionBar3Vertical": "Vertical Action Bar 3",
       "menuRailHorizontal": "Horizontal Menu",
       "snapToGrid": "Snap to Grid",
+      "previewMemberName": "{className} {number}",
       "resetFrameSize": "Reset size",
       "resetFrameSizeFor": "Reset size for {name}",
       "previewSpell": "Example Spell"

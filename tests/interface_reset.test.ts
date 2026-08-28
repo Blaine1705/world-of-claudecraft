@@ -10,14 +10,14 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { readMethodCallSites } from './helpers/method_call_sites';
+import { stripComments } from './helpers/strip_comments';
 
 const HUD_PATH = fileURLToPath(new URL('../src/ui/hud.ts', import.meta.url));
-const scan = readMethodCallSites(
-  HUD_PATH,
-  readFileSync(HUD_PATH, 'utf8'),
-  'Hud',
-  'resetUnitFrames',
-);
+const hudSource = readFileSync(HUD_PATH, 'utf8');
+// The AST walk ignores comments by construction; the raw-text pins below read
+// the stripped copy so commented-out code can never satisfy one.
+const hudCode = stripComments(hudSource);
+const scan = readMethodCallSites(HUD_PATH, hudSource, 'Hud', 'resetUnitFrames');
 const callees = scan.sites.map((s) => s.call);
 
 describe('Hud.resetUnitFrames restores the stock interface layout', () => {
@@ -41,6 +41,10 @@ describe('Hud.resetUnitFrames restores the stock interface layout', () => {
     const site = scan.sites.find((s) => s.call === 'this.optionsHooks.onSettingChange');
     expect(site, 'reset no longer splits combined action bars').toBeTruthy();
     expect(site?.conditions.join(' && ')).toContain('this.combineActionBars');
+    // The call walk records the callee and its guard but not the ARGUMENTS, so
+    // pin them too: reset flipping a different setting, or flipping this one
+    // ON, would otherwise keep the suite green.
+    expect(hudCode).toContain("this.optionsHooks?.onSettingChange('combineActionBars', false)");
   });
 });
 
@@ -55,11 +59,16 @@ describe('the Interface panel Reset to Defaults restores the layout too', () => 
     // stock layout, or "Reset to Defaults" there goes back to resetting only
     // setting values while the frames stay strewn about.
     const OPTIONS_PATH = fileURLToPath(new URL('../src/ui/options_window.ts', import.meta.url));
-    const source = readFileSync(OPTIONS_PATH, 'utf8');
+    const source = stripComments(readFileSync(OPTIONS_PATH, 'utf8'));
     const start = source.indexOf('private renderInterface(');
     expect(start, 'renderInterface() was renamed or moved; re-point this pin').toBeGreaterThan(-1);
     const end = source.indexOf('private chatTimestampRows(', start);
-    const body = source.slice(start, end > start ? end : undefined);
+    // Without this guard a moved end anchor silently widens the slice to the
+    // rest of the file, and the containment pins below lose their scoping.
+    expect(end, 'chatTimestampRows() was renamed or moved; re-point this pin').toBeGreaterThan(
+      start,
+    );
+    const body = source.slice(start, end);
     expect(body).toContain('this.settingsViewFooter(interfaceControlsForTab(controls, tab)');
     expect(body).toContain(`if (tab === 'frames') this.deps.resetUnitFrames()`);
   });

@@ -9078,6 +9078,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.interfaceUnlock.lockFrame'
   | 'hudChrome.interfaceUnlock.lockPlayerFrameToBar'
   | 'hudChrome.interfaceUnlock.menuRailHorizontal'
+  | 'hudChrome.interfaceUnlock.previewMemberName'
   | 'hudChrome.interfaceUnlock.previewSpell'
   | 'hudChrome.interfaceUnlock.resetFrameSize'
   | 'hudChrome.interfaceUnlock.resetFrameSizeFor'

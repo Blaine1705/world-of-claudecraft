@@ -611,7 +611,7 @@ import { MobileMoreDialogController } from './mobile_more_dialog';
 import { MOUNT_DESC_KEYS, mountSpecLines } from './mount_labels';
 import { MountRaceControls } from './mount_race_controls';
 import { MountRaceStrip } from './mount_race_strip';
-import { type FrameDimension, MovableFrame, setFrameSnapToGridProvider } from './movable_frame';
+import { type FrameDimension, MovableFrame } from './movable_frame';
 import { NoticeboardPopup } from './noticeboard_popup';
 import { NPC_WINDOW_CLOSE_RANGE } from './npc_service_range';
 import { OptionsWindow } from './options_window';
@@ -2035,7 +2035,7 @@ export class Hud {
     // ran mover.resetSize(); frames whose sizes live in real SETTINGS (the
     // dimension drags, the scale factors) reset those here through the same
     // persist-and-apply pair the sliders use.
-    snapGridActive: () => !!this.optionsHooks?.settings.get('frameSnapToGrid'),
+    snapGridActive: () => this.frameSnapToGridActive(),
     resetSizeLabel: () => t('hudChrome.interfaceUnlock.resetFrameSize'),
     resetSizeLabelFor: (name) => t('hudChrome.interfaceUnlock.resetFrameSizeFor', { name }),
     onSizeReset: (id) => {
@@ -2047,6 +2047,12 @@ export class Hud {
       for (const key of keys) hooks.onSettingChange(key, hooks.settings.get(key));
     },
   });
+  /** The arrange-mode Snap to Grid read every mover (and the chat
+   *  controller, the doom meter, the grid overlay) shares: one bound
+   *  function so the seventeen configs carry a reference, not a closure
+   *  each. Live per gesture event. */
+  private readonly frameSnapToGridActive = (): boolean =>
+    !!this.optionsHooks?.settings.get('frameSnapToGrid');
   // The "Combine Action Bars" option: while on, the three rows move as the one
   // #actionbar-group frame instead of three independent ones.
   private combineActionBars = false;
@@ -2133,9 +2139,6 @@ export class Hud {
     private readonly features: HudFeatures = { dailyRewardsEnabled: true },
   ) {
     hydrateCrestImageFallbacks(document);
-    // Arrange-mode Snap to Grid: one provider for every MovableFrame (and
-    // the chat controller's matching dep), read live per drag event.
-    setFrameSnapToGridProvider(() => !!this.optionsHooks?.settings.get('frameSnapToGrid'));
     this.mapMarkerTooltipContent = new MapMarkerTooltipContent(this.sim);
     this.mapMarkerInteraction = new MapMarkerInteractionController({
       names: {
@@ -2442,7 +2445,7 @@ export class Hud {
       hasStorePromoCard: () => this.storePromoCard !== null,
       uiScale: getUiScale,
       isInterfaceUnlocked: () => this.interfaceUnlock.isUnlocked,
-      snapToGrid: () => !!this.optionsHooks?.settings.get('frameSnapToGrid'),
+      snapToGrid: this.frameSnapToGridActive,
     });
     this.chatWindow = new ChatWindowController({
       document,
@@ -3749,6 +3752,7 @@ export class Hud {
       this.targetFrameMover = new MovableFrame({
         frame: this.targetFrameEl,
         storageKey: TARGET_FRAME_POS_KEY,
+        snapToGrid: this.frameSnapToGridActive,
         unlockLabelKey: 'hudChrome.targetFrame.unlock',
         lockLabelKey: 'hudChrome.targetFrame.lock',
         resizeLabelKey: 'hudChrome.interfaceUnlock.resizeFrame',
@@ -3782,6 +3786,7 @@ export class Hud {
       this.playerFrameMover = new MovableFrame({
         frame: this.playerFrameEl,
         storageKey: PLAYER_FRAME_POS_KEY,
+        snapToGrid: this.frameSnapToGridActive,
         unlockLabelKey: 'hudChrome.playerFrame.unlock',
         lockLabelKey: 'hudChrome.playerFrame.lock',
         resizeLabelKey: 'hudChrome.interfaceUnlock.resizeFrame',
@@ -3824,6 +3829,7 @@ export class Hud {
     this.partyFrameMover = new MovableFrame({
       frame: this.partyFramesEl,
       storageKey: PARTY_FRAME_POS_KEY,
+      snapToGrid: this.frameSnapToGridActive,
       unlockLabelKey: 'hudChrome.partyFrames.unlock',
       lockLabelKey: 'hudChrome.partyFrames.lock',
       resizeLabelKey: 'hudChrome.interfaceUnlock.resizeFrame',
@@ -3912,6 +3918,7 @@ export class Hud {
       const mover = new MovableFrame({
         frame,
         storageKey: spec.storageKey,
+        snapToGrid: this.frameSnapToGridActive,
         unlockLabelKey: 'hudChrome.interfaceUnlock.unlockFrame',
         lockLabelKey: 'hudChrome.interfaceUnlock.lockFrame',
         resizeLabelKey: 'hudChrome.interfaceUnlock.resizeFrame',
@@ -4526,6 +4533,7 @@ export class Hud {
     {
       detachedParent: $('#ui'),
       isMobileLayout: () => this.isMobileLayout(),
+      snapToGrid: () => this.frameSnapToGridActive(),
     },
   );
   // One decoded/prescaled marker-art cache is shared by every cartography

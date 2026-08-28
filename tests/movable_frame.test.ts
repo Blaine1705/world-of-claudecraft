@@ -190,8 +190,8 @@ let uiScaleStub = 1;
 
 // biome-ignore lint/suspicious/noExplicitAny: module handle loaded after the globals exist
 let MovableFrame: any;
-let setFrameSnapToGridProvider: (provider: () => boolean) => void;
-// Flipped by the snap test; beforeEach resets it so other drags stay exact.
+// Flipped by the snap tests and read through each config's snapToGrid dep;
+// beforeEach resets it so other drags stay exact.
 let snapOn = false;
 
 beforeAll(async () => {
@@ -201,8 +201,7 @@ beforeAll(async () => {
   (globalThis as Record<string, unknown>).getComputedStyle = () => ({
     getPropertyValue: (p: string) => (p === '--ui-scale' ? String(uiScaleStub) : ''),
   });
-  ({ MovableFrame, setFrameSnapToGridProvider } = await import('../src/ui/movable_frame'));
-  setFrameSnapToGridProvider(() => snapOn);
+  ({ MovableFrame } = await import('../src/ui/movable_frame'));
 }, 30_000);
 
 beforeEach(() => {
@@ -230,6 +229,7 @@ function makeFrame(opts: { mobile?: boolean; positioned?: Array<boolean> } = {})
     draggingBodyClass: 'player-frame-dragging',
     fallbackSize: { w: 260, h: 84 },
     isMobileLayout: () => opts.mobile ?? false,
+    snapToGrid: () => snapOn,
     onPositioned: (active: boolean) => positioned.push(active),
   });
   const btn = frame.children[0];
@@ -249,6 +249,7 @@ function makeScalableFrame(opts: { mobile?: boolean } = {}) {
     draggingBodyClass: 'hud-frame-dragging',
     fallbackSize: { w: 260, h: 84 },
     isMobileLayout: () => opts.mobile ?? false,
+    snapToGrid: () => snapOn,
     scalable: true,
     buttonOnlyWhenUnlocked: true,
   });
@@ -634,6 +635,42 @@ describe('MovableFrame edge resize', () => {
     expect(frame.style.cursor).toBe('');
   });
 
+  it('a hover jump between opposite borders repaints the highlight (shared cursor)', () => {
+    const { frame, btn } = makeScalableFrame();
+    btn.dispatch('click', pointer()); // unlock
+    // North band then south band: both are ns-resize, so a cursor-keyed
+    // elision kept the north highlight painted while the pointer sat south.
+    frame.dispatch('pointermove', pointer({ clientX: 300, clientY: 502 }));
+    expect(frame.getAttribute('data-resize-edge')).toBe('n');
+    frame.dispatch('pointermove', pointer({ clientX: 300, clientY: 582 }));
+    expect(frame.getAttribute('data-resize-edge')).toBe('s');
+  });
+
+  it('with Snap to Grid on the move arrows walk grid lines (Shift stays 1px)', () => {
+    snapOn = true;
+    store.set(KEY, JSON.stringify({ left: 105, top: 210, vw: 1600, vh: 900 }));
+    const { frame, btn } = makeFrame();
+    btn.dispatch('click', pointer()); // unlock
+    btn.dispatch('keydown', key('ArrowRight'));
+    expect(frame.style.left).toBe('112px');
+    btn.dispatch('keydown', key('ArrowDown'));
+    expect(frame.style.top).toBe('224px');
+    btn.dispatch('keydown', key('ArrowRight', { shiftKey: true }));
+    expect(frame.style.left).toBe('113px');
+  });
+
+  it('with Snap to Grid on the grip arrows land the visual size on grid lines', () => {
+    snapOn = true;
+    const { frame, btn, grip } = makeSavedScalableFrame();
+    btn.dispatch('click', pointer()); // unlock
+    // rect width 612 at scale 1: the next grid line up is 624.
+    grip.dispatch('keydown', key('ArrowRight'));
+    const m = /scale\(([-\d.]+)/.exec(frame.style.transform);
+    expect(m).toBeTruthy();
+    if (!m) return;
+    expect(Number(m[1]) * 612).toBeCloseTo(624, 6);
+  });
+
   it('stamps the hovered edge on the frame and mints the overlay highlight child', () => {
     const { frame, btn } = makeScalableFrame();
     // A scalable frame carries the .tf-edge-glow overlay the stylesheet
@@ -744,6 +781,7 @@ describe('MovableFrame edge resize', () => {
       draggingBodyClass: 'hud-frame-dragging',
       fallbackSize: { w: 260, h: 84 },
       isMobileLayout: () => false,
+      snapToGrid: () => snapOn,
       scalable: true,
       resizeMode: 'box',
       buttonOnlyWhenUnlocked: true,
@@ -794,6 +832,7 @@ describe('MovableFrame edge resize', () => {
       draggingBodyClass: 'hud-frame-dragging',
       fallbackSize: { w: 260, h: 84 },
       isMobileLayout: () => false,
+      snapToGrid: () => snapOn,
       scalable: true,
       resizeMode: 'box',
       buttonOnlyWhenUnlocked: true,
@@ -917,6 +956,7 @@ describe('MovableFrame name chip', () => {
       draggingBodyClass: 'hud-frame-dragging',
       fallbackSize: { w: 260, h: 84 },
       isMobileLayout: () => false,
+      snapToGrid: () => snapOn,
       scalable: true,
       buttonOnlyWhenUnlocked: true,
     });
@@ -1071,6 +1111,7 @@ describe('MovableFrame dimensions resize', () => {
       draggingBodyClass: 'party-frame-dragging',
       fallbackSize: { w: 360, h: 240 },
       isMobileLayout: () => false,
+      snapToGrid: () => snapOn,
       scalable: true,
       resizeMode: 'dimensions',
       dimensions: {
@@ -1106,6 +1147,31 @@ describe('MovableFrame dimensions resize', () => {
     store.set(KEY, JSON.stringify({ left: 400, top: 300, vw: 1600, vh: 900 }));
     return makeDimensionsFrame(factors);
   }
+
+  it('with Snap to Grid on the dimension arrows walk the visual extent to grid lines', () => {
+    snapOn = true;
+    const { value, btn, grip } = makeSavedDimensionsFrame();
+    btn.dispatch('click', pointer()); // unlock
+    // width 170 at factor 1: the next grid line up is 176, then 192.
+    grip.dispatch('keydown', key('ArrowRight'));
+    expect(value.width).toBe(176);
+    grip.dispatch('keydown', key('ArrowRight'));
+    expect(value.width).toBe(192);
+    // Shift stays the 1px fine setting step, off-grid on purpose.
+    grip.dispatch('keydown', key('ArrowRight', { shiftKey: true }));
+    expect(value.width).toBe(193);
+  });
+
+  it('dispose() leaves the shared dispatcher: a live drag goes dead', () => {
+    const { value, frame, btn, mover } = makeSavedDimensionsFrame();
+    btn.dispatch('click', pointer()); // unlock
+    frame.dispatch('pointerdown', pointer({ clientX: 650, clientY: 542 }));
+    mover.dispose();
+    fakeDocument.body.dispatch('pointermove', pointer({ clientX: 690, clientY: 542 }));
+    // The fanned-out move never reaches the disposed frame: the width
+    // setting the drag would have written stays at its start value.
+    expect(value.width).toBe(170);
+  });
 
   it('Snap to Grid quantizes a dimension drag by its VISUAL extent', () => {
     snapOn = true;

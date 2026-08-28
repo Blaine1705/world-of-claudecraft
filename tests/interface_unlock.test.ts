@@ -222,6 +222,10 @@ describe('InterfaceUnlock', () => {
   });
 
   it('drives the body class the stylesheet gates the unlocked chrome on', () => {
+    // The literal is load-bearing: about thirty hud.css rules gate on
+    // body.interface-unlocked, so a TS-side rename would unstyle the whole
+    // edit mode while every constant-based assertion stayed green.
+    expect(INTERFACE_UNLOCKED_BODY_CLASS).toBe('interface-unlocked');
     const { unlock, classes } = harness({ actionBar1: true });
     expect(classes.has(INTERFACE_UNLOCKED_BODY_CLASS)).toBe(false);
     unlock.setUnlocked(true);

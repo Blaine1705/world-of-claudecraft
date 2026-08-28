@@ -24,7 +24,7 @@ class MemoryStorage {
 
 function makeHarness(
   initialStorage: Record<string, string> = {},
-  options: { mobile?: boolean; unlocked?: boolean; snap?: boolean } = {},
+  options: { mobile?: boolean; unlocked?: boolean; snap?: boolean; uiScale?: number } = {},
 ) {
   const document = new FakeDocument();
   const window = new FakeWindow(1280, 720);
@@ -42,7 +42,7 @@ function makeHarness(
     storage,
     isMobileLayout: () => options.mobile ?? false,
     hasStorePromoCard: () => false,
-    uiScale: () => 1,
+    uiScale: () => options.uiScale ?? 1,
     isInterfaceUnlocked: () => options.unlocked ?? false,
     snapToGrid: () => options.snap ?? false,
   });
@@ -285,6 +285,67 @@ describe('ChatGeometryController interface unlock', () => {
     harness.controller.init();
     harness.frame.querySelector('.chat-resize-grip')?.dispatchEvent(new Event('pointerenter'));
     expect(harness.wrap.getAttribute('data-resize-edge')).toBeNull();
+  });
+
+  it('the hit-test cache stays in VISUAL space at UI Scale 1.25 (review blocker)', () => {
+    // apply() once cached the author-space css box (visual divided by the
+    // #ui zoom) while edgeAt compares against visual clientX/Y, so at any
+    // scale other than 1 the edge bands landed wrong. The cache must hold
+    // placement.geo: the west band of the VISUAL box (left 100) answers,
+    // and the author-space box's edges (left 80) do not.
+    const harness = makeHarness(
+      { woc_chat_geometry: '{"left":100,"top":80,"width":370,"height":184}' },
+      { unlocked: true, uiScale: 1.25 },
+    );
+    harness.controller.init();
+    harness.wrap.dispatchEvent(
+      pointerEvent('pointermove', { pointerId: 4, clientX: 101, clientY: 170 }),
+    );
+    expect(harness.wrap.getAttribute('data-resize-edge')).toBe('w');
+    expect(harness.wrap.style.cursor).toBe('var(--cursor-resize-ew, ew-resize)');
+    // The author-space west band (around x=80) is NOT an edge of the box the
+    // player sees; the visual body there reports no edge.
+    harness.wrap.dispatchEvent(
+      pointerEvent('pointermove', { pointerId: 4, clientX: 81, clientY: 170 }),
+    );
+    expect(harness.wrap.getAttribute('data-resize-edge')).toBeNull();
+  });
+
+  it('a hover jump between opposite borders repaints the highlight (shared cursor)', () => {
+    const harness = makeHarness(
+      { woc_chat_geometry: '{"left":100,"top":80,"width":370,"height":184}' },
+      { unlocked: true },
+    );
+    harness.controller.init();
+    // North band then south band: both are ns-resize, so a cursor-keyed
+    // elision kept the north highlight painted on the south edge.
+    harness.wrap.dispatchEvent(
+      pointerEvent('pointermove', { pointerId: 4, clientX: 285, clientY: 82 }),
+    );
+    expect(harness.wrap.getAttribute('data-resize-edge')).toBe('n');
+    harness.wrap.dispatchEvent(
+      pointerEvent('pointermove', { pointerId: 4, clientX: 285, clientY: 284 }),
+    );
+    expect(harness.wrap.getAttribute('data-resize-edge')).toBe('s');
+  });
+
+  it('with Snap to Grid on the arrows walk grid lines (Shift stays the fine step)', () => {
+    const harness = makeHarness(
+      { woc_chat_geometry: '{"left":100,"top":80,"width":370,"height":184}' },
+      { snap: true },
+    );
+    harness.controller.init();
+    const moveBtn = harness.wrap.querySelector<HTMLElement>('.chat-move-btn');
+    moveBtn?.dispatchEvent(keyEvent('ArrowRight'));
+    expect(harness.wrap.style.left).toBe('112px');
+    moveBtn?.dispatchEvent(keyEvent('ArrowRight', true));
+    expect(harness.wrap.style.left).toBe('113px');
+
+    const grip = harness.frame.querySelector<HTMLElement>('.chat-resize-grip');
+    grip?.dispatchEvent(keyEvent('ArrowRight'));
+    expect(harness.wrap.style.width).toBe('384px');
+    grip?.dispatchEvent(keyEvent('ArrowUp'));
+    expect(harness.frame.style.height).toBe('176px');
   });
 
   it('hovering the unlocked wrap hit-tests a cached box, not a rect read per move', () => {

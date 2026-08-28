@@ -845,7 +845,7 @@ export const tr_TR: EnTranslations = {
       "reset": "Sıfırla",
       "presets": {
         "classic": "Klasik Altın",
-        "fancyGold": "Fancy Gold",
+        "fancyGold": "Fancy Gold (WIP)",
         "midnight": "Gece Yarısı",
         "parchment": "Parşömen",
         "highContrast": "Yüksek Kontrast"
@@ -2765,6 +2765,7 @@ export const tr_TR: EnTranslations = {
       "actionBar3Vertical": "Vertical Action Bar 3",
       "menuRailHorizontal": "Horizontal Menu",
       "snapToGrid": "Snap to Grid",
+      "previewMemberName": "{className} {number}",
       "resetFrameSize": "Reset size",
       "resetFrameSizeFor": "Reset size for {name}",
       "previewSpell": "Example Spell"
