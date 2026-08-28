@@ -202,7 +202,11 @@ const MONOLITHS: MonolithRow[] = [
     // rework); exact merged count.
     // +1 for the entry horizon's scenery cull far at the live frame (one local
     // the four reveal-gated painters share); the prewarm frame inlines it.
-    ceiling: 13330,
+    // Re-pinned at the v0.41.0 sync merge: the release arm's battleground
+    // compile-gate wiring (net +1 after its comment rewording) lands beside
+    // the branch's +1 above, so the merged file is 13331. Exact merged count,
+    // zero headroom.
+    ceiling: 13331,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
