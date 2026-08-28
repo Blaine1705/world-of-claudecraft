@@ -3219,7 +3219,12 @@ export const IGNIVAR_WEAPON_ITEMS: Record<string, ItemDef> = {
     hasteRating: 30,
     sellValue: 14000,
     soulbound: true,
-    requiredClass: ['rogue', 'hunter'],
+    // Hunter-only, unlike the shared rogue/hunter archetype lock on the Kris:
+    // this game has no ranged weapon slot, so a non-hunter could only wield
+    // the bow as a MELEE mainhand stat stick, which is nonsense. Only the
+    // hunter's class Auto Shot actually fires with it (the shot profile reads
+    // the equipped weapon's damage and speed).
+    requiredClass: ['hunter'],
   },
   staff_of_the_last_spring: {
     id: 'staff_of_the_last_spring',
