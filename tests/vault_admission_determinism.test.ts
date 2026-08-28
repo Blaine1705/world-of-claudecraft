@@ -14,7 +14,8 @@
 // (professions/enchanting.ts: the worn apply, the bagged replace, the plain
 // bagged apply) sit on zero-draw paths, so a refusal there never shifts the
 // stream but still forks persisted character state against the inert
-// replay. Both shapes are pinned below.
+// replay. All four sites are pinned below, each driven at its own resolver
+// path (a draw grows onto ONE arm, so no arm may stand in for another).
 //
 // The pins are direction-sensitive on purpose:
 // - Divergence NARROWS (the refusal moves after the draws, the fix the doc
@@ -31,7 +32,7 @@ import { resolveCraftForRecipe } from '../src/sim/professions/crafting';
 import { resolveApplyEnchant } from '../src/sim/professions/enchanting';
 import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
-import type { VaultConsumptionAdmission, VaultConsumptionTake } from '../src/sim/types';
+import type { EquipSlot, VaultConsumptionAdmission, VaultConsumptionTake } from '../src/sim/types';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // Same scenario shape as tests/vault_consumption_admission.test.ts: the plan
@@ -243,15 +244,33 @@ describe('vault admission determinism carve-out (same-seed twin run)', () => {
 describe('enchant-apply admission (the zero-draw arms, same-seed twin run)', () => {
   const SWORD = 'eastbrook_arming_sword';
   const MIGHT = 'enchant_weapon_might';
+  const PRIOR = 'enchant_weapon_intellect';
 
-  it('a refusing enchant admission skips zero draws and forks persisted state only', () => {
-    // The other three admission sites (professions/enchanting.ts: the worn
-    // apply, the bagged replace, the plain bagged apply) sit on paths with
-    // no post-admission rng draws at all (enchanting's only draws are on
-    // the disenchant path), so a refusal there never shifts the stream; the
-    // carve-out it still opens is the persisted-state fork this twin pins.
-    // One resolver stands in for all three arms: they share
-    // reservePlannedVaultConsumption and the same null-refusal 'busy' shape.
+  // The three enchant-apply admission sites (professions/enchanting.ts: the
+  // plain bagged apply, the worn apply, the bagged replace) sit on paths with
+  // no post-admission rng draws at all (enchanting's only draws are on the
+  // disenchant path), so a refusal there never shifts the stream; the
+  // carve-out each still opens is the persisted-state fork these twins pin.
+  // Each arm is driven at ITS OWN resolver path, not one standing in for the
+  // others: they share reservePlannedVaultConsumption and the 'busy' refusal
+  // shape, but a draw grows onto ONE arm's success path, so only a per-arm
+  // twin reds when it does. pinFixture is the routing precondition (a
+  // mis-seeded target would silently fall through to a DIFFERENT arm and
+  // leave this one's claim untested); assertApplied proves the intended
+  // arm's own mint, not just "some apply succeeded".
+  interface EnchantApplyArm {
+    /** Seed the target copy this arm consumes (reagents are shared). */
+    seedTarget(sim: Sim): void;
+    /** The pre-attempt routing precondition, pinned on the inert twin (the
+     *  byte-identical positive control extends it to the refusing twin). */
+    pinFixture(sim: Sim): void;
+    /** The arm-specific success proof on the inert twin. */
+    assertApplied(sim: Sim): void;
+    slot?: EquipSlot;
+    confirmReplace?: boolean;
+  }
+
+  function runEnchantArmTwins(arm: EnchantApplyArm): void {
     const admissionTakes: (readonly VaultConsumptionTake[])[] = [];
     const inert = makeSim(undefined);
     const refusing = makeSim((_pid, takes) => {
@@ -261,12 +280,13 @@ describe('enchant-apply admission (the zero-draw arms, same-seed twin run)', () 
     for (const sim of [inert, refusing]) {
       // The plan must span BOTH pools (2 carried dust, 3 from the vault of
       // the 5 the enchant needs) so the host admission is really consulted.
-      sim.addItem(SWORD, 1, sim.playerId);
       sim.addItem('arcane_dust', 2, sim.playerId);
       const meta = metaOf(sim);
       meta.vault.stock = { arcane_dust: 3 };
       meta.vault.upgrades = 4;
+      arm.seedTarget(sim);
     }
+    arm.pinFixture(inert);
     // Twin positive control: byte-identical before the attempt.
     const pre = fingerprint(inert);
     expect(fingerprint(refusing)).toBe(pre);
@@ -274,15 +294,31 @@ describe('enchant-apply admission (the zero-draw arms, same-seed twin run)', () 
     const inertDraws: number[] = [];
     const refusingDraws: number[] = [];
     inert.ctx.rng.setObserver((value) => inertDraws.push(value));
-    const inertResult = resolveApplyEnchant(inert.ctx, inert.playerId, SWORD, MIGHT);
+    const inertResult = resolveApplyEnchant(
+      inert.ctx,
+      inert.playerId,
+      SWORD,
+      MIGHT,
+      arm.slot,
+      arm.confirmReplace,
+    );
     inert.ctx.rng.setObserver(null);
     refusing.ctx.rng.setObserver((value) => refusingDraws.push(value));
-    const refusingResult = resolveApplyEnchant(refusing.ctx, refusing.playerId, SWORD, MIGHT);
+    const refusingResult = resolveApplyEnchant(
+      refusing.ctx,
+      refusing.playerId,
+      SWORD,
+      MIGHT,
+      arm.slot,
+      arm.confirmReplace,
+    );
     refusing.ctx.rng.setObserver(null);
 
-    // The inert arm really enchanted and really forked persisted state, so
-    // the fingerprint instrument is demonstrably sensitive to an apply.
+    // The inert twin really applied THROUGH THIS ARM and really forked
+    // persisted state, so the fingerprint instrument is demonstrably
+    // sensitive to this arm's apply.
     expect(inertResult.ok).toBe(true);
+    arm.assertApplied(inert);
     expect(fingerprint(inert)).not.toBe(pre);
     // The refusing host was really consulted, with a non-empty vault plan.
     expect(refusingResult).toEqual({
@@ -294,13 +330,78 @@ describe('enchant-apply admission (the zero-draw arms, same-seed twin run)', () 
     expect(admissionTakes).toHaveLength(1);
     expect(admissionTakes[0].length).toBeGreaterThan(0);
     // ZERO draws on BOTH arms: the streams never diverge (a draw growing
-    // onto the apply path lands here first, and moves this arm into the
-    // crafting-style skipped-draw accounting)...
+    // onto this arm's apply path lands here first, and moves the arm into
+    // the crafting-style skipped-draw accounting)...
     expect(inertDraws).toEqual([]);
     expect(refusingDraws).toEqual([]);
     expect(refusing.ctx.rng.next()).toBe(inert.ctx.rng.next());
     // ...so the whole divergence is the persisted-state fork above, and the
     // refused character stays byte-identical to its pre-enchant self.
     expect(fingerprint(refusing)).toBe(pre);
+  }
+
+  it('the plain bagged apply: a refusal skips zero draws and forks persisted state only', () => {
+    runEnchantArmTwins({
+      seedTarget(sim) {
+        sim.addItem(SWORD, 1, sim.playerId);
+      },
+      pinFixture(sim) {
+        const slot = metaOf(sim).inventory.find((s) => s.itemId === SWORD);
+        expect(slot).toBeDefined();
+        expect(slot?.instance).toBeUndefined();
+      },
+      assertApplied(sim) {
+        const slot = metaOf(sim).inventory.find((s) => s.itemId === SWORD);
+        expect(slot?.instance?.enchant).toBe(MIGHT);
+      },
+    });
+  });
+
+  it('the WORN apply: a refusal skips zero draws and forks persisted state only', () => {
+    runEnchantArmTwins({
+      seedTarget(sim) {
+        sim.addItem(SWORD, 1, sim.playerId);
+        sim.equipItem(SWORD, sim.playerId);
+      },
+      // The routing precondition: the named slot is really wearing the sword
+      // (an empty slot would deny not_held and never reach the reservation).
+      pinFixture(sim) {
+        expect(metaOf(sim).equipment.mainhand).toBe(SWORD);
+        expect(metaOf(sim).equipmentInstance?.mainhand).toBeUndefined();
+      },
+      // The worn arm's own mint: the enchant landed on the WORN copy in
+      // place, never on a bagged one.
+      assertApplied(sim) {
+        expect(metaOf(sim).equipmentInstance?.mainhand?.enchant).toBe(MIGHT);
+        expect(metaOf(sim).inventory.some((s) => s.itemId === SWORD)).toBe(false);
+      },
+      slot: 'mainhand',
+    });
+  });
+
+  it('the bagged REPLACE: a confirmed refusal skips zero draws and forks persisted state only', () => {
+    runEnchantArmTwins({
+      seedTarget(sim) {
+        sim.addItem(SWORD, 1, sim.playerId);
+        const slot = metaOf(sim).inventory.find((s) => s.itemId === SWORD);
+        if (!slot) throw new Error('missing seeded sword');
+        slot.instance = { enchant: PRIOR, rolled: { stats: { int: 2 } } };
+      },
+      // The routing precondition: the held copy is ALREADY enchanted, so the
+      // confirmed command reaches resolveReplaceEnchantBagged (an unenchanted
+      // copy would make the inert confirmReplace flag route to the plain arm
+      // and quietly leave the replace arm's claim untested).
+      pinFixture(sim) {
+        const slot = metaOf(sim).inventory.find((s) => s.itemId === SWORD);
+        expect(slot?.instance?.enchant).toBe(PRIOR);
+      },
+      // The replace arm's own mint: the old enchant peeled off exactly (the
+      // int bonus pruned), the new one applied on the same copy.
+      assertApplied(sim) {
+        const slot = metaOf(sim).inventory.find((s) => s.itemId === SWORD);
+        expect(slot?.instance).toEqual({ enchant: MIGHT, rolled: { stats: { str: 2 } } });
+      },
+      confirmReplace: true,
+    });
   });
 });
