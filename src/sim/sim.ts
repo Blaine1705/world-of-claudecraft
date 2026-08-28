@@ -1450,11 +1450,6 @@ export interface PlayerMeta {
   // Runtime-only local recovery attempt. The owning system lives in unstuck.ts;
   // only its anti-relog cooldown is persisted through Entity.cooldowns.
   pendingUnstuck: unstuckMod.PendingUnstuck | null;
-  // Runtime-only grace for the Escape-menu Unstuck path in Thornhollow Fields:
-  // the menu can suppress the movement key before the command reaches the
-  // server, so unstuck.ts remembers that the server recently observed this
-  // fighter pressing into blocking battleground geometry.
-  battlegroundWallPressUntil: number;
   // Ashen Coliseum standings. Legacy arenaRating/Wins/Losses are the 1v1
   // bracket; 2v2 is fully independent and persisted alongside them.
   arenaRating: number;
@@ -3027,7 +3022,6 @@ export class Sim {
         : 0,
       lastActiveTick: this.tickCount,
       pendingUnstuck: null,
-      battlegroundWallPressUntil: 0,
       arenaRating: savedArena1v1.rating,
       arenaWins: savedArena1v1.wins,
       arenaLosses: savedArena1v1.losses,
@@ -6877,9 +6871,8 @@ export class Sim {
     // The rest of the step (turn integration, wish vector, slope gates, swept
     // static collision, the vertical pass with fall damage) moved VERBATIM to
     // player_motion.ts (MV1), which also eases the body off terrain walls at the
-    // end (the standoff); playerMotionDeps binds the live Sim callbacks (fiesta-
-    // aware moveSpeedMult, delve-aware resolveMove, cancelCast/standUp/dealDamage)
-    // so behavior and the rng draw order are unchanged.
+    // end (the standoff); playerMotionDeps binds the live Sim callbacks
+    // (moveSpeedMult, resolveMove, cancelCast/standUp/dealDamage), preserving rng order.
     stepPlayerMotion(this.playerMotionDeps, p, meta.moveInput);
     unstuckMod.noteBattlegroundWallPressure(this.ctx, meta, p);
   }

@@ -62,6 +62,7 @@ const CANCEL_VERTICAL_DISTANCE = 0.25;
 const BG_WALL_PRESS_PROBE_DISTANCE = 0.35;
 const BG_WALL_PRESS_MIN_PROGRESS = 0.05;
 const BG_WALL_PRESS_ESC_GRACE_SECONDS = 3;
+const battlegroundWallPressGrace = new WeakMap<SimContext, Map<number, number>>();
 
 export interface PendingUnstuck {
   startedAt: number;
@@ -260,15 +261,18 @@ function battlegroundBlockedWallPress(ctx: SimContext, meta: PlayerMeta, p: Enti
 }
 
 export function noteBattlegroundWallPressure(ctx: SimContext, meta: PlayerMeta, p: Entity): void {
+  const grace = battlegroundWallPressGrace.get(ctx);
   if (!activeBattlegroundAt(ctx, p)) {
-    meta.battlegroundWallPressUntil = 0;
+    grace?.delete(p.id);
     return;
   }
   if (battlegroundBlockedWallPress(ctx, meta, p)) {
-    meta.battlegroundWallPressUntil = ctx.time + BG_WALL_PRESS_ESC_GRACE_SECONDS;
+    const activeGrace = grace ?? new Map<number, number>();
+    if (!grace) battlegroundWallPressGrace.set(ctx, activeGrace);
+    activeGrace.set(p.id, ctx.time + BG_WALL_PRESS_ESC_GRACE_SECONDS);
     return;
   }
-  if (hasAnyMovementInput(meta)) meta.battlegroundWallPressUntil = 0;
+  if (hasAnyMovementInput(meta)) grace?.delete(p.id);
 }
 
 function battlegroundBlockedProbe(
@@ -297,12 +301,11 @@ function battlegroundBlockedProbe(
 }
 
 function battlegroundGeometryTrap(ctx: SimContext, meta: PlayerMeta, p: Entity): boolean {
+  const wallPressUntil = battlegroundWallPressGrace.get(ctx)?.get(p.id) ?? 0;
   return (
     battlegroundWallTrap(ctx, p) ||
     battlegroundBlockedWallPress(ctx, meta, p) ||
-    (!hasAnyMovementInput(meta) &&
-      activeBattlegroundAt(ctx, p) &&
-      meta.battlegroundWallPressUntil >= ctx.time)
+    (!hasAnyMovementInput(meta) && activeBattlegroundAt(ctx, p) && wallPressUntil >= ctx.time)
   );
 }
 

@@ -960,7 +960,6 @@ describe('unstuck area identity', () => {
     player.facing += Math.PI / 2;
     player.prevFacing = player.facing;
     sim.tick();
-    expect(meta.battlegroundWallPressUntil).toBe(0);
     meta.moveInput.forward = false;
     sim.drainEvents();
 
