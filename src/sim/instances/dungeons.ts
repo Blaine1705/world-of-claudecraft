@@ -347,13 +347,14 @@ export function enterDungeon(
     }
   }
   const key = instanceKeyFor(ctx, r.meta.entityId);
-  // The Ignivar door rules (the Rift door rules applied to the raid family):
-  // an entrant from OUTSIDE the raid may not zone in while any of the group's
-  // rooms still has a living mob engaged (the anti-zerg lockout, ghosts
-  // included), and an allowed outside entrant through the overworld approach
-  // door lands in the deepest room the group already claims, not back at the
-  // approach. A member standing inside one of the group's rooms is moving
-  // BETWEEN rooms and skips both rules.
+  // The Ignivar door rules (modeled on the Rift door, deliberately broader:
+  // the rift bars only dead entrants): NO entrant from OUTSIDE the raid,
+  // living or ghost, may zone in while any of the group's rooms still has a
+  // living mob engaged (the anti-zerg lockout), and an allowed outside
+  // entrant through the overworld approach door lands in the deepest room
+  // the group already claims, not back at the approach. A member standing
+  // inside one of the group's rooms is moving BETWEEN rooms and skips both
+  // rules.
   if (isIgnivarRaidRoom(dungeonId) && !bypass) {
     const raidClaims = ignivarRaidClaimsForKey(ctx, key);
     const insideOwnRaid = raidClaims.some((claim) => instanceClaimContains(claim, r.e.pos));

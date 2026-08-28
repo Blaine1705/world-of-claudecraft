@@ -1,11 +1,14 @@
 // Ignivar raid entry rules: the cleared-room checkpoint redirect and the
 // combat entry lockout the door path applies to entrants from OUTSIDE the
-// raid. Mirrors the Rift door rules (rift/runs.ts): group progress lives in
-// which rooms the group's partyKey already claims, and "in combat" means any
-// living mob of any of the group's rooms is engaged (riftInstanceInCombat's
-// rule, applied to the whole four-room family). Pure helpers over live
-// SimContext views; instances/dungeons.ts owns the mutations and emits the
-// player-facing denial.
+// raid. Modeled on the Rift door rules (rift/runs.ts): group progress lives
+// in which rooms the group's partyKey already claims, and "in combat" means
+// any living mob of any of the group's rooms is engaged (the
+// riftInstanceInCombat rule, applied to the whole four-room family). One
+// DELIBERATE divergence: the rift bars only dead entrants (its anti-zerg
+// corpse rule); this lockout bars EVERY outside entrant, living included,
+// by maintainer decision. Pure helpers over live SimContext views;
+// instances/dungeons.ts owns the mutations and emits the player-facing
+// denial.
 
 import {
   IGNIVAR_FORGE_APPROACH_ID,
@@ -58,8 +61,10 @@ export function resolveIgnivarEntryRoom(
 
 /**
  * True while any living mob of any of the group's raid rooms is engaged: the
- * window in which nobody outside may zone in, living or ghost (the rift
- * anti-zerg rule extended to every outside entrant).
+ * window in which nobody outside may zone in, living or ghost (deliberately
+ * broader than the rift's dead-only anti-zerg arm). Dead mobs are skipped:
+ * a fresh corpse can still carry inCombat, and a kill must never seal the
+ * door behind it.
  */
 export function ignivarRaidInCombat(ctx: SimContext, claims: readonly InstanceSlot[]): boolean {
   for (const claim of claims) {

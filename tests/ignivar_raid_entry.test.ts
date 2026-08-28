@@ -10,15 +10,18 @@ import {
   IGNIVAR_FORGE_APPROACH_ID,
   IGNIVAR_MOLTEN_ASSEMBLY_ID,
   IGNIVAR_RAID_ARENA_ID,
+  IGNIVAR_SECOND_WING_ID,
   IGNIVAR_TRASH_AUTOMATON_IDS,
 } from '../src/sim/ignivar_raid_ids';
 import { enterDungeon, instanceOriginOf, leaveDungeon } from '../src/sim/instances/dungeons';
 import {
   furthestIgnivarRaidRoom,
+  ignivarRaidInCombat,
   resolveIgnivarEntryRoom,
 } from '../src/sim/instances/ignivar_entry';
 import type { InstanceSlot } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
+import type { SimContext } from '../src/sim/sim_context';
 import type { Entity } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 import { localizeSimText } from '../src/ui/sim_i18n';
@@ -95,6 +98,21 @@ describe('ignivar raid entry: pure helpers', () => {
     expect(resolveIgnivarEntryRoom(IGNIVAR_RAID_ARENA_ID, claims)).toBe(IGNIVAR_RAID_ARENA_ID);
     expect(resolveIgnivarEntryRoom(IGNIVAR_FORGE_APPROACH_ID, [])).toBe(IGNIVAR_FORGE_APPROACH_ID);
   });
+
+  it('counts only living engaged mobs toward the lockout', () => {
+    const mobs = new Map<number, Entity>([
+      [1, { dead: false, inCombat: false } as Entity],
+      [2, { dead: true, inCombat: true } as Entity],
+    ]);
+    const ctx = { entities: mobs } as unknown as SimContext;
+    const claim = { mobIds: [1, 2, 3] } as InstanceSlot;
+    // A dead mob still flagged inCombat (a fresh corpse) and a missing entity
+    // id never seal the door; a calm living mob does not either.
+    expect(ignivarRaidInCombat(ctx, [claim])).toBe(false);
+    mobs.set(1, { dead: false, inCombat: true } as Entity);
+    expect(ignivarRaidInCombat(ctx, [claim])).toBe(true);
+    expect(ignivarRaidInCombat(ctx, [])).toBe(false);
+  });
 });
 
 describe('ignivar raid entry: checkpoint redirect', () => {
@@ -118,6 +136,45 @@ describe('ignivar raid entry: checkpoint redirect', () => {
       sim.instances.filter((inst) => inst.partyKey !== null).length,
       'rejoined the live claim, no fresh claim minted',
     ).toBe(claimsBefore);
+  });
+
+  it('redirects all the way to the deepest room of the chain', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', devCommands: true });
+    const ally = sim.addPlayer('paladin', 'Crucible Ally');
+    formTestRaid(sim, [sim.player.id, ally]);
+    expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, sim.player.id)).toBe(true);
+    for (const roomId of [
+      IGNIVAR_RAID_ARENA_ID,
+      IGNIVAR_MOLTEN_ASSEMBLY_ID,
+      IGNIVAR_SECOND_WING_ID,
+    ]) {
+      expect(enterDungeon(sim.ctx, roomId, sim.player.id, true), roomId).toBe(true);
+    }
+    expect(leaveDungeon(sim.ctx, sim.player.id)).toBe(true);
+    placeAt(sim, sim.player.id, DOOR_POS.x, DOOR_POS.z - 1);
+    sim.tick();
+    const crucibleEntry = entryPosOf(sim, IGNIVAR_SECOND_WING_ID);
+    expect(sim.player.pos.x).toBeCloseTo(crucibleEntry.x, 0);
+    expect(sim.player.pos.z).toBeCloseTo(crucibleEntry.z, 0);
+  });
+
+  it('keeps unclaimed deeper rooms sealed: the own-claim exemption never invents entry', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior' });
+    const ally = sim.addPlayer('paladin', 'Sealed Ally');
+    formTestRaid(sim, [sim.player.id, ally]);
+    expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, sim.player.id)).toBe(true);
+    // A member inside the approach with the herald gate still closed: sealed.
+    sim.drainEvents();
+    expect(enterDungeon(sim.ctx, IGNIVAR_RAID_ARENA_ID, sim.player.id)).toBe(false);
+    expect(JSON.stringify(sim.drainEvents())).toContain('The forge gate is sealed to you.');
+    // A member standing outside requesting an unclaimed deeper room: sealed.
+    expect(enterDungeon(sim.ctx, IGNIVAR_RAID_ARENA_ID, ally)).toBe(false);
+    expect(JSON.stringify(sim.drainEvents())).toContain('The forge gate is sealed to you.');
+    expect(
+      sim.instances.find(
+        (inst) => inst.dungeonId === IGNIVAR_RAID_ARENA_ID && inst.partyKey !== null,
+      ),
+    ).toBeUndefined();
   });
 
   it('a group with no deeper claim still enters at the approach', () => {
@@ -154,6 +211,22 @@ describe('ignivar raid entry: combat lockout', () => {
     expect(allyEntity && allyEntity.pos.x < DUNGEON_X_THRESHOLD, 'ally stays outside').toBe(true);
     mob.inCombat = false;
     expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, ally)).toBe(true);
+  });
+
+  it("ignores another raid's fights: the lockout is scoped to your own group", () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior' });
+    const allyA = sim.addPlayer('paladin', 'Raid A Member');
+    formTestRaid(sim, [sim.player.id, allyA]);
+    expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, sim.player.id)).toBe(true);
+    const mobA = livingMobIn(sim, claimOf(sim, IGNIVAR_FORGE_APPROACH_ID));
+    mobA.inCombat = true;
+    const b1 = sim.addPlayer('mage', 'Raid B One');
+    const b2 = sim.addPlayer('priest', 'Raid B Two');
+    formTestRaid(sim, [b1, b2]);
+    expect(
+      enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, b1),
+      "raid A's combat never bars raid B",
+    ).toBe(true);
   });
 
   it('bars a ghost during combat and corpse-runs them back in once it settles', () => {
