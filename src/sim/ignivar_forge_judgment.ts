@@ -3,6 +3,8 @@
 // and renderer share every point and radius so the unique safe refuge cannot
 // drift across hosts, reconnects, or graphics tiers.
 
+import type { DungeonDifficulty } from './types';
+
 export interface IgnivarJudgmentPoint {
   x: number;
   z: number;
@@ -20,7 +22,14 @@ export const IGNIVAR_JUDGMENT_LAYOUT_SLOTS = 24;
 export const IGNIVAR_JUDGMENT_SHELTER_RADIUS = 5.5;
 export const IGNIVAR_JUDGMENT_ARENA_RADIUS = 34;
 export const IGNIVAR_JUDGMENT_PULSE_SECONDS = 0.5;
-export const IGNIVAR_JUDGMENT_BURN_DAMAGE_MAX_HP = 0.12;
+export const IGNIVAR_JUDGMENT_BURN_DAMAGE_MAX_HP = 0.2;
+export const IGNIVAR_JUDGMENT_BURN_DAMAGE_MAX_HP_HEROIC = 0.35;
+
+export function ignivarJudgmentBurnDamageMaxHp(difficulty: DungeonDifficulty): number {
+  return difficulty === 'heroic'
+    ? IGNIVAR_JUDGMENT_BURN_DAMAGE_MAX_HP_HEROIC
+    : IGNIVAR_JUDGMENT_BURN_DAMAGE_MAX_HP;
+}
 
 const SHELTER_RING_RADIUS = 16;
 const SHELTER_RADIUS_JITTER = 2.25;

@@ -16,7 +16,7 @@ import { IGNIVAR_WATER_CONDUIT_TEMPLATES } from '../src/sim/ignivar_arena';
 import { IGNIVAR_JUDGMENT_ACTIVE_SECONDS } from '../src/sim/ignivar_forge_judgment';
 import { enterDungeon } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
-import { DT, type Entity, IGNIVAR_BOSS_ID, type PlayerClass } from '../src/sim/types';
+import { DT, dist2d, type Entity, IGNIVAR_BOSS_ID, type PlayerClass } from '../src/sim/types';
 
 type RaidRole = 'tank' | 'healer' | 'dps';
 
@@ -171,8 +171,17 @@ describe('Ignivar ten-player Normal mechanics smoke', () => {
     expect(boss.ignivar.apocalypseResolved).toBe(true);
 
     boss.hp = Math.floor(boss.maxHp * IGNIVAR_LAST_INFERNO_HP_THRESHOLD);
+    // The boss spawns on the central dais (IGNIVAR_BOSS_SPAWN_Z), so Judgment
+    // first walks it to the arena origin before the warning cast begins. The
+    // 4 yd walk needs about a dozen updates; 40 bounds it without slack for a
+    // stalled walk.
     updateIgnivarEncounter(sim.ctx, boss);
+    expect(boss.ignivar.forgeJudgmentPhase).toBe('moving');
+    for (let step = 0; step < 40 && boss.ignivar.forgeJudgmentPhase === 'moving'; step++) {
+      updateIgnivarEncounter(sim.ctx, boss);
+    }
     expect(boss.ignivar.forgeJudgmentPhase).toBe('warning');
+    expect(dist2d(boss.pos, { x: origin.x, y: 0, z: origin.z })).toBeLessThanOrEqual(0.5);
     expect(boss.castingAbility).toBe(IGNIVAR_JUDGMENT_CAST_ID);
     boss.ignivar.forgeJudgmentRemaining = IGNIVAR_JUDGMENT_ACTIVE_SECONDS + DT;
     updateIgnivarEncounter(sim.ctx, boss);

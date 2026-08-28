@@ -1,3 +1,4 @@
+import { IGNIVAR_FORGE_APPROACH_ID, IGNIVAR_MOLTEN_ASSEMBLY_ID } from '../ignivar_raid_ids';
 import type { DungeonDifficulty } from '../types';
 
 // The participation token awarded directly to every eligible player when a
@@ -53,6 +54,8 @@ export interface HeroicDungeonTuning {
   // Marks awarded directly to each eligible participant at kill time.
   marksPerParticipant: number;
 }
+
+export type HeroicMobTuning = Omit<HeroicDungeonTuning, 'finalBossId' | 'marksPerParticipant'>;
 
 // Tuning model (economy retune, 2026-07): every heroic mob is pinned to LEVEL
 // 22 (two above the level-20 player cap). The calibration target is a FLOOR,
@@ -144,6 +147,36 @@ export interface NormalDungeonTuning {
 // both of which pass this seam. Pinned by
 // tests/heroic_difficulty_floors.test.ts.
 export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
+  [IGNIVAR_FORGE_APPROACH_ID]: {
+    id: IGNIVAR_FORGE_APPROACH_ID,
+    difficulty: 'normal',
+    healthMultiplier: 1,
+    damageMultiplierByMob: {
+      derelict_mech: 1.5,
+      ignivar_ember_sentinel: 1.5,
+      ignivar_crucible_warden: 1.5,
+    },
+    mechanicDamageMultiplierByMob: {
+      derelict_mech: 1.25,
+      ignivar_ember_sentinel: 1.5,
+      ignivar_crucible_warden: 2,
+    },
+  },
+  [IGNIVAR_MOLTEN_ASSEMBLY_ID]: {
+    id: IGNIVAR_MOLTEN_ASSEMBLY_ID,
+    difficulty: 'normal',
+    healthMultiplier: 1,
+    damageMultiplierByMob: {
+      derelict_mech: 1.5,
+      ignivar_ember_sentinel: 1.5,
+      ignivar_crucible_warden: 1.5,
+    },
+    mechanicDamageMultiplierByMob: {
+      derelict_mech: 1.25,
+      ignivar_ember_sentinel: 1.5,
+      ignivar_crucible_warden: 2,
+    },
+  },
   gravewyrm_sanctum: {
     id: 'gravewyrm_sanctum',
     difficulty: 'normal',
@@ -216,6 +249,65 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
       wildheart_stalker: 2.7,
       wildheart_hexcaller: 2.5,
     },
+  },
+};
+
+// These rooms support Heroic mob transforms but are not finale instances:
+// they must not carry final-boss rewards or lockouts. Keeping them outside
+// HEROIC_DUNGEON_TUNING scopes the pressure pass to the two preboss spawn
+// lists and prevents Varkhul's encounter summons from inheriting it.
+export const HEROIC_MOB_TUNING: Record<string, HeroicMobTuning> = {
+  [IGNIVAR_FORGE_APPROACH_ID]: {
+    id: IGNIVAR_FORGE_APPROACH_ID,
+    difficulty: 'heroic',
+    level: 22,
+    healthMultiplier: 5 / 3,
+    healthMultiplierByMob: {
+      ignivar_ember_sentinel: 2,
+      ignivar_crucible_warden: 2,
+    },
+    damageMultiplier: 1,
+    addDamageMultiplier: 1,
+    damageMultiplierByMob: {
+      derelict_mech: 2,
+      ignivar_ember_sentinel: 2,
+      ignivar_crucible_warden: 2,
+    },
+    mechanicDamageMultiplierByMob: {
+      derelict_mech: 1.75,
+      ignivar_ember_sentinel: 2,
+      ignivar_crucible_warden: 4,
+    },
+    burnDamageMultiplierByMob: {
+      ignivar_ember_sentinel: 2,
+    },
+    armorMultiplier: 1.2,
+  },
+  [IGNIVAR_MOLTEN_ASSEMBLY_ID]: {
+    id: IGNIVAR_MOLTEN_ASSEMBLY_ID,
+    difficulty: 'heroic',
+    level: 22,
+    healthMultiplier: 5 / 3,
+    healthMultiplierByMob: {
+      ignivar_ember_sentinel: 2,
+      ignivar_crucible_warden: 2,
+    },
+    damageMultiplier: 1,
+    addDamageMultiplier: 1,
+    damageMultiplierByMob: {
+      derelict_mech: 2,
+      ignivar_ember_sentinel: 2,
+      ignivar_crucible_warden: 2,
+    },
+    mechanicDamageMultiplierByMob: {
+      derelict_mech: 1.75,
+      ignivar_ember_sentinel: 2,
+      ignivar_crucible_warden: 4,
+    },
+    burnDamageMultiplierByMob: {
+      ignivar_ember_sentinel: 2,
+    },
+    armorMultiplier: 1.2,
   },
 };
 

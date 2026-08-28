@@ -243,12 +243,12 @@ describe('Varkhul encounter behavior', () => {
     expect(VARKHUL_RED_HOT_METAL_HEAL_ABSORB_MAX_HP).toBe(0.3);
     expect(VARKHUL_CINDER_FIRE_RADIUS).toBe(3.5);
     expect(VARKHUL_CINDER_FIRE_TICK_SECONDS).toBe(1);
-    expect(VARKHUL_CINDER_FIRE_DAMAGE_MAX_HP).toBe(0.04);
+    expect(VARKHUL_CINDER_FIRE_DAMAGE_MAX_HP).toBe(0.12);
     expect(VARKHUL_CINDER_ORB_PROJECTILES_PER_TARGET).toBe(6);
     expect(VARKHUL_CINDER_ORB_SPEED).toBe(9);
     expect(VARKHUL_CINDER_ORB_DURATION).toBe(5.5);
     expect(VARKHUL_CINDER_ORB_HIT_RADIUS).toBe(1.1);
-    expect(VARKHUL_CINDER_ORB_DAMAGE_MAX_HP).toBe(0.2);
+    expect(VARKHUL_CINDER_ORB_DAMAGE_MAX_HP).toBe(0.35);
     expect(VARKHUL_FORGESTORM_WAVES).toBe(3);
     expect(VARKHUL_ANVILS_DECREE_STRIKES).toBe(3);
     expect(VARKHUL_MASTERS_ASSEMBLY_SECONDS).toBe(45);
@@ -460,8 +460,7 @@ describe('Varkhul encounter behavior', () => {
 
   it('keeps the ground fire permanently and continues ticking after twelve seconds', () => {
     const { sim, boss } = claimedEncounter(431);
-    sim.player.maxHp = 100_000;
-    sim.player.hp = 100_000;
+    sim.player.devGod = true;
     updateVarkhulEncounter(sim.ctx, boss);
     const state = isolateMechanics(boss);
     state.cinderFires.push({
@@ -474,8 +473,15 @@ describe('Varkhul encounter behavior', () => {
       updateVarkhulEncounter(sim.ctx, boss);
     }
 
-    expect(sim.player.hp).toBe(52_000);
     expect(state.cinderFires).toHaveLength(1);
+    sim.player.devGod = false;
+    sim.player.maxHp = 1_000;
+    sim.player.hp = 1_000;
+    state.cinderFires[0].tickTimer = DT;
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(sim.player.hp).toBe(
+      1_000 - Math.ceil(sim.player.maxHp * VARKHUL_CINDER_FIRE_DAMAGE_MAX_HP),
+    );
   });
 
   it('damages the exact cinder fire edge but spares dead and outside players', () => {
@@ -502,7 +508,7 @@ describe('Varkhul encounter behavior', () => {
 
     updateVarkhulEncounter(sim.ctx, boss);
 
-    expect(onEdge.hp).toBe(960);
+    expect(onEdge.hp).toBe(1_000 - Math.ceil(1_000 * VARKHUL_CINDER_FIRE_DAMAGE_MAX_HP));
     expect(outside.hp).toBe(1_000);
     expect(deadInside.hp).toBe(1_000);
   });
@@ -526,11 +532,46 @@ describe('Varkhul encounter behavior', () => {
 
     updateVarkhulEncounter(sim.ctx, boss);
     expect(state.cinderOrbProjectiles[0]?.pos.x).toBeCloseTo(target.pos.x, 6);
-    expect(target.hp).toBe(800);
+    const hpAfterHit = 1_000 - Math.ceil(1_000 * VARKHUL_CINDER_ORB_DAMAGE_MAX_HP);
+    expect(target.hp).toBe(hpAfterHit);
     expect(state.cinderOrbProjectiles[0]?.hitPlayerIds).toContain(target.id);
 
     updateVarkhulEncounter(sim.ctx, boss);
-    expect(target.hp).toBe(800);
+    expect(target.hp).toBe(hpAfterHit);
+  });
+
+  it('routes Heroic cinder fire and orb damage through the live encounter path', () => {
+    const { sim, boss } = claimedEncounter(437);
+    const instance = sim.instances.find((entry) => entry.dungeonId === IGNIVAR_SECOND_WING_ID);
+    if (!instance) throw new Error('Inner Crucible instance disappeared');
+    instance.difficulty = 'heroic';
+    sim.player.maxHp = 1_000;
+    sim.player.hp = 1_000;
+    updateVarkhulEncounter(sim.ctx, boss);
+    const state = isolateMechanics(boss);
+    state.cinderFires.push({
+      id: `${boss.id}:cinder-fire:heroic`,
+      pos: { ...sim.player.pos },
+      tickTimer: DT,
+    });
+
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    expect(sim.player.hp).toBe(750);
+    state.cinderFires.length = 0;
+    sim.player.hp = 1_000;
+    state.cinderOrbProjectiles.push({
+      id: `${boss.id}:cinder-orbs:heroic`,
+      ownerId: boss.id,
+      pos: { ...sim.player.pos, x: sim.player.pos.x - VARKHUL_CINDER_ORB_SPEED * DT },
+      dir: { x: 1, z: 0 },
+      remaining: VARKHUL_CINDER_ORB_DURATION,
+      hitPlayerIds: [],
+    });
+
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    expect(sim.player.hp).toBe(450);
   });
 
   it('waits instead of channeling Cinder Orbs when the tank is alone', () => {
@@ -681,6 +722,25 @@ describe('Varkhul encounter behavior', () => {
         (effect) => effect.sourceId === boss.id && effect.abilityId === VARKHUL_FORGESTORM_CAST_ID,
       ),
     ).toHaveLength(0);
+  });
+
+  it('applies the Heroic Forgestorm damage through the live encounter path', () => {
+    const { sim, boss } = claimedEncounter(4401);
+    const instance = sim.instances.find((entry) => entry.dungeonId === IGNIVAR_SECOND_WING_ID);
+    if (!instance) throw new Error('Inner Crucible instance disappeared');
+    instance.difficulty = 'heroic';
+    sim.player.maxHp = 1_000;
+    sim.player.hp = 1_000;
+    updateVarkhulEncounter(sim.ctx, boss);
+    const state = isolateMechanics(boss);
+    state.forgestormTimer = DT;
+    updateVarkhulEncounter(sim.ctx, boss);
+    sim.player.pos = { ...state.forgestormPoints[0] };
+    state.forgestormWarningRemaining = DT;
+
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    expect(sim.player.hp).toBe(200);
   });
 
   it('cues the PowerUp windup one-shot at the start of every Forgestorm wave', () => {
@@ -1333,6 +1393,70 @@ describe('Varkhul encounter behavior', () => {
     expect(boss.enraged).toBe(false);
     expect(sim.player.auras.some((aura) => aura.sourceId === boss.id)).toBe(false);
     expect(sim.ctx.groundAoEs.some((effect) => effect.sourceId === boss.id)).toBe(false);
+  });
+
+  it('recovers participating players long cooldowns when the pull wipes', () => {
+    const { sim, boss } = claimedEncounter(481);
+    sim.setPlayerLevel(20);
+    const meta = sim.meta(sim.player.id);
+    const longAbility = meta?.known.find((ability) => ability.cooldown >= 120);
+    if (!longAbility) throw new Error('Expected a long Warrior cooldown');
+    sim.player.cooldowns.set(longAbility.def.id, longAbility.cooldown);
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(boss.varkhul?.attemptParticipantIds).toContain(sim.player.id);
+
+    sim.player.dead = true;
+    sim.player.hp = 0;
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    expect(boss.varkhul).toBeUndefined();
+    expect(sim.player.cooldowns.has(longAbility.def.id)).toBe(false);
+  });
+
+  it('does not reset a pre-pull visitor cooldown when another player later wipes', () => {
+    const { sim, boss } = claimedEncounter(482);
+    sim.setPlayerLevel(20);
+    const visitorMeta = sim.meta(sim.player.id);
+    const longAbility = visitorMeta?.known.find((ability) => ability.cooldown >= 120);
+    if (!longAbility) throw new Error('Expected a long Warrior cooldown');
+    sim.player.cooldowns.set(longAbility.def.id, longAbility.cooldown);
+    boss.inCombat = false;
+    boss.aiState = 'idle';
+    boss.aggroTargetId = null;
+    sim.player.pos = sim.ctx.groundPos(boss.pos.x, boss.pos.z - 31);
+    sim.player.prevPos = { ...sim.player.pos };
+
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    expect(boss.inCombat).toBe(false);
+    expect(boss.varkhul?.attemptParticipantIds).toEqual([]);
+
+    const raider = addEncounterPlayer(sim, boss, 'Actual Pull Raider');
+    sim.player.pos = sim.ctx.groundPos(0, 0);
+    sim.player.prevPos = { ...sim.player.pos };
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(boss.varkhul?.attemptParticipantIds).toEqual([raider.id]);
+
+    raider.dead = true;
+    raider.hp = 0;
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    expect(boss.varkhul).toBeUndefined();
+    expect(sim.player.cooldowns.get(longAbility.def.id)).toBe(longAbility.cooldown);
+  });
+
+  it('keeps long cooldowns when the encounter is reset without a wipe', () => {
+    const { sim, boss } = claimedEncounter(483);
+    sim.setPlayerLevel(20);
+    const meta = sim.meta(sim.player.id);
+    const longAbility = meta?.known.find((ability) => ability.cooldown >= 120);
+    if (!longAbility) throw new Error('Expected a long Warrior cooldown');
+    sim.player.cooldowns.set(longAbility.def.id, longAbility.cooldown);
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    resetVarkhulEncounter(sim.ctx, boss);
+
+    expect(sim.player.cooldowns.get(longAbility.def.id)).toBe(longAbility.cooldown);
   });
 
   it('despawns portal-wave adds and clears boss-sourced auras from displaced players on reset', () => {

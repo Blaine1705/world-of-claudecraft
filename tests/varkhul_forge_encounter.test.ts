@@ -373,7 +373,9 @@ describe('Varkhul forge pillars and add intermission', () => {
       .map((id) => sim.entities.get(id))
       .find((add) => add?.templateId === VARKHUL_CINDER_ARTIFICER_ID);
     if (!artificer) throw new Error('Cinder Artificer did not emerge');
-    expect(artificer.maxHp).toBeGreaterThan(2_000);
+    expect(artificer.maxHp).toBe(6_488);
+    expect(artificer.mechanicDamageMult).toBe(1);
+    expect(artificer.rangedDamageMult).toBeUndefined();
     expect(artificer.ccImmune).not.toBe(true);
     expect(artificer.slowImmune).not.toBe(true);
     expect(artificer.ignoreHardLeash).toBe(true);
@@ -2651,6 +2653,7 @@ describe('Varkhul forge pillars and add intermission', () => {
         Math.hypot(first.pos.x - sim.player.pos.x, first.pos.z - sim.player.pos.z),
     )[0];
     if (!sentinel) throw new Error('Ember Sentinel did not emerge');
+    expect(sentinel.mechanicDamageMult).toBeUndefined();
     for (const addId of state.assemblyAddIds) {
       const add = sim.entities.get(addId);
       if (add && add.id !== sentinel.id) add.dead = true;
@@ -2704,6 +2707,8 @@ describe('Varkhul forge pillars and add intermission', () => {
       .map((id) => sim.entities.get(id))
       .find((add) => add?.templateId === VARKHUL_CRUCIBLE_WARDEN_ID);
     if (!warden) throw new Error('Crucible Warden did not emerge');
+    expect(warden.maxHp).toBe(4_011);
+    expect(warden.mechanicDamageMult).toBeCloseTo((92.2 * 1.25) / 99.8, 12);
     state.assemblyForgeBeamWarmupRemaining = 999;
 
     const challenger = addTank(sim, boss, 'WardenChallenger');

@@ -97,11 +97,11 @@ describe('Ignivar and Varkhul raid health bands', () => {
     });
     const minibosses = mobs.filter((mob) => mob.dungeonSpawnMiniboss);
     expect(minibosses).toHaveLength(2);
-    expect(minibosses.every((mob) => mob.level === 22 && mob.maxHp === 9_426)).toBe(true);
+    expect(minibosses.every((mob) => mob.level === 22 && mob.maxHp === 16_269)).toBe(true);
     expect(
       mobs
         .filter((mob) => mob.templateId === IGNIVAR_EMBER_SENTINEL_ID)
-        .every((mob) => mob.level === 22 && mob.maxHp === 3_312),
+        .every((mob) => mob.level === 22 && mob.maxHp === 5_980),
     ).toBe(true);
   });
 });

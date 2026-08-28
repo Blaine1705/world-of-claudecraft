@@ -3,6 +3,7 @@
 // warning event. Keeping the footprint here prevents warning and impact drift.
 
 import { hash2 } from './rng';
+import type { DungeonDifficulty } from './types';
 
 export interface IgnivarMeteorPoint {
   x: number;
@@ -44,7 +45,14 @@ export const IGNIVAR_FIRST_METEOR_SECONDS = 13;
 export const IGNIVAR_METEOR_EVERY = 17;
 export const IGNIVAR_METEOR_TELEGRAPH_SECONDS = 2.5;
 export const IGNIVAR_METEOR_REVEAL_DELAY_SECONDS = 0.75;
-export const IGNIVAR_METEOR_DAMAGE_MAX_HP = 0.35;
+export const IGNIVAR_METEOR_DAMAGE_MAX_HP = 0.5;
+export const IGNIVAR_METEOR_DAMAGE_MAX_HP_HEROIC = 0.8;
+
+export function ignivarMeteorDamageMaxHp(difficulty: DungeonDifficulty): number {
+  return difficulty === 'heroic'
+    ? IGNIVAR_METEOR_DAMAGE_MAX_HP_HEROIC
+    : IGNIVAR_METEOR_DAMAGE_MAX_HP;
+}
 
 const IGNIVAR_METEOR_CANDIDATES = 48;
 const IGNIVAR_METEOR_TARGET_SCATTER_MAX = 13;
