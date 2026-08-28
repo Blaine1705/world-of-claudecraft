@@ -166,6 +166,9 @@ const DRESSING_GROUP_NAMES = [
   'ignivarForgeApproachDressing',
   'ignivarCrucibleArenaDressing',
   'varkhulInnerCrucibleDressing',
+  // the baked exterior pass (composed into the ember zone features): hidden
+  // while the placer is open, or every piece doubles behind its editable copy
+  'forgefatherFortress',
 ];
 
 const state: {
