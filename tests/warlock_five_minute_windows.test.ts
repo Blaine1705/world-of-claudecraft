@@ -19,7 +19,11 @@ describe('Affliction full-BiS five-minute inert-boss balance', () => {
 
     expect(result.dps).toBeGreaterThanOrEqual(175);
     expect(result.dps).toBeLessThanOrEqual(235);
-    expect(result.manaEndPct).toBeLessThan(0.05);
+    // Mana-end corridor widened 0.05 -> 0.09 (all three specs) by the 2/4/6
+    // lineage retune: the halved haste and Clearcasting rates mean fewer
+    // casts fit the five minutes, so more mana survives the window.
+    // Re-anchor with the Phase B Crucible set bonuses.
+    expect(result.manaEndPct).toBeLessThan(0.09);
     expect(result.starvedPct).toBeLessThan(0.45);
   }, 120_000);
 });
@@ -30,7 +34,7 @@ describe('Demonology full-BiS five-minute inert-boss balance', () => {
 
     expect(result.dps).toBeGreaterThanOrEqual(150);
     expect(result.dps).toBeLessThanOrEqual(210);
-    expect(result.manaEndPct).toBeLessThan(0.05);
+    expect(result.manaEndPct).toBeLessThan(0.09);
     expect(result.starvedPct).toBeLessThan(0.45);
   }, 120_000);
 });
@@ -44,7 +48,7 @@ describe('Destruction full-BiS five-minute inert-boss balance', () => {
 
     expect(result.dps).toBeGreaterThanOrEqual(170);
     expect(result.dps).toBeLessThanOrEqual(230);
-    expect(result.manaEndPct).toBeLessThan(0.05);
+    expect(result.manaEndPct).toBeLessThan(0.09);
     expect(result.starvedPct).toBeLessThan(0.45);
   }, 120_000);
 });

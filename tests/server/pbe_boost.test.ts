@@ -35,6 +35,7 @@ import {
   randomBoostName,
 } from '../../server/pbe_boost';
 import { HEROIC_ITEMS } from '../../src/sim/content/heroic_loot';
+import { ITEM_SETS } from '../../src/sim/content/item_sets';
 import { WARFARE_ITEMS } from '../../src/sim/content/pvp_honor';
 import { BUILTIN_WORLD, ITEMS, QUESTS } from '../../src/sim/data';
 import { canEquipItem, canEquipItemInSlot, isShieldItem } from '../../src/sim/equipment_rules';
@@ -172,6 +173,10 @@ describe('bisKit (true best-in-slot over the whole PvE ladder)', () => {
           i.priceHonor === undefined &&
           canEquipItem(cls, i) &&
           (!i.requiredClass || i.requiredClass.includes(cls)) &&
+          // Mirrors eligibleForBoost's Phase A rule: a set piece whose set id
+          // is unregistered in ITEM_SETS has no bonuses yet and never counts
+          // as BiS (self-heals when the Crucible sets register).
+          (i.set === undefined || ITEM_SETS[i.set] !== undefined) &&
           meetsLevelRequirement(BOOST_LEVEL, i),
       );
       const best = Math.max(...candidates.map((i) => classItemScore(cls, i)));

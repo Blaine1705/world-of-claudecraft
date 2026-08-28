@@ -28,8 +28,14 @@ describe('demonology 200 DPS anchors at 120 seconds', () => {
     const mean = (key: 'dps' | 'starvedPct') =>
       rows.reduce((sum, row) => sum + row[key], 0) / rows.length;
 
-    expect(mean('dps')).toBeGreaterThanOrEqual(185);
-    expect(mean('dps')).toBeLessThanOrEqual(220);
+    // Re-anchored for the 2/4/6 lineage retune: the frozen kit stacks both
+    // old caster families, so it pays the halved lineage ladder now (about a
+    // 12 to 15 percent drop from the 2026-08-23 anchors, the measured size of
+    // the deliberate nerf). The Phase B Crucible set bonuses are what restore
+    // the roughly 200 DPS owner target on the NEW sets; re-anchor these to
+    // that target when they land (docs/prd/ignivar-set-bonus-final.md).
+    expect(mean('dps')).toBeGreaterThanOrEqual(158);
+    expect(mean('dps')).toBeLessThanOrEqual(182);
     expect(mean('starvedPct')).toBeLessThan(0.1);
   }, 240_000);
 
@@ -41,8 +47,9 @@ describe('demonology 200 DPS anchors at 120 seconds', () => {
     // 228.3 measured at the 2026-08-23 re-anchor (see the header note on why
     // the zero-armor dummy flatters undead); about plus or minus 5%, so the
     // tripwire trips on a real collapse or runaway, not on engine drift.
-    expect(mean('dps')).toBeGreaterThanOrEqual(217);
-    expect(mean('dps')).toBeLessThanOrEqual(240);
+    // Post-retune measurement 210.7 (see the heroic anchor note above).
+    expect(mean('dps')).toBeGreaterThanOrEqual(202);
+    expect(mean('dps')).toBeLessThanOrEqual(226);
     expect(mean('starvedPct')).toBeLessThan(0.1);
   }, 240_000);
 });

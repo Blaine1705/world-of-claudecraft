@@ -32,6 +32,7 @@
 
 import { randomInt } from 'node:crypto';
 import { BAG_SOCKETS } from '../src/sim/bags';
+import { ITEM_SETS } from '../src/sim/content/item_sets';
 import { ITEMS } from '../src/sim/data';
 import {
   canDualWield,
@@ -326,6 +327,13 @@ function eligibleForBoost(cls: PlayerClass, item: ItemDef): boolean {
   }
   // WARFARE (honor vendor) gear only: PvP-budgeted pieces are never PvE BiS.
   if (item.pvpOffenseRating !== undefined || item.pvpDefenseRating !== undefined) return false;
+  // A set piece whose set id is not registered in ITEM_SETS is Phase A
+  // content: its bonuses have not landed, so wearing it FORFEITS the old
+  // lineage stack's live bonuses for raw stats alone, which is a net loss for
+  // casters (the warlock anchors collapsed 15 percent when the bonus-less
+  // Crucible pieces entered this pool). Self-healing: the moment the set
+  // registers, the kit adopts it with no further change here.
+  if (item.set !== undefined && ITEM_SETS[item.set] === undefined) return false;
   if (item.priceHonor !== undefined) return false;
   if (!canEquipItem(cls, item)) return false;
   // canEquipItem checks requiredClass for weapons only; class-locked armor
