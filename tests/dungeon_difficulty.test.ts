@@ -44,6 +44,7 @@ describe('heroic tuning data contract', () => {
       'drowned_temple',
       'gravewyrm_sanctum',
       'hollow_crypt',
+      'ignivar_inner_crucible',
       'ignivar_raid_arena',
       'nythraxis_boss_arena',
       'sunken_bastion',
@@ -59,6 +60,7 @@ describe('heroic tuning data contract', () => {
       wildheart_basin: 'wildheart_high_priest',
       nythraxis_boss_arena: 'nythraxis_scourge_of_thornpeak',
       ignivar_raid_arena: 'ignivar_herald_of_the_last_flame',
+      ignivar_inner_crucible: 'varkhul_forgefather_of_the_last_flame',
     });
     for (const tuning of Object.values(HEROIC_DUNGEON_TUNING)) {
       expect(tuning.level).toBe(22);
@@ -78,6 +80,7 @@ describe('heroic tuning data contract', () => {
       wildheart_basin: 1,
       nythraxis_boss_arena: 3,
       ignivar_raid_arena: 3,
+      ignivar_inner_crucible: 3,
     });
   });
 
@@ -115,6 +118,10 @@ describe('heroic tuning data contract', () => {
       // addDamageMultiplier stays an inert mirror of damageMultiplier.
       nythraxis_boss_arena: [3.2, 7.25, 7.25, 1.2],
       ignivar_raid_arena: [2.5, 2, 2, 1.2],
+      // The Inner Crucible mirrors the arena's provisional values: the wing
+      // inherits the raid claim's difficulty, so its record exists to keep
+      // heroic Varkhul harder than normal while the raid tier is calibrated.
+      ignivar_inner_crucible: [2.5, 2, 2, 1.2],
     });
   });
 });

@@ -3300,6 +3300,16 @@ export const IGNIVAR_LOOT_ITEMS: Record<string, ItemDef> = {
 // art-pending icon ledger. Order follows the tables above.
 export const IGNIVAR_LOOT_ITEM_IDS: readonly string[] = Object.keys(IGNIVAR_LOOT_ITEMS);
 
+// The art-pending ledger source: every non-weapon id here ships without
+// painted art until the Crucible wave lands. ONE list, two consumers:
+// ITEM_ART_PENDING (src/ui/icons.ts) serves the procedural icon in its
+// place, and the item-art audit CLI (scripts/item_art_audit.mjs) excludes
+// it from the every-live-item-has-art sweep. The 10 weapons are absent:
+// they ship painted art like every other weapon.
+export const IGNIVAR_ART_PENDING_ITEM_IDS: readonly string[] = Object.values(IGNIVAR_LOOT_ITEMS)
+  .filter((item) => item.kind !== 'weapon')
+  .map((item) => item.id);
+
 // The Crucible Quartermaster's redemption stock: every set piece priced at
 // exactly one sigil of its slot and class group. The buy path additionally
 // validates the buyer's class against the piece's requiredClass, so one

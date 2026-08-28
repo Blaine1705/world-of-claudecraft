@@ -59,7 +59,8 @@ function parseArguments(arguments_) {
 async function loadItems(repoRoot) {
   const build = await esbuild.build({
     stdin: {
-      contents: "export { ITEMS } from './src/sim/data.ts';",
+      contents:
+        "export { ITEMS } from './src/sim/data.ts'; export { IGNIVAR_ART_PENDING_ITEM_IDS } from './src/sim/content/ignivar_loot.ts';",
       resolveDir: repoRoot,
       sourcefile: 'item-art-audit-entry.ts',
       loader: 'ts',
@@ -72,7 +73,8 @@ async function loadItems(repoRoot) {
   });
   const bundled = build.outputFiles[0].text;
   const dataUrl = `data:text/javascript;base64,${Buffer.from(bundled).toString('base64')}`;
-  return (await import(dataUrl)).ITEMS;
+  const module_ = await import(dataUrl);
+  return { items: module_.ITEMS, artPendingIds: module_.IGNIVAR_ART_PENDING_ITEM_IDS };
 }
 
 const arguments_ = parseArguments(process.argv.slice(2));
@@ -83,7 +85,7 @@ if (arguments_.help) {
 
 const repoRoot = process.cwd();
 await readFile(path.join(repoRoot, 'package.json'));
-const items = await loadItems(repoRoot);
+const { items, artPendingIds } = await loadItems(repoRoot);
 const mapping = JSON.parse(
   await readFile(path.join(repoRoot, 'public/ui/items/mapping.json'), 'utf8'),
 );
@@ -93,10 +95,13 @@ const build = await buildItemArtAudit({
   outputDirectory: arguments_.outputDirectory,
   renderOutputs: !arguments_.verifyOnly,
   items,
+  artPendingIds,
   mapping,
   expected: {
-    catalogCount: 829,
-    liveItemCount: 844,
+    // 829 + the crucible-raid-weapons-2026-08-28 batch (10 painted weapons).
+    catalogCount: 839,
+    // 844 + the 202 Crucible raid loot definitions (192 of them art-pending).
+    liveItemCount: 1046,
     generatedHeroicDefinitions: 64,
     heroicDefinitionsWithOwnWebp: 48,
     heroicWeaponArtAliases: 16,
