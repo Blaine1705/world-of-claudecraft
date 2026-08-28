@@ -221,6 +221,7 @@ const UI_PURE_CORES = [
   'src/ui/daily_rewards_chrome_view.ts',
   'src/ui/daily_rewards_launcher_core.ts',
   'src/ui/char_bags_pairing_core.ts',
+  'src/ui/empower_hold_core.ts',
   'src/ui/equip_drop_core.ts',
   'src/ui/error_text_i18n_core.ts',
   'src/ui/general_chat_quota_view.ts',

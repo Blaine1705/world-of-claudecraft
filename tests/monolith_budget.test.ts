@@ -249,7 +249,13 @@ const MONOLITHS: MonolithRow[] = [
     // live-hooks half) and the snap-grid / edit-cursor rework under PR #3714.
     // This branch's arm stays its +3 store and vault chrome. Measured on the
     // merged tree, never reconciled by arithmetic. Exact count, zero slack.
-    ceiling: 19005,
+    // Re-pinned at the fifth release/v0.41.0 sync (release tip ddc8988185,
+    // the gamepad empower-hold batch). The release arm lowered its own pin
+    // by 2 when the charge state and the XHB slot lookup moved to
+    // src/ui/empower_hold_core.ts; this branch's arm stays its +3 store and
+    // vault chrome. Measured on the merged tree, never reconciled by
+    // arithmetic. Exact count, zero slack.
+    ceiling: 19003,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -423,7 +429,9 @@ const MONOLITHS: MonolithRow[] = [
     // the player-frame bar lock) predate this ratchet; folding them behind a
     // src/game/ settings-application seam is flagged follow-up work. Exact
     // merged count.
-    ceiling: 11629,
+    // Lowered by 1 at the empower-hold sync merge: the pad cast routing lives
+    // in src/game/pad_cast_routing.ts. Exact merged count.
+    ceiling: 11628,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
