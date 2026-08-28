@@ -7,7 +7,7 @@
 
 import type { TalentRowLevel } from '../src/sim/content/talents';
 import { BUILTIN_WORLD, MOBS } from '../src/sim/data';
-import { equipBestInSlotForDev } from '../src/sim/dev/bis_gear';
+import { equipReferenceEpicKitForDev } from '../src/sim/dev/bis_gear';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity, WorldContent } from '../src/sim/types';
@@ -188,7 +188,7 @@ export function runRogueDpsProbe(
 
   // /dev bis chooses only epic items, so the representative current loadout
   // cannot include the legendary this band intentionally excludes.
-  if (equipBestInSlotForDev(sim.ctx, sim.playerId) === 0) {
+  if (equipReferenceEpicKitForDev(sim.ctx, sim.playerId) === 0) {
     throw new Error(`failed to equip ${spec} probe loadout`);
   }
 

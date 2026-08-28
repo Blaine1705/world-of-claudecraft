@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
-import { bestEpicGearFor, equipBestInSlotForDev } from '../src/sim/dev/bis_gear';
+import {
+  bestEpicGearFor,
+  equipBestInSlotForDev,
+  equipReferenceEpicKitForDev,
+} from '../src/sim/dev/bis_gear';
+import { parseBisGearFor } from '../src/sim/dev/parse_bis_loadouts';
 import { canEquipItemInSlot } from '../src/sim/equipment_rules';
 import { Sim } from '../src/sim/sim';
 import type { EquipSlot } from '../src/sim/types';
@@ -50,6 +55,28 @@ describe('dev bis gear', () => {
     );
     expect(equipped).toBeGreaterThanOrEqual(8);
     expect(sim.player.stats.agi + sim.player.stats.sta).toBeGreaterThan(before);
+    expect(sim.player.hp).toBe(sim.player.maxHp);
+  });
+
+  it('keeps the reference kit on the item-table scorer, never the parse snapshot', () => {
+    // The balance probes and their pinned DPS bands equip through
+    // equipReferenceEpicKitForDev; a new parse capture must not move them.
+    const sim = new Sim({ seed: 5, playerClass: 'rogue', autoEquip: true });
+    sim.setPlayerLevel(20);
+    expect(sim.setSpec('combat')).toBe(true);
+    // The spec has a parse loadout, and it differs from the scorer's picks, so
+    // this fixture actually distinguishes the two sources.
+    const parse = parseBisGearFor('rogue', 'combat');
+    const reference = bestEpicGearFor('rogue', 'combat');
+    expect(parse).toBeTruthy();
+    expect(parse).not.toEqual(reference);
+    const ctx = (sim as unknown as { ctx: Parameters<typeof equipReferenceEpicKitForDev>[0] }).ctx;
+    const equipped = equipReferenceEpicKitForDev(ctx, sim.player.id);
+    expect(equipped).toBeGreaterThanOrEqual(8);
+    const meta = ctx.players.get(sim.player.id);
+    for (const [slot, id] of Object.entries(reference) as [EquipSlot, string][]) {
+      expect(meta?.equipment[slot]).toBe(id);
+    }
     expect(sim.player.hp).toBe(sim.player.maxHp);
   });
 });
