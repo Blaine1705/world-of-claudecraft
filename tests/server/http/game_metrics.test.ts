@@ -27,14 +27,18 @@ import {
   WOC_BANK_LEDGER_GROWTH_BUDGET,
   WOC_BANK_LEDGER_GROWTH_LIMIT_REFUSALS_TOTAL,
   WOC_BANK_LEDGER_TAIL,
+  WOC_BANK_LEDGER_TAIL_DROPPED_ROWS_TOTAL,
   WOC_BATTLEGROUND_CAPTURES_TOTAL,
   WOC_BATTLEGROUND_DURATION_SECONDS_TOTAL,
   WOC_BATTLEGROUND_MATCHES_TOTAL,
+  WOC_CHARACTER_DELETE_BUSY_TOTAL,
+  WOC_CHARACTER_DELETE_GATE,
   WOC_CHARACTERS_CREATED_TOTAL,
   WOC_CHAT_MESSAGES_TOTAL,
   WOC_COPPER_CREDITED_TOTAL,
   WOC_COPPER_SPENT_TOTAL,
-  WOC_DB_BACKEND_CANCELS,
+  WOC_DB_BACKEND_CANCEL_FAILURES_TOTAL,
+  WOC_DB_BACKEND_CANCEL_REQUESTS_TOTAL,
   WOC_DB_POOL_CLIENTS,
   WOC_ESCROW_GATE_IN_FLIGHT,
   WOC_ESCROW_QUEUE_TOTAL,
@@ -100,6 +104,16 @@ function stubSource(overrides: Partial<GameStateSource> = {}): GameStateSource {
       refused: 0,
       cancelled: 0,
     }),
+    characterDeleteGate: () => ({
+      inFlight: 1,
+      waiting: 0,
+      max: 2,
+      configuredHeadroom: 0,
+      acquired: 4,
+      refused: 0,
+      cancelled: 0,
+      busyRefusals: 3,
+    }),
     storageRecovery: () => ({
       tracked: 0,
       scanActive: 0,
@@ -119,7 +133,7 @@ function stubSource(overrides: Partial<GameStateSource> = {}): GameStateSource {
     tickPhaseMillis: () => ({}),
     dbPool: () => ({ total: 7, idle: 4, waiting: 1 }),
     dbBackendCancels: () => ({ requested: 3, failed: 1 }),
-    bankLedgerTail: () => ({ depth: 12, droppedRows: 5 }),
+    bankLedgerTail: () => ({ depth: 12, rows: 240, droppedRows: 5 }),
     generalChatQuotaDbPool: () => ({ total: 2, idle: 1, waiting: 0 }),
     generalChatQuotaInFlight: () => 0,
     generalChatQuotaCachedAccounts: () => 0,
@@ -381,6 +395,62 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
     });
   });
 
+  it('exports the character-delete sub-gate as its own family beside the realm gate', async () => {
+    const registry = new Registry();
+    let gate = {
+      inFlight: 2,
+      waiting: 5,
+      max: 2,
+      configuredHeadroom: 0,
+      acquired: 9,
+      refused: 0,
+      cancelled: 1,
+      busyRefusals: 3,
+    };
+    registerGameStateMetrics(registry, stubSource({ characterDeleteGate: () => gate }));
+    const first = await registry.metrics();
+
+    expect(WOC_CHARACTER_DELETE_GATE).toBe('woc_character_delete_gate');
+    expect(WOC_CHARACTER_DELETE_BUSY_TOTAL).toBe('woc_character_delete_busy_total');
+    expect(first).toContain(`# TYPE ${WOC_CHARACTER_DELETE_GATE} gauge`);
+    expect(first).toContain(`# TYPE ${WOC_CHARACTER_DELETE_BUSY_TOTAL} counter`);
+    // The whole sub-gate readout: a delete stampede parks BEFORE the realm
+    // gate, so this waiting arm is the only place it is visible at all
+    // (woc_background_db_gate reads waiting at most the sub-cap during one).
+    expect(measureValues(first, WOC_CHARACTER_DELETE_GATE)).toEqual({
+      acquired: '9',
+      cancelled: '1',
+      configured_headroom: '0',
+      in_flight: '2',
+      max: '2',
+      refused: '0',
+      waiting: '5',
+    });
+    // The busy total is a COUNTER under its own name, never a measure arm:
+    // operators alert on increase(), which misreads a gauge restart.
+    expect(labelValues(first, 'measure', WOC_CHARACTER_DELETE_GATE)).toEqual(
+      new Set([
+        'in_flight',
+        'waiting',
+        'max',
+        'configured_headroom',
+        'acquired',
+        'refused',
+        'cancelled',
+      ]),
+    );
+    expect(sampleValue(first, /^woc_character_delete_busy_total (\d+)$/m)).toBe('3');
+
+    // Live at scrape time (the family rule): a second scrape tracks movement.
+    gate = { ...gate, inFlight: 1, waiting: 0, busyRefusals: 7 };
+    const second = await registry.metrics();
+    expect(measureValues(second, WOC_CHARACTER_DELETE_GATE)).toMatchObject({
+      in_flight: '1',
+      waiting: '0',
+    });
+    expect(sampleValue(second, /^woc_character_delete_busy_total (\d+)$/m)).toBe('7');
+  });
+
   it('exports pg pool saturation by state from the source snapshot', async () => {
     const registry = new Registry();
     registerGameStateMetrics(registry, stubSource());
@@ -394,31 +464,75 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
     expect(sampleValue(text, /^woc_db_pool_clients\{state="waiting"\} (\d+)$/m)).toBe('1');
   });
 
-  it('exports the bank-ledger insert FIFO depth and cap-dropped rows by measure', async () => {
+  it('splits the bank-ledger FIFO into an instantaneous gauge and a drop counter', async () => {
     const registry = new Registry();
     registerGameStateMetrics(registry, stubSource());
     const text = await registry.metrics();
     expect(WOC_BANK_LEDGER_TAIL).toBe('woc_bank_ledger_tail');
+    expect(WOC_BANK_LEDGER_TAIL_DROPPED_ROWS_TOTAL).toBe('woc_bank_ledger_tail_dropped_rows_total');
     expect(text).toContain(`# TYPE ${WOC_BANK_LEDGER_TAIL} gauge`);
-    // The stub returns depth 12, dropped 5. Depth is the live backlog against
-    // the cap; dropped_rows only ever rises and each unit is an audit hole,
-    // so the two must surface as distinct labeled samples.
+    expect(text).toContain(`# TYPE ${WOC_BANK_LEDGER_TAIL_DROPPED_ROWS_TOTAL} counter`);
+    // The stub returns depth 12 (queued ops) and rows 240 (the ledger rows
+    // those ops carry): one instantaneous occupancy arm per FIFO cap.
     expect(sampleValue(text, /^woc_bank_ledger_tail\{measure="depth"\} (\d+)$/m)).toBe('12');
-    expect(sampleValue(text, /^woc_bank_ledger_tail\{measure="dropped_rows"\} (\d+)$/m)).toBe('5');
+    expect(sampleValue(text, /^woc_bank_ledger_tail\{measure="rows"\} (\d+)$/m)).toBe('240');
+    // The lifetime drop total is its OWN counter, never a measure on the
+    // gauge: rate()/increase() must read correctly across a realm restart,
+    // and a monotonic arm inside an instantaneous family breaks both reads.
+    expect(labelValues(text, 'measure', WOC_BANK_LEDGER_TAIL)).toEqual(new Set(['depth', 'rows']));
+    expect(sampleValue(text, /^woc_bank_ledger_tail_dropped_rows_total (\d+)$/m)).toBe('5');
+    // The retired mixed shape stays retired.
+    expect(text).not.toMatch(/^woc_bank_ledger_tail\{measure="dropped_rows"\}/m);
   });
 
-  it('exports the dedicated-side-pool backend cancel counts by measure', async () => {
+  it('exports the dedicated-side-pool backend cancels as two counters', async () => {
     const registry = new Registry();
     registerGameStateMetrics(registry, stubSource());
     const text = await registry.metrics();
-    expect(WOC_DB_BACKEND_CANCELS).toBe('woc_db_backend_cancels');
-    expect(text).toContain(`# TYPE ${WOC_DB_BACKEND_CANCELS} gauge`);
+    expect(WOC_DB_BACKEND_CANCEL_REQUESTS_TOTAL).toBe('woc_db_backend_cancel_requests_total');
+    expect(WOC_DB_BACKEND_CANCEL_FAILURES_TOTAL).toBe('woc_db_backend_cancel_failures_total');
+    expect(text).toContain(`# TYPE ${WOC_DB_BACKEND_CANCEL_REQUESTS_TOTAL} counter`);
+    expect(text).toContain(`# TYPE ${WOC_DB_BACKEND_CANCEL_FAILURES_TOTAL} counter`);
     // The stub returns requested 3, failed 1: a rising requested rate is the
-    // wall-deadline saturation precursor, failed means even the sub-second
-    // cancel path could not reach PostgreSQL. Both must surface, and per
-    // dimension: a swap of the labels would misdirect an operator mid-incident.
-    expect(sampleValue(text, /^woc_db_backend_cancels\{measure="requested"\} (\d+)$/m)).toBe('3');
-    expect(sampleValue(text, /^woc_db_backend_cancels\{measure="failed"\} (\d+)$/m)).toBe('1');
+    // wall-deadline saturation precursor, failed (a SUBSET of requested) means
+    // even the sub-second cancel path could not reach PostgreSQL. Distinct
+    // counters, per dimension: a swap would misdirect an operator mid-incident.
+    expect(sampleValue(text, /^woc_db_backend_cancel_requests_total (\d+)$/m)).toBe('3');
+    expect(sampleValue(text, /^woc_db_backend_cancel_failures_total (\d+)$/m)).toBe('1');
+    // The old mixed gauge family is gone whole: an alert rule reading the
+    // retired name must find no series at all rather than a stale one.
+    expect(text).not.toContain('woc_db_backend_cancels');
+    // Positive control for that absence pin: the LIVE family name is present
+    // in the same scrape text, so the retired-name check cannot pass
+    // vacuously against an empty or renamed exposition.
+    expect(text).toContain('woc_db_backend_cancel_requests_total');
+  });
+
+  it('re-syncs the scrape-time lifetime counters from the source on every scrape', async () => {
+    const registry = new Registry();
+    let cancels = { requested: 3, failed: 1 };
+    let tail = { depth: 12, rows: 240, droppedRows: 5 };
+    registerGameStateMetrics(
+      registry,
+      stubSource({
+        dbBackendCancels: () => cancels,
+        bankLedgerTail: () => tail,
+      }),
+    );
+    const first = await registry.metrics();
+    expect(sampleValue(first, /^woc_db_backend_cancel_requests_total (\d+)$/m)).toBe('3');
+    expect(sampleValue(first, /^woc_bank_ledger_tail_dropped_rows_total (\d+)$/m)).toBe('5');
+    // The source totals grow while the tail drains: the counters must track
+    // the source (synced at scrape time, not sampled once at registration),
+    // and the occupancy gauge must fall with the drain.
+    cancels = { requested: 7, failed: 2 };
+    tail = { depth: 0, rows: 0, droppedRows: 9 };
+    const second = await registry.metrics();
+    expect(sampleValue(second, /^woc_db_backend_cancel_requests_total (\d+)$/m)).toBe('7');
+    expect(sampleValue(second, /^woc_db_backend_cancel_failures_total (\d+)$/m)).toBe('2');
+    expect(sampleValue(second, /^woc_bank_ledger_tail_dropped_rows_total (\d+)$/m)).toBe('9');
+    expect(sampleValue(second, /^woc_bank_ledger_tail\{measure="depth"\} (\d+)$/m)).toBe('0');
+    expect(sampleValue(second, /^woc_bank_ledger_tail\{measure="rows"\} (\d+)$/m)).toBe('0');
   });
 
   it('exports bounded quota pool, listener, cache, call, and duration observability', async () => {

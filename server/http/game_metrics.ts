@@ -15,6 +15,9 @@
 // never has to push a sample. COUNTERS are pushed from their emission sites through
 // the process-wide slot in server/http/game_signals.ts (installed by main.ts at
 // boot with the sink this function returns), exactly like the attack-signal counters.
+// Three lifetime totals whose truth already lives in their emitting modules (the
+// bank-ledger FIFO's dropped rows, the two backend-cancel counts) are instead
+// SYNCED from the GameStateSource at scrape time; see their registration below.
 //
 // CARDINALITY IS BOUNDED BY DESIGN, same contract as server/http/metrics.ts: the
 // only label values are the fixed tick-phase names, the two per-phase stats
@@ -104,11 +107,17 @@ export const WOC_SIM_TICK_HZ = 'woc_sim_tick_hz';
  *  family (a regression in its rate shows up here first in production). */
 export const WOC_DB_POOL_CLIENTS = 'woc_db_pool_clients';
 
-/** Lifetime deadline-expiry backend cancels through the dedicated side pool,
- *  by measure (requested/failed). A rising requested rate means transactions
- *  are hitting their wall deadlines (the saturation precursor); failures mean
- *  even the sub-second cancel path could not reach PostgreSQL. */
-export const WOC_DB_BACKEND_CANCELS = 'woc_db_backend_cancels';
+/** Total deadline-expiry backend cancels REQUESTED through the dedicated side
+ *  pool. A rising rate means transactions are hitting their wall deadlines
+ *  (the saturation precursor). A Counter, so rate()/increase() read correctly
+ *  across realm restarts. */
+export const WOC_DB_BACKEND_CANCEL_REQUESTS_TOTAL = 'woc_db_backend_cancel_requests_total';
+
+/** The subset of requested cancels that FAILED: even the sub-second cancel
+ *  path could not reach PostgreSQL. Its own counter beside the requests, not
+ *  a measure label on one family (the koi/catches rule below: a subset series
+ *  under a shared name would make the family's sum double-count). */
+export const WOC_DB_BACKEND_CANCEL_FAILURES_TOTAL = 'woc_db_backend_cancel_failures_total';
 
 /** Character-save FIFO keys with a queued or running write (the per-character
  *  serial writer's live map size). The escrow write-path rider's gauge. The
@@ -127,6 +136,19 @@ export const WOC_ESCROW_GATE_IN_FLIGHT = 'woc_escrow_gate_in_flight';
 
 /** Realm-wide cap across the named dominant background DB producers. */
 export const WOC_BACKGROUND_DB_GATE = 'woc_background_db_gate';
+
+/** The character-delete sub-gate (the delete-local concurrency bound UNDER
+ *  the realm background gate) by the same fixed measures. Its own family
+ *  beside woc_background_db_gate: the sub-cap parks a delete stampede BEFORE
+ *  the realm gate, so the realm family's waiting gauge structurally cannot
+ *  see it (a stampede would read there as waiting at most the sub-cap while
+ *  players get 503s), and a leaked sub slot shows as in_flight pinned high. */
+export const WOC_CHARACTER_DELETE_GATE = 'woc_character_delete_gate';
+
+/** Total character-delete saturation refusals (the delete_busy 503s): the
+ *  bounded permit wait elapsed with no slot. Client-gone abandonments never
+ *  count. A Counter, so rate()/increase() read correctly across restarts. */
+export const WOC_CHARACTER_DELETE_BUSY_TOTAL = 'woc_character_delete_busy_total';
 
 /** Bounded storage-recovery scheduler occupancy, age, and lifetime events. */
 export const WOC_STORAGE_RECOVERY = 'woc_storage_recovery';
@@ -183,10 +205,19 @@ export const WOC_RIFT_FORGE_REFUSED_TOTAL = 'woc_rift_forge_refused_total';
 export const WOC_VAULT_LEDGER_INCIDENTS_TOTAL = 'woc_vault_ledger_incidents_total';
 export const WOC_BANK_VAULT_REALM_ROW_BREACHES_TOTAL = 'woc_bank_vault_realm_row_breaches_total';
 
-/** The per-process bank-ledger insert FIFO, by measure: live depth against
- *  its cap, and lifetime rows dropped AT the cap (each dropped row is a
- *  counted audit hole, the same hole a rejected insert leaves). */
+/** The per-process bank-ledger insert FIFO's INSTANTANEOUS occupancy, by
+ *  measure: depth is queued insert ops against BANK_LEDGER_TAIL_MAX_DEPTH,
+ *  rows is the ledger rows those ops carry against BANK_LEDGER_TAIL_MAX_ROWS
+ *  (a batched op is one depth unit but up to 112 rows, so each cap needs its
+ *  own arm). Instantaneous only; the lifetime drop total is the counter
+ *  below, never an arm here. */
 export const WOC_BANK_LEDGER_TAIL = 'woc_bank_ledger_tail';
+
+/** Total audit rows dropped at either bank-ledger FIFO cap (each dropped row
+ *  is a counted audit hole, the same hole a rejected insert leaves). Alert on
+ *  any increase. A Counter, so rate()/increase() read correctly across realm
+ *  restarts, which the old dropped_rows gauge arm did not. */
+export const WOC_BANK_LEDGER_TAIL_DROPPED_ROWS_TOTAL = 'woc_bank_ledger_tail_dropped_rows_total';
 
 /** Marketplace escrow-queue outcomes (the listing entry on the per-character
  *  save FIFO), by kind. */
@@ -318,6 +349,18 @@ export interface GameStateSource {
     refused: number;
     cancelled: number;
   };
+  /** The character-delete sub-gate readout plus its lifetime saturation
+   *  refusals (server/character_delete_db.ts characterDeleteGateStats). */
+  characterDeleteGate(): {
+    inFlight: number;
+    waiting: number;
+    max: number;
+    configuredHeadroom: number;
+    acquired: number;
+    refused: number;
+    cancelled: number;
+    busyRefusals: number;
+  };
   storageRecovery(): {
     tracked: number;
     scanActive: number;
@@ -340,8 +383,9 @@ export interface GameStateSource {
   dbPool(): { total: number; idle: number; waiting: number };
   /** Lifetime detached-backend cancel attempts/failures (the side-pool hook). */
   dbBackendCancels(): { requested: number; failed: number };
-  /** Bank-ledger insert FIFO: live depth plus lifetime cap-dropped rows. */
-  bankLedgerTail(): { depth: number; droppedRows: number };
+  /** Bank-ledger insert FIFO: live queued ops (depth), the ledger rows those
+   *  ops carry, and lifetime rows dropped at either cap. */
+  bankLedgerTail(): { depth: number; rows: number; droppedRows: number };
   generalChatQuotaDbPool(): { total: number; idle: number; waiting: number };
   generalChatQuotaInFlight(): number;
   generalChatQuotaCachedAccounts(): number;
@@ -457,6 +501,35 @@ export function registerGameStateMetrics(
   });
 
   new Gauge({
+    name: WOC_CHARACTER_DELETE_GATE,
+    help: 'Character-delete sub-gate by fixed measure (the delete-local bound under the realm background gate). A stampede parks here BEFORE the realm gate, so woc_background_db_gate waiting cannot see it.',
+    labelNames: ['measure'],
+    registers: [registry],
+    collect() {
+      const state = source.characterDeleteGate();
+      this.set({ measure: 'in_flight' }, state.inFlight);
+      this.set({ measure: 'waiting' }, state.waiting);
+      this.set({ measure: 'max' }, state.max);
+      this.set({ measure: 'configured_headroom' }, state.configuredHeadroom);
+      this.set({ measure: 'acquired' }, state.acquired);
+      this.set({ measure: 'refused' }, state.refused);
+      this.set({ measure: 'cancelled' }, state.cancelled);
+    },
+  });
+
+  // Same scrape-time sync shape as the backend-cancel counters below: the
+  // truth lives in character_delete_db.ts and is monotonic per process.
+  new Counter({
+    name: WOC_CHARACTER_DELETE_BUSY_TOTAL,
+    help: 'Total character-delete saturation refusals (the delete_busy 503s). Client-gone abandonments never count. Alert on sustained increase(): players cannot delete characters.',
+    registers: [registry],
+    collect() {
+      this.reset();
+      this.inc(source.characterDeleteGate().busyRefusals);
+    },
+  });
+
+  new Gauge({
     name: WOC_STORAGE_RECOVERY,
     help: 'Bounded storage-purchase recovery state by fixed measure; ages are seconds and horizon_breached is 0/1.',
     labelNames: ['measure'],
@@ -515,25 +588,52 @@ export function registerGameStateMetrics(
 
   new Gauge({
     name: WOC_BANK_LEDGER_TAIL,
-    help: 'Per-process bank-ledger insert FIFO by measure: depth is the live queue against its cap, dropped_rows is lifetime audit rows dropped at the cap (alert on any increase; each is a counted audit hole).',
+    help: 'Per-process bank-ledger insert FIFO occupancy by measure: depth is queued insert ops against the depth cap, rows is the ledger rows those ops carry against the rows cap (a batched op is one depth unit but many rows). Instantaneous only; alert on drops via woc_bank_ledger_tail_dropped_rows_total.',
     labelNames: ['measure'],
     registers: [registry],
     collect() {
       const tail = source.bankLedgerTail();
       this.set({ measure: 'depth' }, tail.depth);
-      this.set({ measure: 'dropped_rows' }, tail.droppedRows);
+      this.set({ measure: 'rows' }, tail.rows);
     },
   });
 
-  new Gauge({
-    name: WOC_DB_BACKEND_CANCELS,
-    help: 'Lifetime deadline-expiry backend cancels through the dedicated side pool, by measure (requested, failed). Rising requested means transactions are hitting wall deadlines; failed means the sub-second cancel path could not reach PostgreSQL.',
-    labelNames: ['measure'],
+  // The three lifetime totals below are COUNTERS, not gauge arms: operators
+  // alert on rate()/increase(), which treat a counter's restart reset
+  // correctly but misread a restarting gauge as a negative spike. Their truth
+  // lives in the emitting modules (the FIFO's drop count, the cancel side
+  // pool's counts) and reaches the exporter through the same scrape-time
+  // source read as the gauges; a prom Counter has no set(), so collect()
+  // replays the absolute total via reset() + inc(). Each source value is
+  // monotonic for the process's life, so the rendered series is monotonic
+  // between restarts, exactly what the counter type promises.
+  new Counter({
+    name: WOC_BANK_LEDGER_TAIL_DROPPED_ROWS_TOTAL,
+    help: 'Total audit rows dropped at the bank-ledger insert FIFO caps (alert on any increase; each dropped row is an audit hole, the same hole a rejected insert leaves).',
     registers: [registry],
     collect() {
-      const cancels = source.dbBackendCancels();
-      this.set({ measure: 'requested' }, cancels.requested);
-      this.set({ measure: 'failed' }, cancels.failed);
+      this.reset();
+      this.inc(source.bankLedgerTail().droppedRows);
+    },
+  });
+
+  new Counter({
+    name: WOC_DB_BACKEND_CANCEL_REQUESTS_TOTAL,
+    help: 'Total deadline-expiry backend cancels requested through the dedicated side pool. A rising rate means transactions are hitting their wall deadlines (the saturation precursor).',
+    registers: [registry],
+    collect() {
+      this.reset();
+      this.inc(source.dbBackendCancels().requested);
+    },
+  });
+
+  new Counter({
+    name: WOC_DB_BACKEND_CANCEL_FAILURES_TOTAL,
+    help: 'Total requested backend cancels that failed: even the sub-second cancel path could not reach PostgreSQL. A subset of woc_db_backend_cancel_requests_total.',
+    registers: [registry],
+    collect() {
+      this.reset();
+      this.inc(source.dbBackendCancels().failed);
     },
   });
 

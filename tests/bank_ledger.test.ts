@@ -21,11 +21,13 @@ vi.mock('../server/db', () => ({
 
 import {
   BANK_LEDGER_TAIL_MAX_DEPTH,
+  BANK_LEDGER_TAIL_MAX_ROWS,
   bankLedgerIdle,
   bankLedgerTailStats,
   diffBankOp,
   diffBankSocketOp,
   recordBankOp,
+  resetBankLedgerTailDropLogForTests,
 } from '../server/bank_ledger';
 import { BankLedgerGrowthLimitExceeded } from '../server/bank_ledger_growth_budget';
 import { insertBankLedgerRow, insertBankLedgerRows, saveCharacterState } from '../server/db';
@@ -840,6 +842,12 @@ describe('the bounded insert FIFO (tail cap)', () => {
   beforeEach(async () => {
     await bankLedgerIdle();
     insertMock.mockClear();
+    // The drop-log latch (TAIL_DROP_LOG_LIMIT, budget 5) is module-lifetime and
+    // shared by every drop this FILE produces, so without this reset the exact
+    // console.error counts below would depend on how many drops sibling tests
+    // logged first: a new drop-producing test above them would exhaust the
+    // budget and red them for a reason unrelated to their own claim.
+    resetBankLedgerTailDropLogForTests();
   });
 
   it('admits to the cap, drops and counts past it, and recovers after a drain', async () => {
@@ -909,6 +917,140 @@ describe('the bounded insert FIFO (tail cap)', () => {
     expect(bankLedgerTailStats().depth).toBe(0);
     expect(insertMock).toHaveBeenCalledTimes(BANK_LEDGER_TAIL_MAX_DEPTH + 1);
     expect(bankLedgerTailStats().droppedRows).toBe(baselineDropped + 4);
+  });
+
+  it('caps queued ROWS independently of depth, so batched sweeps cannot hide behind the op count', async () => {
+    // The literal rows cap: 4,000 holds even a full-depth tail to an average
+    // batch of 2 rows, keeping the shutdown drain's 200 inserts/s arithmetic
+    // honest for batched statements; a silent edit moves that trade and must
+    // red here.
+    expect(BANK_LEDGER_TAIL_MAX_ROWS).toBe(4_000);
+    const baselineDropped = bankLedgerTailStats().droppedRows;
+    insertRowsMock.mockClear();
+    let release!: () => void;
+    // Wedge the chain on the BATCHED writer: every op in this test is a
+    // 100-row vault sweep, so the rows cap fills at depth 40, nowhere near
+    // the 2,000-op depth cap, which is exactly the two-cap claim.
+    insertRowsMock.mockImplementationOnce(
+      () =>
+        new Promise<void>((resolve) => {
+          release = resolve;
+        }),
+    );
+    const who = { characterId: 42, accountId: 7 };
+    const sweepStock = Object.fromEntries(
+      Array.from({ length: 100 }, (_, i) => [`mat_${String(i).padStart(3, '0')}`, 1]),
+    );
+    const sweep = () => recordVaultOp('deposit', who, vinfo({}), vinfo(sweepStock));
+    const errs = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const incidents: string[] = [];
+    setGameMetricsCounters({
+      ...noopGameMetricsCounters,
+      vaultLedgerIncident: (kind) => incidents.push(kind),
+    });
+    try {
+      for (let i = 0; i < BANK_LEDGER_TAIL_MAX_ROWS / 100; i++) sweep();
+      expect(bankLedgerTailStats().depth).toBe(40);
+      expect(bankLedgerTailStats().rows).toBe(BANK_LEDGER_TAIL_MAX_ROWS);
+      expect(bankLedgerTailStats().droppedRows).toBe(baselineDropped);
+
+      // The next sweep would cross the rows cap: dropped, counted per ROW
+      // (the audit's unit), and the vault site books the same per-row
+      // incident hole its rejected batch does.
+      sweep();
+      expect(bankLedgerTailStats().depth).toBe(40);
+      expect(bankLedgerTailStats().rows).toBe(BANK_LEDGER_TAIL_MAX_ROWS);
+      expect(bankLedgerTailStats().droppedRows).toBe(baselineDropped + 100);
+      expect(incidents).toHaveLength(100);
+      expect(new Set(incidents)).toEqual(new Set(['ledger_write_failed']));
+      expect(errs).toHaveBeenCalledTimes(1);
+      expect(String(errs.mock.calls[0][0])).toContain('rows queued');
+
+      // Even a SINGLE row is refused at the exact cap: the bound is "queued
+      // rows never exceed the cap", not "admit one more op then stop". The
+      // personal arm has no incident family, so only the drop count moves.
+      recordBankOp('deposit', who, info([]), info([{ itemId: 'wolf_fang', count: 1 }]));
+      expect(bankLedgerTailStats().rows).toBe(BANK_LEDGER_TAIL_MAX_ROWS);
+      expect(bankLedgerTailStats().droppedRows).toBe(baselineDropped + 101);
+      expect(incidents).toHaveLength(100);
+    } finally {
+      setGameMetricsCounters(noopGameMetricsCounters);
+      errs.mockRestore();
+      // One microtask turn first: the wedge insert runs off the chain's
+      // .then, so `release` is only assigned once the chain head executed.
+      await Promise.resolve();
+      release();
+    }
+
+    // Draining returns BOTH occupancy counters to zero and re-admits work;
+    // the drop total stays where the overload left it.
+    await bankLedgerIdle();
+    expect(bankLedgerTailStats().depth).toBe(0);
+    expect(bankLedgerTailStats().rows).toBe(0);
+    expect(insertRowsMock).toHaveBeenCalledTimes(40);
+    sweep();
+    await bankLedgerIdle();
+    expect(bankLedgerTailStats().rows).toBe(0);
+    expect(insertRowsMock).toHaveBeenCalledTimes(41);
+    expect(bankLedgerTailStats().droppedRows).toBe(baselineDropped + 101);
+  });
+
+  it('drops a STRADDLING batch whole below the cap, and still admits one that fits exactly', async () => {
+    // The admission is the SUM comparison tailRows + rowCount > MAX, not an
+    // at-capacity check: a fixture that only ever reaches the cap exactly
+    // (the sibling test's 40 x 100) cannot tell the two apart, so a rewrite
+    // to `tailRows >= MAX` would survive it. Fill to 3,950 (39 hundred-row
+    // sweeps plus one 50-row op), then prove a 100-row sweep is refused
+    // WHOLE (4,050 would cross; the queue stays at 3,950, never partially
+    // admitted) while a 50-row op still admits (4,000 does not EXCEED the
+    // cap); together the arms pin the sum, its comparand, and its strictness.
+    const baselineDropped = bankLedgerTailStats().droppedRows;
+    insertRowsMock.mockClear();
+    let release!: () => void;
+    insertRowsMock.mockImplementationOnce(
+      () =>
+        new Promise<void>((resolve) => {
+          release = resolve;
+        }),
+    );
+    const who = { characterId: 42, accountId: 7 };
+    const stockOf = (n: number): Record<string, number> =>
+      Object.fromEntries(
+        Array.from({ length: n }, (_, i) => [`mat_${String(i).padStart(3, '0')}`, 1]),
+      );
+    const sweep100 = () => recordVaultOp('deposit', who, vinfo({}), vinfo(stockOf(100)));
+    const sweep50 = () => recordVaultOp('deposit', who, vinfo({}), vinfo(stockOf(50)));
+    const errs = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      for (let i = 0; i < 39; i++) sweep100();
+      sweep50();
+      expect(bankLedgerTailStats().rows).toBe(3_950);
+      expect(bankLedgerTailStats().depth).toBe(40);
+      expect(bankLedgerTailStats().droppedRows).toBe(baselineDropped);
+
+      // Straddle: 3,950 queued + 100 offered crosses 4,000. Refused whole.
+      sweep100();
+      expect(bankLedgerTailStats().rows).toBe(3_950);
+      expect(bankLedgerTailStats().depth).toBe(40);
+      expect(bankLedgerTailStats().droppedRows).toBe(baselineDropped + 100);
+
+      // Exact fit: 3,950 + 50 = 4,000 does not exceed the cap, so it admits.
+      sweep50();
+      expect(bankLedgerTailStats().rows).toBe(BANK_LEDGER_TAIL_MAX_ROWS);
+      expect(bankLedgerTailStats().depth).toBe(41);
+      expect(bankLedgerTailStats().droppedRows).toBe(baselineDropped + 100);
+    } finally {
+      errs.mockRestore();
+      // One microtask turn first: the wedge insert runs off the chain's
+      // .then, so `release` is only assigned once the chain head executed.
+      await Promise.resolve();
+      release();
+    }
+
+    await bankLedgerIdle();
+    expect(bankLedgerTailStats().depth).toBe(0);
+    expect(bankLedgerTailStats().rows).toBe(0);
+    expect(insertRowsMock).toHaveBeenCalledTimes(41);
   });
 });
 

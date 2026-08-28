@@ -220,48 +220,83 @@ export function diffBankOp(
 // in order; a rejected insert is caught (logged) and the chain continues.
 let tail: Promise<void> = Promise.resolve();
 
-// The tail's depth bound. Inflow scales with connected-account count (the
-// per-account bucket admits 4 rows/s EACH) while the drain is one serialized
-// insert chain, so a busy realm could otherwise grow the tail without bound
-// until the 10s shutdown drain (BANK_LEDGER_SHUTDOWN_DRAIN_MS) cannot settle
-// and silently abandons the whole backlog. 2,000 pending inserts drains
-// inside that window at a conservative 200 inserts/s, so the cap trades a
-// COUNTED, VISIBLE drop under sustained overload for the silent wholesale
-// drop at shutdown. Depth counts queued insert operations (each 1..N rows);
-// the drop counter sizes holes in ROWS, the audit's own unit.
+// The tail's bound, in TWO units. Inflow scales with connected-account count
+// (the per-account bucket admits 4 rows/s EACH) while the drain is one
+// serialized insert chain, so a busy realm could otherwise grow the tail
+// without bound until the 10s shutdown drain (BANK_LEDGER_SHUTDOWN_DRAIN_MS)
+// cannot settle and silently abandons the whole backlog. A depth cap alone is
+// not an honest bound: depth counts queued insert OPERATIONS, and a batched
+// op (vault_deposit_all) carries up to 112 rows, so 2,000 queued ops could
+// retain ~224,000 row objects and a drain of maximal batches is slower than
+// single-row arithmetic assumes. Hence two caps, and an op is dropped
+// (COUNTED and VISIBLE, never the silent wholesale drop at shutdown) when
+// EITHER would be exceeded:
+//   - depth: 2,000 queued ops drains inside the 10s window at a conservative
+//     200 single-row inserts/s;
+//   - rows: 4,000 queued rows holds even a full-depth tail to an average
+//     batch of 2 rows, which keeps that 200 inserts/s figure conservative
+//     for batched statements and bounds retained row objects. Its backlog
+//     coverage scales INVERSELY with banking concurrency: the only bucket
+//     that refuses is the per-account one (4 rows/s each; the realm bucket
+//     in bank_vault_ledger_guard.ts observes and never refuses, so its 8
+//     rows/s is the breach counter's measurement basis, not an admission
+//     bound), so sustained admissible inflow is banking-accounts x 4 rows/s
+//     and 4,000 rows is 1,000s of backlog for one account but ~10s at 100
+//     concurrently banking accounts. The DELIBERATE trade is that rows
+//     binds the one bulk op far tighter than depth: a realm queueing
+//     112-row vault_deposit_all sweeps starts dropping at ~35 queued
+//     sweeps (4,000 / 112), not 2,000 queued ops, the price of bounding
+//     drain time and retained memory in the audit's own unit.
+// The two caps are asymmetric at admission: depth admits one op of ANY size
+// onto a not-yet-full queue, while rows refuses an op larger than
+// BANK_LEDGER_TAIL_MAX_ROWS outright even on an EMPTY queue. The rows
+// constant therefore carries the precondition that no single legitimate op
+// exceeds it (112, the vault_deposit_all sweep, is today's maximum batch);
+// a future bulk verb bigger than the cap could never be admitted at all.
+// The drop counter sizes holes in ROWS, the audit's own unit.
 export const BANK_LEDGER_TAIL_MAX_DEPTH = 2_000;
+export const BANK_LEDGER_TAIL_MAX_ROWS = 4_000;
 let tailDepth = 0;
+let tailRows = 0;
 let tailDroppedRows = 0;
 const TAIL_DROP_LOG_LIMIT = 5;
 let tailDropLogged = 0;
 
-/** Live depth and lifetime dropped rows of the insert FIFO (ops + metrics). */
-export function bankLedgerTailStats(): { depth: number; droppedRows: number } {
-  return { depth: tailDepth, droppedRows: tailDroppedRows };
+/** Live queued ops (depth) and their queued rows in the insert FIFO, plus
+ *  lifetime rows dropped at either cap (ops + metrics). */
+export function bankLedgerTailStats(): { depth: number; rows: number; droppedRows: number } {
+  return { depth: tailDepth, rows: tailRows, droppedRows: tailDroppedRows };
 }
 
-/** Chain one insert onto the FIFO when the depth cap admits it. Returns false
+/** Restore the cap-drop log budget (test-only). The latch is process-lifetime
+ *  by design, so without this a drop-log assertion depends on how many drops
+ *  SIBLING tests produced first; the drop COUNTER is never reset. */
+export function resetBankLedgerTailDropLogForTests(): void {
+  tailDropLogged = 0;
+}
+
+/** Chain one insert onto the FIFO when BOTH caps admit it. Returns false
  *  on a cap drop (counted here in rows, logged under the shared latch idiom);
  *  the call site then does its own audit-hole accounting, exactly as it would
  *  for a rejected insert, which is deliberately PER SITE: the vault and guild
  *  arms count incidents on a drop because their REJECTED inserts count
  *  incidents, while the personal-bank and socket arms have no incident family
  *  for rejected inserts either, so their drops land in the shared
- *  dropped_rows gauge alone, the same visibility their failures have. onError
- *  must never throw; it is guarded anyway. */
+ *  woc_bank_ledger_tail_dropped_rows_total counter alone, the same visibility
+ *  their failures have. onError must never throw; it is guarded anyway. */
 function enqueueOnTail(
   rowCount: number,
   run: () => Promise<void>,
   onError: (err: unknown) => void,
 ): boolean {
-  if (tailDepth >= BANK_LEDGER_TAIL_MAX_DEPTH) {
+  if (tailDepth >= BANK_LEDGER_TAIL_MAX_DEPTH || tailRows + rowCount > BANK_LEDGER_TAIL_MAX_ROWS) {
     tailDroppedRows += rowCount;
     if (tailDropLogged < TAIL_DROP_LOG_LIMIT) {
       tailDropLogged += 1;
       console.error(
-        `bank_ledger insert FIFO is at its ${BANK_LEDGER_TAIL_MAX_DEPTH}-insert cap: dropped ${rowCount} audit row(s)${
+        `bank_ledger insert FIFO is at a cap (${tailDepth} of ${BANK_LEDGER_TAIL_MAX_DEPTH} ops, ${tailRows} of ${BANK_LEDGER_TAIL_MAX_ROWS} rows queued): dropped ${rowCount} audit row(s)${
           tailDropLogged === TAIL_DROP_LOG_LIMIT
-            ? ' (further drops are counted only, see woc_bank_ledger_tail{measure="dropped_rows"})'
+            ? ' (further drops are counted only, see woc_bank_ledger_tail_dropped_rows_total)'
             : ''
         }`,
       );
@@ -269,6 +304,7 @@ function enqueueOnTail(
     return false;
   }
   tailDepth += 1;
+  tailRows += rowCount;
   tail = tail
     .then(run)
     .catch((err) => {
@@ -280,6 +316,7 @@ function enqueueOnTail(
     })
     .finally(() => {
       tailDepth -= 1;
+      tailRows -= rowCount;
     });
   return true;
 }
