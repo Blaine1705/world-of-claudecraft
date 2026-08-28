@@ -43,11 +43,12 @@ function scrubScalar(target: string): string {
  * (diffuseColor.a is the folded constant 1.0 by the time it runs, from the
  * #ifdef OPAQUE block above), and only ever sees a real, non-constant alpha
  * on a transparent material or one using transmission, where a NaN would
- * poison the destination colour once blended. The outgoingLight (rgb)
- * scrub is skipped under USE_FOG: fog_fragment's own guard (below)
- * re-scrubs gl_FragColor.rgb right after the fog mix, and mix(NaN,
- * fogColor, f) is still NaN, so nothing is lost by not paying for it twice
- * on every fogged material.
+ * poison the destination colour once blended. The outgoingLight (rgb) scrub
+ * is also unconditional: fog_fragment may mix in a finite fog color using a
+ * non-zero fogFactor, and mix(NaN, fogColor, f) is still NaN, so the value
+ * needs to be finite before the opaque write feeds fog_fragment. The
+ * fog_fragment guard below remains necessary for NaNs introduced by fog
+ * inputs themselves.
  */
 export function patchOpaqueFragmentNanGuard(source: string): string {
   if (source.includes(OPAQUE_GUARD_MARKER)) return source;
@@ -57,9 +58,7 @@ export function patchOpaqueFragmentNanGuard(source: string): string {
     source.slice(0, index) +
     `// ${OPAQUE_GUARD_MARKER}\n` +
     scrubScalar('diffuseColor.a') +
-    '#ifndef USE_FOG\n' +
     scrubStatements('outgoingLight') +
-    '#endif\n' +
     source.slice(index)
   );
 }
