@@ -69,11 +69,19 @@ describe('Ignivar raid progression', () => {
     expect(ignivarPreviousRaidRoom(IGNIVAR_SECOND_WING_ID)).toBe(IGNIVAR_RAID_ARENA_ID);
     expect(DUNGEONS[IGNIVAR_FORGE_APPROACH_ID]).toMatchObject({
       id: IGNIVAR_FORGE_APPROACH_ID,
-      overworldDoor: false,
       guideVisible: false,
       interior: 'ignivar_approach',
       suggestedPlayers: 10,
     });
+    // The family's front door stands in the OVERWORLD now: the raid entrance
+    // is the Forgefather keep's facade at the top of the fortress stair
+    // (the old overworldDoor: false hid the approach while the fortress was
+    // unbuilt). Only the approach spawns a door; the inner rooms stay
+    // door-free and are reached through the raid's own progression.
+    expect(DUNGEONS[IGNIVAR_FORGE_APPROACH_ID].overworldDoor).toBeUndefined();
+    expect(DUNGEONS[IGNIVAR_FORGE_APPROACH_ID].doorPos).toMatchObject({ x: 503.05, z: 2243.7 });
+    expect(DUNGEONS[IGNIVAR_RAID_ARENA_ID].overworldDoor).toBe(false);
+    expect(DUNGEONS[IGNIVAR_SECOND_WING_ID].overworldDoor).toBe(false);
     expect(INTERIOR_LAYOUTS.ignivar_approach).toBe(IGNIVAR_FORGE_APPROACH_LAYOUT);
     expect(IGNIVAR_FORGE_APPROACH_LAYOUT.zMin).toBe(-58);
     expect(IGNIVAR_FORGE_APPROACH_LAYOUT.zMax).toBe(58);
@@ -211,7 +219,13 @@ describe('Ignivar raid progression', () => {
     expect(enterDungeon(sim.ctx, IGNIVAR_SECOND_WING_ID, sim.player.id)).toBe(false);
   });
 
-  it('requires a raid group even after a solo dev tester defeats Ignivar', () => {
+  it('lets a solo dev tester walk the raid family end to end (maintainer walk-through)', () => {
+    // The owner-directed contract since the fortress entrance shipped: a
+    // dev-commands sim skips the raid-group refusal (the warning still
+    // fires) so the maintainer can experience the whole walk-through solo.
+    // Live sims never carry devCommands (ALLOW_DEV_COMMANDS is a root
+    // invariant), and the non-dev refusals stay pinned by the foreign-claim
+    // and outside-player cases above.
     const sim = new Sim({ seed: 3411, playerClass: 'warrior', devCommands: true });
     sim.chat(`/dev dungeon ${IGNIVAR_RAID_ARENA_ID} normal`);
     const boss = [...sim.entities.values()].find((entity) => entity.templateId === IGNIVAR_BOSS_ID);
@@ -220,8 +234,8 @@ describe('Ignivar raid progression', () => {
     boss.hp = 0;
     sim.tick();
 
-    expect(enterDungeon(sim.ctx, IGNIVAR_SECOND_WING_ID, sim.player.id)).toBe(false);
-    expect(sim.instanceInfoAt(sim.player.pos)?.dungeonId).toBe(IGNIVAR_RAID_ARENA_ID);
+    expect(enterDungeon(sim.ctx, IGNIVAR_SECOND_WING_ID, sim.player.id)).toBe(true);
+    expect(sim.instanceInfoAt(sim.player.pos)?.dungeonId).toBe(IGNIVAR_SECOND_WING_ID);
   });
 
   it('keeps every claimed raid room alive while the raid occupies any sibling', () => {

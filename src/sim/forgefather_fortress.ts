@@ -316,6 +316,7 @@ export function forgefatherStreetlampSites(): PlacedStreetlamp[] {
     roadYaw: p.ry,
     areaId: 'drakelands',
     style: 'drakelands_brazier',
+    authored: true,
   }));
 }
 
