@@ -22,7 +22,9 @@ describe('Affliction full-BiS five-minute inert-boss balance', () => {
     // Mana-end corridor widened 0.05 -> 0.09 (all three specs) by the 2/4/6
     // lineage retune: the halved haste and Clearcasting rates mean fewer
     // casts fit the five minutes, so more mana survives the window.
-    // Re-anchor with the Phase B Crucible set bonuses.
+    // Re-anchor to the new tier's measured economy when the Phase B Crucible
+    // set bonuses land (a new gear wave sets a new level; no old target to
+    // restore).
     expect(result.manaEndPct).toBeLessThan(0.09);
     expect(result.starvedPct).toBeLessThan(0.45);
   }, 120_000);

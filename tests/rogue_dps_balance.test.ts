@@ -75,9 +75,10 @@ describe('Rogue fight-6498 deterministic DPS bands', () => {
     // the Emberflight Longbow's removal freed Combat's picks, and the Phase A
     // exclusion (unregistered set ids never count as BiS) pulled the
     // bonus-less Crucible set pieces back out, which nudged Subtlety a hair
-    // above Assassination. The Phase B set-bonus pass re-anchors and is
-    // expected to restore Assassination's edge; until then the exact new
-    // ordering is pinned so a real collapse still reds.
+    // above Assassination. The Phase B set-bonus pass re-anchors to the new
+    // tier's measured values (a new gear wave sets a new power level; there
+    // is no old band to restore) and may re-order the siblings; until then
+    // the exact current ordering is pinned so a real collapse still reds.
     expect(first.combat).toBeGreaterThanOrEqual(216);
     expect(first.combat).toBeLessThanOrEqual(232);
     expect(first.assassination).toBeGreaterThanOrEqual(168);
