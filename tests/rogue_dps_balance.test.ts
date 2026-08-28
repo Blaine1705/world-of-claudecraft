@@ -60,14 +60,17 @@ describe('Rogue fight-6498 deterministic DPS bands', () => {
     expect(repeat).toEqual(first);
 
     // Accepted three-seed measurements on this fixture are approximately
-    // 203 Combat, 186 Assassination, and 179 Subtlety. The bounds protect the
-    // player outcome while leaving a small deterministic tuning margin.
-    expect(first.combat).toBeGreaterThanOrEqual(195);
-    expect(first.combat).toBeLessThanOrEqual(205);
-    expect(first.assassination).toBeGreaterThanOrEqual(180);
-    expect(first.assassination).toBeLessThanOrEqual(195);
-    expect(first.subtlety).toBeGreaterThanOrEqual(170);
-    expect(first.subtlety).toBeLessThanOrEqual(185);
+    // 212 Combat, 183 Assassination, and 180 Subtlety, re-anchored when the
+    // dev kits started picking the Crucible ilvl-35 gear (the previous
+    // anchors were 203/186/179 on the ilvl-31/33 kits). The bounds protect
+    // the player outcome while leaving a small deterministic tuning margin;
+    // the raid tier's tuning pass re-anchors them again if the kits move.
+    expect(first.combat).toBeGreaterThanOrEqual(205);
+    expect(first.combat).toBeLessThanOrEqual(220);
+    expect(first.assassination).toBeGreaterThanOrEqual(175);
+    expect(first.assassination).toBeLessThanOrEqual(190);
+    expect(first.subtlety).toBeGreaterThanOrEqual(172);
+    expect(first.subtlety).toBeLessThanOrEqual(188);
     expect(first.combat).toBeGreaterThan(first.assassination);
     expect(first.assassination).toBeGreaterThan(first.subtlety);
   }, 30_000);

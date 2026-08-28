@@ -204,6 +204,11 @@ export interface BoostRole {
   weights: Partial<Record<WeightableStat, number>>;
   /** Melee roles value weapon dps; caster roles value spell power. */
   melee: boolean;
+  /** Healer roles additionally value Healing Power. The flag is explicit
+   *  because the directionality contract runs one way: Spell Power heals
+   *  too, but Healing Power never damages, so a DAMAGE caster must not
+   *  score it or the ilvl-35 healer pieces outbid its own set. */
+  healer?: true;
   /** Tank kits: armor always counts as an identity stat and shield block
    *  value scores, so a sta-first kit never discounts the armor it exists
    *  for (sta is deliberately not in IDENTITY_STATS). */
@@ -238,7 +243,7 @@ export const CLASS_ROLES: Record<PlayerClass, readonly BoostRole[]> = {
     // int/spi weight let the giant heroic healer staff outscore the 2H swords
     // and a retribution paladin spawned holding a resto stick.
     { id: 'retribution', weights: { str: 1, sta: 0.8, agi: 0.2 }, melee: true },
-    { id: 'holy', weights: { int: 1, spi: 0.8, sta: 0.4 }, melee: false },
+    { id: 'holy', weights: { int: 1, spi: 0.8, sta: 0.4 }, melee: false, healer: true },
     {
       id: 'protection',
       weights: { sta: 1, str: 0.5, int: 0.2 },
@@ -250,7 +255,7 @@ export const CLASS_ROLES: Record<PlayerClass, readonly BoostRole[]> = {
   hunter: [{ id: 'marksmanship', weights: { agi: 1, sta: 0.6, int: 0.2 }, melee: true }],
   rogue: [{ id: 'combat', weights: { agi: 1, sta: 0.6, str: 0.4 }, melee: true }],
   priest: [
-    { id: 'holy', weights: { int: 1, spi: 0.8, sta: 0.4 }, melee: false },
+    { id: 'holy', weights: { int: 1, spi: 0.8, sta: 0.4 }, melee: false, healer: true },
     // The heroic/raid cloth pool differentiates healer (spi-heavy) from
     // shadow (sta/int) pieces, so shadow earns its own bagged kit (the old
     // single-kit tripwire fired the moment the heroic pool opened).
@@ -291,7 +296,7 @@ export function roleItemScore(role: BoostRole, item: ItemDef): number {
   for (const stat of IDENTITY_STATS) {
     identity += (item.stats?.[stat] ?? 0) * (role.weights[stat] ?? 0);
   }
-  if (!role.melee) identity += item.spellPower ?? 0;
+  if (!role.melee) identity += (item.spellPower ?? 0) + (role.healer ? (item.healPower ?? 0) : 0);
   // Tanks exist for armor: it is their identity stat, never a dead stat.
   if (role.tank) identity += item.stats?.armor ?? 0;
   score +=
@@ -300,7 +305,9 @@ export function roleItemScore(role: BoostRole, item: ItemDef): number {
     const dps = (item.weapon.min + item.weapon.max) / 2 / item.weapon.speed;
     score += dps * (role.melee ? MELEE_DPS_WEIGHT : CASTER_DPS_WEIGHT);
   }
-  if (!role.melee) score += (item.spellPower ?? 0) * SPELL_POWER_WEIGHT;
+  if (!role.melee)
+    score +=
+      ((item.spellPower ?? 0) + (role.healer ? (item.healPower ?? 0) : 0)) * SPELL_POWER_WEIGHT;
   if (role.tank && isShieldItem(item)) score += (item.blockValue ?? 0) * BLOCK_VALUE_WEIGHT;
   score += ((item.critRating ?? 0) + (item.hasteRating ?? 0)) * RATING_WEIGHT;
   return score;
@@ -493,7 +500,10 @@ export const NYTHRAXIS_ATTUNEMENT_QUESTS: readonly string[] = [
  *  whole PvE ladder incl. heroic/raid/rift gear, riding trained. v3: ret
  *  paladin weights go pure physical (the heroic healer staff outscored the
  *  2H swords through the old int/spi weights). */
-export const BOOST_KIT_VERSION = 3;
+// v4: the Crucible ilvl-35 tier entered the BiS pool and healer roles now
+// score Healing Power, so every kit's contents changed; the bump re-kits
+// existing PBE accounts on their next join.
+export const BOOST_KIT_VERSION = 4;
 
 /**
  * Bring one live player up to the current boost kit: level 20, four

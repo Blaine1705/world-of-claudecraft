@@ -3201,7 +3201,10 @@ export const IGNIVAR_WEAPON_ITEMS: Record<string, ItemDef> = {
     hasteRating: 30,
     sellValue: 16000,
     soulbound: true,
-    requiredClass: ['warrior', 'rogue', 'hunter', 'shaman', 'paladin'],
+    // No rogue: the equipment boundary hard-blocks rogues from two-handers,
+    // and requiredClass must list exactly who canEquipItem admits
+    // (tests/equipment_proficiency.test.ts).
+    requiredClass: ['warrior', 'hunter', 'shaman', 'paladin'],
   },
   emberflight_longbow: {
     id: 'emberflight_longbow',
