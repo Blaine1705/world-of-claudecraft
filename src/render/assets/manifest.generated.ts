@@ -671,6 +671,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/dungeon/ignivar_prop_curved_wall.glb": "/media/models/dungeon/ignivar_prop_curved_wall.01cb351fb462.glb",
   "models/dungeon/ignivar_prop_dragon_head.glb": "/media/models/dungeon/ignivar_prop_dragon_head.ca7d3707a886.glb",
   "models/dungeon/ignivar_prop_dragon_pillar.glb": "/media/models/dungeon/ignivar_prop_dragon_pillar.7252a5877bd0.glb",
+  "models/dungeon/ignivar_prop_dungeon_entrance.glb": "/media/models/dungeon/ignivar_prop_dungeon_entrance.89e4cf003b92.glb",
   "models/dungeon/ignivar_prop_firepit.glb": "/media/models/dungeon/ignivar_prop_firepit.b46d502ed9f3.glb",
   "models/dungeon/ignivar_prop_forge.glb": "/media/models/dungeon/ignivar_prop_forge.19bdbd00ff4c.glb",
   "models/dungeon/ignivar_prop_fortress_wall.glb": "/media/models/dungeon/ignivar_prop_fortress_wall.aa1b3c83450a.glb",

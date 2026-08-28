@@ -209,6 +209,7 @@ export const FORGEFATHER_FORTRESS_PLACEMENTS: readonly IgnivarPropPlacement[] = 
   { key: 'chain_hanging', x: 501.6, y: 2.6, z: 2192.5, ry: 90 * DEG, scale: 8 },
   { key: 'tower_pillar', x: 493.9, y: -3.5, z: 2195.5, ry: 45 * DEG, scale: 5 },
   { key: 'street_lamp', x: 493.7, y: -2.6, z: 2195.6, ry: 180 * DEG, scale: 1 },
+  { key: 'dungeon_entrance', x: 502.9, y: 17.7, z: 2244.7, ry: 180 * DEG, scale: 10 },
 ];
 
 /** How far above the local ground a piece's base may sit and still count as

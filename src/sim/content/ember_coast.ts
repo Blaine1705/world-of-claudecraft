@@ -10,6 +10,21 @@ import type { HeightStamp } from '../types';
 // into the desert body, then a broad volcanic belt spanning the far north
 // (the Drakemaw range doubles as the sealed wall's footing where it meets
 // land; over the flanks the range simply runs into the sea).
+// The isle's own land lobes, named so the ground-colour override below and
+// the land-lobe table share ONE set of discs (a by-value copy drifted the
+// moment either table moved).
+const FORGEFATHER_ISLE_LOBES = [
+  { x: 512, z: 2220, r: 32 }, // the isle's body, grown grand
+  { x: 509, z: 2250, r: 21 }, // ...its north shoulder (the summit's footing,
+  // wide enough that the high tiers' rims run out on dry ground)
+  { x: 514, z: 2192, r: 16 }, // ...its south shoulder (the south strand)
+  { x: 524, z: 2216, r: 12 }, // ...the east beach ramp (bank gradient)
+  { x: 520, z: 2240, r: 12 }, // ...the northeast beach ramp (bank gradient)
+  { x: 500, z: 2210, r: 15 }, // ...the west shoulder, stretched so the
+  // bridgehead beach climbs gently out of the strait (bank gradient)
+  { x: 498, z: 2232, r: 12 }, // ...the northwest beach ramp (bank gradient)
+] as const;
+
 export const EMBER_LAND_LOBES = [
   { x: 404, z: 1825, r: 40 }, // the causeway landing, fused across the border
   { x: 404, z: 1858, r: 52 }, // the Wyrmgate shore and Wyrmwatch
@@ -46,17 +61,32 @@ export const EMBER_LAND_LOBES = [
   // Trollmoot coast (high x renders WEST on the world map), a terraced
   // volcanic islet the owner's bridge asset will span from the mainland
   // (docs/design/ignivar-entrance/plan.md). The fortress tier plateaus
-  // are stamped by FORGEFATHER_ISLE_TERRAIN_EDITS below.
-  { x: 512, z: 2220, r: 32 }, // the isle's body, grown grand
-  { x: 509, z: 2250, r: 21 }, // ...its north shoulder (the summit's footing,
-  // wide enough that the high tiers' rims run out on dry ground)
-  { x: 514, z: 2192, r: 16 }, // ...its south shoulder (the south strand)
-  { x: 524, z: 2216, r: 12 }, // ...the east beach ramp (bank gradient)
-  { x: 520, z: 2240, r: 12 }, // ...the northeast beach ramp (bank gradient)
-  { x: 500, z: 2210, r: 15 }, // ...the west shoulder, stretched so the
-  // bridgehead beach climbs gently out of the strait (bank gradient)
-  { x: 498, z: 2232, r: 12 }, // ...the northwest beach ramp (bank gradient)
+  // are stamped by FORGEFATHER_ISLE_TERRAIN_EDITS below; the isle rows
+  // live in FORGEFATHER_ISLE_LOBES (above) because the ground-colour
+  // override reuses the same discs.
+  ...FORGEFATHER_ISLE_LOBES,
 ] as const;
+// The isle's ground-colour override rides the SAME discs as its land lobes:
+// the isle is bare volcanic rock, never desert sand, so the fortress reads
+// against dark ground and the street lamps' night wash (which multiplies
+// against albedo) dims with it. All three colour tiers (near splat mesh,
+// far vista, map plate) consult this ONE weight so the isle cannot be rock
+// in the world and gold on the map.
+const ISLE_ROCK_DISCS = FORGEFATHER_ISLE_LOBES;
+const ISLE_ROCK_FEATHER = 6;
+
+/** 1 on the Forgefather's Isle proper, feathering to 0 a few yards past the
+ *  lobe rims (the strait keeps the mainland's sand untouched). */
+export function forgefatherIsleRockWeight(x: number, z: number): number {
+  if (x < 476 || x > 544 || z < 2168 || z > 2280) return 0;
+  let w = 0;
+  for (const d of ISLE_ROCK_DISCS) {
+    const t = 1 - (Math.hypot(x - d.x, z - d.z) - d.r) / ISLE_ROCK_FEATHER;
+    if (t > w) w = t;
+  }
+  return w < 0 ? 0 : w > 1 ? 1 : w;
+}
+
 export const EMBER_BAYS = [
   { x: 195, z: 1980, r: 50 }, // the west bight
   // the east reach, drawn north of its old eye so its suppression frees
@@ -341,13 +371,25 @@ export const FORGEFATHER_ISLE_TERRAIN_EDITS: HeightStamp[] = [
   // bank up onto the summit flat with no step past the terrain-wall gate,
   // because the movement kernel reads the raw heightfield even while the
   // body stands on the landing platform above it.
-  // (Held well under the keep landing and the door arch: the raid portal
-  // is translucent, and ground cresting behind it read as a pale wedge
-  // inside the doorway. Everything past the door is inside the keep
-  // drum's collider, so nothing walks this ground.)
-  { x: 503.05, z: 2245.1, radius: 2.4, delta: 18.2, falloff: 'smooth', mode: 'level' },
-  { x: 503.1, z: 2246.2, radius: 2.8, delta: 18.3, falloff: 'smooth', mode: 'level' },
-  { x: 503.1, z: 2247.8, radius: 2.8, delta: 18.5, falloff: 'smooth', mode: 'level' },
+  // (Levelled to the owner's dungeon_entrance facade base, y 17.7: ground
+  // above the facade base read as a gold mound inside the open archway.
+  // Everything past the door is inside the keep drum's collider, so
+  // nothing walks this ground, and the walkers on the landing above ride
+  // the lift a full carry clearance over it.)
+  { x: 503.05, z: 2245.1, radius: 2.4, delta: 17.7, falloff: 'smooth', mode: 'level' },
+  { x: 503.1, z: 2246.2, radius: 2.8, delta: 17.7, falloff: 'smooth', mode: 'level' },
+  { x: 503.1, z: 2247.8, radius: 2.8, delta: 17.7, falloff: 'smooth', mode: 'level' },
+  // The keep flight's under-tread pit (owner request): the staircase model
+  // has open risers, and raw ground riding only 0.7yd under the tread line
+  // showed through the gaps as torch-lit bumps. Each disc levels the bank
+  // about 1.5yd under its stretch of the flight line, deep enough to read
+  // as shadow; walkers ride the FORGEFATHER_STAIR_RAMPS lift the whole
+  // way, so a deeper bank only widens their carry clearance.
+  { x: 503.05, z: 2239.2, radius: 2.9, delta: 14.2, falloff: 'smooth', mode: 'level' },
+  { x: 503.05, z: 2240.4, radius: 2.9, delta: 15.0, falloff: 'smooth', mode: 'level' },
+  { x: 503.05, z: 2241.6, radius: 2.9, delta: 15.8, falloff: 'smooth', mode: 'level' },
+  { x: 503.05, z: 2242.8, radius: 2.9, delta: 16.6, falloff: 'smooth', mode: 'level' },
+  { x: 503.05, z: 2243.9, radius: 2.7, delta: 17.3, falloff: 'smooth', mode: 'level' },
   // Stuck-pocket escapes (found by the movement flood scan): the middle
   // court's north-wall strip and the alley between the summit flank and
   // the sea-ring wall each get a walkable way back out. (The old gate
