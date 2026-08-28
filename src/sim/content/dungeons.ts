@@ -1194,6 +1194,13 @@ const IGNIVAR_INNER_CRUCIBLE_SPAWN_LIST: DungeonSpawn[] = [
   { mobId: VARKHUL_BOSS_ID, x: 0, z: 16, facing: 0 },
 ];
 
+// The Ignivar raid family's shared overworld door on the Eastbrook market
+// block: the forge approach's walk-up testing entrance, and the point players
+// are set down beside when leaving ANY raid room (detachFromDungeon reads the
+// left room's own doorPos). The raid's public front door, a Drakelands gate,
+// is still to be authored: docs/design/ignivar-entrance/plan.md.
+const IGNIVAR_EASTBROOK_DOOR_POS = { x: -24, z: -114 };
+
 export const DUNGEON_DEFS: Record<string, DungeonDef> = {
   hollow_crypt: {
     id: 'hollow_crypt',
@@ -1385,8 +1392,9 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     id: IGNIVAR_FORGE_APPROACH_ID,
     name: 'Halls of the First Tempering',
     index: 10,
-    doorPos: { x: 0, z: 0 },
-    overworldDoor: false,
+    // Walk-up testing entrance: the raid family's front room takes the shared
+    // Eastbrook door so raid groups can zone in without /dev commands.
+    doorPos: IGNIVAR_EASTBROOK_DOOR_POS,
     guideVisible: false,
     entry: { x: 0, z: -50 },
     exitOffset: { x: 0, z: -54 },
@@ -1436,8 +1444,9 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     id: IGNIVAR_RAID_ARENA_ID,
     name: 'Crucible of the Last Spring',
     index: 11,
-    // Development-only entrance until the raid's progression hook is authored.
-    doorPos: { x: 0, z: 0 },
+    // Internal raid room reached through the Herald gate in the approach;
+    // doorPos is only where leaving drops players, beside the Eastbrook door.
+    doorPos: IGNIVAR_EASTBROOK_DOOR_POS,
     overworldDoor: false,
     guideVisible: false,
     entry: { x: 0, z: -27 },
@@ -1478,8 +1487,9 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     id: IGNIVAR_MOLTEN_ASSEMBLY_ID,
     name: 'Molten Assembly',
     index: 13,
-    // Internal raid route reached only through the gate behind Ignivar.
-    doorPos: { x: 0, z: 0 },
+    // Internal raid route reached only through the gate behind Ignivar;
+    // doorPos is only where leaving drops players, beside the Eastbrook door.
+    doorPos: IGNIVAR_EASTBROOK_DOOR_POS,
     overworldDoor: false,
     guideVisible: false,
     entry: { x: 0, z: -50 },
@@ -1507,8 +1517,9 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     id: IGNIVAR_SECOND_WING_ID,
     name: 'The Inner Crucible',
     index: 12,
-    // Internal raid wing reached only through the Molten Assembly gate.
-    doorPos: { x: 0, z: 0 },
+    // Internal raid wing reached only through the Molten Assembly gate;
+    // doorPos is only where leaving drops players, beside the Eastbrook door.
+    doorPos: IGNIVAR_EASTBROOK_DOOR_POS,
     overworldDoor: false,
     guideVisible: false,
     entry: { x: 0, z: -34 },
