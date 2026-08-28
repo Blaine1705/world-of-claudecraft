@@ -296,6 +296,16 @@ export function storagePurchaseSchema(schemaName = 'public'): string {
   }
   const schema = `"${schemaName}"`;
   return `
+-- Capture the caller's IN-FLIGHT search_path (session default or the caller's
+-- own SET LOCAL, whichever is live) before this fragment's SET LOCAL below.
+-- The closing restore at the end of the fragment replays exactly this value,
+-- so the fragment is transparent to the rest of the enclosing transaction.
+-- Transaction-scoped (is_local = true): nothing here outlives COMMIT.
+SELECT set_config(
+  'woc.storage_purchase_prior_search_path',
+  current_setting('search_path'),
+  true
+);
 SET LOCAL search_path = "__woc_storage_purchase_schema__", pg_catalog, pg_temp;
 
 CREATE TABLE IF NOT EXISTS storage_purchases (
@@ -731,14 +741,27 @@ BEGIN
 END;
 $storage_purchase_trigger_guard$;
 
--- SET LOCAL lasts until COMMIT, not statement end. TO DEFAULT does NOT restore
--- the prior in-transaction value: it resets to the SESSION default (the
--- role/database-configured search_path). That is correct here only because of
--- a precondition this fragment relies on: the boot client never sets a
--- transaction-scoped search_path before running it, so the session default IS
--- the prior value. A caller that had its own SET LOCAL search_path in flight
--- would lose it at this line.
-SET LOCAL search_path TO DEFAULT;
+-- SET LOCAL lasts until COMMIT, not statement end, so the fragment must put
+-- back whatever search_path the caller had in effect when it began. TO DEFAULT
+-- cannot do that (it resets to the SESSION default, dropping a caller's own
+-- in-flight SET LOCAL), so the restore replays the value the fragment's first
+-- statement captured. The transparency holds when the whole fragment runs in
+-- one transaction with no intervening savepoint rollback: a rollback to a
+-- savepoint taken before the capture DISCARDS it, after which current_setting
+-- answers EMPTY STRING (or NULL / 42704 when never registered), and an
+-- unguarded replay would silently SET search_path to empty. The replay
+-- therefore reads with missing_ok and falls back to the session default (the
+-- old TO DEFAULT behavior) when the capture is gone. Proven by the restore
+-- and discarded-capture tests in tests/server/storage_purchase_db.pg.test.ts.
+-- Transaction-scoped again, so nothing leaks past COMMIT.
+SELECT set_config(
+  'search_path',
+  COALESCE(
+    NULLIF(current_setting('woc.storage_purchase_prior_search_path', true), ''),
+    (SELECT reset_val FROM pg_settings WHERE name = 'search_path')
+  ),
+  true
+);
 `.replaceAll('"__woc_storage_purchase_schema__"', schema);
 }
 

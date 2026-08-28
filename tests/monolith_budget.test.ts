@@ -539,15 +539,14 @@ const MONOLITHS: MonolithRow[] = [
     // BANK_LEDGER_BATCH_RECEIPTS_VALIDATE_SQL lives with its schema in
     // bank_ledger_batch_db.ts; the readback SQL moved beside its builder in
     // bank_ledger_growth_budget.ts); what remains here is coordinator wiring
-    // none of those can own: the boot client's RAISE NOTICE forward, the
-    // readback issue-and-warn before COMMIT, the post-listen VALIDATE call in
-    // the concurrent-index runner, and the delete call-site handing the
-    // dedicated canceller (plus the typeof guard that keeps the notice
-    // forward tolerant of minimal test fakes, the pool.on idiom, and the
-    // notice filter that drops the ~400 duplicate-object skip codes so the
-    // one real report is readable). The raise is this PR's REQUEST, not a
-    // settled ruling: merging is what ratifies it. Exact count, zero slack.
-    ceiling: 4960,
+    // none of those can own: the readback issue-and-warn before COMMIT, the
+    // post-listen VALIDATE call in the concurrent-index runner, and the
+    // delete call-site handing the dedicated canceller. Lowered -1 at the
+    // fourth-round fixes: the notice filter moved to schema_notices.ts (both
+    // boot clients now attach the shared forwarder) and the connection-budget
+    // arithmetic to db_connection_budget.ts, paying for the VALIDATE's
+    // post-unlock restructure in place. Exact count, zero slack.
+    ceiling: 4959,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {

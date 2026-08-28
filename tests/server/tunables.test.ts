@@ -954,22 +954,37 @@ describe('no consolidated tunable literal is duplicated at a call site', () => {
     // -> configuredRealmCount derivation stays pinned end to end: the env
     // literal must still feed the directory parser where it now lives.
     expect(codeOnly(read('server/realm.ts'))).toContain('parseRealms(process.env.REALMS)');
-    const warnStart = dbCode.indexOf(
-      'if (configuredSteadyConnections > DB_POOL_MAX_CLIENTS_CEILING)',
-    );
+    // The warn itself now consumes the pure core in db_connection_budget.ts
+    // (its behavior, including the seven-realm cancel-peak arithmetic from
+    // DEPLOY.md, is pinned in tests/server/db_connection_budget.test.ts);
+    // here pin that db.ts actually wires the core to the parsed realm count,
+    // the live pool size, and the parser's ceiling, and warns on its verdict.
+    const warnStart = dbCode.indexOf('const budgetWarning = dbConnectionBudgetWarning(');
     expect(warnStart).toBeGreaterThan(-1);
-    const warnBranch = dbCode.slice(warnStart, dbCode.indexOf('\n}', warnStart));
-    expect(warnBranch).toContain('console.warn(');
-    // biome-ignore lint/suspicious/noTemplateCurlyInString: pins the UNEVALUATED token in raw source
-    expect(warnBranch).toContain('${configuredRealmCount}');
+    // Slice to the next top-level declaration, not a fixed width: a fixed
+    // window drifts as the call grows (pushing the console.warn out of it) or
+    // reaches into unrelated code, either way changing what the pins below
+    // actually see. The next `export const` after the warning pair is the
+    // statement boundary that follows the whole wired region.
+    const warnEnd = dbCode.indexOf('\nexport const', warnStart);
+    expect(warnEnd).toBeGreaterThan(warnStart);
+    const warnBranch = dbCode.slice(warnStart, warnEnd);
+    // Argument ORDER pinned too: (realmCount, poolMaxClients, ceiling) are all
+    // numbers, so a swapped call type-checks and warns on nonsense arithmetic.
+    expect(warnBranch).toMatch(
+      /dbConnectionBudgetWarning\(\s*configuredRealmCount,\s*DB_POOL_MAX_CLIENTS,\s*DB_POOL_MAX_CLIENTS_CEILING,?\s*\)/,
+    );
+    expect(warnBranch).toContain('if (budgetWarning !== null) console.warn(budgetWarning)');
+    // The per-realm term lives in the pure core and must count all FOUR
+    // pools: the shared pool plus the quota, listener, and deadline-cancel
+    // constants their owner modules export.
+    const budgetCode = codeOnly(read('server/db_connection_budget.ts'));
+    expect(budgetCode).toMatch(
+      /realmCount\s*\*[\s\S]*poolMaxClients[\s\S]*GENERAL_CHAT_QUOTA_DB_POOL_MAX_CLIENTS[\s\S]*GENERAL_CHAT_QUOTA_LISTENER_CONNECTIONS[\s\S]*DB_CANCEL_POOL_MAX_CLIENTS/,
+    );
     // The threshold IS the parser's accepted ceiling (one constant, so the two
     // can never drift), pinned here to its literal value, and to the default
     // beside it: the derivation plus the number, the trap this file exists for.
-    expect(dbCode).toContain('GENERAL_CHAT_QUOTA_DB_POOL_MAX_CLIENTS');
-    expect(dbCode).toContain('GENERAL_CHAT_QUOTA_LISTENER_CONNECTIONS');
-    expect(dbCode).toMatch(
-      /configuredSteadyConnections\s*=\s*configuredRealmCount\s*\*[\s\S]*DB_POOL_MAX_CLIENTS[\s\S]*GENERAL_CHAT_QUOTA_DB_POOL_MAX_CLIENTS[\s\S]*GENERAL_CHAT_QUOTA_LISTENER_CONNECTIONS/,
-    );
     expect(dbCode).toContain('const DB_POOL_MAX_CLIENTS_CEILING = 97;');
     expect(dbCode).toContain('const DB_POOL_MAX_CLIENTS_DEFAULT = 10;');
     // No re-inlined ceiling anywhere in the module (the parser bound and the

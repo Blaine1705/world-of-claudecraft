@@ -55,9 +55,9 @@ CREATE INDEX IF NOT EXISTS bank_ledger_batch_receipts_account
 -- never pays a full-table validation scan of this keep-forever table (a
 -- constant edit or a pg_get_constraintdef rendering change would otherwise
 -- re-fire it as an unbounded ACCESS EXCLUSIVE scan at boot). The existing
--- rows are validated out of boot, post-listen, by
--- BANK_LEDGER_BATCH_RECEIPTS_VALIDATE_SQL (db.ts runs it beside the
--- concurrent index builds; loud and non-fatal there, retried next boot).
+-- rows are validated out of boot, post-listen, INSIDE the same session
+-- advisory lock the concurrent index builds hold, bounded and self-caught
+-- (validateBankLedgerBatchReceiptsKeyShape below; db.ts wires it).
 DO $bank_ledger_batch_receipts_key_shape_converge$
 DECLARE
   key_shape_ready boolean;
@@ -93,10 +93,10 @@ $bank_ledger_batch_receipts_key_shape_converge$;
  * The out-of-boot half of the key-shape converge above: validate a NOT VALID
  * key-shape constraint against the existing rows. VALIDATE takes only SHARE
  * UPDATE EXCLUSIVE, so live inserts keep flowing while the keep-forever table
- * is scanned. Run post-listen beside the concurrent index builds
- * (runConcurrentIndexMigrations), where failure is loud, non-fatal, and
- * retried on the next boot; a validation failure means rows violating the
- * CURRENT key shape exist and an operator must reconcile them.
+ * is scanned. Run post-listen (runConcurrentIndexMigrations), INSIDE the
+ * session advisory lock the concurrent index builds hold, through the
+ * bounded, failure-swallowing helper below; a validation failure means rows
+ * violating the CURRENT key shape exist and an operator must reconcile them.
  */
 export const BANK_LEDGER_BATCH_RECEIPTS_VALIDATE_SQL = `
 DO $bank_ledger_batch_receipts_key_shape_validate$
@@ -113,6 +113,68 @@ BEGIN
 END;
 $bank_ledger_batch_receipts_key_shape_validate$;
 `;
+
+/**
+ * Bounded allowance for the VALIDATE scan, armed with SET LOCAL inside the
+ * helper's own transaction. Sizing evidence, and be honest about cache state:
+ * the timed measurements are WARM (about 0.5 to 0.7s per 2,000,000 receipt
+ * rows, about 3.4s warm at the bank_ledger hard ceiling's cardinality of
+ * 10,000,000 rows, an upper bound on receipts since every receipt covers at
+ * least one ledger row), while a COLD scan on the shared 4-vCPU production
+ * box is tens of seconds. statement_timeout also counts LOCK WAIT, not just
+ * the scan. 60s is therefore headroom over the cold case, not 20x over the
+ * warm one; a wedged scan still dies instead of camping the dedicated boot
+ * client for good.
+ */
+export const BANK_LEDGER_BATCH_RECEIPTS_VALIDATE_TIMEOUT_MS = 60_000;
+
+/**
+ * Lock-wait bound for the VALIDATE transaction. The schema advisory lock
+ * already serializes boots, so nothing conflicting should hold the table; a
+ * short bound turns a surprise holder into a fast next-boot retry instead of
+ * spending the whole statement allowance waiting.
+ */
+export const BANK_LEDGER_BATCH_RECEIPTS_VALIDATE_LOCK_TIMEOUT_MS = 5_000;
+
+/**
+ * Issue the VALIDATE fragment on a dedicated (non-pool) boot client, INSIDE
+ * the post-listen session advisory lock (runConcurrentIndexMigrations). The
+ * in-lock placement is load-bearing: run after the unlock, a concurrently
+ * booting realm would acquire the lock, run its boot DDL (whose ADD COLUMN
+ * IF NOT EXISTS and CREATE INDEX IF NOT EXISTS take ACCESS EXCLUSIVE and
+ * SHARE locks even when skipping, and SHARE conflicts with VALIDATE's SHARE
+ * UPDATE EXCLUSIVE), and then block MID-DDL behind this scan while holding
+ * ACCESS EXCLUSIVE on characters/accounts/auth_tokens at statement_timeout
+ * 0, freezing every login and save for up to the scan bound. Held inside
+ * the lock, that realm waits at pg_advisory_lock holding NOTHING. The scan
+ * runs in its own transaction with SET LOCAL bounds, so the exported helper
+ * can never leave a 60s session setting on a future pooled caller, and is
+ * self-caught: a failed VALIDATE rolls back, reports loudly, and resolves
+ * false, leaving the constraint NOT VALID (new writes still enforce) for
+ * the next boot to retry. A 23514 failure is the operator signal that
+ * surviving rows violate the CURRENT key shape.
+ */
+export async function validateBankLedgerBatchReceiptsKeyShape(
+  client: BankLedgerBatchQueryable,
+): Promise<boolean> {
+  try {
+    await client.query('BEGIN');
+    await client.query(
+      `SET LOCAL statement_timeout = ${BANK_LEDGER_BATCH_RECEIPTS_VALIDATE_TIMEOUT_MS}; ` +
+        `SET LOCAL lock_timeout = ${BANK_LEDGER_BATCH_RECEIPTS_VALIDATE_LOCK_TIMEOUT_MS}`,
+    );
+    await client.query(BANK_LEDGER_BATCH_RECEIPTS_VALIDATE_SQL);
+    await client.query('COMMIT');
+    return true;
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    console.error(
+      'bank_ledger_batch_receipts key-shape VALIDATE failed; the constraint stays NOT VALID (new writes still enforce) and the next boot retries:',
+      err,
+    );
+    return false;
+  }
+}
 
 export interface BankLedgerBatchOwner {
   readonly realm: string;

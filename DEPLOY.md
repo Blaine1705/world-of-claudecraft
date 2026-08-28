@@ -273,7 +273,19 @@ For off-box safety, sync the directory to S3 occasionally:
   character holding a pending storage purchase becomes UNDELETABLE: the 55006
   delete guard still fires, the old deleteCharacter has no handler for it, and no
   old-binary path can resolve the pending row. The remedy is a hand
-  `DELETE FROM storage_purchases` for that character's pending row. Any FUTURE
+  `DELETE FROM storage_purchases` for that character's pending row. One more
+  wrinkle on the schema side, split by where the rollback lands. Rolling back
+  to any SHIPPED release is harmless here: no shipped binary carries the
+  receipts fragment at all (`bank_ledger_batch_receipts` is new in this
+  release), so the old binary never touches the key-shape constraint and
+  simply leaves it behind as-is; a NOT VALID survivor still enforces new
+  writes, and the next new-binary boot resumes its post-listen VALIDATE
+  (bounded, inside the concurrent-index session advisory lock, where a
+  concurrently booting realm waits holding nothing). Only a build cut from
+  THIS branch before the fix re-applies the pre-fix receipts fragment, whose
+  converge re-adds the constraint VALIDATED: that re-fires the full scan of
+  the keep-forever table inside the boot transaction, under the boot advisory
+  lock, and a shape-violating row aborts that boot outright. Any FUTURE
   release that LENGTHENS the bank
   expansion or vault upgrade table joins the professions cap-raise class: the old
   binary clamps the raised value on load and persists the loss, so that release
@@ -644,7 +656,25 @@ For off-box safety, sync the directory to S3 occasionally:
   higher than a live `count(*)` of `bank_ledger`. The measure label was RENAMED
   this release: any dashboard or alert keying `observed_committed_rows` must
   move to `lifetime_inserted_rows` with this deploy (the old series stops
-  being exported).
+  being exported). The per-process bank-ledger FIFO drop total moved the same
+  way: `woc_bank_ledger_tail{measure="dropped_rows"}` is no longer exported,
+  so an existing any-increase alert on that arm goes silently to no-data;
+  point it at the `woc_bank_ledger_tail_dropped_rows_total` counter and alert
+  on `increase()`, which also reads correctly across realm restarts (the old
+  gauge arm did not). `woc_bank_ledger_tail` keeps only the instantaneous
+  `depth` and `rows` occupancy arms.
+  Character deletes carry their own bound on top of the realm-wide background
+  gate: at most 2 concurrent (`CHARACTER_DELETE_PERMIT_SUB_CAP`), exported as
+  `woc_character_delete_gate` (a measure-labeled sibling of
+  `woc_background_db_gate`) plus the `woc_character_delete_busy_total`
+  counter. A delete stampede parks at the sub-gate BEFORE the realm gate, so
+  read it here: `waiting` above 0 with `in_flight` pinned at the cap means
+  players are queuing to delete (the realm gate's own waiting gauge
+  structurally cannot see this); sustained
+  `increase(woc_character_delete_busy_total)` means players are receiving
+  `delete_busy` 503s; `in_flight` stuck at the cap with no delete traffic is a
+  leaked sub slot. Client-gone abandonments (a player closing the tab
+  mid-wait) count in neither series.
 - **Discord bot series (Grafana)**: the bot reports its rate-limit governor
   counters on the presence push it already sends, so `/metrics` carries them with
   no extra scrape target and no bot-side endpoint. Cumulative counters
@@ -821,7 +851,7 @@ For off-box safety, sync the directory to S3 occasionally:
   arithmetic in view. Every realm sharing one `DATABASE_URL` has the main pool plus a
   two-client general-chat quota pool and one dedicated quota `LISTEN` client, so steady
   state is `realms x (DB_POOL_MAX_CLIENTS + 2 + 1)`. Each realm also carries a max-1
-  deadline-cancel side pool (`woc_db_backend_cancels` counts its use) that opens a
+  deadline-cancel side pool (`woc_db_backend_cancel_requests_total` counts its use) that opens a
   connection only in the seconds after a transaction wall deadline fires and releases
   it on the driver's idle timeout; count it as one more TRANSIENT connection per realm
   under load, alongside the boot clients below, and re-derive the peak with it: at
@@ -830,15 +860,19 @@ For off-box safety, sync the directory to S3 occasionally:
   fits with full peak headroom. The cancel connection is demanded exactly when
   Postgres is most contended; at `max_connections` the checkout is refused inside
   its 500ms bound and the cancel is dropped (best-effort by contract, the
-  caller-installed statement timeout stays the backstop), with
-  `woc_db_backend_cancels{measure="failed"}` as the signal. That total must stay below the 97
+  caller-installed statement timeout stays the backstop), with a rising
+  `woc_db_backend_cancel_failures_total` rate as the signal (both cancel series are
+  counters, so alert on `increase()`, which reads correctly across realm
+  restarts). That total must stay below the 97
   usable connections on stock `postgres:16` (`max_connections` 100, 3
   superuser-reserved) with room left for tooling. Eight realms at the default are
   already 104 steady connections and cannot fit. Boot temporarily adds a dedicated
   schema client and a concurrent-index client for each starting realm; rolling deploys
   can overlap both old and new process budgets. Size for those peaks, not only steady
-  state. The boot log warns when the configured steady multiplication alone breaks the
-  stock budget.
+  state. The boot log warns when the configured cancel-peak multiplication (realms x
+  (shared + quota + listener + deadline-cancel), the same arithmetic as above) breaks
+  the stock budget; the boot clients and rolling-restart overlap still ride on top of
+  what it counts.
 - **`BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS`: database-wide lifetime ceiling.** The
   default is 10,000,000 rows for the keep-forever anti-dupe ledger. First deployment
   seeds an exact `COUNT(*)` while inserts are locked; PostgreSQL then accounts every

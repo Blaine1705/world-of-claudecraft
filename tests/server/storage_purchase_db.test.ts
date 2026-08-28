@@ -79,35 +79,57 @@ function dataCalls(calls: Captured[]): Captured[] {
 }
 
 const count = (haystack: string, needle: string): number => haystack.split(needle).length - 1;
+// SQL comments are stripped before every source match (the
+// tests/vault_craft_gate.test.ts idiom): a /* */ wrap or a -- line carrying
+// the pinned text must never keep a pin green while the statement is dead
+// (wrapping the search_path capture in a block comment did exactly that
+// against the raw fold).
+const codeOnly = (sql: string): string =>
+  sql.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/--[^\n]*/g, '');
 const CLAIM_TOKEN = '00000000-0000-4000-8000-000000000001';
 
 describe('the DDL', () => {
   it('creates operational rows plus deletion-proof applied receipts', () => {
-    const folded = STORAGE_PURCHASE_SCHEMA.replace(/\s+/g, ' ');
+    const code = codeOnly(STORAGE_PURCHASE_SCHEMA);
+    const folded = code.replace(/\s+/g, ' ');
     expect(folded).toContain('SET LOCAL search_path = "public", pg_catalog, pg_temp;');
     expect(count(folded, 'SET search_path = pg_catalog, "public", pg_temp')).toBe(3);
-    // SET LOCAL survives to COMMIT, not statement end: the fragment must END
-    // by restoring the session default so the rest of the boot transaction
-    // (ensureSchema runs later fragments on the same client) is unaffected.
-    expect(STORAGE_PURCHASE_SCHEMA.trimEnd().endsWith('SET LOCAL search_path TO DEFAULT;')).toBe(
-      true,
+    // SET LOCAL survives to COMMIT, not statement end: the fragment must
+    // capture the caller's in-flight search_path BEFORE its own SET LOCAL and
+    // END by replaying that captured value, so the rest of the boot
+    // transaction (ensureSchema runs later fragments on the same client) and
+    // any caller-scoped SET LOCAL are unaffected. The behavioral half (a
+    // callee-mutated search_path really is restored) lives in
+    // storage_purchase_db.pg.test.ts.
+    const capture = folded.indexOf(
+      "set_config( 'woc.storage_purchase_prior_search_path', current_setting('search_path'), true )",
     );
-    expect(count(STORAGE_PURCHASE_SCHEMA, 'CREATE TABLE IF NOT EXISTS storage_purchases')).toBe(1);
+    const takeover = folded.indexOf('SET LOCAL search_path = "public", pg_catalog, pg_temp;');
+    expect(capture).toBeGreaterThanOrEqual(0);
+    expect(capture).toBeLessThan(takeover);
+    // The replay reads the capture with missing_ok and falls back to the
+    // session default: a savepoint rollback that discarded the capture (or a
+    // session that never registered the GUC) must degrade to the old TO
+    // DEFAULT behavior, never SET search_path to empty (the pg suite drives
+    // that path for real).
+    expect(count(folded, "current_setting('woc.storage_purchase_prior_search_path', true)")).toBe(
+      1,
+    );
+    expect(folded).toContain(
+      "COALESCE( NULLIF(current_setting('woc.storage_purchase_prior_search_path', true), ''), " +
+        "(SELECT reset_val FROM pg_settings WHERE name = 'search_path') )",
+    );
     expect(
-      count(
-        STORAGE_PURCHASE_SCHEMA,
-        'CREATE TABLE IF NOT EXISTS storage_purchase_applied_receipts',
+      STORAGE_PURCHASE_SCHEMA.trimEnd().endsWith(
+        "SELECT set_config(\n  'search_path',\n  COALESCE(\n    NULLIF(current_setting('woc.storage_purchase_prior_search_path', true), ''),\n    (SELECT reset_val FROM pg_settings WHERE name = 'search_path')\n  ),\n  true\n);",
       ),
-    ).toBe(1);
-    expect(
-      count(
-        STORAGE_PURCHASE_SCHEMA,
-        'CREATE TABLE IF NOT EXISTS storage_purchase_schema_migrations',
-      ),
-    ).toBe(1);
-    expect(count(STORAGE_PURCHASE_SCHEMA, 'idempotency_key TEXT NOT NULL UNIQUE')).toBe(1);
-    expect(count(STORAGE_PURCHASE_SCHEMA, 'expected_cost_claudium INT NOT NULL')).toBe(2);
-    expect(count(STORAGE_PURCHASE_SCHEMA, "status TEXT NOT NULL DEFAULT 'pending'")).toBe(1);
+    ).toBe(true);
+    expect(count(code, 'CREATE TABLE IF NOT EXISTS storage_purchases')).toBe(1);
+    expect(count(code, 'CREATE TABLE IF NOT EXISTS storage_purchase_applied_receipts')).toBe(1);
+    expect(count(code, 'CREATE TABLE IF NOT EXISTS storage_purchase_schema_migrations')).toBe(1);
+    expect(count(code, 'idempotency_key TEXT NOT NULL UNIQUE')).toBe(1);
+    expect(count(code, 'expected_cost_claudium INT NOT NULL')).toBe(2);
+    expect(count(code, "status TEXT NOT NULL DEFAULT 'pending'")).toBe(1);
     expect(folded).toContain('spend_claim_token TEXT');
     expect(folded).toContain('spend_claim_expires_at TIMESTAMPTZ');
     expect(folded).toContain("spend_claim_token ~ '^[0-9a-f]{8}-");
@@ -118,25 +140,21 @@ describe('the DDL', () => {
     // paid-rail authority for both possibly and confirmed debited work.
     expect(
       count(
-        STORAGE_PURCHASE_SCHEMA,
+        code,
         'CREATE INDEX IF NOT EXISTS storage_purchases_character ON storage_purchases (character_id);',
       ),
     ).toBe(1);
     expect(
       count(
-        STORAGE_PURCHASE_SCHEMA,
+        code,
         'CREATE INDEX IF NOT EXISTS storage_purchases_account ON storage_purchases (account_id);',
       ),
     ).toBe(1);
     // Both delete cascades are pinned as text here and executed in the PG16 CI
     // shard. Keeping the fast structural assertion makes an accidental FK
     // change fail before the integration shard reaches its lifecycle cases.
-    expect(STORAGE_PURCHASE_SCHEMA).toContain(
-      'account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE',
-    );
-    expect(STORAGE_PURCHASE_SCHEMA).toContain(
-      'character_id INT NOT NULL REFERENCES characters(id) ON DELETE CASCADE',
-    );
+    expect(code).toContain('account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE');
+    expect(code).toContain('character_id INT NOT NULL REFERENCES characters(id) ON DELETE CASCADE');
     const receiptStart = folded.indexOf(
       'CREATE TABLE IF NOT EXISTS storage_purchase_applied_receipts',
     );
@@ -259,17 +277,13 @@ describe('the DDL', () => {
     );
     // Every CREATE remains idempotent; the deliberate DROP/DELETE migration
     // above removes only the feature branch's abandoned refusal artifacts.
-    expect(count(STORAGE_PURCHASE_SCHEMA, 'CREATE TABLE')).toBe(
-      count(STORAGE_PURCHASE_SCHEMA, 'CREATE TABLE IF NOT EXISTS'),
-    );
-    expect(count(STORAGE_PURCHASE_SCHEMA, 'CREATE INDEX')).toBe(
-      count(STORAGE_PURCHASE_SCHEMA, 'CREATE INDEX IF NOT EXISTS'),
-    );
+    expect(count(code, 'CREATE TABLE')).toBe(count(code, 'CREATE TABLE IF NOT EXISTS'));
+    expect(count(code, 'CREATE INDEX')).toBe(count(code, 'CREATE INDEX IF NOT EXISTS'));
   });
 
   it('qualifies fixed-path trigger authority for private schemas', () => {
     const privateSchema = storagePurchaseSchema('isolated_storage');
-    const folded = privateSchema.replace(/\s+/g, ' ');
+    const folded = codeOnly(privateSchema).replace(/\s+/g, ' ');
     expect(folded).toContain('SET LOCAL search_path = "isolated_storage", pg_catalog, pg_temp;');
     expect(count(folded, 'SET search_path = pg_catalog, "isolated_storage", pg_temp')).toBe(3);
     expect(folded).toContain('pg_catalog.pg_advisory_xact_lock(');

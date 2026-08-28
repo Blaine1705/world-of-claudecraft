@@ -2,7 +2,7 @@
 // always-on sibling pins DDL text and error decoding; this suite proves actual
 // transition-row counts, rollback, receipt idempotency, and concurrent writers.
 
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 const url = process.env.TEST_DATABASE_URL ?? '';
 const d = url === '' ? describe.skip : describe;
@@ -472,15 +472,68 @@ d('bank ledger durable growth budget against real PostgreSQL', () => {
       // Enforcement of NEW writes is immediate despite NOT VALID.
       await expect(insertReceipt('also!bad')).rejects.toMatchObject({ code: '23514' });
       await expect(insertReceipt('good.key')).resolves.toMatchObject({ rowCount: 1 });
-      // The out-of-boot VALIDATE is loud on the surviving bad row, then
-      // proves the table once the operator reconciles it, and settles.
+      // The raw fragment is loud on the surviving bad row; the boot helper
+      // wraps exactly that failure without throwing (boot must stay green),
+      // resolves false, and leaves the constraint NOT VALID and still
+      // enforcing, for the next boot to retry.
       await expect(
         client.query(batchDb.BANK_LEDGER_BATCH_RECEIPTS_VALIDATE_SQL),
       ).rejects.toMatchObject({ code: '23514' });
+      // The helper's bounds are TRANSACTION-LOCAL (SET LOCAL): observe them
+      // from inside the transaction, on the same client, at the moment the
+      // VALIDATE fragment is issued. After the helper returns the session
+      // must be back at its prior values, so the exported helper can never
+      // leave a 60s setting on a future pooled caller.
+      const sessionTimeouts = async () =>
+        (
+          await client.query(
+            "SELECT current_setting('statement_timeout') AS st, current_setting('lock_timeout') AS lt",
+          )
+        ).rows[0];
+      const timeoutsBefore = await sessionTimeouts();
+      expect(timeoutsBefore).not.toEqual({ st: '1min', lt: '5s' });
+      const inTxBounds: Array<Record<string, unknown>> = [];
+      const observing = {
+        query: async (text: string, values?: unknown[]) => {
+          if (text.includes('VALIDATE CONSTRAINT bank_ledger_batch_receipts_key_shape')) {
+            inTxBounds.push(await sessionTimeouts());
+          }
+          return client.query(text, values);
+        },
+      };
+      const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+      try {
+        await expect(batchDb.validateBankLedgerBatchReceiptsKeyShape(observing)).resolves.toBe(
+          false,
+        );
+        expect(errors).toHaveBeenCalledTimes(1);
+        expect(String(errors.mock.calls[0][0])).toContain('key-shape VALIDATE failed');
+      } finally {
+        errors.mockRestore();
+      }
+      const stillNotValid = await client.query(
+        `SELECT convalidated FROM pg_constraint
+          WHERE conname = 'bank_ledger_batch_receipts_key_shape'
+            AND conrelid = 'bank_ledger_batch_receipts'::regclass`,
+      );
+      expect(stillNotValid.rows).toEqual([{ convalidated: false }]);
+      await expect(insertReceipt('still!bad')).rejects.toMatchObject({ code: '23514' });
+      // Both bounds were armed at the VALIDATE, and the failed (rolled-back)
+      // attempt leaked nothing onto the session.
+      expect(inTxBounds).toEqual([{ st: '1min', lt: '5s' }]);
+      await expect(sessionTimeouts()).resolves.toEqual(timeoutsBefore);
+      // Once the operator reconciles the surviving row, the same helper
+      // proves the table and settles.
       await client.query(
         `DELETE FROM bank_ledger_batch_receipts WHERE batch_key = 'violates!current!shape'`,
       );
-      await client.query(batchDb.BANK_LEDGER_BATCH_RECEIPTS_VALIDATE_SQL);
+      await expect(batchDb.validateBankLedgerBatchReceiptsKeyShape(observing)).resolves.toBe(true);
+      // The successful (committed) attempt leaks nothing either.
+      expect(inTxBounds).toEqual([
+        { st: '1min', lt: '5s' },
+        { st: '1min', lt: '5s' },
+      ]);
+      await expect(sessionTimeouts()).resolves.toEqual(timeoutsBefore);
       const validated = await client.query(
         `SELECT convalidated FROM pg_constraint
           WHERE conname = 'bank_ledger_batch_receipts_key_shape'
@@ -500,6 +553,101 @@ d('bank ledger durable growth budget against real PostgreSQL', () => {
       await client.end();
     }
   });
+
+  it('an advisory-lock waiter behind the VALIDATE holds no table locks', async () => {
+    // The serialization property the in-lock VALIDATE placement buys, proven
+    // against real PostgreSQL: while one boot client HOLDS the session
+    // advisory lock and runs the VALIDATE scan, a second booting realm waits
+    // at pg_advisory_lock holding NOTHING, so live traffic has nothing to
+    // queue behind. (Run after the unlock instead, that second realm would
+    // already be executing boot DDL, whose IF NOT EXISTS statements take
+    // ACCESS EXCLUSIVE / SHARE locks even when skipping, and would block
+    // mid-DDL behind the scan.) The key literal mirrors db.ts
+    // SCHEMA_ADVISORY_LOCK_KEY (not exported; tests/schema_wiring.test.ts
+    // pins the lock-to-VALIDATE wiring around that constant).
+    const SCHEMA_ADVISORY_LOCK_KEY = 0x57_4f_43_01;
+    const schema = 'bank_ledger_batch_validate_serialize_pg_test';
+    const { Client } = await import('pg');
+    const holder = new Client({ connectionString: url });
+    const waiter = new Client({ connectionString: url });
+    await holder.connect();
+    await waiter.connect();
+    try {
+      await holder.query(`DROP SCHEMA IF EXISTS "${schema}" CASCADE`);
+      await holder.query(`CREATE SCHEMA "${schema}"`);
+      await holder.query(`SET search_path = "${schema}"`);
+      await holder.query('CREATE TABLE accounts (id INT PRIMARY KEY)');
+      await holder.query(
+        'CREATE TABLE characters (id INT PRIMARY KEY, account_id INT NOT NULL REFERENCES accounts(id))',
+      );
+      // A drifted constraint, so the boot fragment re-adds it NOT VALID and
+      // the in-lock VALIDATE below has real work to do.
+      await holder.query(`CREATE TABLE bank_ledger_batch_receipts (
+        batch_key TEXT PRIMARY KEY,
+        realm TEXT NOT NULL,
+        character_id INT NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
+        account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+        row_count INT NOT NULL,
+        payload_sha256 TEXT NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        CONSTRAINT bank_ledger_batch_receipts_key_shape CHECK (char_length(batch_key) >= 1)
+      )`);
+      await holder.query(batchDb.BANK_LEDGER_BATCH_RECEIPTS_SCHEMA);
+
+      await holder.query('SELECT pg_advisory_lock($1)', [SCHEMA_ADVISORY_LOCK_KEY]);
+      const waiterPid = Number((await waiter.query('SELECT pg_backend_pid() AS pid')).rows[0].pid);
+      // The second realm's boot, parked at the advisory acquire. The promise
+      // is settle-captured at creation so a rejection inside the window fails
+      // the test instead of crashing as an unhandled rejection.
+      let acquireSettled = false;
+      const waiterAcquire = waiter
+        .query('SELECT pg_advisory_lock($1)', [SCHEMA_ADVISORY_LOCK_KEY])
+        .then(
+          () => {
+            acquireSettled = true;
+          },
+          () => {
+            acquireSettled = true;
+          },
+        );
+      // Observe the wait from a SEPARATE autocommit connection: a transaction
+      // freezes its stats snapshot at the first read, so an in-transaction
+      // poller could never see a wait that starts afterwards.
+      let waiting = false;
+      for (let i = 0; i < 400 && !waiting; i++) {
+        const parked = await pool.query(
+          "SELECT 1 FROM pg_locks WHERE pid = $1 AND locktype = 'advisory' AND NOT granted",
+          [waiterPid],
+        );
+        waiting = (parked.rowCount ?? 0) > 0;
+        if (!waiting) await new Promise((resolve) => setTimeout(resolve, 10));
+      }
+      expect(waiting).toBe(true);
+
+      // The holder runs the real VALIDATE while the waiter is parked.
+      await expect(batchDb.validateBankLedgerBatchReceiptsKeyShape(holder)).resolves.toBe(true);
+
+      // Still parked, and holding NOTHING beyond the ungranted advisory wait
+      // itself (and its own virtualxid): no relation, tuple, or transaction
+      // lock a login or save could ever queue behind.
+      expect(acquireSettled).toBe(false);
+      const waiterLocks = await pool.query(
+        `SELECT locktype, granted FROM pg_locks
+          WHERE pid = $1 AND locktype NOT IN ('advisory', 'virtualxid')`,
+        [waiterPid],
+      );
+      expect(waiterLocks.rows).toEqual([]);
+
+      await holder.query('SELECT pg_advisory_unlock($1)', [SCHEMA_ADVISORY_LOCK_KEY]);
+      await waiterAcquire;
+      expect(acquireSettled).toBe(true);
+      await waiter.query('SELECT pg_advisory_unlock($1)', [SCHEMA_ADVISORY_LOCK_KEY]);
+      await holder.query(`DROP SCHEMA "${schema}" CASCADE`);
+    } finally {
+      await waiter.end().catch(() => {});
+      await holder.end().catch(() => {});
+    }
+  }, 30_000);
 
   it('converges by parsed reloption values, so a rendering difference never re-fires the ALTER', async () => {
     const schema = 'bank_ledger_growth_reloptions_pg_test';

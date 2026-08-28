@@ -3,12 +3,15 @@
 // arrays; the caller owns the real transaction and rolls it back on a rejected
 // receipt verification.
 import { createHash } from 'node:crypto';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   BANK_LEDGER_BATCH_RECEIPTS_SCHEMA,
+  BANK_LEDGER_BATCH_RECEIPTS_VALIDATE_LOCK_TIMEOUT_MS,
   BANK_LEDGER_BATCH_RECEIPTS_VALIDATE_SQL,
+  BANK_LEDGER_BATCH_RECEIPTS_VALIDATE_TIMEOUT_MS,
   type BankLedgerBatchOwner,
   bankLedgerCommandBatchPayloadSha256,
+  validateBankLedgerBatchReceiptsKeyShape,
   writeBankLedgerCommandBatches,
 } from '../../server/bank_ledger_batch_db';
 import {
@@ -498,5 +501,88 @@ describe('writeBankLedgerCommandBatches', () => {
     expect(cap.calls).toHaveLength(1);
     expect(result.batches).toHaveLength(BANK_LEDGER_OUTBOX_DEFAULT_SESSION_LIMITS.maxRows);
     expect(cap.calls[0].text.match(/WITH receipt_input AS/g)).toHaveLength(1);
+  });
+});
+
+describe('validateBankLedgerBatchReceiptsKeyShape', () => {
+  const SET_LOCAL_BOUNDS =
+    `SET LOCAL statement_timeout = ${BANK_LEDGER_BATCH_RECEIPTS_VALIDATE_TIMEOUT_MS}; ` +
+    `SET LOCAL lock_timeout = ${BANK_LEDGER_BATCH_RECEIPTS_VALIDATE_LOCK_TIMEOUT_MS}`;
+
+  it('runs the VALIDATE inside its own transaction with SET LOCAL bounds, in order', async () => {
+    const calls: string[] = [];
+    const ok = await validateBankLedgerBatchReceiptsKeyShape({
+      query: (text) => {
+        calls.push(text);
+        return Promise.resolve({ rows: [] });
+      },
+    });
+    expect(ok).toBe(true);
+    expect(calls).toEqual([
+      'BEGIN',
+      SET_LOCAL_BOUNDS,
+      BANK_LEDGER_BATCH_RECEIPTS_VALIDATE_SQL,
+      'COMMIT',
+    ]);
+    // Real bounds, not re-disables: the concurrent-index phase runs this
+    // session at statement_timeout 0. SET LOCAL (never session SET) is what
+    // keeps the 60s allowance from leaking to a future pooled caller of the
+    // exported helper; the values are by-value pins so a constant edit is a
+    // conscious decision here too.
+    expect(BANK_LEDGER_BATCH_RECEIPTS_VALIDATE_TIMEOUT_MS).toBe(60_000);
+    expect(BANK_LEDGER_BATCH_RECEIPTS_VALIDATE_LOCK_TIMEOUT_MS).toBe(5_000);
+  });
+
+  it('swallows a VALIDATE failure loudly: rolls back, resolves false, never throws', async () => {
+    // A shape-violating survivor row (23514) or a deadline expiry (57014)
+    // must leave boot green; the constraint stays NOT VALID for the next
+    // boot to retry while new writes keep enforcing.
+    const calls: string[] = [];
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const ok = await validateBankLedgerBatchReceiptsKeyShape({
+        query: (text) => {
+          calls.push(text);
+          return text.includes('VALIDATE CONSTRAINT')
+            ? Promise.reject(Object.assign(new Error('violated by some row'), { code: '23514' }))
+            : Promise.resolve({ rows: [] });
+        },
+      });
+      expect(ok).toBe(false);
+      // The failed transaction is rolled back, never left open on the client.
+      expect(calls).toEqual([
+        'BEGIN',
+        SET_LOCAL_BOUNDS,
+        BANK_LEDGER_BATCH_RECEIPTS_VALIDATE_SQL,
+        'ROLLBACK',
+      ]);
+      expect(errors).toHaveBeenCalledTimes(1);
+      expect(String(errors.mock.calls[0][0])).toContain('key-shape VALIDATE failed');
+      expect(String(errors.mock.calls[0][0])).toContain('NOT VALID');
+    } finally {
+      errors.mockRestore();
+    }
+  });
+
+  it('a failed SET LOCAL is contained the same way: the fragment is never issued unbounded', async () => {
+    const calls: string[] = [];
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const ok = await validateBankLedgerBatchReceiptsKeyShape({
+        query: (text) => {
+          calls.push(text);
+          return text.startsWith('SET LOCAL ')
+            ? Promise.reject(new Error('connection lost'))
+            : Promise.resolve({ rows: [] });
+        },
+      });
+      expect(ok).toBe(false);
+      // The rejection came from the SET LOCAL, so the VALIDATE fragment must
+      // not have been sent in a transaction whose bounds are unknown, and the
+      // rollback attempt still closes the transaction out.
+      expect(calls).toEqual(['BEGIN', SET_LOCAL_BOUNDS, 'ROLLBACK']);
+    } finally {
+      errors.mockRestore();
+    }
   });
 });

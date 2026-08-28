@@ -17,6 +17,7 @@ const h = vi.hoisted(() => {
     invalidMetricsIndexExists: false,
     failOpenIndexCreate: false,
     failLargeAccountIndexCreate: false,
+    failReceiptsValidate: false,
   };
   const query = vi.fn((sql: string) => {
     calls.push(String(sql));
@@ -35,6 +36,21 @@ const h = vi.hoisted(() => {
       )
     ) {
       return Promise.reject(new Error('large account index build interrupted'));
+    }
+    // A shape-violating survivor row: the real fragment raises 23514 from the
+    // VALIDATE inside the DO block.
+    if (
+      state.failReceiptsValidate &&
+      String(sql).includes('VALIDATE CONSTRAINT bank_ledger_batch_receipts_key_shape')
+    ) {
+      return Promise.reject(
+        Object.assign(
+          new Error(
+            'check constraint "bank_ledger_batch_receipts_key_shape" of relation "bank_ledger_batch_receipts" is violated by some row',
+          ),
+          { code: '23514' },
+        ),
+      );
     }
     // Mirror node-postgres: a simple query carrying several top-level
     // statements resolves to an ARRAY of per-statement results (dollar-quoted
@@ -145,6 +161,7 @@ describe('ensureSchema wires every schema module at boot', () => {
     h.state.invalidMetricsIndexExists = false;
     h.state.failOpenIndexCreate = false;
     h.state.failLargeAccountIndexCreate = false;
+    h.state.failReceiptsValidate = false;
     h.clientConfigs.length = 0;
   });
 
@@ -543,21 +560,44 @@ describe('ensureSchema wires every schema module at boot', () => {
   it('forwards fragment RAISE NOTICE reports to the boot log, filtering the no-op DDL wall', async () => {
     // The schema fragments report through RAISE NOTICE (the storage-purchase
     // refused-row sweep names what it removed); node-postgres discards
-    // unconsumed notices, so ensureSchema must register a listener, and the
-    // listener must drop the ~400 already-exists-skipping notices every
-    // steady-state boot emits or the one real report drowns.
+    // unconsumed notices, so BOTH dedicated boot clients must register the
+    // shared forwarder: the ensureSchema transaction client AND the
+    // post-listen concurrent-index client the VALIDATE now rides (notices
+    // there were silently discarded before the forwarder moved to
+    // schema_notices.ts). The filter must drop the ~400 idempotent-DDL skip
+    // notices every steady-state boot emits or the one real report drowns.
     h.noticeListeners.length = 0;
     await ensureSchema();
-    expect(h.noticeListeners.length).toBeGreaterThan(0);
+    const ensureSchemaListeners = h.noticeListeners.length;
+    expect(ensureSchemaListeners).toBeGreaterThan(0);
+    await runConcurrentIndexMigrations();
+    expect(h.noticeListeners.length).toBeGreaterThan(ensureSchemaListeners);
     const listener = h.noticeListeners[h.noticeListeners.length - 1];
     const warns = vi.spyOn(console, 'warn').mockImplementation(() => {});
     try {
+      // Real steady-state shapes (measured on PG 16). The drop-skips arrive
+      // as SQLSTATE 00000, the SAME code a RAISE report carries, so the
+      // filter keys them on the server routine; 42710 (duplicate_object)
+      // joins the already-exists family the first three codes do not cover.
       listener({ code: '42P07', message: 'relation "accounts" already exists, skipping' });
       listener({ code: '42701', message: 'column "locale" already exists, skipping' });
       listener({ code: '42P06', message: 'schema already exists, skipping' });
+      listener({ code: '42710', message: 'extension "pgcrypto" already exists, skipping' });
+      listener({
+        code: '00000',
+        routine: 'DropErrorMsgNonExistent',
+        message: 'index "woc_market_settlements_open" does not exist, skipping',
+      });
+      listener({
+        code: '00000',
+        routine: 'does_not_exist_skipping',
+        message:
+          'trigger "storage_purchase_archive_applied" for relation "storage_purchases" does not exist, skipping',
+      });
       expect(warns).not.toHaveBeenCalled();
       listener({
-        code: '01000',
+        code: '00000',
+        routine: 'exec_stmt_raise',
         message:
           'storage_purchases: removed 3 legacy refused row(s) before installing the closed status constraint',
       });
@@ -633,16 +673,38 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(postCommitTimeoutOff).toBeLessThan(sessionLock);
 
     // The out-of-boot half of the receipts key-shape converge: db.ts must
-    // actually ISSUE the VALIDATE fragment here, under the session lock and
-    // never inside the boot transaction, or a NOT VALID constraint the boot
-    // converge re-added stays unvalidated forever (the pg suite proves the
-    // fragment's behavior; this pin proves the wiring).
+    // actually ISSUE the VALIDATE fragment here, never inside the boot
+    // transaction, or a NOT VALID constraint the boot converge re-added stays
+    // unvalidated forever, and it must run INSIDE the session advisory lock:
+    // after the unlock, a concurrently booting realm would already hold the
+    // lock and be running boot DDL, whose ADD COLUMN / CREATE INDEX IF NOT
+    // EXISTS take ACCESS EXCLUSIVE / SHARE locks even when skipping (SHARE
+    // conflicts with VALIDATE's SHARE UPDATE EXCLUSIVE), so it would block
+    // MID-DDL behind the scan while holding table locks at statement_timeout
+    // 0, freezing every login and save; a waiter at pg_advisory_lock holds
+    // NOTHING (the pg suite proves the fragment's behavior and the waiter's
+    // empty lock set; this pin proves the wiring).
     const receiptsValidate = h.calls.findIndex((sql) =>
       sql.includes('VALIDATE CONSTRAINT bank_ledger_batch_receipts_key_shape'),
     );
+    expect(receiptsValidate).toBeGreaterThan(commitIndex);
     expect(receiptsValidate).toBeGreaterThan(sessionLock);
     expect(receiptsValidate).toBeLessThan(sessionUnlock);
-    expect(receiptsValidate).toBeGreaterThan(commitIndex);
+    // And the scan is bounded TRANSACTION-LOCALLY: BEGIN, both SET LOCAL
+    // bounds, VALIDATE, COMMIT, all inside the lock, so the exported helper
+    // can never leave a 60s session setting on a future pooled caller.
+    const validateBegin = h.calls.findIndex((sql, i) => i > sessionLock && sql === 'BEGIN');
+    const validateTimeout = h.calls.findIndex(
+      (sql, i) =>
+        i > sessionLock &&
+        sql === 'SET LOCAL statement_timeout = 60000; SET LOCAL lock_timeout = 5000',
+    );
+    const validateCommit = h.calls.findIndex((sql, i) => i > receiptsValidate && sql === 'COMMIT');
+    expect(validateBegin).toBeGreaterThan(sessionLock);
+    expect(validateBegin).toBeLessThan(validateTimeout);
+    expect(validateTimeout).toBeLessThan(receiptsValidate);
+    expect(validateCommit).toBeGreaterThan(receiptsValidate);
+    expect(validateCommit).toBeLessThan(sessionUnlock);
 
     // The invalid-carcass check runs under the session lock, before the create
     // it protects; on a healthy boot (no carcass) nothing is dropped. Scoped
@@ -802,6 +864,41 @@ describe('ensureSchema wires every schema module at boot', () => {
     const unlock = h.calls.findIndex((sql) => sql.includes('pg_advisory_unlock($1)'));
     expect(failedCreate).toBeGreaterThan(-1);
     expect(unlock).toBeGreaterThan(failedCreate);
+    // The VALIDATE rides the same try as the builds: an index-build failure
+    // skips it for the same next-boot retry, never runs it past the unlock.
+    expect(
+      h.calls.some((sql) => sql.includes('VALIDATE CONSTRAINT bank_ledger_batch_receipts')),
+    ).toBe(false);
+  });
+
+  it('a failed receipts VALIDATE reports loudly without failing the migration run', async () => {
+    // The VALIDATE has its own try/catch: a shape-violating survivor row (or a
+    // deadline expiry at production cardinality) must leave the constraint
+    // NOT VALID and the boot GREEN, not reject the whole post-listen phase.
+    // The pg suite proves the constraint really stays NOT VALID and enforcing
+    // for new writes; this pin proves the isolation wiring.
+    h.state.failReceiptsValidate = true;
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      await expect(runConcurrentIndexMigrations()).resolves.toBeUndefined();
+      expect(
+        errors.mock.calls.some((call) => String(call[0]).includes('key-shape VALIDATE failed')),
+      ).toBe(true);
+    } finally {
+      errors.mockRestore();
+    }
+    // The failure was contained INSIDE the lock: the helper rolled its own
+    // transaction back, and the finally still released the session lock, so
+    // no realm stays wedged behind a failed VALIDATE and the next boot
+    // retries it.
+    const validateIdx = h.calls.findIndex((sql) =>
+      sql.includes('VALIDATE CONSTRAINT bank_ledger_batch_receipts_key_shape'),
+    );
+    const rollback = h.calls.findIndex((sql, i) => i > validateIdx && sql === 'ROLLBACK');
+    const unlock = h.calls.findIndex((sql) => sql.includes('pg_advisory_unlock($1)'));
+    expect(validateIdx).toBeGreaterThan(-1);
+    expect(rollback).toBeGreaterThan(validateIdx);
+    expect(unlock).toBeGreaterThan(rollback);
   });
 
   it('keeps the broad account index when its partial replacement build fails', async () => {

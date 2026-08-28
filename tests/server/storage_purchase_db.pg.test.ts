@@ -130,6 +130,77 @@ d('storage_purchases against real PostgreSQL', () => {
     expect(owner.rows.map((r: { schemaname: string }) => r.schemaname)).toContain(SCHEMA);
   });
 
+  it("restores a caller's transaction-scoped search_path after the fragment", async () => {
+    // The restore is ENFORCED, not a precondition on the boot client: the
+    // fragment captures the in-flight search_path before its own SET LOCAL
+    // and replays it at the end. Drive the case the old TO DEFAULT tail got
+    // wrong: a caller with its own SET LOCAL search_path in flight. After the
+    // fragment the caller's value (pg_catalog here, NOT the session default,
+    // which this pool pins to SCHEMA via its startup option) must still be
+    // live, and COMMIT must still drop back to the session default so nothing
+    // leaks across transactions on the pooled connection.
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      await client.query('SET LOCAL search_path = pg_catalog');
+      await client.query(storageSchema);
+      const inTx = await client.query("SELECT current_setting('search_path') AS sp");
+      expect(inTx.rows[0].sp).toBe('pg_catalog');
+      await client.query('COMMIT');
+      const after = await client.query("SELECT current_setting('search_path') AS sp");
+      expect(after.rows[0].sp).toBe(SCHEMA);
+    } finally {
+      client.release();
+    }
+  });
+
+  it('a discarded capture degrades to the session default, never an empty search_path', async () => {
+    // The replay's precondition is the whole fragment in ONE transaction with
+    // no savepoint rollback in between: a rollback to a savepoint taken
+    // before the capture DISCARDS the transaction-scoped GUC, after which
+    // current_setting answers EMPTY STRING, and an unguarded replay would
+    // silently SET search_path to empty for the rest of the transaction.
+    // Drive that path with the replay statement extracted from the LIVE
+    // fragment and prove the guarded fallback lands on the session default
+    // (the old TO DEFAULT behavior) instead.
+    const replay = storageSchema.slice(storageSchema.lastIndexOf('SELECT set_config('));
+    expect(replay).toContain("current_setting('woc.storage_purchase_prior_search_path', true)");
+    expect(replay).toContain("(SELECT reset_val FROM pg_settings WHERE name = 'search_path')");
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      await client.query('SAVEPOINT capture_window');
+      await client.query(
+        "SELECT set_config('woc.storage_purchase_prior_search_path', current_setting('search_path'), true)",
+      );
+      await client.query('ROLLBACK TO SAVEPOINT capture_window');
+      await client.query(replay);
+      const sp = await client.query("SELECT current_setting('search_path') AS sp");
+      expect(sp.rows[0].sp).toBe(SCHEMA);
+      await client.query('COMMIT');
+    } finally {
+      client.release();
+    }
+
+    // The never-registered arm: on a session that has never set the GUC the
+    // unguarded read raised 42704; the guarded replay must instead settle on
+    // the session default. A dedicated connection, because the pool's
+    // sessions may have registered the GUC through earlier fragment runs.
+    const { Client } = await import('pg');
+    const fresh = new Client({ connectionString: url });
+    await fresh.connect();
+    try {
+      const def = await fresh.query("SELECT reset_val FROM pg_settings WHERE name = 'search_path'");
+      await fresh.query('BEGIN');
+      await fresh.query(replay);
+      const sp = await fresh.query("SELECT current_setting('search_path') AS sp");
+      expect(sp.rows[0].sp).toBe(def.rows[0].reset_val);
+      await fresh.query('COMMIT');
+    } finally {
+      await fresh.end();
+    }
+  });
+
   it('materialized operational rows, deletion-proof receipts, triggers, and indexes', async () => {
     const reg = await pool.query(`SELECT to_regclass('${SCHEMA}.storage_purchases') AS reg`);
     expect(reg.rows[0].reg).toBe('storage_purchases');

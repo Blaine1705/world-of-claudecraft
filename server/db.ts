@@ -27,8 +27,8 @@ import {
 import type { BankBonusFacts } from './bank_entitlements';
 import {
   BANK_LEDGER_BATCH_RECEIPTS_SCHEMA,
-  BANK_LEDGER_BATCH_RECEIPTS_VALIDATE_SQL,
   type BankLedgerBatchWriteResult,
+  validateBankLedgerBatchReceiptsKeyShape,
 } from './bank_ledger_batch_db';
 import {
   BANK_LEDGER_GROWTH_BUDGET_SCHEMA,
@@ -67,14 +67,11 @@ import {
 import { CONCURRENT_INDEX_MIGRATIONS } from './concurrent_indexes';
 import { CONTENT_MODERATION_SCHEMA } from './content_moderation_db';
 import { cancelDetachedBackend } from './db_backend_cancel';
+import { dbConnectionBudgetWarning } from './db_connection_budget';
 import type { RankedDeedsAccount } from './deeds_board';
 import { DISCORD_SCHEMA } from './discord_db';
 import { enqueueLinkChange } from './discord_link_changes';
 import { bustDiscordStatus } from './discord_status_cache';
-import {
-  GENERAL_CHAT_QUOTA_DB_POOL_MAX_CLIENTS,
-  GENERAL_CHAT_QUOTA_LISTENER_CONNECTIONS,
-} from './general_chat_quota_config';
 import { GENERAL_CHAT_QUOTA_SCHEMA } from './general_chat_quota_schema';
 import { GITHUB_SCHEMA } from './github_db';
 import {
@@ -105,6 +102,7 @@ import { PROGRESS_EVENTS_SCHEMA } from './progress_events_db';
 import { RATELIMIT_PRUNE_SQL, RATELIMIT_SCHEMA } from './ratelimit_db';
 import { REALM, REALM_DIRECTORY } from './realm';
 import { chooseArchiveName } from './reclaim_name';
+import { attachSchemaNoticeForwarder } from './schema_notices';
 import { SEEKER_ENTITLEMENT_SCHEMA } from './seeker_entitlement_db';
 import { SOCIAL_SCHEMA } from './social_db';
 import {
@@ -159,11 +157,12 @@ const DB_POOL_MAX_CLIENTS_DEFAULT = 10;
 // shipped deployment: stock postgres:16 serves max_connections 100 with 3
 // superuser-reserved, so 97 are usable. Every realm process builds its own pool
 // on the one DATABASE_URL and pools have no cross-process coordination, so
-// realms x (the shared pool + two General-quota consume clients + one LISTEN client) +
-// tooling is what must stay at or under 97. ensureSchema also uses a dedicated
-// boot Client before LISTEN starts (and a rolling restart can overlap them
-// across old/new processes). Past that, logins fail with "too many clients"
-// exactly at peak.
+// realms x (the shared pool + two General-quota consume clients + one LISTEN
+// client + the max-1 deadline-cancel side pool) + tooling is what must stay at
+// or under 97 (the per-realm term lives in db_connection_budget.ts). ensureSchema
+// also uses a dedicated boot Client before LISTEN starts (and a rolling restart
+// can overlap them across old/new processes). Past that, logins fail with
+// "too many clients" exactly at peak.
 // Connections are not the binding constraint on the shipped deployment, though:
 // the game process and Postgres share ONE 4-vCPU box, where the database is
 // already the heaviest CPU consumer at peak, so a large pool only buys
@@ -206,28 +205,24 @@ console.log(
 // left to the operator's arithmetic. REALMS is the realm directory every realm
 // process is handed (scripts/dev-realms.mjs exports it to each child; a
 // production deployment sets the same list on every process), so its entry
-// count is how many independent pools this one DATABASE_URL will see. Unset
-// means a single realm, whose pool is already bounded by the parser ceiling and
-// so can never trip this on its own. PREMISE: every realm shares one database
+// count is how many independent pools this one DATABASE_URL will see; it is
+// counted through the SAME parser the directory ships from (REALM_DIRECTORY
+// dedupes names and drops malformed or non-origin entries), so the arithmetic
+// matches the processes that will actually boot rather than raw comma
+// segments. Unset REALMS parses to the single-realm fallback entry, which can
+// never trip the ceiling on its own. PREMISE: every realm shares one database
 // (true of the shipped single-box deployment); directory entries hosted on
-// their own databases have their own budgets, so the warning below names the
-// assumption instead of pretending to know each realm's DATABASE_URL.
-// Counted through the SAME parser the realm directory ships from
-// (REALM_DIRECTORY dedupes names and drops malformed or non-origin entries),
-// so the warning's arithmetic matches the processes that will actually boot
-// rather than raw comma segments. Unset REALMS parses to the single-realm
-// fallback entry, which can never trip the ceiling on its own.
+// their own databases have their own budgets, so the warning names the
+// assumption instead of pretending to know each realm's DATABASE_URL. The
+// per-realm term (shared + quota + listener + deadline-cancel, matching
+// DEPLOY.md's budget arithmetic) lives in db_connection_budget.ts.
 const configuredRealmCount = REALM_DIRECTORY.length;
-const configuredSteadyConnections =
-  configuredRealmCount *
-  (DB_POOL_MAX_CLIENTS +
-    GENERAL_CHAT_QUOTA_DB_POOL_MAX_CLIENTS +
-    GENERAL_CHAT_QUOTA_LISTENER_CONNECTIONS);
-if (configuredSteadyConnections > DB_POOL_MAX_CLIENTS_CEILING) {
-  console.warn(
-    `db pool: ${configuredRealmCount} realms x (${DB_POOL_MAX_CLIENTS} shared + ${GENERAL_CHAT_QUOTA_DB_POOL_MAX_CLIENTS} quota + ${GENERAL_CHAT_QUOTA_LISTENER_CONNECTIONS} listener) = ${configuredSteadyConnections} steady connections, past the ${DB_POOL_MAX_CLIENTS_CEILING} usable on stock postgres:16 (max_connections 100, 3 superuser-reserved), before tooling, the transient concurrent-index client, and rolling-restart overlap. If every realm shares this DATABASE_URL, logins will fail with "too many clients" at peak: lower DB_POOL_MAX_CLIENTS or raise max_connections.`,
-  );
-}
+const budgetWarning = dbConnectionBudgetWarning(
+  configuredRealmCount,
+  DB_POOL_MAX_CLIENTS,
+  DB_POOL_MAX_CLIENTS_CEILING,
+);
+if (budgetWarning !== null) console.warn(budgetWarning);
 
 // Server-side default statement timeout per session, applied as a connection
 // startup parameter so every query on every pooled client is bounded by the
@@ -1286,18 +1281,10 @@ export async function ensureSchema(): Promise<void> {
   const client = new Client({ connectionString: DATABASE_URL });
   // The schema fragments report through RAISE NOTICE (the storage-purchase
   // refused-row sweep names what it removed); node-postgres discards notices
-  // that no listener consumes, so forward them to the boot log. FILTERED:
-  // the ~400 idempotent IF NOT EXISTS statements each emit an
-  // already-exists-skipping NOTICE on every steady-state boot (codes 42P07
-  // duplicate_table, 42701 duplicate_column, 42P06 duplicate_schema), which
-  // would bury the one report this forward exists to surface. The typeof
-  // guard tolerates minimal test fakes, the pool.on idiom above.
-  if (typeof client.on === 'function') {
-    client.on('notice', (notice) => {
-      if (notice.code === '42P07' || notice.code === '42701' || notice.code === '42P06') return;
-      console.warn(`[schema] ${notice.message}`);
-    });
-  }
+  // that no listener consumes, so forward them to the boot log, filtered
+  // (schema_notices.ts drops the idempotent-DDL skip wall every steady-state
+  // boot emits, which would bury the one report the forward exists to surface).
+  attachSchemaNoticeForwarder(client);
   try {
     // Inside the try so the finally's end() always runs, even on a connect
     // failure (end() on a never-connected client is a harmless no-op).
@@ -1486,42 +1473,54 @@ export async function runConcurrentIndexMigrations(): Promise<void> {
   // a Pool-only factory (the ensureSchema precedent above).
   const { Client } = await import('pg');
   const client = new Client({ connectionString: DATABASE_URL });
-  let locked = false;
+  // The post-listen fragments report through RAISE NOTICE too; without the
+  // forwarder (schema_notices.ts) node-postgres discards them.
+  attachSchemaNoticeForwarder(client);
   try {
-    await client.connect();
-    await client.query('SET statement_timeout = 0');
-    await client.query('SELECT pg_advisory_lock($1)', [SCHEMA_ADVISORY_LOCK_KEY]);
-    locked = true;
-    // A prior build may have died mid-CONCURRENTLY (a deploy-watchdog restart,
-    // a crash), stranding an INVALID index that IF NOT EXISTS would treat as
-    // existing forever, so the reader would sequential-scan for good. Each
-    // entry drops its carcass first; the list and its order live in
-    // server/concurrent_indexes.ts.
-    for (const migration of CONCURRENT_INDEX_MIGRATIONS) {
-      const invalidIndex = await client.query(migration.checkSql);
-      if ((invalidIndex.rowCount ?? 0) > 0) {
-        await client.query(migration.dropSql);
+    let locked = false;
+    try {
+      await client.connect();
+      await client.query('SET statement_timeout = 0');
+      await client.query('SELECT pg_advisory_lock($1)', [SCHEMA_ADVISORY_LOCK_KEY]);
+      locked = true;
+      // A prior build may have died mid-CONCURRENTLY (a deploy-watchdog restart,
+      // a crash), stranding an INVALID index that IF NOT EXISTS would treat as
+      // existing forever, so the reader would sequential-scan for good. Each
+      // entry drops its carcass first; the list and its order live in
+      // server/concurrent_indexes.ts.
+      for (const migration of CONCURRENT_INDEX_MIGRATIONS) {
+        const invalidIndex = await client.query(migration.checkSql);
+        if ((invalidIndex.rowCount ?? 0) > 0) {
+          await client.query(migration.dropSql);
+        }
+        await client.query(migration.createSql);
+        // A replacement must be valid before its superseded index disappears.
+        // If CREATE throws (including an interrupted concurrent build), this is
+        // never reached and the old index keeps serving until the next boot.
+        if (migration.retireSql !== undefined) {
+          await client.query(migration.retireSql);
+        }
       }
-      await client.query(migration.createSql);
-      // A replacement must be valid before its superseded index disappears.
-      // If CREATE throws (including an interrupted concurrent build), this is
-      // never reached and the old index keeps serving until the next boot.
-      if (migration.retireSql !== undefined) {
-        await client.query(migration.retireSql);
+      // The out-of-boot half of the receipts key-shape converge, INSIDE the
+      // session advisory lock: ensureSchema re-adds a drifted constraint as
+      // NOT VALID so boot never scans the keep-forever table; this VALIDATE
+      // (SHARE UPDATE EXCLUSIVE, inserts keep flowing) proves the rows here.
+      // In-lock on purpose: a concurrently booting realm waits at
+      // pg_advisory_lock holding NOTHING, while post-unlock it would run its
+      // boot DDL (IF NOT EXISTS still takes ACCESS EXCLUSIVE/SHARE locks)
+      // and block mid-DDL behind the scan, freezing logins and saves. The
+      // helper bounds the scan in its own SET LOCAL transaction and swallows
+      // failure loudly (NOT VALID survives, next boot retries); the index
+      // loop's own throw skips it for the same next-boot retry.
+      await validateBankLedgerBatchReceiptsKeyShape(client);
+    } finally {
+      if (locked) {
+        await client
+          .query('SELECT pg_advisory_unlock($1)', [SCHEMA_ADVISORY_LOCK_KEY])
+          .catch(() => {});
       }
     }
-    // The out-of-boot half of the receipts key-shape converge: ensureSchema
-    // re-adds a drifted constraint as NOT VALID so boot never scans the
-    // keep-forever table; this VALIDATE (SHARE UPDATE EXCLUSIVE, inserts keep
-    // flowing) proves the existing rows here instead, under the same
-    // loud-but-non-fatal, retried-next-boot contract as the index builds.
-    await client.query(BANK_LEDGER_BATCH_RECEIPTS_VALIDATE_SQL);
   } finally {
-    if (locked) {
-      await client
-        .query('SELECT pg_advisory_unlock($1)', [SCHEMA_ADVISORY_LOCK_KEY])
-        .catch(() => {});
-    }
     await client.end().catch(() => {});
   }
 }
