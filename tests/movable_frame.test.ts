@@ -625,13 +625,45 @@ describe('MovableFrame edge resize', () => {
     btn.dispatch('click', pointer());
 
     frame.dispatch('pointermove', pointer({ clientX: 648, clientY: 540 }));
-    expect(frame.style.cursor).toBe('ew-resize');
+    expect(frame.style.cursor).toBe('var(--cursor-resize-ew, ew-resize)');
     frame.dispatch('pointermove', pointer({ clientX: 300, clientY: 506 }));
-    expect(frame.style.cursor).toBe('ns-resize');
+    expect(frame.style.cursor).toBe('var(--cursor-resize-ns, ns-resize)');
     frame.dispatch('pointermove', pointer({ clientX: 42, clientY: 502 }));
-    expect(frame.style.cursor).toBe('nwse-resize');
+    expect(frame.style.cursor).toBe('var(--cursor-resize-nwse, nwse-resize)');
     frame.dispatch('pointermove', pointer({ clientX: 300, clientY: 540 }));
     expect(frame.style.cursor).toBe('');
+  });
+
+  it('stamps the hovered edge on the frame and mints the overlay highlight child', () => {
+    const { frame, btn } = makeScalableFrame();
+    // A scalable frame carries the .tf-edge-glow overlay the stylesheet
+    // paints the per-side highlight on, stacked over the frame's content.
+    expect(frame.children.some((c) => c.className === 'tf-edge-glow')).toBe(true);
+
+    btn.dispatch('click', pointer()); // unlock
+    frame.dispatch('pointermove', pointer({ clientX: 42, clientY: 540 }));
+    expect(frame.getAttribute('data-resize-edge')).toBe('w');
+    frame.dispatch('pointermove', pointer({ clientX: 300, clientY: 540 }));
+    expect(frame.getAttribute('data-resize-edge')).toBeNull();
+  });
+
+  it('hovering the corner grip lights the two edges it resizes (right and bottom)', () => {
+    const { frame, btn, grip } = makeScalableFrame();
+    btn.dispatch('click', pointer()); // unlock
+    grip.dispatch('pointerenter', pointer());
+    expect(frame.getAttribute('data-resize-edge')).toBe('se');
+    // A pointermove BUBBLING through the frame from the grip must not clear
+    // the pair: the grip's center sits inside the border band's dead zone,
+    // and the frame's own hover hit test yields there.
+    frame.dispatch('pointermove', pointer({ clientX: 640, clientY: 573, target: grip }));
+    expect(frame.getAttribute('data-resize-edge')).toBe('se');
+    grip.dispatch('pointerleave', pointer());
+    expect(frame.getAttribute('data-resize-edge')).toBeNull();
+
+    // Locked (or mobile) the grip hover stamps nothing.
+    btn.dispatch('click', pointer()); // lock again
+    grip.dispatch('pointerenter', pointer());
+    expect(frame.getAttribute('data-resize-edge')).toBeNull();
   });
 
   it('shows no resize cursor while locked, and clears a live one on lock', () => {
@@ -641,7 +673,7 @@ describe('MovableFrame edge resize', () => {
 
     btn.dispatch('click', pointer()); // unlock
     frame.dispatch('pointermove', pointer({ clientX: 648, clientY: 540 }));
-    expect(frame.style.cursor).toBe('ew-resize');
+    expect(frame.style.cursor).toBe('var(--cursor-resize-ew, ew-resize)');
     btn.dispatch('click', pointer()); // lock mid-hover
     expect(frame.style.cursor).toBe('');
   });
@@ -767,7 +799,7 @@ describe('MovableFrame edge resize', () => {
 
     // Just inside it is the n band, and a north drag anchors the bottom.
     frame.dispatch('pointermove', pointer({ clientX: 300, clientY: 504 }));
-    expect(frame.style.cursor).toBe('ns-resize');
+    expect(frame.style.cursor).toBe('var(--cursor-resize-ns, ns-resize)');
     frame.dispatch('pointerdown', pointer({ clientX: 300, clientY: 504 }));
     fakeDocument.body.dispatch('pointermove', pointer({ clientX: 300, clientY: 483 }));
     expect(frame.style.transform).toBe('scale(1, 1.25)');
@@ -877,7 +909,8 @@ describe('MovableFrame name chip', () => {
 
   it('a frame without a frameLabelKey mints no chip', () => {
     const { frame } = makeScalableFrame();
-    expect(frame.children.length).toBe(2); // button + grip only
+    expect(frame.children.length).toBe(3); // button + grip + edge-glow overlay, no chip
+    expect(frame.children.some((c) => c.className === 'tf-frame-label')).toBe(false);
   });
 });
 

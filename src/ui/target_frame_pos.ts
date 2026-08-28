@@ -212,21 +212,22 @@ export function labelBelowFrame(
   return frameTop < clearance;
 }
 
-/** The standard resize cursor for an edge, the exact keyword a desktop window
- *  manager shows on the same border. */
+/** The resize cursor for an edge: the game-styled token for that axis (the
+ *  gold-blade art in tokens.css, so editing never flips to the OS cursor set)
+ *  with the desktop window manager's keyword as the engine fallback. */
 export function cursorForFrameEdge(edge: FrameEdge): string {
   switch (edge) {
     case 'n':
     case 's':
-      return 'ns-resize';
+      return 'var(--cursor-resize-ns, ns-resize)';
     case 'e':
     case 'w':
-      return 'ew-resize';
+      return 'var(--cursor-resize-ew, ew-resize)';
     case 'ne':
     case 'sw':
-      return 'nesw-resize';
+      return 'var(--cursor-resize-nesw, nesw-resize)';
     default:
-      return 'nwse-resize';
+      return 'var(--cursor-resize-nwse, nwse-resize)';
   }
 }
 

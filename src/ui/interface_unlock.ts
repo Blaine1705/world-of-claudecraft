@@ -74,6 +74,10 @@ export interface InterfaceUnlockDeps {
   /** Fired after every flip with the new state (and from relocalize with the
    *  current one). The host hangs the edit-mode preview samples off it. */
   onUnlockedChanged?: (unlocked: boolean) => void;
+  /** Whether the Snap to Grid setting is on: while it is (and the interface
+   *  is unlocked), the coordinator shows the alignment grid overlay the
+   *  snapped drags land on. Absent means no grid ever shows. */
+  snapGridActive?: () => boolean;
 }
 
 /** One frame-behavior toggle row in the frames settings dropdown. */
@@ -107,6 +111,10 @@ export class InterfaceUnlock {
     framesBtn: HTMLButtonElement;
     menu: HTMLElement;
   } | null = null;
+  /** The 16px alignment grid shown while arranging with Snap to Grid on
+   *  (FRAME_SNAP_GRID; the stylesheet draws the lines). Minted with the edit
+   *  controls, refreshed on every unlock flip and snap-toggle change. */
+  private gridOverlay: HTMLElement | null = null;
   private menuOpen = false;
   private submenuOpen = false;
   private readonly entries: UnlockEntry[] = [];
@@ -165,6 +173,14 @@ export class InterfaceUnlock {
     menu.hidden = true;
     bar.appendChild(menu);
     host.appendChild(bar);
+    // The alignment grid sits FIRST in the host at z-index 0, so it paints
+    // over the world but under every HUD element being arranged.
+    const grid = doc.createElement('div');
+    grid.id = 'interface-grid-overlay';
+    grid.setAttribute('aria-hidden', 'true');
+    grid.hidden = true;
+    host.insertBefore(grid, host.firstChild);
+    this.gridOverlay = grid;
     this.controls = { bar, lockBtn, framesBtn, menu };
     return this.controls;
   }
@@ -316,7 +332,14 @@ export class InterfaceUnlock {
       const settings = doc.createElement('div');
       settings.className = 'frames-menu-settings';
       for (const toggle of toggles) {
-        settings.appendChild(this.checkRow(toggle.label, toggle.value, (v) => toggle.set(v)));
+        settings.appendChild(
+          this.checkRow(toggle.label, toggle.value, (v) => {
+            toggle.set(v);
+            // Snap to Grid (or any future toggle that feeds it) can change
+            // whether the alignment grid should show.
+            this.refreshGridOverlay();
+          }),
+        );
       }
       for (const select of selects) settings.appendChild(this.selectRow(select));
       menu.appendChild(settings);
@@ -347,7 +370,14 @@ export class InterfaceUnlock {
       entry.mover.setLockState(decisions.get(entry.id) ?? false);
     }
     this.deps.document.body.classList.toggle(INTERFACE_UNLOCKED_BODY_CLASS, unlocked);
+    this.refreshGridOverlay();
     this.deps.onUnlockedChanged?.(unlocked);
+  }
+
+  /** Show the alignment grid exactly while arranging with Snap to Grid on. */
+  private refreshGridOverlay(): void {
+    if (!this.gridOverlay) return;
+    this.gridOverlay.hidden = !(this.unlocked && (this.deps.snapGridActive?.() ?? false));
   }
 
   /** Re-run the unlock decision for every frame against the CURRENT eligibility,

@@ -1454,7 +1454,7 @@
   /* The frame while unlocked: a dashed gold hint and a move cursor over the body. */
   .unitframe.tf-unlocked,
   .warlock-doom-frame.tf-unlocked {
-    cursor: move;
+    cursor: var(--cursor-move, move);
     outline: 1px dashed var(--gold);
     outline-offset: -1px;
     touch-action: none;
@@ -1496,7 +1496,7 @@
   #xpbar.tf-unlocked,
   #buff-bar.tf-unlocked,
   #debuff-bar.tf-unlocked {
-    cursor: move;
+    cursor: var(--cursor-move, move);
     outline: 1px dashed var(--gold);
     outline-offset: -1px;
     touch-action: none;
@@ -1611,46 +1611,62 @@
     width: 22px;
     height: 22px;
     opacity: 0.85;
+    cursor: var(--cursor-resize-nwse, nwse-resize);
   }
   /* The border bands advertise themselves on hover: the hovered side paints
      an inset gold bar (data-resize-edge, written by the edge hover hit test),
-     so edge resizing is discoverable before the cursor change is noticed. */
-  .tf-unlocked[data-resize-edge="n"],
-  body.interface-unlocked #chatlog-wrap[data-resize-edge="n"] {
+     so edge resizing is discoverable before the cursor change is noticed.
+     The bar is drawn by a dedicated overlay CHILD (.tf-edge-glow, minted by
+     MovableFrame and the chat controller) stacked over the frame's own
+     content: an inset shadow on the frame itself painted UNDER the bars and
+     buttons inside it, which mostly hid the highlight. */
+  .tf-edge-glow {
+    display: none;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 120;
+  }
+  .tf-unlocked > .tf-edge-glow,
+  body.interface-unlocked #chatlog-wrap > .tf-edge-glow {
+    display: block;
+  }
+  .tf-unlocked[data-resize-edge="n"] > .tf-edge-glow,
+  body.interface-unlocked #chatlog-wrap[data-resize-edge="n"] > .tf-edge-glow {
     box-shadow: inset 0 3px 0 var(--gold);
   }
-  .tf-unlocked[data-resize-edge="s"],
-  body.interface-unlocked #chatlog-wrap[data-resize-edge="s"] {
+  .tf-unlocked[data-resize-edge="s"] > .tf-edge-glow,
+  body.interface-unlocked #chatlog-wrap[data-resize-edge="s"] > .tf-edge-glow {
     box-shadow: inset 0 -3px 0 var(--gold);
   }
-  .tf-unlocked[data-resize-edge="e"],
-  body.interface-unlocked #chatlog-wrap[data-resize-edge="e"] {
+  .tf-unlocked[data-resize-edge="e"] > .tf-edge-glow,
+  body.interface-unlocked #chatlog-wrap[data-resize-edge="e"] > .tf-edge-glow {
     box-shadow: inset -3px 0 0 var(--gold);
   }
-  .tf-unlocked[data-resize-edge="w"],
-  body.interface-unlocked #chatlog-wrap[data-resize-edge="w"] {
+  .tf-unlocked[data-resize-edge="w"] > .tf-edge-glow,
+  body.interface-unlocked #chatlog-wrap[data-resize-edge="w"] > .tf-edge-glow {
     box-shadow: inset 3px 0 0 var(--gold);
   }
-  .tf-unlocked[data-resize-edge="ne"],
-  body.interface-unlocked #chatlog-wrap[data-resize-edge="ne"] {
+  .tf-unlocked[data-resize-edge="ne"] > .tf-edge-glow,
+  body.interface-unlocked #chatlog-wrap[data-resize-edge="ne"] > .tf-edge-glow {
     box-shadow:
       inset 0 3px 0 var(--gold),
       inset -3px 0 0 var(--gold);
   }
-  .tf-unlocked[data-resize-edge="nw"],
-  body.interface-unlocked #chatlog-wrap[data-resize-edge="nw"] {
+  .tf-unlocked[data-resize-edge="nw"] > .tf-edge-glow,
+  body.interface-unlocked #chatlog-wrap[data-resize-edge="nw"] > .tf-edge-glow {
     box-shadow:
       inset 0 3px 0 var(--gold),
       inset 3px 0 0 var(--gold);
   }
-  .tf-unlocked[data-resize-edge="se"],
-  body.interface-unlocked #chatlog-wrap[data-resize-edge="se"] {
+  .tf-unlocked[data-resize-edge="se"] > .tf-edge-glow,
+  body.interface-unlocked #chatlog-wrap[data-resize-edge="se"] > .tf-edge-glow {
     box-shadow:
       inset 0 -3px 0 var(--gold),
       inset -3px 0 0 var(--gold);
   }
-  .tf-unlocked[data-resize-edge="sw"],
-  body.interface-unlocked #chatlog-wrap[data-resize-edge="sw"] {
+  .tf-unlocked[data-resize-edge="sw"] > .tf-edge-glow,
+  body.interface-unlocked #chatlog-wrap[data-resize-edge="sw"] > .tf-edge-glow {
     box-shadow:
       inset 0 -3px 0 var(--gold),
       inset 3px 0 0 var(--gold);
@@ -1778,7 +1794,7 @@
      controller: the whole box drags (its panes go pointer-inert so the wrap is
      the event target) and wears the same dashed outline as every other frame. */
   body.interface-unlocked #chatlog-wrap {
-    cursor: move;
+    cursor: var(--cursor-move, move);
     outline: 1px dashed var(--gold);
     outline-offset: -1px;
   }
@@ -1929,6 +1945,21 @@
      every frame's default spot, and above the frame chrome. These are the ONLY
      controls that stay live while the interface is unlocked, so they sit
      outside the pointer-inert sweep by not being inside a frame. */
+  /* The Snap to Grid alignment grid (frameSnapToGrid): one faint gold line
+     every 16px, the exact FRAME_SNAP_GRID pitch snapped drags land on
+     (src/ui/target_frame_pos.ts). First child of #ui at z-index 0, so it
+     paints over the world but under every frame being arranged; the
+     coordinator shows it only while the interface is unlocked AND the
+     setting is on (interface_unlock.ts refreshGridOverlay). */
+  #interface-grid-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      repeating-linear-gradient(to right, #c9a54528 0 1px, transparent 1px 16px),
+      repeating-linear-gradient(to bottom, #c9a54528 0 1px, transparent 1px 16px);
+  }
   #interface-edit-controls {
     position: absolute;
     left: 50%;
@@ -3483,7 +3514,7 @@
     z-index: 20;
   }
   #actionbar-group.tf-unlocked {
-    cursor: move;
+    cursor: var(--cursor-move, move);
     outline: 1px dashed var(--gold);
     outline-offset: -1px;
     touch-action: none;
@@ -8157,7 +8188,13 @@
     animation-play-state: var(--fx-ambient-anim, running);
   }
   .party-frame .bar {
-    height: 9px;
+    /* The hp/resource bars absorb a height drag the way the player and
+       target frames' --uf-bar-height does (partyFrameHeight is the ROW
+       height: the name line plus padding cost about 24px, the remainder
+       splits across the two bars, landing on the stock 9px at the stock
+       42px row). The raid presentation overrides this with its own
+       full-cell bar geometry. */
+    height: max(4px, calc((var(--party-frame-height, 42px) - 24px) / 2));
     margin-top: 2px;
   }
   .party-frame .bar.hp {
@@ -8285,7 +8322,7 @@
     border-color: var(--gold);
   }
   #party-frames.tf-unlocked {
-    cursor: move;
+    cursor: var(--cursor-move, move);
     outline: 1px dashed var(--gold);
     outline-offset: 4px;
     touch-action: none;

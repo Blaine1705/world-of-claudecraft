@@ -409,16 +409,16 @@ describe('boxFromEdgeDrag (the reflowing frames)', () => {
 });
 
 describe('cursorForFrameEdge', () => {
-  it('maps every edge to the window-manager resize cursor for that border', () => {
+  it('maps every edge to the game-styled token with its window-manager fallback', () => {
     const expected: Record<FrameEdge, string> = {
-      n: 'ns-resize',
-      s: 'ns-resize',
-      e: 'ew-resize',
-      w: 'ew-resize',
-      ne: 'nesw-resize',
-      sw: 'nesw-resize',
-      nw: 'nwse-resize',
-      se: 'nwse-resize',
+      n: 'var(--cursor-resize-ns, ns-resize)',
+      s: 'var(--cursor-resize-ns, ns-resize)',
+      e: 'var(--cursor-resize-ew, ew-resize)',
+      w: 'var(--cursor-resize-ew, ew-resize)',
+      ne: 'var(--cursor-resize-nesw, nesw-resize)',
+      sw: 'var(--cursor-resize-nesw, nesw-resize)',
+      nw: 'var(--cursor-resize-nwse, nwse-resize)',
+      se: 'var(--cursor-resize-nwse, nwse-resize)',
     };
     for (const [edge, cursor] of Object.entries(expected)) {
       expect(cursorForFrameEdge(edge as FrameEdge)).toBe(cursor);

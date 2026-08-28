@@ -78,6 +78,11 @@ class FakeEl {
   appendChild(child: FakeEl): void {
     this.children.push(child);
   }
+  insertBefore(child: FakeEl, ref: FakeEl | null): void {
+    const at = ref ? this.children.indexOf(ref) : -1;
+    if (at >= 0) this.children.splice(at, 0, child);
+    else this.children.push(child);
+  }
   removeChild(child: FakeEl): void {
     const at = this.children.indexOf(child);
     if (at >= 0) this.children.splice(at, 1);
@@ -302,6 +307,45 @@ describe('InterfaceUnlock frames menu', () => {
     // way back to showing the frame again.
     expect(rowBox(rows[0])?.checked).toBe(true);
     expect(rowBox(rows[1])?.checked).toBe(false);
+  });
+
+  it('shows the alignment grid only while unlocked with Snap to Grid on', () => {
+    let snapOn = false;
+    const { doc, made } = fakeDocument();
+    const unlock = new InterfaceUnlock({
+      document: doc,
+      snapGridActive: () => snapOn,
+      settingToggles: () => [
+        {
+          id: 'frameSnapToGrid',
+          label: 'Snap to Grid',
+          value: snapOn,
+          set: (v: boolean) => {
+            snapOn = v;
+          },
+        },
+      ],
+    });
+    const grid = () => made.find((el) => el.id === 'interface-grid-overlay');
+
+    unlock.setUnlocked(true);
+    expect(grid(), 'overlay minted with the edit controls').toBeTruthy();
+    expect(grid()?.hidden, 'unlocked with snap off: no grid').toBe(true);
+
+    // Flipping the Snap to Grid row in the open menu shows the grid at once.
+    made.find((el) => el.id === 'interface-frames-toggle')?.fire('click');
+    const settings = made.find((el) => el.className === 'frames-menu-settings');
+    const box = settings?.children[0]?.children.find((c) => c.tag === 'input');
+    expect(box).toBeTruthy();
+    if (!box) return;
+    box.checked = true;
+    box.fire('change');
+    expect(snapOn).toBe(true);
+    expect(grid()?.hidden, 'snap enabled mid-edit: grid appears').toBe(false);
+
+    unlock.setUnlocked(false);
+    expect(grid()?.hidden, 'locking hides the grid, setting untouched').toBe(true);
+    expect(snapOn).toBe(true);
   });
 
   it('toggling a row drives the mover hidden state both ways', () => {

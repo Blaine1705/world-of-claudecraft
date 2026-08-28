@@ -27,3 +27,31 @@ describe('desktop player frame sizing', () => {
     expect(hudCss).not.toContain('#player-frame.pf-detached .uf-bars');
   });
 });
+
+describe('party frame bar sizing', () => {
+  it('the hp/resource bars absorb a partyFrameHeight drag like the other unit frames', () => {
+    // The row height is the setting; the name line plus padding cost about
+    // 24px and the remainder splits across the two bars, landing on the
+    // stock 9px at the stock 42px row. A fixed bar height here is the bug
+    // the owner reported: rows grew while the health bars stayed 9px.
+    const bar = ruleBlock('.party-frame .bar {');
+    expect(bar).toContain('height: max(4px, calc((var(--party-frame-height, 42px) - 24px) / 2));');
+  });
+});
+
+describe('snap-to-grid alignment overlay', () => {
+  it('draws its lines on the exact FRAME_SNAP_GRID pitch', () => {
+    // FRAME_SNAP_GRID is 16 (pinned in tests/target_frame_pos.test.ts); the
+    // overlay must repeat on the same pitch or the drawn grid lies about
+    // where a snapped drag lands.
+    const overlay = hudCss.slice(hudCss.indexOf('#interface-grid-overlay {'));
+    const block = overlay.slice(0, overlay.indexOf('}'));
+    expect(block).toContain(
+      'repeating-linear-gradient(to right, #c9a54528 0 1px, transparent 1px 16px)',
+    );
+    expect(block).toContain(
+      'repeating-linear-gradient(to bottom, #c9a54528 0 1px, transparent 1px 16px)',
+    );
+    expect(block).toContain('pointer-events: none;');
+  });
+});

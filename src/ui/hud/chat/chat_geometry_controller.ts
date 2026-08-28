@@ -116,6 +116,16 @@ export class ChatGeometryController {
     grip.setAttribute('aria-label', t('hudChrome.chatWindow.resize'));
     grip.setAttribute('aria-keyshortcuts', 'ArrowUp ArrowDown ArrowLeft ArrowRight');
     grip.addEventListener('keydown', (event) => this.onKeyResize(event, wrap, tabs));
+    // Hovering the grip lights the two edges it resizes (right and bottom)
+    // through the same data-resize-edge channel the border hover writes;
+    // arrange mode only, matching the highlight's own CSS gate.
+    grip.addEventListener('pointerenter', () => {
+      if (this.deps.isInterfaceUnlocked?.() && !this.deps.isMobileLayout())
+        wrap.setAttribute('data-resize-edge', 'se');
+    });
+    grip.addEventListener('pointerleave', () => {
+      if (!this.chatBoxGesture) wrap.removeAttribute('data-resize-edge');
+    });
     frame.appendChild(grip);
 
     const resizeHandle = this.deps.document.createElement('div');
@@ -159,6 +169,9 @@ export class ChatGeometryController {
     });
     wrap.addEventListener('pointermove', (event) => {
       if (this.chatBoxGesture || !this.deps.isInterfaceUnlocked?.()) return;
+      // A move over the grip bubbles through here from inside the border
+      // band's dead zone; the grip's own hover stamps the 'se' pair.
+      if (event.target === grip) return;
       const edge = this.edgeAt(event, wrap, tabs);
       const cursor = edge ? cursorForFrameEdge(edge) : '';
       if (cursor !== this.hoverCursor) {
@@ -178,6 +191,11 @@ export class ChatGeometryController {
     frameLabel.className = 'tf-frame-label';
     frameLabel.textContent = t('hudChrome.interfaceUnlock.frameNames.chat');
     wrap.appendChild(frameLabel);
+    // The border-hover highlight surface (see .tf-edge-glow in hud.css).
+    const edgeGlow = this.deps.document.createElement('span');
+    edgeGlow.className = 'tf-edge-glow';
+    edgeGlow.setAttribute('aria-hidden', 'true');
+    wrap.appendChild(edgeGlow);
     // The arrange-mode keyboard MOVE half (the tab-strip drag's counterpart),
     // a real button like every MovableFrame's corner toggle: arrow keys step
     // the box, Shift for the fine step. The stylesheet shows it only under

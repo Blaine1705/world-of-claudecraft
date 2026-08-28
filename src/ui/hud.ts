@@ -2035,6 +2035,7 @@ export class Hud {
     // ran mover.resetSize(); frames whose sizes live in real SETTINGS (the
     // dimension drags, the scale factors) reset those here through the same
     // persist-and-apply pair the sliders use.
+    snapGridActive: () => !!this.optionsHooks?.settings.get('frameSnapToGrid'),
     resetSizeLabel: () => t('hudChrome.interfaceUnlock.resetFrameSize'),
     resetSizeLabelFor: (name) => t('hudChrome.interfaceUnlock.resetFrameSizeFor', { name }),
     onSizeReset: (id) => {
@@ -4018,6 +4019,10 @@ export class Hud {
   /** Toggle every movable HUD frame between locked and unlocked. Returns the new
    *  state, which is what the Interface option row repaints its label from. */
   toggleInterfaceUnlock(): boolean {
+    // Frame editing is desktop-only: every gesture refuses touch layouts and
+    // the stylesheet hides the editor chrome, so the mode itself is locked
+    // out here as the backstop (the options row is also gated off on touch).
+    if (this.isMobileLayout()) return false;
     return this.interfaceUnlock.toggle();
   }
 

@@ -240,6 +240,30 @@ describe('ChatGeometryController interface unlock', () => {
     expect(chip?.textContent).toBe(before);
   });
 
+  it('mints the edge-glow overlay and the grip hover lights its two edges', () => {
+    const harness = makeHarness(
+      { woc_chat_geometry: '{"left":100,"top":80,"width":370,"height":184}' },
+      { unlocked: true },
+    );
+    harness.controller.init();
+    expect(harness.wrap.querySelector('.tf-edge-glow')).toBeTruthy();
+
+    const grip = harness.frame.querySelector('.chat-resize-grip');
+    grip?.dispatchEvent(new Event('pointerenter'));
+    expect(harness.wrap.getAttribute('data-resize-edge')).toBe('se');
+    grip?.dispatchEvent(new Event('pointerleave'));
+    expect(harness.wrap.getAttribute('data-resize-edge')).toBeNull();
+  });
+
+  it('the grip hover stamps nothing while the interface is locked', () => {
+    const harness = makeHarness({
+      woc_chat_geometry: '{"left":100,"top":80,"width":370,"height":184}',
+    });
+    harness.controller.init();
+    harness.frame.querySelector('.chat-resize-grip')?.dispatchEvent(new Event('pointerenter'));
+    expect(harness.wrap.getAttribute('data-resize-edge')).toBeNull();
+  });
+
   it('hovering the unlocked wrap hit-tests a cached box, not a rect read per move', () => {
     const harness = makeHarness(
       { woc_chat_geometry: '{"left":100,"top":80,"width":370,"height":184}' },

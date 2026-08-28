@@ -281,6 +281,16 @@ export class MovableFrame {
       this.grip = grip;
       grip.addEventListener('pointerdown', (ev) => this.onScaleStart(ev));
       grip.addEventListener('keydown', (ev) => this.onKeyScale(ev));
+      // Hovering the corner grip lights the two edges it resizes (right and
+      // bottom, its own corner), through the same data-resize-edge channel
+      // the border hover writes.
+      grip.addEventListener('pointerenter', () => {
+        if (this.unlocked && !this.cfg.isMobileLayout())
+          this.cfg.frame.setAttribute('data-resize-edge', 'se');
+      });
+      grip.addEventListener('pointerleave', () => {
+        if (!this.gesture) this.cfg.frame.removeAttribute('data-resize-edge');
+      });
     }
     // The name chip: plain text naming WHICH frame this is, because an unlocked
     // placeholder (an empty cast bar, a disabled action bar) is otherwise an
@@ -291,6 +301,17 @@ export class MovableFrame {
       label.className = 'tf-frame-label';
       cfg.frame.appendChild(label);
       this.label = label;
+    }
+    // The border-hover highlight surface: a dedicated overlay child the
+    // stylesheet paints per data-resize-edge (see .tf-edge-glow in hud.css),
+    // stacked over the frame's own content so the hovered side's bar is
+    // never hidden behind the bars and buttons inside the frame. Appended
+    // LAST so the button/grip/label child indices above stay stable.
+    if (cfg.scalable) {
+      const glow = document.createElement('span');
+      glow.className = 'tf-edge-glow';
+      glow.setAttribute('aria-hidden', 'true');
+      cfg.frame.appendChild(glow);
     }
     this.refreshChrome();
 
@@ -842,6 +863,10 @@ export class MovableFrame {
   // left alone mid-gesture so the grabbed edge's cursor sticks.
   private onEdgeHover(ev: PointerEvent): void {
     if (this.gesture) return;
+    // A move over the grip bubbles through here with the pointer INSIDE the
+    // border band's dead zone, which would clear the 'se' pair the grip's
+    // own pointerenter just stamped; the grip owns its hover entirely.
+    if (this.grip && ev.target === this.grip) return;
     if (!this.unlocked || this.cfg.isMobileLayout()) {
       this.setHoverCursor('');
       return;
