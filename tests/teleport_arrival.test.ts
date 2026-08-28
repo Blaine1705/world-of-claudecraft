@@ -20,6 +20,11 @@ const NO_AMBIENT_WORLD: WorldContent = {
   groundObjects: [],
 };
 
+function required<T>(value: T | null | undefined, label: string): T {
+  if (value == null) throw new Error(`Expected ${label}`);
+  return value;
+}
+
 describe('settleTeleportArrival', () => {
   it('zeroes vertical velocity, clears jumping, grounds the entity, and pins fallStartY to the new pos', () => {
     const p = createPlayer(1, 'warrior', { x: 10, y: 40, z: 10 }, 'Faller');
@@ -51,7 +56,7 @@ describe('instance arrival resets an airborne player (dungeons)', () => {
   it('enterDungeon lands an airborne player settled, with no fall damage on the next tick', () => {
     const sim = makeSim();
     const pid = sim.addPlayer('warrior', 'Solo');
-    const p = sim.entities.get(pid)!;
+    const p = required(sim.entities.get(pid), 'player entity');
     p.maxHp = p.hp = 1_000_000;
     // Mid-jump over the overworld at the exact tick the door trigger fires
     // (door triggers run in the same tick as movement): a stale fallStartY

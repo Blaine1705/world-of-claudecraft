@@ -37,18 +37,7 @@ describe('self motion frame buffer', () => {
     const firstMove = moveInput(true);
     const first = buffer.write(true, firstMove, 1, 80, 4, 0.5, 1 / 60, 12, 50, null);
     const secondMove = moveInput(false);
-    const second = buffer.write(
-      false,
-      secondMove,
-      2,
-      120,
-      8,
-      0.75,
-      1 / 30,
-      31,
-      52,
-      riftFloor,
-    );
+    const second = buffer.write(false, secondMove, 2, 120, 8, 0.75, 1 / 30, 31, 52, riftFloor);
 
     expect(second).toBe(first);
     expect(second).toEqual({

@@ -25,11 +25,13 @@ import { GameServer } from '../server/game';
 import { type CharacterState, Sim } from '../src/sim/sim';
 import {
   canPrestige,
+  type Entity,
   MAX_LEVEL,
   MILESTONES,
   maxPrestigeRank,
   mobXpValue,
   PRESTIGE_XP_PER_RANK,
+  type SimEvent,
   virtualLevel,
   virtualLevelProgress,
   xpForLevel,
@@ -39,7 +41,13 @@ import {
 } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 import { formatXp, xpBarView } from '../src/ui/xp_bar';
-import { bareClient } from './helpers/bare_client';
+import { bareClient, broadcast, fakeWs, joinServer, lastSnap } from './helpers/bare_client';
+
+type VirtualLevelUpEvent = Extract<SimEvent, { type: 'virtualLevelUp' }>;
+type DeedUnlockedEvent = Extract<SimEvent, { type: 'deedUnlocked' }>;
+type MilestoneUnlockedEvent = SimEvent & { type: 'milestoneUnlocked' };
+type SnapshotMessage = { t: 'snap'; self: { lxp: number; prk: number } };
+type SnapshotClient = { applySnapshot(snap: SnapshotMessage): void };
 
 function makeSim(cls: 'warrior' | 'mage' | 'rogue' = 'warrior', seed = 42): Sim {
   return new Sim({ seed, playerClass: cls, autoEquip: true });
@@ -52,7 +60,7 @@ function required<T>(value: T | null | undefined, label: string): T {
 
 function nearestMob(sim: Sim) {
   const p = sim.player;
-  let best: any = null,
+  let best: Entity | null = null,
     bestD = Infinity;
   for (const e of sim.entities.values()) {
     if (e.kind !== 'mob' || e.dead) continue;
@@ -67,7 +75,7 @@ function nearestMob(sim: Sim) {
   return best;
 }
 
-function teleport(sim: Sim, e: any, x: number, z: number) {
+function teleport(sim: Sim, e: Entity, x: number, z: number) {
   e.pos.x = x;
   e.pos.z = z;
   e.pos.y = terrainHeight(x, z, sim.cfg.seed);
@@ -170,7 +178,9 @@ describe('solo grantXp at the cap', () => {
     sim.setPlayerLevel(MAX_LEVEL);
     sim.events.length = 0;
     sim.grantXp(xpToReachLevel(22)); // jump well past the cap
-    const vlevels = sim.events.filter((e) => e.type === 'virtualLevelUp').map((e: any) => e.level);
+    const vlevels = sim.events
+      .filter((e): e is VirtualLevelUpEvent => e.type === 'virtualLevelUp')
+      .map((e) => e.level);
     expect(vlevels).toContain(21);
     expect(vlevels).toContain(22);
   });
@@ -211,7 +221,7 @@ describe('party grantXp at the cap', () => {
     sim.setPlayerLevel(MAX_LEVEL, p1);
     sim.setPlayerLevel(MAX_LEVEL, p2);
 
-    const wolf = nearestMob(sim);
+    const wolf = required(nearestMob(sim), 'nearest mob');
     wolf.level = MAX_LEVEL; // make it worth XP for level-20 killers (anti-gray)
     const e1 = required(sim.entities.get(p1), 'party leader entity');
     const e2 = required(sim.entities.get(p2), 'party member entity');
@@ -221,7 +231,7 @@ describe('party grantXp at the cap', () => {
     const m2 = required(sim.meta(p2), 'party member metadata');
     const before2 = m2.lifetimeXp;
     wolf.hp = 1;
-    (sim as any).dealDamage(e1, wolf, 9999, false, 'physical', 'Test', 'hit');
+    sim.dealDamage(e1, wolf, 9999, false, 'physical', 'Test', 'hit');
 
     expect(wolf.dead).toBe(true);
     expect(m2.lifetimeXp).toBeGreaterThan(before2); // capped member still earns
@@ -268,10 +278,14 @@ describe('cosmetic milestones', () => {
     sim.grantXp(first.lifetimeXp + 1);
     const evs = sim.tick();
     expect(sim.unlockedMilestones).toContain(first.id);
-    expect(evs.some((e: any) => e.type === 'deedUnlocked' && e.deedId === `prog_${first.id}`)).toBe(
-      true,
+    expect(
+      evs.some(
+        (e): e is DeedUnlockedEvent => e.type === 'deedUnlocked' && e.deedId === `prog_${first.id}`,
+      ),
+    ).toBe(true);
+    expect(evs.some((e): e is MilestoneUnlockedEvent => e.type === 'milestoneUnlocked')).toBe(
+      false,
     );
-    expect(evs.some((e: any) => e.type === 'milestoneUnlocked')).toBe(false);
   });
 
   it('does not re-unlock a milestone already earned', () => {
@@ -283,7 +297,7 @@ describe('cosmetic milestones', () => {
     const evs = sim.tick();
     expect(
       evs.some(
-        (e: any) =>
+        (e) =>
           e.type === 'milestoneUnlocked' ||
           (e.type === 'deedUnlocked' && e.deedId === `prog_${MILESTONES[0].id}`),
       ),
@@ -422,7 +436,7 @@ describe('persistence', () => {
       'legacy serialized character state',
     );
     const state: CharacterState = { ...legacy, level: 12, xp: 500 };
-    delete (state as any).lifetimeXp;
+    delete (state as Partial<CharacterState>).lifetimeXp;
     const sim2 = makeSim('warrior');
     const pid = sim2.addPlayer('warrior', 'Legacy', { state });
     const m = required(sim2.meta(pid), 'legacy player metadata');
@@ -510,27 +524,22 @@ describe('online ClientWorld path', () => {
   });
 
   it('post-cap lifetimeXp and prestige reach the client via snapshot', () => {
-    const fc = {
-      sent: [] as any[],
-      ws: { readyState: 1, send: (p: string) => fc.sent.push(JSON.parse(p)) },
-    };
-    const session = server.join(fc.ws as any, 1, 1, 'Hilda', 'warrior', null);
-    if ('error' in session) throw new Error(session.error);
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Hilda');
 
     server.sim.setPlayerLevel(MAX_LEVEL, session.pid);
     const meta = required(server.sim.meta(session.pid), 'snapshot player metadata');
     server.sim.grantXp(xpToReachLevel(23), meta);
     server.sim.prestige(session.pid);
 
-    (server as any).broadcastSnapshots();
-    const snap = [...fc.sent].reverse().find((m) => m.t === 'snap');
-    expect(snap).toBeTruthy();
+    broadcast(server);
+    const snap = required(lastSnap(fc.sent) as SnapshotMessage | null, 'self snapshot');
     expect(snap.self.lxp).toBe(meta.lifetimeXp);
     expect(snap.self.prk).toBe(1);
 
     const serverLifetime = meta.lifetimeXp;
     const client = bareClient(session.pid);
-    (client as any).applySnapshot(snap);
+    (client as unknown as SnapshotClient).applySnapshot(snap);
     expect(client.lifetimeXp).toBe(serverLifetime);
     expect(client.prestigeRank).toBe(1);
     // the client derives the cosmetic virtual level for display — identical to
