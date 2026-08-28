@@ -10,8 +10,8 @@ import { EFFECTS_QUALITY_LOW_CUTOFF } from '../game/ui_effects_profile';
 import { attachBiomeHaze } from './biome_haze_field';
 import { FAR_ANIM_RANGE_SCALE_MAX } from './crowd_lod';
 // Side-effect import only: installs the final-color NaN guard (see the
-// comment on installPbrPointLightShaderPruning's call in initGfxTier below
-// for why this is a bare import here, not a call). This import is also what
+// point-light pruning comment in initGfxTier below for why this is a bare
+// import here, not a direct invocation). This import is also what
 // gives characters/preview.ts, characters/portrait.ts and armory_preview.ts
 // the guard, transitively: they reach it via gfx.ts, never call it directly.
 import './final_color_nan_guard';
@@ -1882,11 +1882,6 @@ export function activateGfxProfile(profile: GfxProfile): GfxProfile {
     epoch,
   });
 
-  // gradePass tiers already get an equivalent scrub one stage later via
-  // OutputGradePass's sanitizeFinite. Direct-render profiles need the chunk
-  // guard installed during profile activation so graphics rebuilds that skip
-  // initGfxTier still patch ShaderChunk before replacement materials compile.
-  if (!settings.gradePass) installFinalColorNanGuard();
   GFX = settings;
   softwareGlDetected = activated.softwareRendering;
   activeGfxProfile = activated;

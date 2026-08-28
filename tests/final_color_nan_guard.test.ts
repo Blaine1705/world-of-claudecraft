@@ -140,15 +140,16 @@ describe('patchOpaqueFragmentNanGuard coverage in stock shaders', () => {
     expect(THREE.ShaderChunk.opaque_fragment).not.toContain('#ifndef USE_FOG');
   });
 
-  it('patches global chunks when profile activation switches into direct rendering', () => {
+  it('keeps global chunks patched across profile activation', () => {
     THREE.ShaderChunk.opaque_fragment = originalOpaqueFragment;
     THREE.ShaderChunk.fog_fragment = originalFogFragment;
+    installFinalColorNanGuard();
 
     const gradePassProfile = resolveGfxProfile(desktopCapabilities, basePreferences, '');
     expect(gradePassProfile.settings.gradePass).toBe(true);
     activateGfxProfile(gradePassProfile);
-    expect(THREE.ShaderChunk.opaque_fragment).not.toContain('WOC_OPAQUE_NAN_GUARD');
-    expect(THREE.ShaderChunk.fog_fragment).not.toContain('WOC_FOG_NAN_GUARD');
+    expect(THREE.ShaderChunk.opaque_fragment).toContain('WOC_OPAQUE_NAN_GUARD');
+    expect(THREE.ShaderChunk.fog_fragment).toContain('WOC_FOG_NAN_GUARD');
 
     const directProfile = resolveGfxProfile(
       desktopCapabilities,
