@@ -10964,7 +10964,7 @@ export const da_DK: EnTranslations = {
       },
       "iron_resolve": {
         "name": "Jernvilje",
-        "description": "Bid tænderne sammen og ignorér smerten: bruger op til 40 raseri (mindst 20) for at absorbere 4 skade pr. brugt raseripoint i op til 10 sek. (Beskyttelse)"
+        "description": "Bid tænderne sammen og ignorér smerten: bruger op til 40 raseri (mindst 20) for at absorbere {absorbPerRage} skade pr. brugt raseripoint i op til 10 sek. (Beskyttelse)"
       },
       "faultline": {
         "name": "Jordspalte",
@@ -18536,6 +18536,16 @@ export const da_DK: EnTranslations = {
         "bonus4": "Dine kritiske våbenslag har 50% chance for at give Gravmagt og øge angrebskraft med 60 i 10 sek.",
         "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 5 damage every 2 sec for 12 sec. Stacks up to 3 times."
       },
+      "emberfury": {
+        "name": "Emberfury Harness",
+        "bonus2": "Your Enrage lasts 6 sec instead of 4.",
+        "bonus4": "Bloodletting always Enrages you, and its healing rises to 8 percent of your maximum health."
+      },
+      "forgewall": {
+        "name": "Forgewall Aegis",
+        "bonus2": "Iron Resolve converts rage at 5 absorb per point instead of 4.",
+        "bonus4": "Casting Shieldcrack reduces Iron Resolve's remaining cooldown by 2 sec."
+      },
       "greyjaw_stalker": {
         "name": "Gråkæbe-jægerens udstyr",
         "bonus3": "Øger angrebs- og magihastighed med 15%."
@@ -18551,6 +18561,11 @@ export const da_DK: EnTranslations = {
         "bonus2": "Øger angrebskraft med 40.",
         "bonus4": "Dine kritiske våbenslag river en Laset Flænge og påfører 6 blødningsskade hvert 2. sek. i 12 sek. Stakker op til 3 gange.",
         "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 4 damage every 2 sec for 12 sec. Stacks up to 3 times."
+      },
+      "slagbreaker": {
+        "name": "Slagbreaker Battlegear",
+        "bonus2": "Redhand empowers your next Maiming Strike by 30 percent per stack instead of 20.",
+        "bonus4": "Every second cast of Redhand reduces Breachmaker's remaining cooldown by 3 sec."
       },
       "soulflame": {
         "name": "Wraithfire regalier",

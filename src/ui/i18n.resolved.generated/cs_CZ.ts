@@ -10964,7 +10964,7 @@ export const cs_CZ: EnTranslations = {
       },
       "iron_resolve": {
         "name": "Železné odhodlání",
-        "description": "Zatneš zuby a ignoruješ bolest: spotřebuješ až 40 vzteku (nejméně 20) a za každý spotřebovaný bod vzteku absorbuješ 4 poškození po dobu až 10 s. (Ochrana)"
+        "description": "Zatneš zuby a ignoruješ bolest: spotřebuješ až 40 vzteku (nejméně 20) a za každý spotřebovaný bod vzteku absorbuješ {absorbPerRage} poškození po dobu až 10 s. (Ochrana)"
       },
       "faultline": {
         "name": "Zlomová linie",
@@ -18536,6 +18536,16 @@ export const cs_CZ: EnTranslations = {
         "bonus4": "Kritické zásahy tvé zbraně mají 50% šanci udělit Hrobomoc, která zvýší sílu útoku o 60 na 10 s.",
         "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 5 damage every 2 sec for 12 sec. Stacks up to 3 times."
       },
+      "emberfury": {
+        "name": "Emberfury Harness",
+        "bonus2": "Your Enrage lasts 6 sec instead of 4.",
+        "bonus4": "Bloodletting always Enrages you, and its healing rises to 8 percent of your maximum health."
+      },
+      "forgewall": {
+        "name": "Forgewall Aegis",
+        "bonus2": "Iron Resolve converts rage at 5 absorb per point instead of 4.",
+        "bonus4": "Casting Shieldcrack reduces Iron Resolve's remaining cooldown by 2 sec."
+      },
       "greyjaw_stalker": {
         "name": "Výbava stopaře Šedočelista",
         "bonus3": "Zvyšuje rychlost útoku a sesílání o 15 %."
@@ -18551,6 +18561,11 @@ export const cs_CZ: EnTranslations = {
         "bonus2": "Zvyšuje sílu útoku o 40.",
         "bonus4": "Kritické zásahy tvé zbraně vytrhnou Rozšklebenou ránu a způsobí cíli krvácení za 6 poškození každé 2 s po dobu 12 s. Nasčítá se až 3krát.",
         "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 4 damage every 2 sec for 12 sec. Stacks up to 3 times."
+      },
+      "slagbreaker": {
+        "name": "Slagbreaker Battlegear",
+        "bonus2": "Redhand empowers your next Maiming Strike by 30 percent per stack instead of 20.",
+        "bonus4": "Every second cast of Redhand reduces Breachmaker's remaining cooldown by 3 sec."
       },
       "soulflame": {
         "name": "Regálie přízračného ohně",

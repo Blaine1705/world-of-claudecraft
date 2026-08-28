@@ -12,6 +12,7 @@
 import { ITEMS } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { canEquipItemInSlot } from '../equipment_rules';
+import { refreshModsForEquipmentChange } from '../progression/talents';
 import type { SimContext } from '../sim_context';
 import type { EquipSlot, ItemDef } from '../types';
 import { ALL_EQUIP_SLOTS } from '../types';
@@ -99,6 +100,7 @@ function applyDevGear(
     if (meta.equipmentInstance) delete meta.equipmentInstance[slot];
     equipped++;
   }
+  refreshModsForEquipmentChange(ctx, meta);
   recalcPlayerStats(player, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   player.hp = player.maxHp;
   return equipped;

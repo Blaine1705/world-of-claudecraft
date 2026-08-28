@@ -10964,7 +10964,7 @@ export const es_ES: EnTranslations = {
       },
       "iron_resolve": {
         "name": "Temple de Hierro",
-        "description": "Aprietas los dientes e ignoras el dolor: gasta hasta 40 de ira (20 como mínimo) para absorber 4 de daño por cada punto de ira gastado, durante un máximo de 10 s. (Protección)"
+        "description": "Aprietas los dientes e ignoras el dolor: gasta hasta 40 de ira (20 como mínimo) para absorber {absorbPerRage} de daño por cada punto de ira gastado, durante un máximo de 10 s. (Protección)"
       },
       "faultline": {
         "name": "Falla",
@@ -18536,6 +18536,16 @@ export const es_ES: EnTranslations = {
         "bonus4": "Tus golpes críticos con el arma tienen un 50% de probabilidad de otorgar Poderío Sepulcral, aumentando el poder de ataque en 60 durante 10 s.",
         "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 5 damage every 2 sec for 12 sec. Stacks up to 3 times."
       },
+      "emberfury": {
+        "name": "Emberfury Harness",
+        "bonus2": "Your Enrage lasts 6 sec instead of 4.",
+        "bonus4": "Bloodletting always Enrages you, and its healing rises to 8 percent of your maximum health."
+      },
+      "forgewall": {
+        "name": "Forgewall Aegis",
+        "bonus2": "Iron Resolve converts rage at 5 absorb per point instead of 4.",
+        "bonus4": "Casting Shieldcrack reduces Iron Resolve's remaining cooldown by 2 sec."
+      },
       "greyjaw_stalker": {
         "name": "Equipo del Acechador de Greyjaw",
         "bonus3": "Aumenta la velocidad de ataque y de lanzamiento en 15%."
@@ -18551,6 +18561,11 @@ export const es_ES: EnTranslations = {
         "bonus2": "Aumenta el poder de ataque en 40.",
         "bonus4": "Tus golpes críticos con el arma abren un Tajo Desgarrado, haciendo sangrar al objetivo 6 de daño cada 2 s durante 12 s. Se acumula hasta 3 veces.",
         "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 4 damage every 2 sec for 12 sec. Stacks up to 3 times."
+      },
+      "slagbreaker": {
+        "name": "Slagbreaker Battlegear",
+        "bonus2": "Redhand empowers your next Maiming Strike by 30 percent per stack instead of 20.",
+        "bonus4": "Every second cast of Redhand reduces Breachmaker's remaining cooldown by 3 sec."
       },
       "soulflame": {
         "name": "Vestiduras de Wraithfire",

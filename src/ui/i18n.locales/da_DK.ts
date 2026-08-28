@@ -3109,7 +3109,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.intimidating_shout.description': 'Et skrækindjagende råb, der får op til 5 fjender inden for 8 m til at flygte i rædsel i 4 sek. Skade kan bryde effekten.',
   'entities.abilities.intimidating_shout.name': 'Frygtindgydende Råb',
   'entities.abilities.iron_resolve.description':
-    'Bid tænderne sammen og ignorér smerten: bruger op til 40 raseri (mindst 20) for at absorbere 4 skade pr. brugt raseripoint i op til 10 sek. (Beskyttelse)',
+    'Bid tænderne sammen og ignorér smerten: bruger op til 40 raseri (mindst 20) for at absorbere {absorbPerRage} skade pr. brugt raseripoint i op til 10 sek. (Beskyttelse)',
   'entities.abilities.iron_resolve.name': 'Jernvilje',
   'entities.abilities.measured_fury.description':
     'Dit afmålte raseri skærper din økonomi: dine evner koster 10% mindre raseri. (Arms)',

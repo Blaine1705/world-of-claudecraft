@@ -3265,7 +3265,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.intimidating_shout.description': "Un cri terrifiant qui fait fuir de peur jusqu'à 5 ennemis dans un rayon de 8 m pendant 4 s. Les dégâts peuvent briser l'effet.",
   'entities.abilities.intimidating_shout.name': 'Cri intimidant',
   'entities.abilities.iron_resolve.description':
-    'Serrez les dents et ignorez la douleur : dépense jusqu’à 40 points de rage (20 minimum) pour absorber 4 points de dégâts par point de rage dépensé, pendant un maximum de 10 s. (Protection)',
+    'Serrez les dents et ignorez la douleur : dépense jusqu’à 40 points de rage (20 minimum) pour absorber {absorbPerRage} points de dégâts par point de rage dépensé, pendant un maximum de 10 s. (Protection)',
   'entities.abilities.iron_resolve.name': 'Résolution de fer',
   'entities.abilities.measured_fury.description':
     'Votre fureur mesurée affine votre économie : vos techniques coûtent 10% de rage en moins. (Armes)',

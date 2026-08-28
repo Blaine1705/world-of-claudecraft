@@ -2968,7 +2968,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.intimidating_shout.description': 'Một tiếng thét kinh hoàng khiến tối đa 5 kẻ địch trong 8 m bỏ chạy vì sợ hãi trong 4 giây. Sát thương có thể phá vỡ hiệu ứng.',
   'entities.abilities.intimidating_shout.name': 'Tiếng Hét Uy Hiếp',
   'entities.abilities.iron_resolve.description':
-    'Nghiến răng chịu đau: tiêu hao tối đa 40 nộ khí (tối thiểu 20) để hấp thụ 4 sát thương cho mỗi điểm nộ khí đã dùng, kéo dài tối đa 10 giây. (Hộ Vệ)',
+    'Nghiến răng chịu đau: tiêu hao tối đa 40 nộ khí (tối thiểu 20) để hấp thụ {absorbPerRage} sát thương cho mỗi điểm nộ khí đã dùng, kéo dài tối đa 10 giây. (Hộ Vệ)',
   'entities.abilities.iron_resolve.name': 'Ý Chí Sắt Đá',
   'entities.abilities.measured_fury.description':
     'Cơn thịnh nộ chừng mực giúp bạn chi tiêu khôn ngoan hơn: các kỹ năng của bạn tốn ít hơn 10% nộ khí. (nhánh Vũ Khí)',

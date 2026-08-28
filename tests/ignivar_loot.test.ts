@@ -20,6 +20,7 @@ import {
   IGNIVAR_SIGIL_ITEMS,
   IGNIVAR_WEAPON_ITEMS,
 } from '../src/sim/content/ignivar_loot';
+import { SET_ENGINE_BONUSES } from '../src/sim/content/ignivar_set_bonuses';
 import { ITEM_SETS } from '../src/sim/content/item_sets';
 import { WEAPON_TYPE_BY_ITEM } from '../src/sim/content/weapon_skin_rules';
 import { ITEMS, MOBS } from '../src/sim/data';
@@ -128,18 +129,48 @@ describe('ignivar loot: the 29 sets', () => {
     }
   });
 
-  it('the 29 set ids are deliberately ABSENT from ITEM_SETS (Phase A)', () => {
-    // The set: tags ship before their bonuses: an unregistered set id folds to
-    // nothing everywhere by design, and this pin is the forcing function that
-    // distinguishes that deliberate Phase A state from a typo'd id. The Phase B
-    // bonus change INVERTS this assertion when it registers the 29 sets
+  it('the Phase B rollout ledger: registered sets are complete, the rest stay absent', () => {
+    // Phase A shipped every set: tag with NO registration (an unregistered id
+    // folds to nothing everywhere by design). Phase B registers the sets one
+    // class wave at a time, and each registration must be COMPLETE: an
+    // ITEM_SETS record with exactly the 2-piece and 4-piece tiers (tooltip
+    // text) AND a matching engine table (content/ignivar_set_bonuses.ts), so
+    // a tooltip never promises an unimplemented bonus and an engine payload
+    // never ships without its tooltip. Move an id from PENDING to REGISTERED
+    // here in the same change that lands its wave
     // (docs/prd/ignivar-set-bonus-final.md).
+    const REGISTERED_SET_IDS = ['slagbreaker', 'emberfury', 'forgewall'] as const;
     const setIds = new Set(
       Object.values(IGNIVAR_SET_ITEMS).flatMap((item) => (item.set ? [item.set] : [])),
     );
     expect(setIds.size).toBe(29);
+    const registered = new Set<string>(REGISTERED_SET_IDS);
+    for (const setId of registered) expect(setIds.has(setId), setId).toBe(true);
     for (const setId of setIds) {
-      expect(ITEM_SETS[setId], `${setId} must stay unregistered until Phase B`).toBeUndefined();
+      if (!registered.has(setId)) {
+        expect(ITEM_SETS[setId], `${setId} stays unregistered until its wave`).toBeUndefined();
+        expect(
+          SET_ENGINE_BONUSES[setId],
+          `${setId} engine bonuses land with its registration`,
+        ).toBeUndefined();
+        continue;
+      }
+      const set = ITEM_SETS[setId];
+      expect(set, setId).toBeDefined();
+      expect(
+        set?.bonuses.map((tier) => tier.pieces),
+        `${setId} breaks at exactly 2 and 4 pieces`,
+      ).toEqual([2, 4]);
+      // Engine bonuses ride the talent seam, never the stat engine: every
+      // registered tier's SetBonusEffect stays EMPTY here.
+      for (const tier of set?.bonuses ?? []) {
+        expect(Object.keys(tier.effect), `${setId} ${tier.pieces}pc stays stat-free`).toEqual([]);
+        expect(tier.text.length, `${setId} ${tier.pieces}pc has tooltip text`).toBeGreaterThan(0);
+      }
+      expect(
+        SET_ENGINE_BONUSES[setId]?.map((tier) => tier.pieces),
+        `${setId} engine tiers mirror the tooltip tiers`,
+      ).toEqual([2, 4]);
     }
   });
 

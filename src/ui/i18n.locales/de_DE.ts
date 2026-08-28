@@ -3189,7 +3189,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.intimidating_shout.description': 'Ein furchteinflößender Schrei, der bis zu 5 Gegner im Umkreis von 8 m 4 Sek. lang in Furcht davonlaufen lässt. Schaden kann den Effekt brechen.',
   'entities.abilities.intimidating_shout.name': 'Drohruf',
   'entities.abilities.iron_resolve.description':
-    'Beißt die Zähne zusammen und ignoriert den Schmerz: Verbraucht bis zu 40 Wut (mindestens 20), um pro verbrauchtem Wutpunkt 4 Schaden zu absorbieren. Hält bis zu 10 Sek. an. (Schutz)',
+    'Beißt die Zähne zusammen und ignoriert den Schmerz: Verbraucht bis zu 40 Wut (mindestens 20), um pro verbrauchtem Wutpunkt {absorbPerRage} Schaden zu absorbieren. Hält bis zu 10 Sek. an. (Schutz)',
   'entities.abilities.iron_resolve.name': 'Eiserne Entschlossenheit',
   'entities.abilities.measured_fury.description':
     'Euer maßvoller Zorn lehrt Euch Sparsamkeit: Eure Fähigkeiten kosten 10% weniger Wut. (Waffen)',

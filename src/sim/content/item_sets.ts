@@ -454,6 +454,67 @@ export const ITEM_SETS: Record<string, ItemSet> = {
       'Increases Warfare Offense and Defense Rating by 80. Your spells have a 15% chance to grant Thornguard, increasing dodge by 15% for 6 sec.',
     ),
   },
+
+  // ---- Crucible tier sets (Ignivar raid, Phase B) ----
+  // Five-piece class sets breaking at 2 and 4 pieces. The tiers here carry
+  // EMPTY stat effects ON PURPOSE: every Crucible bonus modifies the spec's
+  // engine, never raw stats (the maintainer ruling in
+  // docs/prd/ignivar-raid-loot.md, decision 7), so the payloads live in
+  // content/ignivar_set_bonuses.ts and apply through the talent-modifier
+  // seam (src/sim/set_bonus_mods.ts). The `text` below is the tooltip
+  // promise; tests pin it against the audited engine constants so copy and
+  // implementation cannot drift. Sets register one class wave at a time,
+  // text and engine TOGETHER (the rollout ledger in
+  // tests/ignivar_loot.test.ts), so a tooltip never promises an
+  // unimplemented bonus.
+  slagbreaker: {
+    id: 'slagbreaker',
+    name: 'Slagbreaker Battlegear',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: 'Redhand empowers your next Maiming Strike by 30 percent per stack instead of 20.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        // "Every second cast", not "casting": the engine fires on castNth
+        // n:2 (the adversarial-round sizing), and the tooltip must not
+        // promise double the real rate. Deviation from the set doc's copy
+        // line, flagged for maintainer review in the PR.
+        text: "Every second cast of Redhand reduces Breachmaker's remaining cooldown by 3 sec.",
+      },
+    ],
+  },
+  emberfury: {
+    id: 'emberfury',
+    name: 'Emberfury Harness',
+    bonuses: [
+      { pieces: 2, effect: {}, text: 'Your Enrage lasts 6 sec instead of 4.' },
+      {
+        pieces: 4,
+        effect: {},
+        text: 'Bloodletting always Enrages you, and its healing rises to 8 percent of your maximum health.',
+      },
+    ],
+  },
+  forgewall: {
+    id: 'forgewall',
+    name: 'Forgewall Aegis',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: 'Iron Resolve converts rage at 5 absorb per point instead of 4.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: "Casting Shieldcrack reduces Iron Resolve's remaining cooldown by 2 sec.",
+      },
+    ],
+  },
 };
 
 // Fully-resolved set effect: every field defaulted so callers never branch on

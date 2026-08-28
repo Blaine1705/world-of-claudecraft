@@ -3186,7 +3186,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.intimidating_shout.description': 'Um grito aterrorizante que faz até 5 inimigos a até 8 m fugirem de medo por 4 s. O dano pode quebrar o efeito.',
   'entities.abilities.intimidating_shout.name': 'Brado Intimidador',
   'entities.abilities.iron_resolve.description':
-    'Cerre os dentes e ignore a dor: gasta até 40 de raiva (mínimo de 20) para absorver 4 de dano por ponto de raiva gasto, por até 10 s. (Proteção)',
+    'Cerre os dentes e ignore a dor: gasta até 40 de raiva (mínimo de 20) para absorver {absorbPerRage} de dano por ponto de raiva gasto, por até 10 s. (Proteção)',
   'entities.abilities.iron_resolve.name': 'Determinação de Ferro',
   'entities.abilities.measured_fury.description':
     'Sua fúria comedida apura sua economia: suas habilidades custam 10% menos raiva. (Armas)',

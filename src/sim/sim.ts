@@ -547,6 +547,7 @@ import { sanitizeRemovedZone1Content } from './removed_zone1_content';
 import { rideSteepnessAt, shoreStepOut, stepWaterLevel } from './ride_height';
 import { Rng } from './rng';
 import { persistedResource } from './serialize_resource';
+import { computeCharacterModifiers } from './set_bonus_mods';
 import {
   createSimContext,
   type DamageResolution,
@@ -3538,7 +3539,7 @@ export class Sim {
 
     // Resolve the flat talent struct once, before the stat pass + ability
     // resolver below consume it (they only ever read these flat numbers).
-    meta.talentMods = computeTalentModifiers(cls, meta.talents, player.level);
+    meta.talentMods = computeCharacterModifiers(cls, meta.talents, player.level, meta.equipment);
     this.refreshKnownAbilities(meta, false);
     recalcPlayerStats(player, cls, meta.equipment, meta.talentMods, meta.equipmentInstance);
     if (savedState) {
@@ -5919,7 +5920,8 @@ export class Sim {
     // jump must strengthen (or weaken) the mastery, exactly like the live ding path
     // (combat/damage.ts grantXp). Without this a level-jumped character keeps the
     // mastery baked at the OLD level.
-    r.meta.talentMods = computeTalentModifiers(r.meta.cls, r.meta.talents, r.e.level);
+    const m = r.meta;
+    m.talentMods = computeCharacterModifiers(m.cls, m.talents, r.e.level, m.equipment);
     recalcPlayerStats(
       r.e,
       r.meta.cls,

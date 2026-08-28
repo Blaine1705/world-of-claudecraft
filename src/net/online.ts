@@ -15,7 +15,6 @@ import { signChallenge } from '../sim/client_challenge';
 import { MOUNT_RACE_COURSE, type MountKey, normalizeMountKey } from '../sim/content/mounts';
 import { mechChromaSkinIndex } from '../sim/content/skins';
 import {
-  computeTalentModifiers,
   emptyAllocation,
   type Role,
   repairAllocation,
@@ -59,6 +58,7 @@ import {
   restoreReliquaryState,
   type SavedReliquaryState,
 } from '../sim/reliquary';
+import { computeCharacterModifiers } from '../sim/set_bonus_mods';
 import type { ResolvedAbility } from '../sim/sim';
 import { parseTalentAllocation } from '../sim/talent_allocation_input';
 import { repairTalentLoadouts } from '../sim/talent_loadouts';
@@ -3625,7 +3625,12 @@ export class ClientWorld implements IWorld {
       }
       if (!this.talents) this.talents = emptyAllocation();
       const talents = this.talents;
-      const talentMods = computeTalentModifiers(this.cfg.playerClass, talents, e.level);
+      const talentMods = computeCharacterModifiers(
+        this.cfg.playerClass,
+        talents,
+        e.level,
+        this.equipment,
+      );
       this.talentSpec = talentMods.spec;
       this.talentRole = talentMods.role;
       this.known = abilitiesKnownAt(this.cfg.playerClass, e.level, talentMods, this.questsDone);

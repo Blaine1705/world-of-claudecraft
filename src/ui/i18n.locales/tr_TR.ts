@@ -3065,7 +3065,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.intimidating_shout.description': '8 m içindeki en fazla 5 düşmanı 4 sn boyunca korkuyla kaçırtan dehşet verici bir haykırış. Hasar etkiyi bozabilir.',
   'entities.abilities.intimidating_shout.name': 'Gözdağı Narası',
   'entities.abilities.iron_resolve.description':
-    'Dişini sıkıp acıyı yok say: 40’a kadar öfke harcar (en az 20) ve harcanan her öfke başına 4 hasarı en fazla 10 sn boyunca soğurur. (Koruma)',
+    'Dişini sıkıp acıyı yok say: 40’a kadar öfke harcar (en az 20) ve harcanan her öfke başına {absorbPerRage} hasarı en fazla 10 sn boyunca soğurur. (Koruma)',
   'entities.abilities.iron_resolve.name': 'Demir Azim',
   'entities.abilities.measured_fury.description':
     'Ölçülü gazabın tutumunu keskinleştirir: yeteneklerin %10 daha az öfkeye mal olur. (Silahşor)',

@@ -255,7 +255,10 @@ const MONOLITHS: MonolithRow[] = [
     // party trade window countdown): a one-line clock read against
     // lockoutNowMs; the window logic itself lives in loot/bop_trade_window.ts.
     // Thin facet wiring with no clean extraction. Exact count, zero slack.
-    ceiling: 12463,
+    // Plus 2 for the Phase B set-bonus seam: the set_bonus_mods import and
+    // the setPlayerLevel writer routing through computeCharacterModifiers
+    // (the resolver itself is the extracted module). Exact count, zero slack.
+    ceiling: 12465,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -354,7 +357,11 @@ const MONOLITHS: MonolithRow[] = [
     // Plus 4 for the partyTradeMsRemaining IWorld facet delegate (the BoP
     // party trade window countdown vs Date.now(), riftEventMsRemaining's
     // clock). Thin facet wiring with no clean extraction. Exact count.
-    ceiling: 5814,
+    // Plus 5 for the Phase B set-bonus mirror: the snapshot decode resolves
+    // talent mods through computeCharacterModifiers with the equipment
+    // mirror, so worn Crucible tiers read identically in both hosts. Thin
+    // wiring to the extracted set_bonus_mods seam. Exact count.
+    ceiling: 5819,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

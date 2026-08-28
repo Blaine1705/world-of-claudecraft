@@ -58,6 +58,7 @@ import { mountOwned, summonMountItem } from './mounts';
 import { learnRiding } from './mounts_training';
 import { battlefieldExperienceTrickle } from './professions/battlefield_xp';
 import { useGatherToolItem } from './professions/gathering';
+import { refreshModsForEquipmentChange } from './progression/talents';
 import type { ItemUseResult, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { usePassingStone } from './tutorial/death_lesson';
@@ -609,6 +610,7 @@ export function equipItem(
   }
   // The all-slots deed reads equipment, so re-check this player's triggers.
   ctx.markDeedsDirty(meta.entityId);
+  refreshModsForEquipmentChange(ctx, meta);
   recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   ctx.emit({
     type: 'log',
@@ -636,6 +638,7 @@ export function revalidateOffhandForSpec(ctx: SimContext, pid?: number): void {
   if (meta.equipmentInstance) delete meta.equipmentInstance.offhand;
   returnEquippedItemToBags(meta, offhandId, instance);
   ctx.markDeedsDirty(meta.entityId);
+  refreshModsForEquipmentChange(ctx, meta);
   recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   ctx.emit({
     type: 'log',
@@ -700,6 +703,7 @@ export function unequipItem(ctx: SimContext, slot: EquipSlot, pid?: number): boo
   // today keys on an unequip, so there is nothing to award here regardless. An
   // enchanted piece gets its own instanced slot instead, so its enchant survives.
   returnEquippedItemToBags(meta, itemId, instance);
+  refreshModsForEquipmentChange(ctx, meta);
   recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   const def = ITEMS[itemId];
   ctx.emit({

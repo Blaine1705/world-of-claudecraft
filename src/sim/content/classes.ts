@@ -8727,7 +8727,12 @@ export function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): voi
           effect.type === 'selfBuff' ||
           effect.type === 'buffTarget' ||
           effect.type === 'absorb' ||
-          effect.type === 'hot'
+          effect.type === 'hot' ||
+          // Emberfury 2pc (the Crucible set doc's rewrite-list extension):
+          // the Enrage an enrageChance effect grants reads its RESOLVED
+          // duration, so a durationFlat row lengthens the buff for engine
+          // and tooltip alike.
+          effect.type === 'enrageChance'
         ) {
           return { ...effect, duration: Math.max(0, effect.duration + (am.durationFlat ?? 0)) };
         }
@@ -8760,7 +8765,14 @@ export function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): voi
               // damage; a re-coat picks up the new value).
               e.type === 'imbue'
               ? { ...e, bonus: Math.round(e.bonus * mul) }
-              : e,
+              : // Forgewall 2pc (the Crucible set doc's scaleEffect
+                // extension): Iron Resolve's rage-to-absorb rate is the
+                // buff-shaped value on absorbSpentResource, so the generic
+                // per-ability knob reaches it and the tooltip splice reads
+                // the same resolved rate the dispatch consumes.
+                e.type === 'absorbSpentResource'
+                ? { ...e, mult: Math.round(e.mult * mul) }
+                : e,
       );
     }
   }

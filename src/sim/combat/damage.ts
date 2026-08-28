@@ -37,6 +37,7 @@ import { snapshotPetOnOwnerDeath } from '../pet/pet_owner_revive';
 import { pvpDamageMultiplier } from '../pvp';
 import { resolveRespawnSeconds } from '../respawn_policy';
 import { aurasSurvivingDeath } from '../resurrection';
+import { computeCharacterModifiers } from '../set_bonus_mods';
 import type { PlayerMeta } from '../sim';
 import type { DamageResolution, SimContext } from '../sim_context';
 import { addThreat, clearThreat, petCanSeeStealthedTarget } from '../threat';
@@ -1810,7 +1811,7 @@ export function grantXp(
     // Re-bake the flat talent mods at the new level BEFORE the stat pass: spec mastery
     // magnitudes scale with level (min(1, level/20) in accumulate), so a ding must
     // strengthen the mastery without waiting for a respec/spec-pick/relog re-bake.
-    meta.talentMods = computeTalentModifiers(meta.cls, meta.talents, p.level);
+    meta.talentMods = computeCharacterModifiers(meta.cls, meta.talents, p.level, meta.equipment);
     recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
     p.hp = p.maxHp;
     if (p.resourceType === 'mana') p.resource = p.maxResource;

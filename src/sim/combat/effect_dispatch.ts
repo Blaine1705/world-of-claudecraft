@@ -16,6 +16,10 @@
 // shared `ctx.rng` stream, drawn in the exact pre-move order.
 
 import { isDebuffAura, isDispellableAura, isPlayerRemovableAura } from '../aura_classify';
+import {
+  EMBERFURY_4PC_BLOODLETTING_HEAL_PCT_MAX,
+  setBonusFlag,
+} from '../content/ignivar_set_bonuses';
 import { ABILITIES, isDelvePos, MOBS } from '../data';
 import { logCascadeCast, recordCascadeInitial } from '../dev/cascade_playtest';
 import { recalcPlayerStats } from '../entity';
@@ -1027,8 +1031,19 @@ export function runEffects(
       }
       case 'enrageChance': {
         // Guaranteed Enrage consumes no RNG; probabilistic Bloodletting draws
-        // exactly once at the authored chance.
-        if (eff.chance < 1 && !ctx.rng.chance(eff.chance)) break;
+        // exactly once at the authored chance. Emberfury 4pc makes
+        // Bloodletting's Enrage GUARANTEED for the wearer: the roll is
+        // SKIPPED at chance 1, never rolled-and-passed, so wearers
+        // legitimately shift the rng stream (disclosed in
+        // docs/prd/ignivar-set-bonus-final.md for seeded suites).
+        const guaranteed =
+          eff.chance >= 1 ||
+          (ability.id === 'bloodthirst' && mods.selected[setBonusFlag('emberfury', 4)] === true);
+        if (!guaranteed && !ctx.rng.chance(eff.chance)) break;
+        // Emberfury 2pc lives UPSTREAM: durationFlat rows rewrite the
+        // RESOLVED enrageChance durations (applyTalentMods), so eff.duration
+        // already carries the wearer's +2 and the tooltip reads the same
+        // number this site applies.
         ctx.applyAura(p, {
           id: 'fury_enrage',
           name: 'Enraged',
@@ -3797,9 +3812,15 @@ export function runEffects(
         break;
       }
       case 'selfHealPctMax': {
-        const pct = p.auras.some((a) => a.id === 'furious_mending')
-          ? Math.max(eff.pct, 0.2)
-          : eff.pct;
+        // Emberfury 4pc: Bloodletting's self-heal rises to 8 percent of max
+        // health for the wearer. The furious_mending FLOOR (max with 0.2)
+        // stays on top, so the bonus is honestly inert inside that window
+        // (0.08 < 0.2; stated in the set doc).
+        const base =
+          ability.id === 'bloodthirst' && mods.selected[setBonusFlag('emberfury', 4)] === true
+            ? EMBERFURY_4PC_BLOODLETTING_HEAL_PCT_MAX
+            : eff.pct;
+        const pct = p.auras.some((a) => a.id === 'furious_mending') ? Math.max(base, 0.2) : base;
         ctx.applyHeal(p, p, Math.round(p.maxHp * pct), ability.name);
         if (ability.id === 'wildheart') runHunterWildheart(ctx, p);
         break;
@@ -4026,6 +4047,9 @@ export function runEffects(
         break;
       }
       case 'absorbSpentResource': {
+        // Forgewall 2pc lives UPSTREAM: a buffPct row rewrites the RESOLVED
+        // mult (applyTalentMods' scaleEffect extension), so eff.mult already
+        // carries the wearer's 5-per-rage and the tooltip reads the same.
         const amount = Math.round(res.cost * eff.mult);
         if (amount <= 0) break;
         ctx.applyAura(p, {

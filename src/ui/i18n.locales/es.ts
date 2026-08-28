@@ -3267,7 +3267,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.intimidating_shout.description': 'Un grito aterrador que hace huir de miedo a hasta 5 enemigos en 8 m durante 4 s. El daño puede romper el efecto.',
   'entities.abilities.intimidating_shout.name': 'Grito Intimidante',
   'entities.abilities.iron_resolve.description':
-    'Aprietas los dientes e ignoras el dolor: gasta hasta 40 de ira (20 como mínimo) para absorber 4 de daño por cada punto de ira gastado, durante un máximo de 10 s. (Protección)',
+    'Aprietas los dientes e ignoras el dolor: gasta hasta 40 de ira (20 como mínimo) para absorber {absorbPerRage} de daño por cada punto de ira gastado, durante un máximo de 10 s. (Protección)',
   'entities.abilities.iron_resolve.name': 'Temple de Hierro',
   'entities.abilities.measured_fury.description':
     'Tu furia mesurada afina tu economía: tus habilidades cuestan un 10% menos de ira. (Armas)',
