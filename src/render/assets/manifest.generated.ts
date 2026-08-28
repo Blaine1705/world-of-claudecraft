@@ -662,7 +662,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/dungeon/ignivar_prop_beam.glb": "/media/models/dungeon/ignivar_prop_beam.1be5ec8bb0bd.glb",
   "models/dungeon/ignivar_prop_bridge_floor.glb": "/media/models/dungeon/ignivar_prop_bridge_floor.43143e5c47fc.glb",
   "models/dungeon/ignivar_prop_bridge_pillar.glb": "/media/models/dungeon/ignivar_prop_bridge_pillar.3ea32e05e405.glb",
-  "models/dungeon/ignivar_prop_bridge_rail.glb": "/media/models/dungeon/ignivar_prop_bridge_rail.1d7257718854.glb",
+  "models/dungeon/ignivar_prop_bridge_rail.glb": "/media/models/dungeon/ignivar_prop_bridge_rail.76e649c2270f.glb",
   "models/dungeon/ignivar_prop_cannon.glb": "/media/models/dungeon/ignivar_prop_cannon.b3ddb0c7d4c9.glb",
   "models/dungeon/ignivar_prop_chain.glb": "/media/models/dungeon/ignivar_prop_chain.ff71d4c2ea26.glb",
   "models/dungeon/ignivar_prop_chain_hanging.glb": "/media/models/dungeon/ignivar_prop_chain_hanging.a02c6b299d62.glb",

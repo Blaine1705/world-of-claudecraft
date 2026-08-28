@@ -162,7 +162,17 @@ const ITEMS = [
   // the dragon head pours (concept art), plain stonework stays faint.
   { src: 'Exterior_Assets/bridge_floor.glb', name: 'bridge_floor', tex: 1024, emissive: 0.28 },
   { src: 'Exterior_Assets/bridge_pillar.glb', name: 'bridge_pillar', tex: 1024, emissive: 0.28 },
-  { src: 'Exterior_Assets/bridge_rail.glb', name: 'bridge_rail', tex: 512, emissive: 0.28 },
+  // The rail's brazier flame glows like the firepit's: hotBoost lifts the
+  // flame texels clear of the ETC1S crush and the firepit-grade emissive
+  // strength makes them bloom, while the dark iron stays inert (a near
+  // black texel contributes nothing through base-as-emissive).
+  {
+    src: 'Exterior_Assets/bridge_rail.glb',
+    name: 'bridge_rail',
+    tex: 512,
+    emissive: 1.6,
+    hotBoost: 1.35,
+  },
   { src: 'Exterior_Assets/cannon.glb', name: 'cannon', tex: 1024, emissive: 0.28 },
   { src: 'Exterior_Assets/dragon_head.glb', name: 'dragon_head', tex: 1024, emissive: 1.5 },
   { src: 'Exterior_Assets/dragon_pillar.glb', name: 'dragon_pillar', tex: 1024, emissive: 1.0 },

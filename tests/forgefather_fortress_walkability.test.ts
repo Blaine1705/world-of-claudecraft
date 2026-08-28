@@ -98,19 +98,25 @@ describe('forgefather fortress walkability', () => {
     const blockers = forgefatherFortressColliders(WORLD_SEED).filter(
       (collider) => !collider.standable,
     );
-    const blocked = (x: number, z: number): boolean => {
+    // A blocker walls a cell only when its movement top stands above the
+    // cell's walk surface (the pass-over lane): a bridge support capped
+    // under the deck never walls the walkers crossing above it.
+    const blocked = (x: number, z: number, walk: number): boolean => {
       for (const b of blockers) {
         const dx = x - b.x;
         const dz = z - b.z;
-        if (b.type === 'circle') {
-          if (Math.hypot(dx, dz) <= b.r + 0.4) return true;
-          continue;
-        }
-        const cos = Math.cos(-b.rot);
-        const sin = Math.sin(-b.rot);
-        const lx = dx * cos + dz * sin;
-        const lz = -dx * sin + dz * cos;
-        if (Math.abs(lx) <= b.hw + 0.4 && Math.abs(lz) <= b.hd + 0.4) return true;
+        const covers =
+          b.type === 'circle'
+            ? Math.hypot(dx, dz) <= b.r + 0.4
+            : (() => {
+                const cos = Math.cos(-b.rot);
+                const sin = Math.sin(-b.rot);
+                const lx = dx * cos + dz * sin;
+                const lz = -dx * sin + dz * cos;
+                return Math.abs(lx) <= b.hw + 0.4 && Math.abs(lz) <= b.hd + 0.4;
+              })();
+        if (!covers) continue;
+        if (b.moveTopY === undefined || b.moveTopY > walk + 0.3) return true;
       }
       return false;
     };
@@ -125,7 +131,7 @@ describe('forgefather fortress walkability', () => {
         const i = ix + iz * W;
         hts[i] = walkHeight(x, z);
         wet[i] = hts[i] < -4.25 ? 1 : 0;
-        solid[i] = blocked(x, z) ? 1 : 0;
+        solid[i] = blocked(x, z, hts[i]) ? 1 : 0;
         cliff[i] =
           !wet[i] &&
           hts[i] <= groundHeight(x, z, WORLD_SEED) + 0.01 &&

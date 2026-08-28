@@ -167,8 +167,6 @@ interface StairRampSpec {
   z: number;
   ryDeg: number; // ...its yaw in degrees...
   scale: number;
-  wedgeBase: number; // ...and its base height (the stamp floor: banks stay
-  // just above it so the stone wedge always reads grounded)
   h0: number; // the ramp band's surface at the bottom end...
   h1: number; // ...and from the landing start on (the court ground levels)
   clear: number; // bank target depth under the ramp line, pre-bias: the
@@ -186,12 +184,17 @@ function stairRampStamps(spec: StairRampSpec): HeightStamp[] {
   const bottomZ = spec.z - (uz * spec.scale) / 2;
   const landingD = spec.scale * STAIR_LANDING_START;
   const round = (value: number) => Math.round(value * 100) / 100;
-  const steps = Math.ceil((landingD - 0.5) / RAMP_STEP);
+  // The march starts under the lead-in (d < 0), so the RAW ground beneath
+  // the mouth is calmed too: the steepness memo never sees the lifts, and
+  // rough natural ground under a lead band strips control right where
+  // walkers step onto the flight.
+  const start = -1.2;
+  const steps = Math.ceil((landingD - start) / RAMP_STEP);
   const out: HeightStamp[] = [];
   for (let i = 0; i <= steps; i++) {
-    const d = 0.5 + ((landingD - 0.5) * i) / steps;
+    const d = start + ((landingD - start) * i) / steps;
     const line = spec.h0 + (spec.h1 - spec.h0) * (d / landingD);
-    const delta = round(Math.max(line - spec.clear, Math.min(spec.wedgeBase + 0.15, line - 0.6)));
+    const delta = round(Math.max(line - spec.clear, spec.h0 - 0.45));
     for (const lane of spec.lanes)
       out.push({
         x: round(bottomX + ux * d - uz * lane),
@@ -258,7 +261,6 @@ export const FORGEFATHER_ISLE_TERRAIN_EDITS: HeightStamp[] = [
     z: 2207.2,
     ryDeg: 90,
     scale: 9,
-    wedgeBase: 1.2,
     h0: 2.64,
     h1: 6.94,
     clear: 2.1,
@@ -271,7 +273,6 @@ export const FORGEFATHER_ISLE_TERRAIN_EDITS: HeightStamp[] = [
     z: 2221.4,
     ryDeg: 90,
     scale: 9,
-    wedgeBase: 6.45,
     h0: 6.94,
     h1: 11.64,
     clear: 2.1,
@@ -284,12 +285,11 @@ export const FORGEFATHER_ISLE_TERRAIN_EDITS: HeightStamp[] = [
     z: 2234.15,
     ryDeg: 90,
     scale: 6,
-    wedgeBase: 11.45,
     h0: 11.64,
     h1: 15.34,
     clear: 1.6,
-    lanes: [-1.9, 1.9, 0],
-    radius: 2.6,
+    lanes: [-2.4, 2.4, 0],
+    radius: 2.8,
   }),
   // the keep stair
   ...stairRampStamps({
@@ -297,12 +297,11 @@ export const FORGEFATHER_ISLE_TERRAIN_EDITS: HeightStamp[] = [
     z: 2241.4,
     ryDeg: 90,
     scale: 6,
-    wedgeBase: 14.45,
     h0: 15.34,
     h1: 19.0,
     clear: 1.6,
-    lanes: [-1.9, 1.9, 0],
-    radius: 2.6,
+    lanes: [-2.4, 2.4, 0],
+    radius: 2.8,
   }),
   // the quay stair
   ...stairRampStamps({
@@ -310,7 +309,6 @@ export const FORGEFATHER_ISLE_TERRAIN_EDITS: HeightStamp[] = [
     z: 2200.45,
     ryDeg: 180,
     scale: 9,
-    wedgeBase: -3.05,
     h0: -1.86,
     h1: 2.64,
     clear: 2.1,
@@ -327,11 +325,11 @@ export const FORGEFATHER_ISLE_TERRAIN_EDITS: HeightStamp[] = [
   { x: 503.05, z: 2245.1, radius: 2.4, delta: 18.75, falloff: 'smooth', mode: 'level' },
   { x: 503.1, z: 2246.2, radius: 2.8, delta: 18.98, falloff: 'smooth', mode: 'level' },
   { x: 503.1, z: 2247.8, radius: 2.8, delta: 19.0, falloff: 'smooth', mode: 'level' },
-  // Stuck-pocket escapes (found by the movement flood scan): the gate
-  // passage pocket, the middle court's north-wall strip, and the alley
-  // between the summit flank and the sea-ring wall each get a walkable
-  // way back out.
-  { x: 500.5, z: 2203.5, radius: 3, delta: -0.3, falloff: 'smooth', mode: 'level' },
+  // Stuck-pocket escapes (found by the movement flood scan): the middle
+  // court's north-wall strip and the alley between the summit flank and
+  // the sea-ring wall each get a walkable way back out. (The old gate
+  // passage leveler retired with the ramp-band redesign: its dig sat right
+  // at the bailey mouth and read as a freeze cell.)
   // ...the tier-three plate's west rim calmed (a raw remnant slope under
   // the plate edge read steep to the memo within the carry clearance)...
   { x: 500.8, z: 2226.2, radius: 2.2, delta: 10.6, falloff: 'smooth', mode: 'level' },

@@ -31,6 +31,7 @@ import {
   MAX_STEP_HEIGHT,
   moveCharacter,
 } from './physics';
+import { PLATFORM_CARRY_CLEARANCE } from './physics/character';
 import { isSubmergedAt, rideSteepnessAt, shoreStepOut, stepWaterLevel } from './ride_height';
 import { GHOST_RUN_MULT } from './spirit';
 import {
@@ -199,10 +200,7 @@ function isDeepFor(x: number, z: number, seed: number): boolean {
 
 const SWIM_DEPTH = PLAYER_SWIM_DEPTH; // ground this far under the water line = deep water
 const MAX_CLIMB_SLOPE = PLAYER_MAX_CLIMB_SLOPE;
-// Feet more than this far above the raw ground mean the body stands on a
-// collider (deck, tread, crate), not the terrain: the steep-ground control
-// strip is about ground underfoot, so a platform-carried body keeps control.
-const PLATFORM_CARRY_CLEARANCE = 0.5;
+
 const BODY_RADIUS = PLAYER_BODY_RADIUS;
 
 // Movement speed multiplier over the entity's own state (ghost flag + auras).

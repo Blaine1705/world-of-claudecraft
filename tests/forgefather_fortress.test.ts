@@ -25,7 +25,7 @@ const GROUND_STAND_TOLERANCE = 2.5;
 
 describe('forgefather fortress bake', () => {
   it('every placement resolves a registered prop', () => {
-    expect(FORGEFATHER_FORTRESS_PLACEMENTS.length).toBe(155);
+    expect(FORGEFATHER_FORTRESS_PLACEMENTS.length).toBe(184);
     for (const placement of FORGEFATHER_FORTRESS_PLACEMENTS)
       expect(IGNIVAR_PROP_NATIVE[placement.key], placement.key).toBeDefined();
   });
@@ -110,7 +110,9 @@ describe('forgefather fortress bake', () => {
           Math.abs(collider.hd - (native.dep * placement.scale * footprint) / 2) < 1e-9,
       );
       expect(match, `${placement.key} at (${placement.x}, ${placement.z})`).toBeDefined();
-      expect(match?.moveTopY).toBeUndefined();
+      // Solids carry their real top as a pass-over movement top (never
+      // standable): walkers above the top cross it, everyone else is walled.
+      expect(match?.moveTopY).toBeCloseTo(placement.y + native.hei * placement.scale, 9);
       expect(match?.standable).toBeUndefined();
     }
   });

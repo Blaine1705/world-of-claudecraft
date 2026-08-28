@@ -81,7 +81,6 @@ export const FORGEFATHER_FORTRESS_PLACEMENTS: readonly IgnivarPropPlacement[] = 
   { key: 'fortress_wall', x: 514.2, y: 2, z: 2191.45, ry: 180 * DEG, scale: 6 },
   { key: 'fortress_wall', x: 508.7, y: 2, z: 2191.45, ry: 180 * DEG, scale: 6 },
   { key: 'fortress_wall', x: 503.2, y: 2, z: 2191.45, ry: 180 * DEG, scale: 6 },
-  { key: 'tower_base', x: 502.55, y: 0.9, z: 2207.9, ry: 225 * DEG, scale: 10 },
   { key: 'fortress_wall', x: 499.7, y: 4, z: 2213.7, ry: 270 * DEG, scale: 7 },
   { key: 'staircase', x: 497.05, y: -3.05, z: 2200.45, ry: 180 * DEG, scale: 9 },
   { key: 'fortress_wall', x: 498.95, y: -1, z: 2213.95, ry: 270 * DEG, scale: 10 },
@@ -166,13 +165,11 @@ export const FORGEFATHER_FORTRESS_PLACEMENTS: readonly IgnivarPropPlacement[] = 
   { key: 'dragon_head', x: 511.1, y: 1.75, z: 2189.6, ry: 90 * DEG, scale: 4 },
   { key: 'fountain_base', x: 511.1, y: 0, z: 2188.85, ry: 180 * DEG, scale: 8 },
   { key: 'dragon_head', x: 497.85, y: 4, z: 2208.35, ry: 180 * DEG, scale: 4 },
-  { key: 'fountain_base', x: 498.35, y: 1.5, z: 2208.35, ry: 270 * DEG, scale: 8 },
   { key: 'tower_pillar', x: 498.8, y: -2.25, z: 2205.35, ry: 0, scale: 4 },
   { key: 'tower_pillar', x: 497.8, y: -2.25, z: 2206.35, ry: 0, scale: 4 },
   { key: 'tower_pillar', x: 497.8, y: -2.25, z: 2208.35, ry: 0, scale: 4 },
   { key: 'tower_pillar', x: 497.8, y: -2.25, z: 2210.35, ry: 0, scale: 4 },
   { key: 'fortress_wall', x: 497.4, y: -2.75, z: 2204.7, ry: 225 * DEG, scale: 4 },
-  { key: 'cannon', x: 502.3, y: 10.65, z: 2207.9, ry: 135 * DEG, scale: 5 },
   { key: 'fortress_wall', x: 495.9, y: -2.75, z: 2207.45, ry: 270 * DEG, scale: 4 },
   { key: 'fortress_wall', x: 495.9, y: -2.75, z: 2209.45, ry: 270 * DEG, scale: 4 },
   { key: 'fortress_wall', x: 497.4, y: -2.75, z: 2212.45, ry: 315 * DEG, scale: 4 },
@@ -180,6 +177,38 @@ export const FORGEFATHER_FORTRESS_PLACEMENTS: readonly IgnivarPropPlacement[] = 
   { key: 'tower_pillar', x: 448.75, y: -3.7, z: 2190.55, ry: 225 * DEG, scale: 5 },
   { key: 'bridge_floor', x: 444.1, y: -2.25, z: 2183.75, ry: 0, scale: 8 },
   { key: 'bridge_rail', x: 447.65, y: -1.65, z: 2183.85, ry: 90 * DEG, scale: 6 },
+  { key: 'tower_base', x: 501.3, y: 0.9, z: 2207.9, ry: 225 * DEG, scale: 10 },
+  { key: 'fountain_base', x: 497.6, y: 1.5, z: 2208.6, ry: 270 * DEG, scale: 8 },
+  { key: 'cannon', x: 501.05, y: 10.65, z: 2207.9, ry: 135 * DEG, scale: 5 },
+  { key: 'street_lamp', x: 502.5, y: 2.6, z: 2204.7, ry: 180 * DEG, scale: 1 },
+  { key: 'street_lamp', x: 512.25, y: 2.6, z: 2205.2, ry: 180 * DEG, scale: 1 },
+  { key: 'street_lamp', x: 522, y: 2.6, z: 2211.95, ry: 180 * DEG, scale: 1 },
+  { key: 'street_lamp', x: 522, y: 2.6, z: 2195.2, ry: 180 * DEG, scale: 1 },
+  { key: 'dragon_head', x: 503.8, y: 3.35, z: 2192.8, ry: 270 * DEG, scale: 3 },
+  { key: 'fountain_base', x: 503.8, y: 2.6, z: 2193.05, ry: 0, scale: 5 },
+  { key: 'fountain_base', x: 518.8, y: 2.6, z: 2193.05, ry: 0, scale: 5 },
+  { key: 'dragon_head', x: 518.8, y: 3.35, z: 2192.8, ry: 270 * DEG, scale: 3 },
+  { key: 'street_lamp', x: 501.75, y: 2.6, z: 2195.7, ry: 180 * DEG, scale: 1 },
+  { key: 'steam_pipes', x: 511.3, y: 2.6, z: 2191.8, ry: 0, scale: 4 },
+  { key: 'industrial_pipe', x: 508.3, y: 2.6, z: 2191.8, ry: 0, scale: 3 },
+  { key: 'industrial_pipe', x: 514.3, y: 2.6, z: 2191.8, ry: 0, scale: 3 },
+  { key: 'gate_gear', x: 501.6, y: 9.25, z: 2200.6, ry: 90 * DEG, scale: 4 },
+  { key: 'gear_wall_rusty', x: 501.3, y: 10.35, z: 2198.05, ry: 90 * DEG, scale: 3 },
+  { key: 'gear_wall_rusty', x: 501.3, y: 10.35, z: 2203.3, ry: 90 * DEG, scale: 3 },
+  { key: 'street_lamp', x: 513.25, y: 6.9, z: 2212.35, ry: 180 * DEG, scale: 1 },
+  { key: 'street_lamp', x: 508.5, y: 5.65, z: 2218.35, ry: 180 * DEG, scale: 1 },
+  { key: 'tower_pillar', x: 507.1, y: 9.85, z: 2232.6, ry: 225 * DEG, scale: 4 },
+  { key: 'fortress_wall', x: 508.2, y: 11.95, z: 2240.5, ry: 90 * DEG, scale: 8 },
+  { key: 'fortress_wall', x: 499.95, y: 11.95, z: 2240.25, ry: 270 * DEG, scale: 8 },
+  { key: 'street_lamp', x: 499.3, y: 10.65, z: 2225.35, ry: 180 * DEG, scale: 1 },
+  { key: 'street_lamp', x: 507.3, y: 10.65, z: 2225.35, ry: 180 * DEG, scale: 1 },
+  { key: 'street_lamp', x: 507.3, y: 14.9, z: 2237.1, ry: 180 * DEG, scale: 1 },
+  { key: 'street_lamp', x: 499.8, y: 14.9, z: 2237.1, ry: 180 * DEG, scale: 1 },
+  { key: 'street_lamp', x: 500.25, y: 5.65, z: 2211.6, ry: 180 * DEG, scale: 1 },
+  { key: 'chain_link', x: 501.35, y: 7.6, z: 2194.5, ry: 90 * DEG, scale: 4 },
+  { key: 'chain_hanging', x: 501.6, y: 2.6, z: 2192.5, ry: 90 * DEG, scale: 8 },
+  { key: 'tower_pillar', x: 493.9, y: -3.5, z: 2195.5, ry: 45 * DEG, scale: 5 },
+  { key: 'street_lamp', x: 493.7, y: -2.6, z: 2195.6, ry: 180 * DEG, scale: 1 },
 ];
 
 /** How far above the local ground a piece's base may sit and still count as
@@ -333,12 +362,19 @@ export function forgefatherFortressColliders(seed: number): Collider[] {
     // full-height OBB has no top, so a buried mass would otherwise blanket
     // the walkable ground above it.
     if (placement.y + native.hei * placement.scale < ground + 0.5) continue;
+    // Every solid carries its real top as a movement top (the parkour
+    // pass-over lane): a wall or tower stays a wall to anyone below it,
+    // while a bridge support whose cap pokes just past the deck it holds
+    // no longer walls the walkers crossing ABOVE it.
+    const top = placement.y + native.hei * placement.scale;
     if (FORTRESS_CYLINDRICAL_KEYS.has(placement.key)) {
       colliders.push({
         type: 'circle',
         x: placement.x,
         z: placement.z,
         r: ((native.len + native.dep) * placement.scale * footprint) / 4,
+        moveTopY: top,
+        cameraTopY: top,
       });
       continue;
     }
@@ -349,6 +385,8 @@ export function forgefatherFortressColliders(seed: number): Collider[] {
       hw: (native.len * placement.scale * footprint) / 2,
       hd: (native.dep * placement.scale * footprint) / 2,
       rot: placement.ry,
+      moveTopY: top,
+      cameraTopY: top,
     });
   }
   return colliders;
