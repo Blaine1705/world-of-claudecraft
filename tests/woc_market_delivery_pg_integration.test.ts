@@ -872,6 +872,59 @@ describeDb('woc market delivery finalization against real Postgres', () => {
       expect(rows.rows).toEqual([{ op: 'deposit', item_id: 'peacebloom', count: 1 }]);
     });
 
+    it('an EMPTY ledger snapshot is a no-op at the delivered site too: the booked save commits with zero ledger rows', async () => {
+      // The empty half of the second call site, symmetric with the escrow
+      // arm below: a rowCount 0 snapshot collapses to undefined through the
+      // same bankLedgerSaveEffects normalization, so the transaction must
+      // still commit BOTH halves (the fenced save and the booking) while
+      // neither bank_ledger nor bank_ledger_batch_receipts gains a row.
+      const { REALM } = await import('../server/realm');
+      const account = await seedAccount();
+      const characterId = await seedCharacter(REALM, account);
+      const ref = 'woc_delivery_book_empty_ledger';
+      expect(await marketDb.claimCustodyRef(REALM, ref)).toBe(true);
+      const emptySnapshot: BankLedgerOutboxSnapshot = Object.freeze({
+        owner: Object.freeze({ realm: REALM, characterId, accountId: account }),
+        batches: Object.freeze([]),
+        rowCount: 0,
+        encodedBytes: 0,
+        guildIds: Object.freeze([]),
+        hasUnscopedRows: false,
+      });
+      const out = await marketDb.saveDeliveredCharacterBooked(
+        {
+          characterId,
+          level: 16,
+          state: { questLog: [], questsDone: [], inventory: [] } as unknown as CharacterState,
+          leaseNonce: undefined,
+          bankLedgerSnapshot: emptySnapshot,
+        },
+        ref,
+      );
+      expect(out).toBe('booked');
+      // Prove both halves really ran: the no-op claim is about the ledger
+      // statement, never the transaction.
+      const character = await pool.query(`SELECT level FROM characters WHERE id = $1`, [
+        characterId,
+      ]);
+      expect(character.rows[0].level).toBe(16);
+      const claim = await pool.query(
+        `SELECT booked_at FROM woc_market_custody_claims WHERE custody_ref = $1`,
+        [ref],
+      );
+      expect(claim.rows[0].booked_at).not.toBeNull();
+      const ledger = await pool.query(
+        `SELECT count(*)::int AS n FROM bank_ledger WHERE character_id = $1`,
+        [characterId],
+      );
+      expect(ledger.rows[0].n).toBe(0);
+      const receipts = await pool.query(
+        `SELECT count(*)::int AS n FROM bank_ledger_batch_receipts WHERE character_id = $1`,
+        [characterId],
+      );
+      expect(receipts.rows[0].n).toBe(0);
+    });
+
     it('passes the REAL lease fence when this process holds the lease', async () => {
       // The fenced statement's passing form against real Postgres: a wrong
       // holder or nonce column in the EXISTS would make every direct hand-off
