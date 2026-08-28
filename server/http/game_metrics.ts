@@ -542,7 +542,7 @@ export function registerGameStateMetrics(
 
   new Counter({
     name: WOC_CHARACTER_DELETE_VERIFY_TOTAL,
-    help: 'Commit-ambiguity verify outcomes on character deletes by result: landed (the delete committed and its world purge ran), not_landed (the row survived, refusal stood), failed (the verify itself failed, ambiguity propagated unresolved). Any movement deserves a look.',
+    help: 'Commit-ambiguity verify outcomes on character deletes by result: landed (the delete committed and its world purge ran), not_landed (the row survived, refusal stood), failed (the verify itself failed, ambiguity propagated unresolved). Any movement deserves a look; failed dominating points first at the 2s idle-in-transaction bound under an event-loop stall, not the lock mode.',
     labelNames: ['result'],
     registers: [registry],
     collect() {

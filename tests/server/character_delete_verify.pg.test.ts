@@ -173,6 +173,36 @@ d('the commit-ambiguity verify read against real PostgreSQL', () => {
     }
   }, 20_000);
 
+  it('a lock wait past the idle bound is never reaped: waiting is active, not idle', async () => {
+    // The interaction pin between the verify's two tightest bounds: the 2s
+    // idle_in_transaction_session_timeout must not truncate the 10s lock
+    // wait (a waiting backend is ACTIVE, not idle; measured, a 5s hold
+    // survived the 2s bound and still answered). The regression mode is
+    // silent and is the exact bug the resolver fixes: a reaped verify
+    // answers "unresolved" forever while the world purge stops running,
+    // with every shorter-wait test still green.
+    await pool.query(
+      'INSERT INTO characters (id, account_id, realm) VALUES (42, 7, $1) ON CONFLICT (id) DO NOTHING',
+      [REALM],
+    );
+    const deleter = await pool.connect();
+    const verifier = await pool.connect();
+    let wait: Promise<boolean> | null = null;
+    try {
+      await deleter.query('BEGIN');
+      await deleter.query('DELETE FROM characters WHERE id = 42');
+      wait = runVerify(verifier); // the REAL 10s lock bound
+      wait.catch(() => {});
+      await waitForLockWaiter();
+      // Hold the lock well past the 2s idle bound before resolving it.
+      await new Promise((resolve) => setTimeout(resolve, 3_000));
+      await deleter.query('COMMIT');
+      await expect(wait).resolves.toBe(true);
+    } finally {
+      await settleAndRelease(deleter, verifier, wait);
+    }
+  }, 20_000);
+
   it('a lock_timeout expiry rejects with its own 55P03 instead of guessing', async () => {
     await pool.query(
       'INSERT INTO characters (id, account_id, realm) VALUES (42, 7, $1) ON CONFLICT (id) DO NOTHING',
