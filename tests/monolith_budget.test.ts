@@ -484,9 +484,11 @@ const MONOLITHS: MonolithRow[] = [
     // these lines are the thin enabled-gated service method plus the two
     // realm-scoped rows on the WocMarketDb contract the review round asked
     // for. Exact count, zero slack.
+    // Down 3929 -> 3924: the operator listing and p2p row vocabulary moved to
+    // woc_market_ops.ts instead of growing this coordinator.
     // Re-pinned to the exact resolved v0.41 merge count after keeping the
-    // desktop-signing extraction and parked-review operator arm.
-    ceiling: 3956,
+    // parked-review operator arm and the release-line ops extraction.
+    ceiling: 3951,
     seam: 'a woc_market_<thing>.ts sibling behind WocMarketDeps (the drift-warn split is the template)',
   },
   {
