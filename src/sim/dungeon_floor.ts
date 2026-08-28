@@ -19,6 +19,7 @@ import {
   SANCTUM_LAYOUT,
   TEMPLE_LAYOUT,
 } from './dungeon_layout';
+import { IGNIVAR_LAVA_MOAT_DEPTH, ignivarArenaPointInLava } from './ignivar_arena';
 
 /** Room plan per DungeonDef.interior key (colliders.ts derives its sets from
  *  the same map, so floor and walls can never disagree about the plan). */
@@ -85,5 +86,10 @@ export function dungeonInstanceAt(x: number, z: number): DungeonInstanceFrame | 
 export function dungeonFloorLift(x: number, z: number): number {
   const inst = dungeonInstanceAt(x, z);
   if (!inst) return 0;
-  return daisLiftAt(inst.layout, x - inst.ox, z - inst.oz);
+  const localX = x - inst.ox;
+  const localZ = z - inst.oz;
+  if (inst.interior === 'ignivar' && ignivarArenaPointInLava(localX, localZ)) {
+    return -IGNIVAR_LAVA_MOAT_DEPTH;
+  }
+  return daisLiftAt(inst.layout, localX, localZ);
 }

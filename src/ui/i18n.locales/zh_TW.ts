@@ -797,6 +797,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.core.mapMarkerLabels.riftEntrance': '裂隙入口：{name}',
   'hud.core.mapMarkerLabels.hostileEnemy': '敵對目標',
   'hud.core.mapMarkerLabels.aggressiveEnemy': '正在攻擊你的敵人',
+  'hud.core.mapMarkerLabels.bossEnemy': '首領：{name}',
+  'hud.core.mapMarkerLabels.bossAggressiveEnemy': '正在攻擊你的首領：{name}',
   'hud.core.mapMarkerLabels.lootableEnemy': '可拾取戰利品的敵人',
   'hud.core.mapMarkerLabels.corpse': '你的屍體',
   'hud.core.mapMarkerLabels.deathZone': '危險區域',
@@ -4748,7 +4750,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.nythraxis_boss_arena.enterText': '你穿過封印的王室之門。',
   'entities.dungeons.nythraxis_boss_arena.leaveText': '你回到荊峰的寒冷空氣中。',
   'entities.mobs.ignivar_herald_of_the_last_flame.name': '伊格尼瓦，末焰使者',
-  'entities.mobs.ignivar_heart_of_the_end.name': '終焉之心',
+  'entities.mobs.ignivar_heart_of_the_end.name': '伊格尼瓦·喚灰者',
   'entities.mobs.derelict_mech.name': '廢棄機甲',
   'entities.dungeons.ignivar_raid_arena.name': '最後泉源熔爐',
   'entities.dungeons.ignivar_raid_arena.enterText': '熱浪在熔爐封印的水源上方翻湧。',
@@ -7319,6 +7321,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.hot': '每 {interval} 秒恢復 {value} 點生命值',
   'hudChrome.auraEffect.sharedPyre':
     '造成相當於每名玩家最大生命值 {total}% 的傷害，由圈內玩家分攤（{players} 名玩家時每人承受 {perPlayer}%）。',
+  'hudChrome.auraEffect.varkhulSharedPyre':
+    '造成相當於每名玩家最大生命值 {total}% 的傷害，由圈內玩家分攤（{players} 名玩家時每人承受 {perPlayer}%）。每缺少一名玩家，還會對整個團隊（包括圈內玩家）造成最大生命值 {missingPenalty}% 的傷害。',
   'hudChrome.auraEffect.varkhulForgeLink':
     '在啟動的立柱光束抵達鍛爐前將其攔截。未攔截的光束每秒增加6%熱量。普通難度下，已攔截的光束和關閉的立柱會讓鍛爐冷卻；英雄難度下熱量永不降低。達到100%時會觸發致命的鍛爐熔毀。',
   'hudChrome.auraEffect.varkhulCrucibleExposure':
@@ -7326,6 +7330,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.varkhulCallout.leftPillarCharging': '左側鍛爐立柱正在充能，3秒後點燃！',
   'hudChrome.varkhulCallout.rightPillarCharging': '右側鍛爐立柱正在充能，3秒後點燃！',
   'hudChrome.varkhulCallout.bothPillarsCharging': '鍛爐立柱正在充能，3秒後點燃！',
+  'hudChrome.varkhulCallout.artificerApproaches': '燼火工匠正在接近鍛爐！',
   'hudChrome.varkhulCallout.leftPillar': '左側鍛爐立柱點燃了！',
   'hudChrome.varkhulCallout.rightPillar': '右側鍛爐立柱點燃了！',
   'hudChrome.varkhulCallout.bothPillars': '鍛爐立柱點燃了！',
@@ -7337,6 +7342,43 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '世界之火從房間邊緣燃起，42秒後整座熔爐大廳將被吞沒！',
   'hudChrome.varkhulCallout.worldfireClosing': '世界之火正在逼近，往中央移動！',
   'hudChrome.varkhulCallout.worldfireConsumed': '整座熔爐大廳都在燃燒！',
+  'hudChrome.varkhulWaveStatus': '波次 {wave}/{waves} | 敵人: {remaining}',
+  'hudChrome.raidBossGuide.title': '首領指南',
+  'hudChrome.raidBossGuide.button': '指南: {boss}',
+  'hudChrome.raidBossGuide.subtitle': '{boss} | 普通與英雄',
+  'hudChrome.raidBossGuide.close': '關閉首領指南',
+  'hudChrome.raidBossGuide.ignivar.brand':
+    '柴堆印記: 分散站位。將灼熱洪流引向可用水道，再獨自穿過水流完成淨化。',
+  'hudChrome.raidBossGuide.ignivar.movement':
+    '移動: 躲避燼雨的錐形攻擊與隕石，跟隨旋轉煉獄移動，並利用熔爐波的兩個缺口。',
+  'hudChrome.raidBossGuide.ignivar.apocalypse':
+    '末日: 在伊格尼瓦·喚灰者完成施法前將其擊殺。',
+  'hudChrome.raidBossGuide.ignivar.judgment':
+    '熔爐審判: 預警時找出獨特的庇護點，地面燃燒後在標記邊界內集合。',
+  'hudChrome.raidBossGuide.ignivar.finale':
+    '最終煉獄: 在團滅前擊殺伊格尼瓦爾，同時應對加速的隕石、正面攻擊與旋轉煉獄。',
+  'hudChrome.raidBossGuide.ignivar.heroic':
+    '英雄: 熔爐鎖鏈期間成對玩家必須保持靠近，熔爐審判期間印記仍會持續，且熔爐波會將玩家推得更遠。',
+  'hudChrome.raidBossGuide.varkhul.tanks':
+    '坦克: 製作者印記達到2層時換坦，並讓瓦爾庫爾保持在近戰範圍內。',
+  'hudChrome.raidBossGuide.varkhul.orbs':
+    '燼火寶珠: 被標記者分散到房間邊緣。火池會持續存在，釋放的寶珠會穿過房間。',
+  'hudChrome.raidBossGuide.varkhul.pyre':
+    '共享柴堆: 只選擇沒有熾熱金屬的玩家。無論難度，移動圓圈內都需要4名玩家。每缺少一名玩家，整個團隊都會受到相當於最大生命值15%的傷害。',
+  'hudChrome.raidBossGuide.varkhul.forgestorm':
+    '熔爐風暴: 觀察墜落的隕石，在三波隕石落地前離開每個標記區域。',
+  'hudChrome.raidBossGuide.varkhul.anvil':
+    '鐵砧敕令: 瓦爾庫爾移動到巨型熔爐並敲擊三次，造成團隊傷害。英雄模式還會落下標記隕石。',
+  'hudChrome.raidBossGuide.varkhul.ray':
+    '淬火射線: 另一名玩家通常由坦克在長時間預警結束前攔截移動射線。承受傷害者會獲得淬火創傷。',
+  'hudChrome.raidBossGuide.varkhul.forge':
+    '熔爐柱: 在射線抵達熔爐前阻擋，並在坩堝暴露疊加後輪換。熱量滿時會觸發熔爐熔毀。',
+  'hudChrome.raidBossGuide.varkhul.assembly':
+    '大師組裝: 阻擋兩道熔爐射線，擊殺所有傳送門波次，打斷坩堝震擊，並阻止燼火工匠治療瓦爾庫爾。',
+  'hudChrome.raidBossGuide.varkhul.worldfire':
+    '世界之火: 英雄最終階段的燃燒邊緣會向中央收縮。在整個坩堝燃燒前擊敗瓦爾庫爾。',
+  'hudChrome.raidBossGuide.varkhul.heroic':
+    '英雄: 熔爐熱量不會下降，鐵砧敕令會增加隕石，最終階段會集中應對世界之火。',
   'hudChrome.auraEffect.absorb': '吸收 {value} 點傷害',
   'hudChrome.auraEffect.healAbsorb': '吸收 {value} 點受到的治療',
   'hudChrome.auraEffect.thorns': '對攻擊者造成 {value} 點{school}傷害',
@@ -13513,7 +13555,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '回響彼此吻合。瓦爾庫爾將垂死末泉的水束縛進活體金屬。這些自動機械都是失敗的淬鍊品，只有伊格尼瓦爾撐了下來。',
   'entities.quests.q_ignivar_echoes_in_iron.objectives.0.label': '摧毀餘燼哨兵',
   'entities.quests.q_ignivar_echoes_in_iron.objectives.1.label': '摧毀熔爐守衛',
-  'entities.quests.q_ignivar_echoes_in_iron.objectives.2.label': '摧毀燼火工匠',
   'entities.quests.q_ignivar_heralds_heart.title': '先驅之心',
   'entities.quests.q_ignivar_heralds_heart.text':
     '每一道回響都指向唯一的幸存者：伊格尼瓦爾。瓦爾庫爾稱他為先驅、封印和鑰匙。擊敗他。如果記錄屬實，他的死亡會揭示他被鍛造來守護什麼。',
@@ -13529,6 +13570,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.ignivar_forge_approach.name': '首鍛大廳',
   'entities.dungeons.ignivar_forge_approach.enterText': '鍛槌的轟鳴在首鍛大廳中回盪。',
   'entities.dungeons.ignivar_forge_approach.leaveText': '你離開第一座鍛爐，終於又能自由呼吸。',
+  'entities.dungeons.ignivar_molten_assembly.name': '熔火裝配間',
+  'entities.dungeons.ignivar_molten_assembly.enterText': '開啟的大門通往熔火裝配大廳。',
+  'entities.dungeons.ignivar_molten_assembly.leaveText': '你離開裝配線，返回熔爐廳。',
   'entities.dungeons.ignivar_inner_crucible.name': '內環熔爐',
   'entities.dungeons.ignivar_inner_crucible.enterText': '已打開的大門通往熔爐更深處。',
   'entities.dungeons.ignivar_inner_crucible.leaveText': '你離開熔爐寂靜的深處。',

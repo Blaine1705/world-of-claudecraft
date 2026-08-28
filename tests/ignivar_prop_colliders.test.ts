@@ -8,9 +8,12 @@ import type { Collider, ObbCollider } from '../src/sim/colliders';
 import { DUNGEONS } from '../src/sim/data';
 import {
   IGNIVAR_FORGE_APPROACH_LAYOUT,
+  IGNIVAR_LAYOUT,
   IGNIVAR_SECOND_WING_LAYOUT,
 } from '../src/sim/dungeon_layout';
+import { IGNIVAR_WATER_CLEANSE_RADIUS } from '../src/sim/encounters/ignivar';
 import {
+  IGNIVAR_NON_COLLIDING_PROPS,
   IGNIVAR_PROP_COLLIDER_FOOTPRINT,
   IGNIVAR_PROP_NATIVE,
   ignivarPropColliders,
@@ -54,9 +57,11 @@ describe('ignivar prop colliders', () => {
     for (const room of ROOMS) {
       const placements = ignivarPropPlacements(room.interior, room.layout);
       const colliders = obbs(ignivarPropColliders(room.interior, room.layout));
+      // Filter through the module's own non-colliding set, so a new
+      // walk-over prop kind (the lava gutters were the first) can never
+      // drift this census out of step with the derivation it checks.
       const floorProps = placements.filter(
-        (placement) =>
-          placement.y === 0 && !placement.key.startsWith('chain') && placement.key !== 'beam',
+        (placement) => placement.y === 0 && !IGNIVAR_NON_COLLIDING_PROPS.has(placement.key),
       );
       expect(floorProps.length, room.interior).toBeGreaterThanOrEqual(room.minFloorProps);
       expect(colliders.length, room.interior).toBe(floorProps.length);
@@ -132,6 +137,25 @@ describe('ignivar prop colliders', () => {
           ).toBe(false);
         }
       }
+    }
+  });
+
+  it('keeps the water pump conduit collider small enough to stand in the cleanse pool', () => {
+    // The four pumps ARE the water conduits: a player must be able to reach the
+    // active pump's cleanse pool to soak the mechanic. Its central collider has
+    // to stay well inside IGNIVAR_WATER_CLEANSE_RADIUS so the water is always
+    // physically reachable, whatever the approach angle.
+    const pumps = ignivarPropPlacements('ignivar', IGNIVAR_LAYOUT).filter(
+      (placement) => placement.key === 'water_pump',
+    );
+    expect(pumps.length).toBe(4);
+    const native = IGNIVAR_PROP_NATIVE.water_pump;
+    const footprint = IGNIVAR_PROP_COLLIDER_FOOTPRINT.water_pump ?? 1;
+    for (const pump of pumps) {
+      const hw = (native.len * pump.scale * footprint) / 2;
+      const hd = (native.dep * pump.scale * footprint) / 2;
+      // Collider corner plus a generous body radius still lands inside the pool.
+      expect(Math.hypot(hw, hd) + 0.75).toBeLessThan(IGNIVAR_WATER_CLEANSE_RADIUS);
     }
   });
 });

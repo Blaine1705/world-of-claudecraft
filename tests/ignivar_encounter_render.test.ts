@@ -12,14 +12,12 @@ import {
   buildIgnivarFrontalTelegraph,
   buildIgnivarRotatingRaysTelegraph,
   buildIgnivarSkyfireTelegraph,
-  buildIgnivarSoakCircle,
   disposeIgnivarEncounterVisuals,
   hasVisibleIgnivarEncounterTelegraph,
   IGNIVAR_BRAND_VISUAL_NAME,
   IGNIVAR_FRONTAL_VISUAL_NAME,
   IGNIVAR_ROTATING_RAYS_VISUAL_NAME,
   IGNIVAR_SKYFIRE_VISUAL_NAME,
-  IGNIVAR_SOAK_VISUAL_NAME,
   syncIgnivarEncounterVisuals,
 } from '../src/render/ignivar_encounter';
 import {
@@ -32,6 +30,7 @@ import {
   IGNIVAR_FIRE_BEAM_CORE_NAME,
   IGNIVAR_FIRE_BEAM_EMBERS_NAME,
   IGNIVAR_FIRE_BEAM_FLAMES_NAME,
+  IGNIVAR_FIRE_BEAM_FLOOR_BOUNDARY_NAME,
   IGNIVAR_FIRE_BEAM_FLOOR_GLOW_NAME,
   IGNIVAR_FIRE_BEAM_OUTER_NAME,
   IGNIVAR_FIRE_BEAM_VEIL_NAME,
@@ -60,10 +59,6 @@ import {
   IGNIVAR_ROTATING_RAY_FILL_NAME,
   IGNIVAR_ROTATING_RAY_TICKS_NAME,
 } from '../src/render/ignivar_rotating_rays';
-import {
-  IGNIVAR_SOAK_FLAME_NAME,
-  IGNIVAR_SOAK_READY_NAME,
-} from '../src/render/ignivar_soak_telegraph';
 import { handleMageGroundSpellfxEvent, type MageGroundFx } from '../src/render/mage_ground_fx';
 import {
   syncRaidEncounterAnchorVisuals,
@@ -80,8 +75,6 @@ import {
   IGNIVAR_ROTATING_RAYS_ACTIVE_SECONDS,
   IGNIVAR_ROTATING_RAYS_CAST_ID,
   IGNIVAR_SKYFIRE_CAST_ID,
-  IGNIVAR_SOAK_AURA_ID,
-  IGNIVAR_SOAK_RADIUS,
 } from '../src/sim/encounters/ignivar';
 import {
   IGNIVAR_ROTATING_RAYS_HALF_WIDTH,
@@ -93,6 +86,7 @@ import {
   ignivarForgeLayoutFacing,
   ignivarForgeShelterOffsets,
 } from '../src/sim/ignivar_forge_judgment';
+import { DUNGEON_MINIBOSS_STOMP_ABILITY_ID } from '../src/sim/mob/dungeon_miniboss_stomp';
 import { IGNIVAR_BOSS_ID } from '../src/sim/types';
 import { DICT, localizeSimAuraName, localizeSimText } from '../src/ui/sim_i18n';
 
@@ -110,6 +104,7 @@ function expectAuthoredFireBeamInside(
   for (const name of [
     IGNIVAR_FIRE_BEAM_OUTER_NAME,
     IGNIVAR_FIRE_BEAM_CORE_NAME,
+    IGNIVAR_FIRE_BEAM_FLOOR_BOUNDARY_NAME,
     IGNIVAR_FIRE_BEAM_FLOOR_GLOW_NAME,
     IGNIVAR_FIRE_BEAM_VEIL_NAME,
   ]) {
@@ -267,6 +262,17 @@ describe('Ignivar encounter renderer', () => {
     expect(abilityVfxFullSpecFor(IGNIVAR_FRONTAL_CAST_ID)?.decal).toBeUndefined();
     expect(abilityVfxFullSpecFor(IGNIVAR_FRONTAL_CAST_ID)?.linger).toBeUndefined();
     expect(abilityVfxSpecFor('heroic_strike')).toBeDefined();
+  });
+
+  it('authors the promoted Warden Stomp as a readable fire impact', () => {
+    expect(abilityVfxSpecFor(DUNGEON_MINIBOSS_STOMP_ABILITY_ID)).toMatchObject({
+      p: 'fire',
+      pw: 1.35,
+      sp: 30,
+      rg: 1,
+      vr: 1,
+      a: 'burst',
+    });
   });
 
   it('authors Rain of Cinders as three powerful fire eruptions without damage rings', () => {
@@ -624,7 +630,9 @@ describe('Ignivar encounter renderer', () => {
       expect(fireBeam?.getObjectByName(IGNIVAR_FIRE_BEAM_OUTER_NAME)).toBeDefined();
       const blade = fireBeam?.getObjectByName(IGNIVAR_ROTATING_RAY_BLADE_NAME) as THREE.Group;
       expect(blade).toBeDefined();
-      expect(blade.children.length).toBeGreaterThanOrEqual(4);
+      expect(blade.children).toHaveLength(1);
+      expect((blade.children[0] as THREE.InstancedMesh).isInstancedMesh).toBe(true);
+      expect((blade.children[0] as THREE.InstancedMesh).count).toBeGreaterThanOrEqual(7);
       expect(blade.position.y).toBeGreaterThan(1);
       expect(blade.position.z).toBeCloseTo(IGNIVAR_ROTATING_RAYS_RANGE - 1, 8);
       let bladeVertices = 0;
@@ -632,17 +640,29 @@ describe('Ignivar encounter renderer', () => {
         if (!(object instanceof THREE.Mesh)) return;
         object.updateMatrix();
         const positions = object.geometry.getAttribute('position') as THREE.BufferAttribute;
+        const transforms: THREE.Matrix4[] = [];
+        if (object instanceof THREE.InstancedMesh) {
+          for (let instance = 0; instance < object.count; instance++) {
+            const instanceMatrix = new THREE.Matrix4();
+            object.getMatrixAt(instance, instanceMatrix);
+            transforms.push(new THREE.Matrix4().multiplyMatrices(object.matrix, instanceMatrix));
+          }
+        } else {
+          transforms.push(object.matrix);
+        }
         const point = new THREE.Vector3();
-        for (let index = 0; index < positions.count; index++) {
-          point.fromBufferAttribute(positions, index).applyMatrix4(object.matrix);
-          bladeVertices++;
-          expect(Math.abs(point.x + blade.position.x)).toBeLessThanOrEqual(
-            IGNIVAR_ROTATING_RAYS_HALF_WIDTH + 1e-6,
-          );
-          expect(point.z + blade.position.z).toBeGreaterThanOrEqual(
-            IGNIVAR_ROTATING_RAYS_INNER_RANGE,
-          );
-          expect(point.z + blade.position.z).toBeLessThanOrEqual(IGNIVAR_ROTATING_RAYS_RANGE);
+        for (const transform of transforms) {
+          for (let index = 0; index < positions.count; index++) {
+            point.fromBufferAttribute(positions, index).applyMatrix4(transform);
+            bladeVertices++;
+            expect(Math.abs(point.x + blade.position.x)).toBeLessThanOrEqual(
+              IGNIVAR_ROTATING_RAYS_HALF_WIDTH + 1e-6,
+            );
+            expect(point.z + blade.position.z).toBeGreaterThanOrEqual(
+              IGNIVAR_ROTATING_RAYS_INNER_RANGE,
+            );
+            expect(point.z + blade.position.z).toBeLessThanOrEqual(IGNIVAR_ROTATING_RAYS_RANGE);
+          }
         }
       });
       expect(bladeVertices).toBeGreaterThan(0);
@@ -653,8 +673,6 @@ describe('Ignivar encounter renderer', () => {
         endHalfWidth: IGNIVAR_ROTATING_RAYS_HALF_WIDTH,
       });
     }
-    expect(buildIgnivarSoakCircle().name).toBe(IGNIVAR_SOAK_VISUAL_NAME);
-    expect(buildIgnivarSoakCircle().children).toHaveLength(9);
   });
 
   it('derives the rotating-ray warning and active wall from the authoritative cast clock', () => {
@@ -861,16 +879,14 @@ describe('Ignivar encounter renderer', () => {
         auras: [],
       }),
     ).toBe(false);
-    for (const auraId of [IGNIVAR_BRAND_AURA_ID, IGNIVAR_SOAK_AURA_ID]) {
-      expect(
-        ignivarEncounterBypassesCharacterCulling({
-          kind: 'player',
-          templateId: 'player_priest',
-          castingAbility: null,
-          auras: [{ id: auraId }],
-        }),
-      ).toBe(true);
-    }
+    expect(
+      ignivarEncounterBypassesCharacterCulling({
+        kind: 'player',
+        templateId: 'player_priest',
+        castingAbility: null,
+        auras: [{ id: IGNIVAR_BRAND_AURA_ID }],
+      }),
+    ).toBe(true);
     expect(
       ignivarEncounterBypassesCharacterCulling({
         kind: 'mob',
@@ -917,7 +933,7 @@ describe('Ignivar encounter renderer', () => {
     expect(localizeSimAuraName('Forge Wave')).not.toBeNull();
     expect(DICT.es_ES['mechanic.ignivarForgeWave']).toBe('Onda de la Forja');
     expect(DICT.es_ES['mechanic.ignivarJudgmentOfTheForge']).toBe('Juicio de la Forja');
-    expect(localizeSimText('The Heart of the End awakens. Let the world burn!')).not.toBeNull();
+    expect(localizeSimText('Ignivar Ashcaller awakens. Let the world burn!')).not.toBeNull();
     expect(localizeSimText('The last flame consumes all!')).not.toBeNull();
     expect(localizeSimText('The sky itself will burn!')).not.toBeNull();
     expect(localizeSimText('Four must share the pyre, or all will burn!')).not.toBeNull();
@@ -1077,128 +1093,6 @@ describe('Ignivar encounter renderer', () => {
     expect(group.getObjectByName(IGNIVAR_SKYFIRE_VISUAL_NAME)?.visible).toBe(false);
   });
 
-  it('shows and clears the shared soak circle around the marked player', () => {
-    const group = new THREE.Group();
-    const player = {
-      kind: 'player',
-      templateId: 'priest',
-      castingAbility: null,
-      auras: [{ id: IGNIVAR_SOAK_AURA_ID }],
-    };
-
-    syncIgnivarEncounterVisuals(group, player);
-    expect(group.getObjectByName(IGNIVAR_SOAK_VISUAL_NAME)?.visible).toBe(true);
-    player.auras = [];
-    syncIgnivarEncounterVisuals(group, player);
-    expect(group.getObjectByName(IGNIVAR_SOAK_VISUAL_NAME)?.visible).toBe(false);
-  });
-
-  it('counts all living players in the Shared Pyre radius and shows readiness at four', () => {
-    const group = new THREE.Group();
-    const player = {
-      id: 1,
-      kind: 'player',
-      templateId: 'priest',
-      castingAbility: null,
-      pos: { x: 10, z: 20 },
-      auras: [{ id: IGNIVAR_SOAK_AURA_ID, remaining: 3, duration: 6 }],
-    };
-    const entities = new Map([
-      [1, player],
-      [
-        2,
-        {
-          id: 2,
-          kind: 'player',
-          templateId: 'mage',
-          castingAbility: null,
-          pos: { x: 11, z: 20 },
-          auras: [],
-        },
-      ],
-      [
-        3,
-        {
-          id: 3,
-          kind: 'player',
-          templateId: 'rogue',
-          castingAbility: null,
-          pos: { x: 9, z: 20 },
-          auras: [],
-        },
-      ],
-      [
-        4,
-        {
-          id: 4,
-          kind: 'player',
-          templateId: 'druid',
-          castingAbility: null,
-          pos: { x: 10, z: 23 },
-          auras: [],
-        },
-      ],
-      [
-        5,
-        {
-          id: 5,
-          kind: 'player',
-          templateId: 'warlock',
-          castingAbility: null,
-          pos: { x: 30, z: 30 },
-          auras: [],
-        },
-      ],
-    ]);
-
-    syncIgnivarEncounterVisuals(group, player, 0, undefined, undefined, true, undefined, entities);
-    const soak = group.getObjectByName(IGNIVAR_SOAK_VISUAL_NAME) as THREE.Group;
-    expect(soak.userData.playersInside).toBe(4);
-    expect(soak.userData.ready).toBe(true);
-    expect(soak.userData.progress).toBe(0.5);
-    expect(soak.getObjectByName(IGNIVAR_SOAK_FLAME_NAME)?.visible).toBe(false);
-    expect(soak.getObjectByName(IGNIVAR_SOAK_READY_NAME)?.visible).toBe(true);
-
-    const fourthSoaker = entities.get(4);
-    if (!fourthSoaker) throw new Error('fourth soaker fixture missing');
-    fourthSoaker.pos = { x: 20, z: 30 };
-    syncIgnivarEncounterVisuals(group, player, 0, undefined, undefined, true, undefined, entities);
-    expect(soak.userData.playersInside).toBe(3);
-    expect(soak.userData.ready).toBe(false);
-    expect(soak.getObjectByName(IGNIVAR_SOAK_FLAME_NAME)?.visible).toBe(true);
-    expect(soak.getObjectByName(IGNIVAR_SOAK_READY_NAME)?.visible).toBe(false);
-  });
-
-  it('counts only living players through the inclusive Shared Pyre radius boundary', () => {
-    const group = new THREE.Group();
-    const player = {
-      id: 1,
-      kind: 'player',
-      templateId: 'priest',
-      castingAbility: null,
-      pos: { x: 0, z: 0 },
-      auras: [{ id: IGNIVAR_SOAK_AURA_ID }],
-    };
-    const entities = new Map<number, typeof player & { dead?: boolean }>([
-      [1, player],
-      [2, { ...player, id: 2, pos: { x: IGNIVAR_SOAK_RADIUS, z: 0 }, auras: [] }],
-      [3, { ...player, id: 3, pos: { x: IGNIVAR_SOAK_RADIUS + 0.001, z: 0 }, auras: [] }],
-      [4, { ...player, id: 4, pos: { x: 1, z: 0 }, auras: [], dead: true }],
-    ]);
-    entities.set(5, {
-      ...player,
-      id: 5,
-      kind: 'mob',
-      pos: { x: 1, z: 0 },
-      auras: [],
-    });
-
-    syncIgnivarEncounterVisuals(group, player, 0, undefined, undefined, true, undefined, entities);
-    const soak = group.getObjectByName(IGNIVAR_SOAK_VISUAL_NAME) as THREE.Group;
-    expect(soak.userData.playersInside).toBe(2);
-    expect(soak.userData.ready).toBe(false);
-  });
-
   it('shows the frontal only for Ignivar while his cast is in flight', () => {
     const group = new THREE.Group();
     const boss: {
@@ -1339,7 +1233,7 @@ describe('Ignivar encounter renderer', () => {
     expect(brand.userData.overlapDanger).toBe(true);
   });
 
-  it('derives complete frontal and soak clocks including hidden and clamped endpoints', () => {
+  it('derives the complete frontal clock including hidden and clamped endpoints', () => {
     const boss = {
       kind: 'mob',
       templateId: IGNIVAR_BOSS_ID,
@@ -1352,27 +1246,6 @@ describe('Ignivar encounter renderer', () => {
     expect(ignivarEncounterVisualPlan({ ...boss, castRemaining: 0 }).frontalProgress).toBe(1);
     expect(ignivarEncounterVisualPlan({ ...boss, castRemaining: -5 }).frontalProgress).toBe(1);
     expect(ignivarEncounterVisualPlan({ ...boss, castingAbility: null }).frontalProgress).toBe(0);
-
-    const player = {
-      kind: 'player',
-      templateId: 'priest',
-      castingAbility: null,
-      auras: [{ id: IGNIVAR_SOAK_AURA_ID, remaining: 6, duration: 6 }],
-    };
-    expect(ignivarEncounterVisualPlan(player).soakProgress).toBe(0);
-    expect(
-      ignivarEncounterVisualPlan({
-        ...player,
-        auras: [{ id: IGNIVAR_SOAK_AURA_ID, remaining: 0, duration: 6 }],
-      }).soakProgress,
-    ).toBe(1);
-    expect(
-      ignivarEncounterVisualPlan({
-        ...player,
-        auras: [{ id: IGNIVAR_SOAK_AURA_ID, remaining: -2, duration: 0 }],
-      }).soakProgress,
-    ).toBe(1);
-    expect(ignivarEncounterVisualPlan({ ...player, auras: [] }).soakProgress).toBe(0);
   });
 
   it('clamps Brand presentation to three stacks in the pure visual plan', () => {
@@ -1452,8 +1325,7 @@ describe('Ignivar encounter renderer', () => {
     const frontal = buildIgnivarFrontalTelegraph();
     const brand = buildIgnivarBrandCircle();
     const rays = buildIgnivarRotatingRaysTelegraph();
-    const soak = buildIgnivarSoakCircle();
-    group.add(frontal, brand, rays, soak);
+    group.add(frontal, brand, rays);
     const frontalMesh = frontal.children[0] as THREE.Mesh;
     const brandMesh = brand.children[0] as THREE.Mesh;
     const frontalGeometryDispose = vi.spyOn(frontalMesh.geometry, 'dispose');
@@ -1462,33 +1334,45 @@ describe('Ignivar encounter renderer', () => {
       | THREE.Mesh
       | undefined;
     const nestedOuter = rays.getObjectByName(IGNIVAR_FIRE_BEAM_OUTER_NAME) as THREE.Mesh;
+    const nestedFlames = rays.getObjectByName(IGNIVAR_FIRE_BEAM_FLAMES_NAME) as THREE.InstancedMesh;
+    const nestedTip = rays.getObjectByName(IGNIVAR_ROTATING_RAY_BLADE_NAME)?.children[0] as
+      | THREE.InstancedMesh
+      | undefined;
     const nestedTickGeometryDispose = vi.spyOn(
       nestedTick?.geometry as THREE.BufferGeometry,
       'dispose',
     );
     const nestedOuterMaterialDispose = vi.spyOn(nestedOuter.material as THREE.Material, 'dispose');
-    const soakBeacon = soak.getObjectByName('ignivarSoakCallInBeacon') as THREE.Group;
-    const soakBeaconGeometryDispose = vi.spyOn(
-      (soakBeacon.children[0] as THREE.Mesh).geometry,
+    const nestedFlamesDispose = vi.spyOn(nestedFlames, 'dispose');
+    const nestedFlamesGeometryDispose = vi.spyOn(nestedFlames.geometry, 'dispose');
+    const nestedFlamesMaterialDispose = vi.spyOn(
+      nestedFlames.material as THREE.Material,
       'dispose',
     );
-    const soakEmberMaterialDispose = vi.spyOn(
-      (soakBeacon.children[2] as THREE.Points).material as THREE.Material,
+    const nestedTipDispose = vi.spyOn(nestedTip as THREE.InstancedMesh, 'dispose');
+    const nestedTipGeometryDispose = vi.spyOn(
+      (nestedTip as THREE.InstancedMesh).geometry,
       'dispose',
     );
-
+    const nestedTipMaterialDispose = vi.spyOn(
+      (nestedTip as THREE.InstancedMesh).material as THREE.Material,
+      'dispose',
+    );
     disposeIgnivarEncounterVisuals(group);
 
     expect(group.getObjectByName(IGNIVAR_FRONTAL_VISUAL_NAME)).toBeUndefined();
     expect(group.getObjectByName(IGNIVAR_BRAND_VISUAL_NAME)).toBeUndefined();
     expect(group.getObjectByName(IGNIVAR_ROTATING_RAYS_VISUAL_NAME)).toBeUndefined();
-    expect(group.getObjectByName(IGNIVAR_SOAK_VISUAL_NAME)).toBeUndefined();
     expect(frontalGeometryDispose).toHaveBeenCalledOnce();
     expect(brandMaterialDispose).toHaveBeenCalledOnce();
     expect(nestedTickGeometryDispose).toHaveBeenCalledOnce();
     expect(nestedOuterMaterialDispose).toHaveBeenCalledOnce();
-    expect(soakBeaconGeometryDispose).toHaveBeenCalledOnce();
-    expect(soakEmberMaterialDispose).toHaveBeenCalledOnce();
+    expect(nestedFlamesDispose).toHaveBeenCalledOnce();
+    expect(nestedFlamesGeometryDispose).toHaveBeenCalledOnce();
+    expect(nestedFlamesMaterialDispose).toHaveBeenCalledOnce();
+    expect(nestedTipDispose).toHaveBeenCalledOnce();
+    expect(nestedTipGeometryDispose).toHaveBeenCalledOnce();
+    expect(nestedTipMaterialDispose).toHaveBeenCalledOnce();
   });
 
   it('pins the production renderer integration for cleanup, stable conduits, and facing', () => {

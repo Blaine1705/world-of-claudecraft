@@ -2450,6 +2450,7 @@ export const zh_TW: EnTranslations = {
       "leftPillarCharging": "左側鍛爐立柱正在充能，3秒後點燃！",
       "rightPillarCharging": "右側鍛爐立柱正在充能，3秒後點燃！",
       "bothPillarsCharging": "鍛爐立柱正在充能，3秒後點燃！",
+      "artificerApproaches": "燼火工匠正在接近鍛爐！",
       "leftPillar": "左側鍛爐立柱點燃了！",
       "rightPillar": "右側鍛爐立柱點燃了！",
       "bothPillars": "鍛爐立柱點燃了！",
@@ -2461,8 +2462,36 @@ export const zh_TW: EnTranslations = {
       "worldfireClosing": "世界之火正在逼近，往中央移動！",
       "worldfireConsumed": "整座熔爐大廳都在燃燒！"
     },
+    "varkhulWaveStatus": "波次 {wave}/{waves} | 敵人: {remaining}",
+    "raidBossGuide": {
+      "title": "首領指南",
+      "button": "指南: {boss}",
+      "subtitle": "{boss} | 普通與英雄",
+      "close": "關閉首領指南",
+      "ignivar": {
+        "brand": "柴堆印記: 分散站位。將灼熱洪流引向可用水道，再獨自穿過水流完成淨化。",
+        "movement": "移動: 躲避燼雨的錐形攻擊與隕石，跟隨旋轉煉獄移動，並利用熔爐波的兩個缺口。",
+        "apocalypse": "末日: 在伊格尼瓦·喚灰者完成施法前將其擊殺。",
+        "judgment": "熔爐審判: 預警時找出獨特的庇護點，地面燃燒後在標記邊界內集合。",
+        "finale": "最終煉獄: 在團滅前擊殺伊格尼瓦爾，同時應對加速的隕石、正面攻擊與旋轉煉獄。",
+        "heroic": "英雄: 熔爐鎖鏈期間成對玩家必須保持靠近，熔爐審判期間印記仍會持續，且熔爐波會將玩家推得更遠。"
+      },
+      "varkhul": {
+        "tanks": "坦克: 製作者印記達到2層時換坦，並讓瓦爾庫爾保持在近戰範圍內。",
+        "orbs": "燼火寶珠: 被標記者分散到房間邊緣。火池會持續存在，釋放的寶珠會穿過房間。",
+        "pyre": "共享柴堆: 只選擇沒有熾熱金屬的玩家。無論難度，移動圓圈內都需要4名玩家。每缺少一名玩家，整個團隊都會受到相當於最大生命值15%的傷害。",
+        "forgestorm": "熔爐風暴: 觀察墜落的隕石，在三波隕石落地前離開每個標記區域。",
+        "anvil": "鐵砧敕令: 瓦爾庫爾移動到巨型熔爐並敲擊三次，造成團隊傷害。英雄模式還會落下標記隕石。",
+        "ray": "淬火射線: 另一名玩家通常由坦克在長時間預警結束前攔截移動射線。承受傷害者會獲得淬火創傷。",
+        "forge": "熔爐柱: 在射線抵達熔爐前阻擋，並在坩堝暴露疊加後輪換。熱量滿時會觸發熔爐熔毀。",
+        "assembly": "大師組裝: 阻擋兩道熔爐射線，擊殺所有傳送門波次，打斷坩堝震擊，並阻止燼火工匠治療瓦爾庫爾。",
+        "worldfire": "世界之火: 英雄最終階段的燃燒邊緣會向中央收縮。在整個坩堝燃燒前擊敗瓦爾庫爾。",
+        "heroic": "英雄: 熔爐熱量不會下降，鐵砧敕令會增加隕石，最終階段會集中應對世界之火。"
+      }
+    },
     "auraEffect": {
       "sharedPyre": "造成相當於每名玩家最大生命值 {total}% 的傷害，由圈內玩家分攤（{players} 名玩家時每人承受 {perPlayer}%）。",
+      "varkhulSharedPyre": "造成相當於每名玩家最大生命值 {total}% 的傷害，由圈內玩家分攤（{players} 名玩家時每人承受 {perPlayer}%）。每缺少一名玩家，還會對整個團隊（包括圈內玩家）造成最大生命值 {missingPenalty}% 的傷害。",
       "makersBrand": "持續 {duration} 秒，每層使你受到瓦爾庫爾的傷害提高 {pct}%。最多疊加 {max} 層。坦克應在 {swap} 層時換坦。",
       "varkhulSentinelsGaze": "餘燼哨兵正在追擊你。將它帶離團隊，直到它被消滅。",
       "varkhulMoltenCore": "將核心運到鍛爐。熔融重壓每 {interval} 秒造成不斷提高的傷害，從最大生命值的 {min}% 增至 {max}%。",
@@ -8591,6 +8620,8 @@ export const zh_TW: EnTranslations = {
         "riftEntrance": "裂隙入口：{name}",
         "hostileEnemy": "敵對目標",
         "aggressiveEnemy": "正在攻擊你的敵人",
+        "bossEnemy": "首領：{name}",
+        "bossAggressiveEnemy": "正在攻擊你的首領：{name}",
         "lootableEnemy": "可拾取戰利品的敵人",
         "corpse": "你的屍體",
         "deathZone": "危險區域",
@@ -14483,7 +14514,7 @@ export const zh_TW: EnTranslations = {
         "name": "伊格尼瓦，末焰使者"
       },
       "ignivar_heart_of_the_end": {
-        "name": "終焉之心"
+        "name": "伊格尼瓦·喚灰者"
       },
       "ignivar_ember_sentinel": {
         "name": "餘燼哨兵"
@@ -16333,9 +16364,6 @@ export const zh_TW: EnTranslations = {
           },
           "1": {
             "label": "摧毀熔爐守衛"
-          },
-          "2": {
-            "label": "摧毀燼火工匠"
           }
         }
       },
@@ -18245,6 +18273,11 @@ export const zh_TW: EnTranslations = {
         "name": "最後泉源熔爐",
         "enterText": "熱浪在熔爐封印的水源上方翻湧。",
         "leaveText": "你離開熔爐，終於再次暢快呼吸。"
+      },
+      "ignivar_molten_assembly": {
+        "name": "熔火裝配間",
+        "enterText": "開啟的大門通往熔火裝配大廳。",
+        "leaveText": "你離開裝配線，返回熔爐廳。"
       },
       "ignivar_inner_crucible": {
         "name": "內環熔爐",

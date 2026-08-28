@@ -2450,6 +2450,7 @@ export const ko_KR: EnTranslations = {
       "leftPillarCharging": "왼쪽 용광로 기둥이 충전 중입니다. 3초 후 점화됩니다!",
       "rightPillarCharging": "오른쪽 용광로 기둥이 충전 중입니다. 3초 후 점화됩니다!",
       "bothPillarsCharging": "용광로 기둥들이 충전 중입니다. 3초 후 점화됩니다!",
+      "artificerApproaches": "잿불 기계공이 용광로로 다가옵니다!",
       "leftPillar": "왼쪽 용광로 기둥이 점화됩니다!",
       "rightPillar": "오른쪽 용광로 기둥이 점화됩니다!",
       "bothPillars": "용광로 기둥들이 점화됩니다!",
@@ -2461,8 +2462,36 @@ export const ko_KR: EnTranslations = {
       "worldfireClosing": "세계불꽃이 다가옵니다. 중앙으로 이동하세요!",
       "worldfireConsumed": "도가니 전체가 불타고 있습니다!"
     },
+    "varkhulWaveStatus": "공세 {wave}/{waves} | 적: {remaining}",
+    "raidBossGuide": {
+      "title": "우두머리 공략",
+      "button": "공략: {boss}",
+      "subtitle": "{boss} | 일반 및 영웅",
+      "close": "우두머리 공략 닫기",
+      "ignivar": {
+        "brand": "장작더미의 징표: 산개합니다. 불타는 급류를 준비된 수로로 유도한 뒤 혼자 물을 건너 해제합니다.",
+        "movement": "이동: 잿불비의 부채꼴과 운석을 피하고, 회전하는 지옥불과 함께 움직이며, 대장간 파도의 두 틈을 사용합니다.",
+        "apocalypse": "대재앙: 시전이 끝나기 전에 이그니바르 애쉬콜러를 처치합니다.",
+        "judgment": "대장간의 심판: 경고 중 다른 피난처를 찾아내고 바닥이 타오르면 표시된 경계 안에 모입니다.",
+        "finale": "마지막 지옥불: 빨라진 운석, 전방 공격, 회전 지옥불에 대응하며 전멸 전에 이그니바르를 처치합니다.",
+        "heroic": "영웅: 대장간의 사슬 동안 짝과 가까이 있어야 하며 심판 안에서도 징표가 유지되고, 대장간 파도가 플레이어를 더 멀리 밀어냅니다."
+      },
+      "varkhul": {
+        "tanks": "방어 담당: 제작자의 징표 2중첩에 교대하고 바르쿨을 근접 거리 안에 둡니다.",
+        "orbs": "잿불 구슬: 대상자는 방 가장자리로 산개합니다. 불 웅덩이는 남고 방출된 구슬은 방을 가로지릅니다.",
+        "pyre": "공유 장작더미: 달아오른 금속이 없는 대상만 선택합니다. 난이도와 관계없이 이동하는 원 안에 4명이 모입니다. 부족한 플레이어 1명당 공격대 전체가 최대 생명력의 15%에 해당하는 피해를 받습니다.",
+        "forgestorm": "대장간폭풍: 떨어지는 운석을 보고 세 차례의 충돌 전에 표시된 모든 범위에서 벗어납니다.",
+        "anvil": "모루의 칙령: 바르쿨이 거대 대장간으로 이동해 세 번 내리쳐 공격대 피해를 줍니다. 영웅에서는 표시된 운석도 떨어집니다.",
+        "ray": "담금질 광선: 긴 경고가 끝나기 전에 다른 플레이어, 보통 방어 담당이 움직이는 광선을 가로막습니다. 피격자는 담금질 상처를 얻습니다.",
+        "forge": "대장간 기둥: 광선이 대장간에 닿기 전에 막고 도가니 노출이 쌓이면 교대합니다. 열기가 가득 차면 대장간이 붕괴합니다.",
+        "assembly": "거장의 조립: 두 광선을 막고 모든 차원문 웨이브를 처치하며 도가니 지진을 차단하고 잿불 기술자의 치유를 막습니다.",
+        "worldfire": "세계불꽃: 영웅의 마지막 단계에서 불타는 가장자리가 중앙으로 좁혀집니다. 도가니 전체가 타기 전에 바르쿨을 처치합니다.",
+        "heroic": "영웅: 대장간 열기는 식지 않고 모루의 칙령에 운석이 추가되며 마지막 단계는 세계불꽃에 집중합니다."
+      }
+    },
     "auraEffect": {
       "sharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%).",
+      "varkhulSharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%). 부족한 플레이어 1명당 원 안의 플레이어를 포함한 공격대 전체가 최대 생명력의 {missingPenalty}%에 해당하는 피해를 추가로 받습니다.",
       "makersBrand": "{duration}초 동안 중첩당 발쿨에게 받는 피해가 {pct}% 증가합니다. 최대 {max}회 중첩됩니다. 탱커는 {swap}중첩에서 교대하세요.",
       "varkhulSentinelsGaze": "잔불 감시자가 당신을 추격합니다. 처치할 때까지 공격대에서 멀리 떨어뜨리세요.",
       "varkhulMoltenCore": "이 핵을 용광로로 운반하세요. 용융물의 무게는 {interval}초마다 최대 생명력의 {min}%에서 {max}%까지 증가하는 피해를 입힙니다.",
@@ -8591,6 +8620,8 @@ export const ko_KR: EnTranslations = {
         "riftEntrance": "균열 입구: {name}",
         "hostileEnemy": "적대 대상",
         "aggressiveEnemy": "당신을 공격 중인 적",
+        "bossEnemy": "우두머리: {name}",
+        "bossAggressiveEnemy": "당신을 공격 중인 우두머리: {name}",
         "lootableEnemy": "전리품을 획득할 수 있는 적",
         "corpse": "자신의 시체",
         "deathZone": "위험 지역",
@@ -14483,7 +14514,7 @@ export const ko_KR: EnTranslations = {
         "name": "이그니바르, 마지막 불꽃의 전령"
       },
       "ignivar_heart_of_the_end": {
-        "name": "종말의 심장"
+        "name": "이그니바르 애쉬콜러"
       },
       "ignivar_ember_sentinel": {
         "name": "잔불 감시자"
@@ -16333,9 +16364,6 @@ export const ko_KR: EnTranslations = {
           },
           "1": {
             "label": "용광로 수호자 파괴"
-          },
-          "2": {
-            "label": "불씨 기계공 파괴"
           }
         }
       },
@@ -18245,6 +18273,11 @@ export const ko_KR: EnTranslations = {
         "name": "마지막 샘의 도가니",
         "enterText": "도가니의 봉인된 물 위로 열기가 아른거립니다.",
         "leaveText": "도가니를 벗어나 다시 편히 숨을 쉽니다."
+      },
+      "ignivar_molten_assembly": {
+        "name": "용융 조립장",
+        "enterText": "열린 문 너머로 용융 조립 홀이 이어집니다.",
+        "leaveText": "조립 라인을 떠나 도가니로 돌아갑니다."
       },
       "ignivar_inner_crucible": {
         "name": "내부 용광로",

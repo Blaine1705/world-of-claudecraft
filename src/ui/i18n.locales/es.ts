@@ -4431,6 +4431,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hud.core.mapMarkerLabels.riftEntrance': 'Entrada a la brecha: {name}',
   'hud.core.mapMarkerLabels.hostileEnemy': 'Enemigo hostil',
   'hud.core.mapMarkerLabels.aggressiveEnemy': 'Enemigo que te está atacando',
+  'hud.core.mapMarkerLabels.bossEnemy': 'Jefe: {name}',
+  'hud.core.mapMarkerLabels.bossAggressiveEnemy': 'Jefe que te está atacando: {name}',
   'hud.core.mapMarkerLabels.lootableEnemy': 'Enemigo con botín',
   'hud.core.mapMarkerLabels.corpse': 'Tu cadáver',
   'hud.core.mapMarkerLabels.deathZone': 'Zona peligrosa',
@@ -10240,7 +10242,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.hedge_knight.name': 'Caballero de Dawnhold',
   'entities.mobs.ice_wisp.name': 'Fuego Fatuo del Hielo',
   'entities.mobs.idol_guardian.name': 'El Guardián del Ídolo',
-  'entities.mobs.ignivar_heart_of_the_end.name': 'Corazón del Fin',
+  'entities.mobs.ignivar_heart_of_the_end.name': 'Ignivar Ashcaller',
   'entities.mobs.ignivar_herald_of_the_last_flame.name': 'Ignivar, Heraldo de la Última Llama',
   'entities.mobs.lily_wisp.name': 'Fuego Fatuo del Lirio',
   'entities.mobs.mere_lurker.name': 'Acechador del Mere',
@@ -13892,6 +13894,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Golpea al objetivo por {damage} de daño y lo aturde durante 4 s. Otorga 2 puntos de combo.',
   'hudChrome.auraEffect.varkhulForgeLink':
     'Intercepta el rayo de un pilar activo antes de que alcance la forja. Un rayo libre añade un 6% de calor por segundo. En Normal, los rayos bloqueados y los pilares apagados enfrían la forja; en Heroico, el calor nunca baja. Al 100%, la forja sufre una Fusión letal.',
+  'hudChrome.auraEffect.varkhulSharedPyre':
+    'Inflige un {total}% de la salud máxima de cada jugador, repartido entre quienes estén dentro del círculo ({perPlayer}% por persona con {players} jugadores). Cada plaza ausente también inflige un {missingPenalty}% de la salud máxima a toda la banda, incluidos los jugadores dentro del círculo.',
   'hudChrome.auraEffect.varkhulCrucibleExposure':
     'Bloquear un Rayo del Crisol inflige cada segundo más daño según tu salud máxima. Las acumulaciones se reinician 10 s después de salir del rayo en Normal y 60 s después en Heroico.',
   'hudChrome.varkhulCallout.leftPillarCharging':
@@ -13900,6 +13904,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
     '¡El pilar derecho de la forja está cargándose! Se encenderá en 3 s.',
   'hudChrome.varkhulCallout.bothPillarsCharging':
     '¡Los pilares de la forja están cargándose! Se encenderán en 3 s.',
+  'hudChrome.varkhulCallout.artificerApproaches':
+    '¡Un Artífice de ceniza se acerca a la forja!',
   'hudChrome.varkhulCallout.leftPillar': '¡El pilar izquierdo de la forja se enciende!',
   'hudChrome.varkhulCallout.rightPillar': '¡El pilar derecho de la forja se enciende!',
   'hudChrome.varkhulCallout.bothPillars': '¡Los pilares de la forja se encienden!',
@@ -13913,6 +13919,43 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.varkhulCallout.worldfireClosing':
     '¡El Fuego del Mundo se acerca! ¡Avanzad hacia el centro!',
   'hudChrome.varkhulCallout.worldfireConsumed': '¡Todo el crisol está en llamas!',
+  'hudChrome.varkhulWaveStatus': 'Oleada {wave}/{waves} | Enemigos: {remaining}',
+  'hudChrome.raidBossGuide.title': 'Guía de jefes',
+  'hudChrome.raidBossGuide.button': 'Guía: {boss}',
+  'hudChrome.raidBossGuide.subtitle': '{boss} | Normal y heroico',
+  'hudChrome.raidBossGuide.close': 'Cerrar la guía de jefes',
+  'hudChrome.raidBossGuide.ignivar.brand':
+    'Marca de la Pira: separaos. Apunta Torrente abrasador hacia un conducto de agua listo y cruza el agua a solas para limpiarte.',
+  'hudChrome.raidBossGuide.ignivar.movement':
+    'Movimiento: evita los conos y meteoros de Lluvia de cenizas, muévete con Infierno giratorio y usa los dos huecos de Ola de la Forja.',
+  'hudChrome.raidBossGuide.ignivar.apocalypse':
+    'Apocalipsis: mata a Ignivar Ashcaller antes de que termine su lanzamiento.',
+  'hudChrome.raidBossGuide.ignivar.judgment':
+    'Juicio de la Forja: identifica el refugio distinto durante el aviso y reuníos dentro de su límite marcado cuando arda el suelo.',
+  'hudChrome.raidBossGuide.ignivar.finale':
+    'Último Infierno: acaba con Ignivar antes de la aniquilación mientras continúan los meteoros, ataques frontales e Infierno giratorio acelerados.',
+  'hudChrome.raidBossGuide.ignivar.heroic':
+    'Heroico: las parejas permanecen juntas durante Cadenas de la Forja, Marca sigue activa dentro de Juicio y Ola de la Forja empuja más lejos.',
+  'hudChrome.raidBossGuide.varkhul.tanks':
+    'Tanques: cambiad a dos acumulaciones de Marca del Hacedor y mantened a Varkhul a distancia cuerpo a cuerpo.',
+  'hudChrome.raidBossGuide.varkhul.orbs':
+    'Orbes de ceniza: los jugadores marcados se separan hacia el borde. Sus charcos de fuego persisten y los orbes liberados cruzan la sala.',
+  'hudChrome.raidBossGuide.varkhul.pyre':
+    'Pira compartida: solo elige a alguien sin Metal al rojo vivo. Apilad cuatro jugadores dentro del círculo móvil en cualquier dificultad. Cada plaza ausente inflige un 15% de la salud máxima a toda la banda.',
+  'hudChrome.raidBossGuide.varkhul.forgestorm':
+    'Tormenta de la Forja: observa los meteoros que caen y sal de cada impacto marcado antes de que aterrice cada una de las tres oleadas.',
+  'hudChrome.raidBossGuide.varkhul.anvil':
+    'Decreto del Yunque: Varkhul se desplaza hasta la gran forja y la golpea tres veces, dañando a la banda. En heroico también caen meteoros marcados.',
+  'hudChrome.raidBossGuide.varkhul.ray':
+    'Rayo de temple: otro jugador, normalmente un tanque, intercepta la línea móvil antes de que termine el largo aviso. Quien recibe el golpe sufre Herida templada.',
+  'hudChrome.raidBossGuide.varkhul.forge':
+    'Pilares de la forja: bloquea los rayos antes de que lleguen a la forja y rota a los bloqueadores cuando aumente Exposición del Crisol. El calor completo provoca Colapso de la Forja.',
+  'hudChrome.raidBossGuide.varkhul.assembly':
+    'La Asamblea del Maestro: bloquea ambos rayos, mata todas las oleadas de portales, interrumpe Terremoto del Crisol e impide que los Artífices de ceniza curen a Varkhul.',
+  'hudChrome.raidBossGuide.varkhul.worldfire':
+    'Fuego del Mundo: en heroico, el borde en llamas avanza hacia el centro durante la fase final. Derrota a Varkhul antes de que arda todo el crisol.',
+  'hudChrome.raidBossGuide.varkhul.heroic':
+    'Heroico: el calor de la forja nunca baja, Decreto del Yunque añade meteoros y la fase final elimina casi todas las mecánicas para centrarse en Fuego del Mundo.',
   'gpuNotice.bodyDiscreteInactive':
     'El juego no está usando la GPU dedicada para videojuegos y se está ejecutando en la GPU integrada (de ahorro de energía), así que el rendimiento se verá afectado. Actualiza los controladores de gráficos y reinicia el juego. En Windows, establece también el juego como Alto rendimiento en Configuración > Sistema > Pantalla > Gráficos.',
   // v0.40 release i18n fill.

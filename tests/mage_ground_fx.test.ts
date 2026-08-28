@@ -96,7 +96,7 @@ describe('Mage meteor visual', () => {
     expect(landed).toHaveBeenCalledOnce();
   });
 
-  it('reconciles a secondary encounter meteor stream without pruning either owner', () => {
+  it('reconciles three encounter meteor streams without pruning any owner', () => {
     const scene = new THREE.Scene();
     const fx = new MageGroundFx(scene, () => 0, vi.fn());
     const first = {
@@ -117,19 +117,38 @@ describe('Mage meteor visual', () => {
       remaining: 1.2,
       warningLead: 0,
     };
+    const third = {
+      id: 'varkhul-forgestorm:90:2:1:0',
+      sourceId: 90,
+      x: 7,
+      z: 8,
+      radius: 4,
+      duration: 2.5,
+      remaining: 1.5,
+      warningLead: 0,
+    };
 
     fx.syncWorldMeteorWarnings({
       activeIgnivarMeteors: [first],
       activeVarkhulAnvilMeteors: [second],
+      activeVarkhulForgestormWarnings: [third],
     });
-    expect(scene.children.filter((child) => child.name === 'mage-meteor-fx')).toHaveLength(2);
-    fx.syncMeteorWarnings([], [second]);
+    expect(scene.children.filter((child) => child.name === 'mage-meteor-fx')).toHaveLength(3);
+    fx.syncMeteorWarnings([], [second], [third]);
     expect(
       scene.children.find((child) => child.userData.persistentMeteorId === first.id),
     ).toBeUndefined();
     expect(
       scene.children.find((child) => child.userData.persistentMeteorId === second.id),
     ).toBeDefined();
+    expect(
+      scene.children.find((child) => child.userData.persistentMeteorId === third.id),
+    ).toBeDefined();
+    const forgestormMeteor = scene.children.find(
+      (child) => child.userData.persistentMeteorId === third.id,
+    ) as THREE.Group;
+    expect(forgestormMeteor.getObjectByName('mage-meteor-body')?.visible).toBe(true);
+    expect(forgestormMeteor.getObjectByName('mage-meteor-trail')?.visible).toBe(true);
   });
 
   it('lets the contributor fire disc own Ignivar ground detail without hiding countdown', () => {

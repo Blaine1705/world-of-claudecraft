@@ -619,16 +619,16 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
 
   it('localizes authored encounter yells but preserves player-authored yells', () => {
     setLanguage('es_ES');
-    const authored = 'The Heart of the End awakens. Let the world burn!';
+    const authored = 'Ignivar Ashcaller awakens. Let the world burn!';
     expect(localizeAuthoredYellText(authored, 'mob')).toBe(
-      'El Corazón del Fin despierta. ¡Que arda el mundo!',
+      'Ignivar Ashcaller despierta. ¡Que arda el mundo!',
     );
     expect(localizeAuthoredYellText(authored, 'npc')).toBe(
-      'El Corazón del Fin despierta. ¡Que arda el mundo!',
+      'Ignivar Ashcaller despierta. ¡Que arda el mundo!',
     );
     expect(localizeAuthoredYellText(authored, 'player')).toBe(authored);
     expect(localizeAuthoredYellText(authored, undefined)).toBe(
-      'El Corazón del Fin despierta. ¡Que arda el mundo!',
+      'Ignivar Ashcaller despierta. ¡Que arda el mundo!',
     );
     expect(localizeAuthoredYellText(authored, undefined, 'mage')).toBe(authored);
     expect(localizeAuthoredYellText('Player message', 'mob')).toBe('Player message');

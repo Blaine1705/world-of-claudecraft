@@ -539,6 +539,7 @@ import {
 } from './i18n';
 import { iconDataUrl, QUALITY_COLOR, raidMarkerDataUrl } from './icons';
 import { InspectWindow } from './inspect_window';
+import { InteriorMapController } from './interior_map_controller';
 import { itemArmorTypeLabelKey } from './item_armor_type';
 import { requiredClassesForTooltip } from './item_class_restriction';
 import { itemStatDeltas } from './item_compare';
@@ -561,8 +562,6 @@ import {
 } from './item_set_tooltip_view';
 import { itemSlotLabel as itemSlotName } from './item_slot_labels';
 import { knownItemDef, ownEntry } from './known_item';
-import { DAWNHOLD_MAP_PAINTER_SPEC, LastKeepMapPainter } from './lastkeep_map_painter';
-import { dawnholdMapActive, lastKeepMapActive } from './lastkeep_map_view';
 import { LeaderboardWindow } from './leaderboard_window';
 import { ReannounceMarker } from './live_region_reannounce';
 import { isCombatFlavorLog } from './log_event_route';
@@ -689,6 +688,7 @@ import {
   questItemTooltipRelatedKey,
 } from './quest_item_tooltip_view';
 import { questProgressEventText } from './quest_progress_text';
+import { RaidBossGuideWindow, raidBossGuideContextFallback } from './raid_boss_guide_window';
 import { lockoutParts, lockoutShape } from './raid_lockout';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
 import {
@@ -2035,6 +2035,8 @@ export class Hud {
         station: stationNameText,
         poi: zonePoiLabel,
         rift: riftFloorLabel,
+        npc: npcDisplayName,
+        mob: mobDisplayName,
       },
       npc: (marker) => this.mapMarkerTooltipContent.npc(marker),
       navigation: (marker) =>
@@ -3486,8 +3488,10 @@ export class Hud {
         this.arenaWindow.close();
         break;
       case 'dungeon-finder-window':
-        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.dungeonFinderWindow.close();
+        break;
+      case 'raid-boss-guide-window':
+        this.raidBossGuideWindow.close();
         break;
       case 'card-duel-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
@@ -4138,16 +4142,7 @@ export class Hud {
     this.mapMarkerArt,
     this.mapMarkerProfile,
   );
-  // The Last Keep interior map (the castle floor plan): both surfaces routed
-  // by the lastKeepMapActive position guard, exactly like the delve branch.
-  private readonly lastKeepMapPainter = new LastKeepMapPainter(this.writerFacet, classCss);
-  // Dawnhold Castle rides the same parameterized painter with its own spec
-  // (plates, title keys, and pure-core builders), routed by dawnholdMapActive.
-  private readonly dawnholdMapPainter = new LastKeepMapPainter(
-    this.writerFacet,
-    classCss,
-    DAWNHOLD_MAP_PAINTER_SPEC,
-  );
+  private readonly interiorMaps = new InteriorMapController(this.writerFacet, classCss);
   // The Protect Yumi match strip + bench overlay (yumi_match_painter.ts):
   // facet-routed; structure from arenaInfo.match.yumi, dynamics from the
   // yumiStatus/yumiDown events fed in handleEvents. Runs on the mediumHud
@@ -4926,9 +4921,6 @@ export class Hud {
     ...this.windowFocus('#arena-window'),
   });
 
-  // Dungeon Finder (cold window; docs/prd/dungeon-finder.md). Composes the
-  // shared presentation bag for loot icons/tooltips and a narrow map hook for
-  // the non-teleporting "Show on Map" action.
   private readonly dungeonFinderWindow = new DungeonFinderWindow({
     ...this.presentationBag,
     root: () => $('#dungeon-finder-window'),
@@ -4939,9 +4931,13 @@ export class Hud {
     ...this.windowFocus('#dungeon-finder-window'),
   });
 
-  // The WoW-style "group found" prompt: opened by the dfProposal SimEvent,
-  // self-closing when the proposal resolves. Lives OUTSIDE the finder window
-  // so an answer never requires opening it.
+  private readonly raidBossGuideWindow = new RaidBossGuideWindow({
+    root: () => $('#raid-boss-guide-window'),
+    closeOthers: () => this.closeOtherWindows('#raid-boss-guide-window'),
+    contextFallback: () => raidBossGuideContextFallback(document, this.isMobileLayout()),
+    ...this.windowFocus('#raid-boss-guide-window'),
+  });
+
   private readonly dungeonFinderProposalPopup = new DungeonFinderProposalPopup({
     root: () => $('#dfinder-proposal-popup'),
     world: () => this.sim,
@@ -6430,9 +6426,8 @@ export class Hud {
     // Same reason as delveTracker above: the rift floor tracker's signature is
     // floor/timer numbers, none of which move with the locale.
     this.riftTracker.relocalize();
-    // The keyed-pool party rows reuse their DOM, so a rebuild never re-runs t() on
-    // their badge tooltips / leave label; re-localize them in place on a switch.
     this.partyFramesPainter.relocalize();
+    this.raidBossGuideWindow.relocalize();
     // The world map rasterizes its labels into sprites keyed on the RESOLVED
     // string, so a switch can never draw the old language; clearing is about not
     // carrying dead rasters in the sprite budget.
@@ -10156,29 +10151,16 @@ export class Hud {
       );
       return;
     }
-    // Inside The Last Keep: the baked floor plan for the player's current
-    // story, with the '#zone-label' story title (the delve branch pattern).
-    if (lastKeepMapActive(this.sim)) {
-      this.lastKeepMapPainter.paintMinimap(
+    if (
+      this.interiorMaps.paintMinimap(
         ctx,
         this.sim,
         $('#zone-label'),
         MINIMAP_SIZE,
         this.minimapZoom,
-      );
+      )
+    )
       return;
-    }
-    // Inside Dawnhold Castle: the same castle-plan surface, dawnhold spec.
-    if (dawnholdMapActive(this.sim)) {
-      this.dawnholdMapPainter.paintMinimap(
-        ctx,
-        this.sim,
-        $('#zone-label'),
-        MINIMAP_SIZE,
-        this.minimapZoom,
-      );
-      return;
-    }
     // The overworld minimap: a pure marker core (minimap_markers) + the thin canvas
     // painter. It owns the cached terrain blit + the marker draws and writes
     // '#zone-label' through the write-elision facet. It blits the current zone's
@@ -10421,7 +10403,8 @@ export class Hud {
     const inRift = mapMode === 'rift';
     const inBattleground = mapMode === 'battleground';
     const inDelve = mapMode === 'delve';
-    const schematic = inRift || inDelve || inBattleground;
+    const inDungeon = mapMode === 'dungeon';
+    const schematic = inRift || inDelve || inBattleground || inDungeon;
     this.setDisplay($('#map-level-toggle'), schematic ? 'none' : 'block');
     this.setDisplay($('#map-zoom'), schematic || this.mapLevel === 'continent' ? 'none' : 'flex');
     if (inRift) {
@@ -10454,6 +10437,18 @@ export class Hud {
       return;
     }
 
+    if (inDungeon) {
+      this.clearMapHitState(canvas);
+      const result = this.interiorMaps.paintDungeonWorldMap(ctx, this.sim, S);
+      const title = result?.title ?? '';
+      this.setText(summaryEl, t('hud.core.mapSummary', { zone: title }));
+      this.setText(
+        markerSummaryEl,
+        this.mapMarkerInteraction.semantics.updateDungeon(result?.model ?? null, title, S),
+      );
+      return;
+    }
+
     this.setText(
       $('#map-level-toggle'),
       t(
@@ -10480,23 +10475,14 @@ export class Hud {
     }
     this.continentRegions = [];
 
-    // Inside The Last Keep: the whole-plan floor plate for the player's
-    // current story (title drawn on-canvas, the delve branch pattern); the
-    // continent overview above still wins when the player toggles up to it.
-    if (lastKeepMapActive(this.sim)) {
+    const castleTitle = this.interiorMaps.paintCastleWorldMap(ctx, this.sim, S);
+    if (castleTitle !== null) {
       this.clearMapHitState(canvas);
-      const title = this.lastKeepMapPainter.paintWorldMap(ctx, this.sim, S);
-      this.setText(summaryEl, t('hud.core.mapSummary', { zone: title }));
-      this.setText(markerSummaryEl, this.mapMarkerInteraction.semantics.updateSimple(title, S));
-      return;
-    }
-
-    // Inside Dawnhold Castle: the same castle-plan surface, dawnhold spec.
-    if (dawnholdMapActive(this.sim)) {
-      this.clearMapHitState(canvas);
-      const title = this.dawnholdMapPainter.paintWorldMap(ctx, this.sim, S);
-      this.setText(summaryEl, t('hud.core.mapSummary', { zone: title }));
-      this.setText(markerSummaryEl, this.mapMarkerInteraction.semantics.updateSimple(title, S));
+      this.setText(summaryEl, t('hud.core.mapSummary', { zone: castleTitle }));
+      this.setText(
+        markerSummaryEl,
+        this.mapMarkerInteraction.semantics.updateSimple(castleTitle, S),
+      );
       return;
     }
 
@@ -17093,12 +17079,9 @@ export class Hud {
     const target =
       this.sim.player.targetId !== null ? this.sim.entities.get(this.sim.player.targetId) : null;
     const info = this.sim.partyInfo;
-    // Drop the frames below the target frame only when the measured target
-    // stack (frame + #tf-debuffs strip) actually overlaps their column: the
-    // painter keeps --party-below-target-bottom current (measuring only when
-    // its cheap key changes) and reports whether the seat is in play at all (no
-    // overlap, e.g. a dragged-away target frame, keeps the frames at their base
-    // anchor; touch holds the seat with no target off the tier's fallback).
+    const dungeonId = info ? (dungeonAt(this.sim.player.pos.x)?.id ?? null) : null;
+    this.partyFramesPainter.setGuideControl(this.raidBossGuideWindow.syncAvailability(dungeonId));
+    // Re-seat below the target only when its measured stack overlaps this column.
     const targetShown = !!target && target.kind !== 'object';
     const belowTarget = this.partyBelowTargetPainter.update(
       targetShown,

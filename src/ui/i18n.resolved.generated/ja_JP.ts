@@ -2450,6 +2450,7 @@ export const ja_JP: EnTranslations = {
       "leftPillarCharging": "左の鍛冶柱が充填中。3秒後に点火する！",
       "rightPillarCharging": "右の鍛冶柱が充填中。3秒後に点火する！",
       "bothPillarsCharging": "鍛冶柱が充填中。3秒後に点火する！",
+      "artificerApproaches": "灰燼の技工士が鍛冶炉へ近づいている！",
       "leftPillar": "左の鍛冶柱が点火した！",
       "rightPillar": "右の鍛冶柱が点火した！",
       "bothPillars": "鍛冶柱が点火した！",
@@ -2461,8 +2462,36 @@ export const ja_JP: EnTranslations = {
       "worldfireClosing": "世界炎が迫っている。中央へ移動せよ！",
       "worldfireConsumed": "るつぼ全体が炎に包まれた！"
     },
+    "varkhulWaveStatus": "ウェーブ {wave}/{waves} | 敵: {remaining}",
+    "raidBossGuide": {
+      "title": "ボス攻略",
+      "button": "攻略: {boss}",
+      "subtitle": "{boss} | 通常・英雄",
+      "close": "ボス攻略を閉じる",
+      "ignivar": {
+        "brand": "火葬の印: 散開する。灼熱の奔流を使用可能な水路へ向け、一人で水を渡って解除する。",
+        "movement": "移動: 灰の雨の扇形と隕石を避け、回転する業火に合わせて動き、鍛冶波の二つの隙間を使う。",
+        "apocalypse": "黙示録: 詠唱が終わる前にイグニヴァル・アッシュコーラーを倒す。",
+        "judgment": "鍛冶場の審判: 予告中に異なる避難所を見分け、床が燃えたら表示された境界内に集合する。",
+        "finale": "最後の業火: 加速した隕石、前方攻撃、回転する業火に対処しながら全滅前にイグニヴァルを倒す。",
+        "heroic": "英雄: 鍛冶の鎖ではペア同士が近くに留まり、審判中も印が残り、鍛冶波はプレイヤーをさらに遠くへ押し出す。"
+      },
+      "varkhul": {
+        "tanks": "タンク: 創造者の印が2スタックで交代し、ヴァークルを近接範囲に保つ。",
+        "orbs": "灰のオーブ: 対象者は部屋の外周へ散開する。炎の床は残り、放たれたオーブは部屋を横切る。",
+        "pyre": "共有の火葬: 赤熱した金属がない対象だけを選ぶ。難易度に関係なく、移動する円内に4人で集合する。1人不足するごとに、レイド全体が最大体力の15%のダメージを受ける。",
+        "forgestorm": "鍛冶嵐: 落下する隕石を確認し、3波それぞれが着弾する前に表示された範囲から離れる。",
+        "anvil": "金床の布告: ヴァークルは大鍛冶炉へ移動し、3回打って全体ダメージを与える。英雄では表示付き隕石も落ちる。",
+        "ray": "焼き入れ光線: 長い予告が終わる前に別のプレイヤー、通常はタンクが動く光線を遮る。被弾者は焼き入れの傷を受ける。",
+        "forge": "炉の柱: 光線が炉に届く前に遮り、るつぼの曝露が増えたら担当を交代する。熱が満杯になると炉が崩壊する。",
+        "assembly": "師匠の組立: 両方の炉光線を遮り、全ポータル波を倒し、るつぼの地震を中断し、灰の技工士の回復を止める。",
+        "worldfire": "世界炎: 英雄の最終段階では炎の外周が中央へ迫る。るつぼ全体が燃える前にヴァークルを倒す。",
+        "heroic": "英雄: 炉の熱は下がらず、金床の布告に隕石が加わり、最終段階は世界炎に集中する。"
+      }
+    },
     "auraEffect": {
       "sharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。",
+      "varkhulSharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。不足しているプレイヤー1人につき、サークル内を含むレイド全体が最大体力の{missingPenalty}%のダメージを受ける。",
       "makersBrand": "{duration}秒間、1スタックごとにヴァルクルから受けるダメージが{pct}%増加する。最大{max}スタック。タンクは{swap}スタックで交代すること。",
       "varkhulSentinelsGaze": "残り火の番兵に追われている。倒すまでレイドから離しておくこと。",
       "varkhulMoltenCore": "このコアを炉へ運ぶ。溶融の重荷は{interval}秒ごとに最大体力の{min}%から{max}%まで増加するダメージを与える。",
@@ -8591,6 +8620,8 @@ export const ja_JP: EnTranslations = {
         "riftEntrance": "リフト入口：{name}",
         "hostileEnemy": "敵対対象",
         "aggressiveEnemy": "あなたを攻撃中の敵",
+        "bossEnemy": "ボス：{name}",
+        "bossAggressiveEnemy": "あなたを攻撃中のボス：{name}",
         "lootableEnemy": "戦利品を回収できる敵",
         "corpse": "自分の死体",
         "deathZone": "危険地帯",
@@ -14483,7 +14514,7 @@ export const ja_JP: EnTranslations = {
         "name": "イグニヴァル、最後の炎の先触れ"
       },
       "ignivar_heart_of_the_end": {
-        "name": "終焉の心臓"
+        "name": "イグニヴァル・アッシュコーラー"
       },
       "ignivar_ember_sentinel": {
         "name": "残り火の番兵"
@@ -16333,9 +16364,6 @@ export const ja_JP: EnTranslations = {
           },
           "1": {
             "label": "るつぼの守護者を破壊"
-          },
-          "2": {
-            "label": "火の粉の技工士を破壊"
           }
         }
       },
@@ -18245,6 +18273,11 @@ export const ja_JP: EnTranslations = {
         "name": "最後の泉のるつぼ",
         "enterText": "るつぼの封じられた水面に熱気が揺らめいています。",
         "leaveText": "るつぼを離れ、再び自由に息をつきます。"
+      },
+      "ignivar_molten_assembly": {
+        "name": "溶融組立場",
+        "enterText": "開いた門の先には、灼熱の組立ホールが続いている。",
+        "leaveText": "組立ラインを離れ、るつぼへ戻る。"
       },
       "ignivar_inner_crucible": {
         "name": "内部るつぼ",

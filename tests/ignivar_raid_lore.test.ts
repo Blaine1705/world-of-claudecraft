@@ -11,7 +11,6 @@ import {
 import { DUNGEONS, ITEMS, NPCS, QUESTS } from '../src/sim/data';
 import { createGroundObject } from '../src/sim/entity';
 import {
-  IGNIVAR_CINDER_ARTIFICER_ID,
   IGNIVAR_CRUCIBLE_WARDEN_ID,
   IGNIVAR_EMBER_SENTINEL_ID,
   IGNIVAR_FORGE_APPROACH_ID,
@@ -23,7 +22,7 @@ import {
   IGNIVAR_LORE_TEXT_BY_OBJECT_ID,
   IGNIVAR_RAID_NARRATIVE_TEXT_BY_TEMPLATE,
 } from '../src/sim/ignivar_raid_lore';
-import { enterDungeon } from '../src/sim/instances/dungeons';
+import { enterDungeon, instanceOriginOf } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
 import { type Entity, IGNIVAR_BOSS_ID } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
@@ -98,7 +97,6 @@ describe('Ignivar raid lore content', () => {
       objectives: [
         { type: 'kill', targetMobId: IGNIVAR_EMBER_SENTINEL_ID, count: 2 },
         { type: 'kill', targetMobId: IGNIVAR_CRUCIBLE_WARDEN_ID, count: 2 },
-        { type: 'kill', targetMobId: IGNIVAR_CINDER_ARTIFICER_ID, count: 2 },
       ],
     });
     expect(QUESTS[IGNIVAR_LORE_QUEST_IDS.heraldsHeart]).toMatchObject({
@@ -122,11 +120,27 @@ describe('Ignivar raid lore content', () => {
       { npcId: 'crucible_quartermaster', x: 6, z: -47 },
     ]);
     expect(DUNGEONS[IGNIVAR_RAID_ARENA_ID].npcs).toEqual([
-      { npcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID, x: 8, z: 27 },
+      { npcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID, x: 10, z: 24, facing: Math.PI },
     ]);
     expect(DUNGEONS[IGNIVAR_SECOND_WING_ID].npcs).toEqual([
       { npcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID, x: 14, z: 31 },
     ]);
+  });
+
+  it('seats the arena projection between the north pillars facing south', () => {
+    const sim = new Sim({ seed: 96, playerClass: 'warrior', devCommands: true });
+    expect(enterDungeon(sim.ctx, IGNIVAR_RAID_ARENA_ID, sim.player.id, true)).toBe(true);
+    const instance = sim.instances.find((entry) => entry.dungeonId === IGNIVAR_RAID_ARENA_ID);
+    if (!instance) throw new Error('Ignivar arena did not claim an instance');
+    const origin = instanceOriginOf(instance);
+    const projection = instance.npcIds
+      .map((id) => sim.entities.get(id))
+      .find((entity): entity is Entity => entity?.templateId === IGNIVAR_MAELIN_PROJECTION_NPC_ID);
+    if (!projection) throw new Error('Maelin projection did not spawn in the arena');
+    // Facing south (Math.PI = -z) between the north pillar row.
+    expect(projection.pos.x - origin.x).toBeCloseTo(10, 3);
+    expect(projection.pos.z - origin.z).toBeCloseTo(24, 3);
+    expect(projection.facing).toBe(Math.PI);
   });
 
   it('keeps records readable as optional lore without granting quest credit', () => {
@@ -157,7 +171,7 @@ describe('Ignivar raid lore content', () => {
     sim.events = [];
 
     expect(sim.pickUpObject(record.id, pid)).toBe(true);
-    expect(progress.counts).toEqual([0, 0, 0]);
+    expect(progress.counts).toEqual([0, 0]);
     expect(record.lootable).toBe(true);
     expect(sim.events).toContainEqual(
       expect.objectContaining({
@@ -204,15 +218,10 @@ describe('Ignivar raid lore content', () => {
     const instance = sim.instances.find((entry) => entry.dungeonId === IGNIVAR_FORGE_APPROACH_ID);
     if (!instance) throw new Error('Ignivar approach did not claim an instance');
 
-    for (const templateId of [
-      IGNIVAR_EMBER_SENTINEL_ID,
-      IGNIVAR_CRUCIBLE_WARDEN_ID,
-      IGNIVAR_CINDER_ARTIFICER_ID,
-    ] as const) {
+    for (const templateId of [IGNIVAR_EMBER_SENTINEL_ID, IGNIVAR_CRUCIBLE_WARDEN_ID] as const) {
       const mobs = instance.mobIds
         .map((id) => sim.entities.get(id))
         .filter((entity): entity is Entity => entity?.templateId === templateId);
-      // The redesigned first-room packs carry 3 Sentinels, 3 Wardens, 2 Artificers.
       // The memory reveal is keyed on the LAST construct of a type dying, so drive
       // it off the actual pack count rather than a fixed pair.
       expect(mobs.length).toBeGreaterThanOrEqual(2);

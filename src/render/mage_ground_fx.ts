@@ -461,13 +461,19 @@ export class MageGroundFx {
   syncWorldMeteorWarnings(world: {
     activeIgnivarMeteors: readonly MeteorWarningState[];
     activeVarkhulAnvilMeteors: readonly MeteorWarningState[];
+    activeVarkhulForgestormWarnings: readonly MeteorWarningState[];
   }): void {
-    this.syncMeteorWarnings(world.activeIgnivarMeteors, world.activeVarkhulAnvilMeteors);
+    this.syncMeteorWarnings(
+      world.activeIgnivarMeteors,
+      world.activeVarkhulAnvilMeteors,
+      world.activeVarkhulForgestormWarnings,
+    );
   }
 
   syncMeteorWarnings(
     warnings: readonly MeteorWarningState[],
     secondaryWarnings: readonly MeteorWarningState[] = [],
+    tertiaryWarnings: readonly MeteorWarningState[] = [],
   ): void {
     const activeIds = new Set<string>();
     const syncWarning = (warning: MeteorWarningState): void => {
@@ -502,6 +508,7 @@ export class MageGroundFx {
     };
     for (const warning of warnings) syncWarning(warning);
     for (const warning of secondaryWarnings) syncWarning(warning);
+    for (const warning of tertiaryWarnings) syncWarning(warning);
     for (let i = this.meteors.length - 1; i >= 0; i--) {
       const meteor = this.meteors[i];
       if (!meteor.snapshotManaged || !meteor.persistentId || activeIds.has(meteor.persistentId)) {

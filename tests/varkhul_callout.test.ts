@@ -15,6 +15,7 @@ describe('Varkhul encounter callouts', () => {
       varkhulCalloutKey('rightPillar'),
       varkhulCalloutKey('bothPillars'),
       varkhulCalloutKey('portalsOpening'),
+      varkhulCalloutKey('artificerApproaches'),
       varkhulCalloutKey('heat75'),
       varkhulCalloutKey('heat90'),
       varkhulCalloutKey('addsDefeated'),
@@ -29,6 +30,7 @@ describe('Varkhul encounter callouts', () => {
       'hudChrome.varkhulCallout.rightPillar',
       'hudChrome.varkhulCallout.bothPillars',
       'hudChrome.varkhulCallout.portalsOpening',
+      'hudChrome.varkhulCallout.artificerApproaches',
       'hudChrome.varkhulCallout.heat75',
       'hudChrome.varkhulCallout.heat90',
       'hudChrome.varkhulCallout.addsDefeated',
@@ -55,6 +57,7 @@ describe('Varkhul encounter callouts', () => {
       expect(localizeSimAuraName('Tempered Wound')).toBe('Herida templada');
       expect(localizeSimAuraName('Worldfire')).toBe('Fuego del Mundo');
       expect(localizeSimAuraName('crucible_quake')).toBe('Seísmo del Crisol');
+      expect(localizeSimAuraName('Crucible Stomp')).toBe('Pisotón del Crisol');
       expect(localizeSimAuraName('cinder_recalibrate')).toBe('Recalibrar');
     } finally {
       setLanguage('en');

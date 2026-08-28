@@ -10,6 +10,7 @@ const CALLOUT_KEYS = {
   rightPillar: 'hudChrome.varkhulCallout.rightPillar',
   bothPillars: 'hudChrome.varkhulCallout.bothPillars',
   portalsOpening: 'hudChrome.varkhulCallout.portalsOpening',
+  artificerApproaches: 'hudChrome.varkhulCallout.artificerApproaches',
   heat75: 'hudChrome.varkhulCallout.heat75',
   heat90: 'hudChrome.varkhulCallout.heat90',
   addsDefeated: 'hudChrome.varkhulCallout.addsDefeated',

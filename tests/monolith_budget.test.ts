@@ -244,11 +244,14 @@ const MONOLITHS: MonolithRow[] = [
     // sim arm on main while the release pin sat at zero slack (the known
     // both-arms compound). Exact merged count, zero slack.
     // the raid consolidation moved the raid readout getter bodies (ignivar_raid_readouts.ts) plus the same-family ground-AoE and partyInfo projections out; exact count.
-    // Plus 7 for the Crucible sigil shop: the import plus the thin
+    // Re-pinned 12473 -> 12451 for the PR 3684 raid restoration: the authored
+    // pack-aggro call paid for itself by moving the legacy same-template
+    // social pull (and its per-family radius table) to mob/social_aggro.ts.
+    // Plus 7 on top for the Crucible sigil shop: the import plus the thin
     // buyCrucibleVendorItem delegation to instances/crucible_vendor.ts (the
     // buyHeroicVendorItem shape exactly); the logic itself lives in the
-    // instances module. Exact count, zero slack.
-    ceiling: 12480,
+    // instances module. Exact merged count, zero slack.
+    ceiling: 12458,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -353,7 +356,9 @@ const MONOLITHS: MonolithRow[] = [
     // final render replaced the composed themes with a supplied stream-only
     // track; exact merged count.
     // the raid theme registrations were paid for by moving the Gravewyrm Sanctum composer to its sibling module; exact count.
-    ceiling: 4943,
+    // Re-pinned 4943 -> 4935: the molten-assembly music row paid for itself by
+    // moving the DUNGEON_MUSIC table to dungeon_music_zones.ts. Exact count.
+    ceiling: 4935,
     seam: 'a src/game sibling module (the refactor/game-music split is the template)',
   },
   {
@@ -452,7 +457,10 @@ const MONOLITHS: MonolithRow[] = [
     // pillar-swap gate; then again after the banner picking moved to
     // dungeon_banner_core.ts (paying for the ignivar banner suppression
     // gates and the torch-tuck fix). Exact count, zero slack.
-    ceiling: 2715,
+    // Re-pinned 2715 -> 2463 for the lava-moat wiring: the floor/quad/wall kind
+    // pickers moved to dungeon_tile_kind_core.ts (the banner-core pattern).
+    // Exact count, zero slack.
+    ceiling: 2463,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
 ];

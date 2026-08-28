@@ -56,13 +56,19 @@ import {
 import { IGNIVAR_SECOND_WING_ID } from '../src/sim/ignivar_raid_ids';
 import { enterDungeon, leaveDungeon } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
-import { DT, type Entity, type PlayerClass } from '../src/sim/types';
+import { revivePlayerAt } from '../src/sim/spirit';
+import { DT, type Entity, type PlayerClass, type SimEvent } from '../src/sim/types';
 import {
   VARKHUL_ANVIL_METEOR_CAST_ID,
   VARKHUL_ANVIL_METEOR_DAMAGE_MAX_HP,
   VARKHUL_ANVIL_METEOR_RADIUS,
 } from '../src/sim/varkhul_anvil_meteors';
 import { VARKHUL_WORK_LOCAL_POS } from '../src/sim/varkhul_forge_intermission';
+import {
+  VARKHUL_SHARED_PYRE_AURA_ID,
+  VARKHUL_SHARED_PYRE_CAST_SECONDS,
+  VARKHUL_SHARED_PYRE_NAME,
+} from '../src/sim/varkhul_shared_pyre';
 
 function claimedEncounter(seed = 42): { sim: Sim; boss: Entity } {
   const sim = new Sim({ seed, playerClass: 'warrior', devCommands: true });
@@ -104,6 +110,7 @@ function isolateMechanics(boss: Entity): NonNullable<Entity['varkhul']> {
   boss.varkhul.frontalTimer = 999;
   boss.varkhul.cinderOrbsTimer = 999;
   boss.varkhul.forgestormTimer = 999;
+  boss.varkhul.sharedPyreTimer = 999;
   boss.varkhul.anvilTimer = 999;
   boss.varkhul.interceptBeamTimer = 999;
   boss.swingTimer = Number.POSITIVE_INFINITY;
@@ -607,6 +614,11 @@ describe('Varkhul encounter behavior', () => {
 
     updateVarkhulEncounter(sim.ctx, boss);
 
+    expect(state.majorAbility).toBe('forgestorm');
+    expect(boss.castingAbility).toBeNull();
+    expect(boss.castTotal).toBe(0);
+    expect(boss.castRemaining).toBe(0);
+    expect(boss.channeling).toBe(false);
     const warnings = sim.ctx.groundAoEs.filter(
       (effect) => effect.sourceId === boss.id && effect.abilityId === VARKHUL_FORGESTORM_CAST_ID,
     );
@@ -618,6 +630,7 @@ describe('Varkhul encounter behavior', () => {
       duration: VARKHUL_FORGESTORM_WARNING_SECONDS,
       remaining: VARKHUL_FORGESTORM_WARNING_SECONDS,
     });
+    const firstWaveWarningIds = sim.activeVarkhulForgestormWarnings.map((warning) => warning.id);
     expect(warnings[0].remaining).toBeCloseTo(VARKHUL_FORGESTORM_WARNING_SECONDS + DT * 2, 5);
     sim.player.pos = { ...state.forgestormPoints[0] };
     state.forgestormWarningRemaining = DT;
@@ -625,7 +638,18 @@ describe('Varkhul encounter behavior', () => {
     updateVarkhulEncounter(sim.ctx, boss);
 
     expect(sim.player.hp).toBe(1_000 - 1_000 * VARKHUL_FORGESTORM_DAMAGE_MAX_HP);
+    expect(
+      sim.events
+        .filter(
+          (event): event is Extract<SimEvent, { type: 'spellfxAt' }> => event.type === 'spellfxAt',
+        )
+        .filter(
+          (event) => event.ability === VARKHUL_FORGESTORM_CAST_ID && event.fx === 'meteorImpact',
+        )
+        .map((event) => event.persistentId),
+    ).toEqual(firstWaveWarningIds);
     expect(state.forgestormWaveIndex).toBe(1);
+    expect(boss.castingAbility).toBeNull();
     expect(
       sim.ctx.groundAoEs.filter(
         (effect) => effect.sourceId === boss.id && effect.abilityId === VARKHUL_FORGESTORM_CAST_ID,
@@ -653,6 +677,307 @@ describe('Varkhul encounter behavior', () => {
     ).toHaveLength(0);
   });
 
+  it('casts Shared Pyre on a non-tank while preserving Forgestorm as a separate major', () => {
+    const { sim, boss } = claimedEncounter(441);
+    const raiders = [
+      addEncounterPlayer(sim, boss, 'Pyre One'),
+      addEncounterPlayer(sim, boss, 'Pyre Two'),
+      addEncounterPlayer(sim, boss, 'Pyre Three'),
+    ];
+    updateVarkhulEncounter(sim.ctx, boss);
+    const state = isolateMechanics(boss);
+    state.sharedPyreTimer = DT;
+    state.forgestormTimer = 7;
+
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    expect(state.majorAbility).toBe('sharedPyre');
+    expect(state.forgestormTimer).toBeCloseTo(7 - DT, 8);
+    const target =
+      state.sharedPyreTargetId === null ? undefined : sim.entities.get(state.sharedPyreTargetId);
+    if (!target) throw new Error('Shared Pyre did not select a target');
+    expect(raiders.map((player) => player.id)).toContain(target.id);
+    expect(target.auras).toContainEqual(
+      expect.objectContaining({
+        id: VARKHUL_SHARED_PYRE_AURA_ID,
+        name: VARKHUL_SHARED_PYRE_NAME,
+        remaining: VARKHUL_SHARED_PYRE_CAST_SECONDS,
+        stacks: 4,
+        sourceId: boss.id,
+      }),
+    );
+    for (const player of [sim.player, ...raiders]) {
+      player.maxHp = 100_000;
+      player.hp = 100_000;
+      player.damageImmune = false;
+      player.pos = { ...target.pos };
+    }
+    state.sharedPyreRemaining = DT;
+
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    for (const player of [sim.player, ...raiders]) expect(player.hp).toBe(65_000);
+    expect(state.majorAbility).toBe('none');
+    expect(state.sharedPyreTargetId).toBeNull();
+    expect(target.auras.some((aura) => aura.id === VARKHUL_SHARED_PYRE_AURA_ID)).toBe(false);
+  });
+
+  it.each([
+    { difficulty: 'normal' as const, splitDamage: 1.4 / 3 },
+    { difficulty: 'heroic' as const, splitDamage: 2 / 3 },
+  ])(
+    'damages the whole raid for each missing $difficulty Shared Pyre soaker',
+    ({ difficulty, splitDamage }) => {
+      const { sim, boss } = claimedEncounter(difficulty === 'normal' ? 447 : 448);
+      const instance = sim.instances.find((entry) => entry.dungeonId === IGNIVAR_SECOND_WING_ID);
+      if (!instance) throw new Error('Inner Crucible instance disappeared');
+      instance.difficulty = difficulty;
+      const raiders = [
+        addEncounterPlayer(sim, boss, 'Pyre Penalty One'),
+        addEncounterPlayer(sim, boss, 'Pyre Penalty Two'),
+        addEncounterPlayer(sim, boss, 'Pyre Penalty Three'),
+        addEncounterPlayer(sim, boss, 'Pyre Penalty Four'),
+      ];
+      updateVarkhulEncounter(sim.ctx, boss);
+      const state = isolateMechanics(boss);
+      state.sharedPyreTimer = DT;
+      updateVarkhulEncounter(sim.ctx, boss);
+
+      const target =
+        state.sharedPyreTargetId === null ? undefined : sim.entities.get(state.sharedPyreTargetId);
+      if (!target) throw new Error('Shared Pyre did not select a target');
+      const players = [sim.player, ...raiders];
+      const others = players.filter((player) => player.id !== target.id);
+      const soakers = [target, ...others.slice(0, 2)];
+      const outsiders = others.slice(2);
+      for (const player of players) {
+        player.maxHp = 100_000;
+        player.hp = 100_000;
+        player.damageImmune = false;
+      }
+      for (const soaker of soakers) {
+        soaker.pos = { ...target.pos };
+        soaker.prevPos = { ...soaker.pos };
+      }
+      for (const outsider of outsiders) {
+        outsider.pos = { ...target.pos, x: target.pos.x + 10 };
+        outsider.prevPos = { ...outsider.pos };
+      }
+      const aura = target.auras.find((entry) => entry.id === VARKHUL_SHARED_PYRE_AURA_ID);
+      expect(aura).toMatchObject({
+        stacks: 4,
+        value: 0,
+        value2: difficulty === 'heroic' ? 2 : 1.4,
+      });
+      state.sharedPyreRemaining = DT;
+
+      updateVarkhulEncounter(sim.ctx, boss);
+
+      const raidPenalty = 15_000;
+      const expectedSoakerHp = 100_000 - Math.ceil(100_000 * splitDamage) - raidPenalty;
+      for (const soaker of soakers) expect(soaker.hp).toBe(expectedSoakerHp);
+      for (const outsider of outsiders) expect(outsider.hp).toBe(100_000 - raidPenalty);
+    },
+  );
+
+  it('cancels Shared Pyre without raid damage when its marked player dies', () => {
+    const { sim, boss } = claimedEncounter(442);
+    const raiders = [
+      addEncounterPlayer(sim, boss, 'Fallen Pyre'),
+      addEncounterPlayer(sim, boss, 'Living Pyre One'),
+      addEncounterPlayer(sim, boss, 'Living Pyre Two'),
+    ];
+    updateVarkhulEncounter(sim.ctx, boss);
+    const state = isolateMechanics(boss);
+    state.sharedPyreTimer = DT;
+
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    const target =
+      state.sharedPyreTargetId === null ? undefined : sim.entities.get(state.sharedPyreTargetId);
+    if (!target) throw new Error('Shared Pyre did not select a target');
+    const survivors = [sim.player, ...raiders].filter((player) => player.id !== target.id);
+    for (const player of [target, ...survivors]) {
+      player.maxHp = 100_000;
+      player.hp = 100_000;
+      player.damageImmune = false;
+      player.pos = { ...target.pos };
+    }
+    target.dead = true;
+    target.hp = 0;
+    sim.events.length = 0;
+
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    for (const survivor of survivors) expect(survivor.hp).toBe(100_000);
+    expect(
+      sim.events.some(
+        (event) =>
+          event.type === 'spellfx' &&
+          event.ability === VARKHUL_SHARED_PYRE_NAME &&
+          event.fx === 'nova',
+      ),
+    ).toBe(false);
+    expect(state.majorAbility).toBe('none');
+    expect(state.sharedPyreTargetId).toBeNull();
+    expect(boss.castingAbility).toBeNull();
+    expect(target.auras.some((aura) => aura.id === VARKHUL_SHARED_PYRE_AURA_ID)).toBe(false);
+  });
+
+  it('cancels Shared Pyre immediately when its marked player leaves the world', () => {
+    const { sim, boss } = claimedEncounter(446);
+    const raiders = [
+      addEncounterPlayer(sim, boss, 'Departing Pyre'),
+      addEncounterPlayer(sim, boss, 'Remaining Pyre'),
+    ];
+    updateVarkhulEncounter(sim.ctx, boss);
+    const state = isolateMechanics(boss);
+    state.sharedPyreTimer = DT;
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    const targetId = state.sharedPyreTargetId;
+    if (targetId === null) throw new Error('Shared Pyre did not select a target');
+    const remainingBeforeLeave = state.sharedPyreRemaining;
+    expect(remainingBeforeLeave).toBeGreaterThan(DT);
+    sim.entities.delete(targetId);
+    sim.events.length = 0;
+
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    expect(state.majorAbility).toBe('none');
+    expect(state.sharedPyreTargetId).toBeNull();
+    expect(state.sharedPyreRemaining).toBe(0);
+    expect(boss.castingAbility).toBeNull();
+    expect(
+      sim.events.some(
+        (event) => event.type === 'spellfx' && event.ability === VARKHUL_SHARED_PYRE_NAME,
+      ),
+    ).toBe(false);
+    expect(raiders.some((player) => sim.entities.has(player.id))).toBe(true);
+  });
+
+  it('clears raid mechanics through a real death and corpse resurrection', () => {
+    const { sim, boss } = claimedEncounter(443);
+    addEncounterPlayer(sim, boss, 'Living Witness');
+    updateVarkhulEncounter(sim.ctx, boss);
+    const state = isolateMechanics(boss);
+    const encounterAuraIds = [
+      VARKHUL_MAKERS_BRAND_AURA_ID,
+      VARKHUL_RED_HOT_METAL_AURA_ID,
+      VARKHUL_SHARED_PYRE_AURA_ID,
+      VARKHUL_INTERCEPT_BEAM_DEBUFF_AURA_ID,
+    ];
+    sim.ctx.applyAura(sim.player, {
+      id: VARKHUL_MAKERS_BRAND_AURA_ID,
+      name: "Maker's Brand",
+      kind: 'vuln_source',
+      remaining: 30,
+      duration: 30,
+      value: 0.35,
+      sourceId: boss.id,
+      school: 'fire',
+      encounterOwned: true,
+    });
+    sim.ctx.applyAura(sim.player, {
+      id: VARKHUL_RED_HOT_METAL_AURA_ID,
+      name: 'Red-hot Metal',
+      kind: 'dot',
+      remaining: 10,
+      duration: 10,
+      value: 1,
+      sourceId: boss.id,
+      school: 'fire',
+      encounterOwned: true,
+    });
+    sim.ctx.applyAura(sim.player, {
+      id: VARKHUL_SHARED_PYRE_AURA_ID,
+      name: VARKHUL_SHARED_PYRE_NAME,
+      kind: 'vulnerability',
+      remaining: 6,
+      duration: 6,
+      value: 0,
+      stacks: 4,
+      sourceId: boss.id,
+      school: 'fire',
+      encounterOwned: true,
+    });
+    sim.ctx.applyAura(sim.player, {
+      id: VARKHUL_INTERCEPT_BEAM_DEBUFF_AURA_ID,
+      name: VARKHUL_INTERCEPT_BEAM_DEBUFF_NAME,
+      kind: 'vuln_source',
+      remaining: 25,
+      duration: 25,
+      value: VARKHUL_INTERCEPT_BEAM_DEBUFF_DAMAGE_TAKEN,
+      sourceId: boss.id,
+      school: 'fire',
+      encounterOwned: true,
+    });
+
+    sim.ctx.dealDamage(
+      boss,
+      sim.player,
+      sim.player.maxHp * 100,
+      false,
+      'fire',
+      'Raid Test Kill',
+      'hit',
+      true,
+    );
+
+    expect(sim.player.dead).toBe(true);
+    expect(sim.player.auras.some((aura) => encounterAuraIds.includes(aura.id))).toBe(false);
+    expect(boss.varkhul).toBe(state);
+
+    sim.releaseSpirit(sim.player.id);
+    const corpse = sim.player.corpsePos;
+    if (!corpse) throw new Error('Raid death did not leave a corpse');
+    sim.player.pos = { ...corpse };
+    sim.player.prevPos = { ...corpse };
+    sim.rebucket(sim.player);
+    sim.resurrectAtCorpse(sim.player.id);
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    expect(sim.player.dead).toBe(false);
+    expect(sim.player.ghost).toBe(false);
+    expect(sim.player.hp).toBe(Math.round(sim.player.maxHp * 0.5));
+    expect(sim.player.auras.some((aura) => encounterAuraIds.includes(aura.id))).toBe(false);
+    expect(boss.varkhul).toBe(state);
+  });
+
+  it('resets a real all-dead wipe and starts the next pull without stale hazards', () => {
+    const { sim, boss } = claimedEncounter(444);
+    const raider = addEncounterPlayer(sim, boss, 'Wipe Witness');
+    updateVarkhulEncounter(sim.ctx, boss);
+    const firstState = isolateMechanics(boss);
+    firstState.forgestormTimer = DT;
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(sim.ctx.groundAoEs.some((effect) => effect.sourceId === boss.id)).toBe(true);
+
+    sim.ctx.handleDeath(sim.player, boss);
+    sim.ctx.handleDeath(raider, boss);
+    boss.combatExitHoldUntil = sim.ctx.time;
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    expect(boss.varkhul).toBeUndefined();
+    expect(boss.castingAbility).toBeNull();
+    expect(sim.ctx.groundAoEs.some((effect) => effect.sourceId === boss.id)).toBe(false);
+
+    revivePlayerAt(sim.ctx, sim.player.id, { ...boss.pos });
+    revivePlayerAt(sim.ctx, raider.id, { ...boss.pos });
+    boss.inCombat = true;
+    boss.aiState = 'attack';
+    boss.aggroTargetId = sim.player.id;
+    boss.swingTimer = 999;
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    expect(boss.varkhul).toBeDefined();
+    expect(boss.varkhul).not.toBe(firstState);
+    expect(boss.varkhul?.majorAbility).toBe('none');
+    expect(boss.varkhul?.forgestormWaveIndex).toBe(0);
+    expect(boss.varkhul?.sharedPyreTargetId).toBeNull();
+    expect(sim.ctx.groundAoEs.some((effect) => effect.sourceId === boss.id)).toBe(false);
+  });
+
   it.each([
     ['normal', [900, 800, 600]],
     ['heroic', [860, 720, 470]],
@@ -670,12 +995,29 @@ describe('Varkhul encounter behavior', () => {
     updateVarkhulEncounter(sim.ctx, boss);
     const state = isolateMechanics(boss);
     state.anvilTimer = DT;
+    const origin = sim.ctx.instanceOriginOf(instance);
+    const work = sim.ctx.groundPos(
+      origin.x + VARKHUL_WORK_LOCAL_POS.x,
+      origin.z + VARKHUL_WORK_LOCAL_POS.z,
+    );
+    boss.pos = sim.ctx.groundPos(work.x - 12, work.z - 9);
+    boss.prevPos = { ...boss.pos };
+    const distanceBefore = Math.hypot(boss.pos.x - work.x, boss.pos.z - work.z);
     updateVarkhulEncounter(sim.ctx, boss);
 
-    const origin = sim.ctx.instanceOriginOf(instance);
+    const distanceAfterStart = Math.hypot(boss.pos.x - work.x, boss.pos.z - work.z);
+    expect(state.majorAbility).toBe('anvil');
+    expect(boss.castingAbility).toBeNull();
+    expect(distanceAfterStart).toBeLessThan(distanceBefore);
+    expect(distanceAfterStart).toBeGreaterThan(0);
+
+    let walkTicks = 0;
+    while (boss.castingAbility !== VARKHUL_ANVILS_DECREE_CAST_ID && walkTicks++ < 400) {
+      updateVarkhulEncounter(sim.ctx, boss);
+    }
+    expect(walkTicks).toBeLessThan(400);
     expect(boss.castingAbility).toBe(VARKHUL_ANVILS_DECREE_CAST_ID);
-    expect(boss.pos.x).toBeCloseTo(origin.x + VARKHUL_WORK_LOCAL_POS.x, 5);
-    expect(boss.pos.z).toBeCloseTo(origin.z + VARKHUL_WORK_LOCAL_POS.z, 5);
+    expect(Math.hypot(boss.pos.x - work.x, boss.pos.z - work.z)).toBeLessThan(0.1);
     sim.player.pos = { ...boss.pos };
     raider.pos = { ...boss.pos, z: boss.pos.z + 8 };
 

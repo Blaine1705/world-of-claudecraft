@@ -816,6 +816,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.core.mapMarkerLabels.riftEntrance': '균열 입구: {name}',
   'hud.core.mapMarkerLabels.hostileEnemy': '적대 대상',
   'hud.core.mapMarkerLabels.aggressiveEnemy': '당신을 공격 중인 적',
+  'hud.core.mapMarkerLabels.bossEnemy': '우두머리: {name}',
+  'hud.core.mapMarkerLabels.bossAggressiveEnemy': '당신을 공격 중인 우두머리: {name}',
   'hud.core.mapMarkerLabels.lootableEnemy': '전리품을 획득할 수 있는 적',
   'hud.core.mapMarkerLabels.corpse': '자신의 시체',
   'hud.core.mapMarkerLabels.deathZone': '위험 지역',
@@ -4897,7 +4899,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.nythraxis_boss_arena.enterText': '봉인된 왕실 문을 지나갑니다.',
   'entities.dungeons.nythraxis_boss_arena.leaveText': '쏜피크의 차가운 공기 속으로 돌아옵니다.',
   'entities.mobs.ignivar_herald_of_the_last_flame.name': '이그니바르, 마지막 불꽃의 전령',
-  'entities.mobs.ignivar_heart_of_the_end.name': '종말의 심장',
+  'entities.mobs.ignivar_heart_of_the_end.name': '이그니바르 애쉬콜러',
   'entities.mobs.derelict_mech.name': '버려진 기계병',
   'entities.dungeons.ignivar_raid_arena.name': '마지막 샘의 도가니',
   'entities.dungeons.ignivar_raid_arena.enterText': '도가니의 봉인된 물 위로 열기가 아른거립니다.',
@@ -7606,6 +7608,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.hot': '{interval}초마다 생명력을 {value} 회복합니다',
   'hudChrome.auraEffect.sharedPyre':
     '각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%).',
+  'hudChrome.auraEffect.varkhulSharedPyre':
+    '각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%). 부족한 플레이어 1명당 원 안의 플레이어를 포함한 공격대 전체가 최대 생명력의 {missingPenalty}%에 해당하는 피해를 추가로 받습니다.',
   'hudChrome.auraEffect.varkhulForgeLink':
     '활성화된 기둥의 광선이 용광로에 닿기 전에 가로막으세요. 열린 광선은 초당 열기를 6% 올립니다. 일반에서는 차단된 광선과 꺼진 기둥이 용광로를 식히지만, 영웅에서는 열기가 절대 감소하지 않습니다. 100%가 되면 치명적인 용광로 용융이 발생합니다.',
   'hudChrome.auraEffect.varkhulCrucibleExposure':
@@ -7616,6 +7620,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '오른쪽 용광로 기둥이 충전 중입니다. 3초 후 점화됩니다!',
   'hudChrome.varkhulCallout.bothPillarsCharging':
     '용광로 기둥들이 충전 중입니다. 3초 후 점화됩니다!',
+  'hudChrome.varkhulCallout.artificerApproaches': '잿불 기계공이 용광로로 다가옵니다!',
   'hudChrome.varkhulCallout.leftPillar': '왼쪽 용광로 기둥이 점화됩니다!',
   'hudChrome.varkhulCallout.rightPillar': '오른쪽 용광로 기둥이 점화됩니다!',
   'hudChrome.varkhulCallout.bothPillars': '용광로 기둥들이 점화됩니다!',
@@ -7627,6 +7632,43 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '세계불꽃이 방 가장자리에서 타오릅니다. 42초 후 도가니 전체가 불길에 휩싸입니다!',
   'hudChrome.varkhulCallout.worldfireClosing': '세계불꽃이 다가옵니다. 중앙으로 이동하세요!',
   'hudChrome.varkhulCallout.worldfireConsumed': '도가니 전체가 불타고 있습니다!',
+  'hudChrome.varkhulWaveStatus': '공세 {wave}/{waves} | 적: {remaining}',
+  'hudChrome.raidBossGuide.title': '우두머리 공략',
+  'hudChrome.raidBossGuide.button': '공략: {boss}',
+  'hudChrome.raidBossGuide.subtitle': '{boss} | 일반 및 영웅',
+  'hudChrome.raidBossGuide.close': '우두머리 공략 닫기',
+  'hudChrome.raidBossGuide.ignivar.brand':
+    '장작더미의 징표: 산개합니다. 불타는 급류를 준비된 수로로 유도한 뒤 혼자 물을 건너 해제합니다.',
+  'hudChrome.raidBossGuide.ignivar.movement':
+    '이동: 잿불비의 부채꼴과 운석을 피하고, 회전하는 지옥불과 함께 움직이며, 대장간 파도의 두 틈을 사용합니다.',
+  'hudChrome.raidBossGuide.ignivar.apocalypse':
+    '대재앙: 시전이 끝나기 전에 이그니바르 애쉬콜러를 처치합니다.',
+  'hudChrome.raidBossGuide.ignivar.judgment':
+    '대장간의 심판: 경고 중 다른 피난처를 찾아내고 바닥이 타오르면 표시된 경계 안에 모입니다.',
+  'hudChrome.raidBossGuide.ignivar.finale':
+    '마지막 지옥불: 빨라진 운석, 전방 공격, 회전 지옥불에 대응하며 전멸 전에 이그니바르를 처치합니다.',
+  'hudChrome.raidBossGuide.ignivar.heroic':
+    '영웅: 대장간의 사슬 동안 짝과 가까이 있어야 하며 심판 안에서도 징표가 유지되고, 대장간 파도가 플레이어를 더 멀리 밀어냅니다.',
+  'hudChrome.raidBossGuide.varkhul.tanks':
+    '방어 담당: 제작자의 징표 2중첩에 교대하고 바르쿨을 근접 거리 안에 둡니다.',
+  'hudChrome.raidBossGuide.varkhul.orbs':
+    '잿불 구슬: 대상자는 방 가장자리로 산개합니다. 불 웅덩이는 남고 방출된 구슬은 방을 가로지릅니다.',
+  'hudChrome.raidBossGuide.varkhul.pyre':
+    '공유 장작더미: 달아오른 금속이 없는 대상만 선택합니다. 난이도와 관계없이 이동하는 원 안에 4명이 모입니다. 부족한 플레이어 1명당 공격대 전체가 최대 생명력의 15%에 해당하는 피해를 받습니다.',
+  'hudChrome.raidBossGuide.varkhul.forgestorm':
+    '대장간폭풍: 떨어지는 운석을 보고 세 차례의 충돌 전에 표시된 모든 범위에서 벗어납니다.',
+  'hudChrome.raidBossGuide.varkhul.anvil':
+    '모루의 칙령: 바르쿨이 거대 대장간으로 이동해 세 번 내리쳐 공격대 피해를 줍니다. 영웅에서는 표시된 운석도 떨어집니다.',
+  'hudChrome.raidBossGuide.varkhul.ray':
+    '담금질 광선: 긴 경고가 끝나기 전에 다른 플레이어, 보통 방어 담당이 움직이는 광선을 가로막습니다. 피격자는 담금질 상처를 얻습니다.',
+  'hudChrome.raidBossGuide.varkhul.forge':
+    '대장간 기둥: 광선이 대장간에 닿기 전에 막고 도가니 노출이 쌓이면 교대합니다. 열기가 가득 차면 대장간이 붕괴합니다.',
+  'hudChrome.raidBossGuide.varkhul.assembly':
+    '거장의 조립: 두 광선을 막고 모든 차원문 웨이브를 처치하며 도가니 지진을 차단하고 잿불 기술자의 치유를 막습니다.',
+  'hudChrome.raidBossGuide.varkhul.worldfire':
+    '세계불꽃: 영웅의 마지막 단계에서 불타는 가장자리가 중앙으로 좁혀집니다. 도가니 전체가 타기 전에 바르쿨을 처치합니다.',
+  'hudChrome.raidBossGuide.varkhul.heroic':
+    '영웅: 대장간 열기는 식지 않고 모루의 칙령에 운석이 추가되며 마지막 단계는 세계불꽃에 집중합니다.',
   'hudChrome.auraEffect.absorb': '{value}의 피해를 흡수합니다',
   'hudChrome.auraEffect.healAbsorb': '들어오는 치유를 {value}만큼 흡수합니다',
   'hudChrome.auraEffect.thorns': '공격자에게 {value}의 {school} 피해를 입힙니다',
@@ -13795,7 +13837,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '메아리는 모두 일치해. 발쿨은 죽어 가는 마지막 샘의 물을 살아 있는 금속에 묶었어. 이 자동 기계들은 실패한 단련작이었지. 오직 이그니바르만 견뎌 냈어.',
   'entities.quests.q_ignivar_echoes_in_iron.objectives.0.label': '잔불 감시자 파괴',
   'entities.quests.q_ignivar_echoes_in_iron.objectives.1.label': '용광로 수호자 파괴',
-  'entities.quests.q_ignivar_echoes_in_iron.objectives.2.label': '불씨 기계공 파괴',
   'entities.quests.q_ignivar_heralds_heart.title': '선구자의 심장',
   'entities.quests.q_ignivar_heralds_heart.text':
     '모든 메아리가 유일한 생존자 이그니바르를 가리켜. 발쿨은 그를 선구자이자 봉인이며 열쇠라고 불렀지. 그를 쓰러뜨려. 기록이 사실이라면 그의 죽음이 무엇을 지키도록 벼려졌는지 밝혀 줄 거야.',
@@ -13811,6 +13852,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.ignivar_forge_approach.name': '첫 단련의 회랑',
   'entities.dungeons.ignivar_forge_approach.enterText': '첫 단련의 회랑에 망치질 소리가 울려 퍼집니다.',
   'entities.dungeons.ignivar_forge_approach.leaveText': '첫 번째 대장간에서 벗어나 다시 한번 자유롭게 숨을 쉽니다.',
+  'entities.dungeons.ignivar_molten_assembly.name': '용융 조립장',
+  'entities.dungeons.ignivar_molten_assembly.enterText':
+    '열린 문 너머로 용융 조립 홀이 이어집니다.',
+  'entities.dungeons.ignivar_molten_assembly.leaveText':
+    '조립 라인을 떠나 도가니로 돌아갑니다.',
   'entities.dungeons.ignivar_inner_crucible.name': '내부 용광로',
   'entities.dungeons.ignivar_inner_crucible.enterText': '열린 문이 용광로의 더 깊은 곳으로 이어집니다.',
   'entities.dungeons.ignivar_inner_crucible.leaveText': '용광로의 고요한 깊은 곳을 떠납니다.',

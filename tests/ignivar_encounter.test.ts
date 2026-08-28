@@ -15,6 +15,7 @@ import {
   IGNIVAR_CLEANSING_BACKLASH_DAMAGE_MAX_HP,
   IGNIVAR_CLEANSING_BACKLASH_ID,
   IGNIVAR_CONDUIT_ACTIVE_SECONDS,
+  IGNIVAR_DEATH_YELL,
   IGNIVAR_FIRST_ROTATING_RAYS_SECONDS,
   IGNIVAR_FIRST_SKYFIRE_SECONDS,
   IGNIVAR_FIRST_SOAK_SECONDS,
@@ -73,9 +74,11 @@ import {
   IGNIVAR_FORGE_WAVE_ACTIVE_SECONDS,
   IGNIVAR_FORGE_WAVE_DAMAGE_MAX_HP,
   IGNIVAR_FORGE_WAVE_EVERY,
-  IGNIVAR_FORGE_WAVE_KNOCKBACK,
+  IGNIVAR_FORGE_WAVE_KNOCKBACK_HEROIC,
+  IGNIVAR_FORGE_WAVE_KNOCKBACK_NORMAL,
   IGNIVAR_FORGE_WAVE_RANGE,
   IGNIVAR_FORGE_WAVE_WINDUP_SECONDS,
+  ignivarForgeWaveKnockback,
 } from '../src/sim/ignivar_forge_wave';
 import {
   IGNIVAR_FIRST_METEOR_SECONDS,
@@ -91,6 +94,7 @@ import {
 import { enterDungeon, leaveDungeon } from '../src/sim/instances/dungeons';
 import { Rng } from '../src/sim/rng';
 import { type ResolvedAbility, Sim } from '../src/sim/sim';
+import { revivePlayerAt } from '../src/sim/spirit';
 import {
   DT,
   dist2d,
@@ -99,6 +103,7 @@ import {
   type PlayerClass,
   type SimEvent,
 } from '../src/sim/types';
+import { VARKHUL_FORGE_PORTAL_ABILITY_ID } from '../src/sim/varkhul_forge_intermission';
 
 function claimedEncounter(seed = 42): {
   sim: Sim;
@@ -245,14 +250,14 @@ function forgeWaveCadenceTrace(seed: number) {
 }
 
 describe('Ignivar encounter', () => {
-  it('applies the provisional Heroic tuning through the real boss and Heart spawn path', () => {
+  it('applies the calibrated Heroic tuning through the real boss and Heart spawn path', () => {
     const { sim, boss } = claimedHeroicEncounter();
 
-    expect(boss.maxHp).toBe(175_000);
+    expect(boss.maxHp).toBe(210_000);
     expect(boss.weapon).toEqual({ min: 619, max: 968, speed: 2.6 });
     expect(boss.stats.armor).toBe(1_058);
     expect(boss.mechanicDamageMult).toBe(2);
-    expect(boss.mechanicHealMult).toBe(2.5);
+    expect(boss.mechanicHealMult).toBe(1.75);
 
     boss.hp = Math.floor(boss.maxHp * IGNIVAR_APOCALYPSE_HP_THRESHOLD);
     updateIgnivarEncounter(sim.ctx, boss);
@@ -260,11 +265,11 @@ describe('Ignivar encounter', () => {
       (entity) => entity.templateId === IGNIVAR_APOCALYPSE_ADD_ID,
     );
 
-    expect(heart?.maxHp).toBe(17_500);
+    expect(heart?.maxHp).toBe(12_250);
     expect(heart?.weapon).toEqual({ min: 0, max: 0, speed: 2.6 });
     expect(heart?.stats.armor).toBe(302);
     expect(heart?.mechanicDamageMult).toBe(2);
-    expect(heart?.mechanicHealMult).toBe(2.5);
+    expect(heart?.mechanicHealMult).toBe(1.75);
   });
 
   it('keeps Chains of the Forge exclusive to Heroic difficulty', () => {
@@ -719,12 +724,15 @@ describe('Ignivar encounter', () => {
     expect(IGNIVAR_FORGE_STRIKE_EVERY).toBe(14);
     expect(IGNIVAR_FORGE_STRIKE_MAX_HP).toBe(0.35);
     expect(IGNIVAR_MAJOR_ABILITY_GAP_SECONDS).toBe(6);
-    expect(IGNIVAR_FIRST_FORGE_WAVE_SECONDS).toBe(44);
-    expect(IGNIVAR_FORGE_WAVE_EVERY).toBe(46);
+    expect(IGNIVAR_FIRST_FORGE_WAVE_SECONDS).toBe(50);
+    expect(IGNIVAR_FORGE_WAVE_EVERY).toBe(60);
     expect(IGNIVAR_FORGE_WAVE_WINDUP_SECONDS).toBe(2.5);
     expect(IGNIVAR_FORGE_WAVE_ACTIVE_SECONDS).toBe(3);
     expect(IGNIVAR_FORGE_WAVE_DAMAGE_MAX_HP).toBe(0.35);
-    expect(IGNIVAR_FORGE_WAVE_KNOCKBACK).toBe(4);
+    expect(IGNIVAR_FORGE_WAVE_KNOCKBACK_NORMAL).toBe(4);
+    expect(IGNIVAR_FORGE_WAVE_KNOCKBACK_HEROIC).toBe(6);
+    expect(ignivarForgeWaveKnockback('normal')).toBe(4);
+    expect(ignivarForgeWaveKnockback('heroic')).toBe(6);
     expect(IGNIVAR_MOLTEN_ARMOR_DURATION).toBe(26);
     expect(IGNIVAR_MOLTEN_ARMOR_PER_STACK).toBe(0.35);
     expect(IGNIVAR_FRONTAL_CAST_SECONDS).toBe(3);
@@ -735,7 +743,7 @@ describe('Ignivar encounter', () => {
     expect(IGNIVAR_FIRST_SKYFIRE_SECONDS).toBe(16);
     expect(IGNIVAR_SKYFIRE_EVERY).toBe(20);
     expect(IGNIVAR_SKYFIRE_DAMAGE_MAX_HP).toBe(0.45);
-    expect(IGNIVAR_SKYFIRE_RANGE).toBe(24);
+    expect(IGNIVAR_SKYFIRE_RANGE).toBe(30);
     expect(IGNIVAR_SKYFIRE_HALF_ANGLE).toBe(Math.PI / 10);
     expect(IGNIVAR_SKYFIRE_CONE_COUNT).toBe(3);
     expect(IGNIVAR_FIRST_METEOR_SECONDS).toBe(13);
@@ -743,8 +751,8 @@ describe('Ignivar encounter', () => {
     expect(IGNIVAR_METEOR_TELEGRAPH_SECONDS).toBe(2.5);
     expect(IGNIVAR_METEOR_REVEAL_DELAY_SECONDS).toBe(0.75);
     expect(IGNIVAR_METEOR_DAMAGE_MAX_HP).toBe(0.35);
-    expect(IGNIVAR_FIRST_ROTATING_RAYS_SECONDS).toBe(32);
-    expect(IGNIVAR_ROTATING_RAYS_EVERY).toBe(40);
+    expect(IGNIVAR_FIRST_ROTATING_RAYS_SECONDS).toBe(30);
+    expect(IGNIVAR_ROTATING_RAYS_EVERY).toBe(36);
     expect(IGNIVAR_ROTATING_RAYS_WINDUP_SECONDS).toBe(2);
     expect(IGNIVAR_ROTATING_RAYS_ACTIVE_SECONDS).toBe(8);
     expect(IGNIVAR_ROTATING_RAYS_ANGULAR_SPEED).toBe(Math.PI / 10);
@@ -818,7 +826,7 @@ describe('Ignivar encounter', () => {
       unsafeHp - Math.ceil(sim.player.maxHp * IGNIVAR_FORGE_WAVE_DAMAGE_MAX_HP),
     );
     const pushedDistance = Math.hypot(sim.player.pos.x - boss.pos.x, sim.player.pos.z - boss.pos.z);
-    expect(pushedDistance).toBeCloseTo(unsafeDistance + IGNIVAR_FORGE_WAVE_KNOCKBACK, 5);
+    expect(pushedDistance).toBeCloseTo(unsafeDistance + IGNIVAR_FORGE_WAVE_KNOCKBACK_NORMAL, 5);
     expect(safe.hp).toBe(safeHp);
     expect(secondUnsafe.hp).toBe(
       secondUnsafeHp - Math.ceil(secondUnsafe.maxHp * IGNIVAR_FORGE_WAVE_DAMAGE_MAX_HP),
@@ -843,6 +851,40 @@ describe('Ignivar encounter', () => {
     expect(boss.castRemaining).toBe(0);
     expect(boss.castTargetId).toBeNull();
     expect(boss.castAim).toBeNull();
+  });
+
+  it('knocks Heroic Forge Wave victims farther than Normal victims', () => {
+    const encounters = [
+      { ...claimedEncounter(8127), expectedKnockback: IGNIVAR_FORGE_WAVE_KNOCKBACK_NORMAL },
+      {
+        ...claimedHeroicEncounter(8127),
+        expectedKnockback: IGNIVAR_FORGE_WAVE_KNOCKBACK_HEROIC,
+      },
+    ];
+
+    for (const { sim, boss, expectedKnockback } of encounters) {
+      updateIgnivarEncounter(sim.ctx, boss);
+      if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
+      boss.ignivar.frontalTimer = 999;
+      boss.ignivar.skyfireTimer = 999;
+      boss.ignivar.rotatingRaysTimer = 999;
+      boss.ignivar.forgeWaveTimer = 0;
+      updateIgnivarEncounter(sim.ctx, boss);
+
+      boss.ignivar.forgeWaveWindupRemaining = 0;
+      boss.ignivar.forgeWaveActiveRemaining =
+        IGNIVAR_FORGE_WAVE_ACTIVE_SECONDS * (1 - 10 / IGNIVAR_FORGE_WAVE_RANGE) + DT;
+      boss.ignivar.forgeWaveFacing = 0;
+      boss.ignivar.forgeWaveRadius = 9;
+      boss.ignivar.forgeWaveHitPlayerIds = [];
+      sim.player.pos = { x: boss.pos.x + 10, y: boss.pos.y, z: boss.pos.z };
+      sim.player.prevPos = { ...sim.player.pos };
+      const distanceBefore = dist2d(boss.pos, sim.player.pos);
+
+      updateIgnivarEncounter(sim.ctx, boss);
+
+      expect(dist2d(boss.pos, sim.player.pos)).toBeCloseTo(distanceBefore + expectedKnockback, 5);
+    }
   });
 
   it.each([
@@ -893,13 +935,13 @@ describe('Ignivar encounter', () => {
         ...shell.flatMap((from) => shell.map((to) => Math.hypot(to.x - from.x, to.z - from.z))),
       );
       expect(IGNIVAR_FORGE_WAVE_RANGE).toBeGreaterThanOrEqual(roomDiameter);
-      expect(IGNIVAR_FORGE_WAVE_KNOCKBACK).toBeLessThan(IGNIVAR_FORGE_WAVE_RANGE / 10);
+      expect(IGNIVAR_FORGE_WAVE_KNOCKBACK_NORMAL).toBeLessThan(IGNIVAR_FORGE_WAVE_RANGE / 10);
       expect(sim.player.hp).toBe(
         hpBefore - Math.ceil(sim.player.maxHp * IGNIVAR_FORGE_WAVE_DAMAGE_MAX_HP),
       );
       expect(
         Math.hypot(sim.player.pos.x - positionBefore.x, sim.player.pos.z - positionBefore.z),
-      ).toBeLessThanOrEqual(IGNIVAR_FORGE_WAVE_KNOCKBACK);
+      ).toBeLessThanOrEqual(IGNIVAR_FORGE_WAVE_KNOCKBACK_NORMAL);
       const localX = sim.player.pos.x - origin.x;
       const localZ = sim.player.pos.z - origin.z;
       expect(polygonContainsPoint(shell, localX, localZ)).toBe(true);
@@ -911,16 +953,16 @@ describe('Ignivar encounter', () => {
     expect(forgeWaveCadenceTrace(418)).toEqual(first);
     expect(first).toEqual([
       {
-        startTick: 1023,
-        endTick: 1133,
-        facingSlot: 6,
+        startTick: 1101,
+        endTick: 1211,
+        facingSlot: 0,
         windupFrames: 50,
         activeFrames: 60,
       },
       {
-        startTick: 2179,
-        endTick: 2289,
-        facingSlot: 1,
+        startTick: 2380,
+        endTick: 2490,
+        facingSlot: 4,
         windupFrames: 50,
         activeFrames: 60,
       },
@@ -998,7 +1040,7 @@ describe('Ignivar encounter', () => {
     expect(boss.ignivar.rotatingRaysDirection).toBe(-1);
   });
 
-  it('keeps a clear gap after Revolving Inferno and does not overlap Shared Pyre', () => {
+  it('keeps a clear gap after Revolving Inferno before another major ability', () => {
     const { sim, boss } = claimedEncounter(8122);
     sim.player.devGod = true;
     updateIgnivarEncounter(sim.ctx, boss);
@@ -1023,8 +1065,6 @@ describe('Ignivar encounter', () => {
     updateIgnivarEncounter(sim.ctx, boss);
 
     expect(boss.castingAbility).toBe(IGNIVAR_ROTATING_RAYS_CAST_ID);
-    expect(boss.ignivar.soakTargetId).toBeNull();
-    expect(boss.ignivar.soakTimer).toBe(0);
 
     boss.ignivar.rotatingRaysWindupRemaining = 0;
     boss.ignivar.rotatingRaysActiveRemaining = DT;
@@ -1035,7 +1075,6 @@ describe('Ignivar encounter', () => {
     expect(boss.ignivar.frontalTimer).toBeGreaterThanOrEqual(IGNIVAR_MAJOR_ABILITY_GAP_SECONDS);
     expect(boss.ignivar.skyfireTimer).toBeGreaterThanOrEqual(IGNIVAR_MAJOR_ABILITY_GAP_SECONDS);
     expect(boss.ignivar.forgeWaveTimer).toBeGreaterThanOrEqual(IGNIVAR_MAJOR_ABILITY_GAP_SECONDS);
-    expect(boss.ignivar.soakTimer).toBeGreaterThanOrEqual(IGNIVAR_MAJOR_ABILITY_GAP_SECONDS);
   });
 
   it('applies the six-second gap after every cast-based major ability', () => {
@@ -1212,14 +1251,21 @@ describe('Ignivar encounter', () => {
       addEncounterPlayer(sim, boss, 'Second Gap'),
       addEncounterPlayer(sim, boss, 'Third Gap'),
     ];
+    const outsideRangePlayer = addEncounterPlayer(sim, boss, 'Outside Rain Range');
     for (let index = 0; index < conePlayers.length; index++) {
       const angle = facing + (index * Math.PI * 2) / IGNIVAR_SKYFIRE_CONE_COUNT;
+      const radius = index === 0 ? 25 : index === 1 ? IGNIVAR_SKYFIRE_RANGE : 12;
       conePlayers[index].pos = {
-        x: boss.pos.x + Math.sin(angle) * 12,
+        x: boss.pos.x + Math.sin(angle) * radius,
         y: boss.pos.y,
-        z: boss.pos.z + Math.cos(angle) * 12,
+        z: boss.pos.z + Math.cos(angle) * radius,
       };
     }
+    outsideRangePlayer.pos = {
+      x: boss.pos.x + Math.sin(facing) * (IGNIVAR_SKYFIRE_RANGE + 0.01),
+      y: boss.pos.y,
+      z: boss.pos.z + Math.cos(facing) * (IGNIVAR_SKYFIRE_RANGE + 0.01),
+    };
     for (let index = 0; index < gapPlayers.length; index++) {
       const angle = facing + Math.PI / 3 + (index * Math.PI * 2) / IGNIVAR_SKYFIRE_CONE_COUNT;
       gapPlayers[index].pos = {
@@ -1228,7 +1274,9 @@ describe('Ignivar encounter', () => {
         z: boss.pos.z + Math.cos(angle) * 12,
       };
     }
-    for (const player of [...conePlayers, ...gapPlayers]) player.hp = player.maxHp;
+    for (const player of [...conePlayers, ...gapPlayers, outsideRangePlayer]) {
+      player.hp = player.maxHp;
+    }
     const midCastEvents = sim.tick();
     expect(boss.castingAbility).toBe(IGNIVAR_SKYFIRE_CAST_ID);
     expect(boss.ignivar.skyfireCastRemaining).toBeGreaterThan(DT);
@@ -1275,6 +1323,7 @@ describe('Ignivar encounter', () => {
       );
     }
     for (const player of gapPlayers) expect(player.hp).toBe(player.maxHp);
+    expect(outsideRangePlayer.hp).toBe(outsideRangePlayer.maxHp);
     expect(boss.ignivar.skyfireFacing).toBe(lockedFacing);
     expect(boss.castingAbility).toBeNull();
   });
@@ -1505,298 +1554,8 @@ describe('Ignivar encounter', () => {
     expect(starts[1] - starts[0]).toBeGreaterThanOrEqual(IGNIVAR_SKYFIRE_EVERY);
   });
 
-  it('marks a non-tank for a four-player soak and splits its damage', () => {
+  it('never schedules Shared Pyre after it moves to Varkhul and clears a legacy mark', () => {
     const { sim, boss } = claimedEncounter(8103);
-    const offTank = addEncounterPlayer(sim, boss, 'Off Tank', 'paladin');
-    sim.setPlayerLevel(20, offTank.id);
-    expect(sim.setSpec('protection', offTank.id)).toBe(true);
-    const raiders = [
-      offTank,
-      addEncounterPlayer(sim, boss, 'Soaker One'),
-      addEncounterPlayer(sim, boss, 'Soaker Two'),
-      addEncounterPlayer(sim, boss, 'Soaker Three'),
-      addEncounterPlayer(sim, boss, 'Soaker Four'),
-    ];
-    updateIgnivarEncounter(sim.ctx, boss);
-    if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
-    boss.ignivar.brandTimer = 999;
-    boss.ignivar.forgeStrikeTimer = 999;
-    boss.ignivar.frontalTimer = 999;
-    boss.ignivar.skyfireTimer = 999;
-    boss.ignivar.soakTimer = 0;
-
-    updateIgnivarEncounter(sim.ctx, boss);
-
-    const marked = sim.entities.get(boss.ignivar.soakTargetId ?? -1);
-    if (!marked) throw new Error('Ignivar did not mark a soak target');
-    expect(marked.id).not.toBe(sim.player.id);
-    expect(marked.id).not.toBe(offTank.id);
-    const soakAura = marked.auras.find((aura) => aura.id === IGNIVAR_SOAK_AURA_ID);
-    expect(soakAura).toBeDefined();
-    if (!soakAura) throw new Error('Shared Pyre aura was not applied');
-    expect(soakAura.school).toBe('physical');
-    expect(isDispellableAura(soakAura, false)).toBe(false);
-    expect(isDispellableAura({ ...soakAura, encounterOwned: undefined }, false)).toBe(false);
-    const soakers = [marked, ...raiders.filter((player) => player.id !== marked.id).slice(0, 3)];
-    const outsider = raiders.find((player) => !soakers.includes(player));
-    if (!outsider) throw new Error('Soak outsider was not found');
-    for (const player of soakers) {
-      player.pos = { ...marked.pos };
-      player.hp = player.maxHp;
-    }
-    outsider.pos = { x: marked.pos.x + 20, y: marked.pos.y, z: marked.pos.z };
-    outsider.hp = outsider.maxHp;
-    boss.ignivar.soakRemaining = DT;
-
-    updateIgnivarEncounter(sim.ctx, boss);
-
-    for (const player of soakers) {
-      expect(player.hp).toBe(
-        player.maxHp -
-          Math.ceil(player.maxHp * (IGNIVAR_SOAK_SHARED_MAX_HP / IGNIVAR_SOAK_REQUIRED_PLAYERS)),
-      );
-    }
-    expect(outsider.hp).toBe(outsider.maxHp);
-    expect(marked.auras.some((aura) => aura.id === IGNIVAR_SOAK_AURA_ID)).toBe(false);
-    expect(boss.ignivar.soakTargetId).toBeNull();
-  });
-
-  it('splits Shared Pyre only across players inside even when fewer than four gather', () => {
-    const { sim, boss } = claimedEncounter(8104);
-    const markedCandidate = addEncounterPlayer(sim, boss, 'Marked Candidate');
-    const secondRaider = addEncounterPlayer(sim, boss, 'Second Raider');
-    updateIgnivarEncounter(sim.ctx, boss);
-    if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
-    boss.ignivar.brandTimer = 999;
-    boss.ignivar.forgeStrikeTimer = 999;
-    boss.ignivar.frontalTimer = 999;
-    boss.ignivar.skyfireTimer = 999;
-    boss.ignivar.soakTimer = 0;
-    boss.swingTimer = 999;
-    updateIgnivarEncounter(sim.ctx, boss);
-    const marked = sim.entities.get(boss.ignivar.soakTargetId ?? -1);
-    if (!marked) throw new Error('Ignivar did not mark a soak target');
-    const raiders = [sim.player, markedCandidate, secondRaider];
-    const companion = raiders.find((player) => player.id !== marked.id);
-    const outsider = raiders.find(
-      (player) => player.id !== marked.id && player.id !== companion?.id,
-    );
-    if (!companion || !outsider) throw new Error('Shared Pyre test roster is incomplete');
-    for (const player of raiders) player.hp = player.maxHp;
-    companion.pos = { ...marked.pos };
-    outsider.pos = {
-      x: marked.pos.x + 20,
-      y: marked.pos.y,
-      z: marked.pos.z,
-    };
-    boss.ignivar.soakRemaining = DT;
-
-    updateIgnivarEncounter(sim.ctx, boss);
-
-    for (const player of [marked, companion]) {
-      expect(player.hp).toBe(
-        player.maxHp - Math.ceil(player.maxHp * (IGNIVAR_SOAK_SHARED_MAX_HP / 2)),
-      );
-    }
-    expect(outsider.hp).toBe(outsider.maxHp);
-    expect(marked.auras.some((aura) => aura.id === IGNIVAR_SOAK_AURA_ID)).toBe(false);
-    expect(boss.ignivar.soakTargetId).toBeNull();
-  });
-
-  it('lets one immune marked player nullify Shared Pyre without damaging the raid', () => {
-    const { sim, boss } = claimedEncounter(8127);
-    const outsider = addEncounterPlayer(sim, boss, 'Immune Soak Witness');
-    updateIgnivarEncounter(sim.ctx, boss);
-    if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
-    boss.ignivar.brandTimer = 999;
-    boss.ignivar.forgeStrikeTimer = 999;
-    boss.ignivar.frontalTimer = 999;
-    boss.ignivar.skyfireTimer = 999;
-    boss.ignivar.soakTimer = 0;
-    boss.swingTimer = 999;
-    updateIgnivarEncounter(sim.ctx, boss);
-    const marked = sim.entities.get(boss.ignivar.soakTargetId ?? -1);
-    if (!marked) throw new Error('Ignivar did not mark a soak target');
-    const witness = marked.id === outsider.id ? sim.player : outsider;
-    marked.pos = { ...boss.pos, x: boss.pos.x + 2 };
-    witness.pos = { ...boss.pos, x: boss.pos.x - 20 };
-    marked.hp = marked.maxHp;
-    witness.hp = witness.maxHp;
-    marked.auras.push({
-      id: 'ice_block',
-      name: 'Cold Coffin',
-      kind: 'stasis',
-      remaining: 8,
-      duration: 8,
-      value: 0,
-      sourceId: marked.id,
-      school: 'frost',
-    });
-    boss.ignivar.soakRemaining = DT;
-
-    updateIgnivarEncounter(sim.ctx, boss);
-
-    expect(marked.hp).toBe(marked.maxHp);
-    expect(witness.hp).toBe(witness.maxHp);
-    expect(boss.ignivar.soakTargetId).toBeNull();
-  });
-
-  it('prefers an unbranded non-tank as the Shared Pyre target', () => {
-    const { sim, boss } = claimedEncounter(8111);
-    const branded = addEncounterPlayer(sim, boss, 'Branded Raider');
-    const unbranded = addEncounterPlayer(sim, boss, 'Unbranded Raider');
-    branded.auras.push({
-      id: IGNIVAR_BRAND_AURA_ID,
-      name: 'Brand of the Pyre',
-      kind: 'dot',
-      remaining: 10,
-      duration: 10,
-      value: 1,
-      sourceId: boss.id,
-      school: 'fire',
-    });
-    updateIgnivarEncounter(sim.ctx, boss);
-    if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
-    boss.ignivar.brandTimer = 999;
-    boss.ignivar.forgeStrikeTimer = 999;
-    boss.ignivar.frontalTimer = 999;
-    boss.ignivar.skyfireTimer = 999;
-    boss.ignivar.soakTimer = 0;
-
-    updateIgnivarEncounter(sim.ctx, boss);
-
-    expect(boss.ignivar.soakTargetId).toBe(unbranded.id);
-  });
-
-  it('splits a successful Shared Pyre across every player inside, including a fifth', () => {
-    const { sim, boss } = claimedEncounter(8112);
-    const raiders = Array.from({ length: 5 }, (_, index) =>
-      addEncounterPlayer(sim, boss, `Five-player Soaker ${index + 1}`),
-    );
-    updateIgnivarEncounter(sim.ctx, boss);
-    if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
-    boss.ignivar.brandTimer = 999;
-    boss.ignivar.forgeStrikeTimer = 999;
-    boss.ignivar.frontalTimer = 999;
-    boss.ignivar.skyfireTimer = 999;
-    boss.ignivar.soakTimer = 0;
-    boss.swingTimer = 999;
-    updateIgnivarEncounter(sim.ctx, boss);
-    const marked = sim.entities.get(boss.ignivar.soakTargetId ?? -1);
-    if (!marked) throw new Error('Ignivar did not mark a soak target');
-    for (const player of raiders) {
-      player.pos = { ...marked.pos };
-      player.hp = player.maxHp;
-    }
-    sim.player.pos = { x: marked.pos.x + 20, y: marked.pos.y, z: marked.pos.z };
-    boss.ignivar.soakRemaining = DT;
-
-    updateIgnivarEncounter(sim.ctx, boss);
-
-    for (const player of raiders) {
-      expect(player.hp).toBe(player.maxHp - Math.ceil(player.maxHp * (1.2 / 5)));
-    }
-  });
-
-  it("still splits Shared Pyre at the marked player's position if they die", () => {
-    const { sim, boss } = claimedEncounter(8113);
-    const raiders = Array.from({ length: 5 }, (_, index) =>
-      addEncounterPlayer(sim, boss, `Survivor ${index + 1}`),
-    );
-    updateIgnivarEncounter(sim.ctx, boss);
-    if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
-    boss.ignivar.brandTimer = 999;
-    boss.ignivar.forgeStrikeTimer = 999;
-    boss.ignivar.frontalTimer = 999;
-    boss.ignivar.skyfireTimer = 999;
-    boss.ignivar.soakTimer = 0;
-    boss.swingTimer = 999;
-    updateIgnivarEncounter(sim.ctx, boss);
-    const marked = sim.entities.get(boss.ignivar.soakTargetId ?? -1);
-    if (!marked) throw new Error('Ignivar did not mark a soak target');
-    marked.dead = true;
-    marked.hp = 0;
-    const survivors = [sim.player, ...raiders.filter((player) => player.id !== marked.id)];
-    for (const player of survivors) {
-      player.pos = { ...marked.pos };
-      player.hp = player.maxHp;
-    }
-    boss.ignivar.soakRemaining = DT;
-
-    updateIgnivarEncounter(sim.ctx, boss);
-
-    for (const player of survivors) {
-      expect(player.hp).toBe(
-        player.maxHp - Math.ceil(player.maxHp * (IGNIVAR_SOAK_SHARED_MAX_HP / survivors.length)),
-      );
-    }
-    expect(marked.auras.some((aura) => aura.id === IGNIVAR_SOAK_AURA_ID)).toBe(false);
-    expect(boss.ignivar.soakTargetId).toBeNull();
-  });
-
-  it('never chains a follow-up ability on the Shared Pyre resolution tick', () => {
-    const { sim, boss } = claimedEncounter(8114);
-    const raiders = Array.from({ length: 5 }, (_, index) =>
-      addEncounterPlayer(sim, boss, `Follow-up Raider ${index + 1}`),
-    );
-    updateIgnivarEncounter(sim.ctx, boss);
-    if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
-    boss.ignivar.brandTimer = 999;
-    boss.ignivar.forgeStrikeTimer = 999;
-    boss.ignivar.frontalTimer = 999;
-    boss.ignivar.skyfireTimer = 999;
-    boss.ignivar.soakTimer = 0;
-    boss.swingTimer = 999;
-    updateIgnivarEncounter(sim.ctx, boss);
-    const marked = sim.entities.get(boss.ignivar.soakTargetId ?? -1);
-    if (!marked) throw new Error('Ignivar did not mark a soak target');
-    const soakers = [marked, ...raiders.filter((player) => player.id !== marked.id).slice(0, 3)];
-    for (const player of soakers) {
-      player.pos = { ...marked.pos };
-      player.hp = player.maxHp;
-    }
-    marked.hp = 1;
-    boss.ignivar.soakRemaining = DT;
-    boss.ignivar.brandTimer = 0;
-    boss.ignivar.skyfireTimer = 0;
-
-    updateIgnivarEncounter(sim.ctx, boss);
-
-    expect(marked.dead).toBe(true);
-    expect(marked.auras.some((aura) => aura.id === IGNIVAR_BRAND_AURA_ID)).toBe(false);
-    expect(boss.castingAbility).toBeNull();
-    expect(boss.ignivar.skyfireTimer).toBeGreaterThanOrEqual(IGNIVAR_MAJOR_ABILITY_GAP_SECONDS);
-  });
-
-  it('keeps other major abilities paused while Shared Pyre is active', () => {
-    const { sim, boss } = claimedEncounter(8116);
-    updateIgnivarEncounter(sim.ctx, boss);
-    if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
-    boss.ignivar.brandTimer = 999;
-    boss.ignivar.forgeStrikeTimer = 999;
-    boss.ignivar.frontalTimer = 0;
-    boss.ignivar.skyfireTimer = 0;
-    boss.ignivar.rotatingRaysTimer = 0;
-    boss.ignivar.forgeWaveTimer = 0;
-    boss.ignivar.soakTargetId = sim.player.id;
-    boss.ignivar.soakRemaining = 1;
-    boss.swingTimer = 999;
-
-    updateIgnivarEncounter(sim.ctx, boss);
-
-    expect(boss.ignivar.soakRemaining).toBeCloseTo(1 - DT, 8);
-    expect(boss.castingAbility).toBeNull();
-    expect(boss.ignivar.frontalTimer).toBe(0);
-    expect(boss.ignivar.skyfireTimer).toBe(0);
-    expect(boss.ignivar.rotatingRaysTimer).toBe(0);
-    expect(boss.ignivar.forgeWaveTimer).toBe(0);
-  });
-
-  it('starts Shared Pyre at 24 seconds and begins its cooldown after resolution', () => {
-    const { sim, boss } = claimedEncounter(8115);
-    const raiders = Array.from({ length: 4 }, (_, index) =>
-      addEncounterPlayer(sim, boss, `Cadence Raider ${index + 1}`),
-    );
     updateIgnivarEncounter(sim.ctx, boss);
     if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
     boss.ignivar.brandTimer = 999;
@@ -1805,37 +1564,49 @@ describe('Ignivar encounter', () => {
     boss.ignivar.skyfireTimer = 999;
     boss.ignivar.rotatingRaysTimer = 999;
     boss.ignivar.forgeWaveTimer = 999;
-    boss.ignivar.overlapTimer = 999;
-    boss.swingTimer = 999;
-    const starts: number[] = [];
-    let priorTarget = boss.ignivar.soakTargetId;
+    boss.ignivar.soakTimer = 0;
+    boss.ignivar.soakTargetId = sim.player.id;
+    boss.ignivar.soakRemaining = 3;
+    sim.player.auras.push({
+      id: IGNIVAR_SOAK_AURA_ID,
+      name: 'Shared Pyre',
+      kind: 'vulnerability',
+      remaining: 3,
+      duration: 6,
+      value: 0,
+      sourceId: boss.id,
+      school: 'fire',
+      encounterOwned: true,
+    });
 
-    for (let i = 0; i < 1_600 && starts.length < 2; i++) {
-      for (const player of [sim.player, ...raiders]) player.hp = player.maxHp;
-      sim.tick();
-      const targetId = boss.ignivar.soakTargetId;
-      if (targetId !== null && priorTarget === null) starts.push(sim.time);
-      const marked = targetId === null ? undefined : sim.entities.get(targetId);
-      if (marked) {
-        for (const player of [sim.player, ...raiders]) player.pos = { ...marked.pos };
-      }
-      priorTarget = targetId;
-    }
+    updateIgnivarEncounter(sim.ctx, boss);
 
-    expect(starts).toHaveLength(2);
-    expect(starts[0]).toBeCloseTo(IGNIVAR_FIRST_SOAK_SECONDS, 1);
-    expect(starts[1] - starts[0]).toBeCloseTo(IGNIVAR_SOAK_CAST_SECONDS + IGNIVAR_SOAK_EVERY, 1);
+    expect(boss.ignivar.soakTargetId).toBeNull();
+    expect(boss.ignivar.soakRemaining).toBe(0);
+    expect(boss.ignivar.soakTimer).toBe(0);
+    expect(sim.player.auras.some((aura) => aura.id === IGNIVAR_SOAK_AURA_ID)).toBe(false);
   });
-
-  it('marks every available player when fewer than three are present', () => {
+  it('marks every available non-tank and excludes both the active and off tank', () => {
     const { sim, boss } = claimedEncounter();
+    const activeTankMeta = sim.players.get(sim.player.id);
+    if (!activeTankMeta) throw new Error('Active tank metadata is missing');
+    activeTankMeta.talentMods.role = 'tank';
+    const offTank = addEncounterPlayer(sim, boss, 'Off Tank', 'paladin');
+    const offTankMeta = sim.players.get(offTank.id);
+    if (!offTankMeta) throw new Error('Off tank metadata is missing');
+    offTankMeta.talentMods.role = 'tank';
+    const firstNonTank = addEncounterPlayer(sim, boss, 'Brand Candidate One');
+    const secondNonTank = addEncounterPlayer(sim, boss, 'Brand Candidate Two', 'mage');
     updateIgnivarEncounter(sim.ctx, boss);
     if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
     boss.ignivar.brandTimer = 0;
 
     updateIgnivarEncounter(sim.ctx, boss);
 
-    const brand = sim.player.auras.find((a) => a.id === IGNIVAR_BRAND_AURA_ID);
+    expect(sim.player.auras.some((aura) => aura.id === IGNIVAR_BRAND_AURA_ID)).toBe(false);
+    expect(offTank.auras.some((aura) => aura.id === IGNIVAR_BRAND_AURA_ID)).toBe(false);
+    expect(firstNonTank.auras.some((aura) => aura.id === IGNIVAR_BRAND_AURA_ID)).toBe(true);
+    const brand = secondNonTank.auras.find((a) => a.id === IGNIVAR_BRAND_AURA_ID);
     expect(brand).toMatchObject({
       kind: 'dot',
       tickInterval: 2,
@@ -1844,14 +1615,49 @@ describe('Ignivar encounter', () => {
     });
     if (!brand) throw new Error('Ignivar brand was not applied');
     expect(isDispellableAura(brand, false)).toBe(false);
-    const hpBeforeTick = sim.player.hp;
+    const hpBeforeTick = secondNonTank.hp;
     if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
     boss.ignivar.brandTimer = 999;
     boss.ignivar.frontalTimer = 999;
+    boss.ignivar.overlapTimer = 999;
     boss.swingTimer = 999;
     for (let i = 0; i < 40; i++) sim.tick();
-    expect(sim.player.hp).toBe(hpBeforeTick - Math.ceil(sim.player.maxHp * 0.05));
+    expect(secondNonTank.hp).toBe(hpBeforeTick - Math.ceil(secondNonTank.maxHp * 0.05));
   });
+
+  it.each([0, 1, 2])(
+    'preserves historical Brand RNG slots with %i eligible non-tanks',
+    (nonTankCount) => {
+      const { sim, boss } = claimedEncounter(8110 + nonTankCount);
+      const activeTankMeta = sim.players.get(sim.player.id);
+      if (!activeTankMeta) throw new Error('Active tank metadata is missing');
+      activeTankMeta.talentMods.role = 'tank';
+      const eligible = Array.from({ length: nonTankCount }, (_, index) =>
+        addEncounterPlayer(sim, boss, `Brand RNG Candidate ${index}`, 'mage'),
+      );
+      updateIgnivarEncounter(sim.ctx, boss);
+      if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
+      boss.ignivar.brandTimer = 0;
+      boss.ignivar.frontalTimer = 999;
+      boss.ignivar.skyfireTimer = 999;
+      boss.ignivar.rotatingRaysTimer = 999;
+      boss.ignivar.forgeWaveTimer = 999;
+      boss.ignivar.forgeStrikeTimer = 999;
+      boss.ignivar.overlapTimer = 999;
+      boss.ignivar.meteorTimer = 999;
+      boss.swingTimer = 999;
+      let draws = 0;
+      sim.rng.setObserver(() => draws++);
+
+      updateIgnivarEncounter(sim.ctx, boss);
+      sim.rng.setObserver(null);
+
+      expect(draws).toBe(Math.min(IGNIVAR_BRAND_TARGETS_NORMAL, 1 + nonTankCount));
+      expect(
+        eligible.filter((player) => player.auras.some((aura) => aura.id === IGNIVAR_BRAND_AURA_ID)),
+      ).toHaveLength(nonTankCount);
+    },
+  );
 
   it('ramps each uncleansed Brand tick from one to three stacks without exceeding the cap', () => {
     const { sim, boss } = claimedEncounter();
@@ -1938,6 +1744,7 @@ describe('Ignivar encounter', () => {
     );
     expect(sim.player.auras.find((aura) => aura.id === IGNIVAR_MOLTEN_ARMOR_AURA_ID)).toMatchObject(
       {
+        kind: 'vuln_source',
         stacks: 1,
         value: IGNIVAR_MOLTEN_ARMOR_PER_STACK,
         remaining: IGNIVAR_MOLTEN_ARMOR_DURATION,
@@ -2059,6 +1866,59 @@ describe('Ignivar encounter', () => {
 
     expect(normalDamage).toBeGreaterThan(0);
     expect(moltenDamage / normalDamage).toBeCloseTo(1.7, 1);
+  });
+
+  it('limits Molten Armor amplification to damage dealt by Ignivar', () => {
+    const moltenEncounter = (seed: number) => {
+      const encounter = claimedEncounter(seed);
+      const { sim, boss } = encounter;
+      sim.player.maxHp = 1_000_000;
+      sim.player.hp = sim.player.maxHp;
+      sim.player.pos = { x: boss.pos.x, y: boss.pos.y, z: boss.pos.z - 2 };
+      updateIgnivarEncounter(sim.ctx, boss);
+      if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
+      boss.ignivar.brandTimer = 999;
+      boss.ignivar.frontalTimer = 999;
+      boss.ignivar.overlapTimer = 999;
+      boss.swingTimer = 999;
+      boss.ignivar.forgeStrikeTimer = 0;
+      updateIgnivarEncounter(sim.ctx, boss);
+      boss.ignivar.forgeStrikeTimer = 0;
+      updateIgnivarEncounter(sim.ctx, boss);
+      expect(
+        sim.player.auras.find((aura) => aura.id === IGNIVAR_MOLTEN_ARMOR_AURA_ID),
+      ).toMatchObject({ kind: 'vuln_source', sourceId: boss.id, stacks: 2, value: 0.7 });
+      sim.player.hp = sim.player.maxHp;
+      return encounter;
+    };
+
+    const ignivar = moltenEncounter(7442);
+    expect(
+      ignivar.sim.ctx.dealDamage(
+        ignivar.boss,
+        ignivar.sim.player,
+        100,
+        false,
+        'fire',
+        'Ignivar Flame',
+        'hit',
+        true,
+      ),
+    ).toBe(170);
+
+    const foreign = moltenEncounter(7443);
+    expect(
+      foreign.sim.ctx.dealDamage(
+        foreign.conduit,
+        foreign.sim.player,
+        100,
+        false,
+        'fire',
+        'Foreign Flame',
+        'hit',
+        true,
+      ),
+    ).toBe(100);
   });
 
   it('holds a due Forge Strike out of melee, then repeats exactly fourteen seconds after landing', () => {
@@ -2396,14 +2256,7 @@ describe('Ignivar encounter', () => {
   });
 
   it('keeps the boss stationary through every major mechanic in the production dispatcher', () => {
-    const mechanics = [
-      'frontal',
-      'skyfire',
-      'rotating rays',
-      'forge wave',
-      'shared pyre',
-      'judgment',
-    ];
+    const mechanics = ['frontal', 'skyfire', 'rotating rays', 'forge wave', 'judgment'];
     for (let mechanicIndex = 0; mechanicIndex < mechanics.length; mechanicIndex++) {
       const mechanic = mechanics[mechanicIndex];
       const { sim, boss } = claimedEncounter(1_100 + mechanicIndex);
@@ -2435,7 +2288,6 @@ describe('Ignivar encounter', () => {
       else if (mechanic === 'skyfire') st.skyfireTimer = 0;
       else if (mechanic === 'rotating rays') st.rotatingRaysTimer = 0;
       else if (mechanic === 'forge wave') st.forgeWaveTimer = 0;
-      else if (mechanic === 'shared pyre') st.soakTimer = 0;
       else boss.hp = Math.floor(boss.maxHp * 0.45);
 
       const origin = { ...boss.pos };
@@ -2465,8 +2317,13 @@ describe('Ignivar encounter', () => {
     const bystander = bystanderMeta ? sim.entities.get(bystanderMeta.entityId) : undefined;
     if (!bystander) throw new Error('Raid bystander did not spawn');
     const origin = instanceOrigin(DUNGEONS.ignivar_raid_arena.index, 0);
-    sim.player.pos.x = origin.x - 18;
-    sim.player.pos.z = origin.z + 18;
+    // Aim along the north-west conduit line while starting outside its 3.25u
+    // cleansing pool. The conduits now sit on the placed water pumps (just
+    // inside +/-18), so start a little further in than the pump center: the
+    // frontal still brands the player before the explicit step into the
+    // activated water below.
+    sim.player.pos.x = origin.x - 13;
+    sim.player.pos.z = origin.z + 13;
     bystander.pos = { x: origin.x + 18, y: 0, z: origin.z - 18 };
     boss.facing = Math.atan2(sim.player.pos.x - boss.pos.x, sim.player.pos.z - boss.pos.z);
     sim.player.auras.push({
@@ -2974,7 +2831,7 @@ describe('Ignivar encounter', () => {
     });
 
     boss.dead = true;
-    sim.tick();
+    const deathEvents = sim.tick();
 
     expect(boss.ignivar).toBeUndefined();
     expect(boss.enraged).toBe(false);
@@ -2982,6 +2839,161 @@ describe('Ignivar encounter', () => {
     expect(boss.castingAbility).toBeNull();
     expect(conduit.templateId).toBe(IGNIVAR_WATER_CONDUIT_TEMPLATES.ready);
     expect(sim.player.auras.some((aura) => aura.id === IGNIVAR_BRAND_AURA_ID)).toBe(false);
+    expect(
+      deathEvents.filter(
+        (event) =>
+          event.type === 'chat' && event.channel === 'yell' && event.text === IGNIVAR_DEATH_YELL,
+      ),
+    ).toHaveLength(1);
+    expect(
+      sim
+        .tick()
+        .filter(
+          (event) =>
+            event.type === 'chat' && event.channel === 'yell' && event.text === IGNIVAR_DEATH_YELL,
+        ),
+    ).toHaveLength(0);
+  });
+
+  it('despawns Ashcaller and cancels armed meteors when Ignivar dies mid-mechanic', () => {
+    const { sim, boss } = claimedEncounter(453);
+    sim.player.devGod = true;
+    boss.hp = Math.floor(boss.maxHp * IGNIVAR_APOCALYPSE_HP_THRESHOLD);
+    updateIgnivarEncounter(sim.ctx, boss);
+    const add = [...sim.entities.values()].find(
+      (entity) => entity.templateId === IGNIVAR_APOCALYPSE_ADD_ID,
+    );
+    if (!add || !boss.ignivar) throw new Error('Apocalypse did not initialize');
+    isolateForgeChains(boss, 999);
+    boss.ignivar.meteorTimer = 0;
+    updateIgnivarEncounter(sim.ctx, boss);
+    expect(sim.activeIgnivarMeteors.length).toBeGreaterThan(0);
+    const impact = boss.ignivar.meteorPoints[0];
+    if (!impact) throw new Error('Falling Cinders did not choose an impact point');
+    boss.ignivar.meteorImpactRemaining = DT;
+    sim.player.pos = { x: impact.x, y: boss.pos.y, z: impact.z };
+    sim.player.prevPos = { ...sim.player.pos };
+    sim.player.devGod = false;
+    sim.player.damageImmune = false;
+    const hpBeforeDeath = sim.player.hp;
+
+    boss.dead = true;
+    sim.tick();
+
+    expect(boss.ignivar).toBeUndefined();
+    expect(sim.entities.has(add.id)).toBe(false);
+    expect(sim.activeIgnivarMeteors).toEqual([]);
+    expect(boss.castingAbility).toBeNull();
+    expect(sim.player.hp).toBe(hpBeforeDeath);
+    sim.tick();
+    expect(sim.player.hp).toBe(hpBeforeDeath);
+  });
+
+  it('clears raid mechanics through a real death and corpse resurrection', () => {
+    const { sim, boss } = claimedEncounter(454);
+    const ally = addEncounterPlayer(sim, boss, 'Living Witness');
+    updateIgnivarEncounter(sim.ctx, boss);
+    isolateForgeChains(boss, 999);
+    const encounterAuraIds = [
+      IGNIVAR_BRAND_AURA_ID,
+      IGNIVAR_MOLTEN_ARMOR_AURA_ID,
+      IGNIVAR_FORGE_CHAINS_AURA_ID,
+    ];
+    applyIgnivarBrand(sim.player, boss);
+    sim.ctx.applyAura(sim.player, {
+      id: IGNIVAR_MOLTEN_ARMOR_AURA_ID,
+      name: 'Molten Armor',
+      kind: 'vuln_source',
+      remaining: IGNIVAR_MOLTEN_ARMOR_DURATION,
+      duration: IGNIVAR_MOLTEN_ARMOR_DURATION,
+      value: IGNIVAR_MOLTEN_ARMOR_PER_STACK,
+      stacks: 1,
+      sourceId: boss.id,
+      school: 'fire',
+      encounterOwned: true,
+    });
+    sim.ctx.applyAura(sim.player, {
+      id: IGNIVAR_FORGE_CHAINS_AURA_ID,
+      name: 'Forge Chains',
+      kind: 'vulnerability',
+      remaining: IGNIVAR_FORGE_CHAINS_DURATION_SECONDS,
+      duration: IGNIVAR_FORGE_CHAINS_DURATION_SECONDS,
+      value: 0,
+      value2: ally.id,
+      sourceId: boss.id,
+      school: 'fire',
+      encounterOwned: true,
+    });
+
+    sim.ctx.dealDamage(
+      boss,
+      sim.player,
+      sim.player.maxHp * 100,
+      false,
+      'fire',
+      'Raid Test Kill',
+      'hit',
+      true,
+    );
+
+    expect(sim.player.dead).toBe(true);
+    expect(sim.player.auras.some((aura) => encounterAuraIds.includes(aura.id))).toBe(false);
+    const state = boss.ignivar;
+    expect(state).toBeDefined();
+
+    sim.releaseSpirit(sim.player.id);
+    const corpse = sim.player.corpsePos;
+    if (!corpse) throw new Error('Raid death did not leave a corpse');
+    sim.player.pos = { ...corpse };
+    sim.player.prevPos = { ...corpse };
+    sim.rebucket(sim.player);
+    sim.resurrectAtCorpse(sim.player.id);
+    updateIgnivarEncounter(sim.ctx, boss);
+
+    expect(sim.player.dead).toBe(false);
+    expect(sim.player.ghost).toBe(false);
+    expect(sim.player.hp).toBe(Math.round(sim.player.maxHp * 0.5));
+    expect(sim.player.auras.some((aura) => encounterAuraIds.includes(aura.id))).toBe(false);
+    expect(boss.ignivar).toBe(state);
+  });
+
+  it('resets a real all-dead wipe and starts the next pull without stale hazards', () => {
+    const { sim, boss } = claimedEncounter(455);
+    const ally = addEncounterPlayer(sim, boss, 'Wipe Witness');
+    updateIgnivarEncounter(sim.ctx, boss);
+    if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
+    const firstState = boss.ignivar;
+    isolateForgeChains(boss, 999);
+    boss.ignivar.meteorTimer = 0;
+    boss.swingTimer = 999;
+    updateIgnivarEncounter(sim.ctx, boss);
+    expect(sim.activeIgnivarMeteors.length).toBeGreaterThan(0);
+
+    sim.ctx.handleDeath(sim.player, boss);
+    sim.ctx.handleDeath(ally, boss);
+    boss.combatExitHoldUntil = sim.ctx.time;
+    updateIgnivarEncounter(sim.ctx, boss);
+
+    expect(boss.ignivar).toBeUndefined();
+    expect(boss.castingAbility).toBeNull();
+    expect(sim.activeIgnivarMeteors).toEqual([]);
+
+    revivePlayerAt(sim.ctx, sim.player.id, { ...boss.pos });
+    revivePlayerAt(sim.ctx, ally.id, { ...boss.pos });
+    boss.inCombat = true;
+    boss.aiState = 'attack';
+    boss.aggroTargetId = sim.player.id;
+    boss.swingTimer = 999;
+    updateIgnivarEncounter(sim.ctx, boss);
+
+    expect(boss.ignivar).toBeDefined();
+    expect(boss.ignivar).not.toBe(firstState);
+    expect(boss.ignivar?.rotatingRaysWindupRemaining).toBe(0);
+    expect(boss.ignivar?.rotatingRaysActiveRemaining).toBe(0);
+    expect(boss.ignivar?.forgeWaveWindupRemaining).toBe(0);
+    expect(boss.ignivar?.forgeWaveActiveRemaining).toBe(0);
+    expect(boss.ignivar?.meteorPoints).toEqual([]);
+    expect(boss.ignivar?.apocalypseTriggered).toBe(false);
   });
 
   it('ticks the frontal cadence during its cast and honors forced-target threat', () => {
@@ -2997,8 +3009,8 @@ describe('Ignivar encounter', () => {
     expect(boss.aggroTargetId).toBe(tank.id);
     expect(boss.forcedTargetTimer).toBeLessThan(3);
     if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
+    isolateForgeChains(boss, 999);
     boss.ignivar.frontalTimer = 0;
-    boss.ignivar.meteorTimer = 999;
 
     updateIgnivarEncounter(sim.ctx, boss);
     let sawRelease = false;
@@ -3148,7 +3160,7 @@ describe('Ignivar encounter', () => {
     expect(boss.castingAbility).toBeNull();
   });
 
-  it('waits for Shared Pyre to resolve before entering Last Inferno', () => {
+  it('clears a legacy Shared Pyre mark instead of blocking Last Inferno', () => {
     const { sim, boss } = claimedEncounter(9218);
     sim.player.devGod = true;
     updateIgnivarEncounter(sim.ctx, boss);
@@ -3168,7 +3180,7 @@ describe('Ignivar encounter', () => {
 
     updateIgnivarEncounter(sim.ctx, boss);
 
-    expect(boss.ignivar.lastInfernoTriggered).toBe(false);
+    expect(boss.ignivar.lastInfernoTriggered).toBe(true);
     expect(boss.ignivar.soakTargetId).toBeNull();
 
     let ticksUntilFirstFinalCast = 0;
@@ -3178,7 +3190,7 @@ describe('Ignivar encounter', () => {
     }
 
     expect(boss.ignivar.lastInfernoTriggered).toBe(true);
-    expect(ticksUntilFirstFinalCast * DT).toBeGreaterThanOrEqual(6);
+    expect(ticksUntilFirstFinalCast * DT).toBeGreaterThanOrEqual(6 - DT);
     expect(boss.castingAbility).toBe(IGNIVAR_FRONTAL_CAST_ID);
   });
 
@@ -3264,7 +3276,6 @@ describe('Ignivar encounter', () => {
           event.text === 'The last flame consumes all!',
       ),
     ).toBe(true);
-
     const nextEvents = sim.tick();
     expect(
       nextEvents.some(
@@ -3344,7 +3355,7 @@ describe('Ignivar encounter', () => {
         (event) =>
           event.type === 'chat' &&
           event.channel === 'yell' &&
-          event.text === 'The Heart of the End awakens. Let the world burn!',
+          event.text === 'Ignivar Ashcaller awakens. Let the world burn!',
       ),
     ).toBe(true);
     expect(
@@ -3356,6 +3367,19 @@ describe('Ignivar encounter', () => {
           event.fx === 'nova',
       ),
     ).toBe(true);
+    expect(
+      events.some(
+        (event) =>
+          event.type === 'spellfxAt' &&
+          event.x === add.pos.x &&
+          event.z === add.pos.z &&
+          event.fx === 'burst' &&
+          event.ability === VARKHUL_FORGE_PORTAL_ABILITY_ID &&
+          event.sourceId === boss.id &&
+          event.radius === 4 &&
+          event.duration === 2,
+      ),
+    ).toBe(true);
 
     const nextEvents = sim.tick();
     expect(
@@ -3363,7 +3387,7 @@ describe('Ignivar encounter', () => {
         (event) =>
           event.type === 'chat' &&
           event.channel === 'yell' &&
-          event.text === 'The Heart of the End awakens. Let the world burn!',
+          event.text === 'Ignivar Ashcaller awakens. Let the world burn!',
       ),
     ).toBe(false);
   });
@@ -3419,9 +3443,7 @@ describe('Ignivar encounter', () => {
     expect(add.dead).toBe(true);
     const hpBefore = sim.player.hp;
     if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
-    boss.ignivar.brandTimer = 999;
-    boss.ignivar.frontalTimer = 999;
-    boss.ignivar.meteorTimer = 999;
+    isolateForgeChains(boss, 999);
     boss.swingTimer = 999;
 
     const ticksPastOriginalDeadline = Math.round(IGNIVAR_APOCALYPSE_CAST_SECONDS / DT) + 1;

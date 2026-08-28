@@ -3,9 +3,9 @@ import {
   averageRogueDps,
   ROGUE_BAND_FIXTURE,
   type RogueProbeSpec,
+  runRogueDpsProbe,
 } from '../scripts/rogue_dps_probe';
 import { ITEMS } from '../src/sim/data';
-import { bestEpicGearFor } from '../src/sim/dev/bis_gear';
 
 const SPECS: RogueProbeSpec[] = ['assassination', 'combat', 'subtlety'];
 
@@ -44,12 +44,22 @@ describe('Rogue fight-6498 deterministic DPS bands', () => {
       },
     });
 
+    // Assert the gear properties on what a probe run ACTUALLY equipped, not on
+    // a picker function the probe could silently stop calling: re-coupling the
+    // probe to the parse loadouts (legendaries included) fails here cheaply.
     for (const spec of SPECS) {
-      const gear = Object.values(bestEpicGearFor('rogue', spec));
-      expect(gear.length, `${spec} has a complete representative loadout`).toBeGreaterThan(0);
+      const probe = runRogueDpsProbe(
+        spec,
+        ROGUE_BAND_FIXTURE.seeds[0],
+        1,
+        ROGUE_BAND_FIXTURE.targetArmor,
+        ROGUE_BAND_FIXTURE.build,
+      );
+      const gear = Object.values(probe.equipment);
+      expect(gear.length, `${spec} equips a complete representative loadout`).toBeGreaterThan(0);
       expect(
         gear.every((itemId) => ITEMS[itemId]?.quality === 'epic'),
-        `${spec} loadout excludes legendary gear`,
+        `${spec} probe loadout excludes legendary gear`,
       ).toBe(true);
     }
   });
