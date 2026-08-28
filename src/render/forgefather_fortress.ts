@@ -9,6 +9,7 @@ import * as THREE from 'three';
 import { FORGEFATHER_FORTRESS_PLACEMENTS } from '../sim/forgefather_fortress';
 import { registerDeferredPreload } from './assets/preload';
 import { appendIgnivarEnvProps, prepareIgnivarEnvProps } from './ignivar_env_props';
+import { appendIgnivarMistGates } from './ignivar_mist_gate';
 import { addPropGlowPools } from './ignivar_raid_dressing';
 
 // World content: the prop GLBs load in the deferred lane so reaching the
@@ -29,5 +30,8 @@ export function buildForgefatherFortress(): THREE.Group {
   const placements = FORGEFATHER_FORTRESS_PLACEMENTS.filter((p) => p.key !== 'street_lamp');
   appendIgnivarEnvProps(group, placements, false);
   addPropGlowPools(group, placements, false);
+  // Every placed dungeon_entrance facade gets its boss-gate fog wall over
+  // the facade's red membrane (the owner's authored mist target).
+  appendIgnivarMistGates(group, placements);
   return group;
 }

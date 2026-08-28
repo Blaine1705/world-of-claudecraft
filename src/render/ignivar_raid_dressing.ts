@@ -61,6 +61,9 @@ const PROP_GLOW_POOLS: Partial<
   lava_furnace_2: { color: 0xff4316, scale: 0.8 },
   lava_pillar: { color: 0xff5c1e, scale: 0.7 },
   lava_ramp: { color: 0xff4316, scale: 0.9 },
+  // The raid-door facade: a deep red threshold pool under the mist gate
+  // (the facade seats on raised floor plates, so it anchors at placement y).
+  dungeon_entrance: { color: 0xff2a14, scale: 0.8, atPlacementY: true },
   // (The bridge rails carry no floor pool: their braziers glow through the
   // flame's own baked emissive, per the owner's direction.)
 };
