@@ -2269,11 +2269,12 @@ describe('Ignivar encounter', () => {
     if (!bystander) throw new Error('Raid bystander did not spawn');
     const origin = instanceOrigin(DUNGEONS.ignivar_raid_arena.index, 0);
     // Aim along the north-west conduit line while starting outside its 3.25u
-    // cleansing pool. The conduits moved inward with the perimeter-lava room;
-    // using their exact (-18,+18) center here would cleanse before this test's
-    // explicit step into the activated water below.
-    sim.player.pos.x = origin.x - 15;
-    sim.player.pos.z = origin.z + 15;
+    // cleansing pool. The conduits now sit on the placed water pumps (just
+    // inside +/-18), so start a little further in than the pump center: the
+    // frontal still brands the player before the explicit step into the
+    // activated water below.
+    sim.player.pos.x = origin.x - 13;
+    sim.player.pos.z = origin.z + 13;
     bystander.pos = { x: origin.x + 18, y: 0, z: origin.z - 18 };
     boss.facing = Math.atan2(sim.player.pos.x - boss.pos.x, sim.player.pos.z - boss.pos.z);
     sim.player.auras.push({
