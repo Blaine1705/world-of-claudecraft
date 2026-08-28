@@ -17,10 +17,14 @@ import {
   updateIgnivarTrashAutomaton,
 } from '../src/sim/mob/ignivar_trash_automata';
 import { Sim } from '../src/sim/sim';
-import { DT, type Entity } from '../src/sim/types';
+import { DT, type DungeonDifficulty, type Entity } from '../src/sim/types';
 
-function claimedRoom(dungeonId: string): { sim: Sim; mobs: Entity[] } {
+function claimedRoom(
+  dungeonId: string,
+  difficulty: DungeonDifficulty = 'normal',
+): { sim: Sim; mobs: Entity[] } {
   const sim = new Sim({ seed: 8124, playerClass: 'warrior', devCommands: true });
+  sim.setDungeonDifficulty(difficulty, sim.player.id);
   expect(enterDungeon(sim.ctx, dungeonId, sim.player.id, true)).toBe(true);
   const instance = sim.instances.find(
     (candidate) => candidate.dungeonId === dungeonId && candidate.partyKey !== null,
@@ -130,6 +134,23 @@ describe('Ignivar trash automata', () => {
     expect(sentinel.ignivarTrashSpellTimer).toBeCloseTo(5);
     for (let tick = 0; tick < Math.ceil(IGNIVAR_CINDER_LANCE_CAST_SECONDS / DT); tick++) sim.tick();
     expect(sim.player.hp).toBe(healthBefore);
+  });
+
+  it('routes Heroic Cinder Lance damage through the live corridor cast', () => {
+    const { sim, mobs } = claimedRoom(IGNIVAR_FORGE_APPROACH_ID, 'heroic');
+    const sentinel = mobs.find((mob) => mob.templateId === IGNIVAR_EMBER_SENTINEL_ID);
+    if (!sentinel) throw new Error('Heroic Ember Sentinel missing');
+    engage(sim, sentinel);
+    sim.player.maxHp = 1_000;
+    sim.player.hp = 1_000;
+    sentinel.ignivarTrashSpellTimer = DT;
+
+    sim.tick();
+    for (let tick = 0; tick < Math.ceil(IGNIVAR_CINDER_LANCE_CAST_SECONDS / DT); tick++) {
+      sim.tick();
+    }
+
+    expect(sim.player.hp).toBe(450);
   });
 
   it('does not grant Cinder Lance to the same Sentinel template in Varkhul room', () => {

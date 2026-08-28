@@ -18,7 +18,8 @@ export const IGNIVAR_FORGE_WAVE_ACTIVE_SECONDS = 3;
 export const IGNIVAR_FORGE_WAVE_RANGE = 72;
 export const IGNIVAR_FORGE_WAVE_GAP_HALF_ANGLE = Math.PI / 12;
 export const IGNIVAR_FORGE_WAVE_WALL_HALF_THICKNESS = 0.75;
-export const IGNIVAR_FORGE_WAVE_DAMAGE_MAX_HP = 0.35;
+export const IGNIVAR_FORGE_WAVE_DAMAGE_MAX_HP = 0.5;
+export const IGNIVAR_FORGE_WAVE_DAMAGE_MAX_HP_HEROIC = 0.8;
 // Normal keeps the brief impact nudge. Heroic carries victims farther toward
 // the arena moat while the expanding wall still damages each player only once.
 export const IGNIVAR_FORGE_WAVE_KNOCKBACK_NORMAL = 4;
@@ -30,6 +31,12 @@ export function ignivarForgeWaveKnockback(difficulty: DungeonDifficulty): number
   return difficulty === 'heroic'
     ? IGNIVAR_FORGE_WAVE_KNOCKBACK_HEROIC
     : IGNIVAR_FORGE_WAVE_KNOCKBACK_NORMAL;
+}
+
+export function ignivarForgeWaveDamageMaxHp(difficulty: DungeonDifficulty): number {
+  return difficulty === 'heroic'
+    ? IGNIVAR_FORGE_WAVE_DAMAGE_MAX_HP_HEROIC
+    : IGNIVAR_FORGE_WAVE_DAMAGE_MAX_HP;
 }
 
 function angleDistance(a: number, b: number): number {

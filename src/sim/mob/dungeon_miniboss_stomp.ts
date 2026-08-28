@@ -3,11 +3,12 @@
 // replace that cast with this instant Stomp.
 
 import type { SimContext } from '../sim_context';
-import { CAST_COMPLETE_EPS, DT, dist2d, type Entity } from '../types';
+import { CAST_COMPLETE_EPS, DT, type DungeonDifficulty, dist2d, type Entity } from '../types';
 
 export const DUNGEON_MINIBOSS_STOMP_ABILITY_ID = 'Crucible Stomp';
 export const DUNGEON_MINIBOSS_STOMP_RADIUS = 9;
-export const DUNGEON_MINIBOSS_STOMP_DAMAGE_MAX_HP = 0.18;
+export const DUNGEON_MINIBOSS_STOMP_DAMAGE_MAX_HP = 0.4;
+export const DUNGEON_MINIBOSS_STOMP_DAMAGE_MAX_HP_HEROIC = 0.7;
 export const DUNGEON_MINIBOSS_STOMP_FIRST_SECONDS = 6;
 export const DUNGEON_MINIBOSS_STOMP_REPEAT_SECONDS = 12;
 
@@ -15,6 +16,12 @@ function claimFor(ctx: SimContext, mob: Entity) {
   return ctx.instances.find(
     (candidate) => candidate.partyKey !== null && candidate.mobIds.includes(mob.id),
   );
+}
+
+export function dungeonMinibossStompDamageMaxHp(difficulty: DungeonDifficulty): number {
+  return difficulty === 'heroic'
+    ? DUNGEON_MINIBOSS_STOMP_DAMAGE_MAX_HP_HEROIC
+    : DUNGEON_MINIBOSS_STOMP_DAMAGE_MAX_HP;
 }
 
 function livingPlayersInClaim(ctx: SimContext, mob: Entity): Entity[] {
@@ -38,6 +45,8 @@ export function resetDungeonMinibossStomp(mob: Entity): void {
 
 export function updateDungeonMinibossStomp(ctx: SimContext, mob: Entity): boolean {
   if (!mob.dungeonSpawnMiniboss) return false;
+  const claim = claimFor(ctx, mob);
+  const difficulty = claim?.difficulty ?? 'normal';
 
   // A promoted placement replaces the template's interruptible Quake. Keep
   // that generic cadence suppressed even while Stomp is waiting for a target.
@@ -73,9 +82,7 @@ export function updateDungeonMinibossStomp(ctx: SimContext, mob: Entity): boolea
     ctx.dealDamage(
       mob,
       player,
-      Math.ceil(
-        player.maxHp * DUNGEON_MINIBOSS_STOMP_DAMAGE_MAX_HP * (mob.mechanicDamageMult ?? 1),
-      ),
+      Math.ceil(player.maxHp * dungeonMinibossStompDamageMaxHp(difficulty)),
       false,
       'fire',
       DUNGEON_MINIBOSS_STOMP_ABILITY_ID,

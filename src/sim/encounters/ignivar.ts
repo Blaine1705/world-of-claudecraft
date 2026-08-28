@@ -4,6 +4,7 @@
 // fields expose the cast bar and conduit template swaps to every client, while
 // the renderer derives the cone, brand circles, and water zone from that state.
 
+import { resetLongCooldownsForRaidWipe } from '../combat/raid_wipe_cooldowns';
 import { MOBS } from '../data';
 import { createMob } from '../entity';
 import {
@@ -22,7 +23,6 @@ import {
 } from '../ignivar_forge_chains';
 import {
   IGNIVAR_JUDGMENT_ACTIVE_SECONDS,
-  IGNIVAR_JUDGMENT_BURN_DAMAGE_MAX_HP,
   IGNIVAR_JUDGMENT_DURATION_SECONDS,
   IGNIVAR_JUDGMENT_HP_THRESHOLD,
   IGNIVAR_JUDGMENT_LAYOUT_SLOTS,
@@ -30,14 +30,15 @@ import {
   type IgnivarJudgmentShelterIndex,
   ignivarForgeLayoutFacing,
   ignivarForgeShelterPoints,
+  ignivarJudgmentBurnDamageMaxHp,
   ignivarPointOnJudgmentFire,
 } from '../ignivar_forge_judgment';
 import {
   IGNIVAR_FIRST_FORGE_WAVE_SECONDS,
   IGNIVAR_FORGE_WAVE_ACTIVE_SECONDS,
-  IGNIVAR_FORGE_WAVE_DAMAGE_MAX_HP,
   IGNIVAR_FORGE_WAVE_EVERY,
   IGNIVAR_FORGE_WAVE_WINDUP_SECONDS,
+  ignivarForgeWaveDamageMaxHp,
   ignivarForgeWaveKnockback,
   ignivarForgeWaveRadius,
   ignivarPointSweptByForgeWave,
@@ -47,11 +48,11 @@ import {
   IGNIVAR_METEOR_CAST_ID,
   IGNIVAR_METEOR_COUNT_HEROIC,
   IGNIVAR_METEOR_COUNT_NORMAL,
-  IGNIVAR_METEOR_DAMAGE_MAX_HP,
   IGNIVAR_METEOR_EVERY,
   IGNIVAR_METEOR_RADIUS,
   IGNIVAR_METEOR_REVEAL_DELAY_SECONDS,
   IGNIVAR_METEOR_TELEGRAPH_SECONDS,
+  ignivarMeteorDamageMaxHp,
   ignivarMeteorPattern,
   ignivarMeteorTargetOrder,
   ignivarMeteorWarningId,
@@ -69,6 +70,7 @@ import type { SimContext } from '../sim_context';
 import {
   CAST_COMPLETE_EPS,
   DT,
+  type DungeonDifficulty,
   dist2d,
   type Entity,
   IGNIVAR_BOSS_ID,
@@ -86,6 +88,9 @@ export const IGNIVAR_APOCALYPSE_HP_THRESHOLD = 0.65;
 export const IGNIVAR_APOCALYPSE_CAST_SECONDS = 20;
 export const IGNIVAR_BRAND_TARGETS_NORMAL = 3;
 export const IGNIVAR_BRAND_EVERY = 28;
+export const IGNIVAR_BRAND_EVERY_LATE = 20;
+export const IGNIVAR_BRAND_EVERY_FINAL = 12;
+export const IGNIVAR_FINAL_FIRST_BRAND_SECONDS = 4;
 export const IGNIVAR_BRAND_TICK_SECONDS = 2;
 export const IGNIVAR_BRAND_MAX_STACKS = 3;
 export const IGNIVAR_BRAND_RADIUS = 4.5;
@@ -111,21 +116,23 @@ export const IGNIVAR_JUDGMENT_CAST_ID = 'Judgment of the Forge';
 export const IGNIVAR_SKYFIRE_CAST_ID = 'Rain of Cinders';
 export const IGNIVAR_SKYFIRE_CAST_SECONDS = 3;
 export const IGNIVAR_SKYFIRE_EVERY = 20;
-export const IGNIVAR_SKYFIRE_DAMAGE_MAX_HP = 0.45;
+export const IGNIVAR_SKYFIRE_DAMAGE_MAX_HP = 0.6;
+export const IGNIVAR_SKYFIRE_DAMAGE_MAX_HP_HEROIC = 0.9;
 export const IGNIVAR_SKYFIRE_RANGE = 30;
 export const IGNIVAR_SKYFIRE_HALF_ANGLE = Math.PI / 10;
 export const IGNIVAR_SKYFIRE_CONE_COUNT = 3;
 export const IGNIVAR_ROTATING_RAYS_CAST_ID = 'Revolving Inferno';
 export const IGNIVAR_FIRST_ROTATING_RAYS_SECONDS = 30;
-export const IGNIVAR_ROTATING_RAYS_EVERY = 36;
+export const IGNIVAR_ROTATING_RAYS_EVERY = 44;
 export const IGNIVAR_ROTATING_RAYS_WINDUP_SECONDS = 2;
 export const IGNIVAR_ROTATING_RAYS_ACTIVE_SECONDS = 8;
 export const IGNIVAR_ROTATING_RAYS_ANGULAR_SPEED = Math.PI / 10;
 export const IGNIVAR_ROTATING_RAYS_PULSE_SECONDS = 0.5;
-export const IGNIVAR_ROTATING_RAYS_DAMAGE_MAX_HP = 0.2;
+export const IGNIVAR_ROTATING_RAYS_DAMAGE_MAX_HP = 0.3;
+export const IGNIVAR_ROTATING_RAYS_DAMAGE_MAX_HP_HEROIC = 0.5;
 export const IGNIVAR_MAJOR_ABILITY_GAP_SECONDS = 6;
 export const IGNIVAR_FINAL_METEOR_EVERY = 9;
-export const IGNIVAR_FINAL_ROTATING_RAYS_EVERY = 18;
+export const IGNIVAR_FINAL_ROTATING_RAYS_EVERY = 24;
 export const IGNIVAR_FINAL_ROTATING_RAYS_SPEED_MULTIPLIER = 1.6;
 export const IGNIVAR_FINAL_FRONTAL_EVERY = 8;
 export const IGNIVAR_FINAL_FIRST_METEOR_SECONDS = 2;
@@ -147,8 +154,32 @@ export const IGNIVAR_FIRST_SOAK_SECONDS = 24;
 const IGNIVAR_OVERLAP_PULSE_SECONDS = 1;
 const IGNIVAR_BRAND_TICK_MAX_HP = 0.05;
 const IGNIVAR_OVERLAP_MAX_HP = 0.06;
-const IGNIVAR_FRONTAL_MAX_HP = 0.3;
+const IGNIVAR_FRONTAL_MAX_HP = 0.5;
+const IGNIVAR_FRONTAL_MAX_HP_HEROIC = 0.85;
 const IGNIVAR_APOCALYPSE_SPAWN_OFFSET_Z = 9;
+
+export function ignivarFrontalDamageMaxHp(difficulty: DungeonDifficulty): number {
+  return difficulty === 'heroic' ? IGNIVAR_FRONTAL_MAX_HP_HEROIC : IGNIVAR_FRONTAL_MAX_HP;
+}
+
+export function ignivarSkyfireDamageMaxHp(difficulty: DungeonDifficulty): number {
+  return difficulty === 'heroic'
+    ? IGNIVAR_SKYFIRE_DAMAGE_MAX_HP_HEROIC
+    : IGNIVAR_SKYFIRE_DAMAGE_MAX_HP;
+}
+
+export function ignivarRotatingRaysDamageMaxHp(difficulty: DungeonDifficulty): number {
+  return difficulty === 'heroic'
+    ? IGNIVAR_ROTATING_RAYS_DAMAGE_MAX_HP_HEROIC
+    : IGNIVAR_ROTATING_RAYS_DAMAGE_MAX_HP;
+}
+
+export function ignivarBrandCadence(hpFraction: number, lastInfernoTriggered: boolean): number {
+  if (lastInfernoTriggered) return IGNIVAR_BRAND_EVERY_FINAL;
+  return hpFraction <= IGNIVAR_JUDGMENT_HP_THRESHOLD
+    ? IGNIVAR_BRAND_EVERY_LATE
+    : IGNIVAR_BRAND_EVERY;
+}
 
 function encounterInstance(ctx: SimContext, boss: Entity) {
   return ctx.instances.find((instance) => instance.mobIds.includes(boss.id)) ?? null;
@@ -220,6 +251,7 @@ function conduitEntities(ctx: SimContext, boss: Entity): Map<IgnivarConduitId, E
 function initIgnivarEncounter(boss: Entity): IgnivarEncounterState {
   if (!boss.ignivar) {
     boss.ignivar = {
+      attemptParticipantIds: [],
       brandTimer: IGNIVAR_FIRST_BRAND_SECONDS,
       forgeStrikeTimer: IGNIVAR_FIRST_FORGE_STRIKE_SECONDS,
       frontalTimer: IGNIVAR_FIRST_FRONTAL_SECONDS,
@@ -246,6 +278,7 @@ function initIgnivarEncounter(boss: Entity): IgnivarEncounterState {
       rotatingRaysDirection: 1,
       rotatingRaysNextDirection: 1,
       rotatingRaysPulseTimer: 0,
+      rotatingRaysHitCooldownByPlayerId: {},
       forgeWaveTimer: IGNIVAR_FIRST_FORGE_WAVE_SECONDS,
       forgeWaveWindupRemaining: 0,
       forgeWaveActiveRemaining: 0,
@@ -484,6 +517,7 @@ function startForgeJudgment(
   st.rotatingRaysWindupRemaining = 0;
   st.rotatingRaysActiveRemaining = 0;
   st.rotatingRaysPulseTimer = 0;
+  st.rotatingRaysHitCooldownByPlayerId = {};
   boss.facing = ignivarForgeLayoutFacing(layoutSlot, st.forgeJudgmentSafeIndex);
   boss.castingAbility = IGNIVAR_JUDGMENT_CAST_ID;
   boss.castTotal = IGNIVAR_JUDGMENT_DURATION_SECONDS;
@@ -521,6 +555,7 @@ function activateForgeJudgment(
   st.forgeJudgmentPulseTimer = 0;
   st.rotatingRaysActiveRemaining = 0;
   st.rotatingRaysPulseTimer = 0;
+  st.rotatingRaysHitCooldownByPlayerId = {};
   boss.channeling = true;
 }
 
@@ -545,7 +580,7 @@ function finishForgeJudgment(
   st.forgeJudgmentRemaining = 0;
   st.forgeJudgmentPulseTimer = 0;
   st.rotatingRaysActiveRemaining = 0;
-  st.brandTimer = Math.max(st.brandTimer, 10);
+  st.brandTimer = Math.min(st.brandTimer, 8);
   st.frontalTimer = Math.max(st.frontalTimer, 4);
   st.skyfireTimer = Math.max(st.skyfireTimer, 7);
   st.meteorTimer = Math.max(st.meteorTimer, 7);
@@ -632,7 +667,7 @@ function updateForgeJudgment(
       ctx.dealDamage(
         boss,
         player,
-        Math.ceil(player.maxHp * IGNIVAR_JUDGMENT_BURN_DAMAGE_MAX_HP),
+        Math.ceil(player.maxHp * ignivarJudgmentBurnDamageMaxHp(heroic ? 'heroic' : 'normal')),
         false,
         'fire',
         IGNIVAR_JUDGMENT_CAST_ID,
@@ -858,13 +893,14 @@ function resolveMeteorImpacts(
   boss: Entity,
   st: IgnivarEncounterState,
   players: readonly Entity[],
+  heroic: boolean,
 ): void {
   for (const player of players) {
     if (!st.meteorPoints.some((meteor) => pointInIgnivarMeteor(meteor, player.pos))) continue;
     ctx.dealDamage(
       boss,
       player,
-      Math.ceil(player.maxHp * IGNIVAR_METEOR_DAMAGE_MAX_HP),
+      Math.ceil(player.maxHp * ignivarMeteorDamageMaxHp(heroic ? 'heroic' : 'normal')),
       false,
       'fire',
       IGNIVAR_METEOR_CAST_ID,
@@ -904,7 +940,7 @@ function updateMeteorRain(
   if (st.meteorImpactRemaining > 0) {
     st.meteorImpactRemaining = Math.max(0, st.meteorImpactRemaining - DT);
     if (st.meteorImpactRemaining <= CAST_COMPLETE_EPS) {
-      resolveMeteorImpacts(ctx, boss, st, players);
+      resolveMeteorImpacts(ctx, boss, st, players, heroic);
     }
   }
   if (st.meteorTimer <= CAST_COMPLETE_EPS && st.meteorPoints.length === 0) {
@@ -954,6 +990,7 @@ function startRotatingRays(boss: Entity, target: Entity, st: IgnivarEncounterSta
   st.rotatingRaysWindupRemaining = IGNIVAR_ROTATING_RAYS_WINDUP_SECONDS;
   st.rotatingRaysActiveRemaining = IGNIVAR_ROTATING_RAYS_ACTIVE_SECONDS;
   st.rotatingRaysPulseTimer = 0;
+  st.rotatingRaysHitCooldownByPlayerId = {};
   st.rotatingRaysTimer = st.lastInfernoTriggered
     ? IGNIVAR_FINAL_ROTATING_RAYS_EVERY
     : IGNIVAR_ROTATING_RAYS_EVERY;
@@ -972,12 +1009,21 @@ function damagePlayersInRotatingRays(
   st: IgnivarEncounterState,
   players: readonly Entity[],
 ): void {
+  const difficulty = encounterInstance(ctx, boss)?.difficulty ?? 'normal';
+  if (!st.rotatingRaysHitCooldownByPlayerId) st.rotatingRaysHitCooldownByPlayerId = {};
+  const hitCooldowns = st.rotatingRaysHitCooldownByPlayerId;
   for (const player of players) {
+    const hitCooldown = Math.max(0, (hitCooldowns[player.id] ?? 0) - DT);
+    if (hitCooldown > CAST_COMPLETE_EPS) {
+      hitCooldowns[player.id] = hitCooldown;
+      continue;
+    }
+    delete hitCooldowns[player.id];
     if (!ignivarPointInRotatingRay(boss.pos, st.rotatingRaysFacing, player.pos)) continue;
     ctx.dealDamage(
       boss,
       player,
-      Math.ceil(player.maxHp * IGNIVAR_ROTATING_RAYS_DAMAGE_MAX_HP),
+      Math.ceil(player.maxHp * ignivarRotatingRaysDamageMaxHp(difficulty)),
       false,
       'fire',
       IGNIVAR_ROTATING_RAYS_CAST_ID,
@@ -988,6 +1034,7 @@ function damagePlayersInRotatingRays(
       false,
       true,
     );
+    hitCooldowns[player.id] = IGNIVAR_ROTATING_RAYS_PULSE_SECONDS;
   }
 }
 
@@ -1087,7 +1134,7 @@ function updateForgeWave(
     ctx.dealDamage(
       boss,
       player,
-      Math.ceil(player.maxHp * IGNIVAR_FORGE_WAVE_DAMAGE_MAX_HP),
+      Math.ceil(player.maxHp * ignivarForgeWaveDamageMaxHp(difficulty)),
       false,
       'fire',
       IGNIVAR_FORGE_WAVE_CAST_ID,
@@ -1134,9 +1181,9 @@ function updateRotatingRays(
   boss.castRemaining = st.rotatingRaysActiveRemaining;
   st.rotatingRaysPulseTimer = Math.max(0, st.rotatingRaysPulseTimer - DT);
   if (st.rotatingRaysPulseTimer <= CAST_COMPLETE_EPS) {
-    damagePlayersInRotatingRays(ctx, boss, st, players);
     st.rotatingRaysPulseTimer = IGNIVAR_ROTATING_RAYS_PULSE_SECONDS;
   }
+  damagePlayersInRotatingRays(ctx, boss, st, players);
   if (st.rotatingRaysActiveRemaining <= CAST_COMPLETE_EPS) {
     st.rotatingRaysActiveRemaining = 0;
     boss.facing = st.rotatingRaysBossFacing;
@@ -1167,7 +1214,10 @@ function releaseSkyfire(
     ctx.dealDamage(
       boss,
       player,
-      Math.ceil(player.maxHp * IGNIVAR_SKYFIRE_DAMAGE_MAX_HP),
+      Math.ceil(
+        player.maxHp *
+          ignivarSkyfireDamageMaxHp(encounterInstance(ctx, boss)?.difficulty ?? 'normal'),
+      ),
       false,
       'fire',
       IGNIVAR_SKYFIRE_CAST_ID,
@@ -1213,6 +1263,7 @@ function updateLastInferno(
     if (st.soakTargetId !== null || ignivarMajorAbilityActive(st)) return false;
     st.lastInfernoTriggered = true;
     st.lastInfernoRemaining = IGNIVAR_LAST_INFERNO_SECONDS;
+    st.brandTimer = IGNIVAR_FINAL_FIRST_BRAND_SECONDS;
     st.finalFrontalTimer = IGNIVAR_FINAL_FIRST_FRONTAL_SECONDS;
     st.finalNextFrontal = 'searing';
     st.meteorTimer = Math.min(st.meteorTimer, IGNIVAR_FINAL_FIRST_METEOR_SECONDS);
@@ -1425,7 +1476,10 @@ function releaseFrontal(
     ctx.dealDamage(
       boss,
       player,
-      Math.ceil(player.maxHp * IGNIVAR_FRONTAL_MAX_HP),
+      Math.ceil(
+        player.maxHp *
+          ignivarFrontalDamageMaxHp(encounterInstance(ctx, boss)?.difficulty ?? 'normal'),
+      ),
       false,
       'fire',
       'Searing Torrent',
@@ -1516,11 +1570,20 @@ export function updateIgnivarEncounter(ctx: SimContext, boss: Entity, pursueTarg
   if (players.length === 0) {
     boss.aiState = 'evade';
     if (boss.combatExitHoldUntil > ctx.time) return;
+    for (const playerId of boss.ignivar?.attemptParticipantIds ?? []) {
+      const player = ctx.entities.get(playerId);
+      const meta = ctx.players.get(playerId);
+      if (player?.kind === 'player' && meta) resetLongCooldownsForRaidWipe(player, meta.known);
+    }
     resetIgnivarEncounter(ctx, boss);
     ctx.resetEvadingMob(boss);
     return;
   }
   const st = initIgnivarEncounter(boss);
+  for (const player of players) {
+    if (!st.attemptParticipantIds?.includes(player.id)) st.attemptParticipantIds?.push(player.id);
+  }
+  st.attemptParticipantIds?.sort((a, b) => a - b);
   // Shared Pyre now belongs to Varkhul. Clear an in-flight legacy mark from an
   // older snapshot instead of letting it block Ignivar's remaining phases.
   clearLegacySharedPyreState(ctx, boss, st);
@@ -1600,22 +1663,22 @@ export function updateIgnivarEncounter(ctx: SimContext, boss: Entity, pursueTarg
 
   if (sharedPyreBusy) return;
 
+  st.brandTimer -= DT;
+  if (st.brandTimer <= CAST_COMPLETE_EPS) {
+    castBrandOfThePyre(ctx, boss, players);
+    st.brandTimer = ignivarBrandCadence(boss.hp / Math.max(1, boss.maxHp), st.lastInfernoTriggered);
+  }
+
+  st.overlapTimer -= DT;
+  if (st.overlapTimer <= 0) {
+    updateBrandOverlap(ctx, boss, players);
+    st.overlapTimer = IGNIVAR_OVERLAP_PULSE_SECONDS;
+    players = playersInEncounter(ctx, boss);
+    target = resolveLivingTarget(boss, players);
+    if (!target) return;
+  }
+
   if (!finalPhase) {
-    st.brandTimer -= DT;
-    if (st.brandTimer <= 0) {
-      castBrandOfThePyre(ctx, boss, players);
-      st.brandTimer = IGNIVAR_BRAND_EVERY;
-    }
-
-    st.overlapTimer -= DT;
-    if (st.overlapTimer <= 0) {
-      updateBrandOverlap(ctx, boss, players);
-      st.overlapTimer = IGNIVAR_OVERLAP_PULSE_SECONDS;
-      players = playersInEncounter(ctx, boss);
-      target = resolveLivingTarget(boss, players);
-      if (!target) return;
-    }
-
     st.forgeStrikeTimer -= DT;
     if (st.forgeStrikeTimer <= 0 && castForgeStrike(ctx, boss, target)) {
       st.forgeStrikeTimer = IGNIVAR_FORGE_STRIKE_EVERY;

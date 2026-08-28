@@ -39,9 +39,9 @@ describe('Ignivar and Varkhul raid health bands', () => {
 
   it('scales Heroic automata after compensating for their level 20 to 22 jump', () => {
     const rows = [
-      [IGNIVAR_EMBER_SENTINEL_ID, 2_760, 3_312],
-      [IGNIVAR_CRUCIBLE_WARDEN_ID, 3_208, 4_011],
-      [IGNIVAR_CINDER_ARTIFICER_ID, 4_991, 6_488],
+      [IGNIVAR_EMBER_SENTINEL_ID, 2_760, 5_980],
+      [IGNIVAR_CRUCIBLE_WARDEN_ID, 3_208, 6_923],
+      [IGNIVAR_CINDER_ARTIFICER_ID, 4_991, 11_790],
     ] as const;
     for (const [templateId, normalHp, heroicHp] of rows) {
       expect(spawned(templateId, 'ignivar_inner_crucible', 'normal').maxHp).toBe(normalHp);
@@ -49,7 +49,7 @@ describe('Ignivar and Varkhul raid health bands', () => {
     }
   });
 
-  it('raises Heroic tank and add melee without multiplying support damage wildly', () => {
+  it('raises trash melee on Normal and again on Heroic', () => {
     const normalBoss = spawned(VARKHUL_BOSS_ID, 'ignivar_inner_crucible', 'normal');
     const heroicBoss = spawned(VARKHUL_BOSS_ID, 'ignivar_inner_crucible', 'heroic');
     const normalSentinel = spawned(IGNIVAR_EMBER_SENTINEL_ID, 'ignivar_inner_crucible', 'normal');
@@ -58,19 +58,19 @@ describe('Ignivar and Varkhul raid health bands', () => {
     const heroicWarden = spawned(IGNIVAR_CRUCIBLE_WARDEN_ID, 'ignivar_inner_crucible', 'heroic');
     expect(heroicBoss.weapon).toEqual({ min: 407, max: 637, speed: 2.6 });
     expect(normalBoss.weapon).toEqual({ min: 302, max: 472, speed: 2.6 });
-    expect(heroicSentinel.weapon).toEqual({ min: 153, max: 239, speed: 2.4 });
-    expect(normalSentinel.weapon).toEqual({ min: 122, max: 191, speed: 2.4 });
-    expect(heroicWarden.weapon).toEqual({ min: 138, max: 216, speed: 2.8 });
-    expect(normalWarden.weapon).toEqual({ min: 111, max: 173, speed: 2.8 });
+    expect(heroicSentinel.weapon).toEqual({ min: 264, max: 413, speed: 2.4 });
+    expect(normalSentinel.weapon).toEqual({ min: 183, max: 286, speed: 2.4 });
+    expect(heroicWarden.weapon).toEqual({ min: 240, max: 374, speed: 2.8 });
+    expect(normalWarden.weapon).toEqual({ min: 166, max: 259, speed: 2.8 });
   });
 
-  it('raises the Heroic Sentinel sweep and burn by twenty-five percent', () => {
+  it('raises the Sentinel sweep on Normal and doubles sweep and burn on Heroic', () => {
     const normal = spawned(IGNIVAR_EMBER_SENTINEL_ID, 'ignivar_inner_crucible', 'normal');
     const heroic = spawned(IGNIVAR_EMBER_SENTINEL_ID, 'ignivar_inner_crucible', 'heroic');
     applyDungeonMobTuning(normal, 'ignivar_inner_crucible', 'normal');
     applyDungeonMobTuning(heroic, 'ignivar_inner_crucible', 'heroic');
-    expect(normal.mechanicDamageMult).toBeUndefined();
-    expect(heroic.mechanicDamageMult).toBe(1.25);
+    expect(normal.mechanicDamageMult).toBe(1.5);
+    expect(heroic.mechanicDamageMult).toBe(2);
     const burn = DUNGEON_MOBS[IGNIVAR_EMBER_SENTINEL_ID].arcCleave?.burn;
     if (!burn) throw new Error('Ember Sentinel burn missing');
     const normalSim = new Sim({ seed: 801, playerClass: 'warrior' });
@@ -80,7 +80,7 @@ describe('Ignivar and Varkhul raid health bands', () => {
     applyBroodBurn(heroicSim.ctx, heroic, heroicSim.player, burn);
 
     expect(normalSim.player.auras.find((aura) => aura.name === burn.name)?.value).toBe(7);
-    expect(heroicSim.player.auras.find((aura) => aura.name === burn.name)?.value).toBe(9);
+    expect(heroicSim.player.auras.find((aura) => aura.name === burn.name)?.value).toBe(14);
   });
 
   it('keeps the placement multiplier on top of Molten Assembly Heroic Warden tuning', () => {
@@ -97,11 +97,11 @@ describe('Ignivar and Varkhul raid health bands', () => {
     });
     const minibosses = mobs.filter((mob) => mob.dungeonSpawnMiniboss);
     expect(minibosses).toHaveLength(2);
-    expect(minibosses.every((mob) => mob.level === 22 && mob.maxHp === 9_426)).toBe(true);
+    expect(minibosses.every((mob) => mob.level === 22 && mob.maxHp === 16_269)).toBe(true);
     expect(
       mobs
         .filter((mob) => mob.templateId === IGNIVAR_EMBER_SENTINEL_ID)
-        .every((mob) => mob.level === 22 && mob.maxHp === 3_312),
+        .every((mob) => mob.level === 22 && mob.maxHp === 5_980),
     ).toBe(true);
   });
 });

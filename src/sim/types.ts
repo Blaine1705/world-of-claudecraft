@@ -5084,6 +5084,8 @@ export interface NythraxisEncounterState {
 }
 
 export interface IgnivarEncounterState {
+  /** Players seen alive in this pull, used only for wipe cooldown recovery. */
+  attemptParticipantIds?: number[];
   brandTimer: number;
   forgeStrikeTimer: number;
   frontalTimer: number;
@@ -5110,6 +5112,7 @@ export interface IgnivarEncounterState {
   rotatingRaysDirection: -1 | 1;
   rotatingRaysNextDirection: -1 | 1;
   rotatingRaysPulseTimer: number;
+  rotatingRaysHitCooldownByPlayerId?: Record<number, number>;
   forgeWaveTimer: number;
   forgeWaveWindupRemaining: number;
   forgeWaveActiveRemaining: number;
@@ -5138,6 +5141,8 @@ export interface IgnivarEncounterState {
 }
 
 export interface VarkhulEncounterState {
+  /** Players seen alive in this pull, used only for wipe cooldown recovery. */
+  attemptParticipantIds?: number[];
   engage: VarkhulEngageState;
   makersBrandTimer: number;
   frontalTimer: number;

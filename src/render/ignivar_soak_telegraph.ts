@@ -17,6 +17,7 @@ export const IGNIVAR_SOAK_TIMER_NAME = 'ignivarSoakTimer';
 export const IGNIVAR_SOAK_FLAME_NAME = 'ignivarSoakCallInFlame';
 export const IGNIVAR_SOAK_READY_NAME = 'ignivarSoakReadyRune';
 export const IGNIVAR_SOAK_BEACON_NAME = 'ignivarSoakCallInBeacon';
+export const IGNIVAR_SOAK_BEACON_CROWN_NAME = 'ignivarSoakCallInBeaconCrown';
 
 const OCCUPIED_COLOR = new THREE.Color(0xffd36a);
 const EMPTY_COLOR = new THREE.Color(0x58210c);
@@ -29,6 +30,7 @@ function material(color: number, opacity: number): THREE.MeshBasicMaterial {
     depthWrite: false,
     blending: THREE.AdditiveBlending,
     side: THREE.DoubleSide,
+    toneMapped: false,
   });
 }
 
@@ -209,15 +211,20 @@ function callInBeacon(): THREE.Group {
   const beacon = new THREE.Group();
   beacon.name = IGNIVAR_SOAK_BEACON_NAME;
   const outer = new THREE.Mesh(
-    new THREE.ConeGeometry(0.5, 4.2, 8, 1, true),
-    material(0xff750d, 0.22),
+    new THREE.ConeGeometry(0.72, 7.2, 10, 1, true),
+    material(0xff750d, 0.42),
   );
-  outer.position.y = 2.15;
+  outer.position.y = 3.65;
   const core = new THREE.Mesh(
-    new THREE.ConeGeometry(0.16, 3.35, 8, 1, true),
-    material(0xfff0a3, 0.62),
+    new THREE.ConeGeometry(0.22, 6.2, 10, 1, true),
+    material(0xfff0a3, 0.86),
   );
-  core.position.y = 1.88;
+  core.position.y = 3.35;
+  const crown = new THREE.Mesh(new THREE.TorusGeometry(1.08, 0.11, 8, 32), material(0xffe9a1, 0.9));
+  crown.name = IGNIVAR_SOAK_BEACON_CROWN_NAME;
+  crown.position.y = 6.55;
+  crown.rotation.x = Math.PI / 2;
+  crown.renderOrder = 10;
   const emberCount = 22;
   const emberPositions = new Float32Array(emberCount * 3);
   for (let index = 0; index < emberCount; index++) {
@@ -239,12 +246,14 @@ function callInBeacon(): THREE.Group {
       blending: THREE.AdditiveBlending,
       depthWrite: false,
       sizeAttenuation: true,
+      toneMapped: false,
     }),
   );
-  beacon.add(outer, core, embers);
+  beacon.add(outer, core, crown, embers);
   beacon.userData.outer = outer;
   beacon.userData.core = core;
   beacon.userData.embers = embers;
+  beacon.userData.crown = crown;
   beacon.renderOrder = 9;
   return beacon;
 }
@@ -361,8 +370,10 @@ export function syncIgnivarSoakTelegraph(
     const outer = beacon.userData.outer as THREE.Mesh | undefined;
     const core = beacon.userData.core as THREE.Mesh | undefined;
     const embers = beacon.userData.embers as THREE.Points | undefined;
-    if (outer) (outer.material as THREE.Material).opacity = 0.18 + Math.sin(motionTime * 6) * 0.04;
-    if (core) (core.material as THREE.Material).opacity = 0.54 + Math.sin(motionTime * 8) * 0.1;
+    const crown = beacon.userData.crown as THREE.Mesh | undefined;
+    if (outer) (outer.material as THREE.Material).opacity = 0.4 + Math.sin(motionTime * 6) * 0.04;
+    if (core) (core.material as THREE.Material).opacity = 0.86 + Math.sin(motionTime * 8) * 0.08;
+    if (crown) (crown.material as THREE.Material).opacity = 0.88 + Math.sin(motionTime * 5) * 0.06;
     if (embers) embers.rotation.y = motionTime * 1.7;
   }
   if (ready) {

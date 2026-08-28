@@ -9,12 +9,19 @@ import {
   IGNIVAR_MOLTEN_ASSEMBLY_ID,
 } from '../ignivar_raid_ids';
 import type { SimContext } from '../sim_context';
-import { CAST_COMPLETE_EPS, DT, dist2d, type Entity } from '../types';
+import { CAST_COMPLETE_EPS, DT, type DungeonDifficulty, dist2d, type Entity } from '../types';
 
 export const IGNIVAR_CINDER_LANCE_CAST_ID = 'Cinder Lance';
 export const IGNIVAR_CINDER_LANCE_CAST_SECONDS = 2;
 export const IGNIVAR_CINDER_LANCE_RADIUS = 4;
-export const IGNIVAR_CINDER_LANCE_DAMAGE_MAX_HP = 0.14;
+export const IGNIVAR_CINDER_LANCE_DAMAGE_MAX_HP = 0.3;
+export const IGNIVAR_CINDER_LANCE_DAMAGE_MAX_HP_HEROIC = 0.55;
+
+export function ignivarCinderLanceDamageMaxHp(difficulty: DungeonDifficulty): number {
+  return difficulty === 'heroic'
+    ? IGNIVAR_CINDER_LANCE_DAMAGE_MAX_HP_HEROIC
+    : IGNIVAR_CINDER_LANCE_DAMAGE_MAX_HP;
+}
 
 const CINDER_LANCE_FIRST_SECONDS = 5;
 const CINDER_LANCE_REPEAT_SECONDS = 11;
@@ -159,7 +166,7 @@ function resolveCinderLance(ctx: SimContext, mob: Entity): void {
     ctx.dealDamage(
       mob,
       player,
-      Math.ceil(player.maxHp * IGNIVAR_CINDER_LANCE_DAMAGE_MAX_HP * (mob.mechanicDamageMult ?? 1)),
+      Math.ceil(player.maxHp * ignivarCinderLanceDamageMaxHp(instance.difficulty)),
       false,
       'fire',
       IGNIVAR_CINDER_LANCE_CAST_ID,

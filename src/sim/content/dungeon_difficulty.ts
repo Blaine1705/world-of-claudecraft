@@ -41,6 +41,10 @@ export interface HeroicDungeonTuning {
   // from melee after the level-22 transform.
   mechanicDamageMultiplierByMob?: Record<string, number>;
   burnDamageMultiplierByMob?: Record<string, number>;
+  // Optional per-mob multiplier for hostile petSpell casters. Their ranged
+  // nuke is read from the base template at fire time, so dmgBase/dmgPerLevel
+  // cannot tune it. The Normal table uses the same fire-time seam.
+  rangedDamageMultiplierByMob?: Record<string, number>;
   // Per-mob HEALTH override (same shape as the damage map): a mob listed here
   // takes this factor instead of the dungeon-wide healthMultiplier. Added for
   // the 2026-07-24 heroic Nythraxis nerf (skeleton waves at 1.2x their
@@ -144,6 +148,26 @@ export interface NormalDungeonTuning {
 // both of which pass this seam. Pinned by
 // tests/heroic_difficulty_floors.test.ts.
 export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
+  ignivar_inner_crucible: {
+    id: 'ignivar_inner_crucible',
+    difficulty: 'normal',
+    healthMultiplier: 1,
+    damageMultiplierByMob: {
+      derelict_mech: 1.5,
+      ignivar_ember_sentinel: 1.5,
+      ignivar_crucible_warden: 1.5,
+      ignivar_cinder_artificer: 1.25,
+    },
+    mechanicDamageMultiplierByMob: {
+      derelict_mech: 1.25,
+      ignivar_ember_sentinel: 1.5,
+      ignivar_crucible_warden: 2,
+      ignivar_cinder_artificer: 1.25,
+    },
+    rangedDamageMultiplierByMob: {
+      ignivar_cinder_artificer: 1.25,
+    },
+  },
   gravewyrm_sanctum: {
     id: 'gravewyrm_sanctum',
     difficulty: 'normal',
@@ -372,26 +396,32 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     difficulty: 'heroic',
     level: 22,
     healthMultiplier: 5 / 3,
-    // Boss: 120k -> 200k. Add overrides pin the requested per-role Heroic
-    // progression after the shared level transform: Sentinel +20%, Warden
-    // +25%, Artificer +30%.
+    // Keep Varkhul on the established 200k Heroic boss curve while making
+    // every trash family significantly sturdier than its Normal counterpart.
     healthMultiplierByMob: {
-      ignivar_ember_sentinel: (1200 * 1.2) / 1300,
-      ignivar_crucible_warden: (1395 * 1.25) / 1505,
-      ignivar_cinder_artificer: (2170 * 1.3) / 2330,
+      ignivar_ember_sentinel: 2,
+      ignivar_crucible_warden: 2,
+      ignivar_cinder_artificer: 2.2,
     },
     damageMultiplier: (251.5 * 1.35) / 272.5,
     addDamageMultiplier: 1,
     damageMultiplierByMob: {
-      ignivar_ember_sentinel: (101.8 * 1.25) / 110.2,
-      ignivar_crucible_warden: (92.2 * 1.25) / 99.8,
-      ignivar_cinder_artificer: 1,
+      derelict_mech: 2,
+      ignivar_ember_sentinel: 2,
+      ignivar_crucible_warden: 2,
+      ignivar_cinder_artificer: 1.5,
     },
     mechanicDamageMultiplierByMob: {
-      ignivar_ember_sentinel: 1.25,
+      derelict_mech: 1.75,
+      ignivar_ember_sentinel: 2,
+      ignivar_crucible_warden: 4,
+      ignivar_cinder_artificer: 1.5,
+    },
+    rangedDamageMultiplierByMob: {
+      ignivar_cinder_artificer: 1.5,
     },
     burnDamageMultiplierByMob: {
-      ignivar_ember_sentinel: 1.25,
+      ignivar_ember_sentinel: 2,
     },
     armorMultiplier: 1.2,
     finalBossId: 'varkhul_forgefather_of_the_last_flame',

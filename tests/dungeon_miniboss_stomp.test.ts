@@ -9,10 +9,11 @@ import {
   DUNGEON_MINIBOSS_STOMP_REPEAT_SECONDS,
 } from '../src/sim/mob/dungeon_miniboss_stomp';
 import { Sim } from '../src/sim/sim';
-import { DT, type Entity } from '../src/sim/types';
+import { DT, type DungeonDifficulty, type Entity } from '../src/sim/types';
 
-function claimedApproach() {
+function claimedApproach(difficulty: DungeonDifficulty = 'normal') {
   const sim = new Sim({ seed: 9821, playerClass: 'warrior', devCommands: true });
+  sim.setDungeonDifficulty(difficulty, sim.player.id);
   expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, sim.player.id, true)).toBe(true);
   const instance = sim.instances.find(
     (candidate) => candidate.dungeonId === IGNIVAR_FORGE_APPROACH_ID && candidate.partyKey !== null,
@@ -43,7 +44,7 @@ describe('promoted dungeon Warden Stomp', () => {
   it('pins the instant body-attack identity and cadence', () => {
     expect(DUNGEON_MINIBOSS_STOMP_ABILITY_ID).toBe('Crucible Stomp');
     expect(DUNGEON_MINIBOSS_STOMP_RADIUS).toBe(9);
-    expect(DUNGEON_MINIBOSS_STOMP_DAMAGE_MAX_HP).toBe(0.18);
+    expect(DUNGEON_MINIBOSS_STOMP_DAMAGE_MAX_HP).toBe(0.4);
     expect(DUNGEON_MINIBOSS_STOMP_FIRST_SECONDS).toBe(6);
     expect(DUNGEON_MINIBOSS_STOMP_REPEAT_SECONDS).toBe(12);
   });
@@ -103,6 +104,20 @@ describe('promoted dungeon Warden Stomp', () => {
 
     expect(boundary.hp).toBeLessThan(boundaryHp);
     expect(outside.hp).toBe(outsideHp);
+  });
+
+  it('routes Heroic Stomp damage through the live promoted placement', () => {
+    const { sim, mobs } = claimedApproach('heroic');
+    const promoted = mobs.find((mob) => mob.dungeonSpawnMiniboss);
+    if (!promoted) throw new Error('Heroic promoted Warden did not spawn');
+    engage(sim, promoted);
+    sim.player.maxHp = 1_000;
+    sim.player.hp = 1_000;
+    promoted.stompTimer = DT;
+
+    sim.tick();
+
+    expect(sim.player.hp).toBe(300);
   });
 
   it('leaves an ordinary Warden on its interruptible Crucible Quake template cadence', () => {

@@ -3,6 +3,7 @@
 // and GroundAoE snapshots.
 
 import { isLockedOut, isSilenced } from '../combat/cc';
+import { resetLongCooldownsForRaidWipe } from '../combat/raid_wipe_cooldowns';
 import { MOBS } from '../data';
 import { createMob } from '../entity';
 import {
@@ -70,10 +71,8 @@ import {
   varkhulCinderRepairTickAmount,
 } from '../varkhul_cinder_artificer';
 import {
-  VARKHUL_CINDER_FIRE_DAMAGE_MAX_HP,
   VARKHUL_CINDER_FIRE_RADIUS,
   VARKHUL_CINDER_FIRE_TICK_SECONDS,
-  VARKHUL_CINDER_ORB_DAMAGE_MAX_HP,
   VARKHUL_CINDER_ORB_DURATION,
   VARKHUL_CINDER_ORB_HIT_RADIUS,
   VARKHUL_CINDER_ORB_PROJECTILES_PER_TARGET,
@@ -85,7 +84,9 @@ import {
   VARKHUL_RED_HOT_METAL_HEAL_ABSORB_MAX_HP,
   VARKHUL_RED_HOT_METAL_TICK_SECONDS,
   varkhulCinderFireCanSpawn,
+  varkhulCinderFireDamageMaxHp,
   varkhulCinderFireId,
+  varkhulCinderOrbDamageMaxHp,
   varkhulCinderOrbProjectileId,
 } from '../varkhul_cinder_orbs';
 import {
@@ -241,7 +242,15 @@ export {
 export const VARKHUL_FORGESTORM_CAST_ID = 'Forgestorm';
 export const VARKHUL_FORGESTORM_WAVES = 3;
 export const VARKHUL_FORGESTORM_IMPACTS_PER_WAVE = 5;
-export const VARKHUL_FORGESTORM_DAMAGE_MAX_HP = 0.3;
+export const VARKHUL_FORGESTORM_DAMAGE_MAX_HP_NORMAL = 0.5;
+export const VARKHUL_FORGESTORM_DAMAGE_MAX_HP_HEROIC = 0.8;
+export const VARKHUL_FORGESTORM_DAMAGE_MAX_HP = VARKHUL_FORGESTORM_DAMAGE_MAX_HP_NORMAL;
+
+export function varkhulForgestormDamageMaxHp(difficulty: 'normal' | 'heroic'): number {
+  return difficulty === 'heroic'
+    ? VARKHUL_FORGESTORM_DAMAGE_MAX_HP_HEROIC
+    : VARKHUL_FORGESTORM_DAMAGE_MAX_HP_NORMAL;
+}
 
 export {
   VARKHUL_ANVILS_DECREE_CAST_ID,
@@ -324,6 +333,16 @@ function playersInEncounter(ctx: SimContext, boss: Entity, includeDead = false):
   return players;
 }
 
+function recordVarkhulAttemptParticipants(
+  st: VarkhulEncounterState,
+  players: readonly Entity[],
+): void {
+  for (const player of players) {
+    if (!st.attemptParticipantIds?.includes(player.id)) st.attemptParticipantIds?.push(player.id);
+  }
+  st.attemptParticipantIds?.sort((a, b) => a - b);
+}
+
 function tankIds(ctx: SimContext, boss: Entity): Set<number> {
   const result = new Set<number>();
   if (boss.aggroTargetId !== null) result.add(boss.aggroTargetId);
@@ -366,6 +385,7 @@ export function varkhulForgestormPattern(
 function initVarkhulEncounter(boss: Entity): VarkhulEncounterState {
   if (!boss.varkhul) {
     boss.varkhul = {
+      attemptParticipantIds: [],
       engage: initVarkhulEngage(),
       makersBrandTimer: VARKHUL_MAKERS_BRAND_EVERY,
       frontalTimer: VARKHUL_FIRST_FRONTAL_SECONDS,
@@ -1000,6 +1020,7 @@ function updateCinderFires(
   st: VarkhulEncounterState,
   players: readonly Entity[],
 ): void {
+  const difficulty = encounterInstance(ctx, boss)?.difficulty ?? 'normal';
   for (const fire of st.cinderFires) {
     fire.tickTimer -= DT;
     while (fire.tickTimer <= CAST_COMPLETE_EPS) {
@@ -1020,7 +1041,7 @@ function updateCinderFires(
           ctx,
           boss,
           player,
-          VARKHUL_CINDER_FIRE_DAMAGE_MAX_HP,
+          varkhulCinderFireDamageMaxHp(difficulty),
           VARKHUL_CINDER_ORBS_CAST_ID,
         );
       }
@@ -1034,6 +1055,7 @@ function updateCinderOrbProjectiles(
   st: VarkhulEncounterState,
   players: readonly Entity[],
 ): void {
+  const difficulty = encounterInstance(ctx, boss)?.difficulty ?? 'normal';
   for (let index = st.cinderOrbProjectiles.length - 1; index >= 0; index--) {
     const projectile = st.cinderOrbProjectiles[index];
     const speed = projectile.speed ?? VARKHUL_CINDER_ORB_SPEED;
@@ -1055,7 +1077,7 @@ function updateCinderOrbProjectiles(
         ctx,
         boss,
         player,
-        projectile.damageMaxHp ?? VARKHUL_CINDER_ORB_DAMAGE_MAX_HP,
+        projectile.damageMaxHp ?? varkhulCinderOrbDamageMaxHp(difficulty),
         ability,
       );
       ctx.emit({
@@ -1132,6 +1154,7 @@ function resolveForgestormWave(
   st: VarkhulEncounterState,
   players: readonly Entity[],
 ): void {
+  const difficulty = encounterInstance(ctx, boss)?.difficulty ?? 'normal';
   for (let pointIndex = 0; pointIndex < st.forgestormPoints.length; pointIndex++) {
     const point = st.forgestormPoints[pointIndex];
     ctx.emit({
@@ -1163,7 +1186,7 @@ function resolveForgestormWave(
       ctx,
       boss,
       player,
-      VARKHUL_FORGESTORM_DAMAGE_MAX_HP,
+      varkhulForgestormDamageMaxHp(difficulty),
       VARKHUL_FORGESTORM_CAST_ID,
     );
   }
@@ -2753,11 +2776,17 @@ export function updateVarkhulEncounter(ctx: SimContext, boss: Entity, pursueTarg
     }
     boss.aiState = 'evade';
     if (boss.combatExitHoldUntil > ctx.time) return;
+    for (const playerId of boss.varkhul?.attemptParticipantIds ?? []) {
+      const player = ctx.entities.get(playerId);
+      const meta = ctx.players.get(playerId);
+      if (player?.kind === 'player' && meta) resetLongCooldownsForRaidWipe(player, meta.known);
+    }
     resetVarkhulEncounter(ctx, boss);
     ctx.resetEvadingMob(boss);
     return;
   }
   const st = initVarkhulEncounter(boss);
+  if (boss.inCombat) recordVarkhulAttemptParticipants(st, players);
   st.assemblyForgeVentedThisTick = false;
   maybeStartMasterpieceUnbound(ctx, boss, st);
   if (st.assemblyRuneDifficulty === 'heroic' && st.masterpieceTriggered) {
@@ -2801,6 +2830,7 @@ export function updateVarkhulEncounter(ctx: SimContext, boss: Entity, pursueTarg
   boss.aggroTargetId = target.id;
   boss.inCombat = true;
   boss.aiState = 'attack';
+  recordVarkhulAttemptParticipants(st, players);
 
   if (!st.assemblyTriggered && boss.hp / boss.maxHp <= VARKHUL_MASTERS_ASSEMBLY_HP_THRESHOLD) {
     startMastersAssembly(ctx, boss, st);
