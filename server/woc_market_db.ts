@@ -36,13 +36,13 @@ import type {
   WocListingResolution,
   WocListingRow,
   WocMarketDb,
-  WocOpsP2pTradeRow,
   WocSaleRow,
   WocSellerProfile,
   WocSettlementRow,
   WocStrikeRow,
   WocStuckCustodyClasses,
 } from './woc_market';
+import type { WocOpsListingRow, WocOpsListingStatus, WocOpsP2pTradeRow } from './woc_market_ops';
 import type { WocBidStatus, WocSettlementState } from './woc_market_rules';
 import {
   WOC_MARKET_ABANDON_EXEMPT_FAIL_REASONS,
@@ -1631,19 +1631,25 @@ export class PgWocMarketDb implements WocMarketDb {
    */
   async opsListings(q: {
     realm: string;
-    status: 'active' | 'ending' | 'settling' | 'closed' | 'all';
+    status: WocOpsListingStatus;
     fromMs: number;
     toMs: number;
     page: number;
     pageSize: number;
-  }): Promise<{ rows: WocListingRow[]; hasMore: boolean }> {
+  }): Promise<{ rows: WocOpsListingRow[]; hasMore: boolean }> {
     const where: string[] = ['realm = $1', 'directed_buyer_account IS NULL'];
     const params: unknown[] = [q.realm];
     params.push(new Date(q.fromMs));
     where.push(`created_at >= $${params.length}`);
     params.push(new Date(q.toMs));
     where.push(`created_at <= $${params.length}`);
-    if (q.status !== 'all') {
+    if (q.status === 'sold' || q.status === 'cancelled') {
+      // Literals, not bound lifecycle values: they align with the partial
+      // woc_market_ops_closed_created index predicate and let Postgres prove
+      // the index applies before it sees a parameter value.
+      where.push("status = 'closed'");
+      where.push(`resolution = '${q.status}'`);
+    } else if (q.status !== 'all') {
       params.push(q.status);
       where.push(`status = $${params.length}`);
     }
@@ -1654,15 +1660,34 @@ export class PgWocMarketDb implements WocMarketDb {
     // range can be far wider than a player's.
     params.push(pageSize + 1, offset);
     const res = await this.pool.query(
-      `SELECT ${LISTING_COLS}
-         FROM woc_market_listings
-        WHERE ${where.join(' AND ')}
-        ORDER BY created_at DESC, id DESC
-        LIMIT $${params.length - 1} OFFSET $${params.length}`,
+      `WITH listing_page AS MATERIALIZED (
+         SELECT ${LISTING_COLS}
+           FROM woc_market_listings
+          WHERE ${where.join(' AND ')}
+          ORDER BY created_at DESC, id DESC
+          LIMIT $${params.length - 1} OFFSET $${params.length}
+       )
+       SELECT p.*,
+              s.buyer_account AS sale_buyer_account,
+              s.buyer_name AS sale_buyer_name,
+              s.created_at AS sold_at
+         FROM listing_page p
+         LEFT JOIN woc_market_sales s
+           ON p.status = 'closed' AND p.resolution = 'sold'
+          AND s.listing_id = p.id AND s.realm = p.realm AND s.excluded = false
+        ORDER BY p.created_at DESC, p.id DESC`,
       params,
     );
     const hasMore = res.rows.length > pageSize;
-    return { rows: (hasMore ? res.rows.slice(0, pageSize) : res.rows).map(toListing), hasMore };
+    const rows = (hasMore ? res.rows.slice(0, pageSize) : res.rows).map(
+      (row): WocOpsListingRow => ({
+        ...toListing(row),
+        buyerAccount: row.sale_buyer_account ?? null,
+        buyerName: row.sale_buyer_name ?? null,
+        soldAtMs: msOrNull(row.sold_at),
+      }),
+    );
+    return { rows, hasMore };
   }
 
   /**
