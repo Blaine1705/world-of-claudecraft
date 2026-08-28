@@ -187,8 +187,11 @@ describe('battleground wave demon return reuses the entity', () => {
     expect(holdPetCorpseForBgWave(sim.ctx, pet)).toBe(false);
     kill(sim, warlockPid);
     sim.tick();
-    // The real held case, release not required: the hold serves any revive
-    // path that consumes the snapshot, a teammate resurrection included.
+    // The real held case, release not required: the wave raises only
+    // RELEASED spirits and the release press is the player's own, so gating
+    // the hold on ghost would serve only owners who release inside the 3s
+    // corpse window. (In-match player resurrection does not exist: the offer,
+    // the corpse run, and the Spirit Healer all refuse seated fighters.)
     expect(holdPetCorpseForBgWave(sim.ctx, pet)).toBe(true);
     // The snapshot must name THIS corpse.
     const meta = must(sim.ctx.players.get(warlockPid), 'warlock meta');
@@ -205,7 +208,18 @@ describe('battleground wave demon return reuses the entity', () => {
     const realOwnerId = pet.ownerId;
     pet.ownerId = -1;
     expect(holdPetCorpseForBgWave(sim.ctx, pet)).toBe(false);
+    // The unowned-corpse early return, distinct from the lookup miss above.
+    pet.ownerId = null;
+    expect(holdPetCorpseForBgWave(sim.ctx, pet)).toBe(false);
     pet.ownerId = realOwnerId;
+    // A living owner never holds. Unreachable through real revive paths today
+    // (each stands the owner and consumes the snapshot in one synchronous
+    // call, so no tick observes an alive owner with a live snapshot), pinned
+    // as defense in depth for the exported predicate.
+    const owner = must(sim.entities.get(warlockPid), 'warlock entity');
+    owner.dead = false;
+    expect(holdPetCorpseForBgWave(sim.ctx, pet)).toBe(false);
+    owner.dead = true;
     // The match must be in the 'active' state, membership alone is not enough.
     match.state = 'ended';
     expect(holdPetCorpseForBgWave(sim.ctx, pet)).toBe(false);

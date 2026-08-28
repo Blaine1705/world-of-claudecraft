@@ -26,10 +26,24 @@
 //   result hold, and the open world all decay exactly as before.
 // Within those bounds the hold has no clock of its own: an unreleased corpse
 // holds its demon until the owner is raised or the match leaves 'active'. That
-// is deliberate, not an oversight: the wave is not the only way up (a teammate
-// resurrection consumes the same snapshot and takes the same in-place arm), and
-// the demon corpse lying beside its owner's own corpse is coherent for exactly
-// as long as that owner stays down.
+// is deliberate, not an oversight, and the obvious tightening (gate the hold
+// on owner.ghost) is wrong: the wave raises only RELEASED spirits, and the
+// release press is the player's own, on their own time (no in-match
+// auto-release exists; only relog releases for you). A ghost gate would hand
+// the reuse only to owners who press Release inside the corpse's 3s window
+// and drop everyone slower straight back onto the rebuild arm this module
+// exists to remove. Inside a match the wave is also nearly the only way up:
+// player-cast resurrection, the corpse run, and the Spirit Healer all refuse
+// seated fighters (combat/resurrection_offer.ts, spirit.ts); only the
+// /unstuck revive arm also reaches reviveAt. The clockless hold is still
+// bounded in practice: BG_END_HOLD (15s) dwarfs the 3s corpse window, so a
+// fighter who never releases always unravels during the result screen and
+// the match-end path sees the pre-hold shape; the paths that can reach
+// restoreMatchPet with the corpse still standing (the deserter arm and the
+// immediate forfeit teardown) both land on the revive-in-place arm hunter
+// beasts already take there.
+// The demon corpse lying beside its owner's own corpse is coherent for
+// exactly as long as that owner stays down.
 //
 // The caller FREEZES corpseTimer rather than gating only the unravel: the wire
 // mirrors corpse decay as a flag keyed on corpseTimer (server/game.ts `cd`,
@@ -41,6 +55,7 @@
 // Math.random/Date.now, and no draw sites (a read-only predicate).
 
 import type { SimContext } from '../sim_context';
+import { bgActiveSeatedFighter } from '../social/battleground';
 import type { Entity } from '../types';
 
 /**
@@ -56,14 +71,10 @@ export function holdPetCorpseForBgWave(ctx: SimContext, pet: Entity): boolean {
   if (owner?.kind !== 'player' || !owner.dead) return false;
   const snap = ctx.players.get(owner.id)?.deathPet;
   if (!snap || snap.petId !== pet.id || snap.unravelled) return false;
-  // Allocation-free on purpose: this runs per tick for every held corpse AND
-  // for the whole 3s decay window of an open-world warlock death, so the
-  // general bgActiveMatchForFighter helper is out (it spreads both teams into
-  // a fresh array per call and walks every match on its miss path). The
-  // per-pid index is authoritative for a seated fighter and these reads
-  // allocate nothing; a stale index entry simply fails the hold and the
-  // corpse decays exactly as before the hold existed.
-  const match = ctx.bgMatches.get(owner.id);
-  if (match?.state !== 'active') return false;
-  return match.teams[0].includes(owner.id) || match.teams[1].includes(owner.id);
+  // This runs per tick for every held corpse AND for the whole 3s decay
+  // window of an open-world warlock death, so the seated fast path (which
+  // allocates nothing) is used over the general bgActiveMatchForFighter
+  // helper; a stale index entry simply fails the hold and the corpse decays
+  // exactly as before the hold existed.
+  return bgActiveSeatedFighter(ctx, owner.id);
 }
