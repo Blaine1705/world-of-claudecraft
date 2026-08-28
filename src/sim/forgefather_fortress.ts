@@ -217,6 +217,10 @@ export function forgefatherFortressColliders(seed: number): Collider[] {
     if (IGNIVAR_NON_COLLIDING_PROPS.has(placement.key)) continue;
     const ground = terrainHeight(placement.x, placement.z, seed);
     if (placement.y > ground + GROUND_STAND_TOLERANCE) continue;
+    // Fully interred pieces (the summit foundation shaft) never collide: a
+    // full-height OBB has no top, so a buried mass would otherwise blanket
+    // the walkable ground above it.
+    if (placement.y + native.hei * placement.scale < ground + 0.5) continue;
     colliders.push({
       type: 'obb',
       x: placement.x,

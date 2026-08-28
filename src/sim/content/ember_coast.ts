@@ -106,15 +106,92 @@ export const FORGEFATHER_ISLE_TERRAIN_EDITS: HeightStamp[] = [
   { x: 508, z: 2219, radius: 9, delta: 6.3, falloff: 'flat', mode: 'level' },
   { x: 504.3, z: 2241.2, radius: 8, delta: 14.7, falloff: 'smooth', mode: 'level' }, // upper landing
   { x: 504.3, z: 2241.2, radius: 5, delta: 14.7, falloff: 'flat', mode: 'level' },
-  // ...and the stair ramps: each placed staircase dresses a real terrain
-  // ramp (stairs are walk-over props, never colliders), so the climb is
-  // the ground itself. Two risers per flight, blending into the courts.
-  { x: 507.8, z: 2206, radius: 4, delta: 3.2, falloff: 'smooth', mode: 'level' }, // bailey to court
-  { x: 507.8, z: 2209.5, radius: 4, delta: 4.9, falloff: 'smooth', mode: 'level' },
-  { x: 504.1, z: 2220, radius: 4, delta: 7.6, falloff: 'smooth', mode: 'level' }, // court to tier three
-  { x: 504.1, z: 2223.5, radius: 4, delta: 9.4, falloff: 'smooth', mode: 'level' },
-  { x: 503.35, z: 2233, radius: 3.5, delta: 12.2, falloff: 'smooth', mode: 'level' }, // tier three up
-  { x: 503.35, z: 2236, radius: 3.5, delta: 13.5, falloff: 'smooth', mode: 'level' },
-  { x: 503.05, z: 2242.5, radius: 3.5, delta: 15.8, falloff: 'smooth', mode: 'level' }, // landing to keep
-  { x: 503.05, z: 2244.5, radius: 3.5, delta: 16.9, falloff: 'smooth', mode: 'level' },
+  // ...and the stair ramps: each placed staircase dresses a real
+  // terrain ramp (stairs are walk-over props, never colliders), so the
+  // climb is the ground itself. Dense riser ladders, one stamp per
+  // 1.2 yd with sub-step height differences, tuned by the route probe
+  // against MAX_STEP_HEIGHT.
+  // the bailey stair, tier one up to the middle court
+  { x: 507.8, z: 2203.5, radius: 2.4, delta: 2.64, falloff: 'smooth', mode: 'level' },
+  { x: 507.8, z: 2204.7, radius: 2.4, delta: 3.25, falloff: 'smooth', mode: 'level' },
+  { x: 507.8, z: 2205.8, radius: 2.4, delta: 3.86, falloff: 'smooth', mode: 'level' },
+  { x: 507.8, z: 2207.0, radius: 2.4, delta: 4.47, falloff: 'smooth', mode: 'level' },
+  { x: 507.8, z: 2208.2, radius: 2.4, delta: 5.08, falloff: 'smooth', mode: 'level' },
+  { x: 507.8, z: 2209.3, radius: 2.4, delta: 5.69, falloff: 'smooth', mode: 'level' },
+  { x: 507.8, z: 2210.5, radius: 2.4, delta: 6.3, falloff: 'smooth', mode: 'level' },
+  // the court stair, middle court up to tier three
+  { x: 504.1, z: 2216.5, radius: 2.4, delta: 6.94, falloff: 'smooth', mode: 'level' },
+  { x: 504.1, z: 2217.6, radius: 2.4, delta: 7.52, falloff: 'smooth', mode: 'level' },
+  { x: 504.1, z: 2218.8, radius: 2.4, delta: 8.1, falloff: 'smooth', mode: 'level' },
+  { x: 504.1, z: 2219.9, radius: 2.4, delta: 8.68, falloff: 'smooth', mode: 'level' },
+  { x: 504.1, z: 2221.0, radius: 2.4, delta: 9.26, falloff: 'smooth', mode: 'level' },
+  { x: 504.1, z: 2222.1, radius: 2.4, delta: 9.84, falloff: 'smooth', mode: 'level' },
+  { x: 504.1, z: 2223.3, radius: 2.4, delta: 10.42, falloff: 'smooth', mode: 'level' },
+  { x: 504.1, z: 2224.4, radius: 2.4, delta: 11.0, falloff: 'smooth', mode: 'level' },
+  // the upper stair, tier three up to the landing
+  { x: 503.35, z: 2230.0, radius: 2.4, delta: 11.64, falloff: 'smooth', mode: 'level' },
+  { x: 503.35, z: 2231.1, radius: 2.4, delta: 12.05, falloff: 'smooth', mode: 'level' },
+  { x: 503.35, z: 2232.2, radius: 2.4, delta: 12.46, falloff: 'smooth', mode: 'level' },
+  { x: 503.35, z: 2233.3, radius: 2.4, delta: 12.87, falloff: 'smooth', mode: 'level' },
+  { x: 503.35, z: 2234.4, radius: 2.4, delta: 13.28, falloff: 'smooth', mode: 'level' },
+  { x: 503.35, z: 2235.6, radius: 2.4, delta: 13.7, falloff: 'smooth', mode: 'level' },
+  { x: 503.35, z: 2236.7, radius: 2.4, delta: 14.11, falloff: 'smooth', mode: 'level' },
+  { x: 503.35, z: 2237.8, radius: 2.4, delta: 14.52, falloff: 'smooth', mode: 'level' },
+  { x: 503.35, z: 2238.9, radius: 2.4, delta: 14.93, falloff: 'smooth', mode: 'level' },
+  { x: 503.35, z: 2240.0, radius: 2.4, delta: 15.34, falloff: 'smooth', mode: 'level' },
+  // the keep stair, landing up to the summit court
+  { x: 503.05, z: 2242.0, radius: 2.4, delta: 15.34, falloff: 'smooth', mode: 'level' },
+  { x: 503.05, z: 2243.2, radius: 2.4, delta: 15.95, falloff: 'smooth', mode: 'level' },
+  { x: 503.05, z: 2244.3, radius: 2.4, delta: 16.56, falloff: 'smooth', mode: 'level' },
+  { x: 503.05, z: 2245.5, radius: 2.4, delta: 17.17, falloff: 'smooth', mode: 'level' },
+  { x: 503.05, z: 2246.7, radius: 2.4, delta: 17.78, falloff: 'smooth', mode: 'level' },
+  { x: 503.05, z: 2247.8, radius: 2.4, delta: 18.39, falloff: 'smooth', mode: 'level' },
+  { x: 503.05, z: 2249.0, radius: 2.4, delta: 19.0, falloff: 'smooth', mode: 'level' },
+  // the quay stair, waterside quay up through the gate
+  { x: 493.5, z: 2200.5, radius: 2.4, delta: -1.86, falloff: 'smooth', mode: 'level' },
+  { x: 494.6, z: 2200.5, radius: 2.4, delta: -1.3, falloff: 'smooth', mode: 'level' },
+  { x: 495.8, z: 2200.5, radius: 2.4, delta: -0.74, falloff: 'smooth', mode: 'level' },
+  { x: 496.9, z: 2200.5, radius: 2.4, delta: -0.17, falloff: 'smooth', mode: 'level' },
+  { x: 498.0, z: 2200.5, radius: 2.4, delta: 0.39, falloff: 'smooth', mode: 'level' },
+  { x: 499.1, z: 2200.5, radius: 2.4, delta: 0.95, falloff: 'smooth', mode: 'level' },
+  { x: 500.2, z: 2200.5, radius: 2.4, delta: 1.51, falloff: 'smooth', mode: 'level' },
+  { x: 501.4, z: 2200.5, radius: 2.4, delta: 2.08, falloff: 'smooth', mode: 'level' },
+  { x: 502.5, z: 2200.5, radius: 2.4, delta: 2.64, falloff: 'smooth', mode: 'level' },
+  // Stuck-pocket escapes (found by the movement flood scan): the gate
+  // passage pocket, the middle court's north-wall strip, and the alley
+  // between the summit flank and the sea-ring wall each get a walkable
+  // way back out.
+  { x: 500.5, z: 2203.5, radius: 3, delta: -0.3, falloff: 'smooth', mode: 'level' },
+  { x: 513.3, z: 2227.6, radius: 2.2, delta: 6.8, falloff: 'smooth', mode: 'level' },
+  { x: 514.3, z: 2229.4, radius: 2.2, delta: 7.2, falloff: 'smooth', mode: 'level' },
+  { x: 514.3, z: 2231.4, radius: 2.2, delta: 7.1, falloff: 'smooth', mode: 'level' },
+  { x: 512.4, z: 2246, radius: 2.6, delta: -1.15, falloff: 'smooth', mode: 'level' },
+  { x: 512.4, z: 2250, radius: 2.6, delta: -1.1, falloff: 'smooth', mode: 'level' },
+  { x: 519.5, z: 2236.5, radius: 2.4, delta: 1.2, falloff: 'smooth', mode: 'level' },
+  { x: 518.5, z: 2234, radius: 2.4, delta: 2.5, falloff: 'smooth', mode: 'level' },
+  { x: 516, z: 2244.8, radius: 2.2, delta: 3.2, falloff: 'smooth', mode: 'level' },
+  // ...and the sea-pool postern: the walled pool and its keep-side alley
+  // are droppable-into by design (off the summit flank), and their one
+  // walkable way out runs south along the keep's east face. The flood
+  // scan found the exits sealed by single just-over-limit steps; these
+  // levelers open them (the pool's swimmers escape through the alley).
+  { x: 513, z: 2241.0, radius: 2.2, delta: 4.6, falloff: 'smooth', mode: 'level' },
+  { x: 513, z: 2242.2, radius: 2.2, delta: 3.8, falloff: 'smooth', mode: 'level' },
+  { x: 513, z: 2243.4, radius: 2.2, delta: 3.0, falloff: 'smooth', mode: 'level' },
+  { x: 513, z: 2244.6, radius: 2.2, delta: 2.2, falloff: 'smooth', mode: 'level' },
+  { x: 513, z: 2245.8, radius: 2.2, delta: 1.4, falloff: 'smooth', mode: 'level' },
+  { x: 513, z: 2247.0, radius: 2.2, delta: 0.6, falloff: 'smooth', mode: 'level' },
+  { x: 513, z: 2248.2, radius: 2.2, delta: -0.2, falloff: 'smooth', mode: 'level' },
+  { x: 513, z: 2249.4, radius: 2.2, delta: -1.0, falloff: 'smooth', mode: 'level' },
+  // ...and the northwest slot between the west ring wall and the flank
+  // fills to a dead-end balcony shelf (a 12 yd deep two-cell slot has no
+  // walkable ladder; terrain is the answer): FLAT stamps hold the shelf
+  // sag-free between the walls, the smooth ladder grades its south
+  // approach down from the rim, and the only way out is the way in.
+  { x: 496, z: 2247, radius: 3, delta: 6.7, falloff: 'flat', mode: 'level' },
+  { x: 496, z: 2251.5, radius: 3, delta: 6.5, falloff: 'flat', mode: 'level' },
+  { x: 496, z: 2242.5, radius: 3, delta: 7.1, falloff: 'flat', mode: 'level' },
+  { x: 496, z: 2237, radius: 2.4, delta: 8.3, falloff: 'smooth', mode: 'level' },
+  { x: 496, z: 2238.5, radius: 2.4, delta: 7.9, falloff: 'smooth', mode: 'level' },
+  { x: 496, z: 2240, radius: 2.4, delta: 7.5, falloff: 'smooth', mode: 'level' },
 ];

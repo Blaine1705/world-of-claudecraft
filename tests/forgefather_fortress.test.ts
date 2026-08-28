@@ -61,7 +61,10 @@ describe('forgefather fortress bake', () => {
       (placement) =>
         !FORTRESS_STANDABLE_KEYS.has(placement.key) &&
         !IGNIVAR_NON_COLLIDING_PROPS.has(placement.key) &&
-        placement.y <= terrainHeight(placement.x, placement.z, WORLD_SEED) + GROUND_STAND_TOLERANCE,
+        placement.y <=
+          terrainHeight(placement.x, placement.z, WORLD_SEED) + GROUND_STAND_TOLERANCE &&
+        placement.y + IGNIVAR_PROP_NATIVE[placement.key].hei * placement.scale >=
+          terrainHeight(placement.x, placement.z, WORLD_SEED) + 0.5,
     );
     expect(colliders.length).toBe(expected.length);
     expect(colliders.length).toBeGreaterThanOrEqual(40);
@@ -89,9 +92,25 @@ describe('forgefather fortress bake', () => {
     for (const placement of FORGEFATHER_FORTRESS_PLACEMENTS) {
       if (FORTRESS_STANDABLE_KEYS.has(placement.key)) continue;
       const walkOver = IGNIVAR_NON_COLLIDING_PROPS.has(placement.key);
-      const aerial =
-        placement.y > terrainHeight(placement.x, placement.z, WORLD_SEED) + GROUND_STAND_TOLERANCE;
-      if (!walkOver && !aerial) continue;
+      const ground = terrainHeight(placement.x, placement.z, WORLD_SEED);
+      const aerial = placement.y > ground + GROUND_STAND_TOLERANCE;
+      const interred =
+        placement.y + IGNIVAR_PROP_NATIVE[placement.key].hei * placement.scale < ground + 0.5;
+      if (!walkOver && !aerial && !interred) continue;
+      // A stacked twin at the same x/z/rot (a different y) may be a
+      // legitimate blocker; only flag when no such twin explains the hit.
+      const twinBlocks = FORGEFATHER_FORTRESS_PLACEMENTS.some((other) => {
+        if (other === placement || other.x !== placement.x || other.z !== placement.z) return false;
+        if (other.ry !== placement.ry) return false;
+        if (FORTRESS_STANDABLE_KEYS.has(other.key) || IGNIVAR_NON_COLLIDING_PROPS.has(other.key))
+          return false;
+        const g = terrainHeight(other.x, other.z, WORLD_SEED);
+        return (
+          other.y <= g + GROUND_STAND_TOLERANCE &&
+          other.y + IGNIVAR_PROP_NATIVE[other.key].hei * other.scale >= g + 0.5
+        );
+      });
+      if (twinBlocks) continue;
       const hit = blockers.find(
         (collider) =>
           collider.x === placement.x && collider.z === placement.z && collider.rot === placement.ry,
