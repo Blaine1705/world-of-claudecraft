@@ -25,6 +25,10 @@ vi.mock('../server/unstuck_records', () => ({
 }));
 
 import { type ClientSession, GameServer } from '../server/game';
+import {
+  consumeMovementFramesV2,
+  createMovementInputSessionState,
+} from '../server/movement_input_timeline_v2';
 import { recordUnstuckEvent } from '../server/unstuck_records';
 import { ClientWorld } from '../src/net/online';
 import { BG_GRAVEYARDS, bgFieldPlanWalls } from '../src/sim/battleground_layout';
@@ -343,6 +347,42 @@ describe('online unstuck command wiring', () => {
     server.sim.tick();
     meta.moveInput.forward = false;
     server.sim.drainEvents();
+
+    send(server, session, { cmd: 'unstuck' });
+
+    expect(meta.pendingUnstuck).toMatchObject({
+      area: {
+        kind: 'battleground',
+        id: 'thornhollow_fields',
+        instanceId: String(match.id),
+        slot: match.slot,
+      },
+    });
+
+    const events: SimEvent[] = [];
+    for (let i = 0; i < UNSTUCK_COUNTDOWN_SECONDS * 20; i++) events.push(...server.sim.tick());
+
+    expect(events).toContainEqual(
+      expect.objectContaining({ type: 'unstuck', phase: 'completed', pid }),
+    );
+    expect(server.sim.bgMatchFor(pid)).toBe(match);
+    expect(inBgGraveyard(server, match, pid)).toBe(true);
+    expect(player.vx).toBe(0);
+    expect(player.vz).toBe(0);
+    expect(meta.moveInput.forward).toBe(false);
+  });
+
+  it('the Settings command keeps wall-contact eligibility when ESC neutral input wins the race', () => {
+    const server = new GameServer();
+    const { session } = join(server, 26);
+    Object.assign(session, createMovementInputSessionState(2));
+    const { match, pid } = activeBattlegroundForSession(server, session);
+    const player = forceIntoBgWallContact(server, match, pid);
+    const meta = must(server.sim.meta(pid), 'wall-contact player meta');
+
+    server.handleMessage(session, JSON.stringify({ t: 'input', seq: 1, ct: 0, mi: { f: 0 } }));
+    consumeMovementFramesV2(server.sim, [session]);
+    expect(meta.moveInput.forward).toBe(false);
 
     send(server, session, { cmd: 'unstuck' });
 

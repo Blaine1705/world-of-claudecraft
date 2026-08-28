@@ -3,7 +3,9 @@
 import { isStunned } from '../src/sim/combat/cc';
 import { type MoveInputFrame, parseMoveInputFrame } from '../src/sim/move_input';
 import type { PlayerMeta, Sim } from '../src/sim/sim';
+import type { SimContext } from '../src/sim/sim_context';
 import { type Entity, emptyMoveInput, type MoveInput } from '../src/sim/types';
+import { noteBattlegroundWallPressure } from '../src/sim/unstuck';
 import {
   createMovementOverrideSessionState,
   type MovementOverrideSessionState,
@@ -54,6 +56,7 @@ export function applyMovementInputFrame(
   entity: Entity,
   raw: unknown,
   simTime: number,
+  ctx?: SimContext,
 ): MoveInputFrame {
   const frame = parseMoveInputFrame(raw);
   if (session.movementWireVersion === 2) {
@@ -66,7 +69,9 @@ export function applyMovementInputFrame(
     }
     return frame;
   }
+  if (ctx) noteBattlegroundWallPressure(ctx, meta, entity);
   Object.assign(meta.moveInput, frame.moveInput);
+  if (ctx) noteBattlegroundWallPressure(ctx, meta, entity);
   session.lastInputAt = simTime;
   if (frame.facing !== null && (!entity.dead || entity.ghost) && !isStunned(entity)) {
     entity.facing = frame.facing;
@@ -75,7 +80,7 @@ export function applyMovementInputFrame(
 }
 
 export function consumeMovementFramesV2(
-  sim: Pick<Sim, 'time' | 'meta' | 'entities'>,
+  sim: Pick<Sim, 'time' | 'meta' | 'entities' | 'ctx'>,
   sessions: Iterable<MovementInputSessionState>,
 ): void {
   for (const session of sessions) {
@@ -85,10 +90,13 @@ export function consumeMovementFramesV2(
     if (!meta || !entity) continue;
     const frame = session.movementTimeline.consumeNext();
     if (!frame) {
+      noteBattlegroundWallPressure(sim.ctx, meta, entity);
       Object.assign(meta.moveInput, emptyMoveInput());
       continue;
     }
+    noteBattlegroundWallPressure(sim.ctx, meta, entity);
     Object.assign(meta.moveInput, frame.mi);
+    noteBattlegroundWallPressure(sim.ctx, meta, entity);
     if (frame.facing !== null && (!entity.dead || entity.ghost) && !isStunned(entity)) {
       entity.facing = frame.facing;
     }

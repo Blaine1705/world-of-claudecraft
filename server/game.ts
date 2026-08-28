@@ -6481,7 +6481,7 @@ export class GameServer {
       const meta = sim.meta(pid);
       const e = sim.entities.get(pid);
       if (!meta || !e) return;
-      const frame = applyMovementInputFrame(session, meta, e, msg, sim.time);
+      const frame = applyMovementInputFrame(session, meta, e, msg, sim.time, sim.ctx);
       if (typeof msg.seq === 'number' && Number.isFinite(msg.seq) && msg.seq > 0) {
         const seq = Math.floor(msg.seq);
         // R9: the client seq is a per-send increment on an ordered socket, so
