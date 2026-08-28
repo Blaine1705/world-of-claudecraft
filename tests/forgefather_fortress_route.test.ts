@@ -74,21 +74,30 @@ describe('forgefather fortress live-kernel route', () => {
   it('climbs the bailey stair from the forecourt to the middle court', () => {
     seat(507.8, 2203.0, 4);
     walk(0, 1, 12);
-    expect(sim.player.pos.z, `stalled at (${sim.player.pos.x.toFixed(2)}, ${sim.player.pos.y.toFixed(2)}, ${sim.player.pos.z.toFixed(2)})`).toBeGreaterThan(2211.5);
+    expect(
+      sim.player.pos.z,
+      `stalled at (${sim.player.pos.x.toFixed(2)}, ${sim.player.pos.y.toFixed(2)}, ${sim.player.pos.z.toFixed(2)})`,
+    ).toBeGreaterThan(2211.5);
     expect(sim.player.pos.y).toBeGreaterThan(6.5);
   });
 
   it('climbs the court stair onto tier three', () => {
     seat(504.1, 2217.3, 8);
     walk(0, 1, 10);
-    expect(sim.player.pos.z, `stalled at (${sim.player.pos.x.toFixed(2)}, ${sim.player.pos.y.toFixed(2)}, ${sim.player.pos.z.toFixed(2)})`).toBeGreaterThan(2225.5);
+    expect(
+      sim.player.pos.z,
+      `stalled at (${sim.player.pos.x.toFixed(2)}, ${sim.player.pos.y.toFixed(2)}, ${sim.player.pos.z.toFixed(2)})`,
+    ).toBeGreaterThan(2225.5);
     expect(sim.player.pos.y).toBeGreaterThan(11.3);
   });
 
   it('crosses tier three north over the old trench band', () => {
     seat(504.0, 2225.5, 12.2);
     walk(0, 1, 8);
-    expect(sim.player.pos.z, `stalled at (${sim.player.pos.x.toFixed(2)}, ${sim.player.pos.y.toFixed(2)}, ${sim.player.pos.z.toFixed(2)})`).toBeGreaterThan(2231.5);
+    expect(
+      sim.player.pos.z,
+      `stalled at (${sim.player.pos.x.toFixed(2)}, ${sim.player.pos.y.toFixed(2)}, ${sim.player.pos.z.toFixed(2)})`,
+    ).toBeGreaterThan(2231.5);
   });
 
   it('climbs the upper and keep stairs to the keep threshold', () => {
@@ -97,14 +106,38 @@ describe('forgefather fortress live-kernel route', () => {
     // arrival means the top treads, not ground past the drum.
     seat(503.35, 2231.6, 12.2);
     walk(0, 1, 16);
-    expect(sim.player.pos.z, `stalled at (${sim.player.pos.x.toFixed(2)}, ${sim.player.pos.y.toFixed(2)}, ${sim.player.pos.z.toFixed(2)})`).toBeGreaterThan(2243.3);
-    expect(sim.player.pos.y).toBeGreaterThan(18.4);
+    expect(
+      sim.player.pos.z,
+      `stalled at (${sim.player.pos.x.toFixed(2)}, ${sim.player.pos.y.toFixed(2)}, ${sim.player.pos.z.toFixed(2)})`,
+    ).toBeGreaterThan(2243.3);
+    expect(sim.player.pos.y).toBeGreaterThan(17.9);
+  });
+
+  it('descends the bailey stair back to the forecourt', () => {
+    seat(507.8, 2210.8, 8);
+    walk(0, -1, 10);
+    expect(
+      sim.player.pos.z,
+      `stalled at (${sim.player.pos.x.toFixed(2)}, ${sim.player.pos.y.toFixed(2)}, ${sim.player.pos.z.toFixed(2)})`,
+    ).toBeLessThan(2204);
+  });
+
+  it('descends from the keep threshold to the landing court', () => {
+    seat(503.05, 2244.2, 19.5);
+    walk(0, -1, 10);
+    expect(
+      sim.player.pos.z,
+      `stalled at (${sim.player.pos.x.toFixed(2)}, ${sim.player.pos.y.toFixed(2)}, ${sim.player.pos.z.toFixed(2)})`,
+    ).toBeLessThan(2239);
   });
 
   it('descends the court stair back to the middle court', () => {
     seat(504.1, 2225.4, 12.2);
     walk(0, -1, 10);
-    expect(sim.player.pos.z, `stalled at (${sim.player.pos.x.toFixed(2)}, ${sim.player.pos.y.toFixed(2)}, ${sim.player.pos.z.toFixed(2)})`).toBeLessThan(2218);
+    expect(
+      sim.player.pos.z,
+      `stalled at (${sim.player.pos.x.toFixed(2)}, ${sim.player.pos.y.toFixed(2)}, ${sim.player.pos.z.toFixed(2)})`,
+    ).toBeLessThan(2218);
   });
 
   it('is never penned at the reported stuck spot (503, 2226)', () => {
@@ -127,7 +160,10 @@ describe('forgefather fortress live-kernel route', () => {
       moved.push(Math.hypot(sim.player.pos.x - start.x, sim.player.pos.z - start.z));
     }
     const free = moved.filter((d) => d >= 1).length;
-    expect(free, `displacements: ${moved.map((d) => d.toFixed(2)).join(', ')}`).toBeGreaterThanOrEqual(4);
+    expect(
+      free,
+      `displacements: ${moved.map((d) => d.toFixed(2)).join(', ')}`,
+    ).toBeGreaterThanOrEqual(4);
     expect(Math.max(...moved)).toBeGreaterThan(2);
   });
 });

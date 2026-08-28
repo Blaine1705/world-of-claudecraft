@@ -339,8 +339,10 @@ const MONOLITHS: MonolithRow[] = [
     // gardenwalk pass rides in beside the tutorial island). Exact count,
     // zero slack.
     // the ember coast tables extracted to content/ember_coast.ts (the
-    // vale_coast.ts pattern); the Forgefather's Isle cone rode the freed room
-    ceiling: 5309,
+    // vale_coast.ts pattern); the Forgefather's Isle cone rode the freed room.
+    // The walkable-lift sum extracted to walk_lifts.ts (the Forgefather
+    // stair ramps fold in there); exact count.
+    ceiling: 5300,
     seam: 'zone/terrain data as content records; logic as sim sibling modules',
   },
   {

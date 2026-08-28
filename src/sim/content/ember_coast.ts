@@ -70,37 +70,118 @@ export const EMBER_BAYS = [
   { x: 478, z: 2242, r: 14 },
 ] as const;
 
-/** The staircase GLB's nose line, measured from the shipped model: a flat
- *  top landing over the first 12.5% of the length, then tread noses
- *  descending at 0.845 per yd to ground zero at the bottom end (native
- *  landing height 0.74 at scale 1). Walking bodies climb each placed
- *  staircase on REAL standable tread platforms derived from the same
- *  numbers (src/sim/forgefather_fortress.ts staircaseTreadColliders); the
- *  stamps below only sculpt a cosmetic under-bank riding `clear` beneath
- *  the nose line, so the solid stair wedge always meets ground instead of
- *  spanning a void and no rock ever pokes up through the treads. `clear`
- *  absorbs the level-stamp cascade's uphill bias (later stamps win, so a
- *  marching ramp settles above its targets by roughly a third of its
- *  radius times the grade); the wedge is solid to its base plane, so a
- *  bank sitting anywhere under the noses is fully hidden. Three stamp
- *  lanes cover the stair's width; the lead-in holds the lower court's
- *  walk surface so ground beside the buried bottom steps never dips. */
-export const STAIR_GRADE = 0.845; // nose-line slope, yd of rise per yd of run
-export const STAIR_LANDING_HEIGHT = 0.74; // native top-landing height at scale 1
+/** Shared staircase geometry, measured from the shipped GLB: the flight
+ *  spans the first 87.5% of the model's length, then a flat top landing.
+ *  Walking rides the FORGEFATHER_STAIR_RAMPS lift surfaces below; the
+ *  stamp under-banks sculpt the RAW heightfield beneath each band so the
+ *  memo-based movement gates (which never see the lifts) stay calm and no
+ *  raw ground ever rises above a flight. */
 export const STAIR_LANDING_START = 0.875; // the landing begins at this length fraction
 const RAMP_STEP = 0.75; // stamp spacing along the climb
+
+/** The Forgefather stair ramps: the Last Keep castle's walkable-lift idiom
+ *  (castle_layout.ts CASTLE_RAMPS) under the six placed staircases. Each
+ *  row is an axis-aligned band carrying an ABSOLUTE walk surface: a linear
+ *  flight from the lower court's RAW ground level at the stair's bottom
+ *  end up to the upper court's at the landing start, then level across the
+ *  landing. Ground-level ends make the lift CONTINUOUS with the terrain
+ *  (no wall at a ramp mouth, the castle rule); the floor plates, 0.64
+ *  above their court ground, hand walkers on and off mid-band through the
+ *  ordinary collider step. groundHeight folds the
+ *  surface in as a max (src/sim/walk_lifts.ts): the ramp is what the feet
+ *  climb, the staircase prop is what the eye sees, and the render terrain
+ *  never knows, so no rock can show through a flight at any LOD. Bands
+ *  inset 0.1 inside the stair width so the lift's sheer sides hide within
+ *  the stone. Derived from the staircase rows in
+ *  src/sim/forgefather_fortress.ts; re-derive when one moves. */
+interface StairRampBand {
+  /** Lead-ins and tapers are under-plate connective segments: raw court
+   *  ground may legitimately sit at or above them (the floor plates carry
+   *  the walker there); they exist purely for groundHeight continuity. */
+  link?: true;
+  /** 'z' bands run along z at a fixed x range; 'x' bands along x. */
+  axis: 'x' | 'z';
+  b0: number; // across-band bounds
+  b1: number;
+  a0: number; // along the climb: this segment's start...
+  a1: number; // ...and end (either order)
+  h0: number; // ABSOLUTE surface height at a0...
+  h1: number; // ...and at a1
+}
+export const FORGEFATHER_STAIR_RAMPS: readonly StairRampBand[] = [
+  // Each stair carries four segments (three where the top joins bare
+  // terrain): a short LEAD-IN rising from the court's raw ground to its
+  // floor-plate top, the FLIGHT from plate top to plate top (ending 1.2yd
+  // before the upper plate's edge so the hand-off step stays inside
+  // MAX_STEP_HEIGHT), a LEVEL run over the top landing, and a TAPER back
+  // down to the upper court's raw ground. The lead-ins and tapers sit
+  // under the courts' floor slabs (the plates carry the walker there), so
+  // they are invisible: their only job is groundHeight continuity, since
+  // the terrain wall gate refuses any abrupt ground jump.
+  // the bailey stair: forecourt (plates 2.64) up to the middle court (6.94)
+  { link: true, axis: 'z', b0: 503.58, b1: 512.02, a0: 2201.3, a1: 2202.7, h0: 2.0, h1: 2.64 },
+  { axis: 'z', b0: 503.58, b1: 512.02, a0: 2202.7, a1: 2209.7, h0: 2.64, h1: 6.94 },
+  { axis: 'z', b0: 503.58, b1: 512.02, a0: 2209.7, a1: 2211.7, h0: 6.94, h1: 6.94 },
+  { link: true, axis: 'z', b0: 503.58, b1: 512.02, a0: 2211.7, a1: 2213.1, h0: 6.94, h1: 6.3 },
+  // the court stair: middle court (6.94) up to tier three (11.64)
+  { link: true, axis: 'z', b0: 499.88, b1: 508.32, a0: 2215.5, a1: 2216.9, h0: 6.3, h1: 6.94 },
+  { axis: 'z', b0: 499.88, b1: 508.32, a0: 2216.9, a1: 2223.5, h0: 6.94, h1: 11.64 },
+  { axis: 'z', b0: 499.88, b1: 508.32, a0: 2223.5, a1: 2225.9, h0: 11.64, h1: 11.64 },
+  { link: true, axis: 'z', b0: 499.88, b1: 508.32, a0: 2225.9, a1: 2227.3, h0: 11.64, h1: 11.0 },
+  // the upper stair: tier three (11.64) up to the landing court (15.34)
+  { link: true, axis: 'z', b0: 500.57, b1: 506.13, a0: 2229.75, a1: 2231.15, h0: 11.0, h1: 11.64 },
+  { axis: 'z', b0: 500.57, b1: 506.13, a0: 2231.15, a1: 2235.95, h0: 11.64, h1: 15.34 },
+  { axis: 'z', b0: 500.57, b1: 506.13, a0: 2235.95, a1: 2237.15, h0: 15.34, h1: 15.34 },
+  { link: true, axis: 'z', b0: 500.57, b1: 506.13, a0: 2237.15, a1: 2238.55, h0: 15.34, h1: 14.7 },
+  // the keep stair: landing court (15.34) up to the summit flat (19.0,
+  // bare terrain: the summit pads take over past the band)
+  { link: true, axis: 'z', b0: 500.27, b1: 505.83, a0: 2238.0, a1: 2239.4, h0: 14.7, h1: 15.34 },
+  { axis: 'z', b0: 500.27, b1: 505.83, a0: 2239.4, a1: 2244.65, h0: 15.34, h1: 19.0 },
+  { axis: 'z', b0: 500.27, b1: 505.83, a0: 2244.65, a1: 2245.4, h0: 19.0, h1: 19.0 },
+  // the quay stair: waterside quay (plates -1.86) up through the gate (2.64)
+  { link: true, axis: 'x', b0: 2196.23, b1: 2204.67, a0: 491.15, a1: 492.55, h0: -2.5, h1: -1.86 },
+  { axis: 'x', b0: 2196.23, b1: 2204.67, a0: 492.55, a1: 500.0, h0: -1.86, h1: 2.64 },
+  { axis: 'x', b0: 2196.23, b1: 2204.67, a0: 500.0, a1: 501.55, h0: 2.64, h1: 2.64 },
+  { link: true, axis: 'x', b0: 2196.23, b1: 2204.67, a0: 501.55, a1: 502.95, h0: 2.64, h1: 2.0 },
+  // the mainland shore stair: the bridge deck (-1.63) up the dune (1.75,
+  // bare terrain); the climb runs toward -z, so a0 is the greater z, and
+  // the lead-in climbs from the beach under the deck plates
+  { link: true, axis: 'z', b0: 440.49, b1: 447.01, a0: 2189.35, a1: 2186.85, h0: -3.9, h1: -1.63 },
+  { axis: 'z', b0: 440.49, b1: 447.01, a0: 2186.85, a1: 2180.725, h0: -1.63, h1: 1.75 },
+  { axis: 'z', b0: 440.49, b1: 447.01, a0: 2180.725, a1: 2179.85, h0: 1.75, h1: 1.75 },
+];
+
+/** The absolute stair-ramp surface at a point, or -Infinity outside every
+ *  band (the walk_lifts max then leaves the ground untouched). */
+export function forgefatherStairSurface(x: number, z: number): number {
+  let abs = Number.NEGATIVE_INFINITY;
+  for (const ramp of FORGEFATHER_STAIR_RAMPS) {
+    const along = ramp.axis === 'z' ? z : x;
+    const across = ramp.axis === 'z' ? x : z;
+    if (across < ramp.b0 || across > ramp.b1) continue;
+    const lo = Math.min(ramp.a0, ramp.a1);
+    const hi = Math.max(ramp.a0, ramp.a1);
+    if (along < lo || along > hi) continue;
+    const t = (along - ramp.a0) / (ramp.a1 - ramp.a0);
+    abs = Math.max(abs, ramp.h0 + (ramp.h1 - ramp.h0) * t);
+  }
+  return abs;
+}
 
 interface StairRampSpec {
   x: number; // the staircase placement's centre...
   z: number;
   ryDeg: number; // ...its yaw in degrees...
   scale: number;
-  y: number; // ...and its seated base height (the nose line's bottom end)
-  courtLow: number; // the lower court's walk surface (its floor-plate top)
-  clear: number; // bank target depth under the nose line (pre-bias)
+  wedgeBase: number; // ...and its base height (the stamp floor: banks stay
+  // just above it so the stone wedge always reads grounded)
+  h0: number; // the ramp band's surface at the bottom end...
+  h1: number; // ...and from the landing start on (the court ground levels)
+  clear: number; // bank target depth under the ramp line, pre-bias: the
+  // level-stamp cascade settles a marching bank ABOVE its targets by
+  // roughly a third of the stamp radius times the grade
   lanes: readonly number[]; // lateral lane offsets covering the stair width
   radius: number;
-  lead?: number; // distance from the bottom end where stamping begins
 }
 
 function stairRampStamps(spec: StairRampSpec): HeightStamp[] {
@@ -110,16 +191,13 @@ function stairRampStamps(spec: StairRampSpec): HeightStamp[] {
   const bottomX = spec.x - (ux * spec.scale) / 2;
   const bottomZ = spec.z - (uz * spec.scale) / 2;
   const landingD = spec.scale * STAIR_LANDING_START;
-  const landingH = spec.y + STAIR_LANDING_HEIGHT * spec.scale;
-  const crossD = (spec.courtLow + spec.clear - spec.y) / STAIR_GRADE;
-  const start = spec.lead ?? Math.max(0, crossD - 0.9);
-  const steps = Math.ceil((landingD - start) / RAMP_STEP);
   const round = (value: number) => Math.round(value * 100) / 100;
+  const steps = Math.ceil((landingD - 0.5) / RAMP_STEP);
   const out: HeightStamp[] = [];
   for (let i = 0; i <= steps; i++) {
-    const d = start + ((landingD - start) * i) / steps;
-    const nose = Math.min(landingH, spec.y + STAIR_GRADE * d);
-    const delta = round(Math.max(spec.courtLow - 0.05, nose - spec.clear));
+    const d = 0.5 + ((landingD - 0.5) * i) / steps;
+    const line = spec.h0 + (spec.h1 - spec.h0) * (d / landingD);
+    const delta = round(Math.max(line - spec.clear, Math.min(spec.wedgeBase + 0.15, line - 0.6)));
     for (const lane of spec.lanes)
       out.push({
         x: round(bottomX + ux * d - uz * lane),
@@ -175,59 +253,95 @@ export const FORGEFATHER_ISLE_TERRAIN_EDITS: HeightStamp[] = [
   { x: 508, z: 2216.5, radius: 7, delta: 6.3, falloff: 'flat', mode: 'level' },
   { x: 504.3, z: 2241.2, radius: 8, delta: 14.7, falloff: 'smooth', mode: 'level' }, // upper landing
   { x: 504.3, z: 2241.2, radius: 5, delta: 14.7, falloff: 'flat', mode: 'level' },
-  // ...and the stair ramps: each placed staircase dresses a smooth ramp
-  // generated from its own nose line (stairRampStamps above), so every
-  // flight is climbable ground with no rock above the treads.
-  // the bailey stair, forecourt plates up to the middle court
+  // ...and the stair under-banks: walking rides the FORGEFATHER_STAIR_RAMPS
+  // lift surfaces, but the movement kernel's steepness memo and downhill
+  // arm still read the RAW heightfield, so the ground beneath every flight
+  // must stay calm (under the climb gate) and below the walking line. Each
+  // bank tracks its ramp band's own line, `clear` under it pre-bias.
+  // the bailey stair
   ...stairRampStamps({
     x: 507.8,
     z: 2207.2,
     ryDeg: 90,
     scale: 9,
-    y: 0.33,
-    courtLow: 2.64,
-    clear: 1.9,
+    wedgeBase: 0.95,
+    h0: 2.64,
+    h1: 6.94,
+    clear: 2.1,
     lanes: [-2.7, 2.7, 0],
     radius: 3.2,
   }),
-  // the court stair, middle court up to tier three (the lead-in bridges
-  // the gap from the court plates' north edge)
+  // the court stair
   ...stairRampStamps({
     x: 504.1,
     z: 2221.4,
     ryDeg: 90,
     scale: 9,
-    y: 5.03,
-    courtLow: 6.94,
-    clear: 1.9,
+    wedgeBase: 6.7,
+    h0: 6.94,
+    h1: 11.64,
+    clear: 2.1,
     lanes: [-2.7, 2.7, 0],
     radius: 3.2,
-    lead: 2.0,
   }),
-  // the upper stair, tier three up to the landing court
+  // the upper stair
   ...stairRampStamps({
     x: 503.35,
     z: 2234.15,
     ryDeg: 90,
     scale: 6,
-    y: 10.95,
-    courtLow: 11.64,
-    clear: 1.5,
+    wedgeBase: 11.45,
+    h0: 11.64,
+    h1: 15.34,
+    clear: 1.6,
     lanes: [-1.9, 1.9, 0],
     radius: 2.6,
   }),
-  // the keep stair, landing court up to the summit...
+  // the keep stair
   ...stairRampStamps({
     x: 503.05,
     z: 2242.4,
     ryDeg: 90,
     scale: 6,
-    y: 14.61,
-    courtLow: 15.34,
-    clear: 1.5,
+    wedgeBase: 14.45,
+    h0: 15.34,
+    h1: 19.0,
+    clear: 1.6,
     lanes: [-1.9, 1.9, 0],
     radius: 2.6,
   }),
+  // the quay stair
+  ...stairRampStamps({
+    x: 497.05,
+    z: 2200.45,
+    ryDeg: 180,
+    scale: 9,
+    wedgeBase: -2.55,
+    h0: -1.86,
+    h1: 2.64,
+    clear: 2.1,
+    lanes: [-2.7, 2.7, 0],
+    radius: 3.2,
+  }),
+  // the mainland shore stair
+  ...stairRampStamps({
+    x: 443.75,
+    z: 2183.35,
+    ryDeg: 270,
+    scale: 7,
+    wedgeBase: -2.8,
+    h0: -1.63,
+    h1: 1.75,
+    clear: 1.7,
+    lanes: [-2.2, 2.2, 0],
+    radius: 2.8,
+  }),
+  // ...and the mainland dune apron plus west-flank softeners (the shore
+  // chunk meshes at the coarse LOD bands; the softened shoulder keeps the
+  // rendered chords under the flight's silhouette).
+  { x: 443.8, z: 2178.5, radius: 2.5, delta: 1.55, falloff: 'smooth', mode: 'level' },
+  { x: 440.3, z: 2185.5, radius: 2, delta: -3.0, falloff: 'smooth', mode: 'level' },
+  { x: 440.3, z: 2183.8, radius: 2, delta: -2.4, falloff: 'smooth', mode: 'level' },
   // ...plus the summit pads: the raw ground grades from the keep flight's
   // bank up onto the summit flat with no step past the terrain-wall gate,
   // because the movement kernel reads the raw heightfield even while the
@@ -235,47 +349,14 @@ export const FORGEFATHER_ISLE_TERRAIN_EDITS: HeightStamp[] = [
   { x: 503.05, z: 2245.1, radius: 2.4, delta: 18.75, falloff: 'smooth', mode: 'level' },
   { x: 503.1, z: 2246.2, radius: 2.8, delta: 18.98, falloff: 'smooth', mode: 'level' },
   { x: 503.1, z: 2247.8, radius: 2.8, delta: 19.0, falloff: 'smooth', mode: 'level' },
-  // the quay stair, waterside quay up through the gate (the lead-in
-  // bridges the gap from the quay plates' east edge)
-  ...stairRampStamps({
-    x: 497.05,
-    z: 2200.45,
-    ryDeg: 180,
-    scale: 9,
-    y: -3.97,
-    courtLow: -1.86,
-    clear: 2.0,
-    lanes: [-2.7, 2.7, 0],
-    radius: 3.2,
-    lead: 0.75,
-  }),
-  // the mainland shore stair, bridge deck up the dune toward the road...
-  ...stairRampStamps({
-    x: 443.75,
-    z: 2183.35,
-    ryDeg: 270,
-    scale: 7,
-    y: -3.38,
-    courtLow: -1.63,
-    clear: 1.6,
-    lanes: [-2.2, 2.2, 0],
-    radius: 2.8,
-    lead: 1.0,
-  }),
-  // ...and its dune apron: the shore dune dips right at the stair's top
-  // end, so one pad keeps the step off the landing inside the step limit.
-  { x: 443.8, z: 2178.5, radius: 2.5, delta: 1.55, falloff: 'smooth', mode: 'level' },
-  // ...and its west flank softened: the shore chunk meshes at the coarse
-  // LOD bands (2.6/6.5yd), and chords over the burial band's shoulder rode
-  // up to 1.35yd across the flight's silhouette; sinking the shoulder puts
-  // the rendered chords under the tread line at every LOD.
-  { x: 440.3, z: 2185.5, radius: 2, delta: -3.0, falloff: 'smooth', mode: 'level' },
-  { x: 440.3, z: 2183.8, radius: 2, delta: -2.4, falloff: 'smooth', mode: 'level' },
   // Stuck-pocket escapes (found by the movement flood scan): the gate
   // passage pocket, the middle court's north-wall strip, and the alley
   // between the summit flank and the sea-ring wall each get a walkable
   // way back out.
   { x: 500.5, z: 2203.5, radius: 3, delta: -0.3, falloff: 'smooth', mode: 'level' },
+  // ...the tier-three plate's west rim calmed (a raw remnant slope under
+  // the plate edge read steep to the memo within the carry clearance)...
+  { x: 500.8, z: 2226.2, radius: 2.2, delta: 10.6, falloff: 'smooth', mode: 'level' },
   // ...the north-wall strip's channel notch graded flat, so the walk east
   // onto the shelf ladder never crosses a steepness-gated cell...
   { x: 511.5, z: 2227.2, radius: 2, delta: 6.4, falloff: 'smooth', mode: 'level' },

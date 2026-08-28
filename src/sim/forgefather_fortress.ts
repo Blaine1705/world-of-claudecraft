@@ -5,15 +5,13 @@
 // (composed into the ember zone features) and the overworld colliders
 // below, the interior dressing doctrine carried outside: a piece's
 // physical footprint IS its visible silhouette. Placements are absolute
-// world coordinates. Sim layer: no three.js, no DOM, deterministic.
-// One curated deviation from the raw export: each staircase's y is
-// re-seated so its top landing sits flush with the upper court it serves
-// (the surplus length buries at the bottom, where stairs emerging from
-// the ground read naturally); the terrain ramps under the flights are
-// generated from these placements in src/sim/content/ember_coast.ts and
-// must be re-derived whenever a staircase row moves.
+// world coordinates, verbatim from the owner's export. The staircases are
+// walk-over props carried by the FORGEFATHER_STAIR_RAMPS walkable-lift
+// surfaces (src/sim/content/ember_coast.ts, the Last Keep castle-ramp
+// idiom): re-derive those bands and the under-banks whenever a staircase
+// row moves.
 import type { Collider } from './colliders';
-import { STAIR_LANDING_HEIGHT, STAIR_LANDING_START } from './content/ember_coast';
+import { FORGEFATHER_STAIR_RAMPS } from './content/ember_coast';
 import {
   IGNIVAR_NON_COLLIDING_PROPS,
   IGNIVAR_PROP_COLLIDER_FOOTPRINT,
@@ -31,9 +29,9 @@ export const FORGEFATHER_FORTRESS_PLACEMENTS: readonly IgnivarPropPlacement[] = 
   { key: 'tower_middle', x: 503.05, y: 38, z: 2249.75, ry: 315 * DEG, scale: 9 },
   { key: 'tower_top', x: 503.05, y: 45.95, z: 2249.9, ry: 225 * DEG, scale: 8 },
   { key: 'tower_base', x: 503.05, y: -2, z: 2249.4, ry: 270 * DEG, scale: 20 },
-  { key: 'staircase', x: 503.05, y: 14.61, z: 2242.4, ry: 90 * DEG, scale: 6 },
+  { key: 'staircase', x: 503.05, y: 14.45, z: 2242.4, ry: 90 * DEG, scale: 6 },
   { key: 'stone_floor', x: 504.3, y: 14.7, z: 2241.15, ry: 270 * DEG, scale: 8 },
-  { key: 'staircase', x: 503.35, y: 10.95, z: 2234.15, ry: 90 * DEG, scale: 6 },
+  { key: 'staircase', x: 503.35, y: 11.45, z: 2234.15, ry: 90 * DEG, scale: 6 },
   { key: 'stone_floor', x: 504.05, y: 11, z: 2228.7, ry: 180 * DEG, scale: 8 },
   { key: 'dragon_pillar', x: 506.7, y: 13.65, z: 2245.05, ry: 180 * DEG, scale: 8 },
   { key: 'dragon_pillar', x: 506.95, y: 10.9, z: 2235.3, ry: 180 * DEG, scale: 8 },
@@ -43,7 +41,7 @@ export const FORGEFATHER_FORTRESS_PLACEMENTS: readonly IgnivarPropPlacement[] = 
   { key: 'fortress_wall', x: 507.7, y: 7.4, z: 2240.3, ry: 90 * DEG, scale: 9 },
   { key: 'fortress_wall', x: 508.2, y: 6.65, z: 2229.05, ry: 90 * DEG, scale: 9 },
   { key: 'fortress_wall', x: 499.45, y: 6.65, z: 2229.05, ry: 270 * DEG, scale: 9 },
-  { key: 'staircase', x: 504.1, y: 5.03, z: 2221.4, ry: 90 * DEG, scale: 9 },
+  { key: 'staircase', x: 504.1, y: 6.7, z: 2221.4, ry: 90 * DEG, scale: 9 },
   { key: 'fortress_wall', x: 499.45, y: 2.9, z: 2221.05, ry: 270 * DEG, scale: 9 },
   { key: 'stone_floor', x: 511, y: 6.3, z: 2222.7, ry: 0, scale: 8 },
   { key: 'stone_floor', x: 510.9, y: 6.3, z: 2214.9, ry: 0, scale: 8 },
@@ -57,7 +55,7 @@ export const FORGEFATHER_FORTRESS_PLACEMENTS: readonly IgnivarPropPlacement[] = 
   { key: 'fortress_wall', x: 514.45, y: 6.75, z: 2213.2, ry: 90 * DEG, scale: 4 },
   { key: 'fortress_wall', x: 512.2, y: 6.75, z: 2225.2, ry: 180 * DEG, scale: 4 },
   { key: 'lava_pillar', x: 512.2, y: 6.6, z: 2223, ry: 135 * DEG, scale: 8 },
-  { key: 'staircase', x: 507.8, y: 0.33, z: 2207.2, ry: 90 * DEG, scale: 9 },
+  { key: 'staircase', x: 507.8, y: 0.95, z: 2207.2, ry: 90 * DEG, scale: 9 },
   { key: 'tower_base', x: 513.6, y: 1.3, z: 2210.15, ry: 165 * DEG, scale: 8 },
   { key: 'cannon', x: 513.6, y: 9.05, z: 2210.4, ry: 135 * DEG, scale: 4 },
   { key: 'stone_floor', x: 520.2, y: 2, z: 2209.95, ry: 270 * DEG, scale: 8 },
@@ -84,7 +82,7 @@ export const FORGEFATHER_FORTRESS_PLACEMENTS: readonly IgnivarPropPlacement[] = 
   { key: 'fortress_wall', x: 503.2, y: 2, z: 2191.45, ry: 180 * DEG, scale: 6 },
   { key: 'tower_base', x: 502.55, y: 0.9, z: 2207.9, ry: 225 * DEG, scale: 10 },
   { key: 'fortress_wall', x: 499.7, y: 4, z: 2213.7, ry: 270 * DEG, scale: 7 },
-  { key: 'staircase', x: 497.05, y: -3.97, z: 2200.45, ry: 180 * DEG, scale: 9 },
+  { key: 'staircase', x: 497.05, y: -2.55, z: 2200.45, ry: 180 * DEG, scale: 9 },
   { key: 'fortress_wall', x: 498.95, y: -1, z: 2213.95, ry: 270 * DEG, scale: 10 },
   { key: 'fortress_wall', x: 500.45, y: 2, z: 2194.45, ry: 270 * DEG, scale: 6 },
   { key: 'stone_floor', x: 497.1, y: -2.5, z: 2207.75, ry: 90 * DEG, scale: 8 },
@@ -119,7 +117,7 @@ export const FORGEFATHER_FORTRESS_PLACEMENTS: readonly IgnivarPropPlacement[] = 
   { key: 'bridge_floor', x: 436.35, y: -2.75, z: 2193, ry: 0, scale: 8 },
   { key: 'bridge_floor', x: 444.1, y: -2.75, z: 2188.25, ry: 0, scale: 8 },
   { key: 'bridge_floor', x: 436.6, y: -2.75, z: 2188.25, ry: 0, scale: 8 },
-  { key: 'staircase', x: 443.75, y: -3.38, z: 2183.35, ry: 270 * DEG, scale: 7 },
+  { key: 'staircase', x: 443.75, y: -2.8, z: 2183.35, ry: 270 * DEG, scale: 7 },
   { key: 'bridge_floor', x: 489.1, y: -2.75, z: 2197.75, ry: 0, scale: 8 },
   { key: 'tower_pillar', x: 493.9, y: -8, z: 2192.85, ry: 45 * DEG, scale: 8 },
   { key: 'tower_pillar', x: 491.9, y: -8, z: 2191.85, ry: 0, scale: 7 },
@@ -197,16 +195,69 @@ export const FORTRESS_STANDABLE_KEYS: ReadonlySet<IgnivarEnvPropKey> = new Set([
   'stone_floor',
 ]);
 
-/** Ten treads per staircase under its flat top landing, matching the
- *  shipped GLB's nose line (constants shared with the under-bank generator
- *  in src/sim/content/ember_coast.ts). Each tread is a narrow STANDABLE
- *  platform, so a walking body climbs the real steps through the physics
- *  step-up: every rise stays under MAX_STEP_HEIGHT at the placed scales,
- *  and the terrain below is only a cosmetic bank tucked beneath the solid
- *  stair wedge. These are the game's first stacked collider flights (the
- *  Old Beacon's spiral climbs a terrain lift field instead); the live
- *  kernel walks them in tests/forgefather_fortress_route.test.ts. */
-const STAIR_TREADS = 10;
+interface Rect {
+  x0: number;
+  x1: number;
+  z0: number;
+  z1: number;
+}
+
+/** Subtract `cut` from each rect, returning the up-to-four remainder
+ *  strips per rect. Everything here is axis-aligned (every stone_floor and
+ *  bridge_floor sits at a multiple of 90 degrees), so plain rectangle
+ *  arithmetic is exact. */
+function subtractRect(rects: Rect[], cut: Rect): Rect[] {
+  const out: Rect[] = [];
+  for (const r of rects) {
+    const ix0 = Math.max(r.x0, cut.x0);
+    const ix1 = Math.min(r.x1, cut.x1);
+    const iz0 = Math.max(r.z0, cut.z0);
+    const iz1 = Math.min(r.z1, cut.z1);
+    if (ix0 >= ix1 || iz0 >= iz1) {
+      out.push(r);
+      continue;
+    }
+    if (r.z0 < iz0) out.push({ x0: r.x0, x1: r.x1, z0: r.z0, z1: iz0 });
+    if (iz1 < r.z1) out.push({ x0: r.x0, x1: r.x1, z0: iz1, z1: r.z1 });
+    if (r.x0 < ix0) out.push({ x0: r.x0, x1: ix0, z0: iz0, z1: iz1 });
+    if (ix1 < r.x1) out.push({ x0: ix1, x1: r.x1, z0: iz0, z1: iz1 });
+  }
+  return out;
+}
+
+/** A floor plate's standable footprint, cropped where a stair-ramp band
+ *  rises more than a comfortable step above the plate's top: the movement
+ *  kernel never lifts a platform-carried body onto terrain climbing
+ *  overhead, so a plate left standable under a rising flight would carry
+ *  walkers INSIDE the ramp mass (the owner slid the landing plate under
+ *  the keep stair; the flight rises straight through it). */
+function croppedPlateRects(aabb: Rect, top: number): Rect[] {
+  let rects: Rect[] = [aabb];
+  for (const band of FORGEFATHER_STAIR_RAMPS) {
+    const rise = band.h1 - band.h0;
+    const limit = top + 0.5;
+    // The along-axis interval where the band's surface exceeds the limit.
+    let lo = Math.min(band.a0, band.a1);
+    let hi = Math.max(band.a0, band.a1);
+    if (Math.max(band.h0, band.h1) <= limit) continue;
+    if (Math.min(band.h0, band.h1) < limit) {
+      const tCross = (limit - band.h0) / rise;
+      const aCross = band.a0 + (band.a1 - band.a0) * tCross;
+      if (band.h1 > band.h0) {
+        if (band.a1 > band.a0) lo = Math.max(lo, aCross);
+        else hi = Math.min(hi, aCross);
+      } else if (band.a1 > band.a0) hi = Math.min(hi, aCross);
+      else lo = Math.max(lo, aCross);
+    }
+    if (lo >= hi) continue;
+    const cut: Rect =
+      band.axis === 'z'
+        ? { x0: band.b0, x1: band.b1, z0: lo, z1: hi }
+        : { x0: lo, x1: hi, z0: band.b0, z1: band.b1 };
+    rects = subtractRect(rects, cut);
+  }
+  return rects;
+}
 
 /** The round tower pieces collide as CIRCLES at their drum radius: a
  *  square OBB overhangs a cylinder's wall by 41% at the corners, and the
@@ -219,42 +270,6 @@ export const FORTRESS_CYLINDRICAL_KEYS: ReadonlySet<IgnivarEnvPropKey> = new Set
   'tower_pillar',
 ]);
 
-function staircaseTreadColliders(placement: IgnivarPropPlacement): Collider[] {
-  const scale = placement.scale;
-  const flightLen = scale * STAIR_LANDING_START;
-  const treadLen = flightLen / STAIR_TREADS;
-  const halfDep = (IGNIVAR_PROP_NATIVE.staircase.dep * scale) / 2;
-  const rise = (STAIR_LANDING_HEIGHT * scale) / STAIR_TREADS;
-  const cos = Math.cos(placement.ry);
-  const sin = Math.sin(placement.ry);
-  const out: Collider[] = [];
-  const push = (centerD: number, halfLen: number, top: number) => {
-    // centerD measures from the bottom end along the climb; the model's
-    // bottom end sits at local +x (canonicalGeometry seats the landing at
-    // local -x), so the world offset is the rotated local-x displacement.
-    const lx = scale / 2 - centerD;
-    out.push({
-      type: 'obb',
-      x: placement.x + lx * cos,
-      z: placement.z - lx * sin,
-      hw: halfLen,
-      hd: halfDep,
-      rot: placement.ry,
-      moveTopY: top,
-      cameraTopY: top,
-      standable: true,
-    });
-  };
-  for (let tread = 0; tread < STAIR_TREADS; tread++)
-    push((tread + 0.5) * treadLen, treadLen / 2, placement.y + (tread + 1) * rise);
-  push(
-    (flightLen + scale) / 2,
-    (scale - flightLen) / 2,
-    placement.y + STAIR_LANDING_HEIGHT * scale,
-  );
-  return out;
-}
-
 /** Colliders for the baked pass, in world space: standable platform OBBs
  *  for the deck pieces and the staircase treads, full-height blocker OBBs
  *  for every ground-standing solid (the ignivarPropColliders derivation,
@@ -264,23 +279,32 @@ export function forgefatherFortressColliders(seed: number): Collider[] {
   for (const placement of FORGEFATHER_FORTRESS_PLACEMENTS) {
     const native = IGNIVAR_PROP_NATIVE[placement.key];
     const footprint = IGNIVAR_PROP_COLLIDER_FOOTPRINT[placement.key] ?? 1;
-    if (placement.key === 'staircase') {
-      colliders.push(...staircaseTreadColliders(placement));
-      continue;
-    }
     if (FORTRESS_STANDABLE_KEYS.has(placement.key)) {
       const top = placement.y + native.hei * placement.scale;
-      colliders.push({
-        type: 'obb',
-        x: placement.x,
-        z: placement.z,
-        hw: (native.len * placement.scale) / 2,
-        hd: (native.dep * placement.scale) / 2,
-        rot: placement.ry,
-        moveTopY: top,
-        cameraTopY: top,
-        standable: true,
-      });
+      // Every deck sits at a multiple of 90 degrees, so its footprint is an
+      // axis-aligned rectangle: crop it around any stair-ramp band rising
+      // through it, then emit each remainder strip as its own platform.
+      const cos = Math.abs(Math.cos(placement.ry));
+      const halfX = ((cos * native.len + (1 - cos) * native.dep) * placement.scale) / 2;
+      const halfZ = (((1 - cos) * native.len + cos * native.dep) * placement.scale) / 2;
+      const aabb: Rect = {
+        x0: placement.x - halfX,
+        x1: placement.x + halfX,
+        z0: placement.z - halfZ,
+        z1: placement.z + halfZ,
+      };
+      for (const rect of croppedPlateRects(aabb, top))
+        colliders.push({
+          type: 'obb',
+          x: (rect.x0 + rect.x1) / 2,
+          z: (rect.z0 + rect.z1) / 2,
+          hw: (rect.x1 - rect.x0) / 2,
+          hd: (rect.z1 - rect.z0) / 2,
+          rot: 0,
+          moveTopY: top,
+          cameraTopY: top,
+          standable: true,
+        });
       continue;
     }
     if (IGNIVAR_NON_COLLIDING_PROPS.has(placement.key)) continue;

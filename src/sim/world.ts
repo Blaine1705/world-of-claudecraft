@@ -1,14 +1,7 @@
 import { bgFieldHeightLocal } from './battleground_field';
-import { beaconSpiralLift } from './beacon_spiral';
 import { BORDER_EDGES } from './border_edges';
-import { bulwarkLift, bulwarkPadTarget, bulwarkPadWeight } from './bulwark_layout';
-import {
-  castleLift,
-  castlePadTarget,
-  castlePadWeight,
-  castleSkirtWeight,
-  LAST_SPRING,
-} from './castle_layout';
+import { bulwarkPadTarget, bulwarkPadWeight } from './bulwark_layout';
+import { castlePadTarget, castlePadWeight, castleSkirtWeight, LAST_SPRING } from './castle_layout';
 import { EMBER_BAYS, EMBER_LAND_LOBES } from './content/ember_coast';
 import { STABLE_FLAT, STABLE_PADDOCK } from './content/mounts';
 import { PALMREACH_PROPS } from './content/palmreach';
@@ -37,7 +30,7 @@ import {
   ZONES,
   zoneAt,
 } from './data';
-import { dawnholdLift, dawnholdPadTarget, dawnholdPadWeight } from './dawnhold_layout';
+import { dawnholdPadTarget, dawnholdPadWeight } from './dawnhold_layout';
 import { dockSurfaceHeight } from './deck_surfaces';
 import { dungeonFloorLift } from './dungeon_floor';
 import { dawnholdKeepLiftAt, lastKeepLiftAt } from './dungeon_layout';
@@ -68,6 +61,7 @@ import {
 } from './terrain_region_index';
 import { cragLayer, highlandMask, reliefBase, ridged2, warpedCoords } from './terrain_relief';
 import type { BiomeId, HeightStamp, ZoneDef } from './types';
+import { overworldWalkSurface } from './walk_lifts';
 import { wildheartFieldHeight } from './wildheart_field';
 
 // Terrain is a pure function of (x, z, seed): both the sim (ground clamping)
@@ -3967,18 +3961,10 @@ export function groundHeight(x: number, z: number, seed: number): number {
   // ramp just raises where the player stands. Zero outside the stand footprints,
   // so the pitch stays flat. (The custom-map edit layer is applied inside
   // terrainHeight, so it never touches the flat instance/rift floor above.)
-  // The Old Beacon's stair rides the same idiom: beaconSpiralLift raises the
-  // walkable plank helix and gallery ring around the lighthouse (and its
-  // sheer core plug is what blocks walking through the tower). The Last
-  // Keep's curtain walls, bastions, and stair flights ride it too
-  // (castleLift): the wall mass is a sheer riser the climb gate refuses,
-  // and its flat top is the wall-walk.
-  const terrain =
-    terrainHeight(x, z, seed) +
-    beaconSpiralLift(x, z) +
-    castleLift(x, z) +
-    dawnholdLift(x, z) +
-    bulwarkLift(x, z);
+  // The Old Beacon's stair, the Last Keep's walls and flights, and the
+  // Forgefather stair ramps all ride the same idiom, summed by the
+  // walk_lifts leaf: raised walkable ground the render terrain never sees.
+  const terrain = overworldWalkSurface(x, z, terrainHeight(x, z, seed));
   return Math.max(
     terrain,
     dockSurfaceHeight(

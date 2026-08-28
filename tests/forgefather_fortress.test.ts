@@ -29,7 +29,11 @@ describe('forgefather fortress bake', () => {
       expect(IGNIVAR_PROP_NATIVE[placement.key], placement.key).toBeDefined();
   });
 
-  it('every deck piece emits a standable platform at its surface, above the water', () => {
+  it('every deck piece emits standable platform pieces at its surface, above the water', () => {
+    // A deck's standable footprint may be cropped into several strips
+    // around a stair-ramp band rising through it (the plate-under-flight
+    // rule in croppedPlateRects), so each placement matches by surface
+    // height and containment rather than one exact footprint.
     const colliders = forgefatherFortressColliders(WORLD_SEED) as ObbCollider[];
     const decks = FORGEFATHER_FORTRESS_PLACEMENTS.filter((placement) =>
       FORTRESS_STANDABLE_KEYS.has(placement.key),
@@ -38,15 +42,23 @@ describe('forgefather fortress bake', () => {
     for (const placement of decks) {
       const native = IGNIVAR_PROP_NATIVE[placement.key];
       const top = placement.y + native.hei * placement.scale;
-      const match = colliders.find(
+      const cos = Math.abs(Math.cos(placement.ry));
+      const halfX = ((cos * native.len + (1 - cos) * native.dep) * placement.scale) / 2;
+      const halfZ = (((1 - cos) * native.len + cos * native.dep) * placement.scale) / 2;
+      const pieces = colliders.filter(
         (collider) =>
-          collider.x === placement.x &&
-          collider.z === placement.z &&
-          collider.rot === placement.ry &&
+          collider.type === 'obb' &&
           collider.standable === true &&
-          collider.moveTopY === top,
+          collider.moveTopY === top &&
+          collider.x - collider.hw >= placement.x - halfX - 1e-9 &&
+          collider.x + collider.hw <= placement.x + halfX + 1e-9 &&
+          collider.z - collider.hd >= placement.z - halfZ - 1e-9 &&
+          collider.z + collider.hd <= placement.z + halfZ + 1e-9,
       );
-      expect(match, `${placement.key} at (${placement.x}, ${placement.z})`).toBeDefined();
+      expect(
+        pieces.length,
+        `${placement.key} at (${placement.x}, ${placement.z})`,
+      ).toBeGreaterThanOrEqual(1);
       // The crossing stays dry: every walking surface clears the waterline.
       expect(top, `${placement.key} deck at (${placement.x}, ${placement.z})`).toBeGreaterThan(
         WATER_LEVEL + 1,
