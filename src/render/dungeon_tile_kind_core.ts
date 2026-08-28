@@ -3,6 +3,9 @@
 // variant. Extracted from dungeon.ts (monolith ratchet); dungeon.ts is the
 // thin consumer. Deterministic and DOM-free so it unit-tests headless (the
 // ignivar weight constants come from the tile kit module, which is not).
+
+import { polygonContainsPoint } from '../sim/geometry2d';
+import { ignivarArenaFloorTileCenterHasStone } from '../sim/ignivar_arena';
 import type { DungeonInteriorVariant } from './dungeon';
 import { pickKind } from './dungeon_banner_core';
 import { IGNIVAR_FLOOR_KIND_WEIGHTS, IGNIVAR_FLOOR_QUAD_KIND } from './ignivar_tile_kit';
@@ -288,4 +291,65 @@ export function dungeonWallKind(
     ],
     t,
   );
+}
+
+/** Whether a floor module footprint centered at (x, z) with half-extents
+ *  (hw, hd) reaches a polygon-shelled room: its center or any corner lies
+ *  inside the shell. The center-only test drops a boundary module the moment
+ *  its center steps outside, leaving a bare undershoot band (up to a full
+ *  cell) along polygon walls and diagonal cuts; corner inclusion extends the
+ *  floor to the wall face and overshoots slightly instead, exactly like the
+ *  rectangle path's zMin-2/zMax+2 end rows, and the walls occlude the
+ *  overhang. The Ignivar ARENA must keep the center-only predicate at its
+ *  call site: the lava moat's lethal mask consumes the exact center-test
+ *  tile union, so its floor outline is gameplay, not dressing. */
+export function floorFootprintTouchesShell(
+  poly: readonly { x: number; z: number }[],
+  x: number,
+  z: number,
+  hw: number,
+  hd: number,
+): boolean {
+  return (
+    polygonContainsPoint(poly, x, z) ||
+    polygonContainsPoint(poly, x - hw, z - hd) ||
+    polygonContainsPoint(poly, x + hw, z - hd) ||
+    polygonContainsPoint(poly, x - hw, z + hd) ||
+    polygonContainsPoint(poly, x + hw, z + hd)
+  );
+}
+
+/** Whether the Ignivar ARENA's lava-moat stone carve removes the floor cell
+ *  centered at (x, z). The carve is arena ROOM geometry, not tile-kit
+ *  styling: all three Ignivar interiors share the 'ignivar' kit VARIANT, but
+ *  only the arena room (interior 'ignivar') owns the moat, and its playable
+ *  polygon is authored in that room's local frame. Keying this off the
+ *  variant stamped the arena octagon onto the Halls, Molten Assembly, and
+ *  the Inner Crucible, which is exactly the black stair-step floor voids
+ *  those rooms shipped with. */
+export function ignivarMoatCarvesFloorCell(interior: string, x: number, z: number): boolean {
+  return interior === 'ignivar' && !ignivarArenaFloorTileCenterHasStone(x, z);
+}
+
+/** The one room-shape gate for a kit floor module (a 4x4 cell, a 4x2 grate
+ *  half, or a 2x2 quad sub-tile) centered at (cx, cz) with half-extents
+ *  (hw, hd). Rectangle rooms (no shell polygon) place everything, matching
+ *  the grid's deliberate end-row overshoot. The Ignivar ARENA (interior
+ *  'ignivar') keeps the strict center predicate because its lava moat's
+ *  lethal mask consumes the exact center-test tile union: the floor outline
+ *  there is gameplay, not dressing. Every other polygon room keeps a
+ *  boundary module whenever any corner of its footprint reaches the shell,
+ *  so walls and diagonal cuts get no bare undershoot band. */
+export function floorModuleTouchesRoomShell(
+  interior: string,
+  poly: readonly { x: number; z: number }[] | undefined,
+  cx: number,
+  cz: number,
+  hw: number,
+  hd: number,
+): boolean {
+  if (!poly) return true;
+  return interior === 'ignivar'
+    ? polygonContainsPoint(poly, cx, cz)
+    : floorFootprintTouchesShell(poly, cx, cz, hw, hd);
 }

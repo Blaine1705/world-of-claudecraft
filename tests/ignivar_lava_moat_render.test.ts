@@ -114,7 +114,12 @@ describe('Ignivar lava moat render', () => {
     const source = readFileSync(new URL('../src/render/dungeon.ts', import.meta.url), 'utf8');
     expect(source).toContain("from './ignivar_lava_moat'");
     expect(source).toContain('await ensureIgnivarLavaMoatAssets()');
-    expect(source).toContain("variant === 'ignivar' && !ignivarArenaFloorTileCenterHasStone(x, z)");
+    // The carve is keyed by INTERIOR, not the shared 'ignivar' kit variant:
+    // variant-keying stamped the arena octagon onto the Halls, Molten
+    // Assembly, and Inner Crucible floors (the black-void bug). The
+    // arena-only behavior of the predicate itself is pinned in
+    // tests/dungeon_tile_kind_core.test.ts.
+    expect(source).toContain('if (ignivarMoatCarvesFloorCell(interior, x, z)) continue;');
     expect(source.match(/buildIgnivarLavaMoat\(/g)).toHaveLength(1);
   });
 });
