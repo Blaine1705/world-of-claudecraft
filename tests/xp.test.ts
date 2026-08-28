@@ -45,7 +45,6 @@ import { bareClient, broadcast, fakeWs, joinServer, lastSnap } from './helpers/b
 
 type VirtualLevelUpEvent = Extract<SimEvent, { type: 'virtualLevelUp' }>;
 type DeedUnlockedEvent = Extract<SimEvent, { type: 'deedUnlocked' }>;
-type MilestoneUnlockedEvent = SimEvent & { type: 'milestoneUnlocked' };
 type SnapshotMessage = { t: 'snap'; self: { lxp: number; prk: number } };
 type SnapshotClient = { applySnapshot(snap: SnapshotMessage): void };
 
@@ -283,9 +282,7 @@ describe('cosmetic milestones', () => {
         (e): e is DeedUnlockedEvent => e.type === 'deedUnlocked' && e.deedId === `prog_${first.id}`,
       ),
     ).toBe(true);
-    expect(evs.some((e): e is MilestoneUnlockedEvent => e.type === 'milestoneUnlocked')).toBe(
-      false,
-    );
+    expect(evs.map((e) => e.type as string)).not.toContain('milestoneUnlocked');
   });
 
   it('does not re-unlock a milestone already earned', () => {
@@ -295,13 +292,14 @@ describe('cosmetic milestones', () => {
     sim.tick();
     sim.grantXp(1000);
     const evs = sim.tick();
+    const eventTypes = evs.map((e) => e.type as string);
     expect(
       evs.some(
-        (e) =>
-          e.type === 'milestoneUnlocked' ||
-          (e.type === 'deedUnlocked' && e.deedId === `prog_${MILESTONES[0].id}`),
+        (e): e is DeedUnlockedEvent =>
+          e.type === 'deedUnlocked' && e.deedId === `prog_${MILESTONES[0].id}`,
       ),
     ).toBe(false);
+    expect(eventTypes).not.toContain('milestoneUnlocked');
   });
 });
 
