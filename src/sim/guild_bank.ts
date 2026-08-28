@@ -974,6 +974,18 @@ export function guildBankDeposit(
     generalOnlyPools(guildBankCapacity(book)),
   );
   if (result.refusal === 'no_fit') {
+    // The personal-bank deposit arm's discrimination, mirrored
+    // (MoveResult.noFitCause): 'instanced_units' means free slots EXIST and
+    // only the payload's indivisibility refused, so "full" would lie; it
+    // gets its own line (re-localized via src/ui/sim_i18n.ts, every sim
+    // literal's rule).
+    if (result.noFitCause === 'instanced_units') {
+      ctx.error(
+        meta.entityId,
+        'That stack cannot be split to fit the space left in the guild bank.',
+      );
+      return;
+    }
     ctx.error(meta.entityId, 'The guild bank is full.');
     return;
   }
@@ -1027,6 +1039,13 @@ export function guildBankWithdraw(
     bagPools(meta.bags),
   );
   if (result.refusal === 'no_fit') {
+    // The same granularity discrimination as the deposit arm above, into the
+    // bags direction: the honest line for an indivisible stack is shared
+    // with bankWithdraw (same destination, same literal, one EXACT row).
+    if (result.noFitCause === 'instanced_units') {
+      ctx.error(meta.entityId, 'That stack cannot be split to fit the space left in your bags.');
+      return;
+    }
     bagsFullError(ctx, meta.entityId);
     return;
   }

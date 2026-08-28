@@ -26,6 +26,7 @@ import {
   sanitizeItemInstancePayloadOnLoad,
   warnDroppedInstanceKeys,
 } from './item_instance_load';
+import { isMergeableInstancePayload } from './item_instance_merge';
 import { isMaterialItemId } from './material_ids';
 import { sanitizeRiftGearInstance } from './rift/progression';
 import type { SimContext } from './sim_context';
@@ -272,12 +273,15 @@ export type MoveRefusal = 'invalid' | 'no_fit';
  *  free slot the item's pool allows; partial byte-equal merge room counts as
  *  exhaustion, since the remaining SLOTS are what pool allocation is about),
  *  while 'instanced_units' is unit granularity: free usable slots EXIST, but
- *  the slot moves as one indivisible payload whose units outnumber what the
- *  free slots plus merge room can absorb. Every sim-built non-mergeable slot
- *  carries one unit and lands in any free slot, so 'instanced_units' is
- *  reachable only through a tolerated hand-shaped save's multi-unit
- *  non-mergeable stack; the refusal LINE still must not blame pool
- *  allocation for it. */
+ *  the slot's NON-MERGEABLE payload absorbs only one unit per fresh slot, so
+ *  the indivisible whole cannot land. A MERGEABLE payload never earns the
+ *  label: fresh slots absorb full stacks of it, so a refusal with free slots
+ *  left (a hand-shaped over-stackSize stack) is a slot shortage that
+ *  addStacked's splitting could not cover, which IS pool exhaustion.
+ *  Every sim-built non-mergeable slot carries one unit and lands in any free
+ *  slot, so 'instanced_units' is reachable only through a tolerated
+ *  hand-shaped save's multi-unit non-mergeable stack; the refusal LINE still
+ *  must not blame pool allocation for it. */
 export type NoFitCause = 'space' | 'instanced_units';
 export interface MoveResult {
   moved: number;
@@ -344,11 +348,14 @@ export function moveBetweenContainers(
       slot.craftedRecipeId,
     );
     if (fit < slot.count) {
-      // Granularity ONLY when a free slot the item's pool allows exists and
-      // the indivisible payload still cannot land whole; partial byte-equal
-      // merge room with zero free slots IS pool exhaustion ('space'), so the
-      // pool-honest refusal lines stay truthful for it.
+      // Granularity ONLY when the payload is non-mergeable AND a free slot
+      // the item's pool allows exists: partial byte-equal merge room with
+      // zero free slots IS pool exhaustion ('space'), and so is a MERGEABLE
+      // payload short of slots (addStacked would split it across fresh
+      // slots, so "cannot be split" would lie about it; only a tolerated
+      // hand-shaped save's over-stackSize stack reaches that shape).
       const cause: NoFitCause =
+        !isMergeableInstancePayload(slot.instance) &&
         freePoolSlots(dest, destPools, slot.itemId, isMaterialItemId) > 0
           ? 'instanced_units'
           : 'space';
@@ -501,6 +508,15 @@ export function bankWithdraw(
     bagPools(meta.bags),
   );
   if (result.refusal === 'no_fit') {
+    // The deposit arm's discrimination, mirrored (MoveResult.noFitCause):
+    // 'instanced_units' means free bag slots EXIST and only the payload's
+    // indivisibility refused, so "Your bags are full." would lie about the
+    // same stack the deposit path names honestly; it gets its own line
+    // (re-localized via src/ui/sim_i18n.ts, every sim literal's rule).
+    if (result.noFitCause === 'instanced_units') {
+      ctx.error(meta.entityId, 'That stack cannot be split to fit the space left in your bags.');
+      return;
+    }
     bagsFullError(ctx, meta.entityId);
     return;
   }

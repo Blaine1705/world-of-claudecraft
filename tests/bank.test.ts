@@ -330,6 +330,32 @@ describe('deposit rules', () => {
     expect(m.copper).toBe(copperBefore);
   });
 
+  it('a MERGEABLE over-cap instanced deposit short of slots gets the pool-honest full line', () => {
+    // The emit boundary of the moveBetweenContainers "reads space" pin: the
+    // hand-shaped over-stackSize MERGEABLE instanced stack (only the load
+    // clamp keeps sim-built stacks at or under cap) against a bank with free
+    // slots, but too few. The mergeable gate classifies the shortfall as
+    // pool exhaustion, so the deposit arm must emit the pool-honest full
+    // line and must NOT emit the indivisible line: a later re-widening of
+    // the granularity cause cannot silently restore the wrong literal here.
+    const sim = makeSim();
+    const m = meta(sim);
+    m.bank.inventory = gearSlots(22); // base 24: exactly two free slots
+    pushInstanced(sim, 'wolf_fang', { signer: 'Ana' });
+    m.inventory[m.inventory.length - 1].count = 45; // needs 20+20+5: three slots
+    const bagBefore = clone(m.inventory);
+    const bankBefore = clone(m.bank.inventory);
+    sim.drainEvents();
+    sim.bankDeposit(m.inventory.length - 1);
+    const evs = sim.drainEvents();
+    expect(hasErr(evs, 'Your bank is full.')).toBe(true);
+    expect(hasErr(evs, 'That stack cannot be split to fit the space left in your bank.')).toBe(
+      false,
+    );
+    expect(m.inventory).toEqual(bagBefore);
+    expect(m.bank.inventory).toEqual(bankBefore);
+  });
+
   it('treats out-of-range / non-positive / over-count deposits as SILENT no-ops', () => {
     const sim = makeSim();
     const m = meta(sim);
@@ -410,6 +436,29 @@ describe('withdraw rules', () => {
     expect(m.bank.inventory).toEqual([{ itemId: 'wolf_fang', count: 3 }]);
     expect(m.inventory).toEqual(bagBefore); // nothing duplicated into the full bags
     expect(m.copper).toBe(copperBefore);
+  });
+
+  it('a granularity withdraw refusal gets the bags-direction line, never "bags are full"', () => {
+    // The deposit arm's discrimination, mirrored at the withdraw gate: a
+    // hand-shaped multi-unit charges stack (every sim-built charges slot is
+    // count 1) banked, against bags with ONE free slot. One unit would land;
+    // three cannot, so "Your bags are full." would lie about the same stack
+    // the deposit path names honestly.
+    const sim = makeSim();
+    const m = meta(sim);
+    m.bank.inventory = [{ itemId: 'wolf_fang', count: 3, instance: { charges: { heal: 2 } } }];
+    m.inventory = gearSlots(15); // backpack 16: exactly one free general slot
+    const bankBefore = clone(m.bank.inventory);
+    const bagBefore = clone(m.inventory);
+    sim.drainEvents();
+    sim.bankWithdraw(0);
+    const evs = sim.drainEvents();
+    expect(hasErr(evs, 'That stack cannot be split to fit the space left in your bags.')).toBe(
+      true,
+    );
+    expect(hasErr(evs, 'Your bags are full.')).toBe(false);
+    expect(m.bank.inventory).toEqual(bankBefore); // kept in the bank, not destroyed
+    expect(m.inventory).toEqual(bagBefore);
   });
 
   it('lands a MATERIAL in satchel headroom and refuses a non-material from the same state', () => {
@@ -677,6 +726,36 @@ describe('moveBetweenContainers (container-agnostic guild-bank seam)', () => {
     });
     expect(src).toHaveLength(1);
     expect(dst).toEqual([]);
+  });
+
+  it('a MERGEABLE over-cap stack short of slots reads space, because a split would land it', () => {
+    // The hand-shaped save shape that used to misread as granularity: a
+    // mergeable instanced stack past its 20-cap (only the load clamp keeps
+    // sim-built stacks at or under cap) against two free slots. Free slots
+    // EXIST, but addStacked would split the stack across fresh slots if
+    // enough existed, so "cannot be split" is false; the honest cause is a
+    // slot shortage ('space').
+    const src: InvSlot[] = [{ itemId: 'wolf_fang', count: 45, instance: { signer: 'Ana' } }];
+    const dst: InvSlot[] = [];
+    const srcSnap = clone(src);
+    expect(moveBetweenContainers(src, 0, undefined, dst, { general: 2, materials: 0 })).toEqual({
+      moved: 0,
+      refusal: 'no_fit',
+      noFitCause: 'space',
+    });
+    expect(src).toEqual(srcSnap);
+    expect(dst).toEqual([]);
+    // The positive control that makes 'space' the truthful label: one more
+    // free slot and the same stack lands whole, SPLIT across three slots.
+    expect(moveBetweenContainers(src, 0, undefined, dst, { general: 3, materials: 0 })).toEqual({
+      moved: 45,
+    });
+    expect(src).toEqual([]);
+    expect(dst).toEqual([
+      { itemId: 'wolf_fang', count: 20, instance: { signer: 'Ana' } },
+      { itemId: 'wolf_fang', count: 20, instance: { signer: 'Ana' } },
+      { itemId: 'wolf_fang', count: 5, instance: { signer: 'Ana' } },
+    ]);
   });
 
   it('a differently-signed instanced move still demands its own free destination slot', () => {

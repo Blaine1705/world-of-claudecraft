@@ -1165,6 +1165,80 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
     expect(hasErr(sim.drainEvents(), 'Your bags are full.')).toBe(true);
   });
 
+  it('a granularity deposit refusal gets its own line, never "The guild bank is full."', () => {
+    // The personal-bank deposit arm's discrimination, mirrored: a hand-shaped
+    // multi-unit charges stack (every sim-built charges slot is count 1)
+    // against a book with ONE free slot. One unit would land; three cannot,
+    // and "full" would lie about the free slot on screen. Charges are not a
+    // per-copy transfer lock, so the pipe policy passes and the capacity gate
+    // is the arm that answers.
+    const sim = makeOfficerSim();
+    for (let i = 0; i < GUILD_BANK_RUNG_SLOTS[0] - 1; i++) {
+      book(sim).inventory.push({ itemId: 'wolf_fang', count: 1, instance: { signer: `S${i}` } });
+    }
+    meta(sim).inventory.push({ itemId: 'wolf_fang', count: 3, instance: { charges: { heal: 2 } } });
+    const before = fingerprint(sim);
+    sim.drainEvents();
+    sim.guildBankDepositFor(sim.playerId, meta(sim).inventory.length - 1);
+    expect(fingerprint(sim)).toBe(before);
+    const evs = sim.drainEvents();
+    expect(hasErr(evs, 'That stack cannot be split to fit the space left in the guild bank.')).toBe(
+      true,
+    );
+    expect(hasErr(evs, 'The guild bank is full.')).toBe(false);
+  });
+
+  it('a MERGEABLE over-cap deposit short of slots gets the full line, never the split line', () => {
+    // The emit boundary of the mergeable gate, personal-bank twin in
+    // tests/bank.test.ts: a hand-shaped over-stackSize MERGEABLE instanced
+    // stack (signer payloads merge; only the load clamp keeps sim-built
+    // stacks at or under cap) against a book with free slots, but too few.
+    // The gate reads the shortfall as pool exhaustion ('space'), so the
+    // deposit names the full book and must NOT claim the stack cannot be
+    // split: a later re-widening of the granularity cause cannot silently
+    // restore the wrong literal here.
+    const sim = makeOfficerSim();
+    for (let i = 0; i < GUILD_BANK_RUNG_SLOTS[0] - 2; i++) {
+      book(sim).inventory.push({ itemId: 'wolf_fang', count: 1, instance: { signer: `S${i}` } });
+    }
+    meta(sim).inventory.push({ itemId: 'wolf_fang', count: 45, instance: { signer: 'Ana' } });
+    const before = fingerprint(sim);
+    sim.drainEvents();
+    sim.guildBankDepositFor(sim.playerId, meta(sim).inventory.length - 1);
+    expect(fingerprint(sim)).toBe(before);
+    const evs = sim.drainEvents();
+    expect(hasErr(evs, 'The guild bank is full.')).toBe(true);
+    expect(hasErr(evs, 'That stack cannot be split to fit the space left in the guild bank.')).toBe(
+      false,
+    );
+  });
+
+  it('a granularity withdraw refusal gets the bags-direction line, never "bags are full"', () => {
+    // The mirror into the officer's bags: the hand-shaped charges stack sits
+    // in the book, the bags keep ONE free slot, and the refusal names the
+    // stack's indivisibility rather than claiming the bags are full.
+    const sim = makeOfficerSim();
+    book(sim).inventory.push({ itemId: 'wolf_fang', count: 3, instance: { charges: { heal: 2 } } });
+    const m = meta(sim);
+    const cap = bagCapacity(m.bags);
+    while (m.inventory.length < cap - 1) {
+      m.inventory.push({
+        itemId: 'wolf_fang',
+        count: 1,
+        instance: { signer: `B${m.inventory.length}` },
+      });
+    }
+    const before = fingerprint(sim);
+    sim.drainEvents();
+    sim.guildBankWithdrawFor(sim.playerId, 0);
+    expect(fingerprint(sim)).toBe(before);
+    const evs = sim.drainEvents();
+    expect(hasErr(evs, 'That stack cannot be split to fit the space left in your bags.')).toBe(
+      true,
+    );
+    expect(hasErr(evs, 'Your bags are full.')).toBe(false);
+  });
+
   it('deposits a partial count, decrements the source, and emits the item notice', () => {
     const sim = makeOfficerSim();
     sim.addItem('wolf_fang', 10);

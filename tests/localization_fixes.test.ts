@@ -947,8 +947,11 @@ function scanEmitCandidates(simSrc: string, serverSrc: string): Cand[] {
   // bare `ctx.error` from free-function modules (G1a progression/talents.ts, I1
   // instances/dungeons.ts, C4a combat/casting_lifecycle.ts, P1b pet/pet_commands.ts) are
   // the same player-facing error sink. `(?:this|ctx)\.error` matches all three (it catches
-  // this.ctx.error via the trailing ctx.error).
-  const er = new RegExp(`(?:this|ctx)\\.error\\([^,]+,\\s*${lit}\\s*\\)`, 'g');
+  // this.ctx.error via the trailing ctx.error). The close tolerates a trailing
+  // comma before `)`: a biome-wrapped multi-line emit gains one, and without
+  // the tolerance the whole emit is invisible to this guard (its green is then
+  // vacuous for that literal).
+  const er = new RegExp(`(?:this|ctx)\\.error\\([^,]+,\\s*${lit}\\s*,?\\s*\\)`, 'g');
   for (const m of simSrc.matchAll(er)) cands.push({ type: 'error', tmpl: unq(m[1]) });
   // Variable-routed sim emits: this/ctx.notice(pid, '<lit>') (emits 'log') and
   // this/ctx.stopFollow(p, '<lit>') (arg2 routes through error) — blind spots.
@@ -956,9 +959,16 @@ function scanEmitCandidates(simSrc: string, serverSrc: string): Cand[] {
   // `this.stopFollow(p);`) cannot span into the NEXT call's literal.
   const nr = new RegExp(`(?:this|ctx)\\.(?:notice|stopFollow)\\([^,()\\n]+,\\s*${lit}`, 'g');
   for (const m of simSrc.matchAll(nr)) cands.push({ type: 'log', tmpl: unq(m[1]) });
-  // Ternary args to error/notice/stopFollow (both branches).
+  // Ternary args to error/notice/stopFollow (both branches). The first-arg
+  // class spans newlines (a biome-wrapped call puts each arg on its own line)
+  // but still excludes parens, so a single-arg call cannot bleed into the NEXT
+  // call's literal. The condition class also spans newlines and admits `??`
+  // PAIRS (a lone `?` still terminates it, and the no-comma rule keeps it from
+  // crossing an argument boundary or a trailing comma), so a wrapped ternary
+  // emit, nullish-coalescing condition included, stays under the guard.
+  const condw = '(?:[^?,{}]|\\?\\?)*?';
   const ert = new RegExp(
-    `(?:this|ctx)\\.(?:error|notice|stopFollow)\\([^,()\\n]+,\\s*${cond}\\?\\s*${lit}\\s*:\\s*${lit}`,
+    `(?:this|ctx)\\.(?:error|notice|stopFollow)\\([^,()]+,\\s*${condw}\\?\\s*${lit}\\s*:\\s*${lit}`,
     'g',
   );
   for (const m of simSrc.matchAll(ert)) {
@@ -1615,6 +1625,14 @@ describe('S3 scanner enumerates each hardened emit form (regression)', () => {
     "this.notice(p.id, 'SYNTH_NOTICE');", // nr (notice)
     "this.stopFollow(p, 'SYNTH_STOPFOLLOW');", // nr (stopFollow)
     "this.error(p.id, flag ? 'SYNTH_ERR_TERN_A' : 'SYNTH_ERR_TERN_B');", // ert
+    // er, biome-wrapped: each arg on its own line and a trailing comma before
+    // the close (the shape that was invisible before the `,?` close tolerance).
+    "ctx.error(\n  p.id,\n  'SYNTH_WRAPPED_ERR',\n);",
+    // ert, biome-wrapped ternary: wrapped args, wrapped branches, trailing comma.
+    "this.ctx.error(\n  p.id,\n  flag === 'x'\n    ? 'SYNTH_WRAPPED_TERN_A'\n    : 'SYNTH_WRAPPED_TERN_B',\n);",
+    // ert, wrapped ternary whose CONDITION contains a `??` pair (the lone-`?`
+    // terminator must not choke on nullish coalescing).
+    "ctx.error(\n  p.id,\n  (p.mana ?? 0) === 0\n    ? 'SYNTH_WRAPPED_NULLISH_A'\n    : 'SYNTH_WRAPPED_NULLISH_B',\n);",
     "return 'Synth returns a sentence here.';", // rr
     // nr anti-bleed: a single-arg stopFollow() must stop its first-arg scan at ')'
     // (the [^,()\\n]+ class) and NOT span into a following call's literal.
@@ -1640,6 +1658,11 @@ describe('S3 scanner enumerates each hardened emit form (regression)', () => {
     ['sim this.stopFollow literal (nr)', 'log', 'SYNTH_STOPFOLLOW'],
     ['sim this.error ternary, branch A (ert)', 'error', 'SYNTH_ERR_TERN_A'],
     ['sim this.error ternary, branch B (ert)', 'error', 'SYNTH_ERR_TERN_B'],
+    ['sim ctx.error biome-wrapped, trailing comma (er)', 'error', 'SYNTH_WRAPPED_ERR'],
+    ['sim wrapped ternary error, branch A (ert)', 'error', 'SYNTH_WRAPPED_TERN_A'],
+    ['sim wrapped ternary error, branch B (ert)', 'error', 'SYNTH_WRAPPED_TERN_B'],
+    ['sim wrapped nullish-condition ternary, branch A (ert)', 'error', 'SYNTH_WRAPPED_NULLISH_A'],
+    ['sim wrapped nullish-condition ternary, branch B (ert)', 'error', 'SYNTH_WRAPPED_NULLISH_B'],
     ['sim return-sentence (rr)', 'error', 'Synth returns a sentence here.'],
     ['server inline text (s1)', 'error', 'SYNTH_SERVER_INLINE'],
     ['server ternary text, branch A (s1t)', 'log', 'SYNTH_SRV_TERN_A'],
