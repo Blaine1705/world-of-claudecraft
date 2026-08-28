@@ -50,9 +50,15 @@ const PROP_GLOW_POOLS: Partial<Record<IgnivarEnvPropKey, { color: number; scale:
   anvil: { color: 0xff5c1e, scale: 1.25 },
   forge: { color: 0xff5c1e, scale: 1.05 },
   reactor: { color: 0xffa04a, scale: 0.7 },
+  // the Exterior_Assets fortress kit's molten pieces
+  dragon_head: { color: 0xff4316, scale: 0.9 },
+  fountain_base: { color: 0xff5c1e, scale: 0.85 },
+  lava_furnace_2: { color: 0xff4316, scale: 0.8 },
+  lava_pillar: { color: 0xff5c1e, scale: 0.7 },
+  lava_ramp: { color: 0xff4316, scale: 0.9 },
 };
 
-function addPropGlowPools(
+export function addPropGlowPools(
   group: THREE.Group,
   placements: readonly IgnivarPropPlacement[],
   lowGfx: boolean,

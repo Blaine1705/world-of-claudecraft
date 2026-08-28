@@ -98,4 +98,23 @@ export const FORGEFATHER_ISLE_TERRAIN_EDITS: HeightStamp[] = [
   { x: 517, z: 2232, radius: 9, delta: 3.5, falloff: 'smooth', mode: 'level' }, // east mid shelf
   { x: 521, z: 2239, radius: 10, delta: -1, falloff: 'smooth', mode: 'level' }, // northeast landing
   { x: 514, z: 2249, radius: 8, delta: -1, falloff: 'smooth', mode: 'level' }, // north landing
+  // The fortress courts (the owner's baked pass,
+  // src/sim/forgefather_fortress.ts): ground leveled flush under the placed
+  // floor plates. The tier-one and south-bailey floors already sit on their
+  // tiers' own flats.
+  { x: 508, z: 2219, radius: 13, delta: 6.3, falloff: 'smooth', mode: 'level' }, // middle court
+  { x: 508, z: 2219, radius: 9, delta: 6.3, falloff: 'flat', mode: 'level' },
+  { x: 504.3, z: 2241.2, radius: 8, delta: 14.7, falloff: 'smooth', mode: 'level' }, // upper landing
+  { x: 504.3, z: 2241.2, radius: 5, delta: 14.7, falloff: 'flat', mode: 'level' },
+  // ...and the stair ramps: each placed staircase dresses a real terrain
+  // ramp (stairs are walk-over props, never colliders), so the climb is
+  // the ground itself. Two risers per flight, blending into the courts.
+  { x: 507.8, z: 2206, radius: 4, delta: 3.2, falloff: 'smooth', mode: 'level' }, // bailey to court
+  { x: 507.8, z: 2209.5, radius: 4, delta: 4.9, falloff: 'smooth', mode: 'level' },
+  { x: 504.1, z: 2220, radius: 4, delta: 7.6, falloff: 'smooth', mode: 'level' }, // court to tier three
+  { x: 504.1, z: 2223.5, radius: 4, delta: 9.4, falloff: 'smooth', mode: 'level' },
+  { x: 503.35, z: 2233, radius: 3.5, delta: 12.2, falloff: 'smooth', mode: 'level' }, // tier three up
+  { x: 503.35, z: 2236, radius: 3.5, delta: 13.5, falloff: 'smooth', mode: 'level' },
+  { x: 503.05, z: 2242.5, radius: 3.5, delta: 15.8, falloff: 'smooth', mode: 'level' }, // landing to keep
+  { x: 503.05, z: 2244.5, radius: 3.5, delta: 16.9, falloff: 'smooth', mode: 'level' },
 ];

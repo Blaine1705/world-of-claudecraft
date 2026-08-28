@@ -121,7 +121,10 @@ describe('ignivar dressing plan', () => {
       expect(bytes, `${url} exceeds the per-prop budget`).toBeLessThanOrEqual(400_000);
       total += bytes;
     }
-    expect(total, 'prop set exceeds the total budget').toBeLessThanOrEqual(7_000_000);
+    // Raised 7_000_000 to 10_000_000 when the 19-piece Exterior_Assets
+    // fortress kit joined the roster (35 to 54 props); re-tighten to the
+    // exact shipped total once the KTX2 re-encode of the new pieces lands.
+    expect(total, 'prop set exceeds the total budget').toBeLessThanOrEqual(10_000_000);
   });
 
   it('pins the native dims table to the shipped GLBs (canonical long-axis-on-X)', async () => {

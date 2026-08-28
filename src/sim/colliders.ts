@@ -31,7 +31,6 @@ import {
   BUILTIN_WORLD,
   battlegroundOrigin,
   DUNGEON_FLOOR_Y,
-  DUNGEON_LIST,
   DUNGEON_X_THRESHOLD,
   DUNGEONS,
   defaultDelveModules,
@@ -68,6 +67,7 @@ import {
 } from './decoration_dims';
 import { type DelveModuleId, delveModuleColliders } from './delve_layout';
 import { isLitanyModuleId, litanyModuleLosColliders } from './delve_litany_layout';
+import { dungeonDoorJambColliders } from './dungeon_door_jambs';
 import { dungeonInstanceAt, INTERIOR_LAYOUTS } from './dungeon_floor';
 import {
   ARENA_LAYOUT,
@@ -80,6 +80,7 @@ import {
 import { emberLilySpots } from './ember_lilies';
 import { fenWillowSpots, hollowWillowSpots } from './fen_willows';
 import { FENBRIDGE_LAYOUT } from './fenbridge_layout';
+import { forgefatherFortressColliders } from './forgefather_fortress';
 import { derivedInteriorColliders } from './interior_collider_sets';
 import {
   benchDrawnHeight,
@@ -93,10 +94,6 @@ import {
   DELVE_ARCH_HW,
   DOCK_BOAT,
   DOCK_DRESSING,
-  DOOR_ARCH_HEIGHT,
-  DOOR_ARCH_JAMB_HD,
-  DOOR_ARCH_JAMB_HW,
-  DOOR_ARCH_JAMB_X,
   delveArchZ,
   GATHER_NODE_BODIES,
   GRAVE_COUNT,
@@ -875,30 +872,11 @@ function staticWorldColliders(seed: number): Collider[] {
     });
   }
 
-  // Overworld dungeon door arches: only the two stone JAMBS collide, because
-  // walking into the mouth IS the enter trigger. The Abandoned Crypt's door
-  // draws no arch (an invisible click box at the mine), and two dungeons can
-  // share one doorway, so dedupe by position.
-  const doorSpots = new Set<string>();
-  for (const dungeon of DUNGEON_LIST) {
-    if (dungeon.overworldDoor === false) continue;
-    if (dungeon.id === 'nythraxis_crypt') continue;
-    const key = `${dungeon.doorPos.x},${dungeon.doorPos.z}`;
-    if (doorSpots.has(key)) continue;
-    doorSpots.add(key);
-    for (const sx of [-DOOR_ARCH_JAMB_X, DOOR_ARCH_JAMB_X]) {
-      const x = dungeon.doorPos.x + sx;
-      out.push({
-        type: 'obb',
-        x,
-        z: dungeon.doorPos.z,
-        hw: DOOR_ARCH_JAMB_HW,
-        hd: DOOR_ARCH_JAMB_HD,
-        rot: 0,
-        cameraTopY: topY(seed, x, dungeon.doorPos.z, DOOR_ARCH_HEIGHT),
-      });
-    }
-  }
+  // Dungeon door arch jambs (dungeon_door_jambs.ts owns the rule).
+  out.push(...dungeonDoorJambColliders(seed, topY));
+  // The Forgefather's Isle fortress: the owner's baked exterior pass
+  // (forgefather_fortress.ts owns the ground-standing derivation).
+  out.push(...forgefatherFortressColliders(seed));
 
   // Delve entrance portals: the whole slab is a solid one-way threshold
   // (players enter by talking to the warden; leaveDelve drops them mouth-side

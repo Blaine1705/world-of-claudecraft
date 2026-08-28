@@ -412,7 +412,9 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned after the interior-collider-set assembly extraction to
     // interior_collider_sets.ts (which appends the Ignivar authored prop
     // colliders). Exact count, zero slack.
-    ceiling: 2609,
+    // the dungeon-door jamb block extracted to dungeon_door_jambs.ts; the
+    // fortress collider hook rode the freed room
+    ceiling: 2587,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {

@@ -125,6 +125,26 @@ const EXTERIOR_KIT: readonly IgnivarEnvPropKey[] = [
   'lava_outlet_2',
   'lava_port',
   'torch',
+  // the Exterior_Assets fortress kit (the owner's drop, 2026-08-28)
+  'bridge_floor',
+  'bridge_pillar',
+  'bridge_rail',
+  'cannon',
+  'dragon_head',
+  'dragon_pillar',
+  'fortress_wall',
+  'fountain_base',
+  'gate',
+  'gate_gear',
+  'lava_furnace_2',
+  'lava_pillar',
+  'lava_ramp',
+  'staircase',
+  'stone_floor',
+  'tower_base',
+  'tower_middle',
+  'tower_pillar',
+  'tower_top',
 ];
 
 type AssetKit = 'interior' | 'exterior';
@@ -610,7 +630,10 @@ function buildPanel(): void {
   ]);
   const nudgeY = (dy: number) => () =>
     mutateSelected((entry) => {
-      entry.y = Math.max(0, Math.round((entry.y + dy) * 100) / 100);
+      // Interiors floor at 0 (the room's own floor); the exterior floors at
+      // -8, past the waterline (-4.3), so pieces can sink to the seabed.
+      const floor = state.room?.exterior ? -8 : 0;
+      entry.y = Math.max(floor, Math.round((entry.y + dy) * 100) / 100);
     });
   buttonRow(panel, [
     button('Y-1', nudgeY(-1)),

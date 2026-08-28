@@ -44,7 +44,26 @@ export type IgnivarEnvPropKey =
   | 'steam_machine'
   | 'steam_machine_round'
   | 'steam_pipes'
-  | 'torch';
+  | 'torch'
+  | 'bridge_floor'
+  | 'bridge_pillar'
+  | 'bridge_rail'
+  | 'cannon'
+  | 'dragon_head'
+  | 'dragon_pillar'
+  | 'fortress_wall'
+  | 'fountain_base'
+  | 'gate'
+  | 'gate_gear'
+  | 'lava_furnace_2'
+  | 'lava_pillar'
+  | 'lava_ramp'
+  | 'staircase'
+  | 'stone_floor'
+  | 'tower_base'
+  | 'tower_middle'
+  | 'tower_pillar'
+  | 'tower_top';
 
 export interface IgnivarPropPlacement {
   key: IgnivarEnvPropKey;
@@ -102,6 +121,25 @@ export const IGNIVAR_PROP_NATIVE: Record<
   steam_machine_round: { len: 0.51, hei: 1.0, dep: 0.47 },
   steam_pipes: { len: 0.63, hei: 1.0, dep: 0.2 },
   torch: { len: 0.62, hei: 1.06, dep: 0.55 },
+  bridge_floor: { len: 1.0, hei: 0.14, dep: 0.66 },
+  bridge_pillar: { len: 0.68, hei: 1.0, dep: 0.5 },
+  bridge_rail: { len: 1.0, hei: 0.79, dep: 0.16 },
+  cannon: { len: 1.0, hei: 0.96, dep: 0.95 },
+  dragon_head: { len: 0.63, hei: 1.0, dep: 0.5 },
+  dragon_pillar: { len: 0.55, hei: 1.0, dep: 0.45 },
+  fortress_wall: { len: 1.0, hei: 0.93, dep: 0.22 },
+  fountain_base: { len: 1.0, hei: 0.3, dep: 0.54 },
+  gate: { len: 0.48, hei: 1.0, dep: 0.07 },
+  gate_gear: { len: 0.67, hei: 1.0, dep: 0.4 },
+  lava_furnace_2: { len: 0.6, hei: 1.0, dep: 0.32 },
+  lava_pillar: { len: 0.53, hei: 1.0, dep: 0.4 },
+  lava_ramp: { len: 1.0, hei: 0.38, dep: 0.49 },
+  staircase: { len: 1.0, hei: 0.76, dep: 0.96 },
+  stone_floor: { len: 1.0, hei: 0.08, dep: 1.0 },
+  tower_base: { len: 0.97, hei: 1.0, dep: 0.83 },
+  tower_middle: { len: 0.7, hei: 1.0, dep: 0.63 },
+  tower_pillar: { len: 0.53, hei: 1.0, dep: 0.52 },
+  tower_top: { len: 0.66, hei: 1.0, dep: 0.39 },
 };
 
 /** The raid rooms build at the double-height wall course. */
@@ -317,6 +355,16 @@ export const IGNIVAR_NON_COLLIDING_PROPS: ReadonlySet<IgnivarEnvPropKey> = new S
   'lava_channel',
   'lava_channel_curved',
   'torch',
+  // the fortress kit's walk-over floor pieces: the bridge deck, the stone
+  // floor plate, and the lava ramp are surfaces a body crosses, never
+  // blockers (their standable behavior is the exterior bake's concern)
+  'bridge_floor',
+  'stone_floor',
+  'lava_ramp',
+  // stairs are walked UP, never into: the terrain ramp underneath carries
+  // the movement (exterior) or the lift field does (interiors); a collider
+  // here would be an invisible wall across the flight
+  'staircase',
 ]);
 
 /** Collider footprint as a fraction of the visual AABB: ornate pillars and

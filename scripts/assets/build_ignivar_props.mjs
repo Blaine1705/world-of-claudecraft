@@ -155,6 +155,63 @@ const ITEMS = [
   },
   { src: 'New_Assets_Demi/steam-machine.glb', name: 'steam_machine', tex: 1024, emissive: 1.0 },
   { src: 'New_Assets_Demi/steam-pipes.glb', name: 'steam_pipes', tex: 1024, emissive: 0.28 },
+  // The Exterior_Assets drop (2026-08-28): the Forgefather's Isle fortress
+  // kit (the bridge trio, towers, gate and gear, walls, stairs, floors,
+  // the dragon lava spouts, lava carriers, a cannon). Same pre-decimated
+  // contract (~1k tris, single mesh, one atlas). Lava carriers run hot,
+  // the dragon head pours (concept art), plain stonework stays faint.
+  { src: 'Exterior_Assets/bridge_floor.glb', name: 'bridge_floor', tex: 1024, emissive: 0.28 },
+  { src: 'Exterior_Assets/bridge_pillar.glb', name: 'bridge_pillar', tex: 1024, emissive: 0.28 },
+  { src: 'Exterior_Assets/bridge_rail.glb', name: 'bridge_rail', tex: 512, emissive: 0.28 },
+  { src: 'Exterior_Assets/cannon.glb', name: 'cannon', tex: 1024, emissive: 0.28 },
+  { src: 'Exterior_Assets/dragon_head.glb', name: 'dragon_head', tex: 1024, emissive: 1.5 },
+  { src: 'Exterior_Assets/dragon_pillar.glb', name: 'dragon_pillar', tex: 1024, emissive: 1.0 },
+  {
+    src: 'Exterior_Assets/fortress_wall.glb',
+    name: 'fortress_wall',
+    tex: 1024,
+    emissive: 0.28,
+  },
+  {
+    src: 'Exterior_Assets/fountain_base.glb',
+    name: 'fountain_base',
+    tex: 1024,
+    emissive: 1.0,
+  },
+  { src: 'Exterior_Assets/gate.glb', name: 'gate', tex: 1024, emissive: 0.28 },
+  { src: 'Exterior_Assets/gate_gear.glb', name: 'gate_gear', tex: 1024, emissive: 0.28 },
+  // lava_furnace_2: the name lava_furnace is taken by the New_Assets drop
+  // (the lava_outlet_2 precedent for a second same-family model)
+  {
+    src: 'Exterior_Assets/Lava_Furnace.glb',
+    name: 'lava_furnace_2',
+    tex: 1024,
+    emissive: 1.5,
+  },
+  { src: 'Exterior_Assets/lava_pillar.glb', name: 'lava_pillar', tex: 1024, emissive: 1.5 },
+  {
+    src: 'Exterior_Assets/lava_ramp.glb',
+    name: 'lava_ramp',
+    tex: 1024,
+    emissive: 1.5,
+    hotBoost: 1.35,
+  },
+  { src: 'Exterior_Assets/staircase.glb', name: 'staircase', tex: 1024, emissive: 0.28 },
+  { src: 'Exterior_Assets/stone_floor.glb', name: 'stone_floor', tex: 1024, emissive: 0.28 },
+  { src: 'Exterior_Assets/tower_base.glb', name: 'tower_base', tex: 1024, emissive: 0.28 },
+  {
+    src: 'Exterior_Assets/tower_middle.glb',
+    name: 'tower_middle',
+    tex: 1024,
+    emissive: 0.28,
+  },
+  {
+    src: 'Exterior_Assets/tower_pillar.glb',
+    name: 'tower_pillar',
+    tex: 1024,
+    emissive: 0.28,
+  },
+  { src: 'Exterior_Assets/tower_top.glb', name: 'tower_top', tex: 1024, emissive: 0.28 },
 ];
 const SRC_DIR = 'tmp/asset_src/_IGNAR_Environment_Assets';
 const OUT_DIR = 'public/models/dungeon';

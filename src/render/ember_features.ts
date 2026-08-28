@@ -13,6 +13,7 @@ import { hash2 } from '../sim/rng';
 import { EMBER_LAVA_POOLS, terrainHeight } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { buildForgefatherFortress } from './forgefather_fortress';
 import { GFX } from './gfx';
 import { lavaChainPlacements } from './lava_chain_core';
 
@@ -466,6 +467,10 @@ export function buildEmberFeatures(seed: number): EmberFeaturesView {
       group.add(mesh);
     }
   }
+
+  // The Forgefather's Isle fortress rides this view: same zone, same
+  // gated attach and shadow policy (forgefather_fortress.ts carries why).
+  group.add(buildForgefatherFortress());
 
   return {
     group,
