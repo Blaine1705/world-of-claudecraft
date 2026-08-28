@@ -6,6 +6,12 @@ export type VarkhulDifficulty = 'normal' | 'heroic';
 
 export const VARKHUL_FRONTAL_CAST_ID = "Forgefather's Sweep";
 export const VARKHUL_FRONTAL_CAST_SECONDS = 2.5;
+/** After the release he stands his ground through the Slam clip's
+ *  stand-back-up before chasing again: the 0.808s of clip left past the cast
+ *  window at its 0.65 play rate ((2.433 - 2.5 x 0.65) / 0.65). Chasing under
+ *  that recovery slid the model to the tank mid-animation, which read as a
+ *  teleport. */
+export const VARKHUL_FRONTAL_RECOVER_SECONDS = 1.25;
 export const VARKHUL_FRONTAL_RANGE = 42;
 export const VARKHUL_FRONTAL_HALF_ANGLE = (Math.PI * 7) / 18;
 export const VARKHUL_FRONTAL_DAMAGE_MAX_HP_NORMAL = 0.65;

@@ -5,6 +5,7 @@ import {
   type AnimState,
   advanceSwimPitch,
   advanceTreadBlend,
+  castHoldStep,
   desiredBaseState,
   drivesPose,
   isWadingAtDepth,
@@ -14,6 +15,7 @@ import {
   SWIM_PITCH_MAX,
   scanAnimRepair,
   shouldPlayLanding,
+  shouldPlayOutCastExit,
 } from '../src/render/characters/anim_state';
 
 // A three.js SkinnedMesh renders BIND POSE (arms out, the T-pose) whenever the
@@ -420,5 +422,46 @@ describe('shouldPlayLanding', () => {
 
   it('yields to death: a body killed mid-air collapses, it does not stick a landing', () => {
     expect(shouldPlayLanding(true, false, true, true)).toBe(false);
+  });
+});
+
+describe('castHoldStep (freeze the pointing frame while the cast channels)', () => {
+  // The Forgefather's Casting clip: 1.033s, pointing gesture peak at 0.72s.
+  const DURATION = 1.033;
+  const HOLD = 0.72;
+
+  it('plays the raise forward untouched until the hold point', () => {
+    expect(castHoldStep(0, HOLD, DURATION)).toEqual({ paused: false });
+    expect(castHoldStep(HOLD - 0.01, HOLD, DURATION)).toEqual({ paused: false });
+  });
+
+  it('freezes exactly on the hold frame, pinning a coarse-frame overshoot onto it', () => {
+    expect(castHoldStep(HOLD, HOLD, DURATION)).toEqual({ paused: true, time: HOLD });
+    expect(castHoldStep(HOLD + 0.2, HOLD, DURATION)).toEqual({ paused: true, time: HOLD });
+  });
+
+  it('disables the freeze when the hold point is not inside the clip', () => {
+    expect(castHoldStep(0.5, 0, DURATION)).toEqual({ paused: false });
+    expect(castHoldStep(0.5, DURATION, DURATION)).toEqual({ paused: false });
+  });
+});
+
+describe('shouldPlayOutCastExit (finish the clip instead of snapping to base)', () => {
+  const PLAY_OUT = ['Casting', 'Slam'];
+
+  it('plays out a listed clip that was cut mid-way (the Slam recovery)', () => {
+    // frontal cast ends at clip-time 1.62 of 2.433: the stand-back-up must play
+    expect(shouldPlayOutCastExit(PLAY_OUT, 'Slam', 1.62, 2.433)).toBe(true);
+    expect(shouldPlayOutCastExit(PLAY_OUT, 'Casting', 0.72, 1.033)).toBe(true);
+  });
+
+  it('does nothing for a clip that already reached its end', () => {
+    expect(shouldPlayOutCastExit(PLAY_OUT, 'Slam', 2.433, 2.433)).toBe(false);
+  });
+
+  it('leaves unlisted clips on the instant handoff (the Forging cadence loop)', () => {
+    expect(shouldPlayOutCastExit(PLAY_OUT, 'Forging', 0.9, 1.633)).toBe(false);
+    expect(shouldPlayOutCastExit(undefined, 'Slam', 1.62, 2.433)).toBe(false);
+    expect(shouldPlayOutCastExit(PLAY_OUT, null, 1.62, 2.433)).toBe(false);
   });
 });

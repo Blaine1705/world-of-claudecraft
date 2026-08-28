@@ -33,6 +33,7 @@ import {
 } from '../../sim/varkhul_cinder_artificer';
 import { ITEM_WEAPON_VARIANTS } from '../../ui/weapon_variants';
 import type { OverheadEmoteId } from '../../world_api';
+import { VARKHUL_FORGING_STRIKE_TIMESCALE } from '../varkhul_forge_hammer';
 import { NPC_PROP_SET_IDS, type NpcPropSet } from './npc_looks';
 
 export interface EmoteClipSpec {
@@ -65,6 +66,18 @@ export interface ClipMap {
   hit?: string[];
   /** looping cast channel */
   cast?: string;
+  /** Hold instead of replaying: the generic `cast` clip plays ONCE up to this
+   *  many seconds in (the held gesture at the top of the raise: arm up,
+   *  pointing) and FREEZES on that frame while the cast channels; the
+   *  remainder (the recovery back to stance) plays on cast end via
+   *  castPlayOut. Only the generic clip: castByAbility overrides keep their
+   *  authored behavior. */
+  castHoldPointSeconds?: number;
+  /** Cast clips that FINISH as a one-shot when their cast ends mid-clip (the
+   *  crash recovery, the pointing arm coming back down) instead of being cut
+   *  by the base-pose crossfade. Opt-in per clip so a seamless cadence loop
+   *  (the Forgefather's decree Forging) keeps its instant handoff. */
+  castPlayOut?: readonly string[];
   /** Per-ability override for the looping cast clip (the windup LOOK of one
    *  cast differing from the rig's generic channel; the one-shot route in
    *  attackByAbility cannot cover held cast states). */
@@ -840,23 +853,35 @@ const VARKHUL_FORGEFATHER: ClipMap = {
   idle: 'Idle',
   walk: 'Walk',
   run: 'Run',
-  // plain swings only; Slam is reserved for the meteor windups below
+  // plain swings only; Slam is reserved for the frontal windup below
   attack: ['Slash'],
   attackByAbility: {
     [VARKHUL_FORGE_HAMMER_ABILITY_ID]: 'Forging',
     [VARKHUL_ANVILS_DECREE_CAST_ID]: 'Forging',
+    // each Forgestorm wave's windup cue: he powers up and the meteors answer
+    [VARKHUL_FORGESTORM_CAST_ID]: 'PowerUp',
   },
   attackTimeScaleByAbility: {
-    [VARKHUL_FORGE_HAMMER_ABILITY_ID]: 0.815,
-    [VARKHUL_ANVILS_DECREE_CAST_ID]: 0.815,
+    [VARKHUL_FORGE_HAMMER_ABILITY_ID]: VARKHUL_FORGING_STRIKE_TIMESCALE,
+    [VARKHUL_ANVILS_DECREE_CAST_ID]: VARKHUL_FORGING_STRIKE_TIMESCALE,
+    // authored 2.367s fills the 2.5s wave warning; 1 overrides the 1.3
+    // one-shot default so the pump is not rushed
+    [VARKHUL_FORGESTORM_CAST_ID]: 1,
   },
-  // generic channel: the contained hand gesture, never the roar
+  // generic channel: the contained hand gesture, never the roar. Plays up to
+  // the pointing gesture's peak (0.72s in, measured off the shipped clip) and
+  // HOLDS that frame while the cast channels; the arm-down recovery plays on
+  // release via castPlayOut instead of replaying the raise.
   cast: 'Casting',
+  castHoldPointSeconds: 0.72,
+  // Casting's arm-down and Slam's stand-back-up recoveries must not be cut
+  // when the cast ends mid-clip: both finish before the rig returns to base.
+  // Forging stays OFF this list: the decree cadence loop hands off instantly.
+  castPlayOut: ['Casting', 'Slam'],
   castByAbility: {
-    // the meteor windups are full Slam swings: he crashes the hammer down and
-    // the cone or the storm answers it
+    // the frontal windup is a full Slam swing: he crashes the hammer down and
+    // the cone answers it
     [VARKHUL_FRONTAL_CAST_ID]: 'Slam',
-    [VARKHUL_FORGESTORM_CAST_ID]: 'Slam',
     // at the anvil the decree cast IS the forging loop; the 2s strike
     // one-shots land on the same clip so the cadence stays seamless
     [VARKHUL_ANVILS_DECREE_CAST_ID]: 'Forging',
@@ -864,8 +889,7 @@ const VARKHUL_FORGEFATHER: ClipMap = {
   castTimeScaleByAbility: {
     // Slam's crash sits ~1.5s in; 0.65 lands it just before the 2.5s release
     [VARKHUL_FRONTAL_CAST_ID]: 0.65,
-    [VARKHUL_FORGESTORM_CAST_ID]: 0.65,
-    [VARKHUL_ANVILS_DECREE_CAST_ID]: 0.815,
+    [VARKHUL_ANVILS_DECREE_CAST_ID]: VARKHUL_FORGING_STRIKE_TIMESCALE,
   },
   jump: 'Jump',
   // the roar is the ENGAGE cue only (and respawn), never a cast loop

@@ -27,12 +27,14 @@ import {
   advanceSwimBlend,
   advanceTreadBlend,
   type BaseState,
+  castHoldStep,
   desiredBaseState,
   drivesPose,
   locomotionTimeScale,
   pickProxyHeight,
   scanAnimRepair,
   shouldPlayLanding,
+  shouldPlayOutCastExit,
 } from './anim_state';
 import {
   type AssembleOptions,
@@ -626,6 +628,11 @@ export class CharacterVisual {
   private current: THREE.AnimationAction | null = null;
   private currentIsOneShot = false;
   private currentOneShotIsEmote = false;
+  /** the running one-shot is a cast-exit play-out (a recovery tail): it
+   *  yields to any real body state the moment one appears, because holding it
+   *  over a body the sim is already MOVING glides the model across the floor
+   *  with no run animation (the post-Slam "teleport" to the tank) */
+  private currentOneShotIsCastExit = false;
   // Whether the live one-shot is the ATTACK, as opposed to a hit react, a
   // landing, the sheathe gesture or any other one-shot. Only the aim pin needs
   // the distinction (skin_attack.ts rangedSkinAiming); a stale true is harmless
@@ -972,9 +979,22 @@ export class CharacterVisual {
         this.currentIsOneShot = false;
         this.currentOneShotIsEmote = false;
         this.fadeTo(this.baseAction(), this.baseTransitionFade(desired), false);
-      } else if (baseChanged && !this.currentIsOneShot) {
+      } else if (this.currentOneShotIsCastExit && this.shouldInterruptEmote(s)) {
+        // The recovery tail outlived the sim's stand-still window (the clip
+        // lagged the cast, so more of it was left than the window covers) and
+        // the body is really moving/casting again: hand the rig back to the
+        // base state NOW instead of gliding the model under the one-shot.
+        this.currentIsOneShot = false;
+        this.currentOneShotIsCastExit = false;
         this.fadeTo(this.baseAction(), this.baseTransitionFade(desired), false);
-        this.fadeTo(this.baseAction(), waterFade(previousBase, desired), false);
+      } else if (baseChanged && !this.currentIsOneShot) {
+        // a cast clip frozen at its hold point must never stay paused through
+        // the exit, whichever exit path runs below
+        if (previousBase === 'cast' && this.current?.paused) this.current.paused = false;
+        if (previousBase !== 'cast' || !this.beginCastExitPlayOut()) {
+          this.fadeTo(this.baseAction(), this.baseTransitionFade(desired), false);
+          this.fadeTo(this.baseAction(), waterFade(previousBase, desired), false);
+        }
       } else if (
         desired === 'cast' &&
         !this.currentIsOneShot &&
@@ -998,10 +1018,26 @@ export class CharacterVisual {
           // per-frame on purpose: actions are cached per clip, so a clip that
           // doubles as an attackByAbility one-shot would otherwise leak that
           // route's timescale into the cast loop
-          this.current.timeScale =
+          const castScale =
             (this.castingAbility
               ? this.def.clips.castTimeScaleByAbility?.[this.castingAbility]
               : undefined) ?? 1;
+          this.current.timeScale = castScale;
+          const holdPoint = this.def.clips.castHoldPointSeconds;
+          const genericCast = this.action(this.def.clips.cast);
+          // The freeze covers ONLY the generic cast clip: a per-ability
+          // override (the identity check, since actions are cached per clip)
+          // keeps its authored behavior. The recovery past the hold point
+          // plays on cast end via beginCastExitPlayOut.
+          if (holdPoint !== undefined && genericCast && this.current === genericCast) {
+            const step = castHoldStep(
+              this.current.time,
+              holdPoint,
+              this.current.getClip().duration,
+            );
+            if (step.time !== undefined) this.current.time = step.time;
+            this.current.paused = step.paused;
+          }
         }
       }
       // Frozen idle pose (the downed forge mech): hold the idle clip on its first
@@ -3265,6 +3301,29 @@ export class CharacterVisual {
     return s.moving || s.airborne || s.swimming || s.casting || !!s.spinning || s.sitting || s.dead;
   }
 
+  /** The cast just ended mid-clip: let a listed cast clip FINISH as a one-shot
+   *  (the crash recovery, the pointing arm coming back down) instead of being
+   *  cut by the base-pose crossfade. The action keeps its cast timescale and
+   *  its current time; onFinished hands back to whatever base state the rig is
+   *  in by then, and an attack or a new cast stomps it like any one-shot. */
+  private beginCastExitPlayOut(): boolean {
+    const action = this.current;
+    if (!action) return false;
+    const clip = action.getClip();
+    if (!shouldPlayOutCastExit(this.def.clips.castPlayOut, clip.name, action.time, clip.duration))
+      return false;
+    action.paused = false;
+    // the hold loop may exit mid-reverse: the play-out always runs FORWARD
+    action.timeScale = Math.abs(action.timeScale) || 1;
+    action.setLoop(THREE.LoopOnce, 1);
+    action.clampWhenFinished = true;
+    this.currentIsOneShot = true;
+    this.currentOneShotIsEmote = false;
+    this.currentOneShotIsAttack = false;
+    this.currentOneShotIsCastExit = true;
+    return true;
+  }
+
   private fadeTo(next: THREE.AnimationAction | null, fade: number, oneShot: boolean): void {
     if (!next) return;
     if (next === this.current && !oneShot) return;
@@ -3277,6 +3336,7 @@ export class CharacterVisual {
     this.current = next;
     this.currentIsOneShot = oneShot;
     this.currentOneShotIsEmote = false;
+    this.currentOneShotIsCastExit = false;
   }
 
   /**
@@ -3379,6 +3439,7 @@ export class CharacterVisual {
     this.current = a;
     this.currentIsOneShot = true;
     this.currentOneShotIsEmote = emoteId !== null;
+    this.currentOneShotIsCastExit = false;
   }
 
   private onFinished(a: THREE.AnimationAction): void {
@@ -3392,6 +3453,7 @@ export class CharacterVisual {
     if (a === this.current) {
       this.currentIsOneShot = false;
       this.currentOneShotIsEmote = false;
+      this.currentOneShotIsCastExit = false;
       this.fadeTo(this.baseAction(), 0.18, false);
     }
   }
@@ -3422,6 +3484,7 @@ export class CharacterVisual {
     this.deadLock = true;
     this.currentIsOneShot = false;
     this.currentOneShotIsEmote = false;
+    this.currentOneShotIsCastExit = false;
     this.applyCorpseMeshSwap(true);
     // Collapse the upright pick capsule to a flat, ground-hugging profile so a
     // near-eye click behind or above the now-lying corpse no longer intersects an

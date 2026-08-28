@@ -6,11 +6,9 @@ import {
   initVarkhulEngage,
   startVarkhulEngage,
   tickVarkhulEngage,
-  VARKHUL_ENGAGE_LEAP_PEAK_Y,
-  VARKHUL_ENGAGE_LEAP_SECONDS,
+  VARKHUL_ENGAGE_RUN_TIMEOUT_SECONDS,
   VARKHUL_ENGAGE_TAUNT_SECONDS,
   varkhulForgingHammerTick,
-  varkhulLeapPos,
 } from '../src/sim/varkhul_engage';
 
 const DT = 1 / 20;
@@ -22,44 +20,45 @@ describe('Varkhul engage staging (pure module)', () => {
     for (let tick = 0; tick < 20 * 10; tick++) if (varkhulForgingHammerTick(st, DT)) blows++;
     // first blow at 0.6s, then every 2s: 0.6, 2.6, 4.6, 6.6, 8.6 inside 10s
     expect(blows).toBe(5);
-    startVarkhulEngage(st, { x: 1, y: 0, z: 2 });
-    expect(st.phase).toBe('taunting');
-    expect(st.leapFrom).toEqual({ x: 1, y: 0, z: 2 });
+    startVarkhulEngage(st);
+    expect(st.phase).toBe('running');
     expect(varkhulForgingHammerTick(st, DT)).toBe(false);
   });
 
-  it('holds the taunt, then leaps, then completes exactly once', () => {
+  it('runs until arrival, roars exactly once at the handover, then completes', () => {
     const st = initVarkhulEngage();
-    startVarkhulEngage(st, { x: 0, y: 0, z: 16 });
-    const tauntTicks = Math.round((VARKHUL_ENGAGE_TAUNT_SECONDS / DT) * 1) - 1;
-    for (let i = 0; i < tauntTicks; i++) {
-      expect(tickVarkhulEngage(st, DT).phase).toBe('taunting');
+    startVarkhulEngage(st);
+    // still on the way: no roar, phase holds
+    for (let tick = 0; tick < 30; tick++) {
+      expect(tickVarkhulEngage(st, DT, false)).toEqual({ phase: 'running', roar: false });
     }
-    const first = tickVarkhulEngage(st, DT);
-    expect(first.phase).toBe('leaping');
-    let landed = 0;
+    // arrival: the single roar edge starts the taunt
+    expect(tickVarkhulEngage(st, DT, true)).toEqual({ phase: 'taunting', roar: true });
+    let roars = 0;
     let steps = 0;
     while (st.phase !== 'done' && steps < 100) {
-      const step = tickVarkhulEngage(st, DT);
-      if (step.landed) landed++;
+      const step = tickVarkhulEngage(st, DT, true);
+      if (step.roar) roars++;
       steps++;
     }
-    expect(landed).toBe(1);
-    // the transition tick already consumed the first leap step
-    expect(steps).toBe(Math.round(VARKHUL_ENGAGE_LEAP_SECONDS / DT) - 1);
-    // done state is stable and never re-lands
-    expect(tickVarkhulEngage(st, DT)).toEqual({ phase: 'done', leapT: 1, landed: false });
+    expect(roars).toBe(0);
+    // the handover tick starts the taunt at its full length
+    expect(steps).toBe(Math.round(VARKHUL_ENGAGE_TAUNT_SECONDS / DT));
+    // done state is stable and never roars again
+    expect(tickVarkhulEngage(st, DT, true)).toEqual({ phase: 'done', roar: false });
+    expect(tickVarkhulEngage(st, DT, false)).toEqual({ phase: 'done', roar: false });
   });
 
-  it('arcs the leap through the peak and lands exactly at the target', () => {
-    const from = { x: 0, y: 0, z: 16 };
-    const to = { x: 0, y: 0, z: 0 };
-    expect(varkhulLeapPos(from, to, 0, 0)).toEqual({ x: 0, y: 0, z: 16 });
-    const mid = varkhulLeapPos(from, to, 0, 0.5);
-    expect(mid.z).toBeCloseTo(8);
-    expect(mid.y).toBeCloseTo(VARKHUL_ENGAGE_LEAP_PEAK_Y);
-    const end = varkhulLeapPos(from, to, 0, 1);
-    expect(end).toEqual({ x: 0, y: expect.closeTo(0, 5), z: 0 });
+  it('falls back to roaring in place if the run never arrives (the timeout backstop)', () => {
+    const st = initVarkhulEngage();
+    startVarkhulEngage(st);
+    const timeoutTicks = Math.round(VARKHUL_ENGAGE_RUN_TIMEOUT_SECONDS / DT);
+    let handover: ReturnType<typeof tickVarkhulEngage> | null = null;
+    for (let tick = 0; tick < timeoutTicks && !handover; tick++) {
+      const step = tickVarkhulEngage(st, DT, false);
+      if (step.phase !== 'running') handover = step;
+    }
+    expect(handover).toEqual({ phase: 'taunting', roar: true });
   });
 });
 
@@ -80,7 +79,7 @@ describe('Varkhul engage staging (encounter integration)', () => {
     return { sim, boss };
   }
 
-  it('works the anvil pre-pull, roars once on engage, and leaps to the arena center', () => {
+  it('works the anvil pre-pull, runs to the arena center on the ground, then roars once', () => {
     const { sim, boss } = raidSim();
     const spawn = { ...boss.pos };
     const events: SimEvent[] = [];
@@ -99,28 +98,40 @@ describe('Varkhul engage staging (encounter integration)', () => {
     expect(boss.pos).toEqual(spawn);
     expect(boss.varkhul?.engage.phase).toBe('forging');
 
-    // pull: the player steps into aggro range
+    // pull: the player steps into aggro range; the run starts, the roar waits
     sim.player.pos = { x: boss.pos.x, y: boss.pos.y, z: boss.pos.z - 8 };
     updateVarkhulEncounter(sim.ctx, boss, true);
+    expect(boss.varkhul?.engage.phase).toBe('running');
+    expect(events.filter((ev) => ev.type === 'spellfx' && ev.fx === 'shout')).toHaveLength(0);
+
+    // he RUNS to the middle: grounded the whole way (the old leap is gone),
+    // covering real distance, then hands over to the roar at the center
+    let peakY = boss.pos.y;
+    let runTicks = 0;
+    while (boss.varkhul?.engage.phase === 'running' && runTicks < 20 * 8) {
+      updateVarkhulEncounter(sim.ctx, boss, true);
+      peakY = Math.max(peakY, boss.pos.y);
+      runTicks++;
+    }
     expect(boss.varkhul?.engage.phase).toBe('taunting');
+    // grounded run: no leap arc ever lifts him meaningfully off the floor
+    expect(peakY).toBeLessThan(spawn.y + 1);
+    // he ran to the middle of the arena, well away from the anvil
+    const movedFromSpawn = Math.hypot(boss.pos.x - spawn.x, boss.pos.z - spawn.z);
+    expect(movedFromSpawn).toBeGreaterThan(10);
     const shouts = events.filter((ev) => ev.type === 'spellfx' && ev.fx === 'shout');
     expect(shouts).toHaveLength(1);
     expect(shouts[0]).toMatchObject({ sourceId: boss.id });
 
-    // he holds the anvil spot through the taunt, then leaves the ground
-    const engageTicks = Math.ceil(
-      ((VARKHUL_ENGAGE_TAUNT_SECONDS + VARKHUL_ENGAGE_LEAP_SECONDS) / DT) * 1,
-    );
-    let peakY = boss.pos.y;
-    for (let tick = 0; tick < engageTicks + 2; tick++) {
-      updateVarkhulEncounter(sim.ctx, boss, true);
-      peakY = Math.max(peakY, boss.pos.y);
-    }
+    // he stands through the roar (no drift), then the staging completes and
+    // only THEN does the chase move him again
+    const roarPos = { ...boss.pos };
+    const tauntTicks = Math.ceil(VARKHUL_ENGAGE_TAUNT_SECONDS / DT);
+    for (let tick = 0; tick < tauntTicks - 1; tick++) updateVarkhulEncounter(sim.ctx, boss, true);
+    expect(boss.varkhul?.engage.phase).toBe('taunting');
+    expect(boss.pos).toEqual(roarPos);
+    for (let tick = 0; tick < 3; tick++) updateVarkhulEncounter(sim.ctx, boss, true);
     expect(boss.varkhul?.engage.phase).toBe('done');
-    expect(peakY).toBeGreaterThan(spawn.y + VARKHUL_ENGAGE_LEAP_PEAK_Y * 0.8);
-    // landed in the middle of the arena, not at the anvil
-    const movedFromSpawn = Math.hypot(boss.pos.x - spawn.x, boss.pos.z - spawn.z);
-    expect(movedFromSpawn).toBeGreaterThan(10);
     // one roar total: the cue must never re-fire after the staging completes
     for (let tick = 0; tick < 20; tick++) updateVarkhulEncounter(sim.ctx, boss, true);
     expect(events.filter((ev) => ev.type === 'spellfx' && ev.fx === 'shout')).toHaveLength(1);

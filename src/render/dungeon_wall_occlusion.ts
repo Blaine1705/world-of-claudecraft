@@ -1,0 +1,136 @@
+// Per-frame driver for the dungeon shells' hideable walls, moved out of
+// DungeonInteriors so the two occlusion modes live behind one seam:
+// - the classic sightline fade (a wall crossing the eye-to-camera segment
+//   ghosts to 20% opacity), for every standard interior; and
+// - the Ignivar raid shells' BACKFACE CULL: a wall whose outside the camera
+//   is on hides outright (alpha 0, snap-on like every occluder fade), the
+//   whole face at once, with the wall-mounted dressing props bound to that
+//   face culled alongside it. The chase camera has no collision pull-in, so
+//   without this an orbit through a wall filled the frame with its back.
+// Wall fades keep shadow casting (occluder_fade.ts contract; the raid shell
+// walls cast none anyway). Wall-MOUNTED props are the deliberate exception:
+// a culled prop takes its shadow with it, because a shadow thrown by an
+// invisible beam reads worse than a shadow that pops with its caster.
+import type * as THREE from 'three';
+import { type ArenaWallFootprint, arenaWallSegmentHits } from './arena_wall_occlusion_core';
+import { applyOccluderFade, type OccluderFadeMat } from './occluder_fade';
+import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
+import { cameraSeesWallBack, type WallCullPlane } from './wall_backface_cull_core';
+
+/** One registered hideable wall (a face's placements share one record). */
+export interface WallHideable {
+  group: THREE.Group;
+  mats: OccluderFadeMat[];
+  hidden: boolean;
+  alpha: number;
+  footprint: ArenaWallFootprint;
+  /** Present on the Ignivar raid shells: cull to alpha 0 whenever the camera
+   *  is on this plane's outside, instead of the sightline ghost. */
+  backface?: WallCullPlane;
+}
+
+/** A wall-face subgroup of mounted dressing props, culled with its wall. */
+export interface WallPropBinding {
+  node: THREE.Object3D;
+  plane: WallCullPlane;
+  /** interior root that owns this binding (retirement key) */
+  owner: THREE.Object3D;
+  alpha: number;
+}
+
+/** Name prefix the dressing builders give wall-face prop subgroups; the
+ *  subgroup's userData.wallPlane carries the face plane in interior-local
+ *  coordinates. */
+export const WALL_PROP_GROUP_PREFIX = 'ignivarWallProps:';
+
+/**
+ * Alpha the wall must recover to before its mounted props re-show. Hiding is
+ * instant (the props vanish behind a wall that is still opaque on the frame
+ * the cull begins); re-showing waits until the easing wall mostly covers
+ * them again, so the pop is never visible through a transparent wall.
+ */
+export const WALL_PROP_SHOW_ALPHA = 0.6;
+
+/** Collect the wall-face prop subgroups of a dressing group into bindings,
+ *  lifting their local face planes into world space by the interior origin. */
+export function collectWallPropBindings(
+  dressing: THREE.Object3D,
+  ox: number,
+  oz: number,
+  owner: THREE.Object3D,
+): WallPropBinding[] {
+  const bindings: WallPropBinding[] = [];
+  for (const child of dressing.children) {
+    if (!child.name.startsWith(WALL_PROP_GROUP_PREFIX)) continue;
+    const local = (child.userData as { wallPlane?: WallCullPlane }).wallPlane;
+    if (!local) continue;
+    bindings.push({
+      node: child,
+      plane: { x: ox + local.x, z: oz + local.z, nx: local.nx, nz: local.nz },
+      owner,
+      alpha: 1,
+    });
+  }
+  return bindings;
+}
+
+/** Advance every hideable wall and wall-prop binding one frame. */
+export function updateWallOcclusion(
+  hideables: readonly WallHideable[],
+  propBindings: readonly WallPropBinding[],
+  camX: number,
+  camY: number,
+  camZ: number,
+  eyeX: number,
+  eyeY: number,
+  eyeZ: number,
+  dt: number,
+  reducedMotion = false,
+): void {
+  for (const h of hideables) {
+    const hide = h.backface
+      ? cameraSeesWallBack(h.backface, camX, camZ)
+      : arenaWallSegmentHits(h.footprint, eyeX, eyeY, eyeZ, camX, camY, camZ);
+    h.hidden = hide;
+    const floor = h.backface ? 0 : undefined;
+    if (occluderFadeSettled(h.alpha, hide, floor)) continue;
+    h.alpha = stepOccluderFade(h.alpha, hide, dt, reducedMotion, floor);
+    applyOccluderFade(h.mats, h.alpha);
+    if (h.backface) {
+      // At rest a culled wall stops drawing outright: the fade keeps
+      // depthWrite on (correct for the visible ghost), and an invisible
+      // depth-writing wall would clip mis-sorted transparent content behind
+      // it (the arena's lava moat). Program cost: the opaque program linked
+      // at interior attach; the TRANSPARENT twin links once per wall
+      // material on its first re-show (interior-built hideables sit outside
+      // the boot ghost prewarm, see occluder_ghost_prewarm.ts), the same
+      // one-time first-fade link every hideable wall already paid, moved
+      // from the hide frame to the re-show frame.
+      const show = h.alpha > 0;
+      if (h.group.visible !== show) h.group.visible = show;
+    }
+  }
+  for (const b of propBindings) {
+    const hide = cameraSeesWallBack(b.plane, camX, camZ);
+    if (!occluderFadeSettled(b.alpha, hide, 0)) {
+      b.alpha = stepOccluderFade(b.alpha, hide, dt, reducedMotion, 0);
+    }
+    const visible = !hide && b.alpha >= WALL_PROP_SHOW_ALPHA;
+    if (b.node.visible !== visible) b.node.visible = visible;
+  }
+}
+
+/** Drop the records owned by retired interior roots, so the per-frame scan
+ *  does not grow across floor rebuilds. */
+export function retireWallOcclusion(
+  hideables: WallHideable[],
+  propBindings: WallPropBinding[],
+  doomed: ReadonlySet<THREE.Object3D>,
+): void {
+  for (let i = hideables.length - 1; i >= 0; i--) {
+    if (doomed.has(hideables[i].group)) hideables.splice(i, 1);
+  }
+  for (let i = propBindings.length - 1; i >= 0; i--) {
+    if (doomed.has(propBindings[i].owner)) propBindings.splice(i, 1);
+  }
+}

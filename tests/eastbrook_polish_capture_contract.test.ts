@@ -323,11 +323,11 @@ interface AttributionTargetFixture {
 // Re-minted for the v0.40.0 sync merge into the guild pledge branch (the
 // OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
 // both sides). No capture was retaken.
-// Re-minted for the Ignivar raid consolidation (the v0.41.0 base merge plus
-// the renderer extraction round moved the renderer integration leaf). No
-// capture was retaken.
+// Re-minted after the Forgefather strike-route call-site swap in renderer.ts
+// (routeVarkhulForgeHammer replaced the bare forge-hammer dispatch) moved the
+// runtimeRender.renderer leaf. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '019aaef23665529202bb9bf153c69786b1e2d21af11b63219074117fd1559cd5';
+  'd29bd4471e533b27c04543c2a4d8e481e059708930aed93a1d65369c10bea268';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

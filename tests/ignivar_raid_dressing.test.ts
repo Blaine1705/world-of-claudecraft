@@ -1,5 +1,7 @@
+import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
+import { WALL_PROP_GROUP_PREFIX } from '../src/render/dungeon_wall_occlusion';
 import type { IgnivarPropPlacement } from '../src/render/ignivar_dressing_plan_core';
 import type { appendIgnivarEnvProps } from '../src/render/ignivar_env_props';
 import {
@@ -9,7 +11,8 @@ import {
   ignivarRaidDressingInternalsForTest,
   VARKHUL_CRUCIBLE_DRESSING_NAME,
 } from '../src/render/ignivar_raid_dressing';
-import type { DungeonLayout } from '../src/sim/dungeon_layout';
+import type { WallCullPlane } from '../src/render/wall_backface_cull_core';
+import { type DungeonLayout, IGNIVAR_SECOND_WING_LAYOUT } from '../src/sim/dungeon_layout';
 import { VARKHUL_FORGE_LOCAL_POS } from '../src/sim/encounters/varkhul';
 
 function capturingAppender(captured: IgnivarPropPlacement[]): typeof appendIgnivarEnvProps {
@@ -108,5 +111,87 @@ describe('expanded Ignivar raid dressing', () => {
       if (placement.y !== 0) continue;
       expect(Math.hypot(placement.x, placement.z)).toBeGreaterThan(18);
     }
+  });
+
+  it('groups wall-mounted props per shell face for the backface cull', () => {
+    // the real depths shell: beams, wall panels, and pipe runs mount on it
+    const perGroup: Array<{ group: THREE.Group; placements: IgnivarPropPlacement[] }> = [];
+    const appender: typeof appendIgnivarEnvProps = (group, placements) => {
+      perGroup.push({ group: group as THREE.Group, placements: [...placements] });
+      return placements.length;
+    };
+    const group = ignivarRaidDressingInternalsForTest.buildInnerCrucibleDressing(
+      IGNIVAR_SECOND_WING_LAYOUT,
+      false,
+      appender,
+    );
+    const faceGroups = group.children.filter((c) => c.name.startsWith(WALL_PROP_GROUP_PREFIX));
+    expect(faceGroups.length).toBeGreaterThan(0);
+    for (const face of faceGroups) {
+      const plane = face.userData.wallPlane as WallCullPlane | undefined;
+      expect(plane).toBeDefined();
+      if (!plane) continue;
+      expect(Math.hypot(plane.nx, plane.nz)).toBeCloseTo(1, 6);
+    }
+    // the appender ran once for the interior list plus once per face group,
+    // partitioning the plan: nothing dropped, nothing doubled
+    const interiorCall = perGroup.find((c) => c.group === group);
+    expect(interiorCall).toBeDefined();
+    const faceCalls = perGroup.filter((c) => c.group !== group);
+    expect(faceCalls.length).toBe(faceGroups.length);
+    const wallKinds = new Set(faceCalls.flatMap((c) => c.placements.map((p) => p.key)));
+    expect(wallKinds.has('beam')).toBe(true);
+    for (const call of faceCalls) {
+      expect(call.placements.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('wires liftLightsTo at the face fire-routing site (deleting the call must red)', () => {
+    // The plans carry no wall sconce today, so the runtime path is dormant;
+    // this source pin keeps the guard wired for the day one lands.
+    const source = readFileSync(
+      new URL('../src/render/ignivar_raid_dressing.ts', import.meta.url),
+      'utf8',
+    );
+    expect(source).toMatch(/if \(sub\) liftLightsTo\(group, sub\);/);
+  });
+
+  it('re-seats sconce lights on the dressing root so no light culls with a wall', () => {
+    // addTorchFire parents flame AND light into its sink group; the face
+    // subgroups toggle visibility per camera, and a light under that toggle
+    // would both swing room lighting with the orbit and churn numPointLights
+    // (a program cache key). liftLightsTo is the guard.
+    const root = new THREE.Group();
+    const sub = new THREE.Group();
+    const light = new THREE.PointLight(0xffffff, 5, 10, 2);
+    light.position.set(3, 1, -4);
+    const flame = new THREE.Mesh(new THREE.ConeGeometry(0.2, 0.5, 6));
+    sub.add(light);
+    sub.add(flame);
+    root.add(sub);
+    ignivarRaidDressingInternalsForTest.liftLightsTo(root, sub);
+    expect(light.parent).toBe(root);
+    expect(light.position.x).toBe(3);
+    expect(flame.parent).toBe(sub);
+    let lightsUnderSub = 0;
+    sub.traverse((o) => {
+      if ((o as THREE.Light).isLight) lightsUnderSub++;
+    });
+    expect(lightsUnderSub).toBe(0);
+  });
+
+  it('keeps every prop in the main group for layouts without a shell polygon', () => {
+    const perGroup: Array<{ group: THREE.Group }> = [];
+    const appender: typeof appendIgnivarEnvProps = (group, placements) => {
+      perGroup.push({ group: group as THREE.Group });
+      return placements.length;
+    };
+    const group = ignivarRaidDressingInternalsForTest.buildForgeApproachDressing(
+      APPROACH_LAYOUT,
+      false,
+      appender,
+    );
+    expect(group.children.some((c) => c.name.startsWith(WALL_PROP_GROUP_PREFIX))).toBe(false);
+    expect(perGroup.every((c) => c.group === group)).toBe(true);
   });
 });

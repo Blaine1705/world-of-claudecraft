@@ -5165,6 +5165,9 @@ export interface VarkhulEncounterState {
   frontalTimer: number;
   frontalCastKey: number;
   frontalCastRemaining: number;
+  /** post-release stand-back-up window: he holds his ground through the
+   *  Slam's recovery animation before chasing again */
+  frontalRecoverRemaining: number;
   frontalFacing: number;
   frontalTargetId: number | null;
   cinderOrbsTimer: number;

@@ -245,6 +245,47 @@ export function waterContactFrameMode(
 }
 
 // ---------------------------------------------------------------------------
+// Cast hold + cast-exit play-out
+//
+// A generic cast clip shorter than its cast used to REPLAY from the top on
+// loop. Instead the clip plays ONCE up to its hold point (the held gesture:
+// arm up, pointing) and FREEZES there for as long as the cast channels; when
+// the cast ends, the remainder of the clip (the recovery back to stance)
+// plays out as a one-shot instead of being cut by the base-pose crossfade.
+
+export interface CastHoldStep {
+  paused: boolean;
+  /** when set, pin the action's time here (the exact hold frame) */
+  time?: number;
+}
+
+/** One frame of the pointing hold, pure: forward until the hold point, then
+ *  FROZEN exactly on it for as long as the cast channels. A hold point at or
+ *  past the clip end disables the freeze (the cast-exit play-out still covers
+ *  the recovery). */
+export function castHoldStep(time: number, holdPoint: number, duration: number): CastHoldStep {
+  if (!(holdPoint > 0) || holdPoint >= duration - 1e-3) return { paused: false };
+  if (time < holdPoint) return { paused: false };
+  return { paused: true, time: holdPoint };
+}
+
+/** Whether the cast clip driving the rig when its cast ended should FINISH
+ *  playing as a one-shot (the crash recovery, the pointing arm coming back
+ *  down) instead of being cut mid-pose by the base crossfade. Opt-in per
+ *  clip name: a seamless cadence loop (the Forgefather's decree Forging)
+ *  keeps its instant handoff. */
+export function shouldPlayOutCastExit(
+  playOutClips: readonly string[] | undefined,
+  clipName: string | null,
+  time: number,
+  duration: number,
+): boolean {
+  if (!playOutClips || clipName === null) return false;
+  if (!playOutClips.includes(clipName)) return false;
+  return time < duration - 1e-3;
+}
+
+// ---------------------------------------------------------------------------
 // Zero-weight watchdog
 //
 // A three.js SkinnedMesh renders BIND POSE (arms out: the T-pose) whenever the
