@@ -55,9 +55,7 @@ export type IgnivarEnvPropKey =
   | 'fountain_base'
   | 'gate'
   | 'gate_gear'
-  | 'lava_furnace_2'
   | 'lava_pillar'
-  | 'lava_ramp'
   | 'staircase'
   | 'street_lamp'
   | 'dungeon_entrance'
@@ -133,9 +131,7 @@ export const IGNIVAR_PROP_NATIVE: Record<
   fountain_base: { len: 1.0, hei: 0.3, dep: 0.54 },
   gate: { len: 0.48, hei: 1.0, dep: 0.07 },
   gate_gear: { len: 0.67, hei: 1.0, dep: 0.4 },
-  lava_furnace_2: { len: 0.6, hei: 1.0, dep: 0.32 },
   lava_pillar: { len: 0.53, hei: 1.0, dep: 0.4 },
-  lava_ramp: { len: 1.0, hei: 0.38, dep: 0.49 },
   staircase: { len: 1.0, hei: 0.76, dep: 0.96 },
   // The Drakelands town brazier lamp, referenced from the shipped town
   // fixture set (raw GLB dims; the world render normalizes and lights it
@@ -373,12 +369,11 @@ export const IGNIVAR_NON_COLLIDING_PROPS: ReadonlySet<IgnivarEnvPropKey> = new S
   'lava_channel',
   'lava_channel_curved',
   'torch',
-  // the fortress kit's walk-over floor pieces: the bridge deck, the stone
-  // floor plate, and the lava ramp are surfaces a body crosses, never
-  // blockers (their standable behavior is the exterior bake's concern)
+  // the fortress kit's walk-over floor pieces: the bridge deck and the
+  // stone floor plate are surfaces a body crosses, never blockers (their
+  // standable behavior is the exterior bake's concern)
   'bridge_floor',
   'stone_floor',
-  'lava_ramp',
   // stairs are walked UP, never into: the terrain ramp underneath carries
   // the movement (exterior) or the lift field does (interiors); a collider
   // here would be an invisible wall across the flight

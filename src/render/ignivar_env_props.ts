@@ -58,9 +58,7 @@ export const IGNIVAR_ENV_PROP_URLS: Record<IgnivarEnvPropKey, string> = {
   fountain_base: '/models/dungeon/ignivar_prop_fountain_base.glb',
   gate: '/models/dungeon/ignivar_prop_gate.glb',
   gate_gear: '/models/dungeon/ignivar_prop_gate_gear.glb',
-  lava_furnace_2: '/models/dungeon/ignivar_prop_lava_furnace_2.glb',
   lava_pillar: '/models/dungeon/ignivar_prop_lava_pillar.glb',
-  lava_ramp: '/models/dungeon/ignivar_prop_lava_ramp.glb',
   staircase: '/models/dungeon/ignivar_prop_staircase.glb',
   // The Drakelands town brazier, reused from the shipped streetlamp set
   // (placer preview + template only; the world instance renders lit
@@ -116,7 +114,6 @@ const SHADOW_CASTERS: ReadonlySet<IgnivarEnvPropKey> = new Set([
   'fountain_base',
   'gate',
   'gate_gear',
-  'lava_furnace_2',
   'lava_pillar',
   'staircase',
   'tower_base',

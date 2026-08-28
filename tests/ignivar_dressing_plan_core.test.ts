@@ -130,10 +130,12 @@ describe('ignivar dressing plan', () => {
     // KTX2 total (9_645_164), then raised for the owner-directed fortress
     // night glow: the whole exterior kit carries a half-resolution floored
     // emissive texture (the soft red sheen, floor scaled per piece so
-    // floor times strength stays even; measured total 10_560_556), then
-    // again for the owner's dungeon_entrance facade (measured total
-    // 10_802_120) plus a sliver of rebake headroom.
-    expect(total, 'prop set exceeds the total budget').toBeLessThanOrEqual(10_900_000);
+    // floor times strength stays even; measured total 10_560_556), raised
+    // for the owner's dungeon_entrance facade (10_802_120), then TIGHTENED
+    // when the unplaced lava_furnace_2 and lava_ramp were stripped from the
+    // shipped set (measured total 10_326_288) plus a sliver of rebake
+    // headroom.
+    expect(total, 'prop set exceeds the total budget').toBeLessThanOrEqual(10_400_000);
   });
 
   it('pins the native dims table to the shipped GLBs (canonical long-axis-on-X)', async () => {

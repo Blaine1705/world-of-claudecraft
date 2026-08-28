@@ -160,8 +160,20 @@ const ITEMS = [
   // the dragon lava spouts, lava carriers, a cannon). Same pre-decimated
   // contract (~1k tris, single mesh, one atlas). Lava carriers run hot,
   // the dragon head pours (concept art), plain stonework stays faint.
-  { src: 'Exterior_Assets/bridge_floor.glb', name: 'bridge_floor', tex: 1024, emissive: 0.28, glowFloor: [89, 22, 14] },
-  { src: 'Exterior_Assets/bridge_pillar.glb', name: 'bridge_pillar', tex: 1024, emissive: 0.28, glowFloor: [89, 22, 14] },
+  {
+    src: 'Exterior_Assets/bridge_floor.glb',
+    name: 'bridge_floor',
+    tex: 1024,
+    emissive: 0.28,
+    glowFloor: [89, 22, 14],
+  },
+  {
+    src: 'Exterior_Assets/bridge_pillar.glb',
+    name: 'bridge_pillar',
+    tex: 1024,
+    emissive: 0.28,
+    glowFloor: [89, 22, 14],
+  },
   // The rail's brazier flame glows like the firepit's: hotBoost lifts the
   // flame texels clear of the ETC1S crush and the firepit-grade emissive
   // strength makes them bloom, while the dark iron stays inert (a near
@@ -182,7 +194,13 @@ const ITEMS = [
     hotBoost: 1.25,
     glowFloor: [42, 10, 7],
   },
-  { src: 'Exterior_Assets/dragon_head.glb', name: 'dragon_head', tex: 1024, emissive: 1.5, glowFloor: [17, 4, 3] },
+  {
+    src: 'Exterior_Assets/dragon_head.glb',
+    name: 'dragon_head',
+    tex: 1024,
+    emissive: 1.5,
+    glowFloor: [17, 4, 3],
+  },
   // The owner's raid-door facade (2026-08-29 drop): architecture tier.
   {
     src: 'Exterior_Assets/dungeon_entrance.glb',
@@ -231,26 +249,35 @@ const ITEMS = [
     hotBoost: 1.25,
     glowFloor: [36, 9, 6],
   },
-  // lava_furnace_2: the name lava_furnace is taken by the New_Assets drop
-  // (the lava_outlet_2 precedent for a second same-family model)
+  // lava_furnace_2 (src Exterior_Assets/Lava_Furnace.glb) and lava_ramp
+  // (src Exterior_Assets/lava_ramp.glb) are STRIPPED from the shipped set:
+  // zero placements in any sim table, and the furnace's mesh is
+  // byte-identical to the interior lava_furnace. Their sources stay in
+  // tmp/asset_src; restore a build entry here (emissive 1.5, glowFloor
+  // [17, 4, 3], hotBoost 1.35 for the ramp) plus the loader rows if the
+  // owner ever places one, and the hygiene pin in
+  // tests/ignivar_asset_hygiene.test.ts will hold it to a real placement.
   {
-    src: 'Exterior_Assets/Lava_Furnace.glb',
-    name: 'lava_furnace_2',
+    src: 'Exterior_Assets/lava_pillar.glb',
+    name: 'lava_pillar',
     tex: 1024,
     emissive: 1.5,
     glowFloor: [17, 4, 3],
   },
-  { src: 'Exterior_Assets/lava_pillar.glb', name: 'lava_pillar', tex: 1024, emissive: 1.5, glowFloor: [17, 4, 3] },
   {
-    src: 'Exterior_Assets/lava_ramp.glb',
-    name: 'lava_ramp',
+    src: 'Exterior_Assets/staircase.glb',
+    name: 'staircase',
     tex: 1024,
-    emissive: 1.5,
-    hotBoost: 1.35,
-    glowFloor: [17, 4, 3],
+    emissive: 0.28,
+    glowFloor: [89, 22, 14],
   },
-  { src: 'Exterior_Assets/staircase.glb', name: 'staircase', tex: 1024, emissive: 0.28, glowFloor: [89, 22, 14] },
-  { src: 'Exterior_Assets/stone_floor.glb', name: 'stone_floor', tex: 1024, emissive: 0.28, glowFloor: [89, 22, 14] },
+  {
+    src: 'Exterior_Assets/stone_floor.glb',
+    name: 'stone_floor',
+    tex: 1024,
+    emissive: 0.28,
+    glowFloor: [89, 22, 14],
+  },
   // The fortress architecture's warm details (window slits, rune trims)
   // glow softly at night: gentle hotBoost plus sub-lava emissive; stone
   // texels stay near black, so base-as-emissive leaves the masonry inert.

@@ -58,9 +58,7 @@ const PROP_GLOW_POOLS: Partial<
   // the Exterior_Assets fortress kit's molten pieces
   dragon_head: { color: 0xff4316, scale: 0.9 },
   fountain_base: { color: 0xff5c1e, scale: 0.85 },
-  lava_furnace_2: { color: 0xff4316, scale: 0.8 },
   lava_pillar: { color: 0xff5c1e, scale: 0.7 },
-  lava_ramp: { color: 0xff4316, scale: 0.9 },
   // The raid-door facade: a deep red threshold pool under the mist gate
   // (the facade seats on raised floor plates, so it anchors at placement y).
   dungeon_entrance: { color: 0xff2a14, scale: 0.8, atPlacementY: true },
