@@ -895,6 +895,87 @@ describe('unstuck area identity', () => {
     );
   });
 
+  it('completes a recent battleground wall-press ESC attempt after the menu neutralizes input', () => {
+    const { sim, match, pid } = activeBattleground();
+    const player = forceBattlegroundWallContact(sim, match, pid);
+    const meta = required(sim.meta(pid), 'battleground player metadata');
+    const origin = battlegroundOrigin(match.slot);
+
+    sim.tick();
+    meta.moveInput.forward = false;
+    sim.drainEvents();
+
+    expect(sim.unstuck(pid)).toBe(true);
+    sim.drainEvents();
+    const events = tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20);
+    const completed = eventsOf(events).find((event) => event.phase === 'completed');
+
+    expect(completed?.area).toMatchObject({
+      kind: 'battleground',
+      id: 'thornhollow_fields',
+      instanceId: String(match.id),
+      slot: match.slot,
+    });
+    expect(completed?.destination.localX).toBeCloseTo(player.pos.x - origin.x, 6);
+    expect(completed?.destination.localZ).toBeCloseTo(player.pos.z - origin.z, 6);
+    expect(sim.bgMatchFor(pid)).toBe(match);
+    expect(isBgPos(player.pos.x)).toBe(true);
+    expect(
+      Math.hypot(
+        player.pos.x - (origin.x + BG_GRAVEYARDS[0].x),
+        player.pos.z - (origin.z + BG_GRAVEYARDS[0].z),
+      ),
+    ).toBeLessThanOrEqual(Math.hypot(BG_GRAVEYARDS[0].hw, BG_GRAVEYARDS[0].hd));
+    expect(meta.moveInput.forward).toBe(false);
+  });
+
+  it('expires the battleground wall-press ESC grace instead of creating a delayed shortcut', () => {
+    const { sim, match, pid } = activeBattleground();
+    forceBattlegroundWallContact(sim, match, pid);
+    const meta = required(sim.meta(pid), 'battleground player metadata');
+
+    sim.tick();
+    meta.moveInput.forward = false;
+    tickMany(sim, 20 * 4);
+    sim.drainEvents();
+
+    expect(sim.unstuck(pid)).toBe(false);
+    expect(eventsOf(sim.drainEvents())).toContainEqual(
+      expect.objectContaining({
+        type: 'unstuck',
+        phase: 'blocked',
+        reason: 'competitive',
+        pid,
+      }),
+    );
+    expect(meta.pendingUnstuck).toBeNull();
+  });
+
+  it('clears the battleground wall-press ESC grace after non-blocked movement', () => {
+    const { sim, match, pid } = activeBattleground();
+    const player = forceBattlegroundWallContact(sim, match, pid);
+    const meta = required(sim.meta(pid), 'battleground player metadata');
+
+    sim.tick();
+    player.facing += Math.PI / 2;
+    player.prevFacing = player.facing;
+    sim.tick();
+    expect(meta.battlegroundWallPressUntil).toBe(0);
+    meta.moveInput.forward = false;
+    sim.drainEvents();
+
+    expect(sim.unstuck(pid)).toBe(false);
+    expect(eventsOf(sim.drainEvents())).toContainEqual(
+      expect.objectContaining({
+        type: 'unstuck',
+        phase: 'blocked',
+        reason: 'competitive',
+        pid,
+      }),
+    );
+    expect(meta.pendingUnstuck).toBeNull();
+  });
+
   it('rejects a battleground wall-adjacent ESC attempt while moving along the wall', () => {
     const { sim, match, pid } = activeBattleground();
     const player = forceBattlegroundWallContact(sim, match, pid);

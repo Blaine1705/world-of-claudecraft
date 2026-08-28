@@ -61,6 +61,7 @@ const CANCEL_MOVE_DISTANCE = 0.5;
 const CANCEL_VERTICAL_DISTANCE = 0.25;
 const BG_WALL_PRESS_PROBE_DISTANCE = 0.35;
 const BG_WALL_PRESS_MIN_PROGRESS = 0.05;
+const BG_WALL_PRESS_ESC_GRACE_SECONDS = 3;
 
 export interface PendingUnstuck {
   startedAt: number;
@@ -184,6 +185,11 @@ function hasMoveInput(meta: PlayerMeta): boolean {
   return input.forward || input.back || input.strafeLeft || input.strafeRight || input.jump;
 }
 
+function hasAnyMovementInput(meta: PlayerMeta): boolean {
+  const input = meta.moveInput;
+  return hasMoveInput(meta) || input.turnLeft || input.turnRight || input.dive || input.surface;
+}
+
 function moveInputVector(meta: PlayerMeta, p: Entity): { x: number; z: number } | null {
   const input = meta.moveInput;
   let mx = 0;
@@ -253,6 +259,18 @@ function battlegroundBlockedWallPress(ctx: SimContext, meta: PlayerMeta, p: Enti
   return battlegroundBlockedProbe(ctx, p, wish);
 }
 
+export function noteBattlegroundWallPressure(ctx: SimContext, meta: PlayerMeta, p: Entity): void {
+  if (!activeBattlegroundAt(ctx, p)) {
+    meta.battlegroundWallPressUntil = 0;
+    return;
+  }
+  if (battlegroundBlockedWallPress(ctx, meta, p)) {
+    meta.battlegroundWallPressUntil = ctx.time + BG_WALL_PRESS_ESC_GRACE_SECONDS;
+    return;
+  }
+  if (hasAnyMovementInput(meta)) meta.battlegroundWallPressUntil = 0;
+}
+
 function battlegroundBlockedProbe(
   ctx: SimContext,
   p: Entity,
@@ -279,7 +297,13 @@ function battlegroundBlockedProbe(
 }
 
 function battlegroundGeometryTrap(ctx: SimContext, meta: PlayerMeta, p: Entity): boolean {
-  return battlegroundWallTrap(ctx, p) || battlegroundBlockedWallPress(ctx, meta, p);
+  return (
+    battlegroundWallTrap(ctx, p) ||
+    battlegroundBlockedWallPress(ctx, meta, p) ||
+    (!hasAnyMovementInput(meta) &&
+      activeBattlegroundAt(ctx, p) &&
+      meta.battlegroundWallPressUntil >= ctx.time)
+  );
 }
 
 function activeBattlegroundAt(ctx: SimContext, p: Entity): boolean {
