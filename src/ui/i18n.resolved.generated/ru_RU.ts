@@ -13496,9 +13496,6 @@ export const ru_RU: EnTranslations = {
       "heart_of_the_end_greatblade": {
         "name": "Великий клинок Сердца конца"
       },
-      "emberflight_longbow": {
-        "name": "Длинный лук Тлеющего полёта"
-      },
       "staff_of_the_last_spring": {
         "name": "Посох последнего родника"
       },

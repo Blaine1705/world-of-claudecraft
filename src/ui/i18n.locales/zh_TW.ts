@@ -13765,7 +13765,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.slagrender_cleaver.name': '裂渣劈斧',
   'entities.items.anvilguard_blade.name': '砧衛之刃',
   'entities.items.heart_of_the_end_greatblade.name': '終末之心巨刃',
-  'entities.items.emberflight_longbow.name': '燼羽長弓',
   'entities.items.staff_of_the_last_spring.name': '終泉法杖',
   'entities.items.forgefire_spire.name': '爐火尖塔杖',
   'entities.items.springtouched_crozier.name': '泉息牧杖',

@@ -39,8 +39,9 @@ describe('painted weapon inventory icons', () => {
   it('covers every authored base weapon exactly once', () => {
     // 123 with the class-overhaul integration daggers (rimefang, marrowpoint,
     // duskwhisper, boneglass_shiv), painted in integration-dagger-icons-2026-08-10;
-    // 133 with the ten Crucible raid weapons (crucible-raid-weapons-2026-08-28).
-    expect(baseWeapons).toHaveLength(133);
+    // 132 with the nine Crucible raid weapons (crucible-raid-weapons-2026-08-28;
+    // the Emberflight Longbow was pulled: bows wait for the hunter rework).
+    expect(baseWeapons).toHaveLength(132);
     expect([...WEAPON_IMAGE_IDS].sort()).toEqual(baseWeapons);
     expect(Object.keys(ITEM_WEAPON_VARIANTS).sort()).toEqual(baseWeapons);
     for (const id of baseWeapons) {
@@ -132,7 +133,6 @@ describe('painted weapon inventory icons', () => {
     expect(crucibleWeaponIds).toEqual([
       'anvilguard_blade',
       'cinderfang_kris',
-      'emberflight_longbow',
       'forgefathers_warhammer',
       'forgefire_spire',
       'heart_of_the_end_greatblade',

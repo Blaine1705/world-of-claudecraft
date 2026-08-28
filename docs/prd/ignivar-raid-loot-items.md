@@ -434,7 +434,12 @@ Held-slot budget 18 (offhand mult 0.75).
 | Orb of the Last Spring | held offhand | Int 9, Spi 9 | Healing Power 18 | haste 25 | | priest, mage, druid, paladin, shaman |
 | Cinder of the First Design | held offhand | Int 12, Spi 6 | Spell Damage 10 | crit 25 | | mage, priest, warlock, druid |
 
-## Weapons
+## Weapons (9 items)
+
+The Emberflight Longbow was pulled from the tier (maintainer decision
+2026-08-28): this game has no ranged weapon slot, so a bow item could only
+exist as a melee mainhand stat stick. Bows arrive with the hunter
+ranged-slot rework, and the hunter ranged marquee returns with them.
 
 One-hand dps budget 17.2 at item level 35, two-hand 19.8 (the 1.15
 premium); damage ranges keep a plus or minus 20 percent spread around
@@ -447,7 +452,6 @@ average = dps x speed. One-hand stat budget 25, two-hand 33.
 | Slagrender Cleaver | axe | one-hand | 2.4 | 33 to 50 | Str 9, Agi 9, Sta 7 | none | crit 70, hit 30 |
 | Anvilguard Blade | sword | one-hand | 2.6 | 36 to 54 | Str 11, Sta 14 | none | crit 70, haste 30 |
 | Heart of the End Greatblade | sword | two-hand | 3.5 | 55 to 83 | Str 22, Sta 11 | none | crit 70, haste 30 |
-| Emberflight Longbow | bow | ranged mainhand | 2.8 | 39 to 58 | Agi 17, Sta 8 | none | crit 70, haste 30 |
 | Staff of the Last Spring | staff | two-hand | 3.2 | 51 to 76 | Int 17, Spi 16 | Healing Power 45 | haste 70, crit 30 |
 | Forgefire Spire | staff | two-hand | 3.2 | 51 to 76 | Int 22, Spi 11 | Spell Damage 26 | crit 70, haste 30 |
 | Springtouched Crozier | mace | one-hand | 2.4 | 33 to 50 | Int 13, Spi 12 | Healing Power 30 | haste 70, crit 30 |
@@ -510,8 +514,8 @@ power.
 
 ## Counts and gates
 
-202 new item ids: 145 set pieces, 15 sigils, 20 waist/feet, 8 jewelry, 4
-shields/held offhands, 10 weapons. 192 icons through the assets:items
+201 new item ids: 145 set pieces, 15 sigils, 20 waist/feet, 8 jewelry, 4
+shields/held offhands, 9 weapons. 192 icons through the assets:items
 pipeline (weapons register through the variant tables). Acceptance gates:
 the item_level.test.ts budget sweep over every piece above, the
 old-versus-new balance harness (full six-piece lineage versus full new

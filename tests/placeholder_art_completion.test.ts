@@ -289,7 +289,6 @@ describe('v0.36 placeholder-art completion evidence', () => {
     const CRUCIBLE_WEAPON_IDS = [
       'anvilguard_blade',
       'cinderfang_kris',
-      'emberflight_longbow',
       'forgefathers_warhammer',
       'forgefire_spire',
       'heart_of_the_end_greatblade',

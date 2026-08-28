@@ -2450,7 +2450,6 @@ export type TranslationKeyFlat =
   | 'entities.items.elixir_of_the_serpent.name'
   | 'entities.items.ember_wardens_barrier.name'
   | 'entities.items.emberfang_warblade.name'
-  | 'entities.items.emberflight_longbow.name'
   | 'entities.items.emberforge_gauntlets.name'
   | 'entities.items.emberforged_bulwark.name'
   | 'entities.items.emberfury_chest.name'

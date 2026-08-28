@@ -13496,9 +13496,6 @@ export const zh_TW: EnTranslations = {
       "heart_of_the_end_greatblade": {
         "name": "終末之心巨刃"
       },
-      "emberflight_longbow": {
-        "name": "燼羽長弓"
-      },
       "staff_of_the_last_spring": {
         "name": "終泉法杖"
       },

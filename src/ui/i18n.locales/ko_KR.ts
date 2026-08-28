@@ -14049,7 +14049,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.slagrender_cleaver.name': '용재절단 도끼',
   'entities.items.anvilguard_blade.name': '모루수호 검',
   'entities.items.heart_of_the_end_greatblade.name': '종말의 심장 대검',
-  'entities.items.emberflight_longbow.name': '잿불비상 장궁',
   'entities.items.staff_of_the_last_spring.name': '마지막 샘의 지팡이',
   'entities.items.forgefire_spire.name': '화로불꽃 첨탑지팡이',
   'entities.items.springtouched_crozier.name': '샘닿은 홀장',

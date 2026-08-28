@@ -153,7 +153,6 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   slagrender_cleaver: 'axe',
   anvilguard_blade: 'sword',
   heart_of_the_end_greatblade: 'sword',
-  emberflight_longbow: 'bow',
   staff_of_the_last_spring: 'staff',
   forgefire_spire: 'staff',
   wand_of_quenched_sparks: 'wand',

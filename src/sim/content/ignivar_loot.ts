@@ -3206,26 +3206,6 @@ export const IGNIVAR_WEAPON_ITEMS: Record<string, ItemDef> = {
     // (tests/equipment_proficiency.test.ts).
     requiredClass: ['warrior', 'hunter', 'shaman', 'paladin'],
   },
-  emberflight_longbow: {
-    id: 'emberflight_longbow',
-    name: 'Emberflight Longbow',
-    kind: 'weapon',
-    slot: 'mainhand',
-    quality: 'epic',
-    requiredLevel: 20,
-    weapon: { min: 39, max: 58, speed: 2.8 },
-    stats: { agi: 17, sta: 8 },
-    critRating: 70,
-    hasteRating: 30,
-    sellValue: 14000,
-    soulbound: true,
-    // Hunter-only, unlike the shared rogue/hunter archetype lock on the Kris:
-    // this game has no ranged weapon slot, so a non-hunter could only wield
-    // the bow as a MELEE mainhand stat stick, which is nonsense. Only the
-    // hunter's class Auto Shot actually fires with it (the shot profile reads
-    // the equipped weapon's damage and speed).
-    requiredClass: ['hunter'],
-  },
   staff_of_the_last_spring: {
     id: 'staff_of_the_last_spring',
     name: 'Staff of the Last Spring',

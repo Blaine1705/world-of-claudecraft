@@ -48,13 +48,15 @@ const gearItems = (): ItemDef[] =>
 
 describe('ignivar loot: catalog shape', () => {
   it('carries the exact authored counts', () => {
-    expect(IGNIVAR_LOOT_ITEM_IDS.length).toBe(202);
+    expect(IGNIVAR_LOOT_ITEM_IDS.length).toBe(201);
     expect(Object.keys(IGNIVAR_SET_ITEMS).length).toBe(29 * 5);
     expect(Object.keys(IGNIVAR_SIGIL_ITEMS).length).toBe(15);
     expect(Object.keys(IGNIVAR_OFFSET_ITEMS).length).toBe(20);
     expect(Object.keys(IGNIVAR_JEWELRY_ITEMS).length).toBe(8);
     expect(Object.keys(IGNIVAR_HELD_ITEMS).length).toBe(4);
-    expect(Object.keys(IGNIVAR_WEAPON_ITEMS).length).toBe(10);
+    // 9, not 10: the Emberflight Longbow was pulled from the tier (bows wait
+    // for the hunter ranged-slot rework; maintainer decision 2026-08-28).
+    expect(Object.keys(IGNIVAR_WEAPON_ITEMS).length).toBe(9);
   });
 
   it('merges every id into ITEMS without collisions', () => {
@@ -66,9 +68,9 @@ describe('ignivar loot: catalog shape', () => {
 });
 
 describe('ignivar loot: every gear piece is item level 35 and budget-exact', () => {
-  it('derives ilvl 35 from source 26 + epic + raid for all 187 gear pieces', () => {
+  it('derives ilvl 35 from source 26 + epic + raid for all 186 gear pieces', () => {
     const gear = gearItems();
-    expect(gear.length).toBe(187);
+    expect(gear.length).toBe(186);
     for (const item of gear) {
       expect(itemSourceLevel(item.id), `${item.id} source`).toBe(IGNIVAR_RAID_LOOT_SOURCE_LEVEL);
       expect(itemFromRaid(item.id), `${item.id} raid flag`).toBe(true);
@@ -271,8 +273,7 @@ describe('ignivar loot: the 10 weapons', () => {
     }
   });
 
-  it('the longbow is a bow and the kris is a dagger (backstab eligibility)', () => {
-    expect(WEAPON_TYPE_BY_ITEM.emberflight_longbow).toBe('bow');
+  it('the kris is a dagger (backstab eligibility)', () => {
     expect(WEAPON_TYPE_BY_ITEM.cinderfang_kris).toBe('dagger');
   });
 });

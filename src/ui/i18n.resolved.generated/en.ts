@@ -13496,9 +13496,6 @@ export const en: EnTranslations = {
       "heart_of_the_end_greatblade": {
         "name": "Heart of the End Greatblade"
       },
-      "emberflight_longbow": {
-        "name": "Emberflight Longbow"
-      },
       "staff_of_the_last_spring": {
         "name": "Staff of the Last Spring"
       },

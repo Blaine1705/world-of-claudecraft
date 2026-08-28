@@ -13496,9 +13496,6 @@ export const en_XA: EnTranslations = {
       "heart_of_the_end_greatblade": {
         "name": "[Ĥéáŕţ óƒ ţĥé Éñð Ĝŕéáţƀļáðé]"
       },
-      "emberflight_longbow": {
-        "name": "[Éɱƀéŕƒļíĝĥţ Ļóñĝƀóŵ]"
-      },
       "staff_of_the_last_spring": {
         "name": "[Šţáƒƒ óƒ ţĥé Ļášţ Šþŕíñĝ]"
       },

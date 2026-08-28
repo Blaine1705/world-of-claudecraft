@@ -14048,7 +14048,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.slagrender_cleaver.name': 'スラグレンダーのクリーバー',
   'entities.items.anvilguard_blade.name': 'アンヴィルガードのブレード',
   'entities.items.heart_of_the_end_greatblade.name': '終焉の心臓のグレートブレード',
-  'entities.items.emberflight_longbow.name': 'エンバーフライトのロングボウ',
   'entities.items.staff_of_the_last_spring.name': '最後の泉の杖',
   'entities.items.forgefire_spire.name': 'フォージファイアのスパイア',
   'entities.items.springtouched_crozier.name': '泉触れの司教杖',

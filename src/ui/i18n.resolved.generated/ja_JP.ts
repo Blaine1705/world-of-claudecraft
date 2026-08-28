@@ -13496,9 +13496,6 @@ export const ja_JP: EnTranslations = {
       "heart_of_the_end_greatblade": {
         "name": "終焉の心臓のグレートブレード"
       },
-      "emberflight_longbow": {
-        "name": "エンバーフライトのロングボウ"
-      },
       "staff_of_the_last_spring": {
         "name": "最後の泉の杖"
       },

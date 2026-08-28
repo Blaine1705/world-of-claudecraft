@@ -14230,7 +14230,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.slagrender_cleaver.name': 'Секач шлакодёра',
   'entities.items.anvilguard_blade.name': 'Клинок стража наковальни',
   'entities.items.heart_of_the_end_greatblade.name': 'Великий клинок Сердца конца',
-  'entities.items.emberflight_longbow.name': 'Длинный лук Тлеющего полёта',
   'entities.items.staff_of_the_last_spring.name': 'Посох последнего родника',
   'entities.items.forgefire_spire.name': 'Шпиль горнового огня',
   'entities.items.springtouched_crozier.name': 'Посох родникового касания',

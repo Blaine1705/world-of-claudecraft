@@ -98,10 +98,10 @@ const build = await buildItemArtAudit({
   artPendingIds,
   mapping,
   expected: {
-    // 829 + the crucible-raid-weapons-2026-08-28 batch (10 painted weapons).
-    catalogCount: 839,
-    // 844 + the 202 Crucible raid loot definitions (192 of them art-pending).
-    liveItemCount: 1046,
+    // 829 + the crucible-raid-weapons-2026-08-28 batch (9 painted weapons).
+    catalogCount: 838,
+    // 844 + the 201 Crucible raid loot definitions (192 of them art-pending).
+    liveItemCount: 1045,
     generatedHeroicDefinitions: 64,
     heroicDefinitionsWithOwnWebp: 48,
     heroicWeaponArtAliases: 16,

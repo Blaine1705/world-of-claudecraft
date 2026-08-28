@@ -761,7 +761,13 @@ Shields are ArmorItemDef with shield: true and blockValue; requiredClass
 covers the shield-capable classes per role. Held offhands take the 0.75 held
 slot budget (18 points).
 
-### Weapons (10 items)
+### Weapons (9 items)
+
+The Emberflight Longbow was pulled from the tier (maintainer decision
+2026-08-28): this game has no ranged weapon slot, so a bow item could only
+exist as a melee mainhand stat stick, and introducing real bows requires
+the hunter ranged rework. The hunter ranged marquee returns with it; until
+then hunters chase the Kris, the Cleaver, and the two-handers.
 
 | Item | Type | Hand | For |
 |---|---|---|---|
@@ -770,7 +776,6 @@ slot budget (18 points).
 | Slagrender Cleaver | axe | one-hand (2.4) | fury/enhancement offhand, arms |
 | Anvilguard Blade | sword | one-hand (2.6), sta/hit tank identity | tanks |
 | Heart of the End Greatblade | sword | two-hand (3.5) | arms, fury (Titan's Grip), retribution |
-| Emberflight Longbow | bow | mainhand ranged (2.8) | hunters |
 | Staff of the Last Spring | staff | two-hand (3.2), Healing Power | healers |
 | Forgefire Spire | staff | two-hand (3.2), Spell Damage | damage casters |
 | Springtouched Crozier | mace | one-hand (2.4), Healing Power | healers pairing a shield or orb |
@@ -819,7 +824,7 @@ promoted Warden minibosses take over groups when it lands (below).
 | Group | Entries | Chance each |
 |---|---|---|
 | ignivar_h_sigil_robe | Robe Sigil of the Anvil / Ember / Tempest | 1/3 each |
-| ignivar_h_weapon | Forgefather's Warhammer, Anvilguard Blade, Emberflight Longbow, Springtouched Crozier | 0.25 each |
+| ignivar_h_weapon | Forgefather's Warhammer, Anvilguard Blade, Springtouched Crozier | 1/3 each |
 
 ### Varkhul, Forgefather of the Last Flame (both difficulties)
 

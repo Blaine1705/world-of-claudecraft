@@ -333,8 +333,8 @@ describe('item-art consistency accepted-art provenance', () => {
       },
       {
         path: `${evidenceDir}/final-item-art-audit-verdict.json`,
-        acceptedSha256: '2492d650115bb7dc8340954539de9c40818bce8489ab2411a04e2a0f347c4659',
-        acceptedBytes: 109_865,
+        acceptedSha256: 'aa7df96eb533eeb29e904b821d9d9fe66ddedeae60734c1fefe9877cf9562032',
+        acceptedBytes: 109_837,
       },
     ]);
     for (const evidence of [...value.sourceEvidence, ...value.generationReports]) {
@@ -449,9 +449,9 @@ describe('item-art consistency accepted-art provenance', () => {
     expect(readme).toContain('node scripts/item_art_audit.mjs\n');
     expect(readme).toContain('node scripts/item_art_audit.mjs --refresh-verdict');
     const verdictBytes = readFileSync(path.join(repoRoot, verdictPath));
-    expect(verdictBytes.length).toBe(109_865);
+    expect(verdictBytes.length).toBe(109_837);
     expect(sha256(verdictBytes)).toBe(
-      '2492d650115bb7dc8340954539de9c40818bce8489ab2411a04e2a0f347c4659',
+      'aa7df96eb533eeb29e904b821d9d9fe66ddedeae60734c1fefe9877cf9562032',
     );
     const verdict = JSON.parse(verdictBytes.toString('utf8')) as FinalAuditVerdict;
 
@@ -460,8 +460,8 @@ describe('item-art consistency accepted-art provenance', () => {
       baselineCommit: 'aee195551b5aef628eb7a72192117d7e3079818e',
       branch: 'feature/placeholder-art-completion-v036',
       shippingDirectory: 'public/ui/items',
-      itemArtFilesReviewed: 839,
-      liveItemDefinitions: 1046,
+      itemArtFilesReviewed: 838,
+      liveItemDefinitions: 1045,
       generatedHeroicDefinitions: 64,
       heroicDefinitionsWithOwnWebp: 48,
       heroicWeaponArtAliases: 16,
@@ -471,7 +471,7 @@ describe('item-art consistency accepted-art provenance', () => {
       manifest().targetSets.items.map((id) => `public/ui/items/${id}.webp`),
     );
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
-      839,
+      838,
     );
     expect(Object.keys(verdict.auditScope.groups)).toHaveLength(22);
     const shippingIds = new Set(
@@ -516,13 +516,13 @@ describe('item-art consistency accepted-art provenance', () => {
     ]);
     expect(verdict.visualVerdict).toMatchObject({
       status: 'pass',
-      passCount: 839,
+      passCount: 838,
       watchCount: 0,
       watch: [],
       rejectCount: 0,
       reject: [],
       summary:
-        'All 829 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review, plus the ten Crucible raid weapon icons (generated via the OpenAI crucible-raid-weapons-2026-08-28 batch) added on 2026-08-28, machine-checked and awaiting owner visual review.',
+        'All 829 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review, plus the nine Crucible raid weapon icons (generated via the OpenAI crucible-raid-weapons-2026-08-28 batch) added on 2026-08-28, machine-checked and awaiting owner visual review.',
     });
     expect(verdict.visualVerdict.passIds).toEqual(currentIds);
     expect(verdict.nonVisualContentWatch).toEqual([
@@ -562,8 +562,8 @@ describe('item-art consistency accepted-art provenance', () => {
 
     expect(verdict.evidence.catalog).toEqual({
       path: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      sha256: '67915259c99e411be3c4214c5c722664285fd3870c718117d50c0ce2ae1395c5',
-      bytes: 460_124,
+      sha256: 'eff40f352074aaf0eebee82a5a3ec033b1c8324ef1e0fd736f98dba4a0f5310c',
+      bytes: 459_595,
     });
     expect(verdict.evidence.rendererFingerprint).toBe(
       'd80ff4868f979e1717e106c889b7d6505841caf8d4cf887776ecb60848b1b2b7',
@@ -616,7 +616,7 @@ describe('item-art consistency accepted-art provenance', () => {
       sheetSetDigest.update(`${sheet.path}\0${sheet.sha256}\0${sheet.bytes}\n`);
     }
     expect(verdict.evidence.sheetSetSha256).toBe(
-      '0be543f4da74dc5be6440981da3ac5d7552741f09584f11c5364af2e3b55cbcd',
+      '363480a6365bb91e7e615d62523cf9e48086136dfded97e642cc2a48fa44fa11',
     );
     expect(sheetSetDigest.digest('hex')).toBe(verdict.evidence.sheetSetSha256);
 
@@ -626,7 +626,7 @@ describe('item-art consistency accepted-art provenance', () => {
       shippingCatalogDigest.update(`${id}\0${sha256(bytes)}\0${bytes.length}\n`);
     }
     expect(verdict.evidence.shippingCatalogSha256).toBe(
-      'b7d4b3b4d9514624b89858204fda6efd9d625898faa3eafe9a50f009aa36a97e',
+      '24baeb8dcc1f3bd033dbf6a657e9c64e0d63bdab09b2155d07fd5e7e557392a3',
     );
     expect(shippingCatalogDigest.digest('hex')).toBe(verdict.evidence.shippingCatalogSha256);
   });
@@ -755,13 +755,13 @@ describe('item-art consistency accepted-art provenance', () => {
     const oldGeneratedIds = mapping.generatedBatches
       .filter(({ batchId }) => batchId !== BATCH_ID)
       .flatMap(({ itemIds }) => itemIds);
-    expect(oldGeneratedIds).toHaveLength(525);
+    expect(oldGeneratedIds).toHaveLength(524);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(839);
-    expect(new Set(allCurrentOwnerIds).size).toBe(839);
+    expect(allCurrentOwnerIds).toHaveLength(838);
+    expect(new Set(allCurrentOwnerIds).size).toBe(838);
     expect(batch?.provenanceRecords).toEqual([
       `${evidenceDir}/accepted-art.json`,
       `${evidenceDir}/supersession-audit.json`,
@@ -897,8 +897,8 @@ describe('item-art consistency accepted-art provenance', () => {
     for (const id of ownerIds) ownerCountById.set(id, (ownerCountById.get(id) ?? 0) + 1);
 
     const violations: string[] = [];
-    if (ownerIds.length !== 839) violations.push(`mapping owner count: ${ownerIds.length} != 839`);
-    if (fileIds.length !== 839) violations.push(`shipping WebP count: ${fileIds.length} != 839`);
+    if (ownerIds.length !== 838) violations.push(`mapping owner count: ${ownerIds.length} != 838`);
+    if (fileIds.length !== 838) violations.push(`shipping WebP count: ${fileIds.length} != 838`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

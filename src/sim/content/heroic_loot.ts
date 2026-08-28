@@ -767,10 +767,12 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     { itemId: 'sigil_anvil_chest', chance: 0.34, rollGroup: 'ignivar_h_sigil_robe' },
     { itemId: 'sigil_ember_chest', chance: 0.33, rollGroup: 'ignivar_h_sigil_robe' },
     { itemId: 'sigil_tempest_chest', chance: 0.33, rollGroup: 'ignivar_h_sigil_robe' },
-    { itemId: 'forgefathers_warhammer', chance: 0.25, rollGroup: 'ignivar_h_weapon' },
-    { itemId: 'anvilguard_blade', chance: 0.25, rollGroup: 'ignivar_h_weapon' },
-    { itemId: 'emberflight_longbow', chance: 0.25, rollGroup: 'ignivar_h_weapon' },
-    { itemId: 'springtouched_crozier', chance: 0.25, rollGroup: 'ignivar_h_weapon' },
+    // Three entries, not four: the Emberflight Longbow was pulled from the
+    // tier (bows wait for the hunter ranged-slot rework; maintainer decision
+    // 2026-08-28), and the hunter ranged marquee returns with that rework.
+    { itemId: 'forgefathers_warhammer', chance: 0.34, rollGroup: 'ignivar_h_weapon' },
+    { itemId: 'anvilguard_blade', chance: 0.33, rollGroup: 'ignivar_h_weapon' },
+    { itemId: 'springtouched_crozier', chance: 0.33, rollGroup: 'ignivar_h_weapon' },
   ],
   [VARKHUL_BOSS_ID]: [
     { itemId: 'sigil_anvil_chest', chance: 0.34, rollGroup: 'varkhul_h_sigil_robe' },

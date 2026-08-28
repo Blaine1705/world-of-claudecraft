@@ -13496,9 +13496,6 @@ export const ko_KR: EnTranslations = {
       "heart_of_the_end_greatblade": {
         "name": "종말의 심장 대검"
       },
-      "emberflight_longbow": {
-        "name": "잿불비상 장궁"
-      },
       "staff_of_the_last_spring": {
         "name": "마지막 샘의 지팡이"
       },
