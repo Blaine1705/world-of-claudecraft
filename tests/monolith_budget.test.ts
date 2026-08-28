@@ -136,7 +136,13 @@ const MONOLITHS: MonolithRow[] = [
     // Plus 1 for the Exchange's Solana wallet card: the ONE line is the
     // onWalletUiChange fan-out onto wocMarketWindow.onWalletChanged(), the
     // Claudium panel's existing arm. Exact count.
-    ceiling: 18488,
+    // Raised at the PR #3284 v0.41.0 sync merge, then partially taken back
+    // by the review-round extraction: the frames-menu toggle/select tables,
+    // the reset-key table, and the party-sample roster builder moved to the
+    // pure core interface_unlock_menu_core.ts. What remains on coordinator
+    // state (dimension-mode mover wiring, the edit-preview painter closure,
+    // the player-frame bar lock) is the live-hooks half. Exact merged count.
+    ceiling: 19002,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -265,7 +271,12 @@ const MONOLITHS: MonolithRow[] = [
     // availability probe and browser authorizer moved to
     // src/net/desktop_wallet_handoff.ts (thin hoisted delegators remain),
     // paying for the Exchange desktop-signer wiring at the attach site.
-    ceiling: 11563,
+    // Raised at the PR #3284 v0.41.0 sync merge: the applySetting arms for
+    // the interface-editor settings (frame dimensions, aura direction vars,
+    // the player-frame bar lock) predate this ratchet; folding them behind a
+    // src/game/ settings-application seam is flagged follow-up work. Exact
+    // merged count.
+    ceiling: 11629,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
