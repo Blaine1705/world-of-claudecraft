@@ -100,7 +100,11 @@ describe('delete dispatch arm wiring (source pins)', () => {
   it('the legacy main.ts arm threads the request close signal into deleteCharacter', async () => {
     const { readFileSync } = await import('node:fs');
     const { stripComments } = await import('../helpers/strip_comments');
-    const src = readFileSync(new URL('../../server/main.ts', import.meta.url), 'utf8');
+    // Strip FIRST, then slice: a commented-out copy of the start marker
+    // above the real arm would otherwise widen the slice silently.
+    const src = stripComments(
+      readFileSync(new URL('../../server/main.ts', import.meta.url), 'utf8'),
+    );
     // Slice to the DELETE dispatch arm before matching, the sibling idiom in
     // tests/server/characters.test.ts ('legacy DELETE dispatch arm'): a
     // whole-file grep would stay green on a second characterDeleteClientGone
@@ -109,7 +113,7 @@ describe('delete dispatch arm wiring (source pins)', () => {
     expect(start).toBeGreaterThan(-1);
     const end = src.indexOf("url === '/api/realms'", start);
     expect(end).toBeGreaterThan(start);
-    const arm = stripComments(src.slice(start, end));
+    const arm = src.slice(start, end);
     expect(arm).toMatch(
       /deleteCharacter\(\s*accountId,\s*characterId,\s*characterDeleteRequestSignal\(res\),?\s*\)/,
     );

@@ -228,6 +228,38 @@ function expectPinnedDivergence(run: TwinRun, expectedDelta: number): void {
   expect(run.refusing.ctx.rng.next()).toBe(run.inert.ctx.rng.next());
 }
 
+describe('admission call-site census', () => {
+  it('exactly the four pinned sites consult reservePlannedVaultConsumption', async () => {
+    // The header above claims completeness over ALL admission sites, and the
+    // src/sim/CLAUDE.md carve-out doc names this suite as their gate; a
+    // fifth call site added later would silently inherit an untested
+    // carve-out while both claims stayed frozen. Comment-stripped census
+    // over the whole sim tree (the shared recursive walk, so a module move
+    // cannot exit the scan), attributed per file so a new site names
+    // itself: crafting's one arm plus enchanting's three (plain bagged,
+    // worn, bagged replace). The subtraction excludes the definition in
+    // sim_context.ts; import lists carry no call parenthesis and never
+    // count.
+    const { readFileSync } = await import('node:fs');
+    const { stripComments } = await import('./helpers/strip_comments');
+    const { tsFilesUnder } = await import('./helpers/ts_files_under');
+    const root = new URL('../src/sim', import.meta.url);
+    const { fileURLToPath } = await import('node:url');
+    const counts: Record<string, number> = {};
+    for (const { file, full } of tsFilesUnder(fileURLToPath(root))) {
+      const src = stripComments(readFileSync(full, 'utf8'));
+      const calls =
+        (src.match(/reservePlannedVaultConsumption\(/g) ?? []).length -
+        (src.match(/function reservePlannedVaultConsumption\(/g) ?? []).length;
+      if (calls > 0) counts[file] = calls;
+    }
+    expect(counts).toEqual({
+      'professions/crafting.ts': 1,
+      'professions/enchanting.ts': 3,
+    });
+  });
+});
+
 describe('vault admission determinism carve-out (same-seed twin run)', () => {
   it('a refusing admission skips exactly the one output-side draw (masterwork proc)', () => {
     expectPinnedDivergence(runTwins(), 1);
