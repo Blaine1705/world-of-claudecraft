@@ -827,20 +827,25 @@ describe('wiring pins (source scans, anchor style per docs/qa-gate.md)', () => {
     // marked the old renderer unready but before the candidate renderer exists.
     expect(
       between(mainSrc, "addEventListener('webglcontextlost'", 'webglcontextrestored'),
-    ).toContain('ktx2MipsOnContextLost(currentKtx2RestoreUploadQueue)');
-    expect(mainSrc).toContain('const currentKtx2RestoreUploadQueue = ()');
-    expect(mainSrc).toContain('ktx2RestoreUploadQueueWaiters.push(resolve)');
+    ).toContain('ktx2MipsOnContextLost(ktx2RestoreUploadQueue.current)');
+    expect(mainSrc).toContain(
+      "import { createKtx2RestoreUploadQueueCoordinator } from './game/ktx2_restore_upload_queue'",
+    );
+    expect(mainSrc).toContain(
+      "createKtx2RestoreUploadQueueCoordinator<Renderer['backgroundGpuWork']>()",
+    );
+    expect(mainSrc).toContain('ktx2RestoreUploadQueue.setPaused(paused)');
     expect(between(mainSrc, 'shutdownRenderer: async (current)', 'recycleContext')).toContain(
-      'setKtx2RestoreUploadQueue(undefined)',
+      'ktx2RestoreUploadQueue.publish(undefined)',
     );
     const buildRendererBlock = between(
       mainSrc,
       'buildRenderer: (_target, recycled) => {',
       'prepareCurrentZone',
     );
-    expect(buildRendererBlock).toContain('setKtx2RestoreUploadQueue(next.backgroundGpuWork)');
+    expect(buildRendererBlock).toContain('ktx2RestoreUploadQueue.publish(next.backgroundGpuWork)');
     expect(
-      buildRendererBlock.indexOf('setKtx2RestoreUploadQueue(next.backgroundGpuWork)'),
+      buildRendererBlock.indexOf('ktx2RestoreUploadQueue.publish(next.backgroundGpuWork)'),
     ).toBeLessThan(buildRendererBlock.indexOf('return next'));
     // (3) The curtain gate must sit INSIDE the rebuild prewarm step, after the
     // far-vista hold, so the reveal normally shows no stub-black world
