@@ -6,6 +6,7 @@ import {
   type TorchFireColors,
   type TorchFireTuning,
 } from './dungeon_torch_rig';
+import { WALL_PROP_GROUP_PREFIX } from './dungeon_wall_occlusion';
 import { surfaceMat } from './gfx';
 import {
   filterIgnivarPropPlacements,
@@ -19,6 +20,7 @@ import { appendIgnivarEnvProps, prepareIgnivarEnvProps } from './ignivar_env_pro
 import type { FireLightSink } from './point_light_budget';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 import { addTorchGlowDecal } from './torch_glow_decal';
+import { splitWallMountedItems, type WallMountedSplit } from './wall_backface_cull_core';
 
 export const IGNIVAR_APPROACH_DRESSING_NAME = 'ignivarForgeApproachDressing';
 export const IGNIVAR_ARENA_DRESSING_NAME = 'ignivarCrucibleArenaDressing';
@@ -67,6 +69,58 @@ function addPropGlowPools(
   }
 }
 
+/** Split a room's filtered plan into interior placements and per-wall-face
+ *  buckets along the layout's shell polygon (a no-op without one). */
+function splitWallMountedPlacements(
+  layout: DungeonLayout,
+  placements: readonly IgnivarPropPlacement[],
+): WallMountedSplit<IgnivarPropPlacement> {
+  return splitWallMountedItems(placements, layout.shellPolygon, layout.shellPole);
+}
+
+/**
+ * Append a room's props with the wall-mounted ones grouped per shell face, in
+ * subgroups the interior build registers for the backface cull: when a wall
+ * face hides because the camera is on its outside, the props mounted on it
+ * hide with it instead of floating in the void. Floor props and mid-room rigs
+ * stay in the main dressing group.
+ */
+function appendRoomProps(
+  group: THREE.Group,
+  layout: DungeonLayout,
+  placements: readonly IgnivarPropPlacement[],
+  lowGfx: boolean,
+  appendProps: PropAppender,
+): void {
+  const split = splitWallMountedPlacements(layout, placements);
+  appendProps(group, split.interior, lowGfx);
+  addPropGlowPools(group, split.interior, lowGfx);
+  for (const face of split.faces) {
+    const sub = new THREE.Group();
+    sub.name = `${WALL_PROP_GROUP_PREFIX}${face.edge}`;
+    sub.userData.wallPlane = face.plane;
+    appendProps(sub, face.items, lowGfx);
+    // a wall-mounted glow prop's floor pool hides with its face too, so a
+    // culled relief never leaves an orphaned glow on the floor
+    addPropGlowPools(sub, face.items, lowGfx);
+    group.add(sub);
+  }
+}
+
+/**
+ * addTorchFire parents the flame AND the point light into its sink group. A
+ * light must never sit under a per-camera visibility toggle: numPointLights
+ * is a program cache key, and room lighting must not depend on the viewer's
+ * orbit. So after routing a face's fires into its cullable subgroup, the
+ * lights are re-seated on the dressing root (both groups sit at identity, so
+ * local positions carry over unchanged); only the flame culls with the wall.
+ */
+function liftLightsTo(root: THREE.Group, sub: THREE.Group): void {
+  for (const child of [...sub.children]) {
+    if ((child as THREE.Light).isLight) root.add(child);
+  }
+}
+
 function markDressing(group: THREE.Group, name: string): THREE.Group {
   group.name = name;
   group.userData.renderCategory = 'dungeon';
@@ -82,8 +136,7 @@ function buildForgeApproachDressing(
 ): THREE.Group {
   const group = markDressing(new THREE.Group(), IGNIVAR_APPROACH_DRESSING_NAME);
   const placements = filterIgnivarPropPlacements(ignivarApproachPropPlan(layout), lowGfx);
-  appendProps(group, placements, lowGfx);
-  addPropGlowPools(group, placements, lowGfx);
+  appendRoomProps(group, layout, placements, lowGfx, appendProps);
   const halfWidth = layout.floorHalfX ?? layout.wallX ?? 18;
   const sideX = Math.max(IGNIVAR_APPROACH_CLEAR_HALF_WIDTH + 2, Math.min(halfWidth - 3.5, 13));
   const length = Math.max(12, layout.zMax - layout.zMin - 10);
@@ -141,8 +194,7 @@ function buildCrucibleArenaDressing(
 ): THREE.Group {
   const group = markDressing(new THREE.Group(), IGNIVAR_ARENA_DRESSING_NAME);
   const placements = filterIgnivarPropPlacements(ignivarArenaPropPlan(layout), lowGfx);
-  appendProps(group, placements, lowGfx);
-  addPropGlowPools(group, placements, lowGfx);
+  appendRoomProps(group, layout, placements, lowGfx, appendProps);
   return group;
 }
 
@@ -157,8 +209,7 @@ function buildInnerCrucibleDressing(
   // The authored anvil sits exactly on the encounter's forge anchor (the
   // boss works it pre-pull); the furnace and sealed vault stack behind it.
   const placements = filterIgnivarPropPlacements(ignivarCruciblePropPlan(layout), lowGfx);
-  appendProps(group, placements, lowGfx);
-  addPropGlowPools(group, placements, lowGfx);
+  appendRoomProps(group, layout, placements, lowGfx, appendProps);
 
   trenchGeometry ??= markSharedGeometry(new THREE.BoxGeometry(1, 0.045, 1));
   const trenchMaterial = sharedMaterial({
@@ -216,12 +267,32 @@ export function buildIgnivarRaidDressing(
   if (group && torchFire) {
     // Fire for the plan's placed torches, on the same tier filtering the
     // meshes get so a dropped density torch never leaves an orphan flame.
+    // Wall-mounted sconces route their FLAME into the face subgroup so it
+    // culls with the wall; the light is then lifted back onto the dressing
+    // root (liftLightsTo), so room lighting never depends on the camera.
+    const placements = filterIgnivarPropPlacements(ignivarRoomPropPlan(interior, layout), lowGfx);
+    const split = splitWallMountedPlacements(layout, placements);
     addIgnivarPlacedTorchFires(
       { group, flames: torchFire.flames, fireLights: torchFire.fireLights },
-      filterIgnivarPropPlacements(ignivarRoomPropPlan(interior, layout), lowGfx),
+      split.interior,
       torchFire.colors,
       torchFire.tuning,
     );
+    for (const face of split.faces) {
+      const child = group.getObjectByName(`${WALL_PROP_GROUP_PREFIX}${face.edge}`);
+      const sub = child instanceof THREE.Group ? child : null;
+      addIgnivarPlacedTorchFires(
+        {
+          group: sub ?? group,
+          flames: torchFire.flames,
+          fireLights: torchFire.fireLights,
+        },
+        face.items,
+        torchFire.colors,
+        torchFire.tuning,
+      );
+      if (sub) liftLightsTo(group, sub);
+    }
   }
   return group;
 }
@@ -230,4 +301,5 @@ export const ignivarRaidDressingInternalsForTest = {
   buildForgeApproachDressing,
   buildCrucibleArenaDressing,
   buildInnerCrucibleDressing,
+  liftLightsTo,
 };

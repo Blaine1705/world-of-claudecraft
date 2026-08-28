@@ -435,8 +435,10 @@ const MONOLITHS: MonolithRow[] = [
     // gates and the torch-tuck fix). Exact count, zero slack.
     // Re-pinned 2715 -> 2463 for the lava-moat wiring: the floor/quad/wall kind
     // pickers moved to dungeon_tile_kind_core.ts (the banner-core pattern).
-    // Exact count, zero slack.
-    ceiling: 2463,
+    // Re-pinned 2463 -> 2434 for the raid wall backface cull: the hideable-wall
+    // update loop moved to dungeon_wall_occlusion.ts and the torch palette
+    // table to dungeon_torch_colors.ts. Exact count, zero slack.
+    ceiling: 2434,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
 ];
