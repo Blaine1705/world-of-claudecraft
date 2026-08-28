@@ -24,6 +24,7 @@ interface GroundAimHudFacet {
     radius: number;
     school: string;
     dimmed: boolean;
+    blocked: boolean;
   } | null;
 }
 
@@ -85,8 +86,21 @@ export interface GroundAimReticleSyncDeps {
   cursorPoint: () => { x: number; y: number } | null;
   groundPoint: (x: number, y: number) => { x: number; z: number } | null;
   setReticle: (
-    reticle: { x: number; z: number; radius: number; school: string; dimmed: boolean } | null,
+    reticle: {
+      x: number;
+      z: number;
+      radius: number;
+      school: string;
+      dimmed: boolean;
+      blocked: boolean;
+    } | null,
   ) => void;
+}
+
+/** The bound per-frame sync main.ts calls: built once, closures capture
+ *  stable bindings, and the common not-aiming frame costs one call. */
+export function createGroundAimReticleSync(deps: GroundAimReticleSyncDeps): () => void {
+  return () => syncGroundAimReticleFrame(deps);
 }
 
 /** Per-frame reticle sync. Touch placement is updated directly by
@@ -111,6 +125,7 @@ export function syncGroundAimReticleFrame(deps: GroundAimReticleSyncDeps): void 
           radius: reticle.radius,
           school: reticle.school,
           dimmed: reticle.dimmed,
+          blocked: reticle.blocked,
         }
       : null,
   );

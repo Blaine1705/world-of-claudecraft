@@ -14,6 +14,7 @@ import {
   createGroundAimState,
   enterGroundAim,
   type GroundAimState,
+  quickAimPoint,
   smartSeedPoint,
   withinMinRange,
 } from './ground_aim';
@@ -27,7 +28,10 @@ export interface GroundAimReticleView {
   point: AimPoint;
   radius: number;
   school: string;
+  /** Softened but valid: range-clamped or projection-diverged; still casts. */
   dimmed: boolean;
+  /** Inside the ability's minimum range: the commit will be refused. */
+  blocked: boolean;
 }
 
 export interface GroundAimControllerDeps {
@@ -156,8 +160,10 @@ export class GroundAimController {
   // commit still sends the clamped aim: the authoritative cast re-derives its
   // own landing, so projecting the submission would double-apply it. A
   // divergence dims the ring like a range clamp does: honest "not exactly
-  // where you point" feedback. Min range judges the submitted aim, matching
-  // the sim's refusal.
+  // where you point" feedback for a cast that WILL land. A min-range
+  // violation is a different state (the commit will be refused) and gets its
+  // own flag so the render can look refusing, not merely soft. Min range
+  // judges the submitted aim, matching the sim's refusal.
   reticle(): GroundAimReticleView | null {
     if (!this.isActive() || !this.rawPoint) return null;
     const res = this.activeAbility();
@@ -175,7 +181,8 @@ export class GroundAimController {
       point: projected,
       radius: abilityAoeRadius(res),
       school: res.def.school,
-      dimmed: aim.clamped || diverged || withinMinRange(player, aim.point, res.def.minRange),
+      dimmed: aim.clamped || diverged,
+      blocked: withinMinRange(player, aim.point, res.def.minRange),
     };
   }
 
@@ -187,9 +194,16 @@ export class GroundAimController {
       this.cancel();
       return true;
     }
+    const player = this.deps.player();
     const point = rawPoint
-      ? clampAimToRange(this.deps.player(), rawPoint, res.def.range).point
-      : this.deps.fallbackPoint();
+      ? clampAimToRange(player, rawPoint, res.def.range).point
+      : quickAimPoint(
+          player,
+          this.deps.seedTargetPoint(),
+          this.deps.fallbackPoint(),
+          res.def.range,
+          res.def.minRange,
+        );
     const committed = commitGroundAim(this.state);
     this.state = committed.state;
     this.rawPoint = null;

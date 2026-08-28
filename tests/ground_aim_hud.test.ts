@@ -1,5 +1,7 @@
 // @vitest-environment happy-dom
 
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('../src/game/audio', () => ({
@@ -42,6 +44,7 @@ interface GroundAimHarness {
     entities: Map<number, Entity>;
     known: ResolvedAbility[];
     castAbilityAt: ReturnType<typeof vi.fn>;
+    groundAimPlacementPreview: ReturnType<typeof vi.fn>;
   };
   renderer: { setGroundAimReticle: ReturnType<typeof vi.fn> };
   optionsHooks: {
@@ -63,6 +66,7 @@ interface GroundAimHarness {
     radius: number;
     school: string;
     dimmed: boolean;
+    blocked: boolean;
   } | null;
   commitGroundAimAt(point?: AimPoint | null): boolean;
   commitGroundAim(): boolean;
@@ -113,6 +117,7 @@ function makeHud(
     mobileTouch?: boolean;
     touchPrecise?: boolean;
     desktopPreference?: boolean;
+    groundAimPlacementPreview?: (abilityId: string, point: AimPoint) => AimPoint;
   } = {},
 ): GroundAimHarness {
   const player = options.player ?? entity(1, 0, 0);
@@ -135,6 +140,9 @@ function makeHud(
     ),
     known: [ability],
     castAbilityAt: vi.fn(),
+    groundAimPlacementPreview: vi.fn(
+      options.groundAimPlacementPreview ?? ((_id: string, point: AimPoint) => point),
+    ),
   };
   hud.renderer = { setGroundAimReticle: vi.fn() };
   // Mirrors Hud's field initializer, which Object.create(Hud.prototype) skips.
@@ -145,6 +153,8 @@ function makeHud(
     fallbackPoint: () => hud.groundTargetAim(),
     castAt: (id, point) => (hud.sim.castAbilityAt as (i: string, p: AimPoint) => void)(id, point),
     clearReticle: () => (hud.renderer.setGroundAimReticle as (r: null) => void)(null),
+    projectPlacement: (id, point) =>
+      (hud.sim.groundAimPlacementPreview as (i: string, p: AimPoint) => AimPoint)(id, point),
   });
   hud.optionsHooks = {
     groundAimTargetAttackable: () => options.attackable ?? false,
@@ -357,7 +367,7 @@ describe('Hud ground aim behavior', () => {
     expect(hud.renderer.setGroundAimReticle).toHaveBeenCalledWith(null);
   });
 
-  it('dims an unclamped point inside the authored minimum range', () => {
+  it('marks a point inside the authored minimum range blocked, not dimmed', () => {
     const hud = makeHud({ minRange: 8 });
     hud.castSlot(3);
     hud.updateGroundAimPoint({ x: 3, z: 0 });
@@ -365,10 +375,11 @@ describe('Hud ground aim behavior', () => {
     const reticle = hud.groundAimReticle();
 
     expect(reticle?.point).toEqual({ x: 3, z: 0 });
-    expect(reticle?.dimmed).toBe(true);
+    expect(reticle?.blocked).toBe(true);
+    expect(reticle?.dimmed).toBe(false);
   });
 
-  it('does not dim an unclamped point at the minimum-range boundary', () => {
+  it('leaves an unclamped point at the minimum-range boundary unblocked', () => {
     const hud = makeHud({ minRange: 8 });
     hud.castSlot(3);
     hud.updateGroundAimPoint({ x: 8, z: 0 });
@@ -376,6 +387,7 @@ describe('Hud ground aim behavior', () => {
     const reticle = hud.groundAimReticle();
 
     expect(reticle?.point).toEqual({ x: 8, z: 0 });
+    expect(reticle?.blocked).toBe(false);
     expect(reticle?.dimmed).toBe(false);
   });
 
@@ -477,6 +489,24 @@ describe('Hud ground aim behavior', () => {
   });
 
   describe('placement projection', () => {
+    it('returns the world-projected placement dimmed through the Hud harness', () => {
+      const groundAimPlacementPreview = vi.fn((id: string, point: AimPoint) =>
+        id === 'heroic_leap' ? { x: point.x + 3, z: point.z - 6 } : point,
+      );
+      const hud = makeHud({
+        abilityDef: ABILITIES.heroic_leap,
+        groundAimPlacementPreview,
+      });
+
+      hud.castSlot(3);
+      hud.updateGroundAimPoint({ x: 0, z: 20 });
+
+      const reticle = hud.groundAimReticle();
+      expect(groundAimPlacementPreview).toHaveBeenCalledWith('heroic_leap', { x: 0, z: 20 });
+      expect(reticle?.point).toEqual({ x: 3, z: 14 });
+      expect(reticle?.dimmed).toBe(true);
+    });
+
     it('paints the projected landing dimmed while committing the clamped aim', () => {
       const castAt = vi.fn();
       const controller = new GroundAimController({
@@ -525,5 +555,16 @@ describe('Hud ground aim behavior', () => {
       expect(reticle?.point).toEqual({ x: 0, z: 20 });
       expect(reticle?.dimmed).toBe(false);
     });
+  });
+});
+
+describe('Hud ground aim source wiring', () => {
+  it('delegates placement projection to the world seam', () => {
+    const source = readFileSync(join(process.cwd(), 'src/ui/hud.ts'), 'utf8');
+    const code = source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+
+    expect(code).toContain(
+      'projectPlacement: (id, point) => this.sim.groundAimPlacementPreview(id, point)',
+    );
   });
 });

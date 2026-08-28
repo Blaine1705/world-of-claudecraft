@@ -150,7 +150,7 @@ import { music } from './game/music';
 import { tryNearbyInteraction } from './game/nearby_interaction';
 import { nextNpcTarget } from './game/npc_cycle';
 import { isOfflineModeAvailable } from './game/offline_mode_gate';
-import { padGroundAimCallbacks, syncGroundAimReticleFrame } from './game/pad_ground_aim_wiring';
+import { createGroundAimReticleSync, padGroundAimCallbacks } from './game/pad_ground_aim_wiring';
 import { padReelItemId } from './game/pad_reel';
 import { openTargetSubcommands } from './game/pad_subcommands';
 import { createPadTargetPick } from './game/pad_target_pick';
@@ -3542,14 +3542,15 @@ async function startGame(
   }
 
   function syncGroundAimReticle(): void {
-    syncGroundAimReticleFrame({
-      hud,
-      isMobileTouch: () => document.body.classList.contains('mobile-touch'),
-      cursorPoint: () => input.cursorPoint(),
-      groundPoint: (x, y) => renderer.groundPoint(x, y, world.player.pos.y),
-      setReticle: (reticle) => renderer.setGroundAimReticle(reticle),
-    });
+    groundAimReticleSync();
   }
+  const groundAimReticleSync = createGroundAimReticleSync({
+    hud,
+    isMobileTouch: () => document.body.classList.contains('mobile-touch'),
+    cursorPoint: () => input.cursorPoint(),
+    groundPoint: (x, y) => renderer.groundPoint(x, y, world.player.pos.y),
+    setReticle: (reticle) => renderer.setGroundAimReticle(reticle),
+  });
 
   function handlePick(x: number, y: number, button: number): void {
     if (hud.isGroundAimActive()) {

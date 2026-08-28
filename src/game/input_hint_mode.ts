@@ -41,7 +41,11 @@ function clearPadActivity(): void {
 }
 
 function clearPadActivityOnMouseMove(event: MouseEvent): void {
-  if (event.isTrusted) clearPadActivity();
+  // A 1000 Hz mouse fires this per event forever once a pad was seen; skip the
+  // classList write unless there is actually a mark to clear.
+  if (!event.isTrusted) return;
+  if (!hasDom() || !document.body.classList.contains(PAD_ACTIVE_CLASS)) return;
+  clearPadActivity();
 }
 
 /** Called by GamepadManager.poll whenever the pad produced real input this

@@ -3924,7 +3924,7 @@ export class ClientWorld implements IWorld {
       : 0;
   }
   groundAimPlacementPreview(abilityId: string, point: GroundAimPointXZ): GroundAimPointXZ {
-    return heroicLeapPlacementPreview(this.cfg.seed, this.player.pos, abilityId, point);
+    return heroicLeapPlacementPreview(this.cfg.seed, this.player, abilityId, point);
   }
   castAbility(abilityId: string): void {
     if (this.deadTargetCast(this.known.find((k) => k.def.id === abilityId)?.def)) {

@@ -17,7 +17,10 @@ function section(from: string, to: string): string {
   const end = main.indexOf(to, start);
   expect(start).toBeGreaterThanOrEqual(0);
   expect(end).toBeGreaterThan(start);
-  return main.slice(start, end);
+  return main
+    .slice(start, end)
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/(^|[^:])\/\/.*$/gm, '$1');
 }
 
 function mob(id: number, x: number, z: number, overrides: Partial<Entity> = {}): Entity {
@@ -45,6 +48,7 @@ function fakeAimHud(range: number | null) {
         radius: number;
         school: string;
         dimmed: boolean;
+        blocked: boolean;
       } | null => null,
     ),
   };
@@ -98,6 +102,41 @@ describe('ground aim lifecycle wiring', () => {
     expect(setReticle).toHaveBeenCalledWith(null);
   });
 
+  it('updates and paints the full reticle from the desktop cursor path', () => {
+    document.body.classList.remove('pad-active');
+    const hud = fakeAimHud(30);
+    const groundPointResult = { x: 5, z: 7 };
+    const groundPoint = vi.fn(() => groundPointResult);
+    const setReticle = vi.fn();
+    hud.groundAimReticle.mockReturnValue({
+      point: groundPointResult,
+      radius: 8,
+      school: 'fire',
+      dimmed: true,
+      blocked: false,
+    });
+
+    syncGroundAimReticleFrame({
+      hud,
+      isMobileTouch: () => false,
+      cursorPoint: () => ({ x: 120, y: 80 }),
+      groundPoint,
+      setReticle,
+    });
+
+    expect(groundPoint).toHaveBeenCalledWith(120, 80);
+    expect(hud.updateGroundAimPoint).toHaveBeenCalledWith(groundPointResult);
+    expect(setReticle).toHaveBeenCalledWith({
+      x: 5,
+      z: 7,
+      radius: 8,
+      school: 'fire',
+      dimmed: true,
+      blocked: false,
+    });
+    expect(setReticle).not.toHaveBeenCalledWith(null);
+  });
+
   it('keeps the pad-owned point when the pad was the last active input', () => {
     document.body.classList.add('pad-active');
     try {
@@ -138,8 +177,8 @@ describe('ground aim lifecycle wiring', () => {
     const hud = fakeAimHud(30);
     const player = mob(1, 0, 0, { kind: 'player', hostile: false } as Partial<Entity>);
     const inRange = mob(2, 10, 0);
-    const dead = mob(3, 5, 0, { dead: true });
-    const outOfRange = mob(4, 500, 0);
+    const dead = mob(3, 0, -5, { dead: true });
+    const outOfRange = mob(4, -500, -300);
     const callbacks = padGroundAimCallbacks({
       hud,
       world: () =>

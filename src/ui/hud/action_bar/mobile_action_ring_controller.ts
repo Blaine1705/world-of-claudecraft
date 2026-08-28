@@ -350,8 +350,6 @@ function buildRadialPetals(
           return slot === null ? null : deps.itemForSlot(slot);
         },
         keybindLabel: () => '',
-        ownsAimSlot: (activeAimSlot: number) =>
-          petalSlot(deps, gesture, direction) === activeAimSlot,
       })),
     },
     {

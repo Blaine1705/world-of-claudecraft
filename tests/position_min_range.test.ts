@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { abilitiesKnownAt } from '../src/sim/content/classes';
 import { emptyModifiers } from '../src/sim/content/talents';
-import { MOBS } from '../src/sim/data';
+import { ABILITIES, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
@@ -97,8 +97,7 @@ describe('position ability minimum range', () => {
   it('pushes the no-aim fallback out to the minimum range along facing', () => {
     const sim = makeHunter();
     sim.player.facing = 0;
-    const target = addTargetAt(sim, 8);
-    sim.player.targetId = target.id;
+    addTargetAt(sim, 8);
     sim.drainEvents();
 
     sim.castAbility('multi_shot', sim.playerId);
@@ -108,15 +107,32 @@ describe('position ability minimum range', () => {
     expect(damageEvents(events, 'Splitshot')).toHaveLength(1);
   });
 
-  it('never refuses a bare no-aim, no-target cast at the caster feet', () => {
-    const sim = makeHunter();
-    sim.drainEvents();
+  // Non-axis facings at a non-integer position: the sin/cos round trip lands
+  // one ulp short of the minimum on a third of headings, which the old
+  // push-then-re-measure guard refused (review finding on PR 3676).
+  it.each([0.7, Math.PI / 3, -2.1, 2.9, -0.4])(
+    'never refuses a bare no-aim cast at facing %f',
+    (facing) => {
+      const sim = makeHunter();
+      sim.player.pos.x = 123.75;
+      sim.player.pos.z = -410.5;
+      sim.player.prevPos = { ...sim.player.pos };
+      sim.player.facing = facing;
+      sim.drainEvents();
 
-    sim.castAbility('multi_shot', sim.playerId);
-    const events = sim.tick();
+      sim.castAbility('multi_shot', sim.playerId);
+      const events = sim.tick();
 
-    expect(events).not.toContainEqual({ type: 'error', pid: sim.playerId, text: 'Too close!' });
-    expect(sim.player.cooldowns.has('multi_shot')).toBe(true);
+      expect(events).not.toContainEqual({ type: 'error', pid: sim.playerId, text: 'Too close!' });
+      expect(sim.player.cooldowns.has('multi_shot')).toBe(true);
+    },
+  );
+
+  it('authors every position minRange at or under the ability range', () => {
+    for (const def of Object.values(ABILITIES)) {
+      if (def.targetMode !== 'position' || !def.minRange) continue;
+      expect(def.minRange, def.id).toBeLessThanOrEqual(def.range);
+    }
   });
 
   it('allows Blizzard near the caster when no minimum range is authored', () => {

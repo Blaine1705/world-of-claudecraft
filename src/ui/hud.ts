@@ -391,6 +391,7 @@ import {
 import { bindEmpoweredActionHold } from './hud/action_bar/empowered_hold';
 import {
   type AimPoint,
+  quickAimPoint,
   shouldUseGroundAim,
   smartSeedPoint,
   XHB_ONLY_AIM_SLOT,
@@ -6817,17 +6818,15 @@ export class Hud {
     });
   }
 
-  private groundReticleEnabled(abilityId: string): boolean {
+  private groundReticleEnabled(): boolean {
     return shouldUseGroundAim(
-      abilityId,
       document.body.classList.contains('mobile-touch'),
       this.optionsHooks?.settings.get('groundReticle') ?? true,
       this.optionsHooks?.settings.get('touchPreciseGroundAim') ?? true,
     );
   }
 
-  // Ground-aim state and derivation live in GroundAimController; these thin
-  // delegates keep the Hud's public surface stable for main.ts and the tests.
+  // Thin delegates over GroundAimController: the public surface stays stable.
   isGroundAimActive(): boolean {
     return this.groundAim.isActive();
   }
@@ -6904,10 +6903,8 @@ export class Hud {
       return;
     }
     if (action.type === 'ability') {
-      // A position ability arranged only on the pad still gets the reticle: the
-      // aim identity falls back to the ability id (the XHB_ONLY_AIM_SLOT
-      // sentinel), so a same-cell re-press commits and cancel backs out exactly
-      // like a bar-backed cast.
+      // A pad-only position ability still gets the reticle: aim identity falls
+      // back to the ability id (XHB_ONLY_AIM_SLOT), so re-press still commits.
       const known = this.sim.known.find((k) => k.def.id === action.id) ?? null;
       if (known && known.def.targetMode === 'position' && !known.def.selfCentered) {
         if (this.isGroundAimActive()) {
@@ -6934,25 +6931,31 @@ export class Hud {
     this.showError(tSim('error.noItem'));
   }
 
-  // One decision for a position-targeted press, shared by the bar slots and the
-  // XHB-only fallback: enter aim when the reticle applies and the cast could
-  // actually start (alive, off cooldown; resources and GCD legitimately change
-  // while aiming, so they never gate entry), else cast instantly at the
-  // device's quick point. slotForAim is the re-press commit identity.
+  // One decision for a position press (bar slots and the XHB-only fallback):
+  // enter aim when the reticle applies and the cast could start (alive, off
+  // cooldown; resources and the GCD change while aiming, so they never gate
+  // entry), else cast instantly. slotForAim is the re-press commit identity.
   private castPositionAbility(
     abilityId: string,
     resolved: ResolvedAbility,
     slotForAim: number,
   ): void {
     const cooldown = actionBarCooldownRemaining(this.sim.player, resolved);
-    if (this.groundReticleEnabled(abilityId) && !this.sim.player.dead && cooldown <= 0) {
+    if (this.groundReticleEnabled() && !this.sim.player.dead && cooldown <= 0) {
       this.beginGroundAim(abilityId, slotForAim);
       return;
     }
-    const point = document.body.classList.contains('mobile-touch')
-      ? smartSeedPoint(this.sim.player, this.groundAimSeedTarget(), resolved.def.range)
-      : this.groundTargetAim();
-    this.sim.castAbilityAt(abilityId, point);
+    this.sim.castAbilityAt(
+      abilityId,
+      quickAimPoint(
+        this.sim.player,
+        this.groundAimSeedTarget(),
+        this.groundTargetAim(),
+        resolved.def.range,
+        resolved.def.minRange,
+        document.body.classList.contains('mobile-touch'),
+      ),
+    );
   }
 
   castSlot(barSlot: number): void {
@@ -7465,7 +7468,9 @@ export class Hud {
     this.crossHotbar = CrossHotbarController.create(
       this.writerFacet,
       (k) => this.actionBarIconBg(k),
-      crossHotbarResolvers(this.sim, ITEMS, abilityDisplayName, itemDisplayName),
+      crossHotbarResolvers(this.sim, ITEMS, abilityDisplayName, itemDisplayName, () =>
+        this.groundAim.activeAbilityId(),
+      ),
     );
     this.buildMobileActionRing();
     this.buildMobileConsumableSeat();

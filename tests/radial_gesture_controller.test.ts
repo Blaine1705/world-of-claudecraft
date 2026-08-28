@@ -803,6 +803,7 @@ describe('RadialGesture: a petal activation casts exactly once', () => {
         pointerType: 'touch',
       }),
     );
+    rig.petals[2].dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(rig.casts).toEqual([[0, PETAL_DIRECTIONS[2]]]);
     expect(rig.gesture.isOpen()).toBe(false);
   });

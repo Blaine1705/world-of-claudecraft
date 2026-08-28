@@ -42,7 +42,8 @@ export interface IWorldCombat {
   activeConsecrations: ActiveConsecration[];
   /** Remaining server-authoritative lifetime of a reactive ability window. */
   reactiveAbilityWindowRemaining(abilityId: string): number;
-  /** Authoritative adjusted landing for a ground-aimed placement ability. */
+  /** Best-effort adjusted landing preview for a ground-aimed placement
+   *  ability (seed-derived terrain arms only; the cast stays the arbiter). */
   groundAimPlacementPreview(abilityId: string, point: GroundAimPointXZ): GroundAimPointXZ;
   castAbility(abilityId: string): void;
   castAbilityBySlot(slot: number): void;

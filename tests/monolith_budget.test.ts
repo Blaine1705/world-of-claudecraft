@@ -136,6 +136,9 @@ const MONOLITHS: MonolithRow[] = [
     // Plus 1 for the Exchange's Solana wallet card: the ONE line is the
     // onWalletUiChange fan-out onto wocMarketWindow.onWalletChanged(), the
     // Claudium panel's existing arm. Exact count.
+    // Down-ratcheted to the exact count after the PR 3676 review round (the
+    // ground-aim quick path folded into the pure quickAimPoint and the sync
+    // wrapper moved to pad_ground_aim_wiring). Exact count, zero slack.
     ceiling: 18488,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
@@ -268,7 +271,9 @@ const MONOLITHS: MonolithRow[] = [
     // availability probe and browser authorizer moved to
     // src/net/desktop_wallet_handoff.ts (thin hoisted delegators remain),
     // paying for the Exchange desktop-signer wiring at the attach site.
-    ceiling: 11563,
+    // Down 11563 -> 11562 at the PR 3676 review round: the reticle sync
+    // closure moved into pad_ground_aim_wiring. Exact count, zero slack.
+    ceiling: 11562,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

@@ -11,16 +11,27 @@ import { bareClient } from './helpers/bare_client';
 const EPSILON_DIGITS = 6;
 
 describe('Heroic Leap placement preview', () => {
+  const groundedFrom = (x: number, z: number) => ({
+    x,
+    y: groundHeight(x, z, WORLD_SEED),
+    z,
+    onGround: true,
+  });
+
   it('keeps an open-ground target unchanged', () => {
     const target = { x: PLAYER_START.x + 8, z: PLAYER_START.z };
-    const landing = computeHeroicLeapLanding(WORLD_SEED, PLAYER_START, target);
+    const landing = computeHeroicLeapLanding(
+      WORLD_SEED,
+      groundedFrom(PLAYER_START.x, PLAYER_START.z),
+      target,
+    );
 
     expect(landing.x).toBeCloseTo(target.x, EPSILON_DIGITS);
     expect(landing.z).toBeCloseTo(target.z, EPSILON_DIGITS);
   });
 
   it('diverts before deep water and matches the resolved Sim landing', () => {
-    const from = { x: -43, z: 88 };
+    const from = groundedFrom(-43, 88);
     const target = { x: -68, z: 88 };
     const targetGround = groundHeight(target.x, target.z, WORLD_SEED);
     expect(targetGround).toBeLessThan(

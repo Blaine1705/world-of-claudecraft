@@ -2272,7 +2272,7 @@ export class Sim {
     return Math.max(0, this.player.overpowerUntil - this.time);
   }
   groundAimPlacementPreview(abilityId: string, point: GroundAimPointXZ): GroundAimPointXZ {
-    return heroicLeapPlacementPreview(this.cfg.seed, this.player.pos, abilityId, point);
+    return heroicLeapPlacementPreview(this.cfg.seed, this.player, abilityId, point);
   }
   // Live frost-mage Frozen Orbs (combat/frozen_orb.ts): sim state, never
   // serialized; drifted and pulsed by tickFrozenOrbs in the tick prologue.

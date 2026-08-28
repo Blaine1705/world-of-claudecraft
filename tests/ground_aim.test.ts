@@ -20,16 +20,16 @@ function casterAt(x: number, z: number): Pick<Entity, 'pos'> {
 
 describe('ground_aim', () => {
   it('uses the precise touch preference for every mobile ground cast', () => {
-    expect(shouldUseGroundAim('meteor', true, false, true)).toBe(true);
-    expect(shouldUseGroundAim('flamestrike', true, true, true)).toBe(true);
-    expect(shouldUseGroundAim('meteor', true, true, false)).toBe(false);
-    expect(shouldUseGroundAim('flamestrike', true, false, false)).toBe(false);
+    expect(shouldUseGroundAim(true, false, true)).toBe(true);
+    expect(shouldUseGroundAim(true, true, true)).toBe(true);
+    expect(shouldUseGroundAim(true, true, false)).toBe(false);
+    expect(shouldUseGroundAim(true, false, false)).toBe(false);
   });
 
   it('keeps desktop ground placement controlled by its preference', () => {
-    expect(shouldUseGroundAim('meteor', false, true, false)).toBe(true);
-    expect(shouldUseGroundAim('meteor', false, false, true)).toBe(false);
-    expect(shouldUseGroundAim('flamestrike', false, true, false)).toBe(true);
+    expect(shouldUseGroundAim(false, true, false)).toBe(true);
+    expect(shouldUseGroundAim(false, false, true)).toBe(false);
+    expect(shouldUseGroundAim(false, true, false)).toBe(true);
   });
 
   it('passes through points inside range', () => {

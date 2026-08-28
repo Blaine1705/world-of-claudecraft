@@ -301,6 +301,43 @@ function idleWorld(): ActionBarWorldInput {
   };
 }
 
+describe('ActionBarPainter: aria-pressed scoping', () => {
+  it('removes aria-pressed from an ordinary cast slot instead of writing false', () => {
+    const facet = makeWriterFacet(
+      new Map(),
+      new Map(),
+      new Map(),
+      new Map(),
+      () => {},
+      () => {},
+    );
+    const btn = recordingEl();
+    const el: ActionBarSlotElements = {
+      btn: btn.el,
+      label: recordingEl().el,
+      countEl: recordingEl().el,
+      keybindEl: recordingEl().el,
+      cdOverlay: recordingEl().el,
+      cdText: recordingEl().el,
+      rechargeOverlay: recordingEl().el,
+    };
+    const painter = new ActionBarPainter(
+      facet,
+      { container: recordingEl().el, slots: [el] },
+      (key) => `URL(${key})`,
+    );
+
+    painter.paint({
+      manySpells: false,
+      slots: [slotState({ kind: 'ability', aiming: false, queued: false })],
+    });
+
+    const ariaPressedWrites = btn.setAttrCalls.filter(([name]) => name === 'aria-pressed');
+    expect(ariaPressedWrites).toEqual([['aria-pressed', null]]);
+    expect(ariaPressedWrites).not.toContainEqual(['aria-pressed', 'false']);
+  });
+});
+
 describe('ActionBarPainter: aria-label + icon elision (Top risks 1 + 4)', () => {
   it('writes the aria DOM attribute only on change while t() fires every tick', () => {
     const counts = { writes: 0, skips: 0 };
