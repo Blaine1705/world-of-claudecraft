@@ -58,6 +58,12 @@ import {
   mobTemplateForDungeonDifficulty,
 } from './difficulty';
 import { applyDungeonSpawnMinibossTuning } from './dungeon_spawn_miniboss';
+import {
+  IGNIVAR_ENTRY_DENIED_NOTICE_SECONDS,
+  ignivarRaidClaimsForKey,
+  ignivarRaidInCombat,
+  resolveIgnivarEntryRoom,
+} from './ignivar_entry';
 import { tickIgnivarLavaHazard } from './ignivar_lava_hazard';
 
 const DOOR_TRIGGER_RADIUS = 2.0; // walking this close to a dungeon door teleports you
@@ -245,13 +251,6 @@ function instanceClaimContains(inst: InstanceSlot, pos: Vec3): boolean {
   );
 }
 
-function ignivarRaidClaimsForKey(ctx: SimContext, partyKey: string | null): InstanceSlot[] {
-  if (partyKey === null) return [];
-  return ctx.instances.filter(
-    (candidate) => candidate.partyKey === partyKey && isIgnivarRaidRoom(candidate.dungeonId),
-  );
-}
-
 function ignivarGateOpenTo(ctx: SimContext, source: InstanceSlot, destinationId: string): boolean {
   return source.objectIds.some((id) => {
     const gate = ctx.entities.get(id);
@@ -305,7 +304,7 @@ export function updateDoorTriggers(ctx: SimContext, p: Entity): void {
 
 export function enterDungeon(
   ctx: SimContext,
-  dungeonId: string,
+  requestedDungeonId: string,
   pid?: number,
   // [dev] /dev raid: skip the raid-group requirement and the Nythraxis attunement
   // so a lone tester can zone into the raid. Dev-gated (never in production). The
@@ -313,7 +312,10 @@ export function enterDungeon(
   devBypass = false,
 ): boolean {
   const r = ctx.resolve(pid);
-  const dungeon = DUNGEONS[dungeonId];
+  // The Ignivar checkpoint redirect below may re-point the entry at a deeper
+  // room the group already claims, so both bindings stay reassignable.
+  let dungeonId = requestedDungeonId;
+  let dungeon = DUNGEONS[dungeonId];
   if (!r || !dungeon) return false;
   const bypass = devBypass && ctx.devCommands;
   // A living player enters normally; a ghost that has run its spirit back re-enters to
@@ -345,6 +347,38 @@ export function enterDungeon(
     }
   }
   const key = instanceKeyFor(ctx, r.meta.entityId);
+  // The Ignivar door rules (the Rift door rules applied to the raid family):
+  // an entrant from OUTSIDE the raid may not zone in while any of the group's
+  // rooms still has a living mob engaged (the anti-zerg lockout, ghosts
+  // included), and an allowed outside entrant through the overworld approach
+  // door lands in the deepest room the group already claims, not back at the
+  // approach. A member standing inside one of the group's rooms is moving
+  // BETWEEN rooms and skips both rules.
+  if (isIgnivarRaidRoom(dungeonId) && !bypass) {
+    const raidClaims = ignivarRaidClaimsForKey(ctx, key);
+    const insideOwnRaid = raidClaims.some((claim) => instanceClaimContains(claim, r.e.pos));
+    if (!insideOwnRaid) {
+      if (ignivarRaidInCombat(ctx, raidClaims)) {
+        // Throttled like the rift denials: the walk-in trigger fires at 20 Hz.
+        if (
+          ctx.time >=
+          (r.e.ignivarEntryDeniedAt ?? -Infinity) + IGNIVAR_ENTRY_DENIED_NOTICE_SECONDS
+        ) {
+          r.e.ignivarEntryDeniedAt = ctx.time;
+          ctx.error(
+            r.meta.entityId,
+            'Your raid is still in combat. You may enter once the fighting stops.',
+          );
+        }
+        return false;
+      }
+      const checkpointRoom = resolveIgnivarEntryRoom(dungeonId, raidClaims);
+      if (checkpointRoom !== dungeonId) {
+        dungeonId = checkpointRoom;
+        dungeon = DUNGEONS[dungeonId];
+      }
+    }
+  }
   const previousIgnivarRoom = ignivarPreviousRaidRoom(dungeonId);
   const ignivarSourceClaim = previousIgnivarRoom
     ? ctx.instances.find(
@@ -354,9 +388,13 @@ export function enterDungeon(
           instanceClaimContains(candidate, r.e.pos),
       )
     : undefined;
+  // The sealed-gate rule gates FIRST entry only: a room the group already
+  // claims is always re-enterable from anywhere (the checkpoint redirect
+  // above resolves to exactly these rooms).
   if (
     previousIgnivarRoom &&
     !bypass &&
+    !ctx.instances.some((i) => i.dungeonId === dungeonId && i.partyKey === key) &&
     (!ignivarSourceClaim || !ignivarGateOpenTo(ctx, ignivarSourceClaim, dungeonId))
   ) {
     ctx.error(r.meta.entityId, 'The forge gate is sealed to you.');
