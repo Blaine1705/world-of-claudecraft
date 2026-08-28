@@ -766,6 +766,47 @@ describe('MovableFrame edge resize', () => {
     });
   });
 
+  it('Snap to Grid lands a stretched edge on the grid pitch (scale mode)', () => {
+    snapOn = true;
+    const { frame, btn } = makeSavedScalableFrame();
+    btn.dispatch('click', pointer());
+
+    // East band drag of +37: raw visual width 649, which the grid rounds to
+    // 656; the persisted scaleX carries exactly that snapped extent.
+    frame.dispatch('pointerdown', pointer({ clientX: 648, clientY: 540 }));
+    fakeDocument.body.dispatch('pointermove', pointer({ clientX: 685, clientY: 540 }));
+    const m = /scale\(([-\d.]+), ([-\d.]+)\)/.exec(frame.style.transform);
+    expect(m).toBeTruthy();
+    if (!m) return;
+    expect(Number(m[1]) * 612).toBeCloseTo(656, 6);
+    expect(Number(m[2])).toBe(1);
+  });
+
+  it('Snap to Grid quantizes a box-mode stretch to the grid pitch', () => {
+    snapOn = true;
+    const frame = new FakeEl();
+    const mover = new MovableFrame({
+      frame,
+      storageKey: KEY,
+      unlockLabelKey: 'hudChrome.interfaceUnlock.unlockFrame',
+      lockLabelKey: 'hudChrome.interfaceUnlock.lockFrame',
+      resizeLabelKey: 'hudChrome.interfaceUnlock.resizeFrame',
+      draggingBodyClass: 'hud-frame-dragging',
+      fallbackSize: { w: 260, h: 84 },
+      isMobileLayout: () => false,
+      scalable: true,
+      resizeMode: 'box',
+      buttonOnlyWhenUnlocked: true,
+    });
+    expect(mover).toBeTruthy();
+    store.set(KEY, JSON.stringify({ left: 400, top: 300 }));
+    frame.children[0].dispatch('click', pointer());
+
+    frame.dispatch('pointerdown', pointer({ clientX: 648, clientY: 540 }));
+    fakeDocument.body.dispatch('pointermove', pointer({ clientX: 685, clientY: 540 }));
+    expect(frame.style.props.get('width')).toBe('656px');
+  });
+
   it('a corner drag is a UNIFORM zoom that anchors the opposite corner', () => {
     const { frame, btn } = makeSavedScalableFrame();
     btn.dispatch('click', pointer());
@@ -1065,6 +1106,18 @@ describe('MovableFrame dimensions resize', () => {
     store.set(KEY, JSON.stringify({ left: 400, top: 300, vw: 1600, vh: 900 }));
     return makeDimensionsFrame(factors);
   }
+
+  it('Snap to Grid quantizes a dimension drag by its VISUAL extent', () => {
+    snapOn = true;
+    const { value, frame, btn } = makeSavedDimensionsFrame();
+    btn.dispatch('click', pointer());
+
+    // +37 of travel at factor 1: raw setting 207, whose visual extent snaps
+    // to 208 on the 16px grid (the setting equals the visual here).
+    frame.dispatch('pointerdown', pointer({ clientX: 650, clientY: 542 }));
+    fakeDocument.body.dispatch('pointermove', pointer({ clientX: 687, clientY: 542 }));
+    expect(value.width).toBe(208);
+  });
 
   it('an east-border drag writes the width SETTING and never a transform', () => {
     const { frame, btn, value, sets } = makeSavedDimensionsFrame();

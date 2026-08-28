@@ -39,6 +39,8 @@ import {
   serializeTargetFramePos,
   sizeFromEdgeDrag,
   snapFrameCoord,
+  snapFrameSize,
+  snapScaleToGrid,
   type TargetFramePos,
 } from './target_frame_pos';
 import { getUiScale } from './ui_scale';
@@ -740,11 +742,12 @@ export class MovableFrame {
     const g = this.gesture;
     if (!g || g.pointerId !== ev.pointerId) return;
     ev.preventDefault();
+    // With Snap to Grid on (the arrange-mode setting, read through the
+    // provider hud wires), a dragged box lands on the shared grid and a
+    // resize quantizes the frame's visual size to the same pitch, so
+    // frames align without pixel hunting.
+    const snap = frameSnapEnabled?.() ?? false;
     if (g.kind === 'move') {
-      // With Snap to Grid on (the arrange-mode setting, read through the
-      // provider hud wires), the dragged box lands on the shared grid so
-      // frames align without pixel hunting; sizes never snap.
-      const snap = frameSnapEnabled?.() ?? false;
       const left = ev.clientX - g.grabX;
       const top = ev.clientY - g.grabY;
       this.pos = {
@@ -756,13 +759,35 @@ export class MovableFrame {
       // A side edge stretches only its own axis (the horizontal-only /
       // vertical-only adjustment); a corner multiplies both by the larger
       // ratio, staying the proportional zoom the SE grip always was.
-      const next = sizeFromEdgeDrag(
+      let next = sizeFromEdgeDrag(
         g.edge,
         { sx: g.startSx, sy: g.startSy },
         { w: g.startW, h: g.startH },
         ev.clientX - g.startX,
         ev.clientY - g.startY,
       );
+      if (snap) {
+        // Snap the zoom so the frame's visual size lands on the grid. A
+        // corner (or the grip) stays a proportional zoom: the width picks
+        // the snapped ratio and both axes take it.
+        if (g.edge === 'e' || g.edge === 'w') {
+          next = {
+            sx: clampFrameScale(snapScaleToGrid(g.startW, g.startSx, next.sx)),
+            sy: next.sy,
+          };
+        } else if (g.edge === 'n' || g.edge === 's') {
+          next = {
+            sx: next.sx,
+            sy: clampFrameScale(snapScaleToGrid(g.startH, g.startSy, next.sy)),
+          };
+        } else if (g.startSx > 0) {
+          const ratio = snapScaleToGrid(g.startW, g.startSx, next.sx) / g.startSx;
+          next = {
+            sx: clampFrameScale(g.startSx * ratio),
+            sy: clampFrameScale(g.startSy * ratio),
+          };
+        }
+      }
       // Recomputed from the gesture-start snapshot each event (not incremental),
       // so a west/north drag keeps the opposite border pixel-anchored.
       const anchored = posFromEdgeResize(
@@ -793,11 +818,12 @@ export class MovableFrame {
       const width = dims?.width;
       if (width && (g.edge.includes('e') || g.edge.includes('w'))) {
         const travel = g.edge.includes('w') ? g.startX - ev.clientX : ev.clientX - g.startX;
-        const next = clampFrameDimension(
-          g.startW + (g.fw > 0 ? travel / g.fw : 0),
-          width.min,
-          width.max,
-        );
+        const rawW = g.startW + (g.fw > 0 ? travel / g.fw : 0);
+        // Snap the VISUAL extent (setting px times the captured factor), not
+        // the setting value: the grid is screen space, and a fanned-out axis
+        // (the party stack) still lands its outer edge on it.
+        const snappedW = snap && g.fw > 0 ? snapFrameSize(rawW * g.fw) / g.fw : rawW;
+        const next = clampFrameDimension(snappedW, width.min, width.max);
         if (next !== g.lastW) {
           g.lastW = next;
           width.set(next);
@@ -807,11 +833,9 @@ export class MovableFrame {
       const height = dims?.height;
       if (height && (g.edge.includes('n') || g.edge.includes('s'))) {
         const travel = g.edge.includes('n') ? g.startY - ev.clientY : ev.clientY - g.startY;
-        const next = clampFrameDimension(
-          g.startH + (g.fh > 0 ? travel / g.fh : 0),
-          height.min,
-          height.max,
-        );
+        const rawH = g.startH + (g.fh > 0 ? travel / g.fh : 0);
+        const snappedH = snap && g.fh > 0 ? snapFrameSize(rawH * g.fh) / g.fh : rawH;
+        const next = clampFrameDimension(snappedH, height.min, height.max);
         if (next !== g.lastH) {
           g.lastH = next;
           height.set(next);
@@ -827,6 +851,12 @@ export class MovableFrame {
         ev.clientY - g.startY,
         g.factor,
       );
+      // Snap the stretched axis's VISUAL extent onto the grid (author px
+      // times the gesture factor), like every other resize here.
+      if (snap && g.factor > 0) {
+        box.w = snapFrameSize(box.w * g.factor) / g.factor;
+        box.h = snapFrameSize(box.h * g.factor) / g.factor;
+      }
       const anchored = posFromEdgeResize(
         g.edge,
         { left: g.startLeft, top: g.startTop, w: g.startWVis, h: g.startHVis },

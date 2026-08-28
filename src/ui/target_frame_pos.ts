@@ -84,6 +84,29 @@ export function snapFrameCoord(value: number, grid: number = FRAME_SNAP_GRID): n
   return Math.round(value / grid) * grid;
 }
 
+/** The resize half of Snap to Grid: quantize a dragged SIZE (visual px) onto
+ *  the grid pitch, floored to one cell so a resize can never snap a frame to
+ *  nothing. Degenerate inputs pass through unchanged. */
+export function snapFrameSize(value: number, grid: number = FRAME_SNAP_GRID): number {
+  if (!Number.isFinite(value) || grid <= 0) return value;
+  return Math.max(grid, snapFrameCoord(value, grid));
+}
+
+/** Snap a ZOOM gesture the same way: the scale whose visual extent lands on
+ *  the grid. `startVisual` and `startScale` are the gesture-start pair (the
+ *  measured size and the scale it was measured under), `nextScale` the
+ *  candidate the drag produced; a degenerate start returns it unchanged. */
+export function snapScaleToGrid(
+  startVisual: number,
+  startScale: number,
+  nextScale: number,
+  grid: number = FRAME_SNAP_GRID,
+): number {
+  if (!(startVisual > 0) || !(startScale > 0) || !Number.isFinite(nextScale)) return nextScale;
+  const unscaled = startVisual / startScale;
+  return snapFrameSize(unscaled * nextScale, grid) / unscaled;
+}
+
 /** Clamp a desired size multiplier into the legal band. A non-finite read (a
  *  corrupt store, a divide by a zero rect) falls back to 1 rather than blanking
  *  the frame with a degenerate transform. */

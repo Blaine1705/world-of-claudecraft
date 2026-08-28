@@ -24,7 +24,7 @@ class MemoryStorage {
 
 function makeHarness(
   initialStorage: Record<string, string> = {},
-  options: { mobile?: boolean; unlocked?: boolean } = {},
+  options: { mobile?: boolean; unlocked?: boolean; snap?: boolean } = {},
 ) {
   const document = new FakeDocument();
   const window = new FakeWindow(1280, 720);
@@ -44,6 +44,7 @@ function makeHarness(
     hasStorePromoCard: () => false,
     uiScale: () => 1,
     isInterfaceUnlocked: () => options.unlocked ?? false,
+    snapToGrid: () => options.snap ?? false,
   });
   return { controller, document, window, wrap, tabs, frame, input, storage };
 }
@@ -238,6 +239,28 @@ describe('ChatGeometryController interface unlock', () => {
 
     harness.controller.relocalize();
     expect(chip?.textContent).toBe(before);
+  });
+
+  it('Snap to Grid quantizes a grip resize to the grid pitch', () => {
+    const harness = makeHarness(
+      { woc_chat_geometry: '{"left":100,"top":80,"width":370,"height":184}' },
+      { snap: true },
+    );
+    harness.controller.init();
+    const grip = harness.frame.querySelector<HTMLElement>('.chat-resize-grip');
+    grip?.dispatchEvent(pointerEvent('pointerdown', { pointerId: 5, clientX: 470, clientY: 286 }));
+    // +33 of travel: raw 403 wide by 217 tall, which the grid rounds to
+    // 400 x 224 before the placement clamp.
+    harness.document.dispatchEvent(
+      pointerEvent('pointermove', { pointerId: 5, clientX: 503, clientY: 319 }),
+    );
+    harness.document.dispatchEvent(
+      pointerEvent('pointerup', { pointerId: 5, clientX: 503, clientY: 319 }),
+    );
+    expect(JSON.parse(harness.storage.getItem('woc_chat_geometry') ?? '{}')).toMatchObject({
+      width: 400,
+      height: 224,
+    });
   });
 
   it('mints the edge-glow overlay and the grip hover lights its two edges', () => {

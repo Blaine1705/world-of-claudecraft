@@ -6,6 +6,7 @@ import {
   frameEdgeAtPoint,
   MIN_FRAME_BOX,
   snapFrameCoord,
+  snapFrameSize,
 } from '../../target_frame_pos';
 import {
   anchorAdjustedChatBox,
@@ -395,7 +396,7 @@ export class ChatGeometryController {
     event.preventDefault();
     if (gesture.kind === 'move') {
       // Snap to Grid (when on) aligns the dragged box with every other
-      // frame's grid; sizes never snap, mirroring MovableFrame.
+      // frame's grid, mirroring MovableFrame (resizes snap too, below).
       const snap = this.deps.snapToGrid?.() ?? false;
       const left = event.clientX - gesture.grabX;
       const top = event.clientY - gesture.grabY;
@@ -406,18 +407,22 @@ export class ChatGeometryController {
       };
     } else if (gesture.kind === 'edge') {
       // Recomputed from the gesture-start snapshot each event, so a west/north
-      // drag keeps the opposite border anchored for the whole gesture.
+      // drag keeps the opposite border anchored for the whole gesture. With
+      // Snap to Grid on the resized axis quantizes to the same pitch a move
+      // drag lands on, mirroring MovableFrame.
+      const snap = this.deps.snapToGrid?.() ?? false;
+      const quant = (v: number) => Math.max(MIN_FRAME_BOX, snap ? snapFrameSize(v) : v);
       const dx = event.clientX - gesture.startX;
       const dy = event.clientY - gesture.startY;
       const width = gesture.edge.includes('w')
-        ? Math.max(MIN_FRAME_BOX, gesture.startW - dx)
+        ? quant(gesture.startW - dx)
         : gesture.edge.includes('e')
-          ? Math.max(MIN_FRAME_BOX, gesture.startW + dx)
+          ? quant(gesture.startW + dx)
           : gesture.startW;
       const height = gesture.edge.includes('n')
-        ? Math.max(MIN_FRAME_BOX, gesture.startH - dy)
+        ? quant(gesture.startH - dy)
         : gesture.edge.includes('s')
-          ? Math.max(MIN_FRAME_BOX, gesture.startH + dy)
+          ? quant(gesture.startH + dy)
           : gesture.startH;
       this.chatBox = {
         left: gesture.edge.includes('w')
@@ -430,10 +435,12 @@ export class ChatGeometryController {
         height,
       };
     } else {
+      const snap = this.deps.snapToGrid?.() ?? false;
+      const quant = (v: number) => (snap ? snapFrameSize(v) : v);
       this.chatBox = {
         ...this.chatBox,
-        width: gesture.startW + (event.clientX - gesture.startX),
-        height: gesture.startH + (event.clientY - gesture.startY),
+        width: quant(gesture.startW + (event.clientX - gesture.startX)),
+        height: quant(gesture.startH + (event.clientY - gesture.startY)),
       };
     }
     this.apply();

@@ -28,6 +28,8 @@ import {
   serializeTargetFramePos,
   sizeFromEdgeDrag,
   snapFrameCoord,
+  snapFrameSize,
+  snapScaleToGrid,
   TARGET_FRAME_MARGIN,
 } from '../src/ui/target_frame_pos';
 
@@ -68,6 +70,32 @@ describe('snapFrameCoord', () => {
     expect(snapFrameCoord(13, 10)).toBe(10);
     expect(snapFrameCoord(13, 0)).toBe(13);
     expect(snapFrameCoord(Number.NaN)).toBeNaN();
+  });
+});
+
+describe('snapFrameSize', () => {
+  it('quantizes a size onto the pitch with a one-cell floor', () => {
+    expect(snapFrameSize(649)).toBe(656);
+    expect(snapFrameSize(23)).toBe(16);
+    // A resize can never snap a frame to nothing.
+    expect(snapFrameSize(3)).toBe(16);
+    expect(snapFrameSize(0)).toBe(16);
+    expect(snapFrameSize(Number.NaN)).toBeNaN();
+  });
+});
+
+describe('snapScaleToGrid', () => {
+  it('returns the scale whose visual extent lands on the grid', () => {
+    // 612 visual at scale 1: a candidate 1.0604 (visual 649) snaps to 656.
+    expect(snapScaleToGrid(612, 1, 649 / 612) * 612).toBeCloseTo(656, 9);
+    // Under a pre-existing zoom the unscaled base divides back out first.
+    expect(snapScaleToGrid(765, 1.25, 1.3) * 612).toBeCloseTo(snapFrameSize(612 * 1.3), 9);
+  });
+
+  it('passes degenerate starts through unchanged', () => {
+    expect(snapScaleToGrid(0, 1, 1.2)).toBe(1.2);
+    expect(snapScaleToGrid(612, 0, 1.2)).toBe(1.2);
+    expect(snapScaleToGrid(612, 1, Number.NaN)).toBeNaN();
   });
 });
 
