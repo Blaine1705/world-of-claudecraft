@@ -16,6 +16,7 @@ import {
   ignivarCruciblePropPlan,
 } from './ignivar_dressing_plan_core';
 import { appendIgnivarEnvProps, prepareIgnivarEnvProps } from './ignivar_env_props';
+import { buildIgnivarLiftShaft } from './ignivar_lift_room';
 import type { FireLightSink } from './point_light_budget';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 import { addTorchGlowDecal } from './torch_glow_decal';
@@ -112,6 +113,9 @@ function buildForgeApproachDressing(
   const placements = filterIgnivarPropPlacements(ignivarApproachPropPlan(layout), lowGfx);
   appendProps(group, placements, lowGfx);
   addPropGlowPools(group, placements, lowGfx);
+  // The forge-lift car's descending-shaft illusion wraps the entry pocket
+  // (self-animating on the shared uTime clock, zero per-frame CPU).
+  group.add(buildIgnivarLiftShaft(lowGfx));
   const halfWidth = layout.floorHalfX ?? layout.wallX ?? 18;
   const sideX = Math.max(IGNIVAR_APPROACH_CLEAR_HALF_WIDTH + 2, Math.min(halfWidth - 3.5, 13));
   const length = Math.max(12, layout.zMax - layout.zMin - 10);

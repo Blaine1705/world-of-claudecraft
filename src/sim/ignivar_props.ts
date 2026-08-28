@@ -217,6 +217,16 @@ export function ignivarApproachPropPlacements(layout: DungeonLayout): IgnivarPro
     at('chain_hanging', -3.2, -51.4, 0.4, 8, 10),
     at('chain_hanging', 3.2, -51.4, -0.4, 8, 10, true),
     at('chain_link', 0, -52.4, 90 * DEG, 6),
+    // The forge-lift CAR's side walls: iron grille panels (the fortress
+    // gate prop) at x +-8 from the shell wall to the gate line, so riders
+    // see the shaft scroll past through the bars
+    // (src/render/ignivar_lift_room.ts owns the moving shaft; the sealed
+    // gate line itself is the ignivar_forge_lift entity + clamp). The
+    // panels sit at |x| = 8, outside the corridor contract's 7.5 lane.
+    at('gate', -8, -49, 90 * DEG, 12),
+    at('gate', 8, -49, 270 * DEG, 12),
+    at('gate', -8, -54.8, 90 * DEG, 12),
+    at('gate', 8, -54.8, 270 * DEG, 12),
   ];
   // The centre torch pillars ride the layout so they stay glued to the
   // torch rigs dungeon.ts places at the same points.

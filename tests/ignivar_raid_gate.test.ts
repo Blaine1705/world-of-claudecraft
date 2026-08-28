@@ -9,7 +9,7 @@ import {
 
 describe('Ignivar raid gate', () => {
   it('keeps a solid physical barrier while locked', () => {
-    const gate = buildIgnivarRaidGate(false);
+    const gate = buildIgnivarRaidGate({ open: false, height: IGNIVAR_RAID_GATE_HEIGHT });
     expect(gate.name).toBe('ignivar-raid-gate-locked');
     expect(gate.getObjectByName('ember-lock')).toBeDefined();
     expect(gate.getObjectByName('left-iron-leaf')?.position.x).toBeCloseTo(-1.58);
@@ -18,7 +18,7 @@ describe('Ignivar raid gate', () => {
   });
 
   it('swings both leaves clear without changing the frame', () => {
-    const gate = buildIgnivarRaidGate(true);
+    const gate = buildIgnivarRaidGate({ open: true, height: IGNIVAR_RAID_GATE_HEIGHT });
     expect(gate.name).toBe('ignivar-raid-gate-open');
     expect(gate.getObjectByName('ember-lock')).toBeUndefined();
     expect(gate.getObjectByName('left-stone-jamb')).toBeDefined();
@@ -46,13 +46,24 @@ describe('Ignivar raid gate', () => {
       height: 6.4,
     });
     expect(ignivarRaidGatePlan('dungeon_door', 'hollow_crypt')).toBeNull();
+    // the forge-lift antechamber's portcullis rides the same view seam
+    expect(ignivarRaidGatePlan('ignivar_lift_gate_locked', null)).toEqual({
+      open: false,
+      height: 7.2,
+      kind: 'lift',
+    });
+    expect(ignivarRaidGatePlan('ignivar_lift_gate_open', null)).toEqual({
+      open: true,
+      height: 7.2,
+      kind: 'lift',
+    });
 
     const rendererSource = readFileSync(
       new URL('../src/render/renderer.ts', import.meta.url),
       'utf8',
     );
     expect(rendererSource).toContain('ignivarRaidGatePlan(e.templateId, e.dungeonId)');
-    expect(rendererSource).toContain('buildIgnivarRaidGate(raidGatePlan.open)');
+    expect(rendererSource).toContain('buildIgnivarRaidGate(raidGatePlan)');
     expect(rendererSource).toContain('height = raidGatePlan.height');
     const dungeonSource = readFileSync(
       new URL('../src/render/dungeon.ts', import.meta.url),

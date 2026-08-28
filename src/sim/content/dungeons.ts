@@ -8,6 +8,7 @@ import {
   IGNIVAR_EMBER_SENTINEL_ID,
   IGNIVAR_FORGE_APPROACH_ID,
   IGNIVAR_GATE_LOCKED_TEMPLATE,
+  IGNIVAR_LIFT_GATE_LOCKED_TEMPLATE,
   IGNIVAR_RAID_ARENA_ID,
   IGNIVAR_SECOND_WING_ID,
   VARKHUL_BOSS_ID,
@@ -1327,6 +1328,19 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
         z: 53,
         templateId: IGNIVAR_GATE_LOCKED_TEMPLATE,
         dungeonId: IGNIVAR_RAID_ARENA_ID,
+        lootable: false,
+      },
+      // The forge-lift car's inner gate: sealed while the lift "rides down"
+      // (src/sim/ignivar_forge_lift.ts owns the timer, the crossing clamp,
+      // and the open swap), then grinds open into the hall for the rest of
+      // the claim. The car itself is the entry pocket behind it, walled by
+      // the grille props in ignivarApproachPropPlacements.
+      {
+        itemId: '',
+        name: 'Forge-Lift Gate',
+        x: 0,
+        z: -46,
+        templateId: IGNIVAR_LIFT_GATE_LOCKED_TEMPLATE,
         lootable: false,
       },
     ],
