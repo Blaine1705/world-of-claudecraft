@@ -1,4 +1,3 @@
-import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import {
   patchFogFragmentNanGuard,
@@ -8,21 +7,83 @@ import {
 const OPAQUE_WRITE = 'gl_FragColor = vec4( outgoingLight, diffuseColor.a );';
 const FOG_WRITE = 'gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor );';
 
+// A faithful stand-in for three's real opaque_fragment.glsl.js and
+// fog_fragment.glsl.js (r185), reproduced here as literal constants rather
+// than read from THREE.ShaderChunk: this file must stay a PURE unit test of
+// the string transform, independent of whether some other module in the
+// same test run has already patched the live, shared THREE.ShaderChunk
+// object (final_color_nan_guard.ts installs itself as an import side
+// effect, so any test file that imports it, even transitively, would see
+// an already-patched chunk here otherwise).
+const SOURCE_OPAQUE_FRAGMENT = `
+#ifdef OPAQUE
+diffuseColor.a = 1.0;
+#endif
+
+#ifdef USE_TRANSMISSION
+diffuseColor.a *= material.transmissionAlpha;
+#endif
+
+${OPAQUE_WRITE}
+`;
+
+const SOURCE_FOG_FRAGMENT = `
+#ifdef USE_FOG
+
+	#ifdef FOG_EXP2
+
+		float fogFactor = 1.0 - exp( - fogDensity * fogDensity * vFogDepth * vFogDepth );
+
+	#else
+
+		float fogFactor = smoothstep( fogNear, fogFar, vFogDepth );
+
+	#endif
+
+	${FOG_WRITE}
+
+#endif
+`;
+
 describe('final color NaN guard core', () => {
-  it('scrubs outgoingLight immediately before opaque_fragment writes gl_FragColor', () => {
-    const source = THREE.ShaderChunk.opaque_fragment;
-    const patched = patchOpaqueFragmentNanGuard(source);
-    expect(patched).not.toBe(source);
-    const scrubStart = patched.indexOf('outgoingLight.x = ( outgoingLight.x < 0.0');
+  it('scrubs diffuseColor.a unconditionally, immediately before opaque_fragment writes gl_FragColor', () => {
+    const patched = patchOpaqueFragmentNanGuard(SOURCE_OPAQUE_FRAGMENT);
+    expect(patched).not.toBe(SOURCE_OPAQUE_FRAGMENT);
+    const marker = patched.indexOf('// WOC_OPAQUE_NAN_GUARD');
+    const alphaScrub = patched.indexOf('diffuseColor.a = ( diffuseColor.a < 0.0');
     const write = patched.indexOf(OPAQUE_WRITE);
-    expect(scrubStart).toBeGreaterThan(-1);
-    expect(write).toBeGreaterThan(scrubStart);
-    // Nothing sits between the scrub and the write it protects.
-    expect(patched.slice(scrubStart, write)).not.toContain(OPAQUE_WRITE);
+    expect(marker).toBeGreaterThan(-1);
+    expect(alphaScrub).toBeGreaterThan(marker);
+    expect(write).toBeGreaterThan(alphaScrub);
+    // After both stock #ifdef blocks that can still change diffuseColor.a
+    // (OPAQUE forces 1.0, USE_TRANSMISSION multiplies it): the guard has to
+    // be the LAST word on the value, not overwritten again afterward.
+    const opaqueBlockEnd = patched.indexOf('#endif', patched.indexOf('#ifdef OPAQUE'));
+    const transmissionBlockEnd = patched.indexOf(
+      '#endif',
+      patched.indexOf('#ifdef USE_TRANSMISSION'),
+    );
+    expect(alphaScrub).toBeGreaterThan(opaqueBlockEnd);
+    expect(alphaScrub).toBeGreaterThan(transmissionBlockEnd);
+  });
+
+  it('wraps the outgoingLight (rgb) scrub in #ifndef USE_FOG, since fog_fragment re-scrubs rgb when fog is on', () => {
+    const patched = patchOpaqueFragmentNanGuard(SOURCE_OPAQUE_FRAGMENT);
+    const alphaScrub = patched.indexOf('diffuseColor.a = ( diffuseColor.a < 0.0');
+    const ifndef = patched.indexOf('#ifndef USE_FOG');
+    const scrubStart = patched.indexOf('outgoingLight.x = ( outgoingLight.x < 0.0');
+    const endif = patched.indexOf('#endif', scrubStart);
+    const write = patched.indexOf(OPAQUE_WRITE);
+    expect(ifndef).toBeGreaterThan(alphaScrub);
+    expect(scrubStart).toBeGreaterThan(ifndef);
+    expect(endif).toBeGreaterThan(scrubStart);
+    expect(write).toBeGreaterThan(endif);
+    // Nothing but the closing directive sits between the guarded scrub and the write it protects.
+    expect(patched.slice(endif, write).trim()).toBe('#endif');
   });
 
   it('is idempotent on opaque_fragment', () => {
-    const once = patchOpaqueFragmentNanGuard(THREE.ShaderChunk.opaque_fragment);
+    const once = patchOpaqueFragmentNanGuard(SOURCE_OPAQUE_FRAGMENT);
     const twice = patchOpaqueFragmentNanGuard(once);
     expect(twice).toBe(once);
   });
@@ -32,9 +93,8 @@ describe('final color NaN guard core', () => {
   });
 
   it('scrubs fog_fragment gl_FragColor.rgb after the fog mix, via a local copy', () => {
-    const source = THREE.ShaderChunk.fog_fragment;
-    const patched = patchFogFragmentNanGuard(source);
-    expect(patched).not.toBe(source);
+    const patched = patchFogFragmentNanGuard(SOURCE_FOG_FRAGMENT);
+    expect(patched).not.toBe(SOURCE_FOG_FRAGMENT);
     const write = patched.indexOf(FOG_WRITE);
     const localCopy = patched.indexOf('vec3 wocFogNanGuard = gl_FragColor.rgb;');
     const finalWrite = patched.lastIndexOf('gl_FragColor.rgb = wocFogNanGuard;');
@@ -46,7 +106,7 @@ describe('final color NaN guard core', () => {
   });
 
   it('is idempotent on fog_fragment', () => {
-    const once = patchFogFragmentNanGuard(THREE.ShaderChunk.fog_fragment);
+    const once = patchFogFragmentNanGuard(SOURCE_FOG_FRAGMENT);
     const twice = patchFogFragmentNanGuard(once);
     expect(twice).toBe(once);
   });

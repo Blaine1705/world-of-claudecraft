@@ -5,9 +5,20 @@ const OPAQUE_WRITE = 'gl_FragColor = vec4( outgoingLight, diffuseColor.a );';
 const FOG_WRITE = 'gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor );';
 
 // Every NaN comparison is false, so (x < 0.0 || x >= 0.0) keeps finite and
-// infinite values and rewrites only NaN to zero: the same per-component test
-// OutputGradePass's sanitizeFinite already applies one stage later, for the
-// composer/gradePass tiers only (post_output_grade.ts).
+// infinite values and rewrites only NaN to zero. This is generic hardening,
+// installed unconditionally on every tier and platform: GLES leaves the
+// conversion of a NaN fragment output into a fixed-point (UNSIGNED_BYTE)
+// render target undefined, so "the direct-to-canvas tiers clamp it away" is
+// an observation from one driver family, not a portability guarantee, and
+// the IBL/PBR path that emits these NaNs on some drivers (observed on
+// ANGLE's OpenGL backend with NVIDIA on Linux, see post_output_grade.ts) is
+// reachable from every tier, composer or not. On the composer/gradePass
+// tiers this is on top of, not instead of, OutputGradePass's sanitizeFinite
+// (post_output_grade.ts): whether scrubbing this much earlier (at the
+// fragment write, before the bloom pass's own blur can touch the value at
+// all) closes a gap sanitizeFinite's later, per-output-pixel scrub does not
+// is not verified here either way; the unconditional install does not
+// depend on the answer.
 function scrubStatements(target: string): string {
   return (
     `${target}.x = ( ${target}.x < 0.0 || ${target}.x >= 0.0 ) ? ${target}.x : 0.0;\n` +
@@ -16,10 +27,27 @@ function scrubStatements(target: string): string {
   );
 }
 
+function scrubScalar(target: string): string {
+  return `${target} = ( ${target} < 0.0 || ${target} >= 0.0 ) ? ${target} : 0.0;\n`;
+}
+
 /**
- * Scrub NaN out of outgoingLight immediately before opaque_fragment writes it
- * to gl_FragColor. Every material that includes this chunk (lit and basic
- * alike) gets the guard, applied once, right before the write it protects.
+ * Scrub NaN out of diffuseColor.a and outgoingLight immediately before
+ * opaque_fragment writes them to gl_FragColor. Every material that includes
+ * this chunk (lit and basic alike) gets the guard, applied once, right
+ * before the write it protects.
+ *
+ * The alpha scrub is unconditional (never gated on USE_FOG): fog_fragment
+ * never touches gl_FragColor.a, so this is the only defense a NaN source
+ * alpha gets. It is a true no-op on the common case, an OPAQUE material
+ * (diffuseColor.a is the folded constant 1.0 by the time it runs, from the
+ * #ifdef OPAQUE block above), and only ever sees a real, non-constant alpha
+ * on a transparent material or one using transmission, where a NaN would
+ * poison the destination colour once blended. The outgoingLight (rgb)
+ * scrub is skipped under USE_FOG: fog_fragment's own guard (below)
+ * re-scrubs gl_FragColor.rgb right after the fog mix, and mix(NaN,
+ * fogColor, f) is still NaN, so nothing is lost by not paying for it twice
+ * on every fogged material.
  */
 export function patchOpaqueFragmentNanGuard(source: string): string {
   if (source.includes(OPAQUE_GUARD_MARKER)) return source;
@@ -28,7 +56,10 @@ export function patchOpaqueFragmentNanGuard(source: string): string {
   return (
     source.slice(0, index) +
     `// ${OPAQUE_GUARD_MARKER}\n` +
+    scrubScalar('diffuseColor.a') +
+    '#ifndef USE_FOG\n' +
     scrubStatements('outgoingLight') +
+    '#endif\n' +
     source.slice(index)
   );
 }
