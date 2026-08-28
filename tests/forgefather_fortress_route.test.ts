@@ -109,7 +109,7 @@ describe('forgefather fortress live-kernel route', () => {
     expect(
       sim.player.pos.z,
       `stalled at (${sim.player.pos.x.toFixed(2)}, ${sim.player.pos.y.toFixed(2)}, ${sim.player.pos.z.toFixed(2)})`,
-    ).toBeGreaterThan(2243.3);
+    ).toBeGreaterThan(2242.3);
     expect(sim.player.pos.y).toBeGreaterThan(17.9);
   });
 

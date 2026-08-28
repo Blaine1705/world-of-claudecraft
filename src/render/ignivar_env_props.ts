@@ -62,6 +62,10 @@ export const IGNIVAR_ENV_PROP_URLS: Record<IgnivarEnvPropKey, string> = {
   lava_pillar: '/models/dungeon/ignivar_prop_lava_pillar.glb',
   lava_ramp: '/models/dungeon/ignivar_prop_lava_ramp.glb',
   staircase: '/models/dungeon/ignivar_prop_staircase.glb',
+  // The Drakelands town brazier, reused from the shipped streetlamp set
+  // (placer preview + template only; the world instance renders lit
+  // through src/render/streetlamps.ts).
+  street_lamp: '/models/props/streetlamp_drakelands_brazier.glb',
   stone_floor: '/models/dungeon/ignivar_prop_stone_floor.glb',
   tower_base: '/models/dungeon/ignivar_prop_tower_base.glb',
   tower_middle: '/models/dungeon/ignivar_prop_tower_middle.glb',

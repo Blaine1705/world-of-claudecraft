@@ -80,7 +80,7 @@ import {
 import { emberLilySpots } from './ember_lilies';
 import { fenWillowSpots, hollowWillowSpots } from './fen_willows';
 import { FENBRIDGE_LAYOUT } from './fenbridge_layout';
-import { forgefatherFortressColliders } from './forgefather_fortress';
+import { forgefatherFortressColliders, forgefatherStreetlampSites } from './forgefather_fortress';
 import { derivedInteriorColliders } from './interior_collider_sets';
 import {
   benchDrawnHeight,
@@ -1632,7 +1632,7 @@ function buildStreetlampPlacements(seed: number): PlacedStreetlamp[] {
  * never walls off someone you have to walk up to and talk to.
  */
 function addStreetlampColliders(grid: ColliderGrid, seed: number): void {
-  const placements = buildStreetlampPlacements(seed);
+  const placements = [...buildStreetlampPlacements(seed), ...forgefatherStreetlampSites()];
   streetlampsByGrid.set(grid, placements);
   if (placements.length === 0) return;
   const npcSpots = townNpcPositions();

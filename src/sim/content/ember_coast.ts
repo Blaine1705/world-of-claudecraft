@@ -135,20 +135,14 @@ export const FORGEFATHER_STAIR_RAMPS: readonly StairRampBand[] = [
   { link: true, axis: 'z', b0: 500.57, b1: 506.13, a0: 2237.15, a1: 2238.55, h0: 15.34, h1: 14.7 },
   // the keep stair: landing court (15.34) up to the summit flat (19.0,
   // bare terrain: the summit pads take over past the band)
-  { link: true, axis: 'z', b0: 500.27, b1: 505.83, a0: 2238.0, a1: 2239.4, h0: 14.7, h1: 15.34 },
-  { axis: 'z', b0: 500.27, b1: 505.83, a0: 2239.4, a1: 2244.65, h0: 15.34, h1: 19.0 },
-  { axis: 'z', b0: 500.27, b1: 505.83, a0: 2244.65, a1: 2245.4, h0: 19.0, h1: 19.0 },
+  { link: true, axis: 'z', b0: 500.27, b1: 505.83, a0: 2237.0, a1: 2238.4, h0: 14.7, h1: 15.34 },
+  { axis: 'z', b0: 500.27, b1: 505.83, a0: 2238.4, a1: 2243.65, h0: 15.34, h1: 19.0 },
+  { axis: 'z', b0: 500.27, b1: 505.83, a0: 2243.65, a1: 2244.4, h0: 19.0, h1: 19.0 },
   // the quay stair: waterside quay (plates -1.86) up through the gate (2.64)
   { link: true, axis: 'x', b0: 2196.23, b1: 2204.67, a0: 491.15, a1: 492.55, h0: -2.5, h1: -1.86 },
   { axis: 'x', b0: 2196.23, b1: 2204.67, a0: 492.55, a1: 500.0, h0: -1.86, h1: 2.64 },
   { axis: 'x', b0: 2196.23, b1: 2204.67, a0: 500.0, a1: 501.55, h0: 2.64, h1: 2.64 },
   { link: true, axis: 'x', b0: 2196.23, b1: 2204.67, a0: 501.55, a1: 502.95, h0: 2.64, h1: 2.0 },
-  // the mainland shore stair: the bridge deck (-1.63) up the dune (1.75,
-  // bare terrain); the climb runs toward -z, so a0 is the greater z, and
-  // the lead-in climbs from the beach under the deck plates
-  { link: true, axis: 'z', b0: 440.49, b1: 447.01, a0: 2189.35, a1: 2186.85, h0: -3.9, h1: -1.63 },
-  { axis: 'z', b0: 440.49, b1: 447.01, a0: 2186.85, a1: 2180.725, h0: -1.63, h1: 1.75 },
-  { axis: 'z', b0: 440.49, b1: 447.01, a0: 2180.725, a1: 2179.85, h0: 1.75, h1: 1.75 },
 ];
 
 /** The absolute stair-ramp surface at a point, or -Infinity outside every
@@ -264,7 +258,7 @@ export const FORGEFATHER_ISLE_TERRAIN_EDITS: HeightStamp[] = [
     z: 2207.2,
     ryDeg: 90,
     scale: 9,
-    wedgeBase: 0.95,
+    wedgeBase: 1.2,
     h0: 2.64,
     h1: 6.94,
     clear: 2.1,
@@ -277,7 +271,7 @@ export const FORGEFATHER_ISLE_TERRAIN_EDITS: HeightStamp[] = [
     z: 2221.4,
     ryDeg: 90,
     scale: 9,
-    wedgeBase: 6.7,
+    wedgeBase: 6.45,
     h0: 6.94,
     h1: 11.64,
     clear: 2.1,
@@ -300,7 +294,7 @@ export const FORGEFATHER_ISLE_TERRAIN_EDITS: HeightStamp[] = [
   // the keep stair
   ...stairRampStamps({
     x: 503.05,
-    z: 2242.4,
+    z: 2241.4,
     ryDeg: 90,
     scale: 6,
     wedgeBase: 14.45,
@@ -316,32 +310,16 @@ export const FORGEFATHER_ISLE_TERRAIN_EDITS: HeightStamp[] = [
     z: 2200.45,
     ryDeg: 180,
     scale: 9,
-    wedgeBase: -2.55,
+    wedgeBase: -3.05,
     h0: -1.86,
     h1: 2.64,
     clear: 2.1,
     lanes: [-2.7, 2.7, 0],
     radius: 3.2,
   }),
-  // the mainland shore stair
-  ...stairRampStamps({
-    x: 443.75,
-    z: 2183.35,
-    ryDeg: 270,
-    scale: 7,
-    wedgeBase: -2.8,
-    h0: -1.63,
-    h1: 1.75,
-    clear: 1.7,
-    lanes: [-2.2, 2.2, 0],
-    radius: 2.8,
-  }),
-  // ...and the mainland dune apron plus west-flank softeners (the shore
-  // chunk meshes at the coarse LOD bands; the softened shoulder keeps the
-  // rendered chords under the flight's silhouette).
+  // ...and the mainland dune apron: it eases the dune crest the owner's
+  // shore deck emerges from.
   { x: 443.8, z: 2178.5, radius: 2.5, delta: 1.55, falloff: 'smooth', mode: 'level' },
-  { x: 440.3, z: 2185.5, radius: 2, delta: -3.0, falloff: 'smooth', mode: 'level' },
-  { x: 440.3, z: 2183.8, radius: 2, delta: -2.4, falloff: 'smooth', mode: 'level' },
   // ...plus the summit pads: the raw ground grades from the keep flight's
   // bank up onto the summit flat with no step past the terrain-wall gate,
   // because the movement kernel reads the raw heightfield even while the

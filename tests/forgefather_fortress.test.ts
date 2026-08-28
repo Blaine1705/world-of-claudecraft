@@ -11,6 +11,7 @@ import {
   FORTRESS_CYLINDRICAL_KEYS,
   FORTRESS_STANDABLE_KEYS,
   forgefatherFortressColliders,
+  forgefatherStreetlampSites,
 } from '../src/sim/forgefather_fortress';
 import {
   IGNIVAR_NON_COLLIDING_PROPS,
@@ -24,7 +25,7 @@ const GROUND_STAND_TOLERANCE = 2.5;
 
 describe('forgefather fortress bake', () => {
   it('every placement resolves a registered prop', () => {
-    expect(FORGEFATHER_FORTRESS_PLACEMENTS.length).toBe(154);
+    expect(FORGEFATHER_FORTRESS_PLACEMENTS.length).toBe(155);
     for (const placement of FORGEFATHER_FORTRESS_PLACEMENTS)
       expect(IGNIVAR_PROP_NATIVE[placement.key], placement.key).toBeDefined();
   });
@@ -112,6 +113,21 @@ describe('forgefather fortress bake', () => {
       expect(match?.moveTopY).toBeUndefined();
       expect(match?.standable).toBeUndefined();
     }
+  });
+
+  it('street lamp rows bake as Drakelands brazier streetlamp sites', () => {
+    // The placer's 'street_lamp' key rides the town-lamp pipeline: sites
+    // flow into streetlampPlacements (colliders.ts), which hands them to
+    // the real fixture renderer and the night light field; the env-prop
+    // paths treat the key as walk-over so nothing double-collides.
+    const rows = FORGEFATHER_FORTRESS_PLACEMENTS.filter((p) => p.key === 'street_lamp');
+    const sites = forgefatherStreetlampSites();
+    expect(sites.length).toBe(rows.length);
+    for (const site of sites) {
+      expect(site.style).toBe('drakelands_brazier');
+      expect(site.areaId).toBe('drakelands');
+    }
+    expect(IGNIVAR_NON_COLLIDING_PROPS.has('street_lamp')).toBe(true);
   });
 
   it('walk-over trim and aerial stack members never block', () => {

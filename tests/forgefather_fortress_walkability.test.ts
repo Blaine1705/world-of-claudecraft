@@ -67,8 +67,8 @@ describe('forgefather fortress walkability', () => {
     seg('tier three', 504.1, 2226, 504.05, 2229);
     seg('upper stair', 503.35, 2229, 503.35, 2238);
     seg('upper landing', 503.35, 2238, 504.3, 2241);
-    seg('keep stair', 503.05, 2239, 503.05, 2246);
-    seg('summit court', 503.05, 2246, 503, 2249);
+    seg('keep stair', 503.05, 2238, 503.05, 2245);
+    seg('summit court', 503.05, 2245, 503, 2249);
     const bad: string[] = [];
     let prev: number | null = null;
     for (const [name, x, z] of route) {
@@ -227,8 +227,8 @@ describe('forgefather fortress walkability', () => {
     // surface (the bank never pokes up through a flight) and calm enough
     // for the steepness memo the kernel still reads there.
     const stairs = FORGEFATHER_FORTRESS_PLACEMENTS.filter((p) => p.key === 'staircase');
-    expect(stairs.length).toBe(6);
-    expect(FORGEFATHER_STAIR_RAMPS.length).toBe(22);
+    expect(stairs.length).toBe(5);
+    expect(FORGEFATHER_STAIR_RAMPS.length).toBe(19);
     const bad: string[] = [];
     for (const ramp of FORGEFATHER_STAIR_RAMPS) {
       if (ramp.link) continue; // under-plate connective segments

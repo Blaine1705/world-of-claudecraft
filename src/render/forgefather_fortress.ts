@@ -22,7 +22,12 @@ registerDeferredPreload(() => prepareIgnivarEnvProps());
 export function buildForgefatherFortress(): THREE.Group {
   const group = new THREE.Group();
   group.name = 'forgefatherFortress';
-  appendIgnivarEnvProps(group, FORGEFATHER_FORTRESS_PLACEMENTS, false);
-  addPropGlowPools(group, FORGEFATHER_FORTRESS_PLACEMENTS, false);
+  // Street lamps render through src/render/streetlamps.ts (the fixture,
+  // its flame, and its REAL night light come from the town-lamp pipeline
+  // that colliders.ts hands the fortress lamp sites to); the env-prop
+  // template here exists only for the placer's live preview.
+  const placements = FORGEFATHER_FORTRESS_PLACEMENTS.filter((p) => p.key !== 'street_lamp');
+  appendIgnivarEnvProps(group, placements, false);
+  addPropGlowPools(group, placements, false);
   return group;
 }

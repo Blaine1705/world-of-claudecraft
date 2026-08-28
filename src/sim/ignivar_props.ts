@@ -59,6 +59,7 @@ export type IgnivarEnvPropKey =
   | 'lava_pillar'
   | 'lava_ramp'
   | 'staircase'
+  | 'street_lamp'
   | 'stone_floor'
   | 'tower_base'
   | 'tower_middle'
@@ -135,6 +136,10 @@ export const IGNIVAR_PROP_NATIVE: Record<
   lava_pillar: { len: 0.53, hei: 1.0, dep: 0.4 },
   lava_ramp: { len: 1.0, hei: 0.38, dep: 0.49 },
   staircase: { len: 1.0, hei: 0.76, dep: 0.96 },
+  // The Drakelands town brazier lamp, referenced from the shipped town
+  // fixture set (raw GLB dims; the world render normalizes and lights it
+  // through src/render/streetlamps.ts, not the env-prop path).
+  street_lamp: { len: 1.73, hei: 5.5, dep: 1.24 },
   stone_floor: { len: 1.0, hei: 0.08, dep: 1.0 },
   tower_base: { len: 0.97, hei: 1.0, dep: 0.83 },
   tower_middle: { len: 0.7, hei: 1.0, dep: 0.63 },
@@ -365,6 +370,7 @@ export const IGNIVAR_NON_COLLIDING_PROPS: ReadonlySet<IgnivarEnvPropKey> = new S
   // the movement (exterior) or the lift field does (interiors); a collider
   // here would be an invisible wall across the flight
   'staircase',
+  'street_lamp',
 ]);
 
 /** Collider footprint as a fraction of the visual AABB: ornate pillars and
