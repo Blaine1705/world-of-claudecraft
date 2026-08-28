@@ -20,7 +20,11 @@ import { readFileSync } from 'node:fs';
 import type * as http from 'node:http';
 import { resolve } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { CharacterStoragePurchaseOpen } from '../../server/character_delete_db';
+import {
+  CharacterDeleteClientGone,
+  CharacterDeleteQueueSaturated,
+  CharacterStoragePurchaseOpen,
+} from '../../server/character_delete_db';
 import {
   APPEARANCE_REROLL_CUTOFF,
   type CharactersRuntime,
@@ -1678,6 +1682,75 @@ describe('delete handler', () => {
     expect(spies.saveMail).not.toHaveBeenCalled();
   });
 
+  it('threads a client-disconnect signal that short-circuits the delete gate wait, writing nothing', async () => {
+    // Models the bounded realm-gate wait: the promise settles only when the
+    // threaded signal aborts, answering the same client-gone abandonment the
+    // real gate throws for a caller-side abort.
+    const seen: AbortSignal[] = [];
+    const deleteCharacter = vi.fn(
+      (_account: number, characterId: number, signal?: AbortSignal) =>
+        new Promise<boolean>((_resolve, reject) => {
+          if (!signal) throw new Error('expected the request abort signal');
+          seen.push(signal);
+          signal.addEventListener(
+            'abort',
+            () => reject(new CharacterDeleteClientGone(characterId)),
+            { once: true },
+          );
+        }),
+    );
+    const spies = purgeSpies();
+    setCharactersDbForTests({ deleteCharacter });
+    installRuntime({ isCharacterOnline: () => false, ...spies });
+    const ctx = fakeCtx({
+      account: { accountId: 7, scope: 'full' },
+      state: stateWith(charRow({ id: 9, name: 'Deleteme' })),
+      body: { name: 'Deleteme' },
+    });
+    const handled = routeFor('DELETE', '/api/characters/:id').handler(ctx);
+    await new Promise((resolve) => setImmediate(resolve));
+    expect(deleteCharacter).toHaveBeenCalledTimes(1);
+    expect(seen[0].aborted).toBe(false);
+    // The client goes away mid-wait: the same 'close' the real ServerResponse
+    // emits on a torn connection, with the response still unfinished.
+    (ctx.res as unknown as FakeRes).emit('close');
+    expect(seen[0].aborted).toBe(true);
+    await handled;
+    // The handler writes NOTHING for a client-gone abandonment: the socket is
+    // closed, and a booked 503 would count a dead client as gate saturation
+    // (the structural pipeline net owns ending the dead exchange). No purge
+    // ran for a delete that did not land.
+    expect((ctx.res as unknown as FakeRes).headersSent).toBe(false);
+    expect((ctx.res as unknown as FakeRes).writableEnded).toBe(false);
+    expect(spies.purgeMarketSeller).not.toHaveBeenCalled();
+    expect(spies.purgeMailOwner).not.toHaveBeenCalled();
+  });
+
+  it('503s the retryable busy refusal when the delete gate is genuinely saturated', async () => {
+    // Saturation (the bounded wait elapsed with no slot, no disconnect) keeps
+    // its 503: the distinction from the client-gone no-write above is what
+    // lets the busy signal keep meaning saturation.
+    const spies = purgeSpies();
+    setCharactersDbForTests({
+      deleteCharacter: async () => {
+        throw new CharacterDeleteQueueSaturated(9);
+      },
+    });
+    installRuntime({ isCharacterOnline: () => false, ...spies });
+    const res = await callHandler('DELETE', '/api/characters/:id', {
+      account: { accountId: 7, scope: 'full' },
+      state: stateWith(charRow({ id: 9, name: 'Deleteme' })),
+      body: { name: 'Deleteme' },
+    });
+    expect(res.status).toBe(503);
+    expect(res.body).toEqual({
+      error: 'The realm is busy. Try deleting this character again in a moment.',
+      code: 'character.delete_busy',
+    });
+    expect(spies.purgeMarketSeller).not.toHaveBeenCalled();
+    expect(spies.purgeMailOwner).not.toHaveBeenCalled();
+  });
+
   it('404s not-found when the delete matched no row', async () => {
     const spies = purgeSpies();
     setCharactersDbForTests({ deleteCharacter: async () => false });
@@ -1786,7 +1859,9 @@ describe('legacy DELETE dispatch arm (main.ts)', () => {
     expect(end).toBeGreaterThan(start);
     const arm = stripComments(src.slice(start, end));
 
-    const deleteAt = arm.indexOf('await deleteCharacter(accountId, characterId)');
+    const deleteAt = arm.indexOf(
+      'await deleteCharacter(accountId, characterId, characterDeleteRequestSignal(res))',
+    );
     const refusalAt = arm.indexOf('characterDeleteHttpRefusal(error)');
     const responseAt = arm.indexOf('return json(res, refusal.status, refusal.body)');
     const purgeAt = arm.indexOf('purgeDeletedCharacterWorldState(');
@@ -1807,7 +1882,9 @@ describe('legacy DELETE dispatch arm (main.ts)', () => {
     const end = src.indexOf("url === '/api/realms'", start);
     expect(end).toBeGreaterThan(start);
     const arm = stripComments(src.slice(start, end));
-    const deleteAt = arm.indexOf('await deleteCharacter(accountId, characterId)');
+    const deleteAt = arm.indexOf(
+      'await deleteCharacter(accountId, characterId, characterDeleteRequestSignal(res))',
+    );
     const purgeAt = arm.indexOf('purgeDeletedCharacterWorldState(');
     expect(deleteAt).toBeGreaterThan(-1);
     expect(purgeAt).toBeGreaterThan(deleteAt);

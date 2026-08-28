@@ -10,9 +10,17 @@ const rig = vi.hoisted(() => ({
     on: ReturnType<typeof vi.fn>;
   }>,
   queryImpl: vi.fn(async () => ({ rows: [] })),
+  // One-shot Pool constructor failure: rejects the module's lazy factory so
+  // the rejected-memo tests can drive it.
+  poolConstructError: null as Error | null,
 }));
 vi.mock('pg', () => ({
   Pool: function Pool(options: Record<string, unknown>) {
+    if (rig.poolConstructError) {
+      const error = rig.poolConstructError;
+      rig.poolConstructError = null;
+      throw error;
+    }
     const pool = {
       options,
       query: vi.fn((...args: unknown[]) => rig.queryImpl(...(args as []))),
@@ -28,6 +36,7 @@ vi.mock('../../server/db', () => ({ DATABASE_URL: 'postgres://cancel-test/db' })
 import {
   cancelDetachedBackend,
   closeBackendCancelPool,
+  DB_CANCEL_IDLE_TIMEOUT_MS,
   DB_CANCEL_POOL_CONNECT_TIMEOUT_MS,
   DB_CANCEL_QUERY_TIMEOUT_MS,
   DB_CANCEL_STATEMENT_TIMEOUT_MS,
@@ -56,12 +65,16 @@ describe('the dedicated deadline-cancel side pool', () => {
       connectionString: 'postgres://cancel-test/db',
       max: 1,
       connectionTimeoutMillis: DB_CANCEL_POOL_CONNECT_TIMEOUT_MS,
+      idleTimeoutMillis: DB_CANCEL_IDLE_TIMEOUT_MS,
       statement_timeout: DB_CANCEL_STATEMENT_TIMEOUT_MS,
       query_timeout: DB_CANCEL_QUERY_TIMEOUT_MS,
     });
     expect(DB_CANCEL_POOL_CONNECT_TIMEOUT_MS).toBe(500);
     expect(DB_CANCEL_STATEMENT_TIMEOUT_MS).toBe(750);
     expect(DB_CANCEL_QUERY_TIMEOUT_MS).toBe(1_000);
+    // The "transient connection" budget claim is an explicit bound, never
+    // pg-pool's implicit default.
+    expect(DB_CANCEL_IDLE_TIMEOUT_MS).toBe(10_000);
     // Both cancels went through pg_cancel_backend on the ACTIVE-state guard.
     expect(pool.query).toHaveBeenCalledTimes(2);
     expect(pool.query.mock.calls[0][0]).toContain('pg_cancel_backend');
@@ -89,5 +102,81 @@ describe('the dedicated deadline-cancel side pool', () => {
     const pool = rig.pools[rig.pools.length - 1];
     await closeBackendCancelPool();
     expect(pool.end).toHaveBeenCalledTimes(1);
+  });
+
+  it('a rejected lazy factory does not poison later cancels: the memo retries fresh', async () => {
+    // A fresh module instance: the file-level import already memoized a live
+    // pool, and this trap is specifically about the FIRST construction failing.
+    vi.resetModules();
+    const fresh = await import('../../server/db_backend_cancel');
+    rig.poolConstructError = new Error('cancel pool boot failed');
+    const before = rig.pools.length;
+    await expect(fresh.cancelDetachedBackend(21)).rejects.toThrow('cancel pool boot failed');
+    expect(fresh.getBackendCancelCounts()).toEqual({ requested: 1, failed: 1 });
+    // The next deadline expiry constructs a NEW pool and cancels normally;
+    // with a still-memoized rejection this would replay the boot error.
+    await fresh.cancelDetachedBackend(22);
+    expect(rig.pools.length).toBe(before + 1);
+    const pool = rig.pools[rig.pools.length - 1];
+    expect(pool.query).toHaveBeenCalledTimes(1);
+    expect(pool.query.mock.calls[0][1]).toEqual([22]);
+    expect(fresh.getBackendCancelCounts()).toEqual({ requested: 2, failed: 1 });
+    // And shutdown after the recovery never wedges (the close-latch tests
+    // below cover closing over a still-rejected memo).
+    await expect(fresh.closeBackendCancelPool()).resolves.toBeUndefined();
+    expect(pool.end).toHaveBeenCalledTimes(1);
+  });
+
+  it('once closed, a late cancel counts a failure and never constructs a new pool', async () => {
+    vi.resetModules();
+    const fresh = await import('../../server/db_backend_cancel');
+    // The trap this latch closes: the factory REJECTED (memo nulled), then
+    // shutdown closed the (absent) pool. A cancel arriving before
+    // process.exit would otherwise rebuild a fresh Pool nothing ever ends.
+    rig.poolConstructError = new Error('cancel pool boot failed');
+    await expect(fresh.cancelDetachedBackend(31)).rejects.toThrow('cancel pool boot failed');
+    // Closing over the rejected (nulled) memo still never wedges shutdown.
+    await expect(fresh.closeBackendCancelPool()).resolves.toBeUndefined();
+    const before = rig.pools.length;
+    await expect(fresh.cancelDetachedBackend(32)).rejects.toThrow('closed for shutdown');
+    expect(rig.pools.length).toBe(before);
+    // Counted like any refused cancel: a request and a failure.
+    expect(fresh.getBackendCancelCounts()).toEqual({ requested: 2, failed: 2 });
+  });
+
+  it('the closed latch also refuses a late cancel after a normally constructed pool ended', async () => {
+    vi.resetModules();
+    const fresh = await import('../../server/db_backend_cancel');
+    await fresh.cancelDetachedBackend(33);
+    const pool = rig.pools[rig.pools.length - 1];
+    await fresh.closeBackendCancelPool();
+    expect(pool.end).toHaveBeenCalledTimes(1);
+    const before = rig.pools.length;
+    await expect(fresh.cancelDetachedBackend(34)).rejects.toThrow('closed for shutdown');
+    expect(rig.pools.length).toBe(before);
+    // The ended pool was never queried again either.
+    expect(pool.query).toHaveBeenCalledTimes(1);
+  });
+
+  it('closeBackendCancelPool never throws past a failing end(), so shutdown reaches the main pool.end()', async () => {
+    vi.resetModules();
+    const fresh = await import('../../server/db_backend_cancel');
+    await fresh.cancelDetachedBackend(23);
+    const pool = rig.pools[rig.pools.length - 1];
+    pool.end.mockRejectedValueOnce(new Error('end() lost the socket'));
+    const errorLog = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const mainPoolEnd = vi.fn();
+    try {
+      // The real shutdown chain shape (main.ts): closeBackendCancelPool(),
+      // THEN the main pools' end() and process.exit(0). A throw from the
+      // close would skip both.
+      await fresh.closeBackendCancelPool();
+      mainPoolEnd();
+      expect(errorLog).toHaveBeenCalledTimes(1);
+    } finally {
+      errorLog.mockRestore();
+    }
+    expect(pool.end).toHaveBeenCalledTimes(1);
+    expect(mainPoolEnd).toHaveBeenCalledTimes(1);
   });
 });

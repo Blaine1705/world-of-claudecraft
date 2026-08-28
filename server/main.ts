@@ -108,8 +108,15 @@ import {
   pruneBugReportsBatch,
 } from './bug_report_db';
 import { createCachedRead } from './cached_read';
-import { configureCharacterDeleteBackgroundGate } from './character_delete_db';
-import { characterDeleteHttpRefusal } from './character_delete_http';
+import {
+  characterDeleteGateStats,
+  configureCharacterDeleteBackgroundGate,
+} from './character_delete_db';
+import {
+  characterDeleteClientGone,
+  characterDeleteHttpRefusal,
+  characterDeleteRequestSignal,
+} from './character_delete_http';
 import { bustAllLifetimeXpRankCache } from './character_rank_cache';
 import { characterSheet, SHEET_RECENT_DEEDS, type SheetRank } from './character_sheet';
 import {
@@ -2085,8 +2092,11 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       }
       let ok: boolean;
       try {
-        ok = await deleteCharacter(accountId, characterId);
+        ok = await deleteCharacter(accountId, characterId, characterDeleteRequestSignal(res));
       } catch (error) {
+        // The requester vanished mid-wait: the socket is closed, write nothing
+        // (the delete never began; a booked 503 would misread as saturation).
+        if (characterDeleteClientGone(error)) return;
         const refusal = characterDeleteHttpRefusal(error);
         if (refusal === null) throw error;
         return json(res, refusal.status, refusal.body);
@@ -3737,6 +3747,7 @@ export async function startServer(): Promise<http.Server> {
     savePendingKeys: () => game.characterSaveQueues.pendingKeys(),
     escrowGateInFlight: () => wocEscrowGate.stats().inFlight,
     backgroundDbGate: () => majorBackgroundDbGate.stats(),
+    characterDeleteGate: () => characterDeleteGateStats(),
     storageRecovery: () => storagePurchaseRecoveryMetrics(),
     tickPhaseMillis: () => game.tickPhaseMillis(),
     // Coerced at the untyped boundary: @types/pg hand-declares these getters,

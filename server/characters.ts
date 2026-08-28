@@ -52,7 +52,11 @@ import type { PlayerClass } from '../src/sim/types';
 // only guarantees the stored document is small and well shaped.
 import { sanitizeAppearance } from '../src/world_api/appearance';
 import { normalizeCharName, offensiveName } from './auth';
-import { characterDeleteHttpRefusal } from './character_delete_http';
+import {
+  characterDeleteClientGone,
+  characterDeleteHttpRefusal,
+  characterDeleteRequestSignal,
+} from './character_delete_http';
 import { characterSheet, SHEET_RECENT_DEEDS, type SheetRank } from './character_sheet';
 import {
   accountAndScopeForToken,
@@ -861,8 +865,15 @@ async function deleteHandler(ctx: Ctx): Promise<void> {
   }
   let ok: boolean;
   try {
-    ok = await charactersDb.deleteCharacter(accountId, character.id);
+    ok = await charactersDb.deleteCharacter(
+      accountId,
+      character.id,
+      characterDeleteRequestSignal(ctx.res),
+    );
   } catch (error) {
+    // The requester vanished mid-wait: the socket is closed, so write nothing
+    // (the delete never began; a booked 503 would misread as saturation).
+    if (characterDeleteClientGone(error)) return;
     const refusal = characterDeleteHttpRefusal(error);
     if (refusal === null) throw error;
     json(ctx.res, refusal.status, refusal.body);
