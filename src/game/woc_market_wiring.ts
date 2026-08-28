@@ -1,16 +1,13 @@
 // One-call composition of the $WOC Exchange attach (docs/prd/woc/marketplace.md):
-// browser web plus the WEBSITE-distributed Electron desktop shell. Steam and
-// Epic desktop builds and Capacitor native stay fail-closed (tradeable-token
-// UI is against both stores' terms), and so does any desktop shell that
-// cannot prove the website distribution: the shell's main process answers the
-// wocExchangeSupported probe from its packaged stamp, so a missing bridge, a
-// missing method (an older shell), an absent or unknown stamp, or a probe
-// failure all deny. The server additionally answers woc_market.disabled until
-// WOC_MARKET_ENABLED=1. src/main.ts calls this once from its online entry
+// browser web, verified Seeker Solana dApp Store Android, plus the
+// WEBSITE-distributed Electron desktop shell. Google Play Android, iOS, Steam,
+// and Epic stay fail-closed, as does any shell that cannot prove its allowed
+// distribution and device. The server additionally answers woc_market.disabled
+// until WOC_MARKET_ENABLED=1. src/main.ts calls this once from its online entry
 // (main.ts is a firewall, not a home), and the shell flags default to the
-// live NATIVE_APP / DESKTOP_APP constants plus the live desktop bridge while
-// staying injectable so the gate is unit-testable without a Capacitor or
-// Electron host.
+// live NATIVE_APP / DESKTOP_APP constants plus the live native and desktop
+// bridges while staying injectable so the gate is unit-testable without a
+// Capacitor or Electron host.
 //
 // A wrapped DESKTOP shell denied by that gate still gets a launcher:
 // attachWocMarketBrowserOnlyNotice reveals the SAME menu icon wired to the
@@ -27,6 +24,8 @@ import type {
   DesktopWalletBrowserAction,
   DesktopWalletBrowserResult,
 } from '../net/desktop_wallet_handoff';
+import { nativeSolanaMobileBridge } from '../net/native_solana_mobile';
+import { resolveWalletCapability, type WalletCapabilityBridge } from '../net/wallet_capability';
 import { WocMarketClient } from '../net/woc_market_sdk';
 import { desktopBridge } from '../runtime';
 import type { WocMarketHooks } from '../ui/woc_market_window';
@@ -41,6 +40,8 @@ export interface WocMarketShell {
   desktopApp: boolean;
   /** The desktop shell bridge, or null outside the desktop shell. */
   bridge: WocMarketShellBridge | null;
+  /** The Solana Mobile capability bridge, or null outside native Android. */
+  mobileBridge?: WalletCapabilityBridge | null;
 }
 
 export interface WocMarketWiringDeps {
@@ -70,11 +71,18 @@ export interface WocMarketWiringDeps {
   };
 }
 
-/** True for browser web, and for a desktop shell whose main process proves the
- *  website distribution; every other shell (Capacitor native, Steam, Epic, a
- *  desktop shell whose probe is absent, false, or failing) stays fail-closed. */
+/** True for browser web, verified Seeker Solana-store Android, and a desktop
+ *  shell whose main process proves the website distribution. Every other shell
+ *  stays fail-closed. */
 export async function wocMarketAttachAllowed(shell: WocMarketShell): Promise<boolean> {
-  if (shell.nativeApp) return false;
+  if (shell.nativeApp) {
+    return resolveWalletCapability({
+      disabled: false,
+      nativeApp: true,
+      desktopApp: false,
+      bridge: shell.mobileBridge ?? null,
+    });
+  }
   if (!shell.desktopApp) return true;
   try {
     return (await shell.bridge?.wocExchangeSupported?.()) === true;
@@ -92,15 +100,17 @@ export function wocMarketBrowserHandoffAllowed(shell: WocMarketShell): boolean {
   return shell.desktopApp && !shell.nativeApp;
 }
 
-/** Attach the $WOC Exchange hooks on browser web and website-distributed
- *  desktop only; reveal the browser-hand-off launcher on a denied wrapped
- *  desktop shell. Resolves to whether the real Exchange attached. */
+/** Attach the $WOC Exchange hooks on browser web, verified Seeker Solana-store
+ *  Android, and website-distributed desktop; reveal the browser-hand-off
+ *  launcher on a denied wrapped desktop shell. Resolves to whether the real
+ *  Exchange attached. */
 export async function attachWocMarketExchange(
   deps: WocMarketWiringDeps,
   shell: WocMarketShell = {
     nativeApp: NATIVE_APP,
     desktopApp: DESKTOP_APP,
     bridge: desktopBridge(),
+    mobileBridge: NATIVE_APP ? nativeSolanaMobileBridge : null,
   },
 ): Promise<boolean> {
   if (!(await wocMarketAttachAllowed(shell))) {

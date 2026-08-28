@@ -159,18 +159,11 @@ const MONOLITHS: MonolithRow[] = [
     // Plus 1 for the Exchange's Solana wallet card: the ONE line is the
     // onWalletUiChange fan-out onto wocMarketWindow.onWalletChanged(), the
     // Claudium panel's existing arm. Exact count.
-    // The v0.41.0 reconcile keeps both the wrapped-shell hand-off and the
-    // wallet-card fan-out, then re-pins to the exact merged count.
-    // Raised 18488 -> 18501 (+13) for the buff-bar priority/opt-out follow-up
-    // to PR #3668 (player feedback): the alwaysShowAllBuffs field, its setter,
-    // and buffBarFxTier() are Hud-owned coordinator state (a per-session flag
-    // plus the one closure that reads it) with no pure logic to extract --
-    // the actual selection algorithm moved to src/ui/aura_overflow_priority.ts
-    // instead, which is the real fix. Maintainer decision, exact merged count.
-    // Lowered after extracting the managed-window position clamp into
-    // src/ui/window_position_core.ts. The release merge keeps both parent
-    // surfaces, and the ratchet follows the exact merged count with zero slack.
-    ceiling: 18530,
+    // The v0.41.0 reconcile keeps the wrapped-shell hand-off, wallet-card
+    // fan-out, alwaysShowAllBuffs dispatch, interface unlock frames-menu
+    // wiring, and the managed-window position extraction. The ratchet follows
+    // the exact merged count with zero slack.
+    ceiling: 19044,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -308,19 +301,12 @@ const MONOLITHS: MonolithRow[] = [
     // availability probe and browser authorizer moved to
     // src/net/desktop_wallet_handoff.ts (thin hoisted delegators remain),
     // paying for the Exchange desktop-signer wiring at the attach site.
-    // The v0.41.0 reconcile keeps the alwaysShowAllBuffs dispatch and the
-    // desktop signer extraction, and lands at this exact count.
-    // Lowered to the exact size after the Discord status/presence payload
-    // coercers moved into src/ui/discord_status.ts; the freed lines paid for
-    // the R11 wallet-reauth wiring (src/ui/wallet_reauth_prompt.ts) including
-    // the QA round's cancel-path adapter disconnect.
-    // Lowered again after the Discord login-choice persistence moved into
-    // src/game/discord_login_choice.ts (the review-round-2 payment for the
-    // stale-cache self-heal reads and the unlink re-entrancy guard).
-    // Re-pinned to the exact resolved v0.41 merge count after keeping the
-    // desktop signer extraction, alwaysShowAllBuffs dispatch, wallet reauth,
-    // and Discord login-choice persistence.
-    ceiling: 11523,
+    // The v0.41.0 reconcile keeps the desktop signer extraction,
+    // alwaysShowAllBuffs dispatch, wallet reauth, Discord login-choice
+    // persistence, and the interface-editor setting arms. Folding the
+    // settings application behind a src/game/ or src/ui/ seam remains
+    // follow-up work. Exact merged count.
+    ceiling: 11629,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
