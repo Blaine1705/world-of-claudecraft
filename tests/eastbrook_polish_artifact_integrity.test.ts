@@ -1026,9 +1026,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
 // both sides). No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'fa4937c65243ce6c176f792da8233d01e855493e5a3eca1b69857ec8ee9cf326';
+  'b7f20268e9d15b01de7034b18d451f23367b13576506daae0f486b086554df42';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '011085252da36ab16de93b9abcda860d312656cde771314a5ede3c0aa8cc608f';
+  'b4f994b0a5d52ffce488667a7768739838207796dc4eaa331ebd980ab3fe8ba4';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2175,14 +2175,10 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
     // both sides): same order, the composite first, then this seal. No capture
     // was retaken.
-    // Re-minted for the low-tier NaN output-scrub three.js patch: only
-    // pnpm-lock.yaml's patch hash moved, which feeds the town/mailbox/
-    // noticeboard source fingerprints; the composite follows, then this seal
-    // follows the swept evidence bytes. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('9d17ccc7e104ab399eb42ffe53f683abb2d605425b11d76fb225d720cd01a3c6');
+    ).toBe('5bae1eefcdba32613ca7fe8ac5db78be891da7b08a56b66c2085e816c903f31f');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
