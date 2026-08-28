@@ -96,6 +96,11 @@ const nodePath = require('node:path');
 //         initialise ("Invalid visual ID requested"), the GPU process exits three times and
 //         Chromium disables the GPU for the session (measured 2026-08-28 on an Intel ARL
 //         iGPU + RTX 3090 desktop under X11: no WebGL at all).
+//         Known limit: the check keys on the NVIDIA vendor only. The analogous AMD desktop
+//         (an AMD card on the screen, an iGPU left enabled) still takes the offload path,
+//         where DRI_PRIME=1 points rendering at the other device: it mis-selects rather
+//         than crashing, exactly as under the old two-card rule, and PCI vendor ids cannot
+//         tell an AMD dGPU from an AMD APU, so the fatal NVIDIA case is the scope.
 //     (b) APPIMAGE-AWARE SPAWN SOURCE: in an AppImage, process.execPath points INSIDE the
 //         runtime's FUSE mount, and that mount's daemon is the runtime process, which
 //         unmounts and exits the moment its child (this process) exits; a child spawned from

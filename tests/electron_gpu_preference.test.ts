@@ -350,14 +350,17 @@ describe('hasExplicitOzonePlatformArg', () => {
 });
 
 /** A fake sysfs: which card the firmware brought the screen up on, and each
- *  card's PCI vendor; a card absent from the map has no PCI attributes. */
-function sysfs(cards: Record<string, { vendor: string; bootVga: '0' | '1' }>) {
+ *  card's PCI vendor; a card absent from the map has no PCI attributes, a card
+ *  without `vendor` has an unreadable vendor file. */
+function sysfs(cards: Record<string, { vendor?: string; bootVga: '0' | '1' }>) {
   return (path: string, encoding: 'utf8'): string => {
     expect(encoding).toBe('utf8');
     const match = /^\/sys\/class\/drm\/(card\d+)\/device\/(boot_vga|vendor)$/.exec(path);
     const card = match ? cards[match[1]] : undefined;
     if (!match || !card) throw new Error(`ENOENT ${path}`);
-    return `${match[2] === 'vendor' ? card.vendor : card.bootVga}\n`;
+    if (match[2] === 'boot_vga') return `${card.bootVga}\n`;
+    if (card.vendor === undefined) throw new Error(`EACCES ${path}`);
+    return `${card.vendor}\n`;
   };
 }
 
@@ -427,6 +430,14 @@ describe('isLinuxHybridGpu', () => {
         sysfs({ card2: { vendor: NVIDIA, bootVga: '1' } }),
       ),
     ).toBe(false);
+    // boot_vga claims the screen but the vendor file is unreadable: that card is skipped
+    // and the two-card rule decides.
+    expect(
+      isLinuxHybridGpu(
+        cards,
+        sysfs({ card0: { bootVga: '1' }, card1: { vendor: NVIDIA, bootVga: '0' } }),
+      ),
+    ).toBe(true);
   });
 
   it('is false on a single-GPU machine (render nodes and connectors do not count)', () => {
