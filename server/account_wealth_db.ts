@@ -20,10 +20,7 @@
 // endpoint surfaces each character's guild treasury as context instead.
 
 import { DB_HEAVY_STATEMENT_TIMEOUT_MS, pool, runWithStatementTimeout } from './db';
-import {
-  MAIL_PARTITION_MARKER_PREFIX,
-  MAIL_RECIPIENT_KEY_INFIX,
-} from './mail_partition_backfill';
+import { MAIL_PARTITION_MARKER_PREFIX, MAIL_RECIPIENT_KEY_INFIX } from './mail_partition_backfill';
 
 // account_wealth is bounded (one row per account, cascade-deleted with the
 // account), so it needs no retention registration: it can never grow past the

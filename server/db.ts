@@ -58,18 +58,18 @@ import {
 } from './guild_bank_state';
 import { isUniqueViolation } from './http_util';
 import {
-  assertMailPartitionWriteGateOpen,
-  openMailPartitionWriteGate,
-  writeMailPartitions,
-  writeMailPartitionsInTransaction,
-} from './mail_db';
-import {
   advanceCustodyWatermarkIn,
   confirmBakedCustodyRefs,
   deleteBakedCustodyRefsIn,
   MAIL_CUSTODY_PARCELS_SCHEMA,
   snapshotPendingCustodyRefs,
 } from './mail_custody_overlay';
+import {
+  assertMailPartitionWriteGateOpen,
+  openMailPartitionWriteGate,
+  writeMailPartitions,
+  writeMailPartitionsInTransaction,
+} from './mail_db';
 import {
   mailPartitionMarkerKey,
   mailStateKey,
