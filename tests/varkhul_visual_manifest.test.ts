@@ -20,26 +20,38 @@ describe('expanded Ignivar raid visual manifest', () => {
         attackByAbility: {
           "Forgefather's Hammer": 'Forging',
           "Anvil's Decree": 'Forging',
+          // each storm wave's windup cue powers him up; natural speed (the
+          // playAttack default would rush it at 1.3)
+          Forgestorm: 'PowerUp',
         },
         attackTimeScaleByAbility: {
           "Forgefather's Hammer": 0.815,
           "Anvil's Decree": 0.815,
+          Forgestorm: 1,
         },
         cast: 'Casting',
+        // the generic channel freezes on the pointing gesture's peak frame
+        // (0.72s in) while the cast channels; the recovery plays out on
+        // release
+        castHoldPointSeconds: 0.72,
+        // clips whose recovery must finish when the cast ends mid-clip;
+        // Forging deliberately absent (the decree loop hands off instantly)
+        castPlayOut: ['Casting', 'Slam'],
         castByAbility: {
           "Forgefather's Sweep": 'Slam',
-          Forgestorm: 'Slam',
           "Anvil's Decree": 'Forging',
         },
         castTimeScaleByAbility: {
           "Forgefather's Sweep": 0.65,
-          Forgestorm: 0.65,
           "Anvil's Decree": 0.815,
         },
         flourish: 'PowerUp',
         death: 'Death',
       },
     });
+    // The retired Slam meteor cast row must stay gone: Forgestorm is a
+    // windup one-shot now, so a cast-loop mapping would fight it.
+    expect(VISUALS.mob_varkhul_forgefather.clips.castByAbility?.Forgestorm).toBeUndefined();
     // Raid-wide damage must never thrash the boss rig: no hit mapping, like
     // the Ignivar colossus.
     expect(VISUALS.mob_varkhul_forgefather.clips.hit).toBeUndefined();
