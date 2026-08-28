@@ -87,23 +87,18 @@ export function cameraSeesWallBack(
  */
 export const WALL_MOUNTED_PROP_KINDS: ReadonlySet<string> = new Set([
   'vault_door',
-  'gear_wall',
   'gear_wall_rusty',
   'square_wall',
-  'curved_wall',
   'lava_face',
   'beam',
   'steam_pipes',
   'industrial_pipe',
   'lava_outlet',
-  'lava_outlet_2',
   'lava_port',
   'hanging_hook',
   'chain_link',
   'chain_hanging',
   'pillar_slim',
-  'pillar_broad',
-  'radiator',
   'torch',
 ]);
 
