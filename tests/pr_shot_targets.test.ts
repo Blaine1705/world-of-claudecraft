@@ -123,9 +123,10 @@ describe('classifyDiff', () => {
   });
 
   it('maps an options_view change to the unlock, graphics dial, interface tab, and confirm-vendor-sell targets, in order', () => {
-    // All four targets key on 'ui/options_view'; registry order is the capture
-    // order (unlock row, graphics dial, interface tabs, then confirm-vendor
-    // sell). An ordering or selector regression here silently drops or
+    // All four targets key on 'ui/options_view'; registry order is the
+    // capture order: interface-unlock leads, then the graphics dial, then
+    // interface tabs, then the confirm-vendor-sell toggle row (the last one
+    // added). An ordering or selector regression here silently drops or
     // duplicates the options-panel evidence.
     const plan = classifyDiff(['src/ui/options_view.ts']);
     expect(plan.isVisual).toBe(true);
