@@ -347,8 +347,11 @@ interface AttributionTargetFixture {
 // batch-side renderer/entity-view policy leaves combine with the low-tier NaN
 // output-scrub patch hash and Eastbrook asset evidence inputs. No capture was
 // retaken.
+// Re-minted after removing withdrawn v0.41 batch entries #3529 and #3631:
+// renderer.ts moved again, while Eastbrook evidence and captures were adopted
+// verbatim.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'ddfbcf9a774d3bf02c61c70d152000f64bf18c01ced305a2550144757f979d50';
+  '9a401bb58b6c9e5e2238fd4861934eccf04456637ed561a1c4a559b3f1dfc6ee';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
