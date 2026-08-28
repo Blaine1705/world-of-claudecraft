@@ -15,9 +15,9 @@
 // 5,000 offers, ANALYZEs, and EXPLAINs at NATURAL costs, proving the planner
 // PREFERS the account indexes at a scale where the old shape seq-scanned.
 //
-// The pins assert plan CLASS (which index, no seq scan, no sort), anchored to
-// the captured query, never plan text: row estimates and node flavors may
-// drift across Postgres versions, index reachability must not.
+// The pins assert plan CLASS (which index, no seq scan, bounded joins),
+// anchored to the captured query, never costs or row estimates: those details
+// may drift across Postgres versions, index reachability must not.
 import { Pool } from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { PgWocMarketDb } from '../server/woc_market_db';
@@ -310,6 +310,37 @@ describeDb('woc market plan-class pins against real Postgres', () => {
         WHERE realm = $1 AND resolution = 'sold'`,
       [realm],
     );
+    const voidedListing = await pool.query(
+      `INSERT INTO woc_market_listings (
+         realm, seller_account, seller_character, seller_name, seller_wallet,
+         item, item_id, quality, format, start_cents, buy_now_cents,
+         offer_next, status, resolution, item_disposed, ends_at, base_ends_at,
+         created_at)
+       VALUES ($1, 10001, 25201, 'VoidedSeller', 'w-voided',
+               '{"itemId":"crown_of_embers","count":1}'::jsonb, 'crown_of_embers',
+               'epic', 'buy_now', 500, 1000, false, 'closed', 'sold', true,
+               now() - interval '1 hour', now() - interval '1 hour', now())
+       RETURNING id, item, item_id, seller_account, seller_name, created_at`,
+      [realm],
+    );
+    const voided = voidedListing.rows[0];
+    const voidedListingId = Number(voided.id);
+    await pool.query(
+      `INSERT INTO woc_market_sales (
+         realm, listing_id, item_id, item, price_cents, amount_base,
+         seller_account, buyer_account, seller_name, buyer_name, excluded, created_at)
+       VALUES ($1, $2, $3, $4, 1000, '1000000000', $5, 10003, $6,
+               'VoidedBuyer', true, $7)`,
+      [
+        realm,
+        voidedListingId,
+        voided.item_id,
+        voided.item,
+        voided.seller_account,
+        voided.seller_name,
+        voided.created_at,
+      ],
+    );
     await pool.query('ANALYZE woc_market_listings');
     await pool.query('ANALYZE woc_market_sales');
 
@@ -330,8 +361,15 @@ describeDb('woc market plan-class pins against real Postgres', () => {
         `${status} filter is resolution-exclusive`,
       ).toBe(true);
       if (status === 'sold') {
-        expect(page.rows.every((row) => row.buyerAccount === 10002)).toBe(true);
-        expect(page.rows.every((row) => row.soldAtMs !== null)).toBe(true);
+        const excludedSale = page.rows.find((row) => row.id === voidedListingId);
+        expect(excludedSale).toMatchObject({
+          buyerAccount: null,
+          buyerName: null,
+          soldAtMs: null,
+        });
+        const standingSales = page.rows.filter((row) => row.id !== voidedListingId);
+        expect(standingSales.every((row) => row.buyerAccount === 10002)).toBe(true);
+        expect(standingSales.every((row) => row.soldAtMs !== null)).toBe(true);
       } else {
         expect(page.rows.every((row) => row.buyerAccount === null)).toBe(true);
         expect(page.rows.every((row) => row.soldAtMs === null)).toBe(true);
@@ -342,12 +380,12 @@ describeDb('woc market plan-class pins against real Postgres', () => {
       expect(plan, status).not.toMatch(/Seq Scan on woc_market_listings/);
       expect(plan, status).toContain('woc_market_ops_closed_created');
       expect(plan, status).not.toMatch(/Seq Scan on woc_market_sales/);
-      if (status === 'sold') expect(plan).toContain('woc_market_sales_listing_once');
-      // A MATERIALIZED CTE does not export pathkeys, so Postgres may sort the
-      // at-most-201-row joined result once. A second Sort would mean the
-      // listing page stopped riding the ordered index.
-      const sortNodes = plan.split('\n').filter((line) => /(?:^|->)\s*Sort\s+\(/.test(line)).length;
-      expect(sortNodes, status).toBeLessThanOrEqual(1);
+      if (status === 'sold') {
+        expect(plan).toContain('Nested Loop');
+        expect(plan).toContain('woc_market_sales_listing_once');
+        expect(plan).toMatch(/Index Cond: \(listing_id = p\.id\)/);
+        expect(plan).not.toContain('Hash Right Join');
+      }
     }
   }, 20_000);
 

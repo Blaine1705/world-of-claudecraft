@@ -803,7 +803,7 @@ describe('the operator reads behind the internal dashboard', () => {
 
   it('pages before joining sale provenance and filters sold or cancelled by resolution', async () => {
     for (const status of ['sold', 'cancelled'] as const) {
-      const { pool, sql } = recordingPool();
+      const { pool, sql, params } = recordingPool();
       await new PgWocMarketDb(pool).opsListings({
         realm: REALM,
         status,
@@ -815,13 +815,15 @@ describe('the operator reads behind the internal dashboard', () => {
       const [text] = sql();
       expect(text).toContain('WITH listing_page AS MATERIALIZED');
       expect(text).toContain("status = 'closed'");
-      expect(text).toContain(`resolution = '${status}'`);
-      expect(text).toContain('LIMIT $4 OFFSET $5');
-      expect(text).toContain('LEFT JOIN woc_market_sales s');
+      expect(text).toContain('resolution = $4');
+      expect(params()[0]?.[3]).toBe(status);
+      expect(text).toContain('LIMIT $5 OFFSET $6');
+      expect(text).toContain('LEFT JOIN LATERAL');
+      expect(text).toContain('FROM woc_market_sales sale');
       expect(text).toContain("p.status = 'closed' AND p.resolution = 'sold'");
-      expect(text.indexOf('LIMIT $4 OFFSET $5')).toBeLessThan(
-        text.indexOf('LEFT JOIN woc_market_sales s'),
-      );
+      expect(text).toContain('sale.excluded = false');
+      expect(text).toContain('LIMIT 1');
+      expect(text.indexOf('LIMIT $5 OFFSET $6')).toBeLessThan(text.indexOf('LEFT JOIN LATERAL'));
       expect(sql()).toHaveLength(1);
     }
   });

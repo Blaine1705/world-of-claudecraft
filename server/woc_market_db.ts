@@ -1644,11 +1644,12 @@ export class PgWocMarketDb implements WocMarketDb {
     params.push(new Date(q.toMs));
     where.push(`created_at <= $${params.length}`);
     if (q.status === 'sold' || q.status === 'cancelled') {
-      // Literals, not bound lifecycle values: they align with the partial
-      // woc_market_ops_closed_created index predicate and let Postgres prove
-      // the index applies before it sees a parameter value.
+      // Keep the partial-index predicate literal so Postgres can prove that
+      // woc_market_ops_closed_created applies. Resolution is an index key,
+      // not part of that predicate, and remains safely bound.
       where.push("status = 'closed'");
-      where.push(`resolution = '${q.status}'`);
+      params.push(q.status);
+      where.push(`resolution = $${params.length}`);
     } else if (q.status !== 'all') {
       params.push(q.status);
       where.push(`status = $${params.length}`);
@@ -1659,6 +1660,9 @@ export class PgWocMarketDb implements WocMarketDb {
     // window count re-reads the whole matching set on every page, and an ops
     // range can be far wider than a player's.
     params.push(pageSize + 1, offset);
+    // Only standing sale provenance is operator-visible. A voided sale is
+    // retained with excluded=true for audit, but deliberately maps to a null
+    // buyer/sold-at here (and therefore N/A in the dashboard).
     const res = await this.pool.query(
       `WITH listing_page AS MATERIALIZED (
          SELECT ${LISTING_COLS}
@@ -1672,9 +1676,15 @@ export class PgWocMarketDb implements WocMarketDb {
               s.buyer_name AS sale_buyer_name,
               s.created_at AS sold_at
          FROM listing_page p
-         LEFT JOIN woc_market_sales s
-           ON p.status = 'closed' AND p.resolution = 'sold'
-          AND s.listing_id = p.id AND s.realm = p.realm AND s.excluded = false
+         LEFT JOIN LATERAL (
+           SELECT sale.buyer_account, sale.buyer_name, sale.created_at
+             FROM woc_market_sales sale
+            WHERE p.status = 'closed' AND p.resolution = 'sold'
+              AND sale.listing_id = p.id
+              AND sale.realm = p.realm
+              AND sale.excluded = false
+            LIMIT 1
+         ) s ON true
         ORDER BY p.created_at DESC, p.id DESC`,
       params,
     );
