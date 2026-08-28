@@ -283,6 +283,7 @@ import { DungeonFinderProposalPopup } from './dungeon_finder_proposal_popup';
 import { DungeonFinderWindow } from './dungeon_finder_window';
 import { elixirTooltipLines } from './elixir_tooltip_view';
 import { emoteIconUrl } from './emote_icons';
+import { crossHotbarActionSlot, EmpowerHold } from './empower_hold_core';
 import {
   applyEnchantResultToast,
   disenchantResultToast,
@@ -1357,7 +1358,7 @@ export class Hud {
   private groundAim: GroundAimState = createGroundAimState();
   private groundAimPoint: AimPoint | null = null;
   private groundAimClamped = false;
-  private empowerCharge: { slot: number; abilityId: string } | null = null;
+  private readonly empowerHold = new EmpowerHold();
   private dragAction: {
     action: Exclude<HotbarAction, null>;
     sourceIndex: number | null;
@@ -7259,26 +7260,14 @@ export class Hud {
   // Slot key DOWN: every slot fires immediately (a tap is down + up, so this
   // is the press).
   pressSlot(slot: number): void {
-    const empowered = this.empoweredAbilityIdForSlot(slot);
-    if (empowered) {
-      if (this.empowerCharge) return;
-      this.empowerCharge = { slot, abilityId: empowered };
-      this.sim.castAbility(empowered);
-      return;
-    }
+    if (this.empowerHold.press(slot, this.empoweredAbilityIdForSlot(slot), this.sim)) return;
     this.castSlot(slot);
   }
 
   // Slot key UP: release an empowered hold. A non-charging slot already fired
   // on press, so this is a no-op.
   releaseSlot(slot: number): void {
-    if (this.empowerCharge?.slot === slot) {
-      const charge = this.empowerCharge;
-      this.empowerCharge = null;
-      this.sim.releaseEmpoweredAbility(charge.abilityId);
-      this.flashActionSlot(slot);
-      return;
-    }
+    this.empowerHold.releaseSlot(slot, this.sim, (released) => this.flashActionSlot(released));
   }
 
   private bindEmpoweredActionHold(btn: HTMLButtonElement, resolveSlot: () => number): void {
@@ -7289,7 +7278,7 @@ export class Hud {
       if (this.actionBarBind) return; // bind mode owns clicks/holds on the bar
       const slot = resolveSlot();
       if (!this.empoweredAbilityIdForSlot(slot)) return;
-      if (this.empowerCharge) return;
+      if (this.empowerHold.active) return;
       heldPointer = event.pointerId;
       heldSlot = slot;
       this.pressSlot(slot);
@@ -7406,34 +7395,43 @@ export class Hud {
     this.flashActionSlot(0);
   }
 
-  // Shared entry point for hotbar clicks and the 1..0-= keybinds.
-  /**
-   * Fire an action the cross hotbar holds. Routed through castSlot by finding the
-   * action on the bar, so a pad press gets the SAME semantics a key press does
-   * (ground-aim reticle, empower release, sport tap, mouseover cast, the
-   * auto-attack QoL) rather than a second cast path that would drift from it.
-   *
-   * The bar is seeded from the action bar, so the lookup almost always hits. An
-   * action arranged onto the pad and nowhere else falls back to a plain cast (the
-   * one case without a reticle) or, for an item, to the shared item-use seam.
-   */
+  // Pad press edge for a cross hotbar cell. Routed through pressSlot when the bar
+  // holds the action, so a pad press gets the SAME semantics a key press does
+  // (reticle, empower charge, mouseover cast, the auto-attack QoL) rather than a
+  // second cast path that would drift from it; the release edge is releaseCrossHotbarAction.
+  pressCrossHotbarAction(action: { type: 'ability' | 'item'; id: string }): void {
+    if (action.id === CROSS_HOTBAR_ATTACK_ID || action.type === 'item') {
+      this.castCrossHotbarAction(action);
+      return;
+    }
+    const slot = crossHotbarActionSlot(action, this.hotbarActions.length, (barSlot) =>
+      this.actionForSlot(barSlot),
+    );
+    if (slot >= 0) {
+      this.pressSlot(slot);
+      return;
+    }
+    const known = this.sim.known.find((ability) => ability.def.id === action.id);
+    if (known?.def.empowerStages && this.empowerHold.press(-1, action.id, this.sim)) return;
+    this.castCrossHotbarAction(action);
+  }
+
+  releaseCrossHotbarAction(action: { type: 'ability' | 'item'; id: string }): void {
+    this.empowerHold.releaseAction(action, this.sim, (slot) => this.flashActionSlot(slot));
+  }
+
+  // Tap-shaped cross hotbar fire (no hold edge available). The bar is seeded from
+  // the action bar, so the slot lookup almost always hits; an action arranged onto
+  // the pad and nowhere else falls back to a plain cast or the shared item-use seam.
   castCrossHotbarAction(action: { type: 'ability' | 'item'; id: string }): void {
     // Attack is the fixed slot-0 toggle, not something the sim can cast by id.
     if (action.id === CROSS_HOTBAR_ATTACK_ID) {
       this.activateFixedAttackSlot();
       return;
     }
-    // Matched against the EFFECTIVE action of each slot, never the raw array: with
-    // the Attack button on, slot 0 IS Attack and whatever the array holds at index
-    // 0 is not reachable there, so delegating by array index fired auto-attack
-    // instead of the ability the player pressed.
-    let slot = -1;
-    // barSlot 0 is that Attack seat and 1..length are the configurable slots, so
-    // the last one is length itself, not length - 1.
-    for (let i = 0; i <= this.hotbarActions.length && slot < 0; i++) {
-      const onBar = this.actionForSlot(i);
-      if (onBar?.type === action.type && onBar.id === action.id) slot = i;
-    }
+    const slot = crossHotbarActionSlot(action, this.hotbarActions.length, (barSlot) =>
+      this.actionForSlot(barSlot),
+    );
     if (slot >= 0) {
       this.castSlot(slot);
       return;
