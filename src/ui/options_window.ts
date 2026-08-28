@@ -1803,7 +1803,7 @@ export class OptionsWindow {
   // and Jump. Movement-axis actions (forward/strafe/turn) are excluded, they live
   // on the analog stick. Zoom ships unbound by default (no free default slot
   // remains among the 13 bindable buttons), so it is opt-in only from here.
-  private gamepadActionOptions(): { value: string; label: string }[] {
+  private gamepadActionOptions(crossHotbarOwned = false): { value: string; label: string }[] {
     const opts: { value: string; label: string }[] = [
       { value: GAMEPAD_NONE, label: t('hud.options.unbound') },
       { value: 'escape', label: t('hudChrome.controller.menuAction') },
@@ -1817,6 +1817,9 @@ export class OptionsWindow {
     ];
     for (const a of BIND_ACTIONS) {
       if (a.id === 'attackMove') continue; // mode-gated; not a useful pad default
+      // Runtime suppresses flat action-bar slots while the cross hotbar is on,
+      // so do not offer a binding that would be accepted here but never fire.
+      if (crossHotbarOwned && a.id.startsWith('slot')) continue;
       if (a.kind !== 'edge' && a.id !== 'jump') continue;
       opts.push({ value: a.id, label: this.actionDisplayName(a.id, a.label) });
     }
@@ -1840,14 +1843,12 @@ export class OptionsWindow {
     body.appendChild(head);
 
     if (hooks) {
-      const opts = this.gamepadActionOptions();
       const kind = hooks.gamepad.kind();
-      // Only the triggers lose their bare flat bindings while the cross hotbar is
-      // on: they are held modifiers. Face and d-pad buttons remain ordinary
-      // remappable actions until a trigger is held, so keep those rows visible.
       const crossHotbarOwned = hooks.settings.get('gamepadCrossHotbar');
+      const opts = this.gamepadActionOptions(crossHotbarOwned);
       for (const { button, action } of hooks.gamepad.entries()) {
         if (crossHotbarOwned && isCrossHotbarModifier(button)) continue;
+        const current = crossHotbarOwned && action.startsWith('slot') ? GAMEPAD_NONE : action;
         const row = document.createElement('div');
         row.className = 'set-row';
         const name = document.createElement('span');
@@ -1861,7 +1862,7 @@ export class OptionsWindow {
         // language picker's ariaLabel above.
         const dd = this.deps.buildDropdown(
           opts,
-          action,
+          current,
           (v) => hooks.gamepad.bind(button, v),
           undefined,
           {
