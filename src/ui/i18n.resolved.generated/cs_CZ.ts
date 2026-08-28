@@ -1541,6 +1541,8 @@ export const cs_CZ: EnTranslations = {
       "stickyTarget": "Zachovat cíl při kliknutí na zem",
       "showItemLevel": "Zobrazit úroveň předmětu",
       "showReliquaryTracker": "Zobrazit Reliquary Tracker",
+      "confirmVendorSell": "Confirm Before Selling",
+      "confirmVendorSellNote": "Turning this off sells items with a single click and no confirmation, so a shifted bag slot could vendor the wrong item.",
       "itemLevelLine": "Úroveň předmětu {level}",
       "itemScoreLine": "Skóre {score}",
       "showSecondaryActionBar": "Zobrazit sekundární akční lištu",
@@ -4382,7 +4384,13 @@ export const cs_CZ: EnTranslations = {
       "upstream": "Epic neodpověděl. Zkus to za chvíli znovu."
     },
     "wallet": {
-      "handoff_invalid": "Toto oprávnění peněženky vypršelo nebo je neověřitelné. Zkus to znovu."
+      "handoff_invalid": "Toto oprávnění peněženky vypršelo nebo je neověřitelné. Zkus to znovu.",
+      "reauth_required": "Potvrď tuto změnu peněženky heslem k účtu.",
+      "reauth_two_factor": "Tvůj účet má zapnuté dvoufaktorové ověření. Pro potvrzení zadej svůj kód.",
+      "reauth_no_password": "Nejdřív si v nastavení účtu nastav heslo a pak to zkus znovu.",
+      "reauth_bad_signature": "Podpis peněženky se nepodařilo ověřit. Zkus to znovu.",
+      "reauth_bad_password": "Tvoje heslo není správné.",
+      "reauth_bad_two_factor": "Tento kód není platný, zkus to znovu."
     },
     "ota_updates": {
       "invalid_input": "Neplatný vstup."
@@ -7308,6 +7316,13 @@ export const cs_CZ: EnTranslations = {
     "unlink": "Odpojit od účtu",
     "unlinkTitle": "Odebrat ověření peněženky z tohoto účtu",
     "unlinkAria": "Odebrat ověření peněženky z tohoto účtu",
+    "reauthTitle": "Potvrzení změny peněženky",
+    "reauthUnlinkTitle": "Potvrzení odebrání peněženky",
+    "reauthHelp": "Z bezpečnostních důvodů zadej heslo k účtu pro povolení této změny.",
+    "reauthNoPassword": "Tento účet se přihlašuje bez hesla. Nejdřív si v nastavení účtu nastav heslo a pak to zkus znovu.",
+    "reauthConfirm": "Potvrdit",
+    "reauthCancel": "Zrušit",
+    "reauthClose": "Zavřít",
     "signOut": "Odpojit",
     "signOutTitle": "Odpojit aplikaci peněženky v tomto prohlížeči",
     "signOutAria": "Odpojit aplikaci peněženky v tomto prohlížeči",

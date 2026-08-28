@@ -1541,6 +1541,8 @@ export const ja_JP: EnTranslations = {
       "stickyTarget": "地面クリックでターゲットを維持",
       "showItemLevel": "アイテムレベルを表示",
       "showReliquaryTracker": "聖遺物庫トラッカーを表示",
+      "confirmVendorSell": "売却前に確認する",
+      "confirmVendorSellNote": "オフにすると確認なしでワンクリックでアイテムを売却します。カバンのスロットがずれていると、誤ったアイテムを売却する可能性があります。",
       "itemLevelLine": "アイテムレベル {level}",
       "itemScoreLine": "スコア {score}",
       "showSecondaryActionBar": "セカンダリアクションバーを表示",
@@ -4382,7 +4384,13 @@ export const ja_JP: EnTranslations = {
       "upstream": "Epicから応答がありません。しばらくしてからもう一度お試しください。"
     },
     "wallet": {
-      "handoff_invalid": "ウォレット認証の有効期限が切れたか、確認できませんでした。もう一度お試しください。"
+      "handoff_invalid": "ウォレット認証の有効期限が切れたか、確認できませんでした。もう一度お試しください。",
+      "reauth_required": "このウォレット変更を確認するには、アカウントのパスワードを入力してください。",
+      "reauth_two_factor": "このアカウントは二要素認証が有効です。確認のため認証コードを入力してください。",
+      "reauth_no_password": "まずアカウント設定でパスワードを設定してから、もう一度お試しください。",
+      "reauth_bad_signature": "ウォレットの署名を確認できませんでした。もう一度お試しください。",
+      "reauth_bad_password": "パスワードが正しくありません。",
+      "reauth_bad_two_factor": "そのコードは無効です。もう一度お試しください。"
     },
     "ota_updates": {
       "invalid_input": "入力が無効です。"
@@ -7308,6 +7316,13 @@ export const ja_JP: EnTranslations = {
     "unlink": "連携解除",
     "unlinkTitle": "このアカウントからウォレット認証を削除",
     "unlinkAria": "このアカウントからウォレット認証を削除",
+    "reauthTitle": "ウォレット変更の確認",
+    "reauthUnlinkTitle": "ウォレット削除の確認",
+    "reauthHelp": "セキュリティ保護のため、この変更を許可するにはアカウントのパスワードを入力してください。",
+    "reauthNoPassword": "このアカウントはパスワードなしでサインインしています。まずアカウント設定でパスワードを設定してから、もう一度お試しください。",
+    "reauthConfirm": "確認",
+    "reauthCancel": "キャンセル",
+    "reauthClose": "閉じる",
     "signOut": "接続解除",
     "signOutTitle": "このブラウザでウォレットアプリの接続を解除",
     "signOutAria": "このブラウザでウォレットアプリの接続を解除",

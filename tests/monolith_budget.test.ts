@@ -304,40 +304,23 @@ const MONOLITHS: MonolithRow[] = [
     // the ratchet follows the merged file down). Exact count, zero slack.
     // Re-pinned to the exact merged count of the v0.39.3 main back-merge
     // (the utc_day import consolidation shed one line).
-    // Lowered after the movement-harness extractions: the snapshot alpha
-    // formula (src/net/snapshot_alpha.ts), the input-echo/jitter EMAs
-    // (src/net/input_echo_tracker.ts), and the self-prediction gate plus its
-    // immobile-aura table (src/game/self_motion_gate.ts) all left the loop.
-    // Exact count, zero slack.
-    // Re-pinned for the PR #3647 release merge: main.ts wires the v2 movement
-    // predictor plus the legacy v1 fallback frame. Exact merged count, zero
-    // slack.
-    // Raised to the exact new count for the showTargetSwingTimer dispatch
-    // case: a three-line thin delegate onto hud.setShowTargetSwingTimer,
-    // exactly the shape every other boolean toggle's dispatch already takes
-    // in this method (main.ts is a firewall, not a home; the real state and
-    // paint logic live in settings.ts and target_swing_timer_bars.ts). The
-    // merged tree lands below PR #3648's parent pin because the movement
-    // harness extractions ride in too, so keep the exact merged count.
-    // The v0.41.0 reconcile lands below both parent pins, so the ratchet
-    // follows the exact merged count down. The PR #3647 batch-side movement
-    // extractions also shed lines, but the reconciled file keeps the
-    // showTargetSwingTimer dispatch.
-    // Raised 11564 -> 11567 (+3) for the alwaysShowAllBuffs case in
-    // applySetting's dispatch switch (PR #3668 follow-up): a single
-    // settings-key case, the same 3-line shape every other boolToggle case in
-    // this switch already takes; the switch itself IS the seam. Maintainer
-    // decision, exact merged count.
-    // The release merge lands below the PR-side parent pin while preserving the
-    // alwaysShowAllBuffs dispatch case, so the ratchet follows the exact merged
-    // count down.
     // Down 11564 -> 11563 at the desktop-signing round: the wallet-handoff
     // availability probe and browser authorizer moved to
     // src/net/desktop_wallet_handoff.ts (thin hoisted delegators remain),
     // paying for the Exchange desktop-signer wiring at the attach site.
     // The v0.41.0 reconcile keeps the alwaysShowAllBuffs dispatch and the
     // desktop signer extraction, and lands at this exact count.
-    ceiling: 11563,
+    // Lowered to the exact size after the Discord status/presence payload
+    // coercers moved into src/ui/discord_status.ts; the freed lines paid for
+    // the R11 wallet-reauth wiring (src/ui/wallet_reauth_prompt.ts) including
+    // the QA round's cancel-path adapter disconnect.
+    // Lowered again after the Discord login-choice persistence moved into
+    // src/game/discord_login_choice.ts (the review-round-2 payment for the
+    // stale-cache self-heal reads and the unlink re-entrancy guard).
+    // Re-pinned to the exact resolved v0.41 merge count after keeping the
+    // desktop signer extraction, alwaysShowAllBuffs dispatch, wallet reauth,
+    // and Discord login-choice persistence.
+    ceiling: 11523,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -391,7 +374,9 @@ const MONOLITHS: MonolithRow[] = [
     // Thin, unavoidable wiring; no clean branch-owned extraction exists for a
     // single conditional line inside an already-inline-conditional function.
     // The merged tree lands between the two parent pins; keep the exact count.
-    ceiling: 10645,
+    // Re-pinned to the exact resolved v0.41 merge count after combining the
+    // mail partition flush hook with custody overlay replay.
+    ceiling: 10649,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -431,7 +416,12 @@ const MONOLITHS: MonolithRow[] = [
     // (parseDesktopWalletHandoffStatus), paying for the stepup action kind.
     // The v0.41.0 reconcile keeps the combat-scalar extraction, movement-wire
     // mirror, target-swing mirror, and desktop handoff validation. Exact count.
-    ceiling: 5923,
+    // Lowered to the exact size after the ApiError family moved into
+    // src/net/api_error.ts; the freed lines paid for the R11 wallet
+    // re-auth params on linkWallet/unlinkWallet.
+    // Re-pinned to the exact resolved v0.41 merge count after keeping both
+    // the desktop handoff validation and ApiError extraction surfaces.
+    ceiling: 5908,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -454,7 +444,9 @@ const MONOLITHS: MonolithRow[] = [
   },
   {
     file: 'server/db.ts',
-    ceiling: 4980,
+    // Re-pinned to the exact resolved v0.41 merge count after combining the
+    // mail-partitioned save path with custody-overlay schema and bake helpers.
+    ceiling: 5037,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {
@@ -499,7 +491,14 @@ const MONOLITHS: MonolithRow[] = [
     // (quote legs, price/estimate readouts, WocMarketEconomy) moved to
     // woc_market_economy_types.ts (the monitor-types pattern), paying for the
     // desktopHandoff registrar dep and its four registration call sites.
-    ceiling: 3929,
+    // Up 3989 -> 4019 for the parked-review operator arm: the resolution
+    // logic lives in woc_market_review_resolution.ts (the sibling pattern);
+    // these lines are the thin enabled-gated service method plus the two
+    // realm-scoped rows on the WocMarketDb contract the review round asked
+    // for. Exact count, zero slack.
+    // Re-pinned to the exact resolved v0.41 merge count after keeping the
+    // desktop-signing extraction and parked-review operator arm.
+    ceiling: 3956,
     seam: 'a woc_market_<thing>.ts sibling behind WocMarketDeps (the drift-warn split is the template)',
   },
   {
