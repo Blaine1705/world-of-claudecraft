@@ -189,7 +189,7 @@ describe('Varkhul Forgestorm rendering', () => {
     );
     expect(visual).toContain('this.worldfireVisuals.update(dt, reducedMotion)');
     expect(visual).toContain('this.worldfireVisuals.dispose()');
-    expect(renderer).toContain('dispatchVarkhulForgeHammerAttack(ev');
+    expect(renderer).toContain('routeVarkhulForgeHammer(ev');
     expect(renderer).toContain('this.triggerAttack(entityId, abilityId)');
     expect(renderer).toContain('new VarkhulForgestormVisuals(this.scene');
   });

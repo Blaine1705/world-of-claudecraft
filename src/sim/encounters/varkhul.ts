@@ -95,7 +95,6 @@ import {
   VARKHUL_ENGAGE_ARENA_LOCAL_POS,
   varkhulEngagePulled,
   varkhulForgingHammerTick,
-  varkhulLeapPos,
 } from '../varkhul_engage';
 import {
   VARKHUL_FORGE_BEAM_BLOCK_DAMAGE_TICK_SECONDS,
@@ -148,6 +147,7 @@ import {
   pointInVarkhulFrontal,
   VARKHUL_FRONTAL_CAST_ID,
   VARKHUL_FRONTAL_CAST_SECONDS,
+  VARKHUL_FRONTAL_RECOVER_SECONDS,
   varkhulFrontalDamageMaxHp,
 } from '../varkhul_frontal';
 import {
@@ -213,6 +213,7 @@ export {
   VARKHUL_FRONTAL_DAMAGE_MAX_HP_NORMAL,
   VARKHUL_FRONTAL_HALF_ANGLE,
   VARKHUL_FRONTAL_RANGE,
+  VARKHUL_FRONTAL_RECOVER_SECONDS,
 } from '../varkhul_frontal';
 
 export const VARKHUL_CINDER_ORBS_CAST_ID = 'Cinder Orbs';
@@ -370,6 +371,7 @@ function initVarkhulEncounter(boss: Entity): VarkhulEncounterState {
       frontalTimer: VARKHUL_FIRST_FRONTAL_SECONDS,
       frontalCastKey: 0,
       frontalCastRemaining: 0,
+      frontalRecoverRemaining: 0,
       frontalFacing: boss.facing,
       frontalTargetId: null,
       cinderOrbsTimer: VARKHUL_FIRST_CINDER_ORBS_SECONDS,
@@ -524,6 +526,7 @@ function cancelMajorAbility(ctx: SimContext, boss: Entity, st: VarkhulEncounterS
   clearEncounterWarnings(ctx, boss);
   st.majorAbility = 'none';
   st.frontalCastRemaining = 0;
+  st.frontalRecoverRemaining = 0;
   st.frontalTargetId = null;
   st.cinderOrbsMarkRemaining = 0;
   st.cinderOrbsTargetIds = [];
@@ -699,6 +702,7 @@ function releaseFrontal(
     ability: VARKHUL_FRONTAL_CAST_ID,
   });
   st.frontalCastRemaining = 0;
+  st.frontalRecoverRemaining = VARKHUL_FRONTAL_RECOVER_SECONDS;
   st.frontalTargetId = null;
   st.majorAbility = 'none';
   clearBossCast(boss);
@@ -1102,6 +1106,16 @@ function startForgestormWave(
     (point) => ctx.groundPos(point.x, point.z),
   );
   addForgestormWarnings(ctx, boss, st.forgestormPoints);
+  // Each wave's windup plays the PowerUp one-shot (attackByAbility): he draws
+  // the storm down, the meteors answer, and melee resumes after the last wave.
+  ctx.emit({
+    type: 'spellfx',
+    sourceId: boss.id,
+    targetId: boss.id,
+    school: 'fire',
+    fx: 'windup',
+    ability: VARKHUL_FORGESTORM_CAST_ID,
+  });
 }
 
 function startForgestorm(ctx: SimContext, boss: Entity, st: VarkhulEncounterState): void {
@@ -2870,12 +2884,31 @@ export function updateVarkhulEncounter(ctx: SimContext, boss: Entity, pursueTarg
   }
 
   if (st.engage.phase !== 'done') {
-    // First engage: turn from the anvil, roar, then leap to the arena center.
-    // Runs BELOW every ability timer on purpose: the cast schedule ticks
-    // through the staging, so mechanics are byte-identical to an unstaged
-    // pull; only his melee and chase start ~2.2s late.
-    if (st.engage.phase === 'forging') {
-      startVarkhulEngage(st.engage, boss.pos);
+    // First engage: leave the anvil, run to the arena center, stand there and
+    // roar (PowerUp), then start fighting. Runs BELOW every ability timer on
+    // purpose: the cast schedule ticks through the staging, so mechanics are
+    // byte-identical to an unstaged pull; only his melee and chase start late.
+    if (st.engage.phase === 'forging') startVarkhulEngage(st.engage);
+    const instance = encounterInstance(ctx, boss);
+    const origin = instance ? ctx.instanceOriginOf(instance) : null;
+    const to = origin
+      ? ctx.groundPos(
+          origin.x + VARKHUL_ENGAGE_ARENA_LOCAL_POS.x,
+          origin.z + VARKHUL_ENGAGE_ARENA_LOCAL_POS.z,
+        )
+      : { ...boss.spawnPos };
+    // moveToward reports arrival (and faces the run itself); the roar cue
+    // fires on the one tick the run hands over to the taunt.
+    const arrived =
+      st.engage.phase !== 'running'
+        ? true
+        : ctx.moveToward(
+            boss,
+            to,
+            boss.moveSpeed * mobCombatProfile(boss).chaseSpeedMult * ctx.moveSpeedMult(boss),
+          );
+    const step = tickVarkhulEngage(st.engage, DT, arrived);
+    if (step.roar) {
       ctx.emit({
         type: 'spellfx',
         sourceId: boss.id,
@@ -2884,23 +2917,20 @@ export function updateVarkhulEncounter(ctx: SimContext, boss: Entity, pursueTarg
         fx: 'shout',
       });
     }
-    boss.facing = steadyAngleTo(boss.pos, target.pos, boss.facing);
-    const step = tickVarkhulEngage(st.engage, DT);
-    if (step.phase === 'leaping' || step.landed) {
-      const instance = encounterInstance(ctx, boss);
-      const origin = instance ? ctx.instanceOriginOf(instance) : null;
-      const from = st.engage.leapFrom ?? boss.pos;
-      const to = origin
-        ? ctx.groundPos(
-            origin.x + VARKHUL_ENGAGE_ARENA_LOCAL_POS.x,
-            origin.z + VARKHUL_ENGAGE_ARENA_LOCAL_POS.z,
-          )
-        : { ...boss.spawnPos };
-      const pos = varkhulLeapPos(from, to, to.y, step.landed ? 1 : step.leapT);
-      if (step.landed) pos.y = to.y;
-      boss.prevPos = { ...boss.pos };
-      boss.pos = pos;
+    if (step.phase !== 'running') {
+      boss.facing = steadyAngleTo(boss.pos, target.pos, boss.facing);
     }
+    return;
+  }
+  if (st.frontalRecoverRemaining > CAST_COMPLETE_EPS) {
+    // Post-Sweep recovery: he stands his ground while the Slam clip stands
+    // him back up, turning toward the tank, and only THEN runs. Chasing under
+    // the recovery animation slid the model across the floor, which read as a
+    // teleport to the aggro target. Runs BELOW the ability timers like the
+    // engage staging, so the cast schedule is unchanged; a cast firing
+    // mid-recovery simply takes over.
+    st.frontalRecoverRemaining -= DT;
+    boss.facing = steadyAngleTo(boss.pos, target.pos, boss.facing);
     return;
   }
   boss.swingTimer = Math.max(0, boss.swingTimer - DT);

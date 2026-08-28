@@ -684,7 +684,7 @@ import {
   UnderwaterView,
 } from './underwater';
 import { createPrewarmGroupSlot, createVariantPrewarmSlot } from './variant_prewarm_slot';
-import { dispatchVarkhulForgeHammerAttack } from './varkhul_forge_hammer';
+import { routeVarkhulForgeHammer } from './varkhul_forge_hammer';
 import { VarkhulForgestormVisuals } from './varkhul_forgestorm_visual';
 import { SCHOOL_COLORS, Vfx } from './vfx';
 import { createOffsetVfxAnchor, createVfxAnchor, type VfxAnchorPose } from './vfx_anchor';
@@ -7776,7 +7776,7 @@ export class Renderer {
         spawnArmyPortalBurstEvent(this.necromancyArmyPortalFx, ev, (id) =>
           this.sim.entities.get(id),
         );
-        dispatchVarkhulForgeHammerAttack(ev, (entityId, abilityId) =>
+        routeVarkhulForgeHammer(ev, this.vfx, this.sim.cfg.seed, (entityId, abilityId) =>
           this.triggerAttack(entityId, abilityId),
         );
         // Spec-driven ground-cast visuals claim the point-anchored cues first
