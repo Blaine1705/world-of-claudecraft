@@ -693,6 +693,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/dungeon/ignivar_prop_steam_machine_round.glb": "/media/models/dungeon/ignivar_prop_steam_machine_round.ca5e64d61339.glb",
   "models/dungeon/ignivar_prop_steam_pipes.glb": "/media/models/dungeon/ignivar_prop_steam_pipes.ee785363950c.glb",
   "models/dungeon/ignivar_prop_vault_door.glb": "/media/models/dungeon/ignivar_prop_vault_door.7f6fb10cf2fd.glb",
+  "models/dungeon/ignivar_prop_water_pump.glb": "/media/models/dungeon/ignivar_prop_water_pump.cf5aef51ad77.glb",
   "models/dungeon/ignivar_wall.glb": "/media/models/dungeon/ignivar_wall.cf28c46e920a.glb",
   "models/dungeon/ignivar_wall_arched.glb": "/media/models/dungeon/ignivar_wall_arched.87752f406956.glb",
   "models/dungeon/ignivar_wall_archedwindow_gated.glb": "/media/models/dungeon/ignivar_wall_archedwindow_gated.6bc69aa20453.glb",

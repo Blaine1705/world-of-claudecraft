@@ -1443,8 +1443,14 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     entry: { x: 0, z: -27 },
     exitOffset: { x: 0, z: -30 },
     spawns: IGNIVAR_RAID_SPAWN_LIST,
-    npcs: [{ npcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID, x: 8, z: 27 }],
+    // Between the north pillars, facing south into the arena (Math.PI = -z).
+    npcs: [{ npcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID, x: 10, z: 24, facing: Math.PI }],
     objects: [
+      // The four water pumps ARE the water conduits: each pump is promoted to
+      // a sim object so the encounter can flip its state (ready/active/
+      // cooldown) and cleanse players standing in its water. Positions match
+      // the baked water_pump dressing placements (IGNIVAR_CONDUITS), so the
+      // state overlay renders on the pump the player sees.
       ...IGNIVAR_CONDUITS.map((conduit) => ({
         itemId: '',
         name: `${conduit.id} Water Conduit`,

@@ -5,7 +5,7 @@
 import * as THREE from 'three';
 import { IGNIVAR_WATER_CLEANSE_RADIUS } from '../sim/encounters/ignivar';
 import { type IgnivarConduitState, ignivarConduitStateForTemplate } from '../sim/ignivar_arena';
-import { EMISSIVE_GLOW, GFX, surfaceMat } from './gfx';
+import { GFX, surfaceMat } from './gfx';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 
 const HEIGHT = 3.6;
@@ -235,42 +235,16 @@ function buildTemplate(state: IgnivarConduitState): THREE.Group {
   group.name = `ignivarWaterConduit:${state}`;
   group.userData.ignivarConduitState = state;
 
-  const basalt = sharedMaterial({
-    color: 0x302b2b,
-    roughness: 0.96,
-    metalness: 0.02,
-    flatShading: !GFX.standardMaterials,
-  });
+  // The physical conduit body is the placed water_pump dressing prop. This
+  // view draws only the readable water-state layers (the cleanse pool, the
+  // ready aim marker, the active jet, the cooldown seal), so they render on
+  // the pump the player already sees rather than a second stone plinth.
   const rim = sharedMaterial({
     color: 0x62564e,
     roughness: 0.82,
     metalness: 0.08,
     flatShading: !GFX.standardMaterials,
   });
-  const water = sharedMaterial({
-    color: state === 'ready' ? 0x34b3ca : state === 'active' ? 0x56deed : 0x35464c,
-    roughness: 0.24,
-    metalness: 0,
-    emissive: state === 'ready' ? 0x176f83 : state === 'active' ? 0x27bdd4 : 0x10191c,
-    emissiveIntensity:
-      state === 'active' ? EMISSIVE_GLOW : state === 'ready' ? EMISSIVE_GLOW * 0.62 : 0.35,
-  });
-
-  group.add(mesh(new THREE.CylinderGeometry(2.15, 2.4, 0.55, 12), basalt, 0.275));
-  group.add(mesh(new THREE.CylinderGeometry(1.55, 1.8, 0.28, 12), rim, 0.68));
-
-  const leftPost = mesh(new THREE.BoxGeometry(0.55, 2.45, 0.7), basalt, 1.75);
-  leftPost.position.x = -1.2;
-  group.add(leftPost);
-  const rightPost = leftPost.clone();
-  rightPost.position.x = 1.2;
-  group.add(rightPost);
-  group.add(mesh(new THREE.BoxGeometry(2.95, 0.55, 0.8), rim, 3.0));
-
-  const basin = mesh(new THREE.CylinderGeometry(1.18, 1.18, 0.08, 16), water, 0.86);
-  basin.name = 'ignivarWaterBasin';
-  basin.castShadow = false;
-  group.add(basin);
 
   if (state === 'ready') addReadyVisual(group);
   if (state === 'cooldown') addCooldownVisual(group, rim);

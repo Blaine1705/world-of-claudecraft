@@ -148,29 +148,17 @@ describe('Ignivar water conduit renderer', () => {
     );
   });
 
-  it('uses a cool-water palette and separates fill, energy, steam, and rune opacity', () => {
-    const ready = buildIgnivarWaterConduit(IGNIVAR_WATER_CONDUIT_TEMPLATES.ready).group;
+  it('separates cleanse fill, energy, steam, and rune opacity in a cool-water palette', () => {
+    // The conduit view is now overlay-only (the pump body is the placed
+    // water_pump dressing prop), so state readability rides these active
+    // layers; per-state distinctness is pinned by the semantic-layers test.
     const active = buildIgnivarWaterConduit(IGNIVAR_WATER_CONDUIT_TEMPLATES.active).group;
-    const cooldown = buildIgnivarWaterConduit(IGNIVAR_WATER_CONDUIT_TEMPLATES.cooldown).group;
-    const readyState = ready.getObjectByName('ignivarWaterConduit:ready');
-    const activeState = active.getObjectByName('ignivarWaterConduit:active');
-    const cooldownState = cooldown.getObjectByName('ignivarWaterConduit:cooldown');
-    if (!readyState || !activeState || !cooldownState) {
-      throw new Error('Conduit state template is missing');
-    }
-    const readyBasin = materialNamed(readyState, 'ignivarWaterBasin');
-    const activeBasin = materialNamed(activeState, 'ignivarWaterBasin');
-    const cooldownBasin = materialNamed(cooldownState, 'ignivarWaterBasin');
     const footprint = materialNamed(active, IGNIVAR_CONDUIT_CLEANSE_FOOTPRINT_NAME);
     const outerColumn = materialNamed(active, 'ignivarWaterColumnOuter');
     const columnCore = materialNamed(active, 'ignivarWaterColumnCore');
     const steam = materialNamed(active, 'ignivarWaterSteamHaloHigh');
     const rune = materialNamed(active, 'ignivarWaterActivationRuneGlow');
 
-    expect(
-      new Set([readyBasin.color.getHex(), activeBasin.color.getHex(), cooldownBasin.color.getHex()])
-        .size,
-    ).toBe(3);
     expect(footprint.opacity).toBeLessThan(steam.opacity);
     expect(steam.opacity).toBeLessThan(outerColumn.opacity);
     expect(outerColumn.opacity).toBeLessThan(columnCore.opacity);
@@ -215,7 +203,7 @@ describe('Ignivar water conduit renderer', () => {
 
     expect(first).not.toBe(second);
     expect(firstMeshes).toHaveLength(secondMeshes.length);
-    expect(firstMeshes.length).toBeGreaterThan(20);
+    expect(firstMeshes.length).toBeGreaterThan(15);
     for (let index = 0; index < firstMeshes.length; index++) {
       const firstMesh = firstMeshes[index];
       const secondMesh = secondMeshes[index];
