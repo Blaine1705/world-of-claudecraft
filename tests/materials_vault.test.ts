@@ -21,6 +21,7 @@ import {
   consumeVaultStock,
   emitVaultCraftConsume,
   isVaultDepositableSlot,
+  restoreVaultStateOnLoad,
   sanitizeVaultState,
   VAULT_BASE_CAP,
   VAULT_UPGRADE_PRICES,
@@ -2228,6 +2229,48 @@ describe('vault wire revision', () => {
     if (!saved) throw new Error('missing serialized character');
     expect(saved).not.toHaveProperty('vaultWireRev');
   });
+
+  it('restoreVaultStateOnLoad bumps the wire rev, unconditionally (the one bumping surface)', () => {
+    // Installing a sanitized vault REWRITES the wire-visible record, and the
+    // cvault signature elides on (rev, blocked) with no cadence backstop
+    // behind it: a live re-install that kept the rev would leave the
+    // client's cvault stale until the next real write. sanitizeVaultState
+    // itself stays PURE (a dry-run caller must be able to sanitize without
+    // touching the wire), so the installer is the one bumping surface. The
+    // bump is pinned UNCONDITIONAL because the installer cannot distinguish
+    // a no-op rebuild from a rewrite (it never sees the previous vault); the
+    // fail-safe direction is one spurious re-send.
+    const host = { name: 'T', vault: { stock: {}, special: [], upgrades: 0 }, vaultWireRev: 0 };
+    restoreVaultStateOnLoad(host, { stock: { copper_ore: 3 }, upgrades: 1 }, [], 1);
+    expect(host.vaultWireRev).toBe(1);
+    expect(host.vault.stock).toEqual({ copper_ore: 3 });
+    // Re-installing identical content still bumps: no previous vault, no diff.
+    restoreVaultStateOnLoad(host, { stock: { copper_ore: 3 }, upgrades: 1 }, [], 1);
+    expect(host.vaultWireRev).toBe(2);
+    // The sanitizer's early-return shape bumps too: the installer replaces
+    // whatever was there with the returned empty vault, still a rewrite.
+    restoreVaultStateOnLoad(host, undefined, [], 1);
+    expect(host.vaultWireRev).toBe(3);
+    expect(host.vault).toEqual({ stock: {}, special: [], upgrades: 0 });
+  });
+
+  it('the real load path bumps the rev exactly once via restoreVaultStateOnLoad', () => {
+    // The decisive half of the case above: the sim.ts call site must actually
+    // route through the revHost arm, or the unit pin holds while the load
+    // path silently regresses to a rev-less replacement. Exactly ONE bump,
+    // because the whole-record replacement is the only load-time vault write.
+    const seed = makeSim();
+    seed.meta(seed.playerId)!.vault = {
+      stock: { copper_ore: 9 },
+      special: [],
+      upgrades: 1,
+    };
+    const state = seed.serializeCharacter(seed.playerId)!;
+    const sim = makeVaultWorld(1);
+    const pid = sim.addPlayer('warrior', 'Reloaded', { state });
+    expect(meta(sim, pid).vault.stock).toEqual({ copper_ore: 9 });
+    expect(meta(sim, pid).vaultWireRev).toBe(1);
+  });
 });
 
 describe('emitVaultCraftConsume (the sort-and-aggregate contract, Phase 04 review)', () => {
@@ -2279,15 +2322,26 @@ describe('the cvault wire signature premise: stock writers are confined', () => 
     const { readdirSync, readFileSync, statSync } = await import('node:fs');
     const { join } = await import('node:path');
     const root = fileURLToPath(new URL('../src/sim', import.meta.url));
+    // The whole-record `meta.vault = ...` replacement is a write like any
+    // other (one assignment swaps every enumerated surface at once), so it
+    // gets its own pattern rather than an exclusion-by-construction claim:
+    // the one sanctioned site is restoreVaultStateOnLoad in
+    // materials_vault.ts (this walk's one excluded file), which pairs the
+    // install with its rev bump.
+    const wholeRecordWrite = /\.vault\s*=(?!=)/;
     const writes = [
       /vault\.(?:stock|special|upgrades)(?:\[[^\]]*\])?\s*(?:=(?!=)|\+=|-=)/,
       /vault\.(?:stock|special)\.(?:push|splice|pop|shift|unshift)\(/,
       /delete\s+[A-Za-z_$][\w$.]*vault\.stock/,
+      wholeRecordWrite,
     ];
-    // POSITIVE CONTROL first: the patterns must recognize the sanctioned
-    // writer's own mutations, or an offenders list of [] proves nothing.
+    // POSITIVE CONTROLS first: the patterns must recognize the sanctioned
+    // writer's own mutations, or an offenders list of [] proves nothing. The
+    // whole-record pattern is verified on its own, against
+    // restoreVaultStateOnLoad's `meta.vault = ...` install.
     const sanctioned = readFileSync(join(root, 'materials_vault.ts'), 'utf8');
     expect(writes.some((pattern) => pattern.test(sanctioned))).toBe(true);
+    expect(wholeRecordWrite.test(sanctioned)).toBe(true);
     const offenders: string[] = [];
     const walk = (dir: string): void => {
       for (const entry of readdirSync(dir)) {
@@ -2299,11 +2353,11 @@ describe('the cvault wire signature premise: stock writers are confined', () => 
         if (!entry.endsWith('.ts') || entry === 'materials_vault.ts') continue;
         const src = readFileSync(full, 'utf8');
         // WRITES only: an indexed or whole-field assignment, a compound
-        // assignment, an array mutator, or a delete. Plain reads
-        // (quest_item_presence's presence probe) are legal everywhere. The
-        // whole-record `meta.vault = ...` replacement is excluded by
-        // construction: it happens only in Sim.addPlayer, where a fresh
-        // session's undefined lastSent covers the signature.
+        // assignment, an array mutator, a delete, or the whole-record
+        // `meta.vault = ...` replacement. Plain reads (quest_item_presence's
+        // presence probe) are legal everywhere. Sim.addPlayer stays a thin
+        // caller of restoreVaultStateOnLoad, so no file outside the one
+        // sanctioned writer matches any pattern.
         if (writes.some((pattern) => pattern.test(src))) offenders.push(full);
       }
     };

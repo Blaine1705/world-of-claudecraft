@@ -23,14 +23,17 @@
 //   may legitimately draw, so there is no membership arm to add for them and
 //   none is missing.
 //
-// The band backstop at the bottom is a THIRD thing again, and it is what makes
-// the whole predicate safe rather than merely correct: it refuses anywhere on
-// the instance plane even when no live record can be found at all (a slot
-// freed the instant a wipe resolved, a hand-edited save parked in a band with
-// no run). It provably subsumes the two position arms above it for today's
-// layout; those are kept anyway because they are layout-INDEPENDENT, and the
-// layout is not (the Yumi band's own header records that its absolute x
-// already had to move once, when the world grid landed).
+// The band backstop is a THIRD thing again, and it is what makes the whole
+// predicate safe rather than merely correct: it refuses anywhere on the
+// instance plane even when no live record can be found at all (a slot freed
+// the instant a wipe resolved, a hand-edited save parked in a band with no
+// run). It provably subsumes the two position scans for today's layout, which
+// is also why it runs AHEAD of them: every registered footprint opens east of
+// the threshold, so an east position answers at one comparison instead of
+// walking the slot pools. The scans are kept anyway because they are
+// layout-INDEPENDENT, and the layout is not (the Yumi band's own header
+// records that its absolute x already had to move once, when the world grid
+// landed).
 //
 // NEW INSTANCED CONTENT MUST BE ADDED HERE. Nothing about this is automatic: a
 // future band placed WEST of DUNGEON_X_THRESHOLD slips past the backstop, and
@@ -112,7 +115,7 @@ function dungeonClaimsCanSitWestOfThreshold(): boolean {
 
 /** The composed fast-path predicate, OUTSIDE vaultDrawBlocked's body so the
  *  one-occurrence-per-arm source pin in tests/vault_craft_gate.test.ts keeps
- *  seeing exactly ONE threshold comparison inside the predicate (the final
+ *  seeing exactly ONE threshold comparison inside the predicate (the hoisted
  *  backstop): true when `x` is west of the threshold AND no registered claim
  *  can sit there. The dungeon half is derived from the live defs above; the
  *  RIFT half is the static band term (RIFT_BAND_X_MIN east of the
@@ -176,16 +179,18 @@ export function vaultDrawBlocked(ctx: SimContext, pid: number): boolean {
   // with the band, but a band moved west of the threshold reaches its arm
   // below only because that term disables this skip.
   if (vaultGateWestFastPath(pos.x)) return false;
-  // Dungeon AND raid: instanceInfoAt is the canonical claim-footprint read
-  // over the live slot pool (the raid instances are ordinary slots carrying a
-  // RAID_ALLOWED_DUNGEON_IDS dungeon id, so one arm covers both). It is
-  // position-keyed and does NOT filter freed slots, which is the fail-closed
-  // direction here.
-  if (instanceInfoAt(ctx, pos) !== null) return true;
-  // Rift (procedural floors): the floor-region read over the live rift pool,
-  // band-guarded as above.
-  if (isRiftPos(pos.x) && riftInstanceAtPos(ctx, pos) !== null) return true;
-  // THE GEOMETRY BACKSTOP, one arm rather than seven.
+  // THE GEOMETRY BACKSTOP, one arm rather than seven, HOISTED ahead of the
+  // two pool scans below. The hoist is behavior-identical: this comparison is
+  // true for EVERY finite x east of the threshold (the non-finite guard above
+  // already refused NaN, and exact equality is the west side of a strict >),
+  // and east of the threshold every path through the scans also ended in true
+  // (a scan hit refused, and a miss fell through to this same comparison when
+  // it sat at the bottom), so running it first changes no answer, only the
+  // cost. That cost is what the round-4 review measured: with the 4 Hz cvault
+  // cadence gone this gate runs on every broadcast pass per session
+  // (server/vault_wire.ts), and a session standing INSIDE a dungeon or raid
+  // paid a full instance-slot walk (one origin object allocated per slot via
+  // instanceOriginOf) on its way to an answer this comparison already knew.
   //
   // Every instanced band in the game sits on the far-east instance plane, and
   // every one of them opens at least 3575 yards EAST of this threshold, so
@@ -211,7 +216,24 @@ export function vaultDrawBlocked(ctx: SimContext, pid: number): boolean {
   // is that data.ts migrateLegacyInstancePos remaps every one of them to a
   // door position at load, so no live entity ever sits there. A load path that
   // skipped that migration would need its own arm.
-  return pos.x > DUNGEON_X_THRESHOLD;
+  if (pos.x > DUNGEON_X_THRESHOLD) return true;
+  // The two pool scans are reachable only WEST of the threshold now (the
+  // backstop above owns the east), and only when the fast path has disabled
+  // itself because a registered claim or the rift band can sit out here: they
+  // are the layout-independence arms, deciding exactly when the layout has
+  // moved under the backstop.
+  //
+  // Dungeon AND raid: instanceInfoAt is the canonical claim-footprint read
+  // over the live slot pool (the raid instances are ordinary slots carrying a
+  // RAID_ALLOWED_DUNGEON_IDS dungeon id, so one arm covers both). It is
+  // position-keyed and does NOT filter freed slots, which is the fail-closed
+  // direction here.
+  if (instanceInfoAt(ctx, pos) !== null) return true;
+  // Rift (procedural floors): the floor-region read over the live rift pool,
+  // band-guarded as above.
+  if (isRiftPos(pos.x) && riftInstanceAtPos(ctx, pos) !== null) return true;
+  // West of the threshold with no live claim: the open world.
+  return false;
 }
 
 /**

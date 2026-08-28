@@ -794,7 +794,13 @@ export function vaultInfoFor(ctx: SimContext, pid: number): VaultInfo | null {
  *  `upgrades` clamps into the purchasable range so the price indexing stays
  *  coherent. A malformed JSON-shaped save loads; it never throws (both hosts
  *  deliver saves through JSON.parse, which cannot produce the exotic values,
- *  a Symbol or a throwing valueOf, that could trip Number()). */
+ *  a Symbol or a throwing valueOf, that could trip Number()).
+ *
+ *  PURE aside from the droppedSink trace: this function builds and returns a
+ *  fresh record and never touches live player state, so a dry-run caller can
+ *  sanitize without side effects. Installing the result onto a live player is
+ *  restoreVaultStateOnLoad's job, and the vaultWireRev bump an install owes
+ *  lives THERE, the one installer, so there is exactly one bumping surface. */
 export function sanitizeVaultState(
   raw: unknown,
   owner?: string,
@@ -912,4 +918,36 @@ export function sanitizeVaultState(
   );
   if (!droppedSink) warnDroppedInstanceKeys(owner ?? 'vault', localDrops);
   return { stock, special, upgrades };
+}
+
+/** The load-path install: sanitize `raw` and REPLACE `meta.vault` with the
+ *  result, in one move that cannot forget the wire-rev bump. This module owns
+ *  the whole-record replacement the same way it owns every field write, so the
+ *  rev-bump enumeration guard in tests/materials_vault.test.ts stays a
+ *  one-file story; Sim.addPlayer is a thin caller.
+ *
+ *  The bump is the ONE bumping surface for an install (sanitizeVaultState
+ *  stays pure), and it is UNCONDITIONAL per call: the installer never sees
+ *  the previous vault, so it cannot distinguish a no-op rebuild from a
+ *  rewrite, and the fail-safe direction is one spurious re-send. It is
+ *  defence in depth against a future re-install on a live session: on the
+ *  shipped server every addPlayer pairs with a fresh session whose lastSent
+ *  is empty and resumeSession wipes lastSent, so no reachable path serves a
+ *  stale cvault today; the cvault wire elides on the raw (vaultWireRev,
+ *  blocked) signature with no cadence backstop, so a live re-install that
+ *  kept the rev WOULD stick until the next real write.
+ *
+ *  Why the bank twin (sim.ts `meta.bank = sanitizeBankState(...)`) carries no
+ *  bump: bankInfoWireRevFor is banker-proximity gated (null away from a
+ *  banker) and the load path always pairs with an empty lastSent, so a fresh
+ *  session resends regardless; the vault got the bump because vaultWireRevFor
+ *  returns the raw counter. */
+export function restoreVaultStateOnLoad(
+  meta: Pick<PlayerMeta, 'name' | 'vault' | 'vaultWireRev'>,
+  raw: unknown,
+  droppedSink: string[],
+  ownerId: number,
+): void {
+  bumpVaultWireRev(meta);
+  meta.vault = sanitizeVaultState(raw, meta.name, droppedSink, ownerId);
 }

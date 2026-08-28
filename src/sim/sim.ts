@@ -3072,15 +3072,15 @@ export class Sim {
         if (slot.instance && !isMergeableInstancePayload(slot.instance)) slot.count = 1;
         return slot;
       });
-      // Bank sanitizes on load (never destroys items; a pre-bank save has no `bank`
-      // field and sanitizes to an empty bank). See bank.ts sanitizeBankState.
+      // Bank sanitizes on load (never destroys items; a pre-bank save sanitizes to
+      // an empty bank; see bank.ts sanitizeBankState). Deliberately NO wire-rev bump
+      // here, unlike the vault install below: bankInfoWireRevFor is banker-gated and
+      // a load always pairs with an empty lastSent, so a fresh session resends anyway.
       meta.bank = sanitizeBankState(s.bank, meta.name, droppedInstanceJunk, player.id);
       // The Materials Vault sanitizes on load too (never destroys stock; a pre-vault
-      // save has no `vault` field and sanitizes to the empty locked vault). See
-      // materials_vault.ts sanitizeVaultState. The shared sink aggregates BOTH its
-      // special-slot instance junk and the one wholesale-dropped wrong-shaped-stock
-      // trace into the single per-load line the comment above describes.
-      meta.vault = vaultMod.sanitizeVaultState(s.vault, meta.name, droppedInstanceJunk, player.id);
+      // save sanitizes to the empty locked vault): restoreVaultStateOnLoad owns the
+      // whole-record replacement AND its vaultWireRev bump (the rationale sits there).
+      vaultMod.restoreVaultStateOnLoad(meta, s.vault, droppedInstanceJunk, player.id);
       warnDroppedInstanceKeys(meta.name, droppedInstanceJunk);
       let questRevReset = false;
       for (const q of s.questLog) {

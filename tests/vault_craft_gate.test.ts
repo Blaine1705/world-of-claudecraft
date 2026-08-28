@@ -457,6 +457,17 @@ describe('vaultDrawBlocked keeps all six arms', () => {
     ]) {
       expect(body.split(token).length - 1, `${token} inside vaultDrawBlocked`).toBe(1);
     }
+
+    // The round-4 hoist re-anchor: the backstop must stay AHEAD of the two
+    // pool scans. East of the threshold every scan outcome already ended in
+    // true, so the order is behavior-neutral (the behavioural cases live
+    // above: open world, exact threshold, threshold + 1, far-east void, NaN);
+    // what the order carries is the perf contract, no instance-slot walk per
+    // broadcast for a session standing inside an instance. Unambiguous
+    // because the loop above just proved each token occurs exactly once.
+    const backstopAt = body.indexOf('DUNGEON_X_THRESHOLD');
+    expect(backstopAt).toBeLessThan(body.indexOf('instanceInfoAt('));
+    expect(backstopAt).toBeLessThan(body.indexOf('riftInstanceAtPos('));
   });
 });
 
