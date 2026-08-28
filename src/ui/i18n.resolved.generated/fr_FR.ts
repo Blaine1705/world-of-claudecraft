@@ -9013,6 +9013,7 @@ export const fr_FR: EnTranslations = {
       "tradeExpired": "La demande d'échange a expiré.",
       "tradeFailed": "Échange échoué : objets ou argent indisponibles.",
       "tradeBound": "Cet objet est lié et ne peut pas être échangé.",
+      "tradeWindowIneligible": "That can only be traded to players who shared its drop.",
       "marketListBound": "Cet objet est lié et ne peut pas être mis en vente."
     },
     "logs": {

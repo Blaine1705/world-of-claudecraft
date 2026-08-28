@@ -32,13 +32,24 @@ function sameName(a: string, b: string): boolean {
 /** Builds the instance payload for a soulbound copy awarded from party loot,
  *  or undefined when no window applies: fewer than two eligible names means
  *  nobody exists to trade with, so the copy stays a plain grant. `eligible`
- *  is the drop-moment loot-candidate snapshot (winner included). */
+ *  is the drop-moment loot-candidate snapshot (winner included);
+ *  `eligibleIds` carries the stable character ids behind those names where
+ *  the host knows them (the live server always does), and the trade gate
+ *  prefers them, because a display name can be freed by a rename and
+ *  re-taken inside the window while a character id cannot. */
 export function bopPartyTradeInstance(
   nowMs: number,
   eligible: readonly string[],
+  eligibleIds: readonly number[] = [],
 ): ItemInstancePayload | undefined {
   if (eligible.length < 2) return undefined;
-  return { partyTrade: { untilMs: nowMs + BOP_PARTY_TRADE_MS, eligible: [...eligible] } };
+  return {
+    partyTrade: {
+      untilMs: nowMs + BOP_PARTY_TRADE_MS,
+      eligible: [...eligible],
+      ...(eligibleIds.length > 0 ? { eligibleIds: [...eligibleIds] } : {}),
+    },
+  };
 }
 
 /** Whether the copy's window is present, well-formed, and unexpired. The
@@ -54,16 +65,26 @@ export function partyTradeActive(
   return trade.untilMs > nowMs;
 }
 
-/** Whether the copy may be traded to `counterpartyName` right now: the window
- *  must be active AND the counterparty must be one of the drop-moment names. */
+/** Whether the copy may be traded to `counterparty` right now: the window
+ *  must be active AND the counterparty must be one of the drop-moment
+ *  members. When the copy carries stable character ids AND the counterparty
+ *  has one, the id list DECIDES (both directions): a renamed drop-mate stays
+ *  eligible, and a stranger who takes a freed name inside the window does
+ *  not become eligible. The name match remains for id-less hosts (the
+ *  offline sim) and for pre-id persisted copies. */
 export function partyTradeWindowAllows(
   instance: ItemInstancePayload | undefined,
-  counterpartyName: string,
+  counterparty: { name: string; characterId?: number },
   nowMs: number,
 ): boolean {
   if (!partyTradeActive(instance, nowMs)) return false;
-  const eligible = instance?.partyTrade?.eligible ?? [];
-  return eligible.some((name) => typeof name === 'string' && sameName(name, counterpartyName));
+  const trade = instance?.partyTrade;
+  const ids = Array.isArray(trade?.eligibleIds) ? trade.eligibleIds : [];
+  if (ids.length > 0 && counterparty.characterId !== undefined) {
+    return ids.some((id) => typeof id === 'number' && id === counterparty.characterId);
+  }
+  const eligible = trade?.eligible ?? [];
+  return eligible.some((name) => typeof name === 'string' && sameName(name, counterparty.name));
 }
 
 /** Milliseconds left on the copy's window, clamped to zero. */

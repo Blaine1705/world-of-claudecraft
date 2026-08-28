@@ -984,6 +984,17 @@ Implemented alongside the soulbound rulings above:
   joining the party after the kill grants nothing, leaving it loses
   nothing. The window rides the copy through trades, so a recipient can
   pass it on within the same deadline, still only inside that snapshot.
+  The snapshot stores names plus stable character ids; the trade gate
+  prefers ids, so a rename neither strands a drop-mate nor lets a
+  name-squatter in. When a mob has no kill-time snapshot at all, the
+  award grants windowless rather than stamping a loot-time roster.
+- The everyone-passed and winner-offline returns keep the rule: picking
+  the item back up from the corpse's open slot grants the same window a
+  roll win would (`interaction.ts` routes through the shared grant).
+- A windowed grant never auto-equips (equipping would strip the window
+  at the moment of the win); the player equips by hand, accepting the
+  bind. A blocked offer tells the player why: "That can only be traded
+  to players who shared its drop."
 - Equipping the copy ends the window immediately and permanently
   (`items.ts equipmentPayloadFor` strips the payload on the bag-to-worn
   bridge). Mail, market, vendor, and guild bank stay hard-blocked by

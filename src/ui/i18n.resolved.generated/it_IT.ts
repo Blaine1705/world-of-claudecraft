@@ -9013,6 +9013,7 @@ export const it_IT: EnTranslations = {
       "tradeExpired": "La richiesta di scambio è scaduta.",
       "tradeFailed": "Scambio fallito: oggetti o denaro non più disponibili.",
       "tradeBound": "Quell'oggetto è legato e non può essere scambiato.",
+      "tradeWindowIneligible": "That can only be traded to players who shared its drop.",
       "marketListBound": "Quell'oggetto è legato e non può essere messo in vendita."
     },
     "logs": {

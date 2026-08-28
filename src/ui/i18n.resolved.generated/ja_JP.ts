@@ -9013,6 +9013,7 @@ export const ja_JP: EnTranslations = {
       "tradeExpired": "取引リクエストは期限切れです。",
       "tradeFailed": "取引失敗: アイテムまたは所持金が利用できません。",
       "tradeBound": "そのアイテムはバインドされているため取引できません。",
+      "tradeWindowIneligible": "それは同じドロップを分かち合ったプレイヤーにしか取引できません。",
       "marketListBound": "そのアイテムはバインドされているため出品できません。"
     },
     "logs": {

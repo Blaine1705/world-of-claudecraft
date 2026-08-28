@@ -780,8 +780,9 @@ describe('loot_roll: bind-on-pickup party trade window on soulbound awards', () 
     submitLootRoll(sim.ctx, rollId, 'need', a);
     submitLootRoll(sim.ctx, rollId, 'pass', b);
     submitLootRoll(sim.ctx, rollId, 'pass', c);
-    const slot = playerMeta(sim, a).inventory.find((s) => s.itemId === 'slagbreaker_helmet');
-    expectDefined(slot);
+    const slot = expectDefined(
+      playerMeta(sim, a).inventory.find((s) => s.itemId === 'slagbreaker_helmet'),
+    );
     // Winner included: the whole kill-time candidate set may receive the copy.
     expect(slot.instance?.partyTrade?.eligible).toEqual(['Aaa', 'Bbb', 'Ccc']);
     expect(slot.instance?.partyTrade?.untilMs).toBe(
@@ -800,9 +801,39 @@ describe('loot_roll: bind-on-pickup party trade window on soulbound awards', () 
     submitLootRoll(sim.ctx, rollId, 'need', a);
     submitLootRoll(sim.ctx, rollId, 'pass', b);
     submitLootRoll(sim.ctx, rollId, 'pass', c);
-    const slot = playerMeta(sim, a).inventory.find((s) => s.itemId === 'greyjaw_hide_boots');
-    expectDefined(slot);
+    const slot = expectDefined(
+      playerMeta(sim, a).inventory.find((s) => s.itemId === 'greyjaw_hide_boots'),
+    );
     expect(slot.instance).toBeUndefined();
+  });
+
+  it('an everyone-passed return picked up from the corpse still carries the window', () => {
+    const { sim, a, b, c } = partyOfThree();
+    const mob = deadCorpse(sim, a, [a, b, c], {
+      copper: 0,
+      items: [{ itemId: 'slagbreaker_helmet', count: 1 }],
+    });
+    awardSharedLootItem(sim.ctx, 'slagbreaker_helmet', mob, playerMeta(sim, a));
+    mob.loot = { copper: 0, items: [] };
+    const rollId = lootRollEvent(sim).rollId;
+    submitLootRoll(sim.ctx, rollId, 'pass', a);
+    submitLootRoll(sim.ctx, rollId, 'pass', b);
+    submitLootRoll(sim.ctx, rollId, 'pass', c);
+    expect(mob.loot?.items.find((s) => s.itemId === 'slagbreaker_helmet')?.openToAll).toBe(true);
+
+    // The pickup from the returned openToAll slot is the interaction path,
+    // which must route through the same windowed grant as a roll win: the
+    // everyone-passed outcome ("sort it out later") is the most common raid
+    // case the window exists for.
+    const looter = expectDefined(sim.entities.get(b));
+    looter.pos = { ...mob.pos };
+    looter.prevPos = { ...mob.pos };
+    sim.rebucket(looter);
+    expect(sim.lootCorpse(mob.id, b)).toBe(true);
+    const slot = expectDefined(
+      playerMeta(sim, b).inventory.find((s) => s.itemId === 'slagbreaker_helmet'),
+    );
+    expect(slot.instance?.partyTrade?.eligible).toEqual(['Aaa', 'Bbb', 'Ccc']);
   });
 
   it('grants a solo soulbound pickup plain: nobody shared the drop, so no window exists', () => {
@@ -814,8 +845,9 @@ describe('loot_roll: bind-on-pickup party trade window on soulbound awards', () 
     });
     const taken = awardSharedLootItem(sim.ctx, 'slagbreaker_helmet', mob, playerMeta(sim, a));
     expect(taken).toBe(true);
-    const slot = playerMeta(sim, a).inventory.find((s) => s.itemId === 'slagbreaker_helmet');
-    expectDefined(slot);
+    const slot = expectDefined(
+      playerMeta(sim, a).inventory.find((s) => s.itemId === 'slagbreaker_helmet'),
+    );
     expect(slot.instance).toBeUndefined();
   });
 });

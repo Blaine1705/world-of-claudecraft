@@ -9013,6 +9013,7 @@ export const zh_TW: EnTranslations = {
       "tradeExpired": "交易請求已過期。",
       "tradeFailed": "交易失敗：物品或金錢已不可用。",
       "tradeBound": "該物品已綁定，無法交易。",
+      "tradeWindowIneligible": "該物品只能交易給共同獲得該掉落的玩家。",
       "marketListBound": "該物品已綁定，無法上架。"
     },
     "logs": {

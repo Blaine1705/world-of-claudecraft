@@ -9013,6 +9013,7 @@ export const vi_VN: EnTranslations = {
       "tradeExpired": "Yêu cầu giao dịch đã hết hạn.",
       "tradeFailed": "Giao dịch thất bại: vật phẩm hoặc tiền không còn khả dụng.",
       "tradeBound": "Vật phẩm đó đã bị ràng buộc và không thể giao dịch.",
+      "tradeWindowIneligible": "That can only be traded to players who shared its drop.",
       "marketListBound": "Vật phẩm đó đã bị ràng buộc và không thể rao bán."
     },
     "logs": {

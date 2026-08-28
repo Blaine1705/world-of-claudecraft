@@ -9013,6 +9013,7 @@ export const da_DK: EnTranslations = {
       "tradeExpired": "Handelsanmodningen er udløbet.",
       "tradeFailed": "Handel mislykkedes: genstande eller penge er ikke længere tilgængelige.",
       "tradeBound": "Den genstand er bundet og kan ikke handles.",
+      "tradeWindowIneligible": "That can only be traded to players who shared its drop.",
       "marketListBound": "Den genstand er bundet og kan ikke sættes til salg."
     },
     "logs": {

@@ -9013,6 +9013,7 @@ export const es: EnTranslations = {
       "tradeExpired": "La solicitud de comercio ha expirado.",
       "tradeFailed": "Comercio fallido: los objetos o el dinero ya no están disponibles.",
       "tradeBound": "Ese objeto está vinculado y no puede comerciarse.",
+      "tradeWindowIneligible": "That can only be traded to players who shared its drop.",
       "marketListBound": "Ese objeto está vinculado y no puede ponerse a la venta."
     },
     "logs": {

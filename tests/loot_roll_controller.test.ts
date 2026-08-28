@@ -648,9 +648,10 @@ describe('bind-on-pickup note on roll prompts', () => {
 
   it('renders the note on the master-loot curate row too', () => {
     const test = harness();
+    const { type: _needGreedType, ...soulboundFields } = soulboundEvent();
     test.controller.showMasterRoll({
+      ...soulboundFields,
       type: 'masterLoot',
-      ...soulboundEvent(),
       candidates: [
         { pid: 2, name: 'Aki' },
         { pid: 3, name: 'Bex' },

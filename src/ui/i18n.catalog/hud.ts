@@ -532,6 +532,11 @@ const hudStringsEn = {
       tradeExpired: 'The trade request has expired.',
       tradeFailed: 'Trade failed: items or money no longer available.',
       tradeBound: 'That item is bound and cannot be traded.',
+      // The bind-on-pickup window refusal (social/trade.ts windowDenied): the
+      // player holds a windowed copy but this counterparty is not in its
+      // drop-moment snapshot, or the window has run out. Wordy, M16: the
+      // five non-Latin fills land in this same change.
+      tradeWindowIneligible: 'That can only be traded to players who shared its drop.',
       // Wordy, M16: the five non-Latin fills land in this same change.
       marketListBound: 'That item is bound and cannot be listed.',
     },

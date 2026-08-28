@@ -9013,6 +9013,7 @@ export const pl_PL: EnTranslations = {
       "tradeExpired": "Prośba o wymianę wygasła.",
       "tradeFailed": "Wymiana nieudana: przedmioty lub pieniądze są już niedostępne.",
       "tradeBound": "Ten przedmiot jest przywiązany i nie można go wymienić.",
+      "tradeWindowIneligible": "That can only be traded to players who shared its drop.",
       "marketListBound": "Ten przedmiot jest przywiązany i nie można go wystawić na sprzedaż."
     },
     "logs": {

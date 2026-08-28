@@ -11312,6 +11312,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.resonant_steel.name': 'Резонирующая сталь',
   'entities.items.resonant_timber.name': 'Резонирующая древесина',
   'hud.errors.tradeBound': 'Этот предмет привязан и не может быть обменян.',
+  'hud.errors.tradeWindowIneligible': 'Этот предмет можно передать только игрокам, разделившим эту добычу.',
   'hud.errors.marketListBound': 'Этот предмет привязан и не может быть выставлен на продажу.',
   'hudChrome.enchantName.enchant_weapon_might': 'Зачарование оружия - Мощь',
   'hudChrome.enchantName.enchant_weapon_intellect': 'Зачарование оружия - Сила заклинаний',

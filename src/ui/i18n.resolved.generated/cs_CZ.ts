@@ -9013,6 +9013,7 @@ export const cs_CZ: EnTranslations = {
       "tradeExpired": "Žádost o obchod vypršela.",
       "tradeFailed": "Obchod selhal: předměty nebo peníze už nejsou dostupné.",
       "tradeBound": "Tento předmět je vázaný a nelze ho vyměnit.",
+      "tradeWindowIneligible": "That can only be traded to players who shared its drop.",
       "marketListBound": "Tento předmět je vázaný a nelze ho nabídnout k prodeji."
     },
     "logs": {

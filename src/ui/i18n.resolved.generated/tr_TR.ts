@@ -9013,6 +9013,7 @@ export const tr_TR: EnTranslations = {
       "tradeExpired": "Takas isteğinin süresi doldu.",
       "tradeFailed": "Takas başarısız: eşyalar ya da para artık mevcut değil.",
       "tradeBound": "O eşya bağlı ve takas edilemez.",
+      "tradeWindowIneligible": "That can only be traded to players who shared its drop.",
       "marketListBound": "O eşya bağlı ve satışa çıkarılamaz."
     },
     "logs": {

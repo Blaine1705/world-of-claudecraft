@@ -132,6 +132,7 @@ export function localizeErrorText(text: string, deps: ErrorTextLockoutDeps): str
     'The trade request has expired.': 'hud.errors.tradeExpired',
     'Trade failed: items or money no longer available.': 'hud.errors.tradeFailed',
     'That item is bound and cannot be traded.': 'hud.errors.tradeBound',
+    'That can only be traded to players who shared its drop.': 'hud.errors.tradeWindowIneligible',
     'That item is bound and cannot be listed.': 'hud.errors.marketListBound',
     'That quest is not available.': 'questUi.errors.unavailable',
     'That quest is not in your log.': 'questUi.errors.notInLog',

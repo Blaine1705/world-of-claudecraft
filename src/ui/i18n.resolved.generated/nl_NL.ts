@@ -9013,6 +9013,7 @@ export const nl_NL: EnTranslations = {
       "tradeExpired": "Het ruilverzoek is verlopen.",
       "tradeFailed": "Ruil mislukt: voorwerpen of geld niet langer beschikbaar.",
       "tradeBound": "Dat voorwerp is gebonden en kan niet worden verhandeld.",
+      "tradeWindowIneligible": "That can only be traded to players who shared its drop.",
       "marketListBound": "Dat voorwerp is gebonden en kan niet te koop worden aangeboden."
     },
     "logs": {

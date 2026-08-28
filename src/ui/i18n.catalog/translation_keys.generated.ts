@@ -7315,6 +7315,7 @@ export type TranslationKeyFlat =
   | 'hud.errors.tradeFailed'
   | 'hud.errors.tradeInProgress'
   | 'hud.errors.tradeTooFar'
+  | 'hud.errors.tradeWindowIneligible'
   | 'hud.errors.travel'
   | 'hud.errors.unknownCommand'
   | 'hud.errors.whisperAmbiguous'

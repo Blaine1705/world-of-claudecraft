@@ -9013,6 +9013,7 @@ export const id_ID: EnTranslations = {
       "tradeExpired": "Permintaan perdagangan telah kedaluwarsa.",
       "tradeFailed": "Perdagangan gagal: barang atau uang sudah tidak tersedia.",
       "tradeBound": "Barang itu terikat dan tidak dapat diperdagangkan.",
+      "tradeWindowIneligible": "That can only be traded to players who shared its drop.",
       "marketListBound": "Barang itu terikat dan tidak dapat dijual di pasar."
     },
     "logs": {

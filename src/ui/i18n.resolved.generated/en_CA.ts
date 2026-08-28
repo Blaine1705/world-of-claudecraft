@@ -9013,6 +9013,7 @@ export const en_CA: EnTranslations = {
       "tradeExpired": "The trade request has expired.",
       "tradeFailed": "Trade failed: items or money no longer available.",
       "tradeBound": "That item is bound and cannot be traded.",
+      "tradeWindowIneligible": "That can only be traded to players who shared its drop.",
       "marketListBound": "That item is bound and cannot be listed."
     },
     "logs": {

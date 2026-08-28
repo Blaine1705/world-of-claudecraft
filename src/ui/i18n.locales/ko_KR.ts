@@ -11102,6 +11102,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.resonant_steel.name': '공명의 강철',
   'entities.items.resonant_timber.name': '공명의 목재',
   'hud.errors.tradeBound': '그 아이템은 귀속되어 거래할 수 없습니다.',
+  'hud.errors.tradeWindowIneligible': '해당 아이템은 같은 전리품을 함께 획득한 플레이어와만 거래할 수 있습니다.',
   'hud.errors.marketListBound': '그 아이템은 귀속되어 등록할 수 없습니다.',
   'hudChrome.enchantName.enchant_weapon_might': '무기 마법부여 - 위력',
   'hudChrome.enchantName.enchant_weapon_intellect': '무기 마법부여 - 주문력',

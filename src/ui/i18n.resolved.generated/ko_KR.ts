@@ -9013,6 +9013,7 @@ export const ko_KR: EnTranslations = {
       "tradeExpired": "거래 요청이 만료되었습니다.",
       "tradeFailed": "거래 실패: 아이템이나 돈을 더 이상 사용할 수 없습니다.",
       "tradeBound": "그 아이템은 귀속되어 거래할 수 없습니다.",
+      "tradeWindowIneligible": "해당 아이템은 같은 전리품을 함께 획득한 플레이어와만 거래할 수 있습니다.",
       "marketListBound": "그 아이템은 귀속되어 등록할 수 없습니다."
     },
     "logs": {

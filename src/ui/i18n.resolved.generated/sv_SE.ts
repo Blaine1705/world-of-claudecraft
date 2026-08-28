@@ -9013,6 +9013,7 @@ export const sv_SE: EnTranslations = {
       "tradeExpired": "Handelsförfrågan har gått ut.",
       "tradeFailed": "Handeln misslyckades: föremål eller pengar är inte längre tillgängliga.",
       "tradeBound": "Det föremålet är bundet och kan inte handlas.",
+      "tradeWindowIneligible": "That can only be traded to players who shared its drop.",
       "marketListBound": "Det föremålet är bundet och kan inte säljas."
     },
     "logs": {

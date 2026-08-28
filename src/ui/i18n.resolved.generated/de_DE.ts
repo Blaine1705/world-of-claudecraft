@@ -9013,6 +9013,7 @@ export const de_DE: EnTranslations = {
       "tradeExpired": "Die Handelsanfrage ist abgelaufen.",
       "tradeFailed": "Handel fehlgeschlagen: Gegenstände oder Geld sind nicht mehr verfügbar.",
       "tradeBound": "Dieser Gegenstand ist gebunden und kann nicht gehandelt werden.",
+      "tradeWindowIneligible": "That can only be traded to players who shared its drop.",
       "marketListBound": "Dieser Gegenstand ist gebunden und kann nicht zum Verkauf angeboten werden."
     },
     "logs": {
