@@ -94,8 +94,11 @@ const deleteSubGate = createBackgroundDbGate(CHARACTER_DELETE_PERMIT_SUB_CAP, 0)
 // Client-gone abandonments deliberately never count here.
 let saturationRefusals = 0;
 
-/** The delete sub-gate's readout plus the lifetime saturation refusals. */
-export interface CharacterDeleteGateStats extends BackgroundDbGateStats {
+/** The delete sub-gate's readout plus the lifetime saturation refusals and
+ * the ambiguity-resolver outcome counters. */
+export interface CharacterDeleteGateStats
+  extends BackgroundDbGateStats,
+    CharacterDeleteVerifyStats {
   busyRefusals: number;
 }
 
@@ -105,7 +108,7 @@ export interface CharacterDeleteGateStats extends BackgroundDbGateStats {
  * sub slot would be undiagnosable and CHARACTER_DELETE_PERMIT_SUB_CAP
  * untunable from production. */
 export function characterDeleteGateStats(): CharacterDeleteGateStats {
-  return { ...deleteSubGate.stats(), busyRefusals: saturationRefusals };
+  return { ...deleteSubGate.stats(), busyRefusals: saturationRefusals, ...verifyStats };
 }
 
 let registeredAcquireBackgroundPermit: CharacterDeleteAcquireBackgroundPermit | null = null;
@@ -309,14 +312,39 @@ export async function deleteOwnedCharacterRow(
 
 /** Bounded lock wait for the ambiguity verify read below, under the tight
  * 15s statement bound so an expired wait keeps its own honest 55P03
- * (lock_not_available) instead of an ambiguous statement cancel. */
+ * (lock_not_available) instead of an ambiguous statement cancel (a lock
+ * wait counts toward statement_timeout, so the ordering decides which
+ * fires; measured on PG16). */
 export const CHARACTER_DELETE_VERIFY_LOCK_TIMEOUT_MS = 10_000;
 
-/** The verify read, FOR UPDATE on purpose (see ambiguousCommitLanded): a
- * plain SELECT would RACE the hung COMMIT it is verifying. Exported so the
- * pg suite drives this exact statement against real PostgreSQL. */
+/** The verify read, locked on purpose (see ambiguousCommitLanded): a plain
+ * SELECT would RACE the hung COMMIT it is verifying. FOR KEY SHARE, the
+ * weakest mode that still queues behind the in-flight DELETE's row lock
+ * (measured on PG16: identical answers to FOR UPDATE on both outcomes),
+ * because in the not-landed case the verify briefly holds a LIVE character's
+ * row and FOR UPDATE there blocked a concurrent character save into its 2s
+ * lock_timeout (measured: the save died 55P03 under FOR UPDATE, proceeded in
+ * 2 ms under KEY SHARE, whose lock ordinary non-key saves do not conflict
+ * with). Exported so the pg suite drives this exact statement against real
+ * PostgreSQL. */
 export const CHARACTER_DELETE_VERIFY_SQL =
-  'SELECT 1 FROM characters WHERE id = $1 AND account_id = $2 AND realm = $3 FOR UPDATE';
+  'SELECT 1 FROM characters WHERE id = $1 AND account_id = $2 AND realm = $3 FOR KEY SHARE';
+
+/** Lifetime outcomes of the ambiguity resolver, exposed on the gate readout:
+ * the bug this resolver fixes (a landed delete reported unlanded, its world
+ * purge skipped) was production-invisible precisely because nothing counted
+ * here, and a regression would be equally invisible without these. */
+export interface CharacterDeleteVerifyStats {
+  verifyLanded: number;
+  verifyNotLanded: number;
+  verifyFailed: number;
+}
+
+const verifyStats: CharacterDeleteVerifyStats = {
+  verifyLanded: 0,
+  verifyNotLanded: 0,
+  verifyFailed: 0,
+};
 
 const verifyReleaseError = (error: unknown): Error =>
   error instanceof Error ? error : new Error('character delete verify failed');
@@ -339,14 +367,27 @@ const verifyReleaseError = (error: unknown): Error =>
  * "not landed" for a delete that then committed, the client's retry got a
  * 404, and the world-state purge never ran (permanent orphaned market
  * listings and Ravenpost mail), widest exactly under the contention that
- * expired the wall mid-COMMIT. FOR UPDATE queues behind the deleting
+ * expired the wall mid-COMMIT. FOR KEY SHARE queues behind the deleting
  * backend's row lock until that commit resolves and then answers
  * definitively either way: a committed delete fails the EvalPlanQual
- * recheck and returns zero rows; an abort locks the surviving row and
- * returns it. The wait is bounded by lock_timeout in its own transaction;
- * an expiry propagates the ambiguity honestly, exactly like a failed
- * checkout. Runs while the delete permit is still held, so the wait rides
- * the delete's own admission and never stacks over the sub-cap.
+ * recheck and returns zero rows; an abort leaves the surviving row, which
+ * this read shares and returns (see CHARACTER_DELETE_VERIFY_SQL for why
+ * KEY SHARE and not FOR UPDATE). The wait is bounded by lock_timeout in
+ * its own transaction; an expiry propagates the ambiguity honestly,
+ * exactly like a failed checkout.
+ *
+ * One deliberate exception to the module's account-parent-first lock rule:
+ * this transaction takes NO accounts lock. That is safe because it takes
+ * exactly one row lock and never waits while holding another, so it cannot
+ * close a deadlock cycle against the save path, a rival delete, or a
+ * storage-purchase start; any future second lock added here must rejoin
+ * the parent-first hierarchy. Runs while the delete permit is still held,
+ * so the wait rides the delete's own admission and never stacks over the
+ * sub-cap; the cost of that is TIME, stated honestly: an ambiguous delete
+ * extends its permit hold past the 65s wall by up to the checkout bound
+ * plus the 15s verify statement bound (about 85s worst case), so two
+ * simultaneously ambiguous deletes hold both sub-cap slots for that window
+ * and further deletes refuse retryably.
  */
 async function ambiguousCommitLanded(
   db: CharacterDeletePool,
@@ -364,29 +405,55 @@ async function ambiguousCommitLanded(
     verify = await db.connect();
   } catch {
     // Unresolved ambiguity: the original failure is the honest answer.
+    verifyStats.verifyFailed++;
     return false;
   }
+  // A FATAL landing on a checked-out client with no 'error' listener throws
+  // at process level (pg-pool detaches its own idle listener on acquire),
+  // and this client can sit in a lock wait for up to the 10s bound, plenty
+  // of window for a server restart or a backend reap. Swallow it here: the
+  // next statement on the dead client rejects into the catches below, which
+  // discard it. Same hazard the deadline wrapper's own listener covers for
+  // the delete's client (db_transaction_deadline.ts).
+  const onVerifyError = (): void => {};
+  verify.on('error', onVerifyError);
+  const releaseVerify = (error?: Error): void => {
+    verify.removeListener('error', onVerifyError);
+    if (error) verify.release(error);
+    else verify.release();
+  };
   let landed: boolean;
   try {
     await verify.query('BEGIN');
+    // idle_in_transaction rides along like the delete's own transaction: it
+    // fires only when idle BETWEEN statements (a lock wait is not idle), so
+    // it bounds a stalled event loop or a black-holed ROLLBACK without ever
+    // cutting the bounded lock wait short.
     await verify.query(`SET LOCAL statement_timeout = ${DELETE_RESTORE_STATEMENT_TIMEOUT_MS};
-      SET LOCAL lock_timeout = ${CHARACTER_DELETE_VERIFY_LOCK_TIMEOUT_MS}`);
+      SET LOCAL lock_timeout = ${CHARACTER_DELETE_VERIFY_LOCK_TIMEOUT_MS};
+      SET LOCAL idle_in_transaction_session_timeout = '2s'`);
     const row = await verify.query(CHARACTER_DELETE_VERIFY_SQL, [characterId, accountId, realm]);
     landed = (row.rowCount ?? 0) === 0;
   } catch (error) {
     // Same posture as a failed checkout: propagate the original ambiguity.
     // The client may hold an open (possibly aborted) transaction, so it is
     // DISCARDED rather than returned to the pool.
-    verify.release(verifyReleaseError(error));
+    verifyStats.verifyFailed++;
+    releaseVerify(verifyReleaseError(error));
     return false;
   }
+  if (landed) verifyStats.verifyLanded++;
+  else verifyStats.verifyNotLanded++;
   try {
     await verify.query('ROLLBACK');
-    verify.release();
   } catch (error) {
-    // The answer above is already definitive; a failed cleanup only means
-    // this client cannot go back to the pool.
-    verify.release(verifyReleaseError(error));
+    // The answer above is already definitive; a failed ROLLBACK only means
+    // this client cannot go back to the pool. Discarded HERE, not in a
+    // shared catch: a clean release below must never be followed by a
+    // second release (pg throws on double release).
+    releaseVerify(verifyReleaseError(error));
+    return landed;
   }
+  releaseVerify();
   return landed;
 }

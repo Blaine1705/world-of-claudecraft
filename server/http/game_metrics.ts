@@ -150,6 +150,14 @@ export const WOC_CHARACTER_DELETE_GATE = 'woc_character_delete_gate';
  *  count. A Counter, so rate()/increase() read correctly across restarts. */
 export const WOC_CHARACTER_DELETE_BUSY_TOTAL = 'woc_character_delete_busy_total';
 
+/** Total commit-ambiguity verify outcomes on the character-delete path, by
+ *  result (landed / not_landed / failed). The orphan bug this resolver fixes
+ *  (a landed delete reported unlanded, its world purge skipped) was
+ *  production-invisible because nothing counted here; any nonzero movement
+ *  deserves a look, and `failed` climbing means ambiguity is being
+ *  propagated unresolved. A Counter for honest increase() across restarts. */
+export const WOC_CHARACTER_DELETE_VERIFY_TOTAL = 'woc_character_delete_verify_total';
+
 /** Bounded storage-recovery scheduler occupancy, age, and lifetime events. */
 export const WOC_STORAGE_RECOVERY = 'woc_storage_recovery';
 
@@ -360,6 +368,9 @@ export interface GameStateSource {
     refused: number;
     cancelled: number;
     busyRefusals: number;
+    verifyLanded: number;
+    verifyNotLanded: number;
+    verifyFailed: number;
   };
   storageRecovery(): {
     tracked: number;
@@ -526,6 +537,20 @@ export function registerGameStateMetrics(
     collect() {
       this.reset();
       this.inc(source.characterDeleteGate().busyRefusals);
+    },
+  });
+
+  new Counter({
+    name: WOC_CHARACTER_DELETE_VERIFY_TOTAL,
+    help: 'Commit-ambiguity verify outcomes on character deletes by result: landed (the delete committed and its world purge ran), not_landed (the row survived, refusal stood), failed (the verify itself failed, ambiguity propagated unresolved). Any movement deserves a look.',
+    labelNames: ['result'],
+    registers: [registry],
+    collect() {
+      this.reset();
+      const state = source.characterDeleteGate();
+      this.inc({ result: 'landed' }, state.verifyLanded);
+      this.inc({ result: 'not_landed' }, state.verifyNotLanded);
+      this.inc({ result: 'failed' }, state.verifyFailed);
     },
   });
 

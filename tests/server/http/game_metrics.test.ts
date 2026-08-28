@@ -33,6 +33,7 @@ import {
   WOC_BATTLEGROUND_MATCHES_TOTAL,
   WOC_CHARACTER_DELETE_BUSY_TOTAL,
   WOC_CHARACTER_DELETE_GATE,
+  WOC_CHARACTER_DELETE_VERIFY_TOTAL,
   WOC_CHARACTERS_CREATED_TOTAL,
   WOC_CHAT_MESSAGES_TOTAL,
   WOC_COPPER_CREDITED_TOTAL,
@@ -113,6 +114,9 @@ function stubSource(overrides: Partial<GameStateSource> = {}): GameStateSource {
       refused: 0,
       cancelled: 0,
       busyRefusals: 3,
+      verifyLanded: 0,
+      verifyNotLanded: 0,
+      verifyFailed: 0,
     }),
     storageRecovery: () => ({
       tracked: 0,
@@ -406,6 +410,9 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
       refused: 0,
       cancelled: 1,
       busyRefusals: 3,
+      verifyLanded: 2,
+      verifyNotLanded: 1,
+      verifyFailed: 4,
     };
     registerGameStateMetrics(registry, stubSource({ characterDeleteGate: () => gate }));
     const first = await registry.metrics();
@@ -440,15 +447,32 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
       ]),
     );
     expect(sampleValue(first, /^woc_character_delete_busy_total (\d+)$/m)).toBe('3');
+    // The commit-ambiguity verify outcomes, a labeled counter of their own:
+    // the orphan bug the resolver fixes was invisible because nothing
+    // counted; each result arm must read its own source field.
+    expect(WOC_CHARACTER_DELETE_VERIFY_TOTAL).toBe('woc_character_delete_verify_total');
+    expect(first).toContain(`# TYPE ${WOC_CHARACTER_DELETE_VERIFY_TOTAL} counter`);
+    expect(
+      sampleValue(first, /^woc_character_delete_verify_total\{result="landed"\} (\d+)$/m),
+    ).toBe('2');
+    expect(
+      sampleValue(first, /^woc_character_delete_verify_total\{result="not_landed"\} (\d+)$/m),
+    ).toBe('1');
+    expect(
+      sampleValue(first, /^woc_character_delete_verify_total\{result="failed"\} (\d+)$/m),
+    ).toBe('4');
 
     // Live at scrape time (the family rule): a second scrape tracks movement.
-    gate = { ...gate, inFlight: 1, waiting: 0, busyRefusals: 7 };
+    gate = { ...gate, inFlight: 1, waiting: 0, busyRefusals: 7, verifyLanded: 6 };
     const second = await registry.metrics();
     expect(measureValues(second, WOC_CHARACTER_DELETE_GATE)).toMatchObject({
       in_flight: '1',
       waiting: '0',
     });
     expect(sampleValue(second, /^woc_character_delete_busy_total (\d+)$/m)).toBe('7');
+    expect(
+      sampleValue(second, /^woc_character_delete_verify_total\{result="landed"\} (\d+)$/m),
+    ).toBe('6');
   });
 
   it('exports pg pool saturation by state from the source snapshot', async () => {

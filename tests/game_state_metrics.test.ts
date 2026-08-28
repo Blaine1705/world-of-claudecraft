@@ -122,6 +122,9 @@ function sourceOver(server: GameServer): GameStateSource {
       refused: 0,
       cancelled: 0,
       busyRefusals: 0,
+      verifyLanded: 0,
+      verifyNotLanded: 0,
+      verifyFailed: 0,
     }),
     storageRecovery: () => ({
       tracked: 0,

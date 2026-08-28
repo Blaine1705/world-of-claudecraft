@@ -624,6 +624,7 @@ describe('deleteCharacter', () => {
     try {
       const txClient = hungCommitClient();
       const verifyClient = clientStub();
+      const landedBefore = characterDeleteGateStats().verifyLanded;
       // The fresh verification read finds no row: the COMMIT landed, so the
       // delete must report success (link change, busts, and the HTTP arms'
       // world-state purge all key off it) instead of stranding the escrow.
@@ -635,23 +636,40 @@ describe('deleteCharacter', () => {
       await vi.advanceTimersByTimeAsync(65_000);
       await expect(done).resolves.toBe(true);
       // The verify WAITS the hung COMMIT out instead of racing it: its read
-      // runs FOR UPDATE inside its own bounded transaction (a plain SELECT's
+      // runs row-locked inside its own bounded transaction (a plain SELECT's
       // READ COMMITTED snapshot sees the deleted-but-uncommitted row as
       // present and answers "not landed" for a delete that then commits).
       const sql = verifyClient.query.mock.calls.map((call) => String(call[0]));
       expect(sql[0]).toBe('BEGIN');
       expect(sql[1]).toContain(`lock_timeout = ${CHARACTER_DELETE_VERIFY_LOCK_TIMEOUT_MS}`);
       expect(sql[1]).toContain(`statement_timeout = ${DELETE_RESTORE_STATEMENT_TIMEOUT_MS}`);
+      expect(sql[1]).toContain("idle_in_transaction_session_timeout = '2s'");
       const read = verifyClient.query.mock.calls.find((call) =>
         /SELECT 1 FROM characters/.test(String(call[0])),
       );
       expect(String(read?.[0])).toBe(CHARACTER_DELETE_VERIFY_SQL);
-      expect(String(read?.[0])).toContain('FOR UPDATE');
+      // Literal pins on the constant itself (never a self-comparison): the
+      // lock clause and the whole identity predicate are load-bearing. KEY
+      // SHARE, not FOR UPDATE: it queues behind the in-flight DELETE
+      // identically, but in the not-landed case it briefly holds a LIVE
+      // character's row, where FOR UPDATE blocked a concurrent character
+      // save into its 2s lock_timeout (measured; see the SQL's doc).
+      expect(CHARACTER_DELETE_VERIFY_SQL).toContain('FOR KEY SHARE');
+      expect(CHARACTER_DELETE_VERIFY_SQL).toContain(
+        'WHERE id = $1 AND account_id = $2 AND realm = $3',
+      );
       expect(read?.[1]).toEqual([42, 7, REALM]);
       expect(sql.at(-1)).toBe('ROLLBACK');
       expect(verifyClient.release).toHaveBeenCalledOnce();
       // A clean verify returns the client to the pool, never discards it.
       expect(verifyClient.release.mock.calls[0]).toEqual([]);
+      // The FATAL guard wraps the whole checkout window (pg-pool detaches
+      // its own idle listener on acquire) and detaches before release.
+      expect(verifyClient.on).toHaveBeenCalledWith('error', expect.any(Function));
+      expect(verifyClient.removeListener).toHaveBeenCalledWith('error', expect.any(Function));
+      // The landed outcome is counted (the resolver was production-invisible
+      // without it).
+      expect(characterDeleteGateStats().verifyLanded).toBe(landedBefore + 1);
       expect(dbMock.bustGuildList).toHaveBeenCalledOnce();
       expect(drainLinkChanges()).toHaveLength(1);
     } finally {
@@ -664,6 +682,7 @@ describe('deleteCharacter', () => {
     try {
       const txClient = hungCommitClient();
       const verifyClient = clientStub();
+      const notLandedBefore = characterDeleteGateStats().verifyNotLanded;
       // Row present ONLY on the verify read: BEGIN/SET LOCAL/ROLLBACK keep
       // their empty results, so the present answer is the SELECT's own.
       verifyClient.query.mockImplementation(async (sql: string) =>
@@ -685,6 +704,7 @@ describe('deleteCharacter', () => {
       expect(verifyClient.release).toHaveBeenCalledOnce();
       expect(dbMock.bustGuildList).not.toHaveBeenCalled();
       expect(drainLinkChanges()).toHaveLength(0);
+      expect(characterDeleteGateStats().verifyNotLanded).toBe(notLandedBefore + 1);
     } finally {
       vi.useRealTimers();
     }
@@ -694,8 +714,11 @@ describe('deleteCharacter', () => {
     // The wait must expire as a coded 55P03 lock_not_available, which the
     // resolver's catch maps to honest ambiguity; with the statement bound at
     // or under the lock bound, statement_timeout fires first and cancels the
-    // read without saying WHY. The pg suite drives the live semantics; this
-    // ordering is the always-run half.
+    // read without saying WHY (measured: a blocked locked read under the
+    // inverted ordering dies 57014). The pg suite drives the live
+    // semantics; this ordering is the always-run half, and the literal makes
+    // a drifted wait a conscious edit.
+    expect(CHARACTER_DELETE_VERIFY_LOCK_TIMEOUT_MS).toBe(10_000);
     expect(CHARACTER_DELETE_VERIFY_LOCK_TIMEOUT_MS).toBeLessThan(
       DELETE_RESTORE_STATEMENT_TIMEOUT_MS,
     );
@@ -709,6 +732,7 @@ describe('deleteCharacter', () => {
     vi.useFakeTimers();
     try {
       const txClient = hungCommitClient();
+      const failedBefore = characterDeleteGateStats().verifyFailed;
       dbMock.connect
         .mockResolvedValueOnce(txClient)
         .mockRejectedValueOnce(new Error('pool exhausted'));
@@ -719,8 +743,12 @@ describe('deleteCharacter', () => {
       await vi.advanceTimersByTimeAsync(0);
       await vi.advanceTimersByTimeAsync(65_000);
       await failed;
+      // The checkout was really ATTEMPTED (the rejection above was consumed,
+      // not skipped): a resolver that never tried would also pass the rest.
+      expect(dbMock.connect).toHaveBeenCalledTimes(2);
       expect(dbMock.bustGuildList).not.toHaveBeenCalled();
       expect(drainLinkChanges()).toHaveLength(0);
+      expect(characterDeleteGateStats().verifyFailed).toBe(failedBefore + 1);
     } finally {
       vi.useRealTimers();
     }
@@ -737,6 +765,7 @@ describe('deleteCharacter', () => {
     try {
       const txClient = hungCommitClient();
       const verifyClient = clientStub();
+      const failedBefore = characterDeleteGateStats().verifyFailed;
       verifyClient.query.mockImplementation(async (sql: string) => {
         if (/SELECT 1 FROM characters/.test(sql)) {
           throw Object.assign(new Error('canceling statement due to lock timeout'), {
@@ -757,7 +786,71 @@ describe('deleteCharacter', () => {
       expect(verifyClient.release.mock.calls[0][0]).toBeInstanceOf(Error);
       expect(dbMock.bustGuildList).not.toHaveBeenCalled();
       expect(drainLinkChanges()).toHaveLength(0);
+      expect(characterDeleteGateStats().verifyFailed).toBe(failedBefore + 1);
     } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('still reports a landed verify when only the cleanup ROLLBACK fails, discarding the client', async () => {
+    // The one arm that returns the computed answer despite a failed cleanup,
+    // deliberately: the row-gone reading was already definitive, and
+    // demoting it back to ambiguity would skip the world-state purge for a
+    // delete that provably landed (the exact bug the resolver fixes).
+    vi.useFakeTimers();
+    try {
+      const txClient = hungCommitClient();
+      const verifyClient = clientStub();
+      verifyClient.query.mockImplementation(async (sql: string) => {
+        if (sql === 'ROLLBACK') throw new Error('Connection terminated unexpectedly');
+        return { rows: [], rowCount: 0 };
+      });
+      dbMock.connect.mockResolvedValueOnce(txClient).mockResolvedValueOnce(verifyClient);
+      const done = deleteCharacter(7, 42);
+      await vi.advanceTimersByTimeAsync(0);
+      await vi.advanceTimersByTimeAsync(65_000);
+      await expect(done).resolves.toBe(true);
+      expect(dbMock.bustGuildList).toHaveBeenCalledOnce();
+      // Discarded exactly ONCE, with the error: the cleanup failure must
+      // never be followed by a second release (pg throws on double release).
+      expect(verifyClient.release).toHaveBeenCalledOnce();
+      expect(verifyClient.release.mock.calls[0][0]).toBeInstanceOf(Error);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('holds the delete permit across the ambiguity verify (the wait rides the admission)', async () => {
+    // The docstring claim, pinned as an ordering: the verify checkout lands
+    // BEFORE the permit release. Moved after the finally, the verify would
+    // start stacking over the sub-cap under exactly the saturation that
+    // produced the ambiguity, with every test still green but this one.
+    vi.useFakeTimers();
+    const order: string[] = [];
+    configureCharacterDeleteBackgroundGate(async () => ({
+      release: () => {
+        order.push('permit_released');
+      },
+    }));
+    try {
+      const txClient = hungCommitClient();
+      const verifyClient = clientStub();
+      dbMock.connect
+        .mockImplementationOnce(async () => {
+          order.push('connect_tx');
+          return txClient;
+        })
+        .mockImplementationOnce(async () => {
+          order.push('connect_verify');
+          return verifyClient;
+        });
+      const done = deleteCharacter(7, 42);
+      await vi.advanceTimersByTimeAsync(0);
+      await vi.advanceTimersByTimeAsync(65_000);
+      await expect(done).resolves.toBe(true);
+      expect(order).toEqual(['connect_tx', 'connect_verify', 'permit_released']);
+    } finally {
+      configureCharacterDeleteBackgroundGate(null);
       vi.useRealTimers();
     }
   });
