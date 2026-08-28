@@ -136,7 +136,13 @@ const MONOLITHS: MonolithRow[] = [
     // Plus 1 for the Exchange's Solana wallet card: the ONE line is the
     // onWalletUiChange fan-out onto wocMarketWindow.onWalletChanged(), the
     // Claudium panel's existing arm. Exact count.
-    ceiling: 18488,
+    // Raised at the PR #3284 v0.41.0 sync merge, then partially taken back
+    // by the review-round extraction: the frames-menu toggle/select tables,
+    // the reset-key table, and the party-sample roster builder moved to the
+    // pure core interface_unlock_menu_core.ts. What remains on coordinator
+    // state (dimension-mode mover wiring, the edit-preview painter closure,
+    // the player-frame bar lock) is the live-hooks half. Exact merged count.
+    ceiling: 19002,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -271,9 +277,14 @@ const MONOLITHS: MonolithRow[] = [
     // availability probe and browser authorizer moved to
     // src/net/desktop_wallet_handoff.ts (thin hoisted delegators remain),
     // paying for the Exchange desktop-signer wiring at the attach site.
-    // Both extractions combine here, so the merged file lands at 11560. Exact
-    // merged count, zero headroom.
-    ceiling: 11560,
+    // Raised at the PR #3284 v0.41.0 sync merge: the applySetting arms for
+    // the interface-editor settings (frame dimensions, aura direction vars,
+    // the player-frame bar lock) predate this ratchet; folding them behind a
+    // src/game/ settings-application seam is flagged follow-up work.
+    // The branch's spawn_intro_seen extraction still pays for its own line at
+    // the entry wait, so the merged file lands 3 under the release row, at
+    // 11626. Exact merged count, zero headroom.
+    ceiling: 11626,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -406,7 +417,9 @@ const MONOLITHS: MonolithRow[] = [
     // (quote legs, price/estimate readouts, WocMarketEconomy) moved to
     // woc_market_economy_types.ts (the monitor-types pattern), paying for the
     // desktopHandoff registrar dep and its four registration call sites.
-    ceiling: 3929,
+    // Down 3929 -> 3924: the operator listing and p2p row vocabulary moved to
+    // woc_market_ops.ts instead of growing this coordinator.
+    ceiling: 3924,
     seam: 'a woc_market_<thing>.ts sibling behind WocMarketDeps (the drift-warn split is the template)',
   },
   {
