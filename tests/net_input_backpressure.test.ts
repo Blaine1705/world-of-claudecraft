@@ -30,10 +30,7 @@ function makeClient(bufferedAmount: number) {
     ws,
     lastInputSentAt: 0,
     lastInputSig: '',
-    lastInputFacingSent: null,
-    lastInputFacingSentSeq: 0,
     inputSeq: 0,
-    ackedInputSeq: 0,
     pendingInputSeqSentAt: new Map<number, number>(),
   });
   return { client, ws, sent };
@@ -42,13 +39,9 @@ function makeClient(bufferedAmount: number) {
 function sentInput(sent: string[], index = 0) {
   return JSON.parse(sent[index]) as {
     t: 'input';
-    mv: number;
-    mt: number;
     seq: number;
     ct?: number;
     mi: { f: number; b: number; tl: number; tr: number; j: number };
-    p?: { x: number; z: number };
-    stop?: { x: number; z: number };
   };
 }
 
@@ -72,17 +65,6 @@ describe('ClientWorld input send backpressure gate', () => {
       expect(client.flushInput(1_000)).toBe(true);
     });
     expect(sent).toHaveLength(1);
-    expect(sentInput(sent).mv).toBe(2);
-    expect(sentInput(sent).mt).toBe(1_000);
-  });
-
-  it('includes the latest displayed movement position in an accepted input frame', () => {
-    const { client, sent } = makeClient(0);
-    client.setMovementPosition({ x: 12.25, z: -4.5 });
-    withWebSocketStub(() => {
-      expect(client.flushInput(1_000)).toBe(true);
-    });
-    expect(sentInput(sent).p).toEqual({ x: 12.25, z: -4.5 });
   });
 
   it('sheds the send once the local unflushed buffer is backed up past the limit', () => {
@@ -115,46 +97,6 @@ describe('ClientWorld input send backpressure gate', () => {
       expect(client.flushInput(2_000)).toBe(true);
     });
     expect(sent).toHaveLength(1);
-  });
-
-  it('retains a local stop endpoint until the neutral frame reaches the socket', () => {
-    const { client, ws, sent } = makeClient(INPUT_SEND_BACKPRESSURE_LIMIT_BYTES + 1);
-    withWebSocketStub(() => {
-      client.moveInput.forward = false;
-      expect(client.flushInput(1_000, { x: 12.25, z: -4.5 })).toBe(false);
-      ws.bufferedAmount = 0;
-      expect(client.flushInput(2_000)).toBe(true);
-    });
-
-    expect(sentInput(sent).stop).toEqual({ x: 12.25, z: -4.5 });
-  });
-
-  it('recognizes a facing commit only after the server acknowledges its accepted frame', () => {
-    const { client, ws, sent } = makeClient(INPUT_SEND_BACKPRESSURE_LIMIT_BYTES + 1);
-    client.setMouselookFacing(0.22);
-    withWebSocketStub(() => {
-      expect(client.flushInput(1_000)).toBe(false);
-      expect(client.inputFacingAcknowledged(0.22)).toBe(false);
-
-      ws.bufferedAmount = 0;
-      ws.send = () => {
-        throw new Error('socket closed during facing send');
-      };
-      expect(() => client.flushInput(2_000)).toThrow('socket closed during facing send');
-      expect(client.inputFacingAcknowledged(0.22)).toBe(false);
-
-      ws.send = (payload: string) => sent.push(payload);
-      expect(client.flushInput(3_000)).toBe(true);
-      expect(client.inputFacingAcknowledged(0.22)).toBe(false);
-    });
-
-    const internals = client as unknown as {
-      ackedInputSeq: number;
-      lastInputFacingSentSeq: number;
-    };
-    internals.ackedInputSeq = internals.lastInputFacingSentSeq;
-    expect(client.inputFacingAcknowledged(0.22)).toBe(true);
-    expect(JSON.parse(sent[0]).facing).toBeCloseTo(0.22, 12);
   });
 
   it('delivers a jump press exactly once after press and release both occur during congestion', () => {

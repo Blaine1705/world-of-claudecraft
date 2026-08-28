@@ -88,11 +88,11 @@ Everything else is a sibling module in one of these families:
   (a frame cadence starves on a slow client). Landing dust rides the same
   loop through `Vfx.groundPuff`, scaled by the display-derived fall speed
   because the wire carries no vy for remote bodies.
-- `camera_pivot_core.ts`/`camera_feel_core.ts`/`camera_director_core.ts`: the
-  chase-camera feel stack `updateCamera` composes around its rigid
-  displayed-player pivot (FOV kicks + landing thump, directed
-  zone-vista/death-drift moves). All display-only, all gated by the
-  reduced-motion switch; driven from `renderer.ts` `updateCamera` and the hud event hooks
+- `camera_boom_core.ts`/`camera_feel_core.ts`/`camera_director_core.ts`: the
+  AAA chase-camera feel stack `updateCamera` composes (spring-arm pivot lag,
+  look-ahead + FOV kicks + landing thump, directed zone-vista/death-drift
+  moves). All display-only, all gated by the reduced-motion switch; driven
+  from `renderer.ts` `updateCamera` and the hud event hooks
   (`tests/camera_*_core.test.ts`).
 ## Module-first: pure core + thin painter (where NEW render logic lands)
 New per-frame decision logic (visibility, anchors, interpolation, region/LOD

@@ -63,34 +63,6 @@ export const MOUNT_JUMP_MULT = 1.25;
 // meaningfully adjust a jump arc (full authority in ~0.35 s of a ~0.75 s arc)
 // without letting a knockback be cancelled outright.
 export const AIR_CONTROL_ACCEL = 20;
-
-export function applyAirSteering(
-  velocity: { vx: number; vz: number },
-  wishX: number,
-  wishZ: number,
-  wishSpeed: number,
-  seconds = DT,
-): void {
-  const accel = AIR_CONTROL_ACCEL * seconds;
-  let dvx = wishX * wishSpeed - velocity.vx;
-  let dvz = wishZ * wishSpeed - velocity.vz;
-  const deltaLength = Math.hypot(dvx, dvz);
-  if (deltaLength > accel) {
-    const scale = accel / deltaLength;
-    dvx *= scale;
-    dvz *= scale;
-  }
-  const before = Math.hypot(velocity.vx, velocity.vz);
-  velocity.vx += dvx;
-  velocity.vz += dvz;
-  const after = Math.hypot(velocity.vx, velocity.vz);
-  const cap = Math.max(wishSpeed, before);
-  if (after > cap && after > 1e-9) {
-    const scale = cap / after;
-    velocity.vx *= scale;
-    velocity.vz *= scale;
-  }
-}
 // Kernel-owned scratch for the physics solver: the kernel is called once per
 // player per tick on a single thread, so one reused pair keeps the hot path
 // allocation-free (the same discipline the renderer's per-frame cores use).
@@ -220,7 +192,7 @@ export function swimSurfaceY(x: number, z: number, seed: number): number {
 
 /** Swimmable depth at a point, sampling the terrain ONCE (the mount water-walls
  *  ask about a destination they have no height for yet). */
-export function isDeepWaterAt(x: number, z: number, seed: number): boolean {
+function isDeepFor(x: number, z: number, seed: number): boolean {
   const ground = groundHeight(x, z, seed);
   return ground < waterLevelAt(x, z, seed) - SWIM_DEPTH;
 }
@@ -270,12 +242,8 @@ export function jumpMult(e: Entity): number {
 }
 
 export function isSwimming(e: Entity, seed: number): boolean {
-  return isSwimmingAt(e.pos.x, e.pos.y, e.pos.z, seed);
-}
-
-export function isSwimmingAt(x: number, y: number, z: number, seed: number): boolean {
-  const ground = groundHeight(x, z, seed);
-  return swimsAt(y, ground, waterLevelAt(x, z, seed));
+  const ground = groundHeight(e.pos.x, e.pos.z, seed);
+  return swimsAt(e.pos.y, ground, waterLevelAt(e.pos.x, e.pos.z, seed));
 }
 
 export interface PlayerMotionDeps {
@@ -432,10 +400,28 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
       // a spinning wish vector can walk the SPEED up. Measured at about 3
       // percent above run speed by spinning the camera mid-air, which is the
       // classic air-strafe exploit in miniature.
+      const accel = AIR_CONTROL_ACCEL * DT;
+      let dvx = wishX * wishSpeed - p.vx;
+      let dvz = wishZ * wishSpeed - p.vz;
+      const dLen = Math.hypot(dvx, dvz);
+      if (dLen > accel) {
+        const k = accel / dLen;
+        dvx *= k;
+        dvz *= k;
+      }
+      const before = Math.hypot(p.vx, p.vz);
+      p.vx += dvx;
+      p.vz += dvz;
       // Steering redirects momentum, it never adds any. The cap keeps whatever
       // speed the body already carried (a knockback or a charge stays fast) and
       // forbids growing past it or past the wish speed.
-      applyAirSteering(p, wishX, wishZ, wishSpeed);
+      const after = Math.hypot(p.vx, p.vz);
+      const cap = Math.max(wishSpeed, before);
+      if (after > cap && after > 1e-9) {
+        const k = cap / after;
+        p.vx *= k;
+        p.vz *= k;
+      }
     }
     const stepX = slide ? slide.x * STEEP_SLIDE_SPEED : movingOnGround ? wishX * wishSpeed : p.vx;
     const stepZ = slide ? slide.z * STEEP_SLIDE_SPEED : movingOnGround ? wishZ * wishSpeed : p.vz;
@@ -466,7 +452,7 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
       // into the water; horizontal velocity dies with it while airborne,
       // matching the steep-wall airborne gate.
       const mountBlockedByWater =
-        !!p.mountKey && !swimming && isDeepWaterAt(moveOut.x, moveOut.z, deps.seed);
+        !!p.mountKey && !swimming && isDeepFor(moveOut.x, moveOut.z, deps.seed);
       if (mountBlockedByWater) {
         if (!p.onGround) {
           p.vx = 0;
@@ -579,7 +565,7 @@ function stepInstancedRegion(
     // from land. Reset the candidate to the current pose (and kill horizontal
     // velocity when airborne, matching the steep-wall airborne gate) so the body
     // stops at the shore instead of clipping into the water.
-    if (p.mountKey && !swimming && isDeepWaterAt(nx, nz, deps.seed)) {
+    if (p.mountKey && !swimming && isDeepFor(nx, nz, deps.seed)) {
       nx = p.pos.x;
       nz = p.pos.z;
       if (!p.onGround) {
@@ -595,22 +581,6 @@ function stepInstancedRegion(
       p.vz = (resolved.z - p.prevPos.z) / DT;
     }
   }
-}
-
-export function groundedSurfaceY(
-  seed: number,
-  fromX: number,
-  fromZ: number,
-  toX: number,
-  toZ: number,
-  feetY: number,
-  supportY: number,
-): number | null {
-  const run = Math.hypot(toX - fromX, toZ - fromZ);
-  const maxStepDown = Math.max(MAX_STEP_HEIGHT, 0.4 + run * MAX_CLIMB_SLOPE);
-  const glue = slopeGlueHeight(seed, fromX, fromZ, toX, toZ, BODY_RADIUS, feetY);
-  if (glue > -Infinity && Math.abs(glue - feetY) <= MAX_STEP_HEIGHT) return glue;
-  return supportY < feetY - maxStepDown ? null : supportY;
 }
 
 // The vertical state machine: swim tread, jump (with the coyote window),
@@ -727,6 +697,8 @@ function verticalPass(
     // The step height floors it: a body that strides UP a kerb must be able to
     // walk back DOWN one without launching into a fall (the classic stair
     // stutter), so descent and ascent share the same reach.
+    const run = Math.hypot(p.pos.x - p.prevPos.x, p.pos.z - p.prevPos.z);
+    const maxStepDown = Math.max(MAX_STEP_HEIGHT, 0.4 + run * MAX_CLIMB_SLOPE);
     // The slope glue comes FIRST, before either step-down or walk-off: it
     // re-samples exactly the surface the body stood on at its previous
     // position, at full body-radius reach. That covers two cases the strict
@@ -738,16 +710,21 @@ function verticalPass(
     // it still overlapping the prop's face, and the following depenetration
     // would convert that overlap into free forward distance every crossing
     // (the kerb speed exploit tests/parkour.test.ts pins away).
-    const settledY = groundedSurfaceY(
+    const glue = slopeGlueHeight(
       deps.seed,
       p.prevPos.x,
       p.prevPos.z,
       p.pos.x,
       p.pos.z,
+      BODY_RADIUS,
       p.pos.y,
-      support,
     );
-    if (settledY === null) {
+    if (glue > -Infinity && Math.abs(glue - p.pos.y) <= MAX_STEP_HEIGHT) {
+      p.pos.y = glue;
+      p.fallStartY = glue;
+      return;
+    }
+    if (support < p.pos.y - maxStepDown) {
       // Walked off a ledge or a prop top (not a jump), so fences still block.
       // Momentum carries: the horizontal velocity this tick keeps driving the
       // fall (steerable via air control) instead of dropping dead straight.
@@ -758,8 +735,8 @@ function verticalPass(
       p.vy = 0;
       p.fallStartY = p.pos.y;
     } else {
-      p.pos.y = settledY;
-      p.fallStartY = settledY;
+      p.pos.y = support;
+      p.fallStartY = support;
     }
   }
 }
@@ -862,27 +839,21 @@ function swimVerticalPass(
 // acceptance gate below can still commit a push onto ground steeper than the
 // climb limit when it strictly improves on the player's current steepness, so
 // a concave wall pocket converges instead of wedging the player forever.
-export function applyGroundedStandoff(
-  deps: Pick<PlayerMotionDeps, 'seed' | 'resolveMove'>,
+function standoffPass(
+  deps: PlayerMotionDeps,
   p: Entity,
   stepStartX: number,
   stepStartZ: number,
-  position: { x: number; y: number; z: number },
-  onGround: boolean,
   wishX: number,
   wishZ: number,
   wishSpeed: number,
   movingOnGround: boolean,
 ): void {
-  const ground = groundHeight(position.x, position.z, deps.seed);
-  if (
-    onGround &&
-    position.y <= ground + 1e-3 &&
-    !isSubmergedAt(position.x, position.z, deps.seed)
-  ) {
-    const s = terrainWallStandoff(position.x, position.z, deps.seed, BODY_RADIUS, MAX_CLIMB_SLOPE);
-    if (s.x !== position.x || s.z !== position.z) {
-      const resolved = deps.resolveMove(position.x, position.z, s.x, s.z, BODY_RADIUS, p, false);
+  const ground = groundHeight(p.pos.x, p.pos.z, deps.seed);
+  if (p.onGround && p.pos.y <= ground + 1e-3 && !isSubmergedAt(p.pos.x, p.pos.z, deps.seed)) {
+    const s = terrainWallStandoff(p.pos.x, p.pos.z, deps.seed, BODY_RADIUS, MAX_CLIMB_SLOPE);
+    if (s.x !== p.pos.x || s.z !== p.pos.z) {
+      const resolved = deps.resolveMove(p.pos.x, p.pos.z, s.x, s.z, BODY_RADIUS, p, false);
       let standX = resolved.x;
       let standZ = resolved.z;
       if (movingOnGround && wishSpeed > 0) {
@@ -944,38 +915,14 @@ export function applyGroundedStandoff(
       // for this tick rather than silently dismounting them into the pit.
       const standSteep = rideSteepnessAt(standX, standZ, deps.seed);
       if (
-        !(p.mountKey && isDeepWaterAt(standX, standZ, deps.seed)) &&
+        !(p.mountKey && isDeepFor(standX, standZ, deps.seed)) &&
         (standSteep <= MAX_CLIMB_SLOPE ||
-          standSteep <= rideSteepnessAt(position.x, position.z, deps.seed))
+          standSteep <= rideSteepnessAt(p.pos.x, p.pos.z, deps.seed))
       ) {
-        position.x = standX;
-        position.z = standZ;
-        position.y = groundHeight(standX, standZ, deps.seed);
+        p.pos.x = standX;
+        p.pos.z = standZ;
+        p.pos.y = groundHeight(standX, standZ, deps.seed);
       }
     }
   }
-}
-
-function standoffPass(
-  deps: PlayerMotionDeps,
-  p: Entity,
-  stepStartX: number,
-  stepStartZ: number,
-  wishX: number,
-  wishZ: number,
-  wishSpeed: number,
-  movingOnGround: boolean,
-): void {
-  applyGroundedStandoff(
-    deps,
-    p,
-    stepStartX,
-    stepStartZ,
-    p.pos,
-    p.onGround,
-    wishX,
-    wishZ,
-    wishSpeed,
-    movingOnGround,
-  );
 }

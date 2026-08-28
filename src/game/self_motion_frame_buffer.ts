@@ -4,7 +4,6 @@ import type { RiftFloorView } from '../world_api/dungeons';
 export interface BufferedSelfMotionFrame {
   enabled: boolean;
   moveInput: MoveInput;
-  movementPositionAuthority: boolean;
   displayFacing: number;
   echoMs: number;
   jitterMs: number;
@@ -21,7 +20,6 @@ export class SelfMotionFrameBuffer {
   write(
     enabled: boolean,
     moveInput: MoveInput,
-    movementPositionAuthority: boolean,
     displayFacing: number,
     echoMs: number,
     jitterMs: number,
@@ -35,7 +33,6 @@ export class SelfMotionFrameBuffer {
       this.frame = {
         enabled,
         moveInput,
-        movementPositionAuthority,
         displayFacing,
         echoMs,
         jitterMs,
@@ -48,7 +45,6 @@ export class SelfMotionFrameBuffer {
     } else {
       this.frame.enabled = enabled;
       this.frame.moveInput = moveInput;
-      this.frame.movementPositionAuthority = movementPositionAuthority;
       this.frame.displayFacing = displayFacing;
       this.frame.echoMs = echoMs;
       this.frame.jitterMs = jitterMs;

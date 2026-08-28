@@ -15,10 +15,6 @@ const MAX_FACING_MAGNITUDE = 1000;
 
 type MoveField = (typeof MOVE_FIELDS)[number][0];
 
-export function hasTranslationalMoveInput(input: MoveInput): boolean {
-  return input.forward || input.back || input.strafeLeft || input.strafeRight;
-}
-
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }

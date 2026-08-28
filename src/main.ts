@@ -4882,7 +4882,6 @@ async function startGame(
           : selfMotionFrameBuffer.write(
               net.connected && selfPredictionEnabled,
               resolved.mi,
-              net.movementPositionAuthority,
               netFacing ?? interpServerFacing,
               inputEcho.echoMs,
               inputEcho.jitterMs,

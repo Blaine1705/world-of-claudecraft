@@ -88,6 +88,7 @@ import { BuildRetryGate } from './build_retry_gate';
 import { setBuildSpanSink } from './build_spans';
 import { type BulwarkFeaturesView, buildBulwarkFeatures } from './bulwark_features';
 import { BurningPactMarkers } from './burning_pact_markers';
+import { createCameraBoom, stepCameraBoom } from './camera_boom_core';
 import {
   cancelCameraDirective,
   createCameraDirector,
@@ -102,7 +103,6 @@ import {
   stepCameraFeel,
   stepLandingDetector,
 } from './camera_feel_core';
-import { createRigidCameraPivot, rigidCameraPivotInto } from './camera_pivot_core';
 import { buildCampBraziers, type CampBraziersView } from './camp_braziers';
 import { canopyDetailPrewarmTextures } from './canopy_detail';
 import { canvasDataUrlAsync } from './canvas_data_url';
@@ -1324,9 +1324,11 @@ export class Renderer {
   // chasing the player (updateCamera honors it and returns early). Editor-only;
   // always null in the shipped game.
   editorCam: { pos: THREE.Vector3; target: THREE.Vector3 } | null = null;
-  // Camera feel: FOV, landing thump, zone vista, and death drift.
+  // AAA camera-feel layers (all display-only; see the three *_core modules):
+  // spring-arm pivot lag, look-ahead + FOV kicks + landing thump, and the
+  // directed moves (zone vista, death drift). Gated by reducedMotion().
+  private readonly camBoom = createCameraBoom();
   private readonly camFeel = createCameraFeel();
-  private readonly cameraPivot = createRigidCameraPivot();
   private readonly camDirector = createCameraDirector();
   private baseFov = CAMERA_BASE_FOV; // setCameraFov's value; camera.fov is overwritten below each frame
   // Player-pose mirror from last frame: any change while a directive runs is
@@ -12840,14 +12842,21 @@ export class Renderer {
     const seed = this.sim.cfg.seed;
     const reduce = this.reducedMotion();
 
-    // Display-derived landing thump works in both hosts; reduced motion gates its effects.
+    // Spring-arm lag: the look pivot trails the avatar on a critically damped
+    // spring (vertical softer), so runs, jumps, mantles, and landings carry
+    // weight. Reduced motion stiffens it to near-rigid instead of branching.
+    stepCameraBoom(this.camBoom, selfPos.x, selfPos.y, selfPos.z, dt, reduce ? 4 : 1);
+
+    // Landing thump, detected from the display trajectory alone (works in
+    // both hosts): a short FOV dip plus a touch of trauma, scaled by fall
+    // speed. addShake/punchFov are reduced-motion no-ops already.
     const thump = stepLandingDetector(this.camFeel, selfPos.y, dt);
     if (thump > 0) {
       this.punchFov(-3.5 * thump);
       this.addShake(0.1 + 0.3 * thump);
     }
 
-    // Speed FOV, fed by the horizontal display velocity.
+    // Look-ahead lead + speed FOV, fed by the horizontal display velocity.
     let velX = 0;
     let velZ = 0;
     if (this.lastLocalPos && dt > 1e-4) {
@@ -12920,25 +12929,16 @@ export class Renderer {
       this.selfSubmerged && Number.isFinite(swimWaterLevel)
         ? swimWaterLevel - UNDERWATER_CAMERA_DIP
         : Infinity;
-    // Obstructors fade; they never change the requested camera distance.
-    rigidCameraPivotInto(
-      this.cameraPivot,
-      selfPos.x,
-      selfPos.y,
-      selfPos.z,
-      pose.yaw,
-      pose.pitch,
-      pose.dist,
-      underwaterCeilingY,
-    );
-    const {
-      playerX: px,
-      playerZ: pz,
-      eyeY,
-      cameraX: cx,
-      cameraY: cy,
-      cameraZ: cz,
-    } = this.cameraPivot;
+    // The camera orbits the lagged/led pivot at the player's requested
+    // distance. Scene geometry never changes that distance; registered
+    // obstructors fade through their subsystem's occluder-fade pass.
+    const px = this.camBoom.x + this.camFeel.leadX;
+    const py = this.camBoom.y;
+    const pz = this.camBoom.z + this.camFeel.leadZ;
+    const eyeY = py + 2.0;
+    const cx = px - Math.sin(pose.yaw) * Math.cos(pose.pitch) * pose.dist;
+    const cy = Math.min(eyeY + Math.sin(pose.pitch) * pose.dist, underwaterCeilingY);
+    const cz = pz - Math.cos(pose.yaw) * Math.cos(pose.pitch) * pose.dist;
     let groundY = groundHeight(cx, cz, seed) + 0.6;
     // On a raised rift tier the flat ground clamp would let the camera sink
     // into the riser: add the same lift the sim stands entities on.

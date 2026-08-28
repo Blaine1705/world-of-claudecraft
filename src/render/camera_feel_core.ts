@@ -1,4 +1,8 @@
-// Camera "feel" layer: speed/impulse FOV kicks and the display-side landing detector:
+// Camera "feel" layer: velocity look-ahead, speed/impulse FOV kicks, and the
+// display-side landing detector. Together with the spring boom
+// (camera_boom_core.ts) this is the moment-to-moment AAA camera grammar:
+//  - the look pivot LEADS into the run direction so the player sits slightly
+//    behind screen center while moving (and recenters at rest);
 //  - FOV widens a touch at above-run speeds (travel forms, ghost run, speed
 //    buffs) and takes short punch impulses (landing dip, level-up flourish);
 //  - landings are detected from the DISPLAY trajectory alone (works offline
@@ -9,6 +13,8 @@
 import { RUN_SPEED } from '../sim/types';
 
 export interface CameraFeelState {
+  leadX: number;
+  leadZ: number;
   speedKick: number;
   /** Transient FOV impulse (degrees), decays to 0. */
   punchKick: number;
@@ -22,6 +28,12 @@ export interface CameraFeelState {
   detectorActive: boolean;
 }
 
+/** Seconds of travel the look pivot leads by while moving. */
+export const LEAD_TIME = 0.13;
+/** Lead cap (yards): keeps the player near center at any speed. */
+export const LEAD_MAX = 1.0;
+/** Lead ease rate (1/s): slow enough to never feel like a snap. */
+export const LEAD_OMEGA = 4;
 /** Max FOV widen (degrees) from sustained above-run speed. */
 export const SPEED_FOV_MAX = 6;
 /** Speed FOV ease rate (1/s). */
@@ -39,6 +51,8 @@ const MAX_STEP = 0.25;
 
 export function createCameraFeel(): CameraFeelState {
   return {
+    leadX: 0,
+    leadZ: 0,
     speedKick: 0,
     punchKick: 0,
     lastY: 0,
@@ -52,8 +66,8 @@ const ease = (current: number, target: number, omega: number, dt: number): numbe
   target + (current - target) * Math.exp(-omega * dt);
 
 /**
- * Advance the FOV kicks. (vx, vz) is the horizontal display velocity in yd/s;
- * `enabled` false (reduced-motion) eases the speed kick home.
+ * Advance the lead vector and FOV kicks. (vx, vz) is the horizontal DISPLAY
+ * velocity in yd/s; `enabled` false (reduced-motion) eases everything home.
  */
 export function stepCameraFeel(
   s: CameraFeelState,
@@ -64,11 +78,18 @@ export function stepCameraFeel(
 ): void {
   const step = Math.min(Math.max(dt, 0), MAX_STEP);
   const speed = Math.hypot(vx, vz);
+  let targetX = 0;
+  let targetZ = 0;
   let targetKick = 0;
   if (enabled && speed > 0.05) {
+    const lead = Math.min(LEAD_MAX, speed * LEAD_TIME);
+    targetX = (vx / speed) * lead;
+    targetZ = (vz / speed) * lead;
     // Widen only ABOVE base run speed (travel form 1.4x maps to ~full kick).
     targetKick = SPEED_FOV_MAX * Math.min(1, Math.max(0, (speed - RUN_SPEED) / (RUN_SPEED * 0.45)));
   }
+  s.leadX = ease(s.leadX, targetX, LEAD_OMEGA, step);
+  s.leadZ = ease(s.leadZ, targetZ, LEAD_OMEGA, step);
   s.speedKick = ease(s.speedKick, targetKick, SPEED_FOV_OMEGA, step);
   s.punchKick = ease(s.punchKick, 0, PUNCH_DECAY, step);
 }

@@ -41,11 +41,7 @@ import { DEEDS_RECENT_CAP, freshDeedStats } from '../sim/deeds';
 import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
 import type { Ante, PickAction } from '../sim/lockpick';
 import type { MarketQuery } from '../sim/market_query';
-import {
-  hasTranslationalMoveInput,
-  normalizeMoveFacing,
-  sanitizeMoveInput,
-} from '../sim/move_input';
+import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import { isPersistentEngineAura } from '../sim/persistent_aura';
 import { isPrimaryOwnedPetEntity } from '../sim/pet/pet_selection';
 import { getArchetypeTitle, getHobbyCraft } from '../sim/professions/archetype';
@@ -1480,7 +1476,6 @@ export class ClientWorld extends ReconWireState implements IWorld {
   private readonly ownPlayerClass: PlayerClass;
   spectating: string | null = null;
   moveInput: MoveInput = emptyMoveInput();
-  movementPositionAuthority = false;
   known: ResolvedAbility[] = [];
   realm = '';
   // Whether this session's account holds a staff/admin role, from the hello
@@ -1930,8 +1925,6 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // initializers, and the lazy accessor below keeps that construction idiom
   // equivalent to a real instance.
   private pendingTransientInput: PendingTransientInput | undefined;
-  private pendingMovementStop: { x: number; z: number } | undefined;
-  private movementPosition: { x: number; z: number } | undefined;
   private ackedInputSeq = 0;
   private inputEchoSamples: number[] = [];
   private spectateFacingPending = false;
@@ -2080,7 +2073,6 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // 'error' frame, handled in onMessage, which sets sessionEnded).
   private socketClosed(): void {
     this.connected = false;
-    this.movementPositionAuthority = false;
     // A reconnect may land on an older binary. Drop optional behavior before
     // any new transport can accept input; the next capable snapshot re-arms it.
     this.petSpecialCommandsSupported = false;
@@ -2130,7 +2122,6 @@ export class ClientWorld extends ReconWireState implements IWorld {
     // lost to a deliberate logout within the debounce window.
     this.flushActionBarLayoutSave();
     this.sessionEnded = true;
-    this.movementPositionAuthority = false;
     this.failPendingCommandOutcomes();
     // RIFT_REGIONS (src/sim/colliders.ts) is a module-level registry keyed by
     // riftCollisionToken, outside this instance: a session that ends while
@@ -2194,16 +2185,6 @@ export class ClientWorld extends ReconWireState implements IWorld {
     this.mouselookFacing = normalizeMoveFacing(facing);
   }
 
-  setMovementPosition(position: { x: number; z: number } | null): void {
-    if (!position || !Number.isFinite(position.x) || !Number.isFinite(position.z)) {
-      this.movementPosition = undefined;
-      return;
-    }
-    this.movementPosition ??= { x: 0, z: 0 };
-    this.movementPosition.x = position.x;
-    this.movementPosition.z = position.z;
-  }
-
   inputFacingAcknowledged(facing: number | null): boolean {
     if (facing === null || typeof this.lastInputFacingSent !== 'number') return false;
     const sentSeq = this.lastInputFacingSentSeq ?? 0;
@@ -2214,15 +2195,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     );
   }
 
-  flushInput(now = performance.now(), stopPosition?: { x: number; z: number }): boolean {
-    if (
-      stopPosition &&
-      Number.isFinite(stopPosition.x) &&
-      Number.isFinite(stopPosition.z) &&
-      !hasTranslationalMoveInput(this.moveInput)
-    ) {
-      this.pendingMovementStop = { x: stopPosition.x, z: stopPosition.z };
-    }
+  flushInput(now = performance.now()): boolean {
     return this.sendInput(now, 'changed');
   }
   movementWireIsOpen(): boolean {
@@ -2278,7 +2251,6 @@ export class ClientWorld extends ReconWireState implements IWorld {
   neutralizeInputForClientPause(now = performance.now()): boolean {
     Object.assign(this.moveInput, emptyMoveInput());
     this.mouselookFacing = null;
-    this.pendingMovementStop = undefined;
     // On an open socket the forced path admits exactly one neutral frame
     // despite a saturated browser buffer. The accepted neutral frame consumes
     // any pre-pause engagement intent without putting it on the wire.
@@ -2344,11 +2316,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
     }
     const sig = inputSignature(this.moveInput, this.mouselookFacing);
     const hasPendingTransientInput = this.hasPendingTransientInput();
-    if (hasTranslationalMoveInput(this.moveInput)) this.pendingMovementStop = undefined;
-    const hasPendingMovementStop = this.pendingMovementStop !== undefined;
     if (mode === 'changed') {
-      if (!hasPendingTransientInput && !hasPendingMovementStop && sig === this.lastInputSig)
-        return false;
+      if (!hasPendingTransientInput && sig === this.lastInputSig) return false;
       if (!inputFlushGateOpen(now, this.lastInputSentAt)) return false;
     }
     const mi = this.moveInput;
@@ -2390,14 +2359,11 @@ export class ClientWorld extends ReconWireState implements IWorld {
       (msg.mi as Record<string, number>).ss = mi.swimSteer;
     }
     if (this.mouselookFacing !== null) msg.facing = this.mouselookFacing;
-    if (this.movementPosition) msg.p = this.movementPosition;
-    if (this.pendingMovementStop) msg.stop = this.pendingMovementStop;
     this.ws.send(JSON.stringify(msg));
     // WebSocket.send accepted the real frame. Pending edges are transport-local
     // and are consumed exactly once, including when the forced-neutral mode
     // intentionally cancels them rather than replaying them into the pause.
     this.pendingTransientInput = undefined;
-    this.pendingMovementStop = undefined;
     this.lastInputSentAt = now;
     this.lastInputSig = sig;
     if (this.mouselookFacing === null) {
@@ -2507,7 +2473,6 @@ export class ClientWorld extends ReconWireState implements IWorld {
       return;
     }
     if (msg.t === 'hello') {
-      this.movementPositionAuthority = false;
       this.movementWireVersion = msg.movementWire === 2 ? 2 : 1;
       this.movementFrameOutbox?.reset();
       this.onMovementWireNegotiated?.(this.movementWireVersion, performance.now());
@@ -2535,7 +2500,6 @@ export class ClientWorld extends ReconWireState implements IWorld {
         this.lastInputFacingSent = null;
         this.lastInputFacingSentSeq = 0;
         this.pendingTransientInput = undefined;
-        this.pendingMovementStop = undefined;
         this.pendingInputSeqSentAt.clear();
         this.ackedInputSeq = 0;
         this.inputEchoSamples = [];
@@ -2618,7 +2582,6 @@ export class ClientWorld extends ReconWireState implements IWorld {
     if (msg.t === 'error') {
       const wasConnected = this.connected;
       this.connected = false;
-      this.movementPositionAuthority = false;
       // 'character already in world' is the transient window where the
       // server has not yet noticed the old socket died (a black-holed drop
       // sends no FIN/RST): keep backing off, the server's keepalive sweep
@@ -3407,7 +3370,6 @@ export class ClientWorld extends ReconWireState implements IWorld {
         this.inputEchoSamples,
         now,
       );
-      this.movementPositionAuthority = s.mpa === 1;
       e.resource = s.res;
       e.maxResource = s.mres;
       e.resourceType = s.rtype;

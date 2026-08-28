@@ -2,10 +2,11 @@
 //
 // The physics solver climbs a kerb or a field stone by moving the feet to the
 // new surface within a single 20 Hz tick. That is correct simulation and wrong
-// presentation: the mesh teleports up to a step height in one frame. Every
-// modern character controller solves this by letting the RENDERED height chase
-// the physical height over a short window while collision keeps using the real
-// one.
+// presentation: the mesh teleports up to a step height in one frame while the
+// camera boom, which is deliberately soft vertically, lags behind it. The body
+// appears to pop out from under the camera. Every modern character controller
+// solves this the same way, by letting the RENDERED height chase the physical
+// height over a short window while collision keeps using the real one.
 //
 // The rule is deliberately narrow, because the cases it must NOT touch are the
 // ones players read as responsiveness:

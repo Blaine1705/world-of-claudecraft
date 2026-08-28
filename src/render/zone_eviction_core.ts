@@ -33,12 +33,13 @@
 // calls zonesEligibleForEviction on the same throttled cadence as the
 // visible-zone streaming recompute, evicting one zone per call so a long
 // session sheds memory gradually. It measures distance from the PLAYER, not
-// the camera: the chase pivot follows the displayed player exactly, so its
-// only real offset is the zoom arm. Anchoring on the player keeps that
-// zoom/free-look state out of a memory-residency decision. It deliberately
-// never clears prewarmedZonePrograms: that tracks compiled shader programs,
-// which unloadZone (geometry only) never touches, so clearing it would force
-// a wasted recompile on re-entry for no benefit.
+// the camera: the camera boom (camera_boom_core.ts) snaps to and tightly
+// leashes the player, so its only real offset from the player is the zoom
+// arm, and anchoring on the player keeps that zoom/free-look state out of a
+// memory-residency decision. It deliberately never clears
+// prewarmedZonePrograms: that tracks compiled shader programs, which
+// unloadZone (geometry only) never touches, so clearing it would force a
+// wasted recompile on re-entry for no benefit.
 
 import type { ZoneDef } from '../sim/types';
 import { distanceSqToZone, MAX_OUTDOOR_FOG_FAR } from './zone_streaming';

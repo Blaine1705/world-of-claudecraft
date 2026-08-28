@@ -303,7 +303,6 @@ import {
   type MovementInputSessionState,
   resetMovementInputSessionState,
 } from './movement_input_timeline_v2';
-import { type MovementPositionState, resetMovementPosition } from './movement_position';
 import { reconciliationSelfWire, updateOverrideEpochs } from './movement_reconciliation_wire';
 import {
   classifyMsgLane,
@@ -1041,11 +1040,8 @@ export interface ClientSession extends MovementInputSessionState {
   rememberedChat: RememberedChat;
   // last client input sequence processed; echoed in snapshots for latency telemetry
   lastInputSeq: number;
-  // receive high-water used only to attribute packet gaps before buffered input applies
-  lastReceivedInputSeq: number;
   // sim time of the last movement input frame, used to clear stale held input
   lastInputAt: number;
-  movementPositionState?: MovementPositionState | null;
   // serialized form of each delta self field as last sent to this client;
   // a field is omitted from a snapshot while its serialization is unchanged
   lastSent: Record<string, string>;
@@ -3374,7 +3370,6 @@ export class GameServer {
   private clearStaleInputs(): void {
     for (const session of this.clients.values()) {
       if (this.sim.time - session.lastInputAt <= STALE_INPUT_SECONDS) continue;
-      resetMovementPosition(session);
       const meta = this.sim.meta(session.pid);
       if (!meta) continue;
       const mi = meta.moveInput;
@@ -3767,9 +3762,7 @@ export class GameServer {
       lastWhisperFrom: null,
       rememberedChat: { channel: 'say' },
       lastInputSeq: 0,
-      lastReceivedInputSeq: 0,
       lastInputAt: this.sim.time,
-      movementPositionState: null,
       ...createMovementInputSessionState(meta.movementWireVersion),
       lastSent: {},
       timerWireVersion:
@@ -4012,9 +4005,7 @@ export class GameServer {
       }
     }
     session.lastInputSeq = 0;
-    session.lastReceivedInputSeq = 0;
     session.lastInputAt = this.sim.time;
-    resetMovementPosition(session);
     resetMovementInputSessionState(session, meta.movementWireVersion);
     // Load-bearing for every rev + cadence gate (market, mail, corder):
     // wiping lastSent makes sent.market/sent.mail/sent.corder undefined, and
@@ -6499,12 +6490,11 @@ export class GameServer {
         // server's own drops). Guarded to a positive high-water because resume
         // zeroes it while the client restarts its counter on reconnect, and
         // capped so a reset mismatch never books a giant gap.
-        if (session.lastReceivedInputSeq > 0 && seq > session.lastReceivedInputSeq + 1) {
+        if (session.lastInputSeq > 0 && seq > session.lastInputSeq + 1) {
           gameMetricsCounters().wsInputSeqGap(
-            Math.min(seq - session.lastReceivedInputSeq - 1, MSG_SEQ_GAP_SANITY),
+            Math.min(seq - session.lastInputSeq - 1, MSG_SEQ_GAP_SANITY),
           );
         }
-        session.lastReceivedInputSeq = Math.max(session.lastReceivedInputSeq, seq);
         session.lastInputSeq = Math.max(session.lastInputSeq, seq);
       }
       this.botDetector.observeInput(session.botTrackingContext, frame, receivedAtMs);
@@ -8833,12 +8823,6 @@ export class GameServer {
       opUntil: p.overpowerUntil > this.sim.time ? 1 : 0,
       opRem: round2(Math.max(0, p.overpowerUntil - this.sim.time)),
       ack: session.spectating ? 0 : anchorSession.lastInputSeq,
-      mpa:
-        !session.spectating &&
-        p.onGround &&
-        anchorSession.movementPositionState?.authorityActive === true
-          ? 1
-          : 0,
       ...(session.spectating ? {} : reconciliationSelfWire(session, p)),
     });
     // Parked mana (a druid form runs the live bar on rage or energy and sets the

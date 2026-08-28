@@ -563,7 +563,6 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
         : selfMotionFrameBuffer.write(
             predictionEnabled,
             mi,
-            client.movementPositionAuthority,
             netFacing ?? interpServerFacing,
             inputEcho.echoMs,
             inputEcho.jitterMs,
