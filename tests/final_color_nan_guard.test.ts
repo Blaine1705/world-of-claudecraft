@@ -124,23 +124,20 @@ describe('installFinalColorNanGuard call sites', () => {
   });
 });
 
-describe('the #ifndef USE_FOG skip in patchOpaqueFragmentNanGuard depends on this holding', () => {
-  it('every ShaderLib entry with <opaque_fragment> also has <fog_fragment>', () => {
-    // final_color_nan_guard_core.ts skips the opaque arm's rgb scrub under
-    // USE_FOG, relying on fog_fragment's guard to cover it instead. That is
-    // only sound for a compiled program that includes BOTH chunks: a three
-    // bump, or a repo ShaderMaterial, that pairs <opaque_fragment> with a
-    // fogged scene but omits <fog_fragment> would silently lose the rgb
-    // guard with no test failure and no visible symptom until a driver
-    // emits a NaN. This walks every stock ShaderLib entry and pins the
-    // coupling directly, rather than trusting it holds by inspection.
-    const missingFog: string[] = [];
+describe('patchOpaqueFragmentNanGuard coverage in stock shaders', () => {
+  it('does not depend on <fog_fragment> being present to scrub outgoingLight', () => {
+    // The opaque guard scrubs outgoingLight before the opaque write whether or
+    // not USE_FOG is defined. Walking ShaderLib keeps this pinned on the stock
+    // materials that reach <opaque_fragment>, without depending on fog_fragment
+    // as a second line of defense for the same value.
+    const withOpaque: string[] = [];
     for (const [name, shader] of Object.entries(THREE.ShaderLib)) {
       const hasOpaque = shader.fragmentShader.includes('#include <opaque_fragment>');
-      const hasFog = shader.fragmentShader.includes('#include <fog_fragment>');
-      if (hasOpaque && !hasFog) missingFog.push(name);
+      if (hasOpaque) withOpaque.push(name);
     }
-    expect(missingFog).toEqual([]);
+    expect(withOpaque.length).toBeGreaterThan(0);
+    expect(THREE.ShaderChunk.opaque_fragment).toContain('outgoingLight.x = ( outgoingLight.x');
+    expect(THREE.ShaderChunk.opaque_fragment).not.toContain('#ifndef USE_FOG');
   });
 
   it('patches global chunks when profile activation switches into direct rendering', () => {

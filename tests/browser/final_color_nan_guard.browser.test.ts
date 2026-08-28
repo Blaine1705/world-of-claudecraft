@@ -37,6 +37,10 @@ import '../../src/render/final_color_nan_guard';
 
 let renderer: THREE.WebGLRenderer;
 let shaderError: string | null = null;
+const FOG_NEAR = 4;
+const FOG_FAR = 40;
+const FOGGED_CAMERA_Z = 7;
+const CUBE_FRONT_Z = 2;
 
 beforeAll(() => {
   // The module-scope install already ran as an import side effect (above),
@@ -151,7 +155,7 @@ function materialWithForcedAlpha(injectNan: boolean): THREE.MeshStandardMaterial
 /** Render `material` on a large lit cube and read the frame back through a real render target. */
 function renderAndRead(material: THREE.Material, withFog: boolean): Uint8Array {
   const scene = new THREE.Scene();
-  if (withFog) scene.fog = new THREE.Fog(0x223344, 4, 40);
+  if (withFog) scene.fog = new THREE.Fog(0x223344, FOG_NEAR, FOG_FAR);
   scene.add(new THREE.AmbientLight(0xffffff, 0.6));
   const sun = new THREE.DirectionalLight(0xffffff, 1.2);
   sun.position.set(3, 4, 5);
@@ -159,7 +163,7 @@ function renderAndRead(material: THREE.Material, withFog: boolean): Uint8Array {
   scene.add(new THREE.Mesh(new THREE.BoxGeometry(4, 4, 4), material));
 
   const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
-  camera.position.set(0, 0, 6);
+  camera.position.set(0, 0, withFog ? FOGGED_CAMERA_Z : 6);
   camera.lookAt(0, 0, 0);
 
   const size = 32;
@@ -194,7 +198,7 @@ function centerPixelIsLit(pixels: Uint8Array, size: number): boolean {
  */
 function renderAndReadFloat(material: THREE.Material, withFog: boolean): Float32Array {
   const scene = new THREE.Scene();
-  if (withFog) scene.fog = new THREE.Fog(0x223344, 4, 40);
+  if (withFog) scene.fog = new THREE.Fog(0x223344, FOG_NEAR, FOG_FAR);
   scene.add(new THREE.AmbientLight(0xffffff, 0.6));
   const sun = new THREE.DirectionalLight(0xffffff, 1.2);
   sun.position.set(3, 4, 5);
@@ -202,7 +206,7 @@ function renderAndReadFloat(material: THREE.Material, withFog: boolean): Float32
   scene.add(new THREE.Mesh(new THREE.BoxGeometry(4, 4, 4), material));
 
   const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
-  camera.position.set(0, 0, 6);
+  camera.position.set(0, 0, withFog ? FOGGED_CAMERA_Z : 6);
   camera.lookAt(0, 0, 0);
 
   const size = 4;
@@ -221,6 +225,11 @@ function renderAndReadFloat(material: THREE.Material, withFog: boolean): Float32
 function centerTexel(pixels: Float32Array, size: number): [number, number, number, number] {
   const i = (Math.floor(size / 2) * size + Math.floor(size / 2)) * 4;
   return [pixels[i], pixels[i + 1], pixels[i + 2], pixels[i + 3]];
+}
+
+function smoothstep(edge0: number, edge1: number, value: number): number {
+  const t = Math.min(Math.max((value - edge0) / (edge1 - edge0), 0), 1);
+  return t * t * (3 - 2 * t);
 }
 
 describe('final color NaN guard compiles and renders in real WebGL', () => {
@@ -252,19 +261,21 @@ describe('final color NaN guard actually scrubs a NaN (not just compiles)', () =
     expect([r, g, b]).toEqual([0, 0, 0]);
   });
 
-  it('a fogged NaN in outgoingLight still comes out finite (fog_fragment guard, opaque arm skipped)', () => {
+  it('a fogged NaN in outgoingLight mixes like finite 0 after the opaque_fragment guard', () => {
     const pixels = renderAndReadFloat(materialWithForcedOutgoingLight(true), true);
     expect(shaderError).toBeNull();
     const [r, g, b] = centerTexel(pixels, 4);
     expect(Number.isNaN(r)).toBe(false);
     expect(Number.isNaN(g)).toBe(false);
     expect(Number.isNaN(b)).toBe(false);
-    // Fogged: outgoingLight starts at 0 (forced) and opaque_fragment's rgb
-    // scrub is skipped (USE_FOG is defined), so this exercises fog_fragment's
-    // guard specifically. It has to still land on the fog colour it mixed
-    // toward, not black and not NaN.
+    // The sampled center fragment is past fogNear, so this readback reds the
+    // old path: mix(NaN, fogColor, f) reached the fog scrub and collapsed to
+    // black instead of the same fogged finite 0 baseline.
+    expect(smoothstep(FOG_NEAR, FOG_FAR, FOGGED_CAMERA_Z - CUBE_FRONT_Z)).toBeGreaterThan(0);
     const fogged = renderAndReadFloat(materialWithForcedOutgoingLight(false), true);
-    expect([r, g, b]).toEqual(centerTexel(fogged, 4).slice(0, 3));
+    const baseline = centerTexel(fogged, 4).slice(0, 3);
+    expect(baseline.some((component) => component > 0)).toBe(true);
+    expect([r, g, b]).toEqual(baseline);
   });
 
   it('a NaN in diffuseColor.a on a transparent material comes out as a finite 0, not NaN', () => {

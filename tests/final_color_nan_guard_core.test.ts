@@ -67,20 +67,25 @@ describe('final color NaN guard core', () => {
     expect(alphaScrub).toBeGreaterThan(transmissionBlockEnd);
   });
 
-  it('wraps the outgoingLight (rgb) scrub in #ifndef USE_FOG, since fog_fragment re-scrubs rgb when fog is on', () => {
-    const patched = patchOpaqueFragmentNanGuard(SOURCE_OPAQUE_FRAGMENT);
-    const alphaScrub = patched.indexOf('diffuseColor.a = ( diffuseColor.a < 0.0');
-    const ifndef = patched.indexOf('#ifndef USE_FOG');
-    const scrubStart = patched.indexOf('outgoingLight.x = ( outgoingLight.x < 0.0');
-    const endif = patched.indexOf('#endif', scrubStart);
-    const write = patched.indexOf(OPAQUE_WRITE);
-    expect(ifndef).toBeGreaterThan(alphaScrub);
-    expect(scrubStart).toBeGreaterThan(ifndef);
-    expect(endif).toBeGreaterThan(scrubStart);
-    expect(write).toBeGreaterThan(endif);
-    // Nothing but the closing directive sits between the guarded scrub and the write it protects.
-    expect(patched.slice(endif, write).trim()).toBe('#endif');
-  });
+  it(
+    'scrubs outgoingLight (rgb) unconditionally before opaque_fragment writes gl_FragColor',
+    () => {
+      const patched = patchOpaqueFragmentNanGuard(SOURCE_OPAQUE_FRAGMENT);
+      const alphaScrub = patched.indexOf('diffuseColor.a = ( diffuseColor.a < 0.0');
+      const scrubStart = patched.indexOf('outgoingLight.x = ( outgoingLight.x < 0.0');
+      const zScrub =
+        'outgoingLight.z = ( outgoingLight.z < 0.0 || outgoingLight.z >= 0.0 )' +
+        ' ? outgoingLight.z : 0.0;\n';
+      const zScrubStart = patched.indexOf(zScrub);
+      const scrubEnd = zScrubStart + zScrub.length;
+      const write = patched.indexOf(OPAQUE_WRITE);
+      expect(scrubStart).toBeGreaterThan(alphaScrub);
+      expect(zScrubStart).toBeGreaterThan(scrubStart);
+      expect(write).toBeGreaterThan(scrubStart);
+      expect(patched.slice(scrubEnd, write).trim()).toBe('');
+      expect(patched).not.toContain('#ifndef USE_FOG');
+    },
+  );
 
   it('is idempotent on opaque_fragment', () => {
     const once = patchOpaqueFragmentNanGuard(SOURCE_OPAQUE_FRAGMENT);
