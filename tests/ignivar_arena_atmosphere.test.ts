@@ -174,11 +174,11 @@ describe('Ignivar arena atmosphere', () => {
       fogNear: 34,
       fogFar: 112,
       sunColor: 0xff9d48,
-      sunIntensity: 0.98,
+      sunIntensity: 1.27,
       hemiSkyColor: 0x93422a,
       hemiGroundColor: 0x280d06,
-      hemiIntensity: 0.43,
-      envIntensity: 0.1,
+      hemiIntensity: 0.56,
+      envIntensity: 0.13,
       rimIntensity: 1.05,
       rimColor: 0xffa45c,
       forgeLightColor: 0xff6a24,
@@ -188,8 +188,10 @@ describe('Ignivar arena atmosphere', () => {
     expect(IGNIVAR_ARENA_LIGHTING.fogNear).toBeLessThan(IGNIVAR_ARENA_LIGHTING.fogFar);
     // The sunset forge stays a readable interior, never full daylight, and the
     // env ceiling is the anti-sheen bound: the shared environment map is the
-    // daylight sky, and anything near the old 0.3 frosted the rigs blue-white.
-    expect(IGNIVAR_ARENA_LIGHTING.sunIntensity).toBeLessThanOrEqual(1);
+    // daylight sky, and anything from 0.2 up frosted the rigs blue-white.
+    // Ceilings sit just over the 30% room-light lift (1.27 / 0.56 / 0.13),
+    // with env deliberately capped well under that frost band.
+    expect(IGNIVAR_ARENA_LIGHTING.sunIntensity).toBeLessThanOrEqual(1.3);
     expect(IGNIVAR_ARENA_LIGHTING.hemiIntensity).toBeLessThanOrEqual(0.6);
     expect(IGNIVAR_ARENA_LIGHTING.envIntensity).toBeLessThanOrEqual(0.15);
     expect(IGNIVAR_ARENA_LIGHTING.rimIntensity).toBeLessThanOrEqual(1.3);
