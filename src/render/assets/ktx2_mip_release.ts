@@ -41,6 +41,24 @@
 // world props while the workers catch up: a designed, self-healing transient
 // on an exceptional recovery path.
 //
+// Upload pacing: when the caller passes a BackgroundGpuQueue or queue
+// supplier to ktx2MipsOnContextLost, each restore's re-upload (the mipmap
+// swap-in plus needsUpdate) runs as one queued unit at
+// GPU_WORK_PRIORITY.BACKGROUND instead of firing the moment its transcode
+// resolves. A shared 4-worker transcode pool draining a large session-wide
+// backlog (desktop hosts never evict prepared zones, see zone_eviction_core.ts)
+// lands many transcodes close together; setting needsUpdate on all of them
+// unpaced bunches their re-uploads into whichever live frame happens to be
+// current when they settle, an unbudgeted GPU work burst on a canvas that JUST
+// recovered from a context loss. Queuing spreads that cost across frames under
+// the same admission budget every other GPU producer answers to (see
+// "GPU work: every new producer is a client of the scheduler" in
+// src/render/CLAUDE.md). No queue (the caller has none, or none is live) falls
+// back to the pre-existing immediate behavior, and a queue that refuses or has
+// been shut down (a renderer rebuild mid-restore) does too: this stage is a
+// self-healing cosmetic transient, never worth stranding a texture on stubs
+// over.
+//
 // Retention bounds: both registries hold their textures WEAKLY. A texture the
 // world never references again (for example the normal/roughness maps a
 // Lambert-tier material build discards) is garbage-collected together with
@@ -65,6 +83,7 @@
 // iOS is a follow-up that requires a curtained in-place restore first
 // (tracked by issue 3218).
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
+import { type BackgroundGpuQueue, GPU_WORK_PRIORITY } from '../background_gpu_queue';
 
 export interface Ktx2MipLevel {
   width: number;
@@ -113,6 +132,9 @@ export const KTX2_MIP_EXEMPT_MODEL_ROOTS: readonly string[] = [
 
 type RederiveResult = { mipmaps: Ktx2MipLevel[]; format: number };
 type Ktx2RederiveFn = (source: ArrayBuffer) => Promise<RederiveResult>;
+type BackgroundGpuQueueSource =
+  | BackgroundGpuQueue
+  | (() => BackgroundGpuQueue | undefined | Promise<BackgroundGpuQueue | undefined>);
 
 type ReleaseState = 'armed' | 'released' | 'restoring';
 
@@ -321,8 +343,15 @@ function releaseAfterUpload(tex: ReleasableCompressedTexture, entry: ReleaseEntr
  *  player is no longer near, at the direct expense of the ones they are
  *  standing next to. Correctness does not depend on order (every entry starts
  *  its own restore), only which finish before an unrelated caller stops
- *  awaiting them. */
-export function ktx2MipsOnContextLost(): void {
+ *  awaiting them.
+ *
+ *  `queue` can be the CURRENT renderer's background_gpu_queue, or a supplier
+ *  that resolves one when a restore is ready to apply. The supplier form is
+ *  load-bearing for graphics rebuilds: the context-loss event fires after the
+ *  old queue shuts down and before the candidate renderer exists, so the live
+ *  queue must be bound later, at apply time. Omit it (or pass none) to keep
+ *  the pre-existing immediate-upload behavior. */
+export function ktx2MipsOnContextLost(queue?: BackgroundGpuQueueSource): void {
   if (!rederive) return;
   const released: [ReleasableCompressedTexture, ReleaseEntry][] = [];
   for (const pair of entries.entries()) {
@@ -330,7 +359,7 @@ export function ktx2MipsOnContextLost(): void {
   }
   for (let i = released.length - 1; i >= 0; i--) {
     const [tex, entry] = released[i] as [ReleasableCompressedTexture, ReleaseEntry];
-    startRestore(tex, entry);
+    startRestore(tex, entry, queue);
   }
 }
 
@@ -400,7 +429,11 @@ export function ktx2RetainedSourceBytes(): number {
   return total;
 }
 
-function startRestore(tex: ReleasableCompressedTexture, entry: ReleaseEntry): void {
+function startRestore(
+  tex: ReleasableCompressedTexture,
+  entry: ReleaseEntry,
+  queue?: BackgroundGpuQueueSource,
+): void {
   if (!rederive) return;
   entry.state = 'restoring';
   // Pass a copy: the transcode transfers its input buffer to the worker
@@ -416,11 +449,44 @@ function startRestore(tex: ReleasableCompressedTexture, entry: ReleaseEntry): vo
         entry.state = 'released';
         return;
       }
-      tex.mipmaps = fresh.mipmaps;
-      if (tex.source) tex.source.dataReady = true;
-      entry.state = 'armed';
-      // Re-upload on the next render; that upload's onUpdate re-releases.
-      tex.needsUpdate = true;
+      // Re-checked at the point of application, not just above: when queued,
+      // time passes between the transcode settling and this unit actually
+      // running, and the texture can be disposed or lose a race with a
+      // second context loss in between.
+      const applyRestore = (): void => {
+        if (entries.get(tex) !== entry || entry.state !== 'restoring') return;
+        tex.mipmaps = fresh.mipmaps;
+        if (tex.source) tex.source.dataReady = true;
+        entry.state = 'armed';
+        // Re-upload on the next render; that upload's onUpdate re-releases.
+        tex.needsUpdate = true;
+      };
+      const queueAtApply = Promise.resolve().then(() =>
+        typeof queue === 'function' ? queue() : queue,
+      );
+      return queueAtApply.then(
+        (uploadQueue) => {
+          if (!uploadQueue) {
+            applyRestore();
+            return;
+          }
+          // See the module header's "Upload pacing" section: a queued unit at
+          // the cosmetic BACKGROUND tier so a large backlog's re-uploads
+          // spread across frames instead of bursting into whichever one they
+          // settle in.
+          return uploadQueue
+            .run(applyRestore, GPU_WORK_PRIORITY.BACKGROUND, 'ktx2-restore:upload')
+            .catch(() => {
+              // The queue refused or was shut down (a renderer rebuild/teardown
+              // raced this restore): apply directly rather than strand the
+              // texture on stubs forever, matching the no-queue path above.
+              applyRestore();
+            });
+        },
+        () => {
+          applyRestore();
+        },
+      );
     },
     (err: unknown) => {
       if (entries.get(tex) !== entry) return;
