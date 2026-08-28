@@ -358,9 +358,12 @@ export function buildBattleground(
   // reconnect into a live match the client stays responsive while collider-
   // bearing pieces (the terrain and placements ARE the colliders) are still
   // linking, so a wall can block invisibly for the link duration, where it
-  // used to freeze the whole frame for that same time. A reach floor or
-  // imminence elevation is the tracked follow-up if fleet attach-watchdog
-  // captures show that window mattering.
+  // used to freeze the whole frame for that same time. The mirror image also
+  // holds: entity views carry their own gate and reveal independently, so for
+  // the same window a fighter can be visible THROUGH a keep wall that has not
+  // drawn yet. Both are transient, tier-neutral, and the same trade the
+  // interiors seam ships. A reach floor or imminence elevation is the tracked
+  // follow-up if fleet attach-watchdog captures show that window mattering.
   const attachPieceGated = (piece: THREE.Object3D): void => {
     void attachSceneGroupGated(group, piece, opts.compileGate, () => disposed).catch(() => {
       // A field retired mid-gate cancels its reveal; dispose() owns teardown.

@@ -12,6 +12,7 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { stripComments } from './helpers/strip_comments';
 
 vi.mock('../src/render/dungeon', () => ({
   ensureDungeonAssets: vi.fn(() => Promise.resolve()),
@@ -256,7 +257,11 @@ describe('the battleground field stream gates every piece on the compile gate', 
   });
 
   it('routes every streamed piece through the gated attach seam, gate injected by the renderer (source pins)', () => {
-    const field = readFileSync(new URL('../src/render/battleground.ts', import.meta.url), 'utf8');
+    // Stripped so a comment near-quoting a pinned call can never satisfy a
+    // positive pin after a regression; the pins read CODE only.
+    const field = stripComments(
+      readFileSync(new URL('../src/render/battleground.ts', import.meta.url), 'utf8'),
+    );
     expect(field).toContain("from './gated_scene_attach'");
     // one helper, cancellation owned by the view's own disposed flag
     expect(field).toContain(
@@ -281,13 +286,16 @@ describe('the battleground field stream gates every piece on the compile gate', 
     expect(field).not.toContain('group.add(terrain.group)');
     expect(field).not.toContain('group.add(placements.group)');
 
-    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const renderer = stripComments(
+      readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8'),
+    );
     const start = renderer.indexOf('buildBattleground(o, this.sim.cfg.seed, {');
     expect(start).toBeGreaterThan(-1);
-    const construction = renderer.slice(
-      start,
-      renderer.indexOf('this.bgViews.set(i, view);', start),
-    );
+    // The end marker is asserted too: an unchecked -1 would silently widen
+    // the slice to the file tail and let the pin pass from anywhere.
+    const end = renderer.indexOf('this.bgViews.set(i, view);', start);
+    expect(end).toBeGreaterThan(-1);
+    const construction = renderer.slice(start, end);
     expect(construction).toContain(
       'compileGate: this.asyncCompileSupported ? (t) => this.compileGate(t) : undefined,',
     );
