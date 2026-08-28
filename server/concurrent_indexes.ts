@@ -64,6 +64,11 @@ import {
   PLAYER_REPORTS_RETENTION_INVALID_INDEX_DROP_SQL,
 } from './player_reports_retention_index';
 import {
+  WOC_MARKET_OPS_CLOSED_INDEX_SQL,
+  WOC_MARKET_OPS_CLOSED_INVALID_INDEX_CHECK_SQL,
+  WOC_MARKET_OPS_CLOSED_INVALID_INDEX_DROP_SQL,
+} from './woc_market_ops_listings_index';
+import {
   WOC_MARKET_SALES_SELLER_INDEX_SQL,
   WOC_MARKET_SALES_SELLER_INVALID_INDEX_CHECK_SQL,
   WOC_MARKET_SALES_SELLER_INVALID_INDEX_DROP_SQL,
@@ -166,9 +171,19 @@ export const CONCURRENT_INDEX_MIGRATIONS: readonly ConcurrentIndexMigration[] = 
     checkSql: WOC_MARKET_SALES_SELLER_INVALID_INDEX_CHECK_SQL,
     dropSql: WOC_MARKET_SALES_SELLER_INVALID_INDEX_DROP_SQL,
   },
+  // The internal dashboard's Sold and Cancelled listing filters. Appended,
+  // never inserted: the migration order is load-bearing and pinned.
+  {
+    name: 'woc_market_ops_closed_created',
+    createSql: WOC_MARKET_OPS_CLOSED_INDEX_SQL,
+    checkSql: WOC_MARKET_OPS_CLOSED_INVALID_INDEX_CHECK_SQL,
+    dropSql: WOC_MARKET_OPS_CLOSED_INVALID_INDEX_DROP_SQL,
+  },
   // The partial ordered reader for large per-account movements. New entries
   // append after every previously shipped migration, never replace or move an
-  // old entry. See bank_ledger_indexes.ts for the staged retirement plan.
+  // old entry (the release's ops-closed entry above shipped first, so this
+  // branch's entry follows it). See bank_ledger_indexes.ts for the staged
+  // retirement plan.
   {
     name: 'bank_ledger_account_large_recent',
     createSql: BANK_LEDGER_ACCOUNT_LARGE_INDEX_SQL,

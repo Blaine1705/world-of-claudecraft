@@ -240,7 +240,16 @@ const MONOLITHS: MonolithRow[] = [
     // paid both lines by trimming the Exchange-window comment, so its arm and
     // the merged tree both net zero against this row. Measured on the merged
     // tree, never reconciled by arithmetic. Exact count, zero slack.
-    ceiling: 18491,
+    // Re-pinned at the fourth release/v0.41.0 sync (release tip 8592df3866).
+    // The release arm carries two hud-heavy batches of its own: the PR #3284
+    // interface-unlock merge (raised, then partially taken back by the
+    // review-round extraction into the pure core interface_unlock_menu_core.ts;
+    // what remains on coordinator state, the dimension-mode mover wiring, the
+    // edit-preview painter closure and the player-frame bar lock, is the
+    // live-hooks half) and the snap-grid / edit-cursor rework under PR #3714.
+    // This branch's arm stays its +3 store and vault chrome. Measured on the
+    // merged tree, never reconciled by arithmetic. Exact count, zero slack.
+    ceiling: 19005,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -409,7 +418,12 @@ const MONOLITHS: MonolithRow[] = [
     // availability probe and browser authorizer moved to
     // src/net/desktop_wallet_handoff.ts (thin hoisted delegators remain),
     // paying for the Exchange desktop-signer wiring at the attach site.
-    ceiling: 11563,
+    // Raised at the PR #3284 v0.41.0 sync merge: the applySetting arms for
+    // the interface-editor settings (frame dimensions, aura direction vars,
+    // the player-frame bar lock) predate this ratchet; folding them behind a
+    // src/game/ settings-application seam is flagged follow-up work. Exact
+    // merged count.
+    ceiling: 11629,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -591,10 +605,17 @@ const MONOLITHS: MonolithRow[] = [
     // (quote legs, price/estimate readouts, WocMarketEconomy) moved to
     // woc_market_economy_types.ts (the monitor-types pattern), paying for the
     // desktopHandoff registrar dep and its four registration call sites.
+    // Down 3929 -> 3924 on the release arm: the operator listing and p2p row
+    // vocabulary moved to woc_market_ops.ts instead of growing this
+    // coordinator.
     // Re-pinned at the third release/v0.41.0 sync into the bank-storage branch:
     // the merged file lands six lines under the release's own pin, so the
     // ratchet follows it down. Measured on the merged tree. Exact count.
-    ceiling: 3923,
+    // Re-pinned at the fourth release/v0.41.0 sync (release tip 8592df3866,
+    // the operator-listing batch above): the merged file again lands below
+    // both parent pins and the ratchet follows it down. Measured on the
+    // merged tree. Exact count.
+    ceiling: 3918,
     seam: 'a woc_market_<thing>.ts sibling behind WocMarketDeps (the drift-warn split is the template)',
   },
   {
