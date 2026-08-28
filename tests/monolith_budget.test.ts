@@ -167,9 +167,10 @@ const MONOLITHS: MonolithRow[] = [
     // plus the one closure that reads it) with no pure logic to extract --
     // the actual selection algorithm moved to src/ui/aura_overflow_priority.ts
     // instead, which is the real fix. Maintainer decision, exact merged count.
-    // The release merge keeps both parent surfaces, and the resolved comment
-    // lands two lines lower, so the ratchet follows the exact merged count.
-    ceiling: 18534,
+    // Lowered after extracting the managed-window position clamp into
+    // src/ui/window_position_core.ts. The release merge keeps both parent
+    // surfaces, and the ratchet follows the exact merged count with zero slack.
+    ceiling: 18530,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
