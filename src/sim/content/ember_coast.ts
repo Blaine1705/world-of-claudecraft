@@ -148,6 +148,22 @@ export const FORGEFATHER_STAIR_RAMPS: readonly StairRampBand[] = [
   { link: true, axis: 'x', b0: 2196.23, b1: 2204.67, a0: 501.55, a1: 502.95, h0: 2.64, h1: 2.0 },
 ];
 
+/** No wild scatter on the fortress's graded grounds (the Last Keep rule):
+ *  decorationAt refuses these discs, so a seed re-roll can never seat a
+ *  boulder in a court or across a stair flight. The shores outside keep
+ *  their natural stones. */
+const FORGEFATHER_SCATTER_CLEAR = [
+  { x: 508, z: 2205, r: 20 }, // the lower works: quay, gate, forecourt, courts
+  { x: 505, z: 2237, r: 16 }, // the upper works: tiers, landing court, keep
+] as const;
+
+export function forgefatherScatterExcluded(x: number, z: number): boolean {
+  for (const disc of FORGEFATHER_SCATTER_CLEAR) {
+    if (Math.hypot(x - disc.x, z - disc.z) < disc.r) return true;
+  }
+  return false;
+}
+
 /** The absolute stair-ramp surface at a point, or -Infinity outside every
  *  band (the walk_lifts max then leaves the ground untouched). */
 export function forgefatherStairSurface(x: number, z: number): number {

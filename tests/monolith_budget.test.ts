@@ -341,8 +341,10 @@ const MONOLITHS: MonolithRow[] = [
     // the ember coast tables extracted to content/ember_coast.ts (the
     // vale_coast.ts pattern); the Forgefather's Isle cone rode the freed room.
     // The walkable-lift sum extracted to walk_lifts.ts (the Forgefather
-    // stair ramps fold in there); exact count.
-    ceiling: 5300,
+    // stair ramps fold in there), then EMBER_LAVA_POOLS moved home to
+    // ember_lava_layout.ts beside its flat-pool sibling (paying for the
+    // fortress scatter screen); exact count.
+    ceiling: 5275,
     seam: 'zone/terrain data as content records; logic as sim sibling modules',
   },
   {

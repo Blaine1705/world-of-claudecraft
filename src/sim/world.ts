@@ -2,7 +2,7 @@ import { bgFieldHeightLocal } from './battleground_field';
 import { BORDER_EDGES } from './border_edges';
 import { bulwarkPadTarget, bulwarkPadWeight } from './bulwark_layout';
 import { castlePadTarget, castlePadWeight, castleSkirtWeight, LAST_SPRING } from './castle_layout';
-import { EMBER_BAYS, EMBER_LAND_LOBES } from './content/ember_coast';
+import { EMBER_BAYS, EMBER_LAND_LOBES, forgefatherScatterExcluded } from './content/ember_coast';
 import { STABLE_FLAT, STABLE_PADDOCK } from './content/mounts';
 import { PALMREACH_PROPS } from './content/palmreach';
 import { VALE_BAYS, VALE_LAND_LOBES } from './content/vale_coast';
@@ -38,6 +38,7 @@ import { eastbrookDeckSurface } from './eastbrook_harbor';
 import {
   EMBER_FLAT_POOLS,
   EMBER_LAVA_LINKS,
+  EMBER_LAVA_POOLS,
   emberLinkDistanceNorm,
   emberNearestOnLink,
 } from './ember_lava_layout';
@@ -2258,29 +2259,6 @@ export const EMBER_VOLCANOES = [
 ] as const;
 // the Snowline crossing's drake-side footing (appended to the ember lobes
 // below via EMBER_GATE_LOBES; the fire road to the ice)
-
-// Open lava pools out in the wastes (shaped as shallow flat-floored basins;
-// the render lava surface sits just above each floor).
-// padK: where the flat melt floor ends, as a fraction of r. The default 0.95
-// keeps the whole model footprint on level ground; the Drakemaw vent keeps
-// the original tight eye (0.55) because its shore is the escape bench's
-// wade-out ramp (DRAKEMAW_ESCAPE), pinned by tests/terrain_escape_walkout.test.ts.
-export const EMBER_LAVA_POOLS = [
-  { x: 390, z: 2320, r: 14, floor: 12, padK: 0.55 }, // the vent inside the Drakemaw crater
-  { x: 446, z: 2220, r: 11, floor: -0.5 },
-  { x: 302, z: 2328, r: 11, floor: 0 },
-  // crater pools high in the two smaller cones (padK 0.55: the pit walls
-  // cradle the model's rocky ring, and the escape walkers need the legacy
-  // gentle floor-to-wall transition)
-  { x: 270, z: 2282, r: 7, floor: 11.5, padK: 0.55 },
-  { x: 487, z: 2356, r: 6, floor: 9.5, padK: 0.55 },
-  // the Moltenmaw: an open lava-lake field east of the caldera. The big eye
-  // sits at (423, 2347) so its whole model footprint (r * 1.15) stays clear
-  // of the Drakemaw escape bench ring (benchFade 23 from the vent), whose
-  // every-azimuth dry-shore guarantee is pinned by tests/terrain_escape_walkout.
-  { x: 423, z: 2347, r: 16, floor: -1.2 },
-  { x: 438, z: 2326, r: 10, floor: -1.2 },
-] as const;
 
 function emberShapingOffset(x: number, z: number, seed: number): number {
   if (z < DRAKE_ZMIN - 10 || z > DRAKE_ZMAX + 40) return 0;
@@ -5090,8 +5068,10 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
     // beds, and the shaped basins stay clear (a rock there is also a stray
     // collider standing in the melt)
     if (gz > 2160 && gz < 2360 && emberLinkDistanceNorm(gx, gz) < 1.1) return null;
-    // the Last Keep's graded grounds carry no wild scatter
+    // the Last Keep's graded grounds carry no wild scatter, and neither
+    // do the Forgefather fortress's courts and stair flights
     if (castlePadWeight(gx, gz) > 0) return null;
+    if (forgefatherScatterExcluded(gx, gz)) return null;
     // ...nor the Ashen Bulwark's headland pad (a boulder in the drill yard
     // is also a stray collider standing in the muster lane)
     if (bulwarkPadWeight(gx, gz) > 0) return null;

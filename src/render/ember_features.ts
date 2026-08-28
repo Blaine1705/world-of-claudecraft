@@ -7,10 +7,15 @@
 // the renderer's rank-culled fireLights budget.
 import * as THREE from 'three';
 import { CASTLE_CRYSTALS } from '../sim/castle_layout';
-import { EMBER_FLAT_POOLS, EMBER_LAVA_LINKS, emberLinkPolyline } from '../sim/ember_lava_layout';
+import {
+  EMBER_FLAT_POOLS,
+  EMBER_LAVA_LINKS,
+  EMBER_LAVA_POOLS,
+  emberLinkPolyline,
+} from '../sim/ember_lava_layout';
 import { EMBER_DENS, emberLilySpots, emberScatterClear } from '../sim/ember_lilies';
 import { hash2 } from '../sim/rng';
-import { EMBER_LAVA_POOLS, terrainHeight } from '../sim/world';
+import { terrainHeight } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { buildForgefatherFortress } from './forgefather_fortress';
