@@ -14,6 +14,10 @@ import type { ItemDef } from '../types';
 // identity picks its audience. Prices are tunable placeholders sized against
 // the four heroic-final-boss rewards available during each realm reset cycle.
 //
+// Soulbound: every piece binds (maintainer rule 2026-08-28: dropped marks
+// and vendor-bought gear are soulbound; boss-dropped gear stays tradeable).
+// Marks purchases were already unrefundable; binding closes the resale loop.
+//
 // Combat rating: every piece also carries ONE combat rating (hit / crit / haste)
 // at JEWELRY_RATING (25 -> 2.5%), chosen by its stat identity. Ratings are off the
 // primary-stat budget (like spellPower), so the sums above stay budget-enforced.
@@ -40,6 +44,7 @@ export const HEROIC_VENDOR_ITEMS: Record<string, ItemDef> = {
     stats: { str: 7, sta: 4 },
     hitRating: JEWELRY_RATING, // plate melee: Hit answers the Heroic +3 miss
     sellValue: 4500,
+    soulbound: true,
   },
   nielas_coldlight_band: {
     id: 'nielas_coldlight_band',
@@ -51,6 +56,7 @@ export const HEROIC_VENDOR_ITEMS: Record<string, ItemDef> = {
     stats: { int: 7, sta: 4 },
     hitRating: JEWELRY_RATING, // dps caster: Hit answers the Heroic +3 resist
     sellValue: 4500,
+    soulbound: true,
   },
   sutils_gambit: {
     id: 'sutils_gambit',
@@ -62,6 +68,7 @@ export const HEROIC_VENDOR_ITEMS: Record<string, ItemDef> = {
     stats: { agi: 7, sta: 4 },
     critRating: JEWELRY_RATING, // agi dps: crit throughput
     sellValue: 4500,
+    soulbound: true,
   },
   oath_of_the_round_table: {
     id: 'oath_of_the_round_table',
@@ -73,6 +80,7 @@ export const HEROIC_VENDOR_ITEMS: Record<string, ItemDef> = {
     stats: { sta: 6, str: 5 },
     hitRating: JEWELRY_RATING, // tank/melee: Hit
     sellValue: 4500,
+    soulbound: true,
   },
   zyzzs_deathless_signet: {
     id: 'zyzzs_deathless_signet',
@@ -84,6 +92,7 @@ export const HEROIC_VENDOR_ITEMS: Record<string, ItemDef> = {
     stats: { spi: 6, int: 5 },
     hasteRating: JEWELRY_RATING, // healer-leaning: haste
     sellValue: 4500,
+    soulbound: true,
   },
   architects_cornerstone: {
     id: 'architects_cornerstone',
@@ -95,6 +104,7 @@ export const HEROIC_VENDOR_ITEMS: Record<string, ItemDef> = {
     stats: { int: 6, spi: 5 },
     hasteRating: JEWELRY_RATING, // caster/healer: uptime
     sellValue: 4500,
+    soulbound: true,
   },
   yumis_keepsake_locket: {
     id: 'yumis_keepsake_locket',
@@ -106,6 +116,7 @@ export const HEROIC_VENDOR_ITEMS: Record<string, ItemDef> = {
     stats: { agi: 7, sta: 5 },
     hasteRating: JEWELRY_RATING, // agi dps: uptime
     sellValue: 6000,
+    soulbound: true,
   },
   zense_meridian: {
     id: 'zense_meridian',
@@ -117,6 +128,7 @@ export const HEROIC_VENDOR_ITEMS: Record<string, ItemDef> = {
     stats: { int: 7, spi: 5 },
     critRating: JEWELRY_RATING, // caster throughput
     sellValue: 6000,
+    soulbound: true,
   },
   swiftfang_talisman: {
     id: 'swiftfang_talisman',
@@ -128,6 +140,7 @@ export const HEROIC_VENDOR_ITEMS: Record<string, ItemDef> = {
     stats: { str: 6, agi: 6 },
     hasteRating: JEWELRY_RATING, // hybrid melee: haste (the Hit lane keeps nine_oaths + round_table)
     sellValue: 6000,
+    soulbound: true,
   },
   medallion_of_endless_profit: {
     id: 'medallion_of_endless_profit',
@@ -139,6 +152,7 @@ export const HEROIC_VENDOR_ITEMS: Record<string, ItemDef> = {
     stats: { str: 7, sta: 5 },
     critRating: JEWELRY_RATING, // melee throughput
     sellValue: 6000,
+    soulbound: true,
   },
 };
 

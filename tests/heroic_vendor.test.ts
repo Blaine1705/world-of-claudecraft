@@ -53,6 +53,10 @@ describe('heroic vendor stock: item-level and budget pins', () => {
       expect(['ring', 'neck']).toContain(item.slot);
       expect(offer.marks).toBeGreaterThan(0);
       expect(itemLevel(item), offer.itemId).toBe(26);
+      // Maintainer rule (2026-08-28): dropped marks and vendor-bought gear
+      // are soulbound (boss-dropped gear stays tradeable). Marks purchases
+      // were already unrefundable; binding closes the resale loop.
+      expect(item.soulbound, offer.itemId).toBe(true);
     }
   });
 
