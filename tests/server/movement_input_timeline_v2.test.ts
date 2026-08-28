@@ -197,6 +197,28 @@ describe('MovementInputTimeline', () => {
     expect(timeline.starved).toBe(1);
   });
 
+  it('does not require battleground state when consuming a lightweight sim', () => {
+    const timeline = new MovementInputTimeline();
+    const session = {
+      pid: 1,
+      lastInputAt: 0,
+      ...createMovementInputSessionState(2),
+      movementTimeline: timeline,
+    };
+    const meta = { moveInput: emptyMoveInput() };
+    const entity = { auras: [], dead: false, facing: 0, ghost: false };
+    const sim = {
+      time: 1,
+      meta: () => meta,
+      entities: new Map([[1, entity]]),
+    };
+    timeline.enqueue(frame(0, true));
+
+    expect(() => consumeMovementFramesV2(sim as never, [session])).not.toThrow();
+    expect(meta.moveInput.forward).toBe(true);
+    expect(session.lastConsumedCt).toBe(0);
+  });
+
   it('clears held input on null starvation ticks without advancing the ack', () => {
     const timeline = new MovementInputTimeline();
     const session = {

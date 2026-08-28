@@ -260,7 +260,12 @@ function battlegroundBlockedWallPress(ctx: SimContext, meta: PlayerMeta, p: Enti
   return battlegroundBlockedProbe(ctx, p, wish);
 }
 
-export function noteBattlegroundWallPressure(ctx: SimContext, meta: PlayerMeta, p: Entity): void {
+export function noteBattlegroundWallPressure(
+  ctx: SimContext | undefined,
+  meta: PlayerMeta,
+  p: Entity,
+): void {
+  if (!ctx?.bgMatches) return;
   const grace = battlegroundWallPressGrace.get(ctx);
   if (!activeBattlegroundAt(ctx, p)) {
     grace?.delete(p.id);
@@ -309,8 +314,8 @@ function battlegroundGeometryTrap(ctx: SimContext, meta: PlayerMeta, p: Entity):
   );
 }
 
-function activeBattlegroundAt(ctx: SimContext, p: Entity): boolean {
-  const match = ctx.bgMatches.get(p.id);
+function activeBattlegroundAt(ctx: SimContext | undefined, p: Entity): boolean {
+  const match = ctx?.bgMatches?.get(p.id);
   if (!match || !isBgPos(p.pos.x)) return false;
   return match.slot === bgOriginAt(p.pos.z).slot;
 }
