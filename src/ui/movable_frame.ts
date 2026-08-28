@@ -318,11 +318,18 @@ export class MovableFrame {
       // bottom, its own corner), through the same data-resize-edge channel
       // the border hover writes.
       grip.addEventListener('pointerenter', () => {
-        if (this.unlocked && !this.cfg.isMobileLayout())
-          this.cfg.frame.setAttribute('data-resize-edge', 'se');
+        // Through setHoverCursor so the hover MEMO tracks the grip's 'se'
+        // stamp (the grip carries its own CSS cursor, so the frame's inline
+        // cursor is simply released to the stylesheet here).
+        if (this.unlocked && !this.cfg.isMobileLayout()) this.setHoverCursor('', 'se');
       });
       grip.addEventListener('pointerleave', () => {
-        if (!this.gesture) this.cfg.frame.removeAttribute('data-resize-edge');
+        // Through setHoverCursor so the hover elision MEMO clears too:
+        // removing only the attribute left the memo holding the border the
+        // pointer arrived from, and sliding back onto that same band stayed
+        // elided with the highlight gone (review round four). Also covers
+        // the stale 'se' left when a grip drag ends off the frame.
+        if (!this.gesture) this.setHoverCursor('', undefined);
       });
     }
     // The name chip: plain text naming WHICH frame this is, because an unlocked
@@ -883,11 +890,13 @@ export class MovableFrame {
         ev.clientY - g.startY,
         g.factor,
       );
-      // Snap the stretched axis's VISUAL extent onto the grid (author px
-      // times the gesture factor), like every other resize here.
+      // Snap ONLY the stretched axis's VISUAL extent onto the grid (author
+      // px times the gesture factor), like every other resize here; the
+      // cross axis is not part of this gesture (the pos write below drops
+      // it anyway, so snapping it was dead math at best).
       if (snap && g.factor > 0) {
-        box.w = snapFrameSize(box.w * g.factor) / g.factor;
-        box.h = snapFrameSize(box.h * g.factor) / g.factor;
+        if (g.edge === 'e' || g.edge === 'w') box.w = snapFrameSize(box.w * g.factor) / g.factor;
+        else box.h = snapFrameSize(box.h * g.factor) / g.factor;
       }
       const anchored = posFromEdgeResize(
         g.edge,

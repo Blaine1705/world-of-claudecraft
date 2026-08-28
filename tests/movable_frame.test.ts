@@ -684,6 +684,21 @@ describe('MovableFrame edge resize', () => {
     expect(frame.getAttribute('data-resize-edge')).toBeNull();
   });
 
+  it('returning to the approach band after a grip visit repaints its highlight', () => {
+    const { frame, btn, grip } = makeScalableFrame();
+    btn.dispatch('click', pointer()); // unlock
+    // Hover the east band (the grip's approach path), slide onto the grip,
+    // slide back: the leave handler must clear the hover MEMO with the
+    // attribute, or the east band stays elided and its glow never repaints.
+    frame.dispatch('pointermove', pointer({ clientX: 648, clientY: 540 }));
+    expect(frame.getAttribute('data-resize-edge')).toBe('e');
+    grip.dispatch('pointerenter', pointer());
+    expect(frame.getAttribute('data-resize-edge')).toBe('se');
+    grip.dispatch('pointerleave', pointer());
+    frame.dispatch('pointermove', pointer({ clientX: 648, clientY: 540 }));
+    expect(frame.getAttribute('data-resize-edge')).toBe('e');
+  });
+
   it('hovering the corner grip lights the two edges it resizes (right and bottom)', () => {
     const { frame, btn, grip } = makeScalableFrame();
     btn.dispatch('click', pointer()); // unlock

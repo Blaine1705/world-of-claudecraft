@@ -278,6 +278,28 @@ describe('ChatGeometryController interface unlock', () => {
     expect(harness.wrap.getAttribute('data-resize-edge')).toBeNull();
   });
 
+  it('returning to the approach band after a grip visit repaints its highlight', () => {
+    const harness = makeHarness(
+      { woc_chat_geometry: '{"left":100,"top":80,"width":370,"height":184}' },
+      { unlocked: true },
+    );
+    harness.controller.init();
+    const grip = harness.frame.querySelector<HTMLElement>('.chat-resize-grip');
+    // East band, then the grip, then back: the leave handler must clear the
+    // hover memo or the east band stays elided (review round four).
+    harness.wrap.dispatchEvent(
+      pointerEvent('pointermove', { pointerId: 6, clientX: 468, clientY: 170 }),
+    );
+    expect(harness.wrap.getAttribute('data-resize-edge')).toBe('e');
+    grip?.dispatchEvent(new Event('pointerenter'));
+    expect(harness.wrap.getAttribute('data-resize-edge')).toBe('se');
+    grip?.dispatchEvent(new Event('pointerleave'));
+    harness.wrap.dispatchEvent(
+      pointerEvent('pointermove', { pointerId: 6, clientX: 468, clientY: 170 }),
+    );
+    expect(harness.wrap.getAttribute('data-resize-edge')).toBe('e');
+  });
+
   it('the grip hover stamps nothing while the interface is locked', () => {
     const harness = makeHarness({
       woc_chat_geometry: '{"left":100,"top":80,"width":370,"height":184}',

@@ -125,11 +125,26 @@ export class ChatGeometryController {
     // through the same data-resize-edge channel the border hover writes;
     // arrange mode only, matching the highlight's own CSS gate.
     grip.addEventListener('pointerenter', () => {
-      if (this.deps.isInterfaceUnlocked?.() && !this.deps.isMobileLayout())
+      // The hover MEMO tracks the grip's stamp (the grip carries its own
+      // CSS cursor, so the wrap's inline cursor is released here).
+      if (this.deps.isInterfaceUnlocked?.() && !this.deps.isMobileLayout()) {
+        this.hoverCursor = '';
+        this.hoverEdge = 'se';
+        wrap.style.cursor = '';
         wrap.setAttribute('data-resize-edge', 'se');
+      }
     });
     grip.addEventListener('pointerleave', () => {
-      if (!this.chatBoxGesture) wrap.removeAttribute('data-resize-edge');
+      // Clear the hover elision MEMO with the attribute: leaving only the
+      // attribute meant sliding back onto the border band the pointer came
+      // from stayed elided and the highlight never repainted (review round
+      // four, mirroring MovableFrame's grip leave).
+      if (!this.chatBoxGesture) {
+        this.hoverCursor = '';
+        this.hoverEdge = null;
+        wrap.style.cursor = '';
+        wrap.removeAttribute('data-resize-edge');
+      }
     });
     frame.appendChild(grip);
 

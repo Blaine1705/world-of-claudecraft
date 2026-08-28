@@ -40,18 +40,20 @@ describe('party frame bar sizing', () => {
 });
 
 describe('snap-to-grid alignment overlay', () => {
-  it('draws its lines on the exact FRAME_SNAP_GRID pitch', () => {
-    // FRAME_SNAP_GRID is 16 (pinned in tests/target_frame_pos.test.ts); the
-    // overlay must repeat on the same pitch or the drawn grid lies about
-    // where a snapped drag lands.
+  it('draws its lines on the FRAME_SNAP_GRID pitch in VISUAL px', () => {
+    // FRAME_SNAP_GRID is 16 (pinned in tests/target_frame_pos.test.ts) and
+    // every snap quantizes VISUAL px, but the overlay lives inside #ui,
+    // which zooms by --ui-scale: the author-space pitch must divide by the
+    // scale so the zoom lands the drawn lines back on 16 visual px. A plain
+    // 16px here drew the grid offset from where snaps land at any UI Scale
+    // other than 1 (review round four, blocker 1).
     const overlay = hudCss.slice(hudCss.indexOf('#interface-grid-overlay {'));
     const block = overlay.slice(0, overlay.indexOf('}'));
-    expect(block).toContain(
-      'repeating-linear-gradient(to right, #c9a54528 0 1px, transparent 1px 16px)',
-    );
-    expect(block).toContain(
-      'repeating-linear-gradient(to bottom, #c9a54528 0 1px, transparent 1px 16px)',
-    );
+    const pitches = block.match(/transparent 1px calc\(16px \/ var\(--ui-scale, 1\)\)/g) ?? [];
+    expect(pitches, 'both gradients carry the scale-compensated pitch').toHaveLength(2);
+    expect(block).toContain('repeating-linear-gradient');
+    // No uncompensated pitch may survive in the block.
+    expect(block).not.toMatch(/transparent 1px 16px/);
     expect(block).toContain('pointer-events: none;');
   });
 });

@@ -1947,19 +1947,32 @@
      controls that stay live while the interface is unlocked, so they sit
      outside the pointer-inert sweep by not being inside a frame. */
   /* The Snap to Grid alignment grid (frameSnapToGrid): one faint gold line
-     every 16px, the exact FRAME_SNAP_GRID pitch snapped drags land on
-     (src/ui/target_frame_pos.ts). First child of #ui at z-index 0, so it
-     paints over the world but under every frame being arranged; the
-     coordinator shows it only while the interface is unlocked AND the
-     setting is on (interface_unlock.ts refreshGridOverlay). */
+     every 16 VISUAL px, the exact FRAME_SNAP_GRID pitch snapped drags land
+     on (src/ui/target_frame_pos.ts). The overlay lives inside #ui, which
+     carries zoom: var(--ui-scale), so the author-space pitch divides by the
+     scale and the zoom multiplies it back to 16 visual px, the same
+     compensation #ui's own width uses; a plain 16px here drew the grid
+     offset from where snaps actually land at any other UI Scale (review
+     round four, blocker 1). First child of #ui at z-index 0, so it paints
+     over the world but under every frame being arranged; the coordinator
+     shows it only while the interface is unlocked AND the setting is on
+     (interface_unlock.ts refreshGridOverlay). */
   #interface-grid-overlay {
     position: fixed;
     inset: 0;
     pointer-events: none;
     z-index: 0;
     background-image:
-      repeating-linear-gradient(to right, #c9a54528 0 1px, transparent 1px 16px),
-      repeating-linear-gradient(to bottom, #c9a54528 0 1px, transparent 1px 16px);
+      repeating-linear-gradient(
+        to right,
+        #c9a54528 0 1px,
+        transparent 1px calc(16px / var(--ui-scale, 1))
+      ),
+      repeating-linear-gradient(
+        to bottom,
+        #c9a54528 0 1px,
+        transparent 1px calc(16px / var(--ui-scale, 1))
+      );
   }
   #interface-edit-controls {
     position: absolute;
