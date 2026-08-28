@@ -303,10 +303,12 @@ const MONOLITHS: MonolithRow[] = [
     // paying for the Exchange desktop-signer wiring at the attach site.
     // The v0.41.0 reconcile keeps the desktop signer extraction,
     // alwaysShowAllBuffs dispatch, wallet reauth, Discord login-choice
-    // persistence, and the interface-editor setting arms. Folding the
-    // settings application behind a src/game/ or src/ui/ seam remains
-    // follow-up work. Exact merged count.
-    ceiling: 11629,
+    // persistence, and the interface-editor setting arms; #3647's
+    // movement-harness extractions (snapshot_alpha, input_echo_tracker,
+    // self_motion_gate) also stay in the merged tree. Folding the settings
+    // application behind a src/game/ or src/ui/ seam remains follow-up work.
+    // The ratchet follows the exact merged file count with zero slack.
+    ceiling: 11589,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
