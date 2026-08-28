@@ -348,7 +348,7 @@ interface AttributionTargetFixture {
 // output-scrub patch hash and Eastbrook asset evidence inputs. No capture was
 // retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '9bec199ec370911d7035d0c513156ee7c5417e1759d4e14a1e9aa7ec5b3e5fec';
+  'ddfbcf9a774d3bf02c61c70d152000f64bf18c01ced305a2550144757f979d50';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

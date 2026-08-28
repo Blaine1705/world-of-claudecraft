@@ -493,7 +493,7 @@ describe('bake and merge wiring order', () => {
   });
 
   it('game.loadMail merges the overlay only after a successful book load', () => {
-    const body = boundedBody(gameSrc, 'async loadMail()', 'async saveMail()');
+    const body = boundedBody(gameSrc, 'async loadMail(): Promise<void>', 'async saveMail(');
     const loadAt = body.indexOf('this.sim.loadMail(await loadMailState())');
     const mergeAt = body.indexOf('mergeCustodyParcelOverlay(this.sim)');
     const catchAt = body.indexOf('catch');

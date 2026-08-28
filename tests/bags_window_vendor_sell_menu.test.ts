@@ -63,6 +63,7 @@ function harness(
     closeVendor: noop,
     closeBank: noop,
     onClosed: noop,
+    confirmVendorSell: () => true,
     addItemToTrade: noop,
     stageMarketSell: noop,
     stageMailParcel: noop,
