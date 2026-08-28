@@ -54,6 +54,7 @@ function harness(inventory: InvSlot[]): { root: HTMLElement } {
     closeVendor: noop,
     closeBank: noop,
     onClosed: noop,
+    confirmVendorSell: () => true,
     addItemToTrade: noop,
     stageMarketSell: noop,
     stageMailParcel: noop,
