@@ -23,6 +23,7 @@ import {
   IGNIVAR_SECOND_WING_LAYOUT,
 } from '../src/sim/dungeon_layout';
 import { VARKHUL_FORGE_LOCAL_POS } from '../src/sim/encounters/varkhul';
+import { IGNIVAR_CONDUITS } from '../src/sim/ignivar_arena';
 
 const publicDir = path.join(__dirname, '..', 'public');
 
@@ -51,18 +52,21 @@ describe('ignivar dressing plan', () => {
     }
   });
 
-  it('keeps the arena fighting circle clear (dressing rings the outer walls)', () => {
-    // The water pumps (the reworked conduits) and their pipes sit on the
-    // corner anchors near +/-18, and the rest of the pass hugs the walls, so
-    // the central fighting circle stays open for the Ignivar encounter.
+  it('keeps the arena fighting circle and water conduits clear', () => {
     const plan = ignivarArenaPropPlan(IGNIVAR_LAYOUT);
-    expect(plan.length).toBeGreaterThanOrEqual(30);
+    expect(plan.length).toBeGreaterThanOrEqual(4);
     for (const placement of plan) {
       if (!floorLevel(placement)) continue;
       expect(
         Math.hypot(placement.x, placement.z),
         `${placement.key} at ${placement.x},${placement.z} enters the fighting circle`,
       ).toBeGreaterThan(18);
+      for (const conduit of IGNIVAR_CONDUITS) {
+        expect(
+          Math.hypot(placement.x - conduit.x, placement.z - conduit.z),
+          `${placement.key} at ${placement.x},${placement.z} crowds conduit ${conduit.id}`,
+        ).toBeGreaterThan(4.5);
+      }
     }
   });
 

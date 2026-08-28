@@ -859,10 +859,6 @@ function claimInstance(
       NPCS[spawn.npcId],
       ctx.groundPos(origin.x + spawn.x, origin.z + spawn.z),
     );
-    if (spawn.facing !== undefined) {
-      npc.facing = spawn.facing;
-      npc.prevFacing = spawn.facing;
-    }
     ctx.addEntity(npc);
     inst.npcIds.push(npc.id);
   }

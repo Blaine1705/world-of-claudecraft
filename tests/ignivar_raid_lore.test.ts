@@ -22,7 +22,7 @@ import {
   IGNIVAR_LORE_TEXT_BY_OBJECT_ID,
   IGNIVAR_RAID_NARRATIVE_TEXT_BY_TEMPLATE,
 } from '../src/sim/ignivar_raid_lore';
-import { enterDungeon, instanceOriginOf } from '../src/sim/instances/dungeons';
+import { enterDungeon } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
 import { type Entity, IGNIVAR_BOSS_ID } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
@@ -118,27 +118,11 @@ describe('Ignivar raid lore content', () => {
       { npcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID, x: 0, z: 48 },
     ]);
     expect(DUNGEONS[IGNIVAR_RAID_ARENA_ID].npcs).toEqual([
-      { npcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID, x: 10, z: 24, facing: Math.PI },
+      { npcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID, x: 8, z: 27 },
     ]);
     expect(DUNGEONS[IGNIVAR_SECOND_WING_ID].npcs).toEqual([
       { npcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID, x: 14, z: 31 },
     ]);
-  });
-
-  it('seats the arena projection between the north pillars facing south', () => {
-    const sim = new Sim({ seed: 96, playerClass: 'warrior', devCommands: true });
-    expect(enterDungeon(sim.ctx, IGNIVAR_RAID_ARENA_ID, sim.player.id, true)).toBe(true);
-    const instance = sim.instances.find((entry) => entry.dungeonId === IGNIVAR_RAID_ARENA_ID);
-    if (!instance) throw new Error('Ignivar arena did not claim an instance');
-    const origin = instanceOriginOf(instance);
-    const projection = instance.npcIds
-      .map((id) => sim.entities.get(id))
-      .find((entity): entity is Entity => entity?.templateId === IGNIVAR_MAELIN_PROJECTION_NPC_ID);
-    if (!projection) throw new Error('Maelin projection did not spawn in the arena');
-    // Facing south (Math.PI = -z) between the north pillar row.
-    expect(projection.pos.x - origin.x).toBeCloseTo(10, 3);
-    expect(projection.pos.z - origin.z).toBeCloseTo(24, 3);
-    expect(projection.facing).toBe(Math.PI);
   });
 
   it('keeps records readable as optional lore without granting quest credit', () => {

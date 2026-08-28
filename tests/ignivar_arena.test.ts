@@ -109,14 +109,12 @@ describe('Ignivar raid arena', () => {
     ).toBe(false);
   });
 
-  it('places four diagonal conductors on the placed water pumps', () => {
-    // Anchored on the baked water_pump dressing placements (the pumps ARE the
-    // conduits), so these mirror the four water_pump entries in the arena pass.
+  it('places four symmetric diagonal conductors around the central seal', () => {
     expect(IGNIVAR_CONDUITS).toEqual([
-      { id: 'north_west', x: -16.2, z: 16.4 },
-      { id: 'north_east', x: 17.1, z: 16.8 },
-      { id: 'south_east', x: 16.6, z: -16.5 },
-      { id: 'south_west', x: -17.4, z: -17.1 },
+      { id: 'north_west', x: -18, z: 18 },
+      { id: 'north_east', x: 18, z: 18 },
+      { id: 'south_east', x: 18, z: -18 },
+      { id: 'south_west', x: -18, z: -18 },
     ]);
   });
 
@@ -224,14 +222,11 @@ describe('Ignivar raid arena', () => {
 
     expect(conduits).toHaveLength(4);
     expect(conduits.every((conduit) => conduit.kind === 'object' && !conduit.lootable)).toBe(true);
-    // World coords carry a large instance origin (116800+), so reconstructing
-    // the local offset reintroduces float error at the non-integer pump
-    // anchors; compare with tolerance rather than exact equality. Gameplay is
-    // unaffected: the cleanse check uses world-space differences directly.
-    expect(conduits).toHaveLength(IGNIVAR_CONDUITS.length);
-    for (let index = 0; index < IGNIVAR_CONDUITS.length; index++) {
-      expect(conduits[index].pos.x - origin.x).toBeCloseTo(IGNIVAR_CONDUITS[index].x, 5);
-      expect(conduits[index].pos.z - origin.z).toBeCloseTo(IGNIVAR_CONDUITS[index].z, 5);
-    }
+    expect(
+      conduits.map((conduit) => ({
+        x: conduit.pos.x - origin.x,
+        z: conduit.pos.z - origin.z,
+      })),
+    ).toEqual(IGNIVAR_CONDUITS.map(({ x, z }) => ({ x, z })));
   });
 });

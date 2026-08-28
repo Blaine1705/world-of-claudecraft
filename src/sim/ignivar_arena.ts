@@ -99,15 +99,11 @@ export function ignivarArenaPointInLava(x: number, z: number): boolean {
   );
 }
 
-// Anchored on the maintainer's baked water_pump dressing placements: each
-// conduit object sits on the pump the player sees, so the cleanse pool and the
-// state overlay render on the pump body. Keep these in sync with the four
-// water_pump entries in ignivarArenaPropPlacements.
 export const IGNIVAR_CONDUITS: readonly IgnivarConduitPoint[] = [
-  { id: 'north_west', x: -16.2, z: 16.4 },
-  { id: 'north_east', x: 17.1, z: 16.8 },
-  { id: 'south_east', x: 16.6, z: -16.5 },
-  { id: 'south_west', x: -17.4, z: -17.1 },
+  { id: 'north_west', x: -18, z: 18 },
+  { id: 'north_east', x: 18, z: 18 },
+  { id: 'south_east', x: 18, z: -18 },
+  { id: 'south_west', x: -18, z: -18 },
 ];
 
 export const IGNIVAR_WATER_CONDUIT_TEMPLATES = {

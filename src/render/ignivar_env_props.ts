@@ -48,7 +48,6 @@ export const IGNIVAR_ENV_PROP_URLS: Record<IgnivarEnvPropKey, string> = {
   steam_machine: '/models/dungeon/ignivar_prop_steam_machine.glb',
   steam_machine_round: '/models/dungeon/ignivar_prop_steam_machine_round.glb',
   steam_pipes: '/models/dungeon/ignivar_prop_steam_pipes.glb',
-  water_pump: '/models/dungeon/ignivar_prop_water_pump.glb',
   // The dungeon kit's own sconce, shared verbatim: the placed-torch fire
   // (flame, light, floor pool) rides dungeon_torch_rig.ts per placement.
   torch: '/models/dungeon/torch_mounted.glb',
@@ -82,7 +81,6 @@ const SHADOW_CASTERS: ReadonlySet<IgnivarEnvPropKey> = new Set([
   'steam_machine',
   'steam_machine_round',
   'steam_pipes',
-  'water_pump',
 ]);
 
 interface IgnivarEnvPropTemplate {

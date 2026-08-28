@@ -3483,9 +3483,6 @@ export interface DungeonNpcSpawn {
   npcId: string;
   x: number; // relative to instance origin
   z: number;
-  /** Optional fixed facing in radians (sim convention: 0 = +z). Defaults to
-   *  the NpcDef facing when omitted. */
-  facing?: number;
 }
 
 export interface DungeonObjectSpawn {
