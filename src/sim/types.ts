@@ -4858,6 +4858,10 @@ export interface Entity extends ClientMirroredEntityFields {
   // Sim time of the last "the orb is sealed" nudge shown to this player at a
   // dormant Blood Orb (authored citadel), throttled the same way.
   riftOrbNoticeAt?: number;
+  // Sim time of the last "your raid is still in combat" Ignivar entry denial
+  // shown to this player, so the 20 Hz walk-in door trigger does not spam the
+  // toast (instances/ignivar_entry.ts).
+  ignivarEntryDeniedAt?: number;
   // Sim time of the last lockpickOffer emitted to this player from a
   // rift_locked_chest click, so repeated F-key presses don't spam the UI.
   riftLockpickOfferAt?: number;
