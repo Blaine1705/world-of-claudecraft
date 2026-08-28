@@ -1403,7 +1403,6 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     entry: { x: 0, z: -50 },
     exitOffset: { x: 0, z: -54 },
     spawns: IGNIVAR_FORGE_APPROACH_SPAWN_LIST,
-    mobDifficultyTuningId: IGNIVAR_SECOND_WING_ID,
     npcs: [
       { npcId: IGNIVAR_MAELIN_NPC_ID, x: 0, z: -47 },
       { npcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID, x: 0, z: 48 },
@@ -1500,7 +1499,6 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     entry: { x: 0, z: -50 },
     exitOffset: { x: 0, z: -54 },
     spawns: IGNIVAR_MOLTEN_ASSEMBLY_SPAWN_LIST,
-    mobDifficultyTuningId: IGNIVAR_SECOND_WING_ID,
     npcs: [{ npcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID, x: 0, z: -47 }],
     objects: [
       {
