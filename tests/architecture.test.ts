@@ -586,6 +586,7 @@ const RENDER_PURE_CORES = [
   'src/render/fenbridge_town_visibility_core.ts',
   'src/render/occluder_fade_core.ts',
   'src/render/point_light_shader_core.ts',
+  'src/render/final_color_nan_guard_core.ts',
   'src/render/post_bloom_shader_core.ts',
   'src/render/dynamic_resolution_core.ts',
   'src/render/post_plan_core.ts',

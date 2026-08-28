@@ -9,6 +9,7 @@ import { safeStartupGraphicsPreset } from '../game/startup_graphics_safety';
 import { EFFECTS_QUALITY_LOW_CUTOFF } from '../game/ui_effects_profile';
 import { attachBiomeHaze } from './biome_haze_field';
 import { FAR_ANIM_RANGE_SCALE_MAX } from './crowd_lod';
+import { installFinalColorNanGuard } from './final_color_nan_guard';
 import { gfxAaPolicy } from './gfx_aa_policy_core';
 import { applyGfxOverridesFromSearch } from './gfx_override_core';
 import {
@@ -1876,6 +1877,11 @@ export function activateGfxProfile(profile: GfxProfile): GfxProfile {
     epoch,
   });
 
+  // gradePass tiers already get an equivalent scrub one stage later via
+  // OutputGradePass's sanitizeFinite. Direct-render profiles need the chunk
+  // guard installed during profile activation so graphics rebuilds that skip
+  // initGfxTier still patch ShaderChunk before replacement materials compile.
+  if (!settings.gradePass) installFinalColorNanGuard();
   GFX = settings;
   softwareGlDetected = activated.softwareRendering;
   activeGfxProfile = activated;
@@ -1891,7 +1897,8 @@ export function initGfxTier(webgl: THREE.WebGLRenderer): GfxTier {
   const gpuRenderer = rendererName(webgl);
   const softwareRendering = isSoftwareRendererName(gpuRenderer);
   const hints = { ...runtimeHints(), gpuRenderer };
-  return activateGfxProfile(profileFromHints(hints, softwareRendering, 0)).settings.tier;
+  const activated = activateGfxProfile(profileFromHints(hints, softwareRendering, 0));
+  return activated.settings.tier;
 }
 
 export const gfxInternalsForTest = {
