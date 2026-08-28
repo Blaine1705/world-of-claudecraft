@@ -6,9 +6,13 @@ import {
   VARKHUL_SHARED_PYRE_EVERY_SECONDS,
   VARKHUL_SHARED_PYRE_FIRST_SECONDS,
   VARKHUL_SHARED_PYRE_RADIUS,
+  VARKHUL_SHARED_PYRE_RAID_DAMAGE_PER_MISSING,
+  VARKHUL_SHARED_PYRE_REQUIRED_PLAYERS,
   varkhulSharedPyreDamageFraction,
   varkhulSharedPyreEligibleTargets,
+  varkhulSharedPyreRaidDamageFraction,
   varkhulSharedPyreRequiredPlayers,
+  varkhulSharedPyreTotalDamageFraction,
 } from '../src/sim/varkhul_shared_pyre';
 
 describe('Varkhul Shared Pyre', () => {
@@ -18,11 +22,24 @@ describe('Varkhul Shared Pyre', () => {
     expect(VARKHUL_SHARED_PYRE_FIRST_SECONDS).toBe(20);
     expect(VARKHUL_SHARED_PYRE_EVERY_SECONDS).toBe(38);
     expect(VARKHUL_SHARED_PYRE_RADIUS).toBe(5.5);
+    expect(VARKHUL_SHARED_PYRE_REQUIRED_PLAYERS).toBe(4);
     expect(varkhulSharedPyreRequiredPlayers('normal')).toBe(4);
-    expect(varkhulSharedPyreRequiredPlayers('heroic')).toBe(5);
+    expect(varkhulSharedPyreRequiredPlayers('heroic')).toBe(4);
     expect(varkhulSharedPyreDamageFraction('normal', 4)).toBeCloseTo(0.35, 10);
-    expect(varkhulSharedPyreDamageFraction('heroic', 5)).toBeCloseTo(0.4, 10);
+    expect(varkhulSharedPyreDamageFraction('heroic', 4)).toBeCloseTo(0.5, 10);
     expect(varkhulSharedPyreDamageFraction('heroic', 1)).toBe(2);
+    expect(varkhulSharedPyreTotalDamageFraction('normal')).toBe(1.4);
+    expect(varkhulSharedPyreTotalDamageFraction('heroic')).toBe(2);
+  });
+
+  it('prices raid damage at fifteen percent per missing soaker', () => {
+    expect(VARKHUL_SHARED_PYRE_RAID_DAMAGE_PER_MISSING).toBe(0.15);
+    expect(varkhulSharedPyreRaidDamageFraction(5)).toBe(0);
+    expect(varkhulSharedPyreRaidDamageFraction(4)).toBe(0);
+    expect(varkhulSharedPyreRaidDamageFraction(3)).toBeCloseTo(0.15, 10);
+    expect(varkhulSharedPyreRaidDamageFraction(2)).toBeCloseTo(0.3, 10);
+    expect(varkhulSharedPyreRaidDamageFraction(1)).toBeCloseTo(0.45, 10);
+    expect(varkhulSharedPyreRaidDamageFraction(0)).toBeCloseTo(0.6, 10);
   });
 
   it('waits rather than selecting a non-tank with an uncleared fire mark', () => {

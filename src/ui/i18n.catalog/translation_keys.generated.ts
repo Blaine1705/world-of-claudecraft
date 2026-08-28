@@ -7733,6 +7733,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.auraEffect.varkhulForgeLink'
   | 'hudChrome.auraEffect.varkhulMoltenCore'
   | 'hudChrome.auraEffect.varkhulSentinelsGaze'
+  | 'hudChrome.auraEffect.varkhulSharedPyre'
   | 'hudChrome.auraEffect.veiledEdge'
   | 'hudChrome.auraEffect.veilstrikeWindow'
   | 'hudChrome.auraEffect.venomRitual'

@@ -7597,6 +7597,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.hot': '{interval}초마다 생명력을 {value} 회복합니다',
   'hudChrome.auraEffect.sharedPyre':
     '각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%).',
+  'hudChrome.auraEffect.varkhulSharedPyre':
+    '각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%). 부족한 플레이어 1명당 원 안의 플레이어를 포함한 공격대 전체가 최대 생명력의 {missingPenalty}%에 해당하는 피해를 추가로 받습니다.',
   'hudChrome.auraEffect.varkhulForgeLink':
     '활성화된 기둥의 광선이 용광로에 닿기 전에 가로막으세요. 열린 광선은 초당 열기를 6% 올립니다. 일반에서는 차단된 광선과 꺼진 기둥이 용광로를 식히지만, 영웅에서는 열기가 절대 감소하지 않습니다. 100%가 되면 치명적인 용광로 용융이 발생합니다.',
   'hudChrome.auraEffect.varkhulCrucibleExposure':
@@ -7635,13 +7637,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.ignivar.finale':
     '마지막 지옥불: 빨라진 운석, 전방 공격, 회전 지옥불에 대응하며 전멸 전에 이그니바르를 처치합니다.',
   'hudChrome.raidBossGuide.ignivar.heroic':
-    '영웅: 대장간의 사슬 동안 짝과 가까이 있어야 하며 심판 안에서도 징표가 유지됩니다.',
+    '영웅: 대장간의 사슬 동안 짝과 가까이 있어야 하며 심판 안에서도 징표가 유지되고, 대장간 파도가 플레이어를 더 멀리 밀어냅니다.',
   'hudChrome.raidBossGuide.varkhul.tanks':
     '방어 담당: 제작자의 징표 2중첩에 교대하고 바르쿨을 근접 거리 안에 둡니다.',
   'hudChrome.raidBossGuide.varkhul.orbs':
     '잿불 구슬: 대상자는 방 가장자리로 산개합니다. 불 웅덩이는 남고 방출된 구슬은 방을 가로지릅니다.',
   'hudChrome.raidBossGuide.varkhul.pyre':
-    '공유 장작더미: 달아오른 금속이 없는 대상만 선택합니다. 이동하는 원 안에 일반 4명, 영웅 5명이 모입니다.',
+    '공유 장작더미: 달아오른 금속이 없는 대상만 선택합니다. 난이도와 관계없이 이동하는 원 안에 4명이 모입니다. 부족한 플레이어 1명당 공격대 전체가 최대 생명력의 15%에 해당하는 피해를 받습니다.',
   'hudChrome.raidBossGuide.varkhul.forgestorm':
     '대장간폭풍: 떨어지는 운석을 보고 세 차례의 충돌 전에 표시된 모든 범위에서 벗어납니다.',
   'hudChrome.raidBossGuide.varkhul.anvil':

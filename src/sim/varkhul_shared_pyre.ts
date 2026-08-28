@@ -9,10 +9,12 @@ export const VARKHUL_SHARED_PYRE_CAST_SECONDS = 6;
 export const VARKHUL_SHARED_PYRE_FIRST_SECONDS = 20;
 export const VARKHUL_SHARED_PYRE_EVERY_SECONDS = 38;
 export const VARKHUL_SHARED_PYRE_RADIUS = 5.5;
-export const VARKHUL_SHARED_PYRE_REQUIRED_NORMAL = 4;
-export const VARKHUL_SHARED_PYRE_REQUIRED_HEROIC = 5;
+export const VARKHUL_SHARED_PYRE_REQUIRED_PLAYERS = 4;
+export const VARKHUL_SHARED_PYRE_REQUIRED_NORMAL = VARKHUL_SHARED_PYRE_REQUIRED_PLAYERS;
+export const VARKHUL_SHARED_PYRE_REQUIRED_HEROIC = VARKHUL_SHARED_PYRE_REQUIRED_PLAYERS;
 export const VARKHUL_SHARED_PYRE_TOTAL_DAMAGE_NORMAL = 1.4;
 export const VARKHUL_SHARED_PYRE_TOTAL_DAMAGE_HEROIC = 2;
+export const VARKHUL_SHARED_PYRE_RAID_DAMAGE_PER_MISSING = 0.15;
 
 export interface VarkhulSharedPyreCandidate {
   id: number;
@@ -30,11 +32,20 @@ export function varkhulSharedPyreDamageFraction(
   difficulty: VarkhulAssemblyDifficulty,
   soakers: number,
 ): number {
-  const total =
-    difficulty === 'heroic'
-      ? VARKHUL_SHARED_PYRE_TOTAL_DAMAGE_HEROIC
-      : VARKHUL_SHARED_PYRE_TOTAL_DAMAGE_NORMAL;
-  return total / Math.max(1, Math.floor(soakers));
+  return varkhulSharedPyreTotalDamageFraction(difficulty) / Math.max(1, Math.floor(soakers));
+}
+
+export function varkhulSharedPyreTotalDamageFraction(
+  difficulty: VarkhulAssemblyDifficulty,
+): number {
+  return difficulty === 'heroic'
+    ? VARKHUL_SHARED_PYRE_TOTAL_DAMAGE_HEROIC
+    : VARKHUL_SHARED_PYRE_TOTAL_DAMAGE_NORMAL;
+}
+
+export function varkhulSharedPyreRaidDamageFraction(soakers: number): number {
+  const missing = Math.max(0, VARKHUL_SHARED_PYRE_REQUIRED_PLAYERS - Math.floor(soakers));
+  return missing * VARKHUL_SHARED_PYRE_RAID_DAMAGE_PER_MISSING;
 }
 
 export function varkhulSharedPyreEligibleTargets<T extends VarkhulSharedPyreCandidate>(

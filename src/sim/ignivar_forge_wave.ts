@@ -2,6 +2,8 @@
 // The encounter coordinator owns timing and damage; render reuses the same
 // radius and gap contract so every host shows the authoritative danger shape.
 
+import type { DungeonDifficulty } from './types';
+
 export interface IgnivarForgeWavePoint {
   x: number;
   z: number;
@@ -17,11 +19,18 @@ export const IGNIVAR_FORGE_WAVE_RANGE = 72;
 export const IGNIVAR_FORGE_WAVE_GAP_HALF_ANGLE = Math.PI / 12;
 export const IGNIVAR_FORGE_WAVE_WALL_HALF_THICKNESS = 0.75;
 export const IGNIVAR_FORGE_WAVE_DAMAGE_MAX_HP = 0.35;
-// A brief nudge sells the impact without carrying the victim across the room;
-// the expanding wall then continues through them and can only damage once.
-export const IGNIVAR_FORGE_WAVE_KNOCKBACK = 4;
+// Normal keeps the brief impact nudge. Heroic carries victims farther toward
+// the arena moat while the expanding wall still damages each player only once.
+export const IGNIVAR_FORGE_WAVE_KNOCKBACK_NORMAL = 4;
+export const IGNIVAR_FORGE_WAVE_KNOCKBACK_HEROIC = 6;
 
 const TAU = Math.PI * 2;
+
+export function ignivarForgeWaveKnockback(difficulty: DungeonDifficulty): number {
+  return difficulty === 'heroic'
+    ? IGNIVAR_FORGE_WAVE_KNOCKBACK_HEROIC
+    : IGNIVAR_FORGE_WAVE_KNOCKBACK_NORMAL;
+}
 
 function angleDistance(a: number, b: number): number {
   const wrapped = (((a - b + Math.PI) % TAU) + TAU) % TAU;

@@ -722,6 +722,64 @@ describe('Varkhul encounter behavior', () => {
     expect(target.auras.some((aura) => aura.id === VARKHUL_SHARED_PYRE_AURA_ID)).toBe(false);
   });
 
+  it.each([
+    { difficulty: 'normal' as const, splitDamage: 1.4 / 3 },
+    { difficulty: 'heroic' as const, splitDamage: 2 / 3 },
+  ])(
+    'damages the whole raid for each missing $difficulty Shared Pyre soaker',
+    ({ difficulty, splitDamage }) => {
+      const { sim, boss } = claimedEncounter(difficulty === 'normal' ? 447 : 448);
+      const instance = sim.instances.find((entry) => entry.dungeonId === IGNIVAR_SECOND_WING_ID);
+      if (!instance) throw new Error('Inner Crucible instance disappeared');
+      instance.difficulty = difficulty;
+      const raiders = [
+        addEncounterPlayer(sim, boss, 'Pyre Penalty One'),
+        addEncounterPlayer(sim, boss, 'Pyre Penalty Two'),
+        addEncounterPlayer(sim, boss, 'Pyre Penalty Three'),
+        addEncounterPlayer(sim, boss, 'Pyre Penalty Four'),
+      ];
+      updateVarkhulEncounter(sim.ctx, boss);
+      const state = isolateMechanics(boss);
+      state.sharedPyreTimer = DT;
+      updateVarkhulEncounter(sim.ctx, boss);
+
+      const target =
+        state.sharedPyreTargetId === null ? undefined : sim.entities.get(state.sharedPyreTargetId);
+      if (!target) throw new Error('Shared Pyre did not select a target');
+      const players = [sim.player, ...raiders];
+      const others = players.filter((player) => player.id !== target.id);
+      const soakers = [target, ...others.slice(0, 2)];
+      const outsiders = others.slice(2);
+      for (const player of players) {
+        player.maxHp = 100_000;
+        player.hp = 100_000;
+        player.damageImmune = false;
+      }
+      for (const soaker of soakers) {
+        soaker.pos = { ...target.pos };
+        soaker.prevPos = { ...soaker.pos };
+      }
+      for (const outsider of outsiders) {
+        outsider.pos = { ...target.pos, x: target.pos.x + 10 };
+        outsider.prevPos = { ...outsider.pos };
+      }
+      const aura = target.auras.find((entry) => entry.id === VARKHUL_SHARED_PYRE_AURA_ID);
+      expect(aura).toMatchObject({
+        stacks: 4,
+        value: 0,
+        value2: difficulty === 'heroic' ? 2 : 1.4,
+      });
+      state.sharedPyreRemaining = DT;
+
+      updateVarkhulEncounter(sim.ctx, boss);
+
+      const raidPenalty = 15_000;
+      const expectedSoakerHp = 100_000 - Math.ceil(100_000 * splitDamage) - raidPenalty;
+      for (const soaker of soakers) expect(soaker.hp).toBe(expectedSoakerHp);
+      for (const outsider of outsiders) expect(outsider.hp).toBe(100_000 - raidPenalty);
+    },
+  );
+
   it('cancels Shared Pyre without raid damage when its marked player dies', () => {
     const { sim, boss } = claimedEncounter(442);
     const raiders = [

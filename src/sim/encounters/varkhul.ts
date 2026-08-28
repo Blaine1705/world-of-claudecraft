@@ -171,7 +171,9 @@ import {
   VARKHUL_SHARED_PYRE_RADIUS,
   varkhulSharedPyreDamageFraction,
   varkhulSharedPyreEligibleTargets,
+  varkhulSharedPyreRaidDamageFraction,
   varkhulSharedPyreRequiredPlayers,
+  varkhulSharedPyreTotalDamageFraction,
 } from '../varkhul_shared_pyre';
 import {
   VARKHUL_WORLDFIRE_ABILITY_ID,
@@ -1207,6 +1209,7 @@ function startSharedPyre(
     remaining: VARKHUL_SHARED_PYRE_CAST_SECONDS,
     duration: VARKHUL_SHARED_PYRE_CAST_SECONDS,
     value: 0,
+    value2: varkhulSharedPyreTotalDamageFraction(st.assemblyRuneDifficulty),
     stacks: requiredPlayers,
     sourceId: boss.id,
     school: 'fire',
@@ -1232,6 +1235,12 @@ function resolveSharedPyre(
     const fraction = varkhulSharedPyreDamageFraction(st.assemblyRuneDifficulty, soakers.length);
     for (const player of soakers) {
       dealFractionalDamage(ctx, boss, player, fraction, VARKHUL_SHARED_PYRE_NAME);
+    }
+  }
+  const raidDamage = varkhulSharedPyreRaidDamageFraction(soakers.length);
+  if (raidDamage > 0) {
+    for (const player of players) {
+      dealFractionalDamage(ctx, boss, player, raidDamage, VARKHUL_SHARED_PYRE_NAME);
     }
   }
   if (target) {

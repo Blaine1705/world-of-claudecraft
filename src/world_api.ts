@@ -162,9 +162,12 @@ export type {
 // whose exact 4x4 stone-tile union and bridge footprint are shared by movement,
 // damage and rendering. Epoch 21 clients would render and stand on the old full
 // floor while the server burns and lowers the new perimeter.
+// 23 = Ignivar's compiled Rain of Cinders cone length grew from 24 to 30 yards.
+// Epoch 22 clients would display a dangerously shorter warning than the
+// authoritative server damage.
 // (11 through 20 were numbered 9 through 18 on the pre-merge raid branch,
 // which forked before the Eastbrook program bumps above.)
-export const ONLINE_WORLD_LAYOUT_VERSION = 22 as const;
+export const ONLINE_WORLD_LAYOUT_VERSION = 23 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI

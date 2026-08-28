@@ -13906,6 +13906,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Golpea al objetivo por {damage} de daño y lo aturde durante 4 s. Otorga 2 puntos de combo.',
   'hudChrome.auraEffect.varkhulForgeLink':
     'Intercepta el rayo de un pilar activo antes de que alcance la forja. Un rayo libre añade un 6% de calor por segundo. En Normal, los rayos bloqueados y los pilares apagados enfrían la forja; en Heroico, el calor nunca baja. Al 100%, la forja sufre una Fusión letal.',
+  'hudChrome.auraEffect.varkhulSharedPyre':
+    'Inflige un {total}% de la salud máxima de cada jugador, repartido entre quienes estén dentro del círculo ({perPlayer}% por persona con {players} jugadores). Cada plaza ausente también inflige un {missingPenalty}% de la salud máxima a toda la banda, incluidos los jugadores dentro del círculo.',
   'hudChrome.auraEffect.varkhulCrucibleExposure':
     'Bloquear un Rayo del Crisol inflige cada segundo más daño según tu salud máxima. Las acumulaciones se reinician 10 s después de salir del rayo en Normal y 60 s después en Heroico.',
   'hudChrome.varkhulCallout.leftPillarCharging':
@@ -13945,13 +13947,13 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.ignivar.finale':
     'Último Infierno: acaba con Ignivar antes de la aniquilación mientras continúan los meteoros, ataques frontales e Infierno giratorio acelerados.',
   'hudChrome.raidBossGuide.ignivar.heroic':
-    'Heroico: las parejas permanecen juntas durante Cadenas de la Forja y Marca sigue activa dentro de Juicio.',
+    'Heroico: las parejas permanecen juntas durante Cadenas de la Forja, Marca sigue activa dentro de Juicio y Ola de la Forja empuja más lejos.',
   'hudChrome.raidBossGuide.varkhul.tanks':
     'Tanques: cambiad a dos acumulaciones de Marca del Hacedor y mantened a Varkhul a distancia cuerpo a cuerpo.',
   'hudChrome.raidBossGuide.varkhul.orbs':
     'Orbes de ceniza: los jugadores marcados se separan hacia el borde. Sus charcos de fuego persisten y los orbes liberados cruzan la sala.',
   'hudChrome.raidBossGuide.varkhul.pyre':
-    'Pira compartida: solo elige a alguien sin Metal al rojo vivo. Apilad cuatro en Normal o cinco en Heroico dentro del círculo móvil.',
+    'Pira compartida: solo elige a alguien sin Metal al rojo vivo. Apilad cuatro jugadores dentro del círculo móvil en cualquier dificultad. Cada plaza ausente inflige un 15% de la salud máxima a toda la banda.',
   'hudChrome.raidBossGuide.varkhul.forgestorm':
     'Tormenta de la Forja: observa los meteoros que caen y sal de cada impacto marcado antes de que aterrice cada una de las tres oleadas.',
   'hudChrome.raidBossGuide.varkhul.anvil':

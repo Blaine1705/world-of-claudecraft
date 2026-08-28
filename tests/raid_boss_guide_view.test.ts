@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { hudChromeStrings } from '../src/ui/i18n.catalog/hud_chrome';
 import { raidBossGuideBossForDungeon, raidBossGuideView } from '../src/ui/raid_boss_guide_view';
 
 describe('raid boss guide view', () => {
@@ -40,5 +41,18 @@ describe('raid boss guide view', () => {
         'hudChrome.raidBossGuide.varkhul.heroic',
       ],
     });
+  });
+
+  it('teaches the four-player Shared Pyre requirement and missing-soaker penalty', () => {
+    expect(hudChromeStrings.raidBossGuide.varkhul.pyre).toContain('four players');
+    expect(hudChromeStrings.raidBossGuide.varkhul.pyre).toContain('either difficulty');
+    expect(hudChromeStrings.raidBossGuide.varkhul.pyre).toContain('15%');
+    expect(hudChromeStrings.raidBossGuide.varkhul.pyre).toContain('entire raid');
+    expect(hudChromeStrings.raidBossGuide.varkhul.pyre).not.toContain('five');
+  });
+
+  it('warns that Heroic Forge Wave pushes players farther', () => {
+    expect(hudChromeStrings.raidBossGuide.ignivar.heroic).toContain('Forge Wave');
+    expect(hudChromeStrings.raidBossGuide.ignivar.heroic).toContain('pushes farther');
   });
 });
