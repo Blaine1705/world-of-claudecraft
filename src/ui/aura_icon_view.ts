@@ -111,6 +111,9 @@ export const RUNTIME_AURA_ICON_SOURCE_IDS: ReadonlyMap<string, string> = new Map
   ['marrowbreak_guard', 'marrowbreak'],
   ['natures_fury', 'hurricane'],
   ['oath_chain_pull', 'oath_chain'],
+  // Oathpyre 4pc consume shield (src/sim/combat/paladin_solar_reprisal.ts):
+  // same icon family as the Solar Reprisal proc it pays off.
+  ['oathpyre_bulwark', 'vowkeeper_strike'],
   ['pack_ferocity', 'pack_command'],
   ['perpetual_sun_generation', 'divine_ascension'],
   ['pet_aspect_of_the_cheetah', 'aspect_of_the_cheetah'],

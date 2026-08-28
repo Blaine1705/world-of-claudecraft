@@ -675,7 +675,13 @@ export function recalcPlayerStats(
   e.critDmgSpellBonus = mods?.global.critDmgSpellPct ?? 0;
   e.critDmgPhysBonus = mods?.global.critDmgPhysPct ?? 0;
   e.critDmgHealBonus = mods?.global.critDmgHealPct ?? 0;
-  e.castPushbackReduction = setEff.castPushbackReduction;
+  // Stat-set and talent-seam pushback sources MAX-combine (never sum past
+  // immunity); the set aggregation already clamped its own side to 0..1 and
+  // the talent side is authored 0..1 (the Crucible caster/healer 2pc rider).
+  e.castPushbackReduction = Math.min(
+    1,
+    Math.max(setEff.castPushbackReduction, mods?.global.castPushbackReduction ?? 0),
+  );
   e.knockbackResistance = setEff.knockbackResistance;
   e.ccDurationReduction = setEff.ccDurationReduction;
   // Floored at 0: an off-balance debuff (negative buff_dodge) can drive dodge to nothing.

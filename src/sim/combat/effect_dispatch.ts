@@ -179,7 +179,7 @@ import {
 import { placeBeaconOfLight } from './paladin_beacon';
 import { PROTECTION_CONSECRATION_DAMAGE_REDUCTION } from './paladin_consecration';
 import { pullPaladinTargets, pulsePaladinThreat } from './paladin_control';
-import { triggerPaladinDawnRhythm } from './paladin_dawn_rhythm';
+import { dawnRhythmCutSec, triggerPaladinDawnRhythm } from './paladin_dawn_rhythm';
 import { tryGrantDawnsWrath } from './paladin_dawns_wrath';
 import { grantRadiantResonance } from './paladin_radiant_resonance';
 import { riteAnswersTheWholeGroup } from './paladin_rite_of_many';
@@ -704,7 +704,8 @@ export function runEffects(
             fx: 'paladinFinalEdict',
             ability: ability.id,
           });
-          triggerPaladinDawnRhythm(p, ability.id);
+          // Zealfire 2pc deepens the paired cut for wearers (dawnRhythmCutSec).
+          triggerPaladinDawnRhythm(p, ability.id, dawnRhythmCutSec(mods));
           tryGrantDawnsWrath(ctx, p);
         }
         if (hit && ability.id === 'vowkeeper_strike') {
@@ -2442,7 +2443,8 @@ export function runEffects(
           advanceSunGodVerdictForHit(ctx, p, sunVerdictHit.target, ability.id, sunVerdictHit.mark);
         }
         if (ability.id === DAWNFALL_ID && aoeTargets.length > 0 && !dawnRhythmTriggered) {
-          triggerPaladinDawnRhythm(p, ability.id);
+          // Zealfire 2pc deepens the paired cut for wearers (dawnRhythmCutSec).
+          triggerPaladinDawnRhythm(p, ability.id, dawnRhythmCutSec(mods));
           dawnRhythmTriggered = true;
         }
         if (eff.rageOnHit && meta.cls === 'warrior' && p.resourceType === 'rage') {

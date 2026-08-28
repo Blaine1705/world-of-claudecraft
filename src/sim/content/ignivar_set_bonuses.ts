@@ -55,6 +55,32 @@ export const FORGEWALL_2PC_ABSORB_PER_RAGE = 5;
 /** Forgewall 4pc: seconds refunded from Iron Resolve per Shieldcrack cast. */
 export const FORGEWALL_4PC_IRON_RESOLVE_REFUND_SEC = 2;
 
+// Audited constants for the bespoke paladin bends (read by the class-module
+// call sites AND pinned by tests, so the copy cannot drift from the code).
+/** Dawnforged 2pc: Beacon of Light transfer fraction (base BEACON_HEAL_FRACTION 0.5).
+ *  Baked into the beacon AURA VALUE at placement, the ONE source both the
+ *  heal.ts transfer arithmetic and the aura mirror read, so the two readers
+ *  can never diverge. A gear swap after placement keeps the placed fraction
+ *  until the beacon is re-cast (the same at-grant snapshot the Zealfire 4pc
+ *  aura bake uses). */
+export const DAWNFORGED_2PC_BEACON_HEAL_FRACTION = 0.55;
+/** Dawnforged 4pc: the Radiant Resonance empowered Dawn's Embrace cast time
+ *  (base RADIANT_RESONANCE_DAWN_CAST_TIME 1.5): instant for wearers. */
+export const DAWNFORGED_4PC_DAWN_CAST_TIME = 0;
+/** Oathpyre 2pc: Vowkeeper Strike's Solar Reprisal arm chance (base 0.2). */
+export const OATHPYRE_2PC_VOWKEEPER_CHANCE = 0.3;
+/** Oathpyre 2pc: the block-arm Solar Reprisal chance (base 0.25). */
+export const OATHPYRE_2PC_BLOCK_CHANCE = 0.4;
+/** Oathpyre 4pc: shield fraction of max health on Solar Reprisal consume. */
+export const OATHPYRE_4PC_SHIELD_PCT_MAX = 0.06;
+/** Oathpyre 4pc: shield duration in seconds. */
+export const OATHPYRE_4PC_SHIELD_DURATION_SEC = 10;
+/** Zealfire 2pc: the Final Edict / Dawnfall paired cooldown cut in seconds
+ *  (base DAWN_RHYTHM_COOLDOWN_REDUCTION 2). */
+export const ZEALFIRE_2PC_DAWN_RHYTHM_CUT_SEC = 3;
+/** Zealfire 4pc: Dawn's Wrath Hammer of Wrath damage mult (base 1.2). */
+export const ZEALFIRE_4PC_DAWNS_WRATH_DAMAGE_MULT = 1.4;
+
 /** The engine payloads, keyed by set id (the `set` tag on each member item
  *  and the ItemSet id in item_sets.ts). Tiers ascend by pieces. */
 export const SET_ENGINE_BONUSES: Record<string, readonly SetEngineBonusTier[]> = {
@@ -149,6 +175,81 @@ export const SET_ENGINE_BONUSES: Record<string, readonly SetEngineBonusTier[]> =
         },
         tuning: { ironResolveRefundSec: FORGEWALL_4PC_IRON_RESOLVE_REFUND_SEC },
       },
+    },
+  ],
+  // ---- Paladin ----
+  dawnforged: [
+    {
+      pieces: 2,
+      // Beacon of Light copies 55 percent instead of 50: bespoke bend at the
+      // beacon placement (combat/paladin_beacon.ts bakes the wearer fraction
+      // into the aura value; heal.ts's transfer arithmetic reads that value).
+      // The healer 2pc pushback rider rides the GENERIC global knob:
+      // castPushbackReduction 1 folds into the recalc alongside the stat-set
+      // sources (max-combined), so damage taken no longer delays casting.
+      effect: {
+        global: { castPushbackReduction: 1 },
+        tuning: { beaconHealFraction: DAWNFORGED_2PC_BEACON_HEAL_FRACTION },
+      },
+    },
+    {
+      pieces: 4,
+      // The Radiant Resonance empowered Dawn's Embrace goes 1.5 sec -> instant:
+      // bespoke bend on the ONE cast-time knob (radiantResonanceCastTime),
+      // keyed on abilityId so the Mending Light instant arm and every other
+      // cast stay untouched. Billing and the aura consume ride the existing
+      // instant-cast machinery (the Ascension-instant path), so no rng draw
+      // moves for anyone.
+      effect: { tuning: { radiantResonanceDawnCastTime: DAWNFORGED_4PC_DAWN_CAST_TIME } },
+    },
+  ],
+  oathpyre: [
+    {
+      pieces: 2,
+      // Solar Reprisal arms more often: bespoke chance selection at the ONE
+      // grant site (tryGrantSolarReprisal). The same single rng draw happens
+      // either way, only the threshold moves, so no stream shift for wearers
+      // or non-wearers. No internal cooldown exists: a re-arm while armed
+      // refreshes the one aura (same id + source), the disclosed soft cap.
+      effect: {
+        tuning: {
+          vowkeeperArmChance: OATHPYRE_2PC_VOWKEEPER_CHANCE,
+          blockArmChance: OATHPYRE_2PC_BLOCK_CHANCE,
+        },
+      },
+    },
+    {
+      pieces: 4,
+      // Consuming Solar Reprisal (any of the THREE consumers: Sunward Disc,
+      // Hammer of Grace, or Mending Light; the heal route is deliberate)
+      // shields for 6 percent of max health for 10 sec. Fixed aura id, so the
+      // three consumers refresh ONE absorb; a refresh replaces the undrained
+      // remainder (the same-id semantics disclosed for Forgewall 4pc).
+      effect: {
+        tuning: {
+          shieldPctMaxHp: OATHPYRE_4PC_SHIELD_PCT_MAX,
+          shieldDurationSec: OATHPYRE_4PC_SHIELD_DURATION_SEC,
+        },
+      },
+    },
+  ],
+  zealfire: [
+    {
+      pieces: 2,
+      // Final Edict and Dawnfall cut each other's cooldown by 3 sec instead
+      // of 2: bespoke reduction selection fed into triggerPaladinDawnRhythm
+      // at both dispatch sites (the fixpoint sizing verified in band by the
+      // set doc). Deterministic, no rng involved.
+      effect: { tuning: { dawnRhythmCutSec: ZEALFIRE_2PC_DAWN_RHYTHM_CUT_SEC } },
+    },
+    {
+      pieces: 4,
+      // Hammer of Wrath under Dawn's Wrath strikes 40 percent harder, up
+      // from 20. The wearer mult is baked into the AURA VALUE at grant and
+      // the consume reads the aura back, so the HUD's dynamic {pct} print
+      // stays honest for every wearer. Multiplicative with Ascension's 1.3
+      // (1.82 total), disclosed by the set doc.
+      effect: { tuning: { dawnsWrathDamageMult: ZEALFIRE_4PC_DAWNS_WRATH_DAMAGE_MULT } },
     },
   ],
 };

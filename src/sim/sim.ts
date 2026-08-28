@@ -6097,12 +6097,10 @@ export class Sim {
       cost = Math.round(cost * aetherSurgeCostMult(r.e));
     }
     const costResolved = cost === found.cost ? found : { ...found, cost };
-    const ascensionResolved = resolveAscensionAbility(
-      r.e,
-      this.playerMods(r.meta).spec,
-      costResolved,
-    );
-    const castTime = radiantResonanceCastTime(r.e, abilityId, ascensionResolved.castTime);
+    const charMods = this.playerMods(r.meta);
+    const ascensionResolved = resolveAscensionAbility(r.e, charMods.spec, costResolved);
+    // charMods carries the worn-set flags (Dawnforged 4pc: instant empowered Dawn's Embrace).
+    const castTime = radiantResonanceCastTime(r.e, abilityId, ascensionResolved.castTime, charMods);
     return castTime === ascensionResolved.castTime
       ? ascensionResolved
       : { ...ascensionResolved, castTime };

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { SET_ENGINE_BONUSES } from '../src/sim/content/ignivar_set_bonuses';
 import {
   aggregateSetBonuses,
   ITEM_SETS,
@@ -168,12 +169,17 @@ describe('aggregateSetBonuses (the lineage ladder)', () => {
       const pieces = set.bonuses.map((b) => b.pieces);
       // The seven epic families share their lineage's 2/4/6 ladder; the
       // leveling haste kits deliberately carry the single 3-piece tier; the
-      // WARFARE families are 2/4/7 (see tests/warfare_balance_harness.test.ts).
+      // WARFARE families are 2/4/7 (see tests/warfare_balance_harness.test.ts);
+      // the Crucible tier sets break at 2/4 (the engine-registered ids in
+      // content/ignivar_set_bonuses.ts; tests/ignivar_loot.test.ts owns the
+      // per-wave rollout ledger for them).
       const expected = set.id.startsWith('warfare_')
         ? '2,4,7'
         : set.lineage !== undefined
           ? '2,4,6'
-          : '3';
+          : SET_ENGINE_BONUSES[set.id] !== undefined
+            ? '2,4'
+            : '3';
       expect([pieces.join(','), set.id]).toEqual([expected, set.id]);
     }
   });

@@ -18530,6 +18530,11 @@ export const da_DK: EnTranslations = {
         "bonus4": "Dine kritiske våbenslag splintrer målet med Bensplint og påfører 8 blødningsskade hvert 2. sek. i 12 sek. Stakker op til 3 gange.",
         "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 5 damage every 2 sec for 12 sec. Stacks up to 3 times."
       },
+      "dawnforged": {
+        "name": "Dawnforged Vestments",
+        "bonus2": "Beacon of Light copies 55 percent of your direct heals. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Radiant Resonance's empowered Dawn's Embrace is instant."
+      },
       "deathlord": {
         "name": "Barrowlord kampudstyr",
         "bonus2": "Øger angrebskraft med 40.",
@@ -18561,6 +18566,11 @@ export const da_DK: EnTranslations = {
         "bonus2": "Øger angrebskraft med 40.",
         "bonus4": "Dine kritiske våbenslag river en Laset Flænge og påfører 6 blødningsskade hvert 2. sek. i 12 sek. Stakker op til 3 gange.",
         "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 4 damage every 2 sec for 12 sec. Stacks up to 3 times."
+      },
+      "oathpyre": {
+        "name": "Oathpyre Bastion",
+        "bonus2": "Vowkeeper Strike's chance to arm Solar Reprisal rises to 30 percent, and blocking an attack arms it 40 percent of the time.",
+        "bonus4": "Consuming Solar Reprisal shields you for 6 percent of your maximum health for 10 sec."
       },
       "slagbreaker": {
         "name": "Slagbreaker Battlegear",
@@ -18618,6 +18628,11 @@ export const da_DK: EnTranslations = {
         "bonus2": "Øger angrebskraft med 40.",
         "bonus4": "Dine kritiske våbenslag har 50% chance for at give Hugtandsfart og øge angrebshastighed med 25% i 8 sek.",
         "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 4 damage every 2 sec for 12 sec. Stacks up to 3 times."
+      },
+      "zealfire": {
+        "name": "Zealfire Warplate",
+        "bonus2": "Final Edict and Dawnfall cut each other's remaining cooldown by 3 sec instead of 2.",
+        "bonus4": "Hammer of Wrath cast under Dawn's Wrath strikes 40 percent harder, up from 20."
       }
     }
   },

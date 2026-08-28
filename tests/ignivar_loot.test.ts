@@ -139,7 +139,14 @@ describe('ignivar loot: the 29 sets', () => {
     // never ships without its tooltip. Move an id from PENDING to REGISTERED
     // here in the same change that lands its wave
     // (docs/prd/ignivar-set-bonus-final.md).
-    const REGISTERED_SET_IDS = ['slagbreaker', 'emberfury', 'forgewall'] as const;
+    const REGISTERED_SET_IDS = [
+      'slagbreaker',
+      'emberfury',
+      'forgewall',
+      'dawnforged',
+      'oathpyre',
+      'zealfire',
+    ] as const;
     const setIds = new Set(
       Object.values(IGNIVAR_SET_ITEMS).flatMap((item) => (item.set ? [item.set] : [])),
     );

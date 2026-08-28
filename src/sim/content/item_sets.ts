@@ -515,6 +515,56 @@ export const ITEM_SETS: Record<string, ItemSet> = {
       },
     ],
   },
+  dawnforged: {
+    id: 'dawnforged',
+    name: 'Dawnforged Vestments',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        // The healer 2pc carries the pushback rider (full immunity, the raid
+        // tier's upgrade over the leveling lineage's 50 percent).
+        text: 'Beacon of Light copies 55 percent of your direct heals. Damage taken no longer delays your spellcasting.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: "Radiant Resonance's empowered Dawn's Embrace is instant.",
+      },
+    ],
+  },
+  oathpyre: {
+    id: 'oathpyre',
+    name: 'Oathpyre Bastion',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: "Vowkeeper Strike's chance to arm Solar Reprisal rises to 30 percent, and blocking an attack arms it 40 percent of the time.",
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: 'Consuming Solar Reprisal shields you for 6 percent of your maximum health for 10 sec.',
+      },
+    ],
+  },
+  zealfire: {
+    id: 'zealfire',
+    name: 'Zealfire Warplate',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: "Final Edict and Dawnfall cut each other's remaining cooldown by 3 sec instead of 2.",
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: "Hammer of Wrath cast under Dawn's Wrath strikes 40 percent harder, up from 20.",
+      },
+    ],
+  },
 };
 
 // Fully-resolved set effect: every field defaulted so callers never branch on

@@ -18530,6 +18530,11 @@ export const fr_FR: EnTranslations = {
         "bonus4": "Vos coups critiques d'arme lacèrent la cible avec Éclat d'os, lui infligeant 8 points de dégâts de saignement toutes les 2 s pendant 12 s. Se cumule jusqu'à 3 fois.",
         "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 5 damage every 2 sec for 12 sec. Stacks up to 3 times."
       },
+      "dawnforged": {
+        "name": "Dawnforged Vestments",
+        "bonus2": "Beacon of Light copies 55 percent of your direct heals. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Radiant Resonance's empowered Dawn's Embrace is instant."
+      },
       "deathlord": {
         "name": "Tenue de guerre de Barrowlord",
         "bonus2": "Augmente la puissance d'attaque de 40.",
@@ -18561,6 +18566,11 @@ export const fr_FR: EnTranslations = {
         "bonus2": "Augmente la puissance d'attaque de 40.",
         "bonus4": "Vos coups critiques d'arme ouvrent une Entaille déchiquetée, infligeant à la cible 6 points de dégâts de saignement toutes les 2 s pendant 12 s. Se cumule jusqu'à 3 fois.",
         "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 4 damage every 2 sec for 12 sec. Stacks up to 3 times."
+      },
+      "oathpyre": {
+        "name": "Oathpyre Bastion",
+        "bonus2": "Vowkeeper Strike's chance to arm Solar Reprisal rises to 30 percent, and blocking an attack arms it 40 percent of the time.",
+        "bonus4": "Consuming Solar Reprisal shields you for 6 percent of your maximum health for 10 sec."
       },
       "slagbreaker": {
         "name": "Slagbreaker Battlegear",
@@ -18618,6 +18628,11 @@ export const fr_FR: EnTranslations = {
         "bonus2": "Augmente la puissance d'attaque de 40.",
         "bonus4": "Vos coups critiques d'arme ont 50% de chances de conférer Ruée des crocs, augmentant la vitesse d'attaque de 25% pendant 8 s.",
         "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 4 damage every 2 sec for 12 sec. Stacks up to 3 times."
+      },
+      "zealfire": {
+        "name": "Zealfire Warplate",
+        "bonus2": "Final Edict and Dawnfall cut each other's remaining cooldown by 3 sec instead of 2.",
+        "bonus4": "Hammer of Wrath cast under Dawn's Wrath strikes 40 percent harder, up from 20."
       }
     }
   },

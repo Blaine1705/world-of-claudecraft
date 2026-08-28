@@ -142,6 +142,12 @@ export interface GlobalModEffect {
   // Blink While Casting: 1 when picked; Flickerstep slips through the busy
   // guard without touching the cast in progress (casting_lifecycle).
   blinkCast?: number;
+  // Damage cast-pushback removed, 0..1 (1 = immune). The talent-seam twin of
+  // the stat-set knob of the same name: recalcPlayerStats max-combines the two
+  // into Entity.castPushbackReduction (two sources never stack past immunity).
+  // Carrier: the Crucible caster/healer 2-piece pushback rider
+  // (content/ignivar_set_bonuses.ts).
+  castPushbackReduction?: number;
   // Elemental Convergence: 1 when picked; alternating a Fire and a Frost cast
   // opens the surge window (casting_lifecycle convergenceOnCast, marker +
   // ICD carried by auras so no entity field enters the parity hash).
@@ -643,6 +649,7 @@ function zeroGlobal(): Required<GlobalModEffect> {
     barrierDrPct: 0,
     manaDefCdrPer10: 0,
     blinkCast: 0,
+    castPushbackReduction: 0,
     convergence: 0,
     ignitionPct: 0,
     ascensionChargeBonus: 0,
@@ -773,6 +780,12 @@ export function accumulateTalentEffect(
     target.barrierDrPct += (source.barrierDrPct ?? 0) * multiplier;
     target.manaDefCdrPer10 += (source.manaDefCdrPer10 ?? 0) * multiplier;
     target.blinkCast += (source.blinkCast ?? 0) * multiplier;
+    // Pushback sources MAX-combine (like cheatDeathIcd, and like the stat-set
+    // aggregation): two riders never stack past full immunity.
+    target.castPushbackReduction = Math.max(
+      target.castPushbackReduction,
+      source.castPushbackReduction ?? 0,
+    );
     target.convergence += (source.convergence ?? 0) * multiplier;
     target.ignitionPct += (source.ignitionPct ?? 0) * multiplier;
     target.ascensionChargeBonus += (source.ascensionChargeBonus ?? 0) * multiplier;
