@@ -142,7 +142,9 @@ const MONOLITHS: MonolithRow[] = [
     // pure core interface_unlock_menu_core.ts. What remains on coordinator
     // state (dimension-mode mover wiring, the edit-preview painter closure,
     // the player-frame bar lock) is the live-hooks half. Exact merged count.
-    ceiling: 19002,
+    // Lowered by 2 at the empower-hold sync merge: the charge state and the
+    // XHB slot lookup live in src/ui/empower_hold_core.ts. Exact merged count.
+    ceiling: 19000,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -276,7 +278,9 @@ const MONOLITHS: MonolithRow[] = [
     // the player-frame bar lock) predate this ratchet; folding them behind a
     // src/game/ settings-application seam is flagged follow-up work. Exact
     // merged count.
-    ceiling: 11629,
+    // Lowered by 1 at the empower-hold sync merge: the pad cast routing lives
+    // in src/game/pad_cast_routing.ts. Exact merged count.
+    ceiling: 11628,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
