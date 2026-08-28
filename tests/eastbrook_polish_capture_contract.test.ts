@@ -323,8 +323,11 @@ interface AttributionTargetFixture {
 // Re-minted for the v0.40.0 sync merge into the guild pledge branch (the
 // OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
 // both sides). No capture was retaken.
+// Re-minted for the PR 3676 placement-aim round: renderer.ts gained the
+// blocked pass-through on setGroundAimReticle, moving the runtimeRender leaf.
+// No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'b4f994b0a5d52ffce488667a7768739838207796dc4eaa331ebd980ab3fe8ba4';
+  '685dfe4ecae1a8942f51921801e72101d92a66f08e1948f932073aa875b5ee96';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
