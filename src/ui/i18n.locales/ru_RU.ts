@@ -7744,8 +7744,111 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.varkhulWaveStatus': 'Волна {wave}/{waves} | Враги: {remaining}',
   'hudChrome.raidBossGuide.title': 'Тактика на босса',
   'hudChrome.raidBossGuide.button': 'Тактика: {boss}',
-  'hudChrome.raidBossGuide.subtitle': '{boss} | Обычный и героический',
+  'hudChrome.raidBossGuide.subtitle': '{boss} | {difficulty}',
   'hudChrome.raidBossGuide.close': 'Закрыть тактику',
+  'hudChrome.raidBossGuide.bossesLabel': 'Рейдовые боссы',
+  'hudChrome.raidBossGuide.difficultyLabel': 'Сложность',
+  'hudChrome.raidBossGuide.normal': 'Обычный',
+  'hudChrome.raidBossGuide.heroic': 'Героический',
+  'hudChrome.raidBossGuide.portraitAlt': 'Портрет босса {boss}',
+  'hudChrome.raidBossGuide.overviewHeading': 'Обзор',
+  'hudChrome.raidBossGuide.abilitiesHeading': 'Способности',
+  'hudChrome.raidBossGuide.whatToDo': 'Что делать',
+  'hudChrome.raidBossGuide.whatToDoResponse': 'Что делать: {response}',
+  'hudChrome.raidBossGuide.rolesLabel': 'Обязанности ролей',
+  'hudChrome.raidBossGuide.flagsLabel': 'Предупреждения механик',
+  'hudChrome.raidBossGuide.roleTank': 'Танк',
+  'hudChrome.raidBossGuide.roleHealer': 'Лекарь',
+  'hudChrome.raidBossGuide.roleDamage': 'Боец',
+  'hudChrome.raidBossGuide.roleAll': 'Все роли',
+  'hudChrome.raidBossGuide.flagDeadly': 'Смертельно',
+  'hudChrome.raidBossGuide.flagInterruptible': 'Можно прервать',
+  'hudChrome.raidBossGuide.flagImportant': 'Важно',
+  'hudChrome.raidBossGuide.flagCleansable': 'Можно рассеять',
+  'hudChrome.raidBossGuide.browseBoss': 'Показать: {boss}',
+  'hudChrome.raidBossGuide.chooseDifficulty': 'Показать механики сложности «{difficulty}»',
+  'hudChrome.raidBossGuide.expandAbility': 'Развернуть: {ability}',
+  'hudChrome.raidBossGuide.collapseAbility': 'Свернуть: {ability}',
+  'hudChrome.raidBossGuide.abilityControlLabel': '{action}. {details}',
+  'hudChrome.raidBossGuide.tooltipMeta': '{phase} | {difficulty}',
+  'hudChrome.raidBossGuide.ignivar.overview':
+    'Варкхул выковал Игнивара как вестника, живую печать и ключ к Внутреннему горнилу. В этом бою проверяются управление водоводами, точное перемещение и быстрая атака приоритетных целей.',
+  'hudChrome.raidBossGuide.ignivar.phaseOpeningName': 'Пробуждение вестника',
+  'hudChrome.raidBossGuide.ignivar.phaseOpeningSummary':
+    'Управляйте Клеймом костра с помощью водоводов, избегая повторяющихся фронтальных атак, небесного огня, вращающихся лучей и расширяющейся Волны кузни.',
+  'hudChrome.raidBossGuide.ignivar.phaseApocalypseName': 'Переход: Апокалипсис',
+  'hudChrome.raidBossGuide.ignivar.phaseApocalypseSummary':
+    'На {health} здоровья Игнивар призывает Эшколлера, который пытается завершить бой.',
+  'hudChrome.raidBossGuide.ignivar.phaseJudgmentName': 'Суд кузни',
+  'hudChrome.raidBossGuide.ignivar.phaseJudgmentSummary':
+    'На {health} здоровья Игнивар поджигает арену и открывает одно безопасное место среди трёх убежищ.',
+  'hudChrome.raidBossGuide.ignivar.phaseJudgmentHeroicSummary':
+    'На {health} здоровья Игнивар поджигает арену, а действующие Клейма продолжают угрожать игрокам рядом даже внутри убежища.',
+  'hudChrome.raidBossGuide.ignivar.phaseFinaleName': 'Финал: Последний инферно',
+  'hudChrome.raidBossGuide.ignivar.phaseFinaleSummary':
+    'На {health} здоровья Игнивар начинает финальную фазу с жёстким ограничением времени и ускоренными повторяющимися механиками.',
+  'hudChrome.raidBossGuide.ignivar.forgeStrikeName': 'Удар кузни',
+  'hudChrome.raidBossGuide.ignivar.forgeStrikeSummary':
+    'Игнивар бьёт текущего танка и накладывает Расплавленную броню, увеличивая получаемый от Игнивара урон.',
+  'hudChrome.raidBossGuide.ignivar.forgeStrikeResponse':
+    'Танки меняются на{stacks} зарядах. Лекари готовятся к удару и первым атакам ближнего боя по новому танку.',
+  'hudChrome.raidBossGuide.ignivar.brandName': 'Клеймо костра',
+  'hudChrome.raidBossGuide.ignivar.brandSummary':
+    'Игнивар отмечает игроков, кроме танков, постоянным уроном от огня. Отмеченные игроки также обжигают ближайших союзников.',
+  'hudChrome.raidBossGuide.ignivar.brandResponse':
+    'Рассредоточьтесь. Направьте Жгучий поток в готовый водовод, затем каждый отмеченный игрок должен в одиночку пройти через активированную воду и очиститься.',
+  'hudChrome.raidBossGuide.ignivar.brandHeroicResponse':
+    'Рассредоточьтесь. Откройте водовод Жгучим потоком и очищайте по одному отмеченному игроку. Каждое очищение вызывает рейдовую Обратную волну очищения.',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentName': 'Жгучий поток',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentSummary':
+    'Игнивар отслеживает игрока, а затем выпускает широкий фронтальный поток. Готовый водовод, задетый атакой, ненадолго активируется.',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentHeroicSummary':
+    'Игнивар отслеживает игрока, а затем выпускает почти смертельный широкий фронтальный поток. Готовый водовод, задетый атакой, ненадолго активируется.',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentResponse':
+    'Проведите предупреждение ровно через один готовый водовод. Все остальные покидают фронтальную область до завершения заклинания.',
+  'hudChrome.raidBossGuide.ignivar.rainName': 'Дождь углей',
+  'hudChrome.raidBossGuide.ignivar.rainSummary':
+    'Три огненных сектора и отмеченные места падения метеоров наносят урон игрокам, оставшимся в предупреждающих областях.',
+  'hudChrome.raidBossGuide.ignivar.rainHeroicSummary':
+    'Три огненных сектора и отмеченные места падения метеоров наносят огромный урон игрокам, оставшимся в предупреждающих областях.',
+  'hudChrome.raidBossGuide.ignivar.rainResponse':
+    'Перейдите в неотмеченный разрыв и покиньте каждый круг метеора до падения.',
+  'hudChrome.raidBossGuide.ignivar.raysName': 'Вращающийся инферно',
+  'hudChrome.raidBossGuide.ignivar.raysSummary':
+    'Вращающиеся огненные лучи проходят вокруг Игнивара и многократно наносят урон коснувшимся их игрокам.',
+  'hudChrome.raidBossGuide.ignivar.raysHeroicSummary':
+    'Вращающиеся огненные лучи проходят вокруг Игнивара и при касании многократно наносят тяжёлый урон.',
+  'hudChrome.raidBossGuide.ignivar.raysResponse':
+    'Двигайтесь вместе со свободным пространством между лучами. Не пересекайте луч даже с помощью быстрого перемещения.',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveName': 'Волна кузни',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveSummary':
+    'Расширяющаяся стена огня пересекает арену, оставляя два противоположных разрыва и отбрасывая задетых игроков.',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveHeroicSummary':
+    'Расширяющаяся стена огня пересекает арену, оставляя два противоположных разрыва и отбрасывая задетых игроков намного дальше.',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveResponse':
+    'Во время подготовки найдите любой разрыв, выровняйтесь с ним и не позволяйте отбросить себя к краю арены.',
+  'hudChrome.raidBossGuide.ignivar.apocalypseName': 'Апокалипсис',
+  'hudChrome.raidBossGuide.ignivar.apocalypseSummary':
+    'Игнивар призывает Эшколлера. Если прислужник завершит Апокалипсис, рейд немедленно потерпит поражение.',
+  'hudChrome.raidBossGuide.ignivar.apocalypseResponse':
+    'Все доступные бойцы переключаются на Игнивара Эшколлера и уничтожают его до завершения заклинания.',
+  'hudChrome.raidBossGuide.ignivar.judgmentName': 'Суд кузни',
+  'hudChrome.raidBossGuide.ignivar.judgmentSummary':
+    'Игнивар отмечает три убежища, указывает одно безопасное место, а затем многократно поджигает остальную арену.',
+  'hudChrome.raidBossGuide.ignivar.judgmentHeroicSummary':
+    'Пока арена горит, Игнивар отмечает одно безопасное убежище. Клеймо костра остаётся активным и продолжает наносить урон ближайшим союзникам.',
+  'hudChrome.raidBossGuide.ignivar.judgmentResponse':
+    'Во время предупреждения найдите уникально отмеченное убежище и полностью соберитесь внутри его границы до воспламенения пола.',
+  'hudChrome.raidBossGuide.ignivar.chainsName': 'Цепи кузни',
+  'hudChrome.raidBossGuide.ignivar.chainsSummary':
+    'Игнивар связывает ближайшие пары. Слишком большое расстояние или пересечение цепи другой пары наносит смертельный урон.',
+  'hudChrome.raidBossGuide.ignivar.chainsResponse':
+    'Держитесь рядом со связанным напарником, двигайтесь вместе и не позволяйте другим игрокам проходить через вашу цепь.',
+  'hudChrome.raidBossGuide.ignivar.lastInfernoName': 'Последний инферно',
+  'hudChrome.raidBossGuide.ignivar.lastInfernoSummary':
+    'Игнивар впадает в ярость и готовит полное уничтожение, пока Дождь углей, Жгучий поток и Вращающийся инферно ускоряются.',
+  'hudChrome.raidBossGuide.ignivar.lastInfernoResponse':
+    'Используйте оставшиеся атакующие и лечебные способности, продолжайте выполнять механики движения и победите Игнивара до конца отсчёта.',
   'hudChrome.raidBossGuide.ignivar.brand':
     'Клеймо костра: рассредоточьтесь. Направьте Жгучий поток в готовый водовод и пройдите через воду в одиночку, чтобы очиститься.',
   'hudChrome.raidBossGuide.ignivar.movement':
@@ -7758,6 +7861,95 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Последний инферно: убейте Игнивара до полного уничтожения, справляясь с ускоренными метеорами, фронтальными атаками и Вращающимся инферно.',
   'hudChrome.raidBossGuide.ignivar.heroic':
     'Героический: связанные игроки держатся рядом во время Цепей кузни, Клеймо сохраняется внутри Суда, а Волна кузни отбрасывает игроков дальше.',
+  'hudChrome.raidBossGuide.varkhul.overview':
+    'Варкхул заточил умирающий Последний источник, чтобы ковать живой металл, а затем создал Игнивара для охраны своего преступления. Бой сочетает личное позиционирование и управление великой кузней силами всего рейда.',
+  'hudChrome.raidBossGuide.varkhul.phaseOpeningName': 'Отец кузни',
+  'hudChrome.raidBossGuide.varkhul.phaseOpeningSummary':
+    'Варкхул чередует давление на танков, широкие фронтальные атаки, движущиеся снаряды, совместное принятие урона, волны метеоров и атаки великой наковальни.',
+  'hudChrome.raidBossGuide.varkhul.phaseAssemblyName': 'Переход: Сборка мастера',
+  'hudChrome.raidBossGuide.varkhul.phaseAssemblySummary':
+    'На {health} здоровья Варкхул получает защиту, легион кузни входит через порталы, а лучи столпов угрожают вызвать Расплавление кузни.',
+  'hudChrome.raidBossGuide.varkhul.phaseFinaleName': 'Финал: Освобождённый шедевр',
+  'hudChrome.raidBossGuide.varkhul.phaseFinaleSummary':
+    'На {health} здоровья Варкхул атакует быстрее, наносит больше урона и обжигает рейд огненными импульсами до последнего срока.',
+  'hudChrome.raidBossGuide.varkhul.phaseFinaleHeroicSummary':
+    'На {health} здоровья Варкхул отказывается от большинства прежних механик, пока Мировой огонь сжимается внутрь и поглощает горнило.',
+  'hudChrome.raidBossGuide.varkhul.makersBrandName': 'Клеймо создателя',
+  'hudChrome.raidBossGuide.varkhul.makersBrandSummary':
+    'Варкхул бьёт текущего танка и накладывает суммирующийся эффект, увеличивающий весь получаемый от него урон.',
+  'hudChrome.raidBossGuide.varkhul.makersBrandResponse':
+    'Танки меняются на{stacks} зарядах. Лекари защищают входящего танка до смены цели Варкхула.',
+  'hudChrome.raidBossGuide.varkhul.frontalName': 'Размах отца кузни',
+  'hudChrome.raidBossGuide.varkhul.frontalSummary':
+    'Варкхул совершает очень широкий фронтальный размах, наносящий большой урон от огня всем перед ним.',
+  'hudChrome.raidBossGuide.varkhul.frontalHeroicSummary':
+    'Варкхул совершает очень широкий фронтальный размах, наносящий почти смертельный урон от огня всем перед ним.',
+  'hudChrome.raidBossGuide.varkhul.frontalResponse':
+    'Держите Варкхула лицом от группы и сразу перемещайтесь ему за спину при появлении предупреждения.',
+  'hudChrome.raidBossGuide.varkhul.orbsName': 'Угольные сферы',
+  'hudChrome.raidBossGuide.varkhul.orbsSummary':
+    'Отмеченные игроки, кроме танков, оставляют постоянные угольные лужи и выпускают огненные сферы во всех направлениях. Раскалённый металл также поглощает входящее исцеление.',
+  'hudChrome.raidBossGuide.varkhul.orbsHeroicSummary':
+    'Отмеченные игроки, кроме танков, оставляют очень опасные угольные лужи и выпускают огненные сферы во всех направлениях. Раскалённый металл также поглощает входящее исцеление.',
+  'hudChrome.raidBossGuide.varkhul.orbsResponse':
+    'Отнесите каждую метку к краю комнаты, разделите лужи, а затем уклоняйтесь от пересекающих арену сфер. Лекари быстро снимают поглощение исцеления.',
+  'hudChrome.raidBossGuide.varkhul.pyreName': 'Общий костёр',
+  'hudChrome.raidBossGuide.varkhul.pyreSummary':
+    'Движущийся круг следует за игроком без Раскалённого металла. Урон делится между игроками внутри, а за каждого недостающего игрока весь рейд получает {missingPenalty} максимального здоровья.',
+  'hudChrome.raidBossGuide.varkhul.pyreHeroicSummary':
+    'Движущийся круг следует за игроком без Раскалённого металла и делит более сильный удар. За каждого недостающего игрока весь рейд также получает {missingPenalty} максимального здоровья.',
+  'hudChrome.raidBossGuide.varkhul.pyreResponse':
+    'Соберите ровно{players} игроков внутри круга и двигайтесь вместе с целью до срабатывания заклинания.',
+  'hudChrome.raidBossGuide.varkhul.forgestormName': 'Кузнечная буря',
+  'hudChrome.raidBossGuide.varkhul.forgestormSummary':
+    'Варкхул вызывает на арене {waves} последовательных волн отмеченных падений метеоров.',
+  'hudChrome.raidBossGuide.varkhul.forgestormHeroicSummary':
+    'Варкхул вызывает {waves} последовательных волн отмеченных падений метеоров, наносящих огромный урон.',
+  'hudChrome.raidBossGuide.varkhul.forgestormResponse':
+    'Следите за каждым новым набором предупреждений на земле и уходите до падения волны. Не возвращайтесь на прежнее место, не проверив следующую волну.',
+  'hudChrome.raidBossGuide.varkhul.rayName': 'Закалочный луч',
+  'hudChrome.raidBossGuide.varkhul.raySummary':
+    'Луч долго отслеживает отмеченного игрока. Первый другой игрок между Варкхулом и целью перехватывает удар и получает Закалённую рану.',
+  'hudChrome.raidBossGuide.varkhul.rayResponse':
+    'Назначьте здорового игрока, обычно второго танка, который встанет на линию. Остальные отходят, а перехватчики меняются, пока действует Закалённая рана.',
+  'hudChrome.raidBossGuide.varkhul.anvilName': 'Указ наковальни',
+  'hudChrome.raidBossGuide.varkhul.anvilSummary':
+    'Варкхул идёт к великой кузне и бьёт по ней{strikes} раз, нанося всё больший урон всему рейду.',
+  'hudChrome.raidBossGuide.varkhul.anvilHeroicSummary':
+    'Варкхул бьёт по великой кузне{strikes} раз, нанося всё больший урон рейду, пока отмеченные метеоры падают на игроков.',
+  'hudChrome.raidBossGuide.varkhul.anvilResponse':
+    'Соберитесь для рейдового исцеления и используйте защитные способности на последнем ударе.',
+  'hudChrome.raidBossGuide.varkhul.anvilHeroicResponse':
+    'Разнесите отмеченные метеоры от группы, пока лекари и защитные способности прикрывают все{strikes} ударов.',
+  'hudChrome.raidBossGuide.varkhul.assemblyName': 'Сборка мастера',
+  'hudChrome.raidBossGuide.varkhul.assemblySummary':
+    'Варкхул получает защиту и начинает сборку с ограничением времени. Рейд должен победить все волны порталов до завершения шедевра кузней.',
+  'hudChrome.raidBossGuide.varkhul.assemblyResponse':
+    'Разделите внимание между управлением лучами и приоритетными прислужниками. Победите весь легион кузни до окончания таймера сборки.',
+  'hudChrome.raidBossGuide.varkhul.beamName': 'Луч горнила',
+  'hudChrome.raidBossGuide.varkhul.beamSummary':
+    'Активные лучи столпов нагревают кузню, если игроки их не перекрывают. Перекрывающие игроки получают растущий урон от Воздействия горнила, а перекрытые и неактивные лучи позволяют жару спадать.',
+  'hudChrome.raidBossGuide.varkhul.beamHeroicSummary':
+    'Активные лучи столпов нагревают кузню, если игроки их не перекрывают. Перекрывающие игроки получают растущий урон от Воздействия горнила, а жар кузни никогда не спадает.',
+  'hudChrome.raidBossGuide.varkhul.beamResponse':
+    'Встаньте между каждым активным столпом и кузней, затем меняйте игроков до опасного уровня воздействия. Полный жар вызывает смертельное Расплавление кузни.',
+  'hudChrome.raidBossGuide.varkhul.legionName': 'Легион кузни',
+  'hudChrome.raidBossGuide.varkhul.legionSummary':
+    'Стражи горнила применяют Землетрясение тигля, повышающее жар кузни, а Угольные мастера используют Протокол ремонта для лечения Варкхула.',
+  'hudChrome.raidBossGuide.varkhul.legionResponse':
+    'Прерывайте Землетрясение тигля и Протокол ремонта, сосредоточьтесь на каждом опасном заклинателе, а затем добейте остальных прислужников.',
+  'hudChrome.raidBossGuide.varkhul.masterpieceName': 'Освобождённый шедевр',
+  'hudChrome.raidBossGuide.varkhul.masterpieceSummary':
+    'Варкхул атакует быстрее, наносит больше урона и многократно обжигает рейд до финального уничтожения.',
+  'hudChrome.raidBossGuide.varkhul.masterpieceHeroicSummary':
+    'Варкхул атакует быстрее и наносит больше урона, а Мировой огонь заменяет большинство прежних механик в финальном натиске.',
+  'hudChrome.raidBossGuide.varkhul.masterpieceResponse':
+    'Используйте оставшиеся атакующие и защитные способности и победите Варкхула до конца финального отсчёта.',
+  'hudChrome.raidBossGuide.varkhul.worldfireName': 'Мировой огонь',
+  'hudChrome.raidBossGuide.varkhul.worldfireSummary':
+    'В героическом режиме огонь поэтапно движется от края арены к центру, пока всё горнило не загорится.',
+  'hudChrome.raidBossGuide.varkhul.worldfireResponse':
+    'Двигайтесь внутрь раньше каждой наступающей полосы огня, сохраняйте сужающееся безопасное место и победите Варкхула до воспламенения центра.',
   'hudChrome.raidBossGuide.varkhul.tanks':
     'Танки: меняйтесь на двух зарядах Клейма создателя и держите Вархала в радиусе ближнего боя.',
   'hudChrome.raidBossGuide.varkhul.orbs':

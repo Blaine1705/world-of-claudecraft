@@ -7624,8 +7624,110 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.varkhulWaveStatus': '공세 {wave}/{waves} | 적: {remaining}',
   'hudChrome.raidBossGuide.title': '우두머리 공략',
   'hudChrome.raidBossGuide.button': '공략: {boss}',
-  'hudChrome.raidBossGuide.subtitle': '{boss} | 일반 및 영웅',
+  'hudChrome.raidBossGuide.subtitle': '{boss} | {difficulty}',
   'hudChrome.raidBossGuide.close': '우두머리 공략 닫기',
+  'hudChrome.raidBossGuide.bossesLabel': '공격대 우두머리',
+  'hudChrome.raidBossGuide.difficultyLabel': '난이도',
+  'hudChrome.raidBossGuide.normal': '일반',
+  'hudChrome.raidBossGuide.heroic': '영웅',
+  'hudChrome.raidBossGuide.portraitAlt': '{boss} 전투 초상화',
+  'hudChrome.raidBossGuide.overviewHeading': '개요',
+  'hudChrome.raidBossGuide.abilitiesHeading': '능력',
+  'hudChrome.raidBossGuide.whatToDo': '대처 방법',
+  'hudChrome.raidBossGuide.whatToDoResponse': '대처 방법: {response}',
+  'hudChrome.raidBossGuide.rolesLabel': '역할별 책임',
+  'hudChrome.raidBossGuide.flagsLabel': '메커니즘 경고',
+  'hudChrome.raidBossGuide.roleTank': '방어 담당',
+  'hudChrome.raidBossGuide.roleHealer': '치유 담당',
+  'hudChrome.raidBossGuide.roleDamage': '공격 담당',
+  'hudChrome.raidBossGuide.roleAll': '모든 역할',
+  'hudChrome.raidBossGuide.flagDeadly': '치명적',
+  'hudChrome.raidBossGuide.flagInterruptible': '차단 가능',
+  'hudChrome.raidBossGuide.flagImportant': '중요',
+  'hudChrome.raidBossGuide.flagCleansable': '해제 가능',
+  'hudChrome.raidBossGuide.browseBoss': '{boss} 보기',
+  'hudChrome.raidBossGuide.chooseDifficulty': '{difficulty} 메커니즘 보기',
+  'hudChrome.raidBossGuide.expandAbility': '{ability} 펼치기',
+  'hudChrome.raidBossGuide.collapseAbility': '{ability} 접기',
+  'hudChrome.raidBossGuide.abilityControlLabel': '{action}. {details}',
+  'hudChrome.raidBossGuide.tooltipMeta': '{phase} | {difficulty}',
+  'hudChrome.raidBossGuide.ignivar.overview':
+    '바르쿨은 이그니바르를 전령이자 살아 있는 봉인, 내부 도가니로 향하는 열쇠로 벼려냈습니다. 이 전투는 수로 제어, 정확한 이동, 우선 대상에 대한 빠른 집중 공격을 시험합니다.',
+  'hudChrome.raidBossGuide.ignivar.phaseOpeningName': '전령의 각성',
+  'hudChrome.raidBossGuide.ignivar.phaseOpeningSummary':
+    '수로로 장작더미의 징표를 처리하면서 이그니바르의 반복되는 전방 공격, 하늘불꽃, 회전 광선, 확장되는 대장간 파도에 대응합니다.',
+  'hudChrome.raidBossGuide.ignivar.phaseApocalypseName': '사잇단계: 대재앙',
+  'hudChrome.raidBossGuide.ignivar.phaseApocalypseSummary':
+    '생명력이{health}가 되면 이그니바르가 전투를 끝내려는 잿불소환사를 불러냅니다.',
+  'hudChrome.raidBossGuide.ignivar.phaseJudgmentName': '대장간의 심판',
+  'hudChrome.raidBossGuide.ignivar.phaseJudgmentSummary':
+    '생명력이{health}가 되면 이그니바르가 투기장을 불태우고 세 피난처 중 하나의 안전 지대를 드러냅니다.',
+  'hudChrome.raidBossGuide.ignivar.phaseJudgmentHeroicSummary':
+    '생명력이{health}가 되면 이그니바르가 투기장을 불태우며, 활성 징표는 피난처 안에서도 주변 플레이어를 계속 위협합니다.',
+  'hudChrome.raidBossGuide.ignivar.phaseFinaleName': '마지막 단계: 마지막 지옥불',
+  'hudChrome.raidBossGuide.ignivar.phaseFinaleSummary':
+    '생명력이{health}가 되면 이그니바르가 엄격한 제한 시간이 있는 마지막 공격 단계에 들어가며 반복 메커니즘도 빨라집니다.',
+  'hudChrome.raidBossGuide.ignivar.forgeStrikeName': '대장간 일격',
+  'hudChrome.raidBossGuide.ignivar.forgeStrikeSummary':
+    '이그니바르가 현재 방어 담당을 공격하고 용융 갑옷을 부여하여 자신에게 받는 피해를 증가시킵니다.',
+  'hudChrome.raidBossGuide.ignivar.forgeStrikeResponse':
+    '방어 담당은{stacks}중첩에 교대합니다. 치유 담당은 일격과 새 방어 담당이 받는 첫 근접 공격에 대비합니다.',
+  'hudChrome.raidBossGuide.ignivar.brandName': '장작더미의 징표',
+  'hudChrome.raidBossGuide.ignivar.brandSummary':
+    '이그니바르가 방어 담당이 아닌 플레이어에게 지속 화염 피해를 주는 징표를 남깁니다. 대상자는 주변 아군도 불태웁니다.',
+  'hudChrome.raidBossGuide.ignivar.brandResponse':
+    '산개합니다. 불타는 급류를 준비된 수로로 유도한 뒤 징표 대상자가 한 명씩 활성화된 물을 건너 해제합니다.',
+  'hudChrome.raidBossGuide.ignivar.brandHeroicResponse':
+    '산개합니다. 불타는 급류로 수로를 열고 징표 대상자를 한 명씩 해제합니다. 해제할 때마다 공격대 전체에 정화의 반동이 발생합니다.',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentName': '불타는 급류',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentSummary':
+    '이그니바르가 플레이어 한 명을 추적한 뒤 넓은 전방 공격을 방출합니다. 공격에 맞은 준비된 수로는 잠시 활성화됩니다.',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentHeroicSummary':
+    '이그니바르가 플레이어 한 명을 추적한 뒤 거의 치명적인 넓은 전방 공격을 방출합니다. 공격에 맞은 준비된 수로는 잠시 활성화됩니다.',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentResponse':
+    '경고 범위가 준비된 수로 하나만 지나가게 유도합니다. 나머지는 시전이 끝나기 전에 전방 범위를 벗어납니다.',
+  'hudChrome.raidBossGuide.ignivar.rainName': '잿불비',
+  'hudChrome.raidBossGuide.ignivar.rainSummary':
+    '세 화염 구역과 표시된 운석 충돌이 경고 안에 남은 플레이어에게 피해를 줍니다.',
+  'hudChrome.raidBossGuide.ignivar.rainHeroicSummary':
+    '세 화염 구역과 표시된 운석 충돌이 경고 안에 남은 플레이어에게 극심한 피해를 줍니다.',
+  'hudChrome.raidBossGuide.ignivar.rainResponse': '표시되지 않은 틈으로 이동하고 충돌 전에 모든 운석 원을 벗어납니다.',
+  'hudChrome.raidBossGuide.ignivar.raysName': '회전하는 지옥불',
+  'hudChrome.raidBossGuide.ignivar.raysSummary':
+    '회전하는 화염 광선이 이그니바르 주위를 휩쓸며 닿은 플레이어에게 반복 피해를 줍니다.',
+  'hudChrome.raidBossGuide.ignivar.raysHeroicSummary':
+    '회전하는 화염 광선이 이그니바르 주위를 휩쓸며 닿을 때마다 반복해서 큰 피해를 줍니다.',
+  'hudChrome.raidBossGuide.ignivar.raysResponse':
+    '광선 사이의 빈 공간을 따라 이동합니다. 빠른 이동 능력을 사용하더라도 광선을 가로지르지 않습니다.',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveName': '대장간 파도',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveSummary':
+    '확장되는 불의 벽이 투기장을 가로지르며 마주 보는 두 틈을 남기고 적중한 플레이어를 밀쳐냅니다.',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveHeroicSummary':
+    '확장되는 불의 벽이 투기장을 가로지르며 마주 보는 두 틈을 남기고 적중한 플레이어를 훨씬 멀리 밀쳐냅니다.',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveResponse':
+    '예고 중 어느 한 틈을 찾아 정렬하고 투기장 가장자리 쪽으로 밀려나지 않게 합니다.',
+  'hudChrome.raidBossGuide.ignivar.apocalypseName': '대재앙',
+  'hudChrome.raidBossGuide.ignivar.apocalypseSummary':
+    '이그니바르가 잿불소환사를 불러냅니다. 추가 적이 대재앙 시전을 끝내면 공격대가 즉시 패배합니다.',
+  'hudChrome.raidBossGuide.ignivar.apocalypseResponse':
+    '모든 공격 담당이 이그니바르 잿불소환사로 전환하고 시전이 끝나기 전에 처치합니다.',
+  'hudChrome.raidBossGuide.ignivar.judgmentName': '대장간의 심판',
+  'hudChrome.raidBossGuide.ignivar.judgmentSummary':
+    '이그니바르가 세 피난처를 표시하고 하나의 안전 지대를 확인한 뒤 투기장의 나머지 부분을 반복해서 불태웁니다.',
+  'hudChrome.raidBossGuide.ignivar.judgmentHeroicSummary':
+    '투기장이 불타는 동안 이그니바르가 하나의 안전 지대를 표시합니다. 장작더미의 징표는 남아 주변 아군에게 계속 피해를 줍니다.',
+  'hudChrome.raidBossGuide.ignivar.judgmentResponse':
+    '경고 중 독특하게 표시된 피난처를 찾아 바닥이 타오르기 전에 경계 안으로 완전히 모입니다.',
+  'hudChrome.raidBossGuide.ignivar.chainsName': '대장간의 사슬',
+  'hudChrome.raidBossGuide.ignivar.chainsSummary':
+    '이그니바르가 가까운 플레이어를 둘씩 연결합니다. 너무 멀어지거나 다른 짝의 사슬을 가로지르면 치명적인 피해를 받습니다.',
+  'hudChrome.raidBossGuide.ignivar.chainsResponse':
+    '연결된 짝과 가까이 붙어 함께 움직이고 다른 플레이어가 사슬을 통과하지 않게 합니다.',
+  'hudChrome.raidBossGuide.ignivar.lastInfernoName': '마지막 지옥불',
+  'hudChrome.raidBossGuide.ignivar.lastInfernoSummary':
+    '이그니바르가 격노하여 전멸 공격을 준비하는 동안 잿불비, 불타는 급류, 회전하는 지옥불이 빨라집니다.',
+  'hudChrome.raidBossGuide.ignivar.lastInfernoResponse':
+    '남은 공격 및 치유 재사용 대기시간을 사용하고 이동 메커니즘을 계속 수행하여 시간 안에 이그니바르를 처치합니다.',
   'hudChrome.raidBossGuide.ignivar.brand':
     '장작더미의 징표: 산개합니다. 불타는 급류를 준비된 수로로 유도한 뒤 혼자 물을 건너 해제합니다.',
   'hudChrome.raidBossGuide.ignivar.movement':
@@ -7638,6 +7740,94 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '마지막 지옥불: 빨라진 운석, 전방 공격, 회전 지옥불에 대응하며 전멸 전에 이그니바르를 처치합니다.',
   'hudChrome.raidBossGuide.ignivar.heroic':
     '영웅: 대장간의 사슬 동안 짝과 가까이 있어야 하며 심판 안에서도 징표가 유지되고, 대장간 파도가 플레이어를 더 멀리 밀어냅니다.',
+  'hudChrome.raidBossGuide.varkhul.overview':
+    '바르쿨은 죽어 가는 마지막 샘을 가두어 살아 있는 금속을 벼린 뒤 그 죄를 지키도록 이그니바르를 만들었습니다. 이 전투는 개인 위치 선정과 공격대 전체의 거대 대장간 제어를 결합합니다.',
+  'hudChrome.raidBossGuide.varkhul.phaseOpeningName': '대장간의 아버지',
+  'hudChrome.raidBossGuide.varkhul.phaseOpeningSummary':
+    '바르쿨은 방어 담당 압박, 넓은 전방 공격, 이동 투사체, 단체 피해 분담, 운석 공세, 거대 모루의 공격을 반복합니다.',
+  'hudChrome.raidBossGuide.varkhul.phaseAssemblyName': '사잇단계: 거장의 조립',
+  'hudChrome.raidBossGuide.varkhul.phaseAssemblySummary':
+    '생명력이{health}가 되면 바르쿨이 보호받고 대장간 군단이 차원문으로 들어오며 기둥 광선이 대장간 붕괴를 위협합니다.',
+  'hudChrome.raidBossGuide.varkhul.phaseFinaleName': '마지막 단계: 풀려난 걸작',
+  'hudChrome.raidBossGuide.varkhul.phaseFinaleSummary':
+    '생명력이{health}가 되면 바르쿨의 공격이 빨라지고 피해가 증가하며 마지막 시간까지 공격대에 반복해서 화염을 내뿜습니다.',
+  'hudChrome.raidBossGuide.varkhul.phaseFinaleHeroicSummary':
+    '생명력이{health}가 되면 바르쿨이 이전 메커니즘 대부분을 버리고 세계불꽃이 안쪽으로 좁혀져 도가니를 삼킵니다.',
+  'hudChrome.raidBossGuide.varkhul.makersBrandName': '제작자의 징표',
+  'hudChrome.raidBossGuide.varkhul.makersBrandSummary':
+    '바르쿨이 현재 방어 담당을 공격하고 자신에게 받는 모든 피해를 증가시키는 중첩 효과를 부여합니다.',
+  'hudChrome.raidBossGuide.varkhul.makersBrandResponse':
+    '방어 담당은{stacks}중첩에 교대합니다. 치유 담당은 바르쿨이 대상을 바꾸기 전에 다음 방어 담당을 보호합니다.',
+  'hudChrome.raidBossGuide.varkhul.frontalName': '대장간 아버지의 휩쓸기',
+  'hudChrome.raidBossGuide.varkhul.frontalSummary':
+    '바르쿨이 매우 넓은 전방 휩쓸기를 사용하여 앞에 있는 모두에게 큰 화염 피해를 줍니다.',
+  'hudChrome.raidBossGuide.varkhul.frontalHeroicSummary':
+    '바르쿨이 매우 넓은 전방 휩쓸기를 사용하여 앞에 있는 모두에게 거의 치명적인 화염 피해를 줍니다.',
+  'hudChrome.raidBossGuide.varkhul.frontalResponse':
+    '바르쿨이 공격대 반대쪽을 보게 하고 경고가 나타나면 즉시 등 뒤로 이동합니다.',
+  'hudChrome.raidBossGuide.varkhul.orbsName': '잿불 구슬',
+  'hudChrome.raidBossGuide.varkhul.orbsSummary':
+    '표시된 비방어 담당이 지속되는 잿불 웅덩이를 남기고 모든 방향으로 화염 구슬을 방출합니다. 달아오른 금속은 받는 치유도 흡수합니다.',
+  'hudChrome.raidBossGuide.varkhul.orbsHeroicSummary':
+    '표시된 비방어 담당이 큰 피해를 주는 지속 잿불 웅덩이를 남기고 모든 방향으로 위험한 화염 구슬을 방출합니다. 달아오른 금속은 받는 치유도 흡수합니다.',
+  'hudChrome.raidBossGuide.varkhul.orbsResponse':
+    '각 징표를 방 가장자리로 옮겨 웅덩이를 떨어뜨려 놓고 투기장을 가로지르는 구슬을 피합니다. 치유 담당은 치유 흡수를 빠르게 제거합니다.',
+  'hudChrome.raidBossGuide.varkhul.pyreName': '공유 장작더미',
+  'hudChrome.raidBossGuide.varkhul.pyreSummary':
+    '움직이는 원이 달아오른 금속이 없는 플레이어 한 명을 따라갑니다. 피해는 원 안에서 나뉘며 부족한 플레이어마다 공격대 전체가 최대 생명력의{missingPenalty}피해를 받습니다.',
+  'hudChrome.raidBossGuide.varkhul.pyreHeroicSummary':
+    '움직이는 원이 달아오른 금속이 없는 플레이어 한 명을 따라가며 더 큰 일격을 분담합니다. 부족한 플레이어마다 공격대 전체가 최대 생명력의{missingPenalty}피해를 받습니다.',
+  'hudChrome.raidBossGuide.varkhul.pyreResponse':
+    '정확히{players}명이 원 안에 모이고 시전이 해결될 때까지 대상과 함께 이동합니다.',
+  'hudChrome.raidBossGuide.varkhul.forgestormName': '대장간폭풍',
+  'hudChrome.raidBossGuide.varkhul.forgestormSummary':
+    '바르쿨이 투기장 전역에 표시된 운석 충돌을 연속{waves}회 불러냅니다.',
+  'hudChrome.raidBossGuide.varkhul.forgestormHeroicSummary':
+    '바르쿨이 극심한 피해를 주는 표시된 운석 충돌을 연속{waves}회 불러냅니다.',
+  'hudChrome.raidBossGuide.varkhul.forgestormResponse':
+    '새로운 바닥 경고가 나타날 때마다 확인하고 해당 공세가 떨어지기 전에 벗어납니다. 다음 공세를 확인하지 않고 이전 위치로 돌아가지 않습니다.',
+  'hudChrome.raidBossGuide.varkhul.rayName': '담금질 광선',
+  'hudChrome.raidBossGuide.varkhul.raySummary':
+    '광선이 표시된 플레이어를 오랫동안 추적합니다. 바르쿨과 대상 사이에 처음 들어간 다른 플레이어가 공격을 가로막고 담금질 상처를 얻습니다.',
+  'hudChrome.raidBossGuide.varkhul.rayResponse':
+    '생명력이 충분한 플레이어, 보통 보조 방어 담당을 선에 세웁니다. 다른 플레이어는 벗어나고 담금질 상처가 남아 있는 동안 차단자를 교대합니다.',
+  'hudChrome.raidBossGuide.varkhul.anvilName': '모루의 칙령',
+  'hudChrome.raidBossGuide.varkhul.anvilSummary':
+    '바르쿨이 거대 대장간으로 걸어가{strikes}번 내리쳐 점점 증가하는 공격대 전체 피해를 줍니다.',
+  'hudChrome.raidBossGuide.varkhul.anvilHeroicSummary':
+    '바르쿨이 거대 대장간을{strikes}번 내리쳐 점점 증가하는 공격대 피해를 주며 동시에 표시된 운석이 플레이어에게 떨어집니다.',
+  'hudChrome.raidBossGuide.varkhul.anvilResponse': '공격대 치유를 위해 모이고 마지막 일격에 방어 재사용 대기시간을 사용합니다.',
+  'hudChrome.raidBossGuide.varkhul.anvilHeroicResponse':
+    '표시된 운석을 공격대 밖으로 분산시키고 치유 및 방어 재사용 대기시간으로{strikes}번의 일격을 모두 버팁니다.',
+  'hudChrome.raidBossGuide.varkhul.assemblyName': '거장의 조립',
+  'hudChrome.raidBossGuide.varkhul.assemblySummary':
+    '바르쿨이 보호받으며 제한 시간 조립을 시작합니다. 대장간이 그의 걸작을 완성하기 전에 공격대가 모든 차원문 공세를 물리쳐야 합니다.',
+  'hudChrome.raidBossGuide.varkhul.assemblyResponse':
+    '광선 제어와 우선 추가 적에 주의를 나눕니다. 조립 시간이 끝나기 전에 대장간 군단 전체를 처치합니다.',
+  'hudChrome.raidBossGuide.varkhul.beamName': '도가니 광선',
+  'hudChrome.raidBossGuide.varkhul.beamSummary':
+    '활성 기둥 광선은 플레이어가 막지 않으면 대장간을 가열합니다. 차단자는 증가하는 도가니 노출 피해를 받으며 광선이 막히거나 비활성이면 열기가 내려갑니다.',
+  'hudChrome.raidBossGuide.varkhul.beamHeroicSummary':
+    '활성 기둥 광선은 플레이어가 막지 않으면 대장간을 가열합니다. 차단자는 증가하는 도가니 노출 피해를 받으며 대장간 열기는 절대 내려가지 않습니다.',
+  'hudChrome.raidBossGuide.varkhul.beamResponse':
+    '각 활성 기둥과 대장간 사이에 서고 노출이 위험해지기 전에 차단자를 교대합니다. 열기가 가득 차면 치명적인 대장간 붕괴가 발생합니다.',
+  'hudChrome.raidBossGuide.varkhul.legionName': '대장간 군단',
+  'hudChrome.raidBossGuide.varkhul.legionSummary':
+    '도가니 수호자는 대장간 열기를 높이는 도가니 지진을 시전하고 잿불 기술자는 수리 절차로 바르쿨을 치유합니다.',
+  'hudChrome.raidBossGuide.varkhul.legionResponse':
+    '도가니 지진과 수리 절차를 차단하고 위험한 시전자를 먼저 집중 공격한 뒤 남은 추가 적을 처리합니다.',
+  'hudChrome.raidBossGuide.varkhul.masterpieceName': '풀려난 걸작',
+  'hudChrome.raidBossGuide.varkhul.masterpieceSummary':
+    '바르쿨의 공격이 빨라지고 피해가 증가하며 마지막 전멸까지 공격대를 반복해서 불태웁니다.',
+  'hudChrome.raidBossGuide.varkhul.masterpieceHeroicSummary':
+    '바르쿨의 공격이 빨라지고 피해가 증가하며 세계불꽃이 이전 메커니즘 대부분을 대신해 마지막 공격을 이룹니다.',
+  'hudChrome.raidBossGuide.varkhul.masterpieceResponse':
+    '남은 공격 및 방어 재사용 대기시간을 모두 사용하고 마지막 시간이 끝나기 전에 바르쿨을 처치합니다.',
+  'hudChrome.raidBossGuide.varkhul.worldfireName': '세계불꽃',
+  'hudChrome.raidBossGuide.varkhul.worldfireSummary':
+    '영웅 난이도에서는 불길이 투기장 가장자리에서 중앙으로 단계적으로 전진하여 마침내 도가니 전체를 태웁니다.',
+  'hudChrome.raidBossGuide.varkhul.worldfireResponse':
+    '전진하는 불길보다 먼저 안쪽으로 이동하고 줄어드는 안전 공간을 지키며 중앙이 타오르기 전에 바르쿨을 처치합니다.',
   'hudChrome.raidBossGuide.varkhul.tanks':
     '방어 담당: 제작자의 징표 2중첩에 교대하고 바르쿨을 근접 거리 안에 둡니다.',
   'hudChrome.raidBossGuide.varkhul.orbs':

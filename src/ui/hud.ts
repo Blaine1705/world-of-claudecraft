@@ -4933,6 +4933,8 @@ export class Hud {
     root: () => $('#raid-boss-guide-window'),
     closeOthers: () => this.closeOtherWindows('#raid-boss-guide-window'),
     contextFallback: () => raidBossGuideContextFallback(document, this.isMobileLayout()),
+    attachTooltip: (element, html) => this.attachTooltip(element, html),
+    hideTooltip: () => this.hideTooltip(),
     ...this.windowFocus('#raid-boss-guide-window'),
   });
 

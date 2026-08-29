@@ -13934,7 +13934,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.varkhulWaveStatus': 'Oleada {wave}/{waves} | Enemigos: {remaining}',
   'hudChrome.raidBossGuide.title': 'Guía de jefes',
   'hudChrome.raidBossGuide.button': 'Guía: {boss}',
-  'hudChrome.raidBossGuide.subtitle': '{boss} | Normal y heroico',
+  'hudChrome.raidBossGuide.subtitle': '{boss} | {difficulty}',
   'hudChrome.raidBossGuide.close': 'Cerrar la guía de jefes',
   'hudChrome.raidBossGuide.ignivar.brand':
     'Marca de la Pira: separaos. Apunta Torrente abrasador hacia un conducto de agua listo y cruza el agua a solas para limpiarte.',

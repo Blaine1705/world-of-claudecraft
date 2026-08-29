@@ -7334,8 +7334,110 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.varkhulWaveStatus': '波次 {wave}/{waves} | 敌人: {remaining}',
   'hudChrome.raidBossGuide.title': '首领指南',
   'hudChrome.raidBossGuide.button': '指南: {boss}',
-  'hudChrome.raidBossGuide.subtitle': '{boss} | 普通与英雄',
+  'hudChrome.raidBossGuide.subtitle': '{boss} | {difficulty}',
   'hudChrome.raidBossGuide.close': '关闭首领指南',
+  'hudChrome.raidBossGuide.bossesLabel': '团队副本首领',
+  'hudChrome.raidBossGuide.difficultyLabel': '难度',
+  'hudChrome.raidBossGuide.normal': '普通',
+  'hudChrome.raidBossGuide.heroic': '英雄',
+  'hudChrome.raidBossGuide.portraitAlt': '{boss} 战斗肖像',
+  'hudChrome.raidBossGuide.overviewHeading': '概览',
+  'hudChrome.raidBossGuide.abilitiesHeading': '技能',
+  'hudChrome.raidBossGuide.whatToDo': '应对方法',
+  'hudChrome.raidBossGuide.whatToDoResponse': '应对方法：{response}',
+  'hudChrome.raidBossGuide.rolesLabel': '职责',
+  'hudChrome.raidBossGuide.flagsLabel': '机制警告',
+  'hudChrome.raidBossGuide.roleTank': '坦克',
+  'hudChrome.raidBossGuide.roleHealer': '治疗',
+  'hudChrome.raidBossGuide.roleDamage': '输出',
+  'hudChrome.raidBossGuide.roleAll': '所有职责',
+  'hudChrome.raidBossGuide.flagDeadly': '致命',
+  'hudChrome.raidBossGuide.flagInterruptible': '可打断',
+  'hudChrome.raidBossGuide.flagImportant': '重要',
+  'hudChrome.raidBossGuide.flagCleansable': '可净化',
+  'hudChrome.raidBossGuide.browseBoss': '查看 {boss}',
+  'hudChrome.raidBossGuide.chooseDifficulty': '查看{difficulty}机制',
+  'hudChrome.raidBossGuide.expandAbility': '展开{ability}',
+  'hudChrome.raidBossGuide.collapseAbility': '收起{ability}',
+  'hudChrome.raidBossGuide.abilityControlLabel': '{action}。{details}',
+  'hudChrome.raidBossGuide.tooltipMeta': '{phase} | {difficulty}',
+  'hudChrome.raidBossGuide.ignivar.overview':
+    '瓦尔库尔将伊格尼瓦铸造成先驱、活体封印和通往内层坩埚的钥匙。这场战斗考验水渠控制、精确走位和快速集火优先目标。',
+  'hudChrome.raidBossGuide.ignivar.phaseOpeningName': '先驱苏醒',
+  'hudChrome.raidBossGuide.ignivar.phaseOpeningSummary':
+    '利用水渠处理柴堆印记，同时应对伊格尼瓦反复施放的正面攻击、天火、旋转射线和扩张的熔炉波。',
+  'hudChrome.raidBossGuide.ignivar.phaseApocalypseName': '过场阶段：末日',
+  'hudChrome.raidBossGuide.ignivar.phaseApocalypseSummary':
+    '生命值降至{health}时，伊格尼瓦召唤一名试图结束战斗的唤灰者。',
+  'hudChrome.raidBossGuide.ignivar.phaseJudgmentName': '熔炉审判',
+  'hudChrome.raidBossGuide.ignivar.phaseJudgmentSummary':
+    '生命值降至{health}时，伊格尼瓦点燃竞技场，并在三个庇护所中显示一个安全区域。',
+  'hudChrome.raidBossGuide.ignivar.phaseJudgmentHeroicSummary':
+    '生命值降至{health}时，伊格尼瓦点燃竞技场，激活的印记仍会在安全区内威胁附近玩家。',
+  'hudChrome.raidBossGuide.ignivar.phaseFinaleName': '最终阶段：最终炼狱',
+  'hudChrome.raidBossGuide.ignivar.phaseFinaleSummary':
+    '生命值降至{health}时，伊格尼瓦进入有严格时限的最终爆发阶段，重复机制也会加快。',
+  'hudChrome.raidBossGuide.ignivar.forgeStrikeName': '熔炉打击',
+  'hudChrome.raidBossGuide.ignivar.forgeStrikeSummary':
+    '伊格尼瓦打击当前坦克并施加熔火护甲，使其受到伊格尼瓦的伤害提高。',
+  'hudChrome.raidBossGuide.ignivar.forgeStrikeResponse':
+    '坦克在{stacks}层时换坦。治疗为这次打击和新坦克承受的最初几次近战攻击做好准备。',
+  'hudChrome.raidBossGuide.ignivar.brandName': '柴堆印记',
+  'hudChrome.raidBossGuide.ignivar.brandSummary':
+    '伊格尼瓦标记非坦克玩家，使其持续受到火焰伤害。被标记者还会灼烧附近的盟友。',
+  'hudChrome.raidBossGuide.ignivar.brandResponse':
+    '分散站位。将灼热洪流引向可用水渠，再让每名被标记者单独穿过激活的水流完成净化。',
+  'hudChrome.raidBossGuide.ignivar.brandHeroicResponse':
+    '分散站位。用灼热洪流开启水渠，每次只净化一名被标记者。每次净化都会触发全团净化反冲。',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentName': '灼热洪流',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentSummary':
+    '伊格尼瓦追踪一名玩家，随后释放宽阔的正面冲击。被冲击命中的可用水渠会短暂激活。',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentHeroicSummary':
+    '伊格尼瓦追踪一名玩家，随后释放几乎致命的宽阔正面冲击。被冲击命中的可用水渠会短暂激活。',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentResponse':
+    '让预警区域恰好穿过一条可用水渠。其他所有人在施法完成前离开正面区域。',
+  'hudChrome.raidBossGuide.ignivar.rainName': '烬雨',
+  'hudChrome.raidBossGuide.ignivar.rainSummary':
+    '三个火焰扇区和标记的陨石落点会惩罚仍留在预警区域内的玩家。',
+  'hudChrome.raidBossGuide.ignivar.rainHeroicSummary':
+    '三个火焰扇区和标记的陨石落点会对仍留在预警区域内的玩家造成极高伤害。',
+  'hudChrome.raidBossGuide.ignivar.rainResponse': '移入未标记的缺口，并在陨石命中前离开所有圆形区域。',
+  'hudChrome.raidBossGuide.ignivar.raysName': '旋转炼狱',
+  'hudChrome.raidBossGuide.ignivar.raysSummary':
+    '旋转的火焰射线环绕伊格尼瓦扫过，反复伤害接触它们的玩家。',
+  'hudChrome.raidBossGuide.ignivar.raysHeroicSummary':
+    '旋转的火焰射线环绕伊格尼瓦扫过，接触时会反复造成严重伤害。',
+  'hudChrome.raidBossGuide.ignivar.raysResponse':
+    '跟随射线之间的空隙移动。即使使用快速移动技能，也不要穿过射线。',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveName': '熔炉波',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveSummary':
+    '一道扩张的火墙横穿竞技场，留下两个相对的缺口，并击退被命中的玩家。',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveHeroicSummary':
+    '一道扩张的火墙横穿竞技场，留下两个相对的缺口，并将被命中的玩家击退得更远。',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveResponse':
+    '在预备阶段找到任一缺口并与其对齐，避免被击退到竞技场边缘。',
+  'hudChrome.raidBossGuide.ignivar.apocalypseName': '末日',
+  'hudChrome.raidBossGuide.ignivar.apocalypseSummary':
+    '伊格尼瓦召唤一名唤灰者。如果该小怪完成末日施法，团队会立即失败。',
+  'hudChrome.raidBossGuide.ignivar.apocalypseResponse':
+    '所有可用输出立即转火伊格尼瓦唤灰者，并在其完成施法前将其击杀。',
+  'hudChrome.raidBossGuide.ignivar.judgmentName': '熔炉审判',
+  'hudChrome.raidBossGuide.ignivar.judgmentSummary':
+    '伊格尼瓦标记三个庇护所，指出其中一个安全区，然后反复灼烧竞技场其余区域。',
+  'hudChrome.raidBossGuide.ignivar.judgmentHeroicSummary':
+    '竞技场燃烧时，伊格尼瓦只标记一个安全区。柴堆印记仍会持续并伤害附近盟友。',
+  'hudChrome.raidBossGuide.ignivar.judgmentResponse':
+    '在预警期间认出标记独特的庇护所，并在地面燃烧前完全进入其边界内集合。',
+  'hudChrome.raidBossGuide.ignivar.chainsName': '熔炉锁链',
+  'hudChrome.raidBossGuide.ignivar.chainsSummary':
+    '伊格尼瓦连接附近的玩家对。相距过远或穿过其他玩家对的锁链都会造成致命伤害。',
+  'hudChrome.raidBossGuide.ignivar.chainsResponse':
+    '靠近与你相连的玩家并一起移动，不要让其他任何玩家穿过你们的锁链。',
+  'hudChrome.raidBossGuide.ignivar.lastInfernoName': '最终炼狱',
+  'hudChrome.raidBossGuide.ignivar.lastInfernoSummary':
+    '伊格尼瓦进入狂暴并准备强制团灭，同时烬雨、灼热洪流和旋转炼狱会加速。',
+  'hudChrome.raidBossGuide.ignivar.lastInfernoResponse':
+    '使用剩余的输出和治疗冷却，继续正确处理移动机制，并在倒计时结束前击败伊格尼瓦。',
   'hudChrome.raidBossGuide.ignivar.brand':
     '柴堆印记: 分散站位。将灼热洪流引向可用水渠，然后独自穿过水流完成净化。',
   'hudChrome.raidBossGuide.ignivar.movement':
@@ -7348,6 +7450,94 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '最终炼狱: 在团灭前击杀伊格尼瓦尔，同时应对加速的陨石、正面攻击和旋转炼狱。',
   'hudChrome.raidBossGuide.ignivar.heroic':
     '英雄: 熔炉锁链期间成对玩家必须保持靠近，熔炉审判期间印记仍会持续，且熔炉波会将玩家推得更远。',
+  'hudChrome.raidBossGuide.varkhul.overview':
+    '瓦尔库尔囚禁垂死的终末之泉来锻造活体金属，随后创造伊格尼瓦守护这一罪行。这场战斗结合个人走位与全团对巨型熔炉的控制。',
+  'hudChrome.raidBossGuide.varkhul.phaseOpeningName': '锻炉之父',
+  'hudChrome.raidBossGuide.varkhul.phaseOpeningSummary':
+    '瓦尔库尔循环施放坦克压力、宽阔正面攻击、移动投射物、团队分摊、陨石波次和巨型铁砧攻击。',
+  'hudChrome.raidBossGuide.varkhul.phaseAssemblyName': '过场阶段：大师组装',
+  'hudChrome.raidBossGuide.varkhul.phaseAssemblySummary':
+    '生命值降至{health}时，瓦尔库尔获得保护，锻炉军团通过传送门进入，柱状射线则会威胁触发熔炉熔毁。',
+  'hudChrome.raidBossGuide.varkhul.phaseFinaleName': '最终阶段：杰作解放',
+  'hudChrome.raidBossGuide.varkhul.phaseFinaleSummary':
+    '生命值降至{health}时，瓦尔库尔攻击更快、造成更多伤害，并不断对全团释放火焰脉冲直到最终时限。',
+  'hudChrome.raidBossGuide.varkhul.phaseFinaleHeroicSummary':
+    '生命值降至{health}时，瓦尔库尔放弃大部分早期机制，世界之火向内收缩并吞噬整个坩埚。',
+  'hudChrome.raidBossGuide.varkhul.makersBrandName': '制作者印记',
+  'hudChrome.raidBossGuide.varkhul.makersBrandSummary':
+    '瓦尔库尔打击当前坦克并施加可叠加效果，使其受到瓦尔库尔的所有伤害提高。',
+  'hudChrome.raidBossGuide.varkhul.makersBrandResponse':
+    '坦克在{stacks}层时换坦。治疗在瓦尔库尔更换目标前保护即将接怪的坦克。',
+  'hudChrome.raidBossGuide.varkhul.frontalName': '锻炉之父横扫',
+  'hudChrome.raidBossGuide.varkhul.frontalSummary':
+    '瓦尔库尔释放范围极宽的正面横扫，对其前方所有玩家造成大量火焰伤害。',
+  'hudChrome.raidBossGuide.varkhul.frontalHeroicSummary':
+    '瓦尔库尔释放范围极宽的正面横扫，对其前方所有玩家造成几乎致命的火焰伤害。',
+  'hudChrome.raidBossGuide.varkhul.frontalResponse':
+    '让瓦尔库尔始终背对团队，预警出现后立刻移动到他身后。',
+  'hudChrome.raidBossGuide.varkhul.orbsName': '烬火宝珠',
+  'hudChrome.raidBossGuide.varkhul.orbsSummary':
+    '被标记的非坦克玩家会留下持续的烬火池，并向各个方向释放火焰宝珠。炽热金属还会吸收受到的治疗。',
+  'hudChrome.raidBossGuide.varkhul.orbsHeroicSummary':
+    '被标记的非坦克玩家会留下高伤害烬火池，并向各个方向释放危险的火焰宝珠。炽热金属还会吸收受到的治疗。',
+  'hudChrome.raidBossGuide.varkhul.orbsResponse':
+    '将每个标记带到房间边缘，让火池彼此分开，再躲避横穿竞技场的宝珠。治疗迅速清除治疗吸收。',
+  'hudChrome.raidBossGuide.varkhul.pyreName': '共享柴堆',
+  'hudChrome.raidBossGuide.varkhul.pyreSummary':
+    '一个移动圆圈会跟随没有炽热金属的玩家。伤害由圈内玩家分摊，每缺少一名玩家还会对全团造成相当于最大生命值{missingPenalty}的伤害。',
+  'hudChrome.raidBossGuide.varkhul.pyreHeroicSummary':
+    '一个移动圆圈会跟随没有炽热金属的玩家，并分摊更高的伤害。每缺少一名玩家还会对全团造成相当于最大生命值{missingPenalty}的伤害。',
+  'hudChrome.raidBossGuide.varkhul.pyreResponse':
+    '让恰好{players}名玩家在圆圈内集合，并跟随目标移动直到施法结算。',
+  'hudChrome.raidBossGuide.varkhul.forgestormName': '熔炉风暴',
+  'hudChrome.raidBossGuide.varkhul.forgestormSummary':
+    '瓦尔库尔在竞技场中连续召来{waves}波标记的陨石落点。',
+  'hudChrome.raidBossGuide.varkhul.forgestormHeroicSummary':
+    '瓦尔库尔连续召来{waves}波会造成极高伤害的标记陨石落点。',
+  'hudChrome.raidBossGuide.varkhul.forgestormResponse':
+    '观察每一组新的地面预警，并在该波落下前离开。确认下一波位置前不要返回刚才的区域。',
+  'hudChrome.raidBossGuide.varkhul.rayName': '淬火射线',
+  'hudChrome.raidBossGuide.varkhul.raySummary':
+    '一道射线长时间追踪被标记的玩家。瓦尔库尔与目标之间的第一名其他玩家会拦截伤害并获得淬火创伤。',
+  'hudChrome.raidBossGuide.varkhul.rayResponse':
+    '安排一名健康玩家，通常是副坦克，站进射线。其他玩家远离，并在淬火创伤持续期间轮换拦截者。',
+  'hudChrome.raidBossGuide.varkhul.anvilName': '铁砧敕令',
+  'hudChrome.raidBossGuide.varkhul.anvilSummary':
+    '瓦尔库尔走向巨型熔炉并敲击{strikes}次，对全团造成逐次提高的伤害。',
+  'hudChrome.raidBossGuide.varkhul.anvilHeroicSummary':
+    '瓦尔库尔敲击巨型熔炉{strikes}次，造成逐次提高的团队伤害，同时标记的陨石会落向玩家。',
+  'hudChrome.raidBossGuide.varkhul.anvilResponse': '团队集合接受治疗，并为最后一次打击使用防御冷却。',
+  'hudChrome.raidBossGuide.varkhul.anvilHeroicResponse':
+    '将标记的陨石分散到团队之外，治疗和防御冷却则覆盖全部{strikes}次打击。',
+  'hudChrome.raidBossGuide.varkhul.assemblyName': '大师组装',
+  'hudChrome.raidBossGuide.varkhul.assemblySummary':
+    '瓦尔库尔获得保护并开始限时组装。团队必须在熔炉完成他的杰作前击败所有传送门波次。',
+  'hudChrome.raidBossGuide.varkhul.assemblyResponse':
+    '同时关注射线控制和优先小怪。在组装计时结束前击败完整的锻炉军团。',
+  'hudChrome.raidBossGuide.varkhul.beamName': '坩埚射线',
+  'hudChrome.raidBossGuide.varkhul.beamSummary':
+    '激活的柱状射线会加热熔炉，除非有玩家阻挡。阻挡者受到不断提高的坩埚暴露伤害，射线被阻挡或未激活时热量会下降。',
+  'hudChrome.raidBossGuide.varkhul.beamHeroicSummary':
+    '激活的柱状射线会加热熔炉，除非有玩家阻挡。阻挡者受到不断提高的坩埚暴露伤害，且熔炉热量永远不会下降。',
+  'hudChrome.raidBossGuide.varkhul.beamResponse':
+    '站在每根激活的柱子与熔炉之间，并在暴露变得危险前轮换阻挡者。热量满时会触发致命的熔炉熔毁。',
+  'hudChrome.raidBossGuide.varkhul.legionName': '锻炉军团',
+  'hudChrome.raidBossGuide.varkhul.legionSummary':
+    '坩埚守卫施放坩埚震击来增加熔炉热量，烬火工匠则用修复协议治疗瓦尔库尔。',
+  'hudChrome.raidBossGuide.varkhul.legionResponse':
+    '打断坩埚震击和修复协议，优先集火每名危险施法者，再清理剩余小怪。',
+  'hudChrome.raidBossGuide.varkhul.masterpieceName': '杰作解放',
+  'hudChrome.raidBossGuide.varkhul.masterpieceSummary':
+    '瓦尔库尔攻击更快、造成更多伤害，并反复灼烧全团直到最终团灭。',
+  'hudChrome.raidBossGuide.varkhul.masterpieceHeroicSummary':
+    '瓦尔库尔攻击更快、造成更多伤害，世界之火会取代大多数早期机制完成最终爆发。',
+  'hudChrome.raidBossGuide.varkhul.masterpieceResponse':
+    '使用剩余的进攻和防御冷却，并在最终倒计时结束前击败瓦尔库尔。',
+  'hudChrome.raidBossGuide.varkhul.worldfireName': '世界之火',
+  'hudChrome.raidBossGuide.varkhul.worldfireSummary':
+    '英雄难度下，火焰会从竞技场边缘分阶段向中央推进，直到整个坩埚燃烧。',
+  'hudChrome.raidBossGuide.varkhul.worldfireResponse':
+    '在每条推进的火焰带到达前向内移动，保留不断缩小的安全空间，并在中央点燃前击败瓦尔库尔。',
   'hudChrome.raidBossGuide.varkhul.tanks':
     '坦克: 制作者印记达到2层时换坦，并让瓦尔库尔保持在近战范围内。',
   'hudChrome.raidBossGuide.varkhul.orbs':

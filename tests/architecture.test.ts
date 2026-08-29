@@ -2265,6 +2265,7 @@ const UI_DOM_MODULES = [
   // review's note).
   'src/ui/professions_window.ts',
   'src/ui/raid_boss_guide_window.ts',
+  'src/ui/raid_boss_guide_model_controller.ts',
   'src/ui/reconnect_overlay.ts',
   // reliquary_window.ts joined the ledger with the HUD-tracker pin store: the
   // pinned page set persists per character in localStorage (the deeds_window
