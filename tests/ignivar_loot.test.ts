@@ -162,6 +162,9 @@ describe('ignivar loot: the 29 sets', () => {
       'chronoweave',
       'pyroclast',
       'frostquench',
+      'hexthread',
+      'gravebrand',
+      'ruincaller',
     ] as const;
     const setIds = new Set(
       Object.values(IGNIVAR_SET_ITEMS).flatMap((item) => (item.set ? [item.set] : [])),

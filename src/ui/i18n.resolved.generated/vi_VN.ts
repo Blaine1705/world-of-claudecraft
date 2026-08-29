@@ -10458,7 +10458,7 @@ export const vi_VN: EnTranslations = {
       },
       "needle_of_fate": {
         "name": "Kim Định Mệnh",
-        "description": "Xuyên qua kẻ địch gây {damage} sát thương Bóng Tối và tạo ra 5 Kết Án nếu nó mang Ác Nhãn của bạn. Mỗi đòn trúng vào Ác Nhãn chính của bạn thêm 1 Sợi Định Mệnh trong 12 giây, tối đa 3. Nếu không có Ác Nhãn nào tồn tại, Kim sẽ đánh dấu mục tiêu của nó trước."
+        "description": "Xuyên qua kẻ địch gây {damage} sát thương Bóng Tối và tạo ra {needleDoom} Kết Án nếu nó mang Ác Nhãn của bạn. Mỗi đòn trúng vào Ác Nhãn chính của bạn thêm 1 Sợi Định Mệnh trong 12 giây, tối đa 3. Nếu không có Ác Nhãn nào tồn tại, Kim sẽ đánh dấu mục tiêu của nó trước."
       },
       "sentence": {
         "name": "Phán Quyết",
@@ -10860,7 +10860,7 @@ export const vi_VN: EnTranslations = {
       },
       "conflagrate": {
         "name": "Bùng Cháy",
-        "description": "Kéo sớm một nhịp sắp tới của Khế Ước Rực Cháy, rồi thiêu mục tiêu với {damage} sát thương Hỏa. Tạo ra 1 Tàn Phá và 1 Hủy Hoại. Giữ được 2 lượt tích. (Đặc trưng Hủy Diệt)"
+        "description": "Kéo sớm một nhịp sắp tới của Khế Ước Rực Cháy, rồi thiêu mục tiêu với {damage} sát thương Hỏa. Tạo ra 1 Tàn Phá và 1 Hủy Hoại. Giữ được {charges} lượt tích. (Đặc trưng Hủy Diệt)"
       },
       "moonkin_form": {
         "name": "Dạng Cú Mặt Trăng",
@@ -11341,7 +11341,7 @@ export const vi_VN: EnTranslations = {
       },
       "seraphic_vigil": {
         "name": "Canh Thức Thiên Sứ",
-        "description": "Bảo vệ một đồng minh trong 30 giây. Đòn đánh đầu tiên khiến họ xuống dưới 35% máu sẽ tiêu Canh Thức và hồi cho họ {vigilHeal}. (Dấu ấn Phúc Lành)"
+        "description": "Bảo vệ một đồng minh trong 30 giây. Đòn đánh đầu tiên khiến họ xuống dưới 35% máu sẽ tiêu Canh Thức và hồi cho họ {buff}. (Dấu ấn Phúc Lành)"
       },
       "summon_tithefiend": {
         "name": "Triệu Quỷ Thập Phân",
@@ -18586,9 +18586,19 @@ export const vi_VN: EnTranslations = {
         "bonus2": "Rimelance critical strikes bank a second Icicle, up to the maximum of 5. Damage taken no longer delays your spellcasting.",
         "bonus4": "Winterlash plants 3 Winter's Chill charges, up from 2."
       },
+      "gravebrand": {
+        "name": "Gravebrand Regalia",
+        "bonus2": "Reaping Command's cooldown is reduced by 2 sec. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Reaping Command's unison strikes deal 25 percent more damage."
+      },
       "greyjaw_stalker": {
         "name": "Bộ Kẻ Rình Rập Greyjaw",
         "bonus3": "Tăng tốc độ tấn công cùng thi triển thêm 15%."
+      },
+      "hexthread": {
+        "name": "Hexthread Shroud",
+        "bonus2": "Needle of Fate grants 2 additional Condemnation. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Passing Sentence refunds 10 Condemnation."
       },
       "necromancers": {
         "name": "Y Phục Mournweave",
@@ -18616,6 +18626,11 @@ export const vi_VN: EnTranslations = {
         "name": "Pyroclast Regalia",
         "bonus2": "Scald always critically strikes targets at or below 50 percent health. Damage taken no longer delays your spellcasting.",
         "bonus4": "Your Fire spells' critical strikes outside Phoenix Trance reduce its remaining cooldown by 2 sec."
+      },
+      "ruincaller": {
+        "name": "Ruincaller Vestments",
+        "bonus2": "Conflagrate holds 3 charges. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Ruinbolt strikes 20 percent harder."
       },
       "slagbreaker": {
         "name": "Slagbreaker Battlegear",

@@ -834,6 +834,56 @@ export const ITEM_SETS: Record<string, ItemSet> = {
       },
     ],
   },
+  hexthread: {
+    id: 'hexthread',
+    name: 'Hexthread Shroud',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        // The caster 2pc carries the pushback rider (full immunity, the raid
+        // tier's upgrade over the leveling lineage's 50 percent).
+        text: 'Needle of Fate grants 2 additional Condemnation. Damage taken no longer delays your spellcasting.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: 'Passing Sentence refunds 10 Condemnation.',
+      },
+    ],
+  },
+  gravebrand: {
+    id: 'gravebrand',
+    name: 'Gravebrand Regalia',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: "Reaping Command's cooldown is reduced by 2 sec. Damage taken no longer delays your spellcasting.",
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: "Reaping Command's unison strikes deal 25 percent more damage.",
+      },
+    ],
+  },
+  ruincaller: {
+    id: 'ruincaller',
+    name: 'Ruincaller Vestments',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: 'Conflagrate holds 3 charges. Damage taken no longer delays your spellcasting.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: 'Ruinbolt strikes 20 percent harder.',
+      },
+    ],
+  },
 };
 
 // Fully-resolved set effect: every field defaulted so callers never branch on

@@ -10458,7 +10458,7 @@ export const da_DK: EnTranslations = {
       },
       "needle_of_fate": {
         "name": "Needle of Fate",
-        "description": "Gennemborer fjenden for {damage} Skyggeskade og genererer 5 Fordømmelse, hvis den bærer dit Evil Eye. Hvert træf på dit primære Evil Eye tilføjer en Skæbnetråd i 12 sek., op til 3. Findes intet Evil Eye, mærker Needle of Fate først sit mål."
+        "description": "Gennemborer fjenden for {damage} Skyggeskade og genererer {needleDoom} Fordømmelse, hvis den bærer dit Evil Eye. Hvert træf på dit primære Evil Eye tilføjer en Skæbnetråd i 12 sek., op til 3. Findes intet Evil Eye, mærker Needle of Fate først sit mål."
       },
       "sentence": {
         "name": "Sentence",
@@ -10860,7 +10860,7 @@ export const da_DK: EnTranslations = {
       },
       "conflagrate": {
         "name": "Antændelse",
-        "description": "Fremrykker et kommende tik af jeres Brændende Pagt og antænder derefter målet for {damage} Ildskade. Skaber 1 Forødelse og 1 Tilintetgørelse. Rummer 2 ladninger. (Kendetegn for Ødelæggelse)"
+        "description": "Fremrykker et kommende tik af jeres Brændende Pagt og antænder derefter målet for {damage} Ildskade. Skaber 1 Forødelse og 1 Tilintetgørelse. Rummer {charges} ladninger. (Kendetegn for Ødelæggelse)"
       },
       "moonkin_form": {
         "name": "Månekinform",
@@ -11341,7 +11341,7 @@ export const da_DK: EnTranslations = {
       },
       "seraphic_vigil": {
         "name": "Serafisk Vagt",
-        "description": "Beskytter en allieret i 30 sek. Det første slag, der bringer vedkommende under 35% sundhed, forbruger Vagten og helbreder vedkommende for {vigilHeal}. (Velsignelsessignatur)"
+        "description": "Beskytter en allieret i 30 sek. Det første slag, der bringer vedkommende under 35% sundhed, forbruger Vagten og helbreder vedkommende for {buff}. (Velsignelsessignatur)"
       },
       "summon_tithefiend": {
         "name": "Tilkald Tiendedæmon",
@@ -18586,9 +18586,19 @@ export const da_DK: EnTranslations = {
         "bonus2": "Rimelance critical strikes bank a second Icicle, up to the maximum of 5. Damage taken no longer delays your spellcasting.",
         "bonus4": "Winterlash plants 3 Winter's Chill charges, up from 2."
       },
+      "gravebrand": {
+        "name": "Gravebrand Regalia",
+        "bonus2": "Reaping Command's cooldown is reduced by 2 sec. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Reaping Command's unison strikes deal 25 percent more damage."
+      },
       "greyjaw_stalker": {
         "name": "Gråkæbe-jægerens udstyr",
         "bonus3": "Øger angrebs- og magihastighed med 15%."
+      },
+      "hexthread": {
+        "name": "Hexthread Shroud",
+        "bonus2": "Needle of Fate grants 2 additional Condemnation. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Passing Sentence refunds 10 Condemnation."
       },
       "necromancers": {
         "name": "Mournweave klæder",
@@ -18616,6 +18626,11 @@ export const da_DK: EnTranslations = {
         "name": "Pyroclast Regalia",
         "bonus2": "Scald always critically strikes targets at or below 50 percent health. Damage taken no longer delays your spellcasting.",
         "bonus4": "Your Fire spells' critical strikes outside Phoenix Trance reduce its remaining cooldown by 2 sec."
+      },
+      "ruincaller": {
+        "name": "Ruincaller Vestments",
+        "bonus2": "Conflagrate holds 3 charges. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Ruinbolt strikes 20 percent harder."
       },
       "slagbreaker": {
         "name": "Slagbreaker Battlegear",

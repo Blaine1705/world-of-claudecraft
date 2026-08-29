@@ -6491,7 +6491,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.siphon_life.description':
     'Risucchia vita dal nemico, infliggendo {damage} danni da Ombra in 30 s e curandoti per i danni inflitti. (firma Afflizione)',
   'entities.abilities.conflagrate.name': 'Conflagrazione',
-  'entities.abilities.conflagrate.description': 'Anticipa un impulso futuro del vostro Patto Ardente, poi incendia il bersaglio per {damage} danni da Fuoco. Genera 1 Devastazione e 1 Rovina. Tiene 2 cariche. (Distintivo di Distruzione)',
+  'entities.abilities.conflagrate.description': 'Anticipa un impulso futuro del vostro Patto Ardente, poi incendia il bersaglio per {damage} danni da Fuoco. Genera 1 Devastazione e 1 Rovina. Tiene {charges} cariche. (Distintivo di Distruzione)',
   'entities.abilities.moonkin_form.name': 'Forma di Lunagufo',
   'entities.abilities.moonkin_form.description':
     'Assume Forma di Lunagufo, potenziando il lancio di incantesimi finché non cambi di nuovo. Lancia ancora per tornare alla forma normale. (firma Equilibrio)',
@@ -12959,7 +12959,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sacred_form.description':
     'Entra in uno stato sacro fino alla morte, aumentando le cure del 10% e la probabilità di critico magico del 5%, e riducendo la minaccia generata del 50%. Solo per Sanasole.',
   'entities.abilities.seraphic_vigil.description':
-    'Protegge un alleato per 30 s. Il primo colpo che lo porta sotto il 35% di salute consuma la Veglia e lo cura per {vigilHeal}. (Distintivo di Benedizione)',
+    'Protegge un alleato per 30 s. Il primo colpo che lo porta sotto il 35% di salute consuma la Veglia e lo cura per {buff}. (Distintivo di Benedizione)',
   'entities.abilities.scouring_mercy.description':
     'Infligge da 72 a 84 danni Sacri a un nemico oppure cura un bersaglio alleato da 130 a 155. Entrambi gli importi aumentano con la potenza magica. I danni curano inoltre del 30% ogni alleato legato dalla Dottrina, o del 15% il membro del gruppo con meno salute se nessun alleato è legato. (Distintivo di Dottrina)',
   'entities.abilities.solar_invocation.description':
@@ -13389,7 +13389,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonfire.specNote_balance':
     'Mantienilo acceso: Seme Lunare lo estende di 6 sec.',
   'entities.abilities.needle_of_fate.description':
-    'Trafigge il nemico per {damage} danni da Ombra e genera 5 Condanna se porta il tuo Evil Eye. Ogni colpo sul tuo Evil Eye primario aggiunge un Filamento del Fato per 12 sec, fino a 3. Se non esiste alcun Evil Eye, Needle of Fate marchia per prima il suo bersaglio.',
+    'Trafigge il nemico per {damage} danni da Ombra e genera {needleDoom} Condanna se porta il tuo Evil Eye. Ogni colpo sul tuo Evil Eye primario aggiunge un Filamento del Fato per 12 sec, fino a 3. Se non esiste alcun Evil Eye, Needle of Fate marchia per prima il suo bersaglio.',
   'entities.abilities.needle_of_fate.name': 'Needle of Fate',
   'entities.abilities.ossuary_mark.description':
     "Marchia un nemico per 15 sec, accumulando il 20% dei danni inflitti da te e dai tuoi non morti. Rilancia per farlo detonare. Se il nemico marchiato muore, esplode entro 6 metri e crea 1 Frammento d'Anima.",

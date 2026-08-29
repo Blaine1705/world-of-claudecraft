@@ -10458,7 +10458,7 @@ export const pl_PL: EnTranslations = {
       },
       "needle_of_fate": {
         "name": "Needle of Fate",
-        "description": "Przebija wroga za {damage} obrażeń od Cienia i generuje 5 Potępienia, jeśli nosi on twoje Evil Eye. Każde trafienie w twoje główne Evil Eye dodaje Nić Przeznaczenia na 12 sekund, maksymalnie do 3. Jeśli nie istnieje żadne Evil Eye, Needle najpierw oznacza swój cel."
+        "description": "Przebija wroga za {damage} obrażeń od Cienia i generuje {needleDoom} Potępienia, jeśli nosi on twoje Evil Eye. Każde trafienie w twoje główne Evil Eye dodaje Nić Przeznaczenia na 12 sekund, maksymalnie do 3. Jeśli nie istnieje żadne Evil Eye, Needle najpierw oznacza swój cel."
       },
       "sentence": {
         "name": "Sentence",
@@ -10860,7 +10860,7 @@ export const pl_PL: EnTranslations = {
       },
       "conflagrate": {
         "name": "Pożoga",
-        "description": "Przyspiesza przyszłe tyknięcie twojego Płonącego paktu, a następnie podpala cel za {damage} obrażeń od ognia. Generuje 1 Spustoszenie i 1 Ruinę. Mieści 2 ładunki. (Znak Zniszczenia)"
+        "description": "Przyspiesza przyszłe tyknięcie twojego Płonącego paktu, a następnie podpala cel za {damage} obrażeń od ognia. Generuje 1 Spustoszenie i 1 Ruinę. Mieści {charges} ładunki. (Znak Zniszczenia)"
       },
       "moonkin_form": {
         "name": "Postać księżycowej sowy",
@@ -11341,7 +11341,7 @@ export const pl_PL: EnTranslations = {
       },
       "seraphic_vigil": {
         "name": "Serafinowa Straż",
-        "description": "Chroni sojusznika przez 30 s. Pierwszy cios, który zepchnie go poniżej 35% zdrowia, zużywa Straż i leczy go za {vigilHeal}. (Sygnatura Błogosławieństwa)"
+        "description": "Chroni sojusznika przez 30 s. Pierwszy cios, który zepchnie go poniżej 35% zdrowia, zużywa Straż i leczy go za {buff}. (Sygnatura Błogosławieństwa)"
       },
       "summon_tithefiend": {
         "name": "Przyzwij Dziesięcinnika",
@@ -18586,9 +18586,19 @@ export const pl_PL: EnTranslations = {
         "bonus2": "Rimelance critical strikes bank a second Icicle, up to the maximum of 5. Damage taken no longer delays your spellcasting.",
         "bonus4": "Winterlash plants 3 Winter's Chill charges, up from 2."
       },
+      "gravebrand": {
+        "name": "Gravebrand Regalia",
+        "bonus2": "Reaping Command's cooldown is reduced by 2 sec. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Reaping Command's unison strikes deal 25 percent more damage."
+      },
       "greyjaw_stalker": {
         "name": "Rynsztunek tropiciela Szaroszczękiego",
         "bonus3": "Zwiększa szybkość ataku i rzucania zaklęć o 15%."
+      },
+      "hexthread": {
+        "name": "Hexthread Shroud",
+        "bonus2": "Needle of Fate grants 2 additional Condemnation. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Passing Sentence refunds 10 Condemnation."
       },
       "necromancers": {
         "name": "Szaty Mournweave",
@@ -18616,6 +18626,11 @@ export const pl_PL: EnTranslations = {
         "name": "Pyroclast Regalia",
         "bonus2": "Scald always critically strikes targets at or below 50 percent health. Damage taken no longer delays your spellcasting.",
         "bonus4": "Your Fire spells' critical strikes outside Phoenix Trance reduce its remaining cooldown by 2 sec."
+      },
+      "ruincaller": {
+        "name": "Ruincaller Vestments",
+        "bonus2": "Conflagrate holds 3 charges. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Ruinbolt strikes 20 percent harder."
       },
       "slagbreaker": {
         "name": "Slagbreaker Battlegear",

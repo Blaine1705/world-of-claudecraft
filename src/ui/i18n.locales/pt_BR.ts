@@ -6441,7 +6441,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.siphon_life.description':
     'Suga vida do inimigo, causando {damage} de dano de Sombra ao longo de 30 s e curando você pelo dano causado. (assinatura Suplício)',
   'entities.abilities.conflagrate.name': 'Conflagrar',
-  'entities.abilities.conflagrate.description': 'Adianta um pulso futuro de vosso Pacto Ardente, e então incendeia o alvo causando {damage} de dano de Fogo. Gera 1 de Devastação e 1 de Ruína. Guarda 2 cargas. (Distintivo de Destruição)',
+  'entities.abilities.conflagrate.description': 'Adianta um pulso futuro de vosso Pacto Ardente, e então incendeia o alvo causando {damage} de dano de Fogo. Gera 1 de Devastação e 1 de Ruína. Guarda {charges} cargas. (Distintivo de Destruição)',
   'entities.abilities.moonkin_form.name': 'Forma de Luniscante',
   'entities.abilities.moonkin_form.description':
     'Assume Forma de Luniscante, fortalecendo a conjuração até você voltar. Lance novamente para retornar à forma normal. (assinatura Equilíbrio)',
@@ -12896,7 +12896,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sacred_form.description':
     'Entra em um estado sagrado até a morte, aumentando a cura em 10% e a chance de crítico mágico em 5%, e reduzindo a ameaça gerada em 50%. Apenas para Curassóis.',
   'entities.abilities.seraphic_vigil.description':
-    'Protege um aliado por 30 s. O primeiro golpe que o deixar abaixo de 35% de vida consome a Vigília e o cura em {vigilHeal}. (Distintivo de Bênção)',
+    'Protege um aliado por 30 s. O primeiro golpe que o deixar abaixo de 35% de vida consome a Vigília e o cura em {buff}. (Distintivo de Bênção)',
   'entities.abilities.scouring_mercy.description':
     'Causa de 72 a 84 de dano Sagrado a um inimigo ou cura um alvo aliado de 130 a 155. Ambos os valores aumentam com o poder mágico. O dano também cura em 30% cada aliado vinculado pela Doutrina, ou em 15% o membro do grupo com menos vida se nenhum aliado estiver vinculado. (Distintivo de Doutrina)',
   'entities.abilities.solar_invocation.description':
@@ -13327,7 +13327,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonfire.specNote_balance':
     'Mantenha-o queimando: Semente Lunar o estende em 6 s.',
   'entities.abilities.needle_of_fate.description':
-    'Perfura o inimigo causando {damage} de dano das Sombras e gera 5 de Condenação se ele carregar seu Evil Eye. Cada acerto no seu Evil Eye primário adiciona um Fio do Destino por 12 s, até 3. Se não houver Evil Eye, a Needle of Fate primeiro marca seu alvo.',
+    'Perfura o inimigo causando {damage} de dano das Sombras e gera {needleDoom} de Condenação se ele carregar seu Evil Eye. Cada acerto no seu Evil Eye primário adiciona um Fio do Destino por 12 s, até 3. Se não houver Evil Eye, a Needle of Fate primeiro marca seu alvo.',
   'entities.abilities.needle_of_fate.name': 'Needle of Fate',
   'entities.abilities.ossuary_mark.description':
     'Marca um inimigo por 15 s, armazenando 20% do dano causado por você e seus mortos-vivos. Lance novamente para detoná-la. Se o inimigo marcado morrer, ela explode num raio de 6 jardas e cria 1 Fragmento de Alma.',

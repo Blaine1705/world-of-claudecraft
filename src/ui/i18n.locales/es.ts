@@ -2339,7 +2339,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Tu ojo maléfico ataca cada 2,5 s al objetivo principal de Mal de ojo e inflige daño de las Sombras. Poseer el Mal de ojo duplica su velocidad de ataque.',
   'entities.abilities.needle_of_fate.name': 'Aguja del destino',
   'entities.abilities.needle_of_fate.description':
-    'Perfora al enemigo e inflige {damage} de daño de las Sombras. Genera 5 de Condena si porta tu Mal de ojo; si no existe ninguno, primero marca al objetivo.',
+    'Perfora al enemigo e inflige {damage} de daño de las Sombras. Genera {needleDoom} de Condena si porta tu Mal de ojo; si no existe ninguno, primero marca al objetivo.',
   'entities.abilities.sentence.name': 'Sentencia',
   'entities.abilities.sentence.description':
     'Consume toda la Condena y los Hilos del destino para sentenciar al enemigo. Cada Hilo aumenta el daño un 6%. Los efectos adicionales aumentan con 20, 50, 80 y 100 de Condena. El escalado de daño se aplana después del nivel 16.',
@@ -6548,7 +6548,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.siphon_life.description':
     'Absorbe vida del enemigo, inflige {damage} de daño de las Sombras durante 30 s y te sana por el daño causado. (habilidad distintiva de Aflicción)',
   'entities.abilities.conflagrate.name': 'Conflagrar',
-  'entities.abilities.conflagrate.description': 'Adelanta un pulso futuro de tu Pacto Ardiente y luego enciende al objetivo por {damage} de daño de Fuego. Genera 1 de Devastación y 1 de Ruina. Guarda 2 cargas. (Distintivo de Destrucción)',
+  'entities.abilities.conflagrate.description': 'Adelanta un pulso futuro de tu Pacto Ardiente y luego enciende al objetivo por {damage} de daño de Fuego. Genera 1 de Devastación y 1 de Ruina. Guarda {charges} cargas. (Distintivo de Destrucción)',
   'entities.abilities.moonkin_form.name': 'Forma de lechúcico lunar',
   'entities.abilities.moonkin_form.description':
     'Adopta Forma de lechúcico lunar, potenciando el lanzamiento de hechizos hasta que vuelvas a cambiar. Lánzalo otra vez para volver a la forma normal. (habilidad distintiva de Equilibrio)',
@@ -13211,7 +13211,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sacred_form.description':
     'Entra en un estado sagrado hasta la muerte, aumentando la sanación un 10% y la probabilidad de crítico con hechizos un 5%, y reduciendo la amenaza generada un 50%. Solo para Sanadores del Sol.',
   'entities.abilities.seraphic_vigil.description':
-    'Protege a un aliado durante 30 s. El primer golpe que lo deje por debajo del 35% de salud consume la Vigilia y lo sana por {vigilHeal}. (Distintivo de Bendición)',
+    'Protege a un aliado durante 30 s. El primer golpe que lo deje por debajo del 35% de salud consume la Vigilia y lo sana por {buff}. (Distintivo de Bendición)',
   'entities.abilities.scouring_mercy.description':
     'Inflige de 72 a 84 de daño Sagrado a un enemigo o sana a un objetivo amistoso de 130 a 155. Ambas cantidades aumentan con el poder con hechizos. El daño también sana un 30% a cada aliado vinculado por Doctrina, o un 15% al miembro del grupo con menos salud si no hay ninguno vinculado. (Distintivo de Doctrina)',
   'entities.abilities.solar_invocation.description':

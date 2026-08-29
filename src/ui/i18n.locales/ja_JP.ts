@@ -3488,7 +3488,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.siphon_life.description':
     '敵の生命を吸い取り、30秒間で{damage}のシャドウダメージを与え、与えたダメージ分あなたを回復します。（アフリクション特性のシグネチャ）',
   'entities.abilities.conflagrate.name': 'コンフラグレート',
-  'entities.abilities.conflagrate.description': '灼熱の契約の先の刻みを一つ手前へ引き、続けて対象を燃やして{damage}の火炎ダメージを与えます。破滅的猛攻を1と破滅を1生みます。チャージを2つ持ちます。（破壊の象徴）',
+  'entities.abilities.conflagrate.description': '灼熱の契約の先の刻みを一つ手前へ引き、続けて対象を燃やして{damage}の火炎ダメージを与えます。破滅的猛攻を1と破滅を1生みます。チャージを{charges}つ持ちます。（破壊の象徴）',
   'entities.abilities.moonkin_form.name': 'ムーンキンフォーム',
   'entities.abilities.moonkin_form.description':
     'ムーンキンフォームになり、戻るまで呪文詠唱を強化します。再び唱えると通常形態に戻ります。（バランス特性のシグネチャ）',
@@ -7832,6 +7832,18 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '霧氷の槍のクリティカルヒットで氷柱をもう1つ蓄えます。上限は5つのままです。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.frostquench.bonus4':
     'ウィンターラッシュが付与するウィンターズ・チルが2チャージではなく3チャージになります。',
+  'entities.itemSets.hexthread.name': 'ヘックススレッドの外套',
+  'entities.itemSets.hexthread.bonus2':
+    '運命の針が断罪を追加で2生成します。被ダメージで詠唱が遅れなくなります。',
+  'entities.itemSets.hexthread.bonus4': '宣告を下すたびに断罪を10返還します。',
+  'entities.itemSets.gravebrand.name': 'グレイヴブランドの礼装',
+  'entities.itemSets.gravebrand.bonus2':
+    '刈り取りの号令のクールダウンが2秒短縮されます。被ダメージで詠唱が遅れなくなります。',
+  'entities.itemSets.gravebrand.bonus4': '刈り取りの号令の一斉攻撃のダメージが25%増加します。',
+  'entities.itemSets.ruincaller.name': 'ルインコーラーの法衣',
+  'entities.itemSets.ruincaller.bonus2':
+    'コンフラグレートがチャージを3つ持ちます。被ダメージで詠唱が遅れなくなります。',
+  'entities.itemSets.ruincaller.bonus4': '破滅の矢のダメージが20%増加します。',
   'entities.itemSets.slagbreaker.name': 'スラグブレイカーの戦装束',
   'entities.itemSets.slagbreaker.bonus2': '血染めの手による次の重傷の一撃の強化が、1スタックにつき20%から30%に上昇します。',
   'entities.itemSets.slagbreaker.bonus4': '血染めの手を2回発動するごとに、崩し手の残りクールダウンが3秒短縮されます。',
@@ -12458,7 +12470,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '月翼形態専用。{damage}の秘術ダメージを与え、月潮を1段階進め（最大3）、月の嵐を6秒延長する（1回の付与につき最大6秒）。月潮が3段階のとき、このボタンはムーンサージに変化する：3段階すべてを消費し、240から285の秘術ダメージを与える即時攻撃。',
   'entities.abilities.moonseed.name': '月の種',
   'entities.abilities.needle_of_fate.description':
-    '敵を貫いて{damage}の影ダメージを与えます。対象に自分の邪眼があれば断罪を5生成し、邪眼がなければ先に対象を指定します。',
+    '敵を貫いて{damage}の影ダメージを与えます。対象に自分の邪眼があれば断罪を{needleDoom}生成し、邪眼がなければ先に対象を指定します。',
   'entities.abilities.needle_of_fate.name': '運命の針',
   'entities.abilities.oath_chain.description':
     '遠くの敵を聖なる鎖で即座に縛る。敵は秒速18メートルで自身へ引き寄せられ、3メートルまで近づくと4秒間、移動速度が50%低下する。昇天中は周囲の敵をもう1体縛る。',
@@ -12536,7 +12548,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '断罪と運命の糸をすべて消費して敵に宣告を下します。糸1本につきダメージが6%増加し、追加効果は断罪20、50、80、100で強化されます。レベル16以降はダメージの伸びが緩やかになります。',
   'entities.abilities.sentence.name': '宣告',
   'entities.abilities.seraphic_vigil.description':
-    '味方1体に見守りの祝福を与え、危機に陥った時に体力を{vigilHeal}回復する。ベネディクション固有能力。',
+    '味方1体に見守りの祝福を与え、危機に陥った時に体力を{buff}回復する。ベネディクション固有能力。',
   'entities.abilities.seraphic_vigil.name': '熾天使の見守り',
   'entities.abilities.shellskin.description':
     '8秒間、受けるダメージを60%軽減しますが、効果中は攻撃できません。',

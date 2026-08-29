@@ -3074,7 +3074,11 @@ export type AbilityEffect =
       deathRadius: number;
     }
   | { type: 'afflictionEvilEye' }
-  | { type: 'afflictionNeedle' }
+  // doom: base Condemnation the landed Needle generates on a marked target,
+  // BEFORE eyeGeneration's Eye multipliers. Resolved (the Hexthread 2pc
+  // rewrite raises it for wearers): the dispatch and the {needleDoom}
+  // description splice read the same resolved payload.
+  | { type: 'afflictionNeedle'; doom: number }
   | { type: 'afflictionSentence'; damageMult?: number; flat?: number }
   | { type: 'afflictionAccomplice' }
   | {

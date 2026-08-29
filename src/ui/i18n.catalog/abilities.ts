@@ -1526,7 +1526,7 @@ const classAbilityNamesEn = {
       [
         'needle_of_fate',
         'Needle of Fate',
-        'Pierces the enemy for {damage} Shadow damage and generates 7 Condemnation on impact if it still bears your Evil Eye. Completing a cast moves your primary Evil Eye to the target and adds a Fate Thread for 12 sec, up to 3. Fate Threads stay with you when the Eye moves or its target dies. Targeting a secondary Coven Eye swaps it with the primary Eye.',
+        'Pierces the enemy for {damage} Shadow damage and generates {needleDoom} Condemnation on impact if it still bears your Evil Eye. Completing a cast moves your primary Evil Eye to the target and adds a Fate Thread for 12 sec, up to 3. Fate Threads stay with you when the Eye moves or its target dies. Targeting a secondary Coven Eye swaps it with the primary Eye.',
       ],
       [
         'sentence',
@@ -2014,7 +2014,7 @@ const classAbilityNamesEn = {
       [
         'conflagrate',
         'Conflagrate',
-        'Advances one future tick of your Burning Pact, then ignites the target for {damage} Fire damage. Generates 1 Wrack and 1 Desolation. Holds 2 charges. (Destruction signature)',
+        'Advances one future tick of your Burning Pact, then ignites the target for {damage} Fire damage. Generates 1 Wrack and 1 Desolation. Holds {charges} charges. (Destruction signature)',
       ],
       [
         'moonkin_form',
@@ -2595,7 +2595,7 @@ const classAbilityNamesEn = {
       [
         'seraphic_vigil',
         'Seraphic Vigil',
-        'Protect one ally for 30 sec. The first hit that leaves them below 35% health consumes the Vigil and heals them for {vigilHeal}. (Benison signature)',
+        'Protect one ally for 30 sec. The first hit that leaves them below 35% health consumes the Vigil and heals them for {buff}. (Benison signature)',
       ],
       [
         'summon_tithefiend',

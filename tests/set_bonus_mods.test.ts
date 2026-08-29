@@ -49,10 +49,10 @@ describe('set_bonus_mods: the resolver', () => {
 
   it('an unregistered set id folds to nothing (the Phase A posture survives per set)', () => {
     // Re-anchored to a still-unregistered wave as each class wave lands:
-    // hexthread is a real warlock set whose engine registration is pending.
-    const mods = applySetBonusModifiers(computeTalentModifiers('warlock', null), {
-      helmet: 'hexthread_helmet',
-      shoulder: 'hexthread_shoulder',
+    // moonscorch is a real druid set whose engine registration is pending.
+    const mods = applySetBonusModifiers(computeTalentModifiers('druid', null), {
+      helmet: 'moonscorch_helmet',
+      shoulder: 'moonscorch_shoulder',
     });
     expect(Object.keys(mods.selected).filter((k) => k.startsWith('setbonus_'))).toEqual([]);
   });

@@ -10458,7 +10458,7 @@ export const zh_CN: EnTranslations = {
       },
       "needle_of_fate": {
         "name": "命运之针",
-        "description": "刺穿敌人，造成{damage}点暗影伤害。若目标带有你的邪眼，则生成5点谴罪；若不存在邪眼，则先标记目标。"
+        "description": "刺穿敌人，造成{damage}点暗影伤害。若目标带有你的邪眼，则生成{needleDoom}点谴罪；若不存在邪眼，则先标记目标。"
       },
       "sentence": {
         "name": "裁决",
@@ -10860,7 +10860,7 @@ export const zh_CN: EnTranslations = {
       },
       "conflagrate": {
         "name": "燃尽",
-        "description": "将你燃烧契约未来的一跳提前，随后点燃目标，造成 {damage} 点火焰伤害。产生 1 点毁坏和 1 点毁灭性。可存 2 层充能。（毁灭标志技能）"
+        "description": "将你燃烧契约未来的一跳提前，随后点燃目标，造成 {damage} 点火焰伤害。产生 1 点毁坏和 1 点毁灭性。可存 {charges} 层充能。（毁灭标志技能）"
       },
       "moonkin_form": {
         "name": "枭兽形态",
@@ -11341,7 +11341,7 @@ export const zh_CN: EnTranslations = {
       },
       "seraphic_vigil": {
         "name": "炽天使守望",
-        "description": "为一名盟友施加守望祝福，在其陷入危险时恢复 {vigilHeal} 点生命值。赐福专属技能。"
+        "description": "为一名盟友施加守望祝福，在其陷入危险时恢复 {buff} 点生命值。赐福专属技能。"
       },
       "summon_tithefiend": {
         "name": "召唤什一魔",
@@ -18586,9 +18586,19 @@ export const zh_CN: EnTranslations = {
         "bonus2": "凛霜之矛的致命一击会额外积存一枚冰刺，上限仍为 5 枚。受到伤害不再延迟你的施法。",
         "bonus4": "凛冬之鞭施加 3 层凛冬之寒（原为 2 层）。"
       },
+      "gravebrand": {
+        "name": "墓印礼装",
+        "bonus2": "收割号令的冷却时间缩短 2 秒。受到伤害不再延迟你的施法。",
+        "bonus4": "收割号令的齐击造成的伤害提高 25%。"
+      },
       "greyjaw_stalker": {
         "name": "灰颚追猎者装备",
         "bonus3": "攻击速度和施法速度提高 15%。"
+      },
+      "hexthread": {
+        "name": "咒线罩袍",
+        "bonus2": "命运之针额外生成 2 点谴罪。受到伤害不再延迟你的施法。",
+        "bonus4": "施放裁决后返还 10 点谴罪。"
       },
       "necromancers": {
         "name": "哀织法衣",
@@ -18616,6 +18626,11 @@ export const zh_CN: EnTranslations = {
         "name": "火砾礼装",
         "bonus2": "灼烫对生命值不高于 50% 的目标必定造成致命一击。受到伤害不再延迟你的施法。",
         "bonus4": "凤凰出神未激活时，你的火焰法术致命一击会使其剩余冷却时间缩短 2 秒。"
+      },
+      "ruincaller": {
+        "name": "唤灭法衣",
+        "bonus2": "燃尽可存 3 层充能。受到伤害不再延迟你的施法。",
+        "bonus4": "毁灭箭造成的伤害提高 20%。"
       },
       "slagbreaker": {
         "name": "碎渣战甲",

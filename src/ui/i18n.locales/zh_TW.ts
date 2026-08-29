@@ -3356,7 +3356,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.siphon_life.description':
     '虹吸敵人的生命，在30秒內造成{damage}點暗影傷害，並按造成的傷害治療你。（痛苦專精招牌）',
   'entities.abilities.conflagrate.name': '燃盡',
-  'entities.abilities.conflagrate.description': '將你燃燒契約未來的一跳提前，隨後點燃目標，造成 {damage} 點火焰傷害。產生 1 點摧殘和 1 點末日浩劫。可存 2 層充能。（毀滅標誌技能）',
+  'entities.abilities.conflagrate.description': '將你燃燒契約未來的一跳提前，隨後點燃目標，造成 {damage} 點火焰傷害。產生 1 點摧殘和 1 點末日浩劫。可存 {charges} 層充能。（毀滅標誌技能）',
   'entities.abilities.moonkin_form.name': '梟獸形態',
   'entities.abilities.moonkin_form.description':
     '進入梟獸形態，強化施法直到你切換回來。再次施放可返回普通形態。（平衡專精招牌）',
@@ -7523,6 +7523,15 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.frostquench.bonus2':
     '凜霜矛的致命一擊會額外積存一枚冰柱，上限仍為 5 枚。受到傷害不再延遲你的施法。',
   'entities.itemSets.frostquench.bonus4': '凜冬之鞭施加 3 層凜冬之寒（原為 2 層）。',
+  'entities.itemSets.hexthread.name': '咒線罩袍',
+  'entities.itemSets.hexthread.bonus2': '命運之針額外產生 2 點譴罪。受到傷害不再延遲你的施法。',
+  'entities.itemSets.hexthread.bonus4': '施放裁決後返還 10 點譴罪。',
+  'entities.itemSets.gravebrand.name': '墓印禮裝',
+  'entities.itemSets.gravebrand.bonus2': '收割號令的冷卻時間縮短 2 秒。受到傷害不再延遲你的施法。',
+  'entities.itemSets.gravebrand.bonus4': '收割號令的齊擊造成的傷害提高 25%。',
+  'entities.itemSets.ruincaller.name': '喚滅法衣',
+  'entities.itemSets.ruincaller.bonus2': '燃盡可存 3 層充能。受到傷害不再延遲你的施法。',
+  'entities.itemSets.ruincaller.bonus4': '毀滅箭造成的傷害提高 20%。',
   'entities.itemSets.slagbreaker.name': '碎渣戰甲',
   'entities.itemSets.slagbreaker.bonus2': '血手使你下一次致殘打擊的強化效果提高至每層 30%（原為 20%）。',
   'entities.itemSets.slagbreaker.bonus4': '每施放兩次血手，破防者的剩餘冷卻時間縮短 3 秒。',
@@ -11903,7 +11912,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '僅限月翼形態。造成{damage}點秘法傷害，累積1層月潮（最多3層），並將你的月光風暴延長6秒；每次施加最多延長6秒。月潮達3層時，此按鈕變為月湧：立即造成240至285點秘法傷害，並耗盡全部3層。',
   'entities.abilities.moonseed.name': '月種',
   'entities.abilities.needle_of_fate.description':
-    '刺穿敵人，造成{damage}點暗影傷害。若目標帶有你的邪眼，則產生5點譴罪；若不存在邪眼，則先標記目標。',
+    '刺穿敵人，造成{damage}點暗影傷害。若目標帶有你的邪眼，則產生{needleDoom}點譴罪；若不存在邪眼，則先標記目標。',
   'entities.abilities.needle_of_fate.name': '命運之針',
   'entities.abilities.oath_chain.description':
     '立即用神聖鎖鏈束縛一名遠處敵人。敵人以每秒 18 公尺的速度向你移動，直至距離 3 公尺，隨後移動速度降低 50%，持續 4 秒。昇華期間還會束縛附近的第二名敵人。',
@@ -11979,7 +11988,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '消耗全部譴罪與命運絲線裁決敵人。每條絲線使傷害提高6%，附加效果會在20、50、80和100點譴罪時提升。16級後傷害成長趨於平緩。',
   'entities.abilities.sentence.name': '裁決',
   'entities.abilities.seraphic_vigil.description':
-    '為一名盟友施加守望祝福，在其陷入危險時恢復 {vigilHeal} 點生命值。賜福專屬技能。',
+    '為一名盟友施加守望祝福，在其陷入危險時恢復 {buff} 點生命值。賜福專屬技能。',
   'entities.abilities.seraphic_vigil.name': '熾天使守望',
   'entities.abilities.shellskin.description': '受到的傷害降低 60%，持續 8 秒，但生效期間無法攻擊。',
   'entities.abilities.shellskin.name': '甲殼之膚',

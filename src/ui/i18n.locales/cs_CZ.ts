@@ -9923,7 +9923,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.siphon_life.description':
     'Vysává život nepřítele, způsobí mu {damage} stínového poškození během 30 s a vyléčí tě za způsobené poškození. (klíčová schopnost Utrpení)',
   'entities.abilities.conflagrate.name': 'Vzplanutí',
-  'entities.abilities.conflagrate.description': 'Předsune budoucí tik tvého Hořícího paktu a poté zapálí cíl za {damage} ohnivého poškození. Vytvoří 1 Muka a 1 Zpustošení. Drží 2 nabití. (Charakteristika Zkázy)',
+  'entities.abilities.conflagrate.description': 'Předsune budoucí tik tvého Hořícího paktu a poté zapálí cíl za {damage} ohnivého poškození. Vytvoří 1 Muka a 1 Zpustošení. Drží {charges} nabití. (Charakteristika Zkázy)',
   'entities.abilities.moonkin_form.name': 'Podoba měsíčního křídla',
   'entities.abilities.moonkin_form.description':
     'Promění tě v děsivého měsíčníka, zvýší tvoje poškození kouzly o 20 % a zbroj o 50 %. Trvá, dokud podobu neopustíš. Dalším sesláním se vrátíš do normální podoby. (klíčová schopnost Rovnováhy)',
@@ -12673,7 +12673,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sacred_form.description':
     'Vstoupí do svatého stavu až do smrti, zvýší léčení o 10% a kritickou šanci kouzel o 5% a sníží vytvářenou hrozbu o 50%. Pouze pro Slunečné léčitele.',
   'entities.abilities.seraphic_vigil.description':
-    'Chrání spojence po dobu 30 s. První zásah, který jej srazí pod 35% zdraví, spotřebuje Stráž a vyléčí jej za {vigilHeal}. (Signatura Požehnání)',
+    'Chrání spojence po dobu 30 s. První zásah, který jej srazí pod 35% zdraví, spotřebuje Stráž a vyléčí jej za {buff}. (Signatura Požehnání)',
   'entities.abilities.scouring_mercy.description':
     'Způsobí 72 až 84 Svatého poškození nepříteli nebo vyléčí spřáteleného cíle za 130 až 155. Obě hodnoty rostou se silou kouzel. Poškození navíc vyléčí každého spojence spojeného Doktrínou za 30%, nebo člena skupiny s nejnižším zdravím za 15%, pokud není spojen nikdo. (Signatura Doktríny)',
   'entities.abilities.solar_invocation.description':
@@ -13134,7 +13134,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonfire.specNote_balance':
     'Udržuj to hořet: Měsíční semeno to prodlouží o 6 s.',
   'entities.abilities.needle_of_fate.description':
-    'Probodne nepřítele za {damage} stínového poškození a vygeneruje 5 Odsouzení, pokud nese tvé Evil Eye. Každý zásah tvého primárního Evil Eye přidá na 12 s Nit osudu, až do 3. Pokud neexistuje žádné Evil Eye, Needle nejprve označí svůj cíl.',
+    'Probodne nepřítele za {damage} stínového poškození a vygeneruje {needleDoom} Odsouzení, pokud nese tvé Evil Eye. Každý zásah tvého primárního Evil Eye přidá na 12 s Nit osudu, až do 3. Pokud neexistuje žádné Evil Eye, Needle nejprve označí svůj cíl.',
   'entities.abilities.needle_of_fate.name': 'Needle of Fate',
   'entities.abilities.ossuary_mark.description':
     'Na 15 s označí nepřítele a ukládá 20 % poškození způsobeného tebou a tvými nemrtvými. Seslej znovu pro odpálení. Pokud označený nepřítel zemře, vybuchne v okruhu 6 yardů a vytvoří 1 Úlomek duše.',

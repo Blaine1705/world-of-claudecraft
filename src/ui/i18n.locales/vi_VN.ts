@@ -5055,7 +5055,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.siphon_life.description':
     'Hút sự sống từ kẻ địch, gây {damage} sát thương Bóng Tối trong 30 giây và hồi cho bạn bằng lượng sát thương đã gây. (dấu ấn Đau Khổ)',
   'entities.abilities.conflagrate.name': 'Bùng Cháy',
-  'entities.abilities.conflagrate.description': 'Kéo sớm một nhịp sắp tới của Khế Ước Rực Cháy, rồi thiêu mục tiêu với {damage} sát thương Hỏa. Tạo ra 1 Tàn Phá và 1 Hủy Hoại. Giữ được 2 lượt tích. (Đặc trưng Hủy Diệt)',
+  'entities.abilities.conflagrate.description': 'Kéo sớm một nhịp sắp tới của Khế Ước Rực Cháy, rồi thiêu mục tiêu với {damage} sát thương Hỏa. Tạo ra 1 Tàn Phá và 1 Hủy Hoại. Giữ được {charges} lượt tích. (Đặc trưng Hủy Diệt)',
   'entities.abilities.moonkin_form.name': 'Dạng Cú Mặt Trăng',
   'entities.abilities.moonkin_form.description':
     'Nhận dạng cú mặt trăng, cường hóa thi triển phép cho đến khi bạn đổi lại. Thi triển lần nữa để trở về dạng thường. (dấu ấn Cân Bằng)',
@@ -12589,7 +12589,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sacred_form.description':
     'Bước vào trạng thái thánh cho đến khi chết, tăng 10% lượng hồi máu và 5% tỉ lệ chí mạng phép, đồng thời giảm 50% mức đe dọa tạo ra. Chỉ dành cho Người Chữa Lành Mặt Trời.',
   'entities.abilities.seraphic_vigil.description':
-    'Bảo vệ một đồng minh trong 30 giây. Đòn đánh đầu tiên khiến họ xuống dưới 35% máu sẽ tiêu Canh Thức và hồi cho họ {vigilHeal}. (Dấu ấn Phúc Lành)',
+    'Bảo vệ một đồng minh trong 30 giây. Đòn đánh đầu tiên khiến họ xuống dưới 35% máu sẽ tiêu Canh Thức và hồi cho họ {buff}. (Dấu ấn Phúc Lành)',
   'entities.abilities.scouring_mercy.description':
     'Gây 72 đến 84 sát thương Thánh lên kẻ địch hoặc hồi 130 đến 155 máu cho mục tiêu đồng minh. Cả hai đều tăng theo sức mạnh phép thuật. Sát thương cũng hồi 30% cho mỗi đồng minh liên kết bằng Giáo Lý, hoặc 15% cho thành viên nhóm có ít máu nhất nếu không ai được liên kết. (Dấu ấn Giáo Lý)',
   'entities.abilities.solar_invocation.description':
@@ -13068,7 +13068,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.maul.specNote_feral': 'Mỗi đòn đánh trúng thêm 1 Huyết Cổ; ở 3 Huyết Cổ, nút này trở thành Nghiền Tủy: một đòn đánh gây 78 đến 96 sát thương với lượng thù hận lớn; dưới nửa máu, nó sẽ thay vào đó khiên cho bạn 18% máu tối đa và hoàn lại 15 nộ khí.',
   'entities.abilities.moonfire.description': 'Thiêu đốt kẻ địch bằng lửa trăng gây {damage} sát thương Bí Thuật cộng thêm sát thương theo thời gian.',
   'entities.abilities.moonfire.specNote_balance': 'Giữ nó tiếp tục cháy: Nguyệt Chủng kéo dài thêm 6 giây.',
-  'entities.abilities.needle_of_fate.description': 'Xuyên qua kẻ địch gây {damage} sát thương Bóng Tối và tạo ra 5 Kết Án nếu nó mang Ác Nhãn của bạn. Mỗi đòn trúng vào Ác Nhãn chính của bạn thêm 1 Sợi Định Mệnh trong 12 giây, tối đa 3. Nếu không có Ác Nhãn nào tồn tại, Kim sẽ đánh dấu mục tiêu của nó trước.',
+  'entities.abilities.needle_of_fate.description': 'Xuyên qua kẻ địch gây {damage} sát thương Bóng Tối và tạo ra {needleDoom} Kết Án nếu nó mang Ác Nhãn của bạn. Mỗi đòn trúng vào Ác Nhãn chính của bạn thêm 1 Sợi Định Mệnh trong 12 giây, tối đa 3. Nếu không có Ác Nhãn nào tồn tại, Kim sẽ đánh dấu mục tiêu của nó trước.',
   'entities.abilities.needle_of_fate.name': 'Kim Định Mệnh',
   'entities.abilities.ossuary_mark.description': 'Đánh dấu một kẻ địch trong 15 giây, lưu trữ 20% sát thương gây ra bởi bạn và thuộc hạ Bất Tử của bạn. Thi triển lại để kích nổ nó. Nếu kẻ địch bị đánh dấu chết, nó sẽ nổ trong bán kính 6 thước và tạo 1 Mảnh Linh Hồn.',
   'entities.abilities.ossuary_mark.name': 'Dấu Ấn Cốt Táng',

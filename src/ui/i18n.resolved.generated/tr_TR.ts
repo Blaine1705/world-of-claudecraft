@@ -10458,7 +10458,7 @@ export const tr_TR: EnTranslations = {
       },
       "needle_of_fate": {
         "name": "Kader İğnesi",
-        "description": "Düşmanı {damage} Gölge hasarıyla deler ve üzerinde Kem Gözün varsa 5 Mahkûmiyet üretir. Birincil Kem Gözüne isabet eden her vuruş 12 sn süren bir Kader İpliği ekler, en fazla 3. Hiç Kem Göz yoksa, İğne önce hedefini işaretler."
+        "description": "Düşmanı {damage} Gölge hasarıyla deler ve üzerinde Kem Gözün varsa {needleDoom} Mahkûmiyet üretir. Birincil Kem Gözüne isabet eden her vuruş 12 sn süren bir Kader İpliği ekler, en fazla 3. Hiç Kem Göz yoksa, İğne önce hedefini işaretler."
       },
       "sentence": {
         "name": "Hüküm",
@@ -10860,7 +10860,7 @@ export const tr_TR: EnTranslations = {
       },
       "conflagrate": {
         "name": "Tutuşturma",
-        "description": "Yanan Ahdinin gelecek bir tıkını öne alır, ardından hedefi {damage} Ateş hasarı için tutuşturur. 1 Tahribat ve 1 Harabiyet üretir. 2 şarj tutar. (Yıkım imzası)"
+        "description": "Yanan Ahdinin gelecek bir tıkını öne alır, ardından hedefi {damage} Ateş hasarı için tutuşturur. 1 Tahribat ve 1 Harabiyet üretir. {charges} şarj tutar. (Yıkım imzası)"
       },
       "moonkin_form": {
         "name": "Aykuşu Formu",
@@ -11341,7 +11341,7 @@ export const tr_TR: EnTranslations = {
       },
       "seraphic_vigil": {
         "name": "Serafik Nöbet",
-        "description": "Bir müttefiki 30 sn korur. Onu 35% canın altına düşüren ilk vuruş Nöbeti tüketir ve onu {vigilHeal} iyileştirir. (Lütuf imzası)"
+        "description": "Bir müttefiki 30 sn korur. Onu 35% canın altına düşüren ilk vuruş Nöbeti tüketir ve onu {buff} iyileştirir. (Lütuf imzası)"
       },
       "summon_tithefiend": {
         "name": "Öşür İfriti Çağır",
@@ -18586,9 +18586,19 @@ export const tr_TR: EnTranslations = {
         "bonus2": "Rimelance critical strikes bank a second Icicle, up to the maximum of 5. Damage taken no longer delays your spellcasting.",
         "bonus4": "Winterlash plants 3 Winter's Chill charges, up from 2."
       },
+      "gravebrand": {
+        "name": "Gravebrand Regalia",
+        "bonus2": "Reaping Command's cooldown is reduced by 2 sec. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Reaping Command's unison strikes deal 25 percent more damage."
+      },
       "greyjaw_stalker": {
         "name": "Greyjaw İzsürücü takımı",
         "bonus3": "Saldırı ve büyü hızını %15 artırır."
+      },
+      "hexthread": {
+        "name": "Hexthread Shroud",
+        "bonus2": "Needle of Fate grants 2 additional Condemnation. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Passing Sentence refunds 10 Condemnation."
       },
       "necromancers": {
         "name": "Mournweave Giysileri",
@@ -18616,6 +18626,11 @@ export const tr_TR: EnTranslations = {
         "name": "Pyroclast Regalia",
         "bonus2": "Scald always critically strikes targets at or below 50 percent health. Damage taken no longer delays your spellcasting.",
         "bonus4": "Your Fire spells' critical strikes outside Phoenix Trance reduce its remaining cooldown by 2 sec."
+      },
+      "ruincaller": {
+        "name": "Ruincaller Vestments",
+        "bonus2": "Conflagrate holds 3 charges. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Ruinbolt strikes 20 percent harder."
       },
       "slagbreaker": {
         "name": "Slagbreaker Battlegear",

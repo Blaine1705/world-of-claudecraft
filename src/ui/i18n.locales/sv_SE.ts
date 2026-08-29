@@ -4965,7 +4965,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.siphon_life.description':
     'Suger liv från fienden, orsakar {damage} skuggskada under 30 sek och läker dig för skadan som görs. (Lidandesignatur)',
   'entities.abilities.conflagrate.name': 'Storbrand',
-  'entities.abilities.conflagrate.description': 'För fram ett kommande tick av er Brinnande pakt och antänder sedan målet för {damage} Eldskada. Alstrar 1 Förödelse och 1 Ödeläggelse. Rymmer 2 laddningar. (Signatur för Förstörelse)',
+  'entities.abilities.conflagrate.description': 'För fram ett kommande tick av er Brinnande pakt och antänder sedan målet för {damage} Eldskada. Alstrar 1 Förödelse och 1 Ödeläggelse. Rymmer {charges} laddningar. (Signatur för Förstörelse)',
   'entities.abilities.moonkin_form.name': 'Månugglaform',
   'entities.abilities.moonkin_form.description':
     'Anta månugglaform och stärk besvärjelser tills du skiftar tillbaka. Kasta igen för att återgå till normal form. (Balanssignatur)',
@@ -12732,7 +12732,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sacred_form.description':
     'Går in i ett heligt tillstånd till döden, ökar läkning med 10% och kritisk besvärjelsechans med 5%, och minskar genererat hot med 50%. Endast för Solhelare.',
   'entities.abilities.seraphic_vigil.description':
-    'Skyddar en allierad i 30 sek. Den första träffen som för denne under 35% hälsa förbrukar Vakan och läker denne för {vigilHeal}. (Välsignelsesignatur)',
+    'Skyddar en allierad i 30 sek. Den första träffen som för denne under 35% hälsa förbrukar Vakan och läker denne för {buff}. (Välsignelsesignatur)',
   'entities.abilities.scouring_mercy.description':
     'Gör 72 till 84 helig skada på en fiende eller läker ett vänligt mål för 130 till 155. Båda beloppen ökar med besvärjelsekraft. Skadan läker även varje läroförbunden allierad för 30%, eller gruppmedlemmen med lägst hälsa för 15% om ingen allierad är förbunden. (Lärosignatur)',
   'entities.abilities.solar_invocation.description':
@@ -13197,7 +13197,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.moonfire.specNote_balance':
     'Håll den brinnande: Månfrö förlänger den med 6 sek.',
   'entities.abilities.needle_of_fate.description':
-    'Genomborrar fienden för {damage} skuggskada och genererar 5 Fördömelse om den bär ditt Evil Eye. Varje träff på ditt primära Evil Eye lägger till en Ödestråd i 12 sek, upp till 3. Om inget Evil Eye finns märker Needle först sitt mål.',
+    'Genomborrar fienden för {damage} skuggskada och genererar {needleDoom} Fördömelse om den bär ditt Evil Eye. Varje träff på ditt primära Evil Eye lägger till en Ödestråd i 12 sek, upp till 3. Om inget Evil Eye finns märker Needle först sitt mål.',
   'entities.abilities.needle_of_fate.name': 'Needle of Fate',
   'entities.abilities.ossuary_mark.description':
     'Märker en fiende i 15 sek, vilket lagrar 20% av skadan du och dina odöda vållar. Kasta igen för att detonera märket. Om det märkta målet dör exploderar det inom 6 yards och skapar 1 Själfragment.',

@@ -5092,7 +5092,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.siphon_life.description':
     'Düşmandan can sömürür, 30 sn boyunca {damage} Gölge hasarı verir ve verilen hasar kadar seni iyileştirir. (Istırap imzası)',
   'entities.abilities.conflagrate.name': 'Tutuşturma',
-  'entities.abilities.conflagrate.description': 'Yanan Ahdinin gelecek bir tıkını öne alır, ardından hedefi {damage} Ateş hasarı için tutuşturur. 1 Tahribat ve 1 Harabiyet üretir. 2 şarj tutar. (Yıkım imzası)',
+  'entities.abilities.conflagrate.description': 'Yanan Ahdinin gelecek bir tıkını öne alır, ardından hedefi {damage} Ateş hasarı için tutuşturur. 1 Tahribat ve 1 Harabiyet üretir. {charges} şarj tutar. (Yıkım imzası)',
   'entities.abilities.moonkin_form.name': 'Aykuşu Formu',
   'entities.abilities.moonkin_form.description':
     'Aykuşu formuna girer, geri dönene kadar büyü yapmayı güçlendirirsin. Normal forma dönmek için tekrar kullan. (Denge imzası)',
@@ -12742,7 +12742,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sacred_form.description':
     'Ölüme dek kutsal bir hale girer; iyileştirmeyi 10%, büyü kritik şansını 5% artırır ve üretilen tehdidi 50% azaltır. Yalnızca Güneş Şifacıları için.',
   'entities.abilities.seraphic_vigil.description':
-    'Bir müttefiki 30 sn korur. Onu 35% canın altına düşüren ilk vuruş Nöbeti tüketir ve onu {vigilHeal} iyileştirir. (Lütuf imzası)',
+    'Bir müttefiki 30 sn korur. Onu 35% canın altına düşüren ilk vuruş Nöbeti tüketir ve onu {buff} iyileştirir. (Lütuf imzası)',
   'entities.abilities.scouring_mercy.description':
     'Bir düşmana 72 ila 84 Kutsal hasar verir ya da dost bir hedefi 130 ila 155 iyileştirir. Her iki değer de büyü gücüyle artar. Hasar ayrıca Öğreti ile bağlı her müttefiki 30%, hiç bağlı müttefik yoksa en düşük canlı grup üyesini 15% iyileştirir. (Öğreti imzası)',
   'entities.abilities.solar_invocation.description':
@@ -13169,7 +13169,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.maul.specNote_feral': 'İsabet eden her vuruş 1 Kadim Kan ekler; 3 Kadim Kanda bu düğme İlik Kırana dönüşür: yüksek tehditle 78 ila 96 hasar veren bir vuruş; can yarısının altındayken bunun yerine azami canının %18\'i kadar seni kalkanlar ve 15 öfke geri kazandırır.',
   'entities.abilities.moonfire.description': 'Düşmanı ay ateşiyle yakarak {damage} Gizemli hasar artı zamana yayılı hasar verir.',
   'entities.abilities.moonfire.specNote_balance': 'Yanmaya devam ettir: Ay Tohumu süresini 6 sn uzatır.',
-  'entities.abilities.needle_of_fate.description': 'Düşmanı {damage} Gölge hasarıyla deler ve üzerinde Kem Gözün varsa 5 Mahkûmiyet üretir. Birincil Kem Gözüne isabet eden her vuruş 12 sn süren bir Kader İpliği ekler, en fazla 3. Hiç Kem Göz yoksa, İğne önce hedefini işaretler.',
+  'entities.abilities.needle_of_fate.description': 'Düşmanı {damage} Gölge hasarıyla deler ve üzerinde Kem Gözün varsa {needleDoom} Mahkûmiyet üretir. Birincil Kem Gözüne isabet eden her vuruş 12 sn süren bir Kader İpliği ekler, en fazla 3. Hiç Kem Göz yoksa, İğne önce hedefini işaretler.',
   'entities.abilities.needle_of_fate.name': 'Kader İğnesi',
   'entities.abilities.ossuary_mark.description': 'Bir düşmanı 15 sn süreyle işaretler, senin ve ölülerinin verdiği hasarın %20\'sini depolar. Patlatmak için yeniden oku. İşaretli düşman ölürse, 6 yarda içinde patlar ve 1 Ruh Parçası oluşturur.',
   'entities.abilities.ossuary_mark.name': 'Kemik Damgası',

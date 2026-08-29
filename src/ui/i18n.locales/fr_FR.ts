@@ -6945,7 +6945,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.siphon_life.description':
     'Siphonne la vie de l’ennemi, inflige {damage} points de dégâts d’Ombre en 30 s et vous soigne du montant des dégâts infligés. (signature Affliction)',
   'entities.abilities.conflagrate.name': 'Conflagration',
-  'entities.abilities.conflagrate.description': 'Avance un tic à venir de votre Pacte brûlant, puis embrase la cible pour {damage} points de dégâts de Feu. Génère 1 Dévastation et 1 Ruine. Retient 2 charges. (Signature Destruction)',
+  'entities.abilities.conflagrate.description': 'Avance un tic à venir de votre Pacte brûlant, puis embrase la cible pour {damage} points de dégâts de Feu. Génère 1 Dévastation et 1 Ruine. Retient {charges} charges. (Signature Destruction)',
   'entities.abilities.moonkin_form.name': 'Forme de sélénien',
   'entities.abilities.moonkin_form.description':
     'Adopte la forme de sélénien, renforçant l’incantation jusqu’à ce que vous changiez de nouveau. Lancez à nouveau pour revenir à la forme normale. (signature Équilibre)',
@@ -13102,7 +13102,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sacred_form.description':
     "Entre dans un état sacré jusqu'à la mort, augmentant les soins de 10% et les chances de critique des sorts de 5%, et réduisant la menace générée de 50%. Réservé aux Sagesoleil.",
   'entities.abilities.seraphic_vigil.description':
-    'Protège un allié pendant 30 s. Le premier coup qui le fait descendre sous 35% de points de vie consomme la Veille et le soigne de {vigilHeal}. (Signature de Bénison)',
+    'Protège un allié pendant 30 s. Le premier coup qui le fait descendre sous 35% de points de vie consomme la Veille et le soigne de {buff}. (Signature de Bénison)',
   'entities.abilities.scouring_mercy.description':
     "Inflige 72 à 84 points de dégâts Sacrés à un ennemi ou soigne une cible alliée de 130 à 155. Les deux montants augmentent avec la puissance des sorts. Les dégâts soignent aussi chaque allié lié par la Doctrine de 30%, ou le membre du groupe le plus blessé de 15% si aucun allié n'est lié. (Signature de Doctrine)",
   'entities.abilities.solar_invocation.description':
@@ -13430,7 +13430,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.maul.specNote_feral': "Chaque coup porté ajoute 1 Sang ancien ; à 3 Sang ancien, ce bouton devient Brise-moelle : une frappe de 78 à 96 dégâts à forte menace ; sous la moitié des points de vie, elle vous protège à la place d'un bouclier égal à 18% de vos points de vie maximum et rembourse 15 rage.",
   'entities.abilities.moonfire.description': "Brûle l'ennemi avec le feu lunaire pour {damage} points de dégâts d'Arcane plus des dégâts sur la durée.",
   'entities.abilities.moonfire.specNote_balance': 'Entretenez le feu : Graine lunaire le prolonge de 6 s.',
-  'entities.abilities.needle_of_fate.description': "Transperce l'ennemi pour {damage} points de dégâts d'Ombre et génère 5 Condamnation s'il porte votre Mauvais œil. Chaque coup sur votre Mauvais œil principal ajoute un Fil du destin pendant 12 s, jusqu'à 3. Si aucun Mauvais œil n'existe, l'Aiguille marque d'abord sa cible.",
+  'entities.abilities.needle_of_fate.description': "Transperce l'ennemi pour {damage} points de dégâts d'Ombre et génère {needleDoom} Condamnation s'il porte votre Mauvais œil. Chaque coup sur votre Mauvais œil principal ajoute un Fil du destin pendant 12 s, jusqu'à 3. Si aucun Mauvais œil n'existe, l'Aiguille marque d'abord sa cible.",
   'entities.abilities.needle_of_fate.name': 'Aiguille du destin',
   'entities.abilities.ossuary_mark.description': "Marque un ennemi pendant 15 s, stockant 20% des dégâts infligés par vous et vos morts-vivants. Relancez pour la faire détoner. Si l'ennemi marqué meurt, elle explose dans un rayon de 6 mètres et crée 1 Fragment d'âme.",
   'entities.abilities.ossuary_mark.name': "Marque de l'ossuaire",

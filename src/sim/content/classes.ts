@@ -16,6 +16,7 @@ import {
   TEMPORAL_HOURGLASS_SELF_RADIUS,
   type WeaponInfo,
 } from '../types';
+import { HEXTHREAD_2PC_NEEDLE_DOOM_BONUS, setBonusFlag } from './ignivar_set_bonuses';
 import { PALADIN_CORE_ABILITIES } from './paladin_core_abilities';
 import { PRIEST_ABILITIES } from './priest';
 import { MENDING_WATERS_MANA_COST, TIDECALL_MANA_COST } from './shaman_tuning';
@@ -5089,21 +5090,34 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'shadow',
     requiresTarget: true,
-    effects: [{ type: 'afflictionNeedle' }, { type: 'directDamage', min: 22, max: 27 }],
+    effects: [
+      { type: 'afflictionNeedle', doom: 7 },
+      { type: 'directDamage', min: 22, max: 27 },
+    ],
     ranks: [
       {
         rank: 2,
         level: 12,
         cost: 30,
-        effects: [{ type: 'afflictionNeedle' }, { type: 'directDamage', min: 36, max: 43 }],
+        effects: [
+          { type: 'afflictionNeedle', doom: 7 },
+          { type: 'directDamage', min: 36, max: 43 },
+        ],
       },
       {
         rank: 3,
         level: 20,
         cost: 35,
-        effects: [{ type: 'afflictionNeedle' }, { type: 'directDamage', min: 41, max: 49 }],
+        effects: [
+          { type: 'afflictionNeedle', doom: 7 },
+          { type: 'directDamage', min: 41, max: 49 },
+        ],
       },
     ],
+    // The sim-source description keeps the BASE literal 7 (the $-form
+    // contract in tests/ability_tooltip_consistency.test.ts: brace tokens are
+    // reserved for the translated catalog). The catalog row splices the
+    // RESOLVED payload as {needleDoom}, so Hexthread 2pc wearers read 9 there.
     description:
       'Pierces the enemy for $d Shadow damage and generates 7 Condemnation on impact if it still bears your Evil Eye. Completing a cast moves your primary Evil Eye to the target and adds a Fate Thread for 12 sec, up to 3. Fate Threads stay with you when the Eye moves or its target dies. Targeting a secondary Coven Eye swaps it with the primary Eye.',
   },
@@ -7674,6 +7688,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     effects: [{ type: 'destructionConflagrate' }, { type: 'directDamage', min: 118, max: 140 }],
     description:
+      // The sim-source description keeps the BASE literal 2 (the $-form
+      // contract in tests/ability_tooltip_consistency.test.ts); the catalog
+      // row splices the RESOLVED count as {charges}, so Ruincaller 2pc
+      // wearers read 3 there.
       'Advances one future tick of your Burning Pact, then ignites the target for $d Fire damage. Generates 1 Wrack and 1 Desolation. Holds 2 charges. (Destruction signature)',
   },
   moonkin_form: {
@@ -8775,6 +8793,18 @@ export function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): voi
                 : e,
       );
     }
+  }
+  // Hexthread 2pc (the Crucible set doc): Needle of Fate grants 2 additional
+  // Condemnation. The bonus is baked into the RESOLVED afflictionNeedle
+  // payload, the ONE number the dispatch (resolveNeedleOfFate) and the
+  // {needleDoom} description splice both read, so the engine and the printed
+  // figure can never diverge. eyeGeneration still multiplies the total after
+  // (x0.5-with-rounding secondary Eyes, x2 under Hour of Judgment), the set
+  // doc's disclosures.
+  if (entry.def.id === 'needle_of_fate' && mods.selected[setBonusFlag('hexthread', 2)] === true) {
+    entry.effects = entry.effects.map((e) =>
+      e.type === 'afflictionNeedle' ? { ...e, doom: e.doom + HEXTHREAD_2PC_NEEDLE_DOOM_BONUS } : e,
+    );
   }
 }
 

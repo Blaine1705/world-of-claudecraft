@@ -3463,7 +3463,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.siphon_life.description':
     '적의 생명력을 착취하여 30초에 걸쳐 {damage}의 암흑 피해를 주고 준 피해만큼 자신을 치유합니다. (고통 전문화 상징)',
   'entities.abilities.conflagrate.name': '점화',
-  'entities.abilities.conflagrate.description': '불타는 계약의 다가올 주기 하나를 앞당긴 뒤 대상을 불살라 {damage}의 화염 피해를 입힙니다. 파괴력 1과 파멸 1을 만듭니다. 충전을 2회 담아 둡니다. (파괴 상징 기술)',
+  'entities.abilities.conflagrate.description': '불타는 계약의 다가올 주기 하나를 앞당긴 뒤 대상을 불살라 {damage}의 화염 피해를 입힙니다. 파괴력 1과 파멸 1을 만듭니다. 충전을 {charges}회 담아 둡니다. (파괴 상징 기술)',
   'entities.abilities.moonkin_form.name': '달빛야수 변신',
   'entities.abilities.moonkin_form.description':
     '달빛야수 형상을 취해 돌아올 때까지 주문 시전을 강화합니다. 다시 시전하면 일반 형상으로 돌아옵니다. (조화 전문화 상징)',
@@ -7826,6 +7826,18 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '서리 창이 치명타로 적중하면 고드름을 하나 더 저장합니다. 최대치는 5개로 유지됩니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
   'entities.itemSets.frostquench.bonus4':
     '겨울의 채찍이 혹한의 추위를 2중첩 대신 3중첩 부여합니다.',
+  'entities.itemSets.hexthread.name': '주술실 장막',
+  'entities.itemSets.hexthread.bonus2':
+    '운명의 바늘이 단죄를 2 추가로 생성합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+  'entities.itemSets.hexthread.bonus4': '선고를 내리면 단죄 10을 돌려받습니다.',
+  'entities.itemSets.gravebrand.name': '무덤낙인 예장',
+  'entities.itemSets.gravebrand.bonus2':
+    '수확의 명령의 재사용 대기시간이 2초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+  'entities.itemSets.gravebrand.bonus4': '수확의 명령의 일제 공격이 25% 더 큰 피해를 입힙니다.',
+  'entities.itemSets.ruincaller.name': '파멸부름 예복',
+  'entities.itemSets.ruincaller.bonus2':
+    '점화가 충전을 3회 담아 둡니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+  'entities.itemSets.ruincaller.bonus4': '파멸 화살의 피해가 20% 증가합니다.',
   'entities.itemSets.slagbreaker.name': '광재파쇄자 전투복',
   'entities.itemSets.slagbreaker.bonus2': '붉은 손이 다음 불구의 일격을 중첩당 20% 대신 30% 강화합니다.',
   'entities.itemSets.slagbreaker.bonus4': '붉은 손을 두 번 시전할 때마다 돌파자의 남은 재사용 대기시간이 3초 감소합니다.',
@@ -12434,7 +12446,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '달날개 형상 전용입니다. {damage}의 비전 피해를 입히고, 달물결을 1단계 올리며(최대 3단계), 달빛 폭풍을 6초 연장합니다. 적용 한 번당 최대 6초입니다. 달물결 3단계에서 이 버튼이 달의 격동으로 변합니다: 240에서 285의 비전 피해를 입히는 즉시 공격으로, 3단계를 모두 소모합니다.',
   'entities.abilities.moonseed.name': '달씨앗',
   'entities.abilities.needle_of_fate.description':
-    '적을 꿰뚫어 {damage}의 암흑 피해를 줍니다. 대상에게 자신의 사안이 있으면 단죄를 5 생성하고, 사안이 없으면 먼저 대상을 지정합니다.',
+    '적을 꿰뚫어 {damage}의 암흑 피해를 줍니다. 대상에게 자신의 사안이 있으면 단죄를 {needleDoom} 생성하고, 사안이 없으면 먼저 대상을 지정합니다.',
   'entities.abilities.needle_of_fate.name': '운명의 바늘',
   'entities.abilities.oath_chain.description':
     '멀리 있는 적을 성스러운 사슬로 즉시 결박합니다. 적은 자신에게서 3미터 거리까지 초당 18미터의 속도로 끌려오며, 도착하면 4초 동안 이동 속도가 50% 감소합니다. 승천 중에는 주변의 두 번째 적도 결박합니다.',
@@ -12512,7 +12524,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '모든 단죄와 운명의 실을 소모해 적에게 선고를 내립니다. 실 하나당 피해가 6% 증가하고, 추가 효과는 단죄 20, 50, 80, 100에서 강화됩니다. 16레벨 이후 피해 증가폭이 완만해집니다.',
   'entities.abilities.sentence.name': '선고',
   'entities.abilities.seraphic_vigil.description':
-    '아군 한 명에게 수호의 축복을 걸어 위험에 처하면 생명력을 {vigilHeal} 회복시킵니다. 축복 고유 능력입니다.',
+    '아군 한 명에게 수호의 축복을 걸어 위험에 처하면 생명력을 {buff} 회복시킵니다. 축복 고유 능력입니다.',
   'entities.abilities.seraphic_vigil.name': '치천사의 수호',
   'entities.abilities.shellskin.description':
     '8초 동안 받는 피해가 60% 감소하지만, 효과가 지속되는 동안 공격할 수 없습니다.',

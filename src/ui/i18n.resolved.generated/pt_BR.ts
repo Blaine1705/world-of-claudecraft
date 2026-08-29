@@ -10458,7 +10458,7 @@ export const pt_BR: EnTranslations = {
       },
       "needle_of_fate": {
         "name": "Needle of Fate",
-        "description": "Perfura o inimigo causando {damage} de dano das Sombras e gera 5 de Condenação se ele carregar seu Evil Eye. Cada acerto no seu Evil Eye primário adiciona um Fio do Destino por 12 s, até 3. Se não houver Evil Eye, a Needle of Fate primeiro marca seu alvo."
+        "description": "Perfura o inimigo causando {damage} de dano das Sombras e gera {needleDoom} de Condenação se ele carregar seu Evil Eye. Cada acerto no seu Evil Eye primário adiciona um Fio do Destino por 12 s, até 3. Se não houver Evil Eye, a Needle of Fate primeiro marca seu alvo."
       },
       "sentence": {
         "name": "Sentence",
@@ -10860,7 +10860,7 @@ export const pt_BR: EnTranslations = {
       },
       "conflagrate": {
         "name": "Conflagrar",
-        "description": "Adianta um pulso futuro de vosso Pacto Ardente, e então incendeia o alvo causando {damage} de dano de Fogo. Gera 1 de Devastação e 1 de Ruína. Guarda 2 cargas. (Distintivo de Destruição)"
+        "description": "Adianta um pulso futuro de vosso Pacto Ardente, e então incendeia o alvo causando {damage} de dano de Fogo. Gera 1 de Devastação e 1 de Ruína. Guarda {charges} cargas. (Distintivo de Destruição)"
       },
       "moonkin_form": {
         "name": "Forma de Luniscante",
@@ -11341,7 +11341,7 @@ export const pt_BR: EnTranslations = {
       },
       "seraphic_vigil": {
         "name": "Vigília Seráfica",
-        "description": "Protege um aliado por 30 s. O primeiro golpe que o deixar abaixo de 35% de vida consome a Vigília e o cura em {vigilHeal}. (Distintivo de Bênção)"
+        "description": "Protege um aliado por 30 s. O primeiro golpe que o deixar abaixo de 35% de vida consome a Vigília e o cura em {buff}. (Distintivo de Bênção)"
       },
       "summon_tithefiend": {
         "name": "Invocar Demônio do Dízimo",
@@ -18586,9 +18586,19 @@ export const pt_BR: EnTranslations = {
         "bonus2": "Rimelance critical strikes bank a second Icicle, up to the maximum of 5. Damage taken no longer delays your spellcasting.",
         "bonus4": "Winterlash plants 3 Winter's Chill charges, up from 2."
       },
+      "gravebrand": {
+        "name": "Gravebrand Regalia",
+        "bonus2": "Reaping Command's cooldown is reduced by 2 sec. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Reaping Command's unison strikes deal 25 percent more damage."
+      },
       "greyjaw_stalker": {
         "name": "Equipamento do Espreitador de Greyjaw",
         "bonus3": "Aumenta a velocidade de ataque e de lançamento em 15%."
+      },
+      "hexthread": {
+        "name": "Hexthread Shroud",
+        "bonus2": "Needle of Fate grants 2 additional Condemnation. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Passing Sentence refunds 10 Condemnation."
       },
       "necromancers": {
         "name": "Vestes Mournweave",
@@ -18616,6 +18626,11 @@ export const pt_BR: EnTranslations = {
         "name": "Pyroclast Regalia",
         "bonus2": "Scald always critically strikes targets at or below 50 percent health. Damage taken no longer delays your spellcasting.",
         "bonus4": "Your Fire spells' critical strikes outside Phoenix Trance reduce its remaining cooldown by 2 sec."
+      },
+      "ruincaller": {
+        "name": "Ruincaller Vestments",
+        "bonus2": "Conflagrate holds 3 charges. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Ruinbolt strikes 20 percent harder."
       },
       "slagbreaker": {
         "name": "Slagbreaker Battlegear",

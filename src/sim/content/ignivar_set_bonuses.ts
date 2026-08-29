@@ -219,6 +219,46 @@ export const FROSTQUENCH_2PC_CRIT_BONUS_ICICLES = 1;
  *  WINTERS_CHILL_CHARGES 2). */
 export const FROSTQUENCH_4PC_WINTERS_CHILL_CHARGES = 3;
 
+// Audited constants for the bespoke warlock bends (read by the class-module
+// call sites AND pinned by tests, so the copy cannot drift from the code).
+/** Hexthread 2pc: extra Condemnation on the RESOLVED afflictionNeedle payload
+ *  (base doom 7 on the needle_of_fate effect). The bonus is a resolved-ability
+ *  rewrite in applyTalentMods, so the dispatch (resolveNeedleOfFate) and the
+ *  {needleDoom} tooltip splice read the ONE resolved number and can never
+ *  diverge. eyeGeneration still multiplies the total afterward: on a secondary
+ *  Coven Eye the x0.5-with-rounding pays +1 (a +1 bonus would pay zero there),
+ *  and under Hour of Judgment the primary-Eye x2 pays +4, both disclosed by
+ *  the set doc. Income lift on the needle source only: the drain, death, and
+ *  enemy-action streams keep their base amounts. */
+export const HEXTHREAD_2PC_NEEDLE_DOOM_BONUS = 2;
+/** Hexthread 4pc: Condemnation refunded after a resolved Sentence, at the
+ *  post-consume site beside Hour of Judgment's once-per-90s 50-refund charge
+ *  (additive with it; near-moot overlap, stated by the set doc). Flagged as
+ *  the tuning pass's first shave, per the set doc. */
+export const HEXTHREAD_4PC_SENTENCE_DOOM_REFUND = 10;
+/** Gravebrand 2pc: seconds cut from Reaping Command's cooldown (base 8; the
+ *  honest claim is +33 percent Reaping Commands, cooldown-bound in the probe).
+ *  The Soul Fragment bank and the 2-fragment cost are deliberately untouched:
+ *  the bank stays pinned, it never "breathes". */
+export const GRAVEBRAND_2PC_REAPING_COOLDOWN_CUT_SEC = 2;
+/** Gravebrand 4pc: multiplier on reapingDamage, the unison-strike roll with
+ *  exactly ONE caller (combat/necromancy.ts reapWithUndead), so the bend
+ *  scopes to command strikes and carries into the Gravewing cleave (which
+ *  derives from the same damage). No printed numbers exist for the strikes. */
+export const GRAVEBRAND_4PC_UNISON_DAMAGE_MULT = 1.25;
+/** Ruincaller 2pc: extra stored Conflagrate use (native maxCharges 2 -> 3;
+ *  parallel per-charge recharge, so up to +50 percent throughput, net reduced
+ *  by Burning Pact self-burn and Desolation overcap, both disclosed). */
+export const RUINCALLER_2PC_CONFLAGRATE_BONUS_CHARGES = 1;
+/** Ruincaller 4pc: the chaos_bolt dmgPct row. The printed number is 20
+ *  percent DELIVERED: the accumulator is additive (talent_hit_mult.ts,
+ *  1 + spellDmgPct + dmgPct) and a committed Ruination carries the 0.1
+ *  spec-baseline spellDmgPct floor (spec_baselines.ts), so the real baseline
+ *  is 1.1 and the row is 0.2 x 1.1 = 0.22 (1.32 / 1.1 = 1.20 exactly). The
+ *  set doc's bracketed 0.2 assumed a bare 1.0 baseline (the Warspirit 4pc
+ *  deviation shape); recorded as a deviation in the wave's PR notes. */
+export const RUINCALLER_4PC_CHAOS_BOLT_DMG_PCT = 0.22;
+
 /** The engine payloads, keyed by set id (the `set` tag on each member item
  *  and the ItemSet id in item_sets.ts). Tiers ascend by pieces. */
 export const SET_ENGINE_BONUSES: Record<string, readonly SetEngineBonusTier[]> = {
@@ -596,7 +636,7 @@ export const SET_ENGINE_BONUSES: Record<string, readonly SetEngineBonusTier[]> =
       // Seraphic Vigil's rescue 180 -> 270: buffPct 0.5 scales the RESOLVED
       // buffTarget heal_echo value (heal_echo is in neither the integral nor
       // the scalable buff-kind sets, so the resolved value is exactly the
-      // flat 270 the tooltip promises). The {vigilHeal} description splice
+      // flat 270 the tooltip promises). The {buff} description splice
       // reads the same resolved value, so the printed number stays honest
       // for wearers and everyone else. Deterministic, no rng involved.
       effect: {
@@ -873,6 +913,98 @@ export const SET_ENGINE_BONUSES: Record<string, readonly SetEngineBonusTier[]> =
       // suppression, Glacial Spike GCD contention, Rimelance displacement)
       // are the set doc's. Deterministic, no rng involved.
       effect: { tuning: { wintersChillCharges: FROSTQUENCH_4PC_WINTERS_CHILL_CHARGES } },
+    },
+  ],
+  // ---- Warlock ----
+  hexthread: [
+    {
+      pieces: 2,
+      // Needle of Fate grants 2 additional Condemnation: a resolved-ability
+      // rewrite in applyTalentMods bakes the bonus into the afflictionNeedle
+      // payload, the ONE number resolveNeedleOfFate and the {needleDoom}
+      // tooltip splice both read. eyeGeneration multiplies the total after
+      // (x0.5-with-rounding on secondary Coven Eyes pays +1; x2 under Hour of
+      // Judgment pays +4; both disclosed). The caster 2pc pushback rider rides
+      // the generic global knob. Deterministic, no rng involved.
+      effect: {
+        global: { castPushbackReduction: 1 },
+        tuning: { needleDoomBonus: HEXTHREAD_2PC_NEEDLE_DOOM_BONUS },
+      },
+    },
+    {
+      pieces: 4,
+      // Passing Sentence refunds 10 Condemnation: bespoke flag-gated refund at
+      // the post-consume site in resolveSentence (combat/affliction.ts),
+      // additive beside Hour of Judgment's once-per-90s 50-refund charge.
+      // Draws no rng; gainDoom is deterministic.
+      effect: { tuning: { sentenceDoomRefund: HEXTHREAD_4PC_SENTENCE_DOOM_REFUND } },
+    },
+  ],
+  gravebrand: [
+    {
+      pieces: 2,
+      // Reaping Command 8 -> 6 sec: a cooldownFlat row on the resolved entry,
+      // so the engine's cooldown set and the HUD's printed cooldown read the
+      // same number (+33 percent Reaping Commands, the set doc's honest
+      // sizing; the rotation is cooldown-bound in the probe). No cooldown
+      // leak: the row reaches entry.cooldown only, and the reaping rider
+      // auras (reaping_command_* ids, fixed 4/5/6 sec durations) are pinned
+      // untouched by the wave's tests. The Soul Fragment cost and bank stay
+      // pinned. The caster 2pc pushback rider rides the generic global knob.
+      effect: {
+        ability: [
+          {
+            ability: 'reaping_command',
+            cooldownFlat: -GRAVEBRAND_2PC_REAPING_COOLDOWN_CUT_SEC,
+          },
+        ],
+        global: { castPushbackReduction: 1 },
+      },
+    },
+    {
+      pieces: 4,
+      // Unison strikes deal 25 percent more: the multiplier lands inside
+      // reapingDamage via its ONE caller (reapWithUndead), before the round,
+      // so the Gravewing cleave (damage x cleave.mult) carries it too. The
+      // wearer is the OWNER, read once per command; pets carry no set-side
+      // aura, so an owner gear swap simply changes the next command's read
+      // (nothing to orphan or double-apply). Draws no rng.
+      effect: { tuning: { unisonDamageMult: GRAVEBRAND_4PC_UNISON_DAMAGE_MULT } },
+    },
+  ],
+  ruincaller: [
+    {
+      pieces: 2,
+      // Conflagrate holds 3 charges: the generic bonusCharges row stacks on
+      // the def's native maxCharges 2 (applyTalentMods resolves charges 3 /
+      // bonusCharges 2; casting_lifecycle's chargeState reads 1 + bonus = 3).
+      // Parallel per-charge recharge, so up to +50 percent throughput, net
+      // reduced by Burning Pact self-burn and Desolation overcap (disclosed).
+      // The {charges} description splice reads the same resolved count, so
+      // the printed line stays honest for wearers and everyone else. An
+      // unequip mid-fight clamps the pool through normalizeAbilityCharges
+      // (never a free charge). The caster 2pc pushback rider rides the
+      // generic global knob. Deterministic.
+      effect: {
+        ability: [
+          { ability: 'conflagrate', bonusCharges: RUINCALLER_2PC_CONFLAGRATE_BONUS_CHARGES },
+        ],
+        global: { castPushbackReduction: 1 },
+      },
+    },
+    {
+      pieces: 4,
+      // Ruinbolt strikes 20 percent harder, DELIVERED: the additive
+      // accumulator (talent_hit_mult.ts) folds this row beside the committed
+      // spec's 0.1 spellDmgPct baseline floor, so the row is 0.22
+      // (1.32 / 1.1 = 1.20 exactly; the constant's doc note records the set
+      // doc's 0.2-vs-0.22 deviation). The chaos_bolt tooltip's {damage}
+      // splice reads the resolved effect, so the printed number tracks the
+      // bend for wearers automatically. No other row targets chaos_bolt, so
+      // there is no row overlap. Deterministic.
+      effect: {
+        ability: [{ ability: 'chaos_bolt', dmgPct: RUINCALLER_4PC_CHAOS_BOLT_DMG_PCT }],
+      },
     },
   ],
 };

@@ -3912,7 +3912,9 @@ export function runEffects(
         break;
       }
       case 'afflictionNeedle': {
-        if (target) resolveNeedleOfFate(ctx, p, target);
+        // eff.doom is the RESOLVED payload (the Hexthread 2pc rewrite raises
+        // it for wearers), so the dispatch and the tooltip splice agree.
+        if (target) resolveNeedleOfFate(ctx, p, target, eff.doom);
         break;
       }
       case 'afflictionSentence': {
