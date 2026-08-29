@@ -11,7 +11,7 @@
 //    through the car. Zero per-frame CPU: every motion lives in shaders
 //    driven by sharedUniforms.uTime.
 import * as THREE from 'three';
-import { EMISSIVE_GLOW, sharedUniforms, surfaceMat } from './gfx';
+import { sharedUniforms } from './gfx';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 
 export const IGNIVAR_LIFT_GATE_HEIGHT = 7.2;
@@ -31,65 +31,15 @@ const CAR_Z_MAX = 8;
 const SHAFT_HEIGHT = 16; // the ignivar double wall course
 const SHAFT_SHEET_X = 8.7;
 
-function block(
-  name: string,
-  size: readonly [number, number, number],
-  position: readonly [number, number, number],
-  material: THREE.Material,
-): THREE.Mesh {
-  const mesh = new THREE.Mesh(new THREE.BoxGeometry(...size), material);
-  mesh.name = name;
-  mesh.position.set(...position);
-  mesh.castShadow = true;
-  mesh.receiveShadow = true;
-  return mesh;
-}
-
-/** The car's inner gate: a full-width iron portcullis. Closed drops the
- *  bars to the floor behind an ember-hot warning strip; open tucks bar
- *  stubs under the track and calms the strip. The shared frame (posts +
- *  track) never changes between poses. */
-export function buildIgnivarLiftGate(open: boolean): THREE.Group {
+/** The sealed lift gate renders NOTHING by the owner's direction: the car
+ *  wall itself seals the room (crossing is a teleport, never physical),
+ *  and the owner dresses the doorway with the lift kit's own door pieces.
+ *  On arrival the unlock swaps the entity to 'dungeon_door', which takes
+ *  the standard arch-and-swirl portal body: the portal appearing IS the
+ *  visible cue that the ride is over. */
+export function buildIgnivarLiftGate(_open: boolean): THREE.Group {
   const group = new THREE.Group();
-  group.name = open ? 'ignivar-lift-gate-open' : 'ignivar-lift-gate-locked';
-  const iron = surfaceMat({ color: 0x241b18, roughness: 0.52, metalness: 0.78 });
-  const track = surfaceMat({ color: 0x35281f, roughness: 0.62, metalness: 0.6 });
-  const strip = surfaceMat({
-    color: open ? 0x7a4326 : 0xff5a18,
-    emissive: open ? 0x2a1206 : 0xff2a08,
-    emissiveIntensity: open ? EMISSIVE_GLOW * 0.25 : EMISSIVE_GLOW,
-    roughness: 0.4,
-  });
-  const width = IGNIVAR_LIFT_GATE_HALF_WIDTH * 2;
-  group.add(
-    block(
-      'left-post',
-      [0.8, IGNIVAR_LIFT_GATE_HEIGHT, 0.9],
-      [-IGNIVAR_LIFT_GATE_HALF_WIDTH, 3.6, 0],
-      iron,
-    ),
-  );
-  group.add(
-    block(
-      'right-post',
-      [0.8, IGNIVAR_LIFT_GATE_HEIGHT, 0.9],
-      [IGNIVAR_LIFT_GATE_HALF_WIDTH, 3.6, 0],
-      iron,
-    ),
-  );
-  group.add(
-    block('bar-track', [width + 1.6, 0.9, 1.0], [0, IGNIVAR_LIFT_GATE_HEIGHT - 0.45, 0], track),
-  );
-  const barCount = 9;
-  const barLength = open ? 1.0 : IGNIVAR_LIFT_GATE_HEIGHT - 0.9;
-  const barTop = IGNIVAR_LIFT_GATE_HEIGHT - 0.9;
-  for (let index = 0; index < barCount; index++) {
-    const x = -IGNIVAR_LIFT_GATE_HALF_WIDTH + 0.9 + (index / (barCount - 1)) * (width - 1.8);
-    group.add(block(`bar-${index}`, [0.22, barLength, 0.22], [x, barTop - barLength / 2, 0], iron));
-  }
-  group.add(
-    block('ember-strip', [width - 1.4, 0.28, 0.5], [0, open ? barTop + 0.2 : 1.6, -0.2], strip),
-  );
+  group.name = 'ignivar-lift-gate-hidden';
   return group;
 }
 

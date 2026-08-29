@@ -368,29 +368,14 @@ export function ignivarCruciblePropPlacements(_layout: DungeonLayout): IgnivarPr
 }
 
 /** The Forge-Lift car (the raid's first room, interior 'ignivar_lift'):
- *  grille panels line both side walls so riders see the shaft scroll past
- *  through the bars (src/render/ignivar_lift_room.ts hangs the moving
- *  sheets between the grilles and the shell), the hoist machinery crowds
- *  the south end behind the arrivals, and the torch pillars ride the
- *  layout's pillar points like every ignivar room. The owner's placer
- *  pass (the lift asset kit) will refine this seed. */
-export function ignivarLiftPropPlacements(layout: DungeonLayout): IgnivarPropPlacement[] {
-  const placements: IgnivarPropPlacement[] = [
-    at('gate', -8, -3.4, 90 * DEG, 12),
-    at('gate', 8, -3.4, 270 * DEG, 12),
-    at('gate', -8, 2.6, 90 * DEG, 12),
-    at('gate', 8, 2.6, 270 * DEG, 12),
-    at('gear_wall_rusty', -6.6, -7.2, 45 * DEG, 10),
-    at('gear_wall_rusty', 6.6, -7.2, 315 * DEG, 10),
-    at('chain_hanging', -3.2, -1.2, 0.4, 8, 10),
-    at('chain_hanging', 3.2, -1.2, -0.4, 8, 10, true),
-    at('chain', -5.2, 4.6, 1.2, 8, 11),
-    at('chain', 5.2, 3.8, 0.7, 7, 12),
-    at('chain_link', 0, -7.4, 90 * DEG, 6),
-  ];
-  for (const pt of layout.pillars ?? [])
-    placements.push(at('pillar_slim', pt.x, pt.z, pt.x < 0 ? 90 * DEG : 270 * DEG, 15));
-  return placements;
+ *  DELIBERATELY EMPTY. The owner dresses the whole car by hand with the
+ *  lift asset kit (their placer export bakes here); everything the room
+ *  keeps regardless lives in other systems: the shell walls and torch
+ *  points in IGNIVAR_LIFT_LAYOUT, the sealed gate and both portals as
+ *  instance entities, and the descending-shaft illusion in
+ *  src/render/ignivar_lift_room.ts. */
+export function ignivarLiftPropPlacements(_layout: DungeonLayout): IgnivarPropPlacement[] {
+  return [];
 }
 
 export function ignivarPropPlacements(

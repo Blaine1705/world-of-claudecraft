@@ -33,24 +33,13 @@ function compile(material: THREE.Material): CompileShader {
 }
 
 describe('the forge-lift room render kit', () => {
-  it('drops the bars sealed and tucks them open around one shared frame', () => {
+  it('renders nothing while sealed (the owner dresses the doorway)', () => {
     const sealed = buildIgnivarLiftGate(false);
-    const open = buildIgnivarLiftGate(true);
-    for (const gate of [sealed, open]) {
-      expect(gate.getObjectByName('left-post')).toBeDefined();
-      expect(gate.getObjectByName('right-post')).toBeDefined();
-      expect(gate.getObjectByName('bar-track')).toBeDefined();
-      expect(gate.getObjectByName('ember-strip')).toBeDefined();
-    }
-    const sealedBar = sealed.getObjectByName('bar-6') as THREE.Mesh;
-    const openBar = open.getObjectByName('bar-6') as THREE.Mesh;
-    const sealedHeight = (sealedBar.geometry as THREE.BoxGeometry).parameters.height;
-    const openHeight = (openBar.geometry as THREE.BoxGeometry).parameters.height;
-    expect(sealedHeight).toBeGreaterThan(5);
-    expect(openHeight).toBeLessThanOrEqual(1.0);
-    // the bars reach the floor sealed, and hang under the track open
-    expect(sealedBar.position.y - sealedHeight / 2).toBeLessThan(0.1);
-    expect(openBar.position.y - openHeight / 2).toBeGreaterThan(4);
+    expect(sealed.name).toBe('ignivar-lift-gate-hidden');
+    expect(sealed.children.length).toBe(0);
+    // the arrival body is not this builder's: the unlock swaps the entity
+    // to 'dungeon_door', which takes the generic arch-and-swirl portal
+    expect(buildIgnivarLiftGate(true).children.length).toBe(0);
   });
 
   it('wraps the car in two shaft sheets and a dust cloud', () => {
