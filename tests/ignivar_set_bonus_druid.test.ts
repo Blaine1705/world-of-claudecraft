@@ -404,7 +404,7 @@ describe('Wildfang 2pc: Redharvest restores 45 energy, up from 30', () => {
 describe('Wildfang 4pc: Redharvest plants a fresh Flense on the target', () => {
   function redharvestReplant(wearer: boolean): {
     replanted: Aura | undefined;
-    realCastValue: number;
+    realCastAura: Aura;
     combo: number;
     oldBlood: number;
   } {
@@ -417,7 +417,7 @@ describe('Wildfang 4pc: Redharvest plants a fresh Flense on the target', () => {
     readyCast(sim, 'rake');
     sim.castAbility('rake');
     const realCast = expectDefined(ownDot(target, sim.player.id, 'rake'));
-    const realCastValue = realCast.value;
+    const realCastAura = { ...realCast };
     bankOldBlood(sim, 3);
     readyCast(sim, 'ferocious_bite');
     sim.player.comboPoints = 1;
@@ -425,7 +425,7 @@ describe('Wildfang 4pc: Redharvest plants a fresh Flense on the target', () => {
     expect(sim.resolvedAbility('ferocious_bite')?.def.id).not.toBe('redharvest'); // bank spent
     return {
       replanted: ownDot(target, sim.player.id, 'rake'),
-      realCastValue,
+      realCastAura,
       combo: sim.player.comboPoints,
       oldBlood: stacks(sim.player, OLD_BLOOD_ID),
     };
@@ -435,12 +435,17 @@ describe('Wildfang 4pc: Redharvest plants a fresh Flense on the target', () => {
     const bent = redharvestReplant(true);
     const replanted = expectDefined(bent.replanted);
     // The consumeDot cash-out removed the live bleed; this aura is the fresh
-    // replant, and its tick value equals the real cast's exactly (same
-    // authored bake, same Attack Power rider).
-    expect(replanted.value).toBe(bent.realCastValue);
+    // replant. Deep-compare the WHOLE aura (progress fields zeroed) against
+    // the real cast's shape: replantFlense hand-mirrors the effect_dispatch
+    // dot arm, so a field the real arm gains (leechPct, a rider) that the
+    // replant does not copy must fail HERE, not ship silently.
     expect(replanted.duration).toBe(18);
-    expect(replanted.remaining).toBe(18);
     expect(replanted.tickInterval).toBe(3);
+    expect({ ...replanted, remaining: 0, tickTimer: 0 }).toEqual({
+      ...bent.realCastAura,
+      remaining: 0,
+      tickTimer: 0,
+    });
   });
 
   it('is aura-only: no combo point, no Old Blood bank, and non-wearers get nothing', () => {
@@ -817,5 +822,19 @@ describe('the wearer literals against the authored copy', () => {
       min: 105,
       max: 125,
     });
+  });
+
+  it('extendDot and druidOverbloom stay single-user effect types (splice scoping)', () => {
+    // The ability_damage $t/$b arms for these two types are unconditional
+    // first-match returns, safe ONLY while each type has exactly one content
+    // user. A second ability adopting either type must widen the splice
+    // scoping (gate on the ability id) before this pin is re-anchored.
+    const usersOf = (type: string): string[] =>
+      Object.values(ABILITIES)
+        .filter((def) => def.effects.some((eff) => eff.type === type))
+        .map((def) => def.id)
+        .sort();
+    expect(usersOf('extendDot')).toEqual(['moonseed']);
+    expect(usersOf('druidOverbloom')).toEqual(['overbloom']);
   });
 });

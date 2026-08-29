@@ -10,6 +10,7 @@ import {
 } from '../content/ignivar_set_bonuses';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
+import { duelJustEndedBetween } from '../social/duel';
 import { abilityScalingPower, dotTickBonus, hotTickBonus } from '../spell_scaling';
 import { resolveTalentHitMult } from '../talent_hit_mult';
 import type { Aura, AuraKind, Entity } from '../types';
@@ -353,6 +354,11 @@ function replantWildbloom(ctx: SimContext, player: Entity, target: Entity): void
 // same actor, so the two computations cannot drift silently. No combo award,
 // no landed-strike bank, no rng.
 function replantFlense(ctx: SimContext, player: Entity, target: Entity): void {
+  // Mirror the dot arm's duel-end clamp (effect_dispatch 'dot'): this replant
+  // runs at onCastCompleted, strictly AFTER a same-tick duel end has stripped
+  // everything the caster inflicted, so without the guard it would stamp a
+  // fresh hostile bleed the clear can no longer catch.
+  if (duelJustEndedBetween(ctx, target, player)) return;
   const meta = player.kind === 'player' ? ctx.players.get(player.id) : undefined;
   if (!meta) return;
   const resolved = ctx.resolvedAbility('rake', player.id);
@@ -379,6 +385,7 @@ function replantFlense(ctx: SimContext, player: Entity, target: Entity): void {
     sourceId: player.id,
     school: dot.school ?? resolved.def.school,
   });
+  ctx.enterCombat(player, target);
 }
 
 export function resolveDruidOverbloom(
