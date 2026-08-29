@@ -65,10 +65,8 @@ export type IgnivarEnvPropKey =
   | 'lift_beam'
   | 'lift_frame'
   | 'lift_handle'
-  | 'lift_sliding_door'
   | 'lift_vertical_beam'
   | 'lift_weight'
-  | 'lift_winch'
   | 'lift_mount'
   | 'lift_spool'
   | 'stone_floor'
@@ -158,10 +156,8 @@ export const IGNIVAR_PROP_NATIVE: Record<
   lift_beam: { len: 1.0, hei: 0.38, dep: 0.14 },
   lift_frame: { len: 0.71, hei: 1.0, dep: 0.16 },
   lift_handle: { len: 0.44, hei: 1.0, dep: 0.34 },
-  lift_sliding_door: { len: 0.76, hei: 1.0, dep: 0.18 },
   lift_vertical_beam: { len: 0.18, hei: 1.0, dep: 0.13 },
   lift_weight: { len: 0.27, hei: 1.0, dep: 0.14 },
-  lift_winch: { len: 0.58, hei: 1.0, dep: 0.44 },
   // The winch remake: the static cradle and the spool that turns in it.
   lift_mount: { len: 0.98, hei: 1.0, dep: 0.95 },
   lift_spool: { len: 1.0, hei: 0.76, dep: 0.76 },
@@ -465,7 +461,6 @@ export const IGNIVAR_NON_COLLIDING_PROPS: ReadonlySet<IgnivarEnvPropKey> = new S
   'lift_beam',
   'lift_frame',
   'lift_handle',
-  'lift_sliding_door',
   'lift_weight',
   // The spool rides INSIDE its mount's cradle: the mount is the one solid
   // body of the pair, so the spinning drum can never snag a rider its own

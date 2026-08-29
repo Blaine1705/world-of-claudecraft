@@ -284,14 +284,6 @@ const ITEMS = [
     glowFloor: [36, 9, 6],
   },
   {
-    src: 'Lift_Assets/lift_sliding_door.glb',
-    name: 'lift_sliding_door',
-    tex: 1024,
-    emissive: 0.7,
-    hotBoost: 1.25,
-    glowFloor: [36, 9, 6],
-  },
-  {
     src: 'Lift_Assets/lift_vertical_beam.glb',
     name: 'lift_vertical_beam',
     tex: 1024,
@@ -307,16 +299,11 @@ const ITEMS = [
     hotBoost: 1.25,
     glowFloor: [36, 9, 6],
   },
-  {
-    src: 'Lift_Assets/lift_winch.glb',
-    name: 'lift_winch',
-    tex: 1024,
-    emissive: 0.7,
-    hotBoost: 1.25,
-    glowFloor: [36, 9, 6],
-  },
   // The winch remake (2026-08-29 second drop): the owner split the piece so
-  // only the spool turns; the mount is the static cradle it rides in.
+  // only the spool turns; the mount is the static cradle it rides in. The
+  // one-piece winch and the sliding door left the shipped set with the
+  // owner's third drop (zero placements; sources stay archived in
+  // tmp/asset_src for a future return).
   {
     src: 'Lift_Assets/lift_mount.glb',
     name: 'lift_mount',
