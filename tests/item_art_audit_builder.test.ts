@@ -747,11 +747,9 @@ describe('item-art audit builder', () => {
     expect(help).toContain('--refresh-verdict');
     expect(help).toContain('tmp/imagegen/item-art-consistency/final-audit');
 
-    // Moved by the Passing Stone icon (the death lesson's rite marker,
-    // rendered from its own shipped world model). `verdict: null` below is
-    // unchanged and is the point: the committed reviewed verdict covers the
-    // art as of its own review, and a newly added icon is deliberately NOT
-    // folded into it. It awaits an owner visual review of its own.
+    // The current digest includes the Passing Stone addition and the seven reviewed painted bag
+    // replacements. `verdict: null` is the point: verify-only validates the live catalog without
+    // rewriting the committed visual verdict.
     const verified = JSON.parse(
       execFileSync(process.execPath, ['scripts/item_art_audit.mjs', '--verify-only'], {
         cwd: repoRoot,
@@ -761,10 +759,10 @@ describe('item-art audit builder', () => {
     ) as Record<string, unknown>;
     expect(verified).toMatchObject({
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      catalogSha256: '2c07feabe3c173f63296c3189895f38373e17d303e3b004819ead32d5c485c8f',
-      catalogBytes: 455895,
+      catalogSha256: '49f7f271a1749f593004d68d24b622b1bcbd5ea6b6fe84f24b3742b69802d41a',
+      catalogBytes: 459544,
       rendererFingerprint: 'fd92c41a206cd55b05a1de94c4789f6eb6ca4200d063f4bbd284c21ae03b6082',
-      catalogCount: 831,
+      catalogCount: 838,
       // Derived from the live table, not restated from the script's expected
       // block, so the two cannot drift in lockstep.
       liveItemCount: Object.keys(ITEMS).length,
@@ -776,7 +774,7 @@ describe('item-art audit builder', () => {
       sheetCount: 208,
       sheetModeCounts: Object.fromEntries(ITEM_ART_AUDIT_MODES.map((mode) => [mode, 26])),
       sheetSetSha256: null,
-      shippingCatalogSha256: '232ed65a14b786f1904948476fb5119a670b760b12ff3f057c87c85632fb7e61',
+      shippingCatalogSha256: '4f89334df6f4d5a53d8dfe65193d383c1df8e36586e5e874f510d8db085ecf67',
       machineChecksPassed: true,
       verdict: null,
     });

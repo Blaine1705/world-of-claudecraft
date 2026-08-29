@@ -13,7 +13,12 @@
 // invisible beam reads worse than a shadow that pops with its caster.
 import type * as THREE from 'three';
 import { type ArenaWallFootprint, arenaWallSegmentHits } from './arena_wall_occlusion_core';
-import { applyOccluderFade, type OccluderFadeMat } from './occluder_fade';
+import {
+  advanceOccluderFade,
+  applyOccluderFade,
+  type OccluderFadeMat,
+  prefetchOccluderFadeWithin,
+} from './occluder_fade';
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
 import { cameraSeesWallBack, type WallCullPlane } from './wall_backface_cull_core';
 
@@ -88,27 +93,36 @@ export function updateWallOcclusion(
   reducedMotion = false,
 ): void {
   for (const h of hideables) {
-    const hide = h.backface
-      ? cameraSeesWallBack(h.backface, camX, camZ)
-      : arenaWallSegmentHits(h.footprint, eyeX, eyeY, eyeZ, camX, camY, camZ);
-    h.hidden = hide;
-    const floor = h.backface ? 0 : undefined;
-    if (occluderFadeSettled(h.alpha, hide, floor)) continue;
-    h.alpha = stepOccluderFade(h.alpha, hide, dt, reducedMotion, floor);
-    applyOccluderFade(h.mats, h.alpha);
-    if (h.backface) {
-      // At rest a culled wall stops drawing outright: the fade keeps
-      // depthWrite on (correct for the visible ghost), and an invisible
-      // depth-writing wall would clip mis-sorted transparent content behind
-      // it (the arena's lava moat). Program cost: the opaque program linked
-      // at interior attach; the TRANSPARENT twin links once per wall
-      // material on its first re-show (interior-built hideables sit outside
-      // the boot ghost prewarm, see occluder_ghost_prewarm.ts), the same
-      // one-time first-fade link every hideable wall already paid, moved
-      // from the hide frame to the re-show frame.
-      const show = h.alpha > 0;
-      if (h.group.visible !== show) h.group.visible = show;
+    if (!h.backface) {
+      // The classic sightline ghost draws its transparent twin, so it steps
+      // through the shared gated advance: the flip waits for the linked fade
+      // program, warmed ahead by the within-reach prefetch (occluder_fade.ts).
+      prefetchOccluderFadeWithin(h.mats, h.footprint.x, h.footprint.z, camX, camZ);
+      const hide = arenaWallSegmentHits(h.footprint, eyeX, eyeY, eyeZ, camX, camY, camZ);
+      h.hidden = hide;
+      h.alpha = advanceOccluderFade(h.mats, h.alpha, hide, dt, reducedMotion);
+      continue;
     }
+    const hide = cameraSeesWallBack(h.backface, camX, camZ);
+    h.hidden = hide;
+    if (occluderFadeSettled(h.alpha, hide, 0)) continue;
+    h.alpha = stepOccluderFade(h.alpha, hide, dt, reducedMotion, 0);
+    applyOccluderFade(h.mats, h.alpha);
+    // At rest a culled wall stops drawing outright: the fade keeps
+    // depthWrite on (correct for the visible ghost), and an invisible
+    // depth-writing wall would clip mis-sorted transparent content behind
+    // it (the arena's lava moat). Program cost: the opaque program linked
+    // at interior attach; the TRANSPARENT twin links once per wall
+    // material on its first re-show (interior-built hideables sit outside
+    // the boot ghost prewarm, see occluder_ghost_prewarm.ts), the same
+    // one-time first-fade link every hideable wall already paid, moved
+    // from the hide frame to the re-show frame. That accepted one-time link
+    // is why this arm keeps the ungated floor step instead of the gated
+    // advance: the hide frame never draws the transparent twin (the group
+    // hides outright), and holding the ease-back while the group is already
+    // visible again would pop the wall back at full opacity.
+    const show = h.alpha > 0;
+    if (h.group.visible !== show) h.group.visible = show;
   }
   for (const b of propBindings) {
     const hide = cameraSeesWallBack(b.plane, camX, camZ);

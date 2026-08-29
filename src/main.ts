@@ -151,6 +151,8 @@ import { music } from './game/music';
 import { tryNearbyInteraction } from './game/nearby_interaction';
 import { nextNpcTarget } from './game/npc_cycle';
 import { isOfflineModeAvailable } from './game/offline_mode_gate';
+import { padCastPress, padCastRelease } from './game/pad_cast_routing';
+import { createGroundAimReticleSync, padGroundAimCallbacks } from './game/pad_ground_aim_wiring';
 import { padReelItemId } from './game/pad_reel';
 import { openTargetSubcommands } from './game/pad_subcommands';
 import { createPadTargetPick } from './game/pad_target_pick';
@@ -176,6 +178,7 @@ import {
   spawnCinematicFor,
   spawnCinematicPose,
 } from './game/spawn_cinematic';
+import { markSpawnIntroSeen, readSpawnIntroSeen } from './game/spawn_intro_seen';
 import { safeStartupGraphicsPreset } from './game/startup_graphics_safety';
 import { shouldClearTargetOnGroundClick } from './game/target_click';
 import {
@@ -259,6 +262,7 @@ import { openStripeCheckout } from './net/stripe_checkout';
 import type { WalletOption, WalletPickerMode, WalletPickerResult } from './net/wallet';
 import { resolveWalletCapability } from './net/wallet_capability';
 import { installWalletResumeHandlers } from './net/wallet_resume';
+import { setArrivalEstablishingShot } from './render/arrival_cover';
 import {
   prepareGraphicsProfileAssets,
   resetGraphicsProfileDerivedCaches,
@@ -1995,12 +1999,12 @@ async function startGame(
   hud.onIslandFirstArrival = () => {
     // Reduce motion is the EFFECTIVE flag (OS query OR in-game switch, the
     // spawn intro's contract below): a 4.5 s sweeping camera fall is exactly
-    // what that contract exists for, so it never starts and the arrival lands
-    // at the ordinary chase framing.
+    // what that contract exists for. A newborn's landing under the spawn intro
+    // yields too: introCameraTick overwrites this fall every frame.
     const osReduced =
       typeof window.matchMedia === 'function' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (settings.get('reduceMotion') || osReduced) return;
+    if (intro !== null || settings.get('reduceMotion') || osReduced) return;
     startArrivalCinematic(arrivalCinematic, input.camDist, input.camPitch);
   };
 
@@ -2168,7 +2172,7 @@ async function startGame(
     }
     if (!canUseGameKeysNow()) return; // suppress play actions while a modal/chat is up
     if (id.startsWith('slot')) {
-      hud.castSlot(Number(id.slice(4)));
+      hud.pressSlot(Number(id.slice(4)));
       return;
     }
     hud.cancelGroundAim();
@@ -2334,13 +2338,17 @@ async function startGame(
         cameraPromptOpen(),
         document.getElementById('race-start-btn')?.style.display === 'block',
       ),
+    ...padGroundAimCallbacks({
+      hud,
+      world: () => world,
+      camYaw: () => input.camYaw,
+      reticleSpeed: () => settings.get('gamepadReticleSpeed'),
+    }),
     getPlayerHealth: () => (world.player.dead ? 0 : world.player.hp),
     onConnectionChange: () => crossHotbar.syncPadMode(gamepad),
     onActivity: createGamepadActivityNotifier(desktopBridge()),
-    onCrossHotbarCast: (action) => {
-      padTargetPick.autoTarget(action);
-      hud.castCrossHotbarAction(action);
-    },
+    onCrossHotbarCast: (action) => padCastPress(hud, padTargetPick.autoTarget, action),
+    onCastRelease: (hold) => padCastRelease(hud, hold),
     onOpenSpellbook: () => hud.openSpellbook(),
     ...crossHotbar.padCallbacks(() => gamepad.getKind()),
   });
@@ -2466,10 +2474,10 @@ async function startGame(
       settings.set('filterProfanity', !!value);
       return;
     }
-    if (key === 'startAttackOnAbilityUse') {
-      // No live subsystem to update: the HUD reads this setting at ability-cast
+    if (key === 'startAttackOnAbilityUse' || key === 'touchPreciseGroundAim') {
+      // No live subsystem to update: the HUD reads these settings at ability-cast
       // time (see hud.castSlot). Persist the choice and we are done.
-      settings.set('startAttackOnAbilityUse', !!value);
+      settings.set(key, !!value);
       return;
     }
     if (key === 'stopAutoAttackOnTargetSwitch') {
@@ -3059,6 +3067,8 @@ async function startGame(
     },
     captureKey: (cb) => input.captureNextKey(cb),
     settings,
+    groundAimTargetAttackable: (targetId) =>
+      isAttackableEntity(world.entities.get(targetId), world.playerId, activePvpOpponentIds(world)),
     onSettingChange: (key, value) => applySetting(key, value),
     graphicsApplied: () => appliedGraphicsSettings,
     applyGraphics: async (draft) => {
@@ -3152,6 +3162,9 @@ async function startGame(
     const priorOnReconnected = online.onReconnected;
     online.onReconnected = () => {
       priorOnReconnected?.();
+      // A ground aim armed before the drop is anchored to a stale world; the
+      // rebuilt mirror may place the player elsewhere entirely.
+      hud.cancelGroundAim();
       hud.marketResyncAfterReconnect();
       // A fresh join (as opposed to a resume within the linkdead grace window)
       // hands the server a brand-new PlayerMeta with stopAutoAttackOnTargetSwitch
@@ -3401,12 +3414,12 @@ async function startGame(
           throw new Error(claudiumCheckoutErrorText(err));
         });
       },
-      spend: async (itemId, kind, expectedCostClaudium) => {
+      spend: async (itemId, kind, expectedCostClaudium, idempotencyKey) => {
         const result = await economy.spend({
           itemId,
           kind,
           expectedCostClaudium,
-          idempotencyKey: newIdempotencyKey(),
+          idempotencyKey: idempotencyKey ?? newIdempotencyKey(),
         });
         return {
           granted: result.granted,
@@ -3529,32 +3542,15 @@ async function startGame(
   }
 
   function syncGroundAimReticle(): void {
-    if (!hud.isGroundAimActive()) {
-      renderer.setGroundAimReticle(null);
-      return;
-    }
-    // Touch placement is updated directly by MobileControls. Some mobile
-    // Chromium builds also expose a synthetic hover cursor parked at (0, 0);
-    // reading it here would erase the finger-owned point every render frame.
-    if (!document.body.classList.contains('mobile-touch')) {
-      const cursor = input.cursorPoint();
-      hud.updateGroundAimPoint(
-        cursor ? renderer.groundPoint(cursor.x, cursor.y, world.player.pos.y) : null,
-      );
-    }
-    const reticle = hud.groundAimReticle();
-    renderer.setGroundAimReticle(
-      reticle
-        ? {
-            x: reticle.point.x,
-            z: reticle.point.z,
-            radius: reticle.radius,
-            school: reticle.school,
-            dimmed: reticle.clamped,
-          }
-        : null,
-    );
+    groundAimReticleSync();
   }
+  const groundAimReticleSync = createGroundAimReticleSync({
+    hud,
+    isMobileTouch: () => document.body.classList.contains('mobile-touch'),
+    cursorPoint: () => input.cursorPoint(),
+    groundPoint: (x, y) => renderer.groundPoint(x, y, world.player.pos.y),
+    setReticle: (reticle) => renderer.setGroundAimReticle(reticle),
+  });
 
   function handlePick(x: number, y: number, button: number): void {
     if (hud.isGroundAimActive()) {
@@ -4087,7 +4083,9 @@ async function startGame(
     let facing: number | null = mouselook ? input.camYaw : null;
     // A teleport (door, portal, spirit release) invalidates any pending
     // click-to-move: the destination is across the transition, and chasing it
-    // walks the player straight back into the trigger.
+    // walks the player straight back into the trigger. An armed ground aim is
+    // anchored to the prior position the same way, so it drops with it.
+    if (clickMoveBrokenByTeleport(lastResolveMovePos, playerPos)) hud.cancelGroundAim();
     if (input.clickMoveTarget && clickMoveBrokenByTeleport(lastResolveMovePos, playerPos)) {
       input.clearClickMove();
     }
@@ -4440,6 +4438,7 @@ async function startGame(
     );
     const playerDead = world.player.dead;
     if (shouldClearAutorunOnDeath(playerWasDead, playerDead)) {
+      hud.cancelGroundAim();
       input.setAutorun(false);
       mobileControls.syncAutorun(false);
     }
@@ -4921,14 +4920,7 @@ async function startGame(
   // has no Escape key) skips straight to the end; other input is swallowed
   // while it runs. Seen-state persists per character so it plays exactly once;
   // reduce-motion players go straight to gameplay.
-  const INTRO_SEEN_KEY = `woc_spawn_intro_seen:${keybindScope}`;
-  let introSeen = true;
-  try {
-    introSeen = localStorage.getItem(INTRO_SEEN_KEY) === '1';
-  } catch {
-    // storage unavailable: the seen marker can't persist, so treat the intro as
-    // seen rather than replaying it on every boot
-  }
+  const introSeen = readSpawnIntroSeen(keybindScope);
   let intro: { cinematic: SpawnCinematic; startedAt: number | null } | null = null;
   // Wordmark overlay: fades in/hold/out over the opening of the intro cinematic
   // (see logo_fade.ts for the pure timing curve), well clear of the landing.
@@ -4949,6 +4941,9 @@ async function startGame(
     if (!intro) return;
     const end = intro.cinematic.end;
     intro = null;
+    // A skip under the curtain: the establishing shot is off, so the entry
+    // cover's remaining consults go back to the ordinary priority.
+    setArrivalEstablishingShot(false);
     if (skipToEnd) {
       input.camYaw = end.yaw;
       input.camPitch = end.pitch;
@@ -4958,11 +4953,7 @@ async function startGame(
     setIntroUiHidden(false);
     window.removeEventListener('keydown', skipIntro, true);
     window.removeEventListener('pointerdown', skipIntro, true);
-    try {
-      localStorage.setItem(INTRO_SEEN_KEY, '1');
-    } catch {
-      // storage unavailable: worst case the intro replays next session
-    }
+    markSpawnIntroSeen(keybindScope);
   };
   const introTaps: number[] = [];
   const skipIntro = (e: Event): void => {
@@ -5272,6 +5263,9 @@ async function startGame(
         adaptiveBudget: GFX.autoGovernor,
         constrainedMemory: GFX.constrainedMemory,
         online: online !== null,
+        // The intro opens on a wide establishing shot of the village: hold the
+        // curtain, bounded, until what that shot sees has linked.
+        establishingShot: intro !== null,
         revealWorld,
       });
     }),

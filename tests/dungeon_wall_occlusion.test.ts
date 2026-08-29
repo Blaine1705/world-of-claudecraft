@@ -18,9 +18,10 @@ const DT = 1 / 60;
 
 function hideable(backface?: WallHideable['backface']): WallHideable {
   const mat = new THREE.MeshStandardMaterial();
+  const mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), mat);
   return {
     group: new THREE.Group(),
-    mats: [occluderFadeMat(mat)],
+    mats: [occluderFadeMat(mat, mesh)],
     hidden: false,
     alpha: 1,
     // footprint spans x -5..5 at z -58, top 16 (approach entry shape)

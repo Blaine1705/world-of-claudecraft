@@ -1025,16 +1025,31 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the v0.40.0 sync merge into the guild pledge branch (the
 // OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
 // both sides). No capture was retaken.
+// Re-minted for the entry-horizon scenery cull (renderer.ts hands the four
+// reveal-gated painters the horizon-capped cull far at both frame sites): the
+// renderer integration leaf moved. No capture was retaken.
+// Re-minted for the battleground field-stream compile gate (renderer.ts
+// injects the gate at the buildBattleground site; renderer.ts is a
+// provenance input). No capture was retaken.
+// Re-minted for the v0.41.0 sync merge into the entry-fade-gate branch (the
+// compile-gate batch landed on the release arm; renderer inputs moved on
+// both sides). No capture was retaken.
+// Re-minted for the sixth v0.41.0 sync merge into the ground-aim branch: the
+// first-order composite follows the merged renderer.ts (the entry-fade arm's
+// scenery cull beside this branch's aim blocked pass-through), then these
+// seals follow the swept evidence bytes. No capture was retaken.
 // Re-minted after the Forgefather strike-route call-site swap in renderer.ts
 // (routeVarkhulForgeHammer replaced the bare forge-hammer dispatch) moved the
 // runtimeRender.renderer leaf. No capture was retaken.
 // Re-minted for the raid encounter tuning PR's nameplate direct-click pick
 // integration in renderer.ts: the first-order composite follows those bytes,
 // then these seals follow the swept evidence bytes. No capture was retaken.
+// Re-minted on the v0.41.0 base sync into the raid branch (renderer and
+// evidence inputs moved on both arms). No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '10c7ac9d261580b16c97ca8e755460ef932157fb2ef2ae50da98d8ee953517d2';
+  'f2121292a61cc07bb851cd4c9a619f91729c74366b833b03f66e3a4f80c0a9b9';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '5d8f5a693c47ad4237243e48ca8b0ce7b96822026b293a228f2462ae52991168';
+  '7bcff8789b34357b03fbe699d6dff1bab405732ad12dfe14552b4630445706bd';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2181,14 +2196,25 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
     // both sides): same order, the composite first, then this seal. No capture
     // was retaken.
+    // Re-minted for the entry-horizon scenery cull (renderer.ts edit only):
+    // same order, the composite first, then this seal. No capture was retaken.
+    // Re-minted for the battleground field-stream compile gate (renderer.ts
+    // provenance input moved): same order, the composite first, then this
+    // seal. No capture was retaken.
+    // Re-minted for the v0.41.0 sync merge into the entry-fade-gate branch:
+    // same order, the composite first, then this seal. No capture was retaken.
+    // Re-minted for the sixth v0.41.0 sync merge into the ground-aim branch:
+    // same order, the composite first, then this seal. No capture was retaken.
     // Re-minted for the raid encounter tuning PR's nameplate direct-click pick
     // integration in renderer.ts: the composite first, then this second-order
     // performance seal follows the swept evidence bytes. No capture was
     // retaken.
+    // Re-minted on the v0.41.0 base sync into the raid branch (both arms'
+    // renderer inputs land together). No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('3ca3984caca85b30293e596d8412599230e08e828963bddd643a545bd3c4cbfa');
+    ).toBe('b63ebeaa548e9be406e7b02b67c58cff59ab54df7f6cf5cc8478aca38023a90b');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
