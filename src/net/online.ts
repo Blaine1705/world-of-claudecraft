@@ -174,12 +174,12 @@ import {
   type CivicServicePlacementsReader,
   createCivicServicePlacementsReader,
 } from './civic_service_placements';
-import { dungeonEntrySnapshotFacing } from './dungeon_entry_facing';
 import {
   type DesktopWalletBrowserAction,
   type DesktopWalletStatus,
   parseDesktopWalletHandoffStatus,
 } from './desktop_wallet_handoff';
+import { dungeonEntrySnapshotFacing } from './dungeon_entry_facing';
 import {
   decodeConsecrations,
   decodeFrostRings,

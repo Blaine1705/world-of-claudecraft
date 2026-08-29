@@ -7689,8 +7689,110 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.varkhulWaveStatus': 'ウェーブ {wave}/{waves} | 敵: {remaining}',
   'hudChrome.raidBossGuide.title': 'ボス攻略',
   'hudChrome.raidBossGuide.button': '攻略: {boss}',
-  'hudChrome.raidBossGuide.subtitle': '{boss} | 通常・英雄',
+  'hudChrome.raidBossGuide.subtitle': '{boss} | {difficulty}',
   'hudChrome.raidBossGuide.close': 'ボス攻略を閉じる',
+  'hudChrome.raidBossGuide.bossesLabel': 'レイドボス',
+  'hudChrome.raidBossGuide.difficultyLabel': '難易度',
+  'hudChrome.raidBossGuide.normal': '通常',
+  'hudChrome.raidBossGuide.heroic': '英雄',
+  'hudChrome.raidBossGuide.portraitAlt': '{boss}の戦闘ポートレート',
+  'hudChrome.raidBossGuide.overviewHeading': '概要',
+  'hudChrome.raidBossGuide.abilitiesHeading': 'アビリティ',
+  'hudChrome.raidBossGuide.whatToDo': '対処法',
+  'hudChrome.raidBossGuide.whatToDoResponse': '対処法: {response}',
+  'hudChrome.raidBossGuide.rolesLabel': 'ロール別の役割',
+  'hudChrome.raidBossGuide.flagsLabel': 'メカニクス警告',
+  'hudChrome.raidBossGuide.roleTank': 'タンク',
+  'hudChrome.raidBossGuide.roleHealer': 'ヒーラー',
+  'hudChrome.raidBossGuide.roleDamage': 'ダメージ',
+  'hudChrome.raidBossGuide.roleAll': '全ロール',
+  'hudChrome.raidBossGuide.flagDeadly': '致命的',
+  'hudChrome.raidBossGuide.flagInterruptible': '中断可能',
+  'hudChrome.raidBossGuide.flagImportant': '重要',
+  'hudChrome.raidBossGuide.flagCleansable': '解除可能',
+  'hudChrome.raidBossGuide.browseBoss': '{boss}を表示',
+  'hudChrome.raidBossGuide.chooseDifficulty': '{difficulty}のメカニクスを表示',
+  'hudChrome.raidBossGuide.expandAbility': '{ability}を展開',
+  'hudChrome.raidBossGuide.collapseAbility': '{ability}を折りたたむ',
+  'hudChrome.raidBossGuide.abilityControlLabel': '{action}。{details}',
+  'hudChrome.raidBossGuide.tooltipMeta': '{phase} | {difficulty}',
+  'hudChrome.raidBossGuide.ignivar.overview':
+    'ヴァークルはイグニヴァルを先触れ、生ける封印、そして内なるるつぼへの鍵として鍛造した。この戦闘では水路の制御、正確な移動、優先目標への素早い攻撃が試される。',
+  'hudChrome.raidBossGuide.ignivar.phaseOpeningName': '先触れの目覚め',
+  'hudChrome.raidBossGuide.ignivar.phaseOpeningSummary':
+    '水路で火葬の印を処理しながら、イグニヴァルが繰り返す前方攻撃、空からの炎、回転光線、拡大する鍛冶波に対処する。',
+  'hudChrome.raidBossGuide.ignivar.phaseApocalypseName': '幕間：黙示録',
+  'hudChrome.raidBossGuide.ignivar.phaseApocalypseSummary':
+    '体力{health}で、イグニヴァルは戦闘を終わらせようとするアッシュコーラーを召喚する。',
+  'hudChrome.raidBossGuide.ignivar.phaseJudgmentName': '鍛冶場の審判',
+  'hudChrome.raidBossGuide.ignivar.phaseJudgmentSummary':
+    '体力{health}で、イグニヴァルは闘技場を燃やし、三つの避難所のうち一つだけ安全な場所を示す。',
+  'hudChrome.raidBossGuide.ignivar.phaseJudgmentHeroicSummary':
+    '体力{health}で、イグニヴァルは闘技場を燃やす。安全地帯の中でも有効な印が周囲のプレイヤーを脅かし続ける。',
+  'hudChrome.raidBossGuide.ignivar.phaseFinaleName': '最終段階：最後の業火',
+  'hudChrome.raidBossGuide.ignivar.phaseFinaleSummary':
+    '体力{health}で、イグニヴァルは厳しい時間制限のある最終攻撃段階に入り、繰り返すメカニクスも加速する。',
+  'hudChrome.raidBossGuide.ignivar.forgeStrikeName': '鍛冶の一撃',
+  'hudChrome.raidBossGuide.ignivar.forgeStrikeSummary':
+    'イグニヴァルは現在のタンクを攻撃し、イグニヴァルから受けるダメージを増加させる溶融鎧を付与する。',
+  'hudChrome.raidBossGuide.ignivar.forgeStrikeResponse':
+    'タンクは{stacks}スタックで交代する。ヒーラーは一撃と、新しいタンクが受ける最初の近接攻撃に備える。',
+  'hudChrome.raidBossGuide.ignivar.brandName': '火葬の印',
+  'hudChrome.raidBossGuide.ignivar.brandSummary':
+    'イグニヴァルはタンク以外のプレイヤーに継続する炎ダメージの印を付ける。対象者は近くの味方も燃やす。',
+  'hudChrome.raidBossGuide.ignivar.brandResponse':
+    '散開する。灼熱の奔流を使用可能な水路へ向け、印を受けた各プレイヤーが一人ずつ有効になった水を渡って解除する。',
+  'hudChrome.raidBossGuide.ignivar.brandHeroicResponse':
+    '散開する。灼熱の奔流で水路を開き、印を一人ずつ解除する。解除するたびにレイド全体へ浄化の反動が発生する。',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentName': '灼熱の奔流',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentSummary':
+    'イグニヴァルはプレイヤー一人を追跡し、広い前方攻撃を放つ。攻撃が使用可能な水路に当たると、短時間だけ有効になる。',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentHeroicSummary':
+    'イグニヴァルはプレイヤー一人を追跡し、ほぼ致命的な広い前方攻撃を放つ。攻撃が使用可能な水路に当たると、短時間だけ有効になる。',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentResponse':
+    '予告範囲を使用可能な水路一つだけに通す。他の全員は詠唱完了前に前方範囲から離れる。',
+  'hudChrome.raidBossGuide.ignivar.rainName': '灰の雨',
+  'hudChrome.raidBossGuide.ignivar.rainSummary':
+    '三つの炎の区画と表示付き隕石が、予告範囲に残ったプレイヤーへダメージを与える。',
+  'hudChrome.raidBossGuide.ignivar.rainHeroicSummary':
+    '三つの炎の区画と表示付き隕石が、予告範囲に残ったプレイヤーへ極めて大きなダメージを与える。',
+  'hudChrome.raidBossGuide.ignivar.rainResponse': '印のない隙間へ移動し、着弾前にすべての隕石範囲から離れる。',
+  'hudChrome.raidBossGuide.ignivar.raysName': '回転する業火',
+  'hudChrome.raidBossGuide.ignivar.raysSummary':
+    '回転する炎の光線がイグニヴァルの周囲を掃き、触れたプレイヤーへ繰り返しダメージを与える。',
+  'hudChrome.raidBossGuide.ignivar.raysHeroicSummary':
+    '回転する炎の光線がイグニヴァルの周囲を掃き、触れるたびに大きなダメージを繰り返し与える。',
+  'hudChrome.raidBossGuide.ignivar.raysResponse':
+    '光線の間の空間に合わせて動く。高速移動アビリティを使っても光線を横切らない。',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveName': '鍛冶波',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveSummary':
+    '拡大する炎の壁が闘技場を横切り、向かい合う二つの隙間を残して、命中したプレイヤーをノックバックする。',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveHeroicSummary':
+    '拡大する炎の壁が闘技場を横切り、向かい合う二つの隙間を残して、命中したプレイヤーをさらに遠くへノックバックする。',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveResponse':
+    '予告中にどちらかの隙間を見つけて位置を合わせ、闘技場の端へ飛ばされないようにする。',
+  'hudChrome.raidBossGuide.ignivar.apocalypseName': '黙示録',
+  'hudChrome.raidBossGuide.ignivar.apocalypseSummary':
+    'イグニヴァルはアッシュコーラーを召喚する。追加敵が黙示録を唱え終えるとレイドは即座に敗北する。',
+  'hudChrome.raidBossGuide.ignivar.apocalypseResponse':
+    '攻撃できる全員がイグニヴァル・アッシュコーラーへ切り替え、詠唱完了前に倒す。',
+  'hudChrome.raidBossGuide.ignivar.judgmentName': '鍛冶場の審判',
+  'hudChrome.raidBossGuide.ignivar.judgmentSummary':
+    'イグニヴァルは三つの避難所を示し、一つの安全地帯を特定した後、闘技場の残りを繰り返し燃やす。',
+  'hudChrome.raidBossGuide.ignivar.judgmentHeroicSummary':
+    '闘技場が燃える間、イグニヴァルは一つの安全地帯を示す。火葬の印は残り、近くの味方へダメージを与え続ける。',
+  'hudChrome.raidBossGuide.ignivar.judgmentResponse':
+    '予告中に特別な印の避難所を見分け、床が燃える前に全員で境界の内側へ入る。',
+  'hudChrome.raidBossGuide.ignivar.chainsName': '鍛冶の鎖',
+  'hudChrome.raidBossGuide.ignivar.chainsSummary':
+    'イグニヴァルは近くの二人をつなぐ。離れすぎるか、別のペアの鎖を横切ると致命的なダメージを受ける。',
+  'hudChrome.raidBossGuide.ignivar.chainsResponse':
+    'つながった相手の近くで一緒に動き、他のプレイヤーを自分たちの鎖に通さない。',
+  'hudChrome.raidBossGuide.ignivar.lastInfernoName': '最後の業火',
+  'hudChrome.raidBossGuide.ignivar.lastInfernoSummary':
+    'イグニヴァルは激怒して全滅攻撃を準備し、灰の雨、灼熱の奔流、回転する業火が加速する。',
+  'hudChrome.raidBossGuide.ignivar.lastInfernoResponse':
+    '残った攻撃と回復のクールダウンを使い、移動メカニクスを処理し続け、カウント終了前にイグニヴァルを倒す。',
   'hudChrome.raidBossGuide.ignivar.brand':
     '火葬の印: 散開する。灼熱の奔流を使用可能な水路へ向け、一人で水を渡って解除する。',
   'hudChrome.raidBossGuide.ignivar.movement':
@@ -7703,6 +7805,94 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '最後の業火: 加速した隕石、前方攻撃、回転する業火に対処しながら全滅前にイグニヴァルを倒す。',
   'hudChrome.raidBossGuide.ignivar.heroic':
     '英雄: 鍛冶の鎖ではペア同士が近くに留まり、審判中も印が残り、鍛冶波はプレイヤーをさらに遠くへ押し出す。',
+  'hudChrome.raidBossGuide.varkhul.overview':
+    'ヴァークルは死にゆく最後の泉を閉じ込めて生ける金属を鍛え、その罪を守るためにイグニヴァルを造った。この戦闘では個人の位置取りと、レイド全体による大鍛冶炉の制御が組み合わされる。',
+  'hudChrome.raidBossGuide.varkhul.phaseOpeningName': '鍛冶の父',
+  'hudChrome.raidBossGuide.varkhul.phaseOpeningSummary':
+    'ヴァークルはタンクへの圧力、広い前方攻撃、移動する投射物、全員で受ける攻撃、隕石の波、大金床からの攻撃を繰り返す。',
+  'hudChrome.raidBossGuide.varkhul.phaseAssemblyName': '幕間：師匠の組立',
+  'hudChrome.raidBossGuide.varkhul.phaseAssemblySummary':
+    '体力{health}でヴァークルは守られ、鍛冶軍団がポータルから現れる。柱の光線は鍛冶炉の崩壊を引き起こそうとする。',
+  'hudChrome.raidBossGuide.varkhul.phaseFinaleName': '最終段階：解き放たれた傑作',
+  'hudChrome.raidBossGuide.varkhul.phaseFinaleSummary':
+    '体力{health}でヴァークルは攻撃が速くなり、ダメージが増え、最終期限までレイドへ炎を繰り返し放つ。',
+  'hudChrome.raidBossGuide.varkhul.phaseFinaleHeroicSummary':
+    '体力{health}でヴァークルは以前のメカニクスの大半をやめ、世界炎が内側へ迫ってるつぼを飲み込む。',
+  'hudChrome.raidBossGuide.varkhul.makersBrandName': '創造者の印',
+  'hudChrome.raidBossGuide.varkhul.makersBrandSummary':
+    'ヴァークルは現在のタンクを攻撃し、自身から受けるすべてのダメージを増加させる累積効果を付与する。',
+  'hudChrome.raidBossGuide.varkhul.makersBrandResponse':
+    'タンクは{stacks}スタックで交代する。ヒーラーはヴァークルが対象を変える前に次のタンクを守る。',
+  'hudChrome.raidBossGuide.varkhul.frontalName': '鍛冶の父の薙ぎ払い',
+  'hudChrome.raidBossGuide.varkhul.frontalSummary':
+    'ヴァークルは非常に広い前方薙ぎ払いを放ち、前方にいる全員へ大きな炎ダメージを与える。',
+  'hudChrome.raidBossGuide.varkhul.frontalHeroicSummary':
+    'ヴァークルは非常に広い前方薙ぎ払いを放ち、前方にいる全員へほぼ致命的な炎ダメージを与える。',
+  'hudChrome.raidBossGuide.varkhul.frontalResponse':
+    'ヴァークルを常にグループの反対へ向け、予告が出たらすぐ背後へ移動する。',
+  'hudChrome.raidBossGuide.varkhul.orbsName': '灰のオーブ',
+  'hudChrome.raidBossGuide.varkhul.orbsSummary':
+    '印を受けたタンク以外のプレイヤーは残る炎の床を落とし、全方向へ炎のオーブを放つ。赤熱した金属は受ける回復も吸収する。',
+  'hudChrome.raidBossGuide.varkhul.orbsHeroicSummary':
+    '印を受けたタンク以外のプレイヤーは高威力で残る炎の床を落とし、全方向へ危険な炎のオーブを放つ。赤熱した金属は受ける回復も吸収する。',
+  'hudChrome.raidBossGuide.varkhul.orbsResponse':
+    '印を部屋の外周へ運び、炎の床同士を離し、闘技場を横切るオーブを避ける。ヒーラーは回復吸収を素早く消す。',
+  'hudChrome.raidBossGuide.varkhul.pyreName': '共有の火葬',
+  'hudChrome.raidBossGuide.varkhul.pyreSummary':
+    '移動する円が赤熱した金属のないプレイヤー一人を追う。ダメージは円内で分担され、不足する一人ごとにレイド全体が最大体力の{missingPenalty}のダメージを受ける。',
+  'hudChrome.raidBossGuide.varkhul.pyreHeroicSummary':
+    '移動する円が赤熱した金属のないプレイヤー一人を追い、より大きな一撃を分担する。不足する一人ごとにレイド全体が最大体力の{missingPenalty}のダメージを受ける。',
+  'hudChrome.raidBossGuide.varkhul.pyreResponse':
+    '円の中に少なくとも{players}人で集合し、詠唱が解決するまで対象者と一緒に動く。',
+  'hudChrome.raidBossGuide.varkhul.forgestormName': '鍛冶嵐',
+  'hudChrome.raidBossGuide.varkhul.forgestormSummary':
+    'ヴァークルは闘技場全体へ、表示付き隕石を連続{waves}波降らせる。',
+  'hudChrome.raidBossGuide.varkhul.forgestormHeroicSummary':
+    'ヴァークルは極めて大きなダメージを与える表示付き隕石を連続{waves}波降らせる。',
+  'hudChrome.raidBossGuide.varkhul.forgestormResponse':
+    '地面に出る新しい予告を毎回確認し、その波が落ちる前に離れる。次の波を確認せず元の位置へ戻らない。',
+  'hudChrome.raidBossGuide.varkhul.rayName': '焼き入れ光線',
+  'hudChrome.raidBossGuide.varkhul.raySummary':
+    '光線が印を受けたプレイヤーを長く追跡する。ヴァークルと対象の間に最初に入った別のプレイヤーが攻撃を受け、焼き入れの傷を得る。',
+  'hudChrome.raidBossGuide.varkhul.rayResponse':
+    '体力に余裕のある一人、通常はサブタンクを光線へ入れる。他のプレイヤーは離れ、焼き入れの傷が残る間は担当を交代する。',
+  'hudChrome.raidBossGuide.varkhul.anvilName': '金床の布告',
+  'hudChrome.raidBossGuide.varkhul.anvilSummary':
+    'ヴァークルは大鍛冶炉へ歩き、{strikes}回打ってレイド全体へ増加するダメージを与える。',
+  'hudChrome.raidBossGuide.varkhul.anvilHeroicSummary':
+    'ヴァークルは大鍛冶炉を{strikes}回打って増加する全体ダメージを与え、同時に表示付き隕石をプレイヤーへ落とす。',
+  'hudChrome.raidBossGuide.varkhul.anvilResponse': '全体回復のため集合し、最後の一撃には防御クールダウンを使う。',
+  'hudChrome.raidBossGuide.varkhul.anvilHeroicResponse':
+    '表示付き隕石をグループから離して散開し、ヒーラーと防御クールダウンで{strikes}回すべての一撃を耐える。',
+  'hudChrome.raidBossGuide.varkhul.assemblyName': '師匠の組立',
+  'hudChrome.raidBossGuide.varkhul.assemblySummary':
+    'ヴァークルは守られて時間制限付きの組立を始める。鍛冶炉が傑作を完成させる前に、レイドはすべてのポータル波を倒さなければならない。',
+  'hudChrome.raidBossGuide.varkhul.assemblyResponse':
+    '光線の制御と優先追加敵の両方へ注意を分ける。組立時間が切れる前に鍛冶軍団をすべて倒す。',
+  'hudChrome.raidBossGuide.varkhul.beamName': 'るつぼの光線',
+  'hudChrome.raidBossGuide.varkhul.beamSummary':
+    '有効な柱の光線は、プレイヤーが遮らない限り鍛冶炉を加熱する。遮るプレイヤーは増加するるつぼの曝露ダメージを受け、光線が遮られるか無効なら熱が下がる。',
+  'hudChrome.raidBossGuide.varkhul.beamHeroicSummary':
+    '有効な柱の光線は、プレイヤーが遮らない限り鍛冶炉を加熱する。遮るプレイヤーは増加するるつぼの曝露ダメージを受け、鍛冶炉の熱は決して下がらない。',
+  'hudChrome.raidBossGuide.varkhul.beamResponse':
+    '有効な柱と鍛冶炉の間に立ち、曝露が危険になる前に担当を交代する。熱が満杯になると致命的な鍛冶炉の崩壊が起きる。',
+  'hudChrome.raidBossGuide.varkhul.legionName': '鍛冶軍団',
+  'hudChrome.raidBossGuide.varkhul.legionSummary':
+    'るつぼの番人は鍛冶炉の熱を増やす、るつぼの地震を詠唱する。灰の技工士は修復手順でヴァークルを回復する。',
+  'hudChrome.raidBossGuide.varkhul.legionResponse':
+    'るつぼの地震と修復手順を中断し、危険な術者を優先してから残りの追加敵を倒す。',
+  'hudChrome.raidBossGuide.varkhul.masterpieceName': '解き放たれた傑作',
+  'hudChrome.raidBossGuide.varkhul.masterpieceSummary':
+    'ヴァークルは攻撃が速くなり、ダメージが増え、最後の全滅までレイドを繰り返し燃やす。',
+  'hudChrome.raidBossGuide.varkhul.masterpieceHeroicSummary':
+    'ヴァークルは攻撃が速くなり、ダメージが増える。世界炎が以前のメカニクスの大半に代わって最終攻撃となる。',
+  'hudChrome.raidBossGuide.varkhul.masterpieceResponse':
+    '残った攻撃と防御のクールダウンを使い、最終カウントが終わる前にヴァークルを倒す。',
+  'hudChrome.raidBossGuide.varkhul.worldfireName': '世界炎',
+  'hudChrome.raidBossGuide.varkhul.worldfireSummary':
+    '英雄では、炎が闘技場の外周から段階的に中央へ進み、最後にはるつぼ全体を燃やす。',
+  'hudChrome.raidBossGuide.varkhul.worldfireResponse':
+    '進む炎の帯より先に内側へ移動し、狭くなる安全地帯を保ち、中央が燃える前にヴァークルを倒す。',
   'hudChrome.raidBossGuide.varkhul.tanks':
     'タンク: 創造者の印が2スタックで交代し、ヴァークルを近接範囲に保つ。',
   'hudChrome.raidBossGuide.varkhul.orbs':

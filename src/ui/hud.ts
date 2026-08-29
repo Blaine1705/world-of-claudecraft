@@ -674,7 +674,7 @@ import {
   runPreviewPrewarmSchedule,
 } from './preview_prewarm_core';
 import { buildHudPreviewPrewarmUnits } from './preview_prewarm_wiring';
-import { armPreviewOpen } from './preview_stand_in';
+import { armPreviewOpen, previewTouchQueueOf } from './preview_stand_in';
 import { procAuraConsumeSelfNoteText, procAuraGainSelfNoteText } from './proc_fct_notes';
 import { buildProcOverlay } from './proc_overlay_dom';
 import { attachOverlayDrag } from './proc_overlay_drag';
@@ -5382,6 +5382,9 @@ export class Hud {
     root: () => $('#raid-boss-guide-window'),
     closeOthers: () => this.closeOtherWindows('#raid-boss-guide-window'),
     contextFallback: () => raidBossGuideContextFallback(document, this.isMobileLayout()),
+    attachTooltip: (element, html) => this.attachTooltip(element, html),
+    hideTooltip: () => this.hideTooltip(),
+    modelTouchQueue: () => previewTouchQueueOf(this.renderer),
     ...this.windowFocus('#raid-boss-guide-window'),
   });
 
@@ -16567,14 +16570,9 @@ export class Hud {
   replaceRenderer(renderer: Renderer): void {
     this.renderer = renderer;
   }
-
-  /**
-   * Dispose secondary WebGL contexts after target assets are ready but before
-   * the active graphics epoch changes. Their owning windows stay intact.
-   */
+  /** Dispose secondary WebGL contexts before the active graphics epoch changes. */
   resetGraphicsPreviewContexts(): void {
-    // The schedule targets the contexts being destroyed; a mid-flight unit
-    // after this point would rebuild them against the dying graphics epoch.
+    // Stop warmups from rebuilding contexts against the dying graphics epoch.
     this.restartPreviewPrewarmAfterGraphicsRebuild = this.previewPrewarmHandle !== null;
     this.previewPrewarmHandle?.cancel();
     this.previewPrewarmHandle = null;
@@ -16583,6 +16581,7 @@ export class Hud {
     this.charPreview = null;
     this.charPreviewCanvas = null;
     this.dailyRewardsWindow.resetArmoryPreviewForGraphicsRebuild();
+    this.raidBossGuideWindow.resetGraphicsPreviewContext();
   }
 
   /** Restore preview surfaces that were visible across the renderer swap. */
@@ -16590,6 +16589,7 @@ export class Hud {
     if (this.restoreCharPreviewAfterGraphicsRebuild) this.charWindow.renderIfOpen();
     this.restoreCharPreviewAfterGraphicsRebuild = false;
     this.dailyRewardsWindow.restoreArmoryPreviewAfterGraphicsRebuild();
+    this.raidBossGuideWindow.restoreGraphicsPreviewContext();
     // Fresh contexts start cold; re-run the paced schedule so the portrait
     // caches stay covered after a rebuild exactly like they are after boot.
     // (The armory is not in that schedule: it warms per inspected card.)
