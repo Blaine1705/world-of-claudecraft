@@ -100,15 +100,16 @@ const build = await buildItemArtAudit({
   expected: {
     // 829 + the crucible-raid-weapons-2026-08-28 batch (9 painted weapons)
     // + the ignivar-varkhul-drop-renders-2026-08-28 batch (2 rendered
-    // legendaries): the ignivar-raid-complete base merge lands both arms.
-    catalogCount: 840,
+    // legendaries) + the crucible-set-icons-2026-08-29 wave (all 192
+    // non-weapon Crucible pieces; the art-pending ledger is now empty).
+    catalogCount: 1032,
     // 844 + the 201 Crucible raid loot definitions (192 of them art-pending)
     // + the base's 2 Varkhul legendary definitions.
     liveItemCount: 1047,
     generatedHeroicDefinitions: 64,
     heroicDefinitionsWithOwnWebp: 48,
     heroicWeaponArtAliases: 16,
-    sheetPageCount: 26,
+    sheetPageCount: 27,
     groupCount: 22,
   },
 });
