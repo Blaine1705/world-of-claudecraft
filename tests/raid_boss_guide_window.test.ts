@@ -1,5 +1,6 @@
 // @vitest-environment happy-dom
 
+import { readFileSync } from 'node:fs';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { IGNIVAR_RAID_ARENA_ID, IGNIVAR_SECOND_WING_ID } from '../src/sim/ignivar_raid_ids';
 import { VARKHUL_SHARED_PYRE_RAID_DAMAGE_PER_MISSING } from '../src/sim/varkhul_shared_pyre';
@@ -79,6 +80,31 @@ describe('RaidBossGuideWindow', () => {
     expect(root.querySelectorAll('.rbg-ability')).toHaveLength(9);
     expect(root.querySelectorAll('.rbg-ability-detail')).toHaveLength(0);
     expect(document.activeElement).toBe(root.querySelector('[data-boss="ignivar"]'));
+  });
+
+  it('never emits an aria-controls reference without its controlled detail', () => {
+    guide.syncAvailability(IGNIVAR_RAID_ARENA_ID)?.click();
+
+    for (const control of root.querySelectorAll<HTMLElement>('[aria-controls]')) {
+      const id = control.getAttribute('aria-controls');
+      expect(id).toBeTruthy();
+      expect(root.querySelector(`#${id}`)).not.toBeNull();
+    }
+  });
+
+  it('participates in the graphics-preview context reset and restore lifecycle', () => {
+    const hud = readFileSync('src/ui/hud.ts', 'utf8');
+    const reset = hud.slice(
+      hud.indexOf('resetGraphicsPreviewContexts(): void {'),
+      hud.indexOf('restoreGraphicsPreviewContexts(): void {'),
+    );
+    const restore = hud.slice(
+      hud.indexOf('restoreGraphicsPreviewContexts(): void {'),
+      hud.indexOf('prewarmStaticUiAssets(): void {'),
+    );
+
+    expect(reset).toContain('this.raidBossGuideWindow.resetGraphicsPreviewContext();');
+    expect(restore).toContain('this.raidBossGuideWindow.restoreGraphicsPreviewContext();');
   });
 
   it('scrolls the journal with the mouse wheel and dedicated keyboard navigation', () => {
@@ -169,7 +195,9 @@ describe('RaidBossGuideWindow', () => {
     expect(detail?.textContent).toContain('15%');
     expect(detail?.textContent).toContain('What to do');
 
-    const tooltipCall = attachTooltip.mock.calls.find(([element]) => element === sharedPyre);
+    const tooltipCall = attachTooltip.mock.calls.find(
+      ([element]) => element === expandedSharedPyre,
+    );
     expect(tooltipCall?.[1]()).toContain('Shared Pyre');
     expect(tooltipCall?.[1]()).toContain('What to do');
   });

@@ -17,7 +17,7 @@ import { GeneralChatRateLimitLiveState } from '../../server/general_chat_quota';
 import { isConnectionRefused as realIsConnectionRefused } from '../../server/ip_block';
 import { createWsAuth, type WsAuthDeps } from '../../server/ws_auth';
 import { bufferHandshakeMessages } from '../../server/ws_buffer';
-import { ONLINE_WORLD_AUTH_TYPE } from '../../src/world_api';
+import { DUNGEON_ENTRY_FACING_WIRE_VERSION, ONLINE_WORLD_AUTH_TYPE } from '../../src/world_api';
 
 // A fake socket: real EventEmitter wiring (on/once/off/emit) so the handshake
 // buffer and the post-join ws.on('message'|'close'|'error') handlers work, plus
@@ -539,6 +539,28 @@ describe('createWsAuth: Warlock pet-special capability negotiation', () => {
     );
     expect(resume.deps.acquireCharacterLease).not.toHaveBeenCalled();
     expect(joinedMeta(resume.game)).toMatchObject({ petSpecialWireVersion: 1 });
+  });
+});
+
+describe('createWsAuth: dungeon-entry facing capability negotiation', () => {
+  it('accepts only the exact optional capability and otherwise keeps the legacy path', async () => {
+    const capable = setup();
+    await createWsAuth(capable.deps).authenticateWebSocket(
+      asWs(capable.ws),
+      authRaw({ dungeonEntryFacingWire: DUNGEON_ENTRY_FACING_WIRE_VERSION }),
+      capable.req,
+    );
+    expect(joinedMeta(capable.game)).toMatchObject({ dungeonEntryFacingWireVersion: 1 });
+
+    for (const advertised of [undefined, 2, '1', true]) {
+      const legacy = setup();
+      await createWsAuth(legacy.deps).authenticateWebSocket(
+        asWs(legacy.ws),
+        authRaw(advertised === undefined ? {} : { dungeonEntryFacingWire: advertised }),
+        legacy.req,
+      );
+      expect(joinedMeta(legacy.game)).toMatchObject({ dungeonEntryFacingWireVersion: 0 });
+    }
   });
 });
 

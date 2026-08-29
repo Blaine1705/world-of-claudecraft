@@ -3,6 +3,7 @@
 // close() releases it immediately. The committed portrait remains the loading,
 // reduced-motion, no-WebGL, and failure fallback.
 
+import type { LinkedProgramTouchQueue } from '../render/linked_program_touch_lane';
 import { FOCUS_KEY_ATTR } from './focus_restore';
 import type { RaidBossGuideBoss } from './raid_boss_guide_view';
 
@@ -41,6 +42,7 @@ export interface RaidBossGuideModelViewer {
 export type RaidBossGuideModelViewerFactory = (
   stage: HTMLElement,
   canvasLabel: string,
+  touchQueue?: () => LinkedProgramTouchQueue | null,
 ) => Promise<RaidBossGuideModelViewer>;
 
 export interface RaidBossGuideModelMountOptions {
@@ -60,9 +62,10 @@ type ModelState = 'idle' | 'loading' | 'ready' | 'error' | 'nowebgl';
 async function createDefaultViewer(
   stage: HTMLElement,
   canvasLabel: string,
+  touchQueue: () => LinkedProgramTouchQueue | null = () => null,
 ): Promise<RaidBossGuideModelViewer> {
   const { ModelViewer } = await import('../guide/viewer/scene');
-  return new ModelViewer(stage, canvasLabel);
+  return new ModelViewer(stage, canvasLabel, touchQueue);
 }
 
 function browserSupportsWebGL(doc: Document): boolean {
@@ -108,6 +111,7 @@ export class RaidBossGuideModelController {
     private readonly createViewer: RaidBossGuideModelViewerFactory = createDefaultViewer,
     private readonly supportsWebGL: () => boolean = () => browserSupportsWebGL(doc),
     private readonly prefersReducedMotion: () => boolean = () => browserPrefersReducedMotion(doc),
+    private readonly touchQueue: () => LinkedProgramTouchQueue | null = () => null,
   ) {
     this.host = doc.createElement('div');
     this.host.className = 'rbg-model-viewer';
@@ -232,7 +236,7 @@ export class RaidBossGuideModelController {
     if (generation !== this.generation) return;
     let viewer = this.viewer;
     if (!viewer) {
-      viewer = await this.createViewer(this.stage, canvasLabel);
+      viewer = await this.createViewer(this.stage, canvasLabel, this.touchQueue);
       if (generation !== this.generation) {
         viewer.destroy();
         return;

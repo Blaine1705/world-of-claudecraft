@@ -312,6 +312,7 @@ import { DELVE_ITEMS } from './content/delves/items';
 import { HEROIC_ITEMS, RETIRED_HEROIC_ITEMS } from './content/heroic_loot';
 import { buildHeroicVariants } from './content/heroic_variants';
 import { HEROIC_VENDOR_ITEMS } from './content/heroic_vendor';
+import { IGNIVAR_DROP_ITEMS } from './content/ignivar_drops';
 import { PROFESSION_ITEMS } from './content/profession_items';
 import { FURY_NPC, WARFARE_ITEMS } from './content/pvp_honor';
 import { DELVE_MODULE_LAYOUTS, type DelveModuleId, delveModuleSpan } from './delve_layout';
@@ -375,6 +376,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   WILDHEART_ITEMS,
   PROVING_SHORE_ITEMS,
   DUNGEON_KEEPSAKE_ITEMS,
+  IGNIVAR_DROP_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';
@@ -1061,6 +1063,11 @@ export function dungeonAt(x: number): DungeonDef | null {
   }
   if (x <= DUNGEON_X_THRESHOLD || x >= DELVE_BAND_X_MIN || isArenaPos(x)) return null;
   return dungeonByIndex(Math.round((x - (INSTANCE_X_BASE + 900)) / 600));
+}
+
+export function isDungeonEntryTransition(fromX: number, toX: number): boolean {
+  const destination = dungeonAt(toX);
+  return destination !== null && dungeonAt(fromX)?.id !== destination.id;
 }
 
 // ---------------------------------------------------------------------------

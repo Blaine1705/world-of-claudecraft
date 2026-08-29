@@ -2,6 +2,7 @@
 
 import { readFileSync } from 'node:fs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { LinkedProgramTouchQueue } from '../src/render/linked_program_touch_lane';
 import {
   RAID_BOSS_GUIDE_MODEL_SPECS,
   RaidBossGuideModelController,
@@ -67,6 +68,35 @@ describe('RaidBossGuideModelController', () => {
 
     expect(source).toContain("await import('../guide/viewer/scene')");
     expect(source).not.toMatch(/^import .*guide\/viewer\/scene/m);
+  });
+
+  it('forwards a live GPU touch-queue provider to the lazy viewer factory', async () => {
+    const run: LinkedProgramTouchQueue['run'] = async <T>(work: () => T | Promise<T>): Promise<T> =>
+      await work();
+    const queue: LinkedProgramTouchQueue = { run };
+    const touchQueue = vi.fn(() => queue);
+    const queueAwareFactory = vi.fn(
+      async (
+        _stage: HTMLElement,
+        _label: string,
+        currentTouchQueue?: () => LinkedProgramTouchQueue | null,
+      ) => {
+        expect(currentTouchQueue?.()).toBe(queue);
+        return viewer;
+      },
+    );
+    const controller = new RaidBossGuideModelController(
+      document,
+      queueAwareFactory,
+      () => true,
+      () => false,
+      touchQueue,
+    );
+
+    controller.mount(slot, options('ignivar'));
+
+    await vi.waitFor(() => expect(queueAwareFactory).toHaveBeenCalledOnce());
+    expect(touchQueue).toHaveBeenCalledOnce();
   });
 
   it('loads the selected boss GLB and keeps its poster as the loading fallback', async () => {
@@ -244,7 +274,7 @@ describe('RaidBossGuideModelController', () => {
 
   it('returns to the poster and offers a retry when loading fails', async () => {
     const error = new Error('broken GLB');
-    viewer.load = vi.fn(async () => Promise.reject(error));
+    viewer.load = vi.fn().mockRejectedValueOnce(error).mockResolvedValueOnce(undefined);
     const log = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     const controller = new RaidBossGuideModelController(document, createViewer, () => true);
 
@@ -265,6 +295,9 @@ describe('RaidBossGuideModelController', () => {
       'No se pudo cargar el modelo 3D de Ignivar.',
     );
     expect(viewer.load).toHaveBeenCalledOnce();
+    slot.querySelector<HTMLButtonElement>('.rbg-model-load')?.click();
+    await vi.waitFor(() => expect(viewer.load).toHaveBeenCalledTimes(2));
+    expect(slot.querySelector<HTMLElement>('.rbg-model-viewer')?.dataset.state).toBe('ready');
     log.mockRestore();
   });
 

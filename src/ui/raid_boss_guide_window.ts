@@ -2,6 +2,7 @@
 // raid_boss_guide_view.ts owns the boss, phase, difficulty, and mechanic data;
 // this class owns browsing state, localization, tooltips, and focus return.
 
+import type { LinkedProgramTouchQueue } from '../render/linked_program_touch_lane';
 import { markDialogRoot } from './dialog_root';
 import { tEntity } from './entity_i18n';
 import { esc } from './esc';
@@ -32,6 +33,7 @@ export interface RaidBossGuideWindowDeps {
   contextFallback(): HTMLElement | null;
   attachTooltip(element: HTMLElement, html: () => string): void;
   hideTooltip(): void;
+  modelTouchQueue?(): LinkedProgramTouchQueue | null;
 }
 
 const BOSSES: readonly RaidBossGuideBoss[] = ['ignivar', 'varkhul'];
@@ -117,6 +119,10 @@ export class RaidBossGuideWindow {
     doc: Document = document,
     private readonly modelController: RaidBossGuideModelController = new RaidBossGuideModelController(
       doc,
+      undefined,
+      undefined,
+      undefined,
+      deps.modelTouchQueue,
     ),
   ) {
     this.button = doc.createElement('button');
@@ -189,6 +195,14 @@ export class RaidBossGuideWindow {
 
   relocalize(): void {
     if (this.contextBoss) this.paintButton();
+    if (this.isOpen) this.render();
+  }
+
+  resetGraphicsPreviewContext(): void {
+    this.modelController.destroy();
+  }
+
+  restoreGraphicsPreviewContext(): void {
     if (this.isOpen) this.render();
   }
 
@@ -345,9 +359,9 @@ export class RaidBossGuideWindow {
     });
     return `<article class="rbg-ability${expanded ? ' expanded' : ''}"><button type="button" class="rbg-ability-toggle" data-mechanic="${esc(
       mechanic.id,
-    )}" data-focus-key="mechanic:${esc(mechanic.id)}" aria-expanded="${expanded}" aria-controls="${esc(
-      detailId,
-    )}" aria-label="${esc(accessibleLabel)}"><img src="${esc(
+    )}" data-focus-key="mechanic:${esc(mechanic.id)}" aria-expanded="${expanded}"${
+      expanded ? ` aria-controls="${esc(detailId)}"` : ''
+    } aria-label="${esc(accessibleLabel)}"><img src="${esc(
       iconDataUrl('ability', mechanic.iconId, 48),
     )}" alt="" aria-hidden="true"><span class="rbg-ability-main"><span class="rbg-expand-mark" aria-hidden="true">${expanded ? '−' : '+'}</span><span class="rbg-ability-name">${esc(
       name,

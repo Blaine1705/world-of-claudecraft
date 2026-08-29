@@ -3,9 +3,16 @@
 // encounter and choose Normal or Heroic without consulting mutable world state.
 
 import {
+  IGNIVAR_APOCALYPSE_HP_THRESHOLD,
+  IGNIVAR_LAST_INFERNO_HP_THRESHOLD,
+} from '../sim/encounters/ignivar';
+import {
   VARKHUL_FORGESTORM_WAVES,
   VARKHUL_MAKERS_BRAND_TANK_SWAP_STACKS,
+  VARKHUL_MASTERPIECE_UNBOUND_HP_THRESHOLD,
+  VARKHUL_MASTERS_ASSEMBLY_HP_THRESHOLD,
 } from '../sim/encounters/varkhul';
+import { IGNIVAR_JUDGMENT_HP_THRESHOLD } from '../sim/ignivar_forge_judgment';
 import {
   IGNIVAR_FORGE_APPROACH_ID,
   IGNIVAR_MOLTEN_ASSEMBLY_ID,
@@ -169,7 +176,7 @@ const IGNIVAR_PHASES: readonly PhaseDefinition[] = [
     id: 'apocalypse',
     nameKey: key('ignivar.phaseApocalypseName'),
     summaryKey: key('ignivar.phaseApocalypseSummary'),
-    values: { health: 0.65 },
+    values: { health: IGNIVAR_APOCALYPSE_HP_THRESHOLD },
     percentValues: ['health'],
     mechanics: [
       {
@@ -190,7 +197,7 @@ const IGNIVAR_PHASES: readonly PhaseDefinition[] = [
       normal: key('ignivar.phaseJudgmentSummary'),
       heroic: key('ignivar.phaseJudgmentHeroicSummary'),
     },
-    values: { health: 0.45 },
+    values: { health: IGNIVAR_JUDGMENT_HP_THRESHOLD },
     percentValues: ['health'],
     mechanics: [
       {
@@ -221,7 +228,7 @@ const IGNIVAR_PHASES: readonly PhaseDefinition[] = [
     id: 'finale',
     nameKey: key('ignivar.phaseFinaleName'),
     summaryKey: key('ignivar.phaseFinaleSummary'),
-    values: { health: 0.2 },
+    values: { health: IGNIVAR_LAST_INFERNO_HP_THRESHOLD },
     percentValues: ['health'],
     mechanics: [
       {
@@ -338,7 +345,7 @@ const VARKHUL_PHASES: readonly PhaseDefinition[] = [
     id: 'assembly',
     nameKey: key('varkhul.phaseAssemblyName'),
     summaryKey: key('varkhul.phaseAssemblySummary'),
-    values: { health: 0.5 },
+    values: { health: VARKHUL_MASTERS_ASSEMBLY_HP_THRESHOLD },
     percentValues: ['health'],
     mechanics: [
       {
@@ -380,7 +387,7 @@ const VARKHUL_PHASES: readonly PhaseDefinition[] = [
       normal: key('varkhul.phaseFinaleSummary'),
       heroic: key('varkhul.phaseFinaleHeroicSummary'),
     },
-    values: { health: 0.2 },
+    values: { health: VARKHUL_MASTERPIECE_UNBOUND_HP_THRESHOLD },
     percentValues: ['health'],
     mechanics: [
       {

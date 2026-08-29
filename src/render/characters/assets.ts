@@ -27,6 +27,7 @@ import { type ArmorDyeSpec, attachArmorDye } from './armor_dye';
 import { backGripFor } from './back_grips';
 import { dequantizeAttribute } from './dequantize_attribute';
 import { type HandGrip, KAYKIT_SHIELD_ACCESSORIES, KAYKIT_SHIELD_GRIPS } from './held_item_grips';
+import { pruneHeldPropIdles, registerHeldPropIdle } from './held_prop_idle';
 import { composedLookReady } from './look_pieces';
 import { buildMakeupDecal } from './makeup';
 import {
@@ -207,6 +208,7 @@ const KAYKIT_WEAPON_ACCESSORY: Record<string, string> = {
   // Bow-SLOT skin with crossbow HANDLING (a gun aims, it is not drawn): the
   // grip family follows the handling, like the attach bone below.
   encore_the_second_falling_star: 'VAR_CROSSBOW',
+  hammer_varkhul: 'VAR_HAMMER', // Ignivar raid legendary (Varkhul drop)
   ...KAYKIT_SHIELD_ACCESSORIES,
 };
 
@@ -393,7 +395,9 @@ function attachProp(
   swapKind: 'mainhand' | 'offhand' | null = null,
   stowed = false,
 ): THREE.Object3D {
-  const payload = flattenWeaponScene(cloneSkinned(resolvedGltf(att.url).scene));
+  const gltf = resolvedGltf(att.url);
+  const payload = flattenWeaponScene(cloneSkinned(gltf.scene));
+  if (gltf.animations.length) registerHeldPropIdle(root, payload, gltf.animations);
   primeSkinnedSortSpheres(payload);
   payload.traverse((o) => {
     if ((o as THREE.Mesh).isMesh) o.userData.weaponMesh = true;
@@ -1742,6 +1746,7 @@ export function setHeldWeapon(
     if (o.userData[SWAP_WEAPON_TAG]) stale.push(o);
   });
   for (const o of stale) o.removeFromParent();
+  pruneHeldPropIdles(root);
   const payloads: THREE.Object3D[] = [];
   for (const i of targets) {
     const base = attachments[i];
@@ -1773,6 +1778,7 @@ export function setHeldOffhand(
     if (o.userData[SWAP_OFFHAND_TAG]) stale.push(o);
   });
   for (const o of stale) o.removeFromParent();
+  pruneHeldPropIdles(root);
 
   const base = def.attach?.[def.offhandSlot];
   if (!base) return [];
@@ -1828,6 +1834,7 @@ export function setWeaponsStowed(
     if (o.userData[HELD_PROP_TAG]) stale.push(o);
   });
   for (const o of stale) o.removeFromParent();
+  pruneHeldPropIdles(root);
   return attachAllProps(root, def, weaponItemId, weaponSkinId, stowed, offhandItemId);
 }
 

@@ -31,6 +31,7 @@ import {
   ALL_RECIPES,
   abilitiesKnownAt,
   CLASSES,
+  dungeonAt,
   getActiveWorldContent,
   NPCS,
   resolveDelveShopOffers,
@@ -120,6 +121,7 @@ import {
   type DelveRunInfo,
   type DelveShopOfferView,
   type DevLeaderboardPage,
+  DUNGEON_ENTRY_FACING_WIRE_VERSION,
   type DuelInfo,
   type FriendInfo,
   type GuildBankInfo,
@@ -173,6 +175,12 @@ import {
   createCivicServicePlacementsReader,
 } from './civic_service_placements';
 import {
+  type DesktopWalletBrowserAction,
+  type DesktopWalletStatus,
+  parseDesktopWalletHandoffStatus,
+} from './desktop_wallet_handoff';
+import { dungeonEntrySnapshotFacing } from './dungeon_entry_facing';
+import {
   decodeConsecrations,
   decodeFrostRings,
   decodeIgnivarMeteors,
@@ -205,7 +213,7 @@ import {
 // biome-ignore lint/suspicious/noExplicitAny: legacy wire JSON is intentionally loose at the boundary.
 type LooseJson = any;
 
-type InputSendMode = 'periodic' | 'changed' | 'forced-neutral';
+type InputSendMode = 'periodic' | 'changed' | 'forced-neutral' | 'forced-facing';
 
 interface PendingTransientInput {
   jump: boolean;
@@ -310,6 +318,7 @@ export function buildWebSocketAuthMessage(
   token: string;
   character: number;
   clientSeed: string;
+  dungeonEntryFacingWire: typeof DUNGEON_ENTRY_FACING_WIRE_VERSION;
   timerWire: typeof STABLE_TIMER_WIRE_VERSION;
   petSpecialWire: typeof PET_SPECIAL_WIRE_VERSION;
 } {
@@ -318,6 +327,7 @@ export function buildWebSocketAuthMessage(
     token,
     character: characterId,
     clientSeed,
+    dungeonEntryFacingWire: DUNGEON_ENTRY_FACING_WIRE_VERSION,
     timerWire: STABLE_TIMER_WIRE_VERSION,
     petSpecialWire: PET_SPECIAL_WIRE_VERSION,
   };
@@ -618,7 +628,7 @@ export class Api {
   }
 
   async createDesktopWalletHandoff(
-    action: { kind: 'link' } | { kind: 'transaction'; reference: string; expectedAddress: string },
+    action: DesktopWalletBrowserAction,
   ): Promise<{ code: string; expiresInMs: number }> {
     const data = await this.post(
       '/api/desktop-wallet/create',
@@ -631,55 +641,12 @@ export class Api {
     };
   }
 
-  async desktopWalletHandoffResult(code: string): Promise<
-    | { status: 'missing' | 'pending' }
-    | {
-        status: 'complete';
-        result:
-          | { kind: 'link'; address: string; nonce: string; signature: string }
-          | { kind: 'transaction'; address: string; signature: string };
-      }
-  > {
-    const data = await this.post(
-      '/api/desktop-wallet/result',
-      { code },
-      DESKTOP_API_ORIGIN || this.base,
+  async desktopWalletHandoffResult(code: string): Promise<DesktopWalletStatus> {
+    // Shape validation lives in the handoff module (an unknown or malformed
+    // result kind reads as 'missing', which the poller treats as expired).
+    return parseDesktopWalletHandoffStatus(
+      await this.post('/api/desktop-wallet/result', { code }, DESKTOP_API_ORIGIN || this.base),
     );
-    if (data.status !== 'complete' || !data.result || typeof data.result !== 'object') {
-      return { status: data.status === 'pending' ? 'pending' : 'missing' };
-    }
-    const result = data.result as Record<string, unknown>;
-    if (
-      result.kind === 'link' &&
-      typeof result.address === 'string' &&
-      typeof result.nonce === 'string' &&
-      typeof result.signature === 'string'
-    ) {
-      return {
-        status: 'complete',
-        result: {
-          kind: 'link',
-          address: result.address,
-          nonce: result.nonce,
-          signature: result.signature,
-        },
-      };
-    }
-    if (
-      result.kind === 'transaction' &&
-      typeof result.address === 'string' &&
-      typeof result.signature === 'string'
-    ) {
-      return {
-        status: 'complete',
-        result: {
-          kind: 'transaction',
-          address: result.address,
-          signature: result.signature,
-        },
-      };
-    }
-    return { status: 'missing' };
   }
 
   // ── Persistent session (home-page account portal) ──────────────────────────
@@ -1991,14 +1958,14 @@ export class ClientWorld implements IWorld {
   private lastInputSig = '';
   private inputSeq = 0;
   private pendingInputSeqSentAt = new Map<number, number>();
-  // No initializer on purpose: bare ClientWorld test fixtures skip field
-  // initializers, and the lazy accessor below keeps that construction idiom
-  // equivalent to a real instance.
+  // Lazy because bare ClientWorld fixtures skip field initializers.
   private pendingTransientInput: PendingTransientInput | undefined;
   private ackedInputSeq = 0;
   private inputEchoSamples: number[] = [];
   private spectateFacingPending = false;
   private pendingSpectateFacing: number | null = null;
+  private dungeonEntrySeq: number | null = null;
+  private pendingDungeonEntryFacing: number | null = null;
 
   constructor(token: string, characterId: number, cls: PlayerClass, base = '', clientSeed = '') {
     this.characterId = characterId;
@@ -2272,9 +2239,11 @@ export class ClientWorld implements IWorld {
     return facing;
   }
 
-  // -----------------------------------------------------------------------
-  // Socket
-  // -----------------------------------------------------------------------
+  consumeDungeonEntryFacing(): number | null {
+    const facing = this.pendingDungeonEntryFacing ?? null;
+    this.pendingDungeonEntryFacing = null;
+    return facing;
+  }
 
   private inputSignature(): string {
     const mi = this.moveInput;
@@ -2326,12 +2295,9 @@ export class ClientWorld implements IWorld {
     ) {
       return false;
     }
-    // Shed ordinary input while the browser-owned queue is backed up. Preserve
-    // the three engagement edges that are not idempotent-latest: jump can be
-    // pressed and released inside one shed interval, and keyboard-turn flags
-    // are intentionally present for only their engagement frame. Pause
-    // neutralization is the sole bounded force path and admits one frame.
-    if (mode !== 'forced-neutral' && isInputSendBackpressured(this.ws.bufferedAmount)) {
+    // Shed ordinary input under backpressure, retaining one-shot jump and turn
+    // edges. The two bounded forced modes each admit one required frame.
+    if (!mode.startsWith('forced-') && isInputSendBackpressured(this.ws.bufferedAmount)) {
       this.retainTransientInput();
       this.netPipeline().noteInputBackpressure(this.ws.bufferedAmount);
       return false;
@@ -2370,19 +2336,14 @@ export class ClientWorld implements IWorld {
         sf: mi.surface ? 1 : 0,
       },
     };
-    // The camera steer rides along only when it actually GRADES something.
-    // Absent means full rate on the far side (swimSteerRate), which is both the
-    // old behaviour and what every land frame wants — so walking around sends
-    // exactly the bytes it always did, and the field appears only while a
-    // swimmer is easing the view into a dive or a climb.
+    // Swim camera steer is sparse: absent means full rate and preserves the
+    // legacy land-frame wire shape.
     if (mi.swimSteer !== undefined && mi.swimSteer !== 1) {
       (msg.mi as Record<string, number>).ss = mi.swimSteer;
     }
     if (this.mouselookFacing !== null) msg.facing = this.mouselookFacing;
+    if (this.dungeonEntrySeq !== null) msg.de = this.dungeonEntrySeq;
     this.ws.send(JSON.stringify(msg));
-    // WebSocket.send accepted the real frame. Pending edges are transport-local
-    // and are consumed exactly once, including when the forced-neutral mode
-    // intentionally cancels them rather than replaying them into the pause.
     this.pendingTransientInput = undefined;
     this.lastInputSentAt = now;
     this.lastInputSig = sig;
@@ -2502,8 +2463,7 @@ export class ClientWorld implements IWorld {
       }
       if (this.reconnectAttempts > 0) {
         // fresh transport after an auto-reconnect: the server restarts input
-        // acking at 0 and resends the world from an empty interest set, and
-        // any stale mirrored entities fall out via the snapshot prune
+        // acking at 0 and resends the world from an empty interest set.
         this.reconnectAttempts = 0;
         this.conflictRejections = 0;
         this.timeoutRejections = 0;
@@ -2514,6 +2474,8 @@ export class ClientWorld implements IWorld {
         this.pendingInputSeqSentAt.clear();
         this.ackedInputSeq = 0;
         this.inputEchoSamples = [];
+        this.dungeonEntrySeq = null;
+        this.pendingDungeonEntryFacing = null;
         this.missingSince.clear();
         this.lastSnapAt = 0;
         // any in-flight target echo died with the old transport; the resent
@@ -3021,19 +2983,11 @@ export class ClientWorld implements IWorld {
           e.vendorItems = def?.vendorItems ? [...def.vendorItems] : [];
         }
       }
-      // interpolation bases: re-anchor at the pose the renderer last drew,
-      // not at the previous server pose — when a frame extrapolated past the
-      // last update, restarting from the server pose snapped entities
-      // backwards every snapshot (visible rubber-banding while running).
-      // Non-self entities are drawn on their per-entity clock (renderer.sync),
-      // so the continuation alpha comes from that same clock; self stays on
-      // the global snapshot clock the camera follow uses.
+      // Re-anchor remote and self interpolation on their respective clocks.
       const prevUpdatedAt = e.netUpdatedAt;
       const prevInterval = e.netInterval;
-      // LOCKSTEP with remoteEntityAlpha (src/render/net_interp_core.ts, which
-      // net/ cannot import): unknown-cadence entities interpolate on a fixed
-      // 120 ms fallback interval capped at 1, so the re-anchor lands exactly
-      // on the pose the renderer drew instead of the global snapshot clock.
+      // LOCKSTEP with remoteEntityAlpha: unknown cadence uses a fixed 120 ms
+      // interval capped at 1.
       const entAlpha =
         w.id !== this.playerId && prevUpdatedAt !== undefined
           ? Math.min(
@@ -3042,11 +2996,8 @@ export class ClientWorld implements IWorld {
             )
           : contAlpha;
       const entFacingAlpha = Math.min(1, entAlpha);
-      // per-entity update clock: distant entities are sent below snapshot
-      // rate, so each one interpolates over its own measured cadence. Only
-      // gaps within the slowest legitimate cadence count — records also
-      // pause while an entity's state is unchanged, and folding an idle
-      // period into the estimate would smear its next steps in slow motion
+      // Distant entities interpolate on measured cadence. Ignore idle gaps,
+      // which would smear their next movement into slow motion.
       if (prevUpdatedAt !== undefined) {
         const gap = now - prevUpdatedAt;
         if (gap > 5 && gap < 450) {
@@ -3054,15 +3005,26 @@ export class ClientWorld implements IWorld {
         }
       }
       e.netUpdatedAt = now;
-      // A teleport (arena pit, dungeon portal, graveyard release) jumps an
-      // entity far further than any single walking update could. Interpolating
-      // across that gap streaks it across the map — and when its per-entity
-      // interpolation clock isn't established yet, the renderer falls back to
-      // the global alpha and the entity sticks at its old pose until its next
-      // real update (e.g. taking damage). Snap both poses to the destination so
-      // it appears exactly where the server placed it.
       const teleDx = w.x - e.pos.x,
         teleDz = w.z - e.pos.z;
+      if (selfDelta) {
+        const entryFacing = dungeonEntrySnapshotFacing(
+          this.dungeonEntrySeq ?? null,
+          w.de,
+          e.pos.x,
+          w.x,
+          w.f,
+          this.mouselookFacing,
+        );
+        this.dungeonEntrySeq = entryFacing.entrySeq;
+        this.mouselookFacing = entryFacing.inputFacing;
+        if (entryFacing.forceFacing) {
+          this.moveInput.turnLeft = false;
+          this.moveInput.turnRight = false;
+          this.pendingDungeonEntryFacing = w.f;
+          this.sendInput(now, 'forced-facing');
+        } else if (dungeonAt(w.x) === null) this.pendingDungeonEntryFacing = null;
+      }
       const wasDead = e.dead;
       const nowDead = !!w.dead;
       if ((wasDead && !nowDead) || teleDx * teleDx + teleDz * teleDz > TELEPORT_SNAP_DIST_SQ) {

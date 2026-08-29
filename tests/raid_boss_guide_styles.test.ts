@@ -21,10 +21,13 @@ function rule(css: string, selector: string): string {
 }
 
 describe('raid boss guide styles', () => {
-  it('gives the journal a bounded keyboard and pointer scroll region', () => {
-    expect(rule(desktopCss, '#raid-boss-guide-window .rbg-shell')).toMatch(
-      /height:\s*min\(70vh,\s*640px\)/,
-    );
+  it('gives the journal a scale-aware bounded keyboard and pointer scroll region', () => {
+    const windowRule = rule(desktopCss, '#raid-boss-guide-window');
+    expect(windowRule).toContain('var(--app-vh, 100vh)');
+    expect(windowRule).toContain('/ var(--window-scale, 1)');
+    const shell = rule(desktopCss, '#raid-boss-guide-window .rbg-shell');
+    expect(shell).toContain('var(--app-vh, 100vh)');
+    expect(shell).toContain('/ var(--window-scale, 1)');
     const journal = rule(desktopCss, '#raid-boss-guide-window .rbg-journal');
     expect(journal).toMatch(/min-height:\s*0/);
     expect(journal).toMatch(/overflow-y:\s*auto/);

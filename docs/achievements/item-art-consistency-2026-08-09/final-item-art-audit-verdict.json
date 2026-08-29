@@ -5,8 +5,8 @@
     "baselineCommit": "aee195551b5aef628eb7a72192117d7e3079818e",
     "branch": "feature/placeholder-art-completion-v036",
     "shippingDirectory": "public/ui/items",
-    "itemArtFilesReviewed": 829,
-    "liveItemDefinitions": 844,
+    "itemArtFilesReviewed": 831,
+    "liveItemDefinitions": 846,
     "generatedHeroicDefinitions": 64,
     "heroicDefinitionsWithOwnWebp": 48,
     "heroicWeaponArtAliases": 16,
@@ -294,7 +294,7 @@
       "armor-helmet": 41,
       "armor-legs": 58,
       "armor-neck": 8,
-      "armor-offhand": 5,
+      "armor-offhand": 6,
       "armor-ring": 18,
       "armor-shoulder": 49,
       "armor-waist": 27,
@@ -309,7 +309,7 @@
       "quest": 102,
       "tool": 45,
       "ui-backpack": 1,
-      "weapon": 123
+      "weapon": 124
     },
     "incrementalReviews": [
       {
@@ -384,7 +384,7 @@
   },
   "visualVerdict": {
     "status": "pass",
-    "passCount": 829,
+    "passCount": 831,
     "passIds": [
       "abyssal_loop",
       "abysswrought_band",
@@ -1151,6 +1151,8 @@
       "vanguard_azure_armor_plate",
       "vanguard_bone",
       "vanguard_chrome_armor_plate",
+      "varkhul_emberward",
+      "varkhul_forgebreaker",
       "varric_shadow_cowl",
       "veilcloth_robe",
       "veilsteel_blade",
@@ -1220,7 +1222,7 @@
     "watch": [],
     "rejectCount": 0,
     "reject": [],
-    "summary": "All 829 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review."
+    "summary": "All 831 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review, plus the two Ignivar legendary drop renders (varkhul_forgebreaker and varkhul_emberward, rendered from their own shipped held-weapon models by the deterministic weapon-still pipeline) added on 2026-08-28, machine-checked and awaiting owner visual review."
   },
   "nonVisualContentWatch": [
     {
@@ -1377,8 +1379,8 @@
   "evidence": {
     "catalog": {
       "path": "tmp/imagegen/item-art-consistency/final-audit/catalog.json",
-      "sha256": "ec47b8140b2f19caeddd869ee6a2bcb51f6965294b0fa93a1eeddf06d9c4c914",
-      "bytes": 454802
+      "sha256": "2c07feabe3c173f63296c3189895f38373e17d303e3b004819ead32d5c485c8f",
+      "bytes": 455895
     },
     "rendererFingerprint": "fd92c41a206cd55b05a1de94c4789f6eb6ca4200d063f4bbd284c21ae03b6082",
     "sheetCount": 208,
@@ -1392,7 +1394,7 @@
       "small-multiview": 26,
       "identity": 26
     },
-    "sheetSetSha256": "1ffdd0b938eee93919babb4d929efe33972d65b36b27243bc1a268a4eab81ae4",
+    "sheetSetSha256": "12d00e850b3b824b58512ef4791ff2910390c5abf4cf6a0c3744d7f7acb17139",
     "sheets": [
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p01--128-color.png",
@@ -1844,64 +1846,64 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-offhand--p01--128-color.png",
-        "sha256": "2efbde9a35a9adc7041890b5a0cbdf0e467deda220f5931fb1c2f99f4f8c0129",
-        "bytes": 203061,
+        "sha256": "88a46509572ed58f83a35391f7978a930d24b6ff641581723e44476d46939e97",
+        "bytes": 222081,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-offhand--p01--40-color.png",
-        "sha256": "55ff7d96079f793a2320552e49095bb93ddc48f71f7db104b96ae0f801aa4b84",
-        "bytes": 38522,
+        "sha256": "4c28d503a3a64a6a021de0bc9a64f7342dc090027e0703e881242f7a45000736",
+        "bytes": 42543,
         "width": 1600,
         "height": 166,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-offhand--p01--28-color.png",
-        "sha256": "03cb0383999294bcc5768798935628271bea119250efde17e2aed3b571a577e2",
-        "bytes": 27724,
+        "sha256": "1f4fc730150fed1bb03f03a04be96386ccd95d4d9a11ea64a68c07e230ca92c9",
+        "bytes": 30953,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-offhand--p01--22-color.png",
-        "sha256": "5bd2908d5efd6be2f0a92a902c521ec14311b9a9ab7b726ba4b76753f8016a4e",
-        "bytes": 22674,
+        "sha256": "507237f5d7b2b3f0f83fc85a60bb8945c043f397bbca336b3cbda716f5f66003",
+        "bytes": 24872,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-offhand--p01--28-grayscale.png",
-        "sha256": "89a153361fc8edce5c6f9eddd7dd667ac2951ef3d010ac30ffd4450cec4e960b",
-        "bytes": 23660,
+        "sha256": "4dc764f2a2bf2d9552e469942aa18abe96821e8e76c91afdd29cab4f24c55fab",
+        "bytes": 25891,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-offhand--p01--64-circle.png",
-        "sha256": "76e508465a6eb33a624ce5b0790df66ff5590cbb4a85afa870081bbdbf1ad9a6",
-        "bytes": 66258,
+        "sha256": "fc1d11855c283a52a29e958e3c2da91a7761b307d61475e25dccfddf49313309",
+        "bytes": 74173,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-offhand--p01--small-multiview.png",
-        "sha256": "be704ed70bb439a53ccbdc6649b6f685c458ff97e64a8a8132c91dcde3922e28",
-        "bytes": 117029,
+        "sha256": "e7582537a1ca5fad1f82962bb13456d9f6348497a5853e3f288d80fc812bb4a2",
+        "bytes": 130194,
         "width": 1800,
         "height": 262,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-offhand--p01--identity.png",
-        "sha256": "556e6c0f0cd2733f4879fc9ddd183c19e65de47268a7eb3cfed503ae1d8917bc",
-        "bytes": 211654,
+        "sha256": "e1e8e6226299cdc85a20733462297bb464efbfda027b8580153d2c396c679124",
+        "bytes": 232419,
         "width": 1800,
         "height": 248,
         "format": "png"
@@ -2996,69 +2998,69 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p02--128-color.png",
-        "sha256": "465cc21428f171948b6e0a59639203150e086a8d90198086b36aa2206ff69e98",
-        "bytes": 1037424,
+        "sha256": "03e51f12c0d21c734b9ea5ea969cff9fd2eb331b017322c62ee6cbc928cf5fd7",
+        "bytes": 1052961,
         "width": 1600,
         "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p02--40-color.png",
-        "sha256": "43a035e4bdf4d125c12d719b49d375818b7b8e7a92c92b366493b4f4aaea9288",
-        "bytes": 213054,
+        "sha256": "3a3f5f4bf0612135b260257076e161a45712bb63e634b8e792d5ef06105c9f56",
+        "bytes": 217214,
         "width": 1600,
         "height": 654,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p02--28-color.png",
-        "sha256": "b95f10e71216d6e568f53f89ba5da0d117fffbde13c205f55ff954e8e22a9f16",
-        "bytes": 152274,
+        "sha256": "de9bff7a834d02e08a8522298aa22b2bbc58b1c33f579f77ec254a9042dc521a",
+        "bytes": 155537,
         "width": 1600,
         "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p02--22-color.png",
-        "sha256": "08ff03647103cb2899783b2eba07dab162d3d6a8afb9356c0732ec8e83e37a1b",
-        "bytes": 121326,
+        "sha256": "11b81b2804eb7c76df13eb7de8e9e1a5cd1e178153025d5a952416797e36d900",
+        "bytes": 123872,
         "width": 1600,
         "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p02--28-grayscale.png",
-        "sha256": "7fb20a9a123844a97557bb91abc835a1bf535f0508b00f3068c9f4eaefc2f3f9",
-        "bytes": 112911,
+        "sha256": "80b5b7c4649b10f8943ca18af6200216f61e43b2ebf05cc15a62fa3666ec1235",
+        "bytes": 115198,
         "width": 1600,
         "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p02--64-circle.png",
-        "sha256": "ac01ded0ac0e0340e953c08108c76f1453b5cd8a0b3864798a7b1dba042ebc87",
-        "bytes": 345029,
+        "sha256": "35354f5661717b130bf9f02f1dd60f8ad793522610d6f0e6d46d6b16508b2597",
+        "bytes": 351726,
         "width": 1600,
         "height": 874,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p02--small-multiview.png",
-        "sha256": "ac841bc758b59f2667b336f8f458d804854af0db728893cb77d9d793750ccf4c",
-        "bytes": 645240,
+        "sha256": "f570550ee528b317761fd9a438282a02869e65215825637832ed3ec484473f5b",
+        "bytes": 657901,
         "width": 1800,
         "height": 1134,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/weapon--p02--identity.png",
-        "sha256": "2ae8d23a5828cae35ce1a5b66deaff3c0d851fdc5f4ca8bda65f88d5868f55d0",
-        "bytes": 1085894,
+        "sha256": "f4a1d9230da0e95bd2273b9dd1b953a7981c3ae1e53fa57d6351e8612b9a77d4",
+        "bytes": 1102626,
         "width": 1800,
         "height": 1064,
         "format": "png"
       }
     ],
-    "shippingCatalogSha256": "92015c29b0abcb6f1fbb4cdeba01917e7fe4ae641df8bcd3076974a19ce56c97"
+    "shippingCatalogSha256": "232ed65a14b786f1904948476fb5119a670b760b12ff3f057c87c85632fb7e61"
   }
 }

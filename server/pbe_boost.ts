@@ -32,6 +32,7 @@
 
 import { randomInt } from 'node:crypto';
 import { BAG_SOCKETS } from '../src/sim/bags';
+import { IGNIVAR_DROP_PLACEHOLDER_IDS } from '../src/sim/content/ignivar_drops';
 import { ITEMS } from '../src/sim/data';
 import {
   canDualWield,
@@ -320,6 +321,11 @@ function eligibleForBoost(cls: PlayerClass, item: ItemDef): boolean {
   // WARFARE (honor vendor) gear only: PvP-budgeted pieces are never PvE BiS.
   if (item.pvpOffenseRating !== undefined || item.pvpDefenseRating !== undefined) return false;
   if (item.priceHonor !== undefined) return false;
+  // Handover placeholders (defined but not yet obtainable anywhere) are never
+  // BiS: without this the sourceless Ignivar legendaries argmax straight into
+  // every melee/tank kit. Table membership, not level inference (see the
+  // matching rule in src/sim/dev_kit.ts isFreshTwentyItem).
+  if (IGNIVAR_DROP_PLACEHOLDER_IDS.has(item.id)) return false;
   if (!canEquipItem(cls, item)) return false;
   // canEquipItem checks requiredClass for weapons only; class-locked armor
   // (the tier sets) declares intent through requiredClass too, so honor it.
