@@ -1028,10 +1028,13 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the Ignivar raid consolidation (the v0.41.0 base merge plus
 // the renderer extraction round moved the renderer integration leaf). No
 // capture was retaken.
+// Re-minted for PR #3740's forge-lift room (the lift room render hookup and
+// door-portal arm moved the renderer integration leaf). No capture was
+// retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'a7c4d66734757e8d7835efea0cc1218fe53dd8b4501e5c9cff60e581991233cb';
+  'b6905ecbb3ef46081356d519eda229188e6e45f62b3e3b90ca540851495baba9';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '019aaef23665529202bb9bf153c69786b1e2d21af11b63219074117fd1559cd5';
+  '907c3a16258d8d7890b96cded1bf0334287822eb5e7c648be567a0ce0738e77e';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2178,10 +2181,14 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
     // both sides): same order, the composite first, then this seal. No capture
     // was retaken.
+    // Re-minted for PR #3740's forge-lift room: the first-order composite
+    // follows the lift room's renderer.ts hookup, then this second-order
+    // performance seal follows the swept evidence bytes. No capture was
+    // retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('6f37ba491d2fc9161258a88be6dc742ffa371882357c51900a5c7f48c59a0035');
+    ).toBe('12b6f8fd247ca1561deb67d9e7e88168fbb2f9da688f6014f2a4c0f39f3b92b2');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
