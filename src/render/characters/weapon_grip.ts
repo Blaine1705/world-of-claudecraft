@@ -23,6 +23,12 @@
 export interface WeaponGripOverride {
   scale?: number;
   rot?: [number, number, number];
+  /** Off-hand rotation override. `rot` is authored against the RIGHT hand and
+   *  composes against the mirrored (identity) base on the left, so a large yaw
+   *  can read wrong there; when this field is present the LEFT hand uses it
+   *  instead of `rot` ([0, 0, 0] pins the bare mirrored family fit). Absent
+   *  means the prior behavior: `rot` applies to both hands. */
+  rotOffhand?: [number, number, number];
   pos?: [number, number, number];
 }
 
@@ -144,7 +150,7 @@ export const WEAPON_GRIP_OVERRIDES: Record<string, WeaponGripOverride> = {
   // 1.66 sits well under the starfall legendary benchmark (the engine head
   // carries the bulk); the 180 yaw about the haft is the owner's final pick
   // for how the head reads at rest.
-  hammer_varkhul: { rot: [0, 180, 0], scale: 1.66 },
+  hammer_varkhul: { rot: [0, 180, 0], rotOffhand: [0, 0, 0], scale: 1.66 },
 };
 
 export interface GripTransform {
@@ -215,8 +221,9 @@ export function variantGripTransform(
   const oz = left ? -pz : pz;
   const base: [number, number, number, number] = left ? [0, 0, 0, 1] : [0, 1, 0, 0];
   let quaternion = base;
-  if (override?.rot) {
-    const [rx, ry, rz] = override.rot;
+  const rot = left ? (override?.rotOffhand ?? override?.rot) : override?.rot;
+  if (rot) {
+    const [rx, ry, rz] = rot;
     quaternion = quatMul(base, quatFromEuler(rx * DEG2RAD, ry * DEG2RAD, rz * DEG2RAD));
   }
   return {
