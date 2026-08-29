@@ -1267,7 +1267,7 @@ function appendChildSpan(parent: HTMLElement, className: string): HTMLElement {
 }
 
 function availableMobVoiceCue(templateId: string, action: MobVoiceAction): string | null {
-  return mobVoiceCue(templateId, action, (key) => sfx.hasVariants(key));
+  return mobVoiceCue(templateId, action, (key) => sfx.hasVariants(key), voice.isAudible());
 }
 
 // Stable voice-clip key for a spoken yell line. MUST match the generator slug in

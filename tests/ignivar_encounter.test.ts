@@ -61,6 +61,7 @@ import {
   resetIgnivarEncounter,
   updateIgnivarEncounter,
 } from '../src/sim/encounters/ignivar';
+import { IGNIVAR_DIALOGUE } from '../src/sim/encounters/ignivar_dialogue';
 import { polygonContainsPoint } from '../src/sim/geometry2d';
 import { IGNIVAR_WATER_CONDUIT_TEMPLATES } from '../src/sim/ignivar_arena';
 import {
@@ -1143,7 +1144,12 @@ describe('Ignivar encounter', () => {
     boss.ignivar.overlapTimer = 999;
     boss.ignivar.rotatingRaysTimer = 0;
     boss.swingTimer = 999;
-    updateIgnivarEncounter(sim.ctx, boss);
+    const startEvents = sim.tick();
+    expect(
+      startEvents.some(
+        (event) => event.type === 'chat' && event.text === IGNIVAR_DIALOGUE.rotatingRays,
+      ),
+    ).toBe(true);
     const startFacing = boss.ignivar.rotatingRaysFacing;
 
     let castTicks = 0;
@@ -1330,6 +1336,15 @@ describe('Ignivar encounter', () => {
 
     expect(boss.castingAbility).toBe(IGNIVAR_SKYFIRE_CAST_ID);
     expect(boss.castTotal).toBe(IGNIVAR_SKYFIRE_CAST_SECONDS);
+    expect(
+      events.some(
+        (event) =>
+          event.type === 'chat' &&
+          event.channel === 'yell' &&
+          event.fromPid === boss.id &&
+          event.text === IGNIVAR_DIALOGUE.skyfire,
+      ),
+    ).toBe(true);
     expect(
       events.some(
         (event) =>
@@ -2466,6 +2481,11 @@ describe('Ignivar encounter', () => {
     const events = sim.tick();
 
     expect(conduit.templateId).toBe(IGNIVAR_WATER_CONDUIT_TEMPLATES.active);
+    expect(
+      events.some(
+        (event) => event.type === 'chat' && event.text === IGNIVAR_DIALOGUE.conduitActivated,
+      ),
+    ).toBe(true);
     expect(sim.player.hp).toBe(
       hpBeforeFrontal - Math.ceil(sim.player.maxHp * ignivarFrontalDamageMaxHp('normal')),
     );
@@ -3462,6 +3482,151 @@ describe('Ignivar encounter', () => {
     ).toBe(true);
   });
 
+  it('opens a fresh pull with the approved signature yell', () => {
+    const { sim } = claimedEncounter(9220);
+
+    const events = sim.tick();
+
+    expect(
+      events.some(
+        (event) =>
+          event.type === 'chat' &&
+          event.channel === 'yell' &&
+          event.text === IGNIVAR_DIALOGUE.engage,
+      ),
+    ).toBe(true);
+    expect(
+      sim.tick().some((event) => event.type === 'chat' && event.text === IGNIVAR_DIALOGUE.engage),
+    ).toBe(false);
+  });
+
+  it('uses the two supporting defeat barks once per fallen pull participant', () => {
+    const { sim, boss } = claimedEncounter(9221);
+    const first = addEncounterPlayer(sim, boss, 'First Fallen Spark');
+    const second = addEncounterPlayer(sim, boss, 'Second Fallen Spark');
+    sim.player.devGod = true;
+    sim.tick();
+    if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
+    isolateForgeChains(boss, 999);
+    boss.ignivar.dialogueCooldownRemaining = 0;
+    boss.swingTimer = 999;
+
+    sim.ctx.handleDeath(first, boss);
+    const firstEvents = sim.tick();
+    expect(
+      firstEvents.some(
+        (event) => event.type === 'chat' && event.text === IGNIVAR_DIALOGUE.defeatSpark,
+      ),
+    ).toBe(true);
+
+    boss.ignivar.dialogueCooldownRemaining = 0;
+    sim.ctx.handleDeath(second, boss);
+    const secondEvents = sim.tick();
+    expect(
+      secondEvents.some(
+        (event) => event.type === 'chat' && event.text === IGNIVAR_DIALOGUE.defeatForge,
+      ),
+    ).toBe(true);
+
+    boss.ignivar.dialogueCooldownRemaining = 0;
+    expect(
+      sim
+        .tick()
+        .some(
+          (event) =>
+            event.type === 'chat' &&
+            (event.text === IGNIVAR_DIALOGUE.defeatSpark ||
+              event.text === IGNIVAR_DIALOGUE.defeatForge),
+        ),
+    ).toBe(false);
+  });
+
+  it('defers a defeat bark until the current major mechanic has finished', () => {
+    const { sim, boss } = claimedEncounter(9222);
+    const fallen = addEncounterPlayer(sim, boss, 'Deferred Fallen Spark');
+    sim.player.devGod = true;
+    sim.tick();
+    if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
+    isolateForgeChains(boss, 999);
+    boss.ignivar.dialogueCooldownRemaining = 0;
+    boss.ignivar.rotatingRaysTimer = 0;
+    boss.swingTimer = 999;
+    sim.ctx.handleDeath(fallen, boss);
+
+    const rayEvents = sim.tick();
+    expect(
+      rayEvents.some(
+        (event) => event.type === 'chat' && event.text === IGNIVAR_DIALOGUE.rotatingRays,
+      ),
+    ).toBe(true);
+    expect(
+      rayEvents.some(
+        (event) => event.type === 'chat' && event.text === IGNIVAR_DIALOGUE.defeatSpark,
+      ),
+    ).toBe(false);
+
+    boss.ignivar.rotatingRaysActiveRemaining = 0;
+    boss.ignivar.rotatingRaysWindupRemaining = 0;
+    boss.ignivar.dialogueCooldownRemaining = 0;
+    boss.castingAbility = null;
+    expect(
+      sim
+        .tick()
+        .some((event) => event.type === 'chat' && event.text === IGNIVAR_DIALOGUE.defeatSpark),
+    ).toBe(true);
+  });
+
+  it('speaks the supporting Last Flame line on only the first final-phase brand', () => {
+    const { sim, boss } = claimedEncounter(9223);
+    sim.player.devGod = true;
+    sim.tick();
+    if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
+    boss.ignivar.apocalypseTriggered = true;
+    boss.ignivar.apocalypseResolved = true;
+    boss.ignivar.forgeJudgmentPhase = 'done';
+    boss.hp = Math.floor(boss.maxHp * IGNIVAR_LAST_INFERNO_HP_THRESHOLD);
+    isolateForgeChains(boss, 999);
+    boss.ignivar.meteorTimer = 999;
+    boss.ignivar.rotatingRaysTimer = 999;
+    boss.swingTimer = 999;
+
+    const phaseEvents = sim.tick();
+    expect(
+      phaseEvents.some(
+        (event) => event.type === 'chat' && event.text === IGNIVAR_DIALOGUE.lastInferno,
+      ),
+    ).toBe(true);
+    expect(
+      phaseEvents.some(
+        (event) => event.type === 'chat' && event.text === IGNIVAR_DIALOGUE.finalBrand,
+      ),
+    ).toBe(false);
+
+    const brandYells: SimEvent[] = [];
+    for (let ticks = 0; ticks < 10 / DT; ticks++) {
+      brandYells.push(
+        ...sim
+          .tick()
+          .filter((event) => event.type === 'chat' && event.text === IGNIVAR_DIALOGUE.finalBrand),
+      );
+    }
+    expect(brandYells).toHaveLength(1);
+    expect(boss.ignivar.finalBrandYellSpoken).toBe(true);
+
+    boss.castingAbility = null;
+    boss.ignivar.frontalCastRemaining = 0;
+    boss.ignivar.skyfireCastRemaining = 0;
+    boss.ignivar.rotatingRaysWindupRemaining = 0;
+    boss.ignivar.rotatingRaysActiveRemaining = 0;
+    boss.ignivar.brandTimer = DT;
+    boss.ignivar.dialogueCooldownRemaining = 0;
+    expect(
+      sim
+        .tick()
+        .some((event) => event.type === 'chat' && event.text === IGNIVAR_DIALOGUE.finalBrand),
+    ).toBe(false);
+  });
+
   it('ships one Normal Apocalypse add at the sixty-five-percent health gate', () => {
     expect(IGNIVAR_APOCALYPSE_HP_THRESHOLD).toBe(0.65);
     expect(IGNIVAR_APOCALYPSE_CAST_SECONDS).toBe(20);
@@ -3521,7 +3686,7 @@ describe('Ignivar encounter', () => {
         (event) =>
           event.type === 'chat' &&
           event.channel === 'yell' &&
-          event.text === 'Ignivar Ashcaller awakens. Let the world burn!',
+          event.text === IGNIVAR_DIALOGUE.apocalypse,
       ),
     ).toBe(true);
     expect(
@@ -3553,7 +3718,7 @@ describe('Ignivar encounter', () => {
         (event) =>
           event.type === 'chat' &&
           event.channel === 'yell' &&
-          event.text === 'Ignivar Ashcaller awakens. Let the world burn!',
+          event.text === IGNIVAR_DIALOGUE.apocalypse,
       ),
     ).toBe(false);
   });

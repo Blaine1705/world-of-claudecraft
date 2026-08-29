@@ -256,7 +256,11 @@ const MONOLITHS: MonolithRow[] = [
     // pack-aggro call paid for itself by moving the legacy same-template
     // social pull (and its per-family radius table) to mob/social_aggro.ts.
     // Exact count.
-    ceiling: 12451,
+    // Re-pinned 12451 -> 12426 for the raid boss voices: the InstanceSlot
+    // welcome-ledger field paid for itself by moving the twice-duplicated
+    // fresh-slot literal to instances/instance_slot.ts (freshInstanceSlot).
+    // Exact count.
+    ceiling: 12426,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

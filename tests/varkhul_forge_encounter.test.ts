@@ -20,6 +20,7 @@ import {
   VARKHUL_MAKERS_BRAND_AURA_ID,
   VARKHUL_MASTERPIECE_UNBOUND_AURA_ID,
 } from '../src/sim/encounters/varkhul';
+import { VARKHUL_DIALOGUE } from '../src/sim/encounters/varkhul_dialogue';
 import { IGNIVAR_SECOND_WING_ID } from '../src/sim/ignivar_raid_ids';
 import { enterDungeon } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
@@ -241,6 +242,14 @@ describe('Varkhul forge pillars and add intermission', () => {
     expect(state.assemblyPhase).toBe('adds');
     expect(Math.hypot(boss.pos.x - work.x, boss.pos.z - work.z)).toBeLessThanOrEqual(0.3);
     expect(state.assemblyPortalSpawns.length).toBeGreaterThan(0);
+    expect(
+      sim.events.some(
+        (event) =>
+          event.type === 'chat' &&
+          event.channel === 'yell' &&
+          event.text === VARKHUL_DIALOGUE.assembly,
+      ),
+    ).toBe(true);
   });
 
   it("cancels an active Shared Pyre when Master's Assembly starts", () => {
@@ -1236,6 +1245,14 @@ describe('Varkhul forge pillars and add intermission', () => {
     expect(state.assemblyPhase).toBe('stunned');
     expect(state.assemblyStunRemaining).toBe(15);
     expect(boss.damageImmune).toBe(false);
+    expect(
+      sim.events.some(
+        (event) =>
+          event.type === 'chat' &&
+          event.channel === 'yell' &&
+          event.text === VARKHUL_DIALOGUE.addsDefeated,
+      ),
+    ).toBe(true);
   });
 
   it('ends the trigger tick at Meltdown before Brand, Masterpiece, or another major can run', () => {
@@ -1531,6 +1548,14 @@ describe('Varkhul forge pillars and add intermission', () => {
     expect(
       sim.events.some(
         (event) => event.type === 'varkhulCallout' && event.call === 'worldfireBegins',
+      ),
+    ).toBe(true);
+    expect(
+      sim.events.some(
+        (event) =>
+          event.type === 'chat' &&
+          event.channel === 'yell' &&
+          event.text === VARKHUL_DIALOGUE.masterpiece,
       ),
     ).toBe(true);
 

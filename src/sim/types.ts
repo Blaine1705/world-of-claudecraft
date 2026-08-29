@@ -5091,8 +5091,12 @@ export interface NythraxisEncounterState {
 }
 
 export interface IgnivarEncounterState {
-  /** Players seen alive in this pull, used only for wipe cooldown recovery. */
+  /** Players seen alive in this pull, used for wipe recovery and defeat barks. */
   attemptParticipantIds?: number[];
+  /** Session-only voice pacing and at-most-once defeat bark bookkeeping. */
+  dialogueCooldownRemaining?: number;
+  announcedDefeatedPlayerIds?: number[];
+  finalBrandYellSpoken?: boolean;
   brandTimer: number;
   forgeStrikeTimer: number;
   frontalTimer: number;
