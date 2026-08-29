@@ -150,6 +150,9 @@ export const RUNTIME_AURA_ICON_SOURCE_IDS: ReadonlyMap<string, string> = new Map
   ['redline', 'eviscerate'],
   ['rog_improved_evasion', 'evasion'],
   ['rog_slipstream', 'sinister_strike'],
+  // Slagsnare 4pc preserve lockout (src/sim/combat/hunter_fieldcraft.ts):
+  // same icon family as the Woundrend consume it gates.
+  ['slagsnare_momentum_icd', 'mongoose_bite'],
   ['shaman_ancestral_bulwark', 'lightning_shield'],
   ['shaman_ancestral_bulwark_icd', 'lightning_shield'],
   ['shaman_echoing_elements_damage', 'chain_lightning'],

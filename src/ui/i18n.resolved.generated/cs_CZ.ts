@@ -18524,6 +18524,11 @@ export const cs_CZ: EnTranslations = {
         "name": "Předvoj spoutaného kamene",
         "bonus3": "Zvyšuje rychlost útoku a sesílání o 15 %."
       },
+      "coldsight_trackers": {
+        "name": "Coldsight Trackers",
+        "bonus2": "Measured Shot restores 5 additional Focus.",
+        "bonus4": "Long Draw critical strikes extend Cold Focus by 2 sec, up to 6 sec per activation."
+      },
       "crownforged": {
         "name": "Regálie z kosti",
         "bonus2": "Zvyšuje sílu útoku o 40.",
@@ -18572,10 +18577,20 @@ export const cs_CZ: EnTranslations = {
         "bonus2": "Vowkeeper Strike's chance to arm Solar Reprisal rises to 30 percent, and blocking an attack arms it 40 percent of the time.",
         "bonus4": "Consuming Solar Reprisal shields you for 6 percent of your maximum health for 10 sec."
       },
+      "packlord_emberhide": {
+        "name": "Packlord's Emberhide",
+        "bonus2": "Pack Command's cooldown is reduced to 3 sec.",
+        "bonus4": "Pack Command's chance to reset Stampede's cooldown rises to 30 percent."
+      },
       "slagbreaker": {
         "name": "Slagbreaker Battlegear",
         "bonus2": "Redhand empowers your next Maiming Strike by 30 percent per stack instead of 20.",
         "bonus4": "Every second cast of Redhand reduces Breachmaker's remaining cooldown by 3 sec."
+      },
+      "slagsnare": {
+        "name": "Slagsnare Trappings",
+        "bonus2": "Gutting Strike generates 20 Focus.",
+        "bonus4": "Woundrend that consumes 3 Hunting Momentum preserves them. Cannot occur more than once every 8 sec."
       },
       "soulflame": {
         "name": "Regálie přízračného ohně",

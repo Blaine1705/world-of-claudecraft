@@ -7378,7 +7378,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     offGcd: true,
     effects: [{ type: 'selfBuff', kind: 'hunter_cold_focus', value: 1, duration: 12 }],
     description:
-      'For 12 sec, Measured Shot restores 50% more Focus, and Long Draw costs 25% less and casts 30% faster. (Coldsight signature)',
+      'For 12 sec, Measured Shot restores 30 Focus, and Long Draw costs 25% less and casts 30% faster. (Coldsight signature)',
   },
   bloodhook: {
     id: 'bloodhook',

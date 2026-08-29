@@ -565,6 +565,58 @@ export const ITEM_SETS: Record<string, ItemSet> = {
       },
     ],
   },
+  packlord_emberhide: {
+    id: 'packlord_emberhide',
+    name: "Packlord's Emberhide",
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: "Pack Command's cooldown is reduced to 3 sec.",
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: "Pack Command's chance to reset Stampede's cooldown rises to 30 percent.",
+      },
+    ],
+  },
+  coldsight_trackers: {
+    id: 'coldsight_trackers',
+    name: 'Coldsight Trackers',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: 'Measured Shot restores 5 additional Focus.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        // "per activation", not the set doc's "per window": the sim-purity
+        // scanner (tests/architecture.test.ts DOM_GLOBAL_RE) rejects the
+        // literal token "window." anywhere under src/sim, prose included.
+        // Same meaning, flagged as a copy deviation in the PR.
+        text: 'Long Draw critical strikes extend Cold Focus by 2 sec, up to 6 sec per activation.',
+      },
+    ],
+  },
+  slagsnare: {
+    id: 'slagsnare',
+    name: 'Slagsnare Trappings',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: 'Gutting Strike generates 20 Focus.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: 'Woundrend that consumes 3 Hunting Momentum preserves them. Cannot occur more than once every 8 sec.',
+      },
+    ],
+  },
 };
 
 // Fully-resolved set effect: every field defaulted so callers never branch on

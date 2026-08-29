@@ -669,7 +669,10 @@ const classAbilityNamesEn = {
       [
         'cold_focus',
         'Cold Focus',
-        'For 12 sec, Measured Shot restores 50% more Focus, and Long Draw costs 25% less and casts 30% faster. (Coldsight signature)',
+        // Absolute, not "50% more": the Coldsight 2pc adds a flat 5 after the
+        // window rewrite (25 -> 35 for wearers is not 50 percent), so only the
+        // absolute base value composes honestly with the set tooltip.
+        'For 12 sec, Measured Shot restores 30 Focus, and Long Draw costs 25% less and casts 30% faster. (Coldsight signature)',
       ],
       [
         'bloodhook',

@@ -6059,7 +6059,9 @@ export class Sim {
     // hunter resolvers land here, the one choke point the cast path, cost
     // checks, and the server all read).
     let found = resolveActionReplacement(known, r.e);
-    found = resolveColdsightAbility(found, r.e, r.meta);
+    // The worn-set flags ride playerMods.selected (set_bonus_mods): the
+    // Coldsight 2pc hook reads them after the Cold Focus absolute rewrite.
+    found = resolveColdsightAbility(found, r.e, r.meta, this.playerMods(r.meta).selected);
     found = resolveHunterSharedAbility(found, r.e, r.meta);
     found = resolveVespersAbility(found, r.meta);
     // `known` already carries its own talent mods, baked in once when

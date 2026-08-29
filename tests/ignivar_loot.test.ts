@@ -146,6 +146,9 @@ describe('ignivar loot: the 29 sets', () => {
       'dawnforged',
       'oathpyre',
       'zealfire',
+      'packlord_emberhide',
+      'coldsight_trackers',
+      'slagsnare',
     ] as const;
     const setIds = new Set(
       Object.values(IGNIVAR_SET_ITEMS).flatMap((item) => (item.set ? [item.set] : [])),

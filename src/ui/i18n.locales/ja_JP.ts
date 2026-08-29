@@ -7765,6 +7765,17 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.crownforged.bonus2': '筋力が10、スタミナが10上昇します。',
   'entities.itemSets.crownforged.bonus4': '攻撃力が25上昇します。武器のクリティカルヒット時に50%の確率で「グレイブマイト」が発動し、攻撃力が10秒間40上昇します。',
   'entities.itemSets.crownforged.bonus6': '攻撃速度と詠唱速度が4%、命中が3%上昇します。武器のクリティカルヒットで対象に「ボーンスプリンター」を刻み、2秒ごとに5ダメージの出血を12秒間与えます。最大3回まで累積します。',
+  'entities.itemSets.packlord_emberhide.name': 'パックロードの残火皮鎧',
+  'entities.itemSets.packlord_emberhide.bonus2': '群れの指令のクールダウンが3秒に短縮されます。',
+  'entities.itemSets.packlord_emberhide.bonus4': '群れの指令が獣群突撃のクールダウンをリセットする確率が30%に上昇します。',
+  'entities.itemSets.coldsight_trackers.name': 'コールドサイトの追跡具',
+  'entities.itemSets.coldsight_trackers.bonus2': '精密射撃が追加で5のフォーカスを回復します。',
+  'entities.itemSets.coldsight_trackers.bonus4':
+    '引き絞りのクリティカルヒットが冷徹集中を2秒延長します。1回の効果時間につき最大6秒まで延長されます。',
+  'entities.itemSets.slagsnare.name': 'スラグスネアの装具',
+  'entities.itemSets.slagsnare.bonus2': '腹裂きの一撃がフォーカスを20生成します。',
+  'entities.itemSets.slagsnare.bonus4':
+    '狩猟の勢いを3消費する傷裂きが、その勢いを保持します。この効果は8秒に1回まで発動します。',
   'entities.itemSets.slagbreaker.name': 'スラグブレイカーの戦装束',
   'entities.itemSets.slagbreaker.bonus2': '血染めの手による次の重傷の一撃の強化が、1スタックにつき20%から30%に上昇します。',
   'entities.itemSets.slagbreaker.bonus4': '血染めの手を2回発動するごとに、崩し手の残りクールダウンが3秒短縮されます。',

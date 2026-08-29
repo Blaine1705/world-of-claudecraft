@@ -821,7 +821,9 @@ export function runEffects(
         // Read before the hunter/shaman follow-up hooks below, which can deal their
         // own damage: this must stay the damage THIS ability landed.
         const effectiveDamage = Math.max(0, targetHpBefore - target.hp);
-        onHunterPrimaryDamage(ctx, p, target, res, finalDamage);
+        // The crit rolled above is plumbed through as one argument (Coldsight
+        // 4pc observes it; no extra roll happens anywhere downstream).
+        onHunterPrimaryDamage(ctx, p, target, res, finalDamage, crit);
         if (ability.id === 'arcane_shot') runFrenzyFellShotCleave(ctx, p, target);
         if (ability.id === 'lightning_bolt') {
           thundercallOnArcBoltImpact(ctx, p);

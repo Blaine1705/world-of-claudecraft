@@ -7758,6 +7758,17 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.crownforged.bonus2': '힘이 10, 체력이 10만큼 증가합니다.',
   'entities.itemSets.crownforged.bonus4': '전투력이 25만큼 증가합니다. 무기 치명타 적중 시 50% 확률로 "무덤의 위력"이 발동하여 전투력이 40만큼 증가합니다. 10초 동안 지속됩니다.',
   'entities.itemSets.crownforged.bonus6': '공격 및 시전 속도가 4%, 적중이 3% 증가합니다. 무기 치명타 적중 시 대상에게 "뼈 파편"을 남겨 12초 동안 2초마다 5의 출혈 피해를 입힙니다. 최대 3번 중첩됩니다.',
+  'entities.itemSets.packlord_emberhide.name': '무리군주 잉걸가죽',
+  'entities.itemSets.packlord_emberhide.bonus2': '무리 명령의 재사용 대기시간이 3초로 감소합니다.',
+  'entities.itemSets.packlord_emberhide.bonus4': '무리 명령이 야수 쇄도의 재사용 대기시간을 초기화할 확률이 30%로 증가합니다.',
+  'entities.itemSets.coldsight_trackers.name': '냉정한 시선 추적 장구',
+  'entities.itemSets.coldsight_trackers.bonus2': '정밀 사격이 집중을 5 추가로 회복합니다.',
+  'entities.itemSets.coldsight_trackers.bonus4':
+    '긴 시위의 치명타가 냉정한 집중을 2초 연장합니다. 지속시간마다 최대 6초까지 연장됩니다.',
+  'entities.itemSets.slagsnare.name': '용재올가미 장구',
+  'entities.itemSets.slagsnare.bonus2': '내장 가르기가 집중을 20 생성합니다.',
+  'entities.itemSets.slagsnare.bonus4':
+    '사냥의 기세를 3중첩 소모하는 상처 가르기가 중첩을 보존합니다. 이 효과는 8초에 한 번만 발동합니다.',
   'entities.itemSets.slagbreaker.name': '광재파쇄자 전투복',
   'entities.itemSets.slagbreaker.bonus2': '붉은 손이 다음 불구의 일격을 중첩당 20% 대신 30% 강화합니다.',
   'entities.itemSets.slagbreaker.bonus4': '붉은 손을 두 번 시전할 때마다 돌파자의 남은 재사용 대기시간이 3초 감소합니다.',

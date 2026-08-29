@@ -81,6 +81,31 @@ export const ZEALFIRE_2PC_DAWN_RHYTHM_CUT_SEC = 3;
 /** Zealfire 4pc: Dawn's Wrath Hammer of Wrath damage mult (base 1.2). */
 export const ZEALFIRE_4PC_DAWNS_WRATH_DAMAGE_MULT = 1.4;
 
+// Audited constants for the bespoke hunter bends (read by the class-module
+// call sites AND pinned by tests, so the copy cannot drift from the code).
+/** Packlord 4pc: Pack Command's Stampede reset chance (base
+ *  STAMPEDE_RESET_CHANCE 0.2). The threshold moves on the SAME single roll at
+ *  tryResetStampede, so no rng stream shift for wearers or non-wearers; the
+ *  5-fail bad-luck cap is untouched. */
+export const PACKLORD_4PC_STAMPEDE_RESET_CHANCE = 0.3;
+/** Coldsight 2pc: extra Focus on Measured Shot, applied by the named module
+ *  hook AFTER the Cold Focus absolute rewrite (20 to 25 outside the window,
+ *  30 to 35 inside it; Harrier's 1.5x multiplies the result afterward, the
+ *  disclosed 38/53). */
+export const COLDSIGHT_2PC_MEASURED_SHOT_FOCUS_BONUS = 5;
+/** Coldsight 4pc: seconds each Long Draw critical adds to the running Cold
+ *  Focus window. */
+export const COLDSIGHT_4PC_CRIT_EXTENSION_SEC = 2;
+/** Coldsight 4pc: total extension cap per Cold Focus window, in seconds. */
+export const COLDSIGHT_4PC_WINDOW_EXTENSION_CAP_SEC = 6;
+/** Slagsnare 2pc: Focus a landed Gutting Strike grants (base 15). The
+ *  Harrier and Efficient Rhythm riders apply after (preResolved false),
+ *  exactly as they do for the base grant. */
+export const SLAGSNARE_2PC_GUTTING_STRIKE_FOCUS = 20;
+/** Slagsnare 4pc: the once-per-8-sec momentum-preserve lockout; deliberately
+ *  MATCHES the Hunting Momentum window by construction. */
+export const SLAGSNARE_4PC_MOMENTUM_ICD_SEC = 8;
+
 /** The engine payloads, keyed by set id (the `set` tag on each member item
  *  and the ItemSet id in item_sets.ts). Tiers ascend by pieces. */
 export const SET_ENGINE_BONUSES: Record<string, readonly SetEngineBonusTier[]> = {
@@ -250,6 +275,72 @@ export const SET_ENGINE_BONUSES: Record<string, readonly SetEngineBonusTier[]> =
       // stays honest for every wearer. Multiplicative with Ascension's 1.3
       // (1.82 total), disclosed by the set doc.
       effect: { tuning: { dawnsWrathDamageMult: ZEALFIRE_4PC_DAWNS_WRATH_DAMAGE_MULT } },
+    },
+  ],
+  // ---- Hunter ----
+  packlord_emberhide: [
+    {
+      pieces: 2,
+      // Pack Command 4 -> 3 sec: a cooldownPct row on the resolved entry, so
+      // the engine's cooldown set and the tooltip's printed cooldown line read
+      // the same number. Roughly +13 percent Unleash cadence (the set doc's
+      // third-round arithmetic: three casts span two cooldown intervals plus
+      // the fixed 8s frenzy lockout); dead inside Howling Rage, accepted.
+      effect: { ability: [{ ability: 'pack_command', cooldownPct: -0.25 }] },
+    },
+    {
+      pieces: 4,
+      // Bespoke: the Stampede reset roll's threshold rises 0.2 -> 0.3 at the
+      // ONE tryResetStampede draw (combat/hunter_packlord.ts). The same single
+      // rng draw happens either way, only the threshold moves; the 5-fail
+      // bad-luck cap asserts base behavior and stays untouched.
+      effect: { tuning: { stampedeResetChance: PACKLORD_4PC_STAMPEDE_RESET_CHANCE } },
+    },
+  ],
+  coldsight_trackers: [
+    {
+      pieces: 2,
+      // Bespoke: +5 Focus on Measured Shot via the named module hook AFTER
+      // the Cold Focus absolute rewrite (combat/hunter_coldsight.ts): no
+      // flat-resource key exists and an addEffects row would double-map, so
+      // the hook bends the resolved gainResource amount (20 -> 25; 30 -> 35
+      // inside the window; the shared resolver's Harrier multiplier lands
+      // after, the disclosed 38/53).
+      effect: { tuning: { measuredShotFocusBonus: COLDSIGHT_2PC_MEASURED_SHOT_FOCUS_BONUS } },
+    },
+    {
+      pieces: 4,
+      // Bespoke: Long Draw criticals extend the Cold Focus window 2 sec each,
+      // up to 6 per window. The crit already rolled in the shared damage
+      // block is observed (one plumbed argument), so no draw moves for
+      // anyone; the extension re-derives Apex Instinct (window + 4) and
+      // stretches the 2pc's in-window rewrite with it (intra-set
+      // compounding, disclosed by the set doc).
+      effect: {
+        tuning: {
+          critExtensionSec: COLDSIGHT_4PC_CRIT_EXTENSION_SEC,
+          windowExtensionCapSec: COLDSIGHT_4PC_WINDOW_EXTENSION_CAP_SEC,
+        },
+      },
+    },
+  ],
+  slagsnare: [
+    {
+      pieces: 2,
+      // Bespoke: the module-constant Gutting Strike focus grant rises
+      // 15 -> 20 at the grantHunterFocus call site
+      // (combat/hunter_fieldcraft.ts); preResolved stays false so the Harrier
+      // and Efficient Rhythm riders apply after, exactly as for the base
+      // grant. Deterministic, no rng involved.
+      effect: { tuning: { guttingStrikeFocus: SLAGSNARE_2PC_GUTTING_STRIKE_FOCUS } },
+    },
+    {
+      pieces: 4,
+      // Bespoke: a Woundrend that consumes 3 Hunting Momentum preserves the
+      // stacks, once per 8 sec (the lockout deliberately MATCHES the Momentum
+      // window). Scoped to the Woundrend consume site ONLY: the Re-entry
+      // consumers still spend the stacks, and payoffs stay at 3-stack value.
+      effect: { tuning: { momentumPreserveIcdSec: SLAGSNARE_4PC_MOMENTUM_ICD_SEC } },
     },
   ],
 };

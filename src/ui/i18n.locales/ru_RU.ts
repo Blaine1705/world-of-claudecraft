@@ -7881,6 +7881,17 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.crownforged.bonus2': 'Сила повышается на 10, выносливость повышается на 10.',
   'entities.itemSets.crownforged.bonus4': 'Сила атаки повышается на 25. Критические удары оружием с вероятностью 50% даруют «Могильную мощь», увеличивая силу атаки на 40 на 10 сек.',
   'entities.itemSets.crownforged.bonus6': 'Скорость атаки и чтения заклинаний повышается на 4%, меткость на 3%. Критические удары оружием оставляют в цели «Костяной осколок»: 5 ед. урона от кровотечения каждые 2 сек. в течение 12 сек. Суммируется до 3 раз.',
+  'entities.itemSets.packlord_emberhide.name': 'Угольная шкура повелителя стаи',
+  'entities.itemSets.packlord_emberhide.bonus2': 'Время восстановления Команды стае сокращается до 3 сек.',
+  'entities.itemSets.packlord_emberhide.bonus4': 'Шанс Команды стае сбросить восстановление Звериного натиска возрастает до 30%.',
+  'entities.itemSets.coldsight_trackers.name': 'Снаряжение следопыта холодного взора',
+  'entities.itemSets.coldsight_trackers.bonus2': 'Выверенный выстрел восстанавливает на 5 Концентрации больше.',
+  'entities.itemSets.coldsight_trackers.bonus4':
+    'Критические удары Долгого натяга продлевают Холодную сосредоточенность на 2 сек, но не более чем на 6 сек за одно действие эффекта.',
+  'entities.itemSets.slagsnare.name': 'Убранство шлаковых силков',
+  'entities.itemSets.slagsnare.bonus2': 'Потрошащий удар дает 20 Концентрации.',
+  'entities.itemSets.slagsnare.bonus4':
+    'Рваная рана, поглощающая 3 Охотничьих натиска, сохраняет их. Не чаще одного раза в 8 сек.',
   'entities.itemSets.slagbreaker.name': 'Боевое облачение шлаколома',
   'entities.itemSets.slagbreaker.bonus2': 'Кровавая рука усиливает ваш следующий Калечащий удар на 30% за заряд вместо 20%.',
   'entities.itemSets.slagbreaker.bonus4': 'Каждое второе применение Кровавой руки сокращает оставшееся время восстановления Бреши на 3 сек.',

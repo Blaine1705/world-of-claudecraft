@@ -197,6 +197,8 @@ const POST_OVERHAUL_RUNTIME_AURA_SOURCES = [
   ['reaping_command_graveguard', 'reaping_command'],
   ['reaping_command_gravewing', 'reaping_command'],
   ['reaping_command_warrior', 'reaping_command'],
+  // Slagsnare 4pc preserve lockout: same icon family as the Woundrend consume.
+  ['slagsnare_momentum_icd', 'mongoose_bite'],
   ['shaman_ancestral_bulwark', 'lightning_shield'],
   ['shaman_ancestral_bulwark_icd', 'lightning_shield'],
   ['shaman_echoing_elements_damage', 'chain_lightning'],
@@ -304,7 +306,7 @@ describe('resolveAuraIconId', () => {
     // ProcDef producers plus the closed semantic inventory above.
     expect(choiceSources).toHaveLength(7);
     expect(new Set(choiceSources.map(([id]) => id)).size).toBe(choiceSources.length);
-    expect(POST_OVERHAUL_RUNTIME_AURA_SOURCES).toHaveLength(100);
+    expect(POST_OVERHAUL_RUNTIME_AURA_SOURCES).toHaveLength(101);
     const expected = new Map<string, string>([
       ...choiceSources,
       ...NON_CHOICE_RUNTIME_AURA_SOURCES,
@@ -321,7 +323,7 @@ describe('resolveAuraIconId', () => {
       POWERUPS.reduce((count, definition) => count + definition.buffs.length, 0),
     );
     expect(REUSED_PAINTED_RUNTIME_AURA_SOURCES).toHaveLength(12);
-    expect(RUNTIME_AURA_ICON_SOURCE_IDS.size).toBe(140);
+    expect(RUNTIME_AURA_ICON_SOURCE_IDS.size).toBe(141);
     for (const [id, source] of expected) {
       const paintedIdentity = hasAuraImageIdentity(id) ? id : source;
       const imageUrl = auraImageUrl(paintedIdentity);

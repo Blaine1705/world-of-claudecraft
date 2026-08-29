@@ -9752,7 +9752,7 @@ export const en_CA: EnTranslations = {
       },
       "cold_focus": {
         "name": "Cold Focus",
-        "description": "For 12 sec, Measured Shot restores 50% more Focus, and Long Draw costs 25% less and casts 30% faster. (Coldsight signature)"
+        "description": "For 12 sec, Measured Shot restores 30 Focus, and Long Draw costs 25% less and casts 30% faster. (Coldsight signature)"
       },
       "bloodhook": {
         "name": "Bloodhook",
@@ -18524,6 +18524,11 @@ export const en_CA: EnTranslations = {
         "name": "Boundstone Vanguard",
         "bonus3": "Increases attack and casting speed by 7.5%."
       },
+      "coldsight_trackers": {
+        "name": "Coldsight Trackers",
+        "bonus2": "Measured Shot restores 5 additional Focus.",
+        "bonus4": "Long Draw critical strikes extend Cold Focus by 2 sec, up to 6 sec per activation."
+      },
       "crownforged": {
         "name": "Bonewrought Regalia",
         "bonus2": "Increases Strength by 10 and Stamina by 10.",
@@ -18572,10 +18577,20 @@ export const en_CA: EnTranslations = {
         "bonus2": "Vowkeeper Strike's chance to arm Solar Reprisal rises to 30 percent, and blocking an attack arms it 40 percent of the time.",
         "bonus4": "Consuming Solar Reprisal shields you for 6 percent of your maximum health for 10 sec."
       },
+      "packlord_emberhide": {
+        "name": "Packlord's Emberhide",
+        "bonus2": "Pack Command's cooldown is reduced to 3 sec.",
+        "bonus4": "Pack Command's chance to reset Stampede's cooldown rises to 30 percent."
+      },
       "slagbreaker": {
         "name": "Slagbreaker Battlegear",
         "bonus2": "Redhand empowers your next Maiming Strike by 30 percent per stack instead of 20.",
         "bonus4": "Every second cast of Redhand reduces Breachmaker's remaining cooldown by 3 sec."
+      },
+      "slagsnare": {
+        "name": "Slagsnare Trappings",
+        "bonus2": "Gutting Strike generates 20 Focus.",
+        "bonus4": "Woundrend that consumes 3 Hunting Momentum preserves them. Cannot occur more than once every 8 sec."
       },
       "soulflame": {
         "name": "Wraithfire Regalia",
