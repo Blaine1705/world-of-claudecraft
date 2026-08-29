@@ -5328,6 +5328,14 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   // The Proving Shore graduation deed rides the deed_cat_progression crest
   // until its commissioned art lands (docs/achievements/icon-brief.md).
   'prog_ready_for_an_adventure',
+  // The Crucible of the Last Spring raid deeds: all five are 'dungeon', so
+  // each rides the deed_cat_dungeon crest until its commissioned art lands
+  // (docs/achievements/icon-brief.md).
+  'dgn_ignivar',
+  'dgn_ignivar_heroic',
+  'dgn_varkhul',
+  'dgn_varkhul_heroic',
+  'dgn_varkhul_flawless',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

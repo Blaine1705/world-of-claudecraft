@@ -144,6 +144,13 @@ const FINAL_BOSS_DUNGEONS: Record<string, string> = {
   // Without this entry Zulgar kills write no dungeonClears record, so the
   // dgn_wildheart_basin deed pair ships permanently unearnable (0/1 forever).
   wildheart_high_priest: 'wildheart_basin',
+  // The Crucible of the Last Spring raid credits per boss room: each raid
+  // room is its own dungeon id, and each boss dies through the generic
+  // kill-credit path (no bespoke lockout roster yet; the launch pass owns
+  // that), so the eligible snapshot (downed members included) is the
+  // recipient set, the wildheart precedent.
+  ignivar_herald_of_the_last_flame: 'ignivar_raid_arena',
+  varkhul_forgefather_of_the_last_flame: 'ignivar_inner_crucible',
 };
 
 // Perfection tasks: zero player deaths inside the boss's heroic instance
@@ -154,6 +161,7 @@ const FLAWLESS_TASKS: Record<string, string> = {
   ysolei: 'dgn_ysolei_flawless',
   korzul_the_gravewyrm: 'dgn_korzul_flawless',
   nythraxis_scourge_of_thornpeak: 'dgn_nythraxis_deathless',
+  varkhul_forgefather_of_the_last_flame: 'dgn_varkhul_flawless',
 };
 
 // Kill-order tasks: at boss death, every add it summoned this attempt is dead.
