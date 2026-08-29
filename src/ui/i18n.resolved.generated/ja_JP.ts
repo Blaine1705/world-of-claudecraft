@@ -11341,7 +11341,7 @@ export const ja_JP: EnTranslations = {
       },
       "seraphic_vigil": {
         "name": "熾天使の見守り",
-        "description": "味方1体に見守りの祝福を与え、危機に陥った時に体力を回復する。ベネディクション固有能力。"
+        "description": "味方1体に見守りの祝福を与え、危機に陥った時に体力を{vigilHeal}回復する。ベネディクション固有能力。"
       },
       "summon_tithefiend": {
         "name": "タイスフィーンド招来",

@@ -11951,7 +11951,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '消耗全部谴罪与命运丝线裁决敌人。每条丝线使伤害提高6%，附加效果会在20、50、80和100点谴罪时提升。16级后伤害成长趋于平缓。',
   'entities.abilities.sentence.name': '裁决',
   'entities.abilities.seraphic_vigil.description':
-    '为一名盟友施加守望祝福，在其陷入危险时恢复生命值。赐福专属技能。',
+    '为一名盟友施加守望祝福，在其陷入危险时恢复 {vigilHeal} 点生命值。赐福专属技能。',
   'entities.abilities.seraphic_vigil.name': '炽天使守望',
   'entities.abilities.shellskin.description': '受到的伤害降低 60%，持续 8 秒，但生效期间无法攻击。',
   'entities.abilities.shellskin.name': '甲壳之肤',

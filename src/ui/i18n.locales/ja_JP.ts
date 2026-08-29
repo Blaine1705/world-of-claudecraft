@@ -12506,7 +12506,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '断罪と運命の糸をすべて消費して敵に宣告を下します。糸1本につきダメージが6%増加し、追加効果は断罪20、50、80、100で強化されます。レベル16以降はダメージの伸びが緩やかになります。',
   'entities.abilities.sentence.name': '宣告',
   'entities.abilities.seraphic_vigil.description':
-    '味方1体に見守りの祝福を与え、危機に陥った時に体力を回復する。ベネディクション固有能力。',
+    '味方1体に見守りの祝福を与え、危機に陥った時に体力を{vigilHeal}回復する。ベネディクション固有能力。',
   'entities.abilities.seraphic_vigil.name': '熾天使の見守り',
   'entities.abilities.shellskin.description':
     '8秒間、受けるダメージを60%軽減しますが、効果中は攻撃できません。',

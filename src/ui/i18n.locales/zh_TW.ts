@@ -11954,7 +11954,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '消耗全部譴罪與命運絲線裁決敵人。每條絲線使傷害提高6%，附加效果會在20、50、80和100點譴罪時提升。16級後傷害成長趨於平緩。',
   'entities.abilities.sentence.name': '裁決',
   'entities.abilities.seraphic_vigil.description':
-    '為一名盟友施加守望祝福，在其陷入危險時恢復生命值。賜福專屬技能。',
+    '為一名盟友施加守望祝福，在其陷入危險時恢復 {vigilHeal} 點生命值。賜福專屬技能。',
   'entities.abilities.seraphic_vigil.name': '熾天使守望',
   'entities.abilities.shellskin.description': '受到的傷害降低 60%，持續 8 秒，但生效期間無法攻擊。',
   'entities.abilities.shellskin.name': '甲殼之膚',

@@ -11341,7 +11341,7 @@ export const ko_KR: EnTranslations = {
       },
       "seraphic_vigil": {
         "name": "치천사의 수호",
-        "description": "아군 한 명에게 수호의 축복을 걸어 위험에 처하면 생명력을 회복시킵니다. 축복 고유 능력입니다."
+        "description": "아군 한 명에게 수호의 축복을 걸어 위험에 처하면 생명력을 {vigilHeal} 회복시킵니다. 축복 고유 능력입니다."
       },
       "summon_tithefiend": {
         "name": "십일조 악마 소환",

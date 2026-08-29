@@ -11341,7 +11341,7 @@ export const zh_CN: EnTranslations = {
       },
       "seraphic_vigil": {
         "name": "炽天使守望",
-        "description": "为一名盟友施加守望祝福，在其陷入危险时恢复生命值。赐福专属技能。"
+        "description": "为一名盟友施加守望祝福，在其陷入危险时恢复 {vigilHeal} 点生命值。赐福专属技能。"
       },
       "summon_tithefiend": {
         "name": "召唤什一魔",

@@ -12481,7 +12481,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '모든 단죄와 운명의 실을 소모해 적에게 선고를 내립니다. 실 하나당 피해가 6% 증가하고, 추가 효과는 단죄 20, 50, 80, 100에서 강화됩니다. 16레벨 이후 피해 증가폭이 완만해집니다.',
   'entities.abilities.sentence.name': '선고',
   'entities.abilities.seraphic_vigil.description':
-    '아군 한 명에게 수호의 축복을 걸어 위험에 처하면 생명력을 회복시킵니다. 축복 고유 능력입니다.',
+    '아군 한 명에게 수호의 축복을 걸어 위험에 처하면 생명력을 {vigilHeal} 회복시킵니다. 축복 고유 능력입니다.',
   'entities.abilities.seraphic_vigil.name': '치천사의 수호',
   'entities.abilities.shellskin.description':
     '8초 동안 받는 피해가 60% 감소하지만, 효과가 지속되는 동안 공격할 수 없습니다.',
