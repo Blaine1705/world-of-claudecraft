@@ -4901,6 +4901,10 @@ export interface Entity extends ClientMirroredEntityFields {
   // Sim time of the last "the orb is sealed" nudge shown to this player at a
   // dormant Blood Orb (authored citadel), throttled the same way.
   riftOrbNoticeAt?: number;
+  // Sim time of the last "your raid is still in combat" Ignivar entry denial
+  // shown to this player, so the 20 Hz walk-in door trigger does not spam the
+  // toast (instances/ignivar_entry.ts).
+  ignivarEntryDeniedAt?: number;
   // Sim time of the last lockpickOffer emitted to this player from a
   // rift_locked_chest click, so repeated F-key presses don't spam the UI.
   riftLockpickOfferAt?: number;
@@ -5127,6 +5131,8 @@ export interface NythraxisEncounterState {
 }
 
 export interface IgnivarEncounterState {
+  /** Players seen alive in this pull, used only for wipe cooldown recovery. */
+  attemptParticipantIds?: number[];
   brandTimer: number;
   forgeStrikeTimer: number;
   frontalTimer: number;
@@ -5153,6 +5159,7 @@ export interface IgnivarEncounterState {
   rotatingRaysDirection: -1 | 1;
   rotatingRaysNextDirection: -1 | 1;
   rotatingRaysPulseTimer: number;
+  rotatingRaysHitCooldownByPlayerId?: Record<number, number>;
   forgeWaveTimer: number;
   forgeWaveWindupRemaining: number;
   forgeWaveActiveRemaining: number;
@@ -5181,6 +5188,8 @@ export interface IgnivarEncounterState {
 }
 
 export interface VarkhulEncounterState {
+  /** Players seen alive in this pull, used only for wipe cooldown recovery. */
+  attemptParticipantIds?: number[];
   engage: VarkhulEngageState;
   makersBrandTimer: number;
   frontalTimer: number;

@@ -4,11 +4,12 @@ import {
   dungeonDaisHasRaisedPlatform,
   dungeonVariantKeepsFightingFloorClear,
 } from '../src/render/dungeon';
-import { DUNGEONS, instanceOrigin } from '../src/sim/data';
+import { DUNGEONS, instanceOrigin, MOBS } from '../src/sim/data';
 import { dungeonFloorLift, dungeonInstanceAt, INTERIOR_LAYOUTS } from '../src/sim/dungeon_floor';
 import { IGNIVAR_LAYOUT, layoutColliders } from '../src/sim/dungeon_layout';
 import { polygonContainsPoint } from '../src/sim/geometry2d';
 import {
+  IGNIVAR_BOSS_SPAWN_Z,
   IGNIVAR_CONDUITS,
   IGNIVAR_FRONTAL_HALF_ANGLE,
   IGNIVAR_FRONTAL_RANGE,
@@ -170,7 +171,7 @@ describe('Ignivar raid arena', () => {
       interior: 'ignivar',
       overworldDoor: false,
       suggestedPlayers: 10,
-      spawns: [{ mobId: 'ignivar_herald_of_the_last_flame', x: 0, z: 0 }],
+      spawns: [{ mobId: 'ignivar_herald_of_the_last_flame', x: 0, z: IGNIVAR_BOSS_SPAWN_Z }],
       entry: { x: 0, z: -27 },
       exitOffset: { x: 0, z: -30 },
     });
@@ -190,6 +191,21 @@ describe('Ignivar raid arena', () => {
       dungeonId: 'ignivar_molten_assembly',
       lootable: false,
     });
+  });
+
+  it('places Ignivar beyond automatic aggro range from the room entrance', () => {
+    const dungeon = DUNGEONS.ignivar_raid_arena;
+    const spawn = dungeon.spawns.find(
+      (candidate) => candidate.mobId === 'ignivar_herald_of_the_last_flame',
+    );
+    if (!spawn) throw new Error('Ignivar spawn is missing');
+
+    expect(Math.hypot(spawn.x - dungeon.entry.x, spawn.z - dungeon.entry.z)).toBeGreaterThan(
+      MOBS.ignivar_herald_of_the_last_flame.aggroRadius,
+    );
+    expect(
+      Math.hypot(spawn.x - IGNIVAR_LAYOUT.dais.x, spawn.z - IGNIVAR_LAYOUT.dais.z),
+    ).toBeLessThan(IGNIVAR_LAYOUT.dais.r);
   });
 
   it('keeps the hidden raid room behind an explicit dev bypass for solo testing', () => {

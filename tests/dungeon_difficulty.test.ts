@@ -44,7 +44,9 @@ describe('heroic tuning data contract', () => {
       'drowned_temple',
       'gravewyrm_sanctum',
       'hollow_crypt',
+      'ignivar_forge_approach',
       'ignivar_inner_crucible',
+      'ignivar_molten_assembly',
       'ignivar_raid_arena',
       'nythraxis_boss_arena',
       'sunken_bastion',
@@ -129,6 +131,8 @@ describe('claimDifficultyForDungeon', () => {
     expect(claimDifficultyForDungeon('gravewyrm_sanctum', 'heroic')).toBe('heroic');
     expect(claimDifficultyForDungeon('nythraxis_boss_arena', 'heroic')).toBe('heroic');
     expect(claimDifficultyForDungeon('ignivar_raid_arena', 'heroic')).toBe('heroic');
+    expect(claimDifficultyForDungeon('ignivar_forge_approach', 'heroic')).toBe('heroic');
+    expect(claimDifficultyForDungeon('ignivar_molten_assembly', 'heroic')).toBe('heroic');
     expect(claimDifficultyForDungeon('ignivar_inner_crucible', 'heroic')).toBe('heroic');
     // The attunement dungeon is story content: normal even when heroic is selected.
     expect(claimDifficultyForDungeon('nythraxis_crypt', 'heroic')).toBe('normal');

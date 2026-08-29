@@ -1,7 +1,11 @@
 // Dungeon content: mob templates that only spawn inside instances, spawn
 // lists, and the DungeonDef registry merged by sim/data.ts.
 
-import { IGNIVAR_CONDUITS, IGNIVAR_WATER_CONDUIT_TEMPLATES } from '../ignivar_arena';
+import {
+  IGNIVAR_BOSS_SPAWN_Z,
+  IGNIVAR_CONDUITS,
+  IGNIVAR_WATER_CONDUIT_TEMPLATES,
+} from '../ignivar_arena';
 import {
   IGNIVAR_CINDER_ARTIFICER_ID,
   IGNIVAR_CRUCIBLE_WARDEN_ID,
@@ -1125,7 +1129,7 @@ const NYTHRAXIS_RAID_SPAWN_LIST: DungeonSpawn[] = [
 ];
 
 const IGNIVAR_RAID_SPAWN_LIST: DungeonSpawn[] = [
-  { mobId: 'ignivar_herald_of_the_last_flame', x: 0, z: 0 },
+  { mobId: 'ignivar_herald_of_the_last_flame', x: 0, z: IGNIVAR_BOSS_SPAWN_Z },
 ];
 
 const IGNIVAR_WARDEN_MINIBOSS: DungeonSpawnMinibossTuning = {
@@ -1557,7 +1561,6 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     entry: { x: 0, z: -50 },
     exitOffset: { x: 0, z: -54 },
     spawns: IGNIVAR_MOLTEN_ASSEMBLY_SPAWN_LIST,
-    mobDifficultyTuningId: IGNIVAR_SECOND_WING_ID,
     npcs: [{ npcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID, x: 0, z: -47 }],
     objects: [
       {

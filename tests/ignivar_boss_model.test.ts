@@ -58,6 +58,9 @@ describe('Ignivar boss model', () => {
       url: 'models/creatures/ignivar_herald.glb',
       height: 2.65,
       yaw: 0,
+      // The contributor atlas ships metallicFactor 1 + a metallic-roughness
+      // texture; matte kills that specular sheen under the forge key light.
+      matte: true,
       clips: {
         idle: 'Idle',
         walk: 'Walk',
@@ -82,7 +85,7 @@ describe('Ignivar boss model', () => {
       height: 1.8,
       yaw: 0,
       selfIllumination: 0.16,
-      envMapIntensity: 1.3,
+      matte: true,
       deathTimeScale: 3,
       clips: {
         idle: 'Idle',

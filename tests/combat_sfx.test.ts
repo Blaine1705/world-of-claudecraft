@@ -732,6 +732,24 @@ describe('combat SFX policy', () => {
     }
   });
 
+  it('gives each Ignivar raid boss its own recorded voice, present in the shipped manifest', () => {
+    // Bound to the real generated manifest on purpose: the failure mode for a
+    // subfamily pack is silent fallback to the family voice, so a missing
+    // alias, a dropped file, or a stale manifest each have to fail here.
+    const shipped = (key: string) => key in SFX_CLIPS;
+    for (const action of ['idle', 'aggro', 'attack', 'hurt', 'death'] as const) {
+      expect(mobVoiceCue('ignivar_herald_of_the_last_flame', action, shipped), action).toBe(
+        `mob_elemental_ignivar_${action}`,
+      );
+      expect(mobVoiceCue('varkhul_forgefather_of_the_last_flame', action, shipped), action).toBe(
+        `mob_elemental_varkhul_${action}`,
+      );
+    }
+    // A non-aliased elemental still keys off its own id and falls back to the
+    // family voice, exactly like an unaliased wolf would.
+    expect(mobVoiceCue('stormcrag_elemental', 'attack', shipped)).toBe('mob_elemental_attack');
+  });
+
   it('resolves the reptile family for its first real mob', () => {
     expect(mobVoiceFamily('deepfen_spearjaw')).toBe('reptile');
     expect(mobVoiceCue('deepfen_spearjaw', 'aggro')).toBe('mob_reptile_aggro');

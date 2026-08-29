@@ -297,10 +297,13 @@ describe('v0.36 placeholder-art completion evidence', () => {
       'staff_of_the_last_spring',
       'wand_of_quenched_sparks',
     ];
+    // The Ignivar legendary maul postdates the campaign the same way (its art
+    // batch is ignivar-varkhul-drop-renders-2026-08-28).
+    const POST_CAMPAIGN_WEAPON_IDS = [...INTEGRATION_WEAPON_IDS, 'varkhul_forgebreaker'];
     expect(targets.weaponItems).toEqual(
       sorted(
         Object.keys(ITEM_WEAPON_VARIANTS).filter(
-          (id) => !INTEGRATION_WEAPON_IDS.includes(id) && !CRUCIBLE_WEAPON_IDS.includes(id),
+          (id) => !POST_CAMPAIGN_WEAPON_IDS.includes(id) && !CRUCIBLE_WEAPON_IDS.includes(id),
         ),
       ),
     );

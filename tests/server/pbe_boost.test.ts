@@ -33,8 +33,10 @@ import {
   NYTHRAXIS_ATTUNEMENT_QUESTS,
   pbeBoostEnabled,
   randomBoostName,
+  roleItemScore,
 } from '../../server/pbe_boost';
 import { HEROIC_ITEMS } from '../../src/sim/content/heroic_loot';
+import { IGNIVAR_DROP_PLACEHOLDER_IDS } from '../../src/sim/content/ignivar_drops';
 import { ITEM_SETS } from '../../src/sim/content/item_sets';
 import { WARFARE_ITEMS } from '../../src/sim/content/pvp_honor';
 import { BUILTIN_WORLD, ITEMS, QUESTS } from '../../src/sim/data';
@@ -149,6 +151,52 @@ describe('bisKit (true best-in-slot over the whole PvE ladder)', () => {
       }
     }
     expect(heroicPicks, 'no heroic-pool item in any kit').toBeGreaterThan(0);
+  });
+
+  it('never puts an unobtainable handover placeholder in any role kit', () => {
+    // Premise arms first: each placeholder WOULD win a slot on raw score, so
+    // the absence below is the eligibleForBoost exclusion working, not the
+    // scorer disliking the items. (Without the exclusion the shield argmaxes
+    // into every tank offhand and the maul into the paladin melee mainhand.)
+    const prot = CLASS_ROLES.warrior.find((role) => role.tank);
+    expect(prot).toBeDefined();
+    const protKit = bisKitForRole('warrior', prot as BoostRole);
+    expect(protKit.offhand).toBeTruthy();
+    expect(roleItemScore(prot as BoostRole, ITEMS.varkhul_emberward)).toBeGreaterThan(
+      roleItemScore(prot as BoostRole, ITEMS[protKit.offhand as string]),
+    );
+    const ret = CLASS_ROLES.paladin.find((role) => role.melee && !role.tank);
+    expect(ret).toBeDefined();
+    const retKit = bisKitForRole('paladin', ret as BoostRole);
+    expect(retKit.mainhand).toBeTruthy();
+    // The maul arm of the premise retired with the Crucible weapon wave: the
+    // ilvl-35 raid two-handers now legitimately out-score the handover
+    // placeholder, so for the melee mainhand the exclusion is no longer what
+    // keeps it out. The scorer still values the item (non-vacuous sweep), and
+    // the shield arm above remains the decisive premise.
+    expect(roleItemScore(ret as BoostRole, ITEMS.varkhul_forgebreaker)).toBeGreaterThan(0);
+    expect(roleItemScore(ret as BoostRole, ITEMS.varkhul_forgebreaker)).toBeLessThanOrEqual(
+      roleItemScore(ret as BoostRole, ITEMS[retKit.mainhand as string]),
+    );
+    // The exclusion set is the real one, not silently empty (which would make
+    // the sweep below vacuous), and every id in it is a live item.
+    expect([...IGNIVAR_DROP_PLACEHOLDER_IDS].sort()).toEqual([
+      'varkhul_emberward',
+      'varkhul_forgebreaker',
+    ]);
+    for (const id of IGNIVAR_DROP_PLACEHOLDER_IDS) expect(ITEMS[id], id).toBeDefined();
+    // And no kit of any class or role hands one out.
+    for (const cls of BOOST_CLASSES) {
+      for (const role of CLASS_ROLES[cls]) {
+        for (const itemId of Object.values(bisKitForRole(cls, role))) {
+          if (!itemId) continue;
+          expect(
+            IGNIVAR_DROP_PLACEHOLDER_IDS.has(itemId),
+            `${cls}/${role.id} kit hands out placeholder ${itemId}`,
+          ).toBe(false);
+        }
+      }
+    }
   });
 
   it('no role kit of any class contains a WARFARE piece', () => {

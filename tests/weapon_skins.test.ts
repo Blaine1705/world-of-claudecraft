@@ -788,6 +788,30 @@ describe('grip override wiring (editor saves reach the game)', () => {
     expect(tuned.quaternion).not.toEqual(bare.quaternion);
   });
 
+  it('rotOffhand replaces rot on the off-hand only, and absent falls back to rot', async () => {
+    // The Forgebreaker case: the owner-tuned 180 yaw reads right in the RIGHT
+    // hand but composes against the identity base on the left, so the row pins
+    // the off-hand to the bare mirrored fit with rotOffhand [0, 0, 0].
+    const { variantGripTransform } = await import('../src/render/characters/weapon_grip');
+    const bareLeft = variantGripTransform(1.2, true, 0.05, 1.6, undefined);
+    const pinned = variantGripTransform(1.2, true, 0.05, 1.6, {
+      rot: [0, 180, 0],
+      rotOffhand: [0, 0, 0],
+    });
+    // [0, 0, 0] means the bare mirrored family fit, byte-identical.
+    expect(pinned.quaternion).toEqual(bareLeft.quaternion);
+    // The right hand still takes the authored rot.
+    const right = variantGripTransform(1.2, false, 0.05, 1.6, {
+      rot: [0, 180, 0],
+      rotOffhand: [0, 0, 0],
+    });
+    const bareRight = variantGripTransform(1.2, false, 0.05, 1.6, undefined);
+    expect(right.quaternion).not.toEqual(bareRight.quaternion);
+    // Absent rotOffhand keeps the prior behavior: rot applies on the left too.
+    const fallback = variantGripTransform(1.2, true, 0.05, 1.6, { rot: [0, 180, 0] });
+    expect(fallback.quaternion).not.toEqual(bareLeft.quaternion);
+  });
+
   it('mirrors a per-weapon offset onto the off-hand (X and Z flip, Y shared)', async () => {
     // The override is authored against the right hand; the off-hand is the mirror
     // image (a 180-degree turn about Y), so a large offset must flip X and Z or the

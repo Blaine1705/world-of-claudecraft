@@ -40,14 +40,17 @@ export const IGNIVAR_PLAYABLE_FLOOR_POLYGON = [
 export const IGNIVAR_LAVA_MOAT_DEPTH = 0.8;
 export const IGNIVAR_LAVA_BRIDGE_HALF_WIDTH = 4;
 export const IGNIVAR_LAVA_BRIDGE_INNER_Z = 27.5;
+/** Keeps the boss on the central dais while leaving the south entry outside
+ *  its automatic aggro radius. */
+export const IGNIVAR_BOSS_SPAWN_Z = 4;
 /** KayKit's authored Ignivar floor is a 4u grid. These origins are the exact
  * first centers emitted by DungeonInteriors.placeFloor for IGNIVAR_LAYOUT. */
 export const IGNIVAR_FLOOR_TILE_SIZE = 4;
 export const IGNIVAR_FLOOR_GRID_X_ORIGIN = -33;
 export const IGNIVAR_FLOOR_GRID_Z_ORIGIN = -35;
 export const IGNIVAR_LAVA_MOAT_DAMAGE_FRACTION = Object.freeze({
-  normal: 0.15,
-  heroic: 0.2,
+  normal: 0.25,
+  heroic: 0.45,
 });
 export const IGNIVAR_LAVA_MOAT_ABILITY_ID = 'ignivar_crucible_perimeter';
 export const IGNIVAR_LAVA_MOAT_ABILITY_NAME = 'Crucible Perimeter';

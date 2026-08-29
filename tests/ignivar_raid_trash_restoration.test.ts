@@ -113,10 +113,10 @@ describe('restored Ignivar pre-boss rooms', () => {
       overworldDoor: false,
       guideVisible: false,
       interior: 'ignivar_approach',
-      mobDifficultyTuningId: IGNIVAR_SECOND_WING_ID,
       entry: { x: 0, z: -50 },
       exitOffset: { x: 0, z: -54 },
     });
+    expect(assembly.mobDifficultyTuningId).toBeUndefined();
     expect(assembly.spawns).toEqual([
       { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: -5, z: -24, packId: 'intake' },
       { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: 0, z: -22, packId: 'intake' },

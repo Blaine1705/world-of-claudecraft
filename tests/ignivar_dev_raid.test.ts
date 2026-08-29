@@ -12,6 +12,7 @@ import {
   IGNIVAR_FORGE_CHAINS_STRAIN_SECONDS,
 } from '../src/sim/ignivar_forge_chains';
 import { IGNIVAR_FORGE_APPROACH_ID, IGNIVAR_RAID_ARENA_ID } from '../src/sim/ignivar_raid_ids';
+import { MAX_AGGRO_RADIUS } from '../src/sim/mob/aggro_ranges';
 import { Sim } from '../src/sim/sim';
 import { DT, dist2d, IGNIVAR_BOSS_ID } from '../src/sim/types';
 
@@ -235,6 +236,12 @@ describe('/dev ignivarraid', () => {
 
     const boss = [...sim.entities.values()].find((entity) => entity.templateId === IGNIVAR_BOSS_ID);
     expect(boss).toBeDefined();
+    // Forming the practice raid must never pull: every pod member spawns
+    // outside the dais boss's automatic aggro radius.
+    for (const bot of botEntities) {
+      if (!bot || !boss) continue;
+      expect(dist2d(bot.pos, boss.pos)).toBeGreaterThan(MAX_AGGRO_RADIUS);
+    }
     sim.tick();
     expect(boss?.inCombat).toBe(false);
   });

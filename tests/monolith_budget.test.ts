@@ -72,8 +72,16 @@ const MONOLITHS: MonolithRow[] = [
     // window carries only state, handler arms and passthroughs. Exact
     // count, zero headroom; the sell-tab combobox block is the next
     // standing extraction candidate.
+    // Held at 2487 for the Solana wallet card (the Claudium card above the
+    // Browse filters): the card's markup landed in the chrome builder, and
+    // the window's gated wallet fan-out arm was paid for by moving the quote
+    // countdown key's arithmetic to the view core (wocQuoteCountdownSig).
+    // Exact count, zero headroom.
     file: 'src/ui/woc_market_window.ts',
-    ceiling: 2487,
+    // Down 2487 -> 2475 at the desktop-signing round: the WocMarketHooks
+    // contract moved to src/ui/woc_market_hooks.ts (wiring, window, and the
+    // trade arm all consume it), paying for the signer-reference plumbing.
+    ceiling: 2475,
     seam: 'a pure view-core module beside it (src/ui/woc_market_view.ts) that this window renders from',
   },
   {
@@ -125,19 +133,22 @@ const MONOLITHS: MonolithRow[] = [
     // relocalize wiring (the window itself lives in
     // src/ui/hud/guild_board/). Then down one at the controller-tutorial
     // merge. Exact count, zero slack.
+    // Plus 1 for the Exchange's Solana wallet card: the ONE line is the
+    // onWalletUiChange fan-out onto wocMarketWindow.onWalletChanged(), the
+    // Claudium panel's existing arm. Exact count.
+    // Raised at the PR #3284 v0.41.0 sync merge, then partially taken back
+    // by the review-round extraction: the frames-menu toggle/select tables,
+    // the reset-key table, and the party-sample roster builder moved to the
+    // pure core interface_unlock_menu_core.ts. What remains on coordinator
+    // state (dimension-mode mover wiring, the edit-preview painter closure,
+    // the player-frame bar lock) is the live-hooks half. Exact merged count.
     // the Ignivar raid consolidation paid its callout/yell additions by moving the pure entity display-label resolver family to entity_display_labels.ts; exact count.
-    // Lowered 18389 -> 18379: the healPower seam replaced both inline
-    // AbilityScaling literals with the extracted abilityScalingOf constructor
-    // (src/ui/ability_damage.ts), so the coordinator shrank and the ratchet
-    // follows it down. Exact count, zero slack.
-    // Lowered 18379 -> 18371: the Crucible sigil-shop wiring paid its way by
-    // moving the character-sheet progression views (milestoneName,
-    // talentSummaryHtml, progressionHtml) to src/ui/character_progression_view.ts,
-    // shrinking the coordinator below the previous pin. Exact count, zero slack.
-    // Lowered 18371 -> 18357: the changed-files biome pass stripped the
-    // unused imports the progression-view extraction and the lineage retune
-    // left behind; the ratchet follows the file down. Exact count, zero slack.
-    ceiling: 18357,
+    // Re-pinned to the exact count of the ignivar-raid-complete base merge
+    // into the Phase B branch: the base's fork landed its own extractions
+    // while this branch's healPower seam, sigil-shop progression views, and
+    // biome import strip lowered the file; the merge lands both arms and the
+    // ratchet pins the merged reality. Exact count, zero slack.
+    ceiling: 18861,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -278,9 +289,20 @@ const MONOLITHS: MonolithRow[] = [
     // the ratchet follows the merged file down). Exact count, zero slack.
     // Re-pinned to the exact merged count of the v0.39.3 main back-merge
     // (the utc_day import consolidation shed one line).
+    // Down 11564 -> 11563 at the desktop-signing round: the wallet-handoff
+    // availability probe and browser authorizer moved to
+    // src/net/desktop_wallet_handoff.ts (thin hoisted delegators remain),
+    // paying for the Exchange desktop-signer wiring at the attach site.
+    // Raised at the PR #3284 v0.41.0 sync merge: the applySetting arms for
+    // the interface-editor settings (frame dimensions, aura direction vars,
+    // the player-frame bar lock) predate this ratchet; folding them behind a
+    // src/game/ settings-application seam is flagged follow-up work. Exact
+    // merged count.
     // Re-pinned after the /daynight dev-command extraction to
     // src/game/daynight_dev_command.ts (net of the Ignivar placer dispatch).
-    ceiling: 11495,
+    // Re-pinned to the exact merged count of the ignivar-raid-complete merge
+    // (both sides of the fork extracted independently; the merge lands both).
+    ceiling: 11558,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -348,6 +370,9 @@ const MONOLITHS: MonolithRow[] = [
     // then re-pinned when the mirror gained the trust-boundary row
     // validation and the 404-vs-transport-failure split, plus the roster
     // class field. Exact count, zero slack.
+    // Down 5855 -> 5817 at the desktop-signing round: the handoff result
+    // validation moved to src/net/desktop_wallet_handoff.ts
+    // (parseDesktopWalletHandoffStatus), paying for the stepup action kind.
     // the raid consolidation moved the ground-telegraph wire decoders (ground_telegraph_wire.ts) out; exact count.
     // Plus 2 for the Healing Power mirror: the blankEntity default and the
     // s.hpw ?? fallback beside the existing sp lines; thin wire wiring with no
@@ -361,7 +386,10 @@ const MONOLITHS: MonolithRow[] = [
     // talent mods through computeCharacterModifiers with the equipment
     // mirror, so worn Crucible tiers read identically in both hosts. Thin
     // wiring to the extracted set_bonus_mods seam. Exact count.
-    ceiling: 5819,
+    // Re-pinned to the exact merged count of the ignivar-raid-complete base
+    // merge: the base's raid consolidation extracted decoders while this
+    // branch added its mirrors; the merge lands both arms. Exact count.
+    ceiling: 5781,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -428,7 +456,13 @@ const MONOLITHS: MonolithRow[] = [
     // Down 4032 -> 3989 at the second round: the stuck-custody monitor
     // vocabulary moved to woc_market_monitor_types.ts (a leaf types module),
     // paying for the seller-history read.
-    ceiling: 3989,
+    // Down 3989 -> 3929 at the desktop-signing round: the economy vocabulary
+    // (quote legs, price/estimate readouts, WocMarketEconomy) moved to
+    // woc_market_economy_types.ts (the monitor-types pattern), paying for the
+    // desktopHandoff registrar dep and its four registration call sites.
+    // Down 3929 -> 3924: the operator listing and p2p row vocabulary moved to
+    // woc_market_ops.ts instead of growing this coordinator.
+    ceiling: 3924,
     seam: 'a woc_market_<thing>.ts sibling behind WocMarketDeps (the drift-warn split is the template)',
   },
   {

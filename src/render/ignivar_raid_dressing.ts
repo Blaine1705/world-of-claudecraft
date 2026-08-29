@@ -47,7 +47,6 @@ export function ensureIgnivarRaidDressingAssets(interior: string): Promise<void>
  *  recipe: no new lights, the light census stays frozen). Skipped on the low
  *  tier like every other glow decal. */
 const PROP_GLOW_POOLS: Partial<Record<IgnivarEnvPropKey, { color: number; scale: number }>> = {
-  firepit: { color: 0xff7a2e, scale: 0.75 },
   lava_face: { color: 0xff4316, scale: 0.85 },
   anvil: { color: 0xff5c1e, scale: 1.25 },
   forge: { color: 0xff5c1e, scale: 1.05 },

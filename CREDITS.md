@@ -67,7 +67,7 @@ so you *may* redistribute them non-commercially with attribution, but you may
 to World of ClaudeCraft (Levy Street) only and does not transfer to forks. See
 the Audio section.
 
-The **brand marks** (Twitch, X, Kick, YouTube, Discord, Solana, USDC) are
+The **brand marks** (Twitch, X, Kick, YouTube, Discord, Steam, Solana, USDC) are
 trademarks and are not licensed to anyone by this file. See Brand marks.
 
 ## Can I still fork and host my own world?
@@ -185,7 +185,7 @@ than free, so ask before you rely on it.
 | Terrorspark Groundshaker rideable mount model (`public/models/mounts/terrorspark_groundshaker.glb`) | World of ClaudeCraft | Original project art procedurally reconstructed from a user-supplied concept without redistributing source pixels; deterministic source, design boundary, and provenance are committed under `scripts/assets/terrorspark_groundshaker/` and `docs/design/terrorspark-groundshaker/`. Its current item painting is credited in the item-art consistency row above | Project asset, rights reserved | **No, permission required** |
 | Rift dimensional gate model (`public/models/props/rift_portal.glb`) | World of ClaudeCraft | Project-generated via Meshy AI (text-to-3D), owned under the Meshy paid-plan license | Project asset | With the project only |
 | Rift arcane flame + rune monolith props (`public/models/props/rift_flame.glb`, `rift_rune.glb`) | World of ClaudeCraft | Project-generated via Tripo AI (text-to-3D), owned under the Tripo paid-plan license | Project asset | With the project only |
-| Ignivar raid forge-mech dressing props (`public/models/dungeon/ignivar_prop_*.glb`: beams, pillars, gear walls, vault door, reactor, firepit, lava face, forge, anvil, chains) | World of ClaudeCraft | Project-generated via Tripo AI (text-to-3D) from the maintainer's environment drop, owned under the Tripo paid-plan license, optimized to KTX2/meshopt via `scripts/assets/build_ignivar_props.mjs` | Project asset | With the project only |
+| Ignivar raid forge-mech dressing props (`public/models/dungeon/ignivar_prop_*.glb`: beams, pillars, the rusty gear wall, vault door, reactor, lava face, forge, anvil, chains, lava and steam machinery) | World of ClaudeCraft | Project-generated via Tripo AI (text-to-3D) from the maintainer's environment drop, owned under the Tripo paid-plan license, optimized to KTX2/meshopt via `scripts/assets/build_ignivar_props.mjs` | Project asset | With the project only |
 | Realm sky HDRIs (hollow_dusk, ember_storm, frost_twilight, amber_sunset, fen_day, nightbloom_dream, wraithwood_gloom; 2k and 1k) | World of ClaudeCraft | Project-generated equirect sky panoramas, converted to RGBE with HDR sun re-injection | Project asset | With the project only |
 | Zone map overlays (`public/map_art/*.png`) | World of ClaudeCraft | Project-generated painterly map overlay art derived from local zone reference plates | Project asset | With the project only |
 | Infernal Citadel props (`public/models/props/infernal_brazier.glb`, `infernal_altar.glb`, `demon_idol.glb`, `hell_forge.glb`, `hanging_cage.glb`, `bone_pile.glb`, `obsidian_fang.glb`, `infernal_statue.glb`, `slag_cauldron.glb`, `bone_throne.glb`) | World of ClaudeCraft | Project-generated via `scripts/asset_pipeline` (Tripo AI text-to-3D), owned under the Tripo paid-plan license | Project asset | With the project only |
@@ -198,7 +198,8 @@ The four streamer-platform marks inlined as SVG paths in `src/ui/ui_icons.ts`
 reproduced monochrome and unmodified in shape solely to identify a link that
 points at that platform. They are not project assets, and no endorsement or
 affiliation is implied. The Discord (Clyde) mark in the same file is used the
-same way.
+same way, as is the Steam mark, which identifies the links to the game's Steam
+store page (the wishlist reminder, `src/ui/steam_wishlist.ts`).
 
 The Solana and USDC logos shipped as `public/claudium/icons/solana-icon.webp`
 and `public/claudium/icons/usdc-icon.webp` are trademarks of their respective

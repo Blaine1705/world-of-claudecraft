@@ -85,6 +85,9 @@ function claimedEncounter(seed = 42, difficulty: 'normal' | 'heroic' = 'normal')
   boss.aggroTargetId = sim.player.id;
   updateIgnivarEncounter(sim.ctx, boss);
   if (!boss.ignivar) throw new Error('Ignivar state was not initialized');
+  const origin = instanceOrigin(DUNGEONS.ignivar_raid_arena.index, 0);
+  boss.pos = sim.ctx.groundPos(origin.x, origin.z);
+  boss.prevPos = { ...boss.pos };
   boss.ignivar.apocalypseTriggered = true;
   boss.ignivar.apocalypseResolved = true;
   boss.ignivar.apocalypseAddId = null;
@@ -208,7 +211,7 @@ describe('Ignivar Forge Judgment', () => {
     expect(IGNIVAR_JUDGMENT_DURATION_SECONDS).toBe(12);
     expect(IGNIVAR_JUDGMENT_SHELTER_RADIUS).toBe(5.5);
     expect(IGNIVAR_JUDGMENT_PULSE_SECONDS).toBe(0.5);
-    expect(IGNIVAR_JUDGMENT_BURN_DAMAGE_MAX_HP).toBe(0.12);
+    expect(IGNIVAR_JUDGMENT_BURN_DAMAGE_MAX_HP).toBe(0.2);
 
     for (let slot = 0; slot < 24; slot++) {
       for (const safeIndex of [0, 1, 2] as const) {
@@ -497,7 +500,7 @@ describe('Ignivar Forge Judgment', () => {
       boss.ignivar.rotatingRaysTimer,
       boss.ignivar.forgeWaveTimer,
       boss.ignivar.soakTimer,
-    ]).toEqual([11, 4, 8, 7, 17, 20, 13]);
+    ]).toEqual([8, 4, 8, 7, 17, 20, 13]);
     expect(conduit.templateId).toBe(IGNIVAR_WATER_CONDUIT_TEMPLATES.active);
     expect(boss.ignivar.conduitTimers.north_west).toBe(5);
     sim.tick();
@@ -635,12 +638,14 @@ describe('Ignivar Forge Judgment', () => {
     unsafe.hp = unsafe.maxHp;
 
     sim.tick();
-    const onePulseHp = unsafe.maxHp - Math.ceil(unsafe.maxHp * 0.12);
+    const onePulseHp = unsafe.maxHp - Math.ceil(unsafe.maxHp * IGNIVAR_JUDGMENT_BURN_DAMAGE_MAX_HP);
     expect(unsafe.hp).toBe(onePulseHp);
     for (let tick = 0; tick < 9; tick++) sim.tick();
     expect(unsafe.hp).toBe(onePulseHp);
     sim.tick();
-    expect(unsafe.hp).toBe(onePulseHp - Math.ceil(unsafe.maxHp * 0.12));
+    expect(unsafe.hp).toBe(
+      onePulseHp - Math.ceil(unsafe.maxHp * IGNIVAR_JUDGMENT_BURN_DAMAGE_MAX_HP),
+    );
   });
 
   it('queues Judgment behind an already warned meteor instead of cancelling it', () => {
@@ -691,7 +696,7 @@ describe('Ignivar Forge Judgment', () => {
   it('enters the twenty-percent finale and guarantees alternating frontals', () => {
     expect(IGNIVAR_LAST_INFERNO_HP_THRESHOLD).toBe(0.2);
     expect(IGNIVAR_FINAL_METEOR_EVERY).toBe(9);
-    expect(IGNIVAR_FINAL_ROTATING_RAYS_EVERY).toBe(18);
+    expect(IGNIVAR_FINAL_ROTATING_RAYS_EVERY).toBe(24);
     expect(IGNIVAR_FINAL_ROTATING_RAYS_SPEED_MULTIPLIER).toBe(1.6);
     expect(IGNIVAR_FINAL_FRONTAL_EVERY).toBe(8);
 

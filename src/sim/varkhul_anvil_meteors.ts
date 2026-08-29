@@ -28,7 +28,7 @@ export const VARKHUL_ANVIL_METEOR_CAST_ID = 'Hammerfall Meteors';
 export const VARKHUL_ANVIL_METEOR_COUNT = 3;
 export const VARKHUL_ANVIL_METEOR_WARNING_SECONDS = 1.8;
 export const VARKHUL_ANVIL_METEOR_RADIUS = 3.5;
-export const VARKHUL_ANVIL_METEOR_DAMAGE_MAX_HP = 0.35;
+export const VARKHUL_ANVIL_METEOR_DAMAGE_MAX_HP = 0.75;
 
 export function varkhulAnvilMeteorId(
   bossId: number,

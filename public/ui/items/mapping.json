@@ -6081,6 +6081,19 @@
         "springtouched_crozier",
         "wand_of_quenched_sparks"
       ]
+    },
+    {
+      "batchId": "ignivar-varkhul-drop-renders-2026-08-28",
+      "source": "In-engine render of the committed weapon models (scripts/render_varkhul_drop_icons.mjs: models/weapons/hammer_varkhul.glb and models/weapons/varkhul_emberward.glb through the shared weapon still entry, composited on the item-icon vignette)",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "existing painted WebP catalog in public/ui/items/; subjects are the exact held weapon models the two Ignivar legendaries equip",
+      "provenanceRecord": "scripts/render_varkhul_drop_icons.mjs",
+      "itemIds": [
+        "varkhul_emberward",
+        "varkhul_forgebreaker"
+      ],
+      "commonPrompt": "Not a text-to-image prompt: deterministic in-engine still of the committed weapon model (shared framing rig, three-point lighting, alpha subject trimmed and centered with safe margins) composited on the item-icon radial vignette at 128px."
     }
   ]
 }

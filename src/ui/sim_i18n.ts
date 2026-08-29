@@ -525,6 +525,8 @@ const baseEnTable = {
   'lore.ignivarLivingMetalRecordName': 'Living Metal Record',
   'lore.ignivarHeraldKeyRecordName': 'Herald-Key Record',
   'error.ignivarForgeGateSealed': 'The forge gate is sealed to you.',
+  'error.ignivarRaidInCombat':
+    'Your raid is still in combat. You may enter once the fighting stops.',
   'aura.carrierFatigue': 'Carrier Fatigue',
   // The always-worn carried-flag buff; right-clicking it drops the flag on purpose.
   'aura.carriedFlag': 'Carrying the Flag',

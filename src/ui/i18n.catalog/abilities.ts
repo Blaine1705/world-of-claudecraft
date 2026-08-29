@@ -1290,7 +1290,7 @@ const classAbilityNamesEn = {
       [
         'oath_chain',
         'Oath Chain',
-        'Instantly bind a distant enemy with a sacred chain. The enemy travels toward you at 18 m per second until it reaches 3 m, then is slowed by 50% for 4 sec. During Ascension it binds a second nearby enemy.',
+        'Instantly bind a distant enemy with a sacred chain. The enemy travels toward you at 18 m per second until it reaches 3 m, then is slowed by 50% for 4 sec. During Ascension it binds a second nearby enemy. Bosses cannot be pulled or slowed.',
       ],
       [
         'veilbound_march',

@@ -18,6 +18,11 @@ const viewport = mobile
   : { width: 1600, height: 900, deviceScaleFactor: 1, isMobile: false, hasTouch: false };
 const graphicsPreset = mobile ? 1 : 5;
 const forcedGraphicsTier = mobile ? 'low' : 'ultra';
+const raidTuningOnly = process.argv.includes('--raid-tuning');
+const expectRaidTuningVfx = process.argv.includes('--expect-raid-tuning-vfx');
+if (expectRaidTuningVfx && !raidTuningOnly) {
+  throw new Error('--expect-raid-tuning-vfx requires --raid-tuning');
+}
 const sleep = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
 mkdirSync(outputDirectory, { recursive: true });
@@ -84,7 +89,7 @@ try {
   // explicit dismissal below and the next slow SwiftShader frame.
   await page.addStyleTag({
     content:
-      '#gpu-notice, #loot-settings-window, #options-menu, .camera-prompt-backdrop { display: none !important; }',
+      '#gpu-notice, #tutorial-greeting, #loot-settings-window, #options-menu, .camera-prompt-backdrop { display: none !important; }',
   });
 
   const fixture = await page.evaluate(() => {
@@ -99,16 +104,24 @@ try {
     const boss = [...game.sim.entities.values()].find(
       (entity) => entity.templateId === 'ignivar_herald_of_the_last_flame',
     );
+    const conduit = [...game.sim.entities.values()].find(
+      (entity) =>
+        entity.templateId === 'ignivar_water_conduit_ready' &&
+        boss &&
+        entity.pos.x < boss.pos.x &&
+        entity.pos.z > boss.pos.z,
+    );
     const allies = [...game.sim.entities.values()].filter(
       (entity) => entity.kind === 'player' && entity.id !== player.id,
     );
-    if (!boss || allies.length < 3) return null;
+    if (!boss || !conduit || allies.length < 3) return null;
     game.input.camYaw = Math.PI;
     game.input.camPitch = 0.78;
     game.input.camDist = 27;
     return {
       playerId: player.id,
       bossId: boss.id,
+      conduitId: conduit.id,
       allyIds: allies.slice(0, 4).map((ally) => ally.id),
     };
   });
@@ -128,15 +141,20 @@ try {
 
   async function stage(name) {
     await page.evaluate(
-      ({ playerId, bossId, allyIds }, stageName) => {
+      ({ playerId, bossId, conduitId, allyIds }, stageName) => {
         clearInterval(window.__ignivarTelegraphStage);
         const apply = () => {
           const game = window.__game;
           const player = game.sim.entities.get(playerId);
           const boss = game.sim.entities.get(bossId);
+          const conduit = game.sim.entities.get(conduitId);
           const allies = allyIds.map((id) => game.sim.entities.get(id)).filter(Boolean);
-          if (!player || !boss || allies.length < 3) return;
-          const center = { x: boss.pos.x, y: boss.pos.y, z: boss.pos.z + 7 };
+          if (!player || !boss || !conduit || allies.length < 3) return;
+          const center = {
+            x: boss.pos.x,
+            y: boss.pos.y,
+            z: boss.pos.z + 7,
+          };
           player.pos = { ...center };
           player.prevPos = { ...center };
           player.vx = 0;
@@ -146,7 +164,10 @@ try {
           player.dead = false;
           player.hp = player.maxHp;
           player.auras = player.auras.filter(
-            (aura) => aura.id !== 'ignivar_brand_of_the_pyre' && aura.id !== 'ignivar_shared_pyre',
+            (aura) =>
+              aura.id !== 'ignivar_brand_of_the_pyre' &&
+              aura.id !== 'ignivar_shared_pyre' &&
+              aura.id !== 'varkhul_shared_pyre',
           );
           for (let index = 0; index < allies.length; index++) {
             const ally = allies[index];
@@ -182,7 +203,7 @@ try {
           }
           if (stageName.startsWith('soak')) {
             player.auras.push({
-              id: 'ignivar_shared_pyre',
+              id: 'varkhul_shared_pyre',
               name: 'Shared Pyre',
               kind: 'vulnerability',
               remaining: 3,
@@ -199,6 +220,10 @@ try {
           boss.aiState = 'attack';
           boss.facing = 0;
           boss.prevFacing = 0;
+          conduit.templateId =
+            stageName === 'well-active'
+              ? 'ignivar_water_conduit_active'
+              : 'ignivar_water_conduit_ready';
           if (boss.ignivar) {
             Object.assign(boss.ignivar, {
               brandTimer: 600,
@@ -246,6 +271,7 @@ try {
               lastInfernoRemaining: 0,
               lastInfernoResolved: false,
               finalFrontalTimer: 600,
+              conduitTimers: stageName === 'well-active' ? { north_west: 10 } : {},
             });
           }
           boss.castingAbility = stageName === 'frontal' ? 'Searing Torrent' : null;
@@ -253,8 +279,16 @@ try {
           boss.castRemaining = stageName === 'frontal' ? 0.9 : 0;
           boss.channeling = false;
           game.input.camYaw = Math.PI;
-          game.input.camPitch = stageName === 'frontal' ? 0.82 : 0.9;
-          game.input.camDist = stageName === 'frontal' ? 32 : 23;
+          game.input.camPitch = stageName.startsWith('soak')
+            ? 0.76
+            : stageName === 'frontal'
+              ? 0.82
+              : 0.9;
+          game.input.camDist = stageName.startsWith('soak')
+            ? 18
+            : stageName === 'frontal' || stageName === 'well-active'
+              ? 32
+              : 23;
         };
         apply();
         window.__ignivarTelegraphStage = setInterval(apply, 16);
@@ -266,6 +300,7 @@ try {
     await page.evaluate(() => {
       window.__game.hud?.closeLootSettings?.(false);
       window.__game.hud?.closeOptions?.();
+      document.querySelector('#tutorial-greeting')?.remove();
       const dialog = document.querySelector('#loot-settings-window');
       if (dialog instanceof HTMLElement) dialog.style.display = 'none';
       document.querySelector('.gpu-notice-dismiss')?.click();
@@ -280,8 +315,12 @@ try {
       () =>
         new Promise((resolve) => {
           window.__game.hud?.closeOptions?.();
-          document.querySelector('#gpu-notice')?.remove();
-          for (const selector of ['#loot-settings-window', '#options-menu']) {
+          for (const selector of [
+            '#gpu-notice',
+            '#tutorial-greeting',
+            '#loot-settings-window',
+            '#options-menu',
+          ]) {
             const overlay = document.querySelector(selector);
             if (overlay instanceof HTMLElement) {
               overlay.style.setProperty('display', 'none', 'important');
@@ -292,15 +331,17 @@ try {
     );
     const output = path.join(outputDirectory, `${graphicsProfile}-${name}.png`);
     await page.screenshot({ path: output });
-    const state = await page.evaluate(({ playerId, bossId }) => {
+    const state = await page.evaluate(({ playerId, bossId, conduitId }) => {
       const game = window.__game;
       const player = game.sim.entities.get(playerId);
       const boss = game.sim.entities.get(bossId);
       const playerView = game.renderer.views.get(playerId);
       const bossView = game.renderer.views.get(bossId);
-      const soak = playerView?.group?.getObjectByName('ignivarSoakCircle');
+      const soak = playerView?.group?.getObjectByName('varkhulSharedPyreCircle');
       const brand = playerView?.group?.getObjectByName('ignivarBrandCircle');
       const frontal = bossView?.group?.getObjectByName('ignivarFrontalTelegraph');
+      const conduitView = game.renderer.views.get(conduitId);
+      const activeBeacon = conduitView?.group?.getObjectByName('ignivarWaterActiveBeacon');
       const meteor = game.renderer.mageGroundFx?.meteors?.find((entry) =>
         entry.persistentId?.startsWith(`${bossId}:`),
       );
@@ -330,9 +371,11 @@ try {
         frontalAimDot,
         soakPlayersInside: soak?.userData.playersInside ?? 0,
         soakReady: soak?.userData.ready ?? false,
+        soakBeaconVisible: soak?.getObjectByName('ignivarSoakCallInBeacon')?.visible ?? false,
         meteorTelegraphVisible: meteorTelegraph?.visible ?? false,
         meteorTelegraphCount,
         meteorBodyVisible: meteor?.root?.getObjectByName('mage-meteor-body')?.visible ?? false,
+        activeWellBeaconVisible: activeBeacon?.visible ?? false,
       };
     }, fixture);
     const frameProfile =
@@ -370,15 +413,20 @@ try {
   const stageStates = {};
   const frameProfiles = {};
   let compilePendingProbe = null;
-  for (const name of [
-    'brand-safe',
-    'brand-danger',
-    'frontal',
-    'meteor-ground',
-    'meteor-five',
-    'soak-call',
-    'soak-ready',
-  ]) {
+  const stages = raidTuningOnly
+    ? ['well-active', 'soak-call']
+    : [
+        'brand-safe',
+        'brand-danger',
+        'frontal',
+        'well-active',
+        'meteor-ground',
+        'meteor-five',
+        'soak-call',
+        'soak-ready',
+      ];
+  if (raidTuningOnly) await sleep(8_000);
+  for (const name of stages) {
     const capture = await stage(name);
     outputs[name] = capture.output;
     stageStates[name] = capture.state;
@@ -431,7 +479,7 @@ try {
   const renderState = await page.evaluate(({ playerId, bossId }) => {
     const playerView = window.__game.renderer.views.get(playerId);
     const bossView = window.__game.renderer.views.get(bossId);
-    const soak = playerView?.group?.getObjectByName('ignivarSoakCircle');
+    const soak = playerView?.group?.getObjectByName('varkhulSharedPyreCircle');
     const brand = playerView?.group?.getObjectByName('ignivarBrandCircle');
     const frontal = bossView?.group?.getObjectByName('ignivarFrontalTelegraph');
     return {
@@ -444,7 +492,11 @@ try {
   }, fixture);
 
   const fatalConsoleErrors = consoleErrors.filter(
-    (entry) => !entry.text.startsWith('Failed to load resource:'),
+    (entry) =>
+      !entry.text.startsWith('Failed to load resource:') &&
+      (!raidTuningOnly ||
+        (!entry.text.includes('brasscrown_walking_staff.glb') &&
+          !entry.text.includes('training_dummy.glb'))),
   );
   if (pageErrors.length || fatalConsoleErrors.length) {
     throw new Error(
@@ -452,37 +504,48 @@ try {
     );
   }
   if (
-    !renderState.soakVisible ||
-    renderState.soakPlayersInside !== 4 ||
-    !renderState.soakReady ||
-    !renderState.frontalExists
+    !raidTuningOnly &&
+    (!renderState.soakVisible ||
+      renderState.soakPlayersInside !== 4 ||
+      !renderState.soakReady ||
+      !renderState.frontalExists)
   ) {
     throw new Error(`telegraph render contract failed: ${JSON.stringify(renderState)}`);
   }
   if (
-    !stageStates['brand-safe'].brandVisible ||
-    stageStates['brand-safe'].brandOverlapDanger ||
-    !stageStates['brand-danger'].brandVisible ||
-    !stageStates['brand-danger'].brandOverlapDanger ||
-    (stageStates['brand-danger'].brandFillOpacity ?? 0) <=
-      (stageStates['brand-safe'].brandFillOpacity ?? Infinity) ||
-    !stageStates.frontal.frontalVisible ||
-    (stageStates.frontal.frontalAimDot ?? -1) < 0.99 ||
-    !stageStates['meteor-ground'].meteorTelegraphVisible ||
-    stageStates['meteor-five'].meteorTelegraphCount !== 5 ||
-    stageStates['soak-call'].soakPlayersInside !== 1 ||
-    stageStates['soak-call'].soakReady ||
-    stageStates['soak-ready'].soakPlayersInside !== 4 ||
-    !stageStates['soak-ready'].soakReady
+    !raidTuningOnly &&
+    (!stageStates['brand-safe'].brandVisible ||
+      stageStates['brand-safe'].brandOverlapDanger ||
+      !stageStates['brand-danger'].brandVisible ||
+      !stageStates['brand-danger'].brandOverlapDanger ||
+      (stageStates['brand-danger'].brandFillOpacity ?? 0) <=
+        (stageStates['brand-safe'].brandFillOpacity ?? Infinity) ||
+      !stageStates.frontal.frontalVisible ||
+      (stageStates.frontal.frontalAimDot ?? -1) < 0.99 ||
+      !stageStates['meteor-ground'].meteorTelegraphVisible ||
+      stageStates['meteor-five'].meteorTelegraphCount !== 5 ||
+      stageStates['soak-call'].soakPlayersInside !== 1 ||
+      stageStates['soak-call'].soakReady ||
+      stageStates['soak-ready'].soakPlayersInside !== 4 ||
+      !stageStates['soak-ready'].soakReady)
   ) {
     throw new Error(`staged telegraph contract failed: ${JSON.stringify(stageStates)}`);
   }
   if (
-    !compilePendingProbe?.state.groupVisible ||
-    compilePendingProbe.state.rigVisible ||
-    !compilePendingProbe.state.frontalVisible ||
-    !compilePendingProbe.state.compilePending ||
-    !compilePendingProbe.state.visualCompilePending
+    expectRaidTuningVfx &&
+    (!stageStates['well-active'].activeWellBeaconVisible ||
+      !stageStates['soak-call'].soakBeaconVisible ||
+      stageStates['soak-call'].soakReady)
+  ) {
+    throw new Error(`raid tuning VFX contract failed: ${JSON.stringify(stageStates)}`);
+  }
+  if (
+    !raidTuningOnly &&
+    (!compilePendingProbe?.state.groupVisible ||
+      compilePendingProbe.state.rigVisible ||
+      !compilePendingProbe.state.frontalVisible ||
+      !compilePendingProbe.state.compilePending ||
+      !compilePendingProbe.state.visualCompilePending)
   ) {
     throw new Error(
       `compile-pending telegraph contract failed: ${JSON.stringify(compilePendingProbe)}`,

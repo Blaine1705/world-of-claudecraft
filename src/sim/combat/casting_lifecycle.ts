@@ -180,6 +180,7 @@ import {
 } from './paladin_solar_reprisal';
 import { paladinManaCostMultiplier } from './paladin_support';
 import { isValkyrsCallingAirborne } from './paladin_valkyrs_calling_state';
+import { effectivePlayerAttackRange } from './player_attack_reach';
 import { hasTithefiendTarget } from './priest/vespers';
 import { resurrectionCastRange, resurrectionReachError } from './resurrection_reach';
 import {
@@ -1312,7 +1313,7 @@ export function castAbility(
       return;
     }
     const d = dist2d(p.pos, target.pos);
-    const maxRange = ability.range > 0 ? ability.range : MELEE_RANGE;
+    const maxRange = effectivePlayerAttackRange(target, ability.range);
     if (d > maxRange) {
       ctx.error(p.id, 'Out of range.');
       return;
@@ -1342,7 +1343,7 @@ export function castAbility(
       return;
     }
     const d = dist2d(p.pos, target.pos);
-    const maxRange = ability.range > 0 ? ability.range : MELEE_RANGE;
+    const maxRange = effectivePlayerAttackRange(target, ability.range);
     if (d > maxRange) {
       ctx.error(p.id, 'Out of range.');
       return;
@@ -2190,7 +2191,7 @@ function applyChannelTick(
     cancelCast(ctx, p);
     return;
   }
-  const maxRange = res.def.range > 0 ? res.def.range : MELEE_RANGE;
+  const maxRange = effectivePlayerAttackRange(target, res.def.range);
   if (dist2d(p.pos, target.pos) > maxRange) {
     ctx.error(p.id, 'Out of range.');
     cancelCast(ctx, p);
@@ -2521,7 +2522,7 @@ function applyAbility(
       return;
     }
     const d = dist2d(p.pos, target.pos);
-    const maxRange = ability.range > 0 ? ability.range : MELEE_RANGE;
+    const maxRange = effectivePlayerAttackRange(target, ability.range);
     if (d > maxRange + 2) {
       ctx.error(p.id, 'Out of range.');
       return;
@@ -2537,7 +2538,7 @@ function applyAbility(
       return;
     }
     const d = dist2d(p.pos, target.pos);
-    const maxRange = ability.range > 0 ? ability.range : MELEE_RANGE;
+    const maxRange = effectivePlayerAttackRange(target, ability.range);
     if (d > maxRange + 2) {
       ctx.error(p.id, 'Out of range.');
       return;

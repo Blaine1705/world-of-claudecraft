@@ -69,6 +69,7 @@ import {
 import { farMeshShown, shadowProxyShown } from './far_lod_reveal_core';
 import { HairSwayDriver } from './hair_sway';
 import { buildHalo } from './halo';
+import { disposeHeldPropIdles, updateHeldPropIdles } from './held_prop_idle';
 import { noteLookAttached } from './look_pieces';
 import type { EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
 import { createMetamorphWingPose, metamorphWingPoseInto } from './metamorph_wing_motion_core';
@@ -1169,6 +1170,14 @@ export class CharacterVisual {
       // and frozen times are mixer INPUTS, unlike the additive lifts below).
       this.driveClimbClips();
       this.updateMixer(animationDt);
+      // Held props with their own looping clip (the Ignivar legendaries'
+      // engine idles) advance on the same hitstop-aware dt as the rig.
+      // Gated on the far mesh ACTUALLY standing in, like updateWeaponVfx:
+      // while the far bake is shown the props are hidden with the rig, so the
+      // mixer would write node TRS nothing draws.
+      if (!farMeshShown(this.far, this.farMesh !== null, this.farCompilePending)) {
+        updateHeldPropIdles(this.model, animationDt);
+      }
       this.pendingDt = 0;
       // AFTER the mixer wrote the sampled pose: the sheathe gesture's additive
       // arm raise (never applied on skipped-mixer frames, so it cannot accumulate).
@@ -2989,6 +2998,7 @@ export class CharacterVisual {
 
   dispose(): void {
     this.disposed = true;
+    disposeHeldPropIdles(this.model);
     this.bastionSweepFx?.dispose();
     this.bastionSweepFx = null;
     this.bastionSweepAction = null;

@@ -255,7 +255,7 @@ function missingPaintedWaveItemIds(): string[] {
 describe('item webp icons', () => {
   it('has image-backed item ids wired (guards the fixture)', () => {
     expect(ITEM_IMAGE_IDS.size).toBeGreaterThan(0);
-    expect(WEAPON_IMAGE_IDS.size).toBe(132);
+    expect(WEAPON_IMAGE_IDS.size).toBe(133);
   });
 
   it('A) every image-backed item and weapon resolves to a committed, decodable .webp', async () => {

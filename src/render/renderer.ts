@@ -13051,11 +13051,11 @@ export class Renderer {
     return this.pickSloppy(clientX, clientY);
   }
 
-  // The direct-raycast half of pick(): only a hit that actually lands on an
-  // entity's mesh. Split out so callers that also raycast gather nodes (a
-  // click that lands on a node must not be stolen by the sloppy assist below)
-  // can slot the node raycast in between this and pickSloppy.
+  // The direct half of pick(): a visible nameplate health bar or an entity mesh.
+  // Split out so gather-node callers can slot their raycast before pickSloppy.
   pickDirect(clientX: number, clientY: number): number | null {
+    const nameplate = this.nameplatePainter.pickEntityAt(clientX, clientY);
+    if (nameplate !== null) return nameplate;
     this.raycastNdc.set(
       (clientX / this.viewport.width) * 2 - 1,
       -(clientY / this.viewport.height) * 2 + 1,

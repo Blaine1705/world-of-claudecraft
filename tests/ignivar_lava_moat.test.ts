@@ -119,8 +119,8 @@ describe('Ignivar perimeter lava moat', () => {
   });
 
   it.each([
-    ['normal', 0.15],
-    ['heroic', 0.2],
+    ['normal', 0.25],
+    ['heroic', 0.45],
   ] as const)('burns a grounded player once per second on %s', (difficulty, fraction) => {
     expect(IGNIVAR_LAVA_MOAT_DAMAGE_FRACTION[difficulty]).toBe(fraction);
     const { sim, origin } = enterIgnivar(difficulty);

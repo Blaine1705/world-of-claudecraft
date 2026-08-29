@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
+import { IGNIVAR_RAID_ENVIRONMENT } from '../src/render/ignivar_raid_environment';
 import { DUNGEON_MINIBOSS_STOMP_ABILITY_ID } from '../src/sim/mob/dungeon_miniboss_stomp';
 
 describe('expanded Ignivar raid visual manifest', () => {
@@ -122,6 +123,42 @@ describe('expanded Ignivar raid visual manifest', () => {
         death: 'Death',
       },
     });
+  });
+
+  it('keeps every raid rig matte so room lights cannot lay a specular sheen on the bodies', () => {
+    // Derived from the VISUALS table, not a hardcoded list, so a NEW raid rig
+    // (any mob_ignivar* / mob_varkhul* def) must opt into matte or fail here.
+    const raidKeys = Object.keys(VISUALS).filter(
+      (key) => key.startsWith('mob_ignivar') || key.startsWith('mob_varkhul'),
+    );
+    // Vacuity floor: the shipped roster (both bosses, the Ashcaller add, the
+    // three automata) must all be caught by the derivation.
+    for (const key of [
+      'mob_ignivar',
+      'mob_ignivar_heart_of_the_end',
+      'mob_ignivar_crucible_warden',
+      'mob_ignivar_ember_sentinel',
+      'mob_ignivar_cinder_artificer',
+      'mob_varkhul_forgefather',
+    ]) {
+      expect(raidKeys, `derivation must include ${key}`).toContain(key);
+    }
+    for (const key of raidKeys) {
+      expect(VISUALS[key].matte, `${key} must be matte`).toBe(true);
+      // The old boosts (1.3 Ashcaller, 1.6 Forgefather) were dead config
+      // (three overwrites per-material envMapIntensity with
+      // scene.environmentIntensity under scene env); they stay retired so
+      // nobody re-tunes a knob that cannot reach the shader.
+      expect(VISUALS[key].envMapIntensity, `${key} must keep stock env`).toBeUndefined();
+    }
+    // The matte roster and the room grades are a tuned pair: the rooms may
+    // not push the scene-wide daylight environment map back toward the
+    // blue-white frost band the header of ignivar_raid_environment.ts
+    // documents from 0.2 up (the full room-side ceilings live in
+    // tests/ignivar_raid_environment.test.ts; this is the pairing pin).
+    for (const profile of Object.values(IGNIVAR_RAID_ENVIRONMENT)) {
+      expect(profile.envIntensity).toBeLessThanOrEqual(0.18);
+    }
   });
 
   it('reuses the established archivist body for Maelin Emberward', () => {

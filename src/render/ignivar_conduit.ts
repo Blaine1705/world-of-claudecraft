@@ -8,13 +8,14 @@ import { type IgnivarConduitState, ignivarConduitStateForTemplate } from '../sim
 import { GFX, surfaceMat } from './gfx';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 
-const HEIGHT = 3.6;
+const HEIGHT = 7;
 const CLEANSE_EDGE_WIDTH = 0.16;
 
 export const IGNIVAR_CONDUIT_CLEANSE_FOOTPRINT_NAME = 'ignivarWaterCleanseFootprint';
 export const IGNIVAR_CONDUIT_CLEANSE_BOUNDARY_NAME = 'ignivarWaterCleanseBoundary';
 export const IGNIVAR_CONDUIT_ACTIVATION_RUNE_NAME = 'ignivarWaterActivationRune';
 export const IGNIVAR_CONDUIT_READY_AIM_RING_NAME = 'ignivarWaterReadyAimRing';
+export const IGNIVAR_CONDUIT_ACTIVE_BEACON_NAME = 'ignivarWaterActiveBeacon';
 
 const templates = new Map<IgnivarConduitState, THREE.Group>();
 let stableTemplate: THREE.Group | null = null;
@@ -174,6 +175,33 @@ function buildSteamEnergy(material: THREE.Material): THREE.Group {
   return steam;
 }
 
+function buildActiveBeacon(): THREE.Group {
+  const beacon = new THREE.Group();
+  beacon.name = IGNIVAR_CONDUIT_ACTIVE_BEACON_NAME;
+  beacon.userData.ignivarConduitLayer = 'activeBeacon';
+  const outerMaterial = waterGlowMaterial(0x3fdcff, 0.34);
+  const coreMaterial = waterGlowMaterial(0xd9fcff, 0.92);
+  const crownMaterial = waterGlowMaterial(0x8ff4ff, 0.9);
+
+  const outer = mesh(new THREE.CylinderGeometry(0.72, 0.5, 6.2, 16, 1, true), outerMaterial, 3.55);
+  outer.name = 'ignivarWaterActiveBeaconOuter';
+  outer.castShadow = false;
+  outer.receiveShadow = false;
+  outer.renderOrder = 6;
+
+  const core = mesh(new THREE.CylinderGeometry(0.16, 0.25, 6.5, 12, 1, true), coreMaterial, 3.65);
+  core.name = 'ignivarWaterActiveBeaconCore';
+  core.castShadow = false;
+  core.receiveShadow = false;
+  core.renderOrder = 7;
+
+  const crown = horizontalMesh(new THREE.TorusGeometry(1.18, 0.1, 8, 32), crownMaterial, 6.65);
+  crown.name = 'ignivarWaterActiveBeaconCrown';
+  crown.renderOrder = 7;
+  beacon.add(outer, core, crown);
+  return beacon;
+}
+
 function addActiveVisual(group: THREE.Group): void {
   const footprintMaterial = waterGlowMaterial(0x269dcc, 0.14, THREE.NormalBlending);
   const boundaryMaterial = waterGlowMaterial(0x55e6ff, 0.82);
@@ -227,7 +255,7 @@ function addActiveVisual(group: THREE.Group): void {
   core.receiveShadow = false;
   core.renderOrder = 5;
   jet.add(core, buildSteamEnergy(steamMaterial));
-  group.add(jet);
+  group.add(jet, buildActiveBeacon());
 }
 
 function buildTemplate(state: IgnivarConduitState): THREE.Group {

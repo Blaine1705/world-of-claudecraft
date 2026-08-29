@@ -1,6 +1,8 @@
 // The Ignivar prop dressing plan: gameplay clearances hold on the REAL room
-// layouts, the beam outline stays flush against the collider wall line, and
-// the shipped prop GLBs stay inside their byte budget.
+// layouts, the beam outline stays flush against the collider wall line, the
+// shipped prop GLBs stay inside their byte budget, and every wired prop is
+// actually placed in a room (the loader downloads the whole URL map for
+// every player at world entry, so an unplaced prop is pure dead weight).
 import { existsSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { getBounds, NodeIO } from '@gltf-transform/core';
@@ -117,7 +119,26 @@ describe('ignivar dressing plan', () => {
       expect(bytes, `${url} exceeds the per-prop budget`).toBeLessThanOrEqual(400_000);
       total += bytes;
     }
-    expect(total, 'prop set exceeds the total budget').toBeLessThanOrEqual(7_000_000);
+    // Ratcheted down with the 2026-08 unplaced-prop trim (the placed set is
+    // about 4.2 MB); raising this back is a deliberate budget decision.
+    expect(total, 'prop set exceeds the total budget').toBeLessThanOrEqual(4_500_000);
+  });
+
+  it('places every wired prop in at least one raid room (no dead download weight)', () => {
+    // prepareIgnivarEnvProps fetches EVERY url in IGNIVAR_ENV_PROP_URLS at
+    // world entry, for every player, raid visitor or not. A key no room plan
+    // places still costs the whole playerbase its download, decode, and GPU
+    // template, so a new prop lands together with its placements or not at
+    // all (the 2026-08 trim removed 13 wired-but-unplaced props, 2.31 MB).
+    const placed = new Set<string>();
+    for (const plan of [
+      ignivarApproachPropPlan(IGNIVAR_FORGE_APPROACH_LAYOUT),
+      ignivarArenaPropPlan(IGNIVAR_LAYOUT),
+      ignivarCruciblePropPlan(IGNIVAR_SECOND_WING_LAYOUT),
+    ])
+      for (const placement of plan) placed.add(placement.key);
+    for (const key of Object.keys(IGNIVAR_ENV_PROP_URLS))
+      expect(placed.has(key), `${key} is wired to a GLB but placed in no raid room`).toBe(true);
   });
 
   it('pins the native dims table to the shipped GLBs (canonical long-axis-on-X)', async () => {

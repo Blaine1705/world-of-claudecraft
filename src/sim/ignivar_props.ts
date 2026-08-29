@@ -10,12 +10,7 @@ import { DUNGEON_WALL_HEIGHT, type DungeonLayout } from './dungeon_layout';
 
 export type IgnivarEnvPropKey =
   | 'beam'
-  | 'curved_wall'
-  | 'firepit'
-  | 'gear_machine'
   | 'vault_door'
-  | 'gear_wall'
-  | 'pillar_broad'
   | 'pillar_slim'
   | 'reactor'
   | 'gear_wall_rusty'
@@ -24,12 +19,8 @@ export type IgnivarEnvPropKey =
   | 'forge'
   | 'chain'
   | 'chain_hanging'
-  | 'control_machine'
-  | 'furnace_small'
-  | 'gear_pile'
   | 'lava_furnace'
   | 'press_machine'
-  | 'shelf'
   | 'square_wall'
   | 'chain_link'
   | 'hanging_hook'
@@ -37,11 +28,7 @@ export type IgnivarEnvPropKey =
   | 'lava_channel'
   | 'lava_channel_curved'
   | 'lava_outlet'
-  | 'lava_outlet_2'
   | 'lava_port'
-  | 'pressure_device'
-  | 'radiator'
-  | 'steam_machine'
   | 'steam_machine_round'
   | 'steam_pipes'
   | 'water_pump'
@@ -68,12 +55,7 @@ export const IGNIVAR_PROP_NATIVE: Record<
   { len: number; hei: number; dep: number }
 > = {
   beam: { len: 1.0, hei: 0.14, dep: 0.14 },
-  curved_wall: { len: 1.0, hei: 0.72, dep: 0.11 },
-  firepit: { len: 0.97, hei: 0.68, dep: 0.95 },
-  gear_machine: { len: 1.0, hei: 0.75, dep: 0.4 },
   vault_door: { len: 1.0, hei: 0.67, dep: 0.2 },
-  gear_wall: { len: 1.0, hei: 0.63, dep: 0.11 },
-  pillar_broad: { len: 0.43, hei: 1.0, dep: 0.43 },
   pillar_slim: { len: 0.26, hei: 1.0, dep: 0.26 },
   reactor: { len: 0.8, hei: 1.0, dep: 0.52 },
   gear_wall_rusty: { len: 1.0, hei: 0.67, dep: 0.35 },
@@ -82,12 +64,8 @@ export const IGNIVAR_PROP_NATIVE: Record<
   forge: { len: 0.99, hei: 1.0, dep: 0.71 },
   chain: { len: 0.12, hei: 1.0, dep: 0.11 },
   chain_hanging: { len: 0.14, hei: 1.0, dep: 0.1 },
-  control_machine: { len: 0.86, hei: 1.0, dep: 0.62 },
-  furnace_small: { len: 1.0, hei: 0.99, dep: 0.72 },
-  gear_pile: { len: 1.0, hei: 0.69, dep: 0.97 },
   lava_furnace: { len: 0.6, hei: 1.0, dep: 0.32 },
   press_machine: { len: 0.76, hei: 1.0, dep: 0.57 },
-  shelf: { len: 0.83, hei: 1.0, dep: 0.39 },
   square_wall: { len: 0.99, hei: 1.0, dep: 0.2 },
   chain_link: { len: 1.0, hei: 0.75, dep: 0.14 },
   hanging_hook: { len: 0.76, hei: 1.0, dep: 0.4 },
@@ -95,11 +73,7 @@ export const IGNIVAR_PROP_NATIVE: Record<
   lava_channel: { len: 1.0, hei: 0.11, dep: 0.33 },
   lava_channel_curved: { len: 1.0, hei: 0.13, dep: 0.79 },
   lava_outlet: { len: 0.4, hei: 1.0, dep: 0.28 },
-  lava_outlet_2: { len: 0.67, hei: 1.0, dep: 0.25 },
   lava_port: { len: 0.89, hei: 1.0, dep: 0.34 },
-  pressure_device: { len: 0.64, hei: 1.0, dep: 0.27 },
-  radiator: { len: 1.0, hei: 0.67, dep: 0.29 },
-  steam_machine: { len: 0.65, hei: 1.0, dep: 0.48 },
   steam_machine_round: { len: 0.51, hei: 1.0, dep: 0.47 },
   steam_pipes: { len: 0.63, hei: 1.0, dep: 0.2 },
   water_pump: { len: 1.0, hei: 0.93, dep: 0.99 },
@@ -379,19 +353,12 @@ export const IGNIVAR_NON_COLLIDING_PROPS: ReadonlySet<IgnivarEnvPropKey> = new S
   'torch',
 ]);
 
-/** Collider footprint as a fraction of the visual AABB: ornate pillars and
- *  the firepit bowl collide on their trunk, not their widest flange, so a
- *  body brushing the decorative rim slides past instead of snagging (and
- *  the dormant packs hugging the wall pillars stay clear). */
+/** Collider footprint as a fraction of the visual AABB: ornate pillars
+ *  collide on their trunk, not their widest flange, so a body brushing the
+ *  decorative rim slides past instead of snagging (and the dormant packs
+ *  hugging the wall pillars stay clear). */
 export const IGNIVAR_PROP_COLLIDER_FOOTPRINT: Partial<Record<IgnivarEnvPropKey, number>> = {
   pillar_slim: 0.68,
-  pillar_broad: 0.8,
-  firepit: 0.85,
-  // The console's side pipe loops and the rack's hanging hooks widen the
-  // AABB past the solid body; the gear pile's skirt slopes off low.
-  control_machine: 0.8,
-  shelf: 0.75,
-  gear_pile: 0.85,
   // The water pumps are the conduit soak stations: only the central pump body
   // blocks, so a body can wade into the surrounding water pool (the cleanse
   // footprint) to be cleansed while the boss's frontal is up.
