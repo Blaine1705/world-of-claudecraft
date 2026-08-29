@@ -13526,6 +13526,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ignivar_the_forgefather.completion':
     '鍛爐終於寂靜了。泉水也許永遠無法復原，但瓦爾庫爾再也不能將生命鍛成鎖鏈。',
   'entities.quests.q_ignivar_the_forgefather.objectives.0.label': '擊敗瓦爾庫爾',
+  'entities.dungeons.ignivar_forge_lift.name': '鍛爐升降梯',
+  'entities.dungeons.ignivar_forge_lift.enterText': '鍛爐升降梯轟然震顫，緩緩下沉；鍛錘的轟鳴迎面而來。',
+  'entities.dungeons.ignivar_forge_lift.leaveText': '升降梯將你拉回要塞的露天高處。',
   'entities.dungeons.ignivar_forge_approach.name': '首鍛大廳',
   'entities.dungeons.ignivar_forge_approach.enterText': '鍛槌的轟鳴在首鍛大廳中回盪。',
   'entities.dungeons.ignivar_forge_approach.leaveText': '你離開第一座鍛爐，終於又能自由呼吸。',

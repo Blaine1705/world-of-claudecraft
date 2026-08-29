@@ -14,6 +14,7 @@ import {
   ignivarApproachPropPlacements,
   ignivarArenaPropPlacements,
   ignivarCruciblePropPlacements,
+  ignivarLiftPropPlacements,
 } from '../sim/ignivar_props';
 
 export { IGNIVAR_PROP_NATIVE, IGNIVAR_WALL_TOP, type IgnivarEnvPropKey, type IgnivarPropPlacement };
@@ -109,6 +110,10 @@ export function ignivarBeamCourses(
 /** The per-room dressing plans (the sim placement tables, verbatim). */
 export function ignivarApproachPropPlan(layout: DungeonLayout): IgnivarPropPlacement[] {
   return ignivarApproachPropPlacements(layout);
+}
+
+export function ignivarLiftPropPlan(layout: DungeonLayout): IgnivarPropPlacement[] {
+  return ignivarLiftPropPlacements(layout);
 }
 
 export function ignivarArenaPropPlan(layout: DungeonLayout): IgnivarPropPlacement[] {

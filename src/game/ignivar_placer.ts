@@ -15,6 +15,7 @@ import {
   ignivarApproachPropPlan,
   ignivarArenaPropPlan,
   ignivarCruciblePropPlan,
+  ignivarLiftPropPlan,
 } from '../render/ignivar_dressing_plan_core';
 import {
   appendIgnivarEnvProps,
@@ -25,6 +26,7 @@ import { DUNGEON_X_THRESHOLD } from '../sim/data';
 import {
   IGNIVAR_FORGE_APPROACH_LAYOUT,
   IGNIVAR_LAYOUT,
+  IGNIVAR_LIFT_LAYOUT,
   IGNIVAR_SECOND_WING_LAYOUT,
 } from '../sim/dungeon_layout';
 import type { Entity } from '../sim/types';
@@ -59,6 +61,13 @@ interface PlacerRoom {
 const OZ = -1250; // offline client plays instance slot 0
 
 const ROOMS: PlacerRoom[] = [
+  {
+    interior: 'ignivar_lift',
+    label: 'The Forge-Lift',
+    ox: 118000,
+    oz: OZ,
+    plan: () => ignivarLiftPropPlan(IGNIVAR_LIFT_LAYOUT),
+  },
   {
     interior: 'ignivar_approach',
     label: 'Halls of the First Tempering',

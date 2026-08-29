@@ -520,6 +520,8 @@ const baseEnTable = {
   'lore.ignivarLivingMetalRecordName': 'Living Metal Record',
   'lore.ignivarHeraldKeyRecordName': 'Herald-Key Record',
   'error.ignivarForgeGateSealed': 'The forge gate is sealed to you.',
+  // The forge-lift antechamber's arrival line (src/sim/ignivar_forge_lift.ts).
+  'log.ignivarLiftArrives': 'The forge-lift settles; its gate grinds open.',
   'aura.carrierFatigue': 'Carrier Fatigue',
   // The always-worn carried-flag buff; right-clicking it drops the flag on purpose.
   'aura.carriedFlag': 'Carrying the Flag',

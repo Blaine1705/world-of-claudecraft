@@ -160,8 +160,20 @@ const ITEMS = [
   // the dragon lava spouts, lava carriers, a cannon). Same pre-decimated
   // contract (~1k tris, single mesh, one atlas). Lava carriers run hot,
   // the dragon head pours (concept art), plain stonework stays faint.
-  { src: 'Exterior_Assets/bridge_floor.glb', name: 'bridge_floor', tex: 1024, emissive: 0.28, glowFloor: [89, 22, 14] },
-  { src: 'Exterior_Assets/bridge_pillar.glb', name: 'bridge_pillar', tex: 1024, emissive: 0.28, glowFloor: [89, 22, 14] },
+  {
+    src: 'Exterior_Assets/bridge_floor.glb',
+    name: 'bridge_floor',
+    tex: 1024,
+    emissive: 0.28,
+    glowFloor: [89, 22, 14],
+  },
+  {
+    src: 'Exterior_Assets/bridge_pillar.glb',
+    name: 'bridge_pillar',
+    tex: 1024,
+    emissive: 0.28,
+    glowFloor: [89, 22, 14],
+  },
   // The rail's brazier flame glows like the firepit's: hotBoost lifts the
   // flame texels clear of the ETC1S crush and the firepit-grade emissive
   // strength makes them bloom, while the dark iron stays inert (a near
@@ -182,7 +194,13 @@ const ITEMS = [
     hotBoost: 1.25,
     glowFloor: [42, 10, 7],
   },
-  { src: 'Exterior_Assets/dragon_head.glb', name: 'dragon_head', tex: 1024, emissive: 1.5, glowFloor: [17, 4, 3] },
+  {
+    src: 'Exterior_Assets/dragon_head.glb',
+    name: 'dragon_head',
+    tex: 1024,
+    emissive: 1.5,
+    glowFloor: [17, 4, 3],
+  },
   // The owner's raid-door facade (2026-08-29 drop): architecture tier.
   {
     src: 'Exterior_Assets/dungeon_entrance.glb',
@@ -231,6 +249,77 @@ const ITEMS = [
     hotBoost: 1.25,
     glowFloor: [36, 9, 6],
   },
+  // The owner's forge-lift car kit (2026-08-29 drop): the antechamber's
+  // iron furniture, all on the architecture sheen tier.
+  {
+    src: 'Lift_Assets/lift_arch_beam.glb',
+    name: 'lift_arch_beam',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
+  {
+    src: 'Lift_Assets/lift_beam.glb',
+    name: 'lift_beam',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
+  {
+    src: 'Lift_Assets/lift_frame.glb',
+    name: 'lift_frame',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
+  {
+    src: 'Lift_Assets/lift_handle.glb',
+    name: 'lift_handle',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
+  {
+    src: 'Lift_Assets/lift_vertical_beam.glb',
+    name: 'lift_vertical_beam',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
+  {
+    src: 'Lift_Assets/lift_weight.glb',
+    name: 'lift_weight',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
+  // The winch remake (2026-08-29 second drop): the owner split the piece so
+  // only the spool turns; the mount is the static cradle it rides in. The
+  // one-piece winch and the sliding door left the shipped set with the
+  // owner's third drop (zero placements; sources stay archived in
+  // tmp/asset_src for a future return).
+  {
+    src: 'Lift_Assets/lift_mount.glb',
+    name: 'lift_mount',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
+  {
+    src: 'Lift_Assets/lift_spool.glb',
+    name: 'lift_spool',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
   // lava_furnace_2: the name lava_furnace is taken by the New_Assets drop
   // (the lava_outlet_2 precedent for a second same-family model)
   {
@@ -240,7 +329,13 @@ const ITEMS = [
     emissive: 1.5,
     glowFloor: [17, 4, 3],
   },
-  { src: 'Exterior_Assets/lava_pillar.glb', name: 'lava_pillar', tex: 1024, emissive: 1.5, glowFloor: [17, 4, 3] },
+  {
+    src: 'Exterior_Assets/lava_pillar.glb',
+    name: 'lava_pillar',
+    tex: 1024,
+    emissive: 1.5,
+    glowFloor: [17, 4, 3],
+  },
   {
     src: 'Exterior_Assets/lava_ramp.glb',
     name: 'lava_ramp',
@@ -249,8 +344,20 @@ const ITEMS = [
     hotBoost: 1.35,
     glowFloor: [17, 4, 3],
   },
-  { src: 'Exterior_Assets/staircase.glb', name: 'staircase', tex: 1024, emissive: 0.28, glowFloor: [89, 22, 14] },
-  { src: 'Exterior_Assets/stone_floor.glb', name: 'stone_floor', tex: 1024, emissive: 0.28, glowFloor: [89, 22, 14] },
+  {
+    src: 'Exterior_Assets/staircase.glb',
+    name: 'staircase',
+    tex: 1024,
+    emissive: 0.28,
+    glowFloor: [89, 22, 14],
+  },
+  {
+    src: 'Exterior_Assets/stone_floor.glb',
+    name: 'stone_floor',
+    tex: 1024,
+    emissive: 0.28,
+    glowFloor: [89, 22, 14],
+  },
   // The fortress architecture's warm details (window slits, rune trims)
   // glow softly at night: gentle hotBoost plus sub-lava emissive; stone
   // texels stay near black, so base-as-emissive leaves the masonry inert.

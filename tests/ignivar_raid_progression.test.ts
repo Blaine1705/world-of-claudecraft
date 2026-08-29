@@ -13,6 +13,7 @@ import {
   IGNIVAR_APPROACH_GUARDIAN_IDS,
   IGNIVAR_FORGE_APPROACH_ID,
   IGNIVAR_GATE_LOCKED_TEMPLATE,
+  IGNIVAR_LIFT_ROOM_ID,
   IGNIVAR_RAID_ARENA_ID,
   IGNIVAR_RAID_ROOM_IDS,
   IGNIVAR_SECOND_WING_ID,
@@ -60,11 +61,13 @@ function guardianMobs(sim: Sim) {
 describe('Ignivar raid progression', () => {
   it('authors an ordered, hidden three-room raid family', () => {
     expect(IGNIVAR_RAID_ROOM_IDS).toEqual([
+      IGNIVAR_LIFT_ROOM_ID,
       IGNIVAR_FORGE_APPROACH_ID,
       IGNIVAR_RAID_ARENA_ID,
       IGNIVAR_SECOND_WING_ID,
     ]);
-    expect(ignivarPreviousRaidRoom(IGNIVAR_FORGE_APPROACH_ID)).toBeNull();
+    expect(ignivarPreviousRaidRoom(IGNIVAR_LIFT_ROOM_ID)).toBeNull();
+    expect(ignivarPreviousRaidRoom(IGNIVAR_FORGE_APPROACH_ID)).toBe(IGNIVAR_LIFT_ROOM_ID);
     expect(ignivarPreviousRaidRoom(IGNIVAR_RAID_ARENA_ID)).toBe(IGNIVAR_FORGE_APPROACH_ID);
     expect(ignivarPreviousRaidRoom(IGNIVAR_SECOND_WING_ID)).toBe(IGNIVAR_RAID_ARENA_ID);
     expect(DUNGEONS[IGNIVAR_FORGE_APPROACH_ID]).toMatchObject({
@@ -73,13 +76,13 @@ describe('Ignivar raid progression', () => {
       interior: 'ignivar_approach',
       suggestedPlayers: 10,
     });
-    // The family's front door stands in the OVERWORLD now: the raid entrance
-    // is the Forgefather keep's facade at the top of the fortress stair
-    // (the old overworldDoor: false hid the approach while the fortress was
-    // unbuilt). Only the approach spawns a door; the inner rooms stay
-    // door-free and are reached through the raid's own progression.
-    expect(DUNGEONS[IGNIVAR_FORGE_APPROACH_ID].overworldDoor).toBeUndefined();
-    expect(DUNGEONS[IGNIVAR_FORGE_APPROACH_ID].doorPos).toMatchObject({ x: 503.05, z: 2243.7 });
+    // The family's front door stands in the OVERWORLD, on the Forge-Lift:
+    // the keep facade's portal boards the lift (the raid's first room), and
+    // every later room, the Halls included, is reached only through the
+    // chain's own portals.
+    expect(DUNGEONS[IGNIVAR_LIFT_ROOM_ID].overworldDoor).toBeUndefined();
+    expect(DUNGEONS[IGNIVAR_LIFT_ROOM_ID].doorPos).toMatchObject({ x: 503.05, z: 2243.7 });
+    expect(DUNGEONS[IGNIVAR_FORGE_APPROACH_ID].overworldDoor).toBe(false);
     expect(DUNGEONS[IGNIVAR_RAID_ARENA_ID].overworldDoor).toBe(false);
     expect(DUNGEONS[IGNIVAR_SECOND_WING_ID].overworldDoor).toBe(false);
     expect(INTERIOR_LAYOUTS.ignivar_approach).toBe(IGNIVAR_FORGE_APPROACH_LAYOUT);
@@ -240,6 +243,7 @@ describe('Ignivar raid progression', () => {
 
   it('keeps every claimed raid room alive while the raid occupies any sibling', () => {
     const { sim, boss } = claimedRaid();
+    expect(enterDungeon(sim.ctx, IGNIVAR_LIFT_ROOM_ID, sim.player.id, true)).toBe(true);
     expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, sim.player.id, true)).toBe(true);
     boss.dead = true;
     boss.hp = 0;

@@ -130,10 +130,13 @@ describe('ignivar dressing plan', () => {
     // KTX2 total (9_645_164), then raised for the owner-directed fortress
     // night glow: the whole exterior kit carries a half-resolution floored
     // emissive texture (the soft red sheen, floor scaled per piece so
-    // floor times strength stays even; measured total 10_560_556), then
-    // again for the owner's dungeon_entrance facade (measured total
-    // 10_802_120) plus a sliver of rebake headroom.
-    expect(total, 'prop set exceeds the total budget').toBeLessThanOrEqual(10_900_000);
+    // floor times strength stays even; measured total 10_560_556), again
+    // for the owner's dungeon_entrance facade (10_802_120), and again for
+    // the eight-piece forge-lift car kit (measured total 12_554_128), the
+    // winch remake's mount and spool pair, minus the retired one-piece
+    // winch and sliding door (measured total 12_731_480) plus a sliver of
+    // rebake headroom.
+    expect(total, 'prop set exceeds the total budget').toBeLessThanOrEqual(12_800_000);
   });
 
   it('pins the native dims table to the shipped GLBs (canonical long-axis-on-X)', async () => {

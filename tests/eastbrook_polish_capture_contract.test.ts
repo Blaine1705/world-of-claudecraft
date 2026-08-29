@@ -326,8 +326,11 @@ interface AttributionTargetFixture {
 // Re-minted for the Ignivar raid consolidation (the v0.41.0 base merge plus
 // the renderer extraction round moved the renderer integration leaf). No
 // capture was retaken.
+// Re-minted for PR #3740's forge-lift room (the lift room render hookup and
+// door-portal arm moved the renderer integration leaf). No capture was
+// retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '019aaef23665529202bb9bf153c69786b1e2d21af11b63219074117fd1559cd5';
+  '907c3a16258d8d7890b96cded1bf0334287822eb5e7c648be567a0ce0738e77e';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
