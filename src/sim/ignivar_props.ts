@@ -374,13 +374,16 @@ export function ignivarCruciblePropPlacements(_layout: DungeonLayout): IgnivarPr
 
 /** The Forge-Lift car (the raid's first room, interior 'ignivar_lift'):
  *  the owner's hand-placed pass, baked VERBATIM from their placer export
- *  (2026-08-29, second drop): arch beams and door frames bracing both
- *  side walls over the moving shaft, overhead beams, sliding doors
- *  dressing the exit portal and the arrival doorway, wall panels closing
- *  the corners, the counterweight and brake levers riding along, and the
+ *  (2026-08-29, third drop): arch beams and door frames bracing both
+ *  side walls over the moving shaft, overhead beams, wall panels closing
+ *  the corners, the counterweight and brake levers riding along, the
  *  winch remake mounted high on both side walls (a static mount cradling
- *  a spinning spool on each). Never re-derive or re-seat these rows; a
- *  new owner export replaces the table wholesale.
+ *  a spinning spool on each), and a mist-veiled dungeon_entrance facade
+ *  fronting each portal (the sliding doors retired with this pass: the
+ *  facades ARE the entrance and exit looks, dressed by the mist gates in
+ *  the lift dressing, while the portal ENTITIES render nothing through
+ *  the raid-gate plan). Never re-derive or re-seat these rows; a new
+ *  owner export replaces the table wholesale.
  *  The shell walls and torch points live in IGNIVAR_LIFT_LAYOUT, the
  *  gate and both portals are instance entities, and the shaft illusion
  *  is src/render/ignivar_lift_room.ts. */
@@ -400,10 +403,8 @@ export function ignivarLiftPropPlacements(_layout: DungeonLayout): IgnivarPropPl
     at('lift_frame', -7.55, -4.05, 90 * DEG, 8),
     at('lift_vertical_beam', -7.3, -0.55, 90 * DEG, 8),
     at('lift_vertical_beam', -7.3, 0.45, 90 * DEG, 8),
-    at('lift_sliding_door', 0.4, 6.7, 180 * DEG, 7),
     at('square_wall', -5.3, -6.8, 0, 6),
     at('square_wall', 5.45, -6.8, 0, 6),
-    at('lift_sliding_door', -0.1, -6.05, 0, 8),
     at('lift_weight', 4.9, 5.2, 180 * DEG, 8),
     at('lift_handle', -5.5, 5.85, 180 * DEG, 3, 2),
     at('lift_handle', -5.45, -5.9, 0, 3, 2),
@@ -411,6 +412,8 @@ export function ignivarLiftPropPlacements(_layout: DungeonLayout): IgnivarPropPl
     at('lift_spool', -5.3, -0.1, 270 * DEG, 2, 3.75),
     at('lift_spool', 4.2, 0.4, 270 * DEG, 2, 3.75),
     at('lift_mount', 5.2, 0.15, 0, 2, 3.5),
+    at('dungeon_entrance', -0.2, -5.85, 0, 6),
+    at('dungeon_entrance', 0.4, 6.15, 180 * DEG, 6),
   ];
 }
 

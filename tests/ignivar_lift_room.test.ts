@@ -7,11 +7,9 @@ import {
   buildIgnivarLiftGate,
   buildIgnivarLiftShaft,
   decorateLiftBeamMaterial,
-  decorateLiftDoorMaterial,
   decorateLiftSpoolMaterial,
   ignivarLiftRoomInternalsForTest,
   LIFT_BEAM_PROGRAM_CACHE_KEY,
-  LIFT_DOOR_PROGRAM_CACHE_KEY,
   LIFT_SPOOL_PROGRAM_CACHE_KEY,
 } from '../src/render/ignivar_lift_room';
 
@@ -39,8 +37,9 @@ describe('the forge-lift room render kit', () => {
     const sealed = buildIgnivarLiftGate(false);
     expect(sealed.name).toBe('ignivar-lift-gate-hidden');
     expect(sealed.children.length).toBe(0);
-    // the arrival body is not this builder's: the unlock swaps the entity
-    // to 'dungeon_door', which takes the generic arch-and-swirl portal
+    // the opened pose renders nothing too: the owner fronts both portals
+    // with mist-veiled dungeon_entrance facades in the dressing, so the
+    // portal ENTITIES never grow bodies of their own
     expect(buildIgnivarLiftGate(true).children.length).toBe(0);
   });
 
@@ -67,7 +66,7 @@ describe('the forge-lift room render kit', () => {
     expect(shader.fragmentShader).toContain('liftBand');
   });
 
-  it('spins the spool whole and the beam sheave, cycles the door leaf, holds frames still', () => {
+  it('spins the spool whole and the beam sheave, holds everything else still', () => {
     const spool = decorateLiftSpoolMaterial(new THREE.MeshStandardMaterial());
     const spoolShader = compile(spool);
     expect(spoolShader.uniforms.uTime).toBe(sharedUniforms.uTime);
@@ -84,15 +83,6 @@ describe('the forge-lift room render kit', () => {
     expect(beamShader.vertexShader).toContain('step(abs(p.x), 0.11) * step(p.y, 0.17)');
     expect(beamShader.vertexShader).toContain('uTime * 2.1');
     expect(beam.customProgramCacheKey()).toContain(LIFT_BEAM_PROGRAM_CACHE_KEY);
-
-    const door = decorateLiftDoorMaterial(new THREE.MeshStandardMaterial());
-    const doorShader = compile(door);
-    // the leaf inside the pocket posts, on the open-hold-shut loop
-    expect(doorShader.vertexShader).toContain('step(abs(p.x), 0.27) * step(p.y, 0.92)');
-    expect(doorShader.vertexShader).toContain('fract(uTime / 9.0)');
-    expect(door.customProgramCacheKey()).toContain(LIFT_DOOR_PROGRAM_CACHE_KEY);
-    // a pure slide: the door splices no normal pass
-    expect(doorShader.vertexShader).not.toContain('objectNormal = mix(');
 
     // the rotating pieces DO rotate their normals so lighting follows
     expect(spoolShader.vertexShader).toContain('objectNormal = vec3(');

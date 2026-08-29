@@ -18,6 +18,7 @@ import {
 } from './ignivar_dressing_plan_core';
 import { appendIgnivarEnvProps, prepareIgnivarEnvProps } from './ignivar_env_props';
 import { buildIgnivarLiftShaft } from './ignivar_lift_room';
+import { appendIgnivarMistGates } from './ignivar_mist_gate';
 import type { FireLightSink } from './point_light_budget';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 import { addTorchGlowDecal } from './torch_glow_decal';
@@ -178,6 +179,10 @@ function buildForgeLiftDressing(
   const placements = filterIgnivarPropPlacements(ignivarLiftPropPlan(layout), lowGfx);
   appendProps(group, placements, lowGfx);
   addPropGlowPools(group, placements, lowGfx);
+  // The owner fronts both portals with dungeon_entrance facades: each gets
+  // the same boss-gate fog wall the Drakelands keep entrance carries, over
+  // the facade's authored red membrane.
+  appendIgnivarMistGates(group, placements);
   group.add(buildIgnivarLiftShaft(lowGfx));
   return group;
 }

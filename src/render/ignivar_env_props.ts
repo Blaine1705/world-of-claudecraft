@@ -10,11 +10,7 @@ import { loadGltf, releaseGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { addRoofDarkness } from './gfx';
 import type { IgnivarEnvPropKey, IgnivarPropPlacement } from './ignivar_dressing_plan_core';
-import {
-  decorateLiftBeamMaterial,
-  decorateLiftDoorMaterial,
-  decorateLiftSpoolMaterial,
-} from './ignivar_lift_room';
+import { decorateLiftBeamMaterial, decorateLiftSpoolMaterial } from './ignivar_lift_room';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 
 export const IGNIVAR_ENV_PROP_URLS: Record<IgnivarEnvPropKey, string> = {
@@ -227,13 +223,11 @@ export function prepareIgnivarEnvProps(): Promise<void> {
           addRoofDarkness(baked.material);
           // The lift machinery moves in the vertex shader (single baked
           // meshes on the shared uTime clock): the spool turns whole in its
-          // static mount (the owner's winch remake), the beam's sheave
-          // wheel spins, and the sliding door's leaf cycles, per the
-          // owner's direction. The brake handle and the retired one-piece
-          // winch deliberately stay still.
+          // static mount (the owner's winch remake) and the beam's sheave
+          // wheel spins, per the owner's direction. The brake handle, the
+          // retired one-piece winch, and the sliding door stay still.
           if (key === 'lift_spool') decorateLiftSpoolMaterial(baked.material);
           if (key === 'lift_beam') decorateLiftBeamMaterial(baked.material);
-          if (key === 'lift_sliding_door') decorateLiftDoorMaterial(baked.material);
           templates.set(key, {
             geometry: markSharedGeometry(baked.geometry),
             material: markSharedMaterial(baked.material),

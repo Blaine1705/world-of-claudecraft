@@ -46,14 +46,28 @@ describe('Ignivar raid gate', () => {
       height: 6.4,
     });
     expect(ignivarRaidGatePlan('dungeon_door', 'hollow_crypt')).toBeNull();
-    // the Forge-Lift's sealed portcullis rides the same view seam; once
-    // unlocked it IS a 'dungeon_door' and takes the generic portal body
+    // the Forge-Lift's portals all ride the lift kind and render NOTHING:
+    // the owner fronts each with a placed mist-veiled dungeon_entrance
+    // facade (the lift dressing owns both looks), so the sealed gate, the
+    // opened gate, and the exit portal keep only triggers and labels
     expect(ignivarRaidGatePlan('ignivar_lift_gate_locked', 'ignivar_forge_approach')).toEqual({
       open: false,
       height: 7.2,
       kind: 'lift',
     });
-    expect(ignivarRaidGatePlan('dungeon_door', 'ignivar_forge_approach')).toBeNull();
+    expect(ignivarRaidGatePlan('dungeon_door', 'ignivar_forge_approach')).toEqual({
+      open: true,
+      height: 7.2,
+      kind: 'lift',
+    });
+    expect(ignivarRaidGatePlan('dungeon_exit', 'ignivar_forge_lift')).toEqual({
+      open: true,
+      height: 7.2,
+      kind: 'lift',
+    });
+    // every OTHER room's exit keeps the generic way-home body
+    expect(ignivarRaidGatePlan('dungeon_exit', 'ignivar_forge_approach')).toBeNull();
+    expect(ignivarRaidGatePlan('dungeon_exit', 'hollow_crypt')).toBeNull();
 
     const rendererSource = readFileSync(
       new URL('../src/render/renderer.ts', import.meta.url),

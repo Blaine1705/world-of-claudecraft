@@ -195,13 +195,12 @@ export function buildIgnivarLiftShaft(lowGfx: boolean): THREE.Group {
 // shared uTime clock while the rest stands still. Region constants are
 // measured from the shipped GLBs (canonical space: xz-centred, base y 0,
 // dims normalized, or the WHOLE mesh for the spool). The spool turns on
-// its axle inside the static mount (the owner's winch remake), the
-// beam's hanging sheave wheel spins, and the sliding door's leaf cycles
-// open, holds, and shuts inside its pocket frame. The brake handle and
-// the retired one-piece winch deliberately do NOT move.
+// its axle inside the static mount (the owner's winch remake) and the
+// beam's hanging sheave wheel spins. The brake handle, the retired
+// one-piece winch, and the sliding door deliberately do NOT move (the
+// owner retired the door's cycle with the mist-veiled facade portals).
 export const LIFT_SPOOL_PROGRAM_CACHE_KEY = 'ignivar-lift-spool-v1';
 export const LIFT_BEAM_PROGRAM_CACHE_KEY = 'ignivar-lift-beam-v1';
-export const LIFT_DOOR_PROGRAM_CACHE_KEY = 'ignivar-lift-door-v1';
 
 /** Compose a masked vertex motion into a material, preserving any prior
  *  onBeforeCompile hook and cache key. `vertexGlsl` runs after
@@ -293,26 +292,10 @@ objectNormal = mix(
   );
 }
 
-/** The sliding door's leaf (inside the |x| 0.26 pocket posts, under the
- *  y 0.92 header) cycles: closed hold, slide open, open hold, slide
- *  shut, on a nine second loop. Pure translation, normals untouched. */
-export function decorateLiftDoorMaterial(material: THREE.Material): THREE.Material {
-  return decorateLiftMotion(
-    material,
-    LIFT_DOOR_PROGRAM_CACHE_KEY,
-    'step(abs(p.x), 0.27) * step(p.y, 0.92)',
-    `float mask = ignivarLiftMask(position);
-float ph = fract(uTime / 9.0);
-float openT = smoothstep(0.36, 0.5, ph) * (1.0 - smoothstep(0.86, 1.0, ph));
-transformed.x += mask * openT * 0.42;`,
-  );
-}
-
 export const ignivarLiftRoomInternalsForTest = {
   shaftSheetMaterial,
   dustMaterial,
   decorateLiftBeamMaterial,
-  decorateLiftDoorMaterial,
   decorateLiftSpoolMaterial,
   roomGrilleX: ROOM_GRILLE_X,
   carZMin: CAR_Z_MIN,

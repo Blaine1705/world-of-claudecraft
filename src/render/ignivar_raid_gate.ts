@@ -1,7 +1,9 @@
 import * as THREE from 'three';
 import {
+  IGNIVAR_FORGE_APPROACH_ID,
   IGNIVAR_GATE_LOCKED_TEMPLATE,
   IGNIVAR_LIFT_GATE_LOCKED_TEMPLATE,
+  IGNIVAR_LIFT_ROOM_ID,
   IGNIVAR_SECOND_WING_ID,
 } from '../sim/ignivar_raid_ids';
 import { EMISSIVE_GLOW, surfaceMat } from './gfx';
@@ -27,10 +29,19 @@ export function ignivarRaidGatePlan(
     return { open: true, height: IGNIVAR_RAID_GATE_HEIGHT };
   }
   if (templateId === IGNIVAR_LIFT_GATE_LOCKED_TEMPLATE) {
-    // sealed through the ride; the unlock swaps it to 'dungeon_door', which
-    // falls through to the generic arch + swirl portal (the room-crossing
-    // look every raid gate opens into)
+    // sealed through the ride; the unlock swaps it to 'dungeon_door',
+    // which stays on the lift kind below
     return { open: false, height: IGNIVAR_LIFT_GATE_HEIGHT, kind: 'lift' };
+  }
+  if (
+    (templateId === 'dungeon_door' && dungeonId === IGNIVAR_FORGE_APPROACH_ID) ||
+    (templateId === 'dungeon_exit' && dungeonId === IGNIVAR_LIFT_ROOM_ID)
+  ) {
+    // The lift's opened gate AND its exit portal render NOTHING as entity
+    // bodies: the owner fronts each with a placed dungeon_entrance facade
+    // wearing the keep entrance's red mist (the lift dressing owns both
+    // looks); the entities keep only their walk-in triggers and labels.
+    return { open: true, height: IGNIVAR_LIFT_GATE_HEIGHT, kind: 'lift' };
   }
   return null;
 }
