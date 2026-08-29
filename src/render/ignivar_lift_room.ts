@@ -194,12 +194,12 @@ export function buildIgnivarLiftShaft(lowGfx: boolean): THREE.Group {
 // the vertex shader: a position-derived REGION of each mesh moves on the
 // shared uTime clock while the rest stands still. Region constants are
 // measured from the shipped GLBs (canonical space: xz-centred, base y 0,
-// dims normalized). The winch drum turns inside its frame, the beam's
-// hanging sheave wheel spins on its axle, and the sliding door's leaf
-// cycles open, holds, and shuts inside its pocket frame. The brake
-// handle deliberately does NOT move (the owner mounts them as static
-// wall levers).
-export const LIFT_WINCH_PROGRAM_CACHE_KEY = 'ignivar-lift-winch-v1';
+// dims normalized, or the WHOLE mesh for the spool). The spool turns on
+// its axle inside the static mount (the owner's winch remake), the
+// beam's hanging sheave wheel spins, and the sliding door's leaf cycles
+// open, holds, and shuts inside its pocket frame. The brake handle and
+// the retired one-piece winch deliberately do NOT move.
+export const LIFT_SPOOL_PROGRAM_CACHE_KEY = 'ignivar-lift-spool-v1';
 export const LIFT_BEAM_PROGRAM_CACHE_KEY = 'ignivar-lift-beam-v1';
 export const LIFT_DOOR_PROGRAM_CACHE_KEY = 'ignivar-lift-door-v1';
 
@@ -246,29 +246,24 @@ ${vertexGlsl}
   return material;
 }
 
-/** The winch drum turns continuously about its x-axis axle; the frame
- *  posts outside |x| 0.22 hold still. */
-export function decorateLiftWinchMaterial(material: THREE.Material): THREE.Material {
+/** The spool turns WHOLE about its x-axis axle (measured at y 0.378 on
+ *  the shipped GLB): the owner split the winch so the mount stands still
+ *  and this entire piece is the moving half, no region mask needed. */
+export function decorateLiftSpoolMaterial(material: THREE.Material): THREE.Material {
   return decorateLiftMotion(
     material,
-    LIFT_WINCH_PROGRAM_CACHE_KEY,
-    'step(length(vec2(p.y - 0.47, p.z)), 0.25) * step(abs(p.x), 0.22)',
-    `float mask = ignivarLiftMask(position);
-float a = uTime * 1.6 * mask;
+    LIFT_SPOOL_PROGRAM_CACHE_KEY,
+    '1.0',
+    `float a = uTime * 1.8;
 float ca = cos(a);
 float sa = sin(a);
-vec3 q = transformed - vec3(0.0, 0.47, 0.0);
-transformed = mix(transformed, vec3(q.x, q.y * ca - q.z * sa, q.y * sa + q.z * ca) + vec3(0.0, 0.47, 0.0), mask);`,
-    `float nMask = ignivarLiftMask(position);
-float nA = uTime * 1.6 * nMask;
+vec3 q = transformed - vec3(0.0, 0.378, 0.0);
+transformed = vec3(q.x, q.y * ca - q.z * sa, q.y * sa + q.z * ca) + vec3(0.0, 0.378, 0.0);`,
+    `float nA = uTime * 1.8;
 float nCa = cos(nA);
 float nSa = sin(nA);
-objectNormal = mix(
-  objectNormal,
-  vec3(objectNormal.x, objectNormal.y * nCa - objectNormal.z * nSa,
-    objectNormal.y * nSa + objectNormal.z * nCa),
-  nMask
-);`,
+objectNormal = vec3(objectNormal.x, objectNormal.y * nCa - objectNormal.z * nSa,
+  objectNormal.y * nSa + objectNormal.z * nCa);`,
   );
 }
 
@@ -318,6 +313,7 @@ export const ignivarLiftRoomInternalsForTest = {
   dustMaterial,
   decorateLiftBeamMaterial,
   decorateLiftDoorMaterial,
+  decorateLiftSpoolMaterial,
   roomGrilleX: ROOM_GRILLE_X,
   carZMin: CAR_Z_MIN,
   carZMax: CAR_Z_MAX,

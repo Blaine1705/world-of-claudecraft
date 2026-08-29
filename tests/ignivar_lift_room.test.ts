@@ -8,11 +8,11 @@ import {
   buildIgnivarLiftShaft,
   decorateLiftBeamMaterial,
   decorateLiftDoorMaterial,
-  decorateLiftWinchMaterial,
+  decorateLiftSpoolMaterial,
   ignivarLiftRoomInternalsForTest,
   LIFT_BEAM_PROGRAM_CACHE_KEY,
   LIFT_DOOR_PROGRAM_CACHE_KEY,
-  LIFT_WINCH_PROGRAM_CACHE_KEY,
+  LIFT_SPOOL_PROGRAM_CACHE_KEY,
 } from '../src/render/ignivar_lift_room';
 
 type CompileShader = {
@@ -67,15 +67,16 @@ describe('the forge-lift room render kit', () => {
     expect(shader.fragmentShader).toContain('liftBand');
   });
 
-  it('spins the winch drum and beam sheave, cycles the door leaf, holds frames still', () => {
-    const winch = decorateLiftWinchMaterial(new THREE.MeshStandardMaterial());
-    const winchShader = compile(winch);
-    expect(winchShader.uniforms.uTime).toBe(sharedUniforms.uTime);
-    // the drum region: a radial band about the x-axis axle, inside the frame
-    expect(winchShader.vertexShader).toContain('step(length(vec2(p.y - 0.47, p.z)), 0.25)');
-    expect(winchShader.vertexShader).toContain('step(abs(p.x), 0.22)');
-    expect(winchShader.vertexShader).toContain('uTime * 1.6');
-    expect(winch.customProgramCacheKey()).toContain(LIFT_WINCH_PROGRAM_CACHE_KEY);
+  it('spins the spool whole and the beam sheave, cycles the door leaf, holds frames still', () => {
+    const spool = decorateLiftSpoolMaterial(new THREE.MeshStandardMaterial());
+    const spoolShader = compile(spool);
+    expect(spoolShader.uniforms.uTime).toBe(sharedUniforms.uTime);
+    // the whole piece turns about its x-axis axle (y 0.378 on the GLB):
+    // the owner split the winch so the mount stands still and the spool
+    // IS the moving half, no region mask needed
+    expect(spoolShader.vertexShader).toContain('uTime * 1.8');
+    expect(spoolShader.vertexShader).toContain('vec3(0.0, 0.378, 0.0)');
+    expect(spool.customProgramCacheKey()).toContain(LIFT_SPOOL_PROGRAM_CACHE_KEY);
 
     const beam = decorateLiftBeamMaterial(new THREE.MeshStandardMaterial());
     const beamShader = compile(beam);
@@ -94,9 +95,8 @@ describe('the forge-lift room render kit', () => {
     expect(doorShader.vertexShader).not.toContain('objectNormal = mix(');
 
     // the rotating pieces DO rotate their normals so lighting follows
-    for (const shader of [winchShader, beamShader]) {
-      expect(shader.vertexShader).toContain('objectNormal = mix(');
-    }
+    expect(spoolShader.vertexShader).toContain('objectNormal = vec3(');
+    expect(beamShader.vertexShader).toContain('objectNormal = mix(');
   });
 
   it('composes with a prior material hook instead of replacing it', () => {
@@ -106,9 +106,9 @@ describe('the forge-lift room render kit', () => {
       priorRan = true;
     };
     material.customProgramCacheKey = () => 'prior-key';
-    decorateLiftWinchMaterial(material);
+    decorateLiftSpoolMaterial(material);
     compile(material);
     expect(priorRan).toBe(true);
-    expect(material.customProgramCacheKey()).toBe(`prior-key|${LIFT_WINCH_PROGRAM_CACHE_KEY}`);
+    expect(material.customProgramCacheKey()).toBe(`prior-key|${LIFT_SPOOL_PROGRAM_CACHE_KEY}`);
   });
 });

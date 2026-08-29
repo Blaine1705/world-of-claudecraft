@@ -315,6 +315,24 @@ const ITEMS = [
     hotBoost: 1.25,
     glowFloor: [36, 9, 6],
   },
+  // The winch remake (2026-08-29 second drop): the owner split the piece so
+  // only the spool turns; the mount is the static cradle it rides in.
+  {
+    src: 'Lift_Assets/lift_mount.glb',
+    name: 'lift_mount',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
+  {
+    src: 'Lift_Assets/lift_spool.glb',
+    name: 'lift_spool',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
   // lava_furnace_2: the name lava_furnace is taken by the New_Assets drop
   // (the lava_outlet_2 precedent for a second same-family model)
   {

@@ -69,6 +69,8 @@ export type IgnivarEnvPropKey =
   | 'lift_vertical_beam'
   | 'lift_weight'
   | 'lift_winch'
+  | 'lift_mount'
+  | 'lift_spool'
   | 'stone_floor'
   | 'tower_base'
   | 'tower_middle'
@@ -160,6 +162,9 @@ export const IGNIVAR_PROP_NATIVE: Record<
   lift_vertical_beam: { len: 0.18, hei: 1.0, dep: 0.13 },
   lift_weight: { len: 0.27, hei: 1.0, dep: 0.14 },
   lift_winch: { len: 0.58, hei: 1.0, dep: 0.44 },
+  // The winch remake: the static cradle and the spool that turns in it.
+  lift_mount: { len: 0.98, hei: 1.0, dep: 0.95 },
+  lift_spool: { len: 1.0, hei: 0.76, dep: 0.76 },
   stone_floor: { len: 1.0, hei: 0.08, dep: 1.0 },
   tower_base: { len: 0.97, hei: 1.0, dep: 0.83 },
   tower_middle: { len: 0.7, hei: 1.0, dep: 0.63 },
@@ -369,11 +374,13 @@ export function ignivarCruciblePropPlacements(_layout: DungeonLayout): IgnivarPr
 
 /** The Forge-Lift car (the raid's first room, interior 'ignivar_lift'):
  *  the owner's hand-placed pass, baked VERBATIM from their placer export
- *  (2026-08-29): arch beams and door frames bracing both side walls over
- *  the moving shaft, overhead beams, sliding doors dressing the exit
- *  portal and the arrival doorway, wall panels closing the corners, and
- *  the counterweight and brake levers riding along. Never re-derive or
- *  re-seat these rows; a new owner export replaces the table wholesale.
+ *  (2026-08-29, second drop): arch beams and door frames bracing both
+ *  side walls over the moving shaft, overhead beams, sliding doors
+ *  dressing the exit portal and the arrival doorway, wall panels closing
+ *  the corners, the counterweight and brake levers riding along, and the
+ *  winch remake mounted high on both side walls (a static mount cradling
+ *  a spinning spool on each). Never re-derive or re-seat these rows; a
+ *  new owner export replaces the table wholesale.
  *  The shell walls and torch points live in IGNIVAR_LIFT_LAYOUT, the
  *  gate and both portals are instance entities, and the shaft illusion
  *  is src/render/ignivar_lift_room.ts. */
@@ -400,6 +407,10 @@ export function ignivarLiftPropPlacements(_layout: DungeonLayout): IgnivarPropPl
     at('lift_weight', 4.9, 5.2, 180 * DEG, 8),
     at('lift_handle', -5.5, 5.85, 180 * DEG, 3, 2),
     at('lift_handle', -5.45, -5.9, 0, 3, 2),
+    at('lift_mount', -6.3, -0.1, 180 * DEG, 2, 3.5),
+    at('lift_spool', -5.3, -0.1, 270 * DEG, 2, 3.75),
+    at('lift_spool', 4.2, 0.4, 270 * DEG, 2, 3.75),
+    at('lift_mount', 5.2, 0.15, 0, 2, 3.5),
   ];
 }
 
@@ -453,6 +464,10 @@ export const IGNIVAR_NON_COLLIDING_PROPS: ReadonlySet<IgnivarEnvPropKey> = new S
   'lift_handle',
   'lift_sliding_door',
   'lift_weight',
+  // The spool rides INSIDE its mount's cradle: the mount is the one solid
+  // body of the pair, so the spinning drum can never snag a rider its own
+  // housing already blocks.
+  'lift_spool',
 ]);
 
 /** Collider footprint as a fraction of the visual AABB: ornate pillars and

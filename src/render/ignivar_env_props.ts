@@ -13,7 +13,7 @@ import type { IgnivarEnvPropKey, IgnivarPropPlacement } from './ignivar_dressing
 import {
   decorateLiftBeamMaterial,
   decorateLiftDoorMaterial,
-  decorateLiftWinchMaterial,
+  decorateLiftSpoolMaterial,
 } from './ignivar_lift_room';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 
@@ -80,6 +80,8 @@ export const IGNIVAR_ENV_PROP_URLS: Record<IgnivarEnvPropKey, string> = {
   lift_vertical_beam: '/models/dungeon/ignivar_prop_lift_vertical_beam.glb',
   lift_weight: '/models/dungeon/ignivar_prop_lift_weight.glb',
   lift_winch: '/models/dungeon/ignivar_prop_lift_winch.glb',
+  lift_mount: '/models/dungeon/ignivar_prop_lift_mount.glb',
+  lift_spool: '/models/dungeon/ignivar_prop_lift_spool.glb',
   stone_floor: '/models/dungeon/ignivar_prop_stone_floor.glb',
   tower_base: '/models/dungeon/ignivar_prop_tower_base.glb',
   tower_middle: '/models/dungeon/ignivar_prop_tower_middle.glb',
@@ -133,6 +135,8 @@ const SHADOW_CASTERS: ReadonlySet<IgnivarEnvPropKey> = new Set([
   'lift_sliding_door',
   'lift_vertical_beam',
   'lift_winch',
+  'lift_mount',
+  'lift_spool',
   'fountain_base',
   'gate',
   'gate_gear',
@@ -221,12 +225,13 @@ export function prepareIgnivarEnvProps(): Promise<void> {
           // Tall props, chains, and the door towers grade into the roof
           // black with the walls (inert outside the Halls scene state).
           addRoofDarkness(baked.material);
-          // The lift machinery moves in the vertex shader (a masked region
-          // of the single baked mesh on the shared uTime clock): the winch
-          // drum turns, the beam's sheave wheel spins, and the sliding
-          // door's leaf cycles, per the owner's direction. The brake
-          // handle deliberately stays still (a mounted wall lever).
-          if (key === 'lift_winch') decorateLiftWinchMaterial(baked.material);
+          // The lift machinery moves in the vertex shader (single baked
+          // meshes on the shared uTime clock): the spool turns whole in its
+          // static mount (the owner's winch remake), the beam's sheave
+          // wheel spins, and the sliding door's leaf cycles, per the
+          // owner's direction. The brake handle and the retired one-piece
+          // winch deliberately stay still.
+          if (key === 'lift_spool') decorateLiftSpoolMaterial(baked.material);
           if (key === 'lift_beam') decorateLiftBeamMaterial(baked.material);
           if (key === 'lift_sliding_door') decorateLiftDoorMaterial(baked.material);
           templates.set(key, {

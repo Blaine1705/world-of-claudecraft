@@ -132,9 +132,10 @@ describe('ignivar dressing plan', () => {
     // emissive texture (the soft red sheen, floor scaled per piece so
     // floor times strength stays even; measured total 10_560_556), again
     // for the owner's dungeon_entrance facade (10_802_120), and again for
-    // the eight-piece forge-lift car kit (measured total 12_554_128) plus
+    // the eight-piece forge-lift car kit (measured total 12_554_128), and
+    // again for the winch remake's mount and spool pair (13_168_284) plus
     // a sliver of rebake headroom.
-    expect(total, 'prop set exceeds the total budget').toBeLessThanOrEqual(12_650_000);
+    expect(total, 'prop set exceeds the total budget').toBeLessThanOrEqual(13_250_000);
   });
 
   it('pins the native dims table to the shipped GLBs (canonical long-axis-on-X)', async () => {
