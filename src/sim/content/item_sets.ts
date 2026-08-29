@@ -617,6 +617,54 @@ export const ITEM_SETS: Record<string, ItemSet> = {
       },
     ],
   },
+  cinderfang: {
+    id: 'cinderfang',
+    name: 'Cinderfang Shroud',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: "Venom Ritual's energy refund rises to 20 per builder.",
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: "Venom Dart's cooldown is reduced to 4 sec.",
+      },
+    ],
+  },
+  smolderstrike: {
+    id: 'smolderstrike',
+    name: 'Smolderstrike Leathers',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: 'Haymaker hits 20 percent harder.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: "Lights Out refunds 6 sec of Mirrored Blades' remaining cooldown.",
+      },
+    ],
+  },
+  ashveil: {
+    id: 'ashveil',
+    name: 'Ashveil Garb',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: "Lurker's Strike hits 25 percent harder.",
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: 'Your Veiled Edge strike hits for triple, up from double.',
+      },
+    ],
+  },
 };
 
 // Fully-resolved set effect: every field defaulted so callers never branch on

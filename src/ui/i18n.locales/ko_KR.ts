@@ -7769,6 +7769,17 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.slagsnare.bonus2': '내장 가르기가 집중을 20 생성합니다.',
   'entities.itemSets.slagsnare.bonus4':
     '사냥의 기세를 3중첩 소모하는 상처 가르기가 중첩을 보존합니다. 이 효과는 8초에 한 번만 발동합니다.',
+  'entities.itemSets.cinderfang.name': '잉걸송곳니 장막',
+  'entities.itemSets.cinderfang.bonus2': '맹독 의식이 타격마다 돌려주는 기력이 20으로 증가합니다.',
+  'entities.itemSets.cinderfang.bonus4': '맹독 다트의 재사용 대기시간이 4초로 감소합니다.',
+  'entities.itemSets.smolderstrike.name': '불씨타격 가죽 갑옷',
+  'entities.itemSets.smolderstrike.bonus2': '헤이메이커가 20% 더 큰 피해를 입힙니다.',
+  'entities.itemSets.smolderstrike.bonus4':
+    '소등을 시전할 때마다 폭풍의 칼날의 남은 재사용 대기시간이 6초 감소합니다.',
+  'entities.itemSets.ashveil.name': '잿빛 장막 복장',
+  'entities.itemSets.ashveil.bonus2': '잠복자의 일격이 25% 더 큰 피해를 입힙니다.',
+  'entities.itemSets.ashveil.bonus4':
+    '장막 일격 동안 처음 사용하는 잠복자의 일격이 두 배 대신 세 배의 피해를 입힙니다.',
   'entities.itemSets.slagbreaker.name': '광재파쇄자 전투복',
   'entities.itemSets.slagbreaker.bonus2': '붉은 손이 다음 불구의 일격을 중첩당 20% 대신 30% 강화합니다.',
   'entities.itemSets.slagbreaker.bonus4': '붉은 손을 두 번 시전할 때마다 돌파자의 남은 재사용 대기시간이 3초 감소합니다.',

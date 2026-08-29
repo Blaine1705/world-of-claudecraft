@@ -18520,9 +18520,19 @@ export const fr_CA: EnTranslations = {
       }
     },
     "itemSets": {
+      "ashveil": {
+        "name": "Ashveil Garb",
+        "bonus2": "Lurker's Strike hits 25 percent harder.",
+        "bonus4": "Your Veiled Edge strike hits for triple, up from double."
+      },
       "boundstone_vanguard": {
         "name": "Avant-garde de pierre-liée",
         "bonus3": "Augmente la vitesse d'attaque et d'incantation de 15%."
+      },
+      "cinderfang": {
+        "name": "Cinderfang Shroud",
+        "bonus2": "Venom Ritual's energy refund rises to 20 per builder.",
+        "bonus4": "Venom Dart's cooldown is reduced to 4 sec."
       },
       "coldsight_trackers": {
         "name": "Coldsight Trackers",
@@ -18591,6 +18601,11 @@ export const fr_CA: EnTranslations = {
         "name": "Slagsnare Trappings",
         "bonus2": "Gutting Strike generates 20 Focus.",
         "bonus4": "Woundrend that consumes 3 Hunting Momentum preserves them. Cannot occur more than once every 8 sec."
+      },
+      "smolderstrike": {
+        "name": "Smolderstrike Leathers",
+        "bonus2": "Haymaker hits 20 percent harder.",
+        "bonus4": "Lights Out refunds 6 sec of Mirrored Blades' remaining cooldown."
       },
       "soulflame": {
         "name": "Tenue d'apparat Wraithfire",

@@ -7776,6 +7776,17 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.slagsnare.bonus2': '腹裂きの一撃がフォーカスを20生成します。',
   'entities.itemSets.slagsnare.bonus4':
     '狩猟の勢いを3消費する傷裂きが、その勢いを保持します。この効果は8秒に1回まで発動します。',
+  'entities.itemSets.cinderfang.name': 'シンダーファングの外套',
+  'entities.itemSets.cinderfang.bonus2': '毒の儀式が攻撃1回ごとに回復するエナジーが20に上昇します。',
+  'entities.itemSets.cinderfang.bonus4': '毒針のクールダウンが4秒に短縮されます。',
+  'entities.itemSets.smolderstrike.name': 'スモルダーストライクの革鎧',
+  'entities.itemSets.smolderstrike.bonus2': 'ヘイメーカーのダメージが20%増加します。',
+  'entities.itemSets.smolderstrike.bonus4':
+    '消灯を発動するたびに、ブレードフラリーの残りクールダウンが6秒短縮されます。',
+  'entities.itemSets.ashveil.name': 'アッシュヴェールの装束',
+  'entities.itemSets.ashveil.bonus2': '潜伏者の一撃のダメージが25%増加します。',
+  'entities.itemSets.ashveil.bonus4':
+    'ヴェールストライク中の最初の潜伏者の一撃が2倍ではなく3倍のダメージを与えます。',
   'entities.itemSets.slagbreaker.name': 'スラグブレイカーの戦装束',
   'entities.itemSets.slagbreaker.bonus2': '血染めの手による次の重傷の一撃の強化が、1スタックにつき20%から30%に上昇します。',
   'entities.itemSets.slagbreaker.bonus4': '血染めの手を2回発動するごとに、崩し手の残りクールダウンが3秒短縮されます。',

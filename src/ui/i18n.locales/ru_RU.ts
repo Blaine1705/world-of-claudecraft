@@ -7892,6 +7892,19 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.slagsnare.bonus2': 'Потрошащий удар дает 20 Концентрации.',
   'entities.itemSets.slagsnare.bonus4':
     'Рваная рана, поглощающая 3 Охотничьих натиска, сохраняет их. Не чаще одного раза в 8 сек.',
+  'entities.itemSets.cinderfang.name': 'Покров угольного клыка',
+  'entities.itemSets.cinderfang.bonus2':
+    'Ядовитый ритуал возвращает 20 ед. энергии за удар вместо 15.',
+  'entities.itemSets.cinderfang.bonus4':
+    'Время восстановления Ядовитого дротика сокращается до 4 сек.',
+  'entities.itemSets.smolderstrike.name': 'Кожаные доспехи тлеющего удара',
+  'entities.itemSets.smolderstrike.bonus2': 'Удар с размаху наносит на 20% больше урона.',
+  'entities.itemSets.smolderstrike.bonus4':
+    'Каждое применение Отключки сокращает оставшееся время восстановления Шквала клинков на 6 сек.',
+  'entities.itemSets.ashveil.name': 'Одеяние пепельной завесы',
+  'entities.itemSets.ashveil.bonus2': 'Удар скрытня наносит на 25% больше урона.',
+  'entities.itemSets.ashveil.bonus4':
+    'Первый Удар скрытня под Ударом завесы наносит тройной урон вместо двойного.',
   'entities.itemSets.slagbreaker.name': 'Боевое облачение шлаколома',
   'entities.itemSets.slagbreaker.bonus2': 'Кровавая рука усиливает ваш следующий Калечащий удар на 30% за заряд вместо 20%.',
   'entities.itemSets.slagbreaker.bonus4': 'Каждое второе применение Кровавой руки сокращает оставшееся время восстановления Бреши на 3 сек.',

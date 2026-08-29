@@ -18520,9 +18520,19 @@ export const ko_KR: EnTranslations = {
       }
     },
     "itemSets": {
+      "ashveil": {
+        "name": "잿빛 장막 복장",
+        "bonus2": "잠복자의 일격이 25% 더 큰 피해를 입힙니다.",
+        "bonus4": "장막 일격 동안 처음 사용하는 잠복자의 일격이 두 배 대신 세 배의 피해를 입힙니다."
+      },
       "boundstone_vanguard": {
         "name": "속박석 선봉대",
         "bonus3": "공격 속도와 시전 속도가 15% 증가합니다."
+      },
+      "cinderfang": {
+        "name": "잉걸송곳니 장막",
+        "bonus2": "맹독 의식이 타격마다 돌려주는 기력이 20으로 증가합니다.",
+        "bonus4": "맹독 다트의 재사용 대기시간이 4초로 감소합니다."
       },
       "coldsight_trackers": {
         "name": "냉정한 시선 추적 장구",
@@ -18591,6 +18601,11 @@ export const ko_KR: EnTranslations = {
         "name": "용재올가미 장구",
         "bonus2": "내장 가르기가 집중을 20 생성합니다.",
         "bonus4": "사냥의 기세를 3중첩 소모하는 상처 가르기가 중첩을 보존합니다. 이 효과는 8초에 한 번만 발동합니다."
+      },
+      "smolderstrike": {
+        "name": "불씨타격 가죽 갑옷",
+        "bonus2": "헤이메이커가 20% 더 큰 피해를 입힙니다.",
+        "bonus4": "소등을 시전할 때마다 폭풍의 칼날의 남은 재사용 대기시간이 6초 감소합니다."
       },
       "soulflame": {
         "name": "망령불꽃 의복",

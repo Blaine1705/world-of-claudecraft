@@ -18520,9 +18520,19 @@ export const zh_TW: EnTranslations = {
       }
     },
     "itemSets": {
+      "ashveil": {
+        "name": "灰帷裝束",
+        "bonus2": "潛伏者一擊造成的傷害提高 25%。",
+        "bonus4": "罩影突襲期間的第一次潛伏者一擊造成三倍傷害（原為雙倍）。"
+      },
       "boundstone_vanguard": {
         "name": "縛石先鋒",
         "bonus3": "攻擊速度和施法速度提高 15%。"
+      },
+      "cinderfang": {
+        "name": "燼牙罩袍",
+        "bonus2": "毒祭每次攻擊恢復的能量提高至 20 點。",
+        "bonus4": "毒鏢的冷卻時間縮短至 4 秒。"
       },
       "coldsight_trackers": {
         "name": "冷目追獵裝束",
@@ -18591,6 +18601,11 @@ export const zh_TW: EnTranslations = {
         "name": "渣網獵裝",
         "bonus2": "剖膛打擊產生 20 點集中。",
         "bonus4": "裂創消耗 3 層狩獵動能時將其保留。該效果每 8 秒最多觸發一次。"
+      },
+      "smolderstrike": {
+        "name": "燎擊皮甲",
+        "bonus2": "重磅擺拳造成的傷害提高 20%。",
+        "bonus4": "每次施放眼前一黑，劍刃亂舞的剩餘冷卻時間縮短 6 秒。"
       },
       "soulflame": {
         "name": "怨焰法衣",

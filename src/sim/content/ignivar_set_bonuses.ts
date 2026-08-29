@@ -106,6 +106,23 @@ export const SLAGSNARE_2PC_GUTTING_STRIKE_FOCUS = 20;
  *  MATCHES the Hunting Momentum window by construction. */
 export const SLAGSNARE_4PC_MOMENTUM_ICD_SEC = 8;
 
+// Audited constants for the bespoke rogue bends (read by the class-module
+// call sites AND pinned by tests, so the copy cannot drift from the code).
+/** Cinderfang 2pc: energy refunded per qualifying Venom Ritual builder cast
+ *  (base VENOM_STAGE_REFUND 15). BOTH refund readers in
+ *  combat/rogue_engines.ts (the Venom Dart grant and the Craven Thrust
+ *  grant) bend together; the Wicked Slash fallback keeps its existing
+ *  exclusion (the anti-self-funding guard), so a non-dagger build forced
+ *  onto the fallback feels nothing, disclosed by the set doc. */
+export const CINDERFANG_2PC_VENOM_STAGE_REFUND = 20;
+/** Smolderstrike 4pc: seconds refunded from Mirrored Blades (blade_flurry)
+ *  per Lights Out cast. */
+export const SMOLDERSTRIKE_4PC_MIRRORED_BLADES_REFUND_SEC = 6;
+/** Ashveil 4pc: the Veiled Edge aura VALUE baked at arm time (base
+ *  VEILED_EDGE_BONUS 1). consumeVeiledEdge returns 1 + value, so 2 reads
+ *  back as the promised triple. */
+export const ASHVEIL_4PC_VEILED_EDGE_BONUS = 2;
+
 /** The engine payloads, keyed by set id (the `set` tag on each member item
  *  and the ItemSet id in item_sets.ts). Tiers ascend by pieces. */
 export const SET_ENGINE_BONUSES: Record<string, readonly SetEngineBonusTier[]> = {
@@ -341,6 +358,89 @@ export const SET_ENGINE_BONUSES: Record<string, readonly SetEngineBonusTier[]> =
       // window). Scoped to the Woundrend consume site ONLY: the Re-entry
       // consumers still spend the stacks, and payoffs stay at 3-stack value.
       effect: { tuning: { momentumPreserveIcdSec: SLAGSNARE_4PC_MOMENTUM_ICD_SEC } },
+    },
+  ],
+  // ---- Rogue ----
+  cinderfang: [
+    {
+      pieces: 2,
+      // Bespoke: the per-builder energy refund rises 15 -> 20 at BOTH
+      // VENOM_STAGE_REFUND readers (the Venom Dart grant and the Craven
+      // Thrust grant in combat/rogue_engines.ts). The refund stays per
+      // qualifying BUILDER CAST, unconditional at the stage cap, and the
+      // Wicked Slash fallback keeps its exclusion (the anti-self-funding
+      // guard is NOT widened), so a non-dagger build feels nothing
+      // (disclosed by the set doc). Deterministic, no rng involved.
+      effect: { tuning: { venomStageRefund: CINDERFANG_2PC_VENOM_STAGE_REFUND } },
+    },
+    {
+      pieces: 4,
+      // Venom Dart 8 -> 4 sec: a cooldownFlat row on the resolved entry
+      // (applyTalentMods adds after cooldownPct and clamps at 0, so the -4
+      // lands at exactly 4), so the engine's cooldown set and the printed
+      // cooldown line read the same number. The set doc's honesty note: the
+      // dominant effect is the ENERGY economy (the dart is net 10 energy vs
+      // Craven Thrust's net 45), and about a third of each wound extension
+      // overcaps at the 20 sec pin; stages-per-cycle are unchanged so the
+      // 6-vs-5 finisher alternation stays structurally intact.
+      effect: { ability: [{ ability: 'venom_dart', cooldownFlat: -4 }] },
+    },
+  ],
+  smolderstrike: [
+    {
+      pieces: 2,
+      // Haymaker (body_blow, the Wicked Slash transform inside the Redline
+      // run) hits 20 percent harder: a dmgPct row. The transform re-bake in
+      // Sim.resolvedAbility (the applyTalentMods pass keyed by the FINAL id
+      // after resolveActionReplacement) is what carries an ability row onto
+      // a transformed weaponStrike at all. DELIVERED +17.2 percent: the
+      // additive accumulator folds the row beside Thuggery's 0.16 global
+      // (1.36 / 1.16, stated by the set doc).
+      effect: { ability: [{ ability: 'body_blow', dmgPct: 0.2 }] },
+    },
+    {
+      pieces: 4,
+      // Lights Out (knockout_blow, the Dirt Nap transform) refunds Mirrored
+      // Blades (blade_flurry), unconditional: the cast funnel reports the
+      // TRANSFORMED id, so castNth n:1 sees every Lights Out. Refunds that
+      // land while Mirrored Blades is off cooldown are dropped by the
+      // talent_procs guard (disclosed). castNth draws no rng without a
+      // chance field, so wearers and non-wearers keep their rng streams.
+      effect: {
+        proc: {
+          id: 'set_smolderstrike_4pc',
+          name: 'Smolderstrike Rhythm',
+          trigger: { on: 'castNth', n: 1, abilities: ['knockout_blow'] },
+          responses: [
+            {
+              kind: 'cooldownRefund',
+              ability: 'blade_flurry',
+              seconds: SMOLDERSTRIKE_4PC_MIRRORED_BLADES_REFUND_SEC,
+            },
+          ],
+        },
+        tuning: { mirroredBladesRefundSec: SMOLDERSTRIKE_4PC_MIRRORED_BLADES_REFUND_SEC },
+      },
+    },
+  ],
+  ashveil: [
+    {
+      pieces: 2,
+      // Lurker's Strike hits 25 percent harder: a dmgPct row on the
+      // resolved ambush entry. DELIVERED ~+20 percent: the additive
+      // accumulator folds the row beside the spec baseline's 0.16 ambush
+      // row and the 0.08 global (1.49 / 1.24, stated by the set doc); the
+      // in-veil Veiled Edge multiplier applies to the scaled weapon
+      // component afterward.
+      effect: { ability: [{ ability: 'ambush', dmgPct: 0.25 }] },
+    },
+    {
+      pieces: 4,
+      // Bespoke: the Veiled Edge bonus 1 -> 2 is baked into the edge aura
+      // VALUE at arm time (the wearer is known at the detonation), and
+      // consumeVeiledEdge already returns 1 + edge.value, so the consume
+      // reads the triple back dynamically. Deterministic, no rng involved.
+      effect: { tuning: { veiledEdgeBonus: ASHVEIL_4PC_VEILED_EDGE_BONUS } },
     },
   ],
 };
