@@ -218,16 +218,20 @@ describe('Pyroclast 2pc: Scald always crits at or below 50 percent health', () =
     return fireGuaranteedCrit(sim.ctx, sim.player, 'scorch', 'fire', mob);
   }
 
-  it('the execute band: 50 for wearers, 30 base, boundary inclusive', () => {
-    expect(critBand(true, 0.4)).toBe(true);
-    expect(critBand(false, 0.4)).toBe(false);
-    expect(critBand(true, 0.5)).toBe(true); // at exactly 50 percent: "at or below"
-    expect(critBand(true, 0.51)).toBe(false);
+  it('the execute band: 35 for wearers, 30 base, boundary inclusive', () => {
+    // Retuned 50 to 35 (2026-08-30): at 50 the whole bottom half of a fight
+    // played at the execute ceiling, the lay-of-the-land study's dominant
+    // outlier.
+    expect(critBand(true, 0.33)).toBe(true);
+    expect(critBand(false, 0.33)).toBe(false);
+    expect(critBand(true, 0.35)).toBe(true); // at exactly 35 percent: "at or below"
+    expect(critBand(true, 0.36)).toBe(false);
+    expect(critBand(true, 0.4)).toBe(false); // the old 50-band case now misses
     expect(critBand(true, 0.25)).toBe(true);
     expect(critBand(false, 0.25)).toBe(true); // the base band still stands
   });
 
-  it('execute-phase harness case: a real Scald cast crits the 40 percent target', () => {
+  it('execute-phase harness case: a real Scald cast crits the 33 percent target', () => {
     // The set doc's same-change obligation: both fire harnesses fight a
     // full-health dummy, so the execute band is proven here through the REAL
     // cast path with the natural crit roll pinned to a miss.
@@ -235,7 +239,7 @@ describe('Pyroclast 2pc: Scald always crits at or below 50 percent health', () =
       const sim = liveMage(453, 'fire');
       if (wearer) equipSet(sim, 'pyroclast', 2);
       const mob = addHostileMob(sim);
-      mob.hp = Math.round(mob.maxHp * 0.4);
+      mob.hp = Math.round(mob.maxHp * 0.33);
       sim.rng.chance = () => false; // no natural crit: isolate the override
       sim.player.resource = sim.player.maxResource;
       sim.targetEntity(mob.id);
@@ -372,8 +376,8 @@ describe('the wearer literals against the authored copy', () => {
   it('pins every audited mage constant', () => {
     expect(CHRONOWEAVE_2PC_ECHO_CONVERT_SINGLE).toBeCloseTo(0.5, 10);
     expect(CHRONOWEAVE_4PC_CASCADE_COOLDOWN_CUT_SEC).toBe(5);
-    expect(PYROCLAST_2PC_SCALD_EXECUTE_HP).toBeCloseTo(0.5, 10);
-    expect(PYROCLAST_4PC_COMBUSTION_CDR_PER_CRIT).toBe(2);
+    expect(PYROCLAST_2PC_SCALD_EXECUTE_HP).toBeCloseTo(0.35, 10);
+    expect(PYROCLAST_4PC_COMBUSTION_CDR_PER_CRIT).toBe(1.5);
     expect(FROSTQUENCH_2PC_CRIT_BONUS_ICICLES).toBe(1);
     expect(FROSTQUENCH_4PC_WINTERS_CHILL_CHARGES).toBe(3);
     // The base literals the copy's "up from" claims lean on.

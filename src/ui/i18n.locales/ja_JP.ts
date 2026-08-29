@@ -7882,9 +7882,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.chronoweave.bonus4': '時の連鎖のクールダウンが5秒短縮されます。',
   'entities.itemSets.pyroclast.name': 'パイロクラストの礼装',
   'entities.itemSets.pyroclast.bonus2':
-    '灼きが、体力が50%以下の対象に必ずクリティカルヒットします。被ダメージで詠唱が遅れなくなります。',
+    '灼きが、体力が35%以下の対象に必ずクリティカルヒットします。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.pyroclast.bonus4':
-    '不死鳥のトランスの効果外で火炎呪文がクリティカルヒットするたび、その残りクールダウンが2秒短縮されます。',
+    '不死鳥のトランスの効果外で火炎呪文がクリティカルヒットするたび、その残りクールダウンが1.5秒短縮されます。',
   'entities.itemSets.frostquench.name': 'フロストクエンチの織衣',
   'entities.itemSets.frostquench.bonus2':
     '霧氷の槍のクリティカルヒットで氷柱をもう1つ蓄えます。上限は5つのままです。被ダメージで詠唱が遅れなくなります。',

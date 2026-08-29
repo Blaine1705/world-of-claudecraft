@@ -7876,9 +7876,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.chronoweave.bonus4': '시간의 연쇄의 재사용 대기시간이 5초 감소합니다.',
   'entities.itemSets.pyroclast.name': '화쇄류 예장',
   'entities.itemSets.pyroclast.bonus2':
-    '그을리기가 생명력이 50% 이하인 대상에게 항상 치명타로 적중합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+    '그을리기가 생명력이 35% 이하인 대상에게 항상 치명타로 적중합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
   'entities.itemSets.pyroclast.bonus4':
-    '불사조의 무아지경이 활성화되지 않은 동안 화염 주문이 치명타로 적중하면 남은 재사용 대기시간이 2초 감소합니다.',
+    '불사조의 무아지경이 활성화되지 않은 동안 화염 주문이 치명타로 적중하면 남은 재사용 대기시간이 1.5초 감소합니다.',
   'entities.itemSets.frostquench.name': '서리담금질 직조복',
   'entities.itemSets.frostquench.bonus2':
     '서리 창이 치명타로 적중하면 고드름을 하나 더 저장합니다. 최대치는 5개로 유지됩니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',

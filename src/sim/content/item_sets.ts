@@ -809,12 +809,12 @@ export const ITEM_SETS: Record<string, ItemSet> = {
       {
         pieces: 2,
         effect: {},
-        text: 'Scald always critically strikes targets at or below 50 percent health. Damage taken no longer delays your spellcasting.',
+        text: 'Scald always critically strikes targets at or below 35 percent health. Damage taken no longer delays your spellcasting.',
       },
       {
         pieces: 4,
         effect: {},
-        text: "Your Fire spells' critical strikes outside Phoenix Trance reduce its remaining cooldown by 2 sec.",
+        text: "Your Fire spells' critical strikes outside Phoenix Trance reduce its remaining cooldown by 1.5 sec.",
       },
     ],
   },

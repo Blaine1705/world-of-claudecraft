@@ -18718,8 +18718,8 @@ export const fr_FR: EnTranslations = {
       },
       "pyroclast": {
         "name": "Pyroclast Regalia",
-        "bonus2": "Scald always critically strikes targets at or below 50 percent health. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Your Fire spells' critical strikes outside Phoenix Trance reduce its remaining cooldown by 2 sec."
+        "bonus2": "Scald always critically strikes targets at or below 35 percent health. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Your Fire spells' critical strikes outside Phoenix Trance reduce its remaining cooldown by 1.5 sec."
       },
       "ruincaller": {
         "name": "Ruincaller Vestments",

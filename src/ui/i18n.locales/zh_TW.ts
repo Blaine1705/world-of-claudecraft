@@ -7573,9 +7573,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.chronoweave.bonus4': '時光奔流的冷卻時間縮短 5 秒。',
   'entities.itemSets.pyroclast.name': '火礫禮裝',
   'entities.itemSets.pyroclast.bonus2':
-    '沸燙對生命值不高於 50% 的目標必定造成致命一擊。受到傷害不再延遲你的施法。',
+    '沸燙對生命值不高於 35% 的目標必定造成致命一擊。受到傷害不再延遲你的施法。',
   'entities.itemSets.pyroclast.bonus4':
-    '鳳凰出神未啟動時，你的火焰法術致命一擊會使其剩餘冷卻時間縮短 2 秒。',
+    '鳳凰出神未啟動時，你的火焰法術致命一擊會使其剩餘冷卻時間縮短 1.5 秒。',
   'entities.itemSets.frostquench.name': '霜淬織衣',
   'entities.itemSets.frostquench.bonus2':
     '凜霜矛的致命一擊會額外積存一枚冰柱，上限仍為 5 枚。受到傷害不再延遲你的施法。',

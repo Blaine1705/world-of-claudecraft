@@ -207,11 +207,16 @@ export const CHRONOWEAVE_2PC_ECHO_CONVERT_SINGLE = 0.5;
 /** Chronoweave 4pc: seconds cut from Temporal Cascade's cooldown (base 17). */
 export const CHRONOWEAVE_4PC_CASCADE_COOLDOWN_CUT_SEC = 5;
 /** Pyroclast 2pc: the Scald guaranteed-crit execute threshold as a fraction
- *  of the target's max health (base SCORCH_EXECUTE_HP 0.3). */
-export const PYROCLAST_2PC_SCALD_EXECUTE_HP = 0.5;
+ *  of the target's max health (base SCORCH_EXECUTE_HP 0.3). Retuned 0.5 to
+ *  0.35 (2026-08-30): at 0.5 the entire bottom half of a fight played at the
+ *  execute ceiling (the lay-of-the-land study measured 330 vs 145 DPS at a
+ *  40 percent pin), the study's dominant outlier. */
+export const PYROCLAST_2PC_SCALD_EXECUTE_HP = 0.35;
 /** Pyroclast 4pc: seconds a builder crit landed outside Phoenix Trance shaves
- *  off its running cooldown (base COMBUSTION_CDR_PER_CRIT 1). */
-export const PYROCLAST_4PC_COMBUSTION_CDR_PER_CRIT = 2;
+ *  off its running cooldown (base COMBUSTION_CDR_PER_CRIT 1). Retuned 2 to
+ *  1.5 in the same pass: doubling the engine's acceleration led the
+ *  full-health table outright. */
+export const PYROCLAST_4PC_COMBUSTION_CDR_PER_CRIT = 1.5;
 /** Frostquench 2pc: extra Icicles a Rimelance CRITICAL banks on top of the
  *  base per-impact Icicle (cap ICICLE_MAX 5 untouched and load-bearing). */
 export const FROSTQUENCH_2PC_CRIT_BONUS_ICICLES = 1;

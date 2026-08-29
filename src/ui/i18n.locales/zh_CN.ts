@@ -7573,9 +7573,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.chronoweave.bonus4': '时光奔流的冷却时间缩短 5 秒。',
   'entities.itemSets.pyroclast.name': '火砾礼装',
   'entities.itemSets.pyroclast.bonus2':
-    '灼烫对生命值不高于 50% 的目标必定造成致命一击。受到伤害不再延迟你的施法。',
+    '灼烫对生命值不高于 35% 的目标必定造成致命一击。受到伤害不再延迟你的施法。',
   'entities.itemSets.pyroclast.bonus4':
-    '凤凰出神未激活时，你的火焰法术致命一击会使其剩余冷却时间缩短 2 秒。',
+    '凤凰出神未激活时，你的火焰法术致命一击会使其剩余冷却时间缩短 1.5 秒。',
   'entities.itemSets.frostquench.name': '霜淬织衣',
   'entities.itemSets.frostquench.bonus2':
     '凛霜之矛的致命一击会额外积存一枚冰刺，上限仍为 5 枚。受到伤害不再延迟你的施法。',
