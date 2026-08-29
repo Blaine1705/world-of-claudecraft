@@ -258,10 +258,36 @@ function ignivarGateOpenTo(ctx: SimContext, source: InstanceSlot, destinationId:
   });
 }
 
+// Host-agnostic raid-lockout fallbacks: when no host injects a reset boundary
+// (offline browser, headless RL env, tests), a kill locks for a flat 24h day,
+// and the weekly raid rooms for a flat 7-day week. The authoritative server
+// overrides both via SimConfig (realm-local daily and weekly resets).
+export const DEFAULT_RAID_LOCKOUT_MS = 24 * 60 * 60 * 1000;
+export const DEFAULT_WEEKLY_RAID_LOCKOUT_MS = 7 * 24 * 60 * 60 * 1000;
+
 // Difficulty-scoped lockout key: heroic clears lock beside the normal key, so
 // the two difficulties never consume each other's daily lockout.
 export function heroicLockoutId(dungeonId: string): string {
   return `${dungeonId}:heroic`;
+}
+
+// The rooms whose lockouts run on the WEEKLY reset boundary, one lock per
+// difficulty (normal locks under the plain dungeon id, heroic under
+// heroicLockoutId): the Ignivar raid's two encounter rooms. Explicit by
+// maintainer ruling rather than derived from suggestedPlayers, so the older
+// Nythraxis arena deliberately keeps its shipped daily boundary.
+export const WEEKLY_LOCKOUT_RAID_ROOMS: ReadonlySet<string> = new Set([
+  'ignivar_raid_arena',
+  'ignivar_inner_crucible',
+]);
+
+// The reset boundary a final-boss kill in this dungeon locks until: the weekly
+// boundary for the raid rooms above, the realm-daily boundary everywhere else.
+function finalBossLockedUntil(ctx: SimContext, dungeonId: string): number {
+  const nowMs = ctx.lockoutNowMs();
+  return WEEKLY_LOCKOUT_RAID_ROOMS.has(dungeonId)
+    ? ctx.weeklyRaidResetMs(nowMs)
+    : ctx.raidResetMs(nowMs);
 }
 
 // True when this exit-portal id is live and the player stands inside its door
@@ -478,7 +504,7 @@ export function enterDungeon(
   // being entered: the live claim's when one exists, else the current selection.
   // A loot-eligible ghost may return to its party's defeated live claim for the
   // normal corpse-run resurrection, but the lockout still bars every fresh claim.
-  if (dungeonId === 'nythraxis_boss_arena') {
+  if (dungeonId === 'nythraxis_boss_arena' || WEEKLY_LOCKOUT_RAID_ROOMS.has(dungeonId)) {
     const doorDifficulty = inst?.difficulty ?? difficulty;
     const lockId = doorDifficulty === 'heroic' ? heroicLockoutId(dungeonId) : dungeonId;
     if (isRaidLocked(ctx, r.meta, lockId) && !returningForLoot) {
@@ -486,7 +512,7 @@ export function enterDungeon(
         r.meta.entityId,
         doorDifficulty === 'heroic'
           ? `You are locked to Heroic ${dungeon.name}.`
-          : 'You are locked to Nythraxis Raid Arena.',
+          : `You are locked to ${dungeon.name}.`,
       );
       return false;
     }
@@ -1147,10 +1173,35 @@ function heroicRewardWindowToken(lockedUntil: number): string {
 // snapshot is empty) pays nobody, bags or mail, while the lockout still strikes.
 export function awardHeroicMarks(ctx: SimContext, mob: Entity, recipients: PlayerMeta[]): void {
   const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(mob.id));
-  if (inst?.difficulty !== 'heroic') return;
+  if (inst === undefined) return;
+  // The raid rooms' NORMAL kills settle a weekly lockout of their own (no
+  // marks: marks are heroic pay). One lock per difficulty, so a normal clear
+  // never consumes the week's heroic run or vice versa.
+  if (inst.difficulty !== 'heroic') {
+    const tuning = HEROIC_DUNGEON_TUNING[inst.dungeonId];
+    if (
+      WEEKLY_LOCKOUT_RAID_ROOMS.has(inst.dungeonId) &&
+      tuning !== undefined &&
+      mob.templateId === tuning.finalBossId
+    ) {
+      const lockedUntil = finalBossLockedUntil(ctx, inst.dungeonId);
+      const lockoutRecipients = new Map<number, PlayerMeta>();
+      for (const meta of instanceLockoutMetas(ctx, inst)) {
+        lockoutRecipients.set(meta.entityId, meta);
+      }
+      for (const meta of recipients) lockoutRecipients.set(meta.entityId, meta);
+      for (const meta of lockoutRecipients.values()) {
+        // The cleared-run door exception admits exactly this kill's own
+        // participants back for loot and corpse runs (the heroic idiom).
+        if (!isRaidLocked(ctx, meta, inst.dungeonId)) inst.clearedBy.add(meta.entityId);
+        meta.raidLockouts.set(inst.dungeonId, lockedUntil);
+      }
+    }
+    return;
+  }
   const tuning = HEROIC_DUNGEON_TUNING[inst.dungeonId];
   if (!tuning || mob.templateId !== tuning.finalBossId) return;
-  const lockedUntil = ctx.raidResetMs(ctx.lockoutNowMs());
+  const lockedUntil = finalBossLockedUntil(ctx, inst.dungeonId);
   const rewardWindow = heroicRewardWindowToken(lockedUntil);
   // recipients is the death-time participation snapshot (damage.ts): it is empty
   // exactly when the kill resolved without player credit, and a credited kill

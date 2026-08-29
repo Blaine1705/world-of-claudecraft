@@ -602,6 +602,8 @@ import {
 } from './instances/difficulty';
 import {
   awardHeroicMarks as awardHeroicMarksImpl,
+  DEFAULT_RAID_LOCKOUT_MS,
+  DEFAULT_WEEKLY_RAID_LOCKOUT_MS,
   enterCrypt as enterCryptImpl,
   enterDungeon as enterDungeonImpl,
   inheritDungeonResetLocks as inheritDungeonResetLocksImpl,
@@ -837,11 +839,6 @@ const FLEEING_FAMILIES: ReadonlySet<MobFamily> = new Set([
 // FALL_SAFE_DISTANCE moved there too; re-exported for social/chat_readouts.ts (the
 // /falling readout shares the landing-damage threshold with the fall-damage model).
 export { FALL_SAFE_DISTANCE } from './player_motion';
-
-// Host-agnostic raid-lockout fallback: when no host injects a reset boundary (offline
-// browser, headless RL env, tests), a kill locks for a flat 24h day. The authoritative
-// server overrides this with its realm-local 3 AM daily reset via SimConfig.raidResetMs.
-const DEFAULT_RAID_LOCKOUT_MS = 24 * 60 * 60 * 1000;
 
 /** The one opts object a movement grant hands the discovery ledger, shared so
  *  the hot grant path never allocates per call (deeds.ts RETRO_SEED is the
@@ -2295,6 +2292,8 @@ export class Sim {
       compulsoryTutorial: cfg.compulsoryTutorial ?? false,
       lockoutNowMs: cfg.lockoutNowMs ?? (() => Math.floor(this.time * 1000)),
       raidResetMs: cfg.raidResetMs ?? ((nowMs: number) => nowMs + DEFAULT_RAID_LOCKOUT_MS),
+      weeklyRaidResetMs:
+        cfg.weeklyRaidResetMs ?? ((nowMs: number) => nowMs + DEFAULT_WEEKLY_RAID_LOCKOUT_MS),
       // Carried through so the renderer (which reaches the Sim as IWorld) can read
       // the same custom world via sim.cfg.world. Undefined for the built-in world.
       world: cfg.world,
@@ -2729,12 +2728,6 @@ export class Sim {
 
   private lockoutNowMs(): number {
     return this.cfg.lockoutNowMs?.() ?? Math.floor(this.time * 1000);
-  }
-
-  // The next raid-reset instant for a given lockout "now". The host owns the boundary
-  // (server: realm-local 3 AM daily reset); offline/headless fall back to a flat 24h day.
-  private raidResetMs(nowMs: number): number {
-    return this.cfg.raidResetMs(nowMs);
   }
 
   // -------------------------------------------------------------------------
@@ -5543,7 +5536,10 @@ export class Sim {
       // shared raid-lockout clock that stays on Sim (N1 also writes through it);
       // raidResetMs is the host-owned reset boundary the lockout grant reads through.
       lockoutNowMs: sim.lockoutNowMs.bind(sim),
-      raidResetMs: sim.raidResetMs.bind(sim),
+      // The host owns both reset boundaries (server: realm-local daily and
+      // weekly resets); offline/headless fall back to the flat defaults above.
+      raidResetMs: (nowMs: number) => sim.cfg.raidResetMs(nowMs),
+      weeklyRaidResetMs: (nowMs: number) => sim.cfg.weeklyRaidResetMs(nowMs),
       instanceKeyFor: sim.instanceKeyFor.bind(sim),
       instanceOriginOf: sim.instanceOriginOf.bind(sim),
       instanceClaimIdAt: sim.instanceClaimIdAt.bind(sim),

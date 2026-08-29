@@ -7273,6 +7273,11 @@ export interface SimConfig {
   // authoritative server uses its realm-local 3 AM daily reset; offline/headless omit
   // this and fall back to a flat 24h day. Keeps the time zone out of the sim core.
   raidResetMs?: (nowMs: number) => number;
+  // Host-computed next WEEKLY raid-reset instant for a given lockout "now" (epoch
+  // ms): the raid rooms' lockout boundary (the server uses Tuesday at the realm's
+  // daily-reset hour; see server/raid_reset.ts nextWeeklyRaidResetMs). Offline and
+  // headless omit this and fall back to a flat 7-day week.
+  weeklyRaidResetMs?: (nowMs: number) => number;
   // Offline play-test: a custom world to run instead of the built-in one. The Sim
   // ctor reads spawns from here; render/terrain read it via the data.ts registry,
   // so callers that set this MUST also call setActiveWorldContent() with content

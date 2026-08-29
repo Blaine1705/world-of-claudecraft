@@ -46,6 +46,20 @@ export function localizeErrorText(text: string, deps: ErrorTextLockoutDeps): str
       });
     }
   }
+  // Normal-difficulty raid lockout (the weekly rooms): the same enrichment
+  // keyed on the plain dungeon id. The negative lookahead keeps "Heroic X"
+  // for the heroic arm below instead of relying on arm ordering.
+  const normalLock = /^You are locked to (?!Heroic )(.+)\.$/.exec(text);
+  if (normalLock) {
+    const base = DUNGEON_LIST.find((d) => d.name === normalLock[1]);
+    const lock = base ? deps.raidLockouts().find((l) => l.id === base.id) : undefined;
+    if (base && lock) {
+      return t('hudChrome.raidLockout.lockedToast', {
+        raid: dungeonDisplayName(base.id),
+        time: deps.formatLockoutDuration(lock.msRemaining),
+      });
+    }
+  }
   // Heroic daily lockout (any heroic instance): resolve the dungeon name and
   // enrich with the live countdown when the mirrored lockout is present.
   const heroicLock = /^You are locked to Heroic (.+)\.$/.exec(text);

@@ -323,7 +323,7 @@ import {
 import { PartyFrameProjectionCache } from './party_frame_projection';
 import { applyBoostKitToPlayer, pbeBoostEnabled } from './pbe_boost';
 import { recordFtueDeath, recordFtueQuest, recordLevelUp } from './progress_events';
-import { eventLeadDayKey, nextRaidResetMs, resetDayKey } from './raid_reset';
+import { eventLeadDayKey, nextRaidResetMs, nextWeeklyRaidResetMs, resetDayKey } from './raid_reset';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
 import { createRealmReadoutMemo, realmReadoutJson, realmReadoutObject } from './realm_readout_memo';
 import { RiftAssetCoordinator, riftAssetConfigFromEnv } from './rift_assets';
@@ -1973,9 +1973,9 @@ export class GameServer {
       // never skips a scan that could have pulled someone.
       idleMobTickRadius: INTEREST_DROP_RADIUS,
       lockoutNowMs: () => Date.now(),
-      // Raid lockouts end at the next 3 AM (the classic daily reset) in this realm's civil
-      // time zone, so the whole realm shares one predictable reset (via REALM_RESET_TZ).
+      // Both lockout boundaries: realm-local daily 3 AM and weekly Tuesday (rationale in server/raid_reset.ts).
       raidResetMs: (nowMs) => nextRaidResetMs(nowMs, REALM_RESET_TIME_ZONE),
+      weeklyRaidResetMs: (nowMs) => nextWeeklyRaidResetMs(nowMs, REALM_RESET_TIME_ZONE),
       // Per-phase timing inside sim.tick(). The clock stays host-side (sim purity);
       // `simLapMark` is refreshed right before each sim.tick() call in the loop. The
       // probe is always passed but early-returns unless a detailed capture is active,
