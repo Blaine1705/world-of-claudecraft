@@ -645,7 +645,7 @@ describe('Guide deeds spoiler safety', () => {
         .map(([bossId]) => FLAWLESS_TASKS[bossId])
         .filter((id) => id !== undefined),
     );
-    const isGuideHidden = (d) =>
+    const isGuideHidden = (d: (typeof DEEDS)[string]) =>
       guideHiddenDeedIds.has(d.id) ||
       ('dungeonId' in d.trigger && guideHiddenDungeonIds.has(d.trigger.dungeonId));
     const expected = Object.values(DEEDS)
@@ -855,7 +855,8 @@ describe('Guide Reliquary spoiler-safe catalog', () => {
     );
     const visible = RELIQUARY_PAGES.filter(
       (p) =>
-        p.clearSource?.dungeonId === undefined ||
+        p.clearSource === undefined ||
+        !('dungeonId' in p.clearSource) ||
         !guideHiddenDungeonIds.has(p.clearSource.dungeonId),
     );
     expect(GUIDE_RELIQUARY.map((p) => p.id)).toEqual(visible.map((p) => p.id));
