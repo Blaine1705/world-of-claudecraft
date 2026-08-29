@@ -1025,18 +1025,23 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the v0.40.0 sync merge into the guild pledge branch (the
 // OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
 // both sides). No capture was retaken.
-// Re-minted for the PR 3676 placement-aim round (renderer.ts blocked
-// pass-through); the seals follow the swept evidence bytes, no capture retaken.
+// Re-minted for the entry-horizon scenery cull (renderer.ts hands the four
+// reveal-gated painters the horizon-capped cull far at both frame sites): the
+// renderer integration leaf moved. No capture was retaken.
 // Re-minted for the battleground field-stream compile gate (renderer.ts
 // injects the gate at the buildBattleground site; renderer.ts is a
 // provenance input). No capture was retaken.
-// Re-minted at the v0.41.0 sync merge of the two rounds above: the merged
-// renderer.ts carries both the aim pass-through and the compile gate, so the
-// composite moves again. No capture was retaken.
+// Re-minted for the v0.41.0 sync merge into the entry-fade-gate branch (the
+// compile-gate batch landed on the release arm; renderer inputs moved on
+// both sides). No capture was retaken.
+// Re-minted for the sixth v0.41.0 sync merge into the ground-aim branch: the
+// first-order composite follows the merged renderer.ts (the entry-fade arm's
+// scenery cull beside this branch's aim blocked pass-through), then these
+// seals follow the swept evidence bytes. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'b792779142fa85cda301307cc94fc2c2465dbbfcf55c2ae80acb863973644590';
+  '9688f7ddde274f1a9dee6c9c2d8c5b7b4ca4472e979c244b3e48884d66d2aefa';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '290b5ebd3ddf909b207621295a35d3b23e874cabb77d958fb83cae75748c43f8';
+  'fd58a9235b1142bf027371189a3f1b768a45557eb38b831761f41ab6c30d36ac';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2183,17 +2188,19 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
     // both sides): same order, the composite first, then this seal. No capture
     // was retaken.
+    // Re-minted for the entry-horizon scenery cull (renderer.ts edit only):
+    // same order, the composite first, then this seal. No capture was retaken.
     // Re-minted for the battleground field-stream compile gate (renderer.ts
     // provenance input moved): same order, the composite first, then this
     // seal. No capture was retaken.
+    // Re-minted for the v0.41.0 sync merge into the entry-fade-gate branch:
+    // same order, the composite first, then this seal. No capture was retaken.
+    // Re-minted for the sixth v0.41.0 sync merge into the ground-aim branch:
+    // same order, the composite first, then this seal. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-      // Re-minted for the PR 3676 placement-aim round: the first-order composite
-      // follows renderer.ts, then this second-order seal follows the swept
-      // evidence bytes. No capture was retaken. Re-minted again at the v0.41.0
-      // sync merge (the merged renderer.ts moves the first-order composite).
-    ).toBe('9eb5288491ff7dec5164fe8bf6bc07313fce8588f8cc9f536e7c8e32f247d475');
+    ).toBe('edc42727f2bc4689b40be4c7b87d7c404291c79bc5e9294f26e6193d5b423253');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
