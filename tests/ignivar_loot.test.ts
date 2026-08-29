@@ -382,7 +382,7 @@ describe('ignivar loot: the boss drop tables', () => {
     for (const [name, group] of groups) expect(group.sum, name).toBeCloseTo(1, 6);
   });
 
-  it('Varkhul pays two sigil slots, the feet-and-held group, a ring, and copper', () => {
+  it('Varkhul pays two sigil slots, the feet-and-held group, a ring, copper, and the legendary pair', () => {
     const loot = MOBS.varkhul_forgefather_of_the_last_flame.loot ?? [];
     expect(loot[0]).toMatchObject({ copper: 200000, chance: 1 });
     const groups = groupsOf(loot);
@@ -392,12 +392,26 @@ describe('ignivar loot: the boss drop tables', () => {
       'varkhul_offset',
       'varkhul_rings',
     ]);
+    // The launch wiring: both legendaries ride inside the feet-and-held
+    // group at the kingsbane 3 percent precedent, with the held pair shaved
+    // to keep the partition at exactly 1.00.
+    const legendaryRows = loot.filter(
+      (r) => 'itemId' in r && String(r.itemId).startsWith('varkhul_'),
+    );
+    expect(legendaryRows.map((r) => ('itemId' in r ? r.itemId : ''))).toEqual([
+      'varkhul_forgebreaker',
+      'varkhul_emberward',
+    ]);
+    for (const row of legendaryRows) {
+      expect(row).toMatchObject({ chance: 0.03, rollGroup: 'varkhul_offset' });
+    }
     const offset = groups.get('varkhul_offset');
-    expect(offset?.ids.length).toBe(12); // the 10 feet pieces + both held offhands
+    expect(offset?.ids.length).toBe(14); // 10 feet + both held offhands + the legendary pair
     expect(offset?.ids).toContain('orb_of_the_last_spring');
     expect(offset?.ids).toContain('cinder_of_the_first_design');
     for (const id of offset?.ids ?? []) {
-      expect(['feet', 'offhand'], id).toContain(ITEMS[id].slot);
+      // mainhand joins the allowlist for the Forgebreaker alone.
+      expect(['feet', 'offhand', 'mainhand'], id).toContain(ITEMS[id].slot);
     }
     expect(groups.get('varkhul_rings')?.ids).toEqual([
       'seal_of_the_forgewall',

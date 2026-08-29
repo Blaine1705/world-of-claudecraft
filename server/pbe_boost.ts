@@ -517,7 +517,10 @@ export const NYTHRAXIS_ATTUNEMENT_QUESTS: readonly string[] = [
 // v4: the Crucible ilvl-35 tier entered the BiS pool and healer roles now
 // score Healing Power, so every kit's contents changed; the bump re-kits
 // existing PBE accounts on their next join.
-export const BOOST_KIT_VERSION = 4;
+// v5: the Varkhul legendaries went live (launch wiring), the emberward wins
+// the tank offhands, and the registered Crucible set bonuses make the tier
+// pieces the true kit; the bump re-kits the fleet.
+export const BOOST_KIT_VERSION = 5;
 
 /**
  * Bring one live player up to the current boost kit: level 20, four

@@ -1619,9 +1619,13 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     name: 'The Inner Crucible',
     desc: 'Epic spoils claimed from Varkhul, Forgefather of the Last Flame.',
     clearSource: { kind: 'dungeon', dungeonId: 'ignivar_inner_crucible', difficulty: 'normal' },
-    // The wing's one boss drops every relic on the page.
+    // The wing's one boss drops every relic on the page, including the
+    // raid's two legendary chase drops (live at the kingsbane 3 percent
+    // precedent since the launch wiring; see content/ignivar_drops.ts).
     sourceDefault: fromBoss('varkhul_forgefather_of_the_last_flame'),
     relics: items(
+      'varkhul_forgebreaker',
+      'varkhul_emberward',
       'orb_of_the_last_spring',
       'cinder_of_the_first_design',
       'seal_of_the_forgewall',

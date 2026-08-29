@@ -129,8 +129,18 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       { itemId: 'furnace_march_greaves', chance: 0.07, rollGroup: 'varkhul_offset' },
       { itemId: 'thundershock_treads', chance: 0.07, rollGroup: 'varkhul_offset' },
       { itemId: 'springwarden_sabatons', chance: 0.07, rollGroup: 'varkhul_offset' },
-      { itemId: 'orb_of_the_last_spring', chance: 0.15, rollGroup: 'varkhul_offset' },
-      { itemId: 'cinder_of_the_first_design', chance: 0.15, rollGroup: 'varkhul_offset' },
+      { itemId: 'orb_of_the_last_spring', chance: 0.12, rollGroup: 'varkhul_offset' },
+      { itemId: 'cinder_of_the_first_design', chance: 0.12, rollGroup: 'varkhul_offset' },
+      // The raid's two legendary chase drops ride INSIDE the feet-and-held
+      // group at the kingsbane_last_oath 3 percent precedent (each group is
+      // an exclusive partition summing to exactly 1.00, so the held pair
+      // above shaved 0.03 each to pay for them). Wiring them realizes their
+      // item level from Varkhul's own source (33: source 20 + legendary 10 +
+      // raid 3, the tier the handover authored against), and their
+      // Reliquary rows land in the same change per the ignivar_drops.ts
+      // contract.
+      { itemId: 'varkhul_forgebreaker', chance: 0.03, rollGroup: 'varkhul_offset' },
+      { itemId: 'varkhul_emberward', chance: 0.03, rollGroup: 'varkhul_offset' },
       { itemId: 'seal_of_the_forgewall', chance: 0.25, rollGroup: 'varkhul_rings' },
       { itemId: 'band_of_marked_strikes', chance: 0.25, rollGroup: 'varkhul_rings' },
       { itemId: 'circle_of_cinders', chance: 0.25, rollGroup: 'varkhul_rings' },
