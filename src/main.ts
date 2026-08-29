@@ -178,7 +178,12 @@ import {
 } from './game/spawn_cinematic';
 import { safeStartupGraphicsPreset } from './game/startup_graphics_safety';
 import { shouldClearTargetOnGroundClick } from './game/target_click';
-import { isIslandFerryTeleport, islandTeleportCameraYaw } from './game/teleport_camera';
+import {
+  type TeleportCameraArrival,
+  teleportCameraArrivalAfterTick,
+  teleportCameraArrivalKind,
+  teleportCameraFacingState,
+} from './game/teleport_camera';
 import { loadingCurtainFadeMs, resolveUiEffectsProfile } from './game/ui_effects_profile';
 import { feedSimCalendar } from './game/utc_day';
 import { voice } from './game/voice';
@@ -3837,38 +3842,38 @@ async function startGame(
   let onlineInputEchoMs = 0;
   let playerWasDead = world.player.dead;
   let raceMovementWasLocked = world.mountRaceView()?.phase === 'countdown';
-  // Smoothed input-echo jitter (mean absolute deviation of RTT samples) for the
-  // perf overlay's Jitter row.
+  // Smoothed input-echo jitter for the perf overlay.
   let onlineJitterMs = 0;
   let gameInputReady = false;
   let zoneWarmup: Promise<void> | null = null;
 
-  // Displacement and rift-band-exit tracking (src/game/zone_warm_tracker.ts
-  // owns the state and the hidden-freeze semantics). Rift-exit background: the
-  // instance band teleports back into an overworld zone that is usually still
-  // RESIDENT, so the ready-bail below would skip the loading screen entirely
-  // and drop the player inside the residency fog clamp while the surrounding
-  // zones stream back in: a tight teal fog wall easing open over seconds that
-  // reads as "standing in water". A rift exit therefore always takes the
-  // blocking path, and it streams a WIDER arrival neighbourhood than an
-  // ordinary teleport: the rift band sits outside the overworld entirely, so
-  // the whole ring around the exit point may have been evicted rather than
-  // just the border the player lands next to (ARRIVAL_NEIGHBOR_STREAM_RADIUS
-  // covers that ordinary case).
+  // Rift exits block and stream widely because their arrival ring may be evicted.
   const warmTracker = createZoneWarmTracker(isRiftPos);
   const RIFT_EXIT_STREAM_RADIUS = 240;
-  // Last-evaluated position for the ferry camera-snap scoping: the snap needs
-  // the displacement's ORIGIN (the town bell ride lands off-island, so the
-  // landed point alone cannot tell a ferry ride from a hearthstone). Updated
-  // only when the tracker evaluates, so a hidden desktop span keeps its
-  // pre-hidden origin exactly like the tracker's own displacement.
+  // The evaluated origin distinguishes authored arrivals from other movement.
   let camSnapPrevX = world.player.pos.x;
   let camSnapPrevZ = world.player.pos.z;
-  // Ferry crossings are a CLICK, not a walk, so the far shore has to be
-  // resident BEFORE the bell is rung or the arrival takes the blocking loading
-  // screen. Warm it while the player is still walking up to the bell; the
-  // latch keeps it to one stream per destination per session, and a failure
-  // simply leaves the classic screen in place.
+  let observedDungeonEntrySeq = world.player.dungeonEntrySeq ?? 0;
+  const alignTeleportCameraFacing = (
+    arrival: Exclude<TeleportCameraArrival, null>,
+    landedFacing: number,
+  ): number => {
+    const next = teleportCameraFacingState(arrival, landedFacing, {
+      camYaw: input.camYaw,
+      lastInterpFacing,
+      pendingReleaseFacing,
+      prevCameraDrivenFacing,
+      keyboardTurn: kbTurn,
+    });
+    input.camYaw = next.camYaw;
+    lastInterpFacing = next.lastInterpFacing;
+    pendingReleaseFacing = next.pendingReleaseFacing;
+    prevCameraDrivenFacing = next.prevCameraDrivenFacing;
+    Object.assign(kbTurn, next.keyboardTurn);
+    return next.movementFacing;
+  };
+  // Prewarm the clicked ferry's far shore while the player approaches its bell.
+  // The latch streams once per destination; failure keeps the loading screen.
   const ferryPrewarmed = new Set<string>();
   const maybeWarmFerryDestination = (): void => {
     // The hidden desktop shell rule (maybeWarmCurrentZone below) applies to
@@ -3891,43 +3896,27 @@ async function startGame(
   };
   const maybeWarmCurrentZone = (): void => {
     const player = world.player;
-    // A hidden desktop shell must not pay zone-warm GPU work for a view
-    // nobody sees (the presentation gate stops render, not this lane, and
-    // this is its heaviest recurring producer). The tracker freezes whole
-    // while hidden, so the reveal frame computes the accumulated displacement
-    // as if the transition just happened; a rift crossing keeps its exit edge
-    // unless it entered AND left the band inside the hidden span (no rift
-    // session was rendered then, so no eviction happened, and the
-    // displacement arms cover that reveal; see zone_warm_tracker.ts).
+    const dungeonEntryChanged = (player.dungeonEntrySeq ?? 0) !== observedDungeonEntrySeq;
+    observedDungeonEntrySeq = player.dungeonEntrySeq ?? 0;
+    // The tracker freezes while the desktop shell is hidden, then reports the
+    // accumulated reveal displacement and any visible rift-exit edge.
     const warm = warmTracker(player.pos.x, player.pos.z, desktopPresentationHidden());
-    if (!warm) return;
-    const { displacement, riftExit } = warm;
-    // A teleport-scale jump snaps the chase camera behind the landed facing,
-    // so the player sees what the landing authored, SCOPED to the island's
-    // ferry crossings: a snap on every portal, dungeon door and hearthstone
-    // would be a global feel change riding in a tutorial change
-    // (game/teleport_camera.ts owns the pure decision and the scoping).
-    // The same predicate forces the blocking loading screen below: the town
-    // side of the crossing is the whole harbor kit, and even a prewarmed
-    // arrival links its building programs across the first live frames, so
-    // the crossing always rides the curtain and lets the reveal settle behind
-    // it instead of hitching in front of the player.
-    const ferryRide = isIslandFerryTeleport(
-      camSnapPrevX,
-      camSnapPrevZ,
-      player.pos.x,
-      player.pos.z,
-      displacement,
-    );
-    input.camYaw = islandTeleportCameraYaw(
-      camSnapPrevX,
-      camSnapPrevZ,
-      player.pos.x,
-      player.pos.z,
-      displacement,
-      player.facing,
-      input.camYaw,
-    );
+    if (!warm && !dungeonEntryChanged) return;
+    const { displacement, riftExit } = warm ?? { displacement: 0, riftExit: false };
+    // Authored ferry and dungeon arrivals align the camera to the landed
+    // facing. Dungeon entry also clears stale client heading owners before
+    // held movement can stream the approach yaw back over the sim reset.
+    const cameraArrival = dungeonEntryChanged
+      ? 'dungeon'
+      : teleportCameraArrivalKind(
+          camSnapPrevX,
+          camSnapPrevZ,
+          player.pos.x,
+          player.pos.z,
+          displacement,
+        );
+    const ferryRide = cameraArrival === 'ferry';
+    if (cameraArrival !== null) alignTeleportCameraFacing(cameraArrival, player.facing);
     camSnapPrevX = player.pos.x;
     camSnapPrevZ = player.pos.z;
     if (zoneWarmup) return;
@@ -4505,7 +4494,7 @@ async function startGame(
     }
     // A ghost (dead && ghost) is not movement-frozen and keeps its facing; only a
     // corpse-bound dead player (dead && !ghost) loses it.
-    const movementFacing = !movementFrozen()
+    let movementFacing = !movementFrozen()
       ? (renderFacing ?? controllerFacing ?? pendingReleaseFacing)
       : null;
 
@@ -4515,6 +4504,9 @@ async function startGame(
       // itself, to stay deterministic).
       feedSimCalendar(offlineSim);
       while (acc >= DT) {
+        const tickFromX = offlineSim.player.pos.x;
+        const tickFromZ = offlineSim.player.pos.z;
+        const tickFromDungeonEntrySeq = offlineSim.player.dungeonEntrySeq ?? 0;
         const { mi, facing } = resolveMove(
           mouselook,
           offlineSim.player.pos,
@@ -4540,6 +4532,18 @@ async function startGame(
           perf.finishTrace('sim.tick', traceStart, 'mode', 'offline');
           perf.finishTime('sim', simStart);
         }
+        const tickPlayer = offlineSim.player;
+        const tickArrival = teleportCameraArrivalAfterTick(
+          tickFromX,
+          tickFromZ,
+          tickPlayer.pos.x,
+          tickPlayer.pos.z,
+          tickFromDungeonEntrySeq,
+          tickPlayer.dungeonEntrySeq ?? 0,
+        );
+        if (tickArrival !== null) {
+          movementFacing = alignTeleportCameraFacing(tickArrival, tickPlayer.facing);
+        }
         const eventsLength = events.length;
         desktopNotifyOnSimEvents(events, offlineSim.playerId);
         desktopPresenceOnFrame(offlineSim);
@@ -4563,18 +4567,9 @@ async function startGame(
         pendingReleaseFacing = null;
         acc -= DT;
       }
-      // Re-check immediately after the tick loop, before renderer.sync() below reads
-      // offlineSim.player.pos for this frame. The call at the top of frame() only sees
-      // the position as of the START of the frame; a tick above can itself teleport the
-      // player (release-spirit/resurrect landing in a different zone, a dungeon door or
-      // portal trigger reached mid-tick), which the top-of-frame call has no way to see.
-      // Left unchecked, this frame would still render the just-teleported position with
-      // no loading curtain and an unprepared destination zone (a one-frame flash of an
-      // empty/black view). maybeWarmCurrentZone() is idempotent per call (it early-returns
-      // once a warmup is already in flight or the zone is ready), so calling it twice in
-      // one frame is safe; it does not remove the top-of-frame call, which still owns the
-      // input-suspend handling and catches a teleport triggered from outside the tick
-      // (e.g. a UI action) before this frame's tick even runs.
+      // A tick can teleport after the top-of-frame warm check. Re-check before
+      // renderer.sync reads the new position; this call is idempotent while a
+      // warmup is already active or the destination is ready.
       maybeWarmCurrentZone();
       const pp = offlineSim.player;
       traceStart = perf.startTrace();
@@ -4655,6 +4650,10 @@ async function startGame(
     if (gate.paint) spectateBadge.update(net.spectating);
     const spectateFacing = net.consumeSpectateFacing();
     if (spectateFacing !== null) input.camYaw = spectateFacing;
+    const dungeonEntryFacing = net.consumeDungeonEntryFacing();
+    if (dungeonEntryFacing !== null) {
+      movementFacing = alignTeleportCameraFacing('dungeon', dungeonEntryFacing);
+    }
     const resolved = resolveMove(
       mouselook,
       world.player.pos,

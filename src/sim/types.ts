@@ -4272,6 +4272,9 @@ export interface Entity extends ClientMirroredEntityFields {
   prevPos: Vec3; // for render interpolation
   facing: number; // radians, 0 = +Z
   prevFacing: number;
+  // Monotonic, transient generation for successful dungeon entries. Online
+  // clients acknowledge this exact value before their facing regains authority.
+  dungeonEntrySeq?: number;
   // online clients only: when this entity's last wire update landed and the
   // measured update cadence - distant entities are sent below snapshot rate,
   // so each interpolates on its own clock (see ClientWorld.applySnapshot)

@@ -1065,6 +1065,11 @@ export function dungeonAt(x: number): DungeonDef | null {
   return dungeonByIndex(Math.round((x - (INSTANCE_X_BASE + 900)) / 600));
 }
 
+export function isDungeonEntryTransition(fromX: number, toX: number): boolean {
+  const destination = dungeonAt(toX);
+  return destination !== null && dungeonAt(fromX)?.id !== destination.id;
+}
+
 // ---------------------------------------------------------------------------
 // The Ashen Coliseum — 1v1 ranked arena. Its match instances live in their own
 // far-off flat-ground x-band, well past the dungeon bands (index 0/1/2 sit at

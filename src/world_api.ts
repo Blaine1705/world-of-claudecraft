@@ -186,6 +186,11 @@ export type StableTimerWireVersion = typeof STABLE_TIMER_WIRE_VERSION;
 export const PET_SPECIAL_WIRE_VERSION = 1 as const;
 export type PetSpecialWireVersion = typeof PET_SPECIAL_WIRE_VERSION;
 
+// Dungeon-entry facing acknowledgement capability. The exact entry generation
+// proves the client observed the authoritative landing snapshot.
+export const DUNGEON_ENTRY_FACING_WIRE_VERSION = 1 as const;
+export type DungeonEntryFacingWireVersion = typeof DUNGEON_ENTRY_FACING_WIRE_VERSION;
+
 // Absolute cooldown schedule in server simulation seconds. A number is the
 // expiry for 1x recovery. The tuple adds a temporary recovery-rate segment;
 // after acceleratedUntil, recovery continues at 1x until expiresAt.

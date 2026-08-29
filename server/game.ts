@@ -214,6 +214,7 @@ import { discordFlairForAccount, grantRewardPoints } from './discord_db';
 import { enqueueLinkChange } from './discord_link_changes';
 import { enqueueRelay } from './discord_relay';
 import { findDungeonDoorNear } from './dungeon_door';
+import * as entryFacing from './dungeon_entry_facing';
 import { formatDuration } from './duration';
 import {
   copperFlowSourceForCommand,
@@ -1026,8 +1027,8 @@ export interface ClientSession {
   lastWhisperFrom: string | null;
   // last explicit channel this player sent to; plain text follows it.
   rememberedChat: RememberedChat;
-  // last client input sequence processed; echoed in snapshots for latency telemetry
   lastInputSeq: number;
+  dungeonEntryFacing: entryFacing.DungeonEntryFacingFence;
   // sim time of the last movement input frame, used to clear stale held input
   lastInputAt: number;
   // serialized form of each delta self field as last sent to this client;
@@ -3612,6 +3613,7 @@ export class GameServer {
         fbc?: string | null;
         sourceUrl?: string | null;
         leaseNonce?: string;
+        dungeonEntryFacingWireVersion?: entryFacing.WireVersion;
         timerWireVersion?: 1 | StableTimerWireVersion;
         petSpecialWireVersion?: 0 | PetSpecialWireVersion;
         generalChatRateLimit?: GeneralChatRateLimit | null;
@@ -3775,6 +3777,7 @@ export class GameServer {
       lastWhisperFrom: null,
       rememberedChat: { channel: 'say' },
       lastInputSeq: 0,
+      dungeonEntryFacing: entryFacing.forEntity(player, meta.dungeonEntryFacingWireVersion),
       lastInputAt: this.sim.time,
       lastSent: {},
       needsVarkhulPortalReplay: false,
@@ -4035,6 +4038,11 @@ export class GameServer {
       meta.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION ? PET_SPECIAL_WIRE_VERSION : 0;
     const player = this.sim.entities.get(session.pid);
     if (player) {
+      session.dungeonEntryFacing = entryFacing.forResume(
+        session.dungeonEntryFacing,
+        player,
+        meta.dungeonEntryFacingWireVersion,
+      );
       player.petSpecialCommandsSupported =
         session.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION;
     }
@@ -6482,26 +6490,23 @@ export class GameServer {
       return;
     }
     if (msg.t === 'input') {
-      // The movement lane verdicts at the top of the arm, before the sim
-      // moveInput assignment and before observeInput (R5): a dropped movement
-      // frame reaches neither the sim nor the detector, which is FP-safe
-      // because input_absence only counts input frames toward ACTIVE time.
       if (!this.consumeLane(session, 'movement', receivedAtMs / 1000)) return;
       if (session.spectating) return;
       const meta = sim.meta(pid);
       const e = sim.entities.get(pid);
       if (!meta || !e) return;
       const frame = parseMoveInputFrame(msg);
-      Object.assign(meta.moveInput, frame.moveInput);
+      const facingDecision = entryFacing.decideDungeonEntryInput(
+        session.dungeonEntryFacing,
+        e,
+        frame,
+        msg.de,
+      );
+      session.dungeonEntryFacing = facingDecision.state;
+      Object.assign(meta.moveInput, facingDecision.moveInput);
       session.lastInputAt = sim.time;
       if (typeof msg.seq === 'number' && Number.isFinite(msg.seq) && msg.seq > 0) {
         const seq = Math.floor(msg.seq);
-        // R9: the client seq is a per-send increment on an ordered socket, so
-        // a forward jump past lastInputSeq + 1 proves the missing seqs were
-        // sent and never processed (the input-frame-attributed share of the
-        // server's own drops). Guarded to a positive high-water because resume
-        // zeroes it while the client restarts its counter on reconnect, and
-        // capped so a reset mismatch never books a giant gap.
         if (session.lastInputSeq > 0 && seq > session.lastInputSeq + 1) {
           gameMetricsCounters().wsInputSeqGap(
             Math.min(seq - session.lastInputSeq - 1, MSG_SEQ_GAP_SANITY),
@@ -6509,15 +6514,8 @@ export class GameServer {
         }
         session.lastInputSeq = Math.max(session.lastInputSeq, seq);
       }
-      // A released spirit turns with the camera like the living; only a corpse that
-      // has not yet released (dead and not a ghost) keeps its facing frozen. Without
-      // this the server drops the ghost's mouselook facing and its run feels inverted.
-      // A stun locks facing too (issue #2426): the offline kernel already blocks its
-      // own turnLeft/turnRight (player_motion.ts), but mouselook facing streams in on
-      // this out-of-band channel and must be rejected here, the authoritative side,
-      // not trusted to a client that could simply keep sending it.
-      if (frame.facing !== null && (!e.dead || e.ghost) && !isStunned(e)) {
-        e.facing = frame.facing;
+      if (facingDecision.facing !== null && (!e.dead || e.ghost) && !isStunned(e)) {
+        e.facing = facingDecision.facing;
       }
       this.botDetector.observeInput(session.botTrackingContext, frame, receivedAtMs);
       return;
@@ -8840,6 +8838,8 @@ export class GameServer {
     const maybe = (key: string, value: unknown): void => {
       maybeSerialized(key, JSON.stringify(value ?? null));
     };
+    if (session.dungeonEntryFacing.enabled)
+      maybeSerialized('de', `${this.sim.entities.get(session.pid)?.dungeonEntrySeq ?? 0}`);
     // Static combat-rating/progression scalars: rarely change (gear/talent swap,
     // level or XP gain, a copper transaction, a heroic-key toggle), unlike every
     // other field on this record which was still being rebuilt and stringified
