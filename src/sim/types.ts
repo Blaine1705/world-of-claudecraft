@@ -7822,7 +7822,14 @@ export function berserkerCritDamage(e: Entity): number {
 // engines. Beyond the last entry the penalty SATURATES at the cap (does not blow up).
 // Preserve the established +1/+2 leveling curve; only the old +3 cliff is softened.
 //   +1 -> 2.5   +2 -> 14   +3 -> 21   (+4 and beyond hold at 21)
-const ABOVE_LEVEL_MISS_PCT = [0, 2.5, 14, 21];
+// Lowered from [0, 2.5, 14, 21] at the Crucible hit rebalance (2026-08-30,
+// maintainer ruling): the old +2 penalty put the heroic-raid melee cap at 190
+// rating while the tier's elective hit lanes topped out near 145, so upgrading
+// into the tier SHED cap the old lineage stack carried (retribution measured a
+// net loss). The lowered ramp keeps a real above-level tax but brings the
+// heroic cap within the tier's redistributed hit budget; classic-era boss
+// penalties sat near this shape.
+const ABOVE_LEVEL_MISS_PCT = [0, 2.5, 8, 14];
 function aboveLevelMissPct(diff: number): number {
   if (diff <= 0) return 0;
   return diff < ABOVE_LEVEL_MISS_PCT.length

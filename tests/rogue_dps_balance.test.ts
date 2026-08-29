@@ -70,22 +70,21 @@ describe('Rogue fight-6498 deterministic DPS bands', () => {
     expect(repeat).toEqual(first);
 
     // Accepted three-seed measurements on this fixture are approximately
-    // 224 Combat, 176 Assassination, and 195 Subtlety. Re-anchored through
-    // the Phase B set-bonus registration: the Subtlety kit's Ashveil pieces
-    // now pay their registered engine bonuses (the tripled Veiled Edge and
-    // the Lurker's Strike row land squarely in this fixture's veil windows),
-    // so the probe measures a genuine wearer, which is what a BiS player is.
-    // Combat and Assassination held their Phase A bands: their kits' set
-    // pieces pay bonuses this fight profile barely exercises. A new content
-    // wave sets a new power level; re-anchor to the measured values rather
-    // than restoring an old band, and keep the sibling ordering pinned so a
-    // real collapse still reds.
-    expect(first.combat).toBeGreaterThanOrEqual(216);
-    expect(first.combat).toBeLessThanOrEqual(232);
-    expect(first.assassination).toBeGreaterThanOrEqual(168);
-    expect(first.assassination).toBeLessThanOrEqual(184);
-    expect(first.subtlety).toBeGreaterThanOrEqual(187);
-    expect(first.subtlety).toBeLessThanOrEqual(203);
+    // 212 Combat, 175 Assassination, and 190 Subtlety. Re-anchored through
+    // the 2026-08-30 hit rebalance: the Crucible elective rings traded their
+    // crit lines for Hit (full-coverage program), and this fixture fights
+    // SAME-LEVEL mobs where that hit is far past cap, so the crit-for-hit
+    // trade is a real small loss here (the classic farm-content shape) while
+    // the heroic +2 profile gains it back and more. A new itemization ruling
+    // sets a new power level; re-anchor to the measured values rather than
+    // restoring an old band, and keep the sibling ordering pinned so a real
+    // collapse still reds.
+    expect(first.combat).toBeGreaterThanOrEqual(204);
+    expect(first.combat).toBeLessThanOrEqual(220);
+    expect(first.assassination).toBeGreaterThanOrEqual(167);
+    expect(first.assassination).toBeLessThanOrEqual(183);
+    expect(first.subtlety).toBeGreaterThanOrEqual(182);
+    expect(first.subtlety).toBeLessThanOrEqual(198);
     expect(first.combat).toBeGreaterThan(first.subtlety);
     expect(first.subtlety).toBeGreaterThan(first.assassination);
   }, 30_000);

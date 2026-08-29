@@ -32,6 +32,7 @@ import {
   primaryStatSum,
 } from '../src/sim/item_level';
 import type { ItemDef } from '../src/sim/types';
+import { HIT_RATING_PER_PCT, meleeMissChance, spellHitChance } from '../src/sim/types';
 import { ITEM_WEAPON_VARIANTS } from '../src/ui/weapon_variants';
 
 const TIER_SLOTS = ['helmet', 'shoulder', 'chest', 'gloves', 'legs'] as const;
@@ -252,30 +253,22 @@ describe('ignivar loot: sigils and redemption stock', () => {
 });
 
 describe('ignivar loot: the Hit program and affix directionality', () => {
-  it('Hit appears exactly where the plan authored it', () => {
-    const HIT_60 = new Set([
-      'cord_of_the_last_flame',
-      'cinderbark_cinch',
-      'slagstalker_belt',
-      'moonscorch_waistwrap',
-      'forgewall_girdle',
-      'warforged_waistguard',
-      'stormkindled_chain',
-    ]);
-    const HIT_25 = new Set([
-      'ignivars_ember_choker',
-      'band_of_marked_strikes',
-      'circle_of_cinders',
-    ]);
-    const HIT_30 = new Set(['cinderfang_kris', 'slagrender_cleaver', 'wand_of_quenched_sparks']);
+  it('Hit appears exactly where the rebalanced program authors it', () => {
+    // The 2026-08-30 hit rebalance widened the original scattered program to
+    // full elective-lane coverage: EVERY waist carries 60, EVERY ring 25,
+    // EVERY weapon 30 (each a budget-neutral swap of the piece's minor
+    // rating), plus the choker's original 25. Set pieces still carry none
+    // (the Hit-scarcity policy holds: hit lives on the elective lanes), and
+    // the cap-coverage describe below proves the lanes reach the heroic caps.
     for (const item of Object.values(IGNIVAR_LOOT_ITEMS)) {
-      const want = HIT_60.has(item.id)
-        ? 60
-        : HIT_25.has(item.id)
-          ? 25
-          : HIT_30.has(item.id)
-            ? 30
-            : 0;
+      const want =
+        item.slot === 'waist'
+          ? 60
+          : item.slot === 'ring' || item.id === 'ignivars_ember_choker'
+            ? 25
+            : item.kind === 'weapon'
+              ? 30
+              : 0;
       expect(item.hitRating ?? 0, item.id).toBe(want);
     }
   });
@@ -465,6 +458,68 @@ describe('ignivar loot: the boss drop tables', () => {
     ];
     for (const entry of all) {
       if (entry.itemId) expect(ITEMS[entry.itemId], entry.itemId).toBeTruthy();
+    }
+  });
+});
+
+describe('the Crucible hit program reaches cap for every spec (the 2026-08-30 rebalance)', () => {
+  // The lowered above-level ramp puts the heroic-raid caps at
+  // (miss at +2) x HIT_RATING_PER_PCT x 100 rating; the tier's elective lanes
+  // (waist, rings, weapon) must cover them for EVERY class so upgrading into
+  // the tier never sheds cap the old lineage stack carried (the retribution
+  // regression the lay-of-the-land study measured). Derived from the live
+  // miss functions, so a table change re-decides this suite.
+  const HEROIC_LEVEL_GAP_MELEE_MISS = meleeMissChance(20, 22);
+  const HEROIC_LEVEL_GAP_SPELL_MISS = 0.99 - spellHitChance(20, 22);
+  const meleeCap = Math.round(HEROIC_LEVEL_GAP_MELEE_MISS * HIT_RATING_PER_PCT * 100);
+  const spellCap = Math.round(HEROIC_LEVEL_GAP_SPELL_MISS * HIT_RATING_PER_PCT * 100);
+  const crucible = Object.values(IGNIVAR_LOOT_ITEMS);
+
+  it('the guaranteed elective floor (any waist + two rings + any weapon) covers both caps', () => {
+    const minWaist = Math.min(
+      ...crucible.filter((i) => i.slot === 'waist').map((i) => i.hitRating ?? 0),
+    );
+    const rings = crucible
+      .filter((i) => i.slot === 'ring')
+      .map((i) => i.hitRating ?? 0)
+      .sort((a, b) => a - b);
+    const minWeapon = Math.min(
+      ...crucible.filter((i) => i.kind === 'weapon').map((i) => i.hitRating ?? 0),
+    );
+    const floor = minWaist + rings[0] + rings[1] + minWeapon;
+    expect(minWaist).toBeGreaterThanOrEqual(60);
+    expect(rings[0]).toBeGreaterThanOrEqual(25);
+    expect(minWeapon).toBeGreaterThanOrEqual(30);
+    expect(floor).toBeGreaterThanOrEqual(meleeCap);
+    expect(floor).toBeGreaterThanOrEqual(spellCap);
+    // The caps themselves stay honest against the live miss table.
+    expect(meleeCap).toBe(130);
+    expect(spellCap).toBe(110);
+  });
+
+  it('every class can wear a hit waist and a hit weapon from the tier', () => {
+    const classes = [
+      'warrior',
+      'paladin',
+      'hunter',
+      'rogue',
+      'priest',
+      'shaman',
+      'mage',
+      'warlock',
+      'druid',
+    ] as const;
+    for (const cls of classes) {
+      const wearable = (i: (typeof crucible)[number]) =>
+        i.requiredClass === undefined || i.requiredClass.includes(cls);
+      const waist = crucible.some(
+        (i) => i.slot === 'waist' && wearable(i) && (i.hitRating ?? 0) >= 60,
+      );
+      const weapon = crucible.some(
+        (i) => i.kind === 'weapon' && wearable(i) && (i.hitRating ?? 0) >= 30,
+      );
+      expect(waist, `${cls} hit waist`).toBe(true);
+      expect(weapon, `${cls} hit weapon`).toBe(true);
     }
   });
 });

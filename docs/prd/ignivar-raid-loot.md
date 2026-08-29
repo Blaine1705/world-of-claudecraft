@@ -546,6 +546,20 @@ Set pieces carry only crit and haste by the Hit-scarcity policy in the
 ratings section; Hit lives on the elective waist, jewelry, and weapon
 pieces, which is also where tanks pick up their threat Hit.
 
+AMENDED (2026-08-30, the hit rebalance): the lay-of-the-land Monte Carlo
+study measured the original scattered Hit program shedding cap on tier
+upgrade (the old lineage stack capped retribution and fury at the old 190
+heroic cap; the tier's elective lanes topped out near 145, so upgrading
+LOWERED hit and retribution measured a net DPS loss). Two-part fix by
+maintainer direction: the above-level miss ramp lowered from
+[0, 2.5, 14, 21] to [0, 2.5, 8, 14] (heroic caps now 130 melee / 110
+spell), and the elective lanes widened to full coverage: EVERY waist
+carries 60 Hit, EVERY ring 25, EVERY weapon its 30-point pair (each a
+budget-neutral swap of the piece's minor rating). The guaranteed floor
+(any waist + two rings + any weapon = 140) covers both caps for every
+class; pinned by the cap-coverage describe in tests/ignivar_loot.test.ts.
+The scarcity POLICY holds: set pieces still carry no Hit.
+
 ### The sets
 
 UNDER REDESIGN (2026-08-28): the maintainer-directed adversarial review
