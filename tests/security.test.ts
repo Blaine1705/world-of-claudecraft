@@ -60,6 +60,7 @@ const GM_TEST_WORLD: WorldContent = {
 };
 
 import {
+  DUNGEON_ENTRY_FACING_WIRE_VERSION,
   ONLINE_WORLD_AUTH_TYPE,
   ONLINE_WORLD_LAYOUT_VERSION,
   PET_SPECIAL_WIRE_VERSION,
@@ -114,6 +115,7 @@ describe('websocket authentication', () => {
       token: 'a'.repeat(64),
       character: 42,
       clientSeed: '',
+      dungeonEntryFacingWire: DUNGEON_ENTRY_FACING_WIRE_VERSION,
       timerWire: STABLE_TIMER_WIRE_VERSION,
       petSpecialWire: PET_SPECIAL_WIRE_VERSION,
     });
@@ -125,6 +127,7 @@ describe('websocket authentication', () => {
       token: 'a'.repeat(64),
       character: 42,
       clientSeed: 'seed-123',
+      dungeonEntryFacingWire: DUNGEON_ENTRY_FACING_WIRE_VERSION,
       timerWire: STABLE_TIMER_WIRE_VERSION,
       petSpecialWire: PET_SPECIAL_WIRE_VERSION,
     });

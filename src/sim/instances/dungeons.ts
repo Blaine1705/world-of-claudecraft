@@ -593,6 +593,9 @@ export function enterDungeon(
   ctx.rebucket(p);
   p.facing = 0;
   p.prevFacing = 0;
+  p.dungeonEntrySeq = (p.dungeonEntrySeq ?? 0) + 1;
+  r.meta.moveInput.turnLeft = false;
+  r.meta.moveInput.turnRight = false;
   p.targetId = null;
   p.autoAttack = false;
   // Land settled: no carried-over jump arc or fall distance from the overworld
