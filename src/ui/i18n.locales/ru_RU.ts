@@ -873,6 +873,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.core.mapMarkerLabels.riftEntrance': 'Вход в разлом: {name}',
   'hud.core.mapMarkerLabels.hostileEnemy': 'Враждебный противник',
   'hud.core.mapMarkerLabels.aggressiveEnemy': 'Атакующий вас противник',
+  'hud.core.mapMarkerLabels.bossEnemy': 'Босс: {name}',
+  'hud.core.mapMarkerLabels.bossAggressiveEnemy': 'Босс атакует вас: {name}',
   'hud.core.mapMarkerLabels.lootableEnemy': 'Противник с добычей',
   'hud.core.mapMarkerLabels.corpse': 'Ваше тело',
   'hud.core.mapMarkerLabels.deathZone': 'Опасная зона',
@@ -4993,6 +4995,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Вы проходите через запечатанную королевскую дверь.',
   'entities.dungeons.nythraxis_boss_arena.leaveText':
     'Вы возвращаетесь в холодный воздух Терновых высот.',
+  'entities.mobs.ignivar_herald_of_the_last_flame.name': 'Игнивар, Вестник Последнего Пламени',
+  'entities.mobs.ignivar_heart_of_the_end.name': 'Игнивар Эшколлер',
+  'entities.mobs.derelict_mech.name': 'Заброшенный механизм',
+  'entities.dungeons.ignivar_raid_arena.name': 'Горнило Последнего Источника',
+  'entities.dungeons.ignivar_raid_arena.enterText':
+    'Жар дрожит над запечатанными водами Горнила.',
+  'entities.dungeons.ignivar_raid_arena.leaveText':
+    'Вы покидаете Горнило и снова дышите свободно.',
   'entities.quests.q_nythraxis_restless_dead.title': 'Беспокойство на костяных полях',
   'entities.quests.q_nythraxis_restless_dead.text':
     'Что-то изменилось в Терновых высотах, {playerName}. Мертвые больше не бродят бесцельно. Они собираются и маршируют по северным костяным полям за Хайвотчем, где старое поле битвы выходит к дороге у утеса. Идите туда, расследуйте беспокойство среди костяных ревенантов и принесите любое доказательство того, что ими движет.',
@@ -7762,6 +7772,70 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemArmorType.mail': 'Кольчуга',
   'hudChrome.auraEffect.dot': 'Наносит {value} единиц урона ({school}) каждые {interval} сек',
   'hudChrome.auraEffect.hot': 'Восстанавливает {value} здоровья каждые {interval} сек',
+  'hudChrome.auraEffect.sharedPyre':
+    'Наносит урон в размере {total}% от максимального здоровья каждого игрока, разделённый между игроками в круге ({perPlayer}% каждому при {players} игроках).',
+  'hudChrome.auraEffect.varkhulSharedPyre':
+    'Наносит урон в размере {total}% от максимального здоровья каждого игрока, разделённый между игроками в круге ({perPlayer}% каждому при {players} игроках). За каждого недостающего игрока весь рейд, включая игроков в круге, дополнительно получает урон в размере {missingPenalty}% от максимального здоровья.',
+  'hudChrome.auraEffect.varkhulForgeLink':
+    'Перехватите луч активной колонны до того, как он достигнет кузни. Свободный луч добавляет 6% жара в секунду. В обычном режиме заблокированные лучи и выключенные колонны охлаждают кузню; в героическом жар не снижается. При 100% происходит смертоносное расплавление кузни.',
+  'hudChrome.auraEffect.varkhulCrucibleExposure':
+    'Перехват луча горнила каждую секунду наносит всё больший урон от максимального здоровья. Эффект сбрасывается через 10 секунд вне луча в обычном режиме и через 60 секунд в героическом.',
+  'hudChrome.varkhulCallout.leftPillarCharging':
+    'Левая колонна кузни заряжается. Она зажжётся через 3 секунды!',
+  'hudChrome.varkhulCallout.rightPillarCharging':
+    'Правая колонна кузни заряжается. Она зажжётся через 3 секунды!',
+  'hudChrome.varkhulCallout.bothPillarsCharging':
+    'Колонны кузни заряжаются. Они зажгутся через 3 секунды!',
+  'hudChrome.varkhulCallout.artificerApproaches':
+    'Искровой механик приближается к горнилу!',
+  'hudChrome.varkhulCallout.leftPillar': 'Левая колонна кузни зажигается!',
+  'hudChrome.varkhulCallout.rightPillar': 'Правая колонна кузни зажигается!',
+  'hudChrome.varkhulCallout.bothPillars': 'Колонны кузни зажигаются!',
+  'hudChrome.varkhulCallout.portalsOpening': 'Порталы кузни открываются!',
+  'hudChrome.varkhulCallout.heat75': 'Жар кузни достиг 75%!',
+  'hudChrome.varkhulCallout.heat90': 'Расплавление кузни неизбежно!',
+  'hudChrome.varkhulCallout.addsDefeated': 'Легион кузни повержен: Варкхул уязвим!',
+  'hudChrome.varkhulCallout.worldfireBegins':
+    'Мировое пламя вспыхивает по краю зала. Через 42 сек горнило будет поглощено!',
+  'hudChrome.varkhulCallout.worldfireClosing': 'Мировое пламя сжимается. Двигайтесь к центру!',
+  'hudChrome.varkhulCallout.worldfireConsumed': 'Всё горнило охвачено огнём!',
+  'hudChrome.varkhulWaveStatus': 'Волна {wave}/{waves} | Враги: {remaining}',
+  'hudChrome.raidBossGuide.title': 'Тактика на босса',
+  'hudChrome.raidBossGuide.button': 'Тактика: {boss}',
+  'hudChrome.raidBossGuide.subtitle': '{boss} | Обычный и героический',
+  'hudChrome.raidBossGuide.close': 'Закрыть тактику',
+  'hudChrome.raidBossGuide.ignivar.brand':
+    'Клеймо костра: рассредоточьтесь. Направьте Жгучий поток в готовый водовод и пройдите через воду в одиночку, чтобы очиститься.',
+  'hudChrome.raidBossGuide.ignivar.movement':
+    'Движение: избегайте конусов и метеоров Дождя углей, двигайтесь с Вращающимся инферно и используйте два разрыва Волны кузни.',
+  'hudChrome.raidBossGuide.ignivar.apocalypse':
+    'Апокалипсис: уничтожьте Игнивара Эшколлера до завершения заклинания.',
+  'hudChrome.raidBossGuide.ignivar.judgment':
+    'Суд кузни: определите особое убежище во время предупреждения и соберитесь внутри отмеченной границы, когда загорится пол.',
+  'hudChrome.raidBossGuide.ignivar.finale':
+    'Последний инферно: убейте Игнивара до полного уничтожения, справляясь с ускоренными метеорами, фронтальными атаками и Вращающимся инферно.',
+  'hudChrome.raidBossGuide.ignivar.heroic':
+    'Героический: связанные игроки держатся рядом во время Цепей кузни, Клеймо сохраняется внутри Суда, а Волна кузни отбрасывает игроков дальше.',
+  'hudChrome.raidBossGuide.varkhul.tanks':
+    'Танки: меняйтесь на двух зарядах Клейма создателя и держите Вархала в радиусе ближнего боя.',
+  'hudChrome.raidBossGuide.varkhul.orbs':
+    'Угольные сферы: отмеченные игроки расходятся к краю комнаты. Огненные лужи остаются, а выпущенные сферы пересекают комнату.',
+  'hudChrome.raidBossGuide.varkhul.pyre':
+    'Общий костёр: выбирается только игрок без Раскалённого металла. В круге нужны четыре игрока в любом режиме. За каждого недостающего игрока весь рейд получает урон в размере 15% от максимального здоровья.',
+  'hudChrome.raidBossGuide.varkhul.forgestorm':
+    'Кузнечная буря: следите за падающими метеорами и покидайте каждую отмеченную область до падения трёх волн.',
+  'hudChrome.raidBossGuide.varkhul.anvil':
+    'Указ наковальни: Вархал идёт к великой кузне и трижды бьёт по ней, нанося урон рейду. В героическом режиме также падают отмеченные метеоры.',
+  'hudChrome.raidBossGuide.varkhul.ray':
+    'Закалочный луч: другой игрок, обычно танк, перехватывает движущуюся линию до конца долгого предупреждения. Получивший удар получает Закалённую рану.',
+  'hudChrome.raidBossGuide.varkhul.forge':
+    'Столпы кузни: перекрывайте лучи до их попадания в кузню и меняйте игроков по мере роста Воздействия горнила. Полная шкала жара вызывает Расплавление кузни.',
+  'hudChrome.raidBossGuide.varkhul.assembly':
+    'Сборка мастера: перекрывайте оба луча, убивайте все волны порталов, прерывайте Землетрясение тигля и не давайте Угольным мастерам лечить Вархала.',
+  'hudChrome.raidBossGuide.varkhul.worldfire':
+    'Мировой огонь: в героической финальной фазе горящий край сжимается к центру. Победите Вархала до того, как загорится всё горнило.',
+  'hudChrome.raidBossGuide.varkhul.heroic':
+    'Героический: жар кузни не спадает, Указ наковальни добавляет метеоры, а финальная фаза сосредоточена на Мировом огне.',
   'hudChrome.auraEffect.absorb': 'Поглощает {value} единиц урона',
   'hudChrome.auraEffect.healAbsorb': 'Поглощает {value} единиц входящего исцеления',
   'hudChrome.auraEffect.thorns': 'Наносит {value} единиц урона ({school}) атакующим',
@@ -13984,6 +14058,54 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.otaUpdate.incompatible': 'Для игры требуется обновление. Оно будет применено сразу после завершения загрузки.',
   'hudChrome.otaUpdate.progressLabel': 'Ход загрузки обновления',
   'hudChrome.otaUpdate.title': 'Обновление игры',
+  'hudChrome.auraEffect.makersBrand':
+    'В течение {duration} сек. каждый эффект повышает урон от Варкхула на {pct}%. Суммируется до {max} раз. Танкам следует сменяться при {swap} эффектах.',
+  'hudChrome.auraEffect.varkhulSentinelsGaze':
+    'Пепельный часовой преследует вас. Держите его вдали от рейда, пока он не будет уничтожен.',
+  'hudChrome.auraEffect.varkhulMoltenCore':
+    'Отнесите ядро к горну. Бремя расплава каждые {interval} сек. наносит возрастающий урон от {min}% до {max}% максимального здоровья.',
+  'entities.mobs.ignivar_ember_sentinel.name': 'Пепельный часовой',
+  'entities.mobs.ignivar_crucible_warden.name': 'Страж горнила',
+  'entities.mobs.ignivar_cinder_artificer.name': 'Искровой механик',
+  'entities.mobs.varkhul_forgefather_of_the_last_flame.name': 'Варкхул, отец ковки Последнего Пламени',
+  'entities.npcs.archivist_maelin_emberward.name': 'Архивариус Мэйлин Углестраж',
+  'entities.npcs.archivist_maelin_emberward.title': 'Архивариус горнила',
+  'entities.npcs.archivist_maelin_emberward.greeting':
+    'Каждый след молота здесь — это фраза. Помогите мне прочесть то, что Варкхул пытался скрыть.',
+  'entities.npcs.archivist_maelin_ember_projection.name': 'Углевая проекция Мэйлин',
+  'entities.npcs.archivist_maelin_ember_projection.title': 'Углевая проекция',
+  'entities.npcs.archivist_maelin_ember_projection.greeting':
+    'Угли несут голос Мэйлин всё дальше в глубины кузни.',
+  'entities.quests.q_ignivar_echoes_in_iron.title': 'Эхо в железе',
+  'entities.quests.q_ignivar_echoes_in_iron.text':
+    'Эти автоматоны не солдаты, а черновики. Уничтожьте каждую сборочную линию и прислушайтесь, когда падёт последний корпус. Кузня помнит то, что Варкхул пытался стереть.',
+  'entities.quests.q_ignivar_echoes_in_iron.completion':
+    'Отголоски сходятся. Варкхул сковал воду умирающего Последнего Источника с живым металлом. Эти автоматоны были неудачными закалками. Выдержал лишь Игнивар.',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.0.label': 'Уничтожить Пепельных часовых',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.1.label': 'Уничтожить Стражей горнила',
+  'entities.quests.q_ignivar_heralds_heart.title': 'Сердце Предвестника',
+  'entities.quests.q_ignivar_heralds_heart.text':
+    'Каждый отголосок указывает на единственного выжившего, Игнивара. Варкхул называл его предвестником, печатью и ключом. Победите его. Если записи верны, его смерть откроет, что он был выкован охранять.',
+  'entities.quests.q_ignivar_heralds_heart.completion':
+    'Игнивар никогда не был просто стражем. Его сердце было ключом, а последние пластины открыли запечатанное горнило внизу.',
+  'entities.quests.q_ignivar_heralds_heart.objectives.0.label': 'Игнивар повержен',
+  'entities.quests.q_ignivar_the_forgefather.title': 'Отец ковки',
+  'entities.quests.q_ignivar_the_forgefather.text':
+    'Путь вниз ведёт к Варкхулу, отцу ковки Последнего Пламени. Он заточил Последний Источник, чтобы оживить металл, а затем выковал Игнивара, чтобы сохранить преступление в тайне. Войдите во Внутреннее Горнило и положите конец его трудам.',
+  'entities.quests.q_ignivar_the_forgefather.completion':
+    'Наконец горн замолчал. Возможно, источник уже никогда не восстановится, но Варкхул больше не скуёт жизни в цепи.',
+  'entities.quests.q_ignivar_the_forgefather.objectives.0.label': 'Варкхул повержен',
+  'entities.dungeons.ignivar_forge_approach.name': 'Чертоги Первой Закалки',
+  'entities.dungeons.ignivar_forge_approach.enterText': 'Грохот молотов эхом разносится по Чертогам Первой Закалки.',
+  'entities.dungeons.ignivar_forge_approach.leaveText': 'Вы отходите от первого горна и снова дышите свободно.',
+  'entities.dungeons.ignivar_molten_assembly.name': 'Литейный цех',
+  'entities.dungeons.ignivar_molten_assembly.enterText':
+    'Открытые врата ведут в раскалённый сборочный зал.',
+  'entities.dungeons.ignivar_molten_assembly.leaveText':
+    'Вы покидаете сборочную линию и возвращаетесь в Горнило.',
+  'entities.dungeons.ignivar_inner_crucible.name': 'Внутреннее Горнило',
+  'entities.dungeons.ignivar_inner_crucible.enterText': 'Открытые врата ведут глубже в горнило.',
+  'entities.dungeons.ignivar_inner_crucible.leaveText': 'Вы покидаете безмолвные глубины горнила.',
   'hudChrome.controller.crossHotbarPosition': '{trigger} + {button}',
   'hudChrome.mobile.barEditorAria': 'Изменить раскладку панели действий',
   'hudChrome.barEditor.title': 'Редактор панели действий',

@@ -2453,7 +2453,57 @@ export const zh_CN: EnTranslations = {
       "leather": "皮甲",
       "mail": "锁甲"
     },
+    "varkhulCallout": {
+      "leftPillarCharging": "左侧锻炉立柱正在充能，3秒后点燃！",
+      "rightPillarCharging": "右侧锻炉立柱正在充能，3秒后点燃！",
+      "bothPillarsCharging": "锻炉立柱正在充能，3秒后点燃！",
+      "artificerApproaches": "烬火工匠正在接近锻炉！",
+      "leftPillar": "左侧锻炉立柱点燃了！",
+      "rightPillar": "右侧锻炉立柱点燃了！",
+      "bothPillars": "锻炉立柱点燃了！",
+      "portalsOpening": "锻炉传送门正在开启！",
+      "heat75": "锻炉热量达到75%！",
+      "heat90": "锻炉熔毁迫在眉睫！",
+      "addsDefeated": "锻炉军团已被击败，瓦库尔暴露了！",
+      "worldfireBegins": "世界之火从房间边缘燃起，42秒后整个熔炉大厅将被吞没！",
+      "worldfireClosing": "世界之火正在逼近，向中央移动！",
+      "worldfireConsumed": "整个熔炉大厅都在燃烧！"
+    },
+    "varkhulWaveStatus": "波次 {wave}/{waves} | 敌人: {remaining}",
+    "raidBossGuide": {
+      "title": "首领指南",
+      "button": "指南: {boss}",
+      "subtitle": "{boss} | 普通与英雄",
+      "close": "关闭首领指南",
+      "ignivar": {
+        "brand": "柴堆印记: 分散站位。将灼热洪流引向可用水渠，然后独自穿过水流完成净化。",
+        "movement": "移动: 躲避烬雨的锥形攻击和陨石，跟随旋转炼狱移动，并利用熔炉波的两个缺口。",
+        "apocalypse": "末日: 在伊格尼瓦·唤灰者完成施法前将其击杀。",
+        "judgment": "熔炉审判: 预警时找出独特的庇护点，地面燃烧后在标记边界内集合。",
+        "finale": "最终炼狱: 在团灭前击杀伊格尼瓦尔，同时应对加速的陨石、正面攻击和旋转炼狱。",
+        "heroic": "英雄: 熔炉锁链期间成对玩家必须保持靠近，熔炉审判期间印记仍会持续，且熔炉波会将玩家推得更远。"
+      },
+      "varkhul": {
+        "tanks": "坦克: 制作者印记达到2层时换坦，并让瓦尔库尔保持在近战范围内。",
+        "orbs": "烬火宝珠: 被标记者分散到房间边缘。火池会持续存在，释放的宝珠会穿过房间。",
+        "pyre": "共享柴堆: 只选择没有炽热金属的玩家。无论难度，移动圆圈内都需要4名玩家。每缺少一名玩家，整个团队都会受到相当于最大生命值15%的伤害。",
+        "forgestorm": "熔炉风暴: 观察坠落的陨石，在三波陨石落地前离开每个标记区域。",
+        "anvil": "铁砧敕令: 瓦尔库尔移动到巨型熔炉并敲击三次，造成团队伤害。英雄模式还会落下标记陨石。",
+        "ray": "淬火射线: 另一名玩家通常由坦克在长时间预警结束前拦截移动射线。承受伤害者会获得淬火创伤。",
+        "forge": "熔炉柱: 在射线抵达熔炉前阻挡，并在坩埚暴露叠加后轮换。热量满时会触发熔炉熔毁。",
+        "assembly": "大师组装: 阻挡两道熔炉射线，击杀所有传送门波次，打断坩埚震击，并阻止烬火工匠治疗瓦尔库尔。",
+        "worldfire": "世界之火: 英雄最终阶段的燃烧边缘会向中央收缩。在整个坩埚燃烧前击败瓦尔库尔。",
+        "heroic": "英雄: 熔炉热量不会下降，铁砧敕令会增加陨石，最终阶段会集中应对世界之火。"
+      }
+    },
     "auraEffect": {
+      "sharedPyre": "造成相当于每名玩家最大生命值 {total}% 的伤害，由圈内玩家分摊（{players} 名玩家时每人承受 {perPlayer}%）。",
+      "varkhulSharedPyre": "造成相当于每名玩家最大生命值 {total}% 的伤害，由圈内玩家分摊（{players} 名玩家时每人承受 {perPlayer}%）。每缺少一名玩家，还会对整个团队（包括圈内玩家）造成最大生命值 {missingPenalty}% 的伤害。",
+      "makersBrand": "持续 {duration} 秒，每层使你受到瓦尔库尔的伤害提高 {pct}%。最多叠加 {max} 层。坦克应在 {swap} 层时换坦。",
+      "varkhulSentinelsGaze": "余烬哨兵正在追击你。将它带离团队，直到它被消灭。",
+      "varkhulMoltenCore": "将核心运到锻炉。熔融重压每 {interval} 秒造成不断提高的伤害，从最大生命值的 {min}% 增至 {max}%。",
+      "varkhulForgeLink": "在激活的立柱光束抵达锻炉前将其拦截。未拦截的光束每秒增加6%热量。普通难度下，已拦截的光束和关闭的立柱会让锻炉冷却；英雄难度下热量永不降低。达到100%时会触发致命的锻炉熔毁。",
+      "varkhulCrucibleExposure": "拦截坩埚光束时，每秒受到的最大生命值伤害都会提高。离开光束后，普通难度10秒、英雄难度60秒后重置层数。",
       "dot": "每 {interval} 秒造成 {value} 点{school}伤害",
       "hot": "每 {interval} 秒恢复 {value} 点生命值",
       "mendingCurrent": "储存 {value} 点治疗量，随时间释放或由湍流愈合消耗",
@@ -8627,6 +8677,8 @@ export const zh_CN: EnTranslations = {
         "riftEntrance": "裂隙入口：{name}",
         "hostileEnemy": "敌对目标",
         "aggressiveEnemy": "正在攻击你的敌人",
+        "bossEnemy": "首领：{name}",
+        "bossAggressiveEnemy": "正在攻击你的首领：{name}",
         "lootableEnemy": "可拾取战利品的敌人",
         "corpse": "你的尸体",
         "deathZone": "危险区域",
@@ -13918,6 +13970,27 @@ export const zh_CN: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "尼思拉克西斯，荆峰之灾"
       },
+      "ignivar_herald_of_the_last_flame": {
+        "name": "伊格尼瓦，末焰使者"
+      },
+      "ignivar_heart_of_the_end": {
+        "name": "伊格尼瓦·唤灰者"
+      },
+      "ignivar_ember_sentinel": {
+        "name": "余烬哨兵"
+      },
+      "ignivar_crucible_warden": {
+        "name": "熔炉守卫"
+      },
+      "ignivar_cinder_artificer": {
+        "name": "烬火工匠"
+      },
+      "varkhul_forgefather_of_the_last_flame": {
+        "name": "末焰锻父瓦尔库尔"
+      },
+      "derelict_mech": {
+        "name": "废弃机甲"
+      },
       "reliquary_ledger_wraith": {
         "name": "名册幽魂"
       },
@@ -14577,6 +14650,16 @@ export const zh_CN: EnTranslations = {
         "name": "奥德里克修士",
         "title": "山谷牧师",
         "greeting": "从礼拜堂墓地到世界屋脊... 线索到这里结束。我感觉山正在聆听。"
+      },
+      "archivist_maelin_emberward": {
+        "name": "余烬守望者梅琳",
+        "title": "熔炉档案员",
+        "greeting": "这里的每一道锤印都是一句话。帮我读懂瓦尔库尔想隐藏的真相。"
+      },
+      "archivist_maelin_ember_projection": {
+        "name": "梅琳的余烬投影",
+        "title": "余烬投影",
+        "greeting": "余烬将梅琳的声音传向锻炉深处。"
       },
       "brother_halven": {
         "name": "哈尔文修士",
@@ -15723,6 +15806,39 @@ export const zh_CN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "击败尼思拉克西斯"
+          }
+        }
+      },
+      "q_ignivar_echoes_in_iron": {
+        "title": "铁中回响",
+        "text": "这些自动机械不是士兵，而是草稿。摧毁每条装配线，在最后一具躯壳倒下时仔细聆听。锻炉记得瓦尔库尔试图抹去的一切。",
+        "completion": "回响彼此吻合。瓦尔库尔将垂死末泉的水束缚进活体金属。这些自动机械都是失败的淬炼品，只有伊格尼瓦尔撑了下来。",
+        "objectives": {
+          "0": {
+            "label": "摧毁余烬哨兵"
+          },
+          "1": {
+            "label": "摧毁熔炉守卫"
+          }
+        }
+      },
+      "q_ignivar_heralds_heart": {
+        "title": "先驱之心",
+        "text": "每一道回响都指向唯一的幸存者：伊格尼瓦尔。瓦尔库尔称他为先驱、封印和钥匙。击败他。如果记录属实，他的死亡会揭示他被锻造来守护什么。",
+        "completion": "伊格尼瓦尔从来不只是守护者。他的心脏就是钥匙，最后的甲片打开了下方封闭的熔炉。",
+        "objectives": {
+          "0": {
+            "label": "击败伊格尼瓦尔"
+          }
+        }
+      },
+      "q_ignivar_the_forgefather": {
+        "title": "锻父",
+        "text": "下方的道路通向末焰锻父瓦尔库尔。他囚禁末泉以赋予金属生命，又锻造伊格尼瓦尔来封存这罪行。进入内环熔炉，结束他的工作。",
+        "completion": "锻炉终于寂静了。泉水也许永远无法复原，但瓦尔库尔再也不能将生命锻成锁链。",
+        "objectives": {
+          "0": {
+            "label": "击败瓦尔库尔"
           }
         }
       },
@@ -17602,6 +17718,26 @@ export const zh_CN: EnTranslations = {
         "name": "尼思拉克西斯团队竞技场",
         "enterText": "你穿过封印的王室之门。",
         "leaveText": "你回到荆峰的寒冷空气中。"
+      },
+      "ignivar_forge_approach": {
+        "name": "首锻大厅",
+        "enterText": "锻锤的轰鸣在首锻大厅中回荡。",
+        "leaveText": "你离开第一座锻炉，终于又能自由呼吸。"
+      },
+      "ignivar_raid_arena": {
+        "name": "最后泉源熔炉",
+        "enterText": "热浪在熔炉封印的水源上方翻涌。",
+        "leaveText": "你离开熔炉，终于再次畅快呼吸。"
+      },
+      "ignivar_molten_assembly": {
+        "name": "熔火装配间",
+        "enterText": "开启的大门通向熔火装配大厅。",
+        "leaveText": "你离开装配线，返回熔炉厅。"
+      },
+      "ignivar_inner_crucible": {
+        "name": "内环熔炉",
+        "enterText": "已打开的大门通往熔炉更深处。",
+        "leaveText": "你离开熔炉寂静的深处。"
       },
       "wildheart_basin": {
         "name": "荒野之心盆地",

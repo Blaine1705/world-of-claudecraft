@@ -6406,7 +6406,7 @@
     display: none;
     z-index: 100;
     pointer-events: none;
-    max-width: 280px;
+    max-width: min(720px, calc(100vw - 16px));
     padding: 8px 10px;
     font-size: 12px;
     line-height: 1.5;
@@ -7946,6 +7946,70 @@
     grid-template-columns: repeat(var(--party-frame-columns, 1), var(--party-frame-width, 170px));
     gap: var(--party-frame-spacing, 4px);
     zoom: var(--party-frame-scale, 1);
+  }
+  .party-boss-guide-button {
+    width: 170px;
+    min-height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 5px 8px;
+    border: 1px solid var(--gold-dim);
+    border-radius: 4px;
+    background: var(--panel-bg);
+    color: var(--gold);
+    font-family: var(--title-font);
+    font-size: 11px;
+    letter-spacing: 0.25px;
+    cursor: var(--cursor-point);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--gold) 7%, transparent);
+  }
+  .party-boss-guide-button:hover,
+  .party-boss-guide-button:focus-visible {
+    border-color: var(--gold);
+    color: var(--color-text-light);
+  }
+  .party-boss-guide-button .ui-icon {
+    width: 15px;
+    height: 15px;
+    flex: none;
+  }
+  #raid-boss-guide-window {
+    width: min(560px, calc(100vw - 24px));
+    max-height: min(78vh, 650px);
+    overflow: hidden;
+  }
+  #raid-boss-guide-window .rbg-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  #raid-boss-guide-window .rbg-subtitle {
+    margin-top: 4px;
+    color: var(--color-text-muted);
+    font-family: var(--body-font);
+    font-size: 12px;
+    font-weight: 400;
+  }
+  #raid-boss-guide-window .rbg-list {
+    max-height: min(62vh, 520px);
+    margin: 0;
+    padding: 12px 18px 14px 36px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  #raid-boss-guide-window .rbg-list li {
+    padding: 7px 4px;
+    color: var(--color-text-light);
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  #raid-boss-guide-window .rbg-list li::marker {
+    color: var(--gold);
+    font-family: var(--title-font);
+    font-weight: 700;
   }
   #party-frames.below-target {
     /* Below the target frame's MEASURED bottom: party_below_target_painter.ts

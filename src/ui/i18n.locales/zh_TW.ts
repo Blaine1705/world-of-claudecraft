@@ -850,6 +850,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.core.mapMarkerLabels.riftEntrance': '裂隙入口：{name}',
   'hud.core.mapMarkerLabels.hostileEnemy': '敵對目標',
   'hud.core.mapMarkerLabels.aggressiveEnemy': '正在攻擊你的敵人',
+  'hud.core.mapMarkerLabels.bossEnemy': '首領：{name}',
+  'hud.core.mapMarkerLabels.bossAggressiveEnemy': '正在攻擊你的首領：{name}',
   'hud.core.mapMarkerLabels.lootableEnemy': '可拾取戰利品的敵人',
   'hud.core.mapMarkerLabels.corpse': '你的屍體',
   'hud.core.mapMarkerLabels.deathZone': '危險區域',
@@ -4791,6 +4793,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.nythraxis_boss_arena.name': '尼思拉克西斯團隊競技場',
   'entities.dungeons.nythraxis_boss_arena.enterText': '你穿過封印的王室之門。',
   'entities.dungeons.nythraxis_boss_arena.leaveText': '你回到荊峰的寒冷空氣中。',
+  'entities.mobs.ignivar_herald_of_the_last_flame.name': '伊格尼瓦，末焰使者',
+  'entities.mobs.ignivar_heart_of_the_end.name': '伊格尼瓦·喚灰者',
+  'entities.mobs.derelict_mech.name': '廢棄機甲',
+  'entities.dungeons.ignivar_raid_arena.name': '最後泉源熔爐',
+  'entities.dungeons.ignivar_raid_arena.enterText': '熱浪在熔爐封印的水源上方翻湧。',
+  'entities.dungeons.ignivar_raid_arena.leaveText': '你離開熔爐，終於再次暢快呼吸。',
   'entities.quests.q_nythraxis_restless_dead.title': '骨原的異動',
   'entities.quests.q_nythraxis_restless_dead.text':
     '荊峰高地出事了，{playerName}。亡者不再漫無目的地遊蕩。他們在高望以北的骨原集結並行軍，那裡是舊戰場與峭壁道路交會之處。去那裡調查骨甲亡魂的異動，並帶回任何能說明是什麼驅使它們的證據。',
@@ -7357,6 +7365,66 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemArmorType.mail': '鎖甲',
   'hudChrome.auraEffect.dot': '每 {interval} 秒造成 {value} 點{school}傷害',
   'hudChrome.auraEffect.hot': '每 {interval} 秒恢復 {value} 點生命值',
+  'hudChrome.auraEffect.sharedPyre':
+    '造成相當於每名玩家最大生命值 {total}% 的傷害，由圈內玩家分攤（{players} 名玩家時每人承受 {perPlayer}%）。',
+  'hudChrome.auraEffect.varkhulSharedPyre':
+    '造成相當於每名玩家最大生命值 {total}% 的傷害，由圈內玩家分攤（{players} 名玩家時每人承受 {perPlayer}%）。每缺少一名玩家，還會對整個團隊（包括圈內玩家）造成最大生命值 {missingPenalty}% 的傷害。',
+  'hudChrome.auraEffect.varkhulForgeLink':
+    '在啟動的立柱光束抵達鍛爐前將其攔截。未攔截的光束每秒增加6%熱量。普通難度下，已攔截的光束和關閉的立柱會讓鍛爐冷卻；英雄難度下熱量永不降低。達到100%時會觸發致命的鍛爐熔毀。',
+  'hudChrome.auraEffect.varkhulCrucibleExposure':
+    '攔截坩堝光束時，每秒受到的最大生命值傷害都會提高。離開光束後，普通難度10秒、英雄難度60秒後重置層數。',
+  'hudChrome.varkhulCallout.leftPillarCharging': '左側鍛爐立柱正在充能，3秒後點燃！',
+  'hudChrome.varkhulCallout.rightPillarCharging': '右側鍛爐立柱正在充能，3秒後點燃！',
+  'hudChrome.varkhulCallout.bothPillarsCharging': '鍛爐立柱正在充能，3秒後點燃！',
+  'hudChrome.varkhulCallout.artificerApproaches': '燼火工匠正在接近鍛爐！',
+  'hudChrome.varkhulCallout.leftPillar': '左側鍛爐立柱點燃了！',
+  'hudChrome.varkhulCallout.rightPillar': '右側鍛爐立柱點燃了！',
+  'hudChrome.varkhulCallout.bothPillars': '鍛爐立柱點燃了！',
+  'hudChrome.varkhulCallout.portalsOpening': '鍛爐傳送門正在開啟！',
+  'hudChrome.varkhulCallout.heat75': '鍛爐熱量達到75%！',
+  'hudChrome.varkhulCallout.heat90': '鍛爐熔毀迫在眉睫！',
+  'hudChrome.varkhulCallout.addsDefeated': '鍛爐軍團已被擊敗，瓦庫爾暴露了！',
+  'hudChrome.varkhulCallout.worldfireBegins':
+    '世界之火從房間邊緣燃起，42秒後整座熔爐大廳將被吞沒！',
+  'hudChrome.varkhulCallout.worldfireClosing': '世界之火正在逼近，往中央移動！',
+  'hudChrome.varkhulCallout.worldfireConsumed': '整座熔爐大廳都在燃燒！',
+  'hudChrome.varkhulWaveStatus': '波次 {wave}/{waves} | 敵人: {remaining}',
+  'hudChrome.raidBossGuide.title': '首領指南',
+  'hudChrome.raidBossGuide.button': '指南: {boss}',
+  'hudChrome.raidBossGuide.subtitle': '{boss} | 普通與英雄',
+  'hudChrome.raidBossGuide.close': '關閉首領指南',
+  'hudChrome.raidBossGuide.ignivar.brand':
+    '柴堆印記: 分散站位。將灼熱洪流引向可用水道，再獨自穿過水流完成淨化。',
+  'hudChrome.raidBossGuide.ignivar.movement':
+    '移動: 躲避燼雨的錐形攻擊與隕石，跟隨旋轉煉獄移動，並利用熔爐波的兩個缺口。',
+  'hudChrome.raidBossGuide.ignivar.apocalypse':
+    '末日: 在伊格尼瓦·喚灰者完成施法前將其擊殺。',
+  'hudChrome.raidBossGuide.ignivar.judgment':
+    '熔爐審判: 預警時找出獨特的庇護點，地面燃燒後在標記邊界內集合。',
+  'hudChrome.raidBossGuide.ignivar.finale':
+    '最終煉獄: 在團滅前擊殺伊格尼瓦爾，同時應對加速的隕石、正面攻擊與旋轉煉獄。',
+  'hudChrome.raidBossGuide.ignivar.heroic':
+    '英雄: 熔爐鎖鏈期間成對玩家必須保持靠近，熔爐審判期間印記仍會持續，且熔爐波會將玩家推得更遠。',
+  'hudChrome.raidBossGuide.varkhul.tanks':
+    '坦克: 製作者印記達到2層時換坦，並讓瓦爾庫爾保持在近戰範圍內。',
+  'hudChrome.raidBossGuide.varkhul.orbs':
+    '燼火寶珠: 被標記者分散到房間邊緣。火池會持續存在，釋放的寶珠會穿過房間。',
+  'hudChrome.raidBossGuide.varkhul.pyre':
+    '共享柴堆: 只選擇沒有熾熱金屬的玩家。無論難度，移動圓圈內都需要4名玩家。每缺少一名玩家，整個團隊都會受到相當於最大生命值15%的傷害。',
+  'hudChrome.raidBossGuide.varkhul.forgestorm':
+    '熔爐風暴: 觀察墜落的隕石，在三波隕石落地前離開每個標記區域。',
+  'hudChrome.raidBossGuide.varkhul.anvil':
+    '鐵砧敕令: 瓦爾庫爾移動到巨型熔爐並敲擊三次，造成團隊傷害。英雄模式還會落下標記隕石。',
+  'hudChrome.raidBossGuide.varkhul.ray':
+    '淬火射線: 另一名玩家通常由坦克在長時間預警結束前攔截移動射線。承受傷害者會獲得淬火創傷。',
+  'hudChrome.raidBossGuide.varkhul.forge':
+    '熔爐柱: 在射線抵達熔爐前阻擋，並在坩堝暴露疊加後輪換。熱量滿時會觸發熔爐熔毀。',
+  'hudChrome.raidBossGuide.varkhul.assembly':
+    '大師組裝: 阻擋兩道熔爐射線，擊殺所有傳送門波次，打斷坩堝震擊，並阻止燼火工匠治療瓦爾庫爾。',
+  'hudChrome.raidBossGuide.varkhul.worldfire':
+    '世界之火: 英雄最終階段的燃燒邊緣會向中央收縮。在整個坩堝燃燒前擊敗瓦爾庫爾。',
+  'hudChrome.raidBossGuide.varkhul.heroic':
+    '英雄: 熔爐熱量不會下降，鐵砧敕令會增加隕石，最終階段會集中應對世界之火。',
   'hudChrome.auraEffect.absorb': '吸收 {value} 點傷害',
   'hudChrome.auraEffect.healAbsorb': '吸收 {value} 點受到的治療',
   'hudChrome.auraEffect.thorns': '對攻擊者造成 {value} 點{school}傷害',
@@ -13524,6 +13592,52 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.otaUpdate.incompatible': '需要更新後才能進行遊戲。下載完成後將立即套用。',
   'hudChrome.otaUpdate.progressLabel': '更新下載進度',
   'hudChrome.otaUpdate.title': '遊戲更新',
+  'hudChrome.auraEffect.makersBrand':
+    '持續 {duration} 秒，每層使你受到瓦爾庫爾的傷害提高 {pct}%。最多疊加 {max} 層。坦克應在 {swap} 層時換坦。',
+  'hudChrome.auraEffect.varkhulSentinelsGaze':
+    '餘燼哨兵正在追擊你。將它帶離團隊，直到它被消滅。',
+  'hudChrome.auraEffect.varkhulMoltenCore':
+    '將核心運到鍛爐。熔融重壓每 {interval} 秒造成不斷提高的傷害，從最大生命值的 {min}% 增至 {max}%。',
+  'entities.mobs.ignivar_ember_sentinel.name': '餘燼哨兵',
+  'entities.mobs.ignivar_crucible_warden.name': '熔爐守衛',
+  'entities.mobs.ignivar_cinder_artificer.name': '燼火工匠',
+  'entities.mobs.varkhul_forgefather_of_the_last_flame.name': '末焰鍛父瓦爾庫爾',
+  'entities.npcs.archivist_maelin_emberward.name': '餘燼守望者梅琳',
+  'entities.npcs.archivist_maelin_emberward.title': '熔爐檔案員',
+  'entities.npcs.archivist_maelin_emberward.greeting':
+    '這裡的每一道槌印都是一句話。幫我讀懂瓦爾庫爾想隱藏的真相。',
+  'entities.npcs.archivist_maelin_ember_projection.name': '梅琳的餘燼投影',
+  'entities.npcs.archivist_maelin_ember_projection.title': '餘燼投影',
+  'entities.npcs.archivist_maelin_ember_projection.greeting':
+    '餘燼將梅琳的聲音傳向鍛爐深處。',
+  'entities.quests.q_ignivar_echoes_in_iron.title': '鐵中回響',
+  'entities.quests.q_ignivar_echoes_in_iron.text':
+    '這些自動機械不是士兵，而是草稿。摧毀每條裝配線，在最後一具軀殼倒下時仔細聆聽。鍛爐記得瓦爾庫爾試圖抹去的一切。',
+  'entities.quests.q_ignivar_echoes_in_iron.completion':
+    '回響彼此吻合。瓦爾庫爾將垂死末泉的水束縛進活體金屬。這些自動機械都是失敗的淬鍊品，只有伊格尼瓦爾撐了下來。',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.0.label': '摧毀餘燼哨兵',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.1.label': '摧毀熔爐守衛',
+  'entities.quests.q_ignivar_heralds_heart.title': '先驅之心',
+  'entities.quests.q_ignivar_heralds_heart.text':
+    '每一道回響都指向唯一的幸存者：伊格尼瓦爾。瓦爾庫爾稱他為先驅、封印和鑰匙。擊敗他。如果記錄屬實，他的死亡會揭示他被鍛造來守護什麼。',
+  'entities.quests.q_ignivar_heralds_heart.completion':
+    '伊格尼瓦爾從來不只是守護者。他的心臟就是鑰匙，最後的甲片打開了下方封閉的熔爐。',
+  'entities.quests.q_ignivar_heralds_heart.objectives.0.label': '擊敗伊格尼瓦爾',
+  'entities.quests.q_ignivar_the_forgefather.title': '鍛父',
+  'entities.quests.q_ignivar_the_forgefather.text':
+    '下方的道路通向末焰鍛父瓦爾庫爾。他囚禁末泉以賦予金屬生命，又鍛造伊格尼瓦爾來封存這罪行。進入內環熔爐，結束他的工作。',
+  'entities.quests.q_ignivar_the_forgefather.completion':
+    '鍛爐終於寂靜了。泉水也許永遠無法復原，但瓦爾庫爾再也不能將生命鍛成鎖鏈。',
+  'entities.quests.q_ignivar_the_forgefather.objectives.0.label': '擊敗瓦爾庫爾',
+  'entities.dungeons.ignivar_forge_approach.name': '首鍛大廳',
+  'entities.dungeons.ignivar_forge_approach.enterText': '鍛槌的轟鳴在首鍛大廳中回盪。',
+  'entities.dungeons.ignivar_forge_approach.leaveText': '你離開第一座鍛爐，終於又能自由呼吸。',
+  'entities.dungeons.ignivar_molten_assembly.name': '熔火裝配間',
+  'entities.dungeons.ignivar_molten_assembly.enterText': '開啟的大門通往熔火裝配大廳。',
+  'entities.dungeons.ignivar_molten_assembly.leaveText': '你離開裝配線，返回熔爐廳。',
+  'entities.dungeons.ignivar_inner_crucible.name': '內環熔爐',
+  'entities.dungeons.ignivar_inner_crucible.enterText': '已打開的大門通往熔爐更深處。',
+  'entities.dungeons.ignivar_inner_crucible.leaveText': '你離開熔爐寂靜的深處。',
   'hudChrome.controller.crossHotbarPosition': '{trigger} + {button}',
   'hudChrome.mobile.barEditorAria': '編輯動作列配置',
   'hudChrome.barEditor.title': '編輯動作列',

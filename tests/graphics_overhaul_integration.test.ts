@@ -49,14 +49,16 @@ describe('graphics-overhaul integration', () => {
     const consumers = [
       'src/render/props.ts',
       'src/render/foliage.ts',
-      'src/render/dungeon.ts',
+      // dungeon.ts's occluder loop moved to dungeon_wall_occlusion.ts (the
+      // raid backface cull); the pin follows the consumer.
+      'src/render/dungeon_wall_occlusion.ts',
       'src/render/eastbrook_town.ts',
       'src/render/yumi_maze.ts',
       'src/render/battleground_placements.ts',
     ];
     for (const file of consumers) {
       const text = source(file);
-      expect(text, file).toMatch(/stepOccluderFade\([^)]+,\s*reducedMotion\)/s);
+      expect(text, file).toMatch(/stepOccluderFade\([^)]+,\s*reducedMotion\s*[,)]/s);
     }
   });
 

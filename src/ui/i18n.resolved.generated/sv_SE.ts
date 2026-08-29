@@ -2453,7 +2453,57 @@ export const sv_SE: EnTranslations = {
       "leather": "Läder",
       "mail": "Ringbrynja"
     },
+    "varkhulCallout": {
+      "leftPillarCharging": "The left forge pillar is charging. It will ignite in 3 sec!",
+      "rightPillarCharging": "The right forge pillar is charging. It will ignite in 3 sec!",
+      "bothPillarsCharging": "The forge pillars are charging. They will ignite in 3 sec!",
+      "artificerApproaches": "A Cinder Artificer is approaching the forge!",
+      "leftPillar": "The left forge pillar ignites!",
+      "rightPillar": "The right forge pillar ignites!",
+      "bothPillars": "The forge pillars ignite!",
+      "portalsOpening": "The forge portals are opening!",
+      "heat75": "The forge is at 75% heat!",
+      "heat90": "Forge Meltdown is imminent!",
+      "addsDefeated": "The forge legion is defeated: Varkhul is exposed!",
+      "worldfireBegins": "Worldfire ignites at the edge of the room. The crucible will be consumed in 42 sec!",
+      "worldfireClosing": "Worldfire closes in. Move toward the center!",
+      "worldfireConsumed": "The entire crucible is burning!"
+    },
+    "varkhulWaveStatus": "Wave {wave}/{waves} | Enemies: {remaining}",
+    "raidBossGuide": {
+      "title": "Boss Guide",
+      "button": "Boss Guide: {boss}",
+      "subtitle": "{boss} | Normal and Heroic",
+      "close": "Close boss guide",
+      "ignivar": {
+        "brand": "Brand of the Pyre: spread out. Aim Searing Torrent into a ready water conduit, then cross the water alone to cleanse.",
+        "movement": "Movement: avoid Rain of Cinders cones and meteors, move with Revolving Inferno, and use Forge Wave's two gaps.",
+        "apocalypse": "Apocalypse: kill Ignivar Ashcaller before its cast completes.",
+        "judgment": "Judgment of the Forge: identify the unique refuge during the warning, then stack inside its marked boundary when the floor ignites.",
+        "finale": "Last Inferno: finish Ignivar before the hard wipe while faster meteors, frontals, and Revolving Inferno continue.",
+        "heroic": "Heroic: paired players stay close during Chains of the Forge, Brand remains active inside Judgment, and Forge Wave pushes farther."
+      },
+      "varkhul": {
+        "tanks": "Tanks: swap at two stacks of Maker's Brand and keep Varkhul in melee range.",
+        "orbs": "Cinder Orbs: marked players spread to the room edge. Their fire pools persist and the released orbs cross the room.",
+        "pyre": "Shared Pyre: only a player without Red-hot Metal is selected. Stack four players inside the moving circle in either difficulty. Each missing player deals 15% of maximum health to the entire raid.",
+        "forgestorm": "Forgestorm: watch the falling meteors and leave every marked impact before each of the three waves lands.",
+        "anvil": "Anvil's Decree: Varkhul moves to the grand forge and strikes it three times for raid damage. Heroic also drops marked meteors.",
+        "ray": "Tempering Ray: another player, usually a tank, intercepts the moving line before the long windup ends. The player hit receives Tempered Wound.",
+        "forge": "Forge pillars: block active beams before they reach the forge and rotate blockers as Crucible Exposure grows. A full heat meter causes Forge Meltdown.",
+        "assembly": "The Master's Assembly: block both forge beams, kill every portal wave, interrupt Crucible Quake, and stop Cinder Artificers from healing Varkhul.",
+        "worldfire": "Worldfire: on Heroic, the burning edge closes toward the center during the final phase. Defeat Varkhul before the whole crucible burns.",
+        "heroic": "Heroic: forge heat never cools, Anvil's Decree adds meteors, and the final phase removes most mechanics to focus on Worldfire."
+      }
+    },
     "auraEffect": {
+      "sharedPyre": "Deals {total}% of each player's maximum health, divided by the number of players inside the circle ({perPlayer}% each with {players} players).",
+      "varkhulSharedPyre": "Deals {total}% of each player's maximum health, divided among players inside the circle ({perPlayer}% each with {players} players). Each missing player also deals {missingPenalty}% of maximum health to the entire raid, including players inside the circle.",
+      "makersBrand": "For {duration} sec, each stack increases damage taken from Varkhul by {pct}%. Stacks up to {max} times. Tanks should swap at {swap} stacks.",
+      "varkhulSentinelsGaze": "The Ember Sentinel pursues you. Keep it away from the raid until it is destroyed.",
+      "varkhulMoltenCore": "Carry this core to the forge. Molten Burden deals increasing damage every {interval} sec, from {min}% to {max}% of maximum health.",
+      "varkhulForgeLink": "Intercept an active pillar beam before it reaches the forge. Open beams add 6% heat per second. In Normal, blocked beams and inactive pillars cool the forge; in Heroic, heat never falls. At 100%, the forge suffers a lethal Meltdown.",
+      "varkhulCrucibleExposure": "Blocking a Crucible Beam deals increasing maximum-health damage every second. The stacks reset 10 seconds after leaving a beam in Normal and after 60 seconds in Heroic.",
       "dot": "Gör {value} {school}-skada var {interval}:e s",
       "hot": "Återställer {value} hälsa var {interval}:e s",
       "mendingCurrent": "Lagrar {value} läkning, frisläppt över tid eller förbrukad av Kaskadlagning",
@@ -8627,6 +8677,8 @@ export const sv_SE: EnTranslations = {
         "riftEntrance": "Ingång till revan: {name}",
         "hostileEnemy": "Fientligt mål",
         "aggressiveEnemy": "Fiende angriper dig",
+        "bossEnemy": "Boss: {name}",
+        "bossAggressiveEnemy": "Boss attacking you: {name}",
         "lootableEnemy": "Plundringsbar fiende",
         "corpse": "Din kropp",
         "deathZone": "Farozon",
@@ -13918,6 +13970,27 @@ export const sv_SE: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Törntoppens gissel"
       },
+      "ignivar_herald_of_the_last_flame": {
+        "name": "Ignivar, Herald of the Last Flame"
+      },
+      "ignivar_heart_of_the_end": {
+        "name": "Ignivar Ashcaller"
+      },
+      "ignivar_ember_sentinel": {
+        "name": "Ember Sentinel"
+      },
+      "ignivar_crucible_warden": {
+        "name": "Crucible Warden"
+      },
+      "ignivar_cinder_artificer": {
+        "name": "Cinder Artificer"
+      },
+      "varkhul_forgefather_of_the_last_flame": {
+        "name": "Varkhul, Forgefather of the Last Flame"
+      },
+      "derelict_mech": {
+        "name": "Derelict Mech"
+      },
       "reliquary_ledger_wraith": {
         "name": "Liggarvålnad"
       },
@@ -14577,6 +14650,16 @@ export const sv_SE: EnTranslations = {
         "name": "Broder Aldric",
         "title": "Dalens präst",
         "greeting": "Från en kapellgård i Dalen till världens tak... spåret vi följt slutar här. Jag känner hur berget lyssnar."
+      },
+      "archivist_maelin_emberward": {
+        "name": "Archivist Maelin Emberward",
+        "title": "Crucible Archivist",
+        "greeting": "Every hammer mark in this place is a sentence. Help me read what Varkhul tried to hide."
+      },
+      "archivist_maelin_ember_projection": {
+        "name": "Maelin's Ember Projection",
+        "title": "Ember Projection",
+        "greeting": "The embers carry Maelin's voice forward through the forge."
       },
       "brother_halven": {
         "name": "Broder Halven",
@@ -15723,6 +15806,39 @@ export const sv_SE: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Nythraxis dräpt"
+          }
+        }
+      },
+      "q_ignivar_echoes_in_iron": {
+        "title": "Echoes in Iron",
+        "text": "These automata are not soldiers. They are drafts. Break each assembly line and listen when the final shell falls. The forge remembers what Varkhul tried to erase.",
+        "completion": "The echoes agree. Varkhul bound water from the dying Last Spring into living metal. These automatons were failed temperings. Only Ignivar endured.",
+        "objectives": {
+          "0": {
+            "label": "Ember Sentinels destroyed"
+          },
+          "1": {
+            "label": "Crucible Wardens destroyed"
+          }
+        }
+      },
+      "q_ignivar_heralds_heart": {
+        "title": "The Herald's Heart",
+        "text": "The survivor named in every echo is Ignivar. Varkhul called him herald, seal, and key. Defeat him. If the records are true, his death will reveal what he was forged to guard.",
+        "completion": "Ignivar was never merely a guardian. His heart was the key, and its final plates opened the sealed crucible below.",
+        "objectives": {
+          "0": {
+            "label": "Ignivar defeated"
+          }
+        }
+      },
+      "q_ignivar_the_forgefather": {
+        "title": "The Forgefather",
+        "text": "The path below leads to Varkhul, Forgefather of the Last Flame. He imprisoned the Last Spring to make metal live, then forged Ignivar to keep the crime sealed. Enter the Inner Crucible and end his work.",
+        "completion": "The forge is silent at last. The spring may never recover, but Varkhul will shape no more lives into chains.",
+        "objectives": {
+          "0": {
+            "label": "Varkhul defeated"
           }
         }
       },
@@ -17602,6 +17718,26 @@ export const sv_SE: EnTranslations = {
         "name": "Nythraxis raidarena",
         "enterText": "Du passerar genom den förseglade kungliga dörren.",
         "leaveText": "Du återvänder till Törntopps kalla luft."
+      },
+      "ignivar_forge_approach": {
+        "name": "Halls of the First Tempering",
+        "enterText": "Hammerfall echoes through the Halls of the First Tempering.",
+        "leaveText": "You step away from the first forge and breathe freely again."
+      },
+      "ignivar_raid_arena": {
+        "name": "Crucible of the Last Spring",
+        "enterText": "Heat shimmers above the sealed waters of the Crucible.",
+        "leaveText": "You step away from the Crucible and breathe freely again."
+      },
+      "ignivar_molten_assembly": {
+        "name": "Molten Assembly",
+        "enterText": "The opened gate leads into a molten assembly hall.",
+        "leaveText": "You leave the assembly line and return to the Crucible."
+      },
+      "ignivar_inner_crucible": {
+        "name": "The Inner Crucible",
+        "enterText": "The opened gate leads deeper into the Crucible.",
+        "leaveText": "You leave the silent depths of the Crucible."
       },
       "wildheart_basin": {
         "name": "Vildhjärtats bassäng",

@@ -1,8 +1,37 @@
 // Dungeon content: mob templates that only spawn inside instances, spawn
 // lists, and the DungeonDef registry merged by sim/data.ts.
 
-import type { DungeonDef, DungeonSpawn, ItemDef, MobTemplate } from '../types';
+import {
+  IGNIVAR_BOSS_SPAWN_Z,
+  IGNIVAR_CONDUITS,
+  IGNIVAR_WATER_CONDUIT_TEMPLATES,
+} from '../ignivar_arena';
+import {
+  IGNIVAR_CINDER_ARTIFICER_ID,
+  IGNIVAR_CRUCIBLE_WARDEN_ID,
+  IGNIVAR_EMBER_SENTINEL_ID,
+  IGNIVAR_FORGE_APPROACH_ID,
+  IGNIVAR_GATE_LOCKED_TEMPLATE,
+  IGNIVAR_MOLTEN_ASSEMBLY_ID,
+  IGNIVAR_RAID_ARENA_ID,
+  IGNIVAR_SECOND_WING_ID,
+  VARKHUL_BOSS_ID,
+} from '../ignivar_raid_ids';
+import { VARKHUL_CRUCIBLE_QUAKE_CAST_ID } from '../mob/healer_channel';
+import type {
+  DungeonDef,
+  DungeonSpawn,
+  DungeonSpawnMinibossTuning,
+  ItemDef,
+  MobTemplate,
+} from '../types';
 import { HEROIC_FINALE_COPPER, NYTHRAXIS_HEROIC_COPPER } from './dungeon_difficulty';
+import {
+  IGNIVAR_LORE_OBJECTS,
+  IGNIVAR_MAELIN_NPC_ID,
+  IGNIVAR_MAELIN_PROJECTION_NPC_ID,
+  IGNIVAR_RECORD_IDS,
+} from './ignivar_raid_lore';
 
 // Keepsake ground-object items owned by the walk-in castle interiors below
 // (their zone item modules are other workstreams' files), merged into ITEMS
@@ -21,6 +50,227 @@ export const DUNGEON_KEEPSAKE_ITEMS: Record<string, ItemDef> = {
 };
 
 export const DUNGEON_MOBS: Record<string, MobTemplate> = {
+  // WIP forge mech enemy: a downed automaton that lies still on the ground until
+  // pulled, then crawls, lurches up to strike, and dies (visual mob_mech /
+  // mech.glb). idleStationary keeps it motionless in its pack formation; the
+  // render side freezes it on the first crawl frame (VisualDef.idleFrozen).
+  // Placeholder stats, tune per role.
+  derelict_mech: {
+    id: 'derelict_mech',
+    name: 'Derelict Mech',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'elemental',
+    elite: true,
+    hpBase: 400,
+    hpPerLevel: 60,
+    dmgBase: 24,
+    dmgPerLevel: 4.5,
+    attackSpeed: 2.6,
+    armorPerLevel: 40,
+    moveSpeed: 6.5,
+    aggroRadius: 14,
+    hardLeashRadius: 18,
+    idleStationary: true,
+    // Suicide bomber: crawl to the target, stand up over ~the StandUp clip length
+    // (2.8s) flashing red, then detonate an AoE fire blast and die. Blast tuned
+    // to the classic living-bomb proportion (about 70% of a cloth raider's HP
+    // when unavoided, about a third of a warrior's): measured BiS level-20
+    // pools run cloth ~870-910 / warrior ~1700, so 550-700 keeps the classic
+    // "move out or a clothie nearly dies" pressure without a guaranteed kill.
+    meleeBomb: { windup: 2.8, min: 550, max: 700, radius: 8, name: 'Meltdown', school: 'fire' },
+    loot: [],
+    scale: 0.8,
+    color: 0x8a8f96,
+  },
+  [VARKHUL_BOSS_ID]: {
+    id: VARKHUL_BOSS_ID,
+    name: 'Varkhul, Forgefather of the Last Flame',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'elemental',
+    elite: true,
+    boss: true,
+    ccImmune: true,
+    slowImmune: true,
+    damageFloorPct: 0.5,
+    hpBase: 120000 / 2.3,
+    hpPerLevel: 0,
+    dmgBase: 52,
+    dmgPerLevel: 10.5,
+    attackSpeed: 2.6,
+    armorPerLevel: 46,
+    moveSpeed: 6.8,
+    aggroRadius: 30,
+    // The Inner Crucible's finale money entry: Varkhul's room carries its own
+    // heroic claim (HEROIC_DUNGEON_TUNING.ignivar_inner_crucible), so it pays
+    // the raid finale band exactly like Ignivar's arena, heroic substituting on
+    // the same single draw (tests/heroic_finale_gold.test.ts). Item drops are
+    // still to be authored for the development raid tier.
+    loot: [{ copper: 150000, heroicCopper: NYTHRAXIS_HEROIC_COPPER, chance: 1 }],
+    scale: 3.2,
+    color: 0x9f351c,
+  },
+  [IGNIVAR_EMBER_SENTINEL_ID]: {
+    id: IGNIVAR_EMBER_SENTINEL_ID,
+    name: 'Ember Sentinel',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'elemental',
+    elite: true,
+    hpBase: 250,
+    hpPerLevel: 50,
+    dmgBase: 22,
+    dmgPerLevel: 4.2,
+    attackSpeed: 2.4,
+    armorPerLevel: 32,
+    moveSpeed: 7.4,
+    aggroRadius: 13,
+    hardLeashRadius: 18,
+    arcCleave: {
+      every: 3,
+      arcDeg: 100,
+      range: 7,
+      mult: 0.65,
+      name: 'Tempered Sweep',
+      burn: {
+        perTick: 7,
+        interval: 3,
+        duration: 9,
+        name: 'Tempered Cinders',
+        school: 'fire',
+      },
+    },
+    loot: [],
+    scale: 1.45,
+    color: 0xb94b23,
+  },
+  [IGNIVAR_CRUCIBLE_WARDEN_ID]: {
+    id: IGNIVAR_CRUCIBLE_WARDEN_ID,
+    name: 'Crucible Warden',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'elemental',
+    elite: true,
+    hpBase: 350,
+    hpPerLevel: 55,
+    dmgBase: 20,
+    dmgPerLevel: 3.8,
+    attackSpeed: 2.8,
+    armorPerLevel: 42,
+    moveSpeed: 6.8,
+    aggroRadius: 13,
+    hardLeashRadius: 18,
+    bigCast: {
+      castId: VARKHUL_CRUCIBLE_QUAKE_CAST_ID,
+      name: 'Crucible Quake',
+      castTime: 2.5,
+      every: 12,
+      radius: 10,
+      min: 28,
+      max: 38,
+      school: 'fire',
+    },
+    loot: [],
+    scale: 1.7,
+    color: 0x7c4529,
+  },
+  [IGNIVAR_CINDER_ARTIFICER_ID]: {
+    id: IGNIVAR_CINDER_ARTIFICER_ID,
+    name: 'Cinder Artificer',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'elemental',
+    elite: true,
+    ccImmune: false,
+    slowImmune: false,
+    hpBase: 650,
+    hpPerLevel: 80,
+    dmgBase: 10,
+    dmgPerLevel: 2,
+    attackSpeed: 2.6,
+    armorPerLevel: 44,
+    moveSpeed: 8.2,
+    aggroRadius: 15,
+    hardLeashRadius: 18,
+    petSpell: {
+      name: 'Cinderbolt',
+      school: 'fire',
+      min: 55,
+      max: 75,
+      range: 25,
+      every: 3,
+      windup: 0.7,
+    },
+    channelHeal: {
+      radius: 20,
+      every: 5,
+      baseHeal: 160,
+      rampAdd: 120,
+      maxHeal: 640,
+      name: 'Recalibrate',
+      school: 'fire',
+    },
+    loot: [],
+    scale: 1.55,
+    color: 0xd17936,
+  },
+  // Ignivar's dedicated visual is dispatched by render/characters/manifest.ts.
+  // Encounter behavior lives in encounters/ignivar.ts, not on generic template hooks.
+  ignivar_herald_of_the_last_flame: {
+    id: 'ignivar_herald_of_the_last_flame',
+    name: 'Ignivar, Herald of the Last Flame',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'elemental',
+    elite: true,
+    boss: true,
+    ccImmune: true,
+    slowImmune: true,
+    hpBase: 120000 / 2.3,
+    hpPerLevel: 0,
+    dmgBase: 48,
+    dmgPerLevel: 10,
+    attackSpeed: 2.6,
+    armorPerLevel: 42,
+    moveSpeed: 7,
+    aggroRadius: 30,
+    // Raid-finale money ladder, the Nythraxis wiring mirrored: 15g normal
+    // base, and a heroic-claim kill substitutes the shared 20g raid base on
+    // the same single draw (tests/heroic_finale_gold.test.ts). Item drops are
+    // still to be authored for the development raid tier.
+    loot: [{ copper: 150000, heroicCopper: NYTHRAXIS_HEROIC_COPPER, chance: 1 }],
+    scale: 3.4,
+    color: 0xd64316,
+    // Deliberately NO hasteMult: the encounter script owns Ignivar's frenzy.
+    // Last Inferno flips `enraged` itself at 20% (so dmgMult applies) and
+    // carries the swing-speed half as its encounter-owned 1.2x haste aura;
+    // a template hasteMult would stack on that aura and double-dip. Pinned
+    // by tests/mob_enrage.test.ts and tests/ignivar_encounter.test.ts.
+    enrage: { belowHpPct: 0.25, dmgMult: 1.35 },
+  },
+  // Stationary priority target for Ignivar's Normal intermission.
+  ignivar_heart_of_the_end: {
+    id: 'ignivar_heart_of_the_end',
+    name: 'Ignivar Ashcaller',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'elemental',
+    elite: true,
+    ccImmune: true,
+    slowImmune: true,
+    hpBase: 7000 / 2.3,
+    hpPerLevel: 0,
+    dmgBase: 0,
+    dmgPerLevel: 0,
+    attackSpeed: 2.6,
+    armorPerLevel: 12,
+    moveSpeed: 0,
+    aggroRadius: 0,
+    loot: [],
+    scale: 2.25,
+    color: 0xff6a1a,
+  },
   // ---- The Hollow Crypt (5-player elite instance) ----
   crypt_shambler: {
     id: 'crypt_shambler',
@@ -819,6 +1069,142 @@ const NYTHRAXIS_RAID_SPAWN_LIST: DungeonSpawn[] = [
   { mobId: 'nythraxis_scourge_of_thornpeak', x: 0, z: 96 },
 ];
 
+const IGNIVAR_RAID_SPAWN_LIST: DungeonSpawn[] = [
+  { mobId: 'ignivar_herald_of_the_last_flame', x: 0, z: IGNIVAR_BOSS_SPAWN_Z },
+];
+
+const IGNIVAR_WARDEN_MINIBOSS: DungeonSpawnMinibossTuning = {
+  healthMultiplier: 2.35,
+  scale: 2.75,
+  ccImmune: true,
+  slowImmune: true,
+};
+
+// First-room packs: five tight, inward-facing huddles up the Halls of the First
+// Tempering, hand-placed from live in-world coordinates (instance origin
+// (116200, -1250) subtracted to local). "crawler" = derelict_mech. Each pack is
+// a rough circle ~3 to 4 yards across, every mob facing the pack centre. Every
+// mob is idleStationary so the whole formation holds until pulled (the mechs
+// already are via their template; the guardians take the per-spawn flag).
+const IGNIVAR_FORGE_APPROACH_SPAWN_LIST: DungeonSpawn[] = [
+  // Pack 1 (2 crawlers + 1 Ember Sentinel), center local (-16, -15)
+  { mobId: 'derelict_mech', x: -16, z: -17, facing: 0, packId: 'approach_1' },
+  { mobId: 'derelict_mech', x: -14.3, z: -14, facing: -2.09, packId: 'approach_1' },
+  {
+    mobId: IGNIVAR_EMBER_SENTINEL_ID,
+    x: -17.7,
+    z: -14,
+    facing: 2.09,
+    idleStationary: true,
+    packId: 'approach_1',
+  },
+  // Pack 2 (2 crawlers + 1 Crucible Warden), center local (13, 4)
+  { mobId: 'derelict_mech', x: 13, z: 2, facing: 0, packId: 'approach_2' },
+  { mobId: 'derelict_mech', x: 14.7, z: 5, facing: -2.09, packId: 'approach_2' },
+  {
+    mobId: IGNIVAR_CRUCIBLE_WARDEN_ID,
+    x: 11.3,
+    z: 5,
+    facing: 2.09,
+    idleStationary: true,
+    packId: 'approach_2',
+  },
+  // Pack 3 (1 promoted Warden + 2 crawlers), center local (-21, 9)
+  {
+    mobId: IGNIVAR_CRUCIBLE_WARDEN_ID,
+    x: -21,
+    z: 7,
+    facing: 0,
+    idleStationary: true,
+    packId: 'approach_3',
+    miniboss: IGNIVAR_WARDEN_MINIBOSS,
+  },
+  { mobId: 'derelict_mech', x: -19.3, z: 10, facing: -2.09, packId: 'approach_3' },
+  { mobId: 'derelict_mech', x: -22.7, z: 10, facing: 2.09, packId: 'approach_3' },
+  // Pack 4 (2 crawlers + 1 Crucible Warden + 1 Ember Sentinel), center local (19, 42)
+  { mobId: 'derelict_mech', x: 19, z: 39.7, facing: 0, packId: 'approach_4' },
+  { mobId: 'derelict_mech', x: 21.3, z: 42, facing: -1.57, packId: 'approach_4' },
+  {
+    mobId: IGNIVAR_CRUCIBLE_WARDEN_ID,
+    x: 19,
+    z: 44.3,
+    facing: -3.14,
+    idleStationary: true,
+    packId: 'approach_4',
+  },
+  {
+    mobId: IGNIVAR_EMBER_SENTINEL_ID,
+    x: 16.7,
+    z: 42,
+    facing: 1.57,
+    idleStationary: true,
+    packId: 'approach_4',
+  },
+  // Pack 5 (2 crawlers + 2 Wardens + 1 Ember Sentinel), center local (-22, 42)
+  { mobId: 'derelict_mech', x: -22, z: 39.4, facing: 0, packId: 'approach_5' },
+  { mobId: 'derelict_mech', x: -19.5, z: 41.2, facing: -1.26, packId: 'approach_5' },
+  {
+    mobId: IGNIVAR_CRUCIBLE_WARDEN_ID,
+    x: -20.5,
+    z: 44.1,
+    facing: -2.51,
+    idleStationary: true,
+    packId: 'approach_5',
+  },
+  {
+    mobId: IGNIVAR_EMBER_SENTINEL_ID,
+    x: -23.5,
+    z: 44.1,
+    facing: 2.51,
+    idleStationary: true,
+    packId: 'approach_5',
+  },
+  {
+    mobId: IGNIVAR_CRUCIBLE_WARDEN_ID,
+    x: -24.5,
+    z: 41.2,
+    facing: 1.26,
+    idleStationary: true,
+    packId: 'approach_5',
+    miniboss: IGNIVAR_WARDEN_MINIBOSS,
+  },
+];
+
+const IGNIVAR_MOLTEN_ASSEMBLY_SPAWN_LIST: DungeonSpawn[] = [
+  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: -5, z: -24, packId: 'intake' },
+  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: 0, z: -22, packId: 'intake' },
+  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: 5, z: -24, packId: 'intake' },
+  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: -5, z: 4, packId: 'middle' },
+  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: 0, z: 6, packId: 'middle' },
+  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: 5, z: 4, packId: 'middle' },
+  {
+    mobId: IGNIVAR_CRUCIBLE_WARDEN_ID,
+    x: -5,
+    z: 31,
+    packId: 'final',
+    miniboss: IGNIVAR_WARDEN_MINIBOSS,
+  },
+  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: 0, z: 33, packId: 'final' },
+  {
+    mobId: IGNIVAR_CRUCIBLE_WARDEN_ID,
+    x: 5,
+    z: 31,
+    packId: 'final',
+    miniboss: IGNIVAR_WARDEN_MINIBOSS,
+  },
+];
+
+const IGNIVAR_INNER_CRUCIBLE_SPAWN_LIST: DungeonSpawn[] = [
+  { mobId: VARKHUL_BOSS_ID, x: 0, z: 16, facing: 0 },
+];
+
+// The Ignivar raid family's shared overworld door on the Eastbrook market
+// block: the forge approach's walk-up testing entrance, and the point players
+// are set down beside when leaving ANY raid room (detachFromDungeon reads the
+// left room's own doorPos). The raid's public front door, a Drakelands gate,
+// is still to be authored: docs/design/ignivar-entrance/plan.md.
+const IGNIVAR_EASTBROOK_DOOR_POS = { x: -24, z: -114 };
+
 export const DUNGEON_DEFS: Record<string, DungeonDef> = {
   hollow_crypt: {
     id: 'hollow_crypt',
@@ -1005,5 +1391,147 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     suggestedPlayers: 10,
     enterText: 'You pass through the sealed royal door.',
     leaveText: 'You return to the cold air of Thornpeak.',
+  },
+  [IGNIVAR_FORGE_APPROACH_ID]: {
+    id: IGNIVAR_FORGE_APPROACH_ID,
+    name: 'Halls of the First Tempering',
+    index: 10,
+    // Walk-up testing entrance: the raid family's front room takes the shared
+    // Eastbrook door so raid groups can zone in without /dev commands.
+    doorPos: IGNIVAR_EASTBROOK_DOOR_POS,
+    guideVisible: false,
+    entry: { x: 0, z: -50 },
+    exitOffset: { x: 0, z: -54 },
+    spawns: IGNIVAR_FORGE_APPROACH_SPAWN_LIST,
+    npcs: [
+      { npcId: IGNIVAR_MAELIN_NPC_ID, x: 0, z: -47 },
+      { npcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID, x: 0, z: 48 },
+    ],
+    objects: [
+      {
+        itemId: IGNIVAR_RECORD_IDS.firstTempering,
+        name: IGNIVAR_LORE_OBJECTS[IGNIVAR_RECORD_IDS.firstTempering].name,
+        x: -13,
+        z: -40,
+        interactOnly: true,
+      },
+      {
+        itemId: IGNIVAR_RECORD_IDS.livingMetal,
+        name: IGNIVAR_LORE_OBJECTS[IGNIVAR_RECORD_IDS.livingMetal].name,
+        x: 13,
+        z: -8,
+        interactOnly: true,
+      },
+      {
+        itemId: IGNIVAR_RECORD_IDS.heraldKey,
+        name: IGNIVAR_LORE_OBJECTS[IGNIVAR_RECORD_IDS.heraldKey].name,
+        x: -13,
+        z: 21,
+        interactOnly: true,
+      },
+      {
+        itemId: '',
+        name: 'Sealed Herald Gate',
+        x: 0,
+        z: 53,
+        templateId: IGNIVAR_GATE_LOCKED_TEMPLATE,
+        dungeonId: IGNIVAR_RAID_ARENA_ID,
+        lootable: false,
+      },
+    ],
+    interior: 'ignivar_approach',
+    suggestedPlayers: 10,
+    enterText: 'Hammerfall echoes through the Halls of the First Tempering.',
+    leaveText: 'You step away from the first forge and breathe freely again.',
+  },
+  [IGNIVAR_RAID_ARENA_ID]: {
+    id: IGNIVAR_RAID_ARENA_ID,
+    name: 'Crucible of the Last Spring',
+    index: 11,
+    // Internal raid room reached through the Herald gate in the approach;
+    // doorPos is only where leaving drops players, beside the Eastbrook door.
+    doorPos: IGNIVAR_EASTBROOK_DOOR_POS,
+    overworldDoor: false,
+    guideVisible: false,
+    entry: { x: 0, z: -27 },
+    exitOffset: { x: 0, z: -30 },
+    spawns: IGNIVAR_RAID_SPAWN_LIST,
+    // Between the north pillars, facing south into the arena (Math.PI = -z).
+    npcs: [{ npcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID, x: 10, z: 24, facing: Math.PI }],
+    objects: [
+      // The four water pumps ARE the water conduits: each pump is promoted to
+      // a sim object so the encounter can flip its state (ready/active/
+      // cooldown) and cleanse players standing in its water. Positions match
+      // the baked water_pump dressing placements (IGNIVAR_CONDUITS), so the
+      // state overlay renders on the pump the player sees.
+      ...IGNIVAR_CONDUITS.map((conduit) => ({
+        itemId: '',
+        name: `${conduit.id} Water Conduit`,
+        x: conduit.x,
+        z: conduit.z,
+        templateId: IGNIVAR_WATER_CONDUIT_TEMPLATES.ready,
+        lootable: false,
+      })),
+      {
+        itemId: '',
+        name: 'Sealed Assembly Gate',
+        x: 0,
+        z: 31.5,
+        templateId: IGNIVAR_GATE_LOCKED_TEMPLATE,
+        dungeonId: IGNIVAR_MOLTEN_ASSEMBLY_ID,
+        lootable: false,
+      },
+    ],
+    interior: 'ignivar',
+    suggestedPlayers: 10,
+    enterText: 'Heat shimmers above the sealed waters of the Crucible.',
+    leaveText: 'You step away from the Crucible and breathe freely again.',
+  },
+  [IGNIVAR_MOLTEN_ASSEMBLY_ID]: {
+    id: IGNIVAR_MOLTEN_ASSEMBLY_ID,
+    name: 'Molten Assembly',
+    index: 13,
+    // Internal raid route reached only through the gate behind Ignivar;
+    // doorPos is only where leaving drops players, beside the Eastbrook door.
+    doorPos: IGNIVAR_EASTBROOK_DOOR_POS,
+    overworldDoor: false,
+    guideVisible: false,
+    entry: { x: 0, z: -50 },
+    exitOffset: { x: 0, z: -54 },
+    spawns: IGNIVAR_MOLTEN_ASSEMBLY_SPAWN_LIST,
+    npcs: [{ npcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID, x: 0, z: -47 }],
+    objects: [
+      {
+        itemId: '',
+        name: 'Sealed Inner Crucible Gate',
+        x: 0,
+        z: 53,
+        templateId: IGNIVAR_GATE_LOCKED_TEMPLATE,
+        dungeonId: IGNIVAR_SECOND_WING_ID,
+        lootable: false,
+      },
+    ],
+    interior: 'ignivar_approach',
+    suggestedPlayers: 10,
+    enterText: 'The opened gate leads into a molten assembly hall.',
+    leaveText: 'You leave the assembly line and return to the Crucible.',
+  },
+  [IGNIVAR_SECOND_WING_ID]: {
+    id: IGNIVAR_SECOND_WING_ID,
+    name: 'The Inner Crucible',
+    index: 12,
+    // Internal raid wing reached only through the Molten Assembly gate;
+    // doorPos is only where leaving drops players, beside the Eastbrook door.
+    doorPos: IGNIVAR_EASTBROOK_DOOR_POS,
+    overworldDoor: false,
+    guideVisible: false,
+    entry: { x: 0, z: -34 },
+    exitOffset: { x: 0, z: -38 },
+    spawns: IGNIVAR_INNER_CRUCIBLE_SPAWN_LIST,
+    npcs: [{ npcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID, x: 14, z: 31 }],
+    interior: 'ignivar_depths',
+    suggestedPlayers: 10,
+    enterText: 'The opened gate leads deeper into the Crucible.',
+    leaveText: 'You leave the silent depths of the Crucible.',
   },
 };

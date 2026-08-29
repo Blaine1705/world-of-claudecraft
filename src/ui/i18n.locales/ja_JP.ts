@@ -868,6 +868,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.core.mapMarkerLabels.riftEntrance': 'リフト入口：{name}',
   'hud.core.mapMarkerLabels.hostileEnemy': '敵対対象',
   'hud.core.mapMarkerLabels.aggressiveEnemy': 'あなたを攻撃中の敵',
+  'hud.core.mapMarkerLabels.bossEnemy': 'ボス：{name}',
+  'hud.core.mapMarkerLabels.bossAggressiveEnemy': 'あなたを攻撃中のボス：{name}',
   'hud.core.mapMarkerLabels.lootableEnemy': '戦利品を回収できる敵',
   'hud.core.mapMarkerLabels.corpse': '自分の死体',
   'hud.core.mapMarkerLabels.deathZone': '危険地帯',
@@ -4962,6 +4964,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.nythraxis_boss_arena.name': 'ナイスラクシスのレイドアリーナ',
   'entities.dungeons.nythraxis_boss_arena.enterText': '封印された王家の扉を通り抜けます。',
   'entities.dungeons.nythraxis_boss_arena.leaveText': 'ソーンピークの冷たい空気へ戻ります。',
+  'entities.mobs.ignivar_herald_of_the_last_flame.name': 'イグニヴァル、最後の炎の先触れ',
+  'entities.mobs.ignivar_heart_of_the_end.name': 'イグニヴァル・アッシュコーラー',
+  'entities.mobs.derelict_mech.name': '朽ちた機械兵',
+  'entities.dungeons.ignivar_raid_arena.name': '最後の泉のるつぼ',
+  'entities.dungeons.ignivar_raid_arena.enterText':
+    'るつぼの封じられた水面に熱気が揺らめいています。',
+  'entities.dungeons.ignivar_raid_arena.leaveText': 'るつぼを離れ、再び自由に息をつきます。',
   'entities.quests.q_nythraxis_restless_dead.title': '骨原の異変',
   'entities.quests.q_nythraxis_restless_dead.text':
     'ソーンピーク高地で何かが変わりました、{playerName}。死者たちはもはや当てもなくさまよっていません。ハイウォッチの北、古い戦場と崖道が交わる骨原で集まり、行軍しています。そこへ向かい、骨鎧の亡者たちの異変を調べ、彼らを動かしているものの証拠を持ち帰ってください。',
@@ -7654,6 +7663,66 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.itemArmorType.mail': '鎖',
   'hudChrome.auraEffect.dot': '{interval}秒ごとに{value}の{school}ダメージを与える',
   'hudChrome.auraEffect.hot': '{interval}秒ごとに体力を{value}回復する',
+  'hudChrome.auraEffect.sharedPyre':
+    '各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。',
+  'hudChrome.auraEffect.varkhulSharedPyre':
+    '各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。不足しているプレイヤー1人につき、サークル内を含むレイド全体が最大体力の{missingPenalty}%のダメージを受ける。',
+  'hudChrome.auraEffect.varkhulForgeLink':
+    '作動中の柱の光線が鍛冶炉に届く前に遮断する。未遮断の光線は1秒ごとに熱を6%上昇させる。ノーマルでは遮断中と柱の停止中に冷却されるが、ヒロイックでは熱は下がらない。100%で致命的な鍛冶炉メルトダウンが発生する。',
+  'hudChrome.auraEffect.varkhulCrucibleExposure':
+    'るつぼの光線を遮断すると、1秒ごとに最大体力基準のダメージが増加する。スタックはノーマルでは光線を離れて10秒後、ヒロイックでは60秒後にリセットされる。',
+  'hudChrome.varkhulCallout.leftPillarCharging': '左の鍛冶柱が充填中。3秒後に点火する！',
+  'hudChrome.varkhulCallout.rightPillarCharging': '右の鍛冶柱が充填中。3秒後に点火する！',
+  'hudChrome.varkhulCallout.bothPillarsCharging': '鍛冶柱が充填中。3秒後に点火する！',
+  'hudChrome.varkhulCallout.artificerApproaches': '灰燼の技工士が鍛冶炉へ近づいている！',
+  'hudChrome.varkhulCallout.leftPillar': '左の鍛冶柱が点火した！',
+  'hudChrome.varkhulCallout.rightPillar': '右の鍛冶柱が点火した！',
+  'hudChrome.varkhulCallout.bothPillars': '鍛冶柱が点火した！',
+  'hudChrome.varkhulCallout.portalsOpening': '鍛冶炉のポータルが開き始めた！',
+  'hudChrome.varkhulCallout.heat75': '鍛冶炉の熱が75%に達した！',
+  'hudChrome.varkhulCallout.heat90': '鍛冶炉メルトダウンが迫っている！',
+  'hudChrome.varkhulCallout.addsDefeated': '鍛冶軍団を倒した。ヴァークルが無防備になった！',
+  'hudChrome.varkhulCallout.worldfireBegins':
+    '世界炎が部屋の外縁で燃え上がる。42秒後にるつぼ全体が炎に包まれる！',
+  'hudChrome.varkhulCallout.worldfireClosing': '世界炎が迫っている。中央へ移動せよ！',
+  'hudChrome.varkhulCallout.worldfireConsumed': 'るつぼ全体が炎に包まれた！',
+  'hudChrome.varkhulWaveStatus': 'ウェーブ {wave}/{waves} | 敵: {remaining}',
+  'hudChrome.raidBossGuide.title': 'ボス攻略',
+  'hudChrome.raidBossGuide.button': '攻略: {boss}',
+  'hudChrome.raidBossGuide.subtitle': '{boss} | 通常・英雄',
+  'hudChrome.raidBossGuide.close': 'ボス攻略を閉じる',
+  'hudChrome.raidBossGuide.ignivar.brand':
+    '火葬の印: 散開する。灼熱の奔流を使用可能な水路へ向け、一人で水を渡って解除する。',
+  'hudChrome.raidBossGuide.ignivar.movement':
+    '移動: 灰の雨の扇形と隕石を避け、回転する業火に合わせて動き、鍛冶波の二つの隙間を使う。',
+  'hudChrome.raidBossGuide.ignivar.apocalypse':
+    '黙示録: 詠唱が終わる前にイグニヴァル・アッシュコーラーを倒す。',
+  'hudChrome.raidBossGuide.ignivar.judgment':
+    '鍛冶場の審判: 予告中に異なる避難所を見分け、床が燃えたら表示された境界内に集合する。',
+  'hudChrome.raidBossGuide.ignivar.finale':
+    '最後の業火: 加速した隕石、前方攻撃、回転する業火に対処しながら全滅前にイグニヴァルを倒す。',
+  'hudChrome.raidBossGuide.ignivar.heroic':
+    '英雄: 鍛冶の鎖ではペア同士が近くに留まり、審判中も印が残り、鍛冶波はプレイヤーをさらに遠くへ押し出す。',
+  'hudChrome.raidBossGuide.varkhul.tanks':
+    'タンク: 創造者の印が2スタックで交代し、ヴァークルを近接範囲に保つ。',
+  'hudChrome.raidBossGuide.varkhul.orbs':
+    '灰のオーブ: 対象者は部屋の外周へ散開する。炎の床は残り、放たれたオーブは部屋を横切る。',
+  'hudChrome.raidBossGuide.varkhul.pyre':
+    '共有の火葬: 赤熱した金属がない対象だけを選ぶ。難易度に関係なく、移動する円内に4人で集合する。1人不足するごとに、レイド全体が最大体力の15%のダメージを受ける。',
+  'hudChrome.raidBossGuide.varkhul.forgestorm':
+    '鍛冶嵐: 落下する隕石を確認し、3波それぞれが着弾する前に表示された範囲から離れる。',
+  'hudChrome.raidBossGuide.varkhul.anvil':
+    '金床の布告: ヴァークルは大鍛冶炉へ移動し、3回打って全体ダメージを与える。英雄では表示付き隕石も落ちる。',
+  'hudChrome.raidBossGuide.varkhul.ray':
+    '焼き入れ光線: 長い予告が終わる前に別のプレイヤー、通常はタンクが動く光線を遮る。被弾者は焼き入れの傷を受ける。',
+  'hudChrome.raidBossGuide.varkhul.forge':
+    '炉の柱: 光線が炉に届く前に遮り、るつぼの曝露が増えたら担当を交代する。熱が満杯になると炉が崩壊する。',
+  'hudChrome.raidBossGuide.varkhul.assembly':
+    '師匠の組立: 両方の炉光線を遮り、全ポータル波を倒し、るつぼの地震を中断し、灰の技工士の回復を止める。',
+  'hudChrome.raidBossGuide.varkhul.worldfire':
+    '世界炎: 英雄の最終段階では炎の外周が中央へ迫る。るつぼ全体が燃える前にヴァークルを倒す。',
+  'hudChrome.raidBossGuide.varkhul.heroic':
+    '英雄: 炉の熱は下がらず、金床の布告に隕石が加わり、最終段階は世界炎に集中する。',
   'hudChrome.auraEffect.absorb': '{value}のダメージを吸収する',
   'hudChrome.auraEffect.healAbsorb': '受ける回復を{value}吸収する',
   'hudChrome.auraEffect.thorns': '攻撃者に{value}の{school}ダメージを与える',
@@ -13805,6 +13874,54 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.otaUpdate.incompatible': 'プレイするにはアップデートが必要です。ダウンロードが完了すると自動的に適用されます。',
   'hudChrome.otaUpdate.progressLabel': 'アップデートのダウンロード進行状況',
   'hudChrome.otaUpdate.title': 'ゲームアップデート',
+  'hudChrome.auraEffect.makersBrand':
+    '{duration}秒間、1スタックごとにヴァルクルから受けるダメージが{pct}%増加する。最大{max}スタック。タンクは{swap}スタックで交代すること。',
+  'hudChrome.auraEffect.varkhulSentinelsGaze':
+    '残り火の番兵に追われている。倒すまでレイドから離しておくこと。',
+  'hudChrome.auraEffect.varkhulMoltenCore':
+    'このコアを炉へ運ぶ。溶融の重荷は{interval}秒ごとに最大体力の{min}%から{max}%まで増加するダメージを与える。',
+  'entities.mobs.ignivar_ember_sentinel.name': '残り火の番兵',
+  'entities.mobs.ignivar_crucible_warden.name': 'るつぼの守護者',
+  'entities.mobs.ignivar_cinder_artificer.name': '火の粉の技工士',
+  'entities.mobs.varkhul_forgefather_of_the_last_flame.name': '最後の炎の鍛造父、ヴァルクル',
+  'entities.npcs.archivist_maelin_emberward.name': '残り火守りの記録官メイリン',
+  'entities.npcs.archivist_maelin_emberward.title': 'るつぼの記録官',
+  'entities.npcs.archivist_maelin_emberward.greeting':
+    'ここに残る槌の跡は、どれも一つの文だ。ヴァルクルが隠そうとしたことを読み解くのを手伝ってくれ。',
+  'entities.npcs.archivist_maelin_ember_projection.name': 'メイリンの残り火の投影',
+  'entities.npcs.archivist_maelin_ember_projection.title': '残り火の投影',
+  'entities.npcs.archivist_maelin_ember_projection.greeting':
+    '残り火がメイリンの声を鍛冶場の奥へと届ける。',
+  'entities.quests.q_ignivar_echoes_in_iron.title': '鉄に響く記憶',
+  'entities.quests.q_ignivar_echoes_in_iron.text':
+    'この自動人形たちは兵士ではない。試作品だ。各組立ラインを破壊し、最後の殻が倒れた時に耳を澄ませ。ヴァルクルが消そうとした記憶を、鍛冶場は覚えている。',
+  'entities.quests.q_ignivar_echoes_in_iron.completion':
+    '響きはすべて一致している。ヴァルクルは枯れゆく最後の泉の水を生ける金属に縛りつけた。この自動人形たちは失敗作だった。耐え抜いたのはイグニヴァルだけだ。',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.0.label': '残り火の番兵を破壊',
+  'entities.quests.q_ignivar_echoes_in_iron.objectives.1.label': 'るつぼの守護者を破壊',
+  'entities.quests.q_ignivar_heralds_heart.title': '先触れの心臓',
+  'entities.quests.q_ignivar_heralds_heart.text':
+    'すべての響きが唯一の生存者、イグニヴァルを指している。ヴァルクルは彼を先触れ、封印、鍵と呼んだ。彼を倒せ。記録が正しければ、その死が彼の守るために鍛えられたものを明らかにする。',
+  'entities.quests.q_ignivar_heralds_heart.completion':
+    'イグニヴァルは単なる守護者ではなかった。彼の心臓こそが鍵であり、最後の装甲板が下の封じられたるつぼを開いた。',
+  'entities.quests.q_ignivar_heralds_heart.objectives.0.label': 'イグニヴァルを倒す',
+  'entities.quests.q_ignivar_the_forgefather.title': '鍛造父',
+  'entities.quests.q_ignivar_the_forgefather.text':
+    '下へ続く道の先には、最後の炎の鍛造父ヴァルクルがいる。彼は金属に命を与えるため最後の泉を幽閉し、その罪を封じるためイグニヴァルを鍛えた。内部るつぼに入り、彼の所業に終止符を打て。',
+  'entities.quests.q_ignivar_the_forgefather.completion':
+    'ついに炉が静まった。泉は二度と元に戻らないかもしれない。しかしヴァルクルが命を再び鏖に鍛えることはない。',
+  'entities.quests.q_ignivar_the_forgefather.objectives.0.label': 'ヴァルクルを倒す',
+  'entities.dungeons.ignivar_forge_approach.name': '最初の鍛造の大広間',
+  'entities.dungeons.ignivar_forge_approach.enterText': '槌音が最初の鍛造の大広間に響き渡る。',
+  'entities.dungeons.ignivar_forge_approach.leaveText': '最初の炉から離れ、再び自由に息をつく。',
+  'entities.dungeons.ignivar_molten_assembly.name': '溶融組立場',
+  'entities.dungeons.ignivar_molten_assembly.enterText':
+    '開いた門の先には、灼熱の組立ホールが続いている。',
+  'entities.dungeons.ignivar_molten_assembly.leaveText':
+    '組立ラインを離れ、るつぼへ戻る。',
+  'entities.dungeons.ignivar_inner_crucible.name': '内部るつぼ',
+  'entities.dungeons.ignivar_inner_crucible.enterText': '開かれた門はるつぼのさらなる深部へ続いている。',
+  'entities.dungeons.ignivar_inner_crucible.leaveText': 'るつぼの静まり返った深部を後にする。',
   'hudChrome.controller.crossHotbarPosition': '{trigger} + {button}',
   'hudChrome.mobile.barEditorAria': 'アクションバーの配置を編集',
   'hudChrome.barEditor.title': 'アクションバーの編集',

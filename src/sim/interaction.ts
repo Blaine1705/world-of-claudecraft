@@ -11,9 +11,8 @@
 // quest-NPC surface) and are reached through two append-only SimContext callbacks.
 // The corpse-loot helpers (distributeLootCopper / awardSharedLootItem /
 // lootSlotVisibleTo / pruneCorpseLoot) are imported from loot/loot_roll.ts (L1/W6)
-// and the Nythraxis interaction hooks (tryStartNythraxisWardChannel /
-// activateNythraxisRelic / interactObjectForQuests) from encounters/nythraxis.ts
-// (N1); they are imported, never edited.
+// and the encounter interaction hooks from encounters/nythraxis.ts and
+// ignivar_raid_lore.ts; they are imported, never edited.
 //
 // Move-not-rewrite: statements, branches, short-circuit and iteration order are
 // verbatim. The immutability waiver applies: the in-place loot-slot (s.count /
@@ -36,6 +35,7 @@ import {
   tryStartNythraxisWardChannel,
 } from './encounters/nythraxis';
 import { tryStartEscort } from './escort';
+import { interactIgnivarRaidLore } from './ignivar_raid_lore';
 import { isInRaidInstance } from './instances/dungeons';
 import { FERRY_BELL_OBJECT_ID, tryRingFerryBell } from './interactions/ferry_bell';
 import { HUT_OBJECT_ID, tryBurnHut } from './interactions/firebottle_hut';
@@ -824,11 +824,18 @@ export function pickUpObject(
   if (objectItemId === FERRY_BELL_OBJECT_ID) {
     return tryRingFerryBell(ctx, obj, p, meta);
   }
+  const ignivarLore = interactIgnivarRaidLore(ctx, obj, meta);
+  if (!ignivarLore.allowQuestCredit) return ignivarLore.handled;
   const beforeQuestProgress = meta.counters.questProgress;
   const beforeQuestNextId = ctx.nextId;
   if (interactObjectForQuests(ctx, obj, meta)) {
-    return meta.counters.questProgress !== beforeQuestProgress || ctx.nextId !== beforeQuestNextId;
+    return (
+      ignivarLore.handled ||
+      meta.counters.questProgress !== beforeQuestProgress ||
+      ctx.nextId !== beforeQuestNextId
+    );
   }
+  if (ignivarLore.handled) return true;
   const def = ITEMS[objectItemId];
   if (def?.questId) {
     const qp = meta.questLog.get(def.questId);

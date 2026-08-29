@@ -131,6 +131,11 @@ import {
   SPIRIT_HEALER_NPC_ID,
 } from './content/graveyards';
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
+import {
+  IGNIVAR_RAID_LORE_NPCS,
+  IGNIVAR_RAID_LORE_QUEST_ORDER,
+  IGNIVAR_RAID_LORE_QUESTS,
+} from './content/ignivar_raid_lore';
 import { MAGE_PET_MOBS } from './content/mage_pets';
 import { MAILBOXES } from './content/mailboxes';
 import { NECROMANCY_MOBS } from './content/necromancy';
@@ -435,6 +440,7 @@ export const NPCS: Record<string, NpcDef> = {
   // The Proving Shore cast (tutorial island) appends after every shipped NPC
   // for the same insertion-order stability reason as the realms above.
   ...PROVING_SHORE_NPCS,
+  ...IGNIVAR_RAID_LORE_NPCS,
   // The Spirit Healer template (dynamic: true, so the ctor's surface-placement
   // loop skips it). Kept in NPCS so the online client and world_entity_i18n can
   // resolve its name; spirit.ts spawns a copy at every graveyard.
@@ -462,6 +468,7 @@ export const QUESTS: Record<string, QuestDef> = {
   ...GALECREST_QUESTS,
   ...FARSHORE_QUESTS,
   ...PROVING_SHORE_QUESTS,
+  ...IGNIVAR_RAID_LORE_QUESTS,
 };
 
 export const QUEST_ORDER: string[] = [
@@ -481,6 +488,7 @@ export const QUEST_ORDER: string[] = [
   ...GALECREST_QUEST_ORDER,
   ...FARSHORE_QUEST_ORDER,
   ...PROVING_SHORE_QUEST_ORDER,
+  ...IGNIVAR_RAID_LORE_QUEST_ORDER,
 ];
 
 // The Book of Deeds catalog (content/deeds.ts) is deliberately NOT re-exported

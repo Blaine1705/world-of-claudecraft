@@ -3201,6 +3201,29 @@
   body.mobile-touch #party-frames:not(.party-expanded) .party-frame {
     display: none;
   }
+  body.mobile-touch #party-frames:not(.party-expanded) .party-boss-guide-button {
+    display: none;
+  }
+  body.mobile-touch .party-boss-guide-button {
+    width: min(344px, calc(100dvw - 30px));
+    min-height: 40px;
+    border-radius: 8px;
+    font-size: 12px;
+  }
+  body.mobile-touch #raid-boss-guide-window {
+    top: max(10px, env(safe-area-inset-top));
+    width: min(560px, calc(var(--app-vw) / var(--window-scale, 1) - 20px));
+    max-height: calc(var(--app-vh) / var(--window-scale, 1) - 20px - env(safe-area-inset-top));
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-list {
+    max-height: calc(var(--app-vh) / var(--window-scale, 1) - 108px - env(safe-area-inset-top));
+    padding: 8px 12px 14px 30px;
+  }
+  body.mobile-touch #raid-boss-guide-window .rbg-list li {
+    padding: 6px 2px;
+    font-size: 12px;
+    line-height: 1.35;
+  }
   body.mobile-touch #buff-bar {
     right: max(10px, env(safe-area-inset-right));
     top: max(140px, env(safe-area-inset-top));

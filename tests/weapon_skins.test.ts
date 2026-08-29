@@ -661,8 +661,16 @@ describe('bow skin attack animation (hunter draw instead of crossbow aim)', () =
     );
     expect(renderer).not.toContain("from '../sim/combat/auto_attack'");
     expect(launch).toContain("ev.attackAnimation === 'ranged-shot'");
-    expect(damage).toContain('playerRangedAttackAlreadyStarted(');
+    // The damage-side gate moved behind damageEventStartsAttackAnimation
+    // (characters/damage_attack_animation.ts), which still consults the typed
+    // launch correlation first.
+    expect(damage).toContain('damageEventStartsAttackAnimation(');
     expect(damage).toContain('ev.attackAnimationStarted,');
+    const damageGate = readFileSync(
+      join(ROOT, 'src/render/characters/damage_attack_animation.ts'),
+      'utf8',
+    );
+    expect(damageGate).toContain('playerRangedAttackAlreadyStarted(');
     expect(launch).not.toContain('weaponSkinAttackClips(source.weaponSkinId)');
     expect(damage).not.toContain('weaponSkinAttackClips(source.weaponSkinId)');
   });

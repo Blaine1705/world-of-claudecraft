@@ -79,13 +79,12 @@ import {
   isStunned,
   isUnbreakableControlAura,
 } from './combat/cc';
-import { aetherSurgeCostMult, echoVisibleTo } from './combat/chronomancy';
+import { aetherSurgeCostMult } from './combat/chronomancy';
 import {
   dealDamage as dealDamageImpl,
   grantXp as grantXpImpl,
   handleDeath as handleDeathImpl,
 } from './combat/damage';
-import { damageTakenWithin } from './combat/damage_history';
 import { druidEngineCombatState } from './combat/druid_engines';
 import { runEffects as runEffectsImpl } from './combat/effect_dispatch';
 import { steerFearFromWalls } from './combat/fear_steering';
@@ -129,7 +128,6 @@ import { isVeilboundMarchActive } from './combat/paladin_veilbound_state';
 import { cleanupPriestState } from './combat/priest/lifecycle';
 import { resolveVespersAbility } from './combat/priest/vespers';
 import * as resurrectionOfferMod from './combat/resurrection_offer';
-import { rewindHealAmount } from './combat/rewind';
 import { duskLingerOnStealthBreak } from './combat/rogue_talents';
 import { applySetProcs as applySetProcsImpl } from './combat/set_procs';
 import { clearSpiritmendCurrents } from './combat/shaman_spiritmend';
@@ -264,8 +262,10 @@ import * as escortMod from './escort';
 import { initEscorts as initEscortsImpl, updateEscorts as updateEscortsImpl } from './escort';
 import { fleeSpeed } from './flee_speed';
 import { formatMoney } from './format_money';
+import * as groundAoeReadouts from './ground_aoe_readouts';
 import type { GuildBankState, GuildMembership } from './guild_bank';
 import * as guildBankMod from './guild_bank';
+import * as raidReadouts from './ignivar_raid_readouts';
 import * as interaction from './interaction';
 import type { ExtractOutcome, ExtractRef } from './inventory_extract';
 import {
@@ -318,6 +318,7 @@ import {
   tryMobMeleeSwingInRange as tryMobMeleeSwingInRangeImpl,
 } from './mob/combat_profile';
 import { updateDragonkinBrood } from './mob/dragonkin_brood';
+import { aggroDungeonPackmates } from './mob/dungeon_pack_aggro';
 import { NYTHRAXIS_SPIRIT_MENDING_CAST_ID } from './mob/healer_channel';
 import { wanderPause } from './mob/idle_rng';
 import * as lifecycle from './mob/lifecycle';
@@ -335,6 +336,7 @@ import {
   type MobScanCounters,
   resetMobScanCounters,
 } from './mob/scan_counters';
+import { socialPullSameTemplate } from './mob/social_aggro';
 import {
   retargetMob as retargetMobFn,
   updateMobTarget as updateMobTargetFn,
@@ -678,13 +680,7 @@ export { eloDelta } from './social/arena';
 
 import { FINDER_ACTIVITIES, type FinderListingTag } from './content/dungeon_finder';
 import { setHelmHidden as setHelmHiddenMod } from './helm_visibility';
-import {
-  partyFrameAbsorb,
-  partyFrameAggroTargets,
-  partyFrameAuras,
-  partyFrameIncomingHeals,
-  partyFrameRole,
-} from './party_frame_info';
+import { collectPartyInfo } from './party_frame_info';
 import { DungeonFinderMachine } from './social/dungeon_finder';
 import * as fiestaMod from './social/fiesta';
 // A3: Fiesta tuning consts moved to social/fiesta.ts; these five are read back here
@@ -928,15 +924,8 @@ export { DELVE_IMPLEMENTED_AFFIXES, DELVE_MODULE_NAMES } from './delves/runs';
 const MAX_CLIMB_SLOPE = PLAYER_MAX_CLIMB_SLOPE;
 // STEEP_SLIDE_SPEED moved to player_motion.ts (MV1; movement-kernel-only).
 
-// How far a mob pulls same-family neighbours into a fight ("social aggro").
-// Murlocs (the clustered water mobs players call "frogs") used to pull too much,
-// chain-aggroing the whole pond and making solo pulls impossible (#102). Tune
-// per family here; everything else falls back to the default.
+// SOCIAL_PULL_RADIUS moved to mob/social_aggro.ts with socialPullSameTemplate.
 // POTION_COOLDOWN moved to items.ts (W2) with the useItem potion branch.
-const DEFAULT_SOCIAL_PULL_RADIUS = 5;
-const SOCIAL_PULL_RADIUS: Partial<Record<MobFamily, number>> = {
-  mudfin: 8,
-};
 // PACK_FRENZY_AURA_ID moved to mob/lifecycle.ts (M4; used only by frenzyPackmates).
 // BLOOD_FRENZY_AURA_ID moved to combat/damage.ts (C1; used only by maybeFrenzyOnHit).
 // swimSurfaceY / SWIM_SPEED_MULT moved to player_motion.ts (MV1) and imported back
@@ -1152,6 +1141,7 @@ export interface InstanceSlot {
   slot: number;
   partyKey: string | null; // party id or 'solo:<pid>'
   mobIds: number[];
+  npcIds: number[];
   objectIds: number[];
   exitId: number | null;
   // The exit portal a DungeonDef.bossExitPortal dungeon spawns at the final
@@ -1263,6 +1253,9 @@ export interface PlayerMeta {
   // devCommands): a stationary player you can target and whisper to exercise social
   // features offline; a whisper to it auto-replies. Runtime-only, never serialized.
   isDevBot?: boolean;
+  // Dev-only stationary encounter participant. Unlike the derived equipment stat,
+  // this survives aura-driven stat recalculation. Runtime-only, never serialized.
+  devAnchored?: boolean;
   // Offline Fiesta practice opponent. Session-only and never serialized.
   isFiestaBot?: boolean;
   // Firebottle throw cooldown (q_deepfen_purge): sim time the player's next hut
@@ -2218,53 +2211,34 @@ export class Sim {
   private pendingMobRespawns: PendingMobRespawn[] = [];
   private groundAoEs: GroundAoE[] = [];
   get activeFrostRings(): ActiveFrostRing[] {
-    const rings: ActiveFrostRing[] = [];
-    for (const effect of this.groundAoEs) {
-      const ring = effect.frostRing;
-      if (!ring || effect.remaining <= 0) continue;
-      rings.push({
-        id: ring.id,
-        x: effect.pos.x,
-        z: effect.pos.z,
-        radius: effect.radius,
-        innerRadius: ring.innerRadius,
-        duration: ring.duration,
-        remaining: effect.remaining,
-      });
-    }
-    return rings;
+    return groundAoeReadouts.collectActiveFrostRings(this.groundAoEs);
+  }
+  get activeIgnivarMeteors(): raidReadouts.ActiveIgnivarMeteorWarning[] {
+    return raidReadouts.collectActiveIgnivarMeteors(this.ctx);
+  }
+  get activeVarkhulForgestormWarnings(): raidReadouts.ActiveVarkhulForgestormWarning[] {
+    return raidReadouts.collectActiveVarkhulForgestormWarnings(this.ctx);
+  }
+  get activeVarkhulAnvilMeteors(): raidReadouts.ActiveVarkhulAnvilMeteorWarning[] {
+    return raidReadouts.collectActiveVarkhulAnvilMeteors(this.ctx);
+  }
+  get activeVarkhulAssemblies(): raidReadouts.ActiveVarkhulAssembly[] {
+    return raidReadouts.collectActiveVarkhulAssemblies(this.ctx);
+  }
+  get activeVarkhulForgePortalTelegraphs(): raidReadouts.VarkhulForgePortalTelegraph[] {
+    return raidReadouts.collectActiveVarkhulForgePortalTelegraphs(this.ctx);
+  }
+  get activeVarkhulCinderFires(): raidReadouts.ActiveVarkhulCinderFire[] {
+    return raidReadouts.collectActiveVarkhulCinderFires(this.ctx);
+  }
+  get activeVarkhulCinderOrbProjectiles(): raidReadouts.ActiveVarkhulCinderOrbProjectile[] {
+    return raidReadouts.collectActiveVarkhulCinderOrbProjectiles(this.ctx);
   }
   get activeTemporalHourglasses(): ActiveTemporalHourglass[] {
-    const hourglasses: ActiveTemporalHourglass[] = [];
-    for (const effect of this.groundAoEs) {
-      const hourglass = effect.temporalHourglass;
-      if (!hourglass || effect.remaining <= 0) continue;
-      hourglasses.push({
-        id: hourglass.id,
-        x: effect.pos.x,
-        z: effect.pos.z,
-        radius: effect.radius,
-        duration: hourglass.groundDuration,
-        remaining: effect.remaining,
-      });
-    }
-    return hourglasses;
+    return groundAoeReadouts.collectActiveTemporalHourglasses(this.groundAoEs);
   }
   get activeConsecrations(): ActiveConsecration[] {
-    const consecrations: ActiveConsecration[] = [];
-    for (const effect of this.groundAoEs) {
-      const consecration = effect.consecration;
-      if (!consecration || effect.remaining <= 0) continue;
-      consecrations.push({
-        id: consecration.id,
-        x: effect.pos.x,
-        z: effect.pos.z,
-        radius: effect.radius,
-        duration: consecration.duration,
-        remaining: effect.remaining,
-      });
-    }
-    return consecrations;
+    return groundAoeReadouts.collectActiveConsecrations(this.groundAoEs);
   }
   reactiveAbilityWindowRemaining(abilityId: string): number {
     if (abilityId !== 'mongoose_bite') return 0;
@@ -2525,6 +2499,7 @@ export class Sim {
             slot: i,
             partyKey: null,
             mobIds: [],
+            npcIds: [],
             objectIds: [],
             exitId: null,
             bossExitId: null,
@@ -2556,6 +2531,7 @@ export class Sim {
           slot: i,
           partyKey: null,
           mobIds: [],
+          npcIds: [],
           objectIds: [],
           exitId: null,
           bossExitId: null,
@@ -7348,6 +7324,7 @@ export class Sim {
   private applyKnockback(source: Entity, target: Entity, distance: number): number {
     if (source.id !== target.id && this.isIceBlocked(target)) return 0;
     if (source.id !== target.id && isVeilboundMarchActive(target)) return 0;
+    if (this.cfg.devCommands && this.players.get(target.id)?.devAnchored) return 0;
     // Knockback resistance (the caster tier-set 2-piece grants 100%) is applied
     // centrally here so no caller can bypass it: a fully-resisted shove moves 0 yards
     // and never displaces the victim, so a caster keeps casting through it.
@@ -7900,6 +7877,10 @@ export class Sim {
       mob.aiState === 'flee'
     )
       return false;
+    // [dev] /dev noaggro: a designer positioning mobs is invisible to autonomous
+    // pulls, so the pack stays exactly where it spawned. The single aggro choke
+    // point, so this covers proximity, social, and retaliation pulls alike.
+    if (target.kind === 'player' && target.devNoAggro) return false;
     // A quest-gated destructible (e.g. a Broodmother egg) never autonomously pulls a
     // player its own damage gate would refuse: see mob/quest_gated_aggro.ts.
     if (questGateBlocksAggro(this.players, mob, target)) return false;
@@ -7932,28 +7913,11 @@ export class Sim {
     // actually reach the fight. Reordering these two would quietly shorten the
     // leash on every mob they both claim.
     if (playerPull) chainPullInstanceOnBossAggro(this.ctx, mob, target);
-    if (social) {
-      const family = MOBS[mob.templateId]?.family;
-      const pullRadius = (family && SOCIAL_PULL_RADIUS[family]) ?? DEFAULT_SOCIAL_PULL_RADIUS;
-      this.grid.forEachInRadius(mob.pos.x, mob.pos.z, pullRadius, (m, d2) => {
-        if (
-          m.kind === 'mob' &&
-          m.id !== mob.id &&
-          !m.dead &&
-          m.hostile &&
-          m.aiState === 'idle' &&
-          m.ownerId === null &&
-          m.templateId === mob.templateId &&
-          d2 < pullRadius * pullRadius
-        ) {
-          m.aiState = 'chase';
-          m.aggroTargetId = target.id;
-          m.inCombat = true;
-          m.leashAnchor = { ...m.pos };
-          addThreat(m, target.id, 1);
-        }
-      });
-    }
+    // Authored dungeon packs engage as a unit on every player/pet pull, including
+    // the non-social aggro path used by taunts. Keep this separate from the generic
+    // same-template radius below: `social` only controls that legacy propagation.
+    if (playerPull) aggroDungeonPackmates(this.entities.values(), mob, target);
+    if (social) socialPullSameTemplate(this.ctx, mob, target);
     return true;
   }
 
@@ -8159,8 +8123,8 @@ export class Sim {
         this.enterCombat(pet, target);
       } else {
         // rangedDamageMult is the instance-tuning factor for a HOSTILE petSpell
-        // caster (undefined, so 1, for every player pet and every untuned or
-        // heroic spawn). Applied after the rng draw like the mechanic
+        // caster (undefined, so 1, for every player pet and every untuned
+        // spawn). Applied after the rng draw like the mechanic
         // multipliers, so the shared draw order is unchanged.
         const dmg = Math.round(
           this.rng.range(spell.min + pet.level * 0.8, spell.max + pet.level * 1.1) *
@@ -11597,58 +11561,7 @@ export class Sim {
   }
 
   get partyInfo(): import('../world_api').PartyInfo | null {
-    const party = this.partyOf(this.primaryId);
-    if (!party) return null;
-    const aggroTargets = partyFrameAggroTargets(this.entities.values());
-    const incomingHeals = partyFrameIncomingHeals(this.entities.values(), (abilityId, casterId) =>
-      this.resolvedAbility(abilityId, casterId),
-    );
-    return {
-      leader: party.leader,
-      raid: party.raid,
-      master: { ...party.lootStrategies.master },
-      members: party.members.flatMap((mPid) => {
-        const meta = this.players.get(mPid);
-        const e = this.entities.get(mPid);
-        return meta && e
-          ? [
-              {
-                pid: mPid,
-                name: meta.name,
-                cls: meta.cls,
-                level: e.level,
-                hp: e.hp,
-                mhp: e.maxHp,
-                res: Math.round(e.resource),
-                mres: e.maxResource,
-                rtype: e.resourceType,
-                x: e.pos.x,
-                z: e.pos.z,
-                dead: e.dead ? 1 : 0,
-                inCombat: e.inCombat ? 1 : 0,
-                group: party.raidGroups.get(mPid) ?? 1,
-                absorb: partyFrameAbsorb(e.auras),
-                role: partyFrameRole(meta.talentMods.role),
-                // Effective health Rewind could currently restore to this member
-                // (combat/rewind.ts); 0 for members with no recent recorded loss.
-                rewind: rewindHealAmount(damageTakenWithin(e, this.tickCount), e.hp, e.maxHp),
-                connected: 1,
-                hasAggro: aggroTargets.has(mPid) ? 1 : 0,
-                incomingHeal: incomingHeals.get(mPid) ?? 0,
-                // Temporal Echo marks are filtered to the LOCAL player's own (owner
-                // 2026-07-12): other chronomancers' echoes still heal in the sim but
-                // never show in this viewer's group/raid strip. echoVisibleTo reads
-                // the real aura sourceId, so no wire field is added.
-                auras: partyFrameAuras(
-                  e.auras.filter((a) => echoVisibleTo(a, this.primaryId)),
-                  undefined,
-                  e.maxHp,
-                ),
-              },
-            ]
-          : [];
-      }),
-    };
+    return collectPartyInfo(this.ctx);
   }
 
   get tradeInfo(): import('../world_api').TradeInfo | null {

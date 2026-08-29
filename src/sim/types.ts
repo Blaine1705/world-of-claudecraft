@@ -6,6 +6,13 @@ import type { GatheringProfessionId, ToolEffectId } from './content/professions'
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
 import type { HarvestYield } from './professions/harvest_yields';
 import type { RespawnWindow } from './respawn_policy';
+import type {
+  VarkhulAssemblyDifficulty,
+  VarkhulAssemblyPhase,
+  VarkhulAssemblyRuneControl,
+} from './varkhul_assembly';
+import type { VarkhulEngageState } from './varkhul_engage';
+import type { VarkhulForgeBeamWindow } from './varkhul_forge_intermission';
 
 export const TICK_RATE = 20; // sim ticks per second
 export const DT = 1 / TICK_RATE;
@@ -29,6 +36,10 @@ export const INTERACT_RANGE = 5;
 // code that stays on Sim (the chat router, pickUpObject) and an extracted slice (the
 // Nythraxis encounter's yells + crypt-relic respawn), so they live here, not in sim.ts.
 export const YELL_RANGE = 100;
+// New ordinary entities enter a live client's interest set at this radius.
+// Presentation that enumerates the complete offline Sim must use the same edge
+// or it can reveal entities that an online client has not received yet.
+export const PLAYER_INTEREST_RADIUS = 90;
 // Shared host interest boundary: the renderer destroys ordinary entity views at
 // 96 yards, and the network keeps known entities through this slightly wider
 // hysteresis edge. Offline and server Sims may therefore skip only idle,
@@ -626,11 +637,19 @@ export interface Aura {
   value3?: number; // imbue: judgement max; Greater Invisibility: aftereffect duration
   tickInterval?: number;
   tickTimer?: number;
+  // Sim-only periodic ramp: after each resolved DoT tick, increase `stacks`
+  // and recompute `value` as per-stack damage times stacks, up to this cap.
+  // The wire already mirrors the resulting value/stacks, so clients do not
+  // need this authoring field.
+  maxTickStacks?: number;
   sourceId: number;
   school: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
   // Encounter-authored control that must land through immunity and cannot be
   // removed by player counters. Natural expiry and encounter cleanup still own it.
   unbreakableControl?: true;
+  // Encounter-authored mechanic that ordinary dispels and broad self-cleanses
+  // cannot remove. Death, natural expiry, and the encounter script still clear it.
+  encounterOwned?: true;
   // A penalty no player counter may shed: dispel, purge, and cleanse all skip it, and
   // it is never right-click cancelable. Only its own timer takes it off. Set today at
   // exactly one site, applySickness in ./spirit.ts, which serves both recovery
@@ -1484,6 +1503,9 @@ export interface MobTemplate {
   // an ordinary mob across the map one leash-length at a time; a mob carrying
   // this cannot be kited off its ground (mob/combat_profile.ts).
   hardLeashRadius?: number;
+  /** Optional mandatory encounter threshold. Damage cannot move the mob below
+   * this max-HP fraction until encounter logic clears its runtime floor. */
+  damageFloorPct?: number;
   loot: LootEntry[];
   scale: number; // render hint
   color: number; // render hint
@@ -1568,6 +1590,24 @@ export interface MobTemplate {
   // draw count, order, and drawn values are identical for every template, so the
   // parity draw digest never moves.
   wanderHaste?: number;
+  // Dormant-until-pulled: the mob never idle-wanders, so a hand-placed pack holds
+  // its exact spawn position and facing until something aggros it (then it chases
+  // and fights normally). Used by the downed forge mechs, which pair this with the
+  // render-side frozen idle pose (VisualDef.idleFrozen). Skips the idle wander draw
+  // entirely, so it stays put with zero movement.
+  idleStationary?: boolean;
+  // Suicide bomber (the derelict forge mech): the mob crawls to its target,
+  // turning in place to FACE it before it translates (no sideways gliding), and on
+  // reaching melee range it stands up over `windup` seconds (flashing red) before
+  // detonating an AoE blast and dying. Owned by mob/derelict_bomber.ts.
+  meleeBomb?: {
+    windup: number; // seconds standing/arming before the blast (match the StandUp clip)
+    min: number;
+    max: number;
+    radius: number;
+    name: string;
+    school?: Aura['school'];
+  };
   // Purely-ambient decoration (the Highwatch stable horses): never hostile,
   // never aggros/fights, un-attackable and un-tameable, but wanders a bounded
   // patch. Spawned RNG-free (like the dummy) so it never perturbs the shared
@@ -3415,10 +3455,37 @@ export interface GatherNodeDef {
   tier: number;
 }
 
+export interface DungeonSpawnMinibossTuning {
+  healthMultiplier: number;
+  scale: number;
+  ccImmune?: boolean;
+  slowImmune?: boolean;
+}
+
 export interface DungeonSpawn {
   mobId: string;
   x: number; // relative to instance origin
   z: number;
+  facing?: number;
+  // Per-spawn dormancy: this placed mob never idle-wanders, so a hand-authored
+  // pack holds its formation until pulled (see MobTemplate.idleStationary for the
+  // template-level equivalent). Stored on the spawned Entity.idleStationary.
+  idleStationary?: boolean;
+  /** Placement-authored pull identity. Mobs sharing this id in one claimed room
+   * enter combat together even when the pack mixes templates. */
+  packId?: string;
+  /** Per-placement promotion for a recurring trash template. The base template
+   * remains unchanged for ordinary encounter waves that reuse the same mob. */
+  miniboss?: DungeonSpawnMinibossTuning;
+}
+
+export interface DungeonNpcSpawn {
+  npcId: string;
+  x: number; // relative to instance origin
+  z: number;
+  /** Optional fixed facing in radians (sim convention: 0 = +z). Defaults to
+   *  the NpcDef facing when omitted. */
+  facing?: number;
 }
 
 export interface DungeonObjectSpawn {
@@ -3426,7 +3493,13 @@ export interface DungeonObjectSpawn {
   name: string;
   x: number; // relative to instance origin
   z: number;
-  templateId?: 'dungeon_door' | 'dungeon_exit';
+  templateId?:
+    | 'dungeon_door'
+    | 'dungeon_exit'
+    | 'ignivar_raid_gate_locked'
+    | 'ignivar_water_conduit_ready'
+    | 'ignivar_water_conduit_active'
+    | 'ignivar_water_conduit_cooldown';
   dungeonId?: string;
   /**
    * This object is an encounter mechanic players INTERACT with, never a pickup, even
@@ -3435,6 +3508,8 @@ export interface DungeonObjectSpawn {
    * display gate (quest_gated_entity.ts) never hides a flagged object.
    */
   interactOnly?: boolean;
+  /** False for encounter scenery that is targeted by mechanics, not by interact. */
+  lootable?: boolean;
 }
 
 export interface DungeonDef {
@@ -3449,6 +3524,8 @@ export interface DungeonDef {
    *  read as a building's own doorway rather than a magic portal */
   staticDoor?: boolean;
   overworldDoor?: boolean; // false for rooms only reached by internal instance doors
+  /** False for development-only rooms that must stay out of the public Guide. */
+  guideVisible?: boolean;
   entry: { x: number; z: number }; // player arrival point (instance-local)
   exitOffset: { x: number; z: number }; // exit portal (instance-local)
   // Where a second exit portal opens when the final boss dies (instance-local).
@@ -3456,9 +3533,23 @@ export interface DungeonDef {
   // corridor back; absent = no boss portal (every corridor dungeon).
   bossExitPortal?: { x: number; z: number };
   spawns: DungeonSpawn[];
+  /** Optional dungeon id whose mob difficulty tuning applies to this room's
+   * static spawn list. Rewards and lockouts still use this dungeon's own id. */
+  mobDifficultyTuningId?: string;
+  npcs?: DungeonNpcSpawn[];
   objects?: DungeonObjectSpawn[];
   // renderer + collider interior builder key
-  interior: 'crypt' | 'sanctum' | 'temple' | 'nythraxis' | 'wildheart' | 'lastkeep' | 'dawnhold';
+  interior:
+    | 'crypt'
+    | 'sanctum'
+    | 'temple'
+    | 'nythraxis'
+    | 'ignivar'
+    | 'ignivar_approach'
+    | 'ignivar_depths'
+    | 'wildheart'
+    | 'lastkeep'
+    | 'dawnhold';
   /**
    * What dresses this dungeon's wall-side obstacle slots (matches the render
    * variant): coffins get one standable lid, cargo splits into the crate
@@ -4589,6 +4680,9 @@ export interface Entity extends ClientMirroredEntityFields {
   // multiply by these AFTER the rng draw. undefined = 1 (normal difficulty).
   mechanicDamageMult?: number;
   mechanicHealMult?: number;
+  // Per-entity multiplier for mechanic-applied burn auras. Kept separate from
+  // the impact so Heroic Sentinel sweep and burn tuning can differ safely.
+  mechanicBurnDamageMult?: number;
   // Ranged petSpell scaling for a TUNED instance spawn, the third fire-time
   // multiplier beside the two above. A hostile mob's petSpell damage is rolled
   // from the base MOBS table and multiplied by petDamageMult, which returns a
@@ -4618,7 +4712,15 @@ export interface Entity extends ClientMirroredEntityFields {
   mobChargeTimeLeft?: number; // seconds left in the in-flight dash (undefined/0 = not dashing)
   mobChargeTargetId?: number | null; // dash victim; null/undefined = not dashing
   healedThisPull: boolean; // desperation self-heal already used this pull
+  // Room-gated Sentinel cast state. Optional so unrelated entities and wire
+  // snapshots retain their existing shape.
+  ignivarTrashSpellTimer?: number;
+  ignivarTrashSpell?: 'cinderLance';
+  ignivarTrashCastKey?: number;
   nythraxis?: NythraxisEncounterState; // sim-only state for the Nythraxis raid encounter
+  ignivar?: IgnivarEncounterState; // sim-only state for the Ignivar raid encounter
+  varkhul?: VarkhulEncounterState; // sim-only state for the Varkhul raid encounter
+  varkhulAssemblyAttempt?: number; // survives encounter resets so Heroic rune slots reshuffle per pull
   spawnPos: Vec3;
   leashAnchor: Vec3 | null; // refreshed by hostile player/pet actions; spawnPos remains the true home
   evadeStall: number; // seconds an evading mob has failed to get closer to home; snaps it home if it can't path back (e.g. across water)
@@ -4641,10 +4743,31 @@ export interface Entity extends ClientMirroredEntityFields {
   // [dev] /dev god cheat state, kept OFF the production gm flag so it never touches a
   // real game master (who could otherwise deal 100x or have their invuln toggled).
   devGod?: boolean;
-  /** Profiler-only invulnerability. The dev-gated server command sets this
-   *  idempotently so combat presentation remains active without /dev god's
-   *  outgoing damage multiplier. Server-private and never persisted. */
+  /** Dev "no-aggro" mode: mobs never autonomously pull this player, so a designer
+   *  can walk among freshly spawned mobs to verify placement without scattering
+   *  them. Toggled by /dev noaggro (gated by ALLOW_DEV_COMMANDS); never persisted. */
+  devNoAggro?: boolean;
+  /** Per-spawn dormancy override (DungeonSpawn.idleStationary): this mob never
+   *  idle-wanders even if its template would. Set at spawn; see mob/locomotion.ts. */
+  idleStationary?: boolean;
+  /** Runtime marker set only by DungeonSpawn.miniboss placement tuning. */
+  dungeonSpawnMiniboss?: boolean;
+  /** Suicide-bomber fuse (MobTemplate.meleeBomb): seconds remaining in the arming
+   *  windup after the mech reached melee range. >0 means it is standing up and
+   *  about to detonate; owned by mob/derelict_bomber.ts. */
+  bombWindup?: number;
+  /** Dev-only invulnerability used by /dev immortal and profiler tooling so
+   *  combat presentation remains active without /dev god's outgoing damage
+   *  multiplier. Server-private and never persisted. */
   profilerInvulnerable?: boolean;
+  /** Encounter-owned hard immunity. This is authoritative gameplay state and is
+   * checked before every damage modifier, absorb, exact-copy, and dev path. */
+  damageImmune?: boolean;
+  /** Runtime HP floor initialized from MobTemplate.damageFloorPct. */
+  damageFloorHp?: number;
+  /** Encounter adds that must pursue their assigned player throughout an arena
+   * can opt out of a template's ordinary open-world hard tether. */
+  ignoreHardLeash?: boolean;
   /** Owner of a mob created by /dev spawn. Server-private and never persisted. */
   devSpawnOwnerId?: number;
   /** Dev/test healer target: friendly-selectable inert dummy instance. */
@@ -4711,6 +4834,9 @@ export interface Entity extends ClientMirroredEntityFields {
     wardedPlayerIds: number[];
   };
   dungeonId: string | null; // set on dungeon door/exit portals
+  /** Claim-local identity for authored dungeon packs. Sim authority only; the
+   * server resolves the pull and clients need no extra wire state. */
+  dungeonPackId?: string;
   // Procedural Rift portal: set on an overworld 'rift_portal' object so walking
   // into it opens a freshly generated rift from this descriptor (see rift/runs.ts).
   riftSeed?: number;
@@ -4732,6 +4858,10 @@ export interface Entity extends ClientMirroredEntityFields {
   // Sim time of the last "the orb is sealed" nudge shown to this player at a
   // dormant Blood Orb (authored citadel), throttled the same way.
   riftOrbNoticeAt?: number;
+  // Sim time of the last "your raid is still in combat" Ignivar entry denial
+  // shown to this player, so the 20 Hz walk-in door trigger does not spam the
+  // toast (instances/ignivar_entry.ts).
+  ignivarEntryDeniedAt?: number;
   // Sim time of the last lockpickOffer emitted to this player from a
   // rift_locked_chest click, so repeated F-key presses don't spam the UI.
   riftLockpickOfferAt?: number;
@@ -4955,6 +5085,205 @@ export interface NythraxisEncounterState {
   // roster used for raid-wipe recovery, so a remote group member cannot farm
   // cooldown resets without participating.
   attemptParticipantIds?: number[];
+}
+
+export interface IgnivarEncounterState {
+  /** Players seen alive in this pull, used only for wipe cooldown recovery. */
+  attemptParticipantIds?: number[];
+  brandTimer: number;
+  forgeStrikeTimer: number;
+  frontalTimer: number;
+  frontalCastRemaining: number;
+  frontalFacing: number;
+  skyfireTimer: number;
+  skyfireCastRemaining: number;
+  skyfireFacing: number;
+  meteorTimer: number;
+  meteorCastKey: number;
+  meteorImpactRemaining: number;
+  meteorPoints: Array<{ x: number; z: number }>;
+  forgeChainsTimer: number;
+  forgeChainsRemaining: number;
+  forgeChainsAttachGraceRemaining: number;
+  forgeChainsStrainSeconds: number[];
+  forgeChainsPlayerIds: [number, number][] | null;
+  forgeChainsLastPositions: Array<{ playerId: number; x: number; z: number }>;
+  rotatingRaysTimer: number;
+  rotatingRaysWindupRemaining: number;
+  rotatingRaysActiveRemaining: number;
+  rotatingRaysFacing: number;
+  rotatingRaysBossFacing: number;
+  rotatingRaysDirection: -1 | 1;
+  rotatingRaysNextDirection: -1 | 1;
+  rotatingRaysPulseTimer: number;
+  rotatingRaysHitCooldownByPlayerId?: Record<number, number>;
+  forgeWaveTimer: number;
+  forgeWaveWindupRemaining: number;
+  forgeWaveActiveRemaining: number;
+  forgeWaveFacing: number;
+  forgeWaveRadius: number;
+  forgeWaveHitPlayerIds: number[];
+  soakTimer: number;
+  soakTargetId: number | null;
+  soakRemaining: number;
+  overlapTimer: number;
+  conduitTimers: Partial<Record<'north_west' | 'north_east' | 'south_east' | 'south_west', number>>;
+  apocalypseTriggered: boolean;
+  apocalypseAddId: number | null;
+  apocalypseCastRemaining: number;
+  apocalypseResolved: boolean;
+  forgeJudgmentPhase: 'idle' | 'moving' | 'warning' | 'active' | 'done';
+  forgeJudgmentRemaining: number;
+  forgeJudgmentPulseTimer: number;
+  forgeJudgmentRotation: number;
+  forgeJudgmentSafeIndex: 0 | 1 | 2;
+  lastInfernoTriggered: boolean;
+  lastInfernoRemaining: number;
+  lastInfernoResolved: boolean;
+  finalFrontalTimer: number;
+  finalNextFrontal: 'searing' | 'skyfire';
+}
+
+export interface VarkhulEncounterState {
+  /** Players seen alive in this pull, used only for wipe cooldown recovery. */
+  attemptParticipantIds?: number[];
+  engage: VarkhulEngageState;
+  makersBrandTimer: number;
+  frontalTimer: number;
+  frontalCastKey: number;
+  frontalCastRemaining: number;
+  /** post-release stand-back-up window: he holds his ground through the
+   *  Slam's recovery animation before chasing again */
+  frontalRecoverRemaining: number;
+  frontalFacing: number;
+  frontalTargetId: number | null;
+  cinderOrbsTimer: number;
+  cinderOrbsCastKey: number;
+  cinderOrbsMarkRemaining: number;
+  cinderOrbsTargetIds: number[];
+  cinderFires: Array<{ id: string; pos: Vec3; tickTimer: number }>;
+  cinderOrbProjectiles: Array<{
+    id: string;
+    ownerId: number;
+    pos: Vec3;
+    dir: { x: number; z: number };
+    remaining: number;
+    hitPlayerIds: number[];
+    radius?: number;
+    duration?: number;
+    speed?: number;
+    damageMaxHp?: number;
+    ability?: string;
+  }>;
+  forgestormTimer: number;
+  forgestormCastKey: number;
+  forgestormWaveIndex: number;
+  forgestormWarningRemaining: number;
+  forgestormPoints: Vec3[];
+  sharedPyreTimer: number;
+  sharedPyreTargetId: number | null;
+  sharedPyreRemaining: number;
+  anvilTimer: number;
+  anvilWalking: boolean;
+  anvilStrikeIndex: number;
+  anvilStrikeRemaining: number;
+  anvilMeteorCastKey: number;
+  anvilMeteorBatches: Array<{
+    castKey: number;
+    strikeIndex: number;
+    remaining: number;
+    points: Vec3[];
+  }>;
+  interceptBeamTimer: number;
+  interceptBeamCastKey: number;
+  interceptBeamCastRemaining: number;
+  interceptBeamTargetId: number | null;
+  interceptBeamBlockerId: number | null;
+  majorAbility:
+    | 'none'
+    | 'frontal'
+    | 'cinderOrbs'
+    | 'forgestorm'
+    | 'sharedPyre'
+    | 'anvil'
+    | 'interceptBeam';
+  assemblyTriggered: boolean;
+  assemblyRuneDifficulty: VarkhulAssemblyDifficulty;
+  assemblyPhase: VarkhulAssemblyPhase;
+  assemblyAddIds: number[];
+  assemblyLinkAddIds: number[];
+  assemblyLinkWardenIdsByWave: Array<number | null>;
+  assemblyLinkWardenSpawns: Array<{
+    wave: number;
+    remaining: number;
+  }>;
+  assemblyRemaining: number;
+  assemblyWipeResolved: boolean;
+  assemblyDroppedAddIds: number[];
+  assemblyCores: Array<{
+    id: string;
+    sourceAddId: number;
+    pos: Vec3;
+    carrierId: number | null;
+    delivered: boolean;
+    burdenStacks: number;
+    burdenTickTimer: number;
+  }>;
+  assemblyForgeHp: number;
+  assemblyForgeOverheat: number;
+  forgeBeamWindow: VarkhulForgeBeamWindow;
+  forgeBeamWindowRemaining: number;
+  forgeBeamTeachingTriggered: boolean;
+  forgeBeamPressureTriggered: boolean;
+  forgeBeamFinalTriggered: boolean;
+  forgeHeatWarningMask: number;
+  assemblyForgeBeamActiveMask: number;
+  assemblyForgeBeamWarningMask: number;
+  assemblyForgeBeamWarmupRemaining: number;
+  assemblyForgeBeamBlockerIds: Array<number | null>;
+  assemblyForgeBeamDamageTimers: number[];
+  assemblyForgeMeltdownRemaining: number;
+  assemblyForgeMeltdownTickTimer: number;
+  assemblyForgeHammerTimer: number;
+  assemblyForgeVentedThisTick: boolean;
+  assemblyPortalSpawns: Array<{ wave: number; spawnIndex: number; remaining: number }>;
+  assemblyOrdinaryAddWaves: Array<{ addId: number; wave: number }>;
+  assemblyNextWaveIndex: number;
+  assemblyNextWaveRemaining: number;
+  assemblyIntermissionWaves: number;
+  assemblyArtificerNextSpawnRemaining: number;
+  assemblyArtificerSpawnIndex: number;
+  assemblyArtificerPortalSpawns: Array<{ portalIndex: number; remaining: number }>;
+  assemblyDeliveryWindowRemaining: number;
+  assemblyDeliveredCoreIds: string[];
+  assemblyArtificerRepaired: boolean;
+  assemblyFixateTargetId: number | null;
+  assemblyRuneCenter: Vec3 | null;
+  assemblyRuneAssignments: Array<{
+    playerId: number;
+    symbol: number;
+    locked: boolean;
+  }>;
+  assemblyRuneAngles: number[];
+  assemblyRuneControls: VarkhulAssemblyRuneControl[];
+  assemblyRuneControlHoldSeconds: number[];
+  assemblyRuneAlignmentHoldSeconds: number[];
+  assemblyRuneRescuerIds: Array<number | null>;
+  assemblyRuneUnavailablePlayerIds: number[];
+  assemblyRuneSlots: number[];
+  assemblyRuneLayoutKey: number;
+  assemblyLinkFireballTimer: number;
+  assemblyLinkFireballWave: number;
+  assemblyRuneRound: number;
+  assemblyRuneRounds: number;
+  assemblyRuneRemaining: number;
+  assemblyStunRemaining: number;
+  masterpieceTriggered: boolean;
+  masterpieceRemaining: number;
+  masterpiecePulseTimer: number;
+  masterpieceWorldfireStage: number;
+  masterpieceWorldfireTickTimer: number;
+  masterpieceWipeResolved: boolean;
 }
 
 export type ErrorReason = 'target_dead';
@@ -5302,6 +5631,25 @@ export type SimEvent = { pid?: number } & (
     }
   | { type: 'questReady'; questId: string }
   | { type: 'questDone'; questId: string }
+  | {
+      type: 'varkhulCallout';
+      sourceId: number;
+      call:
+        | 'leftPillarCharging'
+        | 'rightPillarCharging'
+        | 'bothPillarsCharging'
+        | 'leftPillar'
+        | 'rightPillar'
+        | 'bothPillars'
+        | 'portalsOpening'
+        | 'artificerApproaches'
+        | 'heat75'
+        | 'heat90'
+        | 'addsDefeated'
+        | 'worldfireBegins'
+        | 'worldfireClosing'
+        | 'worldfireConsumed';
+    }
   | {
       type: 'aura';
       targetId: number;
@@ -5823,7 +6171,9 @@ export type SimEvent = { pid?: number } & (
         | 'tick'
         // Soul released by Sacrifice Undead. It starts at this world point and
         // travels to targetId as a cosmetic homing projectile.
-        | 'soulTravel';
+        | 'soulTravel'
+        | 'meteorImpact'
+        | 'ambientMeteorFall';
       // The casting ability's id, so the renderer can pick that ground cast's
       // authored visual instead of a generic per-school one.
       ability?: string;
@@ -5836,6 +6186,12 @@ export type SimEvent = { pid?: number } & (
       dirZ?: number;
       speed?: number;
       duration?: number;
+      // 'meteorFall' only: seconds where the ground warning is visible before
+      // the falling body appears. Included inside duration, so impact timing stays shared.
+      warningLead?: number;
+      // Stable id for a persistent warning also carried by the snapshot. A
+      // renderer deduplicates the live event against reconnect reconstruction.
+      persistentId?: string;
       // 'orb' only: which flight moment this is. 'release' starts the local
       // animation; 'halt'/'resume' freeze and restart it at the server's real
       // coordinates when the orb latches onto (and outlives) an enemy.
@@ -6974,6 +7330,7 @@ export const PARTY_XP_RANGE = 80; // yards: members this close share kill xp/cre
 // boss death) and the still-on-Sim encounter logic; N1 may re-home it when it owns
 // the encounter. Kept here as the neutral shared seam in the meantime.
 export const NYTHRAXIS_BOSS_ID = 'nythraxis_scourge_of_thornpeak';
+export const IGNIVAR_BOSS_ID = 'ignivar_herald_of_the_last_flame';
 // The Nythraxis arena room radius (yards from the boss spawn). Shared here so
 // deeds.ts can read it without importing encounters/nythraxis.ts (which itself
 // imports deeds.ts). Membership consumers (the lockout roster and the deed

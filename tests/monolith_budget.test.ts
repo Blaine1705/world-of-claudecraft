@@ -142,7 +142,10 @@ const MONOLITHS: MonolithRow[] = [
     // pure core interface_unlock_menu_core.ts. What remains on coordinator
     // state (dimension-mode mover wiring, the edit-preview painter closure,
     // the player-frame bar lock) is the live-hooks half. Exact merged count.
-    ceiling: 19002,
+    // the Ignivar raid consolidation paid its callout/yell additions by moving the pure entity display-label resolver family to entity_display_labels.ts; exact count.
+    // Re-pinned to the exact merged count of the ignivar-raid-complete merge
+    // (both sides of the fork extracted independently; the merge lands both).
+    ceiling: 18886,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -198,7 +201,8 @@ const MONOLITHS: MonolithRow[] = [
     // ceiling is the exact merged count.
     // Re-pinned to the integration merge of the latest v0.40.0 (the touch UI
     // rework); exact merged count.
-    ceiling: 13329,
+    // the raid consolidation paid its additions by moving the fog scene chain (fog_scene_state.ts), the spellfxAt dispatch arms, the boss facing lock, and the raid anchor/rig syncs out; exact count.
+    ceiling: 13265,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -247,7 +251,12 @@ const MONOLITHS: MonolithRow[] = [
     // Plus 7 at the v0.39.3 main back-merge: the Double Honor port grew the
     // sim arm on main while the release pin sat at zero slack (the known
     // both-arms compound). Exact merged count, zero slack.
-    ceiling: 12538,
+    // the raid consolidation moved the raid readout getter bodies (ignivar_raid_readouts.ts) plus the same-family ground-AoE and partyInfo projections out; exact count.
+    // Re-pinned 12473 -> 12451 for the PR 3684 raid restoration: the authored
+    // pack-aggro call paid for itself by moving the legacy same-template
+    // social pull (and its per-family radius table) to mob/social_aggro.ts.
+    // Exact count.
+    ceiling: 12451,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -276,7 +285,11 @@ const MONOLITHS: MonolithRow[] = [
     // the player-frame bar lock) predate this ratchet; folding them behind a
     // src/game/ settings-application seam is flagged follow-up work. Exact
     // merged count.
-    ceiling: 11629,
+    // Re-pinned after the /daynight dev-command extraction to
+    // src/game/daynight_dev_command.ts (net of the Ignivar placer dispatch).
+    // Re-pinned to the exact merged count of the ignivar-raid-complete merge
+    // (both sides of the fork extracted independently; the merge lands both).
+    ceiling: 11558,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -319,7 +332,8 @@ const MONOLITHS: MonolithRow[] = [
     // routeEvents into the guild board window's live REST read (the
     // noticeboard_guilds event transform is deleted). Exact count, zero
     // slack.
-    ceiling: 10645,
+    // the raid consolidation moved the ground-telegraph snapshot unit, the forge-portal replay lifecycle, eventAnchor, and the door gate out; exact count.
+    ceiling: 10604,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -341,7 +355,10 @@ const MONOLITHS: MonolithRow[] = [
     // Down 5855 -> 5817 at the desktop-signing round: the handoff result
     // validation moved to src/net/desktop_wallet_handoff.ts
     // (parseDesktopWalletHandoffStatus), paying for the stepup action kind.
-    ceiling: 5817,
+    // the raid consolidation moved the ground-telegraph wire decoders (ground_telegraph_wire.ts) out; exact count.
+    // Re-pinned to the exact merged count of the ignivar-raid-complete merge
+    // (both sides of the fork extracted independently; the merge lands both).
+    ceiling: 5767,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -349,7 +366,10 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned for the Proving Shore dawn-cue merge, then again when the
     // final render replaced the composed themes with a supplied stream-only
     // track; exact merged count.
-    ceiling: 5064,
+    // the raid theme registrations were paid for by moving the Gravewyrm Sanctum composer to its sibling module; exact count.
+    // Re-pinned 4943 -> 4935: the molten-assembly music row paid for itself by
+    // moving the DUNGEON_MUSIC table to dungeon_music_zones.ts. Exact count.
+    ceiling: 4935,
     seam: 'a src/game sibling module (the refactor/game-music split is the template)',
   },
   {
@@ -434,7 +454,10 @@ const MONOLITHS: MonolithRow[] = [
     file: 'src/sim/colliders.ts',
     // Re-pinned to the integration merge of the latest v0.40.0 (the touch UI
     // rework); exact merged count.
-    ceiling: 2621,
+    // Re-pinned after the interior-collider-set assembly extraction to
+    // interior_collider_sets.ts (which appends the Ignivar authored prop
+    // colliders). Exact count, zero slack.
+    ceiling: 2609,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {
@@ -445,7 +468,19 @@ const MONOLITHS: MonolithRow[] = [
     // current count per the ratchet's rule; any further growth reds, and the
     // fix is extraction behind the seam named here.
     file: 'src/render/dungeon.ts',
-    ceiling: 2882,
+    // the raid consolidation moved the arena-wall occlusion core, the pending-wall builder, and the ignivar tile loaders out; exact count.
+    // Re-pinned after the addTorchGlow extraction to torch_glow_decal.ts
+    // (shared with the Ignivar dressing glow pools), net of the ignivar
+    // pillar-swap gate; then again after the banner picking moved to
+    // dungeon_banner_core.ts (paying for the ignivar banner suppression
+    // gates and the torch-tuck fix). Exact count, zero slack.
+    // Re-pinned 2715 -> 2463 for the lava-moat wiring: the floor/quad/wall kind
+    // pickers moved to dungeon_tile_kind_core.ts (the banner-core pattern).
+    // Re-pinned 2463 -> 2433 for the raid wall backface cull: the hideable-wall
+    // update loop moved to dungeon_wall_occlusion.ts and the torch palette
+    // table to dungeon_torch_colors.ts (re-counted after the raid-complete
+    // floor-coverage merge). Exact count, zero slack.
+    ceiling: 2433,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
 ];

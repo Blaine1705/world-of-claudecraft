@@ -209,6 +209,7 @@ import {
   auraApplyCue,
   castCueForAbility,
   consumeHealCue,
+  dispatchVarkhulCalloutSfx,
   groundTickAbilityCue,
   impactCueForDamage,
   type MobVoiceAction,
@@ -289,6 +290,28 @@ import {
   disenchantSecondaryLineKey,
   salvageResultToast,
 } from './enchanting_view';
+import {
+  abilityCastLine,
+  abilityRangeLine,
+  combatAbilityName,
+  delveText,
+  dungeonText,
+  entityDisplayName,
+  itemDisplayNameFromSource,
+  itemStackDisplayName,
+  mobDisplayName,
+  npcDisplayName,
+  npcDisplayTitle,
+  npcGreeting,
+  parseSimMoney,
+  playerSpellHasteFrac,
+  questNarrative,
+  questObjectiveLabel,
+  questTitle,
+  questTitleFromSource,
+  resourceDisplayName,
+  zoneWelcome,
+} from './entity_display_labels';
 import {
   classDisplayName,
   dungeonDisplayName,
@@ -535,6 +558,7 @@ import {
   FRAME_SIZE_RESET_KEYS,
 } from './interface_unlock_menu_core';
 import { InterfaceUnlockPreview } from './interface_unlock_preview';
+import { InteriorMapController } from './interior_map_controller';
 import { itemArmorTypeLabelKey } from './item_armor_type';
 import { requiredClassesForTooltip } from './item_class_restriction';
 import { itemStatDeltas } from './item_compare';
@@ -553,8 +577,6 @@ import { itemNameColor } from './item_name_color';
 import { itemSetMemberCounts, itemSetTooltipModel } from './item_set_tooltip_view';
 import { itemSlotLabel as itemSlotName } from './item_slot_labels';
 import { knownItemDef, ownEntry } from './known_item';
-import { DAWNHOLD_MAP_PAINTER_SPEC, LastKeepMapPainter } from './lastkeep_map_painter';
-import { dawnholdMapActive, lastKeepMapActive } from './lastkeep_map_view';
 import { LeaderboardWindow } from './leaderboard_window';
 import { ReannounceMarker } from './live_region_reannounce';
 import { isCombatFlavorLog } from './log_event_route';
@@ -681,6 +703,7 @@ import {
   questItemTooltipRelatedKey,
 } from './quest_item_tooltip_view';
 import { questProgressEventText } from './quest_progress_text';
+import { RaidBossGuideWindow, raidBossGuideContextFallback } from './raid_boss_guide_window';
 import { lockoutParts, lockoutShape } from './raid_lockout';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
 import {
@@ -713,7 +736,13 @@ import { curatorRankNameKey, ReliquaryWindow } from './reliquary_window';
 import { restView } from './rest_indicator';
 import { isTalentRowUnlockLevel } from './row_unlock_toast';
 import { localizeServerText } from './server_i18n';
-import { localizeSimAuraName, localizeSimText, tSim } from './sim_i18n';
+import {
+  localizeAuthoredYellSpeakerName,
+  localizeAuthoredYellText,
+  localizeSimAuraName,
+  localizeSimText,
+  tSim,
+} from './sim_i18n';
 import { openSimpleMenu } from './simple_context_menu';
 import {
   advanceSkillLevelObservation,
@@ -779,6 +808,7 @@ import { crestIdForEntity } from './unit_portrait';
 import { UnitPortraitPainter } from './unit_portrait_painter';
 import { knownItemIconHtml } from './unknown_item_icon';
 import { unstuckFeedback } from './unstuck_feedback';
+import { varkhulCalloutKey } from './varkhul_callout';
 import { visibleVendorStock } from './vendor_stock_gate_core';
 import { nextVoicedYell, type VoicedYellState, voicedYellGain } from './voice_events';
 import { onWalletUiChange, walletConnectionView } from './wallet_balance';
@@ -1032,12 +1062,6 @@ const castDisplayName = (id: string): string => {
   return ability ? abilityDisplayName(ability) : id;
 };
 
-const RESOURCE_LABEL_KEYS: Record<ResourceType, TranslationKey> = {
-  mana: 'abilityUi.resources.mana',
-  rage: 'abilityUi.resources.rage',
-  energy: 'abilityUi.resources.energy',
-  focus: 'abilityUi.resources.focus',
-};
 // Ravenpost mailResult refusal codes to their toast lines. `sent`/`collected`
 // are successes rendered as chat-log lines in handleEvents, but they map here
 // too; codes outside THIS bundle's union take the fallback below.
@@ -2148,6 +2172,8 @@ export class Hud {
         station: stationNameText,
         poi: zonePoiLabel,
         rift: riftFloorLabel,
+        npc: npcDisplayName,
+        mob: mobDisplayName,
       },
       npc: (marker) => this.mapMarkerTooltipContent.npc(marker),
       navigation: (marker) =>
@@ -3601,8 +3627,10 @@ export class Hud {
         this.arenaWindow.close();
         break;
       case 'dungeon-finder-window':
-        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.dungeonFinderWindow.close();
+        break;
+      case 'raid-boss-guide-window':
+        this.raidBossGuideWindow.close();
         break;
       case 'card-duel-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
@@ -4561,16 +4589,7 @@ export class Hud {
     this.mapMarkerArt,
     this.mapMarkerProfile,
   );
-  // The Last Keep interior map (the castle floor plan): both surfaces routed
-  // by the lastKeepMapActive position guard, exactly like the delve branch.
-  private readonly lastKeepMapPainter = new LastKeepMapPainter(this.writerFacet, classCss);
-  // Dawnhold Castle rides the same parameterized painter with its own spec
-  // (plates, title keys, and pure-core builders), routed by dawnholdMapActive.
-  private readonly dawnholdMapPainter = new LastKeepMapPainter(
-    this.writerFacet,
-    classCss,
-    DAWNHOLD_MAP_PAINTER_SPEC,
-  );
+  private readonly interiorMaps = new InteriorMapController(this.writerFacet, classCss);
   // The Protect Yumi match strip + bench overlay (yumi_match_painter.ts):
   // facet-routed; structure from arenaInfo.match.yumi, dynamics from the
   // yumiStatus/yumiDown events fed in handleEvents. Runs on the mediumHud
@@ -4693,12 +4712,9 @@ export class Hud {
     },
   });
   // The two cast bars are ONE instance-parameterized painter, over the
-  // castBarState core. The PLAYER instance localizes the cast id (castDisplayName),
-  // layers the eat/drink overlay (consumeBarState, player-only), and clears the bar
-  // on hide (its inline block did). The TARGET instance shows the raw cast id
-  // (byte-faithful: the target block set the raw `label`), has no eat/drink (the
-  // target never eats/drinks, so its paint omits `consume`), and hides with only
-  // display:none (its inline block did not clear).
+  // castBarState core. Both instances localize cast ids; the PLAYER instance also
+  // layers the eat/drink overlay (consumeBarState, player-only) and clears the bar
+  // on hide. The TARGET instance has no eat/drink and hides with only display:none.
   private readonly playerCastBarPainter = new CastBarPainter(
     this.writerFacet,
     {
@@ -4717,7 +4733,7 @@ export class Hud {
       label: this.targetCastbarLabelEl,
       timer: this.targetCastbarTimerEl,
     },
-    { resolveCastLabel: (s) => s.label },
+    { resolveCastLabel: (s) => abilityDisplayNameFromSource(s.label) },
   );
   // Second unit-frame painter instance; heraldry hosts are player identity only.
   // Target validity stays call-site gated. Elite and reaction CSS stay there too;
@@ -5352,9 +5368,6 @@ export class Hud {
     ...this.windowFocus('#arena-window'),
   });
 
-  // Dungeon Finder (cold window; docs/prd/dungeon-finder.md). Composes the
-  // shared presentation bag for loot icons/tooltips and a narrow map hook for
-  // the non-teleporting "Show on Map" action.
   private readonly dungeonFinderWindow = new DungeonFinderWindow({
     ...this.presentationBag,
     root: () => $('#dungeon-finder-window'),
@@ -5365,9 +5378,13 @@ export class Hud {
     ...this.windowFocus('#dungeon-finder-window'),
   });
 
-  // The WoW-style "group found" prompt: opened by the dfProposal SimEvent,
-  // self-closing when the proposal resolves. Lives OUTSIDE the finder window
-  // so an answer never requires opening it.
+  private readonly raidBossGuideWindow = new RaidBossGuideWindow({
+    root: () => $('#raid-boss-guide-window'),
+    closeOthers: () => this.closeOtherWindows('#raid-boss-guide-window'),
+    contextFallback: () => raidBossGuideContextFallback(document, this.isMobileLayout()),
+    ...this.windowFocus('#raid-boss-guide-window'),
+  });
+
   private readonly dungeonFinderProposalPopup = new DungeonFinderProposalPopup({
     root: () => $('#dfinder-proposal-popup'),
     world: () => this.sim,
@@ -6912,9 +6929,8 @@ export class Hud {
     // Same reason as delveTracker above: the rift floor tracker's signature is
     // floor/timer numbers, none of which move with the locale.
     this.riftTracker.relocalize();
-    // The keyed-pool party rows reuse their DOM, so a rebuild never re-runs t() on
-    // their badge tooltips / leave label; re-localize them in place on a switch.
     this.partyFramesPainter.relocalize();
+    this.raidBossGuideWindow.relocalize();
     // The world map rasterizes its labels into sprites keyed on the RESOLVED
     // string, so a switch can never draw the old language; clearing is about not
     // carrying dead rasters in the sprite budget.
@@ -10657,29 +10673,16 @@ export class Hud {
       );
       return;
     }
-    // Inside The Last Keep: the baked floor plan for the player's current
-    // story, with the '#zone-label' story title (the delve branch pattern).
-    if (lastKeepMapActive(this.sim)) {
-      this.lastKeepMapPainter.paintMinimap(
+    if (
+      this.interiorMaps.paintMinimap(
         ctx,
         this.sim,
         $('#zone-label'),
         MINIMAP_SIZE,
         this.minimapZoom,
-      );
+      )
+    )
       return;
-    }
-    // Inside Dawnhold Castle: the same castle-plan surface, dawnhold spec.
-    if (dawnholdMapActive(this.sim)) {
-      this.dawnholdMapPainter.paintMinimap(
-        ctx,
-        this.sim,
-        $('#zone-label'),
-        MINIMAP_SIZE,
-        this.minimapZoom,
-      );
-      return;
-    }
     // The overworld minimap: a pure marker core (minimap_markers) + the thin canvas
     // painter. It owns the cached terrain blit + the marker draws and writes
     // '#zone-label' through the write-elision facet. It blits the current zone's
@@ -10922,7 +10925,8 @@ export class Hud {
     const inRift = mapMode === 'rift';
     const inBattleground = mapMode === 'battleground';
     const inDelve = mapMode === 'delve';
-    const schematic = inRift || inDelve || inBattleground;
+    const inDungeon = mapMode === 'dungeon';
+    const schematic = inRift || inDelve || inBattleground || inDungeon;
     this.setDisplay($('#map-level-toggle'), schematic ? 'none' : 'block');
     this.setDisplay($('#map-zoom'), schematic || this.mapLevel === 'continent' ? 'none' : 'flex');
     if (inRift) {
@@ -10955,6 +10959,18 @@ export class Hud {
       return;
     }
 
+    if (inDungeon) {
+      this.clearMapHitState(canvas);
+      const result = this.interiorMaps.paintDungeonWorldMap(ctx, this.sim, S);
+      const title = result?.title ?? '';
+      this.setText(summaryEl, t('hud.core.mapSummary', { zone: title }));
+      this.setText(
+        markerSummaryEl,
+        this.mapMarkerInteraction.semantics.updateDungeon(result?.model ?? null, title, S),
+      );
+      return;
+    }
+
     this.setText(
       $('#map-level-toggle'),
       t(
@@ -10981,23 +10997,14 @@ export class Hud {
     }
     this.continentRegions = [];
 
-    // Inside The Last Keep: the whole-plan floor plate for the player's
-    // current story (title drawn on-canvas, the delve branch pattern); the
-    // continent overview above still wins when the player toggles up to it.
-    if (lastKeepMapActive(this.sim)) {
+    const castleTitle = this.interiorMaps.paintCastleWorldMap(ctx, this.sim, S);
+    if (castleTitle !== null) {
       this.clearMapHitState(canvas);
-      const title = this.lastKeepMapPainter.paintWorldMap(ctx, this.sim, S);
-      this.setText(summaryEl, t('hud.core.mapSummary', { zone: title }));
-      this.setText(markerSummaryEl, this.mapMarkerInteraction.semantics.updateSimple(title, S));
-      return;
-    }
-
-    // Inside Dawnhold Castle: the same castle-plan surface, dawnhold spec.
-    if (dawnholdMapActive(this.sim)) {
-      this.clearMapHitState(canvas);
-      const title = this.dawnholdMapPainter.paintWorldMap(ctx, this.sim, S);
-      this.setText(summaryEl, t('hud.core.mapSummary', { zone: title }));
-      this.setText(markerSummaryEl, this.mapMarkerInteraction.semantics.updateSimple(title, S));
+      this.setText(summaryEl, t('hud.core.mapSummary', { zone: castleTitle }));
+      this.setText(
+        markerSummaryEl,
+        this.mapMarkerInteraction.semantics.updateSimple(castleTitle, S),
+      );
       return;
     }
 
@@ -11231,6 +11238,18 @@ export class Hud {
         sfx.unloop(`cast:${ev.entityId}`, 0.2);
         this.castLoopIds.delete(ev.entityId);
         return;
+      case 'varkhulCallout': {
+        dispatchVarkhulCalloutSfx(
+          ev,
+          (entityId) => sim.entities.get(entityId),
+          (plan) =>
+            this.combat(plan.cue, plan.x, plan.y, plan.z, plan.gain, {
+              cooldown: plan.cooldown,
+              jitter: plan.jitter,
+            }),
+        );
+        return;
+      }
       case 'spellfx': {
         if (ev.fx === 'temporalClock') {
           const source = sim.entities.get(ev.sourceId) ?? sim.entities.get(ev.targetId);
@@ -12714,12 +12733,23 @@ export class Hud {
           }
           this.questDialog.refresh();
           break;
+        case 'varkhulCallout': {
+          const text = t(varkhulCalloutKey(ev.call));
+          this.questBanner.show(text);
+          this.combatAnnouncer.push(text, performance.now());
+          break;
+        }
         case 'chat': {
           // OFFLINE ONLY. Online, the server drops an ignored player's public chat
           // before it reaches us (and honours the whisper/roll carve-outs), so
           // consulting the local list here as well would resurrect stale ignores
           // the player has since cleared from their account.
           if (this.sim.socialInfo === null && this.localIgnoredNames.has(ignoreKey(ev.from))) break;
+          const bubbleSpeakerId = ev.entityId ?? ev.fromPid;
+          const bubbleSpeaker =
+            typeof bubbleSpeakerId === 'number'
+              ? this.sim.entities.get(bubbleSpeakerId)
+              : undefined;
           switch (ev.channel) {
             case 'party':
               this.chatLogFrom(
@@ -12747,8 +12777,13 @@ export class Hud {
               break;
             case 'yell':
               this.chatLogFrom(
-                ev.from,
-                ev.text,
+                localizeAuthoredYellSpeakerName(
+                  ev.from,
+                  bubbleSpeaker?.kind,
+                  bubbleSpeaker?.templateId,
+                  ev.classId,
+                ),
+                localizeAuthoredYellText(ev.text, bubbleSpeaker?.kind, ev.classId),
                 CHAT_TEMPLATE_KEYS.yell,
                 'yell',
                 ev.fromPid,
@@ -12882,9 +12917,12 @@ export class Hud {
           // guild/officer (server social broadcasts that carry no speaker id, so
           // the client has no entity to anchor to; a server/wire follow-up).
           const bubbleStyle = ev.channel === undefined ? null : chatBubbleStyle(ev.channel);
-          const bubbleSpeakerId = ev.entityId ?? ev.fromPid;
           if (bubbleStyle && typeof bubbleSpeakerId === 'number') {
-            const masked = this.maskChat(this.chatLinkPlainText(ev.text));
+            const visibleText =
+              ev.channel === 'yell'
+                ? localizeAuthoredYellText(ev.text, bubbleSpeaker?.kind, ev.classId)
+                : ev.text;
+            const masked = this.maskChat(this.chatLinkPlainText(visibleText));
             const bubble = ev.channel === 'emote' ? `${ev.from} ${masked}` : masked;
             this.renderer.showChatBubble(bubbleSpeakerId, bubble, bubbleStyle);
           }
@@ -17587,12 +17625,9 @@ export class Hud {
     const target =
       this.sim.player.targetId !== null ? this.sim.entities.get(this.sim.player.targetId) : null;
     const info = this.sim.partyInfo;
-    // Drop the frames below the target frame only when the measured target
-    // stack (frame + #tf-debuffs strip) actually overlaps their column: the
-    // painter keeps --party-below-target-bottom current (measuring only when
-    // its cheap key changes) and reports whether the seat is in play at all (no
-    // overlap, e.g. a dragged-away target frame, keeps the frames at their base
-    // anchor; touch holds the seat with no target off the tier's fallback).
+    const dungeonId = info ? (dungeonAt(this.sim.player.pos.x)?.id ?? null) : null;
+    this.partyFramesPainter.setGuideControl(this.raidBossGuideWindow.syncAvailability(dungeonId));
+    // Re-seat below the target only when its measured stack overlaps this column.
     const targetShown = !!target && target.kind !== 'object';
     const belowTarget = this.partyBelowTargetPainter.update(
       targetShown,
@@ -18787,157 +18822,6 @@ function describeAbilitySummary(
     );
   }
   return parts.join(' · ');
-}
-
-function itemDisplayNameFromSource(name: string): string {
-  const item = Object.values(ITEMS).find((candidate) => candidate.name === name);
-  return item ? itemDisplayName(item) : name;
-}
-
-function itemStackDisplayName(item: string, stackSuffix?: string): string {
-  const itemName = itemDisplayNameFromSource(item);
-  if (!stackSuffix) return itemName;
-  const count = Number(stackSuffix.trim().slice(1));
-  return `${itemName} ${t('itemUi.bags.stackCount', { count: formatNumber(count, { maximumFractionDigits: 0 }) })}`;
-}
-
-function mobDisplayName(mobId: string): string {
-  return tEntity({ kind: 'mob', id: mobId, field: 'name' });
-}
-
-function npcDisplayName(npcId: string): string {
-  return tEntity({ kind: 'npc', id: npcId, field: 'name' });
-}
-
-function npcDisplayTitle(npcId: string): string {
-  return tEntity({ kind: 'npc', id: npcId, field: 'title' });
-}
-
-function npcGreeting(npcId: string, playerClass: PlayerClass, playerName: string): string {
-  const className = classDisplayName(playerClass);
-  return tEntity({
-    kind: 'npc',
-    id: npcId,
-    field: 'greeting',
-    values: {
-      className,
-      classNameLower: className.toLocaleLowerCase(),
-      playerName,
-    },
-  });
-}
-
-function questTitle(questId: string): string {
-  return tEntity({ kind: 'quest', id: questId, field: 'title' });
-}
-
-function questNarrative(questId: string, field: 'text' | 'completion', playerName: string): string {
-  return tEntity({ kind: 'quest', id: questId, field, values: { playerName } });
-}
-
-function questObjectiveLabel(questId: string, objectiveIndex: number): string {
-  return tEntity({
-    kind: 'questObjective',
-    questId,
-    objectiveIndex,
-    field: 'label',
-  });
-}
-
-function questTitleFromSource(name: string): string {
-  const quest = Object.values(QUESTS).find((candidate) => candidate.name === name);
-  return quest ? questTitle(quest.id) : name;
-}
-
-function zoneWelcome(zoneId: string): string {
-  return tEntity({ kind: 'zone', id: zoneId, field: 'welcome' });
-}
-
-function dungeonText(dungeonId: string, field: 'enterText' | 'leaveText'): string {
-  return tEntity({ kind: 'dungeon', id: dungeonId, field });
-}
-
-function delveText(delveId: string, field: 'enterText' | 'leaveText'): string {
-  return tEntity({ kind: 'delve', id: delveId, field });
-}
-
-function entityDisplayName(entity: Entity): string {
-  if (entity.kind === 'mob')
-    return entity.ownerId !== null && !isNecromancyUndead(entity)
-      ? (localizeSimAuraName(entity.name) ?? entity.name)
-      : mobDisplayName(entity.templateId);
-  if (entity.kind === 'npc') return npcDisplayName(entity.templateId);
-  return entity.name;
-}
-
-function combatAbilityName(name: string | null): string {
-  return name ? abilityDisplayNameFromSource(name) : t('hud.combat.attack');
-}
-
-function resourceDisplayName(resourceType: ResourceType | null): string {
-  return t(RESOURCE_LABEL_KEYS[resourceType ?? 'mana']);
-}
-
-// itemSlotName moved to ./item_slot_labels as itemSlotLabel (imported above under
-// its old name here), so the pure view cores can read the same shared-label facts
-// the HUD does (#2466).
-
-function parseSimMoney(text: string): number | null {
-  let copper = 0;
-  let matched = false;
-  for (const match of text.matchAll(/(\d+)\s*([gsc])/gi)) {
-    matched = true;
-    const amount = Number(match[1]);
-    const unit = match[2].toLowerCase();
-    if (unit === 'g') copper += amount * 10000;
-    else if (unit === 's') copper += amount * 100;
-    else copper += amount;
-  }
-  return matched ? copper : null;
-}
-
-function abilityRangeLine(def: AbilityDef): string | null {
-  if (def.range <= 0) return null;
-  if (def.minRange !== undefined) {
-    return t('abilityUi.tooltip.rangeWithMin', {
-      min: formatAbilityNumber(def.minRange),
-      max: formatAbilityNumber(def.range),
-    });
-  }
-  return t('abilityUi.tooltip.range', {
-    range: formatAbilityNumber(def.range),
-  });
-}
-
-// The live caster's TOTAL spell-haste fraction: the resolved stat (set bonuses + spec
-// mastery) PLUS active buff_spellhaste auras (Arcane Power, Icy Veins, Metamorphosis).
-// Mirrors the sim's spellHasteMult (spell_combat.ts) EXACTLY, including its
-// `Math.max(0, ...)` floor, so a shown cast time never disagrees with the real one (a
-// net-negative haste, e.g. a cast-slow debuff, floors at 0 for both). ui/ cannot import
-// the sim-combat helper across the seam, so the formula is kept identical here by hand.
-function playerSpellHasteFrac(p: Entity | null | undefined): number {
-  if (!p) return 0;
-  let frac = p.spellHaste;
-  for (const a of p.auras) if (a.kind === 'buff_spellhaste') frac += a.value;
-  return Math.max(0, frac);
-}
-
-// `spellHaste` (the live character's total spell haste, a fraction) shortens the shown
-// cast / channel time exactly as the sim does, so a hasted caster's tooltips reflect the
-// real, faster cast.
-function abilityCastLine(known: ResolvedAbility, spellHaste = 0): string {
-  const h = 1 + Math.max(0, spellHaste);
-  if (known.def.channel) {
-    return t('abilityUi.tooltip.channeledSeconds', {
-      seconds: formatAbilityNumber(known.def.channel.duration / h),
-    });
-  }
-  if (known.castTime > 0) {
-    return t('abilityUi.tooltip.castSeconds', {
-      seconds: formatAbilityNumber(known.castTime / h),
-    });
-  }
-  return t('abilityUi.tooltip.instant');
 }
 
 // Thin i18n mapper over the pure resolver (ability_requirement_keys.ts), which

@@ -2453,7 +2453,57 @@ export const ko_KR: EnTranslations = {
       "leather": "가죽",
       "mail": "사슬"
     },
+    "varkhulCallout": {
+      "leftPillarCharging": "왼쪽 용광로 기둥이 충전 중입니다. 3초 후 점화됩니다!",
+      "rightPillarCharging": "오른쪽 용광로 기둥이 충전 중입니다. 3초 후 점화됩니다!",
+      "bothPillarsCharging": "용광로 기둥들이 충전 중입니다. 3초 후 점화됩니다!",
+      "artificerApproaches": "잿불 기계공이 용광로로 다가옵니다!",
+      "leftPillar": "왼쪽 용광로 기둥이 점화됩니다!",
+      "rightPillar": "오른쪽 용광로 기둥이 점화됩니다!",
+      "bothPillars": "용광로 기둥들이 점화됩니다!",
+      "portalsOpening": "용광로 차원문이 열리고 있습니다!",
+      "heat75": "용광로 열기가 75%에 도달했습니다!",
+      "heat90": "용광로 용융이 임박했습니다!",
+      "addsDefeated": "용광로 군단이 쓰러졌습니다. 바르쿨이 노출됩니다!",
+      "worldfireBegins": "세계불꽃이 방 가장자리에서 타오릅니다. 42초 후 도가니 전체가 불길에 휩싸입니다!",
+      "worldfireClosing": "세계불꽃이 다가옵니다. 중앙으로 이동하세요!",
+      "worldfireConsumed": "도가니 전체가 불타고 있습니다!"
+    },
+    "varkhulWaveStatus": "공세 {wave}/{waves} | 적: {remaining}",
+    "raidBossGuide": {
+      "title": "우두머리 공략",
+      "button": "공략: {boss}",
+      "subtitle": "{boss} | 일반 및 영웅",
+      "close": "우두머리 공략 닫기",
+      "ignivar": {
+        "brand": "장작더미의 징표: 산개합니다. 불타는 급류를 준비된 수로로 유도한 뒤 혼자 물을 건너 해제합니다.",
+        "movement": "이동: 잿불비의 부채꼴과 운석을 피하고, 회전하는 지옥불과 함께 움직이며, 대장간 파도의 두 틈을 사용합니다.",
+        "apocalypse": "대재앙: 시전이 끝나기 전에 이그니바르 애쉬콜러를 처치합니다.",
+        "judgment": "대장간의 심판: 경고 중 다른 피난처를 찾아내고 바닥이 타오르면 표시된 경계 안에 모입니다.",
+        "finale": "마지막 지옥불: 빨라진 운석, 전방 공격, 회전 지옥불에 대응하며 전멸 전에 이그니바르를 처치합니다.",
+        "heroic": "영웅: 대장간의 사슬 동안 짝과 가까이 있어야 하며 심판 안에서도 징표가 유지되고, 대장간 파도가 플레이어를 더 멀리 밀어냅니다."
+      },
+      "varkhul": {
+        "tanks": "방어 담당: 제작자의 징표 2중첩에 교대하고 바르쿨을 근접 거리 안에 둡니다.",
+        "orbs": "잿불 구슬: 대상자는 방 가장자리로 산개합니다. 불 웅덩이는 남고 방출된 구슬은 방을 가로지릅니다.",
+        "pyre": "공유 장작더미: 달아오른 금속이 없는 대상만 선택합니다. 난이도와 관계없이 이동하는 원 안에 4명이 모입니다. 부족한 플레이어 1명당 공격대 전체가 최대 생명력의 15%에 해당하는 피해를 받습니다.",
+        "forgestorm": "대장간폭풍: 떨어지는 운석을 보고 세 차례의 충돌 전에 표시된 모든 범위에서 벗어납니다.",
+        "anvil": "모루의 칙령: 바르쿨이 거대 대장간으로 이동해 세 번 내리쳐 공격대 피해를 줍니다. 영웅에서는 표시된 운석도 떨어집니다.",
+        "ray": "담금질 광선: 긴 경고가 끝나기 전에 다른 플레이어, 보통 방어 담당이 움직이는 광선을 가로막습니다. 피격자는 담금질 상처를 얻습니다.",
+        "forge": "대장간 기둥: 광선이 대장간에 닿기 전에 막고 도가니 노출이 쌓이면 교대합니다. 열기가 가득 차면 대장간이 붕괴합니다.",
+        "assembly": "거장의 조립: 두 광선을 막고 모든 차원문 웨이브를 처치하며 도가니 지진을 차단하고 잿불 기술자의 치유를 막습니다.",
+        "worldfire": "세계불꽃: 영웅의 마지막 단계에서 불타는 가장자리가 중앙으로 좁혀집니다. 도가니 전체가 타기 전에 바르쿨을 처치합니다.",
+        "heroic": "영웅: 대장간 열기는 식지 않고 모루의 칙령에 운석이 추가되며 마지막 단계는 세계불꽃에 집중합니다."
+      }
+    },
     "auraEffect": {
+      "sharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%).",
+      "varkhulSharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%). 부족한 플레이어 1명당 원 안의 플레이어를 포함한 공격대 전체가 최대 생명력의 {missingPenalty}%에 해당하는 피해를 추가로 받습니다.",
+      "makersBrand": "{duration}초 동안 중첩당 발쿨에게 받는 피해가 {pct}% 증가합니다. 최대 {max}회 중첩됩니다. 탱커는 {swap}중첩에서 교대하세요.",
+      "varkhulSentinelsGaze": "잔불 감시자가 당신을 추격합니다. 처치할 때까지 공격대에서 멀리 떨어뜨리세요.",
+      "varkhulMoltenCore": "이 핵을 용광로로 운반하세요. 용융물의 무게는 {interval}초마다 최대 생명력의 {min}%에서 {max}%까지 증가하는 피해를 입힙니다.",
+      "varkhulForgeLink": "활성화된 기둥의 광선이 용광로에 닿기 전에 가로막으세요. 열린 광선은 초당 열기를 6% 올립니다. 일반에서는 차단된 광선과 꺼진 기둥이 용광로를 식히지만, 영웅에서는 열기가 절대 감소하지 않습니다. 100%가 되면 치명적인 용광로 용융이 발생합니다.",
+      "varkhulCrucibleExposure": "도가니 광선을 막으면 매초 최대 생명력 기반 피해가 증가합니다. 광선을 벗어난 뒤 일반에서는 10초, 영웅에서는 60초 후 중첩이 초기화됩니다.",
       "dot": "{interval}초마다 {value}의 {school} 피해를 입힙니다",
       "hot": "{interval}초마다 생명력을 {value} 회복합니다",
       "mendingCurrent": "치유량 {value}를 저장하여 시간에 따라 방출하거나 쇄도하는 치유로 소모합니다",
@@ -8627,6 +8677,8 @@ export const ko_KR: EnTranslations = {
         "riftEntrance": "균열 입구: {name}",
         "hostileEnemy": "적대 대상",
         "aggressiveEnemy": "당신을 공격 중인 적",
+        "bossEnemy": "우두머리: {name}",
+        "bossAggressiveEnemy": "당신을 공격 중인 우두머리: {name}",
         "lootableEnemy": "전리품을 획득할 수 있는 적",
         "corpse": "자신의 시체",
         "deathZone": "위험 지역",
@@ -13918,6 +13970,27 @@ export const ko_KR: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "나이트락시스, 손피크의 재앙"
       },
+      "ignivar_herald_of_the_last_flame": {
+        "name": "이그니바르, 마지막 불꽃의 전령"
+      },
+      "ignivar_heart_of_the_end": {
+        "name": "이그니바르 애쉬콜러"
+      },
+      "ignivar_ember_sentinel": {
+        "name": "잔불 감시자"
+      },
+      "ignivar_crucible_warden": {
+        "name": "용광로 수호자"
+      },
+      "ignivar_cinder_artificer": {
+        "name": "불씨 기계공"
+      },
+      "varkhul_forgefather_of_the_last_flame": {
+        "name": "마지막 불꽃의 대장장이 발쿨"
+      },
+      "derelict_mech": {
+        "name": "버려진 기계병"
+      },
       "reliquary_ledger_wraith": {
         "name": "명부의 망령"
       },
@@ -14577,6 +14650,16 @@ export const ko_KR: EnTranslations = {
         "name": "알드릭 수사",
         "title": "계곡의 사제",
         "greeting": "예배당 묘지에서 세상의 지붕까지... 흔적은 여기서 끝납니다. 산이 듣고 있음을 느낍니다."
+      },
+      "archivist_maelin_emberward": {
+        "name": "잔불지기 기록관 메일린",
+        "title": "용광로 기록관",
+        "greeting": "이곳의 망치 자국 하나하나가 하나의 문장이야. 발쿨이 숨기려 한 내용을 읽어 내는 것을 도와줘."
+      },
+      "archivist_maelin_ember_projection": {
+        "name": "마엘린의 잔불 투영체",
+        "title": "잔불 투영체",
+        "greeting": "잔불이 마엘린의 목소리를 대장간 깊숙이 전합니다."
       },
       "brother_halven": {
         "name": "브라더 할벤",
@@ -15723,6 +15806,39 @@ export const ko_KR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "니트락시스 처치"
+          }
+        }
+      },
+      "q_ignivar_echoes_in_iron": {
+        "title": "철 속의 메아리",
+        "text": "이 자동 기계들은 병사가 아니라 시작품이야. 각 조립 라인을 부수고 마지막 껍질이 쓰러질 때 귀를 기울여. 대장간은 발쿨이 지우려 한 것을 기억하고 있어.",
+        "completion": "메아리는 모두 일치해. 발쿨은 죽어 가는 마지막 샘의 물을 살아 있는 금속에 묶었어. 이 자동 기계들은 실패한 단련작이었지. 오직 이그니바르만 견뎌 냈어.",
+        "objectives": {
+          "0": {
+            "label": "잔불 감시자 파괴"
+          },
+          "1": {
+            "label": "용광로 수호자 파괴"
+          }
+        }
+      },
+      "q_ignivar_heralds_heart": {
+        "title": "선구자의 심장",
+        "text": "모든 메아리가 유일한 생존자 이그니바르를 가리켜. 발쿨은 그를 선구자이자 봉인이며 열쇠라고 불렀지. 그를 쓰러뜨려. 기록이 사실이라면 그의 죽음이 무엇을 지키도록 벼려졌는지 밝혀 줄 거야.",
+        "completion": "이그니바르는 단순한 수호자가 아니었어. 그의 심장이 바로 열쇠였고, 마지막 갑주 판이 아래에 봉인된 용광로를 열었어.",
+        "objectives": {
+          "0": {
+            "label": "이그니바르 처치"
+          }
+        }
+      },
+      "q_ignivar_the_forgefather": {
+        "title": "대장장이",
+        "text": "아래로 이어진 길은 마지막 불꽃의 대장장이 발쿨에게 이어져. 그는 금속에 생명을 불어넣으려 마지막 샘을 가두고, 그 죄를 봉인하려 이그니바르를 단조했어. 내부 용광로에 들어가 그의 일을 끝내.",
+        "completion": "마침내 대장간이 조용해졌어. 샘은 다시 회복되지 못할지도 모르지만, 발쿨이 다시 생명을 사슬로 빚을 일은 없을 거야.",
+        "objectives": {
+          "0": {
+            "label": "발쿨 처치"
           }
         }
       },
@@ -17602,6 +17718,26 @@ export const ko_KR: EnTranslations = {
         "name": "니트락시스 공격대 투기장",
         "enterText": "봉인된 왕실 문을 지나갑니다.",
         "leaveText": "쏜피크의 차가운 공기 속으로 돌아옵니다."
+      },
+      "ignivar_forge_approach": {
+        "name": "첫 단련의 회랑",
+        "enterText": "첫 단련의 회랑에 망치질 소리가 울려 퍼집니다.",
+        "leaveText": "첫 번째 대장간에서 벗어나 다시 한번 자유롭게 숨을 쉽니다."
+      },
+      "ignivar_raid_arena": {
+        "name": "마지막 샘의 도가니",
+        "enterText": "도가니의 봉인된 물 위로 열기가 아른거립니다.",
+        "leaveText": "도가니를 벗어나 다시 편히 숨을 쉽니다."
+      },
+      "ignivar_molten_assembly": {
+        "name": "용융 조립장",
+        "enterText": "열린 문 너머로 용융 조립 홀이 이어집니다.",
+        "leaveText": "조립 라인을 떠나 도가니로 돌아갑니다."
+      },
+      "ignivar_inner_crucible": {
+        "name": "내부 용광로",
+        "enterText": "열린 문이 용광로의 더 깊은 곳으로 이어집니다.",
+        "leaveText": "용광로의 고요한 깊은 곳을 떠납니다."
       },
       "wildheart_basin": {
         "name": "야생심장 분지",

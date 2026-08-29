@@ -2453,7 +2453,57 @@ export const ja_JP: EnTranslations = {
       "leather": "革",
       "mail": "鎖"
     },
+    "varkhulCallout": {
+      "leftPillarCharging": "左の鍛冶柱が充填中。3秒後に点火する！",
+      "rightPillarCharging": "右の鍛冶柱が充填中。3秒後に点火する！",
+      "bothPillarsCharging": "鍛冶柱が充填中。3秒後に点火する！",
+      "artificerApproaches": "灰燼の技工士が鍛冶炉へ近づいている！",
+      "leftPillar": "左の鍛冶柱が点火した！",
+      "rightPillar": "右の鍛冶柱が点火した！",
+      "bothPillars": "鍛冶柱が点火した！",
+      "portalsOpening": "鍛冶炉のポータルが開き始めた！",
+      "heat75": "鍛冶炉の熱が75%に達した！",
+      "heat90": "鍛冶炉メルトダウンが迫っている！",
+      "addsDefeated": "鍛冶軍団を倒した。ヴァークルが無防備になった！",
+      "worldfireBegins": "世界炎が部屋の外縁で燃え上がる。42秒後にるつぼ全体が炎に包まれる！",
+      "worldfireClosing": "世界炎が迫っている。中央へ移動せよ！",
+      "worldfireConsumed": "るつぼ全体が炎に包まれた！"
+    },
+    "varkhulWaveStatus": "ウェーブ {wave}/{waves} | 敵: {remaining}",
+    "raidBossGuide": {
+      "title": "ボス攻略",
+      "button": "攻略: {boss}",
+      "subtitle": "{boss} | 通常・英雄",
+      "close": "ボス攻略を閉じる",
+      "ignivar": {
+        "brand": "火葬の印: 散開する。灼熱の奔流を使用可能な水路へ向け、一人で水を渡って解除する。",
+        "movement": "移動: 灰の雨の扇形と隕石を避け、回転する業火に合わせて動き、鍛冶波の二つの隙間を使う。",
+        "apocalypse": "黙示録: 詠唱が終わる前にイグニヴァル・アッシュコーラーを倒す。",
+        "judgment": "鍛冶場の審判: 予告中に異なる避難所を見分け、床が燃えたら表示された境界内に集合する。",
+        "finale": "最後の業火: 加速した隕石、前方攻撃、回転する業火に対処しながら全滅前にイグニヴァルを倒す。",
+        "heroic": "英雄: 鍛冶の鎖ではペア同士が近くに留まり、審判中も印が残り、鍛冶波はプレイヤーをさらに遠くへ押し出す。"
+      },
+      "varkhul": {
+        "tanks": "タンク: 創造者の印が2スタックで交代し、ヴァークルを近接範囲に保つ。",
+        "orbs": "灰のオーブ: 対象者は部屋の外周へ散開する。炎の床は残り、放たれたオーブは部屋を横切る。",
+        "pyre": "共有の火葬: 赤熱した金属がない対象だけを選ぶ。難易度に関係なく、移動する円内に4人で集合する。1人不足するごとに、レイド全体が最大体力の15%のダメージを受ける。",
+        "forgestorm": "鍛冶嵐: 落下する隕石を確認し、3波それぞれが着弾する前に表示された範囲から離れる。",
+        "anvil": "金床の布告: ヴァークルは大鍛冶炉へ移動し、3回打って全体ダメージを与える。英雄では表示付き隕石も落ちる。",
+        "ray": "焼き入れ光線: 長い予告が終わる前に別のプレイヤー、通常はタンクが動く光線を遮る。被弾者は焼き入れの傷を受ける。",
+        "forge": "炉の柱: 光線が炉に届く前に遮り、るつぼの曝露が増えたら担当を交代する。熱が満杯になると炉が崩壊する。",
+        "assembly": "師匠の組立: 両方の炉光線を遮り、全ポータル波を倒し、るつぼの地震を中断し、灰の技工士の回復を止める。",
+        "worldfire": "世界炎: 英雄の最終段階では炎の外周が中央へ迫る。るつぼ全体が燃える前にヴァークルを倒す。",
+        "heroic": "英雄: 炉の熱は下がらず、金床の布告に隕石が加わり、最終段階は世界炎に集中する。"
+      }
+    },
     "auraEffect": {
+      "sharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。",
+      "varkhulSharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。不足しているプレイヤー1人につき、サークル内を含むレイド全体が最大体力の{missingPenalty}%のダメージを受ける。",
+      "makersBrand": "{duration}秒間、1スタックごとにヴァルクルから受けるダメージが{pct}%増加する。最大{max}スタック。タンクは{swap}スタックで交代すること。",
+      "varkhulSentinelsGaze": "残り火の番兵に追われている。倒すまでレイドから離しておくこと。",
+      "varkhulMoltenCore": "このコアを炉へ運ぶ。溶融の重荷は{interval}秒ごとに最大体力の{min}%から{max}%まで増加するダメージを与える。",
+      "varkhulForgeLink": "作動中の柱の光線が鍛冶炉に届く前に遮断する。未遮断の光線は1秒ごとに熱を6%上昇させる。ノーマルでは遮断中と柱の停止中に冷却されるが、ヒロイックでは熱は下がらない。100%で致命的な鍛冶炉メルトダウンが発生する。",
+      "varkhulCrucibleExposure": "るつぼの光線を遮断すると、1秒ごとに最大体力基準のダメージが増加する。スタックはノーマルでは光線を離れて10秒後、ヒロイックでは60秒後にリセットされる。",
       "dot": "{interval}秒ごとに{value}の{school}ダメージを与える",
       "hot": "{interval}秒ごとに体力を{value}回復する",
       "mendingCurrent": "{value}の回復量を蓄え、時間経過または流転の癒しで消費して解放する",
@@ -8627,6 +8677,8 @@ export const ja_JP: EnTranslations = {
         "riftEntrance": "リフト入口：{name}",
         "hostileEnemy": "敵対対象",
         "aggressiveEnemy": "あなたを攻撃中の敵",
+        "bossEnemy": "ボス：{name}",
+        "bossAggressiveEnemy": "あなたを攻撃中のボス：{name}",
         "lootableEnemy": "戦利品を回収できる敵",
         "corpse": "自分の死体",
         "deathZone": "危険地帯",
@@ -13918,6 +13970,27 @@ export const ja_JP: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "ナイスラクシス、ソーンピークの災厄"
       },
+      "ignivar_herald_of_the_last_flame": {
+        "name": "イグニヴァル、最後の炎の先触れ"
+      },
+      "ignivar_heart_of_the_end": {
+        "name": "イグニヴァル・アッシュコーラー"
+      },
+      "ignivar_ember_sentinel": {
+        "name": "残り火の番兵"
+      },
+      "ignivar_crucible_warden": {
+        "name": "るつぼの守護者"
+      },
+      "ignivar_cinder_artificer": {
+        "name": "火の粉の技工士"
+      },
+      "varkhul_forgefather_of_the_last_flame": {
+        "name": "最後の炎の鍛造父、ヴァルクル"
+      },
+      "derelict_mech": {
+        "name": "朽ちた機械兵"
+      },
       "reliquary_ledger_wraith": {
         "name": "台帳の亡霊"
       },
@@ -14577,6 +14650,16 @@ export const ja_JP: EnTranslations = {
         "name": "アルドリック修道士",
         "title": "谷の司祭",
         "greeting": "礼拝堂の墓地から世界の屋根まで... 足跡はここで終わります。山が耳を澄ませているのを感じます。"
+      },
+      "archivist_maelin_emberward": {
+        "name": "残り火守りの記録官メイリン",
+        "title": "るつぼの記録官",
+        "greeting": "ここに残る槌の跡は、どれも一つの文だ。ヴァルクルが隠そうとしたことを読み解くのを手伝ってくれ。"
+      },
+      "archivist_maelin_ember_projection": {
+        "name": "メイリンの残り火の投影",
+        "title": "残り火の投影",
+        "greeting": "残り火がメイリンの声を鍛冶場の奥へと届ける。"
       },
       "brother_halven": {
         "name": "ハルヴェン修道士",
@@ -15723,6 +15806,39 @@ export const ja_JP: EnTranslations = {
         "objectives": {
           "0": {
             "label": "ニスラクシスを撃破"
+          }
+        }
+      },
+      "q_ignivar_echoes_in_iron": {
+        "title": "鉄に響く記憶",
+        "text": "この自動人形たちは兵士ではない。試作品だ。各組立ラインを破壊し、最後の殻が倒れた時に耳を澄ませ。ヴァルクルが消そうとした記憶を、鍛冶場は覚えている。",
+        "completion": "響きはすべて一致している。ヴァルクルは枯れゆく最後の泉の水を生ける金属に縛りつけた。この自動人形たちは失敗作だった。耐え抜いたのはイグニヴァルだけだ。",
+        "objectives": {
+          "0": {
+            "label": "残り火の番兵を破壊"
+          },
+          "1": {
+            "label": "るつぼの守護者を破壊"
+          }
+        }
+      },
+      "q_ignivar_heralds_heart": {
+        "title": "先触れの心臓",
+        "text": "すべての響きが唯一の生存者、イグニヴァルを指している。ヴァルクルは彼を先触れ、封印、鍵と呼んだ。彼を倒せ。記録が正しければ、その死が彼の守るために鍛えられたものを明らかにする。",
+        "completion": "イグニヴァルは単なる守護者ではなかった。彼の心臓こそが鍵であり、最後の装甲板が下の封じられたるつぼを開いた。",
+        "objectives": {
+          "0": {
+            "label": "イグニヴァルを倒す"
+          }
+        }
+      },
+      "q_ignivar_the_forgefather": {
+        "title": "鍛造父",
+        "text": "下へ続く道の先には、最後の炎の鍛造父ヴァルクルがいる。彼は金属に命を与えるため最後の泉を幽閉し、その罪を封じるためイグニヴァルを鍛えた。内部るつぼに入り、彼の所業に終止符を打て。",
+        "completion": "ついに炉が静まった。泉は二度と元に戻らないかもしれない。しかしヴァルクルが命を再び鏖に鍛えることはない。",
+        "objectives": {
+          "0": {
+            "label": "ヴァルクルを倒す"
           }
         }
       },
@@ -17602,6 +17718,26 @@ export const ja_JP: EnTranslations = {
         "name": "ナイスラクシスのレイドアリーナ",
         "enterText": "封印された王家の扉を通り抜けます。",
         "leaveText": "ソーンピークの冷たい空気へ戻ります。"
+      },
+      "ignivar_forge_approach": {
+        "name": "最初の鍛造の大広間",
+        "enterText": "槌音が最初の鍛造の大広間に響き渡る。",
+        "leaveText": "最初の炉から離れ、再び自由に息をつく。"
+      },
+      "ignivar_raid_arena": {
+        "name": "最後の泉のるつぼ",
+        "enterText": "るつぼの封じられた水面に熱気が揺らめいています。",
+        "leaveText": "るつぼを離れ、再び自由に息をつきます。"
+      },
+      "ignivar_molten_assembly": {
+        "name": "溶融組立場",
+        "enterText": "開いた門の先には、灼熱の組立ホールが続いている。",
+        "leaveText": "組立ラインを離れ、るつぼへ戻る。"
+      },
+      "ignivar_inner_crucible": {
+        "name": "内部るつぼ",
+        "enterText": "開かれた門はるつぼのさらなる深部へ続いている。",
+        "leaveText": "るつぼの静まり返った深部を後にする。"
       },
       "wildheart_basin": {
         "name": "ワイルドハート盆地",

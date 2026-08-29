@@ -128,7 +128,46 @@ export type {
 // ferry lane), the Copper Dig cluster moves northeast past Mirror Lake onto
 // the Mirefen road, and the harbor-town plat's basin lobes and grading stamps
 // land where the Sowfield stood. (8 on the pre-merge eastbrook branch.)
-export const ONLINE_WORLD_LAYOUT_VERSION = 9 as const;
+// 11 = Varkhul's Forge Links became ten individual room runes with concentric
+// movement controls. Mixed binaries disagree about actionable raid instructions,
+// so they must fail closed before entering the world.
+// 12 = Heroic Forge Links added orphaned-rune rescue state and neighbor signals.
+// Older clients cannot render who is authorized to rescue an orphan.
+// 13 = Forge Links became one five-track rune loom with moving controls, two
+// waves on both difficulties, and explicit Normal/Heroic wire identity. Older
+// clients would render ten overlapping stations and give unsafe instructions.
+// 14 = Forge Links returned to ten separate room stations while retaining the
+// moving controls and two-wave flow. Epoch 13 clients would stack every rune at
+// one shared center and present the wrong interaction geometry.
+// 15 = Forge Links added two authoritative crucible beams, blocker endpoints,
+// forge overheat, and Forge Meltdown. Epoch 14 clients cannot show or react to
+// those lethal signals, so mixed binaries must fail closed.
+// 16 = Forge Links removed the rune interface and became persistent crucible
+// pillars plus timed beam windows, forge heat and portal add waves. Epoch 15
+// clients would still render obsolete runes and hide inactive pillar hardware.
+// 17 = Varkhul added an authoritative moving Tempering Ray with a first-body
+// interceptor. Epoch 16 clients cannot render its lethal line or safe blocker.
+// 18 = Varkhul enlarged Cinder Orb fire from 2.4 to 3.5 yards. The persistent
+// fire radius is authoritative, but the four-second player warning is compiled
+// into the client, so epoch 17 clients would preview a dangerously smaller area.
+// 19 = Heroic Varkhul added Worldfire, a compiled six-stage room-filling fire
+// wall. Epoch 18 clients would take lethal damage from bands they cannot see.
+// 20 = Varkhul's compiled Forgefather's Sweep footprint grew from 30 yards and
+// 120 degrees to 42 yards and 140 degrees. Epoch 19 clients would display a
+// dangerously smaller warning than the authoritative server damage.
+// 21 = The Ignivar raid gained Molten Assembly as a compiled fourth room and
+// Varkhul's Assembly gained authoritative wave/enemy counters. Epoch 20 clients
+// do not know the new route or enough state to present its add phase safely.
+// 22 = Ignivar's compiled arena floor gained a lowered lethal lava perimeter
+// whose exact 4x4 stone-tile union and bridge footprint are shared by movement,
+// damage and rendering. Epoch 21 clients would render and stand on the old full
+// floor while the server burns and lowers the new perimeter.
+// 23 = Ignivar's compiled Rain of Cinders cone length grew from 24 to 30 yards.
+// Epoch 22 clients would display a dangerously shorter warning than the
+// authoritative server damage.
+// (11 through 20 were numbered 9 through 18 on the pre-merge raid branch,
+// which forked before the Eastbrook program bumps above.)
+export const ONLINE_WORLD_LAYOUT_VERSION = 23 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI
@@ -176,7 +215,13 @@ export { isOverheadEmoteId, OVERHEAD_EMOTES } from './world_api/chat';
 export type {
   ActiveConsecration,
   ActiveFrostRing,
+  ActiveIgnivarMeteorWarning,
   ActiveTemporalHourglass,
+  ActiveVarkhulAnvilMeteorWarning,
+  ActiveVarkhulAssembly,
+  ActiveVarkhulCinderFire,
+  ActiveVarkhulCinderOrbProjectile,
+  ActiveVarkhulForgestormWarning,
 } from './world_api/combat';
 export type { AccountCosmetics } from './world_api/cosmetics';
 export type {

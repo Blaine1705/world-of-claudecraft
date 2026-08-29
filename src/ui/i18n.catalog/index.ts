@@ -171,7 +171,8 @@ export const en = {
       },
       biskit: {
         label: 'Equip BIS-20 kit',
-        description: 'Wear the best-in-slot epic set for a spec across every slot. Gear only.',
+        description:
+          'Wear the strongest complete raid-parse loadout observed for a spec. Gear only.',
       },
       gold: { label: 'Add gold', description: 'Add gold to the current purse.' },
       quest: { label: 'Complete quest', description: 'Complete a specific quest by id.' },

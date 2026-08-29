@@ -38,6 +38,7 @@ import {
 import { MOUNT_RACE_START_PLATFORM, type MountKey } from '../src/sim/content/mounts';
 import { COMBO_RECIPES } from '../src/sim/content/recipes';
 import { BUILTIN_WORLD, DELVES, GATHER_NODES, ITEMS, MOBS } from '../src/sim/data';
+import { IGNIVAR_JUDGMENT_CAST_ID } from '../src/sim/encounters/ignivar';
 import { createMob } from '../src/sim/entity';
 import { emptySaleLog } from '../src/sim/market_sale_log';
 import { MOUNT_RACE_COUNTDOWN_TICKS } from '../src/sim/mount_race';
@@ -46,6 +47,10 @@ import { livePlaytimeSeconds } from '../src/sim/playtime';
 import { noteRelicItemFind, noteRelicObtain } from '../src/sim/reliquary';
 import { Sim } from '../src/sim/sim';
 import { type Aura, DT, type PlayerClass, type WorldContent } from '../src/sim/types';
+import {
+  VARKHUL_SHARED_PYRE_AURA_ID,
+  VARKHUL_SHARED_PYRE_NAME,
+} from '../src/sim/varkhul_shared_pyre';
 import { terrainHeight } from '../src/sim/world';
 import { absorbTotal } from '../src/ui/absorb_bar';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
@@ -2555,7 +2560,10 @@ describe('client-side delta merge', () => {
       (client as any).applySnapshot(snap);
     };
     apply();
-    const mirrored = client.entities.get(e.id)!.auras.find((a) => a.id === 'fear_incap')!;
+    const mirroredEntity = client.entities.get(e.id);
+    if (!mirroredEntity) throw new Error('mirrored entity missing');
+    const mirrored = mirroredEntity.auras.find((a) => a.id === 'fear_incap');
+    if (!mirrored) throw new Error('mirrored fear aura missing');
     expect(mirrored.breakThreshold).toBe(1);
 
     fearAura.breakThreshold = undefined;
@@ -5512,7 +5520,10 @@ describe('aura magnitude over the wire (buff/debuff tooltip parity)', () => {
     // the in-memory wire shape.
     const snap = JSON.parse(JSON.stringify({ t: 'snap', ents: [wire] }));
     (client as any).applySnapshot(snap);
-    const mirror = client.entities.get(pid)!.auras.find((a) => a.id === aura.id)!;
+    const mirrorEntity = client.entities.get(pid);
+    if (!mirrorEntity) throw new Error('mirrored entity missing');
+    const mirror = mirrorEntity.auras.find((a) => a.id === aura.id);
+    if (!mirror) throw new Error(`mirrored ${aura.id} aura missing`);
     return { wire, mirror };
   }
 
@@ -5722,13 +5733,19 @@ describe('aura magnitude over the wire (buff/debuff tooltip parity)', () => {
     });
     const client = bareClient(999);
     (client as any).applySnapshot(JSON.parse(JSON.stringify({ t: 'snap', ents: [wireEntity(e)] })));
-    const armed = client.entities.get(pid)!.auras.find((a) => a.id === 'fear_incap')!;
+    const armedEntity = client.entities.get(pid);
+    if (!armedEntity) throw new Error('armed entity missing');
+    const armed = armedEntity.auras.find((a) => a.id === 'fear_incap');
+    if (!armed) throw new Error('armed fear aura missing');
     expect(armed.breakThreshold).not.toBeUndefined();
 
     // Same aura identity, threshold gone: the in-place arm must CLEAR it.
     e.auras[e.auras.length - 1].breakThreshold = undefined;
     (client as any).applySnapshot(JSON.parse(JSON.stringify({ t: 'snap', ents: [wireEntity(e)] })));
-    const mirrored = client.entities.get(pid)!.auras.find((a) => a.id === 'fear_incap')!;
+    const mirroredEntity = client.entities.get(pid);
+    if (!mirroredEntity) throw new Error('mirrored entity missing');
+    const mirrored = mirroredEntity.auras.find((a) => a.id === 'fear_incap');
+    if (!mirrored) throw new Error('mirrored fear aura missing');
     // The fast path updates the SAME record object; assert both the clear
     // and the reuse, so this pin cannot silently slide onto the fresh-array
     // arm if the shape check ever changes.
@@ -5779,7 +5796,10 @@ describe('aura magnitude over the wire (buff/debuff tooltip parity)', () => {
         },
       ],
     });
-    const mirror = client.entities.get(2)!.auras.find((a) => a.kind === 'buff_int')!;
+    const mirrorEntity = client.entities.get(2);
+    if (!mirrorEntity) throw new Error('mirrored entity missing');
+    const mirror = mirrorEntity.auras.find((a) => a.kind === 'buff_int');
+    if (!mirror) throw new Error('mirrored buff_int aura missing');
     expect(mirror.value).toBe(0);
   });
 });
@@ -6185,6 +6205,537 @@ describe('Consecration snapshot parity', () => {
         r: 8,
         dur: 9,
         rem: 6.5,
+      }),
+    ]);
+  });
+});
+
+describe('Ignivar raid actionable reconnect state', () => {
+  it('rebuilds and clears Forge Judgment from the authoritative boss cast snapshot', () => {
+    const boss = createMob(
+      9900,
+      MOBS.ignivar_herald_of_the_last_flame,
+      MOBS.ignivar_herald_of_the_last_flame.maxLevel,
+      { x: 3, y: 0, z: 5 },
+    );
+    boss.castingAbility = IGNIVAR_JUDGMENT_CAST_ID;
+    boss.castTotal = 10;
+    boss.castRemaining = 8;
+    boss.channeling = false;
+    boss.facing = 1.25;
+    const client = bareClient(1);
+
+    (client as unknown as SnapshotApplier).applySnapshot({
+      t: 'snap',
+      ents: [JSON.parse(JSON.stringify(wireEntity(boss)))],
+    });
+
+    expect(client.entities.get(boss.id)).toMatchObject({
+      castingAbility: IGNIVAR_JUDGMENT_CAST_ID,
+      castTotal: 10,
+      castRemaining: 8,
+      channeling: false,
+      facing: 1.25,
+    });
+
+    boss.castRemaining = 4;
+    boss.channeling = true;
+    (client as unknown as SnapshotApplier).applySnapshot({
+      t: 'snap',
+      ents: [JSON.parse(JSON.stringify(wireEntity(boss)))],
+    });
+    expect(client.entities.get(boss.id)).toMatchObject({
+      castingAbility: IGNIVAR_JUDGMENT_CAST_ID,
+      castRemaining: 4,
+      channeling: true,
+    });
+
+    boss.castingAbility = null;
+    boss.castTotal = 0;
+    boss.castRemaining = 0;
+    boss.channeling = false;
+    (client as unknown as SnapshotApplier).applySnapshot({
+      t: 'snap',
+      ents: [JSON.parse(JSON.stringify(wireEntity(boss)))],
+    });
+    expect(client.entities.get(boss.id)).toMatchObject({
+      castingAbility: null,
+      castTotal: 0,
+      castRemaining: 0,
+      channeling: false,
+    });
+  });
+
+  it('rebuilds and clears the Shared Pyre target mark after reconnect', () => {
+    const sim = new Sim({ seed: 9900, playerClass: 'priest', world: WIRE_TEST_WORLD });
+    sim.player.auras.push({
+      id: VARKHUL_SHARED_PYRE_AURA_ID,
+      name: VARKHUL_SHARED_PYRE_NAME,
+      kind: 'vulnerability',
+      remaining: 4.5,
+      duration: 6,
+      value: 0,
+      value2: 2,
+      stacks: 4,
+      sourceId: 9901,
+      school: 'fire',
+      encounterOwned: true,
+    });
+    const client = bareClient(999);
+
+    (client as unknown as SnapshotApplier).applySnapshot({
+      t: 'snap',
+      ents: [JSON.parse(JSON.stringify(wireEntity(sim.player)))],
+    });
+
+    expect(client.entities.get(sim.player.id)?.auras).toContainEqual(
+      expect.objectContaining({
+        id: VARKHUL_SHARED_PYRE_AURA_ID,
+        remaining: 4.5,
+        duration: 6,
+        value2: 2,
+        stacks: 4,
+        sourceId: 9901,
+      }),
+    );
+
+    sim.player.auras = [];
+    (client as unknown as SnapshotApplier).applySnapshot({
+      t: 'snap',
+      ents: [JSON.parse(JSON.stringify(wireEntity(sim.player)))],
+    });
+    expect(
+      client.entities
+        .get(sim.player.id)
+        ?.auras.some((aura) => aura.id === VARKHUL_SHARED_PYRE_AURA_ID),
+    ).toBe(false);
+  });
+});
+
+describe('Ignivar meteor snapshot parity', () => {
+  it('rebuilds active warnings after reconnect and clears them after impact', () => {
+    const client = bareClient(1);
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [],
+      ignivarMeteors: [{ id: '77:912:0', x: 3, z: 5, r: 2.4, dur: 2.5, rem: 1.4, lead: 0.75 }],
+    });
+    expect(client.activeIgnivarMeteors).toEqual([
+      {
+        id: '77:912:0',
+        x: 3,
+        z: 5,
+        radius: 2.4,
+        duration: 2.5,
+        remaining: 1.4,
+        warningLead: 0.75,
+      },
+    ]);
+
+    (client as any).applySnapshot({ t: 'snap', ents: [] });
+    expect(client.activeIgnivarMeteors).toEqual([]);
+  });
+
+  it('rejects malformed warning rows and clamps remaining time to duration', () => {
+    const client = bareClient(1);
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [],
+      ignivarMeteors: [
+        null,
+        'primitive-row',
+        { id: 'valid', x: 3, z: 5, r: 2.4, dur: 2.5, rem: 9, lead: 0 },
+        { id: 'expired', x: 3, z: 5, r: 2.4, dur: 2.5, rem: 0, lead: 0.75 },
+        { id: 'bad-lead', x: 3, z: 5, r: 2.4, dur: 2.5, rem: 1, lead: 2.5 },
+        { id: 77, x: 3, z: 5, r: 2.4, dur: 2.5, rem: 1, lead: 0.75 },
+        { id: 'bad-coordinate', x: Number.NaN, z: 5, r: 2.4, dur: 2.5, rem: 1, lead: 0.75 },
+        { id: 'bad-radius', x: 3, z: 5, r: 0, dur: 2.5, rem: 1, lead: 0.75 },
+        { id: 'bad-duration', x: 3, z: 5, r: 2.4, dur: 0, rem: 1, lead: 0.75 },
+      ],
+    });
+
+    expect(client.activeIgnivarMeteors).toEqual([
+      {
+        id: 'valid',
+        x: 3,
+        z: 5,
+        radius: 2.4,
+        duration: 2.5,
+        remaining: 2.5,
+        warningLead: 0,
+      },
+    ]);
+  });
+
+  it('interest-scopes active warnings with their authoritative remaining lifetime', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Cinderwire', 'mage');
+    const player = server.sim.entities.get(session.pid)!;
+    const boss = createMob(
+      9901,
+      MOBS.ignivar_herald_of_the_last_flame,
+      MOBS.ignivar_herald_of_the_last_flame.maxLevel,
+      { x: player.pos.x + 4, y: player.pos.y, z: player.pos.z },
+    );
+    boss.ignivar = {
+      meteorCastKey: 912,
+      meteorImpactRemaining: 1.4,
+      meteorPoints: [
+        { x: player.pos.x + 5, z: player.pos.z },
+        { x: player.pos.x + 100, z: player.pos.z },
+      ],
+    } as NonNullable<typeof boss.ignivar>;
+    server.sim.entities.set(boss.id, boss);
+
+    broadcast(server);
+
+    expect(lastSnap(fc.sent).ignivarMeteors).toEqual([
+      expect.objectContaining({ id: `${boss.id}:912:0`, r: 2.4, dur: 2.5, rem: 1.4, lead: 0.75 }),
+    ]);
+  });
+});
+
+describe('Varkhul Forgestorm snapshot parity', () => {
+  it('rebuilds active warnings after reconnect, clamps lifetime, and rejects malformed rows', () => {
+    const client = bareClient(1);
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [],
+      varkhulForgestorm: [
+        {
+          id: 'varkhul-forgestorm:9901:1:0:0',
+          sourceId: 9901,
+          x: 3,
+          z: 5,
+          r: 4,
+          dur: 2.5,
+          rem: 9,
+          lead: 0,
+        },
+        { id: 4, sourceId: 9901, x: 3, z: 5, r: 4, dur: 2.5, rem: 1, lead: 0 },
+        { id: 'bad', sourceId: 'bad', x: 3, z: 5, r: 4, dur: 2.5, rem: 1, lead: 0 },
+        { id: 'bad:2', sourceId: 9901, x: Number.NaN, z: 5, r: 4, dur: 2.5, rem: 1, lead: 0 },
+        { id: 'bad:3', sourceId: 9901, x: 3, z: Number.NaN, r: 4, dur: 2.5, rem: 1, lead: 0 },
+        { id: 'bad:4', sourceId: 9901, x: 3, z: 5, r: 0, dur: 2.5, rem: 1, lead: 0 },
+        { id: 'bad:5', sourceId: 9901, x: 3, z: 5, r: 4, dur: 0, rem: 1, lead: 0 },
+        { id: 'bad:6', sourceId: 9901, x: 3, z: 5, r: 4, dur: 2.5, rem: 0, lead: 0 },
+        { id: 'bad:7', sourceId: 9901, x: 3, z: 5, r: 4, dur: 2.5, rem: 1, lead: -1 },
+      ],
+    });
+
+    expect(client.activeVarkhulForgestormWarnings).toEqual([
+      {
+        id: 'varkhul-forgestorm:9901:1:0:0',
+        sourceId: 9901,
+        x: 3,
+        z: 5,
+        radius: 4,
+        duration: 2.5,
+        remaining: 2.5,
+        warningLead: 0,
+      },
+    ]);
+
+    (client as any).applySnapshot({ t: 'snap', ents: [] });
+    expect(client.activeVarkhulForgestormWarnings).toEqual([]);
+  });
+
+  it('interest-scopes active warnings with stable meteor ids and authoritative time', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Forgewire', 'warrior');
+    const player = server.sim.entities.get(session.pid)!;
+    const boss = createMob(
+      9902,
+      MOBS.varkhul_forgefather_of_the_last_flame,
+      MOBS.varkhul_forgefather_of_the_last_flame.maxLevel,
+      { x: player.pos.x + 4, y: player.pos.y, z: player.pos.z },
+    );
+    boss.varkhul = {
+      forgestormCastKey: 7,
+      forgestormWaveIndex: 1,
+      forgestormWarningRemaining: 1.4,
+      cinderFires: [],
+      cinderOrbProjectiles: [],
+      forgestormPoints: [
+        { x: player.pos.x + 5, y: player.pos.y, z: player.pos.z },
+        { x: player.pos.x + 100, y: player.pos.y, z: player.pos.z },
+      ],
+    } as unknown as NonNullable<typeof boss.varkhul>;
+    server.sim.entities.set(boss.id, boss);
+
+    broadcast(server);
+
+    expect(lastSnap(fc.sent).varkhulForgestorm).toEqual([
+      expect.objectContaining({
+        id: `varkhul-forgestorm:${boss.id}:7:1:0`,
+        sourceId: boss.id,
+        r: 4,
+        dur: 2.5,
+        rem: 1.4,
+        lead: 0,
+      }),
+    ]);
+  });
+});
+
+describe('Varkhul Cinder Orbs snapshot parity', () => {
+  it('rebuilds Heroic meteors and all ten individual rune stations after reconnect', () => {
+    const client = bareClient(1);
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [],
+      varkhulAnvilMeteors: [{ id: 'meteor:1', x: 3, z: 5, r: 3.5, dur: 1.8, rem: 1.2, lead: 0 }],
+      varkhulAssemblies: [
+        {
+          bossId: 7,
+          hc: 1,
+          phase: 'links',
+          fx: 10,
+          fz: 20,
+          hp: 0,
+          mhp: 100,
+          oh: 0.42,
+          bw: 2.25,
+          mr: 0,
+          beams: [
+            { i: 0, cx: -18, cz: 20, ix: -8, iz: 20, bid: 1 },
+            { i: 1, cx: 38, cz: 20, ix: 10, iz: 20, bid: null },
+          ],
+          ib: {
+            sid: 7,
+            tid: 1,
+            bid: 4,
+            sx: 2,
+            sz: 4,
+            tx: 14,
+            tz: 20,
+            bx: 8,
+            bz: 12,
+            w: 1.35,
+            dur: 5,
+            rem: 2.25,
+          },
+          win: 0,
+          round: 1,
+          rounds: 2,
+          rem: 18,
+          cores: [],
+          assign: [{ pid: 1, sym: 2, lock: 0 }],
+          runes: Array.from({ length: 10 }, (_, sym) => ({
+            sym,
+            x: sym === 2 ? 14 : sym,
+            z: sym === 2 ? 24 : -sym,
+            r: 3.3,
+            ti: sym,
+            tr: 3,
+            oa: Math.PI / 10 + (sym * Math.PI) / 5,
+            ta: sym === 2 ? 1.2 : 0,
+            ga: sym === 2 ? 1.25 : 1,
+            c: sym === 2 ? 2 : 0,
+            cp: sym === 2 ? 0.5 : 0,
+            ap: 0,
+            al: 0,
+            lock: 0,
+          })),
+        },
+      ],
+    });
+
+    expect(client.activeVarkhulAnvilMeteors).toEqual([
+      expect.objectContaining({ id: 'meteor:1', radius: 3.5, remaining: 1.2 }),
+    ]);
+    expect(client.activeVarkhulAssemblies).toEqual([
+      expect.objectContaining({
+        bossId: 7,
+        difficulty: 'heroic',
+        phase: 'links',
+        forgeOverheat: 0.42,
+        forgeBeamWarmupRemaining: 2.25,
+        round: 1,
+        rounds: 2,
+      }),
+    ]);
+    expect(client.activeVarkhulAssemblies[0].runes).toHaveLength(10);
+    expect(client.activeVarkhulAssemblies[0].forgeBeams).toEqual([
+      expect.objectContaining({ index: 0, blockerId: 1, blocked: true }),
+      expect.objectContaining({ index: 1, blockerId: null, blocked: false }),
+    ]);
+    expect(client.activeVarkhulAssemblies[0].interceptBeam).toEqual({
+      sourceId: 7,
+      targetId: 1,
+      blockerId: 4,
+      sourceX: 2,
+      sourceZ: 4,
+      targetX: 14,
+      targetZ: 20,
+      blockerX: 8,
+      blockerZ: 12,
+      width: 1.35,
+      duration: 5,
+      remaining: 2.25,
+    });
+    expect(client.activeVarkhulAssemblies[0].runes[2]).toMatchObject({
+      assignedPlayerId: 1,
+      trackIndex: 2,
+      trackRadius: 3,
+      control: 'clockwise',
+      controlProgress: 0.5,
+    });
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [],
+      varkhulAssemblies: [
+        {
+          bossId: 7,
+          hc: 1,
+          phase: 'done',
+          fx: 10,
+          fz: 20,
+          hp: 0,
+          mhp: 100,
+          oh: 1,
+          bw: 0,
+          mr: 4.5,
+          beams: [],
+          win: 0,
+          round: 1,
+          rounds: 2,
+          rem: 0,
+          cores: [],
+          assign: [],
+          runes: [],
+        },
+      ],
+    });
+    expect(client.activeVarkhulAssemblies).toEqual([
+      expect.objectContaining({
+        phase: 'done',
+        forgeOverheat: 1,
+        forgeMeltdownRemaining: 4.5,
+        forgeBeams: [],
+        interceptBeam: null,
+      }),
+    ]);
+    (client as any).applySnapshot({ t: 'snap', ents: [] });
+    expect(client.activeVarkhulAnvilMeteors).toEqual([]);
+    expect(client.activeVarkhulAssemblies).toEqual([]);
+  });
+
+  it('rebuilds permanent fires and traveling orbs after reconnect, then clears omissions', () => {
+    const client = bareClient(1);
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [],
+      varkhulCinderFires: [
+        {
+          id: '9901:cinder-fire:2:0',
+          sourceId: 9901,
+          x: 3,
+          z: 5,
+          r: 2.4,
+        },
+      ],
+      varkhulCinderOrbs: [
+        {
+          id: '9901:cinder-orbs:2:0:0',
+          sourceId: 9901,
+          x: 3,
+          z: 5,
+          dx: 1,
+          dz: 0,
+          r: 1.1,
+          dur: 5.5,
+          rem: 4,
+        },
+      ],
+    });
+
+    expect(client.activeVarkhulCinderFires).toEqual([
+      expect.objectContaining({ id: '9901:cinder-fire:2:0', radius: 2.4 }),
+    ]);
+    expect(client.activeVarkhulCinderOrbProjectiles).toEqual([
+      expect.objectContaining({
+        id: '9901:cinder-orbs:2:0:0',
+        radius: 1.1,
+        remaining: 4,
+        dirX: 1,
+        dirZ: 0,
+      }),
+    ]);
+    (client as any).applySnapshot({ t: 'snap', ents: [] });
+    expect(client.activeVarkhulCinderFires).toEqual([]);
+    expect(client.activeVarkhulCinderOrbProjectiles).toEqual([]);
+  });
+
+  it('interest-scopes authoritative Cinder fire and orb positions', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Cinderwire', 'warrior');
+    const player = server.sim.entities.get(session.pid)!;
+    const boss = createMob(
+      9903,
+      MOBS.varkhul_forgefather_of_the_last_flame,
+      MOBS.varkhul_forgefather_of_the_last_flame.maxLevel,
+      { x: player.pos.x + 4, y: player.pos.y, z: player.pos.z },
+    );
+    boss.varkhul = {
+      forgestormCastKey: 0,
+      forgestormWaveIndex: 0,
+      forgestormWarningRemaining: 0,
+      forgestormPoints: [],
+      cinderFires: [
+        {
+          id: `${boss.id}:cinder-fire:6:0`,
+          pos: { x: player.pos.x + 6, y: player.pos.y, z: player.pos.z },
+          tickTimer: 0.5,
+        },
+        {
+          id: `${boss.id}:cinder-fire:6:1`,
+          pos: { x: player.pos.x + 100, y: player.pos.y, z: player.pos.z },
+          tickTimer: 0.5,
+        },
+      ],
+      cinderOrbProjectiles: [
+        {
+          id: `${boss.id}:cinder-orbs:6:0:0`,
+          ownerId: player.id,
+          pos: { x: player.pos.x + 7, y: player.pos.y, z: player.pos.z },
+          dir: { x: 1, z: 0 },
+          remaining: 4,
+          hitPlayerIds: [player.id],
+        },
+        {
+          id: `${boss.id}:cinder-orbs:6:0:1`,
+          ownerId: player.id,
+          pos: { x: player.pos.x + 100, y: player.pos.y, z: player.pos.z },
+          dir: { x: -1, z: 0 },
+          remaining: 4,
+          hitPlayerIds: [player.id],
+        },
+      ],
+    } as unknown as NonNullable<typeof boss.varkhul>;
+    server.sim.entities.set(boss.id, boss);
+
+    broadcast(server);
+
+    expect(lastSnap(fc.sent).varkhulCinderFires).toEqual([
+      expect.objectContaining({
+        id: `${boss.id}:cinder-fire:6:0`,
+        sourceId: boss.id,
+        r: 3.5,
+      }),
+    ]);
+    expect(lastSnap(fc.sent).varkhulCinderOrbs).toEqual([
+      expect.objectContaining({
+        id: `${boss.id}:cinder-orbs:6:0:0`,
+        sourceId: boss.id,
+        dx: 1,
+        dz: 0,
+        r: 1.1,
+        dur: 5.5,
+        rem: 4,
       }),
     ]);
   });

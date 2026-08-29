@@ -3138,7 +3138,76 @@ export const hudChromeStrings = {
   // formatNumber as {value}/{pct}/{interval}/{stacks}/{min}/{max}; {school} is the
   // localized damage-school name (see schools below). Keys are produced by the pure
   // aura_effect.ts descriptor; render via t('hudChrome.auraEffect.<key>', values).
+  varkhulCallout: {
+    leftPillarCharging: 'The left forge pillar is charging. It will ignite in 3 sec!',
+    rightPillarCharging: 'The right forge pillar is charging. It will ignite in 3 sec!',
+    bothPillarsCharging: 'The forge pillars are charging. They will ignite in 3 sec!',
+    artificerApproaches: 'A Cinder Artificer is approaching the forge!',
+    leftPillar: 'The left forge pillar ignites!',
+    rightPillar: 'The right forge pillar ignites!',
+    bothPillars: 'The forge pillars ignite!',
+    portalsOpening: 'The forge portals are opening!',
+    heat75: 'The forge is at 75% heat!',
+    heat90: 'Forge Meltdown is imminent!',
+    addsDefeated: 'The forge legion is defeated: Varkhul is exposed!',
+    worldfireBegins:
+      'Worldfire ignites at the edge of the room. The crucible will be consumed in 42 sec!',
+    worldfireClosing: 'Worldfire closes in. Move toward the center!',
+    worldfireConsumed: 'The entire crucible is burning!',
+  },
+  varkhulWaveStatus: 'Wave {wave}/{waves} | Enemies: {remaining}',
+  raidBossGuide: {
+    title: 'Boss Guide',
+    button: 'Boss Guide: {boss}',
+    subtitle: '{boss} | Normal and Heroic',
+    close: 'Close boss guide',
+    ignivar: {
+      brand:
+        'Brand of the Pyre: spread out. Aim Searing Torrent into a ready water conduit, then cross the water alone to cleanse.',
+      movement:
+        "Movement: avoid Rain of Cinders cones and meteors, move with Revolving Inferno, and use Forge Wave's two gaps.",
+      apocalypse: 'Apocalypse: kill Ignivar Ashcaller before its cast completes.',
+      judgment:
+        'Judgment of the Forge: identify the unique refuge during the warning, then stack inside its marked boundary when the floor ignites.',
+      finale:
+        'Last Inferno: finish Ignivar before the hard wipe while faster meteors, frontals, and Revolving Inferno continue.',
+      heroic:
+        'Heroic: paired players stay close during Chains of the Forge, Brand remains active inside Judgment, and Forge Wave pushes farther.',
+    },
+    varkhul: {
+      tanks: "Tanks: swap at two stacks of Maker's Brand and keep Varkhul in melee range.",
+      orbs: 'Cinder Orbs: marked players spread to the room edge. Their fire pools persist and the released orbs cross the room.',
+      pyre: 'Shared Pyre: only a player without Red-hot Metal is selected. Stack four players inside the moving circle in either difficulty. Each missing player deals 15% of maximum health to the entire raid.',
+      forgestorm:
+        'Forgestorm: watch the falling meteors and leave every marked impact before each of the three waves lands.',
+      anvil:
+        "Anvil's Decree: Varkhul moves to the grand forge and strikes it three times for raid damage. Heroic also drops marked meteors.",
+      ray: 'Tempering Ray: another player, usually a tank, intercepts the moving line before the long windup ends. The player hit receives Tempered Wound.',
+      forge:
+        'Forge pillars: block active beams before they reach the forge and rotate blockers as Crucible Exposure grows. A full heat meter causes Forge Meltdown.',
+      assembly:
+        "The Master's Assembly: block both forge beams, kill every portal wave, interrupt Crucible Quake, and stop Cinder Artificers from healing Varkhul.",
+      worldfire:
+        'Worldfire: on Heroic, the burning edge closes toward the center during the final phase. Defeat Varkhul before the whole crucible burns.',
+      heroic:
+        "Heroic: forge heat never cools, Anvil's Decree adds meteors, and the final phase removes most mechanics to focus on Worldfire.",
+    },
+  },
   auraEffect: {
+    sharedPyre:
+      "Deals {total}% of each player's maximum health, divided by the number of players inside the circle ({perPlayer}% each with {players} players).",
+    varkhulSharedPyre:
+      "Deals {total}% of each player's maximum health, divided among players inside the circle ({perPlayer}% each with {players} players). Each missing player also deals {missingPenalty}% of maximum health to the entire raid, including players inside the circle.",
+    makersBrand:
+      'For {duration} sec, each stack increases damage taken from Varkhul by {pct}%. Stacks up to {max} times. Tanks should swap at {swap} stacks.',
+    varkhulSentinelsGaze:
+      'The Ember Sentinel pursues you. Keep it away from the raid until it is destroyed.',
+    varkhulMoltenCore:
+      'Carry this core to the forge. Molten Burden deals increasing damage every {interval} sec, from {min}% to {max}% of maximum health.',
+    varkhulForgeLink:
+      'Intercept an active pillar beam before it reaches the forge. Open beams add 6% heat per second. In Normal, blocked beams and inactive pillars cool the forge; in Heroic, heat never falls. At 100%, the forge suffers a lethal Meltdown.',
+    varkhulCrucibleExposure:
+      'Blocking a Crucible Beam deals increasing maximum-health damage every second. The stacks reset 10 seconds after leaving a beam in Normal and after 60 seconds in Heroic.',
     dot: 'Deals {value} {school} damage every {interval} sec',
     hot: 'Restores {value} health every {interval} sec',
     mendingCurrent: 'Stores {value} healing, released over time or consumed by Cascading Mend',

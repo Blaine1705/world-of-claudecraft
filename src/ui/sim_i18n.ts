@@ -13,6 +13,7 @@
 // matcher — so a new unhandled sim string cannot ship silently.
 import { ABILITIES, DELVES, ITEMS, MOBS, ZONES } from '../sim/data';
 import { DELVE_MODULE_NAMES } from '../sim/sim';
+import type { EntityKind, PlayerClass } from '../sim/types';
 import { tEntity } from './entity_i18n';
 import {
   formatNumber,
@@ -178,6 +179,7 @@ const baseEnTable = {
   'error.alreadyInParty': 'You are already in a party.',
   'error.notPartyLeader': 'You are not the party leader.',
   'error.raidMarkersParty': 'You must be in a party to use raid markers.',
+  'error.liveRaidClaimUnsafe': 'This live raid claim cannot be replaced safely.',
   'error.nameSellQty': 'Name how many you wish to sell.',
   'error.talentsInCombat': 'You cannot change talents in combat.',
   'error.talentsArena': 'You cannot change talents during an arena match.',
@@ -451,6 +453,79 @@ const baseEnTable = {
   'aura.temporalExhaustion': 'Temporal Exhaustion',
   // Cauterize's 5 min lockout debuff (combat/fire_mage.ts); survives death.
   'aura.cauterizeFatigue': 'Cauterize Fatigue',
+  'aura.ignivarBrandOfThePyre': 'Brand of the Pyre',
+  'aura.ignivarMoltenArmor': 'Molten Armor',
+  'aura.ignivarLastInferno': 'Last Inferno',
+  'aura.ignivarSharedPyre': 'Shared Pyre',
+  'aura.ignivarForgeChains': 'Chains of the Forge',
+  'aura.varkhulMakersBrand': "Maker's Brand",
+  'mechanic.varkhulForgefatherSweep': "Forgefather's Sweep",
+  'mechanic.varkhulCinderOrbs': 'Cinder Orbs',
+  'aura.varkhulRedHotMetal': 'Red-hot Metal',
+  'aura.varkhulRedHotMetalBarrier': 'Red-hot Metal Barrier',
+  'mechanic.varkhulForgestorm': 'Forgestorm',
+  'mechanic.varkhulAnvilsDecree': "Anvil's Decree",
+  'mechanic.varkhulHammerfallMeteors': 'Hammerfall Meteors',
+  'mechanic.varkhulMastersAssembly': "The Master's Assembly",
+  'mechanic.varkhulRepairProtocol': 'Repair Protocol',
+  'mechanic.varkhulForgeConvergence': 'Forge Convergence',
+  'mechanic.varkhulForgeLinks': 'Forge Links',
+  'aura.varkhulSentinelsGaze': "Sentinel's Gaze",
+  'aura.varkhulMoltenCore': 'Molten Core',
+  'aura.varkhulMoltenBurden': 'Molten Burden',
+  'aura.varkhulForgeLink': 'Forge Link',
+  'aura.varkhulForgeShattered': 'Forge Shattered',
+  'mechanic.varkhulUnstableReaction': 'Unstable Reaction',
+  'mechanic.varkhulCrucibleBeam': 'Crucible Beam',
+  'mechanic.varkhulForgeMeltdown': 'Forge Meltdown',
+  'aura.varkhulCrucibleExposure': 'Crucible Exposure',
+  'mechanic.varkhulTemperingRay': 'Tempering Ray',
+  'aura.varkhulTemperedWound': 'Tempered Wound',
+  'aura.varkhulCrucibleGuard': 'Crucible Guard',
+  'aura.varkhulMasterpieceUnbound': 'Masterpiece Unbound',
+  'mechanic.varkhulLivingForge': 'Living Forge',
+  'mechanic.varkhulWorldfire': 'Worldfire',
+  'mechanic.varkhulCrucibleQuake': 'Crucible Quake',
+  'mechanic.ignivarCrucibleStomp': 'Crucible Stomp',
+  'mechanic.ignivarCruciblePerimeter': 'Crucible Perimeter',
+  'mechanic.varkhulRecalibrate': 'Recalibrate',
+  'mechanic.ignivarSearingTorrent': 'Searing Torrent',
+  'mechanic.ignivarForgeStrike': 'Forge Strike',
+  'mechanic.ignivarCleansingBacklash': 'Cleansing Backlash',
+  'mechanic.ignivarApocalypse': 'Apocalypse',
+  'mechanic.ignivarRainOfCinders': 'Rain of Cinders',
+  'mechanic.ignivarFallingCinders': 'Falling Cinders',
+  'mechanic.ignivarRevolvingInferno': 'Revolving Inferno',
+  'mechanic.ignivarForgeWave': 'Forge Wave',
+  'mechanic.ignivarJudgmentOfTheForge': 'Judgment of the Forge',
+  'dialogue.ignivarHeartAwakens': 'Ignivar Ashcaller awakens. Let the world burn!',
+  'dialogue.ignivarLastFlame': 'The last flame consumes all!',
+  'dialogue.ignivarSkyBurns': 'The sky itself will burn!',
+  'dialogue.ignivarSharePyre': 'Four must share the pyre, or all will burn!',
+  'dialogue.ignivarDeath': 'Varkhul... the seal is broken.',
+  'dialogue.varkhulDeath': 'Master... I have failed you.',
+  'lore.ignivarFirstTempering':
+    'Tempering Record I: "Water remembers shape. Fire commands it to endure."',
+  'lore.ignivarLivingMetal':
+    'Tempering Record II: "The spring rejects every shell. Begin again with a living core."',
+  'lore.ignivarHeraldKey':
+    'Tempering Record III: "Ignivar endures. The herald shall carry my seal and guard the path below."',
+  'lore.ignivarSentinelEcho':
+    'Maelin\'s projection crackles: "The first shells held the flame, but nothing lived within them."',
+  'lore.ignivarWardenEcho':
+    'Maelin\'s projection crackles: "Varkhul forced the Last Spring into the metal. The water became its blood."',
+  'lore.ignivarArtificerEcho':
+    'Maelin\'s projection crackles: "Ignivar was the first design to endure. He is not merely a herald. He is the key."',
+  'lore.ignivarCoreFracture':
+    "Ignivar's core fractures. Its plates turn toward the Inner Crucible, and the sealed gate answers.",
+  'lore.ignivarForgeSilenced':
+    'The Grand Forge gutters out. For the first time in an age, the Last Spring is silent and free.',
+  'lore.ignivarFirstTemperingRecordName': 'First Tempering Record',
+  'lore.ignivarLivingMetalRecordName': 'Living Metal Record',
+  'lore.ignivarHeraldKeyRecordName': 'Herald-Key Record',
+  'error.ignivarForgeGateSealed': 'The forge gate is sealed to you.',
+  'error.ignivarRaidInCombat':
+    'Your raid is still in combat. You may enter once the fighting stops.',
   'aura.carrierFatigue': 'Carrier Fatigue',
   // The always-worn carried-flag buff; right-clicking it drops the flag on purpose.
   'aura.carriedFlag': 'Carrying the Flag',
@@ -8499,6 +8574,158 @@ const PET_DICT: Record<SupportedLanguage, Record<PetSimMessageKey, string>> = {
   ...PET_NEW,
 };
 
+const IGNIVAR_DICT: Partial<Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, string>>>> =
+  {
+    es: {
+      'aura.ignivarBrandOfThePyre': 'Marca de la Pira',
+      'aura.ignivarMoltenArmor': 'Armadura Fundida',
+      'aura.ignivarLastInferno': 'Último Infierno',
+      'aura.ignivarSharedPyre': 'Pira compartida',
+      'mechanic.ignivarSearingTorrent': 'Torrente abrasador',
+      'mechanic.ignivarForgeStrike': 'Golpe de Fundición',
+      'mechanic.ignivarCleansingBacklash': 'Represalia purificadora',
+      'mechanic.ignivarApocalypse': 'Apocalipsis',
+      'mechanic.ignivarRainOfCinders': 'Lluvia de brasas',
+      'mechanic.ignivarFallingCinders': 'Caída de brasas',
+      'mechanic.ignivarRevolvingInferno': 'Infierno giratorio',
+      'mechanic.ignivarForgeWave': 'Onda de la Forja',
+      'mechanic.ignivarJudgmentOfTheForge': 'Juicio de la Forja',
+      'mechanic.varkhulForgeConvergence': 'Convergencia de la Forja',
+      'mechanic.varkhulCrucibleBeam': 'Rayo del Crisol',
+      'mechanic.varkhulForgeMeltdown': 'Colapso de la Forja',
+      'aura.varkhulCrucibleExposure': 'Exposición al Crisol',
+      'mechanic.varkhulTemperingRay': 'Rayo de temple',
+      'aura.varkhulTemperedWound': 'Herida templada',
+      'mechanic.varkhulWorldfire': 'Fuego del Mundo',
+      'mechanic.varkhulCrucibleQuake': 'Seísmo del Crisol',
+      'mechanic.ignivarCrucibleStomp': 'Pisotón del Crisol',
+      'mechanic.ignivarCruciblePerimeter': 'Perímetro del Crisol',
+      'mechanic.varkhulRecalibrate': 'Recalibrar',
+      'dialogue.ignivarHeartAwakens': 'Ignivar Ashcaller despierta. ¡Que arda el mundo!',
+      'dialogue.ignivarLastFlame': '¡La última llama lo consume todo!',
+      'dialogue.ignivarSkyBurns': '¡Hasta el propio cielo arderá!',
+      'dialogue.ignivarSharePyre': '¡Cuatro deben compartir la pira o todos arderéis!',
+      'dialogue.ignivarDeath': 'Varkhul... el sello se ha roto.',
+      'dialogue.varkhulDeath': 'Maestro... te he fallado.',
+    },
+    es_ES: {
+      'aura.ignivarBrandOfThePyre': 'Marca de la Pira',
+      'aura.ignivarMoltenArmor': 'Armadura Fundida',
+      'aura.ignivarLastInferno': 'Último Infierno',
+      'aura.ignivarSharedPyre': 'Pira compartida',
+      'mechanic.ignivarSearingTorrent': 'Torrente abrasador',
+      'mechanic.ignivarForgeStrike': 'Golpe de Fundición',
+      'mechanic.ignivarCleansingBacklash': 'Represalia purificadora',
+      'mechanic.ignivarApocalypse': 'Apocalipsis',
+      'mechanic.ignivarRainOfCinders': 'Lluvia de brasas',
+      'mechanic.ignivarFallingCinders': 'Caída de brasas',
+      'mechanic.ignivarRevolvingInferno': 'Infierno giratorio',
+      'mechanic.ignivarForgeWave': 'Onda de la Forja',
+      'mechanic.ignivarJudgmentOfTheForge': 'Juicio de la Forja',
+      'mechanic.varkhulForgeConvergence': 'Convergencia de la Forja',
+      'mechanic.varkhulCrucibleBeam': 'Rayo del Crisol',
+      'mechanic.varkhulForgeMeltdown': 'Colapso de la Forja',
+      'aura.varkhulCrucibleExposure': 'Exposición al Crisol',
+      'mechanic.varkhulTemperingRay': 'Rayo de temple',
+      'aura.varkhulTemperedWound': 'Herida templada',
+      'mechanic.varkhulWorldfire': 'Fuego del Mundo',
+      'mechanic.varkhulCrucibleQuake': 'Seísmo del Crisol',
+      'mechanic.ignivarCrucibleStomp': 'Pisotón del Crisol',
+      'mechanic.ignivarCruciblePerimeter': 'Perímetro del Crisol',
+      'mechanic.varkhulRecalibrate': 'Recalibrar',
+      'dialogue.ignivarHeartAwakens': 'Ignivar Ashcaller despierta. ¡Que arda el mundo!',
+      'dialogue.ignivarLastFlame': '¡La última llama lo consume todo!',
+      'dialogue.ignivarSkyBurns': '¡Hasta el propio cielo arderá!',
+      'dialogue.ignivarSharePyre': '¡Cuatro deben compartir la pira o todos arderéis!',
+      'dialogue.ignivarDeath': 'Varkhul... el sello se ha roto.',
+      'dialogue.varkhulDeath': 'Maestro... te he fallado.',
+    },
+    ja_JP: {
+      'lore.ignivarSentinelEcho':
+        'メイリンの残り火の投影が弾ける。「最初の殻は炎を宿したが、その中に命はなかった。」',
+      'lore.ignivarWardenEcho':
+        'メイリンの残り火の投影が弾ける。「ヴァルクルは最後の泉を金属へ押し込んだ。水はその血となった。」',
+      'lore.ignivarArtificerEcho':
+        'メイリンの残り火の投影が弾ける。「イグニヴァルは初めて耐え抜いた設計だった。彼は単なる先触れではない。鍵なのだ。」',
+      'lore.ignivarCoreFracture':
+        'イグニヴァルの核が砕ける。その板が内なるるつぼへ向き、封じられた門が応える。',
+      'lore.ignivarForgeSilenced':
+        '大炉の火が消える。久遠の時を経て、最後の泉は静まり、自由になった。',
+      'mechanic.varkhulWorldfire': '世界炎',
+      'mechanic.varkhulCrucibleQuake': '坩堝の震撃',
+      'mechanic.ignivarCrucibleStomp': '坩堝の踏みつけ',
+      'mechanic.varkhulRecalibrate': '再調整',
+      'mechanic.varkhulTemperingRay': '焼入れ光線',
+      'aura.varkhulTemperedWound': '焼入れの傷',
+    },
+    ko_KR: {
+      'lore.ignivarSentinelEcho':
+        '메일린의 잔불 투영이 타닥거린다. "첫 번째 껍질들은 불꽃을 품었지만 그 안에는 생명이 없었다."',
+      'lore.ignivarWardenEcho':
+        '메일린의 잔불 투영이 타닥거린다. "바르쿨은 마지막 샘을 금속에 강제로 주입했다. 물은 그들의 피가 되었다."',
+      'lore.ignivarArtificerEcho':
+        '메일린의 잔불 투영이 타닥거린다. "이그니바르는 처음으로 견뎌 낸 설계였다. 그는 단순한 전령이 아니다. 그가 바로 열쇠다."',
+      'lore.ignivarCoreFracture':
+        '이그니바르의 핵이 산산이 갈라진다. 판들이 내부 도가니를 향하자 봉인된 문이 응답한다.',
+      'lore.ignivarForgeSilenced':
+        '대장간의 불이 꺼진다. 오랜 세월 만에 마지막 샘은 고요해지고 자유를 되찾았다.',
+      'mechanic.varkhulWorldfire': '세계불꽃',
+      'mechanic.varkhulCrucibleQuake': '도가니 진동',
+      'mechanic.ignivarCrucibleStomp': '도가니 발구르기',
+      'mechanic.varkhulRecalibrate': '재보정',
+      'mechanic.varkhulTemperingRay': '담금질 광선',
+      'aura.varkhulTemperedWound': '담금질 상처',
+    },
+    ru_RU: {
+      'lore.ignivarSentinelEcho':
+        'Угольная проекция Мэйлин потрескивает: «Первые оболочки удерживали пламя, но жизни в них не было».',
+      'lore.ignivarWardenEcho':
+        'Угольная проекция Мэйлин потрескивает: «Варкхул заточил Последний источник в металле. Вода стала его кровью».',
+      'lore.ignivarArtificerEcho':
+        'Угольная проекция Мэйлин потрескивает: «Игнивар стал первым устойчивым творением. Он не просто вестник. Он ключ».',
+      'lore.ignivarCoreFracture':
+        'Ядро Игнивара раскалывается. Его пластины поворачиваются к Внутреннему горнилу, и запечатанные врата откликаются.',
+      'lore.ignivarForgeSilenced':
+        'Великое горнило угасает. Впервые за долгие века Последний источник затих и обрёл свободу.',
+      'mechanic.varkhulWorldfire': 'Мировое пламя',
+      'mechanic.varkhulCrucibleQuake': 'Сотрясение горнила',
+      'mechanic.ignivarCrucibleStomp': 'Топот Горнила',
+      'mechanic.varkhulRecalibrate': 'Перекалибровка',
+      'mechanic.varkhulTemperingRay': 'Закалочный луч',
+      'aura.varkhulTemperedWound': 'Закалённая рана',
+    },
+    zh_CN: {
+      'lore.ignivarSentinelEcho': '梅琳的余烬投影噼啪作响：“最初的躯壳容得下火焰，却没有生命。”',
+      'lore.ignivarWardenEcho':
+        '梅琳的余烬投影噼啪作响：“瓦尔库尔将最后之泉强行灌入金属，泉水成了它的血液。”',
+      'lore.ignivarArtificerEcho':
+        '梅琳的余烬投影噼啪作响：“伊格尼瓦是第一个存续下来的设计。他不只是先驱，他就是钥匙。”',
+      'lore.ignivarCoreFracture': '伊格尼瓦的核心碎裂，甲片转向内层熔炉，封印的大门随之回应。',
+      'lore.ignivarForgeSilenced': '大熔炉的火焰熄灭了。历经漫长岁月，最后之泉终于重归寂静与自由。',
+      'mechanic.varkhulWorldfire': '世界之火',
+      'mechanic.varkhulCrucibleQuake': '熔炉震击',
+      'mechanic.ignivarCrucibleStomp': '熔炉践踏',
+      'mechanic.varkhulRecalibrate': '重新校准',
+      'mechanic.varkhulTemperingRay': '淬火射线',
+      'aura.varkhulTemperedWound': '淬火创伤',
+    },
+    zh_TW: {
+      'lore.ignivarSentinelEcho': '梅琳的餘燼投影劈啪作響：「最初的軀殼容得下火焰，卻沒有生命。」',
+      'lore.ignivarWardenEcho':
+        '梅琳的餘燼投影劈啪作響：「瓦爾庫爾將最後之泉強行灌入金屬，泉水成了它的血液。」',
+      'lore.ignivarArtificerEcho':
+        '梅琳的餘燼投影劈啪作響：「伊格尼瓦是第一個存續下來的設計。他不只是先驅，他就是鑰匙。」',
+      'lore.ignivarCoreFracture': '伊格尼瓦的核心碎裂，甲片轉向內層熔爐，封印的大門隨之回應。',
+      'lore.ignivarForgeSilenced': '大熔爐的火焰熄滅了。歷經漫長歲月，最後之泉終於重歸寂靜與自由。',
+      'mechanic.varkhulWorldfire': '世界之火',
+      'mechanic.varkhulCrucibleQuake': '熔爐震擊',
+      'mechanic.ignivarCrucibleStomp': '熔爐踐踏',
+      'mechanic.varkhulRecalibrate': '重新校準',
+      'mechanic.varkhulTemperingRay': '淬火射線',
+      'aura.varkhulTemperedWound': '淬火創傷',
+    },
+  };
+
 export const DICT: Record<SupportedLanguage, Record<SimMessageKey, string>> = Object.fromEntries(
   supportedLanguages.map((lang) => [
     lang,
@@ -8507,6 +8734,7 @@ export const DICT: Record<SupportedLanguage, Record<SimMessageKey, string>> = Ob
       ...BASE_DICT[lang],
       ...PET_DICT[lang],
       'log.arenaQueueAutoLeave1v1': ARENA_QUEUE_AUTO_LEAVE_1V1[lang],
+      ...IGNIVAR_DICT[lang],
     },
   ]),
 ) as Record<SupportedLanguage, Record<SimMessageKey, string>>;
@@ -8617,6 +8845,53 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Tamed: 'aura.tamed',
   'Temporal Exhaustion': 'aura.temporalExhaustion',
   'Cauterize Fatigue': 'aura.cauterizeFatigue',
+  'Brand of the Pyre': 'aura.ignivarBrandOfThePyre',
+  'Molten Armor': 'aura.ignivarMoltenArmor',
+  'Last Inferno': 'aura.ignivarLastInferno',
+  'Shared Pyre': 'aura.ignivarSharedPyre',
+  'Chains of the Forge': 'aura.ignivarForgeChains',
+  "Maker's Brand": 'aura.varkhulMakersBrand',
+  "Forgefather's Sweep": 'mechanic.varkhulForgefatherSweep',
+  'Cinder Orbs': 'mechanic.varkhulCinderOrbs',
+  'Red-hot Metal': 'aura.varkhulRedHotMetal',
+  'Red-hot Metal Barrier': 'aura.varkhulRedHotMetalBarrier',
+  Forgestorm: 'mechanic.varkhulForgestorm',
+  "Anvil's Decree": 'mechanic.varkhulAnvilsDecree',
+  'Hammerfall Meteors': 'mechanic.varkhulHammerfallMeteors',
+  "The Master's Assembly": 'mechanic.varkhulMastersAssembly',
+  'Repair Protocol': 'mechanic.varkhulRepairProtocol',
+  'Forge Convergence': 'mechanic.varkhulForgeConvergence',
+  'Forge Links': 'mechanic.varkhulForgeLinks',
+  "Sentinel's Gaze": 'aura.varkhulSentinelsGaze',
+  'Molten Core': 'aura.varkhulMoltenCore',
+  'Molten Burden': 'aura.varkhulMoltenBurden',
+  'Forge Link': 'aura.varkhulForgeLink',
+  'Forge Shattered': 'aura.varkhulForgeShattered',
+  'Unstable Reaction': 'mechanic.varkhulUnstableReaction',
+  'Crucible Beam': 'mechanic.varkhulCrucibleBeam',
+  'Forge Meltdown': 'mechanic.varkhulForgeMeltdown',
+  'Crucible Exposure': 'aura.varkhulCrucibleExposure',
+  'Tempering Ray': 'mechanic.varkhulTemperingRay',
+  'Tempered Wound': 'aura.varkhulTemperedWound',
+  'Crucible Guard': 'aura.varkhulCrucibleGuard',
+  'Masterpiece Unbound': 'aura.varkhulMasterpieceUnbound',
+  'Living Forge': 'mechanic.varkhulLivingForge',
+  Worldfire: 'mechanic.varkhulWorldfire',
+  'Crucible Quake': 'mechanic.varkhulCrucibleQuake',
+  crucible_quake: 'mechanic.varkhulCrucibleQuake',
+  'Crucible Stomp': 'mechanic.ignivarCrucibleStomp',
+  'Crucible Perimeter': 'mechanic.ignivarCruciblePerimeter',
+  Recalibrate: 'mechanic.varkhulRecalibrate',
+  cinder_recalibrate: 'mechanic.varkhulRecalibrate',
+  'Searing Torrent': 'mechanic.ignivarSearingTorrent',
+  'Forge Strike': 'mechanic.ignivarForgeStrike',
+  'Cleansing Backlash': 'mechanic.ignivarCleansingBacklash',
+  Apocalypse: 'mechanic.ignivarApocalypse',
+  'Rain of Cinders': 'mechanic.ignivarRainOfCinders',
+  'Falling Cinders': 'mechanic.ignivarFallingCinders',
+  'Revolving Inferno': 'mechanic.ignivarRevolvingInferno',
+  'Forge Wave': 'mechanic.ignivarForgeWave',
+  'Judgment of the Forge': 'mechanic.ignivarJudgmentOfTheForge',
   // Thornhollow Fields battleground auras (src/sim/social/battleground.ts): spawn
   // protection, the carrier-fatigue vulnerability, the carried-flag buff, and the
   // sprint-rune haste.
@@ -12219,4 +12494,27 @@ export function localizeSimText(text: string): string | null {
     if (m) return rule.build(m);
   }
   return null;
+}
+
+export function localizeAuthoredYellText(
+  text: string,
+  speakerKind?: EntityKind,
+  classId?: PlayerClass,
+): string {
+  if (speakerKind === 'player' || classId !== undefined) return text;
+  return localizeSimText(text) ?? text;
+}
+
+export function localizeAuthoredYellSpeakerName(
+  name: string,
+  speakerKind?: EntityKind,
+  templateId?: string,
+  classId?: PlayerClass,
+): string {
+  if (speakerKind === 'player' || classId !== undefined) return name;
+  if (templateId && (speakerKind === 'mob' || speakerKind === 'npc')) {
+    return tEntity({ kind: speakerKind, id: templateId, field: 'name' });
+  }
+  const mob = Object.values(MOBS).find((entry) => entry.name === name);
+  return mob ? tEntity({ kind: 'mob', id: mob.id, field: 'name' }) : name;
 }

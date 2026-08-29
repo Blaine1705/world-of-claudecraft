@@ -2453,7 +2453,57 @@ export const es_ES: EnTranslations = {
       "leather": "Cuero",
       "mail": "Malla"
     },
+    "varkhulCallout": {
+      "leftPillarCharging": "¡El pilar izquierdo de la forja está cargándose! Se encenderá en 3 s.",
+      "rightPillarCharging": "¡El pilar derecho de la forja está cargándose! Se encenderá en 3 s.",
+      "bothPillarsCharging": "¡Los pilares de la forja están cargándose! Se encenderán en 3 s.",
+      "artificerApproaches": "¡Un Artífice de ceniza se acerca a la forja!",
+      "leftPillar": "¡El pilar izquierdo de la forja se enciende!",
+      "rightPillar": "¡El pilar derecho de la forja se enciende!",
+      "bothPillars": "¡Los pilares de la forja se encienden!",
+      "portalsOpening": "¡Los portales de la forja se están abriendo!",
+      "heat75": "¡La forja ha alcanzado un 75% de calor!",
+      "heat90": "¡La Fusión de la forja es inminente!",
+      "addsDefeated": "¡La legión de la forja ha caído: Varkhul está expuesto!",
+      "worldfireBegins": "¡El Fuego del Mundo prende en el borde de la sala! El crisol quedará consumido en 42 s.",
+      "worldfireClosing": "¡El Fuego del Mundo se acerca! ¡Avanzad hacia el centro!",
+      "worldfireConsumed": "¡Todo el crisol está en llamas!"
+    },
+    "varkhulWaveStatus": "Oleada {wave}/{waves} | Enemigos: {remaining}",
+    "raidBossGuide": {
+      "title": "Guía de jefes",
+      "button": "Guía: {boss}",
+      "subtitle": "{boss} | Normal y heroico",
+      "close": "Cerrar la guía de jefes",
+      "ignivar": {
+        "brand": "Marca de la Pira: separaos. Apunta Torrente abrasador hacia un conducto de agua listo y cruza el agua a solas para limpiarte.",
+        "movement": "Movimiento: evita los conos y meteoros de Lluvia de cenizas, muévete con Infierno giratorio y usa los dos huecos de Ola de la Forja.",
+        "apocalypse": "Apocalipsis: mata a Ignivar Ashcaller antes de que termine su lanzamiento.",
+        "judgment": "Juicio de la Forja: identifica el refugio distinto durante el aviso y reuníos dentro de su límite marcado cuando arda el suelo.",
+        "finale": "Último Infierno: acaba con Ignivar antes de la aniquilación mientras continúan los meteoros, ataques frontales e Infierno giratorio acelerados.",
+        "heroic": "Heroico: las parejas permanecen juntas durante Cadenas de la Forja, Marca sigue activa dentro de Juicio y Ola de la Forja empuja más lejos."
+      },
+      "varkhul": {
+        "tanks": "Tanques: cambiad a dos acumulaciones de Marca del Hacedor y mantened a Varkhul a distancia cuerpo a cuerpo.",
+        "orbs": "Orbes de ceniza: los jugadores marcados se separan hacia el borde. Sus charcos de fuego persisten y los orbes liberados cruzan la sala.",
+        "pyre": "Pira compartida: solo elige a alguien sin Metal al rojo vivo. Apilad cuatro jugadores dentro del círculo móvil en cualquier dificultad. Cada plaza ausente inflige un 15% de la salud máxima a toda la banda.",
+        "forgestorm": "Tormenta de la Forja: observa los meteoros que caen y sal de cada impacto marcado antes de que aterrice cada una de las tres oleadas.",
+        "anvil": "Decreto del Yunque: Varkhul se desplaza hasta la gran forja y la golpea tres veces, dañando a la banda. En heroico también caen meteoros marcados.",
+        "ray": "Rayo de temple: otro jugador, normalmente un tanque, intercepta la línea móvil antes de que termine el largo aviso. Quien recibe el golpe sufre Herida templada.",
+        "forge": "Pilares de la forja: bloquea los rayos antes de que lleguen a la forja y rota a los bloqueadores cuando aumente Exposición del Crisol. El calor completo provoca Colapso de la Forja.",
+        "assembly": "La Asamblea del Maestro: bloquea ambos rayos, mata todas las oleadas de portales, interrumpe Terremoto del Crisol e impide que los Artífices de ceniza curen a Varkhul.",
+        "worldfire": "Fuego del Mundo: en heroico, el borde en llamas avanza hacia el centro durante la fase final. Derrota a Varkhul antes de que arda todo el crisol.",
+        "heroic": "Heroico: el calor de la forja nunca baja, Decreto del Yunque añade meteoros y la fase final elimina casi todas las mecánicas para centrarse en Fuego del Mundo."
+      }
+    },
     "auraEffect": {
+      "sharedPyre": "Deals {total}% of each player's maximum health, divided by the number of players inside the circle ({perPlayer}% each with {players} players).",
+      "varkhulSharedPyre": "Inflige un {total}% de la salud máxima de cada jugador, repartido entre quienes estén dentro del círculo ({perPlayer}% por persona con {players} jugadores). Cada plaza ausente también inflige un {missingPenalty}% de la salud máxima a toda la banda, incluidos los jugadores dentro del círculo.",
+      "makersBrand": "For {duration} sec, each stack increases damage taken from Varkhul by {pct}%. Stacks up to {max} times. Tanks should swap at {swap} stacks.",
+      "varkhulSentinelsGaze": "The Ember Sentinel pursues you. Keep it away from the raid until it is destroyed.",
+      "varkhulMoltenCore": "Carry this core to the forge. Molten Burden deals increasing damage every {interval} sec, from {min}% to {max}% of maximum health.",
+      "varkhulForgeLink": "Intercepta el rayo de un pilar activo antes de que alcance la forja. Un rayo libre añade un 6% de calor por segundo. En Normal, los rayos bloqueados y los pilares apagados enfrían la forja; en Heroico, el calor nunca baja. Al 100%, la forja sufre una Fusión letal.",
+      "varkhulCrucibleExposure": "Bloquear un Rayo del Crisol inflige cada segundo más daño según tu salud máxima. Las acumulaciones se reinician 10 s después de salir del rayo en Normal y 60 s después en Heroico.",
       "dot": "Provoca {value} de daño de {school} cada {interval} s",
       "hot": "Recupera {value} de salud cada {interval} s",
       "mendingCurrent": "Almacena {value} de sanación, liberada con el tiempo o consumida por Remiendo en Cascada",
@@ -8627,6 +8677,8 @@ export const es_ES: EnTranslations = {
         "riftEntrance": "Entrada a la brecha: {name}",
         "hostileEnemy": "Enemigo hostil",
         "aggressiveEnemy": "Enemigo que te está atacando",
+        "bossEnemy": "Jefe: {name}",
+        "bossAggressiveEnemy": "Jefe que te está atacando: {name}",
         "lootableEnemy": "Enemigo con botín",
         "corpse": "Tu cadáver",
         "deathZone": "Zona peligrosa",
@@ -13918,6 +13970,27 @@ export const es_ES: EnTranslations = {
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Azote de Thornpeak"
       },
+      "ignivar_herald_of_the_last_flame": {
+        "name": "Ignivar, Heraldo de la Última Llama"
+      },
+      "ignivar_heart_of_the_end": {
+        "name": "Ignivar Ashcaller"
+      },
+      "ignivar_ember_sentinel": {
+        "name": "Ember Sentinel"
+      },
+      "ignivar_crucible_warden": {
+        "name": "Crucible Warden"
+      },
+      "ignivar_cinder_artificer": {
+        "name": "Cinder Artificer"
+      },
+      "varkhul_forgefather_of_the_last_flame": {
+        "name": "Varkhul, Forgefather of the Last Flame"
+      },
+      "derelict_mech": {
+        "name": "Derelict Mech"
+      },
       "reliquary_ledger_wraith": {
         "name": "Espectro del registro"
       },
@@ -14577,6 +14650,16 @@ export const es_ES: EnTranslations = {
         "name": "Hermano Aldric",
         "title": "Sacerdote del Valle",
         "greeting": "De un patio de capilla al techo del mundo... el rastro termina aquí. Siento que la montaña escucha."
+      },
+      "archivist_maelin_emberward": {
+        "name": "Archivist Maelin Emberward",
+        "title": "Crucible Archivist",
+        "greeting": "Every hammer mark in this place is a sentence. Help me read what Varkhul tried to hide."
+      },
+      "archivist_maelin_ember_projection": {
+        "name": "Maelin's Ember Projection",
+        "title": "Ember Projection",
+        "greeting": "The embers carry Maelin's voice forward through the forge."
       },
       "brother_halven": {
         "name": "Hermano Halven",
@@ -15723,6 +15806,39 @@ export const es_ES: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Nythraxis derrotado"
+          }
+        }
+      },
+      "q_ignivar_echoes_in_iron": {
+        "title": "Echoes in Iron",
+        "text": "These automata are not soldiers. They are drafts. Break each assembly line and listen when the final shell falls. The forge remembers what Varkhul tried to erase.",
+        "completion": "The echoes agree. Varkhul bound water from the dying Last Spring into living metal. These automatons were failed temperings. Only Ignivar endured.",
+        "objectives": {
+          "0": {
+            "label": "Ember Sentinels destroyed"
+          },
+          "1": {
+            "label": "Crucible Wardens destroyed"
+          }
+        }
+      },
+      "q_ignivar_heralds_heart": {
+        "title": "The Herald's Heart",
+        "text": "The survivor named in every echo is Ignivar. Varkhul called him herald, seal, and key. Defeat him. If the records are true, his death will reveal what he was forged to guard.",
+        "completion": "Ignivar was never merely a guardian. His heart was the key, and its final plates opened the sealed crucible below.",
+        "objectives": {
+          "0": {
+            "label": "Ignivar defeated"
+          }
+        }
+      },
+      "q_ignivar_the_forgefather": {
+        "title": "The Forgefather",
+        "text": "The path below leads to Varkhul, Forgefather of the Last Flame. He imprisoned the Last Spring to make metal live, then forged Ignivar to keep the crime sealed. Enter the Inner Crucible and end his work.",
+        "completion": "The forge is silent at last. The spring may never recover, but Varkhul will shape no more lives into chains.",
+        "objectives": {
+          "0": {
+            "label": "Varkhul defeated"
           }
         }
       },
@@ -17602,6 +17718,26 @@ export const es_ES: EnTranslations = {
         "name": "Arena de banda de Nythraxis",
         "enterText": "Cruzas la puerta real sellada.",
         "leaveText": "Regresas al aire frío de Thornpeak."
+      },
+      "ignivar_forge_approach": {
+        "name": "Halls of the First Tempering",
+        "enterText": "Hammerfall echoes through the Halls of the First Tempering.",
+        "leaveText": "You step away from the first forge and breathe freely again."
+      },
+      "ignivar_raid_arena": {
+        "name": "Crucible of the Last Spring",
+        "enterText": "Heat shimmers above the sealed waters of the Crucible.",
+        "leaveText": "You step away from the Crucible and breathe freely again."
+      },
+      "ignivar_molten_assembly": {
+        "name": "Molten Assembly",
+        "enterText": "The opened gate leads into a molten assembly hall.",
+        "leaveText": "You leave the assembly line and return to the Crucible."
+      },
+      "ignivar_inner_crucible": {
+        "name": "The Inner Crucible",
+        "enterText": "The opened gate leads deeper into the Crucible.",
+        "leaveText": "You leave the silent depths of the Crucible."
       },
       "wildheart_basin": {
         "name": "La Cuenca del Corazón Salvaje",

@@ -1025,10 +1025,16 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the v0.40.0 sync merge into the guild pledge branch (the
 // OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
 // both sides). No capture was retaken.
+// Re-minted after the Forgefather strike-route call-site swap in renderer.ts
+// (routeVarkhulForgeHammer replaced the bare forge-hammer dispatch) moved the
+// runtimeRender.renderer leaf. No capture was retaken.
+// Re-minted for the raid encounter tuning PR's nameplate direct-click pick
+// integration in renderer.ts: the first-order composite follows those bytes,
+// then these seals follow the swept evidence bytes. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'b7f20268e9d15b01de7034b18d451f23367b13576506daae0f486b086554df42';
+  '10c7ac9d261580b16c97ca8e755460ef932157fb2ef2ae50da98d8ee953517d2';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'b4f994b0a5d52ffce488667a7768739838207796dc4eaa331ebd980ab3fe8ba4';
+  '5d8f5a693c47ad4237243e48ca8b0ce7b96822026b293a228f2462ae52991168';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2175,10 +2181,14 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
     // both sides): same order, the composite first, then this seal. No capture
     // was retaken.
+    // Re-minted for the raid encounter tuning PR's nameplate direct-click pick
+    // integration in renderer.ts: the composite first, then this second-order
+    // performance seal follows the swept evidence bytes. No capture was
+    // retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('5bae1eefcdba32613ca7fe8ac5db78be891da7b08a56b66c2085e816c903f31f');
+    ).toBe('3ca3984caca85b30293e596d8412599230e08e828963bddd643a545bd3c4cbfa');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

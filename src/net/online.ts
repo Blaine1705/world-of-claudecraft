@@ -93,7 +93,13 @@ import {
   type AccountCosmetics,
   type ActiveConsecration,
   type ActiveFrostRing,
+  type ActiveIgnivarMeteorWarning,
   type ActiveTemporalHourglass,
+  type ActiveVarkhulAnvilMeteorWarning,
+  type ActiveVarkhulAssembly,
+  type ActiveVarkhulCinderFire,
+  type ActiveVarkhulCinderOrbProjectile,
+  type ActiveVarkhulForgestormWarning,
   type ArenaInfo,
   type BankInfo,
   type CardMinigameInfo,
@@ -171,6 +177,13 @@ import {
   type DesktopWalletStatus,
   parseDesktopWalletHandoffStatus,
 } from './desktop_wallet_handoff';
+import {
+  decodeConsecrations,
+  decodeFrostRings,
+  decodeIgnivarMeteors,
+  decodeTemporalHourglasses,
+  decodeVarkhulForgestormWarnings,
+} from './ground_telegraph_wire';
 import { decodeGuildBankLogFrame, GUILD_BANK_LOG_TTL_MS } from './guild_bank_log_wire';
 import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
 import { createNativeAttestationProof } from './native_attestation';
@@ -186,6 +199,11 @@ import {
   stableCooldownRemaining,
   stableDeadlineRemaining,
 } from './snapshot_timer_wire';
+import { decodeVarkhulAnvilMeteors, decodeVarkhulAssemblies } from './varkhul_assembly_wire';
+import {
+  decodeVarkhulCinderFires,
+  decodeVarkhulCinderOrbProjectiles,
+} from './varkhul_cinder_orb_wire';
 
 // The online mirror decodes terse legacy wire JSON. Runtime guards below narrow
 // individual fields as they are consumed; this alias keeps the decoder local.
@@ -1885,6 +1903,12 @@ export class ClientWorld implements IWorld {
   private readonly clientSeed: string;
   private eventQueue: SimEvent[] = [];
   activeFrostRings: ActiveFrostRing[] = [];
+  activeIgnivarMeteors: ActiveIgnivarMeteorWarning[] = [];
+  activeVarkhulForgestormWarnings: ActiveVarkhulForgestormWarning[] = [];
+  activeVarkhulCinderFires: ActiveVarkhulCinderFire[] = [];
+  activeVarkhulCinderOrbProjectiles: ActiveVarkhulCinderOrbProjectile[] = [];
+  activeVarkhulAnvilMeteors: ActiveVarkhulAnvilMeteorWarning[] = [];
+  activeVarkhulAssemblies: ActiveVarkhulAssembly[] = [];
   activeTemporalHourglasses: ActiveTemporalHourglass[] = [];
   activeConsecrations: ActiveConsecration[] = [];
   private counterfangWindowDeadlineMs = 0;
@@ -2819,91 +2843,17 @@ export class ClientWorld implements IWorld {
     if (typeof snap.tickHz === 'number' && Number.isFinite(snap.tickHz) && snap.tickHz > 0) {
       this.serverTickHz = snap.tickHz;
     }
-    this.activeFrostRings = Array.isArray(snap.rings)
-      ? snap.rings.flatMap((value: unknown): ActiveFrostRing[] => {
-          if (!value || typeof value !== 'object') return [];
-          const ring = value as Record<string, unknown>;
-          if (
-            typeof ring.id !== 'string' ||
-            ![ring.x, ring.z, ring.r, ring.i, ring.dur, ring.rem].every(
-              (value) => typeof value === 'number' && Number.isFinite(value),
-            ) ||
-            (ring.r as number) <= 0 ||
-            (ring.i as number) < 0 ||
-            (ring.i as number) >= (ring.r as number) ||
-            (ring.dur as number) <= 0 ||
-            (ring.rem as number) <= 0
-          )
-            return [];
-          return [
-            {
-              id: ring.id,
-              x: ring.x as number,
-              z: ring.z as number,
-              radius: ring.r as number,
-              innerRadius: ring.i as number,
-              duration: ring.dur as number,
-              remaining: Math.min(ring.rem as number, ring.dur as number),
-            },
-          ];
-        })
-      : [];
-    this.activeTemporalHourglasses = Array.isArray(snap.hourglasses)
-      ? snap.hourglasses.flatMap((value: unknown): ActiveTemporalHourglass[] => {
-          if (!value || typeof value !== 'object') return [];
-          const hourglass = value as Record<string, unknown>;
-          if (
-            typeof hourglass.id !== 'string' ||
-            ![hourglass.x, hourglass.z, hourglass.r, hourglass.dur, hourglass.rem].every(
-              (entry) => typeof entry === 'number' && Number.isFinite(entry),
-            ) ||
-            (hourglass.r as number) <= 0 ||
-            (hourglass.dur as number) <= 0 ||
-            (hourglass.rem as number) <= 0
-          )
-            return [];
-          return [
-            {
-              id: hourglass.id,
-              x: hourglass.x as number,
-              z: hourglass.z as number,
-              radius: hourglass.r as number,
-              duration: hourglass.dur as number,
-              remaining: Math.min(hourglass.rem as number, hourglass.dur as number),
-            },
-          ];
-        })
-      : [];
-    this.activeConsecrations = Array.isArray(snap.consecrations)
-      ? snap.consecrations.flatMap((value: unknown): ActiveConsecration[] => {
-          if (!value || typeof value !== 'object') return [];
-          const consecration = value as Record<string, unknown>;
-          if (
-            typeof consecration.id !== 'string' ||
-            ![
-              consecration.x,
-              consecration.z,
-              consecration.r,
-              consecration.dur,
-              consecration.rem,
-            ].every((entry) => typeof entry === 'number' && Number.isFinite(entry)) ||
-            (consecration.r as number) <= 0 ||
-            (consecration.dur as number) <= 0 ||
-            (consecration.rem as number) <= 0
-          )
-            return [];
-          return [
-            {
-              id: consecration.id,
-              x: consecration.x as number,
-              z: consecration.z as number,
-              radius: consecration.r as number,
-              duration: consecration.dur as number,
-              remaining: Math.min(consecration.rem as number, consecration.dur as number),
-            },
-          ];
-        })
-      : [];
+    this.activeFrostRings = decodeFrostRings(snap.rings);
+    this.activeIgnivarMeteors = decodeIgnivarMeteors(snap.ignivarMeteors);
+    this.activeVarkhulForgestormWarnings = decodeVarkhulForgestormWarnings(snap.varkhulForgestorm);
+    this.activeVarkhulCinderFires = decodeVarkhulCinderFires(snap.varkhulCinderFires);
+    this.activeVarkhulCinderOrbProjectiles = decodeVarkhulCinderOrbProjectiles(
+      snap.varkhulCinderOrbs,
+    );
+    this.activeVarkhulAnvilMeteors = decodeVarkhulAnvilMeteors(snap.varkhulAnvilMeteors);
+    this.activeVarkhulAssemblies = decodeVarkhulAssemblies(snap.varkhulAssemblies);
+    this.activeTemporalHourglasses = decodeTemporalHourglasses(snap.hourglasses);
+    this.activeConsecrations = decodeConsecrations(snap.consecrations);
 
     // lazy init (not the field initializer alone): tests build bare instances
     // via Object.create(ClientWorld.prototype), which skips field initializers

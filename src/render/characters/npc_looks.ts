@@ -1726,6 +1726,44 @@ export const NPC_LOOKS: Record<string, NpcLookDef> = {
     worn: kit('druid'),
     props: 'none',
   },
+  // Archivist Maelin Emberward, Crucible Archivist of the hidden Ignivar
+  // forge: ash-grey bun, ember eyes that read Varkhul's records by forgelight.
+  archivist_maelin_emberward: {
+    app: {
+      gender: 'female',
+      hair: 'lowbun',
+      ...hair(24, 0.12, 0.55),
+      brows: 'arched',
+      eyeShape: 'narrow',
+      ...eyes(32, 0.6, 0.42),
+      ...skin(25, 0.42, 0.5),
+      mouth: 'neutral',
+      face: face({ cheeks: -0.2, brow: 0.15, eyes: 0.1 }),
+      body: body({ shoulders: -0.1 }),
+      outfit: 'ember',
+    },
+    worn: kit('mage', { head: 'mage' }),
+    props: 'tome',
+  },
+  // Maelin's Ember Projection: the same archivist carried forward through the
+  // forge as living flame; her silhouette holds, her colours burn.
+  archivist_maelin_ember_projection: {
+    app: {
+      gender: 'female',
+      hair: 'lowbun',
+      ...hair(20, 0.85, 0.6),
+      brows: 'arched',
+      eyeShape: 'narrow',
+      ...eyes(46, 0.85, 0.55),
+      ...skin(22, 0.75, 0.6),
+      mouth: 'neutral',
+      face: face({ cheeks: -0.2, brow: 0.15, eyes: 0.1 }),
+      body: body({ shoulders: -0.1 }),
+      outfit: 'ember',
+    },
+    worn: kit('mage', { head: 'mage' }),
+    props: 'tome',
+  },
 
   // === Palmreach and the far shores ========================================
   // Castaway Navigator: sun-bleached, half-dressed, still reading the stars.
