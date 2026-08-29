@@ -13287,6 +13287,7 @@ export class Renderer {
       radius: number;
       school: string;
       dimmed: boolean;
+      blocked?: boolean;
     } | null,
   ): void {
     this.groundAimReticle.setAim(
@@ -13297,6 +13298,7 @@ export class Renderer {
             radius: aim.radius,
             color: SCHOOL_COLORS[aim.school] ?? 0xffffff,
             dimmed: aim.dimmed,
+            blocked: aim.blocked === true,
           }
         : null,
     );

@@ -117,6 +117,7 @@ export const IWORLD_MEMBERS = [
   // --- commands + read-returning methods ---
   { name: 'questState', kind: 'method' }, // read-returning (1/6)
   { name: 'reactiveAbilityWindowRemaining', kind: 'method' },
+  { name: 'groundAimPlacementPreview', kind: 'method' },
   { name: 'castAbility', kind: 'method' },
   { name: 'castAbilityAt', kind: 'method' },
   { name: 'castAbilityBySlot', kind: 'method' },
@@ -640,6 +641,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // startTutorial (IWorldQuests, a method) for the tutorial greeting. Both
     // arms land in the merged tree and the totals below are read off a run on
     // it, never reconciled by arithmetic across a merge.
+    // The PR 3676 arm's ground-aim landing preview adds groundAimPlacementPreview
+    // (IWorldCombat, a method) on top of the bank-storage members at the sixth
+    // v0.41.0 sync; the totals below are read off a run on the merged tree.
     //
     // NOTE for the next merge, four syncs run now: BOTH sides of this pin move
     // it independently every cycle. Twice git merged identical numbers with no
@@ -649,9 +653,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // even when the total agrees. Only running the suite says what these
     // numbers really are; never reconcile them by arithmetic in the diff (the
     // numbers below were set from a suite run, not from this narrative).
-    expect(IWORLD_MEMBERS.length).toBe(334);
+    expect(IWORLD_MEMBERS.length).toBe(335);
     expect(DATA_MEMBERS.length).toBe(89);
-    expect(METHOD_MEMBERS.length).toBe(245);
+    expect(METHOD_MEMBERS.length).toBe(246);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -786,6 +790,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'friendRemove',
       'friendlyTabTarget',
       'gatheringProficiency',
+      'groundAimPlacementPreview',
       'guildAccept',
       'guildBankBuySlots',
       'guildBankDeposit',
@@ -1181,6 +1186,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'friendAdd',
       'friendRemove',
       'friendlyTabTarget',
+      'groundAimPlacementPreview',
       'guildAccept',
       'guildBankBuySlots',
       'guildBankDeposit',
@@ -1441,6 +1447,7 @@ const FACET_COMBAT = [
   'activeFrostRings',
   'activeTemporalHourglasses',
   'reactiveAbilityWindowRemaining',
+  'groundAimPlacementPreview',
   'castAbility',
   'castAbilityAt',
   'castAbilityBySlot',
@@ -1980,8 +1987,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(334);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(334);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(335);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(335);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

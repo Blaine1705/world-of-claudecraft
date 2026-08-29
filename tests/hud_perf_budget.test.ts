@@ -2531,6 +2531,7 @@ function fakeEl(): HTMLElement {
       toggle(): void {},
     },
     setAttribute(): void {},
+    removeAttribute(): void {},
   } as unknown as HTMLElement;
 }
 
@@ -2681,6 +2682,7 @@ function buildHarnesses(shape: WorldShape, facet: PainterHostWriters): PainterHa
           usable: true,
           outOfRange: false,
           queued: false,
+          aiming: false,
           procGlow: false,
           empowered: false,
           ascensionSpender: false,
@@ -2777,6 +2779,7 @@ function idleWorld(): ActionBarWorldInput {
     inventory: [],
     stealthed: false,
     entities: [],
+    activeAimSlot: null,
   };
 }
 

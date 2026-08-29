@@ -1587,6 +1587,8 @@ export const ja_JP: EnTranslations = {
       "showDailyRewardsChest": "デイリー報酬の宝箱を表示",
       "mobileCameraJoystick": "カメラスティック",
       "mobileLeftHanded": "左利き用レイアウト",
+      "touchPreciseAim": "精密な地面指定",
+      "touchPreciseAimNote": "地面対象の呪文は指定してから発動します。オフにすると推奨地点ですぐに発動します。",
       "touchTapMenus": "タップメニュー",
       "touchTapMenusNote": "アクション、消耗品、メニューの各コントロールをスワイプではなくタップで開きます。項目をタップすると使用し、コントロールをもう一度タップすると通常の動作を行い、外側をタップすると閉じます。"
     },
@@ -1622,6 +1624,7 @@ export const ja_JP: EnTranslations = {
       "invertY": "カメラ反転（Y軸）",
       "deadzone": "スティックの遊び",
       "cameraSpeed": "カメラ速度",
+      "reticleSpeed": "レティクル速度",
       "vibration": "振動",
       "buttons": "ボタン配置",
       "resetButtons": "ボタン配置をリセット",

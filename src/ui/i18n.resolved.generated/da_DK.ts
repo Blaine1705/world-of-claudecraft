@@ -1587,6 +1587,8 @@ export const da_DK: EnTranslations = {
       "showDailyRewardsChest": "Vis kisten med daglige belønninger",
       "mobileCameraJoystick": "Kamera joystick",
       "mobileLeftHanded": "Venstrehånds layout",
+      "touchPreciseAim": "Precise Ground Targeting",
+      "touchPreciseAimNote": "Aim before casting ground spells. Turn off to cast instantly at the suggested point.",
       "touchTapMenus": "Tryk-menuer",
       "touchTapMenusNote": "Åbn kontrollerne for kamphandlinger, forbrugsvarer og menu med et tryk i stedet for et strøg. Tryk på en genstand for at bruge den, tryk på kontrollen igen for dens sædvanlige handling, eller tryk udenfor for at lukke."
     },
@@ -1622,6 +1624,7 @@ export const da_DK: EnTranslations = {
       "invertY": "Vend kamera om (Y)",
       "deadzone": "Stikkets dødzone",
       "cameraSpeed": "Kamerahastighed",
+      "reticleSpeed": "Reticle Speed",
       "vibration": "Vibration",
       "buttons": "Knaplayout",
       "resetButtons": "Nulstil knaplayout",

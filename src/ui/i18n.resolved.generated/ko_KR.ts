@@ -1587,6 +1587,8 @@ export const ko_KR: EnTranslations = {
       "showDailyRewardsChest": "일일 보상 보물상자 표시",
       "mobileCameraJoystick": "카메라 조이스틱",
       "mobileLeftHanded": "왼손잡이 레이아웃",
+      "touchPreciseAim": "정밀 지면 지정",
+      "touchPreciseAimNote": "지면 주문은 조준한 뒤 시전합니다. 끄면 추천 지점에 즉시 시전합니다.",
       "touchTapMenus": "탭 메뉴",
       "touchTapMenusNote": "스와이프 대신 탭으로 행동, 소모품, 메뉴 컨트롤을 엽니다. 항목을 탭하면 사용하고, 컨트롤을 다시 탭하면 기본 동작을 실행하며, 바깥을 탭하면 닫힙니다."
     },
@@ -1622,6 +1624,7 @@ export const ko_KR: EnTranslations = {
       "invertY": "카메라 반전(Y축)",
       "deadzone": "스틱 데드존",
       "cameraSpeed": "카메라 속도",
+      "reticleSpeed": "조준점 속도",
       "vibration": "진동",
       "buttons": "버튼 배치",
       "resetButtons": "버튼 배치 초기화",

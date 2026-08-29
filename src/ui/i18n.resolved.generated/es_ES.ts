@@ -1587,6 +1587,8 @@ export const es_ES: EnTranslations = {
       "showDailyRewardsChest": "Mostrar cofre de recompensas diarias",
       "mobileCameraJoystick": "Palanca de mando de la cámara",
       "mobileLeftHanded": "Diseño para zurdos",
+      "touchPreciseAim": "Precise Ground Targeting",
+      "touchPreciseAimNote": "Aim before casting ground spells. Turn off to cast instantly at the suggested point.",
       "touchTapMenus": "Menús al tocar",
       "touchTapMenusNote": "Abre los controles de acción, consumibles y menú con un toque en lugar de un deslizamiento. Toca un elemento para usarlo, toca el control de nuevo para su acción habitual, o toca fuera para cerrar."
     },
@@ -1622,6 +1624,7 @@ export const es_ES: EnTranslations = {
       "invertY": "Invertir cámara (Y)",
       "deadzone": "Zona muerta del stick",
       "cameraSpeed": "Velocidad de cámara",
+      "reticleSpeed": "Reticle Speed",
       "vibration": "Vibración",
       "buttons": "Distribución de botones",
       "resetButtons": "Restablecer distribución de botones",

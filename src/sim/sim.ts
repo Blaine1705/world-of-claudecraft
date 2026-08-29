@@ -19,6 +19,7 @@ import type {
   PlayerProfessionsView,
   ToolEffectSlotView,
 } from '../world_api';
+import type { GroundAimPointXZ } from '../world_api/combat';
 import * as bagsMod from './bags';
 import {
   addStacked,
@@ -114,7 +115,7 @@ import {
   healingThreat as healingThreatImpl,
   hexOutputMult as hexOutputMultImpl,
 } from './combat/heal';
-import { advanceHeroicLeap } from './combat/heroic_leap';
+import { advanceHeroicLeap, heroicLeapPlacementPreview } from './combat/heroic_leap';
 import { resolveColdsightAbility } from './combat/hunter_coldsight';
 import { clearFieldcraftState, finishBloodhook } from './combat/hunter_fieldcraft';
 import { clearPacklordState } from './combat/hunter_packlord';
@@ -2012,6 +2013,9 @@ export class Sim {
   reactiveAbilityWindowRemaining(abilityId: string): number {
     if (abilityId !== 'mongoose_bite') return 0;
     return Math.max(0, this.player.overpowerUntil - this.time);
+  }
+  groundAimPlacementPreview(abilityId: string, point: GroundAimPointXZ): GroundAimPointXZ {
+    return heroicLeapPlacementPreview(this.cfg.seed, this.player, abilityId, point);
   }
   // Live frost-mage Frozen Orbs (combat/frozen_orb.ts): sim state, never
   // serialized; drifted and pulsed by tickFrozenOrbs in the tick prologue.

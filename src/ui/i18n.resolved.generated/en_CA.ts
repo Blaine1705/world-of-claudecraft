@@ -1587,6 +1587,8 @@ export const en_CA: EnTranslations = {
       "showDailyRewardsChest": "Show Daily Rewards Chest",
       "mobileCameraJoystick": "Camera joystick",
       "mobileLeftHanded": "Left-handed layout",
+      "touchPreciseAim": "Precise Ground Targeting",
+      "touchPreciseAimNote": "Aim before casting ground spells. Turn off to cast instantly at the suggested point.",
       "touchTapMenus": "Tap menus",
       "touchTapMenusNote": "Open the action, consumable and menu controls with a tap instead of a swipe. Tap an item to use it, tap the control again for its usual action, or tap outside to close."
     },
@@ -1622,6 +1624,7 @@ export const en_CA: EnTranslations = {
       "invertY": "Invert Camera (Y)",
       "deadzone": "Stick Deadzone",
       "cameraSpeed": "Camera Speed",
+      "reticleSpeed": "Reticle Speed",
       "vibration": "Vibration",
       "buttons": "Button Layout",
       "resetButtons": "Reset Button Layout",
@@ -11326,7 +11329,7 @@ export const en_CA: EnTranslations = {
       },
       "multi_shot": {
         "name": "Splitshot",
-        "description": "Loose a spread at the target area, dealing {damage} Physical damage to enemies within 8 yd. (Hunter talent)"
+        "description": "Loose a spread at the target area, dealing {damage} Physical damage to enemies within 8 yd. Cannot be aimed within 8 yd of you. (Hunter talent)"
       },
       "prayer_of_healing": {
         "name": "Choirmend",

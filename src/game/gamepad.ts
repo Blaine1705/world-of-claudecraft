@@ -76,6 +76,11 @@ export interface GamepadCallbacks {
   // True while any interactive HUD window is open, switching the pad into the
   // focus-driven UI-navigation mode (movement/camera/abilities are suspended).
   isPointerMode(): boolean;
+  isGroundAimActive?(): boolean;
+  onGroundAimStick?(x: number, y: number, dt: number): void;
+  onGroundAimCommit?(): void;
+  onGroundAimSnap?(direction: 1 | -1): void;
+  cancelGroundAim?(): void;
   // Current local-player health, for rumble-on-damage. Optional.
   getPlayerHealth?(): number;
   // A pad connected or disconnected, so the detected brand (and thus the button
@@ -169,6 +174,7 @@ export class GamepadManager {
   // stepping onto a control beats steering a pointer at it, so this is the escape
   // hatch for what the focus order cannot reach, not the everyday path.
   private mouseMode = false;
+  private placementActive = false;
   private heldCasts = new Map<number, PadCastHold>();
   // Arranging the bar on the bar itself. While it is on, confirm and cancel act on
   // the focused CELL rather than casting, so a player cannot fire an ability by
@@ -228,6 +234,8 @@ export class GamepadManager {
     this.prevPressed.fill(false);
     this.input.clearGamepadMove();
     this.input.setGamepadLookActive(false);
+    this.cb.cancelGroundAim?.();
+    this.placementActive = false;
     this.releaseCrossHotbarEdit();
     this.releaseCrossHotbar();
     this.exitNavMode();
@@ -361,6 +369,8 @@ export class GamepadManager {
       this.prevPressed.fill(false);
       this.input.clearGamepadMove();
       this.input.setGamepadLookActive(false);
+      this.cb.cancelGroundAim?.();
+      this.placementActive = false;
       this.releaseCrossHotbarEdit();
       this.releaseCrossHotbar();
       this.cb.onConnectionChange?.();
@@ -406,6 +416,7 @@ export class GamepadManager {
   poll(dt: number): void {
     const pad = this.activePad();
     if (!pad) {
+      this.placementActive = false;
       if (this.heldCasts.size > 0) this.releaseHeldCasts();
       return;
     }
@@ -428,6 +439,8 @@ export class GamepadManager {
     if (!this.windowFocused()) {
       this.input.clearGamepadMove();
       this.input.setGamepadLookActive(false);
+      this.cb.cancelGroundAim?.();
+      this.placementActive = false;
       this.releaseCrossHotbarEdit();
       this.releaseCrossHotbar();
       this.releaseHeldCasts();
@@ -439,6 +452,62 @@ export class GamepadManager {
 
     this.checkRumble();
 
+    const groundAimActive = this.cb.isGroundAimActive?.() === true;
+    if (groundAimActive && !this.cb.isPointerMode()) {
+      this.input.clearGamepadMove();
+      if (!this.placementActive) this.input.setAutorun(false);
+      this.placementActive = true;
+
+      const rx = pad.axes[AXIS.RIGHT_X] ?? 0;
+      const ry = pad.axes[AXIS.RIGHT_Y] ?? 0;
+      const look = stickToLook(rx, ry, this.deadzone, this.camSpeed, this.invertY, dt);
+      this.input.applyGamepadLook(look.yaw, look.pitch);
+      this.input.setGamepadLookActive(look.active);
+
+      const lx = pad.axes[AXIS.LEFT_X] ?? 0;
+      const ly = pad.axes[AXIS.LEFT_Y] ?? 0;
+      const stick = applyRadialDeadzone(lx, ly, this.deadzone);
+      this.cb.onGroundAimStick?.(stick.x, stick.y, dt);
+
+      this.updateCrossHotbarTriggers(cur);
+
+      const padActiveThisFrame = cur.some(Boolean) || stick.x !== 0 || stick.y !== 0 || look.active;
+      if (padActiveThisFrame) markPadActivity();
+      let acted = stick.x !== 0 || stick.y !== 0 || look.active;
+      for (const idx of risingEdges(this.prevPressed, cur)) {
+        acted = true;
+        this.cb.onInputEdge();
+        if (this.triggerState.hold !== null) {
+          this.dispatch(idx);
+          continue;
+        }
+        if (idx === GP.DPAD_LEFT) {
+          this.cb.onGroundAimSnap?.(-1);
+          continue;
+        }
+        if (idx === GP.DPAD_RIGHT) {
+          this.cb.onGroundAimSnap?.(1);
+          continue;
+        }
+        if (idx === GP.DPAD_UP || idx === GP.DPAD_DOWN) continue;
+        const action = this.bindings.actionFor(idx);
+        if (action === GAMEPAD_CONFIRM) {
+          this.cb.onGroundAimCommit?.();
+          continue;
+        }
+        if (action === GAMEPAD_CANCEL) {
+          this.cb.cancelGroundAim?.();
+          continue;
+        }
+        if (action !== GAMEPAD_NONE) this.cb.cancelGroundAim?.();
+        this.dispatch(idx);
+      }
+      if (acted) this.cb.onActivity?.();
+      this.prevPressed = cur;
+      return;
+    }
+    this.placementActive = false;
+
     // FFXIV's toggle for the virtual mouse: LB + right-stick-click. Checked as a
     // CHORD (either button rising while the other is held) so the order the two
     // are pressed in does not matter.
@@ -447,13 +516,15 @@ export class GamepadManager {
     // modifiers already work this way; this is the same rule for a chord.
     let chordButton: number | null = null;
     const chordRise =
-      (cur[GP.LB] && !this.prevPressed[GP.LB] && cur[GP.R3]) ||
-      (cur[GP.R3] && !this.prevPressed[GP.R3] && cur[GP.LB]);
+      !groundAimActive &&
+      ((cur[GP.LB] && !this.prevPressed[GP.LB] && cur[GP.R3]) ||
+        (cur[GP.R3] && !this.prevPressed[GP.R3] && cur[GP.LB]));
     // Arrange mode, the same shape of chord: LB plus the top face button. On the
     // bar rather than in a menu, because a pad player is looking at the bar.
     const editChord =
-      (cur[GP.LB] && !this.prevPressed[GP.LB] && cur[GP.Y]) ||
-      (cur[GP.Y] && !this.prevPressed[GP.Y] && cur[GP.LB]);
+      !groundAimActive &&
+      ((cur[GP.LB] && !this.prevPressed[GP.LB] && cur[GP.Y]) ||
+        (cur[GP.Y] && !this.prevPressed[GP.Y] && cur[GP.LB]));
     if (editChord && this.crossHotbar) {
       chordButton = cur[GP.Y] && !this.prevPressed[GP.Y] ? GP.Y : GP.LB;
       this.toggleCrossHotbarEdit();

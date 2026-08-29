@@ -382,6 +382,7 @@ import {
   type ActionBarView,
   type ActionBarWorldInput,
   ATTACK_ICON_KEY,
+  actionBarCooldownRemaining,
   createActionBarView,
   EMPTY_ICON_KEY,
   ITEM_ICON_PREFIX,
@@ -398,17 +399,17 @@ import {
   buildMobileConsumableSeat,
   type MobileConsumableSeat,
 } from './hud/action_bar/consumable_seat_controller';
+import { bindEmpoweredActionHold } from './hud/action_bar/empowered_hold';
 import {
   type AimPoint,
-  abilityAoeRadius,
-  cancelGroundAim,
-  clampAimToRange,
-  commitGroundAim,
-  createGroundAimState,
-  enterGroundAim,
-  type GroundAimState,
+  quickAimPoint,
   shouldUseGroundAim,
+  XHB_ONLY_AIM_SLOT,
 } from './hud/action_bar/ground_aim';
+import {
+  GroundAimController,
+  type GroundAimReticleView,
+} from './hud/action_bar/ground_aim_controller';
 import {
   applyLoadoutBar as applyLoadoutBarActions,
   assignAttackSlotAction,
@@ -427,8 +428,10 @@ import {
 import { itemInBagsLine } from './hud/action_bar/item_bags_line_core';
 import {
   clampMobilePage,
-  mobileActionSourceSlotCount,
+  MOBILE_ACTION_PAGE_COUNT,
+  MOBILE_ACTION_SOURCE_SLOT_COUNT,
   mobileButtonHasSourceSlot,
+  mobileButtonOwnsSourceSlot,
   mobilePageCount,
   nextMobilePage,
   sourceSlotForMobileButton,
@@ -842,6 +845,7 @@ export interface OptionsHooks {
   // structurally), so the Controller options panel can read & rebind buttons
   // without the HUD importing the manager.
   gamepad: GamepadBindingsHooks;
+  groundAimTargetAttackable?: (targetId: number) => boolean;
 }
 
 export type GraphicsApplyOutcome = 'applied' | 'saved' | 'failed' | 'fatal';
@@ -1354,9 +1358,15 @@ export class Hud {
   private set attackSlotAction(action: HotbarAction) {
     this.actionBarController.replaceAttackAction(action);
   }
-  private groundAim: GroundAimState = createGroundAimState();
-  private groundAimPoint: AimPoint | null = null;
-  private groundAimClamped = false;
+  private readonly groundAim = new GroundAimController({
+    player: () => this.sim.player,
+    resolveAbility: (id) => this.sim.known.find((k) => k.def.id === id) ?? null,
+    seedTargetPoint: () => this.groundAimSeedTarget(),
+    fallbackPoint: () => this.groundTargetAim(),
+    castAt: (id, point) => this.sim.castAbilityAt(id, point),
+    clearReticle: () => this.renderer.setGroundAimReticle(null),
+    projectPlacement: (id, point) => this.sim.groundAimPlacementPreview(id, point),
+  });
   private readonly empowerHold = new EmpowerHold();
   private dragAction: {
     action: Exclude<HotbarAction, null>;
@@ -5767,7 +5777,7 @@ export class Hud {
     onVisibilityChange: () => this.syncAnyWindowOpenState(),
     hideTooltip: () => this.hideTooltip(),
     barActions: () => this.hotbarActions,
-    sourceSlotCount: () => this.mobileActionSourceSlotCount(),
+    sourceSlotCount: () => MOBILE_ACTION_SOURCE_SLOT_COUNT,
     editAllowed: () => isActionBarEditAllowed(this.actionBarsLocked(), 'drop'),
     placeAbility: (abilityId, slot) => {
       if (!this.actionBarController.isAssignableAction({ type: 'ability', id: abilityId })) return;
@@ -7246,6 +7256,14 @@ export class Hud {
     return { x: me.pos.x, z: me.pos.z };
   }
 
+  private groundAimSeedTarget(): AimPoint | null {
+    const me = this.sim.player;
+    const target = me.targetId !== null ? this.sim.entities.get(me.targetId) : null;
+    if (!target || target.dead || target.id === me.id) return null;
+    const attackable = this.optionsHooks?.groundAimTargetAttackable;
+    return !attackable || attackable(target.id) ? { x: target.pos.x, z: target.pos.z } : null;
+  }
+
   private empoweredAbilityIdForSlot(slot: number): string | null {
     const known = this.abilityForSlot(slot);
     return known?.def.empowerStages ? known.def.id : null;
@@ -7265,122 +7283,61 @@ export class Hud {
   }
 
   private bindEmpoweredActionHold(btn: HTMLButtonElement, resolveSlot: () => number): void {
-    let heldPointer: number | null = null;
-    let heldSlot: number | null = null;
-    btn.addEventListener('pointerdown', (event) => {
-      if (event.pointerType === 'mouse' && event.button !== 0) return;
-      if (this.actionBarBind) return; // bind mode owns clicks/holds on the bar
-      const slot = resolveSlot();
-      if (!this.empoweredAbilityIdForSlot(slot)) return;
-      if (this.empowerHold.active) return;
-      heldPointer = event.pointerId;
-      heldSlot = slot;
-      this.pressSlot(slot);
-      try {
-        btn.setPointerCapture?.(event.pointerId);
-      } catch {
-        /* pointer already released */
-      }
-      event.preventDefault();
+    bindEmpoweredActionHold(btn, resolveSlot, {
+      bindModeActive: () => this.actionBarBind !== null,
+      empoweredAbilityIdForSlot: (slot) => this.empoweredAbilityIdForSlot(slot),
+      chargeActive: () => this.empowerHold.active,
+      pressSlot: (slot) => this.pressSlot(slot),
+      releaseSlot: (slot) => this.releaseSlot(slot),
+      suppressNextClick: () => {
+        this.suppressNextActionClick = true;
+      },
     });
-    const release = (event: PointerEvent, suppressClick: boolean) => {
-      if (heldPointer !== event.pointerId || heldSlot === null) return;
-      const slot = heldSlot;
-      heldPointer = null;
-      heldSlot = null;
-      this.releaseSlot(slot);
-      if (suppressClick) this.suppressNextActionClick = true;
-      event.preventDefault();
-    };
-    btn.addEventListener('pointerup', (event) => release(event, true));
-    btn.addEventListener('pointercancel', (event) => release(event, false));
   }
 
-  private groundReticleEnabled(abilityId: string): boolean {
+  private groundReticleEnabled(): boolean {
     return shouldUseGroundAim(
-      abilityId,
       document.body.classList.contains('mobile-touch'),
       this.optionsHooks?.settings.get('groundReticle') ?? true,
+      this.optionsHooks?.settings.get('touchPreciseGroundAim') ?? true,
     );
   }
 
+  // Thin delegates over GroundAimController: the public surface stays stable.
   isGroundAimActive(): boolean {
-    return this.groundAim.activeAbilityId !== null;
+    return this.groundAim.isActive();
   }
 
   cancelGroundAim(): boolean {
-    if (!this.isGroundAimActive()) return false;
-    this.groundAim = cancelGroundAim(this.groundAim);
-    this.groundAimPoint = null;
-    this.groundAimClamped = false;
-    this.renderer.setGroundAimReticle(null);
-    return true;
+    return this.groundAim.cancel();
   }
 
   private beginGroundAim(abilityId: string, slot: number): void {
-    this.groundAim = enterGroundAim(this.groundAim, abilityId, slot);
-    this.groundAimPoint = null;
+    this.groundAim.begin(abilityId, slot);
   }
 
-  private activeGroundAimAbility(): ResolvedAbility | null {
-    const id = this.groundAim.activeAbilityId;
-    if (!id) return null;
-    return this.sim.known.find((k) => k.def.id === id) ?? null;
+  groundAimAbilityRange(): number | null {
+    return this.groundAim.abilityRange();
   }
 
   updateGroundAimPoint(rawPoint: AimPoint | null): void {
-    if (!this.isGroundAimActive() || !rawPoint) {
-      this.groundAimPoint = null;
-      this.groundAimClamped = false;
-      return;
-    }
-    const res = this.activeGroundAimAbility();
-    if (!res) {
-      this.cancelGroundAim();
-      return;
-    }
-    const aim = clampAimToRange(this.sim.player, rawPoint, res.def.range);
-    this.groundAimPoint = aim.point;
-    this.groundAimClamped = aim.clamped;
+    this.groundAim.updatePoint(rawPoint);
   }
 
-  groundAimReticle(): {
-    point: AimPoint;
-    radius: number;
-    school: string;
-    clamped: boolean;
-  } | null {
-    if (!this.isGroundAimActive()) return null;
-    const point = this.groundAimPoint;
-    if (!point) return null;
-    const res = this.activeGroundAimAbility();
-    if (!res) return null;
-    return {
-      point,
-      radius: abilityAoeRadius(res),
-      school: res.def.school,
-      clamped: this.groundAimClamped,
-    };
+  nudgeGroundAimPoint(dx: number, dz: number): void {
+    this.groundAim.nudge(dx, dz);
   }
 
-  commitGroundAimAt(rawPoint: AimPoint | null = this.groundAimPoint): boolean {
-    if (!this.isGroundAimActive()) return false;
-    const res = this.activeGroundAimAbility();
-    const abilityId = this.groundAim.activeAbilityId;
-    if (!res || !abilityId) {
-      this.cancelGroundAim();
-      return true;
-    }
-    const point = rawPoint
-      ? clampAimToRange(this.sim.player, rawPoint, res.def.range).point
-      : this.groundTargetAim();
-    const committed = commitGroundAim(this.groundAim);
-    this.groundAim = committed.state;
-    this.groundAimPoint = null;
-    this.groundAimClamped = false;
-    this.renderer.setGroundAimReticle(null);
-    this.sim.castAbilityAt(abilityId, point);
-    return true;
+  groundAimReticle(): GroundAimReticleView | null {
+    return this.groundAim.reticle();
+  }
+
+  commitGroundAimAt(rawPoint?: AimPoint | null): boolean {
+    return this.groundAim.commitAt(rawPoint);
+  }
+
+  commitGroundAim(): boolean {
+    return this.groundAim.commitAt();
   }
 
   private activateFixedAttackSlot(): void {
@@ -7416,7 +7373,8 @@ export class Hud {
 
   // Tap-shaped cross hotbar fire (no hold edge available). The bar is seeded from
   // the action bar, so the slot lookup almost always hits; an action arranged onto
-  // the pad and nowhere else falls back to a plain cast or the shared item-use seam.
+  // the pad and nowhere else falls back to a plain cast (position abilities keep
+  // the reticle via the ability-id aim identity) or the shared item-use seam.
   castCrossHotbarAction(action: { type: 'ability' | 'item'; id: string }): void {
     // Attack is the fixed slot-0 toggle, not something the sim can cast by id.
     if (action.id === CROSS_HOTBAR_ATTACK_ID) {
@@ -7430,8 +7388,22 @@ export class Hud {
       this.castSlot(slot);
       return;
     }
-    // The sim owns the refusal for an ability the player no longer knows.
     if (action.type === 'ability') {
+      // A pad-only position ability still gets the reticle: aim identity falls
+      // back to the ability id (XHB_ONLY_AIM_SLOT), so re-press still commits.
+      const known = this.sim.known.find((k) => k.def.id === action.id) ?? null;
+      if (known && known.def.targetMode === 'position' && !known.def.selfCentered) {
+        if (this.isGroundAimActive()) {
+          if (this.groundAim.activeAbilityId() === action.id) {
+            this.commitGroundAimAt();
+            return;
+          }
+          this.cancelGroundAim();
+        }
+        this.castPositionAbility(action.id, known, XHB_ONLY_AIM_SLOT);
+        return;
+      }
+      // The sim owns the refusal for an ability the player no longer knows.
       this.sim.castAbility(action.id);
       return;
     }
@@ -7445,9 +7417,36 @@ export class Hud {
     this.showError(tSim('error.noItem'));
   }
 
+  // One decision for a position press (bar slots and the XHB-only fallback):
+  // enter aim when the reticle applies and the cast could start (alive, off
+  // cooldown; resources and the GCD change while aiming, so they never gate
+  // entry), else cast instantly. slotForAim is the re-press commit identity.
+  private castPositionAbility(
+    abilityId: string,
+    resolved: ResolvedAbility,
+    slotForAim: number,
+  ): void {
+    const cooldown = actionBarCooldownRemaining(this.sim.player, resolved);
+    if (this.groundReticleEnabled() && !this.sim.player.dead && cooldown <= 0) {
+      this.beginGroundAim(abilityId, slotForAim);
+      return;
+    }
+    this.sim.castAbilityAt(
+      abilityId,
+      quickAimPoint(
+        this.sim.player,
+        this.groundAimSeedTarget(),
+        this.groundTargetAim(),
+        resolved.def.range,
+        resolved.def.minRange,
+        document.body.classList.contains('mobile-touch'),
+      ),
+    );
+  }
+
   castSlot(barSlot: number): void {
     if (this.isGroundAimActive()) {
-      if (this.groundAim.activeSlot === barSlot) {
+      if (this.groundAim.activeSlot() === barSlot) {
         this.commitGroundAimAt();
         this.flashActionSlot(barSlot);
         return;
@@ -7475,11 +7474,7 @@ export class Hud {
         // A self-centered channel (Bladestorm) casts at the caster's own feet:
         // no ground-aim reticle, straight to the normal cast path.
         if (resolved.def.targetMode === 'position' && !resolved.def.selfCentered) {
-          if (this.groundReticleEnabled(action.id)) {
-            this.beginGroundAim(action.id, barSlot);
-          } else {
-            this.sim.castAbilityAt(action.id, this.groundTargetAim());
-          }
+          this.castPositionAbility(action.id, resolved, barSlot);
         } else {
           // Clique-style mouseover cast: a friendly (heal/buff) ability pressed
           // while hovering a party frame lands on the hovered member instead of
@@ -7542,18 +7537,8 @@ export class Hud {
     if ($('#bags').style.display !== 'none') this.renderBags();
   }
 
-  private mobileActionSourceSlotCount(): number {
-    return mobileActionSourceSlotCount();
-  }
-
-  private mobileActionPageCount(): number {
-    return mobilePageCount(this.mobileActionSourceSlotCount());
-  }
-
   private currentMobileActionPage(): number {
-    const page = clampMobilePage(this.mobileActionPage, this.mobileActionPageCount());
-    this.mobileActionPage = page;
-    return page;
+    return clampMobilePage(this.mobileActionPage);
   }
 
   private mobileSourceSlotForButton(
@@ -7563,14 +7548,17 @@ export class Hud {
     return sourceSlotForMobileButton(this.currentMobileActionPage(), buttonIndex, direction);
   }
 
-  // Advance the mobile action ring to its next page. Mutates mobileActionPage
+  // Advance the mobile action ring to its next page. Drops any armed ground aim
+  // first (the aim's re-press identity is a source SLOT, which the same physical
+  // button no longer maps to after the flip), then mutates mobileActionPage
   // ONLY: the ring descriptor's per-slot closures (built once in buildActionBar)
   // resolve sourceSlotForMobileButton(mobileActionPage, i) fresh every tick, so no
   // descriptor rebuild is needed and hidden-page cooldowns keep ticking (their
   // state lives on hotbarActions + sim, not on the view). The next update() call
   // repaints the ring from the new page.
   private cycleMobileActionPage(): void {
-    this.mobileActionPage = nextMobilePage(this.mobileActionPage, this.mobileActionPageCount());
+    this.cancelGroundAim();
+    this.mobileActionPage = nextMobilePage(this.mobileActionPage, MOBILE_ACTION_PAGE_COUNT);
   }
 
   private flashActionSlot(barSlot: number): void {
@@ -7924,6 +7912,7 @@ export class Hud {
           const slotKey = `slot${i}`;
           return {
             slotIndex: i,
+            ownsAimSlot: (activeAimSlot: number) => activeAimSlot === i,
             // Live accessor: slot 0 stops being the Attack toggle when the player
             // removes it (Interface option showAttackButton off / right-click).
             isAttack: () => i === 0 && this.attackSlotIsAttack(),
@@ -7984,7 +7973,9 @@ export class Hud {
     this.crossHotbar = CrossHotbarController.create(
       this.writerFacet,
       (k) => this.actionBarIconBg(k),
-      crossHotbarResolvers(this.sim, ITEMS, abilityDisplayName, itemDisplayName),
+      crossHotbarResolvers(this.sim, ITEMS, abilityDisplayName, itemDisplayName, () =>
+        this.groundAim.activeAbilityId(),
+      ),
     );
     this.buildMobileActionRing();
     this.buildMobileConsumableSeat();
@@ -8032,9 +8023,9 @@ export class Hud {
       sourceSlot: (i, direction) => this.mobileSourceSlotForButton(i, direction),
       hasSourceSlot: (i, direction) =>
         mobileButtonHasSourceSlot(
-          this.currentMobileActionPage(),
+          clampMobilePage(this.mobileActionPage),
           i,
-          this.mobileActionSourceSlotCount(),
+          MOBILE_ACTION_SOURCE_SLOT_COUNT,
           direction,
         ),
       actionForSlot: (slot) => this.actionForSlot(slot),
@@ -8047,6 +8038,13 @@ export class Hud {
         this.suppressNextActionClick = false;
         return true;
       },
+      aimOwnsButton: (buttonIndex) =>
+        mobileButtonOwnsSourceSlot(
+          clampMobilePage(this.mobileActionPage),
+          buttonIndex,
+          this.groundAim.activeSlot(),
+        ),
+      cancelAim: () => this.cancelGroundAim(),
       castSlot: (slot) => this.castSlot(slot),
       cyclePage: () => this.cycleMobileActionPage(),
       activateFixedAttackSlot: () => this.activateFixedAttackSlot(),
@@ -9431,6 +9429,7 @@ export class Hud {
       actionBarWorld.paladinSpec = sim.talentSpec;
       actionBarWorld.fateThreads = fateThreads;
       actionBarWorld.entities = sim.entities.values();
+      actionBarWorld.activeAimSlot = this.groundAim.activeSlot();
     } else {
       actionBarWorld = {
         player: p,
@@ -9440,6 +9439,7 @@ export class Hud {
         paladinSpec: sim.talentSpec,
         fateThreads,
         entities: sim.entities.values(),
+        activeAimSlot: this.groundAim.activeSlot(),
       };
       this.actionBarWorldInput = actionBarWorld;
     }
@@ -9454,12 +9454,11 @@ export class Hud {
     // that row's mobile gate.
     this.crossHotbar?.paint(actionBarWorld);
 
-    // mobile action ring: the paged touch cluster replacing the bar above
-    // (view/painter stay undefined if the ring DOM never got built, e.g. an
-    // older cached template). Reuses the desktop bar's world snapshot.
+    // The paged touch ring reuses the desktop bar's world snapshot and stays
+    // absent when older cached markup did not build its view and painter.
     if (this.isMobileLayout() && this.mobileActionRingView && this.mobileActionRingPainter) {
       const mobileActionPage = this.currentMobileActionPage();
-      const mobileActionSourceSlotCount = this.mobileActionSourceSlotCount();
+      const mobileActionSourceSlotCount = MOBILE_ACTION_SOURCE_SLOT_COUNT;
       this.mobileActionRingPainter.paint(
         this.mobileActionRingView.tick(actionBarWorld),
         mobileActionPage,

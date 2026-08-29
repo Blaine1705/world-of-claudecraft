@@ -1587,6 +1587,8 @@ export const vi_VN: EnTranslations = {
       "showDailyRewardsChest": "Hiện Rương Phần Thưởng Hằng Ngày",
       "mobileCameraJoystick": "Cần điều khiển máy ảnh",
       "mobileLeftHanded": "Bố cục thuận tay trái",
+      "touchPreciseAim": "Precise Ground Targeting",
+      "touchPreciseAimNote": "Aim before casting ground spells. Turn off to cast instantly at the suggested point.",
       "touchTapMenus": "Chạm để mở menu",
       "touchTapMenusNote": "Mở các nút điều khiển hành động, vật phẩm tiêu hao và menu bằng một cú chạm thay vì vuốt. Chạm vào một mục để dùng nó, chạm lại vào nút điều khiển để thực hiện hành động thông thường của nó, hoặc chạm ra ngoài để đóng lại."
     },
@@ -1622,6 +1624,7 @@ export const vi_VN: EnTranslations = {
       "invertY": "Đảo Ngược Camera (Y)",
       "deadzone": "Vùng Chết Cần Điều Khiển",
       "cameraSpeed": "Tốc Độ Camera",
+      "reticleSpeed": "Reticle Speed",
       "vibration": "Rung",
       "buttons": "Bố Cục Nút",
       "resetButtons": "Đặt Lại Bố Cục Nút",

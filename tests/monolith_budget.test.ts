@@ -255,7 +255,12 @@ const MONOLITHS: MonolithRow[] = [
     // src/ui/empower_hold_core.ts; this branch's arm stays its +3 store and
     // vault chrome. Measured on the merged tree, never reconciled by
     // arithmetic. Exact count, zero slack.
-    ceiling: 19003,
+    // Re-pinned at the sixth release/v0.41.0 sync, now on the PR 3676 arm: the
+    // ground-aim branch had down-ratcheted its own row via the quickAimPoint
+    // and reticle-sync-closure extractions (one under the empower-hold base),
+    // and the release arm carries the bank-storage +3 above. Measured on the
+    // merged tree, never reconciled by arithmetic. Exact count, zero slack.
+    ceiling: 19002,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -321,7 +326,11 @@ const MONOLITHS: MonolithRow[] = [
     // exact release-side count 13328 (it never touches renderer.ts), while this
     // branch's renderer edits still land the merged file at 13331. Measured on
     // the merged tree. Exact merged count, zero headroom.
-    ceiling: 13331,
+    // Re-pinned at the PR 3676 sync after PR 3645 (entry fade gate) merged:
+    // that arm's entry-horizon cull and this branch's ground-aim reticle
+    // pass-through both land in the merged file. Measured on the merged tree,
+    // never reconciled by arithmetic. Exact merged count, zero headroom.
+    ceiling: 13333,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -405,7 +414,14 @@ const MONOLITHS: MonolithRow[] = [
     // shape as its craftVaultStockFor neighbor. The raise is this PR's
     // REQUEST, not a settled ruling: merging is what ratifies it. Exact
     // count, zero slack.
-    ceiling: 12355,
+    // Plus 4 for the groundAimPlacementPreview IWorld member (the placement
+    // reticle's true-landing preview; the sanctioned both-worlds seam, a
+    // one-line delegate into combat/heroic_leap.ts). Exact count, zero slack.
+    // Re-pinned at the sixth release/v0.41.0 sync: the release arm's own row
+    // moved down across the bank-storage and entry-fade merges while this
+    // branch keeps its +4 above. Measured on the merged tree, never
+    // reconciled by arithmetic. Exact count, zero slack.
+    ceiling: 12359,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -442,7 +458,11 @@ const MONOLITHS: MonolithRow[] = [
     // merge lowered the release row by 1 (the pad cast routing lives in
     // src/game/pad_cast_routing.ts), so the merged file lands at 11625.
     // Exact merged count, zero headroom.
-    ceiling: 11625,
+    // Re-pinned at the PR 3676 sync: this branch's reticle-sync closure
+    // extraction pays 2 more under the entry-fade row above. Measured on the
+    // merged tree, never reconciled by arithmetic. Exact merged count, zero
+    // headroom.
+    ceiling: 11623,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -539,7 +559,14 @@ const MONOLITHS: MonolithRow[] = [
     // kind); this branch's +66 rides on top, so the merged count lands below
     // the branch pin and the ratchet follows it DOWN. Measured on the merged
     // tree, never reconciled by arithmetic. Exact count, zero slack.
-    ceiling: 5883,
+    // Plus 5 for the groundAimPlacementPreview IWorld member (the placement
+    // reticle's true-landing preview; the sanctioned both-worlds seam, a
+    // one-line delegate into the shared sim gate). Exact merged count, zero
+    // slack.
+    // Re-pinned at the PR 3676 sixth v0.41.0 sync: the bank-storage arm's +66
+    // and this branch's +5 above compose. Measured on the merged tree, never
+    // reconciled by arithmetic. Exact count, zero slack.
+    ceiling: 5888,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

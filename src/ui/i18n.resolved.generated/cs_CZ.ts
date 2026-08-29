@@ -1587,6 +1587,8 @@ export const cs_CZ: EnTranslations = {
       "showDailyRewardsChest": "Zobrazit truhlu denních odměn",
       "mobileCameraJoystick": "Joystick kamery",
       "mobileLeftHanded": "Rozvržení pro leváky",
+      "touchPreciseAim": "Precise Ground Targeting",
+      "touchPreciseAimNote": "Aim before casting ground spells. Turn off to cast instantly at the suggested point.",
       "touchTapMenus": "Menu klepnutím",
       "touchTapMenusNote": "Otevírej ovladače akcí, spotřebních předmětů a menu klepnutím místo přejetím. Klepni na položku, ať ji použiješ, klepni na ovladač znovu pro jeho obvyklou akci, nebo klepni mimo něj, ať ho zavřeš."
     },
@@ -1622,6 +1624,7 @@ export const cs_CZ: EnTranslations = {
       "invertY": "Invertovat kameru (Y)",
       "deadzone": "Mrtvá zóna páčky",
       "cameraSpeed": "Rychlost kamery",
+      "reticleSpeed": "Reticle Speed",
       "vibration": "Vibrace",
       "buttons": "Rozložení tlačítek",
       "resetButtons": "Resetovat rozložení tlačítek",

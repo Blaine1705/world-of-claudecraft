@@ -12,6 +12,7 @@ import {
 } from '../sim/account_flair';
 import { bagCapacity } from '../sim/bags';
 import { signChallenge } from '../sim/client_challenge';
+import { heroicLeapPlacementPreview } from '../sim/combat/heroic_leap';
 import { MOUNT_RACE_COURSE, type MountKey, normalizeMountKey } from '../sim/content/mounts';
 import { mechChromaSkinIndex } from '../sim/content/skins';
 import {
@@ -153,6 +154,7 @@ import {
   type ActionBarLayoutRestore,
   sanitizeActionBarLayout,
 } from '../world_api/action_bar';
+import type { GroundAimPointXZ } from '../world_api/combat';
 import type {
   ApplyEnchantResultView,
   CommissionOrderScope,
@@ -3950,6 +3952,9 @@ export class ClientWorld implements IWorld {
     return abilityId === 'mongoose_bite'
       ? Math.max(0, (this.counterfangWindowDeadlineMs - performance.now()) / 1000)
       : 0;
+  }
+  groundAimPlacementPreview(abilityId: string, point: GroundAimPointXZ): GroundAimPointXZ {
+    return heroicLeapPlacementPreview(this.cfg.seed, this.player, abilityId, point);
   }
   castAbility(abilityId: string): void {
     if (this.deadTargetCast(this.known.find((k) => k.def.id === abilityId)?.def)) {

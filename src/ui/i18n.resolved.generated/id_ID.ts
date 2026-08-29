@@ -1587,6 +1587,8 @@ export const id_ID: EnTranslations = {
       "showDailyRewardsChest": "Tampilkan Peti Hadiah Harian",
       "mobileCameraJoystick": "Joystick kamera",
       "mobileLeftHanded": "Tata letak kidal",
+      "touchPreciseAim": "Precise Ground Targeting",
+      "touchPreciseAimNote": "Aim before casting ground spells. Turn off to cast instantly at the suggested point.",
       "touchTapMenus": "Ketuk untuk Menu",
       "touchTapMenusNote": "Buka kontrol aksi, barang habis pakai, dan menu dengan ketukan, bukan geseran. Ketuk sebuah item untuk memakainya, ketuk kontrolnya lagi untuk aksi biasanya, atau ketuk di luar untuk menutup."
     },
@@ -1622,6 +1624,7 @@ export const id_ID: EnTranslations = {
       "invertY": "Balikkan Kamera (Y)",
       "deadzone": "Zona Mati Tuas",
       "cameraSpeed": "Kecepatan Kamera",
+      "reticleSpeed": "Reticle Speed",
       "vibration": "Getaran",
       "buttons": "Tata Letak Tombol",
       "resetButtons": "Atur Ulang Tata Letak Tombol",

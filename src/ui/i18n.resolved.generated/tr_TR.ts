@@ -1587,6 +1587,8 @@ export const tr_TR: EnTranslations = {
       "showDailyRewardsChest": "Günlük Ödül Sandığını Göster",
       "mobileCameraJoystick": "Kamera joystick'i",
       "mobileLeftHanded": "Solak düzen",
+      "touchPreciseAim": "Precise Ground Targeting",
+      "touchPreciseAimNote": "Aim before casting ground spells. Turn off to cast instantly at the suggested point.",
       "touchTapMenus": "Dokunmatik menüler",
       "touchTapMenusNote": "Eylem, sarf malzemesi ve menü denetimlerini kaydırma yerine dokunarak aç. Kullanmak için bir ögeye dokun, olağan eylemi için denetime tekrar dokun, ya da kapatmak için dışarıya dokun."
     },
@@ -1622,6 +1624,7 @@ export const tr_TR: EnTranslations = {
       "invertY": "Kamerayı Ters Çevir (Y)",
       "deadzone": "Çubuk Ölü Bölgesi",
       "cameraSpeed": "Kamera Hızı",
+      "reticleSpeed": "Reticle Speed",
       "vibration": "Titreşim",
       "buttons": "Tuş Düzeni",
       "resetButtons": "Tuş Düzenini Sıfırla",

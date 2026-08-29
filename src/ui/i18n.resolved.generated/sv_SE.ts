@@ -1587,6 +1587,8 @@ export const sv_SE: EnTranslations = {
       "showDailyRewardsChest": "Visa kistan för dagliga belöningar",
       "mobileCameraJoystick": "Kamera joystick",
       "mobileLeftHanded": "Vänsterhänt layout",
+      "touchPreciseAim": "Precise Ground Targeting",
+      "touchPreciseAimNote": "Aim before casting ground spells. Turn off to cast instantly at the suggested point.",
       "touchTapMenus": "Tryckmenyer",
       "touchTapMenusNote": "Öppna handlings-, förbruknings- och menykontrollerna med ett tryck i stället för ett svep. Tryck på ett föremål för att använda det, tryck på kontrollen igen för dess vanliga funktion, eller tryck utanför för att stänga."
     },
@@ -1622,6 +1624,7 @@ export const sv_SE: EnTranslations = {
       "invertY": "Invertera kamera (Y)",
       "deadzone": "Spakens dödzon",
       "cameraSpeed": "Kamerahastighet",
+      "reticleSpeed": "Reticle Speed",
       "vibration": "Vibration",
       "buttons": "Knapplayout",
       "resetButtons": "Återställ knapplayout",

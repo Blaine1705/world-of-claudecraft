@@ -732,6 +732,23 @@ const saturdayClockSeed = async (page) => {
   );
 };
 
+// fakePadSeed's pad reports fixed axes; the placement shot steers the reticle
+// with the left stick, so wrap the installed fake to read live axes from the
+// same __fakePad handle the pressed list uses.
+const fakePadAxesSeed = async (page) => {
+  await fakePadSeed(page);
+  await page.evaluateOnNewDocument(
+    `var basePads = navigator.getGamepads.bind(navigator);
+     var withAxes = function () {
+       var pads = basePads();
+       if (pads && pads[0]) pads[0].axes = window.__fakePad.axes || [0, 0, 0, 0];
+       return pads;
+     };
+     try { Object.defineProperty(Navigator.prototype, 'getGamepads', { value: withAxes, configurable: true, writable: true }); } catch (e) {}
+     try { Object.defineProperty(navigator, 'getGamepads', { value: withAxes, configurable: true, writable: true }); } catch (e) {}`,
+  );
+};
+
 export const TARGETS = [
   {
     key: 'ravenrift',
@@ -11374,6 +11391,110 @@ export const TARGETS = [
         await wait(400);
       }
       return { clip: '#bar-editor' };
+    },
+  },
+  {
+    key: 'ground-aim-placement',
+    when: [
+      'action_bar/ground_aim',
+      'render/ground_aim_reticle_visual',
+      'game/pad_ground_aim',
+      'combat/heroic_leap',
+    ],
+    // Arms a real ground aim (the first known position ability, seated on bar
+    // slot 1) and shoots the world reticle plus the owning button's aiming
+    // accent. On a BASE touch build the meteor-only gate instant-casts
+    // instead, so the armed poll exhausts and the frame is the honest BEFORE:
+    // spell fired, no reticle, no accent.
+    variants: [
+      { key: 'desktop', charClass: 'mage', charName: 'Aimwright', beforeLoad: lowGraphicsSeed },
+      {
+        key: 'mobile',
+        mobile: true,
+        charClass: 'mage',
+        charName: 'Aimwright',
+        beforeLoad: lowGraphicsSeed,
+      },
+      // Pad: the cross hotbar stands up off the fake pad, the armed aim enters
+      // the placement mode for real, and the fake left stick steers the
+      // reticle. On a BASE build the stick does nothing and no reticle paints,
+      // which is the honest before frame beside the same visible bar.
+      {
+        key: 'pad',
+        charClass: 'mage',
+        charName: 'Aimwright',
+        beforeLoad: async (page) => {
+          await lowGraphicsSeed(page);
+          await fakePadAxesSeed(page);
+        },
+      },
+    ],
+    async capture(page, variant) {
+      for (let i = 0; i < 12; i++) {
+        await page.evaluate(() => {
+          document.querySelector('.camera-prompt-confirm')?.click();
+          document.querySelector('.tut-skip')?.click();
+          document.querySelector('.gpu-notice-dismiss')?.click();
+        });
+        await wait(500);
+      }
+      let staged = { ok: false, reason: 'world is unavailable' };
+      for (let i = 0; i < 20 && !staged.ok; i++) {
+        staged = await page.evaluate(() => {
+          const game = window.__game;
+          const sim = game?.sim;
+          const hud = game?.hud;
+          if (!sim?.player || !hud) return { ok: false, reason: 'world is unavailable' };
+          sim.setPlayerLevel?.(20);
+          // Baseline position spells ride the spec kit (Blizzard is frost's).
+          sim.setSpec?.('frost');
+          const known = sim.known?.find?.(
+            (k) => k.def.targetMode === 'position' && !k.def.selfCentered,
+          );
+          if (!known)
+            return {
+              ok: false,
+              reason:
+                'no position ability known: class=' +
+                (sim.player.class ?? '?') +
+                ' level=' +
+                sim.player.level +
+                ' known=' +
+                (sim.known?.map?.((k) => k.def.id).join(',') ?? 'none'),
+            };
+          hud.closeAll?.();
+          const actions = hud.hotbarActions.slice();
+          actions[0] = { type: 'ability', id: known.def.id };
+          hud.hotbarActions = actions;
+          hud.castSlot(1);
+          return { ok: true };
+        });
+        if (!staged.ok) await wait(500);
+      }
+      if (!staged.ok) throw new Error(staged.reason);
+      for (let i = 0; i < 20; i++) {
+        const armed = await page.evaluate(() => window.__game?.hud?.isGroundAimActive?.() === true);
+        if (armed) break;
+        await wait(200);
+      }
+      // Let the entry deed banner and greeting fade; the aim stays armed.
+      await wait(4500);
+      await page.evaluate(() => {
+        const hud = window.__game?.hud;
+        hud?.closeAll?.();
+        if (hud?.isGroundAimActive?.() !== true) hud?.castSlot?.(1);
+      });
+      if (variant?.key === 'pad') {
+        // Steer with the fake left stick through the live placement mode, then
+        // hold LT so the cross hotbar lights its held half for the frame.
+        await page.evaluate('window.__fakePad.axes = [0.85, -0.35, 0, 0]');
+        await wait(700);
+        await page.evaluate('window.__fakePad.axes = [0, 0, 0, 0]');
+        await page.evaluate(`window.__fakePad.pressed = [${GP_LT}]`);
+        await wait(400);
+      }
+      await wait(800);
+      return { clip: '#ui' };
     },
   },
 ];
