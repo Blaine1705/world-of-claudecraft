@@ -44,6 +44,7 @@ import {
   IGNIVAR_SKYFIRE_CAST_ID,
   updateIgnivarEncounter,
 } from '../src/sim/encounters/ignivar';
+import { IGNIVAR_DIALOGUE } from '../src/sim/encounters/ignivar_dialogue';
 import { polygonContainsPoint } from '../src/sim/geometry2d';
 import { IGNIVAR_WATER_CONDUIT_TEMPLATES } from '../src/sim/ignivar_arena';
 import {
@@ -335,6 +336,11 @@ describe('Ignivar Forge Judgment', () => {
     expect(boss.castTotal).toBe(IGNIVAR_JUDGMENT_DURATION_SECONDS);
     expect(boss.channeling).toBe(false);
     expect(boss.castAim).toBeNull();
+    expect(
+      warningEvents.some(
+        (event) => event.type === 'chat' && event.text === IGNIVAR_DIALOGUE.forgeJudgment,
+      ),
+    ).toBe(true);
     expect(ignivarForgeLayoutFromFacing(boss.facing)).toEqual({
       rotation: boss.ignivar.forgeJudgmentRotation,
       safeIndex,

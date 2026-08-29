@@ -503,6 +503,21 @@ const baseEnTable = {
   'dialogue.ignivarSkyBurns': 'The sky itself will burn!',
   'dialogue.ignivarSharePyre': 'Four must share the pyre, or all will burn!',
   'dialogue.ignivarDeath': 'Varkhul... the seal is broken.',
+  'dialogue.ignivarFinalBrand': 'Bear the Last Flame. Let it judge you.',
+  'dialogue.ignivarConduitActivated': 'The old wells answer to my fire.',
+  'dialogue.ignivarRotatingRays': 'Turn with the flame, or be unmade.',
+  'dialogue.ignivarApocalypse': 'Varkhul forged me to endure.',
+  'dialogue.ignivarDefeatSpark': 'Another spark, extinguished.',
+  'dialogue.ignivarDefeatForge': 'The forge rejects you.',
+  'dialogue.ignivarForgeJudgment': 'I am the seal. I will not break.',
+  'dialogue.ignivarRoomEntry':
+    'The seal hears you, little embers. Step closer, and feed the Last Flame.',
+  'dialogue.varkhulAssembly': 'The spring did not die. I bound its last memory into iron.',
+  'dialogue.varkhulAddsDefeated': 'You call it a prison because your flesh fears endurance.',
+  'dialogue.varkhulEngage':
+    'I am Varkhul, Forgefather of the Last Flame. Raise your weapons, little sparks.',
+  'dialogue.varkhulMasterpiece':
+    'Every blow will feed the furnace in my chest. By ember, stone, and anvil, I will unmake you.',
   'dialogue.varkhulDeath': 'Master... I have failed you.',
   'lore.ignivarFirstTempering':
     'Tempering Record I: "Water remembers shape. Fire commands it to endure."',
@@ -8574,6 +8589,92 @@ const PET_DICT: Record<SupportedLanguage, Record<PetSimMessageKey, string>> = {
   ...PET_NEW,
 };
 
+const RAID_BOSS_DIALOGUE_DICT: Partial<
+  Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, string>>>
+> = {
+  zh_CN: {
+    'dialogue.ignivarFinalBrand': '承受最后之焰。让它审判你。',
+    'dialogue.ignivarConduitActivated': '古老的泉源回应我的烈焰。',
+    'dialogue.ignivarRotatingRays': '随火焰旋转，否则便化为虚无。',
+    'dialogue.ignivarApocalypse': '瓦尔库尔锻造我，使我得以不灭。',
+    'dialogue.ignivarDefeatSpark': '又一粒火星，熄灭了。',
+    'dialogue.ignivarDefeatForge': '熔炉拒绝了你。',
+    'dialogue.ignivarForgeJudgment': '我即封印。我绝不会破碎。',
+    'dialogue.ignivarRoomEntry': '封印听见了你们，小小余烬。再靠近些，成为最后之焰的燃料吧。',
+    'dialogue.varkhulAssembly': '泉源并未死去。我将它最后的记忆束缚在钢铁之中。',
+    'dialogue.varkhulAddsDefeated': '你们称它为牢笼，只因血肉惧怕永恒。',
+    'dialogue.varkhulEngage': '我乃瓦尔库尔，最后之焰的铸炉之父。举起武器吧，小小火星。',
+    'dialogue.varkhulMasterpiece':
+      '每一次打击，都将为我胸中的熔炉添火。以余烬、岩石与铁砧之名，我要将你们彻底摧毁。',
+  },
+  zh_TW: {
+    'dialogue.ignivarFinalBrand': '承受最後之焰。讓它審判你。',
+    'dialogue.ignivarConduitActivated': '古老的泉源回應我的烈焰。',
+    'dialogue.ignivarRotatingRays': '隨火焰旋轉，否則便化為虛無。',
+    'dialogue.ignivarApocalypse': '瓦爾庫爾鍛造了我，使我得以不滅。',
+    'dialogue.ignivarDefeatSpark': '又一粒火星，熄滅了。',
+    'dialogue.ignivarDefeatForge': '熔爐拒絕了你。',
+    'dialogue.ignivarForgeJudgment': '我即封印。我絕不會破碎。',
+    'dialogue.ignivarRoomEntry': '封印聽見你們了，小小餘燼。再靠近些，成為最後之焰的燃料吧。',
+    'dialogue.varkhulAssembly': '泉源並未死去。我將它最後的記憶束縛在鋼鐵之中。',
+    'dialogue.varkhulAddsDefeated': '你們稱它為牢籠，只因血肉懼怕永恆。',
+    'dialogue.varkhulEngage': '我乃瓦爾庫爾，最後之焰的鑄爐之父。舉起武器吧，小小火星。',
+    'dialogue.varkhulMasterpiece':
+      '每一次打擊，都將為我胸中的熔爐添火。以餘燼、岩石與鐵砧之名，我要將你們徹底摧毀。',
+  },
+  ja_JP: {
+    'dialogue.ignivarFinalBrand': '最後の炎を受けよ。その裁きを受けるがいい。',
+    'dialogue.ignivarConduitActivated': '古き泉が我が炎に応える。',
+    'dialogue.ignivarRotatingRays': '炎と共に回れ。さもなくば消え去れ。',
+    'dialogue.ignivarApocalypse': 'ヴァルクルは耐え抜くために我を鍛えた。',
+    'dialogue.ignivarDefeatSpark': 'また一つ、火花が消えた。',
+    'dialogue.ignivarDefeatForge': '炉はお前を拒んだ。',
+    'dialogue.ignivarForgeJudgment': '我こそ封印。我は決して砕けぬ。',
+    'dialogue.ignivarRoomEntry':
+      '封印はお前たちを聞きつけた、小さき残り火よ。近づき、最後の炎の糧となれ。',
+    'dialogue.varkhulAssembly': '泉は死ななかった。その最後の記憶を鉄に封じた。',
+    'dialogue.varkhulAddsDefeated': 'お前たちがそれを牢獄と呼ぶのは、肉が永続を恐れるからだ。',
+    'dialogue.varkhulEngage': '我はヴァルクル、最後の炎の炉父。武器を掲げよ、小さき火花ども。',
+    'dialogue.varkhulMasterpiece':
+      '一撃ごとに我が胸の炉は燃え盛る。残り火と石と金床にかけて、お前たちを無へと砕く。',
+  },
+  ko_KR: {
+    'dialogue.ignivarFinalBrand': '마지막 불꽃을 견뎌라. 그 심판을 받아라.',
+    'dialogue.ignivarConduitActivated': '오래된 샘들이 내 불꽃에 응답한다.',
+    'dialogue.ignivarRotatingRays': '불꽃과 함께 돌아라. 아니면 존재째 지워지리라.',
+    'dialogue.ignivarApocalypse': '바르쿨은 내가 끝까지 버티도록 나를 벼려냈다.',
+    'dialogue.ignivarDefeatSpark': '또 하나의 불씨가 꺼졌군.',
+    'dialogue.ignivarDefeatForge': '용광로가 너를 거부한다.',
+    'dialogue.ignivarForgeJudgment': '내가 곧 봉인이다. 나는 결코 부서지지 않는다.',
+    'dialogue.ignivarRoomEntry':
+      '봉인이 너희를 들었다, 작은 잿불들아. 더 가까이 와서 마지막 불꽃의 먹이가 되어라.',
+    'dialogue.varkhulAssembly': '샘은 죽지 않았다. 나는 그 마지막 기억을 철에 묶었다.',
+    'dialogue.varkhulAddsDefeated':
+      '너희 살점이 영속을 두려워하기에 그것을 감옥이라 부르는 것이다.',
+    'dialogue.varkhulEngage':
+      '나는 바르쿨, 마지막 불꽃의 대장간 아버지다. 무기를 들어라, 작은 불티들아.',
+    'dialogue.varkhulMasterpiece':
+      '너희의 모든 일격이 내 가슴 속 용광로를 달굴 것이다. 잿불과 돌과 모루의 이름으로 너희를 산산이 없애 주마.',
+  },
+  ru_RU: {
+    'dialogue.ignivarFinalBrand': 'Прими Последнее пламя. Пусть оно тебя рассудит.',
+    'dialogue.ignivarConduitActivated': 'Древние источники отвечают моему огню.',
+    'dialogue.ignivarRotatingRays': 'Вращайтесь вместе с пламенем, иначе будете уничтожены.',
+    'dialogue.ignivarApocalypse': 'Варкхул выковал меня, чтобы я выстоял.',
+    'dialogue.ignivarDefeatSpark': 'Ещё одна искра погасла.',
+    'dialogue.ignivarDefeatForge': 'Горнило отвергает тебя.',
+    'dialogue.ignivarForgeJudgment': 'Я и есть печать. Меня не сломить.',
+    'dialogue.ignivarRoomEntry':
+      'Печать слышит вас, жалкие угольки. Подойдите ближе и станьте топливом Последнего пламени.',
+    'dialogue.varkhulAssembly': 'Источник не умер. Я сковал его последнюю память в железе.',
+    'dialogue.varkhulAddsDefeated': 'Вы зовёте это тюрьмой, потому что плоть боится вечности.',
+    'dialogue.varkhulEngage':
+      'Я Варкхул, Отец Горнила Последнего пламени. Поднимите оружие, жалкие искры.',
+    'dialogue.varkhulMasterpiece':
+      'Каждый удар напитает горнило в моей груди. Клянусь углём, камнем и наковальней, я уничтожу вас.',
+  },
+};
+
 const IGNIVAR_DICT: Partial<Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, string>>>> =
   {
     es: {
@@ -8734,6 +8835,7 @@ export const DICT: Record<SupportedLanguage, Record<SimMessageKey, string>> = Ob
       ...BASE_DICT[lang],
       ...PET_DICT[lang],
       'log.arenaQueueAutoLeave1v1': ARENA_QUEUE_AUTO_LEAVE_1V1[lang],
+      ...RAID_BOSS_DIALOGUE_DICT[lang],
       ...IGNIVAR_DICT[lang],
     },
   ]),

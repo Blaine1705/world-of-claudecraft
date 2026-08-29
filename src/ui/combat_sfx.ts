@@ -328,6 +328,14 @@ const SUBFAMILY_ALIAS: Record<string, string> = {
   varkhul_forgefather_of_the_last_flame: 'varkhul',
 };
 
+// These bosses own aggro and death with full semantic dialogue clips. Keep the
+// shorter recorded pack for idle, attack, and hurt texture, but never stack two
+// independent vocal performances on the same encounter beat.
+const SEMANTIC_BOSS_VOICE_TEMPLATES = new Set([
+  'ignivar_herald_of_the_last_flame',
+  'varkhul_forgefather_of_the_last_flame',
+]);
+
 function magicSchool(value: string | null | undefined): MagicSchool | null {
   return value && value in SCHOOL_CUES ? (value as MagicSchool) : null;
 }
@@ -517,7 +525,15 @@ export function mobVoiceCue(
   templateId: string,
   action: MobVoiceAction,
   hasCue: (key: string) => boolean = NO_CUE,
+  semanticVoiceEnabled = false,
 ): string | null {
+  if (
+    semanticVoiceEnabled &&
+    (action === 'aggro' || action === 'death') &&
+    SEMANTIC_BOSS_VOICE_TEMPLATES.has(templateId)
+  ) {
+    return null;
+  }
   const family = mobVoiceFamily(templateId);
   if (!family) return null;
   if (family === 'water_elemental') {

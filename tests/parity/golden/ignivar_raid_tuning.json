@@ -151,8 +151,8 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1010,
-      "state": "0307ab44",
-      "events": "1557e2ff",
+      "state": "ca685231",
+      "events": "ed15391e",
       "rng": {
         "draws": 1,
         "digest": "3650680b"
@@ -162,8 +162,8 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 1010,
-      "state": "1e600462",
-      "events": "741638a5",
+      "state": "38de8cef",
+      "events": "563b968a",
       "rng": {
         "draws": 1,
         "digest": "3650680b"
@@ -173,7 +173,7 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 1010,
-      "state": "8c7cf641",
+      "state": "790e74c9",
       "events": "1a1c532c",
       "rng": {
         "draws": 1,
@@ -184,7 +184,7 @@
       "tick": 4,
       "time": 0.2,
       "nextId": 1010,
-      "state": "a98a3a9f",
+      "state": "5ddd5244",
       "events": "741638a5",
       "rng": {
         "draws": 1,
@@ -195,7 +195,7 @@
       "tick": 4,
       "time": 0.2,
       "nextId": 1010,
-      "state": "a98a3a9f",
+      "state": "5ddd5244",
       "events": "741638a5",
       "rng": {
         "draws": 1,
@@ -643,6 +643,7 @@
             ],
             "brandTimer": 998.95,
             "conduitTimers": {},
+            "dialogueCooldownRemaining": 3.9,
             "finalNextFrontal": "searing",
             "forgeChainsTimer": 17.8,
             "forgeJudgmentPhase": "idle",
@@ -848,7 +849,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1010,
-      "state": "371ef789",
+      "state": "98cdb456",
       "events": "3844680a",
       "rng": {
         "draws": 4,
@@ -859,7 +860,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1010,
-      "state": "371ef789",
+      "state": "98cdb456",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -1311,6 +1312,7 @@
             ],
             "brandTimer": 12,
             "conduitTimers": {},
+            "dialogueCooldownRemaining": 3.85,
             "finalFrontalTimer": 8,
             "finalNextFrontal": "skyfire",
             "forgeChainsTimer": 17.8,

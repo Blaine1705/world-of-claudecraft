@@ -76,6 +76,7 @@ import {
   IGNIVAR_ROTATING_RAYS_CAST_ID,
   IGNIVAR_SKYFIRE_CAST_ID,
 } from '../src/sim/encounters/ignivar';
+import { IGNIVAR_DIALOGUE_LINES } from '../src/sim/encounters/ignivar_dialogue';
 import {
   IGNIVAR_ROTATING_RAYS_HALF_WIDTH,
   IGNIVAR_ROTATING_RAYS_INNER_RANGE,
@@ -933,9 +934,9 @@ describe('Ignivar encounter renderer', () => {
     expect(localizeSimAuraName('Forge Wave')).not.toBeNull();
     expect(DICT.es_ES['mechanic.ignivarForgeWave']).toBe('Onda de la Forja');
     expect(DICT.es_ES['mechanic.ignivarJudgmentOfTheForge']).toBe('Juicio de la Forja');
-    expect(localizeSimText('Ignivar Ashcaller awakens. Let the world burn!')).not.toBeNull();
-    expect(localizeSimText('The last flame consumes all!')).not.toBeNull();
-    expect(localizeSimText('The sky itself will burn!')).not.toBeNull();
+    for (const line of IGNIVAR_DIALOGUE_LINES) {
+      expect(localizeSimText(line), line).not.toBeNull();
+    }
     expect(localizeSimText('Four must share the pyre, or all will burn!')).not.toBeNull();
   });
 

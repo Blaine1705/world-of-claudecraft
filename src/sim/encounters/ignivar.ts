@@ -78,6 +78,11 @@ import {
   steadyAngleTo,
 } from '../types';
 import { VARKHUL_FORGE_PORTAL_ABILITY_ID } from '../varkhul_forge_intermission';
+import {
+  IGNIVAR_DIALOGUE,
+  IGNIVAR_DIALOGUE_GAP_SECONDS,
+  ignivarDefeatYell,
+} from './ignivar_dialogue';
 import { walkEncounterActorTo } from './scripted_walk';
 
 export const IGNIVAR_BRAND_AURA_ID = 'ignivar_brand_of_the_pyre';
@@ -144,7 +149,7 @@ export const IGNIVAR_SOAK_EVERY = 34;
 export const IGNIVAR_SOAK_REQUIRED_PLAYERS = 4;
 export const IGNIVAR_SOAK_RADIUS = 5.5;
 export const IGNIVAR_SOAK_SHARED_MAX_HP = 1.2;
-export const IGNIVAR_DEATH_YELL = 'Varkhul... the seal is broken.';
+export const IGNIVAR_DEATH_YELL = IGNIVAR_DIALOGUE.death;
 
 const IGNIVAR_FIRST_BRAND_SECONDS = 2;
 const IGNIVAR_FIRST_FORGE_STRIKE_SECONDS = 12;
@@ -187,7 +192,12 @@ function encounterInstance(ctx: SimContext, boss: Entity) {
 
 export function announceIgnivarDeath(ctx: SimContext, boss: Entity): void {
   if (!boss.ignivar) return;
-  emitMobYell(ctx, boss, IGNIVAR_DEATH_YELL);
+  emitIgnivarYell(ctx, boss, IGNIVAR_DEATH_YELL);
+}
+
+function emitIgnivarYell(ctx: SimContext, boss: Entity, text: string): void {
+  emitMobYell(ctx, boss, text);
+  if (boss.ignivar) boss.ignivar.dialogueCooldownRemaining = IGNIVAR_DIALOGUE_GAP_SECONDS;
 }
 
 function playersInEncounter(ctx: SimContext, boss: Entity, includeDead = false): Entity[] {
@@ -252,6 +262,9 @@ function initIgnivarEncounter(boss: Entity): IgnivarEncounterState {
   if (!boss.ignivar) {
     boss.ignivar = {
       attemptParticipantIds: [],
+      dialogueCooldownRemaining: 0,
+      announcedDefeatedPlayerIds: [],
+      finalBrandYellSpoken: false,
       brandTimer: IGNIVAR_FIRST_BRAND_SECONDS,
       forgeStrikeTimer: IGNIVAR_FIRST_FORGE_STRIKE_SECONDS,
       frontalTimer: IGNIVAR_FIRST_FRONTAL_SECONDS,
@@ -306,7 +319,11 @@ function initIgnivarEncounter(boss: Entity): IgnivarEncounterState {
       finalNextFrontal: 'searing',
     };
   }
-  return boss.ignivar;
+  const state = boss.ignivar;
+  state.dialogueCooldownRemaining ??= 0;
+  state.announcedDefeatedPlayerIds ??= [];
+  state.finalBrandYellSpoken ??= false;
+  return state;
 }
 
 function spawnApocalypseAdd(ctx: SimContext, boss: Entity, st: IgnivarEncounterState): void {
@@ -340,7 +357,7 @@ function spawnApocalypseAdd(ctx: SimContext, boss: Entity, st: IgnivarEncounterS
   st.apocalypseTriggered = true;
   st.apocalypseAddId = add.id;
   st.apocalypseCastRemaining = IGNIVAR_APOCALYPSE_CAST_SECONDS;
-  emitMobYell(ctx, boss, 'Ignivar Ashcaller awakens. Let the world burn!');
+  emitIgnivarYell(ctx, boss, IGNIVAR_DIALOGUE.apocalypse);
   ctx.emit({
     type: 'spellfxAt',
     x: add.pos.x,
@@ -528,7 +545,7 @@ function startForgeJudgment(
   if (!heroic) {
     for (const player of players) clearIgnivarBrand(player, boss.id);
   }
-  emitMobYell(ctx, boss, 'The sky itself will burn!');
+  emitIgnivarYell(ctx, boss, IGNIVAR_DIALOGUE.forgeJudgment);
 }
 
 function activateForgeJudgment(
@@ -839,7 +856,7 @@ function startSkyfire(
   boss.castTargetId = null;
   boss.castAim = null;
   boss.channeling = false;
-  emitMobYell(ctx, boss, 'The sky itself will burn!');
+  emitIgnivarYell(ctx, boss, IGNIVAR_DIALOGUE.skyfire);
 }
 
 function startMeteorRain(
@@ -982,7 +999,12 @@ function ignivarMajorAbilityActive(st: IgnivarEncounterState): boolean {
   );
 }
 
-function startRotatingRays(boss: Entity, target: Entity, st: IgnivarEncounterState): void {
+function startRotatingRays(
+  ctx: SimContext,
+  boss: Entity,
+  target: Entity,
+  st: IgnivarEncounterState,
+): void {
   st.rotatingRaysFacing = Math.atan2(target.pos.x - boss.pos.x, target.pos.z - boss.pos.z);
   st.rotatingRaysBossFacing = st.rotatingRaysFacing;
   st.rotatingRaysDirection = st.rotatingRaysNextDirection;
@@ -1001,6 +1023,7 @@ function startRotatingRays(boss: Entity, target: Entity, st: IgnivarEncounterSta
   boss.castTargetId = null;
   boss.castAim = null;
   boss.channeling = true;
+  emitIgnivarYell(ctx, boss, IGNIVAR_DIALOGUE.rotatingRays);
 }
 
 function damagePlayersInRotatingRays(
@@ -1283,7 +1306,7 @@ function updateLastInferno(
       school: 'fire',
       encounterOwned: true,
     });
-    emitMobYell(ctx, boss, 'The last flame consumes all!');
+    emitIgnivarYell(ctx, boss, IGNIVAR_DIALOGUE.lastInferno);
     ctx.emit({
       type: 'spellfx',
       sourceId: boss.id,
@@ -1508,6 +1531,7 @@ function releaseFrontal(
         school: 'frost',
         fx: 'nova',
       });
+      emitIgnivarYell(ctx, boss, IGNIVAR_DIALOGUE.conduitActivated);
     }
   }
   boss.castingAbility = null;
@@ -1564,9 +1588,70 @@ export function clearIgnivarEncounterAuras(player: Entity, sourceId?: number): v
   );
 }
 
+function tickIgnivarDialogue(st: IgnivarEncounterState): void {
+  st.dialogueCooldownRemaining = Math.max(0, (st.dialogueCooldownRemaining ?? 0) - DT);
+}
+
+function ignivarDialogueHasSafeWindow(boss: Entity, st: IgnivarEncounterState): boolean {
+  const hpFraction = boss.hp / Math.max(1, boss.maxHp);
+  if (!st.apocalypseTriggered && hpFraction <= IGNIVAR_APOCALYPSE_HP_THRESHOLD) return false;
+  if (
+    st.apocalypseResolved &&
+    st.forgeJudgmentPhase === 'idle' &&
+    hpFraction <= IGNIVAR_JUDGMENT_HP_THRESHOLD
+  ) {
+    return false;
+  }
+  if (
+    !st.lastInfernoTriggered &&
+    st.forgeJudgmentPhase === 'done' &&
+    hpFraction <= IGNIVAR_LAST_INFERNO_HP_THRESHOLD
+  ) {
+    return false;
+  }
+  const upcoming = st.lastInfernoTriggered
+    ? [
+        st.finalFrontalTimer,
+        st.rotatingRaysTimer,
+        st.finalBrandYellSpoken ? Number.POSITIVE_INFINITY : st.brandTimer,
+      ]
+    : [st.frontalTimer, st.skyfireTimer, st.rotatingRaysTimer];
+  return upcoming.every((remaining) => remaining > IGNIVAR_DIALOGUE_GAP_SECONDS);
+}
+
+function announceDefeatedEncounterPlayer(
+  ctx: SimContext,
+  boss: Entity,
+  st: IgnivarEncounterState,
+  players: readonly Entity[],
+): void {
+  if (
+    (st.dialogueCooldownRemaining ?? 0) > CAST_COMPLETE_EPS ||
+    boss.castingAbility !== null ||
+    ignivarMajorAbilityActive(st) ||
+    !ignivarDialogueHasSafeWindow(boss, st)
+  ) {
+    return;
+  }
+  const announced = st.announcedDefeatedPlayerIds ?? [];
+  const defeated = players.find(
+    (player) =>
+      player.dead &&
+      (st.attemptParticipantIds?.includes(player.id) ?? false) &&
+      !announced.includes(player.id),
+  );
+  if (!defeated) return;
+  const yell = ignivarDefeatYell(announced.length);
+  announced.push(defeated.id);
+  announced.sort((a, b) => a - b);
+  st.announcedDefeatedPlayerIds = announced;
+  emitIgnivarYell(ctx, boss, yell);
+}
+
 export function updateIgnivarEncounter(ctx: SimContext, boss: Entity, pursueTarget = false): void {
   if (boss.templateId !== IGNIVAR_BOSS_ID || boss.dead) return;
-  let players = playersInEncounter(ctx, boss);
+  const allPlayers = playersInEncounter(ctx, boss, true);
+  let players = allPlayers.filter((player) => !player.dead);
   if (players.length === 0) {
     boss.aiState = 'evade';
     if (boss.combatExitHoldUntil > ctx.time) return;
@@ -1579,11 +1664,17 @@ export function updateIgnivarEncounter(ctx: SimContext, boss: Entity, pursueTarg
     ctx.resetEvadingMob(boss);
     return;
   }
+  const freshPull = boss.ignivar === undefined;
   const st = initIgnivarEncounter(boss);
+  tickIgnivarDialogue(st);
+  if (freshPull && boss.hp / Math.max(1, boss.maxHp) > IGNIVAR_APOCALYPSE_HP_THRESHOLD) {
+    emitIgnivarYell(ctx, boss, IGNIVAR_DIALOGUE.engage);
+  }
   for (const player of players) {
     if (!st.attemptParticipantIds?.includes(player.id)) st.attemptParticipantIds?.push(player.id);
   }
   st.attemptParticipantIds?.sort((a, b) => a - b);
+  announceDefeatedEncounterPlayer(ctx, boss, st, allPlayers);
   // Shared Pyre now belongs to Varkhul. Clear an in-flight legacy mark from an
   // older snapshot instead of letting it block Ignivar's remaining phases.
   clearLegacySharedPyreState(ctx, boss, st);
@@ -1665,6 +1756,14 @@ export function updateIgnivarEncounter(ctx: SimContext, boss: Entity, pursueTarg
 
   st.brandTimer -= DT;
   if (st.brandTimer <= CAST_COMPLETE_EPS) {
+    if (
+      st.lastInfernoTriggered &&
+      !st.finalBrandYellSpoken &&
+      (st.dialogueCooldownRemaining ?? 0) <= DT + CAST_COMPLETE_EPS
+    ) {
+      emitIgnivarYell(ctx, boss, IGNIVAR_DIALOGUE.finalBrand);
+      st.finalBrandYellSpoken = true;
+    }
     castBrandOfThePyre(ctx, boss, players);
     st.brandTimer = ignivarBrandCadence(boss.hp / Math.max(1, boss.maxHp), st.lastInfernoTriggered);
   }
@@ -1692,7 +1791,7 @@ export function updateIgnivarEncounter(ctx: SimContext, boss: Entity, pursueTarg
     st.finalFrontalTimer = Math.max(0, st.finalFrontalTimer - DT);
     st.rotatingRaysTimer = Math.max(0, st.rotatingRaysTimer - DT);
     if (st.rotatingRaysTimer <= CAST_COMPLETE_EPS) {
-      startRotatingRays(boss, target, st);
+      startRotatingRays(ctx, boss, target, st);
       return;
     }
     if (st.finalFrontalTimer <= CAST_COMPLETE_EPS) {
@@ -1726,7 +1825,7 @@ export function updateIgnivarEncounter(ctx: SimContext, boss: Entity, pursueTarg
       return;
     }
     if (st.rotatingRaysTimer <= 0) {
-      startRotatingRays(boss, target, st);
+      startRotatingRays(ctx, boss, target, st);
       return;
     }
     if (st.forgeWaveTimer <= CAST_COMPLETE_EPS) {

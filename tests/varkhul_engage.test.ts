@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { updateVarkhulEncounter, VARKHUL_BOSS_ID } from '../src/sim/encounters/varkhul';
+import { VARKHUL_DIALOGUE } from '../src/sim/encounters/varkhul_dialogue';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
 import {
@@ -122,6 +123,11 @@ describe('Varkhul engage staging (encounter integration)', () => {
     const shouts = events.filter((ev) => ev.type === 'spellfx' && ev.fx === 'shout');
     expect(shouts).toHaveLength(1);
     expect(shouts[0]).toMatchObject({ sourceId: boss.id });
+    const engageYells = events.filter(
+      (ev) => ev.type === 'chat' && ev.channel === 'yell' && ev.text === VARKHUL_DIALOGUE.engage,
+    );
+    expect(engageYells.length).toBeGreaterThan(0);
+    expect(new Set(engageYells.map((event) => event.pid)).size).toBe(engageYells.length);
 
     // he stands through the roar (no drift), then the staging completes and
     // only THEN does the chase move him again
@@ -135,6 +141,11 @@ describe('Varkhul engage staging (encounter integration)', () => {
     // one roar total: the cue must never re-fire after the staging completes
     for (let tick = 0; tick < 20; tick++) updateVarkhulEncounter(sim.ctx, boss, true);
     expect(events.filter((ev) => ev.type === 'spellfx' && ev.fx === 'shout')).toHaveLength(1);
+    expect(
+      events.filter(
+        (ev) => ev.type === 'chat' && ev.channel === 'yell' && ev.text === VARKHUL_DIALOGUE.engage,
+      ),
+    ).toHaveLength(engageYells.length);
   });
 
   it('keeps the ability schedule identical: the first Cinder Orbs still lands 8s after combat starts', () => {

@@ -1166,6 +1166,10 @@ export interface InstanceSlot {
   // when they actually entered this run: a door-camper or a member parked in
   // town takes the lockout without turning roster membership into mailed income.
   enteredBy: Set<number>;
+  // Durable-character or offline-entity identities that already heard this
+  // claim's first-entry raid-boss welcome. Session-only and cleared with the
+  // claim so a relog cannot replay it while a fresh instance can.
+  raidBossWelcomeKeys: Set<string>;
   // Recently-exited-mid-combat memory (issue #2653): a player who left this claim
   // while a mob was actively fighting them has their dropped threat snapshotted
   // here for a short window. Re-entering before it lapses resumes the fight
@@ -2507,6 +2511,7 @@ export class Sim {
             resetAvailableAt: 0,
             clearedBy: new Set(),
             enteredBy: new Set(),
+            raidBossWelcomeKeys: new Set(),
             combatExitMemory: new Map(),
           });
         }
@@ -2539,6 +2544,7 @@ export class Sim {
           resetAvailableAt: 0,
           clearedBy: new Set(),
           enteredBy: new Set(),
+          raidBossWelcomeKeys: new Set(),
           combatExitMemory: new Map(),
         });
       }
