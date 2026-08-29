@@ -615,6 +615,7 @@ import {
   updateInstances as updateInstancesImpl,
 } from './instances/dungeons';
 import { buyHeroicVendorItem as buyHeroicVendorItemImpl } from './instances/heroic_vendor';
+import { freshInstanceSlot } from './instances/instance_slot';
 import { updatePortalTriggers } from './portals';
 import * as questCommands from './quests/quest_commands';
 import {
@@ -2497,23 +2498,7 @@ export class Sim {
     for (const dungeon of DUNGEON_LIST) {
       if (dungeon.overworldDoor === false) {
         for (let i = 0; i < INSTANCE_SLOT_COUNT; i++) {
-          this.instances.push({
-            dungeonId: dungeon.id,
-            difficulty: 'normal',
-            slot: i,
-            partyKey: null,
-            mobIds: [],
-            npcIds: [],
-            objectIds: [],
-            exitId: null,
-            bossExitId: null,
-            emptyFor: 0,
-            resetAvailableAt: 0,
-            clearedBy: new Set(),
-            enteredBy: new Set(),
-            raidBossWelcomeKeys: new Set(),
-            combatExitMemory: new Map(),
-          });
+          this.instances.push(freshInstanceSlot(dungeon.id, i));
         }
         continue;
       }
@@ -2530,23 +2515,7 @@ export class Sim {
       door.lootable = true; // interactable
       this.addEntity(door);
       for (let i = 0; i < INSTANCE_SLOT_COUNT; i++) {
-        this.instances.push({
-          dungeonId: dungeon.id,
-          difficulty: 'normal',
-          slot: i,
-          partyKey: null,
-          mobIds: [],
-          npcIds: [],
-          objectIds: [],
-          exitId: null,
-          bossExitId: null,
-          emptyFor: 0,
-          resetAvailableAt: 0,
-          clearedBy: new Set(),
-          enteredBy: new Set(),
-          raidBossWelcomeKeys: new Set(),
-          combatExitMemory: new Map(),
-        });
+        this.instances.push(freshInstanceSlot(dungeon.id, i));
       }
     }
 
