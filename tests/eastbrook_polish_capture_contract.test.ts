@@ -330,7 +330,7 @@ interface AttributionTargetFixture {
 // integration in renderer.ts: the runtimeRender.renderer leaf moved. No
 // capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '5d8f5a693c47ad4237243e48ca8b0ce7b96822026b293a228f2462ae52991168';
+  '9abf0099a7d8c10e3cbb14bc4545df58f11ae11ce31ad5f70282219b3a213532';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
