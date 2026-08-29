@@ -22,7 +22,6 @@ import {
   delveOrigin,
   delveSlotAt,
   INSTANCE_SLOT_COUNT,
-  ITEM_SETS,
   instanceOrigin,
   isArenaPos,
   isBgPos,
@@ -627,6 +626,7 @@ import { type SelfMotionFrame, SelfMotionPredictor, updateSelfRenderFallback } f
 import { SelfSpiritPrewarmer } from './self_spirit_prewarm';
 import { SentenceVfx } from './sentence_vfx';
 import { sentenceImpactPlan } from './sentence_vfx_core';
+import { SET_PROC_FX_BY_NAME } from './set_proc_fx';
 import {
   createShadowCadenceState,
   resetShadowCadence,
@@ -921,28 +921,6 @@ const LIGHT_BUDGET_RANGE_SQ = 55 * 55;
 const SELECTION_RING_BOOST = 1.5;
 const SELECTION_RING_SPIN = 0.6; // rad/s — slow classic target-reticle rotation
 
-// Themed swirl colors for the 4-piece set-proc auras, by proc id; resolved to
-// the buff display NAME below (the aura SimEvent carries only the name) via
-// ITEM_SETS, so a re-coined proc name keeps its effect wired. The bleeds land
-// on the TARGET (a mob), so the aura case below must not gate these on the
-// player kind.
-const SET_PROC_FX_BY_ID: Record<string, number> = {
-  set_clearcasting: 0x8ed2ff, // icy arcane blue: a free cast
-  set_gravemight: 0xffb04d, // burnished gold: attack power
-  set_fangrush: 0xbfff5a, // feral green-yellow: attack speed
-  set_bonesplinter: 0xc22a2a, // blood red: the plate bleed landing
-  set_ragged_gash: 0xc22a2a, // blood red: the leather bleed landing
-  set_soulblaze: 0xff6a9e, // ember pink: spell power
-};
-const SET_PROC_FX_BY_NAME = new Map<string, number>();
-for (const set of Object.values(ITEM_SETS)) {
-  for (const tier of set.bonuses) {
-    const proc = tier.effect.proc;
-    if (proc && SET_PROC_FX_BY_ID[proc.id] !== undefined) {
-      SET_PROC_FX_BY_NAME.set(proc.name, SET_PROC_FX_BY_ID[proc.id]);
-    }
-  }
-}
 const CLICK_MARKER_POOL = 4; // concurrent click-feedback markers before reuse
 const SPARKLE_BOOST = 1.5;
 // Third-person camera obstruction is opacity-only. Anything registered as a

@@ -205,7 +205,11 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the integration merge of the latest v0.40.0 (the touch UI
     // rework); exact merged count.
     // the raid consolidation paid its additions by moving the fog scene chain (fog_scene_state.ts), the spellfxAt dispatch arms, the boss facing lock, and the raid anchor/rig syncs out; exact count.
-    ceiling: 13265,
+    // Lowered 13265 -> 13243: the set-proc swirl table and both resolution
+    // walks moved to src/render/set_proc_fx.ts (the Crucible engine-proc arm
+    // landed there, not here); the ratchet follows the file down. Exact
+    // count, zero slack.
+    ceiling: 13243,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
