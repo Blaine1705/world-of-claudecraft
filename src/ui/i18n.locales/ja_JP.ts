@@ -7802,6 +7802,22 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'タイスフィーンド招来のクールダウンが6秒短縮されます。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vesperash.bonus4':
     'タイスフィーンドを招来すると精神粉砕のクールダウンがリセットされ、タイスフィーンドの攻撃ごとのマナ回復量が2倍になります。',
+  'entities.itemSets.stormkindled.name': 'ストームキンドルの礼装',
+  'entities.itemSets.stormkindled.bonus2':
+    '火焔烙印中の武器解放で雷鳴を3獲得します。被ダメージで詠唱が遅れなくなります。',
+  'entities.itemSets.stormkindled.bonus4': '大地の衝撃の雷鳴ごとのボーナスが30%に上昇します。',
+  'entities.itemSets.warspirit_emberscale.name': 'ウォースピリットの残火鱗鎧',
+  'entities.itemSets.warspirit_emberscale.bonus2': '祖霊の一撃が戦霊の律動を3段階進めます。',
+  'entities.itemSets.warspirit_emberscale.bonus4': '祖霊の一撃のダメージが30%増加します。',
+  'entities.itemSets.stonehearth.name': 'ストーンハースの砦',
+  'entities.itemSets.stonehearth.bonus2':
+    '石縛の間、ストームキャストの癒しの水流はマナを消費せず、回復量が25%増加します。',
+  'entities.itemSets.stonehearth.bonus4': '石縛の間、戦霊の律動を完了すると最大体力の3%を回復します。',
+  'entities.itemSets.springmender.name': 'スプリングメンダーの鱗鎧',
+  'entities.itemSets.springmender.bonus2':
+    '潮呼びのクールダウンが4秒短縮されます。被ダメージで詠唱が遅れなくなります。',
+  'entities.itemSets.springmender.bonus4':
+    '連なる癒しが4人目の味方に届き、治癒の奔流を150%で回収します。',
   'entities.itemSets.slagbreaker.name': 'スラグブレイカーの戦装束',
   'entities.itemSets.slagbreaker.bonus2': '血染めの手による次の重傷の一撃の強化が、1スタックにつき20%から30%に上昇します。',
   'entities.itemSets.slagbreaker.bonus4': '血染めの手を2回発動するごとに、崩し手の残りクールダウンが3秒短縮されます。',

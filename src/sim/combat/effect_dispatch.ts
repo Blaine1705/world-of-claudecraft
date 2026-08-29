@@ -18,6 +18,7 @@
 import { isDebuffAura, isDispellableAura, isPlayerRemovableAura } from '../aura_classify';
 import {
   EMBERFURY_4PC_BLOODLETTING_HEAL_PCT_MAX,
+  SPRINGMENDER_4PC_BONUS_JUMPS,
   setBonusFlag,
 } from '../content/ignivar_set_bonuses';
 import { ABILITIES, isDelvePos, MOBS } from '../data';
@@ -219,6 +220,7 @@ import {
   rogueEngineOnFinisher,
   rogueGloamDetonation,
 } from './rogue_engines';
+import { wearsSetBonus } from './set_bonus_wearer';
 import { consumeMendingCurrent, depositMendingCurrent } from './shaman_spiritmend';
 import {
   applyPrimalExaltation,
@@ -423,6 +425,13 @@ export function runEffects(
   target: Entity | null,
   res: ResolvedAbility,
   attackAnimationStarted = false,
+  // Cast-scoped outgoing-heal multiplier for the direct 'heal' effect: 1 for
+  // every cast unless the caller marks this one (today only the Stonehearth
+  // 2pc's Stormcast-while-Stonebound Mending Waters, combat/
+  // shaman_stonehearth.ts). It multiplies the WHOLE resolved heal (authored
+  // roll plus the Spell Power rider) so a printed percent is delivered
+  // exactly; at 1 the arithmetic below is untouched.
+  castHealMult = 1,
   deferredBastionImpact = false,
   facingOverride?: number,
 ): void {
@@ -1246,10 +1255,16 @@ export function runEffects(
         // Power rider. Preserve the legacy direct-heal draw order, however:
         // Last Rite used to roll its fixed min/max and crit before this change.
         const rolledAmount = ctx.rng.range(eff.min, eff.max);
-        const healAmount =
+        const baseHealAmount =
           eff.casterMaxHpPct === undefined
             ? rolledAmount + directHealBonus(p.healPower, res.castTime, false, talentHealMult)
             : Math.round(p.maxHp * eff.casterMaxHpPct);
+        // The cast-scoped multiplier (see the runEffects parameter note): the
+        // === 1 guard keeps every unmarked cast's arithmetic byte-identical.
+        const healAmount =
+          castHealMult === 1
+            ? baseHealAmount
+            : Math.max(1, Math.round(baseHealAmount * castHealMult));
         if (eff.canCrit === false) ctx.rng.chance(0);
         // Only this direct-heal effect opts into Beacon transfer. Derived,
         // periodic, chained, area, and self-heal effects remain ineligible.
@@ -1336,8 +1351,16 @@ export function runEffects(
         const baseAmount =
           ctx.rng.range(eff.min, eff.max) +
           directHealBonus(p.healPower, res.castTime, false, talentHealMult);
+        // Springmender 4pc (the Crucible set doc): Cascading Mend reaches a
+        // FOURTH ally, one extra hop past the authored jumps. Bespoke: no
+        // talent primitive reaches chainHeal's jump count, so the bend lives
+        // at this dispatch, gated on the wearer flag. Wearer-only rng note,
+        // disclosed: the extra hop draws its own heal-crit roll below;
+        // non-wearers build the exact chain and draws they always did.
+        const jumps =
+          eff.jumps + (wearsSetBonus(ctx, p, 'springmender', 4) ? SPRINGMENDER_4PC_BONUS_JUMPS : 0);
         const chain: Entity[] = [first];
-        while (chain.length <= eff.jumps) {
+        while (chain.length <= jumps) {
           const from = chain[chain.length - 1];
           let best: Entity | null = null;
           let bestFrac = Infinity;
@@ -2249,7 +2272,7 @@ export function runEffects(
               const source = ctx.entities.get(sourceId);
               const sourceMeta = ctx.players.get(sourceId);
               if (!source || source.dead || !sourceMeta) return;
-              runEffects(ctx, source, sourceMeta, null, res, true, true, castFacing);
+              runEffects(ctx, source, sourceMeta, null, res, true, 1, true, castFacing);
             },
           });
           break;

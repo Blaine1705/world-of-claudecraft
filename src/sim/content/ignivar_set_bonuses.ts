@@ -154,6 +154,45 @@ export const VESPERASH_2PC_TITHEFIEND_COOLDOWN_CUT_SEC = 6;
  *  TITHEFIEND_MANA_RETURN_RATE 0.01 stays untouched for everyone else). */
 export const VESPERASH_4PC_MANA_RETURN_MULT = 2;
 
+// Audited constants for the bespoke shaman bends (read by the class-module
+// call sites AND pinned by tests, so the copy cannot drift from the code).
+/** Stormkindled 2pc: Thunder granted by Unleash Weapon on Pyrebrand (base
+ *  PYREBRAND_UNLEASH_THUNDER 2). With 3 or more already banked part of the
+ *  grant overcaps at the 5-charge cap (disclosed by the set doc). */
+export const STORMKINDLED_2PC_UNLEASH_THUNDER = 3;
+/** Stormkindled 4pc: Earthen Jolt's per-Thunder vent bonus (base
+ *  EARTHEN_JOLT_BONUS_PER_CHARGE 0.25): the full 5-charge vent goes
+ *  2.25x -> 2.5x, and Primal Mastery's 1.25 vent window still MULTIPLIES the
+ *  result (3.125x in-window, disclosed). Faultwake stays untouched. */
+export const STORMKINDLED_4PC_EARTHEN_JOLT_BONUS_PER_CHARGE = 0.3;
+/** Warspirit Emberscale 2pc: cadence steps per Ancestral Strike (base 2 at
+ *  the combat/auto_attack.ts call site). */
+export const WARSPIRIT_EMBERSCALE_2PC_CADENCE_STEPS = 3;
+/** Warspirit Emberscale 4pc: the stormstrike dmgPct row. The printed number
+ *  is 30 percent DELIVERED: the accumulator is additive (talent_hit_mult.ts,
+ *  1 + meleeDmgPct + dmgPct), and a committed Warspirit at the raid's level
+ *  20+ carries the 0.6 spec-baseline stormstrike row PLUS the fully scaled
+ *  Skyrend mastery's 0.1 meleeDmgPct, so the real baseline is 1.7 and the
+ *  row is 0.3 x 1.7 = 0.51 (2.21 / 1.7 = 1.30 exactly). The set doc's
+ *  bracketed 0.48 assumed a 1.6 baseline (it missed the mastery); recorded
+ *  as a deviation in the wave's PR notes. */
+export const WARSPIRIT_EMBERSCALE_4PC_STORMSTRIKE_DMG_PCT = 0.51;
+/** Stonehearth 2pc: the extra healing on a Stormcast Mending Waters cast
+ *  made while Stonebound (the same cast also bills no mana). */
+export const STONEHEARTH_2PC_MENDING_HEAL_BONUS = 0.25;
+/** Stonehearth 4pc: self-heal fraction of max health when a cadence
+ *  completes while Stonebound (a HEAL, never an absorb). */
+export const STONEHEARTH_4PC_CADENCE_HEAL_PCT_MAX = 0.03;
+/** Springmender 2pc: seconds cut from Tidecall's cooldown (base 12; Tidecall
+ *  holds two PARALLEL-recharging charges, so this is +50 percent Tidecall
+ *  throughput, the set doc's honesty note). */
+export const SPRINGMENDER_2PC_TIDECALL_COOLDOWN_CUT_SEC = 4;
+/** Springmender 4pc: extra Cascading Mend hop (jumps 2 -> 3, a fourth ally). */
+export const SPRINGMENDER_4PC_BONUS_JUMPS = 1;
+/** Springmender 4pc: the CHAIN-path Mending Current harvest multiplier (base
+ *  CURRENT_CONSUME_MULTIPLIER 1.25; Unleash Weapon's collapse keeps 1.25). */
+export const SPRINGMENDER_4PC_CHAIN_HARVEST_MULT = 1.5;
+
 /** The engine payloads, keyed by set id (the `set` tag on each member item
  *  and the ItemSet id in item_sets.ts). Tiers ascend by pieces. */
 export const SET_ENGINE_BONUSES: Record<string, readonly SetEngineBonusTier[]> = {
@@ -592,6 +631,133 @@ export const SET_ENGINE_BONUSES: Record<string, readonly SetEngineBonusTier[]> =
           responses: [{ kind: 'cooldownRefund', ability: 'mind_blast', seconds: 'reset' }],
         },
         tuning: { manaReturnMult: VESPERASH_4PC_MANA_RETURN_MULT },
+      },
+    },
+  ],
+  // ---- Shaman ----
+  stormkindled: [
+    {
+      pieces: 2,
+      // Unleash Weapon on Pyrebrand grants 3 Thunder instead of 2: a constant
+      // bend at the ONE grant site (combat/shaman_unleash_weapon.ts,
+      // applyPyrebrandUnleash). With 3 or more already banked part of the
+      // grant overcaps at the 5-charge cap (disclosed). The caster 2pc
+      // pushback rider rides the generic global knob. Deterministic for
+      // everyone: the Unleash damage and crit rolls are unchanged, only the
+      // rng-free grant amount moves.
+      effect: {
+        global: { castPushbackReduction: 1 },
+        tuning: { pyrebrandUnleashThunder: STORMKINDLED_2PC_UNLEASH_THUNDER },
+      },
+    },
+    {
+      pieces: 4,
+      // Earthen Jolt's per-Thunder vent bonus 0.25 -> 0.30 at the ONE
+      // thundercallDamageMultiplier read (combat/shaman_thundercall.ts): the
+      // full 5-charge vent goes 2.25x -> 2.5x, and Primal Mastery's 1.25 vent
+      // window still MULTIPLIES the result (3.125x in-window, disclosed).
+      // Faultwake's earthquake coefficient is deliberately untouched. The two
+      // printed "125 percent" totals (the thunder_reservoir passive and the
+      // earth_shock description) stay static text: no resolved value
+      // parameter reaches them, and every shipped wave leaves such baseline
+      // literals static (the paladin vowkeeper chances, the warrior Enrage
+      // duration), so they are flagged to the maintainer rather than given
+      // new tooltip plumbing here.
+      effect: {
+        tuning: { earthenJoltBonusPerThunder: STORMKINDLED_4PC_EARTHEN_JOLT_BONUS_PER_CHARGE },
+      },
+    },
+  ],
+  warspirit_emberscale: [
+    {
+      pieces: 2,
+      // Ancestral Strike advances the cadence 3 steps instead of 2: the
+      // steps-parameter widening in combat/shaman_warspirit.ts plus call-site
+      // selection in combat/auto_attack.ts. Disclosed: under Primal
+      // Exaltation the cadence target clamps to 2, so a 3-step strike
+      // completes and carries min(1, total - 2); Deep Reservoir shares the
+      // same cadence currency (its Stormcast-consume refund starts the next
+      // loop at 1), an amplification, not a duplication. Draws no rng.
+      effect: {
+        tuning: { ancestralStrikeCadenceSteps: WARSPIRIT_EMBERSCALE_2PC_CADENCE_STEPS },
+      },
+    },
+    {
+      pieces: 4,
+      // Ancestral Strike hits 30 percent harder, DELIVERED: the additive
+      // accumulator (talent_hit_mult.ts) folds this row beside the 0.6
+      // spec-baseline stormstrike row and the fully scaled Skyrend mastery's
+      // 0.1 meleeDmgPct, so the committed-spec baseline is 1.7 and the row
+      // is 0.51 (2.21 / 1.7 = 1.30 exactly; the constant's doc note records
+      // the set doc's 0.48-vs-0.51 deviation). The stormstrike tooltip's
+      // {damage} splice reads the resolved effect, so the printed number
+      // tracks the bend for wearers automatically. No other row targets
+      // stormstrike, so there is no row overlap.
+      effect: {
+        ability: [{ ability: 'stormstrike', dmgPct: WARSPIRIT_EMBERSCALE_4PC_STORMSTRIKE_DMG_PCT }],
+      },
+    },
+  ],
+  stonehearth: [
+    {
+      pieces: 2,
+      // While Stonebound, a Stormcast Mending Waters bills no mana and heals
+      // 25 percent more (combat/shaman_stonehearth.ts, consumed at the
+      // casting_lifecycle Stormcast sites). Consume order (the set doc's
+      // note): the bill is zeroed only AFTER the Stormcast cheap charge is
+      // consumed, so the half-cost aura can never survive into a later cast;
+      // the heal bonus reaches the WHOLE resolved heal (authored roll plus
+      // the Spell Power rider) through runEffects' cast-scoped multiplier,
+      // scoped to that one cast. No pushback rider: the melee tank set.
+      // Disclosed: the Elemental Trance dead window and the no-rotation probe
+      // are the set doc's accepted gaps. Draws no rng.
+      effect: { tuning: { mendingHealBonus: STONEHEARTH_2PC_MENDING_HEAL_BONUS } },
+    },
+    {
+      pieces: 4,
+      // Completing a cadence while Stonebound heals 3 percent of max health:
+      // a HEAL, never an absorb (distinct from Living Weapon's absorb, which
+      // arms on the Stormcast CONSUME in onStormcastConsumed, a different
+      // site; no id or site collision). canCrit false, so the heal draws NO
+      // rng. Disclosed: Primal Exaltation's 2-step cadence target spikes the
+      // completion rate and with it this heal's uptime; the ~1 percent max
+      // health per second derivation is swing-rate dependent (set doc flag).
+      effect: { tuning: { cadenceHealPctMaxHp: STONEHEARTH_4PC_CADENCE_HEAL_PCT_MAX } },
+    },
+  ],
+  springmender: [
+    {
+      pieces: 2,
+      // Tidecall 12 -> 8 sec: a cooldownFlat row on the resolved entry, which
+      // the charge model reads as each charge's PARALLEL recharge duration
+      // (casting_lifecycle's chargeState), so this is +50 percent Tidecall
+      // throughput (the set doc's honesty note). No printed cooldown
+      // literals exist for Tidecall. Deep Reservoir's Lifespring arm
+      // amplifies the extra deposits (disclosed: amplification, not
+      // duplication). The healer 2pc pushback rider rides the generic global
+      // knob. Deterministic.
+      effect: {
+        ability: [
+          { ability: 'tidecall', cooldownFlat: -SPRINGMENDER_2PC_TIDECALL_COOLDOWN_CUT_SEC },
+        ],
+        global: { castPushbackReduction: 1 },
+      },
+    },
+    {
+      pieces: 4,
+      // Cascading Mend reaches a FOURTH ally (jumps 2 -> 3, bespoke: no
+      // talent primitive reaches chainHeal's jump count, so the bend lives at
+      // the dispatch in combat/effect_dispatch.ts) and the CHAIN-path Mending
+      // Current harvest rises to 150 percent (scoped to consumeMendingCurrent
+      // in combat/shaman_spiritmend.ts; Unleash Weapon's collapse keeps
+      // 1.25). The fourth hop consumes that ally's pool at the same full
+      // value. Wearer-only rng note, disclosed: the extra hop draws its own
+      // heal-crit roll; non-wearers draw exactly as before.
+      effect: {
+        tuning: {
+          bonusJumps: SPRINGMENDER_4PC_BONUS_JUMPS,
+          chainHarvestMult: SPRINGMENDER_4PC_CHAIN_HARVEST_MULT,
+        },
       },
     },
   ],

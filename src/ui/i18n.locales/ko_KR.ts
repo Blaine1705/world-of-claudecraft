@@ -7795,6 +7795,23 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '십일조 악마 소환의 재사용 대기시간이 6초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
   'entities.itemSets.vesperash.bonus4':
     '십일조 악마를 소환하면 정신 파열의 재사용 대기시간이 초기화되고, 십일조 악마가 공격할 때마다 회복하는 마나가 두 배가 됩니다.',
+  'entities.itemSets.stormkindled.name': '폭풍점화 예장',
+  'entities.itemSets.stormkindled.bonus2':
+    '화염낙인 상태에서 무기 해방 사용 시 천둥을 3 얻습니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+  'entities.itemSets.stormkindled.bonus4': '대지의 충격의 천둥당 보너스가 30%로 증가합니다.',
+  'entities.itemSets.warspirit_emberscale.name': '전령 잉걸비늘 갑주',
+  'entities.itemSets.warspirit_emberscale.bonus2': '선조의 일격이 전령의 박자를 3단계 진행시킵니다.',
+  'entities.itemSets.warspirit_emberscale.bonus4': '선조의 일격의 피해가 30% 증가합니다.',
+  'entities.itemSets.stonehearth.name': '돌화로 보루',
+  'entities.itemSets.stonehearth.bonus2':
+    '바위결속 상태에서는 폭풍시전 치유의 물결이 마나를 소모하지 않고 치유량이 25% 증가합니다.',
+  'entities.itemSets.stonehearth.bonus4':
+    '바위결속 상태에서 전령의 박자를 완성하면 최대 생명력의 3%만큼 치유됩니다.',
+  'entities.itemSets.springmender.name': '샘치유 비늘갑옷',
+  'entities.itemSets.springmender.bonus2':
+    '해일 부름의 재사용 대기시간이 4초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+  'entities.itemSets.springmender.bonus4':
+    '물결 치유가 네 번째 아군에게 닿고 치유의 흐름을 150%로 거두어들입니다.',
   'entities.itemSets.slagbreaker.name': '광재파쇄자 전투복',
   'entities.itemSets.slagbreaker.bonus2': '붉은 손이 다음 불구의 일격을 중첩당 20% 대신 30% 강화합니다.',
   'entities.itemSets.slagbreaker.bonus4': '붉은 손을 두 번 시전할 때마다 돌파자의 남은 재사용 대기시간이 3초 감소합니다.',

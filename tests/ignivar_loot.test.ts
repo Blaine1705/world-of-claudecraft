@@ -155,6 +155,10 @@ describe('ignivar loot: the 29 sets', () => {
       'emberscreed',
       'benison_dawnweave',
       'vesperash',
+      'stormkindled',
+      'warspirit_emberscale',
+      'stonehearth',
+      'springmender',
     ] as const;
     const setIds = new Set(
       Object.values(IGNIVAR_SET_ITEMS).flatMap((item) => (item.set ? [item.set] : [])),

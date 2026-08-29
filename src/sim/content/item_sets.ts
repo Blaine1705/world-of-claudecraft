@@ -715,6 +715,72 @@ export const ITEM_SETS: Record<string, ItemSet> = {
       },
     ],
   },
+  stormkindled: {
+    id: 'stormkindled',
+    name: 'Stormkindled Regalia',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        // The caster 2pc carries the pushback rider (full immunity, the raid
+        // tier's upgrade over the leveling lineage's 50 percent).
+        text: 'Unleash Weapon on Pyrebrand grants 3 Thunder. Damage taken no longer delays your spellcasting.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: "Earthen Jolt's bonus per Thunder rises to 30 percent.",
+      },
+    ],
+  },
+  warspirit_emberscale: {
+    id: 'warspirit_emberscale',
+    name: 'Warspirit Emberscale',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: 'Ancestral Strike advances your cadence 3 steps.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: 'Ancestral Strike hits 30 percent harder.',
+      },
+    ],
+  },
+  stonehearth: {
+    id: 'stonehearth',
+    name: 'Stonehearth Bastion',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: 'While Stonebound, Stormcast Mending Waters costs no mana and heals 25 percent more.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: 'While Stonebound, completing a cadence heals you for 3 percent of your maximum health.',
+      },
+    ],
+  },
+  springmender: {
+    id: 'springmender',
+    name: 'Springmender Scale',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: "Tidecall's cooldown is reduced by 4 sec. Damage taken no longer delays your spellcasting.",
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: 'Cascading Mend reaches a fourth ally and harvests Mending Currents at 150 percent.',
+      },
+    ],
+  },
 };
 
 // Fully-resolved set effect: every field defaulted so callers never branch on

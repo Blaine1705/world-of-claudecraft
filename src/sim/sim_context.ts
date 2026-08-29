@@ -915,6 +915,10 @@ export interface SimContextCallbacks {
     target: Entity | null,
     res: ResolvedAbility,
     attackAnimationStarted?: boolean,
+    // Cast-scoped outgoing-heal multiplier for the direct 'heal' effect
+    // (default 1; see the parameter note on combat/effect_dispatch.ts's
+    // runEffects). Today only the Stonehearth 2pc bend passes it.
+    castHealMult?: number,
   ): void;
 
   // P1a pet AI (src/sim/pet/pet_ai): the moved updatePet/petRangedAttack/petPickTarget

@@ -7920,6 +7920,24 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Время восстановления Призыва демона десятины сокращается на 6 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
   'entities.itemSets.vesperash.bonus4':
     'Призыв демона десятины сбрасывает восстановление Раскола разума, а демон возвращает вдвое больше маны за каждый удар.',
+  'entities.itemSets.stormkindled.name': 'Регалии грозового розжига',
+  'entities.itemSets.stormkindled.bonus2':
+    'Высвобождение оружия с пламенным клеймом даёт 3 Грома. Получаемый урон больше не замедляет чтение ваших заклинаний.',
+  'entities.itemSets.stormkindled.bonus4':
+    'Бонус Земного толчка за каждый Гром возрастает до 30%.',
+  'entities.itemSets.warspirit_emberscale.name': 'Угольная чешуя духа войны',
+  'entities.itemSets.warspirit_emberscale.bonus2': 'Удар предков продвигает ваш ритм на 3 шага.',
+  'entities.itemSets.warspirit_emberscale.bonus4': 'Удар предков наносит на 30% больше урона.',
+  'entities.itemSets.stonehearth.name': 'Бастион каменного очага',
+  'entities.itemSets.stonehearth.bonus2':
+    'Пока действуют каменные узы, Целебные воды под Бурезаклятием не тратят ману и исцеляют на 25% сильнее.',
+  'entities.itemSets.stonehearth.bonus4':
+    'Пока действуют каменные узы, завершение ритма исцеляет вас на 3% максимального здоровья.',
+  'entities.itemSets.springmender.name': 'Чешуя родникового целителя',
+  'entities.itemSets.springmender.bonus2':
+    'Время восстановления Зова прилива сокращается на 4 сек. Получаемый урон больше не замедляет чтение ваших заклинаний.',
+  'entities.itemSets.springmender.bonus4':
+    'Каскадное исцеление достигает четвёртого союзника и собирает Поток исцеления со 150%.',
   'entities.itemSets.slagbreaker.name': 'Боевое облачение шлаколома',
   'entities.itemSets.slagbreaker.bonus2': 'Кровавая рука усиливает ваш следующий Калечащий удар на 30% за заряд вместо 20%.',
   'entities.itemSets.slagbreaker.bonus4': 'Каждое второе применение Кровавой руки сокращает оставшееся время восстановления Бреши на 3 сек.',
