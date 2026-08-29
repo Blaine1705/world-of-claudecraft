@@ -70,21 +70,22 @@ describe('Rogue fight-6498 deterministic DPS bands', () => {
     expect(repeat).toEqual(first);
 
     // Accepted three-seed measurements on this fixture are approximately
-    // 224 Combat, 176 Assassination, and 178 Subtlety. Re-anchored through
-    // the Crucible round: the ilvl-35 weapons and jewelry entered the kits,
-    // the Emberflight Longbow's removal freed Combat's picks, and the Phase A
-    // exclusion (unregistered set ids never count as BiS) pulled the
-    // bonus-less Crucible set pieces back out, which nudged Subtlety a hair
-    // above Assassination. The Phase B set-bonus pass re-anchors to the new
-    // tier's measured values (a new gear wave sets a new power level; there
-    // is no old band to restore) and may re-order the siblings; until then
-    // the exact current ordering is pinned so a real collapse still reds.
+    // 224 Combat, 176 Assassination, and 195 Subtlety. Re-anchored through
+    // the Phase B set-bonus registration: the Subtlety kit's Ashveil pieces
+    // now pay their registered engine bonuses (the tripled Veiled Edge and
+    // the Lurker's Strike row land squarely in this fixture's veil windows),
+    // so the probe measures a genuine wearer, which is what a BiS player is.
+    // Combat and Assassination held their Phase A bands: their kits' set
+    // pieces pay bonuses this fight profile barely exercises. A new content
+    // wave sets a new power level; re-anchor to the measured values rather
+    // than restoring an old band, and keep the sibling ordering pinned so a
+    // real collapse still reds.
     expect(first.combat).toBeGreaterThanOrEqual(216);
     expect(first.combat).toBeLessThanOrEqual(232);
     expect(first.assassination).toBeGreaterThanOrEqual(168);
     expect(first.assassination).toBeLessThanOrEqual(184);
-    expect(first.subtlety).toBeGreaterThanOrEqual(170);
-    expect(first.subtlety).toBeLessThanOrEqual(186);
+    expect(first.subtlety).toBeGreaterThanOrEqual(187);
+    expect(first.subtlety).toBeLessThanOrEqual(203);
     expect(first.combat).toBeGreaterThan(first.subtlety);
     expect(first.subtlety).toBeGreaterThan(first.assassination);
   }, 30_000);
