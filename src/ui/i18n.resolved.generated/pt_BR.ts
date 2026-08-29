@@ -10556,7 +10556,7 @@ export const pt_BR: EnTranslations = {
       },
       "moonseed": {
         "name": "Semente Lunar",
-        "description": "Somente na Forma de Luniscante. Atinge por {damage} de dano Arcano, adiciona um estágio de Maré Lunar e estende sua Tempestade Lunar em 6 s, até 6 s por aplicação. Com a Maré Lunar cheia, Semente Lunar vira Onda Lunar."
+        "description": "Somente na Forma de Luniscante. Atinge por {damage} de dano Arcano, adiciona um estágio de Maré Lunar e estende sua Tempestade Lunar em 6 s, até {duration} s por aplicação. Com a Maré Lunar cheia, Semente Lunar vira Onda Lunar."
       },
       "rejuvenation": {
         "name": "Florescer Selvagem",
@@ -10892,7 +10892,7 @@ export const pt_BR: EnTranslations = {
       },
       "overbloom": {
         "name": "Superflorescência",
-        "description": "Consome 5 de Verdor. Colhe cada cura ao longo do tempo sua em todos os aliados por 60% da cura restante, remove esses efeitos e planta um Florescer Selvagem novo no alvo."
+        "description": "Consome 5 de Verdor. Colhe cada cura ao longo do tempo sua em todos os aliados por {buff}% da cura restante, remove esses efeitos e planta um Florescer Selvagem novo no alvo."
       },
       "summon_imp": {
         "name": "Invocar Emberkin",
@@ -18539,6 +18539,11 @@ export const pt_BR: EnTranslations = {
         "bonus2": "Temporal Echo converts 50 percent of your single-target Arcane damage into healing. Damage taken no longer delays your spellcasting.",
         "bonus4": "Temporal Cascade's cooldown is reduced by 5 sec."
       },
+      "cinderbark": {
+        "name": "Cinderbark Ward",
+        "bonus2": "Sweeping Claws has a 30 percent chance to bank an additional Old Blood.",
+        "bonus4": "Marrowbreak hits 30 percent harder, and its emergency guard no longer replaces the strike."
+      },
       "cinderfang": {
         "name": "Cinderfang Shroud",
         "bonus2": "Venom Ritual's energy refund rises to 20 per builder.",
@@ -18595,10 +18600,20 @@ export const pt_BR: EnTranslations = {
         "name": "Equipamento do Espreitador de Greyjaw",
         "bonus3": "Aumenta a velocidade de ataque e de lançamento em 15%."
       },
+      "grovespring": {
+        "name": "Grovespring Raiment",
+        "bonus2": "Swiftmend consumes your own Wildbloom or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Overbloom harvests 75 percent of your remaining effects and banks 1 Verdance afterward."
+      },
       "hexthread": {
         "name": "Hexthread Shroud",
         "bonus2": "Needle of Fate grants 2 additional Condemnation. Damage taken no longer delays your spellcasting.",
         "bonus4": "Passing Sentence refunds 10 Condemnation."
+      },
+      "moonscorch": {
+        "name": "Moonscorch Raiment",
+        "bonus2": "Moonseed may extend Lunar Tempest twice per application, to a maximum of 12 sec. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Moonsurge and Sunwake strike 25 percent harder."
       },
       "necromancers": {
         "name": "Vestes Mournweave",
@@ -18717,6 +18732,11 @@ export const pt_BR: EnTranslations = {
         "name": "Warspirit Emberscale",
         "bonus2": "Ancestral Strike advances your cadence 3 steps.",
         "bonus4": "Ancestral Strike hits 30 percent harder."
+      },
+      "wildfang_emberhide": {
+        "name": "Wildfang Emberhide",
+        "bonus2": "Redharvest restores 45 energy, up from 30.",
+        "bonus4": "Redharvest plants a fresh Flense on the target."
       },
       "wyrmshadow": {
         "name": "Traje Nightfang",

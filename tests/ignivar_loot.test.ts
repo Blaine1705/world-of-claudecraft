@@ -129,16 +129,18 @@ describe('ignivar loot: the 29 sets', () => {
     }
   });
 
-  it('the Phase B rollout ledger: registered sets are complete, the rest stay absent', () => {
-    // Phase A shipped every set: tag with NO registration (an unregistered id
-    // folds to nothing everywhere by design). Phase B registers the sets one
-    // class wave at a time, and each registration must be COMPLETE: an
-    // ITEM_SETS record with exactly the 2-piece and 4-piece tiers (tooltip
-    // text) AND a matching engine table (content/ignivar_set_bonuses.ts), so
-    // a tooltip never promises an unimplemented bonus and an engine payload
-    // never ships without its tooltip. Move an id from PENDING to REGISTERED
-    // here in the same change that lands its wave
-    // (docs/prd/ignivar-set-bonus-final.md).
+  it('the Phase B rollout ledger: all 29 sets are registered and complete', () => {
+    // Phase A shipped every set: tag with NO registration; Phase B registered
+    // the sets one class wave at a time. The druid wave was the LAST one, so
+    // the end state this ledger now pins is: every Crucible set id is
+    // registered, and each registration is COMPLETE: an ITEM_SETS record with
+    // exactly the 2-piece and 4-piece tiers (tooltip text) AND a matching
+    // engine table (content/ignivar_set_bonuses.ts), so a tooltip never
+    // promises an unimplemented bonus and an engine payload never ships
+    // without its tooltip (docs/prd/ignivar-set-bonus-final.md). The
+    // stays-absent arm of the rollout retired with the last wave; the
+    // engineless-set posture itself (an id with no engine table folds to
+    // nothing) remains guarded per set in tests/set_bonus_mods.test.ts.
     const REGISTERED_SET_IDS = [
       'slagbreaker',
       'emberfury',
@@ -165,22 +167,21 @@ describe('ignivar loot: the 29 sets', () => {
       'hexthread',
       'gravebrand',
       'ruincaller',
+      'moonscorch',
+      'wildfang_emberhide',
+      'cinderbark',
+      'grovespring',
     ] as const;
     const setIds = new Set(
       Object.values(IGNIVAR_SET_ITEMS).flatMap((item) => (item.set ? [item.set] : [])),
     );
     expect(setIds.size).toBe(29);
     const registered = new Set<string>(REGISTERED_SET_IDS);
+    // The completed rollout, both directions: every ledger id is a real
+    // Crucible set tag, and every Crucible set tag is in the ledger.
     for (const setId of registered) expect(setIds.has(setId), setId).toBe(true);
+    for (const setId of setIds) expect(registered.has(setId), `${setId} registered`).toBe(true);
     for (const setId of setIds) {
-      if (!registered.has(setId)) {
-        expect(ITEM_SETS[setId], `${setId} stays unregistered until its wave`).toBeUndefined();
-        expect(
-          SET_ENGINE_BONUSES[setId],
-          `${setId} engine bonuses land with its registration`,
-        ).toBeUndefined();
-        continue;
-      }
       const set = ITEM_SETS[setId];
       expect(set, setId).toBeDefined();
       expect(

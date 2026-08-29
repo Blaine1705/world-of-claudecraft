@@ -13130,10 +13130,10 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Consuma 3 Marea Lunare per un colpo pesante da {damage} danni Arcani: la scelta del danno. Scia Solare consuma le stesse 3 Marea Lunare, quindi scegline una.',
   'entities.abilities.moonseed.name': 'Seme Lunare',
   'entities.abilities.moonseed.description':
-    'Solo in Forma di Lunagufo. Colpisce per {damage} danni Arcani, aggiunge uno stadio di Marea Lunare ed estende la tua Tempesta Lunare di 6 sec, fino a 6 sec per applicazione. A Marea Lunare piena, Seme Lunare diventa Ondata Lunare.',
+    'Solo in Forma di Lunagufo. Colpisce per {damage} danni Arcani, aggiunge uno stadio di Marea Lunare ed estende la tua Tempesta Lunare di 6 sec, fino a {duration} sec per applicazione. A Marea Lunare piena, Seme Lunare diventa Ondata Lunare.',
   'entities.abilities.overbloom.name': 'Sovrafioritura',
   'entities.abilities.overbloom.description':
-    'Consuma 5 Verzura. Raccoglie ogni tua cura nel tempo su tutti gli alleati per il 60% della cura restante, rimuove quegli effetti e pianta una Fioritura Selvaggia fresca sul bersaglio.',
+    'Consuma 5 Verzura. Raccoglie ogni tua cura nel tempo su tutti gli alleati per il {buff}% della cura restante, rimuove quegli effetti e pianta una Fioritura Selvaggia fresca sul bersaglio.',
   'entities.abilities.redharvest.name': 'Mietitura Rossa',
   'entities.abilities.redharvest.description':
     "Consuma 3 Sangue Antico: colpisce per {damage}, infligge all'istante tutto il danno che i tuoi Scarnificare e Squartare avrebbero ancora inflitto, rimuove entrambe le emorragie e ripristina {rage} energia. Funziona anche senza punti combo.",

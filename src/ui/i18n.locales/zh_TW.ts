@@ -7532,6 +7532,20 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.ruincaller.name': '喚滅法衣',
   'entities.itemSets.ruincaller.bonus2': '燃盡可存 3 層充能。受到傷害不再延遲你的施法。',
   'entities.itemSets.ruincaller.bonus4': '毀滅箭造成的傷害提高 20%。',
+  'entities.itemSets.moonscorch.name': '月灼法衣',
+  'entities.itemSets.moonscorch.bonus2':
+    '月種可將月光風暴每次施加延長兩次，最多共 12 秒。受到傷害不再延遲你的施法。',
+  'entities.itemSets.moonscorch.bonus4': '月湧與日醒造成的傷害提高 25%。',
+  'entities.itemSets.wildfang_emberhide.name': '野牙燼皮甲',
+  'entities.itemSets.wildfang_emberhide.bonus2': '血收恢復的能量由 30 點提高至 45 點。',
+  'entities.itemSets.wildfang_emberhide.bonus4': '血收會在目標身上重新施加剮擊。',
+  'entities.itemSets.cinderbark.name': '燼皮守禦甲',
+  'entities.itemSets.cinderbark.bonus2': '橫掃利爪有 30% 的機率額外累積 1 層古血。',
+  'entities.itemSets.cinderbark.bonus4': '碎髓造成的傷害提高 30%，且其緊急護盾不再取代這次打擊。',
+  'entities.itemSets.grovespring.name': '林泉法衣',
+  'entities.itemSets.grovespring.bonus2':
+    '迅癒優先消耗你自己的野性綻放或再度綻放，治療效果提高 25%。受到傷害不再延遲你的施法。',
+  'entities.itemSets.grovespring.bonus4': '盛放收割你剩餘治療效果的 75%，隨後累積 1 層繁茂。',
   'entities.itemSets.slagbreaker.name': '碎渣戰甲',
   'entities.itemSets.slagbreaker.bonus2': '血手使你下一次致殘打擊的強化效果提高至每層 30%（原為 20%）。',
   'entities.itemSets.slagbreaker.bonus4': '每施放兩次血手，破防者的剩餘冷卻時間縮短 3 秒。',
@@ -11909,7 +11923,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '消耗3層月潮，造成{damage}點秘法傷害的強力打擊：傷害之選。與日醒消耗同一份月潮，二者只能擇一。',
   'entities.abilities.moonlash.name': '月湧',
   'entities.abilities.moonseed.description':
-    '僅限月翼形態。造成{damage}點秘法傷害，累積1層月潮（最多3層），並將你的月光風暴延長6秒；每次施加最多延長6秒。月潮達3層時，此按鈕變為月湧：立即造成240至285點秘法傷害，並耗盡全部3層。',
+    '僅限月翼形態。造成{damage}點秘法傷害，累積1層月潮（最多3層），並將你的月光風暴延長6秒；每次施加最多延長{duration}秒。月潮達3層時，此按鈕變為月湧：立即造成240至285點秘法傷害，並耗盡全部3層。',
   'entities.abilities.moonseed.name': '月種',
   'entities.abilities.needle_of_fate.description':
     '刺穿敵人，造成{damage}點暗影傷害。若目標帶有你的邪眼，則產生{needleDoom}點譴罪；若不存在邪眼，則先標記目標。',
@@ -11921,7 +11935,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '為敵人標記15秒，儲存你與你的亡靈所造成傷害的20%。再次施放可將其引爆。若被標記的敵人死亡，印記會在6碼內爆炸，並產生1枚靈魂碎片。',
   'entities.abilities.ossuary_mark.name': '骸骨印記',
   'entities.abilities.overbloom.description':
-    '消耗5層繁茂。收割你在所有盟友身上的持續治療，以其剩餘治療量的60%立即治療，移除這些效果，並在目標身上種下一次新的野性綻放。',
+    '消耗5層繁茂。收割你在所有盟友身上的持續治療，以其剩餘治療量的{buff}%立即治療，移除這些效果，並在目標身上種下一次新的野性綻放。',
   'entities.abilities.overbloom.name': '盛放',
   'entities.abilities.pack_command.description':
     '命令你的活體寵物發動攻擊。命中後產生 20 點集中值和一層獸群兇性。',

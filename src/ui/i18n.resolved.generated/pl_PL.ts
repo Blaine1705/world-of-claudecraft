@@ -10556,7 +10556,7 @@ export const pl_PL: EnTranslations = {
       },
       "moonseed": {
         "name": "Księżycowe nasienie",
-        "description": "Tylko w Postaci księżycowej sowy. Uderza za {damage} obrażeń tajemnych, dodaje jeden stopień Księżycowego przypływu i przedłuża twoją Księżycową nawałnicę o 6 s, do 6 s na użycie. Przy pełnym Księżycowym przypływie Księżycowe nasienie staje się Księżycowym przyborem."
+        "description": "Tylko w Postaci księżycowej sowy. Uderza za {damage} obrażeń tajemnych, dodaje jeden stopień Księżycowego przypływu i przedłuża twoją Księżycową nawałnicę o 6 s, do {duration} s na użycie. Przy pełnym Księżycowym przypływie Księżycowe nasienie staje się Księżycowym przyborem."
       },
       "rejuvenation": {
         "name": "Dziki rozkwit",
@@ -10892,7 +10892,7 @@ export const pl_PL: EnTranslations = {
       },
       "overbloom": {
         "name": "Nadrozkwit",
-        "description": "Zużywa 5 Zieleni. Zbiera każde twoje leczenie w czasie na wszystkich sojusznikach za 60% pozostałego leczenia, usuwa te efekty i sadzi świeży Dziki rozkwit na celu."
+        "description": "Zużywa 5 Zieleni. Zbiera każde twoje leczenie w czasie na wszystkich sojusznikach za {buff}% pozostałego leczenia, usuwa te efekty i sadzi świeży Dziki rozkwit na celu."
       },
       "summon_imp": {
         "name": "Przywołanie Emberkina",
@@ -18539,6 +18539,11 @@ export const pl_PL: EnTranslations = {
         "bonus2": "Temporal Echo converts 50 percent of your single-target Arcane damage into healing. Damage taken no longer delays your spellcasting.",
         "bonus4": "Temporal Cascade's cooldown is reduced by 5 sec."
       },
+      "cinderbark": {
+        "name": "Cinderbark Ward",
+        "bonus2": "Sweeping Claws has a 30 percent chance to bank an additional Old Blood.",
+        "bonus4": "Marrowbreak hits 30 percent harder, and its emergency guard no longer replaces the strike."
+      },
       "cinderfang": {
         "name": "Cinderfang Shroud",
         "bonus2": "Venom Ritual's energy refund rises to 20 per builder.",
@@ -18595,10 +18600,20 @@ export const pl_PL: EnTranslations = {
         "name": "Rynsztunek tropiciela Szaroszczękiego",
         "bonus3": "Zwiększa szybkość ataku i rzucania zaklęć o 15%."
       },
+      "grovespring": {
+        "name": "Grovespring Raiment",
+        "bonus2": "Swiftmend consumes your own Wildbloom or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Overbloom harvests 75 percent of your remaining effects and banks 1 Verdance afterward."
+      },
       "hexthread": {
         "name": "Hexthread Shroud",
         "bonus2": "Needle of Fate grants 2 additional Condemnation. Damage taken no longer delays your spellcasting.",
         "bonus4": "Passing Sentence refunds 10 Condemnation."
+      },
+      "moonscorch": {
+        "name": "Moonscorch Raiment",
+        "bonus2": "Moonseed may extend Lunar Tempest twice per application, to a maximum of 12 sec. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Moonsurge and Sunwake strike 25 percent harder."
       },
       "necromancers": {
         "name": "Szaty Mournweave",
@@ -18717,6 +18732,11 @@ export const pl_PL: EnTranslations = {
         "name": "Warspirit Emberscale",
         "bonus2": "Ancestral Strike advances your cadence 3 steps.",
         "bonus4": "Ancestral Strike hits 30 percent harder."
+      },
+      "wildfang_emberhide": {
+        "name": "Wildfang Emberhide",
+        "bonus2": "Redharvest restores 45 energy, up from 30.",
+        "bonus4": "Redharvest plants a fresh Flense on the target."
       },
       "wyrmshadow": {
         "name": "Szaty Nightfang",

@@ -10556,7 +10556,7 @@ export const cs_CZ: EnTranslations = {
       },
       "moonseed": {
         "name": "Měsíční semeno",
-        "description": "Pouze v Podobě měsíčního křídla. Zasáhne za {damage} tajemného poškození, přidá jeden stupeň Měsíčního přílivu a prodlouží tvou Měsíční bouři o 6 s, až o 6 s na použití. Při plném Měsíčním přílivu se Měsíční semeno mění v Měsíční vzedmutí."
+        "description": "Pouze v Podobě měsíčního křídla. Zasáhne za {damage} tajemného poškození, přidá jeden stupeň Měsíčního přílivu a prodlouží tvou Měsíční bouři o 6 s, až o {duration} s na použití. Při plném Měsíčním přílivu se Měsíční semeno mění v Měsíční vzedmutí."
       },
       "rejuvenation": {
         "name": "Divoký květ",
@@ -10892,7 +10892,7 @@ export const cs_CZ: EnTranslations = {
       },
       "overbloom": {
         "name": "Překvět",
-        "description": "Spotřebuje 5 Zeleně. Sklidí každé tvé léčení v čase na všech spojencích za 60% zbývajícího léčení, odstraní tyto efekty a zasadí na cíl čerstvý Divoký květ."
+        "description": "Spotřebuje 5 Zeleně. Sklidí každé tvé léčení v čase na všech spojencích za {buff}% zbývajícího léčení, odstraní tyto efekty a zasadí na cíl čerstvý Divoký květ."
       },
       "summon_imp": {
         "name": "Vyvolat Žhavorozeného",
@@ -18539,6 +18539,11 @@ export const cs_CZ: EnTranslations = {
         "bonus2": "Temporal Echo converts 50 percent of your single-target Arcane damage into healing. Damage taken no longer delays your spellcasting.",
         "bonus4": "Temporal Cascade's cooldown is reduced by 5 sec."
       },
+      "cinderbark": {
+        "name": "Cinderbark Ward",
+        "bonus2": "Sweeping Claws has a 30 percent chance to bank an additional Old Blood.",
+        "bonus4": "Marrowbreak hits 30 percent harder, and its emergency guard no longer replaces the strike."
+      },
       "cinderfang": {
         "name": "Cinderfang Shroud",
         "bonus2": "Venom Ritual's energy refund rises to 20 per builder.",
@@ -18595,10 +18600,20 @@ export const cs_CZ: EnTranslations = {
         "name": "Výbava stopaře Šedočelista",
         "bonus3": "Zvyšuje rychlost útoku a sesílání o 15 %."
       },
+      "grovespring": {
+        "name": "Grovespring Raiment",
+        "bonus2": "Swiftmend consumes your own Wildbloom or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Overbloom harvests 75 percent of your remaining effects and banks 1 Verdance afterward."
+      },
       "hexthread": {
         "name": "Hexthread Shroud",
         "bonus2": "Needle of Fate grants 2 additional Condemnation. Damage taken no longer delays your spellcasting.",
         "bonus4": "Passing Sentence refunds 10 Condemnation."
+      },
+      "moonscorch": {
+        "name": "Moonscorch Raiment",
+        "bonus2": "Moonseed may extend Lunar Tempest twice per application, to a maximum of 12 sec. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Moonsurge and Sunwake strike 25 percent harder."
       },
       "necromancers": {
         "name": "Oděv smutkotkaní",
@@ -18717,6 +18732,11 @@ export const cs_CZ: EnTranslations = {
         "name": "Warspirit Emberscale",
         "bonus2": "Ancestral Strike advances your cadence 3 steps.",
         "bonus4": "Ancestral Strike hits 30 percent harder."
+      },
+      "wildfang_emberhide": {
+        "name": "Wildfang Emberhide",
+        "bonus2": "Redharvest restores 45 energy, up from 30.",
+        "bonus4": "Redharvest plants a fresh Flense on the target."
       },
       "wyrmshadow": {
         "name": "Roucha nočního tesáku",

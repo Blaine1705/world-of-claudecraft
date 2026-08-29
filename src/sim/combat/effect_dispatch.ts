@@ -362,6 +362,21 @@ function consumeMatchingAura(
   eff: Extract<ResolvedAbility['effects'][number], { type: 'consumeAura' }>,
 ): number {
   if (!target) return -1;
+  // Grovespring 2pc: Swiftmend (the only hot-kind consumer) prefers the
+  // caster's OWN Wildbloom or Second Bloom, so a wearer stops eating another
+  // healer's HoT while their own is up. With none of their own present the
+  // base pick below still applies (the set doc's explicit fallback: a paid
+  // cast must never turn into a silent no-heal). Selection only; draws no
+  // rng and never changes which auras are eligible for anyone else.
+  if (eff.auraKind === 'hot' && wearsSetBonus(ctx, caster, 'grovespring', 2)) {
+    const own = target.auras.findIndex(
+      (a) =>
+        a.kind === 'hot' &&
+        a.sourceId === caster.id &&
+        (a.id === 'rejuvenation' || a.id === 'regrowth'),
+    );
+    if (own >= 0) return own;
+  }
   return target.auras.findIndex((a) => {
     // Only dot/hot auras are consumable, even by id: a raw splice skips the
     // stat-aura teardown expiry performs, so consuming a stat-carrying aura
@@ -740,7 +755,15 @@ export function runEffects(
         if (
           ability.id === 'marrowbreak' &&
           marrowbreakGuard?.type === 'druidMarrowbreakGuard' &&
-          druidMarrowbreakUsesGuard(p, marrowbreakGuard.belowFrac)
+          druidMarrowbreakUsesGuard(p, marrowbreakGuard.belowFrac) &&
+          // Cinderbark 4pc: the emergency guard no longer REPLACES the
+          // strike. This break is the one replacement site; skipping it for
+          // wearers lands the strike (with its authored flat-110 mult-2
+          // threat) while the druidMarrowbreakGuard arm below still applies
+          // the absorb and rage refund. Wearer-only rng note, disclosed by
+          // the set doc: the restored strike draws its damage and crit rolls
+          // below half health where the base path drew none.
+          !wearsSetBonus(ctx, p, 'cinderbark', 4)
         ) {
           break;
         }

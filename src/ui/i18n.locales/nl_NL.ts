@@ -12857,10 +12857,10 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Verbruikt je 3 Maanvloed voor een zware slag van {damage} Arcane-schade: de schadekeuze. Zonnespoor verbruikt dezelfde 3 Maanvloed, dus kies er een.',
   'entities.abilities.moonseed.name': 'Maanzaad',
   'entities.abilities.moonseed.description':
-    'Alleen in Maanuilvorm. Slaat toe voor {damage} Arcane-schade, voegt een Maanvloed-stadium toe en verlengt je Maanstorm met 6 sec, tot 6 sec per toepassing. Bij volle Maanvloed wordt Maanzaad Maangolf.',
+    'Alleen in Maanuilvorm. Slaat toe voor {damage} Arcane-schade, voegt een Maanvloed-stadium toe en verlengt je Maanstorm met 6 sec, tot {duration} sec per toepassing. Bij volle Maanvloed wordt Maanzaad Maangolf.',
   'entities.abilities.overbloom.name': 'Overbloei',
   'entities.abilities.overbloom.description':
-    'Verbruikt 5 Groenkracht. Oogst elke genezing over tijd die je op alle bondgenoten hebt voor 60% van de resterende genezing, verwijdert die effecten en plant een verse Wildbloei op het doelwit.',
+    'Verbruikt 5 Groenkracht. Oogst elke genezing over tijd die je op alle bondgenoten hebt voor {buff}% van de resterende genezing, verwijdert die effecten en plant een verse Wildbloei op het doelwit.',
   'entities.abilities.redharvest.name': 'Rode Oogst',
   'entities.abilities.redharvest.description':
     'Verbruikt je 3 Oud Bloed: een slag voor {damage} die meteen alle schade toebrengt die je Villen en Verscheuren nog zouden hebben toegebracht, beide bloedingen verwijdert en {rage} energie herstelt. Werkt ook zonder combopunten.',

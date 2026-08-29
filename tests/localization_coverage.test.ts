@@ -994,12 +994,11 @@ describe('i18n Localization Key Coverage', () => {
     // 7 raid/dungeon families with name+bonus2+bonus4+bonus6 (the lineage
     // ladder: every family shares its archetype's 2/4/6 tiers), plus 3
     // leveling haste kits carrying a single 3-piece tier (name+bonus3 only),
-    // the 5 WARFARE families x (name + bonus2/4/7), and the registered
-    // Crucible tier sets x (name + bonus2/bonus4), one class wave at a time
-    // (the rollout ledger in tests/ignivar_loot.test.ts; currently the
-    // warrior, paladin, hunter, rogue, priest, shaman, mage, and warlock
-    // waves, 25 sets).
-    expect(itemSetEntries).toHaveLength(7 * 4 + 3 * 2 + 5 * 4 + 25 * 3);
+    // the 5 WARFARE families x (name + bonus2/4/7), and the Crucible tier
+    // sets x (name + bonus2/bonus4). The druid wave completed the Crucible
+    // rollout, so all 29 sets are registered (the ledger in
+    // tests/ignivar_loot.test.ts).
+    expect(itemSetEntries).toHaveLength(7 * 4 + 3 * 2 + 5 * 4 + 29 * 3);
     expect(missingEntityTranslationsForGroups(['itemSet'])).toHaveLength(0);
 
     for (const lang of ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'] as const) {

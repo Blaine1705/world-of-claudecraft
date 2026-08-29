@@ -7844,6 +7844,22 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.ruincaller.bonus2':
     'コンフラグレートがチャージを3つ持ちます。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.ruincaller.bonus4': '破滅の矢のダメージが20%増加します。',
+  'entities.itemSets.moonscorch.name': 'ムーンスコーチの法衣',
+  'entities.itemSets.moonscorch.bonus2':
+    '月の種が月の嵐を1回の付与につき2回まで延長できるようになり、合計最大12秒になります。被ダメージで詠唱が遅れなくなります。',
+  'entities.itemSets.moonscorch.bonus4': 'ムーンサージと陽醒のダメージが25%増加します。',
+  'entities.itemSets.wildfang_emberhide.name': 'ワイルドファングの燼皮鎧',
+  'entities.itemSets.wildfang_emberhide.bonus2':
+    '血の収穫が回復するエナジーが30から45に増加します。',
+  'entities.itemSets.wildfang_emberhide.bonus4': '血の収穫が対象に新しい皮剥ぎを植え付けます。',
+  'entities.itemSets.cinderbark.name': 'シンダーバークの守り',
+  'entities.itemSets.cinderbark.bonus2': '薙ぎ払う爪が30%の確率で古き血を追加で1蓄えます。',
+  'entities.itemSets.cinderbark.bonus4':
+    '骨髄砕きのダメージが30%増加し、緊急時の護りが攻撃を置き換えなくなります。',
+  'entities.itemSets.grovespring.name': 'グローヴスプリングの法衣',
+  'entities.itemSets.grovespring.bonus2':
+    'スウィフトメンドが自分の野生の芽吹きまたは二度目の開花を優先して消費し、回復量が25%増加します。被ダメージで詠唱が遅れなくなります。',
+  'entities.itemSets.grovespring.bonus4': '満開が残りの効果の75%を収穫し、その後翠成を1蓄えます。',
   'entities.itemSets.slagbreaker.name': 'スラグブレイカーの戦装束',
   'entities.itemSets.slagbreaker.bonus2': '血染めの手による次の重傷の一撃の強化が、1スタックにつき20%から30%に上昇します。',
   'entities.itemSets.slagbreaker.bonus4': '血染めの手を2回発動するごとに、崩し手の残りクールダウンが3秒短縮されます。',
@@ -12467,7 +12483,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '月潮を3消費し、{damage}の秘術ダメージの強撃を放つ、ダメージ重視の選択肢。陽醒も同じ月潮3を消費するため、どちらか一方を選ぶこと。',
   'entities.abilities.moonlash.name': 'ムーンサージ',
   'entities.abilities.moonseed.description':
-    '月翼形態専用。{damage}の秘術ダメージを与え、月潮を1段階進め（最大3）、月の嵐を6秒延長する（1回の付与につき最大6秒）。月潮が3段階のとき、このボタンはムーンサージに変化する：3段階すべてを消費し、240から285の秘術ダメージを与える即時攻撃。',
+    '月翼形態専用。{damage}の秘術ダメージを与え、月潮を1段階進め（最大3）、月の嵐を6秒延長する（1回の付与につき最大{duration}秒）。月潮が3段階のとき、このボタンはムーンサージに変化する：3段階すべてを消費し、240から285の秘術ダメージを与える即時攻撃。',
   'entities.abilities.moonseed.name': '月の種',
   'entities.abilities.needle_of_fate.description':
     '敵を貫いて{damage}の影ダメージを与えます。対象に自分の邪眼があれば断罪を{needleDoom}生成し、邪眼がなければ先に対象を指定します。',
@@ -12479,7 +12495,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '敵に15秒間の印を刻み、自分と自分のアンデッドが与えたダメージの20%を蓄積する。もう一度使用すると起爆する。印のついた敵が死亡すると6ヤード以内で爆発し、魂の欠片を1個生成する。',
   'entities.abilities.ossuary_mark.name': '納骨の印',
   'entities.abilities.overbloom.description':
-    '翠成を5消費する：自身の継続回復効果を持つすべての味方が、その効果の残り回復量の60%分を即座に回復し、効果は除去され、対象には新しい野生の芽吹きが植えられる。',
+    '翠成を5消費する：自身の継続回復効果を持つすべての味方が、その効果の残り回復量の{buff}%分を即座に回復し、効果は除去され、対象には新しい野生の芽吹きが植えられる。',
   'entities.abilities.overbloom.name': '満開',
   'entities.abilities.pack_command.description':
     '生きたペットに攻撃を命じます。命中すると集中値を20生成し、群れの獰猛さを1段階得ます。',

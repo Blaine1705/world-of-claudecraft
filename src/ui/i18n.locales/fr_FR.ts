@@ -13274,10 +13274,10 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Consomme vos 3 Marée lunaire pour une frappe lourde de {damage} points de dégâts d'Arcane : le choix des dégâts. Sillage solaire consomme les mêmes 3 Marée lunaire, alors choisissez-en un.",
   'entities.abilities.moonseed.name': 'Graine lunaire',
   'entities.abilities.moonseed.description':
-    "Forme de sélénien uniquement. Frappe pour {damage} dégâts d'Arcane, ajoute un cran de Marée lunaire et prolonge votre Tempête lunaire de 6 s, jusqu'à 6 s par application. À Marée lunaire pleine, Graine lunaire devient Déferlante lunaire.",
+    "Forme de sélénien uniquement. Frappe pour {damage} dégâts d'Arcane, ajoute un cran de Marée lunaire et prolonge votre Tempête lunaire de 6 s, jusqu'à {duration} s par application. À Marée lunaire pleine, Graine lunaire devient Déferlante lunaire.",
   'entities.abilities.overbloom.name': 'Surfloraison',
   'entities.abilities.overbloom.description':
-    'Consomme 5 Verdoyance. Récolte chaque soin sur la durée que vous possédez sur tous les alliés pour 60% de ses soins restants, retire ces effets et plante une Floraison sauvage fraîche sur la cible.',
+    'Consomme 5 Verdoyance. Récolte chaque soin sur la durée que vous possédez sur tous les alliés pour {buff}% de ses soins restants, retire ces effets et plante une Floraison sauvage fraîche sur la cible.',
   'entities.abilities.redharvest.name': 'Moisson rouge',
   'entities.abilities.redharvest.description':
     "Consomme vos 3 Sang ancien : frappe pour {damage}, inflige instantanément tous les dégâts que vos Écorcher et Lacération auraient encore infligés, retire les deux saignements et rend {rage} points d'énergie. Fonctionne sans aucun point de combo.",

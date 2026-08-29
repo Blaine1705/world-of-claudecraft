@@ -11822,10 +11822,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Verbraucht 3 Mondflut für einen schweren Schlag mit {damage} Arkanschaden: die Schadenswahl. Sonnenspur verbraucht dieselben 3 Mondflut, also wählt eine.',
   'entities.abilities.moonseed.name': 'Mondsaat',
   'entities.abilities.moonseed.description':
-    'Nur in Mondkingestalt. Trifft für {damage} Arkanschaden, fügt eine Mondflut-Stufe hinzu und verlängert Euren Mondsturm um 6 Sek., bis zu 6 Sek. pro Anwendung. Bei voller Mondflut wird Mondsaat zu Mondwoge.',
+    'Nur in Mondkingestalt. Trifft für {damage} Arkanschaden, fügt eine Mondflut-Stufe hinzu und verlängert Euren Mondsturm um 6 Sek., bis zu {duration} Sek. pro Anwendung. Bei voller Mondflut wird Mondsaat zu Mondwoge.',
   'entities.abilities.overbloom.name': 'Überblüte',
   'entities.abilities.overbloom.description':
-    'Verbraucht 5 Grünkraft. Erntet jede Eurer Heilungen über Zeit auf allen Verbündeten für 60% ihrer verbleibenden Heilung, entfernt diese Effekte und pflanzt eine frische Wildblüte auf das Ziel.',
+    'Verbraucht 5 Grünkraft. Erntet jede Eurer Heilungen über Zeit auf allen Verbündeten für {buff}% ihrer verbleibenden Heilung, entfernt diese Effekte und pflanzt eine frische Wildblüte auf das Ziel.',
   'entities.abilities.redharvest.name': 'Rote Ernte',
   'entities.abilities.redharvest.description':
     'Verbraucht 3 Altes Blut: ein Schlag für {damage}, der sofort allen Schaden verursacht, den Euer Schinden und Zerfetzen noch verursacht hätten, beide Blutungen entfernt und {rage} Energie wiederherstellt. Funktioniert auch ohne Combopunkte.',

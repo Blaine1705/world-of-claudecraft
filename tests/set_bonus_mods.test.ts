@@ -47,13 +47,18 @@ describe('set_bonus_mods: the resolver', () => {
     expect(four.selected[setBonusFlag('slagbreaker', 4)]).toBe(true);
   });
 
-  it('an unregistered set id folds to nothing (the Phase A posture survives per set)', () => {
-    // Re-anchored to a still-unregistered wave as each class wave lands:
-    // moonscorch is a real druid set whose engine registration is pending.
-    const mods = applySetBonusModifiers(computeTalentModifiers('druid', null), {
-      helmet: 'moonscorch_helmet',
-      shoulder: 'moonscorch_shoulder',
-    });
+  it('a set id with no engine table folds to nothing (the engineless posture survives per set)', () => {
+    // Every Crucible wave is registered now (the druid wave completed the
+    // 29), so the rolling still-unregistered anchor retired with it. The
+    // posture it guarded is permanent, though: the resolver must treat any
+    // worn set WITHOUT a SET_ENGINE_BONUSES entry as inert, and the
+    // non-Crucible sets (the leveling lineages, WARFARE) never register one.
+    // vale_arcanist is a real leveling set with real ITEM_SETS stat tiers,
+    // so this walks the exact production path: counted by wornSetCounts,
+    // then skipped by the engine fold.
+    const equipment = { helmet: 'acolytes_circlet', chest: 'woven_robe' };
+    expect(wornSetCounts(equipment).get('vale_arcanist')).toBe(2);
+    const mods = applySetBonusModifiers(computeTalentModifiers('mage', null), equipment);
     expect(Object.keys(mods.selected).filter((k) => k.startsWith('setbonus_'))).toEqual([]);
   });
 

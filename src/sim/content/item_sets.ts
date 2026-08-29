@@ -884,6 +884,77 @@ export const ITEM_SETS: Record<string, ItemSet> = {
       },
     ],
   },
+  moonscorch: {
+    id: 'moonscorch',
+    name: 'Moonscorch Raiment',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        // The caster 2pc carries the pushback rider (full immunity, the raid
+        // tier's upgrade over the leveling lineage's 50 percent).
+        text: 'Moonseed may extend Lunar Tempest twice per application, to a maximum of 12 sec. Damage taken no longer delays your spellcasting.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: 'Moonsurge and Sunwake strike 25 percent harder.',
+      },
+    ],
+  },
+  wildfang_emberhide: {
+    id: 'wildfang_emberhide',
+    name: 'Wildfang Emberhide',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: 'Redharvest restores 45 energy, up from 30.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: 'Redharvest plants a fresh Flense on the target.',
+      },
+    ],
+  },
+  cinderbark: {
+    id: 'cinderbark',
+    name: 'Cinderbark Ward',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: 'Sweeping Claws has a 30 percent chance to bank an additional Old Blood.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: 'Marrowbreak hits 30 percent harder, and its emergency guard no longer replaces the strike.',
+      },
+    ],
+  },
+  grovespring: {
+    id: 'grovespring',
+    name: 'Grovespring Raiment',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        // "prefers your own ... first", not the set doc's "consumes only your
+        // own": the implemented (and doc-mandated) explicit fallback still
+        // consumes any HoT when the wearer has none of their own, so "only"
+        // would overclaim the narrowing. Recorded as a copy deviation in the
+        // wave's PR notes.
+        text: 'Swiftmend consumes your own Wildbloom or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: 'Overbloom harvests 75 percent of your remaining effects and banks 1 Verdance afterward.',
+      },
+    ],
+  },
 };
 
 // Fully-resolved set effect: every field defaulted so callers never branch on

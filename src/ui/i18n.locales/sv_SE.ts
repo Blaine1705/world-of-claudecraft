@@ -12901,10 +12901,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Förbrukar dina 3 Månflod för ett tungt slag som ger {damage} arkan skada: skadevalet. Solspår förbrukar samma 3 Månflod, så välj ett.',
   'entities.abilities.moonseed.name': 'Månfrö',
   'entities.abilities.moonseed.description':
-    'Endast i Månugglaform. Slår för {damage} arkan skada, lägger till ett Månflod-steg och förlänger din Månstorm med 6 sek, upp till 6 sek per användning. Vid full Månflod blir Månfrö Månsvall.',
+    'Endast i Månugglaform. Slår för {damage} arkan skada, lägger till ett Månflod-steg och förlänger din Månstorm med 6 sek, upp till {duration} sek per användning. Vid full Månflod blir Månfrö Månsvall.',
   'entities.abilities.overbloom.name': 'Överblomning',
   'entities.abilities.overbloom.description':
-    'Förbrukar 5 Grönska. Skördar varje läkning över tid du äger på alla allierade för 60% av dess återstående läkning, tar bort de effekterna och planterar en färsk Vildblomning på målet.',
+    'Förbrukar 5 Grönska. Skördar varje läkning över tid du äger på alla allierade för {buff}% av dess återstående läkning, tar bort de effekterna och planterar en färsk Vildblomning på målet.',
   'entities.abilities.redharvest.name': 'Röd Skörd',
   'entities.abilities.redharvest.description':
     'Förbrukar dina 3 Gammalt Blod: ett slag för {damage} som omedelbart ger all skada som dina Flå och Riv upp ännu skulle ha gett, tar bort båda blödningarna och återställer {rage} energi. Fungerar utan kombopoäng.',

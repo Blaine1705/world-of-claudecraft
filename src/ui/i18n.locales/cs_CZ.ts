@@ -12840,10 +12840,10 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Spotřebuje 3 Měsíčního přílivu na těžký úder za {damage} tajemného poškození: volba poškození. Sluneční brázda spotřebuje tytéž 3 Měsíčního přílivu, vyber si tedy jednu.',
   'entities.abilities.moonseed.name': 'Měsíční semeno',
   'entities.abilities.moonseed.description':
-    'Pouze v Podobě měsíčního křídla. Zasáhne za {damage} tajemného poškození, přidá jeden stupeň Měsíčního přílivu a prodlouží tvou Měsíční bouři o 6 s, až o 6 s na použití. Při plném Měsíčním přílivu se Měsíční semeno mění v Měsíční vzedmutí.',
+    'Pouze v Podobě měsíčního křídla. Zasáhne za {damage} tajemného poškození, přidá jeden stupeň Měsíčního přílivu a prodlouží tvou Měsíční bouři o 6 s, až o {duration} s na použití. Při plném Měsíčním přílivu se Měsíční semeno mění v Měsíční vzedmutí.',
   'entities.abilities.overbloom.name': 'Překvět',
   'entities.abilities.overbloom.description':
-    'Spotřebuje 5 Zeleně. Sklidí každé tvé léčení v čase na všech spojencích za 60% zbývajícího léčení, odstraní tyto efekty a zasadí na cíl čerstvý Divoký květ.',
+    'Spotřebuje 5 Zeleně. Sklidí každé tvé léčení v čase na všech spojencích za {buff}% zbývajícího léčení, odstraní tyto efekty a zasadí na cíl čerstvý Divoký květ.',
   'entities.abilities.redharvest.name': 'Rudá sklizeň',
   'entities.abilities.redharvest.description':
     'Spotřebuje 3 Staré krve: úder za {damage}, okamžitě způsobí veškeré poškození, které by tvé Stažení z kůže a Roztržení ještě způsobily, odstraní obě krvácení a obnoví {rage} energie. Funguje i bez combo bodů.',

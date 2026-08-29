@@ -12955,10 +12955,10 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Menghabiskan 3 Pasang Rembulan milikmu untuk serangan berat sebesar {damage} kerusakan Gaib: pilihan kerusakan. Jejak Surya menghabiskan 3 Pasang Rembulan yang sama, jadi pilih salah satu.',
   'entities.abilities.moonseed.name': 'Benih Rembulan',
   'entities.abilities.moonseed.description':
-    'Hanya dalam Wujud Burung Bulan. Menyerang sebesar {damage} kerusakan Gaib, menambah satu tahap Pasang Rembulan, dan memperpanjang Badai Rembulan-mu 6 dtk, hingga 6 dtk per penerapan. Saat Pasang Rembulan penuh, Benih Rembulan menjadi Gelombang Rembulan.',
+    'Hanya dalam Wujud Burung Bulan. Menyerang sebesar {damage} kerusakan Gaib, menambah satu tahap Pasang Rembulan, dan memperpanjang Badai Rembulan-mu 6 dtk, hingga {duration} dtk per penerapan. Saat Pasang Rembulan penuh, Benih Rembulan menjadi Gelombang Rembulan.',
   'entities.abilities.overbloom.name': 'Mekar Raya',
   'entities.abilities.overbloom.description':
-    'Menghabiskan 5 Kehijauan. Memanen setiap penyembuhan berkala milikmu pada semua sekutu sebesar 60% dari penyembuhan tersisa, menghapus efek itu, dan menanam Mekar Liar segar pada sasaran.',
+    'Menghabiskan 5 Kehijauan. Memanen setiap penyembuhan berkala milikmu pada semua sekutu sebesar {buff}% dari penyembuhan tersisa, menghapus efek itu, dan menanam Mekar Liar segar pada sasaran.',
   'entities.abilities.redharvest.name': 'Panen Merah',
   'entities.abilities.redharvest.description':
     'Menghabiskan 3 Darah Tua milikmu: menyerang sebesar {damage}, langsung memberikan semua kerusakan yang masih akan diberikan Kupasan dan Robekan milikmu, menghapus kedua pendarahan, dan memulihkan {rage} energi. Berfungsi tanpa poin combo.',

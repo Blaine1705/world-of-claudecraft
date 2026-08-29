@@ -7838,6 +7838,23 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.ruincaller.bonus2':
     '점화가 충전을 3회 담아 둡니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
   'entities.itemSets.ruincaller.bonus4': '파멸 화살의 피해가 20% 증가합니다.',
+  'entities.itemSets.moonscorch.name': '달그을림 예복',
+  'entities.itemSets.moonscorch.bonus2':
+    '달씨앗이 달빛 폭풍을 적용 한 번당 두 번까지 연장할 수 있으며, 최대 12초까지 늘어납니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+  'entities.itemSets.moonscorch.bonus4': '달의 격동과 해돋움의 피해가 25% 증가합니다.',
+  'entities.itemSets.wildfang_emberhide.name': '야생송곳니 잉걸가죽',
+  'entities.itemSets.wildfang_emberhide.bonus2':
+    '피의 수확이 회복시키는 기력이 30에서 45로 증가합니다.',
+  'entities.itemSets.wildfang_emberhide.bonus4': '피의 수확이 대상에게 새로운 저미기를 남깁니다.',
+  'entities.itemSets.cinderbark.name': '잿불나무껍질 수호구',
+  'entities.itemSets.cinderbark.bonus2': '휩쓰는 발톱이 30% 확률로 오랜 피를 1단계 더 쌓습니다.',
+  'entities.itemSets.cinderbark.bonus4':
+    '골수분쇄의 피해가 30% 증가하며, 비상 보호막이 더 이상 타격을 대체하지 않습니다.',
+  'entities.itemSets.grovespring.name': '숲샘 예복',
+  'entities.itemSets.grovespring.bonus2':
+    '신속한 치유가 자신의 야생 개화나 두 번째 개화를 먼저 소모하며, 치유량이 25% 증가합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+  'entities.itemSets.grovespring.bonus4':
+    '만개가 남은 효과의 75%를 수확하고, 그 후 푸른 생장을 1단계 쌓습니다.',
   'entities.itemSets.slagbreaker.name': '광재파쇄자 전투복',
   'entities.itemSets.slagbreaker.bonus2': '붉은 손이 다음 불구의 일격을 중첩당 20% 대신 30% 강화합니다.',
   'entities.itemSets.slagbreaker.bonus4': '붉은 손을 두 번 시전할 때마다 돌파자의 남은 재사용 대기시간이 3초 감소합니다.',
@@ -12443,7 +12460,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '달물결 3단계를 소모해 {damage}의 비전 피해를 입히는 강력한 일격을 가합니다: 피해 특화 선택지입니다. 해돋움도 같은 달물결 3단계를 소모하므로 하나만 선택하세요.',
   'entities.abilities.moonlash.name': '달의 격동',
   'entities.abilities.moonseed.description':
-    '달날개 형상 전용입니다. {damage}의 비전 피해를 입히고, 달물결을 1단계 올리며(최대 3단계), 달빛 폭풍을 6초 연장합니다. 적용 한 번당 최대 6초입니다. 달물결 3단계에서 이 버튼이 달의 격동으로 변합니다: 240에서 285의 비전 피해를 입히는 즉시 공격으로, 3단계를 모두 소모합니다.',
+    '달날개 형상 전용입니다. {damage}의 비전 피해를 입히고, 달물결을 1단계 올리며(최대 3단계), 달빛 폭풍을 6초 연장합니다. 적용 한 번당 최대 {duration}초입니다. 달물결 3단계에서 이 버튼이 달의 격동으로 변합니다: 240에서 285의 비전 피해를 입히는 즉시 공격으로, 3단계를 모두 소모합니다.',
   'entities.abilities.moonseed.name': '달씨앗',
   'entities.abilities.needle_of_fate.description':
     '적을 꿰뚫어 {damage}의 암흑 피해를 줍니다. 대상에게 자신의 사안이 있으면 단죄를 {needleDoom} 생성하고, 사안이 없으면 먼저 대상을 지정합니다.',
@@ -12455,7 +12472,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '적에게 15초 동안 표식을 남겨 당신과 당신의 언데드가 입힌 피해의 20%를 저장합니다. 다시 시전하면 표식을 터뜨립니다. 표식이 남은 적이 죽으면 6야드 안에서 폭발하고 영혼 조각 1개를 생성합니다.',
   'entities.abilities.ossuary_mark.name': '납골 표식',
   'entities.abilities.overbloom.description':
-    '푸른 생장 5단계를 소모합니다: 자신의 지속 치유 효과를 지닌 모든 아군이 해당 효과의 남은 치유량 중 60%를 즉시 회복하고, 해당 효과는 제거되며, 대상에게 새로운 야생 개화를 심습니다.',
+    '푸른 생장 5단계를 소모합니다: 자신의 지속 치유 효과를 지닌 모든 아군이 해당 효과의 남은 치유량 중 {buff}%를 즉시 회복하고, 해당 효과는 제거되며, 대상에게 새로운 야생 개화를 심습니다.',
   'entities.abilities.overbloom.name': '만개',
   'entities.abilities.pack_command.description':
     '살아 있는 소환수에게 공격을 명령합니다. 적중하면 집중 20과 무리 흉포 1단계를 얻습니다.',

@@ -10556,7 +10556,7 @@ export const da_DK: EnTranslations = {
       },
       "moonseed": {
         "name": "Månefrø",
-        "description": "Kun i Månekinform. Rammer for {damage} arkan skade, tilføjer et Måneflod-trin og forlænger din Månestorm med 6 sek., op til 6 sek. pr. anvendelse. Ved fuld Måneflod bliver Månefrø til Månebølge."
+        "description": "Kun i Månekinform. Rammer for {damage} arkan skade, tilføjer et Måneflod-trin og forlænger din Månestorm med 6 sek., op til {duration} sek. pr. anvendelse. Ved fuld Måneflod bliver Månefrø til Månebølge."
       },
       "rejuvenation": {
         "name": "Vildblomst",
@@ -10892,7 +10892,7 @@ export const da_DK: EnTranslations = {
       },
       "overbloom": {
         "name": "Overblomstring",
-        "description": "Forbruger 5 Grønske. Høster hver af dine helbredelser over tid på alle allierede for 60% af den resterende helbredelse, fjerner de virkninger og planter en frisk Vildblomst på målet."
+        "description": "Forbruger 5 Grønske. Høster hver af dine helbredelser over tid på alle allierede for {buff}% af den resterende helbredelse, fjerner de virkninger og planter en frisk Vildblomst på målet."
       },
       "summon_imp": {
         "name": "Tilkald Emberkin",
@@ -18539,6 +18539,11 @@ export const da_DK: EnTranslations = {
         "bonus2": "Temporal Echo converts 50 percent of your single-target Arcane damage into healing. Damage taken no longer delays your spellcasting.",
         "bonus4": "Temporal Cascade's cooldown is reduced by 5 sec."
       },
+      "cinderbark": {
+        "name": "Cinderbark Ward",
+        "bonus2": "Sweeping Claws has a 30 percent chance to bank an additional Old Blood.",
+        "bonus4": "Marrowbreak hits 30 percent harder, and its emergency guard no longer replaces the strike."
+      },
       "cinderfang": {
         "name": "Cinderfang Shroud",
         "bonus2": "Venom Ritual's energy refund rises to 20 per builder.",
@@ -18595,10 +18600,20 @@ export const da_DK: EnTranslations = {
         "name": "Gråkæbe-jægerens udstyr",
         "bonus3": "Øger angrebs- og magihastighed med 15%."
       },
+      "grovespring": {
+        "name": "Grovespring Raiment",
+        "bonus2": "Swiftmend consumes your own Wildbloom or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Overbloom harvests 75 percent of your remaining effects and banks 1 Verdance afterward."
+      },
       "hexthread": {
         "name": "Hexthread Shroud",
         "bonus2": "Needle of Fate grants 2 additional Condemnation. Damage taken no longer delays your spellcasting.",
         "bonus4": "Passing Sentence refunds 10 Condemnation."
+      },
+      "moonscorch": {
+        "name": "Moonscorch Raiment",
+        "bonus2": "Moonseed may extend Lunar Tempest twice per application, to a maximum of 12 sec. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Moonsurge and Sunwake strike 25 percent harder."
       },
       "necromancers": {
         "name": "Mournweave klæder",
@@ -18717,6 +18732,11 @@ export const da_DK: EnTranslations = {
         "name": "Warspirit Emberscale",
         "bonus2": "Ancestral Strike advances your cadence 3 steps.",
         "bonus4": "Ancestral Strike hits 30 percent harder."
+      },
+      "wildfang_emberhide": {
+        "name": "Wildfang Emberhide",
+        "bonus2": "Redharvest restores 45 energy, up from 30.",
+        "bonus4": "Redharvest plants a fresh Flense on the target."
       },
       "wyrmshadow": {
         "name": "Nightfang klæder",

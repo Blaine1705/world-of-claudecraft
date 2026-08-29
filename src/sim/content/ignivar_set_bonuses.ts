@@ -259,6 +259,57 @@ export const RUINCALLER_2PC_CONFLAGRATE_BONUS_CHARGES = 1;
  *  deviation shape); recorded as a deviation in the wave's PR notes. */
 export const RUINCALLER_4PC_CHAOS_BOLT_DMG_PCT = 0.22;
 
+// Audited constants for the bespoke druid bends (read by the class-module
+// call sites AND pinned by tests, so the copy cannot drift from the code).
+/** Moonscorch 2pc: Moonseed's per-application Lunar Tempest extension cap
+ *  (base extendDot maxBonus 6). The RESOLVED effect is rewritten in
+ *  applyTalentMods, the ONE number the extendOwnedDot dispatch and the
+ *  {duration} description splice both read: two 6-sec extensions fit per
+ *  application, and the third press stays dead (the set doc's honesty note). */
+export const MOONSCORCH_2PC_TEMPEST_EXTEND_CAP_SEC = 12;
+/** Moonscorch 4pc: the moonlash/sunlance dmgPct row. The printed number is 25
+ *  percent DELIVERED: the accumulator is additive (talent_hit_mult.ts,
+ *  1 + spellDmgPct + dmgPct) and a committed Moongrove at the raid's level
+ *  20+ carries the 0.08 spec-baseline spellDmgPct floor PLUS the fully
+ *  scaled Moonrage mastery's 0.15, so the real baseline is 1.23 and the row
+ *  is 0.25 x 1.23 = 0.3075 (1.5375 / 1.23 = 1.25 exactly). The set doc's
+ *  bracketed dmgPct assumed a bare baseline (the Warspirit 4pc deviation
+ *  shape); recorded as a deviation in the wave's PR notes. */
+export const MOONSCORCH_4PC_PAYOFF_DMG_PCT = 0.3075;
+/** Wildfang 2pc: multiplier on Redharvest's RESOLVED gainResource energy
+ *  restore (base rank ladder 15/22/30; Math.floor lands the bent ladder at
+ *  22/33/45, the set doc's rank truth, with 45 the raid-tier rank-3 value the
+ *  copy prints). Rewritten in applyTalentMods, so the dispatch's resource
+ *  grant reads the one resolved amount; no tooltip literal exists to drift. */
+export const WILDFANG_2PC_REDHARVEST_ENERGY_MULT = 1.5;
+/** Cinderbark 2pc: chance a landed Sweeping Claws banks an ADDITIONAL Old
+ *  Blood (rolled once per landed cast at the druidEngineOnLandedStrike bank
+ *  site). WEARER-ONLY rng: the roll is flag-gated, so non-wearers draw
+ *  nothing and their stream stays byte-identical (doc-disclosed shift). */
+export const CINDERBARK_2PC_EXTRA_OLD_BLOOD_CHANCE = 0.3;
+/** Cinderbark 4pc: the marrowbreak dmgPct row. The printed number is 30
+ *  percent DELIVERED: a committed Wildfang at the raid's level 20+ carries
+ *  the fully scaled Primal Heart mastery's 0.5 meleeDmgPct (no other row
+ *  targets marrowbreak), so the baseline is 1.5 and the row is
+ *  0.3 x 1.5 = 0.45 (1.95 / 1.5 = 1.30 exactly). */
+export const CINDERBARK_4PC_MARROWBREAK_DMG_PCT = 0.45;
+/** Grovespring 2pc: multiplier on Swiftmend's RESOLVED consumeAura heal
+ *  (bespoke eff.heal rewrite in applyTalentMods, the set doc's named hook:
+ *  no generic knob reaches the consumeAura heal without folding into the
+ *  additive baseline). The $d tooltip splice reads the same resolved range,
+ *  so the printed heal stays honest for wearers. The healPower rider on top
+ *  keeps its base scaling, disclosed in the wave's PR notes. */
+export const GROVESPRING_2PC_SWIFTMEND_HEAL_MULT = 1.25;
+/** Grovespring 4pc: Overbloom's RESOLVED harvest fraction (base
+ *  druidOverbloom harvestPct 0.6). Rewritten in applyTalentMods, the ONE
+ *  number resolveDruidOverbloom and the {buff} description splice both read. */
+export const GROVESPRING_4PC_OVERBLOOM_HARVEST_PCT = 0.75;
+/** Grovespring 4pc: Verdance banked after Overbloom resolves, via
+ *  setBank(current + 1) DIRECTLY (never addStage, which would silently pay
+ *  Quickening's per-stage reward), placed AFTER the Nature's Fury seed so the
+ *  two are additive beside each other. */
+export const GROVESPRING_4PC_VERDANCE_BANK = 1;
+
 /** The engine payloads, keyed by set id (the `set` tag on each member item
  *  and the ItemSet id in item_sets.ts). Tiers ascend by pieces. */
 export const SET_ENGINE_BONUSES: Record<string, readonly SetEngineBonusTier[]> = {
@@ -1004,6 +1055,121 @@ export const SET_ENGINE_BONUSES: Record<string, readonly SetEngineBonusTier[]> =
       // there is no row overlap. Deterministic.
       effect: {
         ability: [{ ability: 'chaos_bolt', dmgPct: RUINCALLER_4PC_CHAOS_BOLT_DMG_PCT }],
+      },
+    },
+  ],
+  // ---- Druid ----
+  moonscorch: [
+    {
+      pieces: 2,
+      // Moonseed may extend Lunar Tempest twice per application: the resolved
+      // extendDot cap goes 6 -> 12 (applyTalentMods rewrite), and the
+      // extendedBy bookkeeping already enforces the per-application budget
+      // (a fresh Lunar Tempest application replaces the aura object, so the
+      // budget resets exactly at the copy's "per application" boundary). The
+      // caster 2pc pushback rider rides the generic global knob. Draws no rng.
+      effect: {
+        global: { castPushbackReduction: 1 },
+        tuning: { tempestExtendCapSec: MOONSCORCH_2PC_TEMPEST_EXTEND_CAP_SEC },
+      },
+    },
+    {
+      pieces: 4,
+      // Moonsurge and Sunwake strike 25 percent harder, DELIVERED: the
+      // additive accumulator folds each row beside the committed spec's 0.08
+      // spellDmgPct floor plus the Moonrage mastery's 0.15, so the row is
+      // 0.3075 (1.5375 / 1.23 = 1.25 exactly; the constant's doc note records
+      // the sizing). The rows reach BOTH arms: Sunwake's burn is a plain dot
+      // (no directPct, no perCombo), so scaleEffect's dot arm carries the
+      // same multiplier into the resolved burn total. Wild Apex's 1.25
+      // payoff multiplier stays MULTIPLICATIVE on top (dispatch-side),
+      // disclosed. Deterministic, no rng involved.
+      effect: {
+        ability: [
+          { ability: 'moonlash', dmgPct: MOONSCORCH_4PC_PAYOFF_DMG_PCT },
+          { ability: 'sunlance', dmgPct: MOONSCORCH_4PC_PAYOFF_DMG_PCT },
+        ],
+      },
+    },
+  ],
+  wildfang_emberhide: [
+    {
+      pieces: 2,
+      // Redharvest restores 45 energy, up from 30 (rank-3 truth; the ladder
+      // is 22/33/45 by rank): a flag-gated rewrite of the resolved
+      // gainResource amount in applyTalentMods. No pushback rider: the melee
+      // damage set. Deterministic, no rng involved.
+      effect: { tuning: { redharvestEnergyMult: WILDFANG_2PC_REDHARVEST_ENERGY_MULT } },
+    },
+    {
+      pieces: 4,
+      // Redharvest plants a fresh Flense on the target: aura-only, applied at
+      // the druidEngineOnCast redharvest branch (which runs AFTER runEffects,
+      // so the consumeDot cash-out has already been paid: no double billing).
+      // The replant mirrors the real dot application's value arithmetic
+      // (replantFlense in combat/druid_engines.ts) but awards no combo point
+      // and banks no Old Blood (the landed-strike hook never fires). The
+      // Blooddrunk tick-banking row makes the finisher self-sustaining for
+      // that build, the set doc's prominent tuning flag. Draws no rng.
+      effect: {},
+    },
+  ],
+  cinderbark: [
+    {
+      pieces: 2,
+      // Sweeping Claws has a 30 percent chance to bank an additional Old
+      // Blood: one flag-gated roll per landed cast at the
+      // druidEngineOnLandedStrike bank site (the aoe arm reports once per
+      // cast that struck anything). WEARER-ONLY rng draw, doc-disclosed;
+      // non-wearers draw nothing extra. The 3-stack cap is untouched: the
+      // extra bank is the hold-versus-spend tension against the 4pc.
+      effect: { tuning: { extraOldBloodChance: CINDERBARK_2PC_EXTRA_OLD_BLOOD_CHANCE } },
+    },
+    {
+      pieces: 4,
+      // Marrowbreak hits 30 percent harder (the dmgPct row, DELIVERED
+      // against the 1.5 Primal Heart baseline) and its emergency guard no
+      // longer replaces the strike: the replacement lives at the ONE
+      // directDamage break in effect_dispatch.ts, now flag-gated, so wearers
+      // below half health land the strike (with its authored flat-110 mult-2
+      // threat) AND keep the guard's absorb and rage refund. Wearer-only rng
+      // note, disclosed: the restored strike draws its damage and crit rolls
+      // below half health where the base path drew none; non-wearers draw
+      // exactly as before.
+      effect: {
+        ability: [{ ability: 'marrowbreak', dmgPct: CINDERBARK_4PC_MARROWBREAK_DMG_PCT }],
+      },
+    },
+  ],
+  grovespring: [
+    {
+      pieces: 2,
+      // Swiftmend prefers the caster's OWN Wildbloom or Second Bloom (the
+      // consumeMatchingAura bend), falling back to the base pick when none
+      // is present so a paid cast never turns into a silent no-heal (the set
+      // doc's explicit fallback), and heals 25 percent more (the bespoke
+      // eff.heal rewrite; the $d splice reads the same resolved range). The
+      // healer 2pc pushback rider rides the generic global knob. Draws no
+      // rng beyond the base heal roll (same count and order for everyone).
+      effect: {
+        global: { castPushbackReduction: 1 },
+        tuning: { swiftmendHealMult: GROVESPRING_2PC_SWIFTMEND_HEAL_MULT },
+      },
+    },
+    {
+      pieces: 4,
+      // Overbloom harvests 75 percent (the resolved harvestPct rewrite; the
+      // {buff} splice reads the same number) and banks 1 Verdance afterward:
+      // setBank(current + 1) DIRECTLY after the Nature's Fury seed (additive
+      // beside it, not a clone; never addStage, which would silently pay
+      // Quickening's reward). The replant is NOT routed through the
+      // hot-planted hook, so Seedspread self-arming stays impossible. Draws
+      // no rng (Overbloom's heal cannot crit).
+      effect: {
+        tuning: {
+          overbloomHarvestPct: GROVESPRING_4PC_OVERBLOOM_HARVEST_PCT,
+          verdanceBank: GROVESPRING_4PC_VERDANCE_BANK,
+        },
       },
     },
   ],

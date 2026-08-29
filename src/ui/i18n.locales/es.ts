@@ -13377,10 +13377,10 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Consume tus 3 de Marea Lunar para un golpe pesado de {damage} de daño Arcano: la opción de daño. Estela Solar consume los mismos 3 de Marea Lunar, así que elige una.',
   'entities.abilities.moonseed.name': 'Semilla Lunar',
   'entities.abilities.moonseed.description':
-    'Solo en Forma de lechúcico lunar. Golpea por {damage} de daño Arcano, añade una fase de Marea Lunar y extiende tu Tempestad Lunar 6 s, hasta 6 s por aplicación. Con la Marea Lunar llena, Semilla Lunar se convierte en Oleada Lunar.',
+    'Solo en Forma de lechúcico lunar. Golpea por {damage} de daño Arcano, añade una fase de Marea Lunar y extiende tu Tempestad Lunar 6 s, hasta {duration} s por aplicación. Con la Marea Lunar llena, Semilla Lunar se convierte en Oleada Lunar.',
   'entities.abilities.overbloom.name': 'Sobrefloración',
   'entities.abilities.overbloom.description':
-    'Consume 5 de Verdor. Cosecha cada sanación periódica tuya en todos los aliados por un 60% de su sanación restante, elimina esos efectos y planta una Floración Silvestre nueva en el objetivo.',
+    'Consume 5 de Verdor. Cosecha cada sanación periódica tuya en todos los aliados por un {buff}% de su sanación restante, elimina esos efectos y planta una Floración Silvestre nueva en el objetivo.',
   'entities.abilities.redharvest.name': 'Cosecha Roja',
   'entities.abilities.redharvest.description':
     'Consume tus 3 de Sangre Antigua: golpea por {damage}, inflige al instante todo el daño que tus Desollar y Desgarrar aún habrían infligido, elimina ambos sangrados y restaura {rage} de energía. Funciona sin puntos de combo.',

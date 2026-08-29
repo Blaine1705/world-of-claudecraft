@@ -12961,10 +12961,10 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Zużywa twoje 3 Księżycowego przypływu na ciężki cios zadający {damage} obrażeń tajemnych: wybór obrażeń. Słoneczny ślad zużywa te same 3 Księżycowego przypływu, więc wybierz jeden.',
   'entities.abilities.moonseed.name': 'Księżycowe nasienie',
   'entities.abilities.moonseed.description':
-    'Tylko w Postaci księżycowej sowy. Uderza za {damage} obrażeń tajemnych, dodaje jeden stopień Księżycowego przypływu i przedłuża twoją Księżycową nawałnicę o 6 s, do 6 s na użycie. Przy pełnym Księżycowym przypływie Księżycowe nasienie staje się Księżycowym przyborem.',
+    'Tylko w Postaci księżycowej sowy. Uderza za {damage} obrażeń tajemnych, dodaje jeden stopień Księżycowego przypływu i przedłuża twoją Księżycową nawałnicę o 6 s, do {duration} s na użycie. Przy pełnym Księżycowym przypływie Księżycowe nasienie staje się Księżycowym przyborem.',
   'entities.abilities.overbloom.name': 'Nadrozkwit',
   'entities.abilities.overbloom.description':
-    'Zużywa 5 Zieleni. Zbiera każde twoje leczenie w czasie na wszystkich sojusznikach za 60% pozostałego leczenia, usuwa te efekty i sadzi świeży Dziki rozkwit na celu.',
+    'Zużywa 5 Zieleni. Zbiera każde twoje leczenie w czasie na wszystkich sojusznikach za {buff}% pozostałego leczenia, usuwa te efekty i sadzi świeży Dziki rozkwit na celu.',
   'entities.abilities.redharvest.name': 'Czerwone Żniwa',
   'entities.abilities.redharvest.description':
     'Zużywa twoje 3 Starej Krwi: cios za {damage}, natychmiast zadaje wszystkie obrażenia, które twoje Zdzieranie i Rozszarpanie by jeszcze zadały, usuwa oba krwawienia i przywraca {rage} energii. Działa bez punktów combo.',

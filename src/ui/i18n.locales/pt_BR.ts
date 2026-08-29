@@ -13067,10 +13067,10 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Consome seus 3 de Maré Lunar para um golpe pesado de {damage} de dano Arcano: a escolha de dano. Esteira Solar consome os mesmos 3 de Maré Lunar, então escolha um.',
   'entities.abilities.moonseed.name': 'Semente Lunar',
   'entities.abilities.moonseed.description':
-    'Somente na Forma de Luniscante. Atinge por {damage} de dano Arcano, adiciona um estágio de Maré Lunar e estende sua Tempestade Lunar em 6 s, até 6 s por aplicação. Com a Maré Lunar cheia, Semente Lunar vira Onda Lunar.',
+    'Somente na Forma de Luniscante. Atinge por {damage} de dano Arcano, adiciona um estágio de Maré Lunar e estende sua Tempestade Lunar em 6 s, até {duration} s por aplicação. Com a Maré Lunar cheia, Semente Lunar vira Onda Lunar.',
   'entities.abilities.overbloom.name': 'Superflorescência',
   'entities.abilities.overbloom.description':
-    'Consome 5 de Verdor. Colhe cada cura ao longo do tempo sua em todos os aliados por 60% da cura restante, remove esses efeitos e planta um Florescer Selvagem novo no alvo.',
+    'Consome 5 de Verdor. Colhe cada cura ao longo do tempo sua em todos os aliados por {buff}% da cura restante, remove esses efeitos e planta um Florescer Selvagem novo no alvo.',
   'entities.abilities.redharvest.name': 'Colheita Vermelha',
   'entities.abilities.redharvest.description':
     'Consome seus 3 de Sangue Antigo: golpeia por {damage}, causa instantaneamente todo o dano que seus Esfolar e Rasgar ainda causariam, remove os dois sangramentos e restaura {rage} de energia. Funciona sem pontos de combo.',

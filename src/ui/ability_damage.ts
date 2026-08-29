@@ -200,6 +200,10 @@ export function abilityOverTimeEffect(
  *  the player actually knows. Null when the ability has none. */
 export function abilityBuffValue(res: ResolvedAbility): number | null {
   for (const eff of res.effects) {
+    // Overbloom's harvest fraction is its $b: the RESOLVED druidOverbloom
+    // harvestPct as a whole percent, so the Grovespring 4pc's 75 shows live
+    // for wearers the same way a talent-upgraded value would (base 60).
+    if (eff.type === 'druidOverbloom') return Math.round(eff.harvestPct * 100);
     if (eff.type === 'selfBuff' || eff.type === 'buffTarget') {
       // form_fireball carries a 1+fraction speed multiplier; the tooltip's $b%
       // wants the whole-percent bonus (1.4 -> 40).
@@ -235,6 +239,10 @@ export function auraBuffDisplayValue(a: { kind: string; value: number }): number
  *  sleep read true). Null when no effect carries a duration. */
 export function abilityDurationValue(res: ResolvedAbility): number | null {
   for (const eff of res.effects) {
+    // An extendDot's timed magnitude is its per-application extension cap in
+    // seconds (Moonseed is the only extendDot user): $t prints the RESOLVED
+    // maxBonus, so the Moonscorch 2pc's 12 shows live for wearers (base 6).
+    if (eff.type === 'extendDot') return eff.maxBonus;
     if ('duration' in eff && typeof eff.duration === 'number') return eff.duration;
   }
   return null;

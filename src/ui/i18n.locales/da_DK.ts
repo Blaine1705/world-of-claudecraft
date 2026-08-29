@@ -12721,10 +12721,10 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Forbruger dine 3 Måneflod til et tungt slag med {damage} arkan skade: skadesvalget. Solspor forbruger de samme 3 Måneflod, så vælg et.',
   'entities.abilities.moonseed.name': 'Månefrø',
   'entities.abilities.moonseed.description':
-    'Kun i Månekinform. Rammer for {damage} arkan skade, tilføjer et Måneflod-trin og forlænger din Månestorm med 6 sek., op til 6 sek. pr. anvendelse. Ved fuld Måneflod bliver Månefrø til Månebølge.',
+    'Kun i Månekinform. Rammer for {damage} arkan skade, tilføjer et Måneflod-trin og forlænger din Månestorm med 6 sek., op til {duration} sek. pr. anvendelse. Ved fuld Måneflod bliver Månefrø til Månebølge.',
   'entities.abilities.overbloom.name': 'Overblomstring',
   'entities.abilities.overbloom.description':
-    'Forbruger 5 Grønske. Høster hver af dine helbredelser over tid på alle allierede for 60% af den resterende helbredelse, fjerner de virkninger og planter en frisk Vildblomst på målet.',
+    'Forbruger 5 Grønske. Høster hver af dine helbredelser over tid på alle allierede for {buff}% af den resterende helbredelse, fjerner de virkninger og planter en frisk Vildblomst på målet.',
   'entities.abilities.redharvest.name': 'Rød Høst',
   'entities.abilities.redharvest.description':
     'Forbruger dine 3 Gammelt Blod: et slag for {damage}, der øjeblikkeligt giver al den skade, dine Flæns og Sønderriv stadig ville have givet, fjerner begge blødninger og gendanner {rage} energi. Virker uden kombopoint.',
