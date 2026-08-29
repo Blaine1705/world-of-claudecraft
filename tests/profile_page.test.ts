@@ -169,7 +169,7 @@ describe('profile page Reliquary pair + Curator rank lines', () => {
     // calls, so the pair assertions below would follow a drifted derivation;
     // the literal anchors them. Literal: update when catalog content lands
     // (311 + the 41 Crucible raid relics + the raid's flawless title).
-    expect(catalogTotal).toBe(353);
+    expect(catalogTotal).toBe(355);
   });
 
   it('renders the owned/total pair and the English rank name for a ranked character', async () => {
