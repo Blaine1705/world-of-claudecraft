@@ -16570,14 +16570,9 @@ export class Hud {
   replaceRenderer(renderer: Renderer): void {
     this.renderer = renderer;
   }
-
-  /**
-   * Dispose secondary WebGL contexts after target assets are ready but before
-   * the active graphics epoch changes. Their owning windows stay intact.
-   */
+  /** Dispose secondary WebGL contexts before the active graphics epoch changes. */
   resetGraphicsPreviewContexts(): void {
-    // The schedule targets the contexts being destroyed; a mid-flight unit
-    // after this point would rebuild them against the dying graphics epoch.
+    // Stop warmups from rebuilding contexts against the dying graphics epoch.
     this.restartPreviewPrewarmAfterGraphicsRebuild = this.previewPrewarmHandle !== null;
     this.previewPrewarmHandle?.cancel();
     this.previewPrewarmHandle = null;
