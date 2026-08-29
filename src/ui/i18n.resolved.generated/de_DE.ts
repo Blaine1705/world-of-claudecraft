@@ -11341,7 +11341,7 @@ export const de_DE: EnTranslations = {
       },
       "seraphic_vigil": {
         "name": "Seraphische Wacht",
-        "description": "Schützt einen Verbündeten 30 Sek. lang. Der erste Treffer, der ihn unter 35% Gesundheit bringt, verbraucht die Wacht und heilt ihn um 180. (Segensspruch-Signatur)"
+        "description": "Schützt einen Verbündeten 30 Sek. lang. Der erste Treffer, der ihn unter 35% Gesundheit bringt, verbraucht die Wacht und heilt ihn um {vigilHeal}. (Segensspruch-Signatur)"
       },
       "summon_tithefiend": {
         "name": "Zehntteufel rufen",
@@ -18525,6 +18525,11 @@ export const de_DE: EnTranslations = {
         "bonus2": "Lurker's Strike hits 25 percent harder.",
         "bonus4": "Your Veiled Edge strike hits for triple, up from double."
       },
+      "benison_dawnweave": {
+        "name": "Benison Dawnweave",
+        "bonus2": "Seraphic Vigil's rescue heals for 270, up from 180. Damage taken no longer delays your spellcasting.",
+        "bonus4": "When Seraphic Vigil triggers, its ally is also mended for 15 percent of their maximum health over 10 sec."
+      },
       "boundstone_vanguard": {
         "name": "Gebundstein-Vorhut",
         "bonus3": "Erhöht Angriffs- und Zaubertempo um 15%."
@@ -18560,6 +18565,11 @@ export const de_DE: EnTranslations = {
         "name": "Emberfury Harness",
         "bonus2": "Your Enrage lasts 6 sec instead of 4.",
         "bonus4": "Bloodletting always Enrages you, and its healing rises to 8 percent of your maximum health."
+      },
+      "emberscreed": {
+        "name": "Creed of Embers Vestments",
+        "bonus2": "Your Doctrine link converts 10 percent more of your Holy damage into healing. Damage taken no longer delays your spellcasting.",
+        "bonus4": "When your Psalm of Warding is fully consumed, your next Scouring Hymn within 10 sec is instant. Cannot occur more than once every 15 sec."
       },
       "forgewall": {
         "name": "Forgewall Aegis",
@@ -18622,6 +18632,11 @@ export const de_DE: EnTranslations = {
       "vale_arcanist": {
         "name": "Ornat des Talarkanisten",
         "bonus3": "Erhöht Angriffs- und Zaubertempo um 15%."
+      },
+      "vesperash": {
+        "name": "Vesperash Shroud",
+        "bonus2": "Call Tithefiend's cooldown is reduced by 6 sec. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Calling your Tithefiend resets Mindfracture's cooldown, and the fiend returns twice as much mana per hit."
       },
       "warfare_ashstalker": {
         "name": "Aschenpirscher-Ausrüstung",

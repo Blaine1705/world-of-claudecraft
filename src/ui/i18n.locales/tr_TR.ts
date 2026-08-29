@@ -12742,7 +12742,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sacred_form.description':
     'Ölüme dek kutsal bir hale girer; iyileştirmeyi 10%, büyü kritik şansını 5% artırır ve üretilen tehdidi 50% azaltır. Yalnızca Güneş Şifacıları için.',
   'entities.abilities.seraphic_vigil.description':
-    'Bir müttefiki 30 sn korur. Onu 35% canın altına düşüren ilk vuruş Nöbeti tüketir ve onu 180 iyileştirir. (Lütuf imzası)',
+    'Bir müttefiki 30 sn korur. Onu 35% canın altına düşüren ilk vuruş Nöbeti tüketir ve onu {vigilHeal} iyileştirir. (Lütuf imzası)',
   'entities.abilities.scouring_mercy.description':
     'Bir düşmana 72 ila 84 Kutsal hasar verir ya da dost bir hedefi 130 ila 155 iyileştirir. Her iki değer de büyü gücüyle artar. Hasar ayrıca Öğreti ile bağlı her müttefiki 30%, hiç bağlı müttefik yoksa en düşük canlı grup üyesini 15% iyileştirir. (Öğreti imzası)',
   'entities.abilities.solar_invocation.description':

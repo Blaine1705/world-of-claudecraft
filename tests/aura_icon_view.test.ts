@@ -141,6 +141,8 @@ const REUSED_PAINTED_RUNTIME_AURA_SOURCES = [
 // painted ability or authored talent icon that owns the state in production.
 const POST_OVERHAUL_RUNTIME_AURA_SOURCES = [
   ['aegis_first_dawn_speed', 'aegis_first_dawn'],
+  // Benison Dawnweave 4pc mend: same icon family as the Seraphic Vigil it pays off.
+  ['benison_dawnweave_mend', 'seraphic_vigil'],
   ['bloodhook_bleed', 'bloodhook'],
   ['bloodhook_pending', 'bloodhook'],
   ['dawns_wrath', 'hammer_of_wrath'],
@@ -225,6 +227,8 @@ const POST_OVERHAUL_RUNTIME_AURA_SOURCES = [
   ['shaman_warded_elements', 'lightning_shield'],
   ['shaman_wayfarer_grace', 'ghost_wolf'],
   ['shaman_wayfarer_grace_icd', 'ghost_wolf'],
+  // Emberscreed 4pc instant-hymn empower: same icon family as Scouring Hymn.
+  ['set_emberscreed_4pc', 'smite'],
   ['shrapnel_wound', 'shrapnel_charge'],
   ['solar_reprisal', 'vowkeeper_strike'],
   ['solar_step_slow_immunity', 'solar_step'],
@@ -306,7 +310,7 @@ describe('resolveAuraIconId', () => {
     // ProcDef producers plus the closed semantic inventory above.
     expect(choiceSources).toHaveLength(7);
     expect(new Set(choiceSources.map(([id]) => id)).size).toBe(choiceSources.length);
-    expect(POST_OVERHAUL_RUNTIME_AURA_SOURCES).toHaveLength(101);
+    expect(POST_OVERHAUL_RUNTIME_AURA_SOURCES).toHaveLength(103);
     const expected = new Map<string, string>([
       ...choiceSources,
       ...NON_CHOICE_RUNTIME_AURA_SOURCES,
@@ -323,7 +327,7 @@ describe('resolveAuraIconId', () => {
       POWERUPS.reduce((count, definition) => count + definition.buffs.length, 0),
     );
     expect(REUSED_PAINTED_RUNTIME_AURA_SOURCES).toHaveLength(12);
-    expect(RUNTIME_AURA_ICON_SOURCE_IDS.size).toBe(141);
+    expect(RUNTIME_AURA_ICON_SOURCE_IDS.size).toBe(143);
     for (const [id, source] of expected) {
       const paintedIdentity = hasAuraImageIdentity(id) ? id : source;
       const imageUrl = auraImageUrl(paintedIdentity);

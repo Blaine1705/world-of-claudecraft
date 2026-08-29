@@ -52,8 +52,11 @@ export const PRIEST_ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     targetType: 'friendly',
     effects: [{ type: 'buffTarget', kind: 'heal_echo', value: 180, duration: 30 }],
+    // {vigilHeal} splices the RESOLVED heal_echo rescue value (base 180; the
+    // Benison Dawnweave 2pc's buffPct row raises it to 270 for wearers), so
+    // the printed number tracks the engine the same way {damage} does.
     description:
-      'Protect one ally for 30 sec. The first hit that leaves them below 35% health consumes the Vigil and heals them for 180. (Benison signature)',
+      'Protect one ally for 30 sec. The first hit that leaves them below 35% health consumes the Vigil and heals them for {vigilHeal}. (Benison signature)',
   },
   summon_tithefiend: {
     id: 'summon_tithefiend',

@@ -7780,6 +7780,21 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.ashveil.bonus2': '잠복자의 일격이 25% 더 큰 피해를 입힙니다.',
   'entities.itemSets.ashveil.bonus4':
     '장막 일격 동안 처음 사용하는 잠복자의 일격이 두 배 대신 세 배의 피해를 입힙니다.',
+  'entities.itemSets.emberscreed.name': '잉걸불 신조 예복',
+  'entities.itemSets.emberscreed.bonus2':
+    '수양의 연결이 신성 피해의 10%를 추가로 치유로 전환합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+  'entities.itemSets.emberscreed.bonus4':
+    '수호의 성가가 완전히 소모되면 10초 이내의 다음 정화의 성가가 즉시 시전됩니다. 이 효과는 15초에 한 번만 발동합니다.',
+  'entities.itemSets.benison_dawnweave.name': '축복의 새벽직조 예복',
+  'entities.itemSets.benison_dawnweave.bonus2':
+    '치천사의 수호의 구원 치유량이 180에서 270으로 증가합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+  'entities.itemSets.benison_dawnweave.bonus4':
+    '치천사의 수호가 발동하면 보호받은 아군이 10초에 걸쳐 최대 생명력의 15%만큼 추가로 치유됩니다.',
+  'entities.itemSets.vesperash.name': '만과의 잿가루 장막',
+  'entities.itemSets.vesperash.bonus2':
+    '십일조 악마 소환의 재사용 대기시간이 6초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+  'entities.itemSets.vesperash.bonus4':
+    '십일조 악마를 소환하면 정신 파열의 재사용 대기시간이 초기화되고, 십일조 악마가 공격할 때마다 회복하는 마나가 두 배가 됩니다.',
   'entities.itemSets.slagbreaker.name': '광재파쇄자 전투복',
   'entities.itemSets.slagbreaker.bonus2': '붉은 손이 다음 불구의 일격을 중첩당 20% 대신 30% 강화합니다.',
   'entities.itemSets.slagbreaker.bonus4': '붉은 손을 두 번 시전할 때마다 돌파자의 남은 재사용 대기시간이 3초 감소합니다.',

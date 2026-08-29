@@ -123,6 +123,37 @@ export const SMOLDERSTRIKE_4PC_MIRRORED_BLADES_REFUND_SEC = 6;
  *  back as the promised triple. */
 export const ASHVEIL_4PC_VEILED_EDGE_BONUS = 2;
 
+// Audited constants for the bespoke priest bends (read by the class-module
+// call sites AND pinned by tests, so the copy cannot drift from the code).
+/** Emberscreed (Creed of Embers) 2pc: ADDITIVE bonus on the Doctrine link
+ *  conversion, applied on BOTH twin branches at placeDoctrineLink (0.3 -> 0.4
+ *  base, 0.7 -> 0.8 under Twin Covenant). The bonus is baked into the link
+ *  aura VALUE at placement, so old links keep their placed rate for up to the
+ *  30 sec duration (snapshot-at-placement, the beacon/Dawn's Wrath posture);
+ *  the 0.15 no-link fallback is deliberately untouched. */
+export const EMBERSCREED_2PC_DOCTRINE_CONVERSION_BONUS = 0.1;
+/** Emberscreed 4pc: seconds the instant Scouring Hymn empower lasts after a
+ *  fully consumed Psalm of Warding. */
+export const EMBERSCREED_4PC_HYMN_WINDOW_SEC = 10;
+/** Emberscreed 4pc: the internal cooldown between empower grants. */
+export const EMBERSCREED_4PC_HYMN_ICD_SEC = 15;
+/** Benison Dawnweave 2pc: Seraphic Vigil's resolved rescue heal (base 180
+ *  x the 1.5 buffPct row; heal_echo is in neither the integral nor the
+ *  scalable buff-kind sets, so the resolved value is exactly this flat 270). */
+export const BENISON_2PC_VIGIL_RESCUE_HEAL = 270;
+/** Benison Dawnweave 4pc: the mend on the Vigil's ally, as a fraction of the
+ *  ALLY'S max health, paid over the duration below. */
+export const BENISON_4PC_MEND_PCT_MAX = 0.15;
+/** Benison Dawnweave 4pc: mend duration in seconds. */
+export const BENISON_4PC_MEND_DURATION_SEC = 10;
+/** Benison Dawnweave 4pc: seconds between mend ticks (5 ticks total). */
+export const BENISON_4PC_MEND_TICK_INTERVAL_SEC = 2;
+/** Vesperash 2pc: seconds cut from Call Tithefiend's cooldown (base 30). */
+export const VESPERASH_2PC_TITHEFIEND_COOLDOWN_CUT_SEC = 6;
+/** Vesperash 4pc: multiplier on the Tithefiend's per-hit mana return (base
+ *  TITHEFIEND_MANA_RETURN_RATE 0.01 stays untouched for everyone else). */
+export const VESPERASH_4PC_MANA_RETURN_MULT = 2;
+
 /** The engine payloads, keyed by set id (the `set` tag on each member item
  *  and the ItemSet id in item_sets.ts). Tiers ascend by pieces. */
 export const SET_ENGINE_BONUSES: Record<string, readonly SetEngineBonusTier[]> = {
@@ -441,6 +472,127 @@ export const SET_ENGINE_BONUSES: Record<string, readonly SetEngineBonusTier[]> =
       // consumeVeiledEdge already returns 1 + edge.value, so the consume
       // reads the triple back dynamically. Deterministic, no rng involved.
       effect: { tuning: { veiledEdgeBonus: ASHVEIL_4PC_VEILED_EDGE_BONUS } },
+    },
+  ],
+  // ---- Priest ----
+  emberscreed: [
+    {
+      pieces: 2,
+      // Bespoke: +0.10 ADDITIVE on the Doctrine link conversion, on BOTH twin
+      // branches at placeDoctrineLink (combat/priest/doctrine.ts): 0.3 -> 0.4
+      // base and 0.7 -> 0.8 under Twin Covenant. The rate is baked into the
+      // link aura VALUE at placement, so links placed before a gear change
+      // keep their placed rate for up to the 30 sec link duration
+      // (snapshot-at-placement); the 0.15 no-link fallback stays untouched.
+      // The healer/caster 2pc pushback rider rides the generic global knob.
+      // Deterministic, no rng involved.
+      effect: {
+        global: { castPushbackReduction: 1 },
+        tuning: { doctrineConversionBonus: EMBERSCREED_2PC_DOCTRINE_CONVERSION_BONUS },
+      },
+    },
+    {
+      pieces: 4,
+      // A fully consumed Psalm of Warding makes the next Scouring Hymn
+      // (ability id smite) within 10 sec instant, once per 15 sec. Generic
+      // proc machinery on the shieldConsumed trigger; the trigger's optional
+      // internal cooldown is this bonus's extension of that trigger (the
+      // castNth/spellCrit icds-map idiom in combat/talent_procs.ts). Draws no
+      // rng; the aura NAME deliberately reuses the localized 'Scouring Hymn'
+      // ability string, so no new sim_i18n dictionary row is needed.
+      effect: {
+        proc: {
+          id: 'set_emberscreed_4pc',
+          name: 'Scouring Hymn',
+          trigger: {
+            on: 'shieldConsumed',
+            ability: 'power_word_shield',
+            icd: EMBERSCREED_4PC_HYMN_ICD_SEC,
+          },
+          responses: [
+            {
+              kind: 'empowerNext',
+              aura: 'next_cast_instant',
+              abilities: ['smite'],
+              duration: EMBERSCREED_4PC_HYMN_WINDOW_SEC,
+            },
+          ],
+        },
+        tuning: {
+          hymnWindowSec: EMBERSCREED_4PC_HYMN_WINDOW_SEC,
+          hymnIcdSec: EMBERSCREED_4PC_HYMN_ICD_SEC,
+        },
+      },
+    },
+  ],
+  benison_dawnweave: [
+    {
+      pieces: 2,
+      // Seraphic Vigil's rescue 180 -> 270: buffPct 0.5 scales the RESOLVED
+      // buffTarget heal_echo value (heal_echo is in neither the integral nor
+      // the scalable buff-kind sets, so the resolved value is exactly the
+      // flat 270 the tooltip promises). The {vigilHeal} description splice
+      // reads the same resolved value, so the printed number stays honest
+      // for wearers and everyone else. Deterministic, no rng involved.
+      effect: {
+        ability: [{ ability: 'seraphic_vigil', buffPct: 0.5 }],
+        global: { castPushbackReduction: 1 },
+        tuning: { vigilRescueHeal: BENISON_2PC_VIGIL_RESCUE_HEAL },
+      },
+    },
+    {
+      pieces: 4,
+      // Bespoke: when a Vigil triggers, its ally is also mended for 15
+      // percent of the ALLY'S max health over 10 sec. Hooked at the
+      // vigil-trigger POINT in damage.ts beside priestOnVigilTriggered
+      // (which stays talent-gated for Incarnate Spirit; the set arm is
+      // flag-gated instead, combat/priest/benison.ts). Replaces the killed
+      // cooldown-reset idea: Twin Covenant's charge model deletes the
+      // cooldowns entry, making cooldownRefund a hard no-op. Draws no rng.
+      effect: {
+        tuning: {
+          mendPctMaxHp: BENISON_4PC_MEND_PCT_MAX,
+          mendDurationSec: BENISON_4PC_MEND_DURATION_SEC,
+          mendTickIntervalSec: BENISON_4PC_MEND_TICK_INTERVAL_SEC,
+        },
+      },
+    },
+  ],
+  vesperash: [
+    {
+      pieces: 2,
+      // Call Tithefiend 30 -> 24 sec: a cooldownFlat row on the resolved
+      // entry, so the engine's cooldown set and the HUD's printed cooldown
+      // read the same number. Honest sizing note from the set doc: the
+      // Gloomtithe bank still saturates roughly 13 of every 24 sec; the gain
+      // is about +25 percent full-strength fiend uptime. Deterministic.
+      effect: {
+        ability: [
+          {
+            ability: 'summon_tithefiend',
+            cooldownFlat: -VESPERASH_2PC_TITHEFIEND_COOLDOWN_CUT_SEC,
+          },
+        ],
+        global: { castPushbackReduction: 1 },
+      },
+    },
+    {
+      pieces: 4,
+      // Calling the Tithefiend resets Mindfracture (ability id mind_blast):
+      // castNth n:1 sees every Call Tithefiend cast and the 'reset' refund
+      // clears the whole cooldown (castNth draws no rng without a chance
+      // field). The doubled per-hit mana return is a bespoke call-site
+      // multiplier in combat/priest/vespers.ts; the base rate constant and
+      // its literal test pin stay untouched for everyone else.
+      effect: {
+        proc: {
+          id: 'set_vesperash_4pc',
+          name: 'Vesperash Communion',
+          trigger: { on: 'castNth', n: 1, abilities: ['summon_tithefiend'] },
+          responses: [{ kind: 'cooldownRefund', ability: 'mind_blast', seconds: 'reset' }],
+        },
+        tuning: { manaReturnMult: VESPERASH_4PC_MANA_RETURN_MULT },
+      },
     },
   ],
 };

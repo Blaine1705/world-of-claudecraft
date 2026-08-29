@@ -12783,7 +12783,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sacred_form.description':
     'Memasuki keadaan suci hingga mati, menambah penyembuhan 10% dan peluang kritis mantra 5%, serta mengurangi ancaman yang dihasilkan 50%. Hanya untuk Penyembuh Surya.',
   'entities.abilities.seraphic_vigil.description':
-    'Melindungi satu sekutu selama 30 dtk. Pukulan pertama yang membuatnya turun di bawah 35% nyawa menghabiskan Jaga dan menyembuhkannya sebesar 180. (Ciri khas Berkat)',
+    'Melindungi satu sekutu selama 30 dtk. Pukulan pertama yang membuatnya turun di bawah 35% nyawa menghabiskan Jaga dan menyembuhkannya sebesar {vigilHeal}. (Ciri khas Berkat)',
   'entities.abilities.scouring_mercy.description':
     'Memberi 72 sampai 84 kerusakan Suci kepada musuh atau menyembuhkan sasaran sekutu sebesar 130 sampai 155. Kedua nilai meningkat dengan kekuatan mantra. Kerusakan juga menyembuhkan setiap sekutu yang terikat Doktrin sebesar 30%, atau anggota kelompok bernyawa terendah sebesar 15% bila tidak ada yang terikat. (Ciri khas Doktrin)',
   'entities.abilities.solar_invocation.description':

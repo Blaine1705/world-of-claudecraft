@@ -665,6 +665,56 @@ export const ITEM_SETS: Record<string, ItemSet> = {
       },
     ],
   },
+  emberscreed: {
+    id: 'emberscreed',
+    name: 'Creed of Embers Vestments',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        // The healer/caster 2pc carries the pushback rider (full immunity,
+        // the raid tier's upgrade over the leveling lineage's 50 percent).
+        text: 'Your Doctrine link converts 10 percent more of your Holy damage into healing. Damage taken no longer delays your spellcasting.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: 'When your Psalm of Warding is fully consumed, your next Scouring Hymn within 10 sec is instant. Cannot occur more than once every 15 sec.',
+      },
+    ],
+  },
+  benison_dawnweave: {
+    id: 'benison_dawnweave',
+    name: 'Benison Dawnweave',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: "Seraphic Vigil's rescue heals for 270, up from 180. Damage taken no longer delays your spellcasting.",
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: 'When Seraphic Vigil triggers, its ally is also mended for 15 percent of their maximum health over 10 sec.',
+      },
+    ],
+  },
+  vesperash: {
+    id: 'vesperash',
+    name: 'Vesperash Shroud',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: "Call Tithefiend's cooldown is reduced by 6 sec. Damage taken no longer delays your spellcasting.",
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: "Calling your Tithefiend resets Mindfracture's cooldown, and the fiend returns twice as much mana per hit.",
+      },
+    ],
+  },
 };
 
 // Fully-resolved set effect: every field defaulted so callers never branch on

@@ -2595,7 +2595,7 @@ const classAbilityNamesEn = {
       [
         'seraphic_vigil',
         'Seraphic Vigil',
-        'Protect one ally for 30 sec. The first hit that leaves them below 35% health consumes the Vigil and heals them for 180. (Benison signature)',
+        'Protect one ally for 30 sec. The first hit that leaves them below 35% health consumes the Vigil and heals them for {vigilHeal}. (Benison signature)',
       ],
       [
         'summon_tithefiend',

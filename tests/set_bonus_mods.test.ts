@@ -48,9 +48,11 @@ describe('set_bonus_mods: the resolver', () => {
   });
 
   it('an unregistered set id folds to nothing (the Phase A posture survives per set)', () => {
-    const mods = applySetBonusModifiers(computeTalentModifiers('priest', null), {
-      helmet: 'creed_helmet',
-      shoulder: 'creed_shoulder',
+    // Re-anchored to a still-unregistered wave as each class wave lands:
+    // stormkindled is a real shaman set whose engine registration is pending.
+    const mods = applySetBonusModifiers(computeTalentModifiers('shaman', null), {
+      helmet: 'stormkindled_helmet',
+      shoulder: 'stormkindled_shoulder',
     });
     expect(Object.keys(mods.selected).filter((k) => k.startsWith('setbonus_'))).toEqual([]);
   });

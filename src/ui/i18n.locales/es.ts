@@ -13211,7 +13211,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sacred_form.description':
     'Entra en un estado sagrado hasta la muerte, aumentando la sanación un 10% y la probabilidad de crítico con hechizos un 5%, y reduciendo la amenaza generada un 50%. Solo para Sanadores del Sol.',
   'entities.abilities.seraphic_vigil.description':
-    'Protege a un aliado durante 30 s. El primer golpe que lo deje por debajo del 35% de salud consume la Vigilia y lo sana por 180. (Distintivo de Bendición)',
+    'Protege a un aliado durante 30 s. El primer golpe que lo deje por debajo del 35% de salud consume la Vigilia y lo sana por {vigilHeal}. (Distintivo de Bendición)',
   'entities.abilities.scouring_mercy.description':
     'Inflige de 72 a 84 de daño Sagrado a un enemigo o sana a un objetivo amistoso de 130 a 155. Ambas cantidades aumentan con el poder con hechizos. El daño también sana un 30% a cada aliado vinculado por Doctrina, o un 15% al miembro del grupo con menos salud si no hay ninguno vinculado. (Distintivo de Doctrina)',
   'entities.abilities.solar_invocation.description':

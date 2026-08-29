@@ -11651,7 +11651,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sacred_form.description':
     'Versetzt Euch bis zum Tod in einen heiligen Zustand, erhöht Heilung um 10% und kritische Zauberchance um 5% und verringert erzeugte Bedrohung um 50%. Nur für Sonnenheiler.',
   'entities.abilities.seraphic_vigil.description':
-    'Schützt einen Verbündeten 30 Sek. lang. Der erste Treffer, der ihn unter 35% Gesundheit bringt, verbraucht die Wacht und heilt ihn um 180. (Segensspruch-Signatur)',
+    'Schützt einen Verbündeten 30 Sek. lang. Der erste Treffer, der ihn unter 35% Gesundheit bringt, verbraucht die Wacht und heilt ihn um {vigilHeal}. (Segensspruch-Signatur)',
   'entities.abilities.scouring_mercy.description':
     'Verursacht 72 bis 84 Heiligschaden an einem Gegner oder heilt ein freundliches Ziel um 130 bis 155. Beide Werte steigen mit der Zaubermacht. Der Schaden heilt außerdem jeden über die Doktrin verbundenen Verbündeten um 30% oder, wenn kein Verbündeter verbunden ist, das Gruppenmitglied mit der geringsten Gesundheit um 15%. (Doktrin-Signatur)',
   'entities.abilities.solar_invocation.description':

@@ -63,6 +63,9 @@ export const RUNTIME_AURA_ICON_SOURCE_IDS: ReadonlyMap<string, string> = new Map
   ['avenging_wrath_buff_haste', 'avenging_wrath'],
   ['avenging_wrath_buff_healing_done', 'avenging_wrath'],
   ['bastion_rite_buff_block', 'bastion_rite'],
+  // Benison Dawnweave 4pc mend (src/sim/combat/priest/benison.ts): same icon
+  // family as the Seraphic Vigil it pays off.
+  ['benison_dawnweave_mend', 'seraphic_vigil'],
   ['bladed_echo', 'whirlwind'],
   ['bloodhook_bleed', 'bloodhook'],
   ['bloodhook_pending', 'bloodhook'],
@@ -181,6 +184,9 @@ export const RUNTIME_AURA_ICON_SOURCE_IDS: ReadonlyMap<string, string> = new Map
   ['shaman_wayfarer_grace', 'ghost_wolf'],
   ['shaman_wayfarer_grace_icd', 'ghost_wolf'],
   ['shaman_warspirit_cadence', 'warspirit_cadence'],
+  // Emberscreed 4pc instant-hymn empower (content/ignivar_set_bonuses.ts):
+  // same icon family as the Scouring Hymn it makes instant.
+  ['set_emberscreed_4pc', 'smite'],
   ['shrapnel_wound', 'shrapnel_charge'],
   ['solar_reprisal', 'vowkeeper_strike'],
   ['solar_step_slow_immunity', 'solar_step'],

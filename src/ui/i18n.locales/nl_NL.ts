@@ -12689,7 +12689,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sacred_form.description':
     'Gaat tot de dood in een heilige staat, verhoogt genezing met 10% en de kritieke spreukkans met 5%, en vermindert de gegenereerde dreiging met 50%. Alleen voor Zonnehelers.',
   'entities.abilities.seraphic_vigil.description':
-    'Beschermt een bondgenoot 30 sec. De eerste treffer die hem onder 35% gezondheid brengt verbruikt de Wake en geneest hem voor 180. (Zegen-kenmerk)',
+    'Beschermt een bondgenoot 30 sec. De eerste treffer die hem onder 35% gezondheid brengt verbruikt de Wake en geneest hem voor {vigilHeal}. (Zegen-kenmerk)',
   'entities.abilities.scouring_mercy.description':
     'Richt 72 tot 84 Heilige schade aan bij een vijand of geneest een bevriend doelwit voor 130 tot 155. Beide bedragen stijgen met spreukkracht. De schade geneest ook elke via de Leer verbonden bondgenoot voor 30%, of het groepslid met de laagste gezondheid voor 15% als geen bondgenoot verbonden is. (Leer-kenmerk)',
   'entities.abilities.solar_invocation.description':

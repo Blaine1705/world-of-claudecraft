@@ -7484,6 +7484,20 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.ashveil.name': '灰帷装束',
   'entities.itemSets.ashveil.bonus2': '潜伏突袭造成的伤害提高 25%。',
   'entities.itemSets.ashveil.bonus4': '罩影突袭期间的第一次潜伏突袭造成三倍伤害（原为双倍）。',
+  'entities.itemSets.emberscreed.name': '余烬信条圣装',
+  'entities.itemSets.emberscreed.bonus2':
+    '你的戒律连结会额外将 10% 的神圣伤害转化为治疗。受到伤害不再延迟你的施法。',
+  'entities.itemSets.emberscreed.bonus4':
+    '你的守护圣咏被完全消耗后，你在 10 秒内的下一次涤净圣歌变为瞬发。该效果每 15 秒最多触发一次。',
+  'entities.itemSets.benison_dawnweave.name': '赐福晨织法衣',
+  'entities.itemSets.benison_dawnweave.bonus2':
+    '炽天使守望的救援治疗量提高至 270（原为 180）。受到伤害不再延迟你的施法。',
+  'entities.itemSets.benison_dawnweave.bonus4':
+    '炽天使守望触发时，其守护的盟友还会在 10 秒内获得相当于其最大生命值 15% 的治疗。',
+  'entities.itemSets.vesperash.name': '晚祷烬灰罩袍',
+  'entities.itemSets.vesperash.bonus2': '召唤什一魔的冷却时间缩短 6 秒。受到伤害不再延迟你的施法。',
+  'entities.itemSets.vesperash.bonus4':
+    '召唤什一魔会重置碎心术的冷却时间，且什一魔每次攻击回复的法力值翻倍。',
   'entities.itemSets.slagbreaker.name': '碎渣战甲',
   'entities.itemSets.slagbreaker.bonus2': '血手使你下一次致残打击的强化效果提高至每层 30%（原为 20%）。',
   'entities.itemSets.slagbreaker.bonus4': '每施放两次血手，破防者的剩余冷却时间缩短 3 秒。',

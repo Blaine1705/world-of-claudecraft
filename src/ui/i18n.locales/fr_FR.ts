@@ -13102,7 +13102,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sacred_form.description':
     "Entre dans un état sacré jusqu'à la mort, augmentant les soins de 10% et les chances de critique des sorts de 5%, et réduisant la menace générée de 50%. Réservé aux Sagesoleil.",
   'entities.abilities.seraphic_vigil.description':
-    'Protège un allié pendant 30 s. Le premier coup qui le fait descendre sous 35% de points de vie consomme la Veille et le soigne de 180. (Signature de Bénison)',
+    'Protège un allié pendant 30 s. Le premier coup qui le fait descendre sous 35% de points de vie consomme la Veille et le soigne de {vigilHeal}. (Signature de Bénison)',
   'entities.abilities.scouring_mercy.description':
     "Inflige 72 à 84 points de dégâts Sacrés à un ennemi ou soigne une cible alliée de 130 à 155. Les deux montants augmentent avec la puissance des sorts. Les dégâts soignent aussi chaque allié lié par la Doctrine de 30%, ou le membre du groupe le plus blessé de 15% si aucun allié n'est lié. (Signature de Doctrine)",
   'entities.abilities.solar_invocation.description':

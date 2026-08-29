@@ -12553,7 +12553,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sacred_form.description':
     'Går ind i en hellig tilstand indtil døden, øger helbredelse med 10% og kritisk besværgelseschance med 5%, og reducerer genereret trussel med 50%. Kun for Solhelere.',
   'entities.abilities.seraphic_vigil.description':
-    'Beskytter en allieret i 30 sek. Det første slag, der bringer vedkommende under 35% sundhed, forbruger Vagten og helbreder vedkommende for 180. (Velsignelsessignatur)',
+    'Beskytter en allieret i 30 sek. Det første slag, der bringer vedkommende under 35% sundhed, forbruger Vagten og helbreder vedkommende for {vigilHeal}. (Velsignelsessignatur)',
   'entities.abilities.scouring_mercy.description':
     'Gør 72 til 84 hellig skade på en fjende eller helbreder et venligt mål for 130 til 155. Begge beløb stiger med besværgelseskraft. Skaden helbreder også hver lærebundet allieret for 30%, eller gruppemedlemmet med lavest sundhed for 15%, hvis ingen allieret er bundet. (Læresignatur)',
   'entities.abilities.solar_invocation.description':

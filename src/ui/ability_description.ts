@@ -218,6 +218,13 @@ export function abilityDisplayDescription(
     (eff): eff is Extract<AbilityEffect, { type: 'absorbSpentResource' }> =>
       eff.type === 'absorbSpentResource',
   )?.mult;
+  // {vigilHeal} splices the RESOLVED heal_echo rescue value (Seraphic Vigil),
+  // so the Benison Dawnweave 2pc's 270 shows live for wearers the same way a
+  // talent-upgraded value would.
+  const vigilHeal = res.effects.find(
+    (eff): eff is Extract<AbilityEffect, { type: 'buffTarget' }> =>
+      eff.type === 'buffTarget' && eff.kind === 'heal_echo',
+  )?.value;
   const values: InterpolationValues = {
     damage: damageText,
     overTime: abilityOverTimeText(res, scaling),
@@ -233,6 +240,7 @@ export function abilityDisplayDescription(
     groundDuration: hourglass === null ? '' : formatAbilityNumber(hourglass.groundDuration),
     rage: rageText,
     absorbPerRage: absorbPerRage === undefined ? '' : formatAbilityNumber(absorbPerRage),
+    vigilHeal: vigilHeal === undefined ? '' : formatAbilityNumber(vigilHeal),
   };
   // Cheap Trick retires Gut Punch's stealth requirement. When the RESOLVED ability
   // has dropped it, prefer the stealth-free description variant so the prose stops

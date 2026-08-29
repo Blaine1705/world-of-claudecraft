@@ -12790,7 +12790,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sacred_form.description':
     'Wchodzi w święty stan aż do śmierci, zwiększając leczenie o 10% i szansę na trafienie krytyczne zaklęć o 5% oraz zmniejszając generowane zagrożenie o 50%. Tylko dla Słonecznych Uzdrowicieli.',
   'entities.abilities.seraphic_vigil.description':
-    'Chroni sojusznika przez 30 s. Pierwszy cios, który zepchnie go poniżej 35% zdrowia, zużywa Straż i leczy go za 180. (Sygnatura Błogosławieństwa)',
+    'Chroni sojusznika przez 30 s. Pierwszy cios, który zepchnie go poniżej 35% zdrowia, zużywa Straż i leczy go za {vigilHeal}. (Sygnatura Błogosławieństwa)',
   'entities.abilities.scouring_mercy.description':
     'Zadaje od 72 do 84 obrażeń Świętych wrogowi albo leczy sojuszniczy cel za 130 do 155. Obie wartości rosną wraz z mocą zaklęć. Obrażenia leczą także każdego sojusznika związanego Doktryną za 30% albo członka drużyny o najniższym zdrowiu za 15%, jeśli nikt nie jest związany. (Sygnatura Doktryny)',
   'entities.abilities.solar_invocation.description':

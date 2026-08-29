@@ -12589,7 +12589,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sacred_form.description':
     'Bước vào trạng thái thánh cho đến khi chết, tăng 10% lượng hồi máu và 5% tỉ lệ chí mạng phép, đồng thời giảm 50% mức đe dọa tạo ra. Chỉ dành cho Người Chữa Lành Mặt Trời.',
   'entities.abilities.seraphic_vigil.description':
-    'Bảo vệ một đồng minh trong 30 giây. Đòn đánh đầu tiên khiến họ xuống dưới 35% máu sẽ tiêu Canh Thức và hồi cho họ 180. (Dấu ấn Phúc Lành)',
+    'Bảo vệ một đồng minh trong 30 giây. Đòn đánh đầu tiên khiến họ xuống dưới 35% máu sẽ tiêu Canh Thức và hồi cho họ {vigilHeal}. (Dấu ấn Phúc Lành)',
   'entities.abilities.scouring_mercy.description':
     'Gây 72 đến 84 sát thương Thánh lên kẻ địch hoặc hồi 130 đến 155 máu cho mục tiêu đồng minh. Cả hai đều tăng theo sức mạnh phép thuật. Sát thương cũng hồi 30% cho mỗi đồng minh liên kết bằng Giáo Lý, hoặc 15% cho thành viên nhóm có ít máu nhất nếu không ai được liên kết. (Dấu ấn Giáo Lý)',
   'entities.abilities.solar_invocation.description':

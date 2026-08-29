@@ -210,7 +210,10 @@ export type ProcTrigger =
   // still resets the counter; the icd arms only on a successful fire.
   | { on: 'castNth'; n: number; abilities: string[]; icd?: number; chance?: number }
   | { on: 'spellCrit'; abilities?: string[]; icd?: number; chance?: number }
-  | { on: 'shieldConsumed'; ability: string }
+  // icd here is the Emberscreed 4pc extension (the Crucible set doc): while it
+  // runs, matching consumes are ignored entirely, exactly like the castNth and
+  // spellCrit guards above. Draws no rng.
+  | { on: 'shieldConsumed'; ability: string; icd?: number }
   | { on: 'hotExpired'; ability: string }
   | { on: 'bigHitTaken'; hpFrac: number; icd: number }
   | { on: 'meleeSwingWhile'; auraKind: string; icd?: number; chance?: number }

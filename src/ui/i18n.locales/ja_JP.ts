@@ -7787,6 +7787,21 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.ashveil.bonus2': '潜伏者の一撃のダメージが25%増加します。',
   'entities.itemSets.ashveil.bonus4':
     'ヴェールストライク中の最初の潜伏者の一撃が2倍ではなく3倍のダメージを与えます。',
+  'entities.itemSets.emberscreed.name': 'エンバーズクリードの祭服',
+  'entities.itemSets.emberscreed.bonus2':
+    'あなたのディシプリンの結びが、神聖ダメージをさらに10%多く回復に変換します。被ダメージで詠唱が遅れなくなります。',
+  'entities.itemSets.emberscreed.bonus4':
+    '守りの聖歌が完全に消費されると、10秒以内の次の浄めの聖歌が即時発動になります。この効果は15秒に1回まで発動します。',
+  'entities.itemSets.benison_dawnweave.name': 'ベニソン・ドーンウィーヴの法衣',
+  'entities.itemSets.benison_dawnweave.bonus2':
+    '熾天使の見守りの救援回復量が180から270に上昇します。被ダメージで詠唱が遅れなくなります。',
+  'entities.itemSets.benison_dawnweave.bonus4':
+    '熾天使の見守りが発動すると、守られた味方はさらに10秒かけて最大体力の15%の回復を得ます。',
+  'entities.itemSets.vesperash.name': 'ヴェスパーアッシュの外套',
+  'entities.itemSets.vesperash.bonus2':
+    'タイスフィーンド招来のクールダウンが6秒短縮されます。被ダメージで詠唱が遅れなくなります。',
+  'entities.itemSets.vesperash.bonus4':
+    'タイスフィーンドを招来すると精神粉砕のクールダウンがリセットされ、タイスフィーンドの攻撃ごとのマナ回復量が2倍になります。',
   'entities.itemSets.slagbreaker.name': 'スラグブレイカーの戦装束',
   'entities.itemSets.slagbreaker.bonus2': '血染めの手による次の重傷の一撃の強化が、1スタックにつき20%から30%に上昇します。',
   'entities.itemSets.slagbreaker.bonus4': '血染めの手を2回発動するごとに、崩し手の残りクールダウンが3秒短縮されます。',

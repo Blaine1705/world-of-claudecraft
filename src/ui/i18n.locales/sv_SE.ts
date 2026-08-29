@@ -12732,7 +12732,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sacred_form.description':
     'Går in i ett heligt tillstånd till döden, ökar läkning med 10% och kritisk besvärjelsechans med 5%, och minskar genererat hot med 50%. Endast för Solhelare.',
   'entities.abilities.seraphic_vigil.description':
-    'Skyddar en allierad i 30 sek. Den första träffen som för denne under 35% hälsa förbrukar Vakan och läker denne för 180. (Välsignelsesignatur)',
+    'Skyddar en allierad i 30 sek. Den första träffen som för denne under 35% hälsa förbrukar Vakan och läker denne för {vigilHeal}. (Välsignelsesignatur)',
   'entities.abilities.scouring_mercy.description':
     'Gör 72 till 84 helig skada på en fiende eller läker ett vänligt mål för 130 till 155. Båda beloppen ökar med besvärjelsekraft. Skadan läker även varje läroförbunden allierad för 30%, eller gruppmedlemmen med lägst hälsa för 15% om ingen allierad är förbunden. (Lärosignatur)',
   'entities.abilities.solar_invocation.description':

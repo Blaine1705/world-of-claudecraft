@@ -12896,7 +12896,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sacred_form.description':
     'Entra em um estado sagrado até a morte, aumentando a cura em 10% e a chance de crítico mágico em 5%, e reduzindo a ameaça gerada em 50%. Apenas para Curassóis.',
   'entities.abilities.seraphic_vigil.description':
-    'Protege um aliado por 30 s. O primeiro golpe que o deixar abaixo de 35% de vida consome a Vigília e o cura em 180. (Distintivo de Bênção)',
+    'Protege um aliado por 30 s. O primeiro golpe que o deixar abaixo de 35% de vida consome a Vigília e o cura em {vigilHeal}. (Distintivo de Bênção)',
   'entities.abilities.scouring_mercy.description':
     'Causa de 72 a 84 de dano Sagrado a um inimigo ou cura um alvo aliado de 130 a 155. Ambos os valores aumentam com o poder mágico. O dano também cura em 30% cada aliado vinculado pela Doutrina, ou em 15% o membro do grupo com menos vida se nenhum aliado estiver vinculado. (Distintivo de Doutrina)',
   'entities.abilities.solar_invocation.description':

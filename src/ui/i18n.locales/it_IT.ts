@@ -12959,7 +12959,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sacred_form.description':
     'Entra in uno stato sacro fino alla morte, aumentando le cure del 10% e la probabilità di critico magico del 5%, e riducendo la minaccia generata del 50%. Solo per Sanasole.',
   'entities.abilities.seraphic_vigil.description':
-    'Protegge un alleato per 30 s. Il primo colpo che lo porta sotto il 35% di salute consuma la Veglia e lo cura per 180. (Distintivo di Benedizione)',
+    'Protegge un alleato per 30 s. Il primo colpo che lo porta sotto il 35% di salute consuma la Veglia e lo cura per {vigilHeal}. (Distintivo di Benedizione)',
   'entities.abilities.scouring_mercy.description':
     'Infligge da 72 a 84 danni Sacri a un nemico oppure cura un bersaglio alleato da 130 a 155. Entrambi gli importi aumentano con la potenza magica. I danni curano inoltre del 30% ogni alleato legato dalla Dottrina, o del 15% il membro del gruppo con meno salute se nessun alleato è legato. (Distintivo di Dottrina)',
   'entities.abilities.solar_invocation.description':

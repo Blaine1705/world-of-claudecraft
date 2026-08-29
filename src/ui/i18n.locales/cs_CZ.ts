@@ -12673,7 +12673,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sacred_form.description':
     'Vstoupí do svatého stavu až do smrti, zvýší léčení o 10% a kritickou šanci kouzel o 5% a sníží vytvářenou hrozbu o 50%. Pouze pro Slunečné léčitele.',
   'entities.abilities.seraphic_vigil.description':
-    'Chrání spojence po dobu 30 s. První zásah, který jej srazí pod 35% zdraví, spotřebuje Stráž a vyléčí jej za 180. (Signatura Požehnání)',
+    'Chrání spojence po dobu 30 s. První zásah, který jej srazí pod 35% zdraví, spotřebuje Stráž a vyléčí jej za {vigilHeal}. (Signatura Požehnání)',
   'entities.abilities.scouring_mercy.description':
     'Způsobí 72 až 84 Svatého poškození nepříteli nebo vyléčí spřáteleného cíle za 130 až 155. Obě hodnoty rostou se silou kouzel. Poškození navíc vyléčí každého spojence spojeného Doktrínou za 30%, nebo člena skupiny s nejnižším zdravím za 15%, pokud není spojen nikdo. (Signatura Doktríny)',
   'entities.abilities.solar_invocation.description':
