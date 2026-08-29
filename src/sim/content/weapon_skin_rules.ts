@@ -95,6 +95,7 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   gravewyrm_thornmaul: 'mace',
   maul_of_the_scourged_wilds: 'mace',
   wildsoul_maul: 'mace',
+  varkhul_forgebreaker: 'mace',
   // Axes
   rusty_hatchet: 'axe',
   copper_bearded_axe: 'axe',

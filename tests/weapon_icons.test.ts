@@ -38,8 +38,10 @@ describe('painted weapon inventory icons', () => {
 
   it('covers every authored base weapon exactly once', () => {
     // 123 with the class-overhaul integration daggers (rimefang, marrowpoint,
-    // duskwhisper, boneglass_shiv), painted in integration-dagger-icons-2026-08-10.
-    expect(baseWeapons).toHaveLength(123);
+    // duskwhisper, boneglass_shiv), painted in integration-dagger-icons-2026-08-10;
+    // 124 with the Ignivar legendary maul (varkhul_forgebreaker, rendered in
+    // ignivar-varkhul-drop-renders-2026-08-28).
+    expect(baseWeapons).toHaveLength(124);
     expect([...WEAPON_IMAGE_IDS].sort()).toEqual(baseWeapons);
     expect(Object.keys(ITEM_WEAPON_VARIANTS).sort()).toEqual(baseWeapons);
     for (const id of baseWeapons) {
@@ -68,7 +70,7 @@ describe('painted weapon inventory icons', () => {
     const weaponBatches = batches.filter((batch) =>
       batch.itemIds.some((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id)),
     );
-    expect(weaponBatches).toHaveLength(3);
+    expect(weaponBatches).toHaveLength(4);
     const historicalBatch = weaponBatches.find(
       ({ batchId }) => batchId === 'placeholder-art-completion-weapons-2026-08-09',
     );
@@ -119,9 +121,22 @@ describe('painted weapon inventory icons', () => {
       'marrowpoint',
       'rimefang',
     ]);
+    // The Ignivar legendaries ship in-engine renders of their own held models
+    // in a dedicated batch (ignivar-varkhul-drop-renders-2026-08-28).
+    const varkhulBatch = weaponBatches.find(
+      ({ batchId }) => batchId === 'ignivar-varkhul-drop-renders-2026-08-28',
+    );
+    expect(varkhulBatch).toBeDefined();
+    const varkhulWeaponIds = (varkhulBatch?.itemIds ?? [])
+      .filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id))
+      .sort();
+    expect(varkhulWeaponIds).toEqual(['varkhul_forgebreaker']);
     expect(historicalBatch?.itemIds).toEqual(
       expected.filter(
-        (id) => !replacementWeaponIds.includes(id) && !integrationWeaponIds.includes(id),
+        (id) =>
+          !replacementWeaponIds.includes(id) &&
+          !integrationWeaponIds.includes(id) &&
+          !varkhulWeaponIds.includes(id),
       ),
     );
     expect(
@@ -162,8 +177,10 @@ describe('painted weapon inventory icons', () => {
     };
     // The chunk records are the frozen weapon campaign's generation reports:
     // they slice the pre-integration weapon roster, without the four
-    // integration daggers that postdate the campaign.
-    const campaignExpected = expected.filter((id) => !integrationWeaponIds.includes(id));
+    // integration daggers and the Ignivar legendary that postdate the campaign.
+    const campaignExpected = expected.filter(
+      (id) => !integrationWeaponIds.includes(id) && !varkhulWeaponIds.includes(id),
+    );
     expect(chunkA.assets.map(({ id }) => id)).toEqual(campaignExpected.slice(0, 40));
     expect(chunkB.assets.map(({ id }) => id)).toEqual(campaignExpected.slice(40, 80));
     expect(chunkC).toEqual(campaignExpected.slice(80, 100));
