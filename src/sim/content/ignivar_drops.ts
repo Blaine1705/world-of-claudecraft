@@ -11,9 +11,14 @@
 //   STAT_PER_ILVL 0.7) = 33; blockValue/armor extrapolate the shield ladder
 //   (buckler 6 / wallshield 14 / bonewrought 30 at epic ilvl 29) one tier up.
 // Until the drop wiring lands, itemLevel() resolves undefined for both (no
-// loot source), so the budget sweeps skip these records; the loot PR must
-// re-derive every number above against the realized item level from Varkhul's
-// own boss level and add the Reliquary page in the same change.
+// loot source), so the budget sweeps skip these records. The drop wiring,
+// the re-derivation of every number above against the realized item level
+// from Varkhul's own boss level, and the Reliquary rows land TOGETHER at
+// the raid's launch pass (the loot PR's obligations closeout deliberately
+// kept the pair uncatalogued: a conquerors page must never hold an
+// unearnable slot, and the reliquary suite's tripwire pin reds the moment
+// this placeholder set shrinks, forcing the page authoring with the
+// wiring).
 import type { ItemDef } from '../types';
 
 /** The handover placeholders above, as a set: gear pickers that argmax over

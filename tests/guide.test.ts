@@ -68,7 +68,8 @@ import {
   TIER2_TOOL_GATE_PROFICIENCY,
   TIER3_TOOL_GATE_PROFICIENCY,
 } from '../src/sim/content/vendor_row_gates';
-import { ABILITIES, CAMPS, ITEMS, MOBS, NPCS, QUESTS, ZONES } from '../src/sim/data';
+import { ABILITIES, CAMPS, DUNGEONS, ITEMS, MOBS, NPCS, QUESTS, ZONES } from '../src/sim/data';
+import { FINAL_BOSS_DUNGEONS, FLAWLESS_TASKS } from '../src/sim/deeds';
 import { MARKET_CUT, MARKET_LISTING_DEPOSIT_COPPER } from '../src/sim/market';
 import {
   WORK_ORDER_CADENCE_TICKS,
@@ -628,12 +629,36 @@ describe('Guide deeds spoiler safety', () => {
   });
 
   it('emits exactly the non-hidden deeds, each mapping back to a real def', () => {
+    // The guideVisible gate reaches the deed catalog: a development-gated
+    // room's clear and flawless deeds stay off the spoiler-safe wiki
+    // (scripts/wiki/build_content.mjs derives the same set from
+    // FINAL_BOSS_DUNGEONS + FLAWLESS_TASKS; mirrored here from the live
+    // dungeon defs so the two derivations cannot drift silently).
+    const guideHiddenDungeonIds = new Set(
+      Object.values(DUNGEONS)
+        .filter((d) => d.guideVisible === false)
+        .map((d) => d.id),
+    );
+    const guideHiddenDeedIds = new Set(
+      Object.entries(FINAL_BOSS_DUNGEONS)
+        .filter(([, dungeonId]) => guideHiddenDungeonIds.has(dungeonId))
+        .map(([bossId]) => FLAWLESS_TASKS[bossId])
+        .filter((id) => id !== undefined),
+    );
+    const isGuideHidden = (d) =>
+      guideHiddenDeedIds.has(d.id) ||
+      ('dungeonId' in d.trigger && guideHiddenDungeonIds.has(d.trigger.dungeonId));
     const expected = Object.values(DEEDS)
-      .filter((d) => !d.hidden)
+      .filter((d) => !d.hidden && !isGuideHidden(d))
       .map((d) => d.id)
       .sort();
     expect(expected.length).toBeGreaterThan(0);
+    // The gate is live, not vacuous: the Ignivar raid rooms are guide-hidden
+    // today and their five deeds must be absent.
+    expect(guideHiddenDeedIds.has('dgn_varkhul_flawless')).toBe(true);
     expect([...GUIDE_DEEDS].map((d) => d.id).sort()).toEqual(expected);
+    const emitted = new Set(GUIDE_DEEDS.map((d) => d.id));
+    expect(emitted.has('dgn_ignivar')).toBe(false);
     for (const gd of GUIDE_DEEDS) {
       const def = DEEDS[gd.id];
       expect(def, `GUIDE_DEEDS has an unknown deed id "${gd.id}"`).toBeDefined();
@@ -820,9 +845,23 @@ describe('Guide deeds spoiler safety', () => {
 // Freshness of GUIDE_RELIQUARY is covered by the shared generator freshness gate;
 // these pins lock field allowlist, catalog parity, and render wiring.
 describe('Guide Reliquary spoiler-safe catalog', () => {
-  it('emits exactly the live RELIQUARY_PAGES ids in catalog order', () => {
-    expect(GUIDE_RELIQUARY.map((p) => p.id)).toEqual(RELIQUARY_PAGES.map((p) => p.id));
-    expect(GUIDE_RELIQUARY.length).toBe(RELIQUARY_PAGES.length);
+  it('emits exactly the guide-visible RELIQUARY_PAGES ids in catalog order', () => {
+    // Pages whose clear source is a guide-hidden room stay off the wiki
+    // (the same guideVisible gate the dungeon and deed catalogs take).
+    const guideHiddenDungeonIds = new Set(
+      Object.values(DUNGEONS)
+        .filter((d) => d.guideVisible === false)
+        .map((d) => d.id),
+    );
+    const visible = RELIQUARY_PAGES.filter(
+      (p) =>
+        p.clearSource?.dungeonId === undefined ||
+        !guideHiddenDungeonIds.has(p.clearSource.dungeonId),
+    );
+    expect(GUIDE_RELIQUARY.map((p) => p.id)).toEqual(visible.map((p) => p.id));
+    // The gate is live: the Ignivar conquerors pages exist and are absent.
+    expect(RELIQUARY_PAGES.some((p) => p.id === 'conquerors_ignivar')).toBe(true);
+    expect(GUIDE_RELIQUARY.some((p) => p.id === 'conquerors_ignivar')).toBe(false);
     expect(GUIDE_RELIQUARY.length).toBeGreaterThanOrEqual(28);
   });
 

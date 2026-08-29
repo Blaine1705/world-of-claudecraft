@@ -135,7 +135,7 @@ export const DEEDS_RECENT_CAP = 8;
 // '<dungeonId>' and '<dungeonId>:heroic') and the dungeonFinalBossKills
 // counter. PINNED as of v1: a future dungeon's boss gets a new deed; this
 // list never grows an earned requirement.
-const FINAL_BOSS_DUNGEONS: Record<string, string> = {
+export const FINAL_BOSS_DUNGEONS: Record<string, string> = {
   morthen: 'hollow_crypt',
   vael_the_mistcaller: 'sunken_bastion',
   ysolei: 'drowned_temple',
@@ -156,7 +156,7 @@ const FINAL_BOSS_DUNGEONS: Record<string, string> = {
 // Perfection tasks: zero player deaths inside the boss's heroic instance
 // while the boss is engaged. Tainted by onPlayerDeathForDeeds; the window
 // re-arms on evade/reset/respawn (resetDeedEncounter).
-const FLAWLESS_TASKS: Record<string, string> = {
+export const FLAWLESS_TASKS: Record<string, string> = {
   morthen: 'dgn_morthen_flawless',
   ysolei: 'dgn_ysolei_flawless',
   korzul_the_gravewyrm: 'dgn_korzul_flawless',

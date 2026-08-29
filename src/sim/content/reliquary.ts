@@ -1563,8 +1563,13 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
   // raid pages come per boss, the conquerors_nythraxis shape. The sigil
   // redemption tokens on both bosses' tables are deliberately NOT catalogued
   // (kind 'tool', redemption currency, see RELIQUARY_HEROIC_GEAR above); the
-  // vendor-redeemed tier pieces are not catalogued either (a chosen purchase,
-  // not a conquerable unique). The two Varkhul legendaries
+  // vendor-redeemed tier pieces are not catalogued either: beyond being a
+  // chosen purchase, paging all 145 would grow the relic catalog by roughly
+  // half against the design doc's deliberate-authoring bound on catalog
+  // growth and the measured autosave cost per catalogued id; if the sets
+  // earn a prestige surface it should be an authored per-lineage page shape
+  // (the honor-stock precedent), a curator decision recorded for the
+  // maintainer. The two Varkhul legendaries
   // (varkhul_forgebreaker, varkhul_emberward) are deliberately ABSENT: no
   // live table awards either yet (IGNIVAR_DROP_PLACEHOLDER_IDS,
   // content/ignivar_drops.ts), and an unearnable slot must never sit on a

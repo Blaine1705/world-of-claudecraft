@@ -217,8 +217,8 @@ export function reliquaryCellArtOpaque(art: ReliquaryCellArt): boolean {
   // An item with neither committed pipeline (no /ui/items webp, no
   // /ui/weapons variant render) paints the procedural compositor's opaque
   // radial tile, so it takes the crest-style answer: opaque exactly while
-  // its painted art is pending (the ITEM_ART_PENDING ledger in icons.ts;
-  // the Crucible raid armor is the live case until its icon wave lands).
+  // its painted art is pending (the ITEM_ART_PENDING ledger in icons.ts,
+  // empty today; the next staged art wave becomes the live case).
   return itemImageUrl(art.itemId) === null && weaponIconUrl(art.itemId) === null;
 }
 

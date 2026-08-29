@@ -938,7 +938,12 @@ Each phase is a reviewable commit (or small commit series) with its tests:
 6. **Art and i18n wave**: 192 icons via the pipeline, catalog names, M16
    fills, quartermaster entity names.
 7. **Obligations closeout**: deeds, reliquary, wiki regen, set proc FX rows,
-   qa-checklist + content-obligations-reviewer pass.
+   qa-checklist + content-obligations-reviewer pass. (Landed 2026-08-30,
+   ahead of the launch pass the gating section below anticipated: the raid's
+   deeds and pages ship NOW but stay out of the public wiki behind the
+   guideVisible gate in scripts/wiki/build_content.mjs until the rooms go
+   guide-visible; the Varkhul legendary pages and the mechanic-specific
+   encounter deeds remain launch-pass work.)
 8. **Tuning pass**: re-run the static viability check against the final
    numbers, confirm the proposed rating/affix constants and the retune
    magnitudes, and stand up the post-release parse-service watch (top
