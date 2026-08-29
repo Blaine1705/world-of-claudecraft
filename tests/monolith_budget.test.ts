@@ -311,16 +311,17 @@ const MONOLITHS: MonolithRow[] = [
     // ceiling is the exact merged count.
     // Re-pinned to the integration merge of the latest v0.40.0 (the touch UI
     // rework); exact merged count.
-    // Re-pinned at the release/v0.41.0 sync into the bank-storage branch (the New
-    // Eastbrook program, which retires the Vale Cup and demolishes the Sowfield).
-    // The release arm DELETES more than this branch adds, so the merged count lands
-    // below the branch pin and the ratchet follows it DOWN. Measured on the merged
-    // tree, never reconciled by arithmetic. Exact count, zero slack.
-    // Re-pinned at the next v0.41.0 sync: the release arm's battleground
-    // compile-gate injection grew renderer.ts by one line under release's own
-    // pin, and this branch's tighter stale pin was what the merge queue ran
-    // (this branch never touches renderer.ts). Exact merged count, zero slack.
-    ceiling: 13328,
+    // +1 for the entry horizon's scenery cull far at the live frame (one local
+    // the four reveal-gated painters share); the prewarm frame inlines it.
+    // Re-pinned at the v0.41.0 sync merge: the release arm's battleground
+    // compile-gate wiring (net +1 after its comment rewording) lands beside
+    // the branch's +1 above, so the merged file is 13331. Exact merged count,
+    // zero headroom.
+    // Re-pinned again after PR 3670 (bank storage) merged: its arm carried the
+    // exact release-side count 13328 (it never touches renderer.ts), while this
+    // branch's renderer edits still land the merged file at 13331. Measured on
+    // the merged tree. Exact merged count, zero headroom.
+    ceiling: 13331,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -424,6 +425,10 @@ const MONOLITHS: MonolithRow[] = [
     // the ratchet follows the merged file down). Exact count, zero slack.
     // Re-pinned to the exact merged count of the v0.39.3 main back-merge
     // (the utc_day import consolidation shed one line).
+    // Re-pinned across the v0.41.0 sync merges after the first-spawn intro's
+    // seen-marker persistence moved out into src/game/spawn_intro_seen.ts
+    // (the establishing-shot entry wait needed one line here, and the ratchet
+    // pays for it by extraction).
     // Down 11564 -> 11563 at the desktop-signing round: the wallet-handoff
     // availability probe and browser authorizer moved to
     // src/net/desktop_wallet_handoff.ts (thin hoisted delegators remain),
@@ -431,11 +436,13 @@ const MONOLITHS: MonolithRow[] = [
     // Raised at the PR #3284 v0.41.0 sync merge: the applySetting arms for
     // the interface-editor settings (frame dimensions, aura direction vars,
     // the player-frame bar lock) predate this ratchet; folding them behind a
-    // src/game/ settings-application seam is flagged follow-up work. Exact
-    // merged count.
-    // Lowered by 1 at the empower-hold sync merge: the pad cast routing lives
-    // in src/game/pad_cast_routing.ts. Exact merged count.
-    ceiling: 11628,
+    // src/game/ settings-application seam is flagged follow-up work.
+    // The branch's spawn_intro_seen extraction still pays for its own line at
+    // the entry wait (3 under the release row), and the empower-hold sync
+    // merge lowered the release row by 1 (the pad cast routing lives in
+    // src/game/pad_cast_routing.ts), so the merged file lands at 11625.
+    // Exact merged count, zero headroom.
+    ceiling: 11625,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -634,7 +641,10 @@ const MONOLITHS: MonolithRow[] = [
     file: 'src/render/foliage.ts',
     // Re-pinned to the eastbrook-plus-tutorial integration merge output:
     // both parents' additions combine, so keep the exact merged count.
-    ceiling: 4121,
+    // Lowered after extracting the world trees' camera-occluder fade (the
+    // hideable records, the trunk hit test, the gated instance/ghost swap)
+    // into src/render/tree_hide_fade.ts.
+    ceiling: 3996,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {
@@ -661,7 +671,9 @@ const MONOLITHS: MonolithRow[] = [
     // current count per the ratchet's rule; any further growth reds, and the
     // fix is extraction behind the seam named here.
     file: 'src/render/dungeon.ts',
-    ceiling: 2882,
+    // Lowered after extracting the arena-wall camera-occluder fade (footprint
+    // hit test plus the per-frame gated step) into src/render/arena_wall_fade.ts.
+    ceiling: 2804,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {
