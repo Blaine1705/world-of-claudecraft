@@ -2748,6 +2748,7 @@ export type TranslationKeyFlat =
   | 'entities.items.korgaths_chainwraps.name'
   | 'entities.items.last_keep_signet.name'
   | 'entities.items.last_step_signet.name'
+  | 'entities.items.lastflame_core.name'
   | 'entities.items.lesser_healing_potion.name'
   | 'entities.items.lesser_mana_potion.name'
   | 'entities.items.lilybed_mantle.name'

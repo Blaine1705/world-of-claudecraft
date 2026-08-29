@@ -7918,6 +7918,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.grovespring.bonus2':
     'スウィフトメンドが自分の野生の芽吹きまたは二度目の開花を優先して消費し、回復量が25%増加します。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.grovespring.bonus4': '満開が残りの効果の75%を収穫し、その後翠成を1蓄えます。',
+  'entities.items.lastflame_core.name': '最後の炎の核',
   'entities.itemSets.slagbreaker.name': 'スラグブレイカーの戦装束',
   'entities.itemSets.slagbreaker.bonus2': '血染めの手による次の重傷の一撃の強化が、1スタックにつき20%から30%に上昇します。',
   'entities.itemSets.slagbreaker.bonus4': '血染めの手を2回発動するごとに、崩し手の残りクールダウンが3秒短縮されます。',

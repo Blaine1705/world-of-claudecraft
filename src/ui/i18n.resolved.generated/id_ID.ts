@@ -13011,6 +13011,9 @@ export const id_ID: EnTranslations = {
       "ps_passing_stone": {
         "name": "Batu Pelepasan"
       },
+      "lastflame_core": {
+        "name": "Core of the Last Flame"
+      },
       "slagbreaker_helmet": {
         "name": "Slagbreaker Helm"
       },

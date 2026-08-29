@@ -145,6 +145,13 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       { itemId: 'band_of_marked_strikes', chance: 0.25, rollGroup: 'varkhul_rings' },
       { itemId: 'circle_of_cinders', chance: 0.25, rollGroup: 'varkhul_rings' },
       { itemId: 'loop_of_quiet_springs', chance: 0.25, rollGroup: 'varkhul_rings' },
+      // The professions fast-follow's core reagent starts dropping AHEAD of
+      // its recipes (maintainer staging call): the classic molten-core band,
+      // one guaranteed plus a 50 percent second, so crafters bank cores
+      // before the scroll-taught tier lands (PR 3704 extends this exact
+      // shape with the scroll roll group and the hammer chain starter).
+      { itemId: 'lastflame_core', chance: 1 },
+      { itemId: 'lastflame_core', chance: 0.5 },
     ],
     scale: 3.2,
     color: 0x9f351c,
@@ -308,6 +315,13 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       { itemId: 'cinderfang_kris', chance: 0.1, rollGroup: 'ignivar_offset' },
       { itemId: 'slagrender_cleaver', chance: 0.1, rollGroup: 'ignivar_offset' },
       { itemId: 'wand_of_quenched_sparks', chance: 0.1, rollGroup: 'ignivar_offset' },
+      // The professions fast-follow's core reagent starts dropping AHEAD of
+      // its recipes (maintainer staging call): the classic molten-core band,
+      // one guaranteed plus a 50 percent second, so crafters bank cores
+      // before the scroll-taught tier lands (PR 3704 extends this exact
+      // shape with the scroll roll group and the hammer chain starter).
+      { itemId: 'lastflame_core', chance: 1 },
+      { itemId: 'lastflame_core', chance: 0.5 },
     ],
     scale: 3.4,
     color: 0xd64316,

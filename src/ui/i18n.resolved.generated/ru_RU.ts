@@ -13011,6 +13011,9 @@ export const ru_RU: EnTranslations = {
       "ps_passing_stone": {
         "name": "Камень Ухода"
       },
+      "lastflame_core": {
+        "name": "Ядро Последнего Пламени"
+      },
       "slagbreaker_helmet": {
         "name": "Шлем шлаколома"
       },

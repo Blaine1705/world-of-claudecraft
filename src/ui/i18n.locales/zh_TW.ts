@@ -7603,6 +7603,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.grovespring.bonus2':
     '迅癒優先消耗你自己的野性綻放或再度綻放，治療效果提高 25%。受到傷害不再延遲你的施法。',
   'entities.itemSets.grovespring.bonus4': '盛放收割你剩餘治療效果的 75%，隨後累積 1 層繁茂。',
+  'entities.items.lastflame_core.name': '末焰之核',
   'entities.itemSets.slagbreaker.name': '碎渣戰甲',
   'entities.itemSets.slagbreaker.bonus2': '血手使你下一次致殘打擊的強化效果提高至每層 30%（原為 20%）。',
   'entities.itemSets.slagbreaker.bonus4': '每施放兩次血手，破防者的剩餘冷卻時間縮短 3 秒。',

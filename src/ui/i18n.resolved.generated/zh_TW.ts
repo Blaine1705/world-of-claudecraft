@@ -13011,6 +13011,9 @@ export const zh_TW: EnTranslations = {
       "ps_passing_stone": {
         "name": "往生石"
       },
+      "lastflame_core": {
+        "name": "末焰之核"
+      },
       "slagbreaker_helmet": {
         "name": "破渣头盔"
       },

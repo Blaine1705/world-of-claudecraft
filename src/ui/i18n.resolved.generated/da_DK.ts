@@ -13011,6 +13011,9 @@ export const da_DK: EnTranslations = {
       "ps_passing_stone": {
         "name": "Hvilesten"
       },
+      "lastflame_core": {
+        "name": "Core of the Last Flame"
+      },
       "slagbreaker_helmet": {
         "name": "Slagbreaker Helm"
       },

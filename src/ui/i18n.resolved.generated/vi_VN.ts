@@ -13011,6 +13011,9 @@ export const vi_VN: EnTranslations = {
       "ps_passing_stone": {
         "name": "Đá Từ Trần"
       },
+      "lastflame_core": {
+        "name": "Core of the Last Flame"
+      },
       "slagbreaker_helmet": {
         "name": "Slagbreaker Helm"
       },

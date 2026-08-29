@@ -13011,6 +13011,9 @@ export const ja_JP: EnTranslations = {
       "ps_passing_stone": {
         "name": "たましいの石"
       },
+      "lastflame_core": {
+        "name": "最後の炎の核"
+      },
       "slagbreaker_helmet": {
         "name": "スラグブレイカーの兜"
       },

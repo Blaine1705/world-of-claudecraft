@@ -13011,6 +13011,9 @@ export const cs_CZ: EnTranslations = {
       "ps_passing_stone": {
         "name": "Kámen přechodu"
       },
+      "lastflame_core": {
+        "name": "Core of the Last Flame"
+      },
       "slagbreaker_helmet": {
         "name": "Slagbreaker Helm"
       },

@@ -13011,6 +13011,9 @@ export const ko_KR: EnTranslations = {
       "ps_passing_stone": {
         "name": "안식의 돌"
       },
+      "lastflame_core": {
+        "name": "마지막 불꽃의 핵"
+      },
       "slagbreaker_helmet": {
         "name": "슬래그브레이커 투구"
       },

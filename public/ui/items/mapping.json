@@ -6297,6 +6297,18 @@
         "orb_of_the_last_spring",
         "cinder_of_the_first_design"
       ]
+    },
+    {
+      "batchId": "crucible-raid-professions-2026-08-28",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "existing painted WebP catalog in public/ui/items/",
+      "commonPrompt": "Painted dark-fantasy MMORPG inventory icon, one centered item, clear silhouette, atmospheric dark background, no text or watermark",
+      "note": "Staged early: only the core reagent ships ahead of the professions fast-follow (PR 3704), which extends this batch to its full ten ids.",
+      "itemIds": [
+        "lastflame_core"
+      ]
     }
   ]
 }

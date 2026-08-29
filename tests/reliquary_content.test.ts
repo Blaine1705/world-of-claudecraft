@@ -196,6 +196,15 @@ function dungeonObjectItemIds(dungeonId: string): string[] {
  * and ground objects contribute their interaction yield. Filler falls out by
  * live ITEMS quality, not hand-listing.
  */
+// Crafting materials fall out by kind too: 'junk' is the material
+// convention (crucible_professions.ts), and a reagent like the Core of the
+// Last Flame is banked and consumed, not a conquerable relic (the
+// professions doctrine: the crafted OUTPUTS are the uniques). The liveness
+// arm in the raid-page describe proves this filter excludes a real epic row.
+function isMaterialId(itemId: string): boolean {
+  return ITEMS[itemId]?.kind === 'junk';
+}
+
 function dungeonRarePlusLootIds(dungeonId: string): string[] {
   const ids = new Set<string>();
   for (const mobId of dungeonMobIds(dungeonId)) {
@@ -205,11 +214,13 @@ function dungeonRarePlusLootIds(dungeonId: string): string[] {
       // 'tool' rows on both raid bosses' tables); the liveness arm in the
       // raid-page describe proves the filter really excludes something.
       if (isRedemptionTokenId(entry.itemId)) continue;
+      if (isMaterialId(entry.itemId)) continue;
       if (isRarePlus(entry.itemId)) ids.add(entry.itemId);
     }
   }
   for (const itemId of dungeonObjectItemIds(dungeonId)) {
-    if (isRarePlus(itemId) && !isRedemptionTokenId(itemId)) ids.add(itemId);
+    if (isRarePlus(itemId) && !isRedemptionTokenId(itemId) && !isMaterialId(itemId))
+      ids.add(itemId);
   }
   return [...ids].sort();
 }
@@ -1574,6 +1585,18 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
       for (const id of dungeonRarePlusLootIds(dungeonId)) {
         expect(isRedemptionTokenId(id), `${dungeonId} derived ${id}`).toBe(false);
       }
+    }
+    // The material carve-out is live, not vacuous: the staged core reagent
+    // is an EPIC junk-kind row on both bosses and must fall out here.
+    expect(ITEMS.lastflame_core?.quality).toBe('epic');
+    const raidFinaleBosses: Record<string, string> = {
+      ignivar_raid_arena: 'ignivar_herald_of_the_last_flame',
+      ignivar_inner_crucible: 'varkhul_forgefather_of_the_last_flame',
+    };
+    for (const [dungeonId, bossId] of Object.entries(raidFinaleBosses)) {
+      const raw = (MOBS[bossId]?.loot ?? []).map((e) => e.itemId);
+      expect(raw, `${dungeonId} raw table carries the core`).toContain('lastflame_core');
+      expect(dungeonRarePlusLootIds(dungeonId)).not.toContain('lastflame_core');
     }
   });
 

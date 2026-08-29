@@ -308,6 +308,7 @@ export {
   resolveDelveShopOffers,
 } from './content/delves';
 
+import { CRUCIBLE_PROFESSION_ITEMS } from './content/crucible_professions';
 import { DELVE_ITEMS } from './content/delves/items';
 import { HEROIC_ITEMS, RETIRED_HEROIC_ITEMS } from './content/heroic_loot';
 import { buildHeroicVariants } from './content/heroic_variants';
@@ -379,6 +380,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   PROVING_SHORE_ITEMS,
   DUNGEON_KEEPSAKE_ITEMS,
   IGNIVAR_DROP_ITEMS,
+  CRUCIBLE_PROFESSION_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';

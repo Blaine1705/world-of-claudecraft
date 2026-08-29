@@ -13011,6 +13011,9 @@ export const en_XA: EnTranslations = {
       "ps_passing_stone": {
         "name": "[Þáššíñĝ Šţóñé]"
       },
+      "lastflame_core": {
+        "name": "[Çóŕé óƒ ţĥé Ļášţ Ƒļáɱé]"
+      },
       "slagbreaker_helmet": {
         "name": "[Šļáĝƀŕéáķéŕ Ĥéļɱ]"
       },
