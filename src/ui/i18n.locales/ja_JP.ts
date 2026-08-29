@@ -7818,6 +7818,20 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '潮呼びのクールダウンが4秒短縮されます。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.springmender.bonus4':
     '連なる癒しが4人目の味方に届き、治癒の奔流を150%で回収します。',
+  'entities.itemSets.chronoweave.name': 'エーテルウィーブの祭服',
+  'entities.itemSets.chronoweave.bonus2':
+    '時の残響が、単体対象への秘術ダメージの50%を回復に変換します。被ダメージで詠唱が遅れなくなります。',
+  'entities.itemSets.chronoweave.bonus4': '時の連鎖のクールダウンが5秒短縮されます。',
+  'entities.itemSets.pyroclast.name': 'パイロクラストの礼装',
+  'entities.itemSets.pyroclast.bonus2':
+    '灼きが、体力が50%以下の対象に必ずクリティカルヒットします。被ダメージで詠唱が遅れなくなります。',
+  'entities.itemSets.pyroclast.bonus4':
+    '不死鳥のトランスの効果外で火炎呪文がクリティカルヒットするたび、その残りクールダウンが2秒短縮されます。',
+  'entities.itemSets.frostquench.name': 'フロストクエンチの織衣',
+  'entities.itemSets.frostquench.bonus2':
+    '霧氷の槍のクリティカルヒットで氷柱をもう1つ蓄えます。上限は5つのままです。被ダメージで詠唱が遅れなくなります。',
+  'entities.itemSets.frostquench.bonus4':
+    'ウィンターラッシュが付与するウィンターズ・チルが2チャージではなく3チャージになります。',
   'entities.itemSets.slagbreaker.name': 'スラグブレイカーの戦装束',
   'entities.itemSets.slagbreaker.bonus2': '血染めの手による次の重傷の一撃の強化が、1スタックにつき20%から30%に上昇します。',
   'entities.itemSets.slagbreaker.bonus4': '血染めの手を2回発動するごとに、崩し手の残りクールダウンが3秒短縮されます。',

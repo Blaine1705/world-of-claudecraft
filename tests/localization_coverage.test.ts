@@ -997,8 +997,9 @@ describe('i18n Localization Key Coverage', () => {
     // the 5 WARFARE families x (name + bonus2/4/7), and the registered
     // Crucible tier sets x (name + bonus2/bonus4), one class wave at a time
     // (the rollout ledger in tests/ignivar_loot.test.ts; currently the
-    // warrior, paladin, hunter, rogue, priest, and shaman waves, 19 sets).
-    expect(itemSetEntries).toHaveLength(7 * 4 + 3 * 2 + 5 * 4 + 19 * 3);
+    // warrior, paladin, hunter, rogue, priest, shaman, and mage waves,
+    // 22 sets).
+    expect(itemSetEntries).toHaveLength(7 * 4 + 3 * 2 + 5 * 4 + 22 * 3);
     expect(missingEntityTranslationsForGroups(['itemSet'])).toHaveLength(0);
 
     for (const lang of ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'] as const) {

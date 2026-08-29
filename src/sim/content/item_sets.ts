@@ -781,6 +781,59 @@ export const ITEM_SETS: Record<string, ItemSet> = {
       },
     ],
   },
+  chronoweave: {
+    id: 'chronoweave',
+    // Renamed from the working title "Chronoweave" in the final adversarial
+    // round: the old name collided with the arcane mastery. The set ID stays
+    // `chronoweave` (the shipped Phase A item tags carry it).
+    name: 'Aetherweave Vestments',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        // The healer 2pc carries the pushback rider (full immunity, the raid
+        // tier's upgrade over the leveling lineage's 50 percent).
+        text: 'Temporal Echo converts 50 percent of your single-target Arcane damage into healing. Damage taken no longer delays your spellcasting.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: "Temporal Cascade's cooldown is reduced by 5 sec.",
+      },
+    ],
+  },
+  pyroclast: {
+    id: 'pyroclast',
+    name: 'Pyroclast Regalia',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: 'Scald always critically strikes targets at or below 50 percent health. Damage taken no longer delays your spellcasting.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: "Your Fire spells' critical strikes outside Phoenix Trance reduce its remaining cooldown by 2 sec.",
+      },
+    ],
+  },
+  frostquench: {
+    id: 'frostquench',
+    name: 'Frostquench Weave',
+    bonuses: [
+      {
+        pieces: 2,
+        effect: {},
+        text: 'Rimelance critical strikes bank a second Icicle, up to the maximum of 5. Damage taken no longer delays your spellcasting.',
+      },
+      {
+        pieces: 4,
+        effect: {},
+        text: "Winterlash plants 3 Winter's Chill charges, up from 2.",
+      },
+    ],
+  },
 };
 
 // Fully-resolved set effect: every field defaulted so callers never branch on

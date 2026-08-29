@@ -7510,6 +7510,19 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.springmender.name': '泉癒鱗甲',
   'entities.itemSets.springmender.bonus2': '潮汐召喚的冷卻時間縮短 4 秒。受到傷害不再延遲你的施法。',
   'entities.itemSets.springmender.bonus4': '層疊治癒可跳躍至第四名盟友，消耗的治癒湧流按 150% 治療。',
+  'entities.itemSets.chronoweave.name': '以太織法衣',
+  'entities.itemSets.chronoweave.bonus2':
+    '時光迴響將你 50% 的單體秘法傷害轉化為治療。受到傷害不再延遲你的施法。',
+  'entities.itemSets.chronoweave.bonus4': '時光奔流的冷卻時間縮短 5 秒。',
+  'entities.itemSets.pyroclast.name': '火礫禮裝',
+  'entities.itemSets.pyroclast.bonus2':
+    '沸燙對生命值不高於 50% 的目標必定造成致命一擊。受到傷害不再延遲你的施法。',
+  'entities.itemSets.pyroclast.bonus4':
+    '鳳凰出神未啟動時，你的火焰法術致命一擊會使其剩餘冷卻時間縮短 2 秒。',
+  'entities.itemSets.frostquench.name': '霜淬織衣',
+  'entities.itemSets.frostquench.bonus2':
+    '凜霜矛的致命一擊會額外積存一枚冰柱，上限仍為 5 枚。受到傷害不再延遲你的施法。',
+  'entities.itemSets.frostquench.bonus4': '凜冬之鞭施加 3 層凜冬之寒（原為 2 層）。',
   'entities.itemSets.slagbreaker.name': '碎渣戰甲',
   'entities.itemSets.slagbreaker.bonus2': '血手使你下一次致殘打擊的強化效果提高至每層 30%（原為 20%）。',
   'entities.itemSets.slagbreaker.bonus4': '每施放兩次血手，破防者的剩餘冷卻時間縮短 3 秒。',

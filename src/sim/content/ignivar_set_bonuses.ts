@@ -193,6 +193,32 @@ export const SPRINGMENDER_4PC_BONUS_JUMPS = 1;
  *  CURRENT_CONSUME_MULTIPLIER 1.25; Unleash Weapon's collapse keeps 1.25). */
 export const SPRINGMENDER_4PC_CHAIN_HARVEST_MULT = 1.5;
 
+// Audited constants for the bespoke mage bends (read by the class-module
+// call sites AND pinned by tests, so the copy cannot drift from the code).
+/** Chronoweave (Aetherweave Vestments) 2pc: the SINGLE-TARGET Temporal Echo
+ *  conversion rate (base ECHO_CONVERT_SINGLE 0.4). Baked into the mark aura
+ *  at placeTemporalEcho, the one write both combat (echoConvertRate) and the
+ *  aura tooltip (value) read back, so the two can never diverge; a gear swap
+ *  after placement keeps the placed rate until the echo is re-cast (the same
+ *  at-grant snapshot the beacon and Dawn's Wrath bakes use). The area rate
+ *  (0.15) and the Cascada group rates (0.13/0.06) are deliberately untouched:
+ *  the copy promises single-target only. */
+export const CHRONOWEAVE_2PC_ECHO_CONVERT_SINGLE = 0.5;
+/** Chronoweave 4pc: seconds cut from Temporal Cascade's cooldown (base 17). */
+export const CHRONOWEAVE_4PC_CASCADE_COOLDOWN_CUT_SEC = 5;
+/** Pyroclast 2pc: the Scald guaranteed-crit execute threshold as a fraction
+ *  of the target's max health (base SCORCH_EXECUTE_HP 0.3). */
+export const PYROCLAST_2PC_SCALD_EXECUTE_HP = 0.5;
+/** Pyroclast 4pc: seconds a builder crit landed outside Phoenix Trance shaves
+ *  off its running cooldown (base COMBUSTION_CDR_PER_CRIT 1). */
+export const PYROCLAST_4PC_COMBUSTION_CDR_PER_CRIT = 2;
+/** Frostquench 2pc: extra Icicles a Rimelance CRITICAL banks on top of the
+ *  base per-impact Icicle (cap ICICLE_MAX 5 untouched and load-bearing). */
+export const FROSTQUENCH_2PC_CRIT_BONUS_ICICLES = 1;
+/** Frostquench 4pc: Winter's Chill charges Winterlash plants (base
+ *  WINTERS_CHILL_CHARGES 2). */
+export const FROSTQUENCH_4PC_WINTERS_CHILL_CHARGES = 3;
+
 /** The engine payloads, keyed by set id (the `set` tag on each member item
  *  and the ItemSet id in item_sets.ts). Tiers ascend by pieces. */
 export const SET_ENGINE_BONUSES: Record<string, readonly SetEngineBonusTier[]> = {
@@ -759,6 +785,94 @@ export const SET_ENGINE_BONUSES: Record<string, readonly SetEngineBonusTier[]> =
           chainHarvestMult: SPRINGMENDER_4PC_CHAIN_HARVEST_MULT,
         },
       },
+    },
+  ],
+  // ---- Mage ----
+  chronoweave: [
+    {
+      pieces: 2,
+      // Temporal Echo converts 50 percent of single-target Arcane damage
+      // instead of 40: bespoke bend at placeTemporalEcho, the ONE placement
+      // write whose baked rate both combat (echoConvertRate) and the aura
+      // tooltip (value) read back. Snapshot-at-placement: a mark placed
+      // before a gear change keeps its placed rate until re-cast. The UI
+      // group-mark classifier (value <= 0.13) stays safe at 0.5, and the
+      // echoRateFor fallback keeps base for legacy marks that never carried
+      // echoConvertRate. The healer 2pc pushback rider rides the generic
+      // global knob. Deterministic, no rng involved.
+      effect: {
+        global: { castPushbackReduction: 1 },
+        tuning: { echoConvertSingle: CHRONOWEAVE_2PC_ECHO_CONVERT_SINGLE },
+      },
+    },
+    {
+      pieces: 4,
+      // Temporal Cascade 17 -> 12 sec: a cooldownFlat row on the resolved
+      // entry, so the engine's cooldown set and the HUD's printed cooldown
+      // read the same number. Touches no rate constants, no classifier, no
+      // wire (the set doc's final-round sizing); no talent row targets
+      // temporal_cascade, so there is no row overlap. Deterministic.
+      effect: {
+        ability: [
+          {
+            ability: 'temporal_cascade',
+            cooldownFlat: -CHRONOWEAVE_4PC_CASCADE_COOLDOWN_CUT_SEC,
+          },
+        ],
+      },
+    },
+  ],
+  pyroclast: [
+    {
+      pieces: 2,
+      // Scald always crits at or below 50 percent health instead of 30: the
+      // execute threshold moves at the SOLE functional reader
+      // (fireGuaranteedCrit in combat/fire_mage.ts). The crit roll is STILL
+      // drawn exactly as before (only the outcome is overridden), so the
+      // shared rng draw order never moves for wearers or non-wearers. The
+      // caster 2pc pushback rider rides the generic global knob. The set
+      // doc's centerpiece, tuning-flagged.
+      effect: {
+        global: { castPushbackReduction: 1 },
+        tuning: { scaldExecuteHp: PYROCLAST_2PC_SCALD_EXECUTE_HP },
+      },
+    },
+    {
+      pieces: 4,
+      // Builder crits outside Phoenix Trance shave 2 sec off its cooldown
+      // instead of 1: the constant selection at the ONE shave site in
+      // fireMageOnSpellHit. Honest trigger scope (the set doc's disclosure):
+      // only the Hot Streak builders feed the seam; Meteor's ground impact
+      // and Ignite ticks never reach noteSpellHit and pay nothing.
+      // Deterministic, no rng involved.
+      effect: { tuning: { combustionCdrPerCrit: PYROCLAST_4PC_COMBUSTION_CDR_PER_CRIT } },
+    },
+  ],
+  frostquench: [
+    {
+      pieces: 2,
+      // Rimelance criticals bank a SECOND Icicle: the crit is observed at the
+      // noteSpellHit seam (frostMageOnSpellHit in combat/frost_mage.ts),
+      // because the base bank site in frostMageAfterCast cannot see the crit
+      // flag. The 5-Icicle cap stays untouched and load-bearing (its three
+      // hardcoded readers keep it), and Frozen Orb pulses stay single-bank
+      // (the set doc's disclosed dead zone). gainIcicle draws no rng, so the
+      // stream is byte-identical for everyone. The caster 2pc pushback rider
+      // rides the generic global knob.
+      effect: {
+        global: { castPushbackReduction: 1 },
+        tuning: { rimelanceCritBonusIcicles: FROSTQUENCH_2PC_CRIT_BONUS_ICICLES },
+      },
+    },
+    {
+      pieces: 4,
+      // Winterlash plants 3 Winter's Chill charges instead of 2: the charge
+      // selection at BOTH applyWintersChill branches (refresh + fresh plant).
+      // The debuff's HUD tooltip prints its live charge count, so the wearer
+      // reads 3 dynamically; the disclosed honest limits (Fingers-priority
+      // suppression, Glacial Spike GCD contention, Rimelance displacement)
+      // are the set doc's. Deterministic, no rng involved.
+      effect: { tuning: { wintersChillCharges: FROSTQUENCH_4PC_WINTERS_CHILL_CHARGES } },
     },
   ],
 };

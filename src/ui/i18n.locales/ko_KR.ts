@@ -7812,6 +7812,20 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '해일 부름의 재사용 대기시간이 4초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
   'entities.itemSets.springmender.bonus4':
     '물결 치유가 네 번째 아군에게 닿고 치유의 흐름을 150%로 거두어들입니다.',
+  'entities.itemSets.chronoweave.name': '에테르직조 예복',
+  'entities.itemSets.chronoweave.bonus2':
+    '시간의 메아리가 단일 대상 비전 피해의 50%를 치유로 전환합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+  'entities.itemSets.chronoweave.bonus4': '시간의 연쇄의 재사용 대기시간이 5초 감소합니다.',
+  'entities.itemSets.pyroclast.name': '화쇄류 예장',
+  'entities.itemSets.pyroclast.bonus2':
+    '그을리기가 생명력이 50% 이하인 대상에게 항상 치명타로 적중합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+  'entities.itemSets.pyroclast.bonus4':
+    '불사조의 무아지경이 활성화되지 않은 동안 화염 주문이 치명타로 적중하면 남은 재사용 대기시간이 2초 감소합니다.',
+  'entities.itemSets.frostquench.name': '서리담금질 직조복',
+  'entities.itemSets.frostquench.bonus2':
+    '서리 창이 치명타로 적중하면 고드름을 하나 더 저장합니다. 최대치는 5개로 유지됩니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.',
+  'entities.itemSets.frostquench.bonus4':
+    '겨울의 채찍이 혹한의 추위를 2중첩 대신 3중첩 부여합니다.',
   'entities.itemSets.slagbreaker.name': '광재파쇄자 전투복',
   'entities.itemSets.slagbreaker.bonus2': '붉은 손이 다음 불구의 일격을 중첩당 20% 대신 30% 강화합니다.',
   'entities.itemSets.slagbreaker.bonus4': '붉은 손을 두 번 시전할 때마다 돌파자의 남은 재사용 대기시간이 3초 감소합니다.',

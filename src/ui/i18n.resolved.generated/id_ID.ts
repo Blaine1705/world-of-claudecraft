@@ -18534,6 +18534,11 @@ export const id_ID: EnTranslations = {
         "name": "Garda Depan Batu Terikat",
         "bonus3": "Meningkatkan kecepatan serangan dan rapal sebesar 15%."
       },
+      "chronoweave": {
+        "name": "Aetherweave Vestments",
+        "bonus2": "Temporal Echo converts 50 percent of your single-target Arcane damage into healing. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Temporal Cascade's cooldown is reduced by 5 sec."
+      },
       "cinderfang": {
         "name": "Cinderfang Shroud",
         "bonus2": "Venom Ritual's energy refund rises to 20 per builder.",
@@ -18576,6 +18581,11 @@ export const id_ID: EnTranslations = {
         "bonus2": "Iron Resolve converts rage at 5 absorb per point instead of 4.",
         "bonus4": "Casting Shieldcrack reduces Iron Resolve's remaining cooldown by 2 sec."
       },
+      "frostquench": {
+        "name": "Frostquench Weave",
+        "bonus2": "Rimelance critical strikes bank a second Icicle, up to the maximum of 5. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Winterlash plants 3 Winter's Chill charges, up from 2."
+      },
       "greyjaw_stalker": {
         "name": "Perlengkapan Penguntit Greyjaw",
         "bonus3": "Meningkatkan kecepatan serangan dan rapal sebesar 15%."
@@ -18601,6 +18611,11 @@ export const id_ID: EnTranslations = {
         "name": "Packlord's Emberhide",
         "bonus2": "Pack Command's cooldown is reduced to 3 sec.",
         "bonus4": "Pack Command's chance to reset Stampede's cooldown rises to 30 percent."
+      },
+      "pyroclast": {
+        "name": "Pyroclast Regalia",
+        "bonus2": "Scald always critically strikes targets at or below 50 percent health. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Your Fire spells' critical strikes outside Phoenix Trance reduce its remaining cooldown by 2 sec."
       },
       "slagbreaker": {
         "name": "Slagbreaker Battlegear",
