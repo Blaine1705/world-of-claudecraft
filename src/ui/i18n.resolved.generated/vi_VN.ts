@@ -13717,6 +13717,12 @@ export const vi_VN: EnTranslations = {
       },
       "reins_thunderstrut_gobbler": {
         "name": "Dây cương Gà Tây Chúa Sải Bước Sấm"
+      },
+      "varkhul_forgebreaker": {
+        "name": "Forgebreaker, Engine of Varkhul"
+      },
+      "varkhul_emberward": {
+        "name": "Emberward, Bulwark of Varkhul"
       }
     },
     "mobs": {

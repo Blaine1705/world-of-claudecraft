@@ -13717,6 +13717,12 @@ export const en: EnTranslations = {
       },
       "reins_thunderstrut_gobbler": {
         "name": "Reins of Thunderstrut the Grand Gobbler"
+      },
+      "varkhul_forgebreaker": {
+        "name": "Forgebreaker, Engine of Varkhul"
+      },
+      "varkhul_emberward": {
+        "name": "Emberward, Bulwark of Varkhul"
       }
     },
     "mobs": {

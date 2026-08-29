@@ -13717,6 +13717,12 @@ export const pt_BR: EnTranslations = {
       },
       "reins_thunderstrut_gobbler": {
         "name": "Rédeas de Pavoneia-Trovões, o Grande Peru"
+      },
+      "varkhul_forgebreaker": {
+        "name": "Forgebreaker, Engine of Varkhul"
+      },
+      "varkhul_emberward": {
+        "name": "Emberward, Bulwark of Varkhul"
       }
     },
     "mobs": {

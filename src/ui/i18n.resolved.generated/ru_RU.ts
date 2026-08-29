@@ -13717,6 +13717,12 @@ export const ru_RU: EnTranslations = {
       },
       "reins_thunderstrut_gobbler": {
         "name": "Поводья Громоступа, великого индюка"
+      },
+      "varkhul_forgebreaker": {
+        "name": "Горнолом, машина Варкула"
+      },
+      "varkhul_emberward": {
+        "name": "Углестраж, бастион Варкула"
       }
     },
     "mobs": {

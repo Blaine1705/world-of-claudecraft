@@ -6066,6 +6066,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.quality.legendary': 'Легендарное',
   'entities.items.deathless_heartwood.name': 'Сердцевина бессмертной короны',
   'entities.items.kingsbane_last_oath.name': 'Погибель Трона, последняя клятва Торнпика',
+  'entities.items.varkhul_forgebreaker.name': 'Горнолом, машина Варкула',
+  'entities.items.varkhul_emberward.name': 'Углестраж, бастион Варкула',
   'entities.items.crownforged_dreadhelm.name': 'Костокованый шлем ужаса',
   'entities.items.crownforged_warspaulders.name': 'Костокованые боевые наплечники',
   'entities.items.nighttalon_crown.name': 'Корона Лютого Клыка',

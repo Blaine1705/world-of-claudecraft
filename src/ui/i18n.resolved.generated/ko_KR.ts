@@ -13717,6 +13717,12 @@ export const ko_KR: EnTranslations = {
       },
       "reins_thunderstrut_gobbler": {
         "name": "천둥활보 대왕 칠면조의 고삐"
+      },
+      "varkhul_forgebreaker": {
+        "name": "화로파괴자, 바르쿨의 기관"
+      },
+      "varkhul_emberward": {
+        "name": "잉걸수호자, 바르쿨의 방벽"
       }
     },
     "mobs": {

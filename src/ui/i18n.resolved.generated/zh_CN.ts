@@ -13717,6 +13717,12 @@ export const zh_CN: EnTranslations = {
       },
       "reins_thunderstrut_gobbler": {
         "name": "雷霆阔步大火鸡的缰绳"
+      },
+      "varkhul_forgebreaker": {
+        "name": "碎炉者，瓦库尔的引擎"
+      },
+      "varkhul_emberward": {
+        "name": "烬卫，瓦库尔的壁垒"
       }
     },
     "mobs": {

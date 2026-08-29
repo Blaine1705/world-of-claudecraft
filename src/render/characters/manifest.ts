@@ -755,6 +755,7 @@ const ITEM_OFFHAND_MODELS: Readonly<Record<string, string>> = {
   highwatch_wallshield: 'shield_square',
   bonewrought_bulwark: 'shield_square',
   pearlward_aegis: 'shield_round', // the first caster (int/spi) shield
+  varkhul_emberward: 'varkhul_emberward', // Ignivar raid legendary (Varkhul drop)
 };
 
 function itemModelKey(

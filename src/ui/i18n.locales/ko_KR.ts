@@ -5996,6 +5996,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.quality.legendary': '전설',
   'entities.items.deathless_heartwood.name': '죽지 않는 왕관의 심재',
   'entities.items.kingsbane_last_oath.name': '왕좌살해자, 손피크의 마지막 맹세',
+  'entities.items.varkhul_forgebreaker.name': '화로파괴자, 바르쿨의 기관',
+  'entities.items.varkhul_emberward.name': '잉걸수호자, 바르쿨의 방벽',
   'entities.items.crownforged_dreadhelm.name': '뼈벼림 공포투구',
   'entities.items.crownforged_warspaulders.name': '뼈벼림 전쟁 어깨갑옷',
   'entities.items.nighttalon_crown.name': '흉포송곳니 왕관',

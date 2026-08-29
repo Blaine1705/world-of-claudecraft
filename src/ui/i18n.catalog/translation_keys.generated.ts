@@ -2905,6 +2905,8 @@ export type TranslationKeyFlat =
   | 'entities.items.vanguard_azure_armor_plate.name'
   | 'entities.items.vanguard_bone.name'
   | 'entities.items.vanguard_chrome_armor_plate.name'
+  | 'entities.items.varkhul_emberward.name'
+  | 'entities.items.varkhul_forgebreaker.name'
   | 'entities.items.varric_shadow_cowl.name'
   | 'entities.items.veilcloth_robe.name'
   | 'entities.items.veilsteel_blade.name'

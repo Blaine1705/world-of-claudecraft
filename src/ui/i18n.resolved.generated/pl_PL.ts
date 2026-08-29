@@ -13717,6 +13717,12 @@ export const pl_PL: EnTranslations = {
       },
       "reins_thunderstrut_gobbler": {
         "name": "Wodze Gromostępa, Wielkiego Indora"
+      },
+      "varkhul_forgebreaker": {
+        "name": "Forgebreaker, Engine of Varkhul"
+      },
+      "varkhul_emberward": {
+        "name": "Emberward, Bulwark of Varkhul"
       }
     },
     "mobs": {

@@ -13717,6 +13717,12 @@ export const en_XA: EnTranslations = {
       },
       "reins_thunderstrut_gobbler": {
         "name": "[Ŕéíñš óƒ Ţĥúñðéŕšţŕúţ ţĥé Ĝŕáñð Ĝóƀƀļéŕ]"
+      },
+      "varkhul_forgebreaker": {
+        "name": "[Ƒóŕĝéƀŕéáķéŕ, Éñĝíñé óƒ Ʋáŕķĥúļ]"
+      },
+      "varkhul_emberward": {
+        "name": "[Éɱƀéŕŵáŕð, Ɓúļŵáŕķ óƒ Ʋáŕķĥúļ]"
       }
     },
     "mobs": {

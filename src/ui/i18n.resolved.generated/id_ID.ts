@@ -13717,6 +13717,12 @@ export const id_ID: EnTranslations = {
       },
       "reins_thunderstrut_gobbler": {
         "name": "Tali Kekang Kalkun Agung Penderap Guntur"
+      },
+      "varkhul_forgebreaker": {
+        "name": "Forgebreaker, Engine of Varkhul"
+      },
+      "varkhul_emberward": {
+        "name": "Emberward, Bulwark of Varkhul"
       }
     },
     "mobs": {

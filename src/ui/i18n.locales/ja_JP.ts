@@ -6011,6 +6011,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.quality.legendary': '伝説',
   'entities.items.deathless_heartwood.name': '不死王冠の心材',
   'entities.items.kingsbane_last_oath.name': 'スロウンベイン、ソーンピーク最後の誓い',
+  'entities.items.varkhul_forgebreaker.name': 'フォージブレイカー、ヴァルクールの機関',
+  'entities.items.varkhul_emberward.name': 'エンバーウォード、ヴァルクールの大盾',
   'entities.items.crownforged_dreadhelm.name': 'ボーンロートの恐怖兜',
   'entities.items.crownforged_warspaulders.name': 'ボーンロートの戦肩当て',
   'entities.items.nighttalon_crown.name': 'ダイアファングの冠',

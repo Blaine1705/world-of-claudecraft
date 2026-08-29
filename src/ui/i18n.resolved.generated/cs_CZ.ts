@@ -13717,6 +13717,12 @@ export const cs_CZ: EnTranslations = {
       },
       "reins_thunderstrut_gobbler": {
         "name": "Otěže Hromokroka, velkého krocana"
+      },
+      "varkhul_forgebreaker": {
+        "name": "Forgebreaker, Engine of Varkhul"
+      },
+      "varkhul_emberward": {
+        "name": "Emberward, Bulwark of Varkhul"
       }
     },
     "mobs": {

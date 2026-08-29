@@ -13717,6 +13717,12 @@ export const nl_NL: EnTranslations = {
       },
       "reins_thunderstrut_gobbler": {
         "name": "Teugels van Donderpronker, de Grote Kalkoen"
+      },
+      "varkhul_forgebreaker": {
+        "name": "Forgebreaker, Engine of Varkhul"
+      },
+      "varkhul_emberward": {
+        "name": "Emberward, Bulwark of Varkhul"
       }
     },
     "mobs": {

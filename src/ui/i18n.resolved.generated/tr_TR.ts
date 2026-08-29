@@ -13717,6 +13717,12 @@ export const tr_TR: EnTranslations = {
       },
       "reins_thunderstrut_gobbler": {
         "name": "Yıldırım Adımlı Büyük Hindinin Dizginleri"
+      },
+      "varkhul_forgebreaker": {
+        "name": "Forgebreaker, Engine of Varkhul"
+      },
+      "varkhul_emberward": {
+        "name": "Emberward, Bulwark of Varkhul"
       }
     },
     "mobs": {

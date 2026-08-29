@@ -284,9 +284,12 @@ describe('v0.36 placeholder-art completion evidence', () => {
     // integration's four daggers (integration-dagger-icons-2026-08-10 owns
     // their art), so the live registry minus that batch is the campaign set.
     const INTEGRATION_WEAPON_IDS = ['boneglass_shiv', 'duskwhisper', 'marrowpoint', 'rimefang'];
+    // The Ignivar legendary maul postdates the campaign the same way (its art
+    // batch is ignivar-varkhul-drop-renders-2026-08-28).
+    const POST_CAMPAIGN_WEAPON_IDS = [...INTEGRATION_WEAPON_IDS, 'varkhul_forgebreaker'];
     expect(targets.weaponItems).toEqual(
       sorted(
-        Object.keys(ITEM_WEAPON_VARIANTS).filter((id) => !INTEGRATION_WEAPON_IDS.includes(id)),
+        Object.keys(ITEM_WEAPON_VARIANTS).filter((id) => !POST_CAMPAIGN_WEAPON_IDS.includes(id)),
       ),
     );
     expect(targets.itemCleanup).toEqual([...CLEANUP_ITEM_IDS]);

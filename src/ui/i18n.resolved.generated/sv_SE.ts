@@ -13717,6 +13717,12 @@ export const sv_SE: EnTranslations = {
       },
       "reins_thunderstrut_gobbler": {
         "name": "Tyglar till Åskstoltseraren, den stora kalkonen"
+      },
+      "varkhul_forgebreaker": {
+        "name": "Forgebreaker, Engine of Varkhul"
+      },
+      "varkhul_emberward": {
+        "name": "Emberward, Bulwark of Varkhul"
       }
     },
     "mobs": {

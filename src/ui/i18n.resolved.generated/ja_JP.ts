@@ -13717,6 +13717,12 @@ export const ja_JP: EnTranslations = {
       },
       "reins_thunderstrut_gobbler": {
         "name": "大七面鳥サンダーストラットの手綱"
+      },
+      "varkhul_forgebreaker": {
+        "name": "フォージブレイカー、ヴァルクールの機関"
+      },
+      "varkhul_emberward": {
+        "name": "エンバーウォード、ヴァルクールの大盾"
       }
     },
     "mobs": {

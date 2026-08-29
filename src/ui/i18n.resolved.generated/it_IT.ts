@@ -13717,6 +13717,12 @@ export const it_IT: EnTranslations = {
       },
       "reins_thunderstrut_gobbler": {
         "name": "Redini di Passotuono, il Gran Tacchino"
+      },
+      "varkhul_forgebreaker": {
+        "name": "Forgebreaker, Engine of Varkhul"
+      },
+      "varkhul_emberward": {
+        "name": "Emberward, Bulwark of Varkhul"
       }
     },
     "mobs": {

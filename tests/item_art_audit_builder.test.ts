@@ -17,6 +17,7 @@ import {
   renderItemArtAuditPreview,
   updateItemArtAuditVerdict,
 } from '../scripts/lib/item_art_audit.mjs';
+import { ITEMS } from '../src/sim/data';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const temporaryRoots: string[] = [];
@@ -760,11 +761,13 @@ describe('item-art audit builder', () => {
     ) as Record<string, unknown>;
     expect(verified).toMatchObject({
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      catalogSha256: 'ec47b8140b2f19caeddd869ee6a2bcb51f6965294b0fa93a1eeddf06d9c4c914',
-      catalogBytes: 454802,
+      catalogSha256: '2c07feabe3c173f63296c3189895f38373e17d303e3b004819ead32d5c485c8f',
+      catalogBytes: 455895,
       rendererFingerprint: 'fd92c41a206cd55b05a1de94c4789f6eb6ca4200d063f4bbd284c21ae03b6082',
-      catalogCount: 829,
-      liveItemCount: 844,
+      catalogCount: 831,
+      // Derived from the live table, not restated from the script's expected
+      // block, so the two cannot drift in lockstep.
+      liveItemCount: Object.keys(ITEMS).length,
       generatedHeroicDefinitions: 64,
       heroicDefinitionsWithOwnWebp: 48,
       heroicWeaponArtAliases: 16,
@@ -773,7 +776,7 @@ describe('item-art audit builder', () => {
       sheetCount: 208,
       sheetModeCounts: Object.fromEntries(ITEM_ART_AUDIT_MODES.map((mode) => [mode, 26])),
       sheetSetSha256: null,
-      shippingCatalogSha256: '92015c29b0abcb6f1fbb4cdeba01917e7fe4ae641df8bcd3076974a19ce56c97',
+      shippingCatalogSha256: '232ed65a14b786f1904948476fb5119a670b760b12ff3f057c87c85632fb7e61',
       machineChecksPassed: true,
       verdict: null,
     });

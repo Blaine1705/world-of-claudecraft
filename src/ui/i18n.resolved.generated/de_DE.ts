@@ -13717,6 +13717,12 @@ export const de_DE: EnTranslations = {
       },
       "reins_thunderstrut_gobbler": {
         "name": "Zügel von Donnerstolz, dem Großen Puter"
+      },
+      "varkhul_forgebreaker": {
+        "name": "Forgebreaker, Engine of Varkhul"
+      },
+      "varkhul_emberward": {
+        "name": "Emberward, Bulwark of Varkhul"
       }
     },
     "mobs": {

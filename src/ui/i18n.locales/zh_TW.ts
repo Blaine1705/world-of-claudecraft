@@ -5814,6 +5814,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.quality.legendary': '傳說',
   'entities.items.deathless_heartwood.name': '不朽王冠之心木',
   'entities.items.kingsbane_last_oath.name': '弒座者，荊峰的最後誓言',
+  'entities.items.varkhul_forgebreaker.name': '碎爐者，瓦庫爾的引擎',
+  'entities.items.varkhul_emberward.name': '燼衛，瓦庫爾的壁壘',
   'entities.items.crownforged_dreadhelm.name': '骨鑄恐懼頭盔',
   'entities.items.crownforged_warspaulders.name': '骨鑄戰肩甲',
   'entities.items.nighttalon_crown.name': '厲牙之冠',

@@ -139,6 +139,12 @@ export const WEAPON_GRIP_OVERRIDES: Record<string, WeaponGripOverride> = {
   lacquered_rod: { pos: [0.0606, 0.1259, -0.0094], rot: [0, 0, -46.2693] },
   fletcher_s_guild_bow: { pos: [-0.2237, 0, 0.0851], scale: 1.39 },
   shard_of_everwinter: { pos: [0, 0.0687, 0.1538], rot: [35.7041, 0, 0] },
+  // Ignivar raid legendary (unit-normalized Tripo build, re-origined at the
+  // grip in tmp/varkhul_drops_build.mjs). Owner-tuned against live play:
+  // 1.66 sits well under the starfall legendary benchmark (the engine head
+  // carries the bulk); the 180 yaw about the haft is the owner's final pick
+  // for how the head reads at rest.
+  hammer_varkhul: { rot: [0, 180, 0], scale: 1.66 },
 };
 
 export interface GripTransform {
