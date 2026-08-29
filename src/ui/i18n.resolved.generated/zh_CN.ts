@@ -17615,6 +17615,11 @@ export const zh_CN: EnTranslations = {
         "enterText": "你穿过封印的王室之门。",
         "leaveText": "你回到荆峰的寒冷空气中。"
       },
+      "ignivar_forge_lift": {
+        "name": "锻炉升降梯",
+        "enterText": "锻炉升降梯轰然震颤，缓缓下沉；锻锤的轰鸣迎面而来。",
+        "leaveText": "升降梯将你拉回要塞的露天高处。"
+      },
       "ignivar_forge_approach": {
         "name": "首锻大厅",
         "enterText": "锻锤的轰鸣在首锻大厅中回荡。",

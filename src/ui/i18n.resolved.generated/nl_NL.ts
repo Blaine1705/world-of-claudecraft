@@ -17615,10 +17615,15 @@ export const nl_NL: EnTranslations = {
         "enterText": "Je gaat door de verzegelde koninklijke deur.",
         "leaveText": "Je keert terug naar de koude lucht van Doorntop."
       },
-      "ignivar_forge_approach": {
-        "name": "Halls of the First Tempering",
+      "ignivar_forge_lift": {
+        "name": "The Forge-Lift",
         "enterText": "The forge-lift shudders and sinks; hammerfall rises to meet you.",
         "leaveText": "The lift hauls you back into the open air of the keep."
+      },
+      "ignivar_forge_approach": {
+        "name": "Halls of the First Tempering",
+        "enterText": "Hammerfall echoes through the Halls of the First Tempering.",
+        "leaveText": "You step away from the first forge and breathe freely again."
       },
       "ignivar_raid_arena": {
         "name": "Crucible of the Last Spring",

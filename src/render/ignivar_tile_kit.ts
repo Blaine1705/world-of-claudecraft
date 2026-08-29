@@ -58,7 +58,12 @@ export function ignivarTileKind(variant: string, kind: string): string {
 
 /** Whether an interior id is one of the three Ignivar raid rooms. */
 export function isIgnivarInterior(interior: string): boolean {
-  return interior === 'ignivar' || interior === 'ignivar_approach' || interior === 'ignivar_depths';
+  return (
+    interior === 'ignivar' ||
+    interior === 'ignivar_approach' ||
+    interior === 'ignivar_depths' ||
+    interior === 'ignivar_lift'
+  );
 }
 
 // The Ignivar raid's dark-iron structural duplicates. Loaded only when one of

@@ -46,17 +46,14 @@ describe('Ignivar raid gate', () => {
       height: 6.4,
     });
     expect(ignivarRaidGatePlan('dungeon_door', 'hollow_crypt')).toBeNull();
-    // the forge-lift antechamber's portcullis rides the same view seam
-    expect(ignivarRaidGatePlan('ignivar_lift_gate_locked', null)).toEqual({
+    // the Forge-Lift's sealed portcullis rides the same view seam; once
+    // unlocked it IS a 'dungeon_door' and takes the generic portal body
+    expect(ignivarRaidGatePlan('ignivar_lift_gate_locked', 'ignivar_forge_approach')).toEqual({
       open: false,
       height: 7.2,
       kind: 'lift',
     });
-    expect(ignivarRaidGatePlan('ignivar_lift_gate_open', null)).toEqual({
-      open: true,
-      height: 7.2,
-      kind: 'lift',
-    });
+    expect(ignivarRaidGatePlan('dungeon_door', 'ignivar_forge_approach')).toBeNull();
 
     const rendererSource = readFileSync(
       new URL('../src/render/renderer.ts', import.meta.url),
@@ -69,9 +66,9 @@ describe('Ignivar raid gate', () => {
       new URL('../src/render/dungeon.ts', import.meta.url),
       'utf8',
     );
-    expect(dungeonSource).toMatch(
-      /interior === 'ignivar_depths'[\s\S]{0,120}\? IGNIVAR_SECOND_WING_LAYOUT/,
-    );
+    // ignivar_depths (and every newer interior, the Forge-Lift included)
+    // resolves through the INTERIOR_LAYOUTS registry fallback
+    expect(dungeonSource).toMatch(/INTERIOR_LAYOUTS\[interior\] \?\? CRYPT_LAYOUT/);
     expect(dungeonSource).toMatch(
       /interior === 'ignivar_approach'[\s\S]{0,120}\? IGNIVAR_FORGE_APPROACH_LAYOUT/,
     );

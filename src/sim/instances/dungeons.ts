@@ -20,7 +20,7 @@ import { DUNGEON_X_THRESHOLD, DUNGEONS, dungeonAt, instanceOrigin, MOBS, NPCS } 
 import { clearIgnivarEncounterAuras } from '../encounters/ignivar';
 import { clearVarkhulEncounterAuras } from '../encounters/varkhul';
 import { createGroundObject, createMob, createNpc } from '../entity';
-import { clampIgnivarForgeLift, updateIgnivarForgeLift } from '../ignivar_forge_lift';
+import { updateIgnivarForgeLift } from '../ignivar_forge_lift';
 import {
   IGNIVAR_RAID_ARENA_ID,
   IGNIVAR_RAID_ROOM_IDS,
@@ -277,10 +277,6 @@ function touchesExitPortal(ctx: SimContext, p: Entity, exitId: number | null): b
 // Party members who walk in land in the same instance via instanceKeyFor.
 export function updateDoorTriggers(ctx: SimContext, p: Entity): void {
   if (p.kind !== 'player') return;
-  // The forge-lift's sealed inner gate rides this per-player pass: it is a
-  // runtime crossing clamp (zero rng), the same cadence and shape as the
-  // rift portcullis, kept beside the other per-player instance checks.
-  clampIgnivarForgeLift(ctx, p);
   if (p.pos.x > DUNGEON_X_THRESHOLD) {
     // inside: walking into the entrance exit, or the boss-death portal a
     // bossExitPortal dungeon opens at the far end, climbs back out

@@ -8,6 +8,7 @@ import type { Collider, ObbCollider } from '../src/sim/colliders';
 import { DUNGEONS } from '../src/sim/data';
 import {
   IGNIVAR_FORGE_APPROACH_LAYOUT,
+  IGNIVAR_LIFT_LAYOUT,
   IGNIVAR_SECOND_WING_LAYOUT,
 } from '../src/sim/dungeon_layout';
 import {
@@ -22,6 +23,12 @@ import { derivedInteriorColliders } from '../src/sim/interior_collider_sets';
 /** Every room carrying a hand-placed floor pass rides the same contracts;
  *  per-room floors pin the pass sizes so a gutted bake fails loudly. */
 const ROOMS = [
+  {
+    interior: 'ignivar_lift',
+    layout: IGNIVAR_LIFT_LAYOUT,
+    minFloorProps: 8,
+    minSpawnPoints: 0,
+  },
   {
     interior: 'ignivar_approach',
     layout: IGNIVAR_FORGE_APPROACH_LAYOUT,

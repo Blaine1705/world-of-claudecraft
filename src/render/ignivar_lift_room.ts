@@ -11,22 +11,25 @@
 //    through the car. Zero per-frame CPU: every motion lives in shaders
 //    driven by sharedUniforms.uTime.
 import * as THREE from 'three';
-import { IGNIVAR_LIFT_GATE_HALF_WIDTH, IGNIVAR_LIFT_GATE_Z } from '../sim/ignivar_forge_lift';
 import { EMISSIVE_GLOW, sharedUniforms, surfaceMat } from './gfx';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 
 export const IGNIVAR_LIFT_GATE_HEIGHT = 7.2;
+// The portcullis frame's half width (the doorway in the car's exit wall).
+const IGNIVAR_LIFT_GATE_HALF_WIDTH = 5;
 export const LIFT_SHAFT_PROGRAM_CACHE_KEY = 'ignivar-lift-shaft-v1';
 export const LIFT_DUST_PROGRAM_CACHE_KEY = 'ignivar-lift-dust-v1';
 
-// The car interior the shaft sheets wrap: the entry pocket walled to
-// x +-8 by the grille props, z -58 (shell wall) to the gate line.
-const CAR_HALF_WIDTH = IGNIVAR_LIFT_GATE_HALF_WIDTH;
-const CAR_Z_MIN = -58;
+// The car interior the shaft sheets wrap: the Forge-Lift's OWN room
+// (interior 'ignivar_lift', shell walls at x +-10, z +-8), its sides
+// lined by grille props at x +-8. The sheets hang between the grilles
+// and the shell wall's inner face (x 9), so the bars read against the
+// moving shaft.
+const ROOM_GRILLE_X = 8;
+const CAR_Z_MIN = -8;
+const CAR_Z_MAX = 8;
 const SHAFT_HEIGHT = 16; // the ignivar double wall course
-// Outside the grilles AND the shaft-gap gearwork (the gear_machine at
-// x -10.6): the machinery lives between the bars and the moving wall.
-const SHAFT_SHEET_X = CAR_HALF_WIDTH + 3.5;
+const SHAFT_SHEET_X = 8.7;
 
 function block(
   name: string,
@@ -57,21 +60,31 @@ export function buildIgnivarLiftGate(open: boolean): THREE.Group {
     emissiveIntensity: open ? EMISSIVE_GLOW * 0.25 : EMISSIVE_GLOW,
     roughness: 0.4,
   });
-  const width = CAR_HALF_WIDTH * 2;
+  const width = IGNIVAR_LIFT_GATE_HALF_WIDTH * 2;
   group.add(
-    block('left-post', [0.8, IGNIVAR_LIFT_GATE_HEIGHT, 0.9], [-CAR_HALF_WIDTH, 3.6, 0], iron),
+    block(
+      'left-post',
+      [0.8, IGNIVAR_LIFT_GATE_HEIGHT, 0.9],
+      [-IGNIVAR_LIFT_GATE_HALF_WIDTH, 3.6, 0],
+      iron,
+    ),
   );
   group.add(
-    block('right-post', [0.8, IGNIVAR_LIFT_GATE_HEIGHT, 0.9], [CAR_HALF_WIDTH, 3.6, 0], iron),
+    block(
+      'right-post',
+      [0.8, IGNIVAR_LIFT_GATE_HEIGHT, 0.9],
+      [IGNIVAR_LIFT_GATE_HALF_WIDTH, 3.6, 0],
+      iron,
+    ),
   );
   group.add(
     block('bar-track', [width + 1.6, 0.9, 1.0], [0, IGNIVAR_LIFT_GATE_HEIGHT - 0.45, 0], track),
   );
-  const barCount = 13;
+  const barCount = 9;
   const barLength = open ? 1.0 : IGNIVAR_LIFT_GATE_HEIGHT - 0.9;
   const barTop = IGNIVAR_LIFT_GATE_HEIGHT - 0.9;
   for (let index = 0; index < barCount; index++) {
-    const x = -CAR_HALF_WIDTH + 0.9 + (index / (barCount - 1)) * (width - 1.8);
+    const x = -IGNIVAR_LIFT_GATE_HALF_WIDTH + 0.9 + (index / (barCount - 1)) * (width - 1.8);
     group.add(block(`bar-${index}`, [0.22, barLength, 0.22], [x, barTop - barLength / 2, 0], iron));
   }
   group.add(
@@ -126,7 +139,7 @@ let shaftMat: THREE.MeshBasicMaterial | null = null;
 
 function shaftSheetGeometry(): THREE.BufferGeometry {
   shaftGeo ??= markSharedGeometry(
-    new THREE.PlaneGeometry(Math.abs(IGNIVAR_LIFT_GATE_Z - CAR_Z_MIN) + 2.4, SHAFT_HEIGHT),
+    new THREE.PlaneGeometry(Math.abs(CAR_Z_MAX - CAR_Z_MIN) + 2.4, SHAFT_HEIGHT),
   );
   return shaftGeo;
 }
@@ -192,9 +205,9 @@ function buildDustCloud(count: number): THREE.Points {
   };
   const positions = new Float32Array(count * 3);
   const phases = new Float32Array(count);
-  const carDepth = Math.abs(IGNIVAR_LIFT_GATE_Z - CAR_Z_MIN);
+  const carDepth = Math.abs(CAR_Z_MAX - CAR_Z_MIN);
   for (let index = 0; index < count; index++) {
-    positions[index * 3] = (rnd() * 2 - 1) * (CAR_HALF_WIDTH - 1);
+    positions[index * 3] = (rnd() * 2 - 1) * (ROOM_GRILLE_X - 1);
     positions[index * 3 + 1] = rnd() * 1.5;
     positions[index * 3 + 2] = CAR_Z_MIN + 1 + rnd() * (carDepth - 2);
     phases[index] = rnd();
@@ -214,7 +227,7 @@ function buildDustCloud(count: number): THREE.Points {
 export function buildIgnivarLiftShaft(lowGfx: boolean): THREE.Group {
   const group = new THREE.Group();
   group.name = 'ignivarLiftShaft';
-  const zCenter = (IGNIVAR_LIFT_GATE_Z + CAR_Z_MIN) / 2;
+  const zCenter = (CAR_Z_MAX + CAR_Z_MIN) / 2;
   for (const side of [-1, 1]) {
     const sheet = new THREE.Mesh(shaftSheetGeometry(), shaftSheetMaterial());
     sheet.name = side < 0 ? 'liftShaftWest' : 'liftShaftEast';
@@ -315,7 +328,8 @@ export function decorateLiftWinchMaterial(material: THREE.Material): THREE.Mater
 export const ignivarLiftRoomInternalsForTest = {
   shaftSheetMaterial,
   dustMaterial,
-  carHalfWidth: CAR_HALF_WIDTH,
+  roomGrilleX: ROOM_GRILLE_X,
   carZMin: CAR_Z_MIN,
+  carZMax: CAR_Z_MAX,
   shaftSheetX: SHAFT_SHEET_X,
 };

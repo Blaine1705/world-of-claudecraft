@@ -13,20 +13,23 @@ import type { InstanceSlot } from './sim';
 import type { SimContext } from './sim_context';
 import type { Entity } from './types';
 
-function unlockGateTo(ctx: SimContext, instance: InstanceSlot, destinationId: string): void {
+export function unlockGateTo(
+  ctx: SimContext,
+  instance: InstanceSlot,
+  destinationId: string,
+  lockedTemplate: string = IGNIVAR_GATE_LOCKED_TEMPLATE,
+): Entity | null {
   const gate = instance.objectIds
     .map((id) => ctx.entities.get(id))
-    .find(
-      (entity) =>
-        entity?.templateId === IGNIVAR_GATE_LOCKED_TEMPLATE && entity.dungeonId === destinationId,
-    );
-  if (!gate) return;
+    .find((entity) => entity?.templateId === lockedTemplate && entity.dungeonId === destinationId);
+  if (!gate) return null;
   gate.templateId = 'dungeon_door';
   gate.lootable = true;
   ctx.dungeonDoorIds ??= [];
   if (!ctx.dungeonDoorIds.includes(gate.id)) {
     ctx.dungeonDoorIds.push(gate.id);
   }
+  return gate;
 }
 
 export function ignivarApproachGuardiansDefeated(ctx: SimContext, instance: InstanceSlot): boolean {

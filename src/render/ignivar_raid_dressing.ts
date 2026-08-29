@@ -14,6 +14,7 @@ import {
   ignivarApproachPropPlan,
   ignivarArenaPropPlan,
   ignivarCruciblePropPlan,
+  ignivarLiftPropPlan,
 } from './ignivar_dressing_plan_core';
 import { appendIgnivarEnvProps, prepareIgnivarEnvProps } from './ignivar_env_props';
 import { buildIgnivarLiftShaft } from './ignivar_lift_room';
@@ -24,6 +25,7 @@ import { addTorchGlowDecal } from './torch_glow_decal';
 export const IGNIVAR_APPROACH_DRESSING_NAME = 'ignivarForgeApproachDressing';
 export const IGNIVAR_ARENA_DRESSING_NAME = 'ignivarCrucibleArenaDressing';
 export const VARKHUL_CRUCIBLE_DRESSING_NAME = 'varkhulInnerCrucibleDressing';
+export const IGNIVAR_LIFT_DRESSING_NAME = 'ignivarForgeLiftDressing';
 export const IGNIVAR_APPROACH_CLEAR_HALF_WIDTH = 7.5;
 
 type PropAppender = typeof appendIgnivarEnvProps;
@@ -37,7 +39,10 @@ function sharedMaterial(options: Parameters<typeof surfaceMat>[0]): THREE.Materi
 }
 
 export function ensureIgnivarRaidDressingAssets(interior: string): Promise<void> {
-  return interior === 'ignivar_approach' || interior === 'ignivar' || interior === 'ignivar_depths'
+  return interior === 'ignivar_approach' ||
+    interior === 'ignivar' ||
+    interior === 'ignivar_depths' ||
+    interior === 'ignivar_lift'
     ? prepareIgnivarEnvProps().catch(() => undefined)
     : Promise.resolve();
 }
@@ -113,9 +118,6 @@ function buildForgeApproachDressing(
   const placements = filterIgnivarPropPlacements(ignivarApproachPropPlan(layout), lowGfx);
   appendProps(group, placements, lowGfx);
   addPropGlowPools(group, placements, lowGfx);
-  // The forge-lift car's descending-shaft illusion wraps the entry pocket
-  // (self-animating on the shared uTime clock, zero per-frame CPU).
-  group.add(buildIgnivarLiftShaft(lowGfx));
   const halfWidth = layout.floorHalfX ?? layout.wallX ?? 18;
   const sideX = Math.max(IGNIVAR_APPROACH_CLEAR_HALF_WIDTH + 2, Math.min(halfWidth - 3.5, 13));
   const length = Math.max(12, layout.zMax - layout.zMin - 10);
@@ -161,6 +163,22 @@ function buildForgeApproachDressing(
   stations.instanceMatrix.needsUpdate = true;
   group.add(stations);
   group.userData.clearHalfWidth = IGNIVAR_APPROACH_CLEAR_HALF_WIDTH;
+  return group;
+}
+
+/** The Forge-Lift car: the grille-and-machinery seed plan plus the
+ *  descending-shaft illusion (self-animating on the shared uTime clock,
+ *  zero per-frame CPU). */
+function buildForgeLiftDressing(
+  layout: DungeonLayout,
+  lowGfx: boolean,
+  appendProps: PropAppender = appendIgnivarEnvProps,
+): THREE.Group {
+  const group = markDressing(new THREE.Group(), IGNIVAR_LIFT_DRESSING_NAME);
+  const placements = filterIgnivarPropPlacements(ignivarLiftPropPlan(layout), lowGfx);
+  appendProps(group, placements, lowGfx);
+  addPropGlowPools(group, placements, lowGfx);
+  group.add(buildIgnivarLiftShaft(lowGfx));
   return group;
 }
 
@@ -225,6 +243,7 @@ export interface IgnivarTorchFire {
 }
 
 function ignivarRoomPropPlan(interior: string, layout: DungeonLayout): IgnivarPropPlacement[] {
+  if (interior === 'ignivar_lift') return ignivarLiftPropPlan(layout);
   if (interior === 'ignivar_approach') return ignivarApproachPropPlan(layout);
   if (interior === 'ignivar') return ignivarArenaPropPlan(layout);
   if (interior === 'ignivar_depths') return ignivarCruciblePropPlan(layout);
@@ -238,13 +257,15 @@ export function buildIgnivarRaidDressing(
   torchFire?: IgnivarTorchFire,
 ): THREE.Group | null {
   const group =
-    interior === 'ignivar_approach'
-      ? buildForgeApproachDressing(layout, lowGfx)
-      : interior === 'ignivar'
-        ? buildCrucibleArenaDressing(layout, lowGfx)
-        : interior === 'ignivar_depths'
-          ? buildInnerCrucibleDressing(layout, lowGfx)
-          : null;
+    interior === 'ignivar_lift'
+      ? buildForgeLiftDressing(layout, lowGfx)
+      : interior === 'ignivar_approach'
+        ? buildForgeApproachDressing(layout, lowGfx)
+        : interior === 'ignivar'
+          ? buildCrucibleArenaDressing(layout, lowGfx)
+          : interior === 'ignivar_depths'
+            ? buildInnerCrucibleDressing(layout, lowGfx)
+            : null;
   if (group && torchFire) {
     // Fire for the plan's placed torches, on the same tier filtering the
     // meshes get so a dropped density torch never leaves an orphan flame.

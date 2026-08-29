@@ -3478,7 +3478,6 @@ export interface DungeonObjectSpawn {
     | 'dungeon_exit'
     | 'ignivar_raid_gate_locked'
     | 'ignivar_lift_gate_locked'
-    | 'ignivar_lift_gate_open'
     | 'ignivar_water_conduit_ready'
     | 'ignivar_water_conduit_active'
     | 'ignivar_water_conduit_cooldown';
@@ -3525,6 +3524,7 @@ export interface DungeonDef {
     | 'nythraxis'
     | 'ignivar'
     | 'ignivar_approach'
+    | 'ignivar_lift'
     | 'ignivar_depths'
     | 'wildheart'
     | 'lastkeep'

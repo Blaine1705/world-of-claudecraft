@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import {
   IGNIVAR_GATE_LOCKED_TEMPLATE,
   IGNIVAR_LIFT_GATE_LOCKED_TEMPLATE,
-  IGNIVAR_LIFT_GATE_OPEN_TEMPLATE,
   IGNIVAR_SECOND_WING_ID,
 } from '../sim/ignivar_raid_ids';
 import { EMISSIVE_GLOW, surfaceMat } from './gfx';
@@ -28,10 +27,10 @@ export function ignivarRaidGatePlan(
     return { open: true, height: IGNIVAR_RAID_GATE_HEIGHT };
   }
   if (templateId === IGNIVAR_LIFT_GATE_LOCKED_TEMPLATE) {
+    // sealed through the ride; the unlock swaps it to 'dungeon_door', which
+    // falls through to the generic arch + swirl portal (the room-crossing
+    // look every raid gate opens into)
     return { open: false, height: IGNIVAR_LIFT_GATE_HEIGHT, kind: 'lift' };
-  }
-  if (templateId === IGNIVAR_LIFT_GATE_OPEN_TEMPLATE) {
-    return { open: true, height: IGNIVAR_LIFT_GATE_HEIGHT, kind: 'lift' };
   }
   return null;
 }

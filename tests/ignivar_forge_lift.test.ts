@@ -1,77 +1,81 @@
-// The forge-lift antechamber: the entry pocket rides "down" for a fixed
-// spell after the claim (the room never moves; presentation sells it),
-// with the inner gate sealed as a runtime crossing clamp until the ride
-// ends, then swapped open in place for the rest of the claim.
+// The Forge-Lift: the raid family's first room, a sealed car between two
+// portals. The overworld keep door teleports the raid in; for a fixed ride
+// the exit gate stays a locked object (a sealed room, no sightline and no
+// crossing), then it swaps into an ordinary room-crossing portal to the
+// Halls through the same unlock the Sealed Herald Gate uses.
 import { describe, expect, it } from 'vitest';
-import { DUNGEONS, instanceOrigin } from '../src/sim/data';
-import {
-  clampIgnivarForgeLift,
-  IGNIVAR_LIFT_GATE_Z,
-  IGNIVAR_LIFT_RIDE_SECONDS,
-} from '../src/sim/ignivar_forge_lift';
+import { DUNGEONS } from '../src/sim/data';
+import { IGNIVAR_LIFT_RIDE_SECONDS, ignivarLiftArrived } from '../src/sim/ignivar_forge_lift';
 import {
   IGNIVAR_FORGE_APPROACH_ID,
   IGNIVAR_LIFT_GATE_LOCKED_TEMPLATE,
-  IGNIVAR_LIFT_GATE_OPEN_TEMPLATE,
+  IGNIVAR_LIFT_ROOM_ID,
+  ignivarPreviousRaidRoom,
 } from '../src/sim/ignivar_raid_ids';
-import { enterDungeon } from '../src/sim/instances/dungeons';
+import { enterDungeon, updateDoorTriggers } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
 
-function boardLift(seed = 4711) {
-  const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: true, devCommands: true });
-  const entered = enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, sim.player.id, true);
-  if (!entered) throw new Error('could not board the forge-lift');
-  const inst = sim.instances.find(
-    (candidate) => candidate.dungeonId === IGNIVAR_FORGE_APPROACH_ID && candidate.partyKey !== null,
+function boardLift() {
+  const sim = new Sim({ seed: 4711, playerClass: 'warrior', devCommands: true });
+  const allyPid = sim.addPlayer('paladin', 'Lift Ally');
+  const raid = sim.ctx.formDungeonFinderGroup(
+    [sim.player.id, allyPid].map((pid) => ({ partyId: null, leaderPid: pid, members: [pid] })),
+    { raid: true },
   );
-  if (!inst) throw new Error('no approach claim formed');
-  const origin = instanceOrigin(DUNGEONS[IGNIVAR_FORGE_APPROACH_ID].index, inst.slot);
+  if (!raid) throw new Error('lift test raid did not form');
+  if (!enterDungeon(sim.ctx, IGNIVAR_LIFT_ROOM_ID, sim.player.id, true))
+    throw new Error('could not board the forge-lift');
+  const inst = sim.instances.find(
+    (candidate) => candidate.dungeonId === IGNIVAR_LIFT_ROOM_ID && candidate.partyKey !== null,
+  );
+  if (!inst) throw new Error('no lift claim formed');
   const gate = () => {
     for (const id of inst.objectIds) {
       const entity = sim.entities.get(id);
       if (
         entity &&
         (entity.templateId === IGNIVAR_LIFT_GATE_LOCKED_TEMPLATE ||
-          entity.templateId === IGNIVAR_LIFT_GATE_OPEN_TEMPLATE)
+          entity.templateId === 'dungeon_door')
       )
         return entity;
     }
     throw new Error('no lift gate in the claim');
   };
-  return { sim, inst, origin, gate };
+  return { sim, inst, gate };
 }
 
-describe('the forge-lift antechamber', () => {
-  it('spawns the sealed gate on the line and lands the rider inside the car', () => {
-    const { sim, origin, gate } = boardLift();
+describe('the Forge-Lift room', () => {
+  it('is the raid chain head: keep door in, the Halls chained behind it', () => {
+    expect(ignivarPreviousRaidRoom(IGNIVAR_LIFT_ROOM_ID)).toBeNull();
+    expect(ignivarPreviousRaidRoom(IGNIVAR_FORGE_APPROACH_ID)).toBe(IGNIVAR_LIFT_ROOM_ID);
+    expect(DUNGEONS[IGNIVAR_LIFT_ROOM_ID]).toMatchObject({
+      doorPos: { x: 503.05, z: 2243.7 },
+      interior: 'ignivar_lift',
+      guideVisible: false,
+      suggestedPlayers: 10,
+    });
+    // the Halls yielded their overworld door to the lift
+    expect(DUNGEONS[IGNIVAR_FORGE_APPROACH_ID].overworldDoor).toBe(false);
+  }, 40000);
+
+  it('seals the car through the ride: locked gate, no walk-through, entry refused', () => {
+    const { sim, gate } = boardLift();
     expect(gate().templateId).toBe(IGNIVAR_LIFT_GATE_LOCKED_TEMPLATE);
-    expect(gate().pos.z - origin.z).toBeCloseTo(IGNIVAR_LIFT_GATE_Z);
-    // the rider lands in the car, behind the sealed line
-    expect(sim.player.pos.z - origin.z).toBeLessThan(IGNIVAR_LIFT_GATE_Z);
-  });
-
-  it('clamps a rider walking across the sealed line back into the car', () => {
-    const { sim, origin } = boardLift();
+    expect(gate().lootable).toBe(false);
+    expect(sim.ctx.dungeonDoorIds ?? []).not.toContain(gate().id);
+    // standing ON the sealed gate triggers nothing (it is not a door yet)
     const p = sim.player;
+    p.pos.x = gate().pos.x;
+    p.pos.z = gate().pos.z;
     p.prevPos = { ...p.pos };
-    p.pos.z = origin.z + IGNIVAR_LIFT_GATE_Z + 0.4; // stepped past the bars
-    clampIgnivarForgeLift(sim.ctx, p);
-    expect(p.pos.z - origin.z).toBeLessThan(IGNIVAR_LIFT_GATE_Z - 0.9);
-    expect(p.prevPos.z).toBeCloseTo(p.pos.z);
-  });
+    updateDoorTriggers(sim.ctx, p);
+    expect(sim.instanceInfoAt(p.pos)?.dungeonId).toBe(IGNIVAR_LIFT_ROOM_ID);
+    // and the chained Halls refuse a live entry while the gate is sealed
+    expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, p.id, false)).toBe(false);
+  }, 40000);
 
-  it('holds a hall-side body out the same way (the sealed gate is solid both ways)', () => {
-    const { sim, origin } = boardLift();
-    const p = sim.player;
-    p.pos.z = origin.z + IGNIVAR_LIFT_GATE_Z + 1.4;
-    p.prevPos = { ...p.pos };
-    p.pos.z = origin.z + IGNIVAR_LIFT_GATE_Z - 0.4; // pushing back INTO the car
-    clampIgnivarForgeLift(sim.ctx, p);
-    expect(p.pos.z - origin.z).toBeGreaterThan(IGNIVAR_LIFT_GATE_Z + 0.9);
-  });
-
-  it('arrives after the ride: the gate swaps open, grinds, and stops clamping', () => {
-    const { sim, origin, gate } = boardLift();
+  it('arrives: the gate becomes the portal into the Halls and the walk-in works', () => {
+    const { sim, gate } = boardLift();
     let grind = false;
     let arrivalLog = false;
     for (let tick = 0; tick < 20 * (IGNIVAR_LIFT_RIDE_SECONDS + 2); tick++) {
@@ -81,34 +85,39 @@ describe('the forge-lift antechamber', () => {
           arrivalLog = true;
       }
     }
-    expect(gate().templateId).toBe(IGNIVAR_LIFT_GATE_OPEN_TEMPLATE);
+    expect(gate().templateId).toBe('dungeon_door');
+    expect(gate().dungeonId).toBe(IGNIVAR_FORGE_APPROACH_ID);
+    expect(gate().lootable).toBe(true);
+    expect(sim.ctx.dungeonDoorIds ?? []).toContain(gate().id);
     expect(grind).toBe(true);
     expect(arrivalLog).toBe(true);
-    // the clamp releases with the swap: walking out now sticks
+    // stepping into the opened portal crosses into the Halls
     const p = sim.player;
-    p.pos.x = origin.x;
-    p.pos.z = origin.z + IGNIVAR_LIFT_GATE_Z - 1.5;
+    p.pos.x = gate().pos.x;
+    p.pos.z = gate().pos.z;
     p.prevPos = { ...p.pos };
-    p.pos.z = origin.z + IGNIVAR_LIFT_GATE_Z + 0.4;
-    clampIgnivarForgeLift(sim.ctx, p);
-    expect(p.pos.z - origin.z).toBeCloseTo(IGNIVAR_LIFT_GATE_Z + 0.4);
-  });
+    updateDoorTriggers(sim.ctx, p);
+    expect(sim.instanceInfoAt(p.pos)?.dungeonId).toBe(IGNIVAR_FORGE_APPROACH_ID);
+  }, 40000);
 
-  it('never touches a rider outside the gate lane or outside instances', () => {
-    const { sim, origin } = boardLift();
+  it('the lift exit IS the dungeon entrance: leaving lands you at the keep door', () => {
+    const { sim, inst } = boardLift();
+    const exit = inst.exitId !== null ? sim.entities.get(inst.exitId) : null;
+    if (!exit) throw new Error('no lift exit portal');
+    // the exit portal rides inside the car, opposite the sealed gate
     const p = sim.player;
-    // beside the car walls, outside the lane: free
-    p.pos.x = origin.x + 12;
-    p.pos.z = origin.z + IGNIVAR_LIFT_GATE_Z + 0.4;
-    p.prevPos = { x: p.pos.x, y: p.pos.y, z: origin.z + IGNIVAR_LIFT_GATE_Z - 0.4 };
-    const before = p.pos.z;
-    clampIgnivarForgeLift(sim.ctx, p);
-    expect(p.pos.z).toBeCloseTo(before);
-    // out in the overworld: the fast bail leaves the body alone
-    p.pos.x = 100;
-    p.pos.z = 100;
+    p.pos.x = exit.pos.x;
+    p.pos.z = exit.pos.z;
     p.prevPos = { ...p.pos };
-    clampIgnivarForgeLift(sim.ctx, p);
-    expect(p.pos.x).toBeCloseTo(100);
-  });
+    updateDoorTriggers(sim.ctx, p);
+    // back OUTSIDE, beside the keep facade the raid walked in through
+    const door = DUNGEONS[IGNIVAR_LIFT_ROOM_ID].doorPos;
+    expect(Math.hypot(p.pos.x - door.x, p.pos.z - door.z)).toBeLessThan(8);
+  }, 40000);
+
+  it('exposes the ride predicate for the sweep', () => {
+    expect(ignivarLiftArrived(undefined, 100)).toBe(false);
+    expect(ignivarLiftArrived(10, 10 + IGNIVAR_LIFT_RIDE_SECONDS - 0.5)).toBe(false);
+    expect(ignivarLiftArrived(10, 10 + IGNIVAR_LIFT_RIDE_SECONDS)).toBe(true);
+  }, 40000);
 });

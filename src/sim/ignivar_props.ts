@@ -224,7 +224,7 @@ export function ignivarApproachPropPlacements(layout: DungeonLayout): IgnivarPro
     at('chain', -20, 24, 5.3, 8, 12, true),
     at('chain', 4, 40, 0.7, 7, 13),
     at('chain', -10, 46, 1.9, 8, 11),
-    // The forge-lift shaft the overworld keep door lowers you into: caged
+    // The forge-lift shaft the keep's lift lowers you beside: caged
     // gearwork and hoist chains around the entry end (all past the z-50
     // door-dressing line, outside the corridor contract), so arriving
     // reads as stepping off the freight lift the Forgefather left running.
@@ -234,16 +234,6 @@ export function ignivarApproachPropPlacements(layout: DungeonLayout): IgnivarPro
     at('chain_hanging', -3.2, -51.4, 0.4, 8, 10),
     at('chain_hanging', 3.2, -51.4, -0.4, 8, 10, true),
     at('chain_link', 0, -52.4, 90 * DEG, 6),
-    // The forge-lift CAR's side walls: iron grille panels (the fortress
-    // gate prop) at x +-8 from the shell wall to the gate line, so riders
-    // see the shaft scroll past through the bars
-    // (src/render/ignivar_lift_room.ts owns the moving shaft; the sealed
-    // gate line itself is the ignivar_forge_lift entity + clamp). The
-    // panels sit at |x| = 8, outside the corridor contract's 7.5 lane.
-    at('gate', -8, -49, 90 * DEG, 12),
-    at('gate', 8, -49, 270 * DEG, 12),
-    at('gate', -8, -54.8, 90 * DEG, 12),
-    at('gate', 8, -54.8, 270 * DEG, 12),
   ];
   // The centre torch pillars ride the layout so they stay glued to the
   // torch rigs dungeon.ts places at the same points.
@@ -377,10 +367,37 @@ export function ignivarCruciblePropPlacements(_layout: DungeonLayout): IgnivarPr
   ];
 }
 
+/** The Forge-Lift car (the raid's first room, interior 'ignivar_lift'):
+ *  grille panels line both side walls so riders see the shaft scroll past
+ *  through the bars (src/render/ignivar_lift_room.ts hangs the moving
+ *  sheets between the grilles and the shell), the hoist machinery crowds
+ *  the south end behind the arrivals, and the torch pillars ride the
+ *  layout's pillar points like every ignivar room. The owner's placer
+ *  pass (the lift asset kit) will refine this seed. */
+export function ignivarLiftPropPlacements(layout: DungeonLayout): IgnivarPropPlacement[] {
+  const placements: IgnivarPropPlacement[] = [
+    at('gate', -8, -3.4, 90 * DEG, 12),
+    at('gate', 8, -3.4, 270 * DEG, 12),
+    at('gate', -8, 2.6, 90 * DEG, 12),
+    at('gate', 8, 2.6, 270 * DEG, 12),
+    at('gear_wall_rusty', -6.6, -7.2, 45 * DEG, 10),
+    at('gear_wall_rusty', 6.6, -7.2, 315 * DEG, 10),
+    at('chain_hanging', -3.2, -1.2, 0.4, 8, 10),
+    at('chain_hanging', 3.2, -1.2, -0.4, 8, 10, true),
+    at('chain', -5.2, 4.6, 1.2, 8, 11),
+    at('chain', 5.2, 3.8, 0.7, 7, 12),
+    at('chain_link', 0, -7.4, 90 * DEG, 6),
+  ];
+  for (const pt of layout.pillars ?? [])
+    placements.push(at('pillar_slim', pt.x, pt.z, pt.x < 0 ? 90 * DEG : 270 * DEG, 15));
+  return placements;
+}
+
 export function ignivarPropPlacements(
   interior: string,
   layout: DungeonLayout,
 ): IgnivarPropPlacement[] {
+  if (interior === 'ignivar_lift') return ignivarLiftPropPlacements(layout);
   if (interior === 'ignivar_approach') return ignivarApproachPropPlacements(layout);
   if (interior === 'ignivar') return ignivarArenaPropPlacements(layout);
   if (interior === 'ignivar_depths') return ignivarCruciblePropPlacements(layout);

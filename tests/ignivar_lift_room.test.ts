@@ -61,13 +61,14 @@ describe('the forge-lift room render kit', () => {
     expect(west).toBeDefined();
     expect(east).toBeDefined();
     expect(dust).toBeDefined();
-    const { shaftSheetX, carZMin } = ignivarLiftRoomInternalsForTest;
+    const { shaftSheetX, carZMin, carZMax, roomGrilleX } = ignivarLiftRoomInternalsForTest;
     expect(west.position.x).toBeCloseTo(-shaftSheetX);
     expect(east.position.x).toBeCloseTo(shaftSheetX);
-    // the sheets sit outside the shaft-gap gearwork (the gear_machine at
-    // x -10.6) so the machinery reads between the bars and the moving wall
-    expect(shaftSheetX).toBeGreaterThan(11);
-    expect(west.position.z).toBeLessThan(carZMin + 13);
+    // the sheets hang between the grille line and the shell wall's
+    // inner face (x 9), so the bars read against the moving shaft
+    expect(shaftSheetX).toBeGreaterThan(roomGrilleX);
+    expect(shaftSheetX).toBeLessThan(9);
+    expect(west.position.z).toBeCloseTo((carZMin + carZMax) / 2);
     const material = west.material as THREE.MeshBasicMaterial;
     const shader = compile(material);
     expect(shader.uniforms.uTime).toBe(sharedUniforms.uTime);
