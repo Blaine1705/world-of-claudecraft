@@ -30,7 +30,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1007,
-      "state": "68c83bc1",
+      "state": "b04f586b",
       "events": "d42d1922",
       "rng": {
         "draws": 0,
@@ -41,7 +41,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1007,
-      "state": "9e3c0a6f",
+      "state": "a71add6d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -52,7 +52,7 @@
       "tick": 54,
       "time": 2.7,
       "nextId": 1007,
-      "state": "8126b1d9",
+      "state": "6ab040b3",
       "events": "b6742e9e",
       "rng": {
         "draws": 109,
@@ -71,7 +71,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
@@ -159,7 +166,10 @@
             "rows": {},
             "spec": "discipline"
           },
-          "townFocus": {}
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -172,7 +182,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
@@ -252,7 +269,10 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -265,7 +285,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
@@ -353,7 +380,10 @@
             "rows": {},
             "spec": "holy"
           },
-          "townFocus": {}
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -366,7 +396,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
@@ -448,7 +485,10 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -461,7 +501,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
@@ -543,7 +590,10 @@
             "rows": {},
             "spec": "shadow"
           },
-          "townFocus": {}
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          }
         }
       ],
       "entities": [
@@ -1014,7 +1064,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1007,
-      "state": "014645e8",
+      "state": "c1705dec",
       "events": "c47ef8bd",
       "rng": {
         "draws": 155,
@@ -1025,7 +1075,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1007,
-      "state": "8d3f3cca",
+      "state": "15e1659a",
       "events": "741638a5",
       "rng": {
         "draws": 325,
@@ -1036,7 +1086,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1007,
-      "state": "fdd27214",
+      "state": "0bbcd3c8",
       "events": "741638a5",
       "rng": {
         "draws": 507,
@@ -1047,7 +1097,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1007,
-      "state": "c45840de",
+      "state": "6dfbe4f2",
       "events": "dd15e219",
       "rng": {
         "draws": 717,
@@ -1058,7 +1108,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 1007,
-      "state": "ebce9ec6",
+      "state": "1f8c3b8a",
       "events": "0b0e862b",
       "rng": {
         "draws": 935,
@@ -1069,7 +1119,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 1007,
-      "state": "dcf88a5f",
+      "state": "b9544e91",
       "events": "a53a3b83",
       "rng": {
         "draws": 1164,
@@ -1080,7 +1130,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 1007,
-      "state": "18604f2d",
+      "state": "85c290c3",
       "events": "741638a5",
       "rng": {
         "draws": 1402,
@@ -1091,7 +1141,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 1007,
-      "state": "acd77bad",
+      "state": "c4011703",
       "events": "893d1426",
       "rng": {
         "draws": 1693,
@@ -1102,7 +1152,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 1007,
-      "state": "a48d9afe",
+      "state": "35e6e5e2",
       "events": "552e81d8",
       "rng": {
         "draws": 1859,
@@ -1113,7 +1163,7 @@
       "tick": 240,
       "time": 12,
       "nextId": 1007,
-      "state": "fa92b052",
+      "state": "6ce39656",
       "events": "741638a5",
       "rng": {
         "draws": 2016,
@@ -1124,7 +1174,7 @@
       "tick": 260,
       "time": 13,
       "nextId": 1007,
-      "state": "831f06f4",
+      "state": "3a9860d8",
       "events": "f1a15c4f",
       "rng": {
         "draws": 2172,
@@ -1135,7 +1185,7 @@
       "tick": 280,
       "time": 14,
       "nextId": 1007,
-      "state": "05bd498c",
+      "state": "14596a64",
       "events": "2926e525",
       "rng": {
         "draws": 2334,
@@ -1146,7 +1196,7 @@
       "tick": 300,
       "time": 15,
       "nextId": 1007,
-      "state": "4e048b9b",
+      "state": "ea503c55",
       "events": "741638a5",
       "rng": {
         "draws": 2500,
@@ -1157,7 +1207,7 @@
       "tick": 301,
       "time": 15.05,
       "nextId": 1007,
-      "state": "25ef9631",
+      "state": "8528997f",
       "events": "741638a5",
       "rng": {
         "draws": 2516,
@@ -1176,7 +1226,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
@@ -1267,7 +1324,10 @@
             "rows": {},
             "spec": "discipline"
           },
-          "townFocus": {}
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -1280,7 +1340,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
@@ -1360,7 +1427,10 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -1373,7 +1443,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
@@ -1464,7 +1541,10 @@
             "rows": {},
             "spec": "holy"
           },
-          "townFocus": {}
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -1477,7 +1557,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
@@ -1559,7 +1646,10 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -1572,7 +1662,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
@@ -1658,7 +1755,10 @@
             "rows": {},
             "spec": "shadow"
           },
-          "townFocus": {}
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          }
         }
       ],
       "entities": [
@@ -2274,7 +2374,7 @@
       "tick": 320,
       "time": 16,
       "nextId": 1008,
-      "state": "72a94d1d",
+      "state": "febb093f",
       "events": "0d45d50e",
       "rng": {
         "draws": 2690,
@@ -2285,7 +2385,7 @@
       "tick": 340,
       "time": 17,
       "nextId": 1008,
-      "state": "625073e4",
+      "state": "f523a99c",
       "events": "46683c39",
       "rng": {
         "draws": 2879,
@@ -2296,7 +2396,7 @@
       "tick": 360,
       "time": 18,
       "nextId": 1008,
-      "state": "7067575e",
+      "state": "bddcbcd6",
       "events": "5dfe33ae",
       "rng": {
         "draws": 3088,
@@ -2307,7 +2407,7 @@
       "tick": 380,
       "time": 19,
       "nextId": 1008,
-      "state": "c90ba531",
+      "state": "586a738b",
       "events": "9f6ebc1e",
       "rng": {
         "draws": 3263,
@@ -2318,7 +2418,7 @@
       "tick": 393,
       "time": 19.65,
       "nextId": 1008,
-      "state": "21b5d499",
+      "state": "08313fbb",
       "events": "88928fc7",
       "rng": {
         "draws": 3380,
@@ -2337,7 +2437,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
@@ -2428,7 +2535,10 @@
             "rows": {},
             "spec": "discipline"
           },
-          "townFocus": {}
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -2441,7 +2551,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
@@ -2521,7 +2638,10 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -2534,7 +2654,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
@@ -2625,7 +2752,10 @@
             "rows": {},
             "spec": "holy"
           },
-          "townFocus": {}
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -2638,7 +2768,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
@@ -2720,7 +2857,10 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -2733,7 +2873,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
@@ -2819,7 +2966,10 @@
             "rows": {},
             "spec": "discipline"
           },
-          "townFocus": {}
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          }
         }
       ],
       "entities": [
@@ -3420,7 +3570,7 @@
       "tick": 393,
       "time": 19.65,
       "nextId": 1008,
-      "state": "21b5d499",
+      "state": "08313fbb",
       "events": "741638a5",
       "rng": {
         "draws": 3380,
@@ -3439,7 +3589,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
@@ -3530,7 +3687,10 @@
             "rows": {},
             "spec": "discipline"
           },
-          "townFocus": {}
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -3543,7 +3703,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
@@ -3623,7 +3790,10 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -3636,7 +3806,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
@@ -3727,7 +3904,10 @@
             "rows": {},
             "spec": "holy"
           },
-          "townFocus": {}
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -3740,7 +3920,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
@@ -3822,7 +4009,10 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -3835,7 +4025,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "priest",
           "companionUpgrades": {},
@@ -3921,7 +4118,10 @@
             "rows": {},
             "spec": "discipline"
           },
-          "townFocus": {}
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          }
         }
       ],
       "entities": [

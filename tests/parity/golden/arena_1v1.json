@@ -29,7 +29,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 1000,
-      "state": "4a2958a2",
+      "state": "ecc17032",
       "events": "b2d538b6",
       "rng": {
         "draws": 0,
@@ -40,7 +40,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 1000,
-      "state": "340743a7",
+      "state": "9ae1dd7f",
       "events": "6db907de",
       "rng": {
         "draws": 70,
@@ -51,7 +51,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 1000,
-      "state": "6bc6fac3",
+      "state": "ecb605cb",
       "events": "bac9a702",
       "rng": {
         "draws": 292,
@@ -62,7 +62,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1000,
-      "state": "5c540b20",
+      "state": "a9dab240",
       "events": "c65626fa",
       "rng": {
         "draws": 530,
@@ -73,7 +73,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 1000,
-      "state": "2334c66d",
+      "state": "c1bbd73b",
       "events": "164c017f",
       "rng": {
         "draws": 781,
@@ -84,7 +84,7 @@
       "tick": 142,
       "time": 7.1,
       "nextId": 1000,
-      "state": "3099570a",
+      "state": "8c27d204",
       "events": "741638a5",
       "rng": {
         "draws": 959,
@@ -104,7 +104,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
@@ -186,7 +193,10 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          }
         },
         {
           "activeLoadout": -1,
@@ -200,7 +210,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
@@ -287,7 +304,10 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          }
         }
       ],
       "entities": [
