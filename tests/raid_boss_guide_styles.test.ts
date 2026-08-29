@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 const desktopCss = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
 const mobileCss = readFileSync(new URL('../src/styles/hud.mobile.css', import.meta.url), 'utf8');
+const tokensCss = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8');
 const guideDesktopCss = desktopCss.slice(
   desktopCss.indexOf('.party-boss-guide-button'),
   desktopCss.indexOf('#party-frames.below-target'),
@@ -63,6 +64,24 @@ describe('raid boss guide styles', () => {
     expect(rule(desktopCss, '#raid-boss-guide-window .rbg-model-poster')).toMatch(
       /object-fit:\s*contain/,
     );
+  });
+
+  it('color codes role icon backgrounds without adding an outline', () => {
+    const roleBadge = rule(desktopCss, '#raid-boss-guide-window .rbg-badge-role');
+    expect(roleBadge).toMatch(/border:\s*0/);
+    expect(roleBadge).toMatch(/color:\s*var\(--color-rbg-role-icon\)/);
+    expect(rule(desktopCss, '#raid-boss-guide-window .rbg-badge-tank')).toMatch(
+      /background:\s*var\(--color-rbg-role-tank-bg\)/,
+    );
+    expect(rule(desktopCss, '#raid-boss-guide-window .rbg-badge-healer')).toMatch(
+      /background:\s*var\(--color-rbg-role-healer-bg\)/,
+    );
+    expect(rule(desktopCss, '#raid-boss-guide-window .rbg-badge-damage')).toMatch(
+      /background:\s*var\(--color-rbg-role-damage-bg\)/,
+    );
+    expect(tokensCss).toContain('--color-rbg-role-tank-bg: #2878c8;');
+    expect(tokensCss).toContain('--color-rbg-role-healer-bg: #278a45;');
+    expect(tokensCss).toContain('--color-rbg-role-damage-bg: #b93b36;');
   });
 
   it('keeps the raid guide palette in shared tokens', () => {

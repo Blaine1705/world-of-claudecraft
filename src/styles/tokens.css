@@ -205,6 +205,10 @@
     --color-rbg-badge-border: #56472f;
     --color-rbg-badge-bg: #0b0a09;
     --color-rbg-badge-text: #cbb889;
+    --color-rbg-role-icon: #fff;
+    --color-rbg-role-tank-bg: #2878c8;
+    --color-rbg-role-healer-bg: #278a45;
+    --color-rbg-role-damage-bg: #b93b36;
     --color-rbg-deadly-border: #9f332d;
     --color-rbg-deadly-text: #ff786d;
     --color-rbg-important-border: #a97828;
