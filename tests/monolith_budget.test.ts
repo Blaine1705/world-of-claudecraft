@@ -316,7 +316,11 @@ const MONOLITHS: MonolithRow[] = [
     // The release arm DELETES more than this branch adds, so the merged count lands
     // below the branch pin and the ratchet follows it DOWN. Measured on the merged
     // tree, never reconciled by arithmetic. Exact count, zero slack.
-    ceiling: 13327,
+    // Re-pinned at the next v0.41.0 sync: the release arm's battleground
+    // compile-gate injection grew renderer.ts by one line under release's own
+    // pin, and this branch's tighter stale pin was what the merge queue ran
+    // (this branch never touches renderer.ts). Exact merged count, zero slack.
+    ceiling: 13328,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
