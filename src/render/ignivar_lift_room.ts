@@ -194,18 +194,25 @@ export function buildIgnivarLiftShaft(lowGfx: boolean): THREE.Group {
 // the vertex shader: a position-derived REGION of each mesh moves on the
 // shared uTime clock while the rest stands still. Region constants are
 // measured from the shipped GLBs (canonical space: xz-centred, base y 0,
-// dims normalized): the handle is a base under y 0.36 with the lever arm
-// and grip above it; the winch drum spans radius ~0.25 about its x-axis
-// axle at y 0.47, with the frame posts outside |x| 0.22.
-export const LIFT_HANDLE_PROGRAM_CACHE_KEY = 'ignivar-lift-handle-v1';
+// dims normalized). The winch drum turns inside its frame, the beam's
+// hanging sheave wheel spins on its axle, and the sliding door's leaf
+// cycles open, holds, and shuts inside its pocket frame. The brake
+// handle deliberately does NOT move (the owner mounts them as static
+// wall levers).
 export const LIFT_WINCH_PROGRAM_CACHE_KEY = 'ignivar-lift-winch-v1';
+export const LIFT_BEAM_PROGRAM_CACHE_KEY = 'ignivar-lift-beam-v1';
+export const LIFT_DOOR_PROGRAM_CACHE_KEY = 'ignivar-lift-door-v1';
 
+/** Compose a masked vertex motion into a material, preserving any prior
+ *  onBeforeCompile hook and cache key. `vertexGlsl` runs after
+ *  begin_vertex with `transformed` live and may use ignivarLiftMask(p);
+ *  `normalGlsl` (optional) runs after beginnormal_vertex. */
 function decorateLiftMotion(
   material: THREE.Material,
   cacheKey: string,
   maskGlsl: string,
-  angleGlsl: string,
-  pivotY: string,
+  vertexGlsl: string,
+  normalGlsl = '',
 ): THREE.Material {
   const previousCompile = material.onBeforeCompile.bind(material);
   const previousCacheKey = material.customProgramCacheKey.bind(material);
@@ -216,68 +223,101 @@ function decorateLiftMotion(
       '#include <common>',
       `#include <common>
 uniform float uTime;
-float ignivarLiftMask(vec3 p) { return ${maskGlsl}; }
-float ignivarLiftAngle() { return ${angleGlsl}; }
-vec3 ignivarLiftSpin(vec3 p, float mask) {
-  float a = ignivarLiftAngle() * mask;
-  float ca = cos(a);
-  float sa = sin(a);
-  vec3 q = p - vec3(0.0, ${pivotY}, 0.0);
-  return mix(p, vec3(q.x, q.y * ca - q.z * sa, q.y * sa + q.z * ca) + vec3(0.0, ${pivotY}, 0.0), mask);
-}`,
+float ignivarLiftMask(vec3 p) { return ${maskGlsl}; }`,
     );
-    shader.vertexShader = shader.vertexShader.replace(
-      '#include <beginnormal_vertex>',
-      `#include <beginnormal_vertex>
+    if (normalGlsl) {
+      shader.vertexShader = shader.vertexShader.replace(
+        '#include <beginnormal_vertex>',
+        `#include <beginnormal_vertex>
 {
-  float liftMask = ignivarLiftMask(position);
-  float liftA = ignivarLiftAngle() * liftMask;
-  float liftCa = cos(liftA);
-  float liftSa = sin(liftA);
-  objectNormal = mix(
-    objectNormal,
-    vec3(objectNormal.x, objectNormal.y * liftCa - objectNormal.z * liftSa,
-      objectNormal.y * liftSa + objectNormal.z * liftCa),
-    liftMask
-  );
+${normalGlsl}
 }`,
-    );
+      );
+    }
     shader.vertexShader = shader.vertexShader.replace(
       '#include <begin_vertex>',
       `#include <begin_vertex>
-transformed = ignivarLiftSpin(transformed, ignivarLiftMask(position));`,
+{
+${vertexGlsl}
+}`,
     );
   };
   material.customProgramCacheKey = () => `${previousCacheKey()}|${cacheKey}`;
   return material;
 }
 
-/** The brake lever pumps: the arm and grip above the base swing about the
- *  pivot in a slow mechanical stroke. */
-export function decorateLiftHandleMaterial(material: THREE.Material): THREE.Material {
-  return decorateLiftMotion(
-    material,
-    LIFT_HANDLE_PROGRAM_CACHE_KEY,
-    'step(0.36, p.y)',
-    'sin(uTime * 1.4) * 0.18',
-    '0.36',
-  );
-}
-
-/** The winch drum turns continuously about its axle; the frame holds. */
+/** The winch drum turns continuously about its x-axis axle; the frame
+ *  posts outside |x| 0.22 hold still. */
 export function decorateLiftWinchMaterial(material: THREE.Material): THREE.Material {
   return decorateLiftMotion(
     material,
     LIFT_WINCH_PROGRAM_CACHE_KEY,
     'step(length(vec2(p.y - 0.47, p.z)), 0.25) * step(abs(p.x), 0.22)',
-    'uTime * 1.6',
-    '0.47',
+    `float mask = ignivarLiftMask(position);
+float a = uTime * 1.6 * mask;
+float ca = cos(a);
+float sa = sin(a);
+vec3 q = transformed - vec3(0.0, 0.47, 0.0);
+transformed = mix(transformed, vec3(q.x, q.y * ca - q.z * sa, q.y * sa + q.z * ca) + vec3(0.0, 0.47, 0.0), mask);`,
+    `float nMask = ignivarLiftMask(position);
+float nA = uTime * 1.6 * nMask;
+float nCa = cos(nA);
+float nSa = sin(nA);
+objectNormal = mix(
+  objectNormal,
+  vec3(objectNormal.x, objectNormal.y * nCa - objectNormal.z * nSa,
+    objectNormal.y * nSa + objectNormal.z * nCa),
+  nMask
+);`,
+  );
+}
+
+/** The beam's hanging sheave wheel (the mid-span lobe under the bar,
+ *  radius ~0.08 about its axle at y 0.08) spins about the z axle. */
+export function decorateLiftBeamMaterial(material: THREE.Material): THREE.Material {
+  return decorateLiftMotion(
+    material,
+    LIFT_BEAM_PROGRAM_CACHE_KEY,
+    'step(abs(p.x), 0.11) * step(p.y, 0.17)',
+    `float mask = ignivarLiftMask(position);
+float a = uTime * 2.1 * mask;
+float ca = cos(a);
+float sa = sin(a);
+vec3 q = transformed - vec3(0.0, 0.08, 0.0);
+transformed = mix(transformed, vec3(q.x * ca - q.y * sa, q.x * sa + q.y * ca, q.z) + vec3(0.0, 0.08, 0.0), mask);`,
+    `float nMask = ignivarLiftMask(position);
+float nA = uTime * 2.1 * nMask;
+float nCa = cos(nA);
+float nSa = sin(nA);
+objectNormal = mix(
+  objectNormal,
+  vec3(objectNormal.x * nCa - objectNormal.y * nSa,
+    objectNormal.x * nSa + objectNormal.y * nCa, objectNormal.z),
+  nMask
+);`,
+  );
+}
+
+/** The sliding door's leaf (inside the |x| 0.26 pocket posts, under the
+ *  y 0.92 header) cycles: closed hold, slide open, open hold, slide
+ *  shut, on a nine second loop. Pure translation, normals untouched. */
+export function decorateLiftDoorMaterial(material: THREE.Material): THREE.Material {
+  return decorateLiftMotion(
+    material,
+    LIFT_DOOR_PROGRAM_CACHE_KEY,
+    'step(abs(p.x), 0.27) * step(p.y, 0.92)',
+    `float mask = ignivarLiftMask(position);
+float ph = fract(uTime / 9.0);
+float openT = smoothstep(0.36, 0.5, ph) * (1.0 - smoothstep(0.86, 1.0, ph));
+transformed.x += mask * openT * 0.42;`,
   );
 }
 
 export const ignivarLiftRoomInternalsForTest = {
   shaftSheetMaterial,
   dustMaterial,
+  decorateLiftBeamMaterial,
+  decorateLiftDoorMaterial,
   roomGrilleX: ROOM_GRILLE_X,
   carZMin: CAR_Z_MIN,
   carZMax: CAR_Z_MAX,

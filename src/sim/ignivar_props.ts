@@ -368,14 +368,39 @@ export function ignivarCruciblePropPlacements(_layout: DungeonLayout): IgnivarPr
 }
 
 /** The Forge-Lift car (the raid's first room, interior 'ignivar_lift'):
- *  DELIBERATELY EMPTY. The owner dresses the whole car by hand with the
- *  lift asset kit (their placer export bakes here); everything the room
- *  keeps regardless lives in other systems: the shell walls and torch
- *  points in IGNIVAR_LIFT_LAYOUT, the sealed gate and both portals as
- *  instance entities, and the descending-shaft illusion in
- *  src/render/ignivar_lift_room.ts. */
+ *  the owner's hand-placed pass, baked VERBATIM from their placer export
+ *  (2026-08-29): arch beams and door frames bracing both side walls over
+ *  the moving shaft, overhead beams, sliding doors dressing the exit
+ *  portal and the arrival doorway, wall panels closing the corners, and
+ *  the counterweight and brake levers riding along. Never re-derive or
+ *  re-seat these rows; a new owner export replaces the table wholesale.
+ *  The shell walls and torch points live in IGNIVAR_LIFT_LAYOUT, the
+ *  gate and both portals are instance entities, and the shaft illusion
+ *  is src/render/ignivar_lift_room.ts. */
 export function ignivarLiftPropPlacements(_layout: DungeonLayout): IgnivarPropPlacement[] {
-  return [];
+  return [
+    at('lift_arch_beam', 8, 0.25, 270 * DEG, 8),
+    at('lift_beam', 0, -5.5, 180 * DEG, 8, 5),
+    at('lift_frame', 6.5, -4.25, 90 * DEG, 8),
+    at('lift_frame', 6.5, 4.5, 90 * DEG, 8),
+    at('lift_vertical_beam', 6.4, 0.85, 270 * DEG, 8),
+    at('lift_vertical_beam', 6.4, -0.15, 270 * DEG, 8),
+    at('square_wall', 5.4, 7.1, 180 * DEG, 6),
+    at('square_wall', -5.6, 7.1, 180 * DEG, 6),
+    at('lift_arch_beam', -8.3, -0.05, 90 * DEG, 8),
+    at('lift_beam', 0.2, 6.45, 180 * DEG, 8, 5),
+    at('lift_frame', -7.55, 4.2, 90 * DEG, 8),
+    at('lift_frame', -7.55, -4.05, 90 * DEG, 8),
+    at('lift_vertical_beam', -7.3, -0.55, 90 * DEG, 8),
+    at('lift_vertical_beam', -7.3, 0.45, 90 * DEG, 8),
+    at('lift_sliding_door', 0.4, 6.7, 180 * DEG, 7),
+    at('square_wall', -5.3, -6.8, 0, 6),
+    at('square_wall', 5.45, -6.8, 0, 6),
+    at('lift_sliding_door', -0.1, -6.05, 0, 8),
+    at('lift_weight', 4.9, 5.2, 180 * DEG, 8),
+    at('lift_handle', -5.5, 5.85, 180 * DEG, 3, 2),
+    at('lift_handle', -5.45, -5.9, 0, 3, 2),
+  ];
 }
 
 export function ignivarPropPlacements(

@@ -10,7 +10,11 @@ import { loadGltf, releaseGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { addRoofDarkness } from './gfx';
 import type { IgnivarEnvPropKey, IgnivarPropPlacement } from './ignivar_dressing_plan_core';
-import { decorateLiftHandleMaterial, decorateLiftWinchMaterial } from './ignivar_lift_room';
+import {
+  decorateLiftBeamMaterial,
+  decorateLiftDoorMaterial,
+  decorateLiftWinchMaterial,
+} from './ignivar_lift_room';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 
 export const IGNIVAR_ENV_PROP_URLS: Record<IgnivarEnvPropKey, string> = {
@@ -218,10 +222,13 @@ export function prepareIgnivarEnvProps(): Promise<void> {
           // black with the walls (inert outside the Halls scene state).
           addRoofDarkness(baked.material);
           // The lift machinery moves in the vertex shader (a masked region
-          // of the single baked mesh on the shared uTime clock): the brake
-          // lever pumps and the winch drum turns, per the owner's direction.
-          if (key === 'lift_handle') decorateLiftHandleMaterial(baked.material);
+          // of the single baked mesh on the shared uTime clock): the winch
+          // drum turns, the beam's sheave wheel spins, and the sliding
+          // door's leaf cycles, per the owner's direction. The brake
+          // handle deliberately stays still (a mounted wall lever).
           if (key === 'lift_winch') decorateLiftWinchMaterial(baked.material);
+          if (key === 'lift_beam') decorateLiftBeamMaterial(baked.material);
+          if (key === 'lift_sliding_door') decorateLiftDoorMaterial(baked.material);
           templates.set(key, {
             geometry: markSharedGeometry(baked.geometry),
             material: markSharedMaterial(baked.material),

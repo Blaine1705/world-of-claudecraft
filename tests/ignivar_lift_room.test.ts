@@ -6,10 +6,12 @@ import { sharedUniforms } from '../src/render/gfx';
 import {
   buildIgnivarLiftGate,
   buildIgnivarLiftShaft,
-  decorateLiftHandleMaterial,
+  decorateLiftBeamMaterial,
+  decorateLiftDoorMaterial,
   decorateLiftWinchMaterial,
   ignivarLiftRoomInternalsForTest,
-  LIFT_HANDLE_PROGRAM_CACHE_KEY,
+  LIFT_BEAM_PROGRAM_CACHE_KEY,
+  LIFT_DOOR_PROGRAM_CACHE_KEY,
   LIFT_WINCH_PROGRAM_CACHE_KEY,
 } from '../src/render/ignivar_lift_room';
 
@@ -65,14 +67,7 @@ describe('the forge-lift room render kit', () => {
     expect(shader.fragmentShader).toContain('liftBand');
   });
 
-  it('pumps the handle arm above its pivot and spins the winch drum only', () => {
-    const handle = decorateLiftHandleMaterial(new THREE.MeshStandardMaterial());
-    const handleShader = compile(handle);
-    expect(handleShader.uniforms.uTime).toBe(sharedUniforms.uTime);
-    expect(handleShader.vertexShader).toContain('step(0.36, p.y)');
-    expect(handleShader.vertexShader).toContain('sin(uTime * 1.4)');
-    expect(handle.customProgramCacheKey()).toContain(LIFT_HANDLE_PROGRAM_CACHE_KEY);
-
+  it('spins the winch drum and beam sheave, cycles the door leaf, holds frames still', () => {
     const winch = decorateLiftWinchMaterial(new THREE.MeshStandardMaterial());
     const winchShader = compile(winch);
     expect(winchShader.uniforms.uTime).toBe(sharedUniforms.uTime);
@@ -81,9 +76,25 @@ describe('the forge-lift room render kit', () => {
     expect(winchShader.vertexShader).toContain('step(abs(p.x), 0.22)');
     expect(winchShader.vertexShader).toContain('uTime * 1.6');
     expect(winch.customProgramCacheKey()).toContain(LIFT_WINCH_PROGRAM_CACHE_KEY);
-    // both splice the position pass AND the normal pass (lighting follows)
-    for (const shader of [handleShader, winchShader]) {
-      expect(shader.vertexShader).toContain('transformed = ignivarLiftSpin');
+
+    const beam = decorateLiftBeamMaterial(new THREE.MeshStandardMaterial());
+    const beamShader = compile(beam);
+    // the hanging sheave wheel: the mid-span lobe under the bar
+    expect(beamShader.vertexShader).toContain('step(abs(p.x), 0.11) * step(p.y, 0.17)');
+    expect(beamShader.vertexShader).toContain('uTime * 2.1');
+    expect(beam.customProgramCacheKey()).toContain(LIFT_BEAM_PROGRAM_CACHE_KEY);
+
+    const door = decorateLiftDoorMaterial(new THREE.MeshStandardMaterial());
+    const doorShader = compile(door);
+    // the leaf inside the pocket posts, on the open-hold-shut loop
+    expect(doorShader.vertexShader).toContain('step(abs(p.x), 0.27) * step(p.y, 0.92)');
+    expect(doorShader.vertexShader).toContain('fract(uTime / 9.0)');
+    expect(door.customProgramCacheKey()).toContain(LIFT_DOOR_PROGRAM_CACHE_KEY);
+    // a pure slide: the door splices no normal pass
+    expect(doorShader.vertexShader).not.toContain('objectNormal = mix(');
+
+    // the rotating pieces DO rotate their normals so lighting follows
+    for (const shader of [winchShader, beamShader]) {
       expect(shader.vertexShader).toContain('objectNormal = mix(');
     }
   });
