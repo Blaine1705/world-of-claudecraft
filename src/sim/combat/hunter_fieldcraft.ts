@@ -1,7 +1,7 @@
 import {
-  setBonusFlag,
   SLAGSNARE_2PC_GUTTING_STRIKE_FOCUS,
   SLAGSNARE_4PC_MOMENTUM_ICD_SEC,
+  setBonusFlag,
 } from '../content/ignivar_set_bonuses';
 import { GRAVITY, JUMP_VELOCITY } from '../player_motion';
 import type { PlayerMeta } from '../sim';

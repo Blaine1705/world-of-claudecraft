@@ -10,8 +10,10 @@
 // draw (the existing bad-luck-cap test's technique) or forces the outcome
 // through critChance 0/1, which keeps the draw count identical.
 import { describe, expect, it, vi } from 'vitest';
-import { coldsightLongDrawCritExtensionSec } from '../src/sim/combat/hunter_coldsight';
-import { resolveColdsightAbilityForSpec } from '../src/sim/combat/hunter_coldsight';
+import {
+  coldsightLongDrawCritExtensionSec,
+  resolveColdsightAbilityForSpec,
+} from '../src/sim/combat/hunter_coldsight';
 import {
   FIELDCRAFT_REENTRY_ID,
   HUNTING_MOMENTUM_ID,
@@ -29,9 +31,9 @@ import {
   COLDSIGHT_4PC_CRIT_EXTENSION_SEC,
   COLDSIGHT_4PC_WINDOW_EXTENSION_CAP_SEC,
   PACKLORD_4PC_STAMPEDE_RESET_CHANCE,
-  setBonusFlag,
   SLAGSNARE_2PC_GUTTING_STRIKE_FOCUS,
   SLAGSNARE_4PC_MOMENTUM_ICD_SEC,
+  setBonusFlag,
 } from '../src/sim/content/ignivar_set_bonuses';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
@@ -310,13 +312,17 @@ describe('Coldsight 2pc: the post-rewrite Measured Shot focus hook', () => {
     const outOfWindow = fakeHunter([]);
     const inWindow = fakeHunter([coldFocusAura()]);
     expect(
-      gainAmount(resolveColdsightAbilityForSpec(resolved, outOfWindow, 'marksmanship', baseSelected)),
+      gainAmount(
+        resolveColdsightAbilityForSpec(resolved, outOfWindow, 'marksmanship', baseSelected),
+      ),
     ).toBe(20);
     expect(
       gainAmount(resolveColdsightAbilityForSpec(resolved, inWindow, 'marksmanship', baseSelected)),
     ).toBe(30);
     expect(
-      gainAmount(resolveColdsightAbilityForSpec(resolved, outOfWindow, 'marksmanship', wornSelected)),
+      gainAmount(
+        resolveColdsightAbilityForSpec(resolved, outOfWindow, 'marksmanship', wornSelected),
+      ),
     ).toBe(20 + COLDSIGHT_2PC_MEASURED_SHOT_FOCUS_BONUS);
     expect(
       gainAmount(resolveColdsightAbilityForSpec(resolved, inWindow, 'marksmanship', wornSelected)),
@@ -567,9 +573,7 @@ describe('Slagsnare 4pc: the Woundrend preserve and its 8 sec lockout', () => {
     // the 4pc never reaches this site.
     onFieldcraftWeaponStrike(ctx, hunter, fakeHunter([]), 'raptor_strike', 40);
     expect(hunter.auras.some((aura) => aura.id === HUNTING_MOMENTUM_ID)).toBe(false);
-    expect(hunter.auras.some((aura) => aura.id === SLAGSNARE_MOMENTUM_PRESERVE_ICD_ID)).toBe(
-      false,
-    );
+    expect(hunter.auras.some((aura) => aura.id === SLAGSNARE_MOMENTUM_PRESERVE_ICD_ID)).toBe(false);
   });
 
   it('live control pair: the wearer keeps 3 Hunting Momentum through a Woundrend tear', () => {
@@ -598,9 +602,7 @@ describe('Slagsnare 4pc: the Woundrend preserve and its 8 sec lockout', () => {
         ready(sim, 'mongoose_bite');
         sim.castAbility('mongoose_bite');
         advance(sim, 0.1);
-        if (
-          sim.player.auras.some((aura) => aura.id === SLAGSNARE_MOMENTUM_PRESERVE_ICD_ID)
-        ) {
+        if (sim.player.auras.some((aura) => aura.id === SLAGSNARE_MOMENTUM_PRESERVE_ICD_ID)) {
           break; // the wearer's tear landed and preserved
         }
       }
@@ -609,9 +611,9 @@ describe('Slagsnare 4pc: the Woundrend preserve and its 8 sec lockout', () => {
 
     const wearer = fieldcraftRun(4);
     expect(wearer.player.auras.find((aura) => aura.id === HUNTING_MOMENTUM_ID)?.stacks).toBe(3);
-    expect(
-      wearer.player.auras.some((aura) => aura.id === SLAGSNARE_MOMENTUM_PRESERVE_ICD_ID),
-    ).toBe(true);
+    expect(wearer.player.auras.some((aura) => aura.id === SLAGSNARE_MOMENTUM_PRESERVE_ICD_ID)).toBe(
+      true,
+    );
     // A second tear inside the lockout spends the stacks even for the wearer
     // (retrying a whiffed strike; the lockout far outlasts these ticks).
     for (

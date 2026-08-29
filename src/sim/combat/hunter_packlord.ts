@@ -1,7 +1,4 @@
-import {
-  PACKLORD_4PC_STAMPEDE_RESET_CHANCE,
-  setBonusFlag,
-} from '../content/ignivar_set_bonuses';
+import { PACKLORD_4PC_STAMPEDE_RESET_CHANCE, setBonusFlag } from '../content/ignivar_set_bonuses';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { armorReduction, dist2d, swingMissChance } from '../types';
