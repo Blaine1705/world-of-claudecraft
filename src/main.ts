@@ -149,6 +149,7 @@ import { music } from './game/music';
 import { tryNearbyInteraction } from './game/nearby_interaction';
 import { nextNpcTarget } from './game/npc_cycle';
 import { isOfflineModeAvailable } from './game/offline_mode_gate';
+import { padCastPress, padCastRelease } from './game/pad_cast_routing';
 import { createGroundAimReticleSync, padGroundAimCallbacks } from './game/pad_ground_aim_wiring';
 import { padReelItemId } from './game/pad_reel';
 import { openTargetSubcommands } from './game/pad_subcommands';
@@ -2235,7 +2236,7 @@ async function startGame(
     }
     if (!canUseGameKeysNow()) return; // suppress play actions while a modal/chat is up
     if (id.startsWith('slot')) {
-      hud.castSlot(Number(id.slice(4)));
+      hud.pressSlot(Number(id.slice(4)));
       return;
     }
     hud.cancelGroundAim();
@@ -2410,10 +2411,8 @@ async function startGame(
     getPlayerHealth: () => (world.player.dead ? 0 : world.player.hp),
     onConnectionChange: () => crossHotbar.syncPadMode(gamepad),
     onActivity: createGamepadActivityNotifier(desktopBridge()),
-    onCrossHotbarCast: (action) => {
-      padTargetPick.autoTarget(action);
-      hud.castCrossHotbarAction(action);
-    },
+    onCrossHotbarCast: (action) => padCastPress(hud, padTargetPick.autoTarget, action),
+    onCastRelease: (hold) => padCastRelease(hud, hold),
     onOpenSpellbook: () => hud.openSpellbook(),
     ...crossHotbar.padCallbacks(() => gamepad.getKind()),
   });

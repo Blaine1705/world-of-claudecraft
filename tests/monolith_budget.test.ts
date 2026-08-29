@@ -145,7 +145,12 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at the merge into the PR 3676 branch (which had down-ratcheted
     // its own arm via quickAimPoint and the sync-closure extraction): both
     // arms' growth and trims compose. Exact merged count, zero slack.
-    ceiling: 19001,
+    // Lowered by 2 at the empower-hold sync merge: the charge state and the
+    // XHB slot lookup live in src/ui/empower_hold_core.ts. Exact merged count.
+    // Re-pinned at the v0.41.0 sync merge of the two arms above: the ground-aim
+    // controller trims and the empower-hold extraction compose, so the merged
+    // file lands below both parent pins. Exact merged count, zero slack.
+    ceiling: 18999,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -201,7 +206,11 @@ const MONOLITHS: MonolithRow[] = [
     // ceiling is the exact merged count.
     // Re-pinned to the integration merge of the latest v0.40.0 (the touch UI
     // rework); exact merged count.
-    ceiling: 13329,
+    // Re-pinned at the PR 3676 v0.41.0 sync merge: the branch's ground-aim
+    // reticle pass-through and the release arm's battleground compile-gate
+    // injection compose to one line over the old pin. Exact merged count,
+    // zero headroom.
+    ceiling: 13330,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -284,7 +293,12 @@ const MONOLITHS: MonolithRow[] = [
     // merged count.
     // Re-pinned at the merge into the PR 3676 branch (its reticle-sync closure
     // extraction composes with the raise). Exact merged count, zero slack.
-    ceiling: 11627,
+    // Lowered by 1 at the empower-hold sync merge: the pad cast routing lives
+    // in src/game/pad_cast_routing.ts. Exact merged count.
+    // Re-pinned at the v0.41.0 sync merge of the two arms above: the reticle
+    // wiring trim and the pad-cast-routing extraction compose. Exact merged
+    // count, zero slack.
+    ceiling: 11626,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -421,7 +435,9 @@ const MONOLITHS: MonolithRow[] = [
     // (quote legs, price/estimate readouts, WocMarketEconomy) moved to
     // woc_market_economy_types.ts (the monitor-types pattern), paying for the
     // desktopHandoff registrar dep and its four registration call sites.
-    ceiling: 3929,
+    // Down 3929 -> 3924: the operator listing and p2p row vocabulary moved to
+    // woc_market_ops.ts instead of growing this coordinator.
+    ceiling: 3924,
     seam: 'a woc_market_<thing>.ts sibling behind WocMarketDeps (the drift-warn split is the template)',
   },
   {

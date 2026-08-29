@@ -44,6 +44,7 @@ import {
   AXIS,
   applyRadialDeadzone,
   detectGamepadKind,
+  fallingEdges,
   GAMEPAD_CANCEL,
   GAMEPAD_CONFIRM,
   GAMEPAD_CYCLE_SET,
@@ -53,6 +54,7 @@ import {
   GAMEPAD_ZOOM_STEP,
   type GamepadKind,
   GP,
+  type PadCastHold,
   risingEdges,
   STANDARD_BUTTON_COUNT,
   stickToLook,
@@ -98,6 +100,7 @@ export interface GamepadCallbacks {
   // an ability or item id rather than an action-bar slot: IWorld.castAbility is
   // deliberately id-based so the client never depends on slot semantics.
   onCrossHotbarCast?(action: { type: 'ability' | 'item'; id: string }): void;
+  onCastRelease?(hold: PadCastHold): void;
   // Edit mode opened, closed, or picked something up. `carriedFrom` is the cell an
   // action was lifted off, for the gap the bar draws where it used to be; `carried`
   // is what is in hand, which is the only feedback a pick-up FROM the spellbook has
@@ -172,6 +175,7 @@ export class GamepadManager {
   // hatch for what the focus order cannot reach, not the everyday path.
   private mouseMode = false;
   private placementActive = false;
+  private heldCasts = new Map<number, PadCastHold>();
   // Arranging the bar on the bar itself. While it is on, confirm and cancel act on
   // the focused CELL rather than casting, so a player cannot fire an ability by
   // trying to move it.
@@ -413,6 +417,7 @@ export class GamepadManager {
     const pad = this.activePad();
     if (!pad) {
       this.placementActive = false;
+      if (this.heldCasts.size > 0) this.releaseHeldCasts();
       return;
     }
     this.refreshKind(pad);
@@ -438,6 +443,7 @@ export class GamepadManager {
       this.placementActive = false;
       this.releaseCrossHotbarEdit();
       this.releaseCrossHotbar();
+      this.releaseHeldCasts();
       this.prevPressed = cur;
       return;
     }
@@ -537,6 +543,7 @@ export class GamepadManager {
       this.input.clearGamepadMove();
       this.input.setGamepadLookActive(false);
       this.releaseCrossHotbar();
+      this.releaseHeldCasts();
       const mv = applyRadialDeadzone(
         pad.axes[AXIS.RIGHT_X] ?? 0,
         pad.axes[AXIS.RIGHT_Y] ?? 0,
@@ -592,6 +599,7 @@ export class GamepadManager {
       this.input.clearGamepadMove();
       this.input.setGamepadLookActive(false);
       this.releaseCrossHotbar();
+      this.releaseHeldCasts();
       // Arranging still works with a window open, and has to: the spellbook is
       // where a new action comes FROM. Without this the poll returned here and
       // dispatch never ran, so confirm on a spell did nothing at all.
@@ -675,6 +683,12 @@ export class GamepadManager {
         }
       }
       this.dispatch(idx);
+    }
+    for (const idx of fallingEdges(this.prevPressed, cur)) {
+      const hold = this.heldCasts.get(idx);
+      if (!hold) continue;
+      this.heldCasts.delete(idx);
+      this.cb.onCastRelease?.(hold);
     }
     // Once per poll, never once per edge: the shell only needs to hear that the
     // player is there, and the notifier throttles anyway.
@@ -826,6 +840,7 @@ export class GamepadManager {
         return;
       const action = this.crossHotbarActionFor(buttonIndex);
       if (action !== null) {
+        this.heldCasts.set(buttonIndex, { kind: 'xhb', action });
         this.cb.onCrossHotbarCast?.(action);
         return;
       }
@@ -882,7 +897,16 @@ export class GamepadManager {
       this.input.zoomBy(GAMEPAD_ZOOM_STEP);
       return;
     }
+    if (action.startsWith('slot')) {
+      this.heldCasts.set(buttonIndex, { kind: 'slot', slot: Number(action.slice(4)) });
+    }
     this.cb.onAction(action);
+  }
+
+  private releaseHeldCasts(): void {
+    if (this.heldCasts.size === 0) return;
+    for (const hold of this.heldCasts.values()) this.cb.onCastRelease?.(hold);
+    this.heldCasts.clear();
   }
 
   // --- Haptics -------------------------------------------------------------

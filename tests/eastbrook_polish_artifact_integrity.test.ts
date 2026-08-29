@@ -1027,10 +1027,16 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // both sides). No capture was retaken.
 // Re-minted for the PR 3676 placement-aim round (renderer.ts blocked
 // pass-through); the seals follow the swept evidence bytes, no capture retaken.
+// Re-minted for the battleground field-stream compile gate (renderer.ts
+// injects the gate at the buildBattleground site; renderer.ts is a
+// provenance input). No capture was retaken.
+// Re-minted at the v0.41.0 sync merge of the two rounds above: the merged
+// renderer.ts carries both the aim pass-through and the compile gate, so the
+// composite moves again. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '584e818c9f5873f1cf38911d9bfe85c0ebf2d7cce32b0d4f2b03c8f0ef46cb5a';
+  'b792779142fa85cda301307cc94fc2c2465dbbfcf55c2ae80acb863973644590';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '685dfe4ecae1a8942f51921801e72101d92a66f08e1948f932073aa875b5ee96';
+  '290b5ebd3ddf909b207621295a35d3b23e874cabb77d958fb83cae75748c43f8';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2177,13 +2183,17 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
     // both sides): same order, the composite first, then this seal. No capture
     // was retaken.
+    // Re-minted for the battleground field-stream compile gate (renderer.ts
+    // provenance input moved): same order, the composite first, then this
+    // seal. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
       // Re-minted for the PR 3676 placement-aim round: the first-order composite
       // follows renderer.ts, then this second-order seal follows the swept
-      // evidence bytes. No capture was retaken.
-    ).toBe('a8fb43fe5259cda9b218fc2918bc54d99bc307cadaed6e752289ce58c74078c8');
+      // evidence bytes. No capture was retaken. Re-minted again at the v0.41.0
+      // sync merge (the merged renderer.ts moves the first-order composite).
+    ).toBe('9eb5288491ff7dec5164fe8bf6bc07313fce8588f8cc9f536e7c8e32f247d475');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

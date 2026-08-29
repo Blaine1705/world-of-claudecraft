@@ -326,8 +326,14 @@ interface AttributionTargetFixture {
 // Re-minted for the PR 3676 placement-aim round: renderer.ts gained the
 // blocked pass-through on setGroundAimReticle, moving the runtimeRender leaf.
 // No capture was retaken.
+// Re-minted for the battleground field-stream compile gate (renderer.ts
+// injects the gate at the buildBattleground site; renderer.ts is a
+// provenance input). No capture was retaken.
+// Re-minted at the v0.41.0 sync merge of the two rounds above: the merged
+// renderer.ts carries both the aim pass-through and the compile gate, so the
+// composite moves again. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '685dfe4ecae1a8942f51921801e72101d92a66f08e1948f932073aa875b5ee96';
+  '290b5ebd3ddf909b207621295a35d3b23e874cabb77d958fb83cae75748c43f8';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
