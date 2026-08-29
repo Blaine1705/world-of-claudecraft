@@ -249,6 +249,72 @@ const ITEMS = [
     hotBoost: 1.25,
     glowFloor: [36, 9, 6],
   },
+  // The owner's forge-lift car kit (2026-08-29 drop): the antechamber's
+  // iron furniture, all on the architecture sheen tier.
+  {
+    src: 'Lift_Assets/lift_arch_beam.glb',
+    name: 'lift_arch_beam',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
+  {
+    src: 'Lift_Assets/lift_beam.glb',
+    name: 'lift_beam',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
+  {
+    src: 'Lift_Assets/lift_frame.glb',
+    name: 'lift_frame',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
+  {
+    src: 'Lift_Assets/lift_handle.glb',
+    name: 'lift_handle',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
+  {
+    src: 'Lift_Assets/lift_sliding_door.glb',
+    name: 'lift_sliding_door',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
+  {
+    src: 'Lift_Assets/lift_vertical_beam.glb',
+    name: 'lift_vertical_beam',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
+  {
+    src: 'Lift_Assets/lift_weight.glb',
+    name: 'lift_weight',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
+  {
+    src: 'Lift_Assets/lift_winch.glb',
+    name: 'lift_winch',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
   // lava_furnace_2: the name lava_furnace is taken by the New_Assets drop
   // (the lava_outlet_2 precedent for a second same-family model)
   {

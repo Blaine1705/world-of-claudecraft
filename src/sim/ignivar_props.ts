@@ -61,6 +61,14 @@ export type IgnivarEnvPropKey =
   | 'staircase'
   | 'street_lamp'
   | 'dungeon_entrance'
+  | 'lift_arch_beam'
+  | 'lift_beam'
+  | 'lift_frame'
+  | 'lift_handle'
+  | 'lift_sliding_door'
+  | 'lift_vertical_beam'
+  | 'lift_weight'
+  | 'lift_winch'
   | 'stone_floor'
   | 'tower_base'
   | 'tower_middle'
@@ -143,6 +151,15 @@ export const IGNIVAR_PROP_NATIVE: Record<
   street_lamp: { len: 1.73, hei: 5.5, dep: 1.24 },
   // The owner's raid-door facade: a thin upright entrance front.
   dungeon_entrance: { len: 0.74, hei: 1.0, dep: 0.28 },
+  // The owner's forge-lift car kit (measured from the shipped GLBs).
+  lift_arch_beam: { len: 1.0, hei: 0.97, dep: 0.21 },
+  lift_beam: { len: 1.0, hei: 0.38, dep: 0.14 },
+  lift_frame: { len: 0.71, hei: 1.0, dep: 0.16 },
+  lift_handle: { len: 0.44, hei: 1.0, dep: 0.34 },
+  lift_sliding_door: { len: 0.76, hei: 1.0, dep: 0.18 },
+  lift_vertical_beam: { len: 0.18, hei: 1.0, dep: 0.13 },
+  lift_weight: { len: 0.27, hei: 1.0, dep: 0.14 },
+  lift_winch: { len: 0.58, hei: 1.0, dep: 0.44 },
   stone_floor: { len: 1.0, hei: 0.08, dep: 1.0 },
   tower_base: { len: 0.97, hei: 1.0, dep: 0.83 },
   tower_middle: { len: 0.7, hei: 1.0, dep: 0.63 },
@@ -397,6 +414,18 @@ export const IGNIVAR_NON_COLLIDING_PROPS: ReadonlySet<IgnivarEnvPropKey> = new S
   // The entrance facade frames a doorway players walk THROUGH: never a
   // blocker, or its own arch would seal the raid door it dresses.
   'dungeon_entrance',
+  // The forge-lift car kit's pass-through and overhead pieces: the arch and
+  // beams span overhead, the frame and sliding door dress the gate line a
+  // body must cross once the lift arrives, and the handle and hanging
+  // weight are brush-past furniture in a car twelve riders share. Only the
+  // vertical beam (a structural post) and the winch (a machinery block)
+  // stand solid.
+  'lift_arch_beam',
+  'lift_beam',
+  'lift_frame',
+  'lift_handle',
+  'lift_sliding_door',
+  'lift_weight',
 ]);
 
 /** Collider footprint as a fraction of the visual AABB: ornate pillars and

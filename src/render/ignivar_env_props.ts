@@ -10,6 +10,7 @@ import { loadGltf, releaseGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { addRoofDarkness } from './gfx';
 import type { IgnivarEnvPropKey, IgnivarPropPlacement } from './ignivar_dressing_plan_core';
+import { decorateLiftHandleMaterial, decorateLiftWinchMaterial } from './ignivar_lift_room';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 
 export const IGNIVAR_ENV_PROP_URLS: Record<IgnivarEnvPropKey, string> = {
@@ -67,6 +68,14 @@ export const IGNIVAR_ENV_PROP_URLS: Record<IgnivarEnvPropKey, string> = {
   // through src/render/streetlamps.ts).
   street_lamp: '/models/props/streetlamp_drakelands_brazier.glb',
   dungeon_entrance: '/models/dungeon/ignivar_prop_dungeon_entrance.glb',
+  lift_arch_beam: '/models/dungeon/ignivar_prop_lift_arch_beam.glb',
+  lift_beam: '/models/dungeon/ignivar_prop_lift_beam.glb',
+  lift_frame: '/models/dungeon/ignivar_prop_lift_frame.glb',
+  lift_handle: '/models/dungeon/ignivar_prop_lift_handle.glb',
+  lift_sliding_door: '/models/dungeon/ignivar_prop_lift_sliding_door.glb',
+  lift_vertical_beam: '/models/dungeon/ignivar_prop_lift_vertical_beam.glb',
+  lift_weight: '/models/dungeon/ignivar_prop_lift_weight.glb',
+  lift_winch: '/models/dungeon/ignivar_prop_lift_winch.glb',
   stone_floor: '/models/dungeon/ignivar_prop_stone_floor.glb',
   tower_base: '/models/dungeon/ignivar_prop_tower_base.glb',
   tower_middle: '/models/dungeon/ignivar_prop_tower_middle.glb',
@@ -113,6 +122,13 @@ const SHADOW_CASTERS: ReadonlySet<IgnivarEnvPropKey> = new Set([
   'dragon_pillar',
   'dungeon_entrance',
   'fortress_wall',
+  // the forge-lift car kit: real silhouettes cast, the thin beams and
+  // small furniture stay cast-free
+  'lift_arch_beam',
+  'lift_frame',
+  'lift_sliding_door',
+  'lift_vertical_beam',
+  'lift_winch',
   'fountain_base',
   'gate',
   'gate_gear',
@@ -201,6 +217,11 @@ export function prepareIgnivarEnvProps(): Promise<void> {
           // Tall props, chains, and the door towers grade into the roof
           // black with the walls (inert outside the Halls scene state).
           addRoofDarkness(baked.material);
+          // The lift machinery moves in the vertex shader (a masked region
+          // of the single baked mesh on the shared uTime clock): the brake
+          // lever pumps and the winch drum turns, per the owner's direction.
+          if (key === 'lift_handle') decorateLiftHandleMaterial(baked.material);
+          if (key === 'lift_winch') decorateLiftWinchMaterial(baked.material);
           templates.set(key, {
             geometry: markSharedGeometry(baked.geometry),
             material: markSharedMaterial(baked.material),
