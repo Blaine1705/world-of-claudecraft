@@ -64,6 +64,7 @@ function harness(
     closeBank: noop,
     onClosed: noop,
     confirmVendorSell: () => true,
+    isVaultBankTab: () => false,
     addItemToTrade: noop,
     stageMarketSell: noop,
     stageMailParcel: noop,

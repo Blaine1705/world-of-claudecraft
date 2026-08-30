@@ -789,7 +789,37 @@ export const fr_CA: EnTranslations = {
       "applied": "Appliquée",
       "apply": "Appliquer l’apparence",
       "detach": "Retirer l’apparence",
-      "equipHint": "Équipez-vous d’un objet de type {type} pour appliquer cette apparence."
+      "equipHint": "Équipez-vous d’un objet de type {type} pour appliquer cette apparence.",
+      "charter": {
+        "eyebrow": "Strongbox",
+        "title": "Strongbox Charters",
+        "scope": "A charter expands the bank of this character only. The bursar sells the same slots for gold.",
+        "grant": "Adds {slots} bank slots",
+        "buy": "Purchase Charter",
+        "buyAria": "Purchase {item}",
+        "confirmTitle": "Confirm Charter Purchase",
+        "confirmBody": "Purchase {item} for {cost} Claudium?",
+        "resultContext": "{item} ({sku}): {message}",
+        "granted": "The charter was applied. The bank of this character is larger now.",
+        "alreadyGranted": "This charter is already on this character. You were not charged again.",
+        "applyDeferred": "Payment complete. The slots apply automatically the next time this character logs in.",
+        "grantUnresolved": "Payment complete, but the slots could not be applied yet. The purchase is recorded and support can finish it for you.",
+        "inProgress": "A purchase for this character is still being completed. Try again in a moment.",
+        "doesNotFit": "The bank of this character cannot fit the full grant of this charter.",
+        "notPurchasable": "This charter cannot be purchased right now.",
+        "noRoom": "The bank of this character has no room left for a charter.",
+        "noCharterFits": "No charter fits the room left in the bank of this character.",
+        "someHiddenByFit": "Charters too large for the room left in the bank of this character are not shown.",
+        "outage": "The purchase could not be confirmed. Try again with this button and you will not be charged twice. Reloading the game first can lose that protection.",
+        "outageStale": "Return to the Store and use the same Purchase Charter action again. You will not be charged twice. Reloading the game first can lose that protection.",
+        "failed": "The purchase could not be completed.",
+        "names": {
+          "strongbox_charter_1": "Lesser Strongbox Charter",
+          "strongbox_charter_2": "Greater Strongbox Charter",
+          "strongbox_charter_3": "Grand Strongbox Charter",
+          "strongbox_charter_complete": "Complete Strongbox Charter"
+        }
+      }
     },
     "claudium": {
       "title": "Claudium",
@@ -1564,6 +1594,8 @@ export const fr_CA: EnTranslations = {
       "showDailyRewardsChest": "Afficher le coffre des récompenses quotidiennes",
       "mobileCameraJoystick": "Manette de caméra",
       "mobileLeftHanded": "Disposition pour gaucher",
+      "touchPreciseAim": "Precise Ground Targeting",
+      "touchPreciseAimNote": "Aim before casting ground spells. Turn off to cast instantly at the suggested point.",
       "touchTapMenus": "Menus par appui",
       "touchTapMenusNote": "Ouvrez les contrôles d'action, de consommables et de menu d'une pression au lieu d'un glissement. Touchez un élément pour l'utiliser, touchez à nouveau le contrôle pour son action habituelle, ou touchez à l'extérieur pour fermer."
     },
@@ -1599,6 +1631,7 @@ export const fr_CA: EnTranslations = {
       "invertY": "Inverser la caméra (Y)",
       "deadzone": "Zone morte du stick",
       "cameraSpeed": "Vitesse de la caméra",
+      "reticleSpeed": "Reticle Speed",
       "vibration": "Vibrations",
       "buttons": "Disposition des boutons",
       "resetButtons": "Réinitialiser la disposition des boutons",
@@ -1979,6 +2012,7 @@ export const fr_CA: EnTranslations = {
       "fromYour": "Grâce à vos {value} en {stat} :",
       "names": {
         "spellPower": "Puissance des sorts",
+        "healPower": "Healing Power",
         "critRating": "Score de critique",
         "hasteRating": "Score de hâte",
         "parry": "Parade",
@@ -2453,7 +2487,10 @@ export const fr_CA: EnTranslations = {
       "backpack": "Sac à dos",
       "bagSocketAria": "{name} : {slots}",
       "socketEmpty": "Emplacement de sac vide",
-      "unequipHint": "Cliquez pour retirer ce sac"
+      "unequipHint": "Cliquez pour retirer ce sac",
+      "poolGeneral": "General: {used} of {total}",
+      "poolMaterials": "Materials: {used} of {total}",
+      "capacityPoolsAria": "Bag slots used: {used} of {total}. General items: {generalUsed} of {generalTotal}. Materials: {materialsUsed} of {materialsTotal}."
     },
     "raidConvert": {
       "toPartyDone": "Votre raid a été reconverti en groupe.",
@@ -2466,7 +2503,180 @@ export const fr_CA: EnTranslations = {
       "leather": "Cuir",
       "mail": "Mailles"
     },
+    "varkhulCallout": {
+      "leftPillarCharging": "The left forge pillar is charging. It will ignite in 3 sec!",
+      "rightPillarCharging": "The right forge pillar is charging. It will ignite in 3 sec!",
+      "bothPillarsCharging": "The forge pillars are charging. They will ignite in 3 sec!",
+      "artificerApproaches": "A Cinder Artificer is approaching the forge!",
+      "leftPillar": "The left forge pillar ignites!",
+      "rightPillar": "The right forge pillar ignites!",
+      "bothPillars": "The forge pillars ignite!",
+      "portalsOpening": "The forge portals are opening!",
+      "heat75": "The forge is at 75% heat!",
+      "heat90": "Forge Meltdown is imminent!",
+      "addsDefeated": "The forge legion is defeated: Varkhul is exposed!",
+      "worldfireBegins": "Worldfire ignites at the edge of the room. The crucible will be consumed in 42 sec!",
+      "worldfireClosing": "Worldfire closes in. Move toward the center!",
+      "worldfireConsumed": "The entire crucible is burning!"
+    },
+    "varkhulWaveStatus": "Wave {wave}/{waves} | Enemies: {remaining}",
+    "raidBossGuide": {
+      "title": "Boss Guide",
+      "button": "Boss Guide: {boss}",
+      "subtitle": "{boss} | {difficulty}",
+      "close": "Close boss guide",
+      "bossesLabel": "Raid bosses",
+      "difficultyLabel": "Difficulty",
+      "normal": "Normal",
+      "heroic": "Heroic",
+      "portraitAlt": "{boss} encounter portrait",
+      "overviewHeading": "Overview",
+      "abilitiesHeading": "Abilities",
+      "whatToDo": "What to do",
+      "whatToDoResponse": "What to do: {response}",
+      "rolesLabel": "Role responsibilities",
+      "flagsLabel": "Mechanic warnings",
+      "roleTank": "Tank",
+      "roleHealer": "Healer",
+      "roleDamage": "Damage",
+      "roleAll": "All roles",
+      "flagDeadly": "Deadly",
+      "flagInterruptible": "Interruptible",
+      "flagImportant": "Important",
+      "flagCleansable": "Cleansable",
+      "browseBoss": "View {boss}",
+      "chooseDifficulty": "View {difficulty} mechanics",
+      "expandAbility": "Expand {ability}",
+      "collapseAbility": "Collapse {ability}",
+      "abilityControlLabel": "{action}. {details}",
+      "tooltipMeta": "{phase} | {difficulty}",
+      "ignivar": {
+        "overview": "Varkhul forged Ignivar as a herald, a living seal, and the key to the Inner Crucible. The encounter tests water-conduit control, precise movement, and fast priority damage.",
+        "phaseOpeningName": "The Herald Awakens",
+        "phaseOpeningSummary": "Control Brand of the Pyre with the water conduits while handling Ignivar's repeating frontal, skyfire, rotating rays, and expanding Forge Wave.",
+        "phaseApocalypseName": "Intermission: Apocalypse",
+        "phaseApocalypseSummary": "At {health} health, Ignivar calls an Ashcaller that attempts to end the encounter.",
+        "phaseJudgmentName": "Judgment of the Forge",
+        "phaseJudgmentSummary": "At {health} health, Ignivar ignites the arena and reveals one safe refuge among three shelters.",
+        "phaseJudgmentHeroicSummary": "At {health} health, Ignivar ignites the arena while active Brands continue to threaten nearby players inside the refuge.",
+        "phaseFinaleName": "Finale: Last Inferno",
+        "phaseFinaleSummary": "At {health} health, Ignivar begins a final burn phase with a hard deadline and faster repeating mechanics.",
+        "forgeStrikeName": "Forge Strike",
+        "forgeStrikeSummary": "Ignivar strikes his current tank and applies Molten Armor, increasing damage taken from Ignivar.",
+        "forgeStrikeResponse": "Tanks swap at {stacks} stacks. Healers prepare for the strike and the new tank's first melee swings.",
+        "brandName": "Brand of the Pyre",
+        "brandSummary": "Ignivar marks non-tank players with persistent fire damage. Branded players also burn nearby allies.",
+        "brandResponse": "Spread out. Aim Searing Torrent into a ready water conduit, then have each marked player cross the activated water alone to cleanse.",
+        "brandHeroicResponse": "Spread out. Open a conduit with Searing Torrent and cleanse one marked player at a time. Every cleanse triggers raid-wide Cleansing Backlash.",
+        "searingTorrentName": "Searing Torrent",
+        "searingTorrentSummary": "Ignivar tracks a player, then releases a wide frontal blast. A ready water conduit struck by the blast becomes active for a short time.",
+        "searingTorrentHeroicSummary": "Ignivar tracks a player, then releases a nearly lethal frontal blast. A ready water conduit struck by the blast becomes active for a short time.",
+        "searingTorrentResponse": "Aim the warning through exactly one ready conduit. Everyone else leaves the frontal before the cast completes.",
+        "rainName": "Rain of Cinders",
+        "rainSummary": "Three fire sectors and marked meteor impacts punish players who remain inside their warnings.",
+        "rainHeroicSummary": "Three fire sectors and marked meteor impacts deal extreme damage to players who remain inside their warnings.",
+        "rainResponse": "Move into an unmarked gap and leave every meteor circle before impact.",
+        "raysName": "Revolving Inferno",
+        "raysSummary": "Rotating fire rays sweep around Ignivar and repeatedly damage players who touch them.",
+        "raysHeroicSummary": "Rotating fire rays sweep around Ignivar and inflict severe repeated damage on contact.",
+        "raysResponse": "Move with the open space between rays. Do not cut through a ray, even with a fast movement ability.",
+        "forgeWaveName": "Forge Wave",
+        "forgeWaveSummary": "An expanding wall of fire crosses the arena, leaving two opposite gaps and knocking back players it hits.",
+        "forgeWaveHeroicSummary": "An expanding wall of fire crosses the arena, leaving two opposite gaps and knocking hit players much farther.",
+        "forgeWaveResponse": "Find either gap during the windup, align with it, and avoid being knocked toward the arena edge.",
+        "apocalypseName": "Apocalypse",
+        "apocalypseSummary": "Ignivar summons an Ashcaller. If the add finishes Apocalypse, the raid is defeated immediately.",
+        "apocalypseResponse": "Switch all available damage to the Ignivar Ashcaller and defeat it before the cast completes.",
+        "judgmentName": "Judgment of the Forge",
+        "judgmentSummary": "Ignivar marks three shelters, identifies one safe refuge, and then repeatedly burns the rest of the arena.",
+        "judgmentHeroicSummary": "Ignivar marks one safe refuge while the arena burns. Brand of the Pyre remains active and still damages nearby allies.",
+        "judgmentResponse": "Identify the uniquely marked refuge during the warning and stack fully inside its boundary before the floor ignites.",
+        "chainsName": "Chains of the Forge",
+        "chainsSummary": "Ignivar links nearby pairs. Separating too far or crossing another pair's chain causes lethal damage.",
+        "chainsResponse": "Stay close to your linked partner, move together, and keep every other player from passing through your chain.",
+        "lastInfernoName": "Last Inferno",
+        "lastInfernoSummary": "Ignivar enrages and prepares a hard wipe while Rain of Cinders, Searing Torrent, and Revolving Inferno accelerate.",
+        "lastInfernoResponse": "Use remaining damage and healing cooldowns, keep executing the movement mechanics, and defeat Ignivar before the countdown ends.",
+        "brand": "Brand of the Pyre: spread out. Aim Searing Torrent into a ready water conduit, then cross the water alone to cleanse.",
+        "movement": "Movement: avoid Rain of Cinders cones and meteors, move with Revolving Inferno, and use Forge Wave's two gaps.",
+        "apocalypse": "Apocalypse: kill Ignivar Ashcaller before its cast completes.",
+        "judgment": "Judgment of the Forge: identify the unique refuge during the warning, then stack inside its marked boundary when the floor ignites.",
+        "finale": "Last Inferno: finish Ignivar before the hard wipe while faster meteors, frontals, and Revolving Inferno continue.",
+        "heroic": "Heroic: paired players stay close during Chains of the Forge, Brand remains active inside Judgment, and Forge Wave pushes farther."
+      },
+      "varkhul": {
+        "overview": "Varkhul imprisoned the dying Last Spring to forge living metal, then created Ignivar to guard the crime. His encounter combines personal positioning with raid-wide control of the grand forge.",
+        "phaseOpeningName": "The Forgefather",
+        "phaseOpeningSummary": "Varkhul cycles tank pressure, wide frontals, moving projectiles, group soaks, meteor waves, and attacks from the grand anvil.",
+        "phaseAssemblyName": "Intermission: The Master's Assembly",
+        "phaseAssemblySummary": "At {health} health, Varkhul becomes protected while his forge legion enters through portals and the pillar beams threaten a Forge Meltdown.",
+        "phaseFinaleName": "Finale: Masterpiece Unbound",
+        "phaseFinaleSummary": "At {health} health, Varkhul attacks faster, deals more damage, and pulses fire through the raid until the final deadline.",
+        "phaseFinaleHeroicSummary": "At {health} health, Varkhul abandons most earlier mechanics as Worldfire closes inward and consumes the crucible.",
+        "makersBrandName": "Maker's Brand",
+        "makersBrandSummary": "Varkhul strikes his current tank and applies a stacking effect that increases all damage taken from him.",
+        "makersBrandResponse": "Tanks swap at {stacks} stacks. Healers prepare the incoming tank before Varkhul changes targets.",
+        "frontalName": "Forgefather's Sweep",
+        "frontalSummary": "Varkhul releases a very wide frontal sweep that deals heavy fire damage to everyone in front of him.",
+        "frontalHeroicSummary": "Varkhul releases a very wide frontal sweep that deals nearly lethal fire damage to everyone in front of him.",
+        "frontalResponse": "Keep Varkhul facing away from the group and move behind him as soon as the warning appears.",
+        "orbsName": "Cinder Orbs",
+        "orbsSummary": "Marked non-tanks drop persistent cinder pools and release fire orbs in every direction. Red-hot Metal also absorbs incoming healing.",
+        "orbsHeroicSummary": "Marked non-tanks drop highly damaging persistent cinder pools and release dangerous fire orbs in every direction. Red-hot Metal also absorbs incoming healing.",
+        "orbsResponse": "Carry each mark to the room edge, separate the pools, then dodge the orbs as they cross the arena. Healers clear the absorb quickly.",
+        "pyreName": "Shared Pyre",
+        "pyreSummary": "A moving circle follows one player without Red-hot Metal. Its damage is divided among players inside, and every missing player deals {missingPenalty} maximum-health damage to the entire raid.",
+        "pyreHeroicSummary": "A moving circle follows one player without Red-hot Metal and splits a larger hit. Every missing player also deals {missingPenalty} maximum-health damage to the entire raid.",
+        "pyreResponse": "Stack at least {players} players inside the circle and move with its target until the cast resolves.",
+        "forgestormName": "Forgestorm",
+        "forgestormSummary": "Varkhul calls down {waves} consecutive waves of marked meteor impacts across the arena.",
+        "forgestormHeroicSummary": "Varkhul calls down {waves} consecutive waves of marked meteor impacts that deal extreme damage.",
+        "forgestormResponse": "Watch each new set of ground warnings and move out before that wave lands. Do not return to a previous position without checking the next wave.",
+        "rayName": "Tempering Ray",
+        "raySummary": "A ray tracks a marked player for a long windup. The first other player between Varkhul and the target intercepts the hit and receives Tempered Wound.",
+        "rayResponse": "Assign a healthy player, usually the off-tank, to step into the line. Keep other players out and rotate interceptors while Tempered Wound is active.",
+        "anvilName": "Anvil's Decree",
+        "anvilSummary": "Varkhul walks to the grand forge and strikes it {strikes} times, dealing increasing raid-wide damage.",
+        "anvilHeroicSummary": "Varkhul strikes the grand forge {strikes} times for increasing raid damage while marked meteors fall on players.",
+        "anvilResponse": "Group for raid healing and use defensive cooldowns for the final strike.",
+        "anvilHeroicResponse": "Spread marked meteors away from the group while healers and defensive cooldowns cover all {strikes} strikes.",
+        "assemblyName": "The Master's Assembly",
+        "assemblySummary": "Varkhul becomes protected and starts a timed assembly. The raid must defeat every portal wave before the forge completes his masterpiece.",
+        "assemblyResponse": "Split attention between beam control and priority adds. Defeat the full forge legion before the assembly timer expires.",
+        "beamName": "Crucible Beam",
+        "beamSummary": "Active pillar beams heat the forge unless a player blocks them. Blockers take increasing damage from Crucible Exposure, while blocked and inactive beams let heat fall.",
+        "beamHeroicSummary": "Active pillar beams heat the forge unless a player blocks them. Blockers take increasing damage from Crucible Exposure, and forge heat never decreases.",
+        "beamResponse": "Stand between each active pillar and the forge, then rotate blockers before exposure becomes dangerous. Reaching full heat causes a lethal Forge Meltdown.",
+        "legionName": "Forge Legion",
+        "legionSummary": "Crucible Wardens cast Crucible Quake to add forge heat, while Cinder Artificers use Repair Protocol to heal Varkhul.",
+        "legionResponse": "Interrupt Crucible Quake, stop Repair Protocol, and focus each dangerous caster before clearing the remaining adds.",
+        "masterpieceName": "Masterpiece Unbound",
+        "masterpieceSummary": "Varkhul attacks faster, deals more damage, and repeatedly burns the raid until the final wipe.",
+        "masterpieceHeroicSummary": "Varkhul attacks faster and deals more damage while Worldfire replaces most earlier mechanics for the final burn.",
+        "masterpieceResponse": "Commit remaining offensive and defensive cooldowns and defeat Varkhul before the final countdown ends.",
+        "worldfireName": "Worldfire",
+        "worldfireSummary": "On Heroic, fire advances from the arena edge toward the center in stages until the entire crucible burns.",
+        "worldfireResponse": "Move inward ahead of each advancing fire band, preserve the shrinking safe space, and finish Varkhul before the center ignites.",
+        "tanks": "Tanks: swap at two stacks of Maker's Brand and keep Varkhul in melee range.",
+        "orbs": "Cinder Orbs: marked players spread to the room edge. Their fire pools persist and the released orbs cross the room.",
+        "pyre": "Shared Pyre: only a player without Red-hot Metal is selected. Stack four players inside the moving circle in either difficulty. Each missing player deals 15% of maximum health to the entire raid.",
+        "forgestorm": "Forgestorm: watch the falling meteors and leave every marked impact before each of the three waves lands.",
+        "anvil": "Anvil's Decree: Varkhul moves to the grand forge and strikes it three times for raid damage. Heroic also drops marked meteors.",
+        "ray": "Tempering Ray: another player, usually a tank, intercepts the moving line before the long windup ends. The player hit receives Tempered Wound.",
+        "forge": "Forge pillars: block active beams before they reach the forge and rotate blockers as Crucible Exposure grows. A full heat meter causes Forge Meltdown.",
+        "assembly": "The Master's Assembly: block both forge beams, kill every portal wave, interrupt Crucible Quake, and stop Cinder Artificers from healing Varkhul.",
+        "worldfire": "Worldfire: on Heroic, the burning edge closes toward the center during the final phase. Defeat Varkhul before the whole crucible burns.",
+        "heroic": "Heroic: forge heat never cools, Anvil's Decree adds meteors, and the final phase removes most mechanics to focus on Worldfire."
+      }
+    },
     "auraEffect": {
+      "sharedPyre": "Deals {total}% of each player's maximum health, divided by the number of players inside the circle ({perPlayer}% each with {players} players).",
+      "varkhulSharedPyre": "Deals {total}% of each player's maximum health, divided among players inside the circle ({perPlayer}% each with {players} players). Each missing player also deals {missingPenalty}% of maximum health to the entire raid, including players inside the circle.",
+      "makersBrand": "For {duration} sec, each stack increases damage taken from Varkhul by {pct}%. Stacks up to {max} times. Tanks should swap at {swap} stacks.",
+      "varkhulSentinelsGaze": "The Ember Sentinel pursues you. Keep it away from the raid until it is destroyed.",
+      "varkhulMoltenCore": "Carry this core to the forge. Molten Burden deals increasing damage every {interval} sec, from {min}% to {max}% of maximum health.",
+      "varkhulForgeLink": "Intercept an active pillar beam before it reaches the forge. Open beams add 6% heat per second. In Normal, blocked beams and inactive pillars cool the forge; in Heroic, heat never falls. At 100%, the forge suffers a lethal Meltdown.",
+      "varkhulCrucibleExposure": "Blocking a Crucible Beam deals increasing maximum-health damage every second. The stacks reset 10 seconds after leaving a beam in Normal and after 60 seconds in Heroic.",
       "dot": "Cause {value} points de dégâts de {school} toutes les {interval} s",
       "hot": "Redonne {value} points de vie toutes les {interval} s",
       "mendingCurrent": "Stocke {value} de soins, libérés avec le temps ou consommés par Reprise en cascade",
@@ -2677,7 +2887,9 @@ export const fr_CA: EnTranslations = {
       "chestTitle": "Coffre",
       "takeLootButton": "Prendre le butin",
       "takeLootTooltip": "Prend les pièces et les objets lâchés. N'utilise pas la récolte.",
-      "unifiedPressHint": "La touche d'interaction pille et récolte en une seule pression, selon votre focus de bourg."
+      "unifiedPressHint": "La touche d'interaction pille et récolte en une seule pression, selon votre focus de bourg.",
+      "bindConfirmTitle": "Binds when picked up",
+      "bindConfirmBody": "This loot contains an item that will bind to you when taken. A bound item can only be traded to players who shared its drop, and only for a limited time."
     },
     "spellbook": {
       "addToBarAria": "Ajouter {name} à la barre d'action",
@@ -2802,7 +3014,8 @@ export const fr_CA: EnTranslations = {
       "riftUpgrade": "Amélioration de faille {level}/{max}",
       "riftSockets": "Gemmes de faille {used}/{total}",
       "statEnchanted": "+{value} {stat} (Enchanté)",
-      "enchantedFallback": "Enchanté"
+      "enchantedFallback": "Enchanté",
+      "partyTradeWindow": "You may trade this item to players who shared its drop for the next {time}. Equipping it ends the trade window."
     },
     "materialHint": {
       "fineGrade": "Qualité fine. Récolté sur un filon de plein palier avec un outil de rang supérieur au matériau, et compte comme la version ordinaire partout où celle-ci est requise.",
@@ -3092,6 +3305,26 @@ export const fr_CA: EnTranslations = {
       "buySlotsMaxed": "Capacité maximale",
       "buyConfirm": "Acheter {count} emplacements de banque supplémentaires pour {price} ?",
       "buyConfirmAccept": "Acheter",
+      "meterLabel": "{used} of {total} slots",
+      "meterPoolGeneral": "General: {used} of {total}",
+      "meterPoolMaterials": "Materials: {used} of {total}",
+      "meterPoolsAria": "Bank slots used: {used} of {total}. General items: {generalUsed} of {generalTotal}. Materials: {materialsUsed} of {materialsTotal}.",
+      "meterMaterialsNote": "Materials-only space from socketed satchels. Other items cannot use it.",
+      "priceDisclaimer": "Prices may change with the game economy.",
+      "rungItemName": "{count} bank slots",
+      "buySlotsDualAria": "Buy {count} slots for {price} or {cost} Claudium",
+      "buyConfirmDual": "Purchase {count} additional bank slots?",
+      "buyConfirmGold": "Purchase for {price}",
+      "buyConfirmClaudium": "Purchase for {cost} Claudium",
+      "rungGranted": "The bank slots were added. The bank of this character is larger now.",
+      "rungAlreadyGranted": "These slots are already on this character. You were not charged again.",
+      "rungApplyDeferred": "Payment complete. The slots apply automatically the next time this character logs in.",
+      "rungGrantUnresolved": "Payment complete, but the slots could not be applied yet. The purchase is recorded and support can finish it for you.",
+      "rungInProgress": "A purchase for this character is still being completed. Try again in a moment.",
+      "rungDoesNotFit": "The bank of this character cannot fit another expansion.",
+      "rungNotPurchasable": "These bank slots cannot be purchased right now.",
+      "rungFailed": "The purchase could not be completed.",
+      "rungOutage": "The purchase could not be confirmed. Try again with this button and you will not be charged twice. Reloading the game first can lose that protection.",
       "withdrawHint": "Cliquez pour retirer",
       "withdrawPartialHint": "Maj-clic pour retirer une quantité partielle",
       "depositHint": "Cliquez pour déposer",
@@ -3104,6 +3337,9 @@ export const fr_CA: EnTranslations = {
       "withdrawQuantityTitle": "Retirer {item}",
       "withdrawQuantityInput": "Quantité à retirer",
       "withdrawQuantityConfirm": "Retirer",
+      "vaultRowWithdrawName": "Withdraw {item}",
+      "priceChanged": "The price changed before the purchase completed. Review the refreshed price and confirm again.",
+      "withdrawQuantityAction": "Quantity to withdraw: {item}",
       "filterGroupAria": "Filtrer la banque par catégorie",
       "sortAria": "Trier les objets de la banque",
       "searchAria": "Rechercher un objet de la banque par son nom",
@@ -3125,6 +3361,34 @@ export const fr_CA: EnTranslations = {
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "Invitez un ami : quand il atteint le niveau 10, vous gagnez chacun 2 emplacements, jusqu'à 5 amis.",
       "bonusSectionAria": "Emplacements de banque bonus et comment en gagner d'autres",
+      "socketRowAria": "Bank bag sockets",
+      "socketEmpty": "Empty bank bag socket",
+      "socketEmptyHint": "Click a bag in your bags to store it in the bank",
+      "socketLocked": "Locked bag socket",
+      "socketLockedLater": "Bag sockets unlock in order, cheapest first",
+      "socketUnlockAria": "Unlock a bank bag socket for {price}",
+      "socketUnlockHint": "Click to unlock this bag socket",
+      "socketUnlockConfirm": "Unlock a bank bag socket for {price}?",
+      "socketUnlockAccept": "Unlock",
+      "unsocketHint": "Click to return this bag to your bags",
+      "socketHint": "Click to socket this bag into your bank",
+      "vaultTab": "Vault",
+      "vaultCapacityNote": "Each material holds up to {cap}.",
+      "vaultEmpty": "Your vault is empty. Click a material in your bags to deposit it.",
+      "vaultRowAria": "{item}: {count} of {cap} stored",
+      "vaultLockedIntro": "Unlock the Materials Vault to stockpile crafting materials beside your bank. Every material gets its own room, up to {cap} apiece.",
+      "vaultUnlockButton": "Unlock the Materials Vault",
+      "vaultUnlockConfirm": "Unlock the Materials Vault for {price}?",
+      "vaultUpgrade": "Widen every ceiling to {cap}",
+      "vaultUpgradeConfirm": "Widen every material ceiling to {cap} for {price}?",
+      "vaultDepositAll": "Deposit all materials",
+      "vaultDepositAllTooltip": "Sends every material from your bags to your vault in one trip, filling each material up to its ceiling. Gear, tools, quest items, and consumables are never touched.",
+      "vaultDepositAllDone": "Materials deposited: {count}.",
+      "vaultDepositAllFull": "Materials deposited: {count}. Some ceilings are full.",
+      "vaultDepositAllNone": "Vault ceilings full: nothing deposited.",
+      "vaultWithdrawShort": "Only {fit} of {count} fit in your bags.",
+      "vaultDepositHint": "Click to deposit into your vault",
+      "vaultCannotDeposit": "Cannot go in the vault",
       "tabsAria": "Onglets de la banque",
       "personalTab": "Personnel",
       "guildTab": "Guilde",
@@ -3524,6 +3788,8 @@ export const fr_CA: EnTranslations = {
       "reagentsNeeded": "Nécessite$1",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(dépense {count} de qualité fine)",
+      "reagentVaultDraw": "(draws {count} from your vault)",
+      "vaultUnreachable": "The Materials Vault is out of reach here.",
       "craftFeeLine": "Frais de fabrication : {fee} chacun",
       "empty": "Aucune recette connue pour l'instant.",
       "resultAria": "Artisanat {name}",
@@ -4388,6 +4654,8 @@ export const fr_CA: EnTranslations = {
       "online": "Le personnage est actuellement en ligne.",
       "rename_not_permitted": "Le changement de nom de ce personnage n'est pas autorisé.",
       "delete_confirm": "Saisissez le nom du personnage pour confirmer la suppression.",
+      "storage_purchase_open": "A storage purchase must finish or be resolved before this character can be deleted.",
+      "delete_busy": "The realm is busy. Try deleting this character again in a moment.",
       "already_in_world": "Le personnage est déjà dans le monde.",
       "taken_over": "Votre personnage a été pris en main par une autre session.",
       "rename_required": "Ce personnage doit être renommé avant d'entrer dans le monde.",
@@ -6399,6 +6667,7 @@ export const fr_CA: EnTranslations = {
       "bankBody": "Chaque ville principale abrite une succursale du Coffre doré, la maison de banque du royaume. Adressez-vous au trésorier sur place pour ouvrir votre chambre forte, une réserve privée au-delà de vos sacs que votre personnage conserve à vie. Tout ce que vous leur confiez attend en lieu sûr, quelle que soit la succursale où vous passerez ensuite.",
       "bankHow": "Une fois la chambre forte ouverte, cliquez sur un objet dans vos sacs pour le déposer, et cliquez dessus dans la chambre forte pour le reprendre. La chambre forte n'accueille que des biens, jamais de pièces, et les objets de quête restent sur vous. Quand vos sacs débordent en pleine route, un seul bouton y range d'un coup tous vos matériaux d'artisanat.",
       "bankSlots": "Une chambre forte neuve commence petite et grandit avec vous. Le trésorier vend des emplacements supplémentaires contre pièces, à des prix toujours plus élevés, et jouer en ligne rapporte de la place bonus en plus, par exemple pour une adresse e-mail vérifiée, des comptes liés ou des amis que vous amenez dans le jeu.",
+      "bankSockets": "Past the slot ladder, the bursar also sells up to four bag sockets, unlocked in order at ever-steeper prices. Seat a spare bag from your carrying set in one and its slots join your vault room: an everyday bag widens the whole store, while a reagent satchel adds room only crafting materials may take. Click a bag in your bags to seat it and click the socket to take it back. Taking one back never costs you a thing you stored: if the vault ends up fuller than its shrunken room, everything stays put and new deposits simply wait for space.",
       "buyingTitle": "Acheter et vendre",
       "buyingBody": "Adressez-vous à un marchand et choisissez de parcourir ses marchandises : sa boutique s'ouvre sur trois onglets, Acheter, Vendre et Rachat. Acheter contient tout ce qu'il tient en stock, à vous si vous en avez les moyens. Vendre liste ce que vos sacs contiennent et qu'il vous paiera, et vendre une pièce qui porte sa propre qualité tirée au sort vous demande d'abord confirmation, pour qu'un exemplaire précieux ne vous échappe jamais par mégarde. Si vous vous séparez d'un objet à regret, l'onglet Rachat conserve vos ventes récentes pour que vous puissiez les racheter au prix qu'on vous en a donné.",
       "junkTitle": "Faire le tri du superflu",
@@ -7832,6 +8101,20 @@ export const fr_CA: EnTranslations = {
     "buyConfirmAccept": "Acheter",
     "buyConfirmCancel": "Annuler"
   },
+  "crucibleShop": {
+    "browse": "Redeem Sigils",
+    "browseAria": "Redeem Crucible sigils with {name}",
+    "empty": "No set pieces are redeemable for your class.",
+    "balance": "Your sigils: {list}",
+    "balanceEntry": "{name} x{count}",
+    "noSigils": "You hold no Crucible sigils.",
+    "price": "1 {sigil}",
+    "buyAria": "Redeem {sigil} for {item}",
+    "buyConfirmTitle": "Confirm Redemption",
+    "buyConfirmBody": "Redeem your {sigil} for {item}? A consumed sigil cannot be refunded.",
+    "buyConfirmAccept": "Redeem",
+    "buyConfirmCancel": "Cancel"
+  },
   "cardDuel": {
     "title": "Duel de cartes",
     "close": "Fermer",
@@ -8660,6 +8943,8 @@ export const fr_CA: EnTranslations = {
         "riftEntrance": "Entrée de la faille : {name}",
         "hostileEnemy": "Ennemi hostile",
         "aggressiveEnemy": "Ennemi qui vous attaque",
+        "bossEnemy": "Boss: {name}",
+        "bossAggressiveEnemy": "Boss attacking you: {name}",
         "lootableEnemy": "Ennemi avec du butin",
         "corpse": "Votre cadavre",
         "deathZone": "Zone dangereuse",
@@ -9048,6 +9333,7 @@ export const fr_CA: EnTranslations = {
       "tradeExpired": "La demande d'échange a expiré.",
       "tradeFailed": "Échange échoué : objets ou argent indisponibles.",
       "tradeBound": "Cet objet est lié et ne peut pas être échangé.",
+      "tradeWindowIneligible": "That can only be traded to players who shared its drop.",
       "marketListBound": "Cet objet est lié et ne peut pas être inscrit au marché."
     },
     "logs": {
@@ -9528,7 +9814,8 @@ export const fr_CA: EnTranslations = {
       "clickUseInstant": "Cliquer pour utiliser instantanément en combat",
       "clickUse": "Cliquer pour utiliser",
       "clickBuyback": "Cliquer pour racheter",
-      "bagSlots": "Sac de {slots} emplacements"
+      "bagSlots": "Sac de {slots} emplacements",
+      "bagSlotsMaterials": "Sac à matériaux de {slots} emplacements"
     },
     "bags": {
       "title": "Sacs",
@@ -9710,7 +9997,8 @@ export const fr_CA: EnTranslations = {
       "greedAria": "Cupidité pour {item}",
       "passAria": "Passer pour {item}",
       "everyonePassed": "Tout le monde a passé pour {item}.",
-      "rolled": "{answered}/{total} ont lancé"
+      "rolled": "{answered}/{total} ont lancé",
+      "bindsOnPickup": "Binds when picked up"
     }
   },
   "entities": {
@@ -10491,7 +10779,7 @@ export const fr_CA: EnTranslations = {
       },
       "needle_of_fate": {
         "name": "Aiguille du destin",
-        "description": "Transperce l'ennemi pour {damage} points de dégâts d'Ombre et génère 5 Condamnation s'il porte votre Mauvais œil. Chaque coup sur votre Mauvais œil principal ajoute un Fil du destin pendant 12 s, jusqu'à 3. Si aucun Mauvais œil n'existe, l'Aiguille marque d'abord sa cible."
+        "description": "Transperce l'ennemi pour {damage} points de dégâts d'Ombre et génère {needleDoom} Condamnation s'il porte votre Mauvais œil. Chaque coup sur votre Mauvais œil principal ajoute un Fil du destin pendant 12 s, jusqu'à 3. Si aucun Mauvais œil n'existe, l'Aiguille marque d'abord sa cible."
       },
       "sentence": {
         "name": "Sentence",
@@ -10589,7 +10877,7 @@ export const fr_CA: EnTranslations = {
       },
       "moonseed": {
         "name": "Graine lunaire",
-        "description": "Forme de sélénien uniquement. Frappe pour {damage} dégâts d'Arcane, ajoute un cran de Marée lunaire et prolonge votre Tempête lunaire de 6 s, jusqu'à 6 s par application. À Marée lunaire pleine, Graine lunaire devient Déferlante lunaire."
+        "description": "Forme de sélénien uniquement. Frappe pour {damage} dégâts d'Arcane, ajoute un cran de Marée lunaire et prolonge votre Tempête lunaire de 6 s, jusqu'à {duration} s par application. À Marée lunaire pleine, Graine lunaire devient Déferlante lunaire."
       },
       "rejuvenation": {
         "name": "Floraison sauvage",
@@ -10893,7 +11181,7 @@ export const fr_CA: EnTranslations = {
       },
       "conflagrate": {
         "name": "Conflagration",
-        "description": "Avance un tic à venir de votre Pacte brûlant, puis embrase la cible pour {damage} points de dégâts de Feu. Génère 1 Dévastation et 1 Ruine. Retient 2 charges. (Signature Destruction)"
+        "description": "Avance un tic à venir de votre Pacte brûlant, puis embrase la cible pour {damage} points de dégâts de Feu. Génère 1 Dévastation et 1 Ruine. Retient {charges} charges. (Signature Destruction)"
       },
       "moonkin_form": {
         "name": "Forme de sélénien",
@@ -10925,7 +11213,7 @@ export const fr_CA: EnTranslations = {
       },
       "overbloom": {
         "name": "Surfloraison",
-        "description": "Consomme 5 Verdoyance. Récolte chaque soin sur la durée que vous possédez sur tous les alliés pour 60% de ses soins restants, retire ces effets et plante une Floraison sauvage fraîche sur la cible."
+        "description": "Consomme 5 Verdoyance. Récolte chaque soin sur la durée que vous possédez sur tous les alliés pour {buff}% de ses soins restants, retire ces effets et plante une Floraison sauvage fraîche sur la cible."
       },
       "summon_imp": {
         "name": "Invoquer un Emberkin",
@@ -10997,7 +11285,7 @@ export const fr_CA: EnTranslations = {
       },
       "iron_resolve": {
         "name": "Résolution de fer",
-        "description": "Serrez les dents et ignorez la douleur : dépense jusqu’à 40 points de rage (20 minimum) pour absorber 4 points de dégâts par point de rage dépensé, pendant un maximum de 10 s. (Protection)"
+        "description": "Serrez les dents et ignorez la douleur : dépense jusqu’à 40 points de rage (20 minimum) pour absorber {absorbPerRage} points de dégâts par point de rage dépensé, pendant un maximum de 10 s. (Protection)"
       },
       "faultline": {
         "name": "Ligne de faille",
@@ -11374,7 +11662,7 @@ export const fr_CA: EnTranslations = {
       },
       "seraphic_vigil": {
         "name": "Veille séraphique",
-        "description": "Protège un allié pendant 30 s. Le premier coup qui le fait descendre sous 35% de points de vie consomme la Veille et le soigne de 180. (Signature de Bénison)"
+        "description": "Protège un allié pendant 30 s. Le premier coup qui le fait descendre sous 35% de points de vie consomme la Veille et le soigne de {buff}. (Signature de Bénison)"
       },
       "summon_tithefiend": {
         "name": "Invoquer un Démon de dîme",
@@ -12965,6 +13253,27 @@ export const fr_CA: EnTranslations = {
       "dawnhold_posy": {
         "name": "Bouquet du jardin de Dawnhold"
       },
+      "wayfarers_backpack": {
+        "name": "Wayfarer's Backpack"
+      },
+      "burlap_reagent_pouch": {
+        "name": "Burlap Reagent Pouch"
+      },
+      "necromancers_reagent_satchel": {
+        "name": "Necromancer's Reagent Satchel"
+      },
+      "duskweave_bag": {
+        "name": "Duskweave Bag"
+      },
+      "resonant_weave_bag": {
+        "name": "Resonantweave Bag"
+      },
+      "foragers_haversack": {
+        "name": "Forager's Haversack"
+      },
+      "loombound_reagent_satchel": {
+        "name": "Loombound Reagent Satchel"
+      },
       "ps_briny_lure": {
         "name": "Leurre saumâtre"
       },
@@ -12976,6 +13285,612 @@ export const fr_CA: EnTranslations = {
       },
       "ps_passing_stone": {
         "name": "Pierre de trépas"
+      },
+      "lastflame_core": {
+        "name": "Core of the Last Flame"
+      },
+      "slagbreaker_helmet": {
+        "name": "Slagbreaker Helm"
+      },
+      "slagbreaker_shoulder": {
+        "name": "Slagbreaker Pauldrons"
+      },
+      "slagbreaker_chest": {
+        "name": "Slagbreaker Hauberk"
+      },
+      "slagbreaker_gloves": {
+        "name": "Slagbreaker Gauntlets"
+      },
+      "slagbreaker_legs": {
+        "name": "Slagbreaker Legguards"
+      },
+      "emberfury_helmet": {
+        "name": "Emberfury Helm"
+      },
+      "emberfury_shoulder": {
+        "name": "Emberfury Pauldrons"
+      },
+      "emberfury_chest": {
+        "name": "Emberfury Hauberk"
+      },
+      "emberfury_gloves": {
+        "name": "Emberfury Gauntlets"
+      },
+      "emberfury_legs": {
+        "name": "Emberfury Legguards"
+      },
+      "forgewall_helmet": {
+        "name": "Forgewall Helm"
+      },
+      "forgewall_shoulder": {
+        "name": "Forgewall Pauldrons"
+      },
+      "forgewall_chest": {
+        "name": "Forgewall Hauberk"
+      },
+      "forgewall_gloves": {
+        "name": "Forgewall Gauntlets"
+      },
+      "forgewall_legs": {
+        "name": "Forgewall Legguards"
+      },
+      "dawnforged_helmet": {
+        "name": "Dawnforged Helm"
+      },
+      "dawnforged_shoulder": {
+        "name": "Dawnforged Pauldrons"
+      },
+      "dawnforged_chest": {
+        "name": "Dawnforged Hauberk"
+      },
+      "dawnforged_gloves": {
+        "name": "Dawnforged Gauntlets"
+      },
+      "dawnforged_legs": {
+        "name": "Dawnforged Legguards"
+      },
+      "oathpyre_helmet": {
+        "name": "Oathpyre Helm"
+      },
+      "oathpyre_shoulder": {
+        "name": "Oathpyre Pauldrons"
+      },
+      "oathpyre_chest": {
+        "name": "Oathpyre Hauberk"
+      },
+      "oathpyre_gloves": {
+        "name": "Oathpyre Gauntlets"
+      },
+      "oathpyre_legs": {
+        "name": "Oathpyre Legguards"
+      },
+      "zealfire_helmet": {
+        "name": "Zealfire Helm"
+      },
+      "zealfire_shoulder": {
+        "name": "Zealfire Pauldrons"
+      },
+      "zealfire_chest": {
+        "name": "Zealfire Hauberk"
+      },
+      "zealfire_gloves": {
+        "name": "Zealfire Gauntlets"
+      },
+      "zealfire_legs": {
+        "name": "Zealfire Legguards"
+      },
+      "packlord_emberhide_helmet": {
+        "name": "Packlord's Cowl"
+      },
+      "packlord_emberhide_shoulder": {
+        "name": "Packlord's Spaulders"
+      },
+      "packlord_emberhide_chest": {
+        "name": "Packlord's Tunic"
+      },
+      "packlord_emberhide_gloves": {
+        "name": "Packlord's Grips"
+      },
+      "packlord_emberhide_legs": {
+        "name": "Packlord's Breeches"
+      },
+      "coldsight_trackers_helmet": {
+        "name": "Coldsight Cowl"
+      },
+      "coldsight_trackers_shoulder": {
+        "name": "Coldsight Spaulders"
+      },
+      "coldsight_trackers_chest": {
+        "name": "Coldsight Tunic"
+      },
+      "coldsight_trackers_gloves": {
+        "name": "Coldsight Grips"
+      },
+      "coldsight_trackers_legs": {
+        "name": "Coldsight Breeches"
+      },
+      "slagsnare_helmet": {
+        "name": "Slagsnare Cowl"
+      },
+      "slagsnare_shoulder": {
+        "name": "Slagsnare Spaulders"
+      },
+      "slagsnare_chest": {
+        "name": "Slagsnare Tunic"
+      },
+      "slagsnare_gloves": {
+        "name": "Slagsnare Grips"
+      },
+      "slagsnare_legs": {
+        "name": "Slagsnare Breeches"
+      },
+      "cinderfang_helmet": {
+        "name": "Cinderfang Cowl"
+      },
+      "cinderfang_shoulder": {
+        "name": "Cinderfang Spaulders"
+      },
+      "cinderfang_chest": {
+        "name": "Cinderfang Tunic"
+      },
+      "cinderfang_gloves": {
+        "name": "Cinderfang Grips"
+      },
+      "cinderfang_legs": {
+        "name": "Cinderfang Breeches"
+      },
+      "smolderstrike_helmet": {
+        "name": "Smolderstrike Cowl"
+      },
+      "smolderstrike_shoulder": {
+        "name": "Smolderstrike Spaulders"
+      },
+      "smolderstrike_chest": {
+        "name": "Smolderstrike Tunic"
+      },
+      "smolderstrike_gloves": {
+        "name": "Smolderstrike Grips"
+      },
+      "smolderstrike_legs": {
+        "name": "Smolderstrike Breeches"
+      },
+      "ashveil_helmet": {
+        "name": "Ashveil Cowl"
+      },
+      "ashveil_shoulder": {
+        "name": "Ashveil Spaulders"
+      },
+      "ashveil_chest": {
+        "name": "Ashveil Tunic"
+      },
+      "ashveil_gloves": {
+        "name": "Ashveil Grips"
+      },
+      "ashveil_legs": {
+        "name": "Ashveil Breeches"
+      },
+      "emberscreed_helmet": {
+        "name": "Creed of Embers Hood"
+      },
+      "emberscreed_shoulder": {
+        "name": "Creed of Embers Mantle"
+      },
+      "emberscreed_chest": {
+        "name": "Creed of Embers Robe"
+      },
+      "emberscreed_gloves": {
+        "name": "Creed of Embers Handwraps"
+      },
+      "emberscreed_legs": {
+        "name": "Creed of Embers Leggings"
+      },
+      "benison_dawnweave_helmet": {
+        "name": "Dawnweave Hood"
+      },
+      "benison_dawnweave_shoulder": {
+        "name": "Dawnweave Mantle"
+      },
+      "benison_dawnweave_chest": {
+        "name": "Dawnweave Robe"
+      },
+      "benison_dawnweave_gloves": {
+        "name": "Dawnweave Handwraps"
+      },
+      "benison_dawnweave_legs": {
+        "name": "Dawnweave Leggings"
+      },
+      "vesperash_helmet": {
+        "name": "Vesperash Hood"
+      },
+      "vesperash_shoulder": {
+        "name": "Vesperash Mantle"
+      },
+      "vesperash_chest": {
+        "name": "Vesperash Robe"
+      },
+      "vesperash_gloves": {
+        "name": "Vesperash Handwraps"
+      },
+      "vesperash_legs": {
+        "name": "Vesperash Leggings"
+      },
+      "stormkindled_helmet": {
+        "name": "Stormkindled Helm"
+      },
+      "stormkindled_shoulder": {
+        "name": "Stormkindled Pauldrons"
+      },
+      "stormkindled_chest": {
+        "name": "Stormkindled Hauberk"
+      },
+      "stormkindled_gloves": {
+        "name": "Stormkindled Gauntlets"
+      },
+      "stormkindled_legs": {
+        "name": "Stormkindled Legguards"
+      },
+      "warspirit_emberscale_helmet": {
+        "name": "Emberscale Helm"
+      },
+      "warspirit_emberscale_shoulder": {
+        "name": "Emberscale Pauldrons"
+      },
+      "warspirit_emberscale_chest": {
+        "name": "Emberscale Hauberk"
+      },
+      "warspirit_emberscale_gloves": {
+        "name": "Emberscale Gauntlets"
+      },
+      "warspirit_emberscale_legs": {
+        "name": "Emberscale Legguards"
+      },
+      "stonehearth_helmet": {
+        "name": "Stonehearth Helm"
+      },
+      "stonehearth_shoulder": {
+        "name": "Stonehearth Pauldrons"
+      },
+      "stonehearth_chest": {
+        "name": "Stonehearth Hauberk"
+      },
+      "stonehearth_gloves": {
+        "name": "Stonehearth Gauntlets"
+      },
+      "stonehearth_legs": {
+        "name": "Stonehearth Legguards"
+      },
+      "springmender_helmet": {
+        "name": "Springmender Helm"
+      },
+      "springmender_shoulder": {
+        "name": "Springmender Pauldrons"
+      },
+      "springmender_chest": {
+        "name": "Springmender Hauberk"
+      },
+      "springmender_gloves": {
+        "name": "Springmender Gauntlets"
+      },
+      "springmender_legs": {
+        "name": "Springmender Legguards"
+      },
+      "chronoweave_helmet": {
+        "name": "Aetherweave Hood"
+      },
+      "chronoweave_shoulder": {
+        "name": "Aetherweave Mantle"
+      },
+      "chronoweave_chest": {
+        "name": "Aetherweave Robe"
+      },
+      "chronoweave_gloves": {
+        "name": "Aetherweave Handwraps"
+      },
+      "chronoweave_legs": {
+        "name": "Aetherweave Leggings"
+      },
+      "pyroclast_helmet": {
+        "name": "Pyroclast Hood"
+      },
+      "pyroclast_shoulder": {
+        "name": "Pyroclast Mantle"
+      },
+      "pyroclast_chest": {
+        "name": "Pyroclast Robe"
+      },
+      "pyroclast_gloves": {
+        "name": "Pyroclast Handwraps"
+      },
+      "pyroclast_legs": {
+        "name": "Pyroclast Leggings"
+      },
+      "frostquench_helmet": {
+        "name": "Frostquench Hood"
+      },
+      "frostquench_shoulder": {
+        "name": "Frostquench Mantle"
+      },
+      "frostquench_chest": {
+        "name": "Frostquench Robe"
+      },
+      "frostquench_gloves": {
+        "name": "Frostquench Handwraps"
+      },
+      "frostquench_legs": {
+        "name": "Frostquench Leggings"
+      },
+      "hexthread_helmet": {
+        "name": "Hexthread Hood"
+      },
+      "hexthread_shoulder": {
+        "name": "Hexthread Mantle"
+      },
+      "hexthread_chest": {
+        "name": "Hexthread Robe"
+      },
+      "hexthread_gloves": {
+        "name": "Hexthread Handwraps"
+      },
+      "hexthread_legs": {
+        "name": "Hexthread Leggings"
+      },
+      "gravebrand_helmet": {
+        "name": "Gravebrand Hood"
+      },
+      "gravebrand_shoulder": {
+        "name": "Gravebrand Mantle"
+      },
+      "gravebrand_chest": {
+        "name": "Gravebrand Robe"
+      },
+      "gravebrand_gloves": {
+        "name": "Gravebrand Handwraps"
+      },
+      "gravebrand_legs": {
+        "name": "Gravebrand Leggings"
+      },
+      "ruincaller_helmet": {
+        "name": "Ruincaller Hood"
+      },
+      "ruincaller_shoulder": {
+        "name": "Ruincaller Mantle"
+      },
+      "ruincaller_chest": {
+        "name": "Ruincaller Robe"
+      },
+      "ruincaller_gloves": {
+        "name": "Ruincaller Handwraps"
+      },
+      "ruincaller_legs": {
+        "name": "Ruincaller Leggings"
+      },
+      "moonscorch_helmet": {
+        "name": "Moonscorch Cowl"
+      },
+      "moonscorch_shoulder": {
+        "name": "Moonscorch Spaulders"
+      },
+      "moonscorch_chest": {
+        "name": "Moonscorch Tunic"
+      },
+      "moonscorch_gloves": {
+        "name": "Moonscorch Grips"
+      },
+      "moonscorch_legs": {
+        "name": "Moonscorch Breeches"
+      },
+      "wildfang_emberhide_helmet": {
+        "name": "Wildfang Cowl"
+      },
+      "wildfang_emberhide_shoulder": {
+        "name": "Wildfang Spaulders"
+      },
+      "wildfang_emberhide_chest": {
+        "name": "Wildfang Tunic"
+      },
+      "wildfang_emberhide_gloves": {
+        "name": "Wildfang Grips"
+      },
+      "wildfang_emberhide_legs": {
+        "name": "Wildfang Breeches"
+      },
+      "cinderbark_helmet": {
+        "name": "Cinderbark Cowl"
+      },
+      "cinderbark_shoulder": {
+        "name": "Cinderbark Spaulders"
+      },
+      "cinderbark_chest": {
+        "name": "Cinderbark Tunic"
+      },
+      "cinderbark_gloves": {
+        "name": "Cinderbark Grips"
+      },
+      "cinderbark_legs": {
+        "name": "Cinderbark Breeches"
+      },
+      "grovespring_helmet": {
+        "name": "Grovespring Cowl"
+      },
+      "grovespring_shoulder": {
+        "name": "Grovespring Spaulders"
+      },
+      "grovespring_chest": {
+        "name": "Grovespring Tunic"
+      },
+      "grovespring_gloves": {
+        "name": "Grovespring Grips"
+      },
+      "grovespring_legs": {
+        "name": "Grovespring Breeches"
+      },
+      "sigil_anvil_helmet": {
+        "name": "Helm Sigil of the Anvil"
+      },
+      "sigil_ember_helmet": {
+        "name": "Helm Sigil of the Ember"
+      },
+      "sigil_tempest_helmet": {
+        "name": "Helm Sigil of the Tempest"
+      },
+      "sigil_anvil_shoulder": {
+        "name": "Mantle Sigil of the Anvil"
+      },
+      "sigil_ember_shoulder": {
+        "name": "Mantle Sigil of the Ember"
+      },
+      "sigil_tempest_shoulder": {
+        "name": "Mantle Sigil of the Tempest"
+      },
+      "sigil_anvil_chest": {
+        "name": "Robe Sigil of the Anvil"
+      },
+      "sigil_ember_chest": {
+        "name": "Robe Sigil of the Ember"
+      },
+      "sigil_tempest_chest": {
+        "name": "Robe Sigil of the Tempest"
+      },
+      "sigil_anvil_gloves": {
+        "name": "Grip Sigil of the Anvil"
+      },
+      "sigil_ember_gloves": {
+        "name": "Grip Sigil of the Ember"
+      },
+      "sigil_tempest_gloves": {
+        "name": "Grip Sigil of the Tempest"
+      },
+      "sigil_anvil_legs": {
+        "name": "Legging Sigil of the Anvil"
+      },
+      "sigil_ember_legs": {
+        "name": "Legging Sigil of the Ember"
+      },
+      "sigil_tempest_legs": {
+        "name": "Legging Sigil of the Tempest"
+      },
+      "cord_of_the_last_flame": {
+        "name": "Cord of the Last Flame"
+      },
+      "cindersoaked_slippers": {
+        "name": "Cindersoaked Slippers"
+      },
+      "springbinder_sash": {
+        "name": "Springbinder Sash"
+      },
+      "steps_of_quiet_water": {
+        "name": "Steps of Quiet Water"
+      },
+      "cinderbark_cinch": {
+        "name": "Cinderbark Cinch"
+      },
+      "ashenbark_treads": {
+        "name": "Ashenbark Treads"
+      },
+      "slagstalker_belt": {
+        "name": "Slagstalker Belt"
+      },
+      "ashrunner_boots": {
+        "name": "Ashrunner Boots"
+      },
+      "moonscorch_waistwrap": {
+        "name": "Moonscorch Waistwrap"
+      },
+      "scorchgrove_striders": {
+        "name": "Scorchgrove Striders"
+      },
+      "grovetender_belt": {
+        "name": "Grovetender Belt"
+      },
+      "dewfall_moccasins": {
+        "name": "Dewfall Moccasins"
+      },
+      "forgewall_girdle": {
+        "name": "Forgewall Girdle"
+      },
+      "anvilstance_sabatons": {
+        "name": "Anvilstance Sabatons"
+      },
+      "warforged_waistguard": {
+        "name": "Warforged Waistguard"
+      },
+      "furnace_march_greaves": {
+        "name": "Furnace March Greaves"
+      },
+      "stormkindled_chain": {
+        "name": "Stormkindled Chain"
+      },
+      "thundershock_treads": {
+        "name": "Thundershock Treads"
+      },
+      "tidebinder_links": {
+        "name": "Tidebinder Links"
+      },
+      "springwarden_sabatons": {
+        "name": "Springwarden Sabatons"
+      },
+      "pendant_of_the_first_tempering": {
+        "name": "Pendant of the First Tempering"
+      },
+      "ignivars_ember_choker": {
+        "name": "Ignivar's Ember Choker"
+      },
+      "locket_of_the_last_flame": {
+        "name": "Locket of the Last Flame"
+      },
+      "heartspring_amulet": {
+        "name": "Heartspring Amulet"
+      },
+      "seal_of_the_forgewall": {
+        "name": "Seal of the Forgewall"
+      },
+      "band_of_marked_strikes": {
+        "name": "Band of Marked Strikes"
+      },
+      "circle_of_cinders": {
+        "name": "Circle of Cinders"
+      },
+      "loop_of_quiet_springs": {
+        "name": "Loop of Quiet Springs"
+      },
+      "bulwark_of_the_inner_crucible": {
+        "name": "Bulwark of the Inner Crucible"
+      },
+      "ember_wardens_barrier": {
+        "name": "Ember Warden's Barrier"
+      },
+      "orb_of_the_last_spring": {
+        "name": "Orb of the Last Spring"
+      },
+      "cinder_of_the_first_design": {
+        "name": "Cinder of the First Design"
+      },
+      "forgefathers_warhammer": {
+        "name": "Forgefather's Warhammer"
+      },
+      "cinderfang_kris": {
+        "name": "Cinderfang Kris"
+      },
+      "slagrender_cleaver": {
+        "name": "Slagrender Cleaver"
+      },
+      "anvilguard_blade": {
+        "name": "Anvilguard Blade"
+      },
+      "heart_of_the_end_greatblade": {
+        "name": "Heart of the End Greatblade"
+      },
+      "staff_of_the_last_spring": {
+        "name": "Staff of the Last Spring"
+      },
+      "forgefire_spire": {
+        "name": "Forgefire Spire"
+      },
+      "springtouched_crozier": {
+        "name": "Springtouched Crozier"
+      },
+      "wand_of_quenched_sparks": {
+        "name": "Wand of Quenched Sparks"
       },
       "conjured_water4": {
         "name": "Eau de source conjurée"
@@ -13753,6 +14668,12 @@ export const fr_CA: EnTranslations = {
       },
       "reins_thunderstrut_gobbler": {
         "name": "Rênes de Pavane-Tonnerre, le Grand Dindon"
+      },
+      "varkhul_forgebreaker": {
+        "name": "Forgebreaker, Engine of Varkhul"
+      },
+      "varkhul_emberward": {
+        "name": "Emberward, Bulwark of Varkhul"
       }
     },
     "mobs": {
@@ -13947,6 +14868,27 @@ export const fr_CA: EnTranslations = {
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "Nythraxis, Fléau de Thornpeak"
+      },
+      "ignivar_herald_of_the_last_flame": {
+        "name": "Ignivar, Herald of the Last Flame"
+      },
+      "ignivar_heart_of_the_end": {
+        "name": "Ignivar Ashcaller"
+      },
+      "ignivar_ember_sentinel": {
+        "name": "Ember Sentinel"
+      },
+      "ignivar_crucible_warden": {
+        "name": "Crucible Warden"
+      },
+      "ignivar_cinder_artificer": {
+        "name": "Cinder Artificer"
+      },
+      "varkhul_forgefather_of_the_last_flame": {
+        "name": "Varkhul, Forgefather of the Last Flame"
+      },
+      "derelict_mech": {
+        "name": "Derelict Mech"
       },
       "reliquary_ledger_wraith": {
         "name": "Spectre du registre"
@@ -14607,6 +15549,21 @@ export const fr_CA: EnTranslations = {
         "name": "Frère Aldric",
         "title": "Prêtre du Val",
         "greeting": "D'un cimetière de chapelle au toit du monde... la piste s'achève ici. Je sens la montagne écouter."
+      },
+      "archivist_maelin_emberward": {
+        "name": "Archivist Maelin Emberward",
+        "title": "Crucible Archivist",
+        "greeting": "Every hammer mark in this place is a sentence. Help me read what Varkhul tried to hide."
+      },
+      "archivist_maelin_ember_projection": {
+        "name": "Maelin's Ember Projection",
+        "title": "Ember Projection",
+        "greeting": "The embers carry Maelin's voice forward through the forge."
+      },
+      "crucible_quartermaster": {
+        "name": "Quartermaster Bronn Emberward",
+        "title": "Crucible Quartermaster",
+        "greeting": "The forge marks its own. Bring me a sigil from the Crucible and I will fit you for war."
       },
       "brother_halven": {
         "name": "Frère Halven",
@@ -15753,6 +16710,39 @@ export const fr_CA: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Nythraxis vaincu"
+          }
+        }
+      },
+      "q_ignivar_echoes_in_iron": {
+        "title": "Echoes in Iron",
+        "text": "These automata are not soldiers. They are drafts. Break each assembly line and listen when the final shell falls. The forge remembers what Varkhul tried to erase.",
+        "completion": "The echoes agree. Varkhul bound water from the dying Last Spring into living metal. These automatons were failed temperings. Only Ignivar endured.",
+        "objectives": {
+          "0": {
+            "label": "Ember Sentinels destroyed"
+          },
+          "1": {
+            "label": "Crucible Wardens destroyed"
+          }
+        }
+      },
+      "q_ignivar_heralds_heart": {
+        "title": "The Herald's Heart",
+        "text": "The survivor named in every echo is Ignivar. Varkhul called him herald, seal, and key. Defeat him. If the records are true, his death will reveal what he was forged to guard.",
+        "completion": "Ignivar was never merely a guardian. His heart was the key, and its final plates opened the sealed crucible below.",
+        "objectives": {
+          "0": {
+            "label": "Ignivar defeated"
+          }
+        }
+      },
+      "q_ignivar_the_forgefather": {
+        "title": "The Forgefather",
+        "text": "The path below leads to Varkhul, Forgefather of the Last Flame. He imprisoned the Last Spring to make metal live, then forged Ignivar to keep the crime sealed. Enter the Inner Crucible and end his work.",
+        "completion": "The forge is silent at last. The spring may never recover, but Varkhul will shape no more lives into chains.",
+        "objectives": {
+          "0": {
+            "label": "Varkhul defeated"
           }
         }
       },
@@ -17633,6 +18623,31 @@ export const fr_CA: EnTranslations = {
         "enterText": "Vous franchissez la porte royale scellée.",
         "leaveText": "Vous retrouvez l'air froid de Thornpeak."
       },
+      "ignivar_forge_lift": {
+        "name": "The Forge-Lift",
+        "enterText": "The forge-lift shudders and sinks; hammerfall rises to meet you.",
+        "leaveText": "The lift hauls you back into the open air of the keep."
+      },
+      "ignivar_forge_approach": {
+        "name": "Halls of the First Tempering",
+        "enterText": "Hammerfall echoes through the Halls of the First Tempering.",
+        "leaveText": "You step away from the first forge and breathe freely again."
+      },
+      "ignivar_raid_arena": {
+        "name": "Crucible of the Last Spring",
+        "enterText": "Heat shimmers above the sealed waters of the Crucible.",
+        "leaveText": "You step away from the Crucible and breathe freely again."
+      },
+      "ignivar_molten_assembly": {
+        "name": "Molten Assembly",
+        "enterText": "The opened gate leads into a molten assembly hall.",
+        "leaveText": "You leave the assembly line and return to the Crucible."
+      },
+      "ignivar_inner_crucible": {
+        "name": "The Inner Crucible",
+        "enterText": "The opened gate leads deeper into the Crucible.",
+        "leaveText": "You leave the silent depths of the Crucible."
+      },
       "wildheart_basin": {
         "name": "Le Bassin du Cœur Sauvage",
         "enterText": "Une pluie tiède crépite sur la pierre ancienne. The Wildheart Basin s'ouvre devant vous.",
@@ -17864,53 +18879,183 @@ export const fr_CA: EnTranslations = {
       }
     },
     "itemSets": {
+      "ashveil": {
+        "name": "Ashveil Garb",
+        "bonus2": "Lurker's Strike hits 25 percent harder.",
+        "bonus4": "Your Veiled Edge strike hits for triple, up from double."
+      },
+      "benison_dawnweave": {
+        "name": "Benison Dawnweave",
+        "bonus2": "Seraphic Vigil's rescue heals for 270, up from 180. Damage taken no longer delays your spellcasting.",
+        "bonus4": "When Seraphic Vigil triggers, its ally is also mended for 15 percent of their maximum health over 10 sec."
+      },
       "boundstone_vanguard": {
         "name": "Avant-garde de pierre-liée",
         "bonus3": "Augmente la vitesse d'attaque et d'incantation de 15%."
       },
+      "chronoweave": {
+        "name": "Aetherweave Vestments",
+        "bonus2": "Temporal Echo converts 50 percent of your single-target Arcane damage into healing. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Temporal Cascade's cooldown is reduced by 5 sec."
+      },
+      "cinderbark": {
+        "name": "Cinderbark Ward",
+        "bonus2": "Sweeping Claws has a 30 percent chance to bank an additional Old Blood.",
+        "bonus4": "Marrowbreak hits 30 percent harder, and its emergency guard no longer replaces the strike."
+      },
+      "cinderfang": {
+        "name": "Cinderfang Shroud",
+        "bonus2": "Venom Ritual's energy refund rises to 20 per builder.",
+        "bonus4": "Venom Dart's cooldown is reduced to 4 sec."
+      },
+      "coldsight_trackers": {
+        "name": "Coldsight Trackers",
+        "bonus2": "Measured Shot restores 5 additional Focus.",
+        "bonus4": "Long Draw critical strikes extend Cold Focus by 2 sec, up to 6 sec per activation."
+      },
       "crownforged": {
         "name": "Tenue d'apparat Bonewrought",
         "bonus2": "Augmente la puissance d'attaque de 40.",
-        "bonus3": "Augmente la force de 15, l'endurance de 15 et la vitesse d'attaque et d'incantation de 15%.",
-        "bonus4": "Vos coups critiques d'arme lacèrent la cible avec Éclat d'os, lui infligeant 8 points de dégâts de saignement toutes les 2 s pendant 12 s. Se cumule jusqu'à 3 fois."
+        "bonus4": "Vos coups critiques d'arme lacèrent la cible avec Éclat d'os, lui infligeant 8 points de dégâts de saignement toutes les 2 s pendant 12 s. Se cumule jusqu'à 3 fois.",
+        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 5 damage every 2 sec for 12 sec. Stacks up to 3 times."
+      },
+      "dawnforged": {
+        "name": "Dawnforged Vestments",
+        "bonus2": "Beacon of Light copies 55 percent of your direct heals. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Radiant Resonance's empowered Dawn's Embrace is instant."
       },
       "deathlord": {
         "name": "Tenue de guerre de Barrowlord",
         "bonus2": "Augmente la puissance d'attaque de 40.",
-        "bonus3": "Augmente la force de 15 et l'endurance de 15.",
-        "bonus4": "Vos coups critiques d'arme ont 50% de chances de conférer Puissance sépulcrale, augmentant la puissance d'attaque de 60 pendant 10 s."
+        "bonus4": "Vos coups critiques d'arme ont 50% de chances de conférer Puissance sépulcrale, augmentant la puissance d'attaque de 60 pendant 10 s.",
+        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 5 damage every 2 sec for 12 sec. Stacks up to 3 times."
+      },
+      "emberfury": {
+        "name": "Emberfury Harness",
+        "bonus2": "Your Enrage lasts 6 sec instead of 4.",
+        "bonus4": "Bloodletting always Enrages you, and its healing rises to 8 percent of your maximum health."
+      },
+      "emberscreed": {
+        "name": "Creed of Embers Vestments",
+        "bonus2": "Your Doctrine link converts 10 percent more of your Holy damage into healing. Damage taken no longer delays your spellcasting.",
+        "bonus4": "When your Psalm of Warding is fully consumed, your next Scouring Hymn within 10 sec is instant. Cannot occur more than once every 15 sec."
+      },
+      "forgewall": {
+        "name": "Forgewall Aegis",
+        "bonus2": "Iron Resolve converts rage at 5 absorb per point instead of 4.",
+        "bonus4": "Casting Shieldcrack reduces Iron Resolve's remaining cooldown by 2 sec."
+      },
+      "frostquench": {
+        "name": "Frostquench Weave",
+        "bonus2": "Rimelance critical strikes bank a second Icicle, up to the maximum of 5. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Winterlash plants 3 Winter's Chill charges, up from 2."
+      },
+      "gravebrand": {
+        "name": "Gravebrand Regalia",
+        "bonus2": "Reaping Command's cooldown is reduced by 2 sec. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Reaping Command's unison strikes deal 25 percent more damage."
       },
       "greyjaw_stalker": {
         "name": "Équipement du traqueur de Greyjaw",
         "bonus3": "Augmente la vitesse d'attaque et d'incantation de 15%."
       },
+      "grovespring": {
+        "name": "Grovespring Raiment",
+        "bonus2": "Swiftmend consumes your own Wildbloom or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Overbloom harvests 75 percent of your remaining effects and banks 1 Verdance afterward."
+      },
+      "hexthread": {
+        "name": "Hexthread Shroud",
+        "bonus2": "Needle of Fate grants 2 additional Condemnation. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Passing Sentence refunds 10 Condemnation."
+      },
+      "moonscorch": {
+        "name": "Moonscorch Raiment",
+        "bonus2": "Moonseed may extend Lunar Tempest twice per application, to a maximum of 12 sec. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Moonsurge and Sunwake strike 25 percent harder."
+      },
       "necromancers": {
         "name": "Parure de Mournweave",
         "bonus2": "Augmente la puissance des sorts de 20. Les dégâts subis ne retardent plus vos incantations (100% de résistance au retard des sorts).",
-        "bonus3": "Augmente l'intelligence de 10 et l'endurance de 10.",
-        "bonus4": "Vos sorts ont 10% de chances de conférer Incantation limpide, rendant votre prochain sort gratuit."
+        "bonus4": "Vos sorts ont 10% de chances de conférer Incantation limpide, rendant votre prochain sort gratuit.",
+        "bonus6": "Increases attack and casting speed by 4%. Your spells have a 10% chance to grant Soulblaze, increasing spell power by 25 for 10 sec."
       },
       "nighttalon": {
         "name": "Peau de Direfang",
         "bonus2": "Augmente la puissance d'attaque de 40.",
-        "bonus3": "Augmente l'agilité de 15, les chances de critique de 2% et la vitesse d'attaque et d'incantation de 15%.",
-        "bonus4": "Vos coups critiques d'arme ouvrent une Entaille déchiquetée, infligeant à la cible 6 points de dégâts de saignement toutes les 2 s pendant 12 s. Se cumule jusqu'à 3 fois."
+        "bonus4": "Vos coups critiques d'arme ouvrent une Entaille déchiquetée, infligeant à la cible 6 points de dégâts de saignement toutes les 2 s pendant 12 s. Se cumule jusqu'à 3 fois.",
+        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 4 damage every 2 sec for 12 sec. Stacks up to 3 times."
+      },
+      "oathpyre": {
+        "name": "Oathpyre Bastion",
+        "bonus2": "Vowkeeper Strike's chance to arm Solar Reprisal rises to 30 percent, and blocking an attack arms it 40 percent of the time.",
+        "bonus4": "Consuming Solar Reprisal shields you for 6 percent of your maximum health for 10 sec."
+      },
+      "packlord_emberhide": {
+        "name": "Packlord's Emberhide",
+        "bonus2": "Pack Command's cooldown is reduced to 3 sec.",
+        "bonus4": "Pack Command's chance to reset Stampede's cooldown rises to 30 percent."
+      },
+      "pyroclast": {
+        "name": "Pyroclast Regalia",
+        "bonus2": "Scald always critically strikes targets at or below 35 percent health. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Your Fire spells' critical strikes outside Phoenix Trance reduce its remaining cooldown by 1.5 sec."
+      },
+      "ruincaller": {
+        "name": "Ruincaller Vestments",
+        "bonus2": "Conflagrate holds 3 charges. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Ruinbolt strikes 20 percent harder."
+      },
+      "slagbreaker": {
+        "name": "Slagbreaker Battlegear",
+        "bonus2": "Redhand empowers your next Maiming Strike by 30 percent per stack instead of 20.",
+        "bonus4": "Every second cast of Redhand reduces Breachmaker's remaining cooldown by 3 sec."
+      },
+      "slagsnare": {
+        "name": "Slagsnare Trappings",
+        "bonus2": "Gutting Strike generates 20 Focus.",
+        "bonus4": "Woundrend that consumes 3 Hunting Momentum preserves them. Cannot occur more than once every 8 sec."
+      },
+      "smolderstrike": {
+        "name": "Smolderstrike Leathers",
+        "bonus2": "Haymaker hits 20 percent harder.",
+        "bonus4": "Lights Out refunds 6 sec of Mirrored Blades' remaining cooldown."
       },
       "soulflame": {
         "name": "Tenue d'apparat Wraithfire",
         "bonus2": "Augmente la puissance des sorts de 20. Les dégâts subis ne retardent plus vos incantations (100% de résistance au retard des sorts).",
-        "bonus3": "Augmente l'intelligence de 15, l'esprit de 15 et la vitesse d'attaque et d'incantation de 15%.",
-        "bonus4": "Vos sorts ont 10% de chances de conférer Embrasement d'âme, augmentant la puissance des sorts de 40 pendant 10 s."
+        "bonus4": "Vos sorts ont 10% de chances de conférer Embrasement d'âme, augmentant la puissance des sorts de 40 pendant 10 s.",
+        "bonus6": "Increases attack and casting speed by 4%. Your spells have a 10% chance to grant Soulblaze, increasing spell power by 25 for 10 sec."
+      },
+      "springmender": {
+        "name": "Springmender Scale",
+        "bonus2": "Tidecall's cooldown is reduced by 4 sec. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Cascading Mend reaches a fourth ally and harvests Mending Currents at 150 percent."
+      },
+      "stonehearth": {
+        "name": "Stonehearth Bastion",
+        "bonus2": "While Stonebound, Stormcast Mending Waters costs no mana and heals 25 percent more.",
+        "bonus4": "While Stonebound, completing a cadence heals you for 3 percent of your maximum health."
       },
       "stormcallers": {
         "name": "Vêtements de Galecall",
         "bonus2": "Augmente la puissance des sorts de 20. Les dégâts subis ne retardent plus vos incantations (100% de résistance au retard des sorts).",
-        "bonus3": "Augmente l'intelligence de 15, l'esprit de 15 et la vitesse d'attaque et d'incantation de 15%.",
-        "bonus4": "Vos sorts ont 10% de chances de conférer Embrasement d'âme, augmentant la puissance des sorts de 40 pendant 10 s."
+        "bonus4": "Vos sorts ont 10% de chances de conférer Embrasement d'âme, augmentant la puissance des sorts de 40 pendant 10 s.",
+        "bonus6": "Increases attack and casting speed by 4%. Your spells have a 10% chance to grant Soulblaze, increasing spell power by 25 for 10 sec."
+      },
+      "stormkindled": {
+        "name": "Stormkindled Regalia",
+        "bonus2": "Unleash Weapon on Pyrebrand grants 3 Thunder. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Earthen Jolt's bonus per Thunder rises to 30 percent."
       },
       "vale_arcanist": {
         "name": "Tenue de l'arcaniste du Val",
         "bonus3": "Augmente la vitesse d'attaque et d'incantation de 15%."
+      },
+      "vesperash": {
+        "name": "Vesperash Shroud",
+        "bonus2": "Call Tithefiend's cooldown is reduced by 6 sec. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Calling your Tithefiend resets Mindfracture's cooldown, and the fiend returns twice as much mana per hit."
       },
       "warfare_ashstalker": {
         "name": "Équipement du traque-cendres",
@@ -17942,11 +19087,26 @@ export const fr_CA: EnTranslations = {
         "bonus4": "Augmente de 40 le score d'Attaque d'Art de la guerre, et le contrôle lancé sur vous par des joueurs hostiles dure 15% de moins.",
         "bonus7": "Augmente de 80 les scores d'Attaque et de Défense d'Art de la guerre. Vos sorts ont 15% de chances d'accorder Garde d'épines, augmentant l'esquive de 15% pendant 6 s."
       },
+      "warspirit_emberscale": {
+        "name": "Warspirit Emberscale",
+        "bonus2": "Ancestral Strike advances your cadence 3 steps.",
+        "bonus4": "Ancestral Strike hits 30 percent harder."
+      },
+      "wildfang_emberhide": {
+        "name": "Wildfang Emberhide",
+        "bonus2": "Redharvest restores 45 energy, up from 30.",
+        "bonus4": "Redharvest plants a fresh Flense on the target."
+      },
       "wyrmshadow": {
         "name": "Vêtements de Nightfang",
         "bonus2": "Augmente la puissance d'attaque de 40.",
-        "bonus3": "Augmente l’agilité de 15 et les chances de critique de 2%.",
-        "bonus4": "Vos coups critiques d'arme ont 50% de chances de conférer Ruée des crocs, augmentant la vitesse d'attaque de 25% pendant 8 s."
+        "bonus4": "Vos coups critiques d'arme ont 50% de chances de conférer Ruée des crocs, augmentant la vitesse d'attaque de 25% pendant 8 s.",
+        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 4 damage every 2 sec for 12 sec. Stacks up to 3 times."
+      },
+      "zealfire": {
+        "name": "Zealfire Warplate",
+        "bonus2": "Final Edict and Dawnfall cut each other's remaining cooldown by 3 sec instead of 2.",
+        "bonus4": "Hammer of Wrath cast under Dawn's Wrath strikes 40 percent harder, up from 20."
       }
     }
   },

@@ -320,38 +320,36 @@ interface AttributionTargetFixture {
 // capture was retaken.
 // Re-minted for the stale remote-entity holdout repair (renderer.ts): the
 // renderer integration leaf moved. No capture was retaken.
-// Re-minted for issue #3479 (rift self-motion prediction): the
-// SelfMotionPredictor construction call site in renderer.ts now threads a
-// second constructor argument (riftCollisionToken), moving the renderer
-// integration leaf. No capture was retaken.
-// Meanwhile on the release base: re-minted for the v0.40.0 sync merge into
-// the guild pledge branch (the OSSBrain v0.40 batch landed on the release
-// arm; renderer inputs moved on both sides). No capture was retaken.
-// Re-minted for the merge of release/v0.41.0 into the rift self-motion
-// prediction branch: renderer.ts combines both parents' bytes, so the
-// composite matches neither parent alone. No capture was retaken.
-// Re-minted for the OSSBrain release merge of the FOV slider fix and rift
-// self-motion prediction: renderer.ts now combines both release PR inputs in
-// one tree. No capture was retaken.
-// Re-minted for resolving PR #3644 on top of PR #3641's Drowned Litany
-// drop-rate and artifact-evidence tree: the composite now seals both the
-// prior Litany evidence inputs and the battleground flag/rune
-// entity_view_policy_core.ts bytes. No capture was retaken.
-// Re-minted for the PR #3647 movement-reconciliation merge: renderer.ts now
-// combines the extracted self-render core, exact-match prediction wiring and
-// the release batch's rift collision token thread. No capture was retaken.
-// Re-minted for the rickshaw mount merge into release/v0.41.0: renderer.ts
-// keeps the release self-render extraction while adding the Bonebound Rickshaw
-// mount wiring. No capture was retaken.
-// Re-minted for resolving PR #3693 on top of the current v0.41 batch: the
-// batch-side renderer/entity-view policy leaves combine with the low-tier NaN
-// output-scrub patch hash and Eastbrook asset evidence inputs. No capture was
+// Re-minted for the v0.40.0 sync merge into the guild pledge branch (the
+// OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
+// both sides). No capture was retaken.
+// Re-minted for the entry-horizon scenery cull (renderer.ts hands the four
+// reveal-gated painters the horizon-capped cull far at both frame sites): the
+// renderer integration leaf moved. No capture was retaken.
+// Re-minted for the battleground field-stream compile gate (renderer.ts
+// injects the gate at the buildBattleground site; renderer.ts is a
+// provenance input). No capture was retaken.
+// Re-minted for the v0.41.0 sync merge into the entry-fade-gate branch (the
+// compile-gate batch landed on the release arm; renderer inputs moved on
+// both sides). No capture was retaken.
+// Re-minted for the sixth v0.41.0 sync merge into the ground-aim branch: the
+// merged renderer.ts carries the entry-fade arm's scenery cull beside this
+// branch's aim blocked pass-through, so the composite matches neither parent.
+// No capture was retaken.
+// Re-minted after the Forgefather strike-route call-site swap in renderer.ts
+// (routeVarkhulForgeHammer replaced the bare forge-hammer dispatch) moved the
+// runtimeRender.renderer leaf. No capture was retaken.
+// Re-minted for the raid encounter tuning PR's nameplate direct-click pick
+// integration in renderer.ts: the runtimeRender.renderer leaf moved. No
+// capture was retaken.
+// Re-minted for PR #3740's forge-lift room (the lift room render hookup and
+// door-portal arm moved the renderer integration leaf). No capture was
 // retaken.
-// Re-minted after removing withdrawn v0.41 batch entries #3529 and #3631:
-// renderer.ts moved again, while Eastbrook evidence and captures were adopted
-// verbatim.
+// Re-minted for the Drakelands entrance merge into the raid branch (PRs 3689
+// plus 3734: both arms had re-minted, the merged renderer and evidence inputs
+// land together). No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '9a401bb58b6c9e5e2238fd4861934eccf04456637ed561a1c4a559b3f1dfc6ee';
+  '89c8a62f400d63c10f85c61eac2c93f2f0a43d1e822679027d03bbed6ee82d0d';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

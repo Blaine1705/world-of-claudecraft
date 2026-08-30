@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { isDebuffAura, isDebuffDisplayAura, isDispellableAura } from '../src/sim/aura_classify';
+import {
+  isDebuffAura,
+  isDebuffDisplayAura,
+  isDispellableAura,
+  isPartyFrameRelevantAura,
+} from '../src/sim/aura_classify';
 import type { Aura, AuraKind } from '../src/sim/types';
 
 // Every harmful kind the HUD and /targetbuffs treat as a debuff. Keeping this
@@ -15,6 +20,7 @@ const HARMFUL: AuraKind[] = [
   'polymorph',
   'attackspeed',
   'bleed_vuln',
+  'vuln_source',
   'debuff_ap',
   'sunder',
   'mortal_wound',
@@ -103,6 +109,12 @@ describe('isDebuffAura', () => {
     expect(isDebuffDisplayAura('internal_cd', 1, 'shaman_stormsurge_ready')).toBe(true);
     expect(isDebuffDisplayAura('internal_cd', 1, 'heating_up')).toBe(false);
     expect(isDebuffDisplayAura('internal_cd', 0, 'shaman_warspirit_cadence')).toBe(false);
+  });
+
+  it("classifies Maker's Brand as an actionable raid-frame debuff", () => {
+    const brand = { id: 'varkhul_makers_brand', kind: 'vuln_source' as const, value: 0.7 };
+    expect(isDebuffAura(brand.kind, brand.value)).toBe(true);
+    expect(isPartyFrameRelevantAura(brand)).toBe(true);
   });
 });
 

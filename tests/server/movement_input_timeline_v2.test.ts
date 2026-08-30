@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { createDungeonEntryFacingFence } from '../../server/dungeon_entry_facing';
 import {
   consumeMovementFramesV2,
   createMovementInputSessionState,
@@ -176,6 +177,7 @@ describe('MovementInputTimeline', () => {
       pid: 1,
       lastInputAt: 0,
       ...createMovementInputSessionState(2),
+      dungeonEntryFacing: createDungeonEntryFacingFence(0, false),
       movementTimeline: timeline,
     };
     const meta = { moveInput: emptyMoveInput() };
@@ -203,6 +205,7 @@ describe('MovementInputTimeline', () => {
       pid: 1,
       lastInputAt: 0,
       ...createMovementInputSessionState(2),
+      dungeonEntryFacing: createDungeonEntryFacingFence(0, false),
       movementTimeline: timeline,
     };
     const meta = { moveInput: emptyMoveInput() };
@@ -225,6 +228,7 @@ describe('MovementInputTimeline', () => {
       pid: 1,
       lastInputAt: 0,
       ...createMovementInputSessionState(2),
+      dungeonEntryFacing: createDungeonEntryFacingFence(0, false),
       movementTimeline: timeline,
     };
     const meta = { moveInput: emptyMoveInput() };
@@ -282,6 +286,7 @@ describe('MovementInputTimeline', () => {
       pid: 1,
       lastInputAt: 10,
       ...createMovementInputSessionState(2),
+      dungeonEntryFacing: createDungeonEntryFacingFence(0, false),
     };
     session.movementTimeline?.enqueue(frame(5));
     expect(session.movementTimeline?.consumeNext()).toBeNull();

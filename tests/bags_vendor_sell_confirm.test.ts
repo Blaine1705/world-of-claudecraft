@@ -103,6 +103,7 @@ function harness(inventory: InvSlot[], opts?: { confirmVendorSell?: boolean }): 
     isBankOpen: () => false,
     isPersonalBankTab: () => false,
     isGuildBankTab: () => false,
+    isVaultBankTab: () => false,
     pendingPetFeed: () => false,
     closeVendor: noop,
     closeBank: noop,

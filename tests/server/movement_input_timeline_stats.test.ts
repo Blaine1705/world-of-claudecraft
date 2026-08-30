@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-
+import { createDungeonEntryFacingFence } from '../../server/dungeon_entry_facing';
 import { MovementInputTimelineTickStats } from '../../server/movement_input_timeline_stats';
 import {
   createMovementInputSessionState,
@@ -12,6 +12,7 @@ function session(pid: number): MovementInputSessionState {
     pid,
     lastInputAt: 0,
     ...createMovementInputSessionState(2),
+    dungeonEntryFacing: createDungeonEntryFacingFence(0, false),
   };
 }
 

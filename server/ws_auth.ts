@@ -17,6 +17,7 @@ import type * as http from 'node:http';
 import type { WebSocket, WebSocketServer } from 'ws';
 import {
   type BankBonusSource,
+  DUNGEON_ENTRY_FACING_WIRE_VERSION,
   ONLINE_WORLD_AUTH_TYPE,
   ONLINE_WORLD_INCOMPATIBLE_MESSAGE,
   PET_SPECIAL_WIRE_VERSION,
@@ -32,6 +33,7 @@ import type {
 } from './db';
 import type { GameServer } from './game';
 import { negotiateMovementWireVersion } from './movement_wire_version';
+import { kickStoragePurchaseRecovery } from './storage_purchases';
 import type { HandshakeFlushMode } from './ws_buffer';
 
 // The {t:'error', error} rejection strings, by the exact value the client reads
@@ -284,6 +286,10 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
     const petSpecialWireVersion: 0 | typeof PET_SPECIAL_WIRE_VERSION =
       msg.petSpecialWire === PET_SPECIAL_WIRE_VERSION ? PET_SPECIAL_WIRE_VERSION : 0;
     const movementWireVersion = negotiateMovementWireVersion(msg.movementWire);
+    const dungeonEntryFacingWireVersion: 0 | typeof DUNGEON_ENTRY_FACING_WIRE_VERSION =
+      msg.dungeonEntryFacingWire === DUNGEON_ENTRY_FACING_WIRE_VERSION
+        ? DUNGEON_ENTRY_FACING_WIRE_VERSION
+        : 0;
     const account = await accountAndScopeForToken(token);
     if (account === null || account.scope !== 'full' || !Number.isFinite(characterId)) {
       rejectHandshake(ws, WS_AUTH_ERROR.notAuthenticated);
@@ -355,6 +361,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
         isAdmin,
         adminPermissions,
         clientSeed,
+        dungeonEntryFacingWireVersion,
         timerWireVersion,
         petSpecialWireVersion,
         movementWireVersion,
@@ -548,6 +555,12 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
         console.log(
           `+ ${admittedCharacter.name} (${admittedCharacter.class}) joined, ${game.clients.size} online`,
         );
+        // Bank Storage phase 11: settle any pending Claudium storage purchase
+        // against the freshly loaded state (fire-and-forget; never gates the
+        // join). A join that internally resumed a linkdead session is safe
+        // here too: an in-flight purchase still holds the per-character mutex
+        // and the recovery yields to it immediately.
+        kickStoragePurchaseRecovery(session.characterId);
         ws.on('message', (data) => {
           game.handleMessage(session, String(data));
         });

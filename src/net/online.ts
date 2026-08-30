@@ -13,10 +13,10 @@ import {
 import { bagCapacity } from '../sim/bags';
 import { signChallenge } from '../sim/client_challenge';
 import { allocRiftCollisionToken, clearRiftRegion, setRiftRegion } from '../sim/colliders';
+import { heroicLeapPlacementPreview } from '../sim/combat/heroic_leap';
 import { MOUNT_RACE_COURSE, type MountKey, normalizeMountKey } from '../sim/content/mounts';
 import { mechChromaSkinIndex } from '../sim/content/skins';
 import {
-  computeTalentModifiers,
   emptyAllocation,
   type Role,
   repairAllocation,
@@ -32,6 +32,7 @@ import {
   ALL_RECIPES,
   abilitiesKnownAt,
   CLASSES,
+  dungeonAt,
   getActiveWorldContent,
   NPCS,
   resolveDelveShopOffers,
@@ -61,6 +62,7 @@ import {
   type SavedReliquaryState,
 } from '../sim/reliquary';
 import { riftFloorColliders } from '../sim/rift/rift_gen';
+import { computeCharacterModifiers } from '../sim/set_bonus_mods';
 import type { ResolvedAbility } from '../sim/sim';
 import { parseTalentAllocation } from '../sim/talent_allocation_input';
 import { repairTalentLoadouts } from '../sim/talent_loadouts';
@@ -95,7 +97,13 @@ import {
   type AccountCosmetics,
   type ActiveConsecration,
   type ActiveFrostRing,
+  type ActiveIgnivarMeteorWarning,
   type ActiveTemporalHourglass,
+  type ActiveVarkhulAnvilMeteorWarning,
+  type ActiveVarkhulAssembly,
+  type ActiveVarkhulCinderFire,
+  type ActiveVarkhulCinderOrbProjectile,
+  type ActiveVarkhulForgestormWarning,
   type ArenaInfo,
   type BankInfo,
   type CardMinigameInfo,
@@ -116,6 +124,7 @@ import {
   type DelveRunInfo,
   type DelveShopOfferView,
   type DevLeaderboardPage,
+  DUNGEON_ENTRY_FACING_WIRE_VERSION,
   type DuelInfo,
   type FriendInfo,
   type GuildBankInfo,
@@ -147,12 +156,14 @@ import {
   type SocialInfo,
   type ToolEffectSlotView,
   type TradeInfo,
+  type VaultInfo,
 } from '../world_api';
 import {
   type ActionBarLayout,
   type ActionBarLayoutRestore,
   sanitizeActionBarLayout,
 } from '../world_api/action_bar';
+import type { GroundAimPointXZ } from '../world_api/combat';
 import type {
   ApplyEnchantResultView,
   CommissionOrderScope,
@@ -164,6 +175,7 @@ import type {
 import { normalizeAccountCosmetics } from './account_cosmetics_wire';
 import { apiErrorFromBody } from './api_error';
 import { computeBackoffDelay } from './backoff';
+import { applyBankSelfWire } from './bank_snapshot_wire';
 import {
   type CivicServicePlacementsReader,
   createCivicServicePlacementsReader,
@@ -174,6 +186,14 @@ import {
   type DesktopWalletStatus,
   parseDesktopWalletHandoffStatus,
 } from './desktop_wallet_handoff';
+import { dungeonEntrySnapshotFacing } from './dungeon_entry_facing';
+import {
+  decodeConsecrations,
+  decodeFrostRings,
+  decodeIgnivarMeteors,
+  decodeTemporalHourglasses,
+  decodeVarkhulForgestormWarnings,
+} from './ground_telegraph_wire';
 import { decodeGuildBankLogFrame, GUILD_BANK_LOG_TTL_MS } from './guild_bank_log_wire';
 import { foldInputAck } from './input_ack';
 import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
@@ -198,6 +218,12 @@ import {
   stableCooldownRemaining,
   stableDeadlineRemaining,
 } from './snapshot_timer_wire';
+import { decodeVarkhulAnvilMeteors, decodeVarkhulAssemblies } from './varkhul_assembly_wire';
+import {
+  decodeVarkhulCinderFires,
+  decodeVarkhulCinderOrbProjectiles,
+} from './varkhul_cinder_orb_wire';
+import { vaultWithdrawPayload } from './vault_snapshot_wire';
 import { buildWebSocketAuthMessage } from './world_auth_message';
 
 export { buildWebSocketAuthMessage } from './world_auth_message';
@@ -207,7 +233,7 @@ export { buildWebSocketAuthMessage } from './world_auth_message';
 // biome-ignore lint/suspicious/noExplicitAny: legacy wire JSON is intentionally loose at the boundary.
 type LooseJson = any;
 
-type InputSendMode = 'periodic' | 'changed' | 'forced-neutral';
+type InputSendMode = 'periodic' | 'changed' | 'forced-neutral' | 'forced-facing';
 
 const inputFacingsMatch = (a: number, b: number): boolean =>
   Math.abs(Math.atan2(Math.sin(a - b), Math.cos(a - b))) <= 1e-12;
@@ -1297,6 +1323,7 @@ function blankEntity(id: number): Entity {
     attackPower: 0,
     rangedPower: 0,
     spellPower: 0,
+    healPower: 0,
     meleeHaste: 0,
     rangedHaste: 0,
     spellHaste: 0,
@@ -1568,6 +1595,32 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // (`s.bank`, delta-omitted). Null away from a banker (proximity-gated by the
   // server), so it only rides the wire while the player stands at a bursar. ---
   bankInfo: BankInfo | null = null;
+  // --- IWorldBank: Materials Vault contents view, the per-material store beside
+  // the slot bank, mirrored from the snapshot self (`s.vault`, delta-omitted).
+  // The payload is OWNER-ONLY and never rides the interest-scoped entity
+  // broadcast: a vault is private character storage, so only the owning player's
+  // `self` block can ever carry it (and only while a banker gates it, like
+  // bankInfo above), which leaves this null away from a bursar. ---
+  vaultInfo: VaultInfo | null = null;
+  // --- IWorldBank: the craft-from-vault stock view (Bank Storage Phase 04),
+  // mirrored from the snapshot self (`s.cvault`, delta-omitted). Owner-only
+  // like vaultInfo, but gated on the craft-draw context predicate instead of
+  // banker proximity: null means vault reagent draw is unavailable HERE (an
+  // instanced or competitive context), {} means available but empty. ---
+  craftVaultStock: Record<string, number> | null = null;
+  // --- IWorldBank: this character's purchased ladder slots (Bank Storage phase
+  // 15), mirrored from the snapshot self (`bpsl`, delta-omitted). Owner-only
+  // like the three reads above, but gated on NOTHING: the Strongbox store opens
+  // anywhere and gates its charter list on this, so a proximity gate would
+  // reproduce the blindness it exists to close. The server emits it for the
+  // VIEWING session's own character rather than the spectate anchor, so this
+  // number always describes ONE character, and it only ever grows for as long as
+  // that character stays RESIDENT server-side (src/sim/bank.ts names the two
+  // reachable cases where a fresh join brings a LOWER count back into this same
+  // mirror, which is not reset on a reconnect). null until the first snapshot
+  // lands, which the fit gate reads as unknown (list everything), never as
+  // zero. ---
+  bankPurchasedSlots: number | null = null;
   // --- IWorldGuildBank: guild bank contents view, mirrored from the snapshot
   // self (`s.guildBank`, delta-omitted). Null away from a banker, while dead,
   // and outside a guild (proximity + membership gated by the server; ANY rank
@@ -1872,6 +1925,12 @@ export class ClientWorld extends ReconWireState implements IWorld {
   private readonly clientSeed: string;
   private eventQueue: SimEvent[] = [];
   activeFrostRings: ActiveFrostRing[] = [];
+  activeIgnivarMeteors: ActiveIgnivarMeteorWarning[] = [];
+  activeVarkhulForgestormWarnings: ActiveVarkhulForgestormWarning[] = [];
+  activeVarkhulCinderFires: ActiveVarkhulCinderFire[] = [];
+  activeVarkhulCinderOrbProjectiles: ActiveVarkhulCinderOrbProjectile[] = [];
+  activeVarkhulAnvilMeteors: ActiveVarkhulAnvilMeteorWarning[] = [];
+  activeVarkhulAssemblies: ActiveVarkhulAssembly[] = [];
   activeTemporalHourglasses: ActiveTemporalHourglass[] = [];
   activeConsecrations: ActiveConsecration[] = [];
   private counterfangWindowDeadlineMs = 0;
@@ -1929,6 +1988,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
   private inputEchoSamples: number[] = [];
   private spectateFacingPending = false;
   private pendingSpectateFacing: number | null = null;
+  private dungeonEntrySeq: number | null = null;
+  private pendingDungeonEntryFacing: number | null = null;
 
   constructor(token: string, characterId: number, cls: PlayerClass, base = '', clientSeed = '') {
     super();
@@ -2272,9 +2333,11 @@ export class ClientWorld extends ReconWireState implements IWorld {
     return facing;
   }
 
-  // -----------------------------------------------------------------------
-  // Socket
-  // -----------------------------------------------------------------------
+  consumeDungeonEntryFacing(): number | null {
+    const facing = this.pendingDungeonEntryFacing ?? null;
+    this.pendingDungeonEntryFacing = null;
+    return facing;
+  }
 
   private pendingTransientInputState(): PendingTransientInput {
     this.pendingTransientInput ??= { jump: false, turnLeft: false, turnRight: false };
@@ -2297,19 +2360,20 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
 
   private sendInput(now = performance.now(), mode: InputSendMode = 'periodic'): boolean {
+    // The forced-facing arm reaches here from applyWire, which snapshot-driven
+    // harnesses (and the reconnect teardown window) run with no socket at all,
+    // so the socket existence check must come before its readyState.
     if (
       typeof this.spectating === 'string' ||
       !this.connected ||
+      !this.ws ||
       this.ws.readyState !== WebSocket.OPEN
     ) {
       return false;
     }
-    // Shed ordinary input while the browser-owned queue is backed up. Preserve
-    // the three engagement edges that are not idempotent-latest: jump can be
-    // pressed and released inside one shed interval, and keyboard-turn flags
-    // are intentionally present for only their engagement frame. Pause
-    // neutralization is the sole bounded force path and admits one frame.
-    if (mode !== 'forced-neutral' && isInputSendBackpressured(this.ws.bufferedAmount)) {
+    // Shed ordinary input under backpressure, retaining one-shot jump and turn
+    // edges. The two bounded forced modes each admit one required frame.
+    if (!mode.startsWith('forced-') && isInputSendBackpressured(this.ws.bufferedAmount)) {
       this.retainTransientInput();
       this.netPipeline().noteInputBackpressure(this.ws.bufferedAmount);
       return false;
@@ -2350,19 +2414,14 @@ export class ClientWorld extends ReconWireState implements IWorld {
         sf: mi.surface ? 1 : 0,
       },
     };
-    // The camera steer rides along only when it actually GRADES something.
-    // Absent means full rate on the far side (swimSteerRate), which is both the
-    // old behaviour and what every land frame wants — so walking around sends
-    // exactly the bytes it always did, and the field appears only while a
-    // swimmer is easing the view into a dive or a climb.
+    // Swim camera steer is sparse: absent means full rate and preserves the
+    // legacy land-frame wire shape.
     if (mi.swimSteer !== undefined && mi.swimSteer !== 1) {
       (msg.mi as Record<string, number>).ss = mi.swimSteer;
     }
     if (this.mouselookFacing !== null) msg.facing = this.mouselookFacing;
+    if (this.dungeonEntrySeq !== null) msg.de = this.dungeonEntrySeq;
     this.ws.send(JSON.stringify(msg));
-    // WebSocket.send accepted the real frame. Pending edges are transport-local
-    // and are consumed exactly once, including when the forced-neutral mode
-    // intentionally cancels them rather than replaying them into the pause.
     this.pendingTransientInput = undefined;
     this.lastInputSentAt = now;
     this.lastInputSig = sig;
@@ -2489,8 +2548,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       }
       if (this.reconnectAttempts > 0) {
         // fresh transport after an auto-reconnect: the server restarts input
-        // acking at 0 and resends the world from an empty interest set, and
-        // any stale mirrored entities fall out via the snapshot prune
+        // acking at 0 and resends the world from an empty interest set.
         this.reconnectAttempts = 0;
         this.conflictRejections = 0;
         this.timeoutRejections = 0;
@@ -2503,6 +2561,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
         this.pendingInputSeqSentAt.clear();
         this.ackedInputSeq = 0;
         this.inputEchoSamples = [];
+        this.dungeonEntrySeq = null;
+        this.pendingDungeonEntryFacing = null;
         this.missingSince.clear();
         this.lastSnapAt = 0;
         // any in-flight target echo died with the old transport; the resent
@@ -2868,91 +2928,17 @@ export class ClientWorld extends ReconWireState implements IWorld {
     if (typeof snap.tickHz === 'number' && Number.isFinite(snap.tickHz) && snap.tickHz > 0) {
       this.serverTickHz = snap.tickHz;
     }
-    this.activeFrostRings = Array.isArray(snap.rings)
-      ? snap.rings.flatMap((value: unknown): ActiveFrostRing[] => {
-          if (!value || typeof value !== 'object') return [];
-          const ring = value as Record<string, unknown>;
-          if (
-            typeof ring.id !== 'string' ||
-            ![ring.x, ring.z, ring.r, ring.i, ring.dur, ring.rem].every(
-              (value) => typeof value === 'number' && Number.isFinite(value),
-            ) ||
-            (ring.r as number) <= 0 ||
-            (ring.i as number) < 0 ||
-            (ring.i as number) >= (ring.r as number) ||
-            (ring.dur as number) <= 0 ||
-            (ring.rem as number) <= 0
-          )
-            return [];
-          return [
-            {
-              id: ring.id,
-              x: ring.x as number,
-              z: ring.z as number,
-              radius: ring.r as number,
-              innerRadius: ring.i as number,
-              duration: ring.dur as number,
-              remaining: Math.min(ring.rem as number, ring.dur as number),
-            },
-          ];
-        })
-      : [];
-    this.activeTemporalHourglasses = Array.isArray(snap.hourglasses)
-      ? snap.hourglasses.flatMap((value: unknown): ActiveTemporalHourglass[] => {
-          if (!value || typeof value !== 'object') return [];
-          const hourglass = value as Record<string, unknown>;
-          if (
-            typeof hourglass.id !== 'string' ||
-            ![hourglass.x, hourglass.z, hourglass.r, hourglass.dur, hourglass.rem].every(
-              (entry) => typeof entry === 'number' && Number.isFinite(entry),
-            ) ||
-            (hourglass.r as number) <= 0 ||
-            (hourglass.dur as number) <= 0 ||
-            (hourglass.rem as number) <= 0
-          )
-            return [];
-          return [
-            {
-              id: hourglass.id,
-              x: hourglass.x as number,
-              z: hourglass.z as number,
-              radius: hourglass.r as number,
-              duration: hourglass.dur as number,
-              remaining: Math.min(hourglass.rem as number, hourglass.dur as number),
-            },
-          ];
-        })
-      : [];
-    this.activeConsecrations = Array.isArray(snap.consecrations)
-      ? snap.consecrations.flatMap((value: unknown): ActiveConsecration[] => {
-          if (!value || typeof value !== 'object') return [];
-          const consecration = value as Record<string, unknown>;
-          if (
-            typeof consecration.id !== 'string' ||
-            ![
-              consecration.x,
-              consecration.z,
-              consecration.r,
-              consecration.dur,
-              consecration.rem,
-            ].every((entry) => typeof entry === 'number' && Number.isFinite(entry)) ||
-            (consecration.r as number) <= 0 ||
-            (consecration.dur as number) <= 0 ||
-            (consecration.rem as number) <= 0
-          )
-            return [];
-          return [
-            {
-              id: consecration.id,
-              x: consecration.x as number,
-              z: consecration.z as number,
-              radius: consecration.r as number,
-              duration: consecration.dur as number,
-              remaining: Math.min(consecration.rem as number, consecration.dur as number),
-            },
-          ];
-        })
-      : [];
+    this.activeFrostRings = decodeFrostRings(snap.rings);
+    this.activeIgnivarMeteors = decodeIgnivarMeteors(snap.ignivarMeteors);
+    this.activeVarkhulForgestormWarnings = decodeVarkhulForgestormWarnings(snap.varkhulForgestorm);
+    this.activeVarkhulCinderFires = decodeVarkhulCinderFires(snap.varkhulCinderFires);
+    this.activeVarkhulCinderOrbProjectiles = decodeVarkhulCinderOrbProjectiles(
+      snap.varkhulCinderOrbs,
+    );
+    this.activeVarkhulAnvilMeteors = decodeVarkhulAnvilMeteors(snap.varkhulAnvilMeteors);
+    this.activeVarkhulAssemblies = decodeVarkhulAssemblies(snap.varkhulAssemblies);
+    this.activeTemporalHourglasses = decodeTemporalHourglasses(snap.hourglasses);
+    this.activeConsecrations = decodeConsecrations(snap.consecrations);
 
     // lazy init (not the field initializer alone): tests build bare instances
     // via Object.create(ClientWorld.prototype), which skips field initializers
@@ -3082,19 +3068,11 @@ export class ClientWorld extends ReconWireState implements IWorld {
           e.vendorItems = def?.vendorItems ? [...def.vendorItems] : [];
         }
       }
-      // interpolation bases: re-anchor at the pose the renderer last drew,
-      // not at the previous server pose — when a frame extrapolated past the
-      // last update, restarting from the server pose snapped entities
-      // backwards every snapshot (visible rubber-banding while running).
-      // Non-self entities are drawn on their per-entity clock (renderer.sync),
-      // so the continuation alpha comes from that same clock; self stays on
-      // the global snapshot clock the camera follow uses.
+      // Re-anchor remote and self interpolation on their respective clocks.
       const prevUpdatedAt = e.netUpdatedAt;
       const prevInterval = e.netInterval;
-      // LOCKSTEP with remoteEntityAlpha (src/render/net_interp_core.ts, which
-      // net/ cannot import): unknown-cadence entities interpolate on a fixed
-      // 120 ms fallback interval capped at 1, so the re-anchor lands exactly
-      // on the pose the renderer drew instead of the global snapshot clock.
+      // LOCKSTEP with remoteEntityAlpha: unknown cadence uses a fixed 120 ms
+      // interval capped at 1.
       const entAlpha =
         w.id !== this.playerId && prevUpdatedAt !== undefined
           ? Math.min(
@@ -3103,11 +3081,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
             )
           : contAlpha;
       const entFacingAlpha = Math.min(1, entAlpha);
-      // per-entity update clock: distant entities are sent below snapshot
-      // rate, so each one interpolates over its own measured cadence. Only
-      // gaps within the slowest legitimate cadence count — records also
-      // pause while an entity's state is unchanged, and folding an idle
-      // period into the estimate would smear its next steps in slow motion
+      // Distant entities interpolate on measured cadence. Ignore idle gaps,
+      // which would smear their next movement into slow motion.
       if (prevUpdatedAt !== undefined) {
         const gap = now - prevUpdatedAt;
         if (gap > 5 && gap < 450) {
@@ -3115,15 +3090,26 @@ export class ClientWorld extends ReconWireState implements IWorld {
         }
       }
       e.netUpdatedAt = now;
-      // A teleport (arena pit, dungeon portal, graveyard release) jumps an
-      // entity far further than any single walking update could. Interpolating
-      // across that gap streaks it across the map — and when its per-entity
-      // interpolation clock isn't established yet, the renderer falls back to
-      // the global alpha and the entity sticks at its old pose until its next
-      // real update (e.g. taking damage). Snap both poses to the destination so
-      // it appears exactly where the server placed it.
       const teleDx = w.x - e.pos.x,
         teleDz = w.z - e.pos.z;
+      if (selfDelta) {
+        const entryFacing = dungeonEntrySnapshotFacing(
+          this.dungeonEntrySeq ?? null,
+          w.de,
+          e.pos.x,
+          w.x,
+          w.f,
+          this.mouselookFacing,
+        );
+        this.dungeonEntrySeq = entryFacing.entrySeq;
+        this.mouselookFacing = entryFacing.inputFacing;
+        if (entryFacing.forceFacing) {
+          this.moveInput.turnLeft = false;
+          this.moveInput.turnRight = false;
+          this.pendingDungeonEntryFacing = w.f;
+          this.sendInput(now, 'forced-facing');
+        } else if (dungeonAt(w.x) === null) this.pendingDungeonEntryFacing = null;
+      }
       const wasDead = e.dead;
       const nowDead = !!w.dead;
       if ((wasDead && !nowDead) || teleDx * teleDx + teleDz * teleDz > TELEPORT_SNAP_DIST_SQ) {
@@ -3666,7 +3652,12 @@ export class ClientWorld extends ReconWireState implements IWorld {
       }
       if (!this.talents) this.talents = emptyAllocation();
       const talents = this.talents;
-      const talentMods = computeTalentModifiers(this.cfg.playerClass, talents, e.level);
+      const talentMods = computeCharacterModifiers(
+        this.cfg.playerClass,
+        talents,
+        e.level,
+        this.equipment,
+      );
       this.talentSpec = talentMods.spec;
       this.talentRole = talentMods.role;
       this.known = abilitiesKnownAt(this.cfg.playerClass, e.level, talentMods, this.questsDone);
@@ -3691,10 +3682,11 @@ export class ClientWorld extends ReconWireState implements IWorld {
       if (s.mktU !== undefined) this.marketCollectPending = !!s.mktU;
       if (s.mail !== undefined) this.mailInfo = s.mail;
       if (s.mailU !== undefined) this.mailUnread = s.mailU ?? 0;
-      // `bank` is delta-omitted when unchanged (an omitted key means unchanged, NOT
-      // "no bank"); away from a banker the server encodes it as null. Never default
-      // to null/empty on omission, that would wipe an open bank window's mirror.
-      if (s.bank !== undefined) this.bankInfo = s.bank;
+      // The four owner-only bank/vault self keys (`bank`, `vault`, `cvault`,
+      // `bpsl`): all delta-omitted, strictly decoded and applied by the sibling
+      // module, where the delta contract, the by-reference adoption rationale,
+      // and each key's malformed policy (vault clears, the rest retain) live.
+      applyBankSelfWire(this, s);
       // `guildBank` follows the same delta contract; the server encodes null
       // away from a banker, on death, and outside a guild (the proximity +
       // membership gate lives in sim guildBankInfoFor; any rank sees it, the
@@ -3951,6 +3943,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
     return abilityId === 'mongoose_bite'
       ? Math.max(0, (this.counterfangWindowDeadlineMs - performance.now()) / 1000)
       : 0;
+  }
+  groundAimPlacementPreview(abilityId: string, point: GroundAimPointXZ): GroundAimPointXZ {
+    return heroicLeapPlacementPreview(this.cfg.seed, this.player, abilityId, point);
   }
   castAbility(abilityId: string): void {
     if (this.deadTargetCast(this.known.find((k) => k.def.id === abilityId)?.def)) {
@@ -4212,6 +4207,10 @@ export class ClientWorld extends ReconWireState implements IWorld {
   socketRiftGem(itemId: string, gemId: string, target?: { slotIndex: number }): void {
     if (target === undefined) this.cmd({ cmd: 'rift_socket_gem', item: itemId, gem: gemId });
     else this.cmd({ cmd: 'rift_socket_gem', item: itemId, gem: gemId, slot: target.slotIndex });
+  }
+  // IWorldInventory: server-stamped untilMs vs Date.now(), riftEventMsRemaining's clock.
+  partyTradeMsRemaining(untilMs: number): number {
+    return Math.max(0, untilMs - Date.now());
   }
   get bagCapacity(): number {
     return bagCapacity(this.bags);
@@ -5146,6 +5145,42 @@ export class ClientWorld extends ReconWireState implements IWorld {
   bankBuySlots(): void {
     this.cmd({ cmd: 'bank_buy_slots' });
   }
+  // --- IWorldBank: bank bag sockets (snake_case wire strings, Bank Storage
+  // phase 07: the command-schema triangle lands whole here, replacing the
+  // phase 06 no-op stubs). The server re-validates banker proximity, unlock
+  // order and exact copper, the payload-free bag rule, and the carried-side
+  // unsocket fit on every send; these are intent only. bankSocketBag mirrors
+  // equipBag's wire shape verbatim (`item` + optional `socket` + optional
+  // `slot` naming the exact carried copy). The socket READOUTS already ride
+  // bankInfo: the server serializes the sim's whole BankInfo, so the mirror
+  // above carries them with no per-field work. ---
+  bankUnlockSocket(): void {
+    this.cmd({ cmd: 'bank_unlock_socket' });
+  }
+  bankSocketBag(itemId: string, socket?: number, target?: { slotIndex: number }): void {
+    if (target === undefined) this.cmd({ cmd: 'bank_socket_bag', item: itemId, socket });
+    else this.cmd({ cmd: 'bank_socket_bag', item: itemId, socket, slot: target.slotIndex });
+  }
+  bankUnsocketBag(socket: number): void {
+    this.cmd({ cmd: 'bank_unsocket_bag', socket });
+  }
+  // --- IWorldBank: Materials Vault deposit/withdraw/buy-upgrade (snake_case wire
+  // strings). vaultInfo is a snapshot read (the mirror field above); the server
+  // re-validates banker proximity, material scope, cap, and price. Deposit uses
+  // carried-inventory index, optional partial `count`); pooled withdrawals use
+  // `itemId`, while special rows add their snapshot index plus fingerprint. ---
+  vaultDeposit(slotIndex: number, count?: number): void {
+    this.cmd({ cmd: 'vault_deposit', slot: slotIndex, ...(count !== undefined ? { count } : {}) });
+  }
+  vaultWithdraw(...args: Parameters<typeof vaultWithdrawPayload>): void {
+    this.cmd({ cmd: 'vault_withdraw', ...vaultWithdrawPayload(...args) });
+  }
+  vaultDepositAll(): void {
+    this.cmd({ cmd: 'vault_deposit_all' });
+  }
+  vaultBuyUpgrade(): void {
+    this.cmd({ cmd: 'vault_buy_upgrade' });
+  }
   // --- IWorldGuildBank: the officer-plus shared treasury + item store
   // (snake_case guild_bank_* wire strings, never a bank_* reuse). The server
   // owns every gameplay rule (officer-plus rank, banker proximity, caps,
@@ -5339,6 +5374,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
   buyHeroicVendorItem(itemId: string): void {
     this.cmd({ cmd: 'heroic_buy', itemId });
+  }
+  buyCrucibleVendorItem(itemId: string): void {
+    this.cmd({ cmd: 'crucible_buy', itemId });
   }
   // Live lethal death zones on the current rift boss floor. Mirrored from
   // riftDeathZoneSpawn events emitted at zone-placement time; the client counts

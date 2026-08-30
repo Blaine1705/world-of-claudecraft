@@ -219,6 +219,8 @@ describe('save-on-leave atomicity for a profession-item listing (#1146)', () => 
       const client = {
         query: vi.fn().mockResolvedValue({ rows: [], rowCount: 0 }),
         release: vi.fn(),
+        on: vi.fn(),
+        removeListener: vi.fn(),
       };
       dbMock.connect.mockResolvedValueOnce(client as any);
 

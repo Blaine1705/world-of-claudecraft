@@ -17,6 +17,7 @@ export function applySelfCombatScalars(e: Entity, s: any): void {
   e.attackPower = s.ap ?? e.attackPower;
   e.rangedPower = s.rp ?? 0;
   e.spellPower = s.sp ?? e.spellPower;
+  e.healPower = s.hpw ?? e.healPower;
   // Spell haste feeds the hasted-cast-time tooltip; melee/ranged haste need no
   // wiring (the swing timers already ride the snapshot).
   e.spellHaste = s.sh ?? e.spellHaste;

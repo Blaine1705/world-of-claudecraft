@@ -55,15 +55,21 @@ describe('graphics-overhaul integration', () => {
   it('routes reduced motion through every occluder-fade consumer', () => {
     const consumers = [
       'src/render/props.ts',
-      'src/render/foliage.ts',
-      'src/render/dungeon.ts',
+      'src/render/tree_hide_fade.ts',
+      // dungeon.ts's occluder loop moved to dungeon_wall_occlusion.ts (the
+      // raid backface cull); the pin follows the consumer.
+      'src/render/dungeon_wall_occlusion.ts',
       'src/render/eastbrook_town.ts',
       'src/render/yumi_maze.ts',
       'src/render/battleground_placements.ts',
     ];
     for (const file of consumers) {
       const text = source(file);
-      expect(text, file).toMatch(/stepOccluderFade\([^)]+,\s*reducedMotion\)/s);
+      // Either the core's step (the instanced-ghost consumers and the raid
+      // backface cull, whose trailing argument is the fade floor) or the
+      // gated stepper over it (occluder_fade.ts advanceOccluderFade, the
+      // fade painters); both take the flag after dt.
+      expect(text, file).toMatch(/(?:step|advance)OccluderFade\([^)]+,\s*reducedMotion\s*[,)]/s);
     }
   });
 

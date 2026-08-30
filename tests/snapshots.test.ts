@@ -2,12 +2,18 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { completeCraftCast } from './helpers/enchant_family_cast';
+import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
+import { tsFilesUnder } from './helpers/ts_files_under';
 
 // Mock the db layer so no Postgres is needed; snapshot logic is under test.
 vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
+  saveCharacterAndGuildBankState: vi.fn(async () => true),
   saveCharacterAndMarketState: vi.fn(async () => {}),
+  saveMarketState: vi.fn(async () => {}),
+  saveMailState: vi.fn(async () => {}),
+  saveMailPartitions: vi.fn(async () => {}),
   openPlaySession: vi.fn(async () => 1),
   touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
@@ -24,12 +30,21 @@ vi.mock('../server/db', () => ({
   loadAccountFlair: vi.fn(async () => ({ ai: false, streamer: false, links: {} })),
 }));
 
+import { createBackgroundDbGate } from '../server/background_db_gate';
 import { COSMETIC_OP_BURST, COSMETIC_OP_REFILL_PER_SECOND } from '../server/cosmetic_op_guard';
-import { saveCharacterState } from '../server/db';
+import {
+  saveCharacterAndGuildBankState,
+  saveCharacterAndMarketState,
+  saveCharacterState,
+  saveMailPartitions,
+  saveMailState,
+  saveMarketState,
+} from '../server/db';
 import { type ClientSession, GameServer, wireEntity } from '../server/game';
 import { gameMetricsCounters } from '../server/http/game_signals';
 import { consumeMovementFramesV2 } from '../server/movement_input_timeline_v2';
 import { updateMovementOverrideEpochs } from '../server/movement_override_epoch';
+import { KeyedSerialWriteAborted } from '../server/serial_writer';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
 import type { ClientWorld } from '../src/net/online';
 import { mechHeldWeaponOverride, visualKeyFor } from '../src/render/characters/manifest';
@@ -40,6 +55,7 @@ import {
 import { MOUNT_RACE_START_PLATFORM, type MountKey } from '../src/sim/content/mounts';
 import { COMBO_RECIPES } from '../src/sim/content/recipes';
 import { BUILTIN_WORLD, DELVES, GATHER_NODES, ITEMS, MOBS } from '../src/sim/data';
+import { IGNIVAR_JUDGMENT_CAST_ID } from '../src/sim/encounters/ignivar';
 import { createMob } from '../src/sim/entity';
 import { emptySaleLog } from '../src/sim/market_sale_log';
 import { MOUNT_RACE_COUNTDOWN_TICKS } from '../src/sim/mount_race';
@@ -54,6 +70,10 @@ import {
   type PlayerClass,
   type WorldContent,
 } from '../src/sim/types';
+import {
+  VARKHUL_SHARED_PYRE_AURA_ID,
+  VARKHUL_SHARED_PYRE_NAME,
+} from '../src/sim/varkhul_shared_pyre';
 import { terrainHeight } from '../src/sim/world';
 import { absorbTotal } from '../src/ui/absorb_bar';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
@@ -2380,6 +2400,16 @@ describe('autosaves', () => {
   beforeEach(() => {
     vi.mocked(saveCharacterState).mockReset();
     vi.mocked(saveCharacterState).mockResolvedValue(true);
+    vi.mocked(saveCharacterAndGuildBankState).mockReset();
+    vi.mocked(saveCharacterAndGuildBankState).mockResolvedValue(true);
+    vi.mocked(saveCharacterAndMarketState).mockReset();
+    vi.mocked(saveCharacterAndMarketState).mockResolvedValue(true);
+    vi.mocked(saveMarketState).mockReset();
+    vi.mocked(saveMarketState).mockResolvedValue();
+    vi.mocked(saveMailState).mockReset();
+    vi.mocked(saveMailState).mockResolvedValue();
+    vi.mocked(saveMailPartitions).mockReset();
+    vi.mocked(saveMailPartitions).mockResolvedValue();
   });
 
   it('skips overlapping saveAll runs while saving each current session once', async () => {
@@ -2435,6 +2465,212 @@ describe('autosaves', () => {
 
     const savedCharacterIds = vi.mocked(saveCharacterState).mock.calls.map((call) => call[0]);
     expect(savedCharacterIds.sort((a, b) => a - b)).toEqual([1, 1, 2, 2]);
+  });
+
+  it('holds each character save under the shared major-producer permit', async () => {
+    const gate = createBackgroundDbGate(3, 2); // one admitted producer
+    const server = new GameServer(undefined, gate);
+    joinServer(server, fakeWs(), 1, 'Testa');
+    joinServer(server, fakeWs(), 2, 'Testb');
+    joinServer(server, fakeWs(), 3, 'Testc');
+    let releaseDb!: () => void;
+    const dbHold = new Promise<void>((resolve) => {
+      releaseDb = resolve;
+    });
+    vi.mocked(saveCharacterState).mockImplementation(async () => {
+      await dbHold;
+      return true;
+    });
+
+    const saving = server.saveAll('autosave');
+    await vi.waitFor(() => {
+      expect(saveCharacterState).toHaveBeenCalledTimes(1);
+      expect(gate.stats()).toMatchObject({ inFlight: 1, waiting: 2, max: 1 });
+    });
+    releaseDb();
+    await saving;
+
+    expect(saveCharacterState).toHaveBeenCalledTimes(3);
+    expect(gate.stats()).toMatchObject({ inFlight: 0, waiting: 0, acquired: 3 });
+  });
+
+  it('joins the character FIFO before taking the shared DB permit', async () => {
+    const gate = createBackgroundDbGate(1, 0); // the supported one-lane edge
+    const server = new GameServer(undefined, gate);
+    const session = joinServer(server, fakeWs(), 1, 'Testa');
+    const order: string[] = [];
+    let markHeadStarted!: () => void;
+    const headStarted = new Promise<void>((resolve) => {
+      markHeadStarted = resolve;
+    });
+    let releaseHead!: () => void;
+    const headHold = new Promise<void>((resolve) => {
+      releaseHead = resolve;
+    });
+    const head = server.enqueueCharacterWrite(session.characterId, async () => {
+      markHeadStarted();
+      await headHold;
+    });
+    await headStarted;
+
+    // Model the marketplace custody adapter: it already owns the character
+    // FIFO before asking for a background permit.
+    const custody = server.enqueueCharacterWrite(session.characterId, async () => {
+      const permit = await gate.acquire();
+      if (!permit) throw new Error('custody permit unexpectedly refused');
+      try {
+        order.push('custody');
+      } finally {
+        permit.release();
+      }
+    });
+    vi.mocked(saveCharacterState).mockImplementationOnce(async () => {
+      expect(gate.stats().inFlight).toBe(1);
+      order.push('autosave');
+      return true;
+    });
+    const autosave = server.saveAll('autosave');
+    await Promise.resolve();
+    await Promise.resolve();
+
+    // The old permit->FIFO order held this one permit here. Custody was ahead
+    // in the same FIFO and waited for it forever, while autosave waited behind
+    // custody. No producer may consume the permit until its FIFO turn begins.
+    expect(gate.stats()).toMatchObject({ inFlight: 0, waiting: 0, max: 1 });
+
+    releaseHead();
+    await Promise.all([head, custody, autosave]);
+    expect(order).toEqual(['custody', 'autosave']);
+    expect(gate.stats()).toMatchObject({ inFlight: 0, waiting: 0, acquired: 2 });
+  });
+
+  it('joins the market FIFO before taking the shared DB permit', async () => {
+    const gate = createBackgroundDbGate(1, 0); // the supported one-lane edge
+    const server = new GameServer(undefined, gate);
+    const session = joinServer(server, fakeWs(), 1, 'Testa');
+    const guildId = 913;
+    server.sim.loadGuildBank(guildId, {
+      treasury: 0,
+      inventory: [],
+      purchasedSlots: 0,
+    });
+    session.dirtyGuildBanks.set(guildId, 1);
+
+    let releaseHead!: () => void;
+    const headHold = new Promise<void>((resolve) => {
+      releaseHead = resolve;
+    });
+    const head = (server as any).enqueueMarketWrite(async () => headHold) as Promise<void>;
+    const order: string[] = [];
+    vi.mocked(saveCharacterAndGuildBankState).mockImplementationOnce(async () => {
+      expect(gate.stats().inFlight).toBe(1);
+      order.push('character');
+      return true;
+    });
+    vi.mocked(saveMarketState).mockImplementationOnce(async () => {
+      expect(gate.stats().inFlight).toBe(1);
+      order.push('market');
+    });
+
+    // The dirty-book autosave owns the character FIFO and queues first on the
+    // market writer. A periodic market save queues behind it. Neither may take
+    // the sole DB permit before its market-FIFO turn begins: the old
+    // permit->market order made the market save hold the permit while waiting
+    // behind a character save that needed that same permit.
+    const serialize = vi.spyOn(server.sim, 'serializeCharacter');
+    const characterSave = server.saveAll('autosave');
+    await vi.waitFor(() => {
+      // The character FIFO is running and has reached the held market writer,
+      // so its market entry necessarily precedes the periodic one below.
+      expect(serialize).toHaveBeenCalled();
+    });
+    const marketSave = server.saveMarket();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(gate.stats()).toMatchObject({ inFlight: 0, waiting: 0, max: 1 });
+
+    releaseHead();
+    await Promise.all([head, characterSave, marketSave]);
+    expect(order).toEqual(['character', 'market']);
+    expect(gate.stats()).toMatchObject({ inFlight: 0, waiting: 0, acquired: 2 });
+  });
+
+  it('gates WOC dirty-book preflush and mail persistence at their innermost DB calls', async () => {
+    const gate = createBackgroundDbGate(1, 0);
+    const server = new GameServer(undefined, gate);
+    const session = joinServer(server, fakeWs(), 1, 'Testa');
+    const guildId = 914;
+    server.sim.loadGuildBank(guildId, {
+      treasury: 0,
+      inventory: [],
+      purchasedSlots: 0,
+    });
+    session.dirtyGuildBanks.set(guildId, 1);
+    vi.mocked(saveCharacterAndGuildBankState).mockImplementationOnce(async () => {
+      expect(gate.stats().inFlight).toBe(1);
+      return true;
+    });
+    // Mail persistence rides the partitioned writer (#3561); a freshly joined
+    // character already has dirty welcome-letter partitions, so the innermost
+    // DB call still fires and can assert the permit is held.
+    vi.mocked(saveMailPartitions).mockImplementationOnce(async () => {
+      expect(gate.stats().inFlight).toBe(1);
+    });
+
+    await server.flushDirtyGuildBooks(session.characterId);
+    await server.persistMailBlob();
+
+    expect(saveCharacterAndGuildBankState).toHaveBeenCalledTimes(1);
+    expect(saveMailPartitions).toHaveBeenCalledTimes(1);
+    expect(gate.stats()).toMatchObject({ inFlight: 0, waiting: 0, acquired: 2 });
+  });
+
+  it('unlinks a cancelled recovery save before it starts in the character FIFO', async () => {
+    const server = new GameServer();
+    const session = joinServer(server, fakeWs(), 1, 'Testa');
+    vi.mocked(saveCharacterState).mockClear();
+    let releaseHead!: () => void;
+    const headHold = new Promise<void>((resolve) => {
+      releaseHead = resolve;
+    });
+    const head = server.enqueueCharacterWrite(session.characterId, async () => headHold);
+    const controller = new AbortController();
+    const cancelled = server.saveCharacter(session, { signal: controller.signal });
+    await Promise.resolve();
+    controller.abort();
+
+    await expect(cancelled).rejects.toBeInstanceOf(KeyedSerialWriteAborted);
+    expect(saveCharacterState).not.toHaveBeenCalled();
+    releaseHead();
+    await head;
+  });
+
+  it('unlinks a cancelled recovery save before it starts in the market FIFO', async () => {
+    const server = new GameServer();
+    const session = joinServer(server, fakeWs(), 1, 'Testa');
+    vi.mocked(saveCharacterAndMarketState).mockClear();
+    let releaseMarket!: () => void;
+    const marketHold = new Promise<void>((resolve) => {
+      releaseMarket = resolve;
+    });
+    const head = (server as any).enqueueMarketWrite(async () => marketHold) as Promise<void>;
+    const serialize = vi.spyOn(server.sim, 'serializeCharacter');
+    const controller = new AbortController();
+    const cancelled = server.saveCharacter(session, {
+      withMarket: true,
+      signal: controller.signal,
+    });
+    await vi.waitFor(() => {
+      // The character FIFO is already running; its synchronous snapshot work
+      // completed before it queued behind the held market writer.
+      expect(serialize).toHaveBeenCalled();
+    });
+    controller.abort();
+
+    await expect(cancelled).rejects.toBeInstanceOf(KeyedSerialWriteAborted);
+    expect(saveCharacterAndMarketState).not.toHaveBeenCalled();
+    releaseMarket();
+    await head;
   });
 });
 
@@ -2952,7 +3188,10 @@ describe('client-side delta merge', () => {
       (client as any).applySnapshot(snap);
     };
     apply();
-    const mirrored = client.entities.get(e.id)!.auras.find((a) => a.id === 'fear_incap')!;
+    const mirroredEntity = client.entities.get(e.id);
+    if (!mirroredEntity) throw new Error('mirrored entity missing');
+    const mirrored = mirroredEntity.auras.find((a) => a.id === 'fear_incap');
+    if (!mirrored) throw new Error('mirrored fear aura missing');
     expect(mirrored.breakThreshold).toBe(1);
 
     fearAura.breakThreshold = undefined;
@@ -4599,10 +4838,12 @@ const ALL_DELTA_KEYS = [
   'app',
   'arena',
   'atitle',
+  'auras',
   'bags',
   'bank',
   'bg',
   'blk',
+  'bpsl',
   'buyback',
   'bval',
   'cardDuel',
@@ -4614,10 +4855,12 @@ const ALL_DELTA_KEYS = [
   'cprof',
   'crat',
   'crit',
+  'cvault',
   'dclears',
   'dcomp',
   'dcompanion',
   'ddiff',
+  'de',
   'deeds',
   'delveDaily',
   'denc',
@@ -4636,6 +4879,7 @@ const ALL_DELTA_KEYS = [
   'hbl',
   'hirat',
   'honor',
+  'hpw',
   'hrat',
   'inv',
   'lhonor',
@@ -4674,17 +4918,36 @@ const ALL_DELTA_KEYS = [
   'tfocus',
   'trade',
   'tslot',
+  'vault',
   'weapon',
   'xp',
 ] as const;
 
+/** The registered delta keys whose DELTA behavior is gated on a wire
+ *  capability the session advertises in its auth frame; both are DIRECT
+ *  maybeSerialized emits in server/game.ts bcastSelf, which is why the emitter
+ *  scrape below needs its Serialized arm to see them at all.
+ *  - `de` (dungeonEntryFacingWireVersion): the dungeon entry facing fence's
+ *    token. Capability-ONLY: a legacy session never receives the key, so it
+ *    stays out of DENSE_DELTA_KEYS. Lifecycle pins:
+ *    tests/server/dungeon_entry_facing.test.ts.
+ *  - `auras` (timerWireVersion, the stable timer wire): delta-ELIDED only for
+ *    a stable-wire session; a legacy session still receives auras on EVERY
+ *    snapshot as part of the always-present base self record (wireEntity's
+ *    includeAuras arm), so the key IS dense but never elides for legacy.
+ *    Lifecycle pins: the negotiated stable timer wire suite below. */
+const CAPABILITY_DELTA_KEYS = ['auras', 'de'] as const;
+
 /** The delta keys a FRESH session is guaranteed to receive on its first
- *  snapshot. Every registered key but one: `app` is the authored modular look,
+ *  snapshot. Every registered key but two: `app` is the authored modular look,
  *  and a character created before the creator (or by a client that posts no
  *  appearance) has none, so it stays sparse on the wire the way `eq`/`eqi` do
- *  on the entity record. Its own round trip is pinned in
- *  tests/appearance_broadcast.test.ts, including that it ships exactly once. */
-const DENSE_DELTA_KEYS = ALL_DELTA_KEYS.filter((key) => key !== 'app');
+ *  on the entity record (its own round trip is pinned in
+ *  tests/appearance_broadcast.test.ts, including that it ships exactly once);
+ *  `de` is capability-only (CAPABILITY_DELTA_KEYS above). `auras` stays dense:
+ *  a legacy session gets it on the base self record and a stable-wire session
+ *  gets the first-send delta. */
+const DENSE_DELTA_KEYS = ALL_DELTA_KEYS.filter((key) => key !== 'app' && key !== 'de');
 
 // The terse wire key -> IWorld member name rename map, in sorted order. The wire
 // string IS the protocol (contract #4): a terse key renamed on one side passes tsc
@@ -4710,6 +4973,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   cprof: 'craftingIdentity',
   crat: 'critRating',
   crit: 'critChance',
+  cvault: 'craftVaultStock',
   dclears: 'delveClears',
   dcomp: 'companionUpgrades',
   dcompanion: 'companionState',
@@ -4763,6 +5027,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   sp: 'spellPower',
   tfocus: 'townFocus',
   tslot: 'toolEffectSlots',
+  vault: 'vaultInfo',
 };
 
 // Year ~2223 in epoch ms. Beats selfWireJson's `until > Date.now()` lockout
@@ -4840,6 +5105,19 @@ function dirtyEveryDeltaField(): {
   const banker = sim.entities.get(sim.bankerIds[0]);
   if (banker) banker.pos = { ...p.pos };
   meta.bank.inventory = [{ itemId: 'wolf_fang', count: 2 }];
+  // `vault`: vaultInfoFor shares the bank's proximity gate (the bursar relocated
+  // above covers it), so only the contents need dirtying. Stocked AND upgraded,
+  // because a locked empty vault still encodes as a non-null all-zero object:
+  // without a rung the mirrored numbers would be indistinguishable from the
+  // default and the decode-target assertion could not tell them apart.
+  meta.vault.stock = { copper_ore: 7 };
+  meta.vault.upgrades = 2;
+  // `cvault`: craftVaultStockFor is gated on the craft-draw context predicate,
+  // not the banker. This harness player carries a live DELVE RUN (the drun
+  // key's seeding below), which the gate refuses by design, so cvault's
+  // dirtied value is the EXPLICIT NULL arrival: presence still pinned by the
+  // all-keys sweep, and the non-null arrival is pinned in
+  // tests/vault_wire.test.ts where no delve run competes for the player.
   // `guildBank`: guildBankInfoFor additionally needs a guild membership stamp
   // (any rank; officer-plus here also exercises canEdit true over the wire)
   // and a loaded guild book (the banker relocated above covers proximity);
@@ -5177,8 +5455,28 @@ describe('full self-state snapshot delta fixture', () => {
     const snap = lastSnap(fc.sent);
     expect(snap).not.toBeNull();
     for (const key of ALL_DELTA_KEYS) {
+      // `de` is capability-only and this fixture joins WITHOUT the
+      // entry-facing capability on purpose (its mirror assertions pin the
+      // legacy wire shapes), so its absence here IS the legacy-exclusion
+      // contract; the capable first-send/elision lifecycle is pinned in
+      // tests/server/dungeon_entry_facing.test.ts (see CAPABILITY_DELTA_KEYS).
+      // `auras` needs no carve-out: the legacy base self record carries it.
+      if (key === 'de') {
+        expect(snap.self, 'self.de sent to a legacy session').not.toHaveProperty(key);
+        continue;
+      }
       expect(snap.self, `self.${key} missing from first snapshot`).toHaveProperty(key);
       // each was dirtied to a non-default value, so none rides the wire as null
+      // EXCEPT cvault: this harness player carries a live delve run (the drun
+      // key's own seeding), and the craft-draw gate refuses vault draw inside
+      // a delve, so cvault's dirtied first-snapshot value IS the explicit
+      // gated null: the two keys are mutually exclusive on one player by
+      // design. Its non-null arrival (and the by-reference mirror) is pinned
+      // in tests/vault_wire.test.ts instead.
+      if (key === 'cvault') {
+        expect(snap.self[key], 'self.cvault must arrive as the explicit gated null').toBeNull();
+        continue;
+      }
       expect(snap.self[key], `self.${key} arrived null`).not.toBeNull();
     }
   });
@@ -5263,6 +5561,23 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.marketCollectPending).toBe(true); // mktU -> marketCollectPending (truthy bit)
     expect(client.bankInfo).not.toBeNull(); // bank -> bankInfo
     expect(client.bankInfo?.slots).toEqual([{ itemId: 'wolf_fang', count: 2 }]); // bank contents mirror
+    // vault -> vaultInfo: the owner-only Materials Vault clone survives whole,
+    // both derived numbers included (rung 2 of the 40-per-rung ladder, priced
+    // from the rung-2 literal in src/sim/materials_vault.ts).
+    expect(client.vaultInfo).toEqual({
+      stock: { copper_ore: 7 },
+      special: [],
+      upgrades: 2,
+      perMaterialCap: 80,
+      nextUpgradeCost: 100000,
+    });
+    // cvault -> craftVaultStock: this harness player is inside a delve run
+    // (see the seeding comment), so the gated null is all that can arrive
+    // here, and null is ALSO the mirror default: this line alone cannot prove
+    // the decode. The decisive decode pins (stocked non-null arrival, the
+    // by-reference adoption, the gate-flip explicit null) live in
+    // tests/vault_wire.test.ts.
+    expect(client.craftVaultStock).toBeNull();
     expect(client.guildBankInfo).not.toBeNull(); // guildBank -> guildBankInfo
     // guild bank mirror: the membership-gated boundary clone survives the wire
     // whole, canEdit included (the client renders read-only panes from it)
@@ -5505,6 +5820,7 @@ describe('full self-state snapshot delta fixture', () => {
     const weaponRef = client.player.weapon;
     const partyRef = client.partyInfo;
     const delveRunRef = client.delveRun;
+    const vaultRef = client.vaultInfo;
 
     // a second broadcast with NO intervening sim.tick() and no state mutation: the
     // maybe() closure sees byte-identical JSON for every registered key and omits every one
@@ -5512,6 +5828,13 @@ describe('full self-state snapshot delta fixture', () => {
     broadcast(server);
     const snap2 = lastSnap(fc.sent);
     for (const key of ALL_DELTA_KEYS) {
+      // `auras` only elides under the stable timer wire (pinned in the
+      // negotiated stable timer wire suite); this legacy fixture receives it
+      // on the always-present base self record, re-broadcast or not.
+      if (key === 'auras') {
+        expect(snap2.self, 'legacy self.auras left the base record').toHaveProperty(key);
+        continue;
+      }
       expect(snap2.self, `self.${key} resent although unchanged`).not.toHaveProperty(key);
     }
 
@@ -5524,6 +5847,9 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.player.weapon).toBe(weaponRef); // s.weapon ?? e.weapon (inline, player entity)
     expect(client.partyInfo).toBe(partyRef);
     expect(client.delveRun).toBe(delveRunRef);
+    // an omitted `vault` must leave an open vault window's mirror alone, not
+    // reset it to null (the omission-is-unchanged half of the delta contract)
+    expect(client.vaultInfo).toBe(vaultRef);
     expect(client.markerFor(memberPid)).toBe(3);
     expect(client.delveMarks).toBe(7);
     expect(client.honor).toBe(321);
@@ -5588,7 +5914,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 84 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 90 unique keys in sorted order', () => {
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
     // sheet's lifetime played-time key ptime, for 67, then +16: the static
@@ -5603,31 +5929,91 @@ describe('delta-key contract pins (anti-drift)', () => {
     // for 86. Every v0.36.0 sync conflicts here because each side pins its own
     // additions alone; the merged tree carries all of them, and this number
     // came from a run on the merged tree. The New Eastbrook program's Vale Cup
-    // retirement then removes sport/vcup/vcupb, for 83, then the melee-weaving
-    // off-hand bar adds offhandWeapon (delta-guarded like weapon/stats: a gear
-    // swap, not a per-tick change; dualWielding rides no key of its own, it is
-    // always exactly offhandWeapon !== null, so the client derives it), for 84.
-    expect(ALL_DELTA_KEYS).toHaveLength(84);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(84);
+    // retirement then removes sport/vcup/vcupb, for 83, and the healPower
+    // seam adds the derived Healing Power scalar hpw for 84. Bank Storage
+    // Phase 2 then adds the purchased-slots key bpsl, the Materials Vault
+    // blob vault, and the craft-vault stock cvault, for 87. Widening the
+    // scrape to the direct maybeSerialized form then registers the two
+    // capability-gated keys it had been blind to, the stable timer wire's
+    // self auras channel and the dungeon entry facing token de
+    // (CAPABILITY_DELTA_KEYS above), for 89. The melee-weaving off-hand bar
+    // adds offhandWeapon (delta-guarded like weapon/stats: a gear swap, not a
+    // per-tick change; dualWielding rides no key of its own, it is always
+    // exactly offhandWeapon !== null, so the client derives it), for 90.
+    expect(ALL_DELTA_KEYS).toHaveLength(90);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(90);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
-  it('ALL_DELTA_KEYS equals the maybe(...) keys scraped from server/game.ts (multi-line lockouts incl.)', () => {
-    const raw = readFileSync(resolve(process.cwd(), 'server/game.ts'), 'utf8');
+  it('ALL_DELTA_KEYS equals the maybe(...) keys scraped from every server emitter (multi-line lockouts incl.)', () => {
+    // Scan the whole recursive server tree: game.ts is the original emitter,
+    // while Bank Storage moved the bank family into bank_wire.ts and the
+    // Materials Vault family into vault_wire.ts. New wire surface belongs in
+    // siblings too, including nested ones, and must join this registry without
+    // relying on a hand-maintained emitter-file inventory.
+    const serverSources = tsFilesUnder(resolve(process.cwd(), 'server'));
+    expect(
+      serverSources.length,
+      'the delta-emitter scrape reads the whole server tree, not one level',
+    ).toBeGreaterThanOrEqual(300);
+    expect(serverSources.map(({ file }) => file)).toContain('vault_wire.ts');
+    const raw = serverSources.map(({ full }) => readFileSync(full, 'utf8')).join('\n');
     // Strip comments before scraping so a commented-out call cannot keep its key
     // in the scraped set (the `(^|[^:])` guard keeps protocol `://` intact).
     const src = raw.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
     // tolerate whitespace/newline between `(` and the quote so the multi-line
     // maybe('lockouts', ...) call (game.ts ~2166-2169) is captured, not undercounted;
-    // the optional `(?:Raw)?` also captures the maybeRaw calls
-    // ('app' and the multi-line 'dfb')
-    const re = /\bmaybe(?:Raw)?\(\s*['"](\w+)['"]/g;
+    // the optional `(?:Raw|Serialized)?` also captures the maybeRaw realm-wide
+    // calls ('vcupb' and the multi-line 'dfb') AND the direct
+    // maybeSerialized(...) emits: `maybe` and `maybeRaw` are both thin wrappers
+    // over maybeSerialized, so a key emitted ONLY through the direct form (the
+    // capability-gated 'de' and 'auras') is exactly as real on the wire, and
+    // before this arm the "exact" registry was structurally blind to it.
+    // `emit(...)` is the same call under the name the extracted emitter gives
+    // the delta-eliding closure its caller hands it; without this arm the two
+    // relocated bank keys stay invisible even with the file in the list.
+    // The lookbehind keeps `emit` to that BARE parameter form: `\b` would also
+    // match a member call (`this.emit('spikeReport', ...)`, `bus.emit(...)`),
+    // whose key is not a delta key at all, and the obvious repair for the red
+    // that would cause is to add it to ALL_DELTA_KEYS, permanently weakening the
+    // registry this pin exists to police.
+    const DELTA_CALL = /(?<![.\w$])(?:maybe(?:Raw|Serialized)?|emit)\(\s*['"](\w+)['"]/g;
+    const re = new RegExp(DELTA_CALL.source, 'g');
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
     expect(scraped.has('app')).toBe(true); // the maybeRaw calls ARE captured by the widened regex
     expect(scraped.has('dfb')).toBe(true); // incl. the multi-line maybeRaw('dfb', ...) form
+    // The two direct-maybeSerialized-only keys, BY NAME: each is emitted through
+    // no other form (de behind the dungeon entry facing capability, auras behind
+    // the stable timer wire), so only the Serialized arm of the scrape sees them
+    // and dropping that arm must redden here, not silently shrink the registry.
+    expect(scraped.has('de')).toBe(true);
+    expect(scraped.has('auras')).toBe(true);
     expect(scraped.has('reliq')).toBe(true); // Reliquary Phase 3 sparse self blob
+    // Both relocated bank keys, BY NAME: the extraction that moved them out of
+    // game.ts left this scrape one short and only the count said so.
+    expect(scraped.has('bank')).toBe(true);
+    expect(scraped.has('bpsl')).toBe(true);
+    expect(scraped.has('vault')).toBe(true);
+    expect(scraped.has('cvault')).toBe(true);
+    // ...and the narrowing really narrows. A member `emit` is not a delta call,
+    // and asserting it on a synthetic source keeps the claim honest even while
+    // neither emitter file happens to contain one.
+    // THROUGH the same pattern the scrape above uses, not a copy of it: a second
+    // literal here would keep passing while the real one was widened back.
+    const memberEmit = new Set<string>();
+    const narrowed = new RegExp(DELTA_CALL.source, 'g');
+    // The bare maybeSerialized call rides along in the same sample: the direct
+    // form IS captured while a member spelling of it stays out, through the one
+    // shared lookbehind.
+    const sample =
+      "this.emit('spikeReport', x); bus.emit('tick', y); emit('bpsl', z); " +
+      "maybeSerialized('de', s); cache.maybeSerialized('memberKey', s);";
+    for (let m = narrowed.exec(sample); m !== null; m = narrowed.exec(sample)) {
+      memberEmit.add(m[1]);
+    }
+    expect([...memberEmit]).toEqual(['bpsl', 'de']);
     // The base-merge union: v0.31's 56 (incl. the market-collect key mktU) plus
     // the Rift + mounts and worn-instance keys (einst, mntRtd and the rift
     // snapshot fragments) for 61, then v0.32's master-loot key mloot for 62,
@@ -5639,10 +6025,18 @@ describe('delta-key contract pins (anti-drift)', () => {
     // (ap/sp/sh/crit/dodge/blk/bval/crat/hrat/hirat/xp/lxp/rxp/prk/copper/ddiff)
     // for 83, then reliq (Reliquary Phase 3 sparse blob) for 84, the nameplate
     // border echo aborder for 85, and the authored modular look `app` for 86.
-    // The Vale Cup retirement then removes sport/vcup/vcupb, for 83, then the
-    // melee-weaving off-hand bar adds offhandWeapon, for 84.
-    expect(scraped.size).toBe(84);
+    // The Vale Cup retirement then removes sport/vcup/vcupb, for 83, and the
+    // healPower seam adds the derived Healing Power scalar hpw for 84. Bank
+    // Storage Phase 2 then adds bpsl, vault, and cvault, for 87. The
+    // maybeSerialized arm of the scrape then surfaces the two capability-gated
+    // direct emits, auras and de, for 89. The off-hand bar adds offhandWeapon,
+    // for 90.
+    expect(scraped.size).toBe(90);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
+  });
+
+  it('scans server emitters only through the shared recursive TypeScript walker', () => {
+    expectScansOnlyThroughSharedWalkers(import.meta.url, ['ts_files_under']);
   });
 
   it('mntOwn is encoded INSIDE the heavy self gate (its inputs sit behind it)', () => {
@@ -5917,7 +6311,10 @@ describe('aura magnitude over the wire (buff/debuff tooltip parity)', () => {
     // the in-memory wire shape.
     const snap = JSON.parse(JSON.stringify({ t: 'snap', ents: [wire] }));
     (client as any).applySnapshot(snap);
-    const mirror = client.entities.get(pid)!.auras.find((a) => a.id === aura.id)!;
+    const mirrorEntity = client.entities.get(pid);
+    if (!mirrorEntity) throw new Error('mirrored entity missing');
+    const mirror = mirrorEntity.auras.find((a) => a.id === aura.id);
+    if (!mirror) throw new Error(`mirrored ${aura.id} aura missing`);
     return { wire, mirror };
   }
 
@@ -6127,13 +6524,19 @@ describe('aura magnitude over the wire (buff/debuff tooltip parity)', () => {
     });
     const client = bareClient(999);
     (client as any).applySnapshot(JSON.parse(JSON.stringify({ t: 'snap', ents: [wireEntity(e)] })));
-    const armed = client.entities.get(pid)!.auras.find((a) => a.id === 'fear_incap')!;
+    const armedEntity = client.entities.get(pid);
+    if (!armedEntity) throw new Error('armed entity missing');
+    const armed = armedEntity.auras.find((a) => a.id === 'fear_incap');
+    if (!armed) throw new Error('armed fear aura missing');
     expect(armed.breakThreshold).not.toBeUndefined();
 
     // Same aura identity, threshold gone: the in-place arm must CLEAR it.
     e.auras[e.auras.length - 1].breakThreshold = undefined;
     (client as any).applySnapshot(JSON.parse(JSON.stringify({ t: 'snap', ents: [wireEntity(e)] })));
-    const mirrored = client.entities.get(pid)!.auras.find((a) => a.id === 'fear_incap')!;
+    const mirroredEntity = client.entities.get(pid);
+    if (!mirroredEntity) throw new Error('mirrored entity missing');
+    const mirrored = mirroredEntity.auras.find((a) => a.id === 'fear_incap');
+    if (!mirrored) throw new Error('mirrored fear aura missing');
     // The fast path updates the SAME record object; assert both the clear
     // and the reuse, so this pin cannot silently slide onto the fresh-array
     // arm if the shape check ever changes.
@@ -6184,7 +6587,10 @@ describe('aura magnitude over the wire (buff/debuff tooltip parity)', () => {
         },
       ],
     });
-    const mirror = client.entities.get(2)!.auras.find((a) => a.kind === 'buff_int')!;
+    const mirrorEntity = client.entities.get(2);
+    if (!mirrorEntity) throw new Error('mirrored entity missing');
+    const mirror = mirrorEntity.auras.find((a) => a.kind === 'buff_int');
+    if (!mirror) throw new Error('mirrored buff_int aura missing');
     expect(mirror.value).toBe(0);
   });
 });
@@ -6590,6 +6996,537 @@ describe('Consecration snapshot parity', () => {
         r: 8,
         dur: 9,
         rem: 6.5,
+      }),
+    ]);
+  });
+});
+
+describe('Ignivar raid actionable reconnect state', () => {
+  it('rebuilds and clears Forge Judgment from the authoritative boss cast snapshot', () => {
+    const boss = createMob(
+      9900,
+      MOBS.ignivar_herald_of_the_last_flame,
+      MOBS.ignivar_herald_of_the_last_flame.maxLevel,
+      { x: 3, y: 0, z: 5 },
+    );
+    boss.castingAbility = IGNIVAR_JUDGMENT_CAST_ID;
+    boss.castTotal = 10;
+    boss.castRemaining = 8;
+    boss.channeling = false;
+    boss.facing = 1.25;
+    const client = bareClient(1);
+
+    (client as unknown as SnapshotApplier).applySnapshot({
+      t: 'snap',
+      ents: [JSON.parse(JSON.stringify(wireEntity(boss)))],
+    });
+
+    expect(client.entities.get(boss.id)).toMatchObject({
+      castingAbility: IGNIVAR_JUDGMENT_CAST_ID,
+      castTotal: 10,
+      castRemaining: 8,
+      channeling: false,
+      facing: 1.25,
+    });
+
+    boss.castRemaining = 4;
+    boss.channeling = true;
+    (client as unknown as SnapshotApplier).applySnapshot({
+      t: 'snap',
+      ents: [JSON.parse(JSON.stringify(wireEntity(boss)))],
+    });
+    expect(client.entities.get(boss.id)).toMatchObject({
+      castingAbility: IGNIVAR_JUDGMENT_CAST_ID,
+      castRemaining: 4,
+      channeling: true,
+    });
+
+    boss.castingAbility = null;
+    boss.castTotal = 0;
+    boss.castRemaining = 0;
+    boss.channeling = false;
+    (client as unknown as SnapshotApplier).applySnapshot({
+      t: 'snap',
+      ents: [JSON.parse(JSON.stringify(wireEntity(boss)))],
+    });
+    expect(client.entities.get(boss.id)).toMatchObject({
+      castingAbility: null,
+      castTotal: 0,
+      castRemaining: 0,
+      channeling: false,
+    });
+  });
+
+  it('rebuilds and clears the Shared Pyre target mark after reconnect', () => {
+    const sim = new Sim({ seed: 9900, playerClass: 'priest', world: WIRE_TEST_WORLD });
+    sim.player.auras.push({
+      id: VARKHUL_SHARED_PYRE_AURA_ID,
+      name: VARKHUL_SHARED_PYRE_NAME,
+      kind: 'vulnerability',
+      remaining: 4.5,
+      duration: 6,
+      value: 0,
+      value2: 2,
+      stacks: 4,
+      sourceId: 9901,
+      school: 'fire',
+      encounterOwned: true,
+    });
+    const client = bareClient(999);
+
+    (client as unknown as SnapshotApplier).applySnapshot({
+      t: 'snap',
+      ents: [JSON.parse(JSON.stringify(wireEntity(sim.player)))],
+    });
+
+    expect(client.entities.get(sim.player.id)?.auras).toContainEqual(
+      expect.objectContaining({
+        id: VARKHUL_SHARED_PYRE_AURA_ID,
+        remaining: 4.5,
+        duration: 6,
+        value2: 2,
+        stacks: 4,
+        sourceId: 9901,
+      }),
+    );
+
+    sim.player.auras = [];
+    (client as unknown as SnapshotApplier).applySnapshot({
+      t: 'snap',
+      ents: [JSON.parse(JSON.stringify(wireEntity(sim.player)))],
+    });
+    expect(
+      client.entities
+        .get(sim.player.id)
+        ?.auras.some((aura) => aura.id === VARKHUL_SHARED_PYRE_AURA_ID),
+    ).toBe(false);
+  });
+});
+
+describe('Ignivar meteor snapshot parity', () => {
+  it('rebuilds active warnings after reconnect and clears them after impact', () => {
+    const client = bareClient(1);
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [],
+      ignivarMeteors: [{ id: '77:912:0', x: 3, z: 5, r: 2.4, dur: 2.5, rem: 1.4, lead: 0.75 }],
+    });
+    expect(client.activeIgnivarMeteors).toEqual([
+      {
+        id: '77:912:0',
+        x: 3,
+        z: 5,
+        radius: 2.4,
+        duration: 2.5,
+        remaining: 1.4,
+        warningLead: 0.75,
+      },
+    ]);
+
+    (client as any).applySnapshot({ t: 'snap', ents: [] });
+    expect(client.activeIgnivarMeteors).toEqual([]);
+  });
+
+  it('rejects malformed warning rows and clamps remaining time to duration', () => {
+    const client = bareClient(1);
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [],
+      ignivarMeteors: [
+        null,
+        'primitive-row',
+        { id: 'valid', x: 3, z: 5, r: 2.4, dur: 2.5, rem: 9, lead: 0 },
+        { id: 'expired', x: 3, z: 5, r: 2.4, dur: 2.5, rem: 0, lead: 0.75 },
+        { id: 'bad-lead', x: 3, z: 5, r: 2.4, dur: 2.5, rem: 1, lead: 2.5 },
+        { id: 77, x: 3, z: 5, r: 2.4, dur: 2.5, rem: 1, lead: 0.75 },
+        { id: 'bad-coordinate', x: Number.NaN, z: 5, r: 2.4, dur: 2.5, rem: 1, lead: 0.75 },
+        { id: 'bad-radius', x: 3, z: 5, r: 0, dur: 2.5, rem: 1, lead: 0.75 },
+        { id: 'bad-duration', x: 3, z: 5, r: 2.4, dur: 0, rem: 1, lead: 0.75 },
+      ],
+    });
+
+    expect(client.activeIgnivarMeteors).toEqual([
+      {
+        id: 'valid',
+        x: 3,
+        z: 5,
+        radius: 2.4,
+        duration: 2.5,
+        remaining: 2.5,
+        warningLead: 0,
+      },
+    ]);
+  });
+
+  it('interest-scopes active warnings with their authoritative remaining lifetime', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Cinderwire', 'mage');
+    const player = server.sim.entities.get(session.pid)!;
+    const boss = createMob(
+      9901,
+      MOBS.ignivar_herald_of_the_last_flame,
+      MOBS.ignivar_herald_of_the_last_flame.maxLevel,
+      { x: player.pos.x + 4, y: player.pos.y, z: player.pos.z },
+    );
+    boss.ignivar = {
+      meteorCastKey: 912,
+      meteorImpactRemaining: 1.4,
+      meteorPoints: [
+        { x: player.pos.x + 5, z: player.pos.z },
+        { x: player.pos.x + 100, z: player.pos.z },
+      ],
+    } as NonNullable<typeof boss.ignivar>;
+    server.sim.entities.set(boss.id, boss);
+
+    broadcast(server);
+
+    expect(lastSnap(fc.sent).ignivarMeteors).toEqual([
+      expect.objectContaining({ id: `${boss.id}:912:0`, r: 2.4, dur: 2.5, rem: 1.4, lead: 0.75 }),
+    ]);
+  });
+});
+
+describe('Varkhul Forgestorm snapshot parity', () => {
+  it('rebuilds active warnings after reconnect, clamps lifetime, and rejects malformed rows', () => {
+    const client = bareClient(1);
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [],
+      varkhulForgestorm: [
+        {
+          id: 'varkhul-forgestorm:9901:1:0:0',
+          sourceId: 9901,
+          x: 3,
+          z: 5,
+          r: 4,
+          dur: 2.5,
+          rem: 9,
+          lead: 0,
+        },
+        { id: 4, sourceId: 9901, x: 3, z: 5, r: 4, dur: 2.5, rem: 1, lead: 0 },
+        { id: 'bad', sourceId: 'bad', x: 3, z: 5, r: 4, dur: 2.5, rem: 1, lead: 0 },
+        { id: 'bad:2', sourceId: 9901, x: Number.NaN, z: 5, r: 4, dur: 2.5, rem: 1, lead: 0 },
+        { id: 'bad:3', sourceId: 9901, x: 3, z: Number.NaN, r: 4, dur: 2.5, rem: 1, lead: 0 },
+        { id: 'bad:4', sourceId: 9901, x: 3, z: 5, r: 0, dur: 2.5, rem: 1, lead: 0 },
+        { id: 'bad:5', sourceId: 9901, x: 3, z: 5, r: 4, dur: 0, rem: 1, lead: 0 },
+        { id: 'bad:6', sourceId: 9901, x: 3, z: 5, r: 4, dur: 2.5, rem: 0, lead: 0 },
+        { id: 'bad:7', sourceId: 9901, x: 3, z: 5, r: 4, dur: 2.5, rem: 1, lead: -1 },
+      ],
+    });
+
+    expect(client.activeVarkhulForgestormWarnings).toEqual([
+      {
+        id: 'varkhul-forgestorm:9901:1:0:0',
+        sourceId: 9901,
+        x: 3,
+        z: 5,
+        radius: 4,
+        duration: 2.5,
+        remaining: 2.5,
+        warningLead: 0,
+      },
+    ]);
+
+    (client as any).applySnapshot({ t: 'snap', ents: [] });
+    expect(client.activeVarkhulForgestormWarnings).toEqual([]);
+  });
+
+  it('interest-scopes active warnings with stable meteor ids and authoritative time', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Forgewire', 'warrior');
+    const player = server.sim.entities.get(session.pid)!;
+    const boss = createMob(
+      9902,
+      MOBS.varkhul_forgefather_of_the_last_flame,
+      MOBS.varkhul_forgefather_of_the_last_flame.maxLevel,
+      { x: player.pos.x + 4, y: player.pos.y, z: player.pos.z },
+    );
+    boss.varkhul = {
+      forgestormCastKey: 7,
+      forgestormWaveIndex: 1,
+      forgestormWarningRemaining: 1.4,
+      cinderFires: [],
+      cinderOrbProjectiles: [],
+      forgestormPoints: [
+        { x: player.pos.x + 5, y: player.pos.y, z: player.pos.z },
+        { x: player.pos.x + 100, y: player.pos.y, z: player.pos.z },
+      ],
+    } as unknown as NonNullable<typeof boss.varkhul>;
+    server.sim.entities.set(boss.id, boss);
+
+    broadcast(server);
+
+    expect(lastSnap(fc.sent).varkhulForgestorm).toEqual([
+      expect.objectContaining({
+        id: `varkhul-forgestorm:${boss.id}:7:1:0`,
+        sourceId: boss.id,
+        r: 4,
+        dur: 2.5,
+        rem: 1.4,
+        lead: 0,
+      }),
+    ]);
+  });
+});
+
+describe('Varkhul Cinder Orbs snapshot parity', () => {
+  it('rebuilds Heroic meteors and all ten individual rune stations after reconnect', () => {
+    const client = bareClient(1);
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [],
+      varkhulAnvilMeteors: [{ id: 'meteor:1', x: 3, z: 5, r: 3.5, dur: 1.8, rem: 1.2, lead: 0 }],
+      varkhulAssemblies: [
+        {
+          bossId: 7,
+          hc: 1,
+          phase: 'links',
+          fx: 10,
+          fz: 20,
+          hp: 0,
+          mhp: 100,
+          oh: 0.42,
+          bw: 2.25,
+          mr: 0,
+          beams: [
+            { i: 0, cx: -18, cz: 20, ix: -8, iz: 20, bid: 1 },
+            { i: 1, cx: 38, cz: 20, ix: 10, iz: 20, bid: null },
+          ],
+          ib: {
+            sid: 7,
+            tid: 1,
+            bid: 4,
+            sx: 2,
+            sz: 4,
+            tx: 14,
+            tz: 20,
+            bx: 8,
+            bz: 12,
+            w: 1.35,
+            dur: 5,
+            rem: 2.25,
+          },
+          win: 0,
+          round: 1,
+          rounds: 2,
+          rem: 18,
+          cores: [],
+          assign: [{ pid: 1, sym: 2, lock: 0 }],
+          runes: Array.from({ length: 10 }, (_, sym) => ({
+            sym,
+            x: sym === 2 ? 14 : sym,
+            z: sym === 2 ? 24 : -sym,
+            r: 3.3,
+            ti: sym,
+            tr: 3,
+            oa: Math.PI / 10 + (sym * Math.PI) / 5,
+            ta: sym === 2 ? 1.2 : 0,
+            ga: sym === 2 ? 1.25 : 1,
+            c: sym === 2 ? 2 : 0,
+            cp: sym === 2 ? 0.5 : 0,
+            ap: 0,
+            al: 0,
+            lock: 0,
+          })),
+        },
+      ],
+    });
+
+    expect(client.activeVarkhulAnvilMeteors).toEqual([
+      expect.objectContaining({ id: 'meteor:1', radius: 3.5, remaining: 1.2 }),
+    ]);
+    expect(client.activeVarkhulAssemblies).toEqual([
+      expect.objectContaining({
+        bossId: 7,
+        difficulty: 'heroic',
+        phase: 'links',
+        forgeOverheat: 0.42,
+        forgeBeamWarmupRemaining: 2.25,
+        round: 1,
+        rounds: 2,
+      }),
+    ]);
+    expect(client.activeVarkhulAssemblies[0].runes).toHaveLength(10);
+    expect(client.activeVarkhulAssemblies[0].forgeBeams).toEqual([
+      expect.objectContaining({ index: 0, blockerId: 1, blocked: true }),
+      expect.objectContaining({ index: 1, blockerId: null, blocked: false }),
+    ]);
+    expect(client.activeVarkhulAssemblies[0].interceptBeam).toEqual({
+      sourceId: 7,
+      targetId: 1,
+      blockerId: 4,
+      sourceX: 2,
+      sourceZ: 4,
+      targetX: 14,
+      targetZ: 20,
+      blockerX: 8,
+      blockerZ: 12,
+      width: 1.35,
+      duration: 5,
+      remaining: 2.25,
+    });
+    expect(client.activeVarkhulAssemblies[0].runes[2]).toMatchObject({
+      assignedPlayerId: 1,
+      trackIndex: 2,
+      trackRadius: 3,
+      control: 'clockwise',
+      controlProgress: 0.5,
+    });
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [],
+      varkhulAssemblies: [
+        {
+          bossId: 7,
+          hc: 1,
+          phase: 'done',
+          fx: 10,
+          fz: 20,
+          hp: 0,
+          mhp: 100,
+          oh: 1,
+          bw: 0,
+          mr: 4.5,
+          beams: [],
+          win: 0,
+          round: 1,
+          rounds: 2,
+          rem: 0,
+          cores: [],
+          assign: [],
+          runes: [],
+        },
+      ],
+    });
+    expect(client.activeVarkhulAssemblies).toEqual([
+      expect.objectContaining({
+        phase: 'done',
+        forgeOverheat: 1,
+        forgeMeltdownRemaining: 4.5,
+        forgeBeams: [],
+        interceptBeam: null,
+      }),
+    ]);
+    (client as any).applySnapshot({ t: 'snap', ents: [] });
+    expect(client.activeVarkhulAnvilMeteors).toEqual([]);
+    expect(client.activeVarkhulAssemblies).toEqual([]);
+  });
+
+  it('rebuilds permanent fires and traveling orbs after reconnect, then clears omissions', () => {
+    const client = bareClient(1);
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [],
+      varkhulCinderFires: [
+        {
+          id: '9901:cinder-fire:2:0',
+          sourceId: 9901,
+          x: 3,
+          z: 5,
+          r: 2.4,
+        },
+      ],
+      varkhulCinderOrbs: [
+        {
+          id: '9901:cinder-orbs:2:0:0',
+          sourceId: 9901,
+          x: 3,
+          z: 5,
+          dx: 1,
+          dz: 0,
+          r: 1.1,
+          dur: 5.5,
+          rem: 4,
+        },
+      ],
+    });
+
+    expect(client.activeVarkhulCinderFires).toEqual([
+      expect.objectContaining({ id: '9901:cinder-fire:2:0', radius: 2.4 }),
+    ]);
+    expect(client.activeVarkhulCinderOrbProjectiles).toEqual([
+      expect.objectContaining({
+        id: '9901:cinder-orbs:2:0:0',
+        radius: 1.1,
+        remaining: 4,
+        dirX: 1,
+        dirZ: 0,
+      }),
+    ]);
+    (client as any).applySnapshot({ t: 'snap', ents: [] });
+    expect(client.activeVarkhulCinderFires).toEqual([]);
+    expect(client.activeVarkhulCinderOrbProjectiles).toEqual([]);
+  });
+
+  it('interest-scopes authoritative Cinder fire and orb positions', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Cinderwire', 'warrior');
+    const player = server.sim.entities.get(session.pid)!;
+    const boss = createMob(
+      9903,
+      MOBS.varkhul_forgefather_of_the_last_flame,
+      MOBS.varkhul_forgefather_of_the_last_flame.maxLevel,
+      { x: player.pos.x + 4, y: player.pos.y, z: player.pos.z },
+    );
+    boss.varkhul = {
+      forgestormCastKey: 0,
+      forgestormWaveIndex: 0,
+      forgestormWarningRemaining: 0,
+      forgestormPoints: [],
+      cinderFires: [
+        {
+          id: `${boss.id}:cinder-fire:6:0`,
+          pos: { x: player.pos.x + 6, y: player.pos.y, z: player.pos.z },
+          tickTimer: 0.5,
+        },
+        {
+          id: `${boss.id}:cinder-fire:6:1`,
+          pos: { x: player.pos.x + 100, y: player.pos.y, z: player.pos.z },
+          tickTimer: 0.5,
+        },
+      ],
+      cinderOrbProjectiles: [
+        {
+          id: `${boss.id}:cinder-orbs:6:0:0`,
+          ownerId: player.id,
+          pos: { x: player.pos.x + 7, y: player.pos.y, z: player.pos.z },
+          dir: { x: 1, z: 0 },
+          remaining: 4,
+          hitPlayerIds: [player.id],
+        },
+        {
+          id: `${boss.id}:cinder-orbs:6:0:1`,
+          ownerId: player.id,
+          pos: { x: player.pos.x + 100, y: player.pos.y, z: player.pos.z },
+          dir: { x: -1, z: 0 },
+          remaining: 4,
+          hitPlayerIds: [player.id],
+        },
+      ],
+    } as unknown as NonNullable<typeof boss.varkhul>;
+    server.sim.entities.set(boss.id, boss);
+
+    broadcast(server);
+
+    expect(lastSnap(fc.sent).varkhulCinderFires).toEqual([
+      expect.objectContaining({
+        id: `${boss.id}:cinder-fire:6:0`,
+        sourceId: boss.id,
+        r: 3.5,
+      }),
+    ]);
+    expect(lastSnap(fc.sent).varkhulCinderOrbs).toEqual([
+      expect.objectContaining({
+        id: `${boss.id}:cinder-orbs:6:0:0`,
+        sourceId: boss.id,
+        dx: 1,
+        dz: 0,
+        r: 1.1,
+        dur: 5.5,
+        rem: 4,
       }),
     ]);
   });

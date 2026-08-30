@@ -453,7 +453,10 @@ describe('bake and merge wiring order', () => {
     const firstAwaitAt = body.indexOf('await ');
     const deleteAt = body.indexOf('deleteBakedCustodyRefsIn(');
     const advanceAt = body.indexOf('advanceCustodyWatermarkIn(');
-    const commitAt = body.indexOf("await client.query('COMMIT')");
+    // transaction.commit(), not a raw client.query('COMMIT'): the fenced save
+    // rides the deadline wrapper that owns the statement/lock timeouts and the
+    // abort-driven pg_cancel_backend, so the commit goes through it too.
+    const commitAt = body.indexOf('await transaction.commit()');
     const confirmAt = body.indexOf('confirmBakedCustodyRefs(');
     for (const at of [snapshotAt, firstAwaitAt, deleteAt, advanceAt, commitAt, confirmAt]) {
       expect(at).toBeGreaterThan(-1);
@@ -510,9 +513,12 @@ describe('bake and merge wiring order', () => {
   it('both callers drain dirty mail partitions inside the queued write', () => {
     // The partitioned mail path replaces whole-book writes: the dirty set is
     // drained inside the same queued write that persists it, so a write failure
-    // can rearm exactly the partitions it consumed.
-    expect(gameSrc).toContain(
-      'await writeDirtyMailPartitions(this.sim, this.enqueueMarketWrite, false, sample)',
+    // can rearm exactly the partitions it consumed. It rides
+    // enqueueBackgroundMarketWrite (market FIFO first, THEN the major-producer
+    // permit) so a dirty-book character save cannot invert against a periodic
+    // mail save, and it still carries the profiler sample through.
+    expect(gameSrc).toMatch(
+      /await writeDirtyMailPartitions<TickProfilerSample>\(\s*this\.sim,\s*\(write, context\) => this\.enqueueBackgroundMarketWrite\(write, context\),\s*false,\s*sample,\s*\)/,
     );
     expect(gameSrc).toContain('mailPartitionsForRearm = this.sim.takeDirtyMailPartitions()');
     expect(gameSrc).toMatch(

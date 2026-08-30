@@ -6,6 +6,7 @@ import type { PlayerMeta, Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import { type Entity, emptyMoveInput, type MoveInput } from '../src/sim/types';
 import { noteBattlegroundWallPressure } from '../src/sim/unstuck';
+import { type DungeonEntryFacingFence, decideDungeonEntryInput } from './dungeon_entry_facing';
 import {
   createMovementOverrideSessionState,
   type MovementOverrideSessionState,
@@ -29,11 +30,15 @@ export interface MovementInputSessionState extends MovementOverrideSessionState 
   movementWireVersion: 1 | 2;
   movementTimeline: MovementInputTimeline | null;
   lastConsumedCt: number;
+  // The dungeon-entry heading fence. Deliberately NOT minted by
+  // createMovementInputSessionState: a resume must carry the armed fence
+  // forward (entryFacing.forResume), never reset it with the wire state.
+  dungeonEntryFacing: DungeonEntryFacingFence;
 }
 
 export function createMovementInputSessionState(
   movementWireVersion: unknown,
-): Omit<MovementInputSessionState, 'pid' | 'lastInputAt'> {
+): Omit<MovementInputSessionState, 'pid' | 'lastInputAt' | 'dungeonEntryFacing'> {
   const version = movementWireVersion === 2 ? 2 : 1;
   return {
     movementWireVersion: version,
@@ -58,7 +63,25 @@ export function applyMovementInputFrame(
   simTime: number,
   ctx?: SimContext,
 ): MoveInputFrame {
-  const frame = parseMoveInputFrame(raw);
+  const parsed = parseMoveInputFrame(raw);
+  // The dungeon-entry heading fence runs at RECEIVE time, so it covers both
+  // wire versions from one place. What it checks is a property of THIS packet
+  // (does its `de` acknowledge the entry generation the server forced?), not of
+  // the tick the input eventually drives, so deciding here is sound; a v2 frame
+  // then carries the already-fenced moveInput and facing into the timeline and
+  // the deferred apply needs no fence state of its own.
+  const decision = decideDungeonEntryInput(
+    session.dungeonEntryFacing,
+    entity,
+    parsed,
+    (raw as { de?: unknown } | null | undefined)?.de,
+  );
+  session.dungeonEntryFacing = decision.state;
+  const frame: MoveInputFrame = {
+    ...parsed,
+    moveInput: decision.moveInput,
+    facing: decision.facing,
+  };
   if (session.movementWireVersion === 2) {
     if (frame.ct !== null) {
       session.movementTimeline?.enqueue({
