@@ -1,10 +1,10 @@
-import { validateAcceptedArtManifest } from '../scripts/lib/icon_asset_audit.mjs';
 import { createHash } from 'node:crypto';
 import { closeSync, existsSync, openSync, readdirSync, readFileSync, readSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
+import { validateAcceptedArtManifest } from '../scripts/lib/icon_asset_audit.mjs';
 import { IGNIVAR_LOOT_ITEM_IDS } from '../src/sim/content/ignivar_loot';
 import { ITEMS } from '../src/sim/data';
 import {
