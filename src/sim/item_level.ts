@@ -276,6 +276,16 @@ function buildSourceIndex(): Map<string, ItemSource> {
   bump('deathless_heartwood', 22, true); // 17.19 dps: ilvl 35 (was 33)
   bump('kingsbane_last_oath', 36, true); // 21.43 dps: ilvl 49 (was 33)
   bump('heroic_kingsbane_last_oath', 37, true); // retained line + seed: ilvl 50
+  // The legendary band (maintainer direction, same round): every legendary is
+  // BUFFED budget-true to the Thronebane tier and labeled there. Bases 49,
+  // heroic mints and the heroic-raid pair 50; the rift pair is non-raid so its
+  // source carries the whole distance.
+  bump('deathless_heartwood', 36, true); // 49
+  bump('heroic_deathless_heartwood', 37, true); // 50
+  bump('varkhul_forgebreaker', 37, true); // 50
+  bump('varkhul_emberward', 37, true); // 50
+  bump('voidsong_dirk', 39, false); // 49
+  bump('heart_of_the_rift', 39, false); // 49
   return idx;
 }
 
