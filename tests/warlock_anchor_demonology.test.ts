@@ -36,8 +36,11 @@ describe('demonology 200 DPS anchors at 120 seconds', () => {
     // new power level, so when the Phase B set bonuses land
     // (docs/prd/ignivar-set-bonus-final.md), re-anchor these to whatever the
     // new-tier kit actually measures, above 200 included.
-    expect(mean('dps')).toBeGreaterThanOrEqual(158);
-    expect(mean('dps')).toBeLessThanOrEqual(182);
+    // Re-anchored for the 2026-08-30 legendary band: the frozen kit wields
+    // Deathless Heartwood, now budget-true at ilvl 49 (65 stats + 25 Spell
+    // Power), measured 187.3 on the gate run; the band keeps its width.
+    expect(mean('dps')).toBeGreaterThanOrEqual(178);
+    expect(mean('dps')).toBeLessThanOrEqual(197);
     expect(mean('starvedPct')).toBeLessThan(0.1);
   }, 240_000);
 

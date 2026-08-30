@@ -422,7 +422,11 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     // (tests/weapon_skins.test.ts). With no class lock a rogue MAY equip this and
     // it does count for Craven Thrust / Ambush (weaponStrike + requiresBehind);
     // the weak damage line is what makes that a downgrade rather than a lure.
-    weapon: { min: 29, max: 48, speed: 1.8, dagger: true },
+    // The swing stays deliberately WEAK (a caster's white line is dead
+    // weight, and rift_loot_pools pins it under the epic melee dagger floor
+    // so no rogue is tempted); the ilvl-49 band power lives in the caster
+    // axes: the 65-point stat line and the lane-share Spell Power.
+    weapon: { min: 15, max: 25, speed: 1.8, dagger: true },
     stats: { int: 25, spi: 23, sta: 17 },
     spellPower: 25,
     // NO requiredClass, deliberately: a class lock is a nerf, and the stat line

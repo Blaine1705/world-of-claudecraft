@@ -35,8 +35,10 @@ describe('destruction 200 DPS anchors at 120 seconds', () => {
     // new power level, so when the Phase B set bonuses land
     // (docs/prd/ignivar-set-bonus-final.md), re-anchor these to whatever the
     // new-tier kit actually measures, above 200 included.
-    expect(mean('dps')).toBeGreaterThanOrEqual(155);
-    expect(mean('dps')).toBeLessThanOrEqual(180);
+    // Re-anchored for the 2026-08-30 legendary band (Heartwood in the frozen
+    // kit; measured 190.9 on the gate run).
+    expect(mean('dps')).toBeGreaterThanOrEqual(181);
+    expect(mean('dps')).toBeLessThanOrEqual(201);
     expect(mean('starvedPct')).toBeLessThan(0.1);
   }, 240_000);
 

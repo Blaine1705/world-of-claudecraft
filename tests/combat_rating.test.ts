@@ -187,9 +187,29 @@ describe('combat-rating tier ladder', () => {
   it('enforces the complete 0 -> 1 -> 2 rating ladder by live item level', async () => {
     const { HEROIC_VENDOR_ITEMS } = await import('../src/sim/content/heroic_vendor');
     const vendorIds = new Set(Object.keys(HEROIC_VENDOR_ITEMS));
+    // The 2026-08-30 ilvl-honesty relabels: these items keep their SHIPPED
+    // identity (zero ratings included) while their item level moved to the
+    // level their lines actually occupy, so they sit outside the authored
+    // rating ladder. Membership is pinned: the carve-out must never grow.
+    const ILVL_HONESTY_RELABELED = new Set([
+      'boneglass_shiv',
+      'duskwhisper',
+      'marrowpoint',
+      'deathless_heartwood',
+      'heroic_deathless_heartwood',
+      'kingsbane_last_oath',
+      'heroic_kingsbane_last_oath',
+      'voidsong_dirk',
+      'heart_of_the_rift',
+      'varkhul_forgebreaker',
+      'varkhul_emberward',
+    ]);
     const allGear = Object.values(ITEMS).filter(
-      (item) => item.slot && itemLevel(item) !== undefined,
+      (item) => item.slot && itemLevel(item) !== undefined && !ILVL_HONESTY_RELABELED.has(item.id),
     );
+    for (const id of ILVL_HONESTY_RELABELED) {
+      expect(ITEMS[id], `${id} still exists (carve-out is not stale)`).toBeDefined();
+    }
 
     const ilvl26 = allGear.filter((item) => itemLevel(item) === 26);
     for (const item of ilvl26) {
@@ -255,7 +275,9 @@ describe('combat-rating tier ladder', () => {
     // 13 pre-existing pieces plus the 6 generated heroic raid variants of the
     // normal-raid epics (greatsword, greatblade, bulwark, orb, the hunter's
     // direfang_quiver, and the feral ladder capstone maul_of_the_scourged_wilds).
-    expect(heroicRaidGear).toHaveLength(19);
+    // Minus the two heroic legendaries, which live in the ilvl-honesty
+    // carve-out above with their shipped rating identity.
+    expect(heroicRaidGear).toHaveLength(17);
     for (const item of heroicRaidGear) {
       const ilvl = itemLevel(item);
       const expectedPrimary = ilvl === 37 ? 70 : item.weapon ? 65 : 55;
