@@ -33,7 +33,11 @@ export const IGNIVAR_DROP_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     hand: 'twohand',
     quality: 'legendary',
-    weapon: { min: 55, max: 82, speed: 3.6 },
+    // Authored ABOVE the ilvl-37 curve (20.5 two-hand dps) on the Thronebane
+    // hot-line precedent: the raid's marquee two-hander must out-white heroic
+    // Thronebane's retained 21.4 dps line, or the old legendary stays the
+    // white-damage king of the new tier (measured 2026-08-30).
+    weapon: { min: 63, max: 94, speed: 3.6 },
     stats: { str: 26, sta: 19, agi: 12 },
     sellValue: 26000,
     // Every class that swings a two-handed mace in the era rules: warrior,

@@ -224,21 +224,21 @@ design targets for the tuning pass.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
-| Emberscale Helm (`warspirit_emberscale_helmet`) | helmet | 325 | Agi 14, Sta 7 | none | haste 60, crit 25 |
-| Emberscale Pauldrons (`warspirit_emberscale_shoulder`) | shoulder | 290 | Agi 12, Sta 6 | none | haste 60, crit 25 |
-| Emberscale Hauberk (`warspirit_emberscale_chest`) | chest | 380 | Agi 17, Sta 8 | none | haste 60, crit 25 |
-| Emberscale Gauntlets (`warspirit_emberscale_gloves`) | gloves | 270 | Agi 11, Sta 6 | none | haste 60, crit 25 |
-| Emberscale Legguards (`warspirit_emberscale_legs`) | legs | 345 | Agi 15, Sta 7 | none | haste 60, crit 25 |
+| Emberscale Helm (`warspirit_emberscale_helmet`) | helmet | 325 | Str 14, Sta 7 | none | haste 60, crit 25 |
+| Emberscale Pauldrons (`warspirit_emberscale_shoulder`) | shoulder | 290 | Str 12, Sta 6 | none | haste 60, crit 25 |
+| Emberscale Hauberk (`warspirit_emberscale_chest`) | chest | 380 | Str 17, Sta 8 | none | haste 60, crit 25 |
+| Emberscale Gauntlets (`warspirit_emberscale_gloves`) | gloves | 270 | Str 11, Sta 6 | none | haste 60, crit 25 |
+| Emberscale Legguards (`warspirit_emberscale_legs`) | legs | 345 | Str 15, Sta 7 | none | haste 60, crit 25 |
 
 **Stonehearth Bastion** (`stonehearth`), enhancement (Warspirit), off-tank, mail. 2 pieces: While Stonebound, Stormcast Mending Waters costs no mana and heals 25 percent more. 4 pieces: While Stonebound, completing a cadence heals you for 3 percent of your maximum health.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
-| Stonehearth Helm (`stonehearth_helmet`) | helmet | 325 | Agi 10, Sta 11 | none | crit 60, haste 25 |
-| Stonehearth Pauldrons (`stonehearth_shoulder`) | shoulder | 290 | Agi 8, Sta 10 | none | crit 60, haste 25 |
-| Stonehearth Hauberk (`stonehearth_chest`) | chest | 380 | Agi 11, Sta 14 | none | crit 60, haste 25 |
-| Stonehearth Gauntlets (`stonehearth_gloves`) | gloves | 270 | Agi 8, Sta 9 | none | crit 60, haste 25 |
-| Stonehearth Legguards (`stonehearth_legs`) | legs | 345 | Agi 10, Sta 12 | none | crit 60, haste 25 |
+| Stonehearth Helm (`stonehearth_helmet`) | helmet | 325 | Str 10, Sta 11 | none | crit 60, haste 25 |
+| Stonehearth Pauldrons (`stonehearth_shoulder`) | shoulder | 290 | Str 8, Sta 10 | none | crit 60, haste 25 |
+| Stonehearth Hauberk (`stonehearth_chest`) | chest | 380 | Str 11, Sta 14 | none | crit 60, haste 25 |
+| Stonehearth Gauntlets (`stonehearth_gloves`) | gloves | 270 | Str 8, Sta 9 | none | crit 60, haste 25 |
+| Stonehearth Legguards (`stonehearth_legs`) | legs | 345 | Str 10, Sta 12 | none | crit 60, haste 25 |
 
 **Springmender Scale** (`springmender`), restoration (Spiritmend), mail. 2 pieces: Tidecall's cooldown is reduced by 4 sec. Damage taken no longer delays your spellcasting. 4 pieces: Cascading Mend reaches a fourth ally and harvests Mending Currents at 150 percent.
 
@@ -330,21 +330,21 @@ design targets for the tuning pass.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
-| Wildfang Cowl (`wildfang_emberhide_helmet`) | helmet | 185 | Agi 14, Sta 7 | none | crit 60, haste 25 |
-| Wildfang Spaulders (`wildfang_emberhide_shoulder`) | shoulder | 165 | Agi 12, Sta 6 | none | crit 60, haste 25 |
-| Wildfang Tunic (`wildfang_emberhide_chest`) | chest | 215 | Agi 17, Sta 8 | none | crit 60, haste 25 |
-| Wildfang Grips (`wildfang_emberhide_gloves`) | gloves | 150 | Agi 11, Sta 6 | none | crit 60, haste 25 |
-| Wildfang Breeches (`wildfang_emberhide_legs`) | legs | 195 | Agi 15, Sta 7 | none | crit 60, haste 25 |
+| Wildfang Cowl (`wildfang_emberhide_helmet`) | helmet | 185 | Str 14, Sta 7 | none | crit 60, haste 25 |
+| Wildfang Spaulders (`wildfang_emberhide_shoulder`) | shoulder | 165 | Str 12, Sta 6 | none | crit 60, haste 25 |
+| Wildfang Tunic (`wildfang_emberhide_chest`) | chest | 215 | Str 17, Sta 8 | none | crit 60, haste 25 |
+| Wildfang Grips (`wildfang_emberhide_gloves`) | gloves | 150 | Str 11, Sta 6 | none | crit 60, haste 25 |
+| Wildfang Breeches (`wildfang_emberhide_legs`) | legs | 195 | Str 15, Sta 7 | none | crit 60, haste 25 |
 
 **Cinderbark Ward** (`cinderbark`), feral (Wildfang), bear tank, leather. 2 pieces: Sweeping Claws has a 30 percent chance to bank an additional Old Blood. 4 pieces: Marrowbreak hits 30 percent harder, and its emergency guard no longer replaces the strike.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
-| Cinderbark Cowl (`cinderbark_helmet`) | helmet | 185 | Agi 10, Sta 11 | none | crit 60, haste 25 |
-| Cinderbark Spaulders (`cinderbark_shoulder`) | shoulder | 165 | Agi 8, Sta 10 | none | crit 60, haste 25 |
-| Cinderbark Tunic (`cinderbark_chest`) | chest | 215 | Agi 11, Sta 14 | none | crit 60, haste 25 |
-| Cinderbark Grips (`cinderbark_gloves`) | gloves | 150 | Agi 8, Sta 9 | none | crit 60, haste 25 |
-| Cinderbark Breeches (`cinderbark_legs`) | legs | 195 | Agi 10, Sta 12 | none | crit 60, haste 25 |
+| Cinderbark Cowl (`cinderbark_helmet`) | helmet | 185 | Str 5, Agi 5, Sta 11 | none | crit 60, haste 25 |
+| Cinderbark Spaulders (`cinderbark_shoulder`) | shoulder | 165 | Str 4, Agi 4, Sta 10 | none | crit 60, haste 25 |
+| Cinderbark Tunic (`cinderbark_chest`) | chest | 215 | Str 6, Agi 5, Sta 14 | none | crit 60, haste 25 |
+| Cinderbark Grips (`cinderbark_gloves`) | gloves | 150 | Str 4, Agi 4, Sta 9 | none | crit 60, haste 25 |
+| Cinderbark Breeches (`cinderbark_legs`) | legs | 195 | Str 5, Agi 5, Sta 12 | none | crit 60, haste 25 |
 
 **Grovespring Raiment** (`grovespring`), restoration (Groveheart), leather. 2 pieces: Swiftmend consumes only your own Wildbloom or Second Bloom and heals 25 percent more. Damage taken no longer delays your spellcasting. 4 pieces: Overbloom harvests 75 percent of your remaining effects and banks 1 Verdance afterward.
 

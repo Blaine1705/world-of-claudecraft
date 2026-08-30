@@ -265,13 +265,13 @@ export const CLASS_ROLES: Record<PlayerClass, readonly BoostRole[]> = {
   ],
   shaman: [
     { id: 'elemental', weights: { int: 1, spi: 0.7, sta: 0.5 }, melee: false },
-    { id: 'enhancement', weights: { agi: 1, str: 0.8, sta: 0.6 }, melee: true },
+    { id: 'enhancement', weights: { str: 1, agi: 0.6, sta: 0.5 }, melee: true },
   ],
   mage: [{ id: 'frost', weights: { int: 1, spi: 0.6, sta: 0.4 }, melee: false }],
   warlock: [{ id: 'demonology', weights: { int: 1, sta: 0.6, spi: 0.5 }, melee: false }],
   druid: [
     { id: 'balance', weights: { int: 1, spi: 0.7, sta: 0.5 }, melee: false },
-    { id: 'feral', weights: { agi: 1, str: 0.6, sta: 0.6 }, melee: true },
+    { id: 'feral', weights: { str: 1, agi: 0.6, sta: 0.6 }, melee: true },
   ],
 };
 
@@ -520,7 +520,11 @@ export const NYTHRAXIS_ATTUNEMENT_QUESTS: readonly string[] = [
 // v5: the Varkhul legendaries went live (launch wiring), the emberward wins
 // the tank offhands, and the registered Crucible set bonuses make the tier
 // pieces the true kit; the bump re-kits the fleet.
-export const BOOST_KIT_VERSION = 5;
+// v6: the str-AP identity fix (shaman/druid melee AP is str x 2, agi pays
+// them nothing): enhancement and feral role weights flip str-first and the
+// four agi-lined Crucible sets re-stat to str-primary, moving several
+// enhancement and feral kit picks; the bump re-kits the fleet.
+export const BOOST_KIT_VERSION = 6;
 
 /**
  * Bring one live player up to the current boost kit: level 20, four
