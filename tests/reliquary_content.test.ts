@@ -391,7 +391,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // hold both sides), so neither page moves these two literals.
     // The four Crucible raid pages add 41 distinct new item ids (17 arena
     // epics, 16 wing epics, 3 + 5 heroic-only weapons and shields): 381.
-    expect(full).toEqual({ owned: 384, total: 384 });
+    expect(full).toEqual({ owned: 383, total: 383 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -402,7 +402,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // pair above, including the three release-merged daggers and the 41
     // Crucible raid relics; marks are character-scoped, so this trails the
     // overview by the 29 account-scoped weapon skins).
-    expect(character).toEqual({ owned: 355, total: 355 });
+    expect(character).toEqual({ owned: 354, total: 354 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -422,11 +422,12 @@ describe('Reliquary Conqueror catalog structure', () => {
     // moved instead of only that the sum did. The four Crucible raid pages
     // add 41 slots (17 + 3 + 16 + 5) on top of the 375 measured before them,
     // and the raid's flawless title joins the titles page, plus the two
-    // Varkhul legendaries at the launch wiring: 419.
+    // Varkhul legendaries at the launch wiring: 419; then 418 when the
+    // maintainer pulled Forgebreaker to route it through crafting.
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(419);
+    ).toBe(418);
     // Distinct mark ids: the 10 shipped before Phase 21 plus the 19
     // rare-slain proofs of conquerors_rares_of_the_realm.
     expect(
@@ -639,11 +640,12 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // predicate IS the index membership test.)
     // The Phase 21 measured final, hand-carried: 237 unique catalogued item
     // ids, plus the three daggers the v0.36.0 release merge added (240), plus
-    // the 43 Crucible raid relics incl. the Varkhul legendaries: 283 (the
+    // the Crucible raid relics incl. the Varkhul shield: 282 (Forgebreaker
+    // left the pages with its loot row, pending its crafting chain; the
     // sixth figure of the ledger row's
     // "all pinned" claim; the other five are the page/overview/character/
     // slot/mark literals nearby).
-    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(283);
+    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(282);
     for (const [id, pages] of RELIQUARY_ITEM_TO_PAGES) {
       expect(pages.length, `catalogued id ${id} maps to an empty page list`).toBeGreaterThan(0);
     }
@@ -1600,22 +1602,24 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
     }
   });
 
-  it('the Varkhul legendaries are live drops AND catalogued, one same-change unit', () => {
-    // The launch wiring landed: both drop from Varkhul's normal table (3
-    // percent each, the kingsbane precedent), the placeholder set is empty,
-    // and both sit on the conquerors_varkhul page. The old tripwire's
-    // bidirectional contract inverts to the landed state: a regression that
-    // re-placeholders either id without pulling its page row (or vice versa)
-    // reds here, keeping wiring and catalog membership one unit forever.
+  it('the Varkhul legendaries: the shield drops and pages, Forgebreaker is craft-pending', () => {
+    // The 2026-08-30 landed state: Emberward drops from Varkhul's normal
+    // table (3 percent, the kingsbane precedent) and sits on the
+    // conquerors_varkhul page. Forgebreaker is deliberately OFF the table
+    // and OFF the pages: the maintainer is routing it through the crafting
+    // professions, and a relic page row requires a conquerable source. This
+    // pin holds drop and page membership as one unit in BOTH directions:
+    // re-wiring the drop without re-paging (or vice versa) reds here, and
+    // so does the recipe chain landing without flipping this pin.
     expect(IGNIVAR_DROP_PLACEHOLDER_IDS.size).toBe(0);
-    for (const legendaryId of ['varkhul_forgebreaker', 'varkhul_emberward']) {
-      expect(IGNIVAR_DROP_PLACEHOLDER_IDS.has(legendaryId), legendaryId).toBe(false);
-      expect(isCataloguedRelicItem(legendaryId), legendaryId).toBe(true);
-      expect(
-        dungeonRarePlusLootIds('ignivar_inner_crucible').includes(legendaryId),
-        `${legendaryId} on Varkhul's live table`,
-      ).toBe(true);
-    }
+    expect(isCataloguedRelicItem('varkhul_emberward')).toBe(true);
+    expect(dungeonRarePlusLootIds('ignivar_inner_crucible').includes('varkhul_emberward')).toBe(
+      true,
+    );
+    expect(isCataloguedRelicItem('varkhul_forgebreaker')).toBe(false);
+    expect(dungeonRarePlusLootIds('ignivar_inner_crucible').includes('varkhul_forgebreaker')).toBe(
+      false,
+    );
   });
 
   it('the mob walk really reaches boss-summoned adds', () => {

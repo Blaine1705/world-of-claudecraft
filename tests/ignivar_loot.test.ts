@@ -375,7 +375,7 @@ describe('ignivar loot: the boss drop tables', () => {
     for (const [name, group] of groups) expect(group.sum, name).toBeCloseTo(1, 6);
   });
 
-  it('Varkhul pays two sigil slots, the feet-and-held group, a ring, copper, and the legendary pair', () => {
+  it('Varkhul pays two sigil slots, the feet-and-held group, a ring, copper, and the legendary shield', () => {
     const loot = MOBS.varkhul_forgefather_of_the_last_flame.loot ?? [];
     expect(loot[0]).toMatchObject({ copper: 200000, chance: 1 });
     const groups = groupsOf(loot);
@@ -385,21 +385,22 @@ describe('ignivar loot: the boss drop tables', () => {
       'varkhul_offset',
       'varkhul_rings',
     ]);
-    // The launch wiring: both legendaries ride inside the feet-and-held
-    // group at the kingsbane 3 percent precedent, with the held pair shaved
-    // to keep the partition at exactly 1.00.
+    // The shield rides inside the feet-and-held group at the kingsbane 3
+    // percent precedent, paid for by its off-hand slot-mate the cinder.
+    // Forgebreaker is deliberately ABSENT: the maintainer pulled it from the
+    // table to route it through the crafting professions (2026-08-30); the
+    // orb sits back at its full 0.15 and the partition stays exactly 1.00.
     const legendaryRows = loot.filter(
       (r) => 'itemId' in r && String(r.itemId).startsWith('varkhul_'),
     );
     expect(legendaryRows.map((r) => ('itemId' in r ? r.itemId : ''))).toEqual([
-      'varkhul_forgebreaker',
       'varkhul_emberward',
     ]);
     for (const row of legendaryRows) {
       expect(row).toMatchObject({ chance: 0.03, rollGroup: 'varkhul_offset' });
     }
     const offset = groups.get('varkhul_offset');
-    expect(offset?.ids.length).toBe(14); // 10 feet + both held offhands + the legendary pair
+    expect(offset?.ids.length).toBe(13); // 10 feet + both held offhands + the shield
     expect(offset?.ids).toContain('orb_of_the_last_spring');
     expect(offset?.ids).toContain('cinder_of_the_first_design');
     for (const id of offset?.ids ?? []) {
