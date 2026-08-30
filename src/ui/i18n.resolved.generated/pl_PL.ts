@@ -956,7 +956,8 @@ export const pl_PL: EnTranslations = {
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "m",
       "durationUnitHours": "h",
-      "durationUnitDays": "d"
+      "durationUnitDays": "d",
+      "buffOverflowLabel": "+{n}"
     },
     "character": {
       "modelPreview": "Podgląd modelu postaci"
@@ -1386,6 +1387,7 @@ export const pl_PL: EnTranslations = {
       "name_thunderstrut_gobbler": "Grzmotokroczek, Wielki Indyk",
       "name_terrorspark_groundshaker": "Groziskra, Wstrząsacz Ziemi",
       "name_drakemaw_raptor": "Raptor Smoczej Paszczy",
+      "name_rickshaw_mount": "Spętana Kośćmi Riksza",
       "desc_valorsteed": "Wytrzymały, pewny kroku rumak, który zapewnia zwiększoną prędkość podróżowania.",
       "desc_grag_bear": "Wytrzymały, pewny kroku niedźwiedź, który zapewnia zwiększoną prędkość podróżowania.",
       "desc_stalkglider_snail": "Krzepki, powoli, lecz niezmordowanie pełznący ślimak, który zapewnia zwiększoną prędkość podróżowania.",
@@ -1394,7 +1396,8 @@ export const pl_PL: EnTranslations = {
       "desc_stormfeather_griffin": "Dostojny gryf burzy, który skrada się po ziemi na szponach okutych runami, ze złożonymi skrzydłami.",
       "desc_thunderstrut_gobbler": "Kolosalny, wylęgły z burzy indyk, który dumnie kroczy z Przebudzonego Szczytu, z ogonem rozłożonym jak burzowa chmura.",
       "desc_terrorspark_groundshaker": "Zwarta opancerzona maszyna z ciężkimi gąsienicami, wielkokalibrowym działem i siodłem stworzonym dla nieustraszonych pilotów.",
-      "desc_drakemaw_raptor": "Ujeżdżony wylęgowy raptor z Kaldery Smoczej Paszczy: same ścięgna i pęd, wciąż pachnący z lekka popiołem."
+      "desc_drakemaw_raptor": "Ujeżdżony wylęgowy raptor z Kaldery Smoczej Paszczy: same ścięgna i pęd, wciąż pachnący z lekka popiołem.",
+      "desc_rickshaw_mount": "Grzechoczący wózek z kości, z kościstym pachołkiem zaprzężonym do dyszli, ciągnącym cię w pełnym pędzie."
     },
     "mountTraining": {
       "mountPrompt": "Naciśnij {key}, aby dosiąść treningowego Rumaka Męstwa.",
@@ -1564,6 +1567,7 @@ export const pl_PL: EnTranslations = {
       "playerFrameScale": "Skala ramki gracza",
       "targetFrameScale": "Skala ramki celu",
       "aurasOnPlayerFrame": "Wzmocnienia na ramce gracza",
+      "alwaysShowAllBuffs": "Always Show All Buffs",
       "highContrastBackground": "Tło o wysokim kontraście",
       "startAttackOnAbility": "Automatyczny atak przy użyciu umiejętności",
       "stopAutoAttackOnTargetSwitch": "Zatrzymaj automatyczny atak przy zmianie celu",
@@ -1573,6 +1577,8 @@ export const pl_PL: EnTranslations = {
       "stickyTarget": "Zachowaj cel po kliknięciu w ziemię",
       "showItemLevel": "Pokaż poziom przedmiotu",
       "showReliquaryTracker": "Pokaż narzędzie do śledzenia relikwiarzy",
+      "confirmVendorSell": "Confirm Before Selling",
+      "confirmVendorSellNote": "Turning this off sells items with a single click and no confirmation, so a shifted bag slot could vendor the wrong item.",
       "itemLevelLine": "Poziom przedmiotu {level}",
       "itemScoreLine": "Ocena {score}",
       "showSecondaryActionBar": "Pokaż dodatkowy pasek akcji",
@@ -1581,6 +1587,7 @@ export const pl_PL: EnTranslations = {
       "hideUnusedActionSlots": "Ukryj nieużywane pola akcji",
       "lockActionBars": "Zablokuj paski akcji",
       "showTargetOfTarget": "Pokaż cel celu",
+      "showTargetSwingTimer": "Pokaż licznik zamachu celu",
       "showPetFrame": "Pokaż swoje zwierzę",
       "waterRipples": "Zmarszczki na wodzie (kilwater)",
       "showAttackButton": "Pokaż Przycisk Ataku",
@@ -2140,6 +2147,12 @@ export const pl_PL: EnTranslations = {
         "few": "pozostały {count} sekundy",
         "many": "pozostało {count} sekund",
         "other": "pozostało {count} sekund"
+      },
+      "buffsHidden": {
+        "one": "Aktywne jest jeszcze {count} wzmocnienie, ale ukryte w tym ustawieniu grafiki",
+        "few": "Aktywne są jeszcze {count} wzmocnienia, ale ukryte w tym ustawieniu grafiki",
+        "many": "Aktywnych jest jeszcze {count} wzmocnień, ale ukryte w tym ustawieniu grafiki",
+        "other": "Aktywnych jest jeszcze {count} wzmocnień, ale ukryte w tym ustawieniu grafiki"
       },
       "playtimeDays": {
         "one": "{count} dzień",
@@ -3204,9 +3217,9 @@ export const pl_PL: EnTranslations = {
       "linked": "Połączono z kontem Steam {id}",
       "benefits": "Połącz swoje konto Steam z poziomu aplikacji na komputer, aby zdobywane czyny znajdowały odbicie w osiągnięciach Steam.",
       "noTicket": "Steam nie wystawił biletu połączenia. Uruchom Steam i spróbuj ponownie.",
-      "wishlist": "Wishlist on Steam",
-      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
-      "wishlistShort": "Wishlist"
+      "wishlist": "Dodaj do listy życzeń na Steam",
+      "wishlistAria": "Dodaj do listy życzeń na Steam: otwórz stronę World of ClaudeCraft w sklepie",
+      "wishlistShort": "Lista życzeń"
     },
     "epic": {
       "title": "Epic",
@@ -3875,7 +3888,9 @@ export const pl_PL: EnTranslations = {
       "equip": "Załóż",
       "disenchant": "Rozbroić",
       "salvage": "Odzyskaj",
-      "applyEnchant": "Zastosuj zaklinanie"
+      "applyEnchant": "Zastosuj zaklinanie",
+      "sell": "Sprzedaj",
+      "sellAll": "Sprzedaj wszystko ({count})"
     },
     "enchanting": {
       "disenchantedLine": "Rozbrajasz {item}.",
@@ -4377,6 +4392,10 @@ export const pl_PL: EnTranslations = {
       "loading": "Wczytywanie Giełdy...",
       "loadFailed": "Nie udało się połączyć z Giełdą. Spróbuj ponownie za chwilę.",
       "disabledRealm": "Giełda $WOC nie jest dostępna na tym świecie.",
+      "browserOnlyConfirmTitle": "Otworzyć Giełdę $WOC w przeglądarce?",
+      "browserOnlyConfirmBody": "Giełda $WOC działa tylko w przeglądarkowej wersji World of ClaudeCraft. Spowoduje to otwarcie World of ClaudeCraft w przeglądarce, gdzie możesz się zalogować i otworzyć Giełdę; gra będzie tu nadal działać.",
+      "browserOnlyConfirmOpen": "Otwórz w przeglądarce",
+      "browserOnlyConfirmCancel": "Anuluj",
       "pausedBanner": "Handel jest wstrzymany. Aukcje nadal odliczają czas; nowe wystawienia, oferty, propozycje i płatności czekają do wznowienia handlu, a płatność już wysłana zostanie mimo to rozliczona.",
       "walletLinkedDisconnected": "Your public address is linked. Reconnect that wallet app when you want to pay with $WOC.",
       "walletLinkedConnected": "Your linked wallet app is connected and ready for $WOC purchases.",
@@ -4697,7 +4716,13 @@ export const pl_PL: EnTranslations = {
       "upstream": "Epic nie odpowiedział. Spróbuj ponownie za chwilę."
     },
     "wallet": {
-      "handoff_invalid": "Autoryzacja portfela wygasła lub nie mogła zostać zweryfikowana. Spróbuj ponownie."
+      "handoff_invalid": "Autoryzacja portfela wygasła lub nie mogła zostać zweryfikowana. Spróbuj ponownie.",
+      "reauth_required": "Potwierdź tę zmianę portfela hasłem do konta.",
+      "reauth_two_factor": "Twoje konto ma włączone uwierzytelnianie dwuskładnikowe. Wpisz swój kod, aby potwierdzić.",
+      "reauth_no_password": "Najpierw ustaw hasło w ustawieniach konta, a potem spróbuj ponownie.",
+      "reauth_bad_signature": "Nie udało się zweryfikować podpisu portfela. Spróbuj ponownie.",
+      "reauth_bad_password": "Twoje hasło jest nieprawidłowe.",
+      "reauth_bad_two_factor": "Ten kod jest nieprawidłowy, spróbuj ponownie."
     },
     "ota_updates": {
       "invalid_input": "Nieprawidłowe dane."
@@ -5155,6 +5180,7 @@ export const pl_PL: EnTranslations = {
       "ifPartySort": "Kolejność, w jakiej wyświetlani są członkowie drużyny: grupa, rola lub nazwa.",
       "ifPartyShowAuras": "Czy wzmocnienia i osłabienia pokazują się na ramkach drużyny. Odpowiadające im przełączniki obejmują paski zasobów, tarcze absorpcji, zwierzęta oraz to, czy pojawiasz się na własnej liście drużyny.",
       "ifAurasOnPlayerFrame": "Umieszcza twoje wzmocnienia i osłabienia na własnej ramce gracza, obok paska aur.",
+      "ifAlwaysShowAllBuffs": "Shows every active buff even on the Low graphics preset, bypassing its usual buff-icon cap.",
       "ifTargetOfTarget": "Pokazuje, kogo atakuje twój cel, co jest klasycznym sposobem sprawdzenia, czy tank wciąż go trzyma.",
       "ifPetFrame": "Pokazuje ramkę dla twojego zwierzęcia.",
       "ifChatFontScale": "Rozmiar tekstu czatu.",
@@ -7623,6 +7649,13 @@ export const pl_PL: EnTranslations = {
     "unlink": "Odepnij",
     "unlinkTitle": "Usuń weryfikację portfela z tego konta",
     "unlinkAria": "Usuń weryfikację portfela z tego konta",
+    "reauthTitle": "Potwierdź zmianę portfela",
+    "reauthUnlinkTitle": "Potwierdź usunięcie portfela",
+    "reauthHelp": "Dla Twojego bezpieczeństwa wpisz hasło do konta, aby zatwierdzić tę zmianę.",
+    "reauthNoPassword": "To konto loguje się bez hasła. Najpierw ustaw hasło w ustawieniach konta, a potem spróbuj ponownie.",
+    "reauthConfirm": "Potwierdź",
+    "reauthCancel": "Anuluj",
+    "reauthClose": "Zamknij",
     "signOut": "Rozłącz",
     "signOutTitle": "Rozłącz aplikację portfela w tej przeglądarce",
     "signOutAria": "Rozłącz aplikację portfela w tej przeglądarce",
@@ -13171,6 +13204,9 @@ export const pl_PL: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Kluczyk zapłonu: Groziskra, Wstrząsacz Ziemi"
+      },
+      "reins_rickshaw_mount": {
+        "name": "Spętane lejce: Spętana Kośćmi Riksza"
       },
       "reins_drakemaw_raptor": {
         "name": "Wodze Raptora Smoczej Paszczy"

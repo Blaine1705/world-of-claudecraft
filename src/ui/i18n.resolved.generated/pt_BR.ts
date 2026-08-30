@@ -956,7 +956,8 @@ export const pt_BR: EnTranslations = {
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "m",
       "durationUnitHours": "h",
-      "durationUnitDays": "d"
+      "durationUnitDays": "d",
+      "buffOverflowLabel": "+{n}"
     },
     "character": {
       "modelPreview": "Prévia do modelo do personagem"
@@ -1386,6 +1387,7 @@ export const pt_BR: EnTranslations = {
       "name_thunderstrut_gobbler": "Pavoneia-Trovões, o Grande Peru",
       "name_terrorspark_groundshaker": "Faíscaterror, Abala-Terra",
       "name_drakemaw_raptor": "Raptor de Drakemaw",
+      "name_rickshaw_mount": "Riquixá de Ossos Vinculados",
       "desc_valorsteed": "Um corcel resistente e de passo firme que aumenta a velocidade de viagem.",
       "desc_grag_bear": "Um urso resistente e de passo firme que aumenta a velocidade de viagem.",
       "desc_stalkglider_snail": "Um caracol valente e de queima lenta que aumenta a velocidade de viagem.",
@@ -1394,7 +1396,8 @@ export const pt_BR: EnTranslations = {
       "desc_stormfeather_griffin": "Um grifo da tempestade majestoso que ronda o chão sobre garras rúnicas, asas recolhidas.",
       "desc_thunderstrut_gobbler": "Um peru colossal nascido da tempestade que desce do Pico Desperto se pavoneando, com a cauda aberta como uma frente de tempestade.",
       "desc_terrorspark_groundshaker": "Uma máquina blindada compacta com esteiras pesadas, um canhão de grande calibre e uma sela feita para pilotos destemidos.",
-      "desc_drakemaw_raptor": "Um raptor da ninhada domado na sela, vindo da Caldeira de Drakemaw, puro músculo e velocidade, ainda com um leve cheiro de cinzas."
+      "desc_drakemaw_raptor": "Um raptor da ninhada domado na sela, vindo da Caldeira de Drakemaw, puro músculo e velocidade, ainda com um leve cheiro de cinzas.",
+      "desc_rickshaw_mount": "Uma carroça de ossos rangente, com um serviçal ossudo atrelado às varas, puxando você em disparada."
     },
     "mountTraining": {
       "mountPrompt": "Pressione {key} para montar no Valorsteed de treinamento.",
@@ -1564,6 +1567,7 @@ export const pt_BR: EnTranslations = {
       "playerFrameScale": "Escala do Quadro do Jogador",
       "targetFrameScale": "Escala do Quadro do Alvo",
       "aurasOnPlayerFrame": "Benefícios no Quadro do Jogador",
+      "alwaysShowAllBuffs": "Always Show All Buffs",
       "highContrastBackground": "Fundo de alto contraste",
       "startAttackOnAbility": "Ataque Automático ao Usar Habilidade",
       "stopAutoAttackOnTargetSwitch": "Parar Ataque Automático ao Trocar de Alvo",
@@ -1573,6 +1577,8 @@ export const pt_BR: EnTranslations = {
       "stickyTarget": "Manter alvo ao clicar no chão",
       "showItemLevel": "Mostrar nível do item",
       "showReliquaryTracker": "Mostrar rastreador de relicário",
+      "confirmVendorSell": "Confirm Before Selling",
+      "confirmVendorSellNote": "Turning this off sells items with a single click and no confirmation, so a shifted bag slot could vendor the wrong item.",
       "itemLevelLine": "Nível do item {level}",
       "itemScoreLine": "Pontuação {score}",
       "showSecondaryActionBar": "Mostrar Barra de Ação Secundária",
@@ -1581,6 +1587,7 @@ export const pt_BR: EnTranslations = {
       "hideUnusedActionSlots": "Ocultar Espaços de Ação Não Utilizados",
       "lockActionBars": "Travar barras de ação",
       "showTargetOfTarget": "Mostrar Alvo do Alvo",
+      "showTargetSwingTimer": "Mostrar temporizador de ataque do alvo",
       "showPetFrame": "Mostrar seu mascote",
       "waterRipples": "Ondulações na água (esteiras)",
       "showAttackButton": "Exibir Botão de Ataque",
@@ -2140,6 +2147,12 @@ export const pt_BR: EnTranslations = {
         "few": "{count} segundos restantes",
         "many": "{count} segundos restantes",
         "other": "{count} segundos restantes"
+      },
+      "buffsHidden": {
+        "one": "Mais {count} bônus está ativo, mas oculto nesta predefinição gráfica",
+        "few": "Mais {count} bônus estão ativos, mas ocultos nesta predefinição gráfica",
+        "many": "Mais {count} bônus estão ativos, mas ocultos nesta predefinição gráfica",
+        "other": "Mais {count} bônus estão ativos, mas ocultos nesta predefinição gráfica"
       },
       "playtimeDays": {
         "one": "{count} dia",
@@ -3204,9 +3217,9 @@ export const pt_BR: EnTranslations = {
       "linked": "Vinculado à conta Steam {id}",
       "benefits": "Vincule sua conta Steam pelo aplicativo para desktop para espelhar os feitos que você ganhar como conquistas do Steam.",
       "noTicket": "O Steam não forneceu um tíquete de vinculação. Inicie o Steam e tente novamente.",
-      "wishlist": "Wishlist on Steam",
-      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
-      "wishlistShort": "Wishlist"
+      "wishlist": "Adicionar à lista de desejos no Steam",
+      "wishlistAria": "Adicionar à lista de desejos no Steam: abrir a página de World of ClaudeCraft na loja",
+      "wishlistShort": "Lista de desejos"
     },
     "epic": {
       "title": "Epic",
@@ -3875,7 +3888,9 @@ export const pt_BR: EnTranslations = {
       "equip": "Equipar",
       "disenchant": "Desencantar",
       "salvage": "Recuperar",
-      "applyEnchant": "Aplicar Encantamento"
+      "applyEnchant": "Aplicar Encantamento",
+      "sell": "Vender",
+      "sellAll": "Vender tudo ({count})"
     },
     "enchanting": {
       "disenchantedLine": "Você desencanta {item}.",
@@ -4377,6 +4392,10 @@ export const pt_BR: EnTranslations = {
       "loading": "Carregando a Bolsa...",
       "loadFailed": "Não foi possível acessar a Bolsa. Tente novamente em instantes.",
       "disabledRealm": "A Bolsa $WOC não está disponível neste reino.",
+      "browserOnlyConfirmTitle": "Abrir a Bolsa $WOC no navegador?",
+      "browserOnlyConfirmBody": "A Bolsa $WOC funciona apenas na versão de navegador de World of ClaudeCraft. Isto abre World of ClaudeCraft no seu navegador, onde você pode entrar e abrir a Bolsa; o jogo continua rodando aqui.",
+      "browserOnlyConfirmOpen": "Abrir no navegador",
+      "browserOnlyConfirmCancel": "Cancelar",
       "pausedBanner": "As negociações estão pausadas. Os leilões continuam a contagem regressiva; novas listagens, lances, ofertas e pagamentos aguardam até que as negociações sejam retomadas, e um pagamento já enviado ainda é liquidado.",
       "walletLinkedDisconnected": "Your public address is linked. Reconnect that wallet app when you want to pay with $WOC.",
       "walletLinkedConnected": "Your linked wallet app is connected and ready for $WOC purchases.",
@@ -4697,7 +4716,13 @@ export const pt_BR: EnTranslations = {
       "upstream": "A Epic não respondeu. Tente novamente em instantes."
     },
     "wallet": {
-      "handoff_invalid": "Essa autorização de carteira expirou ou não pôde ser verificada. Tente novamente."
+      "handoff_invalid": "Essa autorização de carteira expirou ou não pôde ser verificada. Tente novamente.",
+      "reauth_required": "Confirme esta alteração de carteira com a senha da sua conta.",
+      "reauth_two_factor": "Sua conta tem a autenticação em duas etapas ativada. Digite seu código para confirmar.",
+      "reauth_no_password": "Primeiro defina uma senha nas configurações da conta e tente novamente.",
+      "reauth_bad_signature": "Não foi possível verificar a assinatura da carteira. Tente novamente.",
+      "reauth_bad_password": "Sua senha está incorreta.",
+      "reauth_bad_two_factor": "Esse código não é válido, tente novamente."
     },
     "ota_updates": {
       "invalid_input": "Entrada inválida."
@@ -5155,6 +5180,7 @@ export const pt_BR: EnTranslations = {
       "ifPartySort": "A ordem em que os membros do grupo são listados: ordem do grupo, função ou nome.",
       "ifPartyShowAuras": "Se benefícios e penalidades aparecem nos quadros do grupo. Interruptores equivalentes cobrem barras de recurso, absorções, mascotes e se você aparece na sua própria lista de grupo.",
       "ifAurasOnPlayerFrame": "Coloca seus benefícios e penalidades também no seu Quadro do Jogador, além da barra de auras.",
+      "ifAlwaysShowAllBuffs": "Shows every active buff even on the Low graphics preset, bypassing its usual buff-icon cap.",
       "ifTargetOfTarget": "Mostra quem o seu alvo está mirando: a forma clássica de saber se o tanque ainda está com a aggro.",
       "ifPetFrame": "Mostra um quadro para o seu mascote.",
       "ifChatFontScale": "Tamanho do texto do chat.",
@@ -7623,6 +7649,13 @@ export const pt_BR: EnTranslations = {
     "unlink": "Desvincular",
     "unlinkTitle": "Remover a verificação da carteira desta conta",
     "unlinkAria": "Remover a verificação da carteira desta conta",
+    "reauthTitle": "Confirmar alteração de carteira",
+    "reauthUnlinkTitle": "Confirmar remoção de carteira",
+    "reauthHelp": "Para sua segurança, digite a senha da sua conta para autorizar esta alteração.",
+    "reauthNoPassword": "Esta conta entra sem senha. Primeiro defina uma senha nas configurações da conta e tente novamente.",
+    "reauthConfirm": "Confirmar",
+    "reauthCancel": "Cancelar",
+    "reauthClose": "Fechar",
     "signOut": "Desconectar",
     "signOutTitle": "Desconectar o app da carteira neste navegador",
     "signOutAria": "Desconectar o app da carteira neste navegador",
@@ -13171,6 +13204,9 @@ export const pt_BR: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Chave de ignição: Faíscaterror, Abala-Terra"
+      },
+      "reins_rickshaw_mount": {
+        "name": "Rédeas vinculadas: Riquixá de Ossos Vinculados"
       },
       "reins_drakemaw_raptor": {
         "name": "Rédeas do Raptor de Drakemaw"

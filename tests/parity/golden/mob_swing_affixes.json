@@ -10,8 +10,8 @@
     "mobSwing affix cascade: rampage stacking buff_ap (warlord_drogmar self-buff)",
     "friendly-pet mobSwing: mob.hostile=false short-circuits every proc (no debuff on its target)"
   ],
-  "draws": 364,
-  "drawDigest": "0eb4c99a",
+  "draws": 363,
+  "drawDigest": "c0982afc",
   "frames": [
     {
       "tick": 0,
@@ -164,30 +164,30 @@
       "tick": 20,
       "time": 1,
       "nextId": 1006,
-      "state": "5c2b7192",
-      "events": "2819dd8c",
+      "state": "2474dd8c",
+      "events": "d98330b4",
       "rng": {
-        "draws": 56,
-        "digest": "7b458e00"
+        "draws": 55,
+        "digest": "56ee185d"
       }
     },
     {
       "tick": 40,
       "time": 2,
       "nextId": 1006,
-      "state": "a4af69cc",
-      "events": "301299b3",
+      "state": "2d7ea12e",
+      "events": "bd2bfcf1",
       "rng": {
-        "draws": 92,
-        "digest": "4950606f"
+        "draws": 100,
+        "digest": "81fe35c6"
       }
     },
     {
       "tick": 60,
       "time": 3,
       "nextId": 1006,
-      "state": "8b7a1484",
-      "events": "b99b1b11",
+      "state": "82e26464",
+      "events": "f6a9e362",
       "rng": {
         "draws": 326,
         "digest": "5baa2bec"
@@ -197,7 +197,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1006,
-      "state": "725e26d6",
+      "state": "d9ea7b93",
       "events": "741638a5",
       "rng": {
         "draws": 326,
@@ -229,7 +229,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 1657
+            "damageTaken": 1378
           },
           "craftSkills": {},
           "deedStats": {
@@ -313,32 +313,23 @@
               "sourceId": 995
             },
             {
-              "duration": 10,
-              "id": "heal_absorb_gravecaller_summoner",
-              "kind": "heal_absorb",
-              "name": "Grave Blight",
-              "remaining": 7.05,
-              "school": "shadow",
-              "sourceId": 1002,
-              "value": 120
-            },
-            {
               "duration": 3,
               "id": "ensnare_webwood_spider",
               "kind": "root",
               "name": "Sticky Web",
-              "remaining": 2,
+              "remaining": 0.5,
               "school": "nature",
               "sourceId": 1001
             },
             {
-              "duration": 1,
-              "id": "stun_mogger_lackey",
-              "kind": "stun",
-              "name": "Skullthump",
-              "remaining": 0.5,
-              "school": "physical",
-              "sourceId": 1000
+              "duration": 10,
+              "id": "heal_absorb_gravecaller_summoner",
+              "kind": "heal_absorb",
+              "name": "Grave Blight",
+              "remaining": 8.5,
+              "school": "shadow",
+              "sourceId": 1002,
+              "value": 120
             },
             {
               "duration": 10,
@@ -391,7 +382,7 @@
             "z": -21
           },
           "potionCooldownUntil": -1,
-          "resource": 100,
+          "resource": 84.211111,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
@@ -417,7 +408,8 @@
         {
           "aggroTargetId": 1004,
           "aiState": "attack",
-          "combatTimer": 0.5,
+          "autoAttack": true,
+          "combatTimer": 0.95,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -426,7 +418,7 @@
           "fallStartY": -2.838397,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 199989,
+          "hp": 199991,
           "id": 1000,
           "inCombat": true,
           "kind": "mob",
@@ -463,7 +455,7 @@
           "threat": [
             [
               1004,
-              11
+              9
             ]
           ],
           "weapon": {
@@ -475,6 +467,7 @@
         {
           "aggroTargetId": 995,
           "aiState": "attack",
+          "autoAttack": true,
           "combatTimer": 0.5,
           "comboUntil": -1,
           "critChance": 0.05,
@@ -519,6 +512,7 @@
         {
           "aggroTargetId": 995,
           "aiState": "attack",
+          "autoAttack": true,
           "combatTimer": 0.5,
           "comboUntil": -1,
           "critChance": 0.05,
@@ -578,6 +572,7 @@
               "value": 100
             }
           ],
+          "autoAttack": true,
           "combatTimer": 0.3,
           "comboUntil": -1,
           "critChance": 0.05,
@@ -604,7 +599,7 @@
             "z": -21
           },
           "potionCooldownUntil": -1,
-          "pulseTimer": 9.05,
+          "pulseTimer": 9,
           "spawnPos": {
             "x": -1,
             "y": -2.838397,
@@ -625,7 +620,8 @@
         {
           "aggroTargetId": 1000,
           "aiState": "idle",
-          "combatTimer": 0.75,
+          "autoAttack": true,
+          "combatTimer": 0.5,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -633,7 +629,7 @@
           "facing": 1.570796,
           "fallStartY": -2.838397,
           "fiveSecondRule": 99,
-          "hp": 110,
+          "hp": 77,
           "id": 1004,
           "inCombat": true,
           "kind": "mob",
@@ -670,7 +666,8 @@
         {
           "aggroTargetId": 1004,
           "aiState": "attack",
-          "combatTimer": 0.75,
+          "autoAttack": true,
+          "combatTimer": 0.5,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -679,7 +676,7 @@
           "fallStartY": -2.838397,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 199941,
+          "hp": 199910,
           "id": 1005,
           "inCombat": true,
           "kind": "mob",
@@ -715,7 +712,7 @@
           "threat": [
             [
               1004,
-              60
+              91
             ]
           ],
           "weapon": {
@@ -730,11 +727,11 @@
       "tick": 64,
       "time": 3.2,
       "nextId": 1006,
-      "state": "983cb1cd",
+      "state": "3780bae5",
       "events": "741638a5",
       "rng": {
-        "draws": 364,
-        "digest": "0eb4c99a"
+        "draws": 363,
+        "digest": "c0982afc"
       },
       "label": "final",
       "players": [
@@ -762,7 +759,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {
-            "damageTaken": 1657
+            "damageTaken": 1378
           },
           "craftSkills": {},
           "deedStats": {
@@ -846,32 +843,23 @@
               "sourceId": 995
             },
             {
-              "duration": 10,
-              "id": "heal_absorb_gravecaller_summoner",
-              "kind": "heal_absorb",
-              "name": "Grave Blight",
-              "remaining": 6.85,
-              "school": "shadow",
-              "sourceId": 1002,
-              "value": 120
-            },
-            {
               "duration": 3,
               "id": "ensnare_webwood_spider",
               "kind": "root",
               "name": "Sticky Web",
-              "remaining": 1.8,
+              "remaining": 0.3,
               "school": "nature",
               "sourceId": 1001
             },
             {
-              "duration": 1,
-              "id": "stun_mogger_lackey",
-              "kind": "stun",
-              "name": "Skullthump",
-              "remaining": 0.3,
-              "school": "physical",
-              "sourceId": 1000
+              "duration": 10,
+              "id": "heal_absorb_gravecaller_summoner",
+              "kind": "heal_absorb",
+              "name": "Grave Blight",
+              "remaining": 8.3,
+              "school": "shadow",
+              "sourceId": 1002,
+              "value": 120
             },
             {
               "duration": 10,
@@ -924,7 +912,7 @@
             "z": -21
           },
           "potionCooldownUntil": -1,
-          "resource": 100,
+          "resource": 84.211111,
           "resourceType": "rage",
           "spawnPos": {
             "x": -94,
@@ -950,7 +938,8 @@
         {
           "aggroTargetId": 1004,
           "aiState": "attack",
-          "combatTimer": 0.7,
+          "autoAttack": true,
+          "combatTimer": 1.15,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -959,7 +948,7 @@
           "fallStartY": -2.838397,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 199989,
+          "hp": 199991,
           "id": 1000,
           "inCombat": true,
           "kind": "mob",
@@ -996,7 +985,7 @@
           "threat": [
             [
               1004,
-              11
+              9
             ]
           ],
           "weapon": {
@@ -1008,6 +997,7 @@
         {
           "aggroTargetId": 995,
           "aiState": "attack",
+          "autoAttack": true,
           "combatTimer": 0.7,
           "comboUntil": -1,
           "critChance": 0.05,
@@ -1052,6 +1042,7 @@
         {
           "aggroTargetId": 995,
           "aiState": "attack",
+          "autoAttack": true,
           "combatTimer": 0.7,
           "comboUntil": -1,
           "critChance": 0.05,
@@ -1111,6 +1102,7 @@
               "value": 100
             }
           ],
+          "autoAttack": true,
           "combatTimer": 0.5,
           "comboUntil": -1,
           "critChance": 0.05,
@@ -1137,7 +1129,7 @@
             "z": -21
           },
           "potionCooldownUntil": -1,
-          "pulseTimer": 8.85,
+          "pulseTimer": 8.8,
           "spawnPos": {
             "x": -1,
             "y": -2.838397,
@@ -1158,7 +1150,8 @@
         {
           "aggroTargetId": 1000,
           "aiState": "idle",
-          "combatTimer": 0.95,
+          "autoAttack": true,
+          "combatTimer": 0.7,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -1166,7 +1159,7 @@
           "facing": 1.570796,
           "fallStartY": -2.838397,
           "fiveSecondRule": 99,
-          "hp": 110,
+          "hp": 77,
           "id": 1004,
           "inCombat": true,
           "kind": "mob",
@@ -1203,7 +1196,8 @@
         {
           "aggroTargetId": 1004,
           "aiState": "attack",
-          "combatTimer": 0.95,
+          "autoAttack": true,
+          "combatTimer": 0.7,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -1212,7 +1206,7 @@
           "fallStartY": -2.838397,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 199941,
+          "hp": 199910,
           "id": 1005,
           "inCombat": true,
           "kind": "mob",
@@ -1248,7 +1242,7 @@
           "threat": [
             [
               1004,
-              60
+              91
             ]
           ],
           "weapon": {

@@ -956,7 +956,8 @@ export const zh_TW: EnTranslations = {
       "durationUnitSeconds": "秒",
       "durationUnitMinutes": "分",
       "durationUnitHours": "時",
-      "durationUnitDays": "天"
+      "durationUnitDays": "天",
+      "buffOverflowLabel": "+{n}"
     },
     "character": {
       "modelPreview": "角色模型預覽"
@@ -1386,6 +1387,7 @@ export const zh_TW: EnTranslations = {
       "name_thunderstrut_gobbler": "雷霆闊步大火雞",
       "name_terrorspark_groundshaker": "驚雷撼地者",
       "name_drakemaw_raptor": "龍喉迅猛龍",
+      "name_rickshaw_mount": "白骨人力車",
       "desc_valorsteed": "一匹堅韌穩健的駿馬，可提升旅行速度。",
       "desc_grag_bear": "一頭堅韌穩健的巨熊，可提升旅行速度。",
       "desc_stalkglider_snail": "一隻堅毅耐久的蝸牛，可提升旅行速度。",
@@ -1394,7 +1396,8 @@ export const zh_TW: EnTranslations = {
       "desc_stormfeather_griffin": "一頭威嚴的風暴獅鷲，收攏雙翼，以符文利爪行走於大地。",
       "desc_thunderstrut_gobbler": "一隻風暴所生的龐然大火雞，從覺醒之峰昂首闊步而下，尾羽如雷雲般展開。",
       "desc_terrorspark_groundshaker": "一台緊湊的裝甲機械，配備重型履帶、大口徑火炮，以及為無畏駕駛員打造的鞍座。",
-      "desc_drakemaw_raptor": "來自龍喉火山口的馴服巢生迅猛龍，渾身筋肉、疾若奔雷，身上仍帶著淡淡的灰燼氣味。"
+      "desc_drakemaw_raptor": "來自龍喉火山口的馴服巢生迅猛龍，渾身筋肉、疾若奔雷，身上仍帶著淡淡的灰燼氣味。",
+      "desc_rickshaw_mount": "一輛嘎吱作響的骸骨貨車，一具瘦骨嶙峋的雜兵被套在轅木間，拖著你狂奔向前。"
     },
     "mountTraining": {
       "mountPrompt": "按 {key} 鍵騎上訓練用英勇戰馬。",
@@ -1564,6 +1567,7 @@ export const zh_TW: EnTranslations = {
       "playerFrameScale": "玩家框縮放",
       "targetFrameScale": "目標框縮放",
       "aurasOnPlayerFrame": "增益顯示在玩家框",
+      "alwaysShowAllBuffs": "始終顯示所有增益",
       "highContrastBackground": "高對比度背景",
       "startAttackOnAbility": "使用技能時自動攻擊",
       "stopAutoAttackOnTargetSwitch": "切換目標時停止自動攻擊",
@@ -1573,6 +1577,8 @@ export const zh_TW: EnTranslations = {
       "stickyTarget": "點擊地面時保留目標",
       "showItemLevel": "顯示物品等級",
       "showReliquaryTracker": "顯示聖物庫追蹤器",
+      "confirmVendorSell": "出售前確認",
+      "confirmVendorSellNote": "關閉後，出售物品只需單擊即可完成，不再確認；如果背包格位發生變化，可能會賣錯物品。",
       "itemLevelLine": "物品等級 {level}",
       "itemScoreLine": "評分 {score}",
       "showSecondaryActionBar": "顯示副動作列",
@@ -1581,6 +1587,7 @@ export const zh_TW: EnTranslations = {
       "hideUnusedActionSlots": "隱藏未使用的動作欄位",
       "lockActionBars": "鎖定動作列",
       "showTargetOfTarget": "顯示目標的目標",
+      "showTargetSwingTimer": "顯示目標的揮砍計時器",
       "showPetFrame": "顯示你的寵物",
       "waterRipples": "水面漣漪（尾波）",
       "showAttackButton": "顯示攻擊按鈕",
@@ -2140,6 +2147,12 @@ export const zh_TW: EnTranslations = {
         "few": "剩餘 {count} 秒",
         "many": "剩餘 {count} 秒",
         "other": "剩餘 {count} 秒"
+      },
+      "buffsHidden": {
+        "one": "還有 {count} 個增益效果仍在生效，只是因畫質設定未顯示圖示",
+        "few": "還有 {count} 個增益效果仍在生效，只是因畫質設定未顯示圖示",
+        "many": "還有 {count} 個增益效果仍在生效，只是因畫質設定未顯示圖示",
+        "other": "還有 {count} 個增益效果仍在生效，只是因畫質設定未顯示圖示"
       },
       "playtimeDays": {
         "one": "{count} 天",
@@ -3875,7 +3888,9 @@ export const zh_TW: EnTranslations = {
       "equip": "裝備",
       "disenchant": "分解",
       "salvage": "拆解",
-      "applyEnchant": "施加附魔"
+      "applyEnchant": "施加附魔",
+      "sell": "出售",
+      "sellAll": "全部出售（{count}）"
     },
     "enchanting": {
       "disenchantedLine": "你分解了 {item}。",
@@ -4377,6 +4392,10 @@ export const zh_TW: EnTranslations = {
       "loading": "正在載入交易所...",
       "loadFailed": "無法連接交易所，請稍後再試。",
       "disabledRealm": "本伺服器未開放 $WOC 交易所。",
+      "browserOnlyConfirmTitle": "在瀏覽器中開啟 $WOC 交易所？",
+      "browserOnlyConfirmBody": "$WOC 交易所僅在 World of ClaudeCraft 的瀏覽器版本中提供。即將在瀏覽器中開啟 World of ClaudeCraft，你可以在那裡登入並開啟交易所，遊戲會繼續在這裡執行。",
+      "browserOnlyConfirmOpen": "在瀏覽器中開啟",
+      "browserOnlyConfirmCancel": "取消",
       "pausedBanner": "交易已暫停。拍賣倒數照常進行；新的掛單、出價、報價和付款需等交易恢復後再進行，已送出的付款仍會照常結算。",
       "walletLinkedDisconnected": "您的公開地址已連結。需要使用 $WOC 付款時，請重新連接該錢包應用程式。",
       "walletLinkedConnected": "已連結的錢包應用程式已連接，可用於 $WOC 付款。",
@@ -4697,7 +4716,13 @@ export const zh_TW: EnTranslations = {
       "upstream": "Epic 未回應。請稍後重試。"
     },
     "wallet": {
-      "handoff_invalid": "錢包授權已過期或無法驗證。請再試一次。"
+      "handoff_invalid": "錢包授權已過期或無法驗證。請再試一次。",
+      "reauth_required": "請輸入帳號密碼以確認此錢包變更。",
+      "reauth_two_factor": "你的帳號已啟用兩步驟驗證。請輸入驗證碼以確認。",
+      "reauth_no_password": "請先在帳號設定中設定密碼，然後再試一次。",
+      "reauth_bad_signature": "錢包簽章驗證失敗。請再試一次。",
+      "reauth_bad_password": "密碼不正確。",
+      "reauth_bad_two_factor": "這組代碼無效，請再試一次。"
     },
     "ota_updates": {
       "invalid_input": "輸入無效。"
@@ -5155,6 +5180,7 @@ export const zh_TW: EnTranslations = {
       "ifPartySort": "隊伍成員的排列順序：入隊順序、定位，或名字。",
       "ifPartyShowAuras": "隊伍框上是否顯示增益與減益。另有對應的開關管理資源條、吸收護盾、寵物，以及你自己是否出現在自己的隊伍清單裡。",
       "ifAurasOnPlayerFrame": "除了光環列之外，也把你的增益與減益顯示在你自己的單位框上。",
+      "ifAlwaysShowAllBuffs": "即使在低畫質預設下也顯示所有生效中的增益，繞過該檔位平時的增益圖示上限。",
       "ifTargetOfTarget": "顯示你的目標正在攻擊誰，這是判斷坦克有沒有拉穩的經典方式。",
       "ifPetFrame": "為你的寵物顯示一個框。",
       "ifChatFontScale": "聊天文字大小。",
@@ -7623,6 +7649,13 @@ export const zh_TW: EnTranslations = {
     "unlink": "解除綁定",
     "unlinkTitle": "從此帳號移除錢包驗證",
     "unlinkAria": "從此帳號移除錢包驗證",
+    "reauthTitle": "確認錢包變更",
+    "reauthUnlinkTitle": "確認移除錢包",
+    "reauthHelp": "為了你的帳號安全，請輸入帳號密碼以授權此變更。",
+    "reauthNoPassword": "此帳號未設定密碼登入。請先在帳號設定中設定密碼，然後再試一次。",
+    "reauthConfirm": "確認",
+    "reauthCancel": "取消",
+    "reauthClose": "關閉",
     "signOut": "斷開連線",
     "signOutTitle": "在此瀏覽器中斷開錢包應用程式",
     "signOutAria": "在此瀏覽器中斷開錢包應用程式",
@@ -13171,6 +13204,9 @@ export const zh_TW: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "驚雷撼地者點火鑰匙"
+      },
+      "reins_rickshaw_mount": {
+        "name": "白骨人力車縛繩"
       },
       "reins_drakemaw_raptor": {
         "name": "龍喉迅猛龍的韁繩"

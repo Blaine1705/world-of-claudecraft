@@ -2584,6 +2584,15 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'itemUi.stats.parry': 'Tangkis',
   'apiError.wallet.handoff_invalid':
     'Otorisasi dompet itu telah kedaluwarsa atau tidak dapat diverifikasi. Coba lagi.',
+  'apiError.wallet.reauth_required': 'Konfirmasi perubahan dompet ini dengan kata sandi akun Anda.',
+  'apiError.wallet.reauth_two_factor':
+    'Akun Anda mengaktifkan autentikasi dua-faktor. Masukkan kode Anda untuk konfirmasi.',
+  'apiError.wallet.reauth_no_password':
+    'Atur kata sandi di pengaturan akun terlebih dahulu, lalu coba lagi.',
+  'apiError.wallet.reauth_bad_signature':
+    'Tanda tangan dompet tidak dapat diverifikasi. Coba lagi.',
+  'apiError.wallet.reauth_bad_password': 'Kata sandi Anda salah.',
+  'apiError.wallet.reauth_bad_two_factor': 'Kode itu tidak valid, coba lagi.',
   'cardDuel.close': 'Tutup',
   'cardDuel.counts': 'Dek: {deck} · Buang: {discard}',
   'cardDuel.forfeit': 'Menyerah',
@@ -10037,6 +10046,15 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'wallet.switchTitle': 'Verifikasi dompet yang berbeda',
   'wallet.unlink': 'Lepas Tautan',
   'wallet.unlinkAria': 'Hapus verifikasi dompet dari akun ini',
+  'wallet.reauthTitle': 'Konfirmasi perubahan dompet',
+  'wallet.reauthUnlinkTitle': 'Konfirmasi penghapusan dompet',
+  'wallet.reauthHelp':
+    'Demi keamanan Anda, masukkan kata sandi akun untuk mengizinkan perubahan ini.',
+  'wallet.reauthNoPassword':
+    'Akun ini masuk tanpa kata sandi. Atur kata sandi di pengaturan akun terlebih dahulu, lalu coba lagi.',
+  'wallet.reauthConfirm': 'Konfirmasi',
+  'wallet.reauthCancel': 'Batal',
+  'wallet.reauthClose': 'Tutup',
   'wallet.unlinkFailed': 'Tidak dapat melepas tautan dompet.',
   'wallet.unlinkTitle': 'Hapus verifikasi dompet dari akun ini',
   'wallet.verify': 'Verifikasi Dompet',
@@ -13846,4 +13864,30 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   "entities.abilities.nightshade_coating.description": "Melapisi target dalam nightshade, menimbulkan {damage} Kerusakan alam dan mengurangi penyembuhan yang diterimanya sebesar 25% selama 12 detik.",
   "entities.abilities.nightshade_coating.name": "Lapisan Nightshade",
   "guide.settingsPage.ifShowReliquaryTracker": "Apakah pelacak Reliquary (halaman yang Anda sematkan dan kemajuannya) ada di HUD Anda. Jendela Reliquary memiliki tombol mata yang cocok, dan menyematkan halaman akan mengaktifkan kembali pelacak.",
+  // v0.41 release i18n fill.
+  'entities.items.reins_rickshaw_mount.name': 'Kendali Terikat: Becak Terikat Tulang',
+  'hudChrome.itemMenu.sell': 'Jual',
+  'hudChrome.itemMenu.sellAll': 'Jual semua ({count})',
+  'hudChrome.mounts.desc_rickshaw_mount':
+    'Gerobak tulang yang berderak, dengan serdadu kurus bertulang diikat pada porosnya, menarikmu melaju kencang.',
+  'hudChrome.mounts.name_rickshaw_mount': 'Becak Terikat Tulang',
+  'hudChrome.options.showTargetSwingTimer': 'Tampilkan pengatur waktu ayunan target',
+  'hudChrome.plurals.buffsHidden.one':
+    '{count} buff lagi aktif tetapi tersembunyi pada preset grafis ini',
+  'hudChrome.plurals.buffsHidden.few':
+    '{count} buff lagi aktif tetapi tersembunyi pada preset grafis ini',
+  'hudChrome.plurals.buffsHidden.many':
+    '{count} buff lagi aktif tetapi tersembunyi pada preset grafis ini',
+  'hudChrome.plurals.buffsHidden.other':
+    '{count} buff lagi aktif tetapi tersembunyi pada preset grafis ini',
+  'hudChrome.steam.wishlist': 'Masukkan ke wishlist di Steam',
+  'hudChrome.steam.wishlistAria':
+    'Masukkan ke wishlist di Steam: buka halaman toko World of ClaudeCraft',
+  'hudChrome.steam.wishlistShort': 'Wishlist',
+  'hudChrome.unitFrame.buffOverflowLabel': '+{n}',
+  'hudChrome.wocMarket.browserOnlyConfirmTitle': 'Buka Bursa $WOC di browser?',
+  'hudChrome.wocMarket.browserOnlyConfirmBody':
+    'Bursa $WOC hanya berjalan di versi browser World of ClaudeCraft. Ini membuka World of ClaudeCraft di browser, tempat kamu dapat masuk dan membuka Bursa; game tetap berjalan di sini.',
+  'hudChrome.wocMarket.browserOnlyConfirmOpen': 'Buka di Browser',
+  'hudChrome.wocMarket.browserOnlyConfirmCancel': 'Batal',
 };

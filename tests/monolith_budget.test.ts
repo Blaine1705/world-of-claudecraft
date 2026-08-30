@@ -270,7 +270,10 @@ const MONOLITHS: MonolithRow[] = [
     // call into item_affix_tooltip.ts (the Spell Power / Healing Power lines
     // themselves live in that sibling, gather_tool_tooltip pattern). Exact
     // count, zero slack; maintainer-review item.
-    ceiling: 18863,
+    // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
+    // merge: both parents had already ratcheted for their own work, so
+    // the composite is the honest size. Exact count, zero slack.
+    ceiling: 18905,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -570,7 +573,10 @@ const MONOLITHS: MonolithRow[] = [
     // exists for a single serializer line. Exact count.
     // Plus 7 for the crucible_buy command arm: the dispatch case is the
     // heroic_buy shape exactly; validation lives sim-side. Exact count.
-    ceiling: 10612,
+    // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
+    // merge: both parents had already ratcheted for their own work, so
+    // the composite is the honest size. Exact count, zero slack.
+    ceiling: 10641,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -629,7 +635,10 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned again at the PR 3685 base sync: the release arm's Bank
     // Storage wiring and this branch's mirrors both grew the file; the
     // union lands at the count below. Exact merged count, zero headroom.
-    ceiling: 5856,
+    // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
+    // merge: both parents had already ratcheted for their own work, so
+    // the composite is the honest size. Exact count, zero slack.
+    ceiling: 5908,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -678,7 +687,10 @@ const MONOLITHS: MonolithRow[] = [
     // boot clients now attach the shared forwarder) and the connection-budget
     // arithmetic to db_connection_budget.ts, paying for the VALIDATE's
     // post-unlock restructure in place. Exact count, zero slack.
-    ceiling: 4959,
+    // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
+    // merge: both parents had already ratcheted for their own work, so
+    // the composite is the honest size. Exact count, zero slack.
+    ceiling: 5145,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {
@@ -733,7 +745,10 @@ const MONOLITHS: MonolithRow[] = [
     // the operator-listing batch above): the merged file again lands below
     // both parent pins and the ratchet follows it down. Measured on the
     // merged tree. Exact count.
-    ceiling: 3918,
+    // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
+    // merge: both parents had already ratcheted for their own work, so
+    // the composite is the honest size. Exact count, zero slack.
+    ceiling: 3945,
     seam: 'a woc_market_<thing>.ts sibling behind WocMarketDeps (the drift-warn split is the template)',
   },
   {

@@ -956,7 +956,8 @@ export const cs_CZ: EnTranslations = {
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "min",
       "durationUnitHours": "h",
-      "durationUnitDays": "d"
+      "durationUnitDays": "d",
+      "buffOverflowLabel": "+{n}"
     },
     "character": {
       "modelPreview": "Náhled modelu postavy"
@@ -1386,6 +1387,7 @@ export const cs_CZ: EnTranslations = {
       "name_thunderstrut_gobbler": "Hromokrok, Velký krocan",
       "name_terrorspark_groundshaker": "Hrůzojiskra, otřásač země",
       "name_drakemaw_raptor": "Raptor z Dračí tlamy",
+      "name_rickshaw_mount": "Kostipoutaná rikša",
       "desc_valorsteed": "Otužilý, jistonohý oř poskytující zvýšenou rychlost cestování.",
       "desc_grag_bear": "Otužilý, jistonohý medvěd poskytující zvýšenou rychlost cestování.",
       "desc_stalkglider_snail": "Statný, pomalu se pohybující plž poskytující zvýšenou rychlost cestování.",
@@ -1394,7 +1396,8 @@ export const cs_CZ: EnTranslations = {
       "desc_stormfeather_griffin": "Vznešený bouřný gryf, který se plíží po zemi na rounami okovaných spárech, se složenými křídly.",
       "desc_thunderstrut_gobbler": "Kolosální krocan zrozený z bouře, který se hrdě prochází z Probouzejícího se vrcholu, s ocasem rozevřeným jako bouřkový mrak.",
       "desc_terrorspark_groundshaker": "Kompaktní obrněný stroj s těžkými pásy, velkorážním kanónem a sedlem pro nebojácné piloty.",
-      "desc_drakemaw_raptor": "Osedlaný raptor z líhně v Kaldeře Dračí tlamy, samé šlachy a hbitost, ještě slabě páchnoucí popelem."
+      "desc_drakemaw_raptor": "Osedlaný raptor z líhně v Kaldeře Dračí tlamy, samé šlachy a hbitost, ještě slabě páchnoucí popelem.",
+      "desc_rickshaw_mount": "Chrastící kostěný vozík s kostnatým pěšákem zapřaženým do ojí, který tě veze tryskem."
     },
     "mountTraining": {
       "mountPrompt": "Stiskni {key} pro nasednutí na cvičného Udatného oře.",
@@ -1564,6 +1567,7 @@ export const cs_CZ: EnTranslations = {
       "playerFrameScale": "Měřítko rámu hráče",
       "targetFrameScale": "Měřítko rámu cíle",
       "aurasOnPlayerFrame": "Buffy na rámu hráče",
+      "alwaysShowAllBuffs": "Always Show All Buffs",
       "highContrastBackground": "Vysoce kontrastní pozadí",
       "startAttackOnAbility": "Automatický útok při použití schopnosti",
       "stopAutoAttackOnTargetSwitch": "Zastavit automatický útok při přepnutí cíle",
@@ -1573,6 +1577,8 @@ export const cs_CZ: EnTranslations = {
       "stickyTarget": "Zachovat cíl při kliknutí na zem",
       "showItemLevel": "Zobrazit úroveň předmětu",
       "showReliquaryTracker": "Zobrazit Reliquary Tracker",
+      "confirmVendorSell": "Confirm Before Selling",
+      "confirmVendorSellNote": "Turning this off sells items with a single click and no confirmation, so a shifted bag slot could vendor the wrong item.",
       "itemLevelLine": "Úroveň předmětu {level}",
       "itemScoreLine": "Skóre {score}",
       "showSecondaryActionBar": "Zobrazit sekundární akční lištu",
@@ -1581,6 +1587,7 @@ export const cs_CZ: EnTranslations = {
       "hideUnusedActionSlots": "Skrýt nepoužitá políčka akcí",
       "lockActionBars": "Uzamknout akční lišty",
       "showTargetOfTarget": "Zobrazit cíl cíle",
+      "showTargetSwingTimer": "Zobrazit časovač švihu cíle",
       "showPetFrame": "Zobrazit tvého mazlíčka",
       "waterRipples": "Vlnky na vodě (brázdy)",
       "showAttackButton": "Zobrazit tlačítko útoku",
@@ -2140,6 +2147,12 @@ export const cs_CZ: EnTranslations = {
         "few": "zbývají {count} sekundy",
         "many": "zbývá {count} sekundy",
         "other": "zbývá {count} sekund"
+      },
+      "buffsHidden": {
+        "one": "Je aktivní ještě {count} posílení, ale v tomto grafickém přednastavení je skryté",
+        "few": "Jsou aktivní ještě {count} posílení, ale v tomto grafickém přednastavení jsou skrytá",
+        "many": "Je aktivních ještě {count} posílení, ale v tomto grafickém přednastavení jsou skryta",
+        "other": "Je aktivních ještě {count} posílení, ale v tomto grafickém přednastavení jsou skryta"
       },
       "playtimeDays": {
         "one": "{count} den",
@@ -3204,9 +3217,9 @@ export const cs_CZ: EnTranslations = {
       "linked": "Propojeno s účtem Steam {id}",
       "benefits": "Propoj svůj účet Steam z desktopové aplikace a skutky, které vykonáš, se budou zrcadlit do achievementů ve službě Steam.",
       "noTicket": "Steam nevydal propojovací tiket. Spusť Steam a zkus to znovu.",
-      "wishlist": "Wishlist on Steam",
-      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
-      "wishlistShort": "Wishlist"
+      "wishlist": "Přidat na seznam přání ve Steamu",
+      "wishlistAria": "Přidat na seznam přání ve Steamu: otevřít stránku obchodu World of ClaudeCraft",
+      "wishlistShort": "Seznam přání"
     },
     "epic": {
       "title": "Epic",
@@ -3875,7 +3888,9 @@ export const cs_CZ: EnTranslations = {
       "equip": "Vybavit",
       "disenchant": "Rozzačarovat",
       "salvage": "Rozebrat",
-      "applyEnchant": "Aplikovat okouzlení"
+      "applyEnchant": "Aplikovat okouzlení",
+      "sell": "Prodat",
+      "sellAll": "Prodat vše ({count})"
     },
     "enchanting": {
       "disenchantedLine": "Rozzačaruješ {item}.",
@@ -4377,6 +4392,10 @@ export const cs_CZ: EnTranslations = {
       "loading": "Načítání Burzy…",
       "loadFailed": "Burzu se nepodařilo spojit. Zkus to znovu za chvíli.",
       "disabledRealm": "Burza $WOC není na tomto realmu dostupná.",
+      "browserOnlyConfirmTitle": "Otevřít burzu $WOC v prohlížeči?",
+      "browserOnlyConfirmBody": "Burza $WOC funguje pouze v prohlížečové verzi World of ClaudeCraft. Tím se World of ClaudeCraft otevře v prohlížeči, kde se můžete přihlásit a otevřít burzu; hra zde poběží dál.",
+      "browserOnlyConfirmOpen": "Otevřít v prohlížeči",
+      "browserOnlyConfirmCancel": "Zrušit",
       "pausedBanner": "Obchodování je pozastaveno. Aukce dál odpočítávají čas; nové nabídky, příhozy, protinabídky a platby počkají, dokud se obchodování neobnoví, a už odeslaná platba se přesto vyrovná.",
       "walletLinkedDisconnected": "Your public address is linked. Reconnect that wallet app when you want to pay with $WOC.",
       "walletLinkedConnected": "Your linked wallet app is connected and ready for $WOC purchases.",
@@ -4697,7 +4716,13 @@ export const cs_CZ: EnTranslations = {
       "upstream": "Epic neodpověděl. Zkus to za chvíli znovu."
     },
     "wallet": {
-      "handoff_invalid": "Toto oprávnění peněženky vypršelo nebo je neověřitelné. Zkus to znovu."
+      "handoff_invalid": "Toto oprávnění peněženky vypršelo nebo je neověřitelné. Zkus to znovu.",
+      "reauth_required": "Potvrď tuto změnu peněženky heslem k účtu.",
+      "reauth_two_factor": "Tvůj účet má zapnuté dvoufaktorové ověření. Pro potvrzení zadej svůj kód.",
+      "reauth_no_password": "Nejdřív si v nastavení účtu nastav heslo a pak to zkus znovu.",
+      "reauth_bad_signature": "Podpis peněženky se nepodařilo ověřit. Zkus to znovu.",
+      "reauth_bad_password": "Tvoje heslo není správné.",
+      "reauth_bad_two_factor": "Tento kód není platný, zkus to znovu."
     },
     "ota_updates": {
       "invalid_input": "Neplatný vstup."
@@ -5155,6 +5180,7 @@ export const cs_CZ: EnTranslations = {
       "ifPartySort": "Pořadí, ve kterém jsou vypsáni členové skupiny: podle pořadí ve skupině, role nebo jména.",
       "ifPartyShowAuras": "Zda se na rámech skupiny zobrazují buffy a debuffy. Odpovídající přepínače pokrývají lišty zdrojů, absorpce, mazlíčky a to, jestli se objevíš ve vlastním seznamu skupiny.",
       "ifAurasOnPlayerFrame": "Přidá tvé buffy a debuffy i na rám hráče, nejen na lištu aur.",
+      "ifAlwaysShowAllBuffs": "Shows every active buff even on the Low graphics preset, bypassing its usual buff-icon cap.",
       "ifTargetOfTarget": "Zobrazí, na koho míří tvůj cíl, klasický způsob, jak poznat, jestli ho tank ještě drží.",
       "ifPetFrame": "Zobrazí rám pro tvého mazlíčka.",
       "ifChatFontScale": "Velikost textu chatu.",
@@ -7623,6 +7649,13 @@ export const cs_CZ: EnTranslations = {
     "unlink": "Odpojit od účtu",
     "unlinkTitle": "Odebrat ověření peněženky z tohoto účtu",
     "unlinkAria": "Odebrat ověření peněženky z tohoto účtu",
+    "reauthTitle": "Potvrzení změny peněženky",
+    "reauthUnlinkTitle": "Potvrzení odebrání peněženky",
+    "reauthHelp": "Z bezpečnostních důvodů zadej heslo k účtu pro povolení této změny.",
+    "reauthNoPassword": "Tento účet se přihlašuje bez hesla. Nejdřív si v nastavení účtu nastav heslo a pak to zkus znovu.",
+    "reauthConfirm": "Potvrdit",
+    "reauthCancel": "Zrušit",
+    "reauthClose": "Zavřít",
     "signOut": "Odpojit",
     "signOutTitle": "Odpojit aplikaci peněženky v tomto prohlížeči",
     "signOutAria": "Odpojit aplikaci peněženky v tomto prohlížeči",
@@ -13171,6 +13204,9 @@ export const cs_CZ: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Klíček zapalování: Hrůzojiskra, otřásač země"
+      },
+      "reins_rickshaw_mount": {
+        "name": "Spoutané otěže: Kostipoutaná rikša"
       },
       "reins_drakemaw_raptor": {
         "name": "Otěže raptora z Dračí tlamy"

@@ -2598,6 +2598,15 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'itemUi.stats.parry': 'Pareren',
   'apiError.wallet.handoff_invalid':
     'Die portemonnee-autorisatie is verlopen of kon niet worden geverifieerd. Probeer het opnieuw.',
+  'apiError.wallet.reauth_required': 'Bevestig deze portemonneewijziging met je accountwachtwoord.',
+  'apiError.wallet.reauth_two_factor':
+    'Je account heeft tweestapsverificatie ingeschakeld. Voer je code in om te bevestigen.',
+  'apiError.wallet.reauth_no_password':
+    'Stel eerst een wachtwoord in bij de accountinstellingen en probeer het opnieuw.',
+  'apiError.wallet.reauth_bad_signature':
+    'De handtekening van de portemonnee kon niet worden geverifieerd. Probeer het opnieuw.',
+  'apiError.wallet.reauth_bad_password': 'Je wachtwoord is onjuist.',
+  'apiError.wallet.reauth_bad_two_factor': 'Die code is niet geldig, probeer het opnieuw.',
   'cardDuel.close': 'Sluiten',
   'cardDuel.counts': 'Deck: {deck} - Aflegstapel: {discard}',
   'cardDuel.forfeit': 'Opgeven',
@@ -9426,6 +9435,15 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'wallet.switchTitle': 'Verifieer een andere portemonnee',
   'wallet.unlink': 'Ontkoppelen',
   'wallet.unlinkAria': 'Verwijder portemonneeverificatie van dit account',
+  'wallet.reauthTitle': 'Portemonneewijziging bevestigen',
+  'wallet.reauthUnlinkTitle': 'Portemonneeverwijdering bevestigen',
+  'wallet.reauthHelp':
+    'Voer voor je veiligheid je accountwachtwoord in om deze wijziging toe te staan.',
+  'wallet.reauthNoPassword':
+    'Dit account logt in zonder wachtwoord. Stel eerst een wachtwoord in bij de accountinstellingen en probeer het opnieuw.',
+  'wallet.reauthConfirm': 'Bevestigen',
+  'wallet.reauthCancel': 'Annuleren',
+  'wallet.reauthClose': 'Sluiten',
   'wallet.unlinkFailed': 'Kon portemonnee niet ontkoppelen.',
   'wallet.unlinkTitle': 'Verwijder portemonneeverificatie van dit account',
   'wallet.verify': 'Portemonnee verifiëren',
@@ -13858,4 +13876,30 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   "entities.abilities.nightshade_coating.description": "Bestrijkt het doelwit met nachtschade, richt {damage} natuurschade aan en vermindert de genezing die het ontvangt met 25% gedurende 12 seconden.",
   "entities.abilities.nightshade_coating.name": "Nachtschade-coating",
   "guide.settingsPage.ifShowReliquaryTracker": "Of de Reliquary-tracker (uw vastgezette pagina's en hun voortgang) op uw HUD staat. Het Reliquary-venster heeft een bijpassende oogknop, en als u een pagina vastzet, wordt de tracker weer ingeschakeld.",
+  // v0.41 release i18n fill.
+  'entities.items.reins_rickshaw_mount.name': 'Gebonden teugels: Beengebonden Riksja',
+  'hudChrome.itemMenu.sell': 'Verkopen',
+  'hudChrome.itemMenu.sellAll': 'Alles verkopen ({count})',
+  'hudChrome.mounts.desc_rickshaw_mount':
+    'Een ratelende bottenkar met een benige handlanger aan de disselbomen, die je in volle vaart voortsleurt.',
+  'hudChrome.mounts.name_rickshaw_mount': 'Beengebonden Riksja',
+  'hudChrome.options.showTargetSwingTimer': 'Aanvalstimer van doelwit tonen',
+  'hudChrome.plurals.buffsHidden.one':
+    'Er is nog {count} verbetering actief, maar die is verborgen in deze grafische preset',
+  'hudChrome.plurals.buffsHidden.few':
+    'Er zijn nog {count} verbeteringen actief, maar die zijn verborgen in deze grafische preset',
+  'hudChrome.plurals.buffsHidden.many':
+    'Er zijn nog {count} verbeteringen actief, maar die zijn verborgen in deze grafische preset',
+  'hudChrome.plurals.buffsHidden.other':
+    'Er zijn nog {count} verbeteringen actief, maar die zijn verborgen in deze grafische preset',
+  'hudChrome.steam.wishlist': 'Op verlanglijst zetten op Steam',
+  'hudChrome.steam.wishlistAria':
+    'Op verlanglijst zetten op Steam: open de winkelpagina van World of ClaudeCraft',
+  'hudChrome.steam.wishlistShort': 'Verlanglijst',
+  'hudChrome.unitFrame.buffOverflowLabel': '+{n}',
+  'hudChrome.wocMarket.browserOnlyConfirmTitle': 'De $WOC-beurs in je browser openen?',
+  'hudChrome.wocMarket.browserOnlyConfirmBody':
+    'De $WOC-beurs werkt alleen in de browserversie van World of ClaudeCraft. Hiermee wordt World of ClaudeCraft in je browser geopend, waar je kunt inloggen en de beurs kunt openen; het spel blijft hier doorgaan.',
+  'hudChrome.wocMarket.browserOnlyConfirmOpen': 'Openen in browser',
+  'hudChrome.wocMarket.browserOnlyConfirmCancel': 'Annuleren',
 };

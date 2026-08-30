@@ -956,7 +956,8 @@ export const it_IT: EnTranslations = {
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "m",
       "durationUnitHours": "h",
-      "durationUnitDays": "g"
+      "durationUnitDays": "g",
+      "buffOverflowLabel": "+{n}"
     },
     "character": {
       "modelPreview": "Anteprima del modello del personaggio"
@@ -1386,6 +1387,7 @@ export const it_IT: EnTranslations = {
       "name_thunderstrut_gobbler": "Passotuono, il Gran Tacchino",
       "name_terrorspark_groundshaker": "Terrorscintilla, Scuoteterra",
       "name_drakemaw_raptor": "Raptor di Drakemaw",
+      "name_rickshaw_mount": "Risciò Vincolato alle Ossa",
       "desc_valorsteed": "Un destriero robusto e dal passo sicuro che aumenta la velocità di viaggio.",
       "desc_grag_bear": "Un orso robusto e dal passo sicuro che aumenta la velocità di viaggio.",
       "desc_stalkglider_snail": "Una lumaca tenace e a combustione lenta che aumenta la velocità di viaggio.",
@@ -1394,7 +1396,8 @@ export const it_IT: EnTranslations = {
       "desc_stormfeather_griffin": "Un grifone della tempesta regale che incede al suolo su artigli runici, ali ripiegate.",
       "desc_thunderstrut_gobbler": "Un tacchino colossale nato dalla tempesta che scende impettito dal Picco Risvegliato, con la coda spiegata come un fronte di tempesta.",
       "desc_terrorspark_groundshaker": "Una macchina corazzata compatta con cingoli pesanti, un cannone di grosso calibro e una sella costruita per piloti impavidi.",
-      "desc_drakemaw_raptor": "Un raptor da covata domato per la sella, proveniente dalla Caldera di Drakemaw, tutto muscoli e scatto, che sa ancora vagamente di cenere."
+      "desc_drakemaw_raptor": "Un raptor da covata domato per la sella, proveniente dalla Caldera di Drakemaw, tutto muscoli e scatto, che sa ancora vagamente di cenere.",
+      "desc_rickshaw_mount": "Un carro d'ossa sferragliante, con un gregario ossuto imbragato alle stanghe, che ti trascina in una corsa sfrenata."
     },
     "mountTraining": {
       "mountPrompt": "Premi {key} per salire sul Valorsteed di addestramento.",
@@ -1564,6 +1567,7 @@ export const it_IT: EnTranslations = {
       "playerFrameScale": "Scala del riquadro del giocatore",
       "targetFrameScale": "Scala del riquadro del bersaglio",
       "aurasOnPlayerFrame": "Buff sul riquadro del giocatore",
+      "alwaysShowAllBuffs": "Always Show All Buffs",
       "highContrastBackground": "Sfondo a contrasto elevato",
       "startAttackOnAbility": "Attacco automatico all'uso dell'abilita",
       "stopAutoAttackOnTargetSwitch": "Ferma l'Attacco Automatico al Cambio Bersaglio",
@@ -1573,6 +1577,8 @@ export const it_IT: EnTranslations = {
       "stickyTarget": "Mantieni il bersaglio al clic a terra",
       "showItemLevel": "Mostra livello oggetto",
       "showReliquaryTracker": "Mostra tracker del reliquiario",
+      "confirmVendorSell": "Confirm Before Selling",
+      "confirmVendorSellNote": "Turning this off sells items with a single click and no confirmation, so a shifted bag slot could vendor the wrong item.",
       "itemLevelLine": "Livello oggetto {level}",
       "itemScoreLine": "Punteggio {score}",
       "showSecondaryActionBar": "Mostra la barra delle azioni secondaria",
@@ -1581,6 +1587,7 @@ export const it_IT: EnTranslations = {
       "hideUnusedActionSlots": "Nascondi gli slot azione inutilizzati",
       "lockActionBars": "Blocca le barre azione",
       "showTargetOfTarget": "Mostra il bersaglio del bersaglio",
+      "showTargetSwingTimer": "Mostra timer degli attacchi del bersaglio",
       "showPetFrame": "Mostra il tuo famiglio",
       "waterRipples": "Increspature dell'acqua (scie)",
       "showAttackButton": "Mostra Pulsante Attacco",
@@ -2140,6 +2147,12 @@ export const it_IT: EnTranslations = {
         "few": "{count} secondi rimanenti",
         "many": "{count} secondi rimanenti",
         "other": "{count} secondi rimanenti"
+      },
+      "buffsHidden": {
+        "one": "È attivo {count} altro beneficio, ma è nascosto con questa preimpostazione grafica",
+        "few": "Sono attivi {count} altri benefici, ma sono nascosti con questa preimpostazione grafica",
+        "many": "Sono attivi {count} altri benefici, ma sono nascosti con questa preimpostazione grafica",
+        "other": "Sono attivi {count} altri benefici, ma sono nascosti con questa preimpostazione grafica"
       },
       "playtimeDays": {
         "one": "{count} giorno",
@@ -3204,9 +3217,9 @@ export const it_IT: EnTranslations = {
       "linked": "Collegato all'account Steam {id}",
       "benefits": "Collega il tuo account Steam dall'app desktop per rispecchiare le imprese che ottieni negli obiettivi di Steam.",
       "noTicket": "Steam non ha fornito un ticket di collegamento. Avvia Steam e riprova.",
-      "wishlist": "Wishlist on Steam",
-      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
-      "wishlistShort": "Wishlist"
+      "wishlist": "Aggiungi alla lista desideri su Steam",
+      "wishlistAria": "Aggiungi alla lista desideri su Steam: apri la pagina del negozio di World of ClaudeCraft",
+      "wishlistShort": "Lista desideri"
     },
     "epic": {
       "title": "Epic",
@@ -3875,7 +3888,9 @@ export const it_IT: EnTranslations = {
       "equip": "Equipaggia",
       "disenchant": "Disincanta",
       "salvage": "Smantella",
-      "applyEnchant": "Applica Incantesimo"
+      "applyEnchant": "Applica Incantesimo",
+      "sell": "Vendi",
+      "sellAll": "Vendi tutto ({count})"
     },
     "enchanting": {
       "disenchantedLine": "Disincanti {item}.",
@@ -4377,6 +4392,10 @@ export const it_IT: EnTranslations = {
       "loading": "Caricamento della Borsa...",
       "loadFailed": "Impossibile raggiungere la Borsa. Riprova tra poco.",
       "disabledRealm": "La Borsa $WOC non è disponibile su questo reame.",
+      "browserOnlyConfirmTitle": "Aprire la Borsa $WOC nel browser?",
+      "browserOnlyConfirmBody": "La Borsa $WOC funziona solo nella versione browser di World of ClaudeCraft. Questo apre World of ClaudeCraft nel browser, dove puoi accedere e aprire la Borsa; il gioco continua qui.",
+      "browserOnlyConfirmOpen": "Apri nel browser",
+      "browserOnlyConfirmCancel": "Annulla",
       "pausedBanner": "Le contrattazioni sono in pausa. Le aste continuano il conto alla rovescia; nuove inserzioni, offerte, acquisti immediati e pagamenti attendono che le contrattazioni riprendano, e un pagamento già inviato viene comunque saldato.",
       "walletLinkedDisconnected": "Your public address is linked. Reconnect that wallet app when you want to pay with $WOC.",
       "walletLinkedConnected": "Your linked wallet app is connected and ready for $WOC purchases.",
@@ -4697,7 +4716,13 @@ export const it_IT: EnTranslations = {
       "upstream": "Epic non ha risposto. Riprova tra un momento."
     },
     "wallet": {
-      "handoff_invalid": "L'autorizzazione del portafoglio è scaduta o non ha potuto essere verificata. Riprova."
+      "handoff_invalid": "L'autorizzazione del portafoglio è scaduta o non ha potuto essere verificata. Riprova.",
+      "reauth_required": "Conferma questa modifica del portafoglio con la password del tuo account.",
+      "reauth_two_factor": "Il tuo account ha l'autenticazione a due fattori attiva. Inserisci il tuo codice per confermare.",
+      "reauth_no_password": "Imposta prima una password nelle impostazioni dell'account, poi riprova.",
+      "reauth_bad_signature": "Impossibile verificare la firma del portafoglio. Riprova.",
+      "reauth_bad_password": "La tua password non è corretta.",
+      "reauth_bad_two_factor": "Questo codice non è valido, riprova."
     },
     "ota_updates": {
       "invalid_input": "Dati non validi."
@@ -5155,6 +5180,7 @@ export const it_IT: EnTranslations = {
       "ifPartySort": "L'ordine in cui sono elencati i membri del gruppo: ordine di gruppo, ruolo, o nome.",
       "ifPartyShowAuras": "Se buff e debuff compaiono sui riquadri del gruppo. Interruttori corrispondenti coprono le barre risorsa, gli assorbimenti, i famigli e se compari nella tua stessa lista del gruppo.",
       "ifAurasOnPlayerFrame": "Mette i tuoi buff e debuff sul tuo riquadro del giocatore oltre che sulla barra delle aure.",
+      "ifAlwaysShowAllBuffs": "Shows every active buff even on the Low graphics preset, bypassing its usual buff-icon cap.",
       "ifTargetOfTarget": "Mostra chi sta bersagliando il tuo bersaglio, il modo classico per capire se il tank ha ancora la minaccia.",
       "ifPetFrame": "Mostra un riquadro per il tuo famiglio.",
       "ifChatFontScale": "Dimensione del testo della chat.",
@@ -7623,6 +7649,13 @@ export const it_IT: EnTranslations = {
     "unlink": "Scollega",
     "unlinkTitle": "Rimuovi la verifica del portafoglio da questo account",
     "unlinkAria": "Rimuovi la verifica del portafoglio da questo account",
+    "reauthTitle": "Conferma modifica del portafoglio",
+    "reauthUnlinkTitle": "Conferma rimozione del portafoglio",
+    "reauthHelp": "Per la tua sicurezza, inserisci la password del tuo account per autorizzare questa modifica.",
+    "reauthNoPassword": "Questo account accede senza password. Imposta prima una password nelle impostazioni dell'account, poi riprova.",
+    "reauthConfirm": "Conferma",
+    "reauthCancel": "Annulla",
+    "reauthClose": "Chiudi",
     "signOut": "Disconnetti",
     "signOutTitle": "Disconnetti l'app del portafoglio su questo browser",
     "signOutAria": "Disconnetti l'app del portafoglio su questo browser",
@@ -13171,6 +13204,9 @@ export const it_IT: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Chiave d’accensione: Terrorscintilla, Scuoteterra"
+      },
+      "reins_rickshaw_mount": {
+        "name": "Redini vincolate: Risciò Vincolato alle Ossa"
       },
       "reins_drakemaw_raptor": {
         "name": "Redini del Raptor di Drakemaw"

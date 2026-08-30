@@ -2609,6 +2609,16 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'itemUi.stats.parry': 'Aparar',
   'apiError.wallet.handoff_invalid':
     'Essa autorização de carteira expirou ou não pôde ser verificada. Tente novamente.',
+  'apiError.wallet.reauth_required':
+    'Confirme esta alteração de carteira com a senha da sua conta.',
+  'apiError.wallet.reauth_two_factor':
+    'Sua conta tem a autenticação em duas etapas ativada. Digite seu código para confirmar.',
+  'apiError.wallet.reauth_no_password':
+    'Primeiro defina uma senha nas configurações da conta e tente novamente.',
+  'apiError.wallet.reauth_bad_signature':
+    'Não foi possível verificar a assinatura da carteira. Tente novamente.',
+  'apiError.wallet.reauth_bad_password': 'Sua senha está incorreta.',
+  'apiError.wallet.reauth_bad_two_factor': 'Esse código não é válido, tente novamente.',
   'cardDuel.close': 'Fechar',
   'cardDuel.counts': 'Baralho: {deck} · Descarte: {discard}',
   'cardDuel.forfeit': 'Desistir',
@@ -4841,6 +4851,15 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'wallet.unlink': 'Desvincular',
   'wallet.unlinkTitle': 'Remover a verificação da carteira desta conta',
   'wallet.unlinkAria': 'Remover a verificação da carteira desta conta',
+  'wallet.reauthTitle': 'Confirmar alteração de carteira',
+  'wallet.reauthUnlinkTitle': 'Confirmar remoção de carteira',
+  'wallet.reauthHelp':
+    'Para sua segurança, digite a senha da sua conta para autorizar esta alteração.',
+  'wallet.reauthNoPassword':
+    'Esta conta entra sem senha. Primeiro defina uma senha nas configurações da conta e tente novamente.',
+  'wallet.reauthConfirm': 'Confirmar',
+  'wallet.reauthCancel': 'Cancelar',
+  'wallet.reauthClose': 'Fechar',
   'wallet.signOut': 'Desconectar',
   'wallet.signOutTitle': 'Desconectar o app da carteira neste navegador',
   'wallet.signOutAria': 'Desconectar o app da carteira neste navegador',
@@ -13861,4 +13880,30 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   "entities.abilities.nightshade_coating.description": "Cobre o alvo com beladona, causando {damage} de dano de Natureza e reduzindo em 25% a cura que ele recebe por 12 s.",
   "entities.abilities.nightshade_coating.name": "Revestimento de erva-moura",
   "guide.settingsPage.ifShowReliquaryTracker": "Se o rastreador do Relicário (suas páginas fixadas e seu progresso) está no seu HUD. A janela do Relicário tem um botão de olho correspondente e fixar uma página ativa o rastreador novamente.",
+  // v0.41 release i18n fill.
+  'entities.items.reins_rickshaw_mount.name': 'Rédeas vinculadas: Riquixá de Ossos Vinculados',
+  'hudChrome.itemMenu.sell': 'Vender',
+  'hudChrome.itemMenu.sellAll': 'Vender tudo ({count})',
+  'hudChrome.mounts.desc_rickshaw_mount':
+    'Uma carroça de ossos rangente, com um serviçal ossudo atrelado às varas, puxando você em disparada.',
+  'hudChrome.mounts.name_rickshaw_mount': 'Riquixá de Ossos Vinculados',
+  'hudChrome.options.showTargetSwingTimer': 'Mostrar temporizador de ataque do alvo',
+  'hudChrome.plurals.buffsHidden.one':
+    'Mais {count} bônus está ativo, mas oculto nesta predefinição gráfica',
+  'hudChrome.plurals.buffsHidden.few':
+    'Mais {count} bônus estão ativos, mas ocultos nesta predefinição gráfica',
+  'hudChrome.plurals.buffsHidden.many':
+    'Mais {count} bônus estão ativos, mas ocultos nesta predefinição gráfica',
+  'hudChrome.plurals.buffsHidden.other':
+    'Mais {count} bônus estão ativos, mas ocultos nesta predefinição gráfica',
+  'hudChrome.steam.wishlist': 'Adicionar à lista de desejos no Steam',
+  'hudChrome.steam.wishlistAria':
+    'Adicionar à lista de desejos no Steam: abrir a página de World of ClaudeCraft na loja',
+  'hudChrome.steam.wishlistShort': 'Lista de desejos',
+  'hudChrome.unitFrame.buffOverflowLabel': '+{n}',
+  'hudChrome.wocMarket.browserOnlyConfirmTitle': 'Abrir a Bolsa $WOC no navegador?',
+  'hudChrome.wocMarket.browserOnlyConfirmBody':
+    'A Bolsa $WOC funciona apenas na versão de navegador de World of ClaudeCraft. Isto abre World of ClaudeCraft no seu navegador, onde você pode entrar e abrir a Bolsa; o jogo continua rodando aqui.',
+  'hudChrome.wocMarket.browserOnlyConfirmOpen': 'Abrir no navegador',
+  'hudChrome.wocMarket.browserOnlyConfirmCancel': 'Cancelar',
 };

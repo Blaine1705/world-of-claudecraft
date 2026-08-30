@@ -7,9 +7,10 @@
     "applyHeal core: crit branch (rng.chance(spellCrit) draw), overheal clamp, heal2 emit",
     "hexOutputMult outgoing cut (hex on source) + healingTakenMult Mortal-Wound cut (target)",
     "consumeHealAbsorb soak: small shield depletes+filters, big shield survives",
+    "consumeHealAbsorb from HoT ticks: the periodic arm drains the shield too",
     "healingThreat even split across multiple aware mobs (entities.values insertion order)",
     "threatEntryMatchesEntity direct-target + pet-owner branches",
-    "hot aura-tick heal path (healingTakenMult ~3089 + healingThreat ~3101)",
+    "hot aura-tick heal path (healingTakenMult + consumeHealAbsorb + healingThreat)",
     "dealDamage consumers: critVulnBonus (crit-only) + hexOutputMult on a damage hit",
     "multi-class healers: priest/paladin/druid/shaman"
   ],
@@ -1805,8 +1806,8 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1008,
-      "state": "dac972b9",
-      "events": "c5051efd",
+      "state": "09cea488",
+      "events": "81472b5b",
       "rng": {
         "draws": 10,
         "digest": "3c49d817"
@@ -1816,7 +1817,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 1008,
-      "state": "6e05046e",
+      "state": "ad0b74d1",
       "events": "c5051efd",
       "rng": {
         "draws": 10,
@@ -2411,16 +2412,6 @@
               "sourceId": 1003
             },
             {
-              "duration": 60,
-              "id": "absorb_big",
-              "kind": "heal_absorb",
-              "name": "Necrotic",
-              "remaining": 59.6,
-              "school": "physical",
-              "sourceId": 1005,
-              "value": 3700
-            },
-            {
               "duration": 3,
               "id": "hot_tk",
               "kind": "hot",
@@ -2443,7 +2434,7 @@
           "fallStartY": -1.48336,
           "fiveSecondRule": 99.4,
           "healPower": 5,
-          "hp": 3200,
+          "hp": 2800,
           "id": 1003,
           "kind": "player",
           "level": 1,
@@ -2504,7 +2495,7 @@
           "overpowerUntil": -1,
           "ownerId": 1003,
           "petMode": "defensive",
-          "petPathCooldown": 0.2,
+          "petPathCooldown": 0.3,
           "pos": {
             "x": 30,
             "y": -1.48336,
@@ -2593,7 +2584,7 @@
             ],
             [
               1001,
-              343.5
+              293.5
             ],
             [
               1003,
@@ -2654,7 +2645,7 @@
             ],
             [
               1001,
-              237.5
+              187.5
             ],
             [
               1003,
@@ -2721,7 +2712,7 @@
             ],
             [
               1001,
-              237.5
+              187.5
             ],
             [
               1004,

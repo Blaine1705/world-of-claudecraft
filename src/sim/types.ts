@@ -3891,6 +3891,11 @@ export interface ZonePropsDef {
     /** ride the water surface instead of the seabed (moored ships/boats);
      * sunk this many yd below the waterline (the hull's draft) */
     float?: number;
+    /** A standable top (crate/rock family, see `colliders.ts`): this many yd
+     * above ground, a mover may land and stand on it instead of the piece
+     * colliding as a full-height wall. Requires `r` (or `hw`/`hd`) for the
+     * footprint; omit for ordinary full-height or walk-through decor. */
+    standableTop?: number;
   }[];
 }
 
@@ -6088,8 +6093,8 @@ export type SimEvent = { pid?: number } & (
       // Healing lost to the missing-hp clamp (parse fidelity 7.1), omitted
       // when zero. Computed AFTER heal-absorb consumption, so absorbed and
       // overheal never double-count the same lost healing. Set at every
-      // clamped heal2 emit site; a tick whose heal fully overheals still
-      // emits nothing (those sites gate on healed > 0, unchanged).
+      // clamped heal2 emit site; a tick whose heal fully overheals without
+      // draining a heal-absorb shield still emits nothing.
       overheal?: number;
     }
   // visual-only cue for the renderer: spell projectiles, channel beams, dot

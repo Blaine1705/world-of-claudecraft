@@ -381,7 +381,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // honor pieces and the 3 fishing additions (the koi and both rods):
     // 242 + 16 + 29 + 47 + 3 = 337, plus the three daggers the v0.36.0 release
     // merge added to live content (rimefang on the Rift page, duskwhisper on
-    // Wildheart Basin, boneglass_shiv on Spoils): 340. Catalog growth reverts
+    // Wildheart Basin, boneglass_shiv on Spoils): 340, plus the Bonebound
+    // Rickshaw's new horizons_mounts slot: 341. Catalog growth reverts
     // page completion for finished players, per docs/design/reliquary.md.
     // The two excludeFromCompletion pages add
     // slots and 0 to BOTH pairs: the Vault of Ages contributes four retired
@@ -390,8 +391,9 @@ describe('Reliquary Conqueror catalog structure', () => {
     // vault and riftbound pins in this file and tests/reliquary_state.test.ts
     // hold both sides), so neither page moves these two literals.
     // The four Crucible raid pages add 41 distinct new item ids (17 arena
-    // epics, 16 wing epics, 3 + 5 heroic-only weapons and shields): 381.
-    expect(full).toEqual({ owned: 385, total: 385 });
+    // epics, 16 wing epics, 3 + 5 heroic-only weapons and shields), on top of
+    // the batch's own page: 340 + 1 + 45.
+    expect(full).toEqual({ owned: 386, total: 386 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -399,10 +401,11 @@ describe('Reliquary Conqueror catalog structure', () => {
       deedsEarned: allOwned,
     });
     // Literal: update when catalog content lands (same deltas as the overview
-    // pair above, including the three release-merged daggers and the 41
-    // Crucible raid relics; marks are character-scoped, so this trails the
-    // overview by the 29 account-scoped weapon skins).
-    expect(character).toEqual({ owned: 356, total: 356 });
+    // pair above, including the three release-merged daggers, the Bonebound
+    // Rickshaw's new mount slot and the 41 Crucible raid relics; marks are
+    // character-scoped, so this trails the overview by the 29 account-scoped
+    // weapon skins).
+    expect(character).toEqual({ owned: 357, total: 357 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -412,7 +415,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // catalog by 4, and the measured value wins), and the seven Phase 21
     // pages add 123 slots (16 Rift + 19 slain marks + 31 Spoils + 47
     // Warfare + 3 fishing + 4 retired vault + 3 Riftbound bands): 372, plus the
-    // three daggers the v0.36.0 release merge added to live content: 375 total.
+    // three daggers the v0.36.0 release merge added to live content: 375,
+    // plus the Bonebound Rickshaw's new horizons_mounts slot: 376 total.
     // Slots, not unique relics: the two Spoils set repeats count again here,
     // and the seven excludeFromCompletion slots (four vault, three bands)
     // count here while adding zero to every completion pair, which is why this
@@ -430,7 +434,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(420);
+    ).toBe(421);
     // Distinct mark ids: the 10 shipped before Phase 21 plus the 19
     // rare-slain proofs of conquerors_rares_of_the_realm.
     expect(
@@ -2503,7 +2507,7 @@ const RELIC_SLOTS = RELIQUARY_PAGES.flatMap((page) =>
  * row here in the same change.
  */
 const SOURCE_PENDING_RULING: Readonly<Record<string, readonly string[]>> = {
-  // The three gaps are CONTENT gaps, not vocabulary gaps: no live table awards
+  // The four gaps are CONTENT gaps, not vocabulary gaps: no live table awards
   // any of them, so there is no door to name. Every other slot the catalog
   // used to leave pending turned out to be a several-doors slot rather than a
   // no-answer slot, and Phase 13b authored all of them (a relic lists every
@@ -2514,7 +2518,10 @@ const SOURCE_PENDING_RULING: Readonly<Record<string, readonly string[]>> = {
   // slot stays listed and sourceless until the mount gets a route.
   // terrorspark_groundshaker: dev-grant only, deliberately absent from vendors,
   // quests, mob loot, heroic loot, and the rift reins pools.
-  horizons_mounts: ['drakemaw_raptor', 'terrorspark_groundshaker'],
+  // rickshaw_mount: same shape as terrorspark_groundshaker, dev-grant only,
+  // no player-facing acquisition path yet (see the def comment in
+  // content/mounts.ts).
+  horizons_mounts: ['drakemaw_raptor', 'terrorspark_groundshaker', 'rickshaw_mount'],
   // masterwork:engineering: unearnable, QA ruling 2026-08-07. Every live
   // engineering recipe produces a slotless, statless tool, masterworkBonusStats
   // returns null for all of them, so the masterwork proc can never fire and
@@ -3473,7 +3480,7 @@ describe('Reliquary source hint coverage', () => {
     ).toBe(true);
   });
 
-  it('the surviving pending rows are the three slots content awards no route at all', () => {
+  it('the surviving pending rows are the four slots content awards no route at all', () => {
     // The page-wide Horizons rulings are EXECUTED: mounts and skins are no
     // longer derived from the catalog lists (the derivation era ended when the
     // rulings landed), so the identity pins to RELIQUARY_HORIZON_MOUNTS and
@@ -3487,6 +3494,7 @@ describe('Reliquary source hint coverage', () => {
     expect(SOURCE_PENDING_RULING.horizons_mounts).toEqual([
       'drakemaw_raptor',
       'terrorspark_groundshaker',
+      'rickshaw_mount',
     ]);
     // masterwork:engineering pended by the QA ruling 2026-08-07: no
     // engineering recipe can proc a masterwork (see the gear-capability pin),

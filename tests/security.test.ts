@@ -118,6 +118,7 @@ describe('websocket authentication', () => {
       dungeonEntryFacingWire: DUNGEON_ENTRY_FACING_WIRE_VERSION,
       timerWire: STABLE_TIMER_WIRE_VERSION,
       petSpecialWire: PET_SPECIAL_WIRE_VERSION,
+      movementWire: 2,
     });
   });
 
@@ -130,6 +131,7 @@ describe('websocket authentication', () => {
       dungeonEntryFacingWire: DUNGEON_ENTRY_FACING_WIRE_VERSION,
       timerWire: STABLE_TIMER_WIRE_VERSION,
       petSpecialWire: PET_SPECIAL_WIRE_VERSION,
+      movementWire: 2,
     });
   });
 });

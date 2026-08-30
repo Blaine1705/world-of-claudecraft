@@ -956,7 +956,8 @@ export const id_ID: EnTranslations = {
       "durationUnitSeconds": "d",
       "durationUnitMinutes": "m",
       "durationUnitHours": "j",
-      "durationUnitDays": "h"
+      "durationUnitDays": "h",
+      "buffOverflowLabel": "+{n}"
     },
     "character": {
       "modelPreview": "Pratinjau Model Karakter"
@@ -1386,6 +1387,7 @@ export const id_ID: EnTranslations = {
       "name_thunderstrut_gobbler": "Thunderstrut Sang Kalkun Agung",
       "name_terrorspark_groundshaker": "Percik Teror, Pengguncang Bumi",
       "name_drakemaw_raptor": "Raptor Drakemaw",
+      "name_rickshaw_mount": "Becak Terikat Tulang",
       "desc_valorsteed": "Kuda tunggangan tangguh berpijakan mantap yang memberikan kecepatan perjalanan tambahan.",
       "desc_grag_bear": "Beruang tangguh berpijakan mantap yang memberikan kecepatan perjalanan tambahan.",
       "desc_stalkglider_snail": "Siput ulet berenergi tahan lama yang memberikan kecepatan perjalanan tambahan.",
@@ -1394,7 +1396,8 @@ export const id_ID: EnTranslations = {
       "desc_stormfeather_griffin": "Griffin badai yang anggun, melangkah di tanah dengan cakar bersepatu rune, sayap terlipat rapat.",
       "desc_thunderstrut_gobbler": "Kalkun raksasa tetasan badai yang melenggak-lenggok turun dari Puncak yang Terjaga, ekornya terkembang bagai awan guntur.",
       "desc_terrorspark_groundshaker": "Mesin lapis baja ringkas dengan rantai roda berat, meriam berkaliber besar, dan pelana yang dibuat untuk pilot tanpa rasa takut.",
-      "desc_drakemaw_raptor": "Seekor raptor sarang dari Kaldera Drakemaw yang telah dijinakkan untuk ditunggangi, seluruhnya otot dan kecepatan, masih samar berbau abu."
+      "desc_drakemaw_raptor": "Seekor raptor sarang dari Kaldera Drakemaw yang telah dijinakkan untuk ditunggangi, seluruhnya otot dan kecepatan, masih samar berbau abu.",
+      "desc_rickshaw_mount": "Gerobak tulang yang berderak, dengan serdadu kurus bertulang diikat pada porosnya, menarikmu melaju kencang."
     },
     "mountTraining": {
       "mountPrompt": "Tekan {key} untuk menaiki Valorsteed latihan.",
@@ -1564,6 +1567,7 @@ export const id_ID: EnTranslations = {
       "playerFrameScale": "Skala Bingkai Pemain",
       "targetFrameScale": "Skala Bingkai Sasaran",
       "aurasOnPlayerFrame": "Buff pada Bingkai Pemain",
+      "alwaysShowAllBuffs": "Always Show All Buffs",
       "highContrastBackground": "Latar Kontras Tinggi",
       "startAttackOnAbility": "Serangan Otomatis Saat Memakai Kemampuan",
       "stopAutoAttackOnTargetSwitch": "Hentikan Serangan Otomatis Saat Ganti Target",
@@ -1573,6 +1577,8 @@ export const id_ID: EnTranslations = {
       "stickyTarget": "Pertahankan Sasaran Saat Klik Tanah",
       "showItemLevel": "Tampilkan Level Item",
       "showReliquaryTracker": "Tampilkan Pelacak Relikui",
+      "confirmVendorSell": "Confirm Before Selling",
+      "confirmVendorSellNote": "Turning this off sells items with a single click and no confirmation, so a shifted bag slot could vendor the wrong item.",
       "itemLevelLine": "Level Item {level}",
       "itemScoreLine": "Skor {score}",
       "showSecondaryActionBar": "Tampilkan Bilah Aksi Sekunder",
@@ -1581,6 +1587,7 @@ export const id_ID: EnTranslations = {
       "hideUnusedActionSlots": "Sembunyikan Slot Aksi yang Tidak Terpakai",
       "lockActionBars": "Kunci Bilah Aksi",
       "showTargetOfTarget": "Tampilkan Sasaran dari Sasaran",
+      "showTargetSwingTimer": "Tampilkan pengatur waktu ayunan target",
       "showPetFrame": "Tampilkan Peliharaan Anda",
       "waterRipples": "Riak Air (Ombak Jejak)",
       "showAttackButton": "Tampilkan Tombol Serang",
@@ -2140,6 +2147,12 @@ export const id_ID: EnTranslations = {
         "few": "{count} detik tersisa",
         "many": "{count} detik tersisa",
         "other": "{count} detik tersisa"
+      },
+      "buffsHidden": {
+        "one": "{count} buff lagi aktif tetapi tersembunyi pada preset grafis ini",
+        "few": "{count} buff lagi aktif tetapi tersembunyi pada preset grafis ini",
+        "many": "{count} buff lagi aktif tetapi tersembunyi pada preset grafis ini",
+        "other": "{count} buff lagi aktif tetapi tersembunyi pada preset grafis ini"
       },
       "playtimeDays": {
         "one": "{count} hari",
@@ -3204,8 +3217,8 @@ export const id_ID: EnTranslations = {
       "linked": "Tertaut ke akun Steam {id}",
       "benefits": "Tautkan akun Steam-mu dari aplikasi desktop agar jasa yang kamu raih tercermin sebagai pencapaian Steam.",
       "noTicket": "Steam tidak memberikan tiket penautan. Jalankan Steam, lalu coba lagi.",
-      "wishlist": "Wishlist on Steam",
-      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
+      "wishlist": "Masukkan ke wishlist di Steam",
+      "wishlistAria": "Masukkan ke wishlist di Steam: buka halaman toko World of ClaudeCraft",
       "wishlistShort": "Wishlist"
     },
     "epic": {
@@ -3875,7 +3888,9 @@ export const id_ID: EnTranslations = {
       "equip": "Pakai",
       "disenchant": "Hancurkan Pemantraan",
       "salvage": "Salvasi",
-      "applyEnchant": "Terapkan Mantrai"
+      "applyEnchant": "Terapkan Mantrai",
+      "sell": "Jual",
+      "sellAll": "Jual semua ({count})"
     },
     "enchanting": {
       "disenchantedLine": "Kamu menghancurkan pemantraan {item}.",
@@ -4377,6 +4392,10 @@ export const id_ID: EnTranslations = {
       "loading": "Memuat Bursa...",
       "loadFailed": "Bursa tidak dapat dihubungi. Coba lagi sebentar lagi.",
       "disabledRealm": "Bursa $WOC tidak tersedia di realm ini.",
+      "browserOnlyConfirmTitle": "Buka Bursa $WOC di browser?",
+      "browserOnlyConfirmBody": "Bursa $WOC hanya berjalan di versi browser World of ClaudeCraft. Ini membuka World of ClaudeCraft di browser, tempat kamu dapat masuk dan membuka Bursa; game tetap berjalan di sini.",
+      "browserOnlyConfirmOpen": "Buka di Browser",
+      "browserOnlyConfirmCancel": "Batal",
       "pausedBanner": "Perdagangan sedang dijeda. Lelang tetap menghitung mundur; daftar baru, penawaran, tawaran, dan pembayaran menunggu sampai perdagangan berlanjut kembali, dan pembayaran yang sudah dikirim tetap dilunasi.",
       "walletLinkedDisconnected": "Your public address is linked. Reconnect that wallet app when you want to pay with $WOC.",
       "walletLinkedConnected": "Your linked wallet app is connected and ready for $WOC purchases.",
@@ -4697,7 +4716,13 @@ export const id_ID: EnTranslations = {
       "upstream": "Epic tidak merespons. Coba lagi sebentar lagi."
     },
     "wallet": {
-      "handoff_invalid": "Otorisasi dompet itu telah kedaluwarsa atau tidak dapat diverifikasi. Coba lagi."
+      "handoff_invalid": "Otorisasi dompet itu telah kedaluwarsa atau tidak dapat diverifikasi. Coba lagi.",
+      "reauth_required": "Konfirmasi perubahan dompet ini dengan kata sandi akun Anda.",
+      "reauth_two_factor": "Akun Anda mengaktifkan autentikasi dua-faktor. Masukkan kode Anda untuk konfirmasi.",
+      "reauth_no_password": "Atur kata sandi di pengaturan akun terlebih dahulu, lalu coba lagi.",
+      "reauth_bad_signature": "Tanda tangan dompet tidak dapat diverifikasi. Coba lagi.",
+      "reauth_bad_password": "Kata sandi Anda salah.",
+      "reauth_bad_two_factor": "Kode itu tidak valid, coba lagi."
     },
     "ota_updates": {
       "invalid_input": "Masukan tidak valid."
@@ -5155,6 +5180,7 @@ export const id_ID: EnTranslations = {
       "ifPartySort": "Urutan anggota party dicantumkan: urutan grup, peran, atau nama.",
       "ifPartyShowAuras": "Apakah buff dan debuff ditampilkan pada bingkai party. Sakelar serupa mencakup bilah sumber daya, penyerapan, peliharaan, dan apakah Anda muncul pada daftar party Anda sendiri.",
       "ifAurasOnPlayerFrame": "Menampilkan buff dan debuff Anda pada bingkai unit Anda sendiri selain di bilah aura.",
+      "ifAlwaysShowAllBuffs": "Shows every active buff even on the Low graphics preset, bypassing its usual buff-icon cap.",
       "ifTargetOfTarget": "Menampilkan siapa yang sedang disasar oleh sasaran Anda, cara klasik untuk mengetahui apakah tank masih memegangnya.",
       "ifPetFrame": "Menampilkan bingkai untuk peliharaan Anda.",
       "ifChatFontScale": "Ukuran teks obrolan.",
@@ -7623,6 +7649,13 @@ export const id_ID: EnTranslations = {
     "unlink": "Lepas Tautan",
     "unlinkTitle": "Hapus verifikasi dompet dari akun ini",
     "unlinkAria": "Hapus verifikasi dompet dari akun ini",
+    "reauthTitle": "Konfirmasi perubahan dompet",
+    "reauthUnlinkTitle": "Konfirmasi penghapusan dompet",
+    "reauthHelp": "Demi keamanan Anda, masukkan kata sandi akun untuk mengizinkan perubahan ini.",
+    "reauthNoPassword": "Akun ini masuk tanpa kata sandi. Atur kata sandi di pengaturan akun terlebih dahulu, lalu coba lagi.",
+    "reauthConfirm": "Konfirmasi",
+    "reauthCancel": "Batal",
+    "reauthClose": "Tutup",
     "signOut": "Putuskan Hubungan",
     "signOutTitle": "Putuskan hubungan aplikasi dompet di peramban ini",
     "signOutAria": "Putuskan hubungan aplikasi dompet di peramban ini",
@@ -13171,6 +13204,9 @@ export const id_ID: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Kunci Kontak: Percik Teror, Pengguncang Bumi"
+      },
+      "reins_rickshaw_mount": {
+        "name": "Kendali Terikat: Becak Terikat Tulang"
       },
       "reins_drakemaw_raptor": {
         "name": "Tali Kekang Raptor Drakemaw"

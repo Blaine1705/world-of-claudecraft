@@ -705,6 +705,14 @@ export const hudChromeStrings = {
     durationUnitMinutes: 'm',
     durationUnitHours: 'h',
     durationUnitDays: 'd',
+    // The badge label on the player's own buff row (#buff-bar) when the LOW graphics
+    // preset's aura cap (auraVisibleCap, src/game/ui_tier_knobs.ts) has shed {n} cosmetic
+    // buff icons past the cap (docs/design/graphics-settings-fairness.md: hiding a buff
+    // ICON removes no actionable information, the aura stays active either way). {n} is
+    // the shed count (formatNumber). Kept NON-WORDY (a bare "+" plus a number, no
+    // four-plus consecutive-lowercase run) so an English-filled non-Latin locale does not
+    // trip the M16 untranslated-leak guard.
+    buffOverflowLabel: '+{n}',
   },
   // Character sheet (#char-window) accessible names. modelPreview names the role=img 3D
   // turntable HOST distinctly from the title's level/class subtitle (the canvas pixels
@@ -1583,6 +1591,7 @@ export const hudChromeStrings = {
     name_thunderstrut_gobbler: 'Thunderstrut the Grand Gobbler',
     name_terrorspark_groundshaker: 'Terrorspark Groundshaker',
     name_drakemaw_raptor: 'Drakemaw Raptor',
+    name_rickshaw_mount: 'Bonebound Rickshaw',
     desc_valorsteed: 'A hardy, sure-footed steed that provides enhanced travel speed.',
     desc_grag_bear: 'A hardy, sure-footed bear that provides enhanced travel speed.',
     desc_stalkglider_snail: 'A hearty, slow-burning snail that provides enhanced travel speed.',
@@ -1598,6 +1607,8 @@ export const hudChromeStrings = {
       'A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots.',
     desc_drakemaw_raptor:
       'A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash.',
+    desc_rickshaw_mount:
+      'A rattling bone-cart with a bony grunt harnessed to the shafts, hauling you along at a dead run.',
   },
   // The riding lesson at the Highwatch stables (q_riding_lessons): Stablemaster
   // Marla lends the player a training Valorsteed for the paddock race. Finishing
@@ -1884,6 +1895,10 @@ export const hudChromeStrings = {
     // of the classic two-row top-right corner (wordy, M16: the five non-Latin
     // fills land in this same change).
     aurasOnPlayerFrame: 'Buffs on the Player Frame',
+    // Interface panel toggle: bypass the Low graphics preset's buff-icon cap so
+    // every active buff always renders, at the cap's per-frame cost (wordy,
+    // M16: the five non-Latin fills land in this same change).
+    alwaysShowAllBuffs: 'Always Show All Buffs',
     highContrastBackground: 'High-Contrast Background',
     // Interface panel toggle: also engage auto-attack when using an offensive
     // ability, so white swings start without a separate Attack press (on by default).
@@ -1908,6 +1923,13 @@ export const hudChromeStrings = {
     // default); shares the persisted switch with the eye toggle inside The
     // Reliquary window.
     showReliquaryTracker: 'Show Reliquary Tracker',
+    // Interface panel toggle (on by default): confirm before a vendor sale of
+    // anything beyond true junk. Off restores the classic one-click instant
+    // sale for every item (wordy, M16: the five non-Latin fills land in the
+    // same change).
+    confirmVendorSell: 'Confirm Before Selling',
+    confirmVendorSellNote:
+      'Turning this off sells items with a single click and no confirmation, so a shifted bag slot could vendor the wrong item.',
     itemLevelLine: 'Item Level {level}',
     itemScoreLine: 'Score {score}',
     // Interface panel toggle that reveals the optional second action bar row (off
@@ -1932,6 +1954,10 @@ export const hudChromeStrings = {
     // default): a small unit frame under the target frame showing who your target
     // is targeting.
     showTargetOfTarget: 'Show Target of Target',
+    // Interface panel toggle (off by default) for the current target's (and
+    // target-of-target's) own melee/ranged swing timer, under the target
+    // frame. Independent of showTargetOfTarget (the portrait mini-frame).
+    showTargetSwingTimer: 'Show Target Swing Timer',
     // Interface panel toggle for the pet health strip under the player frame (on by
     // default; it only appears while you actually have a pet). Phrased from the
     // frame's own accessible name (unitFrame.petLabel) so the value stays NON-WORDY
@@ -2659,6 +2685,15 @@ export const hudChromeStrings = {
       few: '{count} seconds remaining',
       many: '{count} seconds remaining',
       other: '{count} seconds remaining',
+    },
+    // The native-tooltip text on the buff-bar overflow badge (hudChrome.unitFrame.
+    // buffOverflowLabel): {count} buffs are active but past the low-tier cap, so their
+    // icon is hidden. Read tPlural('hudChrome.plurals.buffsHidden', count).
+    buffsHidden: {
+      one: '{count} more buff is active but hidden on this graphics preset',
+      few: '{count} more buffs are active but hidden on this graphics preset',
+      many: '{count} more buffs are active but hidden on this graphics preset',
+      other: '{count} more buffs are active but hidden on this graphics preset',
     },
     // Unit fragments for the character sheet's Time Played line ({count} is
     // pre-formatted through formatNumber at the call site).
@@ -5393,6 +5428,11 @@ export const hudChromeStrings = {
     disenchant: 'Disenchant',
     salvage: 'Salvage',
     applyEnchant: 'Apply Enchant',
+    // The vendor right-click / tap menu's own default row (Sell, since that is
+    // what it runs there) and its Sell all (N) row (bag_item_context_menu.ts
+    // vendorSellContextActions), the total held across every bag.
+    sell: 'Sell',
+    sellAll: 'Sell all ({count})',
   },
   // Enchanting actions (Professions 2.0): the result toasts for the
   // disenchant / apply-enchant / salvage commands (enchanting_view.ts maps each
@@ -6192,6 +6232,16 @@ export const hudChromeStrings = {
     loading: 'Loading the Exchange...',
     loadFailed: 'The Exchange could not be reached. Try again shortly.',
     disabledRealm: 'The $WOC Exchange is not available on this realm.',
+    // The wrapped DESKTOP shell's (Electron, Steam, packaged website build)
+    // launcher confirm dialog (src/ui/woc_market_link.ts): the Exchange
+    // itself stays fail-closed there (docs/prd/woc/marketplace.md), so this
+    // hands the player off to the browser build instead of leaving the
+    // launcher unexplained. Never shown on Capacitor native.
+    browserOnlyConfirmTitle: 'Open the $WOC Exchange in your browser?',
+    browserOnlyConfirmBody:
+      'The $WOC Exchange runs on the browser version of World of ClaudeCraft only. This opens World of ClaudeCraft in your browser, where you can sign in and open the Exchange; the game keeps running here.',
+    browserOnlyConfirmOpen: 'Open in Browser',
+    browserOnlyConfirmCancel: 'Cancel',
     // Names no cause (an operator pause and an unhealthy price print both
     // land here) and every action the pause refuses (guardEnabledHealthy
     // gates listing, bidding, offers and the payment quote); a payment

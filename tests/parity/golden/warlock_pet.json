@@ -208,7 +208,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1002,
-      "state": "85eacc2b",
+      "state": "f05b91ad",
       "events": "e7b9d380",
       "rng": {
         "draws": 677,
@@ -219,7 +219,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 1002,
-      "state": "7413feb6",
+      "state": "97383d6c",
       "events": "aa29adbb",
       "rng": {
         "draws": 902,
@@ -230,7 +230,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 1002,
-      "state": "54ac52ab",
+      "state": "936ee875",
       "events": "8f847390",
       "rng": {
         "draws": 1147,
@@ -241,7 +241,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 1002,
-      "state": "50e07396",
+      "state": "1671a45a",
       "events": "a9ca0d4a",
       "rng": {
         "draws": 1423,
@@ -252,7 +252,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 1002,
-      "state": "2b859d6d",
+      "state": "937417af",
       "events": "5655a8da",
       "rng": {
         "draws": 1692,
@@ -263,7 +263,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 1002,
-      "state": "841b7194",
+      "state": "5a529c92",
       "events": "d499b597",
       "rng": {
         "draws": 1853,
@@ -274,7 +274,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 1002,
-      "state": "fb800ebe",
+      "state": "e59e7b66",
       "events": "741638a5",
       "rng": {
         "draws": 1853,
@@ -436,6 +436,7 @@
         {
           "aggroTargetId": 1001,
           "aiState": "idle",
+          "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -483,6 +484,7 @@
         {
           "aggroTargetId": 1000,
           "aiState": "attack",
+          "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -549,7 +551,7 @@
       "tick": 224,
       "time": 11.2,
       "nextId": 1002,
-      "state": "034749f2",
+      "state": "150f21c6",
       "events": "a518fa1f",
       "rng": {
         "draws": 1890,
@@ -711,6 +713,7 @@
         {
           "aggroTargetId": 1001,
           "aiState": "idle",
+          "autoAttack": true,
           "combatTimer": 0.15,
           "comboUntil": -1,
           "critChance": 0.05,
@@ -759,6 +762,7 @@
         {
           "aggroTargetId": 1000,
           "aiState": "attack",
+          "autoAttack": true,
           "combatTimer": 0.2,
           "comboUntil": -1,
           "critChance": 0.05,

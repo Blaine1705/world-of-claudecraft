@@ -956,7 +956,8 @@ export const sv_SE: EnTranslations = {
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "m",
       "durationUnitHours": "t",
-      "durationUnitDays": "d"
+      "durationUnitDays": "d",
+      "buffOverflowLabel": "+{n}"
     },
     "character": {
       "modelPreview": "Förhandsvisning av karaktärsmodell"
@@ -1386,6 +1387,7 @@ export const sv_SE: EnTranslations = {
       "name_thunderstrut_gobbler": "Åskstoltsern, Den stora kalkonen",
       "name_terrorspark_groundshaker": "Skräckgnista, markskakaren",
       "name_drakemaw_raptor": "Drakgapsraptor",
+      "name_rickshaw_mount": "Benbunden Rickshaw",
       "desc_valorsteed": "En uthållig, säkerfotad stridshäst som ger ökad reshastighet.",
       "desc_grag_bear": "En uthållig, säkerfotad björn som ger ökad reshastighet.",
       "desc_stalkglider_snail": "En robust, långsamt brinnande snigel som ger ökad reshastighet.",
@@ -1394,7 +1396,8 @@ export const sv_SE: EnTranslations = {
       "desc_stormfeather_griffin": "En kunglig stormgrip som smyger fram på runskodda klor, med vingarna hopfällda.",
       "desc_thunderstrut_gobbler": "En kolossal stormkläckt kalkon som stoltserar ner från Den vaknande toppen, med stjärten spretande som ett åskmoln.",
       "desc_terrorspark_groundshaker": "En kompakt bepansrad maskin med tunga larvband, en grovkalibrig kanon och en sadel byggd för orädda förare.",
-      "desc_drakemaw_raptor": "En sadeltämjd kullraptor från Drakgapets kaldera, ren sena och sprint, som fortfarande doftar svagt av aska."
+      "desc_drakemaw_raptor": "En sadeltämjd kullraptor från Drakgapets kaldera, ren sena och sprint, som fortfarande doftar svagt av aska.",
+      "desc_rickshaw_mount": "En skramlande benkärra med en benig hantlangare fastspänd vid skalmarna, som drar dig fram i språngmarsch."
     },
     "mountTraining": {
       "mountPrompt": "Tryck på {key} för att sitta upp på övnings-Tapperhetshästen.",
@@ -1564,6 +1567,7 @@ export const sv_SE: EnTranslations = {
       "playerFrameScale": "Spelarramens skala",
       "targetFrameScale": "Målramens skala",
       "aurasOnPlayerFrame": "Förstärkningar på spelarramen",
+      "alwaysShowAllBuffs": "Always Show All Buffs",
       "highContrastBackground": "Bakgrund med hög kontrast",
       "startAttackOnAbility": "Automatisk attack vid förmågeanvändning",
       "stopAutoAttackOnTargetSwitch": "Stoppa automatisk attack vid målbyte",
@@ -1573,6 +1577,8 @@ export const sv_SE: EnTranslations = {
       "stickyTarget": "Behåll mål vid markklick",
       "showItemLevel": "Visa föremålsnivå",
       "showReliquaryTracker": "Visa Relikviespårare",
+      "confirmVendorSell": "Confirm Before Selling",
+      "confirmVendorSellNote": "Turning this off sells items with a single click and no confirmation, so a shifted bag slot could vendor the wrong item.",
       "itemLevelLine": "Föremålsnivå {level}",
       "itemScoreLine": "Poäng {score}",
       "showSecondaryActionBar": "Visa sekundärt handlingsfält",
@@ -1581,6 +1587,7 @@ export const sv_SE: EnTranslations = {
       "hideUnusedActionSlots": "Dölj oanvända åtgärdsrutor",
       "lockActionBars": "Lås åtgärdsfälten",
       "showTargetOfTarget": "Visa målets mål",
+      "showTargetSwingTimer": "Visa målets svingtimer",
       "showPetFrame": "Visa ditt djur",
       "waterRipples": "Vattenkrusningar (kölvatten)",
       "showAttackButton": "Visa attackknapp",
@@ -2140,6 +2147,12 @@ export const sv_SE: EnTranslations = {
         "few": "{count} sekunder kvar",
         "many": "{count} sekunder kvar",
         "other": "{count} sekunder kvar"
+      },
+      "buffsHidden": {
+        "one": "Ytterligare {count} förstärkning är aktiv men dold med denna grafikförinställning",
+        "few": "Ytterligare {count} förstärkningar är aktiva men dolda med denna grafikförinställning",
+        "many": "Ytterligare {count} förstärkningar är aktiva men dolda med denna grafikförinställning",
+        "other": "Ytterligare {count} förstärkningar är aktiva men dolda med denna grafikförinställning"
       },
       "playtimeDays": {
         "one": "{count} dag",
@@ -3204,9 +3217,9 @@ export const sv_SE: EnTranslations = {
       "linked": "Länkat till Steam-kontot {id}",
       "benefits": "Länka ditt Steam-konto från skrivbordsappen så speglas bedrifterna du fullbordar som Steam-prestationer.",
       "noTicket": "Steam lämnade ingen länkbiljett. Starta Steam och försök igen.",
-      "wishlist": "Wishlist on Steam",
-      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
-      "wishlistShort": "Wishlist"
+      "wishlist": "Lägg till på önskelistan på Steam",
+      "wishlistAria": "Lägg till på önskelistan på Steam: öppna World of ClaudeCrafts butikssida",
+      "wishlistShort": "Önskelista"
     },
     "epic": {
       "title": "Epic",
@@ -3875,7 +3888,9 @@ export const sv_SE: EnTranslations = {
       "equip": "Utrusta",
       "disenchant": "Avförtrylla",
       "salvage": "Bärga",
-      "applyEnchant": "Applicera förtrollning"
+      "applyEnchant": "Applicera förtrollning",
+      "sell": "Sälj",
+      "sellAll": "Sälj alla ({count})"
     },
     "enchanting": {
       "disenchantedLine": "Du avförtrollar {item}.",
@@ -4377,6 +4392,10 @@ export const sv_SE: EnTranslations = {
       "loading": "Laddar $WOC-börsen...",
       "loadFailed": "$WOC-börsen kunde inte nås. Försök igen om en liten stund.",
       "disabledRealm": "$WOC-börsen är inte tillgänglig på den här världen.",
+      "browserOnlyConfirmTitle": "Öppna $WOC-börsen i webbläsaren?",
+      "browserOnlyConfirmBody": "$WOC-börsen körs endast i webbläsarversionen av World of ClaudeCraft. Detta öppnar World of ClaudeCraft i din webbläsare, där du kan logga in och öppna börsen; spelet fortsätter att köras här.",
+      "browserOnlyConfirmOpen": "Öppna i webbläsaren",
+      "browserOnlyConfirmCancel": "Avbryt",
       "pausedBanner": "Handeln är pausad. Auktioner fortsätter att räkna ner; nya annonser, bud, erbjudanden och betalningar väntar tills handeln återupptas, och en betalning som redan skickats slutförs ändå.",
       "walletLinkedDisconnected": "Your public address is linked. Reconnect that wallet app when you want to pay with $WOC.",
       "walletLinkedConnected": "Your linked wallet app is connected and ready for $WOC purchases.",
@@ -4697,7 +4716,13 @@ export const sv_SE: EnTranslations = {
       "upstream": "Epic svarade inte. Försök igen om en stund."
     },
     "wallet": {
-      "handoff_invalid": "Den plånboksbehörigheten har gått ut eller kunde inte verifieras. Försök igen."
+      "handoff_invalid": "Den plånboksbehörigheten har gått ut eller kunde inte verifieras. Försök igen.",
+      "reauth_required": "Bekräfta den här plånboksändringen med ditt kontolösenord.",
+      "reauth_two_factor": "Ditt konto har tvåfaktorsautentisering aktiverad. Ange din kod för att bekräfta.",
+      "reauth_no_password": "Ange först ett lösenord i kontoinställningarna och försök igen.",
+      "reauth_bad_signature": "Plånbokens signatur kunde inte verifieras. Försök igen.",
+      "reauth_bad_password": "Ditt lösenord är felaktigt.",
+      "reauth_bad_two_factor": "Den koden är inte giltig, försök igen."
     },
     "ota_updates": {
       "invalid_input": "Ogiltig indata."
@@ -5155,6 +5180,7 @@ export const sv_SE: EnTranslations = {
       "ifPartySort": "Ordningen gruppmedlemmarna listas i: gruppordning, roll eller namn.",
       "ifPartyShowAuras": "Om buffar och debuffar visas på gruppramarna. Motsvarande brytare täcker resursfält, absorptioner, djur och om du själv syns i din egen grupplista.",
       "ifAurasOnPlayerFrame": "Lägger dina buffar och debuffar på din egen ram, utöver aurafältet.",
+      "ifAlwaysShowAllBuffs": "Shows every active buff even on the Low graphics preset, bypassing its usual buff-icon cap.",
       "ifTargetOfTarget": "Visar vem ditt mål siktar på, det klassiska sättet att se om tanken fortfarande har aggro.",
       "ifPetFrame": "Visar en ram för ditt djur.",
       "ifChatFontScale": "Textstorlek i chatten.",
@@ -7623,6 +7649,13 @@ export const sv_SE: EnTranslations = {
     "unlink": "Avlänka",
     "unlinkTitle": "Ta bort plånboksverifieringen från det här kontot",
     "unlinkAria": "Ta bort plånboksverifieringen från det här kontot",
+    "reauthTitle": "Bekräfta plånboksändring",
+    "reauthUnlinkTitle": "Bekräfta borttagning av plånbok",
+    "reauthHelp": "För din säkerhet, ange ditt kontolösenord för att godkänna den här ändringen.",
+    "reauthNoPassword": "Det här kontot loggar in utan lösenord. Ange först ett lösenord i kontoinställningarna och försök igen.",
+    "reauthConfirm": "Bekräfta",
+    "reauthCancel": "Avbryt",
+    "reauthClose": "Stäng",
     "signOut": "Koppla från",
     "signOutTitle": "Koppla från plånboksappen i den här webbläsaren",
     "signOutAria": "Koppla från plånboksappen i den här webbläsaren",
@@ -13171,6 +13204,9 @@ export const sv_SE: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Tändningsnyckel: Skräckgnista, markskakaren"
+      },
+      "reins_rickshaw_mount": {
+        "name": "Bundna tyglar: Benbunden Rickshaw"
       },
       "reins_drakemaw_raptor": {
         "name": "Tyglar till Drakgapsraptorn"

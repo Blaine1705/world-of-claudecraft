@@ -2454,6 +2454,14 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'itemUi.stats.parry': 'Đỡ Đòn',
   'apiError.wallet.handoff_invalid':
     'Quyền ủy quyền ví đó đã hết hạn hoặc không thể xác minh. Hãy thử lại.',
+  'apiError.wallet.reauth_required': 'Xác nhận thay đổi ví này bằng mật khẩu tài khoản của bạn.',
+  'apiError.wallet.reauth_two_factor':
+    'Tài khoản của bạn đã bật xác thực hai lớp. Nhập mã của bạn để xác nhận.',
+  'apiError.wallet.reauth_no_password':
+    'Hãy đặt mật khẩu trong cài đặt tài khoản trước, rồi thử lại.',
+  'apiError.wallet.reauth_bad_signature': 'Không thể xác minh chữ ký ví. Hãy thử lại.',
+  'apiError.wallet.reauth_bad_password': 'Mật khẩu của bạn không đúng.',
+  'apiError.wallet.reauth_bad_two_factor': 'Mã đó không hợp lệ, hãy thử lại.',
   'cardDuel.close': 'Đóng',
   'cardDuel.counts': 'Bộ bài: {deck} · Thải bài: {discard}',
   'cardDuel.forfeit': 'Bỏ Cuộc',
@@ -9942,6 +9950,14 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'wallet.switchTitle': 'Xác minh một ví khác',
   'wallet.unlink': 'Hủy liên kết',
   'wallet.unlinkAria': 'Gỡ xác minh ví khỏi tài khoản này',
+  'wallet.reauthTitle': 'Xác nhận thay đổi ví',
+  'wallet.reauthUnlinkTitle': 'Xác nhận gỡ ví',
+  'wallet.reauthHelp': 'Vì an toàn của bạn, hãy nhập mật khẩu tài khoản để cho phép thay đổi này.',
+  'wallet.reauthNoPassword':
+    'Tài khoản này đăng nhập không dùng mật khẩu. Hãy đặt mật khẩu trong cài đặt tài khoản trước, rồi thử lại.',
+  'wallet.reauthConfirm': 'Xác nhận',
+  'wallet.reauthCancel': 'Hủy',
+  'wallet.reauthClose': 'Đóng',
   'wallet.unlinkFailed': 'Không thể hủy liên kết ví.',
   'wallet.unlinkTitle': 'Gỡ xác minh ví khỏi tài khoản này',
   'wallet.verify': 'Xác minh ví',
@@ -13523,4 +13539,31 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   "entities.abilities.nightshade_coating.description": "Bao phủ mục tiêu trong màn đêm, gây {damage} sát thương tự nhiên và giảm khả năng hồi máu mà mục tiêu nhận được đi 25% trong 12 giây.",
   "entities.abilities.nightshade_coating.name": "Lớp phủ bóng đêm",
   "guide.settingsPage.ifShowReliquaryTracker": "Trình theo dõi Thánh tích (các trang được ghim của bạn và tiến trình của chúng) có nằm trên HUD của bạn hay không. Cửa sổ Thánh tích có nút mắt phù hợp và việc ghim một trang sẽ bật lại trình theo dõi.",
+  // v0.41 release i18n fill.
+  'entities.items.reins_rickshaw_mount.name': 'Dây cương ràng buộc: Xe kéo Buộc Xương',
+  'hudChrome.itemMenu.sell': 'Bán',
+  'hudChrome.itemMenu.sellAll': 'Bán tất cả ({count})',
+  'hudChrome.mounts.desc_rickshaw_mount':
+    'Một cỗ xe xương lọc cọc, với một tên lính xương xẩu bị buộc vào càng xe, kéo bạn lao đi hết tốc lực.',
+  'hudChrome.mounts.name_rickshaw_mount': 'Xe kéo Buộc Xương',
+  'hudChrome.options.showTargetSwingTimer': 'Hiển thị bộ đếm vung đòn của mục tiêu',
+  'hudChrome.plurals.buffsHidden.one':
+    'Còn {count} hiệu ứng tăng cường đang hoạt động nhưng bị ẩn trên thiết lập đồ họa này',
+  'hudChrome.plurals.buffsHidden.few':
+    'Còn {count} hiệu ứng tăng cường đang hoạt động nhưng bị ẩn trên thiết lập đồ họa này',
+  'hudChrome.plurals.buffsHidden.many':
+    'Còn {count} hiệu ứng tăng cường đang hoạt động nhưng bị ẩn trên thiết lập đồ họa này',
+  'hudChrome.plurals.buffsHidden.other':
+    'Còn {count} hiệu ứng tăng cường đang hoạt động nhưng bị ẩn trên thiết lập đồ họa này',
+  'hudChrome.steam.wishlist': 'Thêm vào danh sách ước trên Steam',
+  'hudChrome.steam.wishlistAria':
+    'Thêm vào danh sách ước trên Steam: mở trang cửa hàng World of ClaudeCraft',
+  'hudChrome.steam.wishlistShort': 'Danh sách ước',
+  'hudChrome.unitFrame.buffOverflowLabel': '+{n}',
+  'hudChrome.wocMarket.browserOnlyConfirmTitle':
+    'Mở Sàn giao dịch $WOC trong trình duyệt?',
+  'hudChrome.wocMarket.browserOnlyConfirmBody':
+    'Sàn giao dịch $WOC chỉ chạy trên phiên bản trình duyệt của World of ClaudeCraft. Thao tác này mở World of ClaudeCraft trong trình duyệt, nơi bạn có thể đăng nhập và mở Sàn giao dịch; trò chơi vẫn tiếp tục chạy ở đây.',
+  'hudChrome.wocMarket.browserOnlyConfirmOpen': 'Mở trong trình duyệt',
+  'hudChrome.wocMarket.browserOnlyConfirmCancel': 'Hủy',
 };

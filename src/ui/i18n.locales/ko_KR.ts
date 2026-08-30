@@ -845,6 +845,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.playerFrameScale': '플레이어 프레임 크기',
   'hudChrome.options.targetFrameScale': '대상 프레임 크기',
   'hudChrome.options.aurasOnPlayerFrame': '버프를 플레이어 프레임에 표시',
+  'hudChrome.options.alwaysShowAllBuffs': '모든 버프를 항상 표시',
   'hud.core.mapCanvasLabel': '지도',
   'hud.core.mapSummary': '{zone}의 지도.',
   'hud.core.mapMarkerDescription': '{area}. {markers}',
@@ -955,6 +956,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitMinutes': '분',
   'hudChrome.unitFrame.durationUnitHours': '시',
   'hudChrome.unitFrame.durationUnitDays': '일',
+  'hudChrome.unitFrame.buffOverflowLabel': '+{n}',
   'hudChrome.unitFrame.partyLabel': '내 파티',
   'hudChrome.unitFrame.partyChip': '파티',
   'hudChrome.unitFrame.playerLabel': '내 캐릭터',
@@ -1519,6 +1521,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.highContrastBackground': '고대비 배경',
   'hudChrome.options.showItemLevel': '아이템 레벨 표시',
   'hudChrome.options.showReliquaryTracker': '성물고 추적기 표시',
+  'hudChrome.options.confirmVendorSell': '판매 전 확인',
+  'hudChrome.options.confirmVendorSellNote':
+    '이 설정을 끄면 확인 없이 한 번의 클릭으로 아이템을 판매하므로, 가방 칸이 바뀌면 잘못된 아이템이 팔릴 수 있습니다.',
   'hudChrome.options.showSecondaryActionBar': '보조 액션 바 표시',
   'hudChrome.options.showThirdActionBar': '세 번째 액션 바 표시',
   'hudChrome.options.hideUnusedActionSlots': '사용하지 않는 행동 칸 숨기기',
@@ -1779,6 +1784,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'wallet.unlink': '연결 해제',
   'wallet.unlinkTitle': '이 계정에서 지갑 인증 제거',
   'wallet.unlinkAria': '이 계정에서 지갑 인증 제거',
+  'wallet.reauthTitle': '지갑 변경 확인',
+  'wallet.reauthUnlinkTitle': '지갑 제거 확인',
+  'wallet.reauthHelp': '보안을 위해 이 변경을 승인하려면 계정 비밀번호를 입력하세요.',
+  'wallet.reauthNoPassword': '이 계정은 비밀번호 없이 로그인합니다. 먼저 계정 설정에서 비밀번호를 설정한 다음 다시 시도하세요.',
+  'wallet.reauthConfirm': '확인',
+  'wallet.reauthCancel': '취소',
+  'wallet.reauthClose': '닫기',
   'wallet.signOut': '연결 끊기',
   'wallet.signOutTitle': '이 브라우저에서 지갑 앱 연결 끊기',
   'wallet.signOutAria': '이 브라우저에서 지갑 앱 연결 끊기',
@@ -5973,6 +5985,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.secondsRemaining.few': '{count}초 남음',
   'hudChrome.plurals.secondsRemaining.many': '{count}초 남음',
   'hudChrome.plurals.secondsRemaining.other': '{count}초 남음',
+  'hudChrome.plurals.buffsHidden.one': '{count}개의 버프가 활성 상태이지만 그래픽 설정으로 아이콘이 숨겨져 있습니다',
+  'hudChrome.plurals.buffsHidden.few': '{count}개의 버프가 활성 상태이지만 그래픽 설정으로 아이콘이 숨겨져 있습니다',
+  'hudChrome.plurals.buffsHidden.many': '{count}개의 버프가 활성 상태이지만 그래픽 설정으로 아이콘이 숨겨져 있습니다',
+  'hudChrome.plurals.buffsHidden.other': '{count}개의 버프가 활성 상태이지만 그래픽 설정으로 아이콘이 숨겨져 있습니다',
   'hudChrome.plurals.playtimeDays.one': '{count}일',
   'hudChrome.plurals.playtimeDays.few': '{count}일',
   'hudChrome.plurals.playtimeDays.many': '{count}일',
@@ -9064,6 +9080,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.steam.disabled': '현재 Steam 연동을 사용할 수 없습니다.',
   'apiError.wallet.handoff_invalid':
     '지갑 인증이 만료되었거나 확인할 수 없습니다. 다시 시도해 주세요.',
+  'apiError.wallet.reauth_required': '이 지갑 변경을 확인하려면 계정 비밀번호를 입력하세요.',
+  'apiError.wallet.reauth_two_factor': '이 계정은 2단계 인증이 활성화되어 있습니다. 확인하려면 인증 코드를 입력하세요.',
+  'apiError.wallet.reauth_no_password': '먼저 계정 설정에서 비밀번호를 설정한 다음 다시 시도하세요.',
+  'apiError.wallet.reauth_bad_signature': '지갑 서명을 확인할 수 없습니다. 다시 시도하세요.',
+  'apiError.wallet.reauth_bad_password': '비밀번호가 올바르지 않습니다.',
+  'apiError.wallet.reauth_bad_two_factor': '코드가 올바르지 않습니다. 다시 시도하세요.',
   'apiError.seeker.native_only': 'Seeker 자격은 네이티브 앱에서만 사용할 수 있습니다.',
   'apiError.seeker.attestation_failed': '기기 인증에 실패했습니다. 다시 시도해 주세요.',
   'apiError.seeker.solana_artifact_required': 'Solana Store 앱을 사용하여 계속해 주세요.',
@@ -9370,6 +9392,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.loading': '거래소를 불러오는 중...',
   'hudChrome.wocMarket.loadFailed': '거래소에 연결할 수 없습니다. 잠시 후 다시 시도하세요.',
   'hudChrome.wocMarket.disabledRealm': '이 서버에서는 $WOC 거래소를 이용할 수 없습니다.',
+  'hudChrome.wocMarket.browserOnlyConfirmTitle': '브라우저에서 $WOC 거래소를 열까요?',
+  'hudChrome.wocMarket.browserOnlyConfirmBody':
+    '$WOC 거래소는 World of ClaudeCraft의 브라우저 버전에서만 이용할 수 있습니다. 브라우저에서 World of ClaudeCraft를 엽니다. 그곳에서 로그인하고 거래소를 열 수 있습니다. 게임은 계속 실행됩니다.',
+  'hudChrome.wocMarket.browserOnlyConfirmOpen': '브라우저에서 열기',
+  'hudChrome.wocMarket.browserOnlyConfirmCancel': '취소',
   'hudChrome.wocMarket.pausedBanner':
     '거래가 일시 중지되었습니다. 경매 카운트다운은 계속됩니다. 새 등록, 입찰, 제안, 결제는 거래가 재개될 때까지 대기하지만, 이미 전송된 결제는 그대로 정산됩니다.',
   'hudChrome.wocMarket.walletLinkedDisconnected':
@@ -10446,6 +10473,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '화산구 칼데라에서 길들여진 둥지 태생 랩터. 온몸이 힘줄과 질주로 이루어졌으며, 아직도 희미한 재 냄새가 난다.',
   'hudChrome.mounts.name_thunderstrut_gobbler': '천둥활보 대왕 칠면조',
   'hudChrome.mounts.name_terrorspark_groundshaker': '대지를 뒤흔드는 테러스파크',
+  'hudChrome.mounts.name_rickshaw_mount': '뼈에 묶인 인력거',
   'hudChrome.mounts.desc_valorsteed': '여행 속도를 높여 주는 튼튼하고 발이 안정된 군마입니다.',
   'hudChrome.mounts.desc_grag_bear': '여행 속도를 높여 주는 튼튼하고 발이 안정된 곰입니다.',
   'hudChrome.mounts.desc_stalkglider_snail': '여행 속도를 높여 주는 끈질기고 느긋한 달팽이입니다.',
@@ -10459,6 +10487,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '깨어나는 봉우리에서 꼬리깃을 뇌운처럼 펼친 채 활보하며 내려오는, 폭풍이 낳은 거대한 칠면조입니다.',
   'hudChrome.mounts.desc_terrorspark_groundshaker':
     '묵직한 궤도와 대구경 포, 겁 없는 조종사를 위한 안장을 갖춘 소형 장갑 기계입니다.',
+  'hudChrome.mounts.desc_rickshaw_mount':
+    '덜컹거리는 뼈 수레입니다. 뼈만 앙상한 잡졸이 채에 매인 채 전속력으로 당신을 끌고 달립니다.',
   'hudChrome.mounts.emptyTitle': '보유한 탈것 없음',
   'hudChrome.mounts.emptyStableHint':
     '20레벨을 달성한 뒤 하이워치 서쪽 마구간에서 마구간지기 마를라에게 승마를 배우세요.',
@@ -10906,6 +10936,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.combat.blockedTaken': '{source}의 공격을 방어하여 {amount}의 피해를 받았습니다.',
   'hudChrome.options.mouseoverCast': '파티 창에서 마우스오버 시전',
   'hudChrome.options.showTargetOfTarget': '대상의 대상 표시',
+  'hudChrome.options.showTargetSwingTimer': '대상의 공격 타이머 표시',
   'hudChrome.options.showPetFrame': '내 펫 표시',
   'hudChrome.options.stickyTarget': '지면 클릭 시 대상 유지',
   'hudChrome.unitFrame.targetOfTargetLabel': '대상의 대상',
@@ -11243,6 +11274,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.last_keep_signet.name': '마지막 요새의 인장',
   'entities.dungeons.the_last_keep.enterText': '마지막 요새의 차갑고 고요한 회랑에 발을 들입니다.',
   'entities.items.reins_terrorspark_groundshaker.name': '테러스파크 시동 열쇠',
+  'entities.items.reins_rickshaw_mount.name': '결속된 고삐: 뼈에 묶인 인력거',
   'entities.dungeons.the_last_keep.leaveText':
     '요새의 문을 닫고 드레이크랜드의 바람 속으로 돌아갑니다.',
   'entities.dungeons.dawnhold_castle.name': '던홀드 성',
@@ -13486,6 +13518,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.riftsPage.whatHeading': '균열이란',
   'guide.settingsPage.advancedLadder': '그중 하나라도 움직이면 품질 프리셋이 고급으로 바뀌고, 방금 보고 있던 단계 그대로를 씨앗 삼아 시작하므로 나만의 조합이 백지가 아니라 이미 본 화면에서 출발합니다. 마음에 들면 적용을 누르세요. 고급이 프리셋 목록 맨 끝에 놓인 이유도 그것입니다. 나만의 조합이 사는 전문가용 프로필이니까요.',
   'guide.settingsPage.ifAurasOnPlayerFrame': '내 강화 효과와 약화 효과를 오라 막대뿐 아니라 내 유닛 프레임에도 표시합니다.',
+  'guide.settingsPage.ifAlwaysShowAllBuffs':
+    '낮음 그래픽 설정에서도 평소의 버프 아이콘 상한을 무시하고 활성화된 모든 버프를 표시합니다.',
   'guide.settingsPage.ifChatFontScale': '채팅 글자 크기입니다.',
   'guide.settingsPage.ifChatIntro': '채팅 창이 어떻게 읽히는지를 다룹니다. 채팅 창 자체를 처음 상태로 되돌리는 초기화도 여기에 있습니다.',
   'guide.settingsPage.ifChatOpacity': '채팅 배경이 얼마나 불투명한지 정합니다.',
@@ -14379,6 +14413,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.nightshade_coating.name': '가지독 코팅',
   'entities.abilities.nightshade_coating.description':
     '대상을 가지독으로 뒤덮어 {damage}의 자연 피해를 주고 12초 동안 받는 치유 효과를 25% 감소시킵니다.',
+  // v0.41 release i18n fill.
+  'hudChrome.itemMenu.sell': '판매',
+  'hudChrome.itemMenu.sellAll': '모두 판매 ({count})',
   // Ignivar raid loot (Crucible of the Last Spring): the M16 same-change
   // fills for the new wordy item names (src/sim/content/ignivar_loot.ts).
   'entities.items.slagbreaker_helmet.name': '슬래그브레이커 투구',

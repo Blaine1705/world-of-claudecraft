@@ -2617,6 +2617,15 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'itemUi.stats.parry': 'Parieren',
   'apiError.wallet.handoff_invalid':
     'Diese Wallet-Autorisierung ist abgelaufen oder konnte nicht verifiziert werden. Bitte versuche es erneut.',
+  'apiError.wallet.reauth_required': 'Bestätige diese Wallet-Änderung mit deinem Konto-Passwort.',
+  'apiError.wallet.reauth_two_factor':
+    'Für dein Konto ist die Zwei-Faktor-Authentifizierung aktiviert. Gib zur Bestätigung deinen Code ein.',
+  'apiError.wallet.reauth_no_password':
+    'Lege zuerst in den Kontoeinstellungen ein Passwort fest und versuche es dann erneut.',
+  'apiError.wallet.reauth_bad_signature':
+    'Die Wallet-Signatur konnte nicht verifiziert werden. Versuche es erneut.',
+  'apiError.wallet.reauth_bad_password': 'Dein Passwort ist falsch.',
+  'apiError.wallet.reauth_bad_two_factor': 'Dieser Code ist ungültig, versuche es erneut.',
   'cardDuel.close': 'Schließen',
   'cardDuel.counts': 'Deck: {deck} · Ablagestapel: {discard}',
   'cardDuel.forfeit': 'Aufgeben',
@@ -4909,6 +4918,15 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'wallet.unlink': 'Trennen',
   'wallet.unlinkTitle': 'Wallet-Verifizierung von diesem Konto entfernen',
   'wallet.unlinkAria': 'Wallet-Verifizierung von diesem Konto entfernen',
+  'wallet.reauthTitle': 'Wallet-Änderung bestätigen',
+  'wallet.reauthUnlinkTitle': 'Wallet-Entfernung bestätigen',
+  'wallet.reauthHelp':
+    'Gib zu deiner Sicherheit dein Konto-Passwort ein, um diese Änderung zu erlauben.',
+  'wallet.reauthNoPassword':
+    'Dieses Konto meldet sich ohne Passwort an. Lege zuerst in den Kontoeinstellungen ein Passwort fest und versuche es dann erneut.',
+  'wallet.reauthConfirm': 'Bestätigen',
+  'wallet.reauthCancel': 'Abbrechen',
+  'wallet.reauthClose': 'Schließen',
   'wallet.signOut': 'Abmelden',
   'wallet.signOutTitle': 'Wallet-App in diesem Browser trennen',
   'wallet.signOutAria': 'Wallet-App in diesem Browser trennen',
@@ -13941,4 +13959,30 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   "entities.abilities.nightshade_coating.description": "Hüllt das Ziel in Nachtschatten, verursacht {damage} Naturschaden und verringert die erhaltene Heilung 12 Sek. lang um 25 %.",
   "entities.abilities.nightshade_coating.name": "Nachtschattenbeschichtung",
   "guide.settingsPage.ifShowReliquaryTracker": "Ob sich der Reliquiar-Tracker (Ihre angehefteten Seiten und deren Fortschritt) auf Ihrem HUD befindet. Das Reliquiar-Fenster verfügt über eine entsprechende Augenschaltfläche und durch das Anheften einer Seite wird der Tracker wieder aktiviert.",
+  // v0.41 release i18n fill.
+  'entities.items.reins_rickshaw_mount.name': 'Gebundene Zügel: Knochengebundene Rikscha',
+  'hudChrome.itemMenu.sell': 'Verkaufen',
+  'hudChrome.itemMenu.sellAll': 'Alles verkaufen ({count})',
+  'hudChrome.mounts.desc_rickshaw_mount':
+    'Ein klappernder Knochenkarren, an dessen Deichseln ein knochiger Scherge angeschirrt ist und Euch im vollen Lauf zieht.',
+  'hudChrome.mounts.name_rickshaw_mount': 'Knochengebundene Rikscha',
+  'hudChrome.options.showTargetSwingTimer': 'Zielschwungtimer anzeigen',
+  'hudChrome.plurals.buffsHidden.one':
+    '{count} weiterer Stärkungseffekt ist aktiv, aber in dieser Grafikvoreinstellung ausgeblendet',
+  'hudChrome.plurals.buffsHidden.few':
+    '{count} weitere Stärkungseffekte sind aktiv, aber in dieser Grafikvoreinstellung ausgeblendet',
+  'hudChrome.plurals.buffsHidden.many':
+    '{count} weitere Stärkungseffekte sind aktiv, aber in dieser Grafikvoreinstellung ausgeblendet',
+  'hudChrome.plurals.buffsHidden.other':
+    '{count} weitere Stärkungseffekte sind aktiv, aber in dieser Grafikvoreinstellung ausgeblendet',
+  'hudChrome.steam.wishlist': 'Auf Steam auf die Wunschliste setzen',
+  'hudChrome.steam.wishlistAria':
+    'Auf Steam auf die Wunschliste setzen: Shopseite von World of ClaudeCraft öffnen',
+  'hudChrome.steam.wishlistShort': 'Wunschliste',
+  'hudChrome.unitFrame.buffOverflowLabel': '+{n}',
+  'hudChrome.wocMarket.browserOnlyConfirmTitle': '$WOC-Börse im Browser öffnen?',
+  'hudChrome.wocMarket.browserOnlyConfirmBody':
+    'Die $WOC-Börse läuft nur in der Browserversion von World of ClaudeCraft. Dadurch wird World of ClaudeCraft im Browser geöffnet; dort kannst du dich anmelden und die Börse öffnen. Das Spiel läuft hier weiter.',
+  'hudChrome.wocMarket.browserOnlyConfirmOpen': 'Im Browser öffnen',
+  'hudChrome.wocMarket.browserOnlyConfirmCancel': 'Abbrechen',
 };

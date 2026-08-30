@@ -162,7 +162,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1011,
-      "state": "ba67932a",
+      "state": "150e7dbd",
       "events": "85ed29fb",
       "rng": {
         "draws": 1,
@@ -173,7 +173,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 1011,
-      "state": "043b4370",
+      "state": "a9993c5f",
       "events": "7242b55d",
       "rng": {
         "draws": 1,
@@ -184,7 +184,7 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 1011,
-      "state": "4cac2bb5",
+      "state": "36eb481e",
       "events": "eac0d40b",
       "rng": {
         "draws": 1,
@@ -195,7 +195,7 @@
       "tick": 4,
       "time": 0.2,
       "nextId": 1011,
-      "state": "0e9683d8",
+      "state": "795c5aaf",
       "events": "741638a5",
       "rng": {
         "draws": 1,
@@ -206,7 +206,7 @@
       "tick": 4,
       "time": 0.2,
       "nextId": 1011,
-      "state": "0e9683d8",
+      "state": "795c5aaf",
       "events": "741638a5",
       "rng": {
         "draws": 1,
@@ -671,6 +671,7 @@
         {
           "aggroTargetId": 995,
           "aiState": "attack",
+          "autoAttack": true,
           "castRemaining": 7.9,
           "castTotal": 10,
           "castingAbility": "Revolving Inferno",
@@ -904,7 +905,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1011,
-      "state": "8460ff73",
+      "state": "17b8111c",
       "events": "8c30a708",
       "rng": {
         "draws": 4,
@@ -915,7 +916,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1011,
-      "state": "8460ff73",
+      "state": "17b8111c",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -1380,6 +1381,7 @@
         {
           "aggroTargetId": 995,
           "aiState": "attack",
+          "autoAttack": true,
           "castAim": {
             "x": 116800.471161,
             "z": -1230.607402
@@ -1674,7 +1676,7 @@
       "tick": 6,
       "time": 0.3,
       "nextId": 1011,
-      "state": "55d59609",
+      "state": "440e29e4",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -1685,7 +1687,7 @@
       "tick": 6,
       "time": 0.3,
       "nextId": 1011,
-      "state": "55d59609",
+      "state": "440e29e4",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -2150,6 +2152,7 @@
         {
           "aggroTargetId": 995,
           "aiState": "idle",
+          "autoAttack": true,
           "ccImmune": true,
           "combatTimer": 0.15,
           "comboUntil": -1,
@@ -2347,7 +2350,7 @@
       "tick": 6,
       "time": 0.3,
       "nextId": 1011,
-      "state": "55d59609",
+      "state": "440e29e4",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -2812,6 +2815,7 @@
         {
           "aggroTargetId": 995,
           "aiState": "idle",
+          "autoAttack": true,
           "ccImmune": true,
           "combatTimer": 0.15,
           "comboUntil": -1,

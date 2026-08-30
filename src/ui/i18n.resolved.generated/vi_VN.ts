@@ -956,7 +956,8 @@ export const vi_VN: EnTranslations = {
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "ph",
       "durationUnitHours": "g",
-      "durationUnitDays": "ng"
+      "durationUnitDays": "ng",
+      "buffOverflowLabel": "+{n}"
     },
     "character": {
       "modelPreview": "Xem Trước Mô Hình Nhân Vật"
@@ -1386,6 +1387,7 @@ export const vi_VN: EnTranslations = {
       "name_thunderstrut_gobbler": "Thunderstrut, Gà Tây Vĩ Đại",
       "name_terrorspark_groundshaker": "Tia Kinh Hoàng, Kẻ Rung Chuyển Mặt Đất",
       "name_drakemaw_raptor": "Cuồng Long Drakemaw",
+      "name_rickshaw_mount": "Xe kéo Buộc Xương",
       "desc_valorsteed": "Một con chiến mã khỏe mạnh, bước chân vững chãi, giúp tăng tốc độ di chuyển.",
       "desc_grag_bear": "Một chú gấu khỏe mạnh, bước chân vững chãi, giúp tăng tốc độ di chuyển.",
       "desc_stalkglider_snail": "Một chú ốc sên bền bỉ, dẻo dai, giúp tăng tốc độ di chuyển.",
@@ -1394,7 +1396,8 @@ export const vi_VN: EnTranslations = {
       "desc_stormfeather_griffin": "Một con sư tử đầu chim bão uy nghi, rảo bước trên mặt đất bằng những móng vuốt được bọc rune, đôi cánh xếp gọn.",
       "desc_thunderstrut_gobbler": "Một con gà tây khổng lồ nở ra từ giông bão, sải bước xuống từ Đỉnh Tỉnh Thức, đuôi xòe rộng như đám mây giông.",
       "desc_terrorspark_groundshaker": "Một cỗ máy bọc giáp nhỏ gọn với bánh xích nặng, pháo nòng lớn và yên ngồi dành cho những người lái gan dạ.",
-      "desc_drakemaw_raptor": "Một con Cuồng Long thuộc bầy đàn đã được thuần yên cương từ Miệng Núi Lửa Drakemaw, toàn thân gân cốt và tốc lực, vẫn còn phảng phất mùi tro tàn."
+      "desc_drakemaw_raptor": "Một con Cuồng Long thuộc bầy đàn đã được thuần yên cương từ Miệng Núi Lửa Drakemaw, toàn thân gân cốt và tốc lực, vẫn còn phảng phất mùi tro tàn.",
+      "desc_rickshaw_mount": "Một cỗ xe xương lọc cọc, với một tên lính xương xẩu bị buộc vào càng xe, kéo bạn lao đi hết tốc lực."
     },
     "mountTraining": {
       "mountPrompt": "Nhấn {key} để cưỡi Valorsteed huấn luyện.",
@@ -1564,6 +1567,7 @@ export const vi_VN: EnTranslations = {
       "playerFrameScale": "Tỷ Lệ Khung Người Chơi",
       "targetFrameScale": "Tỷ Lệ Khung Mục Tiêu",
       "aurasOnPlayerFrame": "Hiệu Ứng Có Lợi Trên Khung Người Chơi",
+      "alwaysShowAllBuffs": "Always Show All Buffs",
       "highContrastBackground": "Nền Tương Phản Cao",
       "startAttackOnAbility": "Tự Đánh Khi Dùng Kỹ Năng",
       "stopAutoAttackOnTargetSwitch": "Dừng Tự Đánh Khi Đổi Mục Tiêu",
@@ -1573,6 +1577,8 @@ export const vi_VN: EnTranslations = {
       "stickyTarget": "Giữ Mục Tiêu Khi Nhấp Đất",
       "showItemLevel": "Hiển Thị Cấp Vật Phẩm",
       "showReliquaryTracker": "Hiển thị Trình theo dõi Thánh tích",
+      "confirmVendorSell": "Confirm Before Selling",
+      "confirmVendorSellNote": "Turning this off sells items with a single click and no confirmation, so a shifted bag slot could vendor the wrong item.",
       "itemLevelLine": "Cấp Vật Phẩm {level}",
       "itemScoreLine": "Điểm {score}",
       "showSecondaryActionBar": "Hiện Thanh Hành Động Phụ",
@@ -1581,6 +1587,7 @@ export const vi_VN: EnTranslations = {
       "hideUnusedActionSlots": "Ẩn Ô Hành Động Chưa Sử Dụng",
       "lockActionBars": "Khóa Thanh Hành Động",
       "showTargetOfTarget": "Hiện Mục Tiêu Của Mục Tiêu",
+      "showTargetSwingTimer": "Hiển thị bộ đếm vung đòn của mục tiêu",
       "showPetFrame": "Hiện Thú Cưng Của Bạn",
       "waterRipples": "Gợn nước (sóng rẽ nước)",
       "showAttackButton": "Hiển Thị Nút Tấn Công",
@@ -2140,6 +2147,12 @@ export const vi_VN: EnTranslations = {
         "few": "còn lại {count} giây",
         "many": "còn lại {count} giây",
         "other": "còn lại {count} giây"
+      },
+      "buffsHidden": {
+        "one": "Còn {count} hiệu ứng tăng cường đang hoạt động nhưng bị ẩn trên thiết lập đồ họa này",
+        "few": "Còn {count} hiệu ứng tăng cường đang hoạt động nhưng bị ẩn trên thiết lập đồ họa này",
+        "many": "Còn {count} hiệu ứng tăng cường đang hoạt động nhưng bị ẩn trên thiết lập đồ họa này",
+        "other": "Còn {count} hiệu ứng tăng cường đang hoạt động nhưng bị ẩn trên thiết lập đồ họa này"
       },
       "playtimeDays": {
         "one": "{count} ngày",
@@ -3204,9 +3217,9 @@ export const vi_VN: EnTranslations = {
       "linked": "Đã liên kết với tài khoản Steam {id}",
       "benefits": "Hãy liên kết tài khoản Steam từ ứng dụng máy tính để các kỳ công bạn lập được đồng bộ thành thành tựu Steam.",
       "noTicket": "Steam không cung cấp vé liên kết. Hãy khởi động Steam rồi thử lại.",
-      "wishlist": "Wishlist on Steam",
-      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
-      "wishlistShort": "Wishlist"
+      "wishlist": "Thêm vào danh sách ước trên Steam",
+      "wishlistAria": "Thêm vào danh sách ước trên Steam: mở trang cửa hàng World of ClaudeCraft",
+      "wishlistShort": "Danh sách ước"
     },
     "epic": {
       "title": "Epic",
@@ -3875,7 +3888,9 @@ export const vi_VN: EnTranslations = {
       "equip": "Trang Bị",
       "disenchant": "Hủy Pháp Khắc",
       "salvage": "Tháo Dỡ",
-      "applyEnchant": "Áp Dụng Pháp Khắc"
+      "applyEnchant": "Áp Dụng Pháp Khắc",
+      "sell": "Bán",
+      "sellAll": "Bán tất cả ({count})"
     },
     "enchanting": {
       "disenchantedLine": "Bạn hủy pháp khắc {item}.",
@@ -4377,6 +4392,10 @@ export const vi_VN: EnTranslations = {
       "loading": "Đang tải Sàn Giao Dịch...",
       "loadFailed": "Không thể kết nối tới Sàn Giao Dịch. Hãy thử lại sau ít phút.",
       "disabledRealm": "Sàn Giao Dịch $WOC không khả dụng trên thế giới này.",
+      "browserOnlyConfirmTitle": "Mở Sàn giao dịch $WOC trong trình duyệt?",
+      "browserOnlyConfirmBody": "Sàn giao dịch $WOC chỉ chạy trên phiên bản trình duyệt của World of ClaudeCraft. Thao tác này mở World of ClaudeCraft trong trình duyệt, nơi bạn có thể đăng nhập và mở Sàn giao dịch; trò chơi vẫn tiếp tục chạy ở đây.",
+      "browserOnlyConfirmOpen": "Mở trong trình duyệt",
+      "browserOnlyConfirmCancel": "Hủy",
       "pausedBanner": "Giao dịch đang tạm dừng. Các phiên đấu giá vẫn tiếp tục đếm ngược, tin rao mới, giá thầu, đề nghị mua và thanh toán sẽ chờ đến khi giao dịch được nối lại, còn khoản thanh toán đã gửi thì vẫn được xử lý xong.",
       "walletLinkedDisconnected": "Your public address is linked. Reconnect that wallet app when you want to pay with $WOC.",
       "walletLinkedConnected": "Your linked wallet app is connected and ready for $WOC purchases.",
@@ -4697,7 +4716,13 @@ export const vi_VN: EnTranslations = {
       "upstream": "Epic không phản hồi. Hãy thử lại sau giây lát."
     },
     "wallet": {
-      "handoff_invalid": "Quyền ủy quyền ví đó đã hết hạn hoặc không thể xác minh. Hãy thử lại."
+      "handoff_invalid": "Quyền ủy quyền ví đó đã hết hạn hoặc không thể xác minh. Hãy thử lại.",
+      "reauth_required": "Xác nhận thay đổi ví này bằng mật khẩu tài khoản của bạn.",
+      "reauth_two_factor": "Tài khoản của bạn đã bật xác thực hai lớp. Nhập mã của bạn để xác nhận.",
+      "reauth_no_password": "Hãy đặt mật khẩu trong cài đặt tài khoản trước, rồi thử lại.",
+      "reauth_bad_signature": "Không thể xác minh chữ ký ví. Hãy thử lại.",
+      "reauth_bad_password": "Mật khẩu của bạn không đúng.",
+      "reauth_bad_two_factor": "Mã đó không hợp lệ, hãy thử lại."
     },
     "ota_updates": {
       "invalid_input": "Dữ liệu nhập không hợp lệ."
@@ -5155,6 +5180,7 @@ export const vi_VN: EnTranslations = {
       "ifPartySort": "Thứ tự liệt kê thành viên tổ đội: theo thứ tự nhóm, vai trò, hoặc tên.",
       "ifPartyShowAuras": "Buff và debuff có hiển thị trên khung tổ đội hay không. Các công tắc tương ứng còn bao gồm thanh tài nguyên, khiên hấp thụ, thú cưng, và việc bạn có xuất hiện trong danh sách tổ đội của chính mình hay không.",
       "ifAurasOnPlayerFrame": "Hiện buff và debuff của bạn trên khung nhân vật của chính bạn, bên cạnh thanh hiệu ứng.",
+      "ifAlwaysShowAllBuffs": "Shows every active buff even on the Low graphics preset, bypassing its usual buff-icon cap.",
       "ifTargetOfTarget": "Hiện mục tiêu của mục tiêu bạn đang nhắm, cách cổ điển để biết liệu tank có còn giữ được nó hay không.",
       "ifPetFrame": "Hiện một khung cho thú cưng của bạn.",
       "ifChatFontScale": "Cỡ chữ trò chuyện.",
@@ -7623,6 +7649,13 @@ export const vi_VN: EnTranslations = {
     "unlink": "Hủy liên kết",
     "unlinkTitle": "Gỡ xác minh ví khỏi tài khoản này",
     "unlinkAria": "Gỡ xác minh ví khỏi tài khoản này",
+    "reauthTitle": "Xác nhận thay đổi ví",
+    "reauthUnlinkTitle": "Xác nhận gỡ ví",
+    "reauthHelp": "Vì an toàn của bạn, hãy nhập mật khẩu tài khoản để cho phép thay đổi này.",
+    "reauthNoPassword": "Tài khoản này đăng nhập không dùng mật khẩu. Hãy đặt mật khẩu trong cài đặt tài khoản trước, rồi thử lại.",
+    "reauthConfirm": "Xác nhận",
+    "reauthCancel": "Hủy",
+    "reauthClose": "Đóng",
     "signOut": "Ngắt kết nối",
     "signOutTitle": "Ngắt kết nối ứng dụng ví trên trình duyệt này",
     "signOutAria": "Ngắt kết nối ứng dụng ví trên trình duyệt này",
@@ -13171,6 +13204,9 @@ export const vi_VN: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Chìa Khóa Khởi Động: Tia Kinh Hoàng, Kẻ Rung Chuyển Mặt Đất"
+      },
+      "reins_rickshaw_mount": {
+        "name": "Dây cương ràng buộc: Xe kéo Buộc Xương"
       },
       "reins_drakemaw_raptor": {
         "name": "Dây Cương Cuồng Long Drakemaw"

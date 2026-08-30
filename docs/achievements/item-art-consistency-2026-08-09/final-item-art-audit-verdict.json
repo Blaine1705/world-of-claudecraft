@@ -5,8 +5,8 @@
     "baselineCommit": "aee195551b5aef628eb7a72192117d7e3079818e",
     "branch": "feature/placeholder-art-completion-v036",
     "shippingDirectory": "public/ui/items",
-    "itemArtFilesReviewed": 1040,
-    "liveItemDefinitions": 1055,
+    "itemArtFilesReviewed": 1041,
+    "liveItemDefinitions": 1056,
     "generatedHeroicDefinitions": 64,
     "heroicDefinitionsWithOwnWebp": 48,
     "heroicWeaponArtAliases": 16,
@@ -304,7 +304,7 @@
       "food": 21,
       "held_offhand": 11,
       "junk": 83,
-      "mount": 9,
+      "mount": 10,
       "potion": 13,
       "quest": 102,
       "tool": 60,
@@ -403,7 +403,7 @@
   },
   "visualVerdict": {
     "status": "pass",
-    "passCount": 1040,
+    "passCount": 1041,
     "passIds": [
       "abyssal_loop",
       "abysswrought_band",
@@ -1088,6 +1088,7 @@
       "reins_aether_hover_cycle",
       "reins_drakemaw_raptor",
       "reins_grag_bear",
+      "reins_rickshaw_mount",
       "reins_shadowjump_toad",
       "reins_stalkglider_snail",
       "reins_stormfeather_griffin",
@@ -1450,7 +1451,7 @@
     "watch": [],
     "rejectCount": 0,
     "reject": [],
-    "summary": "All 1040 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review, plus the nine Crucible raid weapon icons (generated via the OpenAI crucible-raid-weapons-2026-08-28 batch) added on 2026-08-28, machine-checked and awaiting owner visual review, plus the two Ignivar legendary drop renders (varkhul_forgebreaker and varkhul_emberward, rendered from their own shipped held-weapon models by the deterministic weapon-still pipeline) added on 2026-08-28, machine-checked and awaiting owner visual review, plus the 192 Crucible set-piece, sigil, and off-set icons (generated via the OpenAI crucible-set-icons-2026-08-29 batch) added on 2026-08-29, machine-checked and awaiting owner visual review, plus the Core of the Last Flame reagent icon (staged early from the crucible-raid-professions-2026-08-28 batch) added on 2026-08-30, machine-checked and awaiting owner visual review, plus the seven bank-storage painted bags (implementation-agent reviewed and passed on 2026-08-26, joined at the v0.41.0 base sync)."
+    "summary": "All 1041 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review, plus the nine Crucible raid weapon icons (generated via the OpenAI crucible-raid-weapons-2026-08-28 batch) added on 2026-08-28, machine-checked and awaiting owner visual review, plus the two Ignivar legendary drop renders (varkhul_forgebreaker and varkhul_emberward, rendered from their own shipped held-weapon models by the deterministic weapon-still pipeline) added on 2026-08-28, machine-checked and awaiting owner visual review, plus the 192 Crucible set-piece, sigil, and off-set icons (generated via the OpenAI crucible-set-icons-2026-08-29 batch) added on 2026-08-29, machine-checked and awaiting owner visual review, plus the Core of the Last Flame reagent icon (staged early from the crucible-raid-professions-2026-08-28 batch) added on 2026-08-30, machine-checked and awaiting owner visual review, plus the seven bank-storage painted bags (implementation-agent reviewed and passed on 2026-08-26, joined at the v0.41.0 base sync), All 830 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review, plus the Bonebound Rickshaw reins icon (generated under woc-item-icon-v1 from a user-directed prompt, its own provenance recorded against its mapping.json owner) owner-reviewed against the regenerated mount contact sheet and passed on 2026-08-21."
   },
   "nonVisualContentWatch": [
     {
@@ -1607,8 +1608,8 @@
   "evidence": {
     "catalog": {
       "path": "tmp/imagegen/item-art-consistency/final-audit/catalog.json",
-      "sha256": "9e11ebfaf31fc688bb071b758601ce0f79853b40ac7c6f95e1a8d2a219c26fbe",
-      "bytes": 567150
+      "sha256": "de2dae43730ac6011269ba1564534a23f1cfcd2d721b66f6b1a2fa74228515ee",
+      "bytes": 567686
     },
     "rendererFingerprint": "d80ff4868f979e1717e106c889b7d6505841caf8d4cf887776ecb60848b1b2b7",
     "sheetCount": 216,
@@ -1622,7 +1623,7 @@
       "small-multiview": 27,
       "identity": 27
     },
-    "sheetSetSha256": "ecbb8e992d64bef9b23bd739eb6663b1e2bb19e823b69df3ee6924f6e2f93519",
+    "sheetSetSha256": "7139cd731c87e514144b9d60551c6c1b19dfcd008236f68502e4a0ea3b4b8327",
     "sheets": [
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p01--128-color.png",
@@ -2842,64 +2843,64 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--128-color.png",
-        "sha256": "31f74ade6951362722f51cc85c98c1d4705d1b2adfe7414ce7989688e9f1ea4d",
-        "bytes": 324975,
+        "sha256": "1ec39db4883b10488e3ad14f6a8370f8c5c40487c77bdecbbf028f0212ac3b3c",
+        "bytes": 355260,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--40-color.png",
-        "sha256": "e7d83e7409f03de58024266dd7aa8cd9da4fe7136f092b1c2c8ef78cc6957694",
-        "bytes": 61084,
+        "sha256": "7ceaf4427b8f142a95826b17e5b4326117f3da0c81f2086d2bc9897ae975be79",
+        "bytes": 66225,
         "width": 1600,
         "height": 166,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--28-color.png",
-        "sha256": "237e10d12c6246022ad5bf5ab8439ff4d2f75df48b9211968048f029662e4bfb",
-        "bytes": 42755,
+        "sha256": "bed7740b17277a5a49349ce73fe6e3eeacdd83bbc2884117c9f59f66b394483f",
+        "bytes": 46041,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--22-color.png",
-        "sha256": "d2a3cc6a0bfc8a7843fd56b59fc1922dc8e5b3fe638c68212d3d41a9a9da5f73",
-        "bytes": 33828,
+        "sha256": "58ea3af08805cfd43d95b8d6fa7ed392890c33ac1278a135d2ae17998094451d",
+        "bytes": 36646,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--28-grayscale.png",
-        "sha256": "0fded7fbd7173e32d7b7d8a9c08e099b5865f1c8d6e99eac4bcf1f13b3c89229",
-        "bytes": 32248,
+        "sha256": "d96e3e5b53abadfed726f26d605cd79cea86220069c00686d6c2bc507335c365",
+        "bytes": 34436,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--64-circle.png",
-        "sha256": "f2d3f9ebf7f761042a0f67a9f915bb3847fce05782684e3a7f99f51ed8f7c311",
-        "bytes": 100934,
+        "sha256": "41394faa9342454d566817bde9a89a0ded55d443b13a76e891c3d8c7a6ad11d2",
+        "bytes": 111010,
         "width": 1600,
         "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--small-multiview.png",
-        "sha256": "e4bdd337ad3df5a849ecee8acf24ab9af1d7d4fbed3541b0729d36a2df0e038e",
-        "bytes": 183714,
+        "sha256": "1c95fa878af241f18304a458f349d49c9c0d42778f4e4586865b6415fb31ec21",
+        "bytes": 201118,
         "width": 1800,
         "height": 262,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--identity.png",
-        "sha256": "e817d99475d5599a05b2164e3367b85b9148f16e8acd2b46ed170ef868cfce58",
-        "bytes": 342039,
+        "sha256": "d0975118b05175e39ab1405ca49ff4b06ac63a133d32157bb1c489605c6c4b58",
+        "bytes": 374071,
         "width": 1800,
         "height": 248,
         "format": "png"
@@ -3353,6 +3354,6 @@
         "format": "png"
       }
     ],
-    "shippingCatalogSha256": "b2d42c73204506829d1f0dd254fd9a4461a63c31c7f26120a9b22d5d95f4fbdd"
+    "shippingCatalogSha256": "f4d9c8f07e37a13c944b5ea4cf70da045f42f1154784b1da6605ff1c237c4924"
   }
 }

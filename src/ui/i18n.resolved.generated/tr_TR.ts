@@ -956,7 +956,8 @@ export const tr_TR: EnTranslations = {
       "durationUnitSeconds": "sn",
       "durationUnitMinutes": "dk",
       "durationUnitHours": "sa",
-      "durationUnitDays": "g"
+      "durationUnitDays": "g",
+      "buffOverflowLabel": "+{n}"
     },
     "character": {
       "modelPreview": "Karakter Modeli Önizlemesi"
@@ -1386,6 +1387,7 @@ export const tr_TR: EnTranslations = {
       "name_thunderstrut_gobbler": "Gürlemeadım, Büyük Hindi",
       "name_terrorspark_groundshaker": "Dehşetkıvılcım, Yer Sarsan",
       "name_drakemaw_raptor": "Ejder Ağzı Raptoru",
+      "name_rickshaw_mount": "Kemikbağlı Çekçek",
       "desc_valorsteed": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve sağlam adımlı bir küheylan.",
       "desc_grag_bear": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve sağlam adımlı bir ayı.",
       "desc_stalkglider_snail": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve yavaş yanan bir salyangoz.",
@@ -1394,7 +1396,8 @@ export const tr_TR: EnTranslations = {
       "desc_stormfeather_griffin": "Rün nallı pençeleriyle yerde süzülen, kanatları katlı, asil bir fırtına grifonu.",
       "desc_thunderstrut_gobbler": "Uyanan Zirve'den kabararak inen, kuyruğu bir fırtına bulutu gibi açılmış devasa bir fırtına hindisi.",
       "desc_terrorspark_groundshaker": "Ağır paletleri, büyük çaplı bir topu ve korkusuz pilotlar için yapılmış bir eyeri olan kompakt zırhlı bir makine.",
-      "desc_drakemaw_raptor": "Ejder Ağzı Kalderası'ndan gelen, eyere alıştırılmış bir yuva raptoru: tepeden tırnağa kas ve hız, hâlâ hafiften kül kokuyor."
+      "desc_drakemaw_raptor": "Ejder Ağzı Kalderası'ndan gelen, eyere alıştırılmış bir yuva raptoru: tepeden tırnağa kas ve hız, hâlâ hafiften kül kokuyor.",
+      "desc_rickshaw_mount": "Sırıklarına kemikleri çıkmış bir avanenin koşulduğu, seni ölümüne bir koşuyla çeken takırdayan kemik arabası."
     },
     "mountTraining": {
       "mountPrompt": "Eğitim Yiğit Küheylanına binmek için {key} tuşuna bas.",
@@ -1564,6 +1567,7 @@ export const tr_TR: EnTranslations = {
       "playerFrameScale": "Oyuncu Çerçevesi Ölçeği",
       "targetFrameScale": "Hedef Çerçevesi Ölçeği",
       "aurasOnPlayerFrame": "Oyuncu Çerçevesinde Güçlendirmeler",
+      "alwaysShowAllBuffs": "Always Show All Buffs",
       "highContrastBackground": "Yüksek Kontrastlı Arka Plan",
       "startAttackOnAbility": "Yetenek Kullanımında Otomatik Saldırı",
       "stopAutoAttackOnTargetSwitch": "Hedef Değiştirince Otomatik Saldırıyı Durdur",
@@ -1573,6 +1577,8 @@ export const tr_TR: EnTranslations = {
       "stickyTarget": "Yere Tıklayınca Hedefi Koru",
       "showItemLevel": "Eşya Seviyesini Göster",
       "showReliquaryTracker": "Emanet Takibini Göster",
+      "confirmVendorSell": "Confirm Before Selling",
+      "confirmVendorSellNote": "Turning this off sells items with a single click and no confirmation, so a shifted bag slot could vendor the wrong item.",
       "itemLevelLine": "Eşya Seviyesi {level}",
       "itemScoreLine": "Puan {score}",
       "showSecondaryActionBar": "İkincil Eylem Çubuğunu Göster",
@@ -1581,6 +1587,7 @@ export const tr_TR: EnTranslations = {
       "hideUnusedActionSlots": "Kullanılmayan Eylem Alanlarını Gizle",
       "lockActionBars": "Eylem Çubuklarını Kilitle",
       "showTargetOfTarget": "Hedefin Hedefini Göster",
+      "showTargetSwingTimer": "Hedefin savurma zamanlayıcısını göster",
       "showPetFrame": "Yoldaşını Göster",
       "waterRipples": "Su Dalgacıkları (İz Dalgaları)",
       "showAttackButton": "Saldırı Düğmesini Göster",
@@ -2140,6 +2147,12 @@ export const tr_TR: EnTranslations = {
         "few": "{count} saniye kaldı",
         "many": "{count} saniye kaldı",
         "other": "{count} saniye kaldı"
+      },
+      "buffsHidden": {
+        "one": "{count} güçlendirme daha etkin, ancak bu grafik ön ayarında gizli",
+        "few": "{count} güçlendirme daha etkin, ancak bu grafik ön ayarında gizli",
+        "many": "{count} güçlendirme daha etkin, ancak bu grafik ön ayarında gizli",
+        "other": "{count} güçlendirme daha etkin, ancak bu grafik ön ayarında gizli"
       },
       "playtimeDays": {
         "one": "{count} gün",
@@ -3204,9 +3217,9 @@ export const tr_TR: EnTranslations = {
       "linked": "Bağlı Steam hesabı: {id}",
       "benefits": "Kazandığın yiğitliklerin Steam başarımlarına yansıması için Steam hesabını masaüstü uygulamasından bağla.",
       "noTicket": "Steam bir bağlantı bileti vermedi. Steam'i başlat, sonra tekrar dene.",
-      "wishlist": "Wishlist on Steam",
-      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
-      "wishlistShort": "Wishlist"
+      "wishlist": "Steam'de istek listesine ekle",
+      "wishlistAria": "Steam'de istek listesine ekle: World of ClaudeCraft mağaza sayfasını aç",
+      "wishlistShort": "İstek listesi"
     },
     "epic": {
       "title": "Epic",
@@ -3875,7 +3888,9 @@ export const tr_TR: EnTranslations = {
       "equip": "Kuşan",
       "disenchant": "Büyüyü Boz",
       "salvage": "Kurtar",
-      "applyEnchant": "Büyü Uygula"
+      "applyEnchant": "Büyü Uygula",
+      "sell": "Sat",
+      "sellAll": "Tümünü sat ({count})"
     },
     "enchanting": {
       "disenchantedLine": "{item} büyüsünü bozdunuz.",
@@ -4377,6 +4392,10 @@ export const tr_TR: EnTranslations = {
       "loading": "Borsa yükleniyor...",
       "loadFailed": "Borsa'ya ulaşılamadı. Kısa süre sonra tekrar dene.",
       "disabledRealm": "$WOC Borsası bu sunucuda kullanılamıyor.",
+      "browserOnlyConfirmTitle": "$WOC Borsası tarayıcıda açılsın mı?",
+      "browserOnlyConfirmBody": "$WOC Borsası yalnızca World of ClaudeCraft tarayıcı sürümünde çalışır. Bu, World of ClaudeCraft oyununu tarayıcınızda açar; orada giriş yapıp Borsayı açabilirsiniz. Oyun burada çalışmaya devam eder.",
+      "browserOnlyConfirmOpen": "Tarayıcıda Aç",
+      "browserOnlyConfirmCancel": "İptal",
       "pausedBanner": "Alım satım duraklatıldı. Açık artırmaların geri sayımı sürüyor; yeni ilanlar, teklifler, öneriler ve ödemeler alım satım devam edene kadar bekler, ve gönderilmiş bir ödeme yine de sonuçlanır.",
       "walletLinkedDisconnected": "Your public address is linked. Reconnect that wallet app when you want to pay with $WOC.",
       "walletLinkedConnected": "Your linked wallet app is connected and ready for $WOC purchases.",
@@ -4697,7 +4716,13 @@ export const tr_TR: EnTranslations = {
       "upstream": "Epic yanıt vermedi. Birazdan tekrar deneyin."
     },
     "wallet": {
-      "handoff_invalid": "Cüzdan yetkilendirmesi süresi dolmuş veya doğrulanamadı. Tekrar dene."
+      "handoff_invalid": "Cüzdan yetkilendirmesi süresi dolmuş veya doğrulanamadı. Tekrar dene.",
+      "reauth_required": "Bu cüzdan değişikliğini hesap parolanızla onaylayın.",
+      "reauth_two_factor": "Hesabınızda iki adımlı kimlik doğrulama etkin. Onaylamak için kodunuzu girin.",
+      "reauth_no_password": "Önce hesap ayarlarından bir parola belirleyin, sonra tekrar deneyin.",
+      "reauth_bad_signature": "Cüzdan imzası doğrulanamadı. Tekrar deneyin.",
+      "reauth_bad_password": "Parolanız yanlış.",
+      "reauth_bad_two_factor": "Bu kod geçerli değil, tekrar deneyin."
     },
     "ota_updates": {
       "invalid_input": "Geçersiz girdi."
@@ -5155,6 +5180,7 @@ export const tr_TR: EnTranslations = {
       "ifPartySort": "Grup üyelerinin listelenme sırası: grup sırası, rol ya da ad.",
       "ifPartyShowAuras": "Güçlendirmelerin ve zayıflatmaların grup çerçevelerinde gösterilip gösterilmeyeceği. Eşleşen anahtarlar kaynak çubuklarını, emilimleri, evcil hayvanları ve kendi grup listenizde görünüp görünmeyeceğinizi de kapsar.",
       "ifAurasOnPlayerFrame": "Güçlendirmelerinizi ve zayıflatmalarınızı, aura çubuğunun yanı sıra kendi birim çerçevenize de yerleştirir.",
+      "ifAlwaysShowAllBuffs": "Shows every active buff even on the Low graphics preset, bypassing its usual buff-icon cap.",
       "ifTargetOfTarget": "Hedefinizin kimi hedeflediğini gösterir; tankın canavarı hâlâ tutup tutmadığını anlamanın klasik yolu.",
       "ifPetFrame": "Evcil hayvanınız için bir çerçeve gösterir.",
       "ifChatFontScale": "Sohbet metni boyutu.",
@@ -7623,6 +7649,13 @@ export const tr_TR: EnTranslations = {
     "unlink": "Bağlantıyı Kaldır",
     "unlinkTitle": "Bu hesaptan cüzdan doğrulamasını kaldır",
     "unlinkAria": "Bu hesaptan cüzdan doğrulamasını kaldır",
+    "reauthTitle": "Cüzdan değişikliğini onayla",
+    "reauthUnlinkTitle": "Cüzdan kaldırmayı onayla",
+    "reauthHelp": "Güvenliğiniz için bu değişikliğe izin vermek üzere hesap parolanızı girin.",
+    "reauthNoPassword": "Bu hesap parolasız giriş yapıyor. Önce hesap ayarlarından bir parola belirleyin, sonra tekrar deneyin.",
+    "reauthConfirm": "Onayla",
+    "reauthCancel": "İptal",
+    "reauthClose": "Kapat",
     "signOut": "Bağlantıyı Kes",
     "signOutTitle": "Bu tarayıcıdaki cüzdan uygulamasının bağlantısını kes",
     "signOutAria": "Bu tarayıcıdaki cüzdan uygulamasının bağlantısını kes",
@@ -13171,6 +13204,9 @@ export const tr_TR: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Kontak Anahtarı: Dehşetkıvılcım, Yer Sarsan"
+      },
+      "reins_rickshaw_mount": {
+        "name": "Bağlı Dizginler: Kemikbağlı Çekçek"
       },
       "reins_drakemaw_raptor": {
         "name": "Ejder Ağzı Raptoru'nun Dizginleri"

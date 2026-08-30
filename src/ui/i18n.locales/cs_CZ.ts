@@ -2586,6 +2586,14 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'itemUi.stats.parry': 'Odražení',
   'apiError.wallet.handoff_invalid':
     'Toto oprávnění peněženky vypršelo nebo je neověřitelné. Zkus to znovu.',
+  'apiError.wallet.reauth_required': 'Potvrď tuto změnu peněženky heslem k účtu.',
+  'apiError.wallet.reauth_two_factor':
+    'Tvůj účet má zapnuté dvoufaktorové ověření. Pro potvrzení zadej svůj kód.',
+  'apiError.wallet.reauth_no_password':
+    'Nejdřív si v nastavení účtu nastav heslo a pak to zkus znovu.',
+  'apiError.wallet.reauth_bad_signature': 'Podpis peněženky se nepodařilo ověřit. Zkus to znovu.',
+  'apiError.wallet.reauth_bad_password': 'Tvoje heslo není správné.',
+  'apiError.wallet.reauth_bad_two_factor': 'Tento kód není platný, zkus to znovu.',
   'cardDuel.close': 'Zavřít',
   'cardDuel.counts': 'Balíček: {deck} · Odložiště: {discard}',
   'cardDuel.forfeit': 'Vzdát se',
@@ -4313,6 +4321,14 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'wallet.switchTitle': 'Ověřit jinou peněženku',
   'wallet.unlink': 'Odpojit od účtu',
   'wallet.unlinkAria': 'Odebrat ověření peněženky z tohoto účtu',
+  'wallet.reauthTitle': 'Potvrzení změny peněženky',
+  'wallet.reauthUnlinkTitle': 'Potvrzení odebrání peněženky',
+  'wallet.reauthHelp': 'Z bezpečnostních důvodů zadej heslo k účtu pro povolení této změny.',
+  'wallet.reauthNoPassword':
+    'Tento účet se přihlašuje bez hesla. Nejdřív si v nastavení účtu nastav heslo a pak to zkus znovu.',
+  'wallet.reauthConfirm': 'Potvrdit',
+  'wallet.reauthCancel': 'Zrušit',
+  'wallet.reauthClose': 'Zavřít',
   'wallet.unlinkFailed': 'Peněženku se nepodařilo odpojit od účtu.',
   'wallet.unlinkTitle': 'Odebrat ověření peněženky z tohoto účtu',
   'wallet.verify': 'Ověřit peněženku',
@@ -13651,4 +13667,30 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   "entities.abilities.nightshade_coating.description": "Pokryje cíl v nočním stínu, způsobí {damage} poškození přírody a sníží léčení, které obdrží, o 25 % po dobu 12 sekund.",
   "entities.abilities.nightshade_coating.name": "Nátěr Nightshade",
   "guide.settingsPage.ifShowReliquaryTracker": "Zda je sledovač relikviářů (vaše připnuté stránky a jejich průběh) umístěn na vašem HUD. Okno Relikviář má odpovídající tlačítko oka a připnutím stránky se sledovač opět zapne.",
+  // v0.41 release i18n fill.
+  'entities.items.reins_rickshaw_mount.name': 'Spoutané otěže: Kostipoutaná rikša',
+  'hudChrome.itemMenu.sell': 'Prodat',
+  'hudChrome.itemMenu.sellAll': 'Prodat vše ({count})',
+  'hudChrome.mounts.desc_rickshaw_mount':
+    'Chrastící kostěný vozík s kostnatým pěšákem zapřaženým do ojí, který tě veze tryskem.',
+  'hudChrome.mounts.name_rickshaw_mount': 'Kostipoutaná rikša',
+  'hudChrome.options.showTargetSwingTimer': 'Zobrazit časovač švihu cíle',
+  'hudChrome.plurals.buffsHidden.one':
+    'Je aktivní ještě {count} posílení, ale v tomto grafickém přednastavení je skryté',
+  'hudChrome.plurals.buffsHidden.few':
+    'Jsou aktivní ještě {count} posílení, ale v tomto grafickém přednastavení jsou skrytá',
+  'hudChrome.plurals.buffsHidden.many':
+    'Je aktivních ještě {count} posílení, ale v tomto grafickém přednastavení jsou skryta',
+  'hudChrome.plurals.buffsHidden.other':
+    'Je aktivních ještě {count} posílení, ale v tomto grafickém přednastavení jsou skryta',
+  'hudChrome.steam.wishlist': 'Přidat na seznam přání ve Steamu',
+  'hudChrome.steam.wishlistAria':
+    'Přidat na seznam přání ve Steamu: otevřít stránku obchodu World of ClaudeCraft',
+  'hudChrome.steam.wishlistShort': 'Seznam přání',
+  'hudChrome.unitFrame.buffOverflowLabel': '+{n}',
+  'hudChrome.wocMarket.browserOnlyConfirmTitle': 'Otevřít burzu $WOC v prohlížeči?',
+  'hudChrome.wocMarket.browserOnlyConfirmBody':
+    'Burza $WOC funguje pouze v prohlížečové verzi World of ClaudeCraft. Tím se World of ClaudeCraft otevře v prohlížeči, kde se můžete přihlásit a otevřít burzu; hra zde poběží dál.',
+  'hudChrome.wocMarket.browserOnlyConfirmOpen': 'Otevřít v prohlížeči',
+  'hudChrome.wocMarket.browserOnlyConfirmCancel': 'Zrušit',
 };

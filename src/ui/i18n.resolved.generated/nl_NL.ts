@@ -956,7 +956,8 @@ export const nl_NL: EnTranslations = {
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "m",
       "durationUnitHours": "u",
-      "durationUnitDays": "d"
+      "durationUnitDays": "d",
+      "buffOverflowLabel": "+{n}"
     },
     "character": {
       "modelPreview": "Voorbeeld van Personagemodel"
@@ -1386,6 +1387,7 @@ export const nl_NL: EnTranslations = {
       "name_thunderstrut_gobbler": "Donderstap de Grote Kalkoen",
       "name_terrorspark_groundshaker": "Schrikvonk, de Grondschudder",
       "name_drakemaw_raptor": "Drakenmuil-Raptor",
+      "name_rickshaw_mount": "Beengebonden Riksja",
       "desc_valorsteed": "Een sterk, standvastig strijdros dat extra reissnelheid geeft.",
       "desc_grag_bear": "Een sterke, standvastige beer die extra reissnelheid geeft.",
       "desc_stalkglider_snail": "Een taaie, langzaam brandende slak die extra reissnelheid geeft.",
@@ -1394,7 +1396,8 @@ export const nl_NL: EnTranslations = {
       "desc_stormfeather_griffin": "Een koninklijke stormgriffioen die met runenbeslagen klauwen over de grond sluipt, vleugels opgevouwen.",
       "desc_thunderstrut_gobbler": "Een kolossale, uit de storm geboren kalkoen die vanaf de Ontwakende Piek naar beneden stapt, staart gespreid als een onweerswolk.",
       "desc_terrorspark_groundshaker": "Een compacte gepantserde machine met zware rupsbanden, een grootkaliberkanon en een zadel gebouwd voor onverschrokken piloten.",
-      "desc_drakemaw_raptor": "Een zadelmakke broedraptor uit de Drakenmuil-Caldera, één en al pezen en vaart, nog altijd zwak naar as geurend."
+      "desc_drakemaw_raptor": "Een zadelmakke broedraptor uit de Drakenmuil-Caldera, één en al pezen en vaart, nog altijd zwak naar as geurend.",
+      "desc_rickshaw_mount": "Een ratelende bottenkar met een benige handlanger aan de disselbomen, die je in volle vaart voortsleurt."
     },
     "mountTraining": {
       "mountPrompt": "Druk op {key} om op de trainings-Moedros te stijgen.",
@@ -1564,6 +1567,7 @@ export const nl_NL: EnTranslations = {
       "playerFrameScale": "Schaal spelerframe",
       "targetFrameScale": "Schaal doelwitframe",
       "aurasOnPlayerFrame": "Buffs op het spelerframe",
+      "alwaysShowAllBuffs": "Always Show All Buffs",
       "highContrastBackground": "Hoog-contrastachtergrond",
       "startAttackOnAbility": "Auto-aanval bij gebruik van vaardigheid",
       "stopAutoAttackOnTargetSwitch": "Auto-Aanval Stoppen bij Doelwitwissel",
@@ -1573,6 +1577,8 @@ export const nl_NL: EnTranslations = {
       "stickyTarget": "Doel behouden bij klikken op de grond",
       "showItemLevel": "Itemniveau tonen",
       "showReliquaryTracker": "Toon Relikwieëntracker",
+      "confirmVendorSell": "Confirm Before Selling",
+      "confirmVendorSellNote": "Turning this off sells items with a single click and no confirmation, so a shifted bag slot could vendor the wrong item.",
       "itemLevelLine": "Itemniveau {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Secundaire actiebalk tonen",
@@ -1581,6 +1587,7 @@ export const nl_NL: EnTranslations = {
       "hideUnusedActionSlots": "Ongebruikte actievakjes verbergen",
       "lockActionBars": "Actiebalken vergrendelen",
       "showTargetOfTarget": "Doelwit van doelwit tonen",
+      "showTargetSwingTimer": "Aanvalstimer van doelwit tonen",
       "showPetFrame": "Je huisdier tonen",
       "waterRipples": "Waterrimpels (kielzog)",
       "showAttackButton": "Aanvalsknop Tonen",
@@ -2140,6 +2147,12 @@ export const nl_NL: EnTranslations = {
         "few": "{count} seconden resterend",
         "many": "{count} seconden resterend",
         "other": "{count} seconden resterend"
+      },
+      "buffsHidden": {
+        "one": "Er is nog {count} verbetering actief, maar die is verborgen in deze grafische preset",
+        "few": "Er zijn nog {count} verbeteringen actief, maar die zijn verborgen in deze grafische preset",
+        "many": "Er zijn nog {count} verbeteringen actief, maar die zijn verborgen in deze grafische preset",
+        "other": "Er zijn nog {count} verbeteringen actief, maar die zijn verborgen in deze grafische preset"
       },
       "playtimeDays": {
         "one": "{count} dag",
@@ -3204,9 +3217,9 @@ export const nl_NL: EnTranslations = {
       "linked": "Gekoppeld aan Steam-account {id}",
       "benefits": "Koppel je Steam-account vanuit de desktop-app om de daden die je behaalt te spiegelen naar Steam-prestaties.",
       "noTicket": "Steam gaf geen koppelticket af. Start Steam en probeer het daarna opnieuw.",
-      "wishlist": "Wishlist on Steam",
-      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
-      "wishlistShort": "Wishlist"
+      "wishlist": "Op verlanglijst zetten op Steam",
+      "wishlistAria": "Op verlanglijst zetten op Steam: open de winkelpagina van World of ClaudeCraft",
+      "wishlistShort": "Verlanglijst"
     },
     "epic": {
       "title": "Epic",
@@ -3875,7 +3888,9 @@ export const nl_NL: EnTranslations = {
       "equip": "Uitrusten",
       "disenchant": "Onbetoveren",
       "salvage": "Salvagen",
-      "applyEnchant": "Betovering aanbrengen"
+      "applyEnchant": "Betovering aanbrengen",
+      "sell": "Verkopen",
+      "sellAll": "Alles verkopen ({count})"
     },
     "enchanting": {
       "disenchantedLine": "Je onbetoverd {item}.",
@@ -4377,6 +4392,10 @@ export const nl_NL: EnTranslations = {
       "loading": "De Beurs laden...",
       "loadFailed": "De Beurs kon niet worden bereikt. Probeer het straks opnieuw.",
       "disabledRealm": "De $WOC-beurs is niet beschikbaar op deze wereld.",
+      "browserOnlyConfirmTitle": "De $WOC-beurs in je browser openen?",
+      "browserOnlyConfirmBody": "De $WOC-beurs werkt alleen in de browserversie van World of ClaudeCraft. Hiermee wordt World of ClaudeCraft in je browser geopend, waar je kunt inloggen en de beurs kunt openen; het spel blijft hier doorgaan.",
+      "browserOnlyConfirmOpen": "Openen in browser",
+      "browserOnlyConfirmCancel": "Annuleren",
       "pausedBanner": "Handel is gepauzeerd. Veilingen blijven aftellen; nieuwe aanbiedingen, biedingen, offertes en betalingen wachten tot de handel wordt hervat, en een betaling die al is verzonden, wordt nog steeds afgewikkeld.",
       "walletLinkedDisconnected": "Your public address is linked. Reconnect that wallet app when you want to pay with $WOC.",
       "walletLinkedConnected": "Your linked wallet app is connected and ready for $WOC purchases.",
@@ -4697,7 +4716,13 @@ export const nl_NL: EnTranslations = {
       "upstream": "Epic reageerde niet. Probeer het zo meteen opnieuw."
     },
     "wallet": {
-      "handoff_invalid": "Die portemonnee-autorisatie is verlopen of kon niet worden geverifieerd. Probeer het opnieuw."
+      "handoff_invalid": "Die portemonnee-autorisatie is verlopen of kon niet worden geverifieerd. Probeer het opnieuw.",
+      "reauth_required": "Bevestig deze portemonneewijziging met je accountwachtwoord.",
+      "reauth_two_factor": "Je account heeft tweestapsverificatie ingeschakeld. Voer je code in om te bevestigen.",
+      "reauth_no_password": "Stel eerst een wachtwoord in bij de accountinstellingen en probeer het opnieuw.",
+      "reauth_bad_signature": "De handtekening van de portemonnee kon niet worden geverifieerd. Probeer het opnieuw.",
+      "reauth_bad_password": "Je wachtwoord is onjuist.",
+      "reauth_bad_two_factor": "Die code is niet geldig, probeer het opnieuw."
     },
     "ota_updates": {
       "invalid_input": "Ongeldige invoer."
@@ -5155,6 +5180,7 @@ export const nl_NL: EnTranslations = {
       "ifPartySort": "De volgorde waarin groepsleden worden weergegeven: groepsvolgorde, rol, of naam.",
       "ifPartyShowAuras": "Of buffs en debuffs op de groepsframes worden getoond. Bijbehorende schakelaars beslaan resourcebalken, absorpties, huisdieren, en of je in je eigen groepslijst verschijnt.",
       "ifAurasOnPlayerFrame": "Zet je buffs en debuffs ook op je eigen spelerframe, naast de aurabalk.",
+      "ifAlwaysShowAllBuffs": "Shows every active buff even on the Low graphics preset, bypassing its usual buff-icon cap.",
       "ifTargetOfTarget": "Toont wie het doelwit van jouw doelwit is, de klassieke manier om te zien of de tank het nog vasthoudt.",
       "ifPetFrame": "Toont een frame voor je huisdier.",
       "ifChatFontScale": "Tekstgrootte van de chat.",
@@ -7623,6 +7649,13 @@ export const nl_NL: EnTranslations = {
     "unlink": "Ontkoppelen",
     "unlinkTitle": "Verwijder portemonneeverificatie van dit account",
     "unlinkAria": "Verwijder portemonneeverificatie van dit account",
+    "reauthTitle": "Portemonneewijziging bevestigen",
+    "reauthUnlinkTitle": "Portemonneeverwijdering bevestigen",
+    "reauthHelp": "Voer voor je veiligheid je accountwachtwoord in om deze wijziging toe te staan.",
+    "reauthNoPassword": "Dit account logt in zonder wachtwoord. Stel eerst een wachtwoord in bij de accountinstellingen en probeer het opnieuw.",
+    "reauthConfirm": "Bevestigen",
+    "reauthCancel": "Annuleren",
+    "reauthClose": "Sluiten",
     "signOut": "Verbinding verbreken",
     "signOutTitle": "Verbreek de verbinding met de portemonnee-app in deze browser",
     "signOutAria": "Verbreek de verbinding met de portemonnee-app in deze browser",
@@ -13171,6 +13204,9 @@ export const nl_NL: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Contactsleutel: Schrikvonk, de Grondschudder"
+      },
+      "reins_rickshaw_mount": {
+        "name": "Gebonden teugels: Beengebonden Riksja"
       },
       "reins_drakemaw_raptor": {
         "name": "Teugels van de Drakenmuil-Raptor"

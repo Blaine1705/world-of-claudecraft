@@ -150,7 +150,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1004,
-      "state": "583875c0",
+      "state": "44af2ee4",
       "events": "d16cde2b",
       "rng": {
         "draws": 15,
@@ -161,7 +161,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1004,
-      "state": "d2e8ec7b",
+      "state": "bd0db8a9",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -172,7 +172,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1004,
-      "state": "269a87f1",
+      "state": "6de34165",
       "events": "55622b4e",
       "rng": {
         "draws": 189,
@@ -183,7 +183,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1004,
-      "state": "9c706898",
+      "state": "291f3f2c",
       "events": "741638a5",
       "rng": {
         "draws": 359,
@@ -194,7 +194,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1004,
-      "state": "5bd7b684",
+      "state": "cd1cc594",
       "events": "705d58f1",
       "rng": {
         "draws": 552,
@@ -205,7 +205,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1004,
-      "state": "688f63c9",
+      "state": "41c4ef41",
       "events": "741638a5",
       "rng": {
         "draws": 743,
@@ -216,7 +216,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1004,
-      "state": "67577e6c",
+      "state": "3b90e6f8",
       "events": "741638a5",
       "rng": {
         "draws": 743,
@@ -368,6 +368,7 @@
         },
         {
           "aiState": "idle",
+          "autoAttack": true,
           "combatTimer": 1.05,
           "comboUntil": -1,
           "critChance": 0.05,
@@ -413,6 +414,7 @@
         {
           "aggroTargetId": 1000,
           "aiState": "attack",
+          "autoAttack": true,
           "combatTimer": 1.05,
           "comboUntil": -1,
           "critChance": 0.05,
@@ -475,6 +477,7 @@
         },
         {
           "aiState": "idle",
+          "autoAttack": true,
           "combatTimer": 1.6,
           "comboUntil": -1,
           "critChance": 0.05,
@@ -522,6 +525,7 @@
         {
           "aggroTargetId": 1002,
           "aiState": "attack",
+          "autoAttack": true,
           "combatTimer": 1.6,
           "comboUntil": -1,
           "critChance": 0.05,

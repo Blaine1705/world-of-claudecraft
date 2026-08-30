@@ -2578,6 +2578,14 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'itemUi.stats.parry': 'Savuşturma',
   'apiError.wallet.handoff_invalid':
     'Cüzdan yetkilendirmesi süresi dolmuş veya doğrulanamadı. Tekrar dene.',
+  'apiError.wallet.reauth_required': 'Bu cüzdan değişikliğini hesap parolanızla onaylayın.',
+  'apiError.wallet.reauth_two_factor':
+    'Hesabınızda iki adımlı kimlik doğrulama etkin. Onaylamak için kodunuzu girin.',
+  'apiError.wallet.reauth_no_password':
+    'Önce hesap ayarlarından bir parola belirleyin, sonra tekrar deneyin.',
+  'apiError.wallet.reauth_bad_signature': 'Cüzdan imzası doğrulanamadı. Tekrar deneyin.',
+  'apiError.wallet.reauth_bad_password': 'Parolanız yanlış.',
+  'apiError.wallet.reauth_bad_two_factor': 'Bu kod geçerli değil, tekrar deneyin.',
   'cardDuel.close': 'Kapat',
   'cardDuel.counts': 'Deste: {deck} · Atılan: {discard}',
   'cardDuel.forfeit': 'Teslim Ol',
@@ -9999,6 +10007,14 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'wallet.switchTitle': 'Farklı bir cüzdan doğrula',
   'wallet.unlink': 'Bağlantıyı Kaldır',
   'wallet.unlinkAria': 'Bu hesaptan cüzdan doğrulamasını kaldır',
+  'wallet.reauthTitle': 'Cüzdan değişikliğini onayla',
+  'wallet.reauthUnlinkTitle': 'Cüzdan kaldırmayı onayla',
+  'wallet.reauthHelp': 'Güvenliğiniz için bu değişikliğe izin vermek üzere hesap parolanızı girin.',
+  'wallet.reauthNoPassword':
+    'Bu hesap parolasız giriş yapıyor. Önce hesap ayarlarından bir parola belirleyin, sonra tekrar deneyin.',
+  'wallet.reauthConfirm': 'Onayla',
+  'wallet.reauthCancel': 'İptal',
+  'wallet.reauthClose': 'Kapat',
   'wallet.unlinkFailed': 'Cüzdan bağlantısı kaldırılamadı.',
   'wallet.unlinkTitle': 'Bu hesaptan cüzdan doğrulamasını kaldır',
   'wallet.verify': 'Cüzdanı Doğrula',
@@ -13619,4 +13635,30 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   "entities.abilities.nightshade_coating.description": "Hedefi itüzümüyle kaplayarak {damage} Nature hasarı verir ve aldığı iyileştirmeyi 12 saniye boyunca %25 azaltır.",
   "entities.abilities.nightshade_coating.name": "Gece Gölgesi Kaplama",
   "guide.settingsPage.ifShowReliquaryTracker": "Reliquary izleyicinin (sabitlenmiş sayfalarınız ve ilerlemeleri) HUD'nizde bulunup bulunmadığı. Reliquary penceresinde eşleşen bir göz düğmesi bulunur ve bir sayfayı sabitlemek izleyiciyi tekrar açar.",
+  // v0.41 release i18n fill.
+  'entities.items.reins_rickshaw_mount.name': 'Bağlı Dizginler: Kemikbağlı Çekçek',
+  'hudChrome.itemMenu.sell': 'Sat',
+  'hudChrome.itemMenu.sellAll': 'Tümünü sat ({count})',
+  'hudChrome.mounts.desc_rickshaw_mount':
+    'Sırıklarına kemikleri çıkmış bir avanenin koşulduğu, seni ölümüne bir koşuyla çeken takırdayan kemik arabası.',
+  'hudChrome.mounts.name_rickshaw_mount': 'Kemikbağlı Çekçek',
+  'hudChrome.options.showTargetSwingTimer': 'Hedefin savurma zamanlayıcısını göster',
+  'hudChrome.plurals.buffsHidden.one':
+    '{count} güçlendirme daha etkin, ancak bu grafik ön ayarında gizli',
+  'hudChrome.plurals.buffsHidden.few':
+    '{count} güçlendirme daha etkin, ancak bu grafik ön ayarında gizli',
+  'hudChrome.plurals.buffsHidden.many':
+    '{count} güçlendirme daha etkin, ancak bu grafik ön ayarında gizli',
+  'hudChrome.plurals.buffsHidden.other':
+    '{count} güçlendirme daha etkin, ancak bu grafik ön ayarında gizli',
+  'hudChrome.steam.wishlist': "Steam'de istek listesine ekle",
+  'hudChrome.steam.wishlistAria':
+    "Steam'de istek listesine ekle: World of ClaudeCraft mağaza sayfasını aç",
+  'hudChrome.steam.wishlistShort': 'İstek listesi',
+  'hudChrome.unitFrame.buffOverflowLabel': '+{n}',
+  'hudChrome.wocMarket.browserOnlyConfirmTitle': '$WOC Borsası tarayıcıda açılsın mı?',
+  'hudChrome.wocMarket.browserOnlyConfirmBody':
+    '$WOC Borsası yalnızca World of ClaudeCraft tarayıcı sürümünde çalışır. Bu, World of ClaudeCraft oyununu tarayıcınızda açar; orada giriş yapıp Borsayı açabilirsiniz. Oyun burada çalışmaya devam eder.',
+  'hudChrome.wocMarket.browserOnlyConfirmOpen': 'Tarayıcıda Aç',
+  'hudChrome.wocMarket.browserOnlyConfirmCancel': 'İptal',
 };

@@ -2578,6 +2578,14 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'itemUi.stats.parry': 'Parering',
   'apiError.wallet.handoff_invalid':
     'Den plånboksbehörigheten har gått ut eller kunde inte verifieras. Försök igen.',
+  'apiError.wallet.reauth_required': 'Bekräfta den här plånboksändringen med ditt kontolösenord.',
+  'apiError.wallet.reauth_two_factor':
+    'Ditt konto har tvåfaktorsautentisering aktiverad. Ange din kod för att bekräfta.',
+  'apiError.wallet.reauth_no_password':
+    'Ange först ett lösenord i kontoinställningarna och försök igen.',
+  'apiError.wallet.reauth_bad_signature': 'Plånbokens signatur kunde inte verifieras. Försök igen.',
+  'apiError.wallet.reauth_bad_password': 'Ditt lösenord är felaktigt.',
+  'apiError.wallet.reauth_bad_two_factor': 'Den koden är inte giltig, försök igen.',
   'cardDuel.close': 'Stäng',
   'cardDuel.counts': 'Kortlek: {deck} · Kasserad: {discard}',
   'cardDuel.forfeit': 'Ge upp',
@@ -9270,6 +9278,15 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'wallet.switchTitle': 'Verifiera en annan plånbok',
   'wallet.unlink': 'Avlänka',
   'wallet.unlinkAria': 'Ta bort plånboksverifieringen från det här kontot',
+  'wallet.reauthTitle': 'Bekräfta plånboksändring',
+  'wallet.reauthUnlinkTitle': 'Bekräfta borttagning av plånbok',
+  'wallet.reauthHelp':
+    'För din säkerhet, ange ditt kontolösenord för att godkänna den här ändringen.',
+  'wallet.reauthNoPassword':
+    'Det här kontot loggar in utan lösenord. Ange först ett lösenord i kontoinställningarna och försök igen.',
+  'wallet.reauthConfirm': 'Bekräfta',
+  'wallet.reauthCancel': 'Avbryt',
+  'wallet.reauthClose': 'Stäng',
   'wallet.unlinkFailed': 'Det gick inte att avlänka plånboken.',
   'wallet.unlinkTitle': 'Ta bort plånboksverifieringen från det här kontot',
   'wallet.verify': 'Verifiera plånbok',
@@ -13734,4 +13751,30 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   "entities.abilities.nightshade_coating.description": "Belägger målet i nattskugga, gör {damage} naturskada och minskar läkningen den får med 25 % under 12 sek.",
   "entities.abilities.nightshade_coating.name": "Nightshade beläggning",
   "guide.settingsPage.ifShowReliquaryTracker": "Om Reliquary-spåraren (dina fästa sidor och deras framsteg) sitter på din HUD. Reliquary-fönstret har en matchande ögonknapp, och genom att fästa en sida slås spåraren på igen.",
+  // v0.41 release i18n fill.
+  'entities.items.reins_rickshaw_mount.name': 'Bundna tyglar: Benbunden Rickshaw',
+  'hudChrome.itemMenu.sell': 'Sälj',
+  'hudChrome.itemMenu.sellAll': 'Sälj alla ({count})',
+  'hudChrome.mounts.desc_rickshaw_mount':
+    'En skramlande benkärra med en benig hantlangare fastspänd vid skalmarna, som drar dig fram i språngmarsch.',
+  'hudChrome.mounts.name_rickshaw_mount': 'Benbunden Rickshaw',
+  'hudChrome.options.showTargetSwingTimer': 'Visa målets svingtimer',
+  'hudChrome.plurals.buffsHidden.one':
+    'Ytterligare {count} förstärkning är aktiv men dold med denna grafikförinställning',
+  'hudChrome.plurals.buffsHidden.few':
+    'Ytterligare {count} förstärkningar är aktiva men dolda med denna grafikförinställning',
+  'hudChrome.plurals.buffsHidden.many':
+    'Ytterligare {count} förstärkningar är aktiva men dolda med denna grafikförinställning',
+  'hudChrome.plurals.buffsHidden.other':
+    'Ytterligare {count} förstärkningar är aktiva men dolda med denna grafikförinställning',
+  'hudChrome.steam.wishlist': 'Lägg till på önskelistan på Steam',
+  'hudChrome.steam.wishlistAria':
+    'Lägg till på önskelistan på Steam: öppna World of ClaudeCrafts butikssida',
+  'hudChrome.steam.wishlistShort': 'Önskelista',
+  'hudChrome.unitFrame.buffOverflowLabel': '+{n}',
+  'hudChrome.wocMarket.browserOnlyConfirmTitle': 'Öppna $WOC-börsen i webbläsaren?',
+  'hudChrome.wocMarket.browserOnlyConfirmBody':
+    '$WOC-börsen körs endast i webbläsarversionen av World of ClaudeCraft. Detta öppnar World of ClaudeCraft i din webbläsare, där du kan logga in och öppna börsen; spelet fortsätter att köras här.',
+  'hudChrome.wocMarket.browserOnlyConfirmOpen': 'Öppna i webbläsaren',
+  'hudChrome.wocMarket.browserOnlyConfirmCancel': 'Avbryt',
 };

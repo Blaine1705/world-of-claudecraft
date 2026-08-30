@@ -643,11 +643,18 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the player cast bar plus the eat/drink overlay',
   },
   {
-    call: 'this.swingTimerPainter.paint',
+    call: 'this.swingTimerBars.update',
     band: 'frame',
     gate: '',
     surface: 'chrome',
-    why: 'the auto-attack swing timer',
+    why: 'the main-hand and off-hand (dual-wield melee weaving) swing timers',
+  },
+  {
+    call: 'this.targetSwingTimerBars.update',
+    band: 'frame',
+    gate: '',
+    surface: 'chrome',
+    why: 'the target and target-of-target swing timers, gated internally by showTargetSwingTimer',
   },
   {
     call: 'this.procOverlayEl.classList.add',
@@ -1667,9 +1674,13 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // v0.40.0 sync merge back in.
       // chrome 82 -> 83: the controller-tutorial merge's gamepad control
       // hint apply.
-      // window 44 -> 45: the crucible vendor's out-of-range close (the third
+      // chrome 83 -> 84: the target / target-of-target swing-timer bars call
+      // (target_swing_timer_bars.ts), thin-consumer wiring beside the
+      // existing swingTimerBars.update row.
+      // window 44 -> 46: the crucible vendor's out-of-range close (the third
       // #vendor-window tenant, on the heroic vendor's exact row shape).
-    ).toEqual({ window: 46, chrome: 83, none: 17 });
+      // Both deltas apply on the merged tree.
+    ).toEqual({ window: 46, chrome: 84, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

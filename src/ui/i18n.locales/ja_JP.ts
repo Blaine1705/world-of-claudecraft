@@ -844,6 +844,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.playerFrameScale': 'プレイヤーフレームの大きさ',
   'hudChrome.options.targetFrameScale': 'ターゲットフレームの大きさ',
   'hudChrome.options.aurasOnPlayerFrame': 'バフをプレイヤーフレームに表示',
+  'hudChrome.options.alwaysShowAllBuffs': 'すべてのバフを常に表示',
   'hud.core.mapCanvasLabel': 'マップ',
   'hud.core.mapSummary': '{zone}のマップ。',
   'hud.core.mapMarkerDescription': '{area}。{markers}',
@@ -954,6 +955,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitMinutes': '分',
   'hudChrome.unitFrame.durationUnitHours': '時',
   'hudChrome.unitFrame.durationUnitDays': '日',
+  'hudChrome.unitFrame.buffOverflowLabel': '+{n}',
   'hudChrome.unitFrame.partyLabel': 'あなたのパーティ',
   'hudChrome.unitFrame.partyChip': 'パーティ',
   'hudChrome.unitFrame.playerLabel': 'あなたのキャラクター',
@@ -1523,6 +1525,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.highContrastBackground': '高コントラスト背景',
   'hudChrome.options.showItemLevel': 'アイテムレベルを表示',
   'hudChrome.options.showReliquaryTracker': '聖遺物庫トラッカーを表示',
+  'hudChrome.options.confirmVendorSell': '売却前に確認する',
+  'hudChrome.options.confirmVendorSellNote':
+    'オフにすると確認なしでワンクリックでアイテムを売却します。カバンのスロットがずれていると、誤ったアイテムを売却する可能性があります。',
   'hudChrome.options.showSecondaryActionBar': 'セカンダリアクションバーを表示',
   'hudChrome.options.showThirdActionBar': '3本目のアクションバーを表示',
   'hudChrome.options.hideUnusedActionSlots': '未使用のアクションスロットを非表示',
@@ -1785,6 +1790,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'wallet.unlink': '連携解除',
   'wallet.unlinkTitle': 'このアカウントからウォレット認証を削除',
   'wallet.unlinkAria': 'このアカウントからウォレット認証を削除',
+  'wallet.reauthTitle': 'ウォレット変更の確認',
+  'wallet.reauthUnlinkTitle': 'ウォレット削除の確認',
+  'wallet.reauthHelp': 'セキュリティ保護のため、この変更を許可するにはアカウントのパスワードを入力してください。',
+  'wallet.reauthNoPassword': 'このアカウントはパスワードなしでサインインしています。まずアカウント設定でパスワードを設定してから、もう一度お試しください。',
+  'wallet.reauthConfirm': '確認',
+  'wallet.reauthCancel': 'キャンセル',
+  'wallet.reauthClose': '閉じる',
   'wallet.signOut': '接続解除',
   'wallet.signOutTitle': 'このブラウザでウォレットアプリの接続を解除',
   'wallet.signOutAria': 'このブラウザでウォレットアプリの接続を解除',
@@ -5998,6 +6010,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.secondsRemaining.few': '残り {count} 秒',
   'hudChrome.plurals.secondsRemaining.many': '残り {count} 秒',
   'hudChrome.plurals.secondsRemaining.other': '残り {count} 秒',
+  'hudChrome.plurals.buffsHidden.one': 'あと{count}個のバフが有効ですが、画質設定によりアイコンが非表示です',
+  'hudChrome.plurals.buffsHidden.few': 'あと{count}個のバフが有効ですが、画質設定によりアイコンが非表示です',
+  'hudChrome.plurals.buffsHidden.many': 'あと{count}個のバフが有効ですが、画質設定によりアイコンが非表示です',
+  'hudChrome.plurals.buffsHidden.other': 'あと{count}個のバフが有効ですが、画質設定によりアイコンが非表示です',
   'hudChrome.plurals.playtimeDays.one': '{count} 日',
   'hudChrome.plurals.playtimeDays.few': '{count} 日',
   'hudChrome.plurals.playtimeDays.many': '{count} 日',
@@ -9082,6 +9098,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.steam.disabled': 'Steam連携は現在利用できません。',
   'apiError.wallet.handoff_invalid':
     'ウォレット認証の有効期限が切れたか、確認できませんでした。もう一度お試しください。',
+  'apiError.wallet.reauth_required': 'このウォレット変更を確認するには、アカウントのパスワードを入力してください。',
+  'apiError.wallet.reauth_two_factor': 'このアカウントは二要素認証が有効です。確認のため認証コードを入力してください。',
+  'apiError.wallet.reauth_no_password': 'まずアカウント設定でパスワードを設定してから、もう一度お試しください。',
+  'apiError.wallet.reauth_bad_signature': 'ウォレットの署名を確認できませんでした。もう一度お試しください。',
+  'apiError.wallet.reauth_bad_password': 'パスワードが正しくありません。',
+  'apiError.wallet.reauth_bad_two_factor': 'そのコードは無効です。もう一度お試しください。',
   'apiError.seeker.native_only': 'Seeker資格はネイティブアプリでのみ利用できます。',
   'apiError.seeker.attestation_failed': '端末の検証に失敗しました。もう一度お試しください。',
   'apiError.seeker.solana_artifact_required': 'Solana Store版アプリを使用して続行してください。',
@@ -9400,6 +9422,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.loadFailed':
     '取引所に接続できませんでした。しばらくしてからもう一度お試しください。',
   'hudChrome.wocMarket.disabledRealm': 'このレルムでは $WOC 取引所を利用できません。',
+  'hudChrome.wocMarket.browserOnlyConfirmTitle': 'ブラウザで $WOC 取引所を開きますか？',
+  'hudChrome.wocMarket.browserOnlyConfirmBody':
+    '$WOC 取引所は World of ClaudeCraft のブラウザ版でのみ利用できます。ブラウザで World of ClaudeCraft を開きます。そこでログインして取引所を開けます。ゲームはそのまま続行されます。',
+  'hudChrome.wocMarket.browserOnlyConfirmOpen': 'ブラウザで開く',
+  'hudChrome.wocMarket.browserOnlyConfirmCancel': 'キャンセル',
   'hudChrome.wocMarket.pausedBanner':
     '取引は一時停止中です。オークションのカウントダウンは続行されます。新しい出品、入札、オファー、支払いは取引再開まで待機になりますが、すでに送信された支払いはそのまま決済されます。',
   'hudChrome.wocMarket.walletLinkedDisconnected':
@@ -10468,6 +10495,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '火口のカルデラで鞍慣らしされた巣育ちのラプトル。筋肉と疾走のかたまりで、いまなお灰の匂いをかすかに漂わせている。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '大七面鳥サンダーストラット',
   'hudChrome.mounts.name_terrorspark_groundshaker': '地揺らしのテラースパーク',
+  'hudChrome.mounts.name_rickshaw_mount': '骨縛りの人力車',
   'hudChrome.mounts.desc_valorsteed': '頑健で足取り確かな駿馬。移動速度を高める。',
   'hudChrome.mounts.desc_grag_bear': '頑健で足取り確かな熊。移動速度を高める。',
   'hudChrome.mounts.desc_stalkglider_snail': '粘り強くゆっくり燃えるカタツムリ。移動速度を高める。',
@@ -10481,6 +10509,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '嵐より生まれた巨大な七面鳥。目覚めし峰から尾羽を雷雲のごとく広げ、闊歩して降りてくる。',
   'hudChrome.mounts.desc_terrorspark_groundshaker':
     '重厚な履帯と大口径砲、恐れ知らずの操縦士向けの鞍を備えた小型装甲車両。',
+  'hudChrome.mounts.desc_rickshaw_mount':
+    'がたがたと音を立てる骨の荷車。骨だらけの雑兵が轅に繋がれ、全力疾走であなたを引いていく。',
   'hudChrome.mounts.emptyTitle': 'マウントは未入手',
   'hudChrome.mounts.emptyStableHint':
     'レベル20に到達し、ハイウォッチ西の厩舎で厩舎長マーラの乗馬レッスンを受けましょう。',
@@ -10929,6 +10959,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.combat.blockedTaken': '{source}の攻撃をブロックし、{amount}のダメージを受けました。',
   'hudChrome.options.mouseoverCast': 'パーティフレームでマウスオーバーキャスト',
   'hudChrome.options.showTargetOfTarget': 'ターゲットのターゲットを表示',
+  'hudChrome.options.showTargetSwingTimer': 'ターゲットの攻撃タイマーを表示',
   'hudChrome.options.showPetFrame': '自分のペットを表示',
   'hudChrome.options.stickyTarget': '地面クリックでターゲットを維持',
   'hudChrome.unitFrame.targetOfTargetLabel': 'ターゲットのターゲット',
@@ -11261,6 +11292,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.last_keep_signet.name': '最後の砦の印章',
   'entities.dungeons.the_last_keep.enterText': '最後の砦の冷たく静まり返った広間へ足を踏み入れた。',
   'entities.items.reins_terrorspark_groundshaker.name': 'テラースパークの始動キー',
+  'entities.items.reins_rickshaw_mount.name': '縛りの手綱：骨縛りの人力車',
   'entities.dungeons.the_last_keep.leaveText': '砦の扉を閉め、ドレイクランドの風の中へ戻った。',
   'entities.dungeons.dawnhold_castle.name': 'ドーンホールド城',
   'entities.items.dawnhold_posy.name': 'ドーンホールド庭園の小さな花束',
@@ -13497,6 +13529,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.riftsPage.whatHeading': 'リフトとは何か',
   'guide.settingsPage.advancedLadder': 'そのうちのどれか一つでも動かすと、画質プリセットは「詳細」に切り替わり、いま見ていたとおりの段階がそのまま引き継がれます。ですからあなた好みの組み合わせは、ゼロからではなく、すでに目にしていた状態から始まります。気に入ったら「適用」を押しましょう。「詳細」がプリセット一覧の末尾に置かれているのはそのためです。あなた自身の組み合わせが住まう、上級者向けのプロファイルなのです。',
   'guide.settingsPage.ifAurasOnPlayerFrame': '自分のバフとデバフを、オーラバーだけでなく自分のユニットフレームにも表示します。',
+  'guide.settingsPage.ifAlwaysShowAllBuffs':
+    '低画質プリセットでも、通常のバフアイコンの上限を無視してすべてのバフを常に表示します。',
   'guide.settingsPage.ifChatFontScale': 'チャットの文字サイズです。',
   'guide.settingsPage.ifChatIntro': 'チャットウィンドウの読みやすさに関する設定です。チャットウィンドウそのものをリセットする項目もここにあります。',
   'guide.settingsPage.ifChatOpacity': 'チャット背景の濃さです。',
@@ -14374,6 +14408,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.nightshade_coating.name': 'ナス科毒の塗布',
   'entities.abilities.nightshade_coating.description':
     '対象をナス科毒で覆い、{damage}の自然ダメージを与え、12秒間受ける回復量を25%低下させます。',
+  // v0.41 release i18n fill.
+  'hudChrome.itemMenu.sell': '売却',
+  'hudChrome.itemMenu.sellAll': 'すべて売却（{count}）',
   // Ignivar raid loot (Crucible of the Last Spring): the M16 same-change
   // fills for the new wordy item names (src/sim/content/ignivar_loot.ts).
   'entities.items.slagbreaker_helmet.name': 'スラグブレイカーの兜',

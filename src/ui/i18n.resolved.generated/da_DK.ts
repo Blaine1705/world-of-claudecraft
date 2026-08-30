@@ -956,7 +956,8 @@ export const da_DK: EnTranslations = {
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "m",
       "durationUnitHours": "t",
-      "durationUnitDays": "d"
+      "durationUnitDays": "d",
+      "buffOverflowLabel": "+{n}"
     },
     "character": {
       "modelPreview": "Forhåndsvisning af karaktermodel"
@@ -1386,6 +1387,7 @@ export const da_DK: EnTranslations = {
       "name_thunderstrut_gobbler": "Tordenspanker den Store Kalkun",
       "name_terrorspark_groundshaker": "Skrækgnist, jordrysteren",
       "name_drakemaw_raptor": "Dragegabets Raptor",
+      "name_rickshaw_mount": "Knogebundet Rickshaw",
       "desc_valorsteed": "En hårdfør, sikker ganger, der giver øget rejsehastighed.",
       "desc_grag_bear": "En hårdfør, sikker bjørn, der giver øget rejsehastighed.",
       "desc_stalkglider_snail": "En robust, langsomt forbrændende snegl, der giver øget rejsehastighed.",
@@ -1394,7 +1396,8 @@ export const da_DK: EnTranslations = {
       "desc_stormfeather_griffin": "En kongelig stormgrif, der bevæger sig hen over jorden på runebeslåede kløer, med sammenfoldede vinger.",
       "desc_thunderstrut_gobbler": "En kolossal, stormudklækket kalkun, der spankulerer ned fra Den Opvågnende Tinde, med halen udfoldet som en tordensky.",
       "desc_terrorspark_groundshaker": "En kompakt panseret maskine med tunge larvebånd, en grovkalibret kanon og en saddel bygget til frygtløse førere.",
-      "desc_drakemaw_raptor": "En saddelvant yngelraptor fra Dragegabets Caldera, kun sener og spurt, som stadig lugter svagt af aske."
+      "desc_drakemaw_raptor": "En saddelvant yngelraptor fra Dragegabets Caldera, kun sener og spurt, som stadig lugter svagt af aske.",
+      "desc_rickshaw_mount": "En raslende knoglekærre med en knoklet håndlanger spændt for skafterne, der trækker dig af sted i fuldt firspring."
     },
     "mountTraining": {
       "mountPrompt": "Tryk på {key} for at stige op på trænings-Modgangeren.",
@@ -1564,6 +1567,7 @@ export const da_DK: EnTranslations = {
       "playerFrameScale": "Spillerrammens skala",
       "targetFrameScale": "Målrammens skala",
       "aurasOnPlayerFrame": "Buffs på spillerrammen",
+      "alwaysShowAllBuffs": "Always Show All Buffs",
       "highContrastBackground": "Baggrund med høj kontrast",
       "startAttackOnAbility": "Autoangreb ved brug af evne",
       "stopAutoAttackOnTargetSwitch": "Stop autoangreb ved målskift",
@@ -1573,6 +1577,8 @@ export const da_DK: EnTranslations = {
       "stickyTarget": "Bevar mål ved jordklik",
       "showItemLevel": "Vis genstandsniveau",
       "showReliquaryTracker": "Vis Relikviesporer",
+      "confirmVendorSell": "Confirm Before Selling",
+      "confirmVendorSellNote": "Turning this off sells items with a single click and no confirmation, so a shifted bag slot could vendor the wrong item.",
       "itemLevelLine": "Genstandsniveau {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Vis sekundær handlingslinje",
@@ -1581,6 +1587,7 @@ export const da_DK: EnTranslations = {
       "hideUnusedActionSlots": "Skjul ubrugte handlingsfelter",
       "lockActionBars": "Lås handlingsbjælker",
       "showTargetOfTarget": "Vis målets mål",
+      "showTargetSwingTimer": "Vis målets svingtimer",
       "showPetFrame": "Vis dit kæledyr",
       "waterRipples": "Vandkrusninger (kølvand)",
       "showAttackButton": "Vis angrebsknap",
@@ -2140,6 +2147,12 @@ export const da_DK: EnTranslations = {
         "few": "{count} sekunder tilbage",
         "many": "{count} sekunder tilbage",
         "other": "{count} sekunder tilbage"
+      },
+      "buffsHidden": {
+        "one": "Yderligere {count} styrkelse er aktiv, men skjult i denne grafikforudindstilling",
+        "few": "Yderligere {count} styrkelser er aktive, men skjulte i denne grafikforudindstilling",
+        "many": "Yderligere {count} styrkelser er aktive, men skjulte i denne grafikforudindstilling",
+        "other": "Yderligere {count} styrkelser er aktive, men skjulte i denne grafikforudindstilling"
       },
       "playtimeDays": {
         "one": "{count} dag",
@@ -3204,9 +3217,9 @@ export const da_DK: EnTranslations = {
       "linked": "Tilknyttet Steam-kontoen {id}",
       "benefits": "Tilknyt din Steam-konto fra skrivebordsappen for at spejle de bedrifter, du opnår, som Steam-præstationer.",
       "noTicket": "Steam udstedte ingen tilknytningsbillet. Start Steam, og prøv så igen.",
-      "wishlist": "Wishlist on Steam",
-      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
-      "wishlistShort": "Wishlist"
+      "wishlist": "Føj til ønskelisten på Steam",
+      "wishlistAria": "Føj til ønskelisten på Steam: åbn World of ClaudeCrafts butiksside",
+      "wishlistShort": "Ønskeliste"
     },
     "epic": {
       "title": "Epic",
@@ -3875,7 +3888,9 @@ export const da_DK: EnTranslations = {
       "equip": "Udrust",
       "disenchant": "Affortrylle",
       "salvage": "Bjærg",
-      "applyEnchant": "Anvend fortryllelse"
+      "applyEnchant": "Anvend fortryllelse",
+      "sell": "Sælg",
+      "sellAll": "Sælg alle ({count})"
     },
     "enchanting": {
       "disenchantedLine": "Du affortrylles {item}.",
@@ -4377,6 +4392,10 @@ export const da_DK: EnTranslations = {
       "loading": "Indlæser Børsen...",
       "loadFailed": "Børsen kunne ikke nås. Prøv igen om lidt.",
       "disabledRealm": "$WOC-Børsen er ikke tilgængelig på dette rige.",
+      "browserOnlyConfirmTitle": "Åbn $WOC-børsen i browseren?",
+      "browserOnlyConfirmBody": "$WOC-børsen kører kun i browserversionen af World of ClaudeCraft. Dette åbner World of ClaudeCraft i din browser, hvor du kan logge ind og åbne børsen; spillet fortsætter her.",
+      "browserOnlyConfirmOpen": "Åbn i browser",
+      "browserOnlyConfirmCancel": "Annuller",
       "pausedBanner": "Handel er sat på pause. Auktioner tæller stadig ned; nye noteringer, bud, tilbud og betalinger venter, til handlen genoptages, og en betaling, der allerede er sendt, afregnes stadig.",
       "walletLinkedDisconnected": "Your public address is linked. Reconnect that wallet app when you want to pay with $WOC.",
       "walletLinkedConnected": "Your linked wallet app is connected and ready for $WOC purchases.",
@@ -4697,7 +4716,13 @@ export const da_DK: EnTranslations = {
       "upstream": "Epic svarede ikke. Prøv igen om et øjeblik."
     },
     "wallet": {
-      "handoff_invalid": "Den pung-godkendelse udløb eller kunne ikke bekræftes. Prøv igen."
+      "handoff_invalid": "Den pung-godkendelse udløb eller kunne ikke bekræftes. Prøv igen.",
+      "reauth_required": "Bekræft denne ændring af pungen med din adgangskode til kontoen.",
+      "reauth_two_factor": "Din konto har to-faktor-godkendelse slået til. Indtast din kode for at bekræfte.",
+      "reauth_no_password": "Opret først en adgangskode i kontoindstillingerne, og prøv igen.",
+      "reauth_bad_signature": "Pungens signatur kunne ikke verificeres. Prøv igen.",
+      "reauth_bad_password": "Din adgangskode er forkert.",
+      "reauth_bad_two_factor": "Den kode er ikke gyldig, prøv igen."
     },
     "ota_updates": {
       "invalid_input": "Ugyldig indtastning."
@@ -5155,6 +5180,7 @@ export const da_DK: EnTranslations = {
       "ifPartySort": "Rækkefølgen, gruppemedlemmer vises i: gruppeorden, rolle, eller navn.",
       "ifPartyShowAuras": "Hvorvidt styrkelser og svækkelser vises på gruppens rammer. Tilsvarende kontakter dækker ressourcebjælker, absorberinger, kæledyr, og hvorvidt du selv optræder på din egen gruppeliste.",
       "ifAurasOnPlayerFrame": "Sætter dine styrkelser og svækkelser på din egen spillerramme, ud over aurabjælken.",
+      "ifAlwaysShowAllBuffs": "Shows every active buff even on the Low graphics preset, bypassing its usual buff-icon cap.",
       "ifTargetOfTarget": "Viser, hvem dit måls mål er, den klassiske måde at se, om tanken stadig har fat i det.",
       "ifPetFrame": "Viser en ramme til dit kæledyr.",
       "ifChatFontScale": "Chattekststørrelse.",
@@ -7623,6 +7649,13 @@ export const da_DK: EnTranslations = {
     "unlink": "Frakobl",
     "unlinkTitle": "Fjern pung-verificeringen fra denne konto",
     "unlinkAria": "Fjern pung-verificeringen fra denne konto",
+    "reauthTitle": "Bekræft ændring af pung",
+    "reauthUnlinkTitle": "Bekræft fjernelse af pung",
+    "reauthHelp": "Af sikkerhedshensyn skal du indtaste din adgangskode til kontoen for at godkende denne ændring.",
+    "reauthNoPassword": "Denne konto logger ind uden adgangskode. Opret først en adgangskode i kontoindstillingerne, og prøv igen.",
+    "reauthConfirm": "Bekræft",
+    "reauthCancel": "Annuller",
+    "reauthClose": "Luk",
     "signOut": "Afbryd forbindelse",
     "signOutTitle": "Afbryd forbindelsen til pung-appen i denne browser",
     "signOutAria": "Afbryd forbindelsen til pung-appen i denne browser",
@@ -13171,6 +13204,9 @@ export const da_DK: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Tændingsnøgle: Skrækgnist, jordrysteren"
+      },
+      "reins_rickshaw_mount": {
+        "name": "Bundne tøjler: Knogebundet Rickshaw"
       },
       "reins_drakemaw_raptor": {
         "name": "Tøjler til Dragegabets Raptor"

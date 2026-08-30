@@ -2622,6 +2622,16 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'itemUi.stats.parry': 'Parade',
   'apiError.wallet.handoff_invalid':
     "Cette autorisation de portefeuille a expiré ou n'a pas pu être vérifiée. Réessayez.",
+  'apiError.wallet.reauth_required':
+    'Confirmez ce changement de portefeuille avec le mot de passe de votre compte.',
+  'apiError.wallet.reauth_two_factor':
+    "L'authentification à deux facteurs est activée sur votre compte. Saisissez votre code pour confirmer.",
+  'apiError.wallet.reauth_no_password':
+    "Définissez d'abord un mot de passe dans les paramètres du compte, puis réessayez.",
+  'apiError.wallet.reauth_bad_signature':
+    "La signature du portefeuille n'a pas pu être vérifiée. Réessayez.",
+  'apiError.wallet.reauth_bad_password': 'Votre mot de passe est incorrect.',
+  'apiError.wallet.reauth_bad_two_factor': "Ce code n'est pas valide, réessayez.",
   'cardDuel.close': 'Fermer',
   'cardDuel.counts': 'Deck : {deck} · Défausse : {discard}',
   'cardDuel.forfeit': 'Abandonner',
@@ -5323,6 +5333,15 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'wallet.unlink': 'Dissocier',
   'wallet.unlinkTitle': 'Retirer la vérification du portefeuille de ce compte',
   'wallet.unlinkAria': 'Retirer la vérification du portefeuille de ce compte',
+  'wallet.reauthTitle': 'Confirmer le changement de portefeuille',
+  'wallet.reauthUnlinkTitle': 'Confirmer le retrait du portefeuille',
+  'wallet.reauthHelp':
+    'Pour votre sécurité, saisissez le mot de passe de votre compte pour autoriser ce changement.',
+  'wallet.reauthNoPassword':
+    "Ce compte se connecte sans mot de passe. Définissez d'abord un mot de passe dans les paramètres du compte, puis réessayez.",
+  'wallet.reauthConfirm': 'Confirmer',
+  'wallet.reauthCancel': 'Annuler',
+  'wallet.reauthClose': 'Fermer',
   'wallet.signOut': 'Déconnecter',
   'wallet.signOutTitle': "Déconnecter l'appli de portefeuille sur ce navigateur",
   'wallet.signOutAria': "Déconnecter l'appli de portefeuille sur ce navigateur",
@@ -13891,4 +13910,31 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   "entities.abilities.nightshade_coating.description": "Enduit la cible de morelle, infligeant {damage} dégâts de Nature et réduisant les soins qu'elle reçoit de 25% pendant 12 s.",
   "entities.abilities.nightshade_coating.name": "Revêtement Morelle",
   "guide.settingsPage.ifShowReliquaryTracker": "Si le tracker Reliquaire (vos pages épinglées et leur progression) se trouve sur votre HUD. La fenêtre Reliquaire a un bouton en forme d'œil correspondant, et épingler une page réactive le tracker.",
+  // v0.41 release i18n fill.
+  'entities.items.reins_rickshaw_mount.name': "Rênes liées : Rickshaw d'os liés",
+  'hudChrome.itemMenu.sell': 'Vendre',
+  'hudChrome.itemMenu.sellAll': 'Tout vendre ({count})',
+  'hudChrome.mounts.desc_rickshaw_mount':
+    "Une carriole d'os bringuebalante, avec un soldat osseux attelé aux brancards, qui vous tire au pas de course.",
+  'hudChrome.mounts.name_rickshaw_mount': "Rickshaw d'os liés",
+  'hudChrome.options.showTargetSwingTimer': "Afficher le minuteur d'attaque de la cible",
+  'hudChrome.plurals.buffsHidden.one':
+    'Il reste {count} amélioration active, mais son icône est masquée par ce préréglage graphique',
+  'hudChrome.plurals.buffsHidden.few':
+    'Il reste {count} améliorations actives, mais leurs icônes sont masquées par ce préréglage graphique',
+  'hudChrome.plurals.buffsHidden.many':
+    'Il reste {count} améliorations actives, mais leurs icônes sont masquées par ce préréglage graphique',
+  'hudChrome.plurals.buffsHidden.other':
+    'Il reste {count} améliorations actives, mais leurs icônes sont masquées par ce préréglage graphique',
+  'hudChrome.steam.wishlist': 'Ajouter à la liste de souhaits Steam',
+  'hudChrome.steam.wishlistAria':
+    'Ajouter à la liste de souhaits Steam : ouvrir la page World of ClaudeCraft dans la boutique',
+  'hudChrome.steam.wishlistShort': 'Liste de souhaits',
+  'hudChrome.unitFrame.buffOverflowLabel': '+{n}',
+  'hudChrome.wocMarket.browserOnlyConfirmTitle':
+    'Ouvrir la Bourse $WOC dans votre navigateur ?',
+  'hudChrome.wocMarket.browserOnlyConfirmBody':
+    'La Bourse $WOC fonctionne uniquement dans la version navigateur de World of ClaudeCraft. Cela ouvre World of ClaudeCraft dans votre navigateur, où vous pouvez vous connecter et ouvrir la Bourse ; le jeu continue ici.',
+  'hudChrome.wocMarket.browserOnlyConfirmOpen': 'Ouvrir dans le navigateur',
+  'hudChrome.wocMarket.browserOnlyConfirmCancel': 'Annuler',
 };

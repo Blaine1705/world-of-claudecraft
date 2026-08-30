@@ -956,7 +956,8 @@ export const fr_CA: EnTranslations = {
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "min",
       "durationUnitHours": "h",
-      "durationUnitDays": "j"
+      "durationUnitDays": "j",
+      "buffOverflowLabel": "+{n}"
     },
     "character": {
       "modelPreview": "Aperçu du modèle du personnage"
@@ -1386,6 +1387,7 @@ export const fr_CA: EnTranslations = {
       "name_thunderstrut_gobbler": "Pavane-Tonnerre, le Grand Dindon",
       "name_terrorspark_groundshaker": "Terrétincelle, l’Ébranleur de sol",
       "name_drakemaw_raptor": "Raptor du Drakemaw",
+      "name_rickshaw_mount": "Rickshaw d'os liés",
       "desc_valorsteed": "Un destrier robuste au pied sûr qui accroît la vitesse de déplacement.",
       "desc_grag_bear": "Un ours robuste au pied sûr qui accroît la vitesse de déplacement.",
       "desc_stalkglider_snail": "Un escargot vaillant à combustion lente qui accroît la vitesse de déplacement.",
@@ -1394,7 +1396,8 @@ export const fr_CA: EnTranslations = {
       "desc_stormfeather_griffin": "Un griffon d’orage majestueux qui arpente le sol sur des serres runiques, ailes repliées.",
       "desc_thunderstrut_gobbler": "Un dindon colossal né de l’orage qui descend du Pic Éveillé en se pavanant, la queue déployée comme un front d’orage.",
       "desc_terrorspark_groundshaker": "Un engin blindé compact doté de chenilles lourdes, d’un canon de gros calibre et d’une selle conçue pour les pilotes intrépides.",
-      "desc_drakemaw_raptor": "Un raptor de couvée dressé à la selle, originaire de la Caldeira de Drakemaw : tout en muscles et en vitesse, encore empreint d'une légère odeur de cendre."
+      "desc_drakemaw_raptor": "Un raptor de couvée dressé à la selle, originaire de la Caldeira de Drakemaw : tout en muscles et en vitesse, encore empreint d'une légère odeur de cendre.",
+      "desc_rickshaw_mount": "Une carriole d'os bringuebalante, avec un soldat osseux attelé aux brancards, qui vous tire au pas de course."
     },
     "mountTraining": {
       "mountPrompt": "Appuyez sur {key} pour monter le Valorsteed d'entraînement.",
@@ -1564,6 +1567,7 @@ export const fr_CA: EnTranslations = {
       "playerFrameScale": "Échelle du cadre du joueur",
       "targetFrameScale": "Échelle du cadre de la cible",
       "aurasOnPlayerFrame": "Améliorations sur le cadre du joueur",
+      "alwaysShowAllBuffs": "Always Show All Buffs",
       "highContrastBackground": "Arrière-plan à contraste élevé",
       "startAttackOnAbility": "Attaque auto à l'utilisation d'une compétence",
       "stopAutoAttackOnTargetSwitch": "Arrêter l'attaque auto au changement de cible",
@@ -1573,6 +1577,8 @@ export const fr_CA: EnTranslations = {
       "stickyTarget": "Conserver la cible au clic au sol",
       "showItemLevel": "Afficher le niveau d'objet",
       "showReliquaryTracker": "Afficher le suivi du reliquaire",
+      "confirmVendorSell": "Confirm Before Selling",
+      "confirmVendorSellNote": "Turning this off sells items with a single click and no confirmation, so a shifted bag slot could vendor the wrong item.",
       "itemLevelLine": "Niveau d'objet {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Afficher la barre d'action secondaire",
@@ -1581,6 +1587,7 @@ export const fr_CA: EnTranslations = {
       "hideUnusedActionSlots": "Masquer les emplacements d'action inutilisés",
       "lockActionBars": "Verrouiller les barres d'action",
       "showTargetOfTarget": "Afficher la cible de la cible",
+      "showTargetSwingTimer": "Afficher le minuteur d'attaque de la cible",
       "showPetFrame": "Afficher votre familier",
       "waterRipples": "Ondulations de l'eau (sillages)",
       "showAttackButton": "Afficher le bouton d'attaque",
@@ -2140,6 +2147,12 @@ export const fr_CA: EnTranslations = {
         "few": "{count} secondes restantes",
         "many": "{count} secondes restantes",
         "other": "{count} secondes restantes"
+      },
+      "buffsHidden": {
+        "one": "Il reste {count} amélioration active, mais son icône est masquée par ce préréglage graphique",
+        "few": "Il reste {count} améliorations actives, mais leurs icônes sont masquées par ce préréglage graphique",
+        "many": "Il reste {count} améliorations actives, mais leurs icônes sont masquées par ce préréglage graphique",
+        "other": "Il reste {count} améliorations actives, mais leurs icônes sont masquées par ce préréglage graphique"
       },
       "playtimeDays": {
         "one": "{count} jour",
@@ -3204,9 +3217,9 @@ export const fr_CA: EnTranslations = {
       "linked": "Lié au compte Steam {id}",
       "benefits": "Liez votre compte Steam depuis l'application de bureau pour que les hauts faits que vous obtenez se reflètent dans vos succès Steam.",
       "noTicket": "Steam n'a pas fourni de ticket de liaison. Lancez Steam, puis réessayez.",
-      "wishlist": "Wishlist on Steam",
-      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
-      "wishlistShort": "Wishlist"
+      "wishlist": "Ajouter à la liste de souhaits Steam",
+      "wishlistAria": "Ajouter à la liste de souhaits Steam : ouvrir la page World of ClaudeCraft dans la boutique",
+      "wishlistShort": "Liste de souhaits"
     },
     "epic": {
       "title": "Epic",
@@ -3875,7 +3888,9 @@ export const fr_CA: EnTranslations = {
       "equip": "Équiper",
       "disenchant": "Désenchanter",
       "salvage": "Récupérer",
-      "applyEnchant": "Appliquer un enchantement"
+      "applyEnchant": "Appliquer un enchantement",
+      "sell": "Vendre",
+      "sellAll": "Tout vendre ({count})"
     },
     "enchanting": {
       "disenchantedLine": "Vous désenchantez {item}.",
@@ -4377,6 +4392,10 @@ export const fr_CA: EnTranslations = {
       "loading": "Chargement de la Bourse...",
       "loadFailed": "Impossible de contacter la Bourse. Réessayez dans un instant.",
       "disabledRealm": "La Bourse $WOC n'est pas disponible sur ce royaume.",
+      "browserOnlyConfirmTitle": "Ouvrir la Bourse $WOC dans votre navigateur ?",
+      "browserOnlyConfirmBody": "La Bourse $WOC fonctionne uniquement dans la version navigateur de World of ClaudeCraft. Cela ouvre World of ClaudeCraft dans votre navigateur, où vous pouvez vous connecter et ouvrir la Bourse ; le jeu continue ici.",
+      "browserOnlyConfirmOpen": "Ouvrir dans le navigateur",
+      "browserOnlyConfirmCancel": "Annuler",
       "pausedBanner": "Les échanges sont en pause. Les enchères continuent de décompter ; les nouvelles annonces, enchères, offres et paiements attendent la reprise des échanges, et un paiement déjà envoyé se règle quand même.",
       "walletLinkedDisconnected": "Your public address is linked. Reconnect that wallet app when you want to pay with $WOC.",
       "walletLinkedConnected": "Your linked wallet app is connected and ready for $WOC purchases.",
@@ -4697,7 +4716,13 @@ export const fr_CA: EnTranslations = {
       "upstream": "Epic n’a pas répondu. Réessayez dans un instant."
     },
     "wallet": {
-      "handoff_invalid": "Cette autorisation de portefeuille a expiré ou n'a pas pu être vérifiée. Réessayez."
+      "handoff_invalid": "Cette autorisation de portefeuille a expiré ou n'a pas pu être vérifiée. Réessayez.",
+      "reauth_required": "Confirmez ce changement de portefeuille avec le mot de passe de votre compte.",
+      "reauth_two_factor": "L'authentification à deux facteurs est activée sur votre compte. Saisissez votre code pour confirmer.",
+      "reauth_no_password": "Définissez d'abord un mot de passe dans les paramètres du compte, puis réessayez.",
+      "reauth_bad_signature": "La signature du portefeuille n'a pas pu être vérifiée. Réessayez.",
+      "reauth_bad_password": "Votre mot de passe est incorrect.",
+      "reauth_bad_two_factor": "Ce code n'est pas valide, réessayez."
     },
     "ota_updates": {
       "invalid_input": "Saisie invalide."
@@ -5155,6 +5180,7 @@ export const fr_CA: EnTranslations = {
       "ifPartySort": "L'ordre d'affichage des membres du groupe : ordre du groupe, rôle, ou nom.",
       "ifPartyShowAuras": "Si les améliorations et les affaiblissements s'affichent sur les cadres de groupe. Des interrupteurs équivalents couvrent les barres de ressource, les absorptions, les familiers, et si vous apparaissez dans votre propre liste de groupe.",
       "ifAurasOnPlayerFrame": "Affiche vos améliorations et vos affaiblissements sur votre propre cadre, en plus de la barre d'auras.",
+      "ifAlwaysShowAllBuffs": "Shows every active buff even on the Low graphics preset, bypassing its usual buff-icon cap.",
       "ifTargetOfTarget": "Affiche qui votre cible cible elle-même, la méthode classique pour vérifier si le tank a toujours l'aggro.",
       "ifPetFrame": "Affiche un cadre pour votre familier.",
       "ifChatFontScale": "Taille du texte de discussion.",
@@ -7623,6 +7649,13 @@ export const fr_CA: EnTranslations = {
     "unlink": "Dissocier",
     "unlinkTitle": "Retirer la vérification du portefeuille de ce compte",
     "unlinkAria": "Retirer la vérification du portefeuille de ce compte",
+    "reauthTitle": "Confirmer le changement de portefeuille",
+    "reauthUnlinkTitle": "Confirmer le retrait du portefeuille",
+    "reauthHelp": "Pour votre sécurité, saisissez le mot de passe de votre compte pour autoriser ce changement.",
+    "reauthNoPassword": "Ce compte se connecte sans mot de passe. Définissez d'abord un mot de passe dans les paramètres du compte, puis réessayez.",
+    "reauthConfirm": "Confirmer",
+    "reauthCancel": "Annuler",
+    "reauthClose": "Fermer",
     "signOut": "Déconnecter",
     "signOutTitle": "Déconnecter l'appli de portefeuille sur ce navigateur",
     "signOutAria": "Déconnecter l'appli de portefeuille sur ce navigateur",
@@ -13171,6 +13204,9 @@ export const fr_CA: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Clé de contact : Terrétincelle, l’Ébranleur de sol"
+      },
+      "reins_rickshaw_mount": {
+        "name": "Rênes liées : Rickshaw d'os liés"
       },
       "reins_drakemaw_raptor": {
         "name": "Rênes du Raptor du Drakemaw"

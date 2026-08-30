@@ -2590,6 +2590,15 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'itemUi.stats.parry': 'Parowanie',
   'apiError.wallet.handoff_invalid':
     'Autoryzacja portfela wygasła lub nie mogła zostać zweryfikowana. Spróbuj ponownie.',
+  'apiError.wallet.reauth_required': 'Potwierdź tę zmianę portfela hasłem do konta.',
+  'apiError.wallet.reauth_two_factor':
+    'Twoje konto ma włączone uwierzytelnianie dwuskładnikowe. Wpisz swój kod, aby potwierdzić.',
+  'apiError.wallet.reauth_no_password':
+    'Najpierw ustaw hasło w ustawieniach konta, a potem spróbuj ponownie.',
+  'apiError.wallet.reauth_bad_signature':
+    'Nie udało się zweryfikować podpisu portfela. Spróbuj ponownie.',
+  'apiError.wallet.reauth_bad_password': 'Twoje hasło jest nieprawidłowe.',
+  'apiError.wallet.reauth_bad_two_factor': 'Ten kod jest nieprawidłowy, spróbuj ponownie.',
   'cardDuel.close': 'Zamknij',
   'cardDuel.counts': 'Talia: {deck} · Odrzucone: {discard}',
   'cardDuel.forfeit': 'Poddaj się',
@@ -9496,6 +9505,15 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'wallet.switchTitle': 'Zweryfikuj inny portfel',
   'wallet.unlink': 'Odepnij',
   'wallet.unlinkAria': 'Usuń weryfikację portfela z tego konta',
+  'wallet.reauthTitle': 'Potwierdź zmianę portfela',
+  'wallet.reauthUnlinkTitle': 'Potwierdź usunięcie portfela',
+  'wallet.reauthHelp':
+    'Dla Twojego bezpieczeństwa wpisz hasło do konta, aby zatwierdzić tę zmianę.',
+  'wallet.reauthNoPassword':
+    'To konto loguje się bez hasła. Najpierw ustaw hasło w ustawieniach konta, a potem spróbuj ponownie.',
+  'wallet.reauthConfirm': 'Potwierdź',
+  'wallet.reauthCancel': 'Anuluj',
+  'wallet.reauthClose': 'Zamknij',
   'wallet.unlinkFailed': 'Nie udało się odpiąć portfela.',
   'wallet.unlinkTitle': 'Usuń weryfikację portfela z tego konta',
   'wallet.verify': 'Zweryfikuj portfel',
@@ -13793,4 +13811,30 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   "entities.abilities.nightshade_coating.description": "Pokrywa cel psianką, zadając {damage} obrażeń natury i redukując otrzymywane leczenie o 25% na 12 sek.",
   "entities.abilities.nightshade_coating.name": "Powłoka Nocnego Cienia",
   "guide.settingsPage.ifShowReliquaryTracker": "Czy moduł śledzenia Relikwiarza (przypięte strony i ich postęp) znajduje się na Twoim HUD-ie. Okno Relikwiarza ma pasujący przycisk oka, a przypięcie strony powoduje ponowne włączenie modułu śledzącego.",
+  // v0.41 release i18n fill.
+  'entities.items.reins_rickshaw_mount.name': 'Spętane lejce: Spętana Kośćmi Riksza',
+  'hudChrome.itemMenu.sell': 'Sprzedaj',
+  'hudChrome.itemMenu.sellAll': 'Sprzedaj wszystko ({count})',
+  'hudChrome.mounts.desc_rickshaw_mount':
+    'Grzechoczący wózek z kości, z kościstym pachołkiem zaprzężonym do dyszli, ciągnącym cię w pełnym pędzie.',
+  'hudChrome.mounts.name_rickshaw_mount': 'Spętana Kośćmi Riksza',
+  'hudChrome.options.showTargetSwingTimer': 'Pokaż licznik zamachu celu',
+  'hudChrome.plurals.buffsHidden.one':
+    'Aktywne jest jeszcze {count} wzmocnienie, ale ukryte w tym ustawieniu grafiki',
+  'hudChrome.plurals.buffsHidden.few':
+    'Aktywne są jeszcze {count} wzmocnienia, ale ukryte w tym ustawieniu grafiki',
+  'hudChrome.plurals.buffsHidden.many':
+    'Aktywnych jest jeszcze {count} wzmocnień, ale ukryte w tym ustawieniu grafiki',
+  'hudChrome.plurals.buffsHidden.other':
+    'Aktywnych jest jeszcze {count} wzmocnień, ale ukryte w tym ustawieniu grafiki',
+  'hudChrome.steam.wishlist': 'Dodaj do listy życzeń na Steam',
+  'hudChrome.steam.wishlistAria':
+    'Dodaj do listy życzeń na Steam: otwórz stronę World of ClaudeCraft w sklepie',
+  'hudChrome.steam.wishlistShort': 'Lista życzeń',
+  'hudChrome.unitFrame.buffOverflowLabel': '+{n}',
+  'hudChrome.wocMarket.browserOnlyConfirmTitle': 'Otworzyć Giełdę $WOC w przeglądarce?',
+  'hudChrome.wocMarket.browserOnlyConfirmBody':
+    'Giełda $WOC działa tylko w przeglądarkowej wersji World of ClaudeCraft. Spowoduje to otwarcie World of ClaudeCraft w przeglądarce, gdzie możesz się zalogować i otworzyć Giełdę; gra będzie tu nadal działać.',
+  'hudChrome.wocMarket.browserOnlyConfirmOpen': 'Otwórz w przeglądarce',
+  'hudChrome.wocMarket.browserOnlyConfirmCancel': 'Anuluj',
 };

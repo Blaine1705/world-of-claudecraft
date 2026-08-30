@@ -956,7 +956,8 @@ export const de_DE: EnTranslations = {
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "Min",
       "durationUnitHours": "Std",
-      "durationUnitDays": "T"
+      "durationUnitDays": "T",
+      "buffOverflowLabel": "+{n}"
     },
     "character": {
       "modelPreview": "Charaktermodell-Vorschau"
@@ -1386,6 +1387,7 @@ export const de_DE: EnTranslations = {
       "name_thunderstrut_gobbler": "Donnerstolz der Große Puter",
       "name_terrorspark_groundshaker": "Schreckfunke, der Bodenerschütterer",
       "name_drakemaw_raptor": "Drakenrachen-Raptor",
+      "name_rickshaw_mount": "Knochengebundene Rikscha",
       "desc_valorsteed": "Ein robustes, trittsicheres Ross, das die Reisegeschwindigkeit erhöht.",
       "desc_grag_bear": "Ein robuster, trittsicherer Bär, der die Reisegeschwindigkeit erhöht.",
       "desc_stalkglider_snail": "Eine herzhafte, ausdauernde Schnecke, die die Reisegeschwindigkeit erhöht.",
@@ -1394,7 +1396,8 @@ export const de_DE: EnTranslations = {
       "desc_stormfeather_griffin": "Ein königlicher Sturmgreif, der mit runenbeschlagenen Klauen und angelegten Schwingen über den Boden pirscht.",
       "desc_thunderstrut_gobbler": "Ein kolossaler sturmgeborener Puter, der vom Erwachenden Gipfel herabstolziert, den Schwanz gefächert wie eine Gewitterfront.",
       "desc_terrorspark_groundshaker": "Eine kompakte gepanzerte Maschine mit schweren Ketten, einer großkalibrigen Kanone und einem Sattel für furchtlose Piloten.",
-      "desc_drakemaw_raptor": "Ein zugerittener Brutraptor aus der Drakenrachen-Caldera, ganz Sehne und Sprint, der noch schwach nach Asche riecht."
+      "desc_drakemaw_raptor": "Ein zugerittener Brutraptor aus der Drakenrachen-Caldera, ganz Sehne und Sprint, der noch schwach nach Asche riecht.",
+      "desc_rickshaw_mount": "Ein klappernder Knochenkarren, an dessen Deichseln ein knochiger Scherge angeschirrt ist und Euch im vollen Lauf zieht."
     },
     "mountTraining": {
       "mountPrompt": "Drücke {key}, um das Übungs-Valorross zu besteigen.",
@@ -1564,6 +1567,7 @@ export const de_DE: EnTranslations = {
       "playerFrameScale": "Skalierung des Spielerfensters",
       "targetFrameScale": "Skalierung des Zielfensters",
       "aurasOnPlayerFrame": "Stärkungszauber am Spielerfenster",
+      "alwaysShowAllBuffs": "Always Show All Buffs",
       "highContrastBackground": "Hintergrund mit hohem Kontrast",
       "startAttackOnAbility": "Auto-Angriff bei Fähigkeitseinsatz",
       "stopAutoAttackOnTargetSwitch": "Automatischen Angriff bei Zielwechsel stoppen",
@@ -1573,6 +1577,8 @@ export const de_DE: EnTranslations = {
       "stickyTarget": "Ziel bei Bodenklick behalten",
       "showItemLevel": "Gegenstandsstufe anzeigen",
       "showReliquaryTracker": "Reliquiar-Tracker anzeigen",
+      "confirmVendorSell": "Confirm Before Selling",
+      "confirmVendorSellNote": "Turning this off sells items with a single click and no confirmation, so a shifted bag slot could vendor the wrong item.",
       "itemLevelLine": "Gegenstandsstufe {level}",
       "itemScoreLine": "Wertung {score}",
       "showSecondaryActionBar": "Zweite Aktionsleiste anzeigen",
@@ -1581,6 +1587,7 @@ export const de_DE: EnTranslations = {
       "hideUnusedActionSlots": "Ungenutzte Aktionsfelder ausblenden",
       "lockActionBars": "Aktionsleisten sperren",
       "showTargetOfTarget": "Ziel des Ziels anzeigen",
+      "showTargetSwingTimer": "Zielschwungtimer anzeigen",
       "showPetFrame": "Euren Begleiter anzeigen",
       "waterRipples": "Wasserwellen (Kielwasser)",
       "showAttackButton": "Angriffs-Schaltflache anzeigen",
@@ -2140,6 +2147,12 @@ export const de_DE: EnTranslations = {
         "few": "Noch {count} Sekunden",
         "many": "Noch {count} Sekunden",
         "other": "Noch {count} Sekunden"
+      },
+      "buffsHidden": {
+        "one": "{count} weiterer Stärkungseffekt ist aktiv, aber in dieser Grafikvoreinstellung ausgeblendet",
+        "few": "{count} weitere Stärkungseffekte sind aktiv, aber in dieser Grafikvoreinstellung ausgeblendet",
+        "many": "{count} weitere Stärkungseffekte sind aktiv, aber in dieser Grafikvoreinstellung ausgeblendet",
+        "other": "{count} weitere Stärkungseffekte sind aktiv, aber in dieser Grafikvoreinstellung ausgeblendet"
       },
       "playtimeDays": {
         "one": "{count} Tag",
@@ -3204,9 +3217,9 @@ export const de_DE: EnTranslations = {
       "linked": "Mit Steam-Konto {id} verknüpft",
       "benefits": "Verknüpfe dein Steam-Konto über die Desktop-App, um die Taten, die du erringst, als Steam-Errungenschaften zu spiegeln.",
       "noTicket": "Steam hat kein Verknüpfungsticket geliefert. Starte Steam und versuch es dann erneut.",
-      "wishlist": "Wishlist on Steam",
-      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
-      "wishlistShort": "Wishlist"
+      "wishlist": "Auf Steam auf die Wunschliste setzen",
+      "wishlistAria": "Auf Steam auf die Wunschliste setzen: Shopseite von World of ClaudeCraft öffnen",
+      "wishlistShort": "Wunschliste"
     },
     "epic": {
       "title": "Epic",
@@ -3875,7 +3888,9 @@ export const de_DE: EnTranslations = {
       "equip": "Anlegen",
       "disenchant": "Entzaubern",
       "salvage": "Zerlegen",
-      "applyEnchant": "Verzauberung anwenden"
+      "applyEnchant": "Verzauberung anwenden",
+      "sell": "Verkaufen",
+      "sellAll": "Alles verkaufen ({count})"
     },
     "enchanting": {
       "disenchantedLine": "Du entzauberst {item}.",
@@ -4377,6 +4392,10 @@ export const de_DE: EnTranslations = {
       "loading": "Die Börse wird geladen...",
       "loadFailed": "Die Börse konnte nicht erreicht werden. Versuch es in Kürze erneut.",
       "disabledRealm": "Die $WOC-Börse ist auf dieser Welt nicht verfügbar.",
+      "browserOnlyConfirmTitle": "$WOC-Börse im Browser öffnen?",
+      "browserOnlyConfirmBody": "Die $WOC-Börse läuft nur in der Browserversion von World of ClaudeCraft. Dadurch wird World of ClaudeCraft im Browser geöffnet; dort kannst du dich anmelden und die Börse öffnen. Das Spiel läuft hier weiter.",
+      "browserOnlyConfirmOpen": "Im Browser öffnen",
+      "browserOnlyConfirmCancel": "Abbrechen",
       "pausedBanner": "Der Handel ist pausiert. Auktionen laufen weiter herunter; neue Angebote, Gebote, Offerten und Zahlungen warten, bis der Handel fortgesetzt wird, und eine bereits gesendete Zahlung wird trotzdem abgewickelt.",
       "walletLinkedDisconnected": "Your public address is linked. Reconnect that wallet app when you want to pay with $WOC.",
       "walletLinkedConnected": "Your linked wallet app is connected and ready for $WOC purchases.",
@@ -4697,7 +4716,13 @@ export const de_DE: EnTranslations = {
       "upstream": "Epic hat nicht geantwortet. Versuche es gleich noch einmal."
     },
     "wallet": {
-      "handoff_invalid": "Diese Wallet-Autorisierung ist abgelaufen oder konnte nicht verifiziert werden. Bitte versuche es erneut."
+      "handoff_invalid": "Diese Wallet-Autorisierung ist abgelaufen oder konnte nicht verifiziert werden. Bitte versuche es erneut.",
+      "reauth_required": "Bestätige diese Wallet-Änderung mit deinem Konto-Passwort.",
+      "reauth_two_factor": "Für dein Konto ist die Zwei-Faktor-Authentifizierung aktiviert. Gib zur Bestätigung deinen Code ein.",
+      "reauth_no_password": "Lege zuerst in den Kontoeinstellungen ein Passwort fest und versuche es dann erneut.",
+      "reauth_bad_signature": "Die Wallet-Signatur konnte nicht verifiziert werden. Versuche es erneut.",
+      "reauth_bad_password": "Dein Passwort ist falsch.",
+      "reauth_bad_two_factor": "Dieser Code ist ungültig, versuche es erneut."
     },
     "ota_updates": {
       "invalid_input": "Ungültige Eingabe."
@@ -5155,6 +5180,7 @@ export const de_DE: EnTranslations = {
       "ifPartySort": "Die Reihenfolge, in der Gruppenmitglieder aufgelistet werden: Gruppenreihenfolge, Rolle oder Name.",
       "ifPartyShowAuras": "Ob Stärkungs- und Schwächungseffekte auf den Gruppenfenstern erscheinen. Passende Schalter regeln Ressourcenbalken, Absorptionsschilde, Begleiter und ob Sie selbst in Ihrer eigenen Gruppenliste erscheinen.",
       "ifAurasOnPlayerFrame": "Zeigt Ihre Stärkungs- und Schwächungseffekte zusätzlich zur Auren-Leiste auch auf Ihrem eigenen Spielerfenster.",
+      "ifAlwaysShowAllBuffs": "Shows every active buff even on the Low graphics preset, bypassing its usual buff-icon cap.",
       "ifTargetOfTarget": "Zeigt, wen Ihr Ziel anvisiert, die klassische Art zu erkennen, ob der Tank es noch hält.",
       "ifPetFrame": "Zeigt ein Fenster für Ihren Begleiter.",
       "ifChatFontScale": "Die Textgröße des Chats.",
@@ -7623,6 +7649,13 @@ export const de_DE: EnTranslations = {
     "unlink": "Trennen",
     "unlinkTitle": "Wallet-Verifizierung von diesem Konto entfernen",
     "unlinkAria": "Wallet-Verifizierung von diesem Konto entfernen",
+    "reauthTitle": "Wallet-Änderung bestätigen",
+    "reauthUnlinkTitle": "Wallet-Entfernung bestätigen",
+    "reauthHelp": "Gib zu deiner Sicherheit dein Konto-Passwort ein, um diese Änderung zu erlauben.",
+    "reauthNoPassword": "Dieses Konto meldet sich ohne Passwort an. Lege zuerst in den Kontoeinstellungen ein Passwort fest und versuche es dann erneut.",
+    "reauthConfirm": "Bestätigen",
+    "reauthCancel": "Abbrechen",
+    "reauthClose": "Schließen",
     "signOut": "Abmelden",
     "signOutTitle": "Wallet-App in diesem Browser trennen",
     "signOutAria": "Wallet-App in diesem Browser trennen",
@@ -13171,6 +13204,9 @@ export const de_DE: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Zündschlüssel: Schreckfunke, der Bodenerschütterer"
+      },
+      "reins_rickshaw_mount": {
+        "name": "Gebundene Zügel: Knochengebundene Rikscha"
       },
       "reins_drakemaw_raptor": {
         "name": "Zügel des Drakenrachen-Raptors"

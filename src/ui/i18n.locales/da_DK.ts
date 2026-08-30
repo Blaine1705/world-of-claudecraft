@@ -2575,6 +2575,15 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'itemUi.stats.parry': 'Parering',
   'apiError.wallet.handoff_invalid':
     'Den pung-godkendelse udløb eller kunne ikke bekræftes. Prøv igen.',
+  'apiError.wallet.reauth_required':
+    'Bekræft denne ændring af pungen med din adgangskode til kontoen.',
+  'apiError.wallet.reauth_two_factor':
+    'Din konto har to-faktor-godkendelse slået til. Indtast din kode for at bekræfte.',
+  'apiError.wallet.reauth_no_password':
+    'Opret først en adgangskode i kontoindstillingerne, og prøv igen.',
+  'apiError.wallet.reauth_bad_signature': 'Pungens signatur kunne ikke verificeres. Prøv igen.',
+  'apiError.wallet.reauth_bad_password': 'Din adgangskode er forkert.',
+  'apiError.wallet.reauth_bad_two_factor': 'Den kode er ikke gyldig, prøv igen.',
   'cardDuel.close': 'Luk',
   'cardDuel.counts': 'Bunke: {deck} - Kasserede: {discard}',
   'cardDuel.forfeit': 'Giv op',
@@ -9263,6 +9272,15 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'wallet.switchTitle': 'Verificer en anden pung',
   'wallet.unlink': 'Frakobl',
   'wallet.unlinkAria': 'Fjern pung-verificeringen fra denne konto',
+  'wallet.reauthTitle': 'Bekræft ændring af pung',
+  'wallet.reauthUnlinkTitle': 'Bekræft fjernelse af pung',
+  'wallet.reauthHelp':
+    'Af sikkerhedshensyn skal du indtaste din adgangskode til kontoen for at godkende denne ændring.',
+  'wallet.reauthNoPassword':
+    'Denne konto logger ind uden adgangskode. Opret først en adgangskode i kontoindstillingerne, og prøv igen.',
+  'wallet.reauthConfirm': 'Bekræft',
+  'wallet.reauthCancel': 'Annuller',
+  'wallet.reauthClose': 'Luk',
   'wallet.unlinkFailed': 'Kunne ikke frakoble pungen.',
   'wallet.unlinkTitle': 'Fjern pung-verificeringen fra denne konto',
   'wallet.verify': 'Verificer pung',
@@ -13711,4 +13729,30 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   "entities.abilities.nightshade_coating.description": "Overtrækker målet i natskygge, giver {damage} naturskade og reducerer helingen, den modtager med 25 % i 12 sek.",
   "entities.abilities.nightshade_coating.name": "Natskygge belægning",
   "guide.settingsPage.ifShowReliquaryTracker": "Om Reliquary-trackeren (dine fastgjorte sider og deres fremskridt) sidder på din HUD. Reliquary-vinduet har en matchende øjenknap, og fastgørelse af en side tænder trackeren igen.",
+  // v0.41 release i18n fill.
+  'entities.items.reins_rickshaw_mount.name': 'Bundne tøjler: Knogebundet Rickshaw',
+  'hudChrome.itemMenu.sell': 'Sælg',
+  'hudChrome.itemMenu.sellAll': 'Sælg alle ({count})',
+  'hudChrome.mounts.desc_rickshaw_mount':
+    'En raslende knoglekærre med en knoklet håndlanger spændt for skafterne, der trækker dig af sted i fuldt firspring.',
+  'hudChrome.mounts.name_rickshaw_mount': 'Knogebundet Rickshaw',
+  'hudChrome.options.showTargetSwingTimer': 'Vis målets svingtimer',
+  'hudChrome.plurals.buffsHidden.one':
+    'Yderligere {count} styrkelse er aktiv, men skjult i denne grafikforudindstilling',
+  'hudChrome.plurals.buffsHidden.few':
+    'Yderligere {count} styrkelser er aktive, men skjulte i denne grafikforudindstilling',
+  'hudChrome.plurals.buffsHidden.many':
+    'Yderligere {count} styrkelser er aktive, men skjulte i denne grafikforudindstilling',
+  'hudChrome.plurals.buffsHidden.other':
+    'Yderligere {count} styrkelser er aktive, men skjulte i denne grafikforudindstilling',
+  'hudChrome.steam.wishlist': 'Føj til ønskelisten på Steam',
+  'hudChrome.steam.wishlistAria':
+    'Føj til ønskelisten på Steam: åbn World of ClaudeCrafts butiksside',
+  'hudChrome.steam.wishlistShort': 'Ønskeliste',
+  'hudChrome.unitFrame.buffOverflowLabel': '+{n}',
+  'hudChrome.wocMarket.browserOnlyConfirmTitle': 'Åbn $WOC-børsen i browseren?',
+  'hudChrome.wocMarket.browserOnlyConfirmBody':
+    '$WOC-børsen kører kun i browserversionen af World of ClaudeCraft. Dette åbner World of ClaudeCraft i din browser, hvor du kan logge ind og åbne børsen; spillet fortsætter her.',
+  'hudChrome.wocMarket.browserOnlyConfirmOpen': 'Åbn i browser',
+  'hudChrome.wocMarket.browserOnlyConfirmCancel': 'Annuller',
 };
