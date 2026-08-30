@@ -439,12 +439,21 @@ export function enterDungeon(
     : undefined;
   // The sealed-gate rule gates FIRST entry only: a room the group already
   // claims is always re-enterable from anywhere (the checkpoint redirect
-  // above resolves to exactly these rooms).
+  // above resolves to exactly these rooms). An entrant standing inside the
+  // previous room's claim always answers to that room's gate (a sealed
+  // forge-lift car never leaks its rider into the Halls early). An OUTSIDE
+  // entrant is admitted only where the room carries a real overworld
+  // walk-up door (today the Halls' Eastbrook testing door, whatever the
+  // room's chain position); when the walk-up reverts at launch
+  // (overworldDoor: false), the seal re-engages and the lift-gate flow
+  // governs first entry.
   if (
     previousIgnivarRoom &&
     !bypass &&
     !ctx.instances.some((i) => i.dungeonId === dungeonId && i.partyKey === key) &&
-    (!ignivarSourceClaim || !ignivarGateOpenTo(ctx, ignivarSourceClaim, dungeonId))
+    (ignivarSourceClaim
+      ? !ignivarGateOpenTo(ctx, ignivarSourceClaim, dungeonId)
+      : dungeon.overworldDoor === false)
   ) {
     ctx.error(r.meta.entityId, 'The forge gate is sealed to you.');
     return false;

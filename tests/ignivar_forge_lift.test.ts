@@ -54,8 +54,10 @@ describe('the Forge-Lift room', () => {
       guideVisible: false,
       suggestedPlayers: 10,
     });
-    // the Halls yielded their overworld door to the lift
-    expect(DUNGEONS[IGNIVAR_FORGE_APPROACH_ID].overworldDoor).toBe(false);
+    // The Halls keep the raid branch's Eastbrook walk-up testing door
+    // beside the lift chain (the walk-up reverts at launch; the lift's
+    // exit portal is the chain's own way in either way).
+    expect(DUNGEONS[IGNIVAR_FORGE_APPROACH_ID].overworldDoor).not.toBe(false);
   }, 40000);
 
   it('seals the car through the ride: locked gate, no walk-through, entry refused', () => {
