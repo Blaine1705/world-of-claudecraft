@@ -1972,6 +1972,7 @@ export const ko_KR: EnTranslations = {
       "fromYour": "당신의 {value} {stat}에서:",
       "names": {
         "spellPower": "주문력",
+        "healPower": "치유력",
         "critRating": "치명타 등급",
         "hasteRating": "가속 등급",
         "parry": "무기 막기",

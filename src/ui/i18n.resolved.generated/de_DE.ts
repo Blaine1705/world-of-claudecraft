@@ -1972,6 +1972,7 @@ export const de_DE: EnTranslations = {
       "fromYour": "Von deinen {value} Punkten {stat}:",
       "names": {
         "spellPower": "Zaubermacht",
+        "healPower": "Healing Power",
         "critRating": "Kritische Trefferwertung",
         "hasteRating": "Tempowertung",
         "parry": "Parieren",

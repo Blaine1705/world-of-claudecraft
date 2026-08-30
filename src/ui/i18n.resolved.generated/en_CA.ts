@@ -1972,6 +1972,7 @@ export const en_CA: EnTranslations = {
       "fromYour": "From your {value} {stat}:",
       "names": {
         "spellPower": "Spell Power",
+        "healPower": "Healing Power",
         "critRating": "Crit Rating",
         "hasteRating": "Haste Rating",
         "parry": "Parry",

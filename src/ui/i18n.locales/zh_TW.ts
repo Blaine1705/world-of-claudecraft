@@ -1253,6 +1253,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.charSheet.hidePlaytimeAria': '隱藏遊戲時長',
   'hudChrome.statInfo.fromYour': '來自你的 {value} 點{stat}：',
   'hudChrome.statInfo.names.spellPower': '法術強度',
+  'hudChrome.statInfo.names.healPower': '治療強度',
   'hudChrome.statInfo.names.critRating': '暴擊等級',
   'hudChrome.statInfo.names.hasteRating': '急速等級',
   'hudChrome.statInfo.names.parry': '招架',

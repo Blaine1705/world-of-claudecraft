@@ -1972,6 +1972,7 @@ export const cs_CZ: EnTranslations = {
       "fromYour": "Z tvojí hodnoty {value} {stat}:",
       "names": {
         "spellPower": "Síla kouzel",
+        "healPower": "Healing Power",
         "critRating": "Hodnocení kritického zásahu",
         "hasteRating": "Hodnocení rychlosti",
         "parry": "Odražení",

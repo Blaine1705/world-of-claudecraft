@@ -1972,6 +1972,7 @@ export const zh_CN: EnTranslations = {
       "fromYour": "来自你的 {value} 点{stat}：",
       "names": {
         "spellPower": "法术强度",
+        "healPower": "治疗强度",
         "critRating": "暴击等级",
         "hasteRating": "急速等级",
         "parry": "招架",

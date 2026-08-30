@@ -1972,6 +1972,7 @@ export const ru_RU: EnTranslations = {
       "fromYour": "От вашей характеристики ({value} {stat}):",
       "names": {
         "spellPower": "Сила заклинаний",
+        "healPower": "Сила исцеления",
         "critRating": "Рейтинг крит. удара",
         "hasteRating": "Рейтинг ускорения",
         "parry": "Парирование",

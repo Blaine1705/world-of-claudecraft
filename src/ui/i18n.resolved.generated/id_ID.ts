@@ -1972,6 +1972,7 @@ export const id_ID: EnTranslations = {
       "fromYour": "Dari {value} {stat} Anda:",
       "names": {
         "spellPower": "Kekuatan Mantra",
+        "healPower": "Healing Power",
         "critRating": "Rating Kritis",
         "hasteRating": "Rating Kecepatan",
         "parry": "Tangkis",

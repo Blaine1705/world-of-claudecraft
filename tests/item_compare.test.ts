@@ -12,6 +12,8 @@ function armor(
     hitRating: number;
     critRating: number;
     hasteRating: number;
+    spellPower: number;
+    healPower: number;
   }> = {},
 ): ItemDef {
   return {
@@ -105,6 +107,20 @@ describe('itemStatDeltas', () => {
       { stat: 'hitRating', delta: 20, decimals: 0 },
       { stat: 'critRating', delta: -20, decimals: 0 },
       { stat: 'hasteRating', delta: -15, decimals: 0 },
+    ]);
+  });
+
+  it('reports Spell Power and Healing Power deltas ahead of the ratings', () => {
+    // The Crucible tier authored both affixes onto items; the exact toEqual
+    // pins the tooltip's Stats | Affix | Ratings order (affixes first) and
+    // that each affix earns its own row rather than riding a rating row.
+    const candidate = armor('vestment', { int: 10 }, { spellPower: 14, critRating: 60 });
+    const equipped = armor('oldrobe', { int: 8 }, { healPower: 12, critRating: 40 });
+    expect(itemStatDeltas(candidate, equipped)).toEqual([
+      { stat: 'int', delta: 2, decimals: 0 },
+      { stat: 'spellPower', delta: 14, decimals: 0 },
+      { stat: 'healPower', delta: -12, decimals: 0 },
+      { stat: 'critRating', delta: 20, decimals: 0 },
     ]);
   });
 

@@ -10520,6 +10520,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.statInfo.fromYour'
   | 'hudChrome.statInfo.names.critRating'
   | 'hudChrome.statInfo.names.hasteRating'
+  | 'hudChrome.statInfo.names.healPower'
   | 'hudChrome.statInfo.names.hitRating'
   | 'hudChrome.statInfo.names.parry'
   | 'hudChrome.statInfo.names.spellPower'

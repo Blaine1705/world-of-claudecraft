@@ -1972,6 +1972,7 @@ export const en_XA: EnTranslations = {
       "fromYour": "[Ƒŕóɱ ýóúŕ {value} {stat}:]",
       "names": {
         "spellPower": "[Šþéļļ Þóŵéŕ]",
+        "healPower": "[Ĥéáļíñĝ Þóŵéŕ]",
         "critRating": "[Çŕíţ Ŕáţíñĝ]",
         "hasteRating": "[Ĥášţé Ŕáţíñĝ]",
         "parry": "[Þáŕŕý]",

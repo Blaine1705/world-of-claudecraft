@@ -560,6 +560,7 @@ import {
 } from './interface_unlock_menu_core';
 import { InterfaceUnlockPreview } from './interface_unlock_preview';
 import { InteriorMapController } from './interior_map_controller';
+import { compareStatLabelKey, itemAffixTooltipLines } from './item_affix_tooltip';
 import { itemArmorTypeLabelKey } from './item_armor_type';
 import { requiredClassesForTooltip } from './item_class_restriction';
 import { itemStatDeltas } from './item_compare';
@@ -6521,6 +6522,7 @@ export class Hud {
         }),
       )}</div>`;
     }
+    html += itemAffixTooltipLines(item);
     const warfareRating = Math.min(item.pvpOffenseRating ?? 0, item.pvpDefenseRating ?? 0);
     if (warfareRating > 0) {
       html += `<div class="tt-green">${esc(
@@ -6756,7 +6758,7 @@ export class Hud {
           maximumFractionDigits: d.decimals,
         });
         return `<div class="${cls}">${sign}${magnitude} ${esc(
-          t(statNameKey(d.stat) as TranslationKey),
+          t(compareStatLabelKey(d.stat) as TranslationKey),
         )}</div>`;
       })
       .join('');

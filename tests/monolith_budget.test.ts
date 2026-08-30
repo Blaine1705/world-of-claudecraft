@@ -148,7 +148,11 @@ const MONOLITHS: MonolithRow[] = [
     // while this branch's healPower seam, sigil-shop progression views, and
     // biome import strip lowered the file; the merge lands both arms and the
     // ratchet pins the merged reality. Exact count, zero slack.
-    ceiling: 18861,
+    // Plus 2 for the item-affix tooltip wiring: the import and one composed
+    // call into item_affix_tooltip.ts (the Spell Power / Healing Power lines
+    // themselves live in that sibling, gather_tool_tooltip pattern). Exact
+    // count, zero slack; maintainer-review item.
+    ceiling: 18863,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

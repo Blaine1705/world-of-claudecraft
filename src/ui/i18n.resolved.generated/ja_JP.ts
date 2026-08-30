@@ -1972,6 +1972,7 @@ export const ja_JP: EnTranslations = {
       "fromYour": "あなたの{stat}{value}による効果:",
       "names": {
         "spellPower": "呪文威力",
+        "healPower": "治癒力",
         "critRating": "クリティカルレーティング",
         "hasteRating": "ヘイストレーティング",
         "parry": "受け流し",

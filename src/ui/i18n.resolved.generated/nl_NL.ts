@@ -1972,6 +1972,7 @@ export const nl_NL: EnTranslations = {
       "fromYour": "Van je {value} {stat}:",
       "names": {
         "spellPower": "Spreukkracht",
+        "healPower": "Healing Power",
         "critRating": "Crit-waardering",
         "hasteRating": "Snelheidswaardering",
         "parry": "Parering",
