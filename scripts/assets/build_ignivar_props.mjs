@@ -320,28 +320,19 @@ const ITEMS = [
     hotBoost: 1.25,
     glowFloor: [36, 9, 6],
   },
-  // lava_furnace_2: the name lava_furnace is taken by the New_Assets drop
-  // (the lava_outlet_2 precedent for a second same-family model)
-  {
-    src: 'Exterior_Assets/Lava_Furnace.glb',
-    name: 'lava_furnace_2',
-    tex: 1024,
-    emissive: 1.5,
-    glowFloor: [17, 4, 3],
-  },
+  // lava_furnace_2 (src Exterior_Assets/Lava_Furnace.glb) and lava_ramp
+  // (src Exterior_Assets/lava_ramp.glb) are STRIPPED from the shipped set:
+  // zero placements in any sim table, and the furnace's mesh is
+  // byte-identical to the interior lava_furnace. Their sources stay in
+  // tmp/asset_src; restore a build entry here (emissive 1.5, glowFloor
+  // [17, 4, 3], hotBoost 1.35 for the ramp) plus the loader rows if the
+  // owner ever places one, and the hygiene pin in
+  // tests/ignivar_asset_hygiene.test.ts will hold it to a real placement.
   {
     src: 'Exterior_Assets/lava_pillar.glb',
     name: 'lava_pillar',
     tex: 1024,
     emissive: 1.5,
-    glowFloor: [17, 4, 3],
-  },
-  {
-    src: 'Exterior_Assets/lava_ramp.glb',
-    name: 'lava_ramp',
-    tex: 1024,
-    emissive: 1.5,
-    hotBoost: 1.35,
     glowFloor: [17, 4, 3],
   },
   {
