@@ -28,7 +28,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1000,
-      "state": "45f50e82",
+      "state": "016196cc",
       "events": "f83d68bf",
       "rng": {
         "draws": 8,
@@ -47,7 +47,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
@@ -115,6 +122,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "xp": 192
         }
       ],
@@ -266,7 +276,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1000,
-      "state": "ce35289b",
+      "state": "e3ac5b01",
       "events": "c3c8a727",
       "rng": {
         "draws": 17,
@@ -285,7 +295,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
@@ -353,6 +370,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "xp": 384
         }
       ],
@@ -509,7 +529,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1000,
-      "state": "ce35289b",
+      "state": "e3ac5b01",
       "events": "741638a5",
       "rng": {
         "draws": 17,
@@ -528,7 +548,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
@@ -596,6 +623,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "xp": 384
         }
       ],

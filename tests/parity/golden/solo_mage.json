@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 999,
-      "state": "bb16c978",
+      "state": "a98ac9a6",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -35,7 +35,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
@@ -81,7 +88,10 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          }
         }
       ],
       "entities": [
@@ -142,7 +152,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1000,
-      "state": "41f2c31e",
+      "state": "c003cce0",
       "events": "cde12e22",
       "rng": {
         "draws": 2,
@@ -153,7 +163,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1000,
-      "state": "91ed733b",
+      "state": "a7a3b56b",
       "events": "93b43192",
       "rng": {
         "draws": 2,
@@ -164,7 +174,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1000,
-      "state": "b206314d",
+      "state": "4316dc59",
       "events": "a3c3c83c",
       "rng": {
         "draws": 136,
@@ -175,7 +185,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1000,
-      "state": "fcdaf69d",
+      "state": "be415345",
       "events": "69b35b96",
       "rng": {
         "draws": 304,
@@ -186,7 +196,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1000,
-      "state": "ff2023de",
+      "state": "35996dd4",
       "events": "30d173ba",
       "rng": {
         "draws": 507,
@@ -197,7 +207,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1000,
-      "state": "22056f21",
+      "state": "1b4cdfdd",
       "events": "b42a06f7",
       "rng": {
         "draws": 714,
@@ -208,7 +218,7 @@
       "tick": 128,
       "time": 6.4,
       "nextId": 1000,
-      "state": "f60e6b0c",
+      "state": "4531437e",
       "events": "741638a5",
       "rng": {
         "draws": 797,
@@ -228,7 +238,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
@@ -295,7 +312,10 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          }
         }
       ],
       "entities": [

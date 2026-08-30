@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 999,
-      "state": "fd78b5cb",
+      "state": "5727ba5f",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -37,7 +37,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
@@ -78,7 +85,10 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          }
         }
       ],
       "entities": [
@@ -140,7 +150,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1003,
-      "state": "0b57bf1d",
+      "state": "bb6a88c5",
       "events": "c2384e94",
       "rng": {
         "draws": 15,
@@ -151,7 +161,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1003,
-      "state": "cf5fd348",
+      "state": "20c59aae",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -162,7 +172,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1003,
-      "state": "7a0ce1e8",
+      "state": "e63e4a8e",
       "events": "a7f4d6fb",
       "rng": {
         "draws": 189,
@@ -173,7 +183,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1003,
-      "state": "e91a34c6",
+      "state": "69fbfe80",
       "events": "741638a5",
       "rng": {
         "draws": 359,
@@ -184,7 +194,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1003,
-      "state": "60e26208",
+      "state": "f83a19ee",
       "events": "ba09b188",
       "rng": {
         "draws": 552,
@@ -195,7 +205,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1003,
-      "state": "f139ecdd",
+      "state": "819af705",
       "events": "741638a5",
       "rng": {
         "draws": 743,
@@ -206,7 +216,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1003,
-      "state": "fccc1f70",
+      "state": "9d87b426",
       "events": "741638a5",
       "rng": {
         "draws": 743,
@@ -226,7 +236,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
@@ -287,7 +304,10 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          }
         }
       ],
       "entities": [
@@ -568,7 +588,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 1003,
-      "state": "becc96ee",
+      "state": "686267d8",
       "events": "741638a5",
       "rng": {
         "draws": 963,
@@ -579,7 +599,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 1003,
-      "state": "fe6e676b",
+      "state": "ed896ab7",
       "events": "741638a5",
       "rng": {
         "draws": 1185,
@@ -590,7 +610,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 1003,
-      "state": "932740c6",
+      "state": "0081c280",
       "events": "741638a5",
       "rng": {
         "draws": 1435,
@@ -601,7 +621,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 1003,
-      "state": "932740c6",
+      "state": "0081c280",
       "events": "741638a5",
       "rng": {
         "draws": 1435,
@@ -621,7 +641,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
@@ -682,7 +709,10 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          }
         }
       ],
       "entities": [

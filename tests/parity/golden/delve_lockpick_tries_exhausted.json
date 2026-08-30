@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 999,
-      "state": "f6df7027",
+      "state": "69311947",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -36,7 +36,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
@@ -78,7 +85,10 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          }
         }
       ],
       "entities": [
@@ -148,7 +158,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 1013,
-      "state": "1effbbe7",
+      "state": "d4e80d7f",
       "events": "873d2f22",
       "rng": {
         "draws": 3,
@@ -159,7 +169,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1013,
-      "state": "5693a085",
+      "state": "2e875ba1",
       "events": "632a979f",
       "rng": {
         "draws": 3,
@@ -170,7 +180,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 1013,
-      "state": "17d3acff",
+      "state": "3928c827",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -181,7 +191,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1013,
-      "state": "c7bffc59",
+      "state": "9456e4f5",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -192,7 +202,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 1013,
-      "state": "4a688207",
+      "state": "77a778df",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -203,7 +213,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1013,
-      "state": "e058fb75",
+      "state": "115da251",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -214,7 +224,7 @@
       "tick": 69,
       "time": 3.45,
       "nextId": 1014,
-      "state": "44d7ddbf",
+      "state": "79aebdb1",
       "events": "c838dda8",
       "rng": {
         "draws": 5,
@@ -234,7 +244,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
@@ -320,6 +337,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "xp": 898
         }
       ],
@@ -427,7 +447,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 1014,
-      "state": "31d112cd",
+      "state": "4c1942eb",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -438,7 +458,7 @@
       "tick": 71,
       "time": 3.55,
       "nextId": 1014,
-      "state": "ffc79c17",
+      "state": "937cc7f9",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -458,7 +478,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
@@ -544,6 +571,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "xp": 898
         }
       ],
