@@ -599,7 +599,10 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the v0.41.0 base sync into the
     // raid branch: both arms extracted and added independently, so neither
     // parent pin fits the combined file; the merged count is the honest bound.
-    ceiling: 5838,
+    // Plus 4 at the same sync's integration fix: the sendInput socket guard
+    // (a missing-socket check the raid forced-facing arm needs when applyWire
+    // runs snapshot-driven with no WebSocket). Exact count, zero slack.
+    ceiling: 5842,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
