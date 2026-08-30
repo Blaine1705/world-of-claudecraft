@@ -18587,6 +18587,11 @@ export const ja_JP: EnTranslations = {
         "enterText": "封印された王家の扉を通り抜けます。",
         "leaveText": "ソーンピークの冷たい空気へ戻ります。"
       },
+      "ignivar_forge_lift": {
+        "name": "鍛冶昇降機",
+        "enterText": "鍛冶昇降機が軋みながら沈んでいく。鎚音が迫り上がってくる。",
+        "leaveText": "昇降機が城塞の外気の中へと引き上げてくれる。"
+      },
       "ignivar_forge_approach": {
         "name": "最初の鍛造の大広間",
         "enterText": "槌音が最初の鍛造の大広間に響き渡る。",

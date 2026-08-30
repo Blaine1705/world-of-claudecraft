@@ -342,10 +342,14 @@ interface AttributionTargetFixture {
 // Re-minted for the raid encounter tuning PR's nameplate direct-click pick
 // integration in renderer.ts: the runtimeRender.renderer leaf moved. No
 // capture was retaken.
-// Re-minted on the v0.41.0 base sync into the raid branch (renderer and
-// evidence inputs moved on both arms). No capture was retaken.
+// Re-minted for PR #3740's forge-lift room (the lift room render hookup and
+// door-portal arm moved the renderer integration leaf). No capture was
+// retaken.
+// Re-minted for the Drakelands entrance merge into the raid branch (PRs 3689
+// plus 3734: both arms had re-minted, the merged renderer and evidence inputs
+// land together). No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '9d7f3e9a5e773ceef74c3270f5f77ca9e7b73d9b77d316261d7631e0349b2e8c';
+  '2341578921200326fd128bb8a10fa2f62a5d820803a844670ea130a695820827';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

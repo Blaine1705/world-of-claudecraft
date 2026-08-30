@@ -117,28 +117,30 @@ describe('ignivar dressing plan', () => {
       expect(existsSync(file), `${url} should exist under public/`).toBe(true);
       const bytes = statSync(file).size;
       expect(bytes, `${url} exceeds the per-prop budget`).toBeLessThanOrEqual(400_000);
-      total += bytes;
+      // The total budget covers the bytes THIS set adds to the download:
+      // cross-referenced fixtures from other shipped systems (the town
+      // streetlamp the placer kit reuses) ship regardless and count only
+      // against the per-prop bound above.
+      if (url.includes('/ignivar_prop_')) total += bytes;
     }
-    // Ratcheted down with the 2026-08 unplaced-prop trim (the placed set is
-    // about 4.2 MB); raising this back is a deliberate budget decision.
-    expect(total, 'prop set exceeds the total budget').toBeLessThanOrEqual(4_500_000);
-  });
-
-  it('places every wired prop in at least one raid room (no dead download weight)', () => {
-    // prepareIgnivarEnvProps fetches EVERY url in IGNIVAR_ENV_PROP_URLS at
-    // world entry, for every player, raid visitor or not. A key no room plan
-    // places still costs the whole playerbase its download, decode, and GPU
-    // template, so a new prop lands together with its placements or not at
-    // all (the 2026-08 trim removed 13 wired-but-unplaced props, 2.31 MB).
-    const placed = new Set<string>();
-    for (const plan of [
-      ignivarApproachPropPlan(IGNIVAR_FORGE_APPROACH_LAYOUT),
-      ignivarArenaPropPlan(IGNIVAR_LAYOUT),
-      ignivarCruciblePropPlan(IGNIVAR_SECOND_WING_LAYOUT),
-    ])
-      for (const placement of plan) placed.add(placement.key);
-    for (const key of Object.keys(IGNIVAR_ENV_PROP_URLS))
-      expect(placed.has(key), `${key} is wired to a GLB but placed in no raid room`).toBe(true);
+    // Raised from 7_000_000 when the 19-piece Exterior_Assets fortress kit
+    // joined the roster (35 to 54 props), re-tightened to the measured
+    // KTX2 total (9_645_164), then raised for the owner-directed fortress
+    // night glow: the whole exterior kit carries a half-resolution floored
+    // emissive texture (the soft red sheen, floor scaled per piece so
+    // floor times strength stays even; measured total 10_560_556), raised
+    // for the owner's dungeon_entrance facade (10_802_120), again for the
+    // eight-piece forge-lift car kit and the winch remake's mount and
+    // spool pair minus the retired one-piece winch and sliding door
+    // (12_731_480), then TIGHTENED twice: the entrance arm stripped the
+    // unplaced lava_furnace_2 and lava_ramp, and the raid arm's 2026-08
+    // unplaced-prop trim dropped the unplaced interior placer stock while
+    // adding water_pump; the merge restored gear_machine, which the
+    // approach room's forge-lift shaft dressing places (merged measured
+    // total 10_139_544) plus a sliver of rebake headroom. The
+    // no-unplaced-props rule itself is pinned by
+    // tests/ignivar_asset_hygiene.test.ts over the real sim tables.
+    expect(total, 'prop set exceeds the total budget').toBeLessThanOrEqual(10_200_000);
   });
 
   it('pins the native dims table to the shipped GLBs (canonical long-axis-on-X)', async () => {
@@ -149,9 +151,13 @@ describe('ignivar dressing plan', () => {
       const doc = await io.read(path.join(publicDir, url.replace(/^\//, '')));
       const root = doc.getRoot();
       // The runtime template bakes exactly one mesh; a rebake that splits
-      // the prop would silently drop geometry there.
+      // the prop would silently drop geometry there. The reused town
+      // streetlamp is the one sanctioned exception: its second primitive is
+      // the flame, and only the placer PREVIEW rides the env-prop template
+      // (the world instance renders complete through render/streetlamps.ts).
       expect(root.listMeshes().length, `${key} must stay a single mesh`).toBe(1);
-      expect(root.listMeshes()[0].listPrimitives().length, `${key} single primitive`).toBe(1);
+      if (key !== 'street_lamp')
+        expect(root.listMeshes()[0].listPrimitives().length, `${key} single primitive`).toBe(1);
       const scene = root.getDefaultScene() ?? root.listScenes()[0];
       const bounds = getBounds(scene);
       let dx = bounds.max[0] - bounds.min[0];

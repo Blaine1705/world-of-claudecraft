@@ -171,9 +171,18 @@ export function collectCalmAnchorPads(): CalmPadRow[] {
   // Interior-only rooms (overworldDoor: false) have no walk-up door, so their
   // placeholder doorPos must not calm open-world ground.
   for (const id in DUNGEONS) {
-    const dungeon = DUNGEONS[id];
-    if (dungeon.overworldDoor === false) continue;
-    pad('dungeonDoor', dungeon.doorPos.x, dungeon.doorPos.z, 7, 15);
+    // A room reached only through internal instance doors (overworldDoor:
+    // false, e.g. the Ignivar raid wings) has no surface door to flatten
+    // for; its placeholder doorPos must not register a pad in the open
+    // world. Same skip as dungeon_door_clearance.ts, colliders.ts, and
+    // the sim's door-entity loop (the d14e94fad fix missed this fifth
+    // site). The origin pads these registered are divergence-driven and
+    // measured INERT today (zero height delta over the 88 yd disc at
+    // both seeds), so this changes no terrain; it stops them silently
+    // activating if the character layers near the origin ever diverge.
+    if (DUNGEONS[id].overworldDoor === false) continue;
+    const door = DUNGEONS[id].doorPos;
+    pad('dungeonDoor', door.x, door.z, 7, 15);
   }
   // Paired overworld portals (the merged table, so every zone's passage
   // gets its two gate mounds plus their landings, each landing sitting

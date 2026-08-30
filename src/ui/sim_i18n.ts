@@ -589,6 +589,8 @@ const baseEnTable = {
   'lore.ignivarLivingMetalRecordName': 'Living Metal Record',
   'lore.ignivarHeraldKeyRecordName': 'Herald-Key Record',
   'error.ignivarForgeGateSealed': 'The forge gate is sealed to you.',
+  // The forge-lift antechamber's arrival line (src/sim/ignivar_forge_lift.ts).
+  'log.ignivarLiftArrives': 'The forge-lift settles; its gate grinds open.',
   'error.ignivarRaidInCombat':
     'Your raid is still in combat. You may enter once the fighting stops.',
   'aura.carrierFatigue': 'Carrier Fatigue',

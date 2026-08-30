@@ -66,6 +66,7 @@ import {
   DRAKELANDS_ZONE,
 } from './content/drakelands';
 import { DUNGEON_DEFS, DUNGEON_KEEPSAKE_ITEMS, DUNGEON_MOBS } from './content/dungeons';
+import { FORGEFATHER_ISLE_TERRAIN_EDITS } from './content/ember_coast';
 import {
   EVERGARDEN_CAMPS,
   EVERGARDEN_ITEMS,
@@ -787,6 +788,7 @@ export const BUILTIN_WORLD: WorldContent = {
     ...EASTBROOK_QUAY_TERRAIN_EDITS,
     ...HARBOR_SAND_TERRAIN_EDITS,
     ...SOWFIELD_SEABED_TERRAIN_EDITS,
+    ...FORGEFATHER_ISLE_TERRAIN_EDITS,
   ],
 };
 

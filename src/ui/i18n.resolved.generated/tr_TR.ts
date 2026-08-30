@@ -18587,6 +18587,11 @@ export const tr_TR: EnTranslations = {
         "enterText": "Mühürlü kraliyet kapısından geçersin.",
         "leaveText": "Dikenzirve'nin soğuk havasına geri dönersin."
       },
+      "ignivar_forge_lift": {
+        "name": "The Forge-Lift",
+        "enterText": "The forge-lift shudders and sinks; hammerfall rises to meet you.",
+        "leaveText": "The lift hauls you back into the open air of the keep."
+      },
       "ignivar_forge_approach": {
         "name": "Halls of the First Tempering",
         "enterText": "Hammerfall echoes through the Halls of the First Tempering.",

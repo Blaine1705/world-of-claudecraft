@@ -650,7 +650,13 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned again for the v0.40.0 sync merge (the release arm's
     // gardenwalk pass rides in beside the tutorial island). Exact count,
     // zero slack.
-    ceiling: 5347,
+    // the ember coast tables extracted to content/ember_coast.ts (the
+    // vale_coast.ts pattern); the Forgefather's Isle cone rode the freed room.
+    // The walkable-lift sum extracted to walk_lifts.ts (the Forgefather
+    // stair ramps fold in there), then EMBER_LAVA_POOLS moved home to
+    // ember_lava_layout.ts beside its flat-pool sibling (paying for the
+    // fortress scatter screen); exact count.
+    ceiling: 5275,
     seam: 'zone/terrain data as content records; logic as sim sibling modules',
   },
   {
@@ -756,7 +762,9 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned after the interior-collider-set assembly extraction to
     // interior_collider_sets.ts (which appends the Ignivar authored prop
     // colliders). Exact count, zero slack.
-    ceiling: 2609,
+    // the dungeon-door jamb block extracted to dungeon_door_jambs.ts; the
+    // fortress collider hook rode the freed room
+    ceiling: 2587,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {

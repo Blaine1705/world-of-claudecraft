@@ -15,8 +15,11 @@ import {
   ignivarApproachPropPlan,
   ignivarArenaPropPlan,
   ignivarCruciblePropPlan,
+  ignivarLiftPropPlan,
 } from './ignivar_dressing_plan_core';
 import { appendIgnivarEnvProps, prepareIgnivarEnvProps } from './ignivar_env_props';
+import { buildIgnivarLiftShaft } from './ignivar_lift_room';
+import { appendIgnivarMistGates } from './ignivar_mist_gate';
 import type { FireLightSink } from './point_light_budget';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 import { addTorchGlowDecal } from './torch_glow_decal';
@@ -25,6 +28,7 @@ import { splitWallMountedItems, type WallMountedSplit } from './wall_backface_cu
 export const IGNIVAR_APPROACH_DRESSING_NAME = 'ignivarForgeApproachDressing';
 export const IGNIVAR_ARENA_DRESSING_NAME = 'ignivarCrucibleArenaDressing';
 export const VARKHUL_CRUCIBLE_DRESSING_NAME = 'varkhulInnerCrucibleDressing';
+export const IGNIVAR_LIFT_DRESSING_NAME = 'ignivarForgeLiftDressing';
 export const IGNIVAR_APPROACH_CLEAR_HALF_WIDTH = 7.5;
 
 type PropAppender = typeof appendIgnivarEnvProps;
@@ -38,22 +42,39 @@ function sharedMaterial(options: Parameters<typeof surfaceMat>[0]): THREE.Materi
 }
 
 export function ensureIgnivarRaidDressingAssets(interior: string): Promise<void> {
-  return interior === 'ignivar_approach' || interior === 'ignivar' || interior === 'ignivar_depths'
+  return interior === 'ignivar_approach' ||
+    interior === 'ignivar' ||
+    interior === 'ignivar_depths' ||
+    interior === 'ignivar_lift'
     ? prepareIgnivarEnvProps().catch(() => undefined)
     : Promise.resolve();
 }
 
 /** Baked additive floor pools under the molten props (the addTorchGlow
  *  recipe: no new lights, the light census stays frozen). Skipped on the low
- *  tier like every other glow decal. */
-const PROP_GLOW_POOLS: Partial<Record<IgnivarEnvPropKey, { color: number; scale: number }>> = {
+ *  tier like every other glow decal. Interior pools sit on the room floor
+ *  (y 0 placements only, so a raised prop never mints a floating disc);
+ *  `atPlacementY` pools ride their placement's own height instead, for the
+ *  exterior pieces whose world y IS their standing surface. */
+const PROP_GLOW_POOLS: Partial<
+  Record<IgnivarEnvPropKey, { color: number; scale: number; atPlacementY?: boolean }>
+> = {
   lava_face: { color: 0xff4316, scale: 0.85 },
   anvil: { color: 0xff5c1e, scale: 1.25 },
   forge: { color: 0xff5c1e, scale: 1.05 },
   reactor: { color: 0xffa04a, scale: 0.7 },
+  // the Exterior_Assets fortress kit's molten pieces
+  dragon_head: { color: 0xff4316, scale: 0.9 },
+  fountain_base: { color: 0xff5c1e, scale: 0.85 },
+  lava_pillar: { color: 0xff5c1e, scale: 0.7 },
+  // The raid-door facade: a deep red threshold pool under the mist gate
+  // (the facade seats on raised floor plates, so it anchors at placement y).
+  dungeon_entrance: { color: 0xff2a14, scale: 0.8, atPlacementY: true },
+  // (The bridge rails carry no floor pool: their braziers glow through the
+  // flame's own baked emissive, per the owner's direction.)
 };
 
-function addPropGlowPools(
+export function addPropGlowPools(
   group: THREE.Group,
   placements: readonly IgnivarPropPlacement[],
   lowGfx: boolean,
@@ -63,7 +84,19 @@ function addPropGlowPools(
   if (lowGfx || typeof document === 'undefined') return;
   for (const placement of placements) {
     const pool = PROP_GLOW_POOLS[placement.key];
-    if (!pool || placement.y !== 0) continue;
+    if (!pool) continue;
+    if (pool.atPlacementY) {
+      addTorchGlowDecal(
+        group,
+        placement.x,
+        placement.z,
+        pool.color,
+        placement.y + 0.09,
+        pool.scale,
+      );
+      continue;
+    }
+    if (placement.y !== 0) continue;
     addTorchGlowDecal(group, placement.x, placement.z, pool.color, 0.07, pool.scale);
   }
 }
@@ -184,6 +217,26 @@ function buildForgeApproachDressing(
   return group;
 }
 
+/** The Forge-Lift car: the grille-and-machinery seed plan plus the
+ *  descending-shaft illusion (self-animating on the shared uTime clock,
+ *  zero per-frame CPU). */
+function buildForgeLiftDressing(
+  layout: DungeonLayout,
+  lowGfx: boolean,
+  appendProps: PropAppender = appendIgnivarEnvProps,
+): THREE.Group {
+  const group = markDressing(new THREE.Group(), IGNIVAR_LIFT_DRESSING_NAME);
+  const placements = filterIgnivarPropPlacements(ignivarLiftPropPlan(layout), lowGfx);
+  appendProps(group, placements, lowGfx);
+  addPropGlowPools(group, placements, lowGfx);
+  // The owner fronts both portals with dungeon_entrance facades: each gets
+  // the same boss-gate fog wall the Drakelands keep entrance carries, over
+  // the facade's authored red membrane.
+  appendIgnivarMistGates(group, placements);
+  group.add(buildIgnivarLiftShaft(lowGfx));
+  return group;
+}
+
 /** Crucible of the Last Spring: authored props only; the arena atmosphere
  *  module owns the floor bands and embers. */
 function buildCrucibleArenaDressing(
@@ -243,6 +296,7 @@ export interface IgnivarTorchFire {
 }
 
 function ignivarRoomPropPlan(interior: string, layout: DungeonLayout): IgnivarPropPlacement[] {
+  if (interior === 'ignivar_lift') return ignivarLiftPropPlan(layout);
   if (interior === 'ignivar_approach') return ignivarApproachPropPlan(layout);
   if (interior === 'ignivar') return ignivarArenaPropPlan(layout);
   if (interior === 'ignivar_depths') return ignivarCruciblePropPlan(layout);
@@ -256,13 +310,15 @@ export function buildIgnivarRaidDressing(
   torchFire?: IgnivarTorchFire,
 ): THREE.Group | null {
   const group =
-    interior === 'ignivar_approach'
-      ? buildForgeApproachDressing(layout, lowGfx)
-      : interior === 'ignivar'
-        ? buildCrucibleArenaDressing(layout, lowGfx)
-        : interior === 'ignivar_depths'
-          ? buildInnerCrucibleDressing(layout, lowGfx)
-          : null;
+    interior === 'ignivar_lift'
+      ? buildForgeLiftDressing(layout, lowGfx)
+      : interior === 'ignivar_approach'
+        ? buildForgeApproachDressing(layout, lowGfx)
+        : interior === 'ignivar'
+          ? buildCrucibleArenaDressing(layout, lowGfx)
+          : interior === 'ignivar_depths'
+            ? buildInnerCrucibleDressing(layout, lowGfx)
+            : null;
   if (group && torchFire) {
     // Fire for the plan's placed torches, on the same tier filtering the
     // meshes get so a dropped density torch never leaves an orphan flame.
