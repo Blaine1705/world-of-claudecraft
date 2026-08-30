@@ -27,6 +27,7 @@
 // `src/sim`-pure: no DOM/Three, no Math.random/Date.now; all randomness is the shared
 // `ctx.rng` stream, drawn in the exact pre-move positions.
 
+import { WARSPIRIT_EMBERSCALE_2PC_CADENCE_STEPS } from '../content/ignivar_set_bonuses';
 import { isArenaPos, MOBS } from '../data';
 import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
 import { forceDismount } from '../mounts';
@@ -72,6 +73,7 @@ import { applyRequitalAutoAttack } from './paladin_talents';
 import { isValkyrsCallingAirborne } from './paladin_valkyrs_calling_state';
 import { effectivePlayerAttackRange } from './player_attack_reach';
 import { rangedShotProfile } from './ranged_shot';
+import { wearsSetBonus } from './set_bonus_wearer';
 import { triggerWardCycle } from './shaman_talents';
 import { advanceWarspiritCadence, stoneboundThreatMultiplier } from './shaman_warspirit';
 import { blockedMeleeDamage } from './shield_block';
@@ -662,7 +664,15 @@ export function meleeSwing(
   if (attacker.kind === 'player') {
     if (abilityName === null) advanceWarspiritCadence(ctx, attacker, target, dealtAmount, 1);
     else if (abilityName === 'Ancestral Strike') {
-      advanceWarspiritCadence(ctx, attacker, target, dealtAmount, 2);
+      // Warspirit Emberscale 2pc (the Crucible set doc): Ancestral Strike
+      // advances the shared cadence 3 steps instead of 2, a call-site
+      // selection gated on the wearer flag. The Exaltation clamp and Deep
+      // Reservoir's shared-currency interplay are disclosed in the set
+      // record (content/ignivar_set_bonuses.ts). Draws no rng.
+      const steps = wearsSetBonus(ctx, attacker, 'warspirit_emberscale', 2)
+        ? WARSPIRIT_EMBERSCALE_2PC_CADENCE_STEPS
+        : 2;
+      advanceWarspiritCadence(ctx, attacker, target, dealtAmount, steps);
       triggerWardCycle(ctx, attacker);
     }
     onMeleeSwing(ctx, attacker);

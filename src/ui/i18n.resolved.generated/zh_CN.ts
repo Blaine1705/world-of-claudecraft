@@ -2005,6 +2005,7 @@ export const zh_CN: EnTranslations = {
       "fromYour": "来自你的 {value} 点{stat}：",
       "names": {
         "spellPower": "法术强度",
+        "healPower": "治疗强度",
         "critRating": "暴击等级",
         "hasteRating": "急速等级",
         "parry": "招架",
@@ -2873,7 +2874,9 @@ export const zh_CN: EnTranslations = {
       "chestTitle": "宝箱",
       "takeLootButton": "拾取战利品",
       "takeLootTooltip": "收取金币和掉落的物品。不会用掉采集机会。",
-      "unifiedPressHint": "按一次互动键即可同时拾取战利品并按城镇专注进行采集。"
+      "unifiedPressHint": "按一次互动键即可同时拾取战利品并按城镇专注进行采集。",
+      "bindConfirmTitle": "拾取后绑定",
+      "bindConfirmBody": "这批战利品中有一件物品在拾取后将与你绑定。绑定的物品只能在限定时间内交易给共同获得该掉落的玩家。"
     },
     "spellbook": {
       "addToBarAria": "将{name}添加到动作条",
@@ -2998,7 +3001,8 @@ export const zh_CN: EnTranslations = {
       "riftUpgrade": "裂隙强化 {level}/{max}",
       "riftSockets": "裂隙宝石 {used}/{total}",
       "statEnchanted": "+{value} {stat}（附魔）",
-      "enchantedFallback": "已附魔"
+      "enchantedFallback": "已附魔",
+      "partyTradeWindow": "在接下来的{time}内，你可以将此物品交易给共同获得该掉落的玩家。装备后交易期限即告结束。"
     },
     "materialHint": {
       "fineGrade": "优质品级。以等级高于该材料的工具在满级矿脉采集所得，在任何需要普通版本的地方均可替代使用。",
@@ -8064,6 +8068,19 @@ export const zh_CN: EnTranslations = {
     "buyConfirmAccept": "购买",
     "buyConfirmCancel": "取消"
   },
+  "crucibleShop": {
+    "browse": "兑换印记",
+    "browseAria": "与{name}兑换熔炉印记",
+    "empty": "你的职业没有可兑换的套装部件。",
+    "balance": "你持有的印记: {list}",
+    "noSigils": "你没有持有任何熔炉印记。",
+    "price": "1枚{sigil}",
+    "buyAria": "用{sigil}兑换{item}",
+    "buyConfirmTitle": "确认兑换",
+    "buyConfirmBody": "用{sigil}兑换{item}？印记消耗后无法退还。",
+    "buyConfirmAccept": "兑换",
+    "buyConfirmCancel": "取消"
+  },
   "cardDuel": {
     "title": "纸牌对决",
     "close": "关闭",
@@ -9282,6 +9299,7 @@ export const zh_CN: EnTranslations = {
       "tradeExpired": "交易请求已过期。",
       "tradeFailed": "交易失败：物品或金钱已不可用。",
       "tradeBound": "该物品已绑定，无法交易。",
+      "tradeWindowIneligible": "该物品只能交易给共同获得该掉落的玩家。",
       "marketListBound": "该物品已绑定，无法上架。"
     },
     "logs": {
@@ -9945,7 +9963,8 @@ export const zh_CN: EnTranslations = {
       "greedAria": "贪婪 {item}",
       "passAria": "放弃 {item}",
       "everyonePassed": "所有人都放弃了 {item}。",
-      "rolled": "{answered}/{total} 已投骰"
+      "rolled": "{answered}/{total} 已投骰",
+      "bindsOnPickup": "拾取后绑定"
     }
   },
   "entities": {
@@ -10726,7 +10745,7 @@ export const zh_CN: EnTranslations = {
       },
       "needle_of_fate": {
         "name": "命运之针",
-        "description": "刺穿敌人，造成{damage}点暗影伤害。若目标带有你的邪眼，则生成5点谴罪；若不存在邪眼，则先标记目标。"
+        "description": "刺穿敌人，造成{damage}点暗影伤害。若目标带有你的邪眼，则生成{needleDoom}点谴罪；若不存在邪眼，则先标记目标。"
       },
       "sentence": {
         "name": "裁决",
@@ -10824,7 +10843,7 @@ export const zh_CN: EnTranslations = {
       },
       "moonseed": {
         "name": "月种",
-        "description": "仅限月翼形态。造成{damage}点奥术伤害，累积1层月潮（最多3层），并将你的月光风暴延长6秒；每次施加最多延长6秒。月潮达到3层时，此按钮变为月涌：瞬发打击，造成240至285点奥术伤害，并消耗全部3层。"
+        "description": "仅限月翼形态。造成{damage}点奥术伤害，累积1层月潮（最多3层），并将你的月光风暴延长6秒；每次施加最多延长{duration}秒。月潮达到3层时，此按钮变为月涌：瞬发打击，造成240至285点奥术伤害，并消耗全部3层。"
       },
       "rejuvenation": {
         "name": "野性绽放",
@@ -11128,7 +11147,7 @@ export const zh_CN: EnTranslations = {
       },
       "conflagrate": {
         "name": "燃尽",
-        "description": "将你燃烧契约未来的一跳提前，随后点燃目标，造成 {damage} 点火焰伤害。产生 1 点毁坏和 1 点毁灭性。可存 2 层充能。（毁灭标志技能）"
+        "description": "将你燃烧契约未来的一跳提前，随后点燃目标，造成 {damage} 点火焰伤害。产生 1 点毁坏和 1 点毁灭性。可存 {charges} 层充能。（毁灭标志技能）"
       },
       "moonkin_form": {
         "name": "枭兽形态",
@@ -11160,7 +11179,7 @@ export const zh_CN: EnTranslations = {
       },
       "overbloom": {
         "name": "盛放",
-        "description": "消耗你的5层繁茂：每个持有你的持续治疗效果的盟友立即恢复这些效果剩余治疗量的60%，这些效果随之移除，并为目标种下一个新的野性绽放。"
+        "description": "消耗你的5层繁茂：每个持有你的持续治疗效果的盟友立即恢复这些效果剩余治疗量的{buff}%，这些效果随之移除，并为目标种下一个新的野性绽放。"
       },
       "summon_imp": {
         "name": "召唤烬裔",
@@ -11232,7 +11251,7 @@ export const zh_CN: EnTranslations = {
       },
       "iron_resolve": {
         "name": "钢铁意志",
-        "description": "咬紧牙关、无视疼痛：消耗最多 40 点怒气（至少 20 点），每消耗 1 点怒气可吸收 4 点伤害，持续最多 10 秒。（防护）"
+        "description": "咬紧牙关、无视疼痛：消耗最多 40 点怒气（至少 20 点），每消耗 1 点怒气可吸收 {absorbPerRage} 点伤害，持续最多 10 秒。（防护）"
       },
       "faultline": {
         "name": "地裂",
@@ -11609,7 +11628,7 @@ export const zh_CN: EnTranslations = {
       },
       "seraphic_vigil": {
         "name": "炽天使守望",
-        "description": "为一名盟友施加守望祝福，在其陷入危险时恢复生命值。赐福专属技能。"
+        "description": "为一名盟友施加守望祝福，在其陷入危险时恢复 {buff} 点生命值。赐福专属技能。"
       },
       "summon_tithefiend": {
         "name": "召唤什一魔",
@@ -13229,6 +13248,612 @@ export const zh_CN: EnTranslations = {
       },
       "ps_passing_stone": {
         "name": "往生石"
+      },
+      "lastflame_core": {
+        "name": "末焰之核"
+      },
+      "slagbreaker_helmet": {
+        "name": "破渣头盔"
+      },
+      "slagbreaker_shoulder": {
+        "name": "破渣肩铠"
+      },
+      "slagbreaker_chest": {
+        "name": "破渣锁甲"
+      },
+      "slagbreaker_gloves": {
+        "name": "破渣护手"
+      },
+      "slagbreaker_legs": {
+        "name": "破渣腿甲"
+      },
+      "emberfury_helmet": {
+        "name": "烬怒头盔"
+      },
+      "emberfury_shoulder": {
+        "name": "烬怒肩铠"
+      },
+      "emberfury_chest": {
+        "name": "烬怒锁甲"
+      },
+      "emberfury_gloves": {
+        "name": "烬怒护手"
+      },
+      "emberfury_legs": {
+        "name": "烬怒腿甲"
+      },
+      "forgewall_helmet": {
+        "name": "炉墙头盔"
+      },
+      "forgewall_shoulder": {
+        "name": "炉墙肩铠"
+      },
+      "forgewall_chest": {
+        "name": "炉墙锁甲"
+      },
+      "forgewall_gloves": {
+        "name": "炉墙护手"
+      },
+      "forgewall_legs": {
+        "name": "炉墙腿甲"
+      },
+      "dawnforged_helmet": {
+        "name": "晓铸头盔"
+      },
+      "dawnforged_shoulder": {
+        "name": "晓铸肩铠"
+      },
+      "dawnforged_chest": {
+        "name": "晓铸锁甲"
+      },
+      "dawnforged_gloves": {
+        "name": "晓铸护手"
+      },
+      "dawnforged_legs": {
+        "name": "晓铸腿甲"
+      },
+      "oathpyre_helmet": {
+        "name": "誓火头盔"
+      },
+      "oathpyre_shoulder": {
+        "name": "誓火肩铠"
+      },
+      "oathpyre_chest": {
+        "name": "誓火锁甲"
+      },
+      "oathpyre_gloves": {
+        "name": "誓火护手"
+      },
+      "oathpyre_legs": {
+        "name": "誓火腿甲"
+      },
+      "zealfire_helmet": {
+        "name": "炽诚头盔"
+      },
+      "zealfire_shoulder": {
+        "name": "炽诚肩铠"
+      },
+      "zealfire_chest": {
+        "name": "炽诚锁甲"
+      },
+      "zealfire_gloves": {
+        "name": "炽诚护手"
+      },
+      "zealfire_legs": {
+        "name": "炽诚腿甲"
+      },
+      "packlord_emberhide_helmet": {
+        "name": "兽群领主罩帽"
+      },
+      "packlord_emberhide_shoulder": {
+        "name": "兽群领主肩甲"
+      },
+      "packlord_emberhide_chest": {
+        "name": "兽群领主外衣"
+      },
+      "packlord_emberhide_gloves": {
+        "name": "兽群领主手甲"
+      },
+      "packlord_emberhide_legs": {
+        "name": "兽群领主皮裤"
+      },
+      "coldsight_trackers_helmet": {
+        "name": "冷目罩帽"
+      },
+      "coldsight_trackers_shoulder": {
+        "name": "冷目肩甲"
+      },
+      "coldsight_trackers_chest": {
+        "name": "冷目外衣"
+      },
+      "coldsight_trackers_gloves": {
+        "name": "冷目手甲"
+      },
+      "coldsight_trackers_legs": {
+        "name": "冷目皮裤"
+      },
+      "slagsnare_helmet": {
+        "name": "渣网罩帽"
+      },
+      "slagsnare_shoulder": {
+        "name": "渣网肩甲"
+      },
+      "slagsnare_chest": {
+        "name": "渣网外衣"
+      },
+      "slagsnare_gloves": {
+        "name": "渣网手甲"
+      },
+      "slagsnare_legs": {
+        "name": "渣网皮裤"
+      },
+      "cinderfang_helmet": {
+        "name": "烬牙罩帽"
+      },
+      "cinderfang_shoulder": {
+        "name": "烬牙肩甲"
+      },
+      "cinderfang_chest": {
+        "name": "烬牙外衣"
+      },
+      "cinderfang_gloves": {
+        "name": "烬牙手甲"
+      },
+      "cinderfang_legs": {
+        "name": "烬牙皮裤"
+      },
+      "smolderstrike_helmet": {
+        "name": "燎击罩帽"
+      },
+      "smolderstrike_shoulder": {
+        "name": "燎击肩甲"
+      },
+      "smolderstrike_chest": {
+        "name": "燎击外衣"
+      },
+      "smolderstrike_gloves": {
+        "name": "燎击手甲"
+      },
+      "smolderstrike_legs": {
+        "name": "燎击皮裤"
+      },
+      "ashveil_helmet": {
+        "name": "灰幕罩帽"
+      },
+      "ashveil_shoulder": {
+        "name": "灰幕肩甲"
+      },
+      "ashveil_chest": {
+        "name": "灰幕外衣"
+      },
+      "ashveil_gloves": {
+        "name": "灰幕手甲"
+      },
+      "ashveil_legs": {
+        "name": "灰幕皮裤"
+      },
+      "emberscreed_helmet": {
+        "name": "余烬信条兜帽"
+      },
+      "emberscreed_shoulder": {
+        "name": "余烬信条衬肩"
+      },
+      "emberscreed_chest": {
+        "name": "余烬信条长袍"
+      },
+      "emberscreed_gloves": {
+        "name": "余烬信条裹手"
+      },
+      "emberscreed_legs": {
+        "name": "余烬信条护腿"
+      },
+      "benison_dawnweave_helmet": {
+        "name": "晓织兜帽"
+      },
+      "benison_dawnweave_shoulder": {
+        "name": "晓织衬肩"
+      },
+      "benison_dawnweave_chest": {
+        "name": "晓织长袍"
+      },
+      "benison_dawnweave_gloves": {
+        "name": "晓织裹手"
+      },
+      "benison_dawnweave_legs": {
+        "name": "晓织护腿"
+      },
+      "vesperash_helmet": {
+        "name": "暮灰兜帽"
+      },
+      "vesperash_shoulder": {
+        "name": "暮灰衬肩"
+      },
+      "vesperash_chest": {
+        "name": "暮灰长袍"
+      },
+      "vesperash_gloves": {
+        "name": "暮灰裹手"
+      },
+      "vesperash_legs": {
+        "name": "暮灰护腿"
+      },
+      "stormkindled_helmet": {
+        "name": "燃雷头盔"
+      },
+      "stormkindled_shoulder": {
+        "name": "燃雷肩铠"
+      },
+      "stormkindled_chest": {
+        "name": "燃雷锁甲"
+      },
+      "stormkindled_gloves": {
+        "name": "燃雷护手"
+      },
+      "stormkindled_legs": {
+        "name": "燃雷腿甲"
+      },
+      "warspirit_emberscale_helmet": {
+        "name": "烬鳞头盔"
+      },
+      "warspirit_emberscale_shoulder": {
+        "name": "烬鳞肩铠"
+      },
+      "warspirit_emberscale_chest": {
+        "name": "烬鳞锁甲"
+      },
+      "warspirit_emberscale_gloves": {
+        "name": "烬鳞护手"
+      },
+      "warspirit_emberscale_legs": {
+        "name": "烬鳞腿甲"
+      },
+      "stonehearth_helmet": {
+        "name": "石炉头盔"
+      },
+      "stonehearth_shoulder": {
+        "name": "石炉肩铠"
+      },
+      "stonehearth_chest": {
+        "name": "石炉锁甲"
+      },
+      "stonehearth_gloves": {
+        "name": "石炉护手"
+      },
+      "stonehearth_legs": {
+        "name": "石炉腿甲"
+      },
+      "springmender_helmet": {
+        "name": "泉愈头盔"
+      },
+      "springmender_shoulder": {
+        "name": "泉愈肩铠"
+      },
+      "springmender_chest": {
+        "name": "泉愈锁甲"
+      },
+      "springmender_gloves": {
+        "name": "泉愈护手"
+      },
+      "springmender_legs": {
+        "name": "泉愈腿甲"
+      },
+      "chronoweave_helmet": {
+        "name": "以太织兜帽"
+      },
+      "chronoweave_shoulder": {
+        "name": "以太织衬肩"
+      },
+      "chronoweave_chest": {
+        "name": "以太织长袍"
+      },
+      "chronoweave_gloves": {
+        "name": "以太织裹手"
+      },
+      "chronoweave_legs": {
+        "name": "以太织护腿"
+      },
+      "pyroclast_helmet": {
+        "name": "火砾兜帽"
+      },
+      "pyroclast_shoulder": {
+        "name": "火砾衬肩"
+      },
+      "pyroclast_chest": {
+        "name": "火砾长袍"
+      },
+      "pyroclast_gloves": {
+        "name": "火砾裹手"
+      },
+      "pyroclast_legs": {
+        "name": "火砾护腿"
+      },
+      "frostquench_helmet": {
+        "name": "霜淬兜帽"
+      },
+      "frostquench_shoulder": {
+        "name": "霜淬衬肩"
+      },
+      "frostquench_chest": {
+        "name": "霜淬长袍"
+      },
+      "frostquench_gloves": {
+        "name": "霜淬裹手"
+      },
+      "frostquench_legs": {
+        "name": "霜淬护腿"
+      },
+      "hexthread_helmet": {
+        "name": "咒线兜帽"
+      },
+      "hexthread_shoulder": {
+        "name": "咒线衬肩"
+      },
+      "hexthread_chest": {
+        "name": "咒线长袍"
+      },
+      "hexthread_gloves": {
+        "name": "咒线裹手"
+      },
+      "hexthread_legs": {
+        "name": "咒线护腿"
+      },
+      "gravebrand_helmet": {
+        "name": "墓印兜帽"
+      },
+      "gravebrand_shoulder": {
+        "name": "墓印衬肩"
+      },
+      "gravebrand_chest": {
+        "name": "墓印长袍"
+      },
+      "gravebrand_gloves": {
+        "name": "墓印裹手"
+      },
+      "gravebrand_legs": {
+        "name": "墓印护腿"
+      },
+      "ruincaller_helmet": {
+        "name": "唤灭兜帽"
+      },
+      "ruincaller_shoulder": {
+        "name": "唤灭衬肩"
+      },
+      "ruincaller_chest": {
+        "name": "唤灭长袍"
+      },
+      "ruincaller_gloves": {
+        "name": "唤灭裹手"
+      },
+      "ruincaller_legs": {
+        "name": "唤灭护腿"
+      },
+      "moonscorch_helmet": {
+        "name": "月灼罩帽"
+      },
+      "moonscorch_shoulder": {
+        "name": "月灼肩甲"
+      },
+      "moonscorch_chest": {
+        "name": "月灼外衣"
+      },
+      "moonscorch_gloves": {
+        "name": "月灼手甲"
+      },
+      "moonscorch_legs": {
+        "name": "月灼皮裤"
+      },
+      "wildfang_emberhide_helmet": {
+        "name": "野牙罩帽"
+      },
+      "wildfang_emberhide_shoulder": {
+        "name": "野牙肩甲"
+      },
+      "wildfang_emberhide_chest": {
+        "name": "野牙外衣"
+      },
+      "wildfang_emberhide_gloves": {
+        "name": "野牙手甲"
+      },
+      "wildfang_emberhide_legs": {
+        "name": "野牙皮裤"
+      },
+      "cinderbark_helmet": {
+        "name": "烬皮罩帽"
+      },
+      "cinderbark_shoulder": {
+        "name": "烬皮肩甲"
+      },
+      "cinderbark_chest": {
+        "name": "烬皮外衣"
+      },
+      "cinderbark_gloves": {
+        "name": "烬皮手甲"
+      },
+      "cinderbark_legs": {
+        "name": "烬皮皮裤"
+      },
+      "grovespring_helmet": {
+        "name": "林泉罩帽"
+      },
+      "grovespring_shoulder": {
+        "name": "林泉肩甲"
+      },
+      "grovespring_chest": {
+        "name": "林泉外衣"
+      },
+      "grovespring_gloves": {
+        "name": "林泉手甲"
+      },
+      "grovespring_legs": {
+        "name": "林泉皮裤"
+      },
+      "sigil_anvil_helmet": {
+        "name": "铁砧头盔印记"
+      },
+      "sigil_ember_helmet": {
+        "name": "余烬头盔印记"
+      },
+      "sigil_tempest_helmet": {
+        "name": "风暴头盔印记"
+      },
+      "sigil_anvil_shoulder": {
+        "name": "铁砧肩甲印记"
+      },
+      "sigil_ember_shoulder": {
+        "name": "余烬肩甲印记"
+      },
+      "sigil_tempest_shoulder": {
+        "name": "风暴肩甲印记"
+      },
+      "sigil_anvil_chest": {
+        "name": "铁砧长袍印记"
+      },
+      "sigil_ember_chest": {
+        "name": "余烬长袍印记"
+      },
+      "sigil_tempest_chest": {
+        "name": "风暴长袍印记"
+      },
+      "sigil_anvil_gloves": {
+        "name": "铁砧手套印记"
+      },
+      "sigil_ember_gloves": {
+        "name": "余烬手套印记"
+      },
+      "sigil_tempest_gloves": {
+        "name": "风暴手套印记"
+      },
+      "sigil_anvil_legs": {
+        "name": "铁砧护腿印记"
+      },
+      "sigil_ember_legs": {
+        "name": "余烬护腿印记"
+      },
+      "sigil_tempest_legs": {
+        "name": "风暴护腿印记"
+      },
+      "cord_of_the_last_flame": {
+        "name": "终焰束带"
+      },
+      "cindersoaked_slippers": {
+        "name": "浸烬便鞋"
+      },
+      "springbinder_sash": {
+        "name": "缚泉腰带"
+      },
+      "steps_of_quiet_water": {
+        "name": "静水之履"
+      },
+      "cinderbark_cinch": {
+        "name": "烬皮束腰"
+      },
+      "ashenbark_treads": {
+        "name": "灰皮之靴"
+      },
+      "slagstalker_belt": {
+        "name": "渣行者腰带"
+      },
+      "ashrunner_boots": {
+        "name": "灰行者之靴"
+      },
+      "moonscorch_waistwrap": {
+        "name": "月灼缠腰"
+      },
+      "scorchgrove_striders": {
+        "name": "灼林行者之靴"
+      },
+      "grovetender_belt": {
+        "name": "护林者腰带"
+      },
+      "dewfall_moccasins": {
+        "name": "落露软鞋"
+      },
+      "forgewall_girdle": {
+        "name": "炉墙束带"
+      },
+      "anvilstance_sabatons": {
+        "name": "砧姿铁靴"
+      },
+      "warforged_waistguard": {
+        "name": "战铸护腰"
+      },
+      "furnace_march_greaves": {
+        "name": "熔炉行军胫甲"
+      },
+      "stormkindled_chain": {
+        "name": "燃雷锁链腰带"
+      },
+      "thundershock_treads": {
+        "name": "雷击之靴"
+      },
+      "tidebinder_links": {
+        "name": "缚潮链环"
+      },
+      "springwarden_sabatons": {
+        "name": "泉守铁靴"
+      },
+      "pendant_of_the_first_tempering": {
+        "name": "初次淬火坠饰"
+      },
+      "ignivars_ember_choker": {
+        "name": "伊格尼瓦余烬项圈"
+      },
+      "locket_of_the_last_flame": {
+        "name": "终焰小盒坠链"
+      },
+      "heartspring_amulet": {
+        "name": "心泉护符"
+      },
+      "seal_of_the_forgewall": {
+        "name": "炉墙印戒"
+      },
+      "band_of_marked_strikes": {
+        "name": "刻痕之击指环"
+      },
+      "circle_of_cinders": {
+        "name": "烬環"
+      },
+      "loop_of_quiet_springs": {
+        "name": "静泉指环"
+      },
+      "bulwark_of_the_inner_crucible": {
+        "name": "内炉壁垒"
+      },
+      "ember_wardens_barrier": {
+        "name": "烬卫屏障"
+      },
+      "orb_of_the_last_spring": {
+        "name": "终泉宝珠"
+      },
+      "cinder_of_the_first_design": {
+        "name": "初构之烬"
+      },
+      "forgefathers_warhammer": {
+        "name": "铸父战锤"
+      },
+      "cinderfang_kris": {
+        "name": "烬牙波刃匕首"
+      },
+      "slagrender_cleaver": {
+        "name": "裂渣劈斧"
+      },
+      "anvilguard_blade": {
+        "name": "砧卫之刃"
+      },
+      "heart_of_the_end_greatblade": {
+        "name": "终末之心巨刃"
+      },
+      "staff_of_the_last_spring": {
+        "name": "终泉法杖"
+      },
+      "forgefire_spire": {
+        "name": "炉火尖塔杖"
+      },
+      "springtouched_crozier": {
+        "name": "泉息牧杖"
+      },
+      "wand_of_quenched_sparks": {
+        "name": "熄火花魔杖"
       },
       "conjured_water4": {
         "name": "魔法泉水"
@@ -14897,6 +15522,11 @@ export const zh_CN: EnTranslations = {
         "name": "梅琳的余烬投影",
         "title": "余烬投影",
         "greeting": "余烬将梅琳的声音传向锻炉深处。"
+      },
+      "crucible_quartermaster": {
+        "name": "军需官布隆恩·余烬守卫",
+        "title": "熔炉军需官",
+        "greeting": "熔炉会铭记自己人。把坩埚里的印记带给我，我就为你披挂上阵。"
       },
       "brother_halven": {
         "name": "哈尔文修士",
@@ -18207,53 +18837,183 @@ export const zh_CN: EnTranslations = {
       }
     },
     "itemSets": {
+      "ashveil": {
+        "name": "灰帷装束",
+        "bonus2": "潜伏突袭造成的伤害提高 25%。",
+        "bonus4": "罩影突袭期间的第一次潜伏突袭造成三倍伤害（原为双倍）。"
+      },
+      "benison_dawnweave": {
+        "name": "赐福晨织法衣",
+        "bonus2": "炽天使守望的救援治疗量提高至 270（原为 180）。受到伤害不再延迟你的施法。",
+        "bonus4": "炽天使守望触发时，其守护的盟友还会在 10 秒内获得相当于其最大生命值 15% 的治疗。"
+      },
       "boundstone_vanguard": {
         "name": "缚石先锋",
         "bonus3": "攻击速度和施法速度提高 15%。"
       },
+      "chronoweave": {
+        "name": "以太织法衣",
+        "bonus2": "时光回响将你 50% 的单体奥术伤害转化为治疗。受到伤害不再延迟你的施法。",
+        "bonus4": "时光奔流的冷却时间缩短 5 秒。"
+      },
+      "cinderbark": {
+        "name": "烬皮守御甲",
+        "bonus2": "横扫利爪有 30% 的几率额外积累 1 层古血。",
+        "bonus4": "碎髓造成的伤害提高 30%，且其紧急护盾不再取代这次打击。"
+      },
+      "cinderfang": {
+        "name": "烬牙罩袍",
+        "bonus2": "毒祭每次打击返还的能量提高至 20 点。",
+        "bonus4": "毒镖的冷却时间缩短至 4 秒。"
+      },
+      "coldsight_trackers": {
+        "name": "冷目追猎装束",
+        "bonus2": "审慎射击额外恢复 5 点集中。",
+        "bonus4": "引弓长射的致命一击使冷静专注延长 2 秒，每次持续期间最多延长 6 秒。"
+      },
       "crownforged": {
         "name": "骨铸战装",
-        "bonus2": "攻击强度提高 40 点。",
-        "bonus3": "力量提高 15 点，耐力提高 15 点，攻击速度和施法速度提高 15%。",
-        "bonus4": "你的武器致命一击会使目标产生“骨刺”，每 2 秒流血 8 点伤害，持续 12 秒。最多叠加 3 层。"
+        "bonus2": "力量提高 10 点，耐力提高 10 点。",
+        "bonus4": "攻击强度提高 25 点。你的武器致命一击有 50% 的几率触发“墓冢之力”，使攻击强度提高 40 点，持续 10 秒。",
+        "bonus6": "攻击与施法速度提高 4%，命中提高 3%。你的武器致命一击会使目标产生“骨刺”，每 2 秒流血 5 点伤害，持续 12 秒。最多叠加 3 层。"
+      },
+      "dawnforged": {
+        "name": "晓铸圣装",
+        "bonus2": "圣光道标复制你 55% 的直接治疗。受到伤害不再延迟你的施法。",
+        "bonus4": "辉光共鸣强化的黎明之拥变为瞬发。"
       },
       "deathlord": {
         "name": "冢主战甲",
-        "bonus2": "攻击强度提高 40 点。",
-        "bonus3": "力量提高 15 点，耐力提高 15 点。",
-        "bonus4": "你的武器致命一击有 50% 的几率触发“墓冢之力”，使攻击强度提高 60 点，持续 10 秒。"
+        "bonus2": "力量提高 10 点，耐力提高 10 点。",
+        "bonus4": "攻击强度提高 25 点。你的武器致命一击有 50% 的几率触发“墓冢之力”，使攻击强度提高 40 点，持续 10 秒。",
+        "bonus6": "攻击与施法速度提高 4%，命中提高 3%。你的武器致命一击会使目标产生“骨刺”，每 2 秒流血 5 点伤害，持续 12 秒。最多叠加 3 层。"
+      },
+      "emberfury": {
+        "name": "烬怒挽具",
+        "bonus2": "你的激怒持续 6 秒（原为 4 秒）。",
+        "bonus4": "放血必定使你激怒，其治疗量提高至你最大生命值的 8%。"
+      },
+      "emberscreed": {
+        "name": "余烬信条圣装",
+        "bonus2": "你的戒律连结会额外将 10% 的神圣伤害转化为治疗。受到伤害不再延迟你的施法。",
+        "bonus4": "你的守护圣咏被完全消耗后，你在 10 秒内的下一次涤净圣歌变为瞬发。该效果每 15 秒最多触发一次。"
+      },
+      "forgewall": {
+        "name": "锻墙圣盾",
+        "bonus2": "钢铁意志的怒气转化提高至每点 5 点吸收（原为 4 点）。",
+        "bonus4": "每次施放碎盾击，钢铁意志的剩余冷却时间缩短 2 秒。"
+      },
+      "frostquench": {
+        "name": "霜淬织衣",
+        "bonus2": "凛霜之矛的致命一击会额外积存一枚冰刺，上限仍为 5 枚。受到伤害不再延迟你的施法。",
+        "bonus4": "凛冬之鞭施加 3 层凛冬之寒（原为 2 层）。"
+      },
+      "gravebrand": {
+        "name": "墓印礼装",
+        "bonus2": "收割号令的冷却时间缩短 2 秒。受到伤害不再延迟你的施法。",
+        "bonus4": "收割号令的齐击造成的伤害提高 25%。"
       },
       "greyjaw_stalker": {
         "name": "灰颚追猎者装备",
         "bonus3": "攻击速度和施法速度提高 15%。"
       },
+      "grovespring": {
+        "name": "林泉法衣",
+        "bonus2": "迅捷治愈优先消耗你自己的野性绽放或二度绽放，治疗效果提高 25%。受到伤害不再延迟你的施法。",
+        "bonus4": "盛放收割你剩余治疗效果的 75%，随后积累 1 层繁茂。"
+      },
+      "hexthread": {
+        "name": "咒线罩袍",
+        "bonus2": "命运之针额外生成 2 点谴罪。受到伤害不再延迟你的施法。",
+        "bonus4": "施放裁决后返还 10 点谴罪。"
+      },
+      "moonscorch": {
+        "name": "月灼法衣",
+        "bonus2": "月种可将月光风暴每次施加延长两次，最多共 12 秒。受到伤害不再延迟你的施法。",
+        "bonus4": "月涌与日醒造成的伤害提高 25%。"
+      },
       "necromancers": {
         "name": "哀织法衣",
-        "bonus2": "法术强度提高 20 点。受到伤害不再延迟你的施法（施法延迟抗性 100%）。",
-        "bonus3": "智力提高 10 点，耐力提高 10 点。",
-        "bonus4": "你的法术有 10% 的几率触发“清晰施法”，使你的下一个法术免费施放。"
+        "bonus2": "智力提高 10 点，精神提高 10 点。受到伤害对施法的延迟减半（施法延迟抗性 50%）。",
+        "bonus4": "法术强度提高 12 点。你的法术有 6% 的几率触发“清晰施法”，使你的下一个法术免费施放。",
+        "bonus6": "攻击与施法速度提高 4%。你的法术有 10% 的几率触发“灼魂之焰”，使法术强度提高 25 点，持续 10 秒。"
       },
       "nighttalon": {
         "name": "恐牙皮甲",
-        "bonus2": "攻击强度提高 40 点。",
-        "bonus3": "敏捷提高 15 点，致命一击几率提高 2%，攻击速度和施法速度提高 15%。",
-        "bonus4": "你的武器致命一击会撕开“撕裂伤口”，使目标每 2 秒流血 6 点伤害，持续 12 秒。最多叠加 3 层。"
+        "bonus2": "敏捷提高 10 点，致命一击几率提高 1%。",
+        "bonus4": "攻击强度提高 25 点。你的武器致命一击有 50% 的几率触发“獠牙疾袭”，使攻击速度提高 15%，持续 8 秒。",
+        "bonus6": "攻击与施法速度提高 4%，命中提高 3%。你的武器致命一击会撕开“撕裂伤口”，使目标每 2 秒流血 4 点伤害，持续 12 秒。最多叠加 3 层。"
+      },
+      "oathpyre": {
+        "name": "誓火壁垒",
+        "bonus2": "守誓者打击触发烈阳反击的几率提高至 30%，每次成功格挡有 40% 几率触发。",
+        "bonus4": "消耗烈阳反击时，获得相当于你最大生命值 6% 的护盾，持续 10 秒。"
+      },
+      "packlord_emberhide": {
+        "name": "兽群领主烬皮甲",
+        "bonus2": "兽群号令的冷却时间缩短至 3 秒。",
+        "bonus4": "兽群号令重置兽群奔袭冷却时间的几率提高至 30%。"
+      },
+      "pyroclast": {
+        "name": "火砾礼装",
+        "bonus2": "灼烫对生命值不高于 35% 的目标必定造成致命一击。受到伤害不再延迟你的施法。",
+        "bonus4": "凤凰出神未激活时，你的火焰法术致命一击会使其剩余冷却时间缩短 1.5 秒。"
+      },
+      "ruincaller": {
+        "name": "唤灭法衣",
+        "bonus2": "燃尽可存 3 层充能。受到伤害不再延迟你的施法。",
+        "bonus4": "毁灭箭造成的伤害提高 20%。"
+      },
+      "slagbreaker": {
+        "name": "碎渣战甲",
+        "bonus2": "血手使你下一次致残打击的强化效果提高至每层 30%（原为 20%）。",
+        "bonus4": "每施放两次血手，破防者的剩余冷却时间缩短 3 秒。"
+      },
+      "slagsnare": {
+        "name": "渣网猎装",
+        "bonus2": "剖膛一击产生 20 点集中。",
+        "bonus4": "裂创消耗 3 层狩猎势能时将其保留。该效果每 8 秒最多触发一次。"
+      },
+      "smolderstrike": {
+        "name": "燎击皮甲",
+        "bonus2": "大摆拳造成的伤害提高 20%。",
+        "bonus4": "每次施放眼前一黑，剑刃乱舞的剩余冷却时间缩短 6 秒。"
       },
       "soulflame": {
         "name": "魂焰法衣",
-        "bonus2": "法术强度提高 20 点。受到伤害不再延迟你的施法（施法延迟抗性 100%）。",
-        "bonus3": "智力提高 15 点，精神提高 15 点，攻击速度和施法速度提高 15%。",
-        "bonus4": "你的法术有 10% 的几率触发“灼魂之焰”，使法术强度提高 40 点，持续 10 秒。"
+        "bonus2": "智力提高 10 点，精神提高 10 点。受到伤害对施法的延迟减半（施法延迟抗性 50%）。",
+        "bonus4": "法术强度提高 12 点。你的法术有 6% 的几率触发“清晰施法”，使你的下一个法术免费施放。",
+        "bonus6": "攻击与施法速度提高 4%。你的法术有 10% 的几率触发“灼魂之焰”，使法术强度提高 25 点，持续 10 秒。"
+      },
+      "springmender": {
+        "name": "泉愈鳞甲",
+        "bonus2": "潮汐召唤的冷却时间缩短 4 秒。受到伤害不再延迟你的施法。",
+        "bonus4": "层叠治愈可跳跃至第四名盟友，消耗的治愈湍流按 150% 治疗。"
+      },
+      "stonehearth": {
+        "name": "石炉壁垒",
+        "bonus2": "缚石状态下，风暴施法的治愈之水不消耗法力，且治疗量提高 25%。",
+        "bonus4": "缚石状态下，完成战魂节律时为你治疗最大生命值的 3%。"
       },
       "stormcallers": {
         "name": "唤风法衣",
-        "bonus2": "法术强度提高 20 点。受到伤害不再延迟你的施法（施法延迟抗性 100%）。",
-        "bonus3": "智力提高 15 点，精神提高 15 点，攻击速度和施法速度提高 15%。",
-        "bonus4": "你的法术有 10% 的几率触发“灼魂之焰”，使法术强度提高 40 点，持续 10 秒。"
+        "bonus2": "智力提高 10 点，精神提高 10 点。受到伤害对施法的延迟减半（施法延迟抗性 50%）。",
+        "bonus4": "法术强度提高 12 点。你的法术有 6% 的几率触发“清晰施法”，使你的下一个法术免费施放。",
+        "bonus6": "攻击与施法速度提高 4%。你的法术有 10% 的几率触发“灼魂之焰”，使法术强度提高 25 点，持续 10 秒。"
+      },
+      "stormkindled": {
+        "name": "燃暴礼装",
+        "bonus2": "焰烙状态下的释放武器获得 3 层雷霆。受到伤害不再延迟你的施法。",
+        "bonus4": "大地震击的每层雷霆加成提高至 30%。"
       },
       "vale_arcanist": {
         "name": "谷地秘法师法衣",
         "bonus3": "攻击速度和施法速度提高 15%。"
+      },
+      "vesperash": {
+        "name": "晚祷烬灰罩袍",
+        "bonus2": "召唤什一魔的冷却时间缩短 6 秒。受到伤害不再延迟你的施法。",
+        "bonus4": "召唤什一魔会重置碎心术的冷却时间，且什一魔每次攻击回复的法力值翻倍。"
       },
       "warfare_ashstalker": {
         "name": "灰烬追猎者装备",
@@ -18285,11 +19045,26 @@ export const zh_CN: EnTranslations = {
         "bonus4": "战争攻击等级提高 40，且敌对玩家对你施加的控制效果持续时间缩短 15%。",
         "bonus7": "战争攻击与防御等级提高 80。你的法术有 15% 的几率给予荆棘守护，使躲闪提高 15%，持续 6 秒。"
       },
+      "warspirit_emberscale": {
+        "name": "战魂烬鳞甲",
+        "bonus2": "先祖打击将战魂节律推进 3 段。",
+        "bonus4": "先祖打击造成的伤害提高 30%。"
+      },
+      "wildfang_emberhide": {
+        "name": "野牙烬皮甲",
+        "bonus2": "血收恢复的能量由 30 点提高至 45 点。",
+        "bonus4": "血收会在目标身上重新施加剐削。"
+      },
       "wyrmshadow": {
         "name": "夜牙法衣",
-        "bonus2": "攻击强度提高 40 点。",
-        "bonus3": "敏捷提高 15 点，致命一击几率提高 2%。",
-        "bonus4": "你的武器致命一击有 50% 的几率触发“獠牙疾袭”，使攻击速度提高 25%，持续 8 秒。"
+        "bonus2": "敏捷提高 10 点，致命一击几率提高 1%。",
+        "bonus4": "攻击强度提高 25 点。你的武器致命一击有 50% 的几率触发“獠牙疾袭”，使攻击速度提高 15%，持续 8 秒。",
+        "bonus6": "攻击与施法速度提高 4%，命中提高 3%。你的武器致命一击会撕开“撕裂伤口”，使目标每 2 秒流血 4 点伤害，持续 12 秒。最多叠加 3 层。"
+      },
+      "zealfire": {
+        "name": "炽诚战甲",
+        "bonus2": "终末敕令与黎明坠击互相缩短对方的剩余冷却时间 3 秒（原为 2 秒）。",
+        "bonus4": "在破晓之怒下施放的愤怒之锤伤害提高 40%（原为 20%）。"
       }
     }
   },

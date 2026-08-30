@@ -480,6 +480,7 @@ const baseEnTable = {
   'log.dungeonDifficultyIsHeroic': 'Dungeon difficulty: Heroic. Use /dungeon normal to change it.',
   'log.dungeonDifficultyIsNormal': 'Dungeon difficulty: Normal. Use /dungeon heroic to change it.',
   'error.heroicMarksNeeded': 'You need {marks} Heroic Marks to buy {name}.',
+  'error.sigilNeeded': 'You need a {sigil} to buy {name}.',
   'error.channelUsage': 'Usage: /{action} <channel>. Channels: {list}.',
   'error.generalAlwaysOn': 'The General channel is always on - just use /general.',
   'error.noSuchChannel': "There is no channel named '{name}'. Channels: {list}.",
@@ -1238,6 +1239,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.deathwardSaves': '¡Una protección contra la muerte te salva!',
     'error.noDeadGroupMembers': 'No hay miembros muertos en el grupo que resucitar.',
     'error.heroicMarksNeeded': 'Necesitas {marks} Marcas Heroicas para comprar {name}.',
+    'error.sigilNeeded': 'Necesitas un {sigil} para comprar {name}.',
     'aura.fingersOfFrost': 'Dedos de Escarcha',
     'aura.brainFreeze': 'Congelación Cerebral',
     'aura.wintersChill': 'Frío Invernal',
@@ -1704,6 +1706,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.wrongEquipSlot': 'Ese objeto no va en ese espacio.',
     'log.deathwardSaves': '¡Una protección contra la muerte te salva!',
     'error.heroicMarksNeeded': 'Necesitas {marks} Marcas Heroicas para comprar {name}.',
+    'error.sigilNeeded': 'Necesitas un {sigil} para comprar {name}.',
     'groundPickup.supplyCrateDeny': 'El cajón está cerrado con clavos.',
     'groundPickup.gravecallerSigilDeny': 'El sigilo repele tu contacto.',
     'groundPickup.ledgerPageDeny':
@@ -2178,6 +2181,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.wrongEquipSlot': 'Cet objet ne va pas dans cet emplacement.',
     'log.deathwardSaves': 'Une protection contre la mort vous sauve !',
     'error.heroicMarksNeeded': 'Il vous faut {marks} Marques héroïques pour acheter {name}.',
+    'error.sigilNeeded': 'Il vous faut un {sigil} pour acheter {name}.',
     'groundPickup.supplyCrateDeny': 'La caisse est solidement clouée.',
     'groundPickup.gravecallerSigilDeny': 'Le sceau repousse votre main.',
     'groundPickup.ledgerPageDeny':
@@ -2655,6 +2659,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.wrongEquipSlot': 'Cet objet ne va pas dans cet emplacement.',
     'log.deathwardSaves': 'Une protection contre la mort vous sauve !',
     'error.heroicMarksNeeded': 'Il vous faut {marks} Marques héroïques pour acheter {name}.',
+    'error.sigilNeeded': 'Il vous faut un {sigil} pour acheter {name}.',
     'groundPickup.supplyCrateDeny': 'La caisse est solidement clouée.',
     'groundPickup.gravecallerSigilDeny': 'Le sceau repousse votre main.',
     'groundPickup.ledgerPageDeny':
@@ -3328,6 +3333,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.wrongEquipSlot': "Quell'oggetto non va in quello slot.",
     'log.deathwardSaves': 'Una protezione dalla morte ti salva!',
     'error.heroicMarksNeeded': 'Ti servono {marks} Marchi Eroici per comprare {name}.',
+    'error.sigilNeeded': 'Ti serve un {sigil} per comprare {name}.',
     'groundPickup.supplyCrateDeny': 'La cassa è inchiodata.',
     'groundPickup.gravecallerSigilDeny': 'Il sigillo respinge il tuo tocco.',
     'groundPickup.ledgerPageDeny':
@@ -3800,6 +3806,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.wrongEquipSlot': 'Das gehoert nicht in diesen Slot.',
     'log.deathwardSaves': 'Ein Todesbann rettet dich!',
     'error.heroicMarksNeeded': 'Du brauchst {marks} Heroische Marken, um {name} zu kaufen.',
+    'error.sigilNeeded': 'Du brauchst ein {sigil}, um {name} zu kaufen.',
     'groundPickup.supplyCrateDeny': 'Die Kiste ist fest vernagelt.',
     'groundPickup.gravecallerSigilDeny': 'Das Siegel weist Eure Berührung ab.',
     'groundPickup.ledgerPageDeny': 'Die Buchseiten sind zu fest gebunden, um sie mitzunehmen.',
@@ -4251,6 +4258,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.wrongEquipSlot': '该物品不能放入此装备栏位。',
     'log.deathwardSaves': '死亡护符救了你！',
     'error.heroicMarksNeeded': '购买{name}需要{marks}个英雄徽记。',
+    'error.sigilNeeded': '购买{name}需要{sigil}。',
     'aura.clearcasting': '清晰施法',
     'aura.effigy': '巫蛊像',
     'aura.gloomtithe': '幽暗什一',
@@ -4701,6 +4709,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.wrongEquipSlot': '此物品無法裝備於該欄位。',
     'log.deathwardSaves': '死亡護符救了你！',
     'error.heroicMarksNeeded': '購買{name}需要{marks}個英雄徽記。',
+    'error.sigilNeeded': '購買{name}需要{sigil}。',
     'aura.clearcasting': '清晰施法',
     'aura.effigy': '巫毒塑像',
     'aura.gloomtithe': '幽暗什一',
@@ -5154,6 +5163,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.wrongEquipSlot': '해당 슬롯에 맞지 않는 장비입니다.',
     'log.deathwardSaves': '죽음의 수호가 당신을 구했습니다!',
     'error.heroicMarksNeeded': '{name}을(를) 구매하려면 영웅의 징표 {marks}개가 필요합니다.',
+    'error.sigilNeeded': '{name}을(를) 구매하려면 {sigil}이(가) 필요합니다.',
     'aura.clearcasting': '선명한 시전',
     'aura.effigy': '제물 인형',
     'aura.gloomtithe': '암흑 십일조',
@@ -5619,6 +5629,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.wrongEquipSlot': 'そのアイテムはそのスロットに装備できません。',
     'log.deathwardSaves': '死の加護があなたを救った！',
     'error.heroicMarksNeeded': '{name}を購入するには英雄の証が{marks}個必要です。',
+    'error.sigilNeeded': '{name}を購入するには{sigil}が必要です。',
     'aura.clearcasting': 'クリアキャスティング',
     'aura.effigy': '呪いの人形',
     'aura.gloomtithe': '闇の献納',
@@ -6099,6 +6110,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.wrongEquipSlot': 'Esse item não pode ser colocado nesse espaço.',
     'log.deathwardSaves': 'Uma proteção contra a morte salva você!',
     'error.heroicMarksNeeded': 'Você precisa de {marks} Marcas Heroicas para comprar {name}.',
+    'error.sigilNeeded': 'Você precisa de um {sigil} para comprar {name}.',
     'groundPickup.supplyCrateDeny': 'O caixote está fechado com pregos.',
     'groundPickup.gravecallerSigilDeny': 'O sigilo repele seu toque.',
     'groundPickup.ledgerPageDeny':
@@ -6553,6 +6565,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.wrongEquipSlot': 'Этот предмет не подходит для данного слота.',
     'log.deathwardSaves': 'Оберег от смерти спасает вас!',
     'error.heroicMarksNeeded': 'Вам нужно {marks} Героических знаков, чтобы купить {name}.',
+    'error.sigilNeeded': 'Чтобы купить {name}, нужен предмет {sigil}.',
     'aura.clearcasting': 'Ясность',
     'aura.effigy': 'Изваяние',
     'aura.gloomtithe': 'Мрачная десятина',
@@ -12493,6 +12506,12 @@ const RULES: Rule[] = [
   {
     re: /^You need (.+) Heroic Marks to buy (.+)\.$/,
     build: (m) => tSim('error.heroicMarksNeeded', { marks: m[1], name: locItem(m[2]) }),
+  },
+  {
+    // Anchored on the sigil naming vocabulary so a future unrelated
+    // "You need a X to buy Y." emit cannot be shadowed by this rule.
+    re: /^You need a (.+ Sigil of the .+) to buy (.+)\.$/,
+    build: (m) => tSim('error.sigilNeeded', { sigil: locItem(m[1]), name: locItem(m[2]) }),
   },
   {
     re: /^All instances have been reset\.$/,

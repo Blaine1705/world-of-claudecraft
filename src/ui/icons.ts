@@ -8,6 +8,7 @@
 // from the ability school / item kind + name keywords, so everything always
 // has a proper icon. Results are cached as data URLs.
 
+import { IGNIVAR_ART_PENDING_ITEM_IDS } from '../sim/content/ignivar_loot';
 import { isRawCookingCatch } from '../sim/content/items';
 import { ABILITIES, ITEMS } from '../sim/data';
 import { crestIconUrl } from './crest_icon_art';
@@ -5320,7 +5321,14 @@ export const UI_ITEM_IMAGE_IDS = new Set<string>(['backpack']);
 // bell icons are rendered from their own world models
 // (scripts/render_island_item_icons.mjs), so they ship with committed art like
 // every other item.
-export const ITEM_ART_PENDING = new Set<string>();
+//
+// The Ignivar raid loot table (content/ignivar_loot.ts) currently carries the
+// whole debt: 192 non-weapon items behind the development-only Crucible raid,
+// enumerated here until their painted wave lands (the raid itself ships with a
+// dev-only entrance, so no player-facing surface shows a procedural icon yet).
+// The 10 raid weapons are excluded: weapons never enter this set (guard A2);
+// they ship painted art through WEAPON_IMAGE_IDS like every other weapon.
+export const ITEM_ART_PENDING = new Set<string>(IGNIVAR_ART_PENDING_ITEM_IDS);
 
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */
 export function itemImageUrl(id: string): string | null {
@@ -5360,6 +5368,14 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   // The Proving Shore graduation deed rides the deed_cat_progression crest
   // until its commissioned art lands (docs/achievements/icon-brief.md).
   'prog_ready_for_an_adventure',
+  // The Crucible of the Last Spring raid deeds: all five are 'dungeon', so
+  // each rides the deed_cat_dungeon crest until its commissioned art lands
+  // (docs/achievements/icon-brief.md).
+  'dgn_ignivar',
+  'dgn_ignivar_heroic',
+  'dgn_varkhul',
+  'dgn_varkhul_heroic',
+  'dgn_varkhul_flawless',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

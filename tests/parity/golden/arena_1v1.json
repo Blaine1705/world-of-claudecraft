@@ -29,7 +29,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 1000,
-      "state": "ecc17032",
+      "state": "8d25a77a",
       "events": "b2d538b6",
       "rng": {
         "draws": 0,
@@ -40,7 +40,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 1000,
-      "state": "9ae1dd7f",
+      "state": "ba3af1ed",
       "events": "6db907de",
       "rng": {
         "draws": 70,
@@ -51,7 +51,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 1000,
-      "state": "ecb605cb",
+      "state": "8f25721d",
       "events": "bac9a702",
       "rng": {
         "draws": 292,
@@ -62,7 +62,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1000,
-      "state": "a9dab240",
+      "state": "5f0b7df8",
       "events": "c65626fa",
       "rng": {
         "draws": 530,
@@ -73,7 +73,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 1000,
-      "state": "c1bbd73b",
+      "state": "ec09fcff",
       "events": "164c017f",
       "rng": {
         "draws": 781,
@@ -84,7 +84,7 @@
       "tick": 142,
       "time": 7.1,
       "nextId": 1000,
-      "state": "8c27d204",
+      "state": "664e950e",
       "events": "741638a5",
       "rng": {
         "draws": 959,
@@ -333,6 +333,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.067,
           "fiveSecondRule": 106.1,
+          "healPower": 5,
           "hp": 632,
           "id": 998,
           "kind": "player",
@@ -383,6 +384,7 @@
           "dodgeChance": 0.056,
           "facing": 3.141593,
           "fiveSecondRule": 106.1,
+          "healPower": 34,
           "id": 999,
           "kind": "player",
           "level": 15,

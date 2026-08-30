@@ -39,9 +39,11 @@ describe('painted weapon inventory icons', () => {
   it('covers every authored base weapon exactly once', () => {
     // 123 with the class-overhaul integration daggers (rimefang, marrowpoint,
     // duskwhisper, boneglass_shiv), painted in integration-dagger-icons-2026-08-10;
-    // 124 with the Ignivar legendary maul (varkhul_forgebreaker, rendered in
-    // ignivar-varkhul-drop-renders-2026-08-28).
-    expect(baseWeapons).toHaveLength(124);
+    // 132 with the nine Crucible raid weapons (crucible-raid-weapons-2026-08-28;
+    // the Emberflight Longbow was pulled: bows wait for the hunter rework);
+    // 133 with the Ignivar legendary maul (varkhul_forgebreaker, rendered in
+    // ignivar-varkhul-drop-renders-2026-08-28), landed by the base merge.
+    expect(baseWeapons).toHaveLength(133);
     expect([...WEAPON_IMAGE_IDS].sort()).toEqual(baseWeapons);
     expect(Object.keys(ITEM_WEAPON_VARIANTS).sort()).toEqual(baseWeapons);
     for (const id of baseWeapons) {
@@ -70,7 +72,7 @@ describe('painted weapon inventory icons', () => {
     const weaponBatches = batches.filter((batch) =>
       batch.itemIds.some((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id)),
     );
-    expect(weaponBatches).toHaveLength(4);
+    expect(weaponBatches).toHaveLength(5);
     const historicalBatch = weaponBatches.find(
       ({ batchId }) => batchId === 'placeholder-art-completion-weapons-2026-08-09',
     );
@@ -121,6 +123,26 @@ describe('painted weapon inventory icons', () => {
       'marrowpoint',
       'rimefang',
     ]);
+    // The Crucible raid weapons land in their own batch
+    // (crucible-raid-weapons-2026-08-28), like the integration daggers.
+    const crucibleBatch = weaponBatches.find(
+      ({ batchId }) => batchId === 'crucible-raid-weapons-2026-08-28',
+    );
+    expect(crucibleBatch).toBeDefined();
+    const crucibleWeaponIds = (crucibleBatch?.itemIds ?? [])
+      .filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id))
+      .sort();
+    expect(crucibleWeaponIds).toEqual([
+      'anvilguard_blade',
+      'cinderfang_kris',
+      'forgefathers_warhammer',
+      'forgefire_spire',
+      'heart_of_the_end_greatblade',
+      'slagrender_cleaver',
+      'springtouched_crozier',
+      'staff_of_the_last_spring',
+      'wand_of_quenched_sparks',
+    ]);
     // The Ignivar legendaries ship in-engine renders of their own held models
     // in a dedicated batch (ignivar-varkhul-drop-renders-2026-08-28).
     const varkhulBatch = weaponBatches.find(
@@ -136,6 +158,7 @@ describe('painted weapon inventory icons', () => {
         (id) =>
           !replacementWeaponIds.includes(id) &&
           !integrationWeaponIds.includes(id) &&
+          !crucibleWeaponIds.includes(id) &&
           !varkhulWeaponIds.includes(id),
       ),
     );
@@ -177,9 +200,13 @@ describe('painted weapon inventory icons', () => {
     };
     // The chunk records are the frozen weapon campaign's generation reports:
     // they slice the pre-integration weapon roster, without the four
-    // integration daggers and the Ignivar legendary that postdate the campaign.
+    // integration daggers, the nine Crucible raid weapons, or the Ignivar
+    // legendary that postdate the campaign.
     const campaignExpected = expected.filter(
-      (id) => !integrationWeaponIds.includes(id) && !varkhulWeaponIds.includes(id),
+      (id) =>
+        !integrationWeaponIds.includes(id) &&
+        !crucibleWeaponIds.includes(id) &&
+        !varkhulWeaponIds.includes(id),
     );
     expect(chunkA.assets.map(({ id }) => id)).toEqual(campaignExpected.slice(0, 40));
     expect(chunkB.assets.map(({ id }) => id)).toEqual(campaignExpected.slice(40, 80));

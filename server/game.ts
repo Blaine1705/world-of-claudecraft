@@ -8234,6 +8234,13 @@ export class GameServer {
         if (typeof msg.itemId === 'string') sim.buyHeroicVendorItem(msg.itemId, pid);
         break;
       }
+      case 'crucible_buy': {
+        // Range, stock, class, sigil balance, and bag space all re-validate in
+        // the sim handler (instances/crucible_vendor.ts); the client only
+        // sends intent.
+        if (typeof msg.itemId === 'string') sim.buyCrucibleVendorItem(msg.itemId, pid);
+        break;
+      }
       case 'enter_delve': {
         if (typeof msg.delveId !== 'string' || typeof msg.tierId !== 'string') break;
         const e = sim.entities.get(pid);
@@ -8825,6 +8832,7 @@ export class GameServer {
     maybe('copper', meta.copper);
     maybe('ap', p.attackPower);
     maybe('sp', p.spellPower);
+    maybe('hpw', p.healPower);
     maybe('sh', p.spellHaste);
     maybe('crit', p.critChance);
     maybe('dodge', p.dodgeChance);

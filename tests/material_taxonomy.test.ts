@@ -110,6 +110,11 @@ const ALLOWED_UNCLASSIFIED_JUNK = [
   'gleamstag_charm',
   'guardian_core',
   'last_keep_signet',
+  // Staged AHEAD of its recipes (the professions fast-follow, PR 3704): the
+  // Core of the Last Flame drops now so crafters bank it, and the moment a
+  // recipe consumes it the derivation classifies it IN and this row must
+  // move to the classified list (3704 carries exactly that move).
+  'lastflame_core',
   'old_cragmaws_pelt',
 ] as const;
 
@@ -401,7 +406,7 @@ describe('deriveMaterialItemIds: every source table is actually consulted (injec
 });
 
 describe('completeness tripwire: unclassified non-poor junk', () => {
-  it('is exactly the six allowed oddments, no more and no fewer', () => {
+  it('is exactly the seven allowed oddments, no more and no fewer', () => {
     const unclassified = Object.values(ITEMS)
       .filter((d) => d.kind === 'junk' && d.quality !== 'poor' && !MATERIAL_ITEM_IDS.has(d.id))
       .map((d) => d.id)

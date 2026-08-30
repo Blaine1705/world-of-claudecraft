@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 999,
-      "state": "1e154e54",
+      "state": "69311947",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -102,6 +102,7 @@
           "dualWielding": true,
           "fallStartY": -2,
           "fiveSecondRule": 99,
+          "healPower": 6,
           "hp": 62,
           "id": 994,
           "kind": "player",
@@ -156,7 +157,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1000,
-      "state": "af4429b5",
+      "state": "5f495bb4",
       "events": "64457a63",
       "rng": {
         "draws": 12,
@@ -167,7 +168,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1000,
-      "state": "f63b78a4",
+      "state": "afafab67",
       "events": "230edccc",
       "rng": {
         "draws": 19,
@@ -178,7 +179,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1000,
-      "state": "477d84ad",
+      "state": "5c6addd6",
       "events": "d36db79c",
       "rng": {
         "draws": 162,
@@ -189,7 +190,7 @@
       "tick": 72,
       "time": 3.6,
       "nextId": 1000,
-      "state": "b43459a5",
+      "state": "49f9cd7c",
       "events": "741638a5",
       "rng": {
         "draws": 249,
@@ -304,6 +305,7 @@
           "facing": 1.570796,
           "fallStartY": -2,
           "fiveSecondRule": 102.6,
+          "healPower": 6,
           "hp": 49992,
           "id": 994,
           "inCombat": true,

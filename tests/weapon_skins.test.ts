@@ -124,6 +124,10 @@ describe('weapon type classification', () => {
       if (/^(adv_)?axe/.test(variant)) return 'axe';
       if (/^(adv_)?wand/.test(variant)) return 'wand';
       if (/^spear|^scythe/.test(variant)) return 'polearm';
+      // The Armory bow GLBs double as held-model variants for real bow items
+      // (the Crucible longbow is the first); crossbow names must match first.
+      if (/crossbow/.test(variant)) return 'crossbow';
+      if (/bow$/.test(variant)) return 'bow';
       return null;
     };
     for (const id of weaponIds) {

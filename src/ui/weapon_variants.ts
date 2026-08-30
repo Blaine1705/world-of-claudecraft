@@ -148,4 +148,16 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   tidereaver_gaff: 'spear_a', // a gaff is a hooked spear
   ironbark_boar_spear: 'spear_a', // crafted 2H spear
   fanglords_beastspear: 'spear_a', // RARE: the basin Beastmaster's boar spear
+
+  // ---- Crucible of the Last Spring raid weapons (ignivar_loot.ts) -------------
+  // Held models reuse shipped GLBs.
+  forgefathers_warhammer: 'hammer_c',
+  springtouched_crozier: 'hammer_c',
+  cinderfang_kris: 'adv_dagger',
+  slagrender_cleaver: 'adv_axe_1handed',
+  anvilguard_blade: 'adv_sword_1handed',
+  heart_of_the_end_greatblade: 'adv_sword_2handed_color',
+  staff_of_the_last_spring: 'adv_staff',
+  forgefire_spire: 'adv_staff',
+  wand_of_quenched_sparks: 'adv_wand',
 };

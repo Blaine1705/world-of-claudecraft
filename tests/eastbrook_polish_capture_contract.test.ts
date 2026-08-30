@@ -345,7 +345,7 @@ interface AttributionTargetFixture {
 // Re-minted on the v0.41.0 base sync into the raid branch (renderer and
 // evidence inputs moved on both arms). No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '7bcff8789b34357b03fbe699d6dff1bab405732ad12dfe14552b4630445706bd';
+  '9d7f3e9a5e773ceef74c3270f5f77ca9e7b73d9b77d316261d7631e0349b2e8c';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

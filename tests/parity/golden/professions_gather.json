@@ -21,7 +21,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 999,
-      "state": "780ef49b",
+      "state": "06cbf5e3",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -121,6 +121,7 @@
           "dodgeChance": 0.06,
           "fallStartY": -2,
           "fiveSecondRule": 99,
+          "healPower": 5,
           "hp": 100,
           "id": 994,
           "kind": "player",
@@ -167,7 +168,7 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 999,
-      "state": "07fa0eb7",
+      "state": "4758e07b",
       "events": "5f103aaf",
       "rng": {
         "draws": 2,
@@ -311,6 +312,7 @@
           "dodgeChance": 0.06,
           "fallStartY": -0.477872,
           "fiveSecondRule": 101.55,
+          "healPower": 5,
           "hp": 100,
           "id": 994,
           "kind": "player",
@@ -357,7 +359,7 @@
       "tick": 104,
       "time": 5.2,
       "nextId": 999,
-      "state": "d132b762",
+      "state": "200e5846",
       "events": "49aac4cd",
       "rng": {
         "draws": 4,
@@ -521,6 +523,7 @@
           "dodgeChance": 0.06,
           "fallStartY": -0.791371,
           "fiveSecondRule": 104.2,
+          "healPower": 5,
           "hp": 100,
           "id": 994,
           "kind": "player",
@@ -567,7 +570,7 @@
       "tick": 500,
       "time": 25,
       "nextId": 999,
-      "state": "030bb5d1",
+      "state": "79f46e9d",
       "events": "063d4d9b",
       "rng": {
         "draws": 18,
@@ -578,7 +581,7 @@
       "tick": 1000,
       "time": 50,
       "nextId": 999,
-      "state": "77290c57",
+      "state": "194fb687",
       "events": "83b064a9",
       "rng": {
         "draws": 38,
@@ -589,7 +592,7 @@
       "tick": 1500,
       "time": 75,
       "nextId": 999,
-      "state": "8f222f7d",
+      "state": "039447e5",
       "events": "2e33d1f6",
       "rng": {
         "draws": 58,
@@ -600,7 +603,7 @@
       "tick": 2000,
       "time": 100,
       "nextId": 999,
-      "state": "442293e2",
+      "state": "edddff36",
       "events": "82386e4d",
       "rng": {
         "draws": 78,
@@ -611,7 +614,7 @@
       "tick": 2500,
       "time": 125,
       "nextId": 999,
-      "state": "7aa47363",
+      "state": "ead1bf9f",
       "events": "c32f03f9",
       "rng": {
         "draws": 96,
@@ -622,7 +625,7 @@
       "tick": 3000,
       "time": 150,
       "nextId": 999,
-      "state": "7b272945",
+      "state": "fea53e31",
       "events": "82386e4d",
       "rng": {
         "draws": 116,
@@ -633,7 +636,7 @@
       "tick": 3500,
       "time": 175,
       "nextId": 999,
-      "state": "0da774a4",
+      "state": "5082e148",
       "events": "99cbaa30",
       "rng": {
         "draws": 136,
@@ -644,7 +647,7 @@
       "tick": 4000,
       "time": 200,
       "nextId": 999,
-      "state": "7a8b30ad",
+      "state": "d75d5571",
       "events": "089db9bd",
       "rng": {
         "draws": 156,
@@ -655,7 +658,7 @@
       "tick": 4500,
       "time": 225,
       "nextId": 999,
-      "state": "6c1663e7",
+      "state": "ecb744df",
       "events": "01f10e1e",
       "rng": {
         "draws": 176,
@@ -666,7 +669,7 @@
       "tick": 5000,
       "time": 250,
       "nextId": 999,
-      "state": "f56175f2",
+      "state": "8e4f835e",
       "events": "b9040aa9",
       "rng": {
         "draws": 194,
@@ -677,7 +680,7 @@
       "tick": 5206,
       "time": 260.3,
       "nextId": 999,
-      "state": "2eaab438",
+      "state": "4d6e4a08",
       "events": "6b261455",
       "rng": {
         "draws": 204,
@@ -872,6 +875,7 @@
           "dodgeChance": 0.061,
           "fallStartY": -4.19148,
           "fiveSecondRule": 359.3,
+          "healPower": 5,
           "hp": 176,
           "id": 994,
           "kind": "player",
@@ -918,7 +922,7 @@
       "tick": 5208,
       "time": 260.4,
       "nextId": 999,
-      "state": "bc43494b",
+      "state": "4cfbeb07",
       "events": "741638a5",
       "rng": {
         "draws": 204,
@@ -1113,6 +1117,7 @@
           "dodgeChance": 0.061,
           "fallStartY": -4.19148,
           "fiveSecondRule": 359.4,
+          "healPower": 5,
           "hp": 176,
           "id": 994,
           "kind": "player",

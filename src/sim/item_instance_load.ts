@@ -51,12 +51,16 @@ export const MAX_INSTANCE_STRING_LENGTH = 64;
  */
 export const MAX_INSTANCE_PAYLOAD_KEYS = 24;
 
-/** The sub-objects whose own keys are scanned one level down. Both are
+/** The sub-objects whose own keys are scanned one level down. All are
  *  deep-copied by `cloneItemInstancePayload`, which is what makes it safe to
  *  delete keys inside them (see the ownership contract below); `rift` is
  *  deliberately NOT scanned, because its strings are already validated by
- *  the progression rebuild (rift/progression.ts). */
-const SCANNED_SUB_OBJECT_KEYS: readonly string[] = ['rolled', 'charges'];
+ *  the progression rebuild (rift/progression.ts). `partyTrade` IS scanned:
+ *  unlike rift it is never rebuilt, and its `eligible` name array is the
+ *  one persisted string list in the payload, so the subtree JSON ceiling is
+ *  what bounds it (a legal list is at most RAID_MAX names plus ids, far
+ *  under the ceiling; a hand-edited unbounded list drops). */
+const SCANNED_SUB_OBJECT_KEYS: readonly string[] = ['rolled', 'charges', 'partyTrade'];
 
 /**
  * The serialized-size ceiling for a NON-STRING value nested inside a scanned

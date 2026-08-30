@@ -261,10 +261,16 @@ const MONOLITHS: MonolithRow[] = [
     // and the release arm carries the bank-storage +3 above. Measured on the
     // merged tree, never reconciled by arithmetic. Exact count, zero slack.
     // the Ignivar raid consolidation paid its callout/yell additions by moving the pure entity display-label resolver family to entity_display_labels.ts; exact count.
-    // Re-pinned to the exact merged count of the v0.41.0 base sync into the
-    // raid branch: both arms extracted and added independently, so neither
-    // parent pin fits the combined file; the merged count is the honest bound.
-    ceiling: 18886,
+    // Re-pinned to the exact count of the ignivar-raid-complete base merge
+    // into the Phase B branch: the base's fork landed its own extractions
+    // while this branch's healPower seam, sigil-shop progression views, and
+    // biome import strip lowered the file; the merge lands both arms and the
+    // ratchet pins the merged reality. Exact count, zero slack.
+    // Plus 2 for the item-affix tooltip wiring: the import and one composed
+    // call into item_affix_tooltip.ts (the Spell Power / Healing Power lines
+    // themselves live in that sibling, gather_tool_tooltip pattern). Exact
+    // count, zero slack; maintainer-review item.
+    ceiling: 18863,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -335,10 +341,14 @@ const MONOLITHS: MonolithRow[] = [
     // pass-through both land in the merged file. Measured on the merged tree,
     // never reconciled by arithmetic. Exact merged count, zero headroom.
     // the raid consolidation paid its additions by moving the fog scene chain (fog_scene_state.ts), the spellfxAt dispatch arms, the boss facing lock, and the raid anchor/rig syncs out; exact count.
-    // Re-pinned to the exact merged count of the v0.41.0 base sync into the
-    // raid branch: both arms extracted and added independently, so neither
-    // parent pin fits the combined file; the merged count is the honest bound.
-    ceiling: 13271,
+    // Lowered 13265 -> 13243: the set-proc swirl table and both resolution
+    // walks moved to src/render/set_proc_fx.ts (the Crucible engine-proc arm
+    // landed there, not here); the ratchet follows the file down. Exact
+    // count, zero slack.
+    // Re-pinned at the PR 3685 base sync (release v0.41.0 through the raid
+    // branch): both arms edited the renderer and the union lands at the count
+    // below. Measured on the merged tree. Exact merged count, zero headroom.
+    ceiling: 13249,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -433,15 +443,18 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned 12473 -> 12451 for the PR 3684 raid restoration: the authored
     // pack-aggro call paid for itself by moving the legacy same-template
     // social pull (and its per-family radius table) to mob/social_aggro.ts.
-    // Exact count.
-    // Re-pinned 12451 -> 12426 for the raid boss voices: the InstanceSlot
-    // welcome-ledger field paid for itself by moving the twice-duplicated
-    // fresh-slot literal to instances/instance_slot.ts (freshInstanceSlot).
-    // Exact count.
-    // Re-pinned to the exact merged count of the v0.41.0 base sync into the
-    // raid branch: both arms extracted and added independently, so neither
-    // parent pin fits the combined file; the merged count is the honest bound.
-    ceiling: 12247,
+    // Plus 7 on top for the Crucible sigil shop: the import plus the thin
+    // buyCrucibleVendorItem delegation to instances/crucible_vendor.ts (the
+    // buyHeroicVendorItem shape exactly); the logic itself lives in the
+    // instances module. Exact merged count, zero slack.
+    // Plus 5 for the partyTradeMsRemaining IWorld facet delegate (the BoP
+    // party trade window countdown): a one-line clock read against
+    // lockoutNowMs; the window logic itself lives in loot/bop_trade_window.ts.
+    // Thin facet wiring with no clean extraction. Exact count, zero slack.
+    // Plus 2 for the Phase B set-bonus seam: the set_bonus_mods import and
+    // the setPlayerLevel writer routing through computeCharacterModifiers
+    // (the resolver itself is the extracted module). Exact count, zero slack.
+    ceiling: 12465,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -552,10 +565,12 @@ const MONOLITHS: MonolithRow[] = [
     // logic landed in storage_purchases.ts, paying for the ledger breach-hook
     // wiring and the event-relay filter. Exact count, zero slack.
     // the raid consolidation moved the ground-telegraph snapshot unit, the forge-portal replay lifecycle, eventAnchor, and the door gate out; exact count.
-    // Re-pinned to the exact merged count of the v0.41.0 base sync into the
-    // raid branch: both arms extracted and added independently, so neither
-    // parent pin fits the combined file; the merged count is the honest bound.
-    ceiling: 10578,
+    // Plus 1 for the Healing Power wire field: the ONE line is maybe('hpw')
+    // beside maybe('sp') in the delta-guarded self record; no clean extraction
+    // exists for a single serializer line. Exact count.
+    // Plus 7 for the crucible_buy command arm: the dispatch case is the
+    // heroic_buy shape exactly; validation lives sim-side. Exact count.
+    ceiling: 10612,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -596,13 +611,25 @@ const MONOLITHS: MonolithRow[] = [
     // and this branch's +5 above compose. Measured on the merged tree, never
     // reconciled by arithmetic. Exact count, zero slack.
     // the raid consolidation moved the ground-telegraph wire decoders (ground_telegraph_wire.ts) out; exact count.
-    // Re-pinned to the exact merged count of the v0.41.0 base sync into the
-    // raid branch: both arms extracted and added independently, so neither
-    // parent pin fits the combined file; the merged count is the honest bound.
-    // Plus 4 at the same sync's integration fix: the sendInput socket guard
-    // (a missing-socket check the raid forced-facing arm needs when applyWire
-    // runs snapshot-driven with no WebSocket). Exact count, zero slack.
-    ceiling: 5842,
+    // Plus 2 for the Healing Power mirror: the blankEntity default and the
+    // s.hpw ?? fallback beside the existing sp lines; thin wire wiring with no
+    // clean extraction. Exact count.
+    // Plus 3 for the buyCrucibleVendorItem command mirror (the
+    // buyHeroicVendorItem shape exactly). Exact count, zero slack.
+    // Plus 4 for the partyTradeMsRemaining IWorld facet delegate (the BoP
+    // party trade window countdown vs Date.now(), riftEventMsRemaining's
+    // clock). Thin facet wiring with no clean extraction. Exact count.
+    // Plus 5 for the Phase B set-bonus mirror: the snapshot decode resolves
+    // talent mods through computeCharacterModifiers with the equipment
+    // mirror, so worn Crucible tiers read identically in both hosts. Thin
+    // wiring to the extracted set_bonus_mods seam. Exact count.
+    // Re-pinned to the exact merged count of the ignivar-raid-complete base
+    // merge: the base's raid consolidation extracted decoders while this
+    // branch added its mirrors; the merge lands both arms. Exact count.
+    // Re-pinned again at the PR 3685 base sync: the release arm's Bank
+    // Storage wiring and this branch's mirrors both grew the file; the
+    // union lands at the count below. Exact merged count, zero headroom.
+    ceiling: 5856,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

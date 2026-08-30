@@ -189,9 +189,18 @@ import {
   veilAllowsStealthAbilities,
 } from './rogue_engines';
 import { combineCostMultipliers, duskCostMultiplier } from './rogue_talents';
+import {
+  stonehearthStormcastMendingActive,
+  stonehearthStormcastMendingHealMult,
+} from './shaman_stonehearth';
 import { onShamanManaSpent, shamanCastTimeMultiplier, shamanManaCost } from './shaman_talents';
 import { resolveUnleashWeaponTarget, unleashWeaponCastError } from './shaman_unleash_weapon';
-import { onStormcastConsumed, STORMCAST_CHEAP_ID, STORMCAST_ID } from './shaman_warspirit';
+import {
+  onStormcastConsumed,
+  STORMCAST_CHEAP_ID,
+  STORMCAST_ID,
+  warspiritPosture,
+} from './shaman_warspirit';
 import {
   hasCastShield,
   noteSpellHit,
@@ -1044,8 +1053,24 @@ export function castAbility(
   const discountedCost =
     cheapMultiplier === null ? res.cost : Math.ceil(res.cost * cheapMultiplier);
   const shamanAdjustedCost = shamanManaCost(ctx, p, discountedCost);
-  const payableCost =
-    p.resourceType === 'mana'
+  // Stonehearth 2pc (combat/shaman_stonehearth.ts): a Stormcast Mending
+  // Waters pressed while Stonebound bills no mana, so the affordability gate
+  // must admit it at ANY mana level. The bill itself is zeroed at the
+  // Stormcast consume site below, AFTER the cheap charge is spent (the set
+  // doc's consume-order note). The ability.id short-circuit keeps the
+  // posture scan off every other cast.
+  const stonehearthFree =
+    ability.id === 'healing_wave' &&
+    stonehearthStormcastMendingActive(
+      ctx,
+      p,
+      ability.id,
+      warspiritPosture(p),
+      stormcastArmedForAbility,
+    );
+  const payableCost = stonehearthFree
+    ? 0
+    : p.resourceType === 'mana'
       ? Math.ceil(shamanAdjustedCost * paladinManaCostMultiplier(p))
       : shamanAdjustedCost;
   if (
@@ -1634,6 +1659,13 @@ export function castAbility(
       consumedCheapAura = consumeNextCastCheapAura(ctx, p, ability.id);
       if (consumedCheapAura !== null) {
         res = { ...res, cost: Math.ceil(res.cost * consumedCheapAura.value) };
+      }
+      // Stonehearth 2pc: zero the bill only AFTER the Stormcast cheap charge
+      // was consumed above. Zeroing earlier would skip that consume (this
+      // branch gates on `res.cost > 0`) and leave the half-cost aura alive
+      // for a later cast, the consume-order trap the set doc discloses.
+      if (stonehearthStormcastMendingActive(ctx, p, ability.id, warspiritPosture(p), true)) {
+        res = { ...res, cost: 0 };
       }
     } else if (canCastFree && consumeFreeCostFor(ctx, p, ability.id)) {
       res = { ...res, cost: 0, freeCast: true };
@@ -2636,7 +2668,23 @@ function applyAbility(
         ability: ability.id,
       });
     }
-    ctx.runEffects(p, meta, target, res);
+    // Stonehearth 2pc: the Stormcast-while-Stonebound Mending Waters heals 25
+    // percent more, scoped to THIS cast (the non-null reservation marks it).
+    // The multiplier reaches the WHOLE resolved heal (authored roll plus the
+    // Spell Power rider) through runEffects' cast-scoped heal multiplier; it
+    // is 1 for every other friendly cast, so nothing else moves (the
+    // ability.id short-circuit keeps the posture scan off every other cast).
+    const castHealMult =
+      ability.id === 'healing_wave'
+        ? stonehearthStormcastMendingHealMult(
+            ctx,
+            p,
+            ability.id,
+            warspiritPosture(p),
+            stormcastReservation !== null,
+          )
+        : 1;
+    ctx.runEffects(p, meta, target, res, false, castHealMult);
     completeStormcastReservation(ctx, p, stormcastReservation);
     // 'spellCast' means SPELLS: a physical friendly ability never rolls.
     if (p.kind === 'player' && ability.school !== 'physical')

@@ -53,11 +53,11 @@ import { bagPools } from '../sim/bags';
 import { resolveActionReplacement } from '../sim/combat/action_replacement';
 import { resolveColdsightAbilityForSpec } from '../sim/combat/hunter_coldsight';
 import { resolveHunterSharedAbilityForTalents } from '../sim/combat/hunter_shared';
-import { isNecromancyUndead } from '../sim/combat/necromancy';
 import { warriorParryChance } from '../sim/combat/warrior_hit_table';
-import { DEED_ORDER, DEEDS } from '../sim/content/deeds';
+import { DEEDS } from '../sim/content/deeds';
 import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
 import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
+import { CRUCIBLE_VENDOR_STOCK } from '../sim/content/ignivar_loot';
 import { isOnMountRaceStartPlatform, MOUNTS } from '../sim/content/mounts';
 import { PROVING_SHORE_ARRIVAL } from '../sim/content/proving_shore';
 import { recipeById } from '../sim/content/recipes';
@@ -123,7 +123,6 @@ import {
   isPetClass,
   MAX_LEVEL,
   type MailResultCode,
-  MILESTONES,
   type MotdResultCode,
   type PetMode,
   type PlayerClass,
@@ -133,7 +132,6 @@ import {
   type SkinCatalog,
   TICK_RATE,
   TOOL_RECHARGE_CAST_ID,
-  virtualLevel,
   xpUntilNextPrestige,
 } from '../sim/types';
 import { maxBuyCount } from '../sim/vendor_buy_stack';
@@ -147,7 +145,7 @@ import {
   type OverheadEmoteId,
   type PartyInfo,
 } from '../world_api';
-import type { AbilityScaling } from './ability_damage';
+import { abilityScalingOf } from './ability_damage';
 import {
   abilityDisplayDescription,
   abilityEffectAuraInput,
@@ -189,6 +187,7 @@ import { charSheetRefreshSig } from './char_sheet_sig_core';
 import { type CharSkinPainterHost, paintCharSkinPicker } from './char_skin_window';
 import { archetypeTitleText, CharWindow, craftNameText } from './char_window';
 import { activeCharacterAppearancePreview } from './character_appearance';
+import { progressionHtml, talentSummaryHtml } from './character_progression_view';
 import { chatBubbleStyle } from './chat_bubble_style';
 import {
   ignoreKey,
@@ -521,6 +520,8 @@ import { RiftFloorTrackerController } from './hud/rift/rift_floor_tracker_contro
 import { StanceBarController } from './hud/stance';
 import { closeOpenTouchMenu } from './hud/tap_menu';
 import { dismissBuyQuantityPrompts } from './hud/vendor/buy_quantity_prompt_window';
+import { buildCrucibleVendorView } from './hud/vendor/crucible_vendor_view';
+import { renderCrucibleVendorWindow } from './hud/vendor/crucible_vendor_window';
 import { buildHeroicVendorView } from './hud/vendor/heroic_vendor_view';
 import { renderHeroicVendorWindow } from './hud/vendor/heroic_vendor_window';
 import { TrainLearnTracker } from './hud/vendor/train_learn_core';
@@ -562,6 +563,7 @@ import {
 } from './interface_unlock_menu_core';
 import { InterfaceUnlockPreview } from './interface_unlock_preview';
 import { InteriorMapController } from './interior_map_controller';
+import { compareStatLabelKey, itemAffixTooltipLines } from './item_affix_tooltip';
 import { itemArmorTypeLabelKey } from './item_armor_type';
 import { requiredClassesForTooltip } from './item_class_restriction';
 import { itemStatDeltas } from './item_compare';
@@ -572,12 +574,17 @@ import {
   instanceBonusStatLines,
   instanceLockLine,
   instanceMakersMarkLine,
+  instancePartyTradeLine,
   itemNumber,
   itemStatName,
 } from './item_instance_tooltip';
 import { itemKindLabel, itemQualityLabel } from './item_kind_label';
 import { itemNameColor } from './item_name_color';
-import { itemSetMemberCounts, itemSetTooltipModel } from './item_set_tooltip_view';
+import {
+  equippedSetTooltipPieces,
+  itemSetMemberCounts,
+  itemSetTooltipModel,
+} from './item_set_tooltip_view';
 import { itemSlotLabel as itemSlotName } from './item_slot_labels';
 import { knownItemDef, ownEntry } from './known_item';
 import { LeaderboardWindow } from './leaderboard_window';
@@ -715,11 +722,7 @@ import {
   reliquaryPageName,
 } from './reliquary_i18n';
 import { reliquaryRelicDisplayName } from './reliquary_labels';
-import {
-  buildReliquarySheetModel,
-  reliquarySheetProgressionHtml,
-  selfCuratorStanding,
-} from './reliquary_sheet_view';
+import { selfCuratorStanding } from './reliquary_sheet_view';
 import { ReliquaryTrackerPainter } from './reliquary_tracker_painter';
 import {
   buildReliquaryTrackerViewInto,
@@ -742,7 +745,6 @@ import { localizeServerText } from './server_i18n';
 import {
   localizeAuthoredYellSpeakerName,
   localizeAuthoredYellText,
-  localizeSimAuraName,
   localizeSimText,
   tSim,
 } from './sim_i18n';
@@ -777,7 +779,6 @@ import { recordStoreStackSample } from './store_stack_diag';
 import { nearestSubzone } from './subzone';
 import { swingTimerState } from './swing_timer';
 import { SwingTimerPainter } from './swing_timer_painter';
-import { roleLabel, tTalent } from './talent_i18n';
 import { TalentsWindow } from './talents_window';
 import { targetAuraSourceName } from './target_auras_view';
 import { TargetAurasWindow } from './target_auras_window';
@@ -1716,6 +1717,7 @@ export class Hud {
   private readonly lootRolls: LootRollController;
   private openVendorNpcId: number | null = null;
   private openHeroicVendorNpcId: number | null = null;
+  private openCrucibleVendorNpcId: number | null = null;
   // The WARFARE quartermaster's sectioned honor shop. Its own window
   // (#warfare-window), NOT a third tenant of the shared #vendor-window
   // container: the sectioned layout is structurally different and wider.
@@ -2372,6 +2374,7 @@ export class Hud {
       openChronicles: () => this.openDeeds('chronicle'),
       openVendor: (npcId, opener) => this.openVendor(npcId, opener),
       openHeroicVendor: (npcId, opener) => this.openHeroicVendor(npcId, opener),
+      openCrucibleVendor: (npcId, opener) => this.openCrucibleVendor(npcId, opener),
       openWarfareVendor: (npcId, opener) => this.openWarfareVendor(npcId, opener),
       openTrain: (npcId) => this.openTrain(npcId),
       openUnbind: (npcId) => this.openUnbind(npcId),
@@ -2406,6 +2409,8 @@ export class Hud {
       itemIcon: (item) => this.itemIcon(item),
       itemTooltip: (item, instance?: ItemInstancePayload) => this.itemTooltip(item, true, instance),
       attachTooltip: (element, html) => this.attachTooltip(element, html),
+      confirm: (title, body, okText, cancelText, onOk) =>
+        this.confirmDialog(title, body, okText, cancelText, onOk),
       centerPopup: (element) => this.centerPopupInViewport(element),
       placePopup: (element, x, y, reserveRight, reserveBottom, minLeft, minTop) =>
         this.placePopupAt(element, x, y, reserveRight, reserveBottom, minLeft, minTop),
@@ -3647,6 +3652,7 @@ export class Hud {
       case 'vendor-window':
         this.closeVendor();
         this.closeHeroicVendor();
+        this.closeCrucibleVendor();
         break;
       case 'warfare-window':
         this.closeWarfareVendor();
@@ -5464,8 +5470,8 @@ export class Hud {
     slotName: (slot) => itemSlotName(slot),
     statCellHtml: (stat) => statCellHtml(this.statModel(stat), STAT_VIEW_DEPS, { colon: false }),
     statTooltipHtml: (stat) => statTooltipHtml(this.statModel(stat), STAT_VIEW_DEPS),
-    talentSummaryHtml: () => this.talentSummaryHtml(),
-    progressionHtml: (level) => this.progressionHtml(level),
+    talentSummaryHtml: () => talentSummaryHtml(this.sim),
+    progressionHtml: (level) => progressionHtml(this.sim, level),
     unequip: (slot) => {
       this.sim.unequipItem(slot);
       audio.click();
@@ -6007,12 +6013,7 @@ export class Hud {
       abilityDescription: (id) => {
         const res = this.previewResolvedAbility(id);
         if (!res) return null;
-        const p = this.sim.player;
-        const scaling: AbilityScaling = {
-          spellPower: p.spellPower,
-          rangedPower: p.rangedPower,
-          attackPower: p.attackPower,
-        };
+        const scaling = abilityScalingOf(this.sim.player);
         return abilityDisplayDescription(res, abilityEffectText(res, scaling), scaling, a);
       },
       effectHtml: (aura) => this.auraEffectTooltipHtml(aura),
@@ -6460,6 +6461,10 @@ export class Hud {
     if (item.soulbound) {
       html += `<div class="tt-sub" style="color:var(--gold)">${esc(t('hudChrome.itemSoulbound'))}</div>`;
     }
+    // BoP party trade window: qualifies the Soulbound line above while this
+    // copy can still be traded to the players who shared its drop
+    // (item_instance_tooltip.ts owns the copy rules; the world owns the clock).
+    html += instancePartyTradeLine(instance, (untilMs) => this.sim.partyTradeMsRemaining(untilMs));
     // Maker's Bond lines (Professions 2.0): the commission
     // binds-on-first-trade warning or the bound lock, beside the def-level
     // soulbound line it parallels (item_instance_tooltip.ts owns the copy
@@ -6519,6 +6524,7 @@ export class Hud {
         }),
       )}</div>`;
     }
+    html += itemAffixTooltipLines(item);
     const warfareRating = Math.min(item.pvpOffenseRating ?? 0, item.pvpDefenseRating ?? 0);
     if (warfareRating > 0) {
       html += `<div class="tt-green">${esc(
@@ -6703,11 +6709,7 @@ export class Hud {
   // How many equipped pieces belong to the given set (read from IWorld.equipment
   // so it is identical offline and online).
   private equippedSetPieces(setId: string): number {
-    let n = 0;
-    for (const equippedId of Object.values(this.sim.equipment)) {
-      if (equippedId && ITEMS[equippedId]?.set === setId) n += 1;
-    }
-    return n;
+    return equippedSetTooltipPieces(setId, Object.values(this.sim.equipment));
   }
 
   // Classic tier-set block: the set name with the live (have/total) piece count,
@@ -6764,7 +6766,7 @@ export class Hud {
           maximumFractionDigits: d.decimals,
         });
         return `<div class="${cls}">${sign}${magnitude} ${esc(
-          t(statNameKey(d.stat) as TranslationKey),
+          t(compareStatLabelKey(d.stat) as TranslationKey),
         )}</div>`;
       })
       .join('');
@@ -7047,12 +7049,7 @@ export class Hud {
 
   private abilityTooltip(res: ResolvedAbility): string {
     const a = res.def;
-    const p = this.sim.player;
-    const scaling: AbilityScaling = {
-      spellPower: p.spellPower,
-      rangedPower: p.rangedPower,
-      attackPower: p.attackPower,
-    };
+    const scaling = abilityScalingOf(this.sim.player);
     const damageText = abilityEffectText(res, scaling);
     let html = `<div class="tt-title">${esc(abilityDisplayName(a))}</div>`;
     html += `<div class="tt-sub">${esc(t('abilityUi.tooltip.rank', { rank: formatAbilityNumber(res.rank) }))}</div>`;
@@ -9670,6 +9667,10 @@ export class Hud {
       if (this.openHeroicVendorNpcId !== null) {
         const npc = sim.entities.get(this.openHeroicVendorNpcId);
         if (!npc || dist2d(p.pos, npc.pos) > NPC_WINDOW_CLOSE_RANGE) this.closeHeroicVendor();
+      }
+      if (this.openCrucibleVendorNpcId !== null) {
+        const npc = sim.entities.get(this.openCrucibleVendorNpcId);
+        if (!npc || dist2d(p.pos, npc.pos) > NPC_WINDOW_CLOSE_RANGE) this.closeCrucibleVendor();
       }
       if (this.openWarfareVendorNpcId !== null) {
         const npc = sim.entities.get(this.openWarfareVendorNpcId);
@@ -12526,6 +12527,8 @@ export class Hud {
           // A Heroic Marks purchase rides the same 'vendor' event; refresh the
           // shop so the balance and per-offer affordability update after a buy.
           if (this.openHeroicVendorNpcId !== null) this.renderHeroicVendor();
+          // A sigil redemption rides it too, for the same reason.
+          if (this.openCrucibleVendorNpcId !== null) this.renderCrucibleVendor();
           // An Honor purchase rides the same 'vendor' event, and OFFLINE nothing
           // else repaints this window (onInventoryChanged fires only from bank
           // ops and the online net path), so without this arm the balance, the
@@ -15234,6 +15237,7 @@ export class Hud {
     // vendor pairing takes over.
     if (this.bankWindowOpen) this.closeBank();
     this.openHeroicVendorNpcId = null; // the marks shop shares the container
+    this.openCrucibleVendorNpcId = null; // so does the sigil shop
     // Non-trapping focus capture/return (WCAG 2.4.3), matching the bank
     // companion: NOT windowFocus, which would install a Tab trap and break
     // the vendor + bags cluster.
@@ -15341,6 +15345,7 @@ export class Hud {
     // under an orphaned aria-modal that keeps gating every game key, and the
     // later closeVendor early-returns on its null guard without recovering.
     dismissBuyQuantityPrompts($('#vendor-window'));
+    this.openCrucibleVendorNpcId = null; // the sigil shop shares the container
     this.openHeroicVendorNpcId = npcId;
     this.renderHeroicVendor();
   }
@@ -15371,6 +15376,51 @@ export class Hud {
     this.openHeroicVendorNpcId = null;
     this.hideTooltip();
     // Return focus to the opener (WCAG 2.4.3); mirrors closeVendor below.
+    this.focusManager.restore(this.vendorOpenerFocus);
+    this.vendorOpenerFocus = null;
+  }
+
+  // opener: see openVendor's comment; same handoff need for the Crucible
+  // Quartermaster route out of the quest dialog. Third tenant of the shared
+  // #vendor-window container, on the marks shop's exact open/close contract.
+  openCrucibleVendor(npcId: number, opener?: HTMLElement | null): void {
+    this.closeOtherWindows('#vendor-window');
+    if (this.bankWindowOpen) this.closeBank();
+    this.openVendorNpcId = null; // shares the container with the copper vendor
+    this.openHeroicVendorNpcId = null; // and with the marks shop
+    this.vendorOpenerFocus = opener !== undefined ? opener : this.focusManager.activeFocusable();
+    dismissBuyQuantityPrompts($('#vendor-window'));
+    this.openCrucibleVendorNpcId = npcId;
+    this.renderCrucibleVendor();
+  }
+
+  private renderCrucibleVendor(): void {
+    if (this.openCrucibleVendorNpcId === null) return;
+    const npc = this.sim.entities.get(this.openCrucibleVendorNpcId);
+    if (!npc) return;
+    const sigilCount = (sigilId: string) =>
+      this.sim.inventory
+        .filter((slot) => slot.itemId === sigilId)
+        .reduce((sum, slot) => sum + slot.count, 0);
+    renderCrucibleVendorWindow(
+      $('#vendor-window'),
+      entityDisplayName(npc),
+      buildCrucibleVendorView(CRUCIBLE_VENDOR_STOCK, ITEMS, this.sim.cfg.playerClass, sigilCount),
+      {
+        ...this.presentationBag,
+        hideTooltip: () => this.hideTooltip(),
+        onBuy: (itemId) => this.requestCrucibleVendorPurchase(itemId),
+        onClose: () => this.closeCrucibleVendor(),
+      },
+    );
+  }
+
+  closeCrucibleVendor(): void {
+    if (this.openCrucibleVendorNpcId === null) return;
+    $('#vendor-window').style.display = 'none';
+    this.openCrucibleVendorNpcId = null;
+    this.hideTooltip();
+    // Return focus to the opener (WCAG 2.4.3); mirrors closeHeroicVendor.
     this.focusManager.restore(this.vendorOpenerFocus);
     this.vendorOpenerFocus = null;
   }
@@ -16909,99 +16959,6 @@ export class Hud {
   // milestone badges, prestige dialog, and the lifetime-XP leaderboard panel.
   // -------------------------------------------------------------------------
 
-  private milestoneName(id: string): string {
-    switch (id) {
-      case 'veteran':
-        return t('game.milestone.veteran');
-      case 'champion':
-        return t('game.milestone.champion');
-      case 'paragon':
-        return t('game.milestone.paragon');
-      case 'mythic':
-        return t('game.milestone.mythic');
-      case 'eternal':
-        return t('game.milestone.eternal');
-      default:
-        return id;
-    }
-  }
-
-  // Character-sheet summary of the current specialization, role, and Mastery
-  // (FR-8.6). Reuses the progression-block styling.
-  private talentSummaryHtml(): string {
-    const ct = talentsFor(this.sim.cfg.playerClass);
-    if (!ct) return '';
-    const sp = ct.specs.find((s) => s.id === this.sim.talentSpec);
-    const specName = sp
-      ? esc(tTalent({ kind: 'talentSpec', spec: sp, field: 'name' }))
-      : t('game.talents.noSpec');
-    let html = `<div class="char-progression"><div class="cp-title">${t('game.talents.specTab')}</div>`;
-    html += `<div class="char-stats cp-stats"><span>${t('game.talents.specTab')}: <b>${specName}</b></span>`;
-    if (sp) html += `<span>${t('game.talents.role')}: <b>${roleLabel(sp.role)}</b></span>`;
-    html += `</div>`;
-    if (sp)
-      html += `<div class="cp-milestones"><span class="cp-ms-label">${t('game.talents.mastery')}:</span> <b style="color:var(--gold)">${esc(tTalent({ kind: 'talentMastery', spec: sp, field: 'name' }))}</b> <span class="cp-none">${esc(tTalent({ kind: 'talentMastery', spec: sp, field: 'description' }))}</span></div>`;
-    return `${html}</div>`;
-  }
-
-  // The "Progression" group on the character sheet: total XP, virtual level,
-  // prestige rank (when prestiged), unlocked milestone badges, and — at the cap
-  // — the opt-in Prestige button.
-  private progressionHtml(level: number): string {
-    const sim = this.sim;
-    const vlevel = virtualLevel(sim.lifetimeXp);
-    const unlocked = new Set(sim.unlockedMilestones);
-    // Earned Book of Deeds border rewards join the badge row through the same
-    // ms-badge plumbing. The row is now a WORN-state readout: borders render on
-    // nameplates and unit-frame portraits, and the one the player wears carries
-    // the worn word in its own label, so the state never rides colour alone.
-    const borderBadges = DEED_ORDER.filter(
-      (id) => DEEDS[id].reward?.kind === 'border' && sim.deedsEarned.has(id),
-    )
-      .map((id) => {
-        const worn = id === sim.activeBorder;
-        const name = deedName(id);
-        const label = worn ? t('hudChrome.deeds.charBorderWorn', { name }) : name;
-        return `<span class="ms-badge ms-deed-border${worn ? ' ms-active' : ''}">${esc(label)}</span>`;
-      })
-      .join('');
-    const badges =
-      MILESTONES.filter((m) => unlocked.has(m.id))
-        .map((m) => `<span class="ms-badge ms-${m.kind}">${this.milestoneName(m.id)}</span>`)
-        .join('') + borderBadges;
-    let html = `<div class="cp-title">${t('game.progression.heading')}</div>`;
-    html += `<div class="char-stats cp-stats">
-      <span>${t('game.progression.totalXp')}: <b>${formatXp(sim.lifetimeXp)}</b></span>
-      <span>${t('game.progression.virtualLevel')}: <b>${vlevel}</b></span>`;
-    if (sim.prestigeRank > 0)
-      html += `<span>${t('game.progression.prestigeRank')}: <b>★ ${sim.prestigeRank}</b></span>`;
-    html += `</div>`;
-    html += `<div class="cp-milestones"><span class="cp-ms-label">${t('game.progression.milestones')}:</span> ${badges || `<span class="cp-none">${t('game.progression.none')}</span>`}</div>`;
-    // The active Book of Deeds title line; the button opens the Book (its
-    // Titles section is one click away). Title text is deed content localized
-    // through deed_i18n, never a raw id.
-    const activeTitleText = sim.activeTitle ? deedTitleText(sim.activeTitle) : '';
-    html += `<div class="cp-milestones"><span class="cp-ms-label">${t('hudChrome.deeds.charTitleLabel')}:</span> ${
-      activeTitleText !== ''
-        ? `<b class="cp-active-title">${esc(activeTitleText)}</b>`
-        : `<span class="cp-none">${t('hudChrome.deeds.charTitleNone')}</span>`
-    } <button type="button" class="btn cp-deeds-btn" data-act="open-deeds">${t('hudChrome.deeds.charOpenBook')}</button></div>`;
-    // Labeled Reliquary completion pair + Curator rank (character-scoped;
-    // pure core paints the chrome; open button wires through CharWindow).
-    html += reliquarySheetProgressionHtml(buildReliquarySheetModel(sim));
-    if (level >= MAX_LEVEL) {
-      // The button reflects the server's authoritative prestige gate (post-cap
-      // XP earned). It's disabled — and the requirement shown — until eligible;
-      // the server re-checks regardless, so a forged click does nothing.
-      const ready = canPrestige(level, sim.lifetimeXp, sim.prestigeRank);
-      html += `<div class="cp-actions"><button class="btn" data-act="prestige"${ready ? '' : ' disabled'}>${t('game.prestige.action')}${sim.prestigeRank > 0 ? ` (★ ${sim.prestigeRank})` : ''}</button>`;
-      if (!ready)
-        html += `<span class="cp-hint">${formatXp(xpUntilNextPrestige(sim.lifetimeXp, sim.prestigeRank))} ${t('game.prestige.needXp')}</span>`;
-      html += `</div>`;
-    }
-    return `<div class="char-progression">${html}</div>`;
-  }
-
   private openPrestigeDialog(): void {
     const p = this.sim.player;
     // Mirror the server's gate; the server enforces it authoritatively anyway.
@@ -17058,6 +17015,26 @@ export class Hud {
       t('heroicShop.buyConfirmAccept'),
       t('heroicShop.buyConfirmCancel'),
       () => this.sim.buyHeroicVendorItem(itemId),
+    );
+  }
+
+  // Crucible Quartermaster redemptions consume a sigil with no buyback
+  // recorded, so a mis-tap is unrefundable: confirm before sending the exact
+  // pre-existing buy command (the marks-shop contract above).
+  private requestCrucibleVendorPurchase(itemId: string): void {
+    const offer = CRUCIBLE_VENDOR_STOCK.find((candidate) => candidate.itemId === itemId);
+    const item = ITEMS[itemId];
+    const sigil = offer ? ITEMS[offer.sigilId] : undefined;
+    if (!offer || !item || !sigil) return;
+    this.confirmDialog(
+      t('crucibleShop.buyConfirmTitle'),
+      t('crucibleShop.buyConfirmBody', {
+        item: itemDisplayName(item),
+        sigil: itemDisplayName(sigil),
+      }),
+      t('crucibleShop.buyConfirmAccept'),
+      t('crucibleShop.buyConfirmCancel'),
+      () => this.sim.buyCrucibleVendorItem(itemId),
     );
   }
 

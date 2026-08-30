@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 999,
-      "state": "b1fd4971",
+      "state": "5727ba5f",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -100,6 +100,7 @@
           "dodgeChance": 0.0625,
           "fallStartY": -2,
           "fiveSecondRule": 99,
+          "healPower": 7,
           "hp": 69,
           "id": 994,
           "kind": "player",
@@ -147,7 +148,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1002,
-      "state": "662528a0",
+      "state": "abe5e126",
       "events": "f9813d22",
       "rng": {
         "draws": 10,
@@ -158,7 +159,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1002,
-      "state": "1b091ea7",
+      "state": "75c240ad",
       "events": "741638a5",
       "rng": {
         "draws": 10,
@@ -169,7 +170,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1002,
-      "state": "0387a537",
+      "state": "eeaf22e9",
       "events": "132690c6",
       "rng": {
         "draws": 174,
@@ -180,7 +181,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1002,
-      "state": "f1756394",
+      "state": "405878ce",
       "events": "741638a5",
       "rng": {
         "draws": 339,
@@ -191,7 +192,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1002,
-      "state": "dfcac8d9",
+      "state": "98dca7c7",
       "events": "ad595128",
       "rng": {
         "draws": 533,
@@ -202,7 +203,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1002,
-      "state": "d606d63a",
+      "state": "8b8beaf0",
       "events": "741638a5",
       "rng": {
         "draws": 736,
@@ -213,7 +214,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1002,
-      "state": "d606d63a",
+      "state": "8b8beaf0",
       "events": "741638a5",
       "rng": {
         "draws": 736,
@@ -323,6 +324,7 @@
           "dodgeChance": 0.079,
           "fallStartY": -2,
           "fiveSecondRule": 105,
+          "healPower": 12,
           "hp": 49949,
           "id": 994,
           "inCombat": true,

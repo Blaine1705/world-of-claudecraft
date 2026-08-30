@@ -920,6 +920,12 @@ interface BaseItemDef {
   // Kept off `Stats` because Spell Power is a derived combat rating (like attackPower),
   // not one of the six primary attributes.
   spellPower?: number;
+  // Healing Power affix (healer gear): flat healing-only power. Folds into
+  // Entity.healPower (spellPower + Healing Power), which the heal, HoT, and
+  // absorb riders read. The directionality contract: Spell Power adds to
+  // healing, but Healing Power never adds to damage (damage riders read
+  // Entity.spellPower only). See docs/prd/ignivar-raid-loot.md.
+  healPower?: number;
   // Combat ratings, converted to crit%/haste%/hit% in recalcPlayerStats.
   critRating?: number;
   hasteRating?: number;
@@ -1042,6 +1048,7 @@ export interface SetBonusEffect {
   spi?: number;
   ap?: number; // flat attack power
   sp?: number; // flat spell power (mirrors `ap` for the caster archetype)
+  healPower?: number; // flat Healing Power (heals only; see BaseItemDef.healPower)
   crit?: number; // flat crit chance, 0..1
   critRating?: number; // crit rating (converted to % in recalcPlayerStats)
   // Haste fraction (0.15 = 15% faster). ONE stat: it speeds melee and ranged
@@ -1082,6 +1089,11 @@ export interface SetBonusTier {
 export interface ItemSet {
   id: string;
   name: string; // English source
+  // Cross-tier ladder id (content/item_sets.ts LINEAGE_*): families sharing a
+  // lineage SHARE one bonuses array, their worn counts sum, and the resolver
+  // applies the shared table exactly once. Absent for standalone families
+  // (WARFARE, the haste kits).
+  lineage?: string;
   bonuses: SetBonusTier[]; // ascending by `pieces`
 }
 
@@ -1263,6 +1275,16 @@ export interface ItemInstancePayload {
    *  (items.ts): this is an optional mark the owner sets on an otherwise
    *  ordinary copy. */
   locked?: boolean;
+  /** Bind-on-pickup party trade window (src/sim/loot/bop_trade_window.ts): a
+   *  soulbound copy awarded from party boss loot stays tradeable until
+   *  `untilMs` (the ctx.lockoutNowMs() clock), but only with the characters
+   *  in the drop-moment loot-candidate snapshot: `eligible` holds their
+   *  display names; `eligibleIds` their stable character ids where the host
+   *  knows them (the gate prefers ids, rename-proof). Equipping the copy
+   *  strips this field (items.ts equipmentPayloadFor), ending the window for
+   *  good. Additive and JSONB-safe: an absent or expired window is an
+   *  ordinary soulbound copy. */
+  partyTrade?: { untilMs: number; eligible: string[]; eligibleIds?: number[] };
   /** Long-term Rift gear progression. `rolled.stats` is the authoritative
    * aggregate bonus consumed by recalcPlayerStats; this record explains how it
    * was earned and lets forge operations rebuild it deterministically. */
@@ -1299,6 +1321,13 @@ export function cloneItemInstancePayload(src: ItemInstancePayload): ItemInstance
       baseStats: { ...src.rift.baseStats },
       ...(src.rift.enchant && { enchant: { ...src.rift.enchant } }),
       gems: [...src.rift.gems],
+    };
+  }
+  if (src.partyTrade) {
+    instance.partyTrade = {
+      ...src.partyTrade,
+      eligible: [...src.partyTrade.eligible],
+      ...(src.partyTrade.eligibleIds ? { eligibleIds: [...src.partyTrade.eligibleIds] } : {}),
     };
   }
   return instance;
@@ -3050,7 +3079,11 @@ export type AbilityEffect =
       deathRadius: number;
     }
   | { type: 'afflictionEvilEye' }
-  | { type: 'afflictionNeedle' }
+  // doom: base Condemnation the landed Needle generates on a marked target,
+  // BEFORE eyeGeneration's Eye multipliers. Resolved (the Hexthread 2pc
+  // rewrite raises it for wearers): the dispatch and the {needleDoom}
+  // description splice read the same resolved payload.
+  | { type: 'afflictionNeedle'; doom: number }
   | { type: 'afflictionSentence'; damageMult?: number; flat?: number }
   | { type: 'afflictionAccomplice' }
   | {
@@ -3392,6 +3425,11 @@ export interface NpcDef {
   // Purchasing itself stays emergent from the stock carrying priceHonor, so an
   // unflagged honor vendor still sells its stock through the ordinary grid.
   warfareVendor?: boolean;
+  // The Crucible Quartermaster: talking to this NPC opens the sigil-redemption
+  // shop for the Ignivar raid set pieces (src/sim/content/ignivar_loot.ts).
+  // A flag on the warfareVendor precedent so a second placement never widens a
+  // hard-keyed constant.
+  crucibleVendor?: boolean;
   // The Card Master: talking to this NPC joins/leaves the Card Duel minigame
   // queue (src/sim/social/card_duel.ts) instead of any vendor/bank flow.
   cardMaster?: boolean;
@@ -4319,6 +4357,11 @@ export interface Entity extends ClientMirroredEntityFields {
   attackPower: number;
   rangedPower: number; // hunters: ranged attack power
   spellPower: number; // casters: added to spell damage via per-spell coefficients
+  // Healing power: spellPower plus flat Healing Power from gear and set
+  // bonuses. Every heal, HoT, and absorb rider reads this; damage riders read
+  // spellPower, so Spell Power feeds healing but Healing Power never feeds
+  // damage.
+  healPower: number;
   // Haste fractions from item-set bonuses (0 = none). Melee/ranged haste speed up
   // the respective auto-attack swing; spell haste shortens cast and channel time.
   meleeHaste: number;
@@ -7306,6 +7349,11 @@ export interface SimConfig {
   // authoritative server uses its realm-local 3 AM daily reset; offline/headless omit
   // this and fall back to a flat 24h day. Keeps the time zone out of the sim core.
   raidResetMs?: (nowMs: number) => number;
+  // Host-computed next WEEKLY raid-reset instant for a given lockout "now" (epoch
+  // ms): the raid rooms' lockout boundary (the server uses Tuesday at the realm's
+  // daily-reset hour; see server/raid_reset.ts nextWeeklyRaidResetMs). Offline and
+  // headless omit this and fall back to a flat 7-day week.
+  weeklyRaidResetMs?: (nowMs: number) => number;
   // Offline play-test: a custom world to run instead of the built-in one. The Sim
   // ctor reads spawns from here; render/terrain read it via the data.ts registry,
   // so callers that set this MUST also call setActiveWorldContent() with content
@@ -7862,7 +7910,14 @@ export function berserkerCritDamage(e: Entity): number {
 // engines. Beyond the last entry the penalty SATURATES at the cap (does not blow up).
 // Preserve the established +1/+2 leveling curve; only the old +3 cliff is softened.
 //   +1 -> 2.5   +2 -> 14   +3 -> 21   (+4 and beyond hold at 21)
-const ABOVE_LEVEL_MISS_PCT = [0, 2.5, 14, 21];
+// Lowered from [0, 2.5, 14, 21] at the Crucible hit rebalance (2026-08-30,
+// maintainer ruling): the old +2 penalty put the heroic-raid melee cap at 190
+// rating while the tier's elective hit lanes topped out near 145, so upgrading
+// into the tier SHED cap the old lineage stack carried (retribution measured a
+// net loss). The lowered ramp keeps a real above-level tax but brings the
+// heroic cap within the tier's redistributed hit budget; classic-era boss
+// penalties sat near this shape.
+const ABOVE_LEVEL_MISS_PCT = [0, 2.5, 8, 14];
 function aboveLevelMissPct(diff: number): number {
   if (diff <= 0) return 0;
   return diff < ABOVE_LEVEL_MISS_PCT.length

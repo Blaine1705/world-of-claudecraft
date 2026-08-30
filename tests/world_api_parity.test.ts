@@ -171,6 +171,7 @@ export const IWORLD_MEMBERS = [
   { name: 'upgradeRiftItem', kind: 'method' },
   { name: 'enchantRiftItem', kind: 'method' },
   { name: 'socketRiftGem', kind: 'method' },
+  { name: 'partyTradeMsRemaining', kind: 'method' },
   { name: 'equipBag', kind: 'method' },
   { name: 'unequipBag', kind: 'method' },
   { name: 'changeSkin', kind: 'method' },
@@ -399,6 +400,7 @@ export const IWORLD_MEMBERS = [
   { name: 'dungeonDifficulty', kind: 'method' }, // read-returning
   { name: 'setDungeonDifficulty', kind: 'method' },
   { name: 'buyHeroicVendorItem', kind: 'method' },
+  { name: 'buyCrucibleVendorItem', kind: 'method' },
   { name: 'leaderboard', kind: 'method' }, // async
   { name: 'guildLeaderboard', kind: 'method' }, // async
   { name: 'guildRoster', kind: 'method' }, // async
@@ -659,9 +661,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // even when the total agrees. Only running the suite says what these
     // numbers really are; never reconcile them by arithmetic in the diff (the
     // numbers below were set from a suite run, not from this narrative).
-    expect(IWORLD_MEMBERS.length).toBe(341);
+    expect(IWORLD_MEMBERS.length).toBe(343);
     expect(DATA_MEMBERS.length).toBe(95);
-    expect(METHOD_MEMBERS.length).toBe(246);
+    expect(METHOD_MEMBERS.length).toBe(248);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -722,6 +724,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'blockAdd',
       'blockRemove',
       'buyBackItem',
+      'buyCrucibleVendorItem',
       'buyHeroicVendorItem',
       'buyItem',
       'cancelAura',
@@ -893,6 +896,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'partyKick',
       'partyLeave',
       'partyPromote',
+      'partyTradeMsRemaining',
       'petAttack',
       'petSpecial',
       'petSpecialCommandsSupported',
@@ -1146,6 +1150,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'blockAdd',
       'blockRemove',
       'buyBackItem',
+      'buyCrucibleVendorItem',
       'buyHeroicVendorItem',
       'buyItem',
       'cancelAura',
@@ -1275,6 +1280,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'partyKick',
       'partyLeave',
       'partyPromote',
+      'partyTradeMsRemaining',
       'petAttack',
       'petSpecial',
       'petTaunt',
@@ -1545,6 +1551,7 @@ const FACET_INVENTORY = [
   'upgradeRiftItem',
   'enchantRiftItem',
   'socketRiftGem',
+  'partyTradeMsRemaining',
   'equipBag',
   'unequipBag',
 ] as const satisfies readonly (keyof IWorldInventory)[];
@@ -1801,6 +1808,7 @@ const FACET_DUNGEONS = [
   'dungeonDifficulty',
   'setDungeonDifficulty',
   'buyHeroicVendorItem',
+  'buyCrucibleVendorItem',
 ] as const satisfies readonly (keyof IWorldDungeons)[];
 type _ExhaustDungeons = AssertNever<Exclude<keyof IWorldDungeons, (typeof FACET_DUNGEONS)[number]>>;
 
@@ -2011,8 +2019,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(341);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(341);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(343);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(343);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

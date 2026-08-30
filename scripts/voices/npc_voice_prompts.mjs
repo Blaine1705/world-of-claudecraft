@@ -1090,6 +1090,12 @@ export const VOICE_ALIAS = {
   // own VOICE_PROMPTS entry, with the rank and the cold Highwatch authority the
   // greeting carries, once an ElevenLabs key is available to design and render it.
   warmarshal_draven_kole: 'fury',
+  // Quartermaster Bronn Emberward, the Crucible sigil broker: a quartermaster
+  // at a counter selling proof of hard content, the same register Vex's
+  // designed voice carries, so he borrows it as a ROLE match (the Draven Kole
+  // precedent above). Promote him to his own VOICE_PROMPTS entry, with the
+  // forge-warden weight his greeting carries, when a key is available.
+  crucible_quartermaster: 'heroic_quartermaster',
   // The Proving Shore four (src/sim/content/proving_shore.ts, the tutorial
   // island). Like Warmarshal Draven Kole above, these are ROLE matches rather
   // than the same character recurring under a suffixed id: each borrows the

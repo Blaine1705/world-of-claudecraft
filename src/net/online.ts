@@ -16,7 +16,6 @@ import { heroicLeapPlacementPreview } from '../sim/combat/heroic_leap';
 import { MOUNT_RACE_COURSE, type MountKey, normalizeMountKey } from '../sim/content/mounts';
 import { mechChromaSkinIndex } from '../sim/content/skins';
 import {
-  computeTalentModifiers,
   emptyAllocation,
   type Role,
   repairAllocation,
@@ -61,6 +60,7 @@ import {
   restoreReliquaryState,
   type SavedReliquaryState,
 } from '../sim/reliquary';
+import { computeCharacterModifiers } from '../sim/set_bonus_mods';
 import type { ResolvedAbility } from '../sim/sim';
 import { parseTalentAllocation } from '../sim/talent_allocation_input';
 import { repairTalentLoadouts } from '../sim/talent_loadouts';
@@ -1345,6 +1345,7 @@ function blankEntity(id: number): Entity {
     attackPower: 0,
     rangedPower: 0,
     spellPower: 0,
+    healPower: 0,
     meleeHaste: 0,
     rangedHaste: 0,
     spellHaste: 0,
@@ -3473,6 +3474,7 @@ export class ClientWorld implements IWorld {
       e.attackPower = s.ap ?? e.attackPower;
       e.rangedPower = s.rp ?? 0;
       e.spellPower = s.sp ?? e.spellPower;
+      e.healPower = s.hpw ?? e.healPower;
       // Spell haste feeds the hasted-cast-time tooltip; melee/ranged haste need
       // no wiring (the swing timers already ride the snapshot).
       e.spellHaste = s.sh ?? e.spellHaste;
@@ -3620,7 +3622,12 @@ export class ClientWorld implements IWorld {
       }
       if (!this.talents) this.talents = emptyAllocation();
       const talents = this.talents;
-      const talentMods = computeTalentModifiers(this.cfg.playerClass, talents, e.level);
+      const talentMods = computeCharacterModifiers(
+        this.cfg.playerClass,
+        talents,
+        e.level,
+        this.equipment,
+      );
       this.talentSpec = talentMods.spec;
       this.talentRole = talentMods.role;
       this.known = abilitiesKnownAt(this.cfg.playerClass, e.level, talentMods, this.questsDone);
@@ -4170,6 +4177,10 @@ export class ClientWorld implements IWorld {
   socketRiftGem(itemId: string, gemId: string, target?: { slotIndex: number }): void {
     if (target === undefined) this.cmd({ cmd: 'rift_socket_gem', item: itemId, gem: gemId });
     else this.cmd({ cmd: 'rift_socket_gem', item: itemId, gem: gemId, slot: target.slotIndex });
+  }
+  // IWorldInventory: server-stamped untilMs vs Date.now(), riftEventMsRemaining's clock.
+  partyTradeMsRemaining(untilMs: number): number {
+    return Math.max(0, untilMs - Date.now());
   }
   get bagCapacity(): number {
     return bagCapacity(this.bags);
@@ -5333,6 +5344,9 @@ export class ClientWorld implements IWorld {
   }
   buyHeroicVendorItem(itemId: string): void {
     this.cmd({ cmd: 'heroic_buy', itemId });
+  }
+  buyCrucibleVendorItem(itemId: string): void {
+    this.cmd({ cmd: 'crucible_buy', itemId });
   }
   // Live lethal death zones on the current rift boss floor. Mirrored from
   // riftDeathZoneSpawn events emitted at zone-placement time; the client counts

@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 999,
-      "state": "780ef49b",
+      "state": "06cbf5e3",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -116,6 +116,7 @@
           "dodgeChance": 0.06,
           "fallStartY": -2,
           "fiveSecondRule": 99,
+          "healPower": 5,
           "hp": 100,
           "id": 994,
           "kind": "player",
@@ -162,7 +163,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1008,
-      "state": "4ab6a59a",
+      "state": "4c973e26",
       "events": "3e636240",
       "rng": {
         "draws": 5,
@@ -173,7 +174,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 1008,
-      "state": "31112269",
+      "state": "2a6d2bd9",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -184,7 +185,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 1008,
-      "state": "12c52c12",
+      "state": "475d4bea",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -195,7 +196,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1008,
-      "state": "15f1ce99",
+      "state": "b045852d",
       "events": "632a979f",
       "rng": {
         "draws": 5,
@@ -206,7 +207,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 1008,
-      "state": "efda5fc1",
+      "state": "85604541",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -217,7 +218,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 1008,
-      "state": "ae51a1fc",
+      "state": "55c1ca68",
       "events": "77b5d49d",
       "rng": {
         "draws": 8,
@@ -228,7 +229,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 1008,
-      "state": "0bdf4420",
+      "state": "6660e8cc",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -239,7 +240,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1008,
-      "state": "695fa246",
+      "state": "6fe86856",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -250,7 +251,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1008,
-      "state": "695fa246",
+      "state": "6fe86856",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -363,6 +364,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.063,
           "fiveSecondRule": 101,
+          "healPower": 5,
           "hp": 50000,
           "id": 994,
           "inCombat": true,
@@ -506,7 +508,7 @@
       "tick": 41,
       "time": 2.05,
       "nextId": 1008,
-      "state": "6271a4e3",
+      "state": "75a5ea9f",
       "events": "a48b56be",
       "rng": {
         "draws": 16,
@@ -620,6 +622,7 @@
           "dodgeChance": 0.063,
           "fallStartY": 29.884403,
           "fiveSecondRule": 101.05,
+          "healPower": 5,
           "hp": 29000,
           "id": 994,
           "inCombat": true,
@@ -763,7 +766,7 @@
       "tick": 45,
       "time": 2.25,
       "nextId": 1008,
-      "state": "99a554f6",
+      "state": "f975fe22",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -774,7 +777,7 @@
       "tick": 49,
       "time": 2.45,
       "nextId": 1008,
-      "state": "1f4f2549",
+      "state": "be5d5235",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -888,6 +891,7 @@
           "dodgeChance": 0.063,
           "fallStartY": 30.257382,
           "fiveSecondRule": 101.45,
+          "healPower": 5,
           "hp": 29000,
           "id": 994,
           "kind": "player",
@@ -974,7 +978,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 1008,
-      "state": "edf1f387",
+      "state": "c2f1148b",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -985,7 +989,7 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 1008,
-      "state": "adce713c",
+      "state": "9e665348",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -1099,6 +1103,7 @@
           "dodgeChance": 0.063,
           "fallStartY": 42.029112,
           "fiveSecondRule": 101.55,
+          "healPower": 5,
           "hp": 29000,
           "id": 994,
           "kind": "player",
@@ -1186,7 +1191,7 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 1008,
-      "state": "adce713c",
+      "state": "9e665348",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -1300,6 +1305,7 @@
           "dodgeChance": 0.063,
           "fallStartY": 42.029112,
           "fiveSecondRule": 101.55,
+          "healPower": 5,
           "hp": 29000,
           "id": 994,
           "kind": "player",

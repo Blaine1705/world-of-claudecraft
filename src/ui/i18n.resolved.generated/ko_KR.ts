@@ -2005,6 +2005,7 @@ export const ko_KR: EnTranslations = {
       "fromYour": "당신의 {value} {stat}에서:",
       "names": {
         "spellPower": "주문력",
+        "healPower": "치유력",
         "critRating": "치명타 등급",
         "hasteRating": "가속 등급",
         "parry": "무기 막기",
@@ -2873,7 +2874,9 @@ export const ko_KR: EnTranslations = {
       "chestTitle": "상자",
       "takeLootButton": "전리품 가져가기",
       "takeLootTooltip": "돈과 떨어진 아이템을 가져갑니다. 채집 기회는 소모되지 않습니다.",
-      "unifiedPressHint": "상호작용 키를 한 번 누르면 마을 집중에 따라 전리품 획득과 채집을 함께 수행합니다."
+      "unifiedPressHint": "상호작용 키를 한 번 누르면 마을 집중에 따라 전리품 획득과 채집을 함께 수행합니다.",
+      "bindConfirmTitle": "획득 시 귀속",
+      "bindConfirmBody": "이 전리품에는 가져가면 자신에게 귀속되는 아이템이 있습니다. 귀속된 아이템은 같은 전리품을 함께 획득한 플레이어와만, 제한된 시간 동안만 거래할 수 있습니다."
     },
     "spellbook": {
       "addToBarAria": "{name}을(를) 행동 단축바에 추가",
@@ -2998,7 +3001,8 @@ export const ko_KR: EnTranslations = {
       "riftUpgrade": "균열 강화 {level}/{max}",
       "riftSockets": "균열 보석 {used}/{total}",
       "statEnchanted": "+{value} {stat} (마법부여)",
-      "enchantedFallback": "마법부여됨"
+      "enchantedFallback": "마법부여됨",
+      "partyTradeWindow": "앞으로 {time} 동안 이 아이템을 같은 전리품을 함께 획득한 플레이어와 거래할 수 있습니다. 착용하면 거래 기간이 끝납니다."
     },
     "materialHint": {
       "fineGrade": "상급 등급입니다. 해당 재료보다 높은 등급의 도구로 만렙 채집지에서 캐낸 것이며, 일반 등급이 필요한 곳 어디에서나 대신 사용됩니다.",
@@ -8064,6 +8068,19 @@ export const ko_KR: EnTranslations = {
     "buyConfirmAccept": "구매",
     "buyConfirmCancel": "취소"
   },
+  "crucibleShop": {
+    "browse": "인장 교환",
+    "browseAria": "{name}에게 도가니 인장 교환",
+    "empty": "내 직업으로 교환할 수 있는 세트 부위가 없습니다.",
+    "balance": "보유한 인장: {list}",
+    "noSigils": "도가니 인장을 갖고 있지 않습니다.",
+    "price": "{sigil} 1개",
+    "buyAria": "{sigil}(으)로 {item} 교환",
+    "buyConfirmTitle": "교환 확인",
+    "buyConfirmBody": "{sigil}(을)를 {item}(으)로 교환하시겠습니까? 소모된 인장은 환불되지 않습니다.",
+    "buyConfirmAccept": "교환",
+    "buyConfirmCancel": "취소"
+  },
   "cardDuel": {
     "title": "카드 대결",
     "close": "닫기",
@@ -9282,6 +9299,7 @@ export const ko_KR: EnTranslations = {
       "tradeExpired": "거래 요청이 만료되었습니다.",
       "tradeFailed": "거래 실패: 아이템이나 돈을 더 이상 사용할 수 없습니다.",
       "tradeBound": "그 아이템은 귀속되어 거래할 수 없습니다.",
+      "tradeWindowIneligible": "해당 아이템은 같은 전리품을 함께 획득한 플레이어와만 거래할 수 있습니다.",
       "marketListBound": "그 아이템은 귀속되어 등록할 수 없습니다."
     },
     "logs": {
@@ -9945,7 +9963,8 @@ export const ko_KR: EnTranslations = {
       "greedAria": "{item} 탐욕",
       "passAria": "{item} 포기",
       "everyonePassed": "모두 {item}을(를) 포기했습니다.",
-      "rolled": "{answered}/{total} 굴림 완료"
+      "rolled": "{answered}/{total} 굴림 완료",
+      "bindsOnPickup": "획득 시 귀속"
     }
   },
   "entities": {
@@ -10726,7 +10745,7 @@ export const ko_KR: EnTranslations = {
       },
       "needle_of_fate": {
         "name": "운명의 바늘",
-        "description": "적을 꿰뚫어 {damage}의 암흑 피해를 줍니다. 대상에게 자신의 사안이 있으면 단죄를 5 생성하고, 사안이 없으면 먼저 대상을 지정합니다."
+        "description": "적을 꿰뚫어 {damage}의 암흑 피해를 줍니다. 대상에게 자신의 사안이 있으면 단죄를 {needleDoom} 생성하고, 사안이 없으면 먼저 대상을 지정합니다."
       },
       "sentence": {
         "name": "선고",
@@ -10824,7 +10843,7 @@ export const ko_KR: EnTranslations = {
       },
       "moonseed": {
         "name": "달씨앗",
-        "description": "달날개 형상 전용입니다. {damage}의 비전 피해를 입히고, 달물결을 1단계 올리며(최대 3단계), 달빛 폭풍을 6초 연장합니다. 적용 한 번당 최대 6초입니다. 달물결 3단계에서 이 버튼이 달의 격동으로 변합니다: 240에서 285의 비전 피해를 입히는 즉시 공격으로, 3단계를 모두 소모합니다."
+        "description": "달날개 형상 전용입니다. {damage}의 비전 피해를 입히고, 달물결을 1단계 올리며(최대 3단계), 달빛 폭풍을 6초 연장합니다. 적용 한 번당 최대 {duration}초입니다. 달물결 3단계에서 이 버튼이 달의 격동으로 변합니다: 240에서 285의 비전 피해를 입히는 즉시 공격으로, 3단계를 모두 소모합니다."
       },
       "rejuvenation": {
         "name": "야생 개화",
@@ -11128,7 +11147,7 @@ export const ko_KR: EnTranslations = {
       },
       "conflagrate": {
         "name": "점화",
-        "description": "불타는 계약의 다가올 주기 하나를 앞당긴 뒤 대상을 불살라 {damage}의 화염 피해를 입힙니다. 파괴력 1과 파멸 1을 만듭니다. 충전을 2회 담아 둡니다. (파괴 상징 기술)"
+        "description": "불타는 계약의 다가올 주기 하나를 앞당긴 뒤 대상을 불살라 {damage}의 화염 피해를 입힙니다. 파괴력 1과 파멸 1을 만듭니다. 충전을 {charges}회 담아 둡니다. (파괴 상징 기술)"
       },
       "moonkin_form": {
         "name": "달빛야수 변신",
@@ -11160,7 +11179,7 @@ export const ko_KR: EnTranslations = {
       },
       "overbloom": {
         "name": "만개",
-        "description": "푸른 생장 5단계를 소모합니다: 자신의 지속 치유 효과를 지닌 모든 아군이 해당 효과의 남은 치유량 중 60%를 즉시 회복하고, 해당 효과는 제거되며, 대상에게 새로운 야생 개화를 심습니다."
+        "description": "푸른 생장 5단계를 소모합니다: 자신의 지속 치유 효과를 지닌 모든 아군이 해당 효과의 남은 치유량 중 {buff}%를 즉시 회복하고, 해당 효과는 제거되며, 대상에게 새로운 야생 개화를 심습니다."
       },
       "summon_imp": {
         "name": "불씨족 소환",
@@ -11232,7 +11251,7 @@ export const ko_KR: EnTranslations = {
       },
       "iron_resolve": {
         "name": "강철 의지",
-        "description": "이를 악물고 고통을 무시합니다. 최대 40의 분노(최소 20)를 소모해 소모한 분노 1당 4의 피해를 흡수하며, 최대 10초 동안 지속됩니다. (방어 특성)"
+        "description": "이를 악물고 고통을 무시합니다. 최대 40의 분노(최소 20)를 소모해 소모한 분노 1당 {absorbPerRage}의 피해를 흡수하며, 최대 10초 동안 지속됩니다. (방어 특성)"
       },
       "faultline": {
         "name": "단층선",
@@ -11609,7 +11628,7 @@ export const ko_KR: EnTranslations = {
       },
       "seraphic_vigil": {
         "name": "치천사의 수호",
-        "description": "아군 한 명에게 수호의 축복을 걸어 위험에 처하면 생명력을 회복시킵니다. 축복 고유 능력입니다."
+        "description": "아군 한 명에게 수호의 축복을 걸어 위험에 처하면 생명력을 {buff} 회복시킵니다. 축복 고유 능력입니다."
       },
       "summon_tithefiend": {
         "name": "십일조 악마 소환",
@@ -13229,6 +13248,612 @@ export const ko_KR: EnTranslations = {
       },
       "ps_passing_stone": {
         "name": "안식의 돌"
+      },
+      "lastflame_core": {
+        "name": "마지막 불꽃의 핵"
+      },
+      "slagbreaker_helmet": {
+        "name": "슬래그브레이커 투구"
+      },
+      "slagbreaker_shoulder": {
+        "name": "슬래그브레이커 어깨갑옷"
+      },
+      "slagbreaker_chest": {
+        "name": "슬래그브레이커 사슬갑옷"
+      },
+      "slagbreaker_gloves": {
+        "name": "슬래그브레이커 건틀릿"
+      },
+      "slagbreaker_legs": {
+        "name": "슬래그브레이커 다리갑옷"
+      },
+      "emberfury_helmet": {
+        "name": "잿불격노 투구"
+      },
+      "emberfury_shoulder": {
+        "name": "잿불격노 어깨갑옷"
+      },
+      "emberfury_chest": {
+        "name": "잿불격노 사슬갑옷"
+      },
+      "emberfury_gloves": {
+        "name": "잿불격노 건틀릿"
+      },
+      "emberfury_legs": {
+        "name": "잿불격노 다리갑옷"
+      },
+      "forgewall_helmet": {
+        "name": "화로성벽 투구"
+      },
+      "forgewall_shoulder": {
+        "name": "화로성벽 어깨갑옷"
+      },
+      "forgewall_chest": {
+        "name": "화로성벽 사슬갑옷"
+      },
+      "forgewall_gloves": {
+        "name": "화로성벽 건틀릿"
+      },
+      "forgewall_legs": {
+        "name": "화로성벽 다리갑옷"
+      },
+      "dawnforged_helmet": {
+        "name": "새벽벼림 투구"
+      },
+      "dawnforged_shoulder": {
+        "name": "새벽벼림 어깨갑옷"
+      },
+      "dawnforged_chest": {
+        "name": "새벽벼림 사슬갑옷"
+      },
+      "dawnforged_gloves": {
+        "name": "새벽벼림 건틀릿"
+      },
+      "dawnforged_legs": {
+        "name": "새벽벼림 다리갑옷"
+      },
+      "oathpyre_helmet": {
+        "name": "맹세화염 투구"
+      },
+      "oathpyre_shoulder": {
+        "name": "맹세화염 어깨갑옷"
+      },
+      "oathpyre_chest": {
+        "name": "맹세화염 사슬갑옷"
+      },
+      "oathpyre_gloves": {
+        "name": "맹세화염 건틀릿"
+      },
+      "oathpyre_legs": {
+        "name": "맹세화염 다리갑옷"
+      },
+      "zealfire_helmet": {
+        "name": "열화신념 투구"
+      },
+      "zealfire_shoulder": {
+        "name": "열화신념 어깨갑옷"
+      },
+      "zealfire_chest": {
+        "name": "열화신념 사슬갑옷"
+      },
+      "zealfire_gloves": {
+        "name": "열화신념 건틀릿"
+      },
+      "zealfire_legs": {
+        "name": "열화신념 다리갑옷"
+      },
+      "packlord_emberhide_helmet": {
+        "name": "무리군주 가죽두건"
+      },
+      "packlord_emberhide_shoulder": {
+        "name": "무리군주 어깨보호구"
+      },
+      "packlord_emberhide_chest": {
+        "name": "무리군주 튜닉"
+      },
+      "packlord_emberhide_gloves": {
+        "name": "무리군주 손보호구"
+      },
+      "packlord_emberhide_legs": {
+        "name": "무리군주 가죽바지"
+      },
+      "coldsight_trackers_helmet": {
+        "name": "냉정한 시선 가죽두건"
+      },
+      "coldsight_trackers_shoulder": {
+        "name": "냉정한 시선 어깨보호구"
+      },
+      "coldsight_trackers_chest": {
+        "name": "냉정한 시선 튜닉"
+      },
+      "coldsight_trackers_gloves": {
+        "name": "냉정한 시선 손보호구"
+      },
+      "coldsight_trackers_legs": {
+        "name": "냉정한 시선 가죽바지"
+      },
+      "slagsnare_helmet": {
+        "name": "용재올가미 가죽두건"
+      },
+      "slagsnare_shoulder": {
+        "name": "용재올가미 어깨보호구"
+      },
+      "slagsnare_chest": {
+        "name": "용재올가미 튜닉"
+      },
+      "slagsnare_gloves": {
+        "name": "용재올가미 손보호구"
+      },
+      "slagsnare_legs": {
+        "name": "용재올가미 가죽바지"
+      },
+      "cinderfang_helmet": {
+        "name": "잿불송곳니 가죽두건"
+      },
+      "cinderfang_shoulder": {
+        "name": "잿불송곳니 어깨보호구"
+      },
+      "cinderfang_chest": {
+        "name": "잿불송곳니 튜닉"
+      },
+      "cinderfang_gloves": {
+        "name": "잿불송곳니 손보호구"
+      },
+      "cinderfang_legs": {
+        "name": "잿불송곳니 가죽바지"
+      },
+      "smolderstrike_helmet": {
+        "name": "그을음일격 가죽두건"
+      },
+      "smolderstrike_shoulder": {
+        "name": "그을음일격 어깨보호구"
+      },
+      "smolderstrike_chest": {
+        "name": "그을음일격 튜닉"
+      },
+      "smolderstrike_gloves": {
+        "name": "그을음일격 손보호구"
+      },
+      "smolderstrike_legs": {
+        "name": "그을음일격 가죽바지"
+      },
+      "ashveil_helmet": {
+        "name": "잿빛장막 가죽두건"
+      },
+      "ashveil_shoulder": {
+        "name": "잿빛장막 어깨보호구"
+      },
+      "ashveil_chest": {
+        "name": "잿빛장막 튜닉"
+      },
+      "ashveil_gloves": {
+        "name": "잿빛장막 손보호구"
+      },
+      "ashveil_legs": {
+        "name": "잿빛장막 가죽바지"
+      },
+      "emberscreed_helmet": {
+        "name": "잉걸불 신조 두건"
+      },
+      "emberscreed_shoulder": {
+        "name": "잉걸불 신조 어깨걸이"
+      },
+      "emberscreed_chest": {
+        "name": "잉걸불 신조 로브"
+      },
+      "emberscreed_gloves": {
+        "name": "잉걸불 신조 손싸개"
+      },
+      "emberscreed_legs": {
+        "name": "잉걸불 신조 다리싸개"
+      },
+      "benison_dawnweave_helmet": {
+        "name": "새벽직조 두건"
+      },
+      "benison_dawnweave_shoulder": {
+        "name": "새벽직조 어깨걸이"
+      },
+      "benison_dawnweave_chest": {
+        "name": "새벽직조 로브"
+      },
+      "benison_dawnweave_gloves": {
+        "name": "새벽직조 손싸개"
+      },
+      "benison_dawnweave_legs": {
+        "name": "새벽직조 다리싸개"
+      },
+      "vesperash_helmet": {
+        "name": "저녁잿빛 두건"
+      },
+      "vesperash_shoulder": {
+        "name": "저녁잿빛 어깨걸이"
+      },
+      "vesperash_chest": {
+        "name": "저녁잿빛 로브"
+      },
+      "vesperash_gloves": {
+        "name": "저녁잿빛 손싸개"
+      },
+      "vesperash_legs": {
+        "name": "저녁잿빛 다리싸개"
+      },
+      "stormkindled_helmet": {
+        "name": "폭풍점화 투구"
+      },
+      "stormkindled_shoulder": {
+        "name": "폭풍점화 어깨갑옷"
+      },
+      "stormkindled_chest": {
+        "name": "폭풍점화 사슬갑옷"
+      },
+      "stormkindled_gloves": {
+        "name": "폭풍점화 건틀릿"
+      },
+      "stormkindled_legs": {
+        "name": "폭풍점화 다리갑옷"
+      },
+      "warspirit_emberscale_helmet": {
+        "name": "잉걸비늘 투구"
+      },
+      "warspirit_emberscale_shoulder": {
+        "name": "잉걸비늘 어깨갑옷"
+      },
+      "warspirit_emberscale_chest": {
+        "name": "잉걸비늘 사슬갑옷"
+      },
+      "warspirit_emberscale_gloves": {
+        "name": "잉걸비늘 건틀릿"
+      },
+      "warspirit_emberscale_legs": {
+        "name": "잉걸비늘 다리갑옷"
+      },
+      "stonehearth_helmet": {
+        "name": "돌화로 투구"
+      },
+      "stonehearth_shoulder": {
+        "name": "돌화로 어깨갑옷"
+      },
+      "stonehearth_chest": {
+        "name": "돌화로 사슬갑옷"
+      },
+      "stonehearth_gloves": {
+        "name": "돌화로 건틀릿"
+      },
+      "stonehearth_legs": {
+        "name": "돌화로 다리갑옷"
+      },
+      "springmender_helmet": {
+        "name": "샘물치유사 투구"
+      },
+      "springmender_shoulder": {
+        "name": "샘물치유사 어깨갑옷"
+      },
+      "springmender_chest": {
+        "name": "샘물치유사 사슬갑옷"
+      },
+      "springmender_gloves": {
+        "name": "샘물치유사 건틀릿"
+      },
+      "springmender_legs": {
+        "name": "샘물치유사 다리갑옷"
+      },
+      "chronoweave_helmet": {
+        "name": "에테르직조 두건"
+      },
+      "chronoweave_shoulder": {
+        "name": "에테르직조 어깨걸이"
+      },
+      "chronoweave_chest": {
+        "name": "에테르직조 로브"
+      },
+      "chronoweave_gloves": {
+        "name": "에테르직조 손싸개"
+      },
+      "chronoweave_legs": {
+        "name": "에테르직조 다리싸개"
+      },
+      "pyroclast_helmet": {
+        "name": "화쇄류 두건"
+      },
+      "pyroclast_shoulder": {
+        "name": "화쇄류 어깨걸이"
+      },
+      "pyroclast_chest": {
+        "name": "화쇄류 로브"
+      },
+      "pyroclast_gloves": {
+        "name": "화쇄류 손싸개"
+      },
+      "pyroclast_legs": {
+        "name": "화쇄류 다리싸개"
+      },
+      "frostquench_helmet": {
+        "name": "서리담금질 두건"
+      },
+      "frostquench_shoulder": {
+        "name": "서리담금질 어깨걸이"
+      },
+      "frostquench_chest": {
+        "name": "서리담금질 로브"
+      },
+      "frostquench_gloves": {
+        "name": "서리담금질 손싸개"
+      },
+      "frostquench_legs": {
+        "name": "서리담금질 다리싸개"
+      },
+      "hexthread_helmet": {
+        "name": "저주실타래 두건"
+      },
+      "hexthread_shoulder": {
+        "name": "저주실타래 어깨걸이"
+      },
+      "hexthread_chest": {
+        "name": "저주실타래 로브"
+      },
+      "hexthread_gloves": {
+        "name": "저주실타래 손싸개"
+      },
+      "hexthread_legs": {
+        "name": "저주실타래 다리싸개"
+      },
+      "gravebrand_helmet": {
+        "name": "무덤낙인 두건"
+      },
+      "gravebrand_shoulder": {
+        "name": "무덤낙인 어깨걸이"
+      },
+      "gravebrand_chest": {
+        "name": "무덤낙인 로브"
+      },
+      "gravebrand_gloves": {
+        "name": "무덤낙인 손싸개"
+      },
+      "gravebrand_legs": {
+        "name": "무덤낙인 다리싸개"
+      },
+      "ruincaller_helmet": {
+        "name": "파멸의 부름 두건"
+      },
+      "ruincaller_shoulder": {
+        "name": "파멸의 부름 어깨걸이"
+      },
+      "ruincaller_chest": {
+        "name": "파멸의 부름 로브"
+      },
+      "ruincaller_gloves": {
+        "name": "파멸의 부름 손싸개"
+      },
+      "ruincaller_legs": {
+        "name": "파멸의 부름 다리싸개"
+      },
+      "moonscorch_helmet": {
+        "name": "달그을림 가죽두건"
+      },
+      "moonscorch_shoulder": {
+        "name": "달그을림 어깨보호구"
+      },
+      "moonscorch_chest": {
+        "name": "달그을림 튜닉"
+      },
+      "moonscorch_gloves": {
+        "name": "달그을림 손보호구"
+      },
+      "moonscorch_legs": {
+        "name": "달그을림 가죽바지"
+      },
+      "wildfang_emberhide_helmet": {
+        "name": "야생송곳니 가죽두건"
+      },
+      "wildfang_emberhide_shoulder": {
+        "name": "야생송곳니 어깨보호구"
+      },
+      "wildfang_emberhide_chest": {
+        "name": "야생송곳니 튜닉"
+      },
+      "wildfang_emberhide_gloves": {
+        "name": "야생송곳니 손보호구"
+      },
+      "wildfang_emberhide_legs": {
+        "name": "야생송곳니 가죽바지"
+      },
+      "cinderbark_helmet": {
+        "name": "잿불나무껍질 가죽두건"
+      },
+      "cinderbark_shoulder": {
+        "name": "잿불나무껍질 어깨보호구"
+      },
+      "cinderbark_chest": {
+        "name": "잿불나무껍질 튜닉"
+      },
+      "cinderbark_gloves": {
+        "name": "잿불나무껍질 손보호구"
+      },
+      "cinderbark_legs": {
+        "name": "잿불나무껍질 가죽바지"
+      },
+      "grovespring_helmet": {
+        "name": "숲의 샘 가죽두건"
+      },
+      "grovespring_shoulder": {
+        "name": "숲의 샘 어깨보호구"
+      },
+      "grovespring_chest": {
+        "name": "숲의 샘 튜닉"
+      },
+      "grovespring_gloves": {
+        "name": "숲의 샘 손보호구"
+      },
+      "grovespring_legs": {
+        "name": "숲의 샘 가죽바지"
+      },
+      "sigil_anvil_helmet": {
+        "name": "모루 투구 인장"
+      },
+      "sigil_ember_helmet": {
+        "name": "잉걸불 투구 인장"
+      },
+      "sigil_tempest_helmet": {
+        "name": "폭풍 투구 인장"
+      },
+      "sigil_anvil_shoulder": {
+        "name": "모루 어깨 인장"
+      },
+      "sigil_ember_shoulder": {
+        "name": "잉걸불 어깨 인장"
+      },
+      "sigil_tempest_shoulder": {
+        "name": "폭풍 어깨 인장"
+      },
+      "sigil_anvil_chest": {
+        "name": "모루 로브 인장"
+      },
+      "sigil_ember_chest": {
+        "name": "잉걸불 로브 인장"
+      },
+      "sigil_tempest_chest": {
+        "name": "폭풍 로브 인장"
+      },
+      "sigil_anvil_gloves": {
+        "name": "모루 장갑 인장"
+      },
+      "sigil_ember_gloves": {
+        "name": "잉걸불 장갑 인장"
+      },
+      "sigil_tempest_gloves": {
+        "name": "폭풍 장갑 인장"
+      },
+      "sigil_anvil_legs": {
+        "name": "모루 다리 인장"
+      },
+      "sigil_ember_legs": {
+        "name": "잉걸불 다리 인장"
+      },
+      "sigil_tempest_legs": {
+        "name": "폭풍 다리 인장"
+      },
+      "cord_of_the_last_flame": {
+        "name": "마지막 불꽃의 끈"
+      },
+      "cindersoaked_slippers": {
+        "name": "잿물배인 덧신"
+      },
+      "springbinder_sash": {
+        "name": "샘묶이 장식띠"
+      },
+      "steps_of_quiet_water": {
+        "name": "고요한 물의 발걸음"
+      },
+      "cinderbark_cinch": {
+        "name": "잿불나무껍질 허리끈"
+      },
+      "ashenbark_treads": {
+        "name": "잿빛나무껍질 신발"
+      },
+      "slagstalker_belt": {
+        "name": "용재추적자 허리띠"
+      },
+      "ashrunner_boots": {
+        "name": "재질주자 장화"
+      },
+      "moonscorch_waistwrap": {
+        "name": "달그을림 허리감개"
+      },
+      "scorchgrove_striders": {
+        "name": "그을린숲 활보자"
+      },
+      "grovetender_belt": {
+        "name": "숲지기 허리띠"
+      },
+      "dewfall_moccasins": {
+        "name": "이슬맺힌 신"
+      },
+      "forgewall_girdle": {
+        "name": "화로성벽 허리갑"
+      },
+      "anvilstance_sabatons": {
+        "name": "모루자세 강철신"
+      },
+      "warforged_waistguard": {
+        "name": "전쟁벼림 허리보호구"
+      },
+      "furnace_march_greaves": {
+        "name": "용광로 행군 다리보호구"
+      },
+      "stormkindled_chain": {
+        "name": "폭풍점화 사슬"
+      },
+      "thundershock_treads": {
+        "name": "천둥충격 신발"
+      },
+      "tidebinder_links": {
+        "name": "조수묶이 사슬고리"
+      },
+      "springwarden_sabatons": {
+        "name": "샘지기 강철신"
+      },
+      "pendant_of_the_first_tempering": {
+        "name": "첫 담금질의 목걸이"
+      },
+      "ignivars_ember_choker": {
+        "name": "이그니바르의 잉걸불 목걸이"
+      },
+      "locket_of_the_last_flame": {
+        "name": "마지막 불꽃의 로켓"
+      },
+      "heartspring_amulet": {
+        "name": "심장샘 부적"
+      },
+      "seal_of_the_forgewall": {
+        "name": "화로성벽 인장"
+      },
+      "band_of_marked_strikes": {
+        "name": "새겨진 일격의 반지"
+      },
+      "circle_of_cinders": {
+        "name": "잿불의 고리"
+      },
+      "loop_of_quiet_springs": {
+        "name": "고요한 샘의 고리"
+      },
+      "bulwark_of_the_inner_crucible": {
+        "name": "내부 도가니의 방벽"
+      },
+      "ember_wardens_barrier": {
+        "name": "잉걸불 수호자의 방벽"
+      },
+      "orb_of_the_last_spring": {
+        "name": "마지막 샘의 보주"
+      },
+      "cinder_of_the_first_design": {
+        "name": "최초 설계의 잿불"
+      },
+      "forgefathers_warhammer": {
+        "name": "벼림아버지의 전쟁망치"
+      },
+      "cinderfang_kris": {
+        "name": "잿불송곳니 크리스"
+      },
+      "slagrender_cleaver": {
+        "name": "용재절단 도끼"
+      },
+      "anvilguard_blade": {
+        "name": "모루수호 검"
+      },
+      "heart_of_the_end_greatblade": {
+        "name": "종말의 심장 대검"
+      },
+      "staff_of_the_last_spring": {
+        "name": "마지막 샘의 지팡이"
+      },
+      "forgefire_spire": {
+        "name": "화로불꽃 첨탑지팡이"
+      },
+      "springtouched_crozier": {
+        "name": "샘닿은 홀장"
+      },
+      "wand_of_quenched_sparks": {
+        "name": "꺼진 불꽃의 마법봉"
       },
       "conjured_water4": {
         "name": "창조된 샘물"
@@ -14897,6 +15522,11 @@ export const ko_KR: EnTranslations = {
         "name": "마엘린의 잔불 투영체",
         "title": "잔불 투영체",
         "greeting": "잔불이 마엘린의 목소리를 대장간 깊숙이 전합니다."
+      },
+      "crucible_quartermaster": {
+        "name": "군수담당관 브론 엠버워드",
+        "title": "도가니 군수담당관",
+        "greeting": "화로는 제 사람을 알아본다. 도가니의 인장을 가져오면 전장에 맞게 무장시켜 주지."
       },
       "brother_halven": {
         "name": "브라더 할벤",
@@ -18207,53 +18837,183 @@ export const ko_KR: EnTranslations = {
       }
     },
     "itemSets": {
+      "ashveil": {
+        "name": "잿빛 장막 복장",
+        "bonus2": "잠복자의 일격이 25% 더 큰 피해를 입힙니다.",
+        "bonus4": "장막 일격 동안 처음 사용하는 잠복자의 일격이 두 배 대신 세 배의 피해를 입힙니다."
+      },
+      "benison_dawnweave": {
+        "name": "축복의 새벽직조 예복",
+        "bonus2": "치천사의 수호의 구원 치유량이 180에서 270으로 증가합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
+        "bonus4": "치천사의 수호가 발동하면 보호받은 아군이 10초에 걸쳐 최대 생명력의 15%만큼 추가로 치유됩니다."
+      },
       "boundstone_vanguard": {
         "name": "속박석 선봉대",
         "bonus3": "공격 속도와 시전 속도가 15% 증가합니다."
       },
+      "chronoweave": {
+        "name": "에테르직조 예복",
+        "bonus2": "시간의 메아리가 단일 대상 비전 피해의 50%를 치유로 전환합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
+        "bonus4": "시간의 연쇄의 재사용 대기시간이 5초 감소합니다."
+      },
+      "cinderbark": {
+        "name": "잿불나무껍질 수호구",
+        "bonus2": "휩쓰는 발톱이 30% 확률로 오랜 피를 1단계 더 쌓습니다.",
+        "bonus4": "골수분쇄의 피해가 30% 증가하며, 비상 보호막이 더 이상 타격을 대체하지 않습니다."
+      },
+      "cinderfang": {
+        "name": "잉걸송곳니 장막",
+        "bonus2": "맹독 의식이 타격마다 돌려주는 기력이 20으로 증가합니다.",
+        "bonus4": "맹독 다트의 재사용 대기시간이 4초로 감소합니다."
+      },
+      "coldsight_trackers": {
+        "name": "냉정한 시선 추적 장구",
+        "bonus2": "정밀 사격이 집중을 5 추가로 회복합니다.",
+        "bonus4": "긴 시위의 치명타가 냉정한 집중을 2초 연장합니다. 지속시간마다 최대 6초까지 연장됩니다."
+      },
       "crownforged": {
         "name": "뼈벼림 전투장비",
-        "bonus2": "전투력이 40만큼 증가합니다.",
-        "bonus3": "힘이 15, 체력이 15만큼 증가하고 공격 속도와 시전 속도가 15% 증가합니다.",
-        "bonus4": "무기 치명타 적중 시 대상에게 \"뼈 파편\"을 남겨 12초 동안 2초마다 8의 출혈 피해를 입힙니다. 최대 3번 중첩됩니다."
+        "bonus2": "힘이 10, 체력이 10만큼 증가합니다.",
+        "bonus4": "전투력이 25만큼 증가합니다. 무기 치명타 적중 시 50% 확률로 \"무덤의 위력\"이 발동하여 전투력이 40만큼 증가합니다. 10초 동안 지속됩니다.",
+        "bonus6": "공격 및 시전 속도가 4%, 적중이 3% 증가합니다. 무기 치명타 적중 시 대상에게 \"뼈 파편\"을 남겨 12초 동안 2초마다 5의 출혈 피해를 입힙니다. 최대 3번 중첩됩니다."
+      },
+      "dawnforged": {
+        "name": "새벽벼림 예복",
+        "bonus2": "빛의 봉화가 직접 치유의 55%를 복제합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
+        "bonus4": "광휘의 공명으로 강화된 여명의 포옹이 즉시 시전됩니다."
       },
       "deathlord": {
         "name": "고분군주의 전투장비",
-        "bonus2": "전투력이 40만큼 증가합니다.",
-        "bonus3": "힘이 15, 체력이 15만큼 증가합니다.",
-        "bonus4": "무기 치명타 적중 시 50% 확률로 \"무덤의 위력\"이 발동하여 전투력이 60만큼 증가합니다. 10초 동안 지속됩니다."
+        "bonus2": "힘이 10, 체력이 10만큼 증가합니다.",
+        "bonus4": "전투력이 25만큼 증가합니다. 무기 치명타 적중 시 50% 확률로 \"무덤의 위력\"이 발동하여 전투력이 40만큼 증가합니다. 10초 동안 지속됩니다.",
+        "bonus6": "공격 및 시전 속도가 4%, 적중이 3% 증가합니다. 무기 치명타 적중 시 대상에게 \"뼈 파편\"을 남겨 12초 동안 2초마다 5의 출혈 피해를 입힙니다. 최대 3번 중첩됩니다."
+      },
+      "emberfury": {
+        "name": "잉걸불 분노 마구",
+        "bonus2": "격노의 지속시간이 4초에서 6초로 늘어납니다.",
+        "bonus4": "사혈이 항상 당신을 격노시키며, 회복량이 최대 생명력의 8%로 증가합니다."
+      },
+      "emberscreed": {
+        "name": "잉걸불 신조 예복",
+        "bonus2": "수양의 연결이 신성 피해의 10%를 추가로 치유로 전환합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
+        "bonus4": "수호의 성가가 완전히 소모되면 10초 이내의 다음 정화의 성가가 즉시 시전됩니다. 이 효과는 15초에 한 번만 발동합니다."
+      },
+      "forgewall": {
+        "name": "벼림벽 아이기스",
+        "bonus2": "강철 의지가 분노 1점당 4 대신 5의 흡수로 전환합니다.",
+        "bonus4": "방패 강타를 시전할 때마다 강철 의지의 남은 재사용 대기시간이 2초 감소합니다."
+      },
+      "frostquench": {
+        "name": "서리담금질 직조복",
+        "bonus2": "서리 창이 치명타로 적중하면 고드름을 하나 더 저장합니다. 최대치는 5개로 유지됩니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
+        "bonus4": "겨울의 채찍이 혹한의 추위를 2중첩 대신 3중첩 부여합니다."
+      },
+      "gravebrand": {
+        "name": "무덤낙인 예장",
+        "bonus2": "수확의 명령의 재사용 대기시간이 2초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
+        "bonus4": "수확의 명령의 일제 공격이 25% 더 큰 피해를 입힙니다."
       },
       "greyjaw_stalker": {
         "name": "그레이죠 추적자의 장비",
         "bonus3": "공격 속도와 시전 속도가 15% 증가합니다."
       },
+      "grovespring": {
+        "name": "숲샘 예복",
+        "bonus2": "신속한 치유가 자신의 야생 개화나 두 번째 개화를 먼저 소모하며, 치유량이 25% 증가합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
+        "bonus4": "만개가 남은 효과의 75%를 수확하고, 그 후 푸른 생장을 1단계 쌓습니다."
+      },
+      "hexthread": {
+        "name": "주술실 장막",
+        "bonus2": "운명의 바늘이 단죄를 2 추가로 생성합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
+        "bonus4": "선고를 내리면 단죄 10을 돌려받습니다."
+      },
+      "moonscorch": {
+        "name": "달그을림 예복",
+        "bonus2": "달씨앗이 달빛 폭풍을 적용 한 번당 두 번까지 연장할 수 있으며, 최대 12초까지 늘어납니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
+        "bonus4": "달의 격동과 해돋움의 피해가 25% 증가합니다."
+      },
       "necromancers": {
         "name": "비탄직물 의복",
-        "bonus2": "주문력이 20 증가합니다. 피해를 입어도 주문 시전이 지연되지 않습니다 (시전 지연 저항 100%).",
-        "bonus3": "지능이 10, 체력이 10만큼 증가합니다.",
-        "bonus4": "주문 사용 시 10% 확률로 \"선명한 시전\"이 발동하여 다음 주문을 무료로 시전합니다."
+        "bonus2": "지능이 10, 정신력이 10만큼 증가합니다. 피해를 입어도 주문 시전 지연이 절반으로 줄어듭니다 (시전 지연 저항 50%).",
+        "bonus4": "주문력이 12 증가합니다. 주문 사용 시 6% 확률로 \"선명한 시전\"이 발동하여 다음 주문을 무료로 시전합니다.",
+        "bonus6": "공격 및 시전 속도가 4% 증가합니다. 주문 사용 시 10% 확률로 \"영혼의 불길\"이 발동하여 주문력이 25만큼 증가합니다. 10초 동안 지속됩니다."
       },
       "nighttalon": {
         "name": "흉포송곳니 가죽장비",
-        "bonus2": "전투력이 40만큼 증가합니다.",
-        "bonus3": "민첩이 15, 치명타 확률이 2% 증가하고 공격 속도와 시전 속도가 15% 증가합니다.",
-        "bonus4": "무기 치명타 적중 시 \"찢어진 상처\"를 내어 대상이 12초 동안 2초마다 6의 출혈 피해를 입습니다. 최대 3번 중첩됩니다."
+        "bonus2": "민첩성이 10만큼 증가하고 치명타 확률이 1% 증가합니다.",
+        "bonus4": "전투력이 25만큼 증가합니다. 무기 치명타 적중 시 50% 확률로 \"송곳니 질주\"가 발동하여 공격 속도가 15% 증가합니다. 8초 동안 지속됩니다.",
+        "bonus6": "공격 및 시전 속도가 4%, 적중이 3% 증가합니다. 무기 치명타 적중 시 \"찢어진 상처\"를 내어 대상이 12초 동안 2초마다 4의 출혈 피해를 입습니다. 최대 3번 중첩됩니다."
+      },
+      "oathpyre": {
+        "name": "맹세화염 보루",
+        "bonus2": "맹세수호자의 일격이 태양의 응보를 발동시킬 확률이 30%로 증가하고, 공격을 방패로 막으면 40% 확률로 발동합니다.",
+        "bonus4": "태양의 응보를 소모하면 최대 생명력의 6%를 흡수하는 보호막을 10초 동안 얻습니다."
+      },
+      "packlord_emberhide": {
+        "name": "무리군주 잉걸가죽",
+        "bonus2": "무리 명령의 재사용 대기시간이 3초로 감소합니다.",
+        "bonus4": "무리 명령이 야수 쇄도의 재사용 대기시간을 초기화할 확률이 30%로 증가합니다."
+      },
+      "pyroclast": {
+        "name": "화쇄류 예장",
+        "bonus2": "그을리기가 생명력이 35% 이하인 대상에게 항상 치명타로 적중합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
+        "bonus4": "불사조의 무아지경이 활성화되지 않은 동안 화염 주문이 치명타로 적중하면 남은 재사용 대기시간이 1.5초 감소합니다."
+      },
+      "ruincaller": {
+        "name": "파멸부름 예복",
+        "bonus2": "점화가 충전을 3회 담아 둡니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
+        "bonus4": "파멸 화살의 피해가 20% 증가합니다."
+      },
+      "slagbreaker": {
+        "name": "광재파쇄자 전투복",
+        "bonus2": "붉은 손이 다음 불구의 일격을 중첩당 20% 대신 30% 강화합니다.",
+        "bonus4": "붉은 손을 두 번 시전할 때마다 돌파자의 남은 재사용 대기시간이 3초 감소합니다."
+      },
+      "slagsnare": {
+        "name": "용재올가미 장구",
+        "bonus2": "내장 가르기가 집중을 20 생성합니다.",
+        "bonus4": "사냥의 기세를 3중첩 소모하는 상처 가르기가 중첩을 보존합니다. 이 효과는 8초에 한 번만 발동합니다."
+      },
+      "smolderstrike": {
+        "name": "불씨타격 가죽 갑옷",
+        "bonus2": "헤이메이커가 20% 더 큰 피해를 입힙니다.",
+        "bonus4": "소등을 시전할 때마다 폭풍의 칼날의 남은 재사용 대기시간이 6초 감소합니다."
       },
       "soulflame": {
         "name": "망령불꽃 의복",
-        "bonus2": "주문력이 20 증가합니다. 피해를 입어도 주문 시전이 지연되지 않습니다 (시전 지연 저항 100%).",
-        "bonus3": "지능이 15, 정신력이 15만큼 증가하고 공격 속도와 시전 속도가 15% 증가합니다.",
-        "bonus4": "주문 사용 시 10% 확률로 \"영혼의 불길\"이 발동하여 주문력이 40만큼 증가합니다. 10초 동안 지속됩니다."
+        "bonus2": "지능이 10, 정신력이 10만큼 증가합니다. 피해를 입어도 주문 시전 지연이 절반으로 줄어듭니다 (시전 지연 저항 50%).",
+        "bonus4": "주문력이 12 증가합니다. 주문 사용 시 6% 확률로 \"선명한 시전\"이 발동하여 다음 주문을 무료로 시전합니다.",
+        "bonus6": "공격 및 시전 속도가 4% 증가합니다. 주문 사용 시 10% 확률로 \"영혼의 불길\"이 발동하여 주문력이 25만큼 증가합니다. 10초 동안 지속됩니다."
+      },
+      "springmender": {
+        "name": "샘치유 비늘갑옷",
+        "bonus2": "해일 부름의 재사용 대기시간이 4초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
+        "bonus4": "물결 치유가 네 번째 아군에게 닿고 치유의 흐름을 150%로 거두어들입니다."
+      },
+      "stonehearth": {
+        "name": "돌화로 보루",
+        "bonus2": "바위결속 상태에서는 폭풍시전 치유의 물결이 마나를 소모하지 않고 치유량이 25% 증가합니다.",
+        "bonus4": "바위결속 상태에서 전령의 박자를 완성하면 최대 생명력의 3%만큼 치유됩니다."
       },
       "stormcallers": {
         "name": "강풍부름 의복",
-        "bonus2": "주문력이 20 증가합니다. 피해를 입어도 주문 시전이 지연되지 않습니다 (시전 지연 저항 100%).",
-        "bonus3": "지능이 15, 정신력이 15만큼 증가하고 공격 속도와 시전 속도가 15% 증가합니다.",
-        "bonus4": "주문 사용 시 10% 확률로 \"영혼의 불길\"이 발동하여 주문력이 40만큼 증가합니다. 10초 동안 지속됩니다."
+        "bonus2": "지능이 10, 정신력이 10만큼 증가합니다. 피해를 입어도 주문 시전 지연이 절반으로 줄어듭니다 (시전 지연 저항 50%).",
+        "bonus4": "주문력이 12 증가합니다. 주문 사용 시 6% 확률로 \"선명한 시전\"이 발동하여 다음 주문을 무료로 시전합니다.",
+        "bonus6": "공격 및 시전 속도가 4% 증가합니다. 주문 사용 시 10% 확률로 \"영혼의 불길\"이 발동하여 주문력이 25만큼 증가합니다. 10초 동안 지속됩니다."
+      },
+      "stormkindled": {
+        "name": "폭풍점화 예장",
+        "bonus2": "화염낙인 상태에서 무기 해방 사용 시 천둥을 3 얻습니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
+        "bonus4": "대지의 충격의 천둥당 보너스가 30%로 증가합니다."
       },
       "vale_arcanist": {
         "name": "계곡 비전술사의 예복",
         "bonus3": "공격 속도와 시전 속도가 15% 증가합니다."
+      },
+      "vesperash": {
+        "name": "만과의 잿가루 장막",
+        "bonus2": "십일조 악마 소환의 재사용 대기시간이 6초 감소합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
+        "bonus4": "십일조 악마를 소환하면 정신 파열의 재사용 대기시간이 초기화되고, 십일조 악마가 공격할 때마다 회복하는 마나가 두 배가 됩니다."
       },
       "warfare_ashstalker": {
         "name": "잿빛추적자의 장비",
@@ -18285,11 +19045,26 @@ export const ko_KR: EnTranslations = {
         "bonus4": "워페어 공격 등급이 40 증가하고, 적대 플레이어가 당신에게 거는 군중 제어의 지속시간이 15% 짧아집니다.",
         "bonus7": "워페어 공격 및 방어 등급이 80 증가합니다. 주문에 15% 확률로 가시 수호가 깃들어 회피가 6초 동안 15% 증가합니다."
       },
+      "warspirit_emberscale": {
+        "name": "전령 잉걸비늘 갑주",
+        "bonus2": "선조의 일격이 전령의 박자를 3단계 진행시킵니다.",
+        "bonus4": "선조의 일격의 피해가 30% 증가합니다."
+      },
+      "wildfang_emberhide": {
+        "name": "야생송곳니 잉걸가죽",
+        "bonus2": "피의 수확이 회복시키는 기력이 30에서 45로 증가합니다.",
+        "bonus4": "피의 수확이 대상에게 새로운 저미기를 남깁니다."
+      },
       "wyrmshadow": {
         "name": "밤송곳니 의복",
-        "bonus2": "전투력이 40만큼 증가합니다.",
-        "bonus3": "민첩이 15, 치명타 확률이 2% 증가합니다.",
-        "bonus4": "무기 치명타 적중 시 50% 확률로 \"송곳니 질주\"가 발동하여 공격 속도가 25% 증가합니다. 8초 동안 지속됩니다."
+        "bonus2": "민첩성이 10만큼 증가하고 치명타 확률이 1% 증가합니다.",
+        "bonus4": "전투력이 25만큼 증가합니다. 무기 치명타 적중 시 50% 확률로 \"송곳니 질주\"가 발동하여 공격 속도가 15% 증가합니다. 8초 동안 지속됩니다.",
+        "bonus6": "공격 및 시전 속도가 4%, 적중이 3% 증가합니다. 무기 치명타 적중 시 \"찢어진 상처\"를 내어 대상이 12초 동안 2초마다 4의 출혈 피해를 입습니다. 최대 3번 중첩됩니다."
+      },
+      "zealfire": {
+        "name": "열화신념 전쟁갑주",
+        "bonus2": "최후의 칙령과 여명 강하가 서로의 남은 재사용 대기시간을 2초 대신 3초 감소시킵니다.",
+        "bonus4": "여명의 격노 중에 시전한 분노의 망치가 20% 대신 40% 더 큰 피해를 입힙니다."
       }
     }
   },

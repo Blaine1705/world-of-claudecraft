@@ -4473,6 +4473,7 @@ const ALL_DELTA_KEYS = [
   'hbl',
   'hirat',
   'honor',
+  'hpw',
   'hrat',
   'inv',
   'lhonor',
@@ -5468,7 +5469,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 86 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 87 unique keys in sorted order', () => {
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
     // sheet's lifetime played-time key ptime, for 67, then +16: the static
@@ -5480,16 +5481,15 @@ describe('delta-key contract pins (anti-drift)', () => {
     // modular look, which cannot come from the entity list because the
     // broadcast loop skips the viewer's own entity, and which is heavy and
     // immutable so it rides this channel instead of re-serializing per tick),
-    // for 86, then +1: the Materials Vault's owner-only vault key
-    // (bank-storage phase 02), +1: the craft-from-vault cvault key
-    // (bank-storage phase 04, context-gated), and +1: the always-available
-    // owner-only ladder key bpsl (bank-storage phase 15, the one bank-family
-    // key with NO proximity gate, emitted for the VIEWING session rather than
-    // the spectate anchor). The release arm's Vale Cup retirement then removes
-    // sport/vcup/vcupb. Every release sync conflicts here because each side
-    // pins its own additions alone; this number is MEASURED on the merged tree.
-    expect(ALL_DELTA_KEYS).toHaveLength(86);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(86);
+    // for 86. Every v0.36.0 sync conflicts here because each side pins its own
+    // additions alone; the merged tree carries all of them, and this number
+    // came from a run on the merged tree. The New Eastbrook program's Vale Cup
+    // retirement then removes sport/vcup/vcupb, for 83, and the healPower
+    // seam adds the derived Healing Power scalar hpw for 84. Bank Storage
+    // Phase 2 then adds the purchased-slots key bpsl, the Materials Vault
+    // blob vault, and the craft-vault stock cvault, for 87.
+    expect(ALL_DELTA_KEYS).toHaveLength(87);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(87);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -5557,16 +5557,11 @@ describe('delta-key contract pins (anti-drift)', () => {
     // key ptime for 67, then the 16 static combat-rating/progression scalars
     // (ap/sp/sh/crit/dodge/blk/bval/crat/hrat/hirat/xp/lxp/rxp/prk/copper/ddiff)
     // for 83, then reliq (Reliquary Phase 3 sparse blob) for 84, the nameplate
-    // border echo aborder for 85, and the authored modular look `app` for 86,
-    // then the Materials Vault's vault key for 87, the craft-from-vault cvault
-    // key for 88 and the always-available ladder key bpsl for 89, less the three
-    // the Vale Cup retirement removes (sport/vcup/vcupb), for 86.
-    expect(scraped.size).toBe(86);
-    // Both halves of the relocated bank family are still in reach. These two
-    // are what the phase 15 extraction broke, so they are named rather than
-    // left to the set compare.
-    expect(scraped.has('bank')).toBe(true);
-    expect(scraped.has('bpsl')).toBe(true);
+    // border echo aborder for 85, and the authored modular look `app` for 86.
+    // The Vale Cup retirement then removes sport/vcup/vcupb, for 83, and the
+    // healPower seam adds the derived Healing Power scalar hpw for 84. Bank
+    // Storage Phase 2 then adds bpsl, vault, and cvault, for 87.
+    expect(scraped.size).toBe(87);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
