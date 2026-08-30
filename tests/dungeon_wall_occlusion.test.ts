@@ -221,6 +221,67 @@ describe('updateWallOcclusion, backface twin staging', () => {
     expect(occluderFadeReady(h.mats, 'prefetch')).toBe(true);
   });
 
+  it('holds the re-show HIDDEN while a staged compile is still pending, then releases on the settle', async () => {
+    const { host, compiles } = fakeHost();
+    installOccluderFadeGate(host);
+    const h = backfaceHideable();
+    // Frame 1, camera inside: the staging fires, but the links stay PENDING
+    // (a congested reveal lane can hold a link for seconds).
+    updateWallOcclusion([h], [], 0, 4, -40, 0, 2, -20, DT);
+    expect(compiles).toHaveLength(h.mats.length);
+    // Outside: the wall culls outright, drawing nothing.
+    updateWallOcclusion([h], [], 0, 4, -70, 0, 2, -40, DT);
+    expect(h.group.visible).toBe(false);
+    expect(h.alpha).toBe(0);
+    // Back inside while the compiles are STILL pending: the re-show must
+    // hold the wall hidden rather than draw a transparent twin whose
+    // program has not linked (the synchronous-link race).
+    updateWallOcclusion([h], [], 0, 4, -40, 0, 2, -20, DT);
+    expect(h.hidden).toBe(false);
+    expect(h.group.visible).toBe(false);
+    expect(h.alpha).toBe(0);
+    // The held edge frame escalates the pending prefetch keys to the
+    // actionable floor, once per key.
+    expect(compiles).toHaveLength(2 * h.mats.length);
+    // ... and keeps holding across frames without asking again.
+    updateWallOcclusion([h], [], 0, 4, -40, 0, 2, -20, DT);
+    expect(h.group.visible).toBe(false);
+    expect(h.alpha).toBe(0);
+    expect(compiles).toHaveLength(2 * h.mats.length);
+    // The links settle: the ease-back runs normally from the next frame.
+    for (const c of compiles) c.resolve();
+    await flush();
+    updateWallOcclusion([h], [], 0, 4, -40, 0, 2, -20, DT);
+    expect(h.group.visible).toBe(true);
+    expect(h.alpha).toBeGreaterThan(0);
+    for (const f of h.mats) expect(f.mat.transparent).toBe(true);
+    for (let i = 0; i < 400 && h.alpha < 1; i++) {
+      updateWallOcclusion([h], [], 0, 4, -40, 0, 2, -20, DT);
+    }
+    expect(h.alpha).toBe(1);
+    expect(h.mats[0].mat.transparent).toBe(false);
+  });
+
+  it('reduced motion restores straight to the authored opaque state without waiting on the gate', () => {
+    // The one-step reduced-motion re-show never draws the transparent twin
+    // (alpha jumps 0 to 1, which restores the authored state), so a pending
+    // link must not delay it.
+    const { host, compiles } = fakeHost();
+    installOccluderFadeGate(host);
+    const h = backfaceHideable();
+    updateWallOcclusion([h], [], 0, 4, -40, 0, 2, -20, DT, true);
+    updateWallOcclusion([h], [], 0, 4, -70, 0, 2, -40, DT, true);
+    expect(h.group.visible).toBe(false);
+    // Links still pending; the reduced-motion re-show is immediate anyway.
+    updateWallOcclusion([h], [], 0, 4, -40, 0, 2, -20, DT, true);
+    expect(h.group.visible).toBe(true);
+    expect(h.alpha).toBe(1);
+    expect(h.mats[0].mat.transparent).toBe(false);
+    expect(h.mats[0].mat.opacity).toBe(1);
+    // No escalation either: nothing transparent was ever about to draw.
+    expect(compiles).toHaveLength(h.mats.length);
+  });
+
   it('the sightline arm keeps its reach latch: a far no-backface wall stages nothing', () => {
     const { host, compiles } = fakeHost();
     installOccluderFadeGate(host);

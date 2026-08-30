@@ -17,6 +17,7 @@ import {
   advanceOccluderFade,
   applyOccluderFade,
   type OccluderFadeMat,
+  occluderFadeReady,
   prefetchOccluderFadeWithin,
   stageOccluderFadeOnce,
 } from './occluder_fade';
@@ -117,20 +118,33 @@ export function updateWallOcclusion(
     const hide = cameraSeesWallBack(h.backface, camX, camZ);
     h.hidden = hide;
     if (occluderFadeSettled(h.alpha, hide, 0)) continue;
-    h.alpha = stepOccluderFade(h.alpha, hide, dt, reducedMotion, 0);
+    const next = stepOccluderFade(h.alpha, hide, dt, reducedMotion, 0);
+    // The re-show OUT of the fully hidden state is the one frame that would
+    // draw the transparent twin cold if the staged link is still pending (a
+    // congested reveal lane can hold one for seconds), so it consults
+    // readiness for every exact twin and HOLDS while any is not: the wall is
+    // invisible at alpha 0, so holding it hidden a few frames longer cannot
+    // pop anything, and the edge consult escalates the pending prefetch to
+    // the actionable floor. Scoped to alpha 0 with a mid-range step on
+    // purpose: a mid-ease wall is already visibly transparent (holding it
+    // WOULD pop, the documented rationale below), and the reduced-motion
+    // re-show steps straight to 1, which restores the authored OPAQUE state
+    // and never draws the twin, so neither waits on the gate.
+    if (h.alpha === 0 && next > 0 && next < 1 && !occluderFadeReady(h.mats, 'edge')) continue;
+    h.alpha = next;
     applyOccluderFade(h.mats, h.alpha);
     // At rest a culled wall stops drawing outright: the fade keeps
     // depthWrite on (correct for the visible ghost), and an invisible
     // depth-writing wall would clip mis-sorted transparent content behind
     // it (the arena's lava moat). Program cost: the opaque program linked
     // at interior attach; the TRANSPARENT twin programs are pre-staged by
-    // the stageOccluderFadeOnce above, so the first re-show finds them
-    // already linked instead of paying a synchronous link inside that
-    // frame. The ungated floor step itself stays deliberate: the hide
-    // frame never draws the transparent twin (the group hides outright),
-    // and holding the ease-back while the group is already visible again
-    // would pop the wall back at full opacity, so a gate HOLD has nothing
-    // here to protect. The staging is what removes the link, not a gate.
+    // the stageOccluderFadeOnce above and the re-show out of alpha 0 waits
+    // on their readiness, so no draw here ever links a program inside a
+    // camera frame. The ungated apply below the readiness hold stays
+    // deliberate: the hide frame never draws the transparent twin (the
+    // group hides outright), and holding the ease-back while the group is
+    // already VISIBLE would pop the wall back at full opacity, so the hold
+    // exists only where nothing is showing.
     const show = h.alpha > 0;
     if (h.group.visible !== show) h.group.visible = show;
   }

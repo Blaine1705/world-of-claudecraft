@@ -21,8 +21,9 @@
 // prewarm runs; their first fade goes through the fade gate instead
 // (occluder_fade_gate.ts), which links the twin before the flip, and the raid
 // shells' backface walls stage their twins through the same gate on their
-// first advanced frame (stageOccluderFadeOnce in dungeon_wall_occlusion.ts),
-// because their re-show writes the flip ungated.
+// first advanced frame (stageOccluderFadeOnce in dungeon_wall_occlusion.ts)
+// and hold their re-show out of the fully hidden state until every twin is
+// ready, so the flip never draws a program the stage has not linked.
 //
 // One twin per distinct PROGRAM, not per ghost material: see
 // occluderGhostVariantKey for why a town of thousands of per-structure clones

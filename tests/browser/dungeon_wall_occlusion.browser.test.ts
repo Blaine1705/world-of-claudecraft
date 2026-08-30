@@ -1,12 +1,15 @@
 // The raid-shell backface wall's outside-to-inside first re-show on a real
 // WebGL driver: the browser half of the twin-staging contract in
-// tests/dungeon_wall_occlusion.test.ts. The backface arm writes its flip to
-// transparent UNGATED (rationale in dungeon_wall_occlusion.ts), so the staged
-// warm on the first advanced frame is what must leave NO synchronous program
-// link for the first re-show frame to pay. Observable directly here:
+// tests/dungeon_wall_occlusion.test.ts. The staged warm on the first advanced
+// frame plus the readiness hold on the re-show out of the fully hidden state
+// (rationale in dungeon_wall_occlusion.ts) must leave NO synchronous program
+// link for any camera frame to pay. Observable directly here:
 // renderer.info.programs.length grows when a draw links a program, so the
 // control wall (no gate installed, nothing staged) proves the harness sees
-// the re-show link, and the staged wall proves the staging removed it.
+// the re-show link, and the staged wall proves the staging plus the hold
+// removed it. The treatment host DEFERS its compiles the way the production
+// reveal lane does (a queued link can sit for seconds), so the held re-show
+// while both links are pending is exercised against the real driver too.
 import * as THREE from 'three';
 import { afterEach, describe, expect, it } from 'vitest';
 import { updateWallOcclusion, type WallHideable } from '../../src/render/dungeon_wall_occlusion';
@@ -169,37 +172,62 @@ describe('backface wall twin staging on a real WebGL driver', () => {
     expect(afterControl).toBe(baseline + 1);
 
     // TREATMENT: the production shape. The gate is installed (the renderer
-    // does this beside its reveal gates); its compile host links the twin
-    // through the real driver, hidden in the scene like the reveal host does.
+    // does this beside its reveal gates); its compile host DEFERS like the
+    // real reveal lane and links each twin through the real driver only when
+    // the lane drains, hidden in the scene like the reveal host does.
     const twinStaging = new THREE.Group();
     twinStaging.name = 'twin-staging';
     twinStaging.visible = false;
     scene.add(twinStaging);
+    const pendingLinks: { root: THREE.Object3D; resolve: () => void }[] = [];
     installOccluderFadeGate({
-      compile: (root: object) => {
-        twinStaging.add(root as THREE.Object3D);
-        renderer.compile(scene, camera);
-        return Promise.resolve();
-      },
+      compile: (root: object) =>
+        new Promise<void>((resolve) => {
+          pendingLinks.push({ root: root as THREE.Object3D, resolve });
+        }),
       schedule: () => () => undefined,
     });
+    const drainLinks = (): void => {
+      for (const link of pendingLinks.splice(0)) {
+        twinStaging.add(link.root);
+        renderer.compile(scene, camera);
+        link.resolve();
+      }
+    };
 
-    // The first advanced frame, camera still inside: the staging links one
-    // transparent twin per record (the instanced standard program and the
-    // plain lambert one), off the actionable frame.
+    // The first advanced frame, camera still inside: the staging requests
+    // one transparent twin per record (the instanced standard program and
+    // the plain lambert one); the lane holds both links for now.
     advance(staged, INSIDE);
-    const stagedCount = programCount();
-    expect(stagedCount).toBe(afterControl + 2);
-    await flush();
-    expect(occluderFadeReady(staged.mats, 'prefetch')).toBe(true);
+    expect(pendingLinks).toHaveLength(2);
+    expect(programCount()).toBe(afterControl);
 
     // Outside: the wall culls outright, drawing nothing.
     advance(staged, OUTSIDE);
     expect(staged.group.visible).toBe(false);
     renderer.render(scene, camera);
-    expect(programCount()).toBe(stagedCount);
+    expect(programCount()).toBe(afterControl);
 
-    // Back inside: the FIRST re-show frame draws both wall materials
+    // Back inside while both links are STILL pending: the re-show holds the
+    // wall hidden (nothing to pop at alpha 0), so this camera frame draws no
+    // transparent twin and links nothing on the real driver. The held edge
+    // consult escalates each pending key once.
+    advance(staged, INSIDE);
+    expect(staged.group.visible).toBe(false);
+    expect(staged.alpha).toBe(0);
+    expect(pendingLinks).toHaveLength(4);
+    renderer.render(scene, camera);
+    expect(programCount()).toBe(afterControl);
+
+    // The lane drains: the twins link through the real driver OFF the
+    // camera frame (the escalated duplicates are driver cache hits).
+    drainLinks();
+    await flush();
+    const stagedCount = programCount();
+    expect(stagedCount).toBe(afterControl + 2);
+    expect(occluderFadeReady(staged.mats, 'prefetch')).toBe(true);
+
+    // The next advanced frame re-shows: both wall materials draw
     // transparent with ZERO new program links; the staged twins already
     // linked the exact programs this draw asks for.
     advance(staged, INSIDE);

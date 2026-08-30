@@ -491,15 +491,18 @@ describe('wiring (source pins)', () => {
     expect(dungeon).not.toContain('advanceOccluderFade(');
     // The wall driver gates every sightline fade; the raid backface cull is
     // the pinned exception (its hide frame never draws the transparent twin,
-    // it hides the group outright, and gating the ease-back would pop the
-    // re-shown wall opaque; rationale in dungeon_wall_occlusion.ts). The
-    // ungated floor step is paid for by STAGING: the arm's first advanced
-    // frame stages a twin for every record it will flip, so the first
-    // re-show pays no synchronous link. The staged set and the flipped set
-    // are pinned to the SAME expression (h.mats): a backface material a
-    // registration adds lands in h.mats or the flip cannot touch it either.
-    // Exactly the two floor steps (wall arm, prop arm), the one wall-arm
-    // apply, and the one unconditional stage.
+    // it hides the group outright, and gating the ease-back while VISIBLE
+    // would pop the re-shown wall opaque; rationale in
+    // dungeon_wall_occlusion.ts). The exception is paid for two ways: the
+    // arm's first advanced frame STAGES a twin for every record it will
+    // flip, and the re-show out of the fully hidden state CONSULTS
+    // readiness (an edge consult, so a pending prefetch escalates) and
+    // holds the wall hidden until every exact twin is ready. The staged
+    // set, the consulted set, and the flipped set are pinned to the SAME
+    // expression (h.mats): a backface material a registration adds lands in
+    // h.mats or the flip cannot touch it either. Exactly the two floor
+    // steps (wall arm, prop arm), the one wall-arm apply, the one
+    // unconditional stage, and the one re-show readiness consult.
     const walls = read('src/render/dungeon_wall_occlusion.ts');
     expect(walls).toContain('advanceOccluderFade(');
     expect(walls).toContain('prefetchOccluderFadeWithin(');
@@ -510,6 +513,19 @@ describe('wiring (source pins)', () => {
     expect(walls.match(/stageOccluderFadeOnce\(/g)).toHaveLength(1);
     expect(walls).toContain('stageOccluderFadeOnce(h.mats)');
     expect(walls).toContain('applyOccluderFade(h.mats, h.alpha)');
+    // The re-show flip consults readiness while the wall is still fully
+    // hidden (alpha 0), and only there: the hold cannot pop what is not
+    // showing, and a mid-ease (visible) wall never waits.
+    expect(walls.match(/occluderFadeReady\(/g)).toHaveLength(1);
+    expect(walls).toContain("!occluderFadeReady(h.mats, 'edge')");
+    expect(walls).toContain(
+      "if (h.alpha === 0 && next > 0 && next < 1 && !occluderFadeReady(h.mats, 'edge')) continue;",
+    );
+    // The consult sits AFTER the step and BEFORE the apply: it decides
+    // whether this frame writes, never how far the fade has eased.
+    expect(walls.indexOf("!occluderFadeReady(h.mats, 'edge')")).toBeLessThan(
+      walls.indexOf('applyOccluderFade(h.mats, h.alpha)'),
+    );
     // The stage sits BEFORE the settled early-out, so it cannot wait on the
     // first hide: a wall whose camera starts inside is staged all the same.
     expect(walls.indexOf('stageOccluderFadeOnce(h.mats)')).toBeLessThan(
