@@ -55,6 +55,7 @@ import {
 import { canStackInstancePayloads, itemInstancePayloadsEqual } from './item_instance_merge';
 import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
 import { isItemLocked } from './item_lock';
+import { withoutPartyTradeMarker } from './loot/bop_trade_window';
 import { mountOwned, summonMountItem } from './mounts';
 import { learnRiding } from './mounts_training';
 import { battlefieldExperienceTrickle } from './professions/battlefield_xp';
@@ -110,14 +111,16 @@ function equipmentPayloadFor(unit: EquippedInventoryUnit): ItemInstancePayload |
   if (!unit.instance && unit.craftedRecipeId === undefined) return undefined;
   // Equipping ends the bind-on-pickup party trade window for good: the worn
   // payload never carries it, so the copy returned to bags on unequip
-  // (returnEquippedItemToBags) is permanently window-free. Strip on a clone;
-  // the consumed bag unit's own payload is never mutated.
-  const { partyTrade: _partyTrade, ...instance } = unit.instance
-    ? cloneItemInstancePayload(unit.instance)
-    : ({} as ItemInstancePayload);
-  if (Object.keys(instance).length === 0 && unit.craftedRecipeId === undefined) return undefined;
+  // (returnEquippedItemToBags) is permanently window-free. Strip on a clone
+  // through the SHARED helper (the persisted-equipment load arm in
+  // Sim.addPlayer applies the same one); the consumed bag unit's own payload
+  // is never mutated.
+  const instance = unit.instance
+    ? withoutPartyTradeMarker(cloneItemInstancePayload(unit.instance))
+    : undefined;
+  if (!instance && unit.craftedRecipeId === undefined) return undefined;
   return {
-    ...instance,
+    ...(instance ?? {}),
     ...(unit.craftedRecipeId === undefined ? {} : { craftedRecipeId: unit.craftedRecipeId }),
   };
 }

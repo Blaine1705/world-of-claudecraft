@@ -299,6 +299,7 @@ import {
 } from './leaderboard_page';
 import { entityLineOfSightClear } from './line_of_sight_elevation';
 import type { Ante, PickAction } from './lockpick';
+import { withoutPartyTradeMarker } from './loot/bop_trade_window';
 // L1: the loot-distribution layer (party-loot strategy, the rollLoot roller, copper
 // split, need-greed roll lifecycle, corpse-loot helpers) moved to ./loot/loot_roll.ts;
 // Sim keeps thin same-named delegates that call these.
@@ -2918,7 +2919,15 @@ export class Sim {
         // rebuilt payload instead of being destroyed by the key-count arm.
         const { payload: clean, dropped } = sanitizeItemInstancePayloadOnLoad(owned);
         for (const d of dropped) droppedInstanceJunk.push(`equip.${slot}.${d}`);
-        if (clean) meta.equipmentInstance[slot] = clean;
+        if (!clean) continue;
+        // A worn payload never carries the bind-on-pickup party trade window:
+        // equipping strips it for good (items.ts equipmentPayloadFor), so one
+        // arriving here is a legacy or rollback-written save. Shed it through
+        // the SAME shared helper, or a later unequip would return the copy to
+        // bags with the window resurrected. Silent on purpose: an older
+        // binary was a legal writer, so this is normalization, not junk.
+        const worn = withoutPartyTradeMarker(clean);
+        if (worn) meta.equipmentInstance[slot] = worn;
       }
       // The shared tamper ceiling (bags.ts instancedCountCap, same rule as the
       // bank arm below): a counted instanced slot loads capped at what

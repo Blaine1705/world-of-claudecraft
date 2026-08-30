@@ -1315,19 +1315,27 @@ export function cloneItemInstancePayload(src: ItemInstancePayload): ItemInstance
       ...src.rolled,
       ...(src.rolled.stats && { stats: { ...src.rolled.stats } }),
     };
+  // The array spreads below are guarded by Array.isArray so the clone stays
+  // TOTAL over malformed external data: every persisted container deep-clones
+  // through here BEFORE its load sanitizer runs (Sim.addPlayer, bank.ts,
+  // materials_vault.ts, the escrow books), so a hand-edited field that is not
+  // an array must copy without throwing; a guarded spread that does not fire
+  // leaves the malformed value shallow-aliased for the sanitizer to drop
+  // (item_instance_load.ts drops a malformed partyTrade marker whole).
   if (src.rift) {
     instance.rift = {
       ...src.rift,
       baseStats: { ...src.rift.baseStats },
       ...(src.rift.enchant && { enchant: { ...src.rift.enchant } }),
-      gems: [...src.rift.gems],
+      ...(Array.isArray(src.rift.gems) ? { gems: [...src.rift.gems] } : {}),
     };
   }
   if (src.partyTrade) {
+    const { eligible, eligibleIds } = src.partyTrade;
     instance.partyTrade = {
       ...src.partyTrade,
-      eligible: [...src.partyTrade.eligible],
-      ...(src.partyTrade.eligibleIds ? { eligibleIds: [...src.partyTrade.eligibleIds] } : {}),
+      ...(Array.isArray(eligible) ? { eligible: [...eligible] } : {}),
+      ...(Array.isArray(eligibleIds) ? { eligibleIds: [...eligibleIds] } : {}),
     };
   }
   return instance;

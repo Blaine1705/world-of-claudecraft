@@ -92,3 +92,44 @@ export function partyTradeMsLeft(instance: ItemInstancePayload | undefined, nowM
   if (!partyTradeActive(instance, nowMs)) return 0;
   return Math.max(0, (instance?.partyTrade?.untilMs ?? 0) - nowMs);
 }
+
+/** Load-time shape rule for one persisted marker, judged ATOMICALLY: the
+ *  window is one snapshot (`untilMs` plus the eligibility data the trade gate
+ *  reads together), so eligibility data that is invalid or missing refuses
+ *  the WHOLE marker rather than salvaging a partial `{ untilMs }` residue.
+ *  Total on `unknown` (JSONB is never trusted). Required: a plain object
+ *  whose `untilMs` is a finite number and whose `eligible` is an array of
+ *  names within `maxNameLength` (the caller's persisted-string ceiling,
+ *  item_instance_load.ts MAX_INSTANCE_STRING_LENGTH). `eligibleIds`, when
+ *  present, must be an array of finite numbers. Unknown extra keys ride
+ *  along (the payload's additive forward-compat doctrine); the caller's
+ *  subtree JSON ceiling is what bounds them. */
+export function isLoadablePartyTradeMarker(value: unknown, maxNameLength: number): boolean {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const marker = value as { untilMs?: unknown; eligible?: unknown; eligibleIds?: unknown };
+  if (typeof marker.untilMs !== 'number' || !Number.isFinite(marker.untilMs)) return false;
+  if (!Array.isArray(marker.eligible)) return false;
+  const namesLegal = marker.eligible.every(
+    (name) => typeof name === 'string' && name.length <= maxNameLength,
+  );
+  if (!namesLegal) return false;
+  if (marker.eligibleIds === undefined) return true;
+  return (
+    Array.isArray(marker.eligibleIds) &&
+    marker.eligibleIds.every((id) => typeof id === 'number' && Number.isFinite(id))
+  );
+}
+
+/** The payload without its partyTrade marker, as a NEW object (the input is
+ *  never mutated), or undefined when nothing else remains: an empty `{}`
+ *  payload can never stack with a plain copy of the same item again, so
+ *  absence is the clean form. THE shared strip: the equip bridge (items.ts
+ *  equipmentPayloadFor) and the persisted-equipment load arm (Sim.addPlayer)
+ *  both route through it, so a worn payload never carries the window
+ *  whichever door it arrived through. */
+export function withoutPartyTradeMarker(
+  instance: ItemInstancePayload,
+): ItemInstancePayload | undefined {
+  const { partyTrade: _partyTrade, ...rest } = instance;
+  return Object.keys(rest).length > 0 ? rest : undefined;
+}

@@ -8,9 +8,11 @@ import { describe, expect, it } from 'vitest';
 import {
   BOP_PARTY_TRADE_MS,
   bopPartyTradeInstance,
+  isLoadablePartyTradeMarker,
   partyTradeActive,
   partyTradeMsLeft,
   partyTradeWindowAllows,
+  withoutPartyTradeMarker,
 } from '../src/sim/loot/bop_trade_window';
 import { cloneItemInstancePayload, type ItemInstancePayload } from '../src/sim/types';
 
@@ -136,5 +138,97 @@ describe('bop_trade_window: payload cloning', () => {
     clone.partyTrade?.eligibleIds?.push(99);
     expect(src.partyTrade?.eligible).toEqual(['Alice', 'Bob']);
     expect(src.partyTrade?.eligibleIds).toEqual([11, 22]);
+  });
+
+  it('cloneItemInstancePayload is total over a malformed persisted window (never throws)', () => {
+    // The clone runs BEFORE the load sanitizer on every persisted container,
+    // so a hand-edited marker must copy without throwing; the sanitizer then
+    // drops the whole malformed marker atomically.
+    const malformed = [
+      { partyTrade: { untilMs: 5_000, eligible: 5 } },
+      { partyTrade: { untilMs: 5_000, eligible: ['Alice'], eligibleIds: 7 } },
+      { partyTrade: 'junk' },
+      { partyTrade: { untilMs: 5_000 } },
+    ] as unknown as ItemInstancePayload[];
+    for (const src of malformed) {
+      expect(() => cloneItemInstancePayload(src), JSON.stringify(src)).not.toThrow();
+    }
+  });
+
+  it('cloneItemInstancePayload is total over malformed rift gems too', () => {
+    const src = {
+      rift: { sourceEventId: 'ev', tier: 'C', power: 1, gems: 'junk', baseStats: {} },
+    } as unknown as ItemInstancePayload;
+    expect(() => cloneItemInstancePayload(src)).not.toThrow();
+  });
+});
+
+describe('bop_trade_window: isLoadablePartyTradeMarker', () => {
+  const MAX_NAME = 64;
+
+  it('accepts a legal persisted marker, with or without the id list', () => {
+    expect(
+      isLoadablePartyTradeMarker({ untilMs: 5_000, eligible: ['Alice', 'Bob'] }, MAX_NAME),
+    ).toBe(true);
+    expect(
+      isLoadablePartyTradeMarker(
+        { untilMs: 5_000, eligible: ['Alice', 'Bob'], eligibleIds: [11, 22] },
+        MAX_NAME,
+      ),
+    ).toBe(true);
+  });
+
+  it('refuses any marker whose required eligibility data is invalid or missing', () => {
+    const refused: unknown[] = [
+      undefined,
+      null,
+      'junk',
+      [5_000],
+      { eligible: ['Alice'] }, // untilMs missing
+      { untilMs: Number.NaN, eligible: ['Alice'] },
+      { untilMs: '5000', eligible: ['Alice'] },
+      { untilMs: 5_000 }, // eligible missing
+      { untilMs: 5_000, eligible: 5 }, // not iterable, the load-crash shape
+      { untilMs: 5_000, eligible: ['Alice', 42] },
+      { untilMs: 5_000, eligible: ['Alice', 'x'.repeat(MAX_NAME + 1)] },
+      { untilMs: 5_000, eligible: ['Alice'], eligibleIds: 'junk' },
+      { untilMs: 5_000, eligible: ['Alice'], eligibleIds: [11, 'x'] },
+      { untilMs: 5_000, eligible: ['Alice'], eligibleIds: [Number.NaN] },
+    ];
+    for (const marker of refused) {
+      expect(isLoadablePartyTradeMarker(marker, MAX_NAME), JSON.stringify(marker)).toBe(false);
+    }
+  });
+
+  it('admits unknown extra keys inside the marker (additive forward compat)', () => {
+    expect(
+      isLoadablePartyTradeMarker(
+        { untilMs: 5_000, eligible: ['Alice', 'Bob'], futureField: true },
+        MAX_NAME,
+      ),
+    ).toBe(true);
+  });
+});
+
+describe('bop_trade_window: withoutPartyTradeMarker', () => {
+  it('strips the marker, keeps every other field, and never mutates the input', () => {
+    const src: ItemInstancePayload = {
+      signer: 'Ana',
+      partyTrade: { untilMs: 5_000, eligible: ['Alice', 'Bob'] },
+    };
+    const stripped = withoutPartyTradeMarker(src);
+    expect(stripped).toEqual({ signer: 'Ana' });
+    expect(src.partyTrade?.eligible).toEqual(['Alice', 'Bob']);
+  });
+
+  it('collapses a marker-only payload to undefined (an empty {} would strand the slot)', () => {
+    expect(
+      withoutPartyTradeMarker({ partyTrade: { untilMs: 5_000, eligible: ['Alice', 'Bob'] } }),
+    ).toBeUndefined();
+    expect(withoutPartyTradeMarker({})).toBeUndefined();
+  });
+
+  it('returns a windowless payload unchanged in content', () => {
+    expect(withoutPartyTradeMarker({ signer: 'Ana' })).toEqual({ signer: 'Ana' });
   });
 });
