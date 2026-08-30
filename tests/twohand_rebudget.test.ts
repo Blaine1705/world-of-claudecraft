@@ -48,6 +48,13 @@ describe('v0.27.1 two-hand re-budget', () => {
     for (const item of twoHanders()) {
       const level = itemLevel(item);
       if (level === undefined) continue;
+      // Forgebreaker is the one sanctioned above-curve line (21.81 vs the
+      // curve's 19.09 at its realized ilvl): the raid legendary must out-white
+      // heroic Thronebane's retained 21.4 legacy line or the old legendary
+      // stays the tier's white-damage king (maintainer direction 2026-08-30;
+      // rationale beside the damage line in content/ignivar_drops.ts). Its
+      // exact line is pinned below instead of the curve.
+      if (item.id === 'varkhul_forgebreaker') continue;
       const dps = (item.weapon.min + item.weapon.max) / 2 / item.weapon.speed;
       const target = weaponDpsBudget(level) * TWOHAND_DPS_MULT;
       expect(
@@ -55,5 +62,16 @@ describe('v0.27.1 two-hand re-budget', () => {
         `${item.id} dps ${dps.toFixed(2)} vs target ${target.toFixed(2)}`,
       ).toBeLessThan(0.35);
     }
+  });
+
+  it('pins the sanctioned above-curve legendary line exactly', () => {
+    const forgebreaker = ITEMS.varkhul_forgebreaker;
+    expect(forgebreaker.kind === 'weapon' && forgebreaker.weapon).toBeTruthy();
+    if (forgebreaker.kind !== 'weapon' || !forgebreaker.weapon) return;
+    expect(forgebreaker.weapon).toEqual({ min: 63, max: 94, speed: 3.6 });
+    const dps = (63 + 94) / 2 / 3.6;
+    // Above heroic Thronebane's retained 21.43, below a 23-dps runaway.
+    expect(dps).toBeGreaterThan(21.43);
+    expect(dps).toBeLessThan(23);
   });
 });
