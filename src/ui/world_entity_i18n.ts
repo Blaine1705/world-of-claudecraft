@@ -281,6 +281,7 @@ const NPC_IDS = [
   'brother_aldric_raid', // dynamically-spawned raid turn-in NPC (Crypt of Nythraxis)
   'archivist_maelin_emberward', // dev-only Ignivar raid historian
   'archivist_maelin_ember_projection', // Maelin's instanced raid checkpoint projection
+  'crucible_quartermaster', // Ignivar raid sigil-redemption vendor (Halls of the First Tempering)
   'brother_halven', // Collapsed Reliquary delve board NPC
   'brother_halven_marsh', // Drowned Litany delve board NPC (same character, marsh camp)
   'spirit_healer', // the graveyard angel (spawned at every graveyard + dungeon entry)
@@ -616,6 +617,7 @@ const DUNGEON_IDS = [
   'ignivar_forge_lift',
   'ignivar_forge_approach',
   'ignivar_raid_arena',
+  'ignivar_molten_assembly',
   'ignivar_inner_crucible',
   'wildheart_basin',
   'the_last_keep',

@@ -8,7 +8,14 @@ const IGNIVAR_DEV_BOT_COUNT = 9;
 const IGNIVAR_DEV_POD_SIZE = 3;
 const IGNIVAR_DEV_POD_CENTER_RADIUS = 25;
 const IGNIVAR_DEV_POD_MEMBER_RADIUS = 2.8;
-const IGNIVAR_DEV_POD_ANGLES = [(7 * Math.PI) / 6, (11 * Math.PI) / 6, Math.PI / 2] as const;
+// Two bands of the ring are off limits: due north the boss waits on the
+// central dais at IGNIVAR_BOSS_SPAWN_Z and every pod member must stay outside
+// its automatic aggro radius (MAX_AGGRO_RADIUS) so forming the practice raid
+// never pulls, and due south the pod would crowd the arena entry inside Brand
+// range of an arriving tester. Math.PI / 6 is the widest remaining slot for
+// the third pod: every pod pair stays 60+ degrees apart as seen from the
+// boss, so no single frontal or skyfire cone can clip two pods at once.
+const IGNIVAR_DEV_POD_ANGLES = [(7 * Math.PI) / 6, (11 * Math.PI) / 6, Math.PI / 6] as const;
 
 export type IgnivarDevRaidResult =
   | { ok: true; allies: number; reused: boolean }

@@ -168,6 +168,8 @@ export function collectCalmAnchorPads(): CalmPadRow[] {
   pad('glacierTarn', 50, 1646, 22, 34, false);
   // Dungeon doors: the walk-up entrance in the open world (the instanced
   // interior beyond DUNGEON_X_THRESHOLD is filtered by the world.ts add).
+  // Interior-only rooms (overworldDoor: false) have no walk-up door, so their
+  // placeholder doorPos must not calm open-world ground.
   for (const id in DUNGEONS) {
     // A room reached only through internal instance doors (overworldDoor:
     // false, e.g. the Ignivar raid wings) has no surface door to flatten

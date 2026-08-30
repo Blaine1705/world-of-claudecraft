@@ -14,8 +14,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "63d6bb3b",
+      "nextId": 1000,
+      "state": "337afca8",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -35,7 +35,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
@@ -53,7 +60,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 994,
+          "entityId": 995,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -81,7 +88,10 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          }
         }
       ],
       "entities": [
@@ -95,8 +105,9 @@
           "dodgeChance": 0.056,
           "fallStartY": -2,
           "fiveSecondRule": 99,
+          "healPower": 13,
           "hp": 54,
-          "id": 994,
+          "id": 995,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -140,9 +151,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 1000,
-      "state": "f5398aa9",
-      "events": "cde12e22",
+      "nextId": 1001,
+      "state": "6c785492",
+      "events": "fa3fe951",
       "rng": {
         "draws": 2,
         "digest": "a1c65985"
@@ -151,9 +162,9 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 1000,
-      "state": "88a8775c",
-      "events": "93b43192",
+      "nextId": 1001,
+      "state": "8e8093ff",
+      "events": "6b3caede",
       "rng": {
         "draws": 2,
         "digest": "a1c65985"
@@ -162,9 +173,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 1000,
-      "state": "8f71ebec",
-      "events": "a3c3c83c",
+      "nextId": 1001,
+      "state": "b3ff0e63",
+      "events": "ca2fb0c7",
       "rng": {
         "draws": 136,
         "digest": "e230e6f0"
@@ -173,9 +184,9 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 1000,
-      "state": "c44efb70",
-      "events": "69b35b96",
+      "nextId": 1001,
+      "state": "5557b9cb",
+      "events": "499bd3f1",
       "rng": {
         "draws": 304,
         "digest": "1b76d31b"
@@ -184,9 +195,9 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 1000,
-      "state": "ce2c5831",
-      "events": "30d173ba",
+      "nextId": 1001,
+      "state": "04f11be6",
+      "events": "26ae2b2e",
       "rng": {
         "draws": 507,
         "digest": "7cc40d26"
@@ -195,9 +206,9 @@
     {
       "tick": 120,
       "time": 6,
-      "nextId": 1000,
-      "state": "10be3b76",
-      "events": "b42a06f7",
+      "nextId": 1001,
+      "state": "58ed932c",
+      "events": "f608bdb9",
       "rng": {
         "draws": 714,
         "digest": "ff11f95b"
@@ -206,8 +217,8 @@
     {
       "tick": 128,
       "time": 6.4,
-      "nextId": 1000,
-      "state": "da8012df",
+      "nextId": 1001,
+      "state": "5655c5ab",
       "events": "741638a5",
       "rng": {
         "draws": 797,
@@ -227,7 +238,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
@@ -264,7 +282,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 994,
+          "entityId": 995,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -294,7 +312,10 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          }
         }
       ],
       "entities": [
@@ -302,7 +323,7 @@
           "aiState": "idle",
           "attackPower": 10,
           "castRemaining": 1.7,
-          "castTargetId": 999,
+          "castTargetId": 1000,
           "castTotal": 2.5,
           "castingAbility": "frostbolt",
           "combatTimer": 0.55,
@@ -314,8 +335,9 @@
           "fallStartY": 7.996591,
           "fiveSecondRule": 1.55,
           "gcdRemaining": 0.7,
+          "healPower": 26,
           "hp": 49984,
-          "id": 994,
+          "id": 995,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -347,7 +369,7 @@
             "sta": 23,
             "str": 10
           },
-          "targetId": 999,
+          "targetId": 1000,
           "templateId": "mage",
           "weapon": {
             "max": 6,
@@ -356,7 +378,7 @@
           }
         },
         {
-          "aggroTargetId": 994,
+          "aggroTargetId": 995,
           "aiState": "attack",
           "auras": [
             {
@@ -366,7 +388,7 @@
               "name": "Cinderbolt",
               "remaining": 2.2,
               "school": "fire",
-              "sourceId": 994,
+              "sourceId": 995,
               "tickInterval": 2,
               "tickTimer": 0.2,
               "value": 1
@@ -378,7 +400,7 @@
               "name": "Rimelance",
               "remaining": 4.6,
               "school": "frost",
-              "sourceId": 994,
+              "sourceId": 995,
               "value": 0.6
             }
           ],
@@ -392,7 +414,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 8912,
-          "id": 999,
+          "id": 1000,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -421,11 +443,11 @@
             "armor": 40
           },
           "swingTimer": 1.45,
-          "tappedById": 994,
+          "tappedById": 995,
           "templateId": "forest_wolf",
           "threat": [
             [
-              994,
+              995,
               89
             ]
           ],

@@ -4,8 +4,6 @@ import {
   IGNIVAR_SKYFIRE_CONE_COUNT,
   IGNIVAR_SKYFIRE_HALF_ANGLE,
   IGNIVAR_SKYFIRE_RANGE,
-  IGNIVAR_SOAK_RADIUS,
-  IGNIVAR_SOAK_REQUIRED_PLAYERS,
 } from '../sim/encounters/ignivar';
 import { IGNIVAR_BOSS_ID } from '../sim/types';
 import {
@@ -43,11 +41,6 @@ import {
   IGNIVAR_ROTATING_RAYS_VISUAL_NAME,
   syncIgnivarRotatingRaysTelegraph,
 } from './ignivar_rotating_rays';
-import {
-  buildIgnivarSoakTelegraph,
-  IGNIVAR_SOAK_VISUAL_NAME,
-  syncIgnivarSoakTelegraph,
-} from './ignivar_soak_telegraph';
 import type { Vfx } from './vfx';
 
 export {
@@ -62,11 +55,6 @@ export {
   buildIgnivarRotatingRaysTelegraph,
   IGNIVAR_ROTATING_RAYS_VISUAL_NAME,
 } from './ignivar_rotating_rays';
-export {
-  buildIgnivarSoakTelegraph as buildIgnivarSoakCircle,
-  IGNIVAR_SOAK_VISUAL_NAME,
-} from './ignivar_soak_telegraph';
-
 export const IGNIVAR_SKYFIRE_VISUAL_NAME = 'ignivarSkyfireTelegraph';
 
 function disposeMaterial(material: THREE.Material | THREE.Material[]): void {
@@ -80,6 +68,9 @@ function disposeMaterial(material: THREE.Material | THREE.Material[]): void {
 function disposeOwnedVisual(root: THREE.Object3D): void {
   root.traverse((object) => {
     const renderable = object as THREE.Mesh | THREE.Line;
+    if ((renderable as THREE.InstancedMesh).isInstancedMesh) {
+      (renderable as THREE.InstancedMesh).dispose();
+    }
     if ('geometry' in renderable && renderable.geometry) renderable.geometry.dispose();
     if ('material' in renderable && renderable.material) disposeMaterial(renderable.material);
   });
@@ -157,7 +148,6 @@ export function disposeIgnivarEncounterVisuals(group: THREE.Group): void {
     IGNIVAR_ROTATING_RAYS_VISUAL_NAME,
     IGNIVAR_FORGE_WAVE_VISUAL_NAME,
     IGNIVAR_JUDGMENT_VISUAL_NAME,
-    IGNIVAR_SOAK_VISUAL_NAME,
   ]) {
     const visual = group.getObjectByName(name);
     if (visual) disposeOwnedVisual(visual);
@@ -352,37 +342,6 @@ export function syncIgnivarEncounterVisuals(
     );
   }
 
-  let soak = group.getObjectByName(IGNIVAR_SOAK_VISUAL_NAME);
-  if (!soak && plan.soakMarked) {
-    soak = buildIgnivarSoakTelegraph();
-    group.add(soak);
-  }
-  if (soak) {
-    let playersInside = plan.soakMarked ? 1 : 0;
-    const entityPosition = (entity as IgnivarVisualEntity & { pos?: { x: number; z: number } }).pos;
-    if (plan.soakMarked && entityPosition && encounterEntities && entity.id !== undefined) {
-      playersInside = 0;
-      for (const candidate of encounterEntities.values()) {
-        if (candidate.kind !== 'player' || candidate.dead || !candidate.pos) continue;
-        if (
-          Math.hypot(candidate.pos.x - entityPosition.x, candidate.pos.z - entityPosition.z) <=
-          IGNIVAR_SOAK_RADIUS
-        ) {
-          playersInside++;
-        }
-      }
-    }
-    syncIgnivarSoakTelegraph(
-      soak,
-      plan.soakMarked,
-      playersInside,
-      IGNIVAR_SOAK_REQUIRED_PLAYERS,
-      plan.soakProgress,
-      plan.inverseEntityScale,
-      dt,
-      reducedMotion,
-    );
-  }
   if (chainViews && entity.id !== undefined) {
     syncIgnivarPlayerChainVisual(group, entity, chainViews, dt, undefined, reducedMotion);
   }

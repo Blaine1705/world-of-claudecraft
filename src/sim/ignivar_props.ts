@@ -10,26 +10,18 @@ import { DUNGEON_WALL_HEIGHT, type DungeonLayout } from './dungeon_layout';
 
 export type IgnivarEnvPropKey =
   | 'beam'
-  | 'curved_wall'
-  | 'firepit'
-  | 'gear_machine'
   | 'vault_door'
-  | 'gear_wall'
-  | 'pillar_broad'
   | 'pillar_slim'
   | 'reactor'
   | 'gear_wall_rusty'
+  | 'gear_machine'
   | 'lava_face'
   | 'anvil'
   | 'forge'
   | 'chain'
   | 'chain_hanging'
-  | 'control_machine'
-  | 'furnace_small'
-  | 'gear_pile'
   | 'lava_furnace'
   | 'press_machine'
-  | 'shelf'
   | 'square_wall'
   | 'chain_link'
   | 'hanging_hook'
@@ -37,13 +29,10 @@ export type IgnivarEnvPropKey =
   | 'lava_channel'
   | 'lava_channel_curved'
   | 'lava_outlet'
-  | 'lava_outlet_2'
   | 'lava_port'
-  | 'pressure_device'
-  | 'radiator'
-  | 'steam_machine'
   | 'steam_machine_round'
   | 'steam_pipes'
+  | 'water_pump'
   | 'torch'
   | 'bridge_floor'
   | 'bridge_pillar'
@@ -94,26 +83,18 @@ export const IGNIVAR_PROP_NATIVE: Record<
   { len: number; hei: number; dep: number }
 > = {
   beam: { len: 1.0, hei: 0.14, dep: 0.14 },
-  curved_wall: { len: 1.0, hei: 0.72, dep: 0.11 },
-  firepit: { len: 0.97, hei: 0.68, dep: 0.95 },
-  gear_machine: { len: 1.0, hei: 0.75, dep: 0.4 },
   vault_door: { len: 1.0, hei: 0.67, dep: 0.2 },
-  gear_wall: { len: 1.0, hei: 0.63, dep: 0.11 },
-  pillar_broad: { len: 0.43, hei: 1.0, dep: 0.43 },
   pillar_slim: { len: 0.26, hei: 1.0, dep: 0.26 },
   reactor: { len: 0.8, hei: 1.0, dep: 0.52 },
   gear_wall_rusty: { len: 1.0, hei: 0.67, dep: 0.35 },
+  gear_machine: { len: 1.0, hei: 0.75, dep: 0.4 },
   lava_face: { len: 0.72, hei: 1.0, dep: 0.55 },
   anvil: { len: 1.0, hei: 0.48, dep: 0.37 },
   forge: { len: 0.99, hei: 1.0, dep: 0.71 },
   chain: { len: 0.12, hei: 1.0, dep: 0.11 },
   chain_hanging: { len: 0.14, hei: 1.0, dep: 0.1 },
-  control_machine: { len: 0.86, hei: 1.0, dep: 0.62 },
-  furnace_small: { len: 1.0, hei: 0.99, dep: 0.72 },
-  gear_pile: { len: 1.0, hei: 0.69, dep: 0.97 },
   lava_furnace: { len: 0.6, hei: 1.0, dep: 0.32 },
   press_machine: { len: 0.76, hei: 1.0, dep: 0.57 },
-  shelf: { len: 0.83, hei: 1.0, dep: 0.39 },
   square_wall: { len: 0.99, hei: 1.0, dep: 0.2 },
   chain_link: { len: 1.0, hei: 0.75, dep: 0.14 },
   hanging_hook: { len: 0.76, hei: 1.0, dep: 0.4 },
@@ -121,13 +102,10 @@ export const IGNIVAR_PROP_NATIVE: Record<
   lava_channel: { len: 1.0, hei: 0.11, dep: 0.33 },
   lava_channel_curved: { len: 1.0, hei: 0.13, dep: 0.79 },
   lava_outlet: { len: 0.4, hei: 1.0, dep: 0.28 },
-  lava_outlet_2: { len: 0.67, hei: 1.0, dep: 0.25 },
   lava_port: { len: 0.89, hei: 1.0, dep: 0.34 },
-  pressure_device: { len: 0.64, hei: 1.0, dep: 0.27 },
-  radiator: { len: 1.0, hei: 0.67, dep: 0.29 },
-  steam_machine: { len: 0.65, hei: 1.0, dep: 0.48 },
   steam_machine_round: { len: 0.51, hei: 1.0, dep: 0.47 },
   steam_pipes: { len: 0.63, hei: 1.0, dep: 0.2 },
+  water_pump: { len: 1.0, hei: 0.93, dep: 0.99 },
   torch: { len: 0.62, hei: 1.06, dep: 0.55 },
   bridge_floor: { len: 1.0, hei: 0.14, dep: 0.66 },
   bridge_pillar: { len: 0.68, hei: 1.0, dep: 0.5 },
@@ -239,15 +217,70 @@ export function ignivarApproachPropPlacements(layout: DungeonLayout): IgnivarPro
   return placements;
 }
 
-/** Crucible of the Last Spring: roof chains only until the hand-placed
- *  pass lands. Chains hang high over the ring, outside the fighting circle
- *  in plan view. */
+/** Crucible of the Last Spring: the maintainer's hand-placed pass (baked from
+ *  the /placer export, 2026-08-28). Four water pumps stand at the corner
+ *  anchors as the reworked water conduits, each with a paired industrial pipe;
+ *  the walls carry lava vents, rusty gear panels, a workshop face over the
+ *  south door, slim pillars, roof chain links, and wall torches. The pumps sit
+ *  by the old conduit anchors (+/-18) so the cleanse footprint still lines up
+ *  when they are re-wired to the encounter. */
 export function ignivarArenaPropPlacements(_layout: DungeonLayout): IgnivarPropPlacement[] {
   return [
-    at('chain', -14, -14, 0.7, 8, 12, true),
-    at('chain', 14, -14, 1.9, 8, 12),
-    at('chain', 14, 14, 3.4, 8, 12, true),
-    at('chain', -14, 14, 5.1, 8, 12),
+    // The reworked water conduits: a pump at each corner anchor, paired
+    // with an industrial pipe behind it.
+    at('water_pump', -16.2, 16.4, 135 * DEG, 7),
+    at('water_pump', -17.4, -17.1, 45 * DEG, 7),
+    at('water_pump', 16.6, -16.5, 315 * DEG, 7),
+    at('water_pump', 17.1, 16.8, 225 * DEG, 7),
+    at('industrial_pipe', -18.6, -18.3, 45 * DEG, 11),
+    at('industrial_pipe', -17.7, 17.8, 135 * DEG, 11),
+    at('industrial_pipe', 17.8, -17.6, 135 * DEG, 11),
+    at('industrial_pipe', 18.5, 18.4, 225 * DEG, 11),
+    // East wall: a lava port between the rusty gear panels, torch-lit.
+    at('lava_port', 31.95, 0, 270 * DEG, 8),
+    at('gear_wall_rusty', 33.1, -7.6, 270 * DEG, 11, 1.25),
+    at('gear_wall_rusty', 33.05, 7.45, 270 * DEG, 11, 1.25),
+    // West wall: paired lava outlets.
+    at('lava_outlet', -32.3, -2.65, 90 * DEG, 10, 0.5),
+    at('lava_outlet', -32.3, 2.85, 90 * DEG, 10, 0.5),
+    // South door wall: a workshop face panel flanked by lava faces.
+    at('square_wall', 0.05, -32, 0, 12, 1),
+    at('lava_face', 9.7, -32.35, 0, 10),
+    at('lava_face', -9.8, -32.4, 0, 10),
+    // Roof chain links over the corners (overhead density, low-tier droppable).
+    at('chain_link', -22.7, 22.8, 135 * DEG, 8, 9.5, true),
+    at('chain_link', 23.1, 22.5, 225 * DEG, 8, 9.5, true),
+    at('chain_link', 22.75, -22.6, 315 * DEG, 8, 9.5, true),
+    at('chain_link', -22.75, -22.55, 45 * DEG, 8, 9.5, true),
+    // Side-wall pillar pairs, torch-lit.
+    at('pillar_slim', -29.3, 9.1, 90 * DEG, 12),
+    at('pillar_slim', -29.45, -11, 90 * DEG, 12),
+    at('pillar_slim', 27.05, -11, 90 * DEG, 12),
+    at('pillar_slim', 27.25, 13, 90 * DEG, 12),
+    at('torch', -27.6, 9.2, 0, 2, 8),
+    at('torch', -27.75, -11, 0, 2, 8),
+    at('torch', 25.6, 13, 180 * DEG, 2, 8),
+    at('torch', 25.5, -11.1, 180 * DEG, 2, 8),
+    // North door wall: a pillar row with chain links and low torches.
+    at('pillar_slim', -5.6, 25.4, 180 * DEG, 13),
+    at('pillar_slim', -13.3, 25.4, 180 * DEG, 13),
+    at('pillar_slim', 6.2, 25.5, 180 * DEG, 13),
+    at('pillar_slim', 14.25, 25.4, 180 * DEG, 13),
+    at('chain_link', -9.4, 23.45, 180 * DEG, 10, 5, true),
+    at('chain_link', 10.3, 23.7, 180 * DEG, 10, 5, true),
+    at('torch', -5.5, 23.55, 90 * DEG, 2, 3.25),
+    at('torch', 6.1, 23.8, 90 * DEG, 2, 3.25),
+    // High wall sconces over the south door and the east/west walls.
+    at('torch', -9.7, -31.65, 270 * DEG, 2, 10.75),
+    at('torch', 9.7, -31.7, 270 * DEG, 2, 10.75),
+    at('torch', 31.7, 0, 180 * DEG, 2, 10.75),
+    at('torch', -32, 0, 0, 2, 10.75),
+    // Extra hanging chains draped through the room interior (overhead density,
+    // low-tier droppable).
+    at('chain_hanging', -12.8, 0.7, 90 * DEG, 15, 11, true),
+    at('chain_hanging', 12.3, 7.1, 90 * DEG, 7, 8, true),
+    at('chain_hanging', 8.8, -15, 90 * DEG, 20, 12, true),
+    at('chain_hanging', -3.9, -8.5, 90 * DEG, 5, 10, true),
   ];
 }
 
@@ -270,11 +303,14 @@ export function ignivarCruciblePropPlacements(_layout: DungeonLayout): IgnivarPr
     at('chain', 24, 14, 4.8, 8, 12),
     at('chain_hanging', -5.5, 25, 0.5, 8, 10),
     at('chain_hanging', 5.5, 25, -0.5, 8, 10),
-    // The forge-anchor dressing: the anvil the boss works pre-pull, seated
-    // beside the assembly forge at (0, 22) under the hook chains. The one
-    // deliberate floor placement inside the fighting circle; the clearance
-    // contracts carve out the forge-anchor radius for exactly this.
-    at('anvil', 5.2, 20.9, 225 * DEG, 8),
+    // The forge-anchor dressing (re-baked from the /placer export,
+    // 2026-08-28): the assembly forge stands at the north face of the
+    // fighting circle with the anvil the boss works squared up at its
+    // front, both under the hook chains. The deliberate floor placements
+    // inside the fighting circle; the clearance contracts carve out the
+    // forge-anchor radius for exactly this.
+    at('anvil', 1.2, 22.9, 180 * DEG, 10),
+    at('forge', 0.8, 26.7, 180 * DEG, 13),
     // East wall: furnace bank flanking the steam pipe stack.
     at('steam_pipes', 39.25, -2.5, 270 * DEG, 15),
     at('lava_furnace', 37.5, -10.5, 270 * DEG, 15),
@@ -463,19 +499,16 @@ export const IGNIVAR_NON_COLLIDING_PROPS: ReadonlySet<IgnivarEnvPropKey> = new S
   'lift_spool',
 ]);
 
-/** Collider footprint as a fraction of the visual AABB: ornate pillars and
- *  the firepit bowl collide on their trunk, not their widest flange, so a
- *  body brushing the decorative rim slides past instead of snagging (and
- *  the dormant packs hugging the wall pillars stay clear). */
+/** Collider footprint as a fraction of the visual AABB: ornate pillars
+ *  collide on their trunk, not their widest flange, so a body brushing the
+ *  decorative rim slides past instead of snagging (and the dormant packs
+ *  hugging the wall pillars stay clear). */
 export const IGNIVAR_PROP_COLLIDER_FOOTPRINT: Partial<Record<IgnivarEnvPropKey, number>> = {
   pillar_slim: 0.68,
-  pillar_broad: 0.8,
-  firepit: 0.85,
-  // The console's side pipe loops and the rack's hanging hooks widen the
-  // AABB past the solid body; the gear pile's skirt slopes off low.
-  control_machine: 0.8,
-  shelf: 0.75,
-  gear_pile: 0.85,
+  // The water pumps are the conduit soak stations: only the central pump body
+  // blocks, so a body can wade into the surrounding water pool (the cleanse
+  // footprint) to be cleansed while the boss's frontal is up.
+  water_pump: 0.3,
 };
 
 /** Full-height OBB colliders for every floor-standing dressing prop, in the

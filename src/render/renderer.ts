@@ -22,7 +22,6 @@ import {
   delveOrigin,
   delveSlotAt,
   INSTANCE_SLOT_COUNT,
-  ITEM_SETS,
   instanceOrigin,
   isArenaPos,
   isBgPos,
@@ -450,6 +449,7 @@ import {
   wildGlowAmount,
 } from './night_lighting_core';
 import { buildEastbrookNoticeboard } from './noticeboard';
+import { installOccluderFadeGate } from './occluder_fade_gate';
 import { buildGhostVariantPrewarmGroup } from './occluder_ghost_prewarm';
 import {
   type OpaqueSortPolicyInput,
@@ -627,6 +627,7 @@ import { type SelfMotionFrame, SelfMotionPredictor, updateSelfRenderFallback } f
 import { SelfSpiritPrewarmer } from './self_spirit_prewarm';
 import { SentenceVfx } from './sentence_vfx';
 import { sentenceImpactPlan } from './sentence_vfx_core';
+import { SET_PROC_FX_BY_NAME } from './set_proc_fx';
 import {
   createShadowCadenceState,
   resetShadowCadence,
@@ -684,7 +685,7 @@ import {
   UnderwaterView,
 } from './underwater';
 import { createPrewarmGroupSlot, createVariantPrewarmSlot } from './variant_prewarm_slot';
-import { dispatchVarkhulForgeHammerAttack } from './varkhul_forge_hammer';
+import { routeVarkhulForgeHammer } from './varkhul_forge_hammer';
 import { VarkhulForgestormVisuals } from './varkhul_forgestorm_visual';
 import { SCHOOL_COLORS, Vfx } from './vfx';
 import { createOffsetVfxAnchor, createVfxAnchor, type VfxAnchorPose } from './vfx_anchor';
@@ -921,28 +922,6 @@ const LIGHT_BUDGET_RANGE_SQ = 55 * 55;
 const SELECTION_RING_BOOST = 1.5;
 const SELECTION_RING_SPIN = 0.6; // rad/s — slow classic target-reticle rotation
 
-// Themed swirl colors for the 4-piece set-proc auras, by proc id; resolved to
-// the buff display NAME below (the aura SimEvent carries only the name) via
-// ITEM_SETS, so a re-coined proc name keeps its effect wired. The bleeds land
-// on the TARGET (a mob), so the aura case below must not gate these on the
-// player kind.
-const SET_PROC_FX_BY_ID: Record<string, number> = {
-  set_clearcasting: 0x8ed2ff, // icy arcane blue: a free cast
-  set_gravemight: 0xffb04d, // burnished gold: attack power
-  set_fangrush: 0xbfff5a, // feral green-yellow: attack speed
-  set_bonesplinter: 0xc22a2a, // blood red: the plate bleed landing
-  set_ragged_gash: 0xc22a2a, // blood red: the leather bleed landing
-  set_soulblaze: 0xff6a9e, // ember pink: spell power
-};
-const SET_PROC_FX_BY_NAME = new Map<string, number>();
-for (const set of Object.values(ITEM_SETS)) {
-  for (const tier of set.bonuses) {
-    const proc = tier.effect.proc;
-    if (proc && SET_PROC_FX_BY_ID[proc.id] !== undefined) {
-      SET_PROC_FX_BY_NAME.set(proc.name, SET_PROC_FX_BY_ID[proc.id]);
-    }
-  }
-}
 const CLICK_MARKER_POOL = 4; // concurrent click-feedback markers before reuse
 const SPARKLE_BOOST = 1.5;
 // Third-person camera obstruction is opacity-only. Anything registered as a
@@ -2568,6 +2547,7 @@ export class Renderer {
         createRevealGate(revealHost, () => this.fenbridgeTownView.staticRevealRoots()),
       );
       this.foliageRevealGate = createRevealGate(revealHost, (key) => this.foliage.revealRoots(key));
+      installOccluderFadeGate(revealHost);
     }
 
     // Map-editor play-test: freely placed GLB models (cosmetic, render-only). Loads
@@ -3120,7 +3100,7 @@ export class Renderer {
     // Riding-lesson start platform: the glowing square behind the start arch.
     this.mountBeacon = new MountBeacon(this.scene, this.groundSample);
     // The Proving Shore's guidance: beacon fizz, route ribbon, target ring.
-    this.islandGuidance = new IslandGuidance(this.scene, this.groundSample);
+    this.islandGuidance = new IslandGuidance(this.scene, this.groundSample, (t) => this.compileGate(t));
 
     // ambient precipitation: biome-driven snow/rain that rides with the camera
     this.weather = new Weather(this.scene, this.lowGfx);
@@ -4904,7 +4884,7 @@ export class Renderer {
       this.cameraLookAt.x,
       this.cameraLookAt.y,
       this.cameraLookAt.z,
-      fogFar,
+      this.entryDetailHorizon.sceneryCullFar(fogFar),
       dt,
       this.reducedMotion(),
     );
@@ -4915,7 +4895,7 @@ export class Renderer {
       this.cameraLookAt.x,
       this.cameraLookAt.y,
       this.cameraLookAt.z,
-      fogFar,
+      this.entryDetailHorizon.sceneryCullFar(fogFar),
       dt,
       this.reducedMotion(),
     );
@@ -4926,7 +4906,7 @@ export class Renderer {
       this.cameraLookAt.x,
       this.cameraLookAt.y,
       this.cameraLookAt.z,
-      fogFar,
+      this.entryDetailHorizon.sceneryCullFar(fogFar),
       dt,
       this.reducedMotion(),
     );
@@ -4940,7 +4920,7 @@ export class Renderer {
       this.cameraLookAt.y,
       this.cameraLookAt.z,
       fogNear,
-      fogFar,
+      this.entryDetailHorizon.sceneryCullFar(fogFar),
       this.vistaLive() && this.fogState === 'outdoor'
         ? this.farVista.envelopeFar * 0.9
         : this.lastRequestedFogNear,
@@ -7776,7 +7756,7 @@ export class Renderer {
         spawnArmyPortalBurstEvent(this.necromancyArmyPortalFx, ev, (id) =>
           this.sim.entities.get(id),
         );
-        dispatchVarkhulForgeHammerAttack(ev, (entityId, abilityId) =>
+        routeVarkhulForgeHammer(ev, this.vfx, this.sim.cfg.seed, (entityId, abilityId) =>
           this.triggerAttack(entityId, abilityId),
         );
         // Spec-driven ground-cast visuals claim the point-anchored cues first
@@ -9467,13 +9447,14 @@ export class Renderer {
           // callback marks the rank dirty whenever it does.
           const view = buildBattleground(o, this.sim.cfg.seed, {
             lowGfx: this.lowGfx,
-            // The raw registry on purpose: buildBgFieldLights already hides
-            // each light (battleground.ts) and its release path splices, which
-            // an append-only sink cannot express.
+            // The raw registry on purpose: buildBgFieldLights (battleground.ts) hides
+            // each light and its release path splices, which an append-only sink cannot express.
             fireLights: this.fireLights,
             onFireLightsChanged: () => {
               this.lightRankDirty = true;
             },
+            // Gate each streamed field piece's shader links (the dungeon interiors' seam).
+            compileGate: this.asyncCompileSupported ? (t) => this.compileGate(t) : undefined,
           });
           this.scene.add(view.group);
           this.bgViews.set(i, view);
@@ -12127,7 +12108,8 @@ export class Renderer {
     const eyeX = this.cameraLookAt.x;
     const eyeY = this.cameraLookAt.y;
     const eyeZ = this.cameraLookAt.z;
-    this.propsView.update(camX, camY, camZ, eyeX, eyeY, eyeZ, fogFar, dt, this.reducedMotion());
+    const sceneryFar = this.entryDetailHorizon.sceneryCullFar(fogFar);
+    this.propsView.update(camX, camY, camZ, eyeX, eyeY, eyeZ, sceneryFar, dt, this.reducedMotion());
     this.eastbrookTownView.update(
       camX,
       camY,
@@ -12135,7 +12117,7 @@ export class Renderer {
       eyeX,
       eyeY,
       eyeZ,
-      fogFar,
+      sceneryFar,
       dt,
       this.reducedMotion(),
     );
@@ -12146,7 +12128,7 @@ export class Renderer {
       eyeX,
       eyeY,
       eyeZ,
-      fogFar,
+      sceneryFar,
       dt,
       this.reducedMotion(),
     );
@@ -12163,7 +12145,7 @@ export class Renderer {
       this.cameraLookAt.y,
       this.cameraLookAt.z,
       fogNear,
-      fogFar,
+      sceneryFar,
       this.vistaLive() && this.fogState === 'outdoor'
         ? this.farVista.envelopeFar * 0.9
         : this.lastRequestedFogNear,
@@ -13051,11 +13033,11 @@ export class Renderer {
     return this.pickSloppy(clientX, clientY);
   }
 
-  // The direct-raycast half of pick(): only a hit that actually lands on an
-  // entity's mesh. Split out so callers that also raycast gather nodes (a
-  // click that lands on a node must not be stolen by the sloppy assist below)
-  // can slot the node raycast in between this and pickSloppy.
+  // The direct half of pick(): a visible nameplate health bar or an entity mesh.
+  // Split out so gather-node callers can slot their raycast before pickSloppy.
   pickDirect(clientX: number, clientY: number): number | null {
+    const nameplate = this.nameplatePainter.pickEntityAt(clientX, clientY);
+    if (nameplate !== null) return nameplate;
     this.raycastNdc.set(
       (clientX / this.viewport.width) * 2 - 1,
       -(clientY / this.viewport.height) * 2 + 1,
@@ -13221,6 +13203,7 @@ export class Renderer {
       radius: number;
       school: string;
       dimmed: boolean;
+      blocked?: boolean;
     } | null,
   ): void {
     this.groundAimReticle.setAim(
@@ -13231,6 +13214,7 @@ export class Renderer {
             radius: aim.radius,
             color: SCHOOL_COLORS[aim.school] ?? 0xffffff,
             dimmed: aim.dimmed,
+            blocked: aim.blocked === true,
           }
         : null,
     );

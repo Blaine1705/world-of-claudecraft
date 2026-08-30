@@ -496,8 +496,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.termsLink': 'Borsa koşullarını görüntüle (yeni sekmede açılır)',
   'hudChrome.wocMarket.title': '$WOC Borsası',
   'hudChrome.wocMarket.variableTokenWarning': '$WOC cinsinden bir USD değeri ödemeyi taahhüt ediyorsun. Kesin token miktarı, ödeme istendiğinde yeni bir fiyat teklifiyle belirlenir ve tahminden farklı olabilir.',
-  'hudChrome.wocMarket.walletBanner': "Borsa'da teklif vermek, satın almak veya satmak için bir cüzdan bağla ve doğrula.",
-  'hudChrome.wocMarket.walletBannerCta': 'Cüzdanı bağla',
   'hudChrome.wocMarket.yourListing': 'İlanın',
   'hudChrome.wocMarket.yourListingTip': "Bu eşyayı sen ilan ettin. Kendi ilanına teklif veremezsin; henüz teklif almadığı sürece burada veya Hareketlerim'den iptal edebilirsin.",
   'apiError.guilds.invalid_roster_name': 'Geçersiz lonca adı.',
@@ -3065,7 +3063,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.intimidating_shout.description': '8 m içindeki en fazla 5 düşmanı 4 sn boyunca korkuyla kaçırtan dehşet verici bir haykırış. Hasar etkiyi bozabilir.',
   'entities.abilities.intimidating_shout.name': 'Gözdağı Narası',
   'entities.abilities.iron_resolve.description':
-    'Dişini sıkıp acıyı yok say: 40’a kadar öfke harcar (en az 20) ve harcanan her öfke başına 4 hasarı en fazla 10 sn boyunca soğurur. (Koruma)',
+    'Dişini sıkıp acıyı yok say: 40’a kadar öfke harcar (en az 20) ve harcanan her öfke başına {absorbPerRage} hasarı en fazla 10 sn boyunca soğurur. (Koruma)',
   'entities.abilities.iron_resolve.name': 'Demir Azim',
   'entities.abilities.measured_fury.description':
     'Ölçülü gazabın tutumunu keskinleştirir: yeteneklerin %10 daha az öfkeye mal olur. (Silahşor)',
@@ -4202,6 +4200,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldBoss.spawn': "{name}, Dikenzirve Tepeleri'nin üzerinde yükseliyor!",
   'itemUi.kind.bag': 'Çanta',
   'itemUi.tooltip.bagSlots': '{slots} Yuvalı Çanta',
+  'itemUi.tooltip.bagSlotsMaterials': '{slots} Yuvalı Malzeme Çantası',
   'questUi.tracker.hideFromMap': '{name} görevini haritadan gizle',
   'questUi.tracker.showOnMap': '{name} görevini haritada göster',
   'sim.delve.baptistryEggs':
@@ -5092,7 +5091,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.siphon_life.description':
     'Düşmandan can sömürür, 30 sn boyunca {damage} Gölge hasarı verir ve verilen hasar kadar seni iyileştirir. (Istırap imzası)',
   'entities.abilities.conflagrate.name': 'Tutuşturma',
-  'entities.abilities.conflagrate.description': 'Yanan Ahdinin gelecek bir tıkını öne alır, ardından hedefi {damage} Ateş hasarı için tutuşturur. 1 Tahribat ve 1 Harabiyet üretir. 2 şarj tutar. (Yıkım imzası)',
+  'entities.abilities.conflagrate.description': 'Yanan Ahdinin gelecek bir tıkını öne alır, ardından hedefi {damage} Ateş hasarı için tutuşturur. 1 Tahribat ve 1 Harabiyet üretir. {charges} şarj tutar. (Yıkım imzası)',
   'entities.abilities.moonkin_form.name': 'Aykuşu Formu',
   'entities.abilities.moonkin_form.description':
     'Aykuşu formuna girer, geri dönene kadar büyü yapmayı güçlendirirsin. Normal forma dönmek için tekrar kullan. (Denge imzası)',
@@ -10107,35 +10106,25 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.boundstone_vanguard.bonus3': 'Saldırı ve büyü hızını %15 artırır.',
   'entities.itemSets.crownforged.name': 'Bonewrought Kıyafetleri',
   'entities.itemSets.crownforged.bonus2': 'Saldırı gücünü 40 artırır.',
-  'entities.itemSets.crownforged.bonus3':
-    'Gücü 15, dayanıklılığı 15, saldırı ve büyü hızını %15 artırır.',
   'entities.itemSets.deathlord.name': 'Barrowlord Savaş Takımı',
   'entities.itemSets.deathlord.bonus2': 'Saldırı gücünü 40 artırır.',
-  'entities.itemSets.deathlord.bonus3': 'Gücü 15 ve dayanıklılığı 15 artırır.',
   'entities.itemSets.greyjaw_stalker.name': 'Greyjaw İzsürücü takımı',
   'entities.itemSets.greyjaw_stalker.bonus3': 'Saldırı ve büyü hızını %15 artırır.',
   'entities.itemSets.necromancers.name': 'Mournweave Giysileri',
   'entities.itemSets.necromancers.bonus2':
     'Büyü gücünü 20 artırır. Alınan hasar artık büyü yapmanı geciktirmez (%100 büyü gecikme direnci).',
-  'entities.itemSets.necromancers.bonus3': 'Zekayı 10 ve dayanıklılığı 10 artırır.',
   'entities.itemSets.nighttalon.name': 'Direfang Postu',
   'entities.itemSets.nighttalon.bonus2': 'Saldırı gücünü 40 artırır.',
-  'entities.itemSets.nighttalon.bonus3':
-    'Çevikliği 15, kritik şansını %2, saldırı ve büyü hızını %15 artırır.',
   'entities.itemSets.soulflame.name': 'Wraithfire Kıyafetleri',
   'entities.itemSets.soulflame.bonus2':
     'Büyü gücünü 20 artırır. Alınan hasar artık büyü yapmanı geciktirmez (%100 büyü gecikme direnci).',
-  'entities.itemSets.soulflame.bonus3': 'Zekayı 15, ruhu 15, saldırı ve büyü hızını %15 artırır.',
   'entities.itemSets.stormcallers.name': 'Galecall Cübbeleri',
   'entities.itemSets.stormcallers.bonus2':
     'Büyü gücünü 20 artırır. Alınan hasar artık büyü yapmanı geciktirmez (%100 büyü gecikme direnci).',
-  'entities.itemSets.stormcallers.bonus3':
-    'Zekayı 15, ruhu 15, saldırı ve büyü hızını %15 artırır.',
   'entities.itemSets.vale_arcanist.name': 'Vadi Arkanisti giysileri',
   'entities.itemSets.vale_arcanist.bonus3': 'Saldırı ve büyü hızını %15 artırır.',
   'entities.itemSets.wyrmshadow.name': 'Nightfang Cübbeleri',
   'entities.itemSets.wyrmshadow.bonus2': 'Saldırı gücünü 40 artırır.',
-  'entities.itemSets.wyrmshadow.bonus3': 'Çevikliği 15 ve kritik şansını %2 artırır.',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemSet.bonusLine': '({pieces}) {bonus}',
   'hud.combat.floatingResist': 'Direnildi',
@@ -12752,7 +12741,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sacred_form.description':
     'Ölüme dek kutsal bir hale girer; iyileştirmeyi 10%, büyü kritik şansını 5% artırır ve üretilen tehdidi 50% azaltır. Yalnızca Güneş Şifacıları için.',
   'entities.abilities.seraphic_vigil.description':
-    'Bir müttefiki 30 sn korur. Onu 35% canın altına düşüren ilk vuruş Nöbeti tüketir ve onu 180 iyileştirir. (Lütuf imzası)',
+    'Bir müttefiki 30 sn korur. Onu 35% canın altına düşüren ilk vuruş Nöbeti tüketir ve onu {buff} iyileştirir. (Lütuf imzası)',
   'entities.abilities.scouring_mercy.description':
     'Bir düşmana 72 ila 84 Kutsal hasar verir ya da dost bir hedefi 130 ila 155 iyileştirir. Her iki değer de büyü gücüyle artar. Hasar ayrıca Öğreti ile bağlı her müttefiki 30%, hiç bağlı müttefik yoksa en düşük canlı grup üyesini 15% iyileştirir. (Öğreti imzası)',
   'entities.abilities.solar_invocation.description':
@@ -12923,10 +12912,10 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     '3 Ay Gelgitini {damage} Gizem hasarı veren ağır bir vuruş için tüketir: hasar seçimi. Güneş İzi de aynı 3 Ay Gelgitini tüketir, o yüzden birini seç.',
   'entities.abilities.moonseed.name': 'Ay Tohumu',
   'entities.abilities.moonseed.description':
-    'Yalnızca Aykuşu Formunda. {damage} Gizem hasarı vurur, bir Ay Gelgiti aşaması ekler ve Ay Fırtınanı 6 sn uzatır, uygulama başına en fazla 6 sn. Ay Gelgiti doluyken Ay Tohumu, Ay Kabarışına dönüşür.',
+    'Yalnızca Aykuşu Formunda. {damage} Gizem hasarı vurur, bir Ay Gelgiti aşaması ekler ve Ay Fırtınanı 6 sn uzatır, uygulama başına en fazla {duration} sn. Ay Gelgiti doluyken Ay Tohumu, Ay Kabarışına dönüşür.',
   'entities.abilities.overbloom.name': 'Taşkın Çiçeklenme',
   'entities.abilities.overbloom.description':
-    '5 Yeşillik tüketir. Tüm müttefiklerdeki her süreli iyileştirmeni kalan iyileştirmesinin 60% kadarıyla hasat eder, o etkileri kaldırır ve hedefe taze bir Yaban Çiçeği eker.',
+    '5 Yeşillik tüketir. Tüm müttefiklerdeki her süreli iyileştirmeni kalan iyileştirmesinin {buff}% kadarıyla hasat eder, o etkileri kaldırır ve hedefe taze bir Yaban Çiçeği eker.',
   'entities.abilities.redharvest.name': 'Kızıl Hasat',
   'entities.abilities.redharvest.description':
     '3 Kadim Kanı tüketir: {damage} hasarlık bir vuruş yapar, Deri Yüzme ve Parçalamanın hedefe vereceği kalan tüm hasarı anında verir, iki kanamayı da kaldırır ve {rage} enerji geri kazandırır. Sıfır combo puanıyla da çalışır.',
@@ -13179,7 +13168,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.maul.specNote_feral': 'İsabet eden her vuruş 1 Kadim Kan ekler; 3 Kadim Kanda bu düğme İlik Kırana dönüşür: yüksek tehditle 78 ila 96 hasar veren bir vuruş; can yarısının altındayken bunun yerine azami canının %18\'i kadar seni kalkanlar ve 15 öfke geri kazandırır.',
   'entities.abilities.moonfire.description': 'Düşmanı ay ateşiyle yakarak {damage} Gizemli hasar artı zamana yayılı hasar verir.',
   'entities.abilities.moonfire.specNote_balance': 'Yanmaya devam ettir: Ay Tohumu süresini 6 sn uzatır.',
-  'entities.abilities.needle_of_fate.description': 'Düşmanı {damage} Gölge hasarıyla deler ve üzerinde Kem Gözün varsa 5 Mahkûmiyet üretir. Birincil Kem Gözüne isabet eden her vuruş 12 sn süren bir Kader İpliği ekler, en fazla 3. Hiç Kem Göz yoksa, İğne önce hedefini işaretler.',
+  'entities.abilities.needle_of_fate.description': 'Düşmanı {damage} Gölge hasarıyla deler ve üzerinde Kem Gözün varsa {needleDoom} Mahkûmiyet üretir. Birincil Kem Gözüne isabet eden her vuruş 12 sn süren bir Kader İpliği ekler, en fazla 3. Hiç Kem Göz yoksa, İğne önce hedefini işaretler.',
   'entities.abilities.needle_of_fate.name': 'Kader İğnesi',
   'entities.abilities.ossuary_mark.description': 'Bir düşmanı 15 sn süreyle işaretler, senin ve ölülerinin verdiği hasarın %20\'sini depolar. Patlatmak için yeniden oku. İşaretli düşman ölürse, 6 yarda içinde patlar ve 1 Ruh Parçası oluşturur.',
   'entities.abilities.ossuary_mark.name': 'Kemik Damgası',

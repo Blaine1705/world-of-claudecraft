@@ -4,11 +4,12 @@ import {
   dungeonDaisHasRaisedPlatform,
   dungeonVariantKeepsFightingFloorClear,
 } from '../src/render/dungeon';
-import { DUNGEONS, instanceOrigin } from '../src/sim/data';
+import { DUNGEONS, instanceOrigin, MOBS } from '../src/sim/data';
 import { dungeonFloorLift, dungeonInstanceAt, INTERIOR_LAYOUTS } from '../src/sim/dungeon_floor';
 import { IGNIVAR_LAYOUT, layoutColliders } from '../src/sim/dungeon_layout';
 import { polygonContainsPoint } from '../src/sim/geometry2d';
 import {
+  IGNIVAR_BOSS_SPAWN_Z,
   IGNIVAR_CONDUITS,
   IGNIVAR_FRONTAL_HALF_ANGLE,
   IGNIVAR_FRONTAL_RANGE,
@@ -109,12 +110,14 @@ describe('Ignivar raid arena', () => {
     ).toBe(false);
   });
 
-  it('places four symmetric diagonal conductors around the central seal', () => {
+  it('places four diagonal conductors on the placed water pumps', () => {
+    // Anchored on the baked water_pump dressing placements (the pumps ARE the
+    // conduits), so these mirror the four water_pump entries in the arena pass.
     expect(IGNIVAR_CONDUITS).toEqual([
-      { id: 'north_west', x: -22, z: 22 },
-      { id: 'north_east', x: 22, z: 22 },
-      { id: 'south_east', x: 22, z: -22 },
-      { id: 'south_west', x: -22, z: -22 },
+      { id: 'north_west', x: -16.2, z: 16.4 },
+      { id: 'north_east', x: 17.1, z: 16.8 },
+      { id: 'south_east', x: 16.6, z: -16.5 },
+      { id: 'south_west', x: -17.4, z: -17.1 },
     ]);
   });
 
@@ -131,7 +134,7 @@ describe('Ignivar raid arena', () => {
       const facing = Math.atan2(conduit.x, conduit.z);
       expect(ignivarConduitHitByFrontal({ x: 0, z: 0 }, facing)).toBe(conduit.id);
     }
-    expect(ignivarConduitHitByFrontal({ x: -22, z: 22 }, 0)).not.toBe('north_west');
+    expect(ignivarConduitHitByFrontal({ x: -18, z: 18 }, 0)).not.toBe('north_west');
   });
 
   it('resolves three narrow rotating rays with a safe gap between every pair', () => {
@@ -168,7 +171,7 @@ describe('Ignivar raid arena', () => {
       interior: 'ignivar',
       overworldDoor: false,
       suggestedPlayers: 10,
-      spawns: [{ mobId: 'ignivar_herald_of_the_last_flame', x: 0, z: 0 }],
+      spawns: [{ mobId: 'ignivar_herald_of_the_last_flame', x: 0, z: IGNIVAR_BOSS_SPAWN_Z }],
       entry: { x: 0, z: -27 },
       exitOffset: { x: 0, z: -30 },
     });
@@ -183,11 +186,26 @@ describe('Ignivar raid arena', () => {
       })),
     );
     expect(dungeon.objects?.at(-1)).toMatchObject({
-      name: 'Sealed Inner Crucible Gate',
+      name: 'Sealed Assembly Gate',
       templateId: 'ignivar_raid_gate_locked',
-      dungeonId: 'ignivar_inner_crucible',
+      dungeonId: 'ignivar_molten_assembly',
       lootable: false,
     });
+  });
+
+  it('places Ignivar beyond automatic aggro range from the room entrance', () => {
+    const dungeon = DUNGEONS.ignivar_raid_arena;
+    const spawn = dungeon.spawns.find(
+      (candidate) => candidate.mobId === 'ignivar_herald_of_the_last_flame',
+    );
+    if (!spawn) throw new Error('Ignivar spawn is missing');
+
+    expect(Math.hypot(spawn.x - dungeon.entry.x, spawn.z - dungeon.entry.z)).toBeGreaterThan(
+      MOBS.ignivar_herald_of_the_last_flame.aggroRadius,
+    );
+    expect(
+      Math.hypot(spawn.x - IGNIVAR_LAYOUT.dais.x, spawn.z - IGNIVAR_LAYOUT.dais.z),
+    ).toBeLessThan(IGNIVAR_LAYOUT.dais.r);
   });
 
   it('keeps the hidden raid room behind an explicit dev bypass for solo testing', () => {
@@ -222,11 +240,14 @@ describe('Ignivar raid arena', () => {
 
     expect(conduits).toHaveLength(4);
     expect(conduits.every((conduit) => conduit.kind === 'object' && !conduit.lootable)).toBe(true);
-    expect(
-      conduits.map((conduit) => ({
-        x: conduit.pos.x - origin.x,
-        z: conduit.pos.z - origin.z,
-      })),
-    ).toEqual(IGNIVAR_CONDUITS.map(({ x, z }) => ({ x, z })));
+    // World coords carry a large instance origin (116800+), so reconstructing
+    // the local offset reintroduces float error at the non-integer pump
+    // anchors; compare with tolerance rather than exact equality. Gameplay is
+    // unaffected: the cleanse check uses world-space differences directly.
+    expect(conduits).toHaveLength(IGNIVAR_CONDUITS.length);
+    for (let index = 0; index < IGNIVAR_CONDUITS.length; index++) {
+      expect(conduits[index].pos.x - origin.x).toBeCloseTo(IGNIVAR_CONDUITS[index].x, 5);
+      expect(conduits[index].pos.z - origin.z).toBeCloseTo(IGNIVAR_CONDUITS[index].z, 5);
+    }
   });
 });

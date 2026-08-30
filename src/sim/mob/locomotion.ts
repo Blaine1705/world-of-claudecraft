@@ -38,12 +38,14 @@ import * as deedsMod from '../deeds';
 import { resetDrownedLitanyBossEncounter } from '../delves/drowned_litany_boss';
 import { clearDelveRaiseDeadChannel } from '../delves/runs';
 import {
+  announceIgnivarDeath,
   IGNIVAR_APOCALYPSE_ADD_ID,
   resetIgnivarEncounter,
   updateIgnivarApocalypseAdd,
   updateIgnivarEncounter,
 } from '../encounters/ignivar';
 import {
+  announceVarkhulDeath,
   resetVarkhulEncounter,
   updateVarkhulAssemblyAutomaton,
   updateVarkhulEncounter,
@@ -55,6 +57,7 @@ import {
 import { isEscortNpcTemplate } from '../escort';
 import { unlockIgnivarRaidGate } from '../ignivar_raid_progression';
 import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
+import { holdPetCorpseForBgWave } from '../pet/pet_corpse_hold';
 import { noteMatchPetUnravelled } from '../pet/pet_match_return';
 import { notePetUnravelledOnOwnerDeath } from '../pet/pet_owner_revive';
 import { corpseHasDecayed } from '../respawn_policy';
@@ -102,7 +105,9 @@ import {
 } from './charge';
 import { updateMobCombatProfile } from './combat_profile';
 import { applyBroodBurn } from './dragonkin_brood';
+import { resetDungeonMinibossStomp, updateDungeonMinibossStomp } from './dungeon_miniboss_stomp';
 import { idleRng, wanderPause } from './idle_rng';
+import { resetIgnivarTrashAutomaton, updateIgnivarTrashAutomaton } from './ignivar_trash_automata';
 import {
   claimMechanicSpacing,
   mechanicSlotHeld,
@@ -202,10 +207,16 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   }
   if (mob.dead) {
     if (mob.templateId === IGNIVAR_BOSS_ID) {
-      if (mob.ignivar) resetIgnivarEncounter(ctx, mob);
+      if (mob.ignivar) {
+        announceIgnivarDeath(ctx, mob);
+        resetIgnivarEncounter(ctx, mob);
+      }
       unlockIgnivarRaidGate(ctx, mob);
     }
-    if (mob.templateId === VARKHUL_BOSS_ID && mob.varkhul) resetVarkhulEncounter(ctx, mob);
+    if (mob.templateId === VARKHUL_BOSS_ID && mob.varkhul) {
+      announceVarkhulDeath(ctx, mob);
+      resetVarkhulEncounter(ctx, mob);
+    }
     ctx.onBossDeath(mob);
     if (
       mob.ownerId !== null &&
@@ -230,6 +241,21 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       mob.ownerId !== null &&
       (MOBS[mob.templateId]?.family === 'demon' || MOBS[mob.templateId]?.family === 'undead')
     ) {
+      // A dead battleground fighter is owed THIS corpse back as a revive-in-place
+      // on the next respawn wave: freeze the decay window (undo this tick's
+      // shared decrement above) so the wave reuses the entity instead of
+      // rebuilding a new one every wave, which forced every nearby client to
+      // re-mint the entity and its character view (pet/pet_corpse_hold.ts has
+      // the full why and the narrowness rules). Decay resumes, with the window
+      // it still had, the moment the hold lifts. An UNDO rather than a skip on
+      // purpose: the corpse-interaction expiry and the detonate fuse above must
+      // keep reading the decremented value, in their existing order, so a held
+      // tick stays byte-identical to an unheld one for every draw site.
+      // Pure state, no rng.
+      if (holdPetCorpseForBgWave(ctx, mob)) {
+        mob.corpseTimer += DT;
+        return;
+      }
       if (mob.corpseTimer <= 0) {
         // An owner inside an arena-shaped match is owed this pet back on the way
         // out, and this is the ONE disappearance the world causes rather than the
@@ -604,6 +630,8 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     }
     case 'chase':
     case 'attack': {
+      if (updateDungeonMinibossStomp(ctx, mob)) break;
+      if (updateIgnivarTrashAutomaton(ctx, mob)) break;
       // A heroic charge dash in flight owns the mob's movement for the tick
       // (mirrors the player's updateChargeMovement early return); it also ticks
       // the charge cooldown, so this runs before the combat-profile runner on
@@ -1477,6 +1505,8 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   mob.enraged = false;
   mob.healedThisPull = false;
   mob.stompTimer = MOBS[mob.templateId]?.stomp?.every ?? 0;
+  resetDungeonMinibossStomp(mob);
+  resetIgnivarTrashAutomaton(mob);
   mob.terrifyTimer = MOBS[mob.templateId]?.terrify?.every ?? 0;
   // The shared spacing lock dies with the pull like the timers around it.
   resetMechanicSpacing(mob);

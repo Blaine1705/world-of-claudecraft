@@ -7,8 +7,6 @@ import { EMISSIVE_TINT, sharedUniforms, surfaceMat } from './gfx';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 
 export const IGNIVAR_ARENA_ATMOSPHERE_NAME = 'ignivarArenaAtmosphere';
-export const IGNIVAR_OBSIDIAN_OUTER_BAND_NAME = 'ignivarObsidianOuterBand';
-export const IGNIVAR_MOLTEN_PERIMETER_NAME = 'ignivarMoltenPerimeterChannels';
 export const IGNIVAR_RUNIC_INLAYS_NAME = 'ignivarRunicOuterInlays';
 export const IGNIVAR_FORGE_VENTS_NAME = 'ignivarForgeVents';
 export const IGNIVAR_AMBIENT_PARTICLES_NAME = 'ignivarAmbientEmbers';
@@ -26,11 +24,14 @@ export const IGNIVAR_ARENA_LIGHTING = Object.freeze({
   fogNear: 34,
   fogFar: 112,
   sunColor: 0xff9d48,
-  sunIntensity: 0.98,
+  // Room-light lift: the ambient legs (key, hemisphere, IBL) run 30% over
+  // the first sunset-forge grade (0.98 / 0.43 / 0.1), matching the approach
+  // hall's lift; torches and fog stay authored.
+  sunIntensity: 1.27,
   hemiSkyColor: 0x93422a,
   hemiGroundColor: 0x280d06,
-  hemiIntensity: 0.43,
-  envIntensity: 0.1,
+  hemiIntensity: 0.56,
+  envIntensity: 0.13,
   rimIntensity: 1.05,
   rimColor: 0xffa45c,
   forgeLightColor: 0xff6a24,
@@ -66,23 +67,15 @@ export interface IgnivarArenaAtmosphereOptions {
 
 type Tier = 'low' | 'high';
 
-const OUTER_BAND_MAX_RADIUS = 29.25;
-const CHANNEL_RADIUS = 30.45;
 const RUNE_RADIUS = 23.25;
 const VENT_RADIUS = 28;
 const CONDUIT_CLEAR_RADIUS = 4.5;
 
-const INNER_BAND_FADE_RADIUS = 21.5;
-
-let innerBandGeometry: THREE.RingGeometry | null = null;
-let outerBandGeometry: THREE.RingGeometry | null = null;
-let channelGeometry: THREE.BoxGeometry | null = null;
 let runeGeometry: THREE.BoxGeometry | null = null;
 let ventBaseGeometry: THREE.CylinderGeometry | null = null;
 let ventCoreGeometry: THREE.CircleGeometry | null = null;
 const particleGeometries = new Map<Tier, THREE.BufferGeometry>();
 const particleMaterials = new Map<Tier, THREE.ShaderMaterial>();
-const obsidianWashMaterials = new Map<string, THREE.MeshBasicMaterial>();
 
 function sharedMaterial(options: Parameters<typeof surfaceMat>[0]): THREE.Material {
   return markSharedMaterial(surfaceMat(options));
@@ -102,92 +95,6 @@ function markLayer<T extends THREE.Object3D>(
   layer.userData.actionable = false;
   layer.userData.telegraph = false;
   return layer;
-}
-
-function obsidianWashMaterial(color: number, opacity: number): THREE.MeshBasicMaterial {
-  const key = `${color}:${opacity}`;
-  const cached = obsidianWashMaterials.get(key);
-  if (cached) return cached;
-  const material = markSharedMaterial(
-    new THREE.MeshBasicMaterial({
-      color,
-      transparent: true,
-      opacity,
-      depthWrite: false,
-      blending: THREE.NormalBlending,
-    }),
-  );
-  obsidianWashMaterials.set(key, material);
-  return material;
-}
-
-function outerBand(lowGfx: boolean): THREE.Group {
-  innerBandGeometry ??= markSharedGeometry(
-    new THREE.RingGeometry(IGNIVAR_ARENA_FLOOR_CLEAR_RADIUS, INNER_BAND_FADE_RADIUS, 64).rotateX(
-      -Math.PI / 2,
-    ),
-  );
-  outerBandGeometry ??= markSharedGeometry(
-    new THREE.RingGeometry(INNER_BAND_FADE_RADIUS, OUTER_BAND_MAX_RADIUS, 64).rotateX(-Math.PI / 2),
-  );
-  const group = markLayer(
-    new THREE.Group(),
-    IGNIVAR_OBSIDIAN_OUTER_BAND_NAME,
-    IGNIVAR_ARENA_FLOOR_CLEAR_RADIUS,
-    OUTER_BAND_MAX_RADIUS,
-  );
-  const innerWash = new THREE.Mesh(
-    innerBandGeometry,
-    obsidianWashMaterial(lowGfx ? 0x240d0b : 0x190608, lowGfx ? 0.14 : 0.18),
-  );
-  innerWash.name = 'ignivarObsidianInnerWash';
-  innerWash.position.y = 0.025;
-  const deepWash = new THREE.Mesh(
-    outerBandGeometry,
-    obsidianWashMaterial(lowGfx ? 0x1d0908 : 0x120407, lowGfx ? 0.26 : 0.34),
-  );
-  deepWash.name = 'ignivarObsidianDeepWash';
-  deepWash.position.y = 0.027;
-  group.userData.surface = 'obsidian-wash';
-  group.userData.innerFadeRadius = INNER_BAND_FADE_RADIUS;
-  group.add(innerWash, deepWash);
-  return group;
-}
-
-function moltenChannels(tier: Tier): THREE.InstancedMesh {
-  channelGeometry ??= markSharedGeometry(new THREE.BoxGeometry(19.5, 0.035, 0.58));
-  const emissiveIntensity = tier === 'low' ? 0.72 : 1.35;
-  const material = sharedMaterial({
-    color: 0x49180d,
-    roughness: 0.62,
-    metalness: 0.04,
-    emissive: 0xff3a0c,
-    emissiveIntensity,
-  });
-  const mesh = markLayer(
-    new THREE.InstancedMesh(channelGeometry, material, 4),
-    IGNIVAR_MOLTEN_PERIMETER_NAME,
-    CHANNEL_RADIUS - 0.4,
-    Math.hypot(CHANNEL_RADIUS + 0.4, 9.75),
-  );
-  const matrix = new THREE.Matrix4();
-  const rotation = new THREE.Quaternion();
-  const scale = new THREE.Vector3(1, 1, 1);
-  const placements = [
-    { x: 0, z: -CHANNEL_RADIUS, angle: 0 },
-    { x: CHANNEL_RADIUS, z: 0, angle: Math.PI / 2 },
-    { x: 0, z: CHANNEL_RADIUS, angle: 0 },
-    { x: -CHANNEL_RADIUS, z: 0, angle: Math.PI / 2 },
-  ];
-  placements.forEach((placement, index) => {
-    rotation.setFromAxisAngle(THREE.Object3D.DEFAULT_UP, placement.angle);
-    matrix.compose(new THREE.Vector3(placement.x, 0.06, placement.z), rotation, scale);
-    mesh.setMatrixAt(index, matrix);
-  });
-  mesh.instanceMatrix.needsUpdate = true;
-  mesh.userData.emissiveIntensity = emissiveIntensity;
-  mesh.userData.channelCount = placements.length;
-  return mesh;
 }
 
 function runicInlays(tier: Tier): THREE.InstancedMesh {
@@ -397,12 +304,6 @@ export function buildIgnivarArenaAtmosphere(options: IgnivarArenaAtmosphereOptio
   root.userData.actionable = false;
   root.userData.telegraph = false;
   root.userData.tier = tier;
-  root.add(
-    outerBand(options.lowGfx),
-    moltenChannels(tier),
-    runicInlays(tier),
-    forgeVents(tier),
-    ambientParticles(tier),
-  );
+  root.add(runicInlays(tier), forgeVents(tier), ambientParticles(tier));
   return root;
 }

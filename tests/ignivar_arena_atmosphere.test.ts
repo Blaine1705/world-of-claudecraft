@@ -12,16 +12,12 @@ import {
   IGNIVAR_ARENA_FLOOR_CLEAR_RADIUS,
   IGNIVAR_ARENA_LIGHTING,
   IGNIVAR_FORGE_VENTS_NAME,
-  IGNIVAR_MOLTEN_PERIMETER_NAME,
-  IGNIVAR_OBSIDIAN_OUTER_BAND_NAME,
   IGNIVAR_RUNIC_INLAYS_NAME,
 } from '../src/render/ignivar_arena_atmosphere';
 import { applyInteriorLightRig } from '../src/render/interior_light_rig';
 import { IGNIVAR_CONDUITS } from '../src/sim/ignivar_arena';
 
 const SEMANTIC_LAYERS = [
-  IGNIVAR_OBSIDIAN_OUTER_BAND_NAME,
-  IGNIVAR_MOLTEN_PERIMETER_NAME,
   IGNIVAR_RUNIC_INLAYS_NAME,
   IGNIVAR_FORGE_VENTS_NAME,
   IGNIVAR_AMBIENT_PARTICLES_NAME,
@@ -105,7 +101,6 @@ describe('Ignivar arena atmosphere', () => {
   it('keeps bright placements in the outer band and clear of all four conduit stations', () => {
     const atmosphere = buildIgnivarArenaAtmosphere({ lowGfx: false });
     const decoratedLayers = [
-      IGNIVAR_MOLTEN_PERIMETER_NAME,
       IGNIVAR_RUNIC_INLAYS_NAME,
       'ignivarForgeVentCasings',
       'ignivarForgeVentCores',
@@ -134,8 +129,6 @@ describe('Ignivar arena atmosphere', () => {
     const highRunes = high.getObjectByName(IGNIVAR_RUNIC_INLAYS_NAME) as THREE.InstancedMesh;
     const lowParticles = low.getObjectByName(IGNIVAR_AMBIENT_PARTICLES_NAME) as THREE.Points;
     const highParticles = high.getObjectByName(IGNIVAR_AMBIENT_PARTICLES_NAME) as THREE.Points;
-    const lowChannels = low.getObjectByName(IGNIVAR_MOLTEN_PERIMETER_NAME) as THREE.InstancedMesh;
-    const highChannels = high.getObjectByName(IGNIVAR_MOLTEN_PERIMETER_NAME) as THREE.InstancedMesh;
 
     expect(lowRunes.count).toBe(8);
     expect(highRunes.count).toBe(12);
@@ -143,11 +136,6 @@ describe('Ignivar arena atmosphere', () => {
     expect(highParticles.geometry.getAttribute('position').count).toBe(96);
     expect(lowParticles.userData.smokeParticleCount).toBe(0);
     expect(highParticles.userData.smokeParticleCount).toBeGreaterThan(0);
-    expect(materialEmissiveIntensity(highChannels)).toBeGreaterThan(
-      materialEmissiveIntensity(lowChannels),
-    );
-    expect(materialEmissiveIntensity(lowChannels)).toBeGreaterThanOrEqual(0.6);
-    expect(materialEmissiveIntensity(highChannels)).toBeLessThanOrEqual(1.4);
     expect(materialEmissiveIntensity(highRunes)).toBeLessThan(0.8);
 
     for (const atmosphere of [low, high]) {
@@ -163,78 +151,16 @@ describe('Ignivar arena atmosphere', () => {
     }
   });
 
-  it('preserves the authored floor beneath a restrained two-step obsidian wash', () => {
-    const radialBounds = (mesh: THREE.Mesh): { min: number; max: number } => {
-      const positions = mesh.geometry.getAttribute('position') as THREE.BufferAttribute;
-      const radii = Array.from({ length: positions.count }, (_, index) =>
-        Math.hypot(positions.getX(index), positions.getZ(index)),
-      );
-      return { min: Math.min(...radii), max: Math.max(...radii) };
-    };
-    const expectedTiers = [
-      {
-        lowGfx: false,
-        inner: { color: 0x190608, opacity: 0.18 },
-        deep: { color: 0x120407, opacity: 0.34 },
-      },
-      {
-        lowGfx: true,
-        inner: { color: 0x240d0b, opacity: 0.14 },
-        deep: { color: 0x1d0908, opacity: 0.26 },
-      },
-    ] as const;
-    for (const expected of expectedTiers) {
-      const atmosphere = buildIgnivarArenaAtmosphere({ lowGfx: expected.lowGfx });
-      const band = atmosphere.getObjectByName(IGNIVAR_OBSIDIAN_OUTER_BAND_NAME) as THREE.Group;
-      const inner = band.getObjectByName('ignivarObsidianInnerWash') as THREE.Mesh;
-      const deep = band.getObjectByName('ignivarObsidianDeepWash') as THREE.Mesh;
-      const innerMaterial = inner.material as THREE.MeshBasicMaterial;
-      const deepMaterial = deep.material as THREE.MeshBasicMaterial;
-
-      expect(band.userData.surface).toBe('obsidian-wash');
-      expect(band.userData.innerFadeRadius).toBe(21.5);
-      const innerBounds = radialBounds(inner);
-      const deepBounds = radialBounds(deep);
-      expect(innerBounds.min).toBeCloseTo(18, 5);
-      expect(innerBounds.max).toBeCloseTo(21.5, 5);
-      expect(deepBounds.min).toBeCloseTo(21.5, 5);
-      expect(deepBounds.max).toBeCloseTo(29.25, 5);
-      for (const material of [innerMaterial, deepMaterial]) {
-        expect(material.transparent).toBe(true);
-        expect(material.depthWrite).toBe(false);
-        expect(material.blending).toBe(THREE.NormalBlending);
-      }
-      expect(innerMaterial.color.getHex()).toBe(expected.inner.color);
-      expect(innerMaterial.opacity).toBe(expected.inner.opacity);
-      expect(deepMaterial.color.getHex()).toBe(expected.deep.color);
-      expect(deepMaterial.opacity).toBe(expected.deep.opacity);
-      expect(innerMaterial.opacity).toBeLessThan(deepMaterial.opacity);
-    }
-
-    const second = buildIgnivarArenaAtmosphere({ lowGfx: false });
-    const third = buildIgnivarArenaAtmosphere({ lowGfx: false });
-    expect((second.getObjectByName('ignivarObsidianInnerWash') as THREE.Mesh).material).toBe(
-      (third.getObjectByName('ignivarObsidianInnerWash') as THREE.Mesh).material,
-    );
-    expect((second.getObjectByName('ignivarObsidianDeepWash') as THREE.Mesh).material).toBe(
-      (third.getObjectByName('ignivarObsidianDeepWash') as THREE.Mesh).material,
-    );
-  });
-
   it('shares immutable resources and animates outer embers from the renderer clock', () => {
     const first = buildIgnivarArenaAtmosphere({ lowGfx: false });
     const second = buildIgnivarArenaAtmosphere({ lowGfx: false });
-    const firstChannels = first.getObjectByName(
-      IGNIVAR_MOLTEN_PERIMETER_NAME,
-    ) as THREE.InstancedMesh;
-    const secondChannels = second.getObjectByName(
-      IGNIVAR_MOLTEN_PERIMETER_NAME,
-    ) as THREE.InstancedMesh;
+    const firstRunes = first.getObjectByName(IGNIVAR_RUNIC_INLAYS_NAME) as THREE.InstancedMesh;
+    const secondRunes = second.getObjectByName(IGNIVAR_RUNIC_INLAYS_NAME) as THREE.InstancedMesh;
     const particles = first.getObjectByName(IGNIVAR_AMBIENT_PARTICLES_NAME) as THREE.Points;
     const material = particles.material as THREE.ShaderMaterial;
 
-    expect(firstChannels.geometry).toBe(secondChannels.geometry);
-    expect(firstChannels.material).toBe(secondChannels.material);
+    expect(firstRunes.geometry).toBe(secondRunes.geometry);
+    expect(firstRunes.material).toBe(secondRunes.material);
     expect(material.uniforms.uTime).toBe(sharedUniforms.uTime);
     expect(material.vertexShader).toContain('uTime');
     expect(material.fragmentShader).toContain('uIntensity');
@@ -248,11 +174,11 @@ describe('Ignivar arena atmosphere', () => {
       fogNear: 34,
       fogFar: 112,
       sunColor: 0xff9d48,
-      sunIntensity: 0.98,
+      sunIntensity: 1.27,
       hemiSkyColor: 0x93422a,
       hemiGroundColor: 0x280d06,
-      hemiIntensity: 0.43,
-      envIntensity: 0.1,
+      hemiIntensity: 0.56,
+      envIntensity: 0.13,
       rimIntensity: 1.05,
       rimColor: 0xffa45c,
       forgeLightColor: 0xff6a24,
@@ -262,8 +188,10 @@ describe('Ignivar arena atmosphere', () => {
     expect(IGNIVAR_ARENA_LIGHTING.fogNear).toBeLessThan(IGNIVAR_ARENA_LIGHTING.fogFar);
     // The sunset forge stays a readable interior, never full daylight, and the
     // env ceiling is the anti-sheen bound: the shared environment map is the
-    // daylight sky, and anything near the old 0.3 frosted the rigs blue-white.
-    expect(IGNIVAR_ARENA_LIGHTING.sunIntensity).toBeLessThanOrEqual(1);
+    // daylight sky, and anything from 0.2 up frosted the rigs blue-white.
+    // Ceilings sit just over the 30% room-light lift (1.27 / 0.56 / 0.13),
+    // with env deliberately capped well under that frost band.
+    expect(IGNIVAR_ARENA_LIGHTING.sunIntensity).toBeLessThanOrEqual(1.3);
     expect(IGNIVAR_ARENA_LIGHTING.hemiIntensity).toBeLessThanOrEqual(0.6);
     expect(IGNIVAR_ARENA_LIGHTING.envIntensity).toBeLessThanOrEqual(0.15);
     expect(IGNIVAR_ARENA_LIGHTING.rimIntensity).toBeLessThanOrEqual(1.3);
@@ -273,7 +201,7 @@ describe('Ignivar arena atmosphere', () => {
     const source = readFileSync(new URL('../src/render/dungeon.ts', import.meta.url), 'utf8');
     expect(source).toContain("from './ignivar_arena_atmosphere'");
     expect(source).toMatch(
-      /if \(interior === 'ignivar'\) \{\s+group\.add\(buildIgnivarArenaAtmosphere\(\{ lowGfx: this\.lowGfx \}\)\);\s+\}/,
+      /if \(interior === 'ignivar'\) \{[\s\S]{0,240}?group\.add\(buildIgnivarArenaAtmosphere\(\{ lowGfx: this\.lowGfx \}\)\);\s+\}/,
     );
     expect(source.match(/buildIgnivarArenaAtmosphere\(/g)).toHaveLength(1);
   });

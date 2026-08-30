@@ -309,10 +309,13 @@ export {
   resolveDelveShopOffers,
 } from './content/delves';
 
+import { CRUCIBLE_PROFESSION_ITEMS } from './content/crucible_professions';
 import { DELVE_ITEMS } from './content/delves/items';
 import { HEROIC_ITEMS, RETIRED_HEROIC_ITEMS } from './content/heroic_loot';
 import { buildHeroicVariants } from './content/heroic_variants';
 import { HEROIC_VENDOR_ITEMS } from './content/heroic_vendor';
+import { IGNIVAR_DROP_ITEMS } from './content/ignivar_drops';
+import { IGNIVAR_LOOT_ITEMS, IGNIVAR_VENDOR_NPCS } from './content/ignivar_loot';
 import { PROFESSION_ITEMS } from './content/profession_items';
 import { FURY_NPC, WARFARE_ITEMS } from './content/pvp_honor';
 import { DELVE_MODULE_LAYOUTS, type DelveModuleId, delveModuleSpan } from './delve_layout';
@@ -360,6 +363,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   HEROIC_VENDOR_ITEMS,
   HEROIC_ITEMS,
   RETIRED_HEROIC_ITEMS,
+  IGNIVAR_LOOT_ITEMS,
   WARFARE_ITEMS,
   RIFT_ITEMS,
   REALM_ITEMS,
@@ -376,6 +380,8 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   WILDHEART_ITEMS,
   PROVING_SHORE_ITEMS,
   DUNGEON_KEEPSAKE_ITEMS,
+  IGNIVAR_DROP_ITEMS,
+  CRUCIBLE_PROFESSION_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';
@@ -440,6 +446,9 @@ export const NPCS: Record<string, NpcDef> = {
   // for the same insertion-order stability reason as the realms above.
   ...PROVING_SHORE_NPCS,
   ...IGNIVAR_RAID_LORE_NPCS,
+  // The Crucible Quartermaster (dynamic: true, spawned by the raid's approach
+  // room), appended after the lore NPCs for insertion-order stability.
+  ...IGNIVAR_VENDOR_NPCS,
   // The Spirit Healer template (dynamic: true, so the ctor's surface-placement
   // loop skips it). Kept in NPCS so the online client and world_entity_i18n can
   // resolve its name; spirit.ts spawns a copy at every graveyard.
@@ -1014,15 +1023,20 @@ export const INSTANCE_X_BASE = 99_400;
 export const DUNGEON_X_THRESHOLD = INSTANCE_X_BASE + 600; // x beyond this = inside an instance
 export const DUNGEON_FLOOR_Y = 0;
 
-export function instanceOrigin(dungeonIndex: number, slot: number): { x: number; z: number } {
+/** The x half of instanceOrigin, allocation-free for hot callers that need no
+ *  z (the vault craft gate's derived west-reach walk runs per gate call).
+ *  instanceOrigin below composes THIS, so the band formula has one home. */
+export function instanceOriginX(dungeonIndex: number): number {
   // The original contiguous dungeon band is full at index 6 because the delve
   // band begins immediately after it. New dungeons use an overflow band east
   // of the bounded Yumi instances, preserving every shipped instance origin.
-  const x =
-    dungeonIndex >= DUNGEON_OVERFLOW_INDEX
-      ? DUNGEON_OVERFLOW_X_BASE + (dungeonIndex - DUNGEON_OVERFLOW_INDEX) * 600
-      : INSTANCE_X_BASE + 900 + dungeonIndex * 600;
-  return { x, z: -1250 + slot * 500 };
+  return dungeonIndex >= DUNGEON_OVERFLOW_INDEX
+    ? DUNGEON_OVERFLOW_X_BASE + (dungeonIndex - DUNGEON_OVERFLOW_INDEX) * 600
+    : INSTANCE_X_BASE + 900 + dungeonIndex * 600;
+}
+
+export function instanceOrigin(dungeonIndex: number, slot: number): { x: number; z: number } {
+  return { x: instanceOriginX(dungeonIndex), z: -1250 + slot * 500 };
 }
 
 export const DUNGEON_OVERFLOW_INDEX = 7;
@@ -1063,6 +1077,11 @@ export function dungeonAt(x: number): DungeonDef | null {
   }
   if (x <= DUNGEON_X_THRESHOLD || x >= DELVE_BAND_X_MIN || isArenaPos(x)) return null;
   return dungeonByIndex(Math.round((x - (INSTANCE_X_BASE + 900)) / 600));
+}
+
+export function isDungeonEntryTransition(fromX: number, toX: number): boolean {
+  const destination = dungeonAt(toX);
+  return destination !== null && dungeonAt(fromX)?.id !== destination.id;
 }
 
 // ---------------------------------------------------------------------------

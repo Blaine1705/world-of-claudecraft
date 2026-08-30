@@ -21,6 +21,9 @@ const GROUND_LIFT = 0.09;
 const RIM_INNER_FRACTION = 0.84;
 const FORGESTORM_COLOR = 0xff4b16;
 const FORGESTORM_EDGE_COLOR = 0xffb12b;
+const METEOR_START_HEIGHT = 18;
+const METEOR_IMPACT_HEIGHT = 0.55;
+const METEOR_TRAIL_OFFSET = 3.1;
 
 interface ForgestormVisual {
   group: THREE.Group;
@@ -28,6 +31,10 @@ interface ForgestormVisual {
   fillMaterial: THREE.MeshBasicMaterial;
   countdownMaterial: THREE.MeshBasicMaterial;
   countdown: THREE.Mesh;
+  meteorMaterial: THREE.MeshBasicMaterial;
+  meteor: THREE.Mesh;
+  trailMaterial: THREE.MeshBasicMaterial;
+  trail: THREE.Mesh;
   remaining: number;
   duration: number;
   phase: number;
@@ -98,10 +105,44 @@ export function buildVarkhulForgestormTelegraph(
   countdown.renderOrder = 12;
   group.add(countdown);
 
+  const meteorMaterial = new THREE.MeshBasicMaterial({
+    color: 0xff7a16,
+    transparent: true,
+    opacity: 0.96,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    toneMapped: false,
+  });
+  const meteor = new THREE.Mesh(new THREE.IcosahedronGeometry(0.72, 1), meteorMaterial);
+  meteor.name = 'varkhul-forgestorm-meteor';
+  meteor.position.y = METEOR_START_HEIGHT;
+  meteor.renderOrder = 14;
+  group.add(meteor);
+
+  const trailMaterial = new THREE.MeshBasicMaterial({
+    color: 0xffb12b,
+    transparent: true,
+    opacity: 0.58,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    side: THREE.DoubleSide,
+    toneMapped: false,
+  });
+  trailMaterial.forceSinglePass = true;
+  const trail = new THREE.Mesh(new THREE.ConeGeometry(0.62, 6.2, 9, 1, true), trailMaterial);
+  trail.name = 'varkhul-forgestorm-meteor-trail';
+  trail.position.y = METEOR_START_HEIGHT + METEOR_TRAIL_OFFSET;
+  trail.renderOrder = 13;
+  group.add(trail);
+
   group.userData.rimMaterial = rimMaterial;
   group.userData.fillMaterial = fillMaterial;
   group.userData.countdownMaterial = countdownMaterial;
   group.userData.countdown = countdown;
+  group.userData.meteorMaterial = meteorMaterial;
+  group.userData.meteor = meteor;
+  group.userData.trailMaterial = trailMaterial;
+  group.userData.trail = trail;
   return group;
 }
 
@@ -113,12 +154,14 @@ function disposeVisual(visual: ForgestormVisual): void {
   visual.rimMaterial.dispose();
   visual.fillMaterial.dispose();
   visual.countdownMaterial.dispose();
+  visual.meteorMaterial.dispose();
+  visual.trailMaterial.dispose();
   visual.group.removeFromParent();
 }
 
 export class VarkhulForgestormVisuals {
-  private readonly visuals = new Map<number, ForgestormVisual>();
-  private readonly activeIds = new Set<number>();
+  private readonly visuals = new Map<string, ForgestormVisual>();
+  private readonly activeIds = new Set<string>();
   private readonly cinderOrbVisuals: VarkhulCinderOrbVisuals;
   private readonly forgeBeamVisuals: VarkhulForgeBeamVisuals;
   private readonly interceptBeamVisuals: VarkhulInterceptBeamVisuals;
@@ -153,6 +196,10 @@ export class VarkhulForgestormVisuals {
           fillMaterial: group.userData.fillMaterial as THREE.MeshBasicMaterial,
           countdownMaterial: group.userData.countdownMaterial as THREE.MeshBasicMaterial,
           countdown: group.userData.countdown as THREE.Mesh,
+          meteorMaterial: group.userData.meteorMaterial as THREE.MeshBasicMaterial,
+          meteor: group.userData.meteor as THREE.Mesh,
+          trailMaterial: group.userData.trailMaterial as THREE.MeshBasicMaterial,
+          trail: group.userData.trail as THREE.Mesh,
           remaining: warning.remaining,
           duration: warning.duration,
           phase: 0,
@@ -206,6 +253,17 @@ export class VarkhulForgestormVisuals {
       }
       const duration = Math.max(0.05, visual.duration);
       const elapsedFraction = THREE.MathUtils.clamp(1 - visual.remaining / duration, 0, 1);
+      const descent = elapsedFraction * elapsedFraction * (3 - 2 * elapsedFraction);
+      const meteorY = THREE.MathUtils.lerp(METEOR_START_HEIGHT, METEOR_IMPACT_HEIGHT, descent);
+      visual.meteor.position.y = meteorY;
+      visual.trail.position.y = meteorY + METEOR_TRAIL_OFFSET;
+      visual.trail.scale.y = 0.78 + elapsedFraction * 0.36;
+      visual.meteorMaterial.opacity = 0.82 + elapsedFraction * 0.16;
+      visual.trailMaterial.opacity = 0.42 + elapsedFraction * 0.24;
+      if (!reducedMotion) {
+        visual.meteor.rotation.x += Math.max(0, dt) * 3.4;
+        visual.meteor.rotation.z += Math.max(0, dt) * 2.1;
+      }
       const countdownScale = Math.max(0.001, elapsedFraction);
       visual.countdown.scale.set(countdownScale, 1, countdownScale);
       const pulse = reducedMotion ? 0.5 : 0.5 + 0.5 * Math.sin(visual.phase);

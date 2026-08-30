@@ -1,8 +1,11 @@
 // Shared Pyre presentation. It combines WoW's persistent soak flame and
-// meteor swirl with inward arrows and four explicit occupancy runes.
+// meteor swirl with inward arrows and explicit difficulty-sized occupancy runes.
 
 import * as THREE from 'three';
-import { IGNIVAR_SOAK_RADIUS, IGNIVAR_SOAK_REQUIRED_PLAYERS } from '../sim/encounters/ignivar';
+import {
+  VARKHUL_SHARED_PYRE_RADIUS,
+  VARKHUL_SHARED_PYRE_REQUIRED_NORMAL,
+} from '../sim/varkhul_shared_pyre';
 
 export const IGNIVAR_SOAK_VISUAL_NAME = 'ignivarSoakCircle';
 export const IGNIVAR_SOAK_FILL_NAME = 'ignivarSoakFill';
@@ -14,6 +17,7 @@ export const IGNIVAR_SOAK_TIMER_NAME = 'ignivarSoakTimer';
 export const IGNIVAR_SOAK_FLAME_NAME = 'ignivarSoakCallInFlame';
 export const IGNIVAR_SOAK_READY_NAME = 'ignivarSoakReadyRune';
 export const IGNIVAR_SOAK_BEACON_NAME = 'ignivarSoakCallInBeacon';
+export const IGNIVAR_SOAK_BEACON_CROWN_NAME = 'ignivarSoakCallInBeaconCrown';
 
 const OCCUPIED_COLOR = new THREE.Color(0xffd36a);
 const EMPTY_COLOR = new THREE.Color(0x58210c);
@@ -26,6 +30,7 @@ function material(color: number, opacity: number): THREE.MeshBasicMaterial {
     depthWrite: false,
     blending: THREE.AdditiveBlending,
     side: THREE.DoubleSide,
+    toneMapped: false,
   });
 }
 
@@ -84,8 +89,8 @@ function arrowsGeometry(): THREE.BufferGeometry {
     const forwardZ = Math.cos(angle);
     const tangentX = Math.cos(angle);
     const tangentZ = -Math.sin(angle);
-    const tipRadius = IGNIVAR_SOAK_RADIUS * 0.53;
-    const baseRadius = IGNIVAR_SOAK_RADIUS * 0.78;
+    const tipRadius = VARKHUL_SHARED_PYRE_RADIUS * 0.53;
+    const baseRadius = VARKHUL_SHARED_PYRE_RADIUS * 0.78;
     const vertex = positions.length / 3;
     positions.push(
       forwardX * tipRadius,
@@ -115,8 +120,8 @@ function swirlGeometry(): THREE.BufferGeometry {
     for (let index = 0; index < segments; index++) {
       const progressA = index / segments;
       const progressB = (index + 1) / segments;
-      const radiusA = 0.9 + progressA * (IGNIVAR_SOAK_RADIUS * 0.72 - 0.9);
-      const radiusB = 0.9 + progressB * (IGNIVAR_SOAK_RADIUS * 0.72 - 0.9);
+      const radiusA = 0.9 + progressA * (VARKHUL_SHARED_PYRE_RADIUS * 0.72 - 0.9);
+      const radiusB = 0.9 + progressB * (VARKHUL_SHARED_PYRE_RADIUS * 0.72 - 0.9);
       const angleA = (arm / arms) * Math.PI * 2 + progressA * Math.PI * 1.55;
       const angleB = (arm / arms) * Math.PI * 2 + progressB * Math.PI * 1.55;
       const halfWidth = 0.1;
@@ -144,14 +149,14 @@ function swirlGeometry(): THREE.BufferGeometry {
   return geometry;
 }
 
-function occupancyGeometry(): THREE.BufferGeometry {
+function occupancyGeometry(requiredPlayers: number): THREE.BufferGeometry {
   const positions: number[] = [];
   const colors: number[] = [];
   const indices: number[] = [];
   const centerRadius = 1.62;
   const half = 0.28;
-  for (let slot = 0; slot < IGNIVAR_SOAK_REQUIRED_PLAYERS; slot++) {
-    const angle = (slot / IGNIVAR_SOAK_REQUIRED_PLAYERS) * Math.PI * 2 + Math.PI / 4;
+  for (let slot = 0; slot < requiredPlayers; slot++) {
+    const angle = (slot / requiredPlayers) * Math.PI * 2 + Math.PI / 4;
     const centerX = Math.sin(angle) * centerRadius;
     const centerZ = Math.cos(angle) * centerRadius;
     const vertex = positions.length / 3;
@@ -206,15 +211,20 @@ function callInBeacon(): THREE.Group {
   const beacon = new THREE.Group();
   beacon.name = IGNIVAR_SOAK_BEACON_NAME;
   const outer = new THREE.Mesh(
-    new THREE.ConeGeometry(0.5, 4.2, 8, 1, true),
-    material(0xff750d, 0.22),
+    new THREE.ConeGeometry(0.72, 7.2, 10, 1, true),
+    material(0xff750d, 0.42),
   );
-  outer.position.y = 2.15;
+  outer.position.y = 3.65;
   const core = new THREE.Mesh(
-    new THREE.ConeGeometry(0.16, 3.35, 8, 1, true),
-    material(0xfff0a3, 0.62),
+    new THREE.ConeGeometry(0.22, 6.2, 10, 1, true),
+    material(0xfff0a3, 0.86),
   );
-  core.position.y = 1.88;
+  core.position.y = 3.35;
+  const crown = new THREE.Mesh(new THREE.TorusGeometry(1.08, 0.11, 8, 32), material(0xffe9a1, 0.9));
+  crown.name = IGNIVAR_SOAK_BEACON_CROWN_NAME;
+  crown.position.y = 6.55;
+  crown.rotation.x = Math.PI / 2;
+  crown.renderOrder = 10;
   const emberCount = 22;
   const emberPositions = new Float32Array(emberCount * 3);
   for (let index = 0; index < emberCount; index++) {
@@ -236,30 +246,36 @@ function callInBeacon(): THREE.Group {
       blending: THREE.AdditiveBlending,
       depthWrite: false,
       sizeAttenuation: true,
+      toneMapped: false,
     }),
   );
-  beacon.add(outer, core, embers);
+  beacon.add(outer, core, crown, embers);
   beacon.userData.outer = outer;
   beacon.userData.core = core;
   beacon.userData.embers = embers;
+  beacon.userData.crown = crown;
   beacon.renderOrder = 9;
   return beacon;
 }
 
-export function buildIgnivarSoakTelegraph(): THREE.Group {
+export function buildIgnivarSoakTelegraph(
+  requiredPlayers = VARKHUL_SHARED_PYRE_REQUIRED_NORMAL,
+): THREE.Group {
+  const occupancySlots = Math.max(1, Math.floor(requiredPlayers));
   const root = new THREE.Group();
   root.name = IGNIVAR_SOAK_VISUAL_NAME;
   root.userData.renderCategory = 'ui3d';
-  root.userData.requiredPlayers = IGNIVAR_SOAK_REQUIRED_PLAYERS;
+  root.userData.requiredPlayers = occupancySlots;
+  root.userData.occupancySlots = occupancySlots;
 
   const fill = new THREE.Mesh(
-    discGeometry(IGNIVAR_SOAK_RADIUS, 64, 0.04),
+    discGeometry(VARKHUL_SHARED_PYRE_RADIUS, 64, 0.04),
     material(0xb85a08, 0.16),
   );
   fill.name = IGNIVAR_SOAK_FILL_NAME;
   fill.renderOrder = 2;
   const rim = new THREE.Mesh(
-    radialBandGeometry(IGNIVAR_SOAK_RADIUS - 0.22, IGNIVAR_SOAK_RADIUS, 64, 0.064),
+    radialBandGeometry(VARKHUL_SHARED_PYRE_RADIUS - 0.22, VARKHUL_SHARED_PYRE_RADIUS, 64, 0.064),
     material(0xffcf58, 0.94),
   );
   rim.name = IGNIVAR_SOAK_RIM_NAME;
@@ -272,11 +288,16 @@ export function buildIgnivarSoakTelegraph(): THREE.Group {
   arrows.renderOrder = 4;
   const occupancyMaterial = material(0xffffff, 0.96);
   occupancyMaterial.vertexColors = true;
-  const occupancy = new THREE.Mesh(occupancyGeometry(), occupancyMaterial);
+  const occupancy = new THREE.Mesh(occupancyGeometry(occupancySlots), occupancyMaterial);
   occupancy.name = IGNIVAR_SOAK_OCCUPANCY_NAME;
   occupancy.renderOrder = 6;
   const timer = new THREE.Mesh(
-    radialBandGeometry(IGNIVAR_SOAK_RADIUS - 0.48, IGNIVAR_SOAK_RADIUS - 0.32, 64, 0.082),
+    radialBandGeometry(
+      VARKHUL_SHARED_PYRE_RADIUS - 0.48,
+      VARKHUL_SHARED_PYRE_RADIUS - 0.32,
+      64,
+      0.082,
+    ),
     material(0xfff0ae, 0.74),
   );
   timer.name = IGNIVAR_SOAK_TIMER_NAME;
@@ -323,7 +344,8 @@ export function syncIgnivarSoakTelegraph(
   const arrows = root.getObjectByName(IGNIVAR_SOAK_ARROWS_NAME) as THREE.Mesh | undefined;
   if (occupancy) {
     const colors = occupancy.geometry.getAttribute('color') as THREE.BufferAttribute;
-    for (let slot = 0; slot < IGNIVAR_SOAK_REQUIRED_PLAYERS; slot++) {
+    const occupancySlots = Math.max(1, Math.floor(Number(root.userData.occupancySlots ?? 4)));
+    for (let slot = 0; slot < occupancySlots; slot++) {
       const color = slot < root.userData.playersInside ? OCCUPIED_COLOR : EMPTY_COLOR;
       for (let vertex = 0; vertex < 4; vertex++)
         colors.setXYZ(slot * 4 + vertex, color.r, color.g, color.b);
@@ -348,8 +370,10 @@ export function syncIgnivarSoakTelegraph(
     const outer = beacon.userData.outer as THREE.Mesh | undefined;
     const core = beacon.userData.core as THREE.Mesh | undefined;
     const embers = beacon.userData.embers as THREE.Points | undefined;
-    if (outer) (outer.material as THREE.Material).opacity = 0.18 + Math.sin(motionTime * 6) * 0.04;
-    if (core) (core.material as THREE.Material).opacity = 0.54 + Math.sin(motionTime * 8) * 0.1;
+    const crown = beacon.userData.crown as THREE.Mesh | undefined;
+    if (outer) (outer.material as THREE.Material).opacity = 0.4 + Math.sin(motionTime * 6) * 0.04;
+    if (core) (core.material as THREE.Material).opacity = 0.86 + Math.sin(motionTime * 8) * 0.08;
+    if (crown) (crown.material as THREE.Material).opacity = 0.88 + Math.sin(motionTime * 5) * 0.06;
     if (embers) embers.rotation.y = motionTime * 1.7;
   }
   if (ready) {

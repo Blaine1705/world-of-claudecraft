@@ -83,6 +83,9 @@ export interface ActiveVarkhulAssembly {
   forgeBeamActiveMask: number;
   forgeBeamWarmupRemaining: number;
   forgeMeltdownRemaining: number;
+  addWave: number;
+  addWaves: number;
+  addsRemaining: number;
   forgeBeams: Array<{
     index: VarkhulForgeBeamIndex;
     columnX: number;
@@ -90,6 +93,7 @@ export interface ActiveVarkhulAssembly {
     impactX: number;
     impactZ: number;
     active: boolean;
+    warning: boolean;
     blocked: boolean;
     blockerId: number | null;
   }>;
@@ -111,9 +115,16 @@ export interface VarkhulAssemblyProjectionState {
   assemblyForgeHp: number;
   assemblyForgeOverheat: number;
   assemblyForgeBeamActiveMask: number;
+  assemblyForgeBeamWarningMask: number;
   assemblyForgeBeamWarmupRemaining: number;
   assemblyForgeBeamBlockerIds: readonly (number | null)[];
   assemblyForgeMeltdownRemaining: number;
+  assemblyIntermissionWaves: number;
+  assemblyNextWaveIndex: number;
+  assemblyAddIds: readonly number[];
+  assemblyPortalSpawns: readonly { wave: number; spawnIndex: number; remaining: number }[];
+  assemblyArtificerPortalSpawns: readonly { portalIndex: number; remaining: number }[];
+  assemblyOrdinaryAddWaves: readonly { addId: number; wave: number }[];
   interceptBeamTargetId: number | null;
   interceptBeamBlockerId: number | null;
   interceptBeamCastRemaining: number;
@@ -538,8 +549,22 @@ export function activeVarkhulAssembly(
     return null;
   }
   const forgeAnchor = forge;
+  const addWaves =
+    state.assemblyPhase === 'adds' ? Math.max(0, Math.floor(state.assemblyIntermissionWaves)) : 0;
+  const addWave =
+    addWaves > 0 ? Math.min(addWaves, Math.max(1, Math.floor(state.assemblyNextWaveIndex))) : 0;
+  const addsRemaining =
+    state.assemblyPhase === 'adds'
+      ? state.assemblyPortalSpawns.length +
+        state.assemblyArtificerPortalSpawns.length +
+        state.assemblyAddIds.reduce((count, addId) => {
+          const add = entityOf(addId);
+          return count + (add && !add.dead ? 1 : 0);
+        }, 0)
+      : 0;
   const forgeBeams = varkhulForgeBeamColumns(forgeAnchor).map((column) => {
     const active = (state.assemblyForgeBeamActiveMask & (1 << column.index)) !== 0;
+    const warning = (state.assemblyForgeBeamWarningMask & (1 << column.index)) !== 0;
     const blockerId = state.assemblyForgeBeamBlockerIds?.[column.index] ?? null;
     const blocker = !active || blockerId === null ? undefined : entityOf(blockerId);
     const impact = varkhulForgeBeamImpactPosition(
@@ -556,6 +581,7 @@ export function activeVarkhulAssembly(
       impactX: impact.x,
       impactZ: impact.z,
       active,
+      warning,
       blocked: blocker !== undefined && !blocker.dead,
       blockerId: blocker !== undefined && !blocker.dead ? blockerId : null,
     };
@@ -572,6 +598,9 @@ export function activeVarkhulAssembly(
     forgeBeamActiveMask: state.assemblyForgeBeamActiveMask,
     forgeBeamWarmupRemaining: state.assemblyForgeBeamWarmupRemaining,
     forgeMeltdownRemaining: state.assemblyForgeMeltdownRemaining,
+    addWave,
+    addWaves,
+    addsRemaining,
     forgeBeams,
     interceptBeam: activeVarkhulInterceptBeam(bossId, boss, state, entityOf),
     cores: [],
@@ -602,6 +631,9 @@ export function inactiveVarkhulAssembly(
     forgeBeamActiveMask: 0,
     forgeBeamWarmupRemaining: 0,
     forgeMeltdownRemaining: 0,
+    addWave: 0,
+    addWaves: 0,
+    addsRemaining: 0,
     forgeBeams: varkhulForgeBeamColumns(forge).map((column) => ({
       index: column.index,
       columnX: column.x,
@@ -609,6 +641,7 @@ export function inactiveVarkhulAssembly(
       impactX: forge.x,
       impactZ: forge.z,
       active: false,
+      warning: false,
       blocked: false,
       blockerId: null,
     })),

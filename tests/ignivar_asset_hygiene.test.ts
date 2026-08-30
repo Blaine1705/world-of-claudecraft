@@ -38,29 +38,11 @@ const sha = (bytes: Uint8Array) => createHash('sha256').update(bytes).digest('he
 // Keys shipped ahead of their placements, each a visible maintainer
 // decision. SHRINK-ONLY: never park a new asset here; place it or strip
 // it (the lava_ramp recipe: loader rows out, GLB out of public/, source
-// kept under tmp/asset_src). The current entries are all BASE-drop
-// interior placer-kit stock (this cleanup's scope was the entrance
-// branch's own assets): the owner is still dressing the raid interiors,
-// so their fate is a base-branch decision. torch is a special case
-// either way: its URL is the dungeon kit's shared torch_mounted.glb,
-// which ships for the torch rigs regardless of this key.
-const EXPECTED_UNPLACED: ReadonlySet<string> = new Set([
-  'curved_wall',
-  'firepit',
-  'gear_wall',
-  'pillar_broad',
-  'forge',
-  'control_machine',
-  'furnace_small',
-  'gear_pile',
-  'shelf',
-  'lava_face',
-  'lava_outlet_2',
-  'pressure_device',
-  'radiator',
-  'steam_machine',
-  'torch',
-]);
+// kept under tmp/asset_src). The raid arm's 2026-08 unplaced-prop trim
+// stripped the rest of the BASE-drop interior placer stock, and the raid
+// interior dressing now places every survivor, torch included, so the
+// list is empty today.
+const EXPECTED_UNPLACED: ReadonlySet<string> = new Set<string>();
 
 /** Every prop placement the REAL sim tables author (wired into a loader
  *  does not count as used; these tables are what the game draws). */

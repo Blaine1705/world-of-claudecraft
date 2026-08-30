@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "bddb1cb2",
+      "nextId": 1000,
+      "state": "d0a75969",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -36,7 +36,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
@@ -53,7 +60,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 994,
+          "entityId": 995,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -78,7 +85,10 @@
           "talents": {
             "rows": {}
           },
-          "townFocus": {}
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          }
         }
       ],
       "entities": [
@@ -93,8 +103,9 @@
           "dualWielding": true,
           "fallStartY": -2,
           "fiveSecondRule": 99,
+          "healPower": 6,
           "hp": 62,
-          "id": 994,
+          "id": 995,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -146,9 +157,9 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 1013,
-      "state": "d0749aba",
-      "events": "873d2f22",
+      "nextId": 1014,
+      "state": "9b379c90",
+      "events": "7d9bb708",
       "rng": {
         "draws": 3,
         "digest": "8261aa7c"
@@ -157,9 +168,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 1013,
-      "state": "050475d4",
-      "events": "632a979f",
+      "nextId": 1014,
+      "state": "aae0a60a",
+      "events": "1fb971b0",
       "rng": {
         "draws": 3,
         "digest": "8261aa7c"
@@ -168,8 +179,8 @@
     {
       "tick": 30,
       "time": 1.5,
-      "nextId": 1013,
-      "state": "9e823ca2",
+      "nextId": 1014,
+      "state": "e85bee38",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -179,8 +190,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 1013,
-      "state": "66841f60",
+      "nextId": 1014,
+      "state": "50e7398e",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -190,8 +201,8 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 1013,
-      "state": "8ede6d9a",
+      "nextId": 1014,
+      "state": "b823faf0",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -201,8 +212,8 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 1013,
-      "state": "37a9b124",
+      "nextId": 1014,
+      "state": "d9a5e5ba",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -212,9 +223,9 @@
     {
       "tick": 69,
       "time": 3.45,
-      "nextId": 1014,
-      "state": "02d6d394",
-      "events": "c838dda8",
+      "nextId": 1015,
+      "state": "71491042",
+      "events": "5d86cbe7",
       "rng": {
         "draws": 5,
         "digest": "50aeceb5"
@@ -233,7 +244,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
@@ -291,7 +309,7 @@
             "eastbrook_ledger"
           ],
           "delveMarks": 1,
-          "entityId": 994,
+          "entityId": 995,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -319,6 +337,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "xp": 898
         }
       ],
@@ -333,8 +354,9 @@
           "dodgeChance": 0.0715,
           "dualWielding": true,
           "fiveSecondRule": 102.45,
+          "healPower": 6,
           "hp": 50000,
-          "id": 994,
+          "id": 995,
           "inCombat": true,
           "kind": "player",
           "level": 7,
@@ -391,7 +413,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 1012,
+          "id": 1013,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -424,8 +446,8 @@
     {
       "tick": 70,
       "time": 3.5,
-      "nextId": 1014,
-      "state": "489b3f6e",
+      "nextId": 1015,
+      "state": "f299c3fc",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -435,8 +457,8 @@
     {
       "tick": 71,
       "time": 3.55,
-      "nextId": 1014,
-      "state": "34337e9c",
+      "nextId": 1015,
+      "state": "ceff384a",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -456,7 +478,14 @@
             null,
             null
           ],
-          "bank": {},
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
           "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
@@ -514,7 +543,7 @@
             "eastbrook_ledger"
           ],
           "delveMarks": 1,
-          "entityId": 994,
+          "entityId": 995,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
@@ -542,6 +571,9 @@
             "rows": {}
           },
           "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
           "xp": 898
         }
       ],
@@ -556,8 +588,9 @@
           "dodgeChance": 0.0715,
           "dualWielding": true,
           "fiveSecondRule": 102.55,
+          "healPower": 6,
           "hp": 50000,
-          "id": 994,
+          "id": 995,
           "inCombat": true,
           "kind": "player",
           "level": 7,
@@ -614,7 +647,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 1012,
+          "id": 1013,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",

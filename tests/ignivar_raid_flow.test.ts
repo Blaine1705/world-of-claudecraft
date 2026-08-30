@@ -10,14 +10,13 @@ import {
   IGNIVAR_MOLTEN_ARMOR_AURA_ID,
   IGNIVAR_SKYFIRE_CAST_ID,
   IGNIVAR_SOAK_AURA_ID,
-  IGNIVAR_SOAK_REQUIRED_PLAYERS,
   updateIgnivarEncounter,
 } from '../src/sim/encounters/ignivar';
 import { IGNIVAR_WATER_CONDUIT_TEMPLATES } from '../src/sim/ignivar_arena';
 import { IGNIVAR_JUDGMENT_ACTIVE_SECONDS } from '../src/sim/ignivar_forge_judgment';
 import { enterDungeon } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
-import { DT, type Entity, IGNIVAR_BOSS_ID, type PlayerClass } from '../src/sim/types';
+import { DT, dist2d, type Entity, IGNIVAR_BOSS_ID, type PlayerClass } from '../src/sim/types';
 
 type RaidRole = 'tank' | 'healer' | 'dps';
 
@@ -114,35 +113,24 @@ describe('Ignivar ten-player Normal mechanics smoke', () => {
     ).toBe(false);
 
     boss.ignivar.skyfireTimer = 0;
-    boss.ignivar.soakTimer = 999;
     updateIgnivarEncounter(sim.ctx, boss);
     expect(boss.castingAbility).toBe(IGNIVAR_SKYFIRE_CAST_ID);
     boss.ignivar.skyfireCastRemaining = DT;
     updateIgnivarEncounter(sim.ctx, boss);
     expect(boss.castingAbility).toBeNull();
 
+    // Shared Pyre belongs to Varkhul's Inner Crucible fight now: Ignivar's
+    // legacy soak state stays inert for the whole flow
+    // (tests/ignivar_encounter.test.ts pins the ownership move; the live
+    // mechanic is covered by tests/varkhul_shared_pyre.test.ts).
     boss.ignivar.soakTimer = 0;
     updateIgnivarEncounter(sim.ctx, boss);
-    const marked = sim.entities.get(boss.ignivar.soakTargetId ?? -1);
-    if (!marked) throw new Error('Shared Pyre target was not found');
-    expect(roster.find((raider) => raider.entity.id === marked.id)?.role).not.toBe('tank');
-    const soakGroup = [
-      marked,
-      ...roster
-        .filter((raider) => raider.role !== 'tank' && raider.entity.id !== marked.id)
-        .slice(0, IGNIVAR_SOAK_REQUIRED_PLAYERS - 1)
-        .map((raider) => raider.entity),
-    ];
-    expect(soakGroup).toHaveLength(IGNIVAR_SOAK_REQUIRED_PLAYERS);
-    for (const raider of roster) {
-      raider.entity.pos = soakGroup.includes(raider.entity)
-        ? { ...marked.pos }
-        : { x: marked.pos.x + 20, y: marked.pos.y, z: marked.pos.z };
-    }
-    boss.ignivar.soakRemaining = DT;
-    updateIgnivarEncounter(sim.ctx, boss);
-    expect(marked.auras.some((aura) => aura.id === IGNIVAR_SOAK_AURA_ID)).toBe(false);
     expect(boss.ignivar.soakTargetId).toBeNull();
+    expect(
+      roster.every((raider) =>
+        raider.entity.auras.every((aura) => aura.id !== IGNIVAR_SOAK_AURA_ID),
+      ),
+    ).toBe(true);
 
     tanks[0].pos = { x: boss.pos.x, y: boss.pos.y, z: boss.pos.z - 2 };
     tanks[1].pos = { ...tanks[0].pos };
@@ -183,8 +171,17 @@ describe('Ignivar ten-player Normal mechanics smoke', () => {
     expect(boss.ignivar.apocalypseResolved).toBe(true);
 
     boss.hp = Math.floor(boss.maxHp * IGNIVAR_LAST_INFERNO_HP_THRESHOLD);
+    // The boss spawns on the central dais (IGNIVAR_BOSS_SPAWN_Z), so Judgment
+    // first walks it to the arena origin before the warning cast begins. The
+    // 4 yd walk needs about a dozen updates; 40 bounds it without slack for a
+    // stalled walk.
     updateIgnivarEncounter(sim.ctx, boss);
+    expect(boss.ignivar.forgeJudgmentPhase).toBe('moving');
+    for (let step = 0; step < 40 && boss.ignivar.forgeJudgmentPhase === 'moving'; step++) {
+      updateIgnivarEncounter(sim.ctx, boss);
+    }
     expect(boss.ignivar.forgeJudgmentPhase).toBe('warning');
+    expect(dist2d(boss.pos, { x: origin.x, y: 0, z: origin.z })).toBeLessThanOrEqual(0.5);
     expect(boss.castingAbility).toBe(IGNIVAR_JUDGMENT_CAST_ID);
     boss.ignivar.forgeJudgmentRemaining = IGNIVAR_JUDGMENT_ACTIVE_SECONDS + DT;
     updateIgnivarEncounter(sim.ctx, boss);

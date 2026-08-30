@@ -169,6 +169,9 @@ function requiredClipNames(clips: ClipMap): string[] {
     ...Object.values(clips.attackByAbility ?? {}),
     ...Object.values(clips.castByAbility ?? {}),
     ...Object.values(clips.attackByHand ?? {}),
+    // cast-exit play-out entries name clips: a typo would silently disable
+    // the recovery and bring the snap-to-idle back
+    ...(clips.castPlayOut ?? []),
   ].filter((name): name is string => !!name);
 }
 
@@ -205,6 +208,8 @@ const COVERED_CLIP_FIELDS = new Set<keyof ClipMap>([
   'attackTimeScaleByAbility',
   'castByAbility',
   'castTimeScaleByAbility',
+  'castHoldPointSeconds',
+  'castPlayOut',
   'attackByHand',
   'emote',
 ]);

@@ -1,4 +1,5 @@
-import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { getBounds, NodeIO, Primitive } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
@@ -14,6 +15,7 @@ import {
   disposeIgnivarModelVfx,
   syncIgnivarModelVfx,
 } from '../src/render/ignivar_model_vfx';
+import { MOBS } from '../src/sim/data';
 import {
   IGNIVAR_APOCALYPSE_ADD_ID,
   IGNIVAR_FORGE_WAVE_CAST_ID,
@@ -25,10 +27,12 @@ import { IGNIVAR_BOSS_ID } from '../src/sim/types';
 
 const REPO_ROOT = path.join(__dirname, '..');
 const ASSET_PATH = path.join(REPO_ROOT, 'public/models/creatures/ignivar_herald.glb');
-const HEART_ASSET_PATH = path.join(
+const ASHCALLER_ASSET_PATH = path.join(REPO_ROOT, 'public/models/creatures/ignivar_ashcaller.glb');
+const RETIRED_HEART_ASSET_PATH = path.join(
   REPO_ROOT,
   'public/models/creatures/ignivar_heart_of_the_end.glb',
 );
+const ASHCALLER_SHA256 = '0f92aa55d5f031cc2ae1c9368102edde96a3345827592cb3c56351d1b4fd4396';
 const SHIPPED_CLIPS = [
   'Attack',
   'Channel',
@@ -43,7 +47,7 @@ const SHIPPED_CLIPS = [
   'Run',
   'Walk',
 ];
-const HEART_SHIPPED_CLIPS = ['Attack', 'Cast', 'Death', 'Hit', 'Idle', 'Jump', 'Run', 'Walk'];
+const ASHCALLER_SHIPPED_CLIPS = ['Cast', 'Channel', 'ChannelStart', 'Death', 'Idle', 'Move'];
 
 describe('Ignivar boss model', () => {
   it('routes the raid boss to the contributor Colossus and its authored clips', () => {
@@ -54,6 +58,9 @@ describe('Ignivar boss model', () => {
       url: 'models/creatures/ignivar_herald.glb',
       height: 2.65,
       yaw: 0,
+      // The contributor atlas ships metallicFactor 1 + a metallic-roughness
+      // texture; matte kills that specular sheen under the forge key light.
+      matte: true,
       clips: {
         idle: 'Idle',
         walk: 'Walk',
@@ -67,66 +74,74 @@ describe('Ignivar boss model', () => {
     expect(manifestUrls()).toContain('models/creatures/ignivar_herald.glb');
   });
 
-  it('routes Heart of the End to its stationary automaton visual', () => {
+  it('routes Ignivar Ashcaller to its stationary caster visual', () => {
     const key = visualKeyFor({ kind: 'mob', templateId: IGNIVAR_APOCALYPSE_ADD_ID } as never);
+
+    expect(MOBS[IGNIVAR_APOCALYPSE_ADD_ID].name).toBe('Ignivar Ashcaller');
 
     expect(key).toBe('mob_ignivar_heart_of_the_end');
     expect(VISUALS.mob_ignivar_heart_of_the_end).toMatchObject({
-      url: 'models/creatures/ignivar_heart_of_the_end.glb',
+      url: 'models/creatures/ignivar_ashcaller.glb',
       height: 1.8,
-      yaw: -Math.PI / 2,
-      selfIllumination: 0.1,
+      yaw: 0,
+      selfIllumination: 0.16,
+      matte: true,
       deathTimeScale: 3,
       clips: {
         idle: 'Idle',
-        cast: 'Cast',
+        walk: 'Move',
+        run: 'Move',
+        attack: ['Cast'],
+        cast: 'Channel',
         death: 'Death',
       },
     });
     expect(VISUALS.mob_ignivar_heart_of_the_end.clips?.hit).toBeUndefined();
-    // The IBL boost was the white-sheen crutch for the old near-black rooms;
-    // the sunset forge rig replaced it, so it must stay off the raid defs.
-    expect(VISUALS.mob_ignivar_heart_of_the_end.envMapIntensity).toBeUndefined();
-    expect(VISUALS.mob_ignivar.envMapIntensity).toBeUndefined();
-    expect(VISUALS.mob_ignivar_cinder_artificer.envMapIntensity).toBeUndefined();
-    expect(VISUALS.mob_ignivar_ember_sentinel.envMapIntensity).toBeUndefined();
-    expect(VISUALS.mob_ignivar_crucible_warden.envMapIntensity).toBeUndefined();
-    expect(manifestUrls()).toContain('models/creatures/ignivar_heart_of_the_end.glb');
+    expect(manifestUrls()).toContain('models/creatures/ignivar_ashcaller.glb');
   });
 
-  it('ships Heart of the End as a compressed rig with cast and death clips', async () => {
+  it('ships Ashcaller as a compressed rig with channel and death clips', async () => {
     await MeshoptDecoder.ready;
-    const bytes = readFileSync(HEART_ASSET_PATH);
-    expect(bytes.byteLength).toBeLessThan(1_000_000);
-    expect(MEDIA_ASSETS['models/creatures/ignivar_heart_of_the_end.glb']).toBe(
-      '/media/models/creatures/ignivar_heart_of_the_end.3ff28f2bdb65.glb',
+    const bytes = readFileSync(ASHCALLER_ASSET_PATH);
+    const sha256 = createHash('sha256').update(bytes).digest('hex');
+    expect(bytes.byteLength).toBeLessThan(3_000_000);
+    expect(sha256).toBe(ASHCALLER_SHA256);
+    expect(MEDIA_ASSETS['models/creatures/ignivar_ashcaller.glb']).toBe(
+      `/media/models/creatures/ignivar_ashcaller.${sha256.slice(0, 12)}.glb`,
     );
+    expect(existsSync(RETIRED_HEART_ASSET_PATH)).toBe(false);
+    expect(MEDIA_ASSETS['models/creatures/ignivar_heart_of_the_end.glb']).toBeUndefined();
 
     const io = new NodeIO()
       .registerExtensions(ALL_EXTENSIONS)
       .registerDependencies({ 'meshopt.decoder': MeshoptDecoder });
     const root = (await io.readBinary(bytes)).getRoot();
-    expect(bytes.toString('utf8')).toContain('EXT_meshopt_compression');
-    expect(bytes.toString('utf8')).toContain('KHR_texture_basisu');
+    expect(
+      root
+        .listExtensionsRequired()
+        .map((extension) => extension.extensionName)
+        .sort(),
+    ).toEqual(['EXT_meshopt_compression', 'KHR_mesh_quantization', 'KHR_texture_basisu']);
     expect(root.listSkins()).toHaveLength(1);
-    expect(root.listSkins()[0].listJoints()).toHaveLength(41);
-    expect(root.listTextures()).toHaveLength(3);
-    expect(root.listTextures().map((texture) => texture.getMimeType())).toEqual([
-      'image/ktx2',
-      'image/ktx2',
-      'image/ktx2',
-    ]);
+    const skin = root.listSkins()[0];
+    expect(skin.listJoints()).toHaveLength(51);
+    expect(skin.getInverseBindMatrices()?.getCount()).toBe(51);
+    expect(root.listNodes().filter((node) => node.getMesh() && node.getSkin())).toHaveLength(1);
+    expect(root.listTextures()).toHaveLength(5);
+    expect(root.listTextures().every((texture) => texture.getMimeType() === 'image/ktx2')).toBe(
+      true,
+    );
     expect(
       root
         .listAnimations()
         .map((animation) => animation.getName())
         .sort(),
-    ).toEqual([...HEART_SHIPPED_CLIPS].sort());
+    ).toEqual([...ASHCALLER_SHIPPED_CLIPS].sort());
 
-    for (const clipName of ['Cast', 'Death']) {
+    for (const clipName of ['Channel', 'Death']) {
       const animation = root.listAnimations().find((clip) => clip.getName() === clipName);
       expect(animation, `${clipName} clip`).toBeDefined();
-      expect(animation?.listChannels()).toHaveLength(126);
+      expect(animation?.listChannels()).toHaveLength(153);
       const samplers = animation?.listSamplers() ?? [];
       expect(
         samplers.reduce((count, sampler) => count + (sampler.getInput()?.getCount() ?? 0), 0),
@@ -148,21 +163,48 @@ describe('Ignivar boss model', () => {
           }
         }
       }
-      expect(duration).toBeGreaterThan(5);
+      expect(duration).toBeGreaterThanOrEqual(3);
       expect(maxPoseDelta, `${clipName} must contain authored pose motion`).toBeGreaterThan(0.01);
+      const targetNodes = new Set(
+        (animation?.listChannels() ?? [])
+          .map((channel) => channel.getTargetNode())
+          .filter((node) => node !== null),
+      );
+      expect(targetNodes.size).toBe(51);
+      for (const joint of skin.listJoints()) expect(targetNodes.has(joint)).toBe(true);
     }
 
     const primitives = root.listMeshes().flatMap((mesh) => mesh.listPrimitives());
-    expect(primitives).toHaveLength(1);
-    expect(primitives[0].getMode()).toBe(Primitive.Mode.TRIANGLES);
-    expect(primitives[0].listSemantics().sort()).toEqual([
-      'JOINTS_0',
-      'NORMAL',
-      'POSITION',
-      'TEXCOORD_0',
-      'WEIGHTS_0',
-    ]);
-    expect((primitives[0].getIndices()?.getCount() ?? 0) / 3).toBeLessThanOrEqual(4_000);
+    expect(primitives).toHaveLength(2);
+    for (const primitive of primitives) {
+      expect(primitive.getMode()).toBe(Primitive.Mode.TRIANGLES);
+      expect(primitive.listSemantics().sort()).toEqual([
+        'JOINTS_0',
+        'NORMAL',
+        'POSITION',
+        'TEXCOORD_0',
+        'WEIGHTS_0',
+      ]);
+    }
+    expect(
+      primitives.reduce(
+        (vertices, primitive) => vertices + (primitive.getAttribute('POSITION')?.getCount() ?? 0),
+        0,
+      ),
+    ).toBe(13_257);
+    expect(
+      primitives.reduce(
+        (triangles, primitive) => triangles + (primitive.getIndices()?.getCount() ?? 0) / 3,
+        0,
+      ),
+    ).toBe(10_670);
+    const bounds = getBounds(root.listScenes()[0]);
+    expect(bounds.min[0]).toBeCloseTo(-0.873775, 6);
+    expect(bounds.min[1]).toBeCloseTo(-1, 6);
+    expect(bounds.min[2]).toBeCloseTo(-0.350261, 6);
+    expect(bounds.max[0]).toBeCloseTo(0.873775, 6);
+    expect(bounds.max[1]).toBeCloseTo(1, 6);
+    expect(bounds.max[2]).toBeCloseTo(0.350261, 6);
   });
 
   it('applies its readability controls without mutating the source material', () => {

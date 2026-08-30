@@ -10,13 +10,14 @@ import type { ActiveVarkhulAssembly } from '../src/sim/varkhul_assembly';
 import type { ActiveVarkhulForgestormWarning } from '../src/sim/varkhul_forgestorm';
 
 const WARNING: ActiveVarkhulForgestormWarning = {
-  id: 42_100_210,
+  id: 'varkhul-forgestorm:42:100:2:0',
   sourceId: 42,
   x: 7,
   z: -5,
   radius: 4,
   duration: 2.5,
   remaining: 2.5,
+  warningLead: 0,
 };
 
 const WORLDFIRE_ASSEMBLY: ActiveVarkhulAssembly = {
@@ -31,6 +32,9 @@ const WORLDFIRE_ASSEMBLY: ActiveVarkhulAssembly = {
   forgeBeamActiveMask: 0,
   forgeBeamWarmupRemaining: 0,
   forgeMeltdownRemaining: 0,
+  addWave: 0,
+  addWaves: 0,
+  addsRemaining: 0,
   forgeBeams: [],
   interceptBeam: null,
   cores: [],
@@ -79,12 +83,38 @@ describe('Varkhul Forgestorm rendering', () => {
     expect(countdown.scale.z).toBeCloseTo(0.5);
   });
 
+  it('drops a burning meteor and its flame trail through the warning window', () => {
+    const scene = new THREE.Scene();
+    const visuals = new VarkhulForgestormVisuals(scene, () => 0);
+    visuals.sync([WARNING]);
+    visuals.update(0, true);
+    const group = scene.getObjectByName('varkhul-forgestorm-warning') as THREE.Group;
+    const meteor = group.getObjectByName('varkhul-forgestorm-meteor') as THREE.Mesh;
+    const trail = group.getObjectByName('varkhul-forgestorm-meteor-trail') as THREE.Mesh;
+    expect(meteor).toBeDefined();
+    expect(trail).toBeDefined();
+    const startingHeight = meteor.position.y;
+    expect(startingHeight).toBeGreaterThan(15);
+    expect(trail.position.y).toBeGreaterThan(startingHeight);
+
+    visuals.sync([{ ...WARNING, remaining: 1.25 }]);
+    visuals.update(0, true);
+    expect(meteor.position.y).toBeLessThan(startingHeight);
+    expect(meteor.position.y).toBeGreaterThan(3);
+    const halfwayHeight = meteor.position.y;
+
+    visuals.sync([{ ...WARNING, remaining: 0.05 }]);
+    visuals.update(0, true);
+    expect(meteor.position.y).toBeLessThan(halfwayHeight);
+    expect(meteor.position.y).toBeLessThan(1);
+  });
+
   it('removes stale authoritative warnings and disposes the remaining set', () => {
     const scene = new THREE.Scene();
     const visuals = new VarkhulForgestormVisuals(scene, () => 0);
-    visuals.sync([WARNING, { ...WARNING, id: WARNING.id + 1, x: 12 }]);
+    visuals.sync([WARNING, { ...WARNING, id: `${WARNING.id}:next`, x: 12 }]);
     expect(scene.children).toHaveLength(2);
-    visuals.sync([{ ...WARNING, id: WARNING.id + 1, x: 12 }]);
+    visuals.sync([{ ...WARNING, id: `${WARNING.id}:next`, x: 12 }]);
     expect(scene.children).toHaveLength(1);
     visuals.dispose();
     expect(scene.children).toHaveLength(0);
@@ -159,7 +189,7 @@ describe('Varkhul Forgestorm rendering', () => {
     );
     expect(visual).toContain('this.worldfireVisuals.update(dt, reducedMotion)');
     expect(visual).toContain('this.worldfireVisuals.dispose()');
-    expect(renderer).toContain('dispatchVarkhulForgeHammerAttack(ev');
+    expect(renderer).toContain('routeVarkhulForgeHammer(ev');
     expect(renderer).toContain('this.triggerAttack(entityId, abilityId)');
     expect(renderer).toContain('new VarkhulForgestormVisuals(this.scene');
   });

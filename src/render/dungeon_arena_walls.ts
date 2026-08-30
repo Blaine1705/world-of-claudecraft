@@ -16,6 +16,7 @@ import {
 } from '../sim/dungeon_layout';
 import type { ArenaWallFootprint } from './arena_wall_occlusion_core';
 import type { DungeonInteriorVariant } from './dungeon';
+import { type WallCullPlane, wallSegmentOutward } from './wall_backface_cull_core';
 
 /** Accumulates instance transforms per module kind, then emits InstancedMeshes. */
 export class Placements {
@@ -48,6 +49,10 @@ export class Placements {
 export interface PendingArenaWall {
   placements: Placements;
   footprint: ArenaWallFootprint;
+  /** Ignivar raid shells only: the face's cull plane, so the wall hides
+   *  outright whenever the camera is on its outside (backface cull) instead
+   *  of ghosting one crossed segment to 20%. */
+  backface?: WallCullPlane;
 }
 
 export interface PendingArenaWalls {
@@ -90,16 +95,31 @@ export function pendingArenaWallsFor(
   const front = wall({ x: ox, z: oz + layout.zMin, hw: endWallHw, hd: DUNGEON_WALL_HW, topY });
   const back = wall({ x: ox, z: oz + layout.zMax, hw: endWallHw, hd: DUNGEON_WALL_HW, topY });
   if (layout.shellPolygon) {
-    const polygon = polygonWallSegments(layout.shellPolygon).map((segment) =>
-      wall({
+    const pole = layout.shellPole;
+    const polygon = polygonWallSegments(layout.shellPolygon).map((segment) => {
+      const pending = wall({
         x: ox + segment.x,
         z: oz + segment.z,
         hw: segment.halfLength,
         hd: DUNGEON_WALL_HW,
         topY,
         ry: segment.rot,
-      }),
-    );
+      });
+      // The Ignivar raid rooms are convex shells with a chase camera that has
+      // no collision pull-in: their walls carry a backface-cull plane so a
+      // camera pushed outside a face hides the whole face, not a ray-thin
+      // ghost peephole in one segment.
+      if (variant === 'ignivar' && pole) {
+        const outward = wallSegmentOutward(segment.x, segment.z, segment.rot, pole.x, pole.z);
+        pending.backface = {
+          x: ox + segment.x,
+          z: oz + segment.z,
+          nx: outward.nx,
+          nz: outward.nz,
+        };
+      }
+      return pending;
+    });
     return { left, right, front, back, all: polygon };
   }
   return {

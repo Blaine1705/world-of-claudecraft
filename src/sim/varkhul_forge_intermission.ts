@@ -18,6 +18,8 @@ export type VarkhulForgeBeamWindow =
   | 'pressure_left'
   | 'pressure_right'
   | 'intermission'
+  | 'intermission_left'
+  | 'intermission_right'
   | 'final_left'
   | 'final_gap_left'
   | 'final_right'
@@ -36,13 +38,19 @@ export const VARKHUL_FORGE_FINAL_HP_THRESHOLD = 0.2;
 export const VARKHUL_FORGE_TEACHING_BEAM_SECONDS = 8;
 export const VARKHUL_FORGE_TEACHING_GAP_SECONDS = 2;
 export const VARKHUL_FORGE_PRESSURE_BEAM_SECONDS = 6;
+export const VARKHUL_FORGE_INTERMISSION_BEAM_SECONDS_NORMAL = 8;
+export const VARKHUL_FORGE_INTERMISSION_BEAM_SECONDS_HEROIC = 6;
+export const VARKHUL_FORGE_INTERMISSION_WARNING_SECONDS = 2;
 export const VARKHUL_FORGE_FINAL_BEAM_SECONDS = 8;
 export const VARKHUL_FORGE_FINAL_GAP_SECONDS = 4;
 export const VARKHUL_FORGE_PORTAL_TELEGRAPH_SECONDS = 2;
 export const VARKHUL_FORGE_PORTAL_ABILITY_ID = 'Forge Legion Portal';
-export const VARKHUL_FORGE_ADD_WAVE_EVERY_SECONDS = 8;
+export const VARKHUL_FORGE_ADD_WAVE_DELAY_NORMAL_SECONDS = 3;
+export const VARKHUL_FORGE_ADD_WAVE_DELAY_HEROIC_SECONDS = 14;
 export const VARKHUL_FORGE_INTERMISSION_SECONDS_NORMAL = 60;
 export const VARKHUL_FORGE_INTERMISSION_SECONDS_HEROIC = 70;
+export const VARKHUL_CRUCIBLE_QUAKE_DAMAGE_NORMAL = { min: 180, max: 230 } as const;
+export const VARKHUL_CRUCIBLE_QUAKE_DAMAGE_HEROIC = { min: 260, max: 330 } as const;
 
 export const VARKHUL_FORGE_LOCAL_POS = VARKHUL_ASSEMBLY_FORGE_LOCAL_POS;
 export const VARKHUL_WORK_LOCAL_POS = { x: 0, z: 16 } as const;
@@ -118,18 +126,40 @@ export function varkhulForgeBeamWindowMask(window: VarkhulForgeBeamWindow): numb
   switch (window) {
     case 'teaching_left':
     case 'pressure_left':
+    case 'intermission':
+    case 'intermission_left':
     case 'final_left':
       return 1;
     case 'teaching_right':
     case 'pressure_right':
+    case 'intermission_right':
     case 'final_right':
       return 2;
-    case 'intermission':
-    case 'meltdown':
-      return 3;
     default:
       return 0;
   }
+}
+
+export function varkhulForgeIntermissionBeamSeconds(difficulty: VarkhulAssemblyDifficulty): number {
+  return difficulty === 'heroic'
+    ? VARKHUL_FORGE_INTERMISSION_BEAM_SECONDS_HEROIC
+    : VARKHUL_FORGE_INTERMISSION_BEAM_SECONDS_NORMAL;
+}
+
+export function varkhulForgeIntermissionNextWindow(
+  window: 'intermission_left' | 'intermission_right',
+): 'intermission_left' | 'intermission_right' {
+  return window === 'intermission_left' ? 'intermission_right' : 'intermission_left';
+}
+
+export function varkhulForgeBeamWarningMask(
+  window: VarkhulForgeBeamWindow,
+  remaining: number,
+): number {
+  if (remaining > VARKHUL_FORGE_INTERMISSION_WARNING_SECONDS) return 0;
+  if (window === 'intermission_left') return 2;
+  if (window === 'intermission_right') return 1;
+  return 0;
 }
 
 export function varkhulForgeBeamIsActive(mask: number, index: VarkhulForgeBeamIndex): boolean {
@@ -142,8 +172,23 @@ export function varkhulForgeIntermissionSeconds(difficulty: VarkhulAssemblyDiffi
     : VARKHUL_FORGE_INTERMISSION_SECONDS_NORMAL;
 }
 
+export function varkhulCrucibleQuakeDamageRange(difficulty: VarkhulAssemblyDifficulty): {
+  min: number;
+  max: number;
+} {
+  return difficulty === 'heroic'
+    ? VARKHUL_CRUCIBLE_QUAKE_DAMAGE_HEROIC
+    : VARKHUL_CRUCIBLE_QUAKE_DAMAGE_NORMAL;
+}
+
 export function varkhulForgeIntermissionWaveCount(difficulty: VarkhulAssemblyDifficulty): number {
   return difficulty === 'heroic' ? 4 : 3;
+}
+
+export function varkhulForgeIntermissionWaveDelay(difficulty: VarkhulAssemblyDifficulty): number {
+  return difficulty === 'heroic'
+    ? VARKHUL_FORGE_ADD_WAVE_DELAY_HEROIC_SECONDS
+    : VARKHUL_FORGE_ADD_WAVE_DELAY_NORMAL_SECONDS;
 }
 
 /** One Warden and three/four Sentinels, distributed deterministically over all portals. */

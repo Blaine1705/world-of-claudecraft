@@ -13,7 +13,7 @@ describe('Varkhul Heroic Anvil meteors', () => {
     expect(VARKHUL_ANVIL_METEOR_COUNT).toBe(3);
     expect(VARKHUL_ANVIL_METEOR_WARNING_SECONDS).toBe(1.8);
     expect(VARKHUL_ANVIL_METEOR_RADIUS).toBe(3.5);
-    expect(VARKHUL_ANVIL_METEOR_DAMAGE_MAX_HP).toBe(0.35);
+    expect(VARKHUL_ANVIL_METEOR_DAMAGE_MAX_HP).toBe(0.75);
   });
 
   it('builds a deterministic separated pattern inside the room', () => {

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   buildIgnivarWaterConduit,
   IGNIVAR_CONDUIT_ACTIVATION_RUNE_NAME,
+  IGNIVAR_CONDUIT_ACTIVE_BEACON_NAME,
   IGNIVAR_CONDUIT_CLEANSE_BOUNDARY_NAME,
   IGNIVAR_CONDUIT_CLEANSE_FOOTPRINT_NAME,
   IGNIVAR_CONDUIT_READY_AIM_RING_NAME,
@@ -10,6 +11,7 @@ import {
   isStableIgnivarWaterConduitTransition,
   syncIgnivarWaterConduitVisibility,
 } from '../src/render/ignivar_conduit';
+import { buildIgnivarFrontalTelegraph } from '../src/render/ignivar_frontal_telegraph';
 import { IGNIVAR_WATER_CLEANSE_RADIUS } from '../src/sim/encounters/ignivar';
 import { IGNIVAR_WATER_CONDUIT_TEMPLATES } from '../src/sim/ignivar_arena';
 
@@ -91,7 +93,7 @@ describe('Ignivar water conduit renderer', () => {
     const active = buildIgnivarWaterConduit(IGNIVAR_WATER_CONDUIT_TEMPLATES.active);
     const cooldown = buildIgnivarWaterConduit(IGNIVAR_WATER_CONDUIT_TEMPLATES.cooldown);
 
-    expect(ready.height).toBe(3.6);
+    expect(ready.height).toBe(7);
     expect(ready.group.name).toBe('ignivarWaterConduit');
     expect(active.group.name).toBe('ignivarWaterConduit');
     expect(cooldown.group.name).toBe('ignivarWaterConduit');
@@ -99,6 +101,7 @@ describe('Ignivar water conduit renderer', () => {
     expect(ready.group.getObjectByName('ignivarWaterConduit:active')?.visible).toBe(false);
     expect(active.group.getObjectByName('ignivarWaterJet')).toBeDefined();
     expect(active.group.getObjectByName('ignivarWaterSteamEnergy')).toBeDefined();
+    expect(active.group.getObjectByName(IGNIVAR_CONDUIT_ACTIVE_BEACON_NAME)).toBeDefined();
     expect(active.group.getObjectByName(IGNIVAR_CONDUIT_CLEANSE_FOOTPRINT_NAME)).toBeDefined();
     expect(active.group.getObjectByName(IGNIVAR_CONDUIT_CLEANSE_BOUNDARY_NAME)).toBeDefined();
     expect(active.group.getObjectByName(IGNIVAR_CONDUIT_ACTIVATION_RUNE_NAME)).toBeDefined();
@@ -133,6 +136,41 @@ describe('Ignivar water conduit renderer', () => {
     expect(cooldownState?.userData.remainingSeconds).toBeUndefined();
   });
 
+  it('keeps an activated well readable above frontal effects with a sustained beacon', () => {
+    const active = buildIgnivarWaterConduit(IGNIVAR_WATER_CONDUIT_TEMPLATES.active).group;
+    const beacon = active.getObjectByName(IGNIVAR_CONDUIT_ACTIVE_BEACON_NAME);
+    const outer = meshNamed(active, 'ignivarWaterActiveBeaconOuter');
+    const core = meshNamed(active, 'ignivarWaterActiveBeaconCore');
+    const crown = meshNamed(active, 'ignivarWaterActiveBeaconCrown');
+    const frontal = buildIgnivarFrontalTelegraph();
+    let highestFrontalOrder = 0;
+    frontal.traverse((object) => {
+      highestFrontalOrder = Math.max(highestFrontalOrder, object.renderOrder);
+    });
+
+    expect(beacon?.parent?.name).toBe('ignivarWaterConduit:active');
+    expect(outer.geometry).toBeInstanceOf(THREE.CylinderGeometry);
+    expect(core.geometry).toBeInstanceOf(THREE.CylinderGeometry);
+    expect((outer.geometry as THREE.CylinderGeometry).parameters.height).toBe(6.2);
+    expect((core.geometry as THREE.CylinderGeometry).parameters.height).toBe(6.5);
+    expect((crown.geometry as THREE.TorusGeometry).parameters.radius).toBe(1.18);
+    expect(outer.position.y).toBeGreaterThan(3);
+    expect(core.position.y).toBeGreaterThan(3);
+    expect(crown.position.y).toBeGreaterThan(6);
+    expect(outer.renderOrder).toBe(6);
+    expect(core.renderOrder).toBe(7);
+    expect(crown.renderOrder).toBe(7);
+    expect(outer.renderOrder).toBeGreaterThanOrEqual(highestFrontalOrder);
+    expect(core.renderOrder).toBeGreaterThan(highestFrontalOrder);
+    expect(crown.renderOrder).toBeGreaterThan(highestFrontalOrder);
+    expect((outer.material as THREE.MeshBasicMaterial).opacity).toBeGreaterThanOrEqual(0.3);
+    expect((core.material as THREE.MeshBasicMaterial).opacity).toBeGreaterThanOrEqual(0.85);
+    expect((crown.material as THREE.MeshBasicMaterial).opacity).toBeGreaterThanOrEqual(0.85);
+    expect((outer.material as THREE.MeshBasicMaterial).toneMapped).toBe(false);
+    expect((core.material as THREE.MeshBasicMaterial).toneMapped).toBe(false);
+    expect((crown.material as THREE.MeshBasicMaterial).toneMapped).toBe(false);
+  });
+
   it('draws the exact authoritative cleanse footprint with a high-contrast water edge', () => {
     const active = buildIgnivarWaterConduit(IGNIVAR_WATER_CONDUIT_TEMPLATES.active).group;
     const footprint = meshNamed(active, IGNIVAR_CONDUIT_CLEANSE_FOOTPRINT_NAME);
@@ -148,29 +186,17 @@ describe('Ignivar water conduit renderer', () => {
     );
   });
 
-  it('uses a cool-water palette and separates fill, energy, steam, and rune opacity', () => {
-    const ready = buildIgnivarWaterConduit(IGNIVAR_WATER_CONDUIT_TEMPLATES.ready).group;
+  it('separates cleanse fill, energy, steam, and rune opacity in a cool-water palette', () => {
+    // The conduit view is now overlay-only (the pump body is the placed
+    // water_pump dressing prop), so state readability rides these active
+    // layers; per-state distinctness is pinned by the semantic-layers test.
     const active = buildIgnivarWaterConduit(IGNIVAR_WATER_CONDUIT_TEMPLATES.active).group;
-    const cooldown = buildIgnivarWaterConduit(IGNIVAR_WATER_CONDUIT_TEMPLATES.cooldown).group;
-    const readyState = ready.getObjectByName('ignivarWaterConduit:ready');
-    const activeState = active.getObjectByName('ignivarWaterConduit:active');
-    const cooldownState = cooldown.getObjectByName('ignivarWaterConduit:cooldown');
-    if (!readyState || !activeState || !cooldownState) {
-      throw new Error('Conduit state template is missing');
-    }
-    const readyBasin = materialNamed(readyState, 'ignivarWaterBasin');
-    const activeBasin = materialNamed(activeState, 'ignivarWaterBasin');
-    const cooldownBasin = materialNamed(cooldownState, 'ignivarWaterBasin');
     const footprint = materialNamed(active, IGNIVAR_CONDUIT_CLEANSE_FOOTPRINT_NAME);
     const outerColumn = materialNamed(active, 'ignivarWaterColumnOuter');
     const columnCore = materialNamed(active, 'ignivarWaterColumnCore');
     const steam = materialNamed(active, 'ignivarWaterSteamHaloHigh');
     const rune = materialNamed(active, 'ignivarWaterActivationRuneGlow');
 
-    expect(
-      new Set([readyBasin.color.getHex(), activeBasin.color.getHex(), cooldownBasin.color.getHex()])
-        .size,
-    ).toBe(3);
     expect(footprint.opacity).toBeLessThan(steam.opacity);
     expect(steam.opacity).toBeLessThan(outerColumn.opacity);
     expect(outerColumn.opacity).toBeLessThan(columnCore.opacity);
@@ -215,7 +241,7 @@ describe('Ignivar water conduit renderer', () => {
 
     expect(first).not.toBe(second);
     expect(firstMeshes).toHaveLength(secondMeshes.length);
-    expect(firstMeshes.length).toBeGreaterThan(20);
+    expect(firstMeshes.length).toBeGreaterThan(15);
     for (let index = 0; index < firstMeshes.length; index++) {
       const firstMesh = firstMeshes[index];
       const secondMesh = secondMeshes[index];

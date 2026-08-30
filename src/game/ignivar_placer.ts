@@ -64,7 +64,7 @@ const ROOMS: PlacerRoom[] = [
   {
     interior: 'ignivar_lift',
     label: 'The Forge-Lift',
-    ox: 118000,
+    ox: 118600,
     oz: OZ,
     plan: () => ignivarLiftPropPlan(IGNIVAR_LIFT_LAYOUT),
   },
@@ -117,11 +117,8 @@ const EXTERIOR_KIT: readonly IgnivarEnvPropKey[] = [
   'street_lamp',
   'vault_door',
   'square_wall',
-  'curved_wall',
-  'gear_wall',
   'gear_wall_rusty',
   'gear_machine',
-  'pillar_broad',
   'pillar_slim',
   'reactor',
   'lava_face',
@@ -133,7 +130,6 @@ const EXTERIOR_KIT: readonly IgnivarEnvPropKey[] = [
   'lava_channel',
   'lava_channel_curved',
   'lava_outlet',
-  'lava_outlet_2',
   'lava_port',
   'torch',
   // the Exterior_Assets fortress kit (the owner's drop, 2026-08-28)

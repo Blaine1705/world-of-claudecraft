@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "a602730e660ca981807d949b5a251200a8d68bd01d3b76771b58f0d0e46e0a21",
+  "rendererFingerprint": "448a81d8c63a15b663c304ba52b285ed913382774a309dafb53c06b436f092ad",
   "renderer": {
     "trackedFiles": [
       {
@@ -27,8 +27,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 4345176,
-      "sha256": "eaf3208b0d720e0575e725a82d418c32383d4f34f4538074815d15a2b68633e0",
+      "bytes": 4356414,
+      "sha256": "f443e52bdc3d91da3f8e1ce7ec06bcccae03c4efa350111e7e5b876aa4fc32ec",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -3271,14 +3271,14 @@
       "visualKey": "mob_ignivar_heart_of_the_end",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/ignivar_heart_of_the_end.glb",
-          "path": "public/models/creatures/ignivar_heart_of_the_end.glb",
-          "bytes": 666744,
-          "sha256": "3ff28f2bdb651aea141f089b50c0bc3c656b0c970e8c6a99ce43eba39c676a5e"
+          "url": "models/creatures/ignivar_ashcaller.glb",
+          "path": "public/models/creatures/ignivar_ashcaller.glb",
+          "bytes": 1881768,
+          "sha256": "0f92aa55d5f031cc2ae1c9368102edde96a3345827592cb3c56351d1b4fd4396"
         },
         "idle": "Idle",
         "height": 1.8,
-        "yaw": -1.5707963267948966,
+        "yaw": 0,
         "hover": null,
         "show": null,
         "attach": [],
@@ -3291,11 +3291,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "3239dbd8b4243000ad983722a8a16a445ef1ebef58ead3cf5bad93d85a422d07",
+      "sourceFingerprint": "ea3ad642b5bf35c1aec8ce14bcbc25954097dbf13d6db7b5653dcddfa014ec94",
       "output": {
         "path": "public/ui/mobs/ignivar_heart_of_the_end.webp",
-        "bytes": 2396,
-        "sha256": "00163a575e33213eedfedafb0bed38808035ea8c3353bee8429e982a00ce35f6"
+        "bytes": 2678,
+        "sha256": "43b3f88802b2e22ec9fbcf4eeb7f44d98d52fb63aa032b3a0774d5cb1eed8cfc"
       }
     },
     {

@@ -20,6 +20,9 @@ function assembly(blocked = false): ActiveVarkhulAssembly {
     forgeBeamActiveMask: 0,
     forgeBeamWarmupRemaining: 0,
     forgeMeltdownRemaining: 0,
+    addWave: 0,
+    addWaves: 0,
+    addsRemaining: 0,
     forgeBeams: [],
     interceptBeam: {
       sourceId: 90,
@@ -32,8 +35,8 @@ function assembly(blocked = false): ActiveVarkhulAssembly {
       blockerX: blocked ? 8 : null,
       blockerZ: blocked ? 12 : null,
       width: 1.35,
-      duration: 3.5,
-      remaining: 2.5,
+      duration: 5,
+      remaining: 4,
     },
     cores: [],
     deliveryWindowRemaining: 0,
@@ -66,6 +69,12 @@ describe('Varkhul Tempering Ray render', () => {
     const target = root.getObjectByName('varkhul-tempering-ray-target') as THREE.Group;
     const blocker = root.getObjectByName('varkhul-tempering-ray-blocker') as THREE.Group;
     const intercepted = root.getObjectByName('varkhul-tempering-ray-intercept-core') as THREE.Mesh;
+    const sheath = root.getObjectByName('varkhul-tempering-ray-sheath') as THREE.Mesh;
+    const core = root.getObjectByName('varkhul-tempering-ray-core') as THREE.Mesh;
+    expect(sheath.scale.x).toBeCloseTo(0.42, 6);
+    expect(sheath.scale.z).toBeCloseTo(0.42, 6);
+    expect(core.scale.x).toBeCloseTo(0.16, 6);
+    expect(core.scale.z).toBeCloseTo(0.16, 6);
     expect(corridor.scale.x).toBeCloseTo(2.7, 6);
     expect(corridor.scale.z).toBeCloseTo(20, 6);
     expect(corridor.position.x).toBeCloseTo(8, 6);
@@ -134,7 +143,7 @@ describe('Varkhul Tempering Ray render', () => {
     expect(root.getObjectByName('varkhul-tempering-ray-intercept-sheath')?.visible).toBe(true);
     expect(root.getObjectByName('varkhul-tempering-ray-intercept-core')?.visible).toBe(true);
     expect(root.getObjectByName('varkhul-tempering-ray-target-inner')?.rotation.y).toBe(0);
-    expect(root.userData).toMatchObject({ width: 1.35, remaining: 2.5, blocked: true });
+    expect(root.userData).toMatchObject({ width: 1.35, remaining: 4, blocked: true });
     const initialCorridorOpacity = corridor.material.opacity;
     const initialCoreOpacity = core.material.opacity;
     if (!state.interceptBeam) throw new Error('Fixture beam missing');

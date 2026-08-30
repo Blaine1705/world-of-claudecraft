@@ -1,7 +1,11 @@
 // Dungeon content: mob templates that only spawn inside instances, spawn
 // lists, and the DungeonDef registry merged by sim/data.ts.
 
-import { IGNIVAR_CONDUITS, IGNIVAR_WATER_CONDUIT_TEMPLATES } from '../ignivar_arena';
+import {
+  IGNIVAR_BOSS_SPAWN_Z,
+  IGNIVAR_CONDUITS,
+  IGNIVAR_WATER_CONDUIT_TEMPLATES,
+} from '../ignivar_arena';
 import {
   IGNIVAR_CINDER_ARTIFICER_ID,
   IGNIVAR_CRUCIBLE_WARDEN_ID,
@@ -10,13 +14,21 @@ import {
   IGNIVAR_GATE_LOCKED_TEMPLATE,
   IGNIVAR_LIFT_GATE_LOCKED_TEMPLATE,
   IGNIVAR_LIFT_ROOM_ID,
+  IGNIVAR_MOLTEN_ASSEMBLY_ID,
   IGNIVAR_RAID_ARENA_ID,
   IGNIVAR_SECOND_WING_ID,
   VARKHUL_BOSS_ID,
 } from '../ignivar_raid_ids';
 import { VARKHUL_CRUCIBLE_QUAKE_CAST_ID } from '../mob/healer_channel';
-import type { DungeonDef, DungeonSpawn, ItemDef, MobTemplate } from '../types';
+import type {
+  DungeonDef,
+  DungeonSpawn,
+  DungeonSpawnMinibossTuning,
+  ItemDef,
+  MobTemplate,
+} from '../types';
 import { HEROIC_FINALE_COPPER, NYTHRAXIS_HEROIC_COPPER } from './dungeon_difficulty';
+import { CRUCIBLE_VENDOR_NPC_ID } from './ignivar_loot';
 import {
   IGNIVAR_LORE_OBJECTS,
   IGNIVAR_MAELIN_NPC_ID,
@@ -85,7 +97,7 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     ccImmune: true,
     slowImmune: true,
     damageFloorPct: 0.5,
-    hpBase: 80000 / 2.3,
+    hpBase: 120000 / 2.3,
     hpPerLevel: 0,
     dmgBase: 52,
     dmgPerLevel: 10.5,
@@ -93,7 +105,55 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     armorPerLevel: 46,
     moveSpeed: 6.8,
     aggroRadius: 30,
-    loot: [],
+    // Ilvl-35 loot per docs/prd/ignivar-raid-loot.md "Boss loot tables": two
+    // guaranteed sigil groups, the feet-and-held off-set group, a guaranteed
+    // ring, copper (the raid-finale base on the Ignivar wiring). Heroic-only
+    // appends (Robe sigils, shields) live in HEROIC_BOSS_LOOT; the weapon
+    // groups join at the end with the weapon wave. APPEND-only, never reorder.
+    loot: [
+      // Varkhul is the Inner Crucible's registered heroic finale boss
+      // (dungeon_difficulty.ts), so his money entry carries the shared raid
+      // heroic base like Ignivar's (tests/heroic_finale_gold.test.ts).
+      { copper: 200000, heroicCopper: NYTHRAXIS_HEROIC_COPPER, chance: 1 },
+      { itemId: 'sigil_anvil_legs', chance: 0.34, rollGroup: 'varkhul_sigil_legging' },
+      { itemId: 'sigil_ember_legs', chance: 0.33, rollGroup: 'varkhul_sigil_legging' },
+      { itemId: 'sigil_tempest_legs', chance: 0.33, rollGroup: 'varkhul_sigil_legging' },
+      { itemId: 'sigil_anvil_helmet', chance: 0.34, rollGroup: 'varkhul_sigil_helm' },
+      { itemId: 'sigil_ember_helmet', chance: 0.33, rollGroup: 'varkhul_sigil_helm' },
+      { itemId: 'sigil_tempest_helmet', chance: 0.33, rollGroup: 'varkhul_sigil_helm' },
+      { itemId: 'cindersoaked_slippers', chance: 0.07, rollGroup: 'varkhul_offset' },
+      { itemId: 'steps_of_quiet_water', chance: 0.07, rollGroup: 'varkhul_offset' },
+      { itemId: 'ashenbark_treads', chance: 0.07, rollGroup: 'varkhul_offset' },
+      { itemId: 'ashrunner_boots', chance: 0.07, rollGroup: 'varkhul_offset' },
+      { itemId: 'scorchgrove_striders', chance: 0.07, rollGroup: 'varkhul_offset' },
+      { itemId: 'dewfall_moccasins', chance: 0.07, rollGroup: 'varkhul_offset' },
+      { itemId: 'anvilstance_sabatons', chance: 0.07, rollGroup: 'varkhul_offset' },
+      { itemId: 'furnace_march_greaves', chance: 0.07, rollGroup: 'varkhul_offset' },
+      { itemId: 'thundershock_treads', chance: 0.07, rollGroup: 'varkhul_offset' },
+      { itemId: 'springwarden_sabatons', chance: 0.07, rollGroup: 'varkhul_offset' },
+      { itemId: 'orb_of_the_last_spring', chance: 0.15, rollGroup: 'varkhul_offset' },
+      { itemId: 'cinder_of_the_first_design', chance: 0.12, rollGroup: 'varkhul_offset' },
+      // The legendary shield rides INSIDE the feet-and-held group at the
+      // kingsbane_last_oath 3 percent precedent (each group is an exclusive
+      // partition summing to exactly 1.00): the cinder, its off-hand
+      // slot-mate, pays the 0.03 while the orb sits back at its full 0.15.
+      // Forgebreaker deliberately does NOT drop here: the maintainer is
+      // routing it through the crafting professions (2026-08-30), so the
+      // item stays defined (dev-give, reliquary pending) with no loot row
+      // until its recipe chain lands.
+      { itemId: 'varkhul_emberward', chance: 0.03, rollGroup: 'varkhul_offset' },
+      { itemId: 'seal_of_the_forgewall', chance: 0.25, rollGroup: 'varkhul_rings' },
+      { itemId: 'band_of_marked_strikes', chance: 0.25, rollGroup: 'varkhul_rings' },
+      { itemId: 'circle_of_cinders', chance: 0.25, rollGroup: 'varkhul_rings' },
+      { itemId: 'loop_of_quiet_springs', chance: 0.25, rollGroup: 'varkhul_rings' },
+      // The professions fast-follow's core reagent starts dropping AHEAD of
+      // its recipes (maintainer staging call): the classic molten-core band,
+      // one guaranteed plus a 50 percent second, so crafters bank cores
+      // before the scroll-taught tier lands (PR 3704 extends this exact
+      // shape with the scroll roll group and the hammer chain starter).
+      { itemId: 'lastflame_core', chance: 1 },
+      { itemId: 'lastflame_core', chance: 0.5 },
+    ],
     scale: 3.2,
     color: 0x9f351c,
   },
@@ -213,7 +273,7 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     boss: true,
     ccImmune: true,
     slowImmune: true,
-    hpBase: 70000 / 2.3,
+    hpBase: 120000 / 2.3,
     hpPerLevel: 0,
     dmgBase: 48,
     dmgPerLevel: 10,
@@ -225,7 +285,45 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     // base, and a heroic-claim kill substitutes the shared 20g raid base on
     // the same single draw (tests/heroic_finale_gold.test.ts). Item drops are
     // still to be authored for the development raid tier.
-    loot: [{ copper: 150000, heroicCopper: NYTHRAXIS_HEROIC_COPPER, chance: 1 }],
+    // Ilvl-35 loot per docs/prd/ignivar-raid-loot.md "Boss loot tables": two
+    // guaranteed sigil groups, a guaranteed neck, copper. Same table on both
+    // difficulties (this raid has NO heroic item-level layer); the heroic-only
+    // appends (Robe sigils) live in HEROIC_BOSS_LOOT. Draw order is
+    // parity-sensitive: entries APPEND, never reorder; the off-set group joins
+    // at the end with the weapon wave.
+    loot: [
+      { copper: 150000, heroicCopper: NYTHRAXIS_HEROIC_COPPER, chance: 1 },
+      { itemId: 'sigil_anvil_shoulder', chance: 0.34, rollGroup: 'ignivar_sigil_mantle' },
+      { itemId: 'sigil_ember_shoulder', chance: 0.33, rollGroup: 'ignivar_sigil_mantle' },
+      { itemId: 'sigil_tempest_shoulder', chance: 0.33, rollGroup: 'ignivar_sigil_mantle' },
+      { itemId: 'sigil_anvil_gloves', chance: 0.34, rollGroup: 'ignivar_sigil_grip' },
+      { itemId: 'sigil_ember_gloves', chance: 0.33, rollGroup: 'ignivar_sigil_grip' },
+      { itemId: 'sigil_tempest_gloves', chance: 0.33, rollGroup: 'ignivar_sigil_grip' },
+      { itemId: 'pendant_of_the_first_tempering', chance: 0.25, rollGroup: 'ignivar_jewelry' },
+      { itemId: 'ignivars_ember_choker', chance: 0.25, rollGroup: 'ignivar_jewelry' },
+      { itemId: 'locket_of_the_last_flame', chance: 0.25, rollGroup: 'ignivar_jewelry' },
+      { itemId: 'heartspring_amulet', chance: 0.25, rollGroup: 'ignivar_jewelry' },
+      { itemId: 'cord_of_the_last_flame', chance: 0.07, rollGroup: 'ignivar_offset' },
+      { itemId: 'springbinder_sash', chance: 0.07, rollGroup: 'ignivar_offset' },
+      { itemId: 'cinderbark_cinch', chance: 0.07, rollGroup: 'ignivar_offset' },
+      { itemId: 'slagstalker_belt', chance: 0.07, rollGroup: 'ignivar_offset' },
+      { itemId: 'moonscorch_waistwrap', chance: 0.07, rollGroup: 'ignivar_offset' },
+      { itemId: 'grovetender_belt', chance: 0.07, rollGroup: 'ignivar_offset' },
+      { itemId: 'forgewall_girdle', chance: 0.07, rollGroup: 'ignivar_offset' },
+      { itemId: 'warforged_waistguard', chance: 0.07, rollGroup: 'ignivar_offset' },
+      { itemId: 'stormkindled_chain', chance: 0.07, rollGroup: 'ignivar_offset' },
+      { itemId: 'tidebinder_links', chance: 0.07, rollGroup: 'ignivar_offset' },
+      { itemId: 'cinderfang_kris', chance: 0.1, rollGroup: 'ignivar_offset' },
+      { itemId: 'slagrender_cleaver', chance: 0.1, rollGroup: 'ignivar_offset' },
+      { itemId: 'wand_of_quenched_sparks', chance: 0.1, rollGroup: 'ignivar_offset' },
+      // The professions fast-follow's core reagent starts dropping AHEAD of
+      // its recipes (maintainer staging call): the classic molten-core band,
+      // one guaranteed plus a 50 percent second, so crafters bank cores
+      // before the scroll-taught tier lands (PR 3704 extends this exact
+      // shape with the scroll roll group and the hammer chain starter).
+      { itemId: 'lastflame_core', chance: 1 },
+      { itemId: 'lastflame_core', chance: 0.5 },
+    ],
     scale: 3.4,
     color: 0xd64316,
     // Deliberately NO hasteMult: the encounter script owns Ignivar's frenzy.
@@ -238,7 +336,7 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
   // Stationary priority target for Ignivar's Normal intermission.
   ignivar_heart_of_the_end: {
     id: 'ignivar_heart_of_the_end',
-    name: 'Heart of the End',
+    name: 'Ignivar Ashcaller',
     minLevel: 20,
     maxLevel: 20,
     family: 'elemental',
@@ -720,6 +818,15 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       { itemId: 'deathlord_legguards', chance: 0.05, rollGroup: 'velkhar_bonus' },
       { itemId: 'necromancers_soulsteps', chance: 0.05, rollGroup: 'velkhar_bonus' },
       { itemId: 'wyrmshadow_legguards', chance: 0.05, rollGroup: 'velkhar_bonus' },
+      // The dungeon rung of the materials-satchel ladder, same shape and rate
+      // as the Gravewoven Bag on Morthen. Velkhar is the one Sanctum boss with
+      // room for it: velkhar_bonus sums to 0.75, so a 0.2 row lands fully
+      // inside the partition and still leaves slack for a no-bonus kill, the
+      // way morthen_bonus does at 0.81. korgath_bonus already sums to exactly
+      // 1.0 (an appended row could never be rolled) and korzul_bonus to 0.87
+      // (0.2 would overflow and clip its own tail), so neither could carry it
+      // without re-pricing the pieces already there.
+      { itemId: 'necromancers_reagent_satchel', chance: 0.2, rollGroup: 'velkhar_bonus' },
     ],
     scale: 1.25,
     color: 0x512e5f,
@@ -1056,8 +1163,15 @@ const NYTHRAXIS_RAID_SPAWN_LIST: DungeonSpawn[] = [
 ];
 
 const IGNIVAR_RAID_SPAWN_LIST: DungeonSpawn[] = [
-  { mobId: 'ignivar_herald_of_the_last_flame', x: 0, z: 0 },
+  { mobId: 'ignivar_herald_of_the_last_flame', x: 0, z: IGNIVAR_BOSS_SPAWN_Z },
 ];
+
+const IGNIVAR_WARDEN_MINIBOSS: DungeonSpawnMinibossTuning = {
+  healthMultiplier: 2.35,
+  scale: 2.75,
+  ccImmune: true,
+  slowImmune: true,
+};
 
 // First-room packs: five tight, inward-facing huddles up the Halls of the First
 // Tempering, hand-placed from live in-world coordinates (instance origin
@@ -1067,33 +1181,122 @@ const IGNIVAR_RAID_SPAWN_LIST: DungeonSpawn[] = [
 // already are via their template; the guardians take the per-spawn flag).
 const IGNIVAR_FORGE_APPROACH_SPAWN_LIST: DungeonSpawn[] = [
   // Pack 1 (2 crawlers + 1 Ember Sentinel), center local (-16, -15)
-  { mobId: 'derelict_mech', x: -16, z: -17, facing: 0 },
-  { mobId: 'derelict_mech', x: -14.3, z: -14, facing: -2.09 },
-  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: -17.7, z: -14, facing: 2.09, idleStationary: true },
+  { mobId: 'derelict_mech', x: -16, z: -17, facing: 0, packId: 'approach_1' },
+  { mobId: 'derelict_mech', x: -14.3, z: -14, facing: -2.09, packId: 'approach_1' },
+  {
+    mobId: IGNIVAR_EMBER_SENTINEL_ID,
+    x: -17.7,
+    z: -14,
+    facing: 2.09,
+    idleStationary: true,
+    packId: 'approach_1',
+  },
   // Pack 2 (2 crawlers + 1 Crucible Warden), center local (13, 4)
-  { mobId: 'derelict_mech', x: 13, z: 2, facing: 0 },
-  { mobId: 'derelict_mech', x: 14.7, z: 5, facing: -2.09 },
-  { mobId: IGNIVAR_CRUCIBLE_WARDEN_ID, x: 11.3, z: 5, facing: 2.09, idleStationary: true },
-  // Pack 3 (1 Cinder Artificer + 2 crawlers), center local (-21, 9)
-  { mobId: IGNIVAR_CINDER_ARTIFICER_ID, x: -21, z: 7, facing: 0, idleStationary: true },
-  { mobId: 'derelict_mech', x: -19.3, z: 10, facing: -2.09 },
-  { mobId: 'derelict_mech', x: -22.7, z: 10, facing: 2.09 },
+  { mobId: 'derelict_mech', x: 13, z: 2, facing: 0, packId: 'approach_2' },
+  { mobId: 'derelict_mech', x: 14.7, z: 5, facing: -2.09, packId: 'approach_2' },
+  {
+    mobId: IGNIVAR_CRUCIBLE_WARDEN_ID,
+    x: 11.3,
+    z: 5,
+    facing: 2.09,
+    idleStationary: true,
+    packId: 'approach_2',
+  },
+  // Pack 3 (1 promoted Warden + 2 crawlers), center local (-21, 9)
+  {
+    mobId: IGNIVAR_CRUCIBLE_WARDEN_ID,
+    x: -21,
+    z: 7,
+    facing: 0,
+    idleStationary: true,
+    packId: 'approach_3',
+    miniboss: IGNIVAR_WARDEN_MINIBOSS,
+  },
+  { mobId: 'derelict_mech', x: -19.3, z: 10, facing: -2.09, packId: 'approach_3' },
+  { mobId: 'derelict_mech', x: -22.7, z: 10, facing: 2.09, packId: 'approach_3' },
   // Pack 4 (2 crawlers + 1 Crucible Warden + 1 Ember Sentinel), center local (19, 42)
-  { mobId: 'derelict_mech', x: 19, z: 39.7, facing: 0 },
-  { mobId: 'derelict_mech', x: 21.3, z: 42, facing: -1.57 },
-  { mobId: IGNIVAR_CRUCIBLE_WARDEN_ID, x: 19, z: 44.3, facing: -3.14, idleStationary: true },
-  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: 16.7, z: 42, facing: 1.57, idleStationary: true },
-  // Pack 5 (2 crawlers + 1 Crucible Warden + 1 Ember Sentinel + 1 Cinder Artificer), center local (-22, 42)
-  { mobId: 'derelict_mech', x: -22, z: 39.4, facing: 0 },
-  { mobId: 'derelict_mech', x: -19.5, z: 41.2, facing: -1.26 },
-  { mobId: IGNIVAR_CRUCIBLE_WARDEN_ID, x: -20.5, z: 44.1, facing: -2.51, idleStationary: true },
-  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: -23.5, z: 44.1, facing: 2.51, idleStationary: true },
-  { mobId: IGNIVAR_CINDER_ARTIFICER_ID, x: -24.5, z: 41.2, facing: 1.26, idleStationary: true },
+  { mobId: 'derelict_mech', x: 19, z: 39.7, facing: 0, packId: 'approach_4' },
+  { mobId: 'derelict_mech', x: 21.3, z: 42, facing: -1.57, packId: 'approach_4' },
+  {
+    mobId: IGNIVAR_CRUCIBLE_WARDEN_ID,
+    x: 19,
+    z: 44.3,
+    facing: -3.14,
+    idleStationary: true,
+    packId: 'approach_4',
+  },
+  {
+    mobId: IGNIVAR_EMBER_SENTINEL_ID,
+    x: 16.7,
+    z: 42,
+    facing: 1.57,
+    idleStationary: true,
+    packId: 'approach_4',
+  },
+  // Pack 5 (2 crawlers + 2 Wardens + 1 Ember Sentinel), center local (-22, 42)
+  { mobId: 'derelict_mech', x: -22, z: 39.4, facing: 0, packId: 'approach_5' },
+  { mobId: 'derelict_mech', x: -19.5, z: 41.2, facing: -1.26, packId: 'approach_5' },
+  {
+    mobId: IGNIVAR_CRUCIBLE_WARDEN_ID,
+    x: -20.5,
+    z: 44.1,
+    facing: -2.51,
+    idleStationary: true,
+    packId: 'approach_5',
+  },
+  {
+    mobId: IGNIVAR_EMBER_SENTINEL_ID,
+    x: -23.5,
+    z: 44.1,
+    facing: 2.51,
+    idleStationary: true,
+    packId: 'approach_5',
+  },
+  {
+    mobId: IGNIVAR_CRUCIBLE_WARDEN_ID,
+    x: -24.5,
+    z: 41.2,
+    facing: 1.26,
+    idleStationary: true,
+    packId: 'approach_5',
+    miniboss: IGNIVAR_WARDEN_MINIBOSS,
+  },
+];
+
+const IGNIVAR_MOLTEN_ASSEMBLY_SPAWN_LIST: DungeonSpawn[] = [
+  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: -5, z: -24, packId: 'intake' },
+  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: 0, z: -22, packId: 'intake' },
+  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: 5, z: -24, packId: 'intake' },
+  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: -5, z: 4, packId: 'middle' },
+  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: 0, z: 6, packId: 'middle' },
+  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: 5, z: 4, packId: 'middle' },
+  {
+    mobId: IGNIVAR_CRUCIBLE_WARDEN_ID,
+    x: -5,
+    z: 31,
+    packId: 'final',
+    miniboss: IGNIVAR_WARDEN_MINIBOSS,
+  },
+  { mobId: IGNIVAR_EMBER_SENTINEL_ID, x: 0, z: 33, packId: 'final' },
+  {
+    mobId: IGNIVAR_CRUCIBLE_WARDEN_ID,
+    x: 5,
+    z: 31,
+    packId: 'final',
+    miniboss: IGNIVAR_WARDEN_MINIBOSS,
+  },
 ];
 
 const IGNIVAR_INNER_CRUCIBLE_SPAWN_LIST: DungeonSpawn[] = [
   { mobId: VARKHUL_BOSS_ID, x: 0, z: 16, facing: 0 },
 ];
+
+// The Ignivar raid family's shared overworld door on the Eastbrook market
+// block: the forge approach's walk-up testing entrance, and the point players
+// are set down beside when leaving ANY raid room (detachFromDungeon reads the
+// left room's own doorPos). The raid's public front door, a Drakelands gate,
+// is still to be authored: docs/design/ignivar-entrance/plan.md.
+const IGNIVAR_EASTBROOK_DOOR_POS = { x: -24, z: -114 };
 
 export const DUNGEON_DEFS: Record<string, DungeonDef> = {
   hollow_crypt: {
@@ -1285,7 +1488,10 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
   [IGNIVAR_LIFT_ROOM_ID]: {
     id: IGNIVAR_LIFT_ROOM_ID,
     name: 'The Forge-Lift',
-    index: 13,
+    // 14, not 13: the raid arm's Molten Assembly took 13 in parallel, and
+    // two rooms sharing an instance slot resolve door triggers to the
+    // wrong interior (found in the Drakelands entrance merge).
+    index: 14,
     // The raid's overworld entrance: the Forgefather's Isle keep tower's
     // south face, at the top of the keep stair (the owner's chosen spot).
     // Walking into the keep's doorway boards the forge-lift: a sealed car
@@ -1318,9 +1524,10 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     id: IGNIVAR_FORGE_APPROACH_ID,
     name: 'Halls of the First Tempering',
     index: 10,
-    // Reached only through the Forge-Lift's exit portal (the raid chain).
-    doorPos: { x: 0, z: 0 },
-    overworldDoor: false,
+    // Walk-up testing entrance: the raid family's front room takes the shared
+    // Eastbrook door so raid groups can zone in without /dev commands (the
+    // Forge-Lift's exit portal is the raid chain's own way in).
+    doorPos: IGNIVAR_EASTBROOK_DOOR_POS,
     guideVisible: false,
     entry: { x: 0, z: -50 },
     exitOffset: { x: 0, z: -54 },
@@ -1328,6 +1535,9 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     npcs: [
       { npcId: IGNIVAR_MAELIN_NPC_ID, x: 0, z: -47 },
       { npcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID, x: 0, z: 48 },
+      // The sigil-redemption vendor beside the raid entrance (APPEND-only:
+      // instance entity ids allocate in list order).
+      { npcId: CRUCIBLE_VENDOR_NPC_ID, x: 6, z: -47 },
     ],
     objects: [
       {
@@ -1370,15 +1580,22 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     id: IGNIVAR_RAID_ARENA_ID,
     name: 'Crucible of the Last Spring',
     index: 11,
-    // Development-only entrance until the raid's progression hook is authored.
-    doorPos: { x: 0, z: 0 },
+    // Internal raid room reached through the Herald gate in the approach;
+    // doorPos is only where leaving drops players, beside the Eastbrook door.
+    doorPos: IGNIVAR_EASTBROOK_DOOR_POS,
     overworldDoor: false,
     guideVisible: false,
     entry: { x: 0, z: -27 },
     exitOffset: { x: 0, z: -30 },
     spawns: IGNIVAR_RAID_SPAWN_LIST,
-    npcs: [{ npcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID, x: 8, z: 27 }],
+    // Between the north pillars, facing south into the arena (Math.PI = -z).
+    npcs: [{ npcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID, x: 10, z: 24, facing: Math.PI }],
     objects: [
+      // The four water pumps ARE the water conduits: each pump is promoted to
+      // a sim object so the encounter can flip its state (ready/active/
+      // cooldown) and cleanse players standing in its water. Positions match
+      // the baked water_pump dressing placements (IGNIVAR_CONDUITS), so the
+      // state overlay renders on the pump the player sees.
       ...IGNIVAR_CONDUITS.map((conduit) => ({
         itemId: '',
         name: `${conduit.id} Water Conduit`,
@@ -1389,11 +1606,11 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
       })),
       {
         itemId: '',
-        name: 'Sealed Inner Crucible Gate',
+        name: 'Sealed Assembly Gate',
         x: 0,
         z: 31.5,
         templateId: IGNIVAR_GATE_LOCKED_TEMPLATE,
-        dungeonId: IGNIVAR_SECOND_WING_ID,
+        dungeonId: IGNIVAR_MOLTEN_ASSEMBLY_ID,
         lootable: false,
       },
     ],
@@ -1402,12 +1619,42 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     enterText: 'Heat shimmers above the sealed waters of the Crucible.',
     leaveText: 'You step away from the Crucible and breathe freely again.',
   },
+  [IGNIVAR_MOLTEN_ASSEMBLY_ID]: {
+    id: IGNIVAR_MOLTEN_ASSEMBLY_ID,
+    name: 'Molten Assembly',
+    index: 13,
+    // Internal raid route reached only through the gate behind Ignivar;
+    // doorPos is only where leaving drops players, beside the Eastbrook door.
+    doorPos: IGNIVAR_EASTBROOK_DOOR_POS,
+    overworldDoor: false,
+    guideVisible: false,
+    entry: { x: 0, z: -50 },
+    exitOffset: { x: 0, z: -54 },
+    spawns: IGNIVAR_MOLTEN_ASSEMBLY_SPAWN_LIST,
+    npcs: [{ npcId: IGNIVAR_MAELIN_PROJECTION_NPC_ID, x: 0, z: -47 }],
+    objects: [
+      {
+        itemId: '',
+        name: 'Sealed Inner Crucible Gate',
+        x: 0,
+        z: 53,
+        templateId: IGNIVAR_GATE_LOCKED_TEMPLATE,
+        dungeonId: IGNIVAR_SECOND_WING_ID,
+        lootable: false,
+      },
+    ],
+    interior: 'ignivar_approach',
+    suggestedPlayers: 10,
+    enterText: 'The opened gate leads into a molten assembly hall.',
+    leaveText: 'You leave the assembly line and return to the Crucible.',
+  },
   [IGNIVAR_SECOND_WING_ID]: {
     id: IGNIVAR_SECOND_WING_ID,
     name: 'The Inner Crucible',
     index: 12,
-    // Internal raid wing reached only through the gate behind Ignivar.
-    doorPos: { x: 0, z: 0 },
+    // Internal raid wing reached only through the Molten Assembly gate;
+    // doorPos is only where leaving drops players, beside the Eastbrook door.
+    doorPos: IGNIVAR_EASTBROOK_DOOR_POS,
     overworldDoor: false,
     guideVisible: false,
     entry: { x: 0, z: -34 },

@@ -8,7 +8,6 @@ import {
   IGNIVAR_ROTATING_RAYS_CAST_ID,
   IGNIVAR_ROTATING_RAYS_WINDUP_SECONDS,
   IGNIVAR_SKYFIRE_CAST_ID,
-  IGNIVAR_SOAK_AURA_ID,
 } from '../sim/encounters/ignivar';
 import { IGNIVAR_FORGE_CHAINS_AURA_ID } from '../sim/ignivar_forge_chains';
 import {
@@ -57,8 +56,6 @@ export interface IgnivarEncounterVisualPlan {
   forgeWaveProgress: number;
   forgeWaveRadius: number;
   branded: boolean;
-  soakMarked: boolean;
-  soakProgress: number;
   brandStacks: number;
   inverseEntityScale: number;
 }
@@ -115,10 +112,7 @@ export function ignivarBossFacingLocked(entity: {
 export function ignivarEncounterBypassesCharacterCulling(entity: IgnivarVisualEntity): boolean {
   if (entity.kind === 'player') {
     return entity.auras.some(
-      (aura) =>
-        aura.id === IGNIVAR_FORGE_CHAINS_AURA_ID ||
-        aura.id === IGNIVAR_BRAND_AURA_ID ||
-        aura.id === IGNIVAR_SOAK_AURA_ID,
+      (aura) => aura.id === IGNIVAR_FORGE_CHAINS_AURA_ID || aura.id === IGNIVAR_BRAND_AURA_ID,
     );
   }
   if (entity.templateId !== IGNIVAR_BOSS_ID) return false;
@@ -147,13 +141,6 @@ export function ignivarEncounterVisualPlan(
         1,
         Math.max(0, 1 - (entity.castRemaining ?? 0) / Math.max(0.01, entity.castTotal ?? 0.01)),
       )
-    : 0;
-  const soak =
-    entity.kind === 'player'
-      ? entity.auras.find((aura) => aura.id === IGNIVAR_SOAK_AURA_ID)
-      : undefined;
-  const soakProgress = soak
-    ? Math.min(1, Math.max(0, 1 - (soak.remaining ?? 0) / Math.max(0.01, soak.duration ?? 0.01)))
     : 0;
   const rotatingRaysVisible =
     entity.templateId === IGNIVAR_BOSS_ID &&
@@ -224,8 +211,6 @@ export function ignivarEncounterVisualPlan(
     forgeWaveRadius:
       forgeWavePhase === 'active' ? ignivarForgeWaveRadius(entity.castRemaining ?? 0) : 0,
     branded: brand !== undefined,
-    soakMarked: soak !== undefined,
-    soakProgress,
     brandStacks,
     inverseEntityScale: 1 / Math.max(0.01, entity.scale ?? 1),
   };

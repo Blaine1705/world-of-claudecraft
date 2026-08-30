@@ -110,6 +110,11 @@ const ALLOWED_UNCLASSIFIED_JUNK = [
   'gleamstag_charm',
   'guardian_core',
   'last_keep_signet',
+  // Staged AHEAD of its recipes (the professions fast-follow, PR 3704): the
+  // Core of the Last Flame drops now so crafters bank it, and the moment a
+  // recipe consumes it the derivation classifies it IN and this row must
+  // move to the classified list (3704 carries exactly that move).
+  'lastflame_core',
   'old_cragmaws_pelt',
 ] as const;
 
@@ -401,7 +406,7 @@ describe('deriveMaterialItemIds: every source table is actually consulted (injec
 });
 
 describe('completeness tripwire: unclassified non-poor junk', () => {
-  it('is exactly the six allowed oddments, no more and no fewer', () => {
+  it('is exactly the seven allowed oddments, no more and no fewer', () => {
     const unclassified = Object.values(ITEMS)
       .filter((d) => d.kind === 'junk' && d.quality !== 'poor' && !MATERIAL_ITEM_IDS.has(d.id))
       .map((d) => d.id)
@@ -419,12 +424,15 @@ describe('isMaterialItem', () => {
   });
 });
 
-describe('no src/sim importer (the module-evaluation hard rule)', () => {
+describe('no src/sim importer (presentation-only taxonomy scope)', () => {
   // Two sim leaves carry the identical UI-only contract: material_taxonomy
   // (this file's module) and material_profession_affinity (same hazard class,
   // its header defers enforcement here). One walk guards both.
   // liveImporter is the known consumer outside src/sim that keeps the regex
   // honest as a positive control.
+  // material_ids.ts is the sim-safe canonical registry. This compatibility
+  // module remains presentation-only so production sim code cannot grow a
+  // dependency on an ItemDef-oriented UI predicate.
   const GUARDED_MODULES = [
     { name: 'material_taxonomy', liveImporter: '../src/ui/bag_filter.ts' },
     {
@@ -474,11 +482,8 @@ describe('no src/sim importer (the module-evaluation hard rule)', () => {
   });
 
   it('no src/sim file other than each module itself imports it', () => {
-    // Both modules derive at module evaluation by reading content tables; a
-    // content-side importer would pull that derive inside the tables' own
-    // evaluation cycle, where load order decides between a crash and a clean
-    // run (each module header states the rule), so only a static scan catches
-    // it reliably.
+    // Both modules are presentation classifiers. A static scan keeps the sim
+    // on its id-based/domain seams rather than importing UI-oriented helpers.
     const simRoot = fileURLToPath(new URL('../src/sim', import.meta.url));
     const guards = GUARDED_MODULES.map(({ name }) => ({
       re: importerReFor(name),

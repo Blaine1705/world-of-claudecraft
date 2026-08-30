@@ -29,6 +29,7 @@ function telegraphMaterial(color: number, opacity: number): THREE.MeshBasicMater
     blending: THREE.NormalBlending,
     side: THREE.DoubleSide,
   });
+  material.forceSinglePass = true;
   material.userData.ignivarTelegraphBaseOpacity = opacity;
   return material;
 }
@@ -136,41 +137,41 @@ function buildHeatTicks(): THREE.Group {
 function buildFlameBlade(): THREE.Group {
   const blade = new THREE.Group();
   blade.name = IGNIVAR_ROTATING_RAY_BLADE_NAME;
-  blade.position.set(0, 2.25, IGNIVAR_ROTATING_RAYS_RANGE - 1);
+  blade.position.set(0, 1.05, IGNIVAR_ROTATING_RAYS_RANGE - 1);
   blade.userData.gameplayGeometry = false;
 
-  const outerMaterial = new THREE.MeshBasicMaterial({
-    color: 0xff4b08,
+  const material = new THREE.MeshBasicMaterial({
+    color: 0xffffff,
     transparent: true,
-    opacity: 0.82,
+    opacity: 0.4,
     depthWrite: false,
     blending: THREE.AdditiveBlending,
+    side: THREE.DoubleSide,
     toneMapped: false,
   });
-  const coreMaterial = new THREE.MeshBasicMaterial({
-    color: 0xffd36a,
-    transparent: true,
-    opacity: 0.94,
-    depthWrite: false,
-    blending: THREE.AdditiveBlending,
-    toneMapped: false,
-  });
-  const outerGeometry = new THREE.OctahedronGeometry(0.62, 0);
-  const coreGeometry = new THREE.OctahedronGeometry(0.38, 0);
-
-  for (const lateral of [-0.38, 0, 0.38]) {
-    const outer = new THREE.Mesh(outerGeometry, outerMaterial);
-    outer.position.x = lateral;
-    outer.scale.set(lateral === 0 ? 0.8 : 0.55, lateral === 0 ? 1.75 : 1.3, 0.55);
-    outer.rotation.z = lateral * -0.85;
-    outer.renderOrder = 12;
-    blade.add(outer);
+  material.forceSinglePass = true;
+  material.userData.ignivarThermalLayer = 'flameTip';
+  const geometry = new THREE.ConeGeometry(0.2, 1, 6, 1, true);
+  const tongueCount = 7;
+  const tongues = new THREE.InstancedMesh(geometry, material, tongueCount);
+  const dummy = new THREE.Object3D();
+  for (let index = 0; index < 7; index++) {
+    const lateral = (index - 3) * 0.24;
+    const height = 1.05 + ((index * 5) % 4) * 0.24;
+    dummy.position.set(lateral, height * 0.08 - 0.18, ((index * 7) % 3) * 0.14 - 0.14);
+    dummy.scale.set(0.72 + (index % 2) * 0.18, height, 0.72 + ((index + 1) % 2) * 0.16);
+    dummy.rotation.set(0, 0, lateral * -0.42);
+    dummy.updateMatrix();
+    tongues.setMatrixAt(index, dummy.matrix);
+    tongues.setColorAt(
+      index,
+      new THREE.Color(index % 4 === 0 ? 0xfff2b0 : index % 2 === 0 ? 0xffb02e : 0xff5a0a),
+    );
   }
-
-  const core = new THREE.Mesh(coreGeometry, coreMaterial);
-  core.scale.set(0.68, 1.55, 0.48);
-  core.renderOrder = 13;
-  blade.add(core);
+  tongues.instanceMatrix.needsUpdate = true;
+  if (tongues.instanceColor) tongues.instanceColor.needsUpdate = true;
+  tongues.renderOrder = 12;
+  blade.add(tongues);
   blade.visible = false;
   return blade;
 }

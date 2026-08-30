@@ -115,10 +115,10 @@ describe('Varkhul forge beams', () => {
 
   it('pins healer pressure and the forge meltdown damage profile', () => {
     expect(VARKHUL_FORGE_BEAM_BLOCK_DAMAGE_TICK_SECONDS).toBe(1);
-    expect(varkhulForgeBeamBlockDamageMaxHp('normal', 1)).toBe(0.06);
-    expect(varkhulForgeBeamBlockDamageMaxHp('normal', 3)).toBe(0.1);
-    expect(varkhulForgeBeamBlockDamageMaxHp('heroic', 1)).toBe(0.08);
-    expect(varkhulForgeBeamBlockDamageMaxHp('heroic', 3)).toBe(0.14);
+    expect(varkhulForgeBeamBlockDamageMaxHp('normal', 1)).toBe(0.07);
+    expect(varkhulForgeBeamBlockDamageMaxHp('normal', 3)).toBeCloseTo(0.11, 8);
+    expect(varkhulForgeBeamBlockDamageMaxHp('heroic', 1)).toBe(0.1);
+    expect(varkhulForgeBeamBlockDamageMaxHp('heroic', 3)).toBeCloseTo(0.16, 8);
     expect(varkhulForgeBeamExposureResetSeconds('normal')).toBe(10);
     expect(varkhulForgeBeamExposureResetSeconds('heroic')).toBe(60);
     expect(varkhulForgeMeltdownInitialDamageMaxHp('normal')).toBe(0.65);
@@ -129,9 +129,10 @@ describe('Varkhul forge beams', () => {
     expect(varkhulForgeMeltdownTickDamageMaxHp('heroic')).toBe(0.2);
   });
 
-  it('adds eight forge-heat points only when a Crucible Quake resolves', () => {
+  it('adds eight Normal or ten Heroic forge-heat points when a Crucible Quake resolves', () => {
     expect(VARKHUL_FORGE_QUAKE_OVERHEAT).toBe(0.08);
-    expect(varkhulForgeOverheatAfterQuake(0.4)).toBeCloseTo(0.48, 8);
-    expect(varkhulForgeOverheatAfterQuake(0.97)).toBe(1);
+    expect(varkhulForgeOverheatAfterQuake(0.4, 'normal')).toBeCloseTo(0.48, 8);
+    expect(varkhulForgeOverheatAfterQuake(0.4, 'heroic')).toBeCloseTo(0.5, 8);
+    expect(varkhulForgeOverheatAfterQuake(0.97, 'heroic')).toBe(1);
   });
 });

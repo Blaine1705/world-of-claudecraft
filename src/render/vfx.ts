@@ -265,6 +265,18 @@ export const SCHOOL_COLORS: Record<string, number> = {
   physical: 0xffd28a,
 };
 
+/** A burst waiting out the gap between its cue event and its visual moment. */
+interface PendingBurst {
+  remaining: number;
+  x: number;
+  y: number;
+  z: number;
+  school: string;
+  count: number;
+  power: number;
+  color?: number;
+}
+
 interface Projectile {
   pos: THREE.Vector3;
   targetId: number;
@@ -330,6 +342,8 @@ export class Vfx {
   private head = 0;
   private projectiles: Projectile[] = [];
   private bubbleBeams: BubbleBeam[] = [];
+  private pendingBursts: PendingBurst[] = [];
+  private readonly pendingBurstScratch = new THREE.Vector3();
   private drainLifeVfx: DrainLifeVfx;
   private tmpColor = new THREE.Color();
   private tmpDirection = new THREE.Vector3();
@@ -682,6 +696,7 @@ export class Vfx {
   clear(): void {
     if (this.disposed) return;
     this.projectiles.length = 0;
+    this.pendingBursts.length = 0;
     this.paladinSpellFx.clear();
     for (let i = this.bubbleBeams.length - 1; i >= 0; i--) this.removeBubbleBeam(i);
     this.drainLifeVfx.clear();
@@ -1524,6 +1539,26 @@ export class Vfx {
   }
 
   /**
+   * A burst scheduled `seconds` from now, for impacts whose visual moment sits
+   * inside an already-playing clip (the Forgefather's hammer reaching his
+   * anvil). Fixed world position by design: the emitter aims at a spot, not an
+   * entity, so a mover cannot drag the pending impact with it. Drained by
+   * update(); dispose() drops anything still pending.
+   */
+  burstLater(
+    seconds: number,
+    x: number,
+    y: number,
+    z: number,
+    school: string,
+    count = 18,
+    power = 1,
+    color?: number,
+  ): void {
+    this.pendingBursts.push({ remaining: seconds, x, y, z, school, count, power, color });
+  }
+
+  /**
    * Brief water-entry droplets. These reuse the single pooled point cloud, so
    * an impact adds no mesh, material, texture, or draw call. Continuous motion
    * belongs to the height-field wake; this only fires on discrete impacts.
@@ -2172,6 +2207,20 @@ export class Vfx {
   update(dt: number, reducedMotion = false): void {
     if (this.disposed) return;
     this.drainLifeVfx.update(dt, reducedMotion);
+
+    for (let i = this.pendingBursts.length - 1; i >= 0; i--) {
+      const pending = this.pendingBursts[i];
+      pending.remaining -= dt;
+      if (pending.remaining > 0) continue;
+      this.pendingBursts.splice(i, 1);
+      this.burst(
+        this.pendingBurstScratch.set(pending.x, pending.y, pending.z),
+        pending.school,
+        pending.count,
+        pending.power,
+        pending.color,
+      );
+    }
 
     for (let i = this.bubbleBeams.length - 1; i >= 0; i--) {
       const stream = this.bubbleBeams[i];

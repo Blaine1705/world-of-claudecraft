@@ -4,7 +4,6 @@
 // player outside that room cannot receive this development chain from a groupmate.
 
 import {
-  IGNIVAR_CINDER_ARTIFICER_ID,
   IGNIVAR_CRUCIBLE_WARDEN_ID,
   IGNIVAR_EMBER_SENTINEL_ID,
   VARKHUL_BOSS_ID,
@@ -93,12 +92,6 @@ export const IGNIVAR_RAID_LORE_QUESTS: Record<string, QuestDef> = {
         targetMobId: IGNIVAR_CRUCIBLE_WARDEN_ID,
         count: 2,
         label: 'Crucible Wardens destroyed',
-      },
-      {
-        type: 'kill',
-        targetMobId: IGNIVAR_CINDER_ARTIFICER_ID,
-        count: 2,
-        label: 'Cinder Artificers destroyed',
       },
     ],
   },
