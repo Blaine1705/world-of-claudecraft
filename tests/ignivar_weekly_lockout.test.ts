@@ -692,8 +692,13 @@ describe('the family reaper honors a cleared sibling claim', () => {
     expect(approach.partyKey, 'sibling rides the same grace').toBe(key);
     // One empty second shy of the 900-second cleared grace: the whole family
     // is still live, so the promised loot-recovery window really is 900, not
-    // some shorter figure the loop above would have silently absorbed.
-    while (inst.emptyFor < INSTANCE_CLEARED_EMPTY_TIMEOUT - 1) updateInstances(sim.ctx);
+    // some shorter figure the loop above would have silently absorbed. The
+    // pass count is a FIXED number derived from the elapsed passes, never a
+    // loop on emptyFor itself: a premature family free resets that field to 0
+    // and the reaper skips freed slots, so an unbounded condition would spin
+    // forever instead of letting the live-at-899 asserts below fail normally.
+    const passesTo899 = INSTANCE_CLEARED_EMPTY_TIMEOUT - 1 - (INSTANCE_EMPTY_TIMEOUT + 1);
+    for (let i = 0; i < passesTo899; i += 1) updateInstances(sim.ctx);
     expect(inst.emptyFor).toBe(INSTANCE_CLEARED_EMPTY_TIMEOUT - 1);
     expect(approach.emptyFor).toBe(INSTANCE_CLEARED_EMPTY_TIMEOUT - 1);
     expect(inst.partyKey, 'still live at 899 empty seconds').toBe(key);

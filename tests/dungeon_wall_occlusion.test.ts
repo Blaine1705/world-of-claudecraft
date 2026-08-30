@@ -375,6 +375,70 @@ describe('updateWallOcclusion, backface twin staging', () => {
     expect(b.node.visible).toBe(true);
   });
 
+  it('a face re-covers only when its SLOWEST segment has: one settled segment cannot re-show the prop', async () => {
+    const { host, compiles } = fakeHost();
+    installOccluderFadeGate(host);
+    const owner = new THREE.Group();
+    // Two segments of ONE face whose programs settle independently: a
+    // Standard and a Lambert material key two different twins, so one
+    // segment's link can land while the other stays readiness-held.
+    const wallOn = (x: number, mat: THREE.Material): WallHideable => {
+      const group = new THREE.Group();
+      owner.add(group);
+      return {
+        group,
+        mats: [occluderFadeMat(mat, new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), mat))],
+        hidden: false,
+        alpha: 1,
+        footprint: { x, z: -58, hw: 5, hd: 1, topY: 16 },
+        backface: { x, z: -58, nx: 0, nz: -1 },
+      };
+    };
+    const wallA = wallOn(0, new THREE.MeshStandardMaterial({ name: 'segA' }));
+    const wallB = wallOn(6, new THREE.MeshLambertMaterial({ name: 'segB' }));
+    const b: WallPropBinding = {
+      node: new THREE.Group(),
+      plane: { ...plane },
+      owner,
+      alpha: 1,
+    };
+    const frame = (camZ: number, eyeZ: number): void =>
+      updateWallOcclusion([wallA, wallB], [b], 0, 4, camZ, 0, 2, eyeZ, DT);
+    // Frame 1 inside: both segments stage (one twin each, A first) and the
+    // lazy link binds the face to BOTH of them.
+    frame(-40, -20);
+    expect(b.walls).toEqual([wallA, wallB]);
+    expect(compiles).toHaveLength(2);
+    // Outside: everything hides.
+    frame(-70, -40);
+    expect(b.node.visible).toBe(false);
+    // Only segment A's program settles; B stays readiness-held.
+    compiles[0].resolve();
+    await flush();
+    // A eases past the show threshold while B holds at alpha 0: the face is
+    // NOT re-covered (its slowest segment is still invisible), so the prop
+    // must stay hidden however far A recovers. A maximum or first-segment
+    // cover rule would re-show it the frame A passes 0.6.
+    for (let i = 0; i < 400 && wallA.alpha < 1; i++) {
+      frame(-40, -20);
+      expect(wallB.alpha).toBe(0);
+      expect(wallB.group.visible).toBe(false);
+      expect(b.node.visible, `prop with A at ${wallA.alpha}`).toBe(false);
+    }
+    expect(wallA.alpha).toBe(1);
+    // B settles (its request plus the held edge frames' escalation): the
+    // prop re-shows only once B ITSELF recovers past the threshold.
+    for (const c of compiles) c.resolve();
+    await flush();
+    let propShownAtBAlpha = -1;
+    for (let i = 0; i < 400 && propShownAtBAlpha < 0; i++) {
+      frame(-40, -20);
+      if (b.node.visible) propShownAtBAlpha = wallB.alpha;
+    }
+    expect(propShownAtBAlpha).toBeGreaterThanOrEqual(WALL_PROP_SHOW_ALPHA);
+    expect(wallA.alpha).toBe(1);
+  });
+
   it('an unbound prop keeps the historical proxy-clock timing (no wall to key off)', () => {
     // The [] hideables shape the older prop tests use: no link, no hold.
     const b: WallPropBinding = {
