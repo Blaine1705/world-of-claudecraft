@@ -261,6 +261,21 @@ function buildSourceIndex(): Map<string, ItemSource> {
   // no derivable item level: the budget gates below skip it and the tooltip's item
   // level/score lines never show. Not a raid source.
   for (const recipe of ALL_RECIPES) bump(recipe.resultItemId, recipe.level, false);
+  // The 2026-08-30 ilvl-honesty round: four hand-authored weapon lines sat
+  // above the dps curve their derived item level priced. Players own these
+  // items, so the LINES stay exactly as shipped and the item level rises to
+  // the level each line actually occupies (dps on weaponDpsBudget), giving
+  // future itemization an honest ruler to price against. Sources are stated
+  // so ilvl lands exactly (ilvl = source + quality bonus, + 3 when raid).
+  // Equip gates are unchanged: explicit requiredLevel wins (the shiv freezes
+  // its old gate in content), and the epic/legendary gates clamp at MAX_LEVEL.
+  // tests/twohand_rebudget.test.ts sweeps every weapon against its curve.
+  bump('boneglass_shiv', 18, false); // 12.9 dps: ilvl 21 (was 17)
+  bump('duskwhisper', 22, false); // 15.0 dps: ilvl 28 (was 26)
+  bump('marrowpoint', 23, false); // 15.3 dps: ilvl 29 (was 26)
+  bump('deathless_heartwood', 22, true); // 17.19 dps: ilvl 35 (was 33)
+  bump('kingsbane_last_oath', 36, true); // 21.43 dps: ilvl 49 (was 33)
+  bump('heroic_kingsbane_last_oath', 37, true); // retained line + seed: ilvl 50
   return idx;
 }
 

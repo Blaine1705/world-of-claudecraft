@@ -33,11 +33,10 @@ export const IGNIVAR_DROP_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     hand: 'twohand',
     quality: 'legendary',
-    // Authored ABOVE the ilvl-37 curve (20.5 two-hand dps) on the Thronebane
-    // hot-line precedent: the raid's marquee two-hander must out-white heroic
-    // Thronebane's retained 21.4 dps line, or the old legendary stays the
-    // white-damage king of the new tier (measured 2026-08-30).
-    weapon: { min: 63, max: 94, speed: 3.6 },
+    // On the ilvl-33 two-hand curve exactly (19.05 at 3.6 speed), the original
+    // handover line: with Thronebane re-lined to ITS curve, the ladder is
+    // ilvl-honest and no hot line is needed (the 2026-08-30 ilvl-honesty round).
+    weapon: { min: 55, max: 82, speed: 3.6 },
     stats: { str: 26, sta: 19, agi: 12 },
     sellValue: 26000,
     // Every class that swings a two-handed mace in the era rules: warrior,

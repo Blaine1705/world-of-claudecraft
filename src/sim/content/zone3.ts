@@ -2324,6 +2324,9 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
   // proc so a leveling rogue gets a taste of an interesting dagger before cap.
   boneglass_shiv: {
     id: 'boneglass_shiv',
+    // Gate frozen at the pre-ilvl-honesty derived value: the 2026-08-30
+    // source bump (ilvl 17 to 21) must not raise a leveling item's equip bar.
+    requiredLevel: 14,
     name: 'Boneglass Shiv',
     kind: 'weapon',
     slot: 'mainhand',
@@ -3258,6 +3261,11 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     kind: 'weapon',
     slot: 'mainhand',
     quality: 'legendary',
+    // The line ships exactly as players own it. The 2026-08-30 ilvl-honesty
+    // round moved the LABEL instead: 21.4 dps occupies the ilvl-49 point of
+    // the one-hand curve, so the source registration in item_level.ts prices
+    // it there (heroic mint 50). Future items budget against the honest
+    // number instead of inheriting the pre-budget chase line as a lie.
     weapon: { min: 46, max: 74, speed: 2.8 },
     // Rebalanced into a str/agi/sta hybrid within the fixed 44-pt legendary
     // mainhand budget: 15 agi makes it a viable hunter ranged weapon (ranged AP +

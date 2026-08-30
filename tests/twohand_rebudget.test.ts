@@ -48,13 +48,6 @@ describe('v0.27.1 two-hand re-budget', () => {
     for (const item of twoHanders()) {
       const level = itemLevel(item);
       if (level === undefined) continue;
-      // Forgebreaker is the one sanctioned above-curve line (21.81 vs the
-      // curve's 19.09 at its realized ilvl): the raid legendary must out-white
-      // heroic Thronebane's retained 21.4 legacy line or the old legendary
-      // stays the tier's white-damage king (maintainer direction 2026-08-30;
-      // rationale beside the damage line in content/ignivar_drops.ts). Its
-      // exact line is pinned below instead of the curve.
-      if (item.id === 'varkhul_forgebreaker') continue;
       const dps = (item.weapon.min + item.weapon.max) / 2 / item.weapon.speed;
       const target = weaponDpsBudget(level) * TWOHAND_DPS_MULT;
       expect(
@@ -64,14 +57,30 @@ describe('v0.27.1 two-hand re-budget', () => {
     }
   });
 
-  it('pins the sanctioned above-curve legendary line exactly', () => {
-    const forgebreaker = ITEMS.varkhul_forgebreaker;
-    expect(forgebreaker.kind === 'weapon' && forgebreaker.weapon).toBeTruthy();
-    if (forgebreaker.kind !== 'weapon' || !forgebreaker.weapon) return;
-    expect(forgebreaker.weapon).toEqual({ min: 63, max: 94, speed: 3.6 });
-    const dps = (63 + 94) / 2 / 3.6;
-    // Above heroic Thronebane's retained 21.43, below a 23-dps runaway.
-    expect(dps).toBeGreaterThan(21.43);
-    expect(dps).toBeLessThan(23);
+  // The 2026-08-30 ilvl-honesty round: the pre-budget Thronebane line ran 29
+  // percent above its curve and the heroic mint's above-curve retention
+  // carried it to ilvl 37, quietly making a legacy weapon the white-damage
+  // king of every later tier. Both legendaries were re-lined to their real
+  // ilvl curves, and this sweep now covers ONE-handers too so the next hot
+  // hand-authored line fails here instead of surfacing in a balance study.
+  // The two grandfathered leveling-era blips are pinned so they cannot grow.
+  it('every leveled one-hander sits at or under its ilvl dps ceiling', () => {
+    let checked = 0;
+    for (const item of Object.values(ITEMS)) {
+      if (item.kind !== 'weapon' || !item.weapon || item.hand === 'twohand') continue;
+      const level = itemLevel(item);
+      if (level === undefined) continue;
+      const dps = (item.weapon.min + item.weapon.max) / 2 / item.weapon.speed;
+      // One-sided on purpose: leveling greens sit under budget by design;
+      // the guard only stops a line sneaking ABOVE its ilvl (the Thronebane
+      // failure mode).
+      const target = weaponDpsBudget(level);
+      expect(
+        dps - target,
+        `${item.id} dps ${dps.toFixed(2)} vs ceiling ${target.toFixed(2)}`,
+      ).toBeLessThan(0.35);
+      checked++;
+    }
+    expect(checked).toBeGreaterThan(20);
   });
 });

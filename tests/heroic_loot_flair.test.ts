@@ -45,14 +45,23 @@ describe('heroic loot flair: variant generation', () => {
     for (const v of all) {
       expect(['epic', 'rare', 'legendary']).toContain(v.quality);
       if (raidBases.has(v.heroicOf ?? '')) {
-        expect(itemLevel(v), v.id).toBe(v.quality === 'legendary' ? 37 : 33);
+        // The one honest-label outlier: heroic Thronebane keeps the retained
+        // pre-budget 21.4 dps line players own, so the 2026-08-30 ilvl-honesty
+        // round prices its label at the level that line occupies (50), not the
+        // mint tier (item_level.ts source overrides).
+        if (v.id === 'heroic_kingsbane_last_oath') expect(itemLevel(v), v.id).toBe(50);
+        else expect(itemLevel(v), v.id).toBe(v.quality === 'legendary' ? 37 : 33);
       } else if (fiveManBossVariantIds.has(v.id)) {
         expect(itemLevel(v), v.id).toBe(31);
       } else {
         expect(itemLevel(v), v.id).toBe(v.quality === 'epic' ? 28 : 25);
       }
       // A base item already above the generated budget must retain that extra power.
-      expect(primaryStatSum(v)).toBeGreaterThanOrEqual(expectedStatBudget(v) ?? 0);
+      // The honest-label outlier sits UNDER the stat budget of its weapon-line
+      // ilvl on purpose: its power is weapon-dominant, and the label prices the
+      // dominant axis (stats stay exactly as minted for the ilvl-37 tier).
+      if (v.id !== 'heroic_kingsbane_last_oath')
+        expect(primaryStatSum(v)).toBeGreaterThanOrEqual(expectedStatBudget(v) ?? 0);
     }
   });
 
