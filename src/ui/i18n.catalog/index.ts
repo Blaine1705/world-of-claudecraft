@@ -1133,6 +1133,11 @@ export const en = {
     // sets, but a silently empty panel is the worse failure mode.
     empty: 'No set pieces are redeemable for your class.',
     balance: 'Your sigils: {list}',
+    // One held-sigil entry inside {list}: the window composes each through
+    // this key and joins them with formatList, so a locale can reorder the
+    // count and name and keep its own list punctuation (the
+    // hudChrome.enchanting.replaceConfirmCostItem pattern).
+    balanceEntry: '{name} x{count}',
     noSigils: 'You hold no Crucible sigils.',
     price: '1 {sigil}',
     buyAria: 'Redeem {sigil} for {item}',

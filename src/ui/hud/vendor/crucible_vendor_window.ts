@@ -11,7 +11,7 @@ import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { focusedWithin, restoreFirstEnabled } from '../../focus_restore';
-import { formatNumber, t } from '../../i18n';
+import { formatList, formatNumber, t } from '../../i18n';
 import type { PainterHostPresentation } from '../../painter_host';
 import { svgIcon } from '../../ui_icons';
 import type { CrucibleShopView } from './crucible_vendor_view';
@@ -55,12 +55,17 @@ export function renderCrucibleVendorWindow(
     view.balances.length === 0
       ? t('crucibleShop.noSigils')
       : t('crucibleShop.balance', {
-          list: view.balances
-            .map(
-              (b) =>
-                `${itemDisplayName(b.sigil)} x${formatNumber(b.count, { maximumFractionDigits: 0 })}`,
-            )
-            .join(', '),
+          // Each entry composes through its own catalog key and the join is
+          // formatList (Intl.ListFormat), so no English quantity order or
+          // list punctuation is hardcoded here.
+          list: formatList(
+            view.balances.map((b) =>
+              t('crucibleShop.balanceEntry', {
+                name: itemDisplayName(b.sigil),
+                count: formatNumber(b.count, { maximumFractionDigits: 0 }),
+              }),
+            ),
+          ),
         });
   el.appendChild(balance);
 

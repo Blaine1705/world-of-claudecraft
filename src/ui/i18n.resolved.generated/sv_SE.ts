@@ -8073,6 +8073,7 @@ export const sv_SE: EnTranslations = {
     "browseAria": "Redeem Crucible sigils with {name}",
     "empty": "No set pieces are redeemable for your class.",
     "balance": "Your sigils: {list}",
+    "balanceEntry": "{name} x{count}",
     "noSigils": "You hold no Crucible sigils.",
     "price": "1 {sigil}",
     "buyAria": "Redeem {sigil} for {item}",

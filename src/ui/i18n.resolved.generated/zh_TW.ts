@@ -8073,6 +8073,7 @@ export const zh_TW: EnTranslations = {
     "browseAria": "與{name}兌換熔爐印記",
     "empty": "你的職業沒有可兌換的套裝部件。",
     "balance": "你持有的印記: {list}",
+    "balanceEntry": "{name} x{count}",
     "noSigils": "你沒有持有任何熔爐印記。",
     "price": "1枚{sigil}",
     "buyAria": "用{sigil}兌換{item}",

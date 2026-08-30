@@ -8073,6 +8073,7 @@ export const ru_RU: EnTranslations = {
     "browseAria": "Обменять печати Горнила у {name}",
     "empty": "Для вашего класса нет доступных частей комплекта.",
     "balance": "Ваши печати: {list}",
+    "balanceEntry": "{name} x{count}",
     "noSigils": "У вас нет печатей Горнила.",
     "price": "1 x {sigil}",
     "buyAria": "Обменять {sigil} на {item}",

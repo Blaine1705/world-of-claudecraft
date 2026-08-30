@@ -8073,6 +8073,7 @@ export const ja_JP: EnTranslations = {
     "browseAria": "{name}と坩堝の印章を交換する",
     "empty": "あなたのクラスで交換できるセット装備はありません。",
     "balance": "所持している印章: {list}",
+    "balanceEntry": "{name} x{count}",
     "noSigils": "坩堝の印章を持っていません。",
     "price": "{sigil} 1個",
     "buyAria": "{sigil}を{item}と交換する",

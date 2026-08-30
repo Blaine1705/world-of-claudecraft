@@ -619,6 +619,7 @@ export type TranslationKeyFlat =
   | 'controls.worldMap'
   | 'controls.zoom'
   | 'crucibleShop.balance'
+  | 'crucibleShop.balanceEntry'
   | 'crucibleShop.browse'
   | 'crucibleShop.browseAria'
   | 'crucibleShop.buyAria'
