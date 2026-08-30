@@ -336,8 +336,20 @@ interface AttributionTargetFixture {
 // merged renderer.ts carries the entry-fade arm's scenery cull beside this
 // branch's aim blocked pass-through, so the composite matches neither parent.
 // No capture was retaken.
+// Re-minted after the Forgefather strike-route call-site swap in renderer.ts
+// (routeVarkhulForgeHammer replaced the bare forge-hammer dispatch) moved the
+// runtimeRender.renderer leaf. No capture was retaken.
+// Re-minted for the raid encounter tuning PR's nameplate direct-click pick
+// integration in renderer.ts: the runtimeRender.renderer leaf moved. No
+// capture was retaken.
+// Re-minted for PR #3740's forge-lift room (the lift room render hookup and
+// door-portal arm moved the renderer integration leaf). No capture was
+// retaken.
+// Re-minted for the Drakelands entrance merge into the raid branch (PRs 3689
+// plus 3734: both arms had re-minted, the merged renderer and evidence inputs
+// land together). No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'fd58a9235b1142bf027371189a3f1b768a45557eb38b831761f41ab6c30d36ac';
+  '2341578921200326fd128bb8a10fa2f62a5d820803a844670ea130a695820827';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

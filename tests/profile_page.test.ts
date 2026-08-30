@@ -168,8 +168,9 @@ describe('profile page Reliquary pair + Curator rank lines', () => {
     // catalogTotal comes from the same catalogCharacterCompletion the page
     // calls, so the pair assertions below would follow a drifted derivation;
     // the literal anchors them. Literal: update when catalog content lands
-    // (313 since the v0.37.0 merge paged the two bank-storage bag drops).
-    expect(catalogTotal).toBe(313);
+    // (311 + the 40 Crucible raid relics + the raid's flawless title;
+    // Forgebreaker left the pages for its crafting chain).
+    expect(catalogTotal).toBe(356);
   });
 
   it('renders the owned/total pair and the English rank name for a ranked character', async () => {
