@@ -518,6 +518,20 @@ export function enterDungeon(
   }
   const corpseRunClaim = defeatedNythraxisCorpseRunClaim(ctx, key, r.e);
   const returningForLoot = inst !== undefined && corpseRunClaim === inst;
+  // The weekly raid rooms settle clearedBy at the kill (awardHeroicMarks)
+  // deliberately so this run's own participants can walk back into their
+  // exact still-live claim for loot and corpse runs, the heroic five-man
+  // idiom below. Admit only that: the final boss must be down (a locked
+  // player must never join a live farm an unlocked member claimed fresh),
+  // and only the clearedBy set, whose members are exactly the players whose
+  // lock FIRST landed with this claim's kill, so a non-participant or a
+  // player locked by an earlier run stays barred. A freed claim resets
+  // clearedBy and drops its partyKey, so an expired run admits nobody.
+  const returningToClearedRaidClaim =
+    inst !== undefined &&
+    WEEKLY_LOCKOUT_RAID_ROOMS.has(dungeonId) &&
+    !heroicFinalBossAlive(ctx, inst) &&
+    inst.clearedBy.has(r.meta.entityId);
   // Nythraxis keeps its at-the-door lockout, scoped to the difficulty actually
   // being entered: the live claim's when one exists, else the current selection.
   // A loot-eligible ghost may return to its party's defeated live claim for the
@@ -525,7 +539,7 @@ export function enterDungeon(
   if (dungeonId === 'nythraxis_boss_arena' || WEEKLY_LOCKOUT_RAID_ROOMS.has(dungeonId)) {
     const doorDifficulty = inst?.difficulty ?? difficulty;
     const lockId = doorDifficulty === 'heroic' ? heroicLockoutId(dungeonId) : dungeonId;
-    if (isRaidLocked(ctx, r.meta, lockId) && !returningForLoot) {
+    if (isRaidLocked(ctx, r.meta, lockId) && !returningForLoot && !returningToClearedRaidClaim) {
       ctx.error(
         r.meta.entityId,
         doorDifficulty === 'heroic'
@@ -698,10 +712,12 @@ function isRaidLocked(ctx: SimContext, meta: PlayerMeta, dungeonId: string): boo
   return true;
 }
 
-// Is the claimed heroic instance's final boss still up? Gates the locked-player
-// door rule in enterDungeon: a cleared run (boss down, or its corpse already
+// Is the claimed instance's final boss still up? Gates the locked-player door
+// rules in enterDungeon: a cleared run (boss down, or its corpse already
 // swept) stays re-enterable for loot and corpse-runs; a run with the boss alive
-// is a fresh farm a locked player must not join.
+// is a fresh farm a locked player must not join. Despite the name it reads the
+// tuning's finalBossId regardless of the claim's difficulty, so the weekly
+// raid-room door reuses it for normal claims too.
 function heroicFinalBossAlive(ctx: SimContext, inst: InstanceSlot): boolean {
   const tuning = HEROIC_DUNGEON_TUNING[inst.dungeonId];
   if (!tuning) return false;
