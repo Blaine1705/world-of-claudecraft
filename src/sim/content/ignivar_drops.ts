@@ -33,11 +33,11 @@ export const IGNIVAR_DROP_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     hand: 'twohand',
     quality: 'legendary',
-    // The legendary band (2026-08-30 maintainer direction): every legendary
-    // lives at the Thronebane tier. On the ilvl-50 two-hand curve exactly
-    // (24.95 at 3.6 speed), stats at the full ilvl-50 legendary 2H budget (87).
-    weapon: { min: 72, max: 108, speed: 3.6 },
-    stats: { str: 40, sta: 29, agi: 18 },
+    // The new-raid legendary tier (2026-08-30 three-tier ladder): on the
+    // ilvl-55 two-hand curve exactly (26.68 at 3.6 speed), stats at the full
+    // ilvl-55 legendary 2H budget (95).
+    weapon: { min: 77, max: 115, speed: 3.6 },
+    stats: { str: 44, sta: 32, agi: 19 },
     sellValue: 26000,
     // Every class that swings a two-handed mace in the era rules: warrior,
     // paladin, shaman, and the feral druid ladder; rogue stays excluded from
@@ -55,8 +55,8 @@ export const IGNIVAR_DROP_ITEMS: Record<string, ItemDef> = {
     // Buffed to the legendary band of the 2026-08-30 ilvl-honesty round
     // (maintainer direction: every legendary lives at the Thronebane tier,
     // budget-true at its labeled level; sources in item_level.ts).
-    blockValue: 64,
-    stats: { armor: 1440, sta: 29, str: 21 },
+    blockValue: 70,
+    stats: { armor: 1584, sta: 32, str: 23 },
     sellValue: 20000,
     requiredClass: ['warrior', 'paladin', 'shaman'],
   },

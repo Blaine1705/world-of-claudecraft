@@ -285,16 +285,16 @@ describe('item level: heroic boss drops are budget-exact (five-mans 31, raid 33/
     for (const base of raidBases) {
       const variant = ITEMS[`heroic_${base}`];
       expect(variant, `heroic_${base} exists`).toBeTruthy();
-      // The legendary band (2026-08-30) prices the heroic legendaries at
-      // source 37 (ilvl 50); every epic variant keeps the raid-tier 27.
+      // The three-tier legendary ladder (2026-08-30) prices the heroic
+      // legendaries at source 40 (ilvl 53); epic variants keep the raid 27.
       expect(itemSourceLevel(variant.id), `${variant.id} source`).toBe(
-        variant.quality === 'legendary' ? 37 : 27,
+        variant.quality === 'legendary' ? 40 : 27,
       );
       if (variant.quality === 'legendary') {
         legendaries++;
-        expect(itemLevel(variant), `${variant.id} ilvl`).toBe(50);
+        expect(itemLevel(variant), `${variant.id} ilvl`).toBe(53);
         // The mint keeps its base's line (normalize-to-max): Heartwood's
-        // banded 65, Thronebane's owned 44 plus the heroic seed (49). The 50
+        // banded 65, Thronebane's owned 44 plus the heroic seed (49). The 53
         // label prices the dominant axes, not a fresh stat roll.
         expect(primaryStatSum(variant), `${variant.id} banded stats`).toBe(
           variant.id === 'heroic_deathless_heartwood' ? 65 : 49,

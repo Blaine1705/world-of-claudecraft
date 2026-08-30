@@ -275,15 +275,18 @@ function buildSourceIndex(): Map<string, ItemSource> {
   bump('marrowpoint', 23, false); // 15.3 dps: ilvl 29 (was 26)
   bump('deathless_heartwood', 22, true); // 17.19 dps: ilvl 35 (was 33)
   bump('kingsbane_last_oath', 36, true); // 21.43 dps: ilvl 49 (was 33)
-  bump('heroic_kingsbane_last_oath', 37, true); // retained line + seed: ilvl 50
+  bump('heroic_kingsbane_last_oath', 40, true); // retained line + seed: ilvl 53
+  // The three-tier legendary ladder (maintainer, 2026-08-30): bases 49,
+  // heroic mints 53 (the +70/+30 seed is worth 3-4 levels at the rating
+  // conversions, not 1), the new raid's pair 55 budget-true.
   // The legendary band (maintainer direction, same round): every legendary is
   // BUFFED budget-true to the Thronebane tier and labeled there. Bases 49,
   // heroic mints and the heroic-raid pair 50; the rift pair is non-raid so its
   // source carries the whole distance.
   bump('deathless_heartwood', 36, true); // 49
-  bump('heroic_deathless_heartwood', 37, true); // 50
-  bump('varkhul_forgebreaker', 37, true); // 50
-  bump('varkhul_emberward', 37, true); // 50
+  bump('heroic_deathless_heartwood', 40, true); // 53 (the heroic legendary tier)
+  bump('varkhul_forgebreaker', 42, true); // 55 (the new-raid legendary tier)
+  bump('varkhul_emberward', 42, true); // 55 (the new-raid legendary tier)
   bump('voidsong_dirk', 39, false); // 49
   bump('heart_of_the_rift', 39, false); // 49
   return idx;

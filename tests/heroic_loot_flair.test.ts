@@ -45,10 +45,9 @@ describe('heroic loot flair: variant generation', () => {
     for (const v of all) {
       expect(['epic', 'rare', 'legendary']).toContain(v.quality);
       if (raidBases.has(v.heroicOf ?? '')) {
-        // The legendary band (the 2026-08-30 ilvl-honesty round): every
-        // legendary lives at the Thronebane tier, heroic mints at 50
-        // (item_level.ts source overrides).
-        if (v.quality === 'legendary') expect(itemLevel(v), v.id).toBe(50);
+        // The three-tier legendary ladder (2026-08-30): bases 49, heroic
+        // mints 53 (item_level.ts source overrides price the rating seed).
+        if (v.quality === 'legendary') expect(itemLevel(v), v.id).toBe(53);
         else expect(itemLevel(v), v.id).toBe(33);
       } else if (fiveManBossVariantIds.has(v.id)) {
         expect(itemLevel(v), v.id).toBe(31);
