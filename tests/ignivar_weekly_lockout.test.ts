@@ -494,6 +494,29 @@ function arenaClaimsFor(sim: Sim, pid: number): InstanceSlot[] {
   );
 }
 
+const HEROIC_ARENA_LOCKED_ERROR = 'You are locked to Heroic Crucible of the Last Spring.';
+
+// The heroic twin of clearedClaimRun: the leader flips the party selection to
+// Heroic first, so the settle runs awardHeroicMarks' HEROIC branch and the
+// return key is minted through lockToHeroicClaim, the separate stamping path
+// the normal-difficulty tests above never touch.
+function heroicClearedClaimRun(sim: Sim, lead: PlayerMeta, participant: PlayerMeta): InstanceSlot {
+  sim.setDungeonDifficulty('heroic', lead.entityId);
+  expect(enterDungeon(sim.ctx, 'ignivar_raid_arena', participant.entityId, true)).toBe(true);
+  const inst = arenaClaimsFor(sim, participant.entityId)[0];
+  expect(inst.difficulty).toBe('heroic');
+  const finalBossId = HEROIC_DUNGEON_TUNING.ignivar_raid_arena.finalBossId;
+  const boss = inst.mobIds
+    .map((id) => sim.entities.get(id))
+    .find((e): e is Entity => e !== undefined && e.templateId === finalBossId)!;
+  expect(boss).toBeDefined();
+  boss.hp = 0;
+  boss.dead = true;
+  sim.ctx.awardHeroicMarks(boss, [participant]);
+  expect(participant.raidLockouts.has(heroicLockoutId('ignivar_raid_arena'))).toBe(true);
+  return inst;
+}
+
 describe('the cleared-run door exception on the weekly rooms', () => {
   it('a participant who steps out after the kill re-enters the cleared claim for loot', () => {
     const sim = makeSim();
@@ -575,6 +598,52 @@ describe('the cleared-run door exception on the weekly rooms', () => {
     expect(errors).toContain(ARENA_LOCKED_ERROR);
   });
 
+  it('a heroic relog that mints a new entity id is re-admitted via the character return key', () => {
+    const sim = makeSim();
+    const lead = raidLeader(sim);
+    // The participant carries a durable character id, the server shape; the
+    // kill settles through the HEROIC branch (lockToHeroicClaim minting).
+    const memPid = sim.addPlayer('warrior', 'Mem', { characterId: 777 });
+    sim.partyInvite(memPid, lead.entityId);
+    sim.partyAccept(memPid);
+    const mem = sim.players.get(memPid)!;
+    const inst = heroicClearedClaimRun(sim, lead, mem);
+    expect(inst.raidReturnKeys.has('character:777')).toBe(true);
+    expect(inst.raidReturnKeys.has(`entity:${mem.entityId}`)).toBe(false);
+    expect(leaveDungeon(sim.ctx, memPid)).toBe(true);
+    // Relog: the old session's entity id is gone, the character id survives,
+    // and the durable heroic lockout rides back in the way hydration restores it.
+    sim.removePlayer(memPid);
+    const backPid = sim.addPlayer('warrior', 'Mem', { characterId: 777 });
+    sim.partyInvite(backPid, lead.entityId);
+    sim.partyAccept(backPid);
+    const back = sim.players.get(backPid)!;
+    expect(back.entityId).not.toBe(mem.entityId);
+    back.raidLockouts.set(
+      heroicLockoutId('ignivar_raid_arena'),
+      Math.floor(sim.time * 1000) + WEEK_MS,
+    );
+    expect(enterDungeon(sim.ctx, 'ignivar_raid_arena', backPid, true)).toBe(true);
+    // Back into the SAME live heroic claim, no parallel run minted.
+    expect(arenaClaimsFor(sim, backPid)).toEqual([inst]);
+  });
+
+  it('a heroic roster member who never entered takes the lockout but is refused at the door', () => {
+    const sim = makeSim();
+    const lead = raidLeader(sim);
+    const inst = heroicClearedClaimRun(sim, lead, lead);
+    // The parked alt: the heroic settlement locks it with the roster and adds
+    // it to clearedBy, but it never stepped through the door, so no return key
+    // and the cleared heroic claim stays shut to it.
+    const parked = [...sim.players.values()].find((m) => m.name === 'M0')!;
+    expect(parked.raidLockouts.has(heroicLockoutId('ignivar_raid_arena'))).toBe(true);
+    expect(inst.clearedBy.has(parked.entityId)).toBe(true);
+    expect(inst.raidReturnKeys.has(`entity:${parked.entityId}`)).toBe(false);
+    const errors = captureErrors(sim);
+    expect(enterDungeon(sim.ctx, 'ignivar_raid_arena', parked.entityId, true)).toBe(false);
+    expect(errors).toContain(HEROIC_ARENA_LOCKED_ERROR);
+  });
+
   it('a player locked by an earlier run is still barred from someone else cleared claim', () => {
     const sim = makeSim();
     const lead = raidLeader(sim);
@@ -596,6 +665,11 @@ describe('the cleared-run door exception on the weekly rooms', () => {
 
 describe('the family reaper honors a cleared sibling claim', () => {
   it('a bossless sibling room does not reap the cleared arena at the short timeout', () => {
+    // The shipped boundary values are the promise this test guards: pin them
+    // as literals so a silent retune of either constant fails HERE rather than
+    // letting the loop arithmetic below self-adjust around the change.
+    expect(INSTANCE_EMPTY_TIMEOUT).toBe(300);
+    expect(INSTANCE_CLEARED_EMPTY_TIMEOUT).toBe(900);
     const sim = makeSim();
     const lead = raidLeader(sim);
     // Claim the bossless front room first, then the arena, so the family holds
@@ -608,16 +682,27 @@ describe('the family reaper honors a cleared sibling claim', () => {
     expect(approach).toBeDefined();
     const { inst } = clearedClaimRun(sim, lead);
     expect(leaveDungeon(sim.ctx, lead.entityId)).toBe(true);
-    // Past the SHORT timeout, the bossless approach used to free the whole
-    // family, cleared arena and boss corpse included; the cleared grace now
-    // extends to every sibling.
-    for (let i = 0; i <= INSTANCE_EMPTY_TIMEOUT + 1; i += 1) updateInstances(sim.ctx);
+    // Past the SHORT 300-second timeout, the bossless approach used to free
+    // the whole family, cleared arena and boss corpse included; the cleared
+    // grace now extends to every sibling. Each reaper pass counts one empty
+    // second, so emptyFor tracks the elapsed empty time exactly.
+    for (let i = 0; i < INSTANCE_EMPTY_TIMEOUT + 1; i += 1) updateInstances(sim.ctx);
+    expect(inst.emptyFor).toBe(INSTANCE_EMPTY_TIMEOUT + 1);
     expect(inst.partyKey, 'cleared arena survives the short family timeout').toBe(key);
     expect(approach.partyKey, 'sibling rides the same grace').toBe(key);
-    // Past the extended loot-recovery window, the family finally frees.
-    for (let i = 0; i <= INSTANCE_CLEARED_EMPTY_TIMEOUT + 1; i += 1) updateInstances(sim.ctx);
-    expect(inst.partyKey).toBeNull();
-    expect(approach.partyKey).toBeNull();
+    // One empty second shy of the 900-second cleared grace: the whole family
+    // is still live, so the promised loot-recovery window really is 900, not
+    // some shorter figure the loop above would have silently absorbed.
+    while (inst.emptyFor < INSTANCE_CLEARED_EMPTY_TIMEOUT - 1) updateInstances(sim.ctx);
+    expect(inst.emptyFor).toBe(INSTANCE_CLEARED_EMPTY_TIMEOUT - 1);
+    expect(approach.emptyFor).toBe(INSTANCE_CLEARED_EMPTY_TIMEOUT - 1);
+    expect(inst.partyKey, 'still live at 899 empty seconds').toBe(key);
+    expect(approach.partyKey, 'sibling still live at 899 empty seconds').toBe(key);
+    // The 900th empty second frees the whole family together, at the boundary,
+    // not at some later drift the old two-loop arithmetic could not see.
+    updateInstances(sim.ctx);
+    expect(inst.partyKey, 'freed exactly at the 900-second boundary').toBeNull();
+    expect(approach.partyKey, 'family freed together at the boundary').toBeNull();
   });
 });
 
