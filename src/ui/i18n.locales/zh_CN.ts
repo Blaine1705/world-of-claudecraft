@@ -14019,6 +14019,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ignivar_the_forgefather.completion':
     '锻炉终于寂静了。泉水也许永远无法复原，但瓦尔库尔再也不能将生命锻成锁链。',
   'entities.quests.q_ignivar_the_forgefather.objectives.0.label': '击败瓦尔库尔',
+  'entities.dungeons.ignivar_forge_lift.name': '锻炉升降梯',
+  'entities.dungeons.ignivar_forge_lift.enterText': '锻炉升降梯轰然震颤，缓缓下沉；锻锤的轰鸣迎面而来。',
+  'entities.dungeons.ignivar_forge_lift.leaveText': '升降梯将你拉回要塞的露天高处。',
   'entities.dungeons.ignivar_forge_approach.name': '首锻大厅',
   'entities.dungeons.ignivar_forge_approach.enterText': '锻锤的轰鸣在首锻大厅中回荡。',
   'entities.dungeons.ignivar_forge_approach.leaveText': '你离开第一座锻炉，终于又能自由呼吸。',

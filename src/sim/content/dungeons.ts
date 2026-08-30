@@ -12,6 +12,8 @@ import {
   IGNIVAR_EMBER_SENTINEL_ID,
   IGNIVAR_FORGE_APPROACH_ID,
   IGNIVAR_GATE_LOCKED_TEMPLATE,
+  IGNIVAR_LIFT_GATE_LOCKED_TEMPLATE,
+  IGNIVAR_LIFT_ROOM_ID,
   IGNIVAR_MOLTEN_ASSEMBLY_ID,
   IGNIVAR_RAID_ARENA_ID,
   IGNIVAR_SECOND_WING_ID,
@@ -1483,12 +1485,48 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     enterText: 'You pass through the sealed royal door.',
     leaveText: 'You return to the cold air of Thornpeak.',
   },
+  [IGNIVAR_LIFT_ROOM_ID]: {
+    id: IGNIVAR_LIFT_ROOM_ID,
+    name: 'The Forge-Lift',
+    // 14, not 13: the raid arm's Molten Assembly took 13 in parallel, and
+    // two rooms sharing an instance slot resolve door triggers to the
+    // wrong interior (found in the Drakelands entrance merge).
+    index: 14,
+    // The raid's overworld entrance: the Forgefather's Isle keep tower's
+    // south face, at the top of the keep stair (the owner's chosen spot).
+    // Walking into the keep's doorway boards the forge-lift: a sealed car
+    // that "rides down" for a fixed spell (the room never moves; the
+    // shaft illusion sells it), then its exit gate becomes an ordinary
+    // portal into the Halls. src/sim/ignivar_forge_lift.ts owns the ride.
+    doorPos: { x: 503.05, z: 2243.7 },
+    guideVisible: false,
+    entry: { x: 0, z: -4 },
+    exitOffset: { x: 0, z: -6.5 },
+    spawns: [],
+    npcs: [],
+    objects: [
+      {
+        itemId: '',
+        name: 'Forge-Lift Gate',
+        x: 0,
+        z: 6.5,
+        templateId: IGNIVAR_LIFT_GATE_LOCKED_TEMPLATE,
+        dungeonId: IGNIVAR_FORGE_APPROACH_ID,
+        lootable: false,
+      },
+    ],
+    interior: 'ignivar_lift',
+    suggestedPlayers: 10,
+    enterText: 'The forge-lift shudders and sinks; hammerfall rises to meet you.',
+    leaveText: 'The lift hauls you back into the open air of the keep.',
+  },
   [IGNIVAR_FORGE_APPROACH_ID]: {
     id: IGNIVAR_FORGE_APPROACH_ID,
     name: 'Halls of the First Tempering',
     index: 10,
     // Walk-up testing entrance: the raid family's front room takes the shared
-    // Eastbrook door so raid groups can zone in without /dev commands.
+    // Eastbrook door so raid groups can zone in without /dev commands (the
+    // Forge-Lift's exit portal is the raid chain's own way in).
     doorPos: IGNIVAR_EASTBROOK_DOOR_POS,
     guideVisible: false,
     entry: { x: 0, z: -50 },

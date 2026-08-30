@@ -1,7 +1,7 @@
 // Dev-only in-game placement rig for the Ignivar forge-mech dressing props
 // (local branch tooling, dev builds only: /dev placer or /placer toggles it).
-// Pick a prop, place it in front of the player, tune scale (x0.5..x4),
-// rotation (45 degree steps), and position with nudge buttons; every edit
+// Pick a prop, place it in front of the player, tune scale, rotation (45
+// and 15 degree steps), and position with nudge buttons; every edit
 // re-renders live through the SAME appendIgnivarEnvProps path the shipped
 // dressing uses and persists to localStorage per room. Export dumps the
 // instance-local records used to bake the authored plan
@@ -15,15 +15,18 @@ import {
   ignivarApproachPropPlan,
   ignivarArenaPropPlan,
   ignivarCruciblePropPlan,
+  ignivarLiftPropPlan,
 } from '../render/ignivar_dressing_plan_core';
 import {
   appendIgnivarEnvProps,
   IGNIVAR_ENV_PROP_URLS,
   prepareIgnivarEnvProps,
 } from '../render/ignivar_env_props';
+import { DUNGEON_X_THRESHOLD } from '../sim/data';
 import {
   IGNIVAR_FORGE_APPROACH_LAYOUT,
   IGNIVAR_LAYOUT,
+  IGNIVAR_LIFT_LAYOUT,
   IGNIVAR_SECOND_WING_LAYOUT,
 } from '../sim/dungeon_layout';
 import type { Entity } from '../sim/types';
@@ -39,7 +42,7 @@ interface PlacedEntry {
   x: number;
   y: number;
   z: number;
-  /** degrees, kept in 45 degree steps by the buttons */
+  /** degrees, kept in 45 and 15 degree steps by the two button pairs */
   rot: number;
   scale: number;
 }
@@ -47,37 +50,130 @@ interface PlacedEntry {
 interface PlacerRoom {
   interior: string;
   label: string;
+  /** placement-frame origin: instance slot origin for rooms, 0 for exterior */
   ox: number;
+  oz: number;
+  /** world-space overworld site: placements are absolute world coordinates */
+  exterior?: boolean;
   plan: () => IgnivarPropPlacement[];
 }
 
+const OZ = -1250; // offline client plays instance slot 0
+
 const ROOMS: PlacerRoom[] = [
+  {
+    interior: 'ignivar_lift',
+    label: 'The Forge-Lift',
+    ox: 118600,
+    oz: OZ,
+    plan: () => ignivarLiftPropPlan(IGNIVAR_LIFT_LAYOUT),
+  },
   {
     interior: 'ignivar_approach',
     label: 'Halls of the First Tempering',
     ox: 116200,
+    oz: OZ,
     plan: () => ignivarApproachPropPlan(IGNIVAR_FORGE_APPROACH_LAYOUT),
   },
   {
     interior: 'ignivar',
     label: 'Crucible of the Last Spring',
     ox: 116800,
+    oz: OZ,
     plan: () => ignivarArenaPropPlan(IGNIVAR_LAYOUT),
   },
   {
     interior: 'ignivar_depths',
     label: 'The Inner Crucible',
     ox: 117400,
+    oz: OZ,
     plan: () => ignivarCruciblePropPlan(IGNIVAR_SECOND_WING_LAYOUT),
   },
 ];
-const OZ = -1250; // offline client plays instance slot 0
+
+// Anywhere in the open world (west of the instance band) edits ONE shared
+// world-space set, keyed 'drakelands_exterior': the Ignivar entrance site
+// work. Placements carry absolute world coordinates and their y seeds from
+// the ground under the player, so exports bake straight into a future
+// entrance dressing table.
+const EXTERIOR_SITE: PlacerRoom = {
+  interior: 'drakelands_exterior',
+  label: 'Drakelands exterior (world space)',
+  ox: 0,
+  oz: 0,
+  exterior: true,
+  plan: () => [],
+};
 const ROOM_RANGE = 90;
 const SCALES = [0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 18, 20, 26, 32];
+
+/** The two asset kits are picker FILTERS only: any key renders, saves, and
+ *  exports identically wherever it is placed. The exterior kit is the
+ *  architecture face of the roster (gate walls, gears, pillars, chains,
+ *  lava, torches) for overworld entrance work; new exterior assets (the
+ *  Drakelands bridge) join this list as they land. */
+const EXTERIOR_KIT: readonly IgnivarEnvPropKey[] = [
+  'dungeon_entrance',
+  'street_lamp',
+  'vault_door',
+  'square_wall',
+  'gear_wall_rusty',
+  'gear_machine',
+  'pillar_slim',
+  'reactor',
+  'lava_face',
+  'beam',
+  'chain',
+  'chain_hanging',
+  'chain_link',
+  'hanging_hook',
+  'lava_channel',
+  'lava_channel_curved',
+  'lava_outlet',
+  'lava_port',
+  'torch',
+  // the Exterior_Assets fortress kit (the owner's drop, 2026-08-28)
+  'bridge_floor',
+  'bridge_pillar',
+  'bridge_rail',
+  'cannon',
+  'dragon_head',
+  'dragon_pillar',
+  'fortress_wall',
+  'fountain_base',
+  'gate',
+  'gate_gear',
+  'lava_pillar',
+  'staircase',
+  'stone_floor',
+  'tower_base',
+  'tower_middle',
+  'tower_pillar',
+  'tower_top',
+];
+
+type AssetKit = 'interior' | 'exterior';
+
+/** null = follow the site (exterior site shows the exterior kit); the panel
+ *  button overrides so either kit is reachable anywhere. */
+let kitOverride: AssetKit | null = null;
+
+function activeKit(): AssetKit {
+  return kitOverride ?? (state.room?.exterior ? 'exterior' : 'interior');
+}
+
+function kitKeys(): readonly IgnivarEnvPropKey[] {
+  return activeKit() === 'exterior'
+    ? EXTERIOR_KIT
+    : (Object.keys(IGNIVAR_ENV_PROP_URLS) as IgnivarEnvPropKey[]);
+}
 const DRESSING_GROUP_NAMES = [
   'ignivarForgeApproachDressing',
   'ignivarCrucibleArenaDressing',
   'varkhulInnerCrucibleDressing',
+  // the baked exterior pass (composed into the ember zone features): hidden
+  // while the placer is open, or every piece doubles behind its editable copy
+  'forgefatherFortress',
 ];
 
 const state: {
@@ -86,6 +182,8 @@ const state: {
   listEl: HTMLElement | null;
   statusEl: HTMLElement | null;
   infoEl: HTMLElement | null;
+  pickerEl: HTMLElement | null;
+  kitBtn: HTMLButtonElement | null;
   group: THREE.Group | null;
   marker: THREE.Group | null;
   worklight: THREE.AmbientLight | null;
@@ -100,6 +198,8 @@ const state: {
   listEl: null,
   statusEl: null,
   infoEl: null,
+  pickerEl: null,
+  kitBtn: null,
   group: null,
   marker: null,
   worklight: null,
@@ -183,9 +283,15 @@ function prefillFromPlan(room: PlacerRoom): PlacedEntry[] {
 function roomForPlayer(player: Entity | undefined): PlacerRoom | null {
   if (!player) return null;
   for (const room of ROOMS) {
-    if (Math.abs(player.pos.x - room.ox) <= ROOM_RANGE && Math.abs(player.pos.z - OZ) <= ROOM_RANGE)
+    if (
+      Math.abs(player.pos.x - room.ox) <= ROOM_RANGE &&
+      Math.abs(player.pos.z - room.oz) <= ROOM_RANGE
+    )
       return room;
   }
+  // The whole open world is the exterior site; other instances (past the
+  // dungeon band) stay unmatched so the status hint can say so.
+  if (player.pos.x < DUNGEON_X_THRESHOLD) return EXTERIOR_SITE;
   return null;
 }
 
@@ -209,7 +315,7 @@ function rebuildGroup(): void {
     state.group.name = 'ignivarPlacerPreview';
     deps.scene.add(state.group);
   }
-  state.group.position.set(room.ox, 0, OZ);
+  state.group.position.set(room.ox, 0, room.oz);
   state.group.clear();
   const placements = state.entries.map(toPlacement);
   appendIgnivarEnvProps(state.group, placements, false);
@@ -345,7 +451,7 @@ function localPlayerPos(): { x: number; z: number; facing: number } | null {
   const player = state.deps?.getPlayer();
   const room = state.room;
   if (!player || !room) return null;
-  return { x: player.pos.x - room.ox, z: player.pos.z - OZ, facing: player.facing };
+  return { x: player.pos.x - room.ox, z: player.pos.z - room.oz, facing: player.facing };
 }
 
 function placeProp(key: IgnivarEnvPropKey): void {
@@ -357,8 +463,11 @@ function placeProp(key: IgnivarEnvPropKey): void {
   const z = Math.round((local.z + Math.cos(local.facing) * 2.5) * 10) / 10;
   const rot = (Math.round(((local.facing * 180) / Math.PI + 180) / 45) * 45 + 360) % 360;
   // Spawn room-scaled: the props are near-unit models, so x1 reads as a toy
-  // against the 16u walls.
-  state.entries.push({ key, x, y: 0, z, rot, scale: 8 });
+  // against the 16u walls. Exterior terrain is not flat: seed y from the
+  // ground under the player's feet, then tune with the Y nudges.
+  const player = state.deps?.getPlayer();
+  const y = state.room?.exterior && player ? Math.max(0, Math.round(player.pos.y * 10) / 10) : 0;
+  state.entries.push({ key, x, y, z, rot, scale: 8 });
   state.selected = state.entries.length - 1;
   rebuildGroup();
 }
@@ -377,6 +486,16 @@ function setDressingHidden(hidden: boolean): void {
     for (const object of state.hiddenDressing) object.visible = true;
     state.hiddenDressing = [];
   }
+}
+
+const kitLabel = (): string => `kit: ${activeKit()}`;
+
+function renderPicker(): void {
+  const picker = state.pickerEl;
+  if (!picker) return;
+  picker.textContent = '';
+  for (const key of kitKeys()) picker.appendChild(button(key, () => placeProp(key)));
+  if (state.kitBtn) state.kitBtn.textContent = kitLabel();
 }
 
 function button(label: string, onClick: () => void, wide = false): HTMLButtonElement {
@@ -417,6 +536,7 @@ function enterRoom(room: PlacerRoom): void {
   state.selected = -1;
   setDressingHidden(true);
   rebuildGroup();
+  renderPicker();
 }
 
 function buildPanel(): void {
@@ -438,9 +558,9 @@ function buildPanel(): void {
   panel.appendChild(pickerLabel);
   const picker = document.createElement('div');
   picker.style.cssText = 'display:flex;flex-wrap:wrap;gap:3px;margin-top:3px;';
-  for (const key of Object.keys(IGNIVAR_ENV_PROP_URLS) as IgnivarEnvPropKey[])
-    picker.appendChild(button(key, () => placeProp(key)));
   panel.appendChild(picker);
+  state.pickerEl = picker;
+  renderPicker();
 
   const controlsLabel = document.createElement('div');
   controlsLabel.textContent = 'Selected object:';
@@ -471,6 +591,16 @@ function buildPanel(): void {
     button('rot +45', () =>
       mutateSelected((entry) => {
         entry.rot = (entry.rot + 45) % 360;
+      }),
+    ),
+    button('rot -15', () =>
+      mutateSelected((entry) => {
+        entry.rot = (entry.rot - 15 + 360) % 360;
+      }),
+    ),
+    button('rot +15', () =>
+      mutateSelected((entry) => {
+        entry.rot = (entry.rot + 15) % 360;
       }),
     ),
     button('to me', () =>
@@ -508,7 +638,10 @@ function buildPanel(): void {
   ]);
   const nudgeY = (dy: number) => () =>
     mutateSelected((entry) => {
-      entry.y = Math.max(0, Math.round((entry.y + dy) * 100) / 100);
+      // Interiors floor at 0 (the room's own floor); the exterior floors at
+      // -8, past the waterline (-4.3), so pieces can sink to the seabed.
+      const floor = state.room?.exterior ? -8 : 0;
+      entry.y = Math.max(floor, Math.round((entry.y + dy) * 100) / 100);
     });
   buttonRow(panel, [
     button('Y-1', nudgeY(-1)),
@@ -549,6 +682,11 @@ function buildPanel(): void {
     setWorklight(!worklightOn);
     worklightBtn.textContent = worklightLabel();
   });
+  const kitBtn = button(kitLabel(), () => {
+    kitOverride = activeKit() === 'exterior' ? 'interior' : 'exterior';
+    renderPicker();
+  });
+  state.kitBtn = kitBtn;
   buttonRow(panel, [
     button(
       'toggle built dressing',
@@ -558,6 +696,7 @@ function buildPanel(): void {
       },
       true,
     ),
+    kitBtn,
     worklightBtn,
     button('close', closePlacer),
   ]);
@@ -573,11 +712,11 @@ function tickStatus(): void {
   if (!state.statusEl) return;
   if (!room || !player) {
     state.statusEl.textContent =
-      'Not in an Ignivar room.\nUse /dev dungeon ignivar_forge_approach normal (or _raid_arena / _inner_crucible).';
+      'Not at a placer site (this instance has no placement set).\nUse /dev dungeon ignivar_forge_approach normal (or _raid_arena / _inner_crucible), or leave to the open world for the exterior site.';
     return;
   }
   const lx = (player.pos.x - room.ox).toFixed(1);
-  const lz = (player.pos.z - OZ).toFixed(1);
+  const lz = (player.pos.z - room.oz).toFixed(1);
   state.statusEl.textContent = `${room.label}\nyou: (${lx}, ${lz})  placed: ${state.entries.length}`;
 }
 
@@ -591,6 +730,8 @@ function closePlacer(): void {
   state.listEl = null;
   state.statusEl = null;
   state.infoEl = null;
+  state.pickerEl = null;
+  state.kitBtn = null;
   if (state.group) {
     state.group.parent?.remove(state.group);
     state.group = null;

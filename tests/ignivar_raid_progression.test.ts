@@ -13,6 +13,7 @@ import {
   IGNIVAR_APPROACH_GUARDIAN_IDS,
   IGNIVAR_FORGE_APPROACH_ID,
   IGNIVAR_GATE_LOCKED_TEMPLATE,
+  IGNIVAR_LIFT_ROOM_ID,
   IGNIVAR_MOLTEN_ASSEMBLY_ID,
   IGNIVAR_RAID_ARENA_ID,
   IGNIVAR_RAID_ROOM_IDS,
@@ -61,12 +62,14 @@ function guardianMobs(sim: Sim) {
 describe('Ignivar raid progression', () => {
   it('authors an ordered raid family behind the Eastbrook walk-up door', () => {
     expect(IGNIVAR_RAID_ROOM_IDS).toEqual([
+      IGNIVAR_LIFT_ROOM_ID,
       IGNIVAR_FORGE_APPROACH_ID,
       IGNIVAR_RAID_ARENA_ID,
       IGNIVAR_MOLTEN_ASSEMBLY_ID,
       IGNIVAR_SECOND_WING_ID,
     ]);
-    expect(ignivarPreviousRaidRoom(IGNIVAR_FORGE_APPROACH_ID)).toBeNull();
+    expect(ignivarPreviousRaidRoom(IGNIVAR_LIFT_ROOM_ID)).toBeNull();
+    expect(ignivarPreviousRaidRoom(IGNIVAR_FORGE_APPROACH_ID)).toBe(IGNIVAR_LIFT_ROOM_ID);
     expect(ignivarPreviousRaidRoom(IGNIVAR_RAID_ARENA_ID)).toBe(IGNIVAR_FORGE_APPROACH_ID);
     expect(ignivarPreviousRaidRoom(IGNIVAR_MOLTEN_ASSEMBLY_ID)).toBe(IGNIVAR_RAID_ARENA_ID);
     expect(ignivarPreviousRaidRoom(IGNIVAR_SECOND_WING_ID)).toBe(IGNIVAR_MOLTEN_ASSEMBLY_ID);
@@ -92,6 +95,14 @@ describe('Ignivar raid progression', () => {
       suggestedPlayers: 10,
     });
     expect(DUNGEONS[IGNIVAR_MOLTEN_ASSEMBLY_ID].spawns).toHaveLength(9);
+    // The raid chain's own front door stands in the OVERWORLD, on the
+    // Forge-Lift: the keep facade's portal boards the lift (the raid's
+    // first room). The Halls additionally keep the Eastbrook walk-up
+    // testing door asserted above; the deeper rooms stay interior-only.
+    expect(DUNGEONS[IGNIVAR_LIFT_ROOM_ID].overworldDoor).toBeUndefined();
+    expect(DUNGEONS[IGNIVAR_LIFT_ROOM_ID].doorPos).toMatchObject({ x: 503.05, z: 2243.7 });
+    expect(DUNGEONS[IGNIVAR_RAID_ARENA_ID].overworldDoor).toBe(false);
+    expect(DUNGEONS[IGNIVAR_SECOND_WING_ID].overworldDoor).toBe(false);
     expect(DUNGEONS[IGNIVAR_SECOND_WING_ID]).toMatchObject({
       id: IGNIVAR_SECOND_WING_ID,
       overworldDoor: false,
@@ -244,7 +255,13 @@ describe('Ignivar raid progression', () => {
     expect(enterDungeon(sim.ctx, IGNIVAR_MOLTEN_ASSEMBLY_ID, sim.player.id)).toBe(false);
   });
 
-  it('requires a raid group even after a solo dev tester defeats Ignivar', () => {
+  it('lets a solo dev tester walk the raid family end to end (maintainer walk-through)', () => {
+    // The owner-directed contract since the fortress entrance shipped: a
+    // dev-commands sim skips the raid-group refusal (the warning still
+    // fires) so the maintainer can experience the whole walk-through solo.
+    // Live sims never carry devCommands (ALLOW_DEV_COMMANDS is a root
+    // invariant), and the non-dev refusals stay pinned by the foreign-claim
+    // and outside-player cases above.
     const sim = new Sim({ seed: 3411, playerClass: 'warrior', devCommands: true });
     sim.chat(`/dev dungeon ${IGNIVAR_RAID_ARENA_ID} normal`);
     const boss = [...sim.entities.values()].find((entity) => entity.templateId === IGNIVAR_BOSS_ID);
@@ -253,12 +270,16 @@ describe('Ignivar raid progression', () => {
     boss.hp = 0;
     sim.tick();
 
-    expect(enterDungeon(sim.ctx, IGNIVAR_MOLTEN_ASSEMBLY_ID, sim.player.id)).toBe(false);
-    expect(sim.instanceInfoAt(sim.player.pos)?.dungeonId).toBe(IGNIVAR_RAID_ARENA_ID);
+    // On the merged tree the entrance arm's dev-skip contract carries the
+    // walk-through forward: with the arena boss down, the dev tester steps
+    // into the raid arm's next room in the chain.
+    expect(enterDungeon(sim.ctx, IGNIVAR_MOLTEN_ASSEMBLY_ID, sim.player.id)).toBe(true);
+    expect(sim.instanceInfoAt(sim.player.pos)?.dungeonId).toBe(IGNIVAR_MOLTEN_ASSEMBLY_ID);
   });
 
   it('keeps every claimed raid room alive while the raid occupies any sibling', () => {
     const { sim, boss } = claimedRaid();
+    expect(enterDungeon(sim.ctx, IGNIVAR_LIFT_ROOM_ID, sim.player.id, true)).toBe(true);
     expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, sim.player.id, true)).toBe(true);
     boss.dead = true;
     boss.hp = 0;

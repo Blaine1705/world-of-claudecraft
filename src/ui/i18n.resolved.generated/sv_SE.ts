@@ -18586,6 +18586,11 @@ export const sv_SE: EnTranslations = {
         "enterText": "Du passerar genom den förseglade kungliga dörren.",
         "leaveText": "Du återvänder till Törntopps kalla luft."
       },
+      "ignivar_forge_lift": {
+        "name": "The Forge-Lift",
+        "enterText": "The forge-lift shudders and sinks; hammerfall rises to meet you.",
+        "leaveText": "The lift hauls you back into the open air of the keep."
+      },
       "ignivar_forge_approach": {
         "name": "Halls of the First Tempering",
         "enterText": "Hammerfall echoes through the Halls of the First Tempering.",

@@ -14,6 +14,7 @@ export type IgnivarEnvPropKey =
   | 'pillar_slim'
   | 'reactor'
   | 'gear_wall_rusty'
+  | 'gear_machine'
   | 'lava_face'
   | 'anvil'
   | 'forge'
@@ -32,7 +33,34 @@ export type IgnivarEnvPropKey =
   | 'steam_machine_round'
   | 'steam_pipes'
   | 'water_pump'
-  | 'torch';
+  | 'torch'
+  | 'bridge_floor'
+  | 'bridge_pillar'
+  | 'bridge_rail'
+  | 'cannon'
+  | 'dragon_head'
+  | 'dragon_pillar'
+  | 'fortress_wall'
+  | 'fountain_base'
+  | 'gate'
+  | 'gate_gear'
+  | 'lava_pillar'
+  | 'staircase'
+  | 'street_lamp'
+  | 'dungeon_entrance'
+  | 'lift_arch_beam'
+  | 'lift_beam'
+  | 'lift_frame'
+  | 'lift_handle'
+  | 'lift_vertical_beam'
+  | 'lift_weight'
+  | 'lift_mount'
+  | 'lift_spool'
+  | 'stone_floor'
+  | 'tower_base'
+  | 'tower_middle'
+  | 'tower_pillar'
+  | 'tower_top';
 
 export interface IgnivarPropPlacement {
   key: IgnivarEnvPropKey;
@@ -59,6 +87,7 @@ export const IGNIVAR_PROP_NATIVE: Record<
   pillar_slim: { len: 0.26, hei: 1.0, dep: 0.26 },
   reactor: { len: 0.8, hei: 1.0, dep: 0.52 },
   gear_wall_rusty: { len: 1.0, hei: 0.67, dep: 0.35 },
+  gear_machine: { len: 1.0, hei: 0.75, dep: 0.4 },
   lava_face: { len: 0.72, hei: 1.0, dep: 0.55 },
   anvil: { len: 1.0, hei: 0.48, dep: 0.37 },
   forge: { len: 0.99, hei: 1.0, dep: 0.71 },
@@ -78,6 +107,39 @@ export const IGNIVAR_PROP_NATIVE: Record<
   steam_pipes: { len: 0.63, hei: 1.0, dep: 0.2 },
   water_pump: { len: 1.0, hei: 0.93, dep: 0.99 },
   torch: { len: 0.62, hei: 1.06, dep: 0.55 },
+  bridge_floor: { len: 1.0, hei: 0.14, dep: 0.66 },
+  bridge_pillar: { len: 0.68, hei: 1.0, dep: 0.5 },
+  bridge_rail: { len: 1.0, hei: 0.79, dep: 0.16 },
+  cannon: { len: 1.0, hei: 0.96, dep: 0.95 },
+  dragon_head: { len: 0.63, hei: 1.0, dep: 0.5 },
+  dragon_pillar: { len: 0.55, hei: 1.0, dep: 0.45 },
+  fortress_wall: { len: 1.0, hei: 0.93, dep: 0.22 },
+  fountain_base: { len: 1.0, hei: 0.3, dep: 0.54 },
+  gate: { len: 0.48, hei: 1.0, dep: 0.07 },
+  gate_gear: { len: 0.67, hei: 1.0, dep: 0.4 },
+  lava_pillar: { len: 0.53, hei: 1.0, dep: 0.4 },
+  staircase: { len: 1.0, hei: 0.76, dep: 0.96 },
+  // The Drakelands town brazier lamp, referenced from the shipped town
+  // fixture set (raw GLB dims; the world render normalizes and lights it
+  // through src/render/streetlamps.ts, not the env-prop path).
+  street_lamp: { len: 1.73, hei: 5.5, dep: 1.24 },
+  // The owner's raid-door facade: a thin upright entrance front.
+  dungeon_entrance: { len: 0.74, hei: 1.0, dep: 0.28 },
+  // The owner's forge-lift car kit (measured from the shipped GLBs).
+  lift_arch_beam: { len: 1.0, hei: 0.97, dep: 0.21 },
+  lift_beam: { len: 1.0, hei: 0.38, dep: 0.14 },
+  lift_frame: { len: 0.71, hei: 1.0, dep: 0.16 },
+  lift_handle: { len: 0.44, hei: 1.0, dep: 0.34 },
+  lift_vertical_beam: { len: 0.18, hei: 1.0, dep: 0.13 },
+  lift_weight: { len: 0.27, hei: 1.0, dep: 0.14 },
+  // The winch remake: the static cradle and the spool that turns in it.
+  lift_mount: { len: 0.98, hei: 1.0, dep: 0.95 },
+  lift_spool: { len: 1.0, hei: 0.76, dep: 0.76 },
+  stone_floor: { len: 1.0, hei: 0.08, dep: 1.0 },
+  tower_base: { len: 0.97, hei: 1.0, dep: 0.83 },
+  tower_middle: { len: 0.7, hei: 1.0, dep: 0.63 },
+  tower_pillar: { len: 0.53, hei: 1.0, dep: 0.52 },
+  tower_top: { len: 0.66, hei: 1.0, dep: 0.39 },
 };
 
 /** The raid rooms build at the double-height wall course. */
@@ -137,6 +199,16 @@ export function ignivarApproachPropPlacements(layout: DungeonLayout): IgnivarPro
     at('chain', -20, 24, 5.3, 8, 12, true),
     at('chain', 4, 40, 0.7, 7, 13),
     at('chain', -10, 46, 1.9, 8, 11),
+    // The forge-lift shaft the keep's lift lowers you beside: caged
+    // gearwork and hoist chains around the entry end (all past the z-50
+    // door-dressing line, outside the corridor contract), so arriving
+    // reads as stepping off the freight lift the Forgefather left running.
+    at('gear_wall_rusty', -7.2, -52.8, 135 * DEG, 10),
+    at('gear_wall_rusty', 7.2, -52.8, 225 * DEG, 10),
+    at('gear_machine', -10.6, -53.4, 45 * DEG, 8),
+    at('chain_hanging', -3.2, -51.4, 0.4, 8, 10),
+    at('chain_hanging', 3.2, -51.4, -0.4, 8, 10, true),
+    at('chain_link', 0, -52.4, 90 * DEG, 6),
   ];
   // The centre torch pillars ride the layout so they stay glued to the
   // torch rigs dungeon.ts places at the same points.
@@ -328,10 +400,56 @@ export function ignivarCruciblePropPlacements(_layout: DungeonLayout): IgnivarPr
   ];
 }
 
+/** The Forge-Lift car (the raid's first room, interior 'ignivar_lift'):
+ *  the owner's hand-placed pass, baked VERBATIM from their placer export
+ *  (2026-08-29, third drop): arch beams and door frames bracing both
+ *  side walls over the moving shaft, overhead beams, wall panels closing
+ *  the corners, the counterweight and brake levers riding along, the
+ *  winch remake mounted high on both side walls (a static mount cradling
+ *  a spinning spool on each), and a mist-veiled dungeon_entrance facade
+ *  fronting each portal (the sliding doors retired with this pass: the
+ *  facades ARE the entrance and exit looks, dressed by the mist gates in
+ *  the lift dressing, while the portal ENTITIES render nothing through
+ *  the raid-gate plan). Never re-derive or re-seat these rows; a new
+ *  owner export replaces the table wholesale.
+ *  The shell walls and torch points live in IGNIVAR_LIFT_LAYOUT, the
+ *  gate and both portals are instance entities, and the shaft illusion
+ *  is src/render/ignivar_lift_room.ts. */
+export function ignivarLiftPropPlacements(_layout: DungeonLayout): IgnivarPropPlacement[] {
+  return [
+    at('lift_arch_beam', 8, 0.25, 270 * DEG, 8),
+    at('lift_beam', 0, -5.5, 180 * DEG, 8, 5),
+    at('lift_frame', 6.5, -4.25, 90 * DEG, 8),
+    at('lift_frame', 6.5, 4.5, 90 * DEG, 8),
+    at('lift_vertical_beam', 6.4, 0.85, 270 * DEG, 8),
+    at('lift_vertical_beam', 6.4, -0.15, 270 * DEG, 8),
+    at('square_wall', 5.4, 7.1, 180 * DEG, 6),
+    at('square_wall', -5.6, 7.1, 180 * DEG, 6),
+    at('lift_arch_beam', -8.3, -0.05, 90 * DEG, 8),
+    at('lift_beam', 0.2, 6.45, 180 * DEG, 8, 5),
+    at('lift_frame', -7.55, 4.2, 90 * DEG, 8),
+    at('lift_frame', -7.55, -4.05, 90 * DEG, 8),
+    at('lift_vertical_beam', -7.3, -0.55, 90 * DEG, 8),
+    at('lift_vertical_beam', -7.3, 0.45, 90 * DEG, 8),
+    at('square_wall', -5.3, -6.8, 0, 6),
+    at('square_wall', 5.45, -6.8, 0, 6),
+    at('lift_weight', 4.9, 5.2, 180 * DEG, 8),
+    at('lift_handle', -5.5, 5.85, 180 * DEG, 3, 2),
+    at('lift_handle', -5.45, -5.9, 0, 3, 2),
+    at('lift_mount', -6.3, -0.1, 180 * DEG, 2, 3.5),
+    at('lift_spool', -5.3, -0.1, 270 * DEG, 2, 3.75),
+    at('lift_spool', 4.2, 0.4, 270 * DEG, 2, 3.75),
+    at('lift_mount', 5.2, 0.15, 0, 2, 3.5),
+    at('dungeon_entrance', -0.2, -5.85, 0, 6),
+    at('dungeon_entrance', 0.4, 6.15, 180 * DEG, 6),
+  ];
+}
+
 export function ignivarPropPlacements(
   interior: string,
   layout: DungeonLayout,
 ): IgnivarPropPlacement[] {
+  if (interior === 'ignivar_lift') return ignivarLiftPropPlacements(layout);
   if (interior === 'ignivar_approach') return ignivarApproachPropPlacements(layout);
   if (interior === 'ignivar') return ignivarArenaPropPlacements(layout);
   if (interior === 'ignivar_depths') return ignivarCruciblePropPlacements(layout);
@@ -351,6 +469,34 @@ export const IGNIVAR_NON_COLLIDING_PROPS: ReadonlySet<IgnivarEnvPropKey> = new S
   'lava_channel',
   'lava_channel_curved',
   'torch',
+  // the fortress kit's walk-over floor pieces: the bridge deck and the
+  // stone floor plate are surfaces a body crosses, never blockers (their
+  // standable behavior is the exterior bake's concern)
+  'bridge_floor',
+  'stone_floor',
+  // stairs are walked UP, never into: the terrain ramp underneath carries
+  // the movement (exterior) or the lift field does (interiors); a collider
+  // here would be an invisible wall across the flight
+  'staircase',
+  'street_lamp',
+  // The entrance facade frames a doorway players walk THROUGH: never a
+  // blocker, or its own arch would seal the raid door it dresses.
+  'dungeon_entrance',
+  // The forge-lift car kit's pass-through and overhead pieces: the arch and
+  // beams span overhead, the frame and sliding door dress the gate line a
+  // body must cross once the lift arrives, and the handle and hanging
+  // weight are brush-past furniture in a car twelve riders share. Only the
+  // vertical beam (a structural post) and the winch (a machinery block)
+  // stand solid.
+  'lift_arch_beam',
+  'lift_beam',
+  'lift_frame',
+  'lift_handle',
+  'lift_weight',
+  // The spool rides INSIDE its mount's cradle: the mount is the one solid
+  // body of the pair, so the spinning drum can never snag a rider its own
+  // housing already blocks.
+  'lift_spool',
 ]);
 
 /** Collider footprint as a fraction of the visual AABB: ornate pillars

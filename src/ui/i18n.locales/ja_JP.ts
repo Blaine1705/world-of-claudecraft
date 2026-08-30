@@ -14324,6 +14324,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ignivar_the_forgefather.completion':
     'ついに炉が静まった。泉は二度と元に戻らないかもしれない。しかしヴァルクルが命を再び鏖に鍛えることはない。',
   'entities.quests.q_ignivar_the_forgefather.objectives.0.label': 'ヴァルクルを倒す',
+  'entities.dungeons.ignivar_forge_lift.name': '鍛冶昇降機',
+  'entities.dungeons.ignivar_forge_lift.enterText': '鍛冶昇降機が軋みながら沈んでいく。鎚音が迫り上がってくる。',
+  'entities.dungeons.ignivar_forge_lift.leaveText': '昇降機が城塞の外気の中へと引き上げてくれる。',
   'entities.dungeons.ignivar_forge_approach.name': '最初の鍛造の大広間',
   'entities.dungeons.ignivar_forge_approach.enterText': '槌音が最初の鍛造の大広間に響き渡る。',
   'entities.dungeons.ignivar_forge_approach.leaveText': '最初の炉から離れ、再び自由に息をつく。',

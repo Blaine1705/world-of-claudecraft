@@ -14329,6 +14329,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ignivar_the_forgefather.completion':
     '마침내 대장간이 조용해졌어. 샘은 다시 회복되지 못할지도 모르지만, 발쿨이 다시 생명을 사슬로 빚을 일은 없을 거야.',
   'entities.quests.q_ignivar_the_forgefather.objectives.0.label': '발쿨 처치',
+  'entities.dungeons.ignivar_forge_lift.name': '대장간 승강기',
+  'entities.dungeons.ignivar_forge_lift.enterText': '대장간 승강기가 요동치며 가라앉는다. 망치 소리가 마중 나오듯 울려 퍼진다.',
+  'entities.dungeons.ignivar_forge_lift.leaveText': '승강기가 너를 성채의 탁 트인 바람 속으로 다시 끌어올린다.',
   'entities.dungeons.ignivar_forge_approach.name': '첫 단련의 회랑',
   'entities.dungeons.ignivar_forge_approach.enterText': '첫 단련의 회랑에 망치질 소리가 울려 퍼집니다.',
   'entities.dungeons.ignivar_forge_approach.leaveText': '첫 번째 대장간에서 벗어나 다시 한번 자유롭게 숨을 쉽니다.',

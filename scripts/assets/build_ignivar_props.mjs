@@ -30,6 +30,15 @@ import sharp from 'sharp';
 
 const ITEMS = [
   { src: '_Outter_Walls/Beam_Large_v02.glb', name: 'beam', target: 1400, tex: 512, emissive: 0.28 },
+  // Restored with the Drakelands entrance merge: the approach room's
+  // forge-lift shaft dressing places gear_machine, so it ships again.
+  {
+    src: '_Outter_Walls/GEAR%20MACHINE%201v.glb',
+    name: 'gear_machine',
+    target: 12000,
+    tex: 1024,
+    emissive: 0.28,
+  },
   {
     src: '_Outter_Walls/GEAR%20VAULT%20DOOR.glb',
     name: 'vault_door',
@@ -110,6 +119,235 @@ const ITEMS = [
     emissive: 1.0,
   },
   { src: 'New_Assets_Demi/steam-pipes.glb', name: 'steam_pipes', tex: 1024, emissive: 0.28 },
+  // The Exterior_Assets drop (2026-08-28): the Forgefather's Isle fortress
+  // kit (the bridge trio, towers, gate and gear, walls, stairs, floors,
+  // the dragon lava spouts, lava carriers, a cannon). Same pre-decimated
+  // contract (~1k tris, single mesh, one atlas). Lava carriers run hot,
+  // the dragon head pours (concept art), plain stonework stays faint.
+  {
+    src: 'Exterior_Assets/bridge_floor.glb',
+    name: 'bridge_floor',
+    tex: 1024,
+    emissive: 0.28,
+    glowFloor: [89, 22, 14],
+  },
+  {
+    src: 'Exterior_Assets/bridge_pillar.glb',
+    name: 'bridge_pillar',
+    tex: 1024,
+    emissive: 0.28,
+    glowFloor: [89, 22, 14],
+  },
+  // The rail's brazier flame glows like the firepit's: hotBoost lifts the
+  // flame texels clear of the ETC1S crush and the firepit-grade emissive
+  // strength makes them bloom, while the dark iron stays inert (a near
+  // black texel contributes nothing through base-as-emissive).
+  {
+    src: 'Exterior_Assets/bridge_rail.glb',
+    name: 'bridge_rail',
+    tex: 512,
+    emissive: 1.6,
+    hotBoost: 1.35,
+    glowFloor: [16, 4, 3],
+  },
+  {
+    src: 'Exterior_Assets/cannon.glb',
+    name: 'cannon',
+    tex: 1024,
+    emissive: 0.6,
+    hotBoost: 1.25,
+    glowFloor: [42, 10, 7],
+  },
+  {
+    src: 'Exterior_Assets/dragon_head.glb',
+    name: 'dragon_head',
+    tex: 1024,
+    emissive: 1.5,
+    glowFloor: [17, 4, 3],
+  },
+  // The owner's raid-door facade (2026-08-29 drop): architecture tier.
+  {
+    src: 'Exterior_Assets/dungeon_entrance.glb',
+    name: 'dungeon_entrance',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
+  {
+    src: 'Exterior_Assets/dragon_pillar.glb',
+    name: 'dragon_pillar',
+    tex: 1024,
+    emissive: 1.0,
+    hotBoost: 1.25,
+    glowFloor: [25, 6, 4],
+  },
+  {
+    src: 'Exterior_Assets/fortress_wall.glb',
+    name: 'fortress_wall',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
+  {
+    src: 'Exterior_Assets/fountain_base.glb',
+    name: 'fountain_base',
+    tex: 1024,
+    emissive: 1.0,
+    glowFloor: [25, 6, 4],
+  },
+  {
+    src: 'Exterior_Assets/gate.glb',
+    name: 'gate',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
+  {
+    src: 'Exterior_Assets/gate_gear.glb',
+    name: 'gate_gear',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
+  // The owner's forge-lift car kit (2026-08-29 drop): the antechamber's
+  // iron furniture, all on the architecture sheen tier.
+  {
+    src: 'Lift_Assets/lift_arch_beam.glb',
+    name: 'lift_arch_beam',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
+  {
+    src: 'Lift_Assets/lift_beam.glb',
+    name: 'lift_beam',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
+  {
+    src: 'Lift_Assets/lift_frame.glb',
+    name: 'lift_frame',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
+  {
+    src: 'Lift_Assets/lift_handle.glb',
+    name: 'lift_handle',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
+  {
+    src: 'Lift_Assets/lift_vertical_beam.glb',
+    name: 'lift_vertical_beam',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
+  {
+    src: 'Lift_Assets/lift_weight.glb',
+    name: 'lift_weight',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
+  // The winch remake (2026-08-29 second drop): the owner split the piece so
+  // only the spool turns; the mount is the static cradle it rides in. The
+  // one-piece winch and the sliding door left the shipped set with the
+  // owner's third drop (zero placements; sources stay archived in
+  // tmp/asset_src for a future return).
+  {
+    src: 'Lift_Assets/lift_mount.glb',
+    name: 'lift_mount',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
+  {
+    src: 'Lift_Assets/lift_spool.glb',
+    name: 'lift_spool',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
+  // lava_furnace_2 (src Exterior_Assets/Lava_Furnace.glb) and lava_ramp
+  // (src Exterior_Assets/lava_ramp.glb) are STRIPPED from the shipped set:
+  // zero placements in any sim table, and the furnace's mesh is
+  // byte-identical to the interior lava_furnace. Their sources stay in
+  // tmp/asset_src; restore a build entry here (emissive 1.5, glowFloor
+  // [17, 4, 3], hotBoost 1.35 for the ramp) plus the loader rows if the
+  // owner ever places one, and the hygiene pin in
+  // tests/ignivar_asset_hygiene.test.ts will hold it to a real placement.
+  {
+    src: 'Exterior_Assets/lava_pillar.glb',
+    name: 'lava_pillar',
+    tex: 1024,
+    emissive: 1.5,
+    glowFloor: [17, 4, 3],
+  },
+  {
+    src: 'Exterior_Assets/staircase.glb',
+    name: 'staircase',
+    tex: 1024,
+    emissive: 0.28,
+    glowFloor: [89, 22, 14],
+  },
+  {
+    src: 'Exterior_Assets/stone_floor.glb',
+    name: 'stone_floor',
+    tex: 1024,
+    emissive: 0.28,
+    glowFloor: [89, 22, 14],
+  },
+  // The fortress architecture's warm details (window slits, rune trims)
+  // glow softly at night: gentle hotBoost plus sub-lava emissive; stone
+  // texels stay near black, so base-as-emissive leaves the masonry inert.
+  {
+    src: 'Exterior_Assets/tower_base.glb',
+    name: 'tower_base',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
+  {
+    src: 'Exterior_Assets/tower_middle.glb',
+    name: 'tower_middle',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
+  {
+    src: 'Exterior_Assets/tower_pillar.glb',
+    name: 'tower_pillar',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
+  {
+    src: 'Exterior_Assets/tower_top.glb',
+    name: 'tower_top',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
 ];
 const SRC_DIR = 'tmp/asset_src/_IGNAR_Environment_Assets';
 const OUT_DIR = 'public/models/dungeon';
@@ -212,9 +450,41 @@ for (const item of ITEMS) {
     if (item.emissive) {
       const base = mat.getBaseColorTexture();
       if (base && !mat.getEmissiveTexture()) {
+        if (item.glowFloor) {
+          // The whole piece carries a soft glow: the emissive texture is
+          // the base albedo FLOORED per channel at glowFloor, so dark
+          // masonry emits the floor's warm sheen while authored hot
+          // details keep their extra brightness. (Base-as-emissive alone
+          // leaves near-black stone inert, which read as a pitch-dark
+          // fortress against lamp-lit ground.)
+          const [fr, fg, fb] = item.glowFloor;
+          const { data, info } = await sharp(Buffer.from(base.getImage()))
+            .raw()
+            .toBuffer({ resolveWithObject: true });
+          for (let i = 0; i < info.width * info.height; i++) {
+            const px = i * info.channels;
+            if (data[px] < fr) data[px] = fr;
+            if (data[px + 1] < fg) data[px + 1] = fg;
+            if (data[px + 2] < fb) data[px + 2] = fb;
+          }
+          // The sheen is low-frequency: half-resolution keeps the pieces
+          // inside the per-prop byte budget with no visible cost.
+          const floored = await sharp(data, {
+            raw: { width: info.width, height: info.height, channels: info.channels },
+          })
+            .resize(Math.min(512, info.width))
+            .webp({ quality: 88 })
+            .toBuffer();
+          const glowTex = doc
+            .createTexture(`${item.name}_glow`)
+            .setImage(new Uint8Array(floored))
+            .setMimeType('image/webp');
+          mat.setEmissiveTexture(glowTex);
+        } else {
+          mat.setEmissiveTexture(base);
+        }
         // Spec-valid overdrive: emissiveFactor stays in [0,1], the boost
         // rides KHR_materials_emissive_strength.
-        mat.setEmissiveTexture(base);
         mat.setEmissiveFactor([1, 1, 1]);
         const strengthExt = doc.createExtension(KHRMaterialsEmissiveStrength);
         mat.setExtension(

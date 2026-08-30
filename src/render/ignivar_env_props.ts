@@ -10,6 +10,7 @@ import { loadGltf, releaseGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { addRoofDarkness } from './gfx';
 import type { IgnivarEnvPropKey, IgnivarPropPlacement } from './ignivar_dressing_plan_core';
+import { decorateLiftBeamMaterial, decorateLiftSpoolMaterial } from './ignivar_lift_room';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 
 export const IGNIVAR_ENV_PROP_URLS: Record<IgnivarEnvPropKey, string> = {
@@ -18,6 +19,10 @@ export const IGNIVAR_ENV_PROP_URLS: Record<IgnivarEnvPropKey, string> = {
   pillar_slim: '/models/dungeon/ignivar_prop_pillar_slim.glb',
   reactor: '/models/dungeon/ignivar_prop_reactor.glb',
   gear_wall_rusty: '/models/dungeon/ignivar_prop_gear_wall_rusty.glb',
+  // Restored with the Drakelands entrance merge: the approach room's
+  // forge-lift shaft dressing places it, so it ships again (the 2026-08
+  // trim had stripped it as unplaced).
+  gear_machine: '/models/dungeon/ignivar_prop_gear_machine.glb',
   lava_face: '/models/dungeon/ignivar_prop_lava_face.glb',
   anvil: '/models/dungeon/ignivar_prop_anvil.glb',
   forge: '/models/dungeon/ignivar_prop_forge.glb',
@@ -36,6 +41,36 @@ export const IGNIVAR_ENV_PROP_URLS: Record<IgnivarEnvPropKey, string> = {
   steam_machine_round: '/models/dungeon/ignivar_prop_steam_machine_round.glb',
   steam_pipes: '/models/dungeon/ignivar_prop_steam_pipes.glb',
   water_pump: '/models/dungeon/ignivar_prop_water_pump.glb',
+  bridge_floor: '/models/dungeon/ignivar_prop_bridge_floor.glb',
+  bridge_pillar: '/models/dungeon/ignivar_prop_bridge_pillar.glb',
+  bridge_rail: '/models/dungeon/ignivar_prop_bridge_rail.glb',
+  cannon: '/models/dungeon/ignivar_prop_cannon.glb',
+  dragon_head: '/models/dungeon/ignivar_prop_dragon_head.glb',
+  dragon_pillar: '/models/dungeon/ignivar_prop_dragon_pillar.glb',
+  fortress_wall: '/models/dungeon/ignivar_prop_fortress_wall.glb',
+  fountain_base: '/models/dungeon/ignivar_prop_fountain_base.glb',
+  gate: '/models/dungeon/ignivar_prop_gate.glb',
+  gate_gear: '/models/dungeon/ignivar_prop_gate_gear.glb',
+  lava_pillar: '/models/dungeon/ignivar_prop_lava_pillar.glb',
+  staircase: '/models/dungeon/ignivar_prop_staircase.glb',
+  // The Drakelands town brazier, reused from the shipped streetlamp set
+  // (placer preview + template only; the world instance renders lit
+  // through src/render/streetlamps.ts).
+  street_lamp: '/models/props/streetlamp_drakelands_brazier.glb',
+  dungeon_entrance: '/models/dungeon/ignivar_prop_dungeon_entrance.glb',
+  lift_arch_beam: '/models/dungeon/ignivar_prop_lift_arch_beam.glb',
+  lift_beam: '/models/dungeon/ignivar_prop_lift_beam.glb',
+  lift_frame: '/models/dungeon/ignivar_prop_lift_frame.glb',
+  lift_handle: '/models/dungeon/ignivar_prop_lift_handle.glb',
+  lift_vertical_beam: '/models/dungeon/ignivar_prop_lift_vertical_beam.glb',
+  lift_weight: '/models/dungeon/ignivar_prop_lift_weight.glb',
+  lift_mount: '/models/dungeon/ignivar_prop_lift_mount.glb',
+  lift_spool: '/models/dungeon/ignivar_prop_lift_spool.glb',
+  stone_floor: '/models/dungeon/ignivar_prop_stone_floor.glb',
+  tower_base: '/models/dungeon/ignivar_prop_tower_base.glb',
+  tower_middle: '/models/dungeon/ignivar_prop_tower_middle.glb',
+  tower_pillar: '/models/dungeon/ignivar_prop_tower_pillar.glb',
+  tower_top: '/models/dungeon/ignivar_prop_tower_top.glb',
   // The dungeon kit's own sconce, shared verbatim: the placed-torch fire
   // (flame, light, floor pool) rides dungeon_torch_rig.ts per placement.
   torch: '/models/dungeon/torch_mounted.glb',
@@ -46,6 +81,7 @@ export const IGNIVAR_ENV_PROP_URLS: Record<IgnivarEnvPropKey, string> = {
 const SHADOW_CASTERS: ReadonlySet<IgnivarEnvPropKey> = new Set([
   'pillar_slim',
   'gear_wall_rusty',
+  'gear_machine',
   'reactor',
   'vault_door',
   'lava_face',
@@ -60,6 +96,30 @@ const SHADOW_CASTERS: ReadonlySet<IgnivarEnvPropKey> = new Set([
   'steam_machine_round',
   'steam_pipes',
   'water_pump',
+  // the Exterior_Assets fortress kit: real silhouettes cast, the flat
+  // floor plates, rails and the walk-over ramp stay cast-free
+  'bridge_pillar',
+  'cannon',
+  'dragon_head',
+  'dragon_pillar',
+  'dungeon_entrance',
+  'fortress_wall',
+  // the forge-lift car kit: real silhouettes cast, the thin beams and
+  // small furniture stay cast-free
+  'lift_arch_beam',
+  'lift_frame',
+  'lift_vertical_beam',
+  'lift_mount',
+  'lift_spool',
+  'fountain_base',
+  'gate',
+  'gate_gear',
+  'lava_pillar',
+  'staircase',
+  'tower_base',
+  'tower_middle',
+  'tower_pillar',
+  'tower_top',
 ]);
 
 interface IgnivarEnvPropTemplate {
@@ -138,6 +198,13 @@ export function prepareIgnivarEnvProps(): Promise<void> {
           // Tall props, chains, and the door towers grade into the roof
           // black with the walls (inert outside the Halls scene state).
           addRoofDarkness(baked.material);
+          // The lift machinery moves in the vertex shader (single baked
+          // meshes on the shared uTime clock): the spool turns whole in its
+          // static mount (the owner's winch remake) and the beam's sheave
+          // wheel spins, per the owner's direction. The brake handle, the
+          // retired one-piece winch, and the sliding door stay still.
+          if (key === 'lift_spool') decorateLiftSpoolMaterial(baked.material);
+          if (key === 'lift_beam') decorateLiftBeamMaterial(baked.material);
           templates.set(key, {
             geometry: markSharedGeometry(baked.geometry),
             material: markSharedMaterial(baked.material),

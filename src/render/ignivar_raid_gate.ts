@@ -1,16 +1,22 @@
 import * as THREE from 'three';
 import {
+  IGNIVAR_FORGE_APPROACH_ID,
   IGNIVAR_GATE_LOCKED_TEMPLATE,
+  IGNIVAR_LIFT_GATE_LOCKED_TEMPLATE,
+  IGNIVAR_LIFT_ROOM_ID,
   IGNIVAR_MOLTEN_ASSEMBLY_ID,
   IGNIVAR_SECOND_WING_ID,
 } from '../sim/ignivar_raid_ids';
 import { EMISSIVE_GLOW, surfaceMat } from './gfx';
+import { buildIgnivarLiftGate, IGNIVAR_LIFT_GATE_HEIGHT } from './ignivar_lift_room';
 
 export const IGNIVAR_RAID_GATE_HEIGHT = 6.4;
 
 export interface IgnivarRaidGatePlan {
   open: boolean;
   height: number;
+  /** absent = the herald stone gate; 'lift' = the antechamber portcullis */
+  kind?: 'lift';
 }
 
 export function ignivarRaidGatePlan(
@@ -25,6 +31,21 @@ export function ignivarRaidGatePlan(
     (dungeonId === IGNIVAR_MOLTEN_ASSEMBLY_ID || dungeonId === IGNIVAR_SECOND_WING_ID)
   ) {
     return { open: true, height: IGNIVAR_RAID_GATE_HEIGHT };
+  }
+  if (templateId === IGNIVAR_LIFT_GATE_LOCKED_TEMPLATE) {
+    // sealed through the ride; the unlock swaps it to 'dungeon_door',
+    // which stays on the lift kind below
+    return { open: false, height: IGNIVAR_LIFT_GATE_HEIGHT, kind: 'lift' };
+  }
+  if (
+    (templateId === 'dungeon_door' && dungeonId === IGNIVAR_FORGE_APPROACH_ID) ||
+    (templateId === 'dungeon_exit' && dungeonId === IGNIVAR_LIFT_ROOM_ID)
+  ) {
+    // The lift's opened gate AND its exit portal render NOTHING as entity
+    // bodies: the owner fronts each with a placed dungeon_entrance facade
+    // wearing the keep entrance's red mist (the lift dressing owns both
+    // looks); the entities keep only their walk-in triggers and labels.
+    return { open: true, height: IGNIVAR_LIFT_GATE_HEIGHT, kind: 'lift' };
   }
   return null;
 }
@@ -44,8 +65,12 @@ function block(
 }
 
 /** Physical raid gate. The closed and opened poses share the same stone frame so
- *  the threshold never pops into a magical portal when Ignivar dies. */
-export function buildIgnivarRaidGate(open: boolean): THREE.Group {
+ *  the threshold never pops into a magical portal when Ignivar dies. The
+ *  forge-lift antechamber's portcullis rides the same view seam under its
+ *  own kind. */
+export function buildIgnivarRaidGate(plan: IgnivarRaidGatePlan): THREE.Group {
+  if (plan.kind === 'lift') return buildIgnivarLiftGate(plan.open);
+  const open = plan.open;
   const group = new THREE.Group();
   group.name = open ? 'ignivar-raid-gate-open' : 'ignivar-raid-gate-locked';
   const stone = surfaceMat({ color: 0x392b26, roughness: 0.92, metalness: 0.05 });

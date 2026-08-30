@@ -79,6 +79,8 @@ export function ignivarRaidFogStateForInterior(
   interior: string | null,
 ): IgnivarRaidFogState | null {
   if (interior === 'ignivar_approach') return 'ignivarApproach';
+  // the lift car shares the approach's fog and light grade (one shaft)
+  if (interior === 'ignivar_lift') return 'ignivarApproach';
   if (interior === 'ignivar') return 'ignivar';
   if (interior === 'ignivar_depths') return 'varkhul';
   return null;

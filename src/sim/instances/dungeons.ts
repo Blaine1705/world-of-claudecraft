@@ -20,6 +20,7 @@ import { DUNGEON_X_THRESHOLD, DUNGEONS, dungeonAt, instanceOrigin, MOBS, NPCS } 
 import { clearIgnivarEncounterAuras } from '../encounters/ignivar';
 import { clearVarkhulEncounterAuras } from '../encounters/varkhul';
 import { createGroundObject, createMob, createNpc } from '../entity';
+import { updateIgnivarForgeLift } from '../ignivar_forge_lift';
 import {
   IGNIVAR_RAID_ARENA_ID,
   IGNIVAR_RAID_ROOM_IDS,
@@ -373,7 +374,10 @@ export function enterDungeon(
     ctx.error(r.meta.entityId, 'Raid groups cannot enter standard dungeons.');
     return false;
   }
-  if (!party?.raid && raidRequired && !bypass) {
+  // Dev builds (ALLOW_DEV_COMMANDS) let a solo walker board a raid door so
+  // the maintainer can experience the walk-in; the undersized-party
+  // warning below still fires. Production keeps the hard raid gate.
+  if (!party?.raid && raidRequired && !bypass && !ctx.devCommands) {
     ctx.error(r.meta.entityId, 'You must convert your party to a raid group first.');
     return false;
   }
@@ -435,12 +439,21 @@ export function enterDungeon(
     : undefined;
   // The sealed-gate rule gates FIRST entry only: a room the group already
   // claims is always re-enterable from anywhere (the checkpoint redirect
-  // above resolves to exactly these rooms).
+  // above resolves to exactly these rooms). An entrant standing inside the
+  // previous room's claim always answers to that room's gate (a sealed
+  // forge-lift car never leaks its rider into the Halls early). An OUTSIDE
+  // entrant is admitted only where the room carries a real overworld
+  // walk-up door (today the Halls' Eastbrook testing door, whatever the
+  // room's chain position); when the walk-up reverts at launch
+  // (overworldDoor: false), the seal re-engages and the lift-gate flow
+  // governs first entry.
   if (
     previousIgnivarRoom &&
     !bypass &&
     !ctx.instances.some((i) => i.dungeonId === dungeonId && i.partyKey === key) &&
-    (!ignivarSourceClaim || !ignivarGateOpenTo(ctx, ignivarSourceClaim, dungeonId))
+    (ignivarSourceClaim
+      ? !ignivarGateOpenTo(ctx, ignivarSourceClaim, dungeonId)
+      : dungeon.overworldDoor === false)
   ) {
     ctx.error(r.meta.entityId, 'The forge gate is sealed to you.');
     return false;
@@ -1285,6 +1298,7 @@ export function awardHeroicMarks(ctx: SimContext, mob: Entity, recipients: Playe
 export function updateInstances(ctx: SimContext): void {
   if (ctx.tickCount % 20 !== 0) return; // once a second
   updateIgnivarRaidProgression(ctx);
+  updateIgnivarForgeLift(ctx);
   tickIgnivarLavaHazard(ctx);
   for (const inst of ctx.instances) {
     if (inst.partyKey === null) continue;

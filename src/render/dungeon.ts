@@ -18,6 +18,7 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { arenaOriginAt, instanceOrigin } from '../sim/data';
 import type { DelveModuleId } from '../sim/delve_layout';
 import { isLitanyModuleId, polygonWallSegments } from '../sim/delve_litany_layout';
+import { INTERIOR_LAYOUTS } from '../sim/dungeon_floor';
 import {
   arenaMapForSlot,
   CRYPT_LAYOUT,
@@ -97,6 +98,7 @@ import {
   ensureIgnivarTileAssets,
   ignivarTileKind,
   ignivarUpperWallKind,
+  isIgnivarInterior,
 } from './ignivar_tile_kit';
 import {
   collectOwnedInteriorResources,
@@ -695,9 +697,7 @@ export class DungeonInteriors {
                     ? IGNIVAR_FORGE_APPROACH_LAYOUT
                     : interior === 'ignivar'
                       ? IGNIVAR_LAYOUT
-                      : interior === 'ignivar_depths'
-                        ? IGNIVAR_SECOND_WING_LAYOUT
-                        : CRYPT_LAYOUT);
+                      : (INTERIOR_LAYOUTS[interior] ?? CRYPT_LAYOUT));
     const variant = opts?.style?.kit ?? opts?.variant ?? this.variantFor(interior, ox, oz);
     const torch = opts?.style?.torch ?? TORCH_COLORS[variant];
     const daisRaised = opts?.style?.daisRaised;
@@ -1344,8 +1344,7 @@ export class DungeonInteriors {
         : 'arena';
     }
     if (interior === 'nythraxis') return 'nythraxis';
-    if (interior === 'ignivar_approach' || interior === 'ignivar' || interior === 'ignivar_depths')
-      return 'ignivar';
+    if (isIgnivarInterior(interior)) return 'ignivar';
     if (interior === 'sanctum') return 'sanctum';
     if (interior === 'temple') return 'temple';
     // The Last Keep gets its own warm castle grade (clean stone, candle light,

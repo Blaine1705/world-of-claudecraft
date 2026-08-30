@@ -308,6 +308,35 @@ export const IGNIVAR_FORGE_APPROACH_LAYOUT: DungeonLayout = {
   shellPole: { x: 0, z: 0 },
 };
 
+/** The Forge-Lift: the raid's first room, a sealed 20x16 car with its own
+ *  portal in (the keep facade's teleport) and portal out (the exit gate,
+ *  locked through the ride, then an ordinary dungeon_door to the Halls).
+ *  The two pillar points carry torch rigs so the car is lit. */
+export const IGNIVAR_LIFT_LAYOUT: DungeonLayout = {
+  zMin: -8,
+  zMax: 8,
+  sideWallZ: 0,
+  sideWallHd: 8,
+  wallX: 10,
+  endWallHw: 10,
+  floorHalfX: 10,
+  doorZ: 8,
+  pillars: [
+    { x: -7, z: -3 },
+    { x: 7, z: -3 },
+  ],
+  tombs: [],
+  stubs: [],
+  dais: { x: 0, z: 0, r: 0 },
+  shellPolygon: [
+    { x: -10, z: -8 },
+    { x: 10, z: -8 },
+    { x: 10, z: 8 },
+    { x: -10, z: 8 },
+  ],
+  shellPole: { x: 0, z: 0 },
+};
+
 // Ignivar's Crucible: a flat octagonal raid room centered on the sealed heart.
 // The clipped corners give the four diagonal water conduits their own readable
 // stations while the entire fighting floor stays free of line-of-sight blockers.
