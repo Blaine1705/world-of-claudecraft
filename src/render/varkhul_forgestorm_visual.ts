@@ -11,6 +11,11 @@ import type {
   ActiveVarkhulCinderOrbProjectile,
 } from '../sim/varkhul_cinder_orbs';
 import type { ActiveVarkhulForgestormWarning } from '../sim/varkhul_forgestorm';
+import {
+  type VarkhulAssemblyViewerFocus,
+  varkhulAssemblyViewerFocusInto,
+} from './varkhul_assembly_focus_core';
+import { VarkhulAssemblyVisuals } from './varkhul_assembly_visual';
 import { VarkhulCinderOrbVisuals } from './varkhul_cinder_orb_visual';
 import { VarkhulForgeBeamVisuals } from './varkhul_forge_beam_visual';
 import { VarkhulInterceptBeamVisuals } from './varkhul_intercept_beam_visual';
@@ -166,6 +171,15 @@ export class VarkhulForgestormVisuals {
   private readonly forgeBeamVisuals: VarkhulForgeBeamVisuals;
   private readonly interceptBeamVisuals: VarkhulInterceptBeamVisuals;
   private readonly worldfireVisuals: VarkhulWorldfireVisuals;
+  private readonly assemblyVisuals: VarkhulAssemblyVisuals;
+  // Per-frame scratch for the assembly viewer focus (the sync path is
+  // allocation-free by the render hot-path rule).
+  private readonly assemblyViewerFocus: VarkhulAssemblyViewerFocus = {
+    playerId: Number.MIN_SAFE_INTEGER,
+    x: 0,
+    z: 0,
+    assignedSymbol: null,
+  };
 
   constructor(
     private readonly scene: THREE.Scene,
@@ -175,6 +189,7 @@ export class VarkhulForgestormVisuals {
     this.forgeBeamVisuals = new VarkhulForgeBeamVisuals(scene, groundY);
     this.interceptBeamVisuals = new VarkhulInterceptBeamVisuals(scene, groundY);
     this.worldfireVisuals = new VarkhulWorldfireVisuals(scene, groundY);
+    this.assemblyVisuals = new VarkhulAssemblyVisuals(scene, groundY);
   }
 
   sync(
@@ -235,6 +250,14 @@ export class VarkhulForgestormVisuals {
     this.forgeBeamVisuals.sync(world.activeVarkhulAssemblies);
     this.interceptBeamVisuals.sync(world.activeVarkhulAssemblies);
     this.worldfireVisuals.sync(world.activeVarkhulAssemblies, world.entities);
+    this.assemblyVisuals.sync(
+      world.activeVarkhulAssemblies,
+      varkhulAssemblyViewerFocusInto(
+        world.activeVarkhulAssemblies,
+        world.player,
+        this.assemblyViewerFocus,
+      ),
+    );
     this.sync(
       world.activeVarkhulForgestormWarnings,
       world.activeVarkhulCinderFires,
@@ -247,6 +270,7 @@ export class VarkhulForgestormVisuals {
     this.forgeBeamVisuals.update(dt, reducedMotion);
     this.interceptBeamVisuals.update(dt, reducedMotion);
     this.worldfireVisuals.update(dt, reducedMotion);
+    this.assemblyVisuals.update(dt, reducedMotion);
     for (const visual of this.visuals.values()) {
       if (!reducedMotion) {
         visual.phase = (visual.phase + Math.max(0, dt) * 5) % (Math.PI * 2);
@@ -278,6 +302,7 @@ export class VarkhulForgestormVisuals {
     this.forgeBeamVisuals.dispose();
     this.interceptBeamVisuals.dispose();
     this.worldfireVisuals.dispose();
+    this.assemblyVisuals.dispose();
     for (const visual of this.visuals.values()) disposeVisual(visual);
     this.visuals.clear();
     this.activeIds.clear();

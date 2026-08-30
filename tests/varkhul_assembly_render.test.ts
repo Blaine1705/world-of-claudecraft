@@ -6,6 +6,7 @@ import {
   buildVarkhulRuneSymbol,
   VarkhulAssemblyVisuals,
 } from '../src/render/varkhul_assembly_visual';
+import { VarkhulForgestormVisuals } from '../src/render/varkhul_forgestorm_visual';
 import type { ActiveVarkhulAssembly } from '../src/sim/varkhul_assembly';
 import {
   VARKHUL_ASSEMBLY_RUNE_CONTROL_OFFSET,
@@ -472,6 +473,50 @@ describe('Varkhul Assembly rune rendering', () => {
       expect(rune?.getObjectByName('varkhul-rune-guide-beam')).toBeDefined();
       expect(rune?.getObjectByName('varkhul-rune-lock-burst')?.visible).toBe(true);
     }
+  });
+
+  it('runs through the production Forgestorm owner: stations, controls, focus, and guide arrow', () => {
+    // The Links renderer is owned by VarkhulForgestormVisuals, the painter the
+    // real renderer constructs: this drives that owner end to end so the
+    // assembly clock can never be orphaned from the frame path again.
+    const scene = new THREE.Scene();
+    const owner = new VarkhulForgestormVisuals(scene, () => 0);
+    const world = {
+      activeVarkhulForgestormWarnings: [],
+      activeVarkhulCinderFires: [],
+      activeVarkhulCinderOrbProjectiles: [],
+      activeVarkhulAssemblies: [ASSEMBLY],
+      // The viewer focus derives from player id + pos and the assembly's own
+      // assignment roster; no assignedSymbol is fed from outside.
+      player: {
+        id: LOCAL_VIEWER.playerId,
+        pos: { x: LOCAL_VIEWER.x, z: LOCAL_VIEWER.z },
+        auras: [],
+      },
+      entities: new Map<number, { auras: { id: string; remaining: number; duration: number }[] }>(),
+    };
+    owner.syncWorld(world);
+    const root = scene.getObjectByName('varkhul-assembly-42') as THREE.Group;
+    expect(root).toBeDefined();
+    const focused = root.getObjectByName('varkhul-rune-0') as THREE.Group;
+    expect(focused.visible).toBe(true);
+    expect(focused.userData.visualMode).toBe('focused');
+    expect(focused.getObjectByName('varkhul-rune-station-track')).toBeDefined();
+    expect(focused.getObjectByName('varkhul-rune-control-counterclockwise')?.visible).toBe(true);
+    expect(focused.getObjectByName('varkhul-rune-control-clockwise')?.visible).toBe(true);
+    expect(focused.getObjectByName('varkhul-rune-focus-halo')?.visible).toBe(true);
+    expect(root.getObjectByName('varkhul-rune-player-guide')?.visible).toBe(true);
+    expect(root.getObjectByName('varkhul-molten-core')).toBeDefined();
+
+    // The owner's frame tick reaches the assembly animation.
+    const track = focused.getObjectByName('varkhul-rune-station-track') as THREE.Mesh;
+    const restingOpacity = (track.material as THREE.MeshBasicMaterial).opacity;
+    owner.update(0.1, false);
+    expect((track.material as THREE.MeshBasicMaterial).opacity).not.toBeCloseTo(restingOpacity, 5);
+
+    owner.dispose();
+    expect(scene.getObjectByName('varkhul-assembly-42')).toBeUndefined();
+    expect(scene.getObjectByName('varkhul-rune-player-guide')).toBeUndefined();
   });
 
   it('hides the complete rune clock outside links without hiding core transport', () => {

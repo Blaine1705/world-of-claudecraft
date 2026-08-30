@@ -6,7 +6,11 @@ import {
   VarkhulForgestormVisuals,
 } from '../src/render/varkhul_forgestorm_visual';
 import { VARKHUL_MASTERPIECE_UNBOUND_AURA_ID } from '../src/sim/encounters/varkhul';
-import type { ActiveVarkhulAssembly } from '../src/sim/varkhul_assembly';
+import {
+  type ActiveVarkhulAssembly,
+  varkhulAssemblyRuneSlots,
+  varkhulAssemblyRuneStation,
+} from '../src/sim/varkhul_assembly';
 import type { ActiveVarkhulForgestormWarning } from '../src/sim/varkhul_forgestorm';
 
 const WARNING: ActiveVarkhulForgestormWarning = {
@@ -167,6 +171,55 @@ describe('Varkhul Forgestorm rendering', () => {
     expect(scene.getObjectByName('varkhul-worldfire-42')).toBeUndefined();
   });
 
+  it('wires the Assembly rune clock through the real Forgestorm compositor lifecycle', () => {
+    // Pins the ownership itself: if syncWorld stops syncing the assembly
+    // visuals, no assembly root ever reaches the scene graph.
+    const scene = new THREE.Scene();
+    const visuals = new VarkhulForgestormVisuals(scene, () => 0);
+    const station = varkhulAssemblyRuneStation(
+      { x: 0, z: 0 },
+      varkhulAssemblyRuneSlots('normal', 0)[0],
+    );
+    visuals.syncWorld({
+      activeVarkhulForgestormWarnings: [],
+      activeVarkhulCinderFires: [],
+      activeVarkhulCinderOrbProjectiles: [],
+      activeVarkhulAssemblies: [
+        {
+          ...WORLDFIRE_ASSEMBLY,
+          phase: 'links',
+          assignments: [{ playerId: 7, symbol: 0, locked: false }],
+          runes: [
+            {
+              symbol: 0,
+              ...station,
+              radius: 0.72,
+              assignedPlayerId: 7,
+              orphaned: false,
+              locked: false,
+              targetAngle: 0.4,
+              glyphAngle: 0.7,
+              control: 'off',
+              controlProgress: 0,
+              alignmentProgress: 0,
+              aligned: false,
+            },
+          ],
+        },
+      ],
+      player: { id: 7, pos: { x: 0, z: 0 }, auras: [] },
+      entities: new Map(),
+    });
+    const root = scene.getObjectByName('varkhul-assembly-42') as THREE.Group;
+    expect(root).toBeTruthy();
+    const rune = root.getObjectByName('varkhul-rune-0') as THREE.Group;
+    expect(rune.visible).toBe(true);
+    expect(rune.userData.visualMode).toBe('focused');
+    visuals.update(0.5, true);
+    visuals.dispose();
+    expect(scene.getObjectByName('varkhul-assembly-42')).toBeUndefined();
+  });
+
   it('reconciles the world projection in both renderer frame paths', () => {
     const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
     const visual = readFileSync(
@@ -189,6 +242,10 @@ describe('Varkhul Forgestorm rendering', () => {
     );
     expect(visual).toContain('this.worldfireVisuals.update(dt, reducedMotion)');
     expect(visual).toContain('this.worldfireVisuals.dispose()');
+    expect(visual).toContain('this.assemblyVisuals.sync(');
+    expect(visual).toContain('varkhulAssemblyViewerFocusInto(');
+    expect(visual).toContain('this.assemblyVisuals.update(dt, reducedMotion)');
+    expect(visual).toContain('this.assemblyVisuals.dispose()');
     expect(renderer).toContain('routeVarkhulForgeHammer(ev');
     expect(renderer).toContain('this.triggerAttack(entityId, abilityId)');
     expect(renderer).toContain('new VarkhulForgestormVisuals(this.scene');

@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
   type VarkhulAssemblyFocusState,
+  type VarkhulAssemblyViewerFocus,
   varkhulAssemblyFocusPlan,
+  varkhulAssemblyViewerFocusInto,
 } from '../src/render/varkhul_assembly_focus_core';
 import {
   VARKHUL_ASSEMBLY_RUNE_CONTROL_OFFSET,
@@ -140,6 +142,44 @@ describe('Varkhul Assembly personal focus', () => {
     expect(plan.focusedSymbol).toBe(0);
     expect(plan.focusKind).toBe('rescue');
     expect(plan.guideVisible).toBe(true);
+  });
+
+  it('derives the viewer focus from the assembly assignment roster without allocating', () => {
+    const output: VarkhulAssemblyViewerFocus = {
+      playerId: Number.MIN_SAFE_INTEGER,
+      x: 0,
+      z: 0,
+      assignedSymbol: null,
+    };
+    const assemblies = [
+      {
+        assignments: [
+          { playerId: 100, symbol: 0 },
+          { playerId: 103, symbol: 3 },
+        ],
+      },
+    ];
+    const filled = varkhulAssemblyViewerFocusInto(
+      assemblies,
+      { id: 103, pos: { x: 4, z: -7 } },
+      output,
+    );
+    expect(filled).toBe(output);
+    expect(filled).toEqual({ playerId: 103, x: 4, z: -7, assignedSymbol: 3 });
+  });
+
+  it('clears a stale assigned symbol for a viewer no roster names', () => {
+    const output: VarkhulAssemblyViewerFocus = { playerId: 100, x: 1, z: 2, assignedSymbol: 0 };
+    varkhulAssemblyViewerFocusInto(
+      [{ assignments: [{ playerId: 101, symbol: 1 }] }],
+      { id: 999, pos: { x: 0, z: 0 } },
+      output,
+    );
+    expect(output).toEqual({ playerId: 999, x: 0, z: 0, assignedSymbol: null });
+    varkhulAssemblyViewerFocusInto([], { id: 999, pos: { x: 5, z: 6 } }, output);
+    expect(output.assignedSymbol).toBeNull();
+    expect(output.x).toBe(5);
+    expect(output.z).toBe(6);
   });
 
   it('does not focus an orphan for a non-neighbor', () => {

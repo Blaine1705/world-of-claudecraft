@@ -168,3 +168,27 @@ export function varkhulAssemblyFocusPlan(
     runeModes: [],
   });
 }
+
+/** Fills the viewer focus for the per-frame sync path from the world's player
+ *  and the live assemblies' own assignment rosters (allocation-free: the
+ *  caller owns `output`). The roster is the authoritative assignment record,
+ *  so it still names the viewer's symbol when their rune's own
+ *  `assignedPlayerId` has been cleared (an orphaned station). */
+export function varkhulAssemblyViewerFocusInto(
+  assemblies: readonly { assignments: readonly { playerId: number; symbol: number }[] }[],
+  player: { id: number; pos: { x: number; z: number } },
+  output: VarkhulAssemblyViewerFocus,
+): VarkhulAssemblyViewerFocus {
+  output.playerId = player.id;
+  output.x = player.pos.x;
+  output.z = player.pos.z;
+  output.assignedSymbol = null;
+  for (const assembly of assemblies) {
+    for (const assignment of assembly.assignments) {
+      if (assignment.playerId !== player.id) continue;
+      output.assignedSymbol = assignment.symbol;
+      return output;
+    }
+  }
+  return output;
+}
