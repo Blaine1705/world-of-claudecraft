@@ -13,6 +13,7 @@ import {
 } from './ignivar_brand_telegraph';
 import { type IgnivarVisualEntity, ignivarEncounterVisualPlan } from './ignivar_encounter_core';
 import {
+  buildIgnivarForgeChainVisual,
   disposeIgnivarForgeChainVisual,
   IGNIVAR_FORGE_CHAIN_VISUAL_NAME,
   type IgnivarForgeChainVisualEntity,
@@ -134,6 +135,36 @@ export function buildIgnivarSkyfireTelegraph(): THREE.Group {
   group.userData.renderCategory = 'ui3d';
   group.visible = false;
   return group;
+}
+
+/**
+ * Stages the per-entity Ignivar mechanic materials before the boss is pulled.
+ * These visuals are otherwise built lazily during per-frame encounter sync,
+ * AFTER the view's compile-gate enumeration, so their first onset would link
+ * programs inside a live frame. The rotating rays and Forge Judgment have
+ * their own prewarm builders: each stages several full fire-beam lanes, so
+ * sharing this unit would concatenate the builds into one long task.
+ */
+export function buildIgnivarEncounterPrewarmVisual(): THREE.Group {
+  const root = new THREE.Group();
+  root.name = 'ignivar-encounter-prewarm-entity';
+  const visuals = [
+    buildIgnivarFrontalTelegraph(),
+    buildIgnivarSkyfireTelegraph(),
+    buildIgnivarBrandTelegraph(),
+    buildIgnivarForgeChainVisual(),
+    buildIgnivarForgeWaveVisual(),
+  ];
+  for (let index = 0; index < visuals.length; index++) {
+    const visual = visuals[index];
+    visual.visible = true;
+    visual.position.x = (index - 2) * 3;
+    visual.traverse((child) => {
+      child.visible = true;
+    });
+    root.add(visual);
+  }
+  return root;
 }
 
 /** Releases the per-entity encounter overlays before a character view is pooled. */

@@ -218,6 +218,25 @@ export function buildIgnivarRotatingRaysTelegraph(): THREE.Group {
   return root;
 }
 
+/**
+ * Stages every Revolving Inferno material (lane fills, borders, vertex-colour
+ * heat ticks, the animated fire-beam shells, and the instanced flame blades)
+ * before the boss is pulled. Its own idle unit: each ray carries a full
+ * fire-beam lane, so sharing a unit with the other telegraphs would
+ * concatenate the builds into one long task.
+ */
+export function buildIgnivarRotatingRaysPrewarmVisual(): THREE.Group {
+  const root = buildIgnivarRotatingRaysTelegraph();
+  root.name = 'ignivar-rotating-rays-prewarm';
+  // Exercise the damaging phase the way the live sync reveals it, then show
+  // the phase-hidden leftovers too so every program links.
+  syncIgnivarRotatingRaysTelegraph(root, 'active', 1, 1);
+  root.traverse((child) => {
+    child.visible = true;
+  });
+  return root;
+}
+
 export function syncIgnivarRotatingRaysTelegraph(
   root: THREE.Object3D,
   phase: IgnivarFireBeamPhase,

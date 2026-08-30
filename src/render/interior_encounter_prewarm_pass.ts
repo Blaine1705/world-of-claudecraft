@@ -9,6 +9,9 @@ import { GPU_WORK_PRIORITY } from './background_gpu_queue';
 import { type CharacterVisual, createCharacterVisual } from './characters';
 import { GFX } from './gfx';
 import { idleSlot, runIdleQueue } from './idle_queue';
+import { buildIgnivarEncounterPrewarmVisual } from './ignivar_encounter';
+import { buildIgnivarForgeJudgmentPrewarmVisual } from './ignivar_forge_judgment';
+import { buildIgnivarRotatingRaysPrewarmVisual } from './ignivar_rotating_rays';
 import {
   encounterPrewarmDisabled,
   encounterPrewarmForInterior,
@@ -27,6 +30,7 @@ import {
 } from './necromancy_army_portal_fx';
 import { runBackgroundPrewarm } from './prewarm_pass';
 import { setRenderCategory } from './renderer_diagnostics';
+import { buildVarkhulAssemblyPrewarmVisual } from './varkhul_assembly_visual';
 import { buildVarkhulEncounterPrewarmVisual } from './varkhul_encounter';
 import { buildVarkhulForgeBeamPrewarmVisual } from './varkhul_forge_beam_visual';
 import { buildVarkhulInterceptBeamPrewarmVisual } from './varkhul_intercept_beam_visual';
@@ -152,7 +156,7 @@ async function runInteriorEncounterPrewarm(
   // prewarm_policy.ts). The catalog is 30-odd rigs held for the session; the
   // live arm below is bounded by the bodies actually in the room, so THAT is
   // the half a constrained device keeps.
-  if (GFX.constrainedMemory && !spec.varkhulVisuals) return;
+  if (GFX.constrainedMemory && !spec.varkhulVisuals && !spec.ignivarVisuals) return;
   const plan = planInteriorEncounterPrewarm(spec, {
     playerClasses: GFX.constrainedMemory ? [] : ALL_CLASSES,
     weaponSkinIds: GFX.constrainedMemory ? [] : vfxWeaponSkinIds(WEAPON_SKINS, WEAPON_VFX),
@@ -228,6 +232,43 @@ async function runInteriorEncounterPrewarm(
               worldfire,
             );
             varkhulPortalKeepAlive.push(forgePortals);
+          },
+          // Its own idle unit: the Assembly stages ten full rune stations, so
+          // sharing the unit above would concatenate both builds into one task.
+          () => {
+            const assembly = buildVarkhulAssemblyPrewarmVisual();
+            assembly.position.set(-36, 0, 0);
+            group.add(assembly);
+            varkhulKeepAlive.push(assembly);
+          },
+        ]
+      : []),
+    // Ignivar's own mechanic visuals share the interior with Varkhul's but are
+    // otherwise built lazily during per-frame encounter sync, after the view
+    // compile-gate enumeration: first onset would link their programs (the
+    // Judgment charred-ground and fire-beam shaders included) in a live frame.
+    ...(spec.ignivarVisuals
+      ? [
+          () => {
+            const encounter = buildIgnivarEncounterPrewarmVisual();
+            encounter.position.set(24, 0, 0);
+            group.add(encounter);
+            varkhulKeepAlive.push(encounter);
+          },
+          // Its own idle unit: four full fire-beam lanes plus flame blades.
+          () => {
+            const rays = buildIgnivarRotatingRaysPrewarmVisual();
+            rays.position.set(36, 0, 0);
+            group.add(rays);
+            varkhulKeepAlive.push(rays);
+          },
+          // Its own idle unit: the heaviest per-entity build in the encounter
+          // (three shelters, three warnings, three cue beams, the arena fire).
+          () => {
+            const judgment = buildIgnivarForgeJudgmentPrewarmVisual();
+            judgment.position.set(0, 0, 36);
+            group.add(judgment);
+            varkhulKeepAlive.push(judgment);
           },
         ]
       : []),

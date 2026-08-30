@@ -621,6 +621,26 @@ export function buildIgnivarForgeJudgmentVisual(): THREE.Group {
   return root;
 }
 
+/**
+ * Stages the full Forge Judgment arena (warnings, cue beams, shelters, the
+ * unique shader-clipped charred-ground fire, and the wall cracks) before the
+ * boss is pulled. Its own idle unit: three shelters, three warnings, and three
+ * cue fire-beams are the heaviest per-entity build in the encounter, so
+ * sharing a unit with the other telegraphs would concatenate the builds.
+ */
+export function buildIgnivarForgeJudgmentPrewarmVisual(): THREE.Group {
+  const root = buildIgnivarForgeJudgmentVisual();
+  root.name = 'ignivar-forge-judgment-prewarm';
+  // Exercise the active phase the way the live sync reveals it (this also
+  // seeds the safe-centre uniform of the shader-clip fire surface), then show
+  // the phase-hidden warning half too so every program links.
+  syncIgnivarForgeJudgmentVisual(root, 'active', 0, 0, 1, 1, true);
+  root.traverse((child) => {
+    child.visible = true;
+  });
+  return root;
+}
+
 export function syncIgnivarForgeJudgmentVisual(
   root: THREE.Object3D,
   phase: 'hidden' | 'warning' | 'active',
