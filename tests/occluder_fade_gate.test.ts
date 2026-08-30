@@ -28,6 +28,8 @@ import {
   occluderFadeReady,
   occluderFadeRecordFor,
   prefetchOccluderFade,
+  prefetchOccluderFadeWithin,
+  stageOccluderFadeOnce,
 } from '../src/render/occluder_fade';
 import { OCCLUDER_FADE_ALPHA, OCCLUDER_FADE_PREFETCH_YD } from '../src/render/occluder_fade_core';
 import {
@@ -357,6 +359,30 @@ describe('prefetch', () => {
     const cinematic = read('src/game/spawn_cinematic.ts');
     expect(cinematic).toContain('startDist: 55');
   });
+
+  it('stageOccluderFadeOnce asks once for every record, unconditionally, on the shared latch', () => {
+    const { host, compiles } = fakeHost();
+    installOccluderFadeGate(host);
+    const stone = new THREE.MeshStandardMaterial({ name: 'stone' });
+    const banner = new THREE.MeshLambertMaterial({ name: 'banner' });
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    const mats = [
+      occluderFadeMat(stone, new THREE.InstancedMesh(geometry, stone, 2)),
+      occluderFadeMat(banner, new THREE.Mesh(geometry, banner)),
+    ];
+    stageOccluderFadeOnce(mats);
+    // No distance argument at all: the stage never consults the reach.
+    expect(compiles).toHaveLength(2);
+    expect(compiles.map((c) => c.imminent)).toEqual([false, false]);
+    expect(occluderFadeTwinCount()).toBe(2);
+    // Latched once per structure ...
+    stageOccluderFadeOnce(mats);
+    expect(compiles).toHaveLength(2);
+    // ... on the SAME latch the within-reach prefetch uses: a staged
+    // structure never asks again when it later comes within reach.
+    prefetchOccluderFadeWithin(mats, 0, 0, 0, 0);
+    expect(compiles).toHaveLength(2);
+  });
 });
 
 describe('the instanced-ghost pool', () => {
@@ -466,8 +492,14 @@ describe('wiring (source pins)', () => {
     // The wall driver gates every sightline fade; the raid backface cull is
     // the pinned exception (its hide frame never draws the transparent twin,
     // it hides the group outright, and gating the ease-back would pop the
-    // re-shown wall opaque; rationale in dungeon_wall_occlusion.ts). Exactly
-    // the two floor steps (wall arm, prop arm) and the one wall-arm apply.
+    // re-shown wall opaque; rationale in dungeon_wall_occlusion.ts). The
+    // ungated floor step is paid for by STAGING: the arm's first advanced
+    // frame stages a twin for every record it will flip, so the first
+    // re-show pays no synchronous link. The staged set and the flipped set
+    // are pinned to the SAME expression (h.mats): a backface material a
+    // registration adds lands in h.mats or the flip cannot touch it either.
+    // Exactly the two floor steps (wall arm, prop arm), the one wall-arm
+    // apply, and the one unconditional stage.
     const walls = read('src/render/dungeon_wall_occlusion.ts');
     expect(walls).toContain('advanceOccluderFade(');
     expect(walls).toContain('prefetchOccluderFadeWithin(');
@@ -475,6 +507,14 @@ describe('wiring (source pins)', () => {
     expect(walls).toContain('stepOccluderFade(h.alpha, hide, dt, reducedMotion, 0)');
     expect(walls).toContain('stepOccluderFade(b.alpha, hide, dt, reducedMotion, 0)');
     expect(walls.match(/applyOccluderFade\(/g)).toHaveLength(1);
+    expect(walls.match(/stageOccluderFadeOnce\(/g)).toHaveLength(1);
+    expect(walls).toContain('stageOccluderFadeOnce(h.mats)');
+    expect(walls).toContain('applyOccluderFade(h.mats, h.alpha)');
+    // The stage sits BEFORE the settled early-out, so it cannot wait on the
+    // first hide: a wall whose camera starts inside is staged all the same.
+    expect(walls.indexOf('stageOccluderFadeOnce(h.mats)')).toBeLessThan(
+      walls.indexOf('occluderFadeSettled(h.alpha, hide, 0)'),
+    );
     // The one direct write left: the far-mode restore to the authored state,
     // which never flips to transparent and so never needs the gate.
     const props = read('src/render/props.ts');

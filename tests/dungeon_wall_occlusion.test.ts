@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { type PendingArenaWalls, pendingArenaWallsFor } from '../src/render/dungeon_arena_walls';
 import {
   collectWallPropBindings,
@@ -10,8 +10,17 @@ import {
   type WallHideable,
   type WallPropBinding,
 } from '../src/render/dungeon_wall_occlusion';
-import { occluderFadeMat } from '../src/render/occluder_fade';
+import { occluderFadeMat, occluderFadeReady } from '../src/render/occluder_fade';
 import { OCCLUDER_FADE_ALPHA } from '../src/render/occluder_fade_core';
+import {
+  installOccluderFadeGate,
+  occluderFadeTwinCount,
+  resetOccluderFadeGateForTest,
+} from '../src/render/occluder_fade_gate';
+import {
+  occluderGhostTargetOf,
+  occluderGhostVariantKey,
+} from '../src/render/occluder_ghost_variant_key';
 import { IGNIVAR_LAYOUT, SANCTUM_LAYOUT } from '../src/sim/dungeon_layout';
 
 const DT = 1 / 60;
@@ -105,6 +114,123 @@ describe('updateWallOcclusion, backface mode', () => {
     expect(h.mats[0].mat.opacity).toBeCloseTo(OCCLUDER_FADE_ALPHA, 6);
     // legacy mode never toggles visibility
     expect(h.group.visible).toBe(true);
+  });
+});
+
+describe('updateWallOcclusion, backface twin staging', () => {
+  const plane = { x: 0, z: -58, nx: 0, nz: -1 };
+  const flush = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 0));
+
+  interface Compile {
+    root: THREE.Object3D;
+    imminent: boolean;
+    resolve: () => void;
+  }
+
+  /** A reveal compile host whose links settle only when the test says so. */
+  function fakeHost() {
+    const compiles: Compile[] = [];
+    const host = {
+      compile: (root: object, imminent: boolean) =>
+        new Promise<void>((resolve) => {
+          compiles.push({ root: root as THREE.Object3D, imminent, resolve });
+        }),
+      schedule: () => () => undefined,
+    };
+    return { host, compiles };
+  }
+
+  /** A backface hideable shaped like emitArenaHideable's output: several
+   *  module-kind materials on instanced meshes, each its own fade record. */
+  function backfaceHideable(): WallHideable {
+    const stone = new THREE.MeshStandardMaterial({ name: 'stone' });
+    const banner = new THREE.MeshLambertMaterial({ name: 'banner' });
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    return {
+      group: new THREE.Group(),
+      mats: [
+        occluderFadeMat(stone, new THREE.InstancedMesh(geometry, stone, 2)),
+        occluderFadeMat(banner, new THREE.Mesh(geometry, banner)),
+      ],
+      hidden: false,
+      alpha: 1,
+      footprint: { x: 0, z: -58, hw: 5, hd: 1, topY: 16 },
+      backface: plane,
+    };
+  }
+
+  const keyOf = (mat: THREE.Material, mesh: THREE.Mesh): string =>
+    occluderGhostVariantKey(occluderGhostTargetOf(mat, mesh));
+
+  beforeEach(() => resetOccluderFadeGateForTest());
+  afterEach(() => resetOccluderFadeGateForTest());
+
+  it('stages a twin for EVERY backface record on the first advanced frame, camera still inside', () => {
+    const { host, compiles } = fakeHost();
+    installOccluderFadeGate(host);
+    const h = backfaceHideable();
+    // Camera and eye both inside the room: no hide, no re-show, and the
+    // staging must fire anyway (a within-reach or on-hide trigger would be
+    // too late for a wall the camera exits and re-enters in one orbit).
+    updateWallOcclusion([h], [], 0, 4, -40, 0, 2, -20, DT);
+    expect(h.hidden).toBe(false);
+    expect(compiles).toHaveLength(h.mats.length);
+    expect(occluderFadeTwinCount()).toBe(h.mats.length);
+    // Exact coverage, not a lookalike set: the staged twins key the very
+    // programs the flip will ask for, one per record in h.mats.
+    const staged = new Set(
+      compiles.map((c) =>
+        keyOf((c.root as THREE.Mesh).material as THREE.Material, c.root as THREE.Mesh),
+      ),
+    );
+    const flipped = new Set(
+      h.mats.map((f) =>
+        occluderGhostVariantKey({
+          material: f.mat,
+          geometry: f.geometry,
+          instanced: f.instanced,
+          instanceColor: f.instanceColor,
+        }),
+      ),
+    );
+    expect(staged).toEqual(flipped);
+    // Once: later frames add nothing.
+    updateWallOcclusion([h], [], 0, 4, -40, 0, 2, -20, DT);
+    expect(compiles).toHaveLength(h.mats.length);
+  });
+
+  it('by the first re-show frame every twin program is already warm: no consult remains', async () => {
+    const { host, compiles } = fakeHost();
+    installOccluderFadeGate(host);
+    const h = backfaceHideable();
+    // Frame 1, camera inside: the staging fires and the links land.
+    updateWallOcclusion([h], [], 0, 4, -40, 0, 2, -20, DT);
+    for (const c of compiles) c.resolve();
+    await flush();
+    // Camera pushed outside: the wall culls outright, drawing nothing.
+    updateWallOcclusion([h], [], 0, 4, -70, 0, 2, -40, DT);
+    expect(h.group.visible).toBe(false);
+    expect(compiles).toHaveLength(h.mats.length);
+    // The camera returns inside: the FIRST re-show frame flips transparent
+    // with the staged programs already linked, and asks the gate nothing new.
+    updateWallOcclusion([h], [], 0, 4, -40, 0, 2, -20, DT);
+    expect(h.group.visible).toBe(true);
+    expect(h.alpha).toBeGreaterThan(0);
+    for (const f of h.mats) expect(f.mat.transparent).toBe(true);
+    expect(compiles).toHaveLength(h.mats.length);
+    expect(occluderFadeReady(h.mats, 'prefetch')).toBe(true);
+  });
+
+  it('the sightline arm keeps its reach latch: a far no-backface wall stages nothing', () => {
+    const { host, compiles } = fakeHost();
+    installOccluderFadeGate(host);
+    const h = backfaceHideable();
+    h.backface = undefined;
+    // Anchor far beyond OCCLUDER_FADE_PREFETCH_YD of the camera.
+    h.footprint = { x: 500, z: 500, hw: 5, hd: 1, topY: 16 };
+    updateWallOcclusion([h], [], 0, 4, -40, 0, 2, -20, DT);
+    expect(compiles).toHaveLength(0);
+    expect(occluderFadeTwinCount()).toBe(0);
   });
 });
 

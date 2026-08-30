@@ -18,6 +18,7 @@ import {
   applyOccluderFade,
   type OccluderFadeMat,
   prefetchOccluderFadeWithin,
+  stageOccluderFadeOnce,
 } from './occluder_fade';
 import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
 import { cameraSeesWallBack, type WallCullPlane } from './wall_backface_cull_core';
@@ -103,6 +104,16 @@ export function updateWallOcclusion(
       h.alpha = advanceOccluderFade(h.mats, h.alpha, hide, dt, reducedMotion);
       continue;
     }
+    // Stage the transparent twins AHEAD of the first re-show. Interior-built
+    // hideables sit outside the boot ghost prewarm (occluder_ghost_prewarm.ts
+    // scans the boot scene only), and the floor step below writes the flip
+    // ungated, so the twin programs must already be linked by the time the
+    // camera returns inside the room: the first advanced frame asks the fade
+    // gate (occluder_fade_gate.ts) to link a twin for every record in h.mats
+    // through the reveal host, the same staged warm the sightline arm gets
+    // from its within-reach prefetch. Unconditional on purpose: the backface
+    // cull is distance-independent, so a reach latch would be the wrong gate.
+    stageOccluderFadeOnce(h.mats);
     const hide = cameraSeesWallBack(h.backface, camX, camZ);
     h.hidden = hide;
     if (occluderFadeSettled(h.alpha, hide, 0)) continue;
@@ -112,15 +123,14 @@ export function updateWallOcclusion(
     // depthWrite on (correct for the visible ghost), and an invisible
     // depth-writing wall would clip mis-sorted transparent content behind
     // it (the arena's lava moat). Program cost: the opaque program linked
-    // at interior attach; the TRANSPARENT twin links once per wall
-    // material on its first re-show (interior-built hideables sit outside
-    // the boot ghost prewarm, see occluder_ghost_prewarm.ts), the same
-    // one-time first-fade link every hideable wall already paid, moved
-    // from the hide frame to the re-show frame. That accepted one-time link
-    // is why this arm keeps the ungated floor step instead of the gated
-    // advance: the hide frame never draws the transparent twin (the group
-    // hides outright), and holding the ease-back while the group is already
-    // visible again would pop the wall back at full opacity.
+    // at interior attach; the TRANSPARENT twin programs are pre-staged by
+    // the stageOccluderFadeOnce above, so the first re-show finds them
+    // already linked instead of paying a synchronous link inside that
+    // frame. The ungated floor step itself stays deliberate: the hide
+    // frame never draws the transparent twin (the group hides outright),
+    // and holding the ease-back while the group is already visible again
+    // would pop the wall back at full opacity, so a gate HOLD has nothing
+    // here to protect. The staging is what removes the link, not a gate.
     const show = h.alpha > 0;
     if (h.group.visible !== show) h.group.visible = show;
   }
