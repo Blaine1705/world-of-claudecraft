@@ -4434,6 +4434,7 @@ const ALL_DELTA_KEYS = [
   'app',
   'arena',
   'atitle',
+  'auras',
   'bags',
   'bank',
   'bg',
@@ -4455,6 +4456,7 @@ const ALL_DELTA_KEYS = [
   'dcomp',
   'dcompanion',
   'ddiff',
+  'de',
   'deeds',
   'delveDaily',
   'denc',
@@ -4516,13 +4518,31 @@ const ALL_DELTA_KEYS = [
   'xp',
 ] as const;
 
+/** The registered delta keys whose DELTA behavior is gated on a wire
+ *  capability the session advertises in its auth frame; both are DIRECT
+ *  maybeSerialized emits in server/game.ts bcastSelf, which is why the emitter
+ *  scrape below needs its Serialized arm to see them at all.
+ *  - `de` (dungeonEntryFacingWireVersion): the dungeon entry facing fence's
+ *    token. Capability-ONLY: a legacy session never receives the key, so it
+ *    stays out of DENSE_DELTA_KEYS. Lifecycle pins:
+ *    tests/server/dungeon_entry_facing.test.ts.
+ *  - `auras` (timerWireVersion, the stable timer wire): delta-ELIDED only for
+ *    a stable-wire session; a legacy session still receives auras on EVERY
+ *    snapshot as part of the always-present base self record (wireEntity's
+ *    includeAuras arm), so the key IS dense but never elides for legacy.
+ *    Lifecycle pins: the negotiated stable timer wire suite below. */
+const CAPABILITY_DELTA_KEYS = ['auras', 'de'] as const;
+
 /** The delta keys a FRESH session is guaranteed to receive on its first
- *  snapshot. Every registered key but one: `app` is the authored modular look,
+ *  snapshot. Every registered key but two: `app` is the authored modular look,
  *  and a character created before the creator (or by a client that posts no
  *  appearance) has none, so it stays sparse on the wire the way `eq`/`eqi` do
- *  on the entity record. Its own round trip is pinned in
- *  tests/appearance_broadcast.test.ts, including that it ships exactly once. */
-const DENSE_DELTA_KEYS = ALL_DELTA_KEYS.filter((key) => key !== 'app');
+ *  on the entity record (its own round trip is pinned in
+ *  tests/appearance_broadcast.test.ts, including that it ships exactly once);
+ *  `de` is capability-only (CAPABILITY_DELTA_KEYS above). `auras` stays dense:
+ *  a legacy session gets it on the base self record and a stable-wire session
+ *  gets the first-send delta. */
+const DENSE_DELTA_KEYS = ALL_DELTA_KEYS.filter((key) => key !== 'app' && key !== 'de');
 
 // The terse wire key -> IWorld member name rename map, in sorted order. The wire
 // string IS the protocol (contract #4): a terse key renamed on one side passes tsc
@@ -5027,6 +5047,16 @@ describe('full self-state snapshot delta fixture', () => {
     const snap = lastSnap(fc.sent);
     expect(snap).not.toBeNull();
     for (const key of ALL_DELTA_KEYS) {
+      // `de` is capability-only and this fixture joins WITHOUT the
+      // entry-facing capability on purpose (its mirror assertions pin the
+      // legacy wire shapes), so its absence here IS the legacy-exclusion
+      // contract; the capable first-send/elision lifecycle is pinned in
+      // tests/server/dungeon_entry_facing.test.ts (see CAPABILITY_DELTA_KEYS).
+      // `auras` needs no carve-out: the legacy base self record carries it.
+      if (key === 'de') {
+        expect(snap.self, 'self.de sent to a legacy session').not.toHaveProperty(key);
+        continue;
+      }
       expect(snap.self, `self.${key} missing from first snapshot`).toHaveProperty(key);
       // each was dirtied to a non-default value, so none rides the wire as null
       // EXCEPT cvault: this harness player carries a live delve run (the drun
@@ -5390,6 +5420,13 @@ describe('full self-state snapshot delta fixture', () => {
     broadcast(server);
     const snap2 = lastSnap(fc.sent);
     for (const key of ALL_DELTA_KEYS) {
+      // `auras` only elides under the stable timer wire (pinned in the
+      // negotiated stable timer wire suite); this legacy fixture receives it
+      // on the always-present base self record, re-broadcast or not.
+      if (key === 'auras') {
+        expect(snap2.self, 'legacy self.auras left the base record').toHaveProperty(key);
+        continue;
+      }
       expect(snap2.self, `self.${key} resent although unchanged`).not.toHaveProperty(key);
     }
 
@@ -5469,7 +5506,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 87 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 89 unique keys in sorted order', () => {
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
     // sheet's lifetime played-time key ptime, for 67, then +16: the static
@@ -5487,9 +5524,13 @@ describe('delta-key contract pins (anti-drift)', () => {
     // retirement then removes sport/vcup/vcupb, for 83, and the healPower
     // seam adds the derived Healing Power scalar hpw for 84. Bank Storage
     // Phase 2 then adds the purchased-slots key bpsl, the Materials Vault
-    // blob vault, and the craft-vault stock cvault, for 87.
-    expect(ALL_DELTA_KEYS).toHaveLength(87);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(87);
+    // blob vault, and the craft-vault stock cvault, for 87. Widening the
+    // scrape to the direct maybeSerialized form then registers the two
+    // capability-gated keys it had been blind to, the stable timer wire's
+    // self auras channel and the dungeon entry facing token de
+    // (CAPABILITY_DELTA_KEYS above), for 89.
+    expect(ALL_DELTA_KEYS).toHaveLength(89);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(89);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -5511,8 +5552,12 @@ describe('delta-key contract pins (anti-drift)', () => {
     const src = raw.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
     // tolerate whitespace/newline between `(` and the quote so the multi-line
     // maybe('lockouts', ...) call (game.ts ~2166-2169) is captured, not undercounted;
-    // the optional `(?:Raw)?` also captures the maybeRaw realm-wide calls
-    // ('vcupb' and the multi-line 'dfb')
+    // the optional `(?:Raw|Serialized)?` also captures the maybeRaw realm-wide
+    // calls ('vcupb' and the multi-line 'dfb') AND the direct
+    // maybeSerialized(...) emits: `maybe` and `maybeRaw` are both thin wrappers
+    // over maybeSerialized, so a key emitted ONLY through the direct form (the
+    // capability-gated 'de' and 'auras') is exactly as real on the wire, and
+    // before this arm the "exact" registry was structurally blind to it.
     // `emit(...)` is the same call under the name the extracted emitter gives
     // the delta-eliding closure its caller hands it; without this arm the two
     // relocated bank keys stay invisible even with the file in the list.
@@ -5521,13 +5566,19 @@ describe('delta-key contract pins (anti-drift)', () => {
     // whose key is not a delta key at all, and the obvious repair for the red
     // that would cause is to add it to ALL_DELTA_KEYS, permanently weakening the
     // registry this pin exists to police.
-    const DELTA_CALL = /(?<![.\w$])(?:maybe(?:Raw)?|emit)\(\s*['"](\w+)['"]/g;
+    const DELTA_CALL = /(?<![.\w$])(?:maybe(?:Raw|Serialized)?|emit)\(\s*['"](\w+)['"]/g;
     const re = new RegExp(DELTA_CALL.source, 'g');
     const scraped = new Set<string>();
     for (let m = re.exec(src); m !== null; m = re.exec(src)) scraped.add(m[1]);
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
     expect(scraped.has('app')).toBe(true); // the maybeRaw calls ARE captured by the widened regex
     expect(scraped.has('dfb')).toBe(true); // incl. the multi-line maybeRaw('dfb', ...) form
+    // The two direct-maybeSerialized-only keys, BY NAME: each is emitted through
+    // no other form (de behind the dungeon entry facing capability, auras behind
+    // the stable timer wire), so only the Serialized arm of the scrape sees them
+    // and dropping that arm must redden here, not silently shrink the registry.
+    expect(scraped.has('de')).toBe(true);
+    expect(scraped.has('auras')).toBe(true);
     expect(scraped.has('reliq')).toBe(true); // Reliquary Phase 3 sparse self blob
     // Both relocated bank keys, BY NAME: the extraction that moved them out of
     // game.ts left this scrape one short and only the count said so.
@@ -5542,11 +5593,16 @@ describe('delta-key contract pins (anti-drift)', () => {
     // literal here would keep passing while the real one was widened back.
     const memberEmit = new Set<string>();
     const narrowed = new RegExp(DELTA_CALL.source, 'g');
-    const sample = "this.emit('spikeReport', x); bus.emit('tick', y); emit('bpsl', z);";
+    // The bare maybeSerialized call rides along in the same sample: the direct
+    // form IS captured while a member spelling of it stays out, through the one
+    // shared lookbehind.
+    const sample =
+      "this.emit('spikeReport', x); bus.emit('tick', y); emit('bpsl', z); " +
+      "maybeSerialized('de', s); cache.maybeSerialized('memberKey', s);";
     for (let m = narrowed.exec(sample); m !== null; m = narrowed.exec(sample)) {
       memberEmit.add(m[1]);
     }
-    expect([...memberEmit]).toEqual(['bpsl']);
+    expect([...memberEmit]).toEqual(['bpsl', 'de']);
     // The base-merge union: v0.31's 56 (incl. the market-collect key mktU) plus
     // the Rift + mounts and worn-instance keys (einst, mntRtd and the rift
     // snapshot fragments) for 61, then v0.32's master-loot key mloot for 62,
@@ -5560,8 +5616,10 @@ describe('delta-key contract pins (anti-drift)', () => {
     // border echo aborder for 85, and the authored modular look `app` for 86.
     // The Vale Cup retirement then removes sport/vcup/vcupb, for 83, and the
     // healPower seam adds the derived Healing Power scalar hpw for 84. Bank
-    // Storage Phase 2 then adds bpsl, vault, and cvault, for 87.
-    expect(scraped.size).toBe(87);
+    // Storage Phase 2 then adds bpsl, vault, and cvault, for 87. The
+    // maybeSerialized arm of the scrape then surfaces the two capability-gated
+    // direct emits, auras and de, for 89.
+    expect(scraped.size).toBe(89);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

@@ -42,7 +42,7 @@ import {
 import { type ClientSession, GameServer } from '../../server/game';
 import { DUNGEONS, instanceOrigin } from '../../src/sim/data';
 import { DUNGEON_ENTRY_FACING_WIRE_VERSION } from '../../src/world_api';
-import { broadcast, fakeWs, joinServer, lastSnap } from '../helpers/bare_client';
+import { bareClient, broadcast, fakeWs, joinServer, lastSnap } from '../helpers/bare_client';
 
 describe('server dungeon entry facing fence', () => {
   it('requires the exact entry token and accepts it after the client starts turning', () => {
@@ -300,6 +300,49 @@ describe('server dungeon entry facing fence', () => {
     );
     expect(session.dungeonEntryFacing.requiredEntrySeq).toBe(2);
     expect(meta.moveInput.turnRight).toBe(false);
+  });
+
+  it('runs the de delta lifecycle: first send, change resend, elision, and mirror preservation', () => {
+    // The capability-gated `de` token registered in tests/snapshots.test.ts's
+    // delta-key registry (CAPABILITY_DELTA_KEYS): a DIRECT maybeSerialized emit,
+    // so this pins the delta contract the shared maybe() suite cannot reach
+    // (its fixture is a legacy session by design). Legacy exclusion is pinned
+    // by the legacy/downgrade tests above.
+    const server = new GameServer();
+    const client = fakeWs();
+    const session = joinServer(server, client, 454, 'Delta Facing', 'warrior', {
+      dungeonEntryFacingWireVersion: DUNGEON_ENTRY_FACING_WIRE_VERSION,
+    });
+    const entity = server.sim.entities.get(session.pid);
+    if (!entity) throw new Error('joined player missing');
+
+    // First send: a fresh session's lastSent has no key, so a capable session
+    // receives the token even at its default generation 0.
+    broadcast(server);
+    const first = lastSnap(client.sent);
+    expect(first.self.de).toBe(0);
+    const mirror = bareClient(session.pid);
+    (mirror as any).applySnapshot(first);
+    expect((mirror as any).dungeonEntrySeq).toBe(0);
+
+    // A generation bump re-sends the token with the new value.
+    entity.dungeonEntrySeq = 3;
+    client.sent.length = 0;
+    broadcast(server);
+    const bumped = lastSnap(client.sent);
+    expect(bumped.self.de).toBe(3);
+    (mirror as any).applySnapshot(bumped);
+    expect((mirror as any).dungeonEntrySeq).toBe(3);
+
+    // An unchanged re-broadcast elides the key entirely, and applying the
+    // elided snapshot preserves the PRIOR generation on the client mirror
+    // rather than resetting it (absence means unchanged, never cleared).
+    client.sent.length = 0;
+    broadcast(server);
+    const elided = lastSnap(client.sent);
+    expect(elided.self).not.toHaveProperty('de');
+    (mirror as any).applySnapshot(elided);
+    expect((mirror as any).dungeonEntrySeq).toBe(3);
   });
 
   it('keeps the dungeon entry token owned by the spectator session', () => {
