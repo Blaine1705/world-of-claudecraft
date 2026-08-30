@@ -345,7 +345,10 @@ const MONOLITHS: MonolithRow[] = [
     // walks moved to src/render/set_proc_fx.ts (the Crucible engine-proc arm
     // landed there, not here); the ratchet follows the file down. Exact
     // count, zero slack.
-    ceiling: 13243,
+    // Re-pinned at the PR 3685 base sync (release v0.41.0 through the raid
+    // branch): both arms edited the renderer and the union lands at the count
+    // below. Measured on the merged tree. Exact merged count, zero headroom.
+    ceiling: 13249,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -623,7 +626,10 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the ignivar-raid-complete base
     // merge: the base's raid consolidation extracted decoders while this
     // branch added its mirrors; the merge lands both arms. Exact count.
-    ceiling: 5781,
+    // Re-pinned again at the PR 3685 base sync: the release arm's Bank
+    // Storage wiring and this branch's mirrors both grew the file; the
+    // union lands at the count below. Exact merged count, zero headroom.
+    ceiling: 5856,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
