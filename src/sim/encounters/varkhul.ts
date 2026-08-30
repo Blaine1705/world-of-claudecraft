@@ -184,6 +184,7 @@ import {
   varkhulWorldfireDamageMaxHp,
   varkhulWorldfireStage,
 } from '../varkhul_worldfire';
+import { resolveEncounterWipe } from './encounter_wipe';
 import { walkEncounterActorTo } from './scripted_walk';
 import { VARKHUL_DIALOGUE } from './varkhul_dialogue';
 
@@ -302,6 +303,9 @@ const VARKHUL_CINDER_ORBS_EVERY = 34;
 const VARKHUL_FRONTAL_EVERY = 26;
 const VARKHUL_FORGESTORM_EVERY = 38;
 const VARKHUL_ANVIL_EVERY = 42;
+// Sizes the Master's Assembly absorb shield (effectively infinite). Deliberately
+// independent of encounter_wipe.ts's ENCOUNTER_WIPE_DAMAGE_MULTIPLIER: the wipe
+// damage itself now rides the shared helper.
 const VARKHUL_WIPE_DAMAGE_MULTIPLIER = 100;
 const VARKHUL_ASSEMBLY_WARDEN_FIRST_CAST_SECONDS = 1.5;
 
@@ -594,30 +598,19 @@ function wipeEncounter(
   players: readonly Entity[],
   ability: string,
 ): void {
-  for (const player of players) {
-    if (player.dead) continue;
-    ctx.emit({
-      type: 'spellfx',
-      sourceId: boss.id,
-      targetId: player.id,
-      school: 'fire',
-      fx: 'nova',
-    });
-    ctx.dealDamage(
-      boss,
-      player,
-      player.maxHp * VARKHUL_WIPE_DAMAGE_MULTIPLIER,
-      false,
-      'fire',
-      ability,
-      'hit',
-      true,
-      undefined,
-      false,
-      false,
-      true,
-    );
-  }
+  // The terminal wipe shares Ignivar's forced-death resolution
+  // (encounter_wipe.ts): stasis or a cheat-death ward must not outlive a
+  // completed Masterpiece cast, while dev/GM invulnerability is preserved.
+  // The eager alive-only filter CONVERGES on Ignivar's call-site semantics:
+  // a player already dead at resolution start gets no nova, while one who
+  // dies mid-loop still takes the shared-loop treatment (both pinned by
+  // tests/encounter_wipe.test.ts and tests/varkhul_encounter.test.ts).
+  resolveEncounterWipe(
+    ctx,
+    boss,
+    players.filter((player) => !player.dead),
+    ability,
+  );
 }
 
 function castMakersBrand(ctx: SimContext, boss: Entity, target: Entity): boolean {
@@ -2773,9 +2766,19 @@ export function updateVarkhulEncounter(ctx: SimContext, boss: Entity, pursueTarg
   if (boss.templateId !== VARKHUL_BOSS_TEMPLATE_ID || boss.dead) return;
   let players = playersInEncounter(ctx, boss);
   if (players.length === 0) {
-    if (!boss.inCombat && boss.varkhul?.engage.phase === 'forging') {
-      // Nobody has entered yet and he never engaged: he is simply at his
-      // anvil. Nothing to evade or reset, and no audience for hammer events.
+    if (
+      !boss.inCombat &&
+      (!boss.varkhul || boss.varkhul.engage.phase === 'forging') &&
+      boss.hp >= boss.maxHp &&
+      boss.auras.length === 0
+    ) {
+      // Nobody is here and he never engaged (fresh spawn, or the one wipe
+      // reset below already ran): he is simply at his anvil. Nothing to evade
+      // or reset, no audience for hammer events, and NO rng: locomotion
+      // dispatches him every tick even out of combat, so this gate is what
+      // keeps an empty room from consuming the shared stream. The pristine
+      // check (full hp, no auras) lets a damaged or debuffed boss fall
+      // through to the one healing reset below before the gate latches.
       return;
     }
     boss.aiState = 'evade';
@@ -2787,6 +2790,12 @@ export function updateVarkhulEncounter(ctx: SimContext, boss: Entity, pursueTarg
     }
     resetVarkhulEncounter(ctx, boss);
     ctx.resetEvadingMob(boss);
+    // One home reset: back to the anvil work spot (his spawn) in the inert
+    // pre-pull pose. The encounter dispatch above means locomotion's idle-arm
+    // spawn restore never runs for him, so without this he would stand
+    // wherever the wipe left him. Later empty ticks take the early return.
+    boss.pos = { ...boss.spawnPos };
+    boss.prevPos = { ...boss.pos };
     return;
   }
   const st = initVarkhulEncounter(boss);

@@ -1589,3 +1589,233 @@ describe('Varkhul encounter behavior', () => {
     ]);
   });
 });
+
+describe('Varkhul empty-raid reset and terminal wipe', () => {
+  it('performs exactly one home reset for an all-dead raid and stops consuming rng', () => {
+    const { sim, boss } = claimedEncounter(52);
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(boss.varkhul).toBeDefined();
+    // Drag him off the work spot the way a fight does before everyone drops.
+    boss.pos = { x: boss.spawnPos.x + 8, y: boss.spawnPos.y, z: boss.spawnPos.z + 8 };
+    boss.prevPos = { ...boss.pos };
+    sim.player.dead = true;
+    sim.player.hp = 0;
+    const epochBefore = boss.evadeEpoch;
+    let draws = 0;
+    sim.rng.setObserver(() => {
+      draws += 1;
+    });
+    updateVarkhulEncounter(sim.ctx, boss);
+    const drawsAfterReset = draws;
+    expect(drawsAfterReset).toBeGreaterThan(0);
+    expect(boss.evadeEpoch).toBe(epochBefore + 1);
+    for (let i = 0; i < 3; i++) updateVarkhulEncounter(sim.ctx, boss);
+    sim.rng.setObserver(null);
+
+    expect(draws).toBe(drawsAfterReset);
+    expect(boss.evadeEpoch).toBe(epochBefore + 1);
+    expect(boss.varkhul).toBeUndefined();
+    expect(boss.inCombat).toBe(false);
+    expect(boss.aiState).toBe('idle');
+    expect(boss.pos).toEqual(boss.spawnPos);
+    expect(boss.prevPos).toEqual(boss.spawnPos);
+  });
+
+  it('holds the one-reset state through full ticks of an all-dead raid', () => {
+    const { sim, boss } = claimedEncounter(53);
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(boss.varkhul).toBeDefined();
+    sim.player.dead = true;
+    sim.player.hp = 0;
+    sim.tick();
+    const epochAfterWipe = boss.evadeEpoch;
+
+    for (let i = 0; i < 40; i++) sim.tick();
+
+    expect(boss.evadeEpoch).toBe(epochAfterWipe);
+    expect(boss.varkhul).toBeUndefined();
+    expect(boss.inCombat).toBe(false);
+    expect(boss.pos).toEqual(boss.spawnPos);
+  });
+
+  it('never consumes rng for a spawned boss whose room is empty and unpulled', () => {
+    const { sim, boss } = claimedEncounter(54);
+    // claimedEncounter force-flags a pull; restore the fresh-spawn pose and
+    // walk the only player out before the encounter state ever initializes.
+    boss.inCombat = false;
+    boss.aiState = 'idle';
+    boss.aggroTargetId = null;
+    sim.player.pos = sim.ctx.groundPos(0, 0);
+    sim.player.prevPos = { ...sim.player.pos };
+    const epochBefore = boss.evadeEpoch;
+    let draws = 0;
+    sim.rng.setObserver(() => {
+      draws += 1;
+    });
+    for (let i = 0; i < 3; i++) updateVarkhulEncounter(sim.ctx, boss);
+    sim.rng.setObserver(null);
+
+    expect(draws).toBe(0);
+    expect(boss.evadeEpoch).toBe(epochBefore);
+    expect(boss.varkhul).toBeUndefined();
+    expect(boss.hp).toBe(boss.maxHp);
+  });
+
+  it('heals a damaged stateless boss with one reset before the empty-room gate latches', () => {
+    const { sim, boss } = claimedEncounter(57);
+    // Stateless (boss.varkhul never initialized), out of combat, empty room,
+    // but NOT pristine: the gate must let one reset through to heal him.
+    boss.inCombat = false;
+    boss.aiState = 'idle';
+    boss.aggroTargetId = null;
+    sim.player.pos = sim.ctx.groundPos(0, 0);
+    sim.player.prevPos = { ...sim.player.pos };
+    boss.hp = boss.maxHp - 500;
+    boss.auras.push({
+      id: 'test_burn',
+      name: 'Test Burn',
+      kind: 'dot',
+      remaining: 30,
+      duration: 30,
+      value: 1,
+      sourceId: sim.player.id,
+      school: 'fire',
+    });
+    const epochBefore = boss.evadeEpoch;
+    let draws = 0;
+    sim.rng.setObserver(() => {
+      draws += 1;
+    });
+    updateVarkhulEncounter(sim.ctx, boss);
+    const drawsAfterReset = draws;
+    expect(drawsAfterReset).toBeGreaterThan(0);
+    for (let i = 0; i < 3; i++) updateVarkhulEncounter(sim.ctx, boss);
+    sim.rng.setObserver(null);
+
+    expect(draws).toBe(drawsAfterReset);
+    expect(boss.evadeEpoch).toBe(epochBefore + 1);
+    expect(boss.hp).toBe(boss.maxHp);
+    expect(boss.auras).toEqual([]);
+    expect(boss.pos).toEqual(boss.spawnPos);
+  });
+
+  it('parks in evade without resetting or drawing rng while a combat-exit hold is live', () => {
+    const { sim, boss } = claimedEncounter(58);
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(boss.varkhul).toBeDefined();
+    boss.pos = { x: boss.spawnPos.x + 8, y: boss.spawnPos.y, z: boss.spawnPos.z + 8 };
+    boss.prevPos = { ...boss.pos };
+    const parkedPos = { ...boss.pos };
+    sim.player.dead = true;
+    sim.player.hp = 0;
+    boss.combatExitHoldUntil = sim.ctx.time + 5;
+    const epochBefore = boss.evadeEpoch;
+    let draws = 0;
+    sim.rng.setObserver(() => {
+      draws += 1;
+    });
+    for (let i = 0; i < 3; i++) updateVarkhulEncounter(sim.ctx, boss);
+    expect(draws).toBe(0);
+    expect(boss.evadeEpoch).toBe(epochBefore);
+    expect(boss.varkhul).toBeDefined();
+    expect(boss.aiState).toBe('evade');
+    expect(boss.pos).toEqual(parkedPos);
+
+    boss.combatExitHoldUntil = 0;
+    updateVarkhulEncounter(sim.ctx, boss);
+    const drawsAfterReset = draws;
+    expect(drawsAfterReset).toBeGreaterThan(0);
+    for (let i = 0; i < 3; i++) updateVarkhulEncounter(sim.ctx, boss);
+    sim.rng.setObserver(null);
+
+    expect(draws).toBe(drawsAfterReset);
+    expect(boss.evadeEpoch).toBe(epochBefore + 1);
+    expect(boss.varkhul).toBeUndefined();
+    expect(boss.pos).toEqual(boss.spawnPos);
+  });
+
+  it('filters a player already dead at Masterpiece resolution start out of the wipe', () => {
+    const { sim, boss } = claimedEncounter(59);
+    const fallen = addEncounterPlayer(sim, boss, 'Fallen Raider');
+    updateVarkhulEncounter(sim.ctx, boss);
+    const state = isolateMechanics(boss);
+    state.assemblyTriggered = true;
+    boss.hp = Math.floor(boss.maxHp * 0.2);
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(state.masterpieceTriggered).toBe(true);
+    fallen.dead = true;
+    fallen.hp = 0;
+    state.masterpieceRemaining = DT;
+    sim.player.hp = sim.player.maxHp;
+
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    expect(state.masterpieceWipeResolved).toBe(true);
+    expect(sim.player.dead).toBe(true);
+    // The eager alive-only filter (Ignivar's call-site semantics): no second
+    // nova for someone already down when the wipe resolves.
+    expect(
+      sim.events.some(
+        (event) => event.type === 'spellfx' && event.fx === 'nova' && event.targetId === fallen.id,
+      ),
+    ).toBe(false);
+    expect(
+      sim.events.some(
+        (event) =>
+          event.type === 'spellfx' && event.fx === 'nova' && event.targetId === sim.player.id,
+      ),
+    ).toBe(true);
+  });
+
+  it('kills a full-health Cold Coffin stasis player when Masterpiece Unbound expires', () => {
+    const { sim, boss } = claimedEncounter(55);
+    updateVarkhulEncounter(sim.ctx, boss);
+    const state = isolateMechanics(boss);
+    state.assemblyTriggered = true;
+    boss.hp = Math.floor(boss.maxHp * 0.2);
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(state.masterpieceTriggered).toBe(true);
+    state.masterpieceRemaining = DT;
+    sim.player.hp = sim.player.maxHp;
+    sim.player.auras.push({
+      id: 'ice_block',
+      name: 'Cold Coffin',
+      kind: 'stasis',
+      remaining: 8,
+      duration: 8,
+      value: 0,
+      sourceId: sim.player.id,
+      school: 'frost',
+    });
+
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    expect(state.masterpieceWipeResolved).toBe(true);
+    expect(sim.player.dead).toBe(true);
+    expect(sim.player.hp).toBe(0);
+  });
+
+  it('preserves dev and GM invulnerability through the Masterpiece Unbound wipe', () => {
+    const { sim, boss } = claimedEncounter(56);
+    const god = addEncounterPlayer(sim, boss, 'Wipe God');
+    god.devGod = true;
+    sim.player.gm = true;
+    updateVarkhulEncounter(sim.ctx, boss);
+    const state = isolateMechanics(boss);
+    state.assemblyTriggered = true;
+    boss.hp = Math.floor(boss.maxHp * 0.2);
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(state.masterpieceTriggered).toBe(true);
+    state.masterpieceRemaining = DT;
+    sim.player.hp = sim.player.maxHp;
+    god.hp = god.maxHp;
+
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    expect(state.masterpieceWipeResolved).toBe(true);
+    expect(sim.player.dead).toBe(false);
+    expect(sim.player.hp).toBe(sim.player.maxHp);
+    expect(god.dead).toBe(false);
+    expect(god.hp).toBe(god.maxHp);
+  });
+});

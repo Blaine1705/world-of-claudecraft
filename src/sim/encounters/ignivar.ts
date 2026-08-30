@@ -78,6 +78,7 @@ import {
   steadyAngleTo,
 } from '../types';
 import { VARKHUL_FORGE_PORTAL_ABILITY_ID } from '../varkhul_forge_intermission';
+import { resolveEncounterWipe } from './encounter_wipe';
 import {
   IGNIVAR_DIALOGUE,
   IGNIVAR_DIALOGUE_GAP_SECONDS,
@@ -385,48 +386,6 @@ function finishApocalypseAdd(add: Entity): void {
   add.castTargetId = null;
   add.castAim = null;
   add.channeling = false;
-}
-
-function resolveEncounterWipe(
-  ctx: SimContext,
-  boss: Entity,
-  players: readonly Entity[],
-  ability: string,
-  source: Entity = boss,
-): void {
-  for (const player of players) {
-    ctx.emit({
-      type: 'spellfx',
-      sourceId: source.id,
-      targetId: player.id,
-      school: 'fire',
-      fx: 'nova',
-    });
-    ctx.dealDamage(
-      source,
-      player,
-      player.maxHp * 100,
-      false,
-      'fire',
-      ability,
-      'hit',
-      true,
-      undefined,
-      false,
-      false,
-      true,
-    );
-    // Apocalypse is an encounter failure, not a survivable damage check.
-    // Preserve explicit dev/GM invulnerability, but do not let ordinary
-    // immunity or cheat-death effects turn a completed cast into success.
-    if (
-      !player.dead &&
-      !player.gm &&
-      !(ctx.devCommands && (player.devGod || player.profilerInvulnerable))
-    ) {
-      ctx.handleDeath(player, source);
-    }
-  }
 }
 
 function resolveApocalypseWipe(

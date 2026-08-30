@@ -1852,8 +1852,13 @@ describe('Varkhul forge pillars and add intermission', () => {
     ).toBe(true);
   });
 
-  it('keeps full-room Heroic Worldfire burning after an immune raid survives the deadline', () => {
+  it('keeps full-room Heroic Worldfire burning after a dev-invulnerable raid survives the deadline', () => {
     const { sim, boss } = claimedEncounter(755, true);
+    // The terminal wipe now force-kills through ordinary immunity
+    // (encounter_wipe.ts), so the only sanctioned deadline survivor is a
+    // dev/GM invulnerable player; the persistent Worldfire serves exactly
+    // that survivor.
+    sim.player.devGod = true;
     updateVarkhulEncounter(sim.ctx, boss);
     const state = boss.varkhul;
     if (!state) throw new Error('Varkhul state missing');
