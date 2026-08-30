@@ -2319,9 +2319,13 @@ export class ClientWorld implements IWorld {
   }
 
   private sendInput(now = performance.now(), mode: InputSendMode = 'periodic'): boolean {
+    // The forced-facing arm reaches here from applyWire, which snapshot-driven
+    // harnesses (and the reconnect teardown window) run with no socket at all,
+    // so the socket existence check must come before its readyState.
     if (
       typeof this.spectating === 'string' ||
       !this.connected ||
+      !this.ws ||
       this.ws.readyState !== WebSocket.OPEN
     ) {
       return false;
