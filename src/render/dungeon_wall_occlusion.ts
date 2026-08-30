@@ -43,6 +43,14 @@ export interface WallPropBinding {
   /** interior root that owns this binding (retirement key) */
   owner: THREE.Object3D;
   alpha: number;
+  /** The face's own hideable wall segments, linked lazily on the binding's
+   *  first advanced frame (same owner root, shared face plane): the prop
+   *  re-show keys off the WALL's recovered alpha, so a wall held hidden for
+   *  shader readiness keeps its mounted props held with it. Empty when no
+   *  wall matched, which keeps the historical proxy clock. The references
+   *  cannot outlive their records one-sided: retireWallOcclusion drops an
+   *  interior's walls and bindings on the same doomed set. */
+  walls?: readonly WallHideable[];
 }
 
 /** Name prefix the dressing builders give wall-face prop subgroups; the
@@ -54,7 +62,10 @@ export const WALL_PROP_GROUP_PREFIX = 'ignivarWallProps:';
  * Alpha the wall must recover to before its mounted props re-show. Hiding is
  * instant (the props vanish behind a wall that is still opaque on the frame
  * the cull begins); re-showing waits until the easing wall mostly covers
- * them again, so the pop is never visible through a transparent wall.
+ * them again, so the pop is never visible through a transparent wall. The
+ * wall's OWN alpha is what is consulted (wallPropCoverAlpha, via the lazy
+ * owner-plus-plane association), so a wall held hidden for shader readiness
+ * holds its mounted props hidden with it.
  */
 export const WALL_PROP_SHOW_ALPHA = 0.6;
 
@@ -79,6 +90,44 @@ export function collectWallPropBindings(
     });
   }
   return bindings;
+}
+
+/** How far off a binding's face line (world units, along the face normal) a
+ *  wall segment's plane point may sit and still belong to that face. Both
+ *  planes derive from the same polygon edge (the binding at the edge
+ *  midpoint, the segments at their span midpoints), so the true distance is
+ *  floating error; whole units separate distinct faces. */
+const WALL_PROP_FACE_PLANE_EPS = 0.01;
+/** Minimum normal agreement (cosine) between a binding's face plane and a
+ *  segment's cull plane: both are unit outward normals of the same edge, so
+ *  anything below near-1 is a different face. */
+const WALL_PROP_FACE_NORMAL_MIN = 0.999;
+
+/** Whether a hideable wall segment lies on a binding's face plane: same
+ *  outward normal and its plane point on the face line. */
+function wallSegmentOnFace(h: WallHideable, plane: WallCullPlane): boolean {
+  const back = h.backface;
+  if (!back) return false;
+  if (back.nx * plane.nx + back.nz * plane.nz < WALL_PROP_FACE_NORMAL_MIN) return false;
+  const d = (back.x - plane.x) * plane.nx + (back.z - plane.z) * plane.nz;
+  return Math.abs(d) <= WALL_PROP_FACE_PLANE_EPS;
+}
+
+/**
+ * Associate a wall-face prop binding with the hideable wall segments of its
+ * face, by the two keys both sides already carry: the OWNER interior root
+ * (the binding's retirement key; a hideable's wall group is a direct child
+ * of the same root), and the face plane both derive from the same layout
+ * polygon (an edge's binding plane and its segments' cull planes share the
+ * outward normal and the face line). The owner scope means a colinear face
+ * of another interior can never match. Linked lazily on the binding's first
+ * advanced frame, which is safe because an interior registers its bindings
+ * and hideables in one synchronous block, before any frame can run. A
+ * binding nothing matches keeps an empty list and falls back to its own
+ * proxy clock.
+ */
+function linkWallPropBinding(b: WallPropBinding, hideables: readonly WallHideable[]): void {
+  b.walls = hideables.filter((h) => h.group.parent === b.owner && wallSegmentOnFace(h, b.plane));
 }
 
 /** Advance every hideable wall and wall-prop binding one frame. */
@@ -149,13 +198,35 @@ export function updateWallOcclusion(
     if (h.group.visible !== show) h.group.visible = show;
   }
   for (const b of propBindings) {
+    if (b.walls === undefined) linkWallPropBinding(b, hideables);
     const hide = cameraSeesWallBack(b.plane, camX, camZ);
     if (!occluderFadeSettled(b.alpha, hide, 0)) {
       b.alpha = stepOccluderFade(b.alpha, hide, dt, reducedMotion, 0);
     }
-    const visible = !hide && b.alpha >= WALL_PROP_SHOW_ALPHA;
+    // A prop re-shows only once its WALL mostly covers it again, and the
+    // wall's OWN alpha is the authority (wallPropCoverAlpha): the binding's
+    // proxy clock keeps ticking while its wall is held at alpha 0 for
+    // shader readiness above, and a beam or torch floating in the open over
+    // an invisible wall is exactly what the show threshold exists to
+    // prevent. Bindings whose walls are not held see identical timing (the
+    // wall's alpha and the proxy tick in lockstep); an unmatched binding
+    // keeps the proxy clock outright.
+    const visible = !hide && wallPropCoverAlpha(b) >= WALL_PROP_SHOW_ALPHA;
     if (b.node.visible !== visible) b.node.visible = visible;
   }
+}
+
+/** The covering wall's recovered alpha for a binding: the minimum across its
+ *  face's segments (the face re-covers only when its slowest segment has),
+ *  or the binding's own proxy clock when no wall was linked. */
+function wallPropCoverAlpha(b: WallPropBinding): number {
+  const walls = b.walls;
+  if (walls === undefined || walls.length === 0) return b.alpha;
+  let min = 1;
+  for (let i = 0; i < walls.length; i++) {
+    if (walls[i].alpha < min) min = walls[i].alpha;
+  }
+  return min;
 }
 
 /** Drop the records owned by retired interior roots, so the per-frame scan

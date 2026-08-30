@@ -531,6 +531,13 @@ describe('wiring (source pins)', () => {
     expect(walls.indexOf('stageOccluderFadeOnce(h.mats)')).toBeLessThan(
       walls.indexOf('occluderFadeSettled(h.alpha, hide, 0)'),
     );
+    // The prop arm restores off the WALL's recovered alpha, never its own
+    // proxy clock alone: a wall held for readiness keeps its mounted props
+    // held with it. The lazy owner-plus-plane link runs on the binding's
+    // first advanced frame so the cover consult always has a wall to read.
+    expect(walls).toContain('wallPropCoverAlpha(b) >= WALL_PROP_SHOW_ALPHA');
+    expect(walls).not.toContain('b.alpha >= WALL_PROP_SHOW_ALPHA');
+    expect(walls).toContain('if (b.walls === undefined) linkWallPropBinding(b, hideables);');
     // The one direct write left: the far-mode restore to the authored state,
     // which never flips to transparent and so never needs the gate.
     const props = read('src/render/props.ts');

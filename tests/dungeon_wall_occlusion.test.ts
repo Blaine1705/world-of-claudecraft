@@ -282,6 +282,118 @@ describe('updateWallOcclusion, backface twin staging', () => {
     expect(compiles).toHaveLength(h.mats.length);
   });
 
+  it('the lazy link matches a face by owner root and shared cull plane, and only that face', () => {
+    const owner = new THREE.Group();
+    const own = (h: WallHideable): WallHideable => {
+      owner.add(h.group);
+      return h;
+    };
+    const south = own(backfaceHideable());
+    const southSibling = own(backfaceHideable());
+    // A second segment of the SAME face: on the face line, same normal.
+    southSibling.backface = { x: 6, z: -58, nx: 0, nz: -1 };
+    const north = own(backfaceHideable());
+    north.backface = { x: 0, z: 58, nx: 0, nz: 1 };
+    const sightline = own(backfaceHideable());
+    sightline.backface = undefined;
+    const offset = own(backfaceHideable());
+    // Parallel but OFF the face line (a different wall course).
+    offset.backface = { x: 0, z: -61, nx: 0, nz: -1 };
+    // Same face plane, but a DIFFERENT interior's wall (another owner root):
+    // the owner scope must exclude it however colinear it sits.
+    const foreign = backfaceHideable();
+    new THREE.Group().add(foreign.group);
+    const b: WallPropBinding = {
+      node: new THREE.Group(),
+      plane: { ...plane },
+      owner,
+      alpha: 1,
+    };
+    const all = [south, southSibling, north, sightline, offset, foreign];
+    updateWallOcclusion(all, [b], 0, 4, -40, 0, 2, -20, DT);
+    expect(b.walls).toEqual([south, southSibling]);
+    // A binding nothing matches links empty (proxy-clock fallback).
+    const lone: WallPropBinding = {
+      node: new THREE.Group(),
+      plane: { x: 500, z: 500, nx: 1, nz: 0 },
+      owner: new THREE.Group(),
+      alpha: 1,
+    };
+    updateWallOcclusion(all, [lone], 0, 4, -40, 0, 2, -20, DT);
+    expect(lone.walls).toEqual([]);
+  });
+
+  it('a bound prop stays hidden with its wall through a pending-compile hold, then restores wall-first', async () => {
+    const { host, compiles } = fakeHost();
+    installOccluderFadeGate(host);
+    const owner = new THREE.Group();
+    const h = backfaceHideable();
+    owner.add(h.group);
+    const b: WallPropBinding = {
+      node: new THREE.Group(),
+      plane: { ...plane },
+      owner,
+      alpha: 1,
+    };
+    // Frame 1 inside: the staging fires (links left PENDING) and the lazy
+    // owner-plus-plane link binds the prop face to its wall.
+    updateWallOcclusion([h], [b], 0, 4, -40, 0, 2, -20, DT);
+    expect(b.walls).toEqual([h]);
+    // Outside: wall and prop hide together.
+    updateWallOcclusion([h], [b], 0, 4, -70, 0, 2, -40, DT);
+    expect(h.group.visible).toBe(false);
+    expect(b.node.visible).toBe(false);
+    // Ten inside frames with the links still pending: the wall holds at
+    // alpha 0 for readiness, and the prop must hold WITH it. Its own proxy
+    // clock alone passes the 0.6 show threshold on the tenth frame
+    // (1 - e^-1 = 0.632) and would float the beam in the open.
+    for (let i = 0; i < 10; i++) {
+      updateWallOcclusion([h], [b], 0, 4, -40, 0, 2, -20, DT);
+      expect(h.group.visible).toBe(false);
+      expect(b.node.visible, `held frame ${i}`).toBe(false);
+    }
+    expect(h.alpha).toBe(0);
+    // The links settle: the wall re-shows FIRST (still mostly transparent),
+    // the prop only once the wall itself recovers past the show threshold.
+    for (const c of compiles) c.resolve();
+    await flush();
+    updateWallOcclusion([h], [b], 0, 4, -40, 0, 2, -20, DT);
+    expect(h.group.visible).toBe(true);
+    expect(h.alpha).toBeLessThan(WALL_PROP_SHOW_ALPHA);
+    expect(b.node.visible).toBe(false);
+    let propShownAtWallAlpha = -1;
+    for (let i = 0; i < 400 && propShownAtWallAlpha < 0; i++) {
+      updateWallOcclusion([h], [b], 0, 4, -40, 0, 2, -20, DT);
+      if (b.node.visible) propShownAtWallAlpha = h.alpha;
+    }
+    expect(propShownAtWallAlpha).toBeGreaterThanOrEqual(WALL_PROP_SHOW_ALPHA);
+    // ... and the ease still completes for both.
+    for (let i = 0; i < 400 && h.alpha < 1; i++) {
+      updateWallOcclusion([h], [b], 0, 4, -40, 0, 2, -20, DT);
+    }
+    expect(h.alpha).toBe(1);
+    expect(b.node.visible).toBe(true);
+  });
+
+  it('an unbound prop keeps the historical proxy-clock timing (no wall to key off)', () => {
+    // The [] hideables shape the older prop tests use: no link, no hold.
+    const b: WallPropBinding = {
+      node: new THREE.Group(),
+      plane: { ...plane },
+      owner: new THREE.Group(),
+      alpha: 1,
+    };
+    updateWallOcclusion([], [b], 0, 4, -70, 0, 2, -40, DT);
+    expect(b.node.visible).toBe(false);
+    let shownAt = -1;
+    for (let i = 0; i < 400 && shownAt < 0; i++) {
+      updateWallOcclusion([], [b], 0, 4, -40, 0, 2, -20, DT);
+      if (b.node.visible) shownAt = b.alpha;
+    }
+    expect(shownAt).toBeGreaterThanOrEqual(WALL_PROP_SHOW_ALPHA);
+    expect(shownAt).toBeLessThan(0.75);
+  });
+
   it('the sightline arm keeps its reach latch: a far no-backface wall stages nothing', () => {
     const { host, compiles } = fakeHost();
     installOccluderFadeGate(host);
