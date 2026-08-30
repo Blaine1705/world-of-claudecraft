@@ -456,6 +456,50 @@ export const hudChromeStrings = {
     apply: 'Apply Skin',
     detach: 'Detach Skin',
     equipHint: 'Equip a {type} to apply this skin.',
+    // Strongbox Charters: the Claudium path to bank slots. Per CHARACTER, never
+    // account-wide, and never a capacity gold cannot also reach: the bursar
+    // sells the same slots. Display names live here because the sim registry
+    // (src/sim/content/storage_charters.ts) is deliberately name-free.
+    charter: {
+      eyebrow: 'Strongbox',
+      title: 'Strongbox Charters',
+      scope:
+        'A charter expands the bank of this character only. The bursar sells the same slots for gold.',
+      grant: 'Adds {slots} bank slots',
+      buy: 'Purchase Charter',
+      buyAria: 'Purchase {item}',
+      confirmTitle: 'Confirm Charter Purchase',
+      confirmBody: 'Purchase {item} for {cost} Claudium?',
+      resultContext: '{item} ({sku}): {message}',
+      granted: 'The charter was applied. The bank of this character is larger now.',
+      alreadyGranted: 'This charter is already on this character. You were not charged again.',
+      applyDeferred:
+        'Payment complete. The slots apply automatically the next time this character logs in.',
+      grantUnresolved:
+        'Payment complete, but the slots could not be applied yet. The purchase is recorded and support can finish it for you.',
+      inProgress: 'A purchase for this character is still being completed. Try again in a moment.',
+      doesNotFit: 'The bank of this character cannot fit the full grant of this charter.',
+      notPurchasable: 'This charter cannot be purchased right now.',
+      noRoom: 'The bank of this character has no room left for a charter.',
+      noCharterFits: 'No charter fits the room left in the bank of this character.',
+      // The hidden-charter silence-breaker: the fit gates drop charters one
+      // by one, so a list can render some rungs while hiding others, and even
+      // the fit-unknown arm renders it when the refusal prune hid rows. (Wordy
+      // value, M16: the five non-Latin fills land in this same change.)
+      someHiddenByFit:
+        'Charters too large for the room left in the bank of this character are not shown.',
+      outage:
+        'The purchase could not be confirmed. Try again with this button and you will not be charged twice. Reloading the game first can lose that protection.',
+      outageStale:
+        'Return to the Store and use the same Purchase Charter action again. You will not be charged twice. Reloading the game first can lose that protection.',
+      failed: 'The purchase could not be completed.',
+      names: {
+        strongbox_charter_1: 'Lesser Strongbox Charter',
+        strongbox_charter_2: 'Greater Strongbox Charter',
+        strongbox_charter_3: 'Grand Strongbox Charter',
+        strongbox_charter_complete: 'Complete Strongbox Charter',
+      },
+    },
   },
   // CLAUDIUM: a server-authoritative soft currency. The game renders only what the
   // economy service returns (balance, SKU credits, prices, store costs); it
@@ -1911,6 +1955,9 @@ export const hudChromeStrings = {
     // for left-thumb-dominant players; the same setting as the Key Bindings
     // panel's leftHandedTouch row, surfaced again here alongside the joystick.
     mobileLeftHanded: 'Left-handed layout',
+    touchPreciseAim: 'Precise Ground Targeting',
+    touchPreciseAimNote:
+      'Aim before casting ground spells. Turn off to cast instantly at the suggested point.',
     // Touch accessibility toggle (off by default): every gesture menu opens on a
     // tap instead of a swipe or a hold. The note below is the row's description.
     touchTapMenus: 'Tap menus',
@@ -1963,6 +2010,7 @@ export const hudChromeStrings = {
     invertY: 'Invert Camera (Y)',
     deadzone: 'Stick Deadzone',
     cameraSpeed: 'Camera Speed',
+    reticleSpeed: 'Reticle Speed',
     vibration: 'Vibration',
     buttons: 'Button Layout',
     resetButtons: 'Reset Button Layout',
@@ -3115,6 +3163,15 @@ export const hudChromeStrings = {
     bagSocketAria: '{name}: {slots}',
     socketEmpty: 'Empty bag slot',
     unequipHint: 'Click to remove this bag',
+    // Per-pool truth for the carried counter (Bank Storage phase 08): the
+    // counter's tooltip and split aria name both pools, because the summed
+    // {used}/{total} can read past its denominator in the tolerated-overflow
+    // state while one pool refuses pickups. Values are resolved pool numbers.
+    // (Wordy values, M16: the five non-Latin fills land in this same change.)
+    poolGeneral: 'General: {used} of {total}',
+    poolMaterials: 'Materials: {used} of {total}',
+    capacityPoolsAria:
+      'Bag slots used: {used} of {total}. General items: {generalUsed} of {generalTotal}. Materials: {materialsUsed} of {materialsTotal}.',
   },
   // Raid -> party demotion (Social panel raid tab). The sim emits these in English;
   // src/ui/sim_i18n.ts re-localizes them through these keys. Mirrors the existing
@@ -3160,9 +3217,113 @@ export const hudChromeStrings = {
   raidBossGuide: {
     title: 'Boss Guide',
     button: 'Boss Guide: {boss}',
-    subtitle: '{boss} | Normal and Heroic',
+    subtitle: '{boss} | {difficulty}',
     close: 'Close boss guide',
+    bossesLabel: 'Raid bosses',
+    difficultyLabel: 'Difficulty',
+    normal: 'Normal',
+    heroic: 'Heroic',
+    portraitAlt: '{boss} encounter portrait',
+    overviewHeading: 'Overview',
+    abilitiesHeading: 'Abilities',
+    whatToDo: 'What to do',
+    whatToDoResponse: 'What to do: {response}',
+    rolesLabel: 'Role responsibilities',
+    flagsLabel: 'Mechanic warnings',
+    roleTank: 'Tank',
+    roleHealer: 'Healer',
+    roleDamage: 'Damage',
+    roleAll: 'All roles',
+    flagDeadly: 'Deadly',
+    flagInterruptible: 'Interruptible',
+    flagImportant: 'Important',
+    flagCleansable: 'Cleansable',
+    browseBoss: 'View {boss}',
+    chooseDifficulty: 'View {difficulty} mechanics',
+    expandAbility: 'Expand {ability}',
+    collapseAbility: 'Collapse {ability}',
+    abilityControlLabel: '{action}. {details}',
+    tooltipMeta: '{phase} | {difficulty}',
     ignivar: {
+      overview:
+        'Varkhul forged Ignivar as a herald, a living seal, and the key to the Inner Crucible. The encounter tests water-conduit control, precise movement, and fast priority damage.',
+      phaseOpeningName: 'The Herald Awakens',
+      phaseOpeningSummary:
+        "Control Brand of the Pyre with the water conduits while handling Ignivar's repeating frontal, skyfire, rotating rays, and expanding Forge Wave.",
+      phaseApocalypseName: 'Intermission: Apocalypse',
+      phaseApocalypseSummary:
+        'At {health} health, Ignivar calls an Ashcaller that attempts to end the encounter.',
+      phaseJudgmentName: 'Judgment of the Forge',
+      phaseJudgmentSummary:
+        'At {health} health, Ignivar ignites the arena and reveals one safe refuge among three shelters.',
+      phaseJudgmentHeroicSummary:
+        'At {health} health, Ignivar ignites the arena while active Brands continue to threaten nearby players inside the refuge.',
+      phaseFinaleName: 'Finale: Last Inferno',
+      phaseFinaleSummary:
+        'At {health} health, Ignivar begins a final burn phase with a hard deadline and faster repeating mechanics.',
+      forgeStrikeName: 'Forge Strike',
+      forgeStrikeSummary:
+        'Ignivar strikes his current tank and applies Molten Armor, increasing damage taken from Ignivar.',
+      forgeStrikeResponse:
+        "Tanks swap at {stacks} stacks. Healers prepare for the strike and the new tank's first melee swings.",
+      brandName: 'Brand of the Pyre',
+      brandSummary:
+        'Ignivar marks non-tank players with persistent fire damage. Branded players also burn nearby allies.',
+      brandResponse:
+        'Spread out. Aim Searing Torrent into a ready water conduit, then have each marked player cross the activated water alone to cleanse.',
+      brandHeroicResponse:
+        'Spread out. Open a conduit with Searing Torrent and cleanse one marked player at a time. Every cleanse triggers raid-wide Cleansing Backlash.',
+      searingTorrentName: 'Searing Torrent',
+      searingTorrentSummary:
+        'Ignivar tracks a player, then releases a wide frontal blast. A ready water conduit struck by the blast becomes active for a short time.',
+      searingTorrentHeroicSummary:
+        'Ignivar tracks a player, then releases a nearly lethal frontal blast. A ready water conduit struck by the blast becomes active for a short time.',
+      searingTorrentResponse:
+        'Aim the warning through exactly one ready conduit. Everyone else leaves the frontal before the cast completes.',
+      rainName: 'Rain of Cinders',
+      rainSummary:
+        'Three fire sectors and marked meteor impacts punish players who remain inside their warnings.',
+      rainHeroicSummary:
+        'Three fire sectors and marked meteor impacts deal extreme damage to players who remain inside their warnings.',
+      rainResponse: 'Move into an unmarked gap and leave every meteor circle before impact.',
+      raysName: 'Revolving Inferno',
+      raysSummary:
+        'Rotating fire rays sweep around Ignivar and repeatedly damage players who touch them.',
+      raysHeroicSummary:
+        'Rotating fire rays sweep around Ignivar and inflict severe repeated damage on contact.',
+      raysResponse:
+        'Move with the open space between rays. Do not cut through a ray, even with a fast movement ability.',
+      forgeWaveName: 'Forge Wave',
+      forgeWaveSummary:
+        'An expanding wall of fire crosses the arena, leaving two opposite gaps and knocking back players it hits.',
+      forgeWaveHeroicSummary:
+        'An expanding wall of fire crosses the arena, leaving two opposite gaps and knocking hit players much farther.',
+      forgeWaveResponse:
+        'Find either gap during the windup, align with it, and avoid being knocked toward the arena edge.',
+      apocalypseName: 'Apocalypse',
+      apocalypseSummary:
+        'Ignivar summons an Ashcaller. If the add finishes Apocalypse, the raid is defeated immediately.',
+      apocalypseResponse:
+        'Switch all available damage to the Ignivar Ashcaller and defeat it before the cast completes.',
+      judgmentName: 'Judgment of the Forge',
+      judgmentSummary:
+        'Ignivar marks three shelters, identifies one safe refuge, and then repeatedly burns the rest of the arena.',
+      judgmentHeroicSummary:
+        'Ignivar marks one safe refuge while the arena burns. Brand of the Pyre remains active and still damages nearby allies.',
+      judgmentResponse:
+        'Identify the uniquely marked refuge during the warning and stack fully inside its boundary before the floor ignites.',
+      chainsName: 'Chains of the Forge',
+      chainsSummary:
+        "Ignivar links nearby pairs. Separating too far or crossing another pair's chain causes lethal damage.",
+      chainsResponse:
+        'Stay close to your linked partner, move together, and keep every other player from passing through your chain.',
+      lastInfernoName: 'Last Inferno',
+      lastInfernoSummary:
+        'Ignivar enrages and prepares a hard wipe while Rain of Cinders, Searing Torrent, and Revolving Inferno accelerate.',
+      lastInfernoResponse:
+        'Use remaining damage and healing cooldowns, keep executing the movement mechanics, and defeat Ignivar before the countdown ends.',
+      // Kept as catalog aliases until the existing locale overlays migrate to
+      // the structured journal rows above. The runtime guide no longer reads them.
       brand:
         'Brand of the Pyre: spread out. Aim Searing Torrent into a ready water conduit, then cross the water alone to cleanse.',
       movement:
@@ -3176,6 +3337,96 @@ export const hudChromeStrings = {
         'Heroic: paired players stay close during Chains of the Forge, Brand remains active inside Judgment, and Forge Wave pushes farther.',
     },
     varkhul: {
+      overview:
+        'Varkhul imprisoned the dying Last Spring to forge living metal, then created Ignivar to guard the crime. His encounter combines personal positioning with raid-wide control of the grand forge.',
+      phaseOpeningName: 'The Forgefather',
+      phaseOpeningSummary:
+        'Varkhul cycles tank pressure, wide frontals, moving projectiles, group soaks, meteor waves, and attacks from the grand anvil.',
+      phaseAssemblyName: "Intermission: The Master's Assembly",
+      phaseAssemblySummary:
+        'At {health} health, Varkhul becomes protected while his forge legion enters through portals and the pillar beams threaten a Forge Meltdown.',
+      phaseFinaleName: 'Finale: Masterpiece Unbound',
+      phaseFinaleSummary:
+        'At {health} health, Varkhul attacks faster, deals more damage, and pulses fire through the raid until the final deadline.',
+      phaseFinaleHeroicSummary:
+        'At {health} health, Varkhul abandons most earlier mechanics as Worldfire closes inward and consumes the crucible.',
+      makersBrandName: "Maker's Brand",
+      makersBrandSummary:
+        'Varkhul strikes his current tank and applies a stacking effect that increases all damage taken from him.',
+      makersBrandResponse:
+        'Tanks swap at {stacks} stacks. Healers prepare the incoming tank before Varkhul changes targets.',
+      frontalName: "Forgefather's Sweep",
+      frontalSummary:
+        'Varkhul releases a very wide frontal sweep that deals heavy fire damage to everyone in front of him.',
+      frontalHeroicSummary:
+        'Varkhul releases a very wide frontal sweep that deals nearly lethal fire damage to everyone in front of him.',
+      frontalResponse:
+        'Keep Varkhul facing away from the group and move behind him as soon as the warning appears.',
+      orbsName: 'Cinder Orbs',
+      orbsSummary:
+        'Marked non-tanks drop persistent cinder pools and release fire orbs in every direction. Red-hot Metal also absorbs incoming healing.',
+      orbsHeroicSummary:
+        'Marked non-tanks drop highly damaging persistent cinder pools and release dangerous fire orbs in every direction. Red-hot Metal also absorbs incoming healing.',
+      orbsResponse:
+        'Carry each mark to the room edge, separate the pools, then dodge the orbs as they cross the arena. Healers clear the absorb quickly.',
+      pyreName: 'Shared Pyre',
+      pyreSummary:
+        'A moving circle follows one player without Red-hot Metal. Its damage is divided among players inside, and every missing player deals {missingPenalty} maximum-health damage to the entire raid.',
+      pyreHeroicSummary:
+        'A moving circle follows one player without Red-hot Metal and splits a larger hit. Every missing player also deals {missingPenalty} maximum-health damage to the entire raid.',
+      pyreResponse:
+        'Stack at least {players} players inside the circle and move with its target until the cast resolves.',
+      forgestormName: 'Forgestorm',
+      forgestormSummary:
+        'Varkhul calls down {waves} consecutive waves of marked meteor impacts across the arena.',
+      forgestormHeroicSummary:
+        'Varkhul calls down {waves} consecutive waves of marked meteor impacts that deal extreme damage.',
+      forgestormResponse:
+        'Watch each new set of ground warnings and move out before that wave lands. Do not return to a previous position without checking the next wave.',
+      rayName: 'Tempering Ray',
+      raySummary:
+        'A ray tracks a marked player for a long windup. The first other player between Varkhul and the target intercepts the hit and receives Tempered Wound.',
+      rayResponse:
+        'Assign a healthy player, usually the off-tank, to step into the line. Keep other players out and rotate interceptors while Tempered Wound is active.',
+      anvilName: "Anvil's Decree",
+      anvilSummary:
+        'Varkhul walks to the grand forge and strikes it {strikes} times, dealing increasing raid-wide damage.',
+      anvilHeroicSummary:
+        'Varkhul strikes the grand forge {strikes} times for increasing raid damage while marked meteors fall on players.',
+      anvilResponse: 'Group for raid healing and use defensive cooldowns for the final strike.',
+      anvilHeroicResponse:
+        'Spread marked meteors away from the group while healers and defensive cooldowns cover all {strikes} strikes.',
+      assemblyName: "The Master's Assembly",
+      assemblySummary:
+        'Varkhul becomes protected and starts a timed assembly. The raid must defeat every portal wave before the forge completes his masterpiece.',
+      assemblyResponse:
+        'Split attention between beam control and priority adds. Defeat the full forge legion before the assembly timer expires.',
+      beamName: 'Crucible Beam',
+      beamSummary:
+        'Active pillar beams heat the forge unless a player blocks them. Blockers take increasing damage from Crucible Exposure, while blocked and inactive beams let heat fall.',
+      beamHeroicSummary:
+        'Active pillar beams heat the forge unless a player blocks them. Blockers take increasing damage from Crucible Exposure, and forge heat never decreases.',
+      beamResponse:
+        'Stand between each active pillar and the forge, then rotate blockers before exposure becomes dangerous. Reaching full heat causes a lethal Forge Meltdown.',
+      legionName: 'Forge Legion',
+      legionSummary:
+        'Crucible Wardens cast Crucible Quake to add forge heat, while Cinder Artificers use Repair Protocol to heal Varkhul.',
+      legionResponse:
+        'Interrupt Crucible Quake, stop Repair Protocol, and focus each dangerous caster before clearing the remaining adds.',
+      masterpieceName: 'Masterpiece Unbound',
+      masterpieceSummary:
+        'Varkhul attacks faster, deals more damage, and repeatedly burns the raid until the final wipe.',
+      masterpieceHeroicSummary:
+        'Varkhul attacks faster and deals more damage while Worldfire replaces most earlier mechanics for the final burn.',
+      masterpieceResponse:
+        'Commit remaining offensive and defensive cooldowns and defeat Varkhul before the final countdown ends.',
+      worldfireName: 'Worldfire',
+      worldfireSummary:
+        'On Heroic, fire advances from the arena edge toward the center in stages until the entire crucible burns.',
+      worldfireResponse:
+        'Move inward ahead of each advancing fire band, preserve the shrinking safe space, and finish Varkhul before the center ignites.',
+      // Locale-overlay compatibility aliases. The structured rows above own the
+      // rendered journal, but deleting these keys would orphan current translations.
       tanks: "Tanks: swap at two stacks of Maker's Brand and keep Varkhul in melee range.",
       orbs: 'Cinder Orbs: marked players spread to the room edge. Their fire pools persist and the released orbs cross the room.',
       pyre: 'Shared Pyre: only a player without Red-hot Metal is selected. Stack four players inside the moving circle in either difficulty. Each missing player deals 15% of maximum health to the entire raid.',
@@ -4102,6 +4353,49 @@ export const hudChromeStrings = {
     buySlotsMaxed: 'Fully expanded',
     buyConfirm: 'Purchase {count} additional bank slots for {price}?',
     buyConfirmAccept: 'Purchase',
+    // The capacity meter footer (Bank Storage phase 08): one footer band holds
+    // the meter and the single expand button. The meter label shows the summed
+    // display total; the tooltip and split aria carry the per-pool truth, so
+    // the footer never implies a non-material item can use materials-pool
+    // space. The economy disclaimer rides the click-gated purchase confirm;
+    // later purchase surfaces (store, Claudium) reuse the same key.
+    // (Wordy values, M16: the five non-Latin fills land in this same change.)
+    meterLabel: '{used} of {total} slots',
+    meterPoolGeneral: 'General: {used} of {total}',
+    meterPoolMaterials: 'Materials: {used} of {total}',
+    meterPoolsAria:
+      'Bank slots used: {used} of {total}. General items: {generalUsed} of {generalTotal}. Materials: {materialsUsed} of {materialsTotal}.',
+    meterMaterialsNote: 'Materials-only space from socketed satchels. Other items cannot use it.',
+    priceDisclaimer: 'Prices may change with the game economy.',
+    // The banker's SECOND price tag (Bank Storage phase 13): the same next
+    // rung the gold price buys, priced in Claudium by the economy service and
+    // delivered on the owner-only bank wire. ONE button carries both tags and
+    // the confirm prompt carries both rails, so gold stays primary by position
+    // and nothing anywhere states a rate, an equivalence, or a combined total.
+    // The top-up handoff, the cancel label and the price-changed line REUSE the
+    // shared hudChrome.wocStore.* Claudium strings (they name no product), and
+    // the disclaimer reuses priceDisclaimer above; only the copy that has to
+    // say BANK SLOTS is minted here. Never "vault": that word belongs to the
+    // Materials Vault, which has no Claudium path at all.
+    // (Wordy values, M16: the five non-Latin fills land in this same change.)
+    rungItemName: '{count} bank slots',
+    buySlotsDualAria: 'Buy {count} slots for {price} or {cost} Claudium',
+    buyConfirmDual: 'Purchase {count} additional bank slots?',
+    buyConfirmGold: 'Purchase for {price}',
+    buyConfirmClaudium: 'Purchase for {cost} Claudium',
+    rungGranted: 'The bank slots were added. The bank of this character is larger now.',
+    rungAlreadyGranted: 'These slots are already on this character. You were not charged again.',
+    rungApplyDeferred:
+      'Payment complete. The slots apply automatically the next time this character logs in.',
+    rungGrantUnresolved:
+      'Payment complete, but the slots could not be applied yet. The purchase is recorded and support can finish it for you.',
+    rungInProgress:
+      'A purchase for this character is still being completed. Try again in a moment.',
+    rungDoesNotFit: 'The bank of this character cannot fit another expansion.',
+    rungNotPurchasable: 'These bank slots cannot be purchased right now.',
+    rungFailed: 'The purchase could not be completed.',
+    rungOutage:
+      'The purchase could not be confirmed. Try again with this button and you will not be charged twice. Reloading the game first can lose that protection.',
     withdrawHint: 'Click to withdraw',
     withdrawPartialHint: 'Shift-click to withdraw a partial amount',
     depositHint: 'Click to deposit',
@@ -4119,6 +4413,21 @@ export const hudChromeStrings = {
     withdrawQuantityTitle: 'Withdraw {item}',
     withdrawQuantityInput: 'Quantity to withdraw',
     withdrawQuantityConfirm: 'Withdraw',
+    // The vault row's accessible ACTION name (its aria-label). Same English as
+    // withdrawQuantityTitle on purpose, but a distinct key: that one titles the
+    // quantity PROMPT, and rewording a dialog title must not silently rename
+    // every vault row. (The five non-Latin fills land in this same change.)
+    vaultRowWithdrawName: 'Withdraw {item}',
+    // The gold-ladder stale-price notice (vault upgrade, guild bank slots, bag
+    // sockets). Same English as hudChrome.wocStore.priceChanged, but its own
+    // key: those are sim-priced GOLD surfaces, and rewording the Claudium
+    // store's notice must not silently reword them. (Wordy value, M16: the
+    // five non-Latin fills land in this same change.)
+    priceChanged:
+      'The price changed before the purchase completed. Review the refreshed price and confirm again.',
+    // Item-qualified accessible name/title for every stocked-row partial action.
+    // (Wordy value, M16: the five non-Latin fills land in this same change.)
+    withdrawQuantityAction: 'Quantity to withdraw: {item}',
     // Search / category / sort toolbar. The category chip and sort option
     // labels reuse the generic hudChrome.bags.* strings; only these bank-named aria
     // labels are distinct from the bags wording.
@@ -4149,6 +4458,65 @@ export const hudChromeStrings = {
     bonusReferralExplainer:
       'Invite a friend: when they reach level 10 you each earn 2 slots, up to 5 friends.',
     bonusSectionAria: 'Bonus bank slots and how to earn more',
+    // The bag-socket row (Bank Storage phase 07): four gold-bought sockets
+    // above the slot ladder, each holding one bag whose slots join the bank's
+    // budget. Every price is interpolated from the WIRE (nextSocketCost),
+    // never a client constant (phase 09 makes prices tunable). The filled
+    // cell's aria REUSES the generic hudChrome.bags.bagSocketAria
+    // '{name}: {slots}' with the shared itemUi.tooltip.bagSlots /
+    // bagSlotsMaterials line as its {slots} token, so the row says which pool
+    // the bag's slots actually feed without minting a duplicate key. (Wordy
+    // values, M16: the five non-Latin fills land in this same change.)
+    socketRowAria: 'Bank bag sockets',
+    socketEmpty: 'Empty bank bag socket',
+    // "in the bank", never "here": the bags-side click fills the FIRST empty
+    // unlocked socket, so a later empty cell's hint promising "here" would
+    // name a cell the click does not fill (tooltip-writing.md: write from the
+    // live mechanic).
+    socketEmptyHint: 'Click a bag in your bags to store it in the bank',
+    socketLocked: 'Locked bag socket',
+    socketLockedLater: 'Bag sockets unlock in order, cheapest first',
+    socketUnlockAria: 'Unlock a bank bag socket for {price}',
+    socketUnlockHint: 'Click to unlock this bag socket',
+    socketUnlockConfirm: 'Unlock a bank bag socket for {price}?',
+    socketUnlockAccept: 'Unlock',
+    unsocketHint: 'Click to return this bag to your bags',
+    // The bags-side hover while the personal pane is open and an unlocked
+    // socket is empty (the socket arm of the bank-deposit click ladder).
+    socketHint: 'Click to socket this bag into your bank',
+    // The Materials Vault tab (Bank Storage Phase 03): the per-material
+    // stockpile beside the slot bank. Every price and capacity is interpolated
+    // from the WIRE snapshot (nextUpgradeCost / perMaterialCap), never a
+    // client constant. Withdraw hints, the quantity prompts, the confirm
+    // accept, and the maxed label all REUSE the personal keys above; the
+    // bags-side click denies voice the sim's own error.vaultOnlyMaterials
+    // line (its cannot-store sibling retired with the identity-preserving
+    // deposit rework), so no deny copy lives here. {count} in
+    // the deposit-all summaries is the number of ITEMS moved (pooled counts,
+    // not stacks; the bank's summary counts stacks because slots are its
+    // unit). (Wordy values, M16: the five non-Latin fills land in this same
+    // change.)
+    vaultTab: 'Vault',
+    vaultCapacityNote: 'Each material holds up to {cap}.',
+    vaultEmpty: 'Your vault is empty. Click a material in your bags to deposit it.',
+    vaultRowAria: '{item}: {count} of {cap} stored',
+    vaultLockedIntro:
+      'Unlock the Materials Vault to stockpile crafting materials beside your bank. Every material gets its own room, up to {cap} apiece.',
+    vaultUnlockButton: 'Unlock the Materials Vault',
+    vaultUnlockConfirm: 'Unlock the Materials Vault for {price}?',
+    vaultUpgrade: 'Widen every ceiling to {cap}',
+    vaultUpgradeConfirm: 'Widen every material ceiling to {cap} for {price}?',
+    vaultDepositAll: 'Deposit all materials',
+    vaultDepositAllTooltip:
+      'Sends every material from your bags to your vault in one trip, filling each material up to its ceiling. Gear, tools, quest items, and consumables are never touched.',
+    vaultDepositAllDone: 'Materials deposited: {count}.',
+    vaultDepositAllFull: 'Materials deposited: {count}. Some ceilings are full.',
+    vaultDepositAllNone: 'Vault ceilings full: nothing deposited.',
+    vaultWithdrawShort: 'Only {fit} of {count} fit in your bags.',
+    // Bags-side hints while the VAULT tab is active (the guild pair's rule:
+    // distinct keys because the target differs).
+    vaultDepositHint: 'Click to deposit into your vault',
+    vaultCannotDeposit: 'Cannot go in the vault',
     // The Guild tab (guild bank): the Personal/Guild strip renders only while
     // guildBankInfo is non-null (officer-plus standing at a banker, online).
     // Withdraw/deposit prompt bodies reuse the personal keys above; the gold
@@ -4805,6 +5173,21 @@ export const hudChromeStrings = {
     // D8 downward substitution, 2x gather value), so the spend is stated
     // before the click instead of silent after it.
     reagentFineSub: '(spends {count} fine-grade)',
+    // The craft-from-vault suffix (Bank Storage Phase 04): appended to a
+    // reagent line when carried stock runs short and the craft would draw the
+    // remainder from the Materials Vault (carried always drains first), so
+    // the vault spend is stated before the click, exactly like the
+    // fine-substitution suffix above. Rendered only while the world reports
+    // vault draw available here (craftVaultStock non-null).
+    reagentVaultDraw: '(draws {count} from your vault)',
+    // The place-blocked note (Phase 04 QA): rendered once at the top of the
+    // recipe list when the world reports vault draw BLOCKED here
+    // (craftVaultStock null: an instanced context) AND some reagent row is
+    // short, so a row the vault would have satisfied in town never reads as
+    // a bare red count with no reason (the stationOutOfRange precedent).
+    // Neutral phrasing on purpose: it must stay true for a player who has
+    // never unlocked the vault.
+    vaultUnreachable: 'The Materials Vault is out of reach here.',
     // The #1301 gold-sink fee (src/sim/professions/crafting.ts
     // resolveCraftForRecipe), charged on every successful craft but never
     // shown anywhere before this: {fee} is the already-localized formatMoney

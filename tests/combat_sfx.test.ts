@@ -732,12 +732,28 @@ describe('combat SFX policy', () => {
     }
   });
 
-  it('gives each Ignivar raid boss its own recorded voice, present in the shipped manifest', () => {
+  it('keeps boss texture cues but defers semantic aggro and death to voiced dialogue', () => {
     // Bound to the real generated manifest on purpose: the failure mode for a
     // subfamily pack is silent fallback to the family voice, so a missing
     // alias, a dropped file, or a stale manifest each have to fail here.
     const shipped = (key: string) => key in SFX_CLIPS;
-    for (const action of ['idle', 'aggro', 'attack', 'hurt', 'death'] as const) {
+    for (const action of ['idle', 'attack', 'hurt'] as const) {
+      expect(mobVoiceCue('ignivar_herald_of_the_last_flame', action, shipped), action).toBe(
+        `mob_elemental_ignivar_${action}`,
+      );
+      expect(mobVoiceCue('varkhul_forgefather_of_the_last_flame', action, shipped), action).toBe(
+        `mob_elemental_varkhul_${action}`,
+      );
+    }
+    for (const action of ['aggro', 'death'] as const) {
+      expect(
+        mobVoiceCue('ignivar_herald_of_the_last_flame', action, shipped, true),
+        action,
+      ).toBeNull();
+      expect(
+        mobVoiceCue('varkhul_forgefather_of_the_last_flame', action, shipped, true),
+        action,
+      ).toBeNull();
       expect(mobVoiceCue('ignivar_herald_of_the_last_flame', action, shipped), action).toBe(
         `mob_elemental_ignivar_${action}`,
       );

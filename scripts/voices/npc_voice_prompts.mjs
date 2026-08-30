@@ -196,6 +196,35 @@ export const VOICE_PROMPTS = [
       'I built a kingdom that should have outlived the stars. Kneel before your king. Another kingdom comes to challenge me — and you too will join the rest.',
   },
 
+  {
+    npcId: 'ignivar',
+    name: 'Ignivar Ashcaller',
+    voiceDescription:
+      'A natural, actor-led core voiced through an enormous ancient war automaton. Very deep male ' +
+      'bass with dense iron weight, a furnace-like chest resonance, and a dry scorched texture. ' +
+      'Words arrive like heavy mechanisms locking into place: slow attacks, hard consonants, brief ' +
+      "measured gaps, and controlled bursts of heat. Ignivar is Varkhul's disciplined herald, " +
+      'proud and devoted rather than bestial, with fear buried beneath the metal.',
+    sampleText:
+      'Ignivar Ashcaller awakens. Let the world burn! The sky itself will burn! The last flame ' +
+      'consumes all! Varkhul... the seal is broken.',
+  },
+
+  {
+    npcId: 'varkhul',
+    name: 'Varkhul, Forgefather of the Last Flame',
+    voiceDescription:
+      'Native English with archaic dwarven word shapes and broad Highland vowels. Male-presenting, ' +
+      'older than human. An awakened obsidian forge idol with a non-human mineral voice, very low ' +
+      'pitch, immense cavity resonance, sparse breath, and a dry fractured surface. Speech feels ' +
+      'carved rather than spoken: long silences, heavy vowels, chiseled consonants, and occasional ' +
+      'tectonic strain. No human narrator, beast, demon, or machine.',
+    sampleText:
+      'I am Varkhul, Forgefather of the Last Flame. Raise your weapons, little sparks. The spring ' +
+      'did not die. I bound its last memory into iron. Every blow will feed the furnace in my ' +
+      'chest. By ember, stone, and anvil, I will unmake you. Master... I have failed you.',
+  },
+
   // -- Eldergleam, the Veiled Hollow (src/sim/content/realm.ts) -------------
   {
     npcId: 'keeper_saelwyn',

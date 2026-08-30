@@ -546,6 +546,31 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.apply': 'スキンを適用',
   'hudChrome.wocStore.detach': 'スキンを解除',
   'hudChrome.wocStore.equipHint': 'このスキンを適用するには{type}を装備してください。',
+  'hudChrome.wocStore.charter.eyebrow': '金庫',
+  'hudChrome.wocStore.charter.title': '金庫特許状',
+  'hudChrome.wocStore.charter.scope': '特許状はこのキャラクターの銀行だけを拡張します。同じスロットは出納官がゴールドでも販売しています。',
+  'hudChrome.wocStore.charter.grant': '銀行スロットを{slots}個追加',
+  'hudChrome.wocStore.charter.buy': '特許状を購入',
+  'hudChrome.wocStore.charter.buyAria': '{item}を購入',
+  'hudChrome.wocStore.charter.confirmTitle': '特許状の購入確認',
+  'hudChrome.wocStore.charter.confirmBody': '{item}を{cost} Claudiumで購入しますか？',
+  'hudChrome.wocStore.charter.granted': '特許状が適用されました。このキャラクターの銀行が広がりました。',
+  'hudChrome.wocStore.charter.alreadyGranted': 'この特許状はすでにこのキャラクターに適用されています。二重に請求されることはありません。',
+  'hudChrome.wocStore.charter.applyDeferred': '支払いが完了しました。スロットはこのキャラクターの次回ログイン時に自動で適用されます。',
+  'hudChrome.wocStore.charter.grantUnresolved': '支払いは完了しましたが、スロットをまだ適用できませんでした。購入は記録されており、サポートが対応できます。',
+  'hudChrome.wocStore.charter.inProgress': 'このキャラクターの購入がまだ処理中です。少し待ってからもう一度お試しください。',
+  'hudChrome.wocStore.charter.doesNotFit': 'このキャラクターの銀行では、この特許状のスロットをすべて収めきれません。',
+  'hudChrome.wocStore.charter.notPurchasable': 'この特許状は現在購入できません。',
+  'hudChrome.wocStore.charter.noCharterFits': 'このキャラクターの銀行に残された空きに収まる特許状はありません。',
+  'hudChrome.wocStore.charter.someHiddenByFit': 'このキャラクターの銀行の空きに収まらない大きさの特許状は表示されません。',
+  'hudChrome.wocStore.charter.noRoom': 'このキャラクターの銀行には、もう特許状を収める余地がありません。',
+  'hudChrome.wocStore.charter.outage': '購入を確認できませんでした。このボタンからもう一度お試しください。二重に請求されることはありません。先にゲームを再読み込みすると、この保護が失われる場合があります。',
+  'hudChrome.wocStore.charter.outageStale': 'ストアに戻り、同じ「特許状を購入」操作をもう一度使用してください。二重に請求されることはありません。先にゲームを再読み込みすると、この保護が失われる場合があります。',
+  'hudChrome.wocStore.charter.failed': '購入を完了できませんでした。',
+  'hudChrome.wocStore.charter.names.strongbox_charter_1': '下級金庫特許状',
+  'hudChrome.wocStore.charter.names.strongbox_charter_2': '上級金庫特許状',
+  'hudChrome.wocStore.charter.names.strongbox_charter_3': '大金庫特許状',
+  'hudChrome.wocStore.charter.names.strongbox_charter_complete': '完全金庫特許状',
   'hudChrome.claudium.title': 'Claudium',
   'hudChrome.claudium.open': 'Claudiumを開く',
   'hudChrome.claudium.close': 'Claudiumを閉じる',
@@ -631,6 +656,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.toLabel': '宛先',
   'itemUi.kind.bag': 'バッグ',
   'itemUi.tooltip.bagSlots': '{slots}スロットのバッグ',
+  'itemUi.tooltip.bagSlotsMaterials': '{slots}スロットの素材バッグ',
   'hudChrome.auth.forgotPrompt': 'パスワードをお忘れですか？',
   'hudChrome.auth.forgotTitle': 'パスワードをリセット',
   'hudChrome.auth.forgotHint':
@@ -1504,6 +1530,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showDailyRewardsChest': 'デイリー報酬の宝箱を表示',
   'hudChrome.options.mobileCameraJoystick': 'カメラスティック',
   'hudChrome.options.mobileLeftHanded': '左利き用レイアウト',
+  'hudChrome.options.touchPreciseAim': '精密な地面指定',
+  'hudChrome.options.touchPreciseAimNote': '地面対象の呪文は指定してから発動します。オフにすると推奨地点ですぐに発動します。',
   'hudChrome.options.touchTapMenus': 'タップメニュー',
   'hudChrome.options.touchTapMenusNote': 'アクション、消耗品、メニューの各コントロールをスワイプではなくタップで開きます。項目をタップすると使用し、コントロールをもう一度タップすると通常の動作を行い、外側をタップすると閉じます。',
   'hudChrome.options.itemLevelLine': 'アイテムレベル {level}',
@@ -6004,6 +6032,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.invertY': 'カメラ反転（Y軸）',
   'hudChrome.controller.deadzone': 'スティックの遊び',
   'hudChrome.controller.cameraSpeed': 'カメラ速度',
+  'hudChrome.controller.reticleSpeed': 'レティクル速度',
   'hudChrome.controller.vibration': '振動',
   'hudChrome.controller.buttons': 'ボタン配置',
   'hudChrome.controller.resetButtons': 'ボタン配置をリセット',
@@ -6202,6 +6231,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.backpack': 'バックパック',
   'hudChrome.bags.socketEmpty': '空のバッグスロット',
   'hudChrome.bags.unequipHint': 'クリックしてこのバッグを外す',
+  'hudChrome.bags.poolGeneral': '一般: {total}個中{used}個',
+  'hudChrome.bags.poolMaterials': '素材: {total}個中{used}個',
+  'hudChrome.bags.capacityPoolsAria': '使用中のバッグスロット: {total}個中{used}個。一般アイテム: {generalTotal}個中{generalUsed}個。素材: {materialsTotal}個中{materialsUsed}個。',
   'guide.brand': 'World of ClaudeCraft',
   'guide.brandShort': 'ClaudeCraft',
   'guide.tagline': 'ブラウザで無料で遊べる、クラシックスタイルのMMO。',
@@ -7705,8 +7737,110 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.varkhulWaveStatus': 'ウェーブ {wave}/{waves} | 敵: {remaining}',
   'hudChrome.raidBossGuide.title': 'ボス攻略',
   'hudChrome.raidBossGuide.button': '攻略: {boss}',
-  'hudChrome.raidBossGuide.subtitle': '{boss} | 通常・英雄',
+  'hudChrome.raidBossGuide.subtitle': '{boss} | {difficulty}',
   'hudChrome.raidBossGuide.close': 'ボス攻略を閉じる',
+  'hudChrome.raidBossGuide.bossesLabel': 'レイドボス',
+  'hudChrome.raidBossGuide.difficultyLabel': '難易度',
+  'hudChrome.raidBossGuide.normal': '通常',
+  'hudChrome.raidBossGuide.heroic': '英雄',
+  'hudChrome.raidBossGuide.portraitAlt': '{boss}の戦闘ポートレート',
+  'hudChrome.raidBossGuide.overviewHeading': '概要',
+  'hudChrome.raidBossGuide.abilitiesHeading': 'アビリティ',
+  'hudChrome.raidBossGuide.whatToDo': '対処法',
+  'hudChrome.raidBossGuide.whatToDoResponse': '対処法: {response}',
+  'hudChrome.raidBossGuide.rolesLabel': 'ロール別の役割',
+  'hudChrome.raidBossGuide.flagsLabel': 'メカニクス警告',
+  'hudChrome.raidBossGuide.roleTank': 'タンク',
+  'hudChrome.raidBossGuide.roleHealer': 'ヒーラー',
+  'hudChrome.raidBossGuide.roleDamage': 'ダメージ',
+  'hudChrome.raidBossGuide.roleAll': '全ロール',
+  'hudChrome.raidBossGuide.flagDeadly': '致命的',
+  'hudChrome.raidBossGuide.flagInterruptible': '中断可能',
+  'hudChrome.raidBossGuide.flagImportant': '重要',
+  'hudChrome.raidBossGuide.flagCleansable': '解除可能',
+  'hudChrome.raidBossGuide.browseBoss': '{boss}を表示',
+  'hudChrome.raidBossGuide.chooseDifficulty': '{difficulty}のメカニクスを表示',
+  'hudChrome.raidBossGuide.expandAbility': '{ability}を展開',
+  'hudChrome.raidBossGuide.collapseAbility': '{ability}を折りたたむ',
+  'hudChrome.raidBossGuide.abilityControlLabel': '{action}。{details}',
+  'hudChrome.raidBossGuide.tooltipMeta': '{phase} | {difficulty}',
+  'hudChrome.raidBossGuide.ignivar.overview':
+    'ヴァークルはイグニヴァルを先触れ、生ける封印、そして内なるるつぼへの鍵として鍛造した。この戦闘では水路の制御、正確な移動、優先目標への素早い攻撃が試される。',
+  'hudChrome.raidBossGuide.ignivar.phaseOpeningName': '先触れの目覚め',
+  'hudChrome.raidBossGuide.ignivar.phaseOpeningSummary':
+    '水路で火葬の印を処理しながら、イグニヴァルが繰り返す前方攻撃、空からの炎、回転光線、拡大する鍛冶波に対処する。',
+  'hudChrome.raidBossGuide.ignivar.phaseApocalypseName': '幕間：黙示録',
+  'hudChrome.raidBossGuide.ignivar.phaseApocalypseSummary':
+    '体力{health}で、イグニヴァルは戦闘を終わらせようとするアッシュコーラーを召喚する。',
+  'hudChrome.raidBossGuide.ignivar.phaseJudgmentName': '鍛冶場の審判',
+  'hudChrome.raidBossGuide.ignivar.phaseJudgmentSummary':
+    '体力{health}で、イグニヴァルは闘技場を燃やし、三つの避難所のうち一つだけ安全な場所を示す。',
+  'hudChrome.raidBossGuide.ignivar.phaseJudgmentHeroicSummary':
+    '体力{health}で、イグニヴァルは闘技場を燃やす。安全地帯の中でも有効な印が周囲のプレイヤーを脅かし続ける。',
+  'hudChrome.raidBossGuide.ignivar.phaseFinaleName': '最終段階：最後の業火',
+  'hudChrome.raidBossGuide.ignivar.phaseFinaleSummary':
+    '体力{health}で、イグニヴァルは厳しい時間制限のある最終攻撃段階に入り、繰り返すメカニクスも加速する。',
+  'hudChrome.raidBossGuide.ignivar.forgeStrikeName': '鍛冶の一撃',
+  'hudChrome.raidBossGuide.ignivar.forgeStrikeSummary':
+    'イグニヴァルは現在のタンクを攻撃し、イグニヴァルから受けるダメージを増加させる溶融鎧を付与する。',
+  'hudChrome.raidBossGuide.ignivar.forgeStrikeResponse':
+    'タンクは{stacks}スタックで交代する。ヒーラーは一撃と、新しいタンクが受ける最初の近接攻撃に備える。',
+  'hudChrome.raidBossGuide.ignivar.brandName': '火葬の印',
+  'hudChrome.raidBossGuide.ignivar.brandSummary':
+    'イグニヴァルはタンク以外のプレイヤーに継続する炎ダメージの印を付ける。対象者は近くの味方も燃やす。',
+  'hudChrome.raidBossGuide.ignivar.brandResponse':
+    '散開する。灼熱の奔流を使用可能な水路へ向け、印を受けた各プレイヤーが一人ずつ有効になった水を渡って解除する。',
+  'hudChrome.raidBossGuide.ignivar.brandHeroicResponse':
+    '散開する。灼熱の奔流で水路を開き、印を一人ずつ解除する。解除するたびにレイド全体へ浄化の反動が発生する。',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentName': '灼熱の奔流',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentSummary':
+    'イグニヴァルはプレイヤー一人を追跡し、広い前方攻撃を放つ。攻撃が使用可能な水路に当たると、短時間だけ有効になる。',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentHeroicSummary':
+    'イグニヴァルはプレイヤー一人を追跡し、ほぼ致命的な広い前方攻撃を放つ。攻撃が使用可能な水路に当たると、短時間だけ有効になる。',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentResponse':
+    '予告範囲を使用可能な水路一つだけに通す。他の全員は詠唱完了前に前方範囲から離れる。',
+  'hudChrome.raidBossGuide.ignivar.rainName': '灰の雨',
+  'hudChrome.raidBossGuide.ignivar.rainSummary':
+    '三つの炎の区画と表示付き隕石が、予告範囲に残ったプレイヤーへダメージを与える。',
+  'hudChrome.raidBossGuide.ignivar.rainHeroicSummary':
+    '三つの炎の区画と表示付き隕石が、予告範囲に残ったプレイヤーへ極めて大きなダメージを与える。',
+  'hudChrome.raidBossGuide.ignivar.rainResponse': '印のない隙間へ移動し、着弾前にすべての隕石範囲から離れる。',
+  'hudChrome.raidBossGuide.ignivar.raysName': '回転する業火',
+  'hudChrome.raidBossGuide.ignivar.raysSummary':
+    '回転する炎の光線がイグニヴァルの周囲を掃き、触れたプレイヤーへ繰り返しダメージを与える。',
+  'hudChrome.raidBossGuide.ignivar.raysHeroicSummary':
+    '回転する炎の光線がイグニヴァルの周囲を掃き、触れるたびに大きなダメージを繰り返し与える。',
+  'hudChrome.raidBossGuide.ignivar.raysResponse':
+    '光線の間の空間に合わせて動く。高速移動アビリティを使っても光線を横切らない。',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveName': '鍛冶波',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveSummary':
+    '拡大する炎の壁が闘技場を横切り、向かい合う二つの隙間を残して、命中したプレイヤーをノックバックする。',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveHeroicSummary':
+    '拡大する炎の壁が闘技場を横切り、向かい合う二つの隙間を残して、命中したプレイヤーをさらに遠くへノックバックする。',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveResponse':
+    '予告中にどちらかの隙間を見つけて位置を合わせ、闘技場の端へ飛ばされないようにする。',
+  'hudChrome.raidBossGuide.ignivar.apocalypseName': '黙示録',
+  'hudChrome.raidBossGuide.ignivar.apocalypseSummary':
+    'イグニヴァルはアッシュコーラーを召喚する。追加敵が黙示録を唱え終えるとレイドは即座に敗北する。',
+  'hudChrome.raidBossGuide.ignivar.apocalypseResponse':
+    '攻撃できる全員がイグニヴァル・アッシュコーラーへ切り替え、詠唱完了前に倒す。',
+  'hudChrome.raidBossGuide.ignivar.judgmentName': '鍛冶場の審判',
+  'hudChrome.raidBossGuide.ignivar.judgmentSummary':
+    'イグニヴァルは三つの避難所を示し、一つの安全地帯を特定した後、闘技場の残りを繰り返し燃やす。',
+  'hudChrome.raidBossGuide.ignivar.judgmentHeroicSummary':
+    '闘技場が燃える間、イグニヴァルは一つの安全地帯を示す。火葬の印は残り、近くの味方へダメージを与え続ける。',
+  'hudChrome.raidBossGuide.ignivar.judgmentResponse':
+    '予告中に特別な印の避難所を見分け、床が燃える前に全員で境界の内側へ入る。',
+  'hudChrome.raidBossGuide.ignivar.chainsName': '鍛冶の鎖',
+  'hudChrome.raidBossGuide.ignivar.chainsSummary':
+    'イグニヴァルは近くの二人をつなぐ。離れすぎるか、別のペアの鎖を横切ると致命的なダメージを受ける。',
+  'hudChrome.raidBossGuide.ignivar.chainsResponse':
+    'つながった相手の近くで一緒に動き、他のプレイヤーを自分たちの鎖に通さない。',
+  'hudChrome.raidBossGuide.ignivar.lastInfernoName': '最後の業火',
+  'hudChrome.raidBossGuide.ignivar.lastInfernoSummary':
+    'イグニヴァルは激怒して全滅攻撃を準備し、灰の雨、灼熱の奔流、回転する業火が加速する。',
+  'hudChrome.raidBossGuide.ignivar.lastInfernoResponse':
+    '残った攻撃と回復のクールダウンを使い、移動メカニクスを処理し続け、カウント終了前にイグニヴァルを倒す。',
   'hudChrome.raidBossGuide.ignivar.brand':
     '火葬の印: 散開する。灼熱の奔流を使用可能な水路へ向け、一人で水を渡って解除する。',
   'hudChrome.raidBossGuide.ignivar.movement':
@@ -7719,6 +7853,94 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '最後の業火: 加速した隕石、前方攻撃、回転する業火に対処しながら全滅前にイグニヴァルを倒す。',
   'hudChrome.raidBossGuide.ignivar.heroic':
     '英雄: 鍛冶の鎖ではペア同士が近くに留まり、審判中も印が残り、鍛冶波はプレイヤーをさらに遠くへ押し出す。',
+  'hudChrome.raidBossGuide.varkhul.overview':
+    'ヴァークルは死にゆく最後の泉を閉じ込めて生ける金属を鍛え、その罪を守るためにイグニヴァルを造った。この戦闘では個人の位置取りと、レイド全体による大鍛冶炉の制御が組み合わされる。',
+  'hudChrome.raidBossGuide.varkhul.phaseOpeningName': '鍛冶の父',
+  'hudChrome.raidBossGuide.varkhul.phaseOpeningSummary':
+    'ヴァークルはタンクへの圧力、広い前方攻撃、移動する投射物、全員で受ける攻撃、隕石の波、大金床からの攻撃を繰り返す。',
+  'hudChrome.raidBossGuide.varkhul.phaseAssemblyName': '幕間：師匠の組立',
+  'hudChrome.raidBossGuide.varkhul.phaseAssemblySummary':
+    '体力{health}でヴァークルは守られ、鍛冶軍団がポータルから現れる。柱の光線は鍛冶炉の崩壊を引き起こそうとする。',
+  'hudChrome.raidBossGuide.varkhul.phaseFinaleName': '最終段階：解き放たれた傑作',
+  'hudChrome.raidBossGuide.varkhul.phaseFinaleSummary':
+    '体力{health}でヴァークルは攻撃が速くなり、ダメージが増え、最終期限までレイドへ炎を繰り返し放つ。',
+  'hudChrome.raidBossGuide.varkhul.phaseFinaleHeroicSummary':
+    '体力{health}でヴァークルは以前のメカニクスの大半をやめ、世界炎が内側へ迫ってるつぼを飲み込む。',
+  'hudChrome.raidBossGuide.varkhul.makersBrandName': '創造者の印',
+  'hudChrome.raidBossGuide.varkhul.makersBrandSummary':
+    'ヴァークルは現在のタンクを攻撃し、自身から受けるすべてのダメージを増加させる累積効果を付与する。',
+  'hudChrome.raidBossGuide.varkhul.makersBrandResponse':
+    'タンクは{stacks}スタックで交代する。ヒーラーはヴァークルが対象を変える前に次のタンクを守る。',
+  'hudChrome.raidBossGuide.varkhul.frontalName': '鍛冶の父の薙ぎ払い',
+  'hudChrome.raidBossGuide.varkhul.frontalSummary':
+    'ヴァークルは非常に広い前方薙ぎ払いを放ち、前方にいる全員へ大きな炎ダメージを与える。',
+  'hudChrome.raidBossGuide.varkhul.frontalHeroicSummary':
+    'ヴァークルは非常に広い前方薙ぎ払いを放ち、前方にいる全員へほぼ致命的な炎ダメージを与える。',
+  'hudChrome.raidBossGuide.varkhul.frontalResponse':
+    'ヴァークルを常にグループの反対へ向け、予告が出たらすぐ背後へ移動する。',
+  'hudChrome.raidBossGuide.varkhul.orbsName': '灰のオーブ',
+  'hudChrome.raidBossGuide.varkhul.orbsSummary':
+    '印を受けたタンク以外のプレイヤーは残る炎の床を落とし、全方向へ炎のオーブを放つ。赤熱した金属は受ける回復も吸収する。',
+  'hudChrome.raidBossGuide.varkhul.orbsHeroicSummary':
+    '印を受けたタンク以外のプレイヤーは高威力で残る炎の床を落とし、全方向へ危険な炎のオーブを放つ。赤熱した金属は受ける回復も吸収する。',
+  'hudChrome.raidBossGuide.varkhul.orbsResponse':
+    '印を部屋の外周へ運び、炎の床同士を離し、闘技場を横切るオーブを避ける。ヒーラーは回復吸収を素早く消す。',
+  'hudChrome.raidBossGuide.varkhul.pyreName': '共有の火葬',
+  'hudChrome.raidBossGuide.varkhul.pyreSummary':
+    '移動する円が赤熱した金属のないプレイヤー一人を追う。ダメージは円内で分担され、不足する一人ごとにレイド全体が最大体力の{missingPenalty}のダメージを受ける。',
+  'hudChrome.raidBossGuide.varkhul.pyreHeroicSummary':
+    '移動する円が赤熱した金属のないプレイヤー一人を追い、より大きな一撃を分担する。不足する一人ごとにレイド全体が最大体力の{missingPenalty}のダメージを受ける。',
+  'hudChrome.raidBossGuide.varkhul.pyreResponse':
+    '円の中に少なくとも{players}人で集合し、詠唱が解決するまで対象者と一緒に動く。',
+  'hudChrome.raidBossGuide.varkhul.forgestormName': '鍛冶嵐',
+  'hudChrome.raidBossGuide.varkhul.forgestormSummary':
+    'ヴァークルは闘技場全体へ、表示付き隕石を連続{waves}波降らせる。',
+  'hudChrome.raidBossGuide.varkhul.forgestormHeroicSummary':
+    'ヴァークルは極めて大きなダメージを与える表示付き隕石を連続{waves}波降らせる。',
+  'hudChrome.raidBossGuide.varkhul.forgestormResponse':
+    '地面に出る新しい予告を毎回確認し、その波が落ちる前に離れる。次の波を確認せず元の位置へ戻らない。',
+  'hudChrome.raidBossGuide.varkhul.rayName': '焼き入れ光線',
+  'hudChrome.raidBossGuide.varkhul.raySummary':
+    '光線が印を受けたプレイヤーを長く追跡する。ヴァークルと対象の間に最初に入った別のプレイヤーが攻撃を受け、焼き入れの傷を得る。',
+  'hudChrome.raidBossGuide.varkhul.rayResponse':
+    '体力に余裕のある一人、通常はサブタンクを光線へ入れる。他のプレイヤーは離れ、焼き入れの傷が残る間は担当を交代する。',
+  'hudChrome.raidBossGuide.varkhul.anvilName': '金床の布告',
+  'hudChrome.raidBossGuide.varkhul.anvilSummary':
+    'ヴァークルは大鍛冶炉へ歩き、{strikes}回打ってレイド全体へ増加するダメージを与える。',
+  'hudChrome.raidBossGuide.varkhul.anvilHeroicSummary':
+    'ヴァークルは大鍛冶炉を{strikes}回打って増加する全体ダメージを与え、同時に表示付き隕石をプレイヤーへ落とす。',
+  'hudChrome.raidBossGuide.varkhul.anvilResponse': '全体回復のため集合し、最後の一撃には防御クールダウンを使う。',
+  'hudChrome.raidBossGuide.varkhul.anvilHeroicResponse':
+    '表示付き隕石をグループから離して散開し、ヒーラーと防御クールダウンで{strikes}回すべての一撃を耐える。',
+  'hudChrome.raidBossGuide.varkhul.assemblyName': '師匠の組立',
+  'hudChrome.raidBossGuide.varkhul.assemblySummary':
+    'ヴァークルは守られて時間制限付きの組立を始める。鍛冶炉が傑作を完成させる前に、レイドはすべてのポータル波を倒さなければならない。',
+  'hudChrome.raidBossGuide.varkhul.assemblyResponse':
+    '光線の制御と優先追加敵の両方へ注意を分ける。組立時間が切れる前に鍛冶軍団をすべて倒す。',
+  'hudChrome.raidBossGuide.varkhul.beamName': 'るつぼの光線',
+  'hudChrome.raidBossGuide.varkhul.beamSummary':
+    '有効な柱の光線は、プレイヤーが遮らない限り鍛冶炉を加熱する。遮るプレイヤーは増加するるつぼの曝露ダメージを受け、光線が遮られるか無効なら熱が下がる。',
+  'hudChrome.raidBossGuide.varkhul.beamHeroicSummary':
+    '有効な柱の光線は、プレイヤーが遮らない限り鍛冶炉を加熱する。遮るプレイヤーは増加するるつぼの曝露ダメージを受け、鍛冶炉の熱は決して下がらない。',
+  'hudChrome.raidBossGuide.varkhul.beamResponse':
+    '有効な柱と鍛冶炉の間に立ち、曝露が危険になる前に担当を交代する。熱が満杯になると致命的な鍛冶炉の崩壊が起きる。',
+  'hudChrome.raidBossGuide.varkhul.legionName': '鍛冶軍団',
+  'hudChrome.raidBossGuide.varkhul.legionSummary':
+    'るつぼの番人は鍛冶炉の熱を増やす、るつぼの地震を詠唱する。灰の技工士は修復手順でヴァークルを回復する。',
+  'hudChrome.raidBossGuide.varkhul.legionResponse':
+    'るつぼの地震と修復手順を中断し、危険な術者を優先してから残りの追加敵を倒す。',
+  'hudChrome.raidBossGuide.varkhul.masterpieceName': '解き放たれた傑作',
+  'hudChrome.raidBossGuide.varkhul.masterpieceSummary':
+    'ヴァークルは攻撃が速くなり、ダメージが増え、最後の全滅までレイドを繰り返し燃やす。',
+  'hudChrome.raidBossGuide.varkhul.masterpieceHeroicSummary':
+    'ヴァークルは攻撃が速くなり、ダメージが増える。世界炎が以前のメカニクスの大半に代わって最終攻撃となる。',
+  'hudChrome.raidBossGuide.varkhul.masterpieceResponse':
+    '残った攻撃と防御のクールダウンを使い、最終カウントが終わる前にヴァークルを倒す。',
+  'hudChrome.raidBossGuide.varkhul.worldfireName': '世界炎',
+  'hudChrome.raidBossGuide.varkhul.worldfireSummary':
+    '英雄では、炎が闘技場の外周から段階的に中央へ進み、最後にはるつぼ全体を燃やす。',
+  'hudChrome.raidBossGuide.varkhul.worldfireResponse':
+    '進む炎の帯より先に内側へ移動し、狭くなる安全地帯を保ち、中央が燃える前にヴァークルを倒す。',
   'hudChrome.raidBossGuide.varkhul.tanks':
     'タンク: 創造者の印が2スタックで交代し、ヴァークルを近接範囲に保つ。',
   'hudChrome.raidBossGuide.varkhul.orbs':
@@ -8922,6 +9144,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.character.online': 'キャラクターは現在オンラインです。',
   'apiError.character.rename_not_permitted': 'このキャラクターの名前変更は許可されていません。',
   'apiError.character.delete_confirm': '削除を確認するにはキャラクター名を入力してください。',
+  'apiError.character.storage_purchase_open':
+    'このキャラクターを削除するには、保管庫の購入を完了または解決する必要があります。',
+  'apiError.character.delete_busy':
+    'サーバーが混み合っています。しばらくしてからこのキャラクターの削除をお試しください。',
   'apiError.character.already_in_world': 'キャラクターは既に世界にいます。',
   'apiError.character.taken_over': 'あなたのキャラクターは別のセッションに引き継がれました。',
   'apiError.character.rename_required': 'このキャラクターは世界に入る前に名前変更が必要です。',
@@ -9559,6 +9785,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.craftName.leatherworking': '皮革加工',
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
   'hudChrome.crafting.reagentFineSub': '（上質な等級を{count}個消費）',
+  'hudChrome.crafting.reagentVaultDraw': '（素材保管庫から{count}個使用）',
+  'hudChrome.crafting.vaultUnreachable': 'ここでは素材保管庫を利用できません。',
   // Protect Yumi locale fill (M16 wordy-key floor).
   'yumi.hud.collapse': 'Protect Yumiのバーを折りたたむ',
   'yumi.hud.expand': 'Protect Yumiのバーを展開する',
@@ -9772,6 +10000,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '金庫を開いた状態でバッグの品をクリックすると預けられ、金庫の品をクリックすると引き出せます。金庫に入るのは品物だけで、コインは預けられず、クエストアイテムも手元に残ります。旅の途中でバッグがいっぱいになったら、製作素材をまとめて預けるボタンもあります。',
   'guide.economy.bankSlots':
     '作りたての金庫は小さめですが、あなたとともに広がっていきます。出納官は追加の枠をコインで販売しており、値段は段階ごとに上がります。さらにオンラインでのプレイなら、メール認証やアカウント連携、友人の紹介などでボーナスの空きも手に入ります。',
+  'guide.economy.bankSockets':
+    '枠の階段の先には、出納官が最大四つのバッグスロットも販売しています。安い順に解放され、値段は段階ごとに上がります。手持ちの余ったバッグをスロットに収めれば、そのバッグの枠が金庫の空きに加わります。普通のバッグは金庫全体を広げ、素材袋は製作素材だけが使える空きを加えます。バッグ欄のバッグをクリックすれば収まり、スロットをクリックすれば取り戻せます。取り戻しても預けた品を失うことはありません。金庫が縮んだ空きを上回っても、すべてはそのまま残り、新たな預け入れが空きを待つだけです。',
   'guide.economy.bankTitle': '銀行',
   'hudChrome.bank.title': '銀行',
   'hudChrome.bank.subtitle': '金張りの金庫',
@@ -9784,18 +10014,53 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.buySlotsMaxed': '完全に拡張済み',
   'hudChrome.bank.buyConfirm': '{price}で銀行スロットを追加で{count}個購入しますか？',
   'hudChrome.bank.buyConfirmAccept': '購入',
+  'hudChrome.bank.meterLabel': 'スロット: {total}個中{used}個',
+  'hudChrome.bank.meterPoolGeneral': '一般: {total}個中{used}個',
+  'hudChrome.bank.meterPoolMaterials': '素材: {total}個中{used}個',
+  'hudChrome.bank.meterPoolsAria': '使用中の銀行スロット: {total}個中{used}個。一般アイテム: {generalTotal}個中{generalUsed}個。素材: {materialsTotal}個中{materialsUsed}個。',
+  'hudChrome.bank.meterMaterialsNote': '装着した素材サッチェルによる素材専用スペースです。ほかのアイテムには使えません。',
+  'hudChrome.bank.priceDisclaimer': '価格はゲーム経済に応じて変動することがあります。',
+  'hudChrome.bank.rungItemName': '銀行スロット{count}個',
+  'hudChrome.bank.buySlotsDualAria': '{price}または{cost} Claudiumでスロットを{count}個購入',
+  'hudChrome.bank.buyConfirmDual': '銀行スロットを追加で{count}個購入しますか？',
+  'hudChrome.bank.buyConfirmGold': '{price}で購入',
+  'hudChrome.bank.buyConfirmClaudium': '{cost} Claudiumで購入',
+  'hudChrome.bank.rungGranted': '銀行スロットが追加されました。このキャラクターの銀行が広がりました。',
+  'hudChrome.bank.rungAlreadyGranted': 'これらのスロットはすでにこのキャラクターに適用されています。二重に請求されることはありません。',
+  'hudChrome.bank.rungApplyDeferred': '支払いが完了しました。スロットはこのキャラクターの次回ログイン時に自動で適用されます。',
+  'hudChrome.bank.rungGrantUnresolved': '支払いは完了しましたが、スロットをまだ適用できませんでした。購入は記録されており、サポートが対応できます。',
+  'hudChrome.bank.rungInProgress': 'このキャラクターの購入がまだ処理中です。少し待ってからもう一度お試しください。',
+  'hudChrome.bank.rungDoesNotFit': 'このキャラクターの銀行には、これ以上の拡張を収める余地がありません。',
+  'hudChrome.bank.rungNotPurchasable': 'これらの銀行スロットは現在購入できません。',
+  'hudChrome.bank.rungFailed': '購入を完了できませんでした。',
+  'hudChrome.bank.rungOutage':
+    '購入を確認できませんでした。このボタンからもう一度お試しください。二重に請求されることはありません。先にゲームを再読み込みすると、この保護が失われる場合があります。',
   'hudChrome.bank.withdrawHint': 'クリックで引き出す',
   'hudChrome.bank.withdrawPartialHint': 'Shift+クリックで一部だけ引き出す',
   'hudChrome.bank.depositHint': 'クリックで預ける',
   'hudChrome.bank.depositPartialHint': 'Shift+クリックで一部だけ預ける',
   'hudChrome.bank.cannotDeposit': '銀行に預けられません',
   'hudChrome.bank.cannotDepositNow': '今は預けられません',
+  'hudChrome.bank.socketRowAria': '銀行バッグスロット',
+  'hudChrome.bank.socketEmpty': '空の銀行バッグスロット',
+  'hudChrome.bank.socketEmptyHint': 'バッグ内のバッグをクリックして銀行に収納',
+  'hudChrome.bank.socketLocked': '未解放のバッグスロット',
+  'hudChrome.bank.socketLockedLater': 'バッグスロットは安い順に解放されます',
+  'hudChrome.bank.socketUnlockAria': '{price}で銀行バッグスロットを解放',
+  'hudChrome.bank.socketUnlockHint': 'クリックしてこのバッグスロットを解放',
+  'hudChrome.bank.socketUnlockConfirm': '{price}で銀行バッグスロットを解放しますか？',
+  'hudChrome.bank.socketUnlockAccept': '解放',
+  'hudChrome.bank.unsocketHint': 'クリックしてこのバッグをバッグに戻す',
+  'hudChrome.bank.socketHint': 'クリックしてこのバッグを銀行に装着',
   'hudChrome.bank.depositQuantityTitle': '{item}を預ける',
   'hudChrome.bank.depositQuantityInput': '預ける数量',
   'hudChrome.bank.depositQuantityConfirm': '預ける',
   'hudChrome.bank.withdrawQuantityTitle': '{item}を引き出す',
+  'hudChrome.bank.vaultRowWithdrawName': '{item}を引き出す',
+  'hudChrome.bank.priceChanged': '購入が完了する前に価格が変更されました。更新後の価格を確認し、もう一度確定してください。',
   'hudChrome.bank.withdrawQuantityInput': '引き出す数量',
   'hudChrome.bank.withdrawQuantityConfirm': '引き出す',
+  'hudChrome.bank.withdrawQuantityAction': '{item}の引き出す数量を選択',
   'hudChrome.bank.filterGroupAria': '銀行をカテゴリーで絞り込む',
   'hudChrome.bank.sortAria': '銀行のアイテムを並べ替える',
   'hudChrome.bank.searchAria': '名前で銀行のアイテムを検索',
@@ -9819,6 +10084,25 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.bonusReferralExplainer':
     '友達を招待しましょう：友達がレベル10に達すると、お互いに2スロット獲得できます。友達は最大5人までです。',
   'hudChrome.bank.bonusSectionAria': 'ボーナス銀行スロットと獲得方法',
+  'hudChrome.bank.vaultTab': '保管庫',
+  'hudChrome.bank.vaultCapacityNote': '各素材は最大{cap}個まで保管できます。',
+  'hudChrome.bank.vaultEmpty': '素材保管庫は空です。バッグの素材をクリックすると預けられます。',
+  'hudChrome.bank.vaultRowAria': '{item}：{count}/{cap}個保管中',
+  'hudChrome.bank.vaultLockedIntro':
+    '素材保管庫を開放すると、銀行のそばに製作素材を蓄えられます。素材ごとに専用の枠があり、それぞれ最大{cap}個まで保管できます。',
+  'hudChrome.bank.vaultUnlockButton': '素材保管庫を開放する',
+  'hudChrome.bank.vaultUnlockConfirm': '{price}で素材保管庫を開放しますか？',
+  'hudChrome.bank.vaultUpgrade': '上限を{cap}個に拡張',
+  'hudChrome.bank.vaultUpgradeConfirm': '{price}で各素材の保管上限を{cap}個に拡張しますか？',
+  'hudChrome.bank.vaultDepositAll': '素材をすべて預ける',
+  'hudChrome.bank.vaultDepositAllTooltip':
+    'バッグ内のすべての素材を一度に保管庫へ預けます。各素材は上限まで預けられます。装備、道具、クエストアイテム、消耗品は移動しません。',
+  'hudChrome.bank.vaultDepositAllDone': '預けた素材：{count}個。',
+  'hudChrome.bank.vaultDepositAllFull': '預けた素材：{count}個。上限に達した素材があります。',
+  'hudChrome.bank.vaultDepositAllNone': '保管庫の上限に達しているため、何も預けられませんでした。',
+  'hudChrome.bank.vaultWithdrawShort': 'バッグには{count}個のうち{fit}個しか入りません。',
+  'hudChrome.bank.vaultDepositHint': 'クリックで保管庫に預ける',
+  'hudChrome.bank.vaultCannotDeposit': '保管庫には預けられません',
   'hudChrome.bank.tabsAria': '銀行タブ',
   'hudChrome.bank.personalTab': '個人',
   'hudChrome.bank.guildTab': 'ギルド',
@@ -10914,6 +11198,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.goldweave_robe.name': '鍍金織りのローブ',
   'entities.items.goldweave_leggings.name': '鍍金織りのレギンス',
   'entities.items.silkspun_satchel.name': '絹紡ぎのサッチェル',
+  'entities.items.wayfarers_backpack.name': '旅人のバックパック',
+  'entities.items.burlap_reagent_pouch.name': '粗麻の素材ポーチ',
+  'entities.items.necromancers_reagent_satchel.name': '死霊術師の素材サッチェル',
+  'entities.items.duskweave_bag.name': '宵織りのバッグ',
+  'entities.items.resonant_weave_bag.name': '共鳴織りのバッグ',
+  'entities.items.foragers_haversack.name': '採集者のハヴァサック',
+  'entities.items.loombound_reagent_satchel.name': '織機縛りの素材サッチェル',
   'entities.items.silkbinders_raiment.name': '絹縛りの法衣',
   'entities.items.sunweave_mantle.name': '陽織りのマント',
   'entities.items.sunweave_treads.name': '陽織りの足具',

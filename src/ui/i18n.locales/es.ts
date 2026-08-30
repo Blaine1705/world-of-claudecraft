@@ -4245,6 +4245,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetFrame.unlock': 'Mover el marco del objetivo',
   'itemUi.kind.bag': 'Bolsa',
   'itemUi.tooltip.bagSlots': 'Bolsa de {slots} espacios',
+  'itemUi.tooltip.bagSlotsMaterials': 'Bolsa de materiales de {slots} espacios',
   'sim.delve.baptistryEggs':
     'El baptisterio queda en silencio. Sacos de huevos de araña se aferran, húmedos, al borde.',
   'sim.delve.baptistrySpidersSealed': 'Deberías intentar destruir los sacos de araña.',
@@ -13920,7 +13921,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.varkhulWaveStatus': 'Oleada {wave}/{waves} | Enemigos: {remaining}',
   'hudChrome.raidBossGuide.title': 'Guía de jefes',
   'hudChrome.raidBossGuide.button': 'Guía: {boss}',
-  'hudChrome.raidBossGuide.subtitle': '{boss} | Normal y heroico',
+  'hudChrome.raidBossGuide.subtitle': '{boss} | {difficulty}',
   'hudChrome.raidBossGuide.close': 'Cerrar la guía de jefes',
   'hudChrome.raidBossGuide.ignivar.brand':
     'Marca de la Pira: separaos. Apunta Torrente abrasador hacia un conducto de agua listo y cruza el agua a solas para limpiarte.',

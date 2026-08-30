@@ -551,6 +551,31 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.apply': '스킨 적용',
   'hudChrome.wocStore.detach': '스킨 해제',
   'hudChrome.wocStore.equipHint': '이 스킨을 적용하려면 {type}을(를) 장착하세요.',
+  'hudChrome.wocStore.charter.eyebrow': '금고',
+  'hudChrome.wocStore.charter.title': '금고 특허장',
+  'hudChrome.wocStore.charter.scope': '특허장은 이 캐릭터의 은행만 확장합니다. 출납관도 같은 칸을 골드로 판매합니다.',
+  'hudChrome.wocStore.charter.grant': '은행 칸 {slots}칸 추가',
+  'hudChrome.wocStore.charter.buy': '특허장 구매',
+  'hudChrome.wocStore.charter.buyAria': '{item} 구매',
+  'hudChrome.wocStore.charter.confirmTitle': '특허장 구매 확인',
+  'hudChrome.wocStore.charter.confirmBody': '{item}을(를) {cost} Claudium에 구매할까요?',
+  'hudChrome.wocStore.charter.granted': '특허장이 적용되었습니다. 이 캐릭터의 은행이 넓어졌습니다.',
+  'hudChrome.wocStore.charter.alreadyGranted': '이 특허장은 이미 이 캐릭터에 적용되어 있습니다. 중복 청구되지 않았습니다.',
+  'hudChrome.wocStore.charter.applyDeferred': '결제가 완료되었습니다. 이 캐릭터가 다음에 접속할 때 칸이 자동으로 적용됩니다.',
+  'hudChrome.wocStore.charter.grantUnresolved': '결제는 완료되었지만 칸을 아직 적용하지 못했습니다. 구매 내역은 기록되어 있으며 고객지원이 마무리해 드릴 수 있습니다.',
+  'hudChrome.wocStore.charter.inProgress': '이 캐릭터의 구매가 아직 처리 중입니다. 잠시 후 다시 시도하세요.',
+  'hudChrome.wocStore.charter.doesNotFit': '이 캐릭터의 은행에는 이 특허장의 칸을 모두 담을 수 없습니다.',
+  'hudChrome.wocStore.charter.notPurchasable': '이 특허장은 지금 구매할 수 없습니다.',
+  'hudChrome.wocStore.charter.noCharterFits': '이 캐릭터의 은행에 남은 자리에 들어갈 수 있는 특허장이 없습니다.',
+  'hudChrome.wocStore.charter.someHiddenByFit': '이 캐릭터의 은행에 남은 자리보다 큰 특허장은 표시되지 않습니다.',
+  'hudChrome.wocStore.charter.noRoom': '이 캐릭터의 은행에는 더 이상 특허장을 넣을 자리가 없습니다.',
+  'hudChrome.wocStore.charter.outage': '구매를 확인하지 못했습니다. 이 버튼으로 다시 시도하면 중복 청구되지 않습니다. 먼저 게임을 새로 고치면 이 보호가 사라질 수 있습니다.',
+  'hudChrome.wocStore.charter.outageStale': '상점으로 돌아가 동일한 “특허장 구매” 동작을 다시 사용하세요. 중복 청구되지 않습니다. 먼저 게임을 새로 고치면 이 보호가 사라질 수 있습니다.',
+  'hudChrome.wocStore.charter.failed': '구매를 완료하지 못했습니다.',
+  'hudChrome.wocStore.charter.names.strongbox_charter_1': '하급 금고 특허장',
+  'hudChrome.wocStore.charter.names.strongbox_charter_2': '상급 금고 특허장',
+  'hudChrome.wocStore.charter.names.strongbox_charter_3': '대금고 특허장',
+  'hudChrome.wocStore.charter.names.strongbox_charter_complete': '완전 금고 특허장',
   'hudChrome.claudium.title': 'Claudium',
   'hudChrome.claudium.open': 'Claudium 열기',
   'hudChrome.claudium.close': 'Claudium 닫기',
@@ -634,6 +659,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.toLabel': '받는 사람',
   'itemUi.kind.bag': '가방',
   'itemUi.tooltip.bagSlots': '{slots}칸 가방',
+  'itemUi.tooltip.bagSlotsMaterials': '{slots}칸 재료 가방',
   'hudChrome.auth.forgotPrompt': '비밀번호를 잊으셨나요?',
   'hudChrome.auth.forgotTitle': '비밀번호 재설정',
   'hudChrome.auth.forgotHint': '사용자 이름을 입력하면 등록된 이메일로 재설정 링크를 보내드립니다.',
@@ -1500,6 +1526,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showDailyRewardsChest': '일일 보상 보물상자 표시',
   'hudChrome.options.mobileCameraJoystick': '카메라 조이스틱',
   'hudChrome.options.mobileLeftHanded': '왼손잡이 레이아웃',
+  'hudChrome.options.touchPreciseAim': '정밀 지면 지정',
+  'hudChrome.options.touchPreciseAimNote': '지면 주문은 조준한 뒤 시전합니다. 끄면 추천 지점에 즉시 시전합니다.',
   'hudChrome.options.touchTapMenus': '탭 메뉴',
   'hudChrome.options.touchTapMenusNote': '스와이프 대신 탭으로 행동, 소모품, 메뉴 컨트롤을 엽니다. 항목을 탭하면 사용하고, 컨트롤을 다시 탭하면 기본 동작을 실행하며, 바깥을 탭하면 닫힙니다.',
   'hudChrome.options.itemLevelLine': '아이템 레벨 {level}',
@@ -5983,6 +6011,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.invertY': '카메라 반전(Y축)',
   'hudChrome.controller.deadzone': '스틱 데드존',
   'hudChrome.controller.cameraSpeed': '카메라 속도',
+  'hudChrome.controller.reticleSpeed': '조준점 속도',
   'hudChrome.controller.vibration': '진동',
   'hudChrome.controller.buttons': '버튼 배치',
   'hudChrome.controller.resetButtons': '버튼 배치 초기화',
@@ -6182,6 +6211,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.backpack': '배낭',
   'hudChrome.bags.socketEmpty': '빈 가방 칸',
   'hudChrome.bags.unequipHint': '클릭하여 이 가방을 해제',
+  'hudChrome.bags.poolGeneral': '일반: {total}칸 중 {used}칸',
+  'hudChrome.bags.poolMaterials': '재료: {total}칸 중 {used}칸',
+  'hudChrome.bags.capacityPoolsAria': '사용 중인 가방 칸: {total}칸 중 {used}칸. 일반 아이템: {generalTotal}칸 중 {generalUsed}칸. 재료: {materialsTotal}칸 중 {materialsUsed}칸.',
   'guide.brand': 'World of ClaudeCraft',
   'guide.brandShort': 'ClaudeCraft',
   'guide.tagline': '브라우저에서 무료로 즐기는 클래식 스타일 MMO입니다.',
@@ -7698,8 +7730,110 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.varkhulWaveStatus': '공세 {wave}/{waves} | 적: {remaining}',
   'hudChrome.raidBossGuide.title': '우두머리 공략',
   'hudChrome.raidBossGuide.button': '공략: {boss}',
-  'hudChrome.raidBossGuide.subtitle': '{boss} | 일반 및 영웅',
+  'hudChrome.raidBossGuide.subtitle': '{boss} | {difficulty}',
   'hudChrome.raidBossGuide.close': '우두머리 공략 닫기',
+  'hudChrome.raidBossGuide.bossesLabel': '공격대 우두머리',
+  'hudChrome.raidBossGuide.difficultyLabel': '난이도',
+  'hudChrome.raidBossGuide.normal': '일반',
+  'hudChrome.raidBossGuide.heroic': '영웅',
+  'hudChrome.raidBossGuide.portraitAlt': '{boss} 전투 초상화',
+  'hudChrome.raidBossGuide.overviewHeading': '개요',
+  'hudChrome.raidBossGuide.abilitiesHeading': '능력',
+  'hudChrome.raidBossGuide.whatToDo': '대처 방법',
+  'hudChrome.raidBossGuide.whatToDoResponse': '대처 방법: {response}',
+  'hudChrome.raidBossGuide.rolesLabel': '역할별 책임',
+  'hudChrome.raidBossGuide.flagsLabel': '메커니즘 경고',
+  'hudChrome.raidBossGuide.roleTank': '방어 담당',
+  'hudChrome.raidBossGuide.roleHealer': '치유 담당',
+  'hudChrome.raidBossGuide.roleDamage': '공격 담당',
+  'hudChrome.raidBossGuide.roleAll': '모든 역할',
+  'hudChrome.raidBossGuide.flagDeadly': '치명적',
+  'hudChrome.raidBossGuide.flagInterruptible': '차단 가능',
+  'hudChrome.raidBossGuide.flagImportant': '중요',
+  'hudChrome.raidBossGuide.flagCleansable': '해제 가능',
+  'hudChrome.raidBossGuide.browseBoss': '{boss} 보기',
+  'hudChrome.raidBossGuide.chooseDifficulty': '{difficulty} 메커니즘 보기',
+  'hudChrome.raidBossGuide.expandAbility': '{ability} 펼치기',
+  'hudChrome.raidBossGuide.collapseAbility': '{ability} 접기',
+  'hudChrome.raidBossGuide.abilityControlLabel': '{action}. {details}',
+  'hudChrome.raidBossGuide.tooltipMeta': '{phase} | {difficulty}',
+  'hudChrome.raidBossGuide.ignivar.overview':
+    '바르쿨은 이그니바르를 전령이자 살아 있는 봉인, 내부 도가니로 향하는 열쇠로 벼려냈습니다. 이 전투는 수로 제어, 정확한 이동, 우선 대상에 대한 빠른 집중 공격을 시험합니다.',
+  'hudChrome.raidBossGuide.ignivar.phaseOpeningName': '전령의 각성',
+  'hudChrome.raidBossGuide.ignivar.phaseOpeningSummary':
+    '수로로 장작더미의 징표를 처리하면서 이그니바르의 반복되는 전방 공격, 하늘불꽃, 회전 광선, 확장되는 대장간 파도에 대응합니다.',
+  'hudChrome.raidBossGuide.ignivar.phaseApocalypseName': '사잇단계: 대재앙',
+  'hudChrome.raidBossGuide.ignivar.phaseApocalypseSummary':
+    '생명력이{health}가 되면 이그니바르가 전투를 끝내려는 잿불소환사를 불러냅니다.',
+  'hudChrome.raidBossGuide.ignivar.phaseJudgmentName': '대장간의 심판',
+  'hudChrome.raidBossGuide.ignivar.phaseJudgmentSummary':
+    '생명력이{health}가 되면 이그니바르가 투기장을 불태우고 세 피난처 중 하나의 안전 지대를 드러냅니다.',
+  'hudChrome.raidBossGuide.ignivar.phaseJudgmentHeroicSummary':
+    '생명력이{health}가 되면 이그니바르가 투기장을 불태우며, 활성 징표는 피난처 안에서도 주변 플레이어를 계속 위협합니다.',
+  'hudChrome.raidBossGuide.ignivar.phaseFinaleName': '마지막 단계: 마지막 지옥불',
+  'hudChrome.raidBossGuide.ignivar.phaseFinaleSummary':
+    '생명력이{health}가 되면 이그니바르가 엄격한 제한 시간이 있는 마지막 공격 단계에 들어가며 반복 메커니즘도 빨라집니다.',
+  'hudChrome.raidBossGuide.ignivar.forgeStrikeName': '대장간 일격',
+  'hudChrome.raidBossGuide.ignivar.forgeStrikeSummary':
+    '이그니바르가 현재 방어 담당을 공격하고 용융 갑옷을 부여하여 자신에게 받는 피해를 증가시킵니다.',
+  'hudChrome.raidBossGuide.ignivar.forgeStrikeResponse':
+    '방어 담당은{stacks}중첩에 교대합니다. 치유 담당은 일격과 새 방어 담당이 받는 첫 근접 공격에 대비합니다.',
+  'hudChrome.raidBossGuide.ignivar.brandName': '장작더미의 징표',
+  'hudChrome.raidBossGuide.ignivar.brandSummary':
+    '이그니바르가 방어 담당이 아닌 플레이어에게 지속 화염 피해를 주는 징표를 남깁니다. 대상자는 주변 아군도 불태웁니다.',
+  'hudChrome.raidBossGuide.ignivar.brandResponse':
+    '산개합니다. 불타는 급류를 준비된 수로로 유도한 뒤 징표 대상자가 한 명씩 활성화된 물을 건너 해제합니다.',
+  'hudChrome.raidBossGuide.ignivar.brandHeroicResponse':
+    '산개합니다. 불타는 급류로 수로를 열고 징표 대상자를 한 명씩 해제합니다. 해제할 때마다 공격대 전체에 정화의 반동이 발생합니다.',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentName': '불타는 급류',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentSummary':
+    '이그니바르가 플레이어 한 명을 추적한 뒤 넓은 전방 공격을 방출합니다. 공격에 맞은 준비된 수로는 잠시 활성화됩니다.',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentHeroicSummary':
+    '이그니바르가 플레이어 한 명을 추적한 뒤 거의 치명적인 넓은 전방 공격을 방출합니다. 공격에 맞은 준비된 수로는 잠시 활성화됩니다.',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentResponse':
+    '경고 범위가 준비된 수로 하나만 지나가게 유도합니다. 나머지는 시전이 끝나기 전에 전방 범위를 벗어납니다.',
+  'hudChrome.raidBossGuide.ignivar.rainName': '잿불비',
+  'hudChrome.raidBossGuide.ignivar.rainSummary':
+    '세 화염 구역과 표시된 운석 충돌이 경고 안에 남은 플레이어에게 피해를 줍니다.',
+  'hudChrome.raidBossGuide.ignivar.rainHeroicSummary':
+    '세 화염 구역과 표시된 운석 충돌이 경고 안에 남은 플레이어에게 극심한 피해를 줍니다.',
+  'hudChrome.raidBossGuide.ignivar.rainResponse': '표시되지 않은 틈으로 이동하고 충돌 전에 모든 운석 원을 벗어납니다.',
+  'hudChrome.raidBossGuide.ignivar.raysName': '회전하는 지옥불',
+  'hudChrome.raidBossGuide.ignivar.raysSummary':
+    '회전하는 화염 광선이 이그니바르 주위를 휩쓸며 닿은 플레이어에게 반복 피해를 줍니다.',
+  'hudChrome.raidBossGuide.ignivar.raysHeroicSummary':
+    '회전하는 화염 광선이 이그니바르 주위를 휩쓸며 닿을 때마다 반복해서 큰 피해를 줍니다.',
+  'hudChrome.raidBossGuide.ignivar.raysResponse':
+    '광선 사이의 빈 공간을 따라 이동합니다. 빠른 이동 능력을 사용하더라도 광선을 가로지르지 않습니다.',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveName': '대장간 파도',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveSummary':
+    '확장되는 불의 벽이 투기장을 가로지르며 마주 보는 두 틈을 남기고 적중한 플레이어를 밀쳐냅니다.',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveHeroicSummary':
+    '확장되는 불의 벽이 투기장을 가로지르며 마주 보는 두 틈을 남기고 적중한 플레이어를 훨씬 멀리 밀쳐냅니다.',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveResponse':
+    '예고 중 어느 한 틈을 찾아 정렬하고 투기장 가장자리 쪽으로 밀려나지 않게 합니다.',
+  'hudChrome.raidBossGuide.ignivar.apocalypseName': '대재앙',
+  'hudChrome.raidBossGuide.ignivar.apocalypseSummary':
+    '이그니바르가 잿불소환사를 불러냅니다. 추가 적이 대재앙 시전을 끝내면 공격대가 즉시 패배합니다.',
+  'hudChrome.raidBossGuide.ignivar.apocalypseResponse':
+    '모든 공격 담당이 이그니바르 잿불소환사로 전환하고 시전이 끝나기 전에 처치합니다.',
+  'hudChrome.raidBossGuide.ignivar.judgmentName': '대장간의 심판',
+  'hudChrome.raidBossGuide.ignivar.judgmentSummary':
+    '이그니바르가 세 피난처를 표시하고 하나의 안전 지대를 확인한 뒤 투기장의 나머지 부분을 반복해서 불태웁니다.',
+  'hudChrome.raidBossGuide.ignivar.judgmentHeroicSummary':
+    '투기장이 불타는 동안 이그니바르가 하나의 안전 지대를 표시합니다. 장작더미의 징표는 남아 주변 아군에게 계속 피해를 줍니다.',
+  'hudChrome.raidBossGuide.ignivar.judgmentResponse':
+    '경고 중 독특하게 표시된 피난처를 찾아 바닥이 타오르기 전에 경계 안으로 완전히 모입니다.',
+  'hudChrome.raidBossGuide.ignivar.chainsName': '대장간의 사슬',
+  'hudChrome.raidBossGuide.ignivar.chainsSummary':
+    '이그니바르가 가까운 플레이어를 둘씩 연결합니다. 너무 멀어지거나 다른 짝의 사슬을 가로지르면 치명적인 피해를 받습니다.',
+  'hudChrome.raidBossGuide.ignivar.chainsResponse':
+    '연결된 짝과 가까이 붙어 함께 움직이고 다른 플레이어가 사슬을 통과하지 않게 합니다.',
+  'hudChrome.raidBossGuide.ignivar.lastInfernoName': '마지막 지옥불',
+  'hudChrome.raidBossGuide.ignivar.lastInfernoSummary':
+    '이그니바르가 격노하여 전멸 공격을 준비하는 동안 잿불비, 불타는 급류, 회전하는 지옥불이 빨라집니다.',
+  'hudChrome.raidBossGuide.ignivar.lastInfernoResponse':
+    '남은 공격 및 치유 재사용 대기시간을 사용하고 이동 메커니즘을 계속 수행하여 시간 안에 이그니바르를 처치합니다.',
   'hudChrome.raidBossGuide.ignivar.brand':
     '장작더미의 징표: 산개합니다. 불타는 급류를 준비된 수로로 유도한 뒤 혼자 물을 건너 해제합니다.',
   'hudChrome.raidBossGuide.ignivar.movement':
@@ -7712,6 +7846,94 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '마지막 지옥불: 빨라진 운석, 전방 공격, 회전 지옥불에 대응하며 전멸 전에 이그니바르를 처치합니다.',
   'hudChrome.raidBossGuide.ignivar.heroic':
     '영웅: 대장간의 사슬 동안 짝과 가까이 있어야 하며 심판 안에서도 징표가 유지되고, 대장간 파도가 플레이어를 더 멀리 밀어냅니다.',
+  'hudChrome.raidBossGuide.varkhul.overview':
+    '바르쿨은 죽어 가는 마지막 샘을 가두어 살아 있는 금속을 벼린 뒤 그 죄를 지키도록 이그니바르를 만들었습니다. 이 전투는 개인 위치 선정과 공격대 전체의 거대 대장간 제어를 결합합니다.',
+  'hudChrome.raidBossGuide.varkhul.phaseOpeningName': '대장간의 아버지',
+  'hudChrome.raidBossGuide.varkhul.phaseOpeningSummary':
+    '바르쿨은 방어 담당 압박, 넓은 전방 공격, 이동 투사체, 단체 피해 분담, 운석 공세, 거대 모루의 공격을 반복합니다.',
+  'hudChrome.raidBossGuide.varkhul.phaseAssemblyName': '사잇단계: 거장의 조립',
+  'hudChrome.raidBossGuide.varkhul.phaseAssemblySummary':
+    '생명력이{health}가 되면 바르쿨이 보호받고 대장간 군단이 차원문으로 들어오며 기둥 광선이 대장간 붕괴를 위협합니다.',
+  'hudChrome.raidBossGuide.varkhul.phaseFinaleName': '마지막 단계: 풀려난 걸작',
+  'hudChrome.raidBossGuide.varkhul.phaseFinaleSummary':
+    '생명력이{health}가 되면 바르쿨의 공격이 빨라지고 피해가 증가하며 마지막 시간까지 공격대에 반복해서 화염을 내뿜습니다.',
+  'hudChrome.raidBossGuide.varkhul.phaseFinaleHeroicSummary':
+    '생명력이{health}가 되면 바르쿨이 이전 메커니즘 대부분을 버리고 세계불꽃이 안쪽으로 좁혀져 도가니를 삼킵니다.',
+  'hudChrome.raidBossGuide.varkhul.makersBrandName': '제작자의 징표',
+  'hudChrome.raidBossGuide.varkhul.makersBrandSummary':
+    '바르쿨이 현재 방어 담당을 공격하고 자신에게 받는 모든 피해를 증가시키는 중첩 효과를 부여합니다.',
+  'hudChrome.raidBossGuide.varkhul.makersBrandResponse':
+    '방어 담당은{stacks}중첩에 교대합니다. 치유 담당은 바르쿨이 대상을 바꾸기 전에 다음 방어 담당을 보호합니다.',
+  'hudChrome.raidBossGuide.varkhul.frontalName': '대장간 아버지의 휩쓸기',
+  'hudChrome.raidBossGuide.varkhul.frontalSummary':
+    '바르쿨이 매우 넓은 전방 휩쓸기를 사용하여 앞에 있는 모두에게 큰 화염 피해를 줍니다.',
+  'hudChrome.raidBossGuide.varkhul.frontalHeroicSummary':
+    '바르쿨이 매우 넓은 전방 휩쓸기를 사용하여 앞에 있는 모두에게 거의 치명적인 화염 피해를 줍니다.',
+  'hudChrome.raidBossGuide.varkhul.frontalResponse':
+    '바르쿨이 공격대 반대쪽을 보게 하고 경고가 나타나면 즉시 등 뒤로 이동합니다.',
+  'hudChrome.raidBossGuide.varkhul.orbsName': '잿불 구슬',
+  'hudChrome.raidBossGuide.varkhul.orbsSummary':
+    '표시된 비방어 담당이 지속되는 잿불 웅덩이를 남기고 모든 방향으로 화염 구슬을 방출합니다. 달아오른 금속은 받는 치유도 흡수합니다.',
+  'hudChrome.raidBossGuide.varkhul.orbsHeroicSummary':
+    '표시된 비방어 담당이 큰 피해를 주는 지속 잿불 웅덩이를 남기고 모든 방향으로 위험한 화염 구슬을 방출합니다. 달아오른 금속은 받는 치유도 흡수합니다.',
+  'hudChrome.raidBossGuide.varkhul.orbsResponse':
+    '각 징표를 방 가장자리로 옮겨 웅덩이를 떨어뜨려 놓고 투기장을 가로지르는 구슬을 피합니다. 치유 담당은 치유 흡수를 빠르게 제거합니다.',
+  'hudChrome.raidBossGuide.varkhul.pyreName': '공유 장작더미',
+  'hudChrome.raidBossGuide.varkhul.pyreSummary':
+    '움직이는 원이 달아오른 금속이 없는 플레이어 한 명을 따라갑니다. 피해는 원 안에서 나뉘며 부족한 플레이어마다 공격대 전체가 최대 생명력의{missingPenalty}피해를 받습니다.',
+  'hudChrome.raidBossGuide.varkhul.pyreHeroicSummary':
+    '움직이는 원이 달아오른 금속이 없는 플레이어 한 명을 따라가며 더 큰 일격을 분담합니다. 부족한 플레이어마다 공격대 전체가 최대 생명력의{missingPenalty}피해를 받습니다.',
+  'hudChrome.raidBossGuide.varkhul.pyreResponse':
+    '최소 {players}명이 원 안에 모이고 시전이 해결될 때까지 대상과 함께 이동합니다.',
+  'hudChrome.raidBossGuide.varkhul.forgestormName': '대장간폭풍',
+  'hudChrome.raidBossGuide.varkhul.forgestormSummary':
+    '바르쿨이 투기장 전역에 표시된 운석 충돌을 연속{waves}회 불러냅니다.',
+  'hudChrome.raidBossGuide.varkhul.forgestormHeroicSummary':
+    '바르쿨이 극심한 피해를 주는 표시된 운석 충돌을 연속{waves}회 불러냅니다.',
+  'hudChrome.raidBossGuide.varkhul.forgestormResponse':
+    '새로운 바닥 경고가 나타날 때마다 확인하고 해당 공세가 떨어지기 전에 벗어납니다. 다음 공세를 확인하지 않고 이전 위치로 돌아가지 않습니다.',
+  'hudChrome.raidBossGuide.varkhul.rayName': '담금질 광선',
+  'hudChrome.raidBossGuide.varkhul.raySummary':
+    '광선이 표시된 플레이어를 오랫동안 추적합니다. 바르쿨과 대상 사이에 처음 들어간 다른 플레이어가 공격을 가로막고 담금질 상처를 얻습니다.',
+  'hudChrome.raidBossGuide.varkhul.rayResponse':
+    '생명력이 충분한 플레이어, 보통 보조 방어 담당을 선에 세웁니다. 다른 플레이어는 벗어나고 담금질 상처가 남아 있는 동안 차단자를 교대합니다.',
+  'hudChrome.raidBossGuide.varkhul.anvilName': '모루의 칙령',
+  'hudChrome.raidBossGuide.varkhul.anvilSummary':
+    '바르쿨이 거대 대장간으로 걸어가{strikes}번 내리쳐 점점 증가하는 공격대 전체 피해를 줍니다.',
+  'hudChrome.raidBossGuide.varkhul.anvilHeroicSummary':
+    '바르쿨이 거대 대장간을{strikes}번 내리쳐 점점 증가하는 공격대 피해를 주며 동시에 표시된 운석이 플레이어에게 떨어집니다.',
+  'hudChrome.raidBossGuide.varkhul.anvilResponse': '공격대 치유를 위해 모이고 마지막 일격에 방어 재사용 대기시간을 사용합니다.',
+  'hudChrome.raidBossGuide.varkhul.anvilHeroicResponse':
+    '표시된 운석을 공격대 밖으로 분산시키고 치유 및 방어 재사용 대기시간으로{strikes}번의 일격을 모두 버팁니다.',
+  'hudChrome.raidBossGuide.varkhul.assemblyName': '거장의 조립',
+  'hudChrome.raidBossGuide.varkhul.assemblySummary':
+    '바르쿨이 보호받으며 제한 시간 조립을 시작합니다. 대장간이 그의 걸작을 완성하기 전에 공격대가 모든 차원문 공세를 물리쳐야 합니다.',
+  'hudChrome.raidBossGuide.varkhul.assemblyResponse':
+    '광선 제어와 우선 추가 적에 주의를 나눕니다. 조립 시간이 끝나기 전에 대장간 군단 전체를 처치합니다.',
+  'hudChrome.raidBossGuide.varkhul.beamName': '도가니 광선',
+  'hudChrome.raidBossGuide.varkhul.beamSummary':
+    '활성 기둥 광선은 플레이어가 막지 않으면 대장간을 가열합니다. 차단자는 증가하는 도가니 노출 피해를 받으며 광선이 막히거나 비활성이면 열기가 내려갑니다.',
+  'hudChrome.raidBossGuide.varkhul.beamHeroicSummary':
+    '활성 기둥 광선은 플레이어가 막지 않으면 대장간을 가열합니다. 차단자는 증가하는 도가니 노출 피해를 받으며 대장간 열기는 절대 내려가지 않습니다.',
+  'hudChrome.raidBossGuide.varkhul.beamResponse':
+    '각 활성 기둥과 대장간 사이에 서고 노출이 위험해지기 전에 차단자를 교대합니다. 열기가 가득 차면 치명적인 대장간 붕괴가 발생합니다.',
+  'hudChrome.raidBossGuide.varkhul.legionName': '대장간 군단',
+  'hudChrome.raidBossGuide.varkhul.legionSummary':
+    '도가니 수호자는 대장간 열기를 높이는 도가니 지진을 시전하고 잿불 기술자는 수리 절차로 바르쿨을 치유합니다.',
+  'hudChrome.raidBossGuide.varkhul.legionResponse':
+    '도가니 지진과 수리 절차를 차단하고 위험한 시전자를 먼저 집중 공격한 뒤 남은 추가 적을 처리합니다.',
+  'hudChrome.raidBossGuide.varkhul.masterpieceName': '풀려난 걸작',
+  'hudChrome.raidBossGuide.varkhul.masterpieceSummary':
+    '바르쿨의 공격이 빨라지고 피해가 증가하며 마지막 전멸까지 공격대를 반복해서 불태웁니다.',
+  'hudChrome.raidBossGuide.varkhul.masterpieceHeroicSummary':
+    '바르쿨의 공격이 빨라지고 피해가 증가하며 세계불꽃이 이전 메커니즘 대부분을 대신해 마지막 공격을 이룹니다.',
+  'hudChrome.raidBossGuide.varkhul.masterpieceResponse':
+    '남은 공격 및 방어 재사용 대기시간을 모두 사용하고 마지막 시간이 끝나기 전에 바르쿨을 처치합니다.',
+  'hudChrome.raidBossGuide.varkhul.worldfireName': '세계불꽃',
+  'hudChrome.raidBossGuide.varkhul.worldfireSummary':
+    '영웅 난이도에서는 불길이 투기장 가장자리에서 중앙으로 단계적으로 전진하여 마침내 도가니 전체를 태웁니다.',
+  'hudChrome.raidBossGuide.varkhul.worldfireResponse':
+    '전진하는 불길보다 먼저 안쪽으로 이동하고 줄어드는 안전 공간을 지키며 중앙이 타오르기 전에 바르쿨을 처치합니다.',
   'hudChrome.raidBossGuide.varkhul.tanks':
     '방어 담당: 제작자의 징표 2중첩에 교대하고 바르쿨을 근접 거리 안에 둡니다.',
   'hudChrome.raidBossGuide.varkhul.orbs':
@@ -8901,6 +9123,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.character.online': '캐릭터가 현재 접속 중입니다.',
   'apiError.character.rename_not_permitted': '이 캐릭터의 이름을 변경할 수 없습니다.',
   'apiError.character.delete_confirm': '삭제를 확인하려면 캐릭터 이름을 입력하세요.',
+  'apiError.character.storage_purchase_open':
+    '이 캐릭터를 삭제하려면 보관함 구매를 완료하거나 해결해야 합니다.',
+  'apiError.character.delete_busy': '서버가 혼잡합니다. 잠시 후 이 캐릭터 삭제를 다시 시도해 주세요.',
   'apiError.character.already_in_world': '캐릭터가 이미 세계에 있습니다.',
   'apiError.character.taken_over': '다른 세션이 캐릭터를 넘겨받았습니다.',
   'apiError.character.rename_required': '이 캐릭터는 세계에 들어가기 전에 이름을 변경해야 합니다.',
@@ -9537,6 +9762,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.craftName.leatherworking': '가죽세공',
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
   'hudChrome.crafting.reagentFineSub': '(상급 등급 {count}개 소모)',
+  'hudChrome.crafting.reagentVaultDraw': '(재료 보관소에서 {count}개 사용)',
+  'hudChrome.crafting.vaultUnreachable': '여기에서는 재료 보관소를 사용할 수 없습니다.',
   // Protect Yumi locale fill (M16 wordy-key floor).
   'yumi.hud.collapse': 'Protect Yumi 게이지 접기',
   'yumi.hud.expand': 'Protect Yumi 게이지 펼치기',
@@ -9752,6 +9979,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '금고가 열린 상태에서 가방의 물건을 클릭하면 맡겨지고, 금고의 물건을 클릭하면 되찾습니다. 금고에는 물건만 보관할 수 있고 동전은 맡길 수 없으며, 퀘스트 아이템은 늘 몸에 지니게 됩니다. 여행 중에 가방이 가득 차면 제작 재료를 한 번에 맡기는 버튼도 있습니다.',
   'guide.economy.bankSlots':
     '갓 연 금고는 작지만 당신과 함께 자랍니다. 출납관은 추가 칸을 동전에 판매하며 가격은 단계마다 높아집니다. 온라인으로 플레이하면 이메일 인증, 계정 연동, 친구 초대 등으로 보너스 공간도 얻을 수 있습니다.',
+  'guide.economy.bankSockets':
+    '칸 사다리 너머로, 출납관은 최대 네 개의 가방 칸도 판매합니다. 저렴한 것부터 순서대로 해금되며 가격은 단계마다 높아집니다. 들고 다니던 여분의 가방을 칸에 끼우면 그 가방의 칸이 금고 공간에 더해집니다. 일반 가방은 금고 전체를 넓히고, 재료 주머니는 제작 재료만 쓸 수 있는 공간을 더합니다. 가방에 있는 가방을 클릭하면 끼워지고, 칸을 클릭하면 되찾습니다. 되찾아도 보관한 물건을 잃는 일은 없습니다. 금고가 줄어든 공간을 넘어서더라도 모든 물건은 그대로 남고, 새 보관만 자리가 나기를 기다립니다.',
   'guide.economy.bankTitle': '은행',
   'hudChrome.bank.title': '은행',
   'hudChrome.bank.subtitle': '도금 금고',
@@ -9764,18 +9993,54 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.buySlotsMaxed': '완전히 확장됨',
   'hudChrome.bank.buyConfirm': '{price}에 은행 칸 {count}개를 추가로 구매하시겠습니까?',
   'hudChrome.bank.buyConfirmAccept': '구매',
+  'hudChrome.bank.meterLabel': '{total}칸 중 {used}칸 사용',
+  'hudChrome.bank.meterPoolGeneral': '일반: {total}칸 중 {used}칸',
+  'hudChrome.bank.meterPoolMaterials': '재료: {total}칸 중 {used}칸',
+  'hudChrome.bank.meterPoolsAria': '사용 중인 은행 칸: {total}칸 중 {used}칸. 일반 아이템: {generalTotal}칸 중 {generalUsed}칸. 재료: {materialsTotal}칸 중 {materialsUsed}칸.',
+  'hudChrome.bank.meterMaterialsNote': '장착한 재료 가방이 제공하는 재료 전용 공간입니다. 다른 아이템은 사용할 수 없습니다.',
+  'hudChrome.bank.priceDisclaimer': '가격은 게임 경제에 따라 변동될 수 있습니다.',
+  'hudChrome.bank.rungItemName': '은행 칸 {count}개',
+  'hudChrome.bank.buySlotsDualAria': '{price} 또는 {cost} Claudium으로 {count}칸 구매',
+  'hudChrome.bank.buyConfirmDual': '은행 칸 {count}개를 추가로 구매하시겠습니까?',
+  'hudChrome.bank.buyConfirmGold': '{price}에 구매',
+  'hudChrome.bank.buyConfirmClaudium': '{cost} Claudium으로 구매',
+  'hudChrome.bank.rungGranted': '은행 칸이 추가되었습니다. 이 캐릭터의 은행이 넓어졌습니다.',
+  'hudChrome.bank.rungAlreadyGranted': '이 칸은 이미 이 캐릭터에 적용되어 있습니다. 중복 청구되지 않았습니다.',
+  'hudChrome.bank.rungApplyDeferred': '결제가 완료되었습니다. 이 캐릭터가 다음에 접속할 때 칸이 자동으로 적용됩니다.',
+  'hudChrome.bank.rungGrantUnresolved':
+    '결제는 완료되었지만 칸을 아직 적용하지 못했습니다. 구매 내역은 기록되어 있으며 고객지원이 마무리해 드릴 수 있습니다.',
+  'hudChrome.bank.rungInProgress': '이 캐릭터의 구매가 아직 처리 중입니다. 잠시 후 다시 시도하세요.',
+  'hudChrome.bank.rungDoesNotFit': '이 캐릭터의 은행에는 더 이상 확장을 담을 수 없습니다.',
+  'hudChrome.bank.rungNotPurchasable': '이 은행 칸은 지금 구매할 수 없습니다.',
+  'hudChrome.bank.rungFailed': '구매를 완료하지 못했습니다.',
+  'hudChrome.bank.rungOutage':
+    '구매를 확인하지 못했습니다. 이 버튼으로 다시 시도하면 중복 청구되지 않습니다. 먼저 게임을 새로 고치면 이 보호가 사라질 수 있습니다.',
   'hudChrome.bank.withdrawHint': '클릭하여 꺼내기',
   'hudChrome.bank.withdrawPartialHint': 'Shift+클릭하여 일부만 꺼내기',
   'hudChrome.bank.depositHint': '클릭하여 넣기',
   'hudChrome.bank.depositPartialHint': 'Shift+클릭하여 일부만 넣기',
   'hudChrome.bank.cannotDeposit': '은행에 보관할 수 없음',
   'hudChrome.bank.cannotDepositNow': '지금은 보관할 수 없음',
+  'hudChrome.bank.socketRowAria': '은행 가방 칸',
+  'hudChrome.bank.socketEmpty': '빈 은행 가방 칸',
+  'hudChrome.bank.socketEmptyHint': '가방에 있는 가방을 클릭하면 은행에 보관됩니다',
+  'hudChrome.bank.socketLocked': '잠긴 가방 칸',
+  'hudChrome.bank.socketLockedLater': '가방 칸은 저렴한 것부터 순서대로 해금됩니다',
+  'hudChrome.bank.socketUnlockAria': '{price}(으)로 은행 가방 칸 해금',
+  'hudChrome.bank.socketUnlockHint': '클릭하여 이 가방 칸을 해금',
+  'hudChrome.bank.socketUnlockConfirm': '{price}(으)로 은행 가방 칸을 해금하시겠습니까?',
+  'hudChrome.bank.socketUnlockAccept': '해금',
+  'hudChrome.bank.unsocketHint': '클릭하여 이 가방을 가방으로 되돌리기',
+  'hudChrome.bank.socketHint': '클릭하여 이 가방을 은행에 장착',
   'hudChrome.bank.depositQuantityTitle': '{item} 넣기',
   'hudChrome.bank.depositQuantityInput': '넣을 수량',
   'hudChrome.bank.depositQuantityConfirm': '넣기',
   'hudChrome.bank.withdrawQuantityTitle': '{item} 꺼내기',
+  'hudChrome.bank.vaultRowWithdrawName': '{item} 꺼내기',
+  'hudChrome.bank.priceChanged': '구매가 완료되기 전에 가격이 변경되었습니다. 갱신된 가격을 확인한 후 다시 승인해 주세요.',
   'hudChrome.bank.withdrawQuantityInput': '꺼낼 수량',
   'hudChrome.bank.withdrawQuantityConfirm': '꺼내기',
+  'hudChrome.bank.withdrawQuantityAction': '{item} 꺼낼 수량 선택',
   'hudChrome.bank.filterGroupAria': '은행을 분류별로 필터링',
   'hudChrome.bank.sortAria': '은행 아이템 정렬',
   'hudChrome.bank.searchAria': '이름으로 은행 아이템 검색',
@@ -9799,6 +10064,27 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.bonusReferralExplainer':
     '친구를 초대하세요: 친구가 10레벨에 도달하면 서로 2칸씩 얻으며, 최대 5명까지 가능합니다.',
   'hudChrome.bank.bonusSectionAria': '보너스 은행 칸과 획득 방법',
+  'hudChrome.bank.vaultTab': '보관소',
+  'hudChrome.bank.vaultCapacityNote': '각 재료는 최대 {cap}개까지 보관할 수 있습니다.',
+  'hudChrome.bank.vaultEmpty':
+    '재료 보관소가 비어 있습니다. 가방의 재료를 클릭하면 보관할 수 있습니다.',
+  'hudChrome.bank.vaultRowAria': '{item}: {count}/{cap}개 보관 중',
+  'hudChrome.bank.vaultLockedIntro':
+    '재료 보관소를 개방하면 은행 옆에 제작 재료를 쌓아 둘 수 있습니다. 재료마다 전용 공간이 있으며 각각 최대 {cap}개까지 보관됩니다.',
+  'hudChrome.bank.vaultUnlockButton': '재료 보관소 개방',
+  'hudChrome.bank.vaultUnlockConfirm': '{price}(으)로 재료 보관소를 개방하시겠습니까?',
+  'hudChrome.bank.vaultUpgrade': '보관 한도를 {cap}개로 확장',
+  'hudChrome.bank.vaultUpgradeConfirm':
+    '{price}(으)로 각 재료의 보관 한도를 {cap}개로 확장하시겠습니까?',
+  'hudChrome.bank.vaultDepositAll': '재료 모두 보관',
+  'hudChrome.bank.vaultDepositAllTooltip':
+    '가방의 모든 재료를 한 번에 보관소로 옮깁니다. 각 재료는 한도까지 채워집니다. 장비, 도구, 퀘스트 아이템, 소모품은 옮겨지지 않습니다.',
+  'hudChrome.bank.vaultDepositAllDone': '보관한 재료: {count}개.',
+  'hudChrome.bank.vaultDepositAllFull': '보관한 재료: {count}개. 일부 재료가 한도에 도달했습니다.',
+  'hudChrome.bank.vaultDepositAllNone': '보관 한도가 가득 차서 아무것도 보관하지 못했습니다.',
+  'hudChrome.bank.vaultWithdrawShort': '가방에는 {count}개 중 {fit}개만 들어갑니다.',
+  'hudChrome.bank.vaultDepositHint': '클릭하여 보관소에 보관',
+  'hudChrome.bank.vaultCannotDeposit': '보관소에 넣을 수 없습니다',
   'hudChrome.bank.tabsAria': '은행 탭',
   'hudChrome.bank.personalTab': '개인',
   'hudChrome.bank.guildTab': '길드',
@@ -10893,6 +11179,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.goldweave_robe.name': '도금직조 로브',
   'entities.items.goldweave_leggings.name': '도금직조 각반',
   'entities.items.silkspun_satchel.name': '실크 방적 가방',
+  'entities.items.wayfarers_backpack.name': '나그네의 배낭',
+  'entities.items.burlap_reagent_pouch.name': '삼베 재료 주머니',
+  'entities.items.necromancers_reagent_satchel.name': '강령술사의 재료 가방',
+  'entities.items.duskweave_bag.name': '황혼결 가방',
+  'entities.items.resonant_weave_bag.name': '공명결 가방',
+  'entities.items.foragers_haversack.name': '채집가의 잡낭',
+  'entities.items.loombound_reagent_satchel.name': '베틀결 재료 가방',
   'entities.items.silkbinders_raiment.name': '실크결속의 의복',
   'entities.items.sunweave_mantle.name': '태양직조 망토',
   'entities.items.sunweave_treads.name': '태양직조 발보호구',

@@ -102,10 +102,11 @@ const build = await buildItemArtAudit({
     // + the ignivar-varkhul-drop-renders-2026-08-28 batch (2 rendered
     // legendaries) + the crucible-set-icons-2026-08-29 wave (all 192
     // non-weapon Crucible pieces; the art-pending ledger is now empty).
-    catalogCount: 1033,
+    catalogCount: 1040,
     // 844 + the 201 Crucible raid loot definitions (192 of them art-pending)
-    // + the base's 2 Varkhul legendary definitions.
-    liveItemCount: 1048,
+    // + the base's 2 Varkhul legendary definitions, + the release sync's 7
+    // bank-storage painted bags.
+    liveItemCount: 1055,
     generatedHeroicDefinitions: 64,
     heroicDefinitionsWithOwnWebp: 48,
     heroicWeaponArtAliases: 16,

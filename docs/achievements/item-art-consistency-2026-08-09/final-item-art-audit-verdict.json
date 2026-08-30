@@ -5,8 +5,8 @@
     "baselineCommit": "aee195551b5aef628eb7a72192117d7e3079818e",
     "branch": "feature/placeholder-art-completion-v036",
     "shippingDirectory": "public/ui/items",
-    "itemArtFilesReviewed": 1033,
-    "liveItemDefinitions": 1048,
+    "itemArtFilesReviewed": 1040,
+    "liveItemDefinitions": 1055,
     "generatedHeroicDefinitions": 64,
     "heroicDefinitionsWithOwnWebp": 48,
     "heroicWeaponArtAliases": 16,
@@ -298,7 +298,7 @@
       "armor-ring": 22,
       "armor-shoulder": 78,
       "armor-waist": 37,
-      "bag": 6,
+      "bag": 13,
       "drink": 9,
       "elixir": 4,
       "food": 21,
@@ -342,6 +342,25 @@
           "docs/achievements/icon-brief.md"
         ],
         "note": "The two Proving Shore interact-prop icons, rendered from their own shipped world models (supply_crate.glb, marsh_bell_gallows.glb) by scripts/render_island_item_icons.mjs and owner-reviewed pass on 2026-08-17; the prior reviews stand unchanged."
+      },
+      {
+        "reviewedAt": "2026-08-26",
+        "branch": "feature/bank-storage-pr",
+        "reviewer": "implementation agent",
+        "replacedIds": [
+          "burlap_reagent_pouch",
+          "duskweave_bag",
+          "foragers_haversack",
+          "loombound_reagent_satchel",
+          "necromancers_reagent_satchel",
+          "resonant_weave_bag",
+          "wayfarers_backpack"
+        ],
+        "provenance": [
+          "docs/achievements/bank-storage-painted-bags-2026-08-25/accepted-art.json",
+          "public/ui/items/mapping.json"
+        ],
+        "note": "Seven project-owned programmatic SVG placeholder bag icons were superseded by distinct OpenAI-generated paintings under woc-item-icon-v1. The replacements passed the deterministic icon and complete item-art machine audits and were visually reviewed as a family at the 512px masters and every canonical runtime, grayscale, circular-crop, multiview, and identity sheet size on 2026-08-26; all earlier item-art reviews stand unchanged."
       }
     ]
   },
@@ -384,7 +403,7 @@
   },
   "visualVerdict": {
     "status": "pass",
-    "passCount": 1033,
+    "passCount": 1040,
     "passIds": [
       "abyssal_loop",
       "abysswrought_band",
@@ -477,6 +496,7 @@
       "brutoks_maul",
       "bulwark_of_the_inner_crucible",
       "bulwark_rusted_pauldrons",
+      "burlap_reagent_pouch",
       "canopy_silk_hank",
       "cantors_drowned_sash",
       "captains_crest",
@@ -605,6 +625,7 @@
       "duskfang_dirk",
       "duskhide_wraps",
       "duskthorn_mantle",
+      "duskweave_bag",
       "duskwhisper",
       "duskwisp_essence",
       "eastbrook_arming_sword",
@@ -681,6 +702,7 @@
       "first_blood_razor",
       "fleetblood_band",
       "footpad_jerkin",
+      "foragers_haversack",
       "forest_pink_armor_plate",
       "forgefathers_warhammer",
       "forgefire_spire",
@@ -898,6 +920,7 @@
       "litany_plate_chest",
       "litany_shoulder",
       "locket_of_the_last_flame",
+      "loombound_reagent_satchel",
       "loop_of_quiet_springs",
       "lost_caravan_goods",
       "lunar_choir_leggings",
@@ -978,6 +1001,7 @@
       "mudfin_scale",
       "murloc_hut",
       "necromancers_legwraps",
+      "necromancers_reagent_satchel",
       "necromancers_soulspire_mantle",
       "necromancers_soulsteps",
       "necromancers_starshroud",
@@ -1082,6 +1106,7 @@
       "resonant_steel",
       "resonant_thread",
       "resonant_timber",
+      "resonant_weave_bag",
       "restless_skull",
       "revenant_silk_robe",
       "revenantstep_treads",
@@ -1367,6 +1392,7 @@
       "warspirit_emberscale_legs",
       "warspirit_emberscale_shoulder",
       "waterlogged_idol",
+      "wayfarers_backpack",
       "wayfarers_hood",
       "weathered_ledger_page",
       "webwood_silk",
@@ -1424,7 +1450,7 @@
     "watch": [],
     "rejectCount": 0,
     "reject": [],
-    "summary": "All 1033 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review, plus the nine Crucible raid weapon icons (generated via the OpenAI crucible-raid-weapons-2026-08-28 batch) added on 2026-08-28, machine-checked and awaiting owner visual review, plus the two Ignivar legendary drop renders (varkhul_forgebreaker and varkhul_emberward, rendered from their own shipped held-weapon models by the deterministic weapon-still pipeline) added on 2026-08-28, machine-checked and awaiting owner visual review, plus the 192 Crucible set-piece, sigil, and off-set icons (generated via the OpenAI crucible-set-icons-2026-08-29 batch) added on 2026-08-29, machine-checked and awaiting owner visual review, plus the Core of the Last Flame reagent icon (staged early from the crucible-raid-professions-2026-08-28 batch) added on 2026-08-30, machine-checked and awaiting owner visual review."
+    "summary": "All 1040 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review, plus the nine Crucible raid weapon icons (generated via the OpenAI crucible-raid-weapons-2026-08-28 batch) added on 2026-08-28, machine-checked and awaiting owner visual review, plus the two Ignivar legendary drop renders (varkhul_forgebreaker and varkhul_emberward, rendered from their own shipped held-weapon models by the deterministic weapon-still pipeline) added on 2026-08-28, machine-checked and awaiting owner visual review, plus the 192 Crucible set-piece, sigil, and off-set icons (generated via the OpenAI crucible-set-icons-2026-08-29 batch) added on 2026-08-29, machine-checked and awaiting owner visual review, plus the Core of the Last Flame reagent icon (staged early from the crucible-raid-professions-2026-08-28 batch) added on 2026-08-30, machine-checked and awaiting owner visual review, plus the seven bank-storage painted bags (implementation-agent reviewed and passed on 2026-08-26, joined at the v0.41.0 base sync)."
   },
   "nonVisualContentWatch": [
     {
@@ -1581,8 +1607,8 @@
   "evidence": {
     "catalog": {
       "path": "tmp/imagegen/item-art-consistency/final-audit/catalog.json",
-      "sha256": "e9f19c29cba84c6fde4918fd9366b282790dfcd8150ca1ef3dc5785b66999963",
-      "bytes": 563501
+      "sha256": "9e11ebfaf31fc688bb071b758601ce0f79853b40ac7c6f95e1a8d2a219c26fbe",
+      "bytes": 567150
     },
     "rendererFingerprint": "d80ff4868f979e1717e106c889b7d6505841caf8d4cf887776ecb60848b1b2b7",
     "sheetCount": 216,
@@ -1596,7 +1622,7 @@
       "small-multiview": 27,
       "identity": 27
     },
-    "sheetSetSha256": "1362a9c93cd5841b8ced76904754d53c7b89e72fc237a8f3b69f83c216e28ace",
+    "sheetSetSha256": "ecbb8e992d64bef9b23bd739eb6663b1e2bb19e823b69df3ee6924f6e2f93519",
     "sheets": [
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p01--128-color.png",
@@ -2368,66 +2394,66 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--128-color.png",
-        "sha256": "1740a2b2b31d515aa9ced2255d5b14a625fffd8b3f036f27544da19f9a1db5a8",
-        "bytes": 205497,
+        "sha256": "7b1df7cc571a240aa0c95c6949edfbbc3c0bdb05b8ed26611ab252d9c67d4dd1",
+        "bytes": 414430,
         "width": 1600,
-        "height": 210,
+        "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--40-color.png",
-        "sha256": "817c90d187fd8b182a62b01f523b27d5cedeb66f487c60f4a2c9fce7014d4c1c",
-        "bytes": 38237,
+        "sha256": "3c0681b8736cbdf4a52d0fcb6eff61ce661a165e20fb1199b66c69f5894f1a09",
+        "bytes": 78860,
         "width": 1600,
-        "height": 166,
+        "height": 288,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--28-color.png",
-        "sha256": "0dd61ce32e267617c375b55e16c4a3f66b1d3aafd3764b933947a7ae18ffd2c1",
-        "bytes": 27573,
+        "sha256": "bd2fea765bd24d2be2109b6c6037a672f5a52b10c878662c6a88b2f3c4f5de69",
+        "bytes": 55982,
         "width": 1600,
-        "height": 210,
+        "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--22-color.png",
-        "sha256": "0beeb51cc29c9016c52fdd3356eb6caeed91796610b7b0cf1659926531c9a02c",
-        "bytes": 22110,
+        "sha256": "dc07906de46d3b0d0311ab5fff7f2b24405b3dc9c3a92a013e82aa8faadb458a",
+        "bytes": 44447,
         "width": 1600,
-        "height": 210,
+        "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--28-grayscale.png",
-        "sha256": "d5ba62ced0ccc60c26ea577a3efcc894ae5f5d52c50d1cefd99c55fd8b35415f",
-        "bytes": 22465,
+        "sha256": "3f8b1d8e9633bc9075944bd964fb1a58b1d28db4403586a5d1b1023db273e267",
+        "bytes": 42258,
         "width": 1600,
-        "height": 210,
+        "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--64-circle.png",
-        "sha256": "2618ef73c3043f46cac4f631a4cd362168a0e84cf37ce9b0ef4a64a64905e2e8",
-        "bytes": 67973,
+        "sha256": "3e929c05c0cca32bcd2b4b96a017e54cfb06924d4b41d87c99cbaee398c41d11",
+        "bytes": 137704,
         "width": 1600,
-        "height": 210,
+        "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--small-multiview.png",
-        "sha256": "5ef91f33eda1e9fa3f42aa941f6dcd025949444f7312516049793257fcee5725",
-        "bytes": 121235,
+        "sha256": "5274eff478cf7c8760e1827a8d27371a110d1c2b852e1a90b74d9a748129bf97",
+        "bytes": 247505,
         "width": 1800,
-        "height": 262,
+        "height": 480,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/bag--p01--identity.png",
-        "sha256": "be243cd2875225a9b169b45bcc307b3551267dea2573026635815f35e9b14bab",
-        "bytes": 214532,
+        "sha256": "2369290fe390eaaf5d771cefe97ce50fc10790c66d843db6e27f4deaedc02175",
+        "bytes": 432316,
         "width": 1800,
-        "height": 248,
+        "height": 452,
         "format": "png"
       },
       {
@@ -3327,6 +3353,6 @@
         "format": "png"
       }
     ],
-    "shippingCatalogSha256": "b4fc8912bd948a6c8862e52a5f8fe431a500e18abb26c02cfffd1cf7217fb56e"
+    "shippingCatalogSha256": "b2d42c73204506829d1f0dd254fd9a4461a63c31c7f26120a9b22d5d95f4fbdd"
   }
 }

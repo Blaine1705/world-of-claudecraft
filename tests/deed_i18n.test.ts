@@ -60,7 +60,7 @@ describe('deed_i18n English resolution', () => {
     // visit pair (no title reward), the Proving Shore graduation deed
     // (no title reward), and the five Crucible raid deeds (the Varkhul
     // flawless task carries the 43rd title).
-    expect(manifest.length).toBe(279 * 2 + 43);
+    expect(manifest.length).toBe(281 * 2 + 43);
     expect(manifest.filter((row) => row.field === 'title').length).toBe(43);
     expect(manifest).toContainEqual({
       id: 'prog_veteran',

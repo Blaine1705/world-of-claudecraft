@@ -394,6 +394,31 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.apply': '裝備外觀',
   'hudChrome.wocStore.detach': '卸下外觀',
   'hudChrome.wocStore.equipHint': '裝備{type}後才能使用此外觀。',
+  'hudChrome.wocStore.charter.eyebrow': '保險箱',
+  'hudChrome.wocStore.charter.title': '保險箱特許狀',
+  'hudChrome.wocStore.charter.scope': '特許狀只會擴充目前角色的銀行。司庫同樣以金幣出售這些格子。',
+  'hudChrome.wocStore.charter.grant': '增加 {slots} 個銀行格子',
+  'hudChrome.wocStore.charter.buy': '購買特許狀',
+  'hudChrome.wocStore.charter.buyAria': '購買{item}',
+  'hudChrome.wocStore.charter.confirmTitle': '確認購買特許狀',
+  'hudChrome.wocStore.charter.confirmBody': '花費 {cost} Claudium 購買{item}？',
+  'hudChrome.wocStore.charter.granted': '特許狀已生效。目前角色的銀行已經變大。',
+  'hudChrome.wocStore.charter.alreadyGranted': '目前角色已擁有該特許狀，不會重複扣款。',
+  'hudChrome.wocStore.charter.applyDeferred': '付款完成。該角色下次登入時會自動取得這些格子。',
+  'hudChrome.wocStore.charter.grantUnresolved': '付款完成，但格子尚未發放。此次購買已記錄，客服可以為你處理完成。',
+  'hudChrome.wocStore.charter.inProgress': '目前角色的一筆購買仍在完成中，請稍候再試。',
+  'hudChrome.wocStore.charter.doesNotFit': '目前角色的銀行無法容納該特許狀的全部格子。',
+  'hudChrome.wocStore.charter.notPurchasable': '該特許狀目前無法購買。',
+  'hudChrome.wocStore.charter.noCharterFits': '目前角色的銀行剩餘空間已放不下任何特許狀。',
+  'hudChrome.wocStore.charter.someHiddenByFit': '超出目前角色銀行剩餘空間的特許狀不會顯示。',
+  'hudChrome.wocStore.charter.noRoom': '目前角色的銀行已沒有空間容納任何特許狀。',
+  'hudChrome.wocStore.charter.outage': '無法確認此次購買。使用此按鈕重試不會重複扣款。若先重新載入遊戲，可能會失去這項保護。',
+  'hudChrome.wocStore.charter.outageStale': '返回商店，再次使用相同的「購買特許狀」操作。系統不會重複扣款。若先重新載入遊戲，可能會失去這項保護。',
+  'hudChrome.wocStore.charter.failed': '此次購買未能完成。',
+  'hudChrome.wocStore.charter.names.strongbox_charter_1': '次級保險箱特許狀',
+  'hudChrome.wocStore.charter.names.strongbox_charter_2': '高級保險箱特許狀',
+  'hudChrome.wocStore.charter.names.strongbox_charter_3': '宏偉保險箱特許狀',
+  'hudChrome.wocStore.charter.names.strongbox_charter_complete': '完整保險箱特許狀',
   'hudChrome.wocStore.priceChanged': '購買完成前價格已變更。請查看刷新後的價格並再次確認。',
   'hudChrome.wocStore.collections.guildmark': '公會印記',
   'hudChrome.wocStore.collections.emberwrought': '餘燼鍛造',
@@ -623,6 +648,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mailbox.toLabel': '收件人',
   'itemUi.kind.bag': '背包',
   'itemUi.tooltip.bagSlots': '{slots}格背包',
+  'itemUi.tooltip.bagSlotsMaterials': '{slots}格材料背包',
   'hudChrome.auth.forgotPrompt': '忘記密碼？',
   'hudChrome.auth.forgotTitle': '重設密碼',
   'hudChrome.auth.forgotHint': '輸入您的使用者名稱，我們會將重設連結寄送到登記的電子郵件。',
@@ -1461,6 +1487,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showDailyRewardsChest': '顯示每日獎勵寶箱',
   'hudChrome.options.mobileCameraJoystick': '攝影機搖桿',
   'hudChrome.options.mobileLeftHanded': '左手配置',
+  'hudChrome.options.touchPreciseAim': '精確地面選點',
+  'hudChrome.options.touchPreciseAimNote': '施放地面法術前先瞄準。關閉後會立即在建議位置施放。',
   'hudChrome.options.touchTapMenus': '點擊選單',
   'hudChrome.options.touchTapMenusNote': '用點擊代替滑動來開啟動作、消耗品與選單控制項。點擊項目即可使用，再次點擊控制項執行其一般操作，點擊外部則關閉。',
   'hudChrome.options.itemLevelLine': '物品等級 {level}',
@@ -5807,6 +5835,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.invertY': '反轉鏡頭（Y軸）',
   'hudChrome.controller.deadzone': '搖桿死區',
   'hudChrome.controller.cameraSpeed': '鏡頭速度',
+  'hudChrome.controller.reticleSpeed': '準星速度',
   'hudChrome.controller.vibration': '震動',
   'hudChrome.controller.buttons': '按鍵配置',
   'hudChrome.controller.resetButtons': '重設按鍵配置',
@@ -5992,6 +6021,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.backpack': '背包',
   'hudChrome.bags.socketEmpty': '空背包欄位',
   'hudChrome.bags.unequipHint': '點擊移除此背包',
+  'hudChrome.bags.poolGeneral': '一般：{used}/{total}',
+  'hudChrome.bags.poolMaterials': '材料：{used}/{total}',
+  'hudChrome.bags.capacityPoolsAria': '背包格已用：{used}/{total}。一般物品：{generalUsed}/{generalTotal}。材料：{materialsUsed}/{materialsTotal}。',
   'guide.brand': 'World of ClaudeCraft',
   'guide.brandShort': 'ClaudeCraft',
   'guide.tagline': '一款可在瀏覽器中免費遊玩的經典風格MMO。',
@@ -7407,8 +7439,110 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.varkhulWaveStatus': '波次 {wave}/{waves} | 敵人: {remaining}',
   'hudChrome.raidBossGuide.title': '首領指南',
   'hudChrome.raidBossGuide.button': '指南: {boss}',
-  'hudChrome.raidBossGuide.subtitle': '{boss} | 普通與英雄',
+  'hudChrome.raidBossGuide.subtitle': '{boss} | {difficulty}',
   'hudChrome.raidBossGuide.close': '關閉首領指南',
+  'hudChrome.raidBossGuide.bossesLabel': '團隊副本首領',
+  'hudChrome.raidBossGuide.difficultyLabel': '難度',
+  'hudChrome.raidBossGuide.normal': '普通',
+  'hudChrome.raidBossGuide.heroic': '英雄',
+  'hudChrome.raidBossGuide.portraitAlt': '{boss} 戰鬥肖像',
+  'hudChrome.raidBossGuide.overviewHeading': '概覽',
+  'hudChrome.raidBossGuide.abilitiesHeading': '技能',
+  'hudChrome.raidBossGuide.whatToDo': '應對方法',
+  'hudChrome.raidBossGuide.whatToDoResponse': '應對方法：{response}',
+  'hudChrome.raidBossGuide.rolesLabel': '職責',
+  'hudChrome.raidBossGuide.flagsLabel': '機制警告',
+  'hudChrome.raidBossGuide.roleTank': '坦克',
+  'hudChrome.raidBossGuide.roleHealer': '治療',
+  'hudChrome.raidBossGuide.roleDamage': '輸出',
+  'hudChrome.raidBossGuide.roleAll': '所有職責',
+  'hudChrome.raidBossGuide.flagDeadly': '致命',
+  'hudChrome.raidBossGuide.flagInterruptible': '可打斷',
+  'hudChrome.raidBossGuide.flagImportant': '重要',
+  'hudChrome.raidBossGuide.flagCleansable': '可淨化',
+  'hudChrome.raidBossGuide.browseBoss': '查看 {boss}',
+  'hudChrome.raidBossGuide.chooseDifficulty': '查看{difficulty}機制',
+  'hudChrome.raidBossGuide.expandAbility': '展開{ability}',
+  'hudChrome.raidBossGuide.collapseAbility': '收起{ability}',
+  'hudChrome.raidBossGuide.abilityControlLabel': '{action}。{details}',
+  'hudChrome.raidBossGuide.tooltipMeta': '{phase} | {difficulty}',
+  'hudChrome.raidBossGuide.ignivar.overview':
+    '瓦爾庫爾將伊格尼瓦鑄造成先驅、活體封印和通往內層坩堝的鑰匙。這場戰鬥考驗水道控制、精確走位和快速集火優先目標。',
+  'hudChrome.raidBossGuide.ignivar.phaseOpeningName': '先驅甦醒',
+  'hudChrome.raidBossGuide.ignivar.phaseOpeningSummary':
+    '利用水道處理柴堆印記，同時應對伊格尼瓦反覆施放的正面攻擊、天火、旋轉射線和擴張的熔爐波。',
+  'hudChrome.raidBossGuide.ignivar.phaseApocalypseName': '過場階段：末日',
+  'hudChrome.raidBossGuide.ignivar.phaseApocalypseSummary':
+    '生命力降至{health}時，伊格尼瓦召喚一名試圖結束戰鬥的喚灰者。',
+  'hudChrome.raidBossGuide.ignivar.phaseJudgmentName': '熔爐審判',
+  'hudChrome.raidBossGuide.ignivar.phaseJudgmentSummary':
+    '生命力降至{health}時，伊格尼瓦點燃競技場，並在三個庇護所中顯示一個安全區域。',
+  'hudChrome.raidBossGuide.ignivar.phaseJudgmentHeroicSummary':
+    '生命力降至{health}時，伊格尼瓦點燃競技場，啟動的印記仍會在安全區內威脅附近玩家。',
+  'hudChrome.raidBossGuide.ignivar.phaseFinaleName': '最終階段：最終煉獄',
+  'hudChrome.raidBossGuide.ignivar.phaseFinaleSummary':
+    '生命力降至{health}時，伊格尼瓦進入有嚴格時限的最終爆發階段，重複機制也會加快。',
+  'hudChrome.raidBossGuide.ignivar.forgeStrikeName': '熔爐打擊',
+  'hudChrome.raidBossGuide.ignivar.forgeStrikeSummary':
+    '伊格尼瓦打擊目前坦克並施加熔火護甲，使其受到伊格尼瓦的傷害提高。',
+  'hudChrome.raidBossGuide.ignivar.forgeStrikeResponse':
+    '坦克在{stacks}層時換坦。治療為這次打擊和新坦克承受的最初幾次近戰攻擊做好準備。',
+  'hudChrome.raidBossGuide.ignivar.brandName': '柴堆印記',
+  'hudChrome.raidBossGuide.ignivar.brandSummary':
+    '伊格尼瓦標記非坦克玩家，使其持續受到火焰傷害。被標記者還會灼燒附近的盟友。',
+  'hudChrome.raidBossGuide.ignivar.brandResponse':
+    '分散站位。將灼熱洪流引向可用水道，再讓每名被標記者單獨穿過啟動的水流完成淨化。',
+  'hudChrome.raidBossGuide.ignivar.brandHeroicResponse':
+    '分散站位。用灼熱洪流開啟水道，每次只淨化一名被標記者。每次淨化都會觸發全團淨化反衝。',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentName': '灼熱洪流',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentSummary':
+    '伊格尼瓦追蹤一名玩家，隨後釋放寬闊的正面衝擊。被衝擊命中的可用水道會短暫啟動。',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentHeroicSummary':
+    '伊格尼瓦追蹤一名玩家，隨後釋放幾乎致命的寬闊正面衝擊。被衝擊命中的可用水道會短暫啟動。',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentResponse':
+    '讓預警區域恰好穿過一條可用水道。其他所有人在施法完成前離開正面區域。',
+  'hudChrome.raidBossGuide.ignivar.rainName': '燼雨',
+  'hudChrome.raidBossGuide.ignivar.rainSummary':
+    '三個火焰扇區和標記的隕石落點會懲罰仍留在預警區域內的玩家。',
+  'hudChrome.raidBossGuide.ignivar.rainHeroicSummary':
+    '三個火焰扇區和標記的隕石落點會對仍留在預警區域內的玩家造成極高傷害。',
+  'hudChrome.raidBossGuide.ignivar.rainResponse': '移入未標記的缺口，並在隕石命中前離開所有圓形區域。',
+  'hudChrome.raidBossGuide.ignivar.raysName': '旋轉煉獄',
+  'hudChrome.raidBossGuide.ignivar.raysSummary':
+    '旋轉的火焰射線環繞伊格尼瓦掃過，反覆傷害接觸它們的玩家。',
+  'hudChrome.raidBossGuide.ignivar.raysHeroicSummary':
+    '旋轉的火焰射線環繞伊格尼瓦掃過，接觸時會反覆造成嚴重傷害。',
+  'hudChrome.raidBossGuide.ignivar.raysResponse':
+    '跟隨射線之間的空隙移動。即使使用快速移動技能，也不要穿過射線。',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveName': '熔爐波',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveSummary':
+    '一道擴張的火牆橫穿競技場，留下兩個相對的缺口，並擊退被命中的玩家。',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveHeroicSummary':
+    '一道擴張的火牆橫穿競技場，留下兩個相對的缺口，並將被命中的玩家擊退得更遠。',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveResponse':
+    '在預備階段找到任一缺口並與其對齊，避免被擊退到競技場邊緣。',
+  'hudChrome.raidBossGuide.ignivar.apocalypseName': '末日',
+  'hudChrome.raidBossGuide.ignivar.apocalypseSummary':
+    '伊格尼瓦召喚一名喚灰者。如果該小怪完成末日施法，團隊會立即失敗。',
+  'hudChrome.raidBossGuide.ignivar.apocalypseResponse':
+    '所有可用輸出立即轉火伊格尼瓦喚灰者，並在其完成施法前將其擊殺。',
+  'hudChrome.raidBossGuide.ignivar.judgmentName': '熔爐審判',
+  'hudChrome.raidBossGuide.ignivar.judgmentSummary':
+    '伊格尼瓦標記三個庇護所，指出其中一個安全區，然後反覆灼燒競技場其餘區域。',
+  'hudChrome.raidBossGuide.ignivar.judgmentHeroicSummary':
+    '競技場燃燒時，伊格尼瓦只標記一個安全區。柴堆印記仍會持續並傷害附近盟友。',
+  'hudChrome.raidBossGuide.ignivar.judgmentResponse':
+    '在預警期間認出標記獨特的庇護所，並在地面燃燒前完全進入其邊界內集合。',
+  'hudChrome.raidBossGuide.ignivar.chainsName': '熔爐鎖鏈',
+  'hudChrome.raidBossGuide.ignivar.chainsSummary':
+    '伊格尼瓦連接附近的玩家對。相距過遠或穿過其他玩家對的鎖鏈都會造成致命傷害。',
+  'hudChrome.raidBossGuide.ignivar.chainsResponse':
+    '靠近與你相連的玩家並一起移動，不要讓其他任何玩家穿過你們的鎖鏈。',
+  'hudChrome.raidBossGuide.ignivar.lastInfernoName': '最終煉獄',
+  'hudChrome.raidBossGuide.ignivar.lastInfernoSummary':
+    '伊格尼瓦進入狂暴並準備強制團滅，同時燼雨、灼熱洪流和旋轉煉獄會加速。',
+  'hudChrome.raidBossGuide.ignivar.lastInfernoResponse':
+    '使用剩餘的輸出和治療冷卻，繼續正確處理移動機制，並在倒數結束前擊敗伊格尼瓦。',
   'hudChrome.raidBossGuide.ignivar.brand':
     '柴堆印記: 分散站位。將灼熱洪流引向可用水道，再獨自穿過水流完成淨化。',
   'hudChrome.raidBossGuide.ignivar.movement':
@@ -7421,6 +7555,94 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '最終煉獄: 在團滅前擊殺伊格尼瓦爾，同時應對加速的隕石、正面攻擊與旋轉煉獄。',
   'hudChrome.raidBossGuide.ignivar.heroic':
     '英雄: 熔爐鎖鏈期間成對玩家必須保持靠近，熔爐審判期間印記仍會持續，且熔爐波會將玩家推得更遠。',
+  'hudChrome.raidBossGuide.varkhul.overview':
+    '瓦爾庫爾囚禁垂死的終末之泉來鍛造活體金屬，隨後創造伊格尼瓦守護這項罪行。這場戰鬥結合個人走位與全團對巨型熔爐的控制。',
+  'hudChrome.raidBossGuide.varkhul.phaseOpeningName': '鍛爐之父',
+  'hudChrome.raidBossGuide.varkhul.phaseOpeningSummary':
+    '瓦爾庫爾循環施放坦克壓力、寬闊正面攻擊、移動投射物、團隊分攤、隕石波次和巨型鐵砧攻擊。',
+  'hudChrome.raidBossGuide.varkhul.phaseAssemblyName': '過場階段：大師組裝',
+  'hudChrome.raidBossGuide.varkhul.phaseAssemblySummary':
+    '生命力降至{health}時，瓦爾庫爾獲得保護，鍛爐軍團透過傳送門進入，柱狀射線則會威脅觸發熔爐熔毀。',
+  'hudChrome.raidBossGuide.varkhul.phaseFinaleName': '最終階段：傑作解放',
+  'hudChrome.raidBossGuide.varkhul.phaseFinaleSummary':
+    '生命力降至{health}時，瓦爾庫爾攻擊更快、造成更多傷害，並不斷對全團釋放火焰脈衝直到最終時限。',
+  'hudChrome.raidBossGuide.varkhul.phaseFinaleHeroicSummary':
+    '生命力降至{health}時，瓦爾庫爾放棄大部分早期機制，世界之火向內收縮並吞噬整個坩堝。',
+  'hudChrome.raidBossGuide.varkhul.makersBrandName': '製作者印記',
+  'hudChrome.raidBossGuide.varkhul.makersBrandSummary':
+    '瓦爾庫爾打擊目前坦克並施加可堆疊效果，使其受到瓦爾庫爾的所有傷害提高。',
+  'hudChrome.raidBossGuide.varkhul.makersBrandResponse':
+    '坦克在{stacks}層時換坦。治療在瓦爾庫爾更換目標前保護即將接怪的坦克。',
+  'hudChrome.raidBossGuide.varkhul.frontalName': '鍛爐之父橫掃',
+  'hudChrome.raidBossGuide.varkhul.frontalSummary':
+    '瓦爾庫爾釋放範圍極寬的正面橫掃，對其前方所有玩家造成大量火焰傷害。',
+  'hudChrome.raidBossGuide.varkhul.frontalHeroicSummary':
+    '瓦爾庫爾釋放範圍極寬的正面橫掃，對其前方所有玩家造成幾乎致命的火焰傷害。',
+  'hudChrome.raidBossGuide.varkhul.frontalResponse':
+    '讓瓦爾庫爾始終背對團隊，預警出現後立刻移動到他身後。',
+  'hudChrome.raidBossGuide.varkhul.orbsName': '燼火寶珠',
+  'hudChrome.raidBossGuide.varkhul.orbsSummary':
+    '被標記的非坦克玩家會留下持續的燼火池，並向各個方向釋放火焰寶珠。熾熱金屬還會吸收受到的治療。',
+  'hudChrome.raidBossGuide.varkhul.orbsHeroicSummary':
+    '被標記的非坦克玩家會留下高傷害燼火池，並向各個方向釋放危險的火焰寶珠。熾熱金屬還會吸收受到的治療。',
+  'hudChrome.raidBossGuide.varkhul.orbsResponse':
+    '將每個標記帶到房間邊緣，讓火池彼此分開，再躲避橫穿競技場的寶珠。治療迅速清除治療吸收。',
+  'hudChrome.raidBossGuide.varkhul.pyreName': '共享柴堆',
+  'hudChrome.raidBossGuide.varkhul.pyreSummary':
+    '一個移動圓圈會跟隨沒有熾熱金屬的玩家。傷害由圈內玩家分攤，每缺少一名玩家還會對全團造成相當於最大生命力{missingPenalty}的傷害。',
+  'hudChrome.raidBossGuide.varkhul.pyreHeroicSummary':
+    '一個移動圓圈會跟隨沒有熾熱金屬的玩家，並分攤更高的傷害。每缺少一名玩家還會對全團造成相當於最大生命力{missingPenalty}的傷害。',
+  'hudChrome.raidBossGuide.varkhul.pyreResponse':
+    '讓至少{players}名玩家在圓圈內集合，並跟隨目標移動直到施法結算。',
+  'hudChrome.raidBossGuide.varkhul.forgestormName': '熔爐風暴',
+  'hudChrome.raidBossGuide.varkhul.forgestormSummary':
+    '瓦爾庫爾在競技場中連續召來{waves}波標記的隕石落點。',
+  'hudChrome.raidBossGuide.varkhul.forgestormHeroicSummary':
+    '瓦爾庫爾連續召來{waves}波會造成極高傷害的標記隕石落點。',
+  'hudChrome.raidBossGuide.varkhul.forgestormResponse':
+    '觀察每一組新的地面預警，並在該波落下前離開。確認下一波位置前不要返回剛才的區域。',
+  'hudChrome.raidBossGuide.varkhul.rayName': '淬火射線',
+  'hudChrome.raidBossGuide.varkhul.raySummary':
+    '一道射線長時間追蹤被標記的玩家。瓦爾庫爾與目標之間的第一名其他玩家會攔截傷害並獲得淬火創傷。',
+  'hudChrome.raidBossGuide.varkhul.rayResponse':
+    '安排一名健康玩家，通常是副坦克，站進射線。其他玩家遠離，並在淬火創傷持續期間輪換攔截者。',
+  'hudChrome.raidBossGuide.varkhul.anvilName': '鐵砧敕令',
+  'hudChrome.raidBossGuide.varkhul.anvilSummary':
+    '瓦爾庫爾走向巨型熔爐並敲擊{strikes}次，對全團造成逐次提高的傷害。',
+  'hudChrome.raidBossGuide.varkhul.anvilHeroicSummary':
+    '瓦爾庫爾敲擊巨型熔爐{strikes}次，造成逐次提高的團隊傷害，同時標記的隕石會落向玩家。',
+  'hudChrome.raidBossGuide.varkhul.anvilResponse': '團隊集合接受治療，並為最後一次打擊使用防禦冷卻。',
+  'hudChrome.raidBossGuide.varkhul.anvilHeroicResponse':
+    '將標記的隕石分散到團隊之外，治療和防禦冷卻則覆蓋全部{strikes}次打擊。',
+  'hudChrome.raidBossGuide.varkhul.assemblyName': '大師組裝',
+  'hudChrome.raidBossGuide.varkhul.assemblySummary':
+    '瓦爾庫爾獲得保護並開始限時組裝。團隊必須在熔爐完成他的傑作前擊敗所有傳送門波次。',
+  'hudChrome.raidBossGuide.varkhul.assemblyResponse':
+    '同時關注射線控制和優先小怪。在組裝計時結束前擊敗完整的鍛爐軍團。',
+  'hudChrome.raidBossGuide.varkhul.beamName': '坩堝射線',
+  'hudChrome.raidBossGuide.varkhul.beamSummary':
+    '啟動的柱狀射線會加熱熔爐，除非有玩家阻擋。阻擋者受到不斷提高的坩堝暴露傷害，射線被阻擋或未啟動時熱量會下降。',
+  'hudChrome.raidBossGuide.varkhul.beamHeroicSummary':
+    '啟動的柱狀射線會加熱熔爐，除非有玩家阻擋。阻擋者受到不斷提高的坩堝暴露傷害，且熔爐熱量永遠不會下降。',
+  'hudChrome.raidBossGuide.varkhul.beamResponse':
+    '站在每根啟動的柱子與熔爐之間，並在暴露變得危險前輪換阻擋者。熱量滿時會觸發致命的熔爐熔毀。',
+  'hudChrome.raidBossGuide.varkhul.legionName': '鍛爐軍團',
+  'hudChrome.raidBossGuide.varkhul.legionSummary':
+    '坩堝守衛施放坩堝震擊來增加熔爐熱量，燼火工匠則用修復協定治療瓦爾庫爾。',
+  'hudChrome.raidBossGuide.varkhul.legionResponse':
+    '打斷坩堝震擊和修復協定，優先集火每名危險施法者，再清理剩餘小怪。',
+  'hudChrome.raidBossGuide.varkhul.masterpieceName': '傑作解放',
+  'hudChrome.raidBossGuide.varkhul.masterpieceSummary':
+    '瓦爾庫爾攻擊更快、造成更多傷害，並反覆灼燒全團直到最終團滅。',
+  'hudChrome.raidBossGuide.varkhul.masterpieceHeroicSummary':
+    '瓦爾庫爾攻擊更快、造成更多傷害，世界之火會取代大多數早期機制完成最終爆發。',
+  'hudChrome.raidBossGuide.varkhul.masterpieceResponse':
+    '使用剩餘的進攻和防禦冷卻，並在最終倒數結束前擊敗瓦爾庫爾。',
+  'hudChrome.raidBossGuide.varkhul.worldfireName': '世界之火',
+  'hudChrome.raidBossGuide.varkhul.worldfireSummary':
+    '英雄難度下，火焰會從競技場邊緣分階段向中央推進，直到整個坩堝燃燒。',
+  'hudChrome.raidBossGuide.varkhul.worldfireResponse':
+    '在每條推進的火焰帶到達前向內移動，保留不斷縮小的安全空間，並在中央點燃前擊敗瓦爾庫爾。',
   'hudChrome.raidBossGuide.varkhul.tanks':
     '坦克: 製作者印記達到2層時換坦，並讓瓦爾庫爾保持在近戰範圍內。',
   'hudChrome.raidBossGuide.varkhul.orbs':
@@ -8539,6 +8761,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'apiError.character.online': '角色目前在線上。',
   'apiError.character.rename_not_permitted': '不允許為此角色更名。',
   'apiError.character.delete_confirm': '輸入角色名稱以確認刪除。',
+  'apiError.character.storage_purchase_open': '此儲物空間購買必須完成或解決後，才能刪除該角色。',
+  'apiError.character.delete_busy': '伺服器繁忙，請稍後再嘗試刪除該角色。',
   'apiError.character.already_in_world': '角色已在世界中。',
   'apiError.character.taken_over': '你的角色已被另一個工作階段接管。',
   'apiError.character.rename_required': '此角色必須先更名才能進入世界。',
@@ -9106,6 +9330,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.craftName.leatherworking': '製皮',
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
   'hudChrome.crafting.reagentFineSub': '（消耗 {count} 個優質品級）',
+  'hudChrome.crafting.reagentVaultDraw': '（從材料倉庫取用 {count}）',
+  'hudChrome.crafting.vaultUnreachable': '此處無法使用材料倉庫。',
   // Protect Yumi locale fill (M16 wordy-key floor).
   'yumi.hud.collapse': '摺疊Protect Yumi血條',
   'yumi.hud.expand': '展開Protect Yumi血條',
@@ -9312,6 +9538,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '保險庫打開後，點擊背包中的物品即可存入，點擊保險庫中的物品即可取回。保險庫只存放物品，不存放錢幣，任務物品也會留在你身上。旅途中背包裝滿時，還有一個按鈕可將全部製造材料一鍵存入。',
   'guide.economy.bankSlots':
     '新開的保險庫空間不大，但會隨你一同成長。司庫出售更多格位，價格逐級走高；線上遊玩還能獲得額外空間，例如驗證信箱、連結帳號，以及引薦好友加入遊戲。',
+  'guide.economy.bankSockets':
+    '在格位階梯之上，司庫還出售最多四個背包插槽，按順序解鎖，價格逐級走高。把攜帶的閒置背包裝入插槽，它的格位便併入保險庫空間：普通背包擴充整個倉儲，而材料袋只為製作材料增添空間。點擊背包欄中的背包即可裝入，點擊插槽即可取回。取回背包絕不會損失任何存放之物：若保險庫因此超出縮減後的空間，一切物品原地保留，新的存入只需等待騰出空間。',
   'guide.economy.bankTitle': '銀行',
   'hudChrome.bank.title': '銀行',
   'hudChrome.bank.subtitle': '鍍金保險箱',
@@ -9324,18 +9552,52 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.buySlotsMaxed': '已完全擴展',
   'hudChrome.bank.buyConfirm': '花費 {price} 購買 {count} 個額外的銀行格子嗎？',
   'hudChrome.bank.buyConfirmAccept': '購買',
+  'hudChrome.bank.meterLabel': '已用 {used}/{total} 格',
+  'hudChrome.bank.meterPoolGeneral': '一般：{used}/{total}',
+  'hudChrome.bank.meterPoolMaterials': '材料：{used}/{total}',
+  'hudChrome.bank.meterPoolsAria': '銀行格已用：{used}/{total}。一般物品：{generalUsed}/{generalTotal}。材料：{materialsUsed}/{materialsTotal}。',
+  'hudChrome.bank.meterMaterialsNote': '來自已裝入的材料背包的材料專用空間。其他物品無法使用。',
+  'hudChrome.bank.priceDisclaimer': '價格可能隨遊戲經濟而變動。',
+  'hudChrome.bank.rungItemName': '{count} 個銀行格子',
+  'hudChrome.bank.buySlotsDualAria': '花費 {price} 或 {cost} Claudium 購買 {count} 個格子',
+  'hudChrome.bank.buyConfirmDual': '購買 {count} 個額外的銀行格子嗎？',
+  'hudChrome.bank.buyConfirmGold': '花費 {price} 購買',
+  'hudChrome.bank.buyConfirmClaudium': '花費 {cost} Claudium 購買',
+  'hudChrome.bank.rungGranted': '銀行格子已新增。目前角色的銀行已經變大。',
+  'hudChrome.bank.rungAlreadyGranted': '目前角色已擁有這些格子，不會重複扣款。',
+  'hudChrome.bank.rungApplyDeferred': '付款完成。該角色下次登入時會自動取得這些格子。',
+  'hudChrome.bank.rungGrantUnresolved': '付款完成，但格子尚未發放。此次購買已記錄，客服可以為你處理完成。',
+  'hudChrome.bank.rungInProgress': '目前角色的一筆購買仍在完成中，請稍候再試。',
+  'hudChrome.bank.rungDoesNotFit': '目前角色的銀行已無法再進行一次擴充。',
+  'hudChrome.bank.rungNotPurchasable': '這些銀行格子目前無法購買。',
+  'hudChrome.bank.rungFailed': '此次購買未能完成。',
+  'hudChrome.bank.rungOutage': '無法確認此次購買。使用此按鈕重試不會重複扣款。若先重新載入遊戲，可能會失去這項保護。',
   'hudChrome.bank.withdrawHint': '點擊取出',
   'hudChrome.bank.withdrawPartialHint': 'Shift+點擊取出部分數量',
   'hudChrome.bank.depositHint': '點擊存入',
   'hudChrome.bank.depositPartialHint': 'Shift+點擊存入部分數量',
   'hudChrome.bank.cannotDeposit': '無法存入銀行',
   'hudChrome.bank.cannotDepositNow': '暫時無法存入',
+  'hudChrome.bank.socketRowAria': '銀行背包插槽',
+  'hudChrome.bank.socketEmpty': '空的銀行背包插槽',
+  'hudChrome.bank.socketEmptyHint': '點擊背包欄中的背包即可存入銀行',
+  'hudChrome.bank.socketLocked': '未解鎖的背包插槽',
+  'hudChrome.bank.socketLockedLater': '背包插槽按順序解鎖，先解鎖最便宜的',
+  'hudChrome.bank.socketUnlockAria': '花費{price}解鎖一個銀行背包插槽',
+  'hudChrome.bank.socketUnlockHint': '點擊解鎖此背包插槽',
+  'hudChrome.bank.socketUnlockConfirm': '花費{price}解鎖一個銀行背包插槽？',
+  'hudChrome.bank.socketUnlockAccept': '解鎖',
+  'hudChrome.bank.unsocketHint': '點擊將此背包取回背包欄',
+  'hudChrome.bank.socketHint': '點擊將此背包裝入銀行插槽',
   'hudChrome.bank.depositQuantityTitle': '存入 {item}',
   'hudChrome.bank.depositQuantityInput': '要存入的數量',
   'hudChrome.bank.depositQuantityConfirm': '存入',
   'hudChrome.bank.withdrawQuantityTitle': '取出 {item}',
+  'hudChrome.bank.vaultRowWithdrawName': '取出 {item}',
+  'hudChrome.bank.priceChanged': '購買完成前價格已變更。請查看刷新後的價格並再次確認。',
   'hudChrome.bank.withdrawQuantityInput': '要取出的數量',
   'hudChrome.bank.withdrawQuantityConfirm': '取出',
+  'hudChrome.bank.withdrawQuantityAction': '選擇 {item} 要取出的數量',
   'hudChrome.bank.filterGroupAria': '依類別篩選銀行',
   'hudChrome.bank.sortAria': '排序銀行物品',
   'hudChrome.bank.searchAria': '依名稱搜尋銀行物品',
@@ -9359,6 +9621,25 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.bonusReferralExplainer':
     '邀請好友：當好友升到 10 級，你們各獲得 2 個格子，最多 5 位好友。',
   'hudChrome.bank.bonusSectionAria': '獎勵銀行格子及獲取方式',
+  'hudChrome.bank.vaultTab': '倉庫',
+  'hudChrome.bank.vaultCapacityNote': '每種材料最多可存放{cap}個。',
+  'hudChrome.bank.vaultEmpty': '你的材料倉庫是空的。點擊背包中的材料即可存入。',
+  'hudChrome.bank.vaultRowAria': '{item}：已存{count}/{cap}',
+  'hudChrome.bank.vaultLockedIntro':
+    '解鎖材料倉庫，在銀行旁囤積製造材料。每種材料都有自己的空間，最多可存{cap}個。',
+  'hudChrome.bank.vaultUnlockButton': '解鎖材料倉庫',
+  'hudChrome.bank.vaultUnlockConfirm': '花費{price}解鎖材料倉庫？',
+  'hudChrome.bank.vaultUpgrade': '將上限提升至{cap}',
+  'hudChrome.bank.vaultUpgradeConfirm': '花費{price}將每種材料的存放上限提升至{cap}？',
+  'hudChrome.bank.vaultDepositAll': '存入全部材料',
+  'hudChrome.bank.vaultDepositAllTooltip':
+    '一次將背包中的所有材料存入倉庫，每種材料存至其上限為止。裝備、工具、任務物品和消耗品不會被移動。',
+  'hudChrome.bank.vaultDepositAllDone': '已存入材料：{count}。',
+  'hudChrome.bank.vaultDepositAllFull': '已存入材料：{count}。部分材料已達上限。',
+  'hudChrome.bank.vaultDepositAllNone': '倉庫已滿：未存入任何材料。',
+  'hudChrome.bank.vaultWithdrawShort': '背包只裝得下{count}個中的{fit}個。',
+  'hudChrome.bank.vaultDepositHint': '點擊存入材料倉庫',
+  'hudChrome.bank.vaultCannotDeposit': '無法存入材料倉庫',
   'hudChrome.bank.tabsAria': '銀行標籤頁',
   'hudChrome.bank.personalTab': '個人',
   'hudChrome.bank.guildTab': '公會',
@@ -10393,6 +10674,13 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.goldweave_robe.name': '鎏金織長袍',
   'entities.items.goldweave_leggings.name': '鎏金織護腿',
   'entities.items.silkspun_satchel.name': '絲紡挎包',
+  'entities.items.wayfarers_backpack.name': '旅者背包',
+  'entities.items.burlap_reagent_pouch.name': '粗麻材料袋',
+  'entities.items.necromancers_reagent_satchel.name': '死靈法師的材料挎包',
+  'entities.items.duskweave_bag.name': '暮織袋',
+  'entities.items.resonant_weave_bag.name': '共鳴織袋',
+  'entities.items.foragers_haversack.name': '採集者行囊',
+  'entities.items.loombound_reagent_satchel.name': '織縛材料挎包',
   'entities.items.silkbinders_raiment.name': '縛絲法衣',
   'entities.items.sunweave_mantle.name': '陽織披肩',
   'entities.items.sunweave_treads.name': '陽織足墊',

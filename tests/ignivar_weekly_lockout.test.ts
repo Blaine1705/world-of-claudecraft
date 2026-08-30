@@ -53,6 +53,7 @@ function encounterInstance(
     slot: 0,
     partyKey: 'party:lockout-test',
     mobIds: [boss.id],
+    raidBossWelcomeKeys: new Set(),
     npcIds: [],
     objectIds: [],
     exitId: null,

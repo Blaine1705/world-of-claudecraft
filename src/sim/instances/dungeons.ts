@@ -65,6 +65,7 @@ import {
   resolveIgnivarEntryRoom,
 } from './ignivar_entry';
 import { tickIgnivarLavaHazard } from './ignivar_lava_hazard';
+import { emitFirstRaidBossRoomWelcome } from './raid_boss_room_welcome';
 
 const DOOR_TRIGGER_RADIUS = 2.0; // walking this close to a dungeon door teleports you
 const HEROIC_REWARD_WINDOW_MS = 24 * 60 * 60 * 1000;
@@ -222,17 +223,34 @@ export function instanceClaimIdAt(ctx: SimContext, pos: Vec3): number | null {
   return null;
 }
 
+// The generic instance-footprint HALF-WIDTH (x extent either side of a slot
+// origin). Exported because vault_craft_gate.ts claimWestReach derives its
+// west-reach envelope from this same constant: a bare literal widened here
+// would silently under-estimate that gate's reach and fail it open.
+export const INSTANCE_FOOTPRINT_HALF_WIDTH = 120;
+
+// The one dungeon whose claim footprint is WIDER than the generic envelope
+// (the circle arm in instanceClaimContains below). Exported for the same
+// reason as the half-width above: vault_craft_gate.ts keys its wider-reach
+// derivation on this exact id.
+export const WIDE_CLAIM_DUNGEON_ID = 'nythraxis_boss_arena';
+
 // The one instance-footprint envelope (shared by occupancy, position lookup,
 // and the kill-lockout sweep): is `pos` inside the slot anchored at `origin`?
 function instanceContains(origin: { x: number; z: number }, pos: Vec3): boolean {
-  return Math.abs(pos.x - origin.x) < 120 && Math.abs(pos.z - origin.z) < 250;
+  return (
+    Math.abs(pos.x - origin.x) < INSTANCE_FOOTPRINT_HALF_WIDTH && Math.abs(pos.z - origin.z) < 250
+  );
 }
 
 function instanceClaimContains(inst: InstanceSlot, pos: Vec3): boolean {
   const origin = instanceOriginOf(inst);
   if (instanceContains(origin, pos)) return true;
-  if (inst.dungeonId !== 'nythraxis_boss_arena') return false;
-  const bossSpawn = DUNGEONS.nythraxis_boss_arena.spawns.find(
+  if (inst.dungeonId !== WIDE_CLAIM_DUNGEON_ID) return false;
+  // Looked up through the SAME constant the guard above compares, never a
+  // second hard-coded id: a rename via the constant would otherwise leave
+  // this literal lookup throwing on undefined.
+  const bossSpawn = DUNGEONS[WIDE_CLAIM_DUNGEON_ID].spawns.find(
     (spawn) => spawn.mobId === NYTHRAXIS_BOSS_ID,
   );
   // The raid room is wider than the generic instance footprint, so its claim
@@ -619,6 +637,9 @@ export function enterDungeon(
   ctx.rebucket(p);
   p.facing = 0;
   p.prevFacing = 0;
+  p.dungeonEntrySeq = (p.dungeonEntrySeq ?? 0) + 1;
+  r.meta.moveInput.turnLeft = false;
+  r.meta.moveInput.turnRight = false;
   p.targetId = null;
   p.autoAttack = false;
   // Land settled: no carried-over jump arc or fall distance from the overworld
@@ -634,6 +655,7 @@ export function enterDungeon(
   inst.emptyFor = 0;
   // Session participation record for this run: awardHeroicMarks pays the mail
   // arm only to locked players who actually walked through the door.
+  emitFirstRaidBossRoomWelcome(ctx, inst, r.meta.entityId);
   inst.enteredBy.add(r.meta.entityId);
   for (const devBotId of devReplacementEnteredBy) inst.enteredBy.add(devBotId);
   // Stepping inside removes you from any arena queue: a match must never form for
@@ -891,6 +913,7 @@ function claimInstance(
   inst.claimedAt = ctx.time;
   inst.clearedBy = new Set();
   inst.enteredBy = new Set();
+  inst.raidBossWelcomeKeys = new Set();
   inst.combatExitMemory = new Map();
   const origin = instanceOriginOf(inst);
   const mobDifficultyTuningId = dungeon.mobDifficultyTuningId ?? inst.dungeonId;
@@ -1002,6 +1025,7 @@ function freeInstance(ctx: SimContext, inst: InstanceSlot): void {
   inst.claimedAt = undefined;
   inst.clearedBy = new Set();
   inst.enteredBy = new Set();
+  inst.raidBossWelcomeKeys = new Set();
   inst.combatExitMemory = new Map();
 }
 

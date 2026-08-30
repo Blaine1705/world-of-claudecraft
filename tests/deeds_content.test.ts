@@ -63,7 +63,7 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 279 deeds worth 3310 total Renown', () => {
+  it('ships exactly 281 deeds worth 3340 total Renown', () => {
     // Release base (262 / 3145 after the WARFARE lifetime-honor ladder) plus
     // four Reliquary Curator rank bridges and the five Phase 18 completion
     // ladder deeds (all nine renown 0: catalog prestige never scores the
@@ -71,8 +71,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // exp_dawnhold_castle, renown 5 each), the Proving Shore graduation
     // deed (prog_ready_for_an_adventure, renown 5), and the five Crucible
     // raid deeds (four clears at 25 plus the flawless 50: +150).
-    expect(DEED_ORDER.length).toBe(279);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3310);
+    expect(DEED_ORDER.length).toBe(281);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3340);
   });
 
   it('ships the audited per-category counts', () => {
@@ -92,7 +92,9 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       collection: 37,
       // Release's Thornhollow battlegrounds plus the WARFARE honor ladder.
       pvp: 35,
-      social: 18,
+      // +2 bank socket ladder deeds (soc_strongbox_outfitter,
+      // soc_four_bags_deep; Bank Storage phase 06).
+      social: 20,
       exploration: 11,
       feat: 3,
       hidden: 9,
@@ -224,6 +226,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // keyed on the enterDungeon markVisited emit).
       'exp_the_last_keep',
       'exp_dawnhold_castle',
+      'soc_strongbox_outfitter',
+      'soc_four_bags_deep',
       // The Proving Shore graduation closes the merged tail.
       'prog_ready_for_an_adventure',
       // The Crucible of the Last Spring raid block (per-boss clear pairs on
@@ -652,7 +656,7 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // deeds, the per-boss clear pairs (dgn_ignivar, dgn_ignivar_heroic,
   // dgn_varkhul, dgn_varkhul_heroic) and the Varkhul flawless task
   // (dgn_varkhul_flawless). No shipped trigger or renown changed.
-  const FROZEN_CATALOG_SHA256 = '819fca65d1f9b69908925c6b89e00a9bb5636698b51f1e3faa4b53e9f4640b0d';
+  const FROZEN_CATALOG_SHA256 = 'bd95099f837871f85329aefff1478adc621cc8e83a386b2535826cf29d730219';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(

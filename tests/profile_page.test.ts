@@ -170,7 +170,7 @@ describe('profile page Reliquary pair + Curator rank lines', () => {
     // the literal anchors them. Literal: update when catalog content lands
     // (311 + the 40 Crucible raid relics + the raid's flawless title;
     // Forgebreaker left the pages for its crafting chain).
-    expect(catalogTotal).toBe(354);
+    expect(catalogTotal).toBe(356);
   });
 
   it('renders the owned/total pair and the English rank name for a ranked character', async () => {

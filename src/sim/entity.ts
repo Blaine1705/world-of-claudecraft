@@ -251,6 +251,7 @@ export function createPlayer(id: number, cls: PlayerClass, pos: Vec3, name: stri
   e.kind = 'player';
   e.templateId = cls;
   e.name = name;
+  e.dungeonEntrySeq = 0;
   e.level = 1;
   e.resourceType = def.resourceType;
   e.color = def.color;

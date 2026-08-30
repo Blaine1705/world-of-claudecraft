@@ -1501,8 +1501,8 @@ export class DungeonInteriors {
           new THREE.Color(DROWNED_WALL_TINT),
         );
       }
-      mats.push(occluderFadeMat(material));
       const mesh = new THREE.InstancedMesh(asset.geo, material, matrices.length);
+      mats.push(occluderFadeMat(material, mesh));
       for (let i = 0; i < matrices.length; i++) mesh.setMatrixAt(i, matrices[i]);
       mesh.instanceMatrix.needsUpdate = true;
       mesh.computeBoundingSphere();

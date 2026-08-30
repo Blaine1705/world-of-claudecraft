@@ -185,13 +185,14 @@ import {
   varkhulWorldfireStage,
 } from '../varkhul_worldfire';
 import { walkEncounterActorTo } from './scripted_walk';
+import { VARKHUL_DIALOGUE } from './varkhul_dialogue';
 
 export { VARKHUL_BOSS_ID } from '../ignivar_raid_ids';
 export { VARKHUL_FORGE_PORTAL_ABILITY_ID } from '../varkhul_forge_intermission';
 export const VARKHUL_EMBER_SENTINEL_ID = IGNIVAR_EMBER_SENTINEL_ID;
 export const VARKHUL_CRUCIBLE_WARDEN_ID = IGNIVAR_CRUCIBLE_WARDEN_ID;
 export const VARKHUL_CINDER_ARTIFICER_ID = IGNIVAR_CINDER_ARTIFICER_ID;
-export const VARKHUL_DEATH_YELL = 'Master... I have failed you.';
+export const VARKHUL_DEATH_YELL = VARKHUL_DIALOGUE.death;
 
 export function announceVarkhulDeath(ctx: SimContext, boss: Entity): void {
   if (!boss.varkhul) return;
@@ -1848,6 +1849,7 @@ function beginMastersAssembly(ctx: SimContext, boss: Entity, st: VarkhulEncounte
   st.assemblyPhase = 'adds';
   boss.aiState = 'idle';
   boss.facing = VARKHUL_WORK_FACING;
+  emitMobYell(ctx, boss, VARKHUL_DIALOGUE.assembly);
   emitVarkhulCallout(ctx, boss, 'leftPillarCharging');
   emitVarkhulCallout(ctx, boss, 'portalsOpening');
   queueForgeAddWave(ctx, boss, st, 0);
@@ -2256,6 +2258,7 @@ function updateMastersAssembly(
     return add !== undefined && !add.dead;
   });
   if (allAddsSpawned && !liveAdds) {
+    emitMobYell(ctx, boss, VARKHUL_DIALOGUE.addsDefeated);
     emitVarkhulCallout(ctx, boss, 'addsDefeated');
     shatterAssemblyForge(ctx, boss, st);
     return true;
@@ -2621,6 +2624,7 @@ function startMasterpieceUnbound(ctx: SimContext, boss: Entity, st: VarkhulEncou
     school: 'fire',
     encounterOwned: true,
   });
+  emitMobYell(ctx, boss, VARKHUL_DIALOGUE.masterpiece);
   if (st.assemblyRuneDifficulty === 'heroic') {
     emitVarkhulCallout(ctx, boss, 'worldfireBegins');
   }
@@ -2939,6 +2943,7 @@ export function updateVarkhulEncounter(ctx: SimContext, boss: Entity, pursueTarg
           );
     const step = tickVarkhulEngage(st.engage, DT, arrived);
     if (step.roar) {
+      emitMobYell(ctx, boss, VARKHUL_DIALOGUE.engage);
       ctx.emit({
         type: 'spellfx',
         sourceId: boss.id,

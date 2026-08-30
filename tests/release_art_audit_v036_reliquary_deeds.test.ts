@@ -200,6 +200,8 @@ describe('v0.36 release-audit Reliquary deed art', () => {
     expect([...DEED_ART_PENDING]).toEqual([
       'exp_the_last_keep',
       'exp_dawnhold_castle',
+      'soc_strongbox_outfitter',
+      'soc_four_bags_deep',
       'prog_ready_for_an_adventure',
       'dgn_ignivar',
       'dgn_ignivar_heroic',
@@ -207,7 +209,7 @@ describe('v0.36 release-audit Reliquary deed art', () => {
       'dgn_varkhul_heroic',
       'dgn_varkhul_flawless',
     ]);
-    expect(DEED_ORDER).toHaveLength(279);
+    expect(DEED_ORDER).toHaveLength(281);
     expect(DEED_IMAGE_IDS.size).toBe(271);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(
