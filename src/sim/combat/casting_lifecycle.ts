@@ -2177,7 +2177,11 @@ function applyChannelTick(
   // Self-centered healing channels pulse around the caster's live position on
   // every tick. Instant aoeHeal effects still resolve once through effect_dispatch.
   if (!res.def.requiresTarget && res.effects.some((eff) => eff.type === 'aoeHeal')) {
-    const channelSp = channelTickBonus(abilityScalingPower(p, res.def), res.def, talentHealMult);
+    // Heal riders read the derived healPower (spellPower plus flat Healing
+    // Power), never abilityScalingPower's raw spellPower: the Healing Power
+    // directionality contract (types.ts BaseItemDef.healPower), and the same
+    // reader the Paladin Aegis channel tick uses.
+    const channelSp = channelTickBonus(p.healPower, res.def, talentHealMult);
     for (const eff of res.effects) {
       if (eff.type !== 'aoeHeal') continue;
       ctx.emit({
