@@ -27,12 +27,19 @@ to their set's class. Armor values by slot:
 | gloves | 270 | 150 | 75 |
 | feet | 255 | 145 | 70 |
 
-Affix scales (off the primary budget): Spell Damage 14 on
-chest/legs/helmet, 10 on shoulder/gloves/waist, 8 on feet/jewelry, 26 on
-the damage staff, 10 on the wand and held offhand; Healing Power 25 on
-chest/legs/helmet, 18 on shoulder/gloves/waist, 14 on feet/jewelry, 45 on
-the healing staff, 30 on the healing mace, 18 on the healing shield and
-orb. Ratings: armor 60 primary + 25 secondary, weapons 70 + 30, jewelry a
+Affix scales are PRICED, never free (the throughput lane,
+`src/sim/item_budget.ts` and `tests/ignivar_affix_lane.test.ts`): every
+archetype gets one lane per kit on top of the primary budget. Melee draw
+it as weapon dps; casters draw the same lane as flat Spell Damage at a
+1.25x multiplier pricing the uptime tax (`casterLaneSpTotal(35)` = 86
+kit-wide); healers as Healing Power at half Spell Damage's price per
+point (172 kit-wide). Weapon-heavy split, the classic-era shape: Spell
+Damage 8 on the chest, 7 on helmet/legs, 5 on shoulder/gloves, 4 on
+waist/feet/jewelry, 34 on the damage staff (wand 20 + held 14 mirrors
+it); Healing Power 16 on the chest, 14 on helmet/legs, 10 on
+shoulder/gloves, 8 on waist/feet/jewelry, 68 on the healing staff
+(mace 40 + orb 28 mirrors it, the shield trades some lane for block).
+Ratings: armor 60 primary + 25 secondary, weapons 70 + 30, jewelry a
 single 25. Set pieces carry only crit and haste; Hit appears exactly where
 the Hit program in the plan doc says (elective waists at 60, the physical
 neck and ring and the spell-damage ring at 25, and three weapon
@@ -202,11 +209,11 @@ design targets for the tuning pass.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
-| Vesperash Hood (`vesperash_helmet`) | helmet | 90 | Int 14, Spi 7 | Spell Damage 14 | crit 60, haste 25 |
-| Vesperash Mantle (`vesperash_shoulder`) | shoulder | 80 | Int 12, Spi 6 | Spell Damage 10 | crit 60, haste 25 |
-| Vesperash Robe (`vesperash_chest`) | chest | 105 | Int 17, Spi 8 | Spell Damage 14 | crit 60, haste 25 |
-| Vesperash Handwraps (`vesperash_gloves`) | gloves | 75 | Int 11, Spi 6 | Spell Damage 10 | crit 60, haste 25 |
-| Vesperash Leggings (`vesperash_legs`) | legs | 95 | Int 15, Spi 7 | Spell Damage 14 | crit 60, haste 25 |
+| Vesperash Hood (`vesperash_helmet`) | helmet | 90 | Int 14, Spi 7 | Spell Damage 7 | crit 60, haste 25 |
+| Vesperash Mantle (`vesperash_shoulder`) | shoulder | 80 | Int 12, Spi 6 | Spell Damage 5 | crit 60, haste 25 |
+| Vesperash Robe (`vesperash_chest`) | chest | 105 | Int 17, Spi 8 | Spell Damage 8 | crit 60, haste 25 |
+| Vesperash Handwraps (`vesperash_gloves`) | gloves | 75 | Int 11, Spi 6 | Spell Damage 5 | crit 60, haste 25 |
+| Vesperash Leggings (`vesperash_legs`) | legs | 95 | Int 15, Spi 7 | Spell Damage 7 | crit 60, haste 25 |
 
 ### Shaman
 
@@ -214,11 +221,11 @@ design targets for the tuning pass.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
-| Stormkindled Helm (`stormkindled_helmet`) | helmet | 325 | Int 14, Spi 7 | Spell Damage 14 | crit 60, haste 25 |
-| Stormkindled Pauldrons (`stormkindled_shoulder`) | shoulder | 290 | Int 12, Spi 6 | Spell Damage 10 | crit 60, haste 25 |
-| Stormkindled Hauberk (`stormkindled_chest`) | chest | 380 | Int 17, Spi 8 | Spell Damage 14 | crit 60, haste 25 |
-| Stormkindled Gauntlets (`stormkindled_gloves`) | gloves | 270 | Int 11, Spi 6 | Spell Damage 10 | crit 60, haste 25 |
-| Stormkindled Legguards (`stormkindled_legs`) | legs | 345 | Int 15, Spi 7 | Spell Damage 14 | crit 60, haste 25 |
+| Stormkindled Helm (`stormkindled_helmet`) | helmet | 325 | Int 14, Spi 7 | Spell Damage 7 | crit 60, haste 25 |
+| Stormkindled Pauldrons (`stormkindled_shoulder`) | shoulder | 290 | Int 12, Spi 6 | Spell Damage 5 | crit 60, haste 25 |
+| Stormkindled Hauberk (`stormkindled_chest`) | chest | 380 | Int 17, Spi 8 | Spell Damage 8 | crit 60, haste 25 |
+| Stormkindled Gauntlets (`stormkindled_gloves`) | gloves | 270 | Int 11, Spi 6 | Spell Damage 5 | crit 60, haste 25 |
+| Stormkindled Legguards (`stormkindled_legs`) | legs | 345 | Int 15, Spi 7 | Spell Damage 7 | crit 60, haste 25 |
 
 **Warspirit Emberscale** (`warspirit_emberscale`), enhancement (Warspirit), mail. 2 pieces: Ancestral Strike advances your cadence 3 steps. 4 pieces: Ancestral Strike hits 30 percent harder.
 
@@ -266,21 +273,21 @@ design targets for the tuning pass.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
-| Pyroclast Hood (`pyroclast_helmet`) | helmet | 90 | Int 14, Spi 7 | Spell Damage 14 | crit 60, haste 25 |
-| Pyroclast Mantle (`pyroclast_shoulder`) | shoulder | 80 | Int 12, Spi 6 | Spell Damage 10 | crit 60, haste 25 |
-| Pyroclast Robe (`pyroclast_chest`) | chest | 105 | Int 17, Spi 8 | Spell Damage 14 | crit 60, haste 25 |
-| Pyroclast Handwraps (`pyroclast_gloves`) | gloves | 75 | Int 11, Spi 6 | Spell Damage 10 | crit 60, haste 25 |
-| Pyroclast Leggings (`pyroclast_legs`) | legs | 95 | Int 15, Spi 7 | Spell Damage 14 | crit 60, haste 25 |
+| Pyroclast Hood (`pyroclast_helmet`) | helmet | 90 | Int 14, Spi 7 | Spell Damage 7 | crit 60, haste 25 |
+| Pyroclast Mantle (`pyroclast_shoulder`) | shoulder | 80 | Int 12, Spi 6 | Spell Damage 5 | crit 60, haste 25 |
+| Pyroclast Robe (`pyroclast_chest`) | chest | 105 | Int 17, Spi 8 | Spell Damage 8 | crit 60, haste 25 |
+| Pyroclast Handwraps (`pyroclast_gloves`) | gloves | 75 | Int 11, Spi 6 | Spell Damage 5 | crit 60, haste 25 |
+| Pyroclast Leggings (`pyroclast_legs`) | legs | 95 | Int 15, Spi 7 | Spell Damage 7 | crit 60, haste 25 |
 
 **Frostquench Weave** (`frostquench`), frost (Cryomancy), cloth. 2 pieces: Rimelance critical strikes bank a second Icicle, up to the maximum of 5. Damage taken no longer delays your spellcasting. 4 pieces: Winterlash plants 3 Winter's Chill charges, up from 2.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
-| Frostquench Hood (`frostquench_helmet`) | helmet | 90 | Int 14, Spi 7 | Spell Damage 14 | haste 60, crit 25 |
-| Frostquench Mantle (`frostquench_shoulder`) | shoulder | 80 | Int 12, Spi 6 | Spell Damage 10 | haste 60, crit 25 |
-| Frostquench Robe (`frostquench_chest`) | chest | 105 | Int 17, Spi 8 | Spell Damage 14 | haste 60, crit 25 |
-| Frostquench Handwraps (`frostquench_gloves`) | gloves | 75 | Int 11, Spi 6 | Spell Damage 10 | haste 60, crit 25 |
-| Frostquench Leggings (`frostquench_legs`) | legs | 95 | Int 15, Spi 7 | Spell Damage 14 | haste 60, crit 25 |
+| Frostquench Hood (`frostquench_helmet`) | helmet | 90 | Int 14, Spi 7 | Spell Damage 7 | haste 60, crit 25 |
+| Frostquench Mantle (`frostquench_shoulder`) | shoulder | 80 | Int 12, Spi 6 | Spell Damage 5 | haste 60, crit 25 |
+| Frostquench Robe (`frostquench_chest`) | chest | 105 | Int 17, Spi 8 | Spell Damage 8 | haste 60, crit 25 |
+| Frostquench Handwraps (`frostquench_gloves`) | gloves | 75 | Int 11, Spi 6 | Spell Damage 5 | haste 60, crit 25 |
+| Frostquench Leggings (`frostquench_legs`) | legs | 95 | Int 15, Spi 7 | Spell Damage 7 | haste 60, crit 25 |
 
 ### Warlock
 
@@ -288,31 +295,31 @@ design targets for the tuning pass.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
-| Hexthread Hood (`hexthread_helmet`) | helmet | 90 | Int 14, Spi 7 | Spell Damage 14 | haste 60, crit 25 |
-| Hexthread Mantle (`hexthread_shoulder`) | shoulder | 80 | Int 12, Spi 6 | Spell Damage 10 | haste 60, crit 25 |
-| Hexthread Robe (`hexthread_chest`) | chest | 105 | Int 17, Spi 8 | Spell Damage 14 | haste 60, crit 25 |
-| Hexthread Handwraps (`hexthread_gloves`) | gloves | 75 | Int 11, Spi 6 | Spell Damage 10 | haste 60, crit 25 |
-| Hexthread Leggings (`hexthread_legs`) | legs | 95 | Int 15, Spi 7 | Spell Damage 14 | haste 60, crit 25 |
+| Hexthread Hood (`hexthread_helmet`) | helmet | 90 | Int 14, Spi 7 | Spell Damage 7 | haste 60, crit 25 |
+| Hexthread Mantle (`hexthread_shoulder`) | shoulder | 80 | Int 12, Spi 6 | Spell Damage 5 | haste 60, crit 25 |
+| Hexthread Robe (`hexthread_chest`) | chest | 105 | Int 17, Spi 8 | Spell Damage 8 | haste 60, crit 25 |
+| Hexthread Handwraps (`hexthread_gloves`) | gloves | 75 | Int 11, Spi 6 | Spell Damage 5 | haste 60, crit 25 |
+| Hexthread Leggings (`hexthread_legs`) | legs | 95 | Int 15, Spi 7 | Spell Damage 7 | haste 60, crit 25 |
 
 **Gravebrand Regalia** (`gravebrand`), demonology (Necromancy), cloth. 2 pieces: Reaping Command's cooldown is reduced by 2 sec. Damage taken no longer delays your spellcasting. 4 pieces: Reaping Command's unison strikes deal 25 percent more damage.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
-| Gravebrand Hood (`gravebrand_helmet`) | helmet | 90 | Int 14, Spi 7 | Spell Damage 14 | crit 60, haste 25 |
-| Gravebrand Mantle (`gravebrand_shoulder`) | shoulder | 80 | Int 12, Spi 6 | Spell Damage 10 | crit 60, haste 25 |
-| Gravebrand Robe (`gravebrand_chest`) | chest | 105 | Int 17, Spi 8 | Spell Damage 14 | crit 60, haste 25 |
-| Gravebrand Handwraps (`gravebrand_gloves`) | gloves | 75 | Int 11, Spi 6 | Spell Damage 10 | crit 60, haste 25 |
-| Gravebrand Leggings (`gravebrand_legs`) | legs | 95 | Int 15, Spi 7 | Spell Damage 14 | crit 60, haste 25 |
+| Gravebrand Hood (`gravebrand_helmet`) | helmet | 90 | Int 14, Spi 7 | Spell Damage 7 | crit 60, haste 25 |
+| Gravebrand Mantle (`gravebrand_shoulder`) | shoulder | 80 | Int 12, Spi 6 | Spell Damage 5 | crit 60, haste 25 |
+| Gravebrand Robe (`gravebrand_chest`) | chest | 105 | Int 17, Spi 8 | Spell Damage 8 | crit 60, haste 25 |
+| Gravebrand Handwraps (`gravebrand_gloves`) | gloves | 75 | Int 11, Spi 6 | Spell Damage 5 | crit 60, haste 25 |
+| Gravebrand Leggings (`gravebrand_legs`) | legs | 95 | Int 15, Spi 7 | Spell Damage 7 | crit 60, haste 25 |
 
 **Ruincaller Vestments** (`ruincaller`), destruction (Ruination), cloth. 2 pieces: Conflagrate holds 3 charges. Damage taken no longer delays your spellcasting. 4 pieces: Ruinbolt strikes 20 percent harder.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
-| Ruincaller Hood (`ruincaller_helmet`) | helmet | 90 | Int 14, Spi 7 | Spell Damage 14 | crit 60, haste 25 |
-| Ruincaller Mantle (`ruincaller_shoulder`) | shoulder | 80 | Int 12, Spi 6 | Spell Damage 10 | crit 60, haste 25 |
-| Ruincaller Robe (`ruincaller_chest`) | chest | 105 | Int 17, Spi 8 | Spell Damage 14 | crit 60, haste 25 |
-| Ruincaller Handwraps (`ruincaller_gloves`) | gloves | 75 | Int 11, Spi 6 | Spell Damage 10 | crit 60, haste 25 |
-| Ruincaller Leggings (`ruincaller_legs`) | legs | 95 | Int 15, Spi 7 | Spell Damage 14 | crit 60, haste 25 |
+| Ruincaller Hood (`ruincaller_helmet`) | helmet | 90 | Int 14, Spi 7 | Spell Damage 7 | crit 60, haste 25 |
+| Ruincaller Mantle (`ruincaller_shoulder`) | shoulder | 80 | Int 12, Spi 6 | Spell Damage 5 | crit 60, haste 25 |
+| Ruincaller Robe (`ruincaller_chest`) | chest | 105 | Int 17, Spi 8 | Spell Damage 8 | crit 60, haste 25 |
+| Ruincaller Handwraps (`ruincaller_gloves`) | gloves | 75 | Int 11, Spi 6 | Spell Damage 5 | crit 60, haste 25 |
+| Ruincaller Leggings (`ruincaller_legs`) | legs | 95 | Int 15, Spi 7 | Spell Damage 7 | crit 60, haste 25 |
 
 ### Druid
 
@@ -320,11 +327,11 @@ design targets for the tuning pass.
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|
-| Moonscorch Cowl (`moonscorch_helmet`) | helmet | 185 | Int 14, Spi 7 | Spell Damage 14 | crit 60, haste 25 |
-| Moonscorch Spaulders (`moonscorch_shoulder`) | shoulder | 165 | Int 12, Spi 6 | Spell Damage 10 | crit 60, haste 25 |
-| Moonscorch Tunic (`moonscorch_chest`) | chest | 215 | Int 17, Spi 8 | Spell Damage 14 | crit 60, haste 25 |
-| Moonscorch Grips (`moonscorch_gloves`) | gloves | 150 | Int 11, Spi 6 | Spell Damage 10 | crit 60, haste 25 |
-| Moonscorch Breeches (`moonscorch_legs`) | legs | 195 | Int 15, Spi 7 | Spell Damage 14 | crit 60, haste 25 |
+| Moonscorch Cowl (`moonscorch_helmet`) | helmet | 185 | Int 14, Spi 7 | Spell Damage 7 | crit 60, haste 25 |
+| Moonscorch Spaulders (`moonscorch_shoulder`) | shoulder | 165 | Int 12, Spi 6 | Spell Damage 5 | crit 60, haste 25 |
+| Moonscorch Tunic (`moonscorch_chest`) | chest | 215 | Int 17, Spi 8 | Spell Damage 8 | crit 60, haste 25 |
+| Moonscorch Grips (`moonscorch_gloves`) | gloves | 150 | Int 11, Spi 6 | Spell Damage 5 | crit 60, haste 25 |
+| Moonscorch Breeches (`moonscorch_legs`) | legs | 195 | Int 15, Spi 7 | Spell Damage 7 | crit 60, haste 25 |
 
 **Wildfang Emberhide** (`wildfang_emberhide`), feral (Wildfang), cat, leather. 2 pieces: Redharvest restores 45 energy, up from 30. 4 pieces: Redharvest plants a fresh Flense on the target.
 
@@ -387,24 +394,24 @@ electives; healer waists take haste instead.
 
 | Variant | Piece | Slot | Armor | Stats | Affix | Ratings | Classes |
 |---|---|---|---|---|---|---|---|
-| Cloth spell damage | Cord of the Last Flame | waist | 75 | Int 11, Spi 6 | Spell Damage 10 | hit 60, crit 25 | mage, priest, warlock |
-| Cloth spell damage | Cindersoaked Slippers | feet | 70 | Int 11, Spi 5 | Spell Damage 8 | crit 60, haste 25 | mage, priest, warlock |
+| Cloth spell damage | Cord of the Last Flame | waist | 75 | Int 11, Spi 6 | Spell Damage 4 | hit 60, crit 25 | mage, priest, warlock |
+| Cloth spell damage | Cindersoaked Slippers | feet | 70 | Int 11, Spi 5 | Spell Damage 4 | crit 60, haste 25 | mage, priest, warlock |
 | Cloth healing | Springbinder Sash | waist | 75 | Int 9, Spi 8 | Healing Power 18 | haste 60, crit 25 | mage, priest |
 | Cloth healing | Steps of Quiet Water | feet | 70 | Int 8, Spi 8 | Healing Power 14 | haste 60, crit 25 | mage, priest |
 | Leather tanking | Cinderbark Cinch | waist | 150 | Agi 8, Sta 9 | none | hit 60, crit 25 | druid |
 | Leather tanking | Ashenbark Treads | feet | 145 | Agi 7, Sta 9 | none | crit 60, haste 25 | druid |
 | Leather dps | Slagstalker Belt | waist | 150 | Agi 11, Sta 6 | none | hit 60, crit 25 | rogue, hunter, druid |
 | Leather dps | Ashrunner Boots | feet | 145 | Agi 11, Sta 5 | none | crit 60, haste 25 | rogue, hunter, druid |
-| Leather spell damage | Moonscorch Waistwrap | waist | 150 | Int 11, Spi 6 | Spell Damage 10 | hit 60, crit 25 | druid |
-| Leather spell damage | Scorchgrove Striders | feet | 145 | Int 11, Spi 5 | Spell Damage 8 | crit 60, haste 25 | druid |
+| Leather spell damage | Moonscorch Waistwrap | waist | 150 | Int 11, Spi 6 | Spell Damage 4 | hit 60, crit 25 | druid |
+| Leather spell damage | Scorchgrove Striders | feet | 145 | Int 11, Spi 5 | Spell Damage 4 | crit 60, haste 25 | druid |
 | Leather healing | Grovetender Belt | waist | 150 | Int 9, Spi 8 | Healing Power 18 | haste 60, crit 25 | druid |
 | Leather healing | Dewfall Moccasins | feet | 145 | Int 8, Spi 8 | Healing Power 14 | haste 60, crit 25 | druid |
 | Mail tanking | Forgewall Girdle | waist | 270 | Str 8, Sta 9 | none | hit 60, crit 25 | warrior, paladin, shaman |
 | Mail tanking | Anvilstance Sabatons | feet | 255 | Str 7, Sta 9 | none | crit 60, haste 25 | warrior, paladin, shaman |
 | Mail dps | Warforged Waistguard | waist | 270 | Str 11, Sta 6 | none | hit 60, crit 25 | warrior, paladin, shaman |
 | Mail dps | Furnace March Greaves | feet | 255 | Str 11, Sta 5 | none | crit 60, haste 25 | warrior, paladin, shaman |
-| Mail spell damage | Stormkindled Chain | waist | 270 | Int 11, Spi 6 | Spell Damage 10 | hit 60, crit 25 | shaman |
-| Mail spell damage | Thundershock Treads | feet | 255 | Int 11, Spi 5 | Spell Damage 8 | crit 60, haste 25 | shaman |
+| Mail spell damage | Stormkindled Chain | waist | 270 | Int 11, Spi 6 | Spell Damage 4 | hit 60, crit 25 | shaman |
+| Mail spell damage | Thundershock Treads | feet | 255 | Int 11, Spi 5 | Spell Damage 4 | crit 60, haste 25 | shaman |
 | Mail healing | Tidebinder Links | waist | 270 | Int 9, Spi 8 | Healing Power 18 | haste 60, crit 25 | paladin, shaman |
 | Mail healing | Springwarden Sabatons | feet | 255 | Int 8, Spi 8 | Healing Power 14 | haste 60, crit 25 | paladin, shaman |
 
@@ -416,11 +423,11 @@ Class-open (no armor type). Neck budget 16, ring 15, one rating each.
 |---|---|---|---|---|---|
 | Pendant of the First Tempering | neck | tank | Str 7, Sta 9 | none | crit 25 |
 | Ignivar's Ember Choker | neck | physical dps | Str 8, Agi 8 | none | hit 25 |
-| Locket of the Last Flame | neck | spell damage | Int 11, Spi 5 | Spell Damage 8 | crit 25 |
+| Locket of the Last Flame | neck | spell damage | Int 11, Spi 5 | Spell Damage 4 | crit 25 |
 | Heartspring Amulet | neck | healing | Int 8, Spi 8 | Healing Power 14 | haste 25 |
 | Seal of the Forgewall | ring | tank | Str 7, Sta 8 | none | crit 25 |
 | Band of Marked Strikes | ring | physical dps | Str 8, Agi 7 | none | hit 25 |
-| Circle of Cinders | ring | spell damage | Int 10, Spi 5 | Spell Damage 8 | hit 25 |
+| Circle of Cinders | ring | spell damage | Int 10, Spi 5 | Spell Damage 4 | hit 25 |
 | Loop of Quiet Springs | ring | healing | Int 8, Spi 7 | Healing Power 14 | haste 25 |
 
 ## Shields and held offhands
@@ -432,7 +439,7 @@ Held-slot budget 18 (offhand mult 0.75).
 | Bulwark of the Inner Crucible | shield | Str 8, Sta 10 | none | crit 25 | armor 760, block 30 | warrior, paladin, shaman |
 | Ember Warden's Barrier | shield | Int 9, Spi 9 | Healing Power 18 | haste 25 | armor 760, block 22 | paladin, shaman |
 | Orb of the Last Spring | held offhand | Int 9, Spi 9 | Healing Power 18 | haste 25 | | priest, mage, druid, paladin, shaman |
-| Cinder of the First Design | held offhand | Int 12, Spi 6 | Spell Damage 10 | crit 25 | | mage, priest, warlock, druid |
+| Cinder of the First Design | held offhand | Int 12, Spi 6 | Spell Damage 14 | crit 25 | | mage, priest, warlock, druid |
 
 ## Weapons (9 items)
 
@@ -453,9 +460,9 @@ average = dps x speed. One-hand stat budget 25, two-hand 33.
 | Anvilguard Blade | sword | one-hand | 2.6 | 36 to 54 | Str 11, Sta 14 | none | crit 70, haste 30 |
 | Heart of the End Greatblade | sword | two-hand | 3.5 | 55 to 83 | Str 22, Sta 11 | none | crit 70, haste 30 |
 | Staff of the Last Spring | staff | two-hand | 3.2 | 51 to 76 | Int 17, Spi 16 | Healing Power 45 | haste 70, crit 30 |
-| Forgefire Spire | staff | two-hand | 3.2 | 51 to 76 | Int 22, Spi 11 | Spell Damage 26 | crit 70, haste 30 |
+| Forgefire Spire | staff | two-hand | 3.2 | 51 to 76 | Int 22, Spi 11 | Spell Damage 34 | crit 70, haste 30 |
 | Springtouched Crozier | mace | one-hand | 2.4 | 33 to 50 | Int 13, Spi 12 | Healing Power 30 | haste 70, crit 30 |
-| Wand of Quenched Sparks | wand | mainhand | 1.5 | 21 to 31 | Int 17, Spi 8 | Spell Damage 10 | crit 70, hit 30 |
+| Wand of Quenched Sparks | wand | mainhand | 1.5 | 21 to 31 | Int 17, Spi 8 | Spell Damage 20 | crit 70, hit 30 |
 
 Every weapon gets its WEAPON_TYPE_BY_ITEM row and weapon-variant art
 registration. Cinderfang Kris is a dagger for backstab eligibility.
