@@ -13990,6 +13990,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_ignivar_the_forgefather.completion':
     'Наконец горн замолчал. Возможно, источник уже никогда не восстановится, но Варкхул больше не скуёт жизни в цепи.',
   'entities.quests.q_ignivar_the_forgefather.objectives.0.label': 'Варкхул повержен',
+  'entities.dungeons.ignivar_forge_lift.name': 'Кузнечный подъёмник',
+  'entities.dungeons.ignivar_forge_lift.enterText': 'Кузнечный подъёмник вздрагивает и опускается; навстречу поднимается грохот молотов.',
+  'entities.dungeons.ignivar_forge_lift.leaveText': 'Подъёмник поднимает вас обратно на открытый воздух крепости.',
   'entities.dungeons.ignivar_forge_approach.name': 'Чертоги Первой Закалки',
   'entities.dungeons.ignivar_forge_approach.enterText': 'Грохот молотов эхом разносится по Чертогам Первой Закалки.',
   'entities.dungeons.ignivar_forge_approach.leaveText': 'Вы отходите от первого горна и снова дышите свободно.',

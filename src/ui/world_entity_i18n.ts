@@ -613,6 +613,7 @@ const DUNGEON_IDS = [
   'gravewyrm_sanctum',
   'nythraxis_crypt',
   'nythraxis_boss_arena',
+  'ignivar_forge_lift',
   'ignivar_forge_approach',
   'ignivar_raid_arena',
   'ignivar_inner_crucible',

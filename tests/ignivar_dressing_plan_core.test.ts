@@ -131,11 +131,13 @@ describe('ignivar dressing plan', () => {
     // night glow: the whole exterior kit carries a half-resolution floored
     // emissive texture (the soft red sheen, floor scaled per piece so
     // floor times strength stays even; measured total 10_560_556), raised
-    // for the owner's dungeon_entrance facade (10_802_120), then TIGHTENED
-    // when the unplaced lava_furnace_2 and lava_ramp were stripped from the
-    // shipped set (measured total 10_326_288) plus a sliver of rebake
-    // headroom.
-    expect(total, 'prop set exceeds the total budget').toBeLessThanOrEqual(10_400_000);
+    // for the owner's dungeon_entrance facade (10_802_120), again for the
+    // eight-piece forge-lift car kit and the winch remake's mount and
+    // spool pair minus the retired one-piece winch and sliding door
+    // (12_731_480), then TIGHTENED when the unplaced lava_furnace_2 and
+    // lava_ramp were stripped from the shipped set (measured total
+    // 12_096_580) plus a sliver of rebake headroom.
+    expect(total, 'prop set exceeds the total budget').toBeLessThanOrEqual(12_150_000);
   });
 
   it('pins the native dims table to the shipped GLBs (canonical long-axis-on-X)', async () => {

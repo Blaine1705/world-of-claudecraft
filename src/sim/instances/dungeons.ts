@@ -20,6 +20,7 @@ import { DUNGEON_X_THRESHOLD, DUNGEONS, dungeonAt, instanceOrigin, MOBS, NPCS } 
 import { clearIgnivarEncounterAuras } from '../encounters/ignivar';
 import { clearVarkhulEncounterAuras } from '../encounters/varkhul';
 import { createGroundObject, createMob, createNpc } from '../entity';
+import { updateIgnivarForgeLift } from '../ignivar_forge_lift';
 import {
   IGNIVAR_RAID_ARENA_ID,
   IGNIVAR_RAID_ROOM_IDS,
@@ -1161,6 +1162,7 @@ export function awardHeroicMarks(ctx: SimContext, mob: Entity, recipients: Playe
 export function updateInstances(ctx: SimContext): void {
   if (ctx.tickCount % 20 !== 0) return; // once a second
   updateIgnivarRaidProgression(ctx);
+  updateIgnivarForgeLift(ctx);
   for (const inst of ctx.instances) {
     if (inst.partyKey === null) continue;
     let occupied = false;

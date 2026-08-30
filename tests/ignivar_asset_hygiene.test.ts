@@ -21,6 +21,7 @@ import { IGNIVAR_ENV_PROP_URLS } from '../src/render/ignivar_env_props';
 import {
   IGNIVAR_FORGE_APPROACH_LAYOUT,
   IGNIVAR_LAYOUT,
+  IGNIVAR_LIFT_LAYOUT,
   IGNIVAR_SECOND_WING_LAYOUT,
 } from '../src/sim/dungeon_layout';
 import { FORGEFATHER_FORTRESS_PLACEMENTS } from '../src/sim/forgefather_fortress';
@@ -28,6 +29,7 @@ import {
   ignivarApproachPropPlacements,
   ignivarArenaPropPlacements,
   ignivarCruciblePropPlacements,
+  ignivarLiftPropPlacements,
 } from '../src/sim/ignivar_props';
 
 const publicDir = path.join(__dirname, '..', 'public');
@@ -69,6 +71,7 @@ function placedKeys(): Map<string, number> {
   for (const row of ignivarApproachPropPlacements(IGNIVAR_FORGE_APPROACH_LAYOUT)) bump(row.key);
   for (const row of ignivarArenaPropPlacements(IGNIVAR_LAYOUT)) bump(row.key);
   for (const row of ignivarCruciblePropPlacements(IGNIVAR_SECOND_WING_LAYOUT)) bump(row.key);
+  for (const row of ignivarLiftPropPlacements(IGNIVAR_LIFT_LAYOUT)) bump(row.key);
   return counts;
 }
 

@@ -979,7 +979,11 @@ export function doorArchAuthoredElsewhere(
   placements: readonly { key: string }[] = FORGEFATHER_FORTRESS_PLACEMENTS,
 ): boolean {
   if (dungeonId === 'nythraxis_crypt') return true;
-  if (dungeonId === 'ignivar_forge_approach')
+  // The raid family's overworld door belongs to its chain HEAD (the
+  // Forge-Lift since the lift became the first room; the Halls id stays
+  // covered so a chain reshuffle can never resurrect the generic arch
+  // over the owner's facade).
+  if (dungeonId === 'ignivar_forge_lift' || dungeonId === 'ignivar_forge_approach')
     return placements.some((p) => p.key === 'dungeon_entrance');
   return false;
 }

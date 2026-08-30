@@ -53,10 +53,12 @@ describe('buildDoorBody: Nythraxis crypt click-box', () => {
 
   it('the Forgefather raid door yields to the facade only once one is baked', () => {
     // no facade in the table: the generic arch keeps the door visible
-    expect(doorArchAuthoredElsewhere('ignivar_forge_approach', [{ key: 'stone_floor' }])).toBe(
-      false,
+    expect(doorArchAuthoredElsewhere('ignivar_forge_lift', [{ key: 'stone_floor' }])).toBe(false);
+    // a baked dungeon_entrance facade takes over as the visible door,
+    // keyed to the chain HEAD (the Forge-Lift owns the overworld door now)
+    expect(doorArchAuthoredElsewhere('ignivar_forge_lift', [{ key: 'dungeon_entrance' }])).toBe(
+      true,
     );
-    // a baked dungeon_entrance facade takes over as the visible door
     expect(doorArchAuthoredElsewhere('ignivar_forge_approach', [{ key: 'dungeon_entrance' }])).toBe(
       true,
     );

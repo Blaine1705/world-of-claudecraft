@@ -8184,7 +8184,7 @@ export class Renderer {
     const raidGatePlan =
       e.kind === 'object' ? ignivarRaidGatePlan(e.templateId, e.dungeonId) : null;
     if (raidGatePlan) {
-      body = buildIgnivarRaidGate(raidGatePlan.open);
+      body = buildIgnivarRaidGate(raidGatePlan);
       height = raidGatePlan.height;
       objectMesh = body;
     } else if (

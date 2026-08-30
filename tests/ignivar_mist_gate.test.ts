@@ -2,6 +2,7 @@
 // dungeon_entrance facade, seated over the facade's red membrane (the
 // authored mist target measured from the shipped GLB), pulsing off the
 // shared uTime clock.
+import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { sharedUniforms } from '../src/render/gfx';
@@ -13,7 +14,8 @@ import {
   resetIgnivarMistGateCaches,
 } from '../src/render/ignivar_mist_gate';
 import { isSharedGeometry, isSharedMaterial } from '../src/render/shared_resource';
-import type { IgnivarPropPlacement } from '../src/sim/ignivar_props';
+import { IGNIVAR_LIFT_LAYOUT } from '../src/sim/dungeon_layout';
+import { type IgnivarPropPlacement, ignivarLiftPropPlacements } from '../src/sim/ignivar_props';
 
 const at = (
   key: IgnivarPropPlacement['key'],
@@ -116,6 +118,20 @@ describe('ignivar mist gate', () => {
     // lines up is what lets them share one linked program regardless)
     expect(depths[1]).toBeGreaterThan(depths[0]);
     expect(new Set(depths).size).toBe(2);
+  });
+
+  it('the baked lift pass implies one mist frame per portal facade', () => {
+    const frames = mistGateFramesFor(ignivarLiftPropPlacements(IGNIVAR_LIFT_LAYOUT));
+    expect(frames).toEqual([
+      { x: -0.2, y: 0, z: -5.85, ry: 0, scale: 6 },
+      { x: 0.4, y: 0, z: 6.15, ry: Math.PI, scale: 6 },
+    ]);
+    // and the lift dressing actually appends them
+    const dressingSource = readFileSync(
+      new URL('../src/render/ignivar_raid_dressing.ts', import.meta.url),
+      'utf8',
+    );
+    expect(dressingSource).toContain('appendIgnivarMistGates(group, placements)');
   });
 
   it('a raidless placement set appends nothing', () => {

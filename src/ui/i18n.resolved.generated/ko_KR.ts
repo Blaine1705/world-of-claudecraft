@@ -17615,6 +17615,11 @@ export const ko_KR: EnTranslations = {
         "enterText": "봉인된 왕실 문을 지나갑니다.",
         "leaveText": "쏜피크의 차가운 공기 속으로 돌아옵니다."
       },
+      "ignivar_forge_lift": {
+        "name": "대장간 승강기",
+        "enterText": "대장간 승강기가 요동치며 가라앉는다. 망치 소리가 마중 나오듯 울려 퍼진다.",
+        "leaveText": "승강기가 너를 성채의 탁 트인 바람 속으로 다시 끌어올린다."
+      },
       "ignivar_forge_approach": {
         "name": "첫 단련의 회랑",
         "enterText": "첫 단련의 회랑에 망치질 소리가 울려 퍼집니다.",

@@ -249,6 +249,77 @@ const ITEMS = [
     hotBoost: 1.25,
     glowFloor: [36, 9, 6],
   },
+  // The owner's forge-lift car kit (2026-08-29 drop): the antechamber's
+  // iron furniture, all on the architecture sheen tier.
+  {
+    src: 'Lift_Assets/lift_arch_beam.glb',
+    name: 'lift_arch_beam',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
+  {
+    src: 'Lift_Assets/lift_beam.glb',
+    name: 'lift_beam',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
+  {
+    src: 'Lift_Assets/lift_frame.glb',
+    name: 'lift_frame',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
+  {
+    src: 'Lift_Assets/lift_handle.glb',
+    name: 'lift_handle',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
+  {
+    src: 'Lift_Assets/lift_vertical_beam.glb',
+    name: 'lift_vertical_beam',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
+  {
+    src: 'Lift_Assets/lift_weight.glb',
+    name: 'lift_weight',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
+  // The winch remake (2026-08-29 second drop): the owner split the piece so
+  // only the spool turns; the mount is the static cradle it rides in. The
+  // one-piece winch and the sliding door left the shipped set with the
+  // owner's third drop (zero placements; sources stay archived in
+  // tmp/asset_src for a future return).
+  {
+    src: 'Lift_Assets/lift_mount.glb',
+    name: 'lift_mount',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
+  {
+    src: 'Lift_Assets/lift_spool.glb',
+    name: 'lift_spool',
+    tex: 1024,
+    emissive: 0.7,
+    hotBoost: 1.25,
+    glowFloor: [36, 9, 6],
+  },
   // lava_furnace_2 (src Exterior_Assets/Lava_Furnace.glb) and lava_ramp
   // (src Exterior_Assets/lava_ramp.glb) are STRIPPED from the shipped set:
   // zero placements in any sim table, and the furnace's mesh is
