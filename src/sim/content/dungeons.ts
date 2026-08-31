@@ -132,16 +132,10 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       { itemId: 'thundershock_treads', chance: 0.07, rollGroup: 'varkhul_offset' },
       { itemId: 'springwarden_sabatons', chance: 0.07, rollGroup: 'varkhul_offset' },
       { itemId: 'orb_of_the_last_spring', chance: 0.15, rollGroup: 'varkhul_offset' },
-      { itemId: 'cinder_of_the_first_design', chance: 0.12, rollGroup: 'varkhul_offset' },
-      // The legendary shield rides INSIDE the feet-and-held group at the
-      // kingsbane_last_oath 3 percent precedent (each group is an exclusive
-      // partition summing to exactly 1.00): the cinder, its off-hand
-      // slot-mate, pays the 0.03 while the orb sits back at its full 0.15.
-      // Forgebreaker deliberately does NOT drop here: the maintainer is
-      // routing it through the crafting professions (2026-08-30), so the
-      // item stays defined (dev-give, reliquary pending) with no loot row
-      // until its recipe chain lands.
-      { itemId: 'varkhul_emberward', chance: 0.03, rollGroup: 'varkhul_offset' },
+      { itemId: 'cinder_of_the_first_design', chance: 0.15, rollGroup: 'varkhul_offset' },
+      // Neither legendary drops on Normal. Emberward's 3 percent roll lives
+      // in Varkhul's heroic-only shield group; Forgebreaker remains reserved
+      // for the crafting professions until its recipe chain lands.
       { itemId: 'seal_of_the_forgewall', chance: 0.25, rollGroup: 'varkhul_rings' },
       { itemId: 'band_of_marked_strikes', chance: 0.25, rollGroup: 'varkhul_rings' },
       { itemId: 'circle_of_cinders', chance: 0.25, rollGroup: 'varkhul_rings' },
