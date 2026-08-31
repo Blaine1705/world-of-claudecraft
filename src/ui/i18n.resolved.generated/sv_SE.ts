@@ -4654,8 +4654,8 @@ export const sv_SE: EnTranslations = {
       "online": "Karaktären är för närvarande online.",
       "rename_not_permitted": "Det är inte tillåtet att byta namn på denna karaktär.",
       "delete_confirm": "Skriv karaktärens namn för att bekräfta raderingen.",
-      "storage_purchase_open": "A storage purchase must finish or be resolved before this character can be deleted.",
-      "delete_busy": "The realm is busy. Try deleting this character again in a moment.",
+      "storage_purchase_open": "Ett förrådsköp måste slutföras eller lösas innan den här karaktären kan tas bort.",
+      "delete_busy": "Världen är upptagen. Försök ta bort den här karaktären igen om en stund.",
       "already_in_world": "Karaktären är redan i världen.",
       "taken_over": "Din karaktär togs över av en annan session.",
       "rename_required": "Denna karaktär måste byta namn innan den går in i världen.",
@@ -5180,7 +5180,7 @@ export const sv_SE: EnTranslations = {
       "ifPartySort": "Ordningen gruppmedlemmarna listas i: gruppordning, roll eller namn.",
       "ifPartyShowAuras": "Om buffar och debuffar visas på gruppramarna. Motsvarande brytare täcker resursfält, absorptioner, djur och om du själv syns i din egen grupplista.",
       "ifAurasOnPlayerFrame": "Lägger dina buffar och debuffar på din egen ram, utöver aurafältet.",
-      "ifAlwaysShowAllBuffs": "Shows every active buff even on the Low graphics preset, bypassing its usual buff-icon cap.",
+      "ifAlwaysShowAllBuffs": "Visar alla aktiva förstärkningar även med grafikförinställningen Låg och kringgår den vanliga gränsen för förstärkningsikoner.",
       "ifTargetOfTarget": "Visar vem ditt mål siktar på, det klassiska sättet att se om tanken fortfarande har aggro.",
       "ifPetFrame": "Visar en ram för ditt djur.",
       "ifChatFontScale": "Textstorlek i chatten.",
@@ -6667,7 +6667,7 @@ export const sv_SE: EnTranslations = {
       "bankBody": "Varje huvudort har en filial av Förgyllda kassakistan, rikets bankhus. Tala med kamreren där för att öppna ditt valv, ett privat förvaringsutrymme bortom dina väskor som din karaktär behåller livet ut. Vad du än lämnar hos dem väntar tryggt, oavsett vilken filial du besöker härnäst.",
       "bankHow": "Med valvet öppet klickar du på ett föremål i dina väskor för att sätta in det, och klickar på det i valvet för att ta tillbaka det. Valvet rymmer bara varor, aldrig mynt, och uppdragsföremål stannar hos dig. När väskorna blir fulla mitt under färden sveper en enda knapp in alla dina hantverksmaterial på en gång.",
       "bankSlots": "Ett nytt valv börjar smått och växer med dig. Kamreren säljer fler fack för mynt till allt brantare priser, och den som spelar online tjänar bonusutrymme därtill, för sådant som en verifierad e-post, länkade konton och vänner du tar med in i spelet.",
-      "bankSockets": "Past the slot ladder, the bursar also sells up to four bag sockets, unlocked in order at ever-steeper prices. Seat a spare bag from your carrying set in one and its slots join your vault room: an everyday bag widens the whole store, while a reagent satchel adds room only crafting materials may take. Click a bag in your bags to seat it and click the socket to take it back. Taking one back never costs you a thing you stored: if the vault ends up fuller than its shrunken room, everything stays put and new deposits simply wait for space.",
+      "bankSockets": "Efter fackstegen säljer kamreren också upp till fyra väskplatser, som låses upp i tur och ordning till allt högre priser. Placera en extraväska från ditt bärset i en sådan plats så blir dess fack en del av ditt valv: en vanlig väska utökar hela förrådet, medan en reagenspåse bara ger utrymme för hantverksmaterial. Klicka på en väska i dina väskor för att placera den och klicka på platsen för att ta tillbaka den. När du tar tillbaka en väska förlorar du aldrig något du har lagrat: om valvet blir fullare än det krympta utrymmet ligger allt kvar, och nya insättningar väntar helt enkelt på plats.",
       "buyingTitle": "Köpa och sälja",
       "buyingBody": "Tala med en köpman och välj att bläddra bland deras varor, så öppnas butiken med tre flikar: Bläddra, Sälj och Återköp. Bläddra rymmer allt de har i lager, ditt om du har råd. Sälj listar det i dina väskor som de betalar för, och att sälja en pjäs som bär sin egen slumpade kvalitet ber dig bekräfta först, så att en dyrbar kopia aldrig glider iväg av misstag. Om du gör dig av med något du ångrar håller fliken Återköp kvar dina senaste försäljningar så att du kan köpa tillbaka dem för myntet du fick.",
       "junkTitle": "Rensa bort skräp",
@@ -7711,7 +7711,7 @@ export const sv_SE: EnTranslations = {
       "title": "Anslut en Solana-plånbok",
       "linkBody": "Välj ett plånbokstillägg i denna webbläsare. Du signerar ett verifieringsmeddelande och återvänder sedan till skrivbordsappen.",
       "paymentBody": "Välj plånboken länkad till ditt konto och godkänn transaktionen i denna webbläsare.",
-      "stepUpBody": "Choose the wallet linked to your account and sign the $WOC Exchange authorization message. Signing is free and moves no funds.",
+      "stepUpBody": "Välj plånboken som är länkad till ditt konto och signera auktoriseringsmeddelandet för $WOC-börsen. Det är gratis att signera och inga medel flyttas.",
       "extensionHelp": "Inget kompatibelt plånbokstillägg hittades. Installera eller lås upp Phantom, Solflare eller en annan Solana-webbläsarplånbok och försök sedan igen.",
       "safety": "World of ClaudeCraft ber aldrig om din återställningsfras eller privata nyckel.",
       "continueWith": "Fortsätt med {wallet}",
@@ -8102,18 +8102,18 @@ export const sv_SE: EnTranslations = {
     "buyConfirmCancel": "Avbryt"
   },
   "crucibleShop": {
-    "browse": "Redeem Sigils",
-    "browseAria": "Redeem Crucible sigils with {name}",
-    "empty": "No set pieces are redeemable for your class.",
-    "balance": "Your sigils: {list}",
+    "browse": "Byt in sigill",
+    "browseAria": "Byt in Smältdegelns sigill med {name}",
+    "empty": "Inga setdelar kan lösas in för din klass.",
+    "balance": "Dina sigill: {list}",
     "balanceEntry": "{name} x{count}",
-    "noSigils": "You hold no Crucible sigils.",
+    "noSigils": "Du har inga sigill från Smältdegeln.",
     "price": "1 {sigil}",
-    "buyAria": "Redeem {sigil} for {item}",
-    "buyConfirmTitle": "Confirm Redemption",
-    "buyConfirmBody": "Redeem your {sigil} for {item}? A consumed sigil cannot be refunded.",
-    "buyConfirmAccept": "Redeem",
-    "buyConfirmCancel": "Cancel"
+    "buyAria": "Byt in {sigil} mot {item}",
+    "buyConfirmTitle": "Bekräfta inlösen",
+    "buyConfirmBody": "Byt in ditt {sigil} mot {item}? Ett förbrukat sigill kan inte återbetalas.",
+    "buyConfirmAccept": "Byt in",
+    "buyConfirmCancel": "Avbryt"
   },
   "cardDuel": {
     "title": "Kortduell",
@@ -13254,25 +13254,25 @@ export const sv_SE: EnTranslations = {
         "name": "Bukett från Dawnholds trädgård"
       },
       "wayfarers_backpack": {
-        "name": "Wayfarer's Backpack"
+        "name": "Vandrarens ryggsäck"
       },
       "burlap_reagent_pouch": {
-        "name": "Burlap Reagent Pouch"
+        "name": "Jutepåse för reagenser"
       },
       "necromancers_reagent_satchel": {
-        "name": "Necromancer's Reagent Satchel"
+        "name": "Nekromantikerns reagensväska"
       },
       "duskweave_bag": {
-        "name": "Duskweave Bag"
+        "name": "Skymningsvävd väska"
       },
       "resonant_weave_bag": {
-        "name": "Resonantweave Bag"
+        "name": "Resonantvävsväska"
       },
       "foragers_haversack": {
-        "name": "Forager's Haversack"
+        "name": "Samlarens axelväska"
       },
       "loombound_reagent_satchel": {
-        "name": "Loombound Reagent Satchel"
+        "name": "Vävbundna reagensväskan"
       },
       "ps_briny_lure": {
         "name": "Salt lockbete"
@@ -13287,610 +13287,610 @@ export const sv_SE: EnTranslations = {
         "name": "Övergångssten"
       },
       "lastflame_core": {
-        "name": "Core of the Last Flame"
+        "name": "Den sista lågans kärna"
       },
       "slagbreaker_helmet": {
-        "name": "Slagbreaker Helm"
+        "name": "Slagkrossarens hjälm"
       },
       "slagbreaker_shoulder": {
-        "name": "Slagbreaker Pauldrons"
+        "name": "Slagkrossarens axelskydd"
       },
       "slagbreaker_chest": {
-        "name": "Slagbreaker Hauberk"
+        "name": "Slagkrossarens pansarskjorta"
       },
       "slagbreaker_gloves": {
-        "name": "Slagbreaker Gauntlets"
+        "name": "Slagkrossarens pansarhandskar"
       },
       "slagbreaker_legs": {
-        "name": "Slagbreaker Legguards"
+        "name": "Slagkrossarens benskenor"
       },
       "emberfury_helmet": {
-        "name": "Emberfury Helm"
+        "name": "Glödvrede-hjälm"
       },
       "emberfury_shoulder": {
-        "name": "Emberfury Pauldrons"
+        "name": "Glödvrede-axelskydd"
       },
       "emberfury_chest": {
-        "name": "Emberfury Hauberk"
+        "name": "Glödvrede-brynja"
       },
       "emberfury_gloves": {
-        "name": "Emberfury Gauntlets"
+        "name": "Glödvrede-pansarhandskar"
       },
       "emberfury_legs": {
-        "name": "Emberfury Legguards"
+        "name": "Glödvrede-benskydd"
       },
       "forgewall_helmet": {
-        "name": "Forgewall Helm"
+        "name": "Smidesmurens hjälm"
       },
       "forgewall_shoulder": {
-        "name": "Forgewall Pauldrons"
+        "name": "Smidesmurens axelskydd"
       },
       "forgewall_chest": {
-        "name": "Forgewall Hauberk"
+        "name": "Smidesmurens brynja"
       },
       "forgewall_gloves": {
-        "name": "Forgewall Gauntlets"
+        "name": "Smidesmurens pansarhandskar"
       },
       "forgewall_legs": {
-        "name": "Forgewall Legguards"
+        "name": "Smidesmurens benskydd"
       },
       "dawnforged_helmet": {
-        "name": "Dawnforged Helm"
+        "name": "Gryningssmidd hjälm"
       },
       "dawnforged_shoulder": {
-        "name": "Dawnforged Pauldrons"
+        "name": "Gryningssmidda axelskydd"
       },
       "dawnforged_chest": {
-        "name": "Dawnforged Hauberk"
+        "name": "Gryningssmidda brynja"
       },
       "dawnforged_gloves": {
-        "name": "Dawnforged Gauntlets"
+        "name": "Gryningssmidda pansarhandskar"
       },
       "dawnforged_legs": {
-        "name": "Dawnforged Legguards"
+        "name": "Gryningssmidda benskydd"
       },
       "oathpyre_helmet": {
-        "name": "Oathpyre Helm"
+        "name": "Edsvaktens hjälm"
       },
       "oathpyre_shoulder": {
-        "name": "Oathpyre Pauldrons"
+        "name": "Edsvaktens axelskydd"
       },
       "oathpyre_chest": {
-        "name": "Oathpyre Hauberk"
+        "name": "Edsvaktens brynja"
       },
       "oathpyre_gloves": {
-        "name": "Oathpyre Gauntlets"
+        "name": "Edsvaktens pansarhandskar"
       },
       "oathpyre_legs": {
-        "name": "Oathpyre Legguards"
+        "name": "Edsvaktens benskydd"
       },
       "zealfire_helmet": {
-        "name": "Zealfire Helm"
+        "name": "Zealflammes hjälm"
       },
       "zealfire_shoulder": {
-        "name": "Zealfire Pauldrons"
+        "name": "Zealflammes axelskydd"
       },
       "zealfire_chest": {
-        "name": "Zealfire Hauberk"
+        "name": "Zealflammes brynja"
       },
       "zealfire_gloves": {
-        "name": "Zealfire Gauntlets"
+        "name": "Zealflammes pansarhandskar"
       },
       "zealfire_legs": {
-        "name": "Zealfire Legguards"
+        "name": "Zealflammes benskydd"
       },
       "packlord_emberhide_helmet": {
-        "name": "Packlord's Cowl"
+        "name": "Flockfurstens kåpa"
       },
       "packlord_emberhide_shoulder": {
-        "name": "Packlord's Spaulders"
+        "name": "Flockfurstens axelskydd"
       },
       "packlord_emberhide_chest": {
-        "name": "Packlord's Tunic"
+        "name": "Flockfurstens tunika"
       },
       "packlord_emberhide_gloves": {
-        "name": "Packlord's Grips"
+        "name": "Flockfurstens grepphandskar"
       },
       "packlord_emberhide_legs": {
-        "name": "Packlord's Breeches"
+        "name": "Flockfurstens knäbyxor"
       },
       "coldsight_trackers_helmet": {
-        "name": "Coldsight Cowl"
+        "name": "Köldsynens kåpa"
       },
       "coldsight_trackers_shoulder": {
-        "name": "Coldsight Spaulders"
+        "name": "Köldsynens axelskydd"
       },
       "coldsight_trackers_chest": {
-        "name": "Coldsight Tunic"
+        "name": "Köldsynens tunika"
       },
       "coldsight_trackers_gloves": {
-        "name": "Coldsight Grips"
+        "name": "Köldsynens handskar"
       },
       "coldsight_trackers_legs": {
-        "name": "Coldsight Breeches"
+        "name": "Köldsynens knäbyxor"
       },
       "slagsnare_helmet": {
-        "name": "Slagsnare Cowl"
+        "name": "Slagfångarens kåpa"
       },
       "slagsnare_shoulder": {
-        "name": "Slagsnare Spaulders"
+        "name": "Slagfångarens axelskydd"
       },
       "slagsnare_chest": {
-        "name": "Slagsnare Tunic"
+        "name": "Slagfångarens tunika"
       },
       "slagsnare_gloves": {
-        "name": "Slagsnare Grips"
+        "name": "Slagfångarens grepphandskar"
       },
       "slagsnare_legs": {
-        "name": "Slagsnare Breeches"
+        "name": "Slagfångarens byxor"
       },
       "cinderfang_helmet": {
-        "name": "Cinderfang Cowl"
+        "name": "Glödtandens kåpa"
       },
       "cinderfang_shoulder": {
-        "name": "Cinderfang Spaulders"
+        "name": "Glödtandens axelskydd"
       },
       "cinderfang_chest": {
-        "name": "Cinderfang Tunic"
+        "name": "Glödtandens tunika"
       },
       "cinderfang_gloves": {
-        "name": "Cinderfang Grips"
+        "name": "Glödtandens grepphandskar"
       },
       "cinderfang_legs": {
-        "name": "Cinderfang Breeches"
+        "name": "Glödtandens knäbyxor"
       },
       "smolderstrike_helmet": {
-        "name": "Smolderstrike Cowl"
+        "name": "Glödslagets kåpa"
       },
       "smolderstrike_shoulder": {
-        "name": "Smolderstrike Spaulders"
+        "name": "Glödslagets axelskydd"
       },
       "smolderstrike_chest": {
-        "name": "Smolderstrike Tunic"
+        "name": "Glödslagets tunika"
       },
       "smolderstrike_gloves": {
-        "name": "Smolderstrike Grips"
+        "name": "Glödslagets grepphandskar"
       },
       "smolderstrike_legs": {
-        "name": "Smolderstrike Breeches"
+        "name": "Glödslagets knäbyxor"
       },
       "ashveil_helmet": {
-        "name": "Ashveil Cowl"
+        "name": "Askbeslöjad kåpa"
       },
       "ashveil_shoulder": {
-        "name": "Ashveil Spaulders"
+        "name": "Askbeslöjade axelskydd"
       },
       "ashveil_chest": {
-        "name": "Ashveil Tunic"
+        "name": "Askbeslöjad tunika"
       },
       "ashveil_gloves": {
-        "name": "Ashveil Grips"
+        "name": "Askbeslöjade grepphandskar"
       },
       "ashveil_legs": {
-        "name": "Ashveil Breeches"
+        "name": "Askbeslöjade knäbyxor"
       },
       "emberscreed_helmet": {
-        "name": "Creed of Embers Hood"
+        "name": "Glödbekännelsens huva"
       },
       "emberscreed_shoulder": {
-        "name": "Creed of Embers Mantle"
+        "name": "Glödbekännelsens mantel"
       },
       "emberscreed_chest": {
-        "name": "Creed of Embers Robe"
+        "name": "Glödbekännelsens skrud"
       },
       "emberscreed_gloves": {
-        "name": "Creed of Embers Handwraps"
+        "name": "Glödbekännelsens handlindor"
       },
       "emberscreed_legs": {
-        "name": "Creed of Embers Leggings"
+        "name": "Glödbekännelsens leggings"
       },
       "benison_dawnweave_helmet": {
-        "name": "Dawnweave Hood"
+        "name": "Gryningsvävens huva"
       },
       "benison_dawnweave_shoulder": {
-        "name": "Dawnweave Mantle"
+        "name": "Gryningsvävens mantel"
       },
       "benison_dawnweave_chest": {
-        "name": "Dawnweave Robe"
+        "name": "Gryningsvävens kåpa"
       },
       "benison_dawnweave_gloves": {
-        "name": "Dawnweave Handwraps"
+        "name": "Gryningsvävens handlindor"
       },
       "benison_dawnweave_legs": {
-        "name": "Dawnweave Leggings"
+        "name": "Gryningsvävens leggings"
       },
       "vesperash_helmet": {
-        "name": "Vesperash Hood"
+        "name": "Vesperasks huva"
       },
       "vesperash_shoulder": {
-        "name": "Vesperash Mantle"
+        "name": "Vesperasks mantel"
       },
       "vesperash_chest": {
-        "name": "Vesperash Robe"
+        "name": "Vesperasks kåpa"
       },
       "vesperash_gloves": {
-        "name": "Vesperash Handwraps"
+        "name": "Vesperasks handlindor"
       },
       "vesperash_legs": {
-        "name": "Vesperash Leggings"
+        "name": "Vesperasks leggings"
       },
       "stormkindled_helmet": {
-        "name": "Stormkindled Helm"
+        "name": "Stormglödgad hjälm"
       },
       "stormkindled_shoulder": {
-        "name": "Stormkindled Pauldrons"
+        "name": "Stormglödgade axelskydd"
       },
       "stormkindled_chest": {
-        "name": "Stormkindled Hauberk"
+        "name": "Stormglödgad brynja"
       },
       "stormkindled_gloves": {
-        "name": "Stormkindled Gauntlets"
+        "name": "Stormglödgade pansarhandskar"
       },
       "stormkindled_legs": {
-        "name": "Stormkindled Legguards"
+        "name": "Stormglödgade benskydd"
       },
       "warspirit_emberscale_helmet": {
-        "name": "Emberscale Helm"
+        "name": "Glödskalshjälm"
       },
       "warspirit_emberscale_shoulder": {
-        "name": "Emberscale Pauldrons"
+        "name": "Glödskalsaxelskydd"
       },
       "warspirit_emberscale_chest": {
-        "name": "Emberscale Hauberk"
+        "name": "Glödskalets brynja"
       },
       "warspirit_emberscale_gloves": {
-        "name": "Emberscale Gauntlets"
+        "name": "Glödskalets pansarhandskar"
       },
       "warspirit_emberscale_legs": {
-        "name": "Emberscale Legguards"
+        "name": "Glödskalsskydd"
       },
       "stonehearth_helmet": {
-        "name": "Stonehearth Helm"
+        "name": "Stenhärdens hjälm"
       },
       "stonehearth_shoulder": {
-        "name": "Stonehearth Pauldrons"
+        "name": "Stenhärdens axelskydd"
       },
       "stonehearth_chest": {
-        "name": "Stonehearth Hauberk"
+        "name": "Stenhärdens brynja"
       },
       "stonehearth_gloves": {
-        "name": "Stonehearth Gauntlets"
+        "name": "Stenhärdens pansarhandskar"
       },
       "stonehearth_legs": {
-        "name": "Stonehearth Legguards"
+        "name": "Stenhärdens benskydd"
       },
       "springmender_helmet": {
-        "name": "Springmender Helm"
+        "name": "Vårhelarns hjälm"
       },
       "springmender_shoulder": {
-        "name": "Springmender Pauldrons"
+        "name": "Vårhelarns axelskydd"
       },
       "springmender_chest": {
-        "name": "Springmender Hauberk"
+        "name": "Vårhelarns brynja"
       },
       "springmender_gloves": {
-        "name": "Springmender Gauntlets"
+        "name": "Vårhelarns pansarhandskar"
       },
       "springmender_legs": {
-        "name": "Springmender Legguards"
+        "name": "Vårhelarns benskydd"
       },
       "chronoweave_helmet": {
-        "name": "Aetherweave Hood"
+        "name": "Aetervävens huva"
       },
       "chronoweave_shoulder": {
-        "name": "Aetherweave Mantle"
+        "name": "Aetervävens mantel"
       },
       "chronoweave_chest": {
-        "name": "Aetherweave Robe"
+        "name": "Aetervävens kåpa"
       },
       "chronoweave_gloves": {
-        "name": "Aetherweave Handwraps"
+        "name": "Aetervävens handlindor"
       },
       "chronoweave_legs": {
-        "name": "Aetherweave Leggings"
+        "name": "Aetervävens leggings"
       },
       "pyroclast_helmet": {
-        "name": "Pyroclast Hood"
+        "name": "Pyroklasthuva"
       },
       "pyroclast_shoulder": {
-        "name": "Pyroclast Mantle"
+        "name": "Pyroklastmantel"
       },
       "pyroclast_chest": {
-        "name": "Pyroclast Robe"
+        "name": "Pyroklastrock"
       },
       "pyroclast_gloves": {
-        "name": "Pyroclast Handwraps"
+        "name": "Pyroklasthandbindor"
       },
       "pyroclast_legs": {
-        "name": "Pyroclast Leggings"
+        "name": "Pyroklastleggings"
       },
       "frostquench_helmet": {
-        "name": "Frostquench Hood"
+        "name": "Frostsläckarens huva"
       },
       "frostquench_shoulder": {
-        "name": "Frostquench Mantle"
+        "name": "Frostsläckarens mantel"
       },
       "frostquench_chest": {
-        "name": "Frostquench Robe"
+        "name": "Frostsläckarens skrud"
       },
       "frostquench_gloves": {
-        "name": "Frostquench Handwraps"
+        "name": "Frostsläckarens handlindor"
       },
       "frostquench_legs": {
-        "name": "Frostquench Leggings"
+        "name": "Frostsläckarens leggings"
       },
       "hexthread_helmet": {
-        "name": "Hexthread Hood"
+        "name": "Hextrådens huva"
       },
       "hexthread_shoulder": {
-        "name": "Hexthread Mantle"
+        "name": "Hextrådens mantel"
       },
       "hexthread_chest": {
-        "name": "Hexthread Robe"
+        "name": "Hextrådens skrud"
       },
       "hexthread_gloves": {
-        "name": "Hexthread Handwraps"
+        "name": "Hextrådens handlindor"
       },
       "hexthread_legs": {
-        "name": "Hexthread Leggings"
+        "name": "Hextrådens leggings"
       },
       "gravebrand_helmet": {
-        "name": "Gravebrand Hood"
+        "name": "Gravmärkt huva"
       },
       "gravebrand_shoulder": {
-        "name": "Gravebrand Mantle"
+        "name": "Gravmärkt mantel"
       },
       "gravebrand_chest": {
-        "name": "Gravebrand Robe"
+        "name": "Gravmärkt skrud"
       },
       "gravebrand_gloves": {
-        "name": "Gravebrand Handwraps"
+        "name": "Gravmärkta handlindor"
       },
       "gravebrand_legs": {
-        "name": "Gravebrand Leggings"
+        "name": "Gravmärkta leggings"
       },
       "ruincaller_helmet": {
-        "name": "Ruincaller Hood"
+        "name": "Ruinåkallarhuva"
       },
       "ruincaller_shoulder": {
-        "name": "Ruincaller Mantle"
+        "name": "Ruinåkallarmantel"
       },
       "ruincaller_chest": {
-        "name": "Ruincaller Robe"
+        "name": "Ruinåkallarrock"
       },
       "ruincaller_gloves": {
-        "name": "Ruincaller Handwraps"
+        "name": "Ruinåkallarhandbindor"
       },
       "ruincaller_legs": {
-        "name": "Ruincaller Leggings"
+        "name": "Ruinåkallarleggings"
       },
       "moonscorch_helmet": {
-        "name": "Moonscorch Cowl"
+        "name": "Månbränd kåpa"
       },
       "moonscorch_shoulder": {
-        "name": "Moonscorch Spaulders"
+        "name": "Månbrända axelskydd"
       },
       "moonscorch_chest": {
-        "name": "Moonscorch Tunic"
+        "name": "Månbränd tunika"
       },
       "moonscorch_gloves": {
-        "name": "Moonscorch Grips"
+        "name": "Månbrända grepphandskar"
       },
       "moonscorch_legs": {
-        "name": "Moonscorch Breeches"
+        "name": "Månbrända knäbyxor"
       },
       "wildfang_emberhide_helmet": {
-        "name": "Wildfang Cowl"
+        "name": "Vildhuggarens kåpa"
       },
       "wildfang_emberhide_shoulder": {
-        "name": "Wildfang Spaulders"
+        "name": "Vildhuggarens axelskydd"
       },
       "wildfang_emberhide_chest": {
-        "name": "Wildfang Tunic"
+        "name": "Vildhuggarens tunika"
       },
       "wildfang_emberhide_gloves": {
-        "name": "Wildfang Grips"
+        "name": "Vildhuggarens grepphandskar"
       },
       "wildfang_emberhide_legs": {
-        "name": "Wildfang Breeches"
+        "name": "Vildhuggarens knäbyxor"
       },
       "cinderbark_helmet": {
-        "name": "Cinderbark Cowl"
+        "name": "Glödbarkens kåpa"
       },
       "cinderbark_shoulder": {
-        "name": "Cinderbark Spaulders"
+        "name": "Glödbarkens axelskydd"
       },
       "cinderbark_chest": {
-        "name": "Cinderbark Tunic"
+        "name": "Glödbarkens tunika"
       },
       "cinderbark_gloves": {
-        "name": "Cinderbark Grips"
+        "name": "Glödbarkens grepphandskar"
       },
       "cinderbark_legs": {
-        "name": "Cinderbark Breeches"
+        "name": "Glödbarkens knäbyxor"
       },
       "grovespring_helmet": {
-        "name": "Grovespring Cowl"
+        "name": "Lundkällans kåpa"
       },
       "grovespring_shoulder": {
-        "name": "Grovespring Spaulders"
+        "name": "Lundkällans axelskydd"
       },
       "grovespring_chest": {
-        "name": "Grovespring Tunic"
+        "name": "Lundkällans tunika"
       },
       "grovespring_gloves": {
-        "name": "Grovespring Grips"
+        "name": "Lundkällans grepphandskar"
       },
       "grovespring_legs": {
-        "name": "Grovespring Breeches"
+        "name": "Lundkällans knäbyxor"
       },
       "sigil_anvil_helmet": {
-        "name": "Helm Sigil of the Anvil"
+        "name": "Städets hjälmsigill"
       },
       "sigil_ember_helmet": {
-        "name": "Helm Sigil of the Ember"
+        "name": "Glödens hjälmsigill"
       },
       "sigil_tempest_helmet": {
-        "name": "Helm Sigil of the Tempest"
+        "name": "Stormens hjälmsigill"
       },
       "sigil_anvil_shoulder": {
-        "name": "Mantle Sigil of the Anvil"
+        "name": "Städets mantelsigill"
       },
       "sigil_ember_shoulder": {
-        "name": "Mantle Sigil of the Ember"
+        "name": "Glödens mantelsigill"
       },
       "sigil_tempest_shoulder": {
-        "name": "Mantle Sigil of the Tempest"
+        "name": "Stormens mantelsigill"
       },
       "sigil_anvil_chest": {
-        "name": "Robe Sigil of the Anvil"
+        "name": "Städets rocksigill"
       },
       "sigil_ember_chest": {
-        "name": "Robe Sigil of the Ember"
+        "name": "Glödens rocksigill"
       },
       "sigil_tempest_chest": {
-        "name": "Robe Sigil of the Tempest"
+        "name": "Stormens rocksigill"
       },
       "sigil_anvil_gloves": {
-        "name": "Grip Sigil of the Anvil"
+        "name": "Städets greppsigill"
       },
       "sigil_ember_gloves": {
-        "name": "Grip Sigil of the Ember"
+        "name": "Glödens greppsigill"
       },
       "sigil_tempest_gloves": {
-        "name": "Grip Sigil of the Tempest"
+        "name": "Stormens greppsigill"
       },
       "sigil_anvil_legs": {
-        "name": "Legging Sigil of the Anvil"
+        "name": "Städets leggingsigill"
       },
       "sigil_ember_legs": {
-        "name": "Legging Sigil of the Ember"
+        "name": "Glödens leggingsigill"
       },
       "sigil_tempest_legs": {
-        "name": "Legging Sigil of the Tempest"
+        "name": "Stormens leggingsigill"
       },
       "cord_of_the_last_flame": {
-        "name": "Cord of the Last Flame"
+        "name": "Den sista lågans snöre"
       },
       "cindersoaked_slippers": {
-        "name": "Cindersoaked Slippers"
+        "name": "Glödindränkta tofflor"
       },
       "springbinder_sash": {
-        "name": "Springbinder Sash"
+        "name": "Vårbindarens skärp"
       },
       "steps_of_quiet_water": {
-        "name": "Steps of Quiet Water"
+        "name": "Det stilla vattnets steg"
       },
       "cinderbark_cinch": {
-        "name": "Cinderbark Cinch"
+        "name": "Glödbarkens gördel"
       },
       "ashenbark_treads": {
-        "name": "Ashenbark Treads"
+        "name": "Askbarkens kängor"
       },
       "slagstalker_belt": {
-        "name": "Slagstalker Belt"
+        "name": "Slagstalkerns bälte"
       },
       "ashrunner_boots": {
-        "name": "Ashrunner Boots"
+        "name": "Asklöparens stövlar"
       },
       "moonscorch_waistwrap": {
-        "name": "Moonscorch Waistwrap"
+        "name": "Månbränd midjeväv"
       },
       "scorchgrove_striders": {
-        "name": "Scorchgrove Striders"
+        "name": "Brännlundens vandringsstövlar"
       },
       "grovetender_belt": {
-        "name": "Grovetender Belt"
+        "name": "Lundvårdarens bälte"
       },
       "dewfall_moccasins": {
-        "name": "Dewfall Moccasins"
+        "name": "Daggfalls-mokasiner"
       },
       "forgewall_girdle": {
-        "name": "Forgewall Girdle"
+        "name": "Smidesmurens gördel"
       },
       "anvilstance_sabatons": {
-        "name": "Anvilstance Sabatons"
+        "name": "Städställningens sabatons"
       },
       "warforged_waistguard": {
-        "name": "Warforged Waistguard"
+        "name": "Krigssmidets midjeskydd"
       },
       "furnace_march_greaves": {
-        "name": "Furnace March Greaves"
+        "name": "Ugnsmarschens benskenor"
       },
       "stormkindled_chain": {
-        "name": "Stormkindled Chain"
+        "name": "Stormglödgad kedja"
       },
       "thundershock_treads": {
-        "name": "Thundershock Treads"
+        "name": "Åskslagets kängor"
       },
       "tidebinder_links": {
-        "name": "Tidebinder Links"
+        "name": "Tidvattenbindarens länkar"
       },
       "springwarden_sabatons": {
-        "name": "Springwarden Sabatons"
+        "name": "Vårväktarens sabatons"
       },
       "pendant_of_the_first_tempering": {
-        "name": "Pendant of the First Tempering"
+        "name": "Halsbandet från den första härdningen"
       },
       "ignivars_ember_choker": {
-        "name": "Ignivar's Ember Choker"
+        "name": "Ignivars glödhalsband"
       },
       "locket_of_the_last_flame": {
-        "name": "Locket of the Last Flame"
+        "name": "Den sista lågans medaljong"
       },
       "heartspring_amulet": {
-        "name": "Heartspring Amulet"
+        "name": "Hjärtkällans amulett"
       },
       "seal_of_the_forgewall": {
-        "name": "Seal of the Forgewall"
+        "name": "Smidesmurens sigill"
       },
       "band_of_marked_strikes": {
-        "name": "Band of Marked Strikes"
+        "name": "De markerade huggens ring"
       },
       "circle_of_cinders": {
-        "name": "Circle of Cinders"
+        "name": "Glödens cirkel"
       },
       "loop_of_quiet_springs": {
-        "name": "Loop of Quiet Springs"
+        "name": "De stilla källornas ögla"
       },
       "bulwark_of_the_inner_crucible": {
-        "name": "Bulwark of the Inner Crucible"
+        "name": "Det inre degelns bålverk"
       },
       "ember_wardens_barrier": {
-        "name": "Ember Warden's Barrier"
+        "name": "Glödväktarens barriär"
       },
       "orb_of_the_last_spring": {
-        "name": "Orb of the Last Spring"
+        "name": "Den sista vårens klot"
       },
       "cinder_of_the_first_design": {
-        "name": "Cinder of the First Design"
+        "name": "Den första skapelsens glöd"
       },
       "forgefathers_warhammer": {
-        "name": "Forgefather's Warhammer"
+        "name": "Smidesfaderns stridshammare"
       },
       "cinderfang_kris": {
-        "name": "Cinderfang Kris"
+        "name": "Glödtandens kris"
       },
       "slagrender_cleaver": {
-        "name": "Slagrender Cleaver"
+        "name": "Slagfläktens klyvare"
       },
       "anvilguard_blade": {
-        "name": "Anvilguard Blade"
+        "name": "Städväktarens klinga"
       },
       "heart_of_the_end_greatblade": {
-        "name": "Heart of the End Greatblade"
+        "name": "Slutets hjärta, storklinga"
       },
       "staff_of_the_last_spring": {
-        "name": "Staff of the Last Spring"
+        "name": "Den sista vårens stav"
       },
       "forgefire_spire": {
-        "name": "Forgefire Spire"
+        "name": "Smideseldens spira"
       },
       "springtouched_crozier": {
-        "name": "Springtouched Crozier"
+        "name": "Vårberörd kräkla"
       },
       "wand_of_quenched_sparks": {
-        "name": "Wand of Quenched Sparks"
+        "name": "De slocknade gnistornas stav"
       },
       "conjured_water4": {
         "name": "Frambesvärjt källvatten"
@@ -14670,10 +14670,10 @@ export const sv_SE: EnTranslations = {
         "name": "Tyglar till Åskstoltseraren, den stora kalkonen"
       },
       "varkhul_forgebreaker": {
-        "name": "Forgebreaker, Engine of Varkhul"
+        "name": "Smedjebrytaren, Varkhuls maskin"
       },
       "varkhul_emberward": {
-        "name": "Emberward, Bulwark of Varkhul"
+        "name": "Glödväktaren, Varkhuls bålverk"
       }
     },
     "mobs": {
@@ -14870,25 +14870,25 @@ export const sv_SE: EnTranslations = {
         "name": "Nythraxis, Törntoppens gissel"
       },
       "ignivar_herald_of_the_last_flame": {
-        "name": "Ignivar, Herald of the Last Flame"
+        "name": "Ignivar, den sista lågans härold"
       },
       "ignivar_heart_of_the_end": {
-        "name": "Ignivar Ashcaller"
+        "name": "Ignivar Askkallare"
       },
       "ignivar_ember_sentinel": {
-        "name": "Ember Sentinel"
+        "name": "Glödvakt"
       },
       "ignivar_crucible_warden": {
-        "name": "Crucible Warden"
+        "name": "Degelväktare"
       },
       "ignivar_cinder_artificer": {
-        "name": "Cinder Artificer"
+        "name": "Asksmed"
       },
       "varkhul_forgefather_of_the_last_flame": {
-        "name": "Varkhul, Forgefather of the Last Flame"
+        "name": "Varkhul, den sista lågans smedfader"
       },
       "derelict_mech": {
-        "name": "Derelict Mech"
+        "name": "Övergiven mekanism"
       },
       "reliquary_ledger_wraith": {
         "name": "Liggarvålnad"
@@ -15551,19 +15551,19 @@ export const sv_SE: EnTranslations = {
         "greeting": "Från en kapellgård i Dalen till världens tak... spåret vi följt slutar här. Jag känner hur berget lyssnar."
       },
       "archivist_maelin_emberward": {
-        "name": "Archivist Maelin Emberward",
-        "title": "Crucible Archivist",
-        "greeting": "Every hammer mark in this place is a sentence. Help me read what Varkhul tried to hide."
+        "name": "Arkivarien Maelin Glödväktare",
+        "title": "Degelarkivarie",
+        "greeting": "Varje hammarslag här är en mening. Hjälp mig läsa vad Varkhul försökte dölja."
       },
       "archivist_maelin_ember_projection": {
-        "name": "Maelin's Ember Projection",
-        "title": "Ember Projection",
-        "greeting": "The embers carry Maelin's voice forward through the forge."
+        "name": "Maelins glödprojektion",
+        "title": "Glödprojektion",
+        "greeting": "Glöden bär Maelins röst vidare genom smedjan."
       },
       "crucible_quartermaster": {
-        "name": "Quartermaster Bronn Emberward",
-        "title": "Crucible Quartermaster",
-        "greeting": "The forge marks its own. Bring me a sigil from the Crucible and I will fit you for war."
+        "name": "Förrådsförvaltare Bronn Glödväktare",
+        "title": "Degelns förrådsförvaltare",
+        "greeting": "Smedjan märker sina egna. Ta med mig ett sigill från Degeln så rustar jag dig för krig."
       },
       "brother_halven": {
         "name": "Broder Halven",
@@ -16714,35 +16714,35 @@ export const sv_SE: EnTranslations = {
         }
       },
       "q_ignivar_echoes_in_iron": {
-        "title": "Echoes in Iron",
-        "text": "These automata are not soldiers. They are drafts. Break each assembly line and listen when the final shell falls. The forge remembers what Varkhul tried to erase.",
-        "completion": "The echoes agree. Varkhul bound water from the dying Last Spring into living metal. These automatons were failed temperings. Only Ignivar endured.",
+        "title": "Ekon i järn",
+        "text": "De här automaterna är inga soldater. De är utkast. Bryt varje monteringslinje och lyssna när det sista skalet faller. Smedjan minns vad Varkhul försökte utplåna.",
+        "completion": "Ekona stämmer. Varkhul band vatten från den döende Sista källan i levande metall. De här automaterna var misslyckade härdningar. Bara Ignivar bestod.",
         "objectives": {
           "0": {
-            "label": "Ember Sentinels destroyed"
+            "label": "Glödvakter förstörda"
           },
           "1": {
-            "label": "Crucible Wardens destroyed"
+            "label": "Degelväktare förstörda"
           }
         }
       },
       "q_ignivar_heralds_heart": {
-        "title": "The Herald's Heart",
-        "text": "The survivor named in every echo is Ignivar. Varkhul called him herald, seal, and key. Defeat him. If the records are true, his death will reveal what he was forged to guard.",
-        "completion": "Ignivar was never merely a guardian. His heart was the key, and its final plates opened the sealed crucible below.",
+        "title": "Häroldens hjärta",
+        "text": "Överlevaren som nämns i varje eko är Ignivar. Varkhul kallade honom härold, sigill och nyckel. Besegra honom. Om uppteckningarna stämmer kommer hans död att avslöja vad han smiddes för att vakta.",
+        "completion": "Ignivar var aldrig bara en väktare. Hans hjärta var nyckeln, och dess sista plattor öppnade den förseglade degeln därunder.",
         "objectives": {
           "0": {
-            "label": "Ignivar defeated"
+            "label": "Ignivar besegrad"
           }
         }
       },
       "q_ignivar_the_forgefather": {
-        "title": "The Forgefather",
-        "text": "The path below leads to Varkhul, Forgefather of the Last Flame. He imprisoned the Last Spring to make metal live, then forged Ignivar to keep the crime sealed. Enter the Inner Crucible and end his work.",
-        "completion": "The forge is silent at last. The spring may never recover, but Varkhul will shape no more lives into chains.",
+        "title": "Smidesfadern",
+        "text": "Stigen där nere leder till Varkhul, den Sista lågans smidesfader. Han fängslade den Sista källan för att ge metall liv och smidde sedan Ignivar för att hålla brottet förseglat. Gå in i den Inre degeln och sätt stopp för hans verk.",
+        "completion": "Smedjan är äntligen tyst. Källan kanske aldrig återhämtar sig, men Varkhul kommer inte längre att forma liv till kedjor.",
         "objectives": {
           "0": {
-            "label": "Varkhul defeated"
+            "label": "Varkhul besegrad"
           }
         }
       },
@@ -18624,29 +18624,29 @@ export const sv_SE: EnTranslations = {
         "leaveText": "Du återvänder till Törntopps kalla luft."
       },
       "ignivar_forge_lift": {
-        "name": "The Forge-Lift",
-        "enterText": "The forge-lift shudders and sinks; hammerfall rises to meet you.",
-        "leaveText": "The lift hauls you back into the open air of the keep."
+        "name": "Smedjehissen",
+        "enterText": "Smedjehissen skakar och sjunker; hammarslagen stiger mot dig.",
+        "leaveText": "Hissen för dig tillbaka upp i fästningens fria luft."
       },
       "ignivar_forge_approach": {
-        "name": "Halls of the First Tempering",
-        "enterText": "Hammerfall echoes through the Halls of the First Tempering.",
-        "leaveText": "You step away from the first forge and breathe freely again."
+        "name": "Den Första Härdningens hallar",
+        "enterText": "Hammarslagen ekar genom den Första Härdningens hallar.",
+        "leaveText": "Du kliver bort från den första smedjan och kan andas fritt igen."
       },
       "ignivar_raid_arena": {
-        "name": "Crucible of the Last Spring",
-        "enterText": "Heat shimmers above the sealed waters of the Crucible.",
-        "leaveText": "You step away from the Crucible and breathe freely again."
+        "name": "Den sista källans Smältdegel",
+        "enterText": "Värmen dallrar över Smältdegelns förseglade vatten.",
+        "leaveText": "Du kliver bort från Smältdegeln och kan andas fritt igen."
       },
       "ignivar_molten_assembly": {
-        "name": "Molten Assembly",
-        "enterText": "The opened gate leads into a molten assembly hall.",
-        "leaveText": "You leave the assembly line and return to the Crucible."
+        "name": "Den smälta monteringen",
+        "enterText": "Den öppnade porten leder in i en smält monteringshall.",
+        "leaveText": "Du lämnar monteringslinjen och återvänder till Smältdegeln."
       },
       "ignivar_inner_crucible": {
-        "name": "The Inner Crucible",
-        "enterText": "The opened gate leads deeper into the Crucible.",
-        "leaveText": "You leave the silent depths of the Crucible."
+        "name": "Den inre Smältdegeln",
+        "enterText": "Den öppnade porten leder djupare in i Smältdegeln.",
+        "leaveText": "Du lämnar Smältdegelns tysta djup."
       },
       "wildheart_basin": {
         "name": "Vildhjärtats bassäng",
@@ -18880,182 +18880,182 @@ export const sv_SE: EnTranslations = {
     },
     "itemSets": {
       "ashveil": {
-        "name": "Ashveil Garb",
-        "bonus2": "Lurker's Strike hits 25 percent harder.",
-        "bonus4": "Your Veiled Edge strike hits for triple, up from double."
+        "name": "Askslöjans dräkt",
+        "bonus2": "Lurkarens hugg träffar 25 procent hårdare.",
+        "bonus4": "Ditt Slöjade egg träffar tre gånger så hårt i stället för dubbelt."
       },
       "benison_dawnweave": {
-        "name": "Benison Dawnweave",
-        "bonus2": "Seraphic Vigil's rescue heals for 270, up from 180. Damage taken no longer delays your spellcasting.",
-        "bonus4": "When Seraphic Vigil triggers, its ally is also mended for 15 percent of their maximum health over 10 sec."
+        "name": "Välsignelsens gryningsväv",
+        "bonus2": "Serafisk vaksamhets räddning helar 270 i stället för 180. Skada du tar fördröjer inte längre dina besvärjelser.",
+        "bonus4": "När Serafisk vaksamhet utlöses helas dess allierade också med 15 procent av sin maximala hälsa under 10 sek."
       },
       "boundstone_vanguard": {
         "name": "Bundstens-förtrupp",
         "bonus3": "Ökar attack- och magihastighet med 15%."
       },
       "chronoweave": {
-        "name": "Aetherweave Vestments",
-        "bonus2": "Temporal Echo converts 50 percent of your single-target Arcane damage into healing. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Temporal Cascade's cooldown is reduced by 5 sec."
+        "name": "Etervävda klädnader",
+        "bonus2": "Tidsmässigt eko omvandlar 50 procent av din mystiska skada mot ett mål till läkning. Skada du tar fördröjer inte längre dina besvärjelser.",
+        "bonus4": "Tidsmässig kaskads väntetid minskar med 5 sek."
       },
       "cinderbark": {
-        "name": "Cinderbark Ward",
-        "bonus2": "Sweeping Claws has a 30 percent chance to bank an additional Old Blood.",
-        "bonus4": "Marrowbreak hits 30 percent harder, and its emergency guard no longer replaces the strike."
+        "name": "Askbarkens väktare",
+        "bonus2": "Svepande klor har 30 procents chans att lagra ytterligare gammalt blod.",
+        "bonus4": "Märgbräckan träffar 30 procent hårdare, och dess nödförsvar ersätter inte längre hugget."
       },
       "cinderfang": {
-        "name": "Cinderfang Shroud",
-        "bonus2": "Venom Ritual's energy refund rises to 20 per builder.",
-        "bonus4": "Venom Dart's cooldown is reduced to 4 sec."
+        "name": "Asktandens svepning",
+        "bonus2": "Giftceremonins energiretur ökar till 20 per uppbyggnad.",
+        "bonus4": "Giftpilens väntetid minskar till 4 sek."
       },
       "coldsight_trackers": {
-        "name": "Coldsight Trackers",
-        "bonus2": "Measured Shot restores 5 additional Focus.",
-        "bonus4": "Long Draw critical strikes extend Cold Focus by 2 sec, up to 6 sec per activation."
+        "name": "Kallsynernas spårare",
+        "bonus2": "Mättat skott återställer 5 extra fokus.",
+        "bonus4": "Långdrags kritiska träffar förlänger Kallfokus med 2 sek, upp till 6 sek per aktivering."
       },
       "crownforged": {
         "name": "Bonewrought-regalier",
         "bonus2": "Ökar attackkraft med 40.",
         "bonus4": "Dina kritiska vapenträffar splittrar målet med Benflisa och får det att blöda för 8 skada var 2:e sek i 12 sek. Staplas upp till 3 gånger.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 5 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Ökar attack- och kastningshastigheten med 4 procent och träffsäkerheten med 3 procent. Dina vapens kritiska träffar splittrar målet med Bensplitter och får det att blöda 5 skada varannan sek i 12 sek. Staplas upp till 3 gånger."
       },
       "dawnforged": {
-        "name": "Dawnforged Vestments",
-        "bonus2": "Beacon of Light copies 55 percent of your direct heals. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Radiant Resonance's empowered Dawn's Embrace is instant."
+        "name": "Gryningssmidda klädnader",
+        "bonus2": "Ljusets fyr kopierar 55 procent av dina direkta läkningseffekter. Skada du tar fördröjer inte längre dina besvärjelser.",
+        "bonus4": "Strålande resonans förstärkta Gryningens omfamning är omedelbar."
       },
       "deathlord": {
         "name": "Barrowlords stridsutrustning",
         "bonus2": "Ökar attackkraft med 40.",
         "bonus4": "Dina kritiska vapenträffar har 50% chans att ge Gravmakt och öka attackkraften med 60 i 10 sek.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 5 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Ökar attack- och kastningshastigheten med 4 procent och träffsäkerheten med 3 procent. Dina vapens kritiska träffar splittrar målet med Bensplitter och får det att blöda 5 skada varannan sek i 12 sek. Staplas upp till 3 gånger."
       },
       "emberfury": {
-        "name": "Emberfury Harness",
-        "bonus2": "Your Enrage lasts 6 sec instead of 4.",
-        "bonus4": "Bloodletting always Enrages you, and its healing rises to 8 percent of your maximum health."
+        "name": "Glödvredens sele",
+        "bonus2": "Din vrede varar 6 sek i stället för 4.",
+        "bonus4": "Blodtappning gör dig alltid vred, och läkningen ökar till 8 procent av din maximala hälsa."
       },
       "emberscreed": {
-        "name": "Creed of Embers Vestments",
-        "bonus2": "Your Doctrine link converts 10 percent more of your Holy damage into healing. Damage taken no longer delays your spellcasting.",
-        "bonus4": "When your Psalm of Warding is fully consumed, your next Scouring Hymn within 10 sec is instant. Cannot occur more than once every 15 sec."
+        "name": "Glödernas trosklädnad",
+        "bonus2": "Din lärolänk omvandlar 10 procent mer av din heliga skada till läkning. Skada du tar fördröjer inte längre dina besvärjelser.",
+        "bonus4": "När din skyddande psalm är helt förbrukad blir din nästa Skurgärningshymn inom 10 sek omedelbar. Kan inte inträffa mer än en gång var 15:e sek."
       },
       "forgewall": {
-        "name": "Forgewall Aegis",
-        "bonus2": "Iron Resolve converts rage at 5 absorb per point instead of 4.",
-        "bonus4": "Casting Shieldcrack reduces Iron Resolve's remaining cooldown by 2 sec."
+        "name": "Smedjemurens aegis",
+        "bonus2": "Järnvilja omvandlar vrede till 5 absorption per poäng i stället för 4.",
+        "bonus4": "Att kasta Sköldspricka minskar Järnviljas återstående väntetid med 2 sek."
       },
       "frostquench": {
-        "name": "Frostquench Weave",
-        "bonus2": "Rimelance critical strikes bank a second Icicle, up to the maximum of 5. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Winterlash plants 3 Winter's Chill charges, up from 2."
+        "name": "Frostsläckarens väv",
+        "bonus2": "Rimlans kritiska träffar lagrar en extra istapp, upp till maximalt 5. Skada du tar fördröjer inte längre dina besvärjelser.",
+        "bonus4": "Vinterbett lägger på 3 laddningar Vinterköld, upp från 2."
       },
       "gravebrand": {
-        "name": "Gravebrand Regalia",
-        "bonus2": "Reaping Command's cooldown is reduced by 2 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Reaping Command's unison strikes deal 25 percent more damage."
+        "name": "Gravmärkt regalia",
+        "bonus2": "Skördekommandots väntetid minskar med 2 sek. Skada du tar fördröjer inte längre dina besvärjelser.",
+        "bonus4": "Skördekommandots samstämmiga slag orsakar 25 procent mer skada."
       },
       "greyjaw_stalker": {
         "name": "Gråkäftssmygarens utrustning",
         "bonus3": "Ökar attack- och magihastighet med 15%."
       },
       "grovespring": {
-        "name": "Grovespring Raiment",
-        "bonus2": "Swiftmend consumes your own Wildbloom or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Overbloom harvests 75 percent of your remaining effects and banks 1 Verdance afterward."
+        "name": "Lundkällans dräkt",
+        "bonus2": "Snabbläkning förbrukar din egen Vildblomma eller Andra blomning först och helar 25 procent mer. Skada du tar fördröjer inte längre dina besvärjelser.",
+        "bonus4": "Överblomning skördar 75 procent av dina återstående effekter och lagrar därefter 1 Grönska."
       },
       "hexthread": {
-        "name": "Hexthread Shroud",
-        "bonus2": "Needle of Fate grants 2 additional Condemnation. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Passing Sentence refunds 10 Condemnation."
+        "name": "Hextrådens svepning",
+        "bonus2": "Ödets nål ger 2 extra fördömelse. Skada du tar fördröjer inte längre dina besvärjelser.",
+        "bonus4": "Avkunnad dom återbetalar 10 fördömelse."
       },
       "moonscorch": {
-        "name": "Moonscorch Raiment",
-        "bonus2": "Moonseed may extend Lunar Tempest twice per application, to a maximum of 12 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Moonsurge and Sunwake strike 25 percent harder."
+        "name": "Månbränd dräkt",
+        "bonus2": "Månfrö kan förlänga Månens storm två gånger per applicering, upp till maximalt 12 sek. Skada du tar fördröjer inte längre dina besvärjelser.",
+        "bonus4": "Månsvall och Soluppvaknande träffar 25 procent hårdare."
       },
       "necromancers": {
         "name": "Mournweave-skrud",
         "bonus2": "Ökar trollformelskraft med 20. Skada du tar fördröjer inte längre dina besvärjelser (100% motstånd mot fördröjning av besvärjelser).",
         "bonus4": "Dina besvärjelser har 10% chans att ge Klarsyn, vilket gör din nästa besvärjelse gratis.",
-        "bonus6": "Increases attack and casting speed by 4%. Your spells have a 10% chance to grant Soulblaze, increasing spell power by 25 for 10 sec."
+        "bonus6": "Ökar attack- och kastningshastigheten med 4 procent. Dina besvärjelser har 10 procents chans att ge Själsglöd, vilket ökar besvärjelsekraften med 25 i 10 sek."
       },
       "nighttalon": {
         "name": "Direfang-päls",
         "bonus2": "Ökar attackkraft med 40.",
         "bonus4": "Dina kritiska vapenträffar river upp ett Rivsår och får målet att blöda för 6 skada var 2:e sek i 12 sek. Staplas upp till 3 gånger.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 4 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Ökar attack- och kastningshastigheten med 4 procent och träffsäkerheten med 3 procent. Dina vapens kritiska träffar river upp ett Trasigt sår som får målet att blöda 4 skada varannan sek i 12 sek. Staplas upp till 3 gånger."
       },
       "oathpyre": {
-        "name": "Oathpyre Bastion",
-        "bonus2": "Vowkeeper Strike's chance to arm Solar Reprisal rises to 30 percent, and blocking an attack arms it 40 percent of the time.",
-        "bonus4": "Consuming Solar Reprisal shields you for 6 percent of your maximum health for 10 sec."
+        "name": "Edsvaktens bastion",
+        "bonus2": "Edsvaktarens hugg har 30 procents chans att ladda Solär vedergällning, och att blockera en attack laddar den 40 procent av gångerna.",
+        "bonus4": "När du förbrukar Solär vedergällning får du en sköld på 6 procent av din maximala hälsa i 10 sek."
       },
       "packlord_emberhide": {
-        "name": "Packlord's Emberhide",
-        "bonus2": "Pack Command's cooldown is reduced to 3 sec.",
-        "bonus4": "Pack Command's chance to reset Stampede's cooldown rises to 30 percent."
+        "name": "Flockfurstens glödskinn",
+        "bonus2": "Flockkommando har 3 sek kortare väntetid.",
+        "bonus4": "Flockkommandos chans att återställa Stampedes väntetid ökar till 30 procent."
       },
       "pyroclast": {
-        "name": "Pyroclast Regalia",
-        "bonus2": "Scald always critically strikes targets at or below 35 percent health. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Your Fire spells' critical strikes outside Phoenix Trance reduce its remaining cooldown by 1.5 sec."
+        "name": "Pyroklastregalia",
+        "bonus2": "Skålla ger alltid en kritisk träff mot mål med 35 procent eller mindre hälsa. Skada du tar fördröjer inte längre dina besvärjelser.",
+        "bonus4": "Dina eldbesvärjelsers kritiska träffar utanför Fenixtrans sänker dess återstående väntetid med 1,5 sek."
       },
       "ruincaller": {
-        "name": "Ruincaller Vestments",
-        "bonus2": "Conflagrate holds 3 charges. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Ruinbolt strikes 20 percent harder."
+        "name": "Förstörelseförkunnarens skrud",
+        "bonus2": "Förbrännelse har 3 laddningar. Skada du tar fördröjer inte längre dina besvärjelser.",
+        "bonus4": "Förstörelseblixt träffar 20 procent hårdare."
       },
       "slagbreaker": {
-        "name": "Slagbreaker Battlegear",
-        "bonus2": "Redhand empowers your next Maiming Strike by 30 percent per stack instead of 20.",
-        "bonus4": "Every second cast of Redhand reduces Breachmaker's remaining cooldown by 3 sec."
+        "name": "Slaggbrytarens stridsrustning",
+        "bonus2": "Rödhand förstärker ditt nästa Förlamande hugg med 30 procent per laddning i stället för 20.",
+        "bonus4": "Varannan kastning av Rödhand minskar Brottsmakarens återstående väntetid med 3 sek."
       },
       "slagsnare": {
-        "name": "Slagsnare Trappings",
-        "bonus2": "Gutting Strike generates 20 Focus.",
-        "bonus4": "Woundrend that consumes 3 Hunting Momentum preserves them. Cannot occur more than once every 8 sec."
+        "name": "Slagsnarans utrustning",
+        "bonus2": "Urtagningshugg genererar 20 fokus.",
+        "bonus4": "Sårskärning som förbrukar 3 jaktimpulsar bevarar dem. Kan inte inträffa oftare än var 8:e sek."
       },
       "smolderstrike": {
-        "name": "Smolderstrike Leathers",
-        "bonus2": "Haymaker hits 20 percent harder.",
-        "bonus4": "Lights Out refunds 6 sec of Mirrored Blades' remaining cooldown."
+        "name": "Glödslagets läder",
+        "bonus2": "Knockslaget träffar 20 procent hårdare.",
+        "bonus4": "Släckta ljus återbetalar 6 sek av de Speglade klingornas återstående väntetid."
       },
       "soulflame": {
         "name": "Wraithfire-regalier",
         "bonus2": "Ökar trollformelskraft med 20. Skada du tar fördröjer inte längre dina besvärjelser (100% motstånd mot fördröjning av besvärjelser).",
         "bonus4": "Dina besvärjelser har 10% chans att ge Själslåga och öka besvärjelseskraften med 40 i 10 sek.",
-        "bonus6": "Increases attack and casting speed by 4%. Your spells have a 10% chance to grant Soulblaze, increasing spell power by 25 for 10 sec."
+        "bonus6": "Ökar attack- och kastningshastigheten med 4 procent. Dina besvärjelser har 10 procents chans att ge Själsglöd, vilket ökar besvärjelsekraften med 25 i 10 sek."
       },
       "springmender": {
-        "name": "Springmender Scale",
-        "bonus2": "Tidecall's cooldown is reduced by 4 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Cascading Mend reaches a fourth ally and harvests Mending Currents at 150 percent."
+        "name": "Vårhelarns fjäll",
+        "bonus2": "Tidens kall har 4 sek kortare väntetid. Skada du tar fördröjer inte längre dina besvärjelser.",
+        "bonus4": "Kaskadläkning når en fjärde allierad och skördar läkande strömmar med 150 procent."
       },
       "stonehearth": {
-        "name": "Stonehearth Bastion",
-        "bonus2": "While Stonebound, Stormcast Mending Waters costs no mana and heals 25 percent more.",
-        "bonus4": "While Stonebound, completing a cadence heals you for 3 percent of your maximum health."
+        "name": "Stenhärdens bastion",
+        "bonus2": "När du är stenbunden kostar Stormkastets läkande vatten ingen mana och helar 25 procent mer.",
+        "bonus4": "När du är stenbunden helar en avslutad kadens dig med 3 procent av din maximala hälsa."
       },
       "stormcallers": {
         "name": "Galecall-skrud",
         "bonus2": "Ökar trollformelskraft med 20. Skada du tar fördröjer inte längre dina besvärjelser (100% motstånd mot fördröjning av besvärjelser).",
         "bonus4": "Dina besvärjelser har 10% chans att ge Själslåga och öka besvärjelseskraften med 40 i 10 sek.",
-        "bonus6": "Increases attack and casting speed by 4%. Your spells have a 10% chance to grant Soulblaze, increasing spell power by 25 for 10 sec."
+        "bonus6": "Ökar attack- och kastningshastigheten med 4 procent. Dina besvärjelser har 10 procents chans att ge Själsglöd, vilket ökar besvärjelsekraften med 25 i 10 sek."
       },
       "stormkindled": {
-        "name": "Stormkindled Regalia",
-        "bonus2": "Unleash Weapon on Pyrebrand grants 3 Thunder. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Earthen Jolt's bonus per Thunder rises to 30 percent."
+        "name": "Stormglödgad regalia",
+        "bonus2": "Släpp lös vapen på Pyremärke ger 3 åska. Skada du tar fördröjer inte längre dina besvärjelser.",
+        "bonus4": "Jordstötens bonus per åska ökar till 30 procent."
       },
       "vale_arcanist": {
         "name": "Dalarkanistens skrud",
         "bonus3": "Ökar attack- och magihastighet med 15%."
       },
       "vesperash": {
-        "name": "Vesperash Shroud",
-        "bonus2": "Call Tithefiend's cooldown is reduced by 6 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Calling your Tithefiend resets Mindfracture's cooldown, and the fiend returns twice as much mana per hit."
+        "name": "Vesperasks svepning",
+        "bonus2": "Kalla på tiondedemonen har 6 sek kortare väntetid. Skada du tar fördröjer inte längre dina besvärjelser.",
+        "bonus4": "När du kallar på din tiondedemon återställs Sinnesfrätningens väntetid, och demonen återger dubbelt så mycket mana per träff."
       },
       "warfare_ashstalker": {
         "name": "Asksmygarens utrustning",
@@ -19088,25 +19088,25 @@ export const sv_SE: EnTranslations = {
         "bonus7": "Ökar Krigföringsanfall och Krigföringsförsvar med 80. Era besvärjelser har 15% chans att ge Törnvakt, vilket ökar chansen att undvika med 15% i 6 sek."
       },
       "warspirit_emberscale": {
-        "name": "Warspirit Emberscale",
-        "bonus2": "Ancestral Strike advances your cadence 3 steps.",
-        "bonus4": "Ancestral Strike hits 30 percent harder."
+        "name": "Krigsandens glödskal",
+        "bonus2": "Förfädernas hugg flyttar din kadens 3 steg framåt.",
+        "bonus4": "Förfädernas hugg träffar 30 procent hårdare."
       },
       "wildfang_emberhide": {
-        "name": "Wildfang Emberhide",
-        "bonus2": "Redharvest restores 45 energy, up from 30.",
-        "bonus4": "Redharvest plants a fresh Flense on the target."
+        "name": "Vildtands glödskinn",
+        "bonus2": "Rödskörd återställer 45 energi, upp från 30.",
+        "bonus4": "Rödskörd planterar en ny Flåning på målet."
       },
       "wyrmshadow": {
         "name": "Nightfang-skrud",
         "bonus2": "Ökar attackkraft med 40.",
         "bonus4": "Dina kritiska vapenträffar har 50% chans att ge Betrus och öka attackhastigheten med 25% i 8 sek.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 4 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Ökar attack- och kastningshastigheten med 4 procent och träffsäkerheten med 3 procent. Dina vapens kritiska träffar river upp ett Trasigt sår som får målet att blöda 4 skada varannan sek i 12 sek. Staplas upp till 3 gånger."
       },
       "zealfire": {
-        "name": "Zealfire Warplate",
-        "bonus2": "Final Edict and Dawnfall cut each other's remaining cooldown by 3 sec instead of 2.",
-        "bonus4": "Hammer of Wrath cast under Dawn's Wrath strikes 40 percent harder, up from 20."
+        "name": "Zealfires krigsrustning",
+        "bonus2": "Final Edict och Dawnfall minskar varandras återstående väntetid med 3 sek i stället för 2.",
+        "bonus4": "Hammer of Wrath som kastas under Dawn's Wrath träffar 40 procent hårdare, upp från 20."
       }
     }
   },

@@ -14621,4 +14621,5 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.forgefire_spire.name': 'フォージファイアのスパイア',
   'entities.items.springtouched_crozier.name': '泉触れの司教杖',
   'entities.items.wand_of_quenched_sparks.name': '消えた火花のワンド',
+  'crucibleShop.balanceEntry': '{name} x{count}',
 };

@@ -14312,4 +14312,5 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.forgefire_spire.name': '炉火尖塔杖',
   'entities.items.springtouched_crozier.name': '泉息牧杖',
   'entities.items.wand_of_quenched_sparks.name': '熄火花魔杖',
+  'crucibleShop.balanceEntry': '{name} x{count}',
 };

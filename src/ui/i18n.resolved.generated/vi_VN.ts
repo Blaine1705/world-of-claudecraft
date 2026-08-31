@@ -4654,8 +4654,8 @@ export const vi_VN: EnTranslations = {
       "online": "Nhân vật hiện đang trực tuyến.",
       "rename_not_permitted": "Không được phép đổi tên nhân vật này.",
       "delete_confirm": "Nhập tên nhân vật để xác nhận xóa.",
-      "storage_purchase_open": "A storage purchase must finish or be resolved before this character can be deleted.",
-      "delete_busy": "The realm is busy. Try deleting this character again in a moment.",
+      "storage_purchase_open": "Phải hoàn tất hoặc xử lý giao dịch mua kho trước khi xóa nhân vật này.",
+      "delete_busy": "Vương quốc đang bận. Hãy thử xóa nhân vật này lại sau một lát.",
       "already_in_world": "Nhân vật đã ở trong thế giới.",
       "taken_over": "Nhân vật của bạn đã bị một phiên khác chiếm quyền.",
       "rename_required": "Nhân vật này phải được đổi tên trước khi vào thế giới.",
@@ -5180,7 +5180,7 @@ export const vi_VN: EnTranslations = {
       "ifPartySort": "Thứ tự liệt kê thành viên tổ đội: theo thứ tự nhóm, vai trò, hoặc tên.",
       "ifPartyShowAuras": "Buff và debuff có hiển thị trên khung tổ đội hay không. Các công tắc tương ứng còn bao gồm thanh tài nguyên, khiên hấp thụ, thú cưng, và việc bạn có xuất hiện trong danh sách tổ đội của chính mình hay không.",
       "ifAurasOnPlayerFrame": "Hiện buff và debuff của bạn trên khung nhân vật của chính bạn, bên cạnh thanh hiệu ứng.",
-      "ifAlwaysShowAllBuffs": "Shows every active buff even on the Low graphics preset, bypassing its usual buff-icon cap.",
+      "ifAlwaysShowAllBuffs": "Hiển thị mọi buff đang hoạt động ngay cả ở cấu hình đồ họa Thấp, bỏ qua giới hạn biểu tượng buff thông thường.",
       "ifTargetOfTarget": "Hiện mục tiêu của mục tiêu bạn đang nhắm, cách cổ điển để biết liệu tank có còn giữ được nó hay không.",
       "ifPetFrame": "Hiện một khung cho thú cưng của bạn.",
       "ifChatFontScale": "Cỡ chữ trò chuyện.",
@@ -6667,7 +6667,7 @@ export const vi_VN: EnTranslations = {
       "bankBody": "Mỗi thị trấn trung tâm đều có một chi nhánh của Két Sắt Mạ Vàng, ngân hiệu của cả vương quốc. Hãy nói chuyện với thủ quỹ ở đó để mở kho két của bạn, một khoang chứa riêng ngoài túi đồ mà nhân vật của bạn giữ trọn đời. Bất cứ thứ gì bạn gửi lại đều chờ bạn an toàn, dù lần sau bạn ghé chi nhánh nào.",
       "bankHow": "Khi kho két đang mở, nhấp một vật phẩm trong túi để gửi vào và nhấp nó trong kho két để lấy lại. Kho két chỉ giữ hàng hóa, không bao giờ giữ tiền, và vật phẩm nhiệm vụ luôn ở lại bên bạn. Khi túi đầy giữa chuyến đi, một nút bấm sẽ quét toàn bộ nguyên liệu chế tác của bạn vào cùng một lúc.",
       "bankSlots": "Một kho két mới mở khởi đầu nhỏ bé và lớn dần cùng bạn. Thủ quỹ bán thêm ô với giá tiền vàng ngày một đắt hơn, và chơi trực tuyến còn mang lại chỗ chứa thưởng thêm, cho những việc như xác minh email, liên kết tài khoản, và những người bạn mà bạn đưa vào trò chơi.",
-      "bankSockets": "Past the slot ladder, the bursar also sells up to four bag sockets, unlocked in order at ever-steeper prices. Seat a spare bag from your carrying set in one and its slots join your vault room: an everyday bag widens the whole store, while a reagent satchel adds room only crafting materials may take. Click a bag in your bags to seat it and click the socket to take it back. Taking one back never costs you a thing you stored: if the vault ends up fuller than its shrunken room, everything stays put and new deposits simply wait for space.",
+      "bankSockets": "Sau bậc thang mở rộng ngăn, quản ngân khố còn bán tối đa bốn ô gắn túi, được mở khóa lần lượt với mức giá ngày càng cao. Đặt một túi dự phòng trong bộ túi mang theo vào ô, các ngăn của túi sẽ nhập vào kho của bạn: túi thông thường mở rộng toàn bộ kho, còn túi vật liệu chỉ thêm chỗ cho nguyên liệu chế tạo. Nhấp vào một chiếc túi trong hành trang để đặt vào, rồi nhấp vào ô để lấy ra. Khi lấy túi ra, những vật bạn đã cất không bao giờ bị mất: nếu kho trở nên đầy hơn sức chứa mới bị thu hẹp, mọi thứ vẫn nguyên chỗ và đồ gửi mới chỉ chờ đến khi có chỗ trống.",
       "buyingTitle": "Mua và bán",
       "buyingBody": "Hãy nói chuyện với một thương nhân và chọn xem hàng của họ, cửa hàng của họ mở ra với ba thẻ: Xem Hàng, Bán, và Mua Lại. Xem Hàng chứa mọi thứ họ có trong kho, là của bạn nếu bạn đủ tiền. Bán liệt kê những gì trong túi bạn mà họ chịu trả tiền, và bán một món mang phẩm chất tự tung riêng của nó sẽ yêu cầu bạn xác nhận trước, để một bản quý giá không bao giờ lỡ tay tuột mất. Nếu bạn trót chia tay thứ gì đó rồi tiếc, thẻ Mua Lại giữ những món bạn vừa bán để bạn mua lại chúng bằng đúng số tiền bạn được trả.",
       "junkTitle": "Dọn dẹp đồ tạp",
@@ -7711,7 +7711,7 @@ export const vi_VN: EnTranslations = {
       "title": "Kết Nối Ví Solana",
       "linkBody": "Hãy chọn một tiện ích mở rộng ví trong trình duyệt này. Bạn sẽ ký một tin nhắn xác minh, sau đó quay lại ứng dụng máy tính.",
       "paymentBody": "Hãy chọn ví đã liên kết với tài khoản của bạn và phê duyệt giao dịch trong trình duyệt này.",
-      "stepUpBody": "Choose the wallet linked to your account and sign the $WOC Exchange authorization message. Signing is free and moves no funds.",
+      "stepUpBody": "Chọn ví đã liên kết với tài khoản của bạn và ký thông báo ủy quyền $WOC Exchange. Việc ký là miễn phí và không chuyển khoản tiền nào.",
       "extensionHelp": "Không tìm thấy tiện ích mở rộng ví tương thích nào. Hãy cài đặt hoặc mở khóa Phantom, Solflare hoặc ví trình duyệt Solana khác, rồi thử lại.",
       "safety": "World of ClaudeCraft không bao giờ yêu cầu cụm từ khôi phục hoặc khóa riêng tư của bạn.",
       "continueWith": "Tiếp tục với {wallet}",
@@ -8102,18 +8102,18 @@ export const vi_VN: EnTranslations = {
     "buyConfirmCancel": "Hủy bỏ"
   },
   "crucibleShop": {
-    "browse": "Redeem Sigils",
-    "browseAria": "Redeem Crucible sigils with {name}",
-    "empty": "No set pieces are redeemable for your class.",
-    "balance": "Your sigils: {list}",
+    "browse": "Đổi Ấn hiệu",
+    "browseAria": "Đổi Ấn hiệu Lò Luyện bằng {name}",
+    "empty": "Không có mảnh bộ trang bị nào có thể đổi cho lớp của bạn.",
+    "balance": "Ấn hiệu của bạn: {list}",
     "balanceEntry": "{name} x{count}",
-    "noSigils": "You hold no Crucible sigils.",
+    "noSigils": "Bạn không có Ấn hiệu Crucible nào.",
     "price": "1 {sigil}",
-    "buyAria": "Redeem {sigil} for {item}",
-    "buyConfirmTitle": "Confirm Redemption",
-    "buyConfirmBody": "Redeem your {sigil} for {item}? A consumed sigil cannot be refunded.",
-    "buyConfirmAccept": "Redeem",
-    "buyConfirmCancel": "Cancel"
+    "buyAria": "Đổi {sigil} lấy {item}",
+    "buyConfirmTitle": "Xác nhận đổi",
+    "buyConfirmBody": "Đổi {sigil} của bạn lấy {item}? Ấn hiệu đã sử dụng không thể hoàn lại.",
+    "buyConfirmAccept": "Đổi",
+    "buyConfirmCancel": "Hủy"
   },
   "cardDuel": {
     "title": "Đấu Bài",
@@ -13254,25 +13254,25 @@ export const vi_VN: EnTranslations = {
         "name": "Bó Hoa Vườn Dawnhold"
       },
       "wayfarers_backpack": {
-        "name": "Wayfarer's Backpack"
+        "name": "Ba Lô Lữ Khách"
       },
       "burlap_reagent_pouch": {
-        "name": "Burlap Reagent Pouch"
+        "name": "Túi Thuốc Vải Thô"
       },
       "necromancers_reagent_satchel": {
-        "name": "Necromancer's Reagent Satchel"
+        "name": "Túi Thuốc Thử Của Kẻ Gọi Hồn"
       },
       "duskweave_bag": {
-        "name": "Duskweave Bag"
+        "name": "Túi Vải Dệt Hoàng Hôn"
       },
       "resonant_weave_bag": {
-        "name": "Resonantweave Bag"
+        "name": "Túi Vải Dệt Cộng Hưởng"
       },
       "foragers_haversack": {
-        "name": "Forager's Haversack"
+        "name": "Túi Đeo Vai Người Hái Lượm"
       },
       "loombound_reagent_satchel": {
-        "name": "Loombound Reagent Satchel"
+        "name": "Túi Thuốc Thử Gắn Với Khung Dệt"
       },
       "ps_briny_lure": {
         "name": "Mồi Câu Mặn"
@@ -13287,610 +13287,610 @@ export const vi_VN: EnTranslations = {
         "name": "Đá Từ Trần"
       },
       "lastflame_core": {
-        "name": "Core of the Last Flame"
+        "name": "Lõi Ngọn Lửa Cuối Cùng"
       },
       "slagbreaker_helmet": {
-        "name": "Slagbreaker Helm"
+        "name": "Mũ Kẻ Phá Xỉ"
       },
       "slagbreaker_shoulder": {
-        "name": "Slagbreaker Pauldrons"
+        "name": "Giáp Vai Kẻ Phá Xỉ"
       },
       "slagbreaker_chest": {
-        "name": "Slagbreaker Hauberk"
+        "name": "Giáp Bọc Kẻ Phá Xỉ"
       },
       "slagbreaker_gloves": {
-        "name": "Slagbreaker Gauntlets"
+        "name": "Găng Tay Kẻ Phá Xỉ"
       },
       "slagbreaker_legs": {
-        "name": "Slagbreaker Legguards"
+        "name": "Giáp Chân Kẻ Phá Xỉ"
       },
       "emberfury_helmet": {
-        "name": "Emberfury Helm"
+        "name": "Mũ Cuồng Nộ Tàn Than"
       },
       "emberfury_shoulder": {
-        "name": "Emberfury Pauldrons"
+        "name": "Giáp Vai Cuồng Nộ Tàn Than"
       },
       "emberfury_chest": {
-        "name": "Emberfury Hauberk"
+        "name": "Giáp Ngực Cuồng Nộ Tàn Than"
       },
       "emberfury_gloves": {
-        "name": "Emberfury Gauntlets"
+        "name": "Găng Tay Cuồng Nộ Tàn Than"
       },
       "emberfury_legs": {
-        "name": "Emberfury Legguards"
+        "name": "Giáp Chân Cuồng Nộ Tàn Than"
       },
       "forgewall_helmet": {
-        "name": "Forgewall Helm"
+        "name": "Mũ Thành Lũy Lò Rèn"
       },
       "forgewall_shoulder": {
-        "name": "Forgewall Pauldrons"
+        "name": "Giáp Vai Thành Lũy Lò Rèn"
       },
       "forgewall_chest": {
-        "name": "Forgewall Hauberk"
+        "name": "Giáp Ngực Thành Lũy Lò Rèn"
       },
       "forgewall_gloves": {
-        "name": "Forgewall Gauntlets"
+        "name": "Găng Tay Thành Lũy Lò Rèn"
       },
       "forgewall_legs": {
-        "name": "Forgewall Legguards"
+        "name": "Giáp Chân Thành Lũy Lò Rèn"
       },
       "dawnforged_helmet": {
-        "name": "Dawnforged Helm"
+        "name": "Mũ Rèn Bình Minh"
       },
       "dawnforged_shoulder": {
-        "name": "Dawnforged Pauldrons"
+        "name": "Giáp Vai Rèn Bình Minh"
       },
       "dawnforged_chest": {
-        "name": "Dawnforged Hauberk"
+        "name": "Giáp Ngực Rèn Bình Minh"
       },
       "dawnforged_gloves": {
-        "name": "Dawnforged Gauntlets"
+        "name": "Găng Tay Rèn Bình Minh"
       },
       "dawnforged_legs": {
-        "name": "Dawnforged Legguards"
+        "name": "Giáp Chân Rèn Bình Minh"
       },
       "oathpyre_helmet": {
-        "name": "Oathpyre Helm"
+        "name": "Mũ Sắt Hỏa Thề"
       },
       "oathpyre_shoulder": {
-        "name": "Oathpyre Pauldrons"
+        "name": "Giáp Vai Hỏa Thề"
       },
       "oathpyre_chest": {
-        "name": "Oathpyre Hauberk"
+        "name": "Giáp Hauberk Hỏa Thề"
       },
       "oathpyre_gloves": {
-        "name": "Oathpyre Gauntlets"
+        "name": "Găng Sắt Hỏa Thề"
       },
       "oathpyre_legs": {
-        "name": "Oathpyre Legguards"
+        "name": "Giáp Chân Hỏa Thề"
       },
       "zealfire_helmet": {
-        "name": "Zealfire Helm"
+        "name": "Mũ Sắt Zealfire"
       },
       "zealfire_shoulder": {
-        "name": "Zealfire Pauldrons"
+        "name": "Giáp Vai Zealfire"
       },
       "zealfire_chest": {
-        "name": "Zealfire Hauberk"
+        "name": "Áo Giáp Zealfire"
       },
       "zealfire_gloves": {
-        "name": "Zealfire Gauntlets"
+        "name": "Găng Sắt Zealfire"
       },
       "zealfire_legs": {
-        "name": "Zealfire Legguards"
+        "name": "Giáp Chân Zealfire"
       },
       "packlord_emberhide_helmet": {
-        "name": "Packlord's Cowl"
+        "name": "Mũ Trùm Của Chúa Đàn"
       },
       "packlord_emberhide_shoulder": {
-        "name": "Packlord's Spaulders"
+        "name": "Giáp Vai Của Chúa Đàn"
       },
       "packlord_emberhide_chest": {
-        "name": "Packlord's Tunic"
+        "name": "Áo Chẽn Của Chúa Đàn"
       },
       "packlord_emberhide_gloves": {
-        "name": "Packlord's Grips"
+        "name": "Găng Tay Của Chúa Đàn"
       },
       "packlord_emberhide_legs": {
-        "name": "Packlord's Breeches"
+        "name": "Quần Ống Túm Của Chúa Đàn"
       },
       "coldsight_trackers_helmet": {
-        "name": "Coldsight Cowl"
+        "name": "Mũ Trùm Thợ Săn Coldsight"
       },
       "coldsight_trackers_shoulder": {
-        "name": "Coldsight Spaulders"
+        "name": "Giáp Vai Thợ Săn Coldsight"
       },
       "coldsight_trackers_chest": {
-        "name": "Coldsight Tunic"
+        "name": "Áo Giáp Thợ Săn Coldsight"
       },
       "coldsight_trackers_gloves": {
-        "name": "Coldsight Grips"
+        "name": "Găng Tay Thợ Săn Coldsight"
       },
       "coldsight_trackers_legs": {
-        "name": "Coldsight Breeches"
+        "name": "Quần Bảo Hộ Thợ Săn Coldsight"
       },
       "slagsnare_helmet": {
-        "name": "Slagsnare Cowl"
+        "name": "Mũ Trùm Bẫy Xỉ"
       },
       "slagsnare_shoulder": {
-        "name": "Slagsnare Spaulders"
+        "name": "Giáp Vai Bẫy Xỉ"
       },
       "slagsnare_chest": {
-        "name": "Slagsnare Tunic"
+        "name": "Áo Thun Bẫy Xỉ"
       },
       "slagsnare_gloves": {
-        "name": "Slagsnare Grips"
+        "name": "Găng Tay Bẫy Xỉ"
       },
       "slagsnare_legs": {
-        "name": "Slagsnare Breeches"
+        "name": "Quần Ống Bẫy Xỉ"
       },
       "cinderfang_helmet": {
-        "name": "Cinderfang Cowl"
+        "name": "Mũ Trùm Cinderfang"
       },
       "cinderfang_shoulder": {
-        "name": "Cinderfang Spaulders"
+        "name": "Giáp Vai Cinderfang"
       },
       "cinderfang_chest": {
-        "name": "Cinderfang Tunic"
+        "name": "Áo Giáp Cinderfang"
       },
       "cinderfang_gloves": {
-        "name": "Cinderfang Grips"
+        "name": "Găng Tay Cinderfang"
       },
       "cinderfang_legs": {
-        "name": "Cinderfang Breeches"
+        "name": "Quần Ống Cinderfang"
       },
       "smolderstrike_helmet": {
-        "name": "Smolderstrike Cowl"
+        "name": "Mũ Trùm Đòn Đánh Âm Ỉ"
       },
       "smolderstrike_shoulder": {
-        "name": "Smolderstrike Spaulders"
+        "name": "Giáp Vai Đòn Đánh Âm Ỉ"
       },
       "smolderstrike_chest": {
-        "name": "Smolderstrike Tunic"
+        "name": "Áo Chẽn Đòn Đánh Âm Ỉ"
       },
       "smolderstrike_gloves": {
-        "name": "Smolderstrike Grips"
+        "name": "Găng Tay Đòn Đánh Âm Ỉ"
       },
       "smolderstrike_legs": {
-        "name": "Smolderstrike Breeches"
+        "name": "Quần Ống Túm Đòn Đánh Âm Ỉ"
       },
       "ashveil_helmet": {
-        "name": "Ashveil Cowl"
+        "name": "Mũ Trùm Ashveil"
       },
       "ashveil_shoulder": {
-        "name": "Ashveil Spaulders"
+        "name": "Giáp Vai Ashveil"
       },
       "ashveil_chest": {
-        "name": "Ashveil Tunic"
+        "name": "Áo Giáp Ashveil"
       },
       "ashveil_gloves": {
-        "name": "Ashveil Grips"
+        "name": "Găng Tay Ashveil"
       },
       "ashveil_legs": {
-        "name": "Ashveil Breeches"
+        "name": "Quần Ống Ashveil"
       },
       "emberscreed_helmet": {
-        "name": "Creed of Embers Hood"
+        "name": "Mũ Trùm Tín Điều Tàn Than"
       },
       "emberscreed_shoulder": {
-        "name": "Creed of Embers Mantle"
+        "name": "Áo Choàng Vai Tín Điều Tàn Than"
       },
       "emberscreed_chest": {
-        "name": "Creed of Embers Robe"
+        "name": "Áo Choàng Tín Điều Tàn Than"
       },
       "emberscreed_gloves": {
-        "name": "Creed of Embers Handwraps"
+        "name": "Băng Tay Tín Điều Tàn Than"
       },
       "emberscreed_legs": {
-        "name": "Creed of Embers Leggings"
+        "name": "Quần Legging Tín Điều Tàn Than"
       },
       "benison_dawnweave_helmet": {
-        "name": "Dawnweave Hood"
+        "name": "Mũ Trùm Dawnweave"
       },
       "benison_dawnweave_shoulder": {
-        "name": "Dawnweave Mantle"
+        "name": "Áo Choàng Vai Dawnweave"
       },
       "benison_dawnweave_chest": {
-        "name": "Dawnweave Robe"
+        "name": "Pháp Bào Dawnweave"
       },
       "benison_dawnweave_gloves": {
-        "name": "Dawnweave Handwraps"
+        "name": "Băng Tay Dawnweave"
       },
       "benison_dawnweave_legs": {
-        "name": "Dawnweave Leggings"
+        "name": "Quần Legging Dawnweave"
       },
       "vesperash_helmet": {
-        "name": "Vesperash Hood"
+        "name": "Mũ Trùm Tro Chạng Vạng"
       },
       "vesperash_shoulder": {
-        "name": "Vesperash Mantle"
+        "name": "Áo Choàng Vai Tro Chạng Vạng"
       },
       "vesperash_chest": {
-        "name": "Vesperash Robe"
+        "name": "Áo Choàng Tro Chạng Vạng"
       },
       "vesperash_gloves": {
-        "name": "Vesperash Handwraps"
+        "name": "Băng Tay Tro Chạng Vạng"
       },
       "vesperash_legs": {
-        "name": "Vesperash Leggings"
+        "name": "Quần Legging Tro Chạng Vạng"
       },
       "stormkindled_helmet": {
-        "name": "Stormkindled Helm"
+        "name": "Mũ Sắt Gọi Bão"
       },
       "stormkindled_shoulder": {
-        "name": "Stormkindled Pauldrons"
+        "name": "Giáp Vai Gọi Bão"
       },
       "stormkindled_chest": {
-        "name": "Stormkindled Hauberk"
+        "name": "Giáp Hauberk Gọi Bão"
       },
       "stormkindled_gloves": {
-        "name": "Stormkindled Gauntlets"
+        "name": "Găng Sắt Gọi Bão"
       },
       "stormkindled_legs": {
-        "name": "Stormkindled Legguards"
+        "name": "Giáp Chân Gọi Bão"
       },
       "warspirit_emberscale_helmet": {
-        "name": "Emberscale Helm"
+        "name": "Mũ Sắt Vảy Tàn Hỏa"
       },
       "warspirit_emberscale_shoulder": {
-        "name": "Emberscale Pauldrons"
+        "name": "Giáp Vai Vảy Tàn Hỏa"
       },
       "warspirit_emberscale_chest": {
-        "name": "Emberscale Hauberk"
+        "name": "Giáp Hauberk Vảy Tàn Hỏa"
       },
       "warspirit_emberscale_gloves": {
-        "name": "Emberscale Gauntlets"
+        "name": "Găng Sắt Vảy Tàn Hỏa"
       },
       "warspirit_emberscale_legs": {
-        "name": "Emberscale Legguards"
+        "name": "Giáp Chân Vảy Tàn Hỏa"
       },
       "stonehearth_helmet": {
-        "name": "Stonehearth Helm"
+        "name": "Mũ Sắt Tâm Đá"
       },
       "stonehearth_shoulder": {
-        "name": "Stonehearth Pauldrons"
+        "name": "Giáp Vai Tâm Đá"
       },
       "stonehearth_chest": {
-        "name": "Stonehearth Hauberk"
+        "name": "Giáp Hauberk Tâm Đá"
       },
       "stonehearth_gloves": {
-        "name": "Stonehearth Gauntlets"
+        "name": "Găng Sắt Tâm Đá"
       },
       "stonehearth_legs": {
-        "name": "Stonehearth Legguards"
+        "name": "Giáp Chân Tâm Đá"
       },
       "springmender_helmet": {
-        "name": "Springmender Helm"
+        "name": "Mũ Sắt Người Chữa Suối"
       },
       "springmender_shoulder": {
-        "name": "Springmender Pauldrons"
+        "name": "Giáp Vai Người Chữa Suối"
       },
       "springmender_chest": {
-        "name": "Springmender Hauberk"
+        "name": "Giáp Hauberk Người Chữa Suối"
       },
       "springmender_gloves": {
-        "name": "Springmender Gauntlets"
+        "name": "Găng Sắt Người Chữa Suối"
       },
       "springmender_legs": {
-        "name": "Springmender Legguards"
+        "name": "Giáp Chân Người Chữa Suối"
       },
       "chronoweave_helmet": {
-        "name": "Aetherweave Hood"
+        "name": "Mũ Trùm Aetherweave"
       },
       "chronoweave_shoulder": {
-        "name": "Aetherweave Mantle"
+        "name": "Áo Choàng Vai Aetherweave"
       },
       "chronoweave_chest": {
-        "name": "Aetherweave Robe"
+        "name": "Pháp Bào Aetherweave"
       },
       "chronoweave_gloves": {
-        "name": "Aetherweave Handwraps"
+        "name": "Băng Tay Aetherweave"
       },
       "chronoweave_legs": {
-        "name": "Aetherweave Leggings"
+        "name": "Quần Legging Aetherweave"
       },
       "pyroclast_helmet": {
-        "name": "Pyroclast Hood"
+        "name": "Mũ Trùm Pyroclast"
       },
       "pyroclast_shoulder": {
-        "name": "Pyroclast Mantle"
+        "name": "Áo Choàng Vai Pyroclast"
       },
       "pyroclast_chest": {
-        "name": "Pyroclast Robe"
+        "name": "Áo Choàng Pyroclast"
       },
       "pyroclast_gloves": {
-        "name": "Pyroclast Handwraps"
+        "name": "Băng Tay Pyroclast"
       },
       "pyroclast_legs": {
-        "name": "Pyroclast Leggings"
+        "name": "Quần Ống Pyroclast"
       },
       "frostquench_helmet": {
-        "name": "Frostquench Hood"
+        "name": "Mũ Trùm Dập Băng"
       },
       "frostquench_shoulder": {
-        "name": "Frostquench Mantle"
+        "name": "Áo Choàng Vai Dập Băng"
       },
       "frostquench_chest": {
-        "name": "Frostquench Robe"
+        "name": "Áo Choàng Dập Băng"
       },
       "frostquench_gloves": {
-        "name": "Frostquench Handwraps"
+        "name": "Băng Tay Dập Băng"
       },
       "frostquench_legs": {
-        "name": "Frostquench Leggings"
+        "name": "Quần Legging Dập Băng"
       },
       "hexthread_helmet": {
-        "name": "Hexthread Hood"
+        "name": "Mũ Trùm Sợi Chỉ Nguyền"
       },
       "hexthread_shoulder": {
-        "name": "Hexthread Mantle"
+        "name": "Áo Choàng Vai Sợi Chỉ Nguyền"
       },
       "hexthread_chest": {
-        "name": "Hexthread Robe"
+        "name": "Áo Choàng Sợi Chỉ Nguyền"
       },
       "hexthread_gloves": {
-        "name": "Hexthread Handwraps"
+        "name": "Băng Tay Sợi Chỉ Nguyền"
       },
       "hexthread_legs": {
-        "name": "Hexthread Leggings"
+        "name": "Quần Legging Sợi Chỉ Nguyền"
       },
       "gravebrand_helmet": {
-        "name": "Gravebrand Hood"
+        "name": "Mũ Trùm Dấu Ấn Mộ Phần"
       },
       "gravebrand_shoulder": {
-        "name": "Gravebrand Mantle"
+        "name": "Áo Choàng Vai Dấu Ấn Mộ Phần"
       },
       "gravebrand_chest": {
-        "name": "Gravebrand Robe"
+        "name": "Áo Choàng Dấu Ấn Mộ Phần"
       },
       "gravebrand_gloves": {
-        "name": "Gravebrand Handwraps"
+        "name": "Băng Tay Dấu Ấn Mộ Phần"
       },
       "gravebrand_legs": {
-        "name": "Gravebrand Leggings"
+        "name": "Quần Legging Dấu Ấn Mộ Phần"
       },
       "ruincaller_helmet": {
-        "name": "Ruincaller Hood"
+        "name": "Mũ Trùm Kẻ Gọi Tàn Phá"
       },
       "ruincaller_shoulder": {
-        "name": "Ruincaller Mantle"
+        "name": "Áo Choàng Vai Kẻ Gọi Tàn Phá"
       },
       "ruincaller_chest": {
-        "name": "Ruincaller Robe"
+        "name": "Áo Choàng Kẻ Gọi Tàn Phá"
       },
       "ruincaller_gloves": {
-        "name": "Ruincaller Handwraps"
+        "name": "Băng Tay Kẻ Gọi Tàn Phá"
       },
       "ruincaller_legs": {
-        "name": "Ruincaller Leggings"
+        "name": "Quần Ống Kẻ Gọi Tàn Phá"
       },
       "moonscorch_helmet": {
-        "name": "Moonscorch Cowl"
+        "name": "Mũ Trùm Cháy Xém Trăng"
       },
       "moonscorch_shoulder": {
-        "name": "Moonscorch Spaulders"
+        "name": "Giáp Vai Cháy Xém Trăng"
       },
       "moonscorch_chest": {
-        "name": "Moonscorch Tunic"
+        "name": "Áo Chẽn Cháy Xém Trăng"
       },
       "moonscorch_gloves": {
-        "name": "Moonscorch Grips"
+        "name": "Găng Tay Cháy Xém Trăng"
       },
       "moonscorch_legs": {
-        "name": "Moonscorch Breeches"
+        "name": "Quần Ống Túm Cháy Xém Trăng"
       },
       "wildfang_emberhide_helmet": {
-        "name": "Wildfang Cowl"
+        "name": "Mũ Trùm Nanh Hoang"
       },
       "wildfang_emberhide_shoulder": {
-        "name": "Wildfang Spaulders"
+        "name": "Giáp Vai Nanh Hoang"
       },
       "wildfang_emberhide_chest": {
-        "name": "Wildfang Tunic"
+        "name": "Áo Dài Da Tàn Hỏa Nanh Hoang"
       },
       "wildfang_emberhide_gloves": {
-        "name": "Wildfang Grips"
+        "name": "Găng Tay Nanh Hoang"
       },
       "wildfang_emberhide_legs": {
-        "name": "Wildfang Breeches"
+        "name": "Quần Nanh Hoang"
       },
       "cinderbark_helmet": {
-        "name": "Cinderbark Cowl"
+        "name": "Mũ Trùm Cinderbark"
       },
       "cinderbark_shoulder": {
-        "name": "Cinderbark Spaulders"
+        "name": "Giáp Vai Cinderbark"
       },
       "cinderbark_chest": {
-        "name": "Cinderbark Tunic"
+        "name": "Áo Giáp Cinderbark"
       },
       "cinderbark_gloves": {
-        "name": "Cinderbark Grips"
+        "name": "Găng Tay Cinderbark"
       },
       "cinderbark_legs": {
-        "name": "Cinderbark Breeches"
+        "name": "Quần Ống Cinderbark"
       },
       "grovespring_helmet": {
-        "name": "Grovespring Cowl"
+        "name": "Mũ Trùm Suối Rừng"
       },
       "grovespring_shoulder": {
-        "name": "Grovespring Spaulders"
+        "name": "Giáp Vai Suối Rừng"
       },
       "grovespring_chest": {
-        "name": "Grovespring Tunic"
+        "name": "Áo Chẽn Suối Rừng"
       },
       "grovespring_gloves": {
-        "name": "Grovespring Grips"
+        "name": "Găng Tay Suối Rừng"
       },
       "grovespring_legs": {
-        "name": "Grovespring Breeches"
+        "name": "Quần Ống Túm Suối Rừng"
       },
       "sigil_anvil_helmet": {
-        "name": "Helm Sigil of the Anvil"
+        "name": "Ấn Mũ Đe Rèn"
       },
       "sigil_ember_helmet": {
-        "name": "Helm Sigil of the Ember"
+        "name": "Ấn Mũ Tàn Hỏa"
       },
       "sigil_tempest_helmet": {
-        "name": "Helm Sigil of the Tempest"
+        "name": "Ấn Mũ Bão Tố"
       },
       "sigil_anvil_shoulder": {
-        "name": "Mantle Sigil of the Anvil"
+        "name": "Ấn Áo Choàng Vai Đe Rèn"
       },
       "sigil_ember_shoulder": {
-        "name": "Mantle Sigil of the Ember"
+        "name": "Ấn Áo Choàng Vai Tàn Hỏa"
       },
       "sigil_tempest_shoulder": {
-        "name": "Mantle Sigil of the Tempest"
+        "name": "Ấn Áo Choàng Vai Bão Tố"
       },
       "sigil_anvil_chest": {
-        "name": "Robe Sigil of the Anvil"
+        "name": "Ấn Áo Choàng Đe Rèn"
       },
       "sigil_ember_chest": {
-        "name": "Robe Sigil of the Ember"
+        "name": "Ấn Áo Choàng Tàn Hỏa"
       },
       "sigil_tempest_chest": {
-        "name": "Robe Sigil of the Tempest"
+        "name": "Ấn Áo Choàng Bão Tố"
       },
       "sigil_anvil_gloves": {
-        "name": "Grip Sigil of the Anvil"
+        "name": "Ấn Găng Tay Đe Rèn"
       },
       "sigil_ember_gloves": {
-        "name": "Grip Sigil of the Ember"
+        "name": "Ấn Găng Tay Tàn Hỏa"
       },
       "sigil_tempest_gloves": {
-        "name": "Grip Sigil of the Tempest"
+        "name": "Ấn Găng Tay Bão Tố"
       },
       "sigil_anvil_legs": {
-        "name": "Legging Sigil of the Anvil"
+        "name": "Ấn Quần Ống Đe Rèn"
       },
       "sigil_ember_legs": {
-        "name": "Legging Sigil of the Ember"
+        "name": "Ấn Quần Ống Tàn Hỏa"
       },
       "sigil_tempest_legs": {
-        "name": "Legging Sigil of the Tempest"
+        "name": "Ấn Quần Ống Bão Tố"
       },
       "cord_of_the_last_flame": {
-        "name": "Cord of the Last Flame"
+        "name": "Dây Thừng Ngọn Lửa Cuối Cùng"
       },
       "cindersoaked_slippers": {
-        "name": "Cindersoaked Slippers"
+        "name": "Hài Ngấm Tro"
       },
       "springbinder_sash": {
-        "name": "Springbinder Sash"
+        "name": "Đai Buộc Suối Nguồn"
       },
       "steps_of_quiet_water": {
-        "name": "Steps of Quiet Water"
+        "name": "Bước Chân Nước Tĩnh Lặng"
       },
       "cinderbark_cinch": {
-        "name": "Cinderbark Cinch"
+        "name": "Đai Cinderbark"
       },
       "ashenbark_treads": {
-        "name": "Ashenbark Treads"
+        "name": "Giày Vỏ Tro"
       },
       "slagstalker_belt": {
-        "name": "Slagstalker Belt"
+        "name": "Đai Kẻ Săn Xỉ"
       },
       "ashrunner_boots": {
-        "name": "Ashrunner Boots"
+        "name": "Ủng Kẻ Chạy Tro"
       },
       "moonscorch_waistwrap": {
-        "name": "Moonscorch Waistwrap"
+        "name": "Khăn Quấn Eo Cháy Xém Trăng"
       },
       "scorchgrove_striders": {
-        "name": "Scorchgrove Striders"
+        "name": "Giày Sải Bước Rừng Cháy"
       },
       "grovetender_belt": {
-        "name": "Grovetender Belt"
+        "name": "Đai Người Chăm Rừng"
       },
       "dewfall_moccasins": {
-        "name": "Dewfall Moccasins"
+        "name": "Giày Da Sương Rơi"
       },
       "forgewall_girdle": {
-        "name": "Forgewall Girdle"
+        "name": "Đai Thành Lũy Lò Rèn"
       },
       "anvilstance_sabatons": {
-        "name": "Anvilstance Sabatons"
+        "name": "Giày Sabaton Thế Đe"
       },
       "warforged_waistguard": {
-        "name": "Warforged Waistguard"
+        "name": "Giáp Eo Rèn Cho Chiến Tranh"
       },
       "furnace_march_greaves": {
-        "name": "Furnace March Greaves"
+        "name": "Giáp Ống Chân Hành Quân Lò Luyện"
       },
       "stormkindled_chain": {
-        "name": "Stormkindled Chain"
+        "name": "Xích Gọi Bão"
       },
       "thundershock_treads": {
-        "name": "Thundershock Treads"
+        "name": "Giày Sấm Sét"
       },
       "tidebinder_links": {
-        "name": "Tidebinder Links"
+        "name": "Mắt Xích Buộc Thủy Triều"
       },
       "springwarden_sabatons": {
-        "name": "Springwarden Sabatons"
+        "name": "Giày Sắt Hộ Vệ Suối"
       },
       "pendant_of_the_first_tempering": {
-        "name": "Pendant of the First Tempering"
+        "name": "Mặt Dây Chuyền Tôi Luyện Đầu Tiên"
       },
       "ignivars_ember_choker": {
-        "name": "Ignivar's Ember Choker"
+        "name": "Vòng Cổ Tàn Than Của Ignivar"
       },
       "locket_of_the_last_flame": {
-        "name": "Locket of the Last Flame"
+        "name": "Mặt Dây Chuyền Ngọn Lửa Cuối Cùng"
       },
       "heartspring_amulet": {
-        "name": "Heartspring Amulet"
+        "name": "Bùa Hộ Mệnh Suối Tâm"
       },
       "seal_of_the_forgewall": {
-        "name": "Seal of the Forgewall"
+        "name": "Ấn Ký Tường Lò Rèn"
       },
       "band_of_marked_strikes": {
-        "name": "Band of Marked Strikes"
+        "name": "Nhẫn Đòn Đánh Định Dấu"
       },
       "circle_of_cinders": {
-        "name": "Circle of Cinders"
+        "name": "Vòng Tro Tàn"
       },
       "loop_of_quiet_springs": {
-        "name": "Loop of Quiet Springs"
+        "name": "Vòng Suối Tĩnh Lặng"
       },
       "bulwark_of_the_inner_crucible": {
-        "name": "Bulwark of the Inner Crucible"
+        "name": "Thành Trì Lò Luyện Nội Tâm"
       },
       "ember_wardens_barrier": {
-        "name": "Ember Warden's Barrier"
+        "name": "Khiên Hộ Vệ Tàn Than"
       },
       "orb_of_the_last_spring": {
-        "name": "Orb of the Last Spring"
+        "name": "Quả Cầu Suối Nguồn Cuối Cùng"
       },
       "cinder_of_the_first_design": {
-        "name": "Cinder of the First Design"
+        "name": "Than Hồng Thiết Kế Đầu Tiên"
       },
       "forgefathers_warhammer": {
-        "name": "Forgefather's Warhammer"
+        "name": "Búa Chiến Của Bậc Thầy Lò Rèn"
       },
       "cinderfang_kris": {
-        "name": "Cinderfang Kris"
+        "name": "Dao Găm Kris Cinderfang"
       },
       "slagrender_cleaver": {
-        "name": "Slagrender Cleaver"
+        "name": "Dao Phay Xé Xỉ"
       },
       "anvilguard_blade": {
-        "name": "Anvilguard Blade"
+        "name": "Kiếm Hộ Vệ Anvil"
       },
       "heart_of_the_end_greatblade": {
-        "name": "Heart of the End Greatblade"
+        "name": "Đại Kiếm Trái Tim Tận Cùng"
       },
       "staff_of_the_last_spring": {
-        "name": "Staff of the Last Spring"
+        "name": "Trượng Suối Nguồn Cuối Cùng"
       },
       "forgefire_spire": {
-        "name": "Forgefire Spire"
+        "name": "Tháp Lửa Lò Rèn"
       },
       "springtouched_crozier": {
-        "name": "Springtouched Crozier"
+        "name": "Gậy Quyền Trượng Chạm Suối"
       },
       "wand_of_quenched_sparks": {
-        "name": "Wand of Quenched Sparks"
+        "name": "Đũa Tia Lửa Đã Dập Tắt"
       },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"
@@ -14670,10 +14670,10 @@ export const vi_VN: EnTranslations = {
         "name": "Dây cương Gà Tây Chúa Sải Bước Sấm"
       },
       "varkhul_forgebreaker": {
-        "name": "Forgebreaker, Engine of Varkhul"
+        "name": "Kẻ Phá Lò, Cỗ Máy Của Varkhul"
       },
       "varkhul_emberward": {
-        "name": "Emberward, Bulwark of Varkhul"
+        "name": "Hộ Vệ Tàn Than, Thành Lũy Của Varkhul"
       }
     },
     "mobs": {
@@ -14870,25 +14870,25 @@ export const vi_VN: EnTranslations = {
         "name": "Nythraxis, Tai Họa Đỉnh Gai"
       },
       "ignivar_herald_of_the_last_flame": {
-        "name": "Ignivar, Herald of the Last Flame"
+        "name": "Ignivar, Sứ Giả Ngọn Lửa Cuối Cùng"
       },
       "ignivar_heart_of_the_end": {
-        "name": "Ignivar Ashcaller"
+        "name": "Ignivar, Kẻ Gọi Tro"
       },
       "ignivar_ember_sentinel": {
-        "name": "Ember Sentinel"
+        "name": "Vệ Binh Tàn Hỏa"
       },
       "ignivar_crucible_warden": {
-        "name": "Crucible Warden"
+        "name": "Kẻ Canh Lò Luyện"
       },
       "ignivar_cinder_artificer": {
-        "name": "Cinder Artificer"
+        "name": "Thợ Chế Tác Tro Tàn"
       },
       "varkhul_forgefather_of_the_last_flame": {
-        "name": "Varkhul, Forgefather of the Last Flame"
+        "name": "Varkhul, Tổ Phụ Lò Rèn của Ngọn Lửa Cuối Cùng"
       },
       "derelict_mech": {
-        "name": "Derelict Mech"
+        "name": "Cỗ Máy Bị Bỏ Hoang"
       },
       "reliquary_ledger_wraith": {
         "name": "Oan Hồn Sổ Sách"
@@ -15551,19 +15551,19 @@ export const vi_VN: EnTranslations = {
         "greeting": "Từ sân nhà nguyện ở Thung Lũng đến nóc nhà của thế giới... con đường ta lần theo kết thúc tại đây. Ta cảm nhận được ngọn núi đang lắng nghe."
       },
       "archivist_maelin_emberward": {
-        "name": "Archivist Maelin Emberward",
-        "title": "Crucible Archivist",
-        "greeting": "Every hammer mark in this place is a sentence. Help me read what Varkhul tried to hide."
+        "name": "Thủ Thư Maelin Emberward",
+        "title": "Thủ Thư Lò Luyện",
+        "greeting": "Mỗi dấu búa nơi đây là một câu văn. Hãy giúp ta đọc điều Varkhul cố che giấu."
       },
       "archivist_maelin_ember_projection": {
-        "name": "Maelin's Ember Projection",
-        "title": "Ember Projection",
-        "greeting": "The embers carry Maelin's voice forward through the forge."
+        "name": "Ảo Ảnh Tàn Lửa của Maelin",
+        "title": "Ảo Ảnh Tàn Lửa",
+        "greeting": "Những tàn lửa truyền giọng nói của Maelin qua lò rèn đến nơi này."
       },
       "crucible_quartermaster": {
-        "name": "Quartermaster Bronn Emberward",
-        "title": "Crucible Quartermaster",
-        "greeting": "The forge marks its own. Bring me a sigil from the Crucible and I will fit you for war."
+        "name": "Quản Kho Bronn Emberward",
+        "title": "Quản Kho Lò Luyện",
+        "greeting": "Lò rèn nhận ra người của mình. Mang cho ta một ấn hiệu từ Lò Luyện, ta sẽ trang bị cho ngươi bước vào chiến tranh."
       },
       "brother_halven": {
         "name": "Tu Huynh Halven",
@@ -16714,35 +16714,35 @@ export const vi_VN: EnTranslations = {
         }
       },
       "q_ignivar_echoes_in_iron": {
-        "title": "Echoes in Iron",
-        "text": "These automata are not soldiers. They are drafts. Break each assembly line and listen when the final shell falls. The forge remembers what Varkhul tried to erase.",
-        "completion": "The echoes agree. Varkhul bound water from the dying Last Spring into living metal. These automatons were failed temperings. Only Ignivar endured.",
+        "title": "Tiếng Vọng Trong Sắt",
+        "text": "Những cỗ máy này không phải binh lính. Chúng chỉ là bản nháp. Hãy phá từng dây chuyền lắp ráp và lắng nghe khi lớp vỏ cuối cùng rơi xuống. Lò rèn vẫn nhớ điều Varkhul cố xóa bỏ.",
+        "completion": "Những tiếng vọng đã đồng thuận. Varkhul đã giam nước từ Suối Cuối Cùng đang hấp hối vào kim loại sống. Những cỗ máy này là những lần tôi luyện thất bại. Chỉ Ignivar sống sót.",
         "objectives": {
           "0": {
-            "label": "Ember Sentinels destroyed"
+            "label": "Đã tiêu diệt Vệ Binh Tàn Hỏa"
           },
           "1": {
-            "label": "Crucible Wardens destroyed"
+            "label": "Đã tiêu diệt Kẻ Canh Lò Luyện"
           }
         }
       },
       "q_ignivar_heralds_heart": {
-        "title": "The Herald's Heart",
-        "text": "The survivor named in every echo is Ignivar. Varkhul called him herald, seal, and key. Defeat him. If the records are true, his death will reveal what he was forged to guard.",
-        "completion": "Ignivar was never merely a guardian. His heart was the key, and its final plates opened the sealed crucible below.",
+        "title": "Trái Tim của Sứ Giả",
+        "text": "Kẻ sống sót được nhắc đến trong mọi tiếng vọng là Ignivar. Varkhul gọi hắn là sứ giả, phong ấn và chìa khóa. Hãy đánh bại hắn. Nếu ghi chép là thật, cái chết của hắn sẽ hé lộ điều hắn được rèn ra để canh giữ.",
+        "completion": "Ignivar chưa bao giờ chỉ là một người canh giữ. Trái tim hắn là chìa khóa, và những phiến giáp cuối cùng đã mở lò luyện bị phong ấn bên dưới.",
         "objectives": {
           "0": {
-            "label": "Ignivar defeated"
+            "label": "Đã đánh bại Ignivar"
           }
         }
       },
       "q_ignivar_the_forgefather": {
-        "title": "The Forgefather",
-        "text": "The path below leads to Varkhul, Forgefather of the Last Flame. He imprisoned the Last Spring to make metal live, then forged Ignivar to keep the crime sealed. Enter the Inner Crucible and end his work.",
-        "completion": "The forge is silent at last. The spring may never recover, but Varkhul will shape no more lives into chains.",
+        "title": "Tổ Phụ Lò Rèn",
+        "text": "Con đường phía dưới dẫn đến Varkhul, Tổ Phụ Lò Rèn của Ngọn Lửa Cuối Cùng. Hắn đã giam giữ Suối Cuối Cùng để khiến kim loại sống dậy, rồi rèn Ignivar để che giấu tội ác đó. Hãy bước vào Lò Luyện Nội Tâm và chấm dứt công việc của hắn.",
+        "completion": "Cuối cùng lò rèn cũng im tiếng. Có lẽ Suối sẽ không bao giờ hồi phục, nhưng Varkhul sẽ không thể nhào nặn thêm sinh mạng nào thành xiềng xích nữa.",
         "objectives": {
           "0": {
-            "label": "Varkhul defeated"
+            "label": "Đã đánh bại Varkhul"
           }
         }
       },
@@ -18624,29 +18624,29 @@ export const vi_VN: EnTranslations = {
         "leaveText": "Bạn trở lại không khí lạnh giá của Đỉnh Gai."
       },
       "ignivar_forge_lift": {
-        "name": "The Forge-Lift",
-        "enterText": "The forge-lift shudders and sinks; hammerfall rises to meet you.",
-        "leaveText": "The lift hauls you back into the open air of the keep."
+        "name": "Thang máy lò rèn",
+        "enterText": "Thang máy lò rèn rung chuyển rồi hạ xuống, tiếng búa dội lên đón bạn.",
+        "leaveText": "Thang máy đưa bạn trở lại không gian thoáng đãng của thành trì."
       },
       "ignivar_forge_approach": {
-        "name": "Halls of the First Tempering",
-        "enterText": "Hammerfall echoes through the Halls of the First Tempering.",
-        "leaveText": "You step away from the first forge and breathe freely again."
+        "name": "Đại Sảnh Tôi Luyện Đầu Tiên",
+        "enterText": "Tiếng búa vọng qua Đại Sảnh Tôi Luyện Đầu Tiên.",
+        "leaveText": "Bạn rời lò rèn đầu tiên và lại hít thở tự do."
       },
       "ignivar_raid_arena": {
-        "name": "Crucible of the Last Spring",
-        "enterText": "Heat shimmers above the sealed waters of the Crucible.",
-        "leaveText": "You step away from the Crucible and breathe freely again."
+        "name": "Crucible của Suối Nguồn Cuối Cùng",
+        "enterText": "Hơi nóng lung linh phía trên dòng nước bị phong ấn của Lò Luyện.",
+        "leaveText": "Bạn rời khỏi Lò Luyện và lại hít thở tự do."
       },
       "ignivar_molten_assembly": {
-        "name": "Molten Assembly",
-        "enterText": "The opened gate leads into a molten assembly hall.",
-        "leaveText": "You leave the assembly line and return to the Crucible."
+        "name": "Xưởng lắp ráp nóng chảy",
+        "enterText": "Cánh cổng mở ra dẫn vào một đại sảnh lắp ráp nóng chảy.",
+        "leaveText": "Bạn rời dây chuyền lắp ráp và trở lại Lò Luyện."
       },
       "ignivar_inner_crucible": {
-        "name": "The Inner Crucible",
-        "enterText": "The opened gate leads deeper into the Crucible.",
-        "leaveText": "You leave the silent depths of the Crucible."
+        "name": "Crucible bên trong",
+        "enterText": "Cánh cổng mở ra dẫn sâu hơn vào Lò Luyện.",
+        "leaveText": "Bạn rời khỏi những tầng sâu im lặng của Lò Luyện."
       },
       "wildheart_basin": {
         "name": "Lòng Chảo Trái Tim Hoang Dã",
@@ -18880,182 +18880,182 @@ export const vi_VN: EnTranslations = {
     },
     "itemSets": {
       "ashveil": {
-        "name": "Ashveil Garb",
-        "bonus2": "Lurker's Strike hits 25 percent harder.",
-        "bonus4": "Your Veiled Edge strike hits for triple, up from double."
+        "name": "Trang Phục Tro Mờ",
+        "bonus2": "Đòn Đánh Kẻ Ẩn Nấp gây thêm 25% sát thương.",
+        "bonus4": "Đòn đánh Lưỡi Kiếm Che Mạng gây sát thương gấp ba thay vì gấp đôi."
       },
       "benison_dawnweave": {
-        "name": "Benison Dawnweave",
-        "bonus2": "Seraphic Vigil's rescue heals for 270, up from 180. Damage taken no longer delays your spellcasting.",
-        "bonus4": "When Seraphic Vigil triggers, its ally is also mended for 15 percent of their maximum health over 10 sec."
+        "name": "Phúc Lành Dệt Bình Minh",
+        "bonus2": "Lần cứu viện của Cảnh Giác Seraph hồi 270 thay vì 180. Sát thương nhận vào không còn trì hoãn việc niệm phép.",
+        "bonus4": "Khi Cảnh Giác Seraph kích hoạt, đồng minh của bạn cũng được hồi 15% máu tối đa trong 10 giây."
       },
       "boundstone_vanguard": {
         "name": "Bộ Tiên Phong Đá Trói",
         "bonus3": "Tăng tốc độ tấn công cùng thi triển thêm 15%."
       },
       "chronoweave": {
-        "name": "Aetherweave Vestments",
-        "bonus2": "Temporal Echo converts 50 percent of your single-target Arcane damage into healing. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Temporal Cascade's cooldown is reduced by 5 sec."
+        "name": "Lễ Phục Dệt Aether",
+        "bonus2": "Vọng Âm Thời Gian chuyển 50% sát thương Arcane đơn mục tiêu của bạn thành hồi máu. Sát thương nhận vào không còn trì hoãn việc niệm phép.",
+        "bonus4": "Thời gian hồi của Dòng Thác Thời Gian giảm 5 giây."
       },
       "cinderbark": {
-        "name": "Cinderbark Ward",
-        "bonus2": "Sweeping Claws has a 30 percent chance to bank an additional Old Blood.",
-        "bonus4": "Marrowbreak hits 30 percent harder, and its emergency guard no longer replaces the strike."
+        "name": "Hộ Vệ Vỏ Tro",
+        "bonus2": "Sweeping Claws có 30% cơ hội tích trữ thêm một Old Blood.",
+        "bonus4": "Marrowbreak gây thêm 30% sát thương, và hiệu ứng bảo hộ khẩn cấp không còn thay thế đòn đánh."
       },
       "cinderfang": {
-        "name": "Cinderfang Shroud",
-        "bonus2": "Venom Ritual's energy refund rises to 20 per builder.",
-        "bonus4": "Venom Dart's cooldown is reduced to 4 sec."
+        "name": "Áo Choàng Nanh Tro",
+        "bonus2": "Lượng năng lượng hoàn lại của Venom Ritual tăng lên 20 cho mỗi kỹ năng tạo năng lượng.",
+        "bonus4": "Thời gian hồi của Venom Dart giảm còn 4 giây."
       },
       "coldsight_trackers": {
-        "name": "Coldsight Trackers",
-        "bonus2": "Measured Shot restores 5 additional Focus.",
-        "bonus4": "Long Draw critical strikes extend Cold Focus by 2 sec, up to 6 sec per activation."
+        "name": "Thợ Săn Coldsight",
+        "bonus2": "Measured Shot hồi thêm 5 Focus.",
+        "bonus4": "Đòn chí mạng của Long Draw kéo dài Cold Focus thêm 2 giây, tối đa 6 giây mỗi lần kích hoạt."
       },
       "crownforged": {
         "name": "Bộ Lễ Phục Bonewrought",
         "bonus2": "Tăng sức mạnh tấn công thêm 40.",
         "bonus4": "Các đòn chí mạng bằng vũ khí của bạn găm Dằm Xương vào mục tiêu, khiến nó chảy máu nhận 8 sát thương mỗi 2 giây trong 12 giây. Cộng dồn tối đa 3 lần.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 5 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Tăng 4% tốc độ tấn công và thi triển, cùng 3% Hit. Đòn chí mạng bằng vũ khí của bạn khiến mục tiêu bị Bonesplinter, gây chảy máu 5 sát thương mỗi 2 giây trong 12 giây. Cộng dồn tối đa 3 lần."
       },
       "dawnforged": {
-        "name": "Dawnforged Vestments",
-        "bonus2": "Beacon of Light copies 55 percent of your direct heals. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Radiant Resonance's empowered Dawn's Embrace is instant."
+        "name": "Lễ Phục Rèn Bình Minh",
+        "bonus2": "Beacon of Light sao chép 55% lượng hồi máu trực tiếp của bạn. Sát thương phải chịu không còn làm chậm việc thi triển phép.",
+        "bonus4": "Dawn's Embrace được Radiant Resonance cường hóa sẽ được thi triển ngay lập tức."
       },
       "deathlord": {
         "name": "Bộ Chiến Barrowlord",
         "bonus2": "Tăng sức mạnh tấn công thêm 40.",
         "bonus4": "Các đòn chí mạng bằng vũ khí của bạn có 50% cơ hội ban Uy Lực Mộ Phần, tăng sức mạnh tấn công thêm 60 trong 10 giây.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 5 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Tăng 4% tốc độ tấn công và thi triển, cùng 3% Hit. Đòn chí mạng bằng vũ khí của bạn khiến mục tiêu bị Bonesplinter, gây chảy máu 5 sát thương mỗi 2 giây trong 12 giây. Cộng dồn tối đa 3 lần."
       },
       "emberfury": {
-        "name": "Emberfury Harness",
-        "bonus2": "Your Enrage lasts 6 sec instead of 4.",
-        "bonus4": "Bloodletting always Enrages you, and its healing rises to 8 percent of your maximum health."
+        "name": "Giáp Cơn Cuồng Nộ Tàn Than",
+        "bonus2": "Enrage của bạn kéo dài 6 giây thay vì 4 giây.",
+        "bonus4": "Bloodletting luôn khiến bạn Enrage, và lượng hồi máu tăng lên 8% máu tối đa."
       },
       "emberscreed": {
-        "name": "Creed of Embers Vestments",
-        "bonus2": "Your Doctrine link converts 10 percent more of your Holy damage into healing. Damage taken no longer delays your spellcasting.",
-        "bonus4": "When your Psalm of Warding is fully consumed, your next Scouring Hymn within 10 sec is instant. Cannot occur more than once every 15 sec."
+        "name": "Lễ Phục Tín Điều Tàn Than",
+        "bonus2": "Liên kết Doctrine chuyển thêm 10% sát thương Holy của bạn thành hồi máu. Sát thương phải chịu không còn làm chậm việc thi triển phép.",
+        "bonus4": "Khi Psalm of Warding được tiêu thụ hoàn toàn, Scouring Hymn tiếp theo trong 10 giây sẽ được thi triển ngay lập tức. Không thể xảy ra thường xuyên hơn một lần mỗi 15 giây."
       },
       "forgewall": {
-        "name": "Forgewall Aegis",
-        "bonus2": "Iron Resolve converts rage at 5 absorb per point instead of 4.",
-        "bonus4": "Casting Shieldcrack reduces Iron Resolve's remaining cooldown by 2 sec."
+        "name": "Khiên Aegis Thành Rèn",
+        "bonus2": "Iron Resolve chuyển hóa cơn giận với 5 điểm hấp thụ mỗi điểm thay vì 4.",
+        "bonus4": "Thi triển Shieldcrack giảm 2 giây thời gian hồi còn lại của Iron Resolve."
       },
       "frostquench": {
-        "name": "Frostquench Weave",
-        "bonus2": "Rimelance critical strikes bank a second Icicle, up to the maximum of 5. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Winterlash plants 3 Winter's Chill charges, up from 2."
+        "name": "Dệt Băng Giải Nhiệt",
+        "bonus2": "Đòn chí mạng của Rimelance tích trữ thêm một Icicle, tối đa 5. Sát thương phải chịu không còn làm chậm việc thi triển phép.",
+        "bonus4": "Winterlash đặt 3 cộng dồn Winter's Chill thay vì 2."
       },
       "gravebrand": {
-        "name": "Gravebrand Regalia",
-        "bonus2": "Reaping Command's cooldown is reduced by 2 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Reaping Command's unison strikes deal 25 percent more damage."
+        "name": "Lễ Phục Dấu Mộ",
+        "bonus2": "Thời gian hồi của Reaping Command giảm 2 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.",
+        "bonus4": "Các đòn hợp xướng của Reaping Command gây thêm 25% sát thương."
       },
       "greyjaw_stalker": {
         "name": "Bộ Kẻ Rình Rập Greyjaw",
         "bonus3": "Tăng tốc độ tấn công cùng thi triển thêm 15%."
       },
       "grovespring": {
-        "name": "Grovespring Raiment",
-        "bonus2": "Swiftmend consumes your own Wildbloom or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Overbloom harvests 75 percent of your remaining effects and banks 1 Verdance afterward."
+        "name": "Phục Trang Suối Rừng",
+        "bonus2": "Swiftmend ưu tiên tiêu thụ Wildbloom hoặc Second Bloom của bạn trước và hồi thêm 25% máu. Sát thương phải chịu không còn làm chậm việc thi triển phép.",
+        "bonus4": "Overbloom thu hoạch 75% các hiệu ứng còn lại của bạn và tích trữ 1 Verdance sau đó."
       },
       "hexthread": {
-        "name": "Hexthread Shroud",
-        "bonus2": "Needle of Fate grants 2 additional Condemnation. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Passing Sentence refunds 10 Condemnation."
+        "name": "Áo Choàng Sợi Yểm",
+        "bonus2": "Needle of Fate cho thêm 2 Condemnation. Sát thương phải chịu không còn làm chậm việc thi triển phép.",
+        "bonus4": "Passing Sentence hoàn lại 10 Condemnation."
       },
       "moonscorch": {
-        "name": "Moonscorch Raiment",
-        "bonus2": "Moonseed may extend Lunar Tempest twice per application, to a maximum of 12 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Moonsurge and Sunwake strike 25 percent harder."
+        "name": "Phục Trang Thiêu Đốt Trăng",
+        "bonus2": "Moonseed có thể kéo dài Lunar Tempest hai lần mỗi lần áp dụng, tối đa 12 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.",
+        "bonus4": "Moonsurge và Sunwake gây thêm 25% sát thương."
       },
       "necromancers": {
         "name": "Y Phục Mournweave",
         "bonus2": "Tăng sức mạnh phép thuật thêm 20. Sát thương phải chịu không còn làm chậm việc thi triển phép của bạn (kháng trì hoãn thi triển 100%).",
         "bonus4": "Các phép của bạn có 10% cơ hội ban Tâm Trí Thông Suốt, khiến phép kế tiếp của bạn được thi triển miễn phí.",
-        "bonus6": "Increases attack and casting speed by 4%. Your spells have a 10% chance to grant Soulblaze, increasing spell power by 25 for 10 sec."
+        "bonus6": "Tăng 4% tốc độ tấn công và thi triển. Phép thuật của bạn có 10% cơ hội ban Soulblaze, tăng sức mạnh phép thuật thêm 25 trong 10 giây."
       },
       "nighttalon": {
         "name": "Bộ Da Direfang",
         "bonus2": "Tăng sức mạnh tấn công thêm 40.",
         "bonus4": "Các đòn chí mạng bằng vũ khí của bạn xé ra một Vết Rách Toạc, khiến mục tiêu chảy máu nhận 6 sát thương mỗi 2 giây trong 12 giây. Cộng dồn tối đa 3 lần.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 4 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Tăng 4% tốc độ tấn công và thi triển, cùng 3% Hit. Đòn chí mạng bằng vũ khí của bạn xé một Ragged Gash, khiến mục tiêu chảy máu 4 sát thương mỗi 2 giây trong 12 giây. Cộng dồn tối đa 3 lần."
       },
       "oathpyre": {
-        "name": "Oathpyre Bastion",
-        "bonus2": "Vowkeeper Strike's chance to arm Solar Reprisal rises to 30 percent, and blocking an attack arms it 40 percent of the time.",
-        "bonus4": "Consuming Solar Reprisal shields you for 6 percent of your maximum health for 10 sec."
+        "name": "Thành Trì Lửa Thề",
+        "bonus2": "Cơ hội Vowkeeper Strike kích hoạt Solar Reprisal tăng lên 30%, và đỡ một đòn tấn công sẽ kích hoạt nó với 40% cơ hội.",
+        "bonus4": "Tiêu thụ Solar Reprisal tạo khiên cho bạn bằng 6% máu tối đa trong 10 giây."
       },
       "packlord_emberhide": {
-        "name": "Packlord's Emberhide",
-        "bonus2": "Pack Command's cooldown is reduced to 3 sec.",
-        "bonus4": "Pack Command's chance to reset Stampede's cooldown rises to 30 percent."
+        "name": "Da Ẩn Của Chúa Bầy",
+        "bonus2": "Thời gian hồi của Pack Command giảm xuống còn 3 giây.",
+        "bonus4": "Cơ hội đặt lại thời gian hồi của Stampede từ Pack Command tăng lên 30%."
       },
       "pyroclast": {
-        "name": "Pyroclast Regalia",
-        "bonus2": "Scald always critically strikes targets at or below 35 percent health. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Your Fire spells' critical strikes outside Phoenix Trance reduce its remaining cooldown by 1.5 sec."
+        "name": "Lễ Phục Hỏa Sơn",
+        "bonus2": "Scald luôn chí mạng mục tiêu còn từ 35% máu trở xuống. Sát thương phải chịu không còn làm chậm việc thi triển phép.",
+        "bonus4": "Các đòn chí mạng bằng phép Lửa ngoài Trance Phượng Hoàng giảm thời gian hồi còn lại của bạn đi 1,5 giây."
       },
       "ruincaller": {
-        "name": "Ruincaller Vestments",
-        "bonus2": "Conflagrate holds 3 charges. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Ruinbolt strikes 20 percent harder."
+        "name": "Phục Trang Kẻ Gọi Tàn Phá",
+        "bonus2": "Conflagrate tích trữ 3 lần. Sát thương phải chịu không còn làm chậm việc thi triển phép.",
+        "bonus4": "Ruinbolt gây thêm 20% sát thương."
       },
       "slagbreaker": {
-        "name": "Slagbreaker Battlegear",
-        "bonus2": "Redhand empowers your next Maiming Strike by 30 percent per stack instead of 20.",
-        "bonus4": "Every second cast of Redhand reduces Breachmaker's remaining cooldown by 3 sec."
+        "name": "Chiến Giáp Kẻ Phá Xỉ",
+        "bonus2": "Redhand cường hóa Maiming Strike tiếp theo của bạn thêm 30% mỗi cộng dồn thay vì 20%.",
+        "bonus4": "Mỗi lần thi triển Redhand thứ hai giảm thời gian hồi còn lại của Breachmaker đi 3 giây."
       },
       "slagsnare": {
-        "name": "Slagsnare Trappings",
-        "bonus2": "Gutting Strike generates 20 Focus.",
-        "bonus4": "Woundrend that consumes 3 Hunting Momentum preserves them. Cannot occur more than once every 8 sec."
+        "name": "Trang Phục Bẫy Xỉ",
+        "bonus2": "Gutting Strike tạo 20 Tập Trung.",
+        "bonus4": "Woundrend tiêu thụ 3 Hunting Momentum sẽ giữ lại chúng. Không thể xảy ra thường xuyên hơn một lần mỗi 8 giây."
       },
       "smolderstrike": {
-        "name": "Smolderstrike Leathers",
-        "bonus2": "Haymaker hits 20 percent harder.",
-        "bonus4": "Lights Out refunds 6 sec of Mirrored Blades' remaining cooldown."
+        "name": "Da Đánh Âm Ỉ",
+        "bonus2": "Haymaker gây thêm 20% sát thương.",
+        "bonus4": "Lights Out hoàn lại 6 giây thời gian hồi còn lại của Mirrored Blades."
       },
       "soulflame": {
         "name": "Lễ Phục Wraithfire",
         "bonus2": "Tăng sức mạnh phép thuật thêm 20. Sát thương phải chịu không còn làm chậm việc thi triển phép của bạn (kháng trì hoãn thi triển 100%).",
         "bonus4": "Các phép của bạn có 10% cơ hội ban Hồn Hỏa, tăng sức mạnh phép thuật thêm 40 trong 10 giây.",
-        "bonus6": "Increases attack and casting speed by 4%. Your spells have a 10% chance to grant Soulblaze, increasing spell power by 25 for 10 sec."
+        "bonus6": "Tăng 4% tốc độ tấn công và thi triển. Phép của bạn có 10% cơ hội ban Soulblaze, tăng sức mạnh phép thuật thêm 25 trong 10 giây."
       },
       "springmender": {
-        "name": "Springmender Scale",
-        "bonus2": "Tidecall's cooldown is reduced by 4 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Cascading Mend reaches a fourth ally and harvests Mending Currents at 150 percent."
+        "name": "Vảy Kẻ Chữa Suối",
+        "bonus2": "Thời gian hồi của Tidecall giảm 4 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.",
+        "bonus4": "Cascading Mend chạm tới đồng minh thứ tư và thu hoạch Mending Currents ở mức 150%."
       },
       "stonehearth": {
-        "name": "Stonehearth Bastion",
-        "bonus2": "While Stonebound, Stormcast Mending Waters costs no mana and heals 25 percent more.",
-        "bonus4": "While Stonebound, completing a cadence heals you for 3 percent of your maximum health."
+        "name": "Thành Trì Tâm Thạch",
+        "bonus2": "Khi đang Stonebound, Stormcast Mending Waters không tốn mana và hồi thêm 25% máu.",
+        "bonus4": "Khi đang Stonebound, hoàn tất một nhịp hồi cho bạn 3% máu tối đa."
       },
       "stormcallers": {
         "name": "Áo Lễ Galecall",
         "bonus2": "Tăng sức mạnh phép thuật thêm 20. Sát thương phải chịu không còn làm chậm việc thi triển phép của bạn (kháng trì hoãn thi triển 100%).",
         "bonus4": "Các phép của bạn có 10% cơ hội ban Hồn Hỏa, tăng sức mạnh phép thuật thêm 40 trong 10 giây.",
-        "bonus6": "Increases attack and casting speed by 4%. Your spells have a 10% chance to grant Soulblaze, increasing spell power by 25 for 10 sec."
+        "bonus6": "Tăng 4% tốc độ tấn công và thi triển. Phép của bạn có 10% cơ hội ban Soulblaze, tăng sức mạnh phép thuật thêm 25 trong 10 giây."
       },
       "stormkindled": {
-        "name": "Stormkindled Regalia",
-        "bonus2": "Unleash Weapon on Pyrebrand grants 3 Thunder. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Earthen Jolt's bonus per Thunder rises to 30 percent."
+        "name": "Lễ Phục Gọi Bão",
+        "bonus2": "Unleash Weapon khi có Pyrebrand ban 3 Thunder. Sát thương phải chịu không còn làm chậm việc thi triển phép.",
+        "bonus4": "Phần thưởng mỗi Thunder của Earthen Jolt tăng lên 30%."
       },
       "vale_arcanist": {
         "name": "Bộ Arcanist Thung Khê",
         "bonus3": "Tăng tốc độ tấn công cùng thi triển thêm 15%."
       },
       "vesperash": {
-        "name": "Vesperash Shroud",
-        "bonus2": "Call Tithefiend's cooldown is reduced by 6 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Calling your Tithefiend resets Mindfracture's cooldown, and the fiend returns twice as much mana per hit."
+        "name": "Khăn Choàng Tro Hoàng Hôn",
+        "bonus2": "Thời gian hồi của Call Tithefiend giảm 6 giây. Sát thương phải chịu không còn làm chậm việc thi triển phép.",
+        "bonus4": "Gọi Tithefiend đặt lại thời gian hồi của Mindfracture, và con quỷ trả lại lượng mana gấp đôi mỗi lần đánh trúng."
       },
       "warfare_ashstalker": {
         "name": "Bộ Ashstalker",
@@ -19088,25 +19088,25 @@ export const vi_VN: EnTranslations = {
         "bonus7": "Tăng Điểm Tấn Công và Phòng Thủ Chiến Tranh thêm 80. Phép của bạn có 15% cơ hội ban Hộ Vệ Gai, tăng né thêm 15% trong 6 giây."
       },
       "warspirit_emberscale": {
-        "name": "Warspirit Emberscale",
-        "bonus2": "Ancestral Strike advances your cadence 3 steps.",
-        "bonus4": "Ancestral Strike hits 30 percent harder."
+        "name": "Vảy Linh Chiến",
+        "bonus2": "Ancestral Strike đưa nhịp của bạn tiến 3 bước.",
+        "bonus4": "Ancestral Strike gây thêm 30% sát thương."
       },
       "wildfang_emberhide": {
-        "name": "Wildfang Emberhide",
-        "bonus2": "Redharvest restores 45 energy, up from 30.",
-        "bonus4": "Redharvest plants a fresh Flense on the target."
+        "name": "Da Ẩn Nanh Hoang",
+        "bonus2": "Redharvest hồi 45 năng lượng, tăng từ 30.",
+        "bonus4": "Redharvest đặt một Flense mới lên mục tiêu."
       },
       "wyrmshadow": {
         "name": "Áo Lễ Nightfang",
         "bonus2": "Tăng sức mạnh tấn công thêm 40.",
         "bonus4": "Các đòn chí mạng bằng vũ khí của bạn có 50% cơ hội ban Cuồng Nanh, tăng tốc độ tấn công thêm 25% trong 8 giây.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 4 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Tăng 4% tốc độ tấn công và thi triển, cùng 3% Hit. Đòn chí mạng bằng vũ khí của bạn xé một Ragged Gash, khiến mục tiêu chảy máu 4 sát thương mỗi 2 giây trong 12 giây. Cộng dồn tối đa 3 lần."
       },
       "zealfire": {
-        "name": "Zealfire Warplate",
-        "bonus2": "Final Edict and Dawnfall cut each other's remaining cooldown by 3 sec instead of 2.",
-        "bonus4": "Hammer of Wrath cast under Dawn's Wrath strikes 40 percent harder, up from 20."
+        "name": "Chiến Giáp Zealfire",
+        "bonus2": "Final Edict và Dawnfall cắt thời gian hồi còn lại của nhau 3 giây thay vì 2.",
+        "bonus4": "Hammer of Wrath được thi triển dưới Dawn's Wrath gây sát thương mạnh hơn 40%, tăng từ 20%."
       }
     }
   },

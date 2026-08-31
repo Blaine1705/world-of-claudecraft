@@ -14626,4 +14626,5 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.forgefire_spire.name': '화로불꽃 첨탑지팡이',
   'entities.items.springtouched_crozier.name': '샘닿은 홀장',
   'entities.items.wand_of_quenched_sparks.name': '꺼진 불꽃의 마법봉',
+  'crucibleShop.balanceEntry': '{name} x{count}',
 };
