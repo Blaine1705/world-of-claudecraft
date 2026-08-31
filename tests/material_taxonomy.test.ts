@@ -13,6 +13,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS } from '../src/sim/content/crucible_professions';
 import { ENCHANTS } from '../src/sim/content/enchants';
 import {
   HARVEST_COMPONENT_ITEMS,
@@ -66,6 +67,7 @@ const HONEST_MATERIALS = [
   'homespun_cloth',
   'iron_ore',
   'ironbark_log',
+  'lastflame_core',
   'linen_scrap',
   'prime_cut',
   'pristine_claw',
@@ -110,11 +112,6 @@ const ALLOWED_UNCLASSIFIED_JUNK = [
   'gleamstag_charm',
   'guardian_core',
   'last_keep_signet',
-  // Staged AHEAD of its recipes (the professions fast-follow, PR 3704): the
-  // Core of the Last Flame drops now so crafters bank it, and the moment a
-  // recipe consumes it the derivation classifies it IN and this row must
-  // move to the classified list (3704 carries exactly that move).
-  'lastflame_core',
   'old_cragmaws_pelt',
 ] as const;
 
@@ -290,6 +287,13 @@ describe('MATERIAL_ITEM_IDS: every source table is fully represented', () => {
     expect(junkReagents).toBeGreaterThan(30);
   });
 
+  it('contains every recipe-pending material', () => {
+    expect(CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS.length).toBeGreaterThan(0);
+    for (const id of CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS) {
+      expect(MATERIAL_ITEM_IDS.has(id), id).toBe(true);
+    }
+  });
+
   it('contains every disenchant output (the one source reached only via the reagent union)', () => {
     // The derive deliberately does not union the disenchant tables: the
     // no-dead-end rule in disenchant_reagents.ts says every output is consumed
@@ -327,6 +331,7 @@ describe('deriveMaterialItemIds: every source table is actually consulted (injec
     salvageMaterialByQuality: SALVAGE_MATERIAL_BY_QUALITY,
     recipes: ALL_RECIPES,
     enchants: ENCHANTS,
+    recipePendingMaterialItemIds: CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS,
     items: ITEMS,
   };
   // The probe def rides the real catalog so the junk-kind filter sees it.
@@ -381,6 +386,12 @@ describe('deriveMaterialItemIds: every source table is actually consulted (injec
         },
       },
     ],
+    [
+      'recipe-pending material',
+      {
+        recipePendingMaterialItemIds: [...CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS, PROBE],
+      },
+    ],
   ];
   for (const [source, override] of CASES) {
     it(`a junk-kind id authored only as a ${source} row derives IN`, () => {
@@ -406,7 +417,7 @@ describe('deriveMaterialItemIds: every source table is actually consulted (injec
 });
 
 describe('completeness tripwire: unclassified non-poor junk', () => {
-  it('is exactly the seven allowed oddments, no more and no fewer', () => {
+  it('is exactly the six allowed oddments, no more and no fewer', () => {
     const unclassified = Object.values(ITEMS)
       .filter((d) => d.kind === 'junk' && d.quality !== 'poor' && !MATERIAL_ITEM_IDS.has(d.id))
       .map((d) => d.id)
