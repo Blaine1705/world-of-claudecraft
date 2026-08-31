@@ -593,6 +593,9 @@ const baseEnTable = {
   'log.ignivarLiftArrives': 'The forge-lift settles; its gate grinds open.',
   'error.ignivarRaidInCombat':
     'Your raid is still in combat. You may enter once the fighting stops.',
+  // The boss-fight exit seal (src/sim/instances/ignivar_exit.ts, emitted by
+  // leaveDungeon): no portal leads out of a room whose boss is engaged.
+  'error.ignivarExitSealedInCombat': 'The forge doors hold fast while the battle rages.',
   'aura.carrierFatigue': 'Carrier Fatigue',
   // The always-worn carried-flag buff; right-clicking it drops the flag on purpose.
   'aura.carriedFlag': 'Carrying the Flag',
@@ -8885,6 +8888,7 @@ const IGNIVAR_DICT: Partial<Record<SupportedLanguage, Partial<Record<BaseSimMess
       'dialogue.varkhulDeath': 'Maestro... te he fallado.',
     },
     ja_JP: {
+      'error.ignivarExitSealedInCombat': '戦いが続く間、鍛冶場の扉は固く閉ざされている。',
       'lore.ignivarSentinelEcho':
         'メイリンの残り火の投影が弾ける。「最初の殻は炎を宿したが、その中に命はなかった。」',
       'lore.ignivarWardenEcho':
@@ -8903,6 +8907,7 @@ const IGNIVAR_DICT: Partial<Record<SupportedLanguage, Partial<Record<BaseSimMess
       'aura.varkhulTemperedWound': '焼入れの傷',
     },
     ko_KR: {
+      'error.ignivarExitSealedInCombat': '전투가 계속되는 동안 대장간 문은 굳게 닫혀 있습니다.',
       'lore.ignivarSentinelEcho':
         '메일린의 잔불 투영이 타닥거린다. "첫 번째 껍질들은 불꽃을 품었지만 그 안에는 생명이 없었다."',
       'lore.ignivarWardenEcho':
@@ -8921,6 +8926,7 @@ const IGNIVAR_DICT: Partial<Record<SupportedLanguage, Partial<Record<BaseSimMess
       'aura.varkhulTemperedWound': '담금질 상처',
     },
     ru_RU: {
+      'error.ignivarExitSealedInCombat': 'Пока идет бой, двери кузницы остаются наглухо закрыты.',
       'lore.ignivarSentinelEcho':
         'Угольная проекция Мэйлин потрескивает: «Первые оболочки удерживали пламя, но жизни в них не было».',
       'lore.ignivarWardenEcho':
@@ -8939,6 +8945,7 @@ const IGNIVAR_DICT: Partial<Record<SupportedLanguage, Partial<Record<BaseSimMess
       'aura.varkhulTemperedWound': 'Закалённая рана',
     },
     zh_CN: {
+      'error.ignivarExitSealedInCombat': '战斗仍在进行时，锻炉大门紧闭不动。',
       'lore.ignivarSentinelEcho': '梅琳的余烬投影噼啪作响：“最初的躯壳容得下火焰，却没有生命。”',
       'lore.ignivarWardenEcho':
         '梅琳的余烬投影噼啪作响：“瓦尔库尔将最后之泉强行灌入金属，泉水成了它的血液。”',
@@ -8954,6 +8961,7 @@ const IGNIVAR_DICT: Partial<Record<SupportedLanguage, Partial<Record<BaseSimMess
       'aura.varkhulTemperedWound': '淬火创伤',
     },
     zh_TW: {
+      'error.ignivarExitSealedInCombat': '戰鬥仍在進行時，鍛爐大門緊閉不動。',
       'lore.ignivarSentinelEcho': '梅琳的餘燼投影劈啪作響：「最初的軀殼容得下火焰，卻沒有生命。」',
       'lore.ignivarWardenEcho':
         '梅琳的餘燼投影劈啪作響：「瓦爾庫爾將最後之泉強行灌入金屬，泉水成了它的血液。」',

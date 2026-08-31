@@ -4928,6 +4928,11 @@ export interface Entity extends ClientMirroredEntityFields {
   // shown to this player, so the 20 Hz walk-in door trigger does not spam the
   // toast (instances/ignivar_entry.ts).
   ignivarEntryDeniedAt?: number;
+  // Sim time of the last "the forge doors hold fast" Ignivar exit denial shown
+  // to this player while a boss fight seals the room, throttled the same way:
+  // the 20 Hz exit-portal walk-in trigger must not spam the toast
+  // (instances/ignivar_exit.ts).
+  ignivarExitDeniedAt?: number;
   // Sim time of the last lockpickOffer emitted to this player from a
   // rift_locked_chest click, so repeated F-key presses don't spam the UI.
   riftLockpickOfferAt?: number;
