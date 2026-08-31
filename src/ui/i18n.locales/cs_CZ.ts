@@ -13693,4 +13693,457 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Burza $WOC funguje pouze v prohlížečové verzi World of ClaudeCraft. Tím se World of ClaudeCraft otevře v prohlížeči, kde se můžete přihlásit a otevřít burzu; hra zde poběží dál.',
   'hudChrome.wocMarket.browserOnlyConfirmOpen': 'Otevřít v prohlížeči',
   'hudChrome.wocMarket.browserOnlyConfirmCancel': 'Zrušit',
+
+  // Release-tier autoFillable fill (cs_CZ), i18n-locale-fill skill.
+  'hud.core.mapMarkerLabels.bossAggressiveEnemy': 'Boss útočí na tebe: {name}',
+  'hud.core.mapMarkerLabels.bossEnemy': 'Boss: {name}',
+  'hud.errors.tradeWindowIneligible': 'To lze směnit jen s hráči, kteří sdíleli jeho kořist.',
+  'hudChrome.actionBar.conflictAccept': 'Přesto přiřadit znovu',
+  'hudChrome.actionBar.conflictBody':
+    'Klávesa {key} je už přiřazena k {other}. Přiřazení k {action} zruší přiřazení k {other}.',
+  'hudChrome.actionBar.conflictTitle': 'Klávesa už je přiřazena',
+  'hudChrome.actionBar.hideExtraBar': 'Skrýt akční lištu',
+  'hudChrome.actionBar.showExtraBar': 'Zobrazit další akční lištu',
+  'hudChrome.auraEffect.makersBrand':
+    'Po dobu {duration} s zvyšuje každý stack poškození utrpěné od Varkhula o {pct} %. Stackuje se až {max}krát. Tankové by se měli střídat při {swap} stacích.',
+  'hudChrome.auraEffect.sharedPyre':
+    'Způsobí {total} % maximálního zdraví každého hráče, rozděleno počtem hráčů uvnitř kruhu ({perPlayer} % na hráče při {players} hráčích).',
+  'hudChrome.auraEffect.varkhulCrucibleExposure':
+    'Blokování Paprsku tavicí pece způsobuje každou sekundu rostoucí poškození z maximálního zdraví. Stacky se resetují 10 sekund po opuštění paprsku v Normální obtížnosti a po 60 sekundách v Hrdinské.',
+  'hudChrome.auraEffect.varkhulForgeLink':
+    'Zachyť aktivní paprsek pilíře, než dosáhne výhně. Otevřené paprsky přidávají 6 % žáru za sekundu. V Normální obtížnosti blokované paprsky a neaktivní pilíře výheň ochlazují; v Hrdinské žár nikdy neklesá. Při 100 % výheň postihne smrtící Roztavení.',
+  'hudChrome.auraEffect.varkhulMoltenCore':
+    'Nes toto jádro k výhni. Roztavené břemeno způsobuje každých {interval} s rostoucí poškození, od {min} % do {max} % maximálního zdraví.',
+  'hudChrome.auraEffect.varkhulSentinelsGaze':
+    'Žhavý strážce tě pronásleduje. Drž ho dál od raidu, dokud nebude zničen.',
+  'hudChrome.auraEffect.varkhulSharedPyre':
+    'Způsobí {total} % maximálního zdraví každého hráče, rozděleno mezi hráče uvnitř kruhu ({perPlayer} % na hráče při {players} hráčích). Každý chybějící hráč navíc způsobí celému raidu {missingPenalty} % maximálního zdraví, včetně hráčů uvnitř kruhu.',
+  'hudChrome.bags.capacityPoolsAria':
+    'Použité sloty batohu: {used} z {total}. Obecné předměty: {generalUsed} z {generalTotal}. Materiály: {materialsUsed} z {materialsTotal}.',
+  'hudChrome.bags.poolGeneral': 'Obecné: {used} z {total}',
+  'hudChrome.bags.poolMaterials': 'Materiály: {used} z {total}',
+  'hudChrome.bank.buyConfirmClaudium': 'Koupit za {cost} Claudium',
+  'hudChrome.bank.buyConfirmDual': 'Koupit {count} dalších slotů banky?',
+  'hudChrome.bank.buyConfirmGold': 'Koupit za {price}',
+  'hudChrome.bank.buySlotsDualAria': 'Koupit {count} slotů za {price} nebo {cost} Claudium',
+  'hudChrome.bank.meterLabel': '{used} z {total} slotů',
+  'hudChrome.bank.meterMaterialsNote':
+    'Místo jen pro materiály ze zasazených brašen. Ostatní předměty ho nemohou využít.',
+  'hudChrome.bank.meterPoolGeneral': 'Obecné: {used} z {total}',
+  'hudChrome.bank.meterPoolMaterials': 'Materiály: {used} z {total}',
+  'hudChrome.bank.meterPoolsAria':
+    'Použité sloty banky: {used} z {total}. Obecné předměty: {generalUsed} z {generalTotal}. Materiály: {materialsUsed} z {materialsTotal}.',
+  'hudChrome.bank.priceChanged':
+    'Cena se změnila, než se nákup dokončil. Zkontroluj aktualizovanou cenu a potvrď znovu.',
+  'hudChrome.bank.priceDisclaimer': 'Ceny se mohou měnit podle herní ekonomiky.',
+  'hudChrome.bank.rungAlreadyGranted': 'Tyto sloty už tato postava má. Nebylo ti účtováno znovu.',
+  'hudChrome.bank.rungApplyDeferred':
+    'Platba dokončena. Sloty se automaticky uplatní při příštím přihlášení této postavy.',
+  'hudChrome.bank.rungDoesNotFit': 'Banka této postavy už nepojme další rozšíření.',
+  'hudChrome.bank.rungFailed': 'Nákup se nepodařilo dokončit.',
+  'hudChrome.bank.rungGrantUnresolved':
+    'Platba dokončena, ale sloty se zatím nepodařilo uplatnit. Nákup je zaznamenán a podpora ho za tebe může dokončit.',
+  'hudChrome.bank.rungGranted': 'Sloty banky byly přidány. Banka této postavy je teď větší.',
+  'hudChrome.bank.rungInProgress':
+    'Nákup pro tuto postavu se stále dokončuje. Zkus to znovu za chvíli.',
+  'hudChrome.bank.rungItemName': '{count} slotů banky',
+  'hudChrome.bank.rungNotPurchasable': 'Tyto sloty banky teď nelze koupit.',
+  'hudChrome.bank.rungOutage':
+    'Nákup se nepodařilo potvrdit. Zkus to znovu tímto tlačítkem a nebude ti účtováno dvakrát. Pokud předtím hru znovu načteš, tuto ochranu můžeš ztratit.',
+  'hudChrome.bank.socketEmpty': 'Prázdný slot na brašnu v bance',
+  'hudChrome.bank.socketEmptyHint': 'Klikni na brašnu ve svých batozích, ať ji uložíš do banky',
+  'hudChrome.bank.socketHint': 'Klikni a zasaď tuto brašnu do své banky',
+  'hudChrome.bank.socketLocked': 'Uzamčený slot na brašnu',
+  'hudChrome.bank.socketLockedLater': 'Sloty na brašny se odemykají popořadě, nejlevnější první',
+  'hudChrome.bank.socketRowAria': 'Sloty banky na brašny',
+  'hudChrome.bank.socketUnlockAccept': 'Odemknout',
+  'hudChrome.bank.socketUnlockAria': 'Odemkni slot na brašnu v bance za {price}',
+  'hudChrome.bank.socketUnlockConfirm': 'Odemknout slot na brašnu v bance za {price}?',
+  'hudChrome.bank.socketUnlockHint': 'Klikni a odemkni tento slot na brašnu',
+  'hudChrome.bank.unsocketHint': 'Klikni a vrať tuto brašnu do svých batohů',
+  'hudChrome.bank.vaultCannotDeposit': 'Nelze uložit do trezoru',
+  'hudChrome.bank.vaultCapacityNote': 'Každý materiál pojme až {cap}.',
+  'hudChrome.bank.vaultDepositAll': 'Uložit všechny materiály',
+  'hudChrome.bank.vaultDepositAllDone': 'Uloženo materiálů: {count}.',
+  'hudChrome.bank.vaultDepositAllFull': 'Uloženo materiálů: {count}. Některé stropy jsou plné.',
+  'hudChrome.bank.vaultDepositAllNone': 'Stropy trezoru jsou plné: nic nebylo uloženo.',
+  'hudChrome.bank.vaultDepositAllTooltip':
+    'Jedním krokem pošle všechny materiály z tvých batohů do trezoru a naplní každý až po jeho strop. Výbava, nástroje, úkolové předměty a spotřební věci zůstanou nedotčené.',
+  'hudChrome.bank.vaultDepositHint': 'Klikni a ulož do svého trezoru',
+  'hudChrome.bank.vaultEmpty':
+    'Tvůj trezor je prázdný. Klikni na materiál ve svých batozích, ať ho uložíš.',
+  'hudChrome.bank.vaultLockedIntro':
+    'Odemkni Trezor materiálů a hromaď řemeslné suroviny vedle své banky. Každý materiál dostane vlastní prostor s kapacitou až {cap} kusů.',
+  'hudChrome.bank.vaultRowAria': '{item}: uloženo {count} z {cap}',
+  'hudChrome.bank.vaultRowWithdrawName': 'Vybrat {item}',
+  'hudChrome.bank.vaultTab': 'Trezor',
+  'hudChrome.bank.vaultUnlockButton': 'Odemknout Trezor materiálů',
+  'hudChrome.bank.vaultUnlockConfirm': 'Odemknout Trezor materiálů za {price}?',
+  'hudChrome.bank.vaultUpgrade': 'Rozšířit každý strop na {cap}',
+  'hudChrome.bank.vaultUpgradeConfirm': 'Rozšířit strop každého materiálu na {cap} za {price}?',
+  'hudChrome.bank.vaultWithdrawShort': 'Do tvých batohů se vejde jen {fit} z {count}.',
+  'hudChrome.bank.withdrawQuantityAction': 'Množství k výběru: {item}',
+  'hudChrome.controller.reticleSpeed': 'Rychlost zaměřovače',
+  'hudChrome.crafting.reagentVaultDraw': '(čerpá {count} z tvého trezoru)',
+  'hudChrome.crafting.vaultUnreachable': 'Trezor materiálů je tady mimo dosah.',
+  'hudChrome.interfaceUnlock.actionBar1Vertical': 'Svislá akční lišta',
+  'hudChrome.interfaceUnlock.actionBar2Vertical': 'Svislá akční lišta 2',
+  'hudChrome.interfaceUnlock.actionBar3Vertical': 'Svislá akční lišta 3',
+  'hudChrome.interfaceUnlock.actionBarsVertical': 'Svislé akční lišty',
+  'hudChrome.interfaceUnlock.barsNote':
+    'Při úpravách se zobrazují jen akční lišty, které máš zapnuté. Chceš-li umístit další lišty, nejprve je přidej tlačítky plus a mínus na hlavní akční liště.',
+  'hudChrome.interfaceUnlock.buffsLeftToRight': 'Buffy zleva doprava',
+  'hudChrome.interfaceUnlock.debuffsLeftToRight': 'Debuffy zleva doprava',
+  'hudChrome.interfaceUnlock.frameNames.actionBar1': 'Akční lišta',
+  'hudChrome.interfaceUnlock.frameNames.actionBar2': 'Akční lišta 2',
+  'hudChrome.interfaceUnlock.frameNames.actionBar3': 'Akční lišta 3',
+  'hudChrome.interfaceUnlock.frameNames.actionBarGroup': 'Akční lišty',
+  'hudChrome.interfaceUnlock.frameNames.chat': 'Chat',
+  'hudChrome.interfaceUnlock.frameNames.menu': 'Menu',
+  'hudChrome.interfaceUnlock.frameNames.minimap': 'Minimapa',
+  'hudChrome.interfaceUnlock.frameNames.partyFrames': 'Skupina',
+  'hudChrome.interfaceUnlock.frameNames.playerFrame': 'Hráč',
+  'hudChrome.interfaceUnlock.frameNames.stanceBar': 'Lišta postojů',
+  'hudChrome.interfaceUnlock.frameNames.steamWishlist': 'Připomínka seznamu přání',
+  'hudChrome.interfaceUnlock.frameNames.swingBar': 'Automatický útok',
+  'hudChrome.interfaceUnlock.frameNames.targetFrame': 'Cíl',
+  'hudChrome.interfaceUnlock.frameNames.xpBar': 'Lišta zkušeností',
+  'hudChrome.interfaceUnlock.framesMenu': 'Nastavení rámečků',
+  'hudChrome.interfaceUnlock.framesMenuTitle':
+    'Zobraz nebo skryj jednotlivé rámečky. Nezaškrtnutý rámeček zůstane skrytý, dokud ho znovu nezaškrtneš nebo neobnovíš výchozí nastavení.',
+  'hudChrome.interfaceUnlock.frozenNote':
+    'Během úprav jsou rozhraní i kamera zmrazené: tlačítka a rámečky jsou jen obrázky k rozmístění a kliknutí se nedostanou k hernímu světu.',
+  'hudChrome.interfaceUnlock.label': 'Upravit rámečky',
+  'hudChrome.interfaceUnlock.lock': 'Zamknout rozhraní',
+  'hudChrome.interfaceUnlock.lockAll': 'Zamknout rozhraní',
+  'hudChrome.interfaceUnlock.lockFrame': 'Zamknout tento rámeček',
+  'hudChrome.interfaceUnlock.lockPlayerFrameToBar': 'Připojit rám hráče k akční liště',
+  'hudChrome.interfaceUnlock.menuRailHorizontal': 'Vodorovné menu',
+  'hudChrome.interfaceUnlock.previewMemberName': '{className} {number}',
+  'hudChrome.interfaceUnlock.previewSpell': 'Ukázkové kouzlo',
+  'hudChrome.interfaceUnlock.resetFrameSize': 'Obnovit velikost',
+  'hudChrome.interfaceUnlock.resetFrameSizeFor': 'Obnovit velikost pro {name}',
+  'hudChrome.interfaceUnlock.resizeFrame': 'Změnit velikost tohoto rámečku',
+  'hudChrome.interfaceUnlock.showHideFrames': 'Zobrazit nebo skrýt rámečky',
+  'hudChrome.interfaceUnlock.snapToGrid': 'Přichytit k mřížce',
+  'hudChrome.interfaceUnlock.unlock': 'Odemknout rozhraní',
+  'hudChrome.interfaceUnlock.unlockFrame': 'Odemknout tento rámeček',
+  'hudChrome.itemTooltip.partyTradeWindow':
+    'Tento předmět můžeš dalších {time} směňovat s hráči, kteří sdíleli jeho kořist. Nasazení předmětu okno pro směnu ukončí.',
+  'hudChrome.loot.bindConfirmBody':
+    'Tato kořist obsahuje předmět, který se k tobě po sebrání naváže. Vázaný předmět lze směnit jen s hráči, kteří sdíleli jeho kořist, a to jen po omezenou dobu.',
+  'hudChrome.loot.bindConfirmTitle': 'Váže se při sebrání',
+  'hudChrome.options.alwaysShowAllBuffs': 'Vždy zobrazit všechny buffy',
+  'hudChrome.options.combineActionBars': 'Sloučit akční lišty',
+  'hudChrome.options.confirmVendorSell': 'Potvrdit před prodejem',
+  'hudChrome.options.confirmVendorSellNote':
+    'Vypnutím této volby prodáš předměty jedním kliknutím bez potvrzení, takže přesunutý slot v batohu může obchodníkovi prodat špatný předmět.',
+  'hudChrome.options.touchPreciseAim': 'Přesné zaměřování na zem',
+  'hudChrome.options.touchPreciseAimNote':
+    'Zaměř, než sešleš kouzlo na zem. Vypnutím sešleš okamžitě na navržený bod.',
+  'hudChrome.partyFrames.optionsSection': 'Možnosti rámečků skupiny',
+  'hudChrome.raidBossGuide.abilitiesHeading': 'Schopnosti',
+  'hudChrome.raidBossGuide.abilityControlLabel': '{action}. {details}',
+  'hudChrome.raidBossGuide.bossesLabel': 'Raidoví bossové',
+  'hudChrome.raidBossGuide.browseBoss': 'Zobrazit {boss}',
+  'hudChrome.raidBossGuide.button': 'Průvodce bossem: {boss}',
+  'hudChrome.raidBossGuide.chooseDifficulty': 'Zobrazit mechaniky pro {difficulty}',
+  'hudChrome.raidBossGuide.close': 'Zavřít průvodce bossem',
+  'hudChrome.raidBossGuide.collapseAbility': 'Sbalit {ability}',
+  'hudChrome.raidBossGuide.difficultyLabel': 'Obtížnost',
+  'hudChrome.raidBossGuide.expandAbility': 'Rozbalit {ability}',
+  'hudChrome.raidBossGuide.flagCleansable': 'Očistitelné',
+  'hudChrome.raidBossGuide.flagDeadly': 'Smrtící',
+  'hudChrome.raidBossGuide.flagImportant': 'Důležité',
+  'hudChrome.raidBossGuide.flagInterruptible': 'Přerušitelné',
+  'hudChrome.raidBossGuide.flagsLabel': 'Varování před mechanikami',
+  'hudChrome.raidBossGuide.heroic': 'Hrdinská',
+  'hudChrome.raidBossGuide.ignivar.apocalypse':
+    'Apokalypsa: zabij Ignivarova Vyvolávače popela, než dokončí své sesílání.',
+  'hudChrome.raidBossGuide.ignivar.apocalypseName': 'Apokalypsa',
+  'hudChrome.raidBossGuide.ignivar.apocalypseResponse':
+    'Přesměruj veškeré dostupné poškození na Ignivarova Vyvolávače popela a znič ho, než dokončí sesílání.',
+  'hudChrome.raidBossGuide.ignivar.apocalypseSummary':
+    'Ignivar přivolá Vyvolávače popela. Pokud tato posila dokončí Apokalypsu, je raid okamžitě poražen.',
+  'hudChrome.raidBossGuide.ignivar.brand':
+    'Cejch hranice: rozptylte se. Namiř Spalující příval na připravený vodní kanál, pak přejdi vodou sám, ať se očistíš.',
+  'hudChrome.raidBossGuide.ignivar.brandHeroicResponse':
+    'Rozptylte se. Otevři kanál Spalujícím přívalem a očisti vždy jednoho označeného hráče. Každé očištění spustí Očistný zpětný ráz na celý raid.',
+  'hudChrome.raidBossGuide.ignivar.brandName': 'Cejch hranice',
+  'hudChrome.raidBossGuide.ignivar.brandResponse':
+    'Rozptylte se. Namiř Spalující příval na připravený vodní kanál, pak ať každý označený hráč sám přejde aktivovanou vodou a očistí se.',
+  'hudChrome.raidBossGuide.ignivar.brandSummary':
+    'Ignivar označí hráče mimo tanky trvalým ohnivým poškozením. Označení hráči navíc spalují blízké spojence.',
+  'hudChrome.raidBossGuide.ignivar.chainsName': 'Řetězy výhně',
+  'hudChrome.raidBossGuide.ignivar.chainsResponse':
+    'Zůstaň blízko svého spojeného partnera, pohybujte se společně a nedovolte žádnému jinému hráči projít vaším řetězem.',
+  'hudChrome.raidBossGuide.ignivar.chainsSummary':
+    'Ignivar spojí blízké dvojice. Přílišné oddálení nebo přejití řetězu jiné dvojice způsobí smrtící poškození.',
+  'hudChrome.raidBossGuide.ignivar.finale':
+    'Poslední inferno: znič Ignivara před jistou porážkou raidu, zatímco pokračují rychlejší meteory, čelní útoky a Rotující inferno.',
+  'hudChrome.raidBossGuide.ignivar.forgeStrikeName': 'Úder výhně',
+  'hudChrome.raidBossGuide.ignivar.forgeStrikeResponse':
+    'Tankové se střídají při {stacks} stascích. Léčitelé se připraví na úder a první výpady nového tanka na blízko.',
+  'hudChrome.raidBossGuide.ignivar.forgeStrikeSummary':
+    'Ignivar udeří svého aktuálního tanka a uvalí na něj Roztavené brnění, které zvyšuje poškození utrpěné od Ignivara.',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveHeroicSummary':
+    'Rozpínající se ohnivá stěna projde arénou, ponechá dvě protilehlé mezery a zasažené hráče odhodí mnohem dál.',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveName': 'Vlna výhně',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveResponse':
+    'Během nápřahu najdi jednu z mezer, srovnej se s ní a vyhni se odhození k okraji arény.',
+  'hudChrome.raidBossGuide.ignivar.forgeWaveSummary':
+    'Rozpínající se ohnivá stěna projde arénou, ponechá dvě protilehlé mezery a zasažené hráče odhodí.',
+  'hudChrome.raidBossGuide.ignivar.heroic':
+    'Hrdinská: spárovaní hráči zůstávají blízko během Řetězů výhně, Cejch zůstává aktivní uvnitř Soudu a Vlna výhně odhazuje dál.',
+  'hudChrome.raidBossGuide.ignivar.judgment':
+    'Soud výhně: během varování rozpoznej jedinečné útočiště, pak se shlukněte uvnitř jeho označené hranice, jakmile se podlaha vznítí.',
+  'hudChrome.raidBossGuide.ignivar.judgmentHeroicSummary':
+    'Ignivar označí jedno bezpečné útočiště, zatímco aréna hoří. Cejch hranice zůstává aktivní a dál poškozuje blízké spojence.',
+  'hudChrome.raidBossGuide.ignivar.judgmentName': 'Soud výhně',
+  'hudChrome.raidBossGuide.ignivar.judgmentResponse':
+    'Během varování rozpoznej jedinečně označené útočiště a shlukněte se plně uvnitř jeho hranice, než se podlaha vznítí.',
+  'hudChrome.raidBossGuide.ignivar.judgmentSummary':
+    'Ignivar označí tři úkryty, určí jeden bezpečný z nich a pak opakovaně zapaluje zbytek arény.',
+  'hudChrome.raidBossGuide.ignivar.lastInfernoName': 'Poslední inferno',
+  'hudChrome.raidBossGuide.ignivar.lastInfernoResponse':
+    'Použij zbývající doby obnovy na poškození a léčení, dál plň pohybové mechaniky a znič Ignivara, než vyprší odpočet.',
+  'hudChrome.raidBossGuide.ignivar.lastInfernoSummary':
+    'Ignivar se rozzuří a připravuje jistou porážku raidu, zatímco se zrychlují Popelový déšť, Spalující příval a Rotující inferno.',
+  'hudChrome.raidBossGuide.ignivar.movement':
+    'Pohyb: vyhýbej se kuželům Popelového deště a meteorům, pohybuj se s Rotujícím infernem a využívej obě mezery Vlny výhně.',
+  'hudChrome.raidBossGuide.ignivar.overview':
+    'Varkhul vykoval Ignivara jako posla, živou pečeť a klíč k Vnitřní tavicí peci. Souboj prověřuje ovládání vodních kanálů, přesný pohyb a rychlé prioritní poškození.',
+  'hudChrome.raidBossGuide.ignivar.phaseApocalypseName': 'Mezihra: Apokalypsa',
+  'hudChrome.raidBossGuide.ignivar.phaseApocalypseSummary':
+    'Při {health} zdraví Ignivar přivolá Vyvolávače popela, který se pokusí souboj ukončit.',
+  'hudChrome.raidBossGuide.ignivar.phaseFinaleName': 'Finále: Poslední inferno',
+  'hudChrome.raidBossGuide.ignivar.phaseFinaleSummary':
+    'Při {health} zdraví Ignivar zahájí poslední spalující fázi s pevným termínem a rychleji se opakujícími mechanikami.',
+  'hudChrome.raidBossGuide.ignivar.phaseJudgmentHeroicSummary':
+    'Při {health} zdraví Ignivar zapálí arénu, zatímco aktivní Cejchy dál ohrožují blízké hráče uvnitř útočiště.',
+  'hudChrome.raidBossGuide.ignivar.phaseJudgmentName': 'Soud výhně',
+  'hudChrome.raidBossGuide.ignivar.phaseJudgmentSummary':
+    'Při {health} zdraví Ignivar zapálí arénu a odhalí jedno bezpečné útočiště mezi třemi úkryty.',
+  'hudChrome.raidBossGuide.ignivar.phaseOpeningName': 'Probuzení posla',
+  'hudChrome.raidBossGuide.ignivar.phaseOpeningSummary':
+    'Ovládej Cejch hranice pomocí vodních kanálů a zároveň zvládej Ignivarovy opakující se čelní útoky, nebeský oheň, rotující paprsky a rozpínající se Vlnu výhně.',
+  'hudChrome.raidBossGuide.ignivar.rainHeroicSummary':
+    'Tři ohnivé výseče a označené dopady meteorů způsobí extrémní poškození hráčům, kteří zůstanou uvnitř jejich varování.',
+  'hudChrome.raidBossGuide.ignivar.rainName': 'Popelový déšť',
+  'hudChrome.raidBossGuide.ignivar.rainResponse':
+    'Přesuň se do neoznačené mezery a opusť každý kruh meteoru před dopadem.',
+  'hudChrome.raidBossGuide.ignivar.rainSummary':
+    'Tři ohnivé výseče a označené dopady meteorů trestají hráče, kteří zůstanou uvnitř jejich varování.',
+  'hudChrome.raidBossGuide.ignivar.raysHeroicSummary':
+    'Rotující ohnivé paprsky opisují kruh kolem Ignivara a při kontaktu způsobují těžké opakované poškození.',
+  'hudChrome.raidBossGuide.ignivar.raysName': 'Rotující inferno',
+  'hudChrome.raidBossGuide.ignivar.raysResponse':
+    'Pohybuj se s volným prostorem mezi paprsky. Neprocházej skrz paprsek, ani pomocí rychlé pohybové schopnosti.',
+  'hudChrome.raidBossGuide.ignivar.raysSummary':
+    'Rotující ohnivé paprsky opisují kruh kolem Ignivara a opakovaně poškozují hráče, kteří se jich dotknou.',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentHeroicSummary':
+    'Ignivar si najde hráče a poté vypustí téměř smrtící čelní výbuch. Připravený vodní kanál zasažený výbuchem se na krátkou chvíli aktivuje.',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentName': 'Spalující příval',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentResponse':
+    'Namiř varování přesně skrz jeden připravený kanál. Všichni ostatní opustí čelní výbuch, než se sesílání dokončí.',
+  'hudChrome.raidBossGuide.ignivar.searingTorrentSummary':
+    'Ignivar si najde hráče a poté vypustí široký čelní výbuch. Připravený vodní kanál zasažený výbuchem se na krátkou chvíli aktivuje.',
+  'hudChrome.raidBossGuide.normal': 'Normální',
+  'hudChrome.raidBossGuide.overviewHeading': 'Přehled',
+  'hudChrome.raidBossGuide.portraitAlt': 'Portrét souboje s bossem {boss}',
+  'hudChrome.raidBossGuide.roleAll': 'Všechny role',
+  'hudChrome.raidBossGuide.roleDamage': 'Poškození',
+  'hudChrome.raidBossGuide.roleHealer': 'Léčitel',
+  'hudChrome.raidBossGuide.roleTank': 'Tank',
+  'hudChrome.raidBossGuide.rolesLabel': 'Odpovědnosti rolí',
+  'hudChrome.raidBossGuide.subtitle': '{boss} | {difficulty}',
+  'hudChrome.raidBossGuide.title': 'Průvodce bossem',
+  'hudChrome.raidBossGuide.tooltipMeta': '{phase} | {difficulty}',
+  'hudChrome.raidBossGuide.varkhul.anvil':
+    'Výnos kovadliny: Varkhul přejde k velké výhni a třikrát do ní udeří, což způsobí poškození raidu. V Hrdinské navíc padají označené meteory.',
+  'hudChrome.raidBossGuide.varkhul.anvilHeroicResponse':
+    'Rozprostři označené meteory dál od skupiny, zatímco léčitelé a obranné doby obnovy pokryjí všech {strikes} úderů.',
+  'hudChrome.raidBossGuide.varkhul.anvilHeroicSummary':
+    'Varkhul udeří do velké výhně {strikes}krát za rostoucí poškození raidu, zatímco na hráče dopadají označené meteory.',
+  'hudChrome.raidBossGuide.varkhul.anvilName': 'Výnos kovadliny',
+  'hudChrome.raidBossGuide.varkhul.anvilResponse':
+    'Shlukněte se kvůli léčení raidu a použijte obranné doby obnovy na poslední úder.',
+  'hudChrome.raidBossGuide.varkhul.anvilSummary':
+    'Varkhul dojde k velké výhni a udeří do ní {strikes}krát, čímž způsobí rostoucí poškození celému raidu.',
+  'hudChrome.raidBossGuide.varkhul.assembly':
+    'Mistrovo sestavení: blokujte oba paprsky výhně, pobijte každou vlnu z portálů, přerušte Otřes tavicí pece a zastavte Žhavé konstruktéry, aby nemohli léčit Varkhula.',
+  'hudChrome.raidBossGuide.varkhul.assemblyName': 'Mistrovo sestavení',
+  'hudChrome.raidBossGuide.varkhul.assemblyResponse':
+    'Rozděl pozornost mezi ovládání paprsků a prioritní posily. Poraz celou legii výhně, než vyprší časovač sestavení.',
+  'hudChrome.raidBossGuide.varkhul.assemblySummary':
+    'Varkhul se stane chráněným a zahájí časově omezené sestavení. Raid musí porazit každou vlnu z portálů, než výheň dokončí jeho mistrovské dílo.',
+  'hudChrome.raidBossGuide.varkhul.beamHeroicSummary':
+    'Aktivní paprsky pilířů zahřívají výheň, pokud je hráč neblokuje. Blokující hráči utrpí rostoucí poškození z Vystavení tavicí peci a žár výhně nikdy neklesá.',
+  'hudChrome.raidBossGuide.varkhul.beamName': 'Paprsek tavicí pece',
+  'hudChrome.raidBossGuide.varkhul.beamResponse':
+    'Postav se mezi každý aktivní pilíř a výheň, pak střídejte blokující hráče, než se vystavení stane nebezpečným. Dosažení plného žáru způsobí smrtící Roztavení výhně.',
+  'hudChrome.raidBossGuide.varkhul.beamSummary':
+    'Aktivní paprsky pilířů zahřívají výheň, pokud je hráč neblokuje. Blokující hráči utrpí rostoucí poškození z Vystavení tavicí peci, zatímco blokované a neaktivní paprsky nechají žár klesat.',
+  'hudChrome.raidBossGuide.varkhul.forge':
+    'Pilíře výhně: blokujte aktivní paprsky, než dosáhnou výhně, a střídejte blokující hráče, jak roste Vystavení tavicí peci. Plný ukazatel žáru způsobí Roztavení výhně.',
+  'hudChrome.raidBossGuide.varkhul.forgestorm':
+    'Bouře výhně: sleduj padající meteory a opusť každý označený dopad, než dopadne každá ze tří vln.',
+  'hudChrome.raidBossGuide.varkhul.forgestormHeroicSummary':
+    'Varkhul přivolá {waves} po sobě jdoucích vln označených dopadů meteorů, které způsobí extrémní poškození.',
+  'hudChrome.raidBossGuide.varkhul.forgestormName': 'Bouře výhně',
+  'hudChrome.raidBossGuide.varkhul.forgestormResponse':
+    'Sleduj každou novou sadu varování na zemi a přesuň se pryč, než tato vlna dopadne. Nevracej se na předchozí pozici, aniž bys zkontroloval další vlnu.',
+  'hudChrome.raidBossGuide.varkhul.forgestormSummary':
+    'Varkhul přivolá {waves} po sobě jdoucích vln označených dopadů meteorů po celé aréně.',
+  'hudChrome.raidBossGuide.varkhul.frontalHeroicSummary':
+    'Varkhul vypustí velmi široký čelní rozmach, který způsobí téměř smrtící ohnivé poškození všem před ním.',
+  'hudChrome.raidBossGuide.varkhul.frontalName': 'Rozmach Otce výhně',
+  'hudChrome.raidBossGuide.varkhul.frontalResponse':
+    'Drž Varkhula otočeného od skupiny a přesuň se za něj, jakmile se objeví varování.',
+  'hudChrome.raidBossGuide.varkhul.frontalSummary':
+    'Varkhul vypustí velmi široký čelní rozmach, který způsobí těžké ohnivé poškození všem před ním.',
+  'hudChrome.raidBossGuide.varkhul.heroic':
+    'Hrdinská: žár výhně nikdy nechladne, Výnos kovadliny přidává meteory a poslední fáze odstraní většinu mechanik ve prospěch Světového požáru.',
+  'hudChrome.raidBossGuide.varkhul.legionName': 'Legie výhně',
+  'hudChrome.raidBossGuide.varkhul.legionResponse':
+    'Přeruš Otřes tavicí pece, zastav Opravný protokol a zaměř se na každého nebezpečného sesílatele, než dozabiješ zbývající posily.',
+  'hudChrome.raidBossGuide.varkhul.legionSummary':
+    'Strážci tavicí pece sesílají Otřes tavicí pece, čímž přidávají žár výhni, zatímco Žhaví konstruktéři používají Opravný protokol k léčení Varkhula.',
+  'hudChrome.raidBossGuide.varkhul.makersBrandName': 'Cejch Tvůrce',
+  'hudChrome.raidBossGuide.varkhul.makersBrandResponse':
+    'Tankové se střídají při {stacks} stascích. Léčitelé připraví přicházejícího tanka, než Varkhul změní cíl.',
+  'hudChrome.raidBossGuide.varkhul.makersBrandSummary':
+    'Varkhul udeří svého aktuálního tanka a uvalí na něj stackující se efekt, který zvyšuje veškeré poškození utrpěné od něj.',
+  'hudChrome.raidBossGuide.varkhul.masterpieceHeroicSummary':
+    'Varkhul útočí rychleji a způsobuje více poškození, zatímco Světový požár nahrazuje většinu dřívějších mechanik pro poslední spalující fázi.',
+  'hudChrome.raidBossGuide.varkhul.masterpieceName': 'Rozpoutané mistrovské dílo',
+  'hudChrome.raidBossGuide.varkhul.masterpieceResponse':
+    'Nasaď zbývající útočné i obranné doby obnovy a poraz Varkhula, než vyprší poslední odpočet.',
+  'hudChrome.raidBossGuide.varkhul.masterpieceSummary':
+    'Varkhul útočí rychleji, způsobuje více poškození a opakovaně spaluje raid až do jeho konečné porážky.',
+  'hudChrome.raidBossGuide.varkhul.orbs':
+    'Žhavé koule: označení hráči se rozptýlí k okraji místnosti. Jejich ohnivé kaluže přetrvávají a uvolněné koule prochází místností.',
+  'hudChrome.raidBossGuide.varkhul.orbsHeroicSummary':
+    'Označení hráči mimo tanky zanechávají silně poškozující trvalé žhavé kaluže a uvolňují nebezpečné ohnivé koule na všechny strany. Rozžhavený kov navíc pohlcuje příchozí léčení.',
+  'hudChrome.raidBossGuide.varkhul.orbsName': 'Žhavé koule',
+  'hudChrome.raidBossGuide.varkhul.orbsResponse':
+    'Odnes každé označení k okraji místnosti, odděl kaluže od sebe a poté se vyhýbej koulím, jak prochází arénou. Léčitelé rychle sejmou pohlcení.',
+  'hudChrome.raidBossGuide.varkhul.orbsSummary':
+    'Označení hráči mimo tanky zanechávají trvalé žhavé kaluže a uvolňují ohnivé koule na všechny strany. Rozžhavený kov navíc pohlcuje příchozí léčení.',
+  'hudChrome.raidBossGuide.varkhul.overview':
+    'Varkhul uvěznil umírající Poslední pramen, aby vykoval živý kov, a poté stvořil Ignivara, aby střežil tento zločin. Jeho souboj spojuje osobní pozicování s ovládáním velké výhně na úrovni celého raidu.',
+  'hudChrome.raidBossGuide.varkhul.phaseAssemblyName': 'Mezihra: Mistrovo sestavení',
+  'hudChrome.raidBossGuide.varkhul.phaseAssemblySummary':
+    'Při {health} zdraví se Varkhul stane chráněným, zatímco jeho legie výhně vstupuje portály a paprsky pilířů hrozí Roztavením výhně.',
+  'hudChrome.raidBossGuide.varkhul.phaseFinaleHeroicSummary':
+    'Při {health} zdraví Varkhul opouští většinu dřívějších mechanik, zatímco se Světový požár stahuje dovnitř a pohlcuje tavicí pec.',
+  'hudChrome.raidBossGuide.varkhul.phaseFinaleName': 'Finále: Rozpoutané mistrovské dílo',
+  'hudChrome.raidBossGuide.varkhul.phaseFinaleSummary':
+    'Při {health} zdraví Varkhul útočí rychleji, způsobuje více poškození a vysílá ohnivé pulzy celým raidem až do konečného termínu.',
+  'hudChrome.raidBossGuide.varkhul.phaseOpeningName': 'Otec výhně',
+  'hudChrome.raidBossGuide.varkhul.phaseOpeningSummary':
+    'Varkhul střídá tlak na tanka, široké čelní útoky, pohybující se projektily, skupinová vstřebávání, vlny meteorů a útoky od velké kovadliny.',
+  'hudChrome.raidBossGuide.varkhul.pyre':
+    'Sdílená hranice: vybrán je jen hráč bez Rozžhaveného kovu. V obou obtížnostech se shlukněte čtyři hráči uvnitř pohybujícího se kruhu. Každý chybějící hráč způsobí celému raidu 15 % maximálního zdraví.',
+  'hudChrome.raidBossGuide.varkhul.pyreHeroicSummary':
+    'Pohybující se kruh sleduje jednoho hráče bez Rozžhaveného kovu a rozděluje větší zásah. Každý chybějící hráč navíc způsobí celému raidu poškození {missingPenalty} maximálního zdraví.',
+  'hudChrome.raidBossGuide.varkhul.pyreName': 'Sdílená hranice',
+  'hudChrome.raidBossGuide.varkhul.pyreResponse':
+    'Shlukněte uvnitř kruhu alespoň {players} hráčů a pohybujte se s jeho cílem, dokud se sesílání nedokončí.',
+  'hudChrome.raidBossGuide.varkhul.pyreSummary':
+    'Pohybující se kruh sleduje jednoho hráče bez Rozžhaveného kovu. Jeho poškození se dělí mezi hráče uvnitř a každý chybějící hráč způsobí celému raidu poškození {missingPenalty} maximálního zdraví.',
+  'hudChrome.raidBossGuide.varkhul.ray':
+    'Kalicí paprsek: jiný hráč, obvykle tank, zachytí pohybující se linii, než skončí dlouhý nápřah. Zasažený hráč obdrží Kalenou ránu.',
+  'hudChrome.raidBossGuide.varkhul.rayName': 'Kalicí paprsek',
+  'hudChrome.raidBossGuide.varkhul.rayResponse':
+    'Urči zdravého hráče, obvykle off-tanka, aby vstoupil do linie. Drž ostatní hráče mimo a střídej zachytávače, dokud je Kalená rána aktivní.',
+  'hudChrome.raidBossGuide.varkhul.raySummary':
+    'Paprsek sleduje označeného hráče po dlouhý nápřah. První jiný hráč mezi Varkhulem a cílem zachytí zásah a obdrží Kalenou ránu.',
+  'hudChrome.raidBossGuide.varkhul.tanks':
+    'Tankové: střídejte se při dvou stascích Cejchu Tvůrce a držte Varkhula na dosah zblízka.',
+  'hudChrome.raidBossGuide.varkhul.worldfire':
+    'Světový požár: v Hrdinské se během poslední fáze hořící okraj stahuje ke středu. Poraz Varkhula, než celá tavicí pec shoří.',
+  'hudChrome.raidBossGuide.varkhul.worldfireName': 'Světový požár',
+  'hudChrome.raidBossGuide.varkhul.worldfireResponse':
+    'Přesouvej se dovnitř před každým postupujícím ohnivým pásem, zachovej si zmenšující se bezpečný prostor a znič Varkhula, než se vznítí střed.',
+  'hudChrome.raidBossGuide.varkhul.worldfireSummary':
+    'V Hrdinské oheň postupuje od okraje arény ke středu po etapách, dokud celá tavicí pec nehoří.',
+  'hudChrome.raidBossGuide.whatToDo': 'Co dělat',
+  'hudChrome.raidBossGuide.whatToDoResponse': 'Co dělat: {response}',
+  'hudChrome.statInfo.names.healPower': 'Síla léčení',
+  'hudChrome.theme.presets.fancyGold': 'Okázalá zlatá (WIP)',
+  'hudChrome.transfer.allSettings': 'Všechna nastavení',
+  'hudChrome.transfer.applyReload': 'Použít a znovu načíst',
+  'hudChrome.transfer.copied': 'Zkopírováno do schránky.',
+  'hudChrome.transfer.copy': 'Kopírovat',
+  'hudChrome.transfer.copyFailed': 'Kopírování se nezdařilo. Vyber kód a zkopíruj ho sám(a).',
+  'hudChrome.transfer.exportAction': 'Export',
+  'hudChrome.transfer.frameLayout': 'Rozložení rámečků',
+  'hudChrome.transfer.importAction': 'Import',
+  'hudChrome.transfer.invalid': 'To není platný exportní kód.',
+  'hudChrome.transfer.pastePlaceholder': 'Sem vlož exportovaný kód.',
+  'hudChrome.transfer.wrongKind': 'Tento kód je jiného typu exportu.',
+  'hudChrome.varkhulCallout.addsDefeated': 'Legie výhně je poražena: Varkhul je odhalen!',
+  'hudChrome.varkhulCallout.artificerApproaches': 'K výhni se blíží Žhavý konstruktér!',
+  'hudChrome.varkhulCallout.bothPillars': 'Pilíře výhně se vznítí!',
+  'hudChrome.varkhulCallout.bothPillarsCharging':
+    'Pilíře výhně se nabíjejí. Vznítí se za 3 s!',
+  'hudChrome.varkhulCallout.heat75': 'Výheň má 75 % žáru!',
+  'hudChrome.varkhulCallout.heat90': 'Roztavení výhně je bezprostřední!',
+  'hudChrome.varkhulCallout.leftPillar': 'Levý pilíř výhně se vznítí!',
+  'hudChrome.varkhulCallout.leftPillarCharging':
+    'Levý pilíř výhně se nabíjí. Vznítí se za 3 s!',
+  'hudChrome.varkhulCallout.portalsOpening': 'Portály výhně se otevírají!',
+  'hudChrome.varkhulCallout.rightPillar': 'Pravý pilíř výhně se vznítí!',
+  'hudChrome.varkhulCallout.rightPillarCharging':
+    'Pravý pilíř výhně se nabíjí. Vznítí se za 3 s!',
+  'hudChrome.varkhulCallout.worldfireBegins':
+    'Světový požár se vznítí na okraji místnosti. Tavicí pec bude pohlcena za 42 s!',
+  'hudChrome.varkhulCallout.worldfireClosing': 'Světový požár se stahuje. Přesuň se ke středu!',
+  'hudChrome.varkhulCallout.worldfireConsumed': 'Celá tavicí pec hoří!',
+  'hudChrome.varkhulWaveStatus': 'Vlna {wave}/{waves} | Nepřátelé: {remaining}',
+  'hudChrome.wocMarket.walletLinkedConnected':
+    'Tvoje propojená aplikace peněženky je připojena a připravena na nákupy za $WOC.',
+  'hudChrome.wocMarket.walletLinkedDisconnected':
+    'Tvoje veřejná adresa je propojena. Znovu připoj tuto aplikaci peněženky, když budeš chtít platit za $WOC.',
+  'hudChrome.wocMarket.walletUsdBalance': '{amount} USD',
+  'hudChrome.wocMarket.walletUsdUnknown': 'Neznámé',
+  'hudChrome.wocStore.charter.alreadyGranted':
+    'Tuto listinu už tato postava má. Nebylo ti účtováno znovu.',
+  'hudChrome.wocStore.charter.applyDeferred':
+    'Platba dokončena. Sloty se automaticky uplatní při příštím přihlášení této postavy.',
+  'hudChrome.wocStore.charter.buy': 'Koupit listinu',
+  'hudChrome.wocStore.charter.buyAria': 'Koupit {item}',
+  'hudChrome.wocStore.charter.confirmBody': 'Koupit {item} za {cost} Claudium?',
+  'hudChrome.wocStore.charter.confirmTitle': 'Potvrdit nákup listiny',
+  'hudChrome.wocStore.charter.doesNotFit':
+    'Banka této postavy nepojme celý příděl této listiny.',
+  'hudChrome.wocStore.charter.eyebrow': 'Truhlice',
+  'hudChrome.wocStore.charter.failed': 'Nákup se nepodařilo dokončit.',
+  'hudChrome.wocStore.charter.grant': 'Přidá {slots} slotů banky',
+  'hudChrome.wocStore.charter.grantUnresolved':
+    'Platba dokončena, ale sloty se zatím nepodařilo uplatnit. Nákup je zaznamenán a podpora ho za tebe může dokončit.',
+  'hudChrome.wocStore.charter.granted': 'Listina byla uplatněna. Banka této postavy je teď větší.',
+  'hudChrome.wocStore.charter.inProgress':
+    'Nákup pro tuto postavu se stále dokončuje. Zkus to znovu za chvíli.',
+  'hudChrome.wocStore.charter.names.strongbox_charter_1': 'Menší listina truhlice',
+  'hudChrome.wocStore.charter.names.strongbox_charter_2': 'Větší listina truhlice',
+  'hudChrome.wocStore.charter.names.strongbox_charter_3': 'Velká listina truhlice',
+  'hudChrome.wocStore.charter.names.strongbox_charter_complete': 'Úplná listina truhlice',
+  'hudChrome.wocStore.charter.noCharterFits':
+    'Do zbývajícího místa v bance této postavy se nevejde žádná listina.',
+  'hudChrome.wocStore.charter.noRoom':
+    'Banka této postavy už nemá místo pro žádnou listinu.',
+  'hudChrome.wocStore.charter.notPurchasable': 'Tuto listinu teď nelze koupit.',
+  'hudChrome.wocStore.charter.outage':
+    'Nákup se nepodařilo potvrdit. Zkus to znovu tímto tlačítkem a nebude ti účtováno dvakrát. Pokud předtím hru znovu načteš, tuto ochranu můžeš ztratit.',
+  'hudChrome.wocStore.charter.outageStale':
+    'Vrať se do Obchodu a znovu použij stejnou akci Koupit listinu. Nebude ti účtováno dvakrát. Pokud předtím hru znovu načteš, tuto ochranu můžeš ztratit.',
+  'hudChrome.wocStore.charter.resultContext': '{item} ({sku}): {message}',
+  'hudChrome.wocStore.charter.scope':
+    'Listina rozšiřuje banku jen této postavy. Pokladník prodává stejné sloty za zlato.',
+  'hudChrome.wocStore.charter.someHiddenByFit':
+    'Listiny příliš velké pro zbývající místo v bance této postavy se nezobrazují.',
+  'hudChrome.wocStore.charter.title': 'Listiny truhlice',
+  'itemUi.lootRoll.bindsOnPickup': 'Váže se při sebrání',
 };
