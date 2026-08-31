@@ -9131,6 +9131,8 @@ const RAID_BOSS_DIALOGUE_DICT: Partial<
 const IGNIVAR_DICT: Partial<Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, string>>>> =
   {
     es: {
+      'error.ignivarExitSealedInCombat':
+        'Las puertas de la forja permanecen cerradas mientras continúa la batalla.',
       'aura.ignivarBrandOfThePyre': 'Marca de la Pira',
       'aura.ignivarMoltenArmor': 'Armadura Fundida',
       'aura.ignivarLastInferno': 'Último Infierno',
@@ -9163,6 +9165,8 @@ const IGNIVAR_DICT: Partial<Record<SupportedLanguage, Partial<Record<BaseSimMess
       'dialogue.varkhulDeath': 'Maestro... te he fallado.',
     },
     es_ES: {
+      'error.ignivarExitSealedInCombat':
+        'Las puertas de la forja permanecen cerradas mientras continúa la batalla.',
       'aura.ignivarBrandOfThePyre': 'Marca de la Pira',
       'aura.ignivarMoltenArmor': 'Armadura Fundida',
       'aura.ignivarLastInferno': 'Último Infierno',
@@ -9193,6 +9197,22 @@ const IGNIVAR_DICT: Partial<Record<SupportedLanguage, Partial<Record<BaseSimMess
       'dialogue.ignivarSharePyre': '¡Cuatro deben compartir la pira o todos arderéis!',
       'dialogue.ignivarDeath': 'Varkhul... el sello se ha roto.',
       'dialogue.varkhulDeath': 'Maestro... te he fallado.',
+    },
+    fr_FR: {
+      'error.ignivarExitSealedInCombat':
+        'Les portes de la forge restent scellées tant que la bataille fait rage.',
+    },
+    fr_CA: {
+      'error.ignivarExitSealedInCombat':
+        'Les portes de la forge restent scellées tant que la bataille fait rage.',
+    },
+    it_IT: {
+      'error.ignivarExitSealedInCombat':
+        'Le porte della forgia restano sigillate finché infuria la battaglia.',
+    },
+    de_DE: {
+      'error.ignivarExitSealedInCombat':
+        'Die Tore der Schmiede bleiben verschlossen, solange die Schlacht tobt.',
     },
     ja_JP: {
       'error.ignivarExitSealedInCombat': '戦いが続く間、鍛冶場の扉は固く閉ざされている。',
@@ -9282,6 +9302,42 @@ const IGNIVAR_DICT: Partial<Record<SupportedLanguage, Partial<Record<BaseSimMess
       'mechanic.varkhulRecalibrate': '重新校準',
       'mechanic.varkhulTemperingRay': '淬火射線',
       'aura.varkhulTemperedWound': '淬火創傷',
+    },
+    pt_BR: {
+      'error.ignivarExitSealedInCombat':
+        'As portas da forja permanecem seladas enquanto a batalha continua.',
+    },
+    cs_CZ: {
+      'error.ignivarExitSealedInCombat':
+        'Dveře kovárny zůstávají pevně zavřené, dokud zuří bitva.',
+    },
+    nl_NL: {
+      'error.ignivarExitSealedInCombat':
+        'De deuren van de smidse blijven gesloten zolang de strijd woedt.',
+    },
+    pl_PL: {
+      'error.ignivarExitSealedInCombat':
+        'Drzwi kuźni pozostają zamknięte, dopóki trwa walka.',
+    },
+    id_ID: {
+      'error.ignivarExitSealedInCombat':
+        'Pintu-pintu bengkel tempa tetap tertutup rapat selama pertempuran berlangsung.',
+    },
+    tr_TR: {
+      'error.ignivarExitSealedInCombat':
+        'Demirhane kapıları savaş sürdükçe sıkıca kapalı kalır.',
+    },
+    sv_SE: {
+      'error.ignivarExitSealedInCombat':
+        'Smedjans portar förblir stängda så länge striden pågår.',
+    },
+    vi_VN: {
+      'error.ignivarExitSealedInCombat':
+        'Cửa lò rèn vẫn đóng chặt chừng nào trận chiến còn tiếp diễn.',
+    },
+    da_DK: {
+      'error.ignivarExitSealedInCombat':
+        'Smedjens porte forbliver lukkede, så længe slaget raser.',
     },
   };
 
