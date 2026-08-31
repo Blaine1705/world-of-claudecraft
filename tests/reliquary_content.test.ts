@@ -429,8 +429,9 @@ describe('Reliquary Conqueror catalog structure', () => {
     // moved instead of only that the sum did. The four Crucible raid pages
     // add 41 slots (17 + 3 + 16 + 5) on top of the 375 measured before them,
     // and the raid's flawless title joins the titles page, plus the two
-    // Varkhul legendaries at the launch wiring: 419; then 418 when the
-    // maintainer pulled Forgebreaker to route it through crafting.
+    // Varkhul legendary slots reached 419; then 418 when the maintainer
+    // pulled Forgebreaker to route it through crafting. Moving Emberward
+    // from Varkhul's normal page to its heroic page keeps the total fixed.
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
@@ -1567,7 +1568,7 @@ const EQUALITY_PAGES: Record<string, { pageId: string; floor: number }> = {
   // sigil redemption tokens by kind; the token-liveness arm below proves the
   // filter excludes something real.
   ignivar_raid_arena: { pageId: 'conquerors_ignivar', floor: 17 },
-  ignivar_inner_crucible: { pageId: 'conquerors_varkhul', floor: 16 },
+  ignivar_inner_crucible: { pageId: 'conquerors_varkhul', floor: 15 },
 };
 
 describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
@@ -1609,24 +1610,30 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
     }
   });
 
-  it('the Varkhul legendaries: the shield drops and pages, Forgebreaker is craft-pending', () => {
-    // The 2026-08-30 landed state: Emberward drops from Varkhul's normal
-    // table (3 percent, the kingsbane precedent) and sits on the
-    // conquerors_varkhul page. Forgebreaker is deliberately OFF the table
-    // and OFF the pages: the maintainer is routing it through the crafting
-    // professions, and a relic page row requires a conquerable source. This
-    // pin holds drop and page membership as one unit in BOTH directions:
-    // re-wiring the drop without re-paging (or vice versa) reds here, and
-    // so does the recipe chain landing without flipping this pin.
+  it('the Varkhul legendaries: Emberward is Heroic-only and Forgebreaker is craft-pending', () => {
+    // Emberward's drop and museum route move as one unit: it is absent from
+    // Varkhul's normal table and page, present in the heroic append and page,
+    // and remains catalogued globally. Forgebreaker is deliberately off both
+    // tables and pages while its crafting route is pending.
+    const normalLootIds = (MOBS.varkhul_forgefather_of_the_last_flame.loot ?? []).map(
+      (entry) => entry.itemId,
+    );
+    const heroicLootIds = (
+      HEROIC_BOSS_LOOT.varkhul_forgefather_of_the_last_flame ?? []
+    ).map((entry) => entry.itemId);
     expect(IGNIVAR_DROP_PLACEHOLDER_IDS.size).toBe(0);
     expect(isCataloguedRelicItem('varkhul_emberward')).toBe(true);
-    expect(dungeonRarePlusLootIds('ignivar_inner_crucible').includes('varkhul_emberward')).toBe(
-      true,
+    expect(normalLootIds).not.toContain('varkhul_emberward');
+    expect(heroicLootIds).toContain('varkhul_emberward');
+    expect(itemRelicIds(RELIQUARY_PAGES_BY_ID.conquerors_varkhul)).not.toContain(
+      'varkhul_emberward',
+    );
+    expect(itemRelicIds(RELIQUARY_PAGES_BY_ID.conquerors_varkhul_heroic)).toContain(
+      'varkhul_emberward',
     );
     expect(isCataloguedRelicItem('varkhul_forgebreaker')).toBe(false);
-    expect(dungeonRarePlusLootIds('ignivar_inner_crucible').includes('varkhul_forgebreaker')).toBe(
-      false,
-    );
+    expect(normalLootIds).not.toContain('varkhul_forgebreaker');
+    expect(heroicLootIds).not.toContain('varkhul_forgebreaker');
   });
 
   it('the mob walk really reaches boss-summoned adds', () => {
