@@ -4654,8 +4654,8 @@ export const nl_NL: EnTranslations = {
       "online": "Personage is momenteel online.",
       "rename_not_permitted": "Dit personage hernoemen is niet toegestaan.",
       "delete_confirm": "Typ de personagenaam om de verwijdering te bevestigen.",
-      "storage_purchase_open": "A storage purchase must finish or be resolved before this character can be deleted.",
-      "delete_busy": "The realm is busy. Try deleting this character again in a moment.",
+      "storage_purchase_open": "Een opslag-aankoop moet voltooid of opgelost zijn voordat dit personage kan worden verwijderd.",
+      "delete_busy": "De wereld is bezet. Probeer dit personage zo meteen opnieuw te verwijderen.",
       "already_in_world": "Personage is al in de wereld.",
       "taken_over": "Je personage is overgenomen door een andere sessie.",
       "rename_required": "Dit personage moet hernoemd worden voordat het de wereld kan betreden.",
@@ -5180,7 +5180,7 @@ export const nl_NL: EnTranslations = {
       "ifPartySort": "De volgorde waarin groepsleden worden weergegeven: groepsvolgorde, rol, of naam.",
       "ifPartyShowAuras": "Of buffs en debuffs op de groepsframes worden getoond. Bijbehorende schakelaars beslaan resourcebalken, absorpties, huisdieren, en of je in je eigen groepslijst verschijnt.",
       "ifAurasOnPlayerFrame": "Zet je buffs en debuffs ook op je eigen spelerframe, naast de aurabalk.",
-      "ifAlwaysShowAllBuffs": "Shows every active buff even on the Low graphics preset, bypassing its usual buff-icon cap.",
+      "ifAlwaysShowAllBuffs": "Toont elke actieve buff, zelfs met de preset Lage graphics, en omzeilt de gebruikelijke limiet voor buffpictogrammen.",
       "ifTargetOfTarget": "Toont wie het doelwit van jouw doelwit is, de klassieke manier om te zien of de tank het nog vasthoudt.",
       "ifPetFrame": "Toont een frame voor je huisdier.",
       "ifChatFontScale": "Tekstgrootte van de chat.",
@@ -6667,7 +6667,7 @@ export const nl_NL: EnTranslations = {
       "bankBody": "Elke hoofdplaats heeft een filiaal van De Vergulde Geldkist, het bankhuis van het rijk. Spreek daar met de thesaurier om je kluis te openen: een eigen bergruimte naast je tassen die je personage levenslang behoudt. Wat je bij hen achterlaat, wacht veilig op je, welk filiaal je daarna ook bezoekt.",
       "bankHow": "Met de kluis open klik je op een voorwerp in je tassen om het te storten, en klik je erop in de kluis om het terug te nemen. De kluis bewaart alleen waren, nooit geld, en questvoorwerpen blijven bij je. Raken je tassen onderweg vol, dan veegt één knop al je ambachtsmaterialen in één keer naar binnen.",
       "bankSlots": "Een nieuwe kluis begint klein en groeit met je mee. De thesaurier verkoopt extra vakken voor geld tegen steeds hogere prijzen, en online spelen levert daarbovenop bonusruimte op, voor zaken als een geverifieerd e-mailadres, gekoppelde accounts en vrienden die je naar het spel brengt.",
-      "bankSockets": "Past the slot ladder, the bursar also sells up to four bag sockets, unlocked in order at ever-steeper prices. Seat a spare bag from your carrying set in one and its slots join your vault room: an everyday bag widens the whole store, while a reagent satchel adds room only crafting materials may take. Click a bag in your bags to seat it and click the socket to take it back. Taking one back never costs you a thing you stored: if the vault ends up fuller than its shrunken room, everything stays put and new deposits simply wait for space.",
+      "bankSockets": "Na de stapsgewijze kluisuitbreidingen verkoopt de thesaurier ook maximaal vier tassenleuven, die achtereenvolgens tegen steeds hogere prijzen worden ontgrendeld. Plaats een extra tas uit je draagset in een leuf en de sleuven ervan worden aan je kluisruimte toegevoegd: een gewone tas vergroot de hele opslag, terwijl een reagentia-tas alleen ruimte toevoegt voor knutselmaterialen. Klik op een tas in je tassen om hem te plaatsen en klik op de leuf om hem weer weg te nemen. Dat kost je nooit iets wat je had opgeslagen: als de kluis voller is dan de verkleinde ruimte, blijft alles liggen en wachten nieuwe stortingen gewoon tot er plaats is.",
       "buyingTitle": "Kopen en verkopen",
       "buyingBody": "Spreek een handelaar aan en kies om zijn waar te bekijken, en zijn winkel opent met drie tabbladen: Bekijken, Verkopen en Terugkopen. Bekijken bevat alles wat ze op voorraad hebben, van jou als je het kunt betalen. Verkopen toont welke spullen uit je tassen zij willen kopen, en een stuk verkopen dat zijn eigen gerolde kwaliteit draagt, vraagt je eerst te bevestigen, zodat een gewild exemplaar nooit per ongeluk wegglipt. Doe je afstand van iets waar je spijt van krijgt, dan houdt het tabblad Terugkopen je recente verkopen vast zodat je ze kunt terugkopen voor de munten die je kreeg.",
       "junkTitle": "Rommel opruimen",
@@ -7711,7 +7711,7 @@ export const nl_NL: EnTranslations = {
       "title": "Een Solana-portemonnee verbinden",
       "linkBody": "Kies een portemonnee-extensie in deze browser. Je tekent een verificatiebericht en keert dan terug naar de desktop-app.",
       "paymentBody": "Kies de aan je account gekoppelde portemonnee en keur de transactie goed in deze browser.",
-      "stepUpBody": "Choose the wallet linked to your account and sign the $WOC Exchange authorization message. Signing is free and moves no funds.",
+      "stepUpBody": "Kies de portemonnee die aan je account is gekoppeld en onderteken het autorisatiebericht voor $WOC Exchange. Ondertekenen is gratis en verplaatst geen geld.",
       "extensionHelp": "Geen compatibele portemonnee-extensie gevonden. Installeer of ontgrendel Phantom, Solflare of een andere Solana-browserportemonnee en probeer het opnieuw.",
       "safety": "World of ClaudeCraft vraagt nooit naar je herstelzin of privésleutel.",
       "continueWith": "Doorgaan met {wallet}",
@@ -8102,18 +8102,18 @@ export const nl_NL: EnTranslations = {
     "buyConfirmCancel": "Annuleren"
   },
   "crucibleShop": {
-    "browse": "Redeem Sigils",
-    "browseAria": "Redeem Crucible sigils with {name}",
-    "empty": "No set pieces are redeemable for your class.",
-    "balance": "Your sigils: {list}",
+    "browse": "Zegels inwisselen",
+    "browseAria": "Smeltkroeszegels met {name} inwisselen",
+    "empty": "Er kunnen geen setstukken voor jouw klasse worden ingewisseld.",
+    "balance": "Je zegels: {list}",
     "balanceEntry": "{name} x{count}",
-    "noSigils": "You hold no Crucible sigils.",
+    "noSigils": "Je hebt geen Smeltkroeszegels.",
     "price": "1 {sigil}",
-    "buyAria": "Redeem {sigil} for {item}",
-    "buyConfirmTitle": "Confirm Redemption",
-    "buyConfirmBody": "Redeem your {sigil} for {item}? A consumed sigil cannot be refunded.",
-    "buyConfirmAccept": "Redeem",
-    "buyConfirmCancel": "Cancel"
+    "buyAria": "{sigil} inwisselen voor {item}",
+    "buyConfirmTitle": "Inwisseling bevestigen",
+    "buyConfirmBody": "Je {sigil} inwisselen voor {item}? Een gebruikt zegel kan niet worden terugbetaald.",
+    "buyConfirmAccept": "Inwisselen",
+    "buyConfirmCancel": "Annuleren"
   },
   "cardDuel": {
     "title": "Kaartduel",
@@ -13254,25 +13254,25 @@ export const nl_NL: EnTranslations = {
         "name": "Boeketje uit de tuin van Dawnhold"
       },
       "wayfarers_backpack": {
-        "name": "Wayfarer's Backpack"
+        "name": "Rugzak van de Reiziger"
       },
       "burlap_reagent_pouch": {
-        "name": "Burlap Reagent Pouch"
+        "name": "Jutezak voor Reagentia"
       },
       "necromancers_reagent_satchel": {
-        "name": "Necromancer's Reagent Satchel"
+        "name": "Reagentiazak van de Necromancer"
       },
       "duskweave_bag": {
-        "name": "Duskweave Bag"
+        "name": "Schemerweefsel-Tas"
       },
       "resonant_weave_bag": {
-        "name": "Resonantweave Bag"
+        "name": "Tas van Resonant Weefsel"
       },
       "foragers_haversack": {
-        "name": "Forager's Haversack"
+        "name": "Foerageerders-Rugzak"
       },
       "loombound_reagent_satchel": {
-        "name": "Loombound Reagent Satchel"
+        "name": "Weefgetouwgebonden Reagentiazak"
       },
       "ps_briny_lure": {
         "name": "Ziltig Lokaas"
@@ -13287,610 +13287,610 @@ export const nl_NL: EnTranslations = {
         "name": "Doorgangssteen"
       },
       "lastflame_core": {
-        "name": "Core of the Last Flame"
+        "name": "Kern van de Laatste Vlam"
       },
       "slagbreaker_helmet": {
-        "name": "Slagbreaker Helm"
+        "name": "Helm van de Slakkenbreker"
       },
       "slagbreaker_shoulder": {
-        "name": "Slagbreaker Pauldrons"
+        "name": "Schouderplaten van de Slakkenbreker"
       },
       "slagbreaker_chest": {
-        "name": "Slagbreaker Hauberk"
+        "name": "Pantser van de Slakkenbreker"
       },
       "slagbreaker_gloves": {
-        "name": "Slagbreaker Gauntlets"
+        "name": "Handschoenen van de Slakkenbreker"
       },
       "slagbreaker_legs": {
-        "name": "Slagbreaker Legguards"
+        "name": "Beenplaten van de Slakkenbreker"
       },
       "emberfury_helmet": {
-        "name": "Emberfury Helm"
+        "name": "Sintelwoede-Helm"
       },
       "emberfury_shoulder": {
-        "name": "Emberfury Pauldrons"
+        "name": "Sintelwoede-Schouderplaten"
       },
       "emberfury_chest": {
-        "name": "Emberfury Hauberk"
+        "name": "Sintelwoede-Kolder"
       },
       "emberfury_gloves": {
-        "name": "Emberfury Gauntlets"
+        "name": "Sintelwoede-Handplaten"
       },
       "emberfury_legs": {
-        "name": "Emberfury Legguards"
+        "name": "Sintelwoede-Beenkappen"
       },
       "forgewall_helmet": {
-        "name": "Forgewall Helm"
+        "name": "Smederijmuur-Helm"
       },
       "forgewall_shoulder": {
-        "name": "Forgewall Pauldrons"
+        "name": "Smederijmuur-Schouderplaten"
       },
       "forgewall_chest": {
-        "name": "Forgewall Hauberk"
+        "name": "Smederijmuur-Kolder"
       },
       "forgewall_gloves": {
-        "name": "Forgewall Gauntlets"
+        "name": "Smederijmuur-Handplaten"
       },
       "forgewall_legs": {
-        "name": "Forgewall Legguards"
+        "name": "Smederijmuur-Beenkappen"
       },
       "dawnforged_helmet": {
-        "name": "Dawnforged Helm"
+        "name": "Dageraadgesmeed-Helm"
       },
       "dawnforged_shoulder": {
-        "name": "Dawnforged Pauldrons"
+        "name": "Dageraadgesmeed-Schouderplaten"
       },
       "dawnforged_chest": {
-        "name": "Dawnforged Hauberk"
+        "name": "Dageraadgesmeed-Kolder"
       },
       "dawnforged_gloves": {
-        "name": "Dawnforged Gauntlets"
+        "name": "Dageraadgesmeed-Handplaten"
       },
       "dawnforged_legs": {
-        "name": "Dawnforged Legguards"
+        "name": "Dageraadgesmeed-Beenkappen"
       },
       "oathpyre_helmet": {
-        "name": "Oathpyre Helm"
+        "name": "Eedbrand-Helm"
       },
       "oathpyre_shoulder": {
-        "name": "Oathpyre Pauldrons"
+        "name": "Eedbrand-Schouderplaten"
       },
       "oathpyre_chest": {
-        "name": "Oathpyre Hauberk"
+        "name": "Eedbrand-Kolder"
       },
       "oathpyre_gloves": {
-        "name": "Oathpyre Gauntlets"
+        "name": "Eedbrand-Handplaten"
       },
       "oathpyre_legs": {
-        "name": "Oathpyre Legguards"
+        "name": "Eedbrand-Beenkappen"
       },
       "zealfire_helmet": {
-        "name": "Zealfire Helm"
+        "name": "Zealvuurhelm"
       },
       "zealfire_shoulder": {
-        "name": "Zealfire Pauldrons"
+        "name": "Zealvuur-schouderplaten"
       },
       "zealfire_chest": {
-        "name": "Zealfire Hauberk"
+        "name": "Zealvuurgambeson"
       },
       "zealfire_gloves": {
-        "name": "Zealfire Gauntlets"
+        "name": "Zealvuur-handschoenen"
       },
       "zealfire_legs": {
-        "name": "Zealfire Legguards"
+        "name": "Zealvuur-beenbeschermers"
       },
       "packlord_emberhide_helmet": {
-        "name": "Packlord's Cowl"
+        "name": "Kap van de Roedelleider"
       },
       "packlord_emberhide_shoulder": {
-        "name": "Packlord's Spaulders"
+        "name": "Schouderplaten van de Roedelleider"
       },
       "packlord_emberhide_chest": {
-        "name": "Packlord's Tunic"
+        "name": "Kolder van de Roedelleider"
       },
       "packlord_emberhide_gloves": {
-        "name": "Packlord's Grips"
+        "name": "Handplaten van de Roedelleider"
       },
       "packlord_emberhide_legs": {
-        "name": "Packlord's Breeches"
+        "name": "Beenkappen van de Roedelleider"
       },
       "coldsight_trackers_helmet": {
-        "name": "Coldsight Cowl"
+        "name": "Koudzicht-Kap"
       },
       "coldsight_trackers_shoulder": {
-        "name": "Coldsight Spaulders"
+        "name": "Koudzicht-Schouderplaten"
       },
       "coldsight_trackers_chest": {
-        "name": "Coldsight Tunic"
+        "name": "Koudzicht-Tuniek"
       },
       "coldsight_trackers_gloves": {
-        "name": "Coldsight Grips"
+        "name": "Koudzicht-Handgrepen"
       },
       "coldsight_trackers_legs": {
-        "name": "Coldsight Breeches"
+        "name": "Koudzicht-Broek"
       },
       "slagsnare_helmet": {
-        "name": "Slagsnare Cowl"
+        "name": "Kap van de Slakkenvanger"
       },
       "slagsnare_shoulder": {
-        "name": "Slagsnare Spaulders"
+        "name": "Schouderplaten van de Slakkenvanger"
       },
       "slagsnare_chest": {
-        "name": "Slagsnare Tunic"
+        "name": "Tuniek van de Slakkenvanger"
       },
       "slagsnare_gloves": {
-        "name": "Slagsnare Grips"
+        "name": "Handgrepen van de Slakkenvanger"
       },
       "slagsnare_legs": {
-        "name": "Slagsnare Breeches"
+        "name": "Broek van de Slakkenvanger"
       },
       "cinderfang_helmet": {
-        "name": "Cinderfang Cowl"
+        "name": "Sinteltand-Kap"
       },
       "cinderfang_shoulder": {
-        "name": "Cinderfang Spaulders"
+        "name": "Sinteltand-Schouderplaten"
       },
       "cinderfang_chest": {
-        "name": "Cinderfang Tunic"
+        "name": "Sinteltand-Tuniek"
       },
       "cinderfang_gloves": {
-        "name": "Cinderfang Grips"
+        "name": "Sinteltand-Handgrepen"
       },
       "cinderfang_legs": {
-        "name": "Cinderfang Breeches"
+        "name": "Sinteltand-Broek"
       },
       "smolderstrike_helmet": {
-        "name": "Smolderstrike Cowl"
+        "name": "Smeulslag-kap"
       },
       "smolderstrike_shoulder": {
-        "name": "Smolderstrike Spaulders"
+        "name": "Smeulslag-schouderplaten"
       },
       "smolderstrike_chest": {
-        "name": "Smolderstrike Tunic"
+        "name": "Smeulslag-tuniek"
       },
       "smolderstrike_gloves": {
-        "name": "Smolderstrike Grips"
+        "name": "Smeulslag-handgrepen"
       },
       "smolderstrike_legs": {
-        "name": "Smolderstrike Breeches"
+        "name": "Smeulslag-broek"
       },
       "ashveil_helmet": {
-        "name": "Ashveil Cowl"
+        "name": "Aswaas-Kap"
       },
       "ashveil_shoulder": {
-        "name": "Ashveil Spaulders"
+        "name": "Aswaas-Schouderplaten"
       },
       "ashveil_chest": {
-        "name": "Ashveil Tunic"
+        "name": "Aswaas-Tuniek"
       },
       "ashveil_gloves": {
-        "name": "Ashveil Grips"
+        "name": "Aswaas-Handgrepen"
       },
       "ashveil_legs": {
-        "name": "Ashveil Breeches"
+        "name": "Aswaas-Broek"
       },
       "emberscreed_helmet": {
-        "name": "Creed of Embers Hood"
+        "name": "Geloofsbelijdenis van de Sintels-Kap"
       },
       "emberscreed_shoulder": {
-        "name": "Creed of Embers Mantle"
+        "name": "Geloofsbelijdenis van de Sintels-Mantel"
       },
       "emberscreed_chest": {
-        "name": "Creed of Embers Robe"
+        "name": "Geloofsbelijdenis van de Sintels-Kleed"
       },
       "emberscreed_gloves": {
-        "name": "Creed of Embers Handwraps"
+        "name": "Geloofsbelijdenis van de Sintels-Handwikkels"
       },
       "emberscreed_legs": {
-        "name": "Creed of Embers Leggings"
+        "name": "Geloofsbelijdenis van de Sintels-Beenkappen"
       },
       "benison_dawnweave_helmet": {
-        "name": "Dawnweave Hood"
+        "name": "Dageraadweefsel-Kap"
       },
       "benison_dawnweave_shoulder": {
-        "name": "Dawnweave Mantle"
+        "name": "Dageraadweefsel-Mantel"
       },
       "benison_dawnweave_chest": {
-        "name": "Dawnweave Robe"
+        "name": "Dageraadweefsel-Kleed"
       },
       "benison_dawnweave_gloves": {
-        "name": "Dawnweave Handwraps"
+        "name": "Dageraadweefsel-Handwikkels"
       },
       "benison_dawnweave_legs": {
-        "name": "Dawnweave Leggings"
+        "name": "Dageraadweefsel-Beenkappen"
       },
       "vesperash_helmet": {
-        "name": "Vesperash Hood"
+        "name": "Vesperas-kap"
       },
       "vesperash_shoulder": {
-        "name": "Vesperash Mantle"
+        "name": "Vesperas-mantel"
       },
       "vesperash_chest": {
-        "name": "Vesperash Robe"
+        "name": "Vesperas-robe"
       },
       "vesperash_gloves": {
-        "name": "Vesperash Handwraps"
+        "name": "Vesperas-handwindsels"
       },
       "vesperash_legs": {
-        "name": "Vesperash Leggings"
+        "name": "Vesperas-beenbekleding"
       },
       "stormkindled_helmet": {
-        "name": "Stormkindled Helm"
+        "name": "Helm van de Stormontsteking"
       },
       "stormkindled_shoulder": {
-        "name": "Stormkindled Pauldrons"
+        "name": "Schouderplaten van de Stormontsteking"
       },
       "stormkindled_chest": {
-        "name": "Stormkindled Hauberk"
+        "name": "Harnas van de Stormontsteking"
       },
       "stormkindled_gloves": {
-        "name": "Stormkindled Gauntlets"
+        "name": "Wanten van de Stormontsteking"
       },
       "stormkindled_legs": {
-        "name": "Stormkindled Legguards"
+        "name": "Beenbeschermers van de Stormontsteking"
       },
       "warspirit_emberscale_helmet": {
-        "name": "Emberscale Helm"
+        "name": "Sintelschubbenhelm van de Oorlogsgeest"
       },
       "warspirit_emberscale_shoulder": {
-        "name": "Emberscale Pauldrons"
+        "name": "Sintelschubben-schouderplaten van de Oorlogsgeest"
       },
       "warspirit_emberscale_chest": {
-        "name": "Emberscale Hauberk"
+        "name": "Sintelschubben-harnas van de Oorlogsgeest"
       },
       "warspirit_emberscale_gloves": {
-        "name": "Emberscale Gauntlets"
+        "name": "Sintelschubben-wanten van de Oorlogsgeest"
       },
       "warspirit_emberscale_legs": {
-        "name": "Emberscale Legguards"
+        "name": "Sintelschubben-beenbeschermers van de Oorlogsgeest"
       },
       "stonehearth_helmet": {
-        "name": "Stonehearth Helm"
+        "name": "Helm van het Steenhart"
       },
       "stonehearth_shoulder": {
-        "name": "Stonehearth Pauldrons"
+        "name": "Schouderplaten van het Steenhart"
       },
       "stonehearth_chest": {
-        "name": "Stonehearth Hauberk"
+        "name": "Harnas van het Steenhart"
       },
       "stonehearth_gloves": {
-        "name": "Stonehearth Gauntlets"
+        "name": "Wanten van het Steenhart"
       },
       "stonehearth_legs": {
-        "name": "Stonehearth Legguards"
+        "name": "Beenbeschermers van het Steenhart"
       },
       "springmender_helmet": {
-        "name": "Springmender Helm"
+        "name": "Helm van de Lentegenezer"
       },
       "springmender_shoulder": {
-        "name": "Springmender Pauldrons"
+        "name": "Schouderplaten van de Lentegenezer"
       },
       "springmender_chest": {
-        "name": "Springmender Hauberk"
+        "name": "Harnas van de Lentegenezer"
       },
       "springmender_gloves": {
-        "name": "Springmender Gauntlets"
+        "name": "Wanten van de Lentegenezer"
       },
       "springmender_legs": {
-        "name": "Springmender Legguards"
+        "name": "Beenbeschermers van de Lentegenezer"
       },
       "chronoweave_helmet": {
-        "name": "Aetherweave Hood"
+        "name": "Aetherweefsel-Kap"
       },
       "chronoweave_shoulder": {
-        "name": "Aetherweave Mantle"
+        "name": "Aetherweefsel-Mantel"
       },
       "chronoweave_chest": {
-        "name": "Aetherweave Robe"
+        "name": "Aetherweefsel-Kleed"
       },
       "chronoweave_gloves": {
-        "name": "Aetherweave Handwraps"
+        "name": "Aetherweefsel-Handwikkels"
       },
       "chronoweave_legs": {
-        "name": "Aetherweave Leggings"
+        "name": "Aetherweefsel-Beenkappen"
       },
       "pyroclast_helmet": {
-        "name": "Pyroclast Hood"
+        "name": "Pyroclastische Kap"
       },
       "pyroclast_shoulder": {
-        "name": "Pyroclast Mantle"
+        "name": "Pyroclastische Mantel"
       },
       "pyroclast_chest": {
-        "name": "Pyroclast Robe"
+        "name": "Pyroclastisch Kleed"
       },
       "pyroclast_gloves": {
-        "name": "Pyroclast Handwraps"
+        "name": "Pyroclastische Handwikkels"
       },
       "pyroclast_legs": {
-        "name": "Pyroclast Leggings"
+        "name": "Pyroclastische Beenbekleding"
       },
       "frostquench_helmet": {
-        "name": "Frostquench Hood"
+        "name": "Vorstblussing-Kap"
       },
       "frostquench_shoulder": {
-        "name": "Frostquench Mantle"
+        "name": "Vorstblussing-Mantel"
       },
       "frostquench_chest": {
-        "name": "Frostquench Robe"
+        "name": "Vorstblussing-Kleed"
       },
       "frostquench_gloves": {
-        "name": "Frostquench Handwraps"
+        "name": "Vorstblussing-Handwikkels"
       },
       "frostquench_legs": {
-        "name": "Frostquench Leggings"
+        "name": "Vorstblussing-Beenkappen"
       },
       "hexthread_helmet": {
-        "name": "Hexthread Hood"
+        "name": "Vloekdraad-Kap"
       },
       "hexthread_shoulder": {
-        "name": "Hexthread Mantle"
+        "name": "Vloekdraad-Mantel"
       },
       "hexthread_chest": {
-        "name": "Hexthread Robe"
+        "name": "Vloekdraad-Kleed"
       },
       "hexthread_gloves": {
-        "name": "Hexthread Handwraps"
+        "name": "Vloekdraad-Handwikkels"
       },
       "hexthread_legs": {
-        "name": "Hexthread Leggings"
+        "name": "Vloekdraad-Beenkappen"
       },
       "gravebrand_helmet": {
-        "name": "Gravebrand Hood"
+        "name": "Grafmerk-Kap"
       },
       "gravebrand_shoulder": {
-        "name": "Gravebrand Mantle"
+        "name": "Grafmerk-Mantel"
       },
       "gravebrand_chest": {
-        "name": "Gravebrand Robe"
+        "name": "Grafmerk-Kleed"
       },
       "gravebrand_gloves": {
-        "name": "Gravebrand Handwraps"
+        "name": "Grafmerk-Handwikkels"
       },
       "gravebrand_legs": {
-        "name": "Gravebrand Leggings"
+        "name": "Grafmerk-Beenkappen"
       },
       "ruincaller_helmet": {
-        "name": "Ruincaller Hood"
+        "name": "Kap van de Verderfroepster"
       },
       "ruincaller_shoulder": {
-        "name": "Ruincaller Mantle"
+        "name": "Mantel van de Verderfroepster"
       },
       "ruincaller_chest": {
-        "name": "Ruincaller Robe"
+        "name": "Kleed van de Verderfroepster"
       },
       "ruincaller_gloves": {
-        "name": "Ruincaller Handwraps"
+        "name": "Handwikkels van de Verderfroepster"
       },
       "ruincaller_legs": {
-        "name": "Ruincaller Leggings"
+        "name": "Beenbekleding van de Verderfroepster"
       },
       "moonscorch_helmet": {
-        "name": "Moonscorch Cowl"
+        "name": "Maanschroe-Kap"
       },
       "moonscorch_shoulder": {
-        "name": "Moonscorch Spaulders"
+        "name": "Maanschroe-Schouderplaten"
       },
       "moonscorch_chest": {
-        "name": "Moonscorch Tunic"
+        "name": "Maanschroe-Kleed"
       },
       "moonscorch_gloves": {
-        "name": "Moonscorch Grips"
+        "name": "Maanschroe-Handplaten"
       },
       "moonscorch_legs": {
-        "name": "Moonscorch Breeches"
+        "name": "Maanschroe-Beenkappen"
       },
       "wildfang_emberhide_helmet": {
-        "name": "Wildfang Cowl"
+        "name": "Wildtandkap"
       },
       "wildfang_emberhide_shoulder": {
-        "name": "Wildfang Spaulders"
+        "name": "Wildtand-schouderplaten"
       },
       "wildfang_emberhide_chest": {
-        "name": "Wildfang Tunic"
+        "name": "Wildtandtuniek"
       },
       "wildfang_emberhide_gloves": {
-        "name": "Wildfang Grips"
+        "name": "Wildtandwanten"
       },
       "wildfang_emberhide_legs": {
-        "name": "Wildfang Breeches"
+        "name": "Wildtandbroek"
       },
       "cinderbark_helmet": {
-        "name": "Cinderbark Cowl"
+        "name": "Sintelschors-Kap"
       },
       "cinderbark_shoulder": {
-        "name": "Cinderbark Spaulders"
+        "name": "Sintelschors-Schouderplaten"
       },
       "cinderbark_chest": {
-        "name": "Cinderbark Tunic"
+        "name": "Sintelschors-Tuniek"
       },
       "cinderbark_gloves": {
-        "name": "Cinderbark Grips"
+        "name": "Sintelschors-Handgrepen"
       },
       "cinderbark_legs": {
-        "name": "Cinderbark Breeches"
+        "name": "Sintelschors-Broek"
       },
       "grovespring_helmet": {
-        "name": "Grovespring Cowl"
+        "name": "Groevebron-Kap"
       },
       "grovespring_shoulder": {
-        "name": "Grovespring Spaulders"
+        "name": "Groevebron-Schouderplaten"
       },
       "grovespring_chest": {
-        "name": "Grovespring Tunic"
+        "name": "Groevebron-Kleed"
       },
       "grovespring_gloves": {
-        "name": "Grovespring Grips"
+        "name": "Groevebron-Handwikkels"
       },
       "grovespring_legs": {
-        "name": "Grovespring Breeches"
+        "name": "Groevebron-Beenkappen"
       },
       "sigil_anvil_helmet": {
-        "name": "Helm Sigil of the Anvil"
+        "name": "Helm van het Aambeeldsigil"
       },
       "sigil_ember_helmet": {
-        "name": "Helm Sigil of the Ember"
+        "name": "Helm van het Sintelsigil"
       },
       "sigil_tempest_helmet": {
-        "name": "Helm Sigil of the Tempest"
+        "name": "Helm van het Stormsigil"
       },
       "sigil_anvil_shoulder": {
-        "name": "Mantle Sigil of the Anvil"
+        "name": "Mantel van het Aambeeldsigil"
       },
       "sigil_ember_shoulder": {
-        "name": "Mantle Sigil of the Ember"
+        "name": "Mantel van het Sintelsigil"
       },
       "sigil_tempest_shoulder": {
-        "name": "Mantle Sigil of the Tempest"
+        "name": "Mantel van het Stormsigil"
       },
       "sigil_anvil_chest": {
-        "name": "Robe Sigil of the Anvil"
+        "name": "Kleed van het Aambeeldsigil"
       },
       "sigil_ember_chest": {
-        "name": "Robe Sigil of the Ember"
+        "name": "Kleed van het Sintelsigil"
       },
       "sigil_tempest_chest": {
-        "name": "Robe Sigil of the Tempest"
+        "name": "Kleed van het Stormsigil"
       },
       "sigil_anvil_gloves": {
-        "name": "Grip Sigil of the Anvil"
+        "name": "Handgrepen van het Aambeeldsigil"
       },
       "sigil_ember_gloves": {
-        "name": "Grip Sigil of the Ember"
+        "name": "Handgrepen van het Sintelsigil"
       },
       "sigil_tempest_gloves": {
-        "name": "Grip Sigil of the Tempest"
+        "name": "Handgrepen van het Stormsigil"
       },
       "sigil_anvil_legs": {
-        "name": "Legging Sigil of the Anvil"
+        "name": "Beenbekleding van het Aambeeldsigil"
       },
       "sigil_ember_legs": {
-        "name": "Legging Sigil of the Ember"
+        "name": "Beenbekleding van het Sintelsigil"
       },
       "sigil_tempest_legs": {
-        "name": "Legging Sigil of the Tempest"
+        "name": "Beenbekleding van het Stormsigil"
       },
       "cord_of_the_last_flame": {
-        "name": "Cord of the Last Flame"
+        "name": "Koord van de Laatste Vlam"
       },
       "cindersoaked_slippers": {
-        "name": "Cindersoaked Slippers"
+        "name": "Sinteldoordrenkte Pantoffels"
       },
       "springbinder_sash": {
-        "name": "Springbinder Sash"
+        "name": "Sjerp van de Lentebinder"
       },
       "steps_of_quiet_water": {
-        "name": "Steps of Quiet Water"
+        "name": "Stappen van Stil Water"
       },
       "cinderbark_cinch": {
-        "name": "Cinderbark Cinch"
+        "name": "Sintelschors-Riem"
       },
       "ashenbark_treads": {
-        "name": "Ashenbark Treads"
+        "name": "Assebast-Laarzen"
       },
       "slagstalker_belt": {
-        "name": "Slagstalker Belt"
+        "name": "Gordel van de Slakkenjager"
       },
       "ashrunner_boots": {
-        "name": "Ashrunner Boots"
+        "name": "Asloper-Laarzen"
       },
       "moonscorch_waistwrap": {
-        "name": "Moonscorch Waistwrap"
+        "name": "Maanschroe-Taillewikkel"
       },
       "scorchgrove_striders": {
-        "name": "Scorchgrove Striders"
+        "name": "Schroeibos-Laarzen"
       },
       "grovetender_belt": {
-        "name": "Grovetender Belt"
+        "name": "Woudhoeder-Riem"
       },
       "dewfall_moccasins": {
-        "name": "Dewfall Moccasins"
+        "name": "Dauwval-Mocassins"
       },
       "forgewall_girdle": {
-        "name": "Forgewall Girdle"
+        "name": "Smederijmuur-Riem"
       },
       "anvilstance_sabatons": {
-        "name": "Anvilstance Sabatons"
+        "name": "Aambeeldhouding-Voetplaten"
       },
       "warforged_waistguard": {
-        "name": "Warforged Waistguard"
+        "name": "Oorlogsgesmede middelgordel"
       },
       "furnace_march_greaves": {
-        "name": "Furnace March Greaves"
+        "name": "Ovenmars-Scheenplaten"
       },
       "stormkindled_chain": {
-        "name": "Stormkindled Chain"
+        "name": "Stormontstoken keten"
       },
       "thundershock_treads": {
-        "name": "Thundershock Treads"
+        "name": "Donderschok-laarzen"
       },
       "tidebinder_links": {
-        "name": "Tidebinder Links"
+        "name": "Schakels van de Getijdenbinder"
       },
       "springwarden_sabatons": {
-        "name": "Springwarden Sabatons"
+        "name": "Sabatons van de Lentewachter"
       },
       "pendant_of_the_first_tempering": {
-        "name": "Pendant of the First Tempering"
+        "name": "Hanger van de Eerste Harding"
       },
       "ignivars_ember_choker": {
-        "name": "Ignivar's Ember Choker"
+        "name": "Sintelchoker van Ignivar"
       },
       "locket_of_the_last_flame": {
-        "name": "Locket of the Last Flame"
+        "name": "Medaillon van de Laatste Vlam"
       },
       "heartspring_amulet": {
-        "name": "Heartspring Amulet"
+        "name": "Amulet van de Hartbron"
       },
       "seal_of_the_forgewall": {
-        "name": "Seal of the Forgewall"
+        "name": "Zegel van de Smederijmuur"
       },
       "band_of_marked_strikes": {
-        "name": "Band of Marked Strikes"
+        "name": "Ring van Gemarkeerde Slagen"
       },
       "circle_of_cinders": {
-        "name": "Circle of Cinders"
+        "name": "Cirkel van Sintels"
       },
       "loop_of_quiet_springs": {
-        "name": "Loop of Quiet Springs"
+        "name": "Ring van de Stille Bronnen"
       },
       "bulwark_of_the_inner_crucible": {
-        "name": "Bulwark of the Inner Crucible"
+        "name": "Bolwerk van de Innerlijke Smeltkroes"
       },
       "ember_wardens_barrier": {
-        "name": "Ember Warden's Barrier"
+        "name": "Barrière van de Sintelwachter"
       },
       "orb_of_the_last_spring": {
-        "name": "Orb of the Last Spring"
+        "name": "Bol van de Laatste Bron"
       },
       "cinder_of_the_first_design": {
-        "name": "Cinder of the First Design"
+        "name": "Sintels van het Eerste Ontwerp"
       },
       "forgefathers_warhammer": {
-        "name": "Forgefather's Warhammer"
+        "name": "Smederijvaders-Strijdhamer"
       },
       "cinderfang_kris": {
-        "name": "Cinderfang Kris"
+        "name": "Sinteltand-Kris"
       },
       "slagrender_cleaver": {
-        "name": "Slagrender Cleaver"
+        "name": "Slakkenkliever"
       },
       "anvilguard_blade": {
-        "name": "Anvilguard Blade"
+        "name": "Aambeeldwacht-Kling"
       },
       "heart_of_the_end_greatblade": {
-        "name": "Heart of the End Greatblade"
+        "name": "Grootzwaard van het Eindhart"
       },
       "staff_of_the_last_spring": {
-        "name": "Staff of the Last Spring"
+        "name": "Staf van de Laatste Lente"
       },
       "forgefire_spire": {
-        "name": "Forgefire Spire"
+        "name": "Smederijvuur-Spits"
       },
       "springtouched_crozier": {
-        "name": "Springtouched Crozier"
+        "name": "Lenteraakte kromstaf"
       },
       "wand_of_quenched_sparks": {
-        "name": "Wand of Quenched Sparks"
+        "name": "Toverstaf van Gedoofde Vonken"
       },
       "conjured_water4": {
         "name": "Getoverd bronwater"
@@ -14670,10 +14670,10 @@ export const nl_NL: EnTranslations = {
         "name": "Teugels van Donderpronker, de Grote Kalkoen"
       },
       "varkhul_forgebreaker": {
-        "name": "Forgebreaker, Engine of Varkhul"
+        "name": "Smederijbreker, Motor van Varkhul"
       },
       "varkhul_emberward": {
-        "name": "Emberward, Bulwark of Varkhul"
+        "name": "Sintelschild, Bolwerk van Varkhul"
       }
     },
     "mobs": {
@@ -14870,25 +14870,25 @@ export const nl_NL: EnTranslations = {
         "name": "Nythraxis, Gesel van Doorntop"
       },
       "ignivar_herald_of_the_last_flame": {
-        "name": "Ignivar, Herald of the Last Flame"
+        "name": "Ignivar, Heraut van de Laatste Vlam"
       },
       "ignivar_heart_of_the_end": {
-        "name": "Ignivar Ashcaller"
+        "name": "Ignivar, Asroeper"
       },
       "ignivar_ember_sentinel": {
-        "name": "Ember Sentinel"
+        "name": "Sintelschildwacht"
       },
       "ignivar_crucible_warden": {
-        "name": "Crucible Warden"
+        "name": "Bewaker van de Smeltkroes"
       },
       "ignivar_cinder_artificer": {
-        "name": "Cinder Artificer"
+        "name": "Sintelambachtsman"
       },
       "varkhul_forgefather_of_the_last_flame": {
-        "name": "Varkhul, Forgefather of the Last Flame"
+        "name": "Varkhul, Smidvader van de Laatste Vlam"
       },
       "derelict_mech": {
-        "name": "Derelict Mech"
+        "name": "Verlaten Mech"
       },
       "reliquary_ledger_wraith": {
         "name": "Grootboek-Schim"
@@ -15551,19 +15551,19 @@ export const nl_NL: EnTranslations = {
         "greeting": "Van een kapelhof in het Dal tot het dak van de wereld... het spoor dat we hebben gevolgd eindigt hier. Ik voel de berg luisteren."
       },
       "archivist_maelin_emberward": {
-        "name": "Archivist Maelin Emberward",
-        "title": "Crucible Archivist",
-        "greeting": "Every hammer mark in this place is a sentence. Help me read what Varkhul tried to hide."
+        "name": "Archivaris Maelin Sintelwacht",
+        "title": "Archivaris van de Smeltkroes",
+        "greeting": "Elke hamerslag hier is een zin. Help me lezen wat Varkhul probeerde te verbergen."
       },
       "archivist_maelin_ember_projection": {
-        "name": "Maelin's Ember Projection",
-        "title": "Ember Projection",
-        "greeting": "The embers carry Maelin's voice forward through the forge."
+        "name": "Maelins Sintelprojectie",
+        "title": "Sintelprojectie",
+        "greeting": "De sintels dragen Maelins stem door de smidse naar voren."
       },
       "crucible_quartermaster": {
-        "name": "Quartermaster Bronn Emberward",
-        "title": "Crucible Quartermaster",
-        "greeting": "The forge marks its own. Bring me a sigil from the Crucible and I will fit you for war."
+        "name": "Kwartiermeester Bronn Sintelwacht",
+        "title": "Kwartiermeester van de Smeltkroes",
+        "greeting": "De smidse herkent haar eigen volk. Breng me een zegel uit de Smeltkroes en ik rust je uit voor de oorlog."
       },
       "brother_halven": {
         "name": "Broeder Halven",
@@ -16714,35 +16714,35 @@ export const nl_NL: EnTranslations = {
         }
       },
       "q_ignivar_echoes_in_iron": {
-        "title": "Echoes in Iron",
-        "text": "These automata are not soldiers. They are drafts. Break each assembly line and listen when the final shell falls. The forge remembers what Varkhul tried to erase.",
-        "completion": "The echoes agree. Varkhul bound water from the dying Last Spring into living metal. These automatons were failed temperings. Only Ignivar endured.",
+        "title": "Echo’s in IJzer",
+        "text": "Deze automaten zijn geen soldaten. Het zijn ontwerpen. Breek elke productielijn en luister wanneer de laatste huls valt. De smidse onthoudt wat Varkhul probeerde uit te wissen.",
+        "completion": "De echo’s stemmen overeen. Varkhul bond water uit de stervende Laatste Bron aan levend metaal. Deze automaten waren mislukte hardingen. Alleen Ignivar hield stand.",
         "objectives": {
           "0": {
-            "label": "Ember Sentinels destroyed"
+            "label": "Sintelschildwachten vernietigd"
           },
           "1": {
-            "label": "Crucible Wardens destroyed"
+            "label": "Bewakers van de Smeltkroes vernietigd"
           }
         }
       },
       "q_ignivar_heralds_heart": {
-        "title": "The Herald's Heart",
-        "text": "The survivor named in every echo is Ignivar. Varkhul called him herald, seal, and key. Defeat him. If the records are true, his death will reveal what he was forged to guard.",
-        "completion": "Ignivar was never merely a guardian. His heart was the key, and its final plates opened the sealed crucible below.",
+        "title": "Het Hart van de Heraut",
+        "text": "De overlevende die in elke echo wordt genoemd is Ignivar. Varkhul noemde hem heraut, zegel en sleutel. Versla hem. Als de archieven kloppen, zal zijn dood onthullen wat hij moest bewaken.",
+        "completion": "Ignivar was nooit slechts een bewaker. Zijn hart was de sleutel, en de laatste platen ervan openden de verzegelde smeltkroes beneden.",
         "objectives": {
           "0": {
-            "label": "Ignivar defeated"
+            "label": "Ignivar verslagen"
           }
         }
       },
       "q_ignivar_the_forgefather": {
-        "title": "The Forgefather",
-        "text": "The path below leads to Varkhul, Forgefather of the Last Flame. He imprisoned the Last Spring to make metal live, then forged Ignivar to keep the crime sealed. Enter the Inner Crucible and end his work.",
-        "completion": "The forge is silent at last. The spring may never recover, but Varkhul will shape no more lives into chains.",
+        "title": "De Smidvader",
+        "text": "Het pad hieronder leidt naar Varkhul, Smidvader van de Laatste Vlam. Hij zette de Laatste Bron gevangen om metaal tot leven te wekken en smeedde daarna Ignivar om de misdaad verborgen te houden. Betreed de Binnenste Smeltkroes en maak een einde aan zijn werk.",
+        "completion": "De smidse is eindelijk stil. De Bron herstelt misschien nooit, maar Varkhul zal geen levens meer tot ketenen smeden.",
         "objectives": {
           "0": {
-            "label": "Varkhul defeated"
+            "label": "Varkhul verslagen"
           }
         }
       },
@@ -18624,29 +18624,29 @@ export const nl_NL: EnTranslations = {
         "leaveText": "Je keert terug naar de koude lucht van Doorntop."
       },
       "ignivar_forge_lift": {
-        "name": "The Forge-Lift",
-        "enterText": "The forge-lift shudders and sinks; hammerfall rises to meet you.",
-        "leaveText": "The lift hauls you back into the open air of the keep."
+        "name": "De Smederij-Lift",
+        "enterText": "De smidslift schudt en daalt; hamerklappen stijgen je tegemoet.",
+        "leaveText": "De lift brengt je terug naar de open lucht van de vesting."
       },
       "ignivar_forge_approach": {
-        "name": "Halls of the First Tempering",
-        "enterText": "Hammerfall echoes through the Halls of the First Tempering.",
-        "leaveText": "You step away from the first forge and breathe freely again."
+        "name": "Zalen van de Eerste Tempering",
+        "enterText": "Hamerklappen weerklinken door de Zalen van de Eerste Tempering.",
+        "leaveText": "Je stapt weg van de eerste smidse en ademt weer vrij."
       },
       "ignivar_raid_arena": {
-        "name": "Crucible of the Last Spring",
-        "enterText": "Heat shimmers above the sealed waters of the Crucible.",
-        "leaveText": "You step away from the Crucible and breathe freely again."
+        "name": "Smeltkroes van de Laatste Bron",
+        "enterText": "Hitte trilt boven de verzegelde wateren van de Smeltkroes.",
+        "leaveText": "Je stapt weg van de Smeltkroes en ademt weer vrij."
       },
       "ignivar_molten_assembly": {
-        "name": "Molten Assembly",
-        "enterText": "The opened gate leads into a molten assembly hall.",
-        "leaveText": "You leave the assembly line and return to the Crucible."
+        "name": "Gloeiende Assemblage",
+        "enterText": "De geopende poort leidt naar een gloeiende assemblagehal.",
+        "leaveText": "Je verlaat de assemblagelijn en keert terug naar de Smeltkroes."
       },
       "ignivar_inner_crucible": {
-        "name": "The Inner Crucible",
-        "enterText": "The opened gate leads deeper into the Crucible.",
-        "leaveText": "You leave the silent depths of the Crucible."
+        "name": "De Binnenste Smeltkroes",
+        "enterText": "De geopende poort leidt dieper de Smeltkroes in.",
+        "leaveText": "Je verlaat de stille diepten van de Smeltkroes."
       },
       "wildheart_basin": {
         "name": "Het Wildhartbekken",
@@ -18880,182 +18880,182 @@ export const nl_NL: EnTranslations = {
     },
     "itemSets": {
       "ashveil": {
-        "name": "Ashveil Garb",
-        "bonus2": "Lurker's Strike hits 25 percent harder.",
-        "bonus4": "Your Veiled Edge strike hits for triple, up from double."
+        "name": "Ashveil-kledij",
+        "bonus2": "Lurker’s Strike treft 25 procent harder.",
+        "bonus4": "Je Veiled Edge-aanval treft driemaal zo hard, in plaats van tweemaal."
       },
       "benison_dawnweave": {
-        "name": "Benison Dawnweave",
-        "bonus2": "Seraphic Vigil's rescue heals for 270, up from 180. Damage taken no longer delays your spellcasting.",
-        "bonus4": "When Seraphic Vigil triggers, its ally is also mended for 15 percent of their maximum health over 10 sec."
+        "name": "Benison Dageraadweefsel",
+        "bonus2": "De redding van Seraphic Vigil geneest 270, in plaats van 180. Opgelopen schade vertraagt het uitspreken van je spreuken niet meer.",
+        "bonus4": "Wanneer Seraphic Vigil wordt geactiveerd, wordt zijn bondgenoot ook gedurende 10 sec. genezen voor 15 procent van diens maximale gezondheid."
       },
       "boundstone_vanguard": {
         "name": "Bandsteen-voorhoede",
         "bonus3": "Verhoogt aanvals- en spreuksnelheid met 15%."
       },
       "chronoweave": {
-        "name": "Aetherweave Vestments",
-        "bonus2": "Temporal Echo converts 50 percent of your single-target Arcane damage into healing. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Temporal Cascade's cooldown is reduced by 5 sec."
+        "name": "Aetherweefsel-Gewaden",
+        "bonus2": "Temporal Echo zet 50 procent van je Arcane-schade tegen één doel om in genezing. Opgelopen schade vertraagt het uitspreken van je spreuken niet meer.",
+        "bonus4": "De afkoeltijd van Temporal Cascade wordt met 5 sec. verkort."
       },
       "cinderbark": {
-        "name": "Cinderbark Ward",
-        "bonus2": "Sweeping Claws has a 30 percent chance to bank an additional Old Blood.",
-        "bonus4": "Marrowbreak hits 30 percent harder, and its emergency guard no longer replaces the strike."
+        "name": "Cinderbast-Bescherming",
+        "bonus2": "Sweeping Claws heeft 30 procent kans om een extra Old Blood op te slaan.",
+        "bonus4": "Marrowbreak treft 30 procent harder en zijn noodbescherming vervangt de aanval niet meer."
       },
       "cinderfang": {
-        "name": "Cinderfang Shroud",
-        "bonus2": "Venom Ritual's energy refund rises to 20 per builder.",
-        "bonus4": "Venom Dart's cooldown is reduced to 4 sec."
+        "name": "Cinderfang-Sluier",
+        "bonus2": "De energieteruggave van Venom Ritual stijgt naar 20 per opbouwer.",
+        "bonus4": "De afkoeltijd van Venom Dart wordt verkort tot 4 sec."
       },
       "coldsight_trackers": {
-        "name": "Coldsight Trackers",
-        "bonus2": "Measured Shot restores 5 additional Focus.",
-        "bonus4": "Long Draw critical strikes extend Cold Focus by 2 sec, up to 6 sec per activation."
+        "name": "Koudzicht-Verkenners",
+        "bonus2": "Measured Shot herstelt 5 extra Focus.",
+        "bonus4": "Kritieke treffers van Long Draw verlengen Cold Focus met 2 sec., tot maximaal 6 sec. per activering."
       },
       "crownforged": {
         "name": "Bonewrought-Regalia",
         "bonus2": "Verhoogt aanvalskracht met 40.",
         "bonus4": "Je kritieke wapentreffers splinteren het doelwit met Beensplinter, waardoor het 8 schade bloedt elke 2 sec gedurende 12 sec. Stapelt tot 3 keer.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 5 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Verhoogt aanvals- en spreuksnelheid met 4% en Trefferkans met 3%. Kritieke treffers van je wapen splijten het doel met Bonesplinter, waardoor het 12 sec. lang elke 2 sec. 5 schade oploopt. Stapelt tot 3 keer."
       },
       "dawnforged": {
-        "name": "Dawnforged Vestments",
-        "bonus2": "Beacon of Light copies 55 percent of your direct heals. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Radiant Resonance's empowered Dawn's Embrace is instant."
+        "name": "Dageraadgesmede Gewaden",
+        "bonus2": "Beacon of Light kopieert 55 procent van je directe genezingen. Opgelopen schade vertraagt het uitspreken van je spreuken niet meer.",
+        "bonus4": "De versterkte Dawn’s Embrace van Radiant Resonance is onmiddellijk."
       },
       "deathlord": {
         "name": "Barrowlord-Strijduitrusting",
         "bonus2": "Verhoogt aanvalskracht met 40.",
         "bonus4": "Je kritieke wapentreffers hebben 50% kans om Grafmacht te verlenen, waardoor je aanvalskracht met 60 toeneemt gedurende 10 sec.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 5 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Verhoogt aanvals- en spreuksnelheid met 4% en Trefferkans met 3%. Kritieke treffers van je wapen splijten het doel met Bonesplinter, waardoor het 12 sec. lang elke 2 sec. 5 schade oploopt. Stapelt tot 3 keer."
       },
       "emberfury": {
-        "name": "Emberfury Harness",
-        "bonus2": "Your Enrage lasts 6 sec instead of 4.",
-        "bonus4": "Bloodletting always Enrages you, and its healing rises to 8 percent of your maximum health."
+        "name": "Sintelwoede-Harnas",
+        "bonus2": "Je Enrage duurt 6 sec. in plaats van 4.",
+        "bonus4": "Bloodletting activeert altijd Enrage bij jou en de genezing ervan stijgt naar 8 procent van je maximale gezondheid."
       },
       "emberscreed": {
-        "name": "Creed of Embers Vestments",
-        "bonus2": "Your Doctrine link converts 10 percent more of your Holy damage into healing. Damage taken no longer delays your spellcasting.",
-        "bonus4": "When your Psalm of Warding is fully consumed, your next Scouring Hymn within 10 sec is instant. Cannot occur more than once every 15 sec."
+        "name": "Gewaden van de Beloofde Sintels",
+        "bonus2": "Je Doctrine-link zet 10 procent meer van je Holy-schade om in genezing. Opgelopen schade vertraagt het uitspreken van je spreuken niet meer.",
+        "bonus4": "Wanneer je Psalm of Warding volledig is verbruikt, is je volgende Scouring Hymn binnen 10 sec. onmiddellijk. Kan niet vaker dan eens per 15 sec. optreden."
       },
       "forgewall": {
-        "name": "Forgewall Aegis",
-        "bonus2": "Iron Resolve converts rage at 5 absorb per point instead of 4.",
-        "bonus4": "Casting Shieldcrack reduces Iron Resolve's remaining cooldown by 2 sec."
+        "name": "Smederijmuur-Aegis",
+        "bonus2": "Iron Resolve zet woede om in 5 absorptie per punt in plaats van 4.",
+        "bonus4": "Het uitspreken van Schildbreuk verkort de resterende afkoelperiode van IJzeren Vastberadenheid met 2 sec."
       },
       "frostquench": {
-        "name": "Frostquench Weave",
-        "bonus2": "Rimelance critical strikes bank a second Icicle, up to the maximum of 5. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Winterlash plants 3 Winter's Chill charges, up from 2."
+        "name": "Vorstblus-Weefsel",
+        "bonus2": "Kritieke treffers van Rimelance slaan een tweede Icicle op, tot een maximum van 5. Opgelopen schade vertraagt het uitspreken van je spreuken niet meer.",
+        "bonus4": "Winterlash plaatst 3 Winter’s Chill-ladingen, in plaats van 2."
       },
       "gravebrand": {
-        "name": "Gravebrand Regalia",
-        "bonus2": "Reaping Command's cooldown is reduced by 2 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Reaping Command's unison strikes deal 25 percent more damage."
+        "name": "Grafmerk-Regalia",
+        "bonus2": "De afkoeltijd van Reaping Command wordt met 2 sec. verkort. Opgelopen schade vertraagt het uitspreken van je spreuken niet meer.",
+        "bonus4": "De unisono-aanvallen van Reaping Command richten 25 procent meer schade aan."
       },
       "greyjaw_stalker": {
         "name": "Uitrusting van de Grijskaak-sluiper",
         "bonus3": "Verhoogt aanvals- en spreuksnelheid met 15%."
       },
       "grovespring": {
-        "name": "Grovespring Raiment",
-        "bonus2": "Swiftmend consumes your own Wildbloom or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Overbloom harvests 75 percent of your remaining effects and banks 1 Verdance afterward."
+        "name": "Bosbron-Kledij",
+        "bonus2": "Swiftmend verbruikt eerst je eigen Wildbloom of Second Bloom en geneest 25 procent meer. Opgelopen schade vertraagt het uitspreken van je spreuken niet meer.",
+        "bonus4": "Overbloom oogst 75 procent van je resterende effecten en slaat daarna 1 Verdance op."
       },
       "hexthread": {
-        "name": "Hexthread Shroud",
-        "bonus2": "Needle of Fate grants 2 additional Condemnation. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Passing Sentence refunds 10 Condemnation."
+        "name": "Hexdraad-Sluier",
+        "bonus2": "Needle of Fate verleent 2 extra Condemnation. Opgelopen schade vertraagt het uitspreken van je spreuken niet meer.",
+        "bonus4": "Passing Sentence geeft 10 Condemnation terug."
       },
       "moonscorch": {
-        "name": "Moonscorch Raiment",
-        "bonus2": "Moonseed may extend Lunar Tempest twice per application, to a maximum of 12 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Moonsurge and Sunwake strike 25 percent harder."
+        "name": "Maanschroeisel-Kledij",
+        "bonus2": "Moonseed kan Lunar Tempest per toepassing tweemaal verlengen, tot maximaal 12 sec. Opgelopen schade vertraagt het uitspreken van je spreuken niet meer.",
+        "bonus4": "Moonsurge en Sunwake treffen 25 procent harder."
       },
       "necromancers": {
         "name": "Mournweave-Gewaden",
         "bonus2": "Verhoogt spreukkracht met 20. Opgelopen schade vertraagt je spreuken niet meer (100% weerstand tegen spreukvertraging).",
         "bonus4": "Je spreuken hebben 10% kans om Helder Bezweren te verlenen, waardoor je volgende spreuk gratis is.",
-        "bonus6": "Increases attack and casting speed by 4%. Your spells have a 10% chance to grant Soulblaze, increasing spell power by 25 for 10 sec."
+        "bonus6": "Verhoogt aanvals- en spreuksnelheid met 4%. Je spreuken hebben 10% kans om Soulblaze te verlenen, waardoor spreukkracht gedurende 10 sec. met 25 toeneemt."
       },
       "nighttalon": {
         "name": "Direfang-Pels",
         "bonus2": "Verhoogt aanvalskracht met 40.",
         "bonus4": "Je kritieke wapentreffers rijten een Rafelige Snee, waardoor het doelwit 6 schade bloedt elke 2 sec gedurende 12 sec. Stapelt tot 3 keer.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 4 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Verhoogt aanvals- en spreuksnelheid met 4% en Trefferkans met 3%. Kritieke treffers van je wapen slaan een Ragged Gash, waardoor het doel 12 sec. lang elke 2 sec. 4 schade oploopt. Stapelt tot 3 keer."
       },
       "oathpyre": {
-        "name": "Oathpyre Bastion",
-        "bonus2": "Vowkeeper Strike's chance to arm Solar Reprisal rises to 30 percent, and blocking an attack arms it 40 percent of the time.",
-        "bonus4": "Consuming Solar Reprisal shields you for 6 percent of your maximum health for 10 sec."
+        "name": "Eedvuur-Bastion",
+        "bonus2": "De kans van Vowkeeper Strike om Solar Reprisal te activeren stijgt naar 30 procent, en een aanval blokkeren activeert het 40 procent van de tijd.",
+        "bonus4": "Door Solar Reprisal te verbruiken krijg je 10 sec. lang een schild ter waarde van 6 procent van je maximale gezondheid."
       },
       "packlord_emberhide": {
-        "name": "Packlord's Emberhide",
-        "bonus2": "Pack Command's cooldown is reduced to 3 sec.",
-        "bonus4": "Pack Command's chance to reset Stampede's cooldown rises to 30 percent."
+        "name": "Emberhuid van de Meester van de Roedel",
+        "bonus2": "De afkoeltijd van Pack Command wordt verkort tot 3 sec.",
+        "bonus4": "De kans van Pack Command om de afkoeltijd van Stampede te resetten stijgt naar 30%."
       },
       "pyroclast": {
-        "name": "Pyroclast Regalia",
-        "bonus2": "Scald always critically strikes targets at or below 35 percent health. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Your Fire spells' critical strikes outside Phoenix Trance reduce its remaining cooldown by 1.5 sec."
+        "name": "Pyroclast-Regalia",
+        "bonus2": "Scald deelt altijd kritieke treffers uit aan doelen met 35% gezondheid of minder. Opgelopen schade vertraagt je spreuken niet meer.",
+        "bonus4": "Kritieke treffers van je Vuurspreuken buiten Phoenix Trance verkorten de resterende afkoeltijd ervan met 1,5 sec."
       },
       "ruincaller": {
-        "name": "Ruincaller Vestments",
-        "bonus2": "Conflagrate holds 3 charges. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Ruinbolt strikes 20 percent harder."
+        "name": "Ruincaller-Gewaden",
+        "bonus2": "Conflagrate heeft 3 ladingen. Opgelopen schade vertraagt je spreuken niet meer.",
+        "bonus4": "Ruinbolt treft 20% harder."
       },
       "slagbreaker": {
-        "name": "Slagbreaker Battlegear",
-        "bonus2": "Redhand empowers your next Maiming Strike by 30 percent per stack instead of 20.",
-        "bonus4": "Every second cast of Redhand reduces Breachmaker's remaining cooldown by 3 sec."
+        "name": "Slagbreaker-Strijduitrusting",
+        "bonus2": "Redhand versterkt je volgende Maiming Strike met 30% per stapel in plaats van 20%.",
+        "bonus4": "Elke tweede keer dat je Redhand gebruikt, wordt de resterende afkoeltijd van Breachmaker met 3 sec. verkort."
       },
       "slagsnare": {
-        "name": "Slagsnare Trappings",
-        "bonus2": "Gutting Strike generates 20 Focus.",
-        "bonus4": "Woundrend that consumes 3 Hunting Momentum preserves them. Cannot occur more than once every 8 sec."
+        "name": "Slagsnare-Uitrusting",
+        "bonus2": "Gutting Strike genereert 20 Focus.",
+        "bonus4": "Woundrend die 3 Hunting Momentum verbruikt, bewaart ze. Dit kan niet vaker dan eenmaal per 8 sec. gebeuren."
       },
       "smolderstrike": {
-        "name": "Smolderstrike Leathers",
-        "bonus2": "Haymaker hits 20 percent harder.",
-        "bonus4": "Lights Out refunds 6 sec of Mirrored Blades' remaining cooldown."
+        "name": "Smolderstrike-Leder",
+        "bonus2": "Haymaker treft 20% harder.",
+        "bonus4": "Lights Out geeft 6 sec. van de resterende afkoeltijd van Mirrored Blades terug."
       },
       "soulflame": {
         "name": "Wraithfire-Regalia",
         "bonus2": "Verhoogt spreukkracht met 20. Opgelopen schade vertraagt je spreuken niet meer (100% weerstand tegen spreukvertraging).",
         "bonus4": "Je spreuken hebben 10% kans om Zielevlam te verlenen, waardoor je spreukkracht met 40 toeneemt gedurende 10 sec.",
-        "bonus6": "Increases attack and casting speed by 4%. Your spells have a 10% chance to grant Soulblaze, increasing spell power by 25 for 10 sec."
+        "bonus6": "Verhoogt aanvals- en spreuksnelheid met 4%. Je spreuken hebben 10% kans om Soulblaze toe te kennen, wat spreukkracht met 25 verhoogt gedurende 10 sec."
       },
       "springmender": {
-        "name": "Springmender Scale",
-        "bonus2": "Tidecall's cooldown is reduced by 4 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Cascading Mend reaches a fourth ally and harvests Mending Currents at 150 percent."
+        "name": "Springmender-Schubben",
+        "bonus2": "De afkoeltijd van Tidecall wordt met 4 sec. verkort. Opgelopen schade vertraagt je spreuken niet meer.",
+        "bonus4": "Cascading Mend bereikt een vierde bondgenoot en oogst Mending Currents op 150%."
       },
       "stonehearth": {
-        "name": "Stonehearth Bastion",
-        "bonus2": "While Stonebound, Stormcast Mending Waters costs no mana and heals 25 percent more.",
-        "bonus4": "While Stonebound, completing a cadence heals you for 3 percent of your maximum health."
+        "name": "Stonehearth-Bastion",
+        "bonus2": "Terwijl je Stonebound bent, kost Stormcast Mending Waters geen mana en geneest het 25% meer.",
+        "bonus4": "Terwijl je Stonebound bent, geneest het voltooien van een cadans je voor 3% van je maximale gezondheid."
       },
       "stormcallers": {
         "name": "Galecall-Gewaden",
         "bonus2": "Verhoogt spreukkracht met 20. Opgelopen schade vertraagt je spreuken niet meer (100% weerstand tegen spreukvertraging).",
         "bonus4": "Je spreuken hebben 10% kans om Zielevlam te verlenen, waardoor je spreukkracht met 40 toeneemt gedurende 10 sec.",
-        "bonus6": "Increases attack and casting speed by 4%. Your spells have a 10% chance to grant Soulblaze, increasing spell power by 25 for 10 sec."
+        "bonus6": "Verhoogt aanvals- en spreuksnelheid met 4%. Je spreuken hebben 10% kans om Soulblaze toe te kennen, wat spreukkracht met 25 verhoogt gedurende 10 sec."
       },
       "stormkindled": {
-        "name": "Stormkindled Regalia",
-        "bonus2": "Unleash Weapon on Pyrebrand grants 3 Thunder. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Earthen Jolt's bonus per Thunder rises to 30 percent."
+        "name": "Stormkindled-Regalia",
+        "bonus2": "Unleash Weapon op Pyrebrand kent 3 Thunder toe. Opgelopen schade vertraagt je spreuken niet meer.",
+        "bonus4": "De bonus van Earthen Jolt per Thunder stijgt naar 30%."
       },
       "vale_arcanist": {
         "name": "Gewaden van de Dal-arcanist",
         "bonus3": "Verhoogt aanvals- en spreuksnelheid met 15%."
       },
       "vesperash": {
-        "name": "Vesperash Shroud",
-        "bonus2": "Call Tithefiend's cooldown is reduced by 6 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Calling your Tithefiend resets Mindfracture's cooldown, and the fiend returns twice as much mana per hit."
+        "name": "Vesperash-Sluier",
+        "bonus2": "De afkoeltijd van Call Tithefiend wordt met 6 sec. verkort. Opgelopen schade vertraagt je spreuken niet meer.",
+        "bonus4": "Het oproepen van je Tithefiend reset de afkoeltijd van Mindfracture, en de demon geeft per treffer tweemaal zoveel mana terug."
       },
       "warfare_ashstalker": {
         "name": "Uitrusting van de Asjager",
@@ -19088,25 +19088,25 @@ export const nl_NL: EnTranslations = {
         "bonus7": "Verhoogt de Oorlogvoering-Aanvals- en Verdedigingswaardering met 80. Uw spreuken hebben 15% kans om Doornwacht te verlenen, wat het ontwijken 6 sec lang met 15% verhoogt."
       },
       "warspirit_emberscale": {
-        "name": "Warspirit Emberscale",
-        "bonus2": "Ancestral Strike advances your cadence 3 steps.",
-        "bonus4": "Ancestral Strike hits 30 percent harder."
+        "name": "Warspirit-Emberscale",
+        "bonus2": "Ancestral Strike brengt je cadans 3 stappen vooruit.",
+        "bonus4": "Ancestral Strike treft 30% harder."
       },
       "wildfang_emberhide": {
-        "name": "Wildfang Emberhide",
-        "bonus2": "Redharvest restores 45 energy, up from 30.",
-        "bonus4": "Redharvest plants a fresh Flense on the target."
+        "name": "Wildfang-Emberhuid",
+        "bonus2": "Redharvest herstelt 45 energie, verhoogd van 30.",
+        "bonus4": "Redharvest brengt een nieuwe Flense aan op het doelwit."
       },
       "wyrmshadow": {
         "name": "Nightfang-Gewaden",
         "bonus2": "Verhoogt aanvalskracht met 40.",
         "bonus4": "Je kritieke wapentreffers hebben 50% kans om Slagtandstorm te verlenen, waardoor je aanvalssnelheid met 25% toeneemt gedurende 8 sec.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 4 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Verhoogt aanvals- en spreuksnelheid met 4% en Hit met 3%. Kritieke treffers met je wapen scheuren een Ragged Gash, waardoor het doelwit gedurende 12 sec. elke 2 sec. 4 schade oploopt. Stapelt tot 3 keer."
       },
       "zealfire": {
-        "name": "Zealfire Warplate",
-        "bonus2": "Final Edict and Dawnfall cut each other's remaining cooldown by 3 sec instead of 2.",
-        "bonus4": "Hammer of Wrath cast under Dawn's Wrath strikes 40 percent harder, up from 20."
+        "name": "Zealfire-Strijduitrusting",
+        "bonus2": "Final Edict en Dawnfall verkorten elkaars resterende afkoeltijd met 3 sec. in plaats van 2.",
+        "bonus4": "Hammer of Wrath die onder Dawn's Wrath wordt uitgesproken, treft 40% harder in plaats van 20%."
       }
     }
   },

@@ -4654,8 +4654,8 @@ export const id_ID: EnTranslations = {
       "online": "Karakter sedang daring.",
       "rename_not_permitted": "Mengganti nama karakter ini tidak diperbolehkan.",
       "delete_confirm": "Ketik nama karakter untuk mengonfirmasi penghapusan.",
-      "storage_purchase_open": "A storage purchase must finish or be resolved before this character can be deleted.",
-      "delete_busy": "The realm is busy. Try deleting this character again in a moment.",
+      "storage_purchase_open": "Pembelian penyimpanan harus selesai atau diselesaikan sebelum karakter ini dapat dihapus.",
+      "delete_busy": "Realm sedang sibuk. Coba hapus karakter ini lagi sebentar nanti.",
       "already_in_world": "Karakter sudah berada di dalam dunia.",
       "taken_over": "Karakter Anda telah diambil alih oleh sesi lain.",
       "rename_required": "Karakter ini harus diganti namanya sebelum memasuki dunia.",
@@ -5180,7 +5180,7 @@ export const id_ID: EnTranslations = {
       "ifPartySort": "Urutan anggota party dicantumkan: urutan grup, peran, atau nama.",
       "ifPartyShowAuras": "Apakah buff dan debuff ditampilkan pada bingkai party. Sakelar serupa mencakup bilah sumber daya, penyerapan, peliharaan, dan apakah Anda muncul pada daftar party Anda sendiri.",
       "ifAurasOnPlayerFrame": "Menampilkan buff dan debuff Anda pada bingkai unit Anda sendiri selain di bilah aura.",
-      "ifAlwaysShowAllBuffs": "Shows every active buff even on the Low graphics preset, bypassing its usual buff-icon cap.",
+      "ifAlwaysShowAllBuffs": "Menampilkan setiap buff aktif bahkan pada preset grafis Rendah, melewati batas ikon buff yang biasanya berlaku.",
       "ifTargetOfTarget": "Menampilkan siapa yang sedang disasar oleh sasaran Anda, cara klasik untuk mengetahui apakah tank masih memegangnya.",
       "ifPetFrame": "Menampilkan bingkai untuk peliharaan Anda.",
       "ifChatFontScale": "Ukuran teks obrolan.",
@@ -6667,7 +6667,7 @@ export const id_ID: EnTranslations = {
       "bankBody": "Setiap kota pusat memiliki cabang Brankas Bersepuh Emas, rumah perbankan realm ini. Bicaralah dengan bendahara di sana untuk membuka lemari besimu, ruang simpanan pribadi di luar tasmu yang dimiliki karaktermu seumur hidup. Apa pun yang kamu titipkan pada mereka menunggu dengan aman, di cabang mana pun yang kamu kunjungi berikutnya.",
       "bankHow": "Saat lemari besi terbuka, klik sebuah barang di tasmu untuk menyetorkannya dan klik barang itu di lemari besi untuk mengambilnya kembali. Lemari besi hanya menampung barang, tidak pernah koin, dan barang misi tetap bersamamu. Saat tasmu penuh di tengah perjalanan, satu tombol menyapu semua bahan kerajinanmu masuk sekaligus.",
       "bankSlots": "Lemari besi yang baru mulai dari ukuran kecil dan tumbuh bersamamu. Bendahara menjual slot tambahan dengan koin pada harga yang kian menanjak, dan bermain online memberi ruang bonus di atasnya, untuk hal-hal seperti email terverifikasi, akun tertaut, dan teman yang kamu ajak masuk ke dalam permainan.",
-      "bankSockets": "Past the slot ladder, the bursar also sells up to four bag sockets, unlocked in order at ever-steeper prices. Seat a spare bag from your carrying set in one and its slots join your vault room: an everyday bag widens the whole store, while a reagent satchel adds room only crafting materials may take. Click a bag in your bags to seat it and click the socket to take it back. Taking one back never costs you a thing you stored: if the vault ends up fuller than its shrunken room, everything stays put and new deposits simply wait for space.",
+      "bankSockets": "Setelah jenjang slot, bendahara juga menjual hingga empat soket tas, yang terbuka berurutan dengan harga yang makin mahal. Pasang tas cadangan dari perlengkapan bawaanmu di salah satunya dan slotnya akan menambah ruang penyimpananmu: tas biasa memperluas seluruh penyimpanan, sedangkan tas jinjing bahan hanya menambah ruang untuk material kerajinan. Klik tas di dalam tasmu untuk memasangnya, lalu klik soket untuk mengambilnya kembali. Mengambilnya kembali tidak pernah menghilangkan barang yang kamu simpan: jika ruang penyimpanan menjadi lebih penuh daripada kapasitasnya yang menyusut, semuanya tetap di tempat dan setoran baru cukup menunggu sampai ada ruang.",
       "buyingTitle": "Membeli dan menjual",
       "buyingBody": "Bicaralah dengan seorang pedagang dan pilih untuk menelusuri barangnya, maka tokonya terbuka dengan tiga tab: Telusuri, Jual, dan Beli Ulang. Telusuri memuat semua yang mereka stok, jadi milikmu jika kamu mampu membelinya. Jual mencantumkan apa saja di tasmu yang bersedia mereka bayar, dan menjual sebuah barang yang membawa mutu hasil undiannya sendiri meminta kamu mengonfirmasi lebih dulu, jadi salinan berharga tak pernah lepas karena keliru. Jika kamu melepas sesuatu yang kamu sesali, tab Beli Ulang menyimpan penjualan terakhirmu agar kamu bisa membelinya kembali seharga koin yang kamu terima.",
       "junkTitle": "Membereskan barang rongsokan",
@@ -7711,7 +7711,7 @@ export const id_ID: EnTranslations = {
       "title": "Hubungkan Dompet Solana",
       "linkBody": "Pilih ekstensi dompet di browser ini. Kamu akan menandatangani pesan verifikasi, lalu kembali ke aplikasi desktop.",
       "paymentBody": "Pilih dompet yang tertaut ke akunmu dan setujui transaksi di browser ini.",
-      "stepUpBody": "Choose the wallet linked to your account and sign the $WOC Exchange authorization message. Signing is free and moves no funds.",
+      "stepUpBody": "Pilih dompet yang tertaut ke akunmu dan tanda tangani pesan otorisasi $WOC Exchange. Penandatanganan ini gratis dan tidak memindahkan dana apa pun.",
       "extensionHelp": "Tidak ada ekstensi dompet yang kompatibel ditemukan. Instal atau buka Phantom, Solflare, atau dompet browser Solana lainnya, lalu coba lagi.",
       "safety": "World of ClaudeCraft tidak pernah meminta frasa pemulihan atau kunci privatmu.",
       "continueWith": "Lanjutkan dengan {wallet}",
@@ -8102,18 +8102,18 @@ export const id_ID: EnTranslations = {
     "buyConfirmCancel": "Membatalkan"
   },
   "crucibleShop": {
-    "browse": "Redeem Sigils",
-    "browseAria": "Redeem Crucible sigils with {name}",
-    "empty": "No set pieces are redeemable for your class.",
-    "balance": "Your sigils: {list}",
+    "browse": "Tukar Sigil",
+    "browseAria": "Tukar sigil Crucible dengan {name}",
+    "empty": "Tidak ada bagian set yang dapat ditukar untuk kelas Anda.",
+    "balance": "Sigil Anda: {list}",
     "balanceEntry": "{name} x{count}",
-    "noSigils": "You hold no Crucible sigils.",
+    "noSigils": "Anda tidak memiliki sigil Crucible.",
     "price": "1 {sigil}",
-    "buyAria": "Redeem {sigil} for {item}",
-    "buyConfirmTitle": "Confirm Redemption",
-    "buyConfirmBody": "Redeem your {sigil} for {item}? A consumed sigil cannot be refunded.",
-    "buyConfirmAccept": "Redeem",
-    "buyConfirmCancel": "Cancel"
+    "buyAria": "Tukar {sigil} dengan {item}",
+    "buyConfirmTitle": "Konfirmasi Penukaran",
+    "buyConfirmBody": "Tukar {sigil} Anda dengan {item}? Sigil yang telah digunakan tidak dapat dikembalikan.",
+    "buyConfirmAccept": "Tukar",
+    "buyConfirmCancel": "Batal"
   },
   "cardDuel": {
     "title": "Duel Kartu",
@@ -13254,25 +13254,25 @@ export const id_ID: EnTranslations = {
         "name": "Buket Taman Dawnhold"
       },
       "wayfarers_backpack": {
-        "name": "Wayfarer's Backpack"
+        "name": "Ransel Pengembara"
       },
       "burlap_reagent_pouch": {
-        "name": "Burlap Reagent Pouch"
+        "name": "Kantung Reagen Goni"
       },
       "necromancers_reagent_satchel": {
-        "name": "Necromancer's Reagent Satchel"
+        "name": "Kantong Reagen Ahli Nekromansi"
       },
       "duskweave_bag": {
-        "name": "Duskweave Bag"
+        "name": "Tas Tenunan Senja"
       },
       "resonant_weave_bag": {
-        "name": "Resonantweave Bag"
+        "name": "Tas Tenun Resonansi"
       },
       "foragers_haversack": {
-        "name": "Forager's Haversack"
+        "name": "Tas Punggung Pencari Makan"
       },
       "loombound_reagent_satchel": {
-        "name": "Loombound Reagent Satchel"
+        "name": "Kantong Reagen Terikat Alat Tenun"
       },
       "ps_briny_lure": {
         "name": "Umpan Asin"
@@ -13287,610 +13287,610 @@ export const id_ID: EnTranslations = {
         "name": "Batu Pelepasan"
       },
       "lastflame_core": {
-        "name": "Core of the Last Flame"
+        "name": "Inti Api Terakhir"
       },
       "slagbreaker_helmet": {
-        "name": "Slagbreaker Helm"
+        "name": "Helm Pemecah Terak"
       },
       "slagbreaker_shoulder": {
-        "name": "Slagbreaker Pauldrons"
+        "name": "Pelindung Bahu Pemecah Terak"
       },
       "slagbreaker_chest": {
-        "name": "Slagbreaker Hauberk"
+        "name": "Hauberk Pemecah Terak"
       },
       "slagbreaker_gloves": {
-        "name": "Slagbreaker Gauntlets"
+        "name": "Sarung Tangan Pemecah Terak"
       },
       "slagbreaker_legs": {
-        "name": "Slagbreaker Legguards"
+        "name": "Pelindung Kaki Pemecah Terak"
       },
       "emberfury_helmet": {
-        "name": "Emberfury Helm"
+        "name": "Helm Amukan Bara"
       },
       "emberfury_shoulder": {
-        "name": "Emberfury Pauldrons"
+        "name": "Pelindung Bahu Amukan Bara"
       },
       "emberfury_chest": {
-        "name": "Emberfury Hauberk"
+        "name": "Baju Zirah Amukan Bara"
       },
       "emberfury_gloves": {
-        "name": "Emberfury Gauntlets"
+        "name": "Sarung Tangan Amukan Bara"
       },
       "emberfury_legs": {
-        "name": "Emberfury Legguards"
+        "name": "Pelindung Kaki Amukan Bara"
       },
       "forgewall_helmet": {
-        "name": "Forgewall Helm"
+        "name": "Helm Tembok Tungku"
       },
       "forgewall_shoulder": {
-        "name": "Forgewall Pauldrons"
+        "name": "Pelindung Bahu Tembok Tungku"
       },
       "forgewall_chest": {
-        "name": "Forgewall Hauberk"
+        "name": "Baju Zirah Tembok Tungku"
       },
       "forgewall_gloves": {
-        "name": "Forgewall Gauntlets"
+        "name": "Sarung Tangan Tembok Tungku"
       },
       "forgewall_legs": {
-        "name": "Forgewall Legguards"
+        "name": "Pelindung Kaki Tembok Tungku"
       },
       "dawnforged_helmet": {
-        "name": "Dawnforged Helm"
+        "name": "Helm Tempa Fajar"
       },
       "dawnforged_shoulder": {
-        "name": "Dawnforged Pauldrons"
+        "name": "Pelindung Bahu Tempa Fajar"
       },
       "dawnforged_chest": {
-        "name": "Dawnforged Hauberk"
+        "name": "Baju Zirah Tempa Fajar"
       },
       "dawnforged_gloves": {
-        "name": "Dawnforged Gauntlets"
+        "name": "Sarung Tangan Tempa Fajar"
       },
       "dawnforged_legs": {
-        "name": "Dawnforged Legguards"
+        "name": "Pelindung Kaki Tempa Fajar"
       },
       "oathpyre_helmet": {
-        "name": "Oathpyre Helm"
+        "name": "Helm Api Sumpah"
       },
       "oathpyre_shoulder": {
-        "name": "Oathpyre Pauldrons"
+        "name": "Pelindung Bahu Api Sumpah"
       },
       "oathpyre_chest": {
-        "name": "Oathpyre Hauberk"
+        "name": "Hauberk Api Sumpah"
       },
       "oathpyre_gloves": {
-        "name": "Oathpyre Gauntlets"
+        "name": "Sarung Tangan Api Sumpah"
       },
       "oathpyre_legs": {
-        "name": "Oathpyre Legguards"
+        "name": "Pelindung Kaki Api Sumpah"
       },
       "zealfire_helmet": {
-        "name": "Zealfire Helm"
+        "name": "Helm Api Semangat"
       },
       "zealfire_shoulder": {
-        "name": "Zealfire Pauldrons"
+        "name": "Pelindung Bahu Api Semangat"
       },
       "zealfire_chest": {
-        "name": "Zealfire Hauberk"
+        "name": "Baju Zirah Api Semangat"
       },
       "zealfire_gloves": {
-        "name": "Zealfire Gauntlets"
+        "name": "Sarung Tangan Zirah Api Semangat"
       },
       "zealfire_legs": {
-        "name": "Zealfire Legguards"
+        "name": "Pelindung Kaki Api Semangat"
       },
       "packlord_emberhide_helmet": {
-        "name": "Packlord's Cowl"
+        "name": "Kopiah Penguasa Kawanan"
       },
       "packlord_emberhide_shoulder": {
-        "name": "Packlord's Spaulders"
+        "name": "Pelindung Bahu Penguasa Kawanan"
       },
       "packlord_emberhide_chest": {
-        "name": "Packlord's Tunic"
+        "name": "Tunik Kulit Bara Penguasa Kawanan"
       },
       "packlord_emberhide_gloves": {
-        "name": "Packlord's Grips"
+        "name": "Cengkeram Penguasa Kawanan"
       },
       "packlord_emberhide_legs": {
-        "name": "Packlord's Breeches"
+        "name": "Celana Penguasa Kawanan"
       },
       "coldsight_trackers_helmet": {
-        "name": "Coldsight Cowl"
+        "name": "Kopiah Pelacak Pandangan Dingin"
       },
       "coldsight_trackers_shoulder": {
-        "name": "Coldsight Spaulders"
+        "name": "Pelindung Bahu Pelacak Pandangan Dingin"
       },
       "coldsight_trackers_chest": {
-        "name": "Coldsight Tunic"
+        "name": "Tunik Pelacak Pandangan Dingin"
       },
       "coldsight_trackers_gloves": {
-        "name": "Coldsight Grips"
+        "name": "Sarung Tangan Pelacak Pandangan Dingin"
       },
       "coldsight_trackers_legs": {
-        "name": "Coldsight Breeches"
+        "name": "Celana Pelacak Pandangan Dingin"
       },
       "slagsnare_helmet": {
-        "name": "Slagsnare Cowl"
+        "name": "Tudung Penjerat Terak"
       },
       "slagsnare_shoulder": {
-        "name": "Slagsnare Spaulders"
+        "name": "Pelindung Bahu Penjerat Terak"
       },
       "slagsnare_chest": {
-        "name": "Slagsnare Tunic"
+        "name": "Tunik Penjerat Terak"
       },
       "slagsnare_gloves": {
-        "name": "Slagsnare Grips"
+        "name": "Cengkeram Penjerat Terak"
       },
       "slagsnare_legs": {
-        "name": "Slagsnare Breeches"
+        "name": "Celana Penjerat Terak"
       },
       "cinderfang_helmet": {
-        "name": "Cinderfang Cowl"
+        "name": "Kopiah Taring Bara"
       },
       "cinderfang_shoulder": {
-        "name": "Cinderfang Spaulders"
+        "name": "Pelindung Bahu Taring Bara"
       },
       "cinderfang_chest": {
-        "name": "Cinderfang Tunic"
+        "name": "Tunik Taring Bara"
       },
       "cinderfang_gloves": {
-        "name": "Cinderfang Grips"
+        "name": "Sarung Tangan Taring Bara"
       },
       "cinderfang_legs": {
-        "name": "Cinderfang Breeches"
+        "name": "Celana Taring Bara"
       },
       "smolderstrike_helmet": {
-        "name": "Smolderstrike Cowl"
+        "name": "Tudung Serangan Bara"
       },
       "smolderstrike_shoulder": {
-        "name": "Smolderstrike Spaulders"
+        "name": "Pelindung Bahu Serangan Bara"
       },
       "smolderstrike_chest": {
-        "name": "Smolderstrike Tunic"
+        "name": "Tunik Serangan Bara"
       },
       "smolderstrike_gloves": {
-        "name": "Smolderstrike Grips"
+        "name": "Sarung Tangan Serangan Bara"
       },
       "smolderstrike_legs": {
-        "name": "Smolderstrike Breeches"
+        "name": "Celana Serangan Bara"
       },
       "ashveil_helmet": {
-        "name": "Ashveil Cowl"
+        "name": "Kopiah Selubung Abu"
       },
       "ashveil_shoulder": {
-        "name": "Ashveil Spaulders"
+        "name": "Pelindung Bahu Selubung Abu"
       },
       "ashveil_chest": {
-        "name": "Ashveil Tunic"
+        "name": "Tunik Selubung Abu"
       },
       "ashveil_gloves": {
-        "name": "Ashveil Grips"
+        "name": "Sarung Tangan Selubung Abu"
       },
       "ashveil_legs": {
-        "name": "Ashveil Breeches"
+        "name": "Celana Selubung Abu"
       },
       "emberscreed_helmet": {
-        "name": "Creed of Embers Hood"
+        "name": "Tudung Kredo Bara"
       },
       "emberscreed_shoulder": {
-        "name": "Creed of Embers Mantle"
+        "name": "Mantel Kredo Bara"
       },
       "emberscreed_chest": {
-        "name": "Creed of Embers Robe"
+        "name": "Jubah Kredo Bara"
       },
       "emberscreed_gloves": {
-        "name": "Creed of Embers Handwraps"
+        "name": "Pembalut Tangan Kredo Bara"
       },
       "emberscreed_legs": {
-        "name": "Creed of Embers Leggings"
+        "name": "Legging Kredo Bara"
       },
       "benison_dawnweave_helmet": {
-        "name": "Dawnweave Hood"
+        "name": "Tudung Tenunan Fajar"
       },
       "benison_dawnweave_shoulder": {
-        "name": "Dawnweave Mantle"
+        "name": "Mantel Tenunan Fajar"
       },
       "benison_dawnweave_chest": {
-        "name": "Dawnweave Robe"
+        "name": "Jubah Tenunan Fajar"
       },
       "benison_dawnweave_gloves": {
-        "name": "Dawnweave Handwraps"
+        "name": "Pembalut Tangan Tenunan Fajar"
       },
       "benison_dawnweave_legs": {
-        "name": "Dawnweave Leggings"
+        "name": "Legging Tenunan Fajar"
       },
       "vesperash_helmet": {
-        "name": "Vesperash Hood"
+        "name": "Tudung Abu Senja"
       },
       "vesperash_shoulder": {
-        "name": "Vesperash Mantle"
+        "name": "Mantel Abu Senja"
       },
       "vesperash_chest": {
-        "name": "Vesperash Robe"
+        "name": "Jubah Abu Senja"
       },
       "vesperash_gloves": {
-        "name": "Vesperash Handwraps"
+        "name": "Pembalut Tangan Abu Senja"
       },
       "vesperash_legs": {
-        "name": "Vesperash Leggings"
+        "name": "Legging Abu Senja"
       },
       "stormkindled_helmet": {
-        "name": "Stormkindled Helm"
+        "name": "Helm Nyala Badai"
       },
       "stormkindled_shoulder": {
-        "name": "Stormkindled Pauldrons"
+        "name": "Pelindung Bahu Nyala Badai"
       },
       "stormkindled_chest": {
-        "name": "Stormkindled Hauberk"
+        "name": "Baju Zirah Nyala Badai"
       },
       "stormkindled_gloves": {
-        "name": "Stormkindled Gauntlets"
+        "name": "Sarung Tangan Nyala Badai"
       },
       "stormkindled_legs": {
-        "name": "Stormkindled Legguards"
+        "name": "Pelindung Kaki Nyala Badai"
       },
       "warspirit_emberscale_helmet": {
-        "name": "Emberscale Helm"
+        "name": "Helm Sisik Bara Roh Perang"
       },
       "warspirit_emberscale_shoulder": {
-        "name": "Emberscale Pauldrons"
+        "name": "Pelindung Bahu Sisik Bara Roh Perang"
       },
       "warspirit_emberscale_chest": {
-        "name": "Emberscale Hauberk"
+        "name": "Baju Zirah Sisik Bara Roh Perang"
       },
       "warspirit_emberscale_gloves": {
-        "name": "Emberscale Gauntlets"
+        "name": "Sarung Tangan Sisik Bara Roh Perang"
       },
       "warspirit_emberscale_legs": {
-        "name": "Emberscale Legguards"
+        "name": "Pelindung Kaki Sisik Bara Roh Perang"
       },
       "stonehearth_helmet": {
-        "name": "Stonehearth Helm"
+        "name": "Helm Jantung Batu"
       },
       "stonehearth_shoulder": {
-        "name": "Stonehearth Pauldrons"
+        "name": "Pelindung Bahu Jantung Batu"
       },
       "stonehearth_chest": {
-        "name": "Stonehearth Hauberk"
+        "name": "Baju Zirah Jantung Batu"
       },
       "stonehearth_gloves": {
-        "name": "Stonehearth Gauntlets"
+        "name": "Sarung Tangan Jantung Batu"
       },
       "stonehearth_legs": {
-        "name": "Stonehearth Legguards"
+        "name": "Pelindung Kaki Jantung Batu"
       },
       "springmender_helmet": {
-        "name": "Springmender Helm"
+        "name": "Helm Pemulih Mata Air"
       },
       "springmender_shoulder": {
-        "name": "Springmender Pauldrons"
+        "name": "Pelindung Bahu Pemulih Mata Air"
       },
       "springmender_chest": {
-        "name": "Springmender Hauberk"
+        "name": "Baju Zirah Pemulih Mata Air"
       },
       "springmender_gloves": {
-        "name": "Springmender Gauntlets"
+        "name": "Sarung Tangan Pemulih Mata Air"
       },
       "springmender_legs": {
-        "name": "Springmender Legguards"
+        "name": "Pelindung Kaki Pemulih Mata Air"
       },
       "chronoweave_helmet": {
-        "name": "Aetherweave Hood"
+        "name": "Tudung Tenunan Aether"
       },
       "chronoweave_shoulder": {
-        "name": "Aetherweave Mantle"
+        "name": "Mantel Tenunan Aether"
       },
       "chronoweave_chest": {
-        "name": "Aetherweave Robe"
+        "name": "Jubah Tenunan Aether"
       },
       "chronoweave_gloves": {
-        "name": "Aetherweave Handwraps"
+        "name": "Pembalut Tangan Tenunan Aether"
       },
       "chronoweave_legs": {
-        "name": "Aetherweave Leggings"
+        "name": "Legging Tenunan Aether"
       },
       "pyroclast_helmet": {
-        "name": "Pyroclast Hood"
+        "name": "Tudung Pyroclast"
       },
       "pyroclast_shoulder": {
-        "name": "Pyroclast Mantle"
+        "name": "Mantel Pyroclast"
       },
       "pyroclast_chest": {
-        "name": "Pyroclast Robe"
+        "name": "Jubah Pyroclast"
       },
       "pyroclast_gloves": {
-        "name": "Pyroclast Handwraps"
+        "name": "Pembalut Tangan Pyroclast"
       },
       "pyroclast_legs": {
-        "name": "Pyroclast Leggings"
+        "name": "Legging Pyroclast"
       },
       "frostquench_helmet": {
-        "name": "Frostquench Hood"
+        "name": "Tudung Penyejuk Beku"
       },
       "frostquench_shoulder": {
-        "name": "Frostquench Mantle"
+        "name": "Mantel Penyejuk Beku"
       },
       "frostquench_chest": {
-        "name": "Frostquench Robe"
+        "name": "Jubah Penyejuk Beku"
       },
       "frostquench_gloves": {
-        "name": "Frostquench Handwraps"
+        "name": "Pembalut Tangan Penyejuk Beku"
       },
       "frostquench_legs": {
-        "name": "Frostquench Leggings"
+        "name": "Legging Penyejuk Beku"
       },
       "hexthread_helmet": {
-        "name": "Hexthread Hood"
+        "name": "Tudung Benang Sihir"
       },
       "hexthread_shoulder": {
-        "name": "Hexthread Mantle"
+        "name": "Mantel Benang Sihir"
       },
       "hexthread_chest": {
-        "name": "Hexthread Robe"
+        "name": "Jubah Benang Sihir"
       },
       "hexthread_gloves": {
-        "name": "Hexthread Handwraps"
+        "name": "Balutan Tangan Benang Sihir"
       },
       "hexthread_legs": {
-        "name": "Hexthread Leggings"
+        "name": "Legging Benang Sihir"
       },
       "gravebrand_helmet": {
-        "name": "Gravebrand Hood"
+        "name": "Tudung Tanda Kubur"
       },
       "gravebrand_shoulder": {
-        "name": "Gravebrand Mantle"
+        "name": "Mantel Tanda Kubur"
       },
       "gravebrand_chest": {
-        "name": "Gravebrand Robe"
+        "name": "Jubah Tanda Kubur"
       },
       "gravebrand_gloves": {
-        "name": "Gravebrand Handwraps"
+        "name": "Pembalut Tangan Tanda Kubur"
       },
       "gravebrand_legs": {
-        "name": "Gravebrand Leggings"
+        "name": "Legging Tanda Kubur"
       },
       "ruincaller_helmet": {
-        "name": "Ruincaller Hood"
+        "name": "Tudung Pemanggil Kehancuran"
       },
       "ruincaller_shoulder": {
-        "name": "Ruincaller Mantle"
+        "name": "Mantel Pemanggil Kehancuran"
       },
       "ruincaller_chest": {
-        "name": "Ruincaller Robe"
+        "name": "Jubah Pemanggil Kehancuran"
       },
       "ruincaller_gloves": {
-        "name": "Ruincaller Handwraps"
+        "name": "Pembalut Tangan Pemanggil Kehancuran"
       },
       "ruincaller_legs": {
-        "name": "Ruincaller Leggings"
+        "name": "Legging Pemanggil Kehancuran"
       },
       "moonscorch_helmet": {
-        "name": "Moonscorch Cowl"
+        "name": "Kopiah Hangus Bulan"
       },
       "moonscorch_shoulder": {
-        "name": "Moonscorch Spaulders"
+        "name": "Pelindung Bahu Hangus Bulan"
       },
       "moonscorch_chest": {
-        "name": "Moonscorch Tunic"
+        "name": "Tunik Hangus Bulan"
       },
       "moonscorch_gloves": {
-        "name": "Moonscorch Grips"
+        "name": "Cengkeram Hangus Bulan"
       },
       "moonscorch_legs": {
-        "name": "Moonscorch Breeches"
+        "name": "Celana Hangus Bulan"
       },
       "wildfang_emberhide_helmet": {
-        "name": "Wildfang Cowl"
+        "name": "Tudung Kulit Bara Taring Liar"
       },
       "wildfang_emberhide_shoulder": {
-        "name": "Wildfang Spaulders"
+        "name": "Pelindung Bahu Kulit Bara Taring Liar"
       },
       "wildfang_emberhide_chest": {
-        "name": "Wildfang Tunic"
+        "name": "Tunik Kulit Bara Taring Liar"
       },
       "wildfang_emberhide_gloves": {
-        "name": "Wildfang Grips"
+        "name": "Cengkeram Kulit Bara Taring Liar"
       },
       "wildfang_emberhide_legs": {
-        "name": "Wildfang Breeches"
+        "name": "Celana Kulit Bara Taring Liar"
       },
       "cinderbark_helmet": {
-        "name": "Cinderbark Cowl"
+        "name": "Kopiah Kulit Bara"
       },
       "cinderbark_shoulder": {
-        "name": "Cinderbark Spaulders"
+        "name": "Pelindung Bahu Kulit Bara"
       },
       "cinderbark_chest": {
-        "name": "Cinderbark Tunic"
+        "name": "Tunik Kulit Bara"
       },
       "cinderbark_gloves": {
-        "name": "Cinderbark Grips"
+        "name": "Sarung Tangan Kulit Bara"
       },
       "cinderbark_legs": {
-        "name": "Cinderbark Breeches"
+        "name": "Celana Kulit Bara"
       },
       "grovespring_helmet": {
-        "name": "Grovespring Cowl"
+        "name": "Tudung Mata Air Rimba"
       },
       "grovespring_shoulder": {
-        "name": "Grovespring Spaulders"
+        "name": "Mantel Mata Air Rimba"
       },
       "grovespring_chest": {
-        "name": "Grovespring Tunic"
+        "name": "Jubah Mata Air Rimba"
       },
       "grovespring_gloves": {
-        "name": "Grovespring Grips"
+        "name": "Pembalut Tangan Mata Air Rimba"
       },
       "grovespring_legs": {
-        "name": "Grovespring Breeches"
+        "name": "Legging Mata Air Rimba"
       },
       "sigil_anvil_helmet": {
-        "name": "Helm Sigil of the Anvil"
+        "name": "Sigil Helm Landasan"
       },
       "sigil_ember_helmet": {
-        "name": "Helm Sigil of the Ember"
+        "name": "Sigil Helm Bara"
       },
       "sigil_tempest_helmet": {
-        "name": "Helm Sigil of the Tempest"
+        "name": "Sigil Helm Badai"
       },
       "sigil_anvil_shoulder": {
-        "name": "Mantle Sigil of the Anvil"
+        "name": "Sigil Mantel Landasan"
       },
       "sigil_ember_shoulder": {
-        "name": "Mantle Sigil of the Ember"
+        "name": "Sigil Mantel Bara"
       },
       "sigil_tempest_shoulder": {
-        "name": "Mantle Sigil of the Tempest"
+        "name": "Sigil Mantel Badai"
       },
       "sigil_anvil_chest": {
-        "name": "Robe Sigil of the Anvil"
+        "name": "Sigil Jubah Landasan"
       },
       "sigil_ember_chest": {
-        "name": "Robe Sigil of the Ember"
+        "name": "Sigil Jubah Bara"
       },
       "sigil_tempest_chest": {
-        "name": "Robe Sigil of the Tempest"
+        "name": "Sigil Jubah Badai"
       },
       "sigil_anvil_gloves": {
-        "name": "Grip Sigil of the Anvil"
+        "name": "Sigil Cengkeram Landasan"
       },
       "sigil_ember_gloves": {
-        "name": "Grip Sigil of the Ember"
+        "name": "Sigil Cengkeram Bara"
       },
       "sigil_tempest_gloves": {
-        "name": "Grip Sigil of the Tempest"
+        "name": "Sigil Cengkeram Badai"
       },
       "sigil_anvil_legs": {
-        "name": "Legging Sigil of the Anvil"
+        "name": "Sigil Legging Landasan"
       },
       "sigil_ember_legs": {
-        "name": "Legging Sigil of the Ember"
+        "name": "Sigil Legging Bara"
       },
       "sigil_tempest_legs": {
-        "name": "Legging Sigil of the Tempest"
+        "name": "Sigil Legging Badai"
       },
       "cord_of_the_last_flame": {
-        "name": "Cord of the Last Flame"
+        "name": "Tali Api Terakhir"
       },
       "cindersoaked_slippers": {
-        "name": "Cindersoaked Slippers"
+        "name": "Sandal Basah Bara"
       },
       "springbinder_sash": {
-        "name": "Springbinder Sash"
+        "name": "Selempang Pengikat Mata Air"
       },
       "steps_of_quiet_water": {
-        "name": "Steps of Quiet Water"
+        "name": "Langkah Air Tenang"
       },
       "cinderbark_cinch": {
-        "name": "Cinderbark Cinch"
+        "name": "Ikat Pinggang Kulit Bara"
       },
       "ashenbark_treads": {
-        "name": "Ashenbark Treads"
+        "name": "Sepatu Kulit Abu"
       },
       "slagstalker_belt": {
-        "name": "Slagstalker Belt"
+        "name": "Sabuk Penguntit Terak"
       },
       "ashrunner_boots": {
-        "name": "Ashrunner Boots"
+        "name": "Sepatu Pelari Abu"
       },
       "moonscorch_waistwrap": {
-        "name": "Moonscorch Waistwrap"
+        "name": "Balutan Pinggang Hangus Bulan"
       },
       "scorchgrove_striders": {
-        "name": "Scorchgrove Striders"
+        "name": "Sepatu Langkah Rimba Hangus"
       },
       "grovetender_belt": {
-        "name": "Grovetender Belt"
+        "name": "Sabuk Penjaga Rimba"
       },
       "dewfall_moccasins": {
-        "name": "Dewfall Moccasins"
+        "name": "Mokasin Jatuh Embun"
       },
       "forgewall_girdle": {
-        "name": "Forgewall Girdle"
+        "name": "Ikat Pinggang Tembok Tungku"
       },
       "anvilstance_sabatons": {
-        "name": "Anvilstance Sabatons"
+        "name": "Sabaton Sikap Landasan"
       },
       "warforged_waistguard": {
-        "name": "Warforged Waistguard"
+        "name": "Pelindung Pinggang Tempaan Perang"
       },
       "furnace_march_greaves": {
-        "name": "Furnace March Greaves"
+        "name": "Pelindung Tulang Kering Gerak Tungku"
       },
       "stormkindled_chain": {
-        "name": "Stormkindled Chain"
+        "name": "Rantai Nyala Badai"
       },
       "thundershock_treads": {
-        "name": "Thundershock Treads"
+        "name": "Sepatu Jejak Kejutan Petir"
       },
       "tidebinder_links": {
-        "name": "Tidebinder Links"
+        "name": "Rantai Pengikat Pasang"
       },
       "springwarden_sabatons": {
-        "name": "Springwarden Sabatons"
+        "name": "Sabaton Penjaga Mata Air"
       },
       "pendant_of_the_first_tempering": {
-        "name": "Pendant of the First Tempering"
+        "name": "Liontin Penempaan Pertama"
       },
       "ignivars_ember_choker": {
-        "name": "Ignivar's Ember Choker"
+        "name": "Kalung Bara Ignivar"
       },
       "locket_of_the_last_flame": {
-        "name": "Locket of the Last Flame"
+        "name": "Liontin Api Terakhir"
       },
       "heartspring_amulet": {
-        "name": "Heartspring Amulet"
+        "name": "Jimat Mata Air Jantung"
       },
       "seal_of_the_forgewall": {
-        "name": "Seal of the Forgewall"
+        "name": "Segel Tembok Tempa"
       },
       "band_of_marked_strikes": {
-        "name": "Band of Marked Strikes"
+        "name": "Cincin Serangan Bertanda"
       },
       "circle_of_cinders": {
-        "name": "Circle of Cinders"
+        "name": "Lingkaran Bara"
       },
       "loop_of_quiet_springs": {
-        "name": "Loop of Quiet Springs"
+        "name": "Cincin Mata Air Sunyi"
       },
       "bulwark_of_the_inner_crucible": {
-        "name": "Bulwark of the Inner Crucible"
+        "name": "Benteng Crucible Dalam"
       },
       "ember_wardens_barrier": {
-        "name": "Ember Warden's Barrier"
+        "name": "Penghalang Penjaga Bara"
       },
       "orb_of_the_last_spring": {
-        "name": "Orb of the Last Spring"
+        "name": "Bola Mata Air Terakhir"
       },
       "cinder_of_the_first_design": {
-        "name": "Cinder of the First Design"
+        "name": "Bara Rancangan Pertama"
       },
       "forgefathers_warhammer": {
-        "name": "Forgefather's Warhammer"
+        "name": "Palu Perang Bapak Tungku"
       },
       "cinderfang_kris": {
-        "name": "Cinderfang Kris"
+        "name": "Kris Taring Bara"
       },
       "slagrender_cleaver": {
-        "name": "Slagrender Cleaver"
+        "name": "Kapak Tebas Pengoyak Terak"
       },
       "anvilguard_blade": {
-        "name": "Anvilguard Blade"
+        "name": "Pedang Penjaga Landasan"
       },
       "heart_of_the_end_greatblade": {
-        "name": "Heart of the End Greatblade"
+        "name": "Pedang Agung Jantung Sang Akhir"
       },
       "staff_of_the_last_spring": {
-        "name": "Staff of the Last Spring"
+        "name": "Tongkat Mata Air Terakhir"
       },
       "forgefire_spire": {
-        "name": "Forgefire Spire"
+        "name": "Menara Api Tungku"
       },
       "springtouched_crozier": {
-        "name": "Springtouched Crozier"
+        "name": "Tongkat Kebesaran Sentuhan Mata Air"
       },
       "wand_of_quenched_sparks": {
-        "name": "Wand of Quenched Sparks"
+        "name": "Tongkat Percik Padam"
       },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"
@@ -14670,10 +14670,10 @@ export const id_ID: EnTranslations = {
         "name": "Tali Kekang Kalkun Agung Penderap Guntur"
       },
       "varkhul_forgebreaker": {
-        "name": "Forgebreaker, Engine of Varkhul"
+        "name": "Forgebreaker, Mesin Varkhul"
       },
       "varkhul_emberward": {
-        "name": "Emberward, Bulwark of Varkhul"
+        "name": "Emberward, Benteng Varkhul"
       }
     },
     "mobs": {
@@ -14870,25 +14870,25 @@ export const id_ID: EnTranslations = {
         "name": "Nythraxis, Bencana Thornpeak"
       },
       "ignivar_herald_of_the_last_flame": {
-        "name": "Ignivar, Herald of the Last Flame"
+        "name": "Ignivar, Pewarta Api Terakhir"
       },
       "ignivar_heart_of_the_end": {
-        "name": "Ignivar Ashcaller"
+        "name": "Pemanggil Abu Ignivar"
       },
       "ignivar_ember_sentinel": {
-        "name": "Ember Sentinel"
+        "name": "Penjaga Bara"
       },
       "ignivar_crucible_warden": {
-        "name": "Crucible Warden"
+        "name": "Penjaga Wadah Peleburan"
       },
       "ignivar_cinder_artificer": {
-        "name": "Cinder Artificer"
+        "name": "Pengrajin Bara"
       },
       "varkhul_forgefather_of_the_last_flame": {
-        "name": "Varkhul, Forgefather of the Last Flame"
+        "name": "Varkhul, Bapak Tempa Api Terakhir"
       },
       "derelict_mech": {
-        "name": "Derelict Mech"
+        "name": "Mek Terbengkalai"
       },
       "reliquary_ledger_wraith": {
         "name": "Arwah Buku Catatan"
@@ -15551,19 +15551,19 @@ export const id_ID: EnTranslations = {
         "greeting": "Dari halaman kapel di Lembah hingga atap dunia... jejak yang kita ikuti berakhir di sini. Aku bisa merasakan gunung ini menyimak."
       },
       "archivist_maelin_emberward": {
-        "name": "Archivist Maelin Emberward",
-        "title": "Crucible Archivist",
-        "greeting": "Every hammer mark in this place is a sentence. Help me read what Varkhul tried to hide."
+        "name": "Arsiparis Maelin Penjaga Bara",
+        "title": "Arsiparis Wadah Peleburan",
+        "greeting": "Setiap bekas palu di tempat ini adalah sebuah kalimat. Bantu aku membaca apa yang Varkhul coba sembunyikan."
       },
       "archivist_maelin_ember_projection": {
-        "name": "Maelin's Ember Projection",
-        "title": "Ember Projection",
-        "greeting": "The embers carry Maelin's voice forward through the forge."
+        "name": "Proyeksi Bara Maelin",
+        "title": "Proyeksi Bara",
+        "greeting": "Bara-bara itu membawa suara Maelin menembus tempaan."
       },
       "crucible_quartermaster": {
-        "name": "Quartermaster Bronn Emberward",
-        "title": "Crucible Quartermaster",
-        "greeting": "The forge marks its own. Bring me a sigil from the Crucible and I will fit you for war."
+        "name": "Perbekalan Bronn Penjaga Bara",
+        "title": "Perbekalan Wadah Peleburan",
+        "greeting": "Tempaan mengenali miliknya sendiri. Bawakan aku sigil dari Wadah Peleburan dan akan kupasangkan perlengkapan perang untukmu."
       },
       "brother_halven": {
         "name": "Bruder Halven",
@@ -16714,35 +16714,35 @@ export const id_ID: EnTranslations = {
         }
       },
       "q_ignivar_echoes_in_iron": {
-        "title": "Echoes in Iron",
-        "text": "These automata are not soldiers. They are drafts. Break each assembly line and listen when the final shell falls. The forge remembers what Varkhul tried to erase.",
-        "completion": "The echoes agree. Varkhul bound water from the dying Last Spring into living metal. These automatons were failed temperings. Only Ignivar endured.",
+        "title": "Gema dalam Besi",
+        "text": "Automaton ini bukan prajurit. Mereka adalah rancangan. Hancurkan setiap jalur perakitan dan dengarkan saat cangkang terakhir jatuh. Tempaan mengingat apa yang Varkhul coba hapus.",
+        "completion": "Gema-gema itu sepakat. Varkhul mengikat air dari Mata Air Terakhir yang sekarat ke dalam logam hidup. Automaton ini adalah hasil tempaan yang gagal. Hanya Ignivar yang bertahan.",
         "objectives": {
           "0": {
-            "label": "Ember Sentinels destroyed"
+            "label": "Penjaga Bara dihancurkan"
           },
           "1": {
-            "label": "Crucible Wardens destroyed"
+            "label": "Penjaga Wadah Peleburan dihancurkan"
           }
         }
       },
       "q_ignivar_heralds_heart": {
-        "title": "The Herald's Heart",
-        "text": "The survivor named in every echo is Ignivar. Varkhul called him herald, seal, and key. Defeat him. If the records are true, his death will reveal what he was forged to guard.",
-        "completion": "Ignivar was never merely a guardian. His heart was the key, and its final plates opened the sealed crucible below.",
+        "title": "Jantung Sang Pewarta",
+        "text": "Penyintas yang disebut dalam setiap gema adalah Ignivar. Varkhul menyebutnya pewarta, segel, dan kunci. Kalahkan dia. Jika catatan itu benar, kematiannya akan mengungkap apa yang ditempa untuk dijaganya.",
+        "completion": "Ignivar tidak pernah sekadar penjaga. Jantungnya adalah kunci, dan lempeng terakhirnya membuka wadah peleburan tersegel di bawah.",
         "objectives": {
           "0": {
-            "label": "Ignivar defeated"
+            "label": "Ignivar dikalahkan"
           }
         }
       },
       "q_ignivar_the_forgefather": {
-        "title": "The Forgefather",
-        "text": "The path below leads to Varkhul, Forgefather of the Last Flame. He imprisoned the Last Spring to make metal live, then forged Ignivar to keep the crime sealed. Enter the Inner Crucible and end his work.",
-        "completion": "The forge is silent at last. The spring may never recover, but Varkhul will shape no more lives into chains.",
+        "title": "Bapak Tempa",
+        "text": "Jalan di bawah ini menuju Varkhul, Bapak Tempa Api Terakhir. Ia memenjarakan Mata Air Terakhir untuk membuat logam hidup, lalu menempa Ignivar agar kejahatan itu tetap tersegel. Masuklah ke Wadah Peleburan Dalam dan akhiri pekerjaannya.",
+        "completion": "Tempaan akhirnya sunyi. Mata air itu mungkin takkan pernah pulih, tetapi Varkhul takkan lagi membentuk kehidupan menjadi rantai.",
         "objectives": {
           "0": {
-            "label": "Varkhul defeated"
+            "label": "Varkhul dikalahkan"
           }
         }
       },
@@ -18624,29 +18624,29 @@ export const id_ID: EnTranslations = {
         "leaveText": "Kau kembali ke udara dingin Thornpeak."
       },
       "ignivar_forge_lift": {
-        "name": "The Forge-Lift",
-        "enterText": "The forge-lift shudders and sinks; hammerfall rises to meet you.",
-        "leaveText": "The lift hauls you back into the open air of the keep."
+        "name": "Lift Tungku",
+        "enterText": "Lift tungku bergetar dan turun; dentang palu naik menyambut Anda.",
+        "leaveText": "Lift membawa Anda kembali ke udara terbuka benteng."
       },
       "ignivar_forge_approach": {
-        "name": "Halls of the First Tempering",
-        "enterText": "Hammerfall echoes through the Halls of the First Tempering.",
-        "leaveText": "You step away from the first forge and breathe freely again."
+        "name": "Balairung Penempaan Pertama",
+        "enterText": "Gema dentang palu terdengar di seluruh Balairung Penempaan Pertama.",
+        "leaveText": "Anda menjauh dari tungku pertama dan kembali bernapas lega."
       },
       "ignivar_raid_arena": {
-        "name": "Crucible of the Last Spring",
-        "enterText": "Heat shimmers above the sealed waters of the Crucible.",
-        "leaveText": "You step away from the Crucible and breathe freely again."
+        "name": "Crucible Mata Air Terakhir",
+        "enterText": "Udara panas berkilauan di atas perairan Crucible yang tersegel.",
+        "leaveText": "Anda menjauh dari Crucible dan kembali bernapas lega."
       },
       "ignivar_molten_assembly": {
-        "name": "Molten Assembly",
-        "enterText": "The opened gate leads into a molten assembly hall.",
-        "leaveText": "You leave the assembly line and return to the Crucible."
+        "name": "Perakitan Lelehan",
+        "enterText": "Gerbang yang terbuka membawa Anda ke aula perakitan yang dipenuhi lelehan logam.",
+        "leaveText": "Anda meninggalkan jalur perakitan dan kembali ke Crucible."
       },
       "ignivar_inner_crucible": {
-        "name": "The Inner Crucible",
-        "enterText": "The opened gate leads deeper into the Crucible.",
-        "leaveText": "You leave the silent depths of the Crucible."
+        "name": "Crucible Dalam",
+        "enterText": "Gerbang yang terbuka membawa Anda semakin jauh ke dalam Crucible.",
+        "leaveText": "Anda meninggalkan kedalaman Crucible yang sunyi."
       },
       "wildheart_basin": {
         "name": "Cekungan Hati Liar",
@@ -18880,182 +18880,182 @@ export const id_ID: EnTranslations = {
     },
     "itemSets": {
       "ashveil": {
-        "name": "Ashveil Garb",
-        "bonus2": "Lurker's Strike hits 25 percent harder.",
-        "bonus4": "Your Veiled Edge strike hits for triple, up from double."
+        "name": "Busana Selubung Abu",
+        "bonus2": "Serangan Penyergap menghasilkan kerusakan 25 persen lebih besar.",
+        "bonus4": "Serangan Ujung Terselubung Anda menghasilkan tiga kali lipat kerusakan, bukan dua kali lipat."
       },
       "benison_dawnweave": {
-        "name": "Benison Dawnweave",
-        "bonus2": "Seraphic Vigil's rescue heals for 270, up from 180. Damage taken no longer delays your spellcasting.",
-        "bonus4": "When Seraphic Vigil triggers, its ally is also mended for 15 percent of their maximum health over 10 sec."
+        "name": "Tenunan Fajar Berkah",
+        "bonus2": "Penyelamatan Kewaspadaan Serafim menyembuhkan 270, naik dari 180. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
+        "bonus4": "Saat Kewaspadaan Serafim terpicu, sekutunya juga dipulihkan sebesar 15 persen dari kesehatan maksimum mereka selama 10 detik."
       },
       "boundstone_vanguard": {
         "name": "Garda Depan Batu Terikat",
         "bonus3": "Meningkatkan kecepatan serangan dan rapal sebesar 15%."
       },
       "chronoweave": {
-        "name": "Aetherweave Vestments",
-        "bonus2": "Temporal Echo converts 50 percent of your single-target Arcane damage into healing. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Temporal Cascade's cooldown is reduced by 5 sec."
+        "name": "Busana Tenunan Aether",
+        "bonus2": "Gema Temporal mengubah 50 persen kerusakan Arkana satu target Anda menjadi penyembuhan. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
+        "bonus4": "Waktu Pulih Lenyap Temporal berkurang 5 detik."
       },
       "cinderbark": {
-        "name": "Cinderbark Ward",
-        "bonus2": "Sweeping Claws has a 30 percent chance to bank an additional Old Blood.",
-        "bonus4": "Marrowbreak hits 30 percent harder, and its emergency guard no longer replaces the strike."
+        "name": "Pelindung Kulit Bara",
+        "bonus2": "Cakar Sapu memiliki peluang 30 persen untuk menyimpan Darah Tua tambahan.",
+        "bonus4": "Patah Sumsum menghasilkan kerusakan 30 persen lebih besar, dan perlindungan daruratnya tidak lagi menggantikan serangan."
       },
       "cinderfang": {
-        "name": "Cinderfang Shroud",
-        "bonus2": "Venom Ritual's energy refund rises to 20 per builder.",
-        "bonus4": "Venom Dart's cooldown is reduced to 4 sec."
+        "name": "Selubung Taring Bara",
+        "bonus2": "Pengembalian energi Ritual Bisa meningkat menjadi 20 per pembangun.",
+        "bonus4": "Waktu pulih Panah Bisa berkurang menjadi 4 detik."
       },
       "coldsight_trackers": {
-        "name": "Coldsight Trackers",
-        "bonus2": "Measured Shot restores 5 additional Focus.",
-        "bonus4": "Long Draw critical strikes extend Cold Focus by 2 sec, up to 6 sec per activation."
+        "name": "Pelacak Pandangan Dingin",
+        "bonus2": "Tembakan Terukur memulihkan 5 Fokus tambahan.",
+        "bonus4": "Serangan kritis Tarikan Panjang memperpanjang Fokus Dingin 2 detik, hingga 6 detik per aktivasi."
       },
       "crownforged": {
         "name": "Regalia Bonewrought",
         "bonus2": "Meningkatkan daya serang sebesar 40.",
         "bonus4": "Serangan kritis senjatamu menyerpihkan target dengan Serpih Tulang, membuatnya berdarah sebesar 8 kerusakan setiap 2 detik selama 12 detik. Menumpuk hingga 3 kali.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 5 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Meningkatkan kecepatan serangan dan perapalan sebesar 4% serta Hit sebesar 3%. Serangan kritis senjata Anda memecah target dengan Pecah Tulang, menyebabkan pendarahan 5 kerusakan tiap 2 detik selama 12 detik. Menumpuk hingga 3 kali."
       },
       "dawnforged": {
-        "name": "Dawnforged Vestments",
-        "bonus2": "Beacon of Light copies 55 percent of your direct heals. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Radiant Resonance's empowered Dawn's Embrace is instant."
+        "name": "Busana Tempa Fajar",
+        "bonus2": "Mercusuar Cahaya menyalin 55 persen penyembuhan langsung Anda. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
+        "bonus4": "Pelukan Fajar yang diperkuat oleh Resonansi Cahaya bersifat instan."
       },
       "deathlord": {
         "name": "Perlengkapan Tempur Barrowlord",
         "bonus2": "Meningkatkan daya serang sebesar 40.",
         "bonus4": "Serangan kritis senjatamu memiliki peluang 50% memberikan Kuasa Kubur, meningkatkan daya serang sebesar 60 selama 10 detik.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 5 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Meningkatkan kecepatan serangan dan perapalan sebesar 4% serta Hit sebesar 3%. Serangan kritis senjata Anda memecah target dengan Pecah Tulang, menyebabkan pendarahan 5 kerusakan tiap 2 detik selama 12 detik. Menumpuk hingga 3 kali."
       },
       "emberfury": {
-        "name": "Emberfury Harness",
-        "bonus2": "Your Enrage lasts 6 sec instead of 4.",
-        "bonus4": "Bloodletting always Enrages you, and its healing rises to 8 percent of your maximum health."
+        "name": "Baju Zirah Amukan Bara",
+        "bonus2": "Amukan Anda berlangsung 6 detik, bukan 4.",
+        "bonus4": "Pertumpahan Darah selalu memicu Amukan, dan penyembuhannya meningkat menjadi 8 persen kesehatan maksimum Anda."
       },
       "emberscreed": {
-        "name": "Creed of Embers Vestments",
-        "bonus2": "Your Doctrine link converts 10 percent more of your Holy damage into healing. Damage taken no longer delays your spellcasting.",
-        "bonus4": "When your Psalm of Warding is fully consumed, your next Scouring Hymn within 10 sec is instant. Cannot occur more than once every 15 sec."
+        "name": "Busana Kredo Bara",
+        "bonus2": "Tautan Doktrin Anda mengubah 10 persen lebih banyak kerusakan Suci menjadi penyembuhan. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
+        "bonus4": "Saat Mazmur Penjagaan Anda habis sepenuhnya, Nyanyian Pengikisan berikutnya dalam 10 detik bersifat instan. Tidak dapat terjadi lebih dari sekali tiap 15 detik."
       },
       "forgewall": {
-        "name": "Forgewall Aegis",
-        "bonus2": "Iron Resolve converts rage at 5 absorb per point instead of 4.",
-        "bonus4": "Casting Shieldcrack reduces Iron Resolve's remaining cooldown by 2 sec."
+        "name": "Aegis Tembok Tungku",
+        "bonus2": "Tekad Besi mengubah amarah menjadi 5 serapan per poin, bukan 4.",
+        "bonus4": "Merapal Retak Perisai mengurangi waktu pulih Tekad Besi yang tersisa sebesar 2 detik."
       },
       "frostquench": {
-        "name": "Frostquench Weave",
-        "bonus2": "Rimelance critical strikes bank a second Icicle, up to the maximum of 5. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Winterlash plants 3 Winter's Chill charges, up from 2."
+        "name": "Tenunan Penyejuk Beku",
+        "bonus2": "Serangan kritis Tombak Embun menyimpan Es Runcing kedua, hingga maksimum 5. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
+        "bonus4": "Tebasan Musim Dingin menanamkan 3 muatan Dingin Musim Dingin, naik dari 2."
       },
       "gravebrand": {
-        "name": "Gravebrand Regalia",
-        "bonus2": "Reaping Command's cooldown is reduced by 2 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Reaping Command's unison strikes deal 25 percent more damage."
+        "name": "Regalia Tanda Kubur",
+        "bonus2": "Waktu pulih Perintah Penuai berkurang 2 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
+        "bonus4": "Serangan serempak Perintah Penuai menghasilkan kerusakan 25 persen lebih besar."
       },
       "greyjaw_stalker": {
         "name": "Perlengkapan Penguntit Greyjaw",
         "bonus3": "Meningkatkan kecepatan serangan dan rapal sebesar 15%."
       },
       "grovespring": {
-        "name": "Grovespring Raiment",
-        "bonus2": "Swiftmend consumes your own Wildbloom or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Overbloom harvests 75 percent of your remaining effects and banks 1 Verdance afterward."
+        "name": "Busana Mata Air Rimba",
+        "bonus2": "Sembuh Kilat terlebih dahulu mengonsumsi Mekar Liar atau Mekar Kedua milik Anda dan menyembuhkan 25 persen lebih banyak. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
+        "bonus4": "Mekar Berlebih memanen 75 persen efek Anda yang tersisa dan setelahnya menyimpan 1 Verdansi."
       },
       "hexthread": {
-        "name": "Hexthread Shroud",
-        "bonus2": "Needle of Fate grants 2 additional Condemnation. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Passing Sentence refunds 10 Condemnation."
+        "name": "Selubung Benang Hex",
+        "bonus2": "Jarum Takdir memberikan 2 Penghukuman tambahan. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
+        "bonus4": "Vonis Berlalu mengembalikan 10 Penghukuman."
       },
       "moonscorch": {
-        "name": "Moonscorch Raiment",
-        "bonus2": "Moonseed may extend Lunar Tempest twice per application, to a maximum of 12 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Moonsurge and Sunwake strike 25 percent harder."
+        "name": "Busana Sangrai Bulan",
+        "bonus2": "Benih Bulan dapat memperpanjang Badai Purnama dua kali per penerapan, hingga maksimum 12 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
+        "bonus4": "Gelombang Bulan dan Bangun Surya menghasilkan kerusakan 25 persen lebih besar."
       },
       "necromancers": {
         "name": "Jubah Mournweave",
         "bonus2": "Meningkatkan kekuatan sihir sebesar 20. Kerusakan yang diterima tidak lagi menunda perapalan sihirmu (ketahanan penundaan rapalan 100%).",
         "bonus4": "Mantramu memiliki peluang 10% memberikan Rapal Jernih, menjadikan mantra berikutmu tanpa biaya.",
-        "bonus6": "Increases attack and casting speed by 4%. Your spells have a 10% chance to grant Soulblaze, increasing spell power by 25 for 10 sec."
+        "bonus6": "Meningkatkan kecepatan serangan dan perapalan sebesar 4%. Mantra Anda memiliki peluang 10% untuk memberikan Bara Jiwa, meningkatkan kekuatan mantra sebesar 25 selama 10 detik."
       },
       "nighttalon": {
         "name": "Perlengkapan Kulit Direfang",
         "bonus2": "Meningkatkan daya serang sebesar 40.",
         "bonus4": "Serangan kritis senjatamu mengoyakkan Cabikan Kasar, membuat target berdarah sebesar 6 kerusakan setiap 2 detik selama 12 detik. Menumpuk hingga 3 kali.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 4 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Meningkatkan kecepatan serangan dan perapalan sebesar 4% serta Hit sebesar 3%. Serangan kritis senjata Anda merobek Sobekan Kasar, menyebabkan target berdarah sebesar 4 kerusakan tiap 2 detik selama 12 detik. Menumpuk hingga 3 kali."
       },
       "oathpyre": {
-        "name": "Oathpyre Bastion",
-        "bonus2": "Vowkeeper Strike's chance to arm Solar Reprisal rises to 30 percent, and blocking an attack arms it 40 percent of the time.",
-        "bonus4": "Consuming Solar Reprisal shields you for 6 percent of your maximum health for 10 sec."
+        "name": "Benteng Api Sumpah",
+        "bonus2": "Peluang Serangan Penjaga Sumpah untuk menyiapkan Pembalasan Surya meningkat menjadi 30 persen, dan memblokir serangan menyiapkannya 40 persen dari waktu.",
+        "bonus4": "Mengonsumsi Pembalasan Surya memberi Anda perisai sebesar 6 persen kesehatan maksimum selama 10 detik."
       },
       "packlord_emberhide": {
-        "name": "Packlord's Emberhide",
-        "bonus2": "Pack Command's cooldown is reduced to 3 sec.",
-        "bonus4": "Pack Command's chance to reset Stampede's cooldown rises to 30 percent."
+        "name": "Kulit Bara Penguasa Kawanan",
+        "bonus2": "Waktu pulih Perintah Kawanan berkurang menjadi 3 detik.",
+        "bonus4": "Peluang Perintah Kawanan mereset waktu pulih Amukan meningkat menjadi 30 persen."
       },
       "pyroclast": {
-        "name": "Pyroclast Regalia",
-        "bonus2": "Scald always critically strikes targets at or below 35 percent health. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Your Fire spells' critical strikes outside Phoenix Trance reduce its remaining cooldown by 1.5 sec."
+        "name": "Regalia Piroklas",
+        "bonus2": "Luka Bakar selalu menyerang kritis target dengan kesehatan 35 persen atau kurang. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
+        "bonus4": "Serangan kritis mantra Api Anda di luar Trans Feniks mengurangi waktu pulihnya yang tersisa sebesar 1,5 detik."
       },
       "ruincaller": {
-        "name": "Ruincaller Vestments",
-        "bonus2": "Conflagrate holds 3 charges. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Ruinbolt strikes 20 percent harder."
+        "name": "Busana Pemanggil Reruntuhan",
+        "bonus2": "Kobaran Api menyimpan 3 muatan. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
+        "bonus4": "Baut Reruntuhan menghasilkan kerusakan 20 persen lebih besar."
       },
       "slagbreaker": {
-        "name": "Slagbreaker Battlegear",
-        "bonus2": "Redhand empowers your next Maiming Strike by 30 percent per stack instead of 20.",
-        "bonus4": "Every second cast of Redhand reduces Breachmaker's remaining cooldown by 3 sec."
+        "name": "Baju Tempur Pemecah Terak",
+        "bonus2": "Tangan Merah memperkuat Serangan Pelumpuh berikutnya sebesar 30 persen per tumpukan, bukan 20.",
+        "bonus4": "Setiap perapalan kedua Tangan Merah mengurangi waktu pulih Pembuka Celah yang tersisa sebesar 3 detik."
       },
       "slagsnare": {
-        "name": "Slagsnare Trappings",
-        "bonus2": "Gutting Strike generates 20 Focus.",
-        "bonus4": "Woundrend that consumes 3 Hunting Momentum preserves them. Cannot occur more than once every 8 sec."
+        "name": "Perlengkapan Jerat Terak",
+        "bonus2": "Serangan Pengoyak menghasilkan 20 Fokus.",
+        "bonus4": "Luka Sobek yang mengonsumsi 3 Momentum Berburu mempertahankan momentum tersebut. Tidak dapat terjadi lebih dari sekali tiap 8 detik."
       },
       "smolderstrike": {
-        "name": "Smolderstrike Leathers",
-        "bonus2": "Haymaker hits 20 percent harder.",
-        "bonus4": "Lights Out refunds 6 sec of Mirrored Blades' remaining cooldown."
+        "name": "Kulit Serangan Membara",
+        "bonus2": "Pukulan Tubuh menghasilkan kerusakan 20 persen lebih besar.",
+        "bonus4": "Padamkan Cahaya mengembalikan 6 detik waktu pulih Bilah Cermin yang tersisa."
       },
       "soulflame": {
         "name": "Regalia Wraithfire",
         "bonus2": "Meningkatkan kekuatan sihir sebesar 20. Kerusakan yang diterima tidak lagi menunda perapalan sihirmu (ketahanan penundaan rapalan 100%).",
         "bonus4": "Mantramu memiliki peluang 10% memberikan Nyala Jiwa, meningkatkan kekuatan mantra sebesar 40 selama 10 detik.",
-        "bonus6": "Increases attack and casting speed by 4%. Your spells have a 10% chance to grant Soulblaze, increasing spell power by 25 for 10 sec."
+        "bonus6": "Meningkatkan kecepatan serangan dan perapalan sebesar 4%. Mantra Anda memiliki peluang 10% untuk memberikan Bara Jiwa, meningkatkan kekuatan mantra sebesar 25 selama 10 detik."
       },
       "springmender": {
-        "name": "Springmender Scale",
-        "bonus2": "Tidecall's cooldown is reduced by 4 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Cascading Mend reaches a fourth ally and harvests Mending Currents at 150 percent."
+        "name": "Sisik Pemulih Mata Air",
+        "bonus2": "Waktu pulih Panggilan Pasang berkurang 4 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
+        "bonus4": "Sembuh Beruntun mencapai sekutu keempat dan memanen Arus Pemulihan sebesar 150 persen."
       },
       "stonehearth": {
-        "name": "Stonehearth Bastion",
-        "bonus2": "While Stonebound, Stormcast Mending Waters costs no mana and heals 25 percent more.",
-        "bonus4": "While Stonebound, completing a cadence heals you for 3 percent of your maximum health."
+        "name": "Benteng Jantung Batu",
+        "bonus2": "Saat Terikat Batu, Air Pemulihan Pengguncang Badai tidak memerlukan mana dan menyembuhkan 25 persen lebih banyak.",
+        "bonus4": "Saat Terikat Batu, menyelesaikan irama memulihkan 3 persen kesehatan maksimum Anda."
       },
       "stormcallers": {
         "name": "Jubah Galecall",
         "bonus2": "Meningkatkan kekuatan sihir sebesar 20. Kerusakan yang diterima tidak lagi menunda perapalan sihirmu (ketahanan penundaan rapalan 100%).",
         "bonus4": "Mantramu memiliki peluang 10% memberikan Nyala Jiwa, meningkatkan kekuatan mantra sebesar 40 selama 10 detik.",
-        "bonus6": "Increases attack and casting speed by 4%. Your spells have a 10% chance to grant Soulblaze, increasing spell power by 25 for 10 sec."
+        "bonus6": "Meningkatkan kecepatan serangan dan perapalan sebesar 4%. Mantra Anda memiliki peluang 10% untuk memberikan Bara Jiwa, meningkatkan kekuatan mantra sebesar 25 selama 10 detik."
       },
       "stormkindled": {
-        "name": "Stormkindled Regalia",
-        "bonus2": "Unleash Weapon on Pyrebrand grants 3 Thunder. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Earthen Jolt's bonus per Thunder rises to 30 percent."
+        "name": "Regalia Bara Badai",
+        "bonus2": "Lepaskan Senjata pada Tanda Api memberikan 3 Guntur. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
+        "bonus4": "Bonus Sentakan Bumi per Guntur meningkat menjadi 30 persen."
       },
       "vale_arcanist": {
         "name": "Perlengkapan Arkanis Lembah",
         "bonus3": "Meningkatkan kecepatan serangan dan rapal sebesar 15%."
       },
       "vesperash": {
-        "name": "Vesperash Shroud",
-        "bonus2": "Call Tithefiend's cooldown is reduced by 6 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Calling your Tithefiend resets Mindfracture's cooldown, and the fiend returns twice as much mana per hit."
+        "name": "Selubung Abu Senja",
+        "bonus2": "Waktu pulih Panggil Iblis Persepuluhan berkurang 6 detik. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.",
+        "bonus4": "Memanggil Iblis Persepuluhan mereset waktu pulih Retak Pikiran, dan iblis itu mengembalikan mana dua kali lipat per serangan."
       },
       "warfare_ashstalker": {
         "name": "Perlengkapan Ashstalker",
@@ -19088,25 +19088,25 @@ export const id_ID: EnTranslations = {
         "bonus7": "Meningkatkan Peringkat Serangan dan Pertahanan Perang sebesar 80. Mantramu punya peluang 15% memberi Jaga Duri, yang meningkatkan elakan sebesar 15% selama 6 dtk."
       },
       "warspirit_emberscale": {
-        "name": "Warspirit Emberscale",
-        "bonus2": "Ancestral Strike advances your cadence 3 steps.",
-        "bonus4": "Ancestral Strike hits 30 percent harder."
+        "name": "Sisik Bara Roh Perang",
+        "bonus2": "Serangan Leluhur memajukan irama Anda 3 langkah.",
+        "bonus4": "Serangan Leluhur menghasilkan kerusakan 30 persen lebih besar."
       },
       "wildfang_emberhide": {
-        "name": "Wildfang Emberhide",
-        "bonus2": "Redharvest restores 45 energy, up from 30.",
-        "bonus4": "Redharvest plants a fresh Flense on the target."
+        "name": "Kulit Bara Taring Liar",
+        "bonus2": "Panen Merah memulihkan 45 energi, naik dari 30.",
+        "bonus4": "Panen Merah menanamkan Pengulitan baru pada target."
       },
       "wyrmshadow": {
         "name": "Jubah Nightfang",
         "bonus2": "Meningkatkan daya serang sebesar 40.",
         "bonus4": "Serangan kritis senjatamu memiliki peluang 50% memberikan Sergap Taring, meningkatkan kecepatan serangan sebesar 25% selama 8 detik.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 4 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Meningkatkan kecepatan serangan dan perapalan sebesar 4% serta Hit sebesar 3%. Serangan kritis senjata Anda merobek Sobekan Kasar, menyebabkan target berdarah sebesar 4 kerusakan tiap 2 detik selama 12 detik. Menumpuk hingga 3 kali."
       },
       "zealfire": {
-        "name": "Zealfire Warplate",
-        "bonus2": "Final Edict and Dawnfall cut each other's remaining cooldown by 3 sec instead of 2.",
-        "bonus4": "Hammer of Wrath cast under Dawn's Wrath strikes 40 percent harder, up from 20."
+        "name": "Baju Zirah Api Zela",
+        "bonus2": "Maklumat Terakhir dan Runtuhnya Fajar saling mengurangi waktu pulih yang tersisa sebesar 3 detik, bukan 2.",
+        "bonus4": "Palu Murka yang dirapal di bawah Murka Fajar menghasilkan kerusakan 40 persen lebih besar, naik dari 20."
       }
     }
   },

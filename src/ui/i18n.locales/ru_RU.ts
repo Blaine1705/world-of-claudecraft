@@ -14829,4 +14829,5 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.forgefire_spire.name': 'Шпиль горнового огня',
   'entities.items.springtouched_crozier.name': 'Посох родникового касания',
   'entities.items.wand_of_quenched_sparks.name': 'Жезл угасших искр',
+  'crucibleShop.balanceEntry': '{name} x{count}',
 };

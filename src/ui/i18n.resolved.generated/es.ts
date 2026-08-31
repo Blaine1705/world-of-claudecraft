@@ -4654,8 +4654,8 @@ export const es: EnTranslations = {
       "online": "El personaje está conectado.",
       "rename_not_permitted": "No se permite cambiar el nombre de este personaje.",
       "delete_confirm": "Escribe el nombre del personaje para confirmar la eliminación.",
-      "storage_purchase_open": "A storage purchase must finish or be resolved before this character can be deleted.",
-      "delete_busy": "The realm is busy. Try deleting this character again in a moment.",
+      "storage_purchase_open": "Una compra de almacenamiento debe completarse o resolverse antes de poder eliminar este personaje.",
+      "delete_busy": "El reino está ocupado. Intenta eliminar este personaje de nuevo dentro de un momento.",
       "already_in_world": "El personaje ya está en el mundo.",
       "taken_over": "Otra sesión tomó el control de tu personaje.",
       "rename_required": "Este personaje debe cambiar de nombre antes de entrar al mundo.",
@@ -5180,7 +5180,7 @@ export const es: EnTranslations = {
       "ifPartySort": "El orden en que se listan los miembros del grupo: por grupo, por rol o por nombre.",
       "ifPartyShowAuras": "Si los beneficios y perjuicios se muestran en los marcos de grupo. Interruptores equivalentes cubren las barras de recursos, los escudos de absorción, las mascotas y si apareces en tu propia lista de grupo.",
       "ifAurasOnPlayerFrame": "Muestra tus beneficios y perjuicios en tu propio marco de unidad, además de en la barra de auras.",
-      "ifAlwaysShowAllBuffs": "Shows every active buff even on the Low graphics preset, bypassing its usual buff-icon cap.",
+      "ifAlwaysShowAllBuffs": "Muestra todos los beneficios activos incluso con el preajuste gráfico Bajo, ignorando su límite habitual de iconos de beneficios.",
       "ifTargetOfTarget": "Muestra a quién tiene como objetivo tu objetivo, la forma clásica de saber si el tanque todavía lo controla.",
       "ifPetFrame": "Muestra un marco para tu mascota.",
       "ifChatFontScale": "Tamaño del texto del chat.",
@@ -6667,7 +6667,7 @@ export const es: EnTranslations = {
       "bankBody": "Cada pueblo principal mantiene una sucursal del Arca Dorada, la casa de banca del reino. Habla allí con el tesorero para abrir tu bóveda, una reserva privada de espacio más allá de tus bolsas que tu personaje conserva de por vida. Lo que dejes en sus manos espera a salvo, sea cual sea la sucursal que visites la próxima vez.",
       "bankHow": "Con la bóveda abierta, haz clic en un objeto de tus bolsas para depositarlo y haz clic en él dentro de la bóveda para recuperarlo. La bóveda solo guarda bienes, nunca monedas, y los objetos de misión se quedan contigo. Cuando tus bolsas se llenan a mitad de viaje, un solo botón mete de una vez todos tus materiales de artesanía.",
       "bankSlots": "Una bóveda recién abierta empieza pequeña y crece contigo. El tesorero vende espacios adicionales por monedas a precios cada vez más altos, y jugar en línea suma espacio extra por cosas como un correo verificado, cuentas vinculadas y amigos que traes al juego.",
-      "bankSockets": "Past the slot ladder, the bursar also sells up to four bag sockets, unlocked in order at ever-steeper prices. Seat a spare bag from your carrying set in one and its slots join your vault room: an everyday bag widens the whole store, while a reagent satchel adds room only crafting materials may take. Click a bag in your bags to seat it and click the socket to take it back. Taking one back never costs you a thing you stored: if the vault ends up fuller than its shrunken room, everything stays put and new deposits simply wait for space.",
+      "bankSockets": "Más allá de la escalera de ranuras, el tesorero también vende hasta cuatro ranuras para bolsas, que se desbloquean en orden y a precios cada vez mayores. Coloca en una de ellas una bolsa de tu equipo y sus espacios se sumarán a tu bóveda: una bolsa normal amplía todo el almacén, mientras que una bolsa de reactivos añade espacio solo para materiales de fabricación. Haz clic en una bolsa de tus bolsas para colocarla y en la ranura para retirarla. Retirarla nunca te hace perder nada de lo que hayas guardado: si la bóveda acaba más llena que el espacio reducido, todo permanece en su sitio y los depósitos nuevos simplemente esperan hasta que haya espacio.",
       "buyingTitle": "Comprar y vender",
       "buyingBody": "Habla con un mercader y elige ver sus mercancías, y su tienda se abre con tres pestañas: Explorar, Vender y Recompra. Explorar contiene cuanto tiene en stock, tuyo si te lo puedes permitir. Vender enumera lo que de tus bolsas te pagará, y vender una pieza que lleva su propia calidad tirada te pide confirmar antes, para que un ejemplar preciado nunca se te escape por error. Si te desprendes de algo de lo que te arrepientes, la pestaña de Recompra guarda tus ventas recientes para que puedas recomprarlas por las monedas que te pagaron.",
       "junkTitle": "Despejar la chatarra",
@@ -7711,7 +7711,7 @@ export const es: EnTranslations = {
       "title": "Conectar una Cartera de Solana",
       "linkBody": "Elige una extensión de cartera en este navegador. Firmarás un mensaje de verificación y luego volverás a la aplicación de escritorio.",
       "paymentBody": "Elige la cartera vinculada a tu cuenta y aprueba la transacción en este navegador.",
-      "stepUpBody": "Choose the wallet linked to your account and sign the $WOC Exchange authorization message. Signing is free and moves no funds.",
+      "stepUpBody": "Elige la cartera vinculada a tu cuenta y firma el mensaje de autorización de $WOC Exchange. Firmar es gratis y no mueve fondos.",
       "extensionHelp": "No se encontró ninguna extensión de cartera compatible. Instala o desbloquea Phantom, Solflare u otra cartera de Solana para el navegador, luego vuelve a intentarlo.",
       "safety": "World of ClaudeCraft nunca solicita tu frase de recuperación ni tu clave privada.",
       "continueWith": "Continuar con {wallet}",
@@ -8102,18 +8102,18 @@ export const es: EnTranslations = {
     "buyConfirmCancel": "Cancelar"
   },
   "crucibleShop": {
-    "browse": "Redeem Sigils",
-    "browseAria": "Redeem Crucible sigils with {name}",
-    "empty": "No set pieces are redeemable for your class.",
-    "balance": "Your sigils: {list}",
+    "browse": "Canjear sigilos",
+    "browseAria": "Canjear sigilos del Crisol con {name}",
+    "empty": "No se pueden canjear piezas de conjunto para tu clase.",
+    "balance": "Tus sigilos: {list}",
     "balanceEntry": "{name} x{count}",
-    "noSigils": "You hold no Crucible sigils.",
+    "noSigils": "No tienes sigilos del Crisol.",
     "price": "1 {sigil}",
-    "buyAria": "Redeem {sigil} for {item}",
-    "buyConfirmTitle": "Confirm Redemption",
-    "buyConfirmBody": "Redeem your {sigil} for {item}? A consumed sigil cannot be refunded.",
-    "buyConfirmAccept": "Redeem",
-    "buyConfirmCancel": "Cancel"
+    "buyAria": "Canjear {sigil} por {item}",
+    "buyConfirmTitle": "Confirmar canje",
+    "buyConfirmBody": "¿Canjear tu {sigil} por {item}? Un sigilo consumido no se puede reembolsar.",
+    "buyConfirmAccept": "Canjear",
+    "buyConfirmCancel": "Cancelar"
   },
   "cardDuel": {
     "title": "Duelo de Cartas",
@@ -13254,25 +13254,25 @@ export const es: EnTranslations = {
         "name": "Ramillete del jardín de Dawnhold"
       },
       "wayfarers_backpack": {
-        "name": "Wayfarer's Backpack"
+        "name": "Mochila del Viajero"
       },
       "burlap_reagent_pouch": {
-        "name": "Burlap Reagent Pouch"
+        "name": "Bolsa de Reactivos de Arpillera"
       },
       "necromancers_reagent_satchel": {
-        "name": "Necromancer's Reagent Satchel"
+        "name": "Bolsa de Reactivos del Nigromante"
       },
       "duskweave_bag": {
-        "name": "Duskweave Bag"
+        "name": "Bolsa de Tejido Crepuscular"
       },
       "resonant_weave_bag": {
-        "name": "Resonantweave Bag"
+        "name": "Bolsa de Trama Resonante"
       },
       "foragers_haversack": {
-        "name": "Forager's Haversack"
+        "name": "Mochila del Recolector"
       },
       "loombound_reagent_satchel": {
-        "name": "Loombound Reagent Satchel"
+        "name": "Bolsa de Reactivos Ligada al Telar"
       },
       "ps_briny_lure": {
         "name": "Señuelo Salobre"
@@ -13287,610 +13287,610 @@ export const es: EnTranslations = {
         "name": "Piedra de Paso"
       },
       "lastflame_core": {
-        "name": "Core of the Last Flame"
+        "name": "Núcleo de la Última Llama"
       },
       "slagbreaker_helmet": {
-        "name": "Slagbreaker Helm"
+        "name": "Yelmo Rompeescoria"
       },
       "slagbreaker_shoulder": {
-        "name": "Slagbreaker Pauldrons"
+        "name": "Hombreras Rompeescoria"
       },
       "slagbreaker_chest": {
-        "name": "Slagbreaker Hauberk"
+        "name": "Loriga Rompeescoria"
       },
       "slagbreaker_gloves": {
-        "name": "Slagbreaker Gauntlets"
+        "name": "Guanteletes Rompeescoria"
       },
       "slagbreaker_legs": {
-        "name": "Slagbreaker Legguards"
+        "name": "Guardarrenes Rompeescoria"
       },
       "emberfury_helmet": {
-        "name": "Emberfury Helm"
+        "name": "Yelmo de Furia de Brasa"
       },
       "emberfury_shoulder": {
-        "name": "Emberfury Pauldrons"
+        "name": "Hombreras de Furia de Brasa"
       },
       "emberfury_chest": {
-        "name": "Emberfury Hauberk"
+        "name": "Loriga de Furia de Brasa"
       },
       "emberfury_gloves": {
-        "name": "Emberfury Gauntlets"
+        "name": "Guanteletes de Furia de Brasa"
       },
       "emberfury_legs": {
-        "name": "Emberfury Legguards"
+        "name": "Guardarrenes de Furia de Brasa"
       },
       "forgewall_helmet": {
-        "name": "Forgewall Helm"
+        "name": "Yelmo de la Muralla de la Forja"
       },
       "forgewall_shoulder": {
-        "name": "Forgewall Pauldrons"
+        "name": "Hombreras de la Muralla de la Forja"
       },
       "forgewall_chest": {
-        "name": "Forgewall Hauberk"
+        "name": "Loriga de la Muralla de la Forja"
       },
       "forgewall_gloves": {
-        "name": "Forgewall Gauntlets"
+        "name": "Guanteletes de la Muralla de la Forja"
       },
       "forgewall_legs": {
-        "name": "Forgewall Legguards"
+        "name": "Guardarrenes de la Muralla de la Forja"
       },
       "dawnforged_helmet": {
-        "name": "Dawnforged Helm"
+        "name": "Yelmo Forjado por el Alba"
       },
       "dawnforged_shoulder": {
-        "name": "Dawnforged Pauldrons"
+        "name": "Hombreras Forjadas por el Alba"
       },
       "dawnforged_chest": {
-        "name": "Dawnforged Hauberk"
+        "name": "Loriga Forjada por el Alba"
       },
       "dawnforged_gloves": {
-        "name": "Dawnforged Gauntlets"
+        "name": "Guanteletes Forjados por el Alba"
       },
       "dawnforged_legs": {
-        "name": "Dawnforged Legguards"
+        "name": "Guardarrenes Forjados por el Alba"
       },
       "oathpyre_helmet": {
-        "name": "Oathpyre Helm"
+        "name": "Yelmo de la Pira del Juramento"
       },
       "oathpyre_shoulder": {
-        "name": "Oathpyre Pauldrons"
+        "name": "Hombreras de la Pira del Juramento"
       },
       "oathpyre_chest": {
-        "name": "Oathpyre Hauberk"
+        "name": "Loriga de la Pira del Juramento"
       },
       "oathpyre_gloves": {
-        "name": "Oathpyre Gauntlets"
+        "name": "Guanteletes de la Pira del Juramento"
       },
       "oathpyre_legs": {
-        "name": "Oathpyre Legguards"
+        "name": "Guardarrenes de la Pira del Juramento"
       },
       "zealfire_helmet": {
-        "name": "Zealfire Helm"
+        "name": "Yelmo Fuego del Celo"
       },
       "zealfire_shoulder": {
-        "name": "Zealfire Pauldrons"
+        "name": "Hombreras Fuego del Celo"
       },
       "zealfire_chest": {
-        "name": "Zealfire Hauberk"
+        "name": "Loriga Fuego del Celo"
       },
       "zealfire_gloves": {
-        "name": "Zealfire Gauntlets"
+        "name": "Guanteletes Fuego del Celo"
       },
       "zealfire_legs": {
-        "name": "Zealfire Legguards"
+        "name": "Guardarrenes Fuego del Celo"
       },
       "packlord_emberhide_helmet": {
-        "name": "Packlord's Cowl"
+        "name": "Capucha del Señor de la Manada"
       },
       "packlord_emberhide_shoulder": {
-        "name": "Packlord's Spaulders"
+        "name": "Hombreras del Señor de la Manada"
       },
       "packlord_emberhide_chest": {
-        "name": "Packlord's Tunic"
+        "name": "Túnica del Señor de la Manada"
       },
       "packlord_emberhide_gloves": {
-        "name": "Packlord's Grips"
+        "name": "Guanteletes del Señor de la Manada"
       },
       "packlord_emberhide_legs": {
-        "name": "Packlord's Breeches"
+        "name": "Calzas del Señor de la Manada"
       },
       "coldsight_trackers_helmet": {
-        "name": "Coldsight Cowl"
+        "name": "Capucha de Vista Fría"
       },
       "coldsight_trackers_shoulder": {
-        "name": "Coldsight Spaulders"
+        "name": "Bufas de Vista Fría"
       },
       "coldsight_trackers_chest": {
-        "name": "Coldsight Tunic"
+        "name": "Túnica de Vista Fría"
       },
       "coldsight_trackers_gloves": {
-        "name": "Coldsight Grips"
+        "name": "Guantes de Vista Fría"
       },
       "coldsight_trackers_legs": {
-        "name": "Coldsight Breeches"
+        "name": "Calzones de Vista Fría"
       },
       "slagsnare_helmet": {
-        "name": "Slagsnare Cowl"
+        "name": "Capucha Atrapaescoria"
       },
       "slagsnare_shoulder": {
-        "name": "Slagsnare Spaulders"
+        "name": "Hombreras Atrapaescoria"
       },
       "slagsnare_chest": {
-        "name": "Slagsnare Tunic"
+        "name": "Túnica Atrapaescoria"
       },
       "slagsnare_gloves": {
-        "name": "Slagsnare Grips"
+        "name": "Guantes Atrapaescoria"
       },
       "slagsnare_legs": {
-        "name": "Slagsnare Breeches"
+        "name": "Calzas Atrapaescoria"
       },
       "cinderfang_helmet": {
-        "name": "Cinderfang Cowl"
+        "name": "Capucha de Colmillo de Brasa"
       },
       "cinderfang_shoulder": {
-        "name": "Cinderfang Spaulders"
+        "name": "Bufas de Colmillo de Brasa"
       },
       "cinderfang_chest": {
-        "name": "Cinderfang Tunic"
+        "name": "Túnica de Colmillo de Brasa"
       },
       "cinderfang_gloves": {
-        "name": "Cinderfang Grips"
+        "name": "Guantes de Colmillo de Brasa"
       },
       "cinderfang_legs": {
-        "name": "Cinderfang Breeches"
+        "name": "Calzones de Colmillo de Brasa"
       },
       "smolderstrike_helmet": {
-        "name": "Smolderstrike Cowl"
+        "name": "Capucha Golpe Humeante"
       },
       "smolderstrike_shoulder": {
-        "name": "Smolderstrike Spaulders"
+        "name": "Hombreras Golpe Humeante"
       },
       "smolderstrike_chest": {
-        "name": "Smolderstrike Tunic"
+        "name": "Túnica Golpe Humeante"
       },
       "smolderstrike_gloves": {
-        "name": "Smolderstrike Grips"
+        "name": "Guantes Golpe Humeante"
       },
       "smolderstrike_legs": {
-        "name": "Smolderstrike Breeches"
+        "name": "Calzas Golpe Humeante"
       },
       "ashveil_helmet": {
-        "name": "Ashveil Cowl"
+        "name": "Capucha del Velo de Ceniza"
       },
       "ashveil_shoulder": {
-        "name": "Ashveil Spaulders"
+        "name": "Hombreras del Velo de Ceniza"
       },
       "ashveil_chest": {
-        "name": "Ashveil Tunic"
+        "name": "Túnica del Velo de Ceniza"
       },
       "ashveil_gloves": {
-        "name": "Ashveil Grips"
+        "name": "Guantes del Velo de Ceniza"
       },
       "ashveil_legs": {
-        "name": "Ashveil Breeches"
+        "name": "Calzones del Velo de Ceniza"
       },
       "emberscreed_helmet": {
-        "name": "Creed of Embers Hood"
+        "name": "Capucha del Credo de Brasas"
       },
       "emberscreed_shoulder": {
-        "name": "Creed of Embers Mantle"
+        "name": "Manto del Credo de Brasas"
       },
       "emberscreed_chest": {
-        "name": "Creed of Embers Robe"
+        "name": "Túnica del Credo de Brasas"
       },
       "emberscreed_gloves": {
-        "name": "Creed of Embers Handwraps"
+        "name": "Vendas de Manos del Credo de Brasas"
       },
       "emberscreed_legs": {
-        "name": "Creed of Embers Leggings"
+        "name": "Calzas del Credo de Brasas"
       },
       "benison_dawnweave_helmet": {
-        "name": "Dawnweave Hood"
+        "name": "Capucha de Trama del Alba"
       },
       "benison_dawnweave_shoulder": {
-        "name": "Dawnweave Mantle"
+        "name": "Manto de Trama del Alba"
       },
       "benison_dawnweave_chest": {
-        "name": "Dawnweave Robe"
+        "name": "Túnica de Trama del Alba"
       },
       "benison_dawnweave_gloves": {
-        "name": "Dawnweave Handwraps"
+        "name": "Vendajes de Trama del Alba"
       },
       "benison_dawnweave_legs": {
-        "name": "Dawnweave Leggings"
+        "name": "Leotardos de Trama del Alba"
       },
       "vesperash_helmet": {
-        "name": "Vesperash Hood"
+        "name": "Capucha Ceniza del Ocaso"
       },
       "vesperash_shoulder": {
-        "name": "Vesperash Mantle"
+        "name": "Manto Ceniza del Ocaso"
       },
       "vesperash_chest": {
-        "name": "Vesperash Robe"
+        "name": "Túnica Ceniza del Ocaso"
       },
       "vesperash_gloves": {
-        "name": "Vesperash Handwraps"
+        "name": "Vendajes Ceniza del Ocaso"
       },
       "vesperash_legs": {
-        "name": "Vesperash Leggings"
+        "name": "Calzas Ceniza del Ocaso"
       },
       "stormkindled_helmet": {
-        "name": "Stormkindled Helm"
+        "name": "Yelmo Encendido por la Tormenta"
       },
       "stormkindled_shoulder": {
-        "name": "Stormkindled Pauldrons"
+        "name": "Hombreras Encendidas por la Tormenta"
       },
       "stormkindled_chest": {
-        "name": "Stormkindled Hauberk"
+        "name": "Loriga Encendida por la Tormenta"
       },
       "stormkindled_gloves": {
-        "name": "Stormkindled Gauntlets"
+        "name": "Guanteletes Encendidos por la Tormenta"
       },
       "stormkindled_legs": {
-        "name": "Stormkindled Legguards"
+        "name": "Guardarrenes Encendidos por la Tormenta"
       },
       "warspirit_emberscale_helmet": {
-        "name": "Emberscale Helm"
+        "name": "Yelmo de Escamas de Brasa"
       },
       "warspirit_emberscale_shoulder": {
-        "name": "Emberscale Pauldrons"
+        "name": "Hombreras de Escamas de Brasa"
       },
       "warspirit_emberscale_chest": {
-        "name": "Emberscale Hauberk"
+        "name": "Loriga de Escamas de Brasa"
       },
       "warspirit_emberscale_gloves": {
-        "name": "Emberscale Gauntlets"
+        "name": "Guanteletes de Escamas de Brasa"
       },
       "warspirit_emberscale_legs": {
-        "name": "Emberscale Legguards"
+        "name": "Guardarrenes de Escamas de Brasa"
       },
       "stonehearth_helmet": {
-        "name": "Stonehearth Helm"
+        "name": "Yelmo Corazón de Piedra"
       },
       "stonehearth_shoulder": {
-        "name": "Stonehearth Pauldrons"
+        "name": "Hombreras Corazón de Piedra"
       },
       "stonehearth_chest": {
-        "name": "Stonehearth Hauberk"
+        "name": "Loriga Corazón de Piedra"
       },
       "stonehearth_gloves": {
-        "name": "Stonehearth Gauntlets"
+        "name": "Guanteletes Corazón de Piedra"
       },
       "stonehearth_legs": {
-        "name": "Stonehearth Legguards"
+        "name": "Guardarrenes Corazón de Piedra"
       },
       "springmender_helmet": {
-        "name": "Springmender Helm"
+        "name": "Yelmo Sanafuentes"
       },
       "springmender_shoulder": {
-        "name": "Springmender Pauldrons"
+        "name": "Hombreras Sanafuentes"
       },
       "springmender_chest": {
-        "name": "Springmender Hauberk"
+        "name": "Loriga Sanafuentes"
       },
       "springmender_gloves": {
-        "name": "Springmender Gauntlets"
+        "name": "Guanteletes Sanafuentes"
       },
       "springmender_legs": {
-        "name": "Springmender Legguards"
+        "name": "Guardarrenes Sanafuentes"
       },
       "chronoweave_helmet": {
-        "name": "Aetherweave Hood"
+        "name": "Capucha de Trama Etérea"
       },
       "chronoweave_shoulder": {
-        "name": "Aetherweave Mantle"
+        "name": "Manto de Trama Etérea"
       },
       "chronoweave_chest": {
-        "name": "Aetherweave Robe"
+        "name": "Túnica de Trama Etérea"
       },
       "chronoweave_gloves": {
-        "name": "Aetherweave Handwraps"
+        "name": "Vendajes de Trama Etérea"
       },
       "chronoweave_legs": {
-        "name": "Aetherweave Leggings"
+        "name": "Leotardos de Trama Etérea"
       },
       "pyroclast_helmet": {
-        "name": "Pyroclast Hood"
+        "name": "Capucha de Piroclasto"
       },
       "pyroclast_shoulder": {
-        "name": "Pyroclast Mantle"
+        "name": "Manto de Piroclasto"
       },
       "pyroclast_chest": {
-        "name": "Pyroclast Robe"
+        "name": "Túnica de Piroclasto"
       },
       "pyroclast_gloves": {
-        "name": "Pyroclast Handwraps"
+        "name": "Vendajes de Piroclasto"
       },
       "pyroclast_legs": {
-        "name": "Pyroclast Leggings"
+        "name": "Calzas de Piroclasto"
       },
       "frostquench_helmet": {
-        "name": "Frostquench Hood"
+        "name": "Capucha de Escarcha Extinguida"
       },
       "frostquench_shoulder": {
-        "name": "Frostquench Mantle"
+        "name": "Manto de Escarcha Extinguida"
       },
       "frostquench_chest": {
-        "name": "Frostquench Robe"
+        "name": "Túnica de Escarcha Extinguida"
       },
       "frostquench_gloves": {
-        "name": "Frostquench Handwraps"
+        "name": "Mitones de Escarcha Extinguida"
       },
       "frostquench_legs": {
-        "name": "Frostquench Leggings"
+        "name": "Calzas de Escarcha Extinguida"
       },
       "hexthread_helmet": {
-        "name": "Hexthread Hood"
+        "name": "Capucha de Hilo Maldito"
       },
       "hexthread_shoulder": {
-        "name": "Hexthread Mantle"
+        "name": "Manto de Hilo Maldito"
       },
       "hexthread_chest": {
-        "name": "Hexthread Robe"
+        "name": "Túnica de Hilo Maldito"
       },
       "hexthread_gloves": {
-        "name": "Hexthread Handwraps"
+        "name": "Mitones de Hilo Maldito"
       },
       "hexthread_legs": {
-        "name": "Hexthread Leggings"
+        "name": "Calzas de Hilo Maldito"
       },
       "gravebrand_helmet": {
-        "name": "Gravebrand Hood"
+        "name": "Capucha de Marca Sepulcral"
       },
       "gravebrand_shoulder": {
-        "name": "Gravebrand Mantle"
+        "name": "Manto de Marca Sepulcral"
       },
       "gravebrand_chest": {
-        "name": "Gravebrand Robe"
+        "name": "Túnica de Marca Sepulcral"
       },
       "gravebrand_gloves": {
-        "name": "Gravebrand Handwraps"
+        "name": "Mitones de Marca Sepulcral"
       },
       "gravebrand_legs": {
-        "name": "Gravebrand Leggings"
+        "name": "Calzas de Marca Sepulcral"
       },
       "ruincaller_helmet": {
-        "name": "Ruincaller Hood"
+        "name": "Capucha del Invocador de Ruinas"
       },
       "ruincaller_shoulder": {
-        "name": "Ruincaller Mantle"
+        "name": "Manto del Invocador de Ruinas"
       },
       "ruincaller_chest": {
-        "name": "Ruincaller Robe"
+        "name": "Túnica del Invocador de Ruinas"
       },
       "ruincaller_gloves": {
-        "name": "Ruincaller Handwraps"
+        "name": "Vendajes del Invocador de Ruinas"
       },
       "ruincaller_legs": {
-        "name": "Ruincaller Leggings"
+        "name": "Calzas del Invocador de Ruinas"
       },
       "moonscorch_helmet": {
-        "name": "Moonscorch Cowl"
+        "name": "Capucha de Quemadura Lunar"
       },
       "moonscorch_shoulder": {
-        "name": "Moonscorch Spaulders"
+        "name": "Hombreras de Quemadura Lunar"
       },
       "moonscorch_chest": {
-        "name": "Moonscorch Tunic"
+        "name": "Túnica de Quemadura Lunar"
       },
       "moonscorch_gloves": {
-        "name": "Moonscorch Grips"
+        "name": "Guanteletes de Quemadura Lunar"
       },
       "moonscorch_legs": {
-        "name": "Moonscorch Breeches"
+        "name": "Calzas de Quemadura Lunar"
       },
       "wildfang_emberhide_helmet": {
-        "name": "Wildfang Cowl"
+        "name": "Capucha Colmillo Salvaje"
       },
       "wildfang_emberhide_shoulder": {
-        "name": "Wildfang Spaulders"
+        "name": "Hombreras Colmillo Salvaje"
       },
       "wildfang_emberhide_chest": {
-        "name": "Wildfang Tunic"
+        "name": "Túnica Colmillo Salvaje"
       },
       "wildfang_emberhide_gloves": {
-        "name": "Wildfang Grips"
+        "name": "Guantes Colmillo Salvaje"
       },
       "wildfang_emberhide_legs": {
-        "name": "Wildfang Breeches"
+        "name": "Calzas Colmillo Salvaje"
       },
       "cinderbark_helmet": {
-        "name": "Cinderbark Cowl"
+        "name": "Capucha de Corteza de Brasa"
       },
       "cinderbark_shoulder": {
-        "name": "Cinderbark Spaulders"
+        "name": "Hombreras de Corteza de Brasa"
       },
       "cinderbark_chest": {
-        "name": "Cinderbark Tunic"
+        "name": "Túnica de Corteza de Brasa"
       },
       "cinderbark_gloves": {
-        "name": "Cinderbark Grips"
+        "name": "Guantes de Corteza de Brasa"
       },
       "cinderbark_legs": {
-        "name": "Cinderbark Breeches"
+        "name": "Calzones de Corteza de Brasa"
       },
       "grovespring_helmet": {
-        "name": "Grovespring Cowl"
+        "name": "Capucha de Fuente del Bosque"
       },
       "grovespring_shoulder": {
-        "name": "Grovespring Spaulders"
+        "name": "Hombreras de Fuente del Bosque"
       },
       "grovespring_chest": {
-        "name": "Grovespring Tunic"
+        "name": "Túnica de Fuente del Bosque"
       },
       "grovespring_gloves": {
-        "name": "Grovespring Grips"
+        "name": "Guanteletes de Fuente del Bosque"
       },
       "grovespring_legs": {
-        "name": "Grovespring Breeches"
+        "name": "Calzas de Fuente del Bosque"
       },
       "sigil_anvil_helmet": {
-        "name": "Helm Sigil of the Anvil"
+        "name": "Sigilo de Yelmo del Yunque"
       },
       "sigil_ember_helmet": {
-        "name": "Helm Sigil of the Ember"
+        "name": "Sigilo de Yelmo de la Brasa"
       },
       "sigil_tempest_helmet": {
-        "name": "Helm Sigil of the Tempest"
+        "name": "Sigilo de Yelmo de la Tempestad"
       },
       "sigil_anvil_shoulder": {
-        "name": "Mantle Sigil of the Anvil"
+        "name": "Sigilo de Manto del Yunque"
       },
       "sigil_ember_shoulder": {
-        "name": "Mantle Sigil of the Ember"
+        "name": "Sigilo de Manto de la Brasa"
       },
       "sigil_tempest_shoulder": {
-        "name": "Mantle Sigil of the Tempest"
+        "name": "Sigilo de Manto de la Tempestad"
       },
       "sigil_anvil_chest": {
-        "name": "Robe Sigil of the Anvil"
+        "name": "Sigilo de Túnica del Yunque"
       },
       "sigil_ember_chest": {
-        "name": "Robe Sigil of the Ember"
+        "name": "Sigilo de Túnica de la Brasa"
       },
       "sigil_tempest_chest": {
-        "name": "Robe Sigil of the Tempest"
+        "name": "Sigilo de Túnica de la Tempestad"
       },
       "sigil_anvil_gloves": {
-        "name": "Grip Sigil of the Anvil"
+        "name": "Sigilo de Guanteletes del Yunque"
       },
       "sigil_ember_gloves": {
-        "name": "Grip Sigil of the Ember"
+        "name": "Sigilo de Guanteletes de la Brasa"
       },
       "sigil_tempest_gloves": {
-        "name": "Grip Sigil of the Tempest"
+        "name": "Sigilo de Guanteletes de la Tempestad"
       },
       "sigil_anvil_legs": {
-        "name": "Legging Sigil of the Anvil"
+        "name": "Sigilo de Calzas del Yunque"
       },
       "sigil_ember_legs": {
-        "name": "Legging Sigil of the Ember"
+        "name": "Sigilo de Calzas de la Brasa"
       },
       "sigil_tempest_legs": {
-        "name": "Legging Sigil of the Tempest"
+        "name": "Sigilo de Calzas de la Tempestad"
       },
       "cord_of_the_last_flame": {
-        "name": "Cord of the Last Flame"
+        "name": "Cordón de la Última Llama"
       },
       "cindersoaked_slippers": {
-        "name": "Cindersoaked Slippers"
+        "name": "Zapatillas Empapadas de Ceniza"
       },
       "springbinder_sash": {
-        "name": "Springbinder Sash"
+        "name": "Fajín Vinculafuentes"
       },
       "steps_of_quiet_water": {
-        "name": "Steps of Quiet Water"
+        "name": "Pasos de Agua Serena"
       },
       "cinderbark_cinch": {
-        "name": "Cinderbark Cinch"
+        "name": "Faja de Corteza de Brasa"
       },
       "ashenbark_treads": {
-        "name": "Ashenbark Treads"
+        "name": "Grebas de Corteza Cenicienta"
       },
       "slagstalker_belt": {
-        "name": "Slagstalker Belt"
+        "name": "Cinturón Acechaescoria"
       },
       "ashrunner_boots": {
-        "name": "Ashrunner Boots"
+        "name": "Botas de Correcenizas"
       },
       "moonscorch_waistwrap": {
-        "name": "Moonscorch Waistwrap"
+        "name": "Faja de Quemadura Lunar"
       },
       "scorchgrove_striders": {
-        "name": "Scorchgrove Striders"
+        "name": "Grebas de la Arboleda Abrasada"
       },
       "grovetender_belt": {
-        "name": "Grovetender Belt"
+        "name": "Cinturón del Guardián del Bosque"
       },
       "dewfall_moccasins": {
-        "name": "Dewfall Moccasins"
+        "name": "Mocasines de Rocío Caído"
       },
       "forgewall_girdle": {
-        "name": "Forgewall Girdle"
+        "name": "Fajín de la Muralla de la Forja"
       },
       "anvilstance_sabatons": {
-        "name": "Anvilstance Sabatons"
+        "name": "Sabatones de Postura del Yunque"
       },
       "warforged_waistguard": {
-        "name": "Warforged Waistguard"
+        "name": "Guardarrenes Forjado para la Guerra"
       },
       "furnace_march_greaves": {
-        "name": "Furnace March Greaves"
+        "name": "Grebas de la Marcha del Horno"
       },
       "stormkindled_chain": {
-        "name": "Stormkindled Chain"
+        "name": "Cadena Encendida por la Tormenta"
       },
       "thundershock_treads": {
-        "name": "Thundershock Treads"
+        "name": "Grebas del Trueno"
       },
       "tidebinder_links": {
-        "name": "Tidebinder Links"
+        "name": "Eslabones Vinculamareas"
       },
       "springwarden_sabatons": {
-        "name": "Springwarden Sabatons"
+        "name": "Escarpes Guardafuentes"
       },
       "pendant_of_the_first_tempering": {
-        "name": "Pendant of the First Tempering"
+        "name": "Colgante de la Primera Templanza"
       },
       "ignivars_ember_choker": {
-        "name": "Ignivar's Ember Choker"
+        "name": "Gargantilla de Brasas de Ignivar"
       },
       "locket_of_the_last_flame": {
-        "name": "Locket of the Last Flame"
+        "name": "Relicario de la Última Llama"
       },
       "heartspring_amulet": {
-        "name": "Heartspring Amulet"
+        "name": "Amuleto de Fuente Vital"
       },
       "seal_of_the_forgewall": {
-        "name": "Seal of the Forgewall"
+        "name": "Sello de la Muralla de la Forja"
       },
       "band_of_marked_strikes": {
-        "name": "Band of Marked Strikes"
+        "name": "Anillo de Golpes Marcados"
       },
       "circle_of_cinders": {
-        "name": "Circle of Cinders"
+        "name": "Círculo de Brasas"
       },
       "loop_of_quiet_springs": {
-        "name": "Loop of Quiet Springs"
+        "name": "Anillo de los Manantiales Silenciosos"
       },
       "bulwark_of_the_inner_crucible": {
-        "name": "Bulwark of the Inner Crucible"
+        "name": "Baluarte del Crisol Interior"
       },
       "ember_wardens_barrier": {
-        "name": "Ember Warden's Barrier"
+        "name": "Barrera del Guardián de Brasas"
       },
       "orb_of_the_last_spring": {
-        "name": "Orb of the Last Spring"
+        "name": "Orbe del Último Manantial"
       },
       "cinder_of_the_first_design": {
-        "name": "Cinder of the First Design"
+        "name": "Ascua del Primer Diseño"
       },
       "forgefathers_warhammer": {
-        "name": "Forgefather's Warhammer"
+        "name": "Martillo de Guerra del Padre de la Forja"
       },
       "cinderfang_kris": {
-        "name": "Cinderfang Kris"
+        "name": "Kris de Colmillo de Brasa"
       },
       "slagrender_cleaver": {
-        "name": "Slagrender Cleaver"
+        "name": "Cuchilla Desgarrascoria"
       },
       "anvilguard_blade": {
-        "name": "Anvilguard Blade"
+        "name": "Hoja de Guardia del Yunque"
       },
       "heart_of_the_end_greatblade": {
-        "name": "Heart of the End Greatblade"
+        "name": "Gran Espada del Corazón del Fin"
       },
       "staff_of_the_last_spring": {
-        "name": "Staff of the Last Spring"
+        "name": "Bastón de la Última Fuente"
       },
       "forgefire_spire": {
-        "name": "Forgefire Spire"
+        "name": "Aguja de Fuego de Forja"
       },
       "springtouched_crozier": {
-        "name": "Springtouched Crozier"
+        "name": "Báculo de la Fuente"
       },
       "wand_of_quenched_sparks": {
-        "name": "Wand of Quenched Sparks"
+        "name": "Varita de Chispas Apagadas"
       },
       "conjured_water4": {
         "name": "Agua de Manantial Conjurada"
@@ -14670,10 +14670,10 @@ export const es: EnTranslations = {
         "name": "Riendas de Pavoneatruenos, el Gran Pavo"
       },
       "varkhul_forgebreaker": {
-        "name": "Forgebreaker, Engine of Varkhul"
+        "name": "Rompeforjas, Motor de Varkhul"
       },
       "varkhul_emberward": {
-        "name": "Emberward, Bulwark of Varkhul"
+        "name": "Guardia de Brasas, Baluarte de Varkhul"
       }
     },
     "mobs": {
@@ -14876,19 +14876,19 @@ export const es: EnTranslations = {
         "name": "Ignivar Ashcaller"
       },
       "ignivar_ember_sentinel": {
-        "name": "Ember Sentinel"
+        "name": "Centinela de Brasas"
       },
       "ignivar_crucible_warden": {
-        "name": "Crucible Warden"
+        "name": "Guardián del Crisol"
       },
       "ignivar_cinder_artificer": {
-        "name": "Cinder Artificer"
+        "name": "Artífice de Ceniza"
       },
       "varkhul_forgefather_of_the_last_flame": {
-        "name": "Varkhul, Forgefather of the Last Flame"
+        "name": "Varkhul, Padre de la Forja de la Última Llama"
       },
       "derelict_mech": {
-        "name": "Derelict Mech"
+        "name": "Mecanismo Abandonado"
       },
       "reliquary_ledger_wraith": {
         "name": "Espectro del registro"
@@ -15551,19 +15551,19 @@ export const es: EnTranslations = {
         "greeting": "De un patio de capilla al techo del mundo... el rastro termina aquí. Siento que la montaña escucha."
       },
       "archivist_maelin_emberward": {
-        "name": "Archivist Maelin Emberward",
-        "title": "Crucible Archivist",
-        "greeting": "Every hammer mark in this place is a sentence. Help me read what Varkhul tried to hide."
+        "name": "Archivista Maelin Guardia de Brasas",
+        "title": "Archivista del Crisol",
+        "greeting": "Cada marca de martillo de este lugar es una frase. Ayúdame a leer lo que Varkhul intentó ocultar."
       },
       "archivist_maelin_ember_projection": {
-        "name": "Maelin's Ember Projection",
-        "title": "Ember Projection",
-        "greeting": "The embers carry Maelin's voice forward through the forge."
+        "name": "Proyección de Brasas de Maelin",
+        "title": "Proyección de Brasas",
+        "greeting": "Las brasas llevan la voz de Maelin a través de la forja."
       },
       "crucible_quartermaster": {
-        "name": "Quartermaster Bronn Emberward",
-        "title": "Crucible Quartermaster",
-        "greeting": "The forge marks its own. Bring me a sigil from the Crucible and I will fit you for war."
+        "name": "Intendente Bronn Guardia de Brasas",
+        "title": "Intendente del Crisol",
+        "greeting": "La forja reconoce a los suyos. Tráeme un sigilo del Crisol y te prepararé para la guerra."
       },
       "brother_halven": {
         "name": "Hermano Halven",
@@ -16714,35 +16714,35 @@ export const es: EnTranslations = {
         }
       },
       "q_ignivar_echoes_in_iron": {
-        "title": "Echoes in Iron",
-        "text": "These automata are not soldiers. They are drafts. Break each assembly line and listen when the final shell falls. The forge remembers what Varkhul tried to erase.",
-        "completion": "The echoes agree. Varkhul bound water from the dying Last Spring into living metal. These automatons were failed temperings. Only Ignivar endured.",
+        "title": "Ecos en el Hierro",
+        "text": "Estos autómatas no son soldados. Son borradores. Rompe cada línea de ensamblaje y escucha cuando caiga la última carcasa. La forja recuerda lo que Varkhul intentó borrar.",
+        "completion": "Los ecos coinciden. Varkhul ató agua de la Última Fuente moribunda al metal vivo. Estos autómatas fueron templados fallidos. Solo Ignivar perduró.",
         "objectives": {
           "0": {
-            "label": "Ember Sentinels destroyed"
+            "label": "Centinelas de Brasas destruidos"
           },
           "1": {
-            "label": "Crucible Wardens destroyed"
+            "label": "Guardianes del Crisol destruidos"
           }
         }
       },
       "q_ignivar_heralds_heart": {
-        "title": "The Herald's Heart",
-        "text": "The survivor named in every echo is Ignivar. Varkhul called him herald, seal, and key. Defeat him. If the records are true, his death will reveal what he was forged to guard.",
-        "completion": "Ignivar was never merely a guardian. His heart was the key, and its final plates opened the sealed crucible below.",
+        "title": "El Corazón del Heraldo",
+        "text": "El superviviente mencionado en cada eco es Ignivar. Varkhul lo llamó heraldo, sello y llave. Derrótalo. Si los registros dicen la verdad, su muerte revelará qué fue forjado para proteger.",
+        "completion": "Ignivar nunca fue simplemente un guardián. Su corazón era la llave, y sus placas finales abrieron el crisol sellado de abajo.",
         "objectives": {
           "0": {
-            "label": "Ignivar defeated"
+            "label": "Ignivar derrotado"
           }
         }
       },
       "q_ignivar_the_forgefather": {
-        "title": "The Forgefather",
-        "text": "The path below leads to Varkhul, Forgefather of the Last Flame. He imprisoned the Last Spring to make metal live, then forged Ignivar to keep the crime sealed. Enter the Inner Crucible and end his work.",
-        "completion": "The forge is silent at last. The spring may never recover, but Varkhul will shape no more lives into chains.",
+        "title": "El Padre de la Forja",
+        "text": "El camino de abajo lleva a Varkhul, Padre de la Forja de la Última Llama. Aprisionó la Última Fuente para dar vida al metal y luego forjó a Ignivar para mantener sellado el crimen. Entra en el Crisol Interior y pon fin a su obra.",
+        "completion": "La forja por fin guarda silencio. Puede que la Fuente nunca se recupere, pero Varkhul ya no convertirá más vidas en cadenas.",
         "objectives": {
           "0": {
-            "label": "Varkhul defeated"
+            "label": "Varkhul derrotado"
           }
         }
       },
@@ -18624,29 +18624,29 @@ export const es: EnTranslations = {
         "leaveText": "Regresas al aire frío de Thornpeak."
       },
       "ignivar_forge_lift": {
-        "name": "The Forge-Lift",
-        "enterText": "The forge-lift shudders and sinks; hammerfall rises to meet you.",
-        "leaveText": "The lift hauls you back into the open air of the keep."
+        "name": "Elevador de la Forja",
+        "enterText": "El elevador de la forja tiembla y desciende; el estruendo de los martillos sube a tu encuentro.",
+        "leaveText": "El elevador te devuelve al aire libre de la fortaleza."
       },
       "ignivar_forge_approach": {
-        "name": "Halls of the First Tempering",
-        "enterText": "Hammerfall echoes through the Halls of the First Tempering.",
-        "leaveText": "You step away from the first forge and breathe freely again."
+        "name": "Salas de la Primera Templanza",
+        "enterText": "El estruendo de los martillos resuena por las Salas de la Primera Templanza.",
+        "leaveText": "Te alejas de la primera forja y vuelves a respirar libremente."
       },
       "ignivar_raid_arena": {
-        "name": "Crucible of the Last Spring",
-        "enterText": "Heat shimmers above the sealed waters of the Crucible.",
-        "leaveText": "You step away from the Crucible and breathe freely again."
+        "name": "Crisol de la Última Fuente",
+        "enterText": "El calor reverbera sobre las aguas selladas del Crisol.",
+        "leaveText": "Te alejas del Crisol y vuelves a respirar libremente."
       },
       "ignivar_molten_assembly": {
-        "name": "Molten Assembly",
-        "enterText": "The opened gate leads into a molten assembly hall.",
-        "leaveText": "You leave the assembly line and return to the Crucible."
+        "name": "Ensamblaje Fundido",
+        "enterText": "La puerta abierta conduce a una sala de ensamblaje fundida.",
+        "leaveText": "Abandonas la cadena de montaje y regresas al Crisol."
       },
       "ignivar_inner_crucible": {
-        "name": "The Inner Crucible",
-        "enterText": "The opened gate leads deeper into the Crucible.",
-        "leaveText": "You leave the silent depths of the Crucible."
+        "name": "Crisol Interior",
+        "enterText": "La puerta abierta conduce más adentro del Crisol.",
+        "leaveText": "Abandonas las profundidades silenciosas del Crisol."
       },
       "wildheart_basin": {
         "name": "La Cuenca del Corazón Salvaje",
@@ -18880,182 +18880,182 @@ export const es: EnTranslations = {
     },
     "itemSets": {
       "ashveil": {
-        "name": "Ashveil Garb",
-        "bonus2": "Lurker's Strike hits 25 percent harder.",
-        "bonus4": "Your Veiled Edge strike hits for triple, up from double."
+        "name": "Atuendo del Velo de Ceniza",
+        "bonus2": "Golpe del Acechador inflige un 25% más de daño.",
+        "bonus4": "Tu golpe de Filo Velado inflige el triple de daño, en lugar del doble."
       },
       "benison_dawnweave": {
-        "name": "Benison Dawnweave",
-        "bonus2": "Seraphic Vigil's rescue heals for 270, up from 180. Damage taken no longer delays your spellcasting.",
-        "bonus4": "When Seraphic Vigil triggers, its ally is also mended for 15 percent of their maximum health over 10 sec."
+        "name": "Trama del Alba Benévola",
+        "bonus2": "El rescate de Vigilancia Seráfica cura 270, en lugar de 180. El daño recibido ya no retrasa tus hechizos.",
+        "bonus4": "Cuando se activa Vigilancia Seráfica, su aliado también recupera un 15% de su salud máxima durante 10 s."
       },
       "boundstone_vanguard": {
         "name": "Vanguardia Piedravínculo",
         "bonus3": "Aumenta la velocidad de ataque y de lanzamiento en 15%."
       },
       "chronoweave": {
-        "name": "Aetherweave Vestments",
-        "bonus2": "Temporal Echo converts 50 percent of your single-target Arcane damage into healing. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Temporal Cascade's cooldown is reduced by 5 sec."
+        "name": "Vestimentas de Trama Etérea",
+        "bonus2": "Eco Temporal convierte un 50% de tu daño Arcano a un solo objetivo en sanación. El daño recibido ya no retrasa tus hechizos.",
+        "bonus4": "El tiempo de reutilización de Cascada Temporal se reduce 5 s."
       },
       "cinderbark": {
-        "name": "Cinderbark Ward",
-        "bonus2": "Sweeping Claws has a 30 percent chance to bank an additional Old Blood.",
-        "bonus4": "Marrowbreak hits 30 percent harder, and its emergency guard no longer replaces the strike."
+        "name": "Guardia de Corteza de Brasa",
+        "bonus2": "Garras Barredoras tienen un 30% de probabilidad de almacenar Sangre Antigua adicional.",
+        "bonus4": "Rompemédula inflige un 30% más de daño y su guardia de emergencia ya no sustituye el golpe."
       },
       "cinderfang": {
-        "name": "Cinderfang Shroud",
-        "bonus2": "Venom Ritual's energy refund rises to 20 per builder.",
-        "bonus4": "Venom Dart's cooldown is reduced to 4 sec."
+        "name": "Sudario de Colmillo de Brasa",
+        "bonus2": "El reembolso de energía del Ritual Venenoso aumenta a 20 por generador.",
+        "bonus4": "El tiempo de reutilización del Dardo Venenoso se reduce a 4 s."
       },
       "coldsight_trackers": {
-        "name": "Coldsight Trackers",
-        "bonus2": "Measured Shot restores 5 additional Focus.",
-        "bonus4": "Long Draw critical strikes extend Cold Focus by 2 sec, up to 6 sec per activation."
+        "name": "Rastreadores de Vista Fría",
+        "bonus2": "Disparo Medido restaura 5 de Concentración adicionales.",
+        "bonus4": "Los golpes críticos de Tiro Largo prolongan Concentración Fría 2 s, hasta 6 s por activación."
       },
       "crownforged": {
         "name": "Equipo de batalla Bonewrought",
         "bonus2": "Aumenta el poder de ataque en 40.",
         "bonus4": "Tus golpes críticos con el arma astillan al objetivo con Astilla de Hueso, haciéndolo sangrar 8 de daño cada 2 s durante 12 s. Se acumula hasta 3 veces.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 5 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Aumenta la velocidad de ataque y lanzamiento un 4% y el Golpe un 3%. Los golpes críticos de tu arma astillan al objetivo con Astillahuesos, causándole 5 de daño cada 2 s durante 12 s. Se acumula hasta 3 veces."
       },
       "dawnforged": {
-        "name": "Dawnforged Vestments",
-        "bonus2": "Beacon of Light copies 55 percent of your direct heals. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Radiant Resonance's empowered Dawn's Embrace is instant."
+        "name": "Vestimentas Forjadas por el Alba",
+        "bonus2": "Faro de Luz copia el 55% de tus sanaciones directas. El daño recibido ya no retrasa tus hechizos.",
+        "bonus4": "El Abrazo del Alba potenciado de Resonancia Radiante es instantáneo."
       },
       "deathlord": {
         "name": "Equipo de batalla de Barrowlord",
         "bonus2": "Aumenta el poder de ataque en 40.",
         "bonus4": "Tus golpes críticos con el arma tienen un 50% de probabilidad de otorgar Poderío Sepulcral, aumentando el poder de ataque en 60 durante 10 s.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 5 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Aumenta la velocidad de ataque y lanzamiento un 4% y el Golpe un 3%. Los golpes críticos de tu arma astillan al objetivo con Astillahuesos, causándole 5 de daño cada 2 s durante 12 s. Se acumula hasta 3 veces."
       },
       "emberfury": {
-        "name": "Emberfury Harness",
-        "bonus2": "Your Enrage lasts 6 sec instead of 4.",
-        "bonus4": "Bloodletting always Enrages you, and its healing rises to 8 percent of your maximum health."
+        "name": "Arnés de Furia de Brasa",
+        "bonus2": "Tu Enfurecimiento dura 6 s en lugar de 4.",
+        "bonus4": "Sangrado siempre te Enfurece y su sanación aumenta al 8% de tu salud máxima."
       },
       "emberscreed": {
-        "name": "Creed of Embers Vestments",
-        "bonus2": "Your Doctrine link converts 10 percent more of your Holy damage into healing. Damage taken no longer delays your spellcasting.",
-        "bonus4": "When your Psalm of Warding is fully consumed, your next Scouring Hymn within 10 sec is instant. Cannot occur more than once every 15 sec."
+        "name": "Vestimentas del Credo de Brasas",
+        "bonus2": "El vínculo de tu Doctrina convierte un 10% más de tu daño Sagrado en sanación. El daño recibido ya no retrasa tus hechizos.",
+        "bonus4": "Cuando tu Salmo de Protección se consume por completo, tu próximo Himno de Purga en 10 s es instantáneo. No puede ocurrir más de una vez cada 15 s."
       },
       "forgewall": {
-        "name": "Forgewall Aegis",
-        "bonus2": "Iron Resolve converts rage at 5 absorb per point instead of 4.",
-        "bonus4": "Casting Shieldcrack reduces Iron Resolve's remaining cooldown by 2 sec."
+        "name": "Égida de la Muralla de la Forja",
+        "bonus2": "Determinación de Hierro convierte la furia en 5 de absorción por punto en lugar de 4.",
+        "bonus4": "Lanzar Rompeescudos reduce 2 s el tiempo de reutilización restante de Determinación de Hierro."
       },
       "frostquench": {
-        "name": "Frostquench Weave",
-        "bonus2": "Rimelance critical strikes bank a second Icicle, up to the maximum of 5. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Winterlash plants 3 Winter's Chill charges, up from 2."
+        "name": "Trama de Escarcha Extinguida",
+        "bonus2": "Los golpes críticos de Lanza de Escarcha almacenan un segundo Carámbano, hasta un máximo de 5. El daño recibido ya no retrasa tus hechizos.",
+        "bonus4": "Latigazo Invernal aplica 3 cargas de Frío Invernal en lugar de 2."
       },
       "gravebrand": {
-        "name": "Gravebrand Regalia",
-        "bonus2": "Reaping Command's cooldown is reduced by 2 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Reaping Command's unison strikes deal 25 percent more damage."
+        "name": "Regalia de Marca Sepulcral",
+        "bonus2": "El tiempo de reutilización de Comando de Siega se reduce 2 s. El daño recibido ya no retrasa tus hechizos.",
+        "bonus4": "Los golpes unísonos de Comando de Siega infligen un 25% más de daño."
       },
       "greyjaw_stalker": {
         "name": "Equipo del Acechador de Greyjaw",
         "bonus3": "Aumenta la velocidad de ataque y de lanzamiento en 15%."
       },
       "grovespring": {
-        "name": "Grovespring Raiment",
-        "bonus2": "Swiftmend consumes your own Wildbloom or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Overbloom harvests 75 percent of your remaining effects and banks 1 Verdance afterward."
+        "name": "Atuendo de Fuente del Bosque",
+        "bonus2": "Sanación Rápida consume primero tu Floración Salvaje o Segunda Floración y sana un 25% más. El daño recibido ya no retrasa tus hechizos.",
+        "bonus4": "Sobrefloración cosecha el 75% de tus efectos restantes y almacena 1 Verdancia después."
       },
       "hexthread": {
-        "name": "Hexthread Shroud",
-        "bonus2": "Needle of Fate grants 2 additional Condemnation. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Passing Sentence refunds 10 Condemnation."
+        "name": "Sudario de Hilo Maldito",
+        "bonus2": "Aguja del Destino otorga 2 Condenas adicionales. El daño recibido ya no retrasa tus hechizos.",
+        "bonus4": "Sentencia Final devuelve 10 de Condena."
       },
       "moonscorch": {
-        "name": "Moonscorch Raiment",
-        "bonus2": "Moonseed may extend Lunar Tempest twice per application, to a maximum of 12 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Moonsurge and Sunwake strike 25 percent harder."
+        "name": "Atuendo de Quemadura Lunar",
+        "bonus2": "Semilla Lunar puede prolongar Tempestad Lunar dos veces por aplicación, hasta un máximo de 12 s. El daño recibido ya no retrasa tus hechizos.",
+        "bonus4": "Oleada Lunar y Despertar Solar infligen un 25% más de daño."
       },
       "necromancers": {
         "name": "Vestiduras de Mournweave",
         "bonus2": "Aumenta el poder de los hechizos en 20. El daño recibido ya no retrasa tus hechizos (100% de resistencia al retraso de lanzamiento).",
         "bonus4": "Tus hechizos tienen un 10% de probabilidad de otorgar Mente Clara, haciendo que tu próximo hechizo sea gratuito.",
-        "bonus6": "Increases attack and casting speed by 4%. Your spells have a 10% chance to grant Soulblaze, increasing spell power by 25 for 10 sec."
+        "bonus6": "Aumenta la velocidad de ataque y lanzamiento un 4%. Tus hechizos tienen un 10% de probabilidad de otorgar Alma Ardiente, aumentando el poder de hechizo en 25 durante 10 s."
       },
       "nighttalon": {
         "name": "Atuendo de cuero Direfang",
         "bonus2": "Aumenta el poder de ataque en 40.",
         "bonus4": "Tus golpes críticos con el arma abren un Tajo Desgarrado, haciendo sangrar al objetivo 6 de daño cada 2 s durante 12 s. Se acumula hasta 3 veces.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 4 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Aumenta la velocidad de ataque y lanzamiento un 4% y el Golpe un 3%. Los golpes críticos de tu arma abren una Herida Desgarrada, causando 4 de daño cada 2 s durante 12 s. Se acumula hasta 3 veces."
       },
       "oathpyre": {
-        "name": "Oathpyre Bastion",
-        "bonus2": "Vowkeeper Strike's chance to arm Solar Reprisal rises to 30 percent, and blocking an attack arms it 40 percent of the time.",
-        "bonus4": "Consuming Solar Reprisal shields you for 6 percent of your maximum health for 10 sec."
+        "name": "Bastión de la Pira del Juramento",
+        "bonus2": "La probabilidad de Golpe del Guardavotos de preparar Represalia Solar aumenta al 30%, y bloquear un ataque la prepara el 40% de las veces.",
+        "bonus4": "Consumir Represalia Solar te protege con un escudo del 6% de tu salud máxima durante 10 s."
       },
       "packlord_emberhide": {
-        "name": "Packlord's Emberhide",
-        "bonus2": "Pack Command's cooldown is reduced to 3 sec.",
-        "bonus4": "Pack Command's chance to reset Stampede's cooldown rises to 30 percent."
+        "name": "Piel de Brasa del Señor de la Manada",
+        "bonus2": "El tiempo de reutilización de Comando de la Manada se reduce a 3 s.",
+        "bonus4": "La probabilidad de Comando de la Manada de reiniciar el tiempo de reutilización de Estampida aumenta al 30%."
       },
       "pyroclast": {
-        "name": "Pyroclast Regalia",
-        "bonus2": "Scald always critically strikes targets at or below 35 percent health. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Your Fire spells' critical strikes outside Phoenix Trance reduce its remaining cooldown by 1.5 sec."
+        "name": "Regalia de Piroclasto",
+        "bonus2": "Escaldar siempre asesta golpes críticos a objetivos con un 35% de salud o menos. El daño recibido ya no retrasa tus hechizos.",
+        "bonus4": "Los golpes críticos de tus hechizos de Fuego fuera de Trance de Fénix reducen 1,5 s su tiempo de reutilización restante."
       },
       "ruincaller": {
-        "name": "Ruincaller Vestments",
-        "bonus2": "Conflagrate holds 3 charges. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Ruinbolt strikes 20 percent harder."
+        "name": "Vestimentas del Invocador de Ruinas",
+        "bonus2": "Incinerar acumula 3 cargas. El daño recibido ya no retrasa tus hechizos.",
+        "bonus4": "Rayo de Ruina inflige un 20% más de daño."
       },
       "slagbreaker": {
-        "name": "Slagbreaker Battlegear",
-        "bonus2": "Redhand empowers your next Maiming Strike by 30 percent per stack instead of 20.",
-        "bonus4": "Every second cast of Redhand reduces Breachmaker's remaining cooldown by 3 sec."
+        "name": "Armadura de Batalla Rompeescoria",
+        "bonus2": "Mano Roja potencia tu próximo Golpe Mutilador un 30% por acumulación en lugar de 20%.",
+        "bonus4": "Cada segundo lanzamiento de Mano Roja reduce 3 s el tiempo de reutilización restante de Quebrantabrechas."
       },
       "slagsnare": {
-        "name": "Slagsnare Trappings",
-        "bonus2": "Gutting Strike generates 20 Focus.",
-        "bonus4": "Woundrend that consumes 3 Hunting Momentum preserves them. Cannot occur more than once every 8 sec."
+        "name": "Atavíos de Trampa de Escoria",
+        "bonus2": "Golpe Destripador genera 20 de Concentración.",
+        "bonus4": "Desgarro Cruento que consume 3 de Ímpetu de Caza los conserva. No puede ocurrir más de una vez cada 8 s."
       },
       "smolderstrike": {
-        "name": "Smolderstrike Leathers",
-        "bonus2": "Haymaker hits 20 percent harder.",
-        "bonus4": "Lights Out refunds 6 sec of Mirrored Blades' remaining cooldown."
+        "name": "Cueros de Golpe Humeante",
+        "bonus2": "Golpe de Mazo inflige un 20% más de daño.",
+        "bonus4": "Apagar las Luces devuelve 6 s del tiempo de reutilización restante de Hojas Espejadas."
       },
       "soulflame": {
         "name": "Vestiduras de Wraithfire",
         "bonus2": "Aumenta el poder de los hechizos en 20. El daño recibido ya no retrasa tus hechizos (100% de resistencia al retraso de lanzamiento).",
         "bonus4": "Tus hechizos tienen un 10% de probabilidad de otorgar Fulgor del Alma, aumentando el poder con hechizos en 40 durante 10 s.",
-        "bonus6": "Increases attack and casting speed by 4%. Your spells have a 10% chance to grant Soulblaze, increasing spell power by 25 for 10 sec."
+        "bonus6": "Aumenta la velocidad de ataque y lanzamiento un 4%. Tus hechizos tienen un 10% de probabilidad de otorgar Alma Ardiente, aumentando el poder de hechizo en 25 durante 10 s."
       },
       "springmender": {
-        "name": "Springmender Scale",
-        "bonus2": "Tidecall's cooldown is reduced by 4 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Cascading Mend reaches a fourth ally and harvests Mending Currents at 150 percent."
+        "name": "Escamas del Sanador de Manantial",
+        "bonus2": "El tiempo de reutilización de Llamada de la Marea se reduce 4 s. El daño recibido ya no retrasa tus hechizos.",
+        "bonus4": "Sanación en Cascada alcanza a un cuarto aliado y recoge Corrientes Sanadoras al 150%."
       },
       "stonehearth": {
-        "name": "Stonehearth Bastion",
-        "bonus2": "While Stonebound, Stormcast Mending Waters costs no mana and heals 25 percent more.",
-        "bonus4": "While Stonebound, completing a cadence heals you for 3 percent of your maximum health."
+        "name": "Bastión del Corazón de Piedra",
+        "bonus2": "Mientras estés Ligado a la Piedra, Aguas Sanadoras Invocadas por la Tormenta no cuestan maná y sanan un 25% más.",
+        "bonus4": "Mientras estés Ligado a la Piedra, completar una cadencia te sana un 3% de tu salud máxima."
       },
       "stormcallers": {
         "name": "Vestiduras de Galecall",
         "bonus2": "Aumenta el poder de los hechizos en 20. El daño recibido ya no retrasa tus hechizos (100% de resistencia al retraso de lanzamiento).",
         "bonus4": "Tus hechizos tienen un 10% de probabilidad de otorgar Fulgor del Alma, aumentando el poder con hechizos en 40 durante 10 s.",
-        "bonus6": "Increases attack and casting speed by 4%. Your spells have a 10% chance to grant Soulblaze, increasing spell power by 25 for 10 sec."
+        "bonus6": "Aumenta la velocidad de ataque y lanzamiento un 4%. Tus hechizos tienen un 10% de probabilidad de otorgar Alma Ardiente, aumentando el poder de hechizo en 25 durante 10 s."
       },
       "stormkindled": {
-        "name": "Stormkindled Regalia",
-        "bonus2": "Unleash Weapon on Pyrebrand grants 3 Thunder. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Earthen Jolt's bonus per Thunder rises to 30 percent."
+        "name": "Regalia Encendida por la Tormenta",
+        "bonus2": "Liberar Arma sobre Marca de Pira otorga 3 de Trueno. El daño recibido ya no retrasa tus hechizos.",
+        "bonus4": "La bonificación de Sacudida Terrenal por Trueno aumenta al 30%."
       },
       "vale_arcanist": {
         "name": "Vestiduras del Arcanista del Valle",
         "bonus3": "Aumenta la velocidad de ataque y de lanzamiento en 15%."
       },
       "vesperash": {
-        "name": "Vesperash Shroud",
-        "bonus2": "Call Tithefiend's cooldown is reduced by 6 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Calling your Tithefiend resets Mindfracture's cooldown, and the fiend returns twice as much mana per hit."
+        "name": "Sudario de Ceniza Vespertina",
+        "bonus2": "El tiempo de reutilización de Invocar Diezmo se reduce 6 s. El daño recibido ya no retrasa tus hechizos.",
+        "bonus4": "Invocar a tu Diezmador reinicia el tiempo de reutilización de Fractura Mental, y el demonio devuelve el doble de maná por golpe."
       },
       "warfare_ashstalker": {
         "name": "Equipo Ashstalker",
@@ -19088,25 +19088,25 @@ export const es: EnTranslations = {
         "bonus7": "Aumenta el Ataque y la Defensa de Pericia bélica en 80. Tus hechizos tienen un 15% de probabilidad de otorgar Guarda de Espinas, aumentando la esquiva un 15% durante 6 s."
       },
       "warspirit_emberscale": {
-        "name": "Warspirit Emberscale",
-        "bonus2": "Ancestral Strike advances your cadence 3 steps.",
-        "bonus4": "Ancestral Strike hits 30 percent harder."
+        "name": "Escama de Brasa del Espíritu Bélico",
+        "bonus2": "Golpe Ancestral adelanta tu cadencia 3 pasos.",
+        "bonus4": "Golpe Ancestral inflige un 30% más de daño."
       },
       "wildfang_emberhide": {
-        "name": "Wildfang Emberhide",
-        "bonus2": "Redharvest restores 45 energy, up from 30.",
-        "bonus4": "Redharvest plants a fresh Flense on the target."
+        "name": "Piel de Brasa del Colmillo Salvaje",
+        "bonus2": "Cosecha Roja restaura 45 de energía, en lugar de 30.",
+        "bonus4": "Cosecha Roja aplica un nuevo Desuello al objetivo."
       },
       "wyrmshadow": {
         "name": "Atuendo de Nightfang",
         "bonus2": "Aumenta el poder de ataque en 40.",
         "bonus4": "Tus golpes críticos con el arma tienen un 50% de probabilidad de otorgar Arrebato de Colmillos, aumentando la velocidad de ataque un 25% durante 8 s.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 4 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Aumenta la velocidad de ataque y lanzamiento un 4% y el Golpe un 3%. Los golpes críticos de tu arma abren una Herida Desgarrada, causando 4 de daño cada 2 s durante 12 s. Se acumula hasta 3 veces."
       },
       "zealfire": {
-        "name": "Zealfire Warplate",
-        "bonus2": "Final Edict and Dawnfall cut each other's remaining cooldown by 3 sec instead of 2.",
-        "bonus4": "Hammer of Wrath cast under Dawn's Wrath strikes 40 percent harder, up from 20."
+        "name": "Armadura de Batalla Fuego del Celo",
+        "bonus2": "Edicto Final y Caída del Alba reducen el tiempo de reutilización restante del otro en 3 s, en lugar de 2.",
+        "bonus4": "Martillo de Ira lanzado bajo Ira del Alba inflige un 40% más de daño, en lugar de 20."
       }
     }
   },

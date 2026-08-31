@@ -4654,8 +4654,8 @@ export const cs_CZ: EnTranslations = {
       "online": "Postava je právě online.",
       "rename_not_permitted": "Přejmenování této postavy není povoleno.",
       "delete_confirm": "Pro potvrzení smazání napiš jméno postavy.",
-      "storage_purchase_open": "A storage purchase must finish or be resolved before this character can be deleted.",
-      "delete_busy": "The realm is busy. Try deleting this character again in a moment.",
+      "storage_purchase_open": "Před smazáním této postavy musí být nákup úložiště dokončen nebo vyřešen.",
+      "delete_busy": "Říše je zaneprázdněná. Zkuste tuto postavu znovu smazat za chvíli.",
       "already_in_world": "Postava už je ve světě.",
       "taken_over": "Tvoje postava byla převzata jinou relací.",
       "rename_required": "Tato postava musí být před vstupem do světa přejmenována.",
@@ -5180,7 +5180,7 @@ export const cs_CZ: EnTranslations = {
       "ifPartySort": "Pořadí, ve kterém jsou vypsáni členové skupiny: podle pořadí ve skupině, role nebo jména.",
       "ifPartyShowAuras": "Zda se na rámech skupiny zobrazují buffy a debuffy. Odpovídající přepínače pokrývají lišty zdrojů, absorpce, mazlíčky a to, jestli se objevíš ve vlastním seznamu skupiny.",
       "ifAurasOnPlayerFrame": "Přidá tvé buffy a debuffy i na rám hráče, nejen na lištu aur.",
-      "ifAlwaysShowAllBuffs": "Shows every active buff even on the Low graphics preset, bypassing its usual buff-icon cap.",
+      "ifAlwaysShowAllBuffs": "Zobrazuje všechna aktivní posílení i při nízkém nastavení grafiky a obchází obvyklý limit ikon posílení.",
       "ifTargetOfTarget": "Zobrazí, na koho míří tvůj cíl, klasický způsob, jak poznat, jestli ho tank ještě drží.",
       "ifPetFrame": "Zobrazí rám pro tvého mazlíčka.",
       "ifChatFontScale": "Velikost textu chatu.",
@@ -6667,7 +6667,7 @@ export const cs_CZ: EnTranslations = {
       "bankBody": "Každé větší město si drží pobočku Pozlacené truhlice, bankovního domu celé říše. Promluv tam s pokladníkem a otevři si trezor, soukromý úložný prostor nad rámec batohů, který tvé postavě zůstane na celý život. Cokoli u nich necháš, čeká v bezpečí, ať příště zavítáš do kterékoli pobočky.",
       "bankHow": "Když máš trezor otevřený, klikni na předmět v batozích a uložíš ho; kliknutím na něj v trezoru si ho vezmeš zpět. Trezor pojme jen zboží, nikdy mince, a úkolové předměty zůstávají u tebe. Když se ti batohy zaplní uprostřed cesty, jedno tlačítko smete všechny tvé řemeslné materiály dovnitř najednou.",
       "bankSlots": "Nový trezor je zpočátku malý a roste s tebou. Pokladník prodává další sloty za mince, za stále strmější ceny, a hraní online k tomu přináší bonusový prostor navíc, třeba za ověřený e-mail, propojené účty a přátele, které do hry přivedeš.",
-      "bankSockets": "Past the slot ladder, the bursar also sells up to four bag sockets, unlocked in order at ever-steeper prices. Seat a spare bag from your carrying set in one and its slots join your vault room: an everyday bag widens the whole store, while a reagent satchel adds room only crafting materials may take. Click a bag in your bags to seat it and click the socket to take it back. Taking one back never costs you a thing you stored: if the vault ends up fuller than its shrunken room, everything stays put and new deposits simply wait for space.",
+      "bankSockets": "Za žebříčkem slotů prodává správce pokladny také až čtyři sloty na brašny, které se postupně odemykají za stále vyšší ceny. Vlož do jednoho náhradní brašnu ze své nosné sady a její sloty se přidají k prostoru trezoru: běžná brašna rozšíří celý sklad, zatímco brašna na reagencie přidá místo pouze pro řemeslné materiály. Kliknutím na brašnu ve svých brašnách ji vložíš, kliknutím na slot ji zase vyjmeš. Vyjmutí ti nikdy nevezme nic uloženého: pokud bude trezor po zmenšení prostoru plnější, než se do něj vejde, všechno zůstane na místě a nové vklady jednoduše počkají, až se uvolní místo.",
       "buyingTitle": "Nákup a prodej",
       "buyingBody": "Promluv s obchodníkem a zvol si prohlížení jeho zboží, a jeho obchod se otevře se třemi záložkami: Prohlížet, Prodat a Zpětný odkup. Prohlížet drží vše, co má skladem, tvé, pokud na to máš. Prodat vypisuje, co z tvých batohů vykoupí, a prodej kusu, který nese vlastní vylosovanou kvalitu, tě nejdřív požádá o potvrzení, aby ceněný exemplář nikdy neproklouzl omylem. Když se rozloučíš s něčím, čeho lituješ, záložka Zpětný odkup podrží tvé nedávné prodeje, takže je můžeš koupit zpět za mince, které ti byly vyplaceny.",
       "junkTitle": "Vyklízení harampádí",
@@ -7711,7 +7711,7 @@ export const cs_CZ: EnTranslations = {
       "title": "Připojit peněženku Solana",
       "linkBody": "Zvol rozšíření peněženky v tomto prohlížeči. Podepíšeš ověřovací zprávu a vrátíš se do desktopové aplikace.",
       "paymentBody": "Zvol peněženku propojenou s tvým účtem a schval transakci v tomto prohlížeči.",
-      "stepUpBody": "Choose the wallet linked to your account and sign the $WOC Exchange authorization message. Signing is free and moves no funds.",
+      "stepUpBody": "Vyber peněženku propojenou s účtem a podepiš autorizační zprávu burzy $WOC. Podpis je zdarma a nepřevádí žádné prostředky.",
       "extensionHelp": "Nebyla nalezena žádná kompatibilní rozšíření peněženky. Nainstaluj nebo odemkni Phantom, Solflare nebo jiný Solana prohlížečový wallet a zkus to znovu.",
       "safety": "World of ClaudeCraft nikdy nepožaduje tvoji obnovovací frázi ani soukromý klíč.",
       "continueWith": "Pokračovat s {wallet}",
@@ -8102,18 +8102,18 @@ export const cs_CZ: EnTranslations = {
     "buyConfirmCancel": "Zrušit"
   },
   "crucibleShop": {
-    "browse": "Redeem Sigils",
-    "browseAria": "Redeem Crucible sigils with {name}",
-    "empty": "No set pieces are redeemable for your class.",
-    "balance": "Your sigils: {list}",
-    "balanceEntry": "{name} x{count}",
-    "noSigils": "You hold no Crucible sigils.",
+    "browse": "Vyměnit sigily",
+    "browseAria": "Vyměnit sigily Crucible u {name}",
+    "empty": "Pro vaši třídu nelze vyměnit žádné části sady.",
+    "balance": "Vaše sigily: {list}",
+    "balanceEntry": "{name} × {count}",
+    "noSigils": "Nemáte žádné sigily Crucible.",
     "price": "1 {sigil}",
-    "buyAria": "Redeem {sigil} for {item}",
-    "buyConfirmTitle": "Confirm Redemption",
-    "buyConfirmBody": "Redeem your {sigil} for {item}? A consumed sigil cannot be refunded.",
-    "buyConfirmAccept": "Redeem",
-    "buyConfirmCancel": "Cancel"
+    "buyAria": "Vyměnit {sigil} za {item}",
+    "buyConfirmTitle": "Potvrdit výměnu",
+    "buyConfirmBody": "Vyměnit svůj sigil {sigil} za {item}? Spotřebovaný sigil nelze vrátit.",
+    "buyConfirmAccept": "Vyměnit",
+    "buyConfirmCancel": "Zrušit"
   },
   "cardDuel": {
     "title": "Karetní souboj",
@@ -13254,25 +13254,25 @@ export const cs_CZ: EnTranslations = {
         "name": "Kytička ze zahrady zámku Dawnhold"
       },
       "wayfarers_backpack": {
-        "name": "Wayfarer's Backpack"
+        "name": "Poutnický batoh"
       },
       "burlap_reagent_pouch": {
-        "name": "Burlap Reagent Pouch"
+        "name": "Jutový váček na přísady"
       },
       "necromancers_reagent_satchel": {
-        "name": "Necromancer's Reagent Satchel"
+        "name": "Brašna reagencií nekromanta"
       },
       "duskweave_bag": {
-        "name": "Duskweave Bag"
+        "name": "Taška Soumrakového tkaniva"
       },
       "resonant_weave_bag": {
-        "name": "Resonantweave Bag"
+        "name": "Vak Rezonantního tkaniva"
       },
       "foragers_haversack": {
-        "name": "Forager's Haversack"
+        "name": "Tornistra sběrače"
       },
       "loombound_reagent_satchel": {
-        "name": "Loombound Reagent Satchel"
+        "name": "Brašna reagencií spoutaná stavem"
       },
       "ps_briny_lure": {
         "name": "Slaná návnada"
@@ -13287,610 +13287,610 @@ export const cs_CZ: EnTranslations = {
         "name": "Kámen přechodu"
       },
       "lastflame_core": {
-        "name": "Core of the Last Flame"
+        "name": "Jádro Posledního plamene"
       },
       "slagbreaker_helmet": {
-        "name": "Slagbreaker Helm"
+        "name": "Přilba Drtiče strusky"
       },
       "slagbreaker_shoulder": {
-        "name": "Slagbreaker Pauldrons"
+        "name": "Nárameníky Drtiče strusky"
       },
       "slagbreaker_chest": {
-        "name": "Slagbreaker Hauberk"
+        "name": "Kroužková zbroj Drtiče strusky"
       },
       "slagbreaker_gloves": {
-        "name": "Slagbreaker Gauntlets"
+        "name": "Rukavice Drtiče strusky"
       },
       "slagbreaker_legs": {
-        "name": "Slagbreaker Legguards"
+        "name": "Nánožníky Drtiče strusky"
       },
       "emberfury_helmet": {
-        "name": "Emberfury Helm"
+        "name": "Helma Žáru uhlíků"
       },
       "emberfury_shoulder": {
-        "name": "Emberfury Pauldrons"
+        "name": "Ramenní pláty Žáru uhlíků"
       },
       "emberfury_chest": {
-        "name": "Emberfury Hauberk"
+        "name": "Kyrys Žáru uhlíků"
       },
       "emberfury_gloves": {
-        "name": "Emberfury Gauntlets"
+        "name": "Rukavice Žáru uhlíků"
       },
       "emberfury_legs": {
-        "name": "Emberfury Legguards"
+        "name": "Nánožníky Žáru uhlíků"
       },
       "forgewall_helmet": {
-        "name": "Forgewall Helm"
+        "name": "Helma Kovové hradby"
       },
       "forgewall_shoulder": {
-        "name": "Forgewall Pauldrons"
+        "name": "Ramenní pláty Kovové hradby"
       },
       "forgewall_chest": {
-        "name": "Forgewall Hauberk"
+        "name": "Kyrys Kovové hradby"
       },
       "forgewall_gloves": {
-        "name": "Forgewall Gauntlets"
+        "name": "Rukavice Kovové hradby"
       },
       "forgewall_legs": {
-        "name": "Forgewall Legguards"
+        "name": "Nánožníky Kovové hradby"
       },
       "dawnforged_helmet": {
-        "name": "Dawnforged Helm"
+        "name": "Helma Kovaná úsvitem"
       },
       "dawnforged_shoulder": {
-        "name": "Dawnforged Pauldrons"
+        "name": "Ramenní pláty Kované úsvitem"
       },
       "dawnforged_chest": {
-        "name": "Dawnforged Hauberk"
+        "name": "Kyrys Kovaný úsvitem"
       },
       "dawnforged_gloves": {
-        "name": "Dawnforged Gauntlets"
+        "name": "Rukavice Kované úsvitem"
       },
       "dawnforged_legs": {
-        "name": "Dawnforged Legguards"
+        "name": "Nánožníky Kované úsvitem"
       },
       "oathpyre_helmet": {
-        "name": "Oathpyre Helm"
+        "name": "Helma Přísahového ohně"
       },
       "oathpyre_shoulder": {
-        "name": "Oathpyre Pauldrons"
+        "name": "Nárameníky Přísahového ohně"
       },
       "oathpyre_chest": {
-        "name": "Oathpyre Hauberk"
+        "name": "Hauberk Přísahového ohně"
       },
       "oathpyre_gloves": {
-        "name": "Oathpyre Gauntlets"
+        "name": "Rukavice Přísahového ohně"
       },
       "oathpyre_legs": {
-        "name": "Oathpyre Legguards"
+        "name": "Nánožníky Přísahového ohně"
       },
       "zealfire_helmet": {
-        "name": "Zealfire Helm"
+        "name": "Helma Ohně horlivosti"
       },
       "zealfire_shoulder": {
-        "name": "Zealfire Pauldrons"
+        "name": "Nárameníky Ohně horlivosti"
       },
       "zealfire_chest": {
-        "name": "Zealfire Hauberk"
+        "name": "Hauberk Ohně horlivosti"
       },
       "zealfire_gloves": {
-        "name": "Zealfire Gauntlets"
+        "name": "Rukavice Ohně horlivosti"
       },
       "zealfire_legs": {
-        "name": "Zealfire Legguards"
+        "name": "Nánožníky Ohně horlivosti"
       },
       "packlord_emberhide_helmet": {
-        "name": "Packlord's Cowl"
+        "name": "Kukla Pána smečky z uhlové kůže"
       },
       "packlord_emberhide_shoulder": {
-        "name": "Packlord's Spaulders"
+        "name": "Nárameníky Pána smečky z uhlové kůže"
       },
       "packlord_emberhide_chest": {
-        "name": "Packlord's Tunic"
+        "name": "Tunika Pána smečky z uhlové kůže"
       },
       "packlord_emberhide_gloves": {
-        "name": "Packlord's Grips"
+        "name": "Rukavice Pána smečky z uhlové kůže"
       },
       "packlord_emberhide_legs": {
-        "name": "Packlord's Breeches"
+        "name": "Nohavice Pána smečky z uhlové kůže"
       },
       "coldsight_trackers_helmet": {
-        "name": "Coldsight Cowl"
+        "name": "Kukla Chladného zraku"
       },
       "coldsight_trackers_shoulder": {
-        "name": "Coldsight Spaulders"
+        "name": "Nárameníky Chladného zraku"
       },
       "coldsight_trackers_chest": {
-        "name": "Coldsight Tunic"
+        "name": "Tunika Chladného zraku"
       },
       "coldsight_trackers_gloves": {
-        "name": "Coldsight Grips"
+        "name": "Rukavice Chladného zraku"
       },
       "coldsight_trackers_legs": {
-        "name": "Coldsight Breeches"
+        "name": "Kalhoty Chladného zraku"
       },
       "slagsnare_helmet": {
-        "name": "Slagsnare Cowl"
+        "name": "Kukla Lapače strusky"
       },
       "slagsnare_shoulder": {
-        "name": "Slagsnare Spaulders"
+        "name": "Nárameníky Lapače strusky"
       },
       "slagsnare_chest": {
-        "name": "Slagsnare Tunic"
+        "name": "Tunika Lapače strusky"
       },
       "slagsnare_gloves": {
-        "name": "Slagsnare Grips"
+        "name": "Úchopy Lapače strusky"
       },
       "slagsnare_legs": {
-        "name": "Slagsnare Breeches"
+        "name": "Kalhoty Lapače strusky"
       },
       "cinderfang_helmet": {
-        "name": "Cinderfang Cowl"
+        "name": "Kukla Popelavého tesáku"
       },
       "cinderfang_shoulder": {
-        "name": "Cinderfang Spaulders"
+        "name": "Nárameníky Popelavého tesáku"
       },
       "cinderfang_chest": {
-        "name": "Cinderfang Tunic"
+        "name": "Tunika Popelavého tesáku"
       },
       "cinderfang_gloves": {
-        "name": "Cinderfang Grips"
+        "name": "Úchopy Popelavého tesáku"
       },
       "cinderfang_legs": {
-        "name": "Cinderfang Breeches"
+        "name": "Kalhoty Popelavého tesáku"
       },
       "smolderstrike_helmet": {
-        "name": "Smolderstrike Cowl"
+        "name": "Kápě Žhavého úderu"
       },
       "smolderstrike_shoulder": {
-        "name": "Smolderstrike Spaulders"
+        "name": "Nárameníky Žhavého úderu"
       },
       "smolderstrike_chest": {
-        "name": "Smolderstrike Tunic"
+        "name": "Tunika Žhavého úderu"
       },
       "smolderstrike_gloves": {
-        "name": "Smolderstrike Grips"
+        "name": "Rukavice Žhavého úderu"
       },
       "smolderstrike_legs": {
-        "name": "Smolderstrike Breeches"
+        "name": "Nohavice Žhavého úderu"
       },
       "ashveil_helmet": {
-        "name": "Ashveil Cowl"
+        "name": "Kukla Popelavého závoje"
       },
       "ashveil_shoulder": {
-        "name": "Ashveil Spaulders"
+        "name": "Nárameníky Popelavého závoje"
       },
       "ashveil_chest": {
-        "name": "Ashveil Tunic"
+        "name": "Tunika Popelavého závoje"
       },
       "ashveil_gloves": {
-        "name": "Ashveil Grips"
+        "name": "Úchopy Popelavého závoje"
       },
       "ashveil_legs": {
-        "name": "Ashveil Breeches"
+        "name": "Kalhoty Popelavého závoje"
       },
       "emberscreed_helmet": {
-        "name": "Creed of Embers Hood"
+        "name": "Kápě Kréda uhlíků"
       },
       "emberscreed_shoulder": {
-        "name": "Creed of Embers Mantle"
+        "name": "Plášť Kréda uhlíků"
       },
       "emberscreed_chest": {
-        "name": "Creed of Embers Robe"
+        "name": "Róba Kréda uhlíků"
       },
       "emberscreed_gloves": {
-        "name": "Creed of Embers Handwraps"
+        "name": "Oviny Kréda uhlíků"
       },
       "emberscreed_legs": {
-        "name": "Creed of Embers Leggings"
+        "name": "Legíny Kréda uhlíků"
       },
       "benison_dawnweave_helmet": {
-        "name": "Dawnweave Hood"
+        "name": "Kapuce Úsvitové tkaniny"
       },
       "benison_dawnweave_shoulder": {
-        "name": "Dawnweave Mantle"
+        "name": "Plášť Úsvitové tkaniny"
       },
       "benison_dawnweave_chest": {
-        "name": "Dawnweave Robe"
+        "name": "Kápi Úsvitové tkaniny"
       },
       "benison_dawnweave_gloves": {
-        "name": "Dawnweave Handwraps"
+        "name": "Obinadla Úsvitové tkaniny"
       },
       "benison_dawnweave_legs": {
-        "name": "Dawnweave Leggings"
+        "name": "Legíny Úsvitové tkaniny"
       },
       "vesperash_helmet": {
-        "name": "Vesperash Hood"
+        "name": "Kápě Soumrakového popela"
       },
       "vesperash_shoulder": {
-        "name": "Vesperash Mantle"
+        "name": "Plášť Soumrakového popela"
       },
       "vesperash_chest": {
-        "name": "Vesperash Robe"
+        "name": "Róba Soumrakového popela"
       },
       "vesperash_gloves": {
-        "name": "Vesperash Handwraps"
+        "name": "Omotávky Soumrakového popela"
       },
       "vesperash_legs": {
-        "name": "Vesperash Leggings"
+        "name": "Legíny Soumrakového popela"
       },
       "stormkindled_helmet": {
-        "name": "Stormkindled Helm"
+        "name": "Helma Zažehnutá bouří"
       },
       "stormkindled_shoulder": {
-        "name": "Stormkindled Pauldrons"
+        "name": "Nárameníky Zažehnuté bouří"
       },
       "stormkindled_chest": {
-        "name": "Stormkindled Hauberk"
+        "name": "Kroužková zbroj Zažehnutá bouří"
       },
       "stormkindled_gloves": {
-        "name": "Stormkindled Gauntlets"
+        "name": "Rukavice Zažehnuté bouří"
       },
       "stormkindled_legs": {
-        "name": "Stormkindled Legguards"
+        "name": "Nánožníky Zažehnuté bouří"
       },
       "warspirit_emberscale_helmet": {
-        "name": "Emberscale Helm"
+        "name": "Helma Šupin Žhnoucího ducha"
       },
       "warspirit_emberscale_shoulder": {
-        "name": "Emberscale Pauldrons"
+        "name": "Nárameníky Šupin Žhnoucího ducha"
       },
       "warspirit_emberscale_chest": {
-        "name": "Emberscale Hauberk"
+        "name": "Kroužková zbroj Šupin Žhnoucího ducha"
       },
       "warspirit_emberscale_gloves": {
-        "name": "Emberscale Gauntlets"
+        "name": "Rukavice Šupin Žhnoucího ducha"
       },
       "warspirit_emberscale_legs": {
-        "name": "Emberscale Legguards"
+        "name": "Nánožníky Šupin Žhnoucího ducha"
       },
       "stonehearth_helmet": {
-        "name": "Stonehearth Helm"
+        "name": "Helma Kamenného srdce"
       },
       "stonehearth_shoulder": {
-        "name": "Stonehearth Pauldrons"
+        "name": "Nárameníky Kamenného srdce"
       },
       "stonehearth_chest": {
-        "name": "Stonehearth Hauberk"
+        "name": "Kroužková zbroj Kamenného srdce"
       },
       "stonehearth_gloves": {
-        "name": "Stonehearth Gauntlets"
+        "name": "Rukavice Kamenného srdce"
       },
       "stonehearth_legs": {
-        "name": "Stonehearth Legguards"
+        "name": "Nánožníky Kamenného srdce"
       },
       "springmender_helmet": {
-        "name": "Springmender Helm"
+        "name": "Helma Léčitele pramenů"
       },
       "springmender_shoulder": {
-        "name": "Springmender Pauldrons"
+        "name": "Nárameníky Léčitele pramenů"
       },
       "springmender_chest": {
-        "name": "Springmender Hauberk"
+        "name": "Kroužková zbroj Léčitele pramenů"
       },
       "springmender_gloves": {
-        "name": "Springmender Gauntlets"
+        "name": "Rukavice Léčitele pramenů"
       },
       "springmender_legs": {
-        "name": "Springmender Legguards"
+        "name": "Nánožníky Léčitele pramenů"
       },
       "chronoweave_helmet": {
-        "name": "Aetherweave Hood"
+        "name": "Kapuce Éterové tkaniny"
       },
       "chronoweave_shoulder": {
-        "name": "Aetherweave Mantle"
+        "name": "Plášť Éterové tkaniny"
       },
       "chronoweave_chest": {
-        "name": "Aetherweave Robe"
+        "name": "Kápi Éterové tkaniny"
       },
       "chronoweave_gloves": {
-        "name": "Aetherweave Handwraps"
+        "name": "Obinadla Éterové tkaniny"
       },
       "chronoweave_legs": {
-        "name": "Aetherweave Leggings"
+        "name": "Legíny Éterové tkaniny"
       },
       "pyroclast_helmet": {
-        "name": "Pyroclast Hood"
+        "name": "Kápě Pyroklastu"
       },
       "pyroclast_shoulder": {
-        "name": "Pyroclast Mantle"
+        "name": "Plášť Pyroklastu"
       },
       "pyroclast_chest": {
-        "name": "Pyroclast Robe"
+        "name": "Róba Pyroklastu"
       },
       "pyroclast_gloves": {
-        "name": "Pyroclast Handwraps"
+        "name": "Omotávky Pyroklastu"
       },
       "pyroclast_legs": {
-        "name": "Pyroclast Leggings"
+        "name": "Legíny Pyroklastu"
       },
       "frostquench_helmet": {
-        "name": "Frostquench Hood"
+        "name": "Kápě Mrazivého ztišení"
       },
       "frostquench_shoulder": {
-        "name": "Frostquench Mantle"
+        "name": "Plášť Mrazivého ztišení"
       },
       "frostquench_chest": {
-        "name": "Frostquench Robe"
+        "name": "Róba Mrazivého ztišení"
       },
       "frostquench_gloves": {
-        "name": "Frostquench Handwraps"
+        "name": "Oviny Mrazivého ztišení"
       },
       "frostquench_legs": {
-        "name": "Frostquench Leggings"
+        "name": "Legíny Mrazivého ztišení"
       },
       "hexthread_helmet": {
-        "name": "Hexthread Hood"
+        "name": "Kápě Kouzelné nitě"
       },
       "hexthread_shoulder": {
-        "name": "Hexthread Mantle"
+        "name": "Plášť Kouzelné nitě"
       },
       "hexthread_chest": {
-        "name": "Hexthread Robe"
+        "name": "Róba Kouzelné nitě"
       },
       "hexthread_gloves": {
-        "name": "Hexthread Handwraps"
+        "name": "Rukavice Kouzelné nitě"
       },
       "hexthread_legs": {
-        "name": "Hexthread Leggings"
+        "name": "Legíny Kouzelné nitě"
       },
       "gravebrand_helmet": {
-        "name": "Gravebrand Hood"
+        "name": "Kápě Hrobonálepkování"
       },
       "gravebrand_shoulder": {
-        "name": "Gravebrand Mantle"
+        "name": "Plášť Hrobonálepkování"
       },
       "gravebrand_chest": {
-        "name": "Gravebrand Robe"
+        "name": "Róba Hrobonálepkování"
       },
       "gravebrand_gloves": {
-        "name": "Gravebrand Handwraps"
+        "name": "Rukavice Hrobonálepkování"
       },
       "gravebrand_legs": {
-        "name": "Gravebrand Leggings"
+        "name": "Legíny Hrobonálepkování"
       },
       "ruincaller_helmet": {
-        "name": "Ruincaller Hood"
+        "name": "Kápě Volajícího zkázy"
       },
       "ruincaller_shoulder": {
-        "name": "Ruincaller Mantle"
+        "name": "Plášť Volajícího zkázy"
       },
       "ruincaller_chest": {
-        "name": "Ruincaller Robe"
+        "name": "Róba Volajícího zkázy"
       },
       "ruincaller_gloves": {
-        "name": "Ruincaller Handwraps"
+        "name": "Omotávky Volajícího zkázy"
       },
       "ruincaller_legs": {
-        "name": "Ruincaller Leggings"
+        "name": "Legíny Volajícího zkázy"
       },
       "moonscorch_helmet": {
-        "name": "Moonscorch Cowl"
+        "name": "Kukla Spálená měsícem"
       },
       "moonscorch_shoulder": {
-        "name": "Moonscorch Spaulders"
+        "name": "Nárameníky Spálené měsícem"
       },
       "moonscorch_chest": {
-        "name": "Moonscorch Tunic"
+        "name": "Tunika Spálená měsícem"
       },
       "moonscorch_gloves": {
-        "name": "Moonscorch Grips"
+        "name": "Rukavice Spálené měsícem"
       },
       "moonscorch_legs": {
-        "name": "Moonscorch Breeches"
+        "name": "Nohavice Spálené měsícem"
       },
       "wildfang_emberhide_helmet": {
-        "name": "Wildfang Cowl"
+        "name": "Kukla Divokého tesáku"
       },
       "wildfang_emberhide_shoulder": {
-        "name": "Wildfang Spaulders"
+        "name": "Nárameníky Divokého tesáku"
       },
       "wildfang_emberhide_chest": {
-        "name": "Wildfang Tunic"
+        "name": "Tunika Divokého tesáku"
       },
       "wildfang_emberhide_gloves": {
-        "name": "Wildfang Grips"
+        "name": "Rukavice Divokého tesáku"
       },
       "wildfang_emberhide_legs": {
-        "name": "Wildfang Breeches"
+        "name": "Kalhoty Divokého tesáku"
       },
       "cinderbark_helmet": {
-        "name": "Cinderbark Cowl"
+        "name": "Kukla Popelavé kůry"
       },
       "cinderbark_shoulder": {
-        "name": "Cinderbark Spaulders"
+        "name": "Nárameníky Popelavé kůry"
       },
       "cinderbark_chest": {
-        "name": "Cinderbark Tunic"
+        "name": "Tunika Popelavé kůry"
       },
       "cinderbark_gloves": {
-        "name": "Cinderbark Grips"
+        "name": "Úchopy Popelavé kůry"
       },
       "cinderbark_legs": {
-        "name": "Cinderbark Breeches"
+        "name": "Kalhoty Popelavé kůry"
       },
       "grovespring_helmet": {
-        "name": "Grovespring Cowl"
+        "name": "Kukla Hájového pramene"
       },
       "grovespring_shoulder": {
-        "name": "Grovespring Spaulders"
+        "name": "Nárameníky Hájového pramene"
       },
       "grovespring_chest": {
-        "name": "Grovespring Tunic"
+        "name": "Tunika Hájového pramene"
       },
       "grovespring_gloves": {
-        "name": "Grovespring Grips"
+        "name": "Rukavice Hájového pramene"
       },
       "grovespring_legs": {
-        "name": "Grovespring Breeches"
+        "name": "Nohavice Hájového pramene"
       },
       "sigil_anvil_helmet": {
-        "name": "Helm Sigil of the Anvil"
+        "name": "Přilba Znamení kovadliny"
       },
       "sigil_ember_helmet": {
-        "name": "Helm Sigil of the Ember"
+        "name": "Přilba Znamení uhlíku"
       },
       "sigil_tempest_helmet": {
-        "name": "Helm Sigil of the Tempest"
+        "name": "Přilba Znamení bouře"
       },
       "sigil_anvil_shoulder": {
-        "name": "Mantle Sigil of the Anvil"
+        "name": "Plášť Znamení kovadliny"
       },
       "sigil_ember_shoulder": {
-        "name": "Mantle Sigil of the Ember"
+        "name": "Plášť Znamení uhlíku"
       },
       "sigil_tempest_shoulder": {
-        "name": "Mantle Sigil of the Tempest"
+        "name": "Plášť Znamení bouře"
       },
       "sigil_anvil_chest": {
-        "name": "Robe Sigil of the Anvil"
+        "name": "Róba Znamení kovadliny"
       },
       "sigil_ember_chest": {
-        "name": "Robe Sigil of the Ember"
+        "name": "Róba Znamení uhlíku"
       },
       "sigil_tempest_chest": {
-        "name": "Robe Sigil of the Tempest"
+        "name": "Róba Znamení bouře"
       },
       "sigil_anvil_gloves": {
-        "name": "Grip Sigil of the Anvil"
+        "name": "Úchop Znamení kovadliny"
       },
       "sigil_ember_gloves": {
-        "name": "Grip Sigil of the Ember"
+        "name": "Úchop Znamení uhlíku"
       },
       "sigil_tempest_gloves": {
-        "name": "Grip Sigil of the Tempest"
+        "name": "Úchop Znamení bouře"
       },
       "sigil_anvil_legs": {
-        "name": "Legging Sigil of the Anvil"
+        "name": "Nohavice Znamení kovadliny"
       },
       "sigil_ember_legs": {
-        "name": "Legging Sigil of the Ember"
+        "name": "Nohavice Znamení uhlíku"
       },
       "sigil_tempest_legs": {
-        "name": "Legging Sigil of the Tempest"
+        "name": "Nohavice Znamení bouře"
       },
       "cord_of_the_last_flame": {
-        "name": "Cord of the Last Flame"
+        "name": "Šňůra posledního plamene"
       },
       "cindersoaked_slippers": {
-        "name": "Cindersoaked Slippers"
+        "name": "Popelavě nasáklé střevíce"
       },
       "springbinder_sash": {
-        "name": "Springbinder Sash"
+        "name": "Šerpa Svazovače pramenů"
       },
       "steps_of_quiet_water": {
-        "name": "Steps of Quiet Water"
+        "name": "Kroky Tiché vody"
       },
       "cinderbark_cinch": {
-        "name": "Cinderbark Cinch"
+        "name": "Opasek Popelavé kůry"
       },
       "ashenbark_treads": {
-        "name": "Ashenbark Treads"
+        "name": "Návleky Popelavé kůry"
       },
       "slagstalker_belt": {
-        "name": "Slagstalker Belt"
+        "name": "Pás Slídila strusky"
       },
       "ashrunner_boots": {
-        "name": "Ashrunner Boots"
+        "name": "Boty Popelavého běžce"
       },
       "moonscorch_waistwrap": {
-        "name": "Moonscorch Waistwrap"
+        "name": "Bederní pás Spálený měsícem"
       },
       "scorchgrove_striders": {
-        "name": "Scorchgrove Striders"
+        "name": "Chodidla Spáleného háje"
       },
       "grovetender_belt": {
-        "name": "Grovetender Belt"
+        "name": "Pás strážce háje"
       },
       "dewfall_moccasins": {
-        "name": "Dewfall Moccasins"
+        "name": "Mokasíny Rosného pádu"
       },
       "forgewall_girdle": {
-        "name": "Forgewall Girdle"
+        "name": "Opasek Kovové hradby"
       },
       "anvilstance_sabatons": {
-        "name": "Anvilstance Sabatons"
+        "name": "Sabatony Kovadlinového postoje"
       },
       "warforged_waistguard": {
-        "name": "Warforged Waistguard"
+        "name": "Pás Kovaný pro válku"
       },
       "furnace_march_greaves": {
-        "name": "Furnace March Greaves"
+        "name": "Náholenice Pochodu pecí"
       },
       "stormkindled_chain": {
-        "name": "Stormkindled Chain"
+        "name": "Řetěz Zažehnutý bouří"
       },
       "thundershock_treads": {
-        "name": "Thundershock Treads"
+        "name": "Šlapky Hromového úderu"
       },
       "tidebinder_links": {
-        "name": "Tidebinder Links"
+        "name": "Články Poutače přílivu"
       },
       "springwarden_sabatons": {
-        "name": "Springwarden Sabatons"
+        "name": "Sabatonové boty Strážce pramene"
       },
       "pendant_of_the_first_tempering": {
-        "name": "Pendant of the First Tempering"
+        "name": "Přívěsek Prvního zušlechtění"
       },
       "ignivars_ember_choker": {
-        "name": "Ignivar's Ember Choker"
+        "name": "Ignivarův náhrdelník z uhlíků"
       },
       "locket_of_the_last_flame": {
-        "name": "Locket of the Last Flame"
+        "name": "Medailon Posledního plamene"
       },
       "heartspring_amulet": {
-        "name": "Heartspring Amulet"
+        "name": "Amulet Srdcový pramen"
       },
       "seal_of_the_forgewall": {
-        "name": "Seal of the Forgewall"
+        "name": "Pečeť Kovářské hradby"
       },
       "band_of_marked_strikes": {
-        "name": "Band of Marked Strikes"
+        "name": "Prsten poznamenaných úderů"
       },
       "circle_of_cinders": {
-        "name": "Circle of Cinders"
+        "name": "Kruh uhlíků"
       },
       "loop_of_quiet_springs": {
-        "name": "Loop of Quiet Springs"
+        "name": "Smyčka Tichých pramenů"
       },
       "bulwark_of_the_inner_crucible": {
-        "name": "Bulwark of the Inner Crucible"
+        "name": "Ochranný val Vnitřní tavicí pece"
       },
       "ember_wardens_barrier": {
-        "name": "Ember Warden's Barrier"
+        "name": "Bariéra Strážce uhlíků"
       },
       "orb_of_the_last_spring": {
-        "name": "Orb of the Last Spring"
+        "name": "Koule Posledního pramene"
       },
       "cinder_of_the_first_design": {
-        "name": "Cinder of the First Design"
+        "name": "Popel Prvního návrhu"
       },
       "forgefathers_warhammer": {
-        "name": "Forgefather's Warhammer"
+        "name": "Válečné kladivo Otce kovárny"
       },
       "cinderfang_kris": {
-        "name": "Cinderfang Kris"
+        "name": "Kris Popelavého tesáku"
       },
       "slagrender_cleaver": {
-        "name": "Slagrender Cleaver"
+        "name": "Sekáček Trhače strusky"
       },
       "anvilguard_blade": {
-        "name": "Anvilguard Blade"
+        "name": "Čepel Kovadlinové stráže"
       },
       "heart_of_the_end_greatblade": {
-        "name": "Heart of the End Greatblade"
+        "name": "Velký meč Srdce konce"
       },
       "staff_of_the_last_spring": {
-        "name": "Staff of the Last Spring"
+        "name": "Hůl Posledního pramene"
       },
       "forgefire_spire": {
-        "name": "Forgefire Spire"
+        "name": "Věž Ohně kovárny"
       },
       "springtouched_crozier": {
-        "name": "Springtouched Crozier"
+        "name": "Berla Doteku pramene"
       },
       "wand_of_quenched_sparks": {
-        "name": "Wand of Quenched Sparks"
+        "name": "Hůlka Uhašených jisker"
       },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"
@@ -14670,10 +14670,10 @@ export const cs_CZ: EnTranslations = {
         "name": "Otěže Hromokroka, velkého krocana"
       },
       "varkhul_forgebreaker": {
-        "name": "Forgebreaker, Engine of Varkhul"
+        "name": "Drtič kovárny, Varkhulův nástroj"
       },
       "varkhul_emberward": {
-        "name": "Emberward, Bulwark of Varkhul"
+        "name": "Žárová stráž, Varkhulův val"
       }
     },
     "mobs": {
@@ -14870,25 +14870,25 @@ export const cs_CZ: EnTranslations = {
         "name": "Nythraxis, metla Thornpeaku"
       },
       "ignivar_herald_of_the_last_flame": {
-        "name": "Ignivar, Herald of the Last Flame"
+        "name": "Ignivar, hlasatel Posledního plamene"
       },
       "ignivar_heart_of_the_end": {
-        "name": "Ignivar Ashcaller"
+        "name": "Ignivar, Volající popela"
       },
       "ignivar_ember_sentinel": {
-        "name": "Ember Sentinel"
+        "name": "Žárový strážce"
       },
       "ignivar_crucible_warden": {
-        "name": "Crucible Warden"
+        "name": "Strážce tavicí pece"
       },
       "ignivar_cinder_artificer": {
-        "name": "Cinder Artificer"
+        "name": "Popelavý konstruktér"
       },
       "varkhul_forgefather_of_the_last_flame": {
-        "name": "Varkhul, Forgefather of the Last Flame"
+        "name": "Varkhul, otec kovárny Posledního plamene"
       },
       "derelict_mech": {
-        "name": "Derelict Mech"
+        "name": "Opuštěný mech"
       },
       "reliquary_ledger_wraith": {
         "name": "Přízrak pohřební knihy"
@@ -15551,19 +15551,19 @@ export const cs_CZ: EnTranslations = {
         "greeting": "Od hřbitova kaple v údolí až na střechu světa... stopa, kterou jsme sledovali, končí tady. Cítím, že hora naslouchá."
       },
       "archivist_maelin_emberward": {
-        "name": "Archivist Maelin Emberward",
-        "title": "Crucible Archivist",
-        "greeting": "Every hammer mark in this place is a sentence. Help me read what Varkhul tried to hide."
+        "name": "Archivářka Maelin Žárová stráž",
+        "title": "Archivářka tavicí pece",
+        "greeting": "Každý úder kladiva na tomto místě je větou. Pomoz mi přečíst, co se Varkhul pokusil ukrýt."
       },
       "archivist_maelin_ember_projection": {
-        "name": "Maelin's Ember Projection",
-        "title": "Ember Projection",
-        "greeting": "The embers carry Maelin's voice forward through the forge."
+        "name": "Maelinin žárový přízrak",
+        "title": "Žárový přízrak",
+        "greeting": "Žhavé uhlíky nesou Maelinin hlas kovárnou dál."
       },
       "crucible_quartermaster": {
-        "name": "Quartermaster Bronn Emberward",
-        "title": "Crucible Quartermaster",
-        "greeting": "The forge marks its own. Bring me a sigil from the Crucible and I will fit you for war."
+        "name": "Zbrojíř Bronn Žárová stráž",
+        "title": "Zbrojíř tavicí pece",
+        "greeting": "Kovárna pozná své. Přines mi znak z tavicí pece a vystrojím tě do války."
       },
       "brother_halven": {
         "name": "Bratr Halven",
@@ -16714,35 +16714,35 @@ export const cs_CZ: EnTranslations = {
         }
       },
       "q_ignivar_echoes_in_iron": {
-        "title": "Echoes in Iron",
-        "text": "These automata are not soldiers. They are drafts. Break each assembly line and listen when the final shell falls. The forge remembers what Varkhul tried to erase.",
-        "completion": "The echoes agree. Varkhul bound water from the dying Last Spring into living metal. These automatons were failed temperings. Only Ignivar endured.",
+        "title": "Ozvěny v železe",
+        "text": "Tyto automaty nejsou vojáci. Jsou to náčrty. Přeruš každou výrobní linku a naslouchej, až padne poslední schránka. Kovárna si pamatuje, co se Varkhul pokusil vymazat.",
+        "completion": "Ozvěny se shodují. Varkhul připoutal vodu z umírajícího Posledního pramene do živého kovu. Tyto automaty byly nepovedenými výtvory. Jen Ignivar přetrval.",
         "objectives": {
           "0": {
-            "label": "Ember Sentinels destroyed"
+            "label": "Zničeni žároví strážci"
           },
           "1": {
-            "label": "Crucible Wardens destroyed"
+            "label": "Zničeni strážci tavicí pece"
           }
         }
       },
       "q_ignivar_heralds_heart": {
-        "title": "The Herald's Heart",
-        "text": "The survivor named in every echo is Ignivar. Varkhul called him herald, seal, and key. Defeat him. If the records are true, his death will reveal what he was forged to guard.",
-        "completion": "Ignivar was never merely a guardian. His heart was the key, and its final plates opened the sealed crucible below.",
+        "title": "Srdce hlasatele",
+        "text": "Přeživší, jehož jméno zaznívá v každé ozvěně, je Ignivar. Varkhul mu říkal hlasatel, pečeť i klíč. Poraž ho. Jestli jsou záznamy pravdivé, jeho smrt odhalí, co byl ukován střežit.",
+        "completion": "Ignivar nikdy nebyl pouhým strážcem. Jeho srdce bylo klíčem a jeho poslední pláty otevřely zapečetěnou tavicí pec pod námi.",
         "objectives": {
           "0": {
-            "label": "Ignivar defeated"
+            "label": "Ignivar poražen"
           }
         }
       },
       "q_ignivar_the_forgefather": {
-        "title": "The Forgefather",
-        "text": "The path below leads to Varkhul, Forgefather of the Last Flame. He imprisoned the Last Spring to make metal live, then forged Ignivar to keep the crime sealed. Enter the Inner Crucible and end his work.",
-        "completion": "The forge is silent at last. The spring may never recover, but Varkhul will shape no more lives into chains.",
+        "title": "Otec kovárny",
+        "text": "Cesta níže vede k Varkhulovi, Otci kovárny Posledního plamene. Uvěznil Poslední pramen, aby vdechl život kovu, a poté ukoval Ignivara, aby zločin zůstal zapečetěný. Vstup do Vnitřního tavicího kotle a ukonči jeho dílo.",
+        "completion": "Kovárna je konečně tichá. Pramen se možná nikdy nevzpamatuje, ale Varkhul už žádný život nepřetvoří v řetězy.",
         "objectives": {
           "0": {
-            "label": "Varkhul defeated"
+            "label": "Varkhul poražen"
           }
         }
       },
@@ -18624,29 +18624,29 @@ export const cs_CZ: EnTranslations = {
         "leaveText": "Vracíš se do chladného vzduchu Thornpeaku."
       },
       "ignivar_forge_lift": {
-        "name": "The Forge-Lift",
-        "enterText": "The forge-lift shudders and sinks; hammerfall rises to meet you.",
-        "leaveText": "The lift hauls you back into the open air of the keep."
+        "name": "Kovárenský výtah",
+        "enterText": "Kovárenský výtah se otřese a klesne, zatímco rachot kladiv stoupá vzhůru.",
+        "leaveText": "Výtah tě vytáhne zpět na otevřený vzduch pevnosti."
       },
       "ignivar_forge_approach": {
-        "name": "Halls of the First Tempering",
-        "enterText": "Hammerfall echoes through the Halls of the First Tempering.",
-        "leaveText": "You step away from the first forge and breathe freely again."
+        "name": "Síně Prvního kalení",
+        "enterText": "Síní Prvního kalení se rozléhá rachot kladiv.",
+        "leaveText": "Odcházíš od první kovárny a znovu volně dýcháš."
       },
       "ignivar_raid_arena": {
-        "name": "Crucible of the Last Spring",
-        "enterText": "Heat shimmers above the sealed waters of the Crucible.",
-        "leaveText": "You step away from the Crucible and breathe freely again."
+        "name": "Crucible Posledního pramene",
+        "enterText": "Nad zapečetěnými vodami Tavicí pece se tetelí žár.",
+        "leaveText": "Odcházíš od Tavicí pece a znovu volně dýcháš."
       },
       "ignivar_molten_assembly": {
-        "name": "Molten Assembly",
-        "enterText": "The opened gate leads into a molten assembly hall.",
-        "leaveText": "You leave the assembly line and return to the Crucible."
+        "name": "Roztavená montáž",
+        "enterText": "Otevřená brána vede do roztavené montážní haly.",
+        "leaveText": "Opouštíš montážní linku a vracíš se do Tavicí pece."
       },
       "ignivar_inner_crucible": {
-        "name": "The Inner Crucible",
-        "enterText": "The opened gate leads deeper into the Crucible.",
-        "leaveText": "You leave the silent depths of the Crucible."
+        "name": "Vnitřní Crucible",
+        "enterText": "Otevřená brána vede hlouběji do Tavicí pece.",
+        "leaveText": "Opouštíš tiché hlubiny Tavicí pece."
       },
       "wildheart_basin": {
         "name": "Kotlina Divokého srdce",
@@ -18880,182 +18880,182 @@ export const cs_CZ: EnTranslations = {
     },
     "itemSets": {
       "ashveil": {
-        "name": "Ashveil Garb",
-        "bonus2": "Lurker's Strike hits 25 percent harder.",
-        "bonus4": "Your Veiled Edge strike hits for triple, up from double."
+        "name": "Roucho Popelavého závoje",
+        "bonus2": "Úder Číhajícího způsobuje o 25 procent vyšší poškození.",
+        "bonus4": "Úder Zahaleného ostří způsobuje trojnásobné poškození místo dvojnásobného."
       },
       "benison_dawnweave": {
-        "name": "Benison Dawnweave",
-        "bonus2": "Seraphic Vigil's rescue heals for 270, up from 180. Damage taken no longer delays your spellcasting.",
-        "bonus4": "When Seraphic Vigil triggers, its ally is also mended for 15 percent of their maximum health over 10 sec."
+        "name": "Požehnaná úsvitová tkanina",
+        "bonus2": "Záchrana Serafínské bdělosti léčí za 270 místo 180. Utržené poškození již nezpožďuje sesílání kouzel.",
+        "bonus4": "Po spuštění Serafínské bdělosti je její spojenec po dobu 10 s léčen za 15 procent svého maximálního zdraví."
       },
       "boundstone_vanguard": {
         "name": "Předvoj spoutaného kamene",
         "bonus3": "Zvyšuje rychlost útoku a sesílání o 15 %."
       },
       "chronoweave": {
-        "name": "Aetherweave Vestments",
-        "bonus2": "Temporal Echo converts 50 percent of your single-target Arcane damage into healing. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Temporal Cascade's cooldown is reduced by 5 sec."
+        "name": "Roucha Éterové tkaniny",
+        "bonus2": "Časová ozvěna převádí 50 procent tvého arkánního poškození jediného cíle na léčení. Utržené poškození již nezpožďuje sesílání kouzel.",
+        "bonus4": "Doba obnovy Časové kaskády se zkracuje o 5 s."
       },
       "cinderbark": {
-        "name": "Cinderbark Ward",
-        "bonus2": "Sweeping Claws has a 30 percent chance to bank an additional Old Blood.",
-        "bonus4": "Marrowbreak hits 30 percent harder, and its emergency guard no longer replaces the strike."
+        "name": "Ochrana Popelavé kůry",
+        "bonus2": "Široké drápy mají 30procentní šanci uložit další Starou krev.",
+        "bonus4": "Rozbíječ morku způsobuje o 30 procent vyšší poškození a jeho nouzová ochrana již nenahrazuje úder."
       },
       "cinderfang": {
-        "name": "Cinderfang Shroud",
-        "bonus2": "Venom Ritual's energy refund rises to 20 per builder.",
-        "bonus4": "Venom Dart's cooldown is reduced to 4 sec."
+        "name": "Plášť Popelavého tesáku",
+        "bonus2": "Vrácení energie jedovatého rituálu se zvyšuje na 20 za každý útočný účinek.",
+        "bonus4": "Doba obnovy Jedovaté šipky se zkracuje na 4 s."
       },
       "coldsight_trackers": {
-        "name": "Coldsight Trackers",
-        "bonus2": "Measured Shot restores 5 additional Focus.",
-        "bonus4": "Long Draw critical strikes extend Cold Focus by 2 sec, up to 6 sec per activation."
+        "name": "Stopaři Chladného zraku",
+        "bonus2": "Měřený výstřel obnovuje o 5 více soustředění.",
+        "bonus4": "Kritické zásahy Dlouhého nátahu prodlužují Chladné soustředění o 2 s, až o 6 s při jednom spuštění."
       },
       "crownforged": {
         "name": "Regálie z kosti",
         "bonus2": "Zvyšuje sílu útoku o 40.",
         "bonus4": "Kritické zásahy tvé zbraně roztříští cíl efektem Kostitříska a způsobí mu krvácení za 8 poškození každé 2 s po dobu 12 s. Nasčítá se až 3krát.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 5 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Zvyšuje rychlost útoků a sesílání o 4 % a zásah o 3 %. Kritické zásahy zbraní způsobí Krvavý střep, který cíl krvácí za 5 poškození každé 2 s po dobu 12 s. Sčítá se až 3krát."
       },
       "dawnforged": {
-        "name": "Dawnforged Vestments",
-        "bonus2": "Beacon of Light copies 55 percent of your direct heals. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Radiant Resonance's empowered Dawn's Embrace is instant."
+        "name": "Roucha Kovaná úsvitem",
+        "bonus2": "Maják světla kopíruje 55 procent tvých přímých léčení. Utržené poškození již nezpožďuje sesílání kouzel.",
+        "bonus4": "Posílené objetí úsvitu Zářivé rezonance je okamžité."
       },
       "deathlord": {
         "name": "Bojová výbava mohylového pána",
         "bonus2": "Zvyšuje sílu útoku o 40.",
         "bonus4": "Kritické zásahy tvé zbraně mají 50% šanci udělit Hrobomoc, která zvýší sílu útoku o 60 na 10 s.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 5 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Zvyšuje rychlost útoků a sesílání o 4 % a zásah o 3 %. Kritické zásahy zbraní způsobí Krvavý střep, který cíl krvácí za 5 poškození každé 2 s po dobu 12 s. Sčítá se až 3krát."
       },
       "emberfury": {
-        "name": "Emberfury Harness",
-        "bonus2": "Your Enrage lasts 6 sec instead of 4.",
-        "bonus4": "Bloodletting always Enrages you, and its healing rises to 8 percent of your maximum health."
+        "name": "Postroj Žáru uhlíků",
+        "bonus2": "Tvé Rozzuření trvá 6 s místo 4.",
+        "bonus4": "Pouštění žil tě vždy Rozzuří a jeho léčení se zvýší na 8 procent tvého maximálního zdraví."
       },
       "emberscreed": {
-        "name": "Creed of Embers Vestments",
-        "bonus2": "Your Doctrine link converts 10 percent more of your Holy damage into healing. Damage taken no longer delays your spellcasting.",
-        "bonus4": "When your Psalm of Warding is fully consumed, your next Scouring Hymn within 10 sec is instant. Cannot occur more than once every 15 sec."
+        "name": "Roucha Vyznání uhlíků",
+        "bonus2": "Spojení tvé Doktríny převádí o 10 procent více svatého poškození na léčení. Utržené poškození již nezpožďuje sesílání kouzel.",
+        "bonus4": "Po úplném spotřebování tvého Žalmu ochrany je další Očistný hymnus během 10 s okamžitý. Nemůže nastat častěji než jednou za 15 s."
       },
       "forgewall": {
-        "name": "Forgewall Aegis",
-        "bonus2": "Iron Resolve converts rage at 5 absorb per point instead of 4.",
-        "bonus4": "Casting Shieldcrack reduces Iron Resolve's remaining cooldown by 2 sec."
+        "name": "Égida Kovové hradby",
+        "bonus2": "Železné odhodlání převádí zuřivost na 5 pohlcení za bod místo 4.",
+        "bonus4": "Seslání Rozlomení štítu zkrátí zbývající dobu obnovy Železného odhodlání o 2 s."
       },
       "frostquench": {
-        "name": "Frostquench Weave",
-        "bonus2": "Rimelance critical strikes bank a second Icicle, up to the maximum of 5. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Winterlash plants 3 Winter's Chill charges, up from 2."
+        "name": "Tkanina Zmrazení",
+        "bonus2": "Kritické zásahy Ledového kopí uloží druhý Rampouch, až do maxima 5. Utržené poškození již nezpožďuje sesílání kouzel.",
+        "bonus4": "Zimní úder nanese 3 náboje Zimního chladu místo 2."
       },
       "gravebrand": {
-        "name": "Gravebrand Regalia",
-        "bonus2": "Reaping Command's cooldown is reduced by 2 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Reaping Command's unison strikes deal 25 percent more damage."
+        "name": "Klenoty Hroboznaku",
+        "bonus2": "Doba obnovy Příkazu sklizně se zkracuje o 2 s. Utržené poškození již nezpožďuje sesílání kouzel.",
+        "bonus4": "Sjednocené údery Příkazu sklizně způsobují o 25 procent vyšší poškození."
       },
       "greyjaw_stalker": {
         "name": "Výbava stopaře Šedočelista",
         "bonus3": "Zvyšuje rychlost útoku a sesílání o 15 %."
       },
       "grovespring": {
-        "name": "Grovespring Raiment",
-        "bonus2": "Swiftmend consumes your own Wildbloom or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Overbloom harvests 75 percent of your remaining effects and banks 1 Verdance afterward."
+        "name": "Roucho Hájového pramene",
+        "bonus2": "Rychlé léčení nejprve spotřebuje tvůj vlastní Divoký květ nebo Druhý květ a léčí o 25 procent více. Utržené poškození již nezpožďuje sesílání kouzel.",
+        "bonus4": "Překvetení sklidí 75 procent tvých zbývajících účinků a poté uloží 1 Verdanci."
       },
       "hexthread": {
-        "name": "Hexthread Shroud",
-        "bonus2": "Needle of Fate grants 2 additional Condemnation. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Passing Sentence refunds 10 Condemnation."
+        "name": "Plášť Šesti nití",
+        "bonus2": "Jehla osudu poskytuje 2 další odsouzení. Utržené poškození již nezpožďuje sesílání kouzel.",
+        "bonus4": "Vynesení rozsudku vrací 10 odsouzení."
       },
       "moonscorch": {
-        "name": "Moonscorch Raiment",
-        "bonus2": "Moonseed may extend Lunar Tempest twice per application, to a maximum of 12 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Moonsurge and Sunwake strike 25 percent harder."
+        "name": "Roucho Měsíčního žáru",
+        "bonus2": "Měsíční semeno může při každém použití dvakrát prodloužit Lunární bouři, nejvýše na 12 s. Utržené poškození již nezpožďuje sesílání kouzel.",
+        "bonus4": "Měsíční příval a Sluneční procitnutí způsobují o 25 procent vyšší poškození."
       },
       "necromancers": {
         "name": "Oděv smutkotkaní",
         "bonus2": "Zvyšuje sílu kouzel o 20. Utrpěné poškození již nezdržuje tvé sesílání kouzel (100% odolnost proti zdržení sesílání).",
         "bonus4": "Tvá kouzla mají 10% šanci udělit Jasné sesílání, díky němuž je tvé příští kouzlo zdarma.",
-        "bonus6": "Increases attack and casting speed by 4%. Your spells have a 10% chance to grant Soulblaze, increasing spell power by 25 for 10 sec."
+        "bonus6": "Zvyšuje rychlost útoků a sesílání o 4 %. Kouzla mají 10% šanci udělit Plamen duše, který na 10 s zvýší sílu kouzel o 25."
       },
       "nighttalon": {
         "name": "Kožešina děsivého tesáku",
         "bonus2": "Zvyšuje sílu útoku o 40.",
         "bonus4": "Kritické zásahy tvé zbraně vytrhnou Rozšklebenou ránu a způsobí cíli krvácení za 6 poškození každé 2 s po dobu 12 s. Nasčítá se až 3krát.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 4 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Zvyšuje rychlost útoků a sesílání o 4 % a zásah o 3 %. Kritické zásahy zbraní způsobí Rozervanou ránu, která cíl krvácí za 4 poškození každé 2 s po dobu 12 s. Sčítá se až 3krát."
       },
       "oathpyre": {
-        "name": "Oathpyre Bastion",
-        "bonus2": "Vowkeeper Strike's chance to arm Solar Reprisal rises to 30 percent, and blocking an attack arms it 40 percent of the time.",
-        "bonus4": "Consuming Solar Reprisal shields you for 6 percent of your maximum health for 10 sec."
+        "name": "Bašta Ohně přísahy",
+        "bonus2": "Šance Úderu strážce přísahy připravit Sluneční odvetu se zvyšuje na 30 procent a blokování útoku ji připraví ve 40 procentech případů.",
+        "bonus4": "Spotřebování Sluneční odvety tě na 10 s ochrání štítem o síle 6 procent tvého maximálního zdraví."
       },
       "packlord_emberhide": {
-        "name": "Packlord's Emberhide",
-        "bonus2": "Pack Command's cooldown is reduced to 3 sec.",
-        "bonus4": "Pack Command's chance to reset Stampede's cooldown rises to 30 percent."
+        "name": "Uhlíková kůže Pána smečky",
+        "bonus2": "Doba obnovy Příkazu smečky se zkracuje na 3 s.",
+        "bonus4": "Šance Příkazu smečky resetovat dobu obnovy Úprku se zvyšuje na 30 %."
       },
       "pyroclast": {
-        "name": "Pyroclast Regalia",
-        "bonus2": "Scald always critically strikes targets at or below 35 percent health. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Your Fire spells' critical strikes outside Phoenix Trance reduce its remaining cooldown by 1.5 sec."
+        "name": "Klenoty Pyroklastu",
+        "bonus2": "Opaření vždy kriticky zasáhne cíle s nejvýše 35 % zdraví. Utržené poškození již nezpožďuje sesílání kouzel.",
+        "bonus4": "Kritické zásahy tvých ohnivých kouzel mimo Fénixovo vytržení zkrátí jeho zbývající dobu obnovy o 1,5 s."
       },
       "ruincaller": {
-        "name": "Ruincaller Vestments",
-        "bonus2": "Conflagrate holds 3 charges. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Ruinbolt strikes 20 percent harder."
+        "name": "Roucha Vyvolávače zkázy",
+        "bonus2": "Spalující požár má 3 náboje. Utržené poškození již nezpožďuje sesílání kouzel.",
+        "bonus4": "Zkásošíp způsobuje o 20 % vyšší poškození."
       },
       "slagbreaker": {
-        "name": "Slagbreaker Battlegear",
-        "bonus2": "Redhand empowers your next Maiming Strike by 30 percent per stack instead of 20.",
-        "bonus4": "Every second cast of Redhand reduces Breachmaker's remaining cooldown by 3 sec."
+        "name": "Bitevní výstroj Lamače strusky",
+        "bonus2": "Rudá ruka posílí tvůj další Mrzačící úder o 30 % za náboj místo 20 %.",
+        "bonus4": "Každé druhé seslání Rudé ruky zkrátí zbývající dobu obnovy Prolamovače o 3 s."
       },
       "slagsnare": {
-        "name": "Slagsnare Trappings",
-        "bonus2": "Gutting Strike generates 20 Focus.",
-        "bonus4": "Woundrend that consumes 3 Hunting Momentum preserves them. Cannot occur more than once every 8 sec."
+        "name": "Výbava Struskové smyčky",
+        "bonus2": "Vykuchávající úder vytváří 20 soustředění.",
+        "bonus4": "Trhající rána, která spotřebuje 3 náboje Loveckého rozmachu, je zachová. Nemůže nastat častěji než jednou za 8 s."
       },
       "smolderstrike": {
-        "name": "Smolderstrike Leathers",
-        "bonus2": "Haymaker hits 20 percent harder.",
-        "bonus4": "Lights Out refunds 6 sec of Mirrored Blades' remaining cooldown."
+        "name": "Kožená zbroj Žhnoucího úderu",
+        "bonus2": "Haymaker zasahuje 20 % silněji.",
+        "bonus4": "Zhasnutí vrací 6 s zbývající doby obnovy Zrcadlených čepelí."
       },
       "soulflame": {
         "name": "Regálie přízračného ohně",
         "bonus2": "Zvyšuje sílu kouzel o 20. Utrpěné poškození již nezdržuje tvé sesílání kouzel (100% odolnost proti zdržení sesílání).",
         "bonus4": "Tvá kouzla mají 10% šanci udělit Dušový žár, který zvýší sílu kouzel o 40 na 10 s.",
-        "bonus6": "Increases attack and casting speed by 4%. Your spells have a 10% chance to grant Soulblaze, increasing spell power by 25 for 10 sec."
+        "bonus6": "Zvyšuje rychlost útoků a sesílání o 4 %. Kouzla mají 10% šanci udělit Plamen duše, který na 10 s zvýší sílu kouzel o 25."
       },
       "springmender": {
-        "name": "Springmender Scale",
-        "bonus2": "Tidecall's cooldown is reduced by 4 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Cascading Mend reaches a fourth ally and harvests Mending Currents at 150 percent."
+        "name": "Šupiny Jarního léčitele",
+        "bonus2": "Doba obnovy Přílivového volání se zkracuje o 4 s. Utržené poškození již nezpožďuje sesílání kouzel.",
+        "bonus4": "Kaskádové léčení dosáhne čtvrtého spojence a čerpá Léčivé proudy na 150 %."
       },
       "stonehearth": {
-        "name": "Stonehearth Bastion",
-        "bonus2": "While Stonebound, Stormcast Mending Waters costs no mana and heals 25 percent more.",
-        "bonus4": "While Stonebound, completing a cadence heals you for 3 percent of your maximum health."
+        "name": "Bašta Kamenného srdce",
+        "bonus2": "Když jsi spoután kamenem, Bouřné léčivé vody nestojí manu a léčí o 25 % více.",
+        "bonus4": "Když jsi spoután kamenem, dokončení kadence tě vyléčí za 3 % maximálního zdraví."
       },
       "stormcallers": {
         "name": "Roucha volání vichru",
         "bonus2": "Zvyšuje sílu kouzel o 20. Utrpěné poškození již nezdržuje tvé sesílání kouzel (100% odolnost proti zdržení sesílání).",
         "bonus4": "Tvá kouzla mají 10% šanci udělit Dušový žár, který zvýší sílu kouzel o 40 na 10 s.",
-        "bonus6": "Increases attack and casting speed by 4%. Your spells have a 10% chance to grant Soulblaze, increasing spell power by 25 for 10 sec."
+        "bonus6": "Zvyšuje rychlost útoků a sesílání o 4 %. Kouzla mají 10% šanci udělit Plamen duše, který na 10 s zvýší sílu kouzel o 25."
       },
       "stormkindled": {
-        "name": "Stormkindled Regalia",
-        "bonus2": "Unleash Weapon on Pyrebrand grants 3 Thunder. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Earthen Jolt's bonus per Thunder rises to 30 percent."
+        "name": "Klenoty Rozžhavené bouře",
+        "bonus2": "Uvolnění zbraně na Žárové značce udělí 3 hromy. Utržené poškození již nezpožďuje sesílání kouzel.",
+        "bonus4": "Bonus Zemního výboje za každý hrom se zvyšuje na 30 %."
       },
       "vale_arcanist": {
         "name": "Regálie arkánisty z údolí",
         "bonus3": "Zvyšuje rychlost útoku a sesílání o 15 %."
       },
       "vesperash": {
-        "name": "Vesperash Shroud",
-        "bonus2": "Call Tithefiend's cooldown is reduced by 6 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Calling your Tithefiend resets Mindfracture's cooldown, and the fiend returns twice as much mana per hit."
+        "name": "Plášť Večerního popela",
+        "bonus2": "Doba obnovy Přivolání desátkového démona se zkracuje o 6 s. Utržené poškození již nezpožďuje sesílání kouzel.",
+        "bonus4": "Přivolání tvého desátkového démona resetuje dobu obnovy Rozštěpení mysli a démon vrací za každý zásah dvojnásobek many."
       },
       "warfare_ashstalker": {
         "name": "Výbava Popelného stopaře",
@@ -19088,25 +19088,25 @@ export const cs_CZ: EnTranslations = {
         "bonus7": "Zvyšuje Válečnický útok a obranu o 80. Tvá kouzla mají 15% šanci udělit Trnovou stráž, která zvýší uhýbání o 15 % na 6 s."
       },
       "warspirit_emberscale": {
-        "name": "Warspirit Emberscale",
-        "bonus2": "Ancestral Strike advances your cadence 3 steps.",
-        "bonus4": "Ancestral Strike hits 30 percent harder."
+        "name": "Uhlíkové šupiny Válečného ducha",
+        "bonus2": "Úder předků posune tvou kadenci o 3 kroky.",
+        "bonus4": "Ancestral Strike zasahuje 30 % silněji."
       },
       "wildfang_emberhide": {
-        "name": "Wildfang Emberhide",
-        "bonus2": "Redharvest restores 45 energy, up from 30.",
-        "bonus4": "Redharvest plants a fresh Flense on the target."
+        "name": "Uhlíková kůže Divokého tesáku",
+        "bonus2": "Rudá sklizeň obnoví 45 energie místo 30.",
+        "bonus4": "Rudá sklizeň na cíl umístí nový Odřez."
       },
       "wyrmshadow": {
         "name": "Roucha nočního tesáku",
         "bonus2": "Zvyšuje sílu útoku o 40.",
         "bonus4": "Kritické zásahy tvé zbraně mají 50% šanci udělit Tesákový nápor, který zvýší rychlost útoku o 25 % na 8 s.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 4 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Zvyšuje rychlost útoků a sesílání o 4 % a zásah o 3 %. Kritické zásahy zbraní způsobí Rozervanou ránu, která cíl krvácí za 4 poškození každé 2 s po dobu 12 s. Sčítá se až 3krát."
       },
       "zealfire": {
-        "name": "Zealfire Warplate",
-        "bonus2": "Final Edict and Dawnfall cut each other's remaining cooldown by 3 sec instead of 2.",
-        "bonus4": "Hammer of Wrath cast under Dawn's Wrath strikes 40 percent harder, up from 20."
+        "name": "Válečný plát Ohně horlivosti",
+        "bonus2": "Konečný edikt a Úsvit zkracují navzájem svou zbývající dobu obnovy o 3 s místo 2.",
+        "bonus4": "Kladivo hněvu seslané pod Hněvem úsvitu způsobuje o 40 % vyšší poškození místo 20 %."
       }
     }
   },

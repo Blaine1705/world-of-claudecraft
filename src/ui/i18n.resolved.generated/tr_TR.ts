@@ -4654,8 +4654,8 @@ export const tr_TR: EnTranslations = {
       "online": "Karakter şu anda çevrimiçi.",
       "rename_not_permitted": "Bu karakterin yeniden adlandırılmasına izin verilmiyor.",
       "delete_confirm": "Silmeyi onaylamak için karakter adını yazın.",
-      "storage_purchase_open": "A storage purchase must finish or be resolved before this character can be deleted.",
-      "delete_busy": "The realm is busy. Try deleting this character again in a moment.",
+      "storage_purchase_open": "Bu karakter silinmeden önce depolama satın alımının tamamlanması veya çözümlenmesi gerekir.",
+      "delete_busy": "Diyar meşgul. Birazdan bu karakteri tekrar silmeyi deneyin.",
       "already_in_world": "Karakter zaten dünyada.",
       "taken_over": "Karakteriniz başka bir oturum tarafından devralındı.",
       "rename_required": "Bu karakter dünyaya girmeden önce yeniden adlandırılmalıdır.",
@@ -5180,7 +5180,7 @@ export const tr_TR: EnTranslations = {
       "ifPartySort": "Grup üyelerinin listelenme sırası: grup sırası, rol ya da ad.",
       "ifPartyShowAuras": "Güçlendirmelerin ve zayıflatmaların grup çerçevelerinde gösterilip gösterilmeyeceği. Eşleşen anahtarlar kaynak çubuklarını, emilimleri, evcil hayvanları ve kendi grup listenizde görünüp görünmeyeceğinizi de kapsar.",
       "ifAurasOnPlayerFrame": "Güçlendirmelerinizi ve zayıflatmalarınızı, aura çubuğunun yanı sıra kendi birim çerçevenize de yerleştirir.",
-      "ifAlwaysShowAllBuffs": "Shows every active buff even on the Low graphics preset, bypassing its usual buff-icon cap.",
+      "ifAlwaysShowAllBuffs": "Düşük grafik ön ayarında bile etkin olan tüm güçlendirmeleri gösterir ve güçlendirme simgeleri için uygulanan olağan sınırı kaldırır.",
       "ifTargetOfTarget": "Hedefinizin kimi hedeflediğini gösterir; tankın canavarı hâlâ tutup tutmadığını anlamanın klasik yolu.",
       "ifPetFrame": "Evcil hayvanınız için bir çerçeve gösterir.",
       "ifChatFontScale": "Sohbet metni boyutu.",
@@ -6667,7 +6667,7 @@ export const tr_TR: EnTranslations = {
       "bankBody": "Her merkez kasabada diyarın bankacılık müessesesi olan Yaldızlı Kasa'nın bir şubesi bulunur. Oradaki veznedarla konuşarak kasanı aç: çantalarının ötesinde, karakterinin ömür boyu elinde tuttuğu özel bir depo. Oraya bıraktığın her şey, bir sonraki sefer hangi şubeye uğrarsan uğra, güvenle bekler.",
       "bankHow": "Kasan açıkken, çantandaki bir eşyaya tıklayarak onu yatır; kasadaki eşyaya tıklayarak geri al. Kasa yalnızca eşya tutar, asla para tutmaz; görev eşyaları da sende kalır. Yol ortasında çantaların dolduğunda, tek bir düğme bütün zanaat malzemelerini bir seferde içeri süpürür.",
       "bankSlots": "Yeni açılmış bir kasa küçük başlar ve seninle birlikte büyür. Veznedar, giderek artan fiyatlarla para karşılığında ek yuvalar satar; çevrimiçi oynamak ise bunun üzerine bonus yer kazandırır: doğrulanmış bir e-posta, bağlanmış hesaplar ve oyuna getirdiğin arkadaşlar gibi şeyler için.",
-      "bankSockets": "Past the slot ladder, the bursar also sells up to four bag sockets, unlocked in order at ever-steeper prices. Seat a spare bag from your carrying set in one and its slots join your vault room: an everyday bag widens the whole store, while a reagent satchel adds room only crafting materials may take. Click a bag in your bags to seat it and click the socket to take it back. Taking one back never costs you a thing you stored: if the vault ends up fuller than its shrunken room, everything stays put and new deposits simply wait for space.",
+      "bankSockets": "Yuva basamaklarının ötesinde, veznedar gittikçe yükselen fiyatlarla sırayla açılan dört çanta yuvasına kadar satar. Taşıma takımındaki yedek bir çantayı yuvaya yerleştirince yuvaları kasa odana katılır: sıradan bir çanta tüm depoyu genişletirken, malzeme kesesi yalnızca zanaat malzemelerinin kullanabileceği yer ekler. Yerleştirmek için çantalarındaki bir çantaya, geri almak için yuvaya tıkla. Geri almak, depoladığın hiçbir şeyi kaybettirmez: kasa küçülen alanından daha dolu hale gelirse her şey yerinde kalır ve yeni yatırmalar yer açılmasını bekler.",
       "buyingTitle": "Alım ve satım",
       "buyingBody": "Bir tüccarla konuşun ve mallarına göz atmayı seçin; dükkanları üç sekmeyle açılır: Göz At, Sat ve Geri Al. Göz At sekmesi stokladıkları her şeyi tutar, paranız yeterse sizindir. Sat sekmesi çantalarınızdan para ödeyecekleri şeyleri sıralar; kendi zar atışıyla belirlenmiş bir kaliteye sahip bir parçayı satarken önce onay istenir, böylece değerli bir nüsha yanlışlıkla asla elden kaçmaz. Pişman olduğunuz bir şeyden ayrılırsanız, Geri Al sekmesi son satışlarınızı tutar ve onları size ödenen parayla geri alabilirsiniz.",
       "junkTitle": "Hurdaları temizleme",
@@ -7711,7 +7711,7 @@ export const tr_TR: EnTranslations = {
       "title": "Solana Cüzdanı Bağla",
       "linkBody": "Bu tarayıcıda bir cüzdan uzantısı seç. Bir doğrulama mesajı imzalayacak, ardından masaüstü uygulamasına döneceksin.",
       "paymentBody": "Hesabına bağlı cüzdanı seç ve bu tarayıcıda işlemi onayla.",
-      "stepUpBody": "Choose the wallet linked to your account and sign the $WOC Exchange authorization message. Signing is free and moves no funds.",
+      "stepUpBody": "Hesabına bağlı cüzdanı seç ve $WOC Borsası yetkilendirme mesajını imzala. İmzalamak ücretsizdir ve hiçbir para hareket ettirmez.",
       "extensionHelp": "Uyumlu cüzdan uzantısı bulunamadı. Phantom, Solflare veya başka bir Solana tarayıcı cüzdanını yükle ya da kilidini aç, ardından tekrar dene.",
       "safety": "World of ClaudeCraft hiçbir zaman kurtarma ifadeni veya özel anahtarını istemez.",
       "continueWith": "{wallet} ile devam et",
@@ -8102,18 +8102,18 @@ export const tr_TR: EnTranslations = {
     "buyConfirmCancel": "İptal etmek"
   },
   "crucibleShop": {
-    "browse": "Redeem Sigils",
-    "browseAria": "Redeem Crucible sigils with {name}",
-    "empty": "No set pieces are redeemable for your class.",
-    "balance": "Your sigils: {list}",
+    "browse": "Mühürleri bozdur",
+    "browseAria": "{name} ile Pota mühürlerini bozdur",
+    "empty": "Sınıfın için bozdurulabilecek set parçası yok.",
+    "balance": "Mühürlerin: {list}",
     "balanceEntry": "{name} x{count}",
-    "noSigils": "You hold no Crucible sigils.",
+    "noSigils": "Pota mührün yok.",
     "price": "1 {sigil}",
-    "buyAria": "Redeem {sigil} for {item}",
-    "buyConfirmTitle": "Confirm Redemption",
-    "buyConfirmBody": "Redeem your {sigil} for {item}? A consumed sigil cannot be refunded.",
-    "buyConfirmAccept": "Redeem",
-    "buyConfirmCancel": "Cancel"
+    "buyAria": "{sigil} karşılığında {item} al",
+    "buyConfirmTitle": "Bozdurmayı onayla",
+    "buyConfirmBody": "{sigil} karşılığında {item} alınsın mı? Harcanan mühür iade edilemez.",
+    "buyConfirmAccept": "Bozdur",
+    "buyConfirmCancel": "İptal"
   },
   "cardDuel": {
     "title": "Kart Düellosu",
@@ -13254,25 +13254,25 @@ export const tr_TR: EnTranslations = {
         "name": "Dawnhold Bahçesi Çiçek Demeti"
       },
       "wayfarers_backpack": {
-        "name": "Wayfarer's Backpack"
+        "name": "Gezginin Sırt Çantası"
       },
       "burlap_reagent_pouch": {
-        "name": "Burlap Reagent Pouch"
+        "name": "Çuval Bezi Reaktif Kesesi"
       },
       "necromancers_reagent_satchel": {
-        "name": "Necromancer's Reagent Satchel"
+        "name": "Nekromcunun Reaktif Çantası"
       },
       "duskweave_bag": {
-        "name": "Duskweave Bag"
+        "name": "Alacakaranlık Dokuması Çantası"
       },
       "resonant_weave_bag": {
-        "name": "Resonantweave Bag"
+        "name": "Tınıtlı Dokuma Çantası"
       },
       "foragers_haversack": {
-        "name": "Forager's Haversack"
+        "name": "Toplayıcının Heybesi"
       },
       "loombound_reagent_satchel": {
-        "name": "Loombound Reagent Satchel"
+        "name": "Tezgâha Bağlı Reaktif Çantası"
       },
       "ps_briny_lure": {
         "name": "Tuzlu Yem"
@@ -13287,610 +13287,610 @@ export const tr_TR: EnTranslations = {
         "name": "Geçiş Taşı"
       },
       "lastflame_core": {
-        "name": "Core of the Last Flame"
+        "name": "Son Alevin Özü"
       },
       "slagbreaker_helmet": {
-        "name": "Slagbreaker Helm"
+        "name": "Cüruf Kıranın Miğferi"
       },
       "slagbreaker_shoulder": {
-        "name": "Slagbreaker Pauldrons"
+        "name": "Cüruf Kıranın Omuz Zırhları"
       },
       "slagbreaker_chest": {
-        "name": "Slagbreaker Hauberk"
+        "name": "Cüruf Kıranın Hauberki"
       },
       "slagbreaker_gloves": {
-        "name": "Slagbreaker Gauntlets"
+        "name": "Cüruf Kıranın Zırhlı Eldivenleri"
       },
       "slagbreaker_legs": {
-        "name": "Slagbreaker Legguards"
+        "name": "Cüruf Kıranın Baldır Zırhları"
       },
       "emberfury_helmet": {
-        "name": "Emberfury Helm"
+        "name": "Kor Öfkesi Başlığı"
       },
       "emberfury_shoulder": {
-        "name": "Emberfury Pauldrons"
+        "name": "Kor Öfkesi Omuzlukları"
       },
       "emberfury_chest": {
-        "name": "Emberfury Hauberk"
+        "name": "Kor Öfkesi Göğüslüğü"
       },
       "emberfury_gloves": {
-        "name": "Emberfury Gauntlets"
+        "name": "Kor Öfkesi Eldivenleri"
       },
       "emberfury_legs": {
-        "name": "Emberfury Legguards"
+        "name": "Kor Öfkesi Tozlukları"
       },
       "forgewall_helmet": {
-        "name": "Forgewall Helm"
+        "name": "Dövme Duvarı Başlığı"
       },
       "forgewall_shoulder": {
-        "name": "Forgewall Pauldrons"
+        "name": "Dövme Duvarı Omuzlukları"
       },
       "forgewall_chest": {
-        "name": "Forgewall Hauberk"
+        "name": "Dövme Duvarı Göğüslüğü"
       },
       "forgewall_gloves": {
-        "name": "Forgewall Gauntlets"
+        "name": "Dövme Duvarı Eldivenleri"
       },
       "forgewall_legs": {
-        "name": "Forgewall Legguards"
+        "name": "Dövme Duvarı Tozlukları"
       },
       "dawnforged_helmet": {
-        "name": "Dawnforged Helm"
+        "name": "Şafak Dövmesi Başlığı"
       },
       "dawnforged_shoulder": {
-        "name": "Dawnforged Pauldrons"
+        "name": "Şafak Dövmesi Omuzlukları"
       },
       "dawnforged_chest": {
-        "name": "Dawnforged Hauberk"
+        "name": "Şafak Dövmesi Göğüslüğü"
       },
       "dawnforged_gloves": {
-        "name": "Dawnforged Gauntlets"
+        "name": "Şafak Dövmesi Eldivenleri"
       },
       "dawnforged_legs": {
-        "name": "Dawnforged Legguards"
+        "name": "Şafak Dövmesi Tozlukları"
       },
       "oathpyre_helmet": {
-        "name": "Oathpyre Helm"
+        "name": "Yemin Ateşi Miğferi"
       },
       "oathpyre_shoulder": {
-        "name": "Oathpyre Pauldrons"
+        "name": "Yemin Ateşi Omuz Zırhları"
       },
       "oathpyre_chest": {
-        "name": "Oathpyre Hauberk"
+        "name": "Yemin Ateşi Hauberki"
       },
       "oathpyre_gloves": {
-        "name": "Oathpyre Gauntlets"
+        "name": "Yemin Ateşi Zırhlı Eldivenleri"
       },
       "oathpyre_legs": {
-        "name": "Oathpyre Legguards"
+        "name": "Yemin Ateşi Baldır Zırhları"
       },
       "zealfire_helmet": {
-        "name": "Zealfire Helm"
+        "name": "Şevk Ateşi Miğferi"
       },
       "zealfire_shoulder": {
-        "name": "Zealfire Pauldrons"
+        "name": "Şevk Ateşi Omuzlukları"
       },
       "zealfire_chest": {
-        "name": "Zealfire Hauberk"
+        "name": "Şevk Ateşi Hauberki"
       },
       "zealfire_gloves": {
-        "name": "Zealfire Gauntlets"
+        "name": "Şevk Ateşi Zırhlı Eldivenleri"
       },
       "zealfire_legs": {
-        "name": "Zealfire Legguards"
+        "name": "Şevk Ateşi Baldır Zırhları"
       },
       "packlord_emberhide_helmet": {
-        "name": "Packlord's Cowl"
+        "name": "Sürü Efendisinin Başlığı"
       },
       "packlord_emberhide_shoulder": {
-        "name": "Packlord's Spaulders"
+        "name": "Sürü Efendisinin Omuzlukları"
       },
       "packlord_emberhide_chest": {
-        "name": "Packlord's Tunic"
+        "name": "Sürü Efendisinin Tuniği"
       },
       "packlord_emberhide_gloves": {
-        "name": "Packlord's Grips"
+        "name": "Sürü Efendisinin Eldivenleri"
       },
       "packlord_emberhide_legs": {
-        "name": "Packlord's Breeches"
+        "name": "Sürü Efendisinin Pantolonu"
       },
       "coldsight_trackers_helmet": {
-        "name": "Coldsight Cowl"
+        "name": "Soğuk Görüş Başlığı"
       },
       "coldsight_trackers_shoulder": {
-        "name": "Coldsight Spaulders"
+        "name": "Soğuk Görüş Omuzlukları"
       },
       "coldsight_trackers_chest": {
-        "name": "Coldsight Tunic"
+        "name": "Soğuk Görüş Tuniği"
       },
       "coldsight_trackers_gloves": {
-        "name": "Coldsight Grips"
+        "name": "Soğuk Görüş Eldivenleri"
       },
       "coldsight_trackers_legs": {
-        "name": "Coldsight Breeches"
+        "name": "Soğuk Görüş Pantolonu"
       },
       "slagsnare_helmet": {
-        "name": "Slagsnare Cowl"
+        "name": "Cüruf Tuzakçısının Başlığı"
       },
       "slagsnare_shoulder": {
-        "name": "Slagsnare Spaulders"
+        "name": "Cüruf Tuzakçısının Omuzlukları"
       },
       "slagsnare_chest": {
-        "name": "Slagsnare Tunic"
+        "name": "Cüruf Tuzakçısının Tuniği"
       },
       "slagsnare_gloves": {
-        "name": "Slagsnare Grips"
+        "name": "Cüruf Tuzakçısının Kavrama Eldivenleri"
       },
       "slagsnare_legs": {
-        "name": "Slagsnare Breeches"
+        "name": "Cüruf Tuzakçısının Pantolonu"
       },
       "cinderfang_helmet": {
-        "name": "Cinderfang Cowl"
+        "name": "Kor Dişi Başlığı"
       },
       "cinderfang_shoulder": {
-        "name": "Cinderfang Spaulders"
+        "name": "Kor Dişi Omuzlukları"
       },
       "cinderfang_chest": {
-        "name": "Cinderfang Tunic"
+        "name": "Kor Dişi Tuniği"
       },
       "cinderfang_gloves": {
-        "name": "Cinderfang Grips"
+        "name": "Kor Dişi Eldivenleri"
       },
       "cinderfang_legs": {
-        "name": "Cinderfang Breeches"
+        "name": "Kor Dişi Pantolonu"
       },
       "smolderstrike_helmet": {
-        "name": "Smolderstrike Cowl"
+        "name": "Tüten Vuruş Başlığı"
       },
       "smolderstrike_shoulder": {
-        "name": "Smolderstrike Spaulders"
+        "name": "Tüten Vuruş Omuzlukları"
       },
       "smolderstrike_chest": {
-        "name": "Smolderstrike Tunic"
+        "name": "Tüten Vuruş Tuniği"
       },
       "smolderstrike_gloves": {
-        "name": "Smolderstrike Grips"
+        "name": "Tüten Vuruş Kavrama Eldivenleri"
       },
       "smolderstrike_legs": {
-        "name": "Smolderstrike Breeches"
+        "name": "Tüten Vuruş Pantolonu"
       },
       "ashveil_helmet": {
-        "name": "Ashveil Cowl"
+        "name": "Kül Örtüsü Başlığı"
       },
       "ashveil_shoulder": {
-        "name": "Ashveil Spaulders"
+        "name": "Kül Örtüsü Omuzlukları"
       },
       "ashveil_chest": {
-        "name": "Ashveil Tunic"
+        "name": "Kül Örtüsü Tuniği"
       },
       "ashveil_gloves": {
-        "name": "Ashveil Grips"
+        "name": "Kül Örtüsü Eldivenleri"
       },
       "ashveil_legs": {
-        "name": "Ashveil Breeches"
+        "name": "Kül Örtüsü Pantolonu"
       },
       "emberscreed_helmet": {
-        "name": "Creed of Embers Hood"
+        "name": "Korlar İnancı Başlığı"
       },
       "emberscreed_shoulder": {
-        "name": "Creed of Embers Mantle"
+        "name": "Korlar İnancı Omuz Pelerini"
       },
       "emberscreed_chest": {
-        "name": "Creed of Embers Robe"
+        "name": "Korlar İnancı Cübbesi"
       },
       "emberscreed_gloves": {
-        "name": "Creed of Embers Handwraps"
+        "name": "Korlar İnancı El Sargıları"
       },
       "emberscreed_legs": {
-        "name": "Creed of Embers Leggings"
+        "name": "Korlar İnancı Tozlukları"
       },
       "benison_dawnweave_helmet": {
-        "name": "Dawnweave Hood"
+        "name": "Şafak Dokuması Başlığı"
       },
       "benison_dawnweave_shoulder": {
-        "name": "Dawnweave Mantle"
+        "name": "Şafak Dokuması Omuz Pelerini"
       },
       "benison_dawnweave_chest": {
-        "name": "Dawnweave Robe"
+        "name": "Şafak Dokuması Cübbesi"
       },
       "benison_dawnweave_gloves": {
-        "name": "Dawnweave Handwraps"
+        "name": "Şafak Dokuması El Sargıları"
       },
       "benison_dawnweave_legs": {
-        "name": "Dawnweave Leggings"
+        "name": "Şafak Dokuması Tozlukları"
       },
       "vesperash_helmet": {
-        "name": "Vesperash Hood"
+        "name": "Akşam Külü Başlığı"
       },
       "vesperash_shoulder": {
-        "name": "Vesperash Mantle"
+        "name": "Akşam Külü Omuz Pelerini"
       },
       "vesperash_chest": {
-        "name": "Vesperash Robe"
+        "name": "Akşam Külü Cübbesi"
       },
       "vesperash_gloves": {
-        "name": "Vesperash Handwraps"
+        "name": "Akşam Külü El Sargıları"
       },
       "vesperash_legs": {
-        "name": "Vesperash Leggings"
+        "name": "Akşam Külü Tozlukları"
       },
       "stormkindled_helmet": {
-        "name": "Stormkindled Helm"
+        "name": "Fırtınayla Tutuşmuş Miğfer"
       },
       "stormkindled_shoulder": {
-        "name": "Stormkindled Pauldrons"
+        "name": "Fırtınayla Tutuşmuş Omuz Zırhları"
       },
       "stormkindled_chest": {
-        "name": "Stormkindled Hauberk"
+        "name": "Fırtınayla Tutuşmuş Hauberk"
       },
       "stormkindled_gloves": {
-        "name": "Stormkindled Gauntlets"
+        "name": "Fırtınayla Tutuşmuş Zırhlı Eldivenler"
       },
       "stormkindled_legs": {
-        "name": "Stormkindled Legguards"
+        "name": "Fırtınayla Tutuşmuş Baldır Zırhları"
       },
       "warspirit_emberscale_helmet": {
-        "name": "Emberscale Helm"
+        "name": "Kor Pullu Savaş Ruhu Miğferi"
       },
       "warspirit_emberscale_shoulder": {
-        "name": "Emberscale Pauldrons"
+        "name": "Kor Pullu Savaş Ruhu Omuzlukları"
       },
       "warspirit_emberscale_chest": {
-        "name": "Emberscale Hauberk"
+        "name": "Kor Pullu Savaş Ruhu Hauberki"
       },
       "warspirit_emberscale_gloves": {
-        "name": "Emberscale Gauntlets"
+        "name": "Kor Pullu Savaş Ruhu Zırhlı Eldivenleri"
       },
       "warspirit_emberscale_legs": {
-        "name": "Emberscale Legguards"
+        "name": "Kor Pullu Savaş Ruhu Baldır Zırhları"
       },
       "stonehearth_helmet": {
-        "name": "Stonehearth Helm"
+        "name": "Taşyürek Miğferi"
       },
       "stonehearth_shoulder": {
-        "name": "Stonehearth Pauldrons"
+        "name": "Taşyürek Omuz Zırhları"
       },
       "stonehearth_chest": {
-        "name": "Stonehearth Hauberk"
+        "name": "Taşyürek Hauberki"
       },
       "stonehearth_gloves": {
-        "name": "Stonehearth Gauntlets"
+        "name": "Taşyürek Zırhlı Eldivenleri"
       },
       "stonehearth_legs": {
-        "name": "Stonehearth Legguards"
+        "name": "Taşyürek Baldır Zırhları"
       },
       "springmender_helmet": {
-        "name": "Springmender Helm"
+        "name": "Pınar Onarıcının Miğferi"
       },
       "springmender_shoulder": {
-        "name": "Springmender Pauldrons"
+        "name": "Pınar Onarıcının Omuz Zırhları"
       },
       "springmender_chest": {
-        "name": "Springmender Hauberk"
+        "name": "Pınar Onarıcının Hauberki"
       },
       "springmender_gloves": {
-        "name": "Springmender Gauntlets"
+        "name": "Pınar Onarıcının Zırhlı Eldivenleri"
       },
       "springmender_legs": {
-        "name": "Springmender Legguards"
+        "name": "Pınar Onarıcının Baldır Zırhları"
       },
       "chronoweave_helmet": {
-        "name": "Aetherweave Hood"
+        "name": "Aether Dokuması Başlığı"
       },
       "chronoweave_shoulder": {
-        "name": "Aetherweave Mantle"
+        "name": "Aether Dokuması Omuz Pelerini"
       },
       "chronoweave_chest": {
-        "name": "Aetherweave Robe"
+        "name": "Aether Dokuması Cübbesi"
       },
       "chronoweave_gloves": {
-        "name": "Aetherweave Handwraps"
+        "name": "Aether Dokuması El Sargıları"
       },
       "chronoweave_legs": {
-        "name": "Aetherweave Leggings"
+        "name": "Aether Dokuması Tozlukları"
       },
       "pyroclast_helmet": {
-        "name": "Pyroclast Hood"
+        "name": "Piroklast Başlığı"
       },
       "pyroclast_shoulder": {
-        "name": "Pyroclast Mantle"
+        "name": "Piroklast Omuz Pelerini"
       },
       "pyroclast_chest": {
-        "name": "Pyroclast Robe"
+        "name": "Piroklast Cübbesi"
       },
       "pyroclast_gloves": {
-        "name": "Pyroclast Handwraps"
+        "name": "Piroklast El Sargıları"
       },
       "pyroclast_legs": {
-        "name": "Pyroclast Leggings"
+        "name": "Piroklast Tozlukları"
       },
       "frostquench_helmet": {
-        "name": "Frostquench Hood"
+        "name": "Don Söndüren Başlığı"
       },
       "frostquench_shoulder": {
-        "name": "Frostquench Mantle"
+        "name": "Don Söndüren Omuz Pelerini"
       },
       "frostquench_chest": {
-        "name": "Frostquench Robe"
+        "name": "Don Söndüren Cübbe"
       },
       "frostquench_gloves": {
-        "name": "Frostquench Handwraps"
+        "name": "Don Söndüren El Sargıları"
       },
       "frostquench_legs": {
-        "name": "Frostquench Leggings"
+        "name": "Don Söndüren Tozlukları"
       },
       "hexthread_helmet": {
-        "name": "Hexthread Hood"
+        "name": "Uğursuz İplik Başlığı"
       },
       "hexthread_shoulder": {
-        "name": "Hexthread Mantle"
+        "name": "Uğursuz İplik Omuz Pelerini"
       },
       "hexthread_chest": {
-        "name": "Hexthread Robe"
+        "name": "Uğursuz İplik Cübbesi"
       },
       "hexthread_gloves": {
-        "name": "Hexthread Handwraps"
+        "name": "Uğursuz İplik El Sargıları"
       },
       "hexthread_legs": {
-        "name": "Hexthread Leggings"
+        "name": "Uğursuz İplik Tozlukları"
       },
       "gravebrand_helmet": {
-        "name": "Gravebrand Hood"
+        "name": "Mezar Damgası Başlığı"
       },
       "gravebrand_shoulder": {
-        "name": "Gravebrand Mantle"
+        "name": "Mezar Damgası Omuz Pelerini"
       },
       "gravebrand_chest": {
-        "name": "Gravebrand Robe"
+        "name": "Mezar Damgası Cübbesi"
       },
       "gravebrand_gloves": {
-        "name": "Gravebrand Handwraps"
+        "name": "Mezar Damgası El Sargıları"
       },
       "gravebrand_legs": {
-        "name": "Gravebrand Leggings"
+        "name": "Mezar Damgası Tozlukları"
       },
       "ruincaller_helmet": {
-        "name": "Ruincaller Hood"
+        "name": "Yıkım Çağıranın Başlığı"
       },
       "ruincaller_shoulder": {
-        "name": "Ruincaller Mantle"
+        "name": "Yıkım Çağıranın Omuz Pelerini"
       },
       "ruincaller_chest": {
-        "name": "Ruincaller Robe"
+        "name": "Yıkım Çağıranın Cübbesi"
       },
       "ruincaller_gloves": {
-        "name": "Ruincaller Handwraps"
+        "name": "Yıkım Çağıranın El Sargıları"
       },
       "ruincaller_legs": {
-        "name": "Ruincaller Leggings"
+        "name": "Yıkım Çağıranın Tozlukları"
       },
       "moonscorch_helmet": {
-        "name": "Moonscorch Cowl"
+        "name": "Ay Yanığı Başlığı"
       },
       "moonscorch_shoulder": {
-        "name": "Moonscorch Spaulders"
+        "name": "Ay Yanığı Omuzlukları"
       },
       "moonscorch_chest": {
-        "name": "Moonscorch Tunic"
+        "name": "Ay Yanığı Tuniği"
       },
       "moonscorch_gloves": {
-        "name": "Moonscorch Grips"
+        "name": "Ay Yanığı Eldivenleri"
       },
       "moonscorch_legs": {
-        "name": "Moonscorch Breeches"
+        "name": "Ay Yanığı Pantolonu"
       },
       "wildfang_emberhide_helmet": {
-        "name": "Wildfang Cowl"
+        "name": "Yabani Diş Kor Derisi Başlığı"
       },
       "wildfang_emberhide_shoulder": {
-        "name": "Wildfang Spaulders"
+        "name": "Yabani Diş Kor Derisi Omuzlukları"
       },
       "wildfang_emberhide_chest": {
-        "name": "Wildfang Tunic"
+        "name": "Yabani Diş Kor Derisi Tuniği"
       },
       "wildfang_emberhide_gloves": {
-        "name": "Wildfang Grips"
+        "name": "Yabani Diş Kor Derisi Eldivenleri"
       },
       "wildfang_emberhide_legs": {
-        "name": "Wildfang Breeches"
+        "name": "Yabani Diş Kor Derisi Pantolonu"
       },
       "cinderbark_helmet": {
-        "name": "Cinderbark Cowl"
+        "name": "Kor Kabuğu Başlığı"
       },
       "cinderbark_shoulder": {
-        "name": "Cinderbark Spaulders"
+        "name": "Kor Kabuğu Omuzlukları"
       },
       "cinderbark_chest": {
-        "name": "Cinderbark Tunic"
+        "name": "Kor Kabuğu Tuniği"
       },
       "cinderbark_gloves": {
-        "name": "Cinderbark Grips"
+        "name": "Kor Kabuğu Eldivenleri"
       },
       "cinderbark_legs": {
-        "name": "Cinderbark Breeches"
+        "name": "Kor Kabuğu Pantolonu"
       },
       "grovespring_helmet": {
-        "name": "Grovespring Cowl"
+        "name": "Koruluk Pınarı Başlığı"
       },
       "grovespring_shoulder": {
-        "name": "Grovespring Spaulders"
+        "name": "Koruluk Pınarı Omuzlukları"
       },
       "grovespring_chest": {
-        "name": "Grovespring Tunic"
+        "name": "Koruluk Pınarı Tuniği"
       },
       "grovespring_gloves": {
-        "name": "Grovespring Grips"
+        "name": "Koruluk Pınarı Eldivenleri"
       },
       "grovespring_legs": {
-        "name": "Grovespring Breeches"
+        "name": "Koruluk Pınarı Pantolonu"
       },
       "sigil_anvil_helmet": {
-        "name": "Helm Sigil of the Anvil"
+        "name": "Örsün Miğfer Mührü"
       },
       "sigil_ember_helmet": {
-        "name": "Helm Sigil of the Ember"
+        "name": "Korun Miğfer Mührü"
       },
       "sigil_tempest_helmet": {
-        "name": "Helm Sigil of the Tempest"
+        "name": "Fırtınanın Miğfer Mührü"
       },
       "sigil_anvil_shoulder": {
-        "name": "Mantle Sigil of the Anvil"
+        "name": "Örsün Omuz Pelerini Mührü"
       },
       "sigil_ember_shoulder": {
-        "name": "Mantle Sigil of the Ember"
+        "name": "Korun Omuz Pelerini Mührü"
       },
       "sigil_tempest_shoulder": {
-        "name": "Mantle Sigil of the Tempest"
+        "name": "Fırtınanın Omuz Pelerini Mührü"
       },
       "sigil_anvil_chest": {
-        "name": "Robe Sigil of the Anvil"
+        "name": "Örsün Cübbe Mührü"
       },
       "sigil_ember_chest": {
-        "name": "Robe Sigil of the Ember"
+        "name": "Korun Cübbe Mührü"
       },
       "sigil_tempest_chest": {
-        "name": "Robe Sigil of the Tempest"
+        "name": "Fırtınanın Cübbe Mührü"
       },
       "sigil_anvil_gloves": {
-        "name": "Grip Sigil of the Anvil"
+        "name": "Örsün Kavrama Mührü"
       },
       "sigil_ember_gloves": {
-        "name": "Grip Sigil of the Ember"
+        "name": "Korun Kavrama Mührü"
       },
       "sigil_tempest_gloves": {
-        "name": "Grip Sigil of the Tempest"
+        "name": "Fırtınanın Kavrama Mührü"
       },
       "sigil_anvil_legs": {
-        "name": "Legging Sigil of the Anvil"
+        "name": "Örsün Tozluk Mührü"
       },
       "sigil_ember_legs": {
-        "name": "Legging Sigil of the Ember"
+        "name": "Korun Tozluk Mührü"
       },
       "sigil_tempest_legs": {
-        "name": "Legging Sigil of the Tempest"
+        "name": "Fırtınanın Tozluk Mührü"
       },
       "cord_of_the_last_flame": {
-        "name": "Cord of the Last Flame"
+        "name": "Son Alevin Kordonu"
       },
       "cindersoaked_slippers": {
-        "name": "Cindersoaked Slippers"
+        "name": "Kora Bulanmış Terlikler"
       },
       "springbinder_sash": {
-        "name": "Springbinder Sash"
+        "name": "Pınar Bağlayıcının Kuşağı"
       },
       "steps_of_quiet_water": {
-        "name": "Steps of Quiet Water"
+        "name": "Sessiz Suyun Adımları"
       },
       "cinderbark_cinch": {
-        "name": "Cinderbark Cinch"
+        "name": "Kor Kabuğu Kuşağı"
       },
       "ashenbark_treads": {
-        "name": "Ashenbark Treads"
+        "name": "Kül Kabuğu Pabuçları"
       },
       "slagstalker_belt": {
-        "name": "Slagstalker Belt"
+        "name": "Cüruf İz Sürücüsü Kemeri"
       },
       "ashrunner_boots": {
-        "name": "Ashrunner Boots"
+        "name": "Kül Koşucusu Çizmeleri"
       },
       "moonscorch_waistwrap": {
-        "name": "Moonscorch Waistwrap"
+        "name": "Ay Yanığı Bel Sargısı"
       },
       "scorchgrove_striders": {
-        "name": "Scorchgrove Striders"
+        "name": "Kavrulmuş Koruluk Yürüyüşçüleri"
       },
       "grovetender_belt": {
-        "name": "Grovetender Belt"
+        "name": "Koruluk Bekçisi Kemeri"
       },
       "dewfall_moccasins": {
-        "name": "Dewfall Moccasins"
+        "name": "Çiy Düşüşü Mokasenleri"
       },
       "forgewall_girdle": {
-        "name": "Forgewall Girdle"
+        "name": "Dövme Duvarı Kuşağı"
       },
       "anvilstance_sabatons": {
-        "name": "Anvilstance Sabatons"
+        "name": "Örs Duruşu Savaş Çizmeleri"
       },
       "warforged_waistguard": {
-        "name": "Warforged Waistguard"
+        "name": "Savaş Dövmesi Bel Koruması"
       },
       "furnace_march_greaves": {
-        "name": "Furnace March Greaves"
+        "name": "Fırın Yürüyüşü Baldır Zırhı"
       },
       "stormkindled_chain": {
-        "name": "Stormkindled Chain"
+        "name": "Fırtınayla Tutuşmuş Zincir"
       },
       "thundershock_treads": {
-        "name": "Thundershock Treads"
+        "name": "Gök Gürültüsü Şoku Yürüyüşçüleri"
       },
       "tidebinder_links": {
-        "name": "Tidebinder Links"
+        "name": "Gelgit Bağlayıcının Halkaları"
       },
       "springwarden_sabatons": {
-        "name": "Springwarden Sabatons"
+        "name": "Pınar Muhafızının Savaş Çizmeleri"
       },
       "pendant_of_the_first_tempering": {
-        "name": "Pendant of the First Tempering"
+        "name": "İlk Tavlamanın Kolyesi"
       },
       "ignivars_ember_choker": {
-        "name": "Ignivar's Ember Choker"
+        "name": "Ignivar'ın Kor Gerdanlığı"
       },
       "locket_of_the_last_flame": {
-        "name": "Locket of the Last Flame"
+        "name": "Son Alevin Madalyonu"
       },
       "heartspring_amulet": {
-        "name": "Heartspring Amulet"
+        "name": "Yürek Pınarı Muskası"
       },
       "seal_of_the_forgewall": {
-        "name": "Seal of the Forgewall"
+        "name": "Dövme Duvarı Mührü"
       },
       "band_of_marked_strikes": {
-        "name": "Band of Marked Strikes"
+        "name": "İşaretli Darbeler Yüzüğü"
       },
       "circle_of_cinders": {
-        "name": "Circle of Cinders"
+        "name": "Korlar Çemberi"
       },
       "loop_of_quiet_springs": {
-        "name": "Loop of Quiet Springs"
+        "name": "Sessiz Pınarlar Halkası"
       },
       "bulwark_of_the_inner_crucible": {
-        "name": "Bulwark of the Inner Crucible"
+        "name": "İç Pota Siperliği"
       },
       "ember_wardens_barrier": {
-        "name": "Ember Warden's Barrier"
+        "name": "Kor Muhafızının Bariyeri"
       },
       "orb_of_the_last_spring": {
-        "name": "Orb of the Last Spring"
+        "name": "Son Pınarın Küresi"
       },
       "cinder_of_the_first_design": {
-        "name": "Cinder of the First Design"
+        "name": "İlk Tasarımın Kor Parçası"
       },
       "forgefathers_warhammer": {
-        "name": "Forgefather's Warhammer"
+        "name": "Demirci Atanın Savaş Çekici"
       },
       "cinderfang_kris": {
-        "name": "Cinderfang Kris"
+        "name": "Kor Dişi Krisi"
       },
       "slagrender_cleaver": {
-        "name": "Slagrender Cleaver"
+        "name": "Cüruf Yaran Satır"
       },
       "anvilguard_blade": {
-        "name": "Anvilguard Blade"
+        "name": "Örs Muhafızı Kılıcı"
       },
       "heart_of_the_end_greatblade": {
-        "name": "Heart of the End Greatblade"
+        "name": "Sonun Yüce Kılıcı"
       },
       "staff_of_the_last_spring": {
-        "name": "Staff of the Last Spring"
+        "name": "Son Pınarın Asası"
       },
       "forgefire_spire": {
-        "name": "Forgefire Spire"
+        "name": "Dövme Ateşi Kulesi"
       },
       "springtouched_crozier": {
-        "name": "Springtouched Crozier"
+        "name": "Pınar Dokunuşlu Papaz Asası"
       },
       "wand_of_quenched_sparks": {
-        "name": "Wand of Quenched Sparks"
+        "name": "Sönmüş Kıvılcımların Asası"
       },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"
@@ -14670,10 +14670,10 @@ export const tr_TR: EnTranslations = {
         "name": "Yıldırım Adımlı Büyük Hindinin Dizginleri"
       },
       "varkhul_forgebreaker": {
-        "name": "Forgebreaker, Engine of Varkhul"
+        "name": "Dövme Kıran, Varkhul Motoru"
       },
       "varkhul_emberward": {
-        "name": "Emberward, Bulwark of Varkhul"
+        "name": "Kor Muhafızı, Varkhul Siper Duvarı"
       }
     },
     "mobs": {
@@ -14870,25 +14870,25 @@ export const tr_TR: EnTranslations = {
         "name": "Nythraxis, Dikenzirve Belası"
       },
       "ignivar_herald_of_the_last_flame": {
-        "name": "Ignivar, Herald of the Last Flame"
+        "name": "Ignivar, Son Alevin Habercisi"
       },
       "ignivar_heart_of_the_end": {
-        "name": "Ignivar Ashcaller"
+        "name": "Ignivar, Sonun Kalbi"
       },
       "ignivar_ember_sentinel": {
-        "name": "Ember Sentinel"
+        "name": "Ignivar Kor Nöbetçisi"
       },
       "ignivar_crucible_warden": {
-        "name": "Crucible Warden"
+        "name": "Ignivar Pota Muhafızı"
       },
       "ignivar_cinder_artificer": {
-        "name": "Cinder Artificer"
+        "name": "Ignivar Kül Zanaatkârı"
       },
       "varkhul_forgefather_of_the_last_flame": {
-        "name": "Varkhul, Forgefather of the Last Flame"
+        "name": "Varkhul, Son Alevin Demirhane Babası"
       },
       "derelict_mech": {
-        "name": "Derelict Mech"
+        "name": "Terk Edilmiş Mekanizma"
       },
       "reliquary_ledger_wraith": {
         "name": "Defter Hayaleti"
@@ -15551,19 +15551,19 @@ export const tr_TR: EnTranslations = {
         "greeting": "Vadi'deki bir şapel avlusundan dünyanın çatısına... izlediğimiz iz burada bitiyor. Dağın dinlediğini hissedebiliyorum."
       },
       "archivist_maelin_emberward": {
-        "name": "Archivist Maelin Emberward",
-        "title": "Crucible Archivist",
-        "greeting": "Every hammer mark in this place is a sentence. Help me read what Varkhul tried to hide."
+        "name": "Arşivci Maelin Kor Muhafızı",
+        "title": "Kor Muhafızı",
+        "greeting": "Demirhanenin kayıtlarına hoş geldin."
       },
       "archivist_maelin_ember_projection": {
-        "name": "Maelin's Ember Projection",
-        "title": "Ember Projection",
-        "greeting": "The embers carry Maelin's voice forward through the forge."
+        "name": "Arşivci Maelin Kor Yansıması",
+        "title": "Kor Yansıması",
+        "greeting": "Kül yankılarında hoş geldin."
       },
       "crucible_quartermaster": {
-        "name": "Quartermaster Bronn Emberward",
-        "title": "Crucible Quartermaster",
-        "greeting": "The forge marks its own. Bring me a sigil from the Crucible and I will fit you for war."
+        "name": "Pota Levazım Sorumlusu",
+        "title": "Mühür Tüccarı",
+        "greeting": "Pota mühürlerini mi arıyorsun?"
       },
       "brother_halven": {
         "name": "Birader Halven",
@@ -16714,35 +16714,35 @@ export const tr_TR: EnTranslations = {
         }
       },
       "q_ignivar_echoes_in_iron": {
-        "title": "Echoes in Iron",
-        "text": "These automata are not soldiers. They are drafts. Break each assembly line and listen when the final shell falls. The forge remembers what Varkhul tried to erase.",
-        "completion": "The echoes agree. Varkhul bound water from the dying Last Spring into living metal. These automatons were failed temperings. Only Ignivar endured.",
+        "title": "Demirdeki Yankılar",
+        "text": "Bu otomatlar asker değil. Bunlar ilk tasarımlar. Her üretim hattını kır ve son kabuk düştüğünde dinle. Demirhane, Varkhul’un silmeye çalıştığı şeyi hatırlıyor.",
+        "completion": "Demirhanenin yankıları artık sustu.",
         "objectives": {
           "0": {
-            "label": "Ember Sentinels destroyed"
+            "label": "Demir yankılarını araştır"
           },
           "1": {
-            "label": "Crucible Wardens destroyed"
+            "label": "Pota Muhafızını yen"
           }
         }
       },
       "q_ignivar_heralds_heart": {
-        "title": "The Herald's Heart",
-        "text": "The survivor named in every echo is Ignivar. Varkhul called him herald, seal, and key. Defeat him. If the records are true, his death will reveal what he was forged to guard.",
-        "completion": "Ignivar was never merely a guardian. His heart was the key, and its final plates opened the sealed crucible below.",
+        "title": "Habercinin Kalbi",
+        "text": "Her yankıda adı geçen hayatta kalan Ignivar. Varkhul ona haberci, mühür ve anahtar dedi. Onu yen. Kayıtlar doğruysa ölümü, neyi korumak üzere dövüldüğünü ortaya çıkaracak.",
+        "completion": "Ignivar hiçbir zaman yalnızca bir muhafız değildi. Kalbi anahtardı ve son plakaları aşağıdaki mühürlü potayı açtı.",
         "objectives": {
           "0": {
-            "label": "Ignivar defeated"
+            "label": "Ignivar’ı yen"
           }
         }
       },
       "q_ignivar_the_forgefather": {
-        "title": "The Forgefather",
-        "text": "The path below leads to Varkhul, Forgefather of the Last Flame. He imprisoned the Last Spring to make metal live, then forged Ignivar to keep the crime sealed. Enter the Inner Crucible and end his work.",
-        "completion": "The forge is silent at last. The spring may never recover, but Varkhul will shape no more lives into chains.",
+        "title": "Demirhane Babası",
+        "text": "Aşağıdaki yol, Son Alevin Demirhane Babası Varkhul’a çıkıyor. Metale hayat vermek için Son Pınar’ı hapse attı, ardından suçunu mühürlü tutmak için Ignivar’ı dövdü. İç Potaya gir ve onun işini sona erdir.",
+        "completion": "Demirhane nihayet sustu. Pınar asla toparlanamayabilir, ancak Varkhul artık hiçbir hayatı zincire dönüştürerek şekillendiremeyecek.",
         "objectives": {
           "0": {
-            "label": "Varkhul defeated"
+            "label": "Varkhul yenildi"
           }
         }
       },
@@ -18624,29 +18624,29 @@ export const tr_TR: EnTranslations = {
         "leaveText": "Dikenzirve'nin soğuk havasına geri dönersin."
       },
       "ignivar_forge_lift": {
-        "name": "The Forge-Lift",
-        "enterText": "The forge-lift shudders and sinks; hammerfall rises to meet you.",
-        "leaveText": "The lift hauls you back into the open air of the keep."
+        "name": "Demirhane Asansörü",
+        "enterText": "Demirhane asansörü sarsılarak aşağı iner; Çekiç Darbesi seni karşılamak üzere yükselir.",
+        "leaveText": "Asansör seni kalenin açık havasına geri çıkarır."
       },
       "ignivar_forge_approach": {
-        "name": "Halls of the First Tempering",
-        "enterText": "Hammerfall echoes through the Halls of the First Tempering.",
-        "leaveText": "You step away from the first forge and breathe freely again."
+        "name": "İlk Dövme Salonları",
+        "enterText": "Çekiç Darbesi, İlk Dövme Salonlarında yankılanıyor.",
+        "leaveText": "İlk demirhaneden uzaklaşıyorsun ve yeniden özgürce nefes alıyorsun."
       },
       "ignivar_raid_arena": {
-        "name": "Crucible of the Last Spring",
-        "enterText": "Heat shimmers above the sealed waters of the Crucible.",
-        "leaveText": "You step away from the Crucible and breathe freely again."
+        "name": "Son Pınar Potası",
+        "enterText": "Pota’nın mühürlü sularının üzerinde sıcaklık dalgalanıyor.",
+        "leaveText": "Pota’dan uzaklaşıyor ve yeniden özgürce nefes alıyorsun."
       },
       "ignivar_molten_assembly": {
-        "name": "Molten Assembly",
-        "enterText": "The opened gate leads into a molten assembly hall.",
-        "leaveText": "You leave the assembly line and return to the Crucible."
+        "name": "Erimiş Montaj Salonu",
+        "enterText": "Açılan kapı, erimiş bir montaj salonuna çıkıyor.",
+        "leaveText": "Montaj hattından ayrılıp Pota’ya dönüyorsun."
       },
       "ignivar_inner_crucible": {
-        "name": "The Inner Crucible",
-        "enterText": "The opened gate leads deeper into the Crucible.",
-        "leaveText": "You leave the silent depths of the Crucible."
+        "name": "İç Pota",
+        "enterText": "Açılan kapı Pota’nın daha derinlerine götürüyor.",
+        "leaveText": "Pota’nın sessiz derinliklerinden ayrılıyorsun."
       },
       "wildheart_basin": {
         "name": "Yaban Yürek Çukuru",
@@ -18880,182 +18880,182 @@ export const tr_TR: EnTranslations = {
     },
     "itemSets": {
       "ashveil": {
-        "name": "Ashveil Garb",
-        "bonus2": "Lurker's Strike hits 25 percent harder.",
-        "bonus4": "Your Veiled Edge strike hits for triple, up from double."
+        "name": "Kül Örtüsü Kuşamı",
+        "bonus2": "Sinsi Vuruş %25 daha fazla hasar verir.",
+        "bonus4": "Örtülü Keskinlik vuruşun iki yerine üç kat hasar verir."
       },
       "benison_dawnweave": {
-        "name": "Benison Dawnweave",
-        "bonus2": "Seraphic Vigil's rescue heals for 270, up from 180. Damage taken no longer delays your spellcasting.",
-        "bonus4": "When Seraphic Vigil triggers, its ally is also mended for 15 percent of their maximum health over 10 sec."
+        "name": "Lütuflu Şafak Dokuması",
+        "bonus2": "Serafik Nöbet’in kurtarma iyileştirmesi 180 yerine 270 olur. Alınan hasar artık büyü yapmanı geciktirmez.",
+        "bonus4": "Serafik Nöbet tetiklendiğinde müttefiki de 10 saniye boyunca azami sağlığının %15’i kadar iyileştirilir."
       },
       "boundstone_vanguard": {
         "name": "Bağlıtaş Öncüsü",
         "bonus3": "Saldırı ve büyü hızını %15 artırır."
       },
       "chronoweave": {
-        "name": "Aetherweave Vestments",
-        "bonus2": "Temporal Echo converts 50 percent of your single-target Arcane damage into healing. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Temporal Cascade's cooldown is reduced by 5 sec."
+        "name": "Aether Dokuması Giysileri",
+        "bonus2": "Zamansal Yankı, tek hedefli Gizemli hasarının %50’sini iyileştirmeye dönüştürür. Alınan hasar artık büyü yapmanı geciktirmez.",
+        "bonus4": "Zamansal Çağlayanın bekleme süresi 5 saniye azalır."
       },
       "cinderbark": {
-        "name": "Cinderbark Ward",
-        "bonus2": "Sweeping Claws has a 30 percent chance to bank an additional Old Blood.",
-        "bonus4": "Marrowbreak hits 30 percent harder, and its emergency guard no longer replaces the strike."
+        "name": "Kül Kabuğu Muhafızı",
+        "bonus2": "Süpürücü Pençelerin ek Eski Kan biriktirme şansı %30’dur.",
+        "bonus4": "İlik Kırma %30 daha fazla hasar verir ve acil savunması artık Vuruş’un yerini almaz."
       },
       "cinderfang": {
-        "name": "Cinderfang Shroud",
-        "bonus2": "Venom Ritual's energy refund rises to 20 per builder.",
-        "bonus4": "Venom Dart's cooldown is reduced to 4 sec."
+        "name": "Kül Dişi Örtüsü",
+        "bonus2": "Zehir Ritüeli enerji iadesi, her biriktirmede 20 olur.",
+        "bonus4": "Zehir Oku bekleme süresi 4 saniyeye düşer."
       },
       "coldsight_trackers": {
-        "name": "Coldsight Trackers",
-        "bonus2": "Measured Shot restores 5 additional Focus.",
-        "bonus4": "Long Draw critical strikes extend Cold Focus by 2 sec, up to 6 sec per activation."
+        "name": "Soğuk Görüş İz Sürücüleri",
+        "bonus2": "Ölçülü Atış 5 ek Odak yeniler.",
+        "bonus4": "Uzun Çekiş kritik vuruşları Soğuk Odağı 2 saniye uzatır; her etkinleştirmede en fazla 6 saniye."
       },
       "crownforged": {
         "name": "Bonewrought Kıyafetleri",
         "bonus2": "Saldırı gücünü 40 artırır.",
         "bonus4": "Silah kritik vuruşların hedefi Kemikkıymık ile parçalar, 12 sn boyunca her 2 sn'de 8 kanama hasarı verir. 3 kata kadar üst üste binebilir.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 5 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Saldırı ve büyü yapma hızını %4, İsabeti %3 artırır. Silahlarının kritik vuruşları hedefi Kemik Yarığı ile parçalar ve 12 saniye boyunca her 2 saniyede 5 hasar vererek kanatır. En fazla 3 kez birikir."
       },
       "dawnforged": {
-        "name": "Dawnforged Vestments",
-        "bonus2": "Beacon of Light copies 55 percent of your direct heals. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Radiant Resonance's empowered Dawn's Embrace is instant."
+        "name": "Şafak Dövmesi Giysileri",
+        "bonus2": "Işık Feneri doğrudan iyileştirmelerinin %55'ini kopyalar. Alınan hasar artık büyü yapmanı geciktirmez.",
+        "bonus4": "Parlak Rezonans'ın güçlendirilmiş Şafağın Kucaklayışı anında gerçekleşir."
       },
       "deathlord": {
         "name": "Barrowlord Savaş Takımı",
         "bonus2": "Saldırı gücünü 40 artırır.",
         "bonus4": "Silah kritik vuruşlarının %50 ihtimalle Mezargücü kazandırır, 10 sn boyunca saldırı gücünü 60 artırır.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 5 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Saldırı ve büyü yapma hızını %4, İsabeti %3 artırır. Silahlarının kritik vuruşları hedefi Kemik Yarığı ile parçalar ve 12 saniye boyunca her 2 saniyede 5 hasar vererek kanatır. En fazla 3 kez birikir."
       },
       "emberfury": {
-        "name": "Emberfury Harness",
-        "bonus2": "Your Enrage lasts 6 sec instead of 4.",
-        "bonus4": "Bloodletting always Enrages you, and its healing rises to 8 percent of your maximum health."
+        "name": "Kor Öfkesi Kuşamı",
+        "bonus2": "Öfkelenmen 4 yerine 6 saniye sürer.",
+        "bonus4": "Kan Akıtma seni her zaman Öfkelendirir ve iyileştirmesi azami sağlığının %8'ine çıkar."
       },
       "emberscreed": {
-        "name": "Creed of Embers Vestments",
-        "bonus2": "Your Doctrine link converts 10 percent more of your Holy damage into healing. Damage taken no longer delays your spellcasting.",
-        "bonus4": "When your Psalm of Warding is fully consumed, your next Scouring Hymn within 10 sec is instant. Cannot occur more than once every 15 sec."
+        "name": "Korlar İnancının Giysileri",
+        "bonus2": "Öğreti bağın, Kutsal hasarının %10 daha fazlasını iyileştirmeye dönüştürür. Alınan hasar artık büyü yapmanı geciktirmez.",
+        "bonus4": "Koruma İlahin tamamen tüketildiğinde, 10 saniye içinde kullandığın sonraki Arındırma İlahisi anında gerçekleşir. 15 saniyede birden fazla tetiklenemez."
       },
       "forgewall": {
-        "name": "Forgewall Aegis",
-        "bonus2": "Iron Resolve converts rage at 5 absorb per point instead of 4.",
-        "bonus4": "Casting Shieldcrack reduces Iron Resolve's remaining cooldown by 2 sec."
+        "name": "Dövme Duvarı Aegis",
+        "bonus2": "Demir Kararlılık, öfkeyi puan başına 4 yerine 5 emmeye dönüştürür.",
+        "bonus4": "Kalkan Çatlağı kullanmak Demir Kararlılığın kalan bekleme süresini 2 saniye azaltır."
       },
       "frostquench": {
-        "name": "Frostquench Weave",
-        "bonus2": "Rimelance critical strikes bank a second Icicle, up to the maximum of 5. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Winterlash plants 3 Winter's Chill charges, up from 2."
+        "name": "Don Söndüren Dokuma",
+        "bonus2": "Kırağı Mızrağının kritik vuruşları en fazla 5 olacak şekilde ikinci bir Buz Sarkıtı depolar. Alınan hasar artık büyü yapmanı geciktirmez.",
+        "bonus4": "Kış Yarası, 2 yerine 3 Kış Soğuğu yükü uygular."
       },
       "gravebrand": {
-        "name": "Gravebrand Regalia",
-        "bonus2": "Reaping Command's cooldown is reduced by 2 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Reaping Command's unison strikes deal 25 percent more damage."
+        "name": "Mezar Damgası Asaleti",
+        "bonus2": "Biçim Emrinin bekleme süresi 2 saniye azalır. Alınan hasar artık büyü yapmanı geciktirmez.",
+        "bonus4": "Biçim Emrinin birlik vuruşları %25 daha fazla hasar verir."
       },
       "greyjaw_stalker": {
         "name": "Greyjaw İzsürücü takımı",
         "bonus3": "Saldırı ve büyü hızını %15 artırır."
       },
       "grovespring": {
-        "name": "Grovespring Raiment",
-        "bonus2": "Swiftmend consumes your own Wildbloom or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Overbloom harvests 75 percent of your remaining effects and banks 1 Verdance afterward."
+        "name": "Koruluk Pınarı Giysisi",
+        "bonus2": "Çabuk İyileştirme önce kendi Yaban Çiçeğini veya İkinci Çiçeklenmeni tüketir ve %25 daha fazla iyileştirir. Alınan hasar artık büyü yapmanı geciktirmez.",
+        "bonus4": "Aşırı Çiçeklenme kalan etkilerinin %75'ini hasat eder ve ardından 1 Yeşerme depolar."
       },
       "hexthread": {
-        "name": "Hexthread Shroud",
-        "bonus2": "Needle of Fate grants 2 additional Condemnation. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Passing Sentence refunds 10 Condemnation."
+        "name": "Uğursuz İplik Örtüsü",
+        "bonus2": "Kader İğnesi 2 ek Mahkûmiyet kazandırır. Alınan hasar artık büyü yapmanı geciktirmez.",
+        "bonus4": "Geçen Hüküm 10 Mahkûmiyet iade eder."
       },
       "moonscorch": {
-        "name": "Moonscorch Raiment",
-        "bonus2": "Moonseed may extend Lunar Tempest twice per application, to a maximum of 12 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Moonsurge and Sunwake strike 25 percent harder."
+        "name": "Ay Yanığı Giysisi",
+        "bonus2": "Ay Tohumu, Ay Fırtınasını her uygulamada iki kez, en fazla 12 saniyeye kadar uzatabilir. Alınan hasar artık büyü yapmanı geciktirmez.",
+        "bonus4": "Ay Dalgası ve Güneş Uyanışı %25 daha sert vurur."
       },
       "necromancers": {
         "name": "Mournweave Giysileri",
         "bonus2": "Büyü gücünü 20 artırır. Alınan hasar artık büyü yapmanı geciktirmez (%100 büyü gecikme direnci).",
         "bonus4": "Büyülerinin %10 ihtimalle Berrak Büyü kazandırır, bir sonraki büyünü bedava yapar.",
-        "bonus6": "Increases attack and casting speed by 4%. Your spells have a 10% chance to grant Soulblaze, increasing spell power by 25 for 10 sec."
+        "bonus6": "Saldırı ve büyü yapma hızını %4 artırır. Büyülerinin %10 şansı Ruh Korunu kazandırır; bu, büyü gücünü 10 saniye boyunca 25 artırır."
       },
       "nighttalon": {
         "name": "Direfang Postu",
         "bonus2": "Saldırı gücünü 40 artırır.",
         "bonus4": "Silah kritik vuruşların bir Pürüzlü Yarık açar, hedefi 12 sn boyunca her 2 sn'de 6 kanama hasarıyla kanatır. 3 kata kadar üst üste binebilir.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 4 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Saldırı ve büyü yapma hızını %4, İsabeti %3 artırır. Silahlarının kritik vuruşları Pırtık Yara açarak hedefi 12 saniye boyunca her 2 saniyede 4 hasar için kanatır. En fazla 3 kez birikir."
       },
       "oathpyre": {
-        "name": "Oathpyre Bastion",
-        "bonus2": "Vowkeeper Strike's chance to arm Solar Reprisal rises to 30 percent, and blocking an attack arms it 40 percent of the time.",
-        "bonus4": "Consuming Solar Reprisal shields you for 6 percent of your maximum health for 10 sec."
+        "name": "Yemin Ateşi Burcu",
+        "bonus2": "Yemin Bekçisinin Vuruşunun Güneş Misillemesini hazırlama şansı %30'a çıkar; bir saldırıyı engellemek de onu %40 oranında hazırlar.",
+        "bonus4": "Güneş Misillemesini tüketmek, 10 saniye boyunca azami sağlığının %6'sı kadar kalkan sağlar."
       },
       "packlord_emberhide": {
-        "name": "Packlord's Emberhide",
-        "bonus2": "Pack Command's cooldown is reduced to 3 sec.",
-        "bonus4": "Pack Command's chance to reset Stampede's cooldown rises to 30 percent."
+        "name": "Sürü Efendisinin Kor Derisi",
+        "bonus2": "Sürü Emrinin bekleme süresi 3 saniyeye düşer.",
+        "bonus4": "Sürü Emrinin Çiğneme bekleme süresini sıfırlama şansı %30'a çıkar."
       },
       "pyroclast": {
-        "name": "Pyroclast Regalia",
-        "bonus2": "Scald always critically strikes targets at or below 35 percent health. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Your Fire spells' critical strikes outside Phoenix Trance reduce its remaining cooldown by 1.5 sec."
+        "name": "Piroklast Asaleti",
+        "bonus2": "Kavurma, sağlığı %35 veya altında olan hedeflere her zaman kritik vurur. Alınan hasar artık büyü yapmanı geciktirmez.",
+        "bonus4": "Anka Vecdi dışındaki Ateş büyülerinin kritik vuruşları kalan bekleme süresini 1,5 saniye azaltır."
       },
       "ruincaller": {
-        "name": "Ruincaller Vestments",
-        "bonus2": "Conflagrate holds 3 charges. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Ruinbolt strikes 20 percent harder."
+        "name": "Yıkım Çağıranın Giysileri",
+        "bonus2": "Büyük Yangın 3 yük tutar. Alınan hasar artık büyü yapmanı geciktirmez.",
+        "bonus4": "Yıkım Oku %20 daha sert vurur."
       },
       "slagbreaker": {
-        "name": "Slagbreaker Battlegear",
-        "bonus2": "Redhand empowers your next Maiming Strike by 30 percent per stack instead of 20.",
-        "bonus4": "Every second cast of Redhand reduces Breachmaker's remaining cooldown by 3 sec."
+        "name": "Cüruf Kıranın Savaş Donanımı",
+        "bonus2": "Kızıl El, her yükte sonraki Sakatlayıcı Vuruşu %20 yerine %30 güçlendirir.",
+        "bonus4": "Kızıl Elin her ikinci kullanımı, Yarık Açanın kalan bekleme süresini 3 saniye azaltır."
       },
       "slagsnare": {
-        "name": "Slagsnare Trappings",
-        "bonus2": "Gutting Strike generates 20 Focus.",
-        "bonus4": "Woundrend that consumes 3 Hunting Momentum preserves them. Cannot occur more than once every 8 sec."
+        "name": "Cüruf Tuzakçısının Donanımı",
+        "bonus2": "İçini Boşaltan Vuruş 20 Odak üretir.",
+        "bonus4": "3 Avlanma İvmesi tüketen Yara Yırtma bunları korur. 8 saniyede birden fazla gerçekleşemez."
       },
       "smolderstrike": {
-        "name": "Smolderstrike Leathers",
-        "bonus2": "Haymaker hits 20 percent harder.",
-        "bonus4": "Lights Out refunds 6 sec of Mirrored Blades' remaining cooldown."
+        "name": "Tüten Vuruşun Derileri",
+        "bonus2": "Balyoz %20 daha sert vurur.",
+        "bonus4": "Işıklar Sönsün, Aynalı Bıçakların kalan bekleme süresinden 6 saniye iade eder."
       },
       "soulflame": {
         "name": "Wraithfire Kıyafetleri",
         "bonus2": "Büyü gücünü 20 artırır. Alınan hasar artık büyü yapmanı geciktirmez (%100 büyü gecikme direnci).",
         "bonus4": "Büyülerinin %10 ihtimalle Ruhalazı kazandırır, 10 sn boyunca büyü gücünü 40 artırır.",
-        "bonus6": "Increases attack and casting speed by 4%. Your spells have a 10% chance to grant Soulblaze, increasing spell power by 25 for 10 sec."
+        "bonus6": "Saldırı ve büyü yapma hızını %4 artırır. Büyülerinin %10 şansı Ruh Korunu kazandırır; büyü gücünü 10 saniye boyunca 25 artırır."
       },
       "springmender": {
-        "name": "Springmender Scale",
-        "bonus2": "Tidecall's cooldown is reduced by 4 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Cascading Mend reaches a fourth ally and harvests Mending Currents at 150 percent."
+        "name": "Pınar Onarıcının Pulluğu",
+        "bonus2": "Gelgit Çağrısının bekleme süresi 4 saniye azalır. Alınan hasar artık büyü yapmanı geciktirmez.",
+        "bonus4": "Çağlayan Onarım dördüncü bir müttefike ulaşır ve Onarım Akıntılarını %150 oranında hasat eder."
       },
       "stonehearth": {
-        "name": "Stonehearth Bastion",
-        "bonus2": "While Stonebound, Stormcast Mending Waters costs no mana and heals 25 percent more.",
-        "bonus4": "While Stonebound, completing a cadence heals you for 3 percent of your maximum health."
+        "name": "Taşyüreğin Burcu",
+        "bonus2": "Taşa Bağlı durumdayken, Fırtına Çağrısı Onarım Suları mana harcamaz ve %25 daha fazla iyileştirir.",
+        "bonus4": "Taşa Bağlı durumdayken bir ritmi tamamlamak azami sağlığının %3'ü kadar iyileştirir."
       },
       "stormcallers": {
         "name": "Galecall Cübbeleri",
         "bonus2": "Büyü gücünü 20 artırır. Alınan hasar artık büyü yapmanı geciktirmez (%100 büyü gecikme direnci).",
         "bonus4": "Büyülerinin %10 ihtimalle Ruhalazı kazandırır, 10 sn boyunca büyü gücünü 40 artırır.",
-        "bonus6": "Increases attack and casting speed by 4%. Your spells have a 10% chance to grant Soulblaze, increasing spell power by 25 for 10 sec."
+        "bonus6": "Saldırı ve büyü yapma hızını %4 artırır. Büyülerinin %10 şansı Ruh Korunu kazandırır; büyü gücünü 10 saniye boyunca 25 artırır."
       },
       "stormkindled": {
-        "name": "Stormkindled Regalia",
-        "bonus2": "Unleash Weapon on Pyrebrand grants 3 Thunder. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Earthen Jolt's bonus per Thunder rises to 30 percent."
+        "name": "Fırtınayla Tutuşmuş Asalet",
+        "bonus2": "Ateş Damgasında Silahı Serbest Bırakmak 3 Gök Gürültüsü verir. Alınan hasar artık büyü yapmanı geciktirmez.",
+        "bonus4": "Toprak Sarsıntısının Gök Gürültüsü başına bonusu %30'a çıkar."
       },
       "vale_arcanist": {
         "name": "Vadi Arkanisti giysileri",
         "bonus3": "Saldırı ve büyü hızını %15 artırır."
       },
       "vesperash": {
-        "name": "Vesperash Shroud",
-        "bonus2": "Call Tithefiend's cooldown is reduced by 6 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Calling your Tithefiend resets Mindfracture's cooldown, and the fiend returns twice as much mana per hit."
+        "name": "Akşam Külünün Örtüsü",
+        "bonus2": "Öşür İblisini Çağırmanın bekleme süresi 6 saniye azalır. Alınan hasar artık büyü yapmanı geciktirmez.",
+        "bonus4": "Öşür İblisini çağırmak Zihin Yarığının bekleme süresini sıfırlar ve iblis vuruş başına iki kat mana döndürür."
       },
       "warfare_ashstalker": {
         "name": "Ashstalker Takımı",
@@ -19088,25 +19088,25 @@ export const tr_TR: EnTranslations = {
         "bonus7": "Harp Saldırı ve Savunma Derecesini 80 artırır. Büyülerinin %15 ihtimalle Diken Muhafızı verme şansı vardır, bu da kaçınmayı 6 sn boyunca %15 artırır."
       },
       "warspirit_emberscale": {
-        "name": "Warspirit Emberscale",
-        "bonus2": "Ancestral Strike advances your cadence 3 steps.",
-        "bonus4": "Ancestral Strike hits 30 percent harder."
+        "name": "Savaş Ruhu Kor Pulu",
+        "bonus2": "Ataların Vuruşu ritmini 3 adım ilerletir.",
+        "bonus4": "Ataların Vuruşu %30 daha sert vurur."
       },
       "wildfang_emberhide": {
-        "name": "Wildfang Emberhide",
-        "bonus2": "Redharvest restores 45 energy, up from 30.",
-        "bonus4": "Redharvest plants a fresh Flense on the target."
+        "name": "Yaban Dişinin Kor Derisi",
+        "bonus2": "Kızıl Hasat, 30 yerine 45 enerji yeniler.",
+        "bonus4": "Kızıl Hasat hedefe yeni bir Deri Yüzme etkisi uygular."
       },
       "wyrmshadow": {
         "name": "Nightfang Cübbeleri",
         "bonus2": "Saldırı gücünü 40 artırır.",
         "bonus4": "Silah kritik vuruşlarının %50 ihtimalle Dişhücumu kazandırır, 8 sn boyunca saldırı hızını %25 artırır.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 4 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Saldırı ve büyü yapma hızını %4, İsabeti %3 artırır. Silahlarının kritik vuruşları Pırtık Yara açarak hedefi 12 saniye boyunca her 2 saniyede 4 hasar için kanatır. En fazla 3 kez birikir."
       },
       "zealfire": {
-        "name": "Zealfire Warplate",
-        "bonus2": "Final Edict and Dawnfall cut each other's remaining cooldown by 3 sec instead of 2.",
-        "bonus4": "Hammer of Wrath cast under Dawn's Wrath strikes 40 percent harder, up from 20."
+        "name": "Zel Ateşi Savaş Zırhı",
+        "bonus2": "Son Ferman ve Şafak Çöküşü birbirlerinin kalan bekleme süresini 2 yerine 3 saniye azaltır.",
+        "bonus4": "Şafağın Gazabı altında kullanılan Gazap Çekici, 20 yerine yüzde 40 daha sert vurur."
       }
     }
   },

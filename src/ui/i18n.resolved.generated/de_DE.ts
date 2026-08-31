@@ -4654,8 +4654,8 @@ export const de_DE: EnTranslations = {
       "online": "Der Charakter ist derzeit online.",
       "rename_not_permitted": "Das Umbenennen dieses Charakters ist nicht erlaubt.",
       "delete_confirm": "Gib den Charakternamen ein, um das Löschen zu bestätigen.",
-      "storage_purchase_open": "A storage purchase must finish or be resolved before this character can be deleted.",
-      "delete_busy": "The realm is busy. Try deleting this character again in a moment.",
+      "storage_purchase_open": "Ein Lagerkauf muss abgeschlossen oder geklärt sein, bevor dieser Charakter gelöscht werden kann.",
+      "delete_busy": "Das Reich ist beschäftigt. Versuche, diesen Charakter gleich noch einmal zu löschen.",
       "already_in_world": "Der Charakter ist bereits in der Welt.",
       "taken_over": "Dein Charakter wurde von einer anderen Sitzung übernommen.",
       "rename_required": "Dieser Charakter muss vor dem Betreten der Welt umbenannt werden.",
@@ -5180,7 +5180,7 @@ export const de_DE: EnTranslations = {
       "ifPartySort": "Die Reihenfolge, in der Gruppenmitglieder aufgelistet werden: Gruppenreihenfolge, Rolle oder Name.",
       "ifPartyShowAuras": "Ob Stärkungs- und Schwächungseffekte auf den Gruppenfenstern erscheinen. Passende Schalter regeln Ressourcenbalken, Absorptionsschilde, Begleiter und ob Sie selbst in Ihrer eigenen Gruppenliste erscheinen.",
       "ifAurasOnPlayerFrame": "Zeigt Ihre Stärkungs- und Schwächungseffekte zusätzlich zur Auren-Leiste auch auf Ihrem eigenen Spielerfenster.",
-      "ifAlwaysShowAllBuffs": "Shows every active buff even on the Low graphics preset, bypassing its usual buff-icon cap.",
+      "ifAlwaysShowAllBuffs": "Zeigt jeden aktiven Stärkungseffekt auch bei der Grafikeinstellung Niedrig an und umgeht das übliche Limit für Stärkungssymbole.",
       "ifTargetOfTarget": "Zeigt, wen Ihr Ziel anvisiert, die klassische Art zu erkennen, ob der Tank es noch hält.",
       "ifPetFrame": "Zeigt ein Fenster für Ihren Begleiter.",
       "ifChatFontScale": "Die Textgröße des Chats.",
@@ -6667,7 +6667,7 @@ export const de_DE: EnTranslations = {
       "bankBody": "Jede größere Stadt beherbergt eine Filiale der Vergoldeten Schatulle, des Bankhauses des Reichs. Sprich dort mit dem Kämmerer, um deinen Tresor zu eröffnen: einen privaten Stauraum jenseits deiner Taschen, der deinem Charakter ein Leben lang erhalten bleibt. Was du dort zurücklässt, wartet sicher auf dich, welche Filiale du auch als Nächstes besuchst.",
       "bankHow": "Ist der Tresor geöffnet, klicke einen Gegenstand in deinen Taschen an, um ihn einzulagern, und klicke ihn im Tresor an, um ihn zurückzuholen. Der Tresor fasst nur Waren, niemals Münzen, und Questgegenstände bleiben bei dir. Wenn deine Taschen unterwegs überquellen, fegt ein einziger Knopf alle deine Handwerksmaterialien auf einmal hinein.",
       "bankSlots": "Ein frischer Tresor beginnt klein und wächst mit dir. Der Kämmerer verkauft weitere Fächer für Münzen zu immer steileren Preisen, und Online-Spielen bringt obendrein Bonusfächer ein, etwa für eine bestätigte E-Mail-Adresse, verknüpfte Konten und Freunde, die du ins Spiel holst.",
-      "bankSockets": "Past the slot ladder, the bursar also sells up to four bag sockets, unlocked in order at ever-steeper prices. Seat a spare bag from your carrying set in one and its slots join your vault room: an everyday bag widens the whole store, while a reagent satchel adds room only crafting materials may take. Click a bag in your bags to seat it and click the socket to take it back. Taking one back never costs you a thing you stored: if the vault ends up fuller than its shrunken room, everything stays put and new deposits simply wait for space.",
+      "bankSockets": "Nach den gestaffelten Lagerplatzerweiterungen verkauft der Kämmerer außerdem bis zu vier Taschenplätze, die der Reihe nach zu immer höheren Preisen freigeschaltet werden. Setze eine Ersatztasche aus deinem Trageset in einen Platz, und ihre Fächer werden Teil deines Tresorraums: Eine gewöhnliche Tasche erweitert das gesamte Lager, während eine Reagenzientasche nur Platz für Handwerksmaterialien schafft. Klicke auf eine Tasche in deinen Taschen, um sie einzusetzen, und auf den Platz, um sie wieder herauszunehmen. Beim Herausnehmen geht nichts verloren, was du eingelagert hast: Ist der Tresor danach voller als sein verkleinerter Raum, bleibt alles an seinem Platz, und neue Einlagerungen warten einfach auf freien Raum.",
       "buyingTitle": "Kaufen und Verkaufen",
       "buyingBody": "Sprich mit einem Händler und wähle, seine Waren durchzusehen, und sein Laden öffnet sich mit drei Reitern: Kaufen, Verkaufen und Rückkauf. Kaufen enthält alles, was er führt, deins, sofern du es dir leisten kannst. Verkaufen listet auf, was aus deinen Taschen er dir abkauft, und ein Stück mit eigener gewürfelter Güte zu verkaufen verlangt zuerst eine Bestätigung, sodass ein wertvolles Exemplar nie versehentlich verloren geht. Trennst du dich von etwas, das du bereust, hebt der Reiter Rückkauf deine jüngsten Verkäufe auf, sodass du sie für die Münzen zurückkaufen kannst, die du erhalten hast.",
       "junkTitle": "Plunder loswerden",
@@ -7711,7 +7711,7 @@ export const de_DE: EnTranslations = {
       "title": "Solana-Wallet verbinden",
       "linkBody": "Wähle eine Wallet-Erweiterung in diesem Browser. Du wirst eine Verifizierungsnachricht unterschreiben und dann zur Desktop-App zurückkehren.",
       "paymentBody": "Wähle die mit deinem Konto verknüpfte Wallet und genehmige die Transaktion in diesem Browser.",
-      "stepUpBody": "Choose the wallet linked to your account and sign the $WOC Exchange authorization message. Signing is free and moves no funds.",
+      "stepUpBody": "Wähle das mit deinem Konto verknüpfte Wallet und signiere die Autorisierungsnachricht für die $WOC-Börse. Das Signieren ist kostenlos und bewegt keine Guthaben.",
       "extensionHelp": "Es wurde keine kompatible Wallet-Erweiterung gefunden. Installiere oder entsperre Phantom, Solflare oder eine andere Solana-Browser-Wallet und versuche es erneut.",
       "safety": "World of ClaudeCraft fragt niemals nach deiner Wiederherstellungsphrase oder deinem privaten Schlüssel.",
       "continueWith": "Weiter mit {wallet}",
@@ -8102,18 +8102,18 @@ export const de_DE: EnTranslations = {
     "buyConfirmCancel": "Abbrechen"
   },
   "crucibleShop": {
-    "browse": "Redeem Sigils",
-    "browseAria": "Redeem Crucible sigils with {name}",
-    "empty": "No set pieces are redeemable for your class.",
-    "balance": "Your sigils: {list}",
+    "browse": "Siegel einlösen",
+    "browseAria": "Schmelztiegel-Siegel mit {name} einlösen",
+    "empty": "Für deine Klasse können keine Setgegenstände eingelöst werden.",
+    "balance": "Deine Siegel: {list}",
     "balanceEntry": "{name} x{count}",
-    "noSigils": "You hold no Crucible sigils.",
+    "noSigils": "Du besitzt keine Schmelztiegel-Siegel.",
     "price": "1 {sigil}",
-    "buyAria": "Redeem {sigil} for {item}",
-    "buyConfirmTitle": "Confirm Redemption",
-    "buyConfirmBody": "Redeem your {sigil} for {item}? A consumed sigil cannot be refunded.",
-    "buyConfirmAccept": "Redeem",
-    "buyConfirmCancel": "Cancel"
+    "buyAria": "{sigil} gegen {item} einlösen",
+    "buyConfirmTitle": "Einlösung bestätigen",
+    "buyConfirmBody": "Dein {sigil} gegen {item} einlösen? Ein verbrauchtes Siegel kann nicht erstattet werden.",
+    "buyConfirmAccept": "Einlösen",
+    "buyConfirmCancel": "Abbrechen"
   },
   "cardDuel": {
     "title": "Kartenkampf",
@@ -13254,25 +13254,25 @@ export const de_DE: EnTranslations = {
         "name": "Gartensträußchen von Dawnhold"
       },
       "wayfarers_backpack": {
-        "name": "Wayfarer's Backpack"
+        "name": "Rucksack des Wanderers"
       },
       "burlap_reagent_pouch": {
-        "name": "Burlap Reagent Pouch"
+        "name": "Jutebeutel für Reagenzien"
       },
       "necromancers_reagent_satchel": {
-        "name": "Necromancer's Reagent Satchel"
+        "name": "Reagenzbeutel des Nekromanten"
       },
       "duskweave_bag": {
-        "name": "Duskweave Bag"
+        "name": "Dämmergewebte Tasche"
       },
       "resonant_weave_bag": {
-        "name": "Resonantweave Bag"
+        "name": "Tasche des Resonanzgewebes"
       },
       "foragers_haversack": {
-        "name": "Forager's Haversack"
+        "name": "Rucksack des Nahrungssuchers"
       },
       "loombound_reagent_satchel": {
-        "name": "Loombound Reagent Satchel"
+        "name": "Reagenzbeutel der Webbindung"
       },
       "ps_briny_lure": {
         "name": "Salzköder"
@@ -13287,610 +13287,610 @@ export const de_DE: EnTranslations = {
         "name": "Übergangsstein"
       },
       "lastflame_core": {
-        "name": "Core of the Last Flame"
+        "name": "Kern der Letzten Flamme"
       },
       "slagbreaker_helmet": {
-        "name": "Slagbreaker Helm"
+        "name": "Helm des Schlackenbrechers"
       },
       "slagbreaker_shoulder": {
-        "name": "Slagbreaker Pauldrons"
+        "name": "Schulterstücke des Schlackenbrechers"
       },
       "slagbreaker_chest": {
-        "name": "Slagbreaker Hauberk"
+        "name": "Robe des Schlackenbrechers"
       },
       "slagbreaker_gloves": {
-        "name": "Slagbreaker Gauntlets"
+        "name": "Handschuhe des Schlackenbrechers"
       },
       "slagbreaker_legs": {
-        "name": "Slagbreaker Legguards"
+        "name": "Beinkleider des Schlackenbrechers"
       },
       "emberfury_helmet": {
-        "name": "Emberfury Helm"
+        "name": "Helm der Glutwut"
       },
       "emberfury_shoulder": {
-        "name": "Emberfury Pauldrons"
+        "name": "Schulterplatten der Glutwut"
       },
       "emberfury_chest": {
-        "name": "Emberfury Hauberk"
+        "name": "Brustharnisch der Glutwut"
       },
       "emberfury_gloves": {
-        "name": "Emberfury Gauntlets"
+        "name": "Stulpen der Glutwut"
       },
       "emberfury_legs": {
-        "name": "Emberfury Legguards"
+        "name": "Beinschützer der Glutwut"
       },
       "forgewall_helmet": {
-        "name": "Forgewall Helm"
+        "name": "Helm der Schmiedemauer"
       },
       "forgewall_shoulder": {
-        "name": "Forgewall Pauldrons"
+        "name": "Schulterplatten der Schmiedemauer"
       },
       "forgewall_chest": {
-        "name": "Forgewall Hauberk"
+        "name": "Halsberge der Schmiedemauer"
       },
       "forgewall_gloves": {
-        "name": "Forgewall Gauntlets"
+        "name": "Stulpen der Schmiedemauer"
       },
       "forgewall_legs": {
-        "name": "Forgewall Legguards"
+        "name": "Beinschützer der Schmiedemauer"
       },
       "dawnforged_helmet": {
-        "name": "Dawnforged Helm"
+        "name": "Helm der Morgenschmiede"
       },
       "dawnforged_shoulder": {
-        "name": "Dawnforged Pauldrons"
+        "name": "Schulterplatten der Morgenschmiede"
       },
       "dawnforged_chest": {
-        "name": "Dawnforged Hauberk"
+        "name": "Brustharnisch der Morgenschmiede"
       },
       "dawnforged_gloves": {
-        "name": "Dawnforged Gauntlets"
+        "name": "Stulpen der Morgenschmiede"
       },
       "dawnforged_legs": {
-        "name": "Dawnforged Legguards"
+        "name": "Beinschützer der Morgenschmiede"
       },
       "oathpyre_helmet": {
-        "name": "Oathpyre Helm"
+        "name": "Helm des Schwurfeuers"
       },
       "oathpyre_shoulder": {
-        "name": "Oathpyre Pauldrons"
+        "name": "Schulterplatten des Schwurfeuers"
       },
       "oathpyre_chest": {
-        "name": "Oathpyre Hauberk"
+        "name": "Kettenpanzer des Schwurfeuers"
       },
       "oathpyre_gloves": {
-        "name": "Oathpyre Gauntlets"
+        "name": "Panzerhandschuhe des Schwurfeuers"
       },
       "oathpyre_legs": {
-        "name": "Oathpyre Legguards"
+        "name": "Beinschützer des Schwurfeuers"
       },
       "zealfire_helmet": {
-        "name": "Zealfire Helm"
+        "name": "Helm des Eiferfeuers"
       },
       "zealfire_shoulder": {
-        "name": "Zealfire Pauldrons"
+        "name": "Schulterstücke des Eiferfeuers"
       },
       "zealfire_chest": {
-        "name": "Zealfire Hauberk"
+        "name": "Kettenpanzer des Eiferfeuers"
       },
       "zealfire_gloves": {
-        "name": "Zealfire Gauntlets"
+        "name": "Panzerhandschuhe des Eiferfeuers"
       },
       "zealfire_legs": {
-        "name": "Zealfire Legguards"
+        "name": "Beinschützer des Eiferfeuers"
       },
       "packlord_emberhide_helmet": {
-        "name": "Packlord's Cowl"
+        "name": "Kutte des Rudelführers"
       },
       "packlord_emberhide_shoulder": {
-        "name": "Packlord's Spaulders"
+        "name": "Schulterstücke des Rudelführers"
       },
       "packlord_emberhide_chest": {
-        "name": "Packlord's Tunic"
+        "name": "Tunika des Rudelführers"
       },
       "packlord_emberhide_gloves": {
-        "name": "Packlord's Grips"
+        "name": "Griffe des Rudelführers"
       },
       "packlord_emberhide_legs": {
-        "name": "Packlord's Breeches"
+        "name": "Beinkleider des Rudelführers"
       },
       "coldsight_trackers_helmet": {
-        "name": "Coldsight Cowl"
+        "name": "Kapuze der Kältesicht"
       },
       "coldsight_trackers_shoulder": {
-        "name": "Coldsight Spaulders"
+        "name": "Schulterstücke der Kältesicht"
       },
       "coldsight_trackers_chest": {
-        "name": "Coldsight Tunic"
+        "name": "Brustharnisch der Kältesicht"
       },
       "coldsight_trackers_gloves": {
-        "name": "Coldsight Grips"
+        "name": "Griffe der Kältesicht"
       },
       "coldsight_trackers_legs": {
-        "name": "Coldsight Breeches"
+        "name": "Beinkleider der Kältesicht"
       },
       "slagsnare_helmet": {
-        "name": "Slagsnare Cowl"
+        "name": "Kapuze der Schlackenfessel"
       },
       "slagsnare_shoulder": {
-        "name": "Slagsnare Spaulders"
+        "name": "Mantel der Schlackenfessel"
       },
       "slagsnare_chest": {
-        "name": "Slagsnare Tunic"
+        "name": "Robe der Schlackenfessel"
       },
       "slagsnare_gloves": {
-        "name": "Slagsnare Grips"
+        "name": "Griffe der Schlackenfessel"
       },
       "slagsnare_legs": {
-        "name": "Slagsnare Breeches"
+        "name": "Beinkleider der Schlackenfessel"
       },
       "cinderfang_helmet": {
-        "name": "Cinderfang Cowl"
+        "name": "Kapuze des Aschenzahns"
       },
       "cinderfang_shoulder": {
-        "name": "Cinderfang Spaulders"
+        "name": "Schulterstücke des Aschenzahns"
       },
       "cinderfang_chest": {
-        "name": "Cinderfang Tunic"
+        "name": "Brustharnisch des Aschenzahns"
       },
       "cinderfang_gloves": {
-        "name": "Cinderfang Grips"
+        "name": "Griffe des Aschenzahns"
       },
       "cinderfang_legs": {
-        "name": "Cinderfang Breeches"
+        "name": "Beinkleider des Aschenzahns"
       },
       "smolderstrike_helmet": {
-        "name": "Smolderstrike Cowl"
+        "name": "Kapuze des Glutstoßes"
       },
       "smolderstrike_shoulder": {
-        "name": "Smolderstrike Spaulders"
+        "name": "Mantel des Glutstoßes"
       },
       "smolderstrike_chest": {
-        "name": "Smolderstrike Tunic"
+        "name": "Robe des Glutstoßes"
       },
       "smolderstrike_gloves": {
-        "name": "Smolderstrike Grips"
+        "name": "Griffe des Glutstoßes"
       },
       "smolderstrike_legs": {
-        "name": "Smolderstrike Breeches"
+        "name": "Beinkleider des Glutstoßes"
       },
       "ashveil_helmet": {
-        "name": "Ashveil Cowl"
+        "name": "Kapuze des Aschenschleiers"
       },
       "ashveil_shoulder": {
-        "name": "Ashveil Spaulders"
+        "name": "Schulterstücke des Aschenschleiers"
       },
       "ashveil_chest": {
-        "name": "Ashveil Tunic"
+        "name": "Tunika des Aschenschleiers"
       },
       "ashveil_gloves": {
-        "name": "Ashveil Grips"
+        "name": "Handschuhe des Aschenschleiers"
       },
       "ashveil_legs": {
-        "name": "Ashveil Breeches"
+        "name": "Beinkleider des Aschenschleiers"
       },
       "emberscreed_helmet": {
-        "name": "Creed of Embers Hood"
+        "name": "Kapuze des Glutbekenntnisses"
       },
       "emberscreed_shoulder": {
-        "name": "Creed of Embers Mantle"
+        "name": "Mantel des Glutbekenntnisses"
       },
       "emberscreed_chest": {
-        "name": "Creed of Embers Robe"
+        "name": "Gewand des Glutbekenntnisses"
       },
       "emberscreed_gloves": {
-        "name": "Creed of Embers Handwraps"
+        "name": "Handwickel des Glutbekenntnisses"
       },
       "emberscreed_legs": {
-        "name": "Creed of Embers Leggings"
+        "name": "Beinkleider des Glutbekenntnisses"
       },
       "benison_dawnweave_helmet": {
-        "name": "Dawnweave Hood"
+        "name": "Kapuze des Morgengewebes"
       },
       "benison_dawnweave_shoulder": {
-        "name": "Dawnweave Mantle"
+        "name": "Mantel des Morgengewebes"
       },
       "benison_dawnweave_chest": {
-        "name": "Dawnweave Robe"
+        "name": "Robe des Morgengewebes"
       },
       "benison_dawnweave_gloves": {
-        "name": "Dawnweave Handwraps"
+        "name": "Handwickel des Morgengewebes"
       },
       "benison_dawnweave_legs": {
-        "name": "Dawnweave Leggings"
+        "name": "Gamaschen des Morgengewebes"
       },
       "vesperash_helmet": {
-        "name": "Vesperash Hood"
+        "name": "Kapuze der Abendasche"
       },
       "vesperash_shoulder": {
-        "name": "Vesperash Mantle"
+        "name": "Mantel der Abendasche"
       },
       "vesperash_chest": {
-        "name": "Vesperash Robe"
+        "name": "Robe der Abendasche"
       },
       "vesperash_gloves": {
-        "name": "Vesperash Handwraps"
+        "name": "Handwickel der Abendasche"
       },
       "vesperash_legs": {
-        "name": "Vesperash Leggings"
+        "name": "Beinkleider der Abendasche"
       },
       "stormkindled_helmet": {
-        "name": "Stormkindled Helm"
+        "name": "Helm des Sturmfeuers"
       },
       "stormkindled_shoulder": {
-        "name": "Stormkindled Pauldrons"
+        "name": "Schulterstücke des Sturmfeuers"
       },
       "stormkindled_chest": {
-        "name": "Stormkindled Hauberk"
+        "name": "Kettenpanzer des Sturmfeuers"
       },
       "stormkindled_gloves": {
-        "name": "Stormkindled Gauntlets"
+        "name": "Panzerhandschuhe des Sturmfeuers"
       },
       "stormkindled_legs": {
-        "name": "Stormkindled Legguards"
+        "name": "Beinschützer des Sturmfeuers"
       },
       "warspirit_emberscale_helmet": {
-        "name": "Emberscale Helm"
+        "name": "Helm des Kriegsgeistes"
       },
       "warspirit_emberscale_shoulder": {
-        "name": "Emberscale Pauldrons"
+        "name": "Schulterstücke des Kriegsgeistes"
       },
       "warspirit_emberscale_chest": {
-        "name": "Emberscale Hauberk"
+        "name": "Schuppenpanzer des Kriegsgeistes"
       },
       "warspirit_emberscale_gloves": {
-        "name": "Emberscale Gauntlets"
+        "name": "Panzerhandschuhe des Kriegsgeistes"
       },
       "warspirit_emberscale_legs": {
-        "name": "Emberscale Legguards"
+        "name": "Beinschützer des Kriegsgeistes"
       },
       "stonehearth_helmet": {
-        "name": "Stonehearth Helm"
+        "name": "Helm des Steinherzens"
       },
       "stonehearth_shoulder": {
-        "name": "Stonehearth Pauldrons"
+        "name": "Schulterstücke des Steinherzens"
       },
       "stonehearth_chest": {
-        "name": "Stonehearth Hauberk"
+        "name": "Robe des Steinherzens"
       },
       "stonehearth_gloves": {
-        "name": "Stonehearth Gauntlets"
+        "name": "Handschuhe des Steinherzens"
       },
       "stonehearth_legs": {
-        "name": "Stonehearth Legguards"
+        "name": "Beinkleider des Steinherzens"
       },
       "springmender_helmet": {
-        "name": "Springmender Helm"
+        "name": "Helm des Quellheilers"
       },
       "springmender_shoulder": {
-        "name": "Springmender Pauldrons"
+        "name": "Schulterstücke des Quellheilers"
       },
       "springmender_chest": {
-        "name": "Springmender Hauberk"
+        "name": "Robe des Quellheilers"
       },
       "springmender_gloves": {
-        "name": "Springmender Gauntlets"
+        "name": "Griffe des Quellheilers"
       },
       "springmender_legs": {
-        "name": "Springmender Legguards"
+        "name": "Beinkleider des Quellheilers"
       },
       "chronoweave_helmet": {
-        "name": "Aetherweave Hood"
+        "name": "Kapuze des Äthergewebes"
       },
       "chronoweave_shoulder": {
-        "name": "Aetherweave Mantle"
+        "name": "Mantel des Äthergewebes"
       },
       "chronoweave_chest": {
-        "name": "Aetherweave Robe"
+        "name": "Gewand des Äthergewebes"
       },
       "chronoweave_gloves": {
-        "name": "Aetherweave Handwraps"
+        "name": "Äthergewebte Handwickel"
       },
       "chronoweave_legs": {
-        "name": "Aetherweave Leggings"
+        "name": "Beinkleider des Äthergewebes"
       },
       "pyroclast_helmet": {
-        "name": "Pyroclast Hood"
+        "name": "Kapuze des Pyroklasten"
       },
       "pyroclast_shoulder": {
-        "name": "Pyroclast Mantle"
+        "name": "Mantel des Pyroklasten"
       },
       "pyroclast_chest": {
-        "name": "Pyroclast Robe"
+        "name": "Gewand des Pyroklasten"
       },
       "pyroclast_gloves": {
-        "name": "Pyroclast Handwraps"
+        "name": "Handwickel des Pyroklasten"
       },
       "pyroclast_legs": {
-        "name": "Pyroclast Leggings"
+        "name": "Beinkleider des Pyroklasten"
       },
       "frostquench_helmet": {
-        "name": "Frostquench Hood"
+        "name": "Kapuze der Frostlöschung"
       },
       "frostquench_shoulder": {
-        "name": "Frostquench Mantle"
+        "name": "Mantel der Frostlöschung"
       },
       "frostquench_chest": {
-        "name": "Frostquench Robe"
+        "name": "Robe der Frostlöschung"
       },
       "frostquench_gloves": {
-        "name": "Frostquench Handwraps"
+        "name": "Handwickel der Frostlöschung"
       },
       "frostquench_legs": {
-        "name": "Frostquench Leggings"
+        "name": "Beinkleider der Frostlöschung"
       },
       "hexthread_helmet": {
-        "name": "Hexthread Hood"
+        "name": "Kapuze des Fluchfadens"
       },
       "hexthread_shoulder": {
-        "name": "Hexthread Mantle"
+        "name": "Mantel des Fluchfadens"
       },
       "hexthread_chest": {
-        "name": "Hexthread Robe"
+        "name": "Robe des Fluchfadens"
       },
       "hexthread_gloves": {
-        "name": "Hexthread Handwraps"
+        "name": "Handwickel des Fluchfadens"
       },
       "hexthread_legs": {
-        "name": "Hexthread Leggings"
+        "name": "Beinkleider des Fluchfadens"
       },
       "gravebrand_helmet": {
-        "name": "Gravebrand Hood"
+        "name": "Kapuze der Grabesmale"
       },
       "gravebrand_shoulder": {
-        "name": "Gravebrand Mantle"
+        "name": "Mantel der Grabesmale"
       },
       "gravebrand_chest": {
-        "name": "Gravebrand Robe"
+        "name": "Robe der Grabesmale"
       },
       "gravebrand_gloves": {
-        "name": "Gravebrand Handwraps"
+        "name": "Handwickel der Grabesmale"
       },
       "gravebrand_legs": {
-        "name": "Gravebrand Leggings"
+        "name": "Beinkleider der Grabesmale"
       },
       "ruincaller_helmet": {
-        "name": "Ruincaller Hood"
+        "name": "Kapuze des Ruinenrufers"
       },
       "ruincaller_shoulder": {
-        "name": "Ruincaller Mantle"
+        "name": "Mantel des Ruinenrufers"
       },
       "ruincaller_chest": {
-        "name": "Ruincaller Robe"
+        "name": "Robe des Ruinenrufers"
       },
       "ruincaller_gloves": {
-        "name": "Ruincaller Handwraps"
+        "name": "Handwickel des Ruinenrufers"
       },
       "ruincaller_legs": {
-        "name": "Ruincaller Leggings"
+        "name": "Beinkleider des Ruinenrufers"
       },
       "moonscorch_helmet": {
-        "name": "Moonscorch Cowl"
+        "name": "Kutte des Mondbrandes"
       },
       "moonscorch_shoulder": {
-        "name": "Moonscorch Spaulders"
+        "name": "Schulterstücke des Mondbrandes"
       },
       "moonscorch_chest": {
-        "name": "Moonscorch Tunic"
+        "name": "Tunika des Mondbrandes"
       },
       "moonscorch_gloves": {
-        "name": "Moonscorch Grips"
+        "name": "Griffe des Mondbrandes"
       },
       "moonscorch_legs": {
-        "name": "Moonscorch Breeches"
+        "name": "Beinkleider des Mondbrandes"
       },
       "wildfang_emberhide_helmet": {
-        "name": "Wildfang Cowl"
+        "name": "Kapuze des Wildfangs"
       },
       "wildfang_emberhide_shoulder": {
-        "name": "Wildfang Spaulders"
+        "name": "Schulterstücke des Wildfangs"
       },
       "wildfang_emberhide_chest": {
-        "name": "Wildfang Tunic"
+        "name": "Tunika des Wildfangs"
       },
       "wildfang_emberhide_gloves": {
-        "name": "Wildfang Grips"
+        "name": "Griffe des Wildfangs"
       },
       "wildfang_emberhide_legs": {
-        "name": "Wildfang Breeches"
+        "name": "Beinkleider des Wildfangs"
       },
       "cinderbark_helmet": {
-        "name": "Cinderbark Cowl"
+        "name": "Kapuze der Aschenrinde"
       },
       "cinderbark_shoulder": {
-        "name": "Cinderbark Spaulders"
+        "name": "Schulterstücke der Aschenrinde"
       },
       "cinderbark_chest": {
-        "name": "Cinderbark Tunic"
+        "name": "Brustharnisch der Aschenrinde"
       },
       "cinderbark_gloves": {
-        "name": "Cinderbark Grips"
+        "name": "Griffe der Aschenrinde"
       },
       "cinderbark_legs": {
-        "name": "Cinderbark Breeches"
+        "name": "Beinkleider der Aschenrinde"
       },
       "grovespring_helmet": {
-        "name": "Grovespring Cowl"
+        "name": "Kutte der Hainquelle"
       },
       "grovespring_shoulder": {
-        "name": "Grovespring Spaulders"
+        "name": "Schulterstücke der Hainquelle"
       },
       "grovespring_chest": {
-        "name": "Grovespring Tunic"
+        "name": "Tunika der Hainquelle"
       },
       "grovespring_gloves": {
-        "name": "Grovespring Grips"
+        "name": "Griffe der Hainquelle"
       },
       "grovespring_legs": {
-        "name": "Grovespring Breeches"
+        "name": "Beinkleider der Hainquelle"
       },
       "sigil_anvil_helmet": {
-        "name": "Helm Sigil of the Anvil"
+        "name": "Helm des Amboss-Siegels"
       },
       "sigil_ember_helmet": {
-        "name": "Helm Sigil of the Ember"
+        "name": "Helm des Glut-Siegels"
       },
       "sigil_tempest_helmet": {
-        "name": "Helm Sigil of the Tempest"
+        "name": "Helm des Sturm-Siegels"
       },
       "sigil_anvil_shoulder": {
-        "name": "Mantle Sigil of the Anvil"
+        "name": "Mantel des Amboss-Siegels"
       },
       "sigil_ember_shoulder": {
-        "name": "Mantle Sigil of the Ember"
+        "name": "Mantel des Glut-Siegels"
       },
       "sigil_tempest_shoulder": {
-        "name": "Mantle Sigil of the Tempest"
+        "name": "Mantel des Sturm-Siegels"
       },
       "sigil_anvil_chest": {
-        "name": "Robe Sigil of the Anvil"
+        "name": "Robe des Amboss-Siegels"
       },
       "sigil_ember_chest": {
-        "name": "Robe Sigil of the Ember"
+        "name": "Robe des Glut-Siegels"
       },
       "sigil_tempest_chest": {
-        "name": "Robe Sigil of the Tempest"
+        "name": "Robe des Sturm-Siegels"
       },
       "sigil_anvil_gloves": {
-        "name": "Grip Sigil of the Anvil"
+        "name": "Griffe des Amboss-Siegels"
       },
       "sigil_ember_gloves": {
-        "name": "Grip Sigil of the Ember"
+        "name": "Griffe des Glut-Siegels"
       },
       "sigil_tempest_gloves": {
-        "name": "Grip Sigil of the Tempest"
+        "name": "Griffe des Sturm-Siegels"
       },
       "sigil_anvil_legs": {
-        "name": "Legging Sigil of the Anvil"
+        "name": "Beinkleider des Amboss-Siegels"
       },
       "sigil_ember_legs": {
-        "name": "Legging Sigil of the Ember"
+        "name": "Beinkleider des Glut-Siegels"
       },
       "sigil_tempest_legs": {
-        "name": "Legging Sigil of the Tempest"
+        "name": "Beinkleider des Sturm-Siegels"
       },
       "cord_of_the_last_flame": {
-        "name": "Cord of the Last Flame"
+        "name": "Schnur der Letzten Flamme"
       },
       "cindersoaked_slippers": {
-        "name": "Cindersoaked Slippers"
+        "name": "Aschedurchtränkte Pantoffeln"
       },
       "springbinder_sash": {
-        "name": "Springbinder Sash"
+        "name": "Schärpe des Quellbinders"
       },
       "steps_of_quiet_water": {
-        "name": "Steps of Quiet Water"
+        "name": "Schritte des stillen Wassers"
       },
       "cinderbark_cinch": {
-        "name": "Cinderbark Cinch"
+        "name": "Gürtel der Aschenrinde"
       },
       "ashenbark_treads": {
-        "name": "Ashenbark Treads"
+        "name": "Treter der Aschenrinde"
       },
       "slagstalker_belt": {
-        "name": "Slagstalker Belt"
+        "name": "Gürtel des Schlackenpirschers"
       },
       "ashrunner_boots": {
-        "name": "Ashrunner Boots"
+        "name": "Stiefel des Aschenläufers"
       },
       "moonscorch_waistwrap": {
-        "name": "Moonscorch Waistwrap"
+        "name": "Taillenband des Mondbrandes"
       },
       "scorchgrove_striders": {
-        "name": "Scorchgrove Striders"
+        "name": "Schreiter des Gluthains"
       },
       "grovetender_belt": {
-        "name": "Grovetender Belt"
+        "name": "Gürtel des Hainhüters"
       },
       "dewfall_moccasins": {
-        "name": "Dewfall Moccasins"
+        "name": "Taufall-Mokassins"
       },
       "forgewall_girdle": {
-        "name": "Forgewall Girdle"
+        "name": "Gürtel der Schmiedemauer"
       },
       "anvilstance_sabatons": {
-        "name": "Anvilstance Sabatons"
+        "name": "Sabatons der Ambosshaltung"
       },
       "warforged_waistguard": {
-        "name": "Warforged Waistguard"
+        "name": "Taillenschutz des Kriegsgeschmiedeten"
       },
       "furnace_march_greaves": {
-        "name": "Furnace March Greaves"
+        "name": "Beinschienen des Ofenmarschs"
       },
       "stormkindled_chain": {
-        "name": "Stormkindled Chain"
+        "name": "Kette des Sturmfeuers"
       },
       "thundershock_treads": {
-        "name": "Thundershock Treads"
+        "name": "Donnerschock-Treter"
       },
       "tidebinder_links": {
-        "name": "Tidebinder Links"
+        "name": "Glieder des Gezeitenbinders"
       },
       "springwarden_sabatons": {
-        "name": "Springwarden Sabatons"
+        "name": "Sabaton des Quellhüters"
       },
       "pendant_of_the_first_tempering": {
-        "name": "Pendant of the First Tempering"
+        "name": "Anhänger der Ersten Härtung"
       },
       "ignivars_ember_choker": {
-        "name": "Ignivar's Ember Choker"
+        "name": "Aschenhalsreif des Ignivar"
       },
       "locket_of_the_last_flame": {
-        "name": "Locket of the Last Flame"
+        "name": "Medaillon der Letzten Flamme"
       },
       "heartspring_amulet": {
-        "name": "Heartspring Amulet"
+        "name": "Amulett der Herzquelle"
       },
       "seal_of_the_forgewall": {
-        "name": "Seal of the Forgewall"
+        "name": "Siegel der Schmiedemauer"
       },
       "band_of_marked_strikes": {
-        "name": "Band of Marked Strikes"
+        "name": "Ring der Gezeichneten Schläge"
       },
       "circle_of_cinders": {
-        "name": "Circle of Cinders"
+        "name": "Kreis der Asche"
       },
       "loop_of_quiet_springs": {
-        "name": "Loop of Quiet Springs"
+        "name": "Ring der Stillen Quellen"
       },
       "bulwark_of_the_inner_crucible": {
-        "name": "Bulwark of the Inner Crucible"
+        "name": "Bollwerk des Inneren Schmelztiegels"
       },
       "ember_wardens_barrier": {
-        "name": "Ember Warden's Barrier"
+        "name": "Barriere des Glutwächters"
       },
       "orb_of_the_last_spring": {
-        "name": "Orb of the Last Spring"
+        "name": "Kugel der Letzten Quelle"
       },
       "cinder_of_the_first_design": {
-        "name": "Cinder of the First Design"
+        "name": "Asche des Ersten Entwurfs"
       },
       "forgefathers_warhammer": {
-        "name": "Forgefather's Warhammer"
+        "name": "Kriegshammer des Schmiedevaters"
       },
       "cinderfang_kris": {
-        "name": "Cinderfang Kris"
+        "name": "Kris des Aschenzahns"
       },
       "slagrender_cleaver": {
-        "name": "Slagrender Cleaver"
+        "name": "Schlackenreißer-Klinge"
       },
       "anvilguard_blade": {
-        "name": "Anvilguard Blade"
+        "name": "Klinge der Ambosswache"
       },
       "heart_of_the_end_greatblade": {
-        "name": "Heart of the End Greatblade"
+        "name": "Großklinge des Endherzens"
       },
       "staff_of_the_last_spring": {
-        "name": "Staff of the Last Spring"
+        "name": "Stab des letzten Frühlings"
       },
       "forgefire_spire": {
-        "name": "Forgefire Spire"
+        "name": "Schmiedefeuerspitze"
       },
       "springtouched_crozier": {
-        "name": "Springtouched Crozier"
+        "name": "Krummstab der Frühlingsberührung"
       },
       "wand_of_quenched_sparks": {
-        "name": "Wand of Quenched Sparks"
+        "name": "Stab der erloschenen Funken"
       },
       "conjured_water4": {
         "name": "Herbeigezaubertes Quellwasser"
@@ -14670,10 +14670,10 @@ export const de_DE: EnTranslations = {
         "name": "Zügel von Donnerstolz, dem Großen Puter"
       },
       "varkhul_forgebreaker": {
-        "name": "Forgebreaker, Engine of Varkhul"
+        "name": "Schmiedebrecher, Triebwerk von Varkhul"
       },
       "varkhul_emberward": {
-        "name": "Emberward, Bulwark of Varkhul"
+        "name": "Glutwacht, Bollwerk von Varkhul"
       }
     },
     "mobs": {
@@ -14870,25 +14870,25 @@ export const de_DE: EnTranslations = {
         "name": "Nythraxis, Geißel von Thornpeak"
       },
       "ignivar_herald_of_the_last_flame": {
-        "name": "Ignivar, Herald of the Last Flame"
+        "name": "Ignivar, Herold der Letzten Flamme"
       },
       "ignivar_heart_of_the_end": {
-        "name": "Ignivar Ashcaller"
+        "name": "Ignivar, Aschenrufer"
       },
       "ignivar_ember_sentinel": {
-        "name": "Ember Sentinel"
+        "name": "Glutwache"
       },
       "ignivar_crucible_warden": {
-        "name": "Crucible Warden"
+        "name": "Schmelztiegelwächter"
       },
       "ignivar_cinder_artificer": {
-        "name": "Cinder Artificer"
+        "name": "Schlackenkonstrukteur"
       },
       "varkhul_forgefather_of_the_last_flame": {
-        "name": "Varkhul, Forgefather of the Last Flame"
+        "name": "Varkhul, Schmiedevater der Letzten Flamme"
       },
       "derelict_mech": {
-        "name": "Derelict Mech"
+        "name": "Verlassener Mech"
       },
       "reliquary_ledger_wraith": {
         "name": "Verzeichnisgespenst"
@@ -15551,19 +15551,19 @@ export const de_DE: EnTranslations = {
         "greeting": "Vom Kapellenhof im Tal bis zum Dach der Welt... die Spur endet hier. Ich spüre, wie der Berg lauscht."
       },
       "archivist_maelin_emberward": {
-        "name": "Archivist Maelin Emberward",
-        "title": "Crucible Archivist",
-        "greeting": "Every hammer mark in this place is a sentence. Help me read what Varkhul tried to hide."
+        "name": "Archivar Maelin Glutwacht",
+        "title": "Schmelztiegelarchivar",
+        "greeting": "Jeder Hammerschlag an diesem Ort ist ein Satz. Hilf mir zu lesen, was Varkhul zu verbergen versuchte."
       },
       "archivist_maelin_ember_projection": {
-        "name": "Maelin's Ember Projection",
-        "title": "Ember Projection",
-        "greeting": "The embers carry Maelin's voice forward through the forge."
+        "name": "Maelins Glutprojektion",
+        "title": "Glutprojektion",
+        "greeting": "Die Glut trägt Maelins Stimme durch die Schmiede weiter."
       },
       "crucible_quartermaster": {
-        "name": "Quartermaster Bronn Emberward",
-        "title": "Crucible Quartermaster",
-        "greeting": "The forge marks its own. Bring me a sigil from the Crucible and I will fit you for war."
+        "name": "Quartiermeister Bronn Glutwacht",
+        "title": "Schmelztiegel-Quartiermeister",
+        "greeting": "Die Schmiede erkennt die Ihren. Bring mir ein Siegel aus dem Schmelztiegel, und ich rüste dich für den Krieg aus."
       },
       "brother_halven": {
         "name": "Bruder Halven",
@@ -16714,35 +16714,35 @@ export const de_DE: EnTranslations = {
         }
       },
       "q_ignivar_echoes_in_iron": {
-        "title": "Echoes in Iron",
-        "text": "These automata are not soldiers. They are drafts. Break each assembly line and listen when the final shell falls. The forge remembers what Varkhul tried to erase.",
-        "completion": "The echoes agree. Varkhul bound water from the dying Last Spring into living metal. These automatons were failed temperings. Only Ignivar endured.",
+        "title": "Echos im Eisen",
+        "text": "Diese Automaten sind keine Soldaten. Sie sind Entwürfe. Zerschlage jede Fertigungslinie und lausche, wenn die letzte Hülle fällt. Die Schmiede erinnert sich daran, was Varkhul auszulöschen versuchte.",
+        "completion": "Die Echos stimmen überein. Varkhul band Wasser aus dem sterbenden Letzten Quell in lebendiges Metall. Diese Automaten waren fehlgeschlagene Härtungen. Nur Ignivar hielt stand.",
         "objectives": {
           "0": {
-            "label": "Ember Sentinels destroyed"
+            "label": "Glutwachen zerstört"
           },
           "1": {
-            "label": "Crucible Wardens destroyed"
+            "label": "Schmelztiegelwächter zerstört"
           }
         }
       },
       "q_ignivar_heralds_heart": {
-        "title": "The Herald's Heart",
-        "text": "The survivor named in every echo is Ignivar. Varkhul called him herald, seal, and key. Defeat him. If the records are true, his death will reveal what he was forged to guard.",
-        "completion": "Ignivar was never merely a guardian. His heart was the key, and its final plates opened the sealed crucible below.",
+        "title": "Das Herz des Herolds",
+        "text": "Der in jedem Echo genannte Überlebende ist Ignivar. Varkhul nannte ihn Herold, Siegel und Schlüssel. Besiege ihn. Wenn die Aufzeichnungen stimmen, wird sein Tod enthüllen, was zu bewachen er geschmiedet wurde.",
+        "completion": "Ignivar war nie bloß ein Wächter. Sein Herz war der Schlüssel, und seine letzten Platten öffneten den versiegelten Schmelztiegel darunter.",
         "objectives": {
           "0": {
-            "label": "Ignivar defeated"
+            "label": "Ignivar besiegt"
           }
         }
       },
       "q_ignivar_the_forgefather": {
-        "title": "The Forgefather",
-        "text": "The path below leads to Varkhul, Forgefather of the Last Flame. He imprisoned the Last Spring to make metal live, then forged Ignivar to keep the crime sealed. Enter the Inner Crucible and end his work.",
-        "completion": "The forge is silent at last. The spring may never recover, but Varkhul will shape no more lives into chains.",
+        "title": "Der Schmiedevater",
+        "text": "Der Weg darunter führt zu Varkhul, dem Schmiedevater der Letzten Flamme. Er sperrte den Letzten Quell ein, um Metall Leben einzuhauchen, und schmiedete dann Ignivar, um das Verbrechen geheim zu halten. Betritt den Inneren Schmelztiegel und beende sein Werk.",
+        "completion": "Die Schmiede ist endlich still. Der Quell wird sich vielleicht nie erholen, aber Varkhul wird keine Leben mehr in Ketten schmieden.",
         "objectives": {
           "0": {
-            "label": "Varkhul defeated"
+            "label": "Varkhul besiegt"
           }
         }
       },
@@ -18624,29 +18624,29 @@ export const de_DE: EnTranslations = {
         "leaveText": "Ihr kehrt in die kalte Luft von Thornpeak zurück."
       },
       "ignivar_forge_lift": {
-        "name": "The Forge-Lift",
-        "enterText": "The forge-lift shudders and sinks; hammerfall rises to meet you.",
-        "leaveText": "The lift hauls you back into the open air of the keep."
+        "name": "Schmiedeaufzug",
+        "enterText": "Der Schmiedeaufzug bebt und sinkt; Hammerschläge steigen dir entgegen.",
+        "leaveText": "Der Aufzug bringt dich zurück an die freie Luft der Festung."
       },
       "ignivar_forge_approach": {
-        "name": "Halls of the First Tempering",
-        "enterText": "Hammerfall echoes through the Halls of the First Tempering.",
-        "leaveText": "You step away from the first forge and breathe freely again."
+        "name": "Hallen der Ersten Härtung",
+        "enterText": "Hammerschläge hallen durch die Hallen der Ersten Härtung.",
+        "leaveText": "Du trittst von der ersten Schmiede zurück und atmest wieder frei."
       },
       "ignivar_raid_arena": {
-        "name": "Crucible of the Last Spring",
-        "enterText": "Heat shimmers above the sealed waters of the Crucible.",
-        "leaveText": "You step away from the Crucible and breathe freely again."
+        "name": "Schmelztiegel des Letzten Quells",
+        "enterText": "Hitze flimmert über den versiegelten Wassern des Schmelztiegels.",
+        "leaveText": "Du trittst vom Schmelztiegel zurück und atmest wieder frei."
       },
       "ignivar_molten_assembly": {
-        "name": "Molten Assembly",
-        "enterText": "The opened gate leads into a molten assembly hall.",
-        "leaveText": "You leave the assembly line and return to the Crucible."
+        "name": "Glühende Montage",
+        "enterText": "Das geöffnete Tor führt in eine glutheiße Montagehalle.",
+        "leaveText": "Du verlässt die Montagelinie und kehrst zum Schmelztiegel zurück."
       },
       "ignivar_inner_crucible": {
-        "name": "The Inner Crucible",
-        "enterText": "The opened gate leads deeper into the Crucible.",
-        "leaveText": "You leave the silent depths of the Crucible."
+        "name": "Innerer Schmelztiegel",
+        "enterText": "Das geöffnete Tor führt tiefer in den Schmelztiegel.",
+        "leaveText": "Du verlässt die stillen Tiefen des Schmelztiegels."
       },
       "wildheart_basin": {
         "name": "Das Wildherzbecken",
@@ -18880,182 +18880,182 @@ export const de_DE: EnTranslations = {
     },
     "itemSets": {
       "ashveil": {
-        "name": "Ashveil Garb",
-        "bonus2": "Lurker's Strike hits 25 percent harder.",
-        "bonus4": "Your Veiled Edge strike hits for triple, up from double."
+        "name": "Gewand des Aschenschleiers",
+        "bonus2": "Lauererstoß trifft 25 Prozent härter.",
+        "bonus4": "Dein Schlag mit der Verschleierten Klinge verursacht dreifachen statt doppelten Schaden."
       },
       "benison_dawnweave": {
-        "name": "Benison Dawnweave",
-        "bonus2": "Seraphic Vigil's rescue heals for 270, up from 180. Damage taken no longer delays your spellcasting.",
-        "bonus4": "When Seraphic Vigil triggers, its ally is also mended for 15 percent of their maximum health over 10 sec."
+        "name": "Gewand der Morgengewebten Gunst",
+        "bonus2": "Die Rettungsheilung von Seraphischer Wacht steigt von 180 auf 270. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
+        "bonus4": "Wenn Seraphische Wacht ausgelöst wird, wird der Verbündete zusätzlich 10 Sek. lang um 15 Prozent seiner maximalen Gesundheit geheilt."
       },
       "boundstone_vanguard": {
         "name": "Gebundstein-Vorhut",
         "bonus3": "Erhöht Angriffs- und Zaubertempo um 15%."
       },
       "chronoweave": {
-        "name": "Aetherweave Vestments",
-        "bonus2": "Temporal Echo converts 50 percent of your single-target Arcane damage into healing. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Temporal Cascade's cooldown is reduced by 5 sec."
+        "name": "Gewänder des Äthergewebes",
+        "bonus2": "Zeitliches Echo wandelt 50 Prozent deines arkanen Einzelzielschadens in Heilung um. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
+        "bonus4": "Die Abklingzeit von Zeitliche Kaskade wird um 5 Sek. verkürzt."
       },
       "cinderbark": {
-        "name": "Cinderbark Ward",
-        "bonus2": "Sweeping Claws has a 30 percent chance to bank an additional Old Blood.",
-        "bonus4": "Marrowbreak hits 30 percent harder, and its emergency guard no longer replaces the strike."
+        "name": "Wacht der Aschenrinde",
+        "bonus2": "Weitreichende Klauen haben eine Chance von 30 Prozent, zusätzliches Altes Blut zu speichern.",
+        "bonus4": "Markbruch trifft 30 Prozent härter, und seine Notfallwache ersetzt den Schlag nicht mehr."
       },
       "cinderfang": {
-        "name": "Cinderfang Shroud",
-        "bonus2": "Venom Ritual's energy refund rises to 20 per builder.",
-        "bonus4": "Venom Dart's cooldown is reduced to 4 sec."
+        "name": "Schleier des Aschenzahns",
+        "bonus2": "Der Energieersatz des Giftigen Rituals steigt auf 20 pro Aufbauer.",
+        "bonus4": "Die Abklingzeit des Giftpfeils wird auf 4 Sek. verkürzt."
       },
       "coldsight_trackers": {
-        "name": "Coldsight Trackers",
-        "bonus2": "Measured Shot restores 5 additional Focus.",
-        "bonus4": "Long Draw critical strikes extend Cold Focus by 2 sec, up to 6 sec per activation."
+        "name": "Späher der Kältesicht",
+        "bonus2": "Gezielter Schuss stellt 5 zusätzliche Konzentration wieder her.",
+        "bonus4": "Kritische Treffer von Langer Zug verlängern Kalte Konzentration um 2 Sek., bis zu 6 Sek. pro Aktivierung."
       },
       "crownforged": {
         "name": "Bonewrought-Kriegstracht",
         "bonus2": "Erhöht Angriffskraft um 40.",
         "bonus4": "Eure kritischen Waffentreffer zersplittern das Ziel mit Knochensplitter und lassen es 12 Sek. lang alle 2 Sek. 8 Schaden bluten. Stapelt sich bis zu 3-mal.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 5 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Erhöht Angriffs- und Zaubertempo um 4 % und Trefferchance um 3 %. Kritische Waffentreffer zersplittern das Ziel mit Knochenspalter und lassen es 12 Sek. lang alle 2 Sek. 5 Schaden erleiden. Bis zu 3-mal stapelbar."
       },
       "dawnforged": {
-        "name": "Dawnforged Vestments",
-        "bonus2": "Beacon of Light copies 55 percent of your direct heals. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Radiant Resonance's empowered Dawn's Embrace is instant."
+        "name": "Gewänder der Morgenschmiede",
+        "bonus2": "Leuchtfeuer des Lichts kopiert 55 Prozent deiner direkten Heilungen. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
+        "bonus4": "Die verstärkte Umarmung der Morgenröte durch Strahlende Resonanz ist sofortig."
       },
       "deathlord": {
         "name": "Barrowlord-Kriegstracht",
         "bonus2": "Erhöht Angriffskraft um 40.",
         "bonus4": "Eure kritischen Waffentreffer haben eine Chance von 50%, Grabesmacht zu gewähren, was die Angriffskraft 10 Sek. lang um 60 erhöht.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 5 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Erhöht Angriffs- und Zaubertempo um 4 % und Trefferchance um 3 %. Kritische Waffentreffer zersplittern das Ziel mit Knochenspalter und lassen es 12 Sek. lang alle 2 Sek. 5 Schaden erleiden. Bis zu 3-mal stapelbar."
       },
       "emberfury": {
-        "name": "Emberfury Harness",
-        "bonus2": "Your Enrage lasts 6 sec instead of 4.",
-        "bonus4": "Bloodletting always Enrages you, and its healing rises to 8 percent of your maximum health."
+        "name": "Harnisch der Glutwut",
+        "bonus2": "Deine Wut dauert 6 statt 4 Sek.",
+        "bonus4": "Blutentzug löst immer Wut aus, und seine Heilung steigt auf 8 Prozent deiner maximalen Gesundheit."
       },
       "emberscreed": {
-        "name": "Creed of Embers Vestments",
-        "bonus2": "Your Doctrine link converts 10 percent more of your Holy damage into healing. Damage taken no longer delays your spellcasting.",
-        "bonus4": "When your Psalm of Warding is fully consumed, your next Scouring Hymn within 10 sec is instant. Cannot occur more than once every 15 sec."
+        "name": "Gewänder des Glutbekenntnisses",
+        "bonus2": "Die Verbindung deiner Doktrin wandelt 10 Prozent mehr deines Heiligschadens in Heilung um. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
+        "bonus4": "Wenn dein Psalm der Abwehr vollständig verbraucht ist, wirkt dein nächster Läuterungshymnus innerhalb von 10 Sek. sofort. Höchstens einmal alle 15 Sek."
       },
       "forgewall": {
-        "name": "Forgewall Aegis",
-        "bonus2": "Iron Resolve converts rage at 5 absorb per point instead of 4.",
-        "bonus4": "Casting Shieldcrack reduces Iron Resolve's remaining cooldown by 2 sec."
+        "name": "Ägide der Schmiedemauer",
+        "bonus2": "Eiserne Entschlossenheit wandelt Wut mit 5 Absorption pro Punkt statt 4 um.",
+        "bonus4": "Das Wirken von Schildbruch verringert die verbleibende Abklingzeit von Eiserne Entschlossenheit um 2 Sek."
       },
       "frostquench": {
-        "name": "Frostquench Weave",
-        "bonus2": "Rimelance critical strikes bank a second Icicle, up to the maximum of 5. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Winterlash plants 3 Winter's Chill charges, up from 2."
+        "name": "Gewebe des Frostbanns",
+        "bonus2": "Kritische Treffer von Reiflanze speichern einen zweiten Eiszapfen, bis maximal 5. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
+        "bonus4": "Winterhieb pflanzt 3 Aufladungen Winterkälte statt 2."
       },
       "gravebrand": {
-        "name": "Gravebrand Regalia",
-        "bonus2": "Reaping Command's cooldown is reduced by 2 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Reaping Command's unison strikes deal 25 percent more damage."
+        "name": "Insignien des Grabmals",
+        "bonus2": "Die Abklingzeit von Erntebefehl wird um 2 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
+        "bonus4": "Die gemeinsamen Treffer von Erntebefehl verursachen 25 Prozent mehr Schaden."
       },
       "greyjaw_stalker": {
         "name": "Ausrüstung des Greyjaw-Pirschers",
         "bonus3": "Erhöht Angriffs- und Zaubertempo um 15%."
       },
       "grovespring": {
-        "name": "Grovespring Raiment",
-        "bonus2": "Swiftmend consumes your own Wildbloom or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Overbloom harvests 75 percent of your remaining effects and banks 1 Verdance afterward."
+        "name": "Gewand der Hainquelle",
+        "bonus2": "Schnellheilung verbraucht zuerst deine Wildblüte oder Zweite Blüte und heilt 25 Prozent mehr. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
+        "bonus4": "Überblüte erntet 75 Prozent deiner verbleibenden Effekte und speichert danach 1 Üppigkeit."
       },
       "hexthread": {
-        "name": "Hexthread Shroud",
-        "bonus2": "Needle of Fate grants 2 additional Condemnation. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Passing Sentence refunds 10 Condemnation."
+        "name": "Schleier des Hexengewebes",
+        "bonus2": "Schicksalsnadel gewährt 2 zusätzliche Verurteilung. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
+        "bonus4": "Urteilsspruch erstattet 10 Verurteilung zurück."
       },
       "moonscorch": {
-        "name": "Moonscorch Raiment",
-        "bonus2": "Moonseed may extend Lunar Tempest twice per application, to a maximum of 12 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Moonsurge and Sunwake strike 25 percent harder."
+        "name": "Gewand des Mondbrandes",
+        "bonus2": "Mondkeim kann Mondsturm pro Anwendung zweimal verlängern, bis maximal 12 Sek. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
+        "bonus4": "Mondschwall und Sonnenwachen treffen 25 Prozent härter."
       },
       "necromancers": {
         "name": "Mournweave-Gewänder",
         "bonus2": "Erhöht Zaubermacht um 20. Erlittener Schaden verzögert Eure Zauber nicht mehr (100% Widerstand gegen Zauberverzögerung).",
         "bonus4": "Eure Zauber haben eine Chance von 10%, Klarsicht zu gewähren, wodurch euer nächster Zauber kostenlos wird.",
-        "bonus6": "Increases attack and casting speed by 4%. Your spells have a 10% chance to grant Soulblaze, increasing spell power by 25 for 10 sec."
+        "bonus6": "Erhöht Angriffs- und Zaubertempo um 4 %. Deine Zauber haben eine Chance von 10 %, Seelenbrand zu gewähren, der die Zaubermacht 10 Sek. lang um 25 erhöht."
       },
       "nighttalon": {
         "name": "Direfang-Pelz",
         "bonus2": "Erhöht Angriffskraft um 40.",
         "bonus4": "Eure kritischen Waffentreffer reißen eine Zerfetzte Wunde und lassen das Ziel 12 Sek. lang alle 2 Sek. 6 Schaden bluten. Stapelt sich bis zu 3-mal.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 4 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Erhöht Angriffs- und Zaubertempo um 4 % und Trefferchance um 3 %. Kritische Waffentreffer reißen eine Zerfetzte Wunde und verursachen 12 Sek. lang alle 2 Sek. 4 Blutungsschaden. Bis zu 3-mal stapelbar."
       },
       "oathpyre": {
-        "name": "Oathpyre Bastion",
-        "bonus2": "Vowkeeper Strike's chance to arm Solar Reprisal rises to 30 percent, and blocking an attack arms it 40 percent of the time.",
-        "bonus4": "Consuming Solar Reprisal shields you for 6 percent of your maximum health for 10 sec."
+        "name": "Bastion des Schwurfeuers",
+        "bonus2": "Die Chance von Schwurhüterstoß, Sonnenvergeltung zu aktivieren, steigt auf 30 %. Das Blocken eines Angriffs aktiviert sie in 40 % der Fälle.",
+        "bonus4": "Der Verbrauch von Sonnenvergeltung gewährt 10 Sek. lang einen Schild in Höhe von 6 % deiner maximalen Gesundheit."
       },
       "packlord_emberhide": {
-        "name": "Packlord's Emberhide",
-        "bonus2": "Pack Command's cooldown is reduced to 3 sec.",
-        "bonus4": "Pack Command's chance to reset Stampede's cooldown rises to 30 percent."
+        "name": "Gluthaut des Rudelführers",
+        "bonus2": "Die Abklingzeit von Rudelbefehl wird auf 3 Sek. verkürzt.",
+        "bonus4": "Die Chance von Rudelbefehl, die Abklingzeit von Ansturm zurückzusetzen, steigt auf 30 %."
       },
       "pyroclast": {
-        "name": "Pyroclast Regalia",
-        "bonus2": "Scald always critically strikes targets at or below 35 percent health. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Your Fire spells' critical strikes outside Phoenix Trance reduce its remaining cooldown by 1.5 sec."
+        "name": "Insignien des Pyroklasten",
+        "bonus2": "Versengen trifft Ziele mit höchstens 35 % Gesundheit immer kritisch. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
+        "bonus4": "Kritische Treffer deiner Feuerzauber außerhalb der Phönixtrance verkürzen deren verbleibende Abklingzeit um 1,5 Sek."
       },
       "ruincaller": {
-        "name": "Ruincaller Vestments",
-        "bonus2": "Conflagrate holds 3 charges. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Ruinbolt strikes 20 percent harder."
+        "name": "Gewänder des Ruinenrufers",
+        "bonus2": "Verheeren verfügt über 3 Aufladungen. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
+        "bonus4": "Ruinenblitz trifft 20 Prozent härter."
       },
       "slagbreaker": {
-        "name": "Slagbreaker Battlegear",
-        "bonus2": "Redhand empowers your next Maiming Strike by 30 percent per stack instead of 20.",
-        "bonus4": "Every second cast of Redhand reduces Breachmaker's remaining cooldown by 3 sec."
+        "name": "Kampfmontur des Schlackenbrechers",
+        "bonus2": "Rotfaust verstärkt deinen nächsten Verstümmelnden Schlag pro Stapel um 30 statt 20 Prozent.",
+        "bonus4": "Jedes zweite Wirken von Rotfaust verringert die verbleibende Abklingzeit von Breschenmacher um 3 Sek."
       },
       "slagsnare": {
-        "name": "Slagsnare Trappings",
-        "bonus2": "Gutting Strike generates 20 Focus.",
-        "bonus4": "Woundrend that consumes 3 Hunting Momentum preserves them. Cannot occur more than once every 8 sec."
+        "name": "Ausrüstung des Schlackenfängers",
+        "bonus2": "Ausweidender Schlag erzeugt 20 Konzentration.",
+        "bonus4": "Wundenreißer, der 3 Aufladungen Jagdschwung verbraucht, bewahrt sie. Höchstens einmal alle 8 Sek."
       },
       "smolderstrike": {
-        "name": "Smolderstrike Leathers",
-        "bonus2": "Haymaker hits 20 percent harder.",
-        "bonus4": "Lights Out refunds 6 sec of Mirrored Blades' remaining cooldown."
+        "name": "Leder des Glutstoßes",
+        "bonus2": "Hammerschlag trifft 20 Prozent härter.",
+        "bonus4": "Licht aus erstattet 6 Sek. der verbleibenden Abklingzeit von Spiegelklingen zurück."
       },
       "soulflame": {
         "name": "Wraithfire-Gewänder",
         "bonus2": "Erhöht Zaubermacht um 20. Erlittener Schaden verzögert Eure Zauber nicht mehr (100% Widerstand gegen Zauberverzögerung).",
         "bonus4": "Eure Zauber haben eine Chance von 10%, Seelenbrand zu gewähren, was die Zaubermacht 10 Sek. lang um 40 erhöht.",
-        "bonus6": "Increases attack and casting speed by 4%. Your spells have a 10% chance to grant Soulblaze, increasing spell power by 25 for 10 sec."
+        "bonus6": "Erhöht Angriffs- und Zaubertempo um 4 %. Deine Zauber haben eine Chance von 10 %, Seelenbrand zu gewähren, der die Zaubermacht 10 Sek. lang um 25 erhöht."
       },
       "springmender": {
-        "name": "Springmender Scale",
-        "bonus2": "Tidecall's cooldown is reduced by 4 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Cascading Mend reaches a fourth ally and harvests Mending Currents at 150 percent."
+        "name": "Schuppen des Quellheilers",
+        "bonus2": "Die Abklingzeit von Gezeitenruf wird um 4 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
+        "bonus4": "Kaskadenheilung erreicht einen vierten Verbündeten und erntet Heilende Strömungen mit 150 Prozent."
       },
       "stonehearth": {
-        "name": "Stonehearth Bastion",
-        "bonus2": "While Stonebound, Stormcast Mending Waters costs no mana and heals 25 percent more.",
-        "bonus4": "While Stonebound, completing a cadence heals you for 3 percent of your maximum health."
+        "name": "Bastion des Steinherzens",
+        "bonus2": "Während Steingebunden kostet Sturmwirker-Heilwasser kein Mana und heilt 25 Prozent mehr.",
+        "bonus4": "Während Steingebunden heilt dich der Abschluss einer Kadenz um 3 Prozent deiner maximalen Gesundheit."
       },
       "stormcallers": {
         "name": "Galecall-Gewänder",
         "bonus2": "Erhöht Zaubermacht um 20. Erlittener Schaden verzögert Eure Zauber nicht mehr (100% Widerstand gegen Zauberverzögerung).",
         "bonus4": "Eure Zauber haben eine Chance von 10%, Seelenbrand zu gewähren, was die Zaubermacht 10 Sek. lang um 40 erhöht.",
-        "bonus6": "Increases attack and casting speed by 4%. Your spells have a 10% chance to grant Soulblaze, increasing spell power by 25 for 10 sec."
+        "bonus6": "Erhöht Angriffs- und Zaubertempo um 4 %. Deine Zauber haben eine Chance von 10 %, Seelenbrand zu gewähren, der die Zaubermacht 10 Sek. lang um 25 erhöht."
       },
       "stormkindled": {
-        "name": "Stormkindled Regalia",
-        "bonus2": "Unleash Weapon on Pyrebrand grants 3 Thunder. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Earthen Jolt's bonus per Thunder rises to 30 percent."
+        "name": "Insignien des Sturmfeuers",
+        "bonus2": "Waffe entfesseln auf Scheiterbrand gewährt 3 Donner. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
+        "bonus4": "Der Bonus von Irdischer Ruck pro Donner steigt auf 30 Prozent."
       },
       "vale_arcanist": {
         "name": "Ornat des Talarkanisten",
         "bonus3": "Erhöht Angriffs- und Zaubertempo um 15%."
       },
       "vesperash": {
-        "name": "Vesperash Shroud",
-        "bonus2": "Call Tithefiend's cooldown is reduced by 6 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Calling your Tithefiend resets Mindfracture's cooldown, and the fiend returns twice as much mana per hit."
+        "name": "Schleier der Abendasche",
+        "bonus2": "Die Abklingzeit von Zehntenteufel rufen wird um 6 Sek. verkürzt. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.",
+        "bonus4": "Das Rufen deines Zehntenteufels setzt die Abklingzeit von Gedankenbruch zurück, und der Teufel gibt pro Treffer doppelt so viel Mana zurück."
       },
       "warfare_ashstalker": {
         "name": "Aschenpirscher-Ausrüstung",
@@ -19088,25 +19088,25 @@ export const de_DE: EnTranslations = {
         "bonus7": "Erhöht Kriegsführungs-Angriffs- und Verteidigungswertung um 80. Eure Zauber haben eine Chance von 15%, Dornwacht zu gewähren, was die Ausweichchance 6 Sek. lang um 15% erhöht."
       },
       "warspirit_emberscale": {
-        "name": "Warspirit Emberscale",
-        "bonus2": "Ancestral Strike advances your cadence 3 steps.",
-        "bonus4": "Ancestral Strike hits 30 percent harder."
+        "name": "Kriegsgeist-Glutschuppe",
+        "bonus2": "Ahnenstoß rückt deine Kadenz um 3 Schritte vor.",
+        "bonus4": "Ahnenstoß trifft 30 Prozent härter."
       },
       "wildfang_emberhide": {
-        "name": "Wildfang Emberhide",
-        "bonus2": "Redharvest restores 45 energy, up from 30.",
-        "bonus4": "Redharvest plants a fresh Flense on the target."
+        "name": "Wildfang-Gluthaut",
+        "bonus2": "Roternte stellt 45 statt 30 Energie wieder her.",
+        "bonus4": "Roternte legt eine frische Häutung auf das Ziel."
       },
       "wyrmshadow": {
         "name": "Nightfang-Gewänder",
         "bonus2": "Erhöht Angriffskraft um 40.",
         "bonus4": "Eure kritischen Waffentreffer haben eine Chance von 50%, Fangrausch zu gewähren, was das Angriffstempo 8 Sek. lang um 25% erhöht.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 4 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Erhöht Angriffs- und Zaubertempo um 4 % und Trefferchance um 3 %. Kritische Waffentreffer reißen eine Zerfetzte Wunde und verursachen 12 Sek. lang alle 2 Sek. 4 Blutungsschaden. Bis zu 3-mal stapelbar."
       },
       "zealfire": {
-        "name": "Zealfire Warplate",
-        "bonus2": "Final Edict and Dawnfall cut each other's remaining cooldown by 3 sec instead of 2.",
-        "bonus4": "Hammer of Wrath cast under Dawn's Wrath strikes 40 percent harder, up from 20."
+        "name": "Kriegsplatte des Eiferfeuers",
+        "bonus2": "Letztes Edikt und Morgenfall verkürzen die jeweils verbleibende Abklingzeit um 3 statt 2 Sek.",
+        "bonus4": "Hammer des Zorns unter Zorn der Morgenröte trifft 40 statt 20 Prozent härter."
       }
     }
   },
