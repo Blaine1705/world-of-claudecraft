@@ -218,6 +218,10 @@ export function runDespawnDecay(ctx: SimContext): void {
       e.despawnTimer -= DT;
       if (e.despawnTimer <= 0) despawnIds.push(e.id);
     }
+    if (e.hardDespawnTimer !== undefined) {
+      e.hardDespawnTimer -= DT;
+      if (e.hardDespawnTimer <= 0 && despawnIds.at(-1) !== e.id) despawnIds.push(e.id);
+    }
     if (
       e.kind === 'mob' &&
       DAMAGE_IDLE_DESPAWN_MOB_IDS.has(e.templateId) &&

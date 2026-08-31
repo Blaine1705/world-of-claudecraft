@@ -1558,6 +1558,9 @@ export interface MobTemplate {
   componentTags?: string[];
   boss?: boolean;
   rare?: boolean;
+  // Explicit tame opt-out for ordinary beasts whose encounter lifecycle must
+  // not be replaced by the hunter pet respawn lifecycle.
+  untameable?: boolean;
   // World boss: a server-wide elite that spawns on a fixed cadence (not from a
   // CAMP), announces itself when it rises, and drops PERSONAL loot to every player
   // who damaged it (gated to once per day per boss). The spawn schedule + location
@@ -4875,6 +4878,9 @@ export interface Entity extends ClientMirroredEntityFields {
   // `tid` (#2513).
   harvestClaimedBy: number | null;
   despawnTimer?: number;
+  // An unconditional lifetime countdown. Unlike despawnTimer, combat, retargeting,
+  // and evade transitions never clear this timer.
+  hardDespawnTimer?: number;
   // Summoned quest add (e.g. a Broodmother-egg hatchling): seconds it survives out
   // of combat before despawning. updateMob starts the despawnTimer countdown when
   // the add leashes home and cancels it while the add is back in combat.
