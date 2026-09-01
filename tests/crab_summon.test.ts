@@ -331,8 +331,15 @@ describe('the Mother of Pearl chain in a real sim', () => {
       .drainEvents()
       .filter((e): e is Extract<SimEvent, { type: 'log' }> => e.type === 'log');
     const awaken = logs.find((e) => e.text === 'Mister Crabs awakens!');
-    if (!awaken) throw new Error('Expected the awaken line');
+    const yell = logs.find((e) =>
+      e.text.startsWith('Mister Crabs yells, "MINE! The pearl is mine'),
+    );
+    if (!awaken || !yell) throw new Error('Expected the awaken line and the opening yell');
     expect(awaken.pid).toBeUndefined();
+    // The yell is pinned on its own: the pid-less branch of emitQuestMobDialogue
+    // must stay world-visible AND keep its entity anchor for the chat bubble.
+    expect(yell.pid).toBeUndefined();
+    expect(yell.entityId).toBe(requireLiveBoss(sim).id);
   });
 
   it('stays silent for a player who never took the quest', () => {
