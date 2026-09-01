@@ -181,6 +181,34 @@ describe('dungeon finder view core', () => {
     expect(sexton?.heroicGroups).toEqual([]);
   });
 
+  it('previews a NON-finale encounter heroic table on Heroic only (the roller gate, not enc.final)', () => {
+    // The positive arm of the gate above: inject a heroic table for a
+    // catalogued non-finale encounter and the Heroic preview must show it
+    // while the Normal preview must not. With the old `enc.final` gate this
+    // assertion fails, which is exactly the regression it protects against
+    // (no live catalogue row exercises the branch yet).
+    expect(HEROIC_BOSS_LOOT.sexton_marrow).toBeUndefined();
+    HEROIC_BOSS_LOOT.sexton_marrow = [
+      { itemId: 'mistveil_cord', chance: 1, rollGroup: 'finder_test_nonfinal_heroic' },
+    ];
+    try {
+      const sextonOn = (activityId: string) =>
+        live(
+          buildDungeonFinderView(
+            input({ playerLevel: 20, specRole: 'tank', selectedActivityId: activityId }),
+          ),
+        ).detail?.encounters.find((e) => e.mobId === 'sexton_marrow');
+      const heroic = sextonOn('hollow_crypt_heroic');
+      expect(heroic?.final).toBe(false);
+      expect(heroic?.heroicGroups).toMatchObject([
+        { guaranteed: true, items: [{ itemId: 'mistveil_cord', chance: 1 }] },
+      ]);
+      expect(sextonOn('hollow_crypt_normal')?.heroicGroups).toEqual([]);
+    } finally {
+      delete HEROIC_BOSS_LOOT.sexton_marrow;
+    }
+  });
+
   it('maps raid entrances to the Abandoned Crypt door with its zone', () => {
     const view = live(
       buildDungeonFinderView(

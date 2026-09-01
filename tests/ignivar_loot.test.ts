@@ -526,6 +526,112 @@ describe('ignivar loot: the boss drop tables (one item per five raiders)', () =>
       }
   });
 
+  it('pins every row of every partition to its exact chance, in table order', () => {
+    // The category shares above cannot see a redistribution INSIDE a category
+    // (0.0625 x 3 to 0 / 0.125 / 0.0625 keeps the weapon share at 0.1875), so
+    // each row's chance is pinned by id here, in draw order, on both tables.
+    // Every chance is strictly positive: a zero-weight row is an unreachable
+    // item, never a way to park one.
+    const rowsOf = (entries: readonly LootEntry[], group: string): [string, number][] =>
+      entries
+        .filter((entry) => entry.rollGroup === group)
+        .map((entry) => [entry.itemId ?? '', entry.chance]);
+    const ignivar = MOBS[IGNIVAR_BOSS_ID].loot;
+    const varkhul = MOBS[VARKHUL_BOSS_ID].loot;
+    const ignivarHeroic = HEROIC_BOSS_LOOT[IGNIVAR_BOSS_ID] ?? [];
+    const varkhulHeroic = HEROIC_BOSS_LOOT[VARKHUL_BOSS_ID] ?? [];
+    expect(rowsOf(ignivar, 'ignivar_sigils')).toEqual([
+      ['sigil_anvil_shoulder', 0.17],
+      ['sigil_ember_shoulder', 0.17],
+      ['sigil_tempest_shoulder', 0.16],
+      ['sigil_anvil_gloves', 0.17],
+      ['sigil_ember_gloves', 0.16],
+      ['sigil_tempest_gloves', 0.17],
+    ]);
+    expect(rowsOf(ignivar, 'ignivar_offset')).toEqual([
+      ['pendant_of_the_first_tempering', 0.125],
+      ['ignivars_ember_choker', 0.125],
+      ['locket_of_the_last_flame', 0.125],
+      ['heartspring_amulet', 0.125],
+      ['cord_of_the_last_flame', 0.03125],
+      ['springbinder_sash', 0.03125],
+      ['cinderbark_cinch', 0.03125],
+      ['slagstalker_belt', 0.03125],
+      ['moonscorch_waistwrap', 0.03125],
+      ['grovetender_belt', 0.03125],
+      ['forgewall_girdle', 0.03125],
+      ['warforged_waistguard', 0.03125],
+      ['stormkindled_chain', 0.03125],
+      ['tidebinder_links', 0.03125],
+      ['cinderfang_kris', 0.0625],
+      ['slagrender_cleaver', 0.0625],
+      ['wand_of_quenched_sparks', 0.0625],
+    ]);
+    expect(rowsOf(ignivarHeroic, 'ignivar_h_exclusive')).toEqual([
+      ['sigil_anvil_chest', 0.17],
+      ['sigil_ember_chest', 0.17],
+      ['sigil_tempest_chest', 0.16],
+      ['forgefathers_warhammer', 0.17],
+      ['anvilguard_blade', 0.17],
+      ['springtouched_crozier', 0.16],
+    ]);
+    expect(rowsOf(varkhul, 'varkhul_sigils')).toEqual([
+      ['sigil_anvil_legs', 0.17],
+      ['sigil_ember_legs', 0.17],
+      ['sigil_tempest_legs', 0.16],
+      ['sigil_anvil_helmet', 0.17],
+      ['sigil_ember_helmet', 0.16],
+      ['sigil_tempest_helmet', 0.17],
+    ]);
+    expect(rowsOf(varkhul, 'varkhul_offset')).toEqual([
+      ['cindersoaked_slippers', 0.03125],
+      ['steps_of_quiet_water', 0.03125],
+      ['ashenbark_treads', 0.03125],
+      ['ashrunner_boots', 0.03125],
+      ['scorchgrove_striders', 0.03125],
+      ['dewfall_moccasins', 0.03125],
+      ['anvilstance_sabatons', 0.03125],
+      ['furnace_march_greaves', 0.03125],
+      ['thundershock_treads', 0.03125],
+      ['springwarden_sabatons', 0.03125],
+      ['orb_of_the_last_spring', 0.09375],
+      ['cinder_of_the_first_design', 0.09375],
+      ['seal_of_the_forgewall', 0.125],
+      ['band_of_marked_strikes', 0.125],
+      ['circle_of_cinders', 0.125],
+      ['loop_of_quiet_springs', 0.125],
+    ]);
+    expect(rowsOf(varkhulHeroic, 'varkhul_h_exclusive')).toEqual([
+      ['sigil_anvil_chest', 0.12],
+      ['sigil_ember_chest', 0.12],
+      ['sigil_tempest_chest', 0.11],
+      ['bulwark_of_the_inner_crucible', 0.135],
+      ['ember_wardens_barrier', 0.135],
+      ['varkhul_emberward', 0.03],
+      ['heart_of_the_end_greatblade', 0.12],
+      ['forgefire_spire', 0.12],
+      ['staff_of_the_last_spring', 0.11],
+    ]);
+    // The tables hold nothing else but the money row and the reagent rows.
+    for (const [entries, groups] of [
+      [ignivar, ['ignivar_sigils', 'ignivar_offset']],
+      [varkhul, ['varkhul_sigils', 'varkhul_offset']],
+    ] as const) {
+      const rest = entries.filter((entry) => !entry.rollGroup);
+      expect(rest.map((entry) => entry.itemId ?? 'copper')).toEqual([
+        'copper',
+        'lastflame_core',
+        'lastflame_core',
+      ]);
+      expect(rest.slice(1).map((entry) => entry.chance)).toEqual([1, 0.5]);
+      expect(
+        new Set(entries.flatMap((entry) => (entry.rollGroup ? [entry.rollGroup] : []))),
+      ).toEqual(new Set(groups));
+    }
+    for (const entry of [...ignivar, ...varkhul, ...ignivarHeroic, ...varkhulHeroic])
+      expect(entry.chance, entry.itemId ?? 'copper').toBeGreaterThan(0);
+  });
+
   it('every drop-table id resolves in the merged item table', () => {
     const all = [
       ...(MOBS[IGNIVAR_BOSS_ID].loot ?? []),
