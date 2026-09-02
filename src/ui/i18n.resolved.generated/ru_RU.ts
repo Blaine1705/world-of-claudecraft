@@ -2710,6 +2710,7 @@ export const ru_RU: EnTranslations = {
       "forbiddenReflectionLock": "Запретное отражение пока нельзя подготовить снова",
       "internalCooldown": "Эффект не сработает снова до окончания таймера",
       "carriedFlag": "Вы несете вражеский флаг. Отмените этот эффект, чтобы бросить его.",
+      "carryingFreight": "Вы несёте груз. Скорость передвижения снижена на {pct}%.",
       "battleStance": "Боевая стойка: на 10% больше создания ярости",
       "berserkerStance": "Стойка берсерка: крит. удары на 3% чаще и на 3% сильнее",
       "crit": "Повышает шанс критического удара на {pct}%",
@@ -8914,6 +8915,9 @@ export const ru_RU: EnTranslations = {
         "readyQuest": "Задание готово к сдаче",
         "repeatQuest": "Повторяемое задание",
         "cooldownQuest": "Задание восстанавливается",
+        "availableWorldQuest": "Доступное локальное задание: {name}",
+        "activeWorldQuest": "Активное локальное задание: {name}",
+        "worldBoss": "Мировой босс: {name}",
         "questObjective": "Область цели задания",
         "readyOre": "Доступная залежь руды",
         "readyWood": "Доступная древесина",
@@ -9703,8 +9707,50 @@ export const ru_RU: EnTranslations = {
       "objectiveProgress": "{label}: {current}/{total}",
       "requiresLevel": "Требуется уровень {level}"
     },
+    "worldQuest": {
+      "title": "{zone}: {target}",
+      "unknown": "Неизвестное локальное задание ({id})",
+      "itemReward": "Предметная награда: {name}",
+      "rewardLine": "Награды: {reward}",
+      "availableStatus": "Доступное локальное задание",
+      "activeStatus": "Активное локальное задание",
+      "expiresIn": "Истекает через {time}",
+      "mineOre": "Добыть медную руду",
+      "recoverObject": "Вернуть: {name}",
+      "redirectLeyBeam": "Направить силовой луч",
+      "matchConfections": "Собрать зачарованные сладости",
+      "loadFreight": "Загрузить груз в повозку",
+      "salvageWreckage": "Собрать обломки кораблекрушения",
+      "puzzleTitle": "Настройка силового луча",
+      "puzzleLevel": "Еженедельный уровень {level}",
+      "puzzleInstructions": "Поворачивайте плитки, чтобы провести луч от источника к цели.",
+      "puzzleRotateTile": "Повернуть плитку {tile}",
+      "puzzleConnectors": "Соединения: {connectors}.",
+      "puzzlePowered": "Луч достигает этой плитки.",
+      "puzzleUnpowered": "Луч не достигает этой плитки.",
+      "puzzleClose": "Закрыть головоломку с лучом",
+      "puzzleSource": "Источник",
+      "puzzleTarget": "Цель",
+      "match3Title": "Каскад сладостей",
+      "match3Instructions": "Выберите две соседние сладости. Ход засчитывается, только если обмен создаёт ряд из трёх или более.",
+      "match3Moves": "Ходы: {current}/{total}",
+      "match3Cleared": "Убрано сладостей: {current}/{total}",
+      "match3Cell": "Строка {row}, столбец {column}: {candy}",
+      "match3Selected": "Выбрано",
+      "match3Reset": "Начать уровень заново",
+      "match3Close": "Закрыть головоломку со сладостями",
+      "match3OutOfMoves": "Ходы закончились. Начните уровень заново, чтобы попробовать ещё раз.",
+      "match3Candy": {
+        "berry": "ягодный кристалл",
+        "citrus": "цитрусовая сфера",
+        "mint": "мятный треугольник",
+        "grape": "виноградный квадрат",
+        "star": "сахарная звезда"
+      }
+    },
     "logs": {
       "accepted": "Задание принято: {name}",
+      "worldQuestStarted": "Локальное задание началось: {name}",
       "abandoned": "Задание отменено: {name}",
       "completed": "Задание завершено: {name}",
       "ready": "{name} ({status})",
@@ -13039,6 +13085,18 @@ export const ru_RU: EnTranslations = {
       },
       "sprung_trap": {
         "name": "Захлопнувшийся топяной капкан"
+      },
+      "leyline_cache": {
+        "name": "Миниатюрный тайник силовой линии"
+      },
+      "confection_game_box": {
+        "name": "Игровая шкатулка кондитера"
+      },
+      "eastbrook_freight_crate": {
+        "name": "Грузовой ящик Истбрука"
+      },
+      "eastbrook_freight_wagon": {
+        "name": "Грузовая повозка Истбрука"
       },
       "hearthlined_treads": {
         "name": "Прогретые у очага боты"

@@ -19,12 +19,7 @@
       "maximumBytes": 15360,
       "opaque": true
     },
-    "reviewSizes": [
-      128,
-      40,
-      28,
-      22
-    ],
+    "reviewSizes": [128, 40, 28, 22],
     "circularCropReviewSize": 64,
     "anchors": [
       {
@@ -679,10 +674,7 @@
       "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
       "styleReference": "simple_fishing_pole (licensed CraftPix Premium), plus the project-generated ironreel_fishing_rod and silverstream_fishing_rod, for the centered full rod-and-reel silhouette, dark inventory backdrop and painted material treatment",
       "commonPrompt": "Fresh original premium hand-painted classic-fantasy MMORPG inventory icon of one complete crafted fishing rod and reel on a bottom-left to top-right diagonal, centered with safe margins on an opaque dark atmospheric vignette. Stormreel uses cold storm steel and restrained blue-white electrical accents; Tidewrought is an ornate sea-forged teal, violet, pearl and antique-gold successor. Each is a genuinely different physical rod, not a recolor or trace. No border, rarity frame, circular halo, text, watermark or crop.",
-      "itemIds": [
-        "stormreel_fishing_rod",
-        "tidewrought_fishing_rod"
-      ]
+      "itemIds": ["stormreel_fishing_rod", "tidewrought_fishing_rod"]
     },
     {
       "batchId": "release-v034-additional-art-silkspun-satchel-2026-08-02",
@@ -719,9 +711,7 @@
         ]
       },
       "commonPrompt": "Create one fresh high-resolution square master for the World of ClaudeCraft inventory item Silkspun Satchel. Image 1 is a style/material reference for rich project bag rendering, Image 2 is a composition and safe-margin reference only, Image 3 is the spider-silk material reference, and Image 4 is the Goldleaf accent reference. Paint one tangible compact 10-slot tailoring satchel, centered in three-quarter view: a low crescent-mouthed soft field bag with folded charcoal-violet iridescent spider-silk panels, pale hand-bound thread seams, a sturdy asymmetrical flap, a small brass toggle, and restrained round-leaf gold embroidery worked into the fabric. Make its construction and silhouette entirely distinct from both referenced bags and from the current rectangular linen-pouch recolor; no sun emblem, bottles, dangling clutter, or copied strap layout. Opaque blue-black atmospheric vignette, top-left key light, restrained cool rim, strong silhouette at 28px, visual mass centered within 2px, 12-16px safe margin at 128px. No UI border, rarity frame, circular halo, text, watermark, mannequin, character, scenery, crop, excessive aura, or transparent background. Rarity comes from workmanship only.",
-      "itemIds": [
-        "silkspun_satchel"
-      ]
+      "itemIds": ["silkspun_satchel"]
     },
     {
       "batchId": "release-v034-additional-art-last-keep-signet-2026-08-02",
@@ -752,19 +742,14 @@
         ]
       },
       "commonPrompt": "Create one fresh high-resolution square master for the World of ClaudeCraft inventory item Signet of the Last Keep. Image 1 is a ring composition reference, Image 2 is a dark-fantasy value/style reference, and Image 3 is a metalwork/detail reference; do not copy their gems, emblems, shapes, or aura layouts. Paint one tangible old garrison signet ring, centered in three-quarter view: a weighty worn antique-gold band with dark iron patina, a broad slightly irregular shield-shaped seal face engraved with an abstract crenellated gate and one closed portcullis, no letters or readable heraldry. Add a tiny ember-red wax trace caught in one groove, warm candle-amber key light from upper left, and a restrained cold blue-grey rim suggesting the silent Drakelands hall. It is a poignant floor-found keepsake, not royal treasure: no giant gemstone, spikes, skull, magical aura, or excessive ornament. Opaque charcoal/blue-black atmospheric vignette, strong silhouette at 28px, centered within 2px, 12-16px safe margin at 128px. No UI border, rarity frame, circular quality halo, text, watermark, hand, character, scene, crop, or transparent background.",
-      "itemIds": [
-        "last_keep_signet"
-      ]
+      "itemIds": ["last_keep_signet"]
     },
     {
       "source": "OpenAI built-in image generation",
       "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
       "styleReference": "arcane_essence and arcane_shard for Chime-violet material language; final_oath_medallion, architects_cornerstone and seal_of_the_nine_oaths for tangible talisman composition",
       "commonPrompt": "Fresh original premium hand-painted classic dark-fantasy MMORPG inventory icon of one tangible Enchanter-crafted talisman with a suspension loop and a faceted violet-blue Chime core. Gatherer's Cache is a plump bronze-gold reliquary with abundance worked into its metal; Artisan's Eye is a slim engraved silver-and-gold almond-eye amulet with the shard as its iris. One centered physical object on an opaque near-black indigo vignette, readable at 128px. No flat glyph, spell icon, border, halo, text, watermark or crop.",
-      "itemIds": [
-        "gatherers_cache",
-        "artisans_eye"
-      ]
+      "itemIds": ["gatherers_cache", "artisans_eye"]
     },
     {
       "batchId": "missing-painted-icons-armor-and-jewelry-2026-08-01",
@@ -5392,11 +5377,7 @@
           "intendedVisualSubject": "One small marsh-dweller hut built of lashed river reeds and packed grey mud over a bent driftwood frame, with a low dark doorway and a ragged thatched dome roof. A complete tiny standing structure shown as a single centered object, damp swamp greens and browns, no fire and no water base, not a tent, not a boat, and not a village scene."
         }
       },
-      "itemIds": [
-        "murloc_hut",
-        "restless_skull",
-        "vanguard_bone"
-      ]
+      "itemIds": ["murloc_hut", "restless_skull", "vanguard_bone"]
     },
     {
       "batchId": "hunter-quivers-2026-08-04",
@@ -5587,12 +5568,7 @@
       },
       "commonPrompt": "Fresh premium hand-painted classic-fantasy MMORPG inventory icon of one centered tangible item on an opaque dark atmospheric vignette, with top-left key light, a clear silhouette, safe margins, small-size readability, and no UI border, text, watermark, character, or crop. Exact per-item subjects and constraints are recorded in the provenance record.",
       "provenanceRecord": "docs/achievements/placeholder-art-completion-2026-08-09/item-cleanup-manifest.json",
-      "itemIds": [
-        "curved_tusk",
-        "firebottle",
-        "pristine_claw",
-        "sharp_claw"
-      ]
+      "itemIds": ["curved_tusk", "firebottle", "pristine_claw", "sharp_claw"]
     },
     {
       "batchId": "placeholder-art-completion-weapons-2026-08-09",
@@ -6037,12 +6013,7 @@
       "provenanceRecords": [
         "docs/achievements/integration-dagger-icons-2026-08-10/generation-report.json"
       ],
-      "itemIds": [
-        "boneglass_shiv",
-        "duskwhisper",
-        "marrowpoint",
-        "rimefang"
-      ]
+      "itemIds": ["boneglass_shiv", "duskwhisper", "marrowpoint", "rimefang"]
     },
     {
       "batchId": "proving-shore-prop-renders-2026-08-17",
@@ -6051,11 +6022,7 @@
       "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
       "styleReference": "existing painted WebP catalog in public/ui/items/; subjects are the exact world props the tutorial island player clicks",
       "provenanceRecord": "scripts/render_island_item_icons.mjs",
-      "itemIds": [
-        "ps_castaway_crate",
-        "ps_ferry_bell",
-        "ps_passing_stone"
-      ],
+      "itemIds": ["ps_castaway_crate", "ps_ferry_bell", "ps_passing_stone"],
       "commonPrompt": "Not a text-to-image prompt: deterministic in-engine still of the committed world model (three-quarter yaw, portrait lighting rig, trimmed and centered with safe margins) composited on the item-icon radial vignette at 128px."
     },
     {
@@ -6065,11 +6032,7 @@
       "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
       "styleReference": "existing painted WebP catalog in public/ui/items/",
       "commonPrompt": "Painted dark-fantasy MMORPG inventory icon, one centered item, clear silhouette, atmospheric dark background, no text or watermark",
-      "itemIds": [
-        "mother_of_pearl",
-        "ps_briny_lure",
-        "ps_lustrous_pearl"
-      ]
+      "itemIds": ["mother_of_pearl", "ps_briny_lure", "ps_lustrous_pearl"]
     },
     {
       "batchId": "crucible-raid-weapons-2026-08-28",
@@ -6097,10 +6060,7 @@
       "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
       "styleReference": "existing painted WebP catalog in public/ui/items/; subjects are the exact held weapon models the two Ignivar legendaries equip",
       "provenanceRecord": "scripts/render_varkhul_drop_icons.mjs",
-      "itemIds": [
-        "varkhul_emberward",
-        "varkhul_forgebreaker"
-      ],
+      "itemIds": ["varkhul_emberward", "varkhul_forgebreaker"],
       "commonPrompt": "Not a text-to-image prompt: deterministic in-engine still of the committed weapon model (shared framing rig, three-point lighting, alpha subject trimmed and centered with safe margins) composited on the item-icon radial vignette at 128px."
     },
     {
@@ -6314,9 +6274,7 @@
       "styleReference": "existing painted WebP catalog in public/ui/items/",
       "commonPrompt": "Painted dark-fantasy MMORPG inventory icon, one centered item, clear silhouette, atmospheric dark background, no text or watermark",
       "note": "Staged early: only the core reagent ships ahead of the professions fast-follow (PR 3704), which extends this batch to its full ten ids.",
-      "itemIds": [
-        "lastflame_core"
-      ]
+      "itemIds": ["lastflame_core"]
     },
     {
       "batchId": "bank-storage-painted-bags-2026-08-25",
@@ -6342,6 +6300,80 @@
         "resonant_weave_bag",
         "wayfarers_backpack"
       ]
+    },
+    {
+      "batchId": "world-quest-puzzle-activators-2026-09-01",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "bridgemere_toll_chest.webp was supplied as the style, lighting, scale, and composition reference for leyline_cache; hearth_ember_cache.webp served the same role for confection_game_box. Both references are World of ClaudeCraft project-generated art.",
+      "commonPrompt": "Classic dark-fantasy MMORPG painted inventory art of one complete compact magical puzzle chest centered in a square, with tactile metal and aged wood, a strong silhouette at 28px, top-left key light, an opaque near-black painted vignette, and no text, border, watermark, crop, or extra objects.",
+      "itemDirections": {
+        "leyline_cache": {
+          "canonicalDisplayName": "Miniature Ley Cache",
+          "canonicalGameplayMeaningOrAcquisition": "Physical activator for the rotating Galecrest ley-beam world quest.",
+          "intendedVisualSubject": "A compact ornate treasure chest whose carved runes and narrow seams glow with vivid blue-cyan ley energy.",
+          "reference": {
+            "path": "public/ui/items/bridgemere_toll_chest.webp",
+            "role": "style, lighting, scale, and composition reference",
+            "provenance": "World of ClaudeCraft project-generated art",
+            "license": "Project asset, rights reserved"
+          }
+        },
+        "confection_game_box": {
+          "canonicalDisplayName": "Confectioner's Game Box",
+          "canonicalGameplayMeaningOrAcquisition": "Physical activator for the rotating Palmreach confection match-three world quest.",
+          "intendedVisualSubject": "An ornate tabletop puzzle chest with jewel-like candy motifs and pink-magenta light glowing through narrow seams.",
+          "reference": {
+            "path": "public/ui/items/hearth_ember_cache.webp",
+            "role": "style, lighting, scale, and composition reference",
+            "provenance": "World of ClaudeCraft project-generated art",
+            "license": "Project asset, rights reserved"
+          }
+        }
+      },
+      "itemIds": ["confection_game_box", "leyline_cache"]
+    },
+    {
+      "batchId": "world-quest-freight-icons-2026-09-01",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "supply_crate.webp was supplied as the style, lighting, scale, and composition reference for eastbrook_freight_crate; reins_rickshaw_mount.webp served the same role for eastbrook_freight_wagon. Both references are World of ClaudeCraft project-generated art.",
+      "commonPrompt": "Fresh premium hand-painted classic dark-fantasy MMORPG inventory icon of one complete Eastbrook freight subject centered in a square, with a strong readable silhouette, tactile wood, iron, cloth, and rope, warm top-left key light, cool rim light, an opaque dark painted vignette, and no text, border, watermark, crop, person, or unrelated objects.",
+      "itemDirections": {
+        "eastbrook_freight_crate": {
+          "canonicalDisplayName": "Eastbrook Freight Crate",
+          "canonicalGameplayMeaningOrAcquisition": "The personal cargo picked up and carried to the wagon during the Eastbrook freight world quest.",
+          "intendedVisualSubject": "One sturdy closed wooden cargo crate with iron corner straps, pale-blue Eastbrook cloth, and rope handles, viewed in three-quarter perspective.",
+          "reference": {
+            "path": "public/ui/items/supply_crate.webp",
+            "role": "style, lighting, scale, and composition reference",
+            "provenance": "World of ClaudeCraft project-generated art",
+            "license": "Project asset, rights reserved"
+          }
+        },
+        "eastbrook_freight_wagon": {
+          "canonicalDisplayName": "Eastbrook Freight Wagon",
+          "canonicalGameplayMeaningOrAcquisition": "The destination players load during the Eastbrook freight world quest.",
+          "intendedVisualSubject": "One four-wheeled wooden merchant wagon with iron rims, an open cargo bed loaded with crates, and empty horse shafts, viewed in three-quarter perspective.",
+          "reference": {
+            "path": "public/ui/items/reins_rickshaw_mount.webp",
+            "role": "style, lighting, scale, and composition reference",
+            "provenance": "World of ClaudeCraft project-generated art",
+            "license": "Project asset, rights reserved"
+          }
+        }
+      },
+      "itemIds": ["eastbrook_freight_crate", "eastbrook_freight_wagon"]
     }
   ]
 }

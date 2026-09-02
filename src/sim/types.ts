@@ -580,6 +580,10 @@ export type AuraKind =
   // carry: applied at the pickup, removed by clearCarrierAuras on every path the
   // flag leaves the carrier.
   | 'flag_carried'
+  // Eastbrook freight World Quest: an inert, public marker worn exactly while
+  // the player carries a crate. The movement kernel applies its value as the
+  // cargo speed multiplier; no combat or stat-recalc path consumes it.
+  | 'world_quest_cargo'
   // Chronomancy Temporal Echo mark (docs/prd/mage-chronomancy.md section 13): a
   // per-caster (sourceId) buff on ONE ally; while it rides, a fraction of the
   // mage's Arcane damage heals the marked ally. Value is unused (1); the
@@ -1937,7 +1941,13 @@ export interface MobTemplate {
   // Periodic self-shield: the mob wraps itself in a damage-absorbing barrier
   // every `every` seconds, soaking up to `amount` damage for `duration` seconds.
   // Reuses the existing `absorb` aura (soaked first in dealDamage) - no new combat math.
-  stoneskin?: { amount: number; every: number; duration: number; name: string; school?: string };
+  stoneskin?: {
+    amount: number;
+    every: number;
+    duration: number;
+    name: string;
+    school?: string;
+  };
   // Boss/elite mechanic ("Banshee's Wail"): a periodic, telegraphed scream that
   // terrifies every nearby player into fleeing for `duration`s. Unlike the
   // on-hit `dread`, this is a timed AoE - the room-clearing analogue of `stomp`,
@@ -2130,7 +2140,12 @@ export interface MobTemplate {
   // Melee mechanic: a landed swing has `chance` to land a concussive blow that
   // STUNS the victim for `duration`s (can't move, cast, or act). The single-target
   // cousin of War Stomp's AoE slam - rides the existing `stun` aura, no new kind.
-  concuss?: { chance: number; duration: number; name: string; school?: Aura['school'] };
+  concuss?: {
+    chance: number;
+    duration: number;
+    name: string;
+    school?: Aura['school'];
+  };
   // Melee mechanic: a landed swing has `chance` to crack the victim's guard with
   // an Expose debuff that raises the physical damage they take by `dmgIncrease`
   // (e.g. 0.15 = +15%) for `duration` seconds. Stacks multiplicatively with armor.
@@ -2293,7 +2308,13 @@ export interface MobTemplate {
   // armor (agi*2), dodge and crit - so a single drain shreds both the victim's
   // physical mitigation and their avoidance at once. Rides a `buff_agi` aura with a
   // NEGATIVE value (recalcPlayerStats folds it through), so there is no new stat math.
-  wither?: { chance: number; agi: number; duration: number; name: string; school?: Aura['school'] };
+  wither?: {
+    chance: number;
+    agi: number;
+    duration: number;
+    name: string;
+    school?: Aura['school'];
+  };
   // Combat mechanic: a landed melee hit has `chance` to terrify the victim - a
   // fear that sends the struck player fleeing for `duration`s. Rides the existing
   // `fear_incap` incapacitate aura the player-cast Fear uses, so `updateFearMovement`
@@ -2308,7 +2329,12 @@ export interface MobTemplate {
   // victim into a harmless critter. Reuses the exact `polymorph` aura the mage's
   // Polymorph applies - `isStunned` locks out all actions and the aura breaks the
   // instant the victim takes damage - so no new aura kind, gating, or UI.
-  polymorphHex?: { chance: number; duration: number; name: string; school?: Aura['school'] };
+  polymorphHex?: {
+    chance: number;
+    duration: number;
+    name: string;
+    school?: Aura['school'];
+  };
   // On-hit curse: a landed melee swing has `chance` to lay a curse of frailty on
   // the victim, raising all damage they take by `amp` (e.g. 0.15 = +15%) from
   // every source for `duration`s. Introduces the `vulnerability` aura kind, read
@@ -2429,7 +2455,13 @@ export interface MobTemplate {
   // On-hit "draining curse": a landed swing has `chance` to inflate every
   // ability the victim uses by `pct` (e.g. 0.4 = +40% resource cost) for
   // `duration` seconds - taxes mana/rage/energy alike, not a stat drain.
-  costTax?: { chance: number; pct: number; duration: number; name: string; school?: string };
+  costTax?: {
+    chance: number;
+    pct: number;
+    duration: number;
+    name: string;
+    school?: string;
+  };
   // On-hit chill: a landed melee swing has `chance` to slow the victim's
   // movement to `mult` of normal for `duration` seconds (frost school). Reuses
   // the standard `slow` aura, so it rides the same movement path as Frostbolt.
@@ -2791,7 +2823,13 @@ export type AbilityEffect =
   // pctOfMax: when set, the heal total is this fraction of the TARGET's max
   // health at cast time instead of the flat total, so the heal scales with
   // gear and any future pool retune (Savage Mending is the first user).
-  | { type: 'hot'; total: number; duration: number; interval: number; pctOfMax?: number } // renew, rejuvenation
+  | {
+      type: 'hot';
+      total: number;
+      duration: number;
+      interval: number;
+      pctOfMax?: number;
+    } // renew, rejuvenation
   | {
       type: 'absorb';
       amount: number;
@@ -2854,7 +2892,12 @@ export type AbilityEffect =
   // survival arm. Below the health fraction, the spent bank raises an absorb
   // of absorbPctMaxHp and refunds rage instead of striking; above it the strike
   // alone carries the payoff. Deterministic, druid-only.
-  | { type: 'druidMarrowbreakGuard'; belowFrac: number; absorbPctMaxHp: number; rage: number }
+  | {
+      type: 'druidMarrowbreakGuard';
+      belowFrac: number;
+      absorbPctMaxHp: number;
+      rage: number;
+    }
   // Groveheart Overbloom (combat/druid_engines.ts): harvest every HoT the
   // caster owns for harvestPct of its remaining healing, then replant a
   // Wildbloom on the cast target (or on every harvested ally with the
@@ -3119,7 +3162,12 @@ export type AbilityEffect =
       maxSecondary: number;
     }
   | { type: 'afflictionPossession'; duration: number; doom: number }
-  | { type: 'afflictionJudgment'; duration: number; doom: number; refund: number }
+  | {
+      type: 'afflictionJudgment';
+      duration: number;
+      doom: number;
+      refund: number;
+    }
   | {
       type: 'afflictionLitany';
       duration: number;
@@ -3475,10 +3523,14 @@ export interface CampDef {
 }
 
 // Ground interactables (sparkle objects)
+export const STABLE_GROUND_OBJECT_ENTITY_ID_MIN = 2_147_000_000;
+
 export interface GroundObjectDef {
   itemId: string;
   name: string;
   positions: { x: number; z: number }[];
+  /** Optional ids in the reserved high range, used without shifting the legacy roster. */
+  entityIds?: readonly number[];
 }
 
 // Gatherable world nodes (ore/wood/herb). Permanent, unowned fixtures: this
@@ -3686,7 +3738,13 @@ export interface ZoneDef {
    *  shipped id is never renamed or removed. `hideOnMap` drops the label from
    *  the world map while keeping the record (and its marks) alive, for a place
    *  that no longer reads as a landmark. */
-  pois: { x: number; z: number; label: string; id?: string; hideOnMap?: boolean }[];
+  pois: {
+    x: number;
+    z: number;
+    label: string;
+    id?: string;
+    hideOnMap?: boolean;
+  }[];
   welcome: string; // chat-log hint shown on first entry
   welcomeQuestId?: string; // only show the hint while this quest is available
   // The zone's southern border ridge has NO road pass and is raised past the
@@ -4109,6 +4167,88 @@ export interface QuestProgress {
   // resets the run when the def's rev has moved (quest_progress_migration.ts),
   // dropping the per-run scratch (burnedObjects, creditedObjects) with it.
   rev?: number;
+}
+
+export type WorldQuestReward =
+  | { type: 'xp'; rate: number }
+  | { type: 'copper'; base: number; perLevel: number }
+  | { type: 'item'; itemId: string; count: number };
+
+export type WorldQuestBeamSide = 'north' | 'east' | 'south' | 'west';
+
+export interface WorldQuestBeamPuzzleDef {
+  columns: number;
+  rows: number;
+  source: { tileIndex: number; side: WorldQuestBeamSide };
+  target: { tileIndex: number; side: WorldQuestBeamSide };
+  tiles: readonly {
+    kind: 'straight' | 'corner';
+    initialRotation: number;
+  }[];
+}
+
+export type WorldQuestMatch3Candy = 0 | 1 | 2 | 3 | 4;
+
+export interface WorldQuestMatch3LevelDef {
+  columns: number;
+  rows: number;
+  board: readonly WorldQuestMatch3Candy[];
+  refill: readonly WorldQuestMatch3Candy[];
+  target: number;
+  maxMoves: number;
+}
+
+export type WorldQuestObjective =
+  | { type: 'kill'; targetMobId: string }
+  | { type: 'interact'; targetObjectItemId: string }
+  | {
+      type: 'salvage';
+      objectItemId: string;
+      /** Stable ground-object entity ids, one eight-piece arrangement per week. */
+      layouts: readonly (readonly number[])[];
+    }
+  | { type: 'gather'; nodeType: GatherNodeType }
+  | {
+      type: 'delivery';
+      pickupObjectItemId: string;
+      deliveryObjectItemId: string;
+    }
+  | {
+      type: 'puzzle';
+      activationObjectItemId: string;
+      puzzles: readonly WorldQuestBeamPuzzleDef[];
+    }
+  | {
+      type: 'match3';
+      activationObjectItemId: string;
+      levels: readonly WorldQuestMatch3LevelDef[];
+    };
+
+/** A repeatable open-world objective. World quests have no giver or turn-in:
+ *  entering the authored area starts them and completing the objective pays
+ *  the reward immediately. */
+export interface WorldQuestDef {
+  id: string;
+  zoneId: string;
+  minLevel: number;
+  area: { x: number; z: number; radius: number };
+  objective: WorldQuestObjective;
+  count: number;
+  reward: WorldQuestReward;
+}
+
+/** Per-character state for the current host-provided UTC cycle. Available
+ *  quests are absent; only started and completed entries are persisted. */
+export interface WorldQuestProgress {
+  questId: string;
+  count: number;
+  state: 'active' | 'completed';
+  creditedObjects?: string[];
+  puzzleVariant?: number;
+  puzzleRotations?: number[];
+  match3Board?: WorldQuestMatch3Candy[];
+  match3Moves?: number;
+  match3RefillIndex?: number;
 }
 
 export function questObjectiveRequired(
@@ -5327,14 +5467,21 @@ export interface VarkhulEncounterState {
   assemblyForgeMeltdownTickTimer: number;
   assemblyForgeHammerTimer: number;
   assemblyForgeVentedThisTick: boolean;
-  assemblyPortalSpawns: Array<{ wave: number; spawnIndex: number; remaining: number }>;
+  assemblyPortalSpawns: Array<{
+    wave: number;
+    spawnIndex: number;
+    remaining: number;
+  }>;
   assemblyOrdinaryAddWaves: Array<{ addId: number; wave: number }>;
   assemblyNextWaveIndex: number;
   assemblyNextWaveRemaining: number;
   assemblyIntermissionWaves: number;
   assemblyArtificerNextSpawnRemaining: number;
   assemblyArtificerSpawnIndex: number;
-  assemblyArtificerPortalSpawns: Array<{ portalIndex: number; remaining: number }>;
+  assemblyArtificerPortalSpawns: Array<{
+    portalIndex: number;
+    remaining: number;
+  }>;
   assemblyDeliveryWindowRemaining: number;
   assemblyDeliveredCoreIds: string[];
   assemblyArtificerRepaired: boolean;
@@ -5506,7 +5653,12 @@ export type UnstuckCancelReason =
 export type UnstuckEvent =
   | { type: 'unstuck'; phase: 'started'; seconds: number }
   | { type: 'unstuck'; phase: 'countdown'; seconds: number }
-  | { type: 'unstuck'; phase: 'blocked'; reason: UnstuckBlockedReason; seconds?: number }
+  | {
+      type: 'unstuck';
+      phase: 'blocked';
+      reason: UnstuckBlockedReason;
+      seconds?: number;
+    }
   | {
       type: 'unstuck';
       phase: 'cancelled';
@@ -5712,6 +5864,23 @@ export type SimEvent = { pid?: number } & (
     }
   | { type: 'questReady'; questId: string }
   | { type: 'questDone'; questId: string }
+  | { type: 'worldQuestStarted'; questId: string }
+  | {
+      type: 'worldQuestProgress';
+      questId: string;
+      count: number;
+      required: number;
+    }
+  | { type: 'worldQuestPuzzleOpened'; questId: string }
+  | { type: 'worldQuestPuzzleClosed'; questId: string }
+  | {
+      type: 'worldQuestPuzzleUpdated';
+      questId: string;
+      tileIndex: number;
+      rotation: number;
+    }
+  | { type: 'worldQuestMatch3Updated'; questId: string }
+  | { type: 'worldQuestDone'; questId: string }
   | {
       type: 'varkhulCallout';
       sourceId: number;
@@ -5832,7 +6001,11 @@ export type SimEvent = { pid?: number } & (
   // like deedBroadcast so the one client event switch stays exhaustively
   // typed. Carries the earner's name and the page id only, never page text:
   // the client composes the line from reliquary_i18n plus its own chrome key.
-  | { type: 'reliquaryIlluminationBroadcast'; characterName: string; pageId: string }
+  | {
+      type: 'reliquaryIlluminationBroadcast';
+      characterName: string;
+      pageId: string;
+    }
   // say/yell are delivered only to players in range and carry the speaker's
   // entity id so the client can hang a chat bubble over their head; whisper
   // goes to the target (and echoes to the sender with `to` set); general is

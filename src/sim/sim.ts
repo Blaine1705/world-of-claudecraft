@@ -1,3 +1,4 @@
+// biome-ignore-all format: Legacy coordinator is line-ratcheted; format extracted world-quest modules instead.
 import type {
   AccountCosmetics,
   ActionBarLayout,
@@ -673,6 +674,21 @@ import {
   updateRiftTriggers as updateRiftTriggersImpl,
 } from './rift/runs';
 import type { RiftEvent, RiftInstance } from './rift/types';
+import { dropWorldQuestDeliveryCargo as dropWorldQuestDeliveryCargoImpl } from './world_quest_delivery';
+import {
+  activeWorldQuestsForCycle,
+  onMobKilledForWorldQuests,
+  onNodeGatheredForWorldQuests,
+  onObjectInteractedForWorldQuests,
+  resetWorldQuestMatch3 as resetWorldQuestMatch3Impl,
+  restoreWorldQuestClaims,
+  rotateWorldQuestPuzzleTile as rotateWorldQuestPuzzleTileImpl,
+  sanitizeWorldQuestCycle,
+  sanitizeWorldQuestProgress,
+  swapWorldQuestMatch3Tiles as swapWorldQuestMatch3TilesImpl,
+  updateWorldQuests,
+  worldQuestCycleForResetDay,
+} from './world_quests';
 
 // computeQuestState (the pure quest-state fn) moved to quests/quest_commands.ts (W4);
 // re-export it here so ClientWorld's `import { computeQuestState } from '../sim/sim'`
@@ -799,6 +815,7 @@ import {
   type SimEvent,
   type SkinCatalog,
   type SkinRank,
+  STABLE_GROUND_OBJECT_ENTITY_ID_MIN,
   SUNDER_ARMOR_PCT_PER_STACK,
   steadyAngleTo,
   swingMissChance,
@@ -807,6 +824,8 @@ import {
   type WeaponSkinLoadout,
   type WeaponSkinType,
   type WorldContent,
+  type WorldQuestDef,
+  type WorldQuestProgress,
   xpToReachLevel,
 } from './types';
 import type { VendorBuyOptions } from './vendor_buy_stack';
@@ -1445,6 +1464,14 @@ export interface PlayerMeta {
   known: ResolvedAbility[];
   questLog: Map<string, QuestProgress>;
   questsDone: Set<string>;
+  worldQuestCycle: string;
+  worldQuestLog: Map<string, WorldQuestProgress>;
+  /** Session-only cycle override used by focused dev commands; never persisted. */
+  devWorldQuestCycle?: string | null;
+  /** Puzzle-area entry edges for this session. Never persisted or wired. */
+  worldQuestAreas: Set<string>;
+  /** Minigame unlocked by the area's physical activator for this session. */
+  openWorldQuestPuzzleId: string | null;
   counters: RewardCounters;
   autoEquip: boolean;
   // sim.time when this character entered the world; powers /played. Session-only
@@ -1915,6 +1942,14 @@ export class Sim {
   // local one, so a daily never rolls over mid-evening the way midnight UTC did.
   // Empty string = "no calendar known" (headless/replay), same contract as utcDay.
   resetDay = '';
+  // Host-owned epoch-ms boundary for the active world-quest rotation. The sim
+  // never reads the wall clock; UI hosts expose this number through IWorld.
+  worldQuestExpiresAtMs = 0;
+  private cachedWorldQuestResetDay = '';
+  private cachedWorldQuestRotation: Readonly<{
+    cycle: string;
+    quests: readonly WorldQuestDef[];
+  }> = { cycle: '', quests: [] };
   // The weekend event early-open probe: the reset-day key DOUBLE_HONOR_LEAD_HOURS
   // ahead of now, fed by the host beside resetDay (server: `eventLeadDayKey`;
   // offline: `feedSimCalendar`). '' = no calendar, the event never opens early.
@@ -2220,10 +2255,33 @@ export class Sim {
     }
 
     // Ground objects
+    const stableGroundObjectIds = new Set<number>();
     for (const objDef of worldContent.groundObjects) {
-      for (const p of objDef.positions) {
+      if (objDef.entityIds && objDef.entityIds.length !== objDef.positions.length) {
+        throw new Error(`Ground object ${objDef.itemId} has mismatched stable entity ids`);
+      }
+      for (const entityId of objDef.entityIds ?? []) {
+        if (
+          !Number.isSafeInteger(entityId) ||
+          entityId < STABLE_GROUND_OBJECT_ENTITY_ID_MIN ||
+          stableGroundObjectIds.has(entityId) ||
+          this.entities.has(entityId)
+        ) {
+          throw new Error(`Invalid or duplicate stable ground object entity id: ${entityId}`);
+        }
+        stableGroundObjectIds.add(entityId);
+      }
+    }
+    for (const objDef of worldContent.groundObjects) {
+      for (let positionIndex = 0; positionIndex < objDef.positions.length; positionIndex++) {
+        const p = objDef.positions[positionIndex];
+        const stableId = objDef.entityIds?.[positionIndex];
+        const entityId = stableId ?? this.nextId++;
+        if (!Number.isSafeInteger(entityId) || entityId <= 0 || this.entities.has(entityId)) {
+          throw new Error(`Invalid or duplicate ground object entity id: ${entityId}`);
+        }
         const obj = createGroundObject(
-          this.nextId++,
+          entityId,
           objDef.itemId,
           objDef.name,
           this.groundPos(p.x, p.z),
@@ -2717,6 +2775,11 @@ export class Sim {
       known: [],
       questLog: new Map(),
       questsDone: new Set(),
+      worldQuestCycle: '',
+      worldQuestLog: new Map(),
+      devWorldQuestCycle: null,
+      worldQuestAreas: new Set(),
+      openWorldQuestPuzzleId: null,
       counters: freshCounters(),
       autoEquip: opts?.autoEquip ?? false,
       joinedAt: this.time,
@@ -3089,6 +3152,16 @@ export class Sim {
         }
       }
       for (const q of s.questsDone) meta.questsDone.add(q);
+      if (s.worldQuests) {
+        meta.worldQuestCycle = sanitizeWorldQuestCycle(s.worldQuests.cycle);
+        for (const progress of sanitizeWorldQuestProgress(
+          s.worldQuests.progress,
+          meta.worldQuestCycle,
+        )) {
+          meta.worldQuestLog.set(progress.questId, progress);
+        }
+      }
+      restoreWorldQuestClaims(meta);
       // A rev reset zeroes COLLECT counts too, and those are derived state only
       // onInventoryChangedForQuests re-credits: re-sync once (inventory is already
       // restored above) so a migrated character holding the collect items is not
@@ -3909,7 +3982,27 @@ export class Sim {
         ...(q.rev === undefined ? {} : { rev: q.rev }),
       })),
       questsDone: [...meta.questsDone],
-      arenaRating: meta.arenaRating,
+      ...(meta.worldQuestCycle || meta.worldQuestLog.size > 0
+        ? {
+            worldQuests: {
+              cycle: meta.worldQuestCycle,
+              progress: [...meta.worldQuestLog.values()].map((progress) => {
+                return {
+                  ...progress,
+                  ...(progress.creditedObjects === undefined
+                    ? {}
+                    : { creditedObjects: [...progress.creditedObjects] }),
+                  ...(progress.puzzleRotations === undefined
+                    ? {}
+                    : { puzzleRotations: [...progress.puzzleRotations] }),
+                  ...(progress.match3Board === undefined
+                    ? {}
+                    : { match3Board: [...progress.match3Board] }),
+                };
+              }),
+            },
+          }
+        : {}),      arenaRating: meta.arenaRating,
       arenaWins: meta.arenaWins,
       arenaLosses: meta.arenaLosses,
       arena1v1Rating: meta.arenaRating,
@@ -4605,6 +4698,12 @@ export class Sim {
   get questsDone(): Set<string> {
     return this.primary.questsDone;
   }
+  get worldQuestCycle(): string {
+    return this.primary.worldQuestCycle;
+  }
+  get worldQuestLog(): ReadonlyMap<string, WorldQuestProgress> {
+    return this.primary.worldQuestLog;
+  }
   // --- IWorldDeeds: the Book of Deeds read surface + title/border selection.
   // The reads expose the live per-player state (the questLog precedent above);
   // the facet types them Readonly so no seam consumer mutates them. ---
@@ -4701,6 +4800,14 @@ export class Sim {
       if (msRemaining > 0) out.push({ id, msRemaining });
     }
     return out;
+  }
+  worldBossActive(bossId: string): boolean {
+    const index = WORLD_BOSSES.findIndex((boss) => boss.templateId === bossId);
+    if (index < 0) return false;
+    const entityId = this.worldBossEntityIds[index];
+    if (entityId === null) return false;
+    const entity = this.entities.get(entityId);
+    return entity !== undefined && !entity.dead;
   }
   get counters(): RewardCounters {
     return this.primary.counters;
@@ -5273,10 +5380,16 @@ export class Sim {
       // through `sim.ctx` (lazily read at call time, after the ctor sets it). countItem
       // stays on Sim (L2 inventory hub) and is consumed by the collect updater.
       onMobKilledForQuests: (mob, meta) => onMobKilledForQuests(sim.ctx, mob, meta),
+      onMobKilledForWorldQuests: (mob, meta) => onMobKilledForWorldQuests(sim.ctx, mob, meta),
       onRecipeCraftedForQuests: (recipeId, meta) =>
         onRecipeCraftedForQuests(sim.ctx, recipeId, meta),
       onNodeGatheredForQuests: (node, itemId, meta) =>
         onNodeGatheredForQuests(sim.ctx, node, itemId, meta),
+      onNodeGatheredForWorldQuests: (node, meta) =>
+        onNodeGatheredForWorldQuests(sim.ctx, node, meta),
+      onObjectInteractedForWorldQuests: (object, meta) =>
+        onObjectInteractedForWorldQuests(sim.ctx, object, meta),
+      currentWorldQuestRotation: () => sim.currentWorldQuestRotation(),
       onInventoryChangedForQuests: (meta) => onInventoryChangedForQuests(sim.ctx, meta),
       checkQuestReady: (qp, meta) => checkQuestReady(sim.ctx, qp, meta),
       countItem: sim.countItem.bind(sim),
@@ -5552,6 +5665,20 @@ export class Sim {
     return createSimContext(host);
   }
 
+  private currentWorldQuestRotation(): Readonly<{
+    cycle: string;
+    quests: readonly WorldQuestDef[];
+  }> {
+    if (this.cachedWorldQuestResetDay !== this.resetDay) {
+      this.cachedWorldQuestResetDay = this.resetDay;
+      const cycle = worldQuestCycleForResetDay(this.resetDay);
+      this.cachedWorldQuestRotation = {
+        cycle,
+        quests: activeWorldQuestsForCycle(cycle),
+      };
+    }
+    return this.cachedWorldQuestRotation;
+  }
   private refreshKnownAbilities(meta: PlayerMeta, announce: boolean): void {
     const e = this.entities.get(meta.entityId);
     if (!e) return;
@@ -5905,11 +6032,16 @@ export class Sim {
     for (const meta of this.players.values()) {
       const p = this.entities.get(meta.entityId);
       if (!p) continue;
+      // Rotation expiry applies to ghosts too. Living players keep the system's
+      // established post-movement phase below so crossing the area boundary
+      // starts the objective in the same tick.
+      if (p.dead) updateWorldQuests(this.ctx, meta, p);
       if (!p.dead) {
         ensureWarriorStance(this.ctx, p, meta);
         this.updatePlayerMovement(p, meta);
         updateVeilboundMarchMovement(this.ctx, p);
         completeVeilboundMarch(this.ctx, p);
+        updateWorldQuests(this.ctx, meta, p);
         lap?.('p.move');
         this.updateDoorTriggers(p);
         this.updateRiftTriggers(p);
@@ -9774,6 +9906,27 @@ export class Sim {
     questCommands.abandonQuest(this.ctx, questId, pid);
   }
 
+  rotateWorldQuestPuzzleTile(questId: string, tileIndex: number, pid?: number): void {
+    rotateWorldQuestPuzzleTileImpl(this.ctx, questId, tileIndex, pid);
+  }
+
+  swapWorldQuestMatch3Tiles(
+    questId: string,
+    fromIndex: number,
+    toIndex: number,
+    pid?: number,
+  ): void {
+    swapWorldQuestMatch3TilesImpl(this.ctx, questId, fromIndex, toIndex, pid);
+  }
+
+  resetWorldQuestMatch3(questId: string, pid?: number): void {
+    resetWorldQuestMatch3Impl(this.ctx, questId, pid);
+  }
+
+  dropWorldQuestDeliveryCargo(pid = this.playerId): boolean {
+    const player = this.entities.get(pid);
+    return player ? dropWorldQuestDeliveryCargoImpl(this.ctx, player) : false;
+  }
   turnInQuest(questId: string, pid?: number): void {
     questCommands.turnInQuest(this.ctx, questId, pid);
   }

@@ -104,11 +104,13 @@ const build = await buildItemArtAudit({
     // non-weapon Crucible pieces; the art-pending ledger is now empty).
     // + the OSSBrain v0.41 batch's own painted piece, carried through the
     // base merge alongside the release-side Crucible waves.
-    catalogCount: 1041,
+    // + the two painted world-quest puzzle activators and two Eastbrook
+    // freight-delivery icons.
+    catalogCount: 1045,
     // 844 + the 201 Crucible raid loot definitions (192 of them art-pending)
     // + the base's 2 Varkhul legendary definitions, + the release sync's 7
     // bank-storage painted bags.
-    liveItemCount: 1056,
+    liveItemCount: 1060,
     generatedHeroicDefinitions: 64,
     heroicDefinitionsWithOwnWebp: 48,
     heroicWeaponArtAliases: 16,

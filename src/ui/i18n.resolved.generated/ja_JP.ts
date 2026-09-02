@@ -2710,6 +2710,7 @@ export const ja_JP: EnTranslations = {
       "forbiddenReflectionLock": "フォービドゥン・リフレクションはまだ再準備できない",
       "internalCooldown": "タイマー終了までこの効果は再発動しない",
       "carriedFlag": "敵の旗を運搬中です。このバフを解除すると旗を落とします。",
+      "carryingFreight": "荷物を運搬中です。移動速度が{pct}%低下します。",
       "battleStance": "バトルスタンス: 怒りの生成量が10%増加",
       "berserkerStance": "バーサーカースタンス: クリティカル率が3%上昇し、与えるダメージが3%増加",
       "crit": "クリティカル率を{pct}%上昇させる",
@@ -8914,6 +8915,9 @@ export const ja_JP: EnTranslations = {
         "readyQuest": "報告可能なクエスト",
         "repeatQuest": "繰り返し可能なクエスト",
         "cooldownQuest": "再受注待ちのクエスト",
+        "availableWorldQuest": "利用可能なワールドクエスト: {name}",
+        "activeWorldQuest": "進行中のワールドクエスト: {name}",
+        "worldBoss": "ワールドボス: {name}",
         "questObjective": "クエスト目標エリア",
         "readyOre": "採掘可能な鉱脈",
         "readyWood": "採集可能な木材",
@@ -9703,8 +9707,50 @@ export const ja_JP: EnTranslations = {
       "objectiveProgress": "{label}: {current}/{total}",
       "requiresLevel": "レベル{level}が必要"
     },
+    "worldQuest": {
+      "title": "{zone}: {target}",
+      "unknown": "不明なワールドクエスト（{id}）",
+      "itemReward": "アイテム報酬: {name}",
+      "rewardLine": "報酬: {reward}",
+      "availableStatus": "利用可能なワールドクエスト",
+      "activeStatus": "進行中のワールドクエスト",
+      "expiresIn": "終了まで{time}",
+      "mineOre": "銅鉱石を採掘",
+      "recoverObject": "{name}を回収",
+      "redirectLeyBeam": "レイビームを目的地へ導く",
+      "matchConfections": "魔法のお菓子を揃える",
+      "loadFreight": "荷物を荷馬車に積み込む",
+      "salvageWreckage": "難破船の残骸を回収",
+      "puzzleTitle": "レイビームの調整",
+      "puzzleLevel": "週間レベル {level}",
+      "puzzleInstructions": "タイルを回転させ、光線を始点から目的地までつなげてください。",
+      "puzzleRotateTile": "タイル{tile}を回転",
+      "puzzleConnectors": "接続方向: {connectors}。",
+      "puzzlePowered": "このタイルまで光線が届いています。",
+      "puzzleUnpowered": "このタイルには光線が届いていません。",
+      "puzzleClose": "レイビームパズルを閉じる",
+      "puzzleSource": "始点",
+      "puzzleTarget": "目的地",
+      "match3Title": "お菓子の連鎖",
+      "match3Instructions": "隣り合うお菓子を2つ選んでください。3つ以上の列ができる入れ替えだけが手数に数えられます。",
+      "match3Moves": "手数：{current}/{total}",
+      "match3Cleared": "消したお菓子：{current}/{total}",
+      "match3Cell": "{row} 行 {column} 列：{candy}",
+      "match3Selected": "選択中",
+      "match3Reset": "レベルをやり直す",
+      "match3Close": "お菓子パズルを閉じる",
+      "match3OutOfMoves": "手数が残っていません。レベルをやり直してください。",
+      "match3Candy": {
+        "berry": "ベリークリスタル",
+        "citrus": "シトラスオーブ",
+        "mint": "ミントトライアングル",
+        "grape": "グレープスクエア",
+        "star": "シュガースター"
+      }
+    },
     "logs": {
       "accepted": "クエスト受諾: {name}",
+      "worldQuestStarted": "ワールドクエスト開始: {name}",
       "abandoned": "クエスト破棄: {name}",
       "completed": "クエスト完了: {name}",
       "ready": "{name}（{status}）",
@@ -13039,6 +13085,18 @@ export const ja_JP: EnTranslations = {
       },
       "sprung_trap": {
         "name": "弾かれた沼の罠"
+      },
+      "leyline_cache": {
+        "name": "ミニチュア・レイライン宝箱"
+      },
+      "confection_game_box": {
+        "name": "菓子職人のゲーム箱"
+      },
+      "eastbrook_freight_crate": {
+        "name": "イーストブルックの貨物箱"
+      },
+      "eastbrook_freight_wagon": {
+        "name": "イーストブルックの貨物荷馬車"
       },
       "hearthlined_treads": {
         "name": "炉火裏地の足具"

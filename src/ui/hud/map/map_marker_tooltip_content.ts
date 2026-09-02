@@ -18,8 +18,18 @@ import type {
   MapNpcMarker,
   MapServiceMarker,
   MapStationMarker,
+  MapWorldBossMarker,
+  MapWorldQuestMarker,
 } from '../../map_window_view';
 import { questMarkerTooltipTag } from '../../quest_marker_tags';
+import {
+  worldQuestDef,
+  worldQuestDisplayName,
+  worldQuestObjectiveLabel,
+  worldQuestRewardLine,
+  worldQuestStatusText,
+  worldQuestTimeRemainingText,
+} from '../../world_quest_view';
 
 function questTitle(questId: string): string {
   return tEntity({ kind: 'quest', id: questId, field: 'title' });
@@ -92,6 +102,44 @@ export class MapMarkerTooltipContent {
       return model ? gatherNodeTooltipHtml(model) : '';
     });
     return this.gatherMemo.html;
+  }
+
+  worldQuest(marker: MapWorldQuestMarker, nowMs: number): string {
+    const quest = worldQuestDef(marker.questId);
+    if (!quest) return '';
+    const progress = this.world.worldQuestLog.get(marker.questId);
+    const current = Math.min(progress?.count ?? 0, quest.count);
+    const timeRemaining = worldQuestTimeRemainingText(this.world.worldQuestExpiresAtMs, nowMs);
+    return (
+      `<div class="tt-title">${esc(worldQuestDisplayName(marker.questId))}</div>` +
+      `<div>${esc(worldQuestStatusText(marker.state))}</div>` +
+      `<div>${esc(
+        questProgressText(worldQuestObjectiveLabel(marker.questId), current, quest.count),
+      )}</div>` +
+      `<div>${esc(worldQuestRewardLine(quest, this.world.player.level))}</div>` +
+      (timeRemaining ? `<div>${esc(timeRemaining)}</div>` : '')
+    );
+  }
+
+  /** Plain-text counterpart used by the map's always-present screen-reader summary. */
+  worldQuestSemantic(questId: string, nowMs: number): string {
+    const quest = worldQuestDef(questId);
+    if (!quest) return questId;
+    const progress = this.world.worldQuestLog.get(questId);
+    const current = Math.min(progress?.count ?? 0, quest.count);
+    return [
+      worldQuestDisplayName(questId),
+      questProgressText(worldQuestObjectiveLabel(questId), current, quest.count),
+      worldQuestRewardLine(quest, this.world.player.level),
+      worldQuestTimeRemainingText(this.world.worldQuestExpiresAtMs, nowMs),
+    ]
+      .filter(Boolean)
+      .join('. ');
+  }
+
+  worldBoss(marker: MapWorldBossMarker): string {
+    const name = tEntity({ kind: 'mob', id: marker.bossId, field: 'name' });
+    return `<div class="tt-title">${esc(name)}</div>`;
   }
 
   questArea(refs: readonly QuestObjectiveRef[], activeCount: number): string {

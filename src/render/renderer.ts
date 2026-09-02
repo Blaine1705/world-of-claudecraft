@@ -1,3 +1,4 @@
+// biome-ignore-all format: Legacy monolith has exact-source contracts; format new seams in their modules.
 import * as THREE from 'three';
 import { NumberSampleRing } from '../game/sample_ring';
 import { coerceFxTier, nameplateIntervalSec } from '../game/ui_tier_knobs';
@@ -563,9 +564,8 @@ import { createPrewarmResumeLedger } from './prewarm_resume_ledger_core';
 import { type PriestMarkersVisual, syncPriestMarkersVisual } from './priest_markers_visual';
 import { pieceProgramSettle } from './program_variant_settle';
 import { buildPropMaterialPrewarmGroup, buildProps, propResidencySources } from './props';
-
 import { makeQuestObjectGate, type QuestObjectGateOptions } from './quest_object_gate_core';
-import { buildGroundQuestObject } from './quest_objects';
+import { buildGroundQuestObject, farshoreSalvagePrewarmPlan, prewarmFarshoreSalvageObjects } from './quest_objects';
 import { RaceLine } from './race_line';
 import {
   disposeRaidEncounterVisuals,
@@ -746,6 +746,7 @@ import { weaponVfxShedScale } from './weapon_vfx_shed_core';
 import { Weather } from './weather';
 import { precipForBiome } from './weather_field_core';
 import { buildWorldAmbientSources, footstepSurfaceAt } from './world_audio';
+import { hasWorldQuestDeliveryCargo, syncWorldQuestCarryVisual, type WorldQuestCarryViewState } from './world_quest_carry_visual';
 import { surfaceDetailPrewarmTextures } from './worn_stone';
 import { buildYumiMaze, type YumiMazeView } from './yumi_maze';
 import { YumiTeamMarkers } from './yumi_team_markers';
@@ -1079,7 +1080,7 @@ interface AoeRingSlot {
   elapsed: number; // seconds since spawn; >= AOE_RING_LIFETIME means free
 }
 
-export interface EntityView extends RickshawMountViewState {
+export interface EntityView extends RickshawMountViewState, WorldQuestCarryViewState {
   group: THREE.Group;
   /** rigged glTF visual for characters; null for object views (doors/crates) */
   visual: CharacterVisual | null;
@@ -1998,7 +1999,7 @@ export class Renderer {
     options: RendererCreateOptions = {},
   ) {
     this.canvas = canvas;
-    this.questObjectHidden = makeQuestObjectGate(options);
+    this.questObjectHidden = makeQuestObjectGate(options, this.sim);
     this.nameplateLayer = nameplateLayer;
     this.travelSpeedFx = new TravelSpeedFxPainter(nameplateLayer);
     // ?prep=legacy: admit every unit as before, while the ledger keeps learning
@@ -5285,6 +5286,7 @@ export class Renderer {
         place(built.group);
       }
     }
+    prewarmFarshoreSalvageObjects(buildGroundQuestObject, (poolKey, object) => this.storePooledObject(poolKey, object)).forEach(({ group: object }) => { object.visible = true; place(object); });
     return group;
   }
 
@@ -6422,7 +6424,7 @@ export class Renderer {
           this.scene.add(objectPrewarmGroup);
         },
         detail: () =>
-          `items=${PREWARM_OBJECT_ITEM_IDS.length};copies=${PREWARM_OBJECT_POOL_COPIES}`,
+          `items=${PREWARM_OBJECT_ITEM_IDS.length};copies=${PREWARM_OBJECT_POOL_COPIES};salvage=${farshoreSalvagePrewarmPlan.length}`,
       },
       {
         id: 'props.material-variants',
@@ -10622,6 +10624,7 @@ export class Renderer {
         // holy sparkle over beacon NPCs, gold over the current target.
         this.islandGuidance.npcFizz(this.sim, e, this.vfx, this.time, dt);
       }
+      v.worldQuestCarryVisual = syncWorldQuestCarryVisual(v.worldQuestCarryVisual, v.group, !e.dead && !e.mountKey && hasWorldQuestDeliveryCargo(e));
       const sunVerdictPlan = paladinSunVerdictVisualPlanForAuraInto(
         e.dead,
         sunVerdictAura,

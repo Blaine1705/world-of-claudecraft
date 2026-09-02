@@ -26,6 +26,12 @@ import type {
 } from './types';
 
 export type { FishingEntry } from './content/items';
+export {
+  WORLD_QUEST_MIN_LEVEL,
+  WORLD_QUESTS,
+  WORLD_QUESTS_BY_ID,
+} from './content/world_quests';
+export type { WorldQuestDef } from './types';
 
 import { CASTLE_BLOCKERS } from './castle_layout';
 import {
@@ -232,6 +238,7 @@ import {
   WILLOWFEN_ROADS,
   WILLOWFEN_ZONE,
 } from './content/willowfen';
+import { WORLD_QUEST_ITEMS, WORLD_QUEST_OBJECTS } from './content/world_quests';
 import {
   WRAITHWOOD_CAMPS,
   WRAITHWOOD_ESCORTS,
@@ -382,6 +389,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   DUNGEON_KEEPSAKE_ITEMS,
   IGNIVAR_DROP_ITEMS,
   CRUCIBLE_PROFESSION_ITEMS,
+  WORLD_QUEST_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';
@@ -587,6 +595,7 @@ export const GROUND_OBJECTS: GroundObjectDef[] = [
   ...GALECREST_OBJECTS,
   ...FARSHORE_OBJECTS,
   ...PROVING_SHORE_OBJECTS,
+  ...WORLD_QUEST_OBJECTS,
 ];
 
 export const GATHER_NODES: GatherNodeDef[] = [...GATHER_NODES_CONTENT];
