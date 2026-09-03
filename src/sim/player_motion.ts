@@ -31,6 +31,7 @@ import {
   MAX_STEP_HEIGHT,
   moveCharacter,
 } from './physics';
+import { PLATFORM_CARRY_CLEARANCE } from './physics/character';
 import { isSubmergedAt, rideSteepnessAt, shoreStepOut, stepWaterLevel } from './ride_height';
 import { GHOST_RUN_MULT } from './spirit';
 import {
@@ -199,6 +200,7 @@ function isDeepFor(x: number, z: number, seed: number): boolean {
 
 const SWIM_DEPTH = PLAYER_SWIM_DEPTH; // ground this far under the water line = deep water
 const MAX_CLIMB_SLOPE = PLAYER_MAX_CLIMB_SLOPE;
+
 const BODY_RADIUS = PLAYER_BODY_RADIUS;
 
 // Movement speed multiplier over the entity's own state (ghost flag + auras).
@@ -330,8 +332,17 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
   // EXACT position (terrainDownhill): genuinely steep ground still strips
   // control and slides, but a flat shoulder the cell memo over-reads keeps
   // control, and the wall/contour gate below still refuses the climb.
+  // A body CARRIED BY A STANDABLE PLATFORM (feet well above the raw ground:
+  // a fortress floor plate, a stair tread, a pier deck) is not walking the
+  // ground the memo read at all, so the strip never fires for the terrain
+  // buried under its deck: stripping there froze players on the Forgefather
+  // plates whose under-floor ground the stamps had carved steep, with no
+  // slide to escape by because the platform holds the body in place.
   const steepFlagged =
-    p.onGround && !swimming && rideSteepnessAt(p.pos.x, p.pos.z, deps.seed) > MAX_CLIMB_SLOPE;
+    p.onGround &&
+    !swimming &&
+    p.pos.y <= swimGround + PLATFORM_CARRY_CLEARANCE &&
+    rideSteepnessAt(p.pos.x, p.pos.z, deps.seed) > MAX_CLIMB_SLOPE;
   const steepSlide = steepFlagged ? terrainDownhill(p.pos.x, p.pos.z, deps.seed) : null;
   const steepGround = steepSlide !== null;
   // Move-to-cancel: any movement input during a summon channel cancels the cast.
@@ -904,10 +915,20 @@ function standoffPass(
       // surface (ride_height.ts): on dry ground it is exactly the memoized
       // terrain view this comment describes, and a nudge toward water never
       // reads a submerged bed bump as a wall.
+      // The same mount water wall the main step enforces (a ground mount never
+      // steps off dry land into swimming depth) applies to this nudge too: an
+      // ungraded terrain wall right at the edge of undeclared deep water (open
+      // sea the generator carved outside any authored lake, so it never got a
+      // shore's smoothed approach) can press a mounted rider's body against it,
+      // and without this guard the standoff push carries them straight through
+      // the wall into water the horizontal step above never got a chance to
+      // wall off. Skipping the nudge leaves the rider pressed against the wall
+      // for this tick rather than silently dismounting them into the pit.
       const standSteep = rideSteepnessAt(standX, standZ, deps.seed);
       if (
-        standSteep <= MAX_CLIMB_SLOPE ||
-        standSteep <= rideSteepnessAt(p.pos.x, p.pos.z, deps.seed)
+        !(p.mountKey && isDeepFor(standX, standZ, deps.seed)) &&
+        (standSteep <= MAX_CLIMB_SLOPE ||
+          standSteep <= rideSteepnessAt(p.pos.x, p.pos.z, deps.seed))
       ) {
         p.pos.x = standX;
         p.pos.z = standZ;

@@ -570,6 +570,9 @@ const mergeStringsEn = {
       // World Market's bag-capacity dropdown (market_window.ts), which reuses it so a new
       // bag size needs no new key. Rewording this restyles that market control too.
       bagSlots: '{slots} Slot Bag',
+      // The materials-only satchel variant (phase 05 two-pool bags): the same
+      // tooltip and socket-aria sites, English-appended until the release fill.
+      bagSlotsMaterials: '{slots} Slot Materials Bag',
     },
     vendor: {
       ...itemNames.en.itemUi.vendor,
@@ -3942,7 +3945,7 @@ const mergeExtraEn = {
     [
       'prowl',
       'Stalk',
-      'Enter stealth while in Wolf Form, moving 50% slower. Cannot be used in combat.',
+      'Enter stealth while in Wolf Form, moving 5% slower. Cannot be used in combat.',
     ],
     [
       'rake',

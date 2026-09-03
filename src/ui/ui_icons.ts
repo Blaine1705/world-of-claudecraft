@@ -49,6 +49,7 @@ export type UiIconName =
   | 'x'
   | 'kick'
   | 'youtube'
+  | 'steam'
   | 'donate'
   | 'chest'
   // hand-authored geometrics
@@ -70,7 +71,6 @@ export type UiIconName =
   | 'vibrate'
   | 'lock'
   | 'mail'
-  | 'ball'
   | 'book'
   | 'cards'
   | 'trash'
@@ -83,7 +83,11 @@ export type UiIconName =
   | 'download'
   | 'eye'
   | 'eye-off'
-  | 'wiki';
+  | 'promote'
+  | 'demote'
+  | 'out-of-range'
+  | 'wiki'
+  | 'alert';
 
 // Inner SVG markup per icon (one or more <path>). Default fill rule is nonzero
 // (correct for game-icons.net art incl. overlaps); the two hand-authored cut-out
@@ -91,6 +95,14 @@ export type UiIconName =
 const ICONS: Record<UiIconName, string> = {
   // hand-authored capture-the-flag banner on a pole (Thornhollow Fields battleground)
   battleground: '<path d="M150 56h26v400h-26z"/><path d="M176 78h236l-52 66 52 66H176z"/>',
+  // hand-authored rank arrows: broad chevrons plus a baseline, designed for
+  // the guild roster's 15px controls rather than depending on OS font glyphs
+  promote:
+    '<path d="M88 300 256 132l168 168-46 46-122-122-122 122z"/><path d="M96 404h320v48H96z"/>',
+  demote: '<path d="m88 212 46-46 122 122 122-122 46 46-168 168z"/><path d="M96 60h320v48H96z"/>',
+  // hand-authored four-corner separation mark for an out-of-range unit frame
+  'out-of-range':
+    '<path d="M54 54h154v44h-79l92 92-31 31-92-92v79H54zM458 54v154h-44v-79l-92 92-31-31 92-92h-79V54zM54 458V304h44v79l92-92 31 31-92 92h79v44zM458 458H304v-44h79l-92-92 31-31 92 92v-79h44z"/>',
   // ── game-icons.net (CC BY 3.0) ───────────────────────────────────────────
   arena:
     '<path d="M19.75 14.438c59.538 112.29 142.51 202.35 232.28 292.718l3.626 3.75.063-.062c21.827 21.93 44.04 43.923 66.405 66.25-18.856 14.813-38.974 28.2-59.938 40.312l28.532 28.53 68.717-68.717c42.337 27.636 76.286 63.646 104.094 105.81l28.064-28.06c-42.47-27.493-79.74-60.206-106.03-103.876l68.936-68.938-28.53-28.53c-11.115 21.853-24.413 42.015-39.47 60.593-43.852-43.8-86.462-85.842-130.125-125.47-.224-.203-.432-.422-.656-.625C183.624 122.75 108.515 63.91 19.75 14.437zm471.875 0c-83.038 46.28-154.122 100.78-221.97 161.156l22.814 21.562 56.81-56.812 13.22 13.187-56.438 56.44 24.594 23.186c61.802-66.92 117.6-136.92 160.97-218.72zm-329.53 125.906l200.56 200.53c-4.36 4.443-8.84 8.793-13.405 13.032L148.875 153.53l13.22-13.186zm-76.69 113.28l-28.5 28.532 68.907 68.906c-26.29 43.673-63.53 76.414-106 103.907l28.063 28.06c27.807-42.164 61.758-78.174 104.094-105.81l68.718 68.717 28.53-28.53c-20.962-12.113-41.08-25.5-59.937-40.313 17.865-17.83 35.61-35.433 53.157-52.97l-24.843-25.655-55.47 55.467c-4.565-4.238-9.014-8.62-13.374-13.062l55.844-55.844-24.53-25.374c-18.28 17.856-36.602 36.06-55.158 54.594-15.068-18.587-28.38-38.758-39.5-60.625z"/>',
@@ -145,6 +157,11 @@ const ICONS: Record<UiIconName, string> = {
   // The same YouTube mark public/links.html draws inline for the project's channel.
   youtube:
     '<g transform="translate(16 16) scale(20)"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></g>',
+  // The Steam mark, reproduced monochrome for identification only (see CREDITS.md)
+  // on the same 24 x 24 artboard as the marks above for the wishlist reminder
+  // surfaces owned by steam_wishlist.ts.
+  steam:
+    '<g transform="translate(16 16) scale(20)"><path d="M11.979 0C5.678 0 .511 4.86 0 11.032l6.447 2.665c.545-.373 1.203-.59 1.91-.59.063 0 .125.002.188.005l2.866-4.154V8.9c0-2.501 2.034-4.534 4.534-4.534 2.5 0 4.533 2.034 4.533 4.534s-2.034 4.535-4.533 4.535h-.104l-4.089 2.92c0 .052.004.105.004.159 0 1.875-1.515 3.396-3.39 3.396-1.635 0-3.016-1.173-3.331-2.727L.436 15.27C1.862 20.307 6.486 24 11.979 24c6.627 0 11.999-5.373 11.999-12S18.605 0 11.979 0zM7.54 18.21l-1.473-.61c.262.543.714.999 1.314 1.25 1.297.539 2.793-.076 3.332-1.375.263-.63.264-1.319.005-1.949s-.75-1.121-1.377-1.383c-.624-.26-1.29-.249-1.878-.03l1.523.63c.956.4 1.409 1.5 1.009 2.455-.397.957-1.497 1.41-2.454 1.012H7.54zm11.415-9.303c0-1.662-1.353-3.015-3.015-3.015-1.665 0-3.015 1.353-3.015 3.015 0 1.665 1.35 3.015 3.015 3.015 1.663 0 3.015-1.35 3.015-3.015zm-5.273-.005c0-1.252 1.013-2.266 2.265-2.266 1.249 0 2.266 1.014 2.266 2.266 0 1.251-1.017 2.265-2.266 2.265-1.253 0-2.265-1.014-2.265-2.265z"/></g>',
   // The same filled heart the pre-game shell's Donate community link draws inline
   // (a 24 x 24 artboard), scaled and centered to fit the shared 0 0 512 512 viewBox.
   donate:
@@ -201,9 +218,7 @@ const ICONS: Record<UiIconName, string> = {
   // hand-authored sealed envelope (frame + flap V), distinct from the solid
   // `whisper` glyph so mail chrome and whisper actions stay tellable apart
   mail: '<path d="M48 128a32 32 0 0 1 32-32h352a32 32 0 0 1 32 32v256a32 32 0 0 1-32 32H80a32 32 0 0 1-32-32V128zm52 8 156 122 156-122H100zm312 50L288 296a52 52 0 0 1-64 0L100 186v190h312V186z"/>',
-  // hand-authored boarball (the Vale Cup): a stitched ball, ring + two seams
   // with cross-stitch ticks so it reads at micro-button size
-  ball: '<path fill-rule="evenodd" d="M256 64a192 192 0 1 0 0 384 192 192 0 0 0 0-384zm0 40a152 152 0 1 1 0 304 152 152 0 0 1 0-304z"/><path d="M148 148c60 52 60 164 0 216l24 24c72-64 72-200 0-264zM364 148c-60 52-60 164 0 216l-24 24c-72-64-72-200 0-264z"/><path d="M238 160h36v28h-36zM238 324h36v28h-36zM220 238h72v36h-72z"/>',
   // hand-authored open book (the Book of Deeds): two page leaves meeting at a
   // spine dip, each page hollowed so the glyph reads at micro-button size
   book: '<path fill-rule="evenodd" d="M256 118c-44-26-104-38-172-38v312c68 0 128 12 172 38 44-26 104-38 172-38V80c-68 0-128 12-172 38zM124 122c40 4 76 13 104 28v246c-30-13-66-21-104-24V122zm264 0v250c-38 3-74 11-104 24V150c28-15 64-24 104-28z"/>',
@@ -228,6 +243,11 @@ const ICONS: Record<UiIconName, string> = {
   // micro-button size and stays tellable apart from the emote speech bubble
   // (a filled balloon) and the deeds book (a solid tome)
   wiki: '<path d="M168 180c0-72 176-80 176 6 0 62-88 64-88 132" stroke="currentColor" stroke-width="46" fill="none" stroke-linecap="round"/><circle cx="256" cy="412" r="36"/>',
+  // The state glyph beside an error line (DESIGN.md 12: errors are icon plus
+  // text): an outlined triangle with a bang, currentColor like every other
+  // chrome glyph so it tints with the error text token.
+  alert:
+    '<path d="M256 62 L472 438 H40 Z" fill="none" stroke="currentColor" stroke-width="40" stroke-linejoin="round"/><path d="M256 186v118" stroke="currentColor" stroke-width="44" stroke-linecap="round"/><circle cx="256" cy="374" r="28"/>',
   // World of ClaudeCraft maker's mark: the exact project-owned calligraphic
   // stroke used beside a crafted copy's provenance line. Unlike the filled
   // chrome glyphs above, this mark is intentionally an open currentColor line.

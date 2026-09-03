@@ -27,7 +27,9 @@
 // `src/sim`-pure: no DOM/Three, no Math.random/Date.now; all randomness is the shared
 // `ctx.rng` stream, drawn in the exact pre-move positions.
 
-import { CLASSES, isArenaPos, MOBS } from '../data';
+import { WARSPIRIT_EMBERSCALE_2PC_CADENCE_STEPS } from '../content/ignivar_set_bonuses';
+import { isArenaPos, MOBS } from '../data';
+import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
 import { forceDismount } from '../mounts';
 import { grantDevotionFromBlock } from '../paladin_devotion';
 import { scheduleProjectile } from '../projectile_travel';
@@ -35,6 +37,7 @@ import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { resolveTalentHitMult } from '../talent_hit_mult';
 import { addThreat, hasEscapeStealth } from '../threat';
+import { creditAbilityDrill } from '../tutorial/ability_drill';
 import {
   angleTo,
   armorReduction,
@@ -68,7 +71,9 @@ import { tryGrantDawnsWrath } from './paladin_dawns_wrath';
 import { tryGrantSolarReprisal } from './paladin_solar_reprisal';
 import { applyRequitalAutoAttack } from './paladin_talents';
 import { isValkyrsCallingAirborne } from './paladin_valkyrs_calling_state';
+import { effectivePlayerAttackRange } from './player_attack_reach';
 import { rangedShotProfile } from './ranged_shot';
+import { wearsSetBonus } from './set_bonus_wearer';
 import { triggerWardCycle } from './shaman_talents';
 import { advanceWarspiritCadence, stoneboundThreatMultiplier } from './shaman_warspirit';
 import { blockedMeleeDamage } from './shield_block';
@@ -160,15 +165,23 @@ export function startAutoAttack(ctx: SimContext, pid?: number): void {
   // bug, #1324). The toggle still arms autoAttack above; once the cast resolves, the
   // first landed swing (or the spell's own damage) aggros the target legitimately.
   if (
-    d <= MELEE_RANGE &&
+    d <= effectivePlayerAttackRange(t, MELEE_RANGE) &&
     !p.castingAbility &&
     t.kind === 'mob' &&
     t.hostile &&
     t.ownerId === null &&
     t.aiState !== 'evade'
   ) {
-    if (t.aiState === 'idle') ctx.aggroMob(t, p, true);
-    else if (t.aggroTargetId === null) t.aggroTargetId = p.id;
+    if (questGateBlocksAggro(ctx.players, t, p)) {
+      p.autoAttack = false;
+      return;
+    }
+    if (t.aiState === 'idle' && !ctx.aggroMob(t, p, true)) {
+      p.autoAttack = false;
+      return;
+    } else if (t.aggroTargetId === null) {
+      t.aggroTargetId = p.id;
+    }
     addThreat(t, p.id, 1);
     p.combatTimer = 0;
     p.inCombat = true;
@@ -221,12 +234,12 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
     // with their fixed class wand; the shot then fires at that resolved profile.
     const shot = rangedShotProfile(ranged, p.weapon);
     rangedSwing(ctx, p, t, { ...ranged, min: shot.min, max: shot.max, speed: shot.speed });
-    // The weapon's speed sets the cadence; ranged haste (item-set bonus) then
-    // shortens the auto-shot interval.
-    p.swingTimer = (shot.speed * ctx.swingIntervalMult(p)) / (1 + p.rangedHaste);
+    // The weapon's speed sets the cadence; the ranged channel of the one
+    // additive haste bucket then shortens the auto-shot interval.
+    p.swingTimer = shot.speed * ctx.swingIntervalMult(p, 'ranged');
     return;
   }
-  if (d > MELEE_RANGE) return;
+  if (d > effectivePlayerAttackRange(t, MELEE_RANGE)) return;
   // Melee normally skips line of sight (it's always point-blank), but the
   // arena's thin enclosing walls sit inside MELEE_RANGE: without this a
   // combatant pressed against a wall could swing through it. See sibling
@@ -282,6 +295,12 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
       whiteDualWieldPenalty: dualWieldWhiteMissPenalty && abilityName === null,
       autoAttack: true,
     });
+    // The island's ability drill (tutorial/ability_drill.ts). An onNextSwing
+    // ability (Reaver Strike) rides the SWING and never reaches runEffects,
+    // where the drill's other credit site lives, so it is credited here on
+    // the swing that carried it. A plain white swing has abilityId null and
+    // credits nothing, which is the lesson.
+    if (connected && abilityId) creditAbilityDrill(ctx, p, t, abilityId);
     // Thuggery mastery (Sword Specialization shape): a landed mainhand auto has
     // a chance to swing once more. The pct gate keeps the rng stream untouched
     // for everyone without the mastery, and the extra swing cannot chain.
@@ -645,7 +664,15 @@ export function meleeSwing(
   if (attacker.kind === 'player') {
     if (abilityName === null) advanceWarspiritCadence(ctx, attacker, target, dealtAmount, 1);
     else if (abilityName === 'Ancestral Strike') {
-      advanceWarspiritCadence(ctx, attacker, target, dealtAmount, 2);
+      // Warspirit Emberscale 2pc (the Crucible set doc): Ancestral Strike
+      // advances the shared cadence 3 steps instead of 2, a call-site
+      // selection gated on the wearer flag. The Exaltation clamp and Deep
+      // Reservoir's shared-currency interplay are disclosed in the set
+      // record (content/ignivar_set_bonuses.ts). Draws no rng.
+      const steps = wearsSetBonus(ctx, attacker, 'warspirit_emberscale', 2)
+        ? WARSPIRIT_EMBERSCALE_2PC_CADENCE_STEPS
+        : 2;
+      advanceWarspiritCadence(ctx, attacker, target, dealtAmount, steps);
       triggerWardCycle(ctx, attacker);
     }
     onMeleeSwing(ctx, attacker);

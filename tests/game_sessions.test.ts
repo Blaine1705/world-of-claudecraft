@@ -4,6 +4,8 @@ import { MECH_CHROMAS } from '../src/sim/content/skins';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 
+const FRESH_CORPSE_TIMER = 60;
+
 const openPlaySession = vi.fn(async () => 1);
 const closePlaySession = vi.fn(async () => {});
 const markAccountQuestComplete = vi.fn(async (_accountId: number, questId: string) => ({
@@ -386,7 +388,13 @@ describe('GameServer sessions', () => {
     expect(server.sim.entities.get(blocked.pid)?.skinCatalog).not.toBe('mech');
   });
 
-  it('unequips a mech chroma from every live character on the account and returns its item', () => {
+  it('unequipping a mech chroma stays permanently unlocked, like a purchased Armory skin (issue: cannot unequip on another character)', () => {
+    // Regression for a report where a player unequipped the Onyx Gold mech
+    // chroma on one character (Lupercal) and it got permanently stuck showing
+    // on another (Furyogen): unequipping used to REVOKE the account-wide
+    // unlock, so any other character (online or not) could never take it off,
+    // or put it back on, again. The unlock must behave like the Season 1
+    // Armory weapon skins: account-wide, permanent, and freely reselectable.
     revokeAccountMechChroma.mockClear();
     const server = new GameServer();
     const cosmetics = {
@@ -396,15 +404,15 @@ describe('GameServer sessions', () => {
       weaponSkinLoadout: {},
     };
     const first = expectJoined(
-      server.join(fakeWs(), 11, 101, 'Mechone', 'shaman', null, false, {
+      server.join(fakeWs(), 11, 101, 'Lupercal', 'shaman', null, false, {
         accountCosmetics: cosmetics,
       }),
     );
     // The second live character rides the GM exemption: the session cap allows
-    // one non-GM character per account, and the account-wide sweep under test
+    // one non-GM character per account, and the account-wide unlock under test
     // is the same either way.
     const second = expectJoined(
-      server.join(fakeWs(), 11, 102, 'Mechtwo', 'mage', null, true, {
+      server.join(fakeWs(), 11, 102, 'Furyogen', 'mage', null, true, {
         accountCosmetics: cosmetics,
       }),
     );
@@ -422,13 +430,69 @@ describe('GameServer sessions', () => {
       JSON.stringify({ t: 'cmd', cmd: 'unequip_mech_chroma', chroma: 'amber_crimson' }),
     );
 
-    expect(revokeAccountMechChroma).toHaveBeenCalledWith(11, 'amber_crimson');
-    expect(first.accountCosmetics.mechChromaIds).not.toContain('amber_crimson');
-    expect(second.accountCosmetics.mechChromaIds).not.toContain('amber_crimson');
+    // The account never loses the unlock (never persisted as revoked either).
+    expect(revokeAccountMechChroma).not.toHaveBeenCalled();
+    expect(first.accountCosmetics.mechChromaIds).toContain('amber_crimson');
+    expect(second.accountCosmetics.mechChromaIds).toContain('amber_crimson');
+    // Only the acting character's OWN display reverts...
     expect(server.sim.entities.get(first.pid)?.skinCatalog).toBe('class');
+    // ...the other character's independent choice is left alone, and (the
+    // reported bug) is still removable, because the unlock it depends on is
+    // still there.
+    expect(server.sim.entities.get(second.pid)?.skinCatalog).toBe('mech');
+    server.handleMessage(
+      second,
+      JSON.stringify({ t: 'cmd', cmd: 'unequip_mech_chroma', chroma: 'amber_crimson' }),
+    );
     expect(server.sim.entities.get(second.pid)?.skinCatalog).toBe('class');
-    expect(server.sim.countItem('amber_crimson_armor_plate', first.pid)).toBe(1);
+
+    // Nothing is minted or duplicated: the look was never itemized.
+    expect(server.sim.countItem('amber_crimson_armor_plate', first.pid)).toBe(0);
     expect(server.sim.countItem('amber_crimson_armor_plate', second.pid)).toBe(0);
+
+    // Re-equipping needs no item at all, the same as any other owned Armory
+    // look: the account already owns it.
+    server.handleMessage(
+      first,
+      JSON.stringify({ t: 'cmd', cmd: 'change_skin', skin: 0, catalog: 'mech' }),
+    );
+    expect(server.sim.entities.get(first.pid)?.skinCatalog).toBe('mech');
+  });
+
+  it('reconciles a saved worn mech chroma when the account cosmetics row is stale', async () => {
+    grantAccountMechChroma.mockClear();
+    const seedServer = new GameServer();
+    const seedPid = seedServer.sim.addPlayer('mage', 'Stuckmech');
+    seedServer.sim.setPlayerSkin(seedPid, 0, 'mech');
+    const state = seedServer.sim.serializeCharacter(seedPid);
+    if (!state) throw new Error('missing saved state');
+
+    const server = new GameServer();
+    const session = expectJoined(
+      server.join(fakeWs(), 11, 101, 'Stuckmech', 'mage', state, false, {
+        accountCosmetics: {
+          completedQuestIds: [],
+          mechChromaIds: [],
+          weaponSkinIds: [],
+          weaponSkinLoadout: {},
+        },
+      }),
+    );
+
+    expect(session.accountCosmetics.mechChromaIds).toContain('amber_crimson');
+    await new Promise((resolve) => setImmediate(resolve));
+    expect(grantAccountMechChroma).toHaveBeenCalledWith(11, 'amber_crimson');
+
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'unequip_mech_chroma', chroma: 'amber_crimson' }),
+    );
+    expect(server.sim.entities.get(session.pid)?.skinCatalog).toBe('class');
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'change_skin', skin: 0, catalog: 'mech' }),
+    );
+    expect(server.sim.entities.get(session.pid)?.skinCatalog).toBe('mech');
   });
 
   it('keeps the character-id session index coherent across join, duplicate join, leave, and rejoin', async () => {
@@ -553,19 +617,22 @@ describe('GameServer sessions', () => {
     server.sim.partyInvite(third.pid, leaver.pid);
     server.sim.partyAccept(third.pid);
 
-    const mob = createMob(server.sim.nextId++, MOBS.forest_wolf, 2, { x: 0, y: 0, z: 0 });
+    // Re-pinned 2026-08 for the harbor move (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md): the spawn moved to the quay,
+    // so corpses at the origin fell out of INTERACT_RANGE; drop them at the
+    // players instead (all three sessions join at the identical spawn point).
+    const at = server.sim.entities.get(leaver.pid)!.pos;
+    const mob = createMob(server.sim.nextId++, MOBS.forest_wolf, 2, { ...at });
     mob.dead = true;
+    mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = leaver.pid;
     mob.lootRecipientIds = [leaver.pid, stayer.pid, third.pid];
     mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
     server.sim.entities.set(mob.id, mob);
-    const lateMob = createMob(server.sim.nextId++, MOBS.forest_wolf, 2, {
-      x: 0,
-      y: 0,
-      z: 0,
-    });
+    const lateMob = createMob(server.sim.nextId++, MOBS.forest_wolf, 2, { ...at });
     lateMob.dead = true;
+    lateMob.corpseTimer = FRESH_CORPSE_TIMER;
     lateMob.lootable = true;
     lateMob.tappedById = leaver.pid;
     lateMob.lootRecipientIds = [leaver.pid, stayer.pid, third.pid];
@@ -628,8 +695,15 @@ describe('GameServer sessions', () => {
     server.sim.partyInvite(third.pid, leaver.pid);
     server.sim.partyAccept(third.pid);
 
-    const mob = createMob(server.sim.nextId++, MOBS.forest_wolf, 2, { x: 0, y: 0, z: 0 });
+    // Re-pinned 2026-08 for the harbor move (d19aa33f76,
+    // docs/design/eastbrook-revamp/site-plan.md): the corpse lands at the
+    // stayer (the eventual looter); the old origin literal fell ~110yd out of
+    // INTERACT_RANGE when the spawn moved to the quay.
+    const mob = createMob(server.sim.nextId++, MOBS.forest_wolf, 2, {
+      ...server.sim.entities.get(stayer.pid)!.pos,
+    });
     mob.dead = true;
+    mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = leaver.pid;
     mob.lootRecipientIds = [leaver.pid, stayer.pid, third.pid];

@@ -51,6 +51,8 @@ const abilityStringsEn = {
       offGlobalCooldown: 'Off the global cooldown',
       friendlyTarget: 'Friendly target',
       enemyTarget: 'Enemy target',
+      // targetType 'any': the cast works on an enemy or an ally (Shadeslip).
+      anyTarget: 'Enemy or friendly target',
       selfOnly: 'Self only',
       damageRange: '{min} to {max}',
       finisherDamage: '{base} plus {perCombo} per combo point',
@@ -667,7 +669,10 @@ const classAbilityNamesEn = {
       [
         'cold_focus',
         'Cold Focus',
-        'For 12 sec, Measured Shot restores 50% more Focus, and Long Draw costs 25% less and casts 30% faster. (Coldsight signature)',
+        // Absolute, not "50% more": the Coldsight 2pc adds a flat 5 after the
+        // window rewrite (25 -> 35 for wearers is not 50 percent), so only the
+        // absolute base value composes honestly with the set tooltip.
+        'For 12 sec, Measured Shot restores 30 Focus, and Long Draw costs 25% less and casts 30% faster. (Coldsight signature)',
       ],
       [
         'bloodhook',
@@ -830,7 +835,7 @@ const classAbilityNamesEn = {
       [
         'ignition',
         'Ignition',
-        'Passive: your spell critical strikes burn the target for 40% of the damage dealt over 6 sec, stacking. (Fire mastery)',
+        'Passive: your spell critical strikes burn the target for 30% of the damage dealt over 6 sec, stacking. (Fire mastery)',
       ],
       [
         'mass_barrier',
@@ -1038,12 +1043,22 @@ const classAbilityNamesEn = {
       [
         'sap',
         'Sap',
-        'Incapacitates the target for 8 sec. Must be stealthed and out of combat. Any damage breaks the effect.',
+        'Incapacitates the target for 8 sec without breaking Duskveil or starting a fight. Must be stealthed and out of combat. Any damage breaks the effect.',
       ],
       [
         'crippling_poison',
         'Leaden Venom',
         'Strikes the target with a leaden venom, dealing {damage} Nature damage and slowing its movement speed by 50% for 12 sec.',
+      ],
+      [
+        'melting_acid',
+        'Melting Acid',
+        'Splashes the target with a caustic poison, dealing {damage} Nature damage and reducing its armor by 5% for 12 sec.',
+      ],
+      [
+        'nightshade_coating',
+        'Nightshade Coating',
+        'Coats the target in nightshade, dealing {damage} Nature damage and reducing the healing it receives by 25% for 12 sec.',
       ],
       [
         'expose_armor',
@@ -1275,7 +1290,7 @@ const classAbilityNamesEn = {
       [
         'oath_chain',
         'Oath Chain',
-        'Instantly bind a distant enemy with a sacred chain. The enemy travels toward you at 18 m per second until it reaches 3 m, then is slowed by 50% for 4 sec. During Ascension it binds a second nearby enemy.',
+        'Instantly bind a distant enemy with a sacred chain. The enemy travels toward you at 18 m per second until it reaches 3 m, then is slowed by 50% for 4 sec. During Ascension it binds a second nearby enemy. Bosses cannot be pulled or slowed.',
       ],
       [
         'veilbound_march',
@@ -1356,7 +1371,7 @@ const classAbilityNamesEn = {
       [
         'aspect_of_the_cheetah',
         "Courser's Guise",
-        "Adopt Courser's Guise, increasing your movement speed by 30% for 30 min.",
+        "Adopt Courser's Guise, increasing your movement speed by 30% for 30 min. While active, taking damage dazes you, halving your movement speed for 4 sec (each hit refreshes the daze).",
       ],
       [
         'aimed_shot',
@@ -1483,7 +1498,11 @@ const classAbilityNamesEn = {
         'Gloom Bolt',
         'Sends a shadowy bolt at the enemy for {damage} Shadow damage.',
       ],
-      ['demon_skin', 'Fiendhide', 'Demonic skin increases your armor by {buff} for 30 min.'],
+      [
+        'demon_skin',
+        'Fiendhide',
+        'Demonic skin increases your armor by {buff} for 30 min. Pact Deepened can double this armor and reduce magic damage taken while Fiendhide is active.',
+      ],
       [
         'immolate',
         'Burning Pact',
@@ -1507,7 +1526,7 @@ const classAbilityNamesEn = {
       [
         'needle_of_fate',
         'Needle of Fate',
-        'Pierces the enemy for {damage} Shadow damage and generates 5 Condemnation if it bears your Evil Eye. Each hit on your primary Evil Eye adds a Fate Thread for 12 sec, up to 3. If no Evil Eye exists, the Needle first marks its target.',
+        'Pierces the enemy for {damage} Shadow damage and generates {needleDoom} Condemnation on impact if it still bears your Evil Eye. Completing a cast moves your primary Evil Eye to the target and adds a Fate Thread for 12 sec, up to 3. Fate Threads stay with you when the Eye moves or its target dies. Targeting a secondary Coven Eye swaps it with the primary Eye.',
       ],
       [
         'sentence',
@@ -1553,7 +1572,7 @@ const classAbilityNamesEn = {
       [
         'hex_of_violence',
         'Hex of Violence',
-        'Hexes the enemy for 8 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 16 Shadow damage.',
+        'Hexes the enemy for 8 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 17 Shadow damage.',
       ],
       [
         'cruel_pact',
@@ -1583,7 +1602,7 @@ const classAbilityNamesEn = {
       [
         'fear',
         'Harrow',
-        'Strikes terror into the enemy, leaving it cowering for up to 8 sec. Any damage breaks the effect.',
+        "Strikes terror into the enemy, leaving it cowering for up to 5 sec. Damage totaling 8% of the target's maximum health breaks the effect.",
       ],
       [
         'searing_pain',
@@ -1624,7 +1643,7 @@ const classAbilityNamesEn = {
       [
         'moonseed',
         'Moonseed',
-        'Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At 3 Moontide, this button becomes Moonsurge: an instant strike for 136 to 162 Arcane damage (plus spell power) that spends all 3.',
+        'Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to {duration} sec per application. At 3 Moontide, this button becomes Moonsurge: an instant strike for 136 to 162 Arcane damage (plus spell power) that spends all 3.',
       ],
       [
         'rejuvenation',
@@ -1682,7 +1701,7 @@ const classAbilityNamesEn = {
         'Finishing move that causes {damage}. Wolf Form only.',
         {
           feral:
-            'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: a bite for 70 plus 43 per combo point that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores 30 energy.',
+            'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest, which spends the Old Blood for a stronger strike that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores energy.',
         },
       ],
       [
@@ -1749,7 +1768,7 @@ const classAbilityNamesEn = {
       [
         'tigers_fury',
         'Wolfsblood',
-        'Increases attack power by {buff} for {duration} sec. Wolf Form only.',
+        'Surges {rage} energy and increases attack power by {buff} for {duration} sec. Wolf Form only.',
       ],
       [
         'rip',
@@ -1800,7 +1819,7 @@ const classAbilityNamesEn = {
       [
         'warspirit_cadence',
         'Warspirit Cadence',
-        'Passive: Dual-wield attacks have no extra miss chance. Every 3rd landed weapon attack triggers 2 Galeheart Echoes for 50% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana. Ancestral Strike counts as 2 attacks. (Warspirit)',
+        'Passive: Dual-wield attacks have no extra miss chance. Every 3rd landed weapon attack triggers 2 Galeheart Echoes for 25% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana. Ancestral Strike counts as 2 attacks. (Warspirit)',
       ],
       [
         'stormsurge',
@@ -1870,7 +1889,7 @@ const classAbilityNamesEn = {
       [
         'corpse_explosion',
         'Corpse Explosion',
-        'Sacrifices a Bone Mage first, then a Skeletal Warrior, and a Gravewing only as a last resort. Among duplicates it chooses the one with the least remaining duration, then the weakest, to deal {damage} Shadow damage at the chosen location.',
+        'Sacrifices a Skeletal Warrior first, then a Bone Mage, and a Gravewing only as a last resort. Among duplicates it chooses the one with the least remaining duration, then the weakest, to deal {damage} Shadow damage at the chosen location.',
       ],
       [
         'funeral_harvest',
@@ -1880,7 +1899,7 @@ const classAbilityNamesEn = {
       [
         'ossuary_mark',
         'Ossuary Mark',
-        'Marks an enemy for 12 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment.',
+        'Marks an enemy for 15 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment.',
       ],
       [
         'unholy_command',
@@ -1890,7 +1909,7 @@ const classAbilityNamesEn = {
       [
         'reaping_command',
         'Reaping Command',
-        'Spends 2 Soul Fragments to command every undead servant to strike in unison. Graveguards taunt and brace, Warriors pin, Bone Mages expose magic defenses, and Gravewing rends all enemies hit.',
+        "Spends 2 Soul Fragments to command every undead servant to strike in unison. Graveguards taunt and brace, Warriors pin, Bone Mages expose magic defenses, and Gravewing rends all enemies hit. Reaping Command ignores and does not reset each servant's own ability cooldown.",
       ],
       [
         'sacrifice_undead',
@@ -1995,7 +2014,7 @@ const classAbilityNamesEn = {
       [
         'conflagrate',
         'Conflagrate',
-        'Advances one future tick of your Burning Pact, then ignites the target for {damage} Fire damage. Generates 1 Wrack and 1 Desolation. Holds 2 charges. (Destruction signature)',
+        'Advances one future tick of your Burning Pact, then ignites the target for {damage} Fire damage. Generates 1 Wrack and 1 Desolation. Holds {charges} charges. (Destruction signature)',
       ],
       [
         'moonkin_form',
@@ -2025,7 +2044,7 @@ const classAbilityNamesEn = {
       [
         'redharvest',
         'Redharvest',
-        'Spends your 3 Old Blood: strike for {damage}, instantly deal all the damage your Flense and Bloodrift would still have dealt, remove both bleeds, and restore 30 energy. Works with zero combo points.',
+        'Spends your 3 Old Blood: strike for {damage}, instantly deal all the damage your Flense and Bloodrift would still have dealt, remove both bleeds, and restore {rage} energy. Works with zero combo points.',
       ],
       [
         'marrowbreak',
@@ -2035,7 +2054,7 @@ const classAbilityNamesEn = {
       [
         'overbloom',
         'Overbloom',
-        'Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for 60% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom.',
+        'Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for {buff}% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom.',
       ],
       [
         'summon_imp',
@@ -2065,7 +2084,7 @@ const classAbilityNamesEn = {
       [
         'summon_infernal',
         'Summon Pyre Colossus',
-        'Calls a Pyre Colossus down at the target area, dealing 58-72 Fire damage on impact. It fights for 30 sec without replacing your demon, burns nearby enemies every 2 sec, and generates 1 Wrack every 1 sec.',
+        'Calls a Pyre Colossus down at the target area, dealing 64-79 Fire damage on impact. It fights for 30 sec without replacing your demon, burns nearby enemies every 2 sec, and generates 1 Wrack every 1 sec.',
       ],
       [
         'summon_doomguard',
@@ -2125,7 +2144,7 @@ const classAbilityNamesEn = {
       [
         'iron_resolve',
         'Iron Resolve',
-        'Grit your teeth and ignore the pain: spends up to 40 rage (20 minimum) to absorb 4 damage per rage spent, lasting up to 10 sec. (Protection)',
+        'Grit your teeth and ignore the pain: spends up to 40 rage (20 minimum) to absorb {absorbPerRage} damage per rage spent, lasting up to 10 sec. (Protection)',
       ],
       [
         'faultline',
@@ -2313,7 +2332,7 @@ const classAbilityNamesEn = {
       [
         'evocation',
         'Aetherwell',
-        'Channel for 6 sec: each second restores 100 mana and builds 8 spell power, stacking while you channel. (Mage talent)',
+        'Channel for 6 sec: each second restores 100 mana and builds 8 spell power, stacking while you channel and lasting 15 sec. (Mage talent)',
       ],
       [
         'flurry_of_knives',
@@ -2323,7 +2342,7 @@ const classAbilityNamesEn = {
       [
         'frenzied_regeneration',
         'Savage Mending',
-        'Restores 180 health over 10 sec. Bruin Form only.',
+        'Restores 40% of your maximum health over 10 sec. Bruin Form only.',
       ],
       [
         'frost_trap',
@@ -2348,12 +2367,12 @@ const classAbilityNamesEn = {
       [
         'howl_of_terror',
         'Dread Chorus',
-        'Frightens nearby enemies for up to 3 sec. Damage may break the effect. (Warlock talent)',
+        "Frightens nearby enemies for up to 5 sec. Damage totaling 8% of a target's maximum health breaks its fear. (Warlock talent)",
       ],
       [
         'ice_block',
         'Cold Coffin',
-        'Encases you in ice, absorbing a massive amount of damage for 8 sec. (Mage talent)',
+        'Encases you in solid ice for 8 sec, making you immune to all damage. Removes existing ordinary harmful effects and prevents new ordinary control effects. Usable while stunned or polymorphed. You cannot act while encased. Recast to cancel. (Mage)',
       ],
       [
         'inner_focus',
@@ -2450,7 +2469,7 @@ const classAbilityNamesEn = {
       [
         'multi_shot',
         'Splitshot',
-        'Loose a spread at the target area, dealing {damage} Physical damage to enemies within 8 yd. (Hunter talent)',
+        'Loose a spread at the target area, dealing {damage} Physical damage to enemies within 8 yd. Cannot be aimed within 8 yd of you. (Hunter talent)',
       ],
       [
         'prayer_of_healing',
@@ -2485,7 +2504,7 @@ const classAbilityNamesEn = {
       [
         'shadowstep',
         'Shadeslip',
-        'Steps through the shadows toward your target without breaking Duskveil. (Rogue talent)',
+        'Steps through the shadows to your target, friend or foe, without breaking Duskveil. (Rogue talent)',
       ],
       ['silence', 'Hushword', 'Silences the target for 4 sec. (Priest talent)'],
       [
@@ -2576,7 +2595,7 @@ const classAbilityNamesEn = {
       [
         'seraphic_vigil',
         'Seraphic Vigil',
-        'Protect one ally for 30 sec. The first hit that leaves them below 35% health consumes the Vigil and heals them for 180. (Benison signature)',
+        'Protect one ally for 30 sec. The first hit that leaves them below 35% health consumes the Vigil and heals them for {buff}. (Benison signature)',
       ],
       [
         'summon_tithefiend',

@@ -32,16 +32,35 @@
 // touches not-yet-extracted Sim state routes through the seam.
 
 import { hasUnbreakableMovementLock } from '../combat/cc';
-import { VALE_CUP_BALL_TEMPLATE_ID } from '../content/vale_cup';
 import { YUMI_TEMPLATE_ID } from '../content/yumi';
 import { DUNGEON_X_THRESHOLD, MOBS } from '../data';
 import * as deedsMod from '../deeds';
 import { resetDrownedLitanyBossEncounter } from '../delves/drowned_litany_boss';
 import { clearDelveRaiseDeadChannel } from '../delves/runs';
+import {
+  announceIgnivarDeath,
+  IGNIVAR_APOCALYPSE_ADD_ID,
+  resetIgnivarEncounter,
+  updateIgnivarApocalypseAdd,
+  updateIgnivarEncounter,
+} from '../encounters/ignivar';
+import {
+  announceVarkhulDeath,
+  resetVarkhulEncounter,
+  updateVarkhulAssemblyAutomaton,
+  updateVarkhulEncounter,
+  VARKHUL_BOSS_ID,
+  VARKHUL_CINDER_ARTIFICER_ID,
+  VARKHUL_CRUCIBLE_WARDEN_ID,
+  VARKHUL_EMBER_SENTINEL_ID,
+} from '../encounters/varkhul';
 import { isEscortNpcTemplate } from '../escort';
+import { unlockIgnivarRaidGate } from '../ignivar_raid_progression';
 import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
+import { holdPetCorpseForBgWave } from '../pet/pet_corpse_hold';
 import { noteMatchPetUnravelled } from '../pet/pet_match_return';
 import { notePetUnravelledOnOwnerDeath } from '../pet/pet_owner_revive';
+import { corpseHasDecayed } from '../respawn_policy';
 import {
   capRiftNonLethalMechanicDamage,
   RIFT_S_ZONE_TEMPO,
@@ -62,6 +81,7 @@ import {
   DUNGEON_LEASH_DISTANCE,
   dist2d,
   type Entity,
+  IGNIVAR_BOSS_ID,
   LEASH_DISTANCE,
   MELEE_RANGE,
   type MobTemplate,
@@ -73,6 +93,7 @@ import {
   TOLLING_BELL_TEMPLATE_ID,
   type Vec3,
 } from '../types';
+import { VARKHUL_WORK_FACING } from '../varkhul_forge_intermission';
 import { groundHeight, waterLevelAt } from '../world';
 import { MAX_AGGRO_RADIUS, MAX_WANDER_RADIUS, MIN_WANDER_RADIUS } from './aggro_ranges';
 import { isAmbientMob, updateAmbientMob } from './ambient';
@@ -84,7 +105,9 @@ import {
 } from './charge';
 import { updateMobCombatProfile } from './combat_profile';
 import { applyBroodBurn } from './dragonkin_brood';
+import { resetDungeonMinibossStomp, updateDungeonMinibossStomp } from './dungeon_miniboss_stomp';
 import { idleRng, wanderPause } from './idle_rng';
+import { resetIgnivarTrashAutomaton, updateIgnivarTrashAutomaton } from './ignivar_trash_automata';
 import {
   claimMechanicSpacing,
   mechanicSlotHeld,
@@ -92,6 +115,7 @@ import {
   resetMechanicSpacing,
   tickMechanicSpacing,
 } from './mechanic_spacing';
+import { playerDummyShedHp } from './practice_dummies';
 import {
   impairedZoneFuseMult,
   openRiftEscapeWindow,
@@ -130,6 +154,51 @@ const NYTHRAXIS_HEROIC_ADD_IDS = new Set([
   'nythraxis_heroic_rogue_add',
 ]);
 
+function expireDecayedCorpseInteractions(ctx: SimContext, mob: Entity): void {
+  if (!corpseHasDecayed(mob.dead, mob.corpseTimer)) return;
+  if (!mob.lootable) return;
+  mob.lootable = false;
+  for (const meta of ctx.players.values()) {
+    const player = ctx.entities.get(meta.entityId);
+    if (player?.targetId === mob.id) player.targetId = null;
+  }
+}
+
+/**
+ * Is this dead mob an INSTANCE corpse whose per-tick dead-branch has become a
+ * provable no-op? Instance mobs (dungeon/rift/delve bands) never corpse-decay
+ * or respawn in place (the `!isInstanceMob` gates in updateMob's dead branch),
+ * so once the detonate fuse is spent and the FFA loot window has lapsed, the
+ * only thing the dead branch does is decrement two timers nothing reads. The
+ * Sim idle-cull uses this to stop far-from-player corpse fields (a cleared
+ * rift floor's packs) from paying updateMob every tick for the rest of the
+ * run. Exclusions, each load-bearing:
+ * - owned corpses: pets/demons unravel via their corpseTimer;
+ * - detonate fuses: Death Throes must still burst;
+ * - FFA windows: the owner-lock lapse must still count down;
+ * - auras: the caller would also skip updateAuras (whose dead arm still
+ *   recomputes `stealthed`), and unbreakable-control auras survive death, so
+ *   such corpses simply keep ticking rather than risk frozen aura state;
+ * - a stealth-flagged corpse: the dead updateAuras arm is what clears the
+ *   flag, so it must run at least until the flag settles;
+ * - Nythraxis: onBossDeath drives its death dialogue from the dead branch;
+ * - worldBoss templates: the world-boss scheduler reads boss.corpseTimer to
+ *   reclaim the corpse (none spawn in an instance band today; insurance).
+ */
+export function isInertInstanceCorpse(mob: Entity): boolean {
+  return (
+    mob.dead &&
+    mob.spawnPos.x > DUNGEON_X_THRESHOLD &&
+    mob.ownerId === null &&
+    mob.detonateTimer === Infinity &&
+    mob.lootFfaTimer <= 0 &&
+    mob.auras.length === 0 &&
+    !mob.stealthed &&
+    !mob.nythraxis &&
+    MOBS[mob.templateId]?.worldBoss !== true
+  );
+}
+
 export function updateMob(ctx: SimContext, mob: Entity): void {
   // Summoned quest add (widow hatchling): cancel its out-of-combat despawn while it
   // is fighting; resetEvadingMob (re)starts the countdown when it leashes home.
@@ -137,6 +206,17 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     mob.despawnTimer = undefined;
   }
   if (mob.dead) {
+    if (mob.templateId === IGNIVAR_BOSS_ID) {
+      if (mob.ignivar) {
+        announceIgnivarDeath(ctx, mob);
+        resetIgnivarEncounter(ctx, mob);
+      }
+      unlockIgnivarRaidGate(ctx, mob);
+    }
+    if (mob.templateId === VARKHUL_BOSS_ID && mob.varkhul) {
+      announceVarkhulDeath(ctx, mob);
+      resetVarkhulEncounter(ctx, mob);
+    }
     ctx.onBossDeath(mob);
     if (
       mob.ownerId !== null &&
@@ -147,6 +227,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     mob.corpseTimer -= DT;
     mob.respawnTimer -= DT;
     if (mob.lootFfaTimer > 0) mob.lootFfaTimer -= DT; // owner-lock lapses, then loot goes FFA
+    expireDecayedCorpseInteractions(ctx, mob);
     // Death Throes: a volatile corpse counts down its fuse, then detonates once.
     if (mob.detonateTimer !== Infinity) {
       mob.detonateTimer -= DT;
@@ -160,6 +241,21 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       mob.ownerId !== null &&
       (MOBS[mob.templateId]?.family === 'demon' || MOBS[mob.templateId]?.family === 'undead')
     ) {
+      // A dead battleground fighter is owed THIS corpse back as a revive-in-place
+      // on the next respawn wave: freeze the decay window (undo this tick's
+      // shared decrement above) so the wave reuses the entity instead of
+      // rebuilding a new one every wave, which forced every nearby client to
+      // re-mint the entity and its character view (pet/pet_corpse_hold.ts has
+      // the full why and the narrowness rules). Decay resumes, with the window
+      // it still had, the moment the hold lifts. An UNDO rather than a skip on
+      // purpose: the corpse-interaction expiry and the detonate fuse above must
+      // keep reading the decremented value, in their existing order, so a held
+      // tick stays byte-identical to an unheld one for every draw site.
+      // Pure state, no rng.
+      if (holdPetCorpseForBgWave(ctx, mob)) {
+        mob.corpseTimer += DT;
+        return;
+      }
       if (mob.corpseTimer <= 0) {
         // An owner inside an arena-shaped match is owed this pet back on the way
         // out, and this is the ONE disappearance the world causes rather than the
@@ -201,11 +297,28 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
 
   mob.combatTimer += DT;
 
-  if (MOBS[mob.templateId]?.dummy) {
+  const dummyTemplate = MOBS[mob.templateId];
+  if (dummyTemplate?.dummy) {
     // Training dummy: stays hostile/attackable so it counts for damage and shows on
     // the meters, but is otherwise inert (never aggros, moves, or fights back). It
     // drops combat and heals to full a few seconds after the last hit, so the player
     // leaves combat while the meter retains the finished encounter's DPS.
+    //
+    // A FRIENDLY dummy is the same target from the other side: nothing ever damages
+    // it, so instead of healing to full it SHEDS healing back toward its resting
+    // mark. That is what keeps it healable, both for the healer working on it (a
+    // full-health target returns nothing but overheal) and for whoever walks up
+    // next. It is never put in combat, so healing it costs the healer no regen.
+    if (dummyTemplate.friendlyPracticeTarget) {
+      mob.inCombat = false;
+      mob.hp = playerDummyShedHp(mob.hp, mob.maxHp, DT);
+      mob.aiState = 'idle';
+      mob.aggroTargetId = null;
+      mob.forcedTargetId = null;
+      mob.forcedTargetTimer = 0;
+      clearThreat(mob);
+      return;
+    }
     if (mob.combatTimer >= DUMMY_RESET_SECONDS) {
       mob.inCombat = false;
       mob.hp = mob.maxHp;
@@ -229,23 +342,24 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     return;
   }
 
+  if (mob.templateId === IGNIVAR_APOCALYPSE_ADD_ID) {
+    updateIgnivarApocalypseAdd(mob);
+    return;
+  }
+
+  if (
+    (mob.templateId === VARKHUL_CINDER_ARTIFICER_ID ||
+      mob.templateId === VARKHUL_CRUCIBLE_WARDEN_ID ||
+      mob.templateId === VARKHUL_EMBER_SENTINEL_ID) &&
+    updateVarkhulAssemblyAutomaton(ctx, mob)
+  ) {
+    return;
+  }
+
   // Tolling Bell projectiles (The Drowned Litany finale) are moved exclusively
   // by the boss driver: no aggro, no wander, no evade-home, and the hostility
   // safety net below must not re-hostile them.
   if (mob.templateId === TOLLING_BELL_TEMPLATE_ID) {
-    mob.hostile = false;
-    mob.aiState = 'idle';
-    mob.inCombat = false;
-    mob.aggroTargetId = null;
-    clearThreat(mob);
-    return;
-  }
-
-  // The Vale Cup boarball is moved exclusively by the match driver
-  // (social/vale_cup.ts): no aggro, no wander (an idle wander would also draw
-  // rng inside golden-scenario ticks), no evade-home, and the hostility safety
-  // net below must not re-hostile it. Bell pattern, verbatim.
-  if (mob.templateId === VALE_CUP_BALL_TEMPLATE_ID) {
     mob.hostile = false;
     mob.aiState = 'idle';
     mob.inCombat = false;
@@ -320,7 +434,15 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   if (!mob.hostile) mob.hostile = true;
 
   const isNythraxis = mob.templateId === NYTHRAXIS_BOSS_ID;
-  if (mob.inCombat || (isNythraxis && mob.nythraxis && mob.nythraxis.phase !== 'dead')) {
+  const isIgnivar = mob.templateId === IGNIVAR_BOSS_ID;
+  const isVarkhul = mob.templateId === VARKHUL_BOSS_ID;
+  // Varkhul stages his own pre-pull (anvil work + the proximity pull gate),
+  // so his encounter module owns him even out of combat.
+  if (
+    mob.inCombat ||
+    isVarkhul ||
+    (isNythraxis && mob.nythraxis && mob.nythraxis.phase !== 'dead')
+  ) {
     const nythraxisScriptLocked =
       isNythraxis &&
       mob.nythraxis &&
@@ -339,7 +461,19 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
             (mob.nythraxis.heroicSummonChannelRemaining ?? 0) > 0))
       )
         return;
-    } else {
+    } else if (isIgnivar) {
+      updateIgnivarEncounter(ctx, mob, true);
+      return;
+    } else if (isVarkhul) {
+      updateVarkhulEncounter(ctx, mob, true);
+      return;
+    } else if (mob.aiState !== 'evade') {
+      // Scoped to the generic boss kit on purpose: the scripted raid encounters
+      // above own their own state and returned already. inCombat deliberately
+      // survives startEvadeHome (other systems key on it), so the kit is gated
+      // on the evade state instead: a mob walking home is damage-immune and
+      // untargetable, and must not heal, ward, or enrage its camp back up while
+      // nothing can touch it.
       ctx.updateBossMechanics(mob);
     }
   }
@@ -370,13 +504,14 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
 
   switch (mob.aiState) {
     case 'idle': {
-      if (mob.templateId === NYTHRAXIS_BOSS_ID && !mob.inCombat) {
+      if ((isNythraxis || isIgnivar || isVarkhul) && !mob.inCombat) {
         mob.wanderTarget = null;
         mob.wanderTimer = 3;
         mob.pos = { ...mob.spawnPos };
         mob.prevPos = { ...mob.pos };
-        mob.facing = Math.PI;
-        mob.prevFacing = Math.PI;
+        const homeFacing = isVarkhul ? VARKHUL_WORK_FACING : Math.PI;
+        mob.facing = homeFacing;
+        mob.prevFacing = homeFacing;
         const template = MOBS[mob.templateId];
         let detected: Entity | null = null;
         let detectedD = Infinity;
@@ -437,6 +572,12 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         ctx.aggroMob(mob, detected, true);
         break;
       }
+      // Dormant-until-pulled mobs (the downed forge mechs, and any hand-placed
+      // pack marked per-spawn) never idle-wander, so the formation holds. Drawn
+      // AFTER the aggro scan so proximity still wakes them; skips the wander draw.
+      // A synthetic mob whose templateId does not resolve (perf-capture rigs)
+      // has no template flag; tolerate that like the hardLeashRadius read does.
+      if (template?.idleStationary || mob.idleStationary) break;
       mob.wanderTimer -= DT;
       // ONE idle sub-stream for the whole wander step, threaded through all three
       // draw sites below (the ambient stable horses do the same, mob/ambient.ts).
@@ -495,6 +636,8 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     }
     case 'chase':
     case 'attack': {
+      if (updateDungeonMinibossStomp(ctx, mob)) break;
+      if (updateIgnivarTrashAutomaton(ctx, mob)) break;
       // A heroic charge dash in flight owns the mob's movement for the tick
       // (mirrors the player's updateChargeMovement early return); it also ticks
       // the charge cooldown, so this runs before the combat-profile runner on
@@ -1367,7 +1510,10 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   mob.firedSummons = 0;
   mob.enraged = false;
   mob.healedThisPull = false;
+  mob.pulseTimer = MOBS[mob.templateId]?.aoePulse?.every ?? 0;
   mob.stompTimer = MOBS[mob.templateId]?.stomp?.every ?? 0;
+  resetDungeonMinibossStomp(mob);
+  resetIgnivarTrashAutomaton(mob);
   mob.terrifyTimer = MOBS[mob.templateId]?.terrify?.every ?? 0;
   // The shared spacing lock dies with the pull like the timers around it.
   resetMechanicSpacing(mob);
@@ -1457,6 +1603,8 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   // every mob here privately and intentionally has a different shared RNG digest.
   mob.wanderTimer = wanderPause(idleRng(ctx, mob), mob, 2, 8);
   if (mob.templateId === NYTHRAXIS_BOSS_ID) ctx.resetNythraxisEncounter(mob);
+  if (mob.templateId === IGNIVAR_BOSS_ID) resetIgnivarEncounter(ctx, mob);
+  if (mob.templateId === VARKHUL_BOSS_ID) resetVarkhulEncounter(ctx, mob);
   if (mob.templateId === SISTER_NHALIA_BOSS_ID) resetDrownedLitanyBossEncounter(ctx, mob);
   // No bossId check needed here: clearDelveRaiseDeadChannel is a no-op for every
   // mob other than the one that actually started the channel, so it is safe to

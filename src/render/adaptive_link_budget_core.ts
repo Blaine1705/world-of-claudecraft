@@ -17,6 +17,23 @@ export interface AdaptiveLinkBudgetConfig {
 
 export type AdaptiveLinkBudgetState = 'ramp' | 'steady' | 'backoff' | 'stalled' | 'revealed';
 
+export type AdaptiveLinkBudgetTransitionReason =
+  | 'fast-settlement'
+  | 'mid-settlement'
+  | 'slow-settlement'
+  | 'failed'
+  | 'no-progress'
+  | 'reveal';
+
+export interface AdaptiveLinkBudgetTransition {
+  atMs: number;
+  from: AdaptiveLinkBudgetState;
+  to: AdaptiveLinkBudgetState;
+  reason: AdaptiveLinkBudgetTransitionReason;
+  windowLinks: number;
+  inFlightLinks: number;
+}
+
 export interface AdaptiveLinkBudgetSnapshot {
   state: AdaptiveLinkBudgetState;
   windowLinks: number;
@@ -26,12 +43,14 @@ export interface AdaptiveLinkBudgetSnapshot {
   estimatedLinksPerUnit: number;
   inFlightLinks: number;
   inFlightUnits: number;
+  peakInFlightLinks: number;
   submittedUnits: number;
   settledUnits: number;
   failedUnits: number;
   backoffCount: number;
   noProgressCount: number;
   lastSettlementMs: number | null;
+  transitions: AdaptiveLinkBudgetTransition[];
 }
 
 export interface AdaptiveLinkBudget {
@@ -48,12 +67,17 @@ export interface AdaptiveLinkBudget {
 interface InFlightUnit {
   submittedAtMs: number;
   links: number;
+  /** Its synchronous prologue reported a program delta of zero: the unit
+   *  linked NOTHING, so how fast it settles says nothing about the driver. */
+  cheap: boolean;
 }
 
 const defaultSleep = (ms: number): Promise<void> =>
   new Promise<void>((resolve) => {
     setTimeout(resolve, ms);
   });
+
+export const ADAPTIVE_LINK_BUDGET_MAX_TRANSITIONS = 32;
 
 const positiveInteger = (value: number, fallback: number): number =>
   Number.isFinite(value) && value > 0 ? Math.max(1, Math.floor(value)) : fallback;
@@ -112,16 +136,38 @@ export function createAdaptiveLinkBudget(
   let noProgressCount = 0;
   let lastProgressAtMs = clock.now();
   let lastSettlementMs: number | null = null;
+  let peakInFlightLinks = 0;
+  const transitions: AdaptiveLinkBudgetTransition[] = [];
 
   const inFlightLinks = (): number => {
     let total = 0;
     for (const unit of inFlight.values()) total += unit.links;
     return total;
   };
-  const backoff = (): void => {
+  const transition = (
+    next: AdaptiveLinkBudgetState,
+    reason: AdaptiveLinkBudgetTransitionReason,
+  ): void => {
+    if (state === next) return;
+    if (transitions.length < ADAPTIVE_LINK_BUDGET_MAX_TRANSITIONS) {
+      transitions.push({
+        atMs: clock.now(),
+        from: state,
+        to: next,
+        reason,
+        windowLinks,
+        inFlightLinks: inFlightLinks(),
+      });
+    }
+    state = next;
+  };
+  const notePeak = (): void => {
+    peakInFlightLinks = Math.max(peakInFlightLinks, inFlightLinks());
+  };
+  const backoff = (reason: AdaptiveLinkBudgetTransitionReason = 'slow-settlement'): void => {
     windowLinks = Math.max(config.minWindowLinks, Math.floor(windowLinks / 2));
     backoffCount++;
-    state = 'backoff';
+    transition('backoff', reason);
   };
   const hasNoProgress = (): boolean =>
     inFlight.size > 0 && clock.now() - lastProgressAtMs >= config.noProgressMs;
@@ -140,7 +186,7 @@ export function createAdaptiveLinkBudget(
     lastProgressAtMs = now;
     if (failed) {
       failedUnits++;
-      if (!admissionClosed) backoff();
+      if (!admissionClosed) backoff('failed');
       return;
     }
     settledUnits++;
@@ -148,13 +194,20 @@ export function createAdaptiveLinkBudget(
     lastSettlementMs = settlementMs;
     if (admissionClosed) return;
     if (settlementMs <= config.fastSettlementMs) {
+      // The cheap-unit discount. A unit that linked no program settles
+      // instantly whatever the driver is doing, so its speed is not headroom:
+      // growing the window on it is how a lane of already-linked units (the
+      // boot sweep's hidden entity views, tests/reveal_gate_wiring.test.ts)
+      // ramps to the cap and submits to the wall. It still counts as
+      // progress, it just buys no admission.
+      if (unit.cheap) return;
       windowLinks = Math.min(config.maxWindowLinks, windowLinks + config.increaseLinks);
       maxWindowObserved = Math.max(maxWindowObserved, windowLinks);
-      state = windowLinks >= config.maxWindowLinks ? 'steady' : 'ramp';
+      transition(windowLinks >= config.maxWindowLinks ? 'steady' : 'ramp', 'fast-settlement');
     } else if (settlementMs >= config.slowSettlementMs) {
       backoff();
     } else {
-      state = 'steady';
+      transition('steady', 'mid-settlement');
     }
   };
 
@@ -166,7 +219,7 @@ export function createAdaptiveLinkBudget(
         const noProgressForMs = Math.max(0, clock.now() - lastProgressAtMs);
         if (hasNoProgress()) {
           noProgressCount++;
-          state = 'stalled';
+          transition('stalled', 'no-progress');
           return false;
         }
         if (canSubmit()) return true;
@@ -179,14 +232,18 @@ export function createAdaptiveLinkBudget(
       inFlight.set(id, {
         submittedAtMs: clock.now(),
         links: estimatedLinksPerUnit,
+        cheap: false,
       });
       submittedUnits++;
+      notePeak();
     },
     markSyncEnd(id, chargedLinks) {
       const unit = inFlight.get(id);
       if (!unit) return;
       const actualLinks = positiveInteger(chargedLinks, 1);
+      unit.cheap = Number.isFinite(chargedLinks) && chargedLinks <= 0;
       unit.links = actualLinks;
+      notePeak();
       observedCharges++;
       estimatedLinksPerUnit =
         observedCharges === 1
@@ -200,7 +257,7 @@ export function createAdaptiveLinkBudget(
       finish(id, true);
     },
     markReveal() {
-      state = 'revealed';
+      transition('revealed', 'reveal');
     },
     snapshot() {
       return {
@@ -212,12 +269,14 @@ export function createAdaptiveLinkBudget(
         estimatedLinksPerUnit,
         inFlightLinks: inFlightLinks(),
         inFlightUnits: inFlight.size,
+        peakInFlightLinks,
         submittedUnits,
         settledUnits,
         failedUnits,
         backoffCount,
         noProgressCount,
         lastSettlementMs,
+        transitions: transitions.slice(),
       };
     },
   };

@@ -56,7 +56,7 @@ describe('mount visual specs cover the sim catalog', () => {
         color: 0x8c65a7,
         vertexColors: true,
       });
-      const converted = tintedMaterial(source, null, 0);
+      const converted = tintedMaterial(source, null, 0, null, null, 'body', null, 'rig', '');
       expect(converted).toBeInstanceOf(THREE.MeshLambertMaterial);
       expect((converted as THREE.MeshLambertMaterial).vertexColors).toBe(true);
       expect((converted as THREE.MeshLambertMaterial).color.getHex()).not.toBe(0xffffff);
@@ -97,10 +97,11 @@ describe('the Low vertex-color path covers every mount GLB that ships COLOR_0', 
     ),
   ].sort();
 
-  it('carries authored COLOR_0 on exactly the Terrorspark Groundshaker and the Valorsteed', () => {
+  it('carries authored COLOR_0 on exactly the Terrorspark Groundshaker, the Bonebound Rickshaw, and the Valorsteed', () => {
     expect(mountUrls.length).toBeGreaterThanOrEqual(8);
     const withVertexColors = mountUrls.filter((url) => glbAttributes(url).has('COLOR_0'));
     expect(withVertexColors).toEqual([
+      'models/mounts/rickshaw_mount.glb',
       'models/mounts/terrorspark_groundshaker.glb',
       'models/mounts/valorsteed.glb',
     ]);

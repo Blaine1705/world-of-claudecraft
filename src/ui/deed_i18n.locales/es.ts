@@ -7,6 +7,18 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  prog_ready_for_an_adventure: {
+    name: 'Listo para la Aventura',
+    desc: 'Gradúate en la Costa de la Prueba: termina cada lección de la isla y luego toca la campana del transbordador para volver a Eastbrook.',
+  },
+  exp_dawnhold_castle: {
+    name: 'Una puerta abierta en el jardín',
+    desc: 'Visita el Castillo Dawnhold y pasea por sus soleados salones del jardín.',
+  },
+  exp_the_last_keep: {
+    name: 'Los salones silenciosos',
+    desc: 'Cruza las puertas de La Última Fortaleza y recorre sus salones silenciosos.',
+  },
   pvp_bg_first_capture: {
     name: 'Bandera en Mano',
     desc: 'Captura una bandera en Campos Espinosos.',
@@ -1036,6 +1048,35 @@ export const table: DeedLocaleTable = {
     name: 'Santuario iluminado',
     desc: 'Ilumina la página Heroico: Santuario del Gravewyrm de El Relicario.',
     title: 'Luz del Santuario',
+  },
+  soc_strongbox_outfitter: {
+    name: 'El Equipador del Arca',
+    desc: 'Desbloquea tu primer espacio de bolsa del banco.',
+  },
+  soc_four_bags_deep: {
+    name: 'Las cuatro bolsas',
+    desc: 'Desbloquea los cuatro espacios de bolsa del banco.',
+  },
+  dgn_ignivar: {
+    name: 'El Heraldo cae',
+    desc: 'Derrota a Ignivar, Heraldo de la Última Llama, en Crucible of the Last Spring.',
+  },
+  dgn_ignivar_heroic: {
+    name: 'Heroico: El Heraldo cae',
+    desc: 'Derrota a Ignivar, Heraldo de la Última Llama, en dificultad heroica.',
+  },
+  dgn_varkhul: {
+    name: 'La Forja se enfría',
+    desc: 'Derrota a Varkhul, Padre de la Forja de la Última Llama, en The Inner Crucible.',
+  },
+  dgn_varkhul_heroic: {
+    name: 'Heroico: La Forja se enfría',
+    desc: 'Derrota a Varkhul, Padre de la Forja de la Última Llama, en dificultad heroica.',
+  },
+  dgn_varkhul_flawless: {
+    name: 'Ni una brasa perdida',
+    desc: 'Derrota a Varkhul, Padre de la Forja de la Última Llama, en dificultad heroica sin que muera un solo miembro de la banda.',
+    title: 'el Incólume',
   },
 };
 

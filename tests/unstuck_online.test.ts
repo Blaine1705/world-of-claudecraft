@@ -25,13 +25,23 @@ vi.mock('../server/unstuck_records', () => ({
 }));
 
 import { type ClientSession, GameServer } from '../server/game';
+import {
+  consumeMovementFramesV2,
+  createMovementInputSessionState,
+} from '../server/movement_input_timeline_v2';
 import { recordUnstuckEvent } from '../server/unstuck_records';
 import { ClientWorld } from '../src/net/online';
-import type { SimEvent } from '../src/sim/types';
+import { BG_GRAVEYARDS, bgFieldPlanWalls } from '../src/sim/battleground_layout';
+import { resolvePosition } from '../src/sim/colliders';
+import { battlegroundOrigin } from '../src/sim/data';
+import { PLAYER_BODY_RADIUS } from '../src/sim/pathfind';
+import type { BgMatch } from '../src/sim/social/battleground';
+import type { Entity, SimEvent } from '../src/sim/types';
 import {
   UNSTUCK_COOLDOWN_ID,
   UNSTUCK_COUNTDOWN_SECONDS,
   UNSTUCK_RETRY_SECONDS,
+  UNSTUCK_SUCCESS_COOLDOWN_SECONDS,
 } from '../src/sim/unstuck';
 
 function fakeWs() {
@@ -64,6 +74,11 @@ function send(server: GameServer, session: ClientSession, cmd: Record<string, un
   server.handleMessage(session, JSON.stringify({ t: 'cmd', ...cmd }));
 }
 
+function must<T>(value: T | null | undefined, label: string): T {
+  if (value == null) throw new Error(`Expected ${label}`);
+  return value;
+}
+
 function unstuckEvents(sent: unknown[]): Record<string, unknown>[] {
   return sent
     .flatMap((frame) => {
@@ -87,6 +102,113 @@ function armUnstuck(server: GameServer, session: ClientSession): void {
     startedDead: player.dead || player.ghost,
   };
   player.cooldowns.set(UNSTUCK_COOLDOWN_ID, UNSTUCK_RETRY_SECONDS);
+}
+
+function placeOnGround(server: GameServer, pid: number, x: number, z: number): void {
+  const player = must(server.sim.entities.get(pid), 'player to place');
+  player.pos = server.sim.ctx.groundPos(x, z);
+  player.prevPos = { ...player.pos };
+  player.vx = 0;
+  player.vy = 0;
+  player.vz = 0;
+  player.onGround = true;
+  player.jumping = false;
+  player.inCombat = false;
+  player.combatTimer = 999;
+  server.sim.ctx.rebucket(player);
+}
+
+function activeBattlegroundForSession(
+  server: GameServer,
+  session: ClientSession,
+): { match: BgMatch; pid: number } {
+  const pids = [session.pid];
+  const classes = ['warrior', 'mage', 'priest', 'rogue', 'hunter'] as const;
+  for (let i = 1; i < 10; i++)
+    pids.push(server.sim.addPlayer(classes[i % classes.length], `BG${i}`));
+  pids.forEach((pid, i) => {
+    const player = must(server.sim.entities.get(pid), 'battleground player');
+    player.level = 20;
+    placeOnGround(server, pid, (i % 5) * 2 - 4, -40);
+    server.sim.bgQueueJoin(pid);
+  });
+  server.sim.tick();
+  for (const pid of pids) server.sim.bgRespond(true, pid);
+  const match = must(server.sim.bgMatchFor(session.pid), 'accepted battleground match');
+  for (let i = 0; i < 20 * 12 && match.state !== 'active'; i++) server.sim.tick();
+  expect(match.state).toBe('active');
+  server.sim.drainEvents();
+  return { match, pid: session.pid };
+}
+
+function forceIntoBgWallTrap(server: GameServer, match: BgMatch, pid: number): Entity {
+  const wall = must(
+    bgFieldPlanWalls().find((candidate) => candidate.height >= 3),
+    'battleground wall collider',
+  );
+  const origin = battlegroundOrigin(match.slot);
+  const player = must(server.sim.entities.get(pid), 'trapped battleground player');
+  player.pos = server.sim.ctx.groundPos(origin.x + wall.x, origin.z + wall.z);
+  player.prevPos = { ...player.pos };
+  player.vx = 0.25;
+  player.vy = 0;
+  player.vz = 0;
+  player.onGround = false;
+  player.jumping = true;
+  player.inCombat = false;
+  player.combatTimer = 999;
+  server.sim.ctx.rebucket(player);
+  const resolved = resolvePosition(
+    server.sim.cfg.seed,
+    player.pos.x,
+    player.pos.z,
+    PLAYER_BODY_RADIUS,
+  );
+  expect(Math.hypot(resolved.x - player.pos.x, resolved.z - player.pos.z)).toBeGreaterThan(0.01);
+  return player;
+}
+
+function forceIntoBgWallContact(
+  server: GameServer,
+  match: BgMatch,
+  pid: number,
+  heldMovement = true,
+): Entity {
+  const origin = battlegroundOrigin(match.slot);
+  const player = must(server.sim.entities.get(pid), 'wall-contact battleground player');
+  player.pos = server.sim.ctx.groundPos(origin.x - 48.5, origin.z - 133.5);
+  player.prevPos = { ...player.pos };
+  player.facing = -Math.PI / 2;
+  player.prevFacing = player.facing;
+  player.vx = 0;
+  player.vy = 0;
+  player.vz = 0;
+  player.onGround = true;
+  player.jumping = false;
+  player.inCombat = false;
+  player.combatTimer = 999;
+  must(server.sim.meta(pid), 'wall-contact player meta').moveInput.forward = heldMovement;
+  server.sim.ctx.rebucket(player);
+  const resolved = resolvePosition(
+    server.sim.cfg.seed,
+    player.pos.x,
+    player.pos.z,
+    PLAYER_BODY_RADIUS,
+  );
+  expect(Math.hypot(resolved.x - player.pos.x, resolved.z - player.pos.z)).toBeLessThanOrEqual(
+    1e-6,
+  );
+  return player;
+}
+
+function inBgGraveyard(server: GameServer, match: BgMatch, pid: number): boolean {
+  const origin = battlegroundOrigin(match.slot);
+  const plot = BG_GRAVEYARDS[0];
+  const player = must(server.sim.entities.get(pid), 'battleground player');
+  return (
+    Math.abs(player.pos.x - (origin.x + plot.x)) <= plot.hw &&
+    Math.abs(player.pos.z - (origin.z + plot.z)) <= plot.hd
+  );
 }
 
 describe('online unstuck command wiring', () => {
@@ -144,6 +266,194 @@ describe('online unstuck command wiring', () => {
 
     expect(unstuck).toHaveBeenNthCalledWith(1, session.pid);
     expect(unstuck).toHaveBeenNthCalledWith(2, session.pid);
+  });
+
+  it('the Settings command completes for a battleground wall-trapped fighter', () => {
+    const server = new GameServer();
+    const { session } = join(server, 21);
+    const { match, pid } = activeBattlegroundForSession(server, session);
+    const player = forceIntoBgWallTrap(server, match, pid);
+
+    send(server, session, { cmd: 'unstuck' });
+
+    expect(server.sim.meta(pid)?.pendingUnstuck).toMatchObject({
+      area: {
+        kind: 'battleground',
+        id: 'thornhollow_fields',
+        instanceId: String(match.id),
+        slot: match.slot,
+      },
+    });
+
+    const events: SimEvent[] = [];
+    for (let i = 0; i < UNSTUCK_COUNTDOWN_SECONDS * 20; i++) events.push(...server.sim.tick());
+
+    expect(events).toContainEqual(
+      expect.objectContaining({ type: 'unstuck', phase: 'completed', pid }),
+    );
+    expect(server.sim.bgMatchFor(pid)).toBe(match);
+    expect(player.dead).toBe(false);
+    expect(player.ghost).toBe(false);
+    expect(inBgGraveyard(server, match, pid)).toBe(true);
+    const resolved = resolvePosition(
+      server.sim.cfg.seed,
+      player.pos.x,
+      player.pos.z,
+      PLAYER_BODY_RADIUS,
+    );
+    expect(Math.hypot(resolved.x - player.pos.x, resolved.z - player.pos.z)).toBeLessThanOrEqual(
+      1e-6,
+    );
+    expect(player.cooldowns.get(UNSTUCK_COOLDOWN_ID)).toBe(UNSTUCK_SUCCESS_COOLDOWN_SECONDS);
+  });
+
+  it('the Settings command completes for a battleground wall-contact fighter holding movement', () => {
+    const server = new GameServer();
+    const { session } = join(server, 22);
+    const { match, pid } = activeBattlegroundForSession(server, session);
+    const player = forceIntoBgWallContact(server, match, pid);
+
+    send(server, session, { cmd: 'unstuck' });
+
+    expect(server.sim.meta(pid)?.pendingUnstuck).toMatchObject({
+      area: {
+        kind: 'battleground',
+        id: 'thornhollow_fields',
+        instanceId: String(match.id),
+        slot: match.slot,
+      },
+    });
+
+    const events: SimEvent[] = [];
+    for (let i = 0; i < UNSTUCK_COUNTDOWN_SECONDS * 20; i++) events.push(...server.sim.tick());
+
+    expect(events).toContainEqual(
+      expect.objectContaining({ type: 'unstuck', phase: 'completed', pid }),
+    );
+    expect(server.sim.bgMatchFor(pid)).toBe(match);
+    expect(inBgGraveyard(server, match, pid)).toBe(true);
+    expect(player.vx).toBe(0);
+    expect(player.vz).toBe(0);
+    expect(server.sim.meta(pid)?.moveInput.forward).toBe(false);
+  });
+
+  it('the Settings command completes for recent battleground wall-contact after ESC clears movement', () => {
+    const server = new GameServer();
+    const { session } = join(server, 25);
+    const { match, pid } = activeBattlegroundForSession(server, session);
+    const player = forceIntoBgWallContact(server, match, pid);
+    const meta = must(server.sim.meta(pid), 'wall-contact player meta');
+
+    server.sim.tick();
+    meta.moveInput.forward = false;
+    server.sim.drainEvents();
+
+    send(server, session, { cmd: 'unstuck' });
+
+    expect(meta.pendingUnstuck).toMatchObject({
+      area: {
+        kind: 'battleground',
+        id: 'thornhollow_fields',
+        instanceId: String(match.id),
+        slot: match.slot,
+      },
+    });
+
+    const events: SimEvent[] = [];
+    for (let i = 0; i < UNSTUCK_COUNTDOWN_SECONDS * 20; i++) events.push(...server.sim.tick());
+
+    expect(events).toContainEqual(
+      expect.objectContaining({ type: 'unstuck', phase: 'completed', pid }),
+    );
+    expect(server.sim.bgMatchFor(pid)).toBe(match);
+    expect(inBgGraveyard(server, match, pid)).toBe(true);
+    expect(player.vx).toBe(0);
+    expect(player.vz).toBe(0);
+    expect(meta.moveInput.forward).toBe(false);
+  });
+
+  it('the Settings command keeps wall-contact eligibility when ESC neutral input wins the race', () => {
+    const server = new GameServer();
+    const { session } = join(server, 26);
+    Object.assign(session, createMovementInputSessionState(2));
+    const { match, pid } = activeBattlegroundForSession(server, session);
+    const player = forceIntoBgWallContact(server, match, pid);
+    const meta = must(server.sim.meta(pid), 'wall-contact player meta');
+
+    server.handleMessage(session, JSON.stringify({ t: 'input', seq: 1, ct: 0, mi: { f: 0 } }));
+    consumeMovementFramesV2(server.sim, [session]);
+    expect(meta.moveInput.forward).toBe(false);
+
+    send(server, session, { cmd: 'unstuck' });
+
+    expect(meta.pendingUnstuck).toMatchObject({
+      area: {
+        kind: 'battleground',
+        id: 'thornhollow_fields',
+        instanceId: String(match.id),
+        slot: match.slot,
+      },
+    });
+
+    const events: SimEvent[] = [];
+    for (let i = 0; i < UNSTUCK_COUNTDOWN_SECONDS * 20; i++) events.push(...server.sim.tick());
+
+    expect(events).toContainEqual(
+      expect.objectContaining({ type: 'unstuck', phase: 'completed', pid }),
+    );
+    expect(server.sim.bgMatchFor(pid)).toBe(match);
+    expect(inBgGraveyard(server, match, pid)).toBe(true);
+    expect(player.vx).toBe(0);
+    expect(player.vz).toBe(0);
+    expect(meta.moveInput.forward).toBe(false);
+  });
+
+  it('the Settings command completes for a penetrated battleground wall trap after ESC clears movement', () => {
+    const server = new GameServer();
+    const { session } = join(server, 23);
+    const { match, pid } = activeBattlegroundForSession(server, session);
+    forceIntoBgWallTrap(server, match, pid);
+    must(server.sim.meta(pid), 'wall-trapped player meta').moveInput.forward = false;
+
+    send(server, session, { cmd: 'unstuck' });
+
+    expect(server.sim.meta(pid)?.pendingUnstuck).toMatchObject({
+      area: {
+        kind: 'battleground',
+        id: 'thornhollow_fields',
+        instanceId: String(match.id),
+        slot: match.slot,
+      },
+    });
+
+    const events: SimEvent[] = [];
+    for (let i = 0; i < UNSTUCK_COUNTDOWN_SECONDS * 20; i++) events.push(...server.sim.tick());
+
+    expect(events).toContainEqual(
+      expect.objectContaining({ type: 'unstuck', phase: 'completed', pid }),
+    );
+    expect(server.sim.bgMatchFor(pid)).toBe(match);
+    expect(inBgGraveyard(server, match, pid)).toBe(true);
+  });
+
+  it('the Settings command refuses idle clear battleground wall-contact as a shortcut', () => {
+    const server = new GameServer();
+    const { session } = join(server, 24);
+    const { match, pid } = activeBattlegroundForSession(server, session);
+    forceIntoBgWallContact(server, match, pid, false);
+
+    send(server, session, { cmd: 'unstuck' });
+
+    expect(server.sim.meta(pid)?.pendingUnstuck).toBeNull();
+    expect(server.sim.drainEvents()).toContainEqual(
+      expect.objectContaining({
+        type: 'unstuck',
+        phase: 'blocked',
+        reason: 'competitive',
+        pid,
+      }),
+    );
+    expect(server.sim.bgMatchFor(pid)).toBe(match);
   });
 
   it('the slash alias pays the command lane (a drained lane refuses it)', () => {

@@ -24,6 +24,11 @@ tested sibling module here, never as more methods on `online.ts`. Exemplars
 - `backoff.ts`: pure full-jitter reconnect schedule (`computeBackoffDelay`: 0.5x to
   1.5x of the exponential step, clamped at the max delay AFTER jitter, rng injected
   so tests pin exact delays; `tests/backoff.test.ts`).
+- `entry_watch.ts`: `watchWorldEntry`, the world-entry poll loop `main.ts`'s
+  `enterWorld` drives: polls a connecting world for readiness, gives up after
+  `ENTRY_TIMEOUT_MS` with no sign of life, and exposes `noteActivity()` so a
+  legitimate transient-rejection retry (see Reconnect below) pushes that deadline
+  out instead of being killed mid-backoff (`tests/entry_watch.test.ts`).
 - `realm_population.ts`: pure, i18n-KEY-returning realm-list population banding core
   (Low/Medium/High/Full labels plus tooltip keys from online count vs the advertised
   cap; `tests/realm_population.test.ts`).
@@ -49,10 +54,22 @@ tested sibling module here, never as more methods on `online.ts`. Exemplars
   optimism (scope in Never, below): while a `turnin` is in flight, prerequisite checks
   treat that quest as done, so a follow-up quest appears in the same gossip re-render
   instead of a snapshot later (issue 1667 rationale in its header).
-- Wallet/economy cluster (`wallet*.ts`, `desktop_wallet_*.ts`, `mobile_wallet_deeplink.ts`,
-  `stripe_checkout.ts`, `economy_sdk.ts`, `seeker_entitlement_sync.ts`,
-  `discord_onboarding_gate.ts`): non-custodial Solana linking plus the CLAUDIUM economy
-  client. The contracts: the account-to-wallet LINK is always challenge+signature
+- Wallet/economy cluster (`wallet*.ts`, `desktop_wallet_*.ts`,
+  `mobile_wallet_deeplink.ts`, `stripe_checkout.ts`, `economy_sdk.ts`,
+  `woc_market_sdk.ts`, `seeker_entitlement_sync.ts`, `discord_onboarding_gate.ts`):
+  non-custodial Solana linking plus the CLAUDIUM economy client and the $WOC
+  Exchange client (`woc_market_sdk.ts`, typed and never-throws like
+  `economy_sdk.ts`; marketplace bond and settlement transactions are
+  service-built and signed through the same Wallet Standard path as the
+  Claudium purchase, config-off behind `WOC_MARKET_ENABLED`; a failed call's
+  `WocMarketFail` carries the parsed error body as `params` so parametric
+  codes such as `woc_market.claim_cooldown` can render their values, the
+  `ApiError.params` convention). Wallet-bridge throws are classified for
+  players by `src/ui/wallet_bridge_reason_text.ts`, whose byte-exact message
+  map is drift-pinned against this directory's sources (plus the mobile
+  launcher's and the desktop hand-off's throw sites, incl. the two in
+  `src/main.ts`): rewording a bridge throw string updates that map in the
+  same change. The contracts: the account-to-wallet LINK is always challenge+signature
   verified server-side (`server/wallet.ts`), nothing here is imported by `src/sim/`, and
   `economy_sdk.ts` is same-origin only (the game server's `/api/claudium/*` proxy, never
   the economy service) and NEVER throws into render: every failure resolves to the typed
@@ -144,13 +161,28 @@ over for good (retries exhausted, or a fatal server `error` frame).
   capacity refusals (`'realm is full'`, `'too many connections from your network'`)
   rely on that default so a full realm is never hammered by auto-retry. Keep every
   one of these literals byte-identical on both sides in the same change.
+  **The tolerance applies to the very FIRST join attempt a `ClientWorld` makes, not
+  only a mid-session auto-reconnect** (`isTransientReconnectRejection`/
+  `isTransientTimeoutRejection` take no `reconnectAttempts` argument): a char-select
+  "Enter World" click, or a page reload after a client-side bug, lands in the exact
+  same "server has not yet noticed the old socket died" window a later drop does,
+  since the roster's `online` flag that routed the click can lag a real drop by
+  seconds. The deliberate "this character is actively played elsewhere" case stays
+  fast and explicit through its own UI (the char-select Take Over button + confirm,
+  `takeoverCharacter`), which never reaches this rejection at all. `main.ts`'s
+  `enterWorld` entry poll cooperates via `entry_watch.ts` (`watchWorldEntry`, the
+  poll loop + dead-time budget extracted so the boot coordinator only wires
+  callbacks): its `noteActivity()` is called on every `onConnectionLost` tick, so
+  an active, visibly-retrying first attempt is never killed out from under itself
+  by the flat "nothing ever responded" timeout.
 - A `visibilitychange` handler schedules a near-immediate retry (a 0 to 1000 ms
   random spread in the same `reconnectTimer` slot, so foregrounded tabs do not
   stampede together) when a suspended mobile tab foregrounds, and drives the close
   path itself when `onclose` was never delivered (the zombie-socket case).
   `sendLogout()` signals a deliberate logout so the server skips the linkdead grace;
   call it before a page reload.
-Tests: `tests/linkdead.test.ts`, `tests/net_online_visibility_reconnect.test.ts`.
+Tests: `tests/linkdead.test.ts`, `tests/net_online_visibility_reconnect.test.ts`,
+`tests/entry_watch.test.ts`.
 A reload instead of an in-socket reconnect (the mobile WebView eviction case) is
 handled by `resume_play.ts`, above.
 
@@ -202,29 +234,40 @@ failure, kept as stable English that `main.ts` re-localizes.
   reconcile-on-snapshot contract: display-only, and the server's value always
   wins within a bounded window (`tests/target_echo_client.test.ts` pins the
   target one).
-- **Display-layer locomotion anticipation is the one sanctioned prediction**, and
-  it lives OUTSIDE `net/` (`src/render/self_motion.ts`): a visual-only pose for
-  the LOCAL player that is (a) bounded by measured latency with a hard cap,
-  (b) always blending toward the authoritative server pose, (c) never written
-  into `ClientWorld` mirrored state or any `IWorld` read that logic consumes
-  (targeting, range checks, quest triggers, and interest all use authoritative
-  positions), and (d) never affects what is sent to the server. Widening any of
-  those four constraints is a maintainer decision, see
-  `docs/online-movement-latency.md`. One amendment is already in force, for the
-  long render frame: when a frame outlasts the mirror's snapshot interval the
-  browser applies the snapshots it swallowed in one burst, so for that block
-  episode (a) the leash budget may exceed the latency cap by the ground the
-  frozen anchor did not cover, bounded by `BLOCK_EPISODE_MAX_MS` of run speed,
-  and (b) the blend toward the server pose is held for the settle window that
-  the burst sweep needs. Both live in `src/render/self_motion.ts` and are
-  pinned by `describe('long render frames')` in `tests/self_motion.test.ts`.
+- **Local-player movement prediction is the one sanctioned prediction**, and it
+  lives OUTSIDE `net/` (`src/render/self_prediction.ts` + `self_prediction_core.ts`
+  on movement wire v2; design authority `docs/design/movement-reconciliation.md`):
+  the drawn pose is the shared kernel stepped over the SAME per-tick input
+  frames the client actually sent, reconciled exact-match against the acked
+  authoritative pose (`ackCt` + `rpx/rpy/rpz/rpf`). Its constraints: (a) prediction
+  state is never written into `ClientWorld` mirrored state or any `IWorld` read
+  that logic consumes (targeting, range checks, quest triggers, and interest
+  all use authoritative positions); (b) the drawn pose reflects only input that
+  is really on the wire, never an outcome guess; (c) corrections exist only on
+  server override epochs (`ovE`/`ovA`) and genuine reconcile mismatches, and
+  the display absorbs them through the handoff offset bounded by
+  `MAX_SELF_REWIND_YD_PER_SEC`; (d) the feel bar is
+  `tests/movement_latency_baseline.test.ts` in strict mode, and any change here
+  must keep it green. Changing this model is a maintainer decision. The legacy
+  display extrapolator (`src/render/self_motion.ts`, leash + servo + block
+  episode, pinned by `tests/self_motion.test.ts`) is only the mid-deploy v1
+  fallback under its original latency-cap constraints. Both the v2 exact-match
+  predictor and the v1 fallback use the per-`ClientWorld` `riftCollisionToken`
+  registered on `riftState` for rift wall resolution, and v1 also strips and
+  reapplies the raised-tier lift via `self_motion_rift_lift.ts`. Delves stay
+  excluded because their portcullis clamps are not mirrored client-side. On v2,
+  gated states and `?nopredict` use the plain interpolated fallback in
+  `src/render/self_render_position_core.ts`, with the rewind-clamped handoff.
+  The legacy extrapolator is deleted when v1 is retired, not before.
 - **The heading is NOT predicted, it is client-authoritative input.** The facing
-  channel (`input.facing`, applied outright by the server, corpse-guard only)
+  channel (`input.facing`, applied outright when the player may turn)
   has always been client-driven for mouselook; `src/game/keyboard_turn_facing.ts`
   streams keyboard turns on the SAME channel (with the turn flags zeroed on the
   wire, except the engage-edge frame that still fires the server's manual-turn
   behaviors) so the server never integrates a turn a round trip late. That is
   real input, not anticipation: constraint (d) above does not apply to it, and
-  its authority stays exactly what mouselook already had.
+  its authority stays exactly what mouselook already had. A keyboard turn's
+  release heading remains wire-owned until its input sequence is acknowledged,
+  preventing a rounded snapshot from masquerading as an applied final heading.
 - Never read `Math.random`/timing into *gameplay*; `performance.now` here is for
   render interpolation only (`lastSnapAt`, per-entity `netInterval`), not logic.

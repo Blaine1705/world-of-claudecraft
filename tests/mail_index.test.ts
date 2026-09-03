@@ -16,13 +16,14 @@ interface FakeLetter extends IndexedLetter {
 function letter(
   id: number,
   recipientKey: string,
-  opts: { read?: boolean; deliverAt?: number } = {},
+  opts: { read?: boolean; deliverAt?: number; custodyRef?: string } = {},
 ): FakeLetter {
   return {
     id,
     recipientKey,
     read: opts.read ?? false,
     deliverAt: opts.deliverAt ?? 0,
+    ...(opts.custodyRef === undefined ? {} : { custodyRef: opts.custodyRef }),
   };
 }
 
@@ -207,5 +208,144 @@ describe('MailIndex buckets and unread counts', () => {
     expect(index.bucketFor('alice').map((m) => m.id)).toEqual([1, 3]);
     index.track(b, 0);
     expect(index.bucketFor('alice').map((m) => m.id)).toEqual([1, 3, 2]);
+  });
+});
+
+describe('MailIndex custody-ref presence', () => {
+  // The Exchange booking dedupe (PostOffice.hasCustodyParcel) rides this
+  // index instead of scanning the whole book, so presence must track the
+  // book through every membership mutation the contract names.
+  it('tracks a parcel ref through track, untrack, and the mutation bracket', () => {
+    const index = new MailIndex<FakeLetter>();
+    const parcel = letter(1, 'alice', { custodyRef: 'wm_ref_1' });
+    expect(index.hasCustodyRef('wm_ref_1')).toBe(false);
+    index.track(parcel, 0);
+    expect(index.hasCustodyRef('wm_ref_1')).toBe(true);
+    // The untrack/track bracket (the return flight) must keep the ref present.
+    index.untrack(parcel, 0);
+    index.track(parcel, 0);
+    expect(index.hasCustodyRef('wm_ref_1')).toBe(true);
+    index.untrack(parcel, 0);
+    expect(index.hasCustodyRef('wm_ref_1')).toBe(false);
+  });
+
+  it('refcounts a shared ref so removing one letter never erases the other', () => {
+    const index = new MailIndex<FakeLetter>();
+    const a = letter(1, 'alice', { custodyRef: 'wm_ref_2' });
+    const b = letter(2, 'bob', { custodyRef: 'wm_ref_2' });
+    index.track(a, 0);
+    index.track(b, 0);
+    index.untrack(a, 0);
+    expect(index.hasCustodyRef('wm_ref_2')).toBe(true);
+    // A double untrack of the removed letter must under-count nothing.
+    index.untrack(a, 0);
+    expect(index.hasCustodyRef('wm_ref_2')).toBe(true);
+    index.untrack(b, 0);
+    expect(index.hasCustodyRef('wm_ref_2')).toBe(false);
+  });
+
+  it('rebuild reconstructs presence from the canonical book alone', () => {
+    const index = new MailIndex<FakeLetter>();
+    index.track(letter(1, 'alice', { custodyRef: 'wm_stale' }), 0);
+    const book = [letter(2, 'bob', { custodyRef: 'wm_live' }), letter(3, 'bob')];
+    index.rebuild(book, 0);
+    expect(index.hasCustodyRef('wm_live')).toBe(true);
+    expect(index.hasCustodyRef('wm_stale')).toBe(false);
+  });
+});
+
+// #3561's incremental-autosave seam: which recipient keys takeDirty() reports
+// after each kind of mutation. A missed mark here means a real production bug
+// (a mailbox mutation that autosave never persists), so every mutating method
+// gets its own decisive assertion of the EXACT dirty set, not just "non-empty".
+describe('MailIndex dirty tracking (#3561 incremental autosave)', () => {
+  it('track marks the recipient dirty; a quiet takeDirty drains and clears it', () => {
+    const index = new MailIndex<FakeLetter>();
+    expect(index.takeDirty()).toEqual([]); // nothing dirty yet
+    index.track(letter(1, 'alice'), 0);
+    expect(index.takeDirty().sort()).toEqual(['alice']);
+    expect(index.takeDirty()).toEqual([]); // drained: a second call reports nothing new
+  });
+
+  it('untrack marks the recipient dirty only on an actual removal', () => {
+    const index = new MailIndex<FakeLetter>();
+    const m = letter(1, 'alice');
+    index.track(m, 0);
+    index.takeDirty(); // drain the track()
+
+    index.untrack(m, 0);
+    expect(index.takeDirty()).toEqual(['alice']);
+
+    // A second untrack of the same (already-removed) letter is the documented
+    // idempotent no-op (bucketRemove returns false): must NOT mark dirty
+    // again, or every quiet interval would fabricate spurious writes.
+    index.untrack(m, 0);
+    expect(index.takeDirty()).toEqual([]);
+  });
+
+  it('rekey marks BOTH the old and new key dirty; a same-key call marks neither', () => {
+    const index = new MailIndex<FakeLetter>();
+    const m = letter(1, 'Ghost');
+    index.track(m, 0);
+    index.takeDirty();
+
+    index.rekey(m, '7', 0);
+    expect(index.takeDirty().sort()).toEqual(['7', 'Ghost']);
+
+    index.rekey(m, '7', 0); // same key: the documented no-op
+    expect(index.takeDirty()).toEqual([]);
+  });
+
+  it('markRead marks the recipient dirty only on the actual flip, not a repeat', () => {
+    const index = new MailIndex<FakeLetter>();
+    const m = letter(1, 'alice');
+    index.track(m, 0);
+    index.takeDirty();
+
+    index.markRead(m, 0);
+    expect(index.takeDirty()).toEqual(['alice']);
+
+    index.markRead(m, 0); // already read: guarded no-op
+    expect(index.takeDirty()).toEqual([]);
+  });
+
+  it('markDirty is the explicit escape hatch for a content-only mutation (idempotent, order-independent)', () => {
+    const index = new MailIndex<FakeLetter>();
+    index.markDirty('alice');
+    index.markDirty('alice'); // duplicate: the Set absorbs it
+    index.markDirty('bob');
+    expect(index.takeDirty().sort()).toEqual(['alice', 'bob']);
+  });
+
+  it('a live-mutation bracket (untrack -> field write -> track) dirties BOTH ends, matching returnToSender', () => {
+    const index = new MailIndex<FakeLetter>();
+    const now = 100;
+    const m = letter(1, 'bob', { read: true });
+    index.track(m, now);
+    index.takeDirty();
+
+    index.untrack(m, now);
+    m.recipientKey = 'alice';
+    m.read = false;
+    index.track(m, now);
+
+    expect(index.takeDirty().sort()).toEqual(['alice', 'bob']);
+  });
+
+  it('rebuild (a fresh load) marks NOTHING dirty: reconstructing durable state is not new work', () => {
+    const index = new MailIndex<FakeLetter>();
+    // Seed some pre-rebuild dirty state that must not leak through.
+    index.track(letter(99, 'stale'), 0);
+    expect(index.takeDirty()).not.toEqual([]);
+
+    const now = 100;
+    const book = [letter(1, 'alice'), letter(2, 'bob', { deliverAt: 150 })];
+    index.rebuild(book, now);
+    expect(index.takeDirty()).toEqual([]); // a quiet post-load autosave writes nothing
+
+    // The rebuilt index is still fully functional: a later real mutation
+    // dirties exactly its own key, nothing pre-existing from the load.
+    index.markRead(book[0], now);
+    expect(index.takeDirty()).toEqual(['alice']);
   });
 });

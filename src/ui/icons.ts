@@ -8,10 +8,14 @@
 // from the ability school / item kind + name keywords, so everything always
 // has a proper icon. Results are cached as data URLs.
 
+import { IGNIVAR_ART_PENDING_ITEM_IDS } from '../sim/content/ignivar_loot';
 import { isRawCookingCatch } from '../sim/content/items';
 import { ABILITIES, ITEMS } from '../sim/data';
 import { crestIconUrl } from './crest_icon_art';
+import { currencyImageUrl } from './currency_art';
 import { DEED_IMAGE_IDS } from './deed_image_ids';
+import { MOB_AURA_IMAGE_IDS } from './mob_aura_icon_art';
+import { PET_ACTION_IMAGE_IDS } from './pet_action_icons';
 import { professionImageUrl } from './profession_art';
 import { ITEM_WEAPON_VARIANTS } from './weapon_variants';
 
@@ -2552,6 +2556,36 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   ),
   earthquake: r('earth', 'earthBrown', ['sunburst'], ['crack']),
   attack: r('steel', 'steel', ['sword'], ['motion']),
+  // Ignivar and Varkhul encounter-journal icons. These ids are UI-owned rather
+  // than cast ids so related fire mechanics remain visually distinct at a glance.
+  raid_ignivar_forge_strike: r('fire', 'ember', ['mace', { p: 'flame', ...BR }], ['glow']),
+  raid_ignivar_brand: r('fire', 'blood', ['sigil_rune', { p: 'flame', ...BR }], ['glow']),
+  raid_ignivar_searing_torrent: r('fire', 'ember', ['flame', { p: 'droplet', ...BR, pal: 'ice' }]),
+  raid_ignivar_rain_of_cinders: r('fire', 'ember', [
+    { p: 'meteor', x: -10, y: -8, s: 0.72 },
+    { p: 'meteor', x: 11, y: 10, s: 0.62 },
+  ]),
+  raid_ignivar_revolving_inferno: r('fire', 'ember', ['sunburst', 'flame'], ['arcs']),
+  raid_ignivar_forge_wave: r('fire', 'ember', ['droplet', { p: 'sunburst', ...BIG }], ['arcs']),
+  raid_ignivar_apocalypse: r('shadow', 'blood', ['skull', { p: 'flame', ...BR }], ['glow']),
+  raid_ignivar_judgment: r('fire', 'holyGold', ['mace', { p: 'sunburst', ...BIG }], ['glow']),
+  raid_ignivar_chains: r('steel', 'ember', ['tendrils', { p: 'flame', ...BR }], ['arcs']),
+  raid_ignivar_last_inferno: r('blood', 'ember', ['skull', 'flame'], ['glow', 'drips']),
+  raid_varkhul_makers_brand: r('steel', 'ember', ['sigil_rune', { p: 'mace', ...BR }], ['glow']),
+  raid_varkhul_frontal: r('fury', 'ember', ['mace', { p: 'flame', ...BR }], ['motion']),
+  raid_varkhul_cinder_orbs: r('fire', 'ember', [
+    { p: 'sunburst', x: -10, y: -8, s: 0.68 },
+    { p: 'sunburst', x: 11, y: 10, s: 0.58 },
+  ]),
+  raid_varkhul_shared_pyre: r('fire', 'holyGold', ['heart', { p: 'flame', ...BR }], ['glow']),
+  raid_varkhul_forgestorm: r('storm', 'ember', ['meteor', { p: 'flame', ...BR }], ['arcs']),
+  raid_varkhul_tempering_ray: r('fire', 'holyGold', ['bolt', { p: 'shield', ...BR }], ['glow']),
+  raid_varkhul_anvils_decree: r('steel', 'ember', ['mace', { p: 'sunburst', ...BIG }], ['crack']),
+  raid_varkhul_masters_assembly: r('steel', 'gold', ['sigil_rune', { p: 'mace', ...BR }], ['arcs']),
+  raid_varkhul_crucible_beam: r('fire', 'ember', ['bolt', { p: 'shield', ...BR }], ['arcs']),
+  raid_varkhul_forge_legion: r('steel', 'ember', ['helm', { p: 'mace', ...BR }]),
+  raid_varkhul_masterpiece_unbound: r('fury', 'blood', ['mace', 'flame'], ['glow']),
+  raid_varkhul_worldfire: r('fire', 'blood', ['sunburst', 'flame'], ['glow', 'drips']),
   // pet action bar (dedicated, never a class ability id: see pet_action_icons.ts).
   pet_attack: r('blood', 'blood', ['fang'], ['motion']),
   pet_growl: r('fury', 'gold', ['roar'], ['arcs']),
@@ -2690,6 +2724,10 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   vanish: r('shadow', 'shadowPurple', ['shield'], ['motion', 'glow']),
   instant_poison: r('nature', 'venom', ['droplet'], ['glow']),
   deadly_poison: r('nature', 'venom', ['fang'], ['drips']),
+  // The two utility poisons: the venom palette they share with the rest of the
+  // rogue's poisons, distinguished by what each one eats (armor / healing).
+  melting_acid: r('nature', 'venom', ['chestplate', { p: 'droplet', ...TR }], ['drips']),
+  nightshade_coating: r('nature', 'venom', ['heart', { p: 'droplet', ...TR }], ['drips']),
   blind: r('shadow', 'shadowPurple', ['eye'], ['arcs']),
   // paladin
   seal_of_righteousness: r('holy', 'holyGold', [{ p: 'sunburst', ...BIG }, 'sigil_rune'], ['glow']),
@@ -2810,17 +2848,6 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
     ['tendrils', { p: 'claw_slash', ...BR }],
     ['motion', 'crack'],
   ),
-  // the Vale Cup sport kit (boarball): the 'coin' disc reads as the ball
-  sport_kick: r('earth', 'leather', ['coin', { p: 'boot', ...BR }]),
-  sport_shoot: r('fury', 'ember', ['coin', { p: 'boot', ...BR }], ['motion']),
-  sport_pass: r('nature', 'gold', ['coin', { p: 'boot', ...TL }], ['motion']),
-  sport_boot: r('fury', 'gold', ['coin', { p: 'boot', ...BR }], ['motion']),
-  sport_hoof: r('fury', 'steel', ['boot', { p: 'coin', ...TR }], ['arcs']),
-  sport_punt: r('nature', 'leafGreen', ['coin', { p: 'sunburst', ...TL }], ['motion']),
-  sport_feint: r('shadow', 'steel', ['boot'], ['arcs']),
-  sport_dive: r('earth', 'leather', ['gauntlet', { p: 'coin', ...TR }], ['motion']),
-  sport_shoulder: r('fury', 'steel', ['pauldron', { p: 'claw_slash', ...BR }]),
-  sport_second_wind: r('nature', 'leafGreen', ['boot', { p: 'leaf', ...TR }], ['glow']),
   // priest
   smite: r('holy', 'holyGold', ['bolt', { p: 'sunburst', ...TL }], ['glow']),
   lesser_heal: r('holy', 'silverWhite', ['cross'], ['glow']),
@@ -3340,10 +3367,11 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
 };
 
 const ITEM_RECIPES: Record<string, IconRecipe> = {
-  // Bags (+ the implicit backpack the bag bar shows). All six now ship painted art
-  // (ITEM_IMAGE_IDS / UI_ITEM_IMAGE_IDS below), which iconDataUrl prefers; these recipes
-  // stay as the drawn fallback. Palettes step up with the quality tier so the bag reads
-  // richer as it grows.
+  // Bags (+ the implicit backpack the bag bar shows). Every shipped bag carries painted
+  // art (ITEM_IMAGE_IDS / UI_ITEM_IMAGE_IDS below), which iconDataUrl prefers; the
+  // pre-phase-05 family below keeps a drawn fallback recipe, newer bags rely on
+  // itemFallback's kind-aware sack arm. Palettes step up with the quality tier so the
+  // bag reads richer as it grows.
   backpack: r('leather', 'earthBrown', [{ p: 'sack', pal: 'earthBrown' }]),
   linen_pouch: r('cloth', 'cloth', [{ p: 'sack', pal: 'cloth' }]),
   travelers_knapsack: r('leather', 'leather', [{ p: 'sack', pal: 'leather' }]),
@@ -4408,6 +4436,10 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   // keeps their Warlock ownership explicit.
   'emberkin_felbolt',
   'gloomshade_abyssal_chain',
+  // Shared pet-bar commands are synthetic action identities rather than player
+  // ABILITIES. Their dedicated folder keeps Hunter, Mage, and Warlock ownership
+  // truthful while still using the action-bar image route.
+  ...PET_ACTION_IMAGE_IDS,
   // Choice-row talents use their own images instead of borrowing spell art.
   ...WARLOCK_TALENT_IMAGE_IDS,
   // rogue (CraftPix premium "RPG Thief skill icons" pack). garrote/sap/expose_armor/blind
@@ -4436,6 +4468,8 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'instant_poison',
   'adrenaline_rush',
   'deadly_poison',
+  'melting_acid',
+  'nightshade_coating',
   'stealth',
   // warrior (CraftPix premium "RPG Warrior" + "RPG Berserker" packs; rage/fury abilities
   // drew from berserker). taunt has no provoke art and stays procedural.
@@ -4742,22 +4776,13 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'enrage_passive',
   'measured_fury',
   'seasoned_soldier',
-  'sport_boot',
-  'sport_dive',
-  'sport_feint',
-  'sport_hoof',
-  'sport_kick',
-  'sport_pass',
-  'sport_punt',
-  'sport_second_wind',
-  'sport_shoot',
-  'sport_shoulder',
   'sudden_death',
 ]);
 
 /** Static URL of an ability's image icon, or null if it uses a recipe. */
 export function abilityImageUrl(id: string): string | null {
   if (!ABILITY_IMAGE_IDS.has(id)) return null;
+  if (PET_ACTION_IMAGE_IDS.has(id)) return `${SKILL_ICON_DIR}/pet/${id}.webp`;
   const cls =
     ABILITIES[id]?.class ??
     (id === 'colossal_might' ||
@@ -4791,6 +4816,126 @@ export function abilityImageUrl(id: string): string | null {
           ? 'warlock'
           : null);
   return cls ? `${SKILL_ICON_DIR}/${cls}/${id}.webp` : null;
+}
+
+const AURA_ICON_DIR = '/ui/auras';
+
+/** Exact aura-art identities whose shipping files live directly under /ui/auras. */
+export const AURA_FILE_IMAGE_IDS: ReadonlySet<string> = new Set([
+  ...MOB_AURA_IMAGE_IDS,
+  'affliction_doom',
+  'battle_trance',
+  'bg_battle_rune',
+  'bg_carried_flag',
+  'bg_carrier_vulnerability',
+  'bg_sprint_rune',
+  'bg_ward_rune',
+  'boneglass_cut',
+  'brood_burn_hatchling_burn',
+  'brood_burn_seared_scales',
+  'brood_counter_stun',
+  'brood_ward',
+  'cauterize_fatigue',
+  'cauterizing',
+  'cheater_mark',
+  'convergence_cd',
+  'convergence_mark',
+  'deathbloom',
+  'destruction_ruin',
+  'elemental_convergence',
+  'elixir_buff_sta',
+  'fear_incap',
+  'heating_up',
+  'hunter_enduring_courser_burst',
+  'hunter_enduring_courser_icd',
+  'hunter_pack_rally_haste',
+  'hunter_pack_rally_speed',
+  'hunter_pack_rally_spellhaste',
+  'hunter_predators_pace',
+  'hunter_predators_pace_icd',
+  'icicles',
+  'lifebloom',
+  'marrowpoint_rend',
+  'moontide',
+  'nhalia_cantor_shield',
+  'nythraxis_deathless_stun',
+  'nythraxis_dread_curse',
+  'nythraxis_final_stand',
+  'nythraxis_soul_rend',
+  'nythraxis_transition_pause',
+  'nythraxis_transition_stun',
+  'nythraxis_wardstone_lit',
+  'old_blood',
+  'resurrection_sickness',
+  'sated',
+  'set_bonesplinter',
+  'set_clearcasting',
+  'set_fangrush',
+  'set_gravemight',
+  'set_ragged_gash',
+  'set_soulblaze',
+  'set_warfare_ashen_step',
+  'set_warfare_emberward',
+  'set_warfare_thornguard',
+  'set_warfare_unbroken_oath',
+  'shaman_ancestral_bulwark',
+  'shaman_ancestral_bulwark_icd',
+  'shaman_gathering_winds',
+  'shaman_gathering_winds_icd',
+  'shaman_mending_current',
+  'shaman_stonebound_armor',
+  'shaman_stonebound_dr',
+  'shaman_stonebound_stamina',
+  'shaman_stonebound_unleash_guard',
+  'shaman_stonebound_ward_smooth',
+  'shaman_stormcast',
+  'shaman_stormcast_cheap',
+  'shaman_thunder_charges',
+  'shaman_warspirit_cadence',
+  'shaman_wayfarer_grace',
+  'shaman_wayfarer_grace_icd',
+  'soul_fragments',
+  'stomp_stun',
+  'thronebane_arc_slow',
+  'unstuck_sickness',
+  'verdance',
+  'voidsong_echo',
+  'water_jet',
+  'water_jet_slow',
+  'winters_chill',
+  'wlk_forbidden_reflection',
+  'wlk_forbidden_reflection_lock',
+  'wlk_leaden_hex_root',
+  'wlk_leaden_hex_root_lock',
+  'wlk_leaden_hex_slow',
+]);
+
+/** Aura art identities that deliberately reuse another painted UI family. */
+const EXTERNAL_AURA_IMAGE_URLS: ReadonlyMap<string, string> = new Map([
+  ['bad_air', '/ui/delve-affixes/bad_air.webp'],
+  ['pow_berserker', '/ui/fiesta/powerups/pow_berserker.webp'],
+  ['pow_colossus', '/ui/fiesta/powerups/pow_colossus.webp'],
+  ['pow_moon_boots', '/ui/fiesta/powerups/pow_moon_boots.webp'],
+  ['pow_speed_demon', '/ui/fiesta/powerups/pow_speed_demon.webp'],
+]);
+
+/** All exact aura-art identities, including assets shared from another UI family. */
+export const AURA_IMAGE_IDS: ReadonlySet<string> = new Set([
+  ...AURA_FILE_IMAGE_IDS,
+  ...EXTERNAL_AURA_IMAGE_URLS.keys(),
+]);
+
+/** True when an exact runtime aura identity owns dedicated painted art. */
+export function hasAuraImageIdentity(id: string): boolean {
+  return AURA_IMAGE_IDS.has(id);
+}
+
+/** Static art for an exact aura identity, including ordinary ability-art reuse. */
+export function auraImageUrl(id: string): string | null {
+  const external = EXTERNAL_AURA_IMAGE_URLS.get(id);
+  if (external) return external;
+  if (AURA_FILE_IMAGE_IDS.has(id)) return `${AURA_ICON_DIR}/${id}.webp`;
+  return abilityImageUrl(id);
 }
 
 /** True when an aura identity can reuse known ability or modifier artwork. */
@@ -5060,7 +5205,9 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'soulflame_cord',
   'stormcallers_waistguard',
   'sturdy_belt',
-  // bags (the whole equippable set; the implicit backpack is a UI id, see UI_ITEM_IMAGE_IDS)
+  // bags (the six pre-phase-05 ids; the phase 05 catalog enters via the
+  // auto-derived non-weapon sweep below, so new bags never join this hand
+  // list; the implicit backpack is a UI id, see UI_ITEM_IMAGE_IDS)
   'gravewoven_bag',
   'linen_pouch',
   'mistcallers_duffel',
@@ -5141,6 +5288,7 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'reins_stormfeather_griffin',
   'reins_thunderstrut_gobbler',
   'reins_terrorspark_groundshaker',
+  'reins_rickshaw_mount',
 ]);
 
 // The grouped literals above preserve the curated catalog's provenance history. Derive the
@@ -5169,8 +5317,19 @@ export const UI_ITEM_IMAGE_IDS = new Set<string>(['backpack']);
 // future development-only item may still use it temporarily. tests/item_icons.test.ts holds
 // the line from both sides: it rejects stale entries after art lands and unenumerated art
 // debt. Do not add to this list merely to silence that failure; commission the art.
-// Empty again after the hunter quiver art landed in the same branch that enumerated it.
-export const ITEM_ART_PENDING = new Set<string>();
+// Empty again after the hunter quiver art landed in the same branch that enumerated it,
+// and still empty with the Proving Shore pair: the island's castaway crate and ferry
+// bell icons are rendered from their own world models
+// (scripts/render_island_item_icons.mjs), so they ship with committed art like
+// every other item.
+//
+// The Ignivar raid loot table (content/ignivar_loot.ts) currently carries the
+// whole debt: 192 non-weapon items behind the development-only Crucible raid,
+// enumerated here until their painted wave lands (the raid itself ships with a
+// dev-only entrance, so no player-facing surface shows a procedural icon yet).
+// The 10 raid weapons are excluded: weapons never enter this set (guard A2);
+// they ship painted art through WEAPON_IMAGE_IDS like every other weapon.
+export const ITEM_ART_PENDING = new Set<string>(IGNIVAR_ART_PENDING_ITEM_IDS);
 
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */
 export function itemImageUrl(id: string): string | null {
@@ -5200,6 +5359,24 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   // (docs/achievements/icon-brief.md).
   'exp_the_last_keep',
   'exp_dawnhold_castle',
+  // The bank socket ladder pair (Bank Storage phase 06): both are 'social', so
+  // both fall back to the deed_cat_social crest until their commissioned art
+  // lands (docs/achievements/icon-brief.md). Neither carries a reward, so the
+  // title-shelf rule that forbids a title deed from riding this ledger does
+  // not apply.
+  'soc_strongbox_outfitter',
+  'soc_four_bags_deep',
+  // The Proving Shore graduation deed rides the deed_cat_progression crest
+  // until its commissioned art lands (docs/achievements/icon-brief.md).
+  'prog_ready_for_an_adventure',
+  // The Crucible of the Last Spring raid deeds: all five are 'dungeon', so
+  // each rides the deed_cat_dungeon crest until its commissioned art lands
+  // (docs/achievements/icon-brief.md).
+  'dgn_ignivar',
+  'dgn_ignivar_heroic',
+  'dgn_varkhul',
+  'dgn_varkhul_heroic',
+  'dgn_varkhul_flawless',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {
@@ -5323,16 +5500,22 @@ export function cachedProceduralIconDataUrl(
 
 function staticIconUrl(kind: IconKind, id: string): string | null {
   if (kind === 'item') {
+    const currency = currencyImageUrl(id);
+    if (currency) return currency;
     const weapon = weaponIconUrl(id);
     if (weapon) return weapon;
     const img = itemImageUrl(id);
     if (img) return img;
   }
-  // Abilities, and auras that carry a real ability id (a DoT/buff applied by that
-  // ability), share the same image-based skill art. abilityImageUrl returns null
-  // for generic aura_<kind> ids, so those still fall through to the procedural recipe.
-  if (kind === 'ability' || kind === 'aura') {
+  // Abilities use their skill art. Auras first check exact neutral-aura paintings,
+  // then share matching ability art. Generic aura_<kind> ids still fall through to
+  // their procedural recipe.
+  if (kind === 'ability') {
     const img = abilityImageUrl(id);
+    if (img) return img;
+  }
+  if (kind === 'aura') {
+    const img = auraImageUrl(id);
     if (img) return img;
   }
   // Committed deed, class, family, and status paintings short-circuit to a

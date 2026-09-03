@@ -37,10 +37,25 @@ function cellsOwnedBy(zoneId: string, chunkSize: number): [number, number][] {
   return owned;
 }
 
+/** A build-route-independent identity for a zone's chunks: where each mesh
+ *  sits and how dense it is. Two routes to the same world produce the same set,
+ *  whatever order the chunks arrived in. */
+function chunkFingerprints(group: THREE.Object3D): string[] {
+  return group.children
+    .map((child) => {
+      const geo = (child as THREE.Mesh).geometry as THREE.BufferGeometry;
+      geo.computeBoundingBox();
+      const box = geo.boundingBox;
+      const pos = geo.attributes.position;
+      return `${box?.min.x.toFixed(3)},${box?.min.z.toFixed(3)},${pos.count}`;
+    })
+    .sort();
+}
+
 function mockEmptyAssetLoads(): void {
   vi.doMock('../src/render/assets/loader', () => ({
     loadGltf: vi.fn(() => new Promise(() => {})),
-    loadHdr: vi.fn(() => new Promise(() => {})),
+    loadKtx2Texture: vi.fn(() => new Promise(() => {})),
     loadTexture: vi.fn(() => new Promise(() => {})),
     releaseGltf: vi.fn(),
   }));
@@ -77,6 +92,11 @@ describe('progressive terrain build', () => {
   });
   afterEach(() => {
     vi.useRealTimers();
+    // The pooled-build test below stubs the worker pool; vi.resetModules()
+    // drops the module cache but NOT the mock registry, so without this the
+    // stub would leak into every later test in this file (it made an idle
+    // build finish at fast pace and quietly broke the escalation pins).
+    vi.doUnmock('../src/render/zone_build_pool');
   });
 
   it('builds nothing until a zone is ensured, then only that zone streams in', async () => {
@@ -128,7 +148,7 @@ describe('progressive terrain build', () => {
 
     const builtChunkCount = terrain.group.children.length;
     expect(builtChunkCount).toBeGreaterThan(0);
-    const before = terrain.groundResidency();
+    const before = terrain.groundResidency({ x: 0, z: 0 });
     for (const [cx, cz] of ownedCells) expect(before.isPending(cx, cz)).toBe(false);
     for (const [cx, cz] of neighborCells) expect(before.isPending(cx, cz)).toBe(false);
 
@@ -137,7 +157,7 @@ describe('progressive terrain build', () => {
     // Same state an unvisited zone starts in: not loaded, and the chunk-level
     // fog clamp treats every one of its owned cells as owed again.
     expect(terrain.isZoneLoaded(zone.id)).toBe(false);
-    const after = terrain.groundResidency();
+    const after = terrain.groundResidency({ x: 0, z: 0 });
     for (const [cx, cz] of ownedCells) expect(after.isPending(cx, cz)).toBe(true);
     // The neighbouring zone's own cells (including ITS gap cells) must
     // survive: unloadZone must not over-clear past the evicted zone's
@@ -253,6 +273,190 @@ describe('progressive terrain build', () => {
     idle.cancelStreaming();
   });
 
+  // The GATING arm pipelines through the shared worker pool: it used to build
+  // every cell synchronously on the main thread (measured ~0.8 s per zone under
+  // a teleport's loading screen), while the pool sat idle behind the idle arm.
+  // The pins: every cell really goes off-thread, no more jobs are in flight than
+  // the pool has workers, and the zone that lands is the same one the
+  // main-thread arm builds.
+  it('a fast-paced build pipelines through the worker pool and lands the same zone', async () => {
+    vi.resetModules();
+    mockEmptyAssetLoads();
+    const { buildTerrain } = await import('../src/render/terrain');
+    const { zoneAt } = await import('../src/sim/data');
+    const zone = zoneAt(0, 0);
+
+    const plain = buildTerrain(20061);
+    const plainTask = plain.ensureZone(zone);
+    await vi.runAllTimersAsync();
+    await plainTask;
+    const expected = chunkFingerprints(plain.group);
+    plain.cancelStreaming();
+
+    vi.resetModules();
+    mockEmptyAssetLoads();
+    const stats = { calls: 0, inFlight: 0, peak: 0 };
+    const POOL_SIZE = 3;
+    vi.doMock('../src/render/zone_build_pool', async () => {
+      const { buildChunkArrays } = await import('../src/render/zone_build_worker');
+      return {
+        zoneBuildPool: () => ({
+          size: POOL_SIZE,
+          async buildChunk(job: Record<string, unknown>) {
+            stats.calls++;
+            stats.inFlight++;
+            stats.peak = Math.max(stats.peak, stats.inFlight);
+            await new Promise((resolve) => setTimeout(resolve, 0));
+            stats.inFlight--;
+            return buildChunkArrays({ ...job, kind: 'chunk', id: stats.calls } as never);
+          },
+          async fillWater() {
+            return null;
+          },
+          dispose() {},
+        }),
+        disposeZoneBuildPool: () => {},
+      };
+    });
+    const pooled = (await import('../src/render/terrain')).buildTerrain(20061);
+    const progress: [number, number][] = [];
+    const pooledTask = pooled.ensureZone(zone, (done, total) => progress.push([done, total]));
+    await vi.runAllTimersAsync();
+    await pooledTask;
+
+    const built = chunkFingerprints(pooled.group);
+    expect(built).toEqual(expected);
+    // Every chunk came from the pool: not one fell back to the main thread.
+    expect(stats.calls).toBe(pooled.group.children.length);
+    expect(stats.peak).toBe(POOL_SIZE);
+    // Progress still ticks once per cell (and per normal-bake slice), and it
+    // RUNS OUT: the loading bar has to reach its own total, so the last call
+    // is the full one and no tick ever overshoots it. (Sortedness alone was
+    // vacuous: an unordered lane still pushes an ascending counter.)
+    expect(progress.length).toBeGreaterThan(pooled.group.children.length);
+    const total = progress[0][1];
+    expect(total).toBeGreaterThan(0);
+    expect(progress.every(([, reported]) => reported === total)).toBe(true);
+    expect(progress.at(-1)).toEqual([total, total]);
+    expect(Math.max(...progress.map(([done]) => done))).toBe(total);
+    expect(pooled.isZoneLoaded(zone.id)).toBe(true);
+    pooled.cancelStreaming();
+  });
+
+  // The pool is FALLIBLE by contract: a worker can fail a single job and the
+  // caller must build that one cell here instead. The zone that lands must be
+  // indistinguishable from the all-main-thread one, cell for cell, or a zone
+  // would quietly come out different depending on which jobs happened to fail.
+  it('falls back per cell when the pool declines a job, and still lands the same zone', async () => {
+    vi.resetModules();
+    mockEmptyAssetLoads();
+    const { buildTerrain } = await import('../src/render/terrain');
+    const { zoneAt } = await import('../src/sim/data');
+    const zone = zoneAt(0, 0);
+
+    const plain = buildTerrain(20061);
+    const plainTask = plain.ensureZone(zone);
+    await vi.runAllTimersAsync();
+    await plainTask;
+    const expected = chunkFingerprints(plain.group);
+    plain.cancelStreaming();
+
+    vi.resetModules();
+    mockEmptyAssetLoads();
+    const stats = { calls: 0, declined: 0 };
+    vi.doMock('../src/render/zone_build_pool', async () => {
+      const { buildChunkArrays } = await import('../src/render/zone_build_worker');
+      return {
+        zoneBuildPool: () => ({
+          size: 3,
+          async buildChunk(job: Record<string, unknown>) {
+            const call = ++stats.calls;
+            await new Promise((resolve) => setTimeout(resolve, 0));
+            if (call % 3 === 0) {
+              stats.declined++;
+              return null;
+            }
+            return buildChunkArrays({ ...job, kind: 'chunk', id: call } as never);
+          },
+          async fillWater() {
+            return null;
+          },
+          dispose() {},
+        }),
+        disposeZoneBuildPool: () => {},
+      };
+    });
+    const pooled = (await import('../src/render/terrain')).buildTerrain(20061);
+    const pooledTask = pooled.ensureZone(zone);
+    await vi.runAllTimersAsync();
+    await pooledTask;
+
+    expect(chunkFingerprints(pooled.group)).toEqual(expected);
+    expect(stats.declined).toBeGreaterThan(0);
+    // Still consulted for EVERY claimable cell: a declined job must fall back
+    // for that one cell only, never make the lane give up on the pool.
+    expect(stats.calls).toBe(pooled.group.children.length);
+    expect(pooled.isZoneLoaded(zone.id)).toBe(true);
+    pooled.cancelStreaming();
+  });
+
+  // A pool job that REJECTS (a worker that died mid-zone, not one that merely
+  // declined) must not be swallowed: the gating lane rethrows the first error,
+  // so the zone stays unloaded and the arrival's own catch sees it, instead of
+  // a permanent hole in the ground sitting under an opened fog clamp.
+  it('a rejecting pool job fails the gating build and leaves the zone rebuildable', async () => {
+    vi.resetModules();
+    mockEmptyAssetLoads();
+    const stats = { calls: 0, rejected: 0 };
+    const REJECT_ON_CALL = 5;
+    vi.doMock('../src/render/zone_build_pool', async () => {
+      const { buildChunkArrays } = await import('../src/render/zone_build_worker');
+      return {
+        zoneBuildPool: () => ({
+          size: 3,
+          async buildChunk(job: Record<string, unknown>) {
+            const call = ++stats.calls;
+            await new Promise((resolve) => setTimeout(resolve, 0));
+            if (call === REJECT_ON_CALL) {
+              stats.rejected++;
+              throw new Error('zone build worker died');
+            }
+            return buildChunkArrays({ ...job, kind: 'chunk', id: call } as never);
+          },
+          async fillWater() {
+            return null;
+          },
+          dispose() {},
+        }),
+        disposeZoneBuildPool: () => {},
+      };
+    });
+    const { buildTerrain } = await import('../src/render/terrain');
+    const { zoneAt } = await import('../src/sim/data');
+    const zone = zoneAt(0, 0);
+
+    const terrain = buildTerrain(20061);
+    const settled = terrain.ensureZone(zone).then(
+      () => 'resolved' as const,
+      (error: unknown) => error,
+    );
+    await vi.runAllTimersAsync();
+    expect(await settled).toBeInstanceOf(Error);
+    expect(stats.rejected).toBe(1);
+    expect(terrain.isZoneLoaded(zone.id)).toBe(false);
+
+    // Not loaded means REBUILDABLE, not merely un-flagged: a second ensureZone
+    // must run the build again (consulting the pool for the cells the failed
+    // lane never reached) rather than early-return on a cached zone.
+    const callsAfterFailure = stats.calls;
+    const second = terrain.ensureZone(zone);
+    await vi.runAllTimersAsync();
+    await second;
+    expect(stats.calls).toBeGreaterThan(callsAfterFailure);
+    expect(terrain.isZoneLoaded(zone.id)).toBe(true);
+    terrain.cancelStreaming();
+  });
+
   // Escalation: an in-flight idle build switches to fast pacing mid-zone. In
   // Node the idle fallback is a >=200ms cooperative timer while fast yields
   // are setTimeout(0), so MOCK TIME separates the paces decisively: a zone
@@ -335,7 +539,7 @@ describe('progressive terrain build', () => {
   });
 });
 
-// The outdoor fog clamp reads residency per CHUNK through groundResidency(),
+// The outdoor fog clamp reads residency per CHUNK through groundResidency({ x: 0, z: 0 }),
 // so these pin the terrain side of that seam: what starts pending, and exactly
 // when a cell stops being pending.
 describe('chunk-level ground residency', () => {
@@ -361,7 +565,7 @@ describe('chunk-level ground residency', () => {
     const { zoneAt } = await import('../src/sim/data');
 
     const terrain = buildTerrain(20061);
-    const { grid, isPending } = terrain.groundResidency();
+    const { grid, isPending } = terrain.groundResidency({ x: 0, z: 0 });
     const cells = allCells(grid);
     const pendingCount = (): number => cells.filter(([cx, cz]) => isPending(cx, cz)).length;
 
@@ -384,9 +588,12 @@ describe('chunk-level ground residency', () => {
 
     expect(isPending(hubCx, hubCz)).toBe(false);
     // Exactly this zone's OWNED cells settled, and nothing outside them: the
-    // 36 in-rect cells plus the 21 gap cells nearest-rect ownership assigns
-    // the Vale (see the gap-fill notes in terrain.ts).
-    expect(before - pendingCount()).toBe(57);
+    // Vale's 36 in-rect cells. The 21 western gap cells its nearest-rect
+    // ownership used to absorb belong to the Proving Shore now: the tutorial
+    // island's zone rectangle (x -540..-180, z -180..180) tiles the west
+    // column outright, so those cells build with the island, not the Vale
+    // (see the gap-fill notes in terrain.ts).
+    expect(before - pendingCount()).toBe(36);
     terrain.cancelStreaming();
   });
 
@@ -397,7 +604,7 @@ describe('chunk-level ground residency', () => {
     const { zoneAt } = await import('../src/sim/data');
 
     const terrain = buildTerrain(20061);
-    const { grid, isPending } = terrain.groundResidency();
+    const { grid, isPending } = terrain.groundResidency({ x: 0, z: 0 });
     const startedPending = allCells(grid).filter(([cx, cz]) => isPending(cx, cz));
 
     // Idle pace, stopped mid-build: terrain.ts marks a cell in its internal
@@ -459,22 +666,26 @@ describe('terrain covers the whole world, gaps between zone rectangles included'
       return x >= box.min.x && x <= box.max.x && z >= box.min.z && z <= box.max.z;
     });
 
-  it('meshes the walkable ground at (-195, 161), in the gap west of Eastbrook Vale', async () => {
+  it('meshes the ground at (-195, 161), west of Eastbrook Vale on the island strait', async () => {
     vi.resetModules();
     mockEmptyAssetLoads();
     const { buildTerrain } = await import('../src/render/terrain');
     const { ZONES } = await import('../src/sim/data');
     const { terrainHeight, WATER_LEVEL } = await import('../src/sim/world');
 
-    // Pin the premise on the shipped world seed: this really is dry land, not
-    // seabed under the water plane, so a missing chunk here is ground the
-    // player walks onto and falls through.
-    expect(terrainHeight(-195, 161, WORLD_SEED)).toBeGreaterThan(WATER_LEVEL);
+    // This column was a no-zone gap (dry walkable ground) before the Proving
+    // Shore: the tutorial island's zone rectangle now tiles it, and its coast
+    // recipe turns the spot into the open strait between the island and the
+    // vale. Pin the premise on the shipped world seed: honest seabed BELOW
+    // the water plane, which still needs a meshed chunk under it or a
+    // swimming player sees a hole where the sea floor should be.
+    expect(terrainHeight(-195, 161, WORLD_SEED)).toBeLessThan(WATER_LEVEL);
 
     const terrain = buildTerrain(WORLD_SEED);
-    // The two realms the gap abuts, which is what the renderer's streaming
-    // horizon prepares from either side of the border.
-    for (const id of ['eastbrook_vale', 'willowfen']) {
+    // The cell belongs to the island's zone now, so its build is what meshes
+    // the spot; the vale-side neighbor builds alongside it the way the
+    // renderer's streaming horizon would approaching the strait.
+    for (const id of ['proving_shore', 'eastbrook_vale']) {
       const zone = ZONES.find((candidate) => candidate.id === id);
       if (!zone) throw new Error(`missing zone ${id}`);
       const task = terrain.ensureZone(zone);
@@ -508,7 +719,10 @@ describe('terrain covers the whole world, gaps between zone rectangles included'
         await task;
       }
       vi.useRealTimers();
-    });
+      // Every zone now includes the Proving Shore's cells on top of the ~800
+      // the comment above counts, which outruns the 10s default hook budget
+      // on a loaded runner.
+    }, 60000);
 
     afterAll(() => {
       terrain.cancelStreaming();

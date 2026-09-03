@@ -18,7 +18,7 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { advancePendingProjectiles } from '../src/sim/projectile_travel';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
-import { type Aura, DT, type Entity, type PlayerClass, type SimEvent } from '../src/sim/types';
+import type { Aura, Entity, PlayerClass, SimEvent } from '../src/sim/types';
 import { placePlayerInOpenField } from './helpers/open_field';
 
 type DamageEvent = Extract<SimEvent, { type: 'damage' }>;
@@ -521,13 +521,12 @@ describe('auto_attack Auto Shot scales off the equipped weapon (ranged DPS)', ()
     spawnDummy(sim, p, 20, 20); // beyond the 8yd dead zone, within 35
     // A deliberately slow bow, distinct from the class ranged speed (2.3).
     p.weapon = { min: 40, max: 60, speed: 4 };
-    p.rangedHaste = 0;
     p.autoAttack = true;
     p.swingTimer = 0;
     updatePlayerAutoAttack(sim.ctx, p, meta);
-    expect(p.swingTimer).toBeCloseTo(4 * sim.swingIntervalMult(p));
+    expect(p.swingTimer).toBeCloseTo(4 * sim.swingIntervalMult(p, 'ranged'));
     // and NOT the old class-fixed 2.3 cadence
-    expect(p.swingTimer).not.toBeCloseTo(2.3 * sim.swingIntervalMult(p));
+    expect(p.swingTimer).not.toBeCloseTo(2.3 * sim.swingIntervalMult(p, 'ranged'));
   });
 
   it('a heavier-hitting weapon yields a bigger Auto Shot than a weak one', () => {
@@ -618,6 +617,33 @@ describe('auto_attack startAutoAttack: ranged engage must not pre-aggro (issue #
     startAutoAttack(sim.ctx, p.id);
     expect(p.autoAttack).toBe(true);
     expect(mob.aggroTargetId).toBe(p.id);
+  });
+
+  it('melee engage against a quest-gated egg seeds no threat or combat for a non-quester', () => {
+    const { sim, p } = makeSim('warrior', 12);
+    const egg = createMob(sim.nextId++, MOBS.spider_egg, 10, {
+      x: p.pos.x,
+      y: p.pos.y,
+      z: p.pos.z + 2,
+    });
+    egg.hostile = true;
+    egg.aiState = 'idle';
+    sim.addEntity(egg);
+    p.facing = Math.atan2(egg.pos.x - p.pos.x, egg.pos.z - p.pos.z);
+    sim.targetEntity(egg.id, p.id);
+
+    startAutoAttack(sim.ctx, p.id);
+    expect(p.autoAttack).toBe(false);
+    expect(egg.aiState).toBe('idle');
+    expect(egg.aggroTargetId).toBeNull();
+    expect(egg.threat.size).toBe(0);
+    expect(p.inCombat).toBe(false);
+    expect(egg.inCombat).toBe(false);
+
+    for (let i = 0; i < 20 * 3; i++) sim.tick();
+    expect(egg.threat.size).toBe(0);
+    expect(p.inCombat).toBe(false);
+    expect(egg.inCombat).toBe(false);
   });
 
   it('a wand caster still aggros the mob when the shot actually lands', () => {

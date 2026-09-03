@@ -63,7 +63,7 @@ export const TALENT_ABILITIES_V2_A = {
     targetMode: 'position',
     effects: [{ type: 'aoeDamage', min: 62, max: 74, radius: 8 }],
     description:
-      'Loose a spread at the target area, dealing $d Physical damage to enemies within 8 yd. (Hunter talent)',
+      'Loose a spread at the target area, dealing $d Physical damage to enemies within 8 yd. Cannot be aimed within 8 yd of you. (Hunter talent)',
   },
   deterrence: {
     id: 'deterrence',
@@ -323,9 +323,14 @@ export const TALENT_ABILITIES_V2_A = {
     range: 24,
     school: 'physical',
     requiresTarget: true,
+    // Repositioning, not an attack: the step acts on the caster only, so it
+    // resolves against an ALLY exactly as it does against an enemy (peeling to
+    // a healer, closing on a flag carrier). 'any' routes it through the
+    // casting_lifecycle branch that accepts either side.
+    targetType: 'any',
     effects: [{ type: 'blinkForward', distance: 24 }],
     description:
-      'Steps through the shadows toward your target without breaking Duskveil. (Rogue talent)',
+      'Steps through the shadows to your target, friend or foe, without breaking Duskveil. (Rogue talent)',
   },
 
   silence: {

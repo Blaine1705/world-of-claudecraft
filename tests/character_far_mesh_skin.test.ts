@@ -48,6 +48,13 @@ function stubGltf() {
   const mesh = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), new THREE.MeshStandardMaterial());
   mesh.name = 'body';
   scene.add(mesh);
+  const emissive = new THREE.Mesh(
+    new THREE.BoxGeometry(0.2, 0.2, 0.2),
+    new THREE.MeshStandardMaterial(),
+  );
+  emissive.name = 'authored_emissive_fx';
+  emissive.userData.shadowCaster = false;
+  scene.add(emissive);
   return {
     scene,
     animations: [
@@ -67,7 +74,6 @@ describe('far-LOD mesh follows the selected body skin', () => {
     vi.resetModules();
     vi.doMock('../src/render/assets/loader', () => ({
       loadGltf: vi.fn(() => Promise.resolve(stubGltf())),
-      loadHdr: vi.fn(() => new Promise(() => undefined)),
       // Tag each loaded texture with the URL it came from so the test can
       // tell the alternate-skin atlas apart from the embedded default.
       loadTexture: vi.fn((url: string) =>
@@ -94,22 +100,33 @@ describe('far-LOD mesh follows the selected body skin', () => {
     const visual = new CharacterVisual(VISUAL_KEY, 0xffffff, 0);
     visual.setSkin(1);
 
-    // Near rig: the equipped body mesh must show the alternate atlas.
-    let nearMap: THREE.Texture | null = null;
-    visual.root.traverse((o) => {
-      const mesh = o as THREE.Mesh;
-      if (mesh.isMesh && mesh.userData.bodyMesh) {
-        nearMap = (mesh.material as THREE.MeshStandardMaterial).map;
-      }
+    // Skin atlases load on demand on every host (eagerSkinAtlases is off):
+    // setSkin applies the embedded default first, then ensureSkinTexture
+    // re-runs applySkinMaterials once the atlas arrives, rebuilding the near
+    // rig AND the far mesh. Wait for that heal before asserting either.
+    const readNearMap = (): THREE.Texture | null => {
+      let map: THREE.Texture | null = null;
+      visual.root.traverse((o) => {
+        const mesh = o as THREE.Mesh;
+        if (mesh.isMesh && mesh.userData.bodyMesh) {
+          map = (mesh.material as THREE.MeshStandardMaterial).map;
+        }
+      });
+      return map;
+    };
+    await vi.waitFor(() => {
+      expect(readNearMap()).not.toBeNull();
     });
+
+    // Near rig: the equipped body mesh must show the alternate atlas.
+    const nearMap = readNearMap();
     expect(nearMap).not.toBeNull();
     expect((nearMap as unknown as THREE.Texture).name).toBe(altSkinUrl);
 
     // Far LOD mesh: baked once per key, found by its shared (memoized)
-    // geometry. The shadow-only proxy mesh shares that SAME geometry (see
-    // the constructor), so match on the tinted-material array shape too:
-    // tintedFarMaterials always returns an array, while the shadow proxy's
-    // singleton shadowOnlyMat() is a lone, non-array material.
+    // geometry. Match on the tinted-material array shape: tintedFarMaterials
+    // always returns an array, while the shadow proxy uses a separate baked
+    // geometry containing only authored shadow casters.
     const prep = prepareVisual(VISUAL_KEY);
     let farMaterial: THREE.Material | THREE.Material[] | undefined;
     visual.root.traverse((o) => {
@@ -127,6 +144,22 @@ describe('far-LOD mesh follows the selected body skin', () => {
     // not the model's embedded default texture (map === null).
     expect(farMap).not.toBeNull();
     expect((farMap as unknown as THREE.Texture).name).toBe(altSkinUrl);
+
+    // The visual far LOD keeps authored emissive details, while the dedicated
+    // shadow proxy omits them so flame/core meshes never become solid shadows
+    // in the mid-distance band.
+    expect(prep.shadowGeo).not.toBeNull();
+    expect(prep.shadowGeo).not.toBe(prep.idleGeo);
+    expect(prep.shadowGeo?.getAttribute('position').count).toBeLessThan(
+      prep.idleGeo?.getAttribute('position').count ?? 0,
+    );
+    let shadowProxy: THREE.Mesh | undefined;
+    visual.root.traverse((o) => {
+      const mesh = o as THREE.Mesh;
+      if (mesh.isMesh && mesh.geometry === prep.shadowGeo) shadowProxy = mesh;
+    });
+    expect(shadowProxy).toBeDefined();
+    expect(shadowProxy?.castShadow).toBe(true);
 
     vi.doUnmock('../src/render/assets/loader');
     vi.resetModules();

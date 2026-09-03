@@ -102,7 +102,8 @@ export interface PainterHostWriters {
    * written every frame per slot (Top risk 4); the rendered string still comes from
    * the core's `t()` call each frame, this only elides the DOM write.
    */
-  setAttr(el: HTMLElement, name: string, value: string): void;
+  /** null removes the attribute (elided like any other value). */
+  setAttr(el: HTMLElement, name: string, value: string | null): void;
 }
 
 /**
@@ -123,8 +124,11 @@ export interface SingleSlotEntry {
   value: string;
 }
 
-/** The shared single-slot elision cache (Hud's private `hotWriteCache` field). */
-export type SingleSlotCache = Map<HTMLElement, SingleSlotEntry>;
+/** The shared single-slot elision cache (Hud's private `hotWriteCache` field).
+ * A WeakMap on purpose: entries are keyed by element and never enumerated, and
+ * a strong Map pinned every element ever routed through a writer, including
+ * DOM-removed party/raid rows, for the whole session. */
+export type SingleSlotCache = WeakMap<HTMLElement, SingleSlotEntry>;
 
 /**
  * The single-slot elision decision, shared VERBATIM by Hud's private writers and
@@ -166,11 +170,14 @@ export function shouldWriteSingleSlot(
  * direct writes and the painter writes. No writer composes a key string on any
  * path: an elided frame allocates nothing.
  */
+// Cache sentinel for a removed attribute; no real attribute value can be it.
+const ATTR_REMOVED = '\u0000';
+
 export function makeWriterFacet(
   cache: SingleSlotCache,
-  stylePropCache: Map<HTMLElement, Map<string, string>>,
-  classCache: Map<HTMLElement, Map<string, string>>,
-  attrCache: Map<HTMLElement, Map<string, string>>,
+  stylePropCache: WeakMap<HTMLElement, Map<string, string>>,
+  classCache: WeakMap<HTMLElement, Map<string, string>>,
+  attrCache: WeakMap<HTMLElement, Map<string, string>>,
   onWrite: () => void,
   onSkip: () => void,
 ): PainterHostWriters {
@@ -186,7 +193,7 @@ export function makeWriterFacet(
   // elides per (element, slot). Used by setStyleProp/toggleClass so one element can
   // hold many independent props/classes without them clobbering each other's cache.
   const shouldWriteSlot = (
-    store: Map<HTMLElement, Map<string, string>>,
+    store: WeakMap<HTMLElement, Map<string, string>>,
     el: HTMLElement,
     slot: string,
     value: string,
@@ -224,7 +231,10 @@ export function makeWriterFacet(
       if (shouldWriteSlot(classCache, el, cls, on ? 'on' : 'off')) el.classList.toggle(cls, on);
     },
     setAttr: (el, name, value) => {
-      if (shouldWriteSlot(attrCache, el, name, value)) el.setAttribute(name, value);
+      if (shouldWriteSlot(attrCache, el, name, value === null ? ATTR_REMOVED : value)) {
+        if (value === null) el.removeAttribute(name);
+        else el.setAttribute(name, value);
+      }
     },
   };
 }

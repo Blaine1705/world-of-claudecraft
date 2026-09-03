@@ -249,8 +249,27 @@ describe('far-LOD wiring (source pins)', () => {
     // the composed bake is shared per part set, which cannot represent one.
     const composed = fnBody('src/render/characters/assets.ts', 'export function modularFarBake(');
     expect(composed).toContain('bakeStaticPose(norm, composedFarMeshes(temp))');
+    // The fixed rig captures farBakeMeshes(temp) once, bakes the LOD off that
+    // walk, then derives the shadow bake from the same list (the raid mech's
+    // shadow-policy split), so the pin follows the capture plus the bake call.
     const fixed = fnBody('src/render/characters/assets.ts', 'export function prepareVisual(');
-    expect(fixed).toContain('bakeStaticPose(norm, farBakeMeshes(temp))');
+    expect(fixed).toContain('const farMeshes = farBakeMeshes(temp);');
+    expect(fixed).toContain('bakeStaticPose(norm, farMeshes)');
+  });
+
+  it('composes its throwaway with skipDecals: the flatten drops face decals, so none is minted', () => {
+    // Without the option the bake built both decal maps synchronously on the
+    // per-frame far crossing (production 2026-08-19: a 186 ms frame) and then
+    // threw them away with the temp.
+    const composed = fnBody('src/render/characters/assets.ts', 'export function modularFarBake(');
+    expect(composed).toContain('assembleModular(def, look, null, null, { skipDecals: true })');
+    // The fixed-rig bake's modular throwaway (prepareVisual) takes the same arm:
+    // the default look wears a scalp decal, minted and dropped per key otherwise.
+    const fixed = fnBody('src/render/characters/assets.ts', 'export function prepareVisual(');
+    expect(fixed).toContain('assembleModel(def, null, null, null, { skipDecals: true })');
+    const attach = fnBody('src/render/characters/assets.ts', 'export function attachFaceDecals(');
+    expect(attach.indexOf('if (opts?.skipDecals) return;')).toBeGreaterThan(-1);
+    expect(attach.indexOf('if (opts?.skipDecals) return;')).toBeLessThan(attach.indexOf('headOf('));
   });
 
   it('peeks before spending the budget, and goes pending when refused', () => {
@@ -343,6 +362,15 @@ describe('buildComposedFar catches a fresh far mesh up on effect state', () => {
       tintedFarClaims: new Set(),
       shadowProxy: null,
       poseWrap: new THREE.Group(),
+      modelWrap: new THREE.Group(),
+      far: false,
+      farWrap: null,
+      farCompilePending: false,
+      farBakeGate: null,
+      farSkinScratch: null,
+      pendingFarClaims: null,
+      proxyShadowWanted: false,
+      disposed: false,
       originalMaterials: new Map(),
       farMesh: null,
       farMaterials: null,
@@ -463,6 +491,15 @@ describe('attemptComposedFar keeps farBakeTried in step with a refused budget', 
       tintedFarClaims: new Set(),
       shadowProxy: null,
       poseWrap: new THREE.Group(),
+      modelWrap: new THREE.Group(),
+      far: false,
+      farWrap: null,
+      farCompilePending: false,
+      farBakeGate: null,
+      farSkinScratch: null,
+      pendingFarClaims: null,
+      proxyShadowWanted: false,
+      disposed: false,
       originalMaterials: new Map(),
       farMesh: null,
       farMaterials: null,

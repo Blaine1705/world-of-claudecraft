@@ -41,10 +41,6 @@ describe('remastered soundtrack catalog', () => {
     }
   });
 
-  it('leaves vale_cup streamless: the Sowfield mp3 pair owns that mix', () => {
-    expect(ZONE_STREAM_URLS.vale_cup).toBeNull();
-  });
-
   it('routes each supplied new-zone remaster to its matching music cue', () => {
     const supplied = {
       amber: [
@@ -79,6 +75,10 @@ describe('remastered soundtrack catalog', () => {
         '/audio/music/night.mp3',
         '44f582c437208d480fc0cb828e1ed91f254ccd4cd0236a0815c97e76fb75394e',
       ],
+      proving_shore: [
+        '/audio/music/proving_shore.mp3',
+        '51e9b5a6c01f1e7ef1c7f602875de81f50a21d7e6428e9335e828897bb478b7c',
+      ],
     } as const satisfies Partial<Record<MusicZone, readonly [string, string]>>;
 
     for (const [zone, [url, expectedHash]] of Object.entries(supplied)) {
@@ -95,6 +95,20 @@ describe('remastered soundtrack catalog', () => {
     expect(ZONE_STREAM_URLS.dusk).toBe(ZONE_STREAM_URLS.marsh);
     expect(ZONE_STREAM_URLS.ember).toBe(ZONE_STREAM_URLS.peaks);
     expect(ZONE_STREAM_URLS.haunt).toBe(ZONE_STREAM_URLS.marsh);
+  });
+
+  it('routes the three Ignivar rooms to three distinct matching remasters', () => {
+    const rooms = [
+      'ignivar_forge_approach',
+      'ignivar_raid_arena',
+      'ignivar_inner_crucible',
+    ] as const;
+    const urls = rooms.map((room) => ZONE_STREAM_URLS[room]);
+
+    expect(new Set(urls).size).toBe(rooms.length);
+    for (const [index, room] of rooms.entries()) {
+      expect(urls[index]).toMatch(new RegExp(`/audio/music/${room}\\.mp3\\?v=[a-f0-9]{12}$`));
+    }
   });
 
   it('ships the two battle themes and they exist on disk', () => {
@@ -127,10 +141,13 @@ describe('remastered soundtrack catalog', () => {
       'garden',
       'gale',
       'farshore',
-      'vale_cup',
+      'proving_shore',
       'dungeon_hollow_crypt',
       'dungeon_sunken_bastion',
       'dungeon_gravewyrm_sanctum',
+      'ignivar_forge_approach',
+      'ignivar_raid_arena',
+      'ignivar_inner_crucible',
       'rift_frost',
       'rift_ember',
       'rift_venom',

@@ -31,6 +31,7 @@ import {
   freeCostAuraActive,
   nextCastCheapMultiplierFromAuras,
 } from '../../../sim/combat/empower_next';
+import { willAutoUnshift } from '../../../sim/combat/form_auto_unshift';
 import { frostProcGlowActive } from '../../../sim/combat/frost_mage';
 import { packlordActionGlowActive } from '../../../sim/combat/hunter_packlord';
 import {
@@ -47,6 +48,7 @@ import {
   solarReprisalMakesAbilityFree,
 } from '../../../sim/combat/paladin_solar_reprisal';
 import { sunVerdictAbilityGlowActive } from '../../../sim/combat/paladin_sun_verdict';
+import { effectivePlayerAttackRange } from '../../../sim/combat/player_attack_reach';
 import { priestActionGlowActive } from '../../../sim/combat/priest/presentation';
 import { mendingCurrentTargetCapped } from '../../../sim/combat/shaman_spiritmend';
 import { flowStateDiscountedCost } from '../../../sim/combat/shaman_talents';
@@ -58,8 +60,8 @@ import {
   dist2d,
   GCD,
   type ItemDef,
-  MELEE_RANGE,
   POTION_COOLDOWN,
+  type ResourceType,
   type Vec3,
 } from '../../../sim/types';
 import type { InterpolationValues, TranslationKey } from '../../i18n';
@@ -156,6 +158,9 @@ export interface ActionBarSlotDescriptor {
   item(): ItemDef | null;
   /** The slot's keybind label. Host resolves from the keybind map. */
   keybindLabel(): string;
+  /** Whether this rendered slot owns the source slot of an active ground aim.
+   *  Omitted for bar families that do not cast ground-targeted abilities. */
+  ownsAimSlot?(activeAimSlot: number): boolean;
 }
 
 /** The bar descriptor: the slot set. The FAMILY parameter. */
@@ -184,6 +189,14 @@ export interface ActionBarPlayerInput {
   autoAttack: boolean;
   dead: boolean;
   resource: number;
+  /** Which pool the live bar shows. A druid form swaps it to rage or energy and
+   *  parks the real mana pool in savedMana, so it is what tells an in-form bar
+   *  apart from an ordinary caster's. */
+  resourceType: ResourceType | null;
+  /** Mana set aside while shapeshifted (0 when unshifted). The pool an
+   *  auto-unshifting cast is billed against; mirrored online as the self
+   *  snapshot's sparse `sm` key. */
+  savedMana: number;
   cooldowns: { get(id: string): number | undefined };
   gcdRemaining: number;
   /** Shared combat-potion cooldown, remaining seconds (0 when ready). Painted as a
@@ -221,6 +234,8 @@ export interface ActionBarPlayerInput {
 /** The target fields the bar reads; null when there is no current target. */
 export interface ActionBarTargetInput {
   dead: boolean;
+  kind: string;
+  templateId: string;
   pos: Vec3;
   maxHp?: number;
   auras: readonly ActionBarAuraInput[];
@@ -239,6 +254,8 @@ export interface ActionBarWorldInput {
   /** Fate Threads attached to this Warlock's primary Evil Eye, 0 to 3. */
   fateThreads?: number;
   entities: Iterable<OwnedDominionServant>;
+  /** Source action-bar slot that owns the active ground aim, or null. */
+  activeAimSlot: number | null;
 }
 
 /** One slot's derived state. All fields are mutated IN PLACE each tick; the object
@@ -265,6 +282,7 @@ export interface ActionBarSlotState {
   usable: boolean;
   outOfRange: boolean;
   queued: boolean;
+  aiming: boolean;
   /** A free-cost proc (Battle Trance) covers this ability right now: the
    *  painter renders the classic gold proc glow. Actionable info, so it is
    *  NEVER shed by a graphics tier. */
@@ -295,7 +313,9 @@ export interface ActionBarView {
   tick(world: ActionBarWorldInput): ActionBarState;
 }
 
-function makeSlotState(): ActionBarSlotState {
+/** A blank slot state. Exported so another bar family can hold a fallback cell
+ *  for a position its layout does not fill. */
+export function makeSlotState(): ActionBarSlotState {
   return {
     kind: 'empty',
     abilityId: null,
@@ -311,6 +331,7 @@ function makeSlotState(): ActionBarSlotState {
     usable: true,
     outOfRange: false,
     queued: false,
+    aiming: false,
     procGlow: false,
     empowered: false,
     ascensionSpender: false,
@@ -370,7 +391,22 @@ function hasForbiddenReflection(
   return false;
 }
 
-function inventoryCount(
+export function actionBarCooldownRemaining(
+  player: Pick<ActionBarPlayerInput, 'auras' | 'cooldowns'>,
+  ability: ActionBarAbility,
+  bypassesCooldown = dawnsWrathHammerActive(player, ability.def.id) ||
+    hasForbiddenReflection(player.auras, ability.def.id) ||
+    solarReprisalBypassesCooldown(player, ability.def.id),
+): number {
+  const abilityId = ability.def.id;
+  if (bypassesCooldown) return 0;
+  return player.cooldowns.get(ability.cooldownId ?? abilityId) ?? 0;
+}
+
+/** How many of `itemId` the player is carrying, summed across stacks. Exported
+ *  because the consumables seat needs the same number for its tooltip's in-bags
+ *  line, off the same snapshot the bar state is built from. */
+export function inventoryCount(
   inventory: readonly { itemId: string; count: number }[],
   itemId: string,
 ): number {
@@ -409,11 +445,22 @@ export function createActionBarView(
         }
       }
       let boundCount = 0;
+      let aimingSlotIndex = -1;
+      if (world.activeAimSlot !== null) {
+        for (let i = 0; i < descriptor.slots.length; i++) {
+          const sd = descriptor.slots[i];
+          if (sd.ownsAimSlot?.(world.activeAimSlot) === true) {
+            aimingSlotIndex = i;
+            break;
+          }
+        }
+      }
 
       for (let i = 0; i < descriptor.slots.length; i++) {
         const sd = descriptor.slots[i];
         const slot = slots[i];
         const slotLabel = deps.slotLabel(sd.slotIndex);
+        slot.aiming = i === aimingSlotIndex;
 
         // many-spells counts RAW assigned slots (the attack slot reports no action),
         // byte-identical to the former hotbarActions.filter(a => a !== null).length.
@@ -438,7 +485,8 @@ export function createActionBarView(
           slot.isCharges = false;
           slot.rechargePercent = 0;
           slot.usable = true;
-          slot.outOfRange = tgtDist !== null && tgtDist > MELEE_RANGE;
+          slot.outOfRange =
+            tgtDist !== null && target !== null && tgtDist > effectivePlayerAttackRange(target, 0);
           slot.queued = player.autoAttack;
           slot.procGlow = false;
           slot.empowered = false;
@@ -534,10 +582,11 @@ export function createActionBarView(
         const dawnsWrathActive = dawnsWrathHammerActive(player, def.id);
         const solarReprisalActive = solarReprisalAbilityGlowActive(player, def.id);
         const reflectionReady = hasForbiddenReflection(player.auras, def.id);
-        const cd =
-          dawnsWrathActive || reflectionReady || solarReprisalBypassesCooldown(player, def.id)
-            ? 0
-            : (player.cooldowns.get(ability.cooldownId ?? def.id) ?? 0);
+        const cd = actionBarCooldownRemaining(
+          player,
+          ability,
+          dawnsWrathActive || reflectionReady || solarReprisalBypassesCooldown(player, def.id),
+        );
         const gcdActive = !def.offGcd && player.gcdRemaining > 0;
         const shown = Math.max(cd, gcdActive ? player.gcdRemaining : 0);
         const denom = cd > 0 ? def.cooldown : GCD;
@@ -643,8 +692,18 @@ export function createActionBarView(
           dominionReady =
             dominionSummonBlockFromMask(dominionComposition, dominionTemplateId) === null;
         }
+        // A druid pressing a heal or a nuke from Bruin/Wolf Form leaves the form
+        // and casts it, and the cast is billed against the PARKED mana pool, not
+        // the rage or energy bar the button is pressed from (the same predicate
+        // the sim's cast gate asks, so the bar cannot paint a slot unusable while
+        // the cast it refuses to advertise succeeds). Fleet Form never swapped the
+        // bar, so its pool is already the live one.
+        const castingPool =
+          player.resourceType !== 'mana' && willAutoUnshift(player.auras, def)
+            ? player.savedMana
+            : player.resource;
         slot.usable =
-          (!(player.resource < payableCost) || freeByProc || freeBySolarReprisal) &&
+          (!(castingPool < payableCost) || freeByProc || freeBySolarReprisal) &&
           (def.ruinCost ?? 0) <= ruin &&
           soulFragments >= (def.soulFragmentCost ?? 0) &&
           ascensionReady &&
@@ -657,7 +716,8 @@ export function createActionBarView(
         slot.outOfRange =
           def.requiresTarget &&
           tgtDist !== null &&
-          (tgtDist > (def.range > 0 ? def.range : MELEE_RANGE) ||
+          target !== null &&
+          (tgtDist > effectivePlayerAttackRange(target, def.range) ||
             (def.minRange !== undefined && tgtDist < def.minRange));
         slot.queued = player.queuedOnSwing === def.id;
         // Spec resources/procs share pure sim predicates so the bar and combat

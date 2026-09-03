@@ -1,4 +1,5 @@
 import { isQuestGatedGroundObjectHidden } from '../sim/quest_gated_entity';
+import { isObjectOpenedByViewer } from '../sim/quests/opened_object_view';
 import {
   dist2d,
   type Entity,
@@ -71,6 +72,12 @@ export function tryNearbyInteraction(
   harvestStateReliable = true,
   // The R40 per-use effect confirm gate, threaded to the node dispatch.
   effectConfirm?: GatherEffectConfirmGate,
+  // The npc the caller means, when it has one in mind. The scan is otherwise
+  // nearest-wins, which is right for a keypress aimed by walking up to someone and
+  // wrong for a pad, where the player SELECTS an npc and then presses talk: without
+  // this, pressing talk answered whoever happened to be standing closer. Only ever
+  // promotes an npc the scan would already have accepted, so no rule is bypassed.
+  preferNpcId?: number | null,
 ): InteractionOutcome {
   const player = world.player;
   const playerId = world.playerId ?? player.id;
@@ -125,20 +132,33 @@ export function tryNearbyInteraction(
       // Nothing the viewer cannot see may win the press. An off-quest quest
       // collectable is withheld from the scene entirely (the renderer's gate), so
       // selecting it here would spend the interact on an invisible object and let
-      // it outrank a visible NPC or node standing further away.
-      !isQuestGatedGroundObjectHidden(entity, world.questLog)
+      // it outrank a visible NPC or node standing further away. The same rule
+      // covers an interact-objective object this player already credited (an
+      // opened castaway crate): the renderer hides it for them, so the press
+      // must not target it either.
+      !isQuestGatedGroundObjectHidden(entity, world.questLog) &&
+      !isObjectOpenedByViewer(entity, world.questLog)
     ) {
       if (distance <= objectInteractionRange(entity) && distance < bestObjectDistance) {
         bestObject = entity.id;
         bestObjectDistance = distance;
       }
     }
-    if (entity.kind === 'npc' && distance < bestNpcDistance) {
+    // The promotion jumps the nearest-wins order, so it carries a strict reach check
+    // of its own; the scan keeps the reach its sentinel has always given it.
+    const promoted =
+      preferNpcId !== undefined &&
+      preferNpcId !== null &&
+      entity.id === preferNpcId &&
+      distance <= INTERACT_RANGE;
+    if (entity.kind === 'npc' && (promoted || distance < bestNpcDistance)) {
       const isGhostHealer = entity.templateId === 'spirit_healer' && player.ghost;
       const isLivingNpc = entity.templateId !== 'spirit_healer' && !player.dead;
       if (isGhostHealer || isLivingNpc) {
         bestNpc = entity.id;
-        bestNpcDistance = distance;
+        // Out of reach of anything else, so a nearer npc later in the sweep cannot
+        // take the pick back off the one the player actually selected.
+        bestNpcDistance = promoted ? -1 : distance;
       }
     }
   }

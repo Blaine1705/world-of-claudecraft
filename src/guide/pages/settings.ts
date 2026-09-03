@@ -322,6 +322,10 @@ const INTERFACE_TABS: InterfaceTabBlock[] = [
       { setting: 'hud.options.reduceMotion', body: 'guide.settingsPage.rowReduceMotion' },
       { setting: 'hud.options.invertLookY', body: 'guide.settingsPage.ifInvertLookY' },
       { setting: 'hudChrome.options.showItemLevel', body: 'guide.settingsPage.ifShowItemLevel' },
+      {
+        setting: 'hudChrome.options.showReliquaryTracker',
+        body: 'guide.settingsPage.ifShowReliquaryTracker',
+      },
       { setting: 'hudChrome.options.showPlaytime', body: 'guide.settingsPage.ifShowPlaytime' },
       {
         setting: 'hudChrome.options.showOwnNameplate',
@@ -360,6 +364,10 @@ const INTERFACE_TABS: InterfaceTabBlock[] = [
       {
         setting: 'hudChrome.options.aurasOnPlayerFrame',
         body: 'guide.settingsPage.ifAurasOnPlayerFrame',
+      },
+      {
+        setting: 'hudChrome.options.alwaysShowAllBuffs',
+        body: 'guide.settingsPage.ifAlwaysShowAllBuffs',
       },
       {
         setting: 'hudChrome.options.showTargetOfTarget',

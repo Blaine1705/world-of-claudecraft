@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  exp_dawnhold_castle: {
+    name: '花園中敞開的門',
+    desc: '造訪晨曦堡，漫步於它灑滿陽光的花園廳堂。',
+  },
+  exp_the_last_keep: {
+    name: '寂靜廳堂',
+    desc: '步入最後的堡壘，走過它寂靜的廳堂。',
+  },
   pvp_bg_first_capture: {
     name: '旗幟在手',
     desc: '在荊谷原野奪取一面旗幟。',
@@ -719,5 +727,38 @@ export const table: DeedLocaleTable = {
   prog_armorcrafting_rare: {
     name: '鍛造至完美',
     desc: '在護甲鍛造中製作你的第一件稀有品質物品。',
+  },
+  prog_ready_for_an_adventure: {
+    name: '整裝待發',
+    desc: '從試煉之濱畢業：完成島上的每一堂課，然後敲響渡船鈴回到東溪鎮。',
+  },
+  soc_strongbox_outfitter: {
+    name: '保險箱裝備師',
+    desc: '解鎖你的第一個銀行背包欄位。',
+  },
+  soc_four_bags_deep: {
+    name: '四袋俱全',
+    desc: '解鎖銀行的全部四個背包欄位。',
+  },
+  dgn_ignivar: {
+    name: '使者殞落',
+    desc: '在最後泉源熔爐擊敗「伊格尼瓦，末焰使者」。',
+  },
+  dgn_ignivar_heroic: {
+    name: '英雄：使者殞落',
+    desc: '以英雄難度擊敗「伊格尼瓦，末焰使者」。',
+  },
+  dgn_varkhul: {
+    name: '熔爐漸冷',
+    desc: '在內環熔爐擊敗「末焰鍛父瓦爾庫爾」。',
+  },
+  dgn_varkhul_heroic: {
+    name: '英雄：熔爐漸冷',
+    desc: '以英雄難度擊敗「末焰鍛父瓦爾庫爾」。',
+  },
+  dgn_varkhul_flawless: {
+    name: '餘燼不滅',
+    desc: '以英雄難度擊敗「末焰鍛父瓦爾庫爾」，且沒有任何團隊成員死亡。',
+    title: '未焚者',
   },
 };

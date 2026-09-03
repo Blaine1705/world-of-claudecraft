@@ -25,7 +25,6 @@ async function loadModules(): Promise<{ assets: AssetsModule; visual: VisualModu
   vi.resetModules();
   vi.doMock('../src/render/assets/loader', () => ({
     loadGltf: vi.fn(() => Promise.resolve(stubGltf())),
-    loadHdr: vi.fn(() => new Promise(() => undefined)),
     loadTexture: vi.fn(() => Promise.resolve(new THREE.Texture())),
     loadKtx2Texture: vi.fn(() => Promise.resolve(new THREE.Texture())),
     releaseGltf: vi.fn(),
@@ -58,7 +57,17 @@ function mountedMaterials(root: THREE.Object3D): Set<THREE.Material> {
  *  park at the idle tail), so anything unpinned must have evicted. */
 function floodIdle(assets: AssetsModule, salt: number): void {
   for (let i = 0; i < TINTED_MATERIAL_IDLE_CACHE_MAX * 2; i++) {
-    assets.tintedMaterial(new THREE.MeshStandardMaterial({ color: 0xffffff }), salt + i, 0.4);
+    assets.tintedMaterial(
+      new THREE.MeshStandardMaterial({ color: 0xffffff }),
+      salt + i,
+      0.4,
+      null,
+      null,
+      'body',
+      null,
+      'rig',
+      '',
+    );
   }
 }
 

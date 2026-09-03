@@ -2,12 +2,17 @@ import { describe, expect, it } from 'vitest';
 import { defaultBuild } from '../src/sim/content/talents';
 import { grantDevotion } from '../src/sim/paladin_devotion';
 import { Sim } from '../src/sim/sim';
-import { abilityEffectText } from '../src/ui/hud';
+import { abilityEffectText } from '../src/ui/ability_description';
 
 function tooltipValue(sim: Sim, abilityId: string): string {
   const ability = sim.resolvedAbility(abilityId);
   if (!ability) throw new Error(`missing ability ${abilityId}`);
-  return abilityEffectText(ability, { spellPower: 10_000, rangedPower: 0, attackPower: 0 });
+  return abilityEffectText(ability, {
+    spellPower: 10_000,
+    healPower: 10_000,
+    rangedPower: 0,
+    attackPower: 0,
+  });
 }
 
 describe('Paladin maximum-health percentage tooltips', () => {
