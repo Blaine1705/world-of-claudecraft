@@ -373,8 +373,8 @@ const MOUNT_TORTOISE: ClipMap = {
   // shake in lockstep.
   idleBeat: { clip: 'Idle_Shake', everySec: 20, jitterSec: 4 },
   // Naming `land` opts this rig into the HELD-jump treatment (visual.ts
-  // isOnce): `Jump` stops looping and clamps on its last frame — the airborne
-  // tuck — for as long as the body is off the ground, and `Land` fires as a
+  // isOnce): `Jump` stops looping and clamps on its last frame, the airborne
+  // tuck, for as long as the body is off the ground, and `Land` fires as a
   // one-shot on the touchdown edge. So `Jump` is only the spring and the tuck;
   // the arc itself is the game's, and the clip must not carry a rise or the
   // mount would still be held above the ground when it touches down.
@@ -2005,7 +2005,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // near a horse's saddle without pretending he is horse-shaped.
   //
   // walkRef/runRef are a CADENCE choice, not a foot match, and the gap is not
-  // small — say so plainly rather than calling it a slide. His legs rest 99.6%
+  // small: say so plainly rather than calling it a slide. His legs rest 99.6%
   // extended, so the reach envelope caps his stride at 0.092 model units, about
   // 0.33yd here. At a mounted 12.6 yd/s (RUN_SPEED 7 x +80%) a true foot match
   // would need ~38 strides/sec. Nothing recovers that, so his feet carry only
@@ -2014,7 +2014,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // The numbers are picked to land INSIDE locomotionTimeScale's clamp rather
   // than against it: run clamps to [0.6, 1.6] and walk to [0.6, 1.8], so any
   // runRef at or under 7.9 would saturate at 1.6 and every value in that range
-  // would render identically. 10 gives 1.26 (about 1.7 strides/sec) — brisk for
+  // would render identically. 10 gives 1.26 (about 1.7 strides/sec), brisk for
   // a tortoise without reading as a wind-up toy.
   mount_chimeglass_tortoise: {
     url: `${MOUNTS_DIR}/chimeglass_tortoise.glb`,

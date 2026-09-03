@@ -110,8 +110,8 @@ describe('mount catalog', () => {
     expect(MOUNT_KEYS[0]).toBe('valorsteed');
     expect(MOUNT_KEYS.at(-1)).toBe('rickshaw_mount');
     expect(DEFAULT_MOUNT).toBe('valorsteed');
-    // Every developer-only mount is a real catalog key, and the tank keeps the
-    // tail so a new PLAYER-facing mount always lands above it.
+    // Every developer-only mount is a real catalog key, and the rickshaw keeps
+    // the tail so a new PLAYER-facing mount always lands above it.
     for (const key of DEVELOPER_MOUNTS) expect(MOUNT_KEYS).toContain(key);
   });
 

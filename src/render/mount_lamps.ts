@@ -18,7 +18,7 @@
 // The GLASS itself is not this module's job. The lamp materials in the GLBs are
 // named `lantern_Glow` and `lens_Glow`, and buildTintedClone
 // (characters/assets.ts) pins any material whose name CONTAINS `Glow` to
-// EMISSIVE_GLOW — which is why both names work unchanged — the intensity
+// EMISSIVE_GLOW, which is why both names work unchanged, the intensity
 // calibrated against the bloom threshold. Re-boosting it here would fight that
 // one calibration from a second place, and would not even reach: the low
 // graphics tier rebuilds materials as Lambert and drops their names.
@@ -38,7 +38,7 @@ export interface MountLamps {
   flickers: boolean[];
   /** Peak intensity per light, parallel to `lights`. The budget pass zeroes a
    *  dynamic light and never restores it, so the per-frame update has to know
-   *  what level to drive each one back to — and that level is per-lamp now
+   *  what level to drive each one back to, and that level is per-lamp now
    *  (a lantern and a spectacle lens do not burn at the same brightness). */
   peaks: number[];
 }

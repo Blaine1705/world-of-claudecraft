@@ -164,7 +164,7 @@ const ONESHOT_FADE = 0.1;
  *  Deliberately tight: the fidgets are the whole point of this rig, so they run
  *  on a 5-second beat rather than the sparse 20-to-45s one this shipped with.
  *  The variants themselves run 3.7 to 4.3 seconds, so a standing mount is
- *  almost always mid-fidget — that is the intended read here, not an accident,
+ *  almost always mid-fidget: that is the intended read here, not an accident,
  *  and raising the floor back above the longest clip is a one-line change. */
 const IDLE_VARIANT_MIN = 5;
 const IDLE_VARIANT_JITTER = 0;
@@ -1552,7 +1552,7 @@ export class CharacterVisual {
    * The renderer passes the active mount's MountRideSpec while the mount is
    * shown and null the rest of the time, and the pose is applied after the
    * mixer in the same slot as the ledge climb. Mounts without a ride spec keep
-   * the plain seated loop — the Lanternback's rider is in a CHAIR, where a
+   * the plain seated loop, the Lanternback's rider is in a CHAIR, where a
    * straddle would be wrong.
    */
   setRidePose(spec: MountRideSpec | null): void {
@@ -1563,14 +1563,14 @@ export class CharacterVisual {
    * Fold the legs around the mount's barrel.
    *
    * Runs AFTER the mixer, in the same slot as applyClimbPose, and bails while
-   * the climb owns the body — nothing can be climbing a ledge and riding at
+   * the climb owns the body, nothing can be climbing a ledge and riding at
    * once, and the two would otherwise both write the thigh.
    *
    * Unlike every other pose layer here this one OVERRIDES the legs (a slerp
    * from the clip's pose toward an absolute target) rather than adding to
    * them. The base underneath is the floor-sit loop, whose thighs are folded
    * to 99 degrees forward and 105 degrees out with the shins tucked across
-   * each other — additive offsets on top of a cross-legged pose land wherever
+   * each other, additive offsets on top of a cross-legged pose land wherever
    * that pose happens to be, and the legs of a rider gripping a mount should
    * be still anyway. The base keeps everything else: the hips' HEIGHT (which
    * is what puts his weight on the saddle), the breathing, the arms.
@@ -3651,7 +3651,7 @@ export class CharacterVisual {
    *
    * Separate from the fidget pool because the pool is a single shared timer
    * feeding a random pick, so a clip's real cadence there is the draw interval
-   * times the pool size — fine for "occasionally restless", useless for "every
+   * times the pool size, fine for "occasionally restless", useless for "every
    * twenty seconds". This keeps its own countdown and fires only that clip.
    *
    * It reuses the idle-variant latch, so it inherits the cancel that kills a
@@ -3863,8 +3863,8 @@ function clipNamesOf(def: VisualDef): string[] {
     c.stow,
     // The idle-breakers and the idle beat were MISSING here, which is the only
     // place actions get built (visual.ts constructor). A clip absent from this
-    // list loads fine and passes the clipmap gate — that gate checks the GLB,
-    // not the action map — but `this.action(name)` returns null forever, so
+    // list loads fine and passes the clipmap gate, that gate checks the GLB,
+    // not the action map, but `this.action(name)` returns null forever, so
     // tickIdleVariant/tickIdleBeat bail on every fire and the rig simply never
     // fidgets. Silent: no throw, no warning, just a clip that is never seen.
     ...(c.idleVariants ?? []),

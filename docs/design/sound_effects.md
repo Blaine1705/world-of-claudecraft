@@ -134,7 +134,7 @@ which already computes interpolated position, `loco.speed/moving`, `swimming`,
   audible when the optional on-foot footstep setting is disabled. A mount with no
   `mount_run_<key>` in the catalog (the Lanternback Troll and the Chimeglass
   Tortoise) falls back to the plain `foot_<surface>` cue at running-step gain and
-  pitch — hence the `surface` argument, which the custom-cue branch ignores.
+  pitch: hence the `surface` argument, which the custom-cue branch ignores.
 - **Jump / land / splash / swim:** per-view edge detection on `airborne` and
   `swimming` transitions fires `sink.movement('jump'|'land'|'splash'|'swim', …)`.
 - **Listener:** after the camera is positioned (~L1583), `sink.setListener(camPos,

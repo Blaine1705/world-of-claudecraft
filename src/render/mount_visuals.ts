@@ -33,7 +33,7 @@ export interface MountLampSpec {
   flicker?: 'flame' | 'steady';
 }
 
-/** A soft additive glow billboard carried on the mount's own skeleton — the
+/** A soft additive glow billboard carried on the mount's own skeleton: the
  *  bloom-side companion to a MountLampSpec. The lamp casts light on the WORLD;
  *  this is the halo you see on the glass itself, so a mount can have either,
  *  both, or neither. Sprites, so they read from every angle without the pair of
@@ -41,7 +41,7 @@ export interface MountLampSpec {
 export interface MountGlowSpec {
   /** Joint node name in the mount GLB (three names its Bone after it). */
   bone: string;
-  /** Glow centre in that bone's LOCAL space, in MODEL units — the same frame
+  /** Glow centre in that bone's LOCAL space, in MODEL units: the same frame
    *  MountLampSpec.offset uses, so the two are measured together. Seat it just
    *  CLEAR of the glass it belongs to: a billboard buried inside opaque
    *  geometry is depth-clipped down to whatever ring pokes out. */
@@ -190,7 +190,7 @@ const LENS_LAMP_OFFSET = [-0.0111, 0.0079, 0.011] as const;
 // Where each lens HALO sits, same `lens`-bone local frame, read out of the
 // shipped GLB rather than eyeballed: a vertex rigid-bound to joint j rests at
 // inverseBind_j * v, so the two lens vertex clusters give their own centres
-// (-0.0954, 0.0046, 0.0139) and (0.0733, 0.0111, 0.0081) — whose midpoint IS
+// (-0.0954, 0.0046, 0.0139) and (0.0733, 0.0111, 0.0081), whose midpoint IS
 // LENS_LAMP_OFFSET above, which is what proves the frame. Each is then pushed
 // clear of its own glass along the mount's forward axis, which lands in this
 // bone's space at (0, 0.836, -0.549): the lenses bulge 0.026 forward of centre,
@@ -229,8 +229,8 @@ const LENS_LAMP = {
   flicker: 'steady',
 } as const;
 
-/** The spectacle halos. STEADY is right for the cast light — enchanted glass
- *  has no wick to gutter — but a halo that never moves at all reads as a decal
+/** The spectacle halos. STEADY is right for the cast light, enchanted glass
+ *  has no wick to gutter, but a halo that never moves at all reads as a decal
  *  painted on the lens, so this one breathes: slow, shallow, and well under the
  *  rate a flame flickers at. */
 const LENS_GLOW = {
@@ -297,7 +297,7 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
     { bone: 'chair', offset: [0, 0.918, 0.25] },
   ),
   // The Chimeglass Tortoise: a low, broad carapace, so the rider sits astride
-  // the shell rather than in a chair. No procedural bob — his authored plod
+  // the shell rather than in a chair. No procedural bob, his authored plod
   // carries what little bounce a tortoise has, and his legs rest 99.6%
   // extended, which is why the clips keep the torso deliberately still.
   chimeglass_tortoise: spec(
@@ -325,8 +325,8 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
     // The distance that actually mattered is his SKULL to the mount's crest.
     // Measured over every clip with the rider carried on this bone (he pitches
     // with the shell, so a fixed-point test wrongly condemns the rear-up): the
-    // old crown seat left Idle at +0.000 — grazing, which is exactly the
-    // "his face clips the head at the end of the idle" report — and six of the
+    // old crown seat left Idle at +0.000, grazing, which is exactly the
+    // "his face clips the head at the end of the idle" report, and six of the
     // seven clips negative. With the reclined pelvis below, this seat clears
     // every clip: Idle +0.132, Walk +0.120, Run +0.051, Idle_Rear +0.074.
     //
@@ -345,12 +345,12 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
       // model units wide even at the crown against a 0.104-unit leg, so
       // anything less leaves both legs inside the silhouette and he reads as
       // sunk into the shell rather than sat on it. The knee stays open for the
-      // same reason — a tucked shin disappears behind the dome.
+      // same reason, a tucked shin disappears behind the dome.
       //
       // The PELVIS is what put his face in the mount's crest, not the seat.
       // Pitching it upright-and-forward (+0.06 with a 0.10 chest lean) threw
       // his head joint 0.237 rig-units FORWARD of his root, against -0.126 for
-      // the seated clip — further than any seat shift moves him, which is why
+      // the seated clip, further than any seat shift moves him, which is why
       // sliding the seat alone never cleared it. -0.18 is a relaxed 10 degree
       // recline, still half of the floor-sit's 20, and it buys 0.223 units of
       // headroom. `thigh` carries +0.18 to match, so the legs land exactly
@@ -429,7 +429,7 @@ export function mountLampFlicker(timeSec: number, index: number): number {
  * opacity (MountGlowSpec.opacity). Deterministic and allocation-free, same as
  * the flicker above, and pure so tests/mount_visuals.test.ts can pin it.
  *
- * This is NOT the flicker with different numbers. A flame gutters — fast,
+ * This is NOT the flicker with different numbers. A flame gutters, fast,
  * jittery, two incommensurate periods so it never reads as a loop. Enchanted
  * glass swells and fades on one slow, clean sine, and the whole point is that
  * it stays legible as a rhythm. `index` offsets the pair by a QUARTER cycle,

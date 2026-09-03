@@ -2,9 +2,9 @@
 // halo burning behind the Chimeglass Tortoise's storm-glass spectacles.
 //
 // This is the companion to mount_lamps.ts, and the split is deliberate. A lamp
-// is a POINT LIGHT — it lights the world, it costs a slot in the renderer's
+// is a POINT LIGHT: it lights the world, it costs a slot in the renderer's
 // ranked light budget, and the budget is why the tortoise carries exactly one
-// of them for a pair of lenses. A glow is a SPRITE — it costs one transparent
+// of them for a pair of lenses. A glow is a SPRITE: it costs one transparent
 // draw, lights nothing, and is what actually reads as "the glass is lit" on
 // screen, including on tiers whose materials never see a point light. A mount
 // may carry either, both, or neither.
@@ -87,7 +87,7 @@ function buildSprite(glow: MountGlowSpec): THREE.Sprite {
  *
  * Returns null when the mount carries no glows, or when the GLB is missing the
  * bones the spec names (a model swap that renamed a joint degrades to unlit
- * glass rather than throwing inside the per-frame render path — the same
+ * glass rather than throwing inside the per-frame render path, the same
  * contract attachMountLamps keeps).
  */
 export function attachMountGlows(root: THREE.Object3D, spec: MountVisualSpec): MountGlows | null {
@@ -116,7 +116,7 @@ export function attachMountGlows(root: THREE.Object3D, spec: MountVisualSpec): M
 }
 
 /** Breathe each halo for this frame. The size swells with the level as well as
- *  the opacity — brightness alone reads as a fade, where a halo that also grows
+ *  the opacity, brightness alone reads as a fade, where a halo that also grows
  *  reads as light spilling further out of the glass. */
 export function updateMountGlows(glows: MountGlows, timeSec: number): void {
   for (let i = 0; i < glows.sprites.length; i++) {

@@ -8905,13 +8905,11 @@ export class Renderer {
     }
   }
 
-  private mountViewHost(v: EntityView): MountViewHost {
-    return {
-      reconcileViewLights: () => this.reconcileViewLights(v),
-      gateSwapFlagOnCompile: (root, done) => this.gateSwapFlagOnCompile(root, done),
-      recordBuild: (ms, startedAt) => this.buildLedger.record('view:mount', ms, startedAt),
-    };
-  }
+  private readonly mountHost: MountViewHost = {
+    reconcileViewLights: (v) => this.reconcileViewLights(v as EntityView),
+    gateSwapFlagOnCompile: (root, done) => this.gateSwapFlagOnCompile(root, done),
+    recordBuild: (ms, startedAt) => this.buildLedger.record('view:mount', ms, startedAt),
+  };
 
   private reconcileViewLights(v: EntityView): void {
     const reconciled = reconcileViewPointLights(v.group, v.viewLights, this.viewLights);
@@ -10888,7 +10886,7 @@ export class Renderer {
 
       // The live sheathe toggle (Z key) is diffed further down, folded into the
       // swim/mount stow overlay: ONE writer for `v.weaponStowed`. Two diffs
-      // against the same field fight, because they compute different targets —
+      // against the same field fight, because they compute different targets:
       // this one the bare sim bit, the other the union with swimming/riding. A
       // swimmer with a weapon drawn had them ping-pong the field every frame,
       // replaying the sheathe one-shot forever (for a player rig that clip is
@@ -10929,7 +10927,7 @@ export class Renderer {
       // is untouched either way).
       const mountSpec = e.kind === 'player' && e.mountKey ? mountVisualSpec(e.mountKey) : null;
       const mountShown = !!mountSpec && requestedForm === 'base' && !e.dead;
-      syncMountVisual(v, mountSpec, this.mountViewHost(v));
+      syncMountVisual(v, mountSpec, this.mountHost);
       if (v.mountVisual) v.mountVisual.root.visible = mountShown && !v.mountCompilePending;
       v.mountLift = mountShown && v.mountVisual ? mountSpec.seat : 0;
       const active = activeCharacterFormVisual(
@@ -10982,7 +10980,12 @@ export class Renderer {
       // base underneath: it is what carries his hips down onto the saddle, and
       // every seat offset in this file was fitted against it.
       v.visual.setRidePose(mountShown && mountSpec ? mountSpec.ride : null);
-      placeRider(v, v.visual.root, mountSpec, v.mountLift, 0);
+      // The presented mount block below re-derives the whole rider transform
+      // after the mixer advances (attitude, bob, seat bone), so the seat is
+      // solved here only when that block will not run this frame.
+      if (!(runCharacterPresentation && mountShown && v.mountVisual)) {
+        placeRider(v, v.visual.root, mountSpec, v.mountLift, 0);
+      }
       // Dismounted: relax the tip, or the rider keeps the cart's last attitude.
       if (!mountShown) {
         v.mountJumpPitch = 0;

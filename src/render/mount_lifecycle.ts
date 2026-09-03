@@ -46,11 +46,15 @@ export interface MountViewState extends RickshawMountViewState {
   mountSeatBone: THREE.Object3D | null;
 }
 
+/** Renderer services the lifecycle needs. ONE instance per renderer, never
+ *  per view or per frame: the sync runs for every character view every frame
+ *  and almost always early-returns, so a per-call host would be three closure
+ *  allocations per entity per frame for nothing. */
 export interface MountViewHost {
-  /** Re-derive this view's contribution to the ranked point-light budget.
-   *  Called whenever the mount's carried lamps appear or go away; without it a
-   *  freed light stays ranked and counted into numPointLights. */
-  reconcileViewLights(): void;
+  /** Re-derive `v`'s contribution to the ranked point-light budget. Called
+   *  whenever the mount's carried lamps appear or go away; without it a freed
+   *  light stays ranked and counted into numPointLights. */
+  reconcileViewLights(v: MountViewState): void;
   /** Hold the compile-pending flag until the new rig's materials have linked,
    *  so a summon does not freeze the frame it lands on (#2571). */
   gateSwapFlagOnCompile(root: THREE.Object3D, done: () => void): void;
@@ -71,7 +75,7 @@ function teardown(v: MountViewState, host: MountViewHost): void {
   if (v.mountLamps) {
     disposeMountLamps(v.mountLamps);
     v.mountLamps = null;
-    host.reconcileViewLights();
+    host.reconcileViewLights(v);
   }
   if (v.mountVisual) {
     v.group.remove(v.mountVisual.root);
@@ -119,7 +123,7 @@ export function syncMountVisual(
   // lanterns, the Chimeglass Tortoise's spectacle light) hang off its bones, so
   // they join the ranked point-light budget the moment the mount appears.
   v.mountLamps = attachMountLamps(v.mountVisual.root, spec);
-  if (v.mountLamps) host.reconcileViewLights();
+  if (v.mountLamps) host.reconcileViewLights(v);
   v.mountGlows = attachMountGlows(v.mountVisual.root, spec);
   v.mountCompilePending = true;
   host.gateSwapFlagOnCompile(v.mountVisual.root, () => {
@@ -188,6 +192,10 @@ export function seatRiderOnBone(
  *
  * `spec` null, or the mount hidden, resets him to the ground: the same call
  * covers dismounting and druid forms, so no caller has to remember to undo it.
+ * That reset clears ALL of x, y, z and the rotation: a moving seat has a
+ * lateral component mid-stride, so a rider who dismounts the troll or the
+ * tortoise mid-lope would otherwise keep that x offset for the life of the
+ * view (nothing else in the entity sweep writes the rider's x).
  */
 export function placeRider(
   v: MountViewState,
@@ -204,6 +212,7 @@ export function placeRider(
   ) {
     return;
   }
+  riderRoot.position.x = 0;
   riderRoot.position.y = lift + bob;
   riderRoot.position.z = lift > 0 && spec ? spec.seatFwd : 0;
   riderRoot.quaternion.identity();

@@ -351,7 +351,7 @@ interface AttributionTargetFixture {
 // Re-minted at the release/v0.42.0 sync of PR #3439: renderer.ts moved for the
 // mount lifecycle seam (mount_lifecycle.ts) and the rickshaw hooks it absorbed.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '09b3a045931c53fa828b6859e2e443e806fb9859e7528c125d0e34e01c81c461';
+  'bf62cd1db6c39c23a6b8f6f3cf2cf31ae09bbcd16d1e27232f36eafad49e9215';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

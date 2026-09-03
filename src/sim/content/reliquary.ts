@@ -1256,7 +1256,7 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
       // masterwork:engineering stays a BARE entry (no hint): no engineering
       // recipe can proc a masterwork (see the masterworkByCraft comment), so
       // a profession hint here would name a door that awards nothing. The
-      // slot rides SOURCE_PENDING_RULING with the three gap mounts; the
+      // slot rides SOURCE_PENDING_RULING with the five gap mounts; the
       // gear-capability pin in tests/reliquary_content.test.ts derives the
       // eligible set from masterworkBonusStats and reds if either side moves.
       ...RELIQUARY_PROFESSION_MARKS.masterworkByCraft.map((markId) =>
@@ -1333,12 +1333,12 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     name: 'Mounts',
     desc: 'Rideable mounts from the stable, heroic reins, Rift epics, and rarer saddles. Ownership follows the live reins seam (bags and bank).',
     clearSource: { kind: 'none' },
-    // Seven of the ten mounts name every door that awards their reins (see
+    // Seven of the twelve mounts name every door that awards their reins (see
     // MOUNT_SOURCES above): the four heroic reins each drop from two or three
     // HEROIC_BOSS_LOOT bosses AND from their Rift rank's ladder, the two epic
     // reins are Rift-only, and valorsteed is Marla's counter. The page-wide
     // pending ruling that used to cover all nine is executed; the three that
-    // remain (drakemaw_raptor and the two DEVELOPER_MOUNTS) are content gaps,
+    // remain (drakemaw_raptor and the four DEVELOPER_MOUNTS) are content gaps,
     // not vocabulary gaps, and stay hand-listed in SOURCE_PENDING_RULING.
     relics: mounts(...mountEntries(RELIQUARY_HORIZON_MOUNTS)),
   },

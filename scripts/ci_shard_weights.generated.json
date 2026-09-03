@@ -2,10 +2,10 @@
   "__provenance": {
     "run": "32621561241",
     "harvested": "2026-08-23",
-    "files": 3267,
+    "files": 3268,
     "mergedLocal": "2026-09-03",
-    "mergedFiles": 243,
-    "note": "release/v0.42.0 sync of PR #3439 (Chimeglass Tortoise + Lanternback Troll + the bag-row Space guard) 2026-09-03: 5 new test files carry locally measured durations (single vitest run, jest-json start/end per file, skipped floor 100ms); 0 rows pruned for files absent from the merged tree. v0.41.0 base sync into the ignivar raid branch 2026-08-30: union of both arms' tables (release harvest wins shared rows, raid rows keep their locally measured durations), pruned to files present in the merged tree. Prior note: v0.41.0 sync into the ignivar raid consolidation: release CI harvest kept for shared files; the raid-branch and post-harvest test files carry locally measured durations (full vitest run of the absent files, jest-json start/end per file, skipped floor 100ms) 2026-08-26 prune: dropped 26 rows whose test file no longer exists in the tree. The 192 mergedLocal rows are LOCAL-scale durations (CI runs ~1.6x slower per ci_shard_plan.mjs); three of them exceed the 90s long-lane threshold locally (varkhul_forge_encounter, ignivar_encounter, nameplate_pledge) and CI_LONG_SUITES membership is deliberately deferred until a full-mode CI shard log provides in-shard numbers."
+    "mergedFiles": 244,
+    "note": "release/v0.42.0 sync of PR #3439 (Chimeglass Tortoise + Lanternback Troll + the bag-row Space guard) 2026-09-03: 6 new test files carry locally measured durations (single vitest run, jest-json start/end per file, skipped floor 100ms); 0 rows pruned for files absent from the merged tree. v0.41.0 base sync into the ignivar raid branch 2026-08-30: union of both arms' tables (release harvest wins shared rows, raid rows keep their locally measured durations), pruned to files present in the merged tree. Prior note: v0.41.0 sync into the ignivar raid consolidation: release CI harvest kept for shared files; the raid-branch and post-harvest test files carry locally measured durations (full vitest run of the absent files, jest-json start/end per file, skipped floor 100ms) 2026-08-26 prune: dropped 26 rows whose test file no longer exists in the tree. The 192 mergedLocal rows are LOCAL-scale durations (CI runs ~1.6x slower per ci_shard_plan.mjs); three of them exceed the 90s long-lane threshold locally (varkhul_forge_encounter, ignivar_encounter, nameplate_pledge) and CI_LONG_SUITES membership is deliberately deferred until a full-mode CI shard log provides in-shard numbers."
   },
   "tests/abilities_command.test.ts": 2582,
   "tests/ability_audio_defers_to_recordings.test.ts": 141,
@@ -1760,6 +1760,7 @@
   "tests/mount_jump.test.ts": 2463,
   "tests/mount_labels.test.ts": 6,
   "tests/mount_lamps.test.ts": 100,
+  "tests/mount_lifecycle.test.ts": 100,
   "tests/mount_prewarm.test.ts": 542,
   "tests/mount_quick_summon.test.ts": 6,
   "tests/mount_race.test.ts": 7155,
