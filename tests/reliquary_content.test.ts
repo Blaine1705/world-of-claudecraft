@@ -4,6 +4,7 @@
 // unbounded auto-scrape), while this suite DERIVES its expectations from the
 // live loot / deed tables so a content change reds until the curator decides.
 // Update the literal floors and totals deliberately when product adds content.
+
 import { describe, expect, it } from 'vitest';
 import { stackSizeOf } from '../src/sim/bags';
 import { CLASSES } from '../src/sim/content/classes';
@@ -384,8 +385,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // 242 + 16 + 29 + 47 + 3 = 337, plus the three daggers the v0.36.0 release
     // merge added to live content (rimefang on the Rift page, duskwhisper on
     // Wildheart Basin, boneglass_shiv on Spoils): 340, plus the Bonebound
-    // Rickshaw's new horizons_mounts slot: 341, plus the Cluckwork Mech Bird
-    // store mount on Horizons: 342. Catalog growth reverts
+    // Rickshaw's new horizons_mounts slot: 341, plus the Lanternback Troll
+    // mount slot and the Chimeglass Tortoise's: 343. Catalog growth reverts
     // page completion for finished players, per docs/design/reliquary.md.
     // The two excludeFromCompletion pages add
     // slots and 0 to BOTH pairs: the Vault of Ages contributes four retired
@@ -395,8 +396,10 @@ describe('Reliquary Conqueror catalog structure', () => {
     // hold both sides), so neither page moves these two literals.
     // The four Crucible raid pages add 41 distinct new item ids (17 arena
     // epics, 16 wing epics, 3 + 5 heroic-only weapons and shields), on top of
-    // the batch's own page: 340 + 1 + 45, plus the Mech Bird: 387.
-    expect(full).toEqual({ owned: 387, total: 387 });
+    // the batch's own page: 340 + 1 + 45, plus the two developer mount slots
+    // (Lanternback Troll, Chimeglass Tortoise): 388, plus the Cluckwork Mech
+    // Bird store mount on Horizons: 389.
+    expect(full).toEqual({ owned: 389, total: 389 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -408,7 +411,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // Rickshaw's new mount slot and the 41 Crucible raid relics; marks are
     // character-scoped, so this trails the overview by the 29 account-scoped
     // weapon skins).
-    expect(character).toEqual({ owned: 358, total: 358 });
+    expect(character).toEqual({ owned: 360, total: 360 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -419,8 +422,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // pages add 123 slots (16 Rift + 19 slain marks + 31 Spoils + 47
     // Warfare + 3 fishing + 4 retired vault + 3 Riftbound bands): 372, plus the
     // three daggers the v0.36.0 release merge added to live content: 375,
-    // plus the Bonebound Rickshaw's new horizons_mounts slot and the Cluckwork
-    // Mech Bird store mount on Horizons: 377 total.
+    // plus the Bonebound Rickshaw's new horizons_mounts slot: 376, plus the
+    // two developer mount slots (Lanternback Troll, Chimeglass Tortoise): 378.
     // Slots, not unique relics: the two Spoils set repeats count again here,
     // and the seven excludeFromCompletion slots (four vault, three bands)
     // count here while adding zero to every completion pair, which is why this
@@ -439,7 +442,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(422);
+    ).toBe(424);
     // Distinct mark ids: the 10 shipped before Phase 21 plus the 19
     // rare-slain proofs of conquerors_rares_of_the_realm.
     expect(
@@ -2527,12 +2530,17 @@ const SOURCE_PENDING_RULING: Readonly<Record<string, readonly string[]>> = {
   // drakemaw_raptor: NO acquisition path exists anywhere in content, see the
   // def comment in content/drakelands.ts. Owner call recorded 2026-08-04: the
   // slot stays listed and sourceless until the mount gets a route.
-  // terrorspark_groundshaker: dev-grant only, deliberately absent from vendors,
-  // quests, mob loot, heroic loot, and the rift reins pools.
-  // rickshaw_mount: same shape as terrorspark_groundshaker, dev-grant only,
-  // no player-facing acquisition path yet (see the def comment in
-  // content/mounts.ts).
-  horizons_mounts: ['drakemaw_raptor', 'terrorspark_groundshaker', 'rickshaw_mount'],
+  // terrorspark_groundshaker, lanternback_troll, chimeglass_tortoise and
+  // rickshaw_mount: DEVELOPER_MOUNTS, dev-grant only, deliberately absent from
+  // vendors, quests, mob loot, heroic loot, and the rift reins pools (see the
+  // def comments in content/mounts.ts).
+  horizons_mounts: [
+    'chimeglass_tortoise',
+    'drakemaw_raptor',
+    'lanternback_troll',
+    'rickshaw_mount',
+    'terrorspark_groundshaker',
+  ],
   // masterwork:engineering: unearnable, QA ruling 2026-08-07. Every live
   // engineering recipe produces a slotless, statless tool, masterworkBonusStats
   // returns null for all of them, so the masterwork proc can never fire and
@@ -3503,7 +3511,7 @@ describe('Reliquary source hint coverage', () => {
     ).toBe(true);
   });
 
-  it('the surviving pending rows are the four slots content awards no route at all', () => {
+  it('the surviving pending rows are the six slots content awards no route at all', () => {
     // The page-wide Horizons rulings are EXECUTED: mounts and skins are no
     // longer derived from the catalog lists (the derivation era ended when the
     // rulings landed), so the identity pins to RELIQUARY_HORIZON_MOUNTS and
@@ -3515,9 +3523,11 @@ describe('Reliquary source hint coverage', () => {
       'professions_masterwork',
     ]);
     expect(SOURCE_PENDING_RULING.horizons_mounts).toEqual([
+      'chimeglass_tortoise',
       'drakemaw_raptor',
-      'terrorspark_groundshaker',
+      'lanternback_troll',
       'rickshaw_mount',
+      'terrorspark_groundshaker',
     ]);
     // masterwork:engineering pended by the QA ruling 2026-08-07: no
     // engineering recipe can proc a masterwork (see the gear-capability pin),
@@ -4044,8 +4054,7 @@ describe('Reliquary source hint coverage', () => {
         'mark x activity',
         'mark x boss',
         'mark x zone',
-        // mount: heroic tables, Marla's counter, the rift reins ladder, and
-        // the storefront (the Mech Bird, walked by the store truth arm above).
+        // mount: heroic tables, Marla's counter, the rift reins ladder.
         'mount x boss',
         'mount x vendor',
         'mount x rift',

@@ -6565,6 +6565,14 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "mount",
+        "name": "Grumbol the Lanternback"
+      },
+      {
+        "kind": "mount",
+        "name": "Tolliver the Chimeglass"
+      },
+      {
+        "kind": "mount",
         "name": "Terrorspark Groundshaker"
       },
       {
