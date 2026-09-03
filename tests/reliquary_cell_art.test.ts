@@ -35,7 +35,9 @@ import { WEAPON_SKINS } from '../src/sim/content/weapon_skins';
 import { ITEMS } from '../src/sim/data';
 import { mountItemId } from '../src/sim/mounts';
 import {
+  DEED_ART_PENDING,
   deedImageUrl,
+  ITEM_ART_PENDING,
   iconDataUrl,
   isUnknownIconRecipe,
   itemIconRecipe,
@@ -44,9 +46,9 @@ import {
   weaponIconUrl,
 } from '../src/ui/icons';
 import {
+  RELIQUARY_PERFECT_SPECIMEN_IMAGE_URL,
   RELIQUARY_SLAIN_GLYPH_ID,
   RELIQUARY_SLAIN_GLYPH_URL,
-  RELIQUARY_SPECIMEN_GLYPH_ID,
   RELIQUARY_SPECIMEN_GLYPH_URL,
   type ReliquaryArtSlot,
   reliquaryCellArt,
@@ -54,7 +56,7 @@ import {
 } from '../src/ui/reliquary_cell_art';
 import { ReliquaryWindow, type ReliquaryWindowDeps } from '../src/ui/reliquary_window';
 import { knownItemIconHtml } from '../src/ui/unknown_item_icon';
-import { webpHasAlpha } from './helpers/webp_header';
+import { webpHasAlpha, webpSize } from './helpers/webp_header';
 
 const REPO_ROOT = join(__dirname, '..');
 
@@ -181,14 +183,19 @@ describe('title relics resolve the deed crest', () => {
     expect(art).toEqual({ kind: 'crest', crestId: 'deed_col_reliquary_rank_2' });
   });
 
-  it('routes every title on the shelf to a committed per-deed crest', () => {
+  it('routes every title on the shelf to its per-deed crest, category fallback only while pinned art-pending', () => {
+    // A shelf title without committed art must be an enumerated DEED_ART_PENDING
+    // member (the docs/design/deeds.md "art can trail the deed" contract), never
+    // an unreviewed fallback; those route to their category crest until the
+    // commissioned painting lands. Exactly the Crucible flawless title today.
     const pending = RELIQUARY_HORIZON_TITLES.filter((id) => deedImageUrl(`deed_${id}`) === null);
-    expect(pending, 'the title shelf must not use category fallback art').toEqual([]);
+    expect(pending, 'artless shelf titles must be the pinned art-pending set').toEqual([
+      'dgn_varkhul_flawless',
+    ]);
+    for (const id of pending) expect(DEED_ART_PENDING.has(id), id).toBe(true);
     for (const id of RELIQUARY_HORIZON_TITLES) {
-      expect(reliquaryCellArt({ kind: 'title', id }), id).toEqual({
-        kind: 'crest',
-        crestId: `deed_${id}`,
-      });
+      const crestId = pending.includes(id) ? `deed_cat_${DEEDS[id].category}` : `deed_${id}`;
+      expect(reliquaryCellArt({ kind: 'title', id }), id).toEqual({ kind: 'crest', crestId });
     }
   });
 });
@@ -234,49 +241,82 @@ describe('profession mark relics resolve the profession sheet', () => {
   });
 });
 
-describe('the corpse-harvest specimen glyph', () => {
+describe('the corpse-harvest specimen painting', () => {
   const SPECIMEN_ID = 'gather_event:perfect_specimen';
-  // sha256 of the full data URL; re-pin here on a deliberate art edit.
-  const SPECIMEN_GLYPH_SHA256 = 'd8f1dd69de9efa193f5bf1131184abd7b8c09d873c5447df8de682f399e02091';
+  const SPECIMEN_IMAGE_SHA256 = '01bbc0dbc951a4b5491cfe7de0e4a0c835f4665033a74503cc1a2a3a975dffd7';
 
-  it('is the authored SVG, not a borrowed profession image', () => {
-    // The premise the whole glyph exists for: this mark belongs to no gathering
-    // profession, so the catalog map has no entry to borrow art from.
+  it('owns exact painted art instead of borrowing a profession image', () => {
+    // This mark belongs to no gathering profession, so the catalog map has no
+    // entry to borrow art from.
     expect(FIELD_NOTE_PROFESSIONS[SPECIMEN_ID]).toBeUndefined();
     const art = reliquaryCellArt({ kind: 'mark', id: SPECIMEN_ID });
-    expect(art).toEqual({ kind: 'url', url: RELIQUARY_SPECIMEN_GLYPH_URL });
-    // Literal shape pins, so a re-encoding or a swapped glyph reddens.
-    expect(RELIQUARY_SPECIMEN_GLYPH_URL.startsWith('data:image/svg+xml,')).toBe(true);
-    expect(RELIQUARY_SPECIMEN_GLYPH_URL).toContain('woc-specimen-glyph');
-    expect(RELIQUARY_SPECIMEN_GLYPH_ID).toBe('woc-specimen-glyph');
-    // Byte pin on the authored art itself (the equality above compares the
-    // constant to its own import, which cannot see a redraw). To update after
-    // a deliberate art edit, re-pin this digest in the same commit.
-    expect(createHash('sha256').update(RELIQUARY_SPECIMEN_GLYPH_URL).digest('hex')).toBe(
-      SPECIMEN_GLYPH_SHA256,
-    );
+    expect(art).toEqual({
+      kind: 'url',
+      url: RELIQUARY_PERFECT_SPECIMEN_IMAGE_URL,
+      fallbackUrl: RELIQUARY_SPECIMEN_GLYPH_URL,
+    });
+    expect(RELIQUARY_PERFECT_SPECIMEN_IMAGE_URL).toBe('/ui/reliquary/perfect_specimen.webp');
+    const file = join(REPO_ROOT, 'public/ui/reliquary/perfect_specimen.webp');
+    const bytes = readFileSync(file);
+    expect(createHash('sha256').update(bytes).digest('hex')).toBe(SPECIMEN_IMAGE_SHA256);
+    expect(bytes.length).toBe(6550);
+    expect(webpSize(file)).toEqual({ width: 128, height: 128 });
+    expect(webpHasAlpha(file)).toBe(true);
+  });
+
+  it('keeps the shipping painting and provenance record in lockstep', () => {
+    const mapping = JSON.parse(
+      readFileSync(join(REPO_ROOT, 'public/ui/reliquary/mapping.json'), 'utf8'),
+    ) as {
+      family: string;
+      iconSize: number;
+      assets: Array<{
+        id: string;
+        runtimeIdentity: string;
+        output: string;
+        url: string;
+        sourceSha256: string;
+        acceptedSha256: string;
+        acceptedBytes: number;
+        builtInImagegenCalls: number;
+        acceptedAttempt: number;
+      }>;
+    };
+    expect(mapping).toMatchObject({ family: 'reliquary', iconSize: 128 });
+    expect(mapping.assets).toHaveLength(1);
+    expect(mapping.assets[0]).toMatchObject({
+      id: 'perfect_specimen',
+      runtimeIdentity: SPECIMEN_ID,
+      output: 'perfect_specimen.webp',
+      url: RELIQUARY_PERFECT_SPECIMEN_IMAGE_URL,
+      sourceSha256: '8e1e9c1572a097333a44defbc0cf5bf61d095bf27b8e8961fd7a0a86fad9f6df',
+      acceptedSha256: SPECIMEN_IMAGE_SHA256,
+      acceptedBytes: 6550,
+      builtInImagegenCalls: 1,
+      acceptedAttempt: 1,
+    });
   });
 
   it('is NOT the procedural unknown-icon ghost the slot used to get', () => {
-    // Both halves of the old behavior, pinned canvas-free: this id ships no
-    // static art (so the ghost path had to composite) and the recipe it would
-    // have composited IS the shared UNKNOWN_RECIPE fallback.
+    // Both halves of the retired item-fallback behavior remain pinned
+    // canvas-free: the mark is not an item identity, and sending it through
+    // the item compositor would still produce the shared unknown recipe.
     expect(needsIconDataUrlWarm('item', SPECIMEN_ID)).toBe(true);
     expect(isUnknownIconRecipe(itemIconRecipe(SPECIMEN_ID))).toBe(true);
-    expect(RELIQUARY_SPECIMEN_GLYPH_URL).not.toContain('base64');
+    expect(RELIQUARY_PERFECT_SPECIMEN_IMAGE_URL).not.toContain('data:image');
   });
 
-  it('percent-encodes to a src the window escaper cannot alter', () => {
-    // esc() rewrites & < > " and ', so any of them surviving the encoding would
-    // corrupt the src on the way into the attribute.
-    expect(RELIQUARY_SPECIMEN_GLYPH_URL).not.toMatch(/[&<>"']/);
-    const svg = decodeURIComponent(
-      RELIQUARY_SPECIMEN_GLYPH_URL.slice('data:image/svg+xml,'.length),
-    );
-    expect(svg.startsWith('<svg ')).toBe(true);
-    expect(svg.endsWith('</svg>')).toBe(true);
-    // Multi-color painted style, not a flat monochrome vector.
-    expect([...svg.matchAll(/#[0-9a-f]{6}/g)].length).toBeGreaterThan(4);
+  it('swaps a failed specimen painting to its authored specimen glyph once', () => {
+    const rig = makeRig();
+    openPage(rig, 'professions', 'professions_field_notes');
+    const img = cellArt(rig, SPECIMEN_ID);
+    expect(img.getAttribute('data-icon-fallback-src')).toBe(RELIQUARY_SPECIMEN_GLYPH_URL);
+
+    img.dispatchEvent(new Event('error'));
+    expect(img.getAttribute('src')).toBe(RELIQUARY_SPECIMEN_GLYPH_URL);
+    expect(img.hasAttribute('data-icon-fallback-src')).toBe(false);
+    img.dispatchEvent(new Event('error'));
+    expect(img.getAttribute('src')).toBe(RELIQUARY_SPECIMEN_GLYPH_URL);
   });
 });
 
@@ -310,8 +350,8 @@ describe('the rare-slain portraits (Phase 21)', () => {
     expect(RELIQUARY_SLAIN_GLYPH_URL.startsWith('data:image/svg+xml,')).toBe(true);
     expect(RELIQUARY_SLAIN_GLYPH_URL).toContain('woc-slain-glyph');
     expect(RELIQUARY_SLAIN_GLYPH_ID).toBe('woc-slain-glyph');
-    // Byte pin on the authored art itself, the specimen-glyph regime: re-pin
-    // this digest in the same commit as a deliberate art edit.
+    // Byte pin on the authored fallback itself: re-pin this digest in the same
+    // commit as a deliberate art edit.
     expect(createHash('sha256').update(RELIQUARY_SLAIN_GLYPH_URL).digest('hex')).toBe(
       SLAIN_GLYPH_SHA256,
     );
@@ -390,9 +430,11 @@ describe('unknown ids fall through to the caller fallback', () => {
     // Mob portraits are opaque dark-card art like the item family, not a
     // bright self-backgrounded card that needs the gentler carve-out.
     expect(reliquaryCellArtOpaque({ kind: 'url', url: '/ui/mobs/old_greyjaw.webp' })).toBe(false);
-    expect(reliquaryCellArtOpaque({ kind: 'url', url: RELIQUARY_SPECIMEN_GLYPH_URL })).toBe(false);
+    expect(reliquaryCellArtOpaque({ kind: 'url', url: RELIQUARY_PERFECT_SPECIMEN_IMAGE_URL })).toBe(
+      false,
+    );
     // The slain trophy glyph carries a real alpha matte like the specimen
-    // flask, so it stays on the silhouette-darken side of the carve-out.
+    // painting, so it stays on the silhouette-darken side of the carve-out.
     expect(reliquaryCellArtOpaque({ kind: 'url', url: RELIQUARY_SLAIN_GLYPH_URL })).toBe(false);
     expect(reliquaryCellArtOpaque({ kind: 'crest', crestId: 'deed_prog_veteran' })).toBe(false);
     expect(reliquaryCellArtOpaque({ kind: 'item', itemId: 'reins_valorsteed' })).toBe(false);
@@ -425,6 +467,13 @@ describe('unknown ids fall through to the caller fallback', () => {
     expect(skin !== null && reliquaryCellArtOpaque(skin)).toBe(true);
     for (const id of RELIQUARY_HORIZON_TITLES) {
       const painted = reliquaryCellArt({ kind: 'title', id });
+      // Art-pending shelf titles ride their category crest and are opaque
+      // (procedural radial); every painted title is bespoke and dark-card.
+      if (DEED_ART_PENDING.has(id)) {
+        expect(painted).toEqual({ kind: 'crest', crestId: `deed_cat_${DEEDS[id].category}` });
+        expect(painted !== null && reliquaryCellArtOpaque(painted), id).toBe(true);
+        continue;
+      }
       expect(painted).toEqual({ kind: 'crest', crestId: `deed_${id}` });
       expect(painted !== null && reliquaryCellArtOpaque(painted), id).toBe(false);
     }
@@ -448,22 +497,25 @@ describe('unknown ids fall through to the caller fallback', () => {
     expect(crests, 'anti-vacuity: the titles shelf really contributed crests').toBeGreaterThan(30);
   });
 
-  it('every catalogued item relic resolves to a COMMITTED dark-card pipeline', () => {
-    // The item arm of reliquaryCellArtOpaque answers false uncondition-
-    // ally, resting on this premise: every item the catalog can show ships
-    // either a /ui/items webp (non-weapons, alpha-less but dark-card) or a
-    // /ui/weapons rendered-model jpg (weapons via ITEM_WEAPON_VARIANTS,
-    // measured dark: mean luma ~25/255), both of which stay legible under
-    // the silhouette darken. A catalogued item that falls through to the
-    // procedural compositor instead would paint an opaque radial tile, so
-    // the FIRST such relic reds here and must extend the predicate rather
-    // than land silently on the wrong filter.
+  it('every catalogued item relic is dark-card committed art or an enumerated art-pending opaque', () => {
+    // The item arm of reliquaryCellArtOpaque answers from the two committed
+    // pipelines: a /ui/items webp (non-weapons, alpha-less but dark-card) or
+    // a /ui/weapons rendered-model jpg (weapons via ITEM_WEAPON_VARIANTS,
+    // measured dark: mean luma ~25/255) stays on the silhouette-darken
+    // filter, while an item with NEITHER paints the procedural compositor's
+    // opaque radial tile and must take the crest-style opaque answer. The iff
+    // is swept both ways here, and every procedural relic must additionally
+    // be an ITEM_ART_PENDING member (the enumerated icon debt of the
+    // dev-gated Crucible raid), so an unenumerated procedural relic still
+    // reds rather than landing silently on either filter.
     const procedural: string[] = [];
     let itemsWebp = 0;
     let weaponsJpg = 0;
     for (const slot of CATALOG_SLOTS) {
       const art = reliquaryCellArt(slot);
       if (art === null || art.kind !== 'item') continue;
+      const committed = itemImageUrl(art.itemId) !== null || weaponIconUrl(art.itemId) !== null;
+      expect(reliquaryCellArtOpaque(art), art.itemId).toBe(!committed);
       if (itemImageUrl(art.itemId) !== null) itemsWebp += 1;
       else if (weaponIconUrl(art.itemId) !== null) weaponsJpg += 1;
       else procedural.push(art.itemId);
@@ -476,10 +528,16 @@ describe('unknown ids fall through to the caller fallback', () => {
     expect(weaponsJpg, 'anti-vacuity: the weapons-jpg pipeline really contributed').toBeGreaterThan(
       10,
     );
-    expect(
-      procedural,
-      `catalogued item relics with only procedural art (extend reliquaryCellArtOpaque):\n${procedural.join('\n')}`,
-    ).toEqual([]);
+    for (const itemId of procedural) {
+      expect(
+        ITEM_ART_PENDING.has(itemId),
+        `${itemId} has only procedural art and is not an enumerated ITEM_ART_PENDING member`,
+      ).toBe(true);
+    }
+    // Snug ceiling: the pending set can only SHRINK as the Crucible icon wave
+    // lands (32 catalogued art-pending relics today); growth is a deliberate
+    // catalog decision that re-raises this literal.
+    expect(procedural.length).toBeLessThanOrEqual(32);
   });
 
   it('preserves the item passthrough for a real item id (behavior unchanged)', () => {
@@ -511,7 +569,12 @@ describe('shipped art files', () => {
     }
     // Anti-vacuity: all URL families the catalog reaches are really swept, so
     // a resolver that stopped emitting URLs could not pass by emitting none.
-    expect([...families].sort()).toEqual(['/ui/mobs', '/ui/professions', '/ui/store/armory']);
+    expect([...families].sort()).toEqual([
+      '/ui/mobs',
+      '/ui/professions',
+      '/ui/reliquary',
+      '/ui/store/armory',
+    ]);
     expect(missing, `art URLs with no committed file:\n${missing.join('\n')}`).toEqual([]);
   });
 
@@ -552,11 +615,12 @@ describe('shipped art files', () => {
       const expectAlpha = !url.startsWith('/ui/store/armory/') && !url.startsWith('/ui/mobs/');
       expect(hasAlpha(join(REPO_ROOT, 'public', url.slice(1))), url).toBe(expectAlpha);
     }
-    // Anti-vacuity: all four file-backed non-item families really swept.
+    // Anti-vacuity: all five file-backed non-item families really swept.
     expect([...families].sort()).toEqual([
       '/ui/deeds',
       '/ui/mobs',
       '/ui/professions',
+      '/ui/reliquary',
       '/ui/store/armory',
     ]);
   });
@@ -626,6 +690,8 @@ function makeRig(seed: { recent?: string[]; marks?: string[] } = {}): ArtRig {
     captureFocus: () => opener,
     restoreFocus: () => {},
     onPinChanged: () => {},
+    trackerShown: () => true,
+    setTrackerShown: () => {},
     // The production body verbatim (Hud.itemIcon is `knownItemIconHtml(item)`,
     // pinned below), so the markup these tests read is the markup a player gets.
     itemIcon: (item) => knownItemIconHtml(item),
@@ -700,12 +766,12 @@ describe('ReliquaryWindow cell markup', () => {
     expect(craft.getAttribute('src')).toBe('/ui/professions/prof_weaponcrafting.webp');
   });
 
-  it('paints the corpse-harvest specimen cell as the authored glyph', () => {
+  it('paints the corpse-harvest specimen cell as the dedicated image', () => {
     const rig = makeRig();
     openPage(rig, 'professions', 'professions_field_notes');
     const img = cellArt(rig, 'gather_event:perfect_specimen');
     expect(img.getAttribute('class')).toBe('item-icon q-rare');
-    expect(img.getAttribute('src')).toBe(RELIQUARY_SPECIMEN_GLYPH_URL);
+    expect(img.getAttribute('src')).toBe(RELIQUARY_PERFECT_SPECIMEN_IMAGE_URL);
     // Its neighbour on the same page takes the borrowed profession art, so the
     // glyph is demonstrably specific to this slot and not a page-wide default.
     expect(cellArt(rig, 'gather_event:pristine_vein').getAttribute('src')).toBe(

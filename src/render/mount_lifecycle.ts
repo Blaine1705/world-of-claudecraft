@@ -20,9 +20,18 @@ import { mountAssetsReady, preloadMountAssets } from './characters/assets';
 import { attachMountGlows, disposeMountGlows, type MountGlows } from './mount_glow';
 import { attachMountLamps, disposeMountLamps, type MountLamps } from './mount_lamps';
 import type { MountVisualSpec } from './mount_visuals';
+import {
+  attachPullerIfRickshaw,
+  preloadPullerIfRickshaw,
+  type RickshawMountViewState,
+  releaseRickshawMountState,
+  rickshawMountBuildReady,
+} from './rickshaw_mount';
 
-/** The slice of EntityView the mount lifecycle owns. */
-export interface MountViewState {
+/** The slice of EntityView the mount lifecycle owns. The rickshaw's puller and
+ *  wheel cache ride along (RickshawMountViewState): they live and die with the
+ *  cart's visual, so the same build/swap/teardown edges own them. */
+export interface MountViewState extends RickshawMountViewState {
   group: THREE.Group;
   mountVisual: CharacterVisual | null;
   /** '' = none; diffed each frame so a live mount swap rebuilds. */
@@ -45,10 +54,16 @@ export interface MountViewHost {
   /** Hold the compile-pending flag until the new rig's materials have linked,
    *  so a summon does not freeze the frame it lands on (#2571). */
   gateSwapFlagOnCompile(root: THREE.Object3D, done: () => void): void;
+  /** Account the rig build to the renderer's build ledger (`view:mount`). */
+  recordBuild(ms: number, startedAt: number): void;
 }
 
 function teardown(v: MountViewState, host: MountViewHost): void {
   v.mountSeatBone = null;
+  // The puller is parented under the cart's root and the wheel cache points
+  // into it, so both go before the visual they hang off (no-op for every
+  // other mount).
+  releaseRickshawMountState(v, true);
   if (v.mountGlows) {
     disposeMountGlows(v.mountGlows);
     v.mountGlows = null;
@@ -84,15 +99,22 @@ export function syncMountVisual(
   }
   if (v.mountVisualKey === spec.visualKey) return;
   teardown(v, host);
-  if (!mountAssetsReady(spec.visualKey)) {
+  // A mount that composes a second rig (the rickshaw's puller) waits for BOTH
+  // halves, or the cart pops in gripless for a frame; every other mount
+  // answers on its own asset alone.
+  if (!rickshawMountBuildReady(spec.visualKey, mountAssetsReady(spec.visualKey))) {
     void preloadMountAssets(spec.visualKey).catch((err) =>
       console.error('Failed to preload mount model:', err),
     );
+    preloadPullerIfRickshaw(spec.visualKey);
     return;
   }
+  const started = performance.now();
   v.mountVisual = createMountVisual(spec.visualKey);
+  host.recordBuild(performance.now() - started, started);
   v.group.add(v.mountVisual.root); // group.scale already carries e.scale
   v.mountVisualKey = spec.visualKey;
+  attachPullerIfRickshaw(v, spec.visualKey, v.mountVisual.root);
   // Lamps a mount carries on its own rig (the Lanternback's pair of storm
   // lanterns, the Chimeglass Tortoise's spectacle light) hang off its bones, so
   // they join the ranked point-light budget the moment the mount appears.
@@ -191,6 +213,7 @@ export function placeRider(
  *  has already pulled this view's lights out of the renderer-wide pool, so
  *  this does not reconcile. */
 export function disposeMountView(v: MountViewState): void {
+  releaseRickshawMountState(v, true);
   if (v.mountGlows) {
     disposeMountGlows(v.mountGlows);
     v.mountGlows = null;
@@ -216,6 +239,9 @@ export interface MountTransitionInputs {
   present: boolean;
   playCallPose(seconds: number): void;
   summonGlow(): void;
+  /** The mount's own summon call (Sfx.mountSummon); silent for a mount with
+   *  no authored take. */
+  summonCall(): void;
   engineReset(): void;
   preloadEngine(mountKey: string): void;
 }
@@ -244,6 +270,13 @@ export function syncMountTransitionFx(
   if (x.mountKey !== v.lastMountKey) {
     v.lastMountKey = x.mountKey;
     if (x.present) x.summonGlow();
+    // The mount's own call, on the same edge as the glow but only when a mount
+    // actually APPEARED: mountKey '' is a dismount, which keeps the glow and
+    // gets no call. A live swap is a genuine appearance and does play the new
+    // mount's call. lastMountKey is seeded from the entity's current state at
+    // view creation, so a rider already mounted when they enter interest range
+    // (or at login) never reaches this edge and stays silent.
+    if (x.mountKey !== '') x.summonCall();
     // A mountKey change (dismount, a live mount swap, or a fresh summon reusing
     // this entity id) must drop any engine mount's windup/loop state; otherwise
     // the old loop node stays connected forever once logicallyMounted goes false

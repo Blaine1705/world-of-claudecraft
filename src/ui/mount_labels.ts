@@ -22,6 +22,7 @@ export const MOUNT_NAME_KEYS: Record<string, TranslationKey> = {
   lanternback_troll: 'hudChrome.mounts.name_lanternback_troll',
   chimeglass_tortoise: 'hudChrome.mounts.name_chimeglass_tortoise',
   terrorspark_groundshaker: 'hudChrome.mounts.name_terrorspark_groundshaker',
+  rickshaw_mount: 'hudChrome.mounts.name_rickshaw_mount',
 };
 
 export const MOUNT_DESC_KEYS: Record<string, TranslationKey> = {
@@ -36,6 +37,7 @@ export const MOUNT_DESC_KEYS: Record<string, TranslationKey> = {
   lanternback_troll: 'hudChrome.mounts.desc_lanternback_troll',
   chimeglass_tortoise: 'hudChrome.mounts.desc_chimeglass_tortoise',
   terrorspark_groundshaker: 'hudChrome.mounts.desc_terrorspark_groundshaker',
+  rickshaw_mount: 'hudChrome.mounts.desc_rickshaw_mount',
 };
 
 /** The localized mount name, falling back to the catalog's English label and

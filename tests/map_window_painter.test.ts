@@ -89,6 +89,9 @@ const MAP_COLOR_TOKENS = [
   '--color-map-building-chapel',
   '--color-map-building-inn',
   '--color-map-building-house',
+  '--color-map-castle-wall',
+  '--color-map-castle-tower',
+  '--color-map-castle-court',
   '--color-map-well',
   '--color-map-stall',
   '--color-map-tent',
@@ -334,6 +337,8 @@ function fakeMapContext(trace: PaintTrace): CanvasRenderingContext2D {
         at: trace.seq++,
       });
     },
+    // the castle plan outlines its wall and tower rects
+    strokeRect(): void {},
     beginPath(): void {
       commands = [];
       pathArgs = [];
@@ -570,14 +575,15 @@ describe('map_window_painter: cadence + cached background preserved', () => {
   });
 
   it('wires landmark and gather hit targets: stores, clears, memos, and tooltip priority', () => {
-    // The overworld paint stores this paint's hit-test markers; the delve and
-    // non-zone branches clear them so no stale zone icon answers a tap.
+    // The overworld paint stores this paint's hit-test markers; the delve,
+    // non-zone, and walk-in castle branches clear them so no stale zone icon
+    // answers a tap.
     expect(hud).toContain('this.mapMarkerInteraction.setOverworld(result);');
     expect(markerInteraction).toContain('this.gatherNodes = EMPTY_MARKERS;');
     expect(markerInteraction).toContain('this.stations = EMPTY_MARKERS;');
     expect(markerInteraction).toContain('this.services = EMPTY_MARKERS;');
     expect(markerInteraction).toContain('this.navigation = EMPTY_MARKERS;');
-    expect(hud.match(/this\.clearMapHitState\(canvas\);/g)).toHaveLength(4);
+    expect(hud.match(/this\.clearMapHitState\(canvas\);/g)).toHaveLength(6);
     // The gather-tip resolve memo resets inside the shared clear and beside the
     // overworld store, bounding its staleness at the same
     // mediumHud repaint that refreshes the painted icon.
@@ -869,10 +875,18 @@ function portalLabelText(): string {
 
 /** Every label this world must put on the canvas, sourced from the content
  *  tables rather than from the painter's own localizers. */
+// A hideOnMap POI keeps its record (deed visit marks reference it, and the
+// labels resolve through positional locale keys) but the model skips its
+// marker, so it rasterizes no sprite and blits nothing. Derived rather than
+// listed, so a future hide or unhide needs no edit here.
+function drawnLabelPois() {
+  return LABEL_ZONE.pois.filter((poi) => !poi.hideOnMap);
+}
+
 function expectedLabels(): Set<string> {
   return new Set<string>([
     LABEL_ZONE.name,
-    ...LABEL_ZONE.pois.map((poi) => poi.label),
+    ...drawnLabelPois().map((poi) => poi.label),
     ...overworldDungeonPortals(DUNGEON_LIST, LABEL_ZONE.zMin, LABEL_ZONE.zMax).map((portal) =>
       dungeonName(portal.id),
     ),
@@ -1925,7 +1939,7 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
     const badges = result.questAreas.reduce((n, area) => n + area.numbers.length, 0);
     const expected =
       1 + // the zone title
-      LABEL_ZONE.pois.length +
+      drawnLabelPois().length + // hidden POIs draw no label, see expectedLabels
       overworldDungeonPortals(DUNGEON_LIST, LABEL_ZONE.zMin, LABEL_ZONE.zMax).length +
       2 + // the two allies
       badges;

@@ -7,6 +7,18 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  prog_ready_for_an_adventure: {
+    name: 'Na prahu dobrodružství',
+    desc: 'Absolvuj Zkušební pobřeží: dokonči každou lekci na ostrově, pak zazvoň na přívozní zvon a vrať se domů do Eastbrooku.',
+  },
+  exp_dawnhold_castle: {
+    name: 'Otevřené dveře v zahradě',
+    desc: 'Navštiv zámek Dawnhold a projdi se jeho prosluněnými zahradními síněmi.',
+  },
+  exp_the_last_keep: {
+    name: 'Tiché síně',
+    desc: 'Vstup do Poslední tvrze a projdi se jejími tichými síněmi.',
+  },
   pvp_bg_first_capture: {
     name: 'Vlajka v ruce',
     desc: 'Zajmi vlajku v Thornhollowských polích.',
@@ -999,5 +1011,34 @@ export const table: DeedLocaleTable = {
     name: 'Svatyně iluminována',
     desc: 'Iluminuj v Relikviáři stránku Hrdinská: Svatyně Hrobodraka.',
     title: 'Světlo svatyně',
+  },
+  soc_strongbox_outfitter: {
+    name: 'Správce truhlice',
+    desc: 'Odemkni svůj první slot na bankovní tašku.',
+  },
+  soc_four_bags_deep: {
+    name: 'Všechny čtyři tašky',
+    desc: 'Odemkni všechny čtyři sloty na bankovní tašky.',
+  },
+  dgn_ignivar: {
+    name: 'Posel padá',
+    desc: 'Poraz Ignivara, posla posledního plamene, v tavírně posledního pramene.',
+  },
+  dgn_ignivar_heroic: {
+    name: 'Hrdinská: Posel padá',
+    desc: 'Poraz Ignivara, posla posledního plamene, na hrdinské obtížnosti.',
+  },
+  dgn_varkhul: {
+    name: 'Výheň chladne',
+    desc: 'Poraz Varkhula, kovotce posledního plamene, ve vnitřní tavírně.',
+  },
+  dgn_varkhul_heroic: {
+    name: 'Hrdinská: Výheň chladne',
+    desc: 'Poraz Varkhula, kovotce posledního plamene, na hrdinské obtížnosti.',
+  },
+  dgn_varkhul_flawless: {
+    name: 'Ani jiskřička nazmar',
+    desc: 'Poraz Varkhula, kovotce posledního plamene, na hrdinské obtížnosti, aniž by jediný člen raidu zemřel.',
+    title: 'Nespálený',
   },
 };

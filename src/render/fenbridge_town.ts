@@ -31,10 +31,20 @@ import {
 } from './fenbridge_town_visibility_core';
 import { EMISSIVE_GLOW, GFX, surfaceMat } from './gfx';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
-import { applyOccluderFade, type OccluderFadeMat, occluderFadeMat } from './occluder_fade';
-import { occluderFadeSettled, stepOccluderFade } from './occluder_fade_core';
+import {
+  advanceOccluderFade,
+  type OccluderFadeMat,
+  occluderFadeMat,
+  prefetchOccluderFadeWithin,
+} from './occluder_fade';
 import type { RevealGateCore } from './reveal_gate_core';
-import { townStaticReveal } from './town_reveal_core';
+import {
+  newTownPiecewiseReveal,
+  orderTownRootsNearestFirst,
+  townPiecewiseRevealInto,
+  townRootVisible,
+  townStaticReveal,
+} from './town_reveal_core';
 import { modulateEmissiveByVertexColor } from './vertex_color_emissive';
 
 const ROOT_NAME = 'fenbridgeTownRebuild';
@@ -42,6 +52,8 @@ const OVERLAY_NAME = 'fenbridgeCaptureOverlay';
 const FOUNDATION_OVERLAP = 0.03;
 const FOUNDATION_COLOR = 0x4e5650;
 const TOWN_CULL_RADIUS = FENBRIDGE_LAYOUT.hub.radius + FENBRIDGE_LAYOUT.wall.maximumSegmentSpan / 2;
+/** The one reveal-gate key of the town's static content. */
+const STATIC_REVEAL_KEY = 'fenbridge-town-static';
 
 const PROP_ASSET_URLS = Object.freeze([
   ...FENBRIDGE_LAYOUT.buildings.map((building) => building.assetId),
@@ -358,17 +370,20 @@ function townMaterial(
   independent = false,
   doubleSided = false,
 ): THREE.Material {
-  const shared = surfaceMat({
+  const options = {
     ...materialOptions(emissive, textures),
     side: doubleSided ? THREE.DoubleSide : THREE.FrontSide,
-  });
+  };
+  // The shared response texture packs roughness in green and semantic metalness
+  // in blue, so aged iron/brass can read distinctly without a fourth town-wide
+  // texture allocation. It rides in the OPTIONS: surfaceMat dedupes by key and
+  // metalnessMap is a program-cache-key input, so writing it onto the returned
+  // shared entry relinked every material already drawing with it.
+  const shared = surfaceMat(
+    options.normalMap ? { ...options, metalness: 1, metalnessMap: options.roughnessMap } : options,
+  );
   if (shared instanceof THREE.MeshStandardMaterial && shared.normalMap) {
     shared.normalScale.setScalar(FENBRIDGE_SURFACE_NORMAL_SCALE);
-    // The shared response texture packs roughness in green and semantic
-    // metalness in blue, so aged iron/brass can read distinctly without a
-    // fourth town-wide texture allocation.
-    shared.metalness = 1;
-    shared.metalnessMap = shared.roughnessMap;
   }
   // Hook-preserving clone: a bare clone dropped the zone-haze hook and split
   // the program cache key, so each independent building material linked a new
@@ -486,7 +501,7 @@ function buildBuilding(
   group.rotation.y = building.rotation;
   group.add(opaqueMesh);
 
-  const materials = [opaqueMaterial];
+  const materials = [occluderFadeMat(opaqueMaterial, opaqueMesh)];
   if (template.emissive) {
     const emissiveMaterial = townMaterial(true, textures, true);
     emissiveMaterial.name = `fenbridgeTownEmissive:${building.id}`;
@@ -499,14 +514,14 @@ function buildBuilding(
     emissiveMesh.receiveShadow = false;
     emissiveMesh.userData.placementId = building.id;
     group.add(emissiveMesh);
-    materials.push(emissiveMaterial);
+    materials.push(occluderFadeMat(emissiveMaterial, emissiveMesh));
   }
 
   return {
     group,
     hideTarget: {
       group,
-      materials: materials.map(occluderFadeMat),
+      materials,
       hidden: false,
       alpha: 1,
       x: building.position.x,
@@ -1213,12 +1228,14 @@ function buildFromTemplates(
   }
 
   const hideTargets: BuildingHideTarget[] = [];
+  const buildingGroups: THREE.Object3D[] = [];
   for (const building of FENBRIDGE_LAYOUT.buildings) {
     const template = templates.get(building.assetId);
     if (!template) throw new Error(`Fenbridge town template is missing: ${building.assetId}`);
     const built = buildBuilding(building, template, groundAt, textures);
     group.add(built.group);
     hideTargets.push(built.hideTarget);
+    buildingGroups.push(built.group);
   }
 
   const microBatches = buildMicroBatches(templates, groundAt, textures);
@@ -1250,6 +1267,34 @@ function buildFromTemplates(
 
   const repeatedBatches = [...wallBatches, ...gateBatches, ...boardwalkBatches];
   const staticCullTargets: THREE.Object3D[] = [...microBatches, ...repeatedBatches];
+  // The reveal gate compiles the buildings with the static batches: their
+  // per-building materials (the emissive lantern variant above all) are not
+  // shared with any batch, so a building outside the roots linked cold on the
+  // frame its own fog cull first showed it (the prod 220 ms
+  // fenbridgeTownEmissive row).
+  const staticRevealRoots: THREE.Object3D[] = [...staticCullTargets, ...buildingGroups];
+  // Piecewise reveal anchors, in staticRevealRoots order: a batch spans the
+  // whole town so it anchors at the hub centre, a building at its own
+  // footprint. hideTargets is built in the buildingGroups loop, so the two
+  // stay index-aligned by construction.
+  // Only the buildings are FOOTPRINT-anchored, so only they can take the reach
+  // floor: a batch's centre anchor is an ordering hint, never an arm's-length
+  // distance (a camera at the hub would flip every batch at once).
+  const rootX: number[] = staticCullTargets.map(() => FENBRIDGE_LAYOUT.hub.center.x);
+  const rootZ: number[] = staticCullTargets.map(() => FENBRIDGE_LAYOUT.hub.center.z);
+  const rootFootprint: boolean[] = staticCullTargets.map(() => false);
+  for (const target of hideTargets) {
+    rootX.push(target.x);
+    rootZ.push(target.z);
+    rootFootprint.push(true);
+  }
+  const staticPiecewise = newTownPiecewiseReveal(
+    STATIC_REVEAL_KEY,
+    staticRevealRoots,
+    rootX,
+    rootZ,
+    rootFootprint,
+  );
   const visibilityPlan = newFenbridgeBuildingVisibilityPlan();
   const setCaptureOverlay = (visible: boolean): void => {
     overlay.visible = visible;
@@ -1290,6 +1335,12 @@ function buildFromTemplates(
 
   let revealGate: RevealGateCore | null = null;
   let staticRevealed = false;
+  // The gate asks for the roots the moment the consult fires the request, so
+  // these are the CAMERA's coordinates of that very frame: an arrival submits
+  // the buildings it landed among before the far side of the town.
+  let lastCamX = 0;
+  let lastCamZ = 0;
+  const orderedRevealRoots: THREE.Object3D[] = [];
   return {
     group,
     setCaptureOverlay,
@@ -1297,7 +1348,14 @@ function buildFromTemplates(
       revealGate = gate;
     },
     staticRevealRoots(): readonly THREE.Object3D[] {
-      return staticCullTargets;
+      return orderTownRootsNearestFirst(
+        staticRevealRoots,
+        staticPiecewise.x,
+        staticPiecewise.z,
+        lastCamX,
+        lastCamZ,
+        orderedRevealRoots,
+      );
     },
     update(
       camX: number,
@@ -1310,6 +1368,8 @@ function buildFromTemplates(
       dt: number,
       reducedMotion = false,
     ): void {
+      lastCamX = camX;
+      lastCamZ = camZ;
       const hubDx = camX - FENBRIDGE_LAYOUT.hub.center.x;
       const hubDz = camZ - FENBRIDGE_LAYOUT.hub.center.z;
       const reveal = townStaticReveal(
@@ -1325,13 +1385,21 @@ function buildFromTemplates(
         hubDx * hubDx + hubDz * hubDz,
         TOWN_CULL_RADIUS,
         revealGate,
-        'fenbridge-town-static',
+        STATIC_REVEAL_KEY,
       );
       if (reveal === 'revealed') staticRevealed = true;
-      const staticVisible = reveal === 'revealed';
+      // While the key is held, each root that has linked comes in on its own,
+      // nearest first: the whole town no longer waits for its slowest program.
+      townPiecewiseRevealInto(staticPiecewise, reveal, camX, camZ, revealGate);
       for (let index = 0; index < staticCullTargets.length; index++) {
-        staticCullTargets[index].visible = staticVisible;
+        staticCullTargets[index].visible = townRootVisible(reveal, staticPiecewise, index);
       }
+      // Buildings keep their own fog cull and camera fade, but their FIRST
+      // reveal rides the same hold as the batches: while the gate compiles
+      // the town they stay hidden until their own group has linked, and once
+      // the key is revealed the latch above never consults the gate again (a
+      // fog re-entry is a plain cull flip).
+      const buildingRootBase = staticCullTargets.length;
       for (let index = 0; index < hideTargets.length; index++) {
         const target = hideTargets[index];
         fenbridgeBuildingVisibilityPlanInto(
@@ -1346,12 +1414,19 @@ function buildFromTemplates(
           eyeZ,
           fogFar,
         );
-        target.group.visible = visibilityPlan.visible;
+        target.group.visible =
+          visibilityPlan.visible &&
+          townRootVisible(reveal, staticPiecewise, buildingRootBase + index);
         if (!visibilityPlan.visible) continue;
+        prefetchOccluderFadeWithin(target.materials, target.x, target.z, camX, camZ);
         target.hidden = visibilityPlan.hidden;
-        if (occluderFadeSettled(target.alpha, target.hidden)) continue;
-        target.alpha = stepOccluderFade(target.alpha, target.hidden, dt, reducedMotion);
-        applyOccluderFade(target.materials, target.alpha);
+        target.alpha = advanceOccluderFade(
+          target.materials,
+          target.alpha,
+          target.hidden,
+          dt,
+          reducedMotion,
+        );
       }
     },
   };

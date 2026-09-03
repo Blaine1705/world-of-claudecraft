@@ -6,9 +6,12 @@
 // bind-on-trade windfall is not resellable or mail-launderable). trade.ts
 // keeps its own per-copy lock, isTradeLocked (boundTo only), so an armed
 // copy may still trade in person, where the stamp lands on the recipient.
-// trade.ts also carries a def-level exclusion of its own (RIFT_GEAR_ITEMS);
-// the pipes cover that family through each pipe's def-level rules instead
-// (every rift gear def carries noMarketList).
+// trade.ts also carries a def-level exclusion of its own (RIFT_GEAR_ITEMS,
+// the three riftbound_band_of_* personal rings); the pipes cover that same
+// family through each pipe's def-level rules instead (every RIFT_GEAR_ITEM_IDS
+// def carries noMarketList). Rift forge currency (rift_essence, rift_gem_*)
+// is a SEPARATE family: not in RIFT_GEAR_ITEM_IDS and not noMarketList, so it
+// stays tradeable through every pipe (see content/rift/items.ts).
 //
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no rng, no clock
 // (enforced by tests/architecture.test.ts). Pure bookkeeping, zero draws.
@@ -17,6 +20,7 @@ import { sanitizeItemInstancePayloadOnLoad } from './item_instance_load';
 import { itemInstancePayloadsEqual } from './item_instance_merge';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
+import { isTransferLockedInstance } from './transfer_lock';
 import {
   cloneItemInstancePayload,
   type InventoryUnit,
@@ -24,15 +28,11 @@ import {
   type ItemInstancePayload,
 } from './types';
 
-/** True when this copy is locked out of the anonymous exchange pipes (market
- *  listing, mail attachment): armed (bindOnTrade) or bound (boundTo). The
- *  def-level rules (soulbound/quest/noMarketList) stay with each pipe; this is
- *  only the per-copy lock. A plain copy is never locked. */
-export function isTransferLockedInstance(instance: ItemInstancePayload | undefined): boolean {
-  return (
-    instance !== undefined && (instance.bindOnTrade === true || instance.boundTo !== undefined)
-  );
-}
+// The per-copy lock predicate lives in its own leaf (transfer_lock.ts, its
+// docblock owns the rule) and is re-exported here so every pipe keeps its
+// import; this module's Unlocked/Locked helper names refer to that TRANSFER
+// lock only.
+export { isTransferLockedInstance };
 
 /** The public display projection of a payload, for wire surfaces other players
  *  see (market browse rows, letter attachment chips). The allowlist is the eqi
@@ -167,10 +167,11 @@ export function grantCopies(
 
 /** Rebuild a persisted exchange-escrow slot (market collection item, mail
  *  attachment): unknown ids stay dormant recoverable data, counts clamp to
- *  what identical-payload merges could legitimately have built (the character
- *  load's instancedCountCap rule), and payloads deep-clone so a loaded book
- *  never aliases the raw save object. `cap` is instancedCountCap(def, instance)
- *  from bags.ts, passed in so this module stays free of the ITEMS table. */
+ *  what identical-payload merges or an in-place whole-stack lock could
+ *  legitimately have built (the character load's instancedCountCap rule), and
+ *  payloads deep-clone so a loaded book never aliases the raw save object.
+ *  `cap` is instancedCountCap(def, instance) from bags.ts, passed in so this
+ *  module stays free of the ITEMS table. */
 export function sanitizeEscrowSlot(raw: InvSlot, cap: number, dropped?: string[]): InvSlot {
   const count = Math.min(Math.max(1, raw.count | 0), cap);
   if (!raw.instance || typeof raw.instance !== 'object') {

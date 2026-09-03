@@ -363,6 +363,26 @@ describe('corpse harvest: single-use, first-come (#1141)', () => {
     expect(mob.harvestClaimedBy).toBe(b);
   });
 
+  it('direct harvest refuses an owned tagged corpse without consuming or minting materials', () => {
+    const { sim, mob, a, b } = setup();
+    mob.ownerId = a;
+    mob.lootable = false;
+    sim.drainEvents();
+    let draws = 0;
+    const rng = (sim as unknown as { rng: { setObserver: (o: (() => void) | null) => void } }).rng;
+    rng.setObserver(() => {
+      draws++;
+    });
+    sim.harvestCorpse(mob.id, undefined, b);
+    rng.setObserver(null);
+
+    expect(mob.harvestClaimedBy).toBeNull();
+    expect(draws).toBe(0);
+    expect(sim.countItem('rough_hide', b)).toBe(0);
+    expect(sim.countItem('wolf_fang', b)).toBe(0);
+    expect(sim.drainEvents()).toEqual([]);
+  });
+
   it('a full-bags harvest is refused and does not consume the claim', () => {
     const { sim, internals, mob, a, b } = setup();
     fillBags(sim, internals, a);
@@ -847,32 +867,29 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
   });
 
   it('the filed crossing case: zero free slots + a partial plain stack tops up, never overflows', () => {
-    // Hunted seed, the dedupe-pin idiom: probe on roomy bags proves the fang
-    // roll clears the signable floor, then a FRESH same-seed world reproduces
-    // the same draws (they are inventory-independent, pinned by the
-    // grant-order contract above) against the issue's exact inventory shape.
-    for (let seed = 1; seed <= 200; seed++) {
-      const probe = setup(seed);
-      probe.sim.harvestCorpse(probe.mob.id, ['fang'], probe.a);
-      const pm = expectDefined(probe.internals.players.get(probe.a));
-      if (!pm.inventory.some((s) => s.itemId === 'wolf_fang' && s.instance?.signer)) continue;
-      const { sim, internals, a, mob } = setup(seed);
-      fillBags(sim, internals, a);
-      const m = expectDefined(internals.players.get(a));
-      const cap = bagCapacity(m.bags);
-      m.inventory[0] = { itemId: 'wolf_fang', count: 1 };
-      expect(m.inventory.length).toBe(cap);
-      sim.drainEvents();
-      sim.harvestCorpse(mob.id, ['fang'], a);
-      expect(mob.harvestClaimedBy).toBe(a);
-      // The issue's acceptance: never past capacity, and the yield arrived as
-      // the plain top-up (the signature truncated, the yield did not).
-      expect(m.inventory.length).toBeLessThanOrEqual(cap);
-      expect(m.inventory.some((s) => s.itemId === 'wolf_fang' && s.instance)).toBe(false);
-      expect(sim.countItem('wolf_fang', a)).toBeGreaterThan(1);
-      return;
-    }
-    throw new Error('no seed with a signable fang roll within 200');
+    // Seed 31 is the suite's pinned signable fang roll. A roomy-bag probe
+    // proves the premise, then a FRESH same-seed world reproduces the same
+    // inventory-independent draws against the issue's exact inventory shape.
+    const seed = 31;
+    const probe = setup(seed);
+    probe.sim.harvestCorpse(probe.mob.id, ['fang'], probe.a);
+    const pm = expectDefined(probe.internals.players.get(probe.a));
+    expect(pm.inventory.some((s) => s.itemId === 'wolf_fang' && s.instance?.signer)).toBe(true);
+
+    const { sim, internals, a, mob } = setup(seed);
+    fillBags(sim, internals, a);
+    const m = expectDefined(internals.players.get(a));
+    const cap = bagCapacity(m.bags);
+    m.inventory[0] = { itemId: 'wolf_fang', count: 1 };
+    expect(m.inventory.length).toBe(cap);
+    sim.drainEvents();
+    sim.harvestCorpse(mob.id, ['fang'], a);
+    expect(mob.harvestClaimedBy).toBe(a);
+    // The issue's acceptance: never past capacity, and the yield arrived as
+    // the plain top-up (the signature truncated, the yield did not).
+    expect(m.inventory.length).toBeLessThanOrEqual(cap);
+    expect(m.inventory.some((s) => s.itemId === 'wolf_fang' && s.instance)).toBe(false);
+    expect(sim.countItem('wolf_fang', a)).toBeGreaterThan(1);
   });
 
   it('a slot-full bag with a same-signer stack WITH room keeps the signature: the grant merges (seed 31)', () => {
@@ -3458,9 +3475,18 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
     // all-unmapped subsets fall out of refused and land in spent instead.
     // Exact totals are pinned against the shipped catalog, not derived, so a
     // template that gains or loses a mapped tag moves one of them.
-    expect(spent).toBe(188);
+    // 188 to 196 when frostmane_yeti left the ogre family for beast: the
+    // every-beast-pays-in-components rule then owes it hide/fang/meat, and three
+    // mapped families contribute all 8 of its masks to spent and none to
+    // refused (all three are mapped), exactly +8/+0.
+    // 196 to 200 for the Proving Shore: shore_scuttler AND its tide-pool king
+    // mister_crabs each carry the meat tag the tide_scuttler twin already has,
+    // so all four of their subsets spend and none refuse, exactly +2/+0 per
+    // template (training_effigy has no tags and never enters the sweep, and
+    // neither do the Highwatch practice dummies).
+    expect(spent).toBe(200);
     expect(refused).toBe(6);
-    expect(spent + refused).toBe(194);
+    expect(spent + refused).toBe(206);
   });
 
   // The eight mapped families and their item ids, spelled out. Deriving them
@@ -3550,9 +3576,13 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
     // `unmappedOffered` to only the subsets naming gills or horn on the
     // templates left, while `extracted` rises with the extra families each
     // affected subset now extracts. Exact totals are pinned against the
-    // shipped catalog, not derived.
+    // shipped catalog, not derived. frostmane_yeti's move from the ogre family
+    // to beast then adds its hide/fang/meat subsets to `extracted` (286 to 301)
+    // and nothing to `unmappedOffered`, since all three tags are mapped.
     expect(unmappedOffered).toBe(14);
-    expect(extracted).toBe(286);
+    // 301 to 305 with the Proving Shore's two meat-tagged templates
+    // (shore_scuttler and mister_crabs) and their mapped-family extractions.
+    expect(extracted).toBe(305);
   });
 
   it('keeps every mixed template harvestable, so the gate is not a blanket refusal', () => {

@@ -13,9 +13,6 @@ vi.mock('../server/db', () => ({
   walletForAccount: vi.fn(async () => null),
   markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
-  // The chroma unequip path revokes through the db before its promise chain;
-  // stubbed so the movement pin below exercises the real server method.
-  revokeAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   insertBankLedgerRow: vi.fn(async () => {}),
   // join() refreshes account flair; stub so tests do not stderr on missing export.
   loadAccountFlair: vi.fn(async () => ({ ai: false, streamer: false, links: {} })),
@@ -23,7 +20,6 @@ vi.mock('../server/db', () => ({
 
 import { GameServer } from '../server/game';
 import { applyBoostKitToPlayer } from '../server/pbe_boost';
-import { mechChromaItemId } from '../src/sim/content/skins';
 import { markItemDiscovered } from '../src/sim/deeds';
 import {
   isCataloguedRelicItem,
@@ -412,40 +408,18 @@ describe('Reliquary movement flag on the server-only grant paths', () => {
       isCataloguedRelicItem(id),
     );
     expect(seededRelics.length).toBeGreaterThan(0);
-    // The alt-role BAGGED loop is a distinct grant site inside the kit: prove
-    // it handed over a catalogued relic of its own, so dropping only ITS
-    // movement flag cannot stay green on the equipped items' content alone.
-    expect(meta.inventory.some((s) => isCataloguedRelicItem(s.itemId))).toBe(true);
+    // The alt-role BAGGED loop is a distinct grant site inside the kit. Its
+    // arm-specific catalogued-relic proof retired when the Crucible ilvl-35
+    // tier became the kit's BiS while its Reliquary pages are pended
+    // (tests/reliquary_content.test.ts HEROIC_PAGE_PENDING): the bagged picks
+    // are currently uncatalogued, so only the union proof below is
+    // non-vacuous. When the launch pass authors the Crucible pages the bagged
+    // picks become catalogued again; restore the arm-specific assertion then.
+    expect(meta.inventory.length).toBeGreaterThan(0);
     // Discovery fills the catalog, as on every movement path...
     for (const id of seededRelics) expect(meta.reliquary.firstFind[id]).toBeDefined();
     // ...and not one of them counts as something the world handed the player.
     expect(meta.reliquary.counts).toEqual({});
-  });
-
-  it('unequipping a mech chroma re-grants without counting (server arm)', () => {
-    // The twin of the offline Sim.unequipMechChroma pin in
-    // tests/reliquary_state.test.ts. Both arms must carry the flag or the two
-    // hosts answer the tally differently for one action; this is the half a
-    // sim-only test cannot see.
-    const server = new GameServer();
-    const fw = fakeWs();
-    const session = joinAt(server, fw, 21, 'RelicChroma');
-    const sim = server.sim as Sim;
-    const meta = sim.players.get(session.pid)!;
-
-    const chromaId = 'amber_crimson';
-    const itemId = mechChromaItemId(chromaId);
-    expect(itemId).toBeTruthy();
-    session.accountCosmetics = { ...session.accountCosmetics, mechChromaIds: [chromaId] };
-    const before = { ...meta.reliquary.counts };
-
-    (
-      server as unknown as { unequipAccountMechChroma(s: unknown, c: string): void }
-    ).unequipAccountMechChroma(session, chromaId);
-
-    expect(meta.inventory.some((s) => s.itemId === itemId)).toBe(true);
-    expect(meta.deedStats.itemsDiscovered.has(itemId!)).toBe(true);
-    expect(meta.reliquary.counts).toEqual(before);
   });
 });
 

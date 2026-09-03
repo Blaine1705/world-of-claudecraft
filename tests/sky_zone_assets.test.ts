@@ -1,27 +1,28 @@
 import * as THREE from 'three';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const loadHdr = vi.fn(
-  async (_url: string, _opts?: { maxWidth?: number }) => new THREE.DataTexture(),
+const loadKtx2Texture = vi.fn(
+  async (_url: string, _opts?: { repeat?: boolean; large?: boolean }) =>
+    new THREE.CompressedTexture([], 2, 1),
 );
 const loadTexture = vi.fn(async () => new THREE.Texture());
-const releaseHdr = vi.fn((_url: string, _opts?: { maxWidth?: number }) => undefined);
+const releaseKtx2Texture = vi.fn((_url: string, _opts?: { repeat?: boolean }) => undefined);
 const releaseTexture = vi.fn();
 
 describe('zone-scoped sky assets', () => {
   beforeEach(() => {
     vi.resetModules();
-    loadHdr.mockClear();
+    loadKtx2Texture.mockClear();
     loadTexture.mockClear();
-    releaseHdr.mockClear();
+    releaseKtx2Texture.mockClear();
     releaseTexture.mockClear();
     vi.doMock('../src/render/gfx', () => ({ GFX: { standardMaterials: true } }));
     vi.doMock('../src/render/assets/loader', () => ({
       loadGltf: vi.fn(),
-      loadHdr,
+      loadKtx2Texture,
       loadTexture,
       releaseGltf: vi.fn(),
-      releaseHdr,
+      releaseKtx2Texture,
       releaseTexture,
     }));
     vi.doMock('../src/render/textures', () => ({
@@ -33,13 +34,15 @@ describe('zone-scoped sky assets', () => {
   it('loads only requested biomes and deduplicates repeated calls', async () => {
     const { ensureSkyBiomeAssets, hasSkyHdriAssets } = await import('../src/render/sky');
 
-    expect(loadHdr).not.toHaveBeenCalled();
+    expect(loadKtx2Texture).not.toHaveBeenCalled();
     await ensureSkyBiomeAssets(['vale', 'vale']);
-    // The visible dome keeps its high-resolution HDR while PMREM uses a
-    // separate 1k source, so one biome intentionally requests two HDR assets.
-    expect(loadHdr).toHaveBeenCalledTimes(2);
-    expect(loadHdr).toHaveBeenNthCalledWith(1, '/env/vale_day_2k.hdr');
-    expect(loadHdr).toHaveBeenNthCalledWith(2, '/env/vale_day_1k.hdr', { maxWidth: 512 });
+    // The visible dome keeps its high-resolution sky while PMREM uses a
+    // separate 512 source, so one biome intentionally requests two KTX2 assets.
+    expect(loadKtx2Texture).toHaveBeenCalledTimes(2);
+    // The dome takes the single-slot `large` lane; the small PMREM source does
+    // not, so it cannot sit behind a 1.6 MB dome fetch on a biome crossing.
+    expect(loadKtx2Texture).toHaveBeenNthCalledWith(1, '/env/vale_day_2k.ktx2', { large: true });
+    expect(loadKtx2Texture).toHaveBeenNthCalledWith(2, '/env/vale_day_512.ktx2');
     // All shipped backdrop strengths are zero: dead 8k panoramas must not be
     // fetched merely because their biome's HDRI is requested.
     expect(loadTexture).not.toHaveBeenCalled();
@@ -47,22 +50,46 @@ describe('zone-scoped sky assets', () => {
     expect(hasSkyHdriAssets(['marsh'])).toBe(false);
 
     await ensureSkyBiomeAssets(['vale']);
-    expect(loadHdr).toHaveBeenCalledTimes(2);
+    expect(loadKtx2Texture).toHaveBeenCalledTimes(2);
     expect(loadTexture).not.toHaveBeenCalled();
   });
 
-  it('classifies a dome-arrived biome as non-resident until its env HDR lands', async () => {
+  it('wraps the dome equirect in U only, and maps both arms as equirectangular', async () => {
+    // The trap this pins: loadKtx2Texture's `repeat` option would set wrapT as
+    // well, and an equirect whose V wraps mirrors the sky across the poles. The
+    // Radiance path set wrapS alone, so the KTX2 path must too. The PMREM
+    // source is never wrapped at all (it is convolved, not sampled by view
+    // direction), which is also what loadHdr left it as.
+    const { ensureSkyBiomeAssets, buildSky } = await import('../src/render/sky');
+    await ensureSkyBiomeAssets(['vale']);
+    const view = buildSky(false, new THREE.Vector3(90, 140, 50), 0, 40);
+
+    const dome = view.domeTexture('vale');
+    if (!dome) throw new Error('expected the vale dome to be resident');
+    expect(dome.wrapS).toBe(THREE.RepeatWrapping);
+    expect(dome.wrapT).not.toBe(THREE.RepeatWrapping);
+    expect(dome.mapping).toBe(THREE.EquirectangularReflectionMapping);
+
+    // PMREMGenerator._fromTexture branches on mapping, so the env arm needs it
+    // too or the prefilter would take the cubemap path on a 2D texture.
+    const env = view.envTexture('vale');
+    if (!env) throw new Error('expected the vale PMREM source to be resident');
+    expect(env.mapping).toBe(THREE.EquirectangularReflectionMapping);
+    expect(env.wrapS).not.toBe(THREE.RepeatWrapping);
+  });
+
+  it('classifies a dome-arrived biome as non-resident until its env sky lands', async () => {
     const sky = await import('../src/render/sky');
     const biomes = sky.skyBiomesAt(0, 0);
-    // The dome (2k) and env (1k, maxWidth 512) fetches settle independently:
-    // resolve every dome immediately, hang every env until released.
-    const releaseEnv: Array<(tex: THREE.DataTexture) => void> = [];
-    loadHdr.mockImplementation((url) =>
-      url.includes('_1k.hdr')
-        ? new Promise<THREE.DataTexture>((resolve) => {
+    // The dome (2k) and env (512) fetches settle independently: resolve every
+    // dome immediately, hang every env until released.
+    const releaseEnv: Array<(tex: THREE.CompressedTexture) => void> = [];
+    loadKtx2Texture.mockImplementation((url) =>
+      url.includes('_512.ktx2')
+        ? new Promise<THREE.CompressedTexture>((resolve) => {
             releaseEnv.push(resolve);
           })
-        : Promise.resolve(new THREE.DataTexture()),
+        : Promise.resolve(new THREE.CompressedTexture([], 2, 1)),
     );
     try {
       const pending = sky.ensureSkyBiomeAssets(biomes);
@@ -79,23 +106,24 @@ describe('zone-scoped sky assets', () => {
         expect(view.envTexture(biome)).not.toBeNull();
         expect(view.skyBiomeAssetsResident(biome)).toBe(false);
       }
-      for (const release of releaseEnv) release(new THREE.DataTexture());
+      for (const release of releaseEnv) release(new THREE.CompressedTexture([], 2, 1));
       await pending;
       for (const biome of biomes) {
         expect(view.skyBiomeAssetsResident(biome)).toBe(true);
       }
     } finally {
-      loadHdr.mockImplementation(async () => new THREE.DataTexture());
+      loadKtx2Texture.mockImplementation(async () => new THREE.CompressedTexture([], 2, 1));
     }
   });
 
-  // Residency: the stores used to grow for a whole session (one 2k dome HDR is
-  // ~16.8 MB of CPU pixels plus the same on the GPU, times the shipped keys).
+  // Residency: the stores used to grow for a whole session (a 2k dome is 2 MB
+  // of compressed blocks on a BC6H or ASTC HDR device, times the shipped keys,
+  // and the 16.8 MB the Radiance path cost on every one of them).
   it('releases exactly the asked biomes and lets a later ensure re-fetch', async () => {
     const sky = await import('../src/render/sky');
     await sky.ensureSkyBiomeAssets(['vale', 'marsh']);
-    // North of the Sowfield bowl, so the dome's start pair is the vale alone
-    // (the Vale Cup practice sky overlaps the world origin).
+    // Well clear of the marsh band, so the dome's start pair is the vale
+    // alone: a biome bound into the live dome refuses release.
     const view = sky.buildSky(false, new THREE.Vector3(90, 140, 50), 0, 40);
     const marshDome = view.domeTexture('marsh');
     const marshEnv = view.envTexture('marsh');
@@ -114,16 +142,57 @@ describe('zone-scoped sky assets', () => {
     expect(sky.residentSkyBiomes()).toContain('vale');
     // Dispose and loader-cache release are one step, or the next ensure would
     // be handed the disposed texture straight back out of the promise cache.
-    expect(releaseHdr).toHaveBeenCalledWith('/env/marsh_overcast_2k.hdr', undefined);
-    expect(releaseHdr).toHaveBeenCalledWith('/env/marsh_overcast_1k.hdr', { maxWidth: 512 });
-    expect(releaseHdr).not.toHaveBeenCalledWith('/env/vale_day_2k.hdr', undefined);
+    expect(releaseKtx2Texture).toHaveBeenCalledWith('/env/marsh_overcast_2k.ktx2');
+    expect(releaseKtx2Texture).toHaveBeenCalledWith('/env/marsh_overcast_512.ktx2');
+    expect(releaseKtx2Texture).not.toHaveBeenCalledWith('/env/vale_day_2k.ktx2');
 
     // The per-biome fetch memo is gone too, so the re-ensure really re-fetches.
-    loadHdr.mockClear();
+    loadKtx2Texture.mockClear();
     await sky.ensureSkyBiomeAssets(['marsh']);
-    expect(loadHdr).toHaveBeenCalledTimes(2);
-    expect(loadHdr).toHaveBeenNthCalledWith(1, '/env/marsh_overcast_2k.hdr');
+    expect(loadKtx2Texture).toHaveBeenCalledTimes(2);
+    expect(loadKtx2Texture).toHaveBeenNthCalledWith(1, '/env/marsh_overcast_2k.ktx2', {
+      large: true,
+    });
     expect(sky.hasSkyHdriAssets(['marsh'])).toBe(true);
+  });
+
+  it('reports its resident textures to the residency table, counted as compressed blocks', async () => {
+    // The dome binds its skies through raw ShaderMaterial uniforms, which the
+    // residency walk's material-slot list does not reach, so the whole
+    // resident sky read as free until sky.ts published them itself. Counted
+    // as STORED blocks, not w*h*4: over-reporting by the compression ratio
+    // would hide the exact win this conversion exists for.
+    const sky = await import('../src/render/sky');
+    const { residencyBudget } = await import('../src/render/assets/residency_budget');
+    const blocks = (width: number, height: number): THREE.CompressedTexture => {
+      // One byte per pixel, what UASTC HDR transcodes to on BC6H and ASTC HDR.
+      const tex = new THREE.CompressedTexture([], width, height);
+      tex.mipmaps = [{ data: new Uint8Array(width * height), width, height }];
+      return tex;
+    };
+    loadKtx2Texture.mockImplementation(async (url: string) =>
+      url.includes('_512.ktx2') ? blocks(512, 256) : blocks(2048, 1024),
+    );
+    try {
+      expect(sky.skyResidencyTextures()).toEqual([]);
+      await sky.ensureSkyBiomeAssets(['marsh']);
+      const held = sky.skyResidencyTextures();
+      expect(held).toHaveLength(2);
+
+      const [bucket] = residencyBudget([{ label: 'sky', textures: held }]);
+      expect(bucket.category).toBe('sky: textures');
+      expect(bucket.bytes).toBe(2048 * 1024 + 512 * 256);
+      // The acceptance bar the conversion is measured against: a 2k dome under
+      // 3 MB resident, where the half-float RGBA upload cost 16.8 MB.
+      expect(bucket.bytes).toBeLessThan(3 * 1024 * 1024);
+
+      // An evicted biome stops being reported, so the table tracks the
+      // residency lane rather than a high-water mark.
+      sky.releaseSkyBiomeAssets(['marsh']);
+      expect(sky.skyResidencyTextures()).toEqual([]);
+    } finally {
+      loadKtx2Texture.mockImplementation(async () => new THREE.CompressedTexture([], 2, 1));
+    }
   });
 
   it('refuses to release a biome bound into a live dome until that dome is gone', async () => {
@@ -136,7 +205,7 @@ describe('zone-scoped sky assets', () => {
     // The second line of defense behind the renderer's pinned set.
     expect(sky.releaseSkyBiomeAssets([...startBiomes])).toEqual([]);
     expect(sky.hasSkyHdriAssets(startBiomes)).toBe(true);
-    expect(releaseHdr).not.toHaveBeenCalled();
+    expect(releaseKtx2Texture).not.toHaveBeenCalled();
 
     view.dispose();
     expect(sky.currentDomeBiomes()).toEqual([]);
@@ -144,17 +213,16 @@ describe('zone-scoped sky assets', () => {
     expect(sky.hasSkyHdriAssets(startBiomes)).toBe(false);
   });
 
-  it('never disposes an HDR two biome keys share through an aliased url', async () => {
-    // beach reuses the vale day sky, cave/volcano the marsh overcast: loadHdr
-    // hands both keys the SAME decoded texture, so a per-key dispose would
-    // blank the other key's dome.
-    const decoded = new Map<string, THREE.DataTexture>();
-    loadHdr.mockImplementation(async (url: string, opts?: { maxWidth?: number }) => {
-      const key = `${url}|${opts?.maxWidth ?? ''}`;
-      const existing = decoded.get(key);
+  it('never disposes a sky two biome keys share through an aliased url', async () => {
+    // beach reuses the vale day sky, cave/volcano the marsh overcast:
+    // loadKtx2Texture hands both keys the SAME transcoded texture, so a
+    // per-key dispose would blank the other key's dome.
+    const decoded = new Map<string, THREE.CompressedTexture>();
+    loadKtx2Texture.mockImplementation(async (url: string) => {
+      const existing = decoded.get(url);
       if (existing) return existing;
-      const tex = new THREE.DataTexture();
-      decoded.set(key, tex);
+      const tex = new THREE.CompressedTexture([], 2, 1);
+      decoded.set(url, tex);
       return tex;
     });
     try {
@@ -168,7 +236,7 @@ describe('zone-scoped sky assets', () => {
 
       expect(sky.releaseSkyBiomeAssets(['beach'])).toEqual(['beach']);
       expect(disposed).not.toHaveBeenCalled();
-      expect(releaseHdr).not.toHaveBeenCalledWith('/env/vale_day_2k.hdr', undefined);
+      expect(releaseKtx2Texture).not.toHaveBeenCalledWith('/env/vale_day_2k.ktx2');
       expect(sky.hasSkyHdriAssets(['vale'])).toBe(true);
       expect(sky.hasSkyHdriAssets(['beach'])).toBe(false);
 
@@ -176,9 +244,9 @@ describe('zone-scoped sky assets', () => {
       view.dispose();
       expect(sky.releaseSkyBiomeAssets(['vale'])).toEqual(['vale']);
       expect(disposed).toHaveBeenCalled();
-      expect(releaseHdr).toHaveBeenCalledWith('/env/vale_day_2k.hdr', undefined);
+      expect(releaseKtx2Texture).toHaveBeenCalledWith('/env/vale_day_2k.ktx2');
     } finally {
-      loadHdr.mockImplementation(async () => new THREE.DataTexture());
+      loadKtx2Texture.mockImplementation(async () => new THREE.CompressedTexture([], 2, 1));
     }
   });
 
@@ -203,10 +271,9 @@ describe('zone-scoped sky assets', () => {
 
   it('maps every sky key to the rectangles it is drawn over', async () => {
     const sky = await import('../src/render/sky');
-    const { SOWFIELD_CENTER } = await import('../src/sim/vale_cup_layout');
     const regions = sky.skyResidencyRegions();
-    // One region per zone (several zones share the vale sky) plus the two
-    // place-keyed windows.
+    // One region per zone (several zones share the vale sky) plus the
+    // place-keyed Farshore window.
     expect(regions.filter((region) => region.key === 'vale').length).toBeGreaterThan(1);
 
     const isle = regions.find((region) => region.key === 'farshore');
@@ -221,16 +288,6 @@ describe('zone-scoped sky assets', () => {
     expect(sky.skyBiomesAt(300, isle.minZ - 5)).not.toContain('farshore');
     expect(sky.skyBiomesAt(300, isle.maxZ - 5)).toContain('farshore');
     expect(sky.skyBiomesAt(300, isle.maxZ + 5)).not.toContain('farshore');
-
-    const cup = regions.find((region) => region.key === 'vale_cup');
-    if (!cup) throw new Error('expected a Vale Cup sky region');
-    expect(sky.skyBiomesAt(SOWFIELD_CENTER.x, SOWFIELD_CENTER.z)).toContain('vale_cup');
-    // The rect covers the whole 120 yd disc (over-covering at the corners).
-    expect(cup.minX).toBeLessThanOrEqual(SOWFIELD_CENTER.x - 119);
-    expect(cup.maxX).toBeGreaterThanOrEqual(SOWFIELD_CENTER.x + 119);
-    expect(cup.minZ).toBeLessThanOrEqual(SOWFIELD_CENTER.z - 119);
-    expect(cup.maxZ).toBeGreaterThanOrEqual(SOWFIELD_CENTER.z + 119);
-    expect(sky.skyBiomesAt(SOWFIELD_CENTER.x + 125, SOWFIELD_CENTER.z)).not.toContain('vale_cup');
   });
 
   it('renders the shipping HDRI dome after opaques at far depth', async () => {
@@ -255,9 +312,9 @@ describe('zone-scoped sky assets', () => {
     // its task memo, and a later residency pass must re-fetch the missing arm
     // to full readiness once the loader recovers.
     const sky = await import('../src/render/sky');
-    loadHdr.mockImplementation(async (url: string) => {
-      if (url.includes('_1k.hdr')) throw new Error('env fetch failed terminally');
-      return new THREE.DataTexture();
+    loadKtx2Texture.mockImplementation(async (url: string) => {
+      if (url.includes('_512.ktx2')) throw new Error('env fetch failed terminally');
+      return new THREE.CompressedTexture([], 2, 1);
     });
     await expect(sky.ensureSkyBiomeAssets(['marsh'])).rejects.toThrow('env fetch failed');
     expect(sky.residentSkyBiomes()).toContain('marsh');
@@ -265,7 +322,7 @@ describe('zone-scoped sky assets', () => {
 
     // Connectivity returns: the same ensure entry point (what the residency
     // lane re-runs) completes the missing arm.
-    loadHdr.mockImplementation(async () => new THREE.DataTexture());
+    loadKtx2Texture.mockImplementation(async () => new THREE.CompressedTexture([], 2, 1));
     await sky.ensureSkyBiomeAssets(['marsh']);
     expect(sky.readySkyBiomes()).toContain('marsh');
   });
@@ -277,7 +334,7 @@ describe('zone-scoped sky assets', () => {
     // every approach forever. Every sky key REACHABLE in a world must
     // therefore map to a region: zone biomes through the zones the renderer
     // passes (the LIVE world's list, so a custom map's paint-only biome is
-    // covered too), the place-keyed skies through their override windows.
+    // covered too), the place-keyed Farshore sky through its override window.
     const sky = await import('../src/render/sky');
     const { ZONES } = await import('../src/sim/data');
     const builtIn = new Set(sky.skyResidencyRegions().map((r: { key: string }) => r.key));
@@ -286,9 +343,7 @@ describe('zone-scoped sky assets', () => {
         true,
       );
     }
-    for (const key of ['farshore', 'vale_cup']) {
-      expect(builtIn.has(key), `place-keyed sky ${key} has no residency region`).toBe(true);
-    }
+    expect(builtIn.has('farshore'), 'place-keyed sky farshore has no residency region').toBe(true);
     // The custom-map arm: a paint-only biome present in the PASSED zone list
     // gets a region, which is what makes the renderer's live-zone wiring
     // sufficient for editor worlds.
@@ -338,10 +393,10 @@ describe('zone-scoped sky assets', () => {
     expect(sky.residentSkyBiomes()).not.toContain('marsh');
   });
 
-  it('a shadowless recheck sweeps the resident HDR stores and the derived env RTs', async () => {
+  it('a shadowless recheck sweeps the resident sky stores and the derived env RTs', async () => {
     // A downgrade rebuild (Medium or higher to Low) leaves the module stores
     // populated while the residency lane's ensure arm is gated off; the
-    // shadowless branch must still run the evict half or the decoded HDRs
+    // shadowless branch must still run the evict half or the transcoded skies
     // leak for the whole Low session. Behavioral, through the real driver and
     // the real stores: only the renderer host is faked.
     const sky = await import('../src/render/sky');
@@ -375,7 +430,7 @@ describe('zone-scoped sky assets', () => {
     driver.updateSkyResidency(0, 0);
 
     expect(sky.residentSkyBiomes()).not.toContain('marsh');
-    expect(releaseHdr).toHaveBeenCalledWith('/env/marsh_overcast_2k.hdr', undefined);
+    expect(releaseKtx2Texture).toHaveBeenCalledWith('/env/marsh_overcast_2k.ktx2');
     expect(rt.dispose).toHaveBeenCalled();
     expect(envRTs.size).toBe(0);
   });

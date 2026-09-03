@@ -14,7 +14,7 @@
 // Math.random/Date.now, host-agnostic so it runs offline, on the server, and
 // in the headless RL env unchanged.
 
-import { bagCapacity, canAddItem, consumeOneScratch } from '../bags';
+import { bagPools, canAddItem, consumeOneScratch } from '../bags';
 import { ENCHANT_FAMILY_CAST_DURATION_SEC } from '../content/professions';
 import { RIFT_ESSENCE_ITEM_ID } from '../content/rift/items';
 import { ITEMS } from '../data';
@@ -34,6 +34,7 @@ import {
   isConsuming,
   SALVAGE_CAST_ID,
 } from '../types';
+import { SALVAGE_MATERIAL_BY_QUALITY } from './salvage_materials';
 
 const QUALITY_ORDER: readonly NonNullable<ItemDef['quality']>[] = [
   'poor',
@@ -44,28 +45,21 @@ const QUALITY_ORDER: readonly NonNullable<ItemDef['quality']>[] = [
   'legendary',
 ];
 
-// Materials returned per rarity tier (issue #1300 scope: "which items are
-// salvageable and their yield tables"). Reuses existing harvested-material
-// item ids (bone_fragments/linen_scrap/spider_leg) rather than introducing
-// new item ids, same rationale content/recipes.ts documents for the same
-// reason (avoids expanding the positional item-name arrays in
-// src/ui/i18n.catalog/items.ts for this issue).
-export const SALVAGE_MATERIAL_BY_QUALITY: Readonly<Record<string, string>> = {
-  common: 'bone_fragments',
-  uncommon: 'linen_scrap',
-  rare: 'spider_leg',
-  epic: 'spider_leg',
-  legendary: 'spider_leg',
-};
+// Public compatibility for callers that historically imported the canonical
+// table through the command module.
+export { SALVAGE_MATERIAL_BY_QUALITY } from './salvage_materials';
 
-/** Eligible for salvage: an equippable weapon or armor piece, at least
- *  `common` quality (a `poor`/undefined-quality piece has nothing worth
- *  reclaiming). Ineligible items (consumables, quest items, poor-quality
- *  junk, unknown ids) are never salvageable. */
+/** Eligible for salvage: an equippable weapon, armor, or held-offhand piece,
+ *  at least `common` quality (a `poor`/undefined-quality piece has nothing
+ *  worth reclaiming). A held offhand is equipment exactly like a weapon or
+ *  armor piece (it carries quality and requiredClass), so a copy the
+ *  player's class cannot wield is never stuck with no way to recover value
+ *  from it. Ineligible items (consumables, quest items, poor-quality junk,
+ *  unknown ids) are never salvageable. */
 export function isSalvageable(def: ItemDef | undefined): boolean {
   return (
     !!def &&
-    (def.kind === 'weapon' || def.kind === 'armor') &&
+    (def.kind === 'weapon' || def.kind === 'armor' || def.kind === 'held_offhand') &&
     !!def.quality &&
     def.quality !== 'poor'
   );
@@ -160,7 +154,7 @@ export function resolveSalvage(
     if (isItemLocked(victim)) return { ok: false, itemId, reason: 'locked' };
     const fitItemId = victim?.rift ? RIFT_ESSENCE_ITEM_ID : materialItemId;
     const fitCount = victim?.rift ? riftSalvageYield(victim) : maxSalvageYield(def);
-    if (!canAddItem(scratch, bagCapacity(meta.bags), fitItemId, fitCount)) {
+    if (!canAddItem(scratch, bagPools(meta.bags), fitItemId, fitCount)) {
       return { ok: false, itemId, reason: 'no_bag_space' };
     }
   }
@@ -237,7 +231,7 @@ export function evaluateSalvageAdmission(
   if (isItemLocked(victim)) return { ok: false, itemId, reason: 'locked' };
   const fitItemId = victim?.rift ? RIFT_ESSENCE_ITEM_ID : materialItemId;
   const fitCount = victim?.rift ? riftSalvageYield(victim) : maxSalvageYield(def);
-  if (!canAddItem(scratch, bagCapacity(meta.bags), fitItemId, fitCount)) {
+  if (!canAddItem(scratch, bagPools(meta.bags), fitItemId, fitCount)) {
     return { ok: false, itemId, reason: 'no_bag_space' };
   }
   return null;

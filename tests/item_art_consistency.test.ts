@@ -147,6 +147,15 @@ type FinalAuditVerdict = {
     modifiedItemArtCount: number;
     modifiedItemArtPaths: string[];
     groups: Record<string, number>;
+    incrementalReviews: Array<{
+      reviewedAt: string;
+      branch: string;
+      reviewer: string;
+      addedIds?: string[];
+      replacedIds?: string[];
+      provenance: string[];
+      note: string;
+    }>;
   };
   reviewContract: {
     everyShippingFileReviewedInModes: string[];
@@ -333,8 +342,8 @@ describe('item-art consistency accepted-art provenance', () => {
       },
       {
         path: `${evidenceDir}/final-item-art-audit-verdict.json`,
-        acceptedSha256: 'b77340d50027a9abe3fca2238747706190f5fdf37cffdd5d4c6f04dbf21b6aed',
-        acceptedBytes: 109_944,
+        acceptedSha256: '90e5d5a3f8262eeccda2e965105d7016d516578d6c8f4f90248436b15f4c4c31',
+        acceptedBytes: 123_234,
       },
     ]);
     for (const evidence of [...value.sourceEvidence, ...value.generationReports]) {
@@ -442,26 +451,27 @@ describe('item-art consistency accepted-art provenance', () => {
     }
   });
 
-  it('pins the final 817-item visual audit, Heroic accounting, and evidence digests', () => {
+  it('pins the final item-art visual audit, Heroic accounting, and evidence digests', () => {
     const verdictPath = `${evidenceDir}/final-item-art-audit-verdict.json`;
     const readme = readFileSync(path.join(repoRoot, evidenceDir, 'README.md'), 'utf8');
     expect(readme).toContain('`final-item-art-audit-verdict.json`');
     expect(readme).toContain('node scripts/item_art_audit.mjs\n');
     expect(readme).toContain('node scripts/item_art_audit.mjs --refresh-verdict');
     const verdictBytes = readFileSync(path.join(repoRoot, verdictPath));
-    expect(verdictBytes.length).toBe(109_944);
+    expect(verdictBytes.length).toBe(123_234);
     expect(sha256(verdictBytes)).toBe(
-      'b77340d50027a9abe3fca2238747706190f5fdf37cffdd5d4c6f04dbf21b6aed',
+      '90e5d5a3f8262eeccda2e965105d7016d516578d6c8f4f90248436b15f4c4c31',
     );
     const verdict = JSON.parse(verdictBytes.toString('utf8')) as FinalAuditVerdict;
 
     expect(verdict.schemaVersion).toBe(1);
+    expect(verdict.generatedAt).toBe('2026-08-10T04:33:00.640Z');
     expect(verdict.auditScope).toMatchObject({
       baselineCommit: 'aee195551b5aef628eb7a72192117d7e3079818e',
       branch: 'feature/placeholder-art-completion-v036',
       shippingDirectory: 'public/ui/items',
-      itemArtFilesReviewed: 824,
-      liveItemDefinitions: 839,
+      itemArtFilesReviewed: 1043,
+      liveItemDefinitions: 1058,
       generatedHeroicDefinitions: 64,
       heroicDefinitionsWithOwnWebp: 48,
       heroicWeaponArtAliases: 16,
@@ -471,9 +481,17 @@ describe('item-art consistency accepted-art provenance', () => {
       manifest().targetSets.items.map((id) => `public/ui/items/${id}.webp`),
     );
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
-      824,
+      1043,
     );
     expect(Object.keys(verdict.auditScope.groups)).toHaveLength(22);
+    expect(verdict.auditScope.incrementalReviews.at(-1)).toEqual({
+      reviewedAt: '2026-08-15',
+      branch: 'feature/turtle-mount',
+      reviewer: 'owner',
+      addedIds: ['reins_chimeglass_tortoise'],
+      provenance: ['public/ui/items/mapping.json'],
+      note: "The Chimeglass Tortoise mount reins icon. Rendered from the shipped mount model (public/models/mounts/chimeglass_tortoise.glb) as a three-quarter head study, background keyed and flattened to the 128px opaque woc-item-icon-v1 shipping format, and owner-reviewed pass on 2026-08-15. Re-rendered on 2026-08-16 alongside the mount's lens-glow pass, which restyled the glowing lens pair the icon frames: same three-quarter head study, same shipping format, 3062 to 3784 bytes, owner-reviewed pass again on 2026-08-16. The 2026-08-09 campaign review of the prior 817 files, the 2026-08-10 review of the five class-overhaul integration additions, and the 2026-08-15 Lanternback Troll review all stand unchanged. Joined the 2026-08-09 record at the release/v0.42.0 sync of PR #3439 (which carries the troll of PR #3399), on top of the release side's 2026-08-12 through 2026-08-30 additions.",
+    });
     const shippingIds = new Set(
       readdirSync(path.join(repoRoot, 'public/ui/items'))
         .filter((name) => name.endsWith('.webp'))
@@ -516,13 +534,13 @@ describe('item-art consistency accepted-art provenance', () => {
     ]);
     expect(verdict.visualVerdict).toMatchObject({
       status: 'pass',
-      passCount: 824,
+      passCount: 1043,
       watchCount: 0,
       watch: [],
       rejectCount: 0,
       reject: [],
       summary:
-        'All 824 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, the Lanternback Troll mount reins icon owner-supplied and passed on 2026-08-15, and the Chimeglass Tortoise mount reins icon rendered from its shipped mount model and owner-reviewed on 2026-08-15.',
+        'All 1043 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review, plus the nine Crucible raid weapon icons (generated via the OpenAI crucible-raid-weapons-2026-08-28 batch) added on 2026-08-28, machine-checked and awaiting owner visual review, plus the two Ignivar legendary drop renders (varkhul_forgebreaker and varkhul_emberward, rendered from their own shipped held-weapon models by the deterministic weapon-still pipeline) added on 2026-08-28, machine-checked and awaiting owner visual review, plus the 192 Crucible set-piece, sigil, and off-set icons (generated via the OpenAI crucible-set-icons-2026-08-29 batch) added on 2026-08-29, machine-checked and awaiting owner visual review, plus the Core of the Last Flame reagent icon (staged early from the crucible-raid-professions-2026-08-28 batch) added on 2026-08-30, machine-checked and awaiting owner visual review, plus the seven bank-storage painted bags (implementation-agent reviewed and passed on 2026-08-26, joined at the v0.41.0 base sync), All 830 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review, plus the Bonebound Rickshaw reins icon (generated under woc-item-icon-v1 from a user-directed prompt, its own provenance recorded against its mapping.json owner) owner-reviewed against the regenerated mount contact sheet and passed on 2026-08-21, plus the Lanternback Troll mount reins icon (owner-supplied painted master, downscaled to the shipping format) owner-reviewed and passed on 2026-08-15 and the Chimeglass Tortoise mount reins icon (rendered from its shipped mount model) owner-reviewed and passed on 2026-08-16, both joining this record at the release/v0.42.0 sync of PR #3439.',
     });
     expect(verdict.visualVerdict.passIds).toEqual(currentIds);
     expect(verdict.nonVisualContentWatch).toEqual([
@@ -562,26 +580,26 @@ describe('item-art consistency accepted-art provenance', () => {
 
     expect(verdict.evidence.catalog).toEqual({
       path: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      sha256: '7b579121f18eb5ff259b594d9f74d4b28fb73c214cfbbef422fcede31bc5f67d',
-      bytes: 452_340,
+      sha256: '3efd2743afd17f7a91cba7405f746b95304c03ef16fedcae2d485696bcf734aa',
+      bytes: 568_769,
     });
     expect(verdict.evidence.rendererFingerprint).toBe(
-      'fd92c41a206cd55b05a1de94c4789f6eb6ca4200d063f4bbd284c21ae03b6082',
+      'd80ff4868f979e1717e106c889b7d6505841caf8d4cf887776ecb60848b1b2b7',
     );
     expect(verdict.evidence.rendererFingerprint).toBe(ITEM_ART_AUDIT_RENDERER_FINGERPRINT);
-    expect(verdict.evidence.sheetCount).toBe(208);
+    expect(verdict.evidence.sheetCount).toBe(216);
     expect(verdict.evidence.sheetModeCounts).toEqual({
-      '128-color': 26,
-      '40-color': 26,
-      '28-color': 26,
-      '22-color': 26,
-      '28-grayscale': 26,
-      '64-circle': 26,
-      'small-multiview': 26,
-      identity: 26,
+      '128-color': 27,
+      '40-color': 27,
+      '28-color': 27,
+      '22-color': 27,
+      '28-grayscale': 27,
+      '64-circle': 27,
+      'small-multiview': 27,
+      identity: 27,
     });
-    expect(verdict.evidence.sheets).toHaveLength(208);
-    expect(new Set(verdict.evidence.sheets.map(({ path: sheetPath }) => sheetPath)).size).toBe(208);
+    expect(verdict.evidence.sheets).toHaveLength(216);
+    expect(new Set(verdict.evidence.sheets.map(({ path: sheetPath }) => sheetPath)).size).toBe(216);
     const modesByPage = new Map<string, string[]>();
     for (const sheet of verdict.evidence.sheets) {
       const match = sheet.path.match(
@@ -593,7 +611,7 @@ describe('item-art consistency accepted-art provenance', () => {
       modes.push(match?.[2] ?? '');
       modesByPage.set(page, modes);
     }
-    expect(modesByPage.size).toBe(26);
+    expect(modesByPage.size).toBe(27);
     for (const modes of modesByPage.values()) {
       expect(modes).toEqual([
         '128-color',
@@ -616,7 +634,7 @@ describe('item-art consistency accepted-art provenance', () => {
       sheetSetDigest.update(`${sheet.path}\0${sheet.sha256}\0${sheet.bytes}\n`);
     }
     expect(verdict.evidence.sheetSetSha256).toBe(
-      '716289d62ace747c133b47935a54ca5ce78d352eed37f7b5997d1edcb33a7c70',
+      '2fa9445468ab6965ca41714c14755a423e6a5c8068bfd726af80916dd92cf461',
     );
     expect(sheetSetDigest.digest('hex')).toBe(verdict.evidence.sheetSetSha256);
 
@@ -626,7 +644,7 @@ describe('item-art consistency accepted-art provenance', () => {
       shippingCatalogDigest.update(`${id}\0${sha256(bytes)}\0${bytes.length}\n`);
     }
     expect(verdict.evidence.shippingCatalogSha256).toBe(
-      'fbaac839dbf147c8a88d906f141e8b011a9a91434aa54d3842fbec7407d698fe',
+      '29faad091260141d02e5ce4086458020033b2ec4d3d829173db1fbe0d80c5d86',
     );
     expect(shippingCatalogDigest.digest('hex')).toBe(verdict.evidence.shippingCatalogSha256);
   });
@@ -736,9 +754,9 @@ describe('item-art consistency accepted-art provenance', () => {
       mapping.license,
       'no ordinary item inherits the retired CraftPix default',
     ).toBeUndefined();
-    expect(mapping.entries).toHaveLength(41);
+    expect(mapping.entries).toHaveLength(43);
     expect(mapping.entries.every(({ license }) => Boolean(license))).toBe(true);
-    expect(mapping.generatedBatches).toHaveLength(16);
+    expect(mapping.generatedBatches).toHaveLength(23);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -755,13 +773,13 @@ describe('item-art consistency accepted-art provenance', () => {
     const oldGeneratedIds = mapping.generatedBatches
       .filter(({ batchId }) => batchId !== BATCH_ID)
       .flatMap(({ itemIds }) => itemIds);
-    expect(oldGeneratedIds).toHaveLength(509);
+    expect(oldGeneratedIds).toHaveLength(726);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(824);
-    expect(new Set(allCurrentOwnerIds).size).toBe(824);
+    expect(allCurrentOwnerIds).toHaveLength(1043);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1043);
     expect(batch?.provenanceRecords).toEqual([
       `${evidenceDir}/accepted-art.json`,
       `${evidenceDir}/supersession-audit.json`,
@@ -883,7 +901,7 @@ describe('item-art consistency accepted-art provenance', () => {
     expect(report.assets.every((asset) => asset.issues.length === 0)).toBe(true);
   }, 30_000);
 
-  it('keeps the full 817-icon catalog owned, decodable, opaque, budgeted, and unique', async () => {
+  it('keeps the full shipping icon catalog owned, decodable, opaque, budgeted, and unique', async () => {
     const mapping = readJson<ItemMapping>('public/ui/items/mapping.json');
     const ownerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
@@ -897,8 +915,9 @@ describe('item-art consistency accepted-art provenance', () => {
     for (const id of ownerIds) ownerCountById.set(id, (ownerCountById.get(id) ?? 0) + 1);
 
     const violations: string[] = [];
-    if (ownerIds.length !== 824) violations.push(`mapping owner count: ${ownerIds.length} != 824`);
-    if (fileIds.length !== 824) violations.push(`shipping WebP count: ${fileIds.length} != 824`);
+    if (ownerIds.length !== 1043)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1043`);
+    if (fileIds.length !== 1043) violations.push(`shipping WebP count: ${fileIds.length} != 1043`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

@@ -28,7 +28,14 @@ interface FakeSource {
 // mount's cue still fails the coverage tests below instead of quietly
 // redefining what full coverage means.
 const FOOTFALL_MOUNTS = new Set(['lanternback_troll', 'chimeglass_tortoise']);
-const CUSTOM_STRIDE_MOUNTS = MOUNT_KEYS.filter((mountKey) => !FOOTFALL_MOUNTS.has(mountKey));
+// A mount with a continuous loop (the rickshaw's mount_loop_ cue) gets no
+// per-stride one-shot either: mountRun no-ops for it by design (see its own
+// comment in sfx.ts), checking the real SFX_CLIPS catalog for a mount_loop_*
+// entry, so it is excluded from the stride coverage below rather than asserted
+// against a source mountRun never actually plays.
+const CUSTOM_STRIDE_MOUNTS = MOUNT_KEYS.filter(
+  (mountKey) => !FOOTFALL_MOUNTS.has(mountKey) && !(`mount_loop_${mountKey}` in SFX_CLIPS),
+);
 // SFX_CLIPS is a generated object LITERAL type, so a mount_run_ key that is
 // legitimately absent cannot index it directly. Widen it for the lookups that
 // are allowed to miss.
@@ -363,6 +370,14 @@ describe('mount running audio', () => {
     expect(lastSource().playbackRate.value).not.toBeCloseTo(first, 3);
   });
 
+  it('does not play a per-stride one-shot for a mount with a continuous loop', () => {
+    // mount_loop_rickshaw_mount is a real SFX_CLIPS entry (checked by
+    // mountRun itself), so no mock setup is needed here.
+    const before = sources.length;
+    sfx.mountRun(0, 0, 0, 'rickshaw_mount', 'grass', true);
+    expect(sources.length).toBe(before);
+  });
+
   it('plays independently of the optional on-foot footstep toggle', () => {
     // Both branches: a mount is world audio whether or not it borrows a
     // footfall clip, so the footstep setting must not silence either one.
@@ -385,6 +400,50 @@ describe('mount running audio', () => {
     const before = sources.length;
     sfx.mountRun(0, 0, 0, 'lanternback_troll', 'lava', true);
     expect(sources.length).toBe(before);
+  });
+});
+
+describe('mount rolling loop', () => {
+  beforeEach(() => {
+    const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
+    buffers.set('mount_loop_rickshaw_mount', { duration: 7.8 });
+  });
+
+  it('holds one BufferSource across a moving flag flicker, ramping gain instead of restarting it', () => {
+    const loops = (sfx as unknown as { loops: Map<string, { target: number }> }).loops;
+    sfx.mountLoop(1, 0, 0, 0, 'rickshaw_mount', true);
+    expect(sources).toHaveLength(1);
+    const held = sources[0];
+    expect(loops.get('mountloop_1')?.target).toBeGreaterThan(0);
+    // A single-frame flicker in `moving` (the exact failure the design doc
+    // comment on mountLoop warns about) must ramp gain, not tear down and
+    // recreate the source.
+    sfx.mountLoop(1, 0, 0, 0, 'rickshaw_mount', false);
+    expect(sources).toHaveLength(1);
+    expect(loops.get('mountloop_1')?.target).toBe(0);
+    sfx.mountLoop(1, 0, 0, 0, 'rickshaw_mount', true);
+    expect(sources).toHaveLength(1);
+    expect(sources[0]).toBe(held);
+    expect(loops.get('mountloop_1')?.target).toBeGreaterThan(0);
+  });
+
+  it('creates no BufferSource for a mount with no mount_loop_* clip', () => {
+    sfx.mountLoop(2, 0, 0, 0, 'valorsteed', true);
+    expect(sources).toHaveLength(0);
+  });
+
+  it('stopMountLoop releases the held slot immediately, letting a later mountLoop start fresh', () => {
+    sfx.mountLoop(3, 0, 0, 0, 'rickshaw_mount', true);
+    expect(sources).toHaveLength(1);
+    const first = sources[0];
+    // unloop's fade schedules the real .stop() via setTimeout (a real fade
+    // out, so playback overlaps the teardown), but it deletes the loop slot
+    // synchronously: a mountLoop call right after must not reuse the old
+    // source or silently no-op against a slot that still looks occupied.
+    sfx.stopMountLoop(3);
+    sfx.mountLoop(3, 0, 0, 0, 'rickshaw_mount', true);
+    expect(sources).toHaveLength(2);
+    expect(sources[1]).not.toBe(first);
   });
 });
 

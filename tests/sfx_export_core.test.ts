@@ -2,6 +2,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import {
   copyFileSync,
+  existsSync,
   mkdirSync,
   mkdtempSync,
   readdirSync,
@@ -169,16 +170,18 @@ describe('SFX production bundle', () => {
     }
   }, 30_000);
 
-  it('measures the production-conformance verdict with the bundled ffmpeg toolchain', () => {
+  it('measures the production-conformance verdict with the shared SFX conformance toolchain', () => {
     // The export validator must resolve the same binaries that gate the checked-in
-    // assets (scripts/sfx_conform.mjs / npm run sfx:check use ffmpeg-static and
-    // ffprobe-static), not the PATH ffmpeg the Studio spawns for playback. A newer
-    // PATH ffmpeg measures MP3 duration a few tens of milliseconds shorter, which
-    // flips these clips across the one-second peak/LUFS branch boundary and rejects a
-    // clip the gate accepts. Pinning the resolution keeps that regression from
-    // silently returning.
+    // assets (scripts/sfx_conform.mjs / npm run sfx:check), not the PATH ffmpeg
+    // the Studio spawns for playback. A newer PATH ffmpeg measures MP3 duration a
+    // few tens of milliseconds shorter, which flips these clips across the
+    // one-second peak/LUFS branch boundary and rejects a clip the gate accepts.
+    // ffprobe-static@3.1.0 has no Linux arm64 binary, so the shared conformance
+    // resolver falls back to PATH ffprobe only when the static binary is absent.
     expect(exportBundleModule.CONFORMANCE_FFMPEG_PATH).toBe(ffmpegPath);
-    expect(exportBundleModule.CONFORMANCE_FFPROBE_PATH).toBe(ffprobeStatic.path);
+    expect(exportBundleModule.CONFORMANCE_FFPROBE_PATH).toBe(
+      existsSync(ffprobeStatic.path) ? ffprobeStatic.path : 'ffprobe',
+    );
     // The constants alone do not prove the validator USES them: pin the call-site
     // wiring so a revert to the PATH binaries (which only misbehaves on machines
     // whose PATH ffmpeg diverges from the bundled one) reds deterministically.
@@ -368,7 +371,12 @@ describe('SFX production bundle', () => {
     } finally {
       rmSync(installFixture, { recursive: true, force: true });
     }
-  }, 90_000);
+    // Two full bundle builds (each ffprobe-validating every published track)
+    // plus the installer spawns measure ~63s solo on an M-class laptop; under
+    // bounded-worker gate contention the old 90s budget flaked while the SFX
+    // set itself was untouched. 180s keeps a genuine hang loud without
+    // re-flaking on a busy runner.
+  }, 180_000);
 
   it('exports numbered takes in exact round-robin order with runtime mix values', () => {
     const fixture = mkdtempSync(join(tmpdir(), 'woc-sfx-export-round-robin-'));

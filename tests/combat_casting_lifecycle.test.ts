@@ -31,6 +31,7 @@ import {
   CAST_PUSHBACK_SEC,
   CAST_QUEUE_WINDOW_SEC,
   CHANNEL_PUSHBACK_FRACTION,
+  DT,
   FISHING_CAST_ID,
   GATHER_CAST_ID,
 } from '../src/sim/types';
@@ -145,6 +146,118 @@ describe('casting_lifecycle: timed cast start -> progress -> finish', () => {
       advancePendingProjectiles(sim.ctx);
     expect(firstTarget.hp).toBeLessThan(firstHp0);
     expect(secondTarget.hp).toBe(secondHp0);
+  });
+
+  it('cancels a plain timed (non-channel) hostile cast the instant its locked target dies', () => {
+    const { sim, p, meta } = makeSim('mage', 12);
+    const mob = spawnTarget(sim, p, 12, 6);
+    sim.drainEvents();
+    castAbility(sim.ctx, 'fireball', p.id);
+    expect(p.castingAbility).toBe('fireball');
+    expect(p.castTargetId).toBe(mob.id);
+    expect(p.castRemaining).toBeGreaterThan(1); // well short of the 1.5s cast's natural finish
+
+    handleDeath(sim.ctx, mob, p); // another source (an AoE, a DoT tick, ...) kills it mid-cast
+    updateCasting(sim.ctx, p, meta); // the very next tick catches it, no waiting for a pulse
+
+    expect(p.castingAbility).toBeNull(); // interrupted immediately, never ran to completion
+    expect(p.castTargetId).toBeNull();
+    expect(p.castRemaining).toBe(0);
+    const events = sim.drainEvents();
+    const stops = events.filter((e: any) => e.type === 'castStop' && e.entityId === p.id);
+    expect(stops.some((e: any) => e.success === false)).toBe(true); // a genuine cancel
+    expect(events).toContainEqual(
+      expect.objectContaining({
+        type: 'error',
+        text: 'You have no target.',
+        reason: 'target_dead',
+      }),
+    );
+    expect(sim.ctx.pendingProjectiles.length).toBe(0); // the cast never resolved into a hit
+  });
+
+  it('cancels a plain timed hostile cast when its locked target is removed from the world entirely (not merely marked dead)', () => {
+    const { sim, p, meta } = makeSim('mage', 12);
+    const mob = spawnTarget(sim, p, 12, 6);
+    castAbility(sim.ctx, 'fireball', p.id);
+    expect(p.castTargetId).toBe(mob.id);
+    sim.drainEvents();
+
+    sim.entities.delete(mob.id); // despawned/removed outright, never marked .dead
+    updateCasting(sim.ctx, p, meta);
+
+    expect(p.castingAbility).toBeNull();
+    const events = sim.drainEvents();
+    expect(
+      events.some((e: any) => e.type === 'castStop' && e.entityId === p.id && e.success === false),
+    ).toBe(true);
+    // A target that vanished, rather than one confirmed dead, carries no
+    // target_dead reason (mirrors castAbility's own start-time gate).
+    const errEvent = events.find((e: any) => e.type === 'error') as any;
+    expect(errEvent?.text).toBe('You have no target.');
+    expect(errEvent?.reason).toBeUndefined();
+  });
+
+  it('does NOT cancel a channeling cast via the new tick-level check (channels keep their own per-pulse target check)', () => {
+    const { sim, p, meta } = makeSim('mage', 12);
+    expect(sim.setSpec('arcane')).toBe(true);
+    const mob = spawnTarget(sim, p, 12, 6);
+    p.resource = p.maxResource;
+    castAbility(sim.ctx, 'arcane_missiles', p.id);
+    expect(p.channeling).toBe(true);
+    expect(p.castTargetId).toBe(mob.id);
+
+    handleDeath(sim.ctx, mob, p); // dies well before the 1s-interval first pulse
+    updateCasting(sim.ctx, p, meta); // one tick later: the new timed-cast check must not fire here
+
+    expect(p.castingAbility).toBe('arcane_missiles'); // still running; only the per-pulse check may cancel it
+    expect(p.channeling).toBe(true);
+  });
+
+  it('does not cancel a combat-resurrection cast even though its (deliberately dead) target stays dead', () => {
+    const { sim, p, meta } = makeSim('mage', 20);
+    expect(sim.setSpec('arcane')).toBe(true);
+    const ally = sim.entities.get(sim.addPlayer('warrior', 'Fallen')) as AnyEntity;
+    placePlayerInOpenField(sim, ally.id, { x: 2 });
+    sim.partyInvite(ally.id, p.id);
+    sim.partyAccept(ally.id);
+    ally.dead = true;
+    ally.hp = 0;
+    ally.corpsePos = { ...ally.pos };
+    p.resource = p.maxResource;
+    sim.targetEntity(ally.id, p.id);
+    castAbility(sim.ctx, 'temporal_reversal', p.id);
+    expect(p.castingAbility).toBe('temporal_reversal');
+    expect(p.castTargetId).toBe(ally.id);
+
+    for (let i = 0; i < 10; i++) updateCasting(sim.ctx, p, meta); // well inside the 2s cast
+
+    // The new dead/gone-target check is excluded for targetsDead casts (its own
+    // reach/dead-ally gate above already owns this); it must still be running.
+    expect(p.castingAbility).toBe('temporal_reversal');
+  });
+
+  it('does not cancel a friendly heal when its target dies mid-cast (still falls back to self at completion)', () => {
+    const { sim, p, meta } = makeSim('priest', 12);
+    const ally = sim.entities.get(sim.addPlayer('warrior', 'Ally')) as AnyEntity;
+    placePlayerInOpenField(sim, ally.id, { x: 2 });
+    p.hp = Math.max(1, p.maxHp - 500);
+    const selfHp0 = p.hp;
+    sim.targetEntity(ally.id, p.id);
+    castAbility(sim.ctx, 'lesser_heal', p.id);
+    expect(p.castingAbility).toBe('lesser_heal');
+    expect(p.castTargetId).toBe(ally.id);
+
+    handleDeath(sim.ctx, ally, null); // the heal target dies mid-cast
+
+    for (let i = 0; i < 3; i++) {
+      updateCasting(sim.ctx, p, meta);
+      expect(p.castingAbility).toBe('lesser_heal'); // never cancelled early by the new check
+    }
+    drainCast(sim, p, meta);
+
+    expect(p.castingAbility).toBeNull(); // ran to its natural completion
+    expect(p.hp).toBeGreaterThan(selfHp0); // resolveFriendlyTarget fell back to the caster
   });
 
   it('resolves a completed friendly heal against the target locked at cast start', () => {
@@ -519,6 +632,244 @@ describe('casting_lifecycle: pushbackCast', () => {
     pushbackCast(p);
     expect(p.channeling).toBe(true);
     expect(p.castRemaining).toBeCloseTo(Math.max(0, rem0 - tot0 * CHANNEL_PUSHBACK_FRACTION), 9);
+  });
+
+  // Bug report: taking hits during a Consume channel should drop the ticks the
+  // shortened channel no longer has room for (classic-era pushback trims the
+  // trailing tick count along with the time), not fire them all in one burst
+  // the instant the clipped channel ends. pushbackCast only ever shortens
+  // castRemaining; it never touches channelTickTimer/channelTicksLeft, so the
+  // two clocks fall out of lockstep and updateCasting's completion-time flush
+  // (meant only to rescue a single tick lost to floating-point drift, see the
+  // Arcane Missiles 5-barrage fix) used to force-fire every tick pushback had
+  // orphaned, all at the same instant, instead of dropping them.
+  it('drops ticks a channel-ending pushback orphans instead of bursting them at completion', () => {
+    const { sim, p, meta } = makeSim('warlock', 12);
+    spawnTarget(sim, p);
+    castAbility(sim.ctx, 'drain_life', p.id);
+    updateCasting(sim.ctx, p, meta); // Consume's first pulse fires on the very first update
+    expect(p.channelTicksLeft).toBe(2); // two of the drain's three ticks still owed
+    expect(sim.ctx.pendingProjectiles).toHaveLength(1);
+
+    // Four hits (each CHANNEL_PUSHBACK_FRACTION = 25% of the channel's total)
+    // fully exhaust castRemaining without ever advancing the tick clock: by
+    // construction neither owed tick's own schedule has come due yet.
+    pushbackCast(p);
+    pushbackCast(p);
+    pushbackCast(p);
+    pushbackCast(p);
+    expect(p.castRemaining).toBe(0);
+    // Pushback gives up the boundaries the shortened channel can no longer
+    // reach, so both owed ticks are already surrendered before completion.
+    expect(p.channelTicksLeft).toBe(0);
+
+    let maxFiredInOneUpdate = 0;
+    let updates = 0;
+    while (p.castingAbility && updates++ < 1000) {
+      const before = sim.ctx.pendingProjectiles.length;
+      updateCasting(sim.ctx, p, meta);
+      maxFiredInOneUpdate = Math.max(
+        maxFiredInOneUpdate,
+        sim.ctx.pendingProjectiles.length - before,
+      );
+    }
+
+    expect(p.castingAbility).toBeNull(); // the channel still completes
+    // Only the tick that fired before the channel was cut short ever goes out;
+    // both ticks the pushback orphaned are dropped, never bundled into a
+    // same-instant completion burst.
+    expect(sim.ctx.pendingProjectiles).toHaveLength(1);
+    expect(maxFiredInOneUpdate).toBeLessThanOrEqual(1);
+    expect(p.channelTicksLeft).toBe(0);
+  });
+
+  it('still fires the drain fixed-count exactly, unpushed (the flush gate is a no-op here)', () => {
+    const { sim, p, meta } = makeSim('warlock', 12);
+    spawnTarget(sim, p);
+    castAbility(sim.ctx, 'drain_life', p.id);
+    drainCast(sim, p, meta);
+    expect(p.castingAbility).toBeNull();
+    expect(sim.ctx.pendingProjectiles).toHaveLength(3); // all 3 ticks land, none dropped
+    expect(p.channelTicksLeft).toBe(0);
+  });
+
+  it('drops only the one tick a smaller pushback orphans, without bursting it with a neighbor', () => {
+    const { sim, p, meta } = makeSim('warlock', 12);
+    spawnTarget(sim, p);
+    castAbility(sim.ctx, 'drain_life', p.id);
+    updateCasting(sim.ctx, p, meta); // tick 1 fires
+    expect(p.channelTicksLeft).toBe(2);
+
+    // Two hits (50% of the channel's total) leave enough time for tick 2's own
+    // schedule to still come due naturally, but not tick 3's: a PARTIAL clip,
+    // distinct from the full-exhaustion case above, so the fix's due-time gate
+    // is exercised at its boundary rather than only the all-or-nothing extreme.
+    pushbackCast(p);
+    pushbackCast(p);
+    expect(p.castRemaining).toBeGreaterThan(0);
+
+    let maxFiredInOneUpdate = 0;
+    let updates = 0;
+    while (p.castingAbility && updates++ < 1000) {
+      const before = sim.ctx.pendingProjectiles.length;
+      updateCasting(sim.ctx, p, meta);
+      maxFiredInOneUpdate = Math.max(
+        maxFiredInOneUpdate,
+        sim.ctx.pendingProjectiles.length - before,
+      );
+    }
+
+    expect(p.castingAbility).toBeNull();
+    // Tick 2 still lands on its own schedule; only tick 3 (the one the
+    // pushback's shortened duration no longer has room for) is dropped, and
+    // it is dropped alone rather than bundled with tick 2 into a burst.
+    expect(sim.ctx.pendingProjectiles).toHaveLength(2);
+    expect(maxFiredInOneUpdate).toBeLessThanOrEqual(1);
+    expect(p.channelTicksLeft).toBe(0);
+  });
+
+  it('still flushes a tick whose own timer is a hair positive at completion (floating-point drift, e.g. Arcane Missiles)', () => {
+    const { sim, p, meta } = makeSim('warlock', 12);
+    spawnTarget(sim, p);
+    castAbility(sim.ctx, 'drain_life', p.id);
+    // The residual the Arcane Missiles 5-barrage bug pins: after this update's
+    // ordinary DT decrement, channelTickTimer lands a hair ABOVE zero (drift),
+    // so the ordinary "if (channelTickTimer <= 0)" firing check above does NOT
+    // catch it, at the exact same update where castRemaining also completes.
+    // This is independent of pushback: it pins that the fix's due-time gate
+    // still rescues a genuinely-due tick, not just drops everything on sight.
+    p.channelTickTimer = DT + 3e-16;
+    p.castRemaining = DT;
+    p.channelTicksLeft = 1;
+    const before = sim.ctx.pendingProjectiles.length;
+    updateCasting(sim.ctx, p, meta);
+    expect(sim.ctx.pendingProjectiles.length - before).toBe(1); // the due tick still fires
+    expect(p.castingAbility).toBeNull();
+    expect(p.channelTicksLeft).toBe(0);
+  });
+
+  it('drops even the first tick of a non-front-loaded channel pushed back before it ever comes due (mind_flay)', () => {
+    const { sim, p, meta } = makeSim('priest', 14);
+    spawnTarget(sim, p);
+    castAbility(sim.ctx, 'mind_flay', p.id);
+    // Unlike Consume, mind_flay's first tick is not front-loaded to fire on
+    // the very first update: nothing has fired yet at channel start.
+    expect(p.channelTicksLeft).toBe(3);
+    expect(sim.ctx.pendingProjectiles).toHaveLength(0);
+
+    // Four hits fully exhaust castRemaining before mind_flay's first tick
+    // (due at channelTickEvery, about 1s in) ever has a chance to fire.
+    pushbackCast(p);
+    pushbackCast(p);
+    pushbackCast(p);
+    pushbackCast(p);
+    expect(p.castRemaining).toBe(0);
+
+    drainCast(sim, p, meta);
+    expect(p.castingAbility).toBeNull();
+    expect(sim.ctx.pendingProjectiles).toHaveLength(0); // every tick dropped, none forced
+    expect(p.channelTicksLeft).toBe(0);
+  });
+
+  it('drops the fixed-count ticks a shortened channel no longer reaches', () => {
+    const { sim, p } = makeSim('warlock', 12);
+    spawnTarget(sim, p);
+    castAbility(sim.ctx, 'drain_life', p.id);
+    // Consume runs 3s over 3 ticks with the first pulse front-loaded to one DT,
+    // so its tick boundaries sit at 0.05s, 1.05s and 2.05s.
+    expect(p.channelTicksLeft).toBe(3);
+    pushbackCast(p); // 3.00s to 2.25s: every boundary still fits
+    expect(p.channelTicksLeft).toBe(3);
+    pushbackCast(p); // 2.25s to 1.50s: the 2.05s boundary no longer fits
+    expect(p.channelTicksLeft).toBe(2);
+  });
+});
+
+// A fixed-count channel tick queues exactly one bolt (Aether Darts, Consume), and
+// driving updateCasting alone never advances the projectile queue, so the queue
+// length is a running count of the ticks fired.
+function runChannelTicks(
+  sim: AnySim,
+  p: AnyEntity,
+  meta: any,
+  pushbackOnTicks: number[],
+): number[] {
+  const firedPerTick: number[] = [];
+  let queued = sim.ctx.pendingProjectiles.length;
+  for (let i = 0; p.castingAbility && i < 400; i++) {
+    if (pushbackOnTicks.includes(i)) pushbackCast(p);
+    updateCasting(sim.ctx, p, meta);
+    const now = sim.ctx.pendingProjectiles.length;
+    firedPerTick.push(now - queued);
+    queued = now;
+  }
+  return firedPerTick;
+}
+
+function totalFired(perTick: number[]): number {
+  return perTick.reduce((a, b) => a + b, 0);
+}
+
+describe('casting_lifecycle: channel pushback costs the ticks it removes', () => {
+  // Aether Darts: 3s over 3 ticks with no front-load, so its boundaries land at
+  // 1s, 2s and 3s and the last one coincides with the channel's own end.
+  function aetherDartsCaster() {
+    const { sim, p, meta } = makeSim('mage', 20);
+    expect(sim.setSpec('arcane')).toBe(true);
+    spawnTarget(sim, p, 12);
+    castAbility(sim.ctx, 'arcane_missiles', p.id);
+    expect(p.channeling).toBe(true);
+    expect(p.channelTicksLeft).toBe(3);
+    return { sim, p, meta };
+  }
+
+  it('lands every authored tick, one per boundary, when nothing pushes back', () => {
+    const { sim, p, meta } = aetherDartsCaster();
+    const perTick = runChannelTicks(sim, p, meta, []);
+    expect(totalFired(perTick)).toBe(3);
+    expect(Math.max(...perTick)).toBe(1); // never two missiles inside one sim tick
+    // The final boundary coincides with the channel's end, so the drift-recovery
+    // flush is what delivers it: it must still land.
+    expect(perTick[perTick.length - 1]).toBe(1);
+  });
+
+  it('loses the tail ticks that no longer fit after two pushbacks', () => {
+    const { sim, p, meta } = aetherDartsCaster();
+    const perTick = runChannelTicks(sim, p, meta, [0, 1]);
+    expect(totalFired(perTick)).toBeLessThan(3); // the shortened channel costs ticks
+    expect(totalFired(perTick)).toBeGreaterThan(0);
+    expect(Math.max(...perTick)).toBe(1); // the end flush never dumps the rest of the barrage
+  });
+
+  it('never fires more ticks than the channel authored, however often it is hit', () => {
+    const { sim, p, meta } = aetherDartsCaster();
+    const everyTick = Array.from({ length: 60 }, (_, i) => i);
+    const perTick = runChannelTicks(sim, p, meta, everyTick);
+    expect(totalFired(perTick)).toBeLessThan(3);
+    expect(Math.max(...perTick, 0)).toBeLessThanOrEqual(1);
+  });
+
+  it('costs a pushed Consume real drain damage and self-heal', () => {
+    const runDrain = (pushbackOnTicks: number[]) => {
+      const { sim, p, meta } = makeSim('warlock', 12);
+      const mob = spawnTarget(sim, p);
+      p.hp = 1; // room for every self-heal to land unclamped
+      const mobHp0 = mob.hp;
+      castAbility(sim.ctx, 'drain_life', p.id);
+      const perTick = runChannelTicks(sim, p, meta, pushbackOnTicks);
+      for (let i = 0; i < 200 && sim.ctx.pendingProjectiles.length > 0; i++)
+        advancePendingProjectiles(sim.ctx);
+      return { perTick, simTicks: perTick.length, healed: p.hp - 1, dealt: mobHp0 - mob.hp };
+    };
+
+    const clean = runDrain([]);
+    const pushed = runDrain([0, 1]);
+    expect(totalFired(clean.perTick)).toBe(3);
+    expect(pushed.simTicks).toBeLessThan(clean.simTicks); // pushback did shorten it
+    expect(totalFired(pushed.perTick)).toBeLessThan(3); // and it cost pulses
+    expect(Math.max(...pushed.perTick)).toBe(1); // never a whole drain in one sim tick
+    expect(pushed.dealt).toBeLessThan(clean.dealt);
+    expect(pushed.healed).toBeLessThan(clean.healed);
   });
 });
 

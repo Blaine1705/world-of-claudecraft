@@ -55,6 +55,8 @@ function harness(inventory: InvSlot[]): {
     restoreFocus: noop,
     renderCharIfOpen: noop,
     vendorOpen: () => false,
+    isVaultBankTab: () => false,
+    confirmVendorSell: () => true,
     tradeOpen: () => false,
     isMarketSell: () => false,
     isMailAttach: () => false,

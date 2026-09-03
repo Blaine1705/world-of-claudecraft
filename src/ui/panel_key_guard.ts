@@ -4,8 +4,10 @@
 // non-modal overlays, so canUseGameKeys() stays true over them and the global
 // jump (Space) / chat (Enter) binds would otherwise hijack those keys on a
 // focused panel button (the map's Quests toggle, a bank grid cell, and each
-// close button included). The Hud's guard stops propagation, but NOT the
-// default, so the button's native activation still fires.
+// close button included). The shared guard (pointer_blur.ts
+// bindChromeButtonKeyGuard, wired over every root in chrome_focus_wiring.ts)
+// stops propagation on this decision, but NOT the default, so the button's
+// native activation still fires.
 //
 // The one exception is a bag ITEM row. That button runs a GAME action (use /
 // summon / equip / sell / deposit), so Space over it must stay Jump:
@@ -25,10 +27,22 @@
 /** Marks a bag item row: the one panel button Space must pass through. */
 export const BAG_ITEM_ROW_ATTR = 'data-bag-item-row';
 
+/** The slice of a keydown target the rule reads. Structural (not HTMLElement) so
+ *  the DOM-free guard in pointer_blur.ts can hand it a plain event target and
+ *  the Node-side tests can hand it a bare `{ tagName }` fake. */
+export interface PanelKeyTarget {
+  tagName?: string;
+  hasAttribute?(name: string): boolean;
+}
+
 /** True when a key over `target` is a panel activation the game must not also see. */
-export function panelKeyGuardStops(target: HTMLElement, key: string, code: string): boolean {
-  if (target.tagName !== 'BUTTON') return false;
+export function panelKeyGuardStops(
+  target: PanelKeyTarget | null | undefined,
+  key: string,
+  code: string,
+): boolean {
+  if (target?.tagName !== 'BUTTON') return false;
   const isSpace = key === ' ' || key === 'Spacebar' || code === 'Space';
-  if (isSpace) return !target.hasAttribute(BAG_ITEM_ROW_ATTR);
+  if (isSpace) return !target.hasAttribute?.(BAG_ITEM_ROW_ATTR);
   return key === 'Enter';
 }

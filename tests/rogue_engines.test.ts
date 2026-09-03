@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { onCastCompleted } from '../src/sim/combat/talent_procs';
 import { MOBS } from '../src/sim/data';
-import { equipBestInSlotForDev } from '../src/sim/dev/bis_gear';
+import { equipReferenceEpicKitForDev } from '../src/sim/dev/bis_gear';
 import { resetCombatForDev } from '../src/sim/dev_commands';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
@@ -331,11 +331,18 @@ describe('Skulduggery: the Gloam bank and its detonation', () => {
     (sim as unknown as { addEntity(e: Entity): void }).addEntity(mob);
     sim.targetEntity(mob.id);
     p.facing = 0;
-    equipBestInSlotForDev(
-      (sim as unknown as { ctx: Parameters<typeof equipBestInSlotForDev>[0] }).ctx,
+    equipReferenceEpicKitForDev(
+      (sim as unknown as { ctx: Parameters<typeof equipReferenceEpicKitForDev>[0] }).ctx,
       p.id,
     ); // Lurker's Strike requires a dagger
     p.critChance = 0; // crits keep kind 'hit' (crit flag), so pin them off
+    // Pin the miss off too: the detonation is ONE swing, and hitBonus 1
+    // floors player-to-mob miss at 0 (swingMissChance). Two luck arms
+    // survive the pins, because neither reads an entity field this test can
+    // zero: a mob target keeps the 5 percent formula dodge slot, and the
+    // veiled opener carries its own authored crit arm on top of critChance.
+    // The hunted idle tick below parks the draw on a plain hit.
+    p.hitBonus = 1;
     const isHit = (e: SimEvent): e is SimEvent & { amount: number; ability: string | null } =>
       e.type === 'damage' &&
       (e as { kind?: string }).kind === 'hit' &&
@@ -358,6 +365,13 @@ describe('Skulduggery: the Gloam bank and its detonation', () => {
     // and the armed bank must waive the behind requirement or the detonator
     // could never land outside a group (owner playtest bug).
     mob.facing = Math.PI;
+
+    // Hunted idle (seed 23, after every beat above, re-hunted on the
+    // release/v0.37.0 castle base): one tick parks the shared stream where
+    // the single detonation swing resolves as a plain non-crit hit (the
+    // formula dodge slot and the authored opener crit arm both stay live,
+    // see the pin comment above).
+    sim.tick();
 
     // The detonation: one press, in the open, face to face. The veil rises
     // BEFORE the strike resolves, so this very hit is the doubled one.

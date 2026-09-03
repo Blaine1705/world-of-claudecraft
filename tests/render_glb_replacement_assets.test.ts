@@ -34,6 +34,7 @@ import { fishPreloadInternalsForTest } from '../src/render/fish';
 import { galeFeaturesPreloadInternalsForTest } from '../src/render/gale_features';
 import { gardenFeaturesPreloadInternalsForTest } from '../src/render/garden_features';
 import { gatherNodePreloadInternalsForTest } from '../src/render/gather_nodes';
+import { ignivarEnvPropsInternalsForTest } from '../src/render/ignivar_env_props';
 import { mailboxPreloadInternalsForTest } from '../src/render/mailbox';
 import { propPreloadInternalsForTest } from '../src/render/props';
 import { questObjectPreloadInternalsForTest } from '../src/render/quest_objects';
@@ -72,7 +73,7 @@ const armouryFinalPipelineEnabled =
     item.src?.endsWith('eastbrook_grand_armoury-final.glb'),
   ) ?? false;
 const ARMOURY_SHIPPING_BYTE_CEILING = 160 * 1024;
-const ARMOURY_SHIPPING_SHA256 = 'f3db9ea85d0a82595f8d62b11c95e2f0bd19f105edece22ba510cc0b2dd3e0c7';
+const ARMOURY_SHIPPING_SHA256 = 'd7c056c90862ef3684ac33008ff8b748cb04b784f1629fe6f7c4cc36f669401e';
 const MANIFEST_HASH_LENGTH = 12;
 
 function expectAssetExistsAndManifested(url: string): void {
@@ -678,6 +679,12 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
   it('dungeon door arch asset', () => {
     expectAssetExistsAndManifested(doorPortalPreloadInternalsForTest.doorArchAssetUrl);
     expectAssetExistsAndManifested(doorPortalPreloadInternalsForTest.wildheartGateAssetUrl);
+  });
+
+  it('ignivar raid dressing prop assets', () => {
+    for (const url of Object.values(ignivarEnvPropsInternalsForTest.urls)) {
+      expectAssetExistsAndManifested(url);
+    }
   });
 
   it('quest object assets', () => {

@@ -31,14 +31,17 @@ import {
 import { drainRelay, type QueuedRelay, requeueRelay } from './discord_relay';
 import type { GameServer } from './game';
 import {
+  DASHBOARD_SECRET_ENV,
+  DASHBOARD_SECRET_HEADER,
   DEPLOY_SECRET_ENV,
   DEPLOY_SECRET_HEADER,
   DISCORD_SECRET_ENV,
   DISCORD_SECRET_HEADER,
   requireInternalSecret,
 } from './http/middleware/require_internal_secret';
-import type { RouteDef, RouteHandler, RouteMeta } from './http/types';
+import type { Ctx, RouteDef, RouteHandler, RouteMeta } from './http/types';
 import { json, readBody } from './http_util';
+import type { WocMarketService, WocStuckCustodyReadout } from './woc_market';
 
 function ok(res: http.ServerResponse, data: unknown): void {
   json(res, 200, { success: true, data, error: null });
@@ -79,6 +82,164 @@ export async function handleInternalApi(
   }
 
   return fail(res, 404, 'unknown endpoint');
+}
+
+/**
+ * Secret-gated operator READS for the internal dashboard.
+ *
+ * These exist because listings and p2p trades live only in this process's
+ * database: the economy service owns quotes and settings, and nothing else can
+ * see a listing. The dashboard reaches them the way it already reaches the
+ * payout and economy services, with a shared secret injected server-side, so no
+ * privileged user credential is stored merely to read an ops table.
+ *
+ * Reads plus exactly ONE write, the parked-review settlement ruling. Every
+ * OTHER mutation an operator could want lives on the role-gated /admin/api
+ * surface with its own audit trail, and moving one here would move it out
+ * from under that. The ruling is the deliberate exception: its workflow is
+ * inseparable from the stuck readout the dashboard renders (verify the row
+ * on chain, then rule it), and the game admin SPA has no market surface at
+ * all. What compensates for the shared secret carrying no actor: the
+ * dashboard side gates the control on its settlement-management role and
+ * sends the acting username in the body's note (echoed into the audit log
+ * line here), the service's kill switch freezes the arm with the other
+ * operator writes, and the ruling rides the realm-scoped transition CAS.
+ */
+const LISTING_STATUSES = [
+  'active',
+  'ending',
+  'settling',
+  'closed',
+  'sold',
+  'cancelled',
+  'all',
+] as const;
+const OFFER_STATUSES = ['pending', 'accepted', 'declined', 'withdrawn', 'expired', 'all'] as const;
+
+const OPS_DAY_MS = 24 * 60 * 60 * 1000;
+
+/** An unrecognised value falls back to the default rather than refusing: an ops
+ *  read answering 400 on a typo is less useful than one showing the default. */
+function readEnum<T extends string>(raw: string | null, allowed: readonly T[], fallback: T): T {
+  return allowed.includes(raw as T) ? (raw as T) : fallback;
+}
+
+/** A query-string integer with a default. Distinct from clampInt below, which
+ *  clamps an already-decoded value and has no notion of an absent parameter. */
+function intParam(raw: string | null, fallback: number, min: number, max: number): number {
+  // ABSENT is checked before Number(), not after. Number(null) and Number('')
+  // are both 0, and 0 is finite, so a "not a number, use the default" guard
+  // never fires for a missing parameter: the window silently collapsed to
+  // fromMs=toMs=0 and every read came back empty.
+  if (raw === null || raw.trim() === '') return fallback;
+  const n = Number(raw);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.min(Math.max(Math.trunc(n), min), max);
+}
+
+/** The window, defaulting to the last 30 days. Both ends are clamped so a
+ *  malformed or hostile range cannot turn an ops read into a full scan with an
+ *  unbounded sort. */
+function readRange(query: Ctx['query']): { fromMs: number; toMs: number } {
+  const now = Date.now();
+  const toMs = intParam(param(query, 'toMs'), now, 0, now + OPS_DAY_MS);
+  const fromMs = intParam(param(query, 'fromMs'), toMs - 30 * OPS_DAY_MS, 0, toMs);
+  return { fromMs, toMs };
+}
+
+/** ctx.query, not a re-parse of ctx.req.url: the dispatcher already parsed the
+ *  request, and re-deriving it here read an empty search string, so every filter
+ *  silently fell back to its default. A repeated key arrives as an array, and
+ *  the first value is the one that counts. */
+function param(query: Ctx['query'], key: string): string | null {
+  const raw = query[key];
+  if (raw === undefined) return null;
+  return Array.isArray(raw) ? (raw[0] ?? null) : raw;
+}
+
+function opsQuery(ctx: Ctx): { query: Ctx['query']; page: number; pageSize: number } {
+  return {
+    query: ctx.query,
+    page: intParam(param(ctx.query, 'page'), 0, 0, 10_000),
+    pageSize: intParam(param(ctx.query, 'pageSize'), 50, 1, 200),
+  };
+}
+
+async function opsListingsHandler(ctx: Ctx): Promise<void> {
+  const service = wocMarketOps;
+  // An unwired market is a 404, matching how an unset secret reads: the
+  // dashboard learns the surface is unavailable, not that it guessed wrong.
+  if (!service) return fail(ctx.res, 404, 'unknown endpoint');
+  const { query, page, pageSize } = opsQuery(ctx);
+  const status = readEnum(param(query, 'status'), LISTING_STATUSES, 'active');
+  ok(ctx.res, await service.opsListings({ status, ...readRange(query), page, pageSize }));
+}
+
+async function opsP2pTradesHandler(ctx: Ctx): Promise<void> {
+  const service = wocMarketOps;
+  if (!service) return fail(ctx.res, 404, 'unknown endpoint');
+  const { query, page, pageSize } = opsQuery(ctx);
+  const status = readEnum(param(query, 'status'), OFFER_STATUSES, 'all');
+  ok(ctx.res, await service.opsP2pTrades({ status, ...readRange(query), page, pageSize }));
+}
+
+async function opsStuckHandler(ctx: Ctx): Promise<void> {
+  const read = wocMarketStuckRead;
+  // An unwired monitor is a 404, matching how an unset secret reads.
+  if (!read) return fail(ctx.res, 404, 'unknown endpoint');
+  // Deliberately parameter-free: every caller gets the same bounded readout,
+  // which is what lets the monitor's cached read serve all of them.
+  ok(ctx.res, await read());
+}
+
+async function opsResolveSettlementHandler(ctx: Ctx): Promise<void> {
+  const service = wocMarketOps;
+  // An unwired market is a 404, matching the sibling reads above.
+  if (!service) return fail(ctx.res, 404, 'unknown endpoint');
+  // Digits-only, then range: Number() alone also accepts hex, exponent and
+  // whitespace-padded forms, which an operator pasting from a log must not
+  // discover the hard way on a money path.
+  const rawId = ctx.params.id ?? '';
+  if (!/^\d+$/.test(rawId)) return fail(ctx.res, 400, 'invalid settlement id');
+  const id = Number(rawId);
+  if (!Number.isSafeInteger(id) || id <= 0) {
+    return fail(ctx.res, 400, 'invalid settlement id');
+  }
+  // A malformed or over-cap body is its own refusal, never disguised as a
+  // verdict complaint.
+  let body: Record<string, unknown>;
+  try {
+    body = (await readBody(ctx.req)) as Record<string, unknown>;
+  } catch {
+    return fail(ctx.res, 400, 'invalid JSON body');
+  }
+  const verdict = body.verdict;
+  if (verdict !== 'paid' && verdict !== 'unpaid') {
+    return fail(ctx.res, 400, "verdict must be 'paid' or 'unpaid'");
+  }
+  // Optional attribution (the dashboard sends who clicked; a ticket id or the
+  // verified signature may ride along): bounded and flattened for the log.
+  const note =
+    typeof body.note === 'string' ? body.note.replace(/\s+/g, ' ').trim().slice(0, 200) : '';
+  const out = await service.adminResolveReviewSettlement(id, verdict);
+  if (!out.ok) {
+    // The kill switch freezes this write (the service's own gate); the CAS
+    // answers are operator truths, not errors in the request. A live row
+    // outside review carries its actual state so the operator can tell a
+    // lost race from a mistyped id onto a settlement in another phase.
+    if (out.reason === 'disabled') return fail(ctx.res, 409, 'market disabled');
+    if ('state' in out) {
+      return fail(ctx.res, 409, 'settlement is not in review', { state: out.state });
+    }
+    return fail(ctx.res, 404, 'settlement not found');
+  }
+  // Dev-channel breadcrumb (no player surface): the ruling is the one manual
+  // state transition in the market, so this line plus the row's fail_reason
+  // provenance and updated_at are the durable audit trail.
+  console.log(
+    `[woc_market] review settlement ${id} resolved ${verdict} -> ${out.to}${note ? ` (${note})` : ''}`,
+  );
+  ok(ctx.res, { resolved: verdict, state: out.to });
 }
 
 // Secret-gated server<->bot channel. The Discord bot (a separate process) reads
@@ -635,6 +796,40 @@ export function configureInternalRuntime(runtime: InternalRuntime): void {
 /** Clear the injected runtime so a unit test can install its own fake. */
 export function resetInternalRuntimeForTests(): void {
   internalRuntime = null;
+  wocMarketOps = null;
+  wocMarketStuckRead = null;
+}
+
+/**
+ * The market's operator surface, injected at boot like the runtime above:
+ * the two ops reads plus the parked-review resolution arm (the one operator
+ * WRITE this surface carries; it rides the service's own kill-switch gate).
+ *
+ * Injected rather than imported: reaching woc_market_routes from here drags
+ * admin.ts and account.ts in behind it, and this module is loaded by tests that
+ * mock server/db down to a bare pool token. A type-only import costs nothing at
+ * runtime and keeps that graph flat.
+ */
+type WocMarketOps = Pick<
+  WocMarketService,
+  'opsListings' | 'opsP2pTrades' | 'adminResolveReviewSettlement'
+>;
+
+let wocMarketOps: WocMarketOps | null = null;
+
+export function configureInternalWocMarketOps(ops: WocMarketOps): void {
+  wocMarketOps = ops;
+}
+
+/** The stuck-custody readout behind GET /internal/woc-market/stuck, injected
+ *  as a thunk over the monitor's CACHED read (server/woc_market_monitor.ts):
+ *  this surface must never learn about the db or grow a per-request query. */
+let wocMarketStuckRead: (() => Promise<WocStuckCustodyReadout>) | null = null;
+
+export function configureInternalWocMarketStuckRead(
+  read: () => Promise<WocStuckCustodyReadout>,
+): void {
+  wocMarketStuckRead = read;
 }
 
 /** The injected runtime, or a loud failure if a request somehow beat boot wiring. */
@@ -653,12 +848,69 @@ const deployGate = requireInternalSecret({
   header: DEPLOY_SECRET_HEADER,
   envVar: DEPLOY_SECRET_ENV,
 });
+/** The dashboard's own gate: its own secret and header, so revoking the
+ *  dashboard's access never touches the Discord bot's. */
+const dashboardGate = requireInternalSecret({
+  header: DASHBOARD_SECRET_HEADER,
+  envVar: DASHBOARD_SECRET_ENV,
+});
+
 const discordGate = requireInternalSecret({
   header: DISCORD_SECRET_HEADER,
   envVar: DISCORD_SECRET_ENV,
 });
 
 export const routes: RouteDef[] = [
+  {
+    method: 'GET',
+    path: '/internal/woc-market/listings',
+    surface: 'internal',
+    meta: INTERNAL_META,
+    middleware: [dashboardGate],
+    handler: opsListingsHandler,
+  },
+  {
+    method: 'GET',
+    path: '/internal/woc-market/p2p-trades',
+    surface: 'internal',
+    meta: INTERNAL_META,
+    middleware: [dashboardGate],
+    handler: opsP2pTradesHandler,
+  },
+  {
+    // Operator semantics per class: unbookedClaims / stuckDelivering /
+    // undisposedListings follow the parked-delivery runbook (never delete a
+    // claim row; confirm what the buyer holds before hand-delivering).
+    // reviewSettlements are over-aged 'confirming' rows the sweep parked
+    // (fail_reason confirming_overdue): verify the payment reference on chain
+    // with the service release tooling, then drive the resolution through
+    // POST /internal/woc-market/settlements/:id/resolve below, review ->
+    // confirmed (paid: delivery resumes) or review -> failed (unpaid: the
+    // overdue default pass takes over). Hand SQL stays FORBIDDEN (it
+    // bypasses the transition CAS the resolve route rides). stuckBonds are
+    // paid-but-undecided bid bonds past the same bound: still polled, no
+    // automatic void (the money may have landed); verify the signature by
+    // hand and resolve through the same tooling.
+    method: 'GET',
+    path: '/internal/woc-market/stuck',
+    surface: 'internal',
+    meta: INTERNAL_META,
+    middleware: [dashboardGate],
+    handler: opsStuckHandler,
+  },
+  {
+    // The parked-review operator arm (the runbook's pre-enable gate): rules a
+    // settlement the sweep parked in 'review' as paid or unpaid, through the
+    // same transition CAS every other state move rides. Dashboard-secret
+    // gated beside the stuck readout it acts on; the service's kill switch
+    // freezes it with the other operator writes.
+    method: 'POST',
+    path: '/internal/woc-market/settlements/:id/resolve',
+    surface: 'internal',
+    meta: INTERNAL_META,
+    middleware: [dashboardGate],
+    handler: opsResolveSettlementHandler,
+  },
   {
     method: 'POST',
     path: '/internal/restart-countdown',

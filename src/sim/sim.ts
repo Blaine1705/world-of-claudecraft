@@ -19,24 +19,37 @@ import type {
   PlayerProfessionsView,
   ToolEffectSlotView,
 } from '../world_api';
+import type { GroundAimPointXZ } from '../world_api/combat';
 import * as bagsMod from './bags';
 import {
   addStacked,
   BAG_SOCKETS,
   bagCapacity,
+  bagPools,
   canAddItem,
   instancedCountCap,
   migrationBagsFor,
   stackSizeOf,
 } from './bags';
 import * as bankMod from './bank';
-import { type BankState, clampBonusSlots, sanitizeBankState } from './bank';
+import {
+  applyBankBonusStamp,
+  type BankState,
+  emptyBankState,
+  sanitizeBankState,
+  savedBankState,
+} from './bank';
+import * as bankSocketsMod from './bank_sockets';
+import { extractTradableCopyImpl, grantTradableCopyImpl } from './broker_custody';
 import { campSpawnOffset } from './camp_scatter';
+import type { CharacterState, PetState } from './character_state';
+
+export type { CharacterState, PetState } from './character_state';
+
 import { buildCivicServicePlacements } from './civic_service_placements';
 import { advanceClimb, tryStartClimb } from './climb';
 import {
   allocRiftCollisionToken,
-  lineOfSightClear,
   moverHeight,
   placementFloorHeight,
   resolveMovement,
@@ -79,15 +92,15 @@ import {
   isStunned,
   isUnbreakableControlAura,
 } from './combat/cc';
-import { aetherSurgeCostMult, echoVisibleTo } from './combat/chronomancy';
+import { aetherSurgeCostMult } from './combat/chronomancy';
 import {
   dealDamage as dealDamageImpl,
   grantXp as grantXpImpl,
   handleDeath as handleDeathImpl,
 } from './combat/damage';
-import { damageTakenWithin } from './combat/damage_history';
 import { druidEngineCombatState } from './combat/druid_engines';
 import { runEffects as runEffectsImpl } from './combat/effect_dispatch';
+import { steerFearFromWalls } from './combat/fear_steering';
 import { applyIgnite } from './combat/fire_mage';
 import { frostMageChannelPulse } from './combat/frost_mage';
 import { type FrozenOrbState, tickFrozenOrbs } from './combat/frozen_orb';
@@ -101,13 +114,13 @@ import {
   healingThreat as healingThreatImpl,
   hexOutputMult as hexOutputMultImpl,
 } from './combat/heal';
-import { advanceHeroicLeap } from './combat/heroic_leap';
+import { advanceHeroicLeap, heroicLeapPlacementPreview } from './combat/heroic_leap';
 import { resolveColdsightAbility } from './combat/hunter_coldsight';
 import { clearFieldcraftState, finishBloodhook } from './combat/hunter_fieldcraft';
 import { clearPacklordState } from './combat/hunter_packlord';
 import {
   clearHunterTalentState,
-  hunterPetFerocityDamageMultiplier,
+  hunterPetDamageMultiplier,
   resolveHunterSharedAbility,
 } from './combat/hunter_shared';
 import { tickNaturesFury } from './combat/natures_fury';
@@ -128,7 +141,6 @@ import { isVeilboundMarchActive } from './combat/paladin_veilbound_state';
 import { cleanupPriestState } from './combat/priest/lifecycle';
 import { resolveVespersAbility } from './combat/priest/vespers';
 import * as resurrectionOfferMod from './combat/resurrection_offer';
-import { rewindHealAmount } from './combat/rewind';
 import { duskLingerOnStealthBreak } from './combat/rogue_talents';
 import { applySetProcs as applySetProcsImpl } from './combat/set_procs';
 import { clearSpiritmendCurrents } from './combat/shaman_spiritmend';
@@ -147,13 +159,13 @@ import { type AugmentSpecial, type AugmentTier, POWERUPS_BY_ID } from './content
 import { applyTalentMods } from './content/classes';
 import { DEFAULT_MOUNT, type MountKey } from './content/mounts';
 import { GATHERING_PROFESSION_IDS, type GatheringProfessionId } from './content/professions';
+import { PROVING_SHORE_ARRIVAL } from './content/proving_shore';
 import { PTR_DEV_VENDOR_DEF } from './content/ptr_dev_vendor';
 import { FURY_ENTITY_ID, FURY_NPC_ID } from './content/pvp_honor';
 import {
   classHasSkin,
   EVENT_SKIN_TOKEN_ID,
   MECH_CHROMAS,
-  mechChromaItemId,
   mechChromaSkinIndex,
   rankAllowsMechChroma,
   rankAllowsSkin,
@@ -179,12 +191,8 @@ import {
   withWeaponSkinApplied,
 } from './content/weapon_skin_rules';
 import { WEAPON_SKINS } from './content/weapon_skins';
-import {
-  type AbilityChargeState,
-  applyCooldowns,
-  type SavedCooldowns,
-  serializeCooldowns,
-} from './cooldown_persist';
+import { type AbilityChargeState, applyCooldowns, serializeCooldowns } from './cooldown_persist';
+import { dailyRewardsStub } from './daily_rewards_stub';
 import type { DelveShopGate, DelveShopOffer } from './data';
 import {
   ABILITIES,
@@ -222,7 +230,6 @@ import {
   type DeedRuntime,
   freshDeedStats,
   restoreDeedStats,
-  type SavedDeedStats,
   serializeDeedStats,
 } from './deeds';
 import * as companionMod from './delves/companion';
@@ -244,7 +251,6 @@ import {
   createPlayer,
   type PlayerEquipment,
   type PlayerEquipmentInstances,
-  pctValue,
   recalcPlayerStats,
 } from './entity';
 import {
@@ -263,9 +269,13 @@ import * as escortMod from './escort';
 import { initEscorts as initEscortsImpl, updateEscorts as updateEscortsImpl } from './escort';
 import { fleeSpeed } from './flee_speed';
 import { formatMoney } from './format_money';
+import * as groundAoeReadouts from './ground_aoe_readouts';
 import type { GuildBankState, GuildMembership } from './guild_bank';
 import * as guildBankMod from './guild_bank';
+import * as raidReadouts from './ignivar_raid_readouts';
 import * as interaction from './interaction';
+import type { ExtractOutcome, ExtractRef } from './inventory_extract';
+import { foldNamedSlotTarget } from './item_copy_ref';
 import {
   boundCraftedRecipeIdOnLoad,
   sanitizeItemInstancePayloadOnLoad,
@@ -275,11 +285,11 @@ import { canStackInstancePayloads, isMergeableInstancePayload } from './item_ins
 import { meetsLevelRequirement } from './item_level_req';
 import { setItemLocked as setItemLockedCmd } from './item_lock';
 import * as items from './items';
-import type { JailState } from './jail';
 import {
   type DeedsLeaderboardPage,
   type DevLeaderboardPage,
   type GuildLeaderboardPage,
+  type GuildRosterInfo,
   LEADERBOARD_PAGE_SIZE,
   type LeaderboardPage,
   paginateDeedsLeaderboard,
@@ -287,7 +297,9 @@ import {
   paginateGuildLeaderboard,
   paginateLeaderboard,
 } from './leaderboard_page';
+import { entityLineOfSightClear } from './line_of_sight_elevation';
 import type { Ante, PickAction } from './lockpick';
+import { withoutPartyTradeMarker } from './loot/bop_trade_window';
 // L1: the loot-distribution layer (party-loot strategy, the rollLoot roller, copper
 // split, need-greed roll lifecycle, corpse-loot helpers) moved to ./loot/loot_roll.ts;
 // Sim keeps thin same-named delegates that call these.
@@ -307,23 +319,34 @@ import {
 import { type MailSave, PostOffice } from './mail/post_office';
 import { Market, type MarketListing, type MarketSave } from './market';
 import { defaultMarketQuery, type MarketQuery } from './market_query';
+import type { MaterialsVaultState } from './materials_vault';
+import * as vaultMod from './materials_vault';
+import { accountCosmeticsWithWornMechChroma } from './mech_chroma_ownership';
 import {
   mobCombatProfile as mobCombatProfileFn,
   mobEffectiveMeleeRange as mobEffectiveMeleeRangeImpl,
   tryMobMeleeSwingInRange as tryMobMeleeSwingInRangeImpl,
 } from './mob/combat_profile';
 import { updateDragonkinBrood } from './mob/dragonkin_brood';
+import { aggroDungeonPackmates } from './mob/dungeon_pack_aggro';
 import { NYTHRAXIS_SPIRIT_MENDING_CAST_ID } from './mob/healer_channel';
 import { wanderPause } from './mob/idle_rng';
 import * as lifecycle from './mob/lifecycle';
-import { resetEvadingMob as resetEvadingMobFn, updateMob as updateMobFn } from './mob/locomotion';
+import {
+  isInertInstanceCorpse,
+  resetEvadingMob as resetEvadingMobFn,
+  updateMob as updateMobFn,
+} from './mob/locomotion';
 import { runMobSwingAffixes } from './mob/mob_swing';
 import { findNearbyAllies } from './mob/nearby_allies';
+import { applyPlayerDummyVitals } from './mob/practice_dummies';
+import { questGateBlocksAggro, questGateBlocksCombat } from './mob/quest_gated_aggro';
 import {
   createMobScanCounters,
   type MobScanCounters,
   resetMobScanCounters,
 } from './mob/scan_counters';
+import { socialPullSameTemplate } from './mob/social_aggro';
 import {
   retargetMob as retargetMobFn,
   updateMobTarget as updateMobTargetFn,
@@ -527,16 +550,19 @@ import {
   type ReliquaryState,
   reliquaryOwnershipOpts,
   restoreReliquaryState,
-  type SavedReliquaryState,
   serializeReliquaryState,
 } from './reliquary';
 import { sanitizeRemovedZone1Content } from './removed_zone1_content';
+import { freshCounters, type RewardCounters } from './reward_counters';
 import { rideSteepnessAt, shoreStepOut, stepWaterLevel } from './ride_height';
 import { Rng } from './rng';
 import { persistedResource } from './serialize_resource';
+import { computeCharacterModifiers } from './set_bonus_mods';
 import {
   createSimContext,
   type DamageResolution,
+  inertVaultConsumptionAdmission,
+  type RuntimeSimConfig,
   type SimContext,
   type SimContextHost,
 } from './sim_context';
@@ -553,11 +579,15 @@ import {
   spawnOverworldSpiritHealers,
   UNSTUCK_SICKNESS_ID,
 } from './spirit';
+import { resolveStoragePrices, type StoragePrices } from './storage_prices';
 import { repairTalentLoadouts } from './talent_loadouts';
 import {
   CURRENT_CHARACTER_CONTENT_REVISION,
   migrateCharacterTalentsV2,
 } from './talent_save_migration';
+import { updateAbilityDrill } from './tutorial/ability_drill';
+import { updateGauntletRuns } from './tutorial/gauntlet_run';
+import { resolveStartTutorial, updateTutorialGreeting } from './tutorial/greeting';
 import * as unstuckMod from './unstuck';
 import {
   rollWorldBossLoot as rollWorldBossLootImpl,
@@ -577,6 +607,7 @@ import { updateBreath } from './breath';
 import { updateSwimFatigue } from './fatigue';
 import type { CombatExitMemory } from './instance_exit_memory';
 import { chainPullInstanceOnBossAggro } from './instances/boss_chain_pull';
+import { buyCrucibleVendorItem as buyCrucibleVendorItemImpl } from './instances/crucible_vendor';
 import {
   applyDungeonMobTuning,
   mobLevelForDungeonDifficulty,
@@ -584,6 +615,8 @@ import {
 } from './instances/difficulty';
 import {
   awardHeroicMarks as awardHeroicMarksImpl,
+  DEFAULT_RAID_LOCKOUT_MS,
+  DEFAULT_WEEKLY_RAID_LOCKOUT_MS,
   enterCrypt as enterCryptImpl,
   enterDungeon as enterDungeonImpl,
   inheritDungeonResetLocks as inheritDungeonResetLocksImpl,
@@ -599,6 +632,7 @@ import {
   updateInstances as updateInstancesImpl,
 } from './instances/dungeons';
 import { buyHeroicVendorItem as buyHeroicVendorItemImpl } from './instances/heroic_vendor';
+import { freshInstanceSlot } from './instances/instance_slot';
 import { updatePortalTriggers } from './portals';
 import * as questCommands from './quests/quest_commands';
 import {
@@ -664,13 +698,7 @@ export { eloDelta } from './social/arena';
 
 import { FINDER_ACTIVITIES, type FinderListingTag } from './content/dungeon_finder';
 import { setHelmHidden as setHelmHiddenMod } from './helm_visibility';
-import {
-  partyFrameAbsorb,
-  partyFrameAggroTargets,
-  partyFrameAuras,
-  partyFrameIncomingHeals,
-  partyFrameRole,
-} from './party_frame_info';
+import { collectPartyInfo } from './party_frame_info';
 import { DungeonFinderMachine } from './social/dungeon_finder';
 import * as fiestaMod from './social/fiesta';
 // A3: Fiesta tuning consts moved to social/fiesta.ts; these five are read back here
@@ -685,9 +713,6 @@ import {
 import * as fiestaBotsMod from './social/fiesta_bots';
 import { PartyMachine } from './social/party';
 import * as readyCheckMod from './social/ready_check';
-import * as valeCupMod from './social/vale_cup';
-import { createVcState, type VcState } from './social/vale_cup';
-import * as valeCupBotsMod from './social/vale_cup_bots';
 import { SpatialGrid } from './spatial';
 import { diminishedCrowdControlDuration as diminishedCrowdControlDurationImpl } from './stun_dr';
 import { Targeting } from './targeting';
@@ -774,12 +799,9 @@ import {
   type SimEvent,
   type SkinCatalog,
   type SkinRank,
-  type SportRole,
   SUNDER_ARMOR_PCT_PER_STACK,
   steadyAngleTo,
   swingMissChance,
-  type VcBracket,
-  type VcNationId,
   type Vec3,
   virtualLevel,
   type WeaponSkinLoadout,
@@ -790,7 +812,6 @@ import {
 import type { VendorBuyOptions } from './vendor_buy_stack';
 import * as weaponStowMod from './weapon_stow';
 import {
-  crossesGardenHedge,
   groundHeight,
   nearSteepWalls,
   terrainSteepnessAt,
@@ -832,11 +853,6 @@ const FLEEING_FAMILIES: ReadonlySet<MobFamily> = new Set([
 // FALL_SAFE_DISTANCE moved there too; re-exported for social/chat_readouts.ts (the
 // /falling readout shares the landing-damage threshold with the fall-damage model).
 export { FALL_SAFE_DISTANCE } from './player_motion';
-
-// Host-agnostic raid-lockout fallback: when no host injects a reset boundary (offline
-// browser, headless RL env, tests), a kill locks for a flat 24h day. The authoritative
-// server overrides this with its realm-local 3 AM daily reset via SimConfig.raidResetMs.
-const DEFAULT_RAID_LOCKOUT_MS = 24 * 60 * 60 * 1000;
 
 /** The one opts object a movement grant hands the discovery ledger, shared so
  *  the hot grant path never allocates per call (deeds.ts RETRO_SEED is the
@@ -921,15 +937,8 @@ export { DELVE_IMPLEMENTED_AFFIXES, DELVE_MODULE_NAMES } from './delves/runs';
 const MAX_CLIMB_SLOPE = PLAYER_MAX_CLIMB_SLOPE;
 // STEEP_SLIDE_SPEED moved to player_motion.ts (MV1; movement-kernel-only).
 
-// How far a mob pulls same-family neighbours into a fight ("social aggro").
-// Murlocs (the clustered water mobs players call "frogs") used to pull too much,
-// chain-aggroing the whole pond and making solo pulls impossible (#102). Tune
-// per family here; everything else falls back to the default.
+// SOCIAL_PULL_RADIUS moved to mob/social_aggro.ts with socialPullSameTemplate.
 // POTION_COOLDOWN moved to items.ts (W2) with the useItem potion branch.
-const DEFAULT_SOCIAL_PULL_RADIUS = 5;
-const SOCIAL_PULL_RADIUS: Partial<Record<MobFamily, number>> = {
-  mudfin: 8,
-};
 // PACK_FRENZY_AURA_ID moved to mob/lifecycle.ts (M4; used only by frenzyPackmates).
 // BLOOD_FRENZY_AURA_ID moved to combat/damage.ts (C1; used only by maybeFrenzyOnHit).
 // swimSurfaceY / SWIM_SPEED_MULT moved to player_motion.ts (MV1) and imported back
@@ -1145,6 +1154,7 @@ export interface InstanceSlot {
   slot: number;
   partyKey: string | null; // party id or 'solo:<pid>'
   mobIds: number[];
+  npcIds: number[];
   objectIds: number[];
   exitId: number | null;
   // The exit portal a DungeonDef.bossExitPortal dungeon spawns at the final
@@ -1169,6 +1179,17 @@ export interface InstanceSlot {
   // when they actually entered this run: a door-camper or a member parked in
   // town takes the lockout without turning roster membership into mailed income.
   enteredBy: Set<number>;
+  // Durable-character (or offline-entity) identities of THIS kill's own locked
+  // participants who actually stepped through the door: the weekly raid rooms'
+  // cleared-run door exception re-admits exactly these for loot and corpse
+  // runs. Durable-keyed (the raidBossWelcomeKeys idiom) so the relog that
+  // mints a new entity id after a wipe cannot strand a raider outside their
+  // own cleared claim. Session-only, cleared with the claim.
+  raidReturnKeys: Set<string>;
+  // Durable-character or offline-entity identities that already heard this
+  // claim's first-entry raid-boss welcome. Session-only and cleared with the
+  // claim so a relog cannot replay it while a fresh instance can.
+  raidBossWelcomeKeys: Set<string>;
   // Recently-exited-mid-combat memory (issue #2653): a player who left this claim
   // while a mob was actively fighting them has their dropped threat snapshotted
   // here for a short window. Re-entering before it lapses resumes the fight
@@ -1209,18 +1230,6 @@ export interface ResolvedAbility {
   hunterRhythm?: boolean;
 }
 
-export interface RewardCounters {
-  damageDealt: number;
-  damageTaken: number;
-  kills: number;
-  deaths: number;
-  xpGained: number;
-  questsCompleted: number;
-  questProgress: number;
-  lootCopper: number;
-  levelUps: number;
-}
-
 export interface SentChat {
   channel: 'say' | 'yell' | 'whisper' | 'general' | 'party' | 'battleground' | 'world' | 'lfg';
   message: string;
@@ -1256,6 +1265,9 @@ export interface PlayerMeta {
   // devCommands): a stationary player you can target and whisper to exercise social
   // features offline; a whisper to it auto-replies. Runtime-only, never serialized.
   isDevBot?: boolean;
+  // Dev-only stationary encounter participant. Unlike the derived equipment stat,
+  // this survives aura-driven stat recalculation. Runtime-only, never serialized.
+  devAnchored?: boolean;
   // Offline Fiesta practice opponent. Session-only and never serialized.
   isFiestaBot?: boolean;
   // Firebottle throw cooldown (q_deepfen_purge): sim time the player's next hut
@@ -1328,6 +1340,14 @@ export interface PlayerMeta {
   // never persisted, never sim-mutated, always [] offline; capacity itself rides
   // bank.bonusSlots. Excluded from the parity meta sample (tests/parity/trace.ts).
   bankBonusSources: BankBonusSource[];
+  // The per-character Materials Vault: a count per material id with a gold-bought
+  // per-material ceiling. Capacity and move math live in materials_vault.ts.
+  // Persisted (inside the character save, exactly like inventory/bags/bank).
+  vault: MaterialsVaultState;
+  // Runtime-only change signals for the owner-only bank/vault wires (bumped by
+  // every write to meta.bank state / vault state respectively); never persisted.
+  bankWireRev: number;
+  vaultWireRev: number;
   // Server-stamped guild membership (guild id + rank), the authorization input
   // the Guild Bank's officer-plus gate reads; written only through
   // setPlayerGuildMembership (guild_bank.ts). Session-only exactly like
@@ -1461,12 +1481,11 @@ export interface PlayerMeta {
   bgLosses: number;
   bgDraws: number;
   bgCaptures: number;
-  // The Vale Cup (docs/prd/vale-cup.md). `sportRole` is the temporary sport-kit
-  // role while seated in a Sowfield match: SESSION-ONLY, never serialized
-  // (known is derived on load, so persistence is naturally safe with no restore
-  // snapshot). The W/L/D standing persists in CharacterState, absent until the
-  // first result so pre-cup saves and the parity samples are untouched.
-  sportRole: SportRole | null;
+  // The retired Vale Cup's persisted standings (the minigame left with the
+  // New Eastbrook program; docs/design/eastbrook-revamp/master-plan.md). The
+  // W/L/D standing persists in CharacterState, absent until the first result,
+  // so historical earners keep their record and the retired deed catalog rows
+  // keep reading real progress.
   vcupWins: number;
   vcupLosses: number;
   vcupDraws: number;
@@ -1597,6 +1616,16 @@ export interface PlayerMeta {
   // Persisted in CharacterState so no later load can re-fire it (the
   // guildLetterSent idiom).
   profTierTutorialSent: boolean;
+  // One-time spawn greeting sent (tutorial island; sim/tutorial/greeting.ts):
+  // flipped on a character's first swept tick, silently for established
+  // characters. Persisted in CharacterState so no later load can re-fire it
+  // (the guildLetterSent idiom).
+  tutorialGreetingSent: boolean;
+  // Whether this is the account's FIRST character. TRANSIENT: never
+  // serialized; the server recomputes it from the character table at every
+  // join (the bankBonus idiom) and the offline Sim, which is stateless by
+  // design, is always a first character. Read only by the tutorial greeting.
+  firstCharacter: boolean;
   // In-memory trend-nudge cadence (Professions 2.0). TRANSIENT: never
   // serialized (a restart reopens the window, deliberately: the nudge is a hint,
   // not an award), and empty at construction and on load, so the parity sampler
@@ -1672,263 +1701,8 @@ export interface AwayStatus {
 // is re-exported from this module (above) for server/db.ts.
 // ---------------------------------------------------------------------------
 
-// Persistable character state (stored as JSONB server-side). The arena fields
-// are optional so characters saved before the Ashen Coliseum existed load
-// cleanly (addPlayer falls back to the unranked defaults).
-export interface CharacterState {
-  // Production content migration revision. Revision 1 is the v0.26 all-class
-  // Talents V2 migration; revision 2 is the v0.29 Hunter redesign repick.
-  // Absent means a pre-v0.26 character JSONB save.
-  contentRevision?: number;
-  level: number;
-  xp: number;
-  // Post-cap progression. All optional so characters saved before the Max-Level
-  // XP Overflow system load cleanly (addPlayer backfills lifetimeXp from level).
-  lifetimeXp?: number;
-  // Soulbound PvP progression. Optional so pre-honor saves load at zero.
-  honor?: number;
-  lifetimeHonor?: number;
-  honorArenaDaily?: HonorArenaDailyState;
-  prestigeRank?: number;
-  unlockedMilestones?: string[];
-  // Rested XP pool. Optional so pre-rested-XP saves load cleanly (defaults to 0).
-  restedXp?: number;
-  // Lifetime played time in seconds (unfloored, for drift-free accumulation; only
-  // the display floors), accumulated across every prior session (this session's
-  // elapsed time is folded in at save; see PlayerMeta.totalPlayedSeconds and
-  // /playtime in social/chat.ts). Optional so pre-/playtime saves load cleanly
-  // (defaults to 0).
-  totalPlayedSeconds?: number;
-  // Gathering profession proficiency (JSONB; optional so pre-professions saves
-  // load cleanly, defaulting every profession to 0). `professions` is the legacy
-  // pre-rename key, still WRITTEN on every save alongside the current
-  // `gatheringProficiency` key (dual-write for downgrade back-compat); reads
-  // prefer `gatheringProficiency` and fall back to `professions`.
-  professions?: Partial<Record<string, number>>;
-  gatheringProficiency?: Partial<Record<string, number>>;
-  // Slotted tool effects, keyed by gathering profession id (JSONB). OPTIONAL,
-  // and written only when the player actually has one: a slot is rare, so an
-  // always-present `{}` would add a key to every character row in the realm to
-  // say nothing. Absent loads to an absent PlayerMeta field, which is the
-  // default the parity digest depends on, so a save written before this field
-  // existed loads byte-identically.
-  toolEffectSlots?: Partial<Record<string, ToolEffectSlot>>;
-  copper: number;
-  hp: number;
-  resource: number;
-  pos: { x: number; z: number };
-  facing: number;
-  equipment: PlayerEquipment;
-  // Per-slot ItemInstancePayload for whichever equipped piece carries one (an
-  // enchanted item's rolled.stats or a rift-forged upgrade's payload).
-  // Optional so pre-Enchanting saves load cleanly (defaults to no instances).
-  equipmentInstance?: Partial<Record<EquipSlot, ItemInstancePayload>>;
-  /** Legacy plural key written by this branch's earlier rift-gear saves. */
-  equipmentInstances?: Partial<Record<EquipSlot, ItemInstancePayload>>;
-  inventory: InvSlot[];
-  // Equipped bag sockets. Optional so pre-bag saves load cleanly (defaults to
-  // 4 empty sockets; an over-capacity legacy inventory is tolerated).
-  bags?: (string | null)[];
-  // Per-character bank (JSONB; optional so pre-bank saves load cleanly, defaulting
-  // to an empty bank with no purchased/bonus slots). sanitizeBankState is the one
-  // load path (never destroys items; tolerates an over-capacity inventory).
-  bank?: BankState;
-  vendorBuyback?: InvSlot[];
-  questLog: QuestProgress[];
-  questsDone: string[];
-  // Legacy arenaRating/Wins/Losses are treated as 1v1 data. The explicit
-  // 1v1 fields are written by new saves, while old saves fall back cleanly.
-  arenaRating?: number;
-  arenaWins?: number;
-  arenaLosses?: number;
-  arena1v1Rating?: number;
-  arena1v1Wins?: number;
-  arena1v1Losses?: number;
-  arena1v1Draws?: number;
-  arena2v2Rating?: number;
-  arena2v2Wins?: number;
-  arena2v2Losses?: number;
-  arena2v2Draws?: number;
-  // Thornhollow Fields battleground standing (JSONB; optional and written only once a
-  // result or capture exists, so pre-Thornhollow Fields saves load cleanly and
-  // unchanged saves stay byte-equal).
-  bgRating?: number;
-  bgWins?: number;
-  bgLosses?: number;
-  bgDraws?: number;
-  bgCaptures?: number;
-  // The Vale Cup standing (JSONB; optional and written only once a result
-  // exists, so pre-cup saves load cleanly and unchanged saves stay byte-equal).
-  vcupWins?: number;
-  vcupLosses?: number;
-  vcupDraws?: number;
-  // Guild-banner cup record (JSONB; written only once a guild result exists, so
-  // pre-guild-entry saves stay byte-equal).
-  vcupGuildWins?: number;
-  vcupGuildLosses?: number;
-  // The Vale Cup spectator betting record (JSONB; written only once a bet has
-  // settled, so pre-betting saves stay byte-equal).
-  vcupBetWins?: number;
-  vcupBetLosses?: number;
-  vcupBetNet?: number;
-  // Talents & Specializations (JSONB). All optional so characters saved before
-  // talents existed load cleanly; contentRevision owns point-tree -> row migration.
-  talents?: TalentAllocation;
-  loadouts?: SavedLoadout[];
-  activeLoadout?: number;
-  raidLockouts?: Record<string, number>;
-  // Ability/potion cooldowns as remaining-time deltas (JSONB; optional so pre-fix
-  // saves load cleanly with no cooldowns). Persisted so logging out and back in no
-  // longer wipes cooldowns and lets a player bypass them by relogging.
-  cooldowns?: SavedCooldowns;
-  // Per-player gather-node respawn timers as remaining-time deltas (D6; JSONB,
-  // nodeId -> remaining seconds, the cooldowns scheme above applied to node
-  // readiness). Optional with zero-default omission: absent for pre-D6 saves
-  // and whenever every node is ready, so unchanged characters stay byte-equal.
-  // Loaded through applyNodeReadiness (professions/node_persist.ts): re-anchored
-  // to the loading sim's clock, filtered to live node ids, clamped to one
-  // respawn. Closes the relog exploit that used to reset every node timer.
-  nodeHarvestCooldowns?: Record<string, number>;
-  pet?: PetState | null;
-  // WoW-style ghost state (JSONB; optional so pre-ghost saves load alive). A player who
-  // logs out as a released spirit resumes as a ghost at the graveyard with the corpse
-  // still marked, rather than free-resurrecting on relog. See src/sim/spirit.ts.
-  ghost?: boolean;
-  corpsePos?: { x: number; z: number } | null;
-  // True when the character was saved dead (JSONB; optional so older saves load
-  // alive exactly as before). A dead-but-UNRELEASED logout resumes as a released
-  // ghost on relog (auto-release-on-logout), so logging out cannot bypass the
-  // death loop. See the addPlayer ghost block + src/sim/spirit.ts.
-  dead?: boolean;
-  // The Keeper's Toll (Resurrection Sickness) remaining seconds (JSONB; optional/null when
-  // none). Persisted so the penalty cannot be shed by logging out and back in.
-  resSickness?: number | null;
-  // Unstuck Sickness remaining seconds, same contract as resSickness above (JSONB;
-  // optional/null when none, so pre-feature saves stay byte-equal and load clean).
-  unstuckSickness?: number | null;
-  jail?: JailState;
-  // Z-key sheathed-weapon toggle (JSONB; written only while sheathed, so pre-feature
-  // saves and unsheathed characters stay byte-equal and load with the weapon drawn).
-  weaponStowed?: boolean;
-  // Paperdoll helmet-visibility preference (JSONB; written only while hidden, same
-  // pre-feature byte-equality contract as weaponStowed).
-  helmHidden?: boolean;
-  skin?: number; // appearance index (JSONB; optional so pre-skin saves load as 0)
-  skinCatalog?: SkinCatalog;
-  // Pending skin-select event rank (JSONB; optional so older saves load as null).
-  pendingSkinRank?: SkinRank | null;
-  pendingSkinCatalog?: SkinCatalog | null;
-  pendingSkinItemId?: string | null;
-  // LEGACY. The old "selected mount" pick, written by builds before reins became
-  // usable items. Still declared so an existing save deserializes without a type
-  // error, but nothing reads it and nothing writes it any more: the field simply
-  // ages out of saves as characters are re-saved. Do NOT reintroduce a reader.
-  selectedMount?: string;
-  // One-time riding-lesson training fee (100g), charged when the first lesson
-  // race starts (or through legacy mount_train_begin). Optional and absent until
-  // paid, so pre-mount-training saves (and every save before the fee is ever
-  // charged) stay byte-equal.
-  mountTrainingFeePaid?: boolean;
-  // Riding skill purchased from Marla (80g). Optional and absent until bought.
-  ridingTrained?: boolean;
-  // PBE boost kit version applied (server/pbe_boost.ts); absent outside PBE.
-  pbeBoostKit?: number;
-  delveMarks?: number;
-  delveClears?: Record<string, number>;
-  companionUpgrades?: Record<string, number>;
-  delveLoreUnlocked?: string[];
-  delveDaily?: { date: string; firstClearXp: string[]; markClears: number };
-  heroicDaily?: { date: string; marked: string[] };
-  // Ravenpost welcome letter already sent (optional so pre-mail saves load
-  // cleanly and receive the announcement letter once on their next login).
-  mailWelcomed?: boolean;
-  // Guild trend letter already sent (optional so older saves load
-  // cleanly and receive at most one letter when their crafts qualify).
-  guildLetterSent?: boolean;
-  // Repeatable work-order cooldowns (Professions 2.0; JSONB, quest id ->
-  // availableAt tick). Written only when non-empty (zero-default omission), so
-  // older and no-work-order saves stay byte-equal; loaded through
-  // clampCadenceOnLoad (tick-reset safe).
-  questCadence?: Record<string, number>;
-  // Per-major acknowledged craft tier (Professions 2.0; JSONB, craft id
-  // -> tier). Written only when non-empty (zero-default omission), so
-  // older and unattuned saves stay byte-equal.
-  tierMailSent?: Record<string, number>;
-  // Per-pair quested hobby (Professions 2.0; JSONB, canonical pair id ->
-  // craft id). Written only when non-empty (zero-default omission), so older
-  // saves and characters that never quested a hobby stay byte-equal.
-  questedHobbies?: Record<string, string>;
-  // First-tier tutorial already sent (Professions 2.0; JSONB, optional
-  // so older saves load cleanly and fire it once when they first qualify).
-  // Written only when true (zero-default omission).
-  profTierTutorialSent?: boolean;
-  // World-boss loot lockouts now ride `raidLockouts` (keyed worldboss:<mobId>). The
-  // legacy per-day `worldBossDaily` field is intentionally dropped: pre-migration saves
-  // that still carry it just ignore it (a player locked at deploy may loot once more, a
-  // one-time, player-friendly transition), and their lockouts persist via raidLockouts
-  // from then on.
-  // World-boss daily loot record. Optional so saves from before world bosses load
-  // cleanly (addPlayer falls back to an empty record).
-  worldBossDaily?: { date: string; looted: string[] };
-  // Flat per-craft skill tracking (#1126; JSONB, additive back-compat: absent or
-  // partial on older saves loads the missing crafts as 0, see normalizeCraftSkills).
-  craftSkills?: Record<string, number>;
-  // Recipe acquisition (#1299; JSONB, additive back-compat: absent on older
-  // saves loads as an empty set, i.e. no learned non-grandfathered recipes).
-  knownRecipes?: string[];
-  // Grandfather normalize already applied (JSONB, additive
-  // back-compat, the mailWelcomed idiom): absent/false on an older save
-  // triggers the one-time PRE_TRAINING_RECIPE_IDS union on load, then true
-  // is persisted so it never re-runs (it is idempotent anyway).
-  recipesGrandfathered?: boolean;
-  // Mastery reset already applied (JSONB, the recipesGrandfathered
-  // idiom): absent/false on a pre-curve save triggers the one-time
-  // applyMasteryReset on load (professions/mastery_reset.ts), then LITERAL
-  // true is serialized unconditionally (any blob written by curve-era code
-  // has the reset applied), so it can never re-fire.
-  masteryResetApplied?: boolean;
-  // Proficiency display heal already applied (issue 2339; JSONB, the
-  // masteryResetApplied idiom): absent/false on a save written while the
-  // character sheet still ROUNDED its Gathering rows triggers the one-time
-  // healDisplayRoundedProficiency on load (a value the old sheet displayed
-  // as a crossed band threshold, 99.5 to 99.99 reading "100", bumps to that
-  // threshold so the join retro pass grants the stranded 100/200 gathering
-  // deeds), then LITERAL true is serialized unconditionally so it can never
-  // re-fire on the floored post-fix display.
-  proficiencyDisplayHealApplied?: boolean;
-  townFocus?: Record<string, number>;
-  // Active-archetype state (#1129, superseded scope; JSONB, back-compat: absent on
-  // older saves loads as emptyArchetypeState, see normalizeArchetypeState).
-  archetype?: Partial<ArchetypeState>;
-  // The Book of Deeds (JSONB; ALL optional and written only once non-empty, so
-  // pre-deed saves load cleanly and stay byte-equal until the system engages).
-  // `deeds` maps deed id to the utcDay earned ('' when unknown); `renown` is
-  // denormalized for a later SQL sort index and RECOMPUTED from `deeds` on
-  // load (the sim is authoritative). Loading also unions the legacy
-  // `unlockedMilestones` ids into `deeds` (milestone unification), while new
-  // grants keep dual-writing `unlockedMilestones` for one release as
-  // forward-only rollback insurance.
-  deeds?: Record<string, string>;
-  deedStats?: SavedDeedStats;
-  activeTitle?: string | null;
-  activeBorder?: string | null;
-  renown?: number;
-  // The Reliquary (JSONB; optional, written only when non-empty so pre-system
-  // saves load cleanly and stay byte-equal until the system engages).
-  reliquary?: SavedReliquaryState;
-}
-
-export interface PetState {
-  templateId: string;
-  name: string;
-  level: number;
-  hp: number;
-  dead: boolean;
-  mode?: PetMode;
-  autoTaunt?: boolean;
-  autoWaterJet?: boolean;
-  autoSkill?: boolean;
-}
+// Persisted character and pet shapes live in the type-only character_state.ts
+// leaf and are re-exported above for public import compatibility.
 
 // PendingMobRespawn is exported so SimContext can type the live `pendingMobRespawns`
 // view that pet_commands.ts (completeTame) pushes the tamed beast's respawn into.
@@ -1947,19 +1721,10 @@ export interface PendingMobRespawn {
 
 // copyPos moved to entity_roster.ts (used only by the despawn prologue).
 
-function freshCounters(): RewardCounters {
-  return {
-    damageDealt: 0,
-    damageTaken: 0,
-    kills: 0,
-    deaths: 0,
-    xpGained: 0,
-    questsCompleted: 0,
-    questProgress: 0,
-    lootCopper: 0,
-    levelUps: 0,
-  };
-}
+// RewardCounters and its zero value moved to reward_counters.ts: one module owns
+// the shape, so a counter added without a matching zero cannot ship. Re-exported
+// here so headless/env_server.ts's import stays byte-identical.
+export type { RewardCounters };
 
 // The offline guild bank log answer: a FROZEN empty ready view. Offline play
 // never has a guild (guilds live in the server social DB) and there is no
@@ -1980,8 +1745,12 @@ export class Sim {
   readonly petSpecialCommandsSupported = true;
   // `world` stays optional (a custom map for play-test, else undefined for the
   // built-in world); everything else is defaulted to a concrete value below.
-  cfg: Required<Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap' | 'respawnSeconds'>> &
-    Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds'>;
+  // `storagePrices` is consumed at construction like `noPlayer`, never carried
+  // here: the resolved table below is the single truth.
+  cfg: RuntimeSimConfig;
+  // The resolved storage price table (storage_prices.ts): frozen once in the
+  // ctor from cfg.storagePrices; every bank/vault price read charges from it.
+  readonly storagePrices: StoragePrices;
   /**
    * The authored world this simulation owns. The active registry is a host/render
    * seam and may be swapped by an editor after construction; gameplay services,
@@ -2039,6 +1808,12 @@ export class Sim {
   readonly playerGrid = new SpatialGrid();
   private engagedPids = new Set<number>();
   primaryId = -1; // the local/RL player in single-player contexts
+  // The pid of the player the CONSTRUCTOR itself created (cfg.noPlayer false),
+  // -1 on a server-shaped sim. The compulsory-tutorial sweep ferries only this
+  // player or persisted-row characters; the first addPlayer on a noPlayer sim
+  // claims primaryId too, and a test fixture's probe character must never be
+  // mistaken for the offline player (tutorial/greeting.ts).
+  private ownPlayerPid = -1;
   nextId = 1;
   events: SimEvent[] = [];
   // Owned by E1 (entity_roster drains it); stays on Sim because N1/M3 schedule into
@@ -2099,10 +1874,6 @@ export class Sim {
   readonly bgProposals: bgProposalMod.BgProposal[] = [];
   readonly bgProposalLockouts = new Map<number, number>();
   nextBgProposalId = 1;
-  // The Vale Cup boarball state (social/vale_cup.ts): ONE holder object (the
-  // per-bracket queues, the single Sowfield match slot, the Groundskeeper's
-  // deserter book, and the live bot pids), exposed as the live ctx.vcup view.
-  vcup: VcState = createVcState();
   // per-player chat token bucket (anti-spam); refilled lazily by sim time
   private chatTokens = new Map<number, { tokens: number; at: number }>();
   // per-player set of opt-in global channels (world, lfg) joined via /join
@@ -2144,6 +1915,10 @@ export class Sim {
   // local one, so a daily never rolls over mid-evening the way midnight UTC did.
   // Empty string = "no calendar known" (headless/replay), same contract as utcDay.
   resetDay = '';
+  // The weekend event early-open probe: the reset-day key DOUBLE_HONOR_LEAD_HOURS
+  // ahead of now, fed by the host beside resetDay (server: `eventLeadDayKey`;
+  // offline: `feedSimCalendar`). '' = no calendar, the event never opens early.
+  eventLeadDay = '';
   // the World Market (the Merchant's auction house): the Market instance owns the
   // listing book, per-seller collections, the id counter, and the Merchant entity
   // id. Constructed in the ctor after the SimContext (it consumes the seam); Sim
@@ -2192,57 +1967,41 @@ export class Sim {
   private pendingMobRespawns: PendingMobRespawn[] = [];
   private groundAoEs: GroundAoE[] = [];
   get activeFrostRings(): ActiveFrostRing[] {
-    const rings: ActiveFrostRing[] = [];
-    for (const effect of this.groundAoEs) {
-      const ring = effect.frostRing;
-      if (!ring || effect.remaining <= 0) continue;
-      rings.push({
-        id: ring.id,
-        x: effect.pos.x,
-        z: effect.pos.z,
-        radius: effect.radius,
-        innerRadius: ring.innerRadius,
-        duration: ring.duration,
-        remaining: effect.remaining,
-      });
-    }
-    return rings;
+    return groundAoeReadouts.collectActiveFrostRings(this.groundAoEs);
+  }
+  get activeIgnivarMeteors(): raidReadouts.ActiveIgnivarMeteorWarning[] {
+    return raidReadouts.collectActiveIgnivarMeteors(this.ctx);
+  }
+  get activeVarkhulForgestormWarnings(): raidReadouts.ActiveVarkhulForgestormWarning[] {
+    return raidReadouts.collectActiveVarkhulForgestormWarnings(this.ctx);
+  }
+  get activeVarkhulAnvilMeteors(): raidReadouts.ActiveVarkhulAnvilMeteorWarning[] {
+    return raidReadouts.collectActiveVarkhulAnvilMeteors(this.ctx);
+  }
+  get activeVarkhulAssemblies(): raidReadouts.ActiveVarkhulAssembly[] {
+    return raidReadouts.collectActiveVarkhulAssemblies(this.ctx);
+  }
+  get activeVarkhulForgePortalTelegraphs(): raidReadouts.VarkhulForgePortalTelegraph[] {
+    return raidReadouts.collectActiveVarkhulForgePortalTelegraphs(this.ctx);
+  }
+  get activeVarkhulCinderFires(): raidReadouts.ActiveVarkhulCinderFire[] {
+    return raidReadouts.collectActiveVarkhulCinderFires(this.ctx);
+  }
+  get activeVarkhulCinderOrbProjectiles(): raidReadouts.ActiveVarkhulCinderOrbProjectile[] {
+    return raidReadouts.collectActiveVarkhulCinderOrbProjectiles(this.ctx);
   }
   get activeTemporalHourglasses(): ActiveTemporalHourglass[] {
-    const hourglasses: ActiveTemporalHourglass[] = [];
-    for (const effect of this.groundAoEs) {
-      const hourglass = effect.temporalHourglass;
-      if (!hourglass || effect.remaining <= 0) continue;
-      hourglasses.push({
-        id: hourglass.id,
-        x: effect.pos.x,
-        z: effect.pos.z,
-        radius: effect.radius,
-        duration: hourglass.groundDuration,
-        remaining: effect.remaining,
-      });
-    }
-    return hourglasses;
+    return groundAoeReadouts.collectActiveTemporalHourglasses(this.groundAoEs);
   }
   get activeConsecrations(): ActiveConsecration[] {
-    const consecrations: ActiveConsecration[] = [];
-    for (const effect of this.groundAoEs) {
-      const consecration = effect.consecration;
-      if (!consecration || effect.remaining <= 0) continue;
-      consecrations.push({
-        id: consecration.id,
-        x: effect.pos.x,
-        z: effect.pos.z,
-        radius: effect.radius,
-        duration: consecration.duration,
-        remaining: effect.remaining,
-      });
-    }
-    return consecrations;
+    return groundAoeReadouts.collectActiveConsecrations(this.groundAoEs);
   }
   reactiveAbilityWindowRemaining(abilityId: string): number {
     if (abilityId !== 'mongoose_bite') return 0;
     return Math.max(0, this.player.overpowerUntil - this.time);
+  }
+  groundAimPlacementPreview(abilityId: string, point: GroundAimPointXZ): GroundAimPointXZ {
+    return heroicLeapPlacementPreview(this.cfg.seed, this.player, abilityId, point);
   }
   // Live frost-mage Frozen Orbs (combat/frozen_orb.ts): sim state, never
   // serialized; drifted and pulsed by tickFrozenOrbs in the tick prologue.
@@ -2290,9 +2049,11 @@ export class Sim {
       devCommands: this.devCommands,
       worldBossAtBoot: cfg.worldBossAtBoot ?? false,
       riftPortals: cfg.riftPortals ?? false,
+      compulsoryTutorial: cfg.compulsoryTutorial ?? false,
       lockoutNowMs: cfg.lockoutNowMs ?? (() => Math.floor(this.time * 1000)),
       raidResetMs: cfg.raidResetMs ?? ((nowMs: number) => nowMs + DEFAULT_RAID_LOCKOUT_MS),
-      valeCupShowcase: cfg.valeCupShowcase ?? false,
+      weeklyRaidResetMs:
+        cfg.weeklyRaidResetMs ?? ((nowMs: number) => nowMs + DEFAULT_WEEKLY_RAID_LOCKOUT_MS),
       // Carried through so the renderer (which reaches the Sim as IWorld) can read
       // the same custom world via sim.cfg.world. Undefined for the built-in world.
       world: cfg.world,
@@ -2316,10 +2077,12 @@ export class Sim {
     // has its boss up. Draws no rng here; the spawn itself fires on the first
     // tick through the normal updateWorldBosses path.
     if (cfg.worldBossAtBoot) this.worldBossNextAt = WORLD_BOSSES.map(() => 0);
+    // Resolved before the seam is built so ctx.storagePrices reads it; pure, no rng.
+    this.storagePrices = resolveStoragePrices(cfg.storagePrices);
     // S0b seam: the shared SimContext every extracted slice routes through. Built
     // once here (the rng now exists); a live view + bound callbacks, it draws no rng
     // and mutates nothing, so it cannot perturb the construction draws below.
-    this.ctx = this.buildSimContext();
+    this.ctx = this.buildSimContext(cfg.vaultConsumptionAdmission);
     // Movement-kernel deps (MV1): pure binding, no rng draws, no construction effects.
     this.playerMotionDeps = {
       seed: this.cfg.seed,
@@ -2330,11 +2093,11 @@ export class Sim {
       cancelCast: (p) => this.cancelCast(p),
       standUp: (p) => this.standUp(p),
       dealDamage: (source, target, amount, crit, school, ability, kind, noRage) => {
+        const wasAlive = !target.dead;
         this.dealDamage(source, target, amount, crit, school, ability, kind, noRage);
-        // The one sim-side observer of a lethal fall (hid_fall_death): the
-        // shared pure kernel labels the hit 'Falling' with a null source, and
-        // this wrapper keeps the deed hook out of the kernel both hosts run.
-        if (source === null && ability === 'Falling' && target.kind === 'player' && target.dead) {
+        // Null-source Falling is the kernel sentinel; dead targets no-op, so require transition.
+        const isPlayerFall = source === null && ability === 'Falling' && target.kind === 'player';
+        if (isPlayerFall && wasAlive && target.dead) {
           deedsMod.onFallDeathForDeeds(this.ctx, target);
         }
       },
@@ -2404,6 +2167,11 @@ export class Sim {
           );
           mob.facing = 0;
           mob.prevFacing = 0;
+          // A friendly practice dummy simulates a geared level-20 ally, so its
+          // body comes from the reference kit rather than its own template
+          // numbers (which cannot reach the item tables from content/). Pure and
+          // rng-free, like the rest of this branch.
+          if (template.friendlyPracticeTarget) applyPlayerDummyVitals(mob);
           this.addEntity(mob);
           continue;
         }
@@ -2479,6 +2247,7 @@ export class Sim {
       box.templateId = 'mailbox';
       box.objectItemId = null;
       box.lootable = true; // interactable
+      if (boxDef.facing !== undefined) box.facing = boxDef.facing;
       this.addEntity(box);
       this.postOffice.mailboxIds.push(box.id);
     }
@@ -2487,21 +2256,7 @@ export class Sim {
     for (const dungeon of DUNGEON_LIST) {
       if (dungeon.overworldDoor === false) {
         for (let i = 0; i < INSTANCE_SLOT_COUNT; i++) {
-          this.instances.push({
-            dungeonId: dungeon.id,
-            difficulty: 'normal',
-            slot: i,
-            partyKey: null,
-            mobIds: [],
-            objectIds: [],
-            exitId: null,
-            bossExitId: null,
-            emptyFor: 0,
-            resetAvailableAt: 0,
-            clearedBy: new Set(),
-            enteredBy: new Set(),
-            combatExitMemory: new Map(),
-          });
+          this.instances.push(freshInstanceSlot(dungeon.id, i));
         }
         continue;
       }
@@ -2518,21 +2273,7 @@ export class Sim {
       door.lootable = true; // interactable
       this.addEntity(door);
       for (let i = 0; i < INSTANCE_SLOT_COUNT; i++) {
-        this.instances.push({
-          dungeonId: dungeon.id,
-          difficulty: 'normal',
-          slot: i,
-          partyKey: null,
-          mobIds: [],
-          objectIds: [],
-          exitId: null,
-          bossExitId: null,
-          emptyFor: 0,
-          resetAvailableAt: 0,
-          clearedBy: new Set(),
-          enteredBy: new Set(),
-          combatExitMemory: new Map(),
-        });
+        this.instances.push(freshInstanceSlot(dungeon.id, i));
       }
     }
 
@@ -2540,19 +2281,6 @@ export class Sim {
     // Per-instance dungeon/raid healers spawn on claim (instances/dungeons.ts).
     // createNpc draws no rng, so world-gen determinism is preserved.
     spawnOverworldSpiritHealers(this.ctx, worldContent.services?.graveyards ?? []);
-
-    // Groundskeeper Bram at the Sowfield gate (Vale Cup). Placed through the
-    // SAME findSafePos path as the generic NPC loop above, but under a RESERVED
-    // entity id outside the nextId sequence (and after the rng-drawing camp
-    // loop), so world-gen determinism AND the parity goldens' pinned id
-    // sequence are both preserved. See social/vale_cup.ts VALE_CUP_BRAM_ID.
-    {
-      const bramDef = worldContent.npcs.groundskeeper_bram;
-      if (bramDef) {
-        const safe = this.findSafePos(bramDef.pos.x, bramDef.pos.z, waterLevel() + 0.6);
-        valeCupMod.spawnGroundskeeper(this.ctx, bramDef, safe);
-      }
-    }
 
     // FURY uses a reserved id and spawns after the rng-driven world roster, so
     // the Honor Quartermaster cannot perturb existing entity ids or replay RNG.
@@ -2690,7 +2418,26 @@ export class Sim {
     if (cfg.noPlayer && this.devCommands) this.spawnHealerPracticeDummy();
 
     if (!cfg.noPlayer) {
-      this.addPlayer(this.cfg.playerClass, this.cfg.playerName, { autoEquip: this.cfg.autoEquip });
+      this.ownPlayerPid = this.addPlayer(this.cfg.playerClass, this.cfg.playerName, {
+        autoEquip: this.cfg.autoEquip,
+      });
+      // The compulsory tutorial starts ASHORE, not one greeting sweep later.
+      // An offline session is always a fresh character, so landing at the
+      // mainland spawn first would stream Eastbrook behind the loading screen
+      // and then teleport away from it a second afterwards, paying for both
+      // worlds to show one. The greeting sweep's already-ashore arm then just
+      // plays Odo's welcome. Online is unaffected: the server rolls the
+      // newborn row at the same arrival (server/main.ts initialCharacterState).
+      const ownPlayer = this.cfg.compulsoryTutorial
+        ? this.entities.get(this.ownPlayerPid)
+        : undefined;
+      if (ownPlayer) {
+        ownPlayer.pos = this.groundPos(PROVING_SHORE_ARRIVAL.x, PROVING_SHORE_ARRIVAL.z);
+        ownPlayer.prevPos = { ...ownPlayer.pos };
+        ownPlayer.facing = PROVING_SHORE_ARRIVAL.facing;
+        ownPlayer.prevFacing = ownPlayer.facing;
+        this.rebucket(ownPlayer);
+      }
     }
 
     // Escort quest NPCs (src/sim/escort.ts). Last on purpose: the spawns draw
@@ -2713,12 +2460,6 @@ export class Sim {
 
   private lockoutNowMs(): number {
     return this.cfg.lockoutNowMs?.() ?? Math.floor(this.time * 1000);
-  }
-
-  // The next raid-reset instant for a given lockout "now". The host owns the boundary
-  // (server: realm-local 3 AM daily reset); offline/headless fall back to a flat 24h day.
-  private raidResetMs(nowMs: number): number {
-    return this.cfg.raidResetMs(nowMs);
   }
 
   // -------------------------------------------------------------------------
@@ -2834,6 +2575,12 @@ export class Sim {
       autoEquip?: boolean;
       state?: CharacterState;
       characterId?: number;
+      // Pre-latch the compulsory-tutorial one-shot (sim/tutorial/greeting.ts):
+      // the server passes true for a BARE join (null character state), which
+      // is the test-harness shape, so a fixture character is never ferried
+      // off the spot its test put it on. A real character row always carries
+      // creation state and rides the ferry normally.
+      tutorialGreetingSent?: boolean;
       // Server-stamped bank bonus slots, recomputed from account facts at every
       // join (email/Discord/wallet/referrals). Overrides the persisted value so
       // unlinking lowers capacity at the next login; a shrink below the used slot
@@ -2841,11 +2588,21 @@ export class Sim {
       // deposits refuse, nothing is destroyed). Never passed offline (bonusSlots
       // stays the sanitized save value, [] breakdown).
       bankBonus?: { bonusSlots: number; sources: BankBonusSource[] };
+      // Server-stamped account fact, recomputed at every join like bankBonus:
+      // whether this is the account's first character. Never persisted; the
+      // offline Sim omits it and defaults to true (offline is stateless).
+      // Read only by the tutorial greeting (sim/tutorial/greeting.ts).
+      firstCharacter?: boolean;
       // The character's authored modular look (characters.appearance column,
       // normalized at write; NOT part of CharacterState, so serializeCharacter
       // never re-emits it). Stamped onto the entity so it rides the identity
       // wire (`app`) to every client in view. Opaque to the sim.
       appearance?: Record<string, unknown> | null;
+      // A synthetic participant (Vale Cup showcase/backfill, fiesta practice,
+      // /dev bots): created pre-welcomed so no mail is ever minted for it. Bot
+      // metas are session-only, but their letters would outlive them in the
+      // shared mail book forever (issue #3560).
+      bot?: boolean;
     },
   ): number {
     const savedState = opts?.state
@@ -2927,8 +2684,11 @@ export class Sim {
       wireRev: 0,
       inventory: [],
       bags: Array<string | null>(BAG_SOCKETS).fill(null),
-      bank: { inventory: [], purchasedSlots: 0, bonusSlots: 0 },
+      bank: emptyBankState(),
       bankBonusSources: [],
+      vault: { stock: {}, special: [], upgrades: 0 },
+      bankWireRev: 0,
+      vaultWireRev: 0,
       guildMembership: null,
       vendorBuyback: [],
       copper: 0,
@@ -2991,7 +2751,6 @@ export class Sim {
       bgCaptures: Number.isFinite(savedState?.bgCaptures)
         ? Math.max(0, savedState?.bgCaptures as number)
         : 0,
-      sportRole: null,
       vcupWins: savedState?.vcupWins ?? 0,
       vcupLosses: savedState?.vcupLosses ?? 0,
       vcupDraws: savedState?.vcupDraws ?? 0,
@@ -3036,6 +2795,8 @@ export class Sim {
       tierMailSent: new Map(),
       questedHobbies: new Map(),
       profTierTutorialSent: false,
+      tutorialGreetingSent: opts?.tutorialGreetingSent === true,
+      firstCharacter: opts?.firstCharacter ?? true,
       profNudgeCadence: new Map(),
       archetype: emptyArchetypeState(),
       delveMarks: 0,
@@ -3062,6 +2823,11 @@ export class Sim {
     this.players.set(player.id, meta);
     player.skinCatalog = meta.skinCatalog;
     player.skin = meta.skin; // mirror onto the entity so the renderer + wire can read it
+    this.accountCosmetics = accountCosmeticsWithWornMechChroma(
+      this.accountCosmetics,
+      meta.skinCatalog,
+      meta.skin,
+    );
     if (this.primaryId === -1) this.primaryId = player.id;
 
     if (savedState) {
@@ -3117,8 +2883,13 @@ export class Sim {
       // ONE aggregated dev-channel line per character load, not one per row: a
       // systematically corrupt blob (a bad migration) would otherwise log once
       // per affected stack, and over-capacity inventories are tolerated rather
-      // than truncated, so that count is unbounded. Every container below
-      // pushes its drops here; the single warn sits after the bank load.
+      // than truncated, so that count is unbounded. Every instance-carrying
+      // container below pushes its drops here; the single warn sits after the
+      // bank load. The Materials Vault SHARES the sink: its special slots carry
+      // real instances (identity-preserving stacks), so their junk aggregates
+      // here, and the one wrong-shaped-stock trace rides the same line rather
+      // than minting a second warn channel (the sanitizer's no-sink fallback
+      // exists for callers without an aggregate, see sanitizeVaultState).
       const droppedInstanceJunk: string[] = [];
       for (const [slot, instance] of Object.entries(
         s.equipmentInstance ?? s.equipmentInstances ?? {},
@@ -3155,7 +2926,15 @@ export class Sim {
         // rebuilt payload instead of being destroyed by the key-count arm.
         const { payload: clean, dropped } = sanitizeItemInstancePayloadOnLoad(owned);
         for (const d of dropped) droppedInstanceJunk.push(`equip.${slot}.${d}`);
-        if (clean) meta.equipmentInstance[slot] = clean;
+        if (!clean) continue;
+        // A worn payload never carries the bind-on-pickup party trade window:
+        // equipping strips it for good (items.ts equipmentPayloadFor), so one
+        // arriving here is a legacy or rollback-written save. Shed it through
+        // the SAME shared helper, or a later unequip would return the copy to
+        // bags with the window resurrected. Silent on purpose: an older
+        // binary was a legal writer, so this is normalization, not junk.
+        const worn = withoutPartyTradeMarker(clean);
+        if (worn) meta.equipmentInstance[slot] = worn;
       }
       // The shared tamper ceiling (bags.ts instancedCountCap, same rule as the
       // bank arm below): a counted instanced slot loads capped at what
@@ -3259,9 +3038,15 @@ export class Sim {
         if (slot.instance && !isMergeableInstancePayload(slot.instance)) slot.count = 1;
         return slot;
       });
-      // Bank sanitizes on load (never destroys items; a pre-bank save has no `bank`
-      // field and sanitizes to an empty bank). See bank.ts sanitizeBankState.
+      // Bank sanitizes on load (never destroys items; a pre-bank save sanitizes to
+      // an empty bank; see bank.ts sanitizeBankState). Deliberately NO wire-rev bump
+      // here, unlike the vault install below: bankInfoWireRevFor is banker-gated and
+      // a load always pairs with an empty lastSent, so a fresh session resends anyway.
       meta.bank = sanitizeBankState(s.bank, meta.name, droppedInstanceJunk, player.id);
+      // The Materials Vault sanitizes on load too (never destroys stock; a pre-vault
+      // save sanitizes to the empty locked vault): restoreVaultStateOnLoad owns the
+      // whole-record replacement AND its vaultWireRev bump (the rationale sits there).
+      vaultMod.restoreVaultStateOnLoad(meta, s.vault, droppedInstanceJunk, player.id);
       warnDroppedInstanceKeys(meta.name, droppedInstanceJunk);
       let questRevReset = false;
       for (const q of s.questLog) {
@@ -3435,6 +3220,7 @@ export class Sim {
       // character left the pair is the entire point (professions/hobby_memory.ts).
       meta.questedHobbies = normalizeHobbyMemoryOnLoad(s.questedHobbies);
       meta.profTierTutorialSent = s.profTierTutorialSent === true;
+      meta.tutorialGreetingSent = s.tutorialGreetingSent === true;
       meta.delveMarks = s.delveMarks ?? 0;
       meta.delveClears = { ...(s.delveClears ?? {}) };
       meta.companionUpgrades = { ...(s.companionUpgrades ?? {}) };
@@ -3489,18 +3275,13 @@ export class Sim {
       if (s.helmHidden) player.helmHidden = true;
     }
 
-    // Host-stamped bank bonus slots (see the opt doc above). Applied on BOTH the
-    // saved-state and brand-new-character arms: a first-ever join can already have
-    // earned account bonuses. Values are host-trusted but clamped to the registry
-    // ceiling anyway; the breakdown rows are cloned at this write boundary.
-    if (opts?.bankBonus) {
-      meta.bank.bonusSlots = clampBonusSlots(opts.bankBonus.bonusSlots);
-      meta.bankBonusSources = opts.bankBonus.sources.map((s) => ({ ...s }));
-    }
+    // Host-stamped bank bonus slots (see the opt doc above); applyBankBonusStamp
+    // owns the clamp and the row clone, so bank.ts stays the one writer.
+    if (opts?.bankBonus) applyBankBonusStamp(meta, opts.bankBonus);
 
     // Resolve the flat talent struct once, before the stat pass + ability
     // resolver below consume it (they only ever read these flat numbers).
-    meta.talentMods = computeTalentModifiers(cls, meta.talents, player.level);
+    meta.talentMods = computeCharacterModifiers(cls, meta.talents, player.level, meta.equipment);
     this.refreshKnownAbilities(meta, false);
     recalcPlayerStats(player, cls, meta.equipment, meta.talentMods, meta.equipmentInstance);
     if (savedState) {
@@ -3604,10 +3385,11 @@ export class Sim {
     }
     // One-time Ravenpost welcome (doubles as the service announcement for
     // characters saved before mail existed). Flipped before the send so a
-    // re-entrant save can never double-book the letter.
+    // re-entrant save can never double-book the letter. Bots flip WITHOUT the
+    // send: their letters would sit in the shared mail book forever.
     if (!meta.mailWelcomed) {
       meta.mailWelcomed = true;
-      this.postOffice.sendWelcome(meta);
+      if (!opts?.bot) this.postOffice.sendWelcome(meta);
     }
     // Book of Deeds retro-on-join, after the saved state is fully restored:
     // seed the discovery ledger from current holdings, apply the retro
@@ -3637,7 +3419,7 @@ export class Sim {
     if (!clean) return -1;
     for (const m of this.players.values())
       if (m.name.toLowerCase() === clean.toLowerCase()) return -1;
-    const pid = this.addPlayer('mage', clean);
+    const pid = this.addPlayer('mage', clean, { bot: true });
     const meta = this.players.get(pid);
     if (meta) meta.isDevBot = true;
     const me = this.entities.get(this.primaryId);
@@ -3664,7 +3446,7 @@ export class Sim {
   // A friendly stationary ally bot for the Cascada playtest scenario, dropped at an
   // exact spot (no name-uniqueness gate, so /dev cascade can be re-run). Dev only.
   private spawnScenarioAlly(name: string, x: number, z: number, cls: PlayerClass = 'mage'): number {
-    const id = this.addPlayer(cls, name);
+    const id = this.addPlayer(cls, name, { bot: true });
     const meta = this.players.get(id);
     if (meta) meta.isDevBot = true;
     // Level 20 like the mage: a level-1 ally has so little health that a single Echo
@@ -3885,12 +3667,6 @@ export class Sim {
     // the offline Sim / headless env from leaking cardDuels/cardDuelQueue
     // entries for a departed pid).
     this.leaveCardMinigameEntirely(pid);
-    // Vale Cup: leaving the queue is free; deserting a counted match benches
-    // the fighter (the team plays short), takes the loss, and arms the
-    // Groundskeeper's lockout. Idempotent: the server already resolved it
-    // before the leave save (vcupResolveDesertion is a public delegate).
-    valeCupMod.vcupDequeue(this.ctx, pid);
-    valeCupMod.vcupResolveDesertion(this.ctx, pid);
     this.party.partyInvites.delete(pid);
     this.tradeInvites.delete(pid);
     this.duelInvites.delete(pid);
@@ -4022,11 +3798,6 @@ export class Sim {
     // forces a fresh re-summon instead of laundering the summon cooldown for free.
     // Hunter pets (non-demon) persist. See pet_commands.isDemonPetState.
     const petSnapshot = this.serializePet(pid);
-    // Seated in a Vale Cup match: persist the pre-match RETURN spot, never a
-    // mid-pitch position (a mid-match save or desertion must not strand the
-    // character on the Sowfield). The stowed pet persists via serializePet's
-    // delvePetStash fallback; known/sportRole are session-derived, not saved.
-    const cupReturn = valeCupMod.vcupReturnFor(this.ctx, pid);
     // One fold serves both persisted proficiency keys below: the live counters
     // plus any still-queued grants (foldPendingGatherGrants), so a leave-time
     // save landing between the tick that queued a grant and the tick that
@@ -4099,8 +3870,8 @@ export class Sim {
         e.resource,
         e.savedMana,
       ),
-      pos: cupReturn ? { x: cupReturn.x, z: cupReturn.z } : { x: e.pos.x, z: e.pos.z },
-      facing: cupReturn ? cupReturn.facing : e.facing,
+      pos: { x: e.pos.x, z: e.pos.z },
+      facing: e.facing,
       // Death state: a released spirit resumes its corpse run on relog, and a
       // dead-but-unreleased corpse auto-releases on load (see addPlayer).
       dead: e.dead,
@@ -4119,11 +3890,10 @@ export class Sim {
       ),
       inventory: meta.inventory.map(cloneInvSlot),
       bags: [...meta.bags],
-      bank: {
-        inventory: meta.bank.inventory.map(cloneInvSlot),
-        purchasedSlots: meta.bank.purchasedSlots,
-        bonusSlots: meta.bank.bonusSlots,
-      },
+      bank: savedBankState(meta.bank),
+      // Hand-enumerated clone: tsc forces a new REQUIRED MaterialsVaultState field
+      // to appear here, but an optional one would compile unpersisted; add it by hand.
+      vault: vaultMod.savedVaultState(meta.vault),
       vendorBuyback: meta.vendorBuyback.map(cloneInvSlot),
       questLog: [...meta.questLog.values()].map((q) => ({
         questId: q.questId,
@@ -4273,6 +4043,7 @@ export class Sim {
           }
         : {}),
       ...(meta.profTierTutorialSent ? { profTierTutorialSent: true } : {}),
+      ...(meta.tutorialGreetingSent ? { tutorialGreetingSent: true } : {}),
       townFocus: { ...meta.townFocus },
       // World-boss lockouts serialize via raidLockouts (above), not a separate field.
       // Book of Deeds: every field conditional (absent while empty/null/zero)
@@ -4528,6 +4299,16 @@ export class Sim {
    *  full retro pass grants exactly that one deed and re-checks the rest as
    *  no-ops. Any later membership change is a genuine live join: mark dirty for
    *  the normal unlock path (banner, audio, broadcast gate). */
+  /** Server-stamped guild pledge presentation (docs/prd/guild-pledge-board.md):
+   *  the pledged guild's name ('' for none) and the guild colour tier for the
+   *  nameplate line. Display only; membership stays setPlayerGuild's. */
+  setPlayerPledge(pid: number, pledgeGuild: string, guildTier: number): void {
+    const e = this.entities.get(pid);
+    if (!e) return;
+    e.pledgeGuild = pledgeGuild;
+    e.guildTier = guildTier;
+  }
+
   setPlayerGuild(pid: number, guild: string, opts: { retroDeeds?: boolean } = {}): void {
     const e = this.entities.get(pid);
     if (!e) return;
@@ -4549,7 +4330,6 @@ export class Sim {
   renamePlayerGuild(pid: number, oldName: string, newName: string): void {
     const e = this.entities.get(pid);
     if (!e || e.guild !== oldName) return;
-    valeCupMod.vcupRenameGuild(this.ctx, pid, oldName, newName);
     e.guild = newName;
   }
 
@@ -4640,25 +4420,20 @@ export class Sim {
     return { type: 'mechChroma', chromaId };
   }
 
+  /** Take the mech chroma off the resolved player's own current appearance,
+   *  reverting to the class body. The account-wide unlock
+   *  (accountCosmetics.mechChromaIds) is permanent, exactly like a purchased
+   *  Season 1 Armory weapon skin: this only changes what is CURRENTLY
+   *  displayed, never revokes ownership, so any character on the account can
+   *  freely re-select it later via changeSkin with no item involved. */
   unequipMechChroma(chromaId: string, pid?: number): boolean {
     const r = this.resolve(pid);
     if (!r) return false;
     const skin = mechChromaSkinIndex(chromaId);
-    const itemId = mechChromaItemId(chromaId);
-    if (skin < 0 || !itemId) return false;
-    if (!this.accountCosmetics.mechChromaIds.includes(chromaId)) return false;
-    this.accountCosmetics = {
-      ...this.accountCosmetics,
-      mechChromaIds: this.accountCosmetics.mechChromaIds.filter((id) => id !== chromaId),
-    };
-    for (const meta of this.players.values()) {
-      if (meta.skinCatalog === 'mech' && meta.skin === skin) {
-        this.setPlayerSkin(meta.entityId, 0, 'class');
-      }
-    }
-    // movement: unequipping a mech chroma re-grants the very item equipping it
-    // consumed, so this relocates a copy the account already owns.
-    this.addItem(itemId, 1, r.meta.entityId, MOVEMENT_GRANT);
+    if (skin < 0) return false;
+    const { meta } = r;
+    if (meta.skinCatalog !== 'mech' || meta.skin !== skin) return false;
+    this.setPlayerSkin(meta.entityId, 0, 'class');
     return true;
   }
 
@@ -4773,6 +4548,12 @@ export class Sim {
   guildLeaderboard(page = 0, pageSize = LEADERBOARD_PAGE_SIZE): Promise<GuildLeaderboardPage> {
     return Promise.resolve(paginateGuildLeaderboard([], page, pageSize));
   }
+  // Same server-only reasoning as the board above: the offline world has no
+  // guild to drill into, so the roster read resolves null and the signpost
+  // window renders its localized empty state.
+  guildRoster(_name: string): Promise<GuildRosterInfo | null> {
+    return Promise.resolve(null);
+  }
   // The developer board is sourced from GitHub's contributor stats, which the
   // offline world cannot fetch, so it ranks none: an empty page through the same
   // helper. Online play overrides this with the cached server query.
@@ -4786,31 +4567,10 @@ export class Sim {
     return Promise.resolve(paginateDeedsLeaderboard([], page, pageSize));
   }
 
+  // The offline constant readout (#1307) lives in daily_rewards_stub.ts, the
+  // one file the $WOC token firewall allows to name chain vocabulary.
   dailyRewards(): Promise<DailyRewardStatus> {
-    const day = '1970-01-01';
-    return Promise.resolve({
-      enabled: true,
-      day,
-      resetAt: '1970-01-02T00:00:00.000Z',
-      prizePoolUsd: 0,
-      prizePoolSol: null,
-      eligibility: {
-        eligible: false,
-        reason: 'no_wallet',
-        banReason: null,
-        walletPubkey: null,
-        wocBalance: null,
-        wocUsdPrice: null,
-        usdValue: null,
-        minUsd: 20,
-      },
-      score: 0,
-      rank: null,
-      spin: { claimed: false, points: null, outcomeKey: null, claimedAt: null },
-      tasks: [],
-      leaderboard: [],
-      leaderboardTotal: 0,
-    });
+    return dailyRewardsStub();
   }
 
   dailyRewardLeaderboard(
@@ -5068,7 +4828,7 @@ export class Sim {
   // routes straight back to the Sim method of the same name (the callback registry
   // in 02-WORKING-MEMORY.md). As a later slice owns one of these, it reimplements the
   // callback in its own module without renaming it here, so consumers never change.
-  private buildSimContext(): SimContext {
+  private buildSimContext(reserveVaultConsumption = inertVaultConsumptionAdmission): SimContext {
     const sim = this;
     const host: SimContextHost = {
       get rng() {
@@ -5194,6 +4954,10 @@ export class Sim {
       get cfg() {
         return sim.cfg;
       },
+      get storagePrices() {
+        return sim.storagePrices;
+      },
+      reserveVaultConsumption,
       // A2: duel + arena state stays on Sim, exposed as live views (backing fields
       // mutated in place / the queues reassigned by the matchmaker filter).
       get trades() {
@@ -5292,6 +5056,9 @@ export class Sim {
       get resetDay() {
         return sim.resetDay;
       },
+      get eventLeadDay() {
+        return sim.eventLeadDay;
+      },
       get utcDay() {
         return sim.utcDay;
       },
@@ -5333,6 +5100,9 @@ export class Sim {
       get devCommands() {
         return sim.devCommands;
       },
+      get compulsoryTutorial() {
+        return sim.cfg.compulsoryTutorial;
+      },
       get marketListings() {
         return sim.marketListings;
       },
@@ -5356,11 +5126,6 @@ export class Sim {
       // through the guild_bank.ts helpers. Sim-owned, never reassigned.
       get guildBanks() {
         return sim.guildBanks;
-      },
-      // The Vale Cup holder (queues/deserters/botPids mutated in place; the
-      // match slot reassigned inside the holder, so no setter is needed).
-      get vcup() {
-        return sim.vcup;
       },
       // Book of Deeds live views (all mutated in place, never reassigned).
       get deedDirtyPids() {
@@ -5523,7 +5288,10 @@ export class Sim {
       // shared raid-lockout clock that stays on Sim (N1 also writes through it);
       // raidResetMs is the host-owned reset boundary the lockout grant reads through.
       lockoutNowMs: sim.lockoutNowMs.bind(sim),
-      raidResetMs: sim.raidResetMs.bind(sim),
+      // The host owns both reset boundaries (server: realm-local daily and
+      // weekly resets); offline/headless fall back to the flat defaults above.
+      raidResetMs: (nowMs: number) => sim.cfg.raidResetMs(nowMs),
+      weeklyRaidResetMs: (nowMs: number) => sim.cfg.weeklyRaidResetMs(nowMs),
       instanceKeyFor: sim.instanceKeyFor.bind(sim),
       instanceOriginOf: sim.instanceOriginOf.bind(sim),
       instanceClaimIdAt: sim.instanceClaimIdAt.bind(sim),
@@ -5709,8 +5477,8 @@ export class Sim {
       effectiveAttackPower: sim.effectiveAttackPower.bind(sim),
       hasLineOfSight: sim.hasLineOfSight.bind(sim),
       findChargePath: sim.findChargePath.bind(sim),
-      runEffects: (p, meta, target, res, attackAnimationStarted) =>
-        runEffectsImpl(sim.ctx, p, meta, target, res, attackAnimationStarted),
+      runEffects: (p, meta, target, res, attackAnimationStarted, castHealMult) =>
+        runEffectsImpl(sim.ctx, p, meta, target, res, attackAnimationStarted, castHealMult),
       applySetProcs: sim.applySetProcs.bind(sim),
       // P1a pet-AI seam: the helper the moved updatePet/petRangedAttack/petPickTarget
       // reach back for. syncPetAspect STAYS on Sim (pet-management, P1b owns it eventually);
@@ -5775,21 +5543,6 @@ export class Sim {
       markVisited: (meta, markId) => deedsMod.markVisited(sim.ctx, meta, markId),
       markDeedsDirty: (pid) => deedsMod.markDeedsDirty(sim.ctx, pid),
       grantDeed: (meta, deedId, opts) => deedsMod.grantDeed(sim.ctx, meta, deedId, opts),
-      // Vale Cup <-> Arena queue exclusion (owned by social/vale_cup.ts).
-      // Late-bound arrow so sim.ctx resolves at call time (the Q1 pattern).
-      vcupSeatedOrQueued: (pid) => valeCupMod.vcupSeatedOrQueued(sim.ctx, pid),
-      // The Vale Cup sport-move arms (owned by social/vale_cup.ts). Late-bound
-      // arrows so sim.ctx resolves at call time (the Q1 pattern).
-      vcupBallKick: (caster, power, loft, range) =>
-        valeCupMod.vcupBallKick(sim.ctx, caster, power, loft, range),
-      vcupBallPass: (caster, power, loft, range) =>
-        valeCupMod.vcupBallPass(sim.ctx, caster, power, loft, range),
-      vcupShoot: (caster, power, loft, range) =>
-        valeCupMod.vcupShoot(sim.ctx, caster, power, loft, range),
-      vcupSportDash: (caster, distance, catchBall) =>
-        valeCupMod.vcupSportDash(sim.ctx, caster, distance, catchBall),
-      vcupSportShove: (caster, target, distance) =>
-        valeCupMod.vcupSportShove(sim.ctx, caster, target, distance),
       // Thornhollow Fields battleground hooks (social/battleground.ts).
       bgOnPlayerDeath: (e, killer) => bgMod.bgOnPlayerDeath(sim.ctx, e, killer),
       bgOnPlayerDamaged: (victim, source) => bgMod.bgOnPlayerDamaged(sim.ctx, victim, source),
@@ -5915,7 +5668,8 @@ export class Sim {
     // jump must strengthen (or weaken) the mastery, exactly like the live ding path
     // (combat/damage.ts grantXp). Without this a level-jumped character keeps the
     // mastery baked at the OLD level.
-    r.meta.talentMods = computeTalentModifiers(r.meta.cls, r.meta.talents, r.e.level);
+    const m = r.meta;
+    m.talentMods = computeCharacterModifiers(m.cls, m.talents, r.e.level, m.equipment);
     recalcPlayerStats(
       r.e,
       r.meta.cls,
@@ -6053,7 +5807,9 @@ export class Sim {
     // hunter resolvers land here, the one choke point the cast path, cost
     // checks, and the server all read).
     let found = resolveActionReplacement(known, r.e);
-    found = resolveColdsightAbility(found, r.e, r.meta);
+    // The worn-set flags ride playerMods.selected (set_bonus_mods): the
+    // Coldsight 2pc hook reads them after the Cold Focus absolute rewrite.
+    found = resolveColdsightAbility(found, r.e, r.meta, this.playerMods(r.meta).selected);
     found = resolveHunterSharedAbility(found, r.e, r.meta);
     found = resolveVespersAbility(found, r.meta);
     // `known` already carries its own talent mods, baked in once when
@@ -6091,12 +5847,10 @@ export class Sim {
       cost = Math.round(cost * aetherSurgeCostMult(r.e));
     }
     const costResolved = cost === found.cost ? found : { ...found, cost };
-    const ascensionResolved = resolveAscensionAbility(
-      r.e,
-      this.playerMods(r.meta).spec,
-      costResolved,
-    );
-    const castTime = radiantResonanceCastTime(r.e, abilityId, ascensionResolved.castTime);
+    const charMods = this.playerMods(r.meta);
+    const ascensionResolved = resolveAscensionAbility(r.e, charMods.spec, costResolved);
+    // charMods carries the worn-set flags (Dawnforged 4pc: instant empowered Dawn's Embrace).
+    const castTime = radiantResonanceCastTime(r.e, abilityId, ascensionResolved.castTime, charMods);
     return castTime === ascensionResolved.castTime
       ? ascensionResolved
       : { ...ascensionResolved, castTime };
@@ -6326,10 +6080,6 @@ export class Sim {
     lap?.('instances');
     this.updateDelveRuns();
     lap?.('delves');
-    // The Vale Cup phase draws ZERO shared rng (pure ball physics + timers +
-    // tick-staggered bots), so appending it here cannot fork the draw order.
-    this.updateValeCup();
-    lap?.('valecup');
     // Thornhollow Fields' ACTIVE phase draws ZERO rng (queue-order matchmaking,
     // tick-math wave and rune clocks; the one seeded draw is the power-rune
     // face at match START), so its tick position cannot fork the draw order
@@ -6359,6 +6109,19 @@ export class Sim {
     // first-tier tutorial personal events. Draws ZERO rng (it only emits events,
     // which draw nothing), so its mail-phase position cannot fork the draw order.
     updateProfNudges(this.ctx);
+    // The spawn greeting sweep (tutorial island): the one-shot compulsory
+    // ferry for fresh characters. Draws ZERO rng (it emits events and
+    // displaces, and displacePlayer itself draws nothing), so its
+    // mail-phase position cannot fork the draw order.
+    updateTutorialGreeting(this.ctx, this.ownPlayerPid);
+    // The Gauntlet run sweep (tutorial island): per-tick flag credit for
+    // q_ps_the_gauntlet, the same zero-rng argument as the greeting above.
+    updateGauntletRuns(this.ctx);
+    // The ability drill's rage loan (tutorial island): keeps a warrior
+    // standing in the effigy yard able to press the button the coach is
+    // naming. Draws ZERO rng (it clamps one resource bar and emits nothing),
+    // so its position cannot fork the draw order.
+    updateAbilityDrill(this.ctx);
     // The one-time mastery reset notice (Professions 2.0): drains
     // the transient pendingMasteryResetNotice flag the load-time reset branch
     // set. Draws ZERO rng and emits nothing itself (it only books a letter
@@ -6389,14 +6152,25 @@ export class Sim {
   private shouldSkipIdleMobTick(mob: Entity): boolean {
     const radius = this.cfg.idleMobTickRadius ?? 0;
     if (radius <= 0) return false;
-    if (
-      mob.dead ||
+    if (mob.dead) {
+      // Instance corpse fields (a cleared rift floor's packs) never decay or
+      // respawn, so once every dead-branch effect is provably spent the corpse
+      // stops paying updateMob. Radius-gated like the live cull: the radius is
+      // the interest-drop radius, so a skipped corpse is outside every
+      // player's replicated view EXCEPT a viewer's own target (targets get
+      // NPC_DROP_RADIUS, slightly wider); that is safe today because the only
+      // frozen fields are two timers nothing serializes, and any change to
+      // that must re-check this exception. Dead mobs draw no rng, so the skip
+      // cannot shift the shared draw order.
+      if (!isInertInstanceCorpse(mob)) return false;
+    } else if (
       mob.ownerId !== null ||
       mob.aiState !== 'idle' ||
       mob.inCombat ||
       mob.auras.length > 0
-    )
+    ) {
       return false;
+    }
     if (this.players.size === 0) return true;
     return !this.playerGrid.hasInRadius(mob.pos.x, mob.pos.z, radius);
   }
@@ -6426,7 +6200,16 @@ export class Sim {
     const aura = this.fearAura(e);
     if (!aura || e.auras.some((a) => a.kind === 'root') || hasUnbreakableMovementLock(e, aura))
       return false;
-    const angle = Number.isFinite(aura.value) ? aura.value : e.facing;
+    let angle = Number.isFinite(aura.value) ? aura.value : e.facing;
+    // Player-only wall guard (combat/fear_steering.ts): redirect the flee heading
+    // away from a wall it is about to run into, and remember the new heading on the
+    // aura so it holds until the next wall. Feared mobs keep their untouched
+    // movement (and the parity draw order with it), matching the vertical snap's
+    // player-only scoping.
+    if (e.kind === 'player') {
+      angle = steerFearFromWalls(this.ctx, e, angle);
+      aura.value = angle;
+    }
     const dest = this.groundPos(e.pos.x + Math.sin(angle) * 10, e.pos.z + Math.cos(angle) * 10);
     this.moveToward(e, dest, this.fleeMoveSpeed(e));
     return true;
@@ -6513,6 +6296,9 @@ export class Sim {
         reductionPct = Math.max(reductionPct, SUNDER_ARMOR_PCT_PER_STACK * (a.stacks ?? 1));
       else if (a.kind === 'faerie_fire')
         reductionPct = Math.max(reductionPct, FAERIE_FIRE_ARMOR_PCT);
+      // Melting Acid carries its own fraction on the aura (0.05), so a future
+      // rank or talent scales the value rather than a constant here.
+      else if (a.kind === 'melting_acid') reductionPct = Math.max(reductionPct, a.value);
     }
     return Math.max(0, armor * (1 - reductionPct));
   }
@@ -6534,14 +6320,7 @@ export class Sim {
 
   private petDamageMult(e: Entity): number {
     if (e.ownerId === null) return 1;
-    let mult = 1;
-    for (const a of e.auras) {
-      if (a.kind === 'pet_damage_pct') mult += pctValue(a.value);
-    }
-    const ownerMeta = this.players.get(e.ownerId);
-    if (ownerMeta) mult *= 1 + this.playerMods(ownerMeta).global.petDmgPct;
-    mult *= hunterPetFerocityDamageMultiplier(this.ctx, e);
-    return mult;
+    return hunterPetDamageMultiplier(this.ctx, e);
   }
 
   // Non-player stat-aura HP bookkeeping moved to pet/pet_commands.ts (P1b); Sim keeps
@@ -6588,10 +6367,10 @@ export class Sim {
   // Bloodlust 1.3 x Wildfang Rally 1.05 x Enrage 1.25 = 1.71x attack speed
   // instead of the additive 1.6x. Single-source cases are unchanged
   // (1/(1 + x) === 1/mult for one aura). Slows keep their own multiplicative
-  // axis so layered slows are not weakened by the haste change.
-  swingIntervalMult(e: Entity): number {
+  // axis so layered slows are not weakened by the haste change; `channel` picks the seed stat.
+  swingIntervalMult(e: Entity, channel: 'melee' | 'ranged' = 'melee'): number {
     let slow = 1;
-    let haste = e.meleeHaste;
+    let haste = channel === 'ranged' ? e.rangedHaste : e.meleeHaste;
     for (const a of e.auras) {
       if (a.kind === 'attackspeed' || a.kind === 'sanguine') slow *= a.value;
       if (a.kind === 'buff_haste') haste += a.value - 1;
@@ -6819,10 +6598,10 @@ export class Sim {
     // The rest of the step (turn integration, wish vector, slope gates, swept
     // static collision, the vertical pass with fall damage) moved VERBATIM to
     // player_motion.ts (MV1), which also eases the body off terrain walls at the
-    // end (the standoff); playerMotionDeps binds the live Sim callbacks (fiesta-
-    // aware moveSpeedMult, delve-aware resolveMove, cancelCast/standUp/dealDamage)
-    // so behavior and the rng draw order are unchanged.
+    // end (the standoff); playerMotionDeps binds the live Sim callbacks
+    // (moveSpeedMult, resolveMove, cancelCast/standUp/dealDamage), preserving rng order.
     stepPlayerMotion(this.playerMotionDeps, p, meta.moveInput);
+    unstuckMod.noteBattlegroundWallPressure(this.ctx, meta, p);
   }
 
   private standUp(p: Entity): void {
@@ -6968,15 +6747,23 @@ export class Sim {
   }
 
   private hasLineOfSight(source: Entity, target: Entity): boolean {
-    const run =
-      this.delveRunForMob(source.id) ??
-      this.delveRunForMob(target.id) ??
-      this.delveRunForPlayer(source.id) ??
-      this.delveRunForPlayer(target.id);
-    return lineOfSightClear(
+    // The delve-run lookup is O(active runs x mobs per run) and allocates a
+    // party key per call, and this method sits on every ranged auto-attack,
+    // AoE pulse, and LOS-gated cast. Only a sight line with an endpoint
+    // inside the delve band can ever consume run.modules (the collider LOS
+    // delve arm keys off from.x), so every other combat sight check skips
+    // all four lookups. Mirrors the movement path's isDelvePos guard.
+    const inDelve = isDelvePos(source.pos.x) || isDelvePos(target.pos.x);
+    const run = inDelve
+      ? (this.delveRunForMob(source.id) ??
+        this.delveRunForMob(target.id) ??
+        this.delveRunForPlayer(source.id) ??
+        this.delveRunForPlayer(target.id))
+      : undefined;
+    return entityLineOfSightClear(
       this.cfg.seed,
-      source.pos,
-      target.pos,
+      source,
+      target,
       0.05,
       run?.modules,
       this.riftCollisionToken,
@@ -7288,6 +7075,7 @@ export class Sim {
   private applyKnockback(source: Entity, target: Entity, distance: number): number {
     if (source.id !== target.id && this.isIceBlocked(target)) return 0;
     if (source.id !== target.id && isVeilboundMarchActive(target)) return 0;
+    if (this.cfg.devCommands && this.players.get(target.id)?.devAnchored) return 0;
     // Knockback resistance (the caster tier-set 2-piece grants 100%) is applied
     // centrally here so no caller can bypass it: a fully-resisted shove moves 0 yards
     // and never displaces the victim, so a caster keeps casting through it.
@@ -7421,7 +7209,12 @@ export class Sim {
 
   // Taunt/Growl, classic semantics: never misses, lifts the caster's threat to
   // the top of the table, and forces the mob onto the caster for 3 seconds.
-  private applyTaunt(p: Entity, mob: Entity): void {
+  private applyTaunt(p: Entity, mob: Entity): boolean {
+    // The one shared taunt entry (single-target, area, hunter/warlock pet growl,
+    // necromancy undead): a quest-gated mob must stay untouchable in this direction
+    // too, or an area taunt swept over a hidden Broodmother egg would still seed
+    // threat/forcedTargetId and force it into combat with a non-quester.
+    if (questGateBlocksAggro(this.players, mob, p)) return false;
     const top = topThreatValue(mob);
     const mine = mob.threat.get(p.id) ?? 0;
     mob.threat.set(p.id, Math.max(mine, top, 1));
@@ -7431,11 +7224,11 @@ export class Sim {
     // aggroed it permanently and pinned the attacker in combat forever.
     if (MOBS[mob.templateId]?.ignoreTaunt || MOBS[mob.templateId]?.dummy) {
       this.enterCombat(p, mob);
-      return;
+      return true;
     }
     if (p.ownerId !== null && MOBS[mob.templateId]?.boss) {
       this.enterCombat(p, mob);
-      return;
+      return true;
     }
     mob.forcedTargetId = p.id;
     mob.forcedTargetTimer = TAUNT_FORCE_SECONDS;
@@ -7448,6 +7241,7 @@ export class Sim {
       mob.fleeReturnTimer = 0;
     }
     this.enterCombat(p, mob);
+    return true;
   }
 
   // -------------------------------------------------------------------------
@@ -7533,8 +7327,7 @@ export class Sim {
   }
 
   feedPet(itemId: string, pidOrTarget?: number | { slotIndex: number }, slotIndex?: number): void {
-    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
-    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    const { pid, named } = foldNamedSlotTarget(pidOrTarget, slotIndex);
     petCommands.feedPet(this.ctx, itemId, pid, named);
   }
 
@@ -7661,7 +7454,8 @@ export class Sim {
     );
   }
 
-  private enterCombat(a: Entity, b: Entity): void {
+  private enterCombat(a: Entity, b: Entity): boolean {
+    if (questGateBlocksCombat(this.players, a, b)) return false;
     a.combatTimer = 0;
     b.combatTimer = 0;
     a.inCombat = true;
@@ -7689,6 +7483,7 @@ export class Sim {
     ) {
       this.aggroMob(a, b, false);
     }
+    return true;
   }
 
   private handleDeath(e: Entity, killer: Entity | null, killerAbility?: string | null): void {
@@ -7823,7 +7618,7 @@ export class Sim {
     return mobCombatProfileFn(mob);
   }
 
-  aggroMob(mob: Entity, target: Entity, social: boolean): void {
+  aggroMob(mob: Entity, target: Entity, social: boolean): boolean {
     if (
       mob.dead ||
       mob.aiState === 'evade' ||
@@ -7831,7 +7626,14 @@ export class Sim {
       mob.aiState === 'attack' ||
       mob.aiState === 'flee'
     )
-      return;
+      return false;
+    // [dev] /dev noaggro: a designer positioning mobs is invisible to autonomous
+    // pulls, so the pack stays exactly where it spawned. The single aggro choke
+    // point, so this covers proximity, social, and retaliation pulls alike.
+    if (target.kind === 'player' && target.devNoAggro) return false;
+    // A quest-gated destructible (e.g. a Broodmother egg) never autonomously pulls a
+    // player its own damage gate would refuse: see mob/quest_gated_aggro.ts.
+    if (questGateBlocksAggro(this.players, mob, target)) return false;
     mob.aiState = 'chase';
     mob.aggroTargetId = target.id;
     mob.inCombat = true;
@@ -7861,28 +7663,12 @@ export class Sim {
     // actually reach the fight. Reordering these two would quietly shorten the
     // leash on every mob they both claim.
     if (playerPull) chainPullInstanceOnBossAggro(this.ctx, mob, target);
-    if (social) {
-      const family = MOBS[mob.templateId]?.family;
-      const pullRadius = (family && SOCIAL_PULL_RADIUS[family]) ?? DEFAULT_SOCIAL_PULL_RADIUS;
-      this.grid.forEachInRadius(mob.pos.x, mob.pos.z, pullRadius, (m, d2) => {
-        if (
-          m.kind === 'mob' &&
-          m.id !== mob.id &&
-          !m.dead &&
-          m.hostile &&
-          m.aiState === 'idle' &&
-          m.ownerId === null &&
-          m.templateId === mob.templateId &&
-          d2 < pullRadius * pullRadius
-        ) {
-          m.aiState = 'chase';
-          m.aggroTargetId = target.id;
-          m.inCombat = true;
-          m.leashAnchor = { ...m.pos };
-          addThreat(m, target.id, 1);
-        }
-      });
-    }
+    // Authored dungeon packs engage as a unit on every player/pet pull, including
+    // the non-social aggro path used by taunts. Keep this separate from the generic
+    // same-template radius below: `social` only controls that legacy propagation.
+    if (playerPull) aggroDungeonPackmates(this.entities.values(), mob, target);
+    if (social) socialPullSameTemplate(this.ctx, mob, target);
+    return true;
   }
 
   private updateMob(mob: Entity): void {
@@ -8087,8 +7873,8 @@ export class Sim {
         this.enterCombat(pet, target);
       } else {
         // rangedDamageMult is the instance-tuning factor for a HOSTILE petSpell
-        // caster (undefined, so 1, for every player pet and every untuned or
-        // heroic spawn). Applied after the rng draw like the mechanic
+        // caster (undefined, so 1, for every player pet and every untuned
+        // spawn). Applied after the rng draw like the mechanic
         // multipliers, so the shared draw order is unchanged.
         const dmg = Math.round(
           this.rng.range(spell.min + pet.level * 0.8, spell.max + pet.level * 1.1) *
@@ -8189,12 +7975,13 @@ export class Sim {
           h0 = ride(e.pos.x, e.pos.z, groundHeight(e.pos.x, e.pos.z, this.cfg.seed));
         if (ride(nx, nz, groundHeight(nx, nz, this.cfg.seed)) > h0) continue;
       }
-      const r = this.resolveMovePoint(nx, nz, BODY_RADIUS, e);
       // The Great Maze's hedge walls are hard for mobs too (the maze patrol
-      // knights pace their dead ends instead of drifting through a hedge);
-      // crossesGardenHedge fast-rejects outside the maze, so the open-world
-      // fan pays two comparisons.
-      if (crossesGardenHedge(e.pos.x, e.pos.z, r.x, r.z)) continue;
+      // knights pace their dead ends instead of drifting through a hedge).
+      // resolveMovePoint now does that on its own: the hedges are real collider
+      // boxes, so this no longer needs its own segment test, and keeping one
+      // would reject every candidate for a body that ever ended up inside a
+      // hedge, leaving it stuck instead of letting the push-out carry it clear.
+      const r = this.resolveMovePoint(nx, nz, BODY_RADIUS, e);
       const progress = d - Math.hypot(r.x - dest.x, r.z - dest.z);
       if (progress > bestProgress) {
         bestProgress = progress;
@@ -8966,6 +8753,17 @@ export class Sim {
     this.ctx.onInventoryChangedForQuests(meta);
   }
 
+  // The broker custody pair (extraction into escrow, grant back) lives in
+  // broker_custody.ts; these stay as the delegates server/woc_market_custody.ts
+  // resolves on the Sim facade.
+  extractTradableCopy(pid: number | undefined, ref: ExtractRef): ExtractOutcome {
+    return extractTradableCopyImpl(this.ctx, pid, ref);
+  }
+
+  grantTradableCopy(pid: number | undefined, slot: InvSlot): boolean {
+    return grantTradableCopyImpl(this.ctx, pid, slot);
+  }
+
   // Enchanting-eligible count for `itemId` (#1712 review): a plain fungible
   // stack counts, and so does an instanced copy that is not itself already
   // enchanted (e.g. crafting.ts's single-copy rare+ grant or a
@@ -9050,7 +8848,7 @@ export class Sim {
     const r = this.resolve(pid);
     if (!r) return false;
     const { meta } = r;
-    return canAddItem(meta.inventory, bagCapacity(meta.bags), itemId, count);
+    return canAddItem(meta.inventory, bagPools(meta.bags), itemId, count);
   }
 
   equipBag(
@@ -9059,8 +8857,7 @@ export class Sim {
     pidOrTarget?: number | { slotIndex: number },
     slotIndex?: number,
   ): void {
-    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
-    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    const { pid, named } = foldNamedSlotTarget(pidOrTarget, slotIndex);
     bagsMod.equipBag(this.ctx, itemId, socket, pid, named);
   }
 
@@ -9074,8 +8871,7 @@ export class Sim {
     pidOrTarget?: number | { slotIndex: number },
     slotIndex?: number,
   ): void {
-    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
-    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    const { pid, named } = foldNamedSlotTarget(pidOrTarget, slotIndex);
     items.discardItem(this.ctx, itemId, count, pid, named);
   }
 
@@ -9085,8 +8881,7 @@ export class Sim {
     pidOrTarget?: number | { slotIndex: number },
     slotIndex?: number,
   ): void {
-    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
-    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    const { pid, named } = foldNamedSlotTarget(pidOrTarget, slotIndex);
     setItemLockedCmd(this.ctx, itemId, locked, pid, named);
   }
 
@@ -9098,8 +8893,7 @@ export class Sim {
   ): void {
     // The disenchantItem shape (see it for the reasoning): position 2 carries the
     // target for an IWorld caller and pid for a sim/server caller.
-    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
-    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    const { pid, named } = foldNamedSlotTarget(pidOrTarget, slotIndex);
     items.equipItem(this.ctx, itemId, pid, targetSlot, named);
   }
 
@@ -9124,8 +8918,7 @@ export class Sim {
     // The aimed equip arm, and the one the UI actually drives (char_window drag
     // to a paperdoll slot), so a gear loadout reaches equip through HERE rather
     // than through the unaimed equipItem.
-    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
-    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    const { pid, named } = foldNamedSlotTarget(pidOrTarget, slotIndex);
     items.equipItem(this.ctx, itemId, pid, slot, named);
   }
 
@@ -9138,8 +8931,7 @@ export class Sim {
     pidOrTarget?: number | { slotIndex: number },
     slotIndex?: number,
   ): ItemUseResult | undefined {
-    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
-    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    const { pid, named } = foldNamedSlotTarget(pidOrTarget, slotIndex);
     return items.useItem(this.ctx, itemId, pid, named);
   }
 
@@ -9159,8 +8951,7 @@ export class Sim {
     pidOrTarget?: number | { slotIndex: number },
     slotIndex?: number,
   ): void {
-    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
-    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    const { pid, named } = foldNamedSlotTarget(pidOrTarget, slotIndex);
     items.sellItem(this.ctx, itemId, count, pid, named);
   }
 
@@ -9319,6 +9110,17 @@ export class Sim {
   // recent masterwork proc, or null before their first proc this session.
   get lastMasterwork(): MasterworkProc | null {
     return this.players.get(this.primaryId)?.lastMasterwork ?? null;
+  }
+
+  // The tutorial greeting's accept button (IWorldQuests.startTutorial): the
+  // ferry ride to the Proving Shore. All gates (alive, out of combat, level 1,
+  // overworld) re-run here on the authoritative copy; the client never
+  // predicts it.
+  startTutorial(pid?: number): void {
+    if (refusedWhileDead(this.ctx, pid)) return;
+    const r = this.ctx.resolve(pid);
+    if (!r) return;
+    resolveStartTutorial(this.ctx, r.e, r.meta);
   }
 
   // Mobile crafting station command (Professions 2.0, wiring #1134):
@@ -9543,8 +9345,7 @@ export class Sim {
     // passes the target here, a sim/server caller passes pid. Both arities must
     // stay, because IWorld declares (itemId, target?) while server/game.ts and
     // the RL host call (itemId, pid, slot).
-    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
-    const targetSlotIndex = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    const { pid, named: targetSlotIndex } = foldNamedSlotTarget(pidOrTarget, slotIndex);
     if (refusedWhileDead(this.ctx, pid)) return;
     // Phase 4: salvageItemImpl starts a cast or returns a start-gate denial.
     // On casting:true castStart is the surface; salvageResult lands only from
@@ -9585,8 +9386,7 @@ export class Sim {
     pidOrTarget?: number | { slotIndex: number },
     slotIndex?: number,
   ): RiftForgeResult {
-    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
-    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    const { pid, named } = foldNamedSlotTarget(pidOrTarget, slotIndex);
     return upgradeRiftItemImpl(this.ctx, itemId, pid, named);
   }
 
@@ -9596,8 +9396,7 @@ export class Sim {
     pidOrTarget?: number | { slotIndex: number },
     slotIndex?: number,
   ): RiftForgeResult {
-    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
-    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    const { pid, named } = foldNamedSlotTarget(pidOrTarget, slotIndex);
     return enchantRiftItemImpl(this.ctx, itemId, stat, pid, named);
   }
 
@@ -9607,9 +9406,13 @@ export class Sim {
     pidOrTarget?: number | { slotIndex: number },
     slotIndex?: number,
   ): RiftForgeResult {
-    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
-    const named = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    const { pid, named } = foldNamedSlotTarget(pidOrTarget, slotIndex);
     return socketRiftGemImpl(this.ctx, itemId, gemId, pid, named);
+  }
+
+  // IWorldInventory: the BoP window countdown against the clock that stamped it.
+  partyTradeMsRemaining(untilMs: number): number {
+    return Math.max(0, untilMs - this.lockoutNowMs());
   }
 
   // Enchanting profession commands (IWorldProfessions): same thin-
@@ -9619,8 +9422,7 @@ export class Sim {
     pidOrTarget?: number | { slotIndex: number },
     slotIndex?: number,
   ): void {
-    const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
-    const targetSlotIndex = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    const { pid, named: targetSlotIndex } = foldNamedSlotTarget(pidOrTarget, slotIndex);
     if (refusedWhileDead(this.ctx, pid)) return;
     // Phase 4: start cast or deny; result event only on complete or start deny.
     const result = disenchantItemImpl(this.ctx, itemId, pid, targetSlotIndex);
@@ -10126,16 +9928,7 @@ export class Sim {
       // bounces off GM invulnerability. Audited punishment stays /kill; this
       // is for roughing up the cellblock.
       if (attackerPlayer.gm && target.jailed) return true;
-      // The Vale Cup: opposing fighters are hostile only while play is live so
-      // the harvest-truce Shoulder can land on them (targeting also opens during
-      // the countdown via targeting.ts; damage between seated fighters is
-      // floored to 0 in combat/damage.ts, boots and shoulders only).
-      const cupMatch = this.vcup.match;
-      return (
-        !!cupMatch &&
-        (cupMatch.phase === 'active' || cupMatch.phase === 'golden') &&
-        valeCupMod.isVcupCrossTeam(cupMatch, attackerPlayer.id, target.id)
-      );
+      return false;
     }
     return false;
   }
@@ -10310,7 +10103,7 @@ export class Sim {
         if (!taken) break;
         name = `${baseName}${n}`;
       }
-      const botPid = this.addPlayer(cls, name);
+      const botPid = this.addPlayer(cls, name, { bot: true });
       const meta = this.players.get(botPid);
       if (meta) meta.isDevBot = true;
       spawnSeq++;
@@ -10438,6 +10231,8 @@ export class Sim {
   realm = '';
   // Offline the player owns the world, so admin-gated dev surfaces are open.
   accountAdmin = true;
+  // Offline play never spectates: this session is always its own viewer.
+  readonly spectating: string | null = null;
   socialInfo: null = null;
   friendAdd(_name: string): void {}
   friendRemove(_name: string): void {}
@@ -10447,6 +10242,10 @@ export class Sim {
   ignoreRemove(_name: string): void {}
   guildCreate(_name: string): void {}
   guildInvite(_name: string): void {}
+  guildPledge(_name: string): void {}
+  guildPledgeWithdraw(): void {}
+  guildPledgeDecide(_name: string, _accept: boolean): void {}
+  setGuildPledgeSettings(_enabled: boolean, _minLevel: number, _note: string): void {}
   guildAccept(): void {}
   guildDecline(): void {}
   guildLeave(): void {}
@@ -10843,77 +10642,6 @@ export class Sim {
     fiestaBotsMod.updateFiestaBots(this);
   }
 
-  // -------------------------------------------------------------------------
-  // The Vale Cup: boarball at the Sowfield (social/vale_cup.ts +
-  // social/vale_cup_bots.ts). State stays on Sim (`this.vcup`); Sim keeps thin
-  // same-named delegates for the IWorld facet, the server, and tests. The bots
-  // are driven inside the same tick phase (they need Sim-only affordances), so
-  // the server's queue backfill and the offline Practice run identical code.
-  // -------------------------------------------------------------------------
-
-  private updateValeCup(): void {
-    valeCupMod.updateValeCup(this.ctx);
-    valeCupBotsMod.updateValeCupBots(this);
-  }
-
-  vcupQueueJoin(
-    bracket: VcBracket,
-    nation: VcNationId,
-    role: SportRole,
-    enterAsGuild = false,
-    pid?: number,
-  ): void {
-    valeCupMod.vcupQueueJoin(this.ctx, bracket, nation, role, enterAsGuild, pid);
-  }
-
-  vcupQueueLeave(pid?: number): void {
-    valeCupMod.vcupQueueLeave(this.ctx, pid);
-  }
-
-  vcupSetRole(role: SportRole, pid?: number): void {
-    valeCupMod.vcupSetRole(this.ctx, role, pid);
-  }
-
-  vcupReady(pid?: number): void {
-    valeCupMod.vcupReady(this.ctx, pid);
-  }
-
-  vcupBet(side: 'A' | 'B', amount: number, pid?: number): void {
-    valeCupMod.vcupPlaceBet(this.ctx, pid ?? this.primaryId, side, amount);
-  }
-
-  // Private practice bout vs bots on an instanced pitch copy (parallel to the
-  // real match). Runs identically offline and on the server (via vcup_practice).
-  vcupPracticeStart(bracket: VcBracket, pid?: number): void {
-    valeCupBotsMod.startValeCupPractice(this, bracket, pid);
-  }
-
-  /** The live cup match this pid is seated in, if any (server helpers). */
-  vcupMatchOf(pid: number): valeCupMod.VcMatch | null {
-    return valeCupMod.vcupMatchOf(this.ctx, pid);
-  }
-
-  /** Idempotent desertion resolution; the server calls it BEFORE the leave
-   *  save so the counted loss reaches the persisted standing. */
-  vcupResolveDesertion(pid: number): void {
-    valeCupMod.vcupResolveDesertion(this.ctx, pid);
-  }
-
-  cupInfoFor(
-    pid: number,
-    shared?: import('../world_api/vale_cup').VcSharedCupInfo,
-  ): import('../world_api/vale_cup').CupInfo | null {
-    return valeCupMod.cupInfoFor(this.ctx, pid, shared);
-  }
-
-  cupSharedInfoFor(): import('../world_api/vale_cup').VcSharedCupInfo {
-    return valeCupMod.cupSharedInfoFor(this.ctx);
-  }
-
-  get cupInfo(): import('../world_api/vale_cup').CupInfo | null {
-    return this.primaryId === -1 ? null : this.cupInfoFor(this.primaryId);
-  }
-
   private fiestaMatchInfo(
     match: ArenaMatch,
     pid: number,
@@ -11103,6 +10831,10 @@ export class Sim {
     tradeMod.tradeCancel(this.ctx, pid);
   }
 
+  tradeClose(pid?: number): void {
+    tradeMod.tradeClose(this.ctx, pid);
+  }
+
   // offerCovered / closeTrade are module-internal in social/trade.ts now (no Sim
   // delegate; only the moved trade methods used them).
 
@@ -11142,6 +10874,66 @@ export class Sim {
     return bankMod.bankInfoFor(this.ctx, pid);
   }
 
+  bankInfoWireRevFor(pid: number): number | null {
+    return bankMod.bankInfoWireRevFor(this.ctx, pid);
+  }
+
+  // Thin delegates to the socket free functions (bank_sockets.ts); state rides
+  // the same PlayerMeta.bank. bankSocketBag folds the facet's named-slot
+  // target into the trailing pid/slotIndex pair, the equipBag idiom.
+
+  bankUnlockSocket(pid?: number): void {
+    bankSocketsMod.bankUnlockSocket(this.ctx, pid);
+  }
+
+  bankSocketBag(
+    itemId: string,
+    socket?: number,
+    pidOrTarget?: number | { slotIndex: number },
+    slotIndex?: number,
+  ): void {
+    const { pid, named } = foldNamedSlotTarget(pidOrTarget, slotIndex);
+    bankSocketsMod.bankSocketBag(this.ctx, itemId, socket, pid, named);
+  }
+
+  bankUnsocketBag(socket: number, pid?: number): void {
+    bankSocketsMod.bankUnsocketBag(this.ctx, socket, pid);
+  }
+
+  // -------------------------------------------------------------------------
+  // The Materials Vault: the per-character material stockpile
+  // -------------------------------------------------------------------------
+  // Thin delegates; materials_vault.ts owns state, persistence, gates, and revisions.
+  vaultDeposit(slotIndex: number, count?: number, pid?: number): void {
+    vaultMod.vaultDeposit(this.ctx, slotIndex, count, pid);
+  }
+  vaultDepositAll(pid?: number): void {
+    vaultMod.vaultDepositAll(this.ctx, pid);
+  }
+  vaultWithdraw(...args: vaultMod.VaultWithdrawArgs): void {
+    vaultMod.vaultWithdraw(this.ctx, ...args);
+  }
+  vaultBuyUpgrade(pid?: number): void {
+    vaultMod.vaultBuyUpgrade(this.ctx, pid);
+  }
+  vaultInfoFor(pid: number): import('../world_api').VaultInfo | null {
+    return vaultMod.vaultInfoFor(this.ctx, pid);
+  }
+  vaultInfoWireRevFor(pid: number): number | null {
+    return vaultMod.vaultInfoWireRevFor(this.ctx, pid);
+  }
+  vaultWireRevFor(pid: number): number | null {
+    return vaultMod.vaultWireRevFor(this.ctx, pid);
+  }
+  // NOT banker-gated, unlike every read above: gated instead on the
+  // craft-from-vault context predicate (src/sim/vault_craft_gate.ts).
+  craftVaultStockFor(pid: number): Record<string, number> | null {
+    return vaultMod.craftVaultStockFor(this.ctx, pid);
+  }
+  craftVaultDrawBlockedFor(pid: number): boolean {
+    return vaultMod.craftVaultDrawBlockedFor(this.ctx, pid);
+  }
+
   // -------------------------------------------------------------------------
   // The Guild Bank: the shared guild treasury + item store (Phase 1 foundation)
   // -------------------------------------------------------------------------
@@ -11171,15 +10963,14 @@ export class Sim {
     return guildBankMod.guildBankHoldings(this.ctx, guildId);
   }
 
-  // Reserve-at-gate (state.md, revised by Phase 3 QA): the server charges this
-  // synchronously at the guild_create dispatch gate, before any DB work, and
-  // refunds on every refusal arm. Returns the copper actually charged.
+  // Paid guild creation charges at the head of the character-save FIFO, just
+  // before its atomic post-charge snapshot. Returns the copper actually charged.
   chargeGuildCreationFeeFor(pid: number): number {
     return guildBankMod.chargeGuildCreationFee(this.ctx, pid);
   }
 
-  // The refusal arm of the reserve-at-gate flow: return a reserved creation
-  // fee to the purse. Returns the copper actually refunded.
+  // Compensate only after the DB layer proves the atomic create rolled back.
+  // Ambiguous COMMIT outcomes reload durable truth instead of refunding.
   refundGuildCreationFeeFor(pid: number, amount: number): number {
     return guildBankMod.refundGuildCreationFee(this.ctx, pid, amount);
   }
@@ -11326,10 +11117,8 @@ export class Sim {
   // The Ravenpost: in-game mail
   // -------------------------------------------------------------------------
 
-  // Thin delegates to the PostOffice instance (this.postOffice), which owns the
-  // mail book / id counter / mailbox entity ids (mail/post_office.ts, the
-  // market.ts shape). server/game.ts and the IWorld surface call these
-  // unchanged; the inventory hub stays on Sim, reached via the SimContext.
+  // Thin delegates to PostOffice (this.postOffice), the mail book/id-counter/
+  // mailbox-ids owner (mail/post_office.ts, the market.ts shape).
 
   mailSend(
     to: string,
@@ -11377,6 +11166,20 @@ export class Sim {
     return this.postOffice.mailRevFor(pid);
   }
 
+  // Custody mail ($WOC Exchange escrow returns and deliveries).
+  mailSystemParcel(
+    recipient: { key: string; name: string },
+    letter: import('./content/letters').LetterDef,
+    items: InvSlot[],
+    custodyRef?: string,
+  ): boolean {
+    return this.postOffice.mailSystemParcel(recipient, letter, items, custodyRef);
+  }
+
+  hasCustodyParcel(custodyRef: string): boolean {
+    return this.postOffice.hasCustodyParcel(custodyRef);
+  }
+
   mailUnreadFor(pid: number): number {
     return this.postOffice.mailUnreadFor(pid);
   }
@@ -11392,6 +11195,14 @@ export class Sim {
 
   serializeMail(): MailSave {
     return this.postOffice.serializeMail();
+  }
+
+  takeDirtyMailPartitions(): { recipientKey: string; letters: MailSave['mail'] }[] {
+    return this.postOffice.takeDirtyMailPartitions();
+  }
+
+  markMailPartitionsDirty(recipientKeys: readonly string[]): void {
+    this.postOffice.markPartitionsDirty(recipientKeys);
   }
 
   loadMail(save: MailSave | null | undefined): void {
@@ -11512,6 +11323,12 @@ export class Sim {
     buyHeroicVendorItemImpl(this.ctx, itemId, pid);
   }
 
+  // Crucible Quartermaster sigil redemption (owned by instances/crucible_vendor.ts):
+  // the crucible_buy command dispatch and the offline HUD resolve it here.
+  buyCrucibleVendorItem(itemId: string, pid?: number): void {
+    buyCrucibleVendorItemImpl(this.ctx, itemId, pid);
+  }
+
   private dungeonDifficultyForPid(pid: number): DungeonDifficulty {
     // In a party the PARTY state is the only authority (leader-set): falling
     // through to a member's personal stamp would let a stale solo preference
@@ -11558,58 +11375,7 @@ export class Sim {
   }
 
   get partyInfo(): import('../world_api').PartyInfo | null {
-    const party = this.partyOf(this.primaryId);
-    if (!party) return null;
-    const aggroTargets = partyFrameAggroTargets(this.entities.values());
-    const incomingHeals = partyFrameIncomingHeals(this.entities.values(), (abilityId, casterId) =>
-      this.resolvedAbility(abilityId, casterId),
-    );
-    return {
-      leader: party.leader,
-      raid: party.raid,
-      master: { ...party.lootStrategies.master },
-      members: party.members.flatMap((mPid) => {
-        const meta = this.players.get(mPid);
-        const e = this.entities.get(mPid);
-        return meta && e
-          ? [
-              {
-                pid: mPid,
-                name: meta.name,
-                cls: meta.cls,
-                level: e.level,
-                hp: e.hp,
-                mhp: e.maxHp,
-                res: Math.round(e.resource),
-                mres: e.maxResource,
-                rtype: e.resourceType,
-                x: e.pos.x,
-                z: e.pos.z,
-                dead: e.dead ? 1 : 0,
-                inCombat: e.inCombat ? 1 : 0,
-                group: party.raidGroups.get(mPid) ?? 1,
-                absorb: partyFrameAbsorb(e.auras),
-                role: partyFrameRole(meta.talentMods.role),
-                // Effective health Rewind could currently restore to this member
-                // (combat/rewind.ts); 0 for members with no recent recorded loss.
-                rewind: rewindHealAmount(damageTakenWithin(e, this.tickCount), e.hp, e.maxHp),
-                connected: 1,
-                hasAggro: aggroTargets.has(mPid) ? 1 : 0,
-                incomingHeal: incomingHeals.get(mPid) ?? 0,
-                // Temporal Echo marks are filtered to the LOCAL player's own (owner
-                // 2026-07-12): other chronomancers' echoes still heal in the sim but
-                // never show in this viewer's group/raid strip. echoVisibleTo reads
-                // the real aura sourceId, so no wire field is added.
-                auras: partyFrameAuras(
-                  e.auras.filter((a) => echoVisibleTo(a, this.primaryId)),
-                  undefined,
-                  e.maxHp,
-                ),
-              },
-            ]
-          : [];
-      }),
-    };
+    return collectPartyInfo(this.ctx);
   }
 
   get tradeInfo(): import('../world_api').TradeInfo | null {
@@ -11661,6 +11427,18 @@ export class Sim {
 
   get bankInfo(): import('../world_api').BankInfo | null {
     return this.primaryId === -1 ? null : this.bankInfoFor(this.primaryId);
+  }
+
+  get vaultInfo(): import('../world_api').VaultInfo | null {
+    return this.primaryId === -1 ? null : this.vaultInfoFor(this.primaryId);
+  }
+
+  get craftVaultStock(): Record<string, number> | null {
+    return this.primaryId === -1 ? null : this.craftVaultStockFor(this.primaryId);
+  }
+
+  get bankPurchasedSlots(): number | null {
+    return this.primaryId === -1 ? null : bankMod.bankPurchasedSlotsFor(this.ctx, this.primaryId);
   }
 
   instanceSlotAt(pos: Vec3): number | null {
@@ -12479,10 +12257,8 @@ export class Sim {
     return this.delveDailyWire(this.primaryId);
   }
 
-  // Gathering profession proficiency (Mining/Logging/Herbalism), the real
-  // read surface for #1119, mapped onto the settled #1164 shape. Crafting/
-  // secondary professions still contribute nothing until #1120/#1125/#1126/
-  // #1140 land.
+  // Gathering profession proficiency; crafting/secondary professions still
+  // contribute nothing until #1120/#1125/#1126/#1140 land.
   professionsStateFor(pid: number): PlayerProfessionsView {
     const proficiency = this.players.get(pid)?.gatheringProficiency ?? emptyGatheringProficiency();
     return { skills: gatheringSkillsView(proficiency) };
@@ -12493,7 +12269,5 @@ export class Sim {
   }
 }
 
-// formatMoney now lives in ./format_money (a leaf module, to break the value-cycle
-// with market.ts and loot/loot_roll.ts). Re-exported here so existing importers
-// (e.g. tests/gold_command.test.ts) that import it from './sim' keep working.
+// Re-export for existing importers while the implementation lives in ./format_money.
 export { formatMoney };

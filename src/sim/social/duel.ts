@@ -10,6 +10,7 @@
 // here via SimContext; `entityInDungeon` / `hasPendingSocialInvite` likewise stay
 // on Sim and are read through the seam.
 
+import { ownedNecromancyUndead } from '../combat/necromancy';
 import type { DuelState } from '../sim';
 import type { SimContext } from '../sim_context';
 import { DT, dist2d, type Entity } from '../types';
@@ -149,10 +150,19 @@ export function updateDuels(ctx: SimContext): void {
     // carries only `sourceId`, so once a pet despawns nothing can map its dot
     // back to the owner; the clamp meanwhile treats that dot as the opponent's
     // for the whole bout. Recording the id here is what lets the end clear
-    // exactly what the clamp was protecting against.
+    // exactly what the clamp was protecting against. Necromancy temporary
+    // undead are deliberately excluded from petOf (they must never replace or
+    // persist as the owner's primary pet), so they need their own recording
+    // pass here: the clamp already treats their damage as the opponent's
+    // (pvpController resolves ANY owned mob, not just petOf's one), but without
+    // this a dot one of them left behind survives a mid-duel expiry the same
+    // way an unrecorded pet's used to.
     for (const dPid of [duel.a, duel.b]) {
       const pet = ctx.petOf(dPid);
       if (pet) duel.controlled?.get(dPid)?.add(pet.id);
+      for (const undead of ownedNecromancyUndead(ctx, dPid)) {
+        duel.controlled?.get(dPid)?.add(undead.id);
+      }
     }
     // forfeit by running away or dying to something else
     if (dist2d(ea.pos, eb.pos) > DUEL_FORFEIT_DISTANCE) {
@@ -263,4 +273,36 @@ export function duelFor(ctx: SimContext, pid: number): DuelState | null {
   // lookup in combat/damage.ts must keep seeing it as gone the instant it
   // ends, matching the old synchronous-delete behavior.
   return duel && duel.endedTick === undefined ? duel : null;
+}
+
+/**
+ * True when `opponent` just ended a duel against `recipient` on THIS very
+ * tick. A duel that ends still lingers in `ctx.duels` (see the comment on
+ * `duelFor` above) because the clamp in `combat/damage.ts` calls `endDuel`
+ * SYNCHRONOUSLY mid-swing: it strips every aura the opponent had inflicted
+ * (`clearAurasFromController`) BEFORE returning control to the swing shell
+ * (`combat/auto_attack.ts`), which then fires proc effects (weapon procs,
+ * set-bonus procs) unconditionally right after. Without this check, the
+ * killing blow's own crit can stamp a fresh hostile aura on the loser a beat
+ * after the clear already ran, and nothing purges that one afterward: the
+ * duel is over, so it rides out with no clamp left to stop it, and kills the
+ * 1-hp loser for real seconds later.
+ *
+ * Resolves `opponent` through `pvpController`, the same definition of "the
+ * opponent" `clearAurasFromController` uses, so a pet or Necromancy undead
+ * source is covered exactly like a direct opponent hit. Requires the
+ * resolved controller be the SIDE OPPOSITE `recipient`: a player's own
+ * self-targeted proc (a heal, a self-buff) is never something the duel's end
+ * would have cleared, and must keep applying even on the ending tick.
+ */
+export function duelJustEndedBetween(
+  ctx: SimContext,
+  recipient: Entity,
+  opponent: Entity,
+): boolean {
+  if (recipient.kind !== 'player') return false;
+  const duel = ctx.duels.get(recipient.id);
+  if (!duel || duel.endedTick !== ctx.tickCount) return false;
+  const opponentPid = recipient.id === duel.a ? duel.b : duel.a;
+  return ctx.pvpController(opponent)?.id === opponentPid;
 }

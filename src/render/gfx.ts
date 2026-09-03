@@ -9,12 +9,26 @@ import { safeStartupGraphicsPreset } from '../game/startup_graphics_safety';
 import { EFFECTS_QUALITY_LOW_CUTOFF } from '../game/ui_effects_profile';
 import { attachBiomeHaze } from './biome_haze_field';
 import { FAR_ANIM_RANGE_SCALE_MAX } from './crowd_lod';
+// Side-effect import only: installs the final-color NaN guard (see the
+// point-light pruning comment in initGfxTier below for why this is a bare
+// import here, not a direct invocation). This import is also what
+// gives characters/preview.ts, characters/portrait.ts and armory_preview.ts
+// the guard, transitively: they reach it via gfx.ts, never call it directly.
+import './final_color_nan_guard';
 import { gfxAaPolicy } from './gfx_aa_policy_core';
 import { applyGfxOverridesFromSearch } from './gfx_override_core';
 import {
   installPbrPointLightShaderPruning,
   patchPbrRimGlowFragmentShader,
+  RIM_GLOW_DEFAULT_COLOR,
 } from './pbr_fragment_shader';
+import {
+  patchRoofDarknessFragmentShader,
+  patchRoofDarknessVertexShader,
+  ROOF_DARK_END_Y,
+  ROOF_DARK_START_Y,
+} from './roof_darkness_core';
+import { markSharedMaterial } from './shared_resource';
 import { isSoftwareRendererName } from './software_renderer';
 
 // Quality tiers: every tier-dependent knob keys off this module instead of
@@ -1886,11 +1900,21 @@ export function initGfxTier(webgl: THREE.WebGLRenderer): GfxTier {
   // Install before any scene material compiles. The fixed point-light budget
   // keeps program counts stable with zero-intensity slots; the shader guard
   // makes those stable slots cheap without changing their permutation.
+  //
+  // The final-color NaN guard (final_color_nan_guard.ts) is NOT installed
+  // here: unlike this pruning, it needs to run before renderers this repo
+  // builds outside initGfxTier too (characters/preview.ts,
+  // characters/portrait.ts, armory_preview.ts), so it installs itself at
+  // module scope instead, as an import side effect. It is not moved here
+  // because a per-site call was tried first and provably missed two of
+  // those three; see final_color_nan_guard.ts for the reasoning. The two
+  // guards use different seams on purpose, not by oversight.
   installPbrPointLightShaderPruning();
   const gpuRenderer = rendererName(webgl);
   const softwareRendering = isSoftwareRendererName(gpuRenderer);
   const hints = { ...runtimeHints(), gpuRenderer };
-  return activateGfxProfile(profileFromHints(hints, softwareRendering, 0)).settings.tier;
+  const activated = activateGfxProfile(profileFromHints(hints, softwareRendering, 0));
+  return activated.settings.tier;
 }
 
 export const gfxInternalsForTest = {
@@ -1919,10 +1943,18 @@ export const gfxInternalsForTest = {
 // One clock uniform shared by every onBeforeCompile shader (wind, water,
 // grade grain). The renderer ticks it once per frame in sync(). uRimBoost
 // scales the character rim glow (raised inside dungeons so silhouettes
-// separate from the murk).
+// separate from the murk); uRimColor is its tint, cool by default and
+// re-graded by the interior light rig (warm ember in the Ignivar forge).
 export const sharedUniforms = {
   uTime: { value: 0 },
   uRimBoost: { value: 1 },
+  uRimColor: { value: new THREE.Color(RIM_GLOW_DEFAULT_COLOR) },
+  /** The raid rooms' world-height black ramp (roof_darkness_core.ts):
+   *  strength 0 everywhere except the ignivar states, which the interior
+   *  light rig raises to 1 on settle. */
+  uRoofDarkStrength: { value: 0 },
+  uRoofDarkStart: { value: ROOF_DARK_START_Y },
+  uRoofDarkEnd: { value: ROOF_DARK_END_Y },
   /** (player x, player z, dense blade-carpet radius): the paint-free ring the
    *  terrain splat reads so painted blades never show under the real carpet.
    *  Radius 0 (a tier with no carpet) leaves the paint everywhere. Written by
@@ -1962,6 +1994,11 @@ export interface SurfaceMatOpts {
   normalMap?: THREE.Texture;
   /** PBR roughness map (high/ultra only; ignored on the Lambert tier) */
   roughnessMap?: THREE.Texture;
+  /** PBR metalness map (high/ultra only; ignored on the Lambert tier). An
+   *  OPTION rather than a post-hoc write on the returned material: slot
+   *  presence is a program-cache-key input, so writing it onto a shared cache
+   *  entry relinks every material already drawing with it. */
+  metalnessMap?: THREE.Texture;
   /** baked AO map — needs uv2 on the geometry (high/ultra only) */
   aoMap?: THREE.Texture;
   roughness?: number;
@@ -1992,6 +2029,7 @@ export function addRimGlow(mat: THREE.Material): void {
     const patched = patchPbrRimGlowFragmentShader(sh.fragmentShader);
     if (patched === sh.fragmentShader) return;
     sh.uniforms.uRimBoost = sharedUniforms.uRimBoost;
+    sh.uniforms.uRimColor = sharedUniforms.uRimColor;
     sh.fragmentShader = patched;
   };
   mat.customProgramCacheKey = () =>
@@ -2004,6 +2042,30 @@ export function addRimGlow(mat: THREE.Material): void {
  *  material_clone_hooks.ts re-attaches. */
 export function hasRimGlow(mat: THREE.Material): boolean {
   return rimGlowMaterials.has(mat);
+}
+
+// The raid rooms' roof darkness (roof_darkness_core.ts): a post-fog world
+// height black ramp. Hooked onto the ignivar tile packs and the env prop
+// templates; inert (strength 0) in every other scene state.
+const roofDarknessMaterials = new WeakSet<THREE.Material>();
+
+export function addRoofDarkness(mat: THREE.Material): void {
+  if (roofDarknessMaterials.has(mat)) return;
+  roofDarknessMaterials.add(mat);
+  const previousCompile = mat.onBeforeCompile;
+  const previousCompileSource = previousCompile.toString();
+  const previousProgramKey = mat.customProgramCacheKey.bind(mat);
+  mat.onBeforeCompile = (sh, renderer) => {
+    previousCompile.call(mat, sh, renderer);
+    const fragment = patchRoofDarknessFragmentShader(sh.fragmentShader);
+    if (fragment === sh.fragmentShader) return;
+    sh.vertexShader = patchRoofDarknessVertexShader(sh.vertexShader);
+    sh.uniforms.uRoofDarkStrength = sharedUniforms.uRoofDarkStrength;
+    sh.uniforms.uRoofDarkStart = sharedUniforms.uRoofDarkStart;
+    sh.uniforms.uRoofDarkEnd = sharedUniforms.uRoofDarkEnd;
+    sh.fragmentShader = fragment;
+  };
+  mat.customProgramCacheKey = () => `roof-dark|${previousCompileSource}|${previousProgramKey()}`;
 }
 
 // Material factory: dedupes by (color|maps|flags) so hundreds of small box
@@ -2022,6 +2084,7 @@ export function surfaceMat(opts: SurfaceMatOpts): THREE.Material {
     map: opts.map?.uuid,
     normalMap: opts.normalMap?.uuid,
     roughnessMap: opts.roughnessMap?.uuid,
+    metalnessMap: opts.metalnessMap?.uuid,
     aoMap: opts.aoMap?.uuid,
     std: GFX.standardMaterials,
   });
@@ -2034,6 +2097,7 @@ export function surfaceMat(opts: SurfaceMatOpts): THREE.Material {
         vertexColors: opts.vertexColors ?? false,
         normalMap: opts.normalMap ?? null,
         roughnessMap: opts.roughnessMap ?? null,
+        metalnessMap: opts.metalnessMap ?? null,
         aoMap: opts.aoMap ?? null,
         roughness: opts.roughness ?? 0.85,
         metalness: opts.metalness ?? 0,
@@ -2056,6 +2120,13 @@ export function surfaceMat(opts: SurfaceMatOpts): THREE.Material {
   // on tiers without a field): props and buildings at range must haze with
   // the ground under them or the effect reads as nothing.
   attachBiomeHaze(mat);
+  // Every material handed back from this cache is SHARED by construction: one
+  // instance is reused by every caller with the same key, process-wide. Marking
+  // it here is what keeps a per-root terminal owner (the interior resource
+  // registry, a view teardown) from claiming and disposing a material the rest
+  // of the world is still drawing with, and it is marked at the source rather
+  // than per consumer so a new caller cannot forget.
+  markSharedMaterial(mat);
   matCache.set(key, mat);
   return mat;
 }

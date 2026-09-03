@@ -20,6 +20,7 @@ import { revokeMasterLooterAuthority } from '../loot/loot_roll';
 import { effectiveMasterLooter } from '../loot_master';
 import type { Party } from '../sim';
 import type { SimContext } from '../sim_context';
+import { rememberSoulwellPartyEligibility } from '../soulwell';
 import { type Aura, DEFAULT_PARTY_LOOT_STRATEGIES } from '../types';
 
 // Group caps (classic 5-player party, 10-player raid as 2 subgroups of 5). Moved
@@ -208,6 +209,7 @@ export class PartyMachine {
     party.members.push(r.meta.entityId);
     party.raidGroups.set(r.meta.entityId, raidGroup);
     this.partyByPid.set(r.meta.entityId, party.id);
+    rememberSoulwellPartyEligibility(this.ctx, party);
     this.ctx.inheritDungeonResetLocks(r.meta.entityId);
     this.syncPersistentPaladinPartyAuras(party);
     // Forming the party is the inviter's join too; the accepter counts on
@@ -497,6 +499,7 @@ export class PartyMachine {
         party.members.push(pid);
         party.raidGroups.set(pid, raidGroup);
         this.partyByPid.set(pid, party.id);
+        rememberSoulwellPartyEligibility(this.ctx, party);
         // A finder merge is a join like any other: without this, a
         // finder-formed member escapes the reset-cooldown inheritance the
         // invite path (acceptInvite above) enforces.
@@ -575,10 +578,13 @@ export class PartyMachine {
     party.raidGroups.delete(pid);
     this.partyByPid.delete(pid);
     // Paladin auras are tied to the party relationship. Keep the caster's own
-    // aura intact, but remove paladin auras from the remaining members.
+    // aura intact, but remove paladin auras across the broken relationship in
+    // both directions.
+    const leaver = this.ctx.resolve(pid)?.e;
     for (const mPid of party.members) {
       const member = this.ctx.resolve(mPid)?.e;
       if (member) this.ctx.clearAurasFromSource(member, pid, isPersistentPaladinAura);
+      if (leaver) this.ctx.clearAurasFromSource(leaver, mPid, isPersistentPaladinAura);
     }
     // Drop the leaver from any in-flight ready check so the remaining members can
     // still early-finalize once everyone left has answered (their pending slot

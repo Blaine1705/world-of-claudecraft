@@ -15,6 +15,11 @@ import {
   cloneMaterialWithHooks,
   reattachClonedMaterialHooks,
 } from '../src/render/material_clone_hooks';
+import {
+  hasVertexColorEmissive,
+  modulateEmissiveByVertexColor,
+  vertexColorEmissiveInternalsForTest,
+} from '../src/render/vertex_color_emissive';
 import { applySurfaceDetail } from '../src/render/worn_stone';
 
 // A rig material as characters/assets.ts tintedMaterial builds it on the
@@ -145,18 +150,107 @@ describe('biome-haze layer survival across the program-preserving clone', () => 
   });
 });
 
-describe('the castle stone slabs use the program-preserving clone', () => {
-  it('clones the surfaceMat slab sources through material_clone_hooks', () => {
+describe('vertex-colour emissive layer survival across the program-preserving clone', () => {
+  // A town emissive building material as townMaterial(true, ..., true)
+  // composes one: surfaceMat attaches the zone haze at creation, the
+  // independent building takes its hook-preserving clone, and the
+  // vertex-colour emissive layer rides last.
+  function townEmissiveMaterial(name: string): THREE.MeshStandardMaterial {
+    const mat = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      vertexColors: true,
+      emissive: 0xffffff,
+      roughness: 0.5,
+      metalness: 0.04,
+    });
+    mat.name = name;
+    attachBiomeHaze(mat);
+    modulateEmissiveByVertexColor(mat);
+    return mat;
+  }
+
+  function emissiveShaderStub(): { uniforms: Record<string, unknown>; fragmentShader: string } {
+    return {
+      uniforms: {},
+      fragmentShader: [
+        '#include <common>',
+        'void main() {',
+        '#include <emissivemap_fragment>',
+        '}',
+      ].join('\n'),
+    };
+  }
+
+  it('reproduces the bare-clone program split it exists to fix', () => {
+    const source = townEmissiveMaterial('fenbridgeTownEmissive:fenbridge_hesk_tannery');
+    const bare = source.clone();
+    // clone() copies the userData stamp, so the clone still CLAIMS the layer...
+    expect((bare.userData as { vertexColorEmissive?: string }).vertexColorEmissive).toBe(
+      vertexColorEmissiveInternalsForTest.programCacheKey,
+    );
+    // ...while the hook and the composed key it contributes are both gone.
+    expect(bare.customProgramCacheKey()).not.toBe(source.customProgramCacheKey());
+    expect(bare.customProgramCacheKey()).not.toContain(
+      vertexColorEmissiveInternalsForTest.programCacheKey,
+    );
+  });
+
+  it('restores the source program cache key exactly on the clone', () => {
+    const source = townEmissiveMaterial('fenbridgeTownEmissive:fenbridge_hesk_tannery');
+    const clone = cloneMaterialWithHooks(source);
+    expect(clone).not.toBe(source);
+    expect(clone.customProgramCacheKey()).toBe(source.customProgramCacheKey());
+    // Both layers ride the composed key, in the source's order: the haze
+    // layer's own prefix, then the emissive marker chained onto it.
+    expect(clone.customProgramCacheKey()).toContain('woc-zone-haze:');
+    expect(
+      clone
+        .customProgramCacheKey()
+        .endsWith(`|${vertexColorEmissiveInternalsForTest.programCacheKey}`),
+    ).toBe(true);
+  });
+
+  it('restores the shader patch itself, not just the key', () => {
+    const clone = cloneMaterialWithHooks(townEmissiveMaterial('townEmissive'));
+    const shader = emissiveShaderStub();
+    clone.onBeforeCompile(shader as never, null as never);
+    expect(shader.fragmentShader).toContain('totalEmissiveRadiance *= vColor.rgb;');
+  });
+
+  it('never grants the layer to a clone of an undecorated source', () => {
+    const source = new THREE.MeshStandardMaterial({ color: 0x8a7568 });
+    attachBiomeHaze(source);
+    const clone = cloneMaterialWithHooks(source);
+    expect(hasVertexColorEmissive(clone)).toBe(false);
+    expect(clone.customProgramCacheKey()).toBe(source.customProgramCacheKey());
+    expect(clone.customProgramCacheKey()).not.toContain(
+      vertexColorEmissiveInternalsForTest.programCacheKey,
+    );
+  });
+});
+
+describe('the castle stone slabs stay program-cache-safe', () => {
+  it('draws every raw mass from castle_stone, whose factories ride surfaceMat', () => {
+    // The slab masses moved off the clone-then-patch idiom entirely: their
+    // materials come from castle_stone.ts, whose factories return surfaceMat
+    // results directly (haze hook and program-cache identity by
+    // construction, deduped per tone) with the course tiling on the
+    // GEOMETRY (tileCastleUv), so no per-mass clone exists to drop a hook.
+    // Pin both halves: the factories route through surfaceMat and never
+    // clone, and the feature module builds its masses from castle_stone
+    // rather than minting patched surfaceMat clones of its own.
+    const stone = readFileSync(new URL('../src/render/castle_stone.ts', import.meta.url), 'utf8');
+    expect(stone).toContain("import { surfaceMat } from './gfx'");
+    expect(stone).toContain('return surfaceMat({');
+    expect(stone).not.toContain('.clone()');
     const castle = readFileSync(
       new URL('../src/render/castle_features.ts', import.meta.url),
       'utf8',
     );
-    const start = castle.indexOf('const stoneSlab = (');
-    expect(start).toBeGreaterThan(-1);
-    const slice = castle.slice(start, castle.indexOf('const slab = (', start));
-    expect(slice).toContain('cloneMaterialWithHooks(surfaceMat({ color, roughness }))');
-    expect(slice).toContain('cloneMaterialWithHooks(stoneSlab(');
-    expect(slice).not.toContain('.clone()');
+    expect(castle).toContain("from './castle_stone'");
+    expect(castle).toContain('castleStoneMat(');
+    expect(castle).toContain('castleStoneBox(');
+    expect(castle).not.toContain('cloneMaterialWithHooks(surfaceMat(');
   });
 });
 
@@ -382,14 +476,7 @@ describe('the character overlay caches and the arena walls clone through the hoo
       new URL('../src/render/characters/visual.ts', import.meta.url),
       'utf8',
     );
-    const caches = [
-      'ferocityMaterial',
-      'runeTintMaterial',
-      'ghostMaterial',
-      'shadowformMaterial',
-      'moonkinMaterial',
-      'ascensionMaterial',
-    ];
+    const caches = ['ferocityMaterial', 'runeTintMaterial', 'ascensionMaterial'];
     for (const name of caches) {
       const body = methodSource(visual, `  private ${name}(`);
       expect(body, `${name} lost its hook-preserving clone`).toContain(
@@ -397,15 +484,30 @@ describe('the character overlay caches and the arena walls clone through the hoo
       );
       expect(body, `${name} went back to a bare clone`).not.toContain('.clone(');
     }
-    const soulRend = methodSource(visual, '  private soulRendMaterial(');
-    expect(soulRend).toContain('applySoulRendOverlay(material)');
-    expect(soulRend).not.toContain('.clone(');
-    const overlay = readFileSync(
-      new URL('../src/render/characters/soul_rend_overlay.ts', import.meta.url),
-      'utf8',
-    );
-    expect(overlay).toContain('cloneMaterialWithHooks(material)');
-    expect(overlay).not.toContain('.clone(');
+    // The overlays that flip `transparent` mint through a shared factory
+    // module instead, so the boot prewarm twin and the live clone cannot drift
+    // into different program keys (character_effect_prewarm.ts). Each factory
+    // owes the same hook-preserving clone.
+    for (const [name, factory] of [
+      ['ghostMaterial', 'createGhostEffectMaterial'],
+      ['shadowformMaterial', 'createShadowformEffectMaterial'],
+      ['moonkinMaterial', 'createMoonkinEffectMaterial'],
+      ['soulRendMaterial', 'applySoulRendOverlay'],
+    ] as const) {
+      const body = methodSource(visual, `  private ${name}(`);
+      expect(body, `${name} lost its shared factory`).toContain(`${factory}(material`);
+      expect(body, `${name} went back to a bare clone`).not.toContain('.clone(');
+    }
+    for (const module of ['effect_materials', 'soul_rend_overlay']) {
+      const factory = readFileSync(
+        new URL(`../src/render/characters/${module}.ts`, import.meta.url),
+        'utf8',
+      );
+      expect(factory, `${module} lost its hook-preserving clone`).toMatch(
+        /cloneMaterialWithHooks\((?:source|material)\)/,
+      );
+      expect(factory, `${module} went back to a bare clone`).not.toContain('.clone(');
+    }
   });
 
   it('clones the hideable arena wall material through cloneMaterialWithHooks', () => {

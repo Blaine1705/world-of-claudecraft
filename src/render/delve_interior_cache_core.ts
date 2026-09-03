@@ -9,12 +9,20 @@
 // where the player actually is.
 export type DelveInteriorBuildAction = 'skip' | 'build' | 'rebuild';
 
+export interface DelveInteriorPlacement {
+  moduleId: string;
+  ox: number;
+  oz: number;
+}
+
 export function delveInteriorBuildAction(
-  cachedModuleId: string | undefined,
-  moduleId: string,
+  cached: DelveInteriorPlacement | undefined,
+  next: DelveInteriorPlacement,
   pending: boolean,
 ): DelveInteriorBuildAction {
   if (pending) return 'skip';
-  if (cachedModuleId === undefined) return 'build';
-  return cachedModuleId === moduleId ? 'skip' : 'rebuild';
+  if (!cached) return 'build';
+  return cached.moduleId === next.moduleId && cached.ox === next.ox && cached.oz === next.oz
+    ? 'skip'
+    : 'rebuild';
 }

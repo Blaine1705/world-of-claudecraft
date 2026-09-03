@@ -1,4 +1,4 @@
-import { pctValue } from '../entity';
+import { PACKLORD_4PC_STAMPEDE_RESET_CHANCE, setBonusFlag } from '../content/ignivar_set_bonuses';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { armorReduction, dist2d, swingMissChance } from '../types';
@@ -7,7 +7,7 @@ import {
   activateHunterMajorWindow,
   grantHunterFocus,
   hunterFerocityDamageMultiplier,
-  hunterPetFerocityDamageMultiplier,
+  hunterPetDamageMultiplier,
 } from './hunter_shared';
 
 export const PACK_FEROCITY_AURA_ID = 'pack_ferocity';
@@ -26,21 +26,6 @@ function removeAura(ctx: SimContext, entity: Entity, id: string): void {
   if (index < 0) return;
   const [aura] = entity.auras.splice(index, 1);
   ctx.emit({ type: 'aura', targetId: entity.id, name: aura.name, gained: false });
-}
-
-function petDamageMultiplier(ctx: SimContext, pet: Entity): number {
-  let multiplier = 1;
-  for (const aura of pet.auras) {
-    if (aura.kind === 'pet_damage_pct') multiplier += pctValue(aura.value);
-  }
-  if (pet.ownerId !== null) {
-    const ownerMeta = ctx.players.get(pet.ownerId);
-    if (ownerMeta) multiplier *= 1 + ctx.playerMods(ownerMeta).global.petDmgPct;
-    const owner = ctx.entities.get(pet.ownerId);
-    if (owner?.auras.some((aura) => aura.kind === 'hunter_frenzy')) multiplier *= 1.25;
-  }
-  multiplier *= hunterPetFerocityDamageMultiplier(ctx, pet);
-  return multiplier;
 }
 
 function petStrike(
@@ -70,7 +55,7 @@ function petStrike(
   let damage = ctx.rng.range(min, max);
   damage += (ctx.effectiveAttackPower(pet) / 14) * 0.5;
   if (crit) damage *= 2;
-  damage *= petDamageMultiplier(ctx, pet);
+  damage *= hunterPetDamageMultiplier(ctx, pet);
   damage *= 1 - armorReduction(ctx.effectiveArmor(target), pet.level);
   const dealt = Math.max(1, Math.round(damage));
   ctx.dealDamage(pet, target, dealt, crit, 'physical', abilityName, 'hit', true);
@@ -129,7 +114,16 @@ function tryResetStampede(ctx: SimContext, hunter: Entity): void {
   if (hunter.auras.some((aura) => aura.id === STAMPEDE_READY_AURA_ID)) return;
 
   const failed = hunter.procState?.counters[STAMPEDE_FAILURE_COUNTER] ?? 0;
-  if (ctx.rng.chance(STAMPEDE_RESET_CHANCE) || failed + 1 >= STAMPEDE_BAD_LUCK_CAP) {
+  // Packlord 4pc: the wearer's reset threshold rises 0.2 -> 0.3 on the SAME
+  // single roll (only the threshold moves, so neither wearers nor non-wearers
+  // shift the rng stream). The 5-fail bad-luck cap below stays untouched.
+  const meta = ctx.players.get(hunter.id);
+  const resetChance =
+    meta !== undefined &&
+    ctx.playerMods(meta).selected[setBonusFlag('packlord_emberhide', 4)] === true
+      ? PACKLORD_4PC_STAMPEDE_RESET_CHANCE
+      : STAMPEDE_RESET_CHANCE;
+  if (ctx.rng.chance(resetChance) || failed + 1 >= STAMPEDE_BAD_LUCK_CAP) {
     armStampedeReady(ctx, hunter);
     return;
   }

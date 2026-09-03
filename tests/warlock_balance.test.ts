@@ -123,10 +123,17 @@ describe('warlock low-level sustained damage tuning', () => {
     const impDps = rawPetDps('emberkin');
     const voidwalkerDps = rawPetDps('gloomshade');
 
-    expect(impDps).toBeCloseTo(13, 1);
+    expect(WARLOCK_PET_MOBS.emberkin).toMatchObject({
+      hpBase: 40,
+      hpPerLevel: 17,
+      dmgBase: 6,
+      dmgPerLevel: 1.25,
+      armorPerLevel: 12,
+    });
+    expect(impDps).toBeCloseTo(14.9, 1);
     expect(voidwalkerDps).toBeCloseTo(9.1, 1);
-    expect(voidwalkerDps / impDps).toBeLessThan(0.75);
-    expect(voidwalkerDps / impDps).toBeGreaterThan(0.65);
+    expect(voidwalkerDps / impDps).toBeLessThan(0.65);
+    expect(voidwalkerDps / impDps).toBeGreaterThan(0.55);
   });
 
   it('pins the maintenance DoTs and the Ruination Gloom Bolt capstone rank', () => {
@@ -164,7 +171,9 @@ describe('warlock low-level sustained damage tuning', () => {
       20,
     );
     expect(amplified.global.dotDmgPct).toBe(0);
-    expect(amplified.global.spellDmgPct).toBe(0);
+    // The 0.07 is the affliction viability-floor baseline (spec_baselines.ts,
+    // 2026-08-23), not anything Deepened Hex adds: the row stays cost-only.
+    expect(amplified.global.spellDmgPct).toBeCloseTo(0.07);
     expect(amplified.abilities.needle_of_fate?.dmgPct).toBeCloseTo(0.18);
     expect(amplified.abilities.sentence?.dmgPct).toBeCloseTo(0.1);
     expect(amplified.abilities.needle_of_fate?.costPct).toBe(-0.33);

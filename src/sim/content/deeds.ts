@@ -1803,11 +1803,16 @@ export const DEEDS: Record<string, DeedDef> = {
   // be created. Holders earn it at login or receipt (the items are unbound,
   // so they still trade); a fresh realm can never mint a first earner. That
   // is the intended nature of this feat class, it stays visible as a history
-  // marker, and feat deeds are excluded from BOOK_COMPLETE_REQUIREMENTS.
+  // marker, and feat deeds are excluded from BOOK_COMPLETE_REQUIREMENTS. The
+  // desc states the no-longer-drops fact directly (the col_reliquary_complete
+  // caveat-sentence precedent) since players otherwise read a stuck 0/1 as a
+  // broken achievement and report it as a bug.
   feat_brightwood_relic: {
     id: 'feat_brightwood_relic',
     name: 'Brightwood Remembered',
-    desc: "Keep a relic of the old Brightwood: the Bramblehide Jerkin or the Monarch's Crown.",
+    desc:
+      "Keep a relic of the old Brightwood: the Bramblehide Jerkin or the Monarch's Crown. " +
+      'The relics no longer drop; only a trade with an existing holder can pass one on.',
     category: 'feat',
     renown: 0,
     trigger: {
@@ -2817,6 +2822,121 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 0,
     trigger: { kind: 'manual' },
     reward: { kind: 'title', text: 'Light of the Sanctum' },
+  },
+
+  // The walk-in castle visits, appended per the append-only DEED_ORDER
+  // contract. The Last Keep one retro-fixes a rule gap: the keep shipped
+  // without its deeds (every new conquerable content authors deeds in the
+  // same change; docs/design/deeds.md). Both key on the dungeon: visit mark
+  // enterDungeon writes, the drowned_temple moongate precedent.
+  exp_the_last_keep: {
+    id: 'exp_the_last_keep',
+    name: 'The Quiet Halls',
+    desc: 'Step through the doors of the Last Keep and walk its silent halls.',
+    category: 'exploration',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'dungeon:the_last_keep' },
+  },
+  exp_dawnhold_castle: {
+    id: 'exp_dawnhold_castle',
+    name: 'An Open Door in the Garden',
+    desc: 'Call on Dawnhold Castle and wander its sunlit garden halls.',
+    category: 'exploration',
+    renown: 5,
+    trigger: { kind: 'visit', markId: 'dungeon:dawnhold_castle' },
+  },
+  // Bank bag sockets (Bank Storage phase 06): the socket ladder's two rungs of
+  // recognition, beside soc_room_for_more / soc_gilded_strongbox for the slot
+  // ladder. The meter reads BankState.unlockedSockets, bumped only by
+  // bankUnlockSocket (bank_sockets.ts), which marks deeds dirty on purchase.
+  soc_strongbox_outfitter: {
+    id: 'soc_strongbox_outfitter',
+    name: 'Strongbox Outfitter',
+    desc: 'Unlock your first bank bag socket.',
+    category: 'social',
+    renown: 5,
+    trigger: { kind: 'meter', meter: 'bankSocketsUnlocked', amount: 1 },
+  },
+  soc_four_bags_deep: {
+    id: 'soc_four_bags_deep',
+    name: 'Four Bags Deep',
+    desc: 'Unlock all four bank bag sockets.',
+    category: 'social',
+    renown: 25,
+    trigger: { kind: 'meter', meter: 'bankSocketsUnlocked', amount: 4 },
+  },
+  // The Proving Shore graduation: every lesson on the tutorial island handed
+  // in, then the ferry bell rung for the ride home. The stat is bumped by
+  // interactions/ferry_bell.ts on the island bell's home crossing, only once
+  // the whole rail sits in questsDone, so the deed can never fire on a
+  // mid-lesson misclick ride or a veteran's refresher visit. Appended at the
+  // release merge behind the castle visits, keeping both sides' tails in
+  // their own authored order.
+  prog_ready_for_an_adventure: {
+    id: 'prog_ready_for_an_adventure',
+    name: 'Ready for an Adventure',
+    desc: 'Graduate the Proving Shore: finish every lesson on the island, then ring the ferry bell home to Eastbrook.',
+    category: 'progression',
+    renown: 5,
+    trigger: { kind: 'stat', stat: 'tutorialGraduations', count: 1 },
+  },
+  // The Crucible of the Last Spring raid (the deeds its content rule owes,
+  // docs/prd/ignivar-raid-loot.md "Obligations closeout"). Clear credit is
+  // per boss room: each raid room is its own dungeon id, so the clear deeds
+  // mirror the dgn_nythraxis pair per boss (FINAL_BOSS_DUNGEONS rows in
+  // src/sim/deeds.ts land in the same change). The flawless task rides the
+  // generic FLAWLESS_TASKS window on the raid finale, the
+  // dgn_nythraxis_deathless shape.
+  dgn_ignivar: {
+    id: 'dgn_ignivar',
+    name: 'The Herald Falls',
+    desc: 'Defeat Ignivar, Herald of the Last Flame, in the Crucible of the Last Spring.',
+    category: 'dungeon',
+    renown: 25,
+    trigger: { kind: 'dungeonClears', dungeonId: 'ignivar_raid_arena', count: 1 },
+  },
+  dgn_ignivar_heroic: {
+    id: 'dgn_ignivar_heroic',
+    name: 'Heroic: The Herald Falls',
+    desc: 'Defeat Ignivar, Herald of the Last Flame, on Heroic difficulty.',
+    category: 'dungeon',
+    renown: 25,
+    trigger: {
+      kind: 'dungeonClears',
+      dungeonId: 'ignivar_raid_arena',
+      difficulty: 'heroic',
+      count: 1,
+    },
+  },
+  dgn_varkhul: {
+    id: 'dgn_varkhul',
+    name: 'The Forge Goes Cold',
+    desc: 'Defeat Varkhul, Forgefather of the Last Flame, in the Inner Crucible.',
+    category: 'dungeon',
+    renown: 25,
+    trigger: { kind: 'dungeonClears', dungeonId: 'ignivar_inner_crucible', count: 1 },
+  },
+  dgn_varkhul_heroic: {
+    id: 'dgn_varkhul_heroic',
+    name: 'Heroic: The Forge Goes Cold',
+    desc: 'Defeat Varkhul, Forgefather of the Last Flame, on Heroic difficulty.',
+    category: 'dungeon',
+    renown: 25,
+    trigger: {
+      kind: 'dungeonClears',
+      dungeonId: 'ignivar_inner_crucible',
+      difficulty: 'heroic',
+      count: 1,
+    },
+  },
+  dgn_varkhul_flawless: {
+    id: 'dgn_varkhul_flawless',
+    name: 'Not One Ember Lost',
+    desc: 'Defeat Varkhul, Forgefather of the Last Flame, on Heroic difficulty without a single raider dying.',
+    category: 'dungeon',
+    renown: 50,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'the Unscorched' },
   },
 };
 

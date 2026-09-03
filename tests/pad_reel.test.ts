@@ -72,11 +72,12 @@ describe('padReelItemId', () => {
     expect(interactCase).toContain(
       'const reelRod = padReelItemId(world.player.castingAbility, world.inventory);',
     );
-    // The reel wins BEFORE interactKey runs: a live bobber must never be
-    // answered with a nearby scan.
-    expect(interactCase.indexOf('padReelItemId')).toBeLessThan(
-      interactCase.indexOf('interactKey()'),
-    );
+    // The reel wins BEFORE the nearby scan runs: a live bobber must never be
+    // answered with a scan. The scan moved behind padTargetPick (it selects the
+    // npc first now), so the guarantee is pinned against that call.
+    const scanCall = interactCase.indexOf('padTargetPick.interact()');
+    expect(scanCall).toBeGreaterThan(-1);
+    expect(interactCase.indexOf('padReelItemId')).toBeLessThan(scanCall);
   });
 });
 
@@ -127,7 +128,7 @@ describe('gamepad dispatch covers every action the controller panel offers', () 
     // load-bearing, not decorative).
     const body = dispatchBody();
     expect(body).toContain("if (id.startsWith('slot')) {");
-    expect(body).toContain('hud.castSlot(Number(id.slice(4)));');
+    expect(body).toContain('hud.pressSlot(Number(id.slice(4)));');
     expect(BIND_ACTIONS.some((a) => a.kind === 'edge' && a.id.startsWith('slot'))).toBe(true);
     // escape: a PANEL-extra row (not in BIND_ACTIONS), so the loop above
     // never checks it; pin the offer and the dispatch arm directly.

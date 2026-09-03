@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  exp_dawnhold_castle: {
+    name: '庭園に開かれた扉',
+    desc: 'ドーンホールド城を訪ね、日差しあふれる庭園の広間を巡ろう。',
+  },
+  exp_the_last_keep: {
+    name: '静寂の広間',
+    desc: '最後の砦の扉をくぐり、静まり返った広間を歩こう。',
+  },
   pvp_bg_first_capture: {
     name: '手中の軍旗',
     desc: 'ソーンホロウ平原で旗を奪う。',
@@ -896,5 +904,38 @@ export const table: DeedLocaleTable = {
   prog_armorcrafting_rare: {
     name: '完璧な装甲',
     desc: '防具鍛冶で初めてのレア級アイテムを作る。',
+  },
+  prog_ready_for_an_adventure: {
+    name: '冒険の準備は万端',
+    desc: '修練の浜を卒業する。島でのすべての課題を終え、渡しの鐘を鳴らしてイーストブルックへ帰る。',
+  },
+  soc_strongbox_outfitter: {
+    name: '最初のスロット',
+    desc: '初めて銀行バッグスロットを解放する。',
+  },
+  soc_four_bags_deep: {
+    name: '四つのスロット',
+    desc: '銀行バッグスロットを4つすべて解放する。',
+  },
+  dgn_ignivar: {
+    name: '先触れ、ここに墜つ',
+    desc: '最後の泉のるつぼで「イグニヴァル、最後の炎の先触れ」を倒す。',
+  },
+  dgn_ignivar_heroic: {
+    name: '英雄: 先触れ、ここに墜つ',
+    desc: '英雄難易度で「イグニヴァル、最後の炎の先触れ」を倒す。',
+  },
+  dgn_varkhul: {
+    name: '鍛冶場、冷え果てる',
+    desc: '内部るつぼで「最後の炎の鍛造父、ヴァルクル」を倒す。',
+  },
+  dgn_varkhul_heroic: {
+    name: '英雄: 鍛冶場、冷え果てる',
+    desc: '英雄難易度で「最後の炎の鍛造父、ヴァルクル」を倒す。',
+  },
+  dgn_varkhul_flawless: {
+    name: '消えぬ熾火',
+    desc: 'レイドの誰ひとり死なせずに、英雄難易度で「最後の炎の鍛造父、ヴァルクル」を倒す。',
+    title: '無傷',
   },
 };

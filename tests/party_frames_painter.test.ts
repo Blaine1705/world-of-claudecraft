@@ -340,6 +340,7 @@ describe('createPartyRow: decorative badges + relocalize hook (a11y + live langu
     // group span is visually-hidden (in the a11y tree, clipped from sight) so the raid
     // group reaches a screen reader. Both attrs/classes are set ONCE here at build.
     expect(row.leadStar.getAttribute('aria-hidden')).toBe('true');
+    expect(String(row.leadStar.innerHTML)).toContain('<svg');
     expect(String(row.group.className)).toContain('visually-hidden');
   });
 
@@ -578,6 +579,24 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     expect(rows()).toHaveLength(2);
   });
 
+  it('keeps one stable boss-guide control between member rows and leader controls', () => {
+    const guide = fakeEl('button');
+    const master = fakeEl('div');
+    painter.setMasterControl(master as unknown as HTMLElement);
+    painter.setGuideControl(guide as unknown as HTMLElement);
+    painter.sync([member({ pid: 2 })], 1, false);
+
+    expect(container.childNodes).toEqual([wrapperOf(), guide, master]);
+    const movesBefore = container._mutations;
+    painter.setGuideControl(guide as unknown as HTMLElement);
+    painter.sync([member({ pid: 2, hp: 40 })], 1, false);
+    expect(container._mutations).toBe(movesBefore);
+
+    painter.clear();
+    expect(container.childNodes).toEqual([]);
+    expect(guide.parentNode).toBeNull();
+  });
+
   it('repaints the crest with the recycled member class via the live slot (the portrait gate)', () => {
     iconDataUrlSpy.mockClear();
     // A mage joins: the gate fires once for class_mage on the first paint.
@@ -647,12 +666,11 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     // The compact party row never appends the absorb total to the HP text (that is a
     // player/target-frame affordance), so "(25)" must not appear.
     expect(has('setText', (c) => String(c.args[0]).includes('(25)'))).toBe(false);
-    // The leader star is its OWN aria-hidden write (★), and the level element
-    // (.lead-num) holds the bare number (20), never the old concatenated '★20'. Both
-    // route through the elided setText (no raw write on the hot path).
-    expect(has('setText', (c) => c.args[0] === '★')).toBe(true);
+    // The leader crown is static aria-hidden SVG whose visibility routes through
+    // setDisplay. The level element holds the bare number, never a glyph concat.
+    expect(has('setText', (c) => c.args[0] === '\u2605')).toBe(false);
     expect(has('setText', (c) => c.args[0] === '20')).toBe(true);
-    expect(has('setText', (c) => c.args[0] === '★20')).toBe(false);
+    expect(has('setText', (c) => c.args[0] === '\u260520')).toBe(false);
     expect(has('setText', (c) => c.args[0] === 'Alice')).toBe(true);
     // Outside raid, no group label is emitted (the group span stays empty).
     expect(has('setText', (c) => c.args[0] === 'Group 1')).toBe(false);
@@ -757,6 +775,17 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     expect(kids[0].id).toBe(chipId);
     expect(rows()).toHaveLength(2); // the two member rows live inside the wrapper
     expect(kids[kids.length - 1]).toBe(wrapperOf());
+  });
+
+  it('keeps the complete mobile footer order with chip, rows, guide, and loot controls', () => {
+    const guide = fakeEl('button');
+    const master = fakeEl('div');
+    painter.setCollapse(true, true, false, false);
+    painter.setGuideControl(guide as unknown as HTMLElement);
+    painter.setMasterControl(master as unknown as HTMLElement);
+    painter.sync([member({ pid: 2 })], 1, false);
+
+    expect(container.childNodes).toEqual([findChip(), wrapperOf(), guide, master]);
   });
 
   it('F1: an expanded party seats the chip alone on its line, no member frame beside it', () => {

@@ -22,7 +22,8 @@ export type MountKey =
   | 'drakemaw_raptor'
   | 'lanternback_troll'
   | 'chimeglass_tortoise'
-  | 'terrorspark_groundshaker';
+  | 'terrorspark_groundshaker'
+  | 'rickshaw_mount';
 
 export type MountRarity = 'common' | 'uncommon' | 'rare' | 'epic';
 
@@ -81,10 +82,11 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     moveSpeedPct: 0.75,
   },
   // Epic tier (80%): the hover-cycle and the gobbler come from Rift S clears.
-  // The Terrorspark Groundshaker and the Lanternback Troll are developer-only
-  // for now and have no player-facing acquisition. The tank stays LAST in the
-  // catalog (the tests pin it as the tail, so a new player-facing mount lands
-  // above it); see DEVELOPER_MOUNTS below for the shared gate.
+  // The Terrorspark Groundshaker, the Lanternback Troll, the Chimeglass
+  // Tortoise and the Bonebound Rickshaw are developer-only for now and have no
+  // player-facing acquisition. The tank and the rickshaw stay LAST in the
+  // catalog (the tests pin the rickshaw as the tail, so a new player-facing
+  // mount lands above them); see DEVELOPER_MOUNTS below for the shared gate.
   aether_hover_cycle: {
     key: 'aether_hover_cycle',
     name: 'Aether-Jouster Hover-Cycle',
@@ -132,6 +134,21 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     rarity: 'epic',
     moveSpeedPct: 0.8,
   },
+  // Developer-only, like the tank above: no player-facing acquisition path
+  // yet. A Halloween-flavored hand-pulled cart with a skeleton puller (its own
+  // rig, skel_rickshaw_puller in characters/manifest.ts, attached by a fixed
+  // offset, see src/render/rickshaw_mount.ts) built into the front, gripping
+  // the shafts. The puller runs a real gait, and the wheels roll from
+  // actual per-frame ground travel (rickshaw_mount.ts's spinMountWheels), so the
+  // moveSpeedPct below needs no matching animation constant anywhere: change it
+  // and the wheels simply roll faster. Stays LAST in the catalog
+  // alongside the tank; a new player-facing mount lands above both.
+  rickshaw_mount: {
+    key: 'rickshaw_mount',
+    name: 'Bonebound Rickshaw',
+    rarity: 'epic',
+    moveSpeedPct: 0.8,
+  },
 };
 
 /** Catalog order: rarity tier, then declaration order. */
@@ -148,6 +165,7 @@ export const DEVELOPER_MOUNTS: readonly MountKey[] = [
   'lanternback_troll',
   'chimeglass_tortoise',
   'terrorspark_groundshaker',
+  'rickshaw_mount',
 ];
 
 /** True while a mount has no player-facing acquisition path (see DEVELOPER_MOUNTS). */

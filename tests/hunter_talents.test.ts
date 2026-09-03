@@ -114,6 +114,38 @@ describe('Hunter v0.29 choice-row mechanics', () => {
     );
   });
 
+  // Regression for the reported exploit: right-clicking the Enduring Courser
+  // internal-cooldown aura (its wire kind is 'internal_cd', the same
+  // engine-state marker every class's internal-cooldown gates ride) used to
+  // pass isCancelableAura's debuff check, so a player could strip the 20s
+  // gate the instant it landed and immediately recast Aspect of the Cheetah
+  // for a fresh 3s/60% burst, chained every GCD for 100% uptime in arena/BG.
+  it("right-clicking Enduring Courser's internal cooldown cannot farm 100% burst uptime", () => {
+    const sim = hunter('survival', { 5: 'hun_r5_enduring_courser' }, 2927);
+
+    sim.castAbility('aspect_of_the_cheetah');
+    expect(sim.player.auras.some((entry) => entry.id === 'hunter_enduring_courser_burst')).toBe(
+      true,
+    );
+    expect(sim.player.auras.some((entry) => entry.id === 'hunter_enduring_courser_icd')).toBe(true);
+
+    // The exploit: right-click the ICD gate to cancel it.
+    sim.cancelAura('hunter_enduring_courser_icd');
+    expect(sim.player.auras.some((entry) => entry.id === 'hunter_enduring_courser_icd')).toBe(true);
+
+    advance(sim, 3); // let the original 3s burst fully expire on its own
+    expect(sim.player.auras.some((entry) => entry.id === 'hunter_enduring_courser_burst')).toBe(
+      false,
+    );
+
+    // Recast well inside the real 20s internal cooldown: no fresh burst.
+    ready(sim, 'aspect_of_the_cheetah');
+    sim.castAbility('aspect_of_the_cheetah');
+    expect(sim.player.auras.some((entry) => entry.id === 'hunter_enduring_courser_burst')).toBe(
+      false,
+    );
+  });
+
   it("Predator's Pace follows a successful Focus generator and respects its cooldown", () => {
     const sim = hunter('marksmanship', { 5: 'hun_r5_predators_pace' }, 2928);
     const target = addMob(sim, 20);
@@ -345,6 +377,55 @@ describe('Hunter v0.29 choice-row mechanics', () => {
       .map((event) => event.targetId);
     expect(clapTargets).toContain(primary.id);
     expect(clapTargets).toContain(nearby.id);
+  });
+
+  it("applies Unleashed Frenzy (+25% pet damage) to Fang Chorus, not only the pet's ordinary damage sites", () => {
+    // Fang Chorus is reachable while beast_mastery specced (talent rows are shared
+    // across specs, per the Pack Rally test below), so a Packlord who also picks
+    // hun_r20_fang_chorus can be mid-Unleashed-Frenzy when it procs. Regression
+    // guard for the pet-damage-multiplier consolidation: runFangChorus previously
+    // read a local copy of the multiplier that never carried the hunter_frenzy term.
+    function fangChorusDamage(frenzied: boolean): number {
+      const sim = hunter('beast_mastery', { 20: 'hun_r20_fang_chorus' }, 2937);
+      anchorProbeInOpenField(sim);
+      addPet(sim);
+      const primary = addMob(sim, 20);
+      sim.targetEntity(primary.id);
+      if (frenzied) {
+        sim.player.auras.push({
+          id: 'pack_frenzy',
+          name: 'Unleashed Frenzy',
+          kind: 'hunter_frenzy',
+          remaining: 8,
+          duration: 8,
+          value: 0.25,
+          sourceId: sim.playerId,
+          school: 'physical',
+        });
+      }
+      const allEvents: SimEvent[] = [];
+      for (let cast = 0; cast < 2; cast++) {
+        sim.player.resource = sim.player.maxResource;
+        ready(sim, 'arcane_shot');
+        sim.castAbility('arcane_shot');
+        allEvents.push(...advance(sim, 2));
+      }
+      const event = allEvents.find(
+        (candidate) => candidate.type === 'damage' && candidate.ability === 'Fang Chorus',
+      );
+      if (!event || event.type !== 'damage') throw new Error('missing Fang Chorus damage');
+      return event.amount;
+    }
+
+    const calm = fangChorusDamage(false);
+    const frenzied = fangChorusDamage(true);
+    expect(calm).toBeGreaterThan(0);
+    // A wide window rather than toBeCloseTo: Fang Chorus hits for a small integer
+    // amount, so Math.round alone can move the ratio a few percent off 1.25 (e.g.
+    // 42 -> round(52.5) reads 1.238, not 1.25). Still decisive against a missing
+    // multiplier (ratio ~1.0) or a doubled one (~1.5).
+    expect(frenzied / calm).toBeGreaterThan(1.15);
+    expect(frenzied / calm).toBeLessThan(1.35);
   });
 
   it('Pack Rally transforms Courser in combat and returns to Courser on cooldown', () => {

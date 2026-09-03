@@ -148,6 +148,7 @@ function loadedClipNames(def: VisualDef, standardMaterials: boolean, key?: strin
 function requiredClipNames(clips: ClipMap): string[] {
   return [
     clips.idle,
+    clips.combatIdle,
     clips.walk,
     clips.run,
     clips.death,
@@ -168,7 +169,11 @@ function requiredClipNames(clips: ClipMap): string[] {
     clips.idleBeat?.clip,
     ...(clips.hit ?? []),
     ...Object.values(clips.attackByAbility ?? {}),
+    ...Object.values(clips.castByAbility ?? {}),
     ...Object.values(clips.attackByHand ?? {}),
+    // cast-exit play-out entries name clips: a typo would silently disable
+    // the recovery and bring the snap-to-idle back
+    ...(clips.castPlayOut ?? []),
   ].filter((name): name is string => !!name);
 }
 
@@ -182,6 +187,7 @@ function emoteChains(clips: ClipMap): [string, readonly string[]][] {
 // silently stop covering it.
 const COVERED_CLIP_FIELDS = new Set<keyof ClipMap>([
   'idle',
+  'combatIdle',
   'walk',
   'run',
   'death',
@@ -202,6 +208,10 @@ const COVERED_CLIP_FIELDS = new Set<keyof ClipMap>([
   'hit',
   'attackByAbility',
   'attackTimeScaleByAbility',
+  'castByAbility',
+  'castTimeScaleByAbility',
+  'castHoldPointSeconds',
+  'castPlayOut',
   'attackByHand',
   'emote',
   'idleVariants',
@@ -219,6 +229,7 @@ const COVERED_CLIP_FIELDS = new Set<keyof ClipMap>([
 const CLIPLESS_RIGS = new Set([
   'mount_stalkglider_snail',
   'mount_aether_hover_cycle',
+  'mount_rickshaw_mount',
   'mob_glimmerwisp',
   'mob_duskwisp',
   'mob_spider_egg_sac',

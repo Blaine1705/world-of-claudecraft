@@ -20,14 +20,46 @@ export interface EmberFlatPool {
   h: number;
 }
 
+// One pool per lava AREA. The twin at (344, 2233) came out: it sat 22yd
+// from its neighbour with a combined model reach of 14, so the two read as
+// one lumpy smear and every river between them overlapped both.
+// Moved from world.ts under the monolith ratchet: the lava pools are
+// layout data, and this file is the pool tables' one home.
+// Open lava pools out in the wastes (shaped as shallow flat-floored basins;
+// the render lava surface sits just above each floor).
+// padK: where the flat melt floor ends, as a fraction of r. The default 0.95
+// keeps the whole model footprint on level ground; the Drakemaw vent keeps
+// the original tight eye (0.55) because its shore is the escape bench's
+// wade-out ramp (DRAKEMAW_ESCAPE), pinned by tests/terrain_escape_walkout.test.ts.
+export const EMBER_LAVA_POOLS = [
+  { x: 390, z: 2320, r: 14, floor: 12, padK: 0.55 }, // the vent inside the Drakemaw crater
+  { x: 446, z: 2220, r: 11, floor: -0.5 },
+  { x: 302, z: 2328, r: 11, floor: 0 },
+  // crater pools high in the two smaller cones (padK 0.55: the pit walls
+  // cradle the model's rocky ring, and the escape walkers need the legacy
+  // gentle floor-to-wall transition)
+  { x: 270, z: 2282, r: 7, floor: 11.5, padK: 0.55 },
+  { x: 487, z: 2356, r: 6, floor: 9.5, padK: 0.55 },
+  // the Moltenmaw: an open lava-lake field east of the caldera. The big eye
+  // sits at (423, 2347) so its whole model footprint (r * 1.15) stays clear
+  // of the Drakemaw escape bench ring (benchFade 23 from the vent), whose
+  // every-azimuth dry-shore guarantee is pinned by tests/terrain_escape_walkout.
+  { x: 423, z: 2347, r: 16, floor: -1.2 },
+  { x: 438, z: 2326, r: 10, floor: -1.2 },
+] as const;
+
 export const EMBER_FLAT_POOLS: readonly EmberFlatPool[] = [
   { x: 330, z: 2250, r: 8, h: 3.4 },
-  { x: 344, z: 2233, r: 6, h: 3.4 },
   { x: 418, z: 2196, r: 7, h: 5.4 },
 ] as const;
 
-/** One river run joining exactly two pools (a flat pool or a shaped basin
- *  mouth). The network is a TREE: one link per pool pair, no orphan runs. */
+/** How a run terminates at one of its mouths: pouring into a pool, or
+ *  spending itself on open ground under a river END cap. */
+export type EmberLavaMouth = 'pool' | 'cap';
+
+/** One river run. Most join two pools (a flat pool or a shaped basin
+ *  mouth); a run may also spill onto open waste, which is where the END
+ *  piece of the three-asset vocabulary belongs. */
 export interface EmberLavaLink {
   x0: number;
   z0: number;
@@ -50,61 +82,54 @@ export interface EmberLavaLink {
   trim0: number;
   /** ...and stop this far short of (x1, z1) */
   trim1: number;
+  /** how the (x0, z0) mouth ends (render-only; the grader beds the whole
+   *  polyline either way) */
+  m0: EmberLavaMouth;
+  /** how the (x1, z1) mouth ends */
+  m1: EmberLavaMouth;
 }
 
 // Endpoints reference EMBER_FLAT_POOLS and world.ts EMBER_LAVA_POOLS (the
 // shaped basins). Mouth bed heights sit just above the receiving pool's melt
 // surface so the pour-in reads downhill, never uphill.
 export const EMBER_LAVA_LINKS: readonly EmberLavaLink[] = [
-  // the twin waste pools' own short link
-  // biome-ignore format: link rows read best as single lines
-  { x0: 330, z0: 2250, h0: 3.4, x1: 344, z1: 2233, h1: 3.4, w: 10, amp: 1.2, wavelength: 40, phase: 1.1, trim0: 8, trim1: 6 },
-  // the long run south from the twin pools into the waste basin (gentle
-  // sway: the short bendy river pieces add their own curl on top, so a
-  // tight authored meander made the chain read as loops)
+  // ONE run per lava area, and one river piece per run: a pool, the river
+  // that leaves it, and the end that spends it. The old network ran four
+  // pool-to-pool links whose chords needed 2, 11, 5 and 2 river pieces to
+  // span, so a single area could stack eleven overlapping models into one
+  // long smear. Each run below is sized so exactly one middle fits between
+  // the pool's edge and its end cap.
   {
     x0: 330,
     z0: 2250,
     h0: 3.4,
-    x1: 302,
-    z1: 2328,
-    h1: 0.6,
-    w: 12,
-    amp: 1.8,
-    wavelength: 64,
-    phase: 4.2,
+    x1: 309,
+    z1: 2237,
+    h1: 1.0,
+    w: 9,
+    amp: 1.1,
+    wavelength: 38,
+    phase: 0.7,
     trim0: 8,
-    trim1: 11,
+    trim1: 0,
+    m0: 'pool',
+    m1: 'cap',
   },
-  // the north pool down into the spring basin
   {
     x0: 418,
     z0: 2196,
     h0: 5.4,
-    x1: 446,
-    z1: 2220,
-    h1: 0.2,
-    w: 11,
-    amp: 1.6,
-    wavelength: 56,
+    x1: 436,
+    z1: 2210,
+    h1: 1.9,
+    w: 8,
+    amp: 1.0,
+    wavelength: 34,
     phase: 2.6,
     trim0: 7,
-    trim1: 11,
-  },
-  // the Moltenmaw pair: the lake field's two eyes joined across the saddle
-  {
-    x0: 423,
-    z0: 2347,
-    h0: -0.2,
-    x1: 438,
-    z1: 2326,
-    h1: -0.2,
-    w: 14,
-    amp: 1.4,
-    wavelength: 48,
-    phase: 5.3,
-    trim0: 15,
-    trim1: 10,
+    trim1: 0,
+    m0: 'pool',
+    m1: 'cap',
   },
 ] as const;
 

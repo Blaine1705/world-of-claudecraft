@@ -17,6 +17,7 @@ import {
   renderItemArtAuditPreview,
   updateItemArtAuditVerdict,
 } from '../scripts/lib/item_art_audit.mjs';
+import { ITEMS } from '../src/sim/data';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const temporaryRoots: string[] = [];
@@ -746,6 +747,9 @@ describe('item-art audit builder', () => {
     expect(help).toContain('--refresh-verdict');
     expect(help).toContain('tmp/imagegen/item-art-consistency/final-audit');
 
+    // The current digest includes the Passing Stone addition and the seven reviewed painted bag
+    // replacements. `verdict: null` is the point: verify-only validates the live catalog without
+    // rewriting the committed visual verdict.
     const verified = JSON.parse(
       execFileSync(process.execPath, ['scripts/item_art_audit.mjs', '--verify-only'], {
         cwd: repoRoot,
@@ -755,20 +759,20 @@ describe('item-art audit builder', () => {
     ) as Record<string, unknown>;
     expect(verified).toMatchObject({
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      catalogSha256: '7b579121f18eb5ff259b594d9f74d4b28fb73c214cfbbef422fcede31bc5f67d',
-      catalogBytes: 452340,
-      rendererFingerprint: 'fd92c41a206cd55b05a1de94c4789f6eb6ca4200d063f4bbd284c21ae03b6082',
-      catalogCount: 824,
-      liveItemCount: 839,
+      catalogSha256: '3efd2743afd17f7a91cba7405f746b95304c03ef16fedcae2d485696bcf734aa',
+      catalogBytes: 568769,
+      rendererFingerprint: 'd80ff4868f979e1717e106c889b7d6505841caf8d4cf887776ecb60848b1b2b7',
+      catalogCount: 1043,
+      liveItemCount: 1058,
       generatedHeroicDefinitions: 64,
       heroicDefinitionsWithOwnWebp: 48,
       heroicWeaponArtAliases: 16,
       groupCount: 22,
-      sheetPageCount: 26,
-      sheetCount: 208,
-      sheetModeCounts: Object.fromEntries(ITEM_ART_AUDIT_MODES.map((mode) => [mode, 26])),
+      sheetPageCount: 27,
+      sheetCount: 216,
+      sheetModeCounts: Object.fromEntries(ITEM_ART_AUDIT_MODES.map((mode) => [mode, 27])),
       sheetSetSha256: null,
-      shippingCatalogSha256: 'fbaac839dbf147c8a88d906f141e8b011a9a91434aa54d3842fbec7407d698fe',
+      shippingCatalogSha256: '29faad091260141d02e5ce4086458020033b2ec4d3d829173db1fbe0d80c5d86',
       machineChecksPassed: true,
       verdict: null,
     });

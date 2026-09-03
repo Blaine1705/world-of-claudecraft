@@ -72,6 +72,15 @@
  * is what keeps a future caller from quietly reintroducing the per-window divergence
  * #2528 exists to end.
  */
+import { POINTER_FOCUS_PARK_SELECTOR } from './pointer_blur';
+
+/** The shared focus-key ATTRIBUTE, exported so an emit-only builder (a pure
+ *  chrome module that writes the markup but never reads focus back) can
+ *  spell the namespace from its one source instead of a stray literal; the
+ *  reads in this module stay on dataset.focusKey, the same attribute through
+ *  the DOM's own camelCase mapping. */
+export const FOCUS_KEY_ATTR = 'data-focus-key';
+
 export interface FocusRestoreCandidate {
   readonly disabled?: boolean;
   focus(): void;
@@ -106,8 +115,37 @@ export interface FocusRestoreCandidate {
  * `if (focusKey !== null)`), so a caller that could mint one must decide which it means
  * rather than inherit whichever its guard happens to be.
  */
+/**
+ * The one place the `data-focus-key` ATTRIBUTE is built, so a markup emitter and
+ * {@link captureFocusKey} cannot disagree about the namespace's spelling. Returns
+ * a leading-space attribute fragment ready to concatenate into an element's
+ * opening tag, with the key escaped for a double-quoted attribute context.
+ *
+ * It exists because a pure markup module can legitimately EMIT a key without
+ * ever reading focus: pushing the emission through this seam keeps such a module
+ * inside the namespace's single-reader rule instead of hand-spelling the
+ * attribute beside it.
+ */
+export function focusKeyAttr(key: string): string {
+  return ` data-focus-key="${key.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;')}"`;
+}
+
 export function captureFocusKey(root: HTMLElement): string | null {
   return focusedWithin(root)?.dataset.focusKey ?? null;
+}
+
+/**
+ * Resolve one focus key in a rebuilt subtree by exact dataset equality.
+ *
+ * Keys may include server-supplied item ids, so the value is deliberately never
+ * interpolated into a CSS attribute selector. The literal selector discovers the
+ * namespace members; the DOM's dataset value then performs the identity match.
+ */
+export function findFocusKey(root: ParentNode, key: string): HTMLElement | null {
+  for (const candidate of root.querySelectorAll(`[${FOCUS_KEY_ATTR}]`)) {
+    if (candidate instanceof HTMLElement && candidate.dataset.focusKey === key) return candidate;
+  }
+  return null;
 }
 
 /**
@@ -123,12 +161,28 @@ export function captureFocusKey(root: HTMLElement): string | null {
  * `instanceof` narrowing are the two lines a copy gets wrong, and `data-focus-key` is not
  * what makes them worth centralizing.
  *
- * Note the containment check subsumes the `<body>` case a caller might otherwise special
- * case: `root` is a descendant of `<body>`, so `root.contains(document.body)` is false.
+ * `<body>` is refused explicitly: for an ELEMENT root the containment check already
+ * excludes it (`root` is a descendant of `<body>`), but `root` may be any ParentNode
+ * (form_draft.ts keys its own fields and passes the container it is handed), and a
+ * Document root does contain its body.
+ *
+ * A DIALOG ROOT is never "a focused control within": the pointer-only focus drop
+ * (src/ui/pointer_blur.ts) parks pointer focus on the nearest POINTER_FOCUS_PARK_SELECTOR
+ * root so the Tab trap stays armed, and a repaint ladder that read a parked root as a
+ * focused control would resolve no key and fall through to its Close rung, planting focus
+ * on Close after every mouse click (the #2377 double-fire family). Refused by identity (the
+ * root passed in) AND by the park's own shape (the same selector, so the reader can never
+ * drift from what the drop parks on, and a root nested inside `root` is refused too).
+ * Repaint ladders that hand-roll `root.contains(active)` must use this helper instead
+ * (deeds_window.ts, bank_window.ts and form_draft.ts do); the bare containment reads that
+ * remain in src/ui are trap boundary checks or dataset-keyed reads that cannot resolve a
+ * root into a Close fallback, and tests/focus_restore.test.ts lists each one with its reason.
  */
-export function focusedWithin(root: HTMLElement): HTMLElement | null {
+export function focusedWithin(root: ParentNode): HTMLElement | null {
   const active = document.activeElement;
-  if (!(active instanceof HTMLElement)) return null;
+  if (!(active instanceof HTMLElement) || active === root) return null;
+  if (active === active.ownerDocument.body) return null;
+  if (active.matches(POINTER_FOCUS_PARK_SELECTOR)) return null;
   return root.contains(active) ? active : null;
 }
 
@@ -156,6 +210,17 @@ export function focusedWithin(root: HTMLElement): HTMLElement | null {
  * player may not be looking at) win over that offset. Focus must be visible (WCAG
  * 2.4.11), and the common case cannot conflict: the control being refocused is the one
  * the player was already on, so it is in view and `focus()` scrolls nothing.
+ *
+ * THAT LAST PREMISE HAS ONE KNOWN EXCEPTION, and it is recorded here because this is
+ * the one place the decision is spelled. Bank Storage phase 18 made `#bank-window`
+ * itself a scroller on short phones, so the control a player was already on CAN be out
+ * of view: they scroll away from the search box while it still holds focus. A repaint
+ * then restores the offset and a bare `focus()` immediately spends 127px of it
+ * (measured). The bank window passes `preventScroll` on THAT path only, and the
+ * reasoning above is why it is not done here: this helper serves a DEGRADE ladder, and
+ * a degraded target is one the player may genuinely not be looking at, so scrolling it
+ * into view is the behaviour that keeps focus visible. A caller re-focusing the SAME
+ * control it captured is the case where the offset should win instead.
  *
  * SYNCHRONOUS on purpose, unlike FocusManager.restore, which defers a tick to win
  * against a browser's own post-close focus move. There is no competing move here: the

@@ -74,6 +74,7 @@ await page.evaluate(() => {
     'reins_terrorspark_groundshaker',
     'reins_lanternback_troll',
     'reins_chimeglass_tortoise',
+    'reins_rickshaw_mount',
   ])
     sim.addItem(id, 1);
 });

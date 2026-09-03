@@ -16,6 +16,9 @@ import {
 } from '../src/sim/data';
 import { EASTBROOK_BUILDINGS_BY_ID, localToWorld } from '../src/sim/eastbrook_layout';
 import { createMob } from '../src/sim/entity';
+import { IGNIVAR_LIFT_RIDE_SECONDS } from '../src/sim/ignivar_forge_lift';
+import { IGNIVAR_LIFT_ROOM_ID, isIgnivarRaidRoom } from '../src/sim/ignivar_raid_ids';
+import { enterDungeon } from '../src/sim/instances/dungeons';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import { Sim } from '../src/sim/sim';
 import { dist2d, type Entity, type LootEntry, type SimEvent } from '../src/sim/types';
@@ -43,6 +46,8 @@ interface SimPrivateHarness {
     eligible?: ReturnType<Sim['meta']>[],
   ): void;
 }
+
+const FRESH_CORPSE_TIMER = 60;
 
 function asHarness(sim: Sim): SimPrivateHarness {
   return sim as unknown as SimPrivateHarness;
@@ -331,9 +336,10 @@ describe('terrain wall standoff', () => {
     expect(isBlocked(SEED, 91.09, 613.41, PLAYER_BODY_RADIUS)).toBe(true); // mound center
     const deeprockFar = mineMoundFar(88, 612, -2.0);
     expect(isBlocked(SEED, deeprockFar.x, deeprockFar.z, PLAYER_BODY_RADIUS)).toBe(false); // far past the 5yd mound radius
-    // zone1 mine (-88, -68, rot 0.8):
-    expect(isBlocked(SEED, -90.44, -70.37, PLAYER_BODY_RADIUS)).toBe(true); // mound center
-    const zone1Far = mineMoundFar(-88, -68, 0.8);
+    // zone1 mine (-148, -92, rot 0.8), on the dig headland since the New
+    // Eastbrook relocation (the mound offset math is unchanged):
+    expect(isBlocked(SEED, -40.44, 135.63, PLAYER_BODY_RADIUS)).toBe(true); // mound center
+    const zone1Far = mineMoundFar(-38, 138, 0.8);
     expect(isBlocked(SEED, zone1Far.x, zone1Far.z, PLAYER_BODY_RADIUS)).toBe(false); // far past the 5yd mound radius
   });
 
@@ -680,12 +686,27 @@ describe('the Hollow Crypt doors', () => {
 describe('dungeon instance placement and targetability', () => {
   it('places every dungeon entry and mob spawn on unblocked instance ground', () => {
     for (const dungeon of DUNGEON_LIST) {
-      const sim = makeSim();
+      const ignivarRaidRoom = isIgnivarRaidRoom(dungeon.id);
+      const sim = ignivarRaidRoom
+        ? new Sim({ seed: SEED, playerClass: 'warrior', devCommands: true })
+        : makeSim();
       if (dungeon.id === 'nythraxis_boss_arena') {
         sim.players.get(sim.playerId)?.questsDone.add('q_nythraxis_bound_guardian');
         formRaid(sim);
       }
-      sim.enterDungeon(dungeon.id);
+      if (ignivarRaidRoom) {
+        formRaid(sim);
+        expect(enterDungeon(sim.ctx, dungeon.id, sim.playerId, true)).toBe(true);
+      } else {
+        sim.enterDungeon(dungeon.id);
+      }
+      if (dungeon.id === IGNIVAR_LIFT_ROOM_ID) {
+        // The lift's only encounter is its exit gate, sealed under the
+        // locked template for the descent; ride it out so the placement
+        // sweep samples the room settled, with the gate swapped to the
+        // open dungeon_door portal every rider walks out through.
+        for (let tick = 0; tick < 20 * (IGNIVAR_LIFT_RIDE_SECONDS + 2); tick++) sim.tick();
+      }
       const p = sim.player;
       expect(p.pos.x, `${dungeon.id} entry is not inside an instance`).toBeGreaterThan(
         DUNGEON_X_THRESHOLD,
@@ -843,6 +864,7 @@ describe('boss loot and encounter resets', () => {
     expectDefined(sim.entities.get(c)).dead = true;
     const mob = createMob(990099, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
     mob.dead = true;
+    mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = a;
     mob.loot = { copper: 12, items: [] };
@@ -869,6 +891,7 @@ describe('boss loot and encounter resets', () => {
     teleportTo(sim, 21, 20, b);
     const mob = createMob(990098, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
     mob.dead = true;
+    mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = a;
     mob.loot = {
@@ -906,6 +929,7 @@ describe('boss loot and encounter resets', () => {
     teleportTo(sim, 21, 20, b);
     const mob = createMob(990100, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
     mob.dead = true;
+    mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = a;
     mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
@@ -931,6 +955,7 @@ describe('boss loot and encounter resets', () => {
     teleportTo(sim, 21, 20, b);
     const mob = createMob(990102, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
     mob.dead = true;
+    mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = a;
     mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
@@ -957,6 +982,7 @@ describe('boss loot and encounter resets', () => {
     teleportTo(sim, 21, 20, b);
     const mob = createMob(990103, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
     mob.dead = true;
+    mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = a;
     mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
@@ -992,6 +1018,7 @@ describe('boss loot and encounter resets', () => {
     teleportTo(sim, 21, 20, b);
     const mob = createMob(990104, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
     mob.dead = true;
+    mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = a;
     mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
@@ -1018,6 +1045,7 @@ describe('boss loot and encounter resets', () => {
     teleportTo(sim, 21, 20, b);
     const mob = createMob(990105, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
     mob.dead = true;
+    mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = a;
     mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
@@ -1047,6 +1075,7 @@ describe('boss loot and encounter resets', () => {
     teleportTo(sim, 21, 20, b);
     const mob = createMob(990106, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
     mob.dead = true;
+    mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = a;
     mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
@@ -1084,6 +1113,7 @@ describe('boss loot and encounter resets', () => {
     teleportTo(sim, 22, 20, c);
     const mob = createMob(990107, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
     mob.dead = true;
+    mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = a;
     mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
@@ -1116,6 +1146,7 @@ describe('boss loot and encounter resets', () => {
     teleportTo(sim, 21, 20, b);
     const mob = createMob(990108, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
     mob.dead = true;
+    mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = a;
     mob.loot = { copper: 0, items: [{ itemId: 'greyjaw_hide_boots', count: 1 }] };
@@ -1168,6 +1199,7 @@ describe('boss loot and encounter resets', () => {
     expect(mob.loot?.items).toContainEqual({ itemId: 'boar_hide', count: 1, personalFor: [a, b] });
 
     mob.dead = true;
+    mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = a;
     sim.entities.set(mob.id, mob);
@@ -1195,6 +1227,7 @@ describe('boss loot and encounter resets', () => {
     const b = sim.addPlayer('mage', 'Bert');
     const mob = createMob(990103, MOBS.forest_wolf, 2, { x: 20, y: 0, z: 22 });
     mob.dead = true;
+    mob.corpseTimer = FRESH_CORPSE_TIMER;
     mob.lootable = true;
     mob.tappedById = a;
     mob.loot = {

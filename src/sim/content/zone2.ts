@@ -242,7 +242,7 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
       { copper: 38, chance: 1 },
       { itemId: 'widow_venom_sac', chance: 0.65, questId: 'q_widows' },
       { itemId: 'spider_leg', chance: 0.4 },
-      { itemId: 'fenbark_leggings', chance: 0.12 },
+      { itemId: 'fenbark_leggings', chance: 0.02 },
     ],
     scale: 1.0,
     color: 0x283747,
@@ -399,8 +399,16 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
       { itemId: 'troll_fetish', chance: 0.6, questId: 'q_troll_fetishes' },
       { itemId: 'chipped_tusk', chance: 0.4 },
       { itemId: 'bogiron_nugget', chance: 0.3 },
-      { itemId: 'elixir_of_the_bear', chance: 0.07 },
-      { itemId: 'marshlight_hauberk', chance: 0.1 },
+      { itemId: 'elixir_of_the_bear', chance: 0.008 },
+      { itemId: 'marshlight_hauberk', chance: 0.012 },
+      // The rare world-drop bag, and the middle of its three ordinary-mob rows
+      // (the others are on zone3's Deeprock Tunneler and Thornpeak Ogre). All
+      // three hosts rob the roads, so the pack turns up on the humanoids that
+      // would have taken it off a traveller. A rare 16-slot bag is a genuine
+      // chase item, so all three rows sit inside the classic normal-mob blue
+      // band (tests/loot_quality_rates.test.ts); the elevated row is on a rare
+      // mob, not here.
+      { itemId: 'wayfarers_backpack', chance: 0.0015 },
     ],
     scale: 1.15,
     color: 0x229954,
@@ -529,7 +537,7 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
       { copper: 58, chance: 1 },
       { itemId: 'cult_cipher', chance: 0.4, questId: 'q_summoners' },
       { itemId: 'tallow_candle', chance: 0.3 },
-      { itemId: 'duskthorn_mantle', chance: 0.12 },
+      { itemId: 'duskthorn_mantle', chance: 0.02 },
     ],
     scale: 1.0,
     color: 0x9b59b6,
