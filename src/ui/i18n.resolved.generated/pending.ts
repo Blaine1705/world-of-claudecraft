@@ -11,46 +11,82 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "entities.items.reins_chimeglass_tortoise.name",
+    "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.desc_mech_bird",
     "hudChrome.mounts.name_chimeglass_tortoise",
-    "hudChrome.mounts.name_lanternback_troll"
+    "hudChrome.mounts.name_lanternback_troll",
+    "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountBuyAria",
+    "hudChrome.wocStore.mountsEyebrow",
+    "hudChrome.wocStore.mountsTitle"
   ],
   "es_ES": [
     "entities.items.reins_chimeglass_tortoise.name",
+    "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.desc_mech_bird",
     "hudChrome.mounts.name_chimeglass_tortoise",
-    "hudChrome.mounts.name_lanternback_troll"
+    "hudChrome.mounts.name_lanternback_troll",
+    "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountBuyAria",
+    "hudChrome.wocStore.mountsEyebrow",
+    "hudChrome.wocStore.mountsTitle"
   ],
   "fr_FR": [
     "entities.items.reins_chimeglass_tortoise.name",
+    "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.desc_mech_bird",
     "hudChrome.mounts.name_chimeglass_tortoise",
-    "hudChrome.mounts.name_lanternback_troll"
+    "hudChrome.mounts.name_lanternback_troll",
+    "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountBuyAria",
+    "hudChrome.wocStore.mountsEyebrow",
+    "hudChrome.wocStore.mountsTitle"
   ],
   "fr_CA": [
     "entities.items.reins_chimeglass_tortoise.name",
+    "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.desc_mech_bird",
     "hudChrome.mounts.name_chimeglass_tortoise",
-    "hudChrome.mounts.name_lanternback_troll"
+    "hudChrome.mounts.name_lanternback_troll",
+    "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountBuyAria",
+    "hudChrome.wocStore.mountsEyebrow",
+    "hudChrome.wocStore.mountsTitle"
   ],
   "en_CA": [],
   "it_IT": [
     "entities.items.reins_chimeglass_tortoise.name",
+    "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.desc_mech_bird",
     "hudChrome.mounts.name_chimeglass_tortoise",
-    "hudChrome.mounts.name_lanternback_troll"
+    "hudChrome.mounts.name_lanternback_troll",
+    "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountBuyAria",
+    "hudChrome.wocStore.mountsEyebrow",
+    "hudChrome.wocStore.mountsTitle"
   ],
   "de_DE": [
     "entities.items.reins_chimeglass_tortoise.name",
+    "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.desc_mech_bird",
     "hudChrome.mounts.name_chimeglass_tortoise",
-    "hudChrome.mounts.name_lanternback_troll"
+    "hudChrome.mounts.name_lanternback_troll",
+    "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountBuyAria",
+    "hudChrome.wocStore.mountsEyebrow",
+    "hudChrome.wocStore.mountsTitle"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -58,66 +94,120 @@ export const pending: Record<string, readonly string[]> = {
   "ja_JP": [],
   "pt_BR": [
     "entities.items.reins_chimeglass_tortoise.name",
+    "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.desc_mech_bird",
     "hudChrome.mounts.name_chimeglass_tortoise",
-    "hudChrome.mounts.name_lanternback_troll"
+    "hudChrome.mounts.name_lanternback_troll",
+    "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountBuyAria",
+    "hudChrome.wocStore.mountsEyebrow",
+    "hudChrome.wocStore.mountsTitle"
   ],
   "ru_RU": [],
   "cs_CZ": [
     "entities.items.reins_chimeglass_tortoise.name",
+    "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.desc_mech_bird",
     "hudChrome.mounts.name_chimeglass_tortoise",
-    "hudChrome.mounts.name_lanternback_troll"
+    "hudChrome.mounts.name_lanternback_troll",
+    "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountBuyAria",
+    "hudChrome.wocStore.mountsEyebrow",
+    "hudChrome.wocStore.mountsTitle"
   ],
   "nl_NL": [
     "entities.items.reins_chimeglass_tortoise.name",
+    "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.desc_mech_bird",
     "hudChrome.mounts.name_chimeglass_tortoise",
-    "hudChrome.mounts.name_lanternback_troll"
+    "hudChrome.mounts.name_lanternback_troll",
+    "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountBuyAria",
+    "hudChrome.wocStore.mountsEyebrow",
+    "hudChrome.wocStore.mountsTitle"
   ],
   "pl_PL": [
     "entities.items.reins_chimeglass_tortoise.name",
+    "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.desc_mech_bird",
     "hudChrome.mounts.name_chimeglass_tortoise",
-    "hudChrome.mounts.name_lanternback_troll"
+    "hudChrome.mounts.name_lanternback_troll",
+    "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountBuyAria",
+    "hudChrome.wocStore.mountsEyebrow",
+    "hudChrome.wocStore.mountsTitle"
   ],
   "id_ID": [
     "entities.items.reins_chimeglass_tortoise.name",
+    "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.desc_mech_bird",
     "hudChrome.mounts.name_chimeglass_tortoise",
-    "hudChrome.mounts.name_lanternback_troll"
+    "hudChrome.mounts.name_lanternback_troll",
+    "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountBuyAria",
+    "hudChrome.wocStore.mountsEyebrow",
+    "hudChrome.wocStore.mountsTitle"
   ],
   "tr_TR": [
     "entities.items.reins_chimeglass_tortoise.name",
+    "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.desc_mech_bird",
     "hudChrome.mounts.name_chimeglass_tortoise",
-    "hudChrome.mounts.name_lanternback_troll"
+    "hudChrome.mounts.name_lanternback_troll",
+    "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountBuyAria",
+    "hudChrome.wocStore.mountsEyebrow",
+    "hudChrome.wocStore.mountsTitle"
   ],
   "sv_SE": [
     "entities.items.reins_chimeglass_tortoise.name",
+    "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.desc_mech_bird",
     "hudChrome.mounts.name_chimeglass_tortoise",
-    "hudChrome.mounts.name_lanternback_troll"
+    "hudChrome.mounts.name_lanternback_troll",
+    "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountBuyAria",
+    "hudChrome.wocStore.mountsEyebrow",
+    "hudChrome.wocStore.mountsTitle"
   ],
   "vi_VN": [
     "entities.items.reins_chimeglass_tortoise.name",
+    "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.desc_mech_bird",
     "hudChrome.mounts.name_chimeglass_tortoise",
-    "hudChrome.mounts.name_lanternback_troll"
+    "hudChrome.mounts.name_lanternback_troll",
+    "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountBuyAria",
+    "hudChrome.wocStore.mountsEyebrow",
+    "hudChrome.wocStore.mountsTitle"
   ],
   "da_DK": [
     "entities.items.reins_chimeglass_tortoise.name",
+    "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_chimeglass_tortoise",
     "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.desc_mech_bird",
     "hudChrome.mounts.name_chimeglass_tortoise",
-    "hudChrome.mounts.name_lanternback_troll"
+    "hudChrome.mounts.name_lanternback_troll",
+    "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountBuyAria",
+    "hudChrome.wocStore.mountsEyebrow",
+    "hudChrome.wocStore.mountsTitle"
   ]
 };
