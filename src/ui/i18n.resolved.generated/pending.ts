@@ -9,25 +9,115 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "entities.items.reins_chimeglass_tortoise.name",
+    "hudChrome.mounts.desc_chimeglass_tortoise",
+    "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.name_chimeglass_tortoise",
+    "hudChrome.mounts.name_lanternback_troll"
+  ],
+  "es_ES": [
+    "entities.items.reins_chimeglass_tortoise.name",
+    "hudChrome.mounts.desc_chimeglass_tortoise",
+    "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.name_chimeglass_tortoise",
+    "hudChrome.mounts.name_lanternback_troll"
+  ],
+  "fr_FR": [
+    "entities.items.reins_chimeglass_tortoise.name",
+    "hudChrome.mounts.desc_chimeglass_tortoise",
+    "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.name_chimeglass_tortoise",
+    "hudChrome.mounts.name_lanternback_troll"
+  ],
+  "fr_CA": [
+    "entities.items.reins_chimeglass_tortoise.name",
+    "hudChrome.mounts.desc_chimeglass_tortoise",
+    "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.name_chimeglass_tortoise",
+    "hudChrome.mounts.name_lanternback_troll"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "entities.items.reins_chimeglass_tortoise.name",
+    "hudChrome.mounts.desc_chimeglass_tortoise",
+    "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.name_chimeglass_tortoise",
+    "hudChrome.mounts.name_lanternback_troll"
+  ],
+  "de_DE": [
+    "entities.items.reins_chimeglass_tortoise.name",
+    "hudChrome.mounts.desc_chimeglass_tortoise",
+    "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.name_chimeglass_tortoise",
+    "hudChrome.mounts.name_lanternback_troll"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "entities.items.reins_chimeglass_tortoise.name",
+    "hudChrome.mounts.desc_chimeglass_tortoise",
+    "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.name_chimeglass_tortoise",
+    "hudChrome.mounts.name_lanternback_troll"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "entities.items.reins_chimeglass_tortoise.name",
+    "hudChrome.mounts.desc_chimeglass_tortoise",
+    "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.name_chimeglass_tortoise",
+    "hudChrome.mounts.name_lanternback_troll"
+  ],
+  "nl_NL": [
+    "entities.items.reins_chimeglass_tortoise.name",
+    "hudChrome.mounts.desc_chimeglass_tortoise",
+    "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.name_chimeglass_tortoise",
+    "hudChrome.mounts.name_lanternback_troll"
+  ],
+  "pl_PL": [
+    "entities.items.reins_chimeglass_tortoise.name",
+    "hudChrome.mounts.desc_chimeglass_tortoise",
+    "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.name_chimeglass_tortoise",
+    "hudChrome.mounts.name_lanternback_troll"
+  ],
+  "id_ID": [
+    "entities.items.reins_chimeglass_tortoise.name",
+    "hudChrome.mounts.desc_chimeglass_tortoise",
+    "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.name_chimeglass_tortoise",
+    "hudChrome.mounts.name_lanternback_troll"
+  ],
+  "tr_TR": [
+    "entities.items.reins_chimeglass_tortoise.name",
+    "hudChrome.mounts.desc_chimeglass_tortoise",
+    "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.name_chimeglass_tortoise",
+    "hudChrome.mounts.name_lanternback_troll"
+  ],
+  "sv_SE": [
+    "entities.items.reins_chimeglass_tortoise.name",
+    "hudChrome.mounts.desc_chimeglass_tortoise",
+    "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.name_chimeglass_tortoise",
+    "hudChrome.mounts.name_lanternback_troll"
+  ],
+  "vi_VN": [
+    "entities.items.reins_chimeglass_tortoise.name",
+    "hudChrome.mounts.desc_chimeglass_tortoise",
+    "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.name_chimeglass_tortoise",
+    "hudChrome.mounts.name_lanternback_troll"
+  ],
+  "da_DK": [
+    "entities.items.reins_chimeglass_tortoise.name",
+    "hudChrome.mounts.desc_chimeglass_tortoise",
+    "hudChrome.mounts.desc_lanternback_troll",
+    "hudChrome.mounts.name_chimeglass_tortoise",
+    "hudChrome.mounts.name_lanternback_troll"
+  ]
 };
