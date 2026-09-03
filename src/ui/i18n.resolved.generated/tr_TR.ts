@@ -572,6 +572,7 @@ export const tr_TR: EnTranslations = {
       "rewardsTab": "Günlük Ödüller",
       "mountsEyebrow": "Account Mounts",
       "mountsTitle": "Machine Stable",
+      "mountBuyAria": "Purchase {item}",
       "loading": "WOC Mağazası yükleniyor...",
       "error": "WOC Mağazası şu anda kullanılamıyor. Lütfen kısa süre sonra tekrar deneyin.",
       "balance": "Claudium Bakiyesi",

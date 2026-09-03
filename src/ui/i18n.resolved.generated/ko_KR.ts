@@ -572,6 +572,7 @@ export const ko_KR: EnTranslations = {
       "rewardsTab": "일일 보상",
       "mountsEyebrow": "계정 탈것",
       "mountsTitle": "기계 마구간",
+      "mountBuyAria": "{item} 구매",
       "loading": "WOC 상점 불러오는 중…",
       "error": "현재 WOC 상점을 이용할 수 없습니다. 잠시 후 다시 시도해 주세요.",
       "balance": "Claudium 잔액",

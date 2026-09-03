@@ -572,6 +572,7 @@ export const ru_RU: EnTranslations = {
       "rewardsTab": "Ежедневные награды",
       "mountsEyebrow": "Маунты аккаунта",
       "mountsTitle": "Механическая конюшня",
+      "mountBuyAria": "Купить: {item}",
       "loading": "Загрузка магазина WOC…",
       "error": "Магазин WOC сейчас недоступен. Повторите попытку позже.",
       "balance": "Баланс Claudium",

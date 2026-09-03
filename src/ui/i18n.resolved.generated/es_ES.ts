@@ -572,6 +572,7 @@ export const es_ES: EnTranslations = {
       "rewardsTab": "Recompensas diarias",
       "mountsEyebrow": "Account Mounts",
       "mountsTitle": "Machine Stable",
+      "mountBuyAria": "Purchase {item}",
       "loading": "Cargando la tienda WOC...",
       "error": "La tienda WOC no está disponible en este momento. Vuelve a intentarlo dentro de poco.",
       "balance": "Saldo de Claudium",

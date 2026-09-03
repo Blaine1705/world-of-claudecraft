@@ -572,6 +572,7 @@ export const ja_JP: EnTranslations = {
       "rewardsTab": "デイリー報酬",
       "mountsEyebrow": "アカウント共有マウント",
       "mountsTitle": "機械の厩舎",
+      "mountBuyAria": "{item}を購入",
       "loading": "WOCストアを読み込み中…",
       "error": "WOCストアは現在利用できません。しばらくしてからお試しください。",
       "balance": "Claudium残高",

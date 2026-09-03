@@ -331,6 +331,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.rewardsTab': '每日獎勵',
   'hudChrome.wocStore.mountsEyebrow': '帳號坐騎',
   'hudChrome.wocStore.mountsTitle': '機械馬廄',
+  'hudChrome.wocStore.mountBuyAria': '購買{item}',
   'hudChrome.wocStore.loading': '正在載入 WOC 商店…',
   'hudChrome.wocStore.error': 'WOC 商店目前無法使用，請稍後再試。',
   'hudChrome.wocStore.balance': 'Claudium 餘額',

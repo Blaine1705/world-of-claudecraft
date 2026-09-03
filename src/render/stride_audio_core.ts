@@ -4,10 +4,12 @@
 // time accumulated travel crosses the stride length, so cadence tracks real
 // ground speed and pausing mid-stride never banks a phantom step.
 //
-// RENDER_PURE_CORES: host-agnostic, no Three/DOM, unit-tested directly
-// (tests/stride_audio_core.test.ts). The renderer stays the only caller and
-// keeps sink dispatch; this core owns just the accumulate/threshold/reset
-// arithmetic so the hot path allocates nothing.
+// RENDER_PURE_CORES: host-agnostic and deterministic (no Three/DOM, no clock,
+// no RNG), unit-tested directly (tests/stride_audio_core.test.ts). Not
+// value-pure: it advances the accumulator on the view it is handed in place,
+// which is the point (one number per entity, no per-frame allocation). The
+// renderer stays the only caller and keeps sink dispatch; this core owns just
+// the accumulate/threshold/reset arithmetic.
 
 /** Advance the view's stride accumulator by this frame's travel and report
  *  whether a cue fires now (accumulator resets on fire). */

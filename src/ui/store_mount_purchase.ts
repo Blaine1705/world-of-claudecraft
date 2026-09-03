@@ -169,9 +169,12 @@ export class StoreMountPurchase {
       );
       return null;
     }
-    // Ownership reflects through the refreshed rows; a spend that neither
-    // granted nor left the row owned is the error state.
-    if (!owned && !this.rowById(row.itemId)?.owned) this.deps.setError();
+    // On the live surface only the refreshed row proves ownership, exactly as
+    // the skin controller reads it: an already_granted answer whose reins the
+    // mirror has not landed is the error state, not a silent success (the
+    // stale-surface toast above is the one place already_granted reads as
+    // owned, because there is no row to check against there).
+    if (!result?.granted && !this.rowById(row.itemId)?.owned) this.deps.setError();
     return null;
   }
 

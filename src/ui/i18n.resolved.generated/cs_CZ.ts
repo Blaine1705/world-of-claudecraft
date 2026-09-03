@@ -572,6 +572,7 @@ export const cs_CZ: EnTranslations = {
       "rewardsTab": "Denní odměny",
       "mountsEyebrow": "Account Mounts",
       "mountsTitle": "Machine Stable",
+      "mountBuyAria": "Purchase {item}",
       "loading": "Načítání obchodu WOC…",
       "error": "Obchod WOC nyní není dostupný. Zkus to za chvíli znovu.",
       "balance": "Zůstatek Claudium",

@@ -150,6 +150,19 @@ describe('StoreMountPurchase.purchase outcomes on a current surface', () => {
     expect(h.deps.setError).not.toHaveBeenCalled();
   });
 
+  it('reads already_granted as the error state when the refreshed row is still unowned', async () => {
+    // The skin controller's rule: on the live surface the row proves ownership,
+    // an already_granted answer alone does not (the mirror may not have landed).
+    const h = harness(5000, [service()], [], async () =>
+      result({ granted: false, reason: 'already_granted' }),
+    );
+    h.controller.request(REINS);
+    await confirm(h);
+    expect(h.deps.refreshStore).toHaveBeenCalledTimes(1);
+    expect(h.deps.setError).toHaveBeenCalledTimes(1);
+    expect(h.deps.showResult).not.toHaveBeenCalled();
+  });
+
   it('marks the error state when a refusal leaves the row unowned after the refresh', async () => {
     const h = harness(5000, [service()], [], async () => result({ reason: 'unavailable' }));
     h.controller.request(REINS);

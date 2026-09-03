@@ -572,6 +572,7 @@ export const en_XA: EnTranslations = {
       "rewardsTab": "[Ðáíļý Ŕéŵáŕðš]",
       "mountsEyebrow": "[Áççóúñţ Ɱóúñţš]",
       "mountsTitle": "[Ɱáçĥíñé Šţáƀļé]",
+      "mountBuyAria": "[Þúŕçĥášé {item}]",
       "loading": "[Ļóáðíñĝ ŴÓÇ Šţóŕé...]",
       "error": "[Ţĥé ŴÓÇ Šţóŕé íš úñáʋáíļáƀļé ŕíĝĥţ ñóŵ. Þļéášé ţŕý áĝáíñ šĥóŕţļý.]",
       "balance": "[Çļáúðíúɱ Ɓáļáñçé]",

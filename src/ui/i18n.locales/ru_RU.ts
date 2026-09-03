@@ -332,6 +332,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.rewardsTab': 'Ежедневные награды',
   'hudChrome.wocStore.mountsEyebrow': 'Маунты аккаунта',
   'hudChrome.wocStore.mountsTitle': 'Механическая конюшня',
+  'hudChrome.wocStore.mountBuyAria': 'Купить: {item}',
   'hudChrome.wocStore.loading': 'Загрузка магазина WOC…',
   'hudChrome.wocStore.error': 'Магазин WOC сейчас недоступен. Повторите попытку позже.',
   'hudChrome.wocStore.balance': 'Баланс Claudium',

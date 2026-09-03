@@ -572,6 +572,7 @@ export const id_ID: EnTranslations = {
       "rewardsTab": "Hadiah Harian",
       "mountsEyebrow": "Account Mounts",
       "mountsTitle": "Machine Stable",
+      "mountBuyAria": "Purchase {item}",
       "loading": "Memuat Toko WOC...",
       "error": "Toko WOC tidak tersedia saat ini. Silakan coba lagi sebentar lagi.",
       "balance": "Saldo Claudium",

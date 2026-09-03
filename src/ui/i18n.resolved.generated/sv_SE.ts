@@ -572,6 +572,7 @@ export const sv_SE: EnTranslations = {
       "rewardsTab": "Dagliga belöningar",
       "mountsEyebrow": "Account Mounts",
       "mountsTitle": "Machine Stable",
+      "mountBuyAria": "Purchase {item}",
       "loading": "Laddar WOC-butiken...",
       "error": "WOC-butiken är inte tillgänglig just nu. Försök igen om en stund.",
       "balance": "Claudium-saldo",

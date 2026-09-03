@@ -572,6 +572,7 @@ export const nl_NL: EnTranslations = {
       "rewardsTab": "Dagelijkse beloningen",
       "mountsEyebrow": "Account Mounts",
       "mountsTitle": "Machine Stable",
+      "mountBuyAria": "Purchase {item}",
       "loading": "WOC-winkel laden...",
       "error": "De WOC Store is momenteel niet beschikbaar. Probeer het binnenkort opnieuw.",
       "balance": "Claudium-saldo",

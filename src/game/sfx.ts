@@ -1045,12 +1045,14 @@ class Sfx {
   ): void {
     const key = this.idleClipKey(mountKey);
     if (key === null) return;
-    const loopId = `mountIdle:${entityId}`;
+    // The loop id is built only on the arm that spends it: the moving branch
+    // polls this every frame, and for a rider already off the hum that must
+    // stay a Set miss with no string allocation.
     if (active) {
       this.mountIdles.add(entityId);
-      this.loop(loopId, key, 0.55, x, y, z);
+      this.loop(`mountIdle:${entityId}`, key, 0.55, x, y, z);
     } else if (this.mountIdles.delete(entityId)) {
-      this.unloop(loopId, 0.25);
+      this.unloop(`mountIdle:${entityId}`, 0.25);
     }
   }
   private mountIdles = new Set<number>();

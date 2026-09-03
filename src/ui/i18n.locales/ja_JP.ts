@@ -332,6 +332,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.rewardsTab': 'デイリー報酬',
   'hudChrome.wocStore.mountsEyebrow': 'アカウント共有マウント',
   'hudChrome.wocStore.mountsTitle': '機械の厩舎',
+  'hudChrome.wocStore.mountBuyAria': '{item}を購入',
   'hudChrome.wocStore.loading': 'WOCストアを読み込み中…',
   'hudChrome.wocStore.error': 'WOCストアは現在利用できません。しばらくしてからお試しください。',
   'hudChrome.wocStore.balance': 'Claudium残高',

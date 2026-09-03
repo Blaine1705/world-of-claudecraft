@@ -572,6 +572,7 @@ export const zh_TW: EnTranslations = {
       "rewardsTab": "每日獎勵",
       "mountsEyebrow": "帳號坐騎",
       "mountsTitle": "機械馬廄",
+      "mountBuyAria": "購買{item}",
       "loading": "正在載入 WOC 商店…",
       "error": "WOC 商店目前無法使用，請稍後再試。",
       "balance": "Claudium 餘額",

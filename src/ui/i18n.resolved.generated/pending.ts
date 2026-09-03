@@ -13,6 +13,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_mech_bird",
     "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle"
   ],
@@ -20,6 +21,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_mech_bird",
     "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle"
   ],
@@ -27,6 +29,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_mech_bird",
     "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle"
   ],
@@ -34,6 +37,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_mech_bird",
     "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle"
   ],
@@ -42,6 +46,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_mech_bird",
     "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle"
   ],
@@ -49,6 +54,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_mech_bird",
     "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle"
   ],
@@ -60,6 +66,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_mech_bird",
     "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle"
   ],
@@ -68,6 +75,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_mech_bird",
     "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle"
   ],
@@ -75,6 +83,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_mech_bird",
     "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle"
   ],
@@ -82,6 +91,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_mech_bird",
     "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle"
   ],
@@ -89,6 +99,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_mech_bird",
     "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle"
   ],
@@ -96,6 +107,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_mech_bird",
     "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle"
   ],
@@ -103,6 +115,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_mech_bird",
     "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle"
   ],
@@ -110,6 +123,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_mech_bird",
     "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle"
   ],
@@ -117,6 +131,7 @@ export const pending: Record<string, readonly string[]> = {
     "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_mech_bird",
     "hudChrome.mounts.name_mech_bird",
+    "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle"
   ]

@@ -572,6 +572,7 @@ export const da_DK: EnTranslations = {
       "rewardsTab": "Daglige belønninger",
       "mountsEyebrow": "Account Mounts",
       "mountsTitle": "Machine Stable",
+      "mountBuyAria": "Purchase {item}",
       "loading": "Indlæser WOC-butikken...",
       "error": "WOC-butikken er ikke tilgængelig lige nu. Prøv igen om lidt.",
       "balance": "Claudium-saldo",

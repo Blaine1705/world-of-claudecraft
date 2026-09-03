@@ -11340,6 +11340,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.wocStore.inspectAria'
   | 'hudChrome.wocStore.loading'
   | 'hudChrome.wocStore.lore'
+  | 'hudChrome.wocStore.mountBuyAria'
   | 'hudChrome.wocStore.mountsEyebrow'
   | 'hudChrome.wocStore.mountsTitle'
   | 'hudChrome.wocStore.needMoreBody'

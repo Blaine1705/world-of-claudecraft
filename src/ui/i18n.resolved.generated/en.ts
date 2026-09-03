@@ -572,6 +572,7 @@ export const en: EnTranslations = {
       "rewardsTab": "Daily Rewards",
       "mountsEyebrow": "Account Mounts",
       "mountsTitle": "Machine Stable",
+      "mountBuyAria": "Purchase {item}",
       "loading": "Loading WOC Store...",
       "error": "The WOC Store is unavailable right now. Please try again shortly.",
       "balance": "Claudium Balance",

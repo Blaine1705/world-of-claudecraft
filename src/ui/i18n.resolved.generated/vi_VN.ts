@@ -572,6 +572,7 @@ export const vi_VN: EnTranslations = {
       "rewardsTab": "Phần thưởng hàng ngày",
       "mountsEyebrow": "Account Mounts",
       "mountsTitle": "Machine Stable",
+      "mountBuyAria": "Purchase {item}",
       "loading": "Đang tải Cửa hàng WOC...",
       "error": "Cửa hàng WOC hiện không khả dụng. Vui lòng thử lại trong thời gian ngắn.",
       "balance": "Số dư Claudium",

@@ -337,6 +337,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.rewardsTab': '일일 보상',
   'hudChrome.wocStore.mountsEyebrow': '계정 탈것',
   'hudChrome.wocStore.mountsTitle': '기계 마구간',
+  'hudChrome.wocStore.mountBuyAria': '{item} 구매',
   'hudChrome.wocStore.loading': 'WOC 상점 불러오는 중…',
   'hudChrome.wocStore.error': '현재 WOC 상점을 이용할 수 없습니다. 잠시 후 다시 시도해 주세요.',
   'hudChrome.wocStore.balance': 'Claudium 잔액',
