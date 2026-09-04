@@ -198,7 +198,10 @@ export class WorldQuestPuzzleWindow {
       `<div class="wqm-grid" role="group" aria-label="${esc(t('questUi.worldQuest.match3Title'))}" style="--wqm-columns:${view.columns};--wqm-rows:${view.rows}">${cells}</div>` +
       `${view.exhausted ? `<p class="wqm-out" role="alert">${esc(t('questUi.worldQuest.match3OutOfMoves'))}</p>` : ''}` +
       `<button type="button" class="btn secondary wqm-reset" data-match3-reset${focusKeyAttr('match3:reset')}>${esc(t('questUi.worldQuest.match3Reset'))}</button>`;
-    const announcement = `${movesStatus}. ${clearedStatus}`;
+    const announcement = t('questUi.worldQuest.match3Announcement', {
+      moves: movesStatus,
+      cleared: clearedStatus,
+    });
     if (this.match3Announcer.textContent !== announcement) {
       this.match3Announcer.textContent = announcement;
     }

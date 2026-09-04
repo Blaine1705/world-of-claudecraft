@@ -45,6 +45,29 @@ describe('quest event presentation', () => {
     } as SimEvent);
     expect(accepted).toEqual({ sound: 'quest_accept', refreshQuestDialog: true });
 
+    const progress = questEventPresentation({
+      type: 'questProgress',
+      questId: 'q_wolves',
+      objectiveIndex: 0,
+      current: 2,
+      required: 8,
+      text: 'legacy fallback',
+      pid: 1,
+    } as SimEvent);
+    expect(progress).toEqual({
+      logText: 'Forest Wolf slain: 2/8',
+      flashText: 'Forest Wolf slain: 2/8',
+      refreshQuestDialog: true,
+    });
+
+    expect(
+      questEventPresentation({ type: 'questReady', questId: 'q_wolves', pid: 1 } as SimEvent),
+    ).toEqual({
+      bannerText: 'Wolves at the Door (Complete)',
+      sound: 'quest_ready',
+      refreshQuestDialog: true,
+    });
+
     const riding = questEventPresentation({
       type: 'questDone',
       questId: 'q_riding_lessons',
@@ -54,6 +77,14 @@ describe('quest event presentation', () => {
       sound: 'quest_complete',
       refreshQuestDialog: true,
       mountOwnedPrompt: true,
+    });
+
+    expect(
+      questEventPresentation({ type: 'questDone', questId: 'q_wolves', pid: 1 } as SimEvent),
+    ).toEqual({
+      sound: 'quest_complete',
+      refreshQuestDialog: true,
+      mountOwnedPrompt: false,
     });
 
     expect(questEventPresentation({ type: 'error', text: 'none' } as SimEvent)).toBeNull();

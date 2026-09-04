@@ -17,6 +17,7 @@ import {
   renderItemArtAuditPreview,
   updateItemArtAuditVerdict,
 } from '../scripts/lib/item_art_audit.mjs';
+import { ITEMS } from '../src/sim/data';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const temporaryRoots: string[] = [];
@@ -94,11 +95,7 @@ async function sheetPins(root: string, paths: string[]): Promise<Array<[string, 
 }
 
 afterEach(() => {
-  // libvips can otherwise retain Windows file handles for decoded fixture images.
-  sharp.cache(false);
-  for (const root of temporaryRoots.splice(0)) {
-    rmSync(root, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
-  }
+  for (const root of temporaryRoots.splice(0)) rmSync(root, { recursive: true, force: true });
 });
 
 describe('item-art audit builder', () => {
@@ -757,16 +754,16 @@ describe('item-art audit builder', () => {
       execFileSync(process.execPath, ['scripts/item_art_audit.mjs', '--verify-only'], {
         cwd: repoRoot,
         encoding: 'utf8',
-        timeout: 90_000,
+        timeout: 30_000,
       }),
     ) as Record<string, unknown>;
     expect(verified).toMatchObject({
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      catalogSha256: '16e947b61cc15f5f6dde94f3ca85087dbdc36f457513cc124284e5cb28343d4c',
-      catalogBytes: 569778,
+      catalogSha256: '9d110ac08f4b2246f0d6b5379a007947819db2e910c7a92303e5dd1d774af54b',
+      catalogBytes: 571388,
       rendererFingerprint: 'd80ff4868f979e1717e106c889b7d6505841caf8d4cf887776ecb60848b1b2b7',
-      catalogCount: 1045,
-      liveItemCount: 1060,
+      catalogCount: 1048,
+      liveItemCount: 1063,
       generatedHeroicDefinitions: 64,
       heroicDefinitionsWithOwnWebp: 48,
       heroicWeaponArtAliases: 16,
@@ -775,7 +772,7 @@ describe('item-art audit builder', () => {
       sheetCount: 216,
       sheetModeCounts: Object.fromEntries(ITEM_ART_AUDIT_MODES.map((mode) => [mode, 27])),
       sheetSetSha256: null,
-      shippingCatalogSha256: 'baf3a9ae097ac3683b838c5b6bbce5c53f108fc38362324a20c011bb63c5f3c1',
+      shippingCatalogSha256: '6ec3101a64788d35a8894a4b091e5f728c960bc7c525dbc250df85ab30f26a8b',
       machineChecksPassed: true,
       verdict: null,
     });

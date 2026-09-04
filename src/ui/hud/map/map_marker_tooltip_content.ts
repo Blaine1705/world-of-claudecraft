@@ -127,14 +127,15 @@ export class MapMarkerTooltipContent {
     if (!quest) return questId;
     const progress = this.world.worldQuestLog.get(questId);
     const current = Math.min(progress?.count ?? 0, quest.count);
-    return [
-      worldQuestDisplayName(questId),
-      questProgressText(worldQuestObjectiveLabel(questId), current, quest.count),
-      worldQuestRewardLine(quest, this.world.player.level),
-      worldQuestTimeRemainingText(this.world.worldQuestExpiresAtMs, nowMs),
-    ]
-      .filter(Boolean)
-      .join('. ');
+    const values = {
+      name: worldQuestDisplayName(questId),
+      progress: questProgressText(worldQuestObjectiveLabel(questId), current, quest.count),
+      reward: worldQuestRewardLine(quest, this.world.player.level),
+    };
+    const time = worldQuestTimeRemainingText(this.world.worldQuestExpiresAtMs, nowMs);
+    return time
+      ? t('questUi.worldQuest.semanticSummaryTimed', { ...values, time })
+      : t('questUi.worldQuest.semanticSummary', values);
   }
 
   worldBoss(marker: MapWorldBossMarker): string {

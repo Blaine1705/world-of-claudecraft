@@ -32,7 +32,7 @@ export function buildWorldQuestPuzzleView(
   progress: WorldQuestProgress | undefined,
 ): WorldQuestPuzzleView | null {
   const quest = ownEntry(WORLD_QUESTS_BY_ID, questId);
-  if (!quest || quest.objective.type !== 'puzzle' || progress?.state !== 'active') return null;
+  if (quest?.objective.type !== 'puzzle' || progress?.state !== 'active') return null;
   const level = Math.max(
     0,
     Math.min(quest.objective.puzzles.length - 1, progress.puzzleVariant ?? 0),
@@ -55,12 +55,12 @@ export function buildWorldQuestPuzzleView(
       const targetSide = puzzle.target.tileIndex === index ? puzzle.target.side : undefined;
       const direction = (side: WorldQuestBeamSide): string =>
         t(`hud.core.mapMarkerDirections.${side}` as TranslationKey);
-      const endpointText = [
-        sourceSide ? `${t('questUi.worldQuest.puzzleSource')}: ${direction(sourceSide)}.` : '',
-        targetSide ? `${t('questUi.worldQuest.puzzleTarget')}: ${direction(targetSide)}.` : '',
-      ]
-        .filter(Boolean)
-        .join(' ');
+      const source = sourceSide
+        ? t('questUi.worldQuest.puzzleSourceEndpoint', { direction: direction(sourceSide) })
+        : '';
+      const target = targetSide
+        ? t('questUi.worldQuest.puzzleTargetEndpoint', { direction: direction(targetSide) })
+        : '';
       return {
         index,
         rotation: rotations[index],
@@ -68,18 +68,19 @@ export function buildWorldQuestPuzzleView(
         powered: isPowered,
         ...(sourceSide ? { sourceSide } : {}),
         ...(targetSide ? { targetSide } : {}),
-        ariaLabel: [
-          t('questUi.worldQuest.puzzleRotateTile', {
+        ariaLabel: t('questUi.worldQuest.puzzleTileAria', {
+          rotation: t('questUi.worldQuest.puzzleRotateTile', {
             tile: formatNumber(index + 1, { maximumFractionDigits: 0 }),
           }),
-          t('questUi.worldQuest.puzzleConnectors', {
+          connectors: t('questUi.worldQuest.puzzleConnectors', {
             connectors: formatList(connectors.map(direction)),
           }),
-          t(isPowered ? 'questUi.worldQuest.puzzlePowered' : 'questUi.worldQuest.puzzleUnpowered'),
-          endpointText,
-        ]
-          .filter(Boolean)
-          .join(' '),
+          power: t(
+            isPowered ? 'questUi.worldQuest.puzzlePowered' : 'questUi.worldQuest.puzzleUnpowered',
+          ),
+          source,
+          target,
+        }),
       };
     }),
   };

@@ -19,7 +19,12 @@
       "maximumBytes": 15360,
       "opaque": true
     },
-    "reviewSizes": [128, 40, 28, 22],
+    "reviewSizes": [
+      128,
+      40,
+      28,
+      22
+    ],
     "circularCropReviewSize": 64,
     "anchors": [
       {
@@ -381,6 +386,22 @@
       "sourceFile": "reins_rickshaw_mount.png master (OpenAI image generation, user-directed prompt following docs/design/item-icon-art-style.md woc-item-icon-v1, cart-only three-quarter mount portrait, puller omitted to avoid misrepresenting the actual skel_rickshaw_puller rig)",
       "confidence": "high",
       "license": "World of ClaudeCraft project-generated art, project asset, rights reserved"
+    },
+    {
+      "itemId": "reins_lanternback_troll",
+      "name": "Lamplighter's Yoke: Grumbol",
+      "sourcePack": "woc_owner_supplied_art",
+      "sourceFile": "troll icon 2.png (owner-supplied painted master, 624x624)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "reins_chimeglass_tortoise",
+      "name": "Roadwarden's Bellstrap: Tolliver",
+      "sourcePack": "project-authored",
+      "sourceFile": "three-quarter head render of the shipped mount model (public/models/mounts/chimeglass_tortoise.glb) by scripts/render_mount_icons.mjs, background keyed and downscaled to the 128px opaque woc-item-icon-v1 shipping format (re-rendered 2026-08-16 with the lens-glow pass)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     }
   ],
   "generatedBatches": [
@@ -674,7 +695,10 @@
       "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
       "styleReference": "simple_fishing_pole (licensed CraftPix Premium), plus the project-generated ironreel_fishing_rod and silverstream_fishing_rod, for the centered full rod-and-reel silhouette, dark inventory backdrop and painted material treatment",
       "commonPrompt": "Fresh original premium hand-painted classic-fantasy MMORPG inventory icon of one complete crafted fishing rod and reel on a bottom-left to top-right diagonal, centered with safe margins on an opaque dark atmospheric vignette. Stormreel uses cold storm steel and restrained blue-white electrical accents; Tidewrought is an ornate sea-forged teal, violet, pearl and antique-gold successor. Each is a genuinely different physical rod, not a recolor or trace. No border, rarity frame, circular halo, text, watermark or crop.",
-      "itemIds": ["stormreel_fishing_rod", "tidewrought_fishing_rod"]
+      "itemIds": [
+        "stormreel_fishing_rod",
+        "tidewrought_fishing_rod"
+      ]
     },
     {
       "batchId": "release-v034-additional-art-silkspun-satchel-2026-08-02",
@@ -711,7 +735,9 @@
         ]
       },
       "commonPrompt": "Create one fresh high-resolution square master for the World of ClaudeCraft inventory item Silkspun Satchel. Image 1 is a style/material reference for rich project bag rendering, Image 2 is a composition and safe-margin reference only, Image 3 is the spider-silk material reference, and Image 4 is the Goldleaf accent reference. Paint one tangible compact 10-slot tailoring satchel, centered in three-quarter view: a low crescent-mouthed soft field bag with folded charcoal-violet iridescent spider-silk panels, pale hand-bound thread seams, a sturdy asymmetrical flap, a small brass toggle, and restrained round-leaf gold embroidery worked into the fabric. Make its construction and silhouette entirely distinct from both referenced bags and from the current rectangular linen-pouch recolor; no sun emblem, bottles, dangling clutter, or copied strap layout. Opaque blue-black atmospheric vignette, top-left key light, restrained cool rim, strong silhouette at 28px, visual mass centered within 2px, 12-16px safe margin at 128px. No UI border, rarity frame, circular halo, text, watermark, mannequin, character, scenery, crop, excessive aura, or transparent background. Rarity comes from workmanship only.",
-      "itemIds": ["silkspun_satchel"]
+      "itemIds": [
+        "silkspun_satchel"
+      ]
     },
     {
       "batchId": "release-v034-additional-art-last-keep-signet-2026-08-02",
@@ -742,14 +768,19 @@
         ]
       },
       "commonPrompt": "Create one fresh high-resolution square master for the World of ClaudeCraft inventory item Signet of the Last Keep. Image 1 is a ring composition reference, Image 2 is a dark-fantasy value/style reference, and Image 3 is a metalwork/detail reference; do not copy their gems, emblems, shapes, or aura layouts. Paint one tangible old garrison signet ring, centered in three-quarter view: a weighty worn antique-gold band with dark iron patina, a broad slightly irregular shield-shaped seal face engraved with an abstract crenellated gate and one closed portcullis, no letters or readable heraldry. Add a tiny ember-red wax trace caught in one groove, warm candle-amber key light from upper left, and a restrained cold blue-grey rim suggesting the silent Drakelands hall. It is a poignant floor-found keepsake, not royal treasure: no giant gemstone, spikes, skull, magical aura, or excessive ornament. Opaque charcoal/blue-black atmospheric vignette, strong silhouette at 28px, centered within 2px, 12-16px safe margin at 128px. No UI border, rarity frame, circular quality halo, text, watermark, hand, character, scene, crop, or transparent background.",
-      "itemIds": ["last_keep_signet"]
+      "itemIds": [
+        "last_keep_signet"
+      ]
     },
     {
       "source": "OpenAI built-in image generation",
       "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
       "styleReference": "arcane_essence and arcane_shard for Chime-violet material language; final_oath_medallion, architects_cornerstone and seal_of_the_nine_oaths for tangible talisman composition",
       "commonPrompt": "Fresh original premium hand-painted classic dark-fantasy MMORPG inventory icon of one tangible Enchanter-crafted talisman with a suspension loop and a faceted violet-blue Chime core. Gatherer's Cache is a plump bronze-gold reliquary with abundance worked into its metal; Artisan's Eye is a slim engraved silver-and-gold almond-eye amulet with the shard as its iris. One centered physical object on an opaque near-black indigo vignette, readable at 128px. No flat glyph, spell icon, border, halo, text, watermark or crop.",
-      "itemIds": ["gatherers_cache", "artisans_eye"]
+      "itemIds": [
+        "gatherers_cache",
+        "artisans_eye"
+      ]
     },
     {
       "batchId": "missing-painted-icons-armor-and-jewelry-2026-08-01",
@@ -5377,7 +5408,11 @@
           "intendedVisualSubject": "One small marsh-dweller hut built of lashed river reeds and packed grey mud over a bent driftwood frame, with a low dark doorway and a ragged thatched dome roof. A complete tiny standing structure shown as a single centered object, damp swamp greens and browns, no fire and no water base, not a tent, not a boat, and not a village scene."
         }
       },
-      "itemIds": ["murloc_hut", "restless_skull", "vanguard_bone"]
+      "itemIds": [
+        "murloc_hut",
+        "restless_skull",
+        "vanguard_bone"
+      ]
     },
     {
       "batchId": "hunter-quivers-2026-08-04",
@@ -5568,7 +5603,12 @@
       },
       "commonPrompt": "Fresh premium hand-painted classic-fantasy MMORPG inventory icon of one centered tangible item on an opaque dark atmospheric vignette, with top-left key light, a clear silhouette, safe margins, small-size readability, and no UI border, text, watermark, character, or crop. Exact per-item subjects and constraints are recorded in the provenance record.",
       "provenanceRecord": "docs/achievements/placeholder-art-completion-2026-08-09/item-cleanup-manifest.json",
-      "itemIds": ["curved_tusk", "firebottle", "pristine_claw", "sharp_claw"]
+      "itemIds": [
+        "curved_tusk",
+        "firebottle",
+        "pristine_claw",
+        "sharp_claw"
+      ]
     },
     {
       "batchId": "placeholder-art-completion-weapons-2026-08-09",
@@ -6013,7 +6053,12 @@
       "provenanceRecords": [
         "docs/achievements/integration-dagger-icons-2026-08-10/generation-report.json"
       ],
-      "itemIds": ["boneglass_shiv", "duskwhisper", "marrowpoint", "rimefang"]
+      "itemIds": [
+        "boneglass_shiv",
+        "duskwhisper",
+        "marrowpoint",
+        "rimefang"
+      ]
     },
     {
       "batchId": "proving-shore-prop-renders-2026-08-17",
@@ -6022,7 +6067,11 @@
       "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
       "styleReference": "existing painted WebP catalog in public/ui/items/; subjects are the exact world props the tutorial island player clicks",
       "provenanceRecord": "scripts/render_island_item_icons.mjs",
-      "itemIds": ["ps_castaway_crate", "ps_ferry_bell", "ps_passing_stone"],
+      "itemIds": [
+        "ps_castaway_crate",
+        "ps_ferry_bell",
+        "ps_passing_stone"
+      ],
       "commonPrompt": "Not a text-to-image prompt: deterministic in-engine still of the committed world model (three-quarter yaw, portrait lighting rig, trimmed and centered with safe margins) composited on the item-icon radial vignette at 128px."
     },
     {
@@ -6032,7 +6081,11 @@
       "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
       "styleReference": "existing painted WebP catalog in public/ui/items/",
       "commonPrompt": "Painted dark-fantasy MMORPG inventory icon, one centered item, clear silhouette, atmospheric dark background, no text or watermark",
-      "itemIds": ["mother_of_pearl", "ps_briny_lure", "ps_lustrous_pearl"]
+      "itemIds": [
+        "mother_of_pearl",
+        "ps_briny_lure",
+        "ps_lustrous_pearl"
+      ]
     },
     {
       "batchId": "crucible-raid-weapons-2026-08-28",
@@ -6060,7 +6113,10 @@
       "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
       "styleReference": "existing painted WebP catalog in public/ui/items/; subjects are the exact held weapon models the two Ignivar legendaries equip",
       "provenanceRecord": "scripts/render_varkhul_drop_icons.mjs",
-      "itemIds": ["varkhul_emberward", "varkhul_forgebreaker"],
+      "itemIds": [
+        "varkhul_emberward",
+        "varkhul_forgebreaker"
+      ],
       "commonPrompt": "Not a text-to-image prompt: deterministic in-engine still of the committed weapon model (shared framing rig, three-point lighting, alpha subject trimmed and centered with safe margins) composited on the item-icon radial vignette at 128px."
     },
     {
@@ -6274,7 +6330,9 @@
       "styleReference": "existing painted WebP catalog in public/ui/items/",
       "commonPrompt": "Painted dark-fantasy MMORPG inventory icon, one centered item, clear silhouette, atmospheric dark background, no text or watermark",
       "note": "Staged early: only the core reagent ships ahead of the professions fast-follow (PR 3704), which extends this batch to its full ten ids.",
-      "itemIds": ["lastflame_core"]
+      "itemIds": [
+        "lastflame_core"
+      ]
     },
     {
       "batchId": "bank-storage-painted-bags-2026-08-25",
@@ -6336,7 +6394,10 @@
           }
         }
       },
-      "itemIds": ["confection_game_box", "leyline_cache"]
+      "itemIds": [
+        "confection_game_box",
+        "leyline_cache"
+      ]
     },
     {
       "batchId": "world-quest-freight-icons-2026-09-01",
@@ -6373,7 +6434,25 @@
           }
         }
       },
-      "itemIds": ["eastbrook_freight_crate", "eastbrook_freight_wagon"]
+      "itemIds": [
+        "eastbrook_freight_crate",
+        "eastbrook_freight_wagon"
+      ]
+    },
+    {
+      "batchId": "mech-bird-mount-icon-2026-08-17",
+      "source": "Project Blender render of the shipped mount model (Cycles) with painted-treatment post (median brushwork pass, warm and cool grade, vignette multiply)",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "Generated under item-icon contract woc-item-icon-v1, Mount collectible family row: three-quarter mount bust with tack. Source model is the shipped public/models/mounts/mech_bird.glb posed on its Idle clip head-turn hold, rendered opaque on a dark umber vignette with a top-left warm key.",
+      "commonPrompt": "Three-quarter bust portrait of the Cluckwork Mech Bird mount with saddle and grab handle visible, opaque dark atmospheric vignette ground, top-left warm key light, cool deep shadow, painted brushwork finish, no writing, frame, transparency, or crop.",
+      "itemIds": [
+        "reins_mech_bird"
+      ]
     }
   ]
 }

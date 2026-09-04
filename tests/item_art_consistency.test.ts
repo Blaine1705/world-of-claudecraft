@@ -342,8 +342,8 @@ describe('item-art consistency accepted-art provenance', () => {
       },
       {
         path: `${evidenceDir}/final-item-art-audit-verdict.json`,
-        acceptedSha256: 'c25dcef11762c0f08b093851d01b119e96818d150d14f670a9ed27f6ac414ba3',
-        acceptedBytes: 119_986,
+        acceptedSha256: 'dd07d5126d8b8aaa6276d285f2f305d01bc75d0eba3564cfc45f808f741b0f72',
+        acceptedBytes: 121_943,
       },
     ]);
     for (const evidence of [...value.sourceEvidence, ...value.generationReports]) {
@@ -458,9 +458,9 @@ describe('item-art consistency accepted-art provenance', () => {
     expect(readme).toContain('node scripts/item_art_audit.mjs\n');
     expect(readme).toContain('node scripts/item_art_audit.mjs --refresh-verdict');
     const verdictBytes = readFileSync(path.join(repoRoot, verdictPath));
-    expect(verdictBytes.length).toBe(119_986);
+    expect(verdictBytes.length).toBe(121_943);
     expect(sha256(verdictBytes)).toBe(
-      'c25dcef11762c0f08b093851d01b119e96818d150d14f670a9ed27f6ac414ba3',
+      'dd07d5126d8b8aaa6276d285f2f305d01bc75d0eba3564cfc45f808f741b0f72',
     );
     const verdict = JSON.parse(verdictBytes.toString('utf8')) as FinalAuditVerdict;
 
@@ -470,8 +470,8 @@ describe('item-art consistency accepted-art provenance', () => {
       baselineCommit: 'aee195551b5aef628eb7a72192117d7e3079818e',
       branch: 'feature/placeholder-art-completion-v036',
       shippingDirectory: 'public/ui/items',
-      itemArtFilesReviewed: 1045,
-      liveItemDefinitions: 1060,
+      itemArtFilesReviewed: 1048,
+      liveItemDefinitions: 1063,
       generatedHeroicDefinitions: 64,
       heroicDefinitionsWithOwnWebp: 48,
       heroicWeaponArtAliases: 16,
@@ -481,7 +481,7 @@ describe('item-art consistency accepted-art provenance', () => {
       manifest().targetSets.items.map((id) => `public/ui/items/${id}.webp`),
     );
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
-      1045,
+      1048,
     );
     expect(Object.keys(verdict.auditScope.groups)).toHaveLength(22);
     expect(verdict.auditScope.incrementalReviews.at(-1)).toEqual({
@@ -534,14 +534,14 @@ describe('item-art consistency accepted-art provenance', () => {
     ]);
     expect(verdict.visualVerdict).toMatchObject({
       status: 'pass',
-      passCount: 1045,
+      passCount: 1048,
       watchCount: 0,
       watch: [],
       rejectCount: 0,
       reject: [],
     });
     expect(verdict.visualVerdict.summary).toMatch(
-      /^All 1045 shipping item-art files pass the visual contract\./,
+      /^All 1048 shipping item-art files pass the visual contract\./,
     );
     expect(verdict.visualVerdict.summary).toContain(
       'the two world-quest puzzle activator icons and the Eastbrook freight crate and wagon icons generated with the built-in OpenAI image generator were implementation-agent reviewed and passed across every canonical audit mode on 2026-09-01.',
@@ -584,8 +584,8 @@ describe('item-art consistency accepted-art provenance', () => {
 
     expect(verdict.evidence.catalog).toEqual({
       path: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      sha256: '16e947b61cc15f5f6dde94f3ca85087dbdc36f457513cc124284e5cb28343d4c',
-      bytes: 569_778,
+      sha256: '9d110ac08f4b2246f0d6b5379a007947819db2e910c7a92303e5dd1d774af54b',
+      bytes: 571_388,
     });
     expect(verdict.evidence.rendererFingerprint).toBe(
       'd80ff4868f979e1717e106c889b7d6505841caf8d4cf887776ecb60848b1b2b7',
@@ -638,7 +638,7 @@ describe('item-art consistency accepted-art provenance', () => {
       sheetSetDigest.update(`${sheet.path}\0${sheet.sha256}\0${sheet.bytes}\n`);
     }
     expect(verdict.evidence.sheetSetSha256).toBe(
-      '4c138f65a35a5f98142ae8cc8da93aa066613e1c5e075a273fd3b022797b5dfb',
+      '4231c4465d73f05d0b6c0f1b7f3fc9d466d548ac6a113eb64be3519f91eda7b5',
     );
     expect(sheetSetDigest.digest('hex')).toBe(verdict.evidence.sheetSetSha256);
 
@@ -648,7 +648,7 @@ describe('item-art consistency accepted-art provenance', () => {
       shippingCatalogDigest.update(`${id}\0${sha256(bytes)}\0${bytes.length}\n`);
     }
     expect(verdict.evidence.shippingCatalogSha256).toBe(
-      'baf3a9ae097ac3683b838c5b6bbce5c53f108fc38362324a20c011bb63c5f3c1',
+      '6ec3101a64788d35a8894a4b091e5f728c960bc7c525dbc250df85ab30f26a8b',
     );
     expect(shippingCatalogDigest.digest('hex')).toBe(verdict.evidence.shippingCatalogSha256);
   });
@@ -758,9 +758,9 @@ describe('item-art consistency accepted-art provenance', () => {
       mapping.license,
       'no ordinary item inherits the retired CraftPix default',
     ).toBeUndefined();
-    expect(mapping.entries).toHaveLength(41);
+    expect(mapping.entries).toHaveLength(43);
     expect(mapping.entries.every(({ license }) => Boolean(license))).toBe(true);
-    expect(mapping.generatedBatches).toHaveLength(25);
+    expect(mapping.generatedBatches).toHaveLength(26);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -777,13 +777,13 @@ describe('item-art consistency accepted-art provenance', () => {
     const oldGeneratedIds = mapping.generatedBatches
       .filter(({ batchId }) => batchId !== BATCH_ID)
       .flatMap(({ itemIds }) => itemIds);
-    expect(oldGeneratedIds).toHaveLength(730);
+    expect(oldGeneratedIds).toHaveLength(731);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(1045);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1045);
+    expect(allCurrentOwnerIds).toHaveLength(1048);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1048);
     expect(batch?.provenanceRecords).toEqual([
       `${evidenceDir}/accepted-art.json`,
       `${evidenceDir}/supersession-audit.json`,
@@ -919,9 +919,9 @@ describe('item-art consistency accepted-art provenance', () => {
     for (const id of ownerIds) ownerCountById.set(id, (ownerCountById.get(id) ?? 0) + 1);
 
     const violations: string[] = [];
-    if (ownerIds.length !== 1045)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1045`);
-    if (fileIds.length !== 1045) violations.push(`shipping WebP count: ${fileIds.length} != 1045`);
+    if (ownerIds.length !== 1048)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1048`);
+    if (fileIds.length !== 1048) violations.push(`shipping WebP count: ${fileIds.length} != 1048`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

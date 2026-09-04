@@ -1034,10 +1034,20 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the Drakelands entrance merge into the raid branch (PRs 3689
 // plus 3734: both arms had re-minted, the merged renderer and evidence inputs
 // land together). No capture was retaken.
+// Re-minted at the release/v0.42.0 sync of PR #3439: renderer.ts moved for the
+// mount lifecycle seam (mount_lifecycle.ts) and the rickshaw hooks it absorbed.
+// Re-minted for the Cluckwork Mech Bird store mount (PR #3464) on top of the
+// v0.42.0 mount-lifecycle move: the renderer's stride accumulator moved to
+// src/render/stride_audio_core.ts and the mounted audio branch gained the
+// idle-hum poll. No capture was retaken.
+// Re-minted after integrating the world-quests renderer with the current
+// release/v0.42.0 renderer. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'a5c2116d1b9087ee0a1471a4e3bcaf8e81edb88c09b4ef6de792305b778ba94c';
+  'da99768f8bd9e27ec24498f2bd4d8cfe7b3cd85525b45c7746afbfdf826b7363';
+// Re-minted at the release/v0.42.0 sync of PR #3439: renderer.ts moved for the
+// mount lifecycle seam (mount_lifecycle.ts) and the rickshaw hooks it absorbed.
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '89c8a62f400d63c10f85c61eac2c93f2f0a43d1e822679027d03bbed6ee82d0d';
+  'a82a974dc32f32ca10e91c1404680161ba2e0f3b0ea6083ac9c9955ef65fad91';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2193,7 +2203,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
       // Re-minted for the Drakelands entrance merge into the raid branch: the
       // composite first, then this seal. No capture was retaken.
-    ).toBe('eca473321cb438c8ecdd9bfadf949fcf23f0b38fd1830590822d878950ce6a55');
+    ).toBe('51c631dc8e7722148a91cf30d1db4f232e75ff6e94c72bd2e5e149f1159d8a9f');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

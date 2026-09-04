@@ -48,6 +48,6 @@ export class QuestWorldWireState {
     this.worldQuestCycle = '';
     this.worldQuestExpiresAtMs = 0;
     this.worldQuestLog = new Map();
-    this.activeWorldBossIds.clear();
+    this.activeWorldBossIds = new Set();
   }
 }

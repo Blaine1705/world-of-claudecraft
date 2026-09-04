@@ -26,6 +26,17 @@ describe('world quest puzzle window', () => {
     expect(rule).toContain('height: 1px');
   });
 
+  it('keeps a visible tile focus ring in normal and forced-colors modes', () => {
+    const css = readFileSync(join(process.cwd(), 'src/styles/components.css'), 'utf8');
+    const focusRule = css.match(/\.wqp-tile:focus-visible\s*\{[^}]+\}/)?.[0];
+    expect(focusRule).toContain('outline: 3px solid var(--color-border-focus)');
+    expect(focusRule).toContain('outline-offset: 2px');
+    expect(focusRule).not.toContain('outline: none');
+    expect(css).toMatch(
+      /@media \(forced-colors: active\) \{[\s\S]*?\.wqp-tile:focus-visible\s*\{[^}]*outline-color: Highlight;/,
+    );
+  });
+
   it('traps focus, describes the beam, preserves tile focus, and relocalizes', async () => {
     const quest = WORLD_QUESTS_BY_ID.wq_galecrest_wisps;
     if (quest.objective.type !== 'puzzle') throw new Error('Expected puzzle fixture');

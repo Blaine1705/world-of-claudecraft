@@ -1,3 +1,4 @@
+// biome-ignore-all format: Preserve the legacy hand-maintained dictionaries; format new locale modules instead.
 // AUTO-ASSEMBLED localization for sim-emitted system/combat/loot/error log text.
 // The deterministic core (src/sim) is host-agnostic and MUST stay English: it emits
 // SimEvent log/error/loot text in English. The client re-renders it here, exactly
@@ -152,11 +153,11 @@ const baseEnTable = {
   'error.noMountYet': "You don't have a mount yet.",
   'error.mountBuyLevel': 'You must be level 20 to buy a mount.',
   'error.mountAlreadyOwned': 'You already own that mount.',
+  'error.mountCarryingFreight': "You can't ride while carrying freight.",
   // Riding skill gate (src/sim/mounts.ts): emitted when the player tries to
   // mount or select a mount without having purchased the riding skill from Marla.
   // Placeholder-free, so it registers in the EXACT matcher automatically.
   'error.ridingUntrained': 'You must learn to ride first. Find a riding trainer.',
-  'error.mountCarryingFreight': "You can't ride while carrying freight.",
   // (The narrower "You can't ride while carrying the flag." row lived here
   // until the mount ban widened to the whole battleground; its replacement is
   // the BG_EXTRA errMountInBg RULE below, beside the mode's other refusals.)
@@ -287,13 +288,13 @@ const baseEnTable = {
   // cannot see them); values must stay byte-identical to that table for the EXACT
   // matcher to recognize them. The three grave_* deny lines share one string/key.
   'groundPickup.supplyCrateDeny': 'The crate is nailed shut.',
-  'groundPickup.freightOrderDeny': 'The freight order is not active.',
-  'groundPickup.freightCrateEnough': 'You are already carrying a freight crate.',
-  'groundPickup.freightWagonEnough': 'The wagon is waiting for another crate.',
   'groundPickup.gravecallerSigilDeny': 'The sigil repels your touch.',
   'groundPickup.ledgerPageDeny': 'The ledger pages are bound too tightly to take.',
   'groundPickup.morthenGrimoireDeny': "The grimoire's clasp is magically sealed.",
   'groundPickup.fenMusterOrderDeny': 'The wax seal holds until the order is yours to claim.',
+  'groundPickup.freightOrderDeny': 'The freight order is not active.',
+  'groundPickup.freightCrateEnough': 'You are already carrying a freight crate.',
+  'groundPickup.freightWagonEnough': 'The wagon is waiting for another crate.',
   'groundPickup.caravanGoodsDeny': "You aren't authorized to salvage these goods yet.",
   'groundPickup.rustedCenserDeny': 'The censer is chained in place.',
   'groundPickup.bastionWardStoneDeny': 'The ward stone will not budge.',
@@ -343,6 +344,11 @@ const baseEnTable = {
   'groundPickup.hollowSealstoneDeny':
     'The sealstone waits, its socket empty. You have nothing that fits it.',
   'groundPickup.hollowSealstoneEnough': 'The seal is set. The sealstone asks nothing more of you.',
+  'groundPickup.leylineCacheDeny': 'The cache is dormant. A ley disturbance may awaken it.',
+  'groundPickup.confectionGameBoxDeny':
+    'The game box is sealed until its confectionery challenge returns.',
+  'groundPickup.leylineCacheEnough': 'This ley alignment is already complete.',
+  'groundPickup.confectionGameBoxEnough': 'This confection challenge is already complete.',
   'groundPickup.monumentOverlookDeny':
     'The verse is worn shallow. Without a reason to read, it stays silent.',
   'groundPickup.monumentOverlookEnough':
@@ -419,11 +425,6 @@ const baseEnTable = {
   // distinct object, so this covers all of them (bells rung, lanterns relit,
   // banners planted, carts righted). Emitted from interactObjectForQuests.
   'groundPickup.objectAlreadyCredited': 'You have already done this one.',
-  'groundPickup.leylineCacheDeny': 'The cache is dormant. A ley disturbance may awaken it.',
-  'groundPickup.confectionGameBoxDeny':
-    'The game box is sealed until its confectionery challenge returns.',
-  'groundPickup.leylineCacheEnough': 'This ley alignment is already complete.',
-  'groundPickup.confectionGameBoxEnough': 'This confection challenge is already complete.',
   'log.talentsUpdated': 'Talents updated.',
   'log.talentsReset': 'Talents reset.',
   'log.cheatDeathSave': 'Cheat Death saves you!',
@@ -608,6 +609,7 @@ const baseEnTable = {
   'aura.carrierFatigue': 'Carrier Fatigue',
   // The always-worn carried-flag buff; right-clicking it drops the flag on purpose.
   'aura.carriedFlag': 'Carrying the Flag',
+  'aura.carryingFreight': 'Carrying Freight',
   'aura.sprintRune': 'Sprint',
   'aura.battleRune': 'Battle Rune',
   'aura.wardRune': 'Ward Rune',
@@ -803,7 +805,6 @@ const baseEnTable = {
   'aura.solarReprisal': 'Solar Reprisal',
   'aura.dawnsWrath': "Dawn's Wrath",
   'aura.moontide': 'Moontide',
-  'aura.carryingFreight': 'Carrying Freight',
   // The operator-applied Cheater mark's countdown debuff (src/sim/moderation/).
   // The sim authors the aura name in English; this row is what stops the debuff
   // bar and combat log shipping that English to all 21 locales.
@@ -1177,10 +1178,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.rawCatchCookFirst': 'Está crudo. Cocínalo primero.',
     'log.questItemRecovered': 'Recuperas un objeto de misión que te faltaba.',
     'groundPickup.objectAlreadyCredited': 'Ya has hecho esto.',
-    'groundPickup.leylineCacheDeny':
-      'El alijo está inactivo. Una perturbación ley podría despertarlo.',
-    'groundPickup.confectionGameBoxDeny':
-      'La caja de juego está sellada hasta que vuelva su desafío de confitería.',
     'error.mountTrainInProgress': 'Ya hay una lección de equitación en curso.',
     'error.mountTrainDismountFirst': 'Desmonta primero.',
     'error.ridingAlreadyLearned': 'Ya has aprendido equitación.',
@@ -1260,7 +1257,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.heroicMarksNeeded': 'Necesitas {marks} Marcas Heroicas para comprar {name}.',
     'error.sigilNeeded': 'Necesitas un {sigil} para comprar {name}.',
     'aura.fingersOfFrost': 'Dedos de Escarcha',
-    'aura.carryingFreight': 'Transportando mercancía',
     'aura.brainFreeze': 'Congelación Cerebral',
     'aura.wintersChill': 'Frío Invernal',
     'groundPickup.supplyCrateDeny': 'El cajón está cerrado con clavos.',
@@ -1613,7 +1609,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.ignivarForgeGateSealed': 'La puerta de la forja está sellada para ti.',
     'error.liveRaidClaimUnsafe':
       'Esta reclamación de banda activa no se puede reemplazar de forma segura.',
-    'error.vaultOnlyMaterials': 'En la Bóveda de materiales solo se pueden almacenar materiales.',
+    'error.vaultOnlyMaterials':
+      'En la Bóveda de materiales solo se pueden almacenar materiales.',
     'error.vaultLocked': 'No has desbloqueado la Bóveda de materiales.',
     'error.vaultMaterialFull': 'Tu bóveda no puede almacenar más de ese material.',
     'error.vaultMaxUpgrades': 'Tu bóveda no se puede mejorar más.',
@@ -2082,7 +2079,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.emboldened': 'Envalentonado',
     'aura.enraged': 'Enfurecido',
     'aura.fingersOfFrost': 'Dedos de Escarcha',
-    'aura.carryingFreight': 'Transportando mercancía',
     'aura.brainFreeze': 'Congelación Cerebral',
     'aura.wintersChill': 'Frío Invernal',
     'aura.icicles': 'Carámbanos',
@@ -2091,13 +2087,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.townFocusCannotAfford': 'No puedes costear ese reajuste de enfoque.',
     'log.townFocusRespecComplete': 'Tu reajuste de enfoque ha terminado.',
 
-    'error.townFocusRespecCancelled':
-      'No podías permitirte la reespecialización de enfoque pendiente, así que se canceló.',
-    'error.ignivarRaidInCombat':
-      'Tu banda sigue en combate. Podrás entrar cuando termine la lucha.',
+    'error.townFocusRespecCancelled': 'No podías permitirte la reespecialización de enfoque pendiente, así que se canceló.',
+    'error.ignivarRaidInCombat': 'Tu banda sigue en combate. Podrás entrar cuando termine la lucha.',
     'error.ignivarForgeGateSealed': 'La puerta de la forja está sellada para ti.',
-    'error.liveRaidClaimUnsafe':
-      'Esta reclamación de banda activa no se puede reemplazar de forma segura.',
+    'error.liveRaidClaimUnsafe': 'Esta reclamación de banda activa no se puede reemplazar de forma segura.',
     'error.vaultOnlyMaterials': 'En la Bóveda de materiales solo se pueden almacenar materiales.',
     'error.vaultLocked': 'No has desbloqueado la Bóveda de materiales.',
     'error.vaultMaterialFull': 'Tu bóveda no puede almacenar más de ese material.',
@@ -2586,15 +2579,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.townFocusCannotAfford': "Vous n'avez pas les moyens de cette respécialisation de focus.",
     'log.townFocusRespecComplete': 'Votre respécialisation de focus est terminée.',
 
-    'error.townFocusRespecCancelled':
-      'Vous n’aviez pas les moyens de payer votre réattribution de spécialisation de focus en attente ; elle a donc été annulée.',
-    'error.ignivarRaidInCombat':
-      'Votre raid est toujours en combat. Vous pourrez entrer une fois le combat terminé.',
+    'error.townFocusRespecCancelled': 'Vous n’aviez pas les moyens de payer votre réattribution de spécialisation de focus en attente ; elle a donc été annulée.',
+    'error.ignivarRaidInCombat': 'Votre raid est toujours en combat. Vous pourrez entrer une fois le combat terminé.',
     'error.ignivarForgeGateSealed': 'La porte de la forge vous est scellée.',
-    'error.liveRaidClaimUnsafe':
-      'Cette revendication de raid en direct ne peut pas être remplacée en toute sécurité.',
-    'error.vaultOnlyMaterials':
-      'Seuls les matériaux peuvent être stockés dans le Coffre des matériaux.',
+    'error.liveRaidClaimUnsafe': 'Cette revendication de raid en direct ne peut pas être remplacée en toute sécurité.',
+    'error.vaultOnlyMaterials': 'Seuls les matériaux peuvent être stockés dans le Coffre des matériaux.',
     'error.vaultLocked': 'Vous n’avez pas déverrouillé le Coffre des matériaux.',
     'error.vaultMaterialFull': 'Votre coffre ne peut plus contenir de ce matériau.',
     'error.vaultMaxUpgrades': 'Votre coffre ne peut pas être amélioré davantage.',
@@ -3083,15 +3072,11 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
       'Vous n’avez pas assez de moyens pour cette respécialisation de focus.',
     'log.townFocusRespecComplete': 'Votre respécialisation de focus est complétée.',
 
-    'error.townFocusRespecCancelled':
-      'Vous n’aviez pas les moyens de payer votre réattribution de spécialisation de focus en attente ; elle a donc été annulée.',
-    'error.ignivarRaidInCombat':
-      'Votre raid est toujours en combat. Vous pourrez entrer une fois le combat terminé.',
+    'error.townFocusRespecCancelled': 'Vous n’aviez pas les moyens de payer votre réattribution de spécialisation de focus en attente ; elle a donc été annulée.',
+    'error.ignivarRaidInCombat': 'Votre raid est toujours en combat. Vous pourrez entrer une fois le combat terminé.',
     'error.ignivarForgeGateSealed': 'La porte de la forge vous est scellée.',
-    'error.liveRaidClaimUnsafe':
-      'Cette revendication de raid en direct ne peut pas être remplacée en toute sécurité.',
-    'error.vaultOnlyMaterials':
-      'Seuls les matériaux peuvent être stockés dans le Coffre des matériaux.',
+    'error.liveRaidClaimUnsafe': 'Cette revendication de raid en direct ne peut pas être remplacée en toute sécurité.',
+    'error.vaultOnlyMaterials': 'Seuls les matériaux peuvent être stockés dans le Coffre des matériaux.',
     'error.vaultLocked': 'Vous n’avez pas déverrouillé le Coffre des matériaux.',
     'error.vaultMaterialFull': 'Votre coffre ne peut plus contenir de ce matériau.',
     'error.vaultMaxUpgrades': 'Votre coffre ne peut pas être amélioré davantage.',
@@ -3771,13 +3756,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.townFocusCannotAfford': 'Non puoi permetterti quella rispecializzazione del focus.',
     'log.townFocusRespecComplete': 'La tua rispecializzazione del focus è completata.',
 
-    'error.townFocusRespecCancelled':
-      'Non potevi permetterti la riassegnazione della specializzazione di focus in sospeso, quindi è stata annullata.',
-    'error.ignivarRaidInCombat':
-      'La tua incursione è ancora in combattimento. Potrai entrare quando lo scontro sarà terminato.',
+    'error.townFocusRespecCancelled': 'Non potevi permetterti la riassegnazione della specializzazione di focus in sospeso, quindi è stata annullata.',
+    'error.ignivarRaidInCombat': 'La tua incursione è ancora in combattimento. Potrai entrare quando lo scontro sarà terminato.',
     'error.ignivarForgeGateSealed': 'Il cancello della forgia ti è precluso.',
-    'error.liveRaidClaimUnsafe':
-      'Questa rivendicazione dell’incursione in corso non può essere sostituita in sicurezza.',
+    'error.liveRaidClaimUnsafe': 'Questa rivendicazione dell’incursione in corso non può essere sostituita in sicurezza.',
     'error.vaultOnlyMaterials': 'Nel Deposito dei materiali si possono conservare solo materiali.',
     'error.vaultLocked': 'Non hai sbloccato il Deposito dei materiali.',
     'error.vaultMaterialFull': 'Il tuo deposito non può contenere altro di quel materiale.',
@@ -4261,13 +4243,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.townFocusCannotAfford': 'Du kannst dir diese Fokus-Neuverteilung nicht leisten.',
     'log.townFocusRespecComplete': 'Deine Fokus-Neuverteilung ist abgeschlossen.',
 
-    'error.townFocusRespecCancelled':
-      'Du konntest dir deine ausstehende Fokus-Neuspezialisierung nicht leisten, daher wurde sie abgebrochen.',
-    'error.ignivarRaidInCombat':
-      'Dein Schlachtzug befindet sich noch im Kampf. Du kannst eintreten, sobald der Kampf vorbei ist.',
+    'error.townFocusRespecCancelled': 'Du konntest dir deine ausstehende Fokus-Neuspezialisierung nicht leisten, daher wurde sie abgebrochen.',
+    'error.ignivarRaidInCombat': 'Dein Schlachtzug befindet sich noch im Kampf. Du kannst eintreten, sobald der Kampf vorbei ist.',
     'error.ignivarForgeGateSealed': 'Das Tor zur Schmiede ist für dich versiegelt.',
-    'error.liveRaidClaimUnsafe':
-      'Diese laufende Schlachtzugsbeanspruchung kann nicht sicher ersetzt werden.',
+    'error.liveRaidClaimUnsafe': 'Diese laufende Schlachtzugsbeanspruchung kann nicht sicher ersetzt werden.',
     'error.vaultOnlyMaterials': 'Im Materiallager können nur Materialien gelagert werden.',
     'error.vaultLocked': 'Du hast das Materiallager noch nicht freigeschaltet.',
     'error.vaultMaterialFull': 'Dein Lager kann von diesem Material nichts mehr aufnehmen.',
@@ -4721,7 +4700,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.emboldened': '鼓舞',
     'aura.enraged': '激怒',
     'aura.fingersOfFrost': '寒冰指',
-    'aura.carryingFreight': '搬运货物',
     'aura.brainFreeze': '思维冻结',
     'aura.wintersChill': '凛冬之寒',
     'aura.icicles': '冰锥',
@@ -5187,7 +5165,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.emboldened': '壯膽',
     'aura.enraged': '激怒',
     'aura.fingersOfFrost': '寒冰指',
-    'aura.carryingFreight': '搬運貨物',
     'aura.brainFreeze': '思維凍結',
     'aura.wintersChill': '凜冬之寒',
     'aura.icicles': '冰錐',
@@ -5664,7 +5641,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.emboldened': '대담함',
     'aura.enraged': '격노',
     'aura.fingersOfFrost': '서리의 손가락',
-    'aura.carryingFreight': '화물 운반 중',
     'aura.brainFreeze': '두뇌 빙결',
     'aura.wintersChill': '겨울의 한기',
     'aura.icicles': '고드름',
@@ -5674,8 +5650,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'log.townFocusRespecComplete': '집중 재설정이 완료되었습니다.',
 
     'error.townFocusRespecCancelled': '대기 중인 특성 초기화 비용을 감당할 수 없어 취소되었습니다.',
-    'error.ignivarRaidInCombat':
-      '공격대가 아직 전투 중입니다. 전투가 끝난 뒤에 입장할 수 있습니다.',
+    'error.ignivarRaidInCombat': '공격대가 아직 전투 중입니다. 전투가 끝난 뒤에 입장할 수 있습니다.',
     'error.ignivarForgeGateSealed': '당신에게는 대장간 문이 봉인되어 있습니다.',
     'error.liveRaidClaimUnsafe': '현재 진행 중인 공격대 점유를 안전하게 교체할 수 없습니다.',
     'error.vaultOnlyMaterials': '재료 보관함에는 재료만 보관할 수 있습니다.',
@@ -6153,7 +6128,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.emboldened': '奮起',
     'aura.enraged': '激昂',
     'aura.fingersOfFrost': 'フィンガーズ・オブ・フロスト',
-    'aura.carryingFreight': '荷物を運搬中',
     'aura.brainFreeze': 'ブレインフリーズ',
     'aura.wintersChill': '冬の凍え',
     'aura.icicles': '氷柱',
@@ -6162,8 +6136,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.townFocusCannotAfford': 'そのフォーカス再設定を支払えません。',
     'log.townFocusRespecComplete': 'フォーカス再設定が完了しました。',
 
-    'error.townFocusRespecCancelled':
-      '保留中のフォーカス振り直し費用を支払えないため、キャンセルされました。',
+    'error.townFocusRespecCancelled': '保留中のフォーカス振り直し費用を支払えないため、キャンセルされました。',
     'error.ignivarRaidInCombat': 'あなたのレイドはまだ戦闘中です。戦闘が終わるまで入場できません。',
     'error.ignivarForgeGateSealed': 'あなたに対して鍛冶場の門は封印されています。',
     'error.liveRaidClaimUnsafe': '現在進行中のレイドの権利を安全に置き換えられません。',
@@ -6642,13 +6615,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.townFocusCannotAfford': 'Você não pode pagar essa redefinição de foco.',
     'log.townFocusRespecComplete': 'Sua redefinição de foco foi concluída.',
 
-    'error.townFocusRespecCancelled':
-      'Você não pôde pagar pela redefinição de foco pendente, então ela foi cancelada.',
-    'error.ignivarRaidInCombat':
-      'Seu raide ainda está em combate. Você poderá entrar quando a luta terminar.',
+    'error.townFocusRespecCancelled': 'Você não pôde pagar pela redefinição de foco pendente, então ela foi cancelada.',
+    'error.ignivarRaidInCombat': 'Seu raide ainda está em combate. Você poderá entrar quando a luta terminar.',
     'error.ignivarForgeGateSealed': 'O portão da forja está selado para você.',
-    'error.liveRaidClaimUnsafe':
-      'Esta reivindicação de raide ao vivo não pode ser substituída com segurança.',
+    'error.liveRaidClaimUnsafe': 'Esta reivindicação de raide ao vivo não pode ser substituída com segurança.',
     'error.vaultOnlyMaterials': 'Somente materiais podem ser armazenados no Cofre de Materiais.',
     'error.vaultLocked': 'Você ainda não desbloqueou o Cofre de Materiais.',
     'error.vaultMaterialFull': 'Seu cofre não pode armazenar mais desse material.',
@@ -7124,7 +7094,6 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.emboldened': 'Ободрение',
     'aura.enraged': 'Разъярение',
     'aura.fingersOfFrost': 'Ледяные пальцы',
-    'aura.carryingFreight': 'Переноска груза',
     'aura.brainFreeze': 'Заморозка мозгов',
     'aura.wintersChill': 'Зимний холод',
     'aura.icicles': 'Сосульки',
@@ -7133,10 +7102,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.townFocusCannotAfford': 'Вам не хватает средств на эту смену фокуса.',
     'log.townFocusRespecComplete': 'Смена фокуса завершена.',
 
-    'error.townFocusRespecCancelled':
-      'Вы не смогли оплатить ожидающую смену специализации фокуса, поэтому она была отменена.',
-    'error.ignivarRaidInCombat':
-      'Ваш рейд всё ещё в бою. Вы сможете войти, когда сражение закончится.',
+    'error.townFocusRespecCancelled': 'Вы не смогли оплатить ожидающую смену специализации фокуса, поэтому она была отменена.',
+    'error.ignivarRaidInCombat': 'Ваш рейд всё ещё в бою. Вы сможете войти, когда сражение закончится.',
     'error.ignivarForgeGateSealed': 'Вам закрыт доступ к воротам кузницы.',
     'error.liveRaidClaimUnsafe': 'Эту активную заявку на рейд нельзя безопасно заменить.',
     'error.vaultOnlyMaterials': 'В хранилище материалов можно хранить только материалы.',
@@ -7305,22 +7272,18 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': 'Rampouchy',
     'aura.perfectMoment': 'Dokonalý okamžik',
 
-    'error.townFocusRespecCancelled':
-      'Nemáš dost prostředků na čekající změnu zaměření, takže byla zrušena.',
+    'error.townFocusRespecCancelled': 'Nemáš dost prostředků na čekající změnu zaměření, takže byla zrušena.',
     'error.ignivarRaidInCombat': 'Tvůj raid je stále v boji. Vstoupit můžeš, až boj skončí.',
     'error.ignivarForgeGateSealed': 'Brána kovárny je pro tebe zapečetěná.',
     'error.liveRaidClaimUnsafe': 'Tento nárok na probíhající raid nelze bezpečně nahradit.',
-    'error.bankStackIndivisible':
-      'Tento stoh nelze rozdělit tak, aby se vešel do volného místa v bance.',
-    'error.bagsStackIndivisible':
-      'Tento stoh nelze rozdělit tak, aby se vešel do volného místa v brašnách.',
+    'error.bankStackIndivisible': 'Tento stoh nelze rozdělit tak, aby se vešel do volného místa v bance.',
+    'error.bagsStackIndivisible': 'Tento stoh nelze rozdělit tak, aby se vešel do volného místa v brašnách.',
     'error.vaultOnlyMaterials': 'Do Trezoru materiálů lze ukládat pouze materiály.',
     'error.vaultLocked': 'Trezor materiálů sis ještě neodemkl.',
     'error.vaultMaterialFull': 'Do trezoru se už žádný další materiál nevejde.',
     'error.vaultMaxUpgrades': 'Trezor už nelze dále vylepšit.',
     'error.vaultCannotAfford': 'Na toto vylepšení trezoru nemáš dost prostředků.',
-    'error.guildBankStackIndivisible':
-      'Tento stoh nelze rozdělit tak, aby se vešel do volného místa v cechovní bance.',
+    'error.guildBankStackIndivisible': 'Tento stoh nelze rozdělit tak, aby se vešel do volného místa v cechovní bance.',
     'log.vaultUnlocked': 'Odemkl sis Trezor materiálů.',
     'log.vaultUpgraded': 'Vylepšil sis Trezor materiálů.',
     'error.alreadyEating': 'Už jíš.',
@@ -7483,23 +7446,18 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': 'IJspegels',
     'aura.perfectMoment': 'Volmaakt Ogenblik',
 
-    'error.townFocusRespecCancelled':
-      'Je kon de geplande focus-herverdeling niet betalen, dus deze is geannuleerd.',
-    'error.ignivarRaidInCombat':
-      'Je raid is nog in gevecht. Je kunt binnenkomen zodra het gevecht voorbij is.',
+    'error.townFocusRespecCancelled': 'Je kon de geplande focus-herverdeling niet betalen, dus deze is geannuleerd.',
+    'error.ignivarRaidInCombat': 'Je raid is nog in gevecht. Je kunt binnenkomen zodra het gevecht voorbij is.',
     'error.ignivarForgeGateSealed': 'De poort van de smidse is voor jou verzegeld.',
     'error.liveRaidClaimUnsafe': 'Deze claim voor een live raid kan niet veilig worden vervangen.',
-    'error.bankStackIndivisible':
-      'Deze stapel kan niet worden gesplitst om in de resterende ruimte van je bank te passen.',
-    'error.bagsStackIndivisible':
-      'Deze stapel kan niet worden gesplitst om in de resterende ruimte van je tassen te passen.',
+    'error.bankStackIndivisible': 'Deze stapel kan niet worden gesplitst om in de resterende ruimte van je bank te passen.',
+    'error.bagsStackIndivisible': 'Deze stapel kan niet worden gesplitst om in de resterende ruimte van je tassen te passen.',
     'error.vaultOnlyMaterials': 'Alleen materialen kunnen in de Materialenkluis worden opgeslagen.',
     'error.vaultLocked': 'Je hebt de Materialenkluis nog niet ontgrendeld.',
     'error.vaultMaterialFull': 'Er past geen extra exemplaar van dat materiaal meer in je kluis.',
     'error.vaultMaxUpgrades': 'Je kluis kan niet verder worden verbeterd.',
     'error.vaultCannotAfford': 'Je kunt die kluisverbetering niet betalen.',
-    'error.guildBankStackIndivisible':
-      'Deze stapel kan niet worden gesplitst om in de resterende ruimte van de gildebank te passen.',
+    'error.guildBankStackIndivisible': 'Deze stapel kan niet worden gesplitst om in de resterende ruimte van de gildebank te passen.',
     'log.vaultUnlocked': 'Je ontgrendelt de Materialenkluis.',
     'log.vaultUpgraded': 'Je verbetert de Materialenkluis.',
     'error.alreadyEating': 'Je bent al aan het eten.',
@@ -7663,23 +7621,18 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': 'Sople lodu',
     'aura.perfectMoment': 'Idealna chwila',
 
-    'error.townFocusRespecCancelled':
-      'Nie było Cię stać na oczekującą zmianę specjalizacji skupienia, więc ją anulowano.',
-    'error.ignivarRaidInCombat':
-      'Twój rajd wciąż jest w walce. Możesz wejść, gdy walka się zakończy.',
+    'error.townFocusRespecCancelled': 'Nie było Cię stać na oczekującą zmianę specjalizacji skupienia, więc ją anulowano.',
+    'error.ignivarRaidInCombat': 'Twój rajd wciąż jest w walce. Możesz wejść, gdy walka się zakończy.',
     'error.ignivarForgeGateSealed': 'Brama kuźni jest dla Ciebie zamknięta.',
     'error.liveRaidClaimUnsafe': 'Tego aktywnego zgłoszenia rajdu nie można bezpiecznie zastąpić.',
-    'error.bankStackIndivisible':
-      'Nie można podzielić tego stosu, aby zmieścić go w wolnym miejscu w banku.',
-    'error.bagsStackIndivisible':
-      'Nie można podzielić tego stosu, aby zmieścić go w wolnym miejscu w torbach.',
+    'error.bankStackIndivisible': 'Nie można podzielić tego stosu, aby zmieścić go w wolnym miejscu w banku.',
+    'error.bagsStackIndivisible': 'Nie można podzielić tego stosu, aby zmieścić go w wolnym miejscu w torbach.',
     'error.vaultOnlyMaterials': 'W Skarbcu Materiałów można przechowywać wyłącznie materiały.',
     'error.vaultLocked': 'Nie odblokowano jeszcze Skarbca Materiałów.',
     'error.vaultMaterialFull': 'W Skarbcu nie ma już miejsca na ten materiał.',
     'error.vaultMaxUpgrades': 'Skarbca nie można już bardziej ulepszyć.',
     'error.vaultCannotAfford': 'Nie stać Cię na to ulepszenie Skarbca.',
-    'error.guildBankStackIndivisible':
-      'Nie można podzielić tego stosu, aby zmieścić go w wolnym miejscu w banku gildii.',
+    'error.guildBankStackIndivisible': 'Nie można podzielić tego stosu, aby zmieścić go w wolnym miejscu w banku gildii.',
     'log.vaultUnlocked': 'Odblokowujesz Skarbiec Materiałów.',
     'log.vaultUpgraded': 'Ulepszasz Skarbiec Materiałów.',
     'error.alreadyEating': 'Już jesz.',
@@ -7842,23 +7795,18 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': 'Kerucut Es',
     'aura.perfectMoment': 'Momen Sempurna',
 
-    'error.townFocusRespecCancelled':
-      'Kamu tidak mampu membayar perubahan spesialisasi fokus yang tertunda, jadi perubahan itu dibatalkan.',
-    'error.ignivarRaidInCombat':
-      'Raid kamu masih dalam pertempuran. Kamu dapat masuk setelah pertarungan berhenti.',
+    'error.townFocusRespecCancelled': 'Kamu tidak mampu membayar perubahan spesialisasi fokus yang tertunda, jadi perubahan itu dibatalkan.',
+    'error.ignivarRaidInCombat': 'Raid kamu masih dalam pertempuran. Kamu dapat masuk setelah pertarungan berhenti.',
     'error.ignivarForgeGateSealed': 'Gerbang tempa itu tertutup bagimu.',
     'error.liveRaidClaimUnsafe': 'Klaim raid aktif ini tidak dapat digantikan dengan aman.',
-    'error.bankStackIndivisible':
-      'Tumpukan itu tidak dapat dipecah agar muat di ruang yang tersisa dalam bankmu.',
-    'error.bagsStackIndivisible':
-      'Tumpukan itu tidak dapat dipecah agar muat di ruang yang tersisa dalam tasmu.',
+    'error.bankStackIndivisible': 'Tumpukan itu tidak dapat dipecah agar muat di ruang yang tersisa dalam bankmu.',
+    'error.bagsStackIndivisible': 'Tumpukan itu tidak dapat dipecah agar muat di ruang yang tersisa dalam tasmu.',
     'error.vaultOnlyMaterials': 'Hanya material yang dapat disimpan di Vault Material.',
     'error.vaultLocked': 'Kamu belum membuka Vault Material.',
     'error.vaultMaterialFull': 'Vault-mu tidak dapat menampung material itu lagi.',
     'error.vaultMaxUpgrades': 'Vault-mu tidak dapat ditingkatkan lagi.',
     'error.vaultCannotAfford': 'Kamu tidak mampu membayar peningkatan vault itu.',
-    'error.guildBankStackIndivisible':
-      'Tumpukan itu tidak dapat dipecah agar muat di ruang yang tersisa dalam bank guild.',
+    'error.guildBankStackIndivisible': 'Tumpukan itu tidak dapat dipecah agar muat di ruang yang tersisa dalam bank guild.',
     'log.vaultUnlocked': 'Kamu membuka Vault Material.',
     'log.vaultUpgraded': 'Kamu meningkatkan Vault Material.',
     'error.alreadyEating': 'Kamu sedang makan.',
@@ -8021,8 +7969,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': 'Buz Sarkıtları',
     'aura.perfectMoment': 'Mükemmel An',
 
-    'error.townFocusRespecCancelled':
-      'Bekleyen odak uzmanlık değişikliğinin ücretini karşılayamadığın için iptal edildi.',
+    'error.townFocusRespecCancelled': 'Bekleyen odak uzmanlık değişikliğinin ücretini karşılayamadığın için iptal edildi.',
     'error.ignivarRaidInCombat': 'Raid’in hâlâ savaşta. Savaş sona erince girebilirsin.',
     'error.ignivarForgeGateSealed': 'Demirhane kapısı sana kapalı.',
     'error.liveRaidClaimUnsafe': 'Bu canlı raid talebi güvenle değiştirilemez.',
@@ -8033,8 +7980,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.vaultMaterialFull': 'Kasanda bu malzemeden daha fazla yer yok.',
     'error.vaultMaxUpgrades': 'Kasan daha fazla yükseltilemez.',
     'error.vaultCannotAfford': 'Bu kasa yükseltmesinin ücretini karşılayamazsın.',
-    'error.guildBankStackIndivisible':
-      'Bu yığın, lonca bankasında kalan alana sığması için bölünemez.',
+    'error.guildBankStackIndivisible': 'Bu yığın, lonca bankasında kalan alana sığması için bölünemez.',
     'log.vaultUnlocked': 'Malzeme Kasası’nın kilidini açtın.',
     'log.vaultUpgraded': 'Malzeme Kasası’nı yükselttin.',
     'error.alreadyEating': 'Zaten yemek yiyorsun.',
@@ -8195,24 +8141,18 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': 'Istappar',
     'aura.perfectMoment': 'Perfekt ögonblick',
 
-    'error.townFocusRespecCancelled':
-      'Du hade inte råd med den pågående ändringen av fokusinriktning, så den avbröts.',
-    'error.ignivarRaidInCombat':
-      'Ditt raid är fortfarande i strid. Du kan gå in när striden är över.',
+    'error.townFocusRespecCancelled': 'Du hade inte råd med den pågående ändringen av fokusinriktning, så den avbröts.',
+    'error.ignivarRaidInCombat': 'Ditt raid är fortfarande i strid. Du kan gå in när striden är över.',
     'error.ignivarForgeGateSealed': 'Smidesporten är stängd för dig.',
-    'error.liveRaidClaimUnsafe':
-      'Det här aktiva raidanspråket kan inte ersättas på ett säkert sätt.',
-    'error.bankStackIndivisible':
-      'Den högen kan inte delas för att få plats i det återstående utrymmet i banken.',
-    'error.bagsStackIndivisible':
-      'Den högen kan inte delas för att få plats i det återstående utrymmet i dina väskor.',
+    'error.liveRaidClaimUnsafe': 'Det här aktiva raidanspråket kan inte ersättas på ett säkert sätt.',
+    'error.bankStackIndivisible': 'Den högen kan inte delas för att få plats i det återstående utrymmet i banken.',
+    'error.bagsStackIndivisible': 'Den högen kan inte delas för att få plats i det återstående utrymmet i dina väskor.',
     'error.vaultOnlyMaterials': 'Endast material kan förvaras i materialförrådet.',
     'error.vaultLocked': 'Du har inte låst upp materialförrådet.',
     'error.vaultMaterialFull': 'Ditt förråd rymmer inte mer av det materialet.',
     'error.vaultMaxUpgrades': 'Ditt förråd kan inte uppgraderas mer.',
     'error.vaultCannotAfford': 'Du har inte råd med den uppgraderingen av förrådet.',
-    'error.guildBankStackIndivisible':
-      'Den högen kan inte delas för att få plats i det återstående utrymmet i guildbanken.',
+    'error.guildBankStackIndivisible': 'Den högen kan inte delas för att få plats i det återstående utrymmet i guildbanken.',
     'log.vaultUnlocked': 'Du låser upp materialförrådet.',
     'log.vaultUpgraded': 'Du uppgraderar materialförrådet.',
     'error.alreadyEating': 'Du äter redan.',
@@ -8372,24 +8312,18 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': 'Nhũ Băng',
     'aura.perfectMoment': 'Khoảnh Khắc Hoàn Hảo',
 
-    'error.townFocusRespecCancelled':
-      'Bạn không đủ tiền để đặt lại chuyên môn đang chờ, nên thao tác đã bị hủy.',
-    'error.ignivarRaidInCombat':
-      'Đội raid của bạn vẫn đang giao chiến. Bạn có thể vào khi trận chiến kết thúc.',
+    'error.townFocusRespecCancelled': 'Bạn không đủ tiền để đặt lại chuyên môn đang chờ, nên thao tác đã bị hủy.',
+    'error.ignivarRaidInCombat': 'Đội raid của bạn vẫn đang giao chiến. Bạn có thể vào khi trận chiến kết thúc.',
     'error.ignivarForgeGateSealed': 'Cổng lò rèn không mở cho bạn.',
-    'error.liveRaidClaimUnsafe':
-      'Không thể thay thế yêu cầu nhận phần thưởng raid đang diễn ra này một cách an toàn.',
-    'error.bankStackIndivisible':
-      'Không thể tách chồng vật phẩm đó để vừa với chỗ trống còn lại trong ngân hàng.',
-    'error.bagsStackIndivisible':
-      'Không thể tách chồng vật phẩm đó để vừa với chỗ trống còn lại trong túi.',
+    'error.liveRaidClaimUnsafe': 'Không thể thay thế yêu cầu nhận phần thưởng raid đang diễn ra này một cách an toàn.',
+    'error.bankStackIndivisible': 'Không thể tách chồng vật phẩm đó để vừa với chỗ trống còn lại trong ngân hàng.',
+    'error.bagsStackIndivisible': 'Không thể tách chồng vật phẩm đó để vừa với chỗ trống còn lại trong túi.',
     'error.vaultOnlyMaterials': 'Chỉ vật liệu mới có thể được cất trong Kho Vật liệu.',
     'error.vaultLocked': 'Bạn chưa mở khóa Kho Vật liệu.',
     'error.vaultMaterialFull': 'Kho của bạn không thể chứa thêm vật liệu đó.',
     'error.vaultMaxUpgrades': 'Kho của bạn không thể nâng cấp thêm nữa.',
     'error.vaultCannotAfford': 'Bạn không đủ tiền cho lần nâng cấp kho đó.',
-    'error.guildBankStackIndivisible':
-      'Không thể tách chồng vật phẩm đó để vừa với chỗ trống còn lại trong ngân hàng hội.',
+    'error.guildBankStackIndivisible': 'Không thể tách chồng vật phẩm đó để vừa với chỗ trống còn lại trong ngân hàng hội.',
     'log.vaultUnlocked': 'Bạn đã mở khóa Kho Vật liệu.',
     'log.vaultUpgraded': 'Bạn đã nâng cấp Kho Vật liệu.',
     'error.alreadyEating': 'Bạn đang ăn.',
@@ -8551,23 +8485,18 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.icicles': 'Istapper',
     'aura.perfectMoment': 'Perfekt Øjeblik',
 
-    'error.townFocusRespecCancelled':
-      'Du havde ikke råd til at nulstille dit fokus, så det blev annulleret.',
+    'error.townFocusRespecCancelled': 'Du havde ikke råd til at nulstille dit fokus, så det blev annulleret.',
     'error.ignivarRaidInCombat': 'Dit raid er stadig i kamp. Du kan gå ind, når kampen er slut.',
     'error.ignivarForgeGateSealed': 'Smedjens port er lukket for dig.',
-    'error.liveRaidClaimUnsafe':
-      'Dette krav på belønningen fra det igangværende raid kan ikke erstattes sikkert.',
-    'error.bankStackIndivisible':
-      'Stakken kan ikke opdeles, så den passer til den resterende plads i din bank.',
-    'error.bagsStackIndivisible':
-      'Stakken kan ikke opdeles, så den passer til den resterende plads i dine tasker.',
+    'error.liveRaidClaimUnsafe': 'Dette krav på belønningen fra det igangværende raid kan ikke erstattes sikkert.',
+    'error.bankStackIndivisible': 'Stakken kan ikke opdeles, så den passer til den resterende plads i din bank.',
+    'error.bagsStackIndivisible': 'Stakken kan ikke opdeles, så den passer til den resterende plads i dine tasker.',
     'error.vaultOnlyMaterials': 'Kun materialer kan opbevares i Materialelageret.',
     'error.vaultLocked': 'Du har ikke låst Materialelageret op.',
     'error.vaultMaterialFull': 'Dit lager kan ikke rumme mere af dette materiale.',
     'error.vaultMaxUpgrades': 'Dit lager kan ikke opgraderes yderligere.',
     'error.vaultCannotAfford': 'Du har ikke råd til den lageropgradering.',
-    'error.guildBankStackIndivisible':
-      'Stakken kan ikke opdeles, så den passer til den resterende plads i laugsbanken.',
+    'error.guildBankStackIndivisible': 'Stakken kan ikke opdeles, så den passer til den resterende plads i laugsbanken.',
     'log.vaultUnlocked': 'Du låser Materialelageret op.',
     'log.vaultUpgraded': 'Du opgraderer Materialelageret.',
     'error.alreadyEating': 'Du spiser allerede.',
@@ -9390,33 +9319,58 @@ const IGNIVAR_DICT: Partial<Record<SupportedLanguage, Partial<Record<BaseSimMess
         'As portas da forja permanecem seladas enquanto a batalha continua.',
     },
     cs_CZ: {
-      'error.ignivarExitSealedInCombat': 'Dveře kovárny zůstávají pevně zavřené, dokud zuří bitva.',
+      'error.ignivarExitSealedInCombat':
+        'Dveře kovárny zůstávají pevně zavřené, dokud zuří bitva.',
     },
     nl_NL: {
       'error.ignivarExitSealedInCombat':
         'De deuren van de smidse blijven gesloten zolang de strijd woedt.',
     },
     pl_PL: {
-      'error.ignivarExitSealedInCombat': 'Drzwi kuźni pozostają zamknięte, dopóki trwa walka.',
+      'error.ignivarExitSealedInCombat':
+        'Drzwi kuźni pozostają zamknięte, dopóki trwa walka.',
     },
     id_ID: {
       'error.ignivarExitSealedInCombat':
         'Pintu-pintu bengkel tempa tetap tertutup rapat selama pertempuran berlangsung.',
     },
     tr_TR: {
-      'error.ignivarExitSealedInCombat': 'Demirhane kapıları savaş sürdükçe sıkıca kapalı kalır.',
+      'error.ignivarExitSealedInCombat':
+        'Demirhane kapıları savaş sürdükçe sıkıca kapalı kalır.',
     },
     sv_SE: {
-      'error.ignivarExitSealedInCombat': 'Smedjans portar förblir stängda så länge striden pågår.',
+      'error.ignivarExitSealedInCombat':
+        'Smedjans portar förblir stängda så länge striden pågår.',
     },
     vi_VN: {
       'error.ignivarExitSealedInCombat':
         'Cửa lò rèn vẫn đóng chặt chừng nào trận chiến còn tiếp diễn.',
     },
     da_DK: {
-      'error.ignivarExitSealedInCombat': 'Smedjens porte forbliver lukkede, så længe slaget raser.',
+      'error.ignivarExitSealedInCombat':
+        'Smedjens porte forbliver lukkede, så længe slaget raser.',
     },
   };
+
+const WORLD_QUEST_DICT: Partial<
+  Record<SupportedLanguage, Partial<Record<SimMessageKey, string>>>
+> = {
+  es: {
+    'groundPickup.leylineCacheDeny':
+      'El alijo está inactivo. Una perturbación ley podría despertarlo.',
+    'groundPickup.confectionGameBoxDeny':
+      'La caja de juego está sellada hasta que vuelva su desafío de confitería.',
+    'aura.carryingFreight': 'Transportando mercancía',
+  },
+  es_ES: {
+    'aura.carryingFreight': 'Transportando mercancía',
+  },
+  zh_CN: { 'aura.carryingFreight': '搬运货物' },
+  zh_TW: { 'aura.carryingFreight': '搬運貨物' },
+  ko_KR: { 'aura.carryingFreight': '화물 운반 중' },
+  ja_JP: { 'aura.carryingFreight': '荷物を運搬中' },
+  ru_RU: { 'aura.carryingFreight': 'Переноска груза' },
+};
 
 export const DICT: Record<SupportedLanguage, Record<SimMessageKey, string>> = Object.fromEntries(
   supportedLanguages.map((lang) => [
@@ -9424,6 +9378,7 @@ export const DICT: Record<SupportedLanguage, Record<SimMessageKey, string>> = Ob
     {
       ...baseEnTable,
       ...BASE_DICT[lang],
+      ...WORLD_QUEST_DICT[lang],
       ...PET_DICT[lang],
       'log.arenaQueueAutoLeave1v1': ARENA_QUEUE_AUTO_LEAVE_1V1[lang],
       ...RAID_BOSS_DIALOGUE_DICT[lang],
@@ -9516,7 +9471,6 @@ function locPetGrowlAutoState(state: string): string {
 // they share a single English source here.
 const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Moontide: 'aura.moontide',
-  'Carrying Freight': 'aura.carryingFreight',
   // The operator-applied Cheater mark's countdown debuff (cheaterMarkAura in
   // src/sim/moderation/cheater_mark.ts). Without this row localizeSimAuraName
   // returns null and every caller falls back to the RAW ENGLISH aura name, which
@@ -9591,6 +9545,7 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   // sprint-rune haste.
   'Carrier Fatigue': 'aura.carrierFatigue',
   'Carrying the Flag': 'aura.carriedFlag',
+  'Carrying Freight': 'aura.carryingFreight',
   Sprint: 'aura.sprintRune',
   'Battle Rune': 'aura.battleRune',
   'Ward Rune': 'aura.wardRune',
@@ -12017,11 +11972,7 @@ for (const key of Object.keys(enTable) as SimMessageKey[]) {
 function locTalentBreakdown(s: string): string {
   let m = /^Class (.+), (.+) (.+)$/.exec(s);
   if (m)
-    return t('game.talents.readout.breakdownSpec', {
-      classPts: m[1],
-      spec: m[2],
-      specPts: m[3],
-    });
+    return t('game.talents.readout.breakdownSpec', { classPts: m[1], spec: m[2], specPts: m[3] });
   m = /^Class (.+)$/.exec(s);
   if (m) return t('game.talents.readout.breakdownClass', { classPts: m[1] });
   return s;
@@ -12048,68 +11999,40 @@ const RULES: Rule[] = [
   // their own remaining/total countdown line.
   {
     re: /^You are crafting: (.+)s of (.+)s remaining\.$/,
-    build: (m) =>
-      t('hudChrome.professions.craftingProgress', {
-        remaining: m[1],
-        total: m[2],
-      }),
+    build: (m) => t('hudChrome.professions.craftingProgress', { remaining: m[1], total: m[2] }),
   },
   {
     re: /^You are disenchanting: (.+)s of (.+)s remaining\.$/,
     build: (m) =>
-      t('hudChrome.professions.disenchantingProgress', {
-        remaining: m[1],
-        total: m[2],
-      }),
+      t('hudChrome.professions.disenchantingProgress', { remaining: m[1], total: m[2] }),
   },
   {
     re: /^You are enchanting: (.+)s of (.+)s remaining\.$/,
-    build: (m) =>
-      t('hudChrome.professions.enchantingProgress', {
-        remaining: m[1],
-        total: m[2],
-      }),
+    build: (m) => t('hudChrome.professions.enchantingProgress', { remaining: m[1], total: m[2] }),
   },
   {
     re: /^You are salvaging: (.+)s of (.+)s remaining\.$/,
-    build: (m) =>
-      t('hudChrome.professions.salvagingProgress', {
-        remaining: m[1],
-        total: m[2],
-      }),
+    build: (m) => t('hudChrome.professions.salvagingProgress', { remaining: m[1], total: m[2] }),
   },
   {
     re: /^You are recharging a tool effect: (.+)s of (.+)s remaining\.$/,
     build: (m) =>
-      t('hudChrome.professions.rechargingToolEffectProgress', {
-        remaining: m[1],
-        total: m[2],
-      }),
+      t('hudChrome.professions.rechargingToolEffectProgress', { remaining: m[1], total: m[2] }),
   },
   // Ready-check result summary (social/ready_check.ts finalizeReadyCheck).
   {
     re: /^Ready check: (\d+) ready, (\d+) not ready, (\d+) no response\.$/,
     build: (m) =>
-      t('hudChrome.readyCheck.result', {
-        ready: m[1],
-        notReady: m[2],
-        noResponse: m[3],
-      }),
+      t('hudChrome.readyCheck.result', { ready: m[1], notReady: m[2], noResponse: m[3] }),
   },
   // Per-member ready-check follow-ups (social/ready_check.ts finalizeReadyCheck).
   // Player names splice verbatim; "Pet taunt is not ready." resolves via EXACT first.
-  {
-    re: /^(.+) is not ready\.$/,
-    build: (m) => tSim('log.readyCheckNotReady', { name: m[1] }),
-  },
+  { re: /^(.+) is not ready\.$/, build: (m) => tSim('log.readyCheckNotReady', { name: m[1] }) },
   {
     re: /^(.+) did not respond to the ready check\.$/,
     build: (m) => tSim('log.readyCheckNoResponse', { name: m[1] }),
   },
-  {
-    re: /^Your class has no talent tree yet\.$/,
-    build: () => t('game.talents.readout.noTree'),
-  },
+  { re: /^Your class has no talent tree yet\.$/, build: () => t('game.talents.readout.noTree') },
   {
     re: /^You have not unlocked talents yet — they begin at level (.+)\.$/,
     build: (m) => t('game.talents.readout.locked', { level: m[1] }),
@@ -12146,59 +12069,26 @@ const RULES: Rule[] = [
     re: /^The ritual circle is silent without the Crypt Keystone\.$/,
     build: () => tQuestExtra('ritualNeedsKey'),
   },
-  {
-    re: /^My king was a good man\.$/,
-    build: () => tQuestExtra('aldrenVision1'),
-  },
-  {
-    re: /^I swore my blade to him\.$/,
-    build: () => tQuestExtra('aldrenVision2'),
-  },
+  { re: /^My king was a good man\.$/, build: () => tQuestExtra('aldrenVision1') },
+  { re: /^I swore my blade to him\.$/, build: () => tQuestExtra('aldrenVision2') },
   { re: /^I would do so again\.$/, build: () => tQuestExtra('aldrenVision3') },
-  {
-    re: /^There had to be another way\.$/,
-    build: () => tQuestExtra('malricVision1'),
-  },
-  {
-    re: /^I could not let him die\.$/,
-    build: () => tQuestExtra('malricVision2'),
-  },
-  {
-    re: /^I only wanted to save him\.$/,
-    build: () => tQuestExtra('malricVision3'),
-  },
-  {
-    re: /^The king was already dead\.$/,
-    build: () => tQuestExtra('vossVision1'),
-  },
-  {
-    re: /^Malric refused to accept it\.$/,
-    build: () => tQuestExtra('vossVision2'),
-  },
-  {
-    re: /^We should have let him rest\.$/,
-    build: () => tQuestExtra('vossVision3'),
-  },
-  {
-    re: /^If you find the crypt\.\.\. end this\.$/,
-    build: () => tQuestExtra('vossVision4'),
-  },
+  { re: /^There had to be another way\.$/, build: () => tQuestExtra('malricVision1') },
+  { re: /^I could not let him die\.$/, build: () => tQuestExtra('malricVision2') },
+  { re: /^I only wanted to save him\.$/, build: () => tQuestExtra('malricVision3') },
+  { re: /^The king was already dead\.$/, build: () => tQuestExtra('vossVision1') },
+  { re: /^Malric refused to accept it\.$/, build: () => tQuestExtra('vossVision2') },
+  { re: /^We should have let him rest\.$/, build: () => tQuestExtra('vossVision3') },
+  { re: /^If you find the crypt\.\.\. end this\.$/, build: () => tQuestExtra('vossVision4') },
   {
     re: /^The Crypt Keystone turns cold as the seal breaks\.$/,
     build: () => tQuestExtra('ritualBreaks'),
   },
-  {
-    re: /^The crypt entrance is sealed to you\.$/,
-    build: () => tQuestExtra('cryptSealed'),
-  },
+  { re: /^The crypt entrance is sealed to you\.$/, build: () => tQuestExtra('cryptSealed') },
   {
     re: /^That item cannot be listed on the World Market\.$/,
     build: () => t('itemUi.tooltip.cannotMarket'),
   },
-  {
-    re: /^(.+) awakens!$/,
-    build: (m) => tQuestExtra('awakens', { name: locMob(m[1]) }),
-  },
+  { re: /^(.+) awakens!$/, build: (m) => tQuestExtra('awakens', { name: locMob(m[1]) }) },
   {
     re: /^(.+) rises over Thornpeak Heights!$/,
     build: (m) => t('hudChrome.worldBoss.spawn', { name: locMob(m[1]) }),
@@ -12247,26 +12137,11 @@ const RULES: Rule[] = [
     re: /^You can save at most (\d+) loadouts\.$/,
     build: (m) => tSim('error.maxLoadouts', { count: m[1] }),
   },
-  {
-    re: /^Saved build "(.+)"\.$/,
-    build: (m) => tSim('log.savedBuild', { name: m[1] }),
-  },
-  {
-    re: /^Loadout "(.+)" applied\.$/,
-    build: (m) => tSim('log.loadoutApplied', { name: m[1] }),
-  },
-  {
-    re: /^Deleted build "(.+)"\.$/,
-    build: (m) => tSim('log.deletedBuild', { name: m[1] }),
-  },
-  {
-    re: /^You dismiss (.+)\.$/,
-    build: (m) => tSim('log.dismissPet', { name: locMob(m[1]) }),
-  },
-  {
-    re: /^You summon (.+)\.$/,
-    build: (m) => tSim('log.summonDemon', { name: locMob(m[1]) }),
-  },
+  { re: /^Saved build "(.+)"\.$/, build: (m) => tSim('log.savedBuild', { name: m[1] }) },
+  { re: /^Loadout "(.+)" applied\.$/, build: (m) => tSim('log.loadoutApplied', { name: m[1] }) },
+  { re: /^Deleted build "(.+)"\.$/, build: (m) => tSim('log.deletedBuild', { name: m[1] }) },
+  { re: /^You dismiss (.+)\.$/, build: (m) => tSim('log.dismissPet', { name: locMob(m[1]) }) },
+  { re: /^You summon (.+)\.$/, build: (m) => tSim('log.summonDemon', { name: locMob(m[1]) }) },
   {
     re: /^(.+) crashes into the battle\.$/,
     build: (m) => tSim('log.pyreCrashes', { name: locMob(m[1]) }),
@@ -12288,20 +12163,11 @@ const RULES: Rule[] = [
     build: (m) =>
       tSim('petGrowl.cooldown', {
         autoState: locPetGrowlAutoState(m[1]),
-        seconds: formatNumber(Number(m[2]), {
-          maximumFractionDigits: 0,
-          useGrouping: false,
-        }),
+        seconds: formatNumber(Number(m[2]), { maximumFractionDigits: 0, useGrouping: false }),
       }),
   },
-  {
-    re: /^You abandon (.+)\.$/,
-    build: (m) => tSim('log.abandonPet', { name: locMob(m[1]) }),
-  },
-  {
-    re: /^Your pet is now named (.+)\.$/,
-    build: (m) => tSim('log.petRenamed', { name: m[1] }),
-  },
+  { re: /^You abandon (.+)\.$/, build: (m) => tSim('log.abandonPet', { name: locMob(m[1]) }) },
+  { re: /^Your pet is now named (.+)\.$/, build: (m) => tSim('log.petRenamed', { name: m[1] }) },
   {
     re: /^(.+) returns to your side\.$/,
     build: (m) => tSim('log.petReturns', { name: locMob(m[1]) }),
@@ -12310,10 +12176,7 @@ const RULES: Rule[] = [
     re: /^(.+) could not be restored and has been lost\.$/,
     build: (m) => tSim('log.petRestoreLost', { name: locMob(m[1]) }),
   },
-  {
-    re: /^You feed (.+)\.$/,
-    build: (m) => tSim('log.feedPet', { name: locMob(m[1]) }),
-  },
+  { re: /^You feed (.+)\.$/, build: (m) => tSim('log.feedPet', { name: locMob(m[1]) }) },
   {
     re: /^You channel healing into (.+)\.$/,
     build: (m) => tSim('log.demonHealChannel', { name: locMob(m[1]) }),
@@ -12326,22 +12189,13 @@ const RULES: Rule[] = [
     re: /^(.+) is now (.+)\.$/,
     build: (m) => tSim('log.petMode', { name: locMob(m[1]), mode: locPetMode(m[2]) }),
   },
-  {
-    re: /^(.+) dies\.$/,
-    build: (m) => tSim('log.entityDies', { name: locMob(m[1]) }),
-  },
+  { re: /^(.+) dies\.$/, build: (m) => tSim('log.entityDies', { name: locMob(m[1]) }) },
   {
     re: /^You have prestiged! Prestige Rank (\d+)\.$/,
     build: (m) => tSim('log.prestiged', { rank: m[1] }),
   },
-  {
-    re: /^(.+) becomes enraged!$/,
-    build: (m) => tSim('log.enraged', { name: locMob(m[1]) }),
-  },
-  {
-    re: /^(.+) calls for aid!$/,
-    build: (m) => tSim('log.callsForAid', { name: locMob(m[1]) }),
-  },
+  { re: /^(.+) becomes enraged!$/, build: (m) => tSim('log.enraged', { name: locMob(m[1]) }) },
+  { re: /^(.+) calls for aid!$/, build: (m) => tSim('log.callsForAid', { name: locMob(m[1]) }) },
   {
     re: /^(.+) begins to swell — get clear!$/,
     build: (m) => tSim('log.deathThroesArm', { name: locMob(m[1]) }),
@@ -12360,14 +12214,8 @@ const RULES: Rule[] = [
   },
   // /gear self-readout (must precede the single-item Equipped rule below, which is
   // anchored with (?!\() so it can never swallow this compound readout).
-  {
-    re: /^Equipped \(([^/]+)\/([^)]+)\): (.+)\.$/,
-    build: (m) => locGearReadout(m[1], m[2], m[3]),
-  },
-  {
-    re: /^You have nothing equipped\.$/,
-    build: () => tItemExtra('nothingEquipped'),
-  },
+  { re: /^Equipped \(([^/]+)\/([^)]+)\): (.+)\.$/, build: (m) => locGearReadout(m[1], m[2], m[3]) },
+  { re: /^You have nothing equipped\.$/, build: () => tItemExtra('nothingEquipped') },
   // Quest-item + relic pickup error toasts (src/sim emits these as `?? 'English'`
   // fallbacks, so the S3 drift guard's this.error regex cannot see them — covered
   // explicitly by tests/sim_item_i18n.test.ts instead).
@@ -12379,22 +12227,10 @@ const RULES: Rule[] = [
     re: /^(.+) offers nothing more\.$/,
     build: (m) => tItemExtra('offersNothingMore', { name: locItem(m[1]) }),
   },
-  {
-    re: /^The relic is bound by the sealed crypt\.$/,
-    build: () => tItemExtra('relicBound'),
-  },
-  {
-    re: /^You have already recovered this relic\.$/,
-    build: () => tItemExtra('relicRecovered'),
-  },
-  {
-    re: /^Equipped (?!\()(.+)\.$/,
-    build: (m) => tSim('log.equipped', { item: locItem(m[1]) }),
-  },
-  {
-    re: /^Unequipped (.+)\.$/,
-    build: (m) => tSim('log.unequipped', { item: locItem(m[1]) }),
-  },
+  { re: /^The relic is bound by the sealed crypt\.$/, build: () => tItemExtra('relicBound') },
+  { re: /^You have already recovered this relic\.$/, build: () => tItemExtra('relicRecovered') },
+  { re: /^Equipped (?!\()(.+)\.$/, build: (m) => tSim('log.equipped', { item: locItem(m[1]) }) },
+  { re: /^Unequipped (.+)\.$/, build: (m) => tSim('log.unequipped', { item: locItem(m[1]) }) },
   // Bank bag sockets (src/sim/bank_sockets.ts). Anchored on the full phrase so
   // neither rule can swallow a future bare Socketed/Unsocketed line.
   {
@@ -12405,10 +12241,7 @@ const RULES: Rule[] = [
     re: /^Unsocketed (.+) from your bank\.$/,
     build: (m) => tSim('log.bankBagUnsocketed', { item: locItem(m[1]) }),
   },
-  {
-    re: /^You quaff (.+)\.$/,
-    build: (m) => tSim('log.quaff', { item: locItem(m[1]) }),
-  },
+  { re: /^You quaff (.+)\.$/, build: (m) => tSim('log.quaff', { item: locItem(m[1]) }) },
   {
     re: /^(Need|Greed) Roll - (\d+) for (.+) by (.+)$/,
     build: (m) =>
@@ -12450,10 +12283,7 @@ const RULES: Rule[] = [
     re: /^(.+) is too far away to follow\.$/,
     build: (m) => tSim('log.tooFarToFollow', { name: locMob(m[1]) }),
   },
-  {
-    re: /^Now following (.+)\.$/,
-    build: (m) => tSim('log.nowFollowing', { name: locMob(m[1]) }),
-  },
+  { re: /^Now following (.+)\.$/, build: (m) => tSim('log.nowFollowing', { name: locMob(m[1]) }) },
   // AFK / DND presence. The {message} is custom text OR the default presence label; the
   // default labels are themselves keys, custom text splices through verbatim.
   {
@@ -12476,10 +12306,7 @@ const RULES: Rule[] = [
     re: /^Joined the (.+) channel\. Type \/(.+) <message> to talk\.$/,
     build: (m) => tSim('log.channelJoined', { channel: m[1] }),
   },
-  {
-    re: /^Left the (.+) channel\.$/,
-    build: (m) => tSim('log.channelLeft', { channel: m[1] }),
-  },
+  { re: /^Left the (.+) channel\.$/, build: (m) => tSim('log.channelLeft', { channel: m[1] }) },
   {
     re: /^Usage: \/(.+) <channel>\. Channels: (.+)\.$/,
     build: (m) => tSim('error.channelUsage', { action: m[1], list: m[2] }),
@@ -12500,22 +12327,13 @@ const RULES: Rule[] = [
     re: /^You are not in the (.+) channel\.$/,
     build: (m) => tSim('error.notInChannel', { channel: m[1] }),
   },
-  {
-    re: /^(.+) leaves the party\.$/,
-    build: (m) => tSim('log.partyLeaves', { name: m[1] }),
-  },
-  {
-    re: /^(.+) has left the party\.$/,
-    build: (m) => tSim('log.partyLeft', { name: m[1] }),
-  },
+  { re: /^(.+) leaves the party\.$/, build: (m) => tSim('log.partyLeaves', { name: m[1] }) },
+  { re: /^(.+) has left the party\.$/, build: (m) => tSim('log.partyLeft', { name: m[1] }) },
   {
     re: /^(.+) has been removed from the party\.$/,
     build: (m) => tSim('log.partyRemoved', { name: m[1] }),
   },
-  {
-    re: /^Your party has converted to a raid group\.$/,
-    build: () => tRaidExtra('converted'),
-  },
+  { re: /^Your party has converted to a raid group\.$/, build: () => tRaidExtra('converted') },
   {
     re: /^(.+) has been moved to raid group (.+)\.$/,
     build: (m) => tRaidExtra('memberMoved', { name: m[1], group: m[2] }),
@@ -12524,30 +12342,15 @@ const RULES: Rule[] = [
     re: /^You need a full party of five before converting to raid\.$/,
     build: () => tRaidExtra('needFullParty'),
   },
-  {
-    re: /^Only the party leader may convert to raid\.$/,
-    build: () => tRaidExtra('leaderConvert'),
-  },
-  {
-    re: /^Your group is already a raid\.$/,
-    build: () => tRaidExtra('alreadyRaid'),
-  },
-  {
-    re: /^You are not in a raid group\.$/,
-    build: () => tRaidExtra('notInRaid'),
-  },
-  {
-    re: /^Only the raid leader may adjust groups\.$/,
-    build: () => tRaidExtra('leaderAdjust'),
-  },
+  { re: /^Only the party leader may convert to raid\.$/, build: () => tRaidExtra('leaderConvert') },
+  { re: /^Your group is already a raid\.$/, build: () => tRaidExtra('alreadyRaid') },
+  { re: /^You are not in a raid group\.$/, build: () => tRaidExtra('notInRaid') },
+  { re: /^Only the raid leader may adjust groups\.$/, build: () => tRaidExtra('leaderAdjust') },
   {
     re: /^Your raid has converted back to a party\.$/,
     build: () => t('hudChrome.raidConvert.toPartyDone'),
   },
-  {
-    re: /^Your group is not a raid\.$/,
-    build: () => t('hudChrome.raidConvert.notRaid'),
-  },
+  { re: /^Your group is not a raid\.$/, build: () => t('hudChrome.raidConvert.notRaid') },
   {
     re: /^Only the raid leader may convert to a party\.$/,
     build: () => t('hudChrome.raidConvert.leaderOnly'),
@@ -12556,16 +12359,10 @@ const RULES: Rule[] = [
     re: /^A raid with more than five members cannot convert back to a party\.$/,
     build: () => t('hudChrome.raidConvert.tooLarge'),
   },
-  {
-    re: /^Raid group (.+) is full\.$/,
-    build: (m) => tRaidExtra('groupFull', { group: m[1] }),
-  },
+  { re: /^Raid group (.+) is full\.$/, build: (m) => tRaidExtra('groupFull', { group: m[1] }) },
   { re: /^Your raid is full\.$/, build: () => tRaidExtra('yourRaidFull') },
   { re: /^That raid is full\.$/, build: () => tRaidExtra('thatRaidFull') },
-  {
-    re: /^You cannot duel in Nythraxis Raid Arena\.$/,
-    build: () => tRaidExtra('noDuelArena'),
-  },
+  { re: /^You cannot duel in Nythraxis Raid Arena\.$/, build: () => tRaidExtra('noDuelArena') },
   {
     re: /^Raid groups cannot enter standard dungeons\.$/,
     build: () => tRaidExtra('noStandardDungeons'),
@@ -12574,14 +12371,8 @@ const RULES: Rule[] = [
     re: /^You must convert your party to a raid group first\.$/,
     build: () => tRaidExtra('mustConvert'),
   },
-  {
-    re: /^The royal door is sealed to you\.$/,
-    build: () => tRaidExtra('royalDoorSealed'),
-  },
-  {
-    re: /^You are locked to Nythraxis Raid Arena\.$/,
-    build: () => tRaidExtra('locked'),
-  },
+  { re: /^The royal door is sealed to you\.$/, build: () => tRaidExtra('royalDoorSealed') },
+  { re: /^You are locked to Nythraxis Raid Arena\.$/, build: () => tRaidExtra('locked') },
   {
     re: /^Nythraxis is engaged — the royal door has sealed shut\.$/,
     build: () => tRaidExtra('engagedSealed'),
@@ -12594,14 +12385,8 @@ const RULES: Rule[] = [
     re: /^You join the Ashen Coliseum 2v2 queue\. Stand by for opponents[.…]{1,3}$/,
     build: () => tArenaExtra('join2v2'),
   },
-  {
-    re: /^You leave the Ashen Coliseum queue\.$/,
-    build: () => t('hud.logs.arenaLeave'),
-  },
-  {
-    re: /^You leave the Ashen Coliseum 2v2 queue\.$/,
-    build: () => tArenaExtra('leave2v2'),
-  },
+  { re: /^You leave the Ashen Coliseum queue\.$/, build: () => t('hud.logs.arenaLeave') },
+  { re: /^You leave the Ashen Coliseum 2v2 queue\.$/, build: () => tArenaExtra('leave2v2') },
   {
     re: /^Your team leaves the Ashen Coliseum 2v2 queue\.$/,
     build: () => tArenaExtra('teamLeave2v2'),
@@ -12610,10 +12395,7 @@ const RULES: Rule[] = [
     re: /^You are already in the (.+) queue\. Leave it before queueing for (.+)\.$/,
     build: (m) => tArenaExtra('alreadyQueuedOther', { current: m[1], next: m[2] }),
   },
-  {
-    re: /^Leave your party before queueing for 1v1\.$/,
-    build: () => tArenaExtra('leaveParty1v1'),
-  },
+  { re: /^Leave your party before queueing for 1v1\.$/, build: () => tArenaExtra('leaveParty1v1') },
   {
     re: /^Only the party leader may queue your team for 2v2\.$/,
     build: () => tArenaExtra('partyLeaderQueue2v2'),
@@ -12622,10 +12404,7 @@ const RULES: Rule[] = [
     re: /^2v2 premade requires a party of exactly two\.$/,
     build: () => tArenaExtra('premadeNeedsTwo'),
   },
-  {
-    re: /^A party member is unavailable\.$/,
-    build: () => tArenaExtra('partyMemberUnavailable'),
-  },
+  { re: /^A party member is unavailable\.$/, build: () => tArenaExtra('partyMemberUnavailable') },
   {
     re: /^(.+) cannot queue while dead\.$/,
     build: (m) => tArenaExtra('memberDead', { name: m[1] }),
@@ -12659,10 +12438,7 @@ const RULES: Rule[] = [
     re: /^Your party of (.+?) joins the Thornhollow Fields queue\.$/,
     build: (m) => tBg('partyJoinQueue', { count: m[1] }),
   },
-  {
-    re: /^You leave the Thornhollow Fields queue\.$/,
-    build: () => tBg('leaveQueue'),
-  },
+  { re: /^You leave the Thornhollow Fields queue\.$/, build: () => tBg('leaveQueue') },
   {
     re: /^A party member must wait before queueing for Thornhollow Fields again\.$/,
     build: () => tBg('errMemberRequeueLocked'),
@@ -12724,14 +12500,8 @@ const RULES: Rule[] = [
   { re: /^You seize a Sprint Rune!$/, build: () => tBg('seizeRune') },
   { re: /^You seize a Battle Rune!$/, build: () => tBg('seizeBattleRune') },
   { re: /^You seize a Ward Rune!$/, build: () => tBg('seizeWardRune') },
-  {
-    re: /^You are already in a battleground\.$/,
-    build: () => tBg('errInBattleground'),
-  },
-  {
-    re: /^You are not in a battleground\.$/,
-    build: () => tBg('errNotInBattleground'),
-  },
+  { re: /^You are already in a battleground\.$/, build: () => tBg('errInBattleground') },
+  { re: /^You are not in a battleground\.$/, build: () => tBg('errNotInBattleground') },
   {
     re: /^You cannot queue for Thornhollow Fields while dead\.$/,
     build: () => tBg('errQueueDead'),
@@ -12798,39 +12568,21 @@ const RULES: Rule[] = [
     re: /^You descend deeper into (.+)\.$/,
     build: (m) => t('sim.rift.descendFloor', { name: m[1] }),
   },
-  {
-    re: /^You step back through the rift\.$/,
-    build: () => t('sim.rift.stepBack'),
-  },
+  { re: /^You step back through the rift\.$/, build: () => t('sim.rift.stepBack') },
   {
     re: /^A rune pylon flares to life \(([^/)]+)\/([^)]+)\)\.$/,
     build: (m) => t('sim.rift.pylonLit', { lit: m[1], total: m[2] }),
   },
-  {
-    re: /^The way down tears open\.$/,
-    build: () => t('sim.rift.wayDownOpens'),
-  },
-  {
-    re: /^The frost sigil blazes\. The way stirs\.$/,
-    build: () => t('sim.rift.iceGoalLit'),
-  },
-  {
-    re: /^The sockets grind shut\. The way stirs\.$/,
-    build: () => t('sim.rift.socketsShut'),
-  },
+  { re: /^The way down tears open\.$/, build: () => t('sim.rift.wayDownOpens') },
+  { re: /^The frost sigil blazes\. The way stirs\.$/, build: () => t('sim.rift.iceGoalLit') },
+  { re: /^The sockets grind shut\. The way stirs\.$/, build: () => t('sim.rift.socketsShut') },
   {
     re: /^The runes answer in turn \(([^/)]+)\/([^)]+)\)\.$/,
     build: (m) => t('sim.rift.seqProgress', { step: m[1], total: m[2] }),
   },
-  {
-    re: /^The runes go dark\. Begin again\.$/,
-    build: () => t('sim.rift.seqReset'),
-  },
+  { re: /^The runes go dark\. Begin again\.$/, build: () => t('sim.rift.seqReset') },
   { re: /^The gate grinds open\.$/, build: () => t('sim.rift.gateOpen') },
-  {
-    re: /^The orb is sealed by the ritual below\.$/,
-    build: () => t('sim.rift.orbSealed'),
-  },
+  { re: /^The orb is sealed by the ritual below\.$/, build: () => t('sim.rift.orbSealed') },
   {
     re: /^The pentagram's flame gutters out\. Something wakes on the altar\.$/,
     build: () => t('sim.rift.orbWakes'),
@@ -12981,30 +12733,12 @@ const RULES: Rule[] = [
     re: /^Hellfire Brand detonates!$/,
     build: () => t('sim.rift.detonateHellfireBrand'),
   },
-  {
-    re: /^You cannot enter a delve right now\.$/,
-    build: () => t('sim.delve.cannotEnterNow'),
-  },
-  {
-    re: /^Leave the dungeon first\.$/,
-    build: () => t('sim.delve.leaveDungeonFirst'),
-  },
-  {
-    re: /^Leave the arena first\.$/,
-    build: () => t('sim.delve.leaveArenaFirst'),
-  },
-  {
-    re: /^You are already in a delve\.$/,
-    build: () => t('sim.delve.alreadyInDelve'),
-  },
-  {
-    re: /^You cannot enter a delve while trading\.$/,
-    build: () => t('sim.delve.whileTrading'),
-  },
-  {
-    re: /^You cannot enter a delve during a duel\.$/,
-    build: () => t('sim.delve.duringDuel'),
-  },
+  { re: /^You cannot enter a delve right now\.$/, build: () => t('sim.delve.cannotEnterNow') },
+  { re: /^Leave the dungeon first\.$/, build: () => t('sim.delve.leaveDungeonFirst') },
+  { re: /^Leave the arena first\.$/, build: () => t('sim.delve.leaveArenaFirst') },
+  { re: /^You are already in a delve\.$/, build: () => t('sim.delve.alreadyInDelve') },
+  { re: /^You cannot enter a delve while trading\.$/, build: () => t('sim.delve.whileTrading') },
+  { re: /^You cannot enter a delve during a duel\.$/, build: () => t('sim.delve.duringDuel') },
   {
     re: /^You cannot enter a delve during an arena match\.$/,
     build: () => t('sim.delve.duringArena'),
@@ -13014,18 +12748,12 @@ const RULES: Rule[] = [
     re: /^A mechanism clicks open nearby\. A passage opens to the north\. Find the exit portal ahead\.$/,
     build: () => t('sim.delve.mechanismOpen'),
   },
-  {
-    re: /^The grave rite falters\.$/,
-    build: () => t('sim.delve.graveFalters'),
-  },
+  { re: /^The grave rite falters\.$/, build: () => t('sim.delve.graveFalters') },
   {
     re: /^The dead answer Deacon Varric's call!$/,
     build: () => t('delveUi.boss.varric.raise.interrupt_fail'),
   },
-  {
-    re: /^The door is already open\.$/,
-    build: () => t('sim.delve.doorAlreadyOpen'),
-  },
+  { re: /^The door is already open\.$/, build: () => t('sim.delve.doorAlreadyOpen') },
   {
     re: /^The boss falls\. A warded reliquary chest rises on the dais\. Pick its lock to claim your spoils\.$/,
     build: () => t('sim.delve.bossChest'),
@@ -13070,26 +12798,17 @@ const RULES: Rule[] = [
     re: /^The shrines replay the rite\. Wait\.$/,
     build: () => t('sim.delve.riteSequencePlaying'),
   },
-  {
-    re: /^A soft chime answers your touch\.$/,
-    build: () => t('sim.delve.riteCorrect'),
-  },
+  { re: /^A soft chime answers your touch\.$/, build: () => t('sim.delve.riteCorrect') },
   {
     re: /^A harsh bell crack\. Black water splashes at your feet\.$/,
     build: () => t('sim.delve.riteWrong'),
   },
-  {
-    re: /^The Drowned Reliquary opens\.$/,
-    build: () => t('sim.delve.riteReliquaryOpen'),
-  },
+  { re: /^The Drowned Reliquary opens\.$/, build: () => t('sim.delve.riteReliquaryOpen') },
   {
     re: /^Complete the shrine rite to open the reliquary\.$/,
     build: () => t('sim.delve.riteReliquaryLocked'),
   },
-  {
-    re: /^The reliquary is empty\.$/,
-    build: () => t('sim.delve.riteReliquaryEmpty'),
-  },
+  { re: /^The reliquary is empty\.$/, build: () => t('sim.delve.riteReliquaryEmpty') },
   {
     re: /^A stairway to the surface opens\. Press F at the stairs to leave\.$/,
     build: () => t('sim.delve.surfaceStairs'),
@@ -13104,20 +12823,11 @@ const RULES: Rule[] = [
   },
   { re: /^The chest is empty\.$/, build: () => t('sim.delve.chestEmpty') },
   { re: /^You are not in a delve\.$/, build: () => t('sim.delve.notInDelve') },
-  {
-    re: /^You cannot interact with that\.$/,
-    build: () => t('sim.delve.cannotInteract'),
-  },
+  { re: /^You cannot interact with that\.$/, build: () => t('sim.delve.cannotInteract') },
   { re: /^You are too far away\.$/, build: () => t('sim.delve.tooFar') },
-  {
-    re: /^The grave is silent for now\.$/,
-    build: () => t('sim.delve.graveSilent'),
-  },
+  { re: /^The grave is silent for now\.$/, build: () => t('sim.delve.graveSilent') },
   { re: /^The door is locked\.$/, build: () => t('sim.delve.doorLocked') },
-  {
-    re: /^Strike the wall to break through\.$/,
-    build: () => t('sim.delve.strikeWall'),
-  },
+  { re: /^Strike the wall to break through\.$/, build: () => t('sim.delve.strikeWall') },
   { re: /^Nothing happens\.$/, build: () => t('sim.delve.nothingHappens') },
   { re: /^Unknown companion\.$/, build: () => t('sim.delve.unknownCompanion') },
   {
@@ -13128,60 +12838,24 @@ const RULES: Rule[] = [
     re: /^You cannot afford this upgrade\.$/,
     build: () => t('sim.delve.cannotAffordCompanionUpgrade'),
   },
-  {
-    re: /^The passage is sealed\.$/,
-    build: () => t('sim.delve.passageSealed'),
-  },
-  {
-    re: /^Clear the remaining enemies first\.$/,
-    build: () => t('sim.delve.enemiesRemain'),
-  },
-  {
-    re: /^Move closer to the passage\.$/,
-    build: () => t('sim.delve.moveCloserPassage'),
-  },
-  {
-    re: /^Move closer to the chest\.$/,
-    build: () => t('sim.delve.moveCloserChest'),
-  },
-  {
-    re: /^Move closer to the reliquary\.$/,
-    build: () => t('sim.delve.moveCloserReliquary'),
-  },
-  {
-    re: /^There is nothing left to take\.$/,
-    build: () => t('sim.delve.nothingToTake'),
-  },
-  {
-    re: /^The way out is not yet open\.$/,
-    build: () => t('sim.delve.wayOutNotOpen'),
-  },
-  {
-    re: /^Move closer to the stairs\.$/,
-    build: () => t('sim.delve.moveCloserStairs'),
-  },
+  { re: /^The passage is sealed\.$/, build: () => t('sim.delve.passageSealed') },
+  { re: /^Clear the remaining enemies first\.$/, build: () => t('sim.delve.enemiesRemain') },
+  { re: /^Move closer to the passage\.$/, build: () => t('sim.delve.moveCloserPassage') },
+  { re: /^Move closer to the chest\.$/, build: () => t('sim.delve.moveCloserChest') },
+  { re: /^Move closer to the reliquary\.$/, build: () => t('sim.delve.moveCloserReliquary') },
+  { re: /^There is nothing left to take\.$/, build: () => t('sim.delve.nothingToTake') },
+  { re: /^The way out is not yet open\.$/, build: () => t('sim.delve.wayOutNotOpen') },
+  { re: /^Move closer to the stairs\.$/, build: () => t('sim.delve.moveCloserStairs') },
   // Lockpicking minigame (exact lines).
   {
     re: /^Someone is already working the lock\.$/,
     build: () => t('sim.lockpick.alreadyInProgress'),
   },
-  {
-    re: /^You cannot pick that\.$/,
-    build: () => t('sim.lockpick.cannotPickThat'),
-  },
-  {
-    re: /^Choose 1, 2, or 3 picks\.$/,
-    build: () => t('sim.lockpick.chooseAnte'),
-  },
-  {
-    re: /^No lock attempt in progress\.$/,
-    build: () => t('sim.lockpick.noAttempt'),
-  },
+  { re: /^You cannot pick that\.$/, build: () => t('sim.lockpick.cannotPickThat') },
+  { re: /^Choose 1, 2, or 3 picks\.$/, build: () => t('sim.lockpick.chooseAnte') },
+  { re: /^No lock attempt in progress\.$/, build: () => t('sim.lockpick.noAttempt') },
   { re: /^That is not your lock\.$/, build: () => t('sim.lockpick.notYours') },
-  {
-    re: /^That tool slips off this lock\.$/,
-    build: () => t('sim.lockpick.toolSlips'),
-  },
+  { re: /^That tool slips off this lock\.$/, build: () => t('sim.lockpick.toolSlips') },
   // Chest-loss lockpick lines.
   {
     re: /^The lock is jammed beyond picking\. Clear the delve again for another attempt\.$/,
@@ -13212,10 +12886,7 @@ const RULES: Rule[] = [
   },
   // "All instances of X are busy" is handled by the hud-local localizeErrorText
   // arm (it runs first and resolves the dungeon-or-delve name), so no rule here.
-  {
-    re: /^(.+) run failed\.$/,
-    build: (m) => t('sim.delve.runFailed', { name: locDelve(m[1]) }),
-  },
+  { re: /^(.+) run failed\.$/, build: (m) => t('sim.delve.runFailed', { name: locDelve(m[1]) }) },
   {
     re: /^(.+) begins Raise Dead\.$/,
     build: (m) => t('sim.delve.raiseDead', { name: locMob(m[1]) }),
@@ -13224,26 +12895,16 @@ const RULES: Rule[] = [
     re: /^(.+) marks (.+) with Blackwater!$/,
     build: (m) => t('sim.delve.nhaliaBlackwaterMark', { name: locMob(m[1]), player: m[2] }),
   },
-  {
-    re: /^Cantors, hold the note!$/,
-    build: () => t('sim.delve.nhaliaCantorShield'),
-  },
+  { re: /^Cantors, hold the note!$/, build: () => t('sim.delve.nhaliaCantorShield') },
   {
     re: /^(.+) tolls the bells!$/,
     build: (m) => tSim('log.nhaliaTollsBells', { name: locMob(m[1]) }),
   },
   {
     re: /^You need (.+) Delve Marks to upgrade (.+)\.$/,
-    build: (m) =>
-      t('sim.delve.companionMarksRequired', {
-        marks: m[1],
-        name: locMob(m[2]),
-      }),
+    build: (m) => t('sim.delve.companionMarksRequired', { marks: m[1], name: locMob(m[2]) }),
   },
-  {
-    re: /^You have not unlocked that item yet\.$/,
-    build: () => t('sim.delve.shopItemLocked'),
-  },
+  { re: /^You have not unlocked that item yet\.$/, build: () => t('sim.delve.shopItemLocked') },
   {
     re: /^You need (.+) Delve Marks to buy (.+)\.$/,
     build: (m) => t('sim.delve.shopMarksRequired', { marks: m[1], name: locItem(m[2]) }),
@@ -13302,10 +12963,7 @@ const RULES: Rule[] = [
     re: /^(.+) reaches rank (.+)\.$/,
     build: (m) => t('sim.delve.companionRankUp', { name: locMob(m[1]), rank: m[2] }),
   },
-  {
-    re: /^(.+) complete\.$/,
-    build: (m) => t('sim.delve.complete', { name: locDelve(m[1]) }),
-  },
+  { re: /^(.+) complete\.$/, build: (m) => t('sim.delve.complete', { name: locDelve(m[1]) }) },
   // Module-enter banner: "<module>: <objective>". Anchored on the two fixed
   // objective lines (not a bare "X: Y" catch-all), so the captured module name is
   // the only free part; localize it and the objective.
@@ -13332,14 +12990,8 @@ const RULES: Rule[] = [
     re: /^You join the 2v2 Fiesta queue\. Get ready to PARTY[.…]{1,3}$/,
     build: () => t('fiesta.queue.join'),
   },
-  {
-    re: /^You leave the 2v2 Fiesta queue\.$/,
-    build: () => t('fiesta.queue.leave'),
-  },
-  {
-    re: /^Your team leaves the 2v2 Fiesta queue\.$/,
-    build: () => t('fiesta.queue.teamLeave'),
-  },
+  { re: /^You leave the 2v2 Fiesta queue\.$/, build: () => t('fiesta.queue.leave') },
+  { re: /^Your team leaves the 2v2 Fiesta queue\.$/, build: () => t('fiesta.queue.teamLeave') },
   {
     re: /^Only the party leader may queue your team for (.+)\.$/,
     build: (m) => t('fiesta.error.leaderOnly', { label: m[1] }),
@@ -13348,14 +13000,8 @@ const RULES: Rule[] = [
     re: /^(.+) premade requires a party of exactly two\.$/,
     build: (m) => t('fiesta.error.premadeTwo', { label: m[1] }),
   },
-  {
-    re: /^You have no augment to choose right now\.$/,
-    build: () => t('fiesta.error.noAugment'),
-  },
-  {
-    re: /^That augment is not on offer\.$/,
-    build: () => t('fiesta.error.notOnOffer'),
-  },
+  { re: /^You have no augment to choose right now\.$/, build: () => t('fiesta.error.noAugment') },
+  { re: /^That augment is not on offer\.$/, build: () => t('fiesta.error.notOnOffer') },
   {
     re: /^Welcome to the 2v2 FIESTA! Score takedowns, grab augments, survive the ring!$/,
     build: () => t('fiesta.log.welcome'),
@@ -13372,14 +13018,8 @@ const RULES: Rule[] = [
     re: /^You join the Protect Yumi queue\. Guard your familiar[.…]{1,3}$/,
     build: () => t('yumi.queue.join'),
   },
-  {
-    re: /^You leave the Protect Yumi queue\.$/,
-    build: () => t('yumi.queue.leave'),
-  },
-  {
-    re: /^Your team leaves the Protect Yumi queue\.$/,
-    build: () => t('yumi.queue.teamLeave'),
-  },
+  { re: /^You leave the Protect Yumi queue\.$/, build: () => t('yumi.queue.leave') },
+  { re: /^Your team leaves the Protect Yumi queue\.$/, build: () => t('yumi.queue.teamLeave') },
   {
     re: /^Protect Yumi 3v3 allows a party of up to three\.$/,
     build: () => t('yumi.error.partyTooBig3'),
@@ -13396,11 +13036,7 @@ const RULES: Rule[] = [
   // after every more-specific "{X} {verb}!" rule above (awakens, enraged, calls for aid).
   {
     re: /^(.+) channels (.+)\.$/,
-    build: (m) =>
-      tSim('log.mobChannels', {
-        name: locMob(m[1]),
-        mechanic: locBossMechanic(m[2]),
-      }),
+    build: (m) => tSim('log.mobChannels', { name: locMob(m[1]), mechanic: locBossMechanic(m[2]) }),
   },
   // Dungeon Finder member-specific templates (player names splice verbatim).
   {
@@ -13427,20 +13063,11 @@ const RULES: Rule[] = [
   {
     re: /^(.+) unleashes (.+)!$/,
     build: (m) =>
-      tSim('log.bossUnleashes', {
-        name: locMob(m[1]),
-        mechanic: locBossMechanic(m[2]),
-      }),
+      tSim('log.bossUnleashes', { name: locMob(m[1]), mechanic: locBossMechanic(m[2]) }),
   },
   // Card Duel minigame (Card Master NPC, src/sim/social/card_duel.ts).
-  {
-    re: /^You queue for a Card Duel\.$/,
-    build: () => tSim('log.cardDuelQueued'),
-  },
-  {
-    re: /^You leave the Card Duel queue\.$/,
-    build: () => tSim('log.cardDuelLeftQueue'),
-  },
+  { re: /^You queue for a Card Duel\.$/, build: () => tSim('log.cardDuelQueued') },
+  { re: /^You leave the Card Duel queue\.$/, build: () => tSim('log.cardDuelLeftQueue') },
   {
     re: /^Your Card Duel against (.+) begins!$/,
     build: (m) => tSim('log.cardDuelBegins', { name: m[1] }),
@@ -13469,10 +13096,7 @@ const RULES: Rule[] = [
     re: /^You lose the Card Duel\.$/,
     build: () => tSim('log.cardDuelLossNoOpponent'),
   },
-  {
-    re: /^You forfeit the Card Duel\.$/,
-    build: () => tSim('log.cardDuelForfeit'),
-  },
+  { re: /^You forfeit the Card Duel\.$/, build: () => tSim('log.cardDuelForfeit') },
   {
     re: /^Your opponent forfeited the Card Duel\. You win!$/,
     build: () => tSim('log.cardDuelOpponentForfeited'),
@@ -13485,18 +13109,12 @@ const RULES: Rule[] = [
     re: /^You must be at the Card Master to queue for a Card Duel\.$/,
     build: () => tSim('error.cardDuelNotAtMaster'),
   },
-  {
-    re: /^You are not in a Card Duel\.$/,
-    build: () => tSim('error.cardDuelNotInMatch'),
-  },
+  { re: /^You are not in a Card Duel\.$/, build: () => tSim('error.cardDuelNotInMatch') },
   {
     re: /^You already played a card this round\.$/,
     build: () => tSim('error.cardDuelAlreadyPlayed'),
   },
-  {
-    re: /^You don't hold that card\.$/,
-    build: () => tSim('error.cardDuelNotHeld'),
-  },
+  { re: /^You don't hold that card\.$/, build: () => tSim('error.cardDuelNotHeld') },
   {
     re: /^You are already in a Card Duel\.$/,
     build: () => tSim('error.cardDuelAlreadyInDuel'),
