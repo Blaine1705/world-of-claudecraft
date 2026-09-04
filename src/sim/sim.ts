@@ -671,6 +671,7 @@ import {
   updateRiftTriggers as updateRiftTriggersImpl,
 } from './rift/runs';
 import type { RiftEvent, RiftInstance } from './rift/types';
+import { worldQuestCreditBindings } from './world_quest_context';
 import { dropWorldQuestDeliveryCargo as dropWorldQuestDeliveryCargoImpl } from './world_quest_delivery';
 import * as worldQuestState from './world_quest_state';
 import * as worldQuestMod from './world_quests';
@@ -5240,16 +5241,11 @@ export class Sim {
       // through `sim.ctx` (lazily read at call time, after the ctor sets it). countItem
       // stays on Sim (L2 inventory hub) and is consumed by the collect updater.
       onMobKilledForQuests: (mob, meta) => onMobKilledForQuests(sim.ctx, mob, meta),
-      onMobKilledForWorldQuests: (mob, meta) =>
-        worldQuestMod.onMobKilledForWorldQuests(sim.ctx, mob, meta),
+      ...worldQuestCreditBindings(() => sim.ctx),
       onRecipeCraftedForQuests: (recipeId, meta) =>
         onRecipeCraftedForQuests(sim.ctx, recipeId, meta),
       onNodeGatheredForQuests: (node, itemId, meta) =>
         onNodeGatheredForQuests(sim.ctx, node, itemId, meta),
-      onNodeGatheredForWorldQuests: (node, meta) =>
-        worldQuestMod.onNodeGatheredForWorldQuests(sim.ctx, node, meta),
-      onObjectInteractedForWorldQuests: (object, meta) =>
-        worldQuestMod.onObjectInteractedForWorldQuests(sim.ctx, object, meta),
       currentWorldQuestRotation: () => sim.currentWorldQuestRotation(),
       onInventoryChangedForQuests: (meta) => onInventoryChangedForQuests(sim.ctx, meta),
       checkQuestReady: (qp, meta) => checkQuestReady(sim.ctx, qp, meta),

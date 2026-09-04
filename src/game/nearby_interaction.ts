@@ -230,7 +230,7 @@ export function tryNearbyInteraction(
   // looting the ambush wave is never swallowed.
   const escort = player.dead
     ? ({ kind: 'none' } as const)
-    : decideEscortPress(player.pos, world.entities, world.questLog);
+    : decideEscortPress(player.pos, world.entities, world.questLog, world.worldQuestLog);
   if (escort.kind === 'start') return handleEscortPress(world, hud, escort, escortAwayText);
   if (bestNode !== null) {
     return handleGatherNodeInteract(

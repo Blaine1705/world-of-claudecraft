@@ -9729,6 +9729,7 @@ export const es_ES: EnTranslations = {
       "redirectLeyBeam": "Redirige el rayo ley",
       "matchConfections": "Combina dulces encantados",
       "loadFreight": "Load freight into the wagon",
+      "escortCaravan": "Escolta la caravana: {zone}",
       "salvageWreckage": "Recupera restos del naufragio",
       "puzzleTitle": "Alineación del rayo ley",
       "puzzleLevel": "Nivel semanal {level}",
@@ -14782,6 +14783,15 @@ export const es_ES: EnTranslations = {
       },
       "vale_bandit": {
         "name": "Bandido del Valle"
+      },
+      "eastbrook_freight_caravan": {
+        "name": "Caravana de mercancías de Eastbrook"
+      },
+      "willowfen_remedy_caravan": {
+        "name": "Caravana de remedios del Pantano de los Sauces"
+      },
+      "frostveil_supply_caravan": {
+        "name": "Caravana de suministros del Velo de Escarcha"
       },
       "restless_bones": {
         "name": "Huesos inquietos"

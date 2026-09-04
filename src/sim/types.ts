@@ -3972,19 +3972,19 @@ export interface EscortAmbushDef {
   atWaypoint: number;
   mobId: string;
   count: number;
+  // Optional authored level for scaled public-event waves. Ordinary quest
+  // escorts omit it and keep using the template's minimum level.
+  level?: number;
   // Spawn scatter ring around the escortee (world yards).
   radius?: number;
 }
 
-export interface EscortDef {
+interface EscortDefBase {
   id: string;
   // MobTemplate of the escortee: a non-hostile mob with moveSpeed 0 (the run
   // drives all movement) and aggroRadius 0. Players cannot attack it; mobs
   // damage it through seeded ambush threat; players may heal it while live.
   npcMobId: string;
-  // The quest carrying this escort's { type: 'escort' } objective. Interacting
-  // with the idle escortee while this quest is active starts the run.
-  questId: string;
   start: { x: number; z: number };
   waypoints: { x: number; z: number }[];
   moveSpeed: number;
@@ -4000,7 +4000,29 @@ export interface EscortDef {
   startText: string;
   successText: string;
   failText: string;
+  // Optional checkpoint story, spoken only between ambushes. Each line becomes
+  // eligible after arriving at its waypoint, then waits for reading space.
+  story?: {
+    speaker: string;
+    lineSpacingSeconds: number;
+    ambushText: string;
+    lines: { atWaypoint: number; text: string }[];
+  };
 }
+
+export type EscortDef = EscortDefBase &
+  (
+    | {
+        // The ordinary quest carrying this escort objective.
+        questId: string;
+        worldQuestId?: never;
+      }
+    | {
+        // The public world quest carrying this escort objective.
+        worldQuestId: string;
+        questId?: never;
+      }
+  );
 
 // Live per-def escort state (src/sim/escort.ts; the backing map stays on Sim).
 // Exactly one of three phases: idle (npcId set, run null), live (npcId set,
@@ -4014,6 +4036,7 @@ export interface EscortRunState {
     startedAt: number;
     ambushIds: number[];
     fired: boolean[];
+    story?: { nextLine: number; nextSpeechAt: number; finaleAt?: number };
     // Stuck-advance bookkeeping: a walker pinned against a collider for a few
     // seconds counts its current waypoint as reached (escort.ts).
     lastX: number;
@@ -4157,6 +4180,7 @@ export interface WorldQuestMatch3LevelDef {
 
 export type WorldQuestObjective =
   | { type: 'kill'; targetMobId: string }
+  | { type: 'escort'; escortId: string }
   | { type: 'interact'; targetObjectItemId: string }
   | {
       type: 'salvage';

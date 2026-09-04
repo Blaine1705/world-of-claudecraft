@@ -1124,6 +1124,13 @@ export interface SimContextCallbacks {
   onNodeGatheredForWorldQuests(node: GatherNodeDef, meta: PlayerMeta): void;
   onObjectInteractedForWorldQuests(object: Entity, meta: PlayerMeta): boolean;
   currentWorldQuestRotation(): Readonly<{ cycle: string; quests: readonly WorldQuestDef[] }>;
+  hasActiveWorldQuest(meta: PlayerMeta, questId: string): boolean;
+  completeWorldQuestEscort(
+    meta: PlayerMeta,
+    questId: string,
+    escortId: string,
+    escortee: Entity,
+  ): void;
 }
 
 // The seam consumed by extracted modules.
@@ -1706,6 +1713,8 @@ export function createSimContext(host: SimContextHost): SimContext {
     onNodeGatheredForWorldQuests: host.onNodeGatheredForWorldQuests,
     onObjectInteractedForWorldQuests: host.onObjectInteractedForWorldQuests,
     currentWorldQuestRotation: host.currentWorldQuestRotation,
+    hasActiveWorldQuest: host.hasActiveWorldQuest,
+    completeWorldQuestEscort: host.completeWorldQuestEscort,
   };
 }
 

@@ -93,6 +93,7 @@ const questStringsEn = {
       redirectLeyBeam: 'Redirect the ley beam',
       matchConfections: 'Match enchanted confections',
       loadFreight: 'Load freight into the wagon',
+      escortCaravan: 'Escort the caravan: {zone}',
       salvageWreckage: 'Salvage shipwreck debris',
       puzzleTitle: 'Ley Beam Alignment',
       puzzleLevel: 'Weekly level {level}',

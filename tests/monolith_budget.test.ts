@@ -358,7 +358,9 @@ const MONOLITHS: MonolithRow[] = [
     // and the release arm's rickshaw hooks moved with it, so the merged file
     // lands below both prior pins. Measured on the merged tree. Exact merged
     // count, zero headroom.
-    ceiling: 13214,
+    // Quest caravan animation and entity-body picking now share the tested
+    // quest_entity_presentation.ts lifecycle adapter. Exact post-extraction count.
+    ceiling: 13210,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -467,7 +469,8 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered after world-quest state/persistence and static-object bootstrap
     // moved behind their own modules. The feature's required facade and tick
     // wiring now land with zero net growth against release/v0.42.0.
-    ceiling: 12273,
+    // World-quest credit callbacks moved behind world_quest_context.ts.
+    ceiling: 12268,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

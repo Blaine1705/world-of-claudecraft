@@ -3,6 +3,7 @@ import { isBlocked, resolveMovement } from '../src/sim/colliders';
 import { dealDamage } from '../src/sim/combat/damage';
 import {
   BUILTIN_WORLD,
+  ESCORTS,
   GATHER_NODES,
   ITEMS,
   MOBS,
@@ -156,17 +157,21 @@ function finishQuest(sim: Sim, quest: WorldQuestDef): void {
     }
     return;
   }
+  if (quest.objective.type === 'escort') {
+    throw new Error(`Escort ${quest.id} must complete through its live route`);
+  }
   const target = targetFor(sim, quest);
   for (let i = 0; i < quest.count; i++) onMobKilledForWorldQuests(sim.ctx, target, meta);
 }
 
 describe('world quest content', () => {
-  it('authors one level 10 objective in every shipped map over enough live targets', () => {
+  it('authors level 10 objectives in every shipped map over enough live targets', () => {
     const freight = WORLD_QUESTS_BY_ID.wq_eastbrook_bandits;
     const recovery = WORLD_QUESTS_BY_ID.wq_frostveil_howlers;
     const puzzle = WORLD_QUESTS_BY_ID.wq_galecrest_wisps;
     const match3 = WORLD_QUESTS_BY_ID.wq_palmreach_confections;
     const salvage = WORLD_QUESTS_BY_ID.wq_farshore_salvage;
+    const caravan = WORLD_QUESTS_BY_ID.wq_eastbrook_caravan;
     expect(freight.count).toBe(6);
     expect(freight.objective).toEqual({
       type: 'delivery',
@@ -190,6 +195,10 @@ describe('world quest content', () => {
     expect(salvage.objective.type).toBe('salvage');
     if (salvage.objective.type !== 'salvage') throw new Error('Expected salvage fixture');
     expect(salvage.objective.layouts).toHaveLength(3);
+    expect(caravan.objective).toEqual({
+      type: 'escort',
+      escortId: 'esc_wq_eastbrook_caravan',
+    });
     expect(new Set(WORLD_QUESTS.map((quest) => quest.id)).size).toBe(WORLD_QUESTS.length);
     expect(new Set(WORLD_QUESTS.map((quest) => quest.zoneId))).toEqual(
       new Set(ZONES.map((zone) => zone.id)),
@@ -256,11 +265,16 @@ describe('world quest content', () => {
             ).toBeLessThanOrEqual(quest.area.radius);
           }
         }
-      } else {
+      } else if (quest.objective.type === 'match3') {
         for (const level of quest.objective.levels) {
           expect(level.board).toHaveLength(level.columns * level.rows);
           expect(level.target).toBe(quest.count);
         }
+      } else if (quest.objective.type === 'escort') {
+        const escort = ESCORTS[quest.objective.escortId];
+        expect(escort, `${quest.id} escort`).toBeDefined();
+        expect(escort?.worldQuestId).toBe(quest.id);
+        expect(escort?.waypoints.length).toBeGreaterThan(0);
       }
       if (quest.objective.type === 'puzzle' || quest.objective.type === 'match3') {
         const activationObjectItemId = quest.objective.activationObjectItemId;
@@ -281,7 +295,8 @@ describe('world quest content', () => {
       ).toBe(false);
       if (quest.reward.type === 'item') expect(ITEMS[quest.reward.itemId], quest.id).toBeDefined();
     }
-    expect([...zoneFrequency.values()]).toEqual(ZONES.map(() => 1));
+    expect([...zoneFrequency.values()].every((count) => count >= 1)).toBe(true);
+    expect(zoneFrequency.get('eastbrook_vale')).toBe(2);
   });
 
   it('places both minigame activators on safe, walkable ground outside hostile aggro', () => {
@@ -604,8 +619,47 @@ describe('world quest lifecycle', () => {
     const thirdIds = activeWorldQuestsForCycle(worldQuestCycleForResetDay('2026-09-06')).map(
       (quest) => quest.id,
     );
-    const allRotatedIds = [...firstIds, ...nextIds, ...thirdIds];
-    expect(allRotatedIds).toHaveLength(WORLD_QUESTS.length);
+    const fourthIds = activeWorldQuestsForCycle(worldQuestCycleForResetDay('2026-09-09')).map(
+      (quest) => quest.id,
+    );
+    const fifthIds = activeWorldQuestsForCycle(worldQuestCycleForResetDay('2026-09-12')).map(
+      (quest) => quest.id,
+    );
+    const sixthIds = activeWorldQuestsForCycle(worldQuestCycleForResetDay('2026-09-15')).map(
+      (quest) => quest.id,
+    );
+    expect(firstIds).toEqual([
+      'wq_eastbrook_bandits',
+      'wq_mirefen_gravecallers',
+      'wq_palmreach_confections',
+      'wq_evergarden_watch',
+      'wq_galecrest_wisps',
+    ]);
+    expect(nextIds).toEqual([
+      'wq_thornpeak_stormcrag',
+      'wq_hollow_sporelings',
+      'wq_drakelands_brood',
+      'wq_frostveil_howlers',
+      'wq_amberfall_lurkers',
+    ]);
+    expect(thirdIds).toEqual([
+      'wq_willowfen_ore',
+      'wq_nightbloom_barrow',
+      'wq_wraithwood_restless',
+      'wq_farshore_salvage',
+      'wq_proving_shore_scuttlers',
+    ]);
+    expect(fourthIds).toEqual(['wq_eastbrook_caravan', ...firstIds.slice(1)]);
+    expect(fifthIds).toEqual([...nextIds.slice(0, 3), 'wq_frostveil_caravan', nextIds[4]]);
+    expect(sixthIds).toEqual(['wq_willowfen_caravan', ...thirdIds.slice(1)]);
+    const allRotatedIds = [
+      ...firstIds,
+      ...nextIds,
+      ...thirdIds,
+      ...fourthIds,
+      ...fifthIds,
+      ...sixthIds,
+    ];
     expect(new Set(allRotatedIds)).toEqual(new Set(WORLD_QUESTS.map((quest) => quest.id)));
   });
 

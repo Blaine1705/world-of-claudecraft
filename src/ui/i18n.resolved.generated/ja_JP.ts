@@ -9729,6 +9729,7 @@ export const ja_JP: EnTranslations = {
       "redirectLeyBeam": "レイビームを目的地へ導く",
       "matchConfections": "魔法のお菓子を揃える",
       "loadFreight": "荷物を荷馬車に積み込む",
+      "escortCaravan": "{zone}の隊商を護衛する",
       "salvageWreckage": "難破船の残骸を回収",
       "puzzleTitle": "レイビームの調整",
       "puzzleLevel": "週間レベル {level}",
@@ -9740,8 +9741,8 @@ export const ja_JP: EnTranslations = {
       "puzzleClose": "レイビームパズルを閉じる",
       "puzzleSource": "始点",
       "puzzleTarget": "目的地",
-      "puzzleSourceEndpoint": "Source: {direction}.",
-      "puzzleTargetEndpoint": "Destination: {direction}.",
+      "puzzleSourceEndpoint": "始点: {direction}。",
+      "puzzleTargetEndpoint": "目的地: {direction}。",
       "puzzleTileAria": "{rotation} {connectors} {power} {source} {target}",
       "match3Title": "お菓子の連鎖",
       "match3Instructions": "隣り合うお菓子を2つ選んでください。3つ以上の列ができる入れ替えだけが手数に数えられます。",
@@ -14782,6 +14783,15 @@ export const ja_JP: EnTranslations = {
       },
       "vale_bandit": {
         "name": "谷の盗賊"
+      },
+      "eastbrook_freight_caravan": {
+        "name": "イーストブルック貨物隊"
+      },
+      "willowfen_remedy_caravan": {
+        "name": "ウィローフェン薬品隊商"
+      },
+      "frostveil_supply_caravan": {
+        "name": "フロストヴェイル補給隊商"
       },
       "restless_bones": {
         "name": "安らがぬ骨"

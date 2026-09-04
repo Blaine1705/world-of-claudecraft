@@ -167,6 +167,14 @@ function resetCycleIfNeeded(ctx: SimContext, meta: PlayerMeta, resolvedCycle?: s
   meta.wireRev++;
 }
 
+/** Whether this character may start the authored escort in its already
+ * reconciled current rotation. The player tick owns cycle rollover. */
+export function hasActiveWorldQuest(meta: PlayerMeta, questId: string): boolean {
+  const progress = meta.worldQuestLog.get(questId);
+  if (progress?.state !== 'active') return false;
+  return activeWorldQuestsForCycle(meta.worldQuestCycle).some((quest) => quest.id === questId);
+}
+
 /** Starts every eligible objective whose area the living player enters. */
 export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Entity): void {
   if (player.level < WORLD_QUEST_MIN_LEVEL) return;
@@ -304,6 +312,35 @@ function creditWorldQuest(
   meta.unlockedMilestones.add(claimToken(meta.worldQuestCycle, quest.id));
   awardWorldQuest(ctx, meta, quest);
   ctx.emit({ type: 'worldQuestDone', questId: quest.id, pid: meta.entityId });
+}
+
+/** Complete one escort objective for a nearby eligible participant. The
+ * escort engine owns proximity; this seam revalidates rotation, objective id,
+ * and authored area before awarding the public-event reward. */
+export function completeWorldQuestEscort(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  questId: string,
+  escortId: string,
+  escortee: Entity,
+): void {
+  resetCycleIfNeeded(ctx, meta);
+  if (!hasActiveWorldQuest(meta, questId)) return;
+  const player = ctx.entities.get(meta.entityId);
+  const quest = worldQuestById(questId);
+  const progress = meta.worldQuestLog.get(questId);
+  if (
+    !player ||
+    player.dead ||
+    !quest ||
+    quest.objective.type !== 'escort' ||
+    quest.objective.escortId !== escortId ||
+    progress?.state !== 'active' ||
+    !inWorldQuestArea(player, quest) ||
+    !inWorldQuestArea(escortee, quest)
+  )
+    return;
+  creditWorldQuest(ctx, meta, quest, progress, quest.count);
 }
 
 /** Credits an eligible participant for a target killed inside the active area. */

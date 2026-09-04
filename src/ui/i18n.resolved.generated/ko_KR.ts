@@ -9729,6 +9729,7 @@ export const ko_KR: EnTranslations = {
       "redirectLeyBeam": "지맥 광선의 방향을 바꾸기",
       "matchConfections": "마법 과자 맞추기",
       "loadFreight": "화물을 마차에 싣기",
+      "escortCaravan": "{zone} 대상단 호위",
       "salvageWreckage": "난파선 잔해 회수",
       "puzzleTitle": "지맥 광선 정렬",
       "puzzleLevel": "주간 레벨 {level}",
@@ -9740,8 +9741,8 @@ export const ko_KR: EnTranslations = {
       "puzzleClose": "지맥 광선 퍼즐 닫기",
       "puzzleSource": "시작점",
       "puzzleTarget": "목적지",
-      "puzzleSourceEndpoint": "Source: {direction}.",
-      "puzzleTargetEndpoint": "Destination: {direction}.",
+      "puzzleSourceEndpoint": "시작점: {direction}.",
+      "puzzleTargetEndpoint": "목적지: {direction}.",
       "puzzleTileAria": "{rotation} {connectors} {power} {source} {target}",
       "match3Title": "과자 연쇄",
       "match3Instructions": "서로 인접한 과자 두 개를 선택하세요. 세 개 이상 한 줄을 만드는 교환만 이동으로 계산됩니다.",
@@ -14782,6 +14783,15 @@ export const ko_KR: EnTranslations = {
       },
       "vale_bandit": {
         "name": "계곡 도적"
+      },
+      "eastbrook_freight_caravan": {
+        "name": "이스트브룩 화물 대상단"
+      },
+      "willowfen_remedy_caravan": {
+        "name": "버들늪 약품 대상단"
+      },
+      "frostveil_supply_caravan": {
+        "name": "서리장막 보급 대상단"
       },
       "restless_bones": {
         "name": "불안한 뼈무더기"

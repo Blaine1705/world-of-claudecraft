@@ -9729,6 +9729,7 @@ export const tr_TR: EnTranslations = {
       "redirectLeyBeam": "Redirect the ley beam",
       "matchConfections": "Match enchanted confections",
       "loadFreight": "Load freight into the wagon",
+      "escortCaravan": "Escort the caravan: {zone}",
       "salvageWreckage": "Salvage shipwreck debris",
       "puzzleTitle": "Ley Beam Alignment",
       "puzzleLevel": "Weekly level {level}",
@@ -14782,6 +14783,15 @@ export const tr_TR: EnTranslations = {
       },
       "vale_bandit": {
         "name": "Vadi Haydudu"
+      },
+      "eastbrook_freight_caravan": {
+        "name": "Eastbrook Freight Caravan"
+      },
+      "willowfen_remedy_caravan": {
+        "name": "Willowfen Remedy Caravan"
+      },
+      "frostveil_supply_caravan": {
+        "name": "Frostveil Supply Caravan"
       },
       "restless_bones": {
         "name": "Huzursuz Kemikler"

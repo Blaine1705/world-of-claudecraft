@@ -9729,6 +9729,7 @@ export const zh_TW: EnTranslations = {
       "redirectLeyBeam": "引導魔網光束",
       "matchConfections": "配對魔法糖果",
       "loadFreight": "將貨物裝上馬車",
+      "escortCaravan": "護送{zone}商隊",
       "salvageWreckage": "回收沉船殘骸",
       "puzzleTitle": "魔網光束校準",
       "puzzleLevel": "每週關卡 {level}",
@@ -9740,8 +9741,8 @@ export const zh_TW: EnTranslations = {
       "puzzleClose": "關閉魔網光束謎題",
       "puzzleSource": "起點",
       "puzzleTarget": "終點",
-      "puzzleSourceEndpoint": "Source: {direction}.",
-      "puzzleTargetEndpoint": "Destination: {direction}.",
+      "puzzleSourceEndpoint": "起點：{direction}。",
+      "puzzleTargetEndpoint": "終點：{direction}。",
       "puzzleTileAria": "{rotation} {connectors} {power} {source} {target}",
       "match3Title": "糖果連鎖",
       "match3Instructions": "選擇兩個相鄰的糖果。只有組成三個或更多相同糖果的一排時，交換才會計入。",
@@ -14782,6 +14783,15 @@ export const zh_TW: EnTranslations = {
       },
       "vale_bandit": {
         "name": "谷地強盜"
+      },
+      "eastbrook_freight_caravan": {
+        "name": "東溪貨運商隊"
+      },
+      "willowfen_remedy_caravan": {
+        "name": "柳澤沼地藥品商隊"
+      },
+      "frostveil_supply_caravan": {
+        "name": "霜幕之境補給商隊"
       },
       "restless_bones": {
         "name": "不寧骸骨"

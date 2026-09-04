@@ -9,34 +9,58 @@ const WORLD_QUEST_CYCLE_PREFIX = 'wq3_';
 export const WORLD_QUEST_ROTATION_DAYS = 3;
 export const WORLD_QUESTS_PER_ROTATION = 5;
 
-// Keep each three-day selection geographically varied while guaranteeing that
-// all authored objectives appear once across three consecutive rotations.
-const WORLD_QUEST_ROTATION_ORDER = Object.freeze([
-  'wq_eastbrook_bandits',
-  'wq_mirefen_gravecallers',
-  'wq_palmreach_confections',
-  'wq_evergarden_watch',
-  'wq_galecrest_wisps',
-  'wq_thornpeak_stormcrag',
-  'wq_hollow_sporelings',
-  'wq_drakelands_brood',
-  'wq_frostveil_howlers',
-  'wq_amberfall_lurkers',
-  'wq_willowfen_ore',
-  'wq_nightbloom_barrow',
-  'wq_wraithwood_restless',
-  'wq_farshore_salvage',
-  'wq_proving_shore_scuttlers',
+// Preserve the three shipped rotations and their modulo-3 cadence. Cycle 3
+// replaces Eastbrook's bandit slot with its caravan. Cycles 4 and 5 offer
+// Frostveil and Willowfen caravans in their own region's slots, leaving the
+// first three rotations and the five-quest daily roster unchanged.
+const WORLD_QUEST_ROTATION_ID_GROUPS = Object.freeze([
+  Object.freeze([
+    'wq_eastbrook_bandits',
+    'wq_mirefen_gravecallers',
+    'wq_palmreach_confections',
+    'wq_evergarden_watch',
+    'wq_galecrest_wisps',
+  ]),
+  Object.freeze([
+    'wq_thornpeak_stormcrag',
+    'wq_hollow_sporelings',
+    'wq_drakelands_brood',
+    'wq_frostveil_howlers',
+    'wq_amberfall_lurkers',
+  ]),
+  Object.freeze([
+    'wq_willowfen_ore',
+    'wq_nightbloom_barrow',
+    'wq_wraithwood_restless',
+    'wq_farshore_salvage',
+    'wq_proving_shore_scuttlers',
+  ]),
+  Object.freeze([
+    'wq_eastbrook_caravan',
+    'wq_mirefen_gravecallers',
+    'wq_palmreach_confections',
+    'wq_evergarden_watch',
+    'wq_galecrest_wisps',
+  ]),
+  Object.freeze([
+    'wq_thornpeak_stormcrag',
+    'wq_hollow_sporelings',
+    'wq_drakelands_brood',
+    'wq_frostveil_caravan',
+    'wq_amberfall_lurkers',
+  ]),
+  Object.freeze([
+    'wq_willowfen_caravan',
+    'wq_nightbloom_barrow',
+    'wq_wraithwood_restless',
+    'wq_farshore_salvage',
+    'wq_proving_shore_scuttlers',
+  ]),
 ] as const);
 
 const WORLD_QUEST_ROTATIONS: readonly (readonly WorldQuestDef[])[] = Object.freeze(
-  [0, 1, 2].map((group) =>
-    Object.freeze(
-      WORLD_QUEST_ROTATION_ORDER.slice(
-        group * WORLD_QUESTS_PER_ROTATION,
-        (group + 1) * WORLD_QUESTS_PER_ROTATION,
-      ).map((id) => WORLD_QUESTS_BY_ID[id]),
-    ),
+  WORLD_QUEST_ROTATION_ID_GROUPS.map((ids) =>
+    Object.freeze(ids.map((id) => WORLD_QUESTS_BY_ID[id])),
   ),
 );
 

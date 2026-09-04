@@ -27,6 +27,8 @@ import type {
 
 export type { FishingEntry } from './content/items';
 export {
+  EASTBROOK_FREIGHT_CARAVAN_ESCORT_ID,
+  EASTBROOK_FREIGHT_CARAVAN_MOB_ID,
   WORLD_QUEST_MIN_LEVEL,
   WORLD_QUESTS,
   WORLD_QUESTS_BY_ID,
@@ -238,7 +240,12 @@ import {
   WILLOWFEN_ROADS,
   WILLOWFEN_ZONE,
 } from './content/willowfen';
-import { WORLD_QUEST_ITEMS, WORLD_QUEST_OBJECTS } from './content/world_quests';
+import {
+  WORLD_QUEST_ESCORTS,
+  WORLD_QUEST_ITEMS,
+  WORLD_QUEST_MOBS,
+  WORLD_QUEST_OBJECTS,
+} from './content/world_quests';
 import {
   WRAITHWOOD_CAMPS,
   WRAITHWOOD_ESCORTS,
@@ -422,6 +429,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...GALECREST_MOBS,
   ...FARSHORE_MOBS,
   ...PROVING_SHORE_MOBS,
+  ...WORLD_QUEST_MOBS,
 };
 
 // Heroic upgraded drop variants: generated from the base item + mob loot tables and
@@ -576,6 +584,7 @@ export const ESCORTS: Record<string, EscortDef> = {
   ...WRAITHWOOD_ESCORTS,
   ...PALMREACH_ESCORTS,
   ...FARSHORE_ESCORTS,
+  ...WORLD_QUEST_ESCORTS,
 };
 
 export const GROUND_OBJECTS: GroundObjectDef[] = [

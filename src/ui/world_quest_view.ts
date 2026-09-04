@@ -23,6 +23,9 @@ export function worldQuestObjectiveLabel(questId: string): string {
   const quest = worldQuestDef(questId);
   if (!quest) return t('questUi.worldQuest.unknown', { id: questId });
   if (quest.objective.type === 'kill') return mobDisplayName(quest.objective.targetMobId);
+  if (quest.objective.type === 'escort') {
+    return t('questUi.worldQuest.escortCaravan', { zone: zoneDisplayName(quest.zoneId) });
+  }
   if (quest.objective.type === 'gather') return t('questUi.worldQuest.mineOre');
   if (quest.objective.type === 'puzzle') return t('questUi.worldQuest.redirectLeyBeam');
   if (quest.objective.type === 'match3') return t('questUi.worldQuest.matchConfections');

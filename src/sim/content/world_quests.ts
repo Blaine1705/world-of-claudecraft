@@ -1,6 +1,234 @@
-import type { GroundObjectDef, ItemDef, WorldQuestBeamPuzzleDef, WorldQuestDef } from '../types';
+import type {
+  EscortDef,
+  GroundObjectDef,
+  ItemDef,
+  MobTemplate,
+  WorldQuestBeamPuzzleDef,
+  WorldQuestDef,
+} from '../types';
 
 export const WORLD_QUEST_MIN_LEVEL = 10;
+
+export const EASTBROOK_FREIGHT_CARAVAN_MOB_ID = 'eastbrook_freight_caravan';
+export const EASTBROOK_FREIGHT_CARAVAN_ESCORT_ID = 'esc_wq_eastbrook_caravan';
+export const WILLOWFEN_REMEDY_CARAVAN_MOB_ID = 'willowfen_remedy_caravan';
+export const WILLOWFEN_REMEDY_CARAVAN_ESCORT_ID = 'esc_wq_willowfen_caravan';
+export const FROSTVEIL_SUPPLY_CARAVAN_MOB_ID = 'frostveil_supply_caravan';
+export const FROSTVEIL_SUPPLY_CARAVAN_ESCORT_ID = 'esc_wq_frostveil_caravan';
+
+export const WORLD_QUEST_MOBS: Record<string, MobTemplate> = {
+  [EASTBROOK_FREIGHT_CARAVAN_MOB_ID]: {
+    id: EASTBROOK_FREIGHT_CARAVAN_MOB_ID,
+    name: 'Eastbrook Freight Caravan',
+    minLevel: WORLD_QUEST_MIN_LEVEL,
+    maxLevel: 20,
+    family: 'humanoid',
+    hpBase: 650,
+    hpPerLevel: 45,
+    dmgBase: 1,
+    dmgPerLevel: 0,
+    attackSpeed: 2,
+    armorPerLevel: 25,
+    moveSpeed: 0,
+    aggroRadius: 0,
+    loot: [],
+    scale: 1,
+    color: 0x8b5a2b,
+  },
+  [WILLOWFEN_REMEDY_CARAVAN_MOB_ID]: {
+    id: WILLOWFEN_REMEDY_CARAVAN_MOB_ID,
+    name: 'Willowfen Remedy Caravan',
+    minLevel: WORLD_QUEST_MIN_LEVEL,
+    maxLevel: 20,
+    family: 'humanoid',
+    hpBase: 650,
+    hpPerLevel: 45,
+    dmgBase: 1,
+    dmgPerLevel: 0,
+    attackSpeed: 2,
+    armorPerLevel: 25,
+    moveSpeed: 0,
+    aggroRadius: 0,
+    loot: [],
+    scale: 1,
+    color: 0x718957,
+  },
+  [FROSTVEIL_SUPPLY_CARAVAN_MOB_ID]: {
+    id: FROSTVEIL_SUPPLY_CARAVAN_MOB_ID,
+    name: 'Frostveil Supply Caravan',
+    minLevel: WORLD_QUEST_MIN_LEVEL,
+    maxLevel: 20,
+    family: 'humanoid',
+    hpBase: 650,
+    hpPerLevel: 45,
+    dmgBase: 1,
+    dmgPerLevel: 0,
+    attackSpeed: 2,
+    armorPerLevel: 25,
+    moveSpeed: 0,
+    aggroRadius: 0,
+    loot: [],
+    scale: 1,
+    color: 0x7a91a6,
+  },
+};
+
+/** Public-event route from Eastbrook's quay to its market, following the
+ * authored quay walk and main street exactly. The existing escort engine owns
+ * movement, wave pauses, shared completion credit, death, and respawn. */
+export const WORLD_QUEST_ESCORTS: Record<string, EscortDef> = {
+  [EASTBROOK_FREIGHT_CARAVAN_ESCORT_ID]: {
+    id: EASTBROOK_FREIGHT_CARAVAN_ESCORT_ID,
+    npcMobId: EASTBROOK_FREIGHT_CARAVAN_MOB_ID,
+    worldQuestId: 'wq_eastbrook_caravan',
+    start: { x: -92, z: -32 },
+    waypoints: [
+      { x: -92, z: -46 },
+      { x: -92, z: -56 },
+      { x: -88, z: -60 },
+      { x: -80, z: -66 },
+      { x: -70, z: -68 },
+      { x: -62, z: -76 },
+      { x: -56, z: -88 },
+      { x: -44, z: -98 },
+      { x: -26, z: -101 },
+      { x: -20, z: -102 },
+    ],
+    moveSpeed: 4,
+    ambushes: [
+      { atWaypoint: 2, mobId: 'vale_bandit', count: 3, level: 10, radius: 6 },
+      { atWaypoint: 5, mobId: 'vale_bandit', count: 4, level: 10, radius: 7 },
+      { atWaypoint: 8, mobId: 'vale_bandit', count: 5, level: 10, radius: 8 },
+    ],
+    creditRadius: 35,
+    respawnSeconds: 30,
+    startText: "I'm Tobin. This is my old friend Bram's last delivery. Stay close.",
+    successText: 'We made it, Bram. Your toys are home. Thank you for helping me keep my promise.',
+    failText: 'The caravan is lost!',
+    story: {
+      speaker: 'Tobin',
+      lineSpacingSeconds: 7,
+      ambushText: 'Hands off that chest! Cover the horses!',
+      lines: [
+        {
+          atWaypoint: 0,
+          text: 'Bram vanished on the north road. His last letter asked me to bring this chest to the market.',
+        },
+        {
+          atWaypoint: 3,
+          text: "The bandits heard 'precious cargo'. Bram never owned anything worth stealing.",
+        },
+        {
+          atWaypoint: 6,
+          text: "Inside? Wooden horses and patched dolls. He repaired them for Eastbrook's children.",
+        },
+      ],
+    },
+  },
+  [WILLOWFEN_REMEDY_CARAVAN_ESCORT_ID]: {
+    id: WILLOWFEN_REMEDY_CARAVAN_ESCORT_ID,
+    npcMobId: WILLOWFEN_REMEDY_CARAVAN_MOB_ID,
+    worldQuestId: 'wq_willowfen_caravan',
+    // Willowweep's dry shore, around the western moat, then over the only
+    // Fenway crossing. Intermediate points stay on WILLOWFEN_ROADS.
+    start: { x: -412, z: 442 },
+    waypoints: [
+      { x: -414, z: 424 },
+      { x: -416, z: 406 },
+      { x: -417, z: 384 },
+      { x: -418, z: 362 },
+      { x: -411, z: 338 },
+      { x: -404, z: 314 },
+      { x: -393, z: 316 },
+      { x: -360, z: 322 },
+      { x: -360, z: 338 },
+      { x: -360, z: 350 },
+    ],
+    moveSpeed: 4,
+    ambushes: [
+      { atWaypoint: 1, mobId: 'bogtoad', count: 3, level: 10, radius: 6 },
+      { atWaypoint: 3, mobId: 'willow_sprite', count: 4, level: 10, radius: 7 },
+      { atWaypoint: 6, mobId: 'bogtoad', count: 5, level: 10, radius: 6 },
+    ],
+    creditRadius: 35,
+    respawnSeconds: 30,
+    startText: "I'm Mira. These remedies must reach Bridgemere. Walk with me?",
+    successText:
+      'Safe at the bridge. Tonight, someone in Bridgemere will sleep without a fever. Thank you.',
+    failText: 'The remedy caravan is lost!',
+    story: {
+      speaker: 'Mira',
+      lineSpacingSeconds: 7,
+      ambushText: 'Keep them away from the medicine! I cannot replace those bottles!',
+      lines: [
+        {
+          atWaypoint: 0,
+          text: 'Mother Sedge taught me this remedy. The first patient she saved was the bridgewright who called her a witch.',
+        },
+        {
+          atWaypoint: 3,
+          text: 'He offered her gold. She asked him to mend the Fenway so nobody would face the marsh alone.',
+        },
+        {
+          atWaypoint: 7,
+          text: 'That is why I make this trip. A sound bridge and a little kindness can carry a whole town.',
+        },
+      ],
+    },
+  },
+  [FROSTVEIL_SUPPLY_CARAVAN_ESCORT_ID]: {
+    id: FROSTVEIL_SUPPLY_CARAVAN_ESCORT_ID,
+    npcMobId: FROSTVEIL_SUPPLY_CARAVAN_MOB_ID,
+    worldQuestId: 'wq_frostveil_caravan',
+    // Icemantle to the Aurora Steps, following FROSTVEIL_ROADS around the
+    // Glacier Tarn's western shore instead of cutting across its frozen lake.
+    start: { x: -12, z: 1578 },
+    waypoints: [
+      { x: -5, z: 1585 },
+      { x: 10, z: 1600 },
+      { x: 26, z: 1613 },
+      { x: 42, z: 1626 },
+      { x: 35, z: 1644 },
+      { x: 28, z: 1662 },
+      { x: 34, z: 1681 },
+      { x: 40, z: 1700 },
+      { x: 35, z: 1720 },
+      { x: 30, z: 1740 },
+    ],
+    moveSpeed: 4,
+    ambushes: [
+      { atWaypoint: 1, mobId: 'snowdrift_wolf', count: 3, level: 10, radius: 6 },
+      { atWaypoint: 5, mobId: 'rime_elemental', count: 4, level: 10, radius: 7 },
+      { atWaypoint: 8, mobId: 'terrace_howler', count: 5, level: 10, radius: 8 },
+    ],
+    creditRadius: 35,
+    respawnSeconds: 30,
+    startText:
+      'Orin, at your service. Blankets and lamp oil for the Aurora Steps. Keep an eye on the snow.',
+    successText:
+      'Supplies delivered. Keep that lantern burning, friends. Nobody gets left in the snow.',
+    failText: 'The supply caravan is lost!',
+    story: {
+      speaker: 'Orin',
+      lineSpacingSeconds: 7,
+      ambushText: 'Wolves or worse! Form up by the wagon and protect the horses!',
+      lines: [
+        {
+          atWaypoint: 0,
+          text: 'My first winter patrol vanished here in a whiteout. I thought the mountain had swallowed every road.',
+        },
+        {
+          atWaypoint: 3,
+          text: 'A lantern appeared through the snow. A young scout had tied herself to a post and come looking for us.',
+        },
+        {
+          atWaypoint: 6,
+          text: 'I never learned her name. Every winter I bring oil to the Steps, so the next patrol sees that same light.',
+        },
+      ],
+    },
+  },
+};
 
 export const FARSHORE_SALVAGE_OBJECT_ITEM_ID = 'wreckfield_flotsam_crate';
 export const FARSHORE_SALVAGE_ENTITY_ID_START = 2_147_100_100;
@@ -247,6 +475,17 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     reward: { type: 'xp', rate: 0.12 },
   },
   {
+    id: 'wq_eastbrook_caravan',
+    zoneId: 'eastbrook_vale',
+    minLevel: WORLD_QUEST_MIN_LEVEL,
+    // Marker sits on the waiting caravan at the quay; the radius covers its
+    // full road to the market so completion remains area-authoritative.
+    area: { x: -92, z: -32, radius: 110 },
+    objective: { type: 'escort', escortId: EASTBROOK_FREIGHT_CARAVAN_ESCORT_ID },
+    count: 1,
+    reward: { type: 'copper', base: 2_500, perLevel: 175 },
+  },
+  {
     id: 'wq_mirefen_gravecallers',
     zoneId: 'mirefen_marsh',
     minLevel: WORLD_QUEST_MIN_LEVEL,
@@ -308,6 +547,24 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     objective: { type: 'gather', nodeType: 'ore' },
     count: 3,
     reward: { type: 'xp', rate: 0.12 },
+  },
+  {
+    id: 'wq_willowfen_caravan',
+    zoneId: 'willowfen',
+    minLevel: WORLD_QUEST_MIN_LEVEL,
+    area: { x: -412, z: 442, radius: 145 },
+    objective: { type: 'escort', escortId: WILLOWFEN_REMEDY_CARAVAN_ESCORT_ID },
+    count: 1,
+    reward: { type: 'copper', base: 2_500, perLevel: 175 },
+  },
+  {
+    id: 'wq_frostveil_caravan',
+    zoneId: 'frostveil',
+    minLevel: WORLD_QUEST_MIN_LEVEL,
+    area: { x: -12, z: 1578, radius: 190 },
+    objective: { type: 'escort', escortId: FROSTVEIL_SUPPLY_CARAVAN_ESCORT_ID },
+    count: 1,
+    reward: { type: 'copper', base: 2_500, perLevel: 175 },
   },
   {
     id: 'wq_nightbloom_barrow',

@@ -9729,6 +9729,7 @@ export const ru_RU: EnTranslations = {
       "redirectLeyBeam": "Направить силовой луч",
       "matchConfections": "Собрать зачарованные сладости",
       "loadFreight": "Загрузить груз в повозку",
+      "escortCaravan": "Сопроводить караван: {zone}",
       "salvageWreckage": "Собрать обломки кораблекрушения",
       "puzzleTitle": "Настройка силового луча",
       "puzzleLevel": "Еженедельный уровень {level}",
@@ -9740,8 +9741,8 @@ export const ru_RU: EnTranslations = {
       "puzzleClose": "Закрыть головоломку с лучом",
       "puzzleSource": "Источник",
       "puzzleTarget": "Цель",
-      "puzzleSourceEndpoint": "Source: {direction}.",
-      "puzzleTargetEndpoint": "Destination: {direction}.",
+      "puzzleSourceEndpoint": "Источник: {direction}.",
+      "puzzleTargetEndpoint": "Цель: {direction}.",
       "puzzleTileAria": "{rotation} {connectors} {power} {source} {target}",
       "match3Title": "Каскад сладостей",
       "match3Instructions": "Выберите две соседние сладости. Ход засчитывается, только если обмен создаёт ряд из трёх или более.",
@@ -14782,6 +14783,15 @@ export const ru_RU: EnTranslations = {
       },
       "vale_bandit": {
         "name": "Долинный бандит"
+      },
+      "eastbrook_freight_caravan": {
+        "name": "Грузовой караван Истврука"
+      },
+      "willowfen_remedy_caravan": {
+        "name": "Караван лекарств Ивовой Топи"
+      },
+      "frostveil_supply_caravan": {
+        "name": "Караван припасов Морозного Предела"
       },
       "restless_bones": {
         "name": "Беспокойные кости"

@@ -46,5 +46,14 @@ describe('world quest view', () => {
       'Match enchanted confections',
     );
     expect(worldQuestObjectiveLabel('wq_farshore_salvage')).toBe('Salvage shipwreck debris');
+    expect(worldQuestObjectiveLabel('wq_eastbrook_caravan')).toBe(
+      'Escort the caravan: Eastbrook Vale',
+    );
+    expect(worldQuestObjectiveLabel('wq_willowfen_caravan')).toBe(
+      'Escort the caravan: The Willowfen',
+    );
+    expect(worldQuestObjectiveLabel('wq_frostveil_caravan')).toBe(
+      'Escort the caravan: The Frostveil Reach',
+    );
   });
 });

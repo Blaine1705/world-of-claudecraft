@@ -183,11 +183,13 @@ export type {
 // carried-cargo aura. Older clients cannot render or predict its movement state.
 // 30 = World Quests add personal rotating shipwreck-salvage props. Older clients
 // cannot gate, render, or select their stable object ids without leaking normal quest credit.
+// 31 = World Quests add a moving, interactable public caravan escort. Older clients
+// cannot identify its objective or render and start the authoritative escort entity.
 // (12 is deliberately unassigned: 13 through 25 were numbered 11 through 23 on
 // the pre-merge raid branch, which forked before the Bank Storage and Materials
 // Vault bumps above; that branch's 11 through 20 were in turn 9 through 18
 // before the Eastbrook program bumps.)
-export const ONLINE_WORLD_LAYOUT_VERSION = 30 as const;
+export const ONLINE_WORLD_LAYOUT_VERSION = 31 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI

@@ -27,6 +27,7 @@ import {
 } from './i18n';
 import { ARENA_NEW, BASE_NEW, ITEM_NEW, PET_NEW, QUEST_NEW, RAID_NEW } from './sim_i18n.newlocales';
 import { localizeTalentTitle } from './talent_i18n';
+import { localizeWorldQuestFreightYell, worldQuestFreightSpeakerName } from './world_quest_freight_i18n';
 
 const baseEnTable = {
   'log.deathwardSaves': 'A deathward saves you!',
@@ -13167,7 +13168,7 @@ export function localizeAuthoredYellText(
   classId?: PlayerClass,
 ): string {
   if (speakerKind === 'player' || classId !== undefined) return text;
-  return localizeSimText(text) ?? text;
+  return localizeWorldQuestFreightYell(text, getLanguage()) ?? localizeSimText(text) ?? text;
 }
 
 export function localizeAuthoredYellSpeakerName(
@@ -13177,6 +13178,8 @@ export function localizeAuthoredYellSpeakerName(
   classId?: PlayerClass,
 ): string {
   if (speakerKind === 'player' || classId !== undefined) return name;
+  const freightSpeaker = worldQuestFreightSpeakerName(name, speakerKind, templateId);
+  if (freightSpeaker !== null) return freightSpeaker;
   if (templateId && (speakerKind === 'mob' || speakerKind === 'npc')) {
     return tEntity({ kind: speakerKind, id: templateId, field: 'name' });
   }

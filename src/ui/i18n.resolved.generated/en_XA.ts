@@ -9729,6 +9729,7 @@ export const en_XA: EnTranslations = {
       "redirectLeyBeam": "[Ŕéðíŕéçţ ţĥé ļéý ƀéáɱ]",
       "matchConfections": "[Ɱáţçĥ éñçĥáñţéð çóñƒéçţíóñš]",
       "loadFreight": "[Ļóáð ƒŕéíĝĥţ íñţó ţĥé ŵáĝóñ]",
+      "escortCaravan": "[Éšçóŕţ ţĥé çáŕáʋáñ: {zone}]",
       "salvageWreckage": "[Šáļʋáĝé šĥíþŵŕéçķ ðéƀŕíš]",
       "puzzleTitle": "[Ļéý Ɓéáɱ Áļíĝñɱéñţ]",
       "puzzleLevel": "[Ŵééķļý ļéʋéļ {level}]",
@@ -14782,6 +14783,15 @@ export const en_XA: EnTranslations = {
       },
       "vale_bandit": {
         "name": "[Ʋáļé Ɓáñðíţ]"
+      },
+      "eastbrook_freight_caravan": {
+        "name": "[Éášţƀŕóóķ Ƒŕéíĝĥţ Çáŕáʋáñ]"
+      },
+      "willowfen_remedy_caravan": {
+        "name": "[Ŵíļļóŵƒéñ Ŕéɱéðý Çáŕáʋáñ]"
+      },
+      "frostveil_supply_caravan": {
+        "name": "[Ƒŕóšţʋéíļ Šúþþļý Çáŕáʋáñ]"
       },
       "restless_bones": {
         "name": "[Ŕéšţļéšš Ɓóñéš]"

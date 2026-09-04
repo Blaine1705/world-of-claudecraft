@@ -357,7 +357,7 @@ interface AttributionTargetFixture {
 // Re-minted after integrating the world-quests renderer with the current
 // release/v0.42.0 renderer. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'a82a974dc32f32ca10e91c1404680161ba2e0f3b0ea6083ac9c9955ef65fad91';
+  'f7dcf9b7ba79dff5a6faf12d1c13ed59c08c8d1f4b65f23ae22c3e7d65b6eb31';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

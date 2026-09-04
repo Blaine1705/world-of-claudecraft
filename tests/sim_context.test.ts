@@ -256,6 +256,8 @@ const CALLBACK_KEYS = [
   'onNodeGatheredForWorldQuests',
   'onObjectInteractedForWorldQuests',
   'currentWorldQuestRotation',
+  'hasActiveWorldQuest',
+  'completeWorldQuestEscort',
 ] as const;
 
 // A fully-spied fake host. `clock` is mutable so a test can prove the context reads
@@ -427,6 +429,8 @@ function makeFakeHost() {
     onNodeGatheredForWorldQuests: vi.fn(),
     onObjectInteractedForWorldQuests: vi.fn(() => false),
     currentWorldQuestRotation: vi.fn(() => ({ cycle: '', quests: [] })),
+    hasActiveWorldQuest: vi.fn(() => false),
+    completeWorldQuestEscort: vi.fn(),
     onInventoryChangedForQuests: vi.fn(),
     checkQuestReady: vi.fn(),
     countItem: vi.fn(() => 0),
