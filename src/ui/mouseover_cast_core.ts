@@ -28,8 +28,11 @@ export interface MouseoverCastInputs {
   enabled: boolean;
   /** Whether this client currently holds the entity (in interest scope). */
   hasEntity: (pid: number) => boolean;
-  /** The local player's party/raid roster (pids, self included; null when solo). */
-  partyMemberPids: readonly number[] | null;
+  /** The local player's party/raid roster (pids, self included; null when solo).
+   *  A callback, and read ONLY when the entity is out of scope: the offline Sim
+   *  rebuilds its whole party model (aura + aggro sweeps) on every partyInfo read,
+   *  and this runs on every ability press. */
+  partyMemberPids: () => readonly number[] | null;
 }
 
 /**
@@ -48,5 +51,5 @@ export function mouseoverCastTargetPid(
   if (hoveredPid === null || !inputs.enabled) return null;
   if (!ability?.requiresTarget || ability.targetType !== 'friendly') return null;
   if (inputs.hasEntity(hoveredPid)) return hoveredPid;
-  return inputs.partyMemberPids?.includes(hoveredPid) ? hoveredPid : null;
+  return inputs.partyMemberPids()?.includes(hoveredPid) ? hoveredPid : null;
 }

@@ -26,7 +26,7 @@ describe('mouseoverCastTargetPid', () => {
       mouseoverCastTargetPid(7, HEAL, {
         enabled: true,
         hasEntity: simLikeEntities([1, 7]),
-        partyMemberPids: [1, 7],
+        partyMemberPids: () => [1, 7],
       }),
     ).toBe(7);
   });
@@ -38,7 +38,7 @@ describe('mouseoverCastTargetPid', () => {
       mouseoverCastTargetPid(7, RES, {
         enabled: true,
         hasEntity: () => false,
-        partyMemberPids: [1, 7],
+        partyMemberPids: () => [1, 7],
       }),
     ).toBe(7);
     // Same inputs on the Sim-shaped host (entity present) resolve to the same pid.
@@ -46,7 +46,7 @@ describe('mouseoverCastTargetPid', () => {
       mouseoverCastTargetPid(7, RES, {
         enabled: true,
         hasEntity: simLikeEntities([1, 7]),
-        partyMemberPids: [1, 7],
+        partyMemberPids: () => [1, 7],
       }),
     ).toBe(7);
   });
@@ -59,14 +59,14 @@ describe('mouseoverCastTargetPid', () => {
       mouseoverCastTargetPid(7, HEAL, {
         enabled: true,
         hasEntity: () => false,
-        partyMemberPids: [1, 2],
+        partyMemberPids: () => [1, 2],
       }),
     ).toBeNull();
     expect(
       mouseoverCastTargetPid(7, HEAL, {
         enabled: true,
         hasEntity: () => false,
-        partyMemberPids: null,
+        partyMemberPids: () => null,
       }),
     ).toBeNull();
   });
@@ -75,13 +75,43 @@ describe('mouseoverCastTargetPid', () => {
     const inScope = {
       enabled: true,
       hasEntity: simLikeEntities([7]),
-      partyMemberPids: [1, 7],
+      partyMemberPids: () => [1, 7],
     };
     expect(mouseoverCastTargetPid(7, BOLT, inScope)).toBeNull();
     expect(mouseoverCastTargetPid(7, ABILITIES.collective_reversal, inScope)).toBeNull();
     expect(mouseoverCastTargetPid(7, undefined, inScope)).toBeNull();
     expect(mouseoverCastTargetPid(null, HEAL, inScope)).toBeNull();
     expect(mouseoverCastTargetPid(7, HEAL, { ...inScope, enabled: false })).toBeNull();
+  });
+
+  it('reads the roster only when the entity is out of scope', () => {
+    // The offline Sim rebuilds its whole party model on every partyInfo read
+    // (aura + aggro sweeps over the world), and this runs on every ability press:
+    // the in-scope answer must never pay for it.
+    let rosterReads = 0;
+    const roster = () => {
+      rosterReads++;
+      return [1, 7];
+    };
+    expect(
+      mouseoverCastTargetPid(7, HEAL, {
+        enabled: true,
+        hasEntity: simLikeEntities([7]),
+        partyMemberPids: roster,
+      }),
+    ).toBe(7);
+    expect(rosterReads).toBe(0);
+    // No hover at all: neither callback is consulted.
+    expect(
+      mouseoverCastTargetPid(null, HEAL, {
+        enabled: true,
+        hasEntity: () => {
+          throw new Error('entity lookup on an unhovered press');
+        },
+        partyMemberPids: roster,
+      }),
+    ).toBeNull();
+    expect(rosterReads).toBe(0);
   });
 
   it('keeps the two resurrections on the friendly-targeted path the redirect covers', () => {
@@ -96,7 +126,7 @@ describe('mouseoverCastTargetPid', () => {
         mouseoverCastTargetPid(7, ability, {
           enabled: true,
           hasEntity: () => false,
-          partyMemberPids: [1, 7],
+          partyMemberPids: () => [1, 7],
         }),
       ).toBe(7);
     }

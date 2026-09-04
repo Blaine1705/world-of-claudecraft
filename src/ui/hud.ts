@@ -7499,7 +7499,7 @@ export class Hud {
           const mouseoverPid = mouseoverCastTargetPid(this.hoveredPartyPid, resolved.def, {
             enabled: this.optionsHooks?.settings.get('mouseoverCast') ?? true,
             hasEntity: (pid) => this.sim.entities.has(pid),
-            partyMemberPids: localPartyMemberIds(this.sim.partyInfo),
+            partyMemberPids: () => localPartyMemberIds(this.sim.partyInfo),
           });
           if (mouseoverPid !== null) {
             this.sim.castAbilityOn(action.id, mouseoverPid);
