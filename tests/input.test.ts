@@ -43,6 +43,7 @@ function makeInput(userAgent?: string) {
   // The optional "Unlock interface" arrange-mode gate: while true, no camera
   // drag / mouselook / click-pick may start. False unless a test flips it.
   let cameraLocked = false;
+  let cameraMotionLocked = false;
   const canvas = {
     style: { cursor: '' },
     addEventListener: vi.fn((type: string, cb: (event: any) => void) => {
@@ -90,6 +91,7 @@ function makeInput(userAgent?: string) {
     onAttackMove: vi.fn(),
     canUseGameKeys: () => gameKeysAllowed,
     isCameraLocked: () => cameraLocked,
+    isCameraMotionLocked: () => cameraMotionLocked,
   };
   const input = new Input(canvas as any, cb, new Keybinds());
   return {
@@ -99,6 +101,9 @@ function makeInput(userAgent?: string) {
     documentListeners,
     cb,
     input,
+    setCameraMotionLocked: (locked: boolean) => {
+      cameraMotionLocked = locked;
+    },
     setGameActive: (active: boolean) => {
       gameActive = active;
     },
@@ -124,6 +129,32 @@ afterEach(() => {
 });
 
 describe('Input camera zoom', () => {
+  it('vehicle orbit lock freezes all look controls without consuming ground-aim clicks', () => {
+    const { input, canvas, canvasListeners, windowListeners, cb, setCameraMotionLocked } =
+      makeInput();
+    const original = { yaw: input.camYaw, pitch: input.camPitch, dist: input.camDist };
+    setCameraMotionLocked(true);
+    input.zoomBy(4);
+    input.applyTouchLookDelta(100, 100);
+    input.applyGamepadLook(1, 1);
+    input.recenterCameraBehind(2);
+    const event = {
+      target: canvas,
+      clientX: 400,
+      clientY: 300,
+      button: 0,
+      preventDefault: vi.fn(),
+    };
+    canvasListeners.get('mousedown')!(event);
+    windowListeners.get('mousemove')!({ ...event, movementX: 100, movementY: 100 });
+    windowListeners.get('mouseup')!(event);
+    expect({ yaw: input.camYaw, pitch: input.camPitch, dist: input.camDist }).toEqual(original);
+    expect(cb.onClickPick).toHaveBeenCalledWith(400, 300, 0);
+    expect(input.hoverX).toBe(400);
+    setCameraMotionLocked(false);
+    input.zoomBy(1);
+    expect(input.camDist).toBe(original.dist + 1);
+  });
   it('zooms the camera with the mouse wheel on desktop', () => {
     const { canvasListeners, input } = makeInput();
     const preventDefault = vi.fn();

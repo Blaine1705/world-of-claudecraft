@@ -29,6 +29,7 @@ import { applySurfaceDetail, wornFamilyFor } from './worn_stone';
 const TARGET_HEIGHT = 1.35;
 
 const QUEST_OBJECT_URLS: Record<string, string> = {
+  north_watch_cannon: '/models/biome/hex_cannon.glb',
   eastbrook_freight_crate: '/models/quest/supply_crate.glb',
   crypt_ritual_circle: '/models/quest/crypt_ritual_circle.glb',
   supply_crate: '/models/quest/supply_crate.glb',
@@ -61,6 +62,7 @@ const QUEST_OBJECT_URLS: Record<string, string> = {
 };
 
 const QUEST_OBJECT_HEIGHTS: Record<string, number> = {
+  north_watch_cannon: 2.4,
   // The Nythraxis soul wardstones are an active raid mechanic — make them a tall,
   // obvious glowing pillar rather than a small sigil so all three read at range.
   bastion_ward_stone: 3.4,

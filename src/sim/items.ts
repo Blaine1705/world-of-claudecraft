@@ -728,6 +728,7 @@ export function useItem(
   const { meta, e: p } = r;
   const def = ITEMS[itemId];
   // All three use branches (food/drink, potion, elixir) consume one unit, so the
+  if (meta.vehicle) return;
   // selection is honored here once instead of at each arm. Returns the consumed
   // payload because the potion branch reads it (the crafting-provenance trickle).
   //

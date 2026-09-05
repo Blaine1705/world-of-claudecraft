@@ -1,4 +1,7 @@
+import { NORTH_WATCH_CANNON } from './content/vehicle_stations';
+import { WORLD_QUEST_CALLIGRAPHY_ID } from './content/world_quest_calligraphy';
 import { WORLD_QUEST_MIN_LEVEL, WORLD_QUESTS, WORLD_QUESTS_BY_ID } from './content/world_quests';
+import { grantDeed } from './deeds';
 import { formatMoney } from './format_money';
 import {
   hasInteractObjectCredit,
@@ -41,6 +44,20 @@ import {
   isWorldQuestSalvageObject,
   isWorldQuestSalvageObjectInCurrentLayout,
 } from './world_quest_salvage';
+import {
+  sanitizeWorldQuestTraceScores,
+  scoreWorldQuestTraceLesson,
+} from './world_quest_trace_score';
+import {
+  sanitizeWorldQuestTraceVariant,
+  worldQuestTraceVariantForCycle,
+} from './world_quest_trace_variants';
+import {
+  clearWorldQuestTracing,
+  ensureWorldQuestTraceInstructors,
+  startWorldQuestTracing,
+  updateWorldQuestTracing,
+} from './world_quest_tracing';
 
 export {
   activeWorldQuestsForCycle,
@@ -91,6 +108,11 @@ export function restoreWorldQuestClaims(meta: PlayerMeta): void {
   }
   for (const claim of claims) {
     if (claim.cycle !== meta.worldQuestCycle) continue;
+    // The current save format already carries the authoritative completed
+    // progress (including minigame result fields). Claims only reconstruct a
+    // row lost by an older binary. An inconsistent active row is still
+    // replaced so the durable claim cannot be replayed for another reward.
+    if (meta.worldQuestLog.get(claim.quest.id)?.state === 'completed') continue;
     meta.worldQuestLog.set(claim.quest.id, {
       questId: claim.quest.id,
       count: claim.quest.count,
@@ -177,12 +199,16 @@ export function hasActiveWorldQuest(meta: PlayerMeta, questId: string): boolean 
 
 /** Starts every eligible objective whose area the living player enters. */
 export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Entity): void {
-  if (player.level < WORLD_QUEST_MIN_LEVEL) return;
+  if (player.level < WORLD_QUEST_MIN_LEVEL) {
+    for (const progress of meta.worldQuestLog.values()) clearWorldQuestTracing(meta, progress);
+    return;
+  }
   const rotation = ctx.currentWorldQuestRotation();
   const devCycle = meta.devWorldQuestCycle ?? null;
   const cycle = devCycle ?? rotation.cycle;
   resetCycleIfNeeded(ctx, meta, cycle);
   if (player.dead) {
+    for (const progress of meta.worldQuestLog.values()) clearWorldQuestTracing(meta, progress);
     dropWorldQuestDeliveryCargo(ctx, player);
     if (meta.openWorldQuestPuzzleId) {
       ctx.emit({
@@ -201,6 +227,8 @@ export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Ent
     const inside = inWorldQuestArea(player, quest);
     const wasInside = meta.worldQuestAreas.has(quest.id);
     if (!inside) {
+      const progress = meta.worldQuestLog.get(quest.id);
+      if (progress) clearWorldQuestTracing(meta, progress);
       if (wasInside && quest.objective.type === 'delivery')
         dropWorldQuestDeliveryCargo(ctx, player);
       if (wasInside && meta.openWorldQuestPuzzleId === quest.id) {
@@ -215,6 +243,19 @@ export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Ent
       continue;
     }
     const existing = meta.worldQuestLog.get(quest.id);
+    if (quest.objective.type === 'tracing') {
+      ensureWorldQuestTraceInstructors(ctx);
+      if (
+        existing &&
+        updateWorldQuestTracing(ctx, meta, player, quest, existing) &&
+        existing.state === 'active'
+      )
+        creditWorldQuest(ctx, meta, quest, existing);
+      if (existing?.state === 'completed') {
+        meta.worldQuestAreas.delete(quest.id);
+        continue;
+      }
+    }
     if (isWorldQuestMinigame(quest) && existing?.state === 'completed') {
       meta.worldQuestAreas.delete(quest.id);
       continue;
@@ -225,6 +266,8 @@ export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Ent
         count: 0,
         state: 'active',
       };
+      if (quest.objective.type === 'tracing')
+        progress.traceVariant = worldQuestTraceVariantForCycle(meta.worldQuestCycle);
       if (
         quest.objective.type === 'puzzle' ||
         quest.objective.type === 'match3' ||
@@ -258,6 +301,31 @@ export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Ent
     }
     meta.worldQuestAreas.add(quest.id);
   }
+}
+
+/** Existing target-and-interact command, with no client-supplied trace or credit. */
+export function talkToWorldQuestInstructor(
+  ctx: SimContext,
+  npc: Entity,
+  meta: PlayerMeta,
+  player: Entity,
+): boolean {
+  const quest = WORLD_QUESTS.find(
+    (candidate) =>
+      candidate.objective.type === 'tracing' &&
+      candidate.objective.instructorNpcId === npc.templateId,
+  );
+  if (!quest) return false;
+  resetCycleIfNeeded(ctx, meta);
+  const progress = meta.worldQuestLog.get(quest.id);
+  if (
+    player.level >= quest.minLevel &&
+    hasActiveWorldQuest(meta, quest.id) &&
+    progress &&
+    inWorldQuestArea(player, quest)
+  )
+    startWorldQuestTracing(ctx, meta, player, npc, quest, progress);
+  return true;
 }
 
 function awardWorldQuest(ctx: SimContext, meta: PlayerMeta, quest: WorldQuestDef): void {
@@ -311,7 +379,19 @@ function creditWorldQuest(
   meta.counters.questsCompleted++;
   meta.unlockedMilestones.add(claimToken(meta.worldQuestCycle, quest.id));
   awardWorldQuest(ctx, meta, quest);
-  ctx.emit({ type: 'worldQuestDone', questId: quest.id, pid: meta.entityId });
+  if (quest.id === WORLD_QUEST_CALLIGRAPHY_ID) {
+    grantDeed(ctx, meta, 'exp_arcane_calligraphy');
+    if (progress.traceResult?.rating === 'gold')
+      grantDeed(ctx, meta, 'exp_arcane_calligraphy_gold');
+  }
+  ctx.emit({
+    type: 'worldQuestDone',
+    questId: quest.id,
+    pid: meta.entityId,
+    ...(quest.id === WORLD_QUEST_CALLIGRAPHY_ID && progress.traceResult
+      ? { traceResult: { score: progress.traceResult.score, rating: progress.traceResult.rating } }
+      : {}),
+  });
 }
 
 /** Complete one escort objective for a nearby eligible participant. The
@@ -338,6 +418,36 @@ export function completeWorldQuestEscort(
     progress?.state !== 'active' ||
     !inWorldQuestArea(player, quest) ||
     !inWorldQuestArea(escortee, quest)
+  )
+    return;
+  creditWorldQuest(ctx, meta, quest, progress, quest.count);
+}
+
+/** Only an authoritative winning personal session may award vehicle credit. */
+export function completeWorldQuestVehicle(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  stationId: string,
+): void {
+  resetCycleIfNeeded(ctx, meta);
+  const session = meta.vehicle;
+  const quest = worldQuestById(NORTH_WATCH_CANNON.questId);
+  const progress = meta.worldQuestLog.get(NORTH_WATCH_CANNON.questId);
+  const player = ctx.entities.get(meta.entityId);
+  if (
+    !session ||
+    session.stationId !== stationId ||
+    session.cycle !== meta.worldQuestCycle ||
+    session.encounter.phase !== 'won' ||
+    !session.encounter.commanderKilled ||
+    !player ||
+    player.dead ||
+    !quest ||
+    quest.objective.type !== 'vehicle' ||
+    quest.objective.stationId !== stationId ||
+    progress?.state !== 'active' ||
+    !hasActiveWorldQuest(meta, quest.id) ||
+    !inWorldQuestArea(player, quest)
   )
     return;
   creditWorldQuest(ctx, meta, quest, progress, quest.count);
@@ -610,6 +720,19 @@ export function sanitizeWorldQuestProgress(value: unknown, cycle?: unknown): Wor
       count,
       state: raw.state,
     };
+    if (quest.objective.type === 'tracing') {
+      normalized.traceVariant =
+        raw.traceVariant === undefined
+          ? 'star'
+          : sanitizeWorldQuestTraceVariant(
+              raw.traceVariant,
+              typeof cycle === 'string' ? cycle : '',
+            );
+      const scores = sanitizeWorldQuestTraceScores(raw.traceScores, count);
+      if (scores.length > 0) normalized.traceScores = scores;
+      if (raw.state === 'completed' && scores.length === quest.count)
+        normalized.traceResult = scoreWorldQuestTraceLesson(scores);
+    }
     if (
       raw.state === 'active' &&
       (quest.objective.type === 'interact' || quest.objective.type === 'salvage')

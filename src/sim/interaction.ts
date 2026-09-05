@@ -1,3 +1,5 @@
+import { NORTH_WATCH_CANNON } from './content/vehicle_stations';
+import { enterVehicle } from './vehicles';
 // Interaction: looting, quest NPCs, ground objects. The three IWorldInteraction
 // command bodies (lootCorpse / pickUpObject / interact) extracted from sim.ts
 // (session W3) as a pure MOVE behind SimContext, exactly as PR #943 did for
@@ -775,6 +777,7 @@ export function pickUpObject(
   }
   const obj = ctx.entities.get(objId);
   if (obj?.kind !== 'object' || !obj.lootable) return false;
+  if (obj.id === NORTH_WATCH_CANNON.entityId) return enterVehicle(ctx, NORTH_WATCH_CANNON.id, p.id);
   const noticeboardDef = noticeboardDefByEntityId(noticeboardDefinitions, obj.id);
   // Preserve the historical no-op for malformed/non-pickup objects. The board
   // is the one intentional lootable object without an item payload.

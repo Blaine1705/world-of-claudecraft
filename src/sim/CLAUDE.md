@@ -70,6 +70,7 @@ plausibly covers means the table needs a new row in the same change.
 
 | Module | Owns |
 |--------|------|
+| `player_movement_modes.ts` | exclusive locomotion order before ordinary walking: vehicle freeze, rift lift strip, deliberate-input AFK clear, Valkyr, race countdown, leap and ledge climb |
 | `combat/damage.ts` | `dealDamage`, `handleDeath`, `grantXp` (+ lifetime-XP; milestone unlocks absorbed into `deeds.ts`) |
 | `combat/heal.ts` | `applyHeal`, healing threat/taken-mult, hex/crit-vuln mults, heal-absorb |
 | `combat/auras.ts` + `combat/cc.ts` | per-tick auras/regen/timers, NPC aura cleanse; CC predicates (stun/root/silence/disarm/lockout/blind/tongues) |
@@ -103,6 +104,9 @@ plausibly covers means the table needs a new row in the same change.
 | `bags.ts` | pooled bag capacity over TWO pools (phase 05): the backpack plus unrestricted bags feed the general pool, `materialsOnly` bags feed a materials-only pool; every fit gate takes the `PoolCapacity` split from `bag_pools.ts` (`bagPools`), while `bagCapacity` stays the summed total for the shrink guards, the grid, and the IWorld readout |
 | `quests/quest_credit.ts` | kill/collect quest credit + turn-in readiness; siblings `quests/interact_object_credit.ts` (the per-object credit ledger for multi-count interact objectives, since interact deliberately does not consume the object) and `quests/profession_quest_effects.ts` (the profession-quest effect arms over `professions/archetype.ts`) |
 | `world_quests.ts` + `world_quest_state.ts` | level-10 overworld area auto-start, kill credit, realm-reset rollover and automatic rewards; the state adapter owns fresh/load/save normalization, rotation caching and downgrade-safe completion claims; runs after player movement and draws zero RNG |
+| `world_quest_tracing.ts` + `world_quest_trace_geometry.ts` | instructor-started calligraphy, authoritative movement validation and bounded session-only trails; wire validation lives in `world_quest_trace_wire.ts`, pinned by the paired tracing and wire tests |
+| `vehicles.ts` + `minigames/cannon_encounter.ts` | personal vehicle admission, lifecycle and WQ credit; fixed-tick cannon waves and private actors never enter shared combat; state stays on `PlayerMeta.vehicle` |
+| `quest_npc_interaction.ts` | ordinary NPC quest-talk item regrant and objective credit, delegated from the existing Sim interaction dispatcher |
 | `ground_object_spawns.ts` | rng-free bootstrap for authored ground objects, civic mailboxes and dungeon doors/slots; validates reserved stable IDs before adding anything and leaves allocator/entity state on `Sim` through explicit callbacks |
 | `quests/quest_commands.ts` | accept/abandon/turn-in verbs + `queueQuestLetter` (W4; dev arm in `quests/dev_quest_commands.ts`) |
 | `quests/quest_item_presence.ts` | `playerHoldsQuestItem`: the accept-time re-grant predicate over bags/bank/mail/market escrow |

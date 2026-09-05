@@ -14,6 +14,9 @@
    written per element by the HUD, never on :root. */
 @layer tokens {
   :root {
+    --color-vehicle-integrity: #2f8c4a;
+    --color-vehicle-danger: #b72b27;
+    --color-vehicle-text: #ffffff;
     --gold: #ffd100;
     --gold-dim: #c8a838;
     /* The deed-unlock banner plate (#banner.banner-deed). Echoes the Book of

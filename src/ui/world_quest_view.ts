@@ -13,6 +13,8 @@ export function worldQuestDef(questId: string): WorldQuestDef | null {
 export function worldQuestDisplayName(questId: string): string {
   const quest = worldQuestDef(questId);
   if (!quest) return t('questUi.worldQuest.unknown', { id: questId });
+  if (quest.objective.type === 'vehicle') return t('hudChrome.vehicle.title');
+  if (quest.objective.type === 'tracing') return t('questUi.worldQuest.calligraphyTitle');
   return t('questUi.worldQuest.title', {
     zone: zoneDisplayName(quest.zoneId),
     target: worldQuestObjectiveLabel(questId),
@@ -23,6 +25,8 @@ export function worldQuestObjectiveLabel(questId: string): string {
   const quest = worldQuestDef(questId);
   if (!quest) return t('questUi.worldQuest.unknown', { id: questId });
   if (quest.objective.type === 'kill') return mobDisplayName(quest.objective.targetMobId);
+  if (quest.objective.type === 'vehicle') return t('hudChrome.vehicle.objective');
+  if (quest.objective.type === 'tracing') return t('questUi.worldQuest.traceOutline');
   if (quest.objective.type === 'escort') {
     return t('questUi.worldQuest.escortCaravan', { zone: zoneDisplayName(quest.zoneId) });
   }

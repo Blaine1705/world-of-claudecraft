@@ -6,6 +6,7 @@ import {
   type Entity,
   INTERACT_RANGE,
 } from '../sim/types';
+import { isWorldQuestTraceInstructor } from '../sim/world_quest_trace_identity';
 import { t } from '../ui/i18n';
 import { tSim } from '../ui/sim_i18n';
 import type { IWorld } from '../world_api';
@@ -283,7 +284,8 @@ export function handlePickedEntity(
           // command too); do not open the quest dialog client-side.
           hud.showError(tSim('error.cantWhileDead'));
           return false;
-        } else if (e.templateId === 'brother_halven' || e.templateId === 'brother_halven_marsh')
+        } else if (isWorldQuestTraceInstructor(e.templateId)) world.interact();
+        else if (e.templateId === 'brother_halven' || e.templateId === 'brother_halven_marsh')
           hud.openDelveBoard(id);
         else hud.openQuestDialog(id);
         return true;
@@ -363,7 +365,8 @@ export function handlePickedEntity(
       // No quest dialog while dead (the server refuses quest talk too); a ghost
       // takes the Spirit Healer res via right-click or the death panel button.
       if (d <= INTERACT_RANGE + 2 && !world.player.dead) {
-        if (e.templateId === 'brother_halven' || e.templateId === 'brother_halven_marsh')
+        if (isWorldQuestTraceInstructor(e.templateId)) world.interact();
+        else if (e.templateId === 'brother_halven' || e.templateId === 'brother_halven_marsh')
           hud.openDelveBoard(id);
         else hud.openQuestDialog(id);
         return true;

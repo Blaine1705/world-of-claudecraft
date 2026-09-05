@@ -5,6 +5,24 @@ import { questEventPresentation } from '../src/ui/quest_event_view';
 import { worldQuestDisplayName } from '../src/ui/world_quest_view';
 
 describe('quest event presentation', () => {
+  it.each(['bronze', 'silver', 'gold'] as const)(
+    'keeps %s score in the durable log without changing normal completion feedback',
+    (rating) => {
+      const event = {
+        type: 'worldQuestDone',
+        questId: 'wq_eastbrook_calligraphy',
+        pid: 1,
+      } as const;
+      const ordinary = questEventPresentation(event);
+      const scored = questEventPresentation({ ...event, traceResult: { score: 87, rating } });
+      expect(scored).toEqual({ ...ordinary, logText: expect.stringContaining('87/100') });
+      expect(scored?.logText).toContain(ordinary?.logText);
+      expect(scored?.logText).toContain('Base reward unchanged. Gold: deed, title, +10 Renown.');
+      expect(scored?.bannerText).toBe(ordinary?.bannerText);
+      expect(scored?.sound).toBe('quest_complete');
+    },
+  );
+
   it('announces world-quest start, progress, and completion through durable and visual paths', () => {
     const quest = WORLD_QUESTS_BY_ID.wq_eastbrook_bandits;
     const started = questEventPresentation({

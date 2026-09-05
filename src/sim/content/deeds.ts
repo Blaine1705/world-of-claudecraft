@@ -2938,6 +2938,23 @@ export const DEEDS: Record<string, DeedDef> = {
     trigger: { kind: 'manual' },
     reward: { kind: 'title', text: 'the Unscorched' },
   },
+  exp_arcane_calligraphy: {
+    id: 'exp_arcane_calligraphy',
+    name: 'A Steady Hand',
+    desc: 'Complete Arcane Calligraphy in Eastbrook Vale.',
+    category: 'exploration',
+    renown: 5,
+    trigger: { kind: 'manual' },
+  },
+  exp_arcane_calligraphy_gold: {
+    id: 'exp_arcane_calligraphy_gold',
+    name: 'Written in Starlight',
+    desc: 'Earn a Gold rating in Arcane Calligraphy.',
+    category: 'exploration',
+    renown: 10,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'the Runecaller' },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

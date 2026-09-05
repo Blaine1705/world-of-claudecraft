@@ -3,6 +3,7 @@
 // a firewall). Pure math lives in pad_ground_aim.ts; this module only binds it
 // to the injected world, input, and Hud facets.
 
+import type { IWorldVehicles } from '../world_api/vehicles';
 import { currentInputHintMode } from './input_hint_mode';
 import {
   activePvpOpponentIds,
@@ -12,6 +13,7 @@ import {
 import { nextSnapPoint, reticleStickDelta } from './pad_ground_aim';
 
 interface GroundAimHudFacet {
+  pressSlot?(slot: number): void;
   isGroundAimActive(): boolean;
   cancelGroundAim(): boolean;
   groundAimAbilityRange(): number | null;
@@ -34,12 +36,15 @@ type GroundAimWorldFacet = Pick<
 
 export interface PadGroundAimWiringDeps {
   hud: GroundAimHudFacet;
-  world: () => GroundAimWorldFacet;
+  world: () => GroundAimWorldFacet & Partial<IWorldVehicles>;
   camYaw: () => number;
   reticleSpeed: () => number;
 }
 
 export function padGroundAimCallbacks(deps: PadGroundAimWiringDeps): {
+  isVehicleActive: () => boolean;
+  onVehicleSlot: (slot: number) => void;
+  onVehicleExit: () => void;
   isGroundAimActive: () => boolean;
   cancelGroundAim: () => void;
   onGroundAimStick: (x: number, y: number, dt: number) => void;
@@ -47,12 +52,16 @@ export function padGroundAimCallbacks(deps: PadGroundAimWiringDeps): {
   onGroundAimSnap: (direction: 1 | -1) => void;
 } {
   return {
+    isVehicleActive: () => !!deps.world().vehicleSession,
+    onVehicleSlot: (slot) => deps.hud.pressSlot?.(slot),
+    onVehicleExit: () => deps.world().leaveVehicle?.(),
     isGroundAimActive: () => deps.hud.isGroundAimActive(),
     cancelGroundAim: () => deps.hud.cancelGroundAim(),
     onGroundAimStick: (x, y, dt) => {
       const range = deps.hud.groundAimAbilityRange();
       if (range === null) return;
-      const delta = reticleStickDelta(x, y, deps.camYaw(), dt, range, deps.reticleSpeed());
+      const yaw = deps.world().vehicleSession ? Math.PI : deps.camYaw();
+      const delta = reticleStickDelta(x, y, yaw, dt, range, deps.reticleSpeed());
       deps.hud.nudgeGroundAimPoint(delta.dx, delta.dz);
     },
     onGroundAimCommit: () => deps.hud.commitGroundAimAt(),
@@ -61,6 +70,16 @@ export function padGroundAimCallbacks(deps: PadGroundAimWiringDeps): {
       if (range === null) return;
       const world = deps.world();
       const player = world.player;
+      if (world.vehicleSession) {
+        const point = nextSnapPoint(
+          player.pos,
+          world.vehicleSession.encounter.enemies,
+          deps.hud.groundAimReticle()?.point ?? null,
+          direction,
+        );
+        if (point) deps.hud.updateGroundAimPoint(point);
+        return;
+      }
       const pvpOpponents = activePvpOpponentIds(world);
       const candidates: { x: number; z: number }[] = [];
       for (const entity of world.entities.values()) {

@@ -197,6 +197,7 @@ import { decodeGuildBankLogFrame, GUILD_BANK_LOG_TTL_MS } from './guild_bank_log
 import { foldInputAck } from './input_ack';
 import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
 import { inputSignature } from './input_signature';
+import { decodeMountRaceMirror, type MountRaceMirror } from './mount_race_wire';
 import {
   type MovementFrameV2,
   MovementFrameV2Outbox,
@@ -225,6 +226,7 @@ import {
   decodeVarkhulCinderOrbProjectiles,
 } from './varkhul_cinder_orb_wire';
 import { vaultWithdrawPayload } from './vault_snapshot_wire';
+import { decodeVehicleSession } from './vehicle_session_wire';
 import { buildWebSocketAuthMessage } from './world_auth_message';
 
 export { buildWebSocketAuthMessage } from './world_auth_message';
@@ -1702,16 +1704,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // goDeadlineMs for the 3..2..1 countdown and deadlineMs for the timed lap, so
   // mountRaceView() can count both down; the server stays authoritative (its end
   // event clears the mirror). clearedMask/cleared mirror the any-order jump progress.
-  private mountRaceMirror: {
-    raceId: string;
-    phase: 'countdown' | 'racing';
-    clearedMask: number;
-    cleared: number;
-    jumpsTotal: number;
-    goDeadlineMs: number;
-    deadlineMs: number;
-    timeLimitTicks: number;
-  } | null = null;
+  private mountRaceMirror: MountRaceMirror | null = null;
   // Riding lesson liveness, mirrored from mountTrain* events and reconciled from
   // the authoritative self snapshot for legacy mountLessonActive() consumers.
   private mountLessonActiveMirror = false;
@@ -2135,6 +2128,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     // A reconnect may land on an older binary. Drop optional behavior before
     // any new transport can accept input; the next capable snapshot re-arms it.
     this.petSpecialCommandsSupported = false;
+    this.vehicleSession = null;
     this.failPendingCommandOutcomes();
     if (this.sessionEnded) return;
     // A pending reconnect timer means this close is a duplicate signal of the
@@ -2175,6 +2169,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
 
   private endSession(): void {
+    this.vehicleSession = null;
     // Flush a pending layout save BEFORE teardown, while the socket is still open
     // and `connected` is still true: close() calls this before ws.close() and
     // sendLogout() calls it before the logout frame, so the final edit is not
@@ -2582,6 +2577,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         // resync stays pending until a genuinely post-reconnect market snapshot decodes.
         this.marketInfo = null;
         this.resetQuestWorldWireState();
+        this.vehicleSession = null;
         this.onReconnected?.();
       }
       this.connected = true;
@@ -3328,7 +3324,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     }
 
     // self with extended state (always a full record)
-    const s = snap.self;
+    const s = this.applyNearbyWorldQuestTraceSnapshot(snap);
     const e = s ? applyWire(s, true) : null;
     if (s && e) {
       applyReconSelfWire(this, s, this.movementWireVersion);
@@ -3606,25 +3602,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
       }
       if (s.mntRtd !== undefined) this.selfRidingTrained = s.mntRtd === true;
       if (s.mntLesson !== undefined) this.mountLessonActiveMirror = s.mntLesson === true;
+      if (s.vehicle !== undefined) this.vehicleSession = decodeVehicleSession(s.vehicle);
       if (s.mntRace !== undefined) {
-        const view = s.mntRace as MountRaceView | null;
-        if (!view) {
-          this.mountRaceMirror = null;
-        } else {
-          const goTicksLeft = Math.max(0, Number(view.goTicksLeft) || 0);
-          const ticksLeft = Math.max(0, Number(view.ticksLeft) || 0);
-          const timeLimitTicks = Math.max(0, Number(view.timeLimitTicks) || 0);
-          this.mountRaceMirror = {
-            raceId: String(view.raceId),
-            phase: view.phase === 'racing' ? 'racing' : 'countdown',
-            clearedMask: Math.max(0, Number(view.clearedMask) || 0),
-            cleared: Math.max(0, Number(view.cleared) || 0),
-            jumpsTotal: Math.max(0, Number(view.jumpsTotal) || 0),
-            goDeadlineMs: now + (goTicksLeft / TICK_RATE) * 1000,
-            deadlineMs: now + (ticksLeft / TICK_RATE) * 1000,
-            timeLimitTicks,
-          };
-        }
+        this.mountRaceMirror = decodeMountRaceMirror(s.mntRace, now);
       }
       if (s.ddiff === 'normal' || s.ddiff === 'heroic') this.selectedDungeonDifficulty = s.ddiff;
       if (s.qlog !== undefined || s.qdone !== undefined) this.pendingQuestCommands?.clear();

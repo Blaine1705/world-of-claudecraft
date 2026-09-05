@@ -32,6 +32,10 @@ import { FireballTravelVisual, fireballMaterials } from './fireball_travel_visua
 import { FrostNovaRootVisual, frostRootMaterials } from './frost_nova_root_visual';
 import { IceBlockVisual, iceMaterials } from './ice_block_visual';
 import { TemporalHourglassVisual, temporalHourglassMaterials } from './temporal_hourglass_visual';
+import {
+  buildWorldQuestTraceStandIn,
+  worldQuestTraceMaterials,
+} from './world_quest_trace_materials';
 
 /** The reference rig height these visuals scale against; the scale reaches the
  *  geometry only, never the materials, so any live body links the same
@@ -57,6 +61,12 @@ export interface AbilityMaterialSource {
  *  by tests/ability_material_prewarm_sweep.test.ts, which walks the tree for
  *  the same idiom and fails until it is registered here. */
 export const ABILITY_MATERIAL_SOURCES: readonly AbilityMaterialSource[] = [
+  {
+    id: 'world-quest-trace',
+    module: 'world_quest_trace_materials.ts',
+    materials: () => Object.values(worldQuestTraceMaterials()),
+    build: () => buildWorldQuestTraceStandIn(),
+  },
   {
     id: 'frost-nova-root',
     module: 'frost_nova_root_visual.ts',

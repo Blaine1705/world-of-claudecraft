@@ -321,6 +321,39 @@ export const ko_KR: EnTranslations = {
     }
   },
   "hudChrome": {
+    "vehicle": {
+      "title": "North Watch Cannon",
+      "objective": "Defend the north watch",
+      "cannonball": "Cannonball",
+      "grapeshot": "Grapeshot",
+      "incendiary": "Incendiary Shot",
+      "integrity": "Cannon integrity",
+      "exit": "Leave cannon",
+      "wave": "Wave {wave}/{total}",
+      "enemies": "Enemies remaining: {count}",
+      "countdown": "Prepare: {seconds}",
+      "hint": "Choose a shot, then click the ground to fire.",
+      "aim": "Click to fire. Right click or Escape cancels aiming.",
+      "sapperWarning": "Sapper incoming! Stop the explosive carrier before it reaches the line.",
+      "chargeWarning": "Commander orders a charge! All surviving enemies move faster.",
+      "armorHint": "Break the silver shields with Cannonball, then use Incendiary Shot.",
+      "exposedHint": "Broken armor: Incendiary Shot deals double damage.",
+      "barrelHint": "Shoot the marked powder barrels when enemies gather around them.",
+      "barrelRules": "Direct hits ignite powder barrels: {damage} damage within {radius} yards, with chain explosions.",
+      "armorRules": "Armored troops take {reduction} less damage until Cannonball breaks their armor. Broken armor takes {bonus} more fire damage.",
+      "shake": "Camera shake",
+      "gold": "Gold medal",
+      "silver": "Silver medal",
+      "bronze": "Bronze medal",
+      "failed": "Defense failed",
+      "result": "{medal}: integrity {integrity}, accuracy {accuracy}.",
+      "medalRules": "Gold: at least {goldIntegrity} integrity and {goldAccuracy} accuracy. Silver: {silverIntegrity} and {silverAccuracy}. Any other victory earns Bronze. Enemy or barrel hits count; each shot counts once. Medals grant no extra money.",
+      "shotDamage": "Deal {damage} damage to each enemy within {radius} yards of the impact.",
+      "shotSlow": "Slow enemies hit by {amount} for {seconds} sec.",
+      "shotBurn": "Leave fire for {seconds} sec, dealing {damage} damage each second to enemies standing in it.",
+      "shotTiming": "Cooldown: {cooldown} sec. Impact after {flight} sec. All shots share {recovery} sec recovery.",
+      "shotRules": "Aim inside the marked field. No mana cost. Damage does not scale with gear or talents."
+    },
     "warlock": {
       "doomLabel": "단죄",
       "fateThreadsLabel": "운명의 실타래",
@@ -9731,6 +9764,43 @@ export const ko_KR: EnTranslations = {
       "loadFreight": "화물을 마차에 싣기",
       "escortCaravan": "{zone} 대상단 호위",
       "salvageWreckage": "난파선 잔해 회수",
+      "calligraphyTitle": "비전 서예",
+      "traceOutline": "발걸음으로 윤곽 따라 그리기",
+      "traceRoundInstruction": "{round}/{total}단계: {shape}. {instruction}",
+      "traceShape": {
+        "triangle": "삼각형",
+        "square": "정사각형",
+        "star": "별",
+        "hourglass": "모래시계",
+        "lightning": "번개 룬",
+        "spiral": "각진 나선",
+        "double-triangle": "쌍삼각 문양"
+      },
+      "traceRating": {
+        "bronze": "동",
+        "silver": "은",
+        "gold": "금"
+      },
+      "traceScoreResult": "완료! {rating}: {score}/{total}. 기본 보상 유지. 금: 업적, 칭호, 명성 +10.",
+      "traceCompletionLog": "{completion} {result}",
+      "traceUnavailable": "이 룬은 최신 게임 버전이 필요합니다.",
+      "traceReaction": {
+        "tessaTriangle": "꼭짓점 세 개가 모두 제자리에 있어요!",
+        "pipSquare": "변이 네 개! 저도 할 수 있을 것 같아요!",
+        "elianFinal": "마지막 룬이네. 선이 교차하거나 같은 점을 다시 지날 수 있으니 밝은 표식을 따라 다음 꼭짓점으로 가게.",
+        "elianGold": "멋지게 그렸군! 자네의 발걸음은 금빛 평가에 어울리네.",
+        "elianComplete": "룬 완성! 정성을 다해 연습하면 다음에는 더 멋지게 그릴 걸세."
+      },
+      "traceReady": "교관에게 말을 걸어 시작하세요.",
+      "tracePreview": "윤곽을 살펴보세요. 금빛 반짝임이 길을 안내합니다.",
+      "traceStart": "시작 표식으로 이동하세요. 어느 방향으로든 시작할 수 있습니다.",
+      "traceDrawing": "금빛 반짝임을 따라 빛나는 꼭짓점으로 가세요. 파란색은 지나온 길입니다.",
+      "traceSuccess": "윤곽 완성!",
+      "traceRetry": "교관에게 말을 걸어 다시 도전하세요.",
+      "traceOffPath": "윤곽을 벗어났습니다. 교관에게 말을 걸어 다시 도전하세요.",
+      "traceMovement": "탈것에서 내려 땅 위를 걸으세요. 교관에게 말을 걸어 다시 도전하세요.",
+      "traceTimeout": "시간이 다 됐습니다. 교관에게 말을 걸어 다시 도전하세요.",
+      "traceCombat": "전투에서 벗어난 뒤 교관에게 말을 걸어 다시 도전하세요.",
       "puzzleTitle": "지맥 광선 정렬",
       "puzzleLevel": "주간 레벨 {level}",
       "puzzleInstructions": "타일을 돌려 광선을 시작점에서 목적지까지 연결하세요.",
@@ -15497,6 +15567,21 @@ export const ko_KR: EnTranslations = {
       }
     },
     "npcs": {
+      "calligraphy_instructor": {
+        "name": "교관 엘리안",
+        "title": "비전 서예",
+        "greeting": "차분한 걸음이 반듯한 선을 만들지. 제자들에게 삼각형과 정사각형, 고급 룬을 그리는 법을 가르쳐 주게."
+      },
+      "calligraphy_apprentice_1": {
+        "name": "견습생 테사",
+        "title": "서예 학생",
+        "greeting": "자꾸 너무 일찍 방향을 틀어요. 어디가 꼭짓점인지 보여 주실래요?"
+      },
+      "calligraphy_apprentice_2": {
+        "name": "견습생 핍",
+        "title": "서예 학생",
+        "greeting": "삼각형 먼저, 그다음은 정사각형, 마지막은 룬. 한 걸음씩 차분하게!"
+      },
       "the_merchant": {
         "name": "상인",
         "title": "세계 시장 관리자",

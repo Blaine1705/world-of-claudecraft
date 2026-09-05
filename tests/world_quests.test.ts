@@ -37,6 +37,7 @@ import {
 } from '../src/sim/world';
 import { hasWorldQuestDeliveryCargo } from '../src/sim/world_quest_delivery';
 import { applyWorldQuestMatch3Move } from '../src/sim/world_quest_match3';
+import { worldQuestPuzzleVariantForCycle } from '../src/sim/world_quest_rotation';
 import { worldQuestSalvageLayout } from '../src/sim/world_quest_salvage';
 import {
   activeWorldQuestsForCycle,
@@ -275,6 +276,29 @@ describe('world quest content', () => {
         expect(escort, `${quest.id} escort`).toBeDefined();
         expect(escort?.worldQuestId).toBe(quest.id);
         expect(escort?.waypoints.length).toBeGreaterThan(0);
+      } else if (quest.objective.type === 'tracing') {
+        expect(quest.count).toBe(3);
+        expect(quest.objective.shapes.map((shape) => shape.kind)).toEqual([
+          'triangle',
+          'square',
+          'star',
+        ]);
+        const instructor = NPCS[quest.objective.instructorNpcId];
+        expect(instructor, `${quest.id} instructor`).toBeDefined();
+        expect(instructor.dynamic).toBe(true);
+        expect(
+          Math.hypot(instructor.pos.x - quest.area.x, instructor.pos.z - quest.area.z),
+        ).toBeLessThan(quest.area.radius);
+        for (const shape of quest.objective.shapes) {
+          expect(shape.points[0]).toEqual(shape.points.at(-1));
+          for (const point of shape.points) {
+            expect(Math.hypot(point.x - quest.area.x, point.z - quest.area.z)).toBeLessThan(
+              quest.area.radius,
+            );
+          }
+        }
+      } else {
+        throw new Error(`Unchecked world quest objective ${quest.id}`);
       }
       if (quest.objective.type === 'puzzle' || quest.objective.type === 'match3') {
         const activationObjectItemId = quest.objective.activationObjectItemId;
@@ -296,7 +320,7 @@ describe('world quest content', () => {
       if (quest.reward.type === 'item') expect(ITEMS[quest.reward.itemId], quest.id).toBeDefined();
     }
     expect([...zoneFrequency.values()].every((count) => count >= 1)).toBe(true);
-    expect(zoneFrequency.get('eastbrook_vale')).toBe(2);
+    expect(zoneFrequency.get('eastbrook_vale')).toBe(3);
   });
 
   it('places both minigame activators on safe, walkable ground outside hostile aggro', () => {
@@ -628,6 +652,9 @@ describe('world quest lifecycle', () => {
     const sixthIds = activeWorldQuestsForCycle(worldQuestCycleForResetDay('2026-09-15')).map(
       (quest) => quest.id,
     );
+    const seventhIds = activeWorldQuestsForCycle(worldQuestCycleForResetDay('2026-09-18')).map(
+      (quest) => quest.id,
+    );
     expect(firstIds).toEqual([
       'wq_eastbrook_bandits',
       'wq_mirefen_gravecallers',
@@ -652,6 +679,9 @@ describe('world quest lifecycle', () => {
     expect(fourthIds).toEqual(['wq_eastbrook_caravan', ...firstIds.slice(1)]);
     expect(fifthIds).toEqual([...nextIds.slice(0, 3), 'wq_frostveil_caravan', nextIds[4]]);
     expect(sixthIds).toEqual(['wq_willowfen_caravan', ...thirdIds.slice(1)]);
+    expect(seventhIds).toEqual(['wq_eastbrook_calligraphy', ...firstIds.slice(1)]);
+    const eighthIds = activeWorldQuestsForCycle('wq3_7').map((quest) => quest.id);
+    expect(eighthIds).toEqual(['wq_eastbrook_calligraphy', ...thirdIds.slice(1)]);
     const allRotatedIds = [
       ...firstIds,
       ...nextIds,
@@ -659,8 +689,47 @@ describe('world quest lifecycle', () => {
       ...fourthIds,
       ...fifthIds,
       ...sixthIds,
+      ...seventhIds,
+      ...eighthIds,
     ];
     expect(new Set(allRotatedIds)).toEqual(new Set(WORLD_QUESTS.map((quest) => quest.id)));
+  });
+
+  it('naturally offers every puzzle layout across the full roster and weekly-variant repeat', () => {
+    // Eight three-day rosters and three seven-day variants realign after 168 days.
+    const variants = new Map<string, Set<number>>();
+    const offered = new Set<string>();
+    for (let cycle = 0; cycle < 56; cycle++) {
+      const cycleId = `wq3_${cycle}`;
+      const roster = activeWorldQuestsForCycle(cycleId);
+      expect(roster).toHaveLength(5);
+      expect(new Set(roster.map((quest) => quest.id)).size).toBe(5);
+      expect(activeWorldQuestsForCycle(`wq3_${cycle + 56}`)).toEqual(roster);
+      for (const quest of roster) {
+        offered.add(quest.id);
+        const count =
+          quest.objective.type === 'salvage'
+            ? quest.objective.layouts.length
+            : quest.objective.type === 'puzzle'
+              ? quest.objective.puzzles.length
+              : quest.objective.type === 'match3'
+                ? quest.objective.levels.length
+                : 0;
+        if (!count) continue;
+        const variant = worldQuestPuzzleVariantForCycle(cycleId, count);
+        expect(worldQuestPuzzleVariantForCycle(`wq3_${cycle + 56}`, count)).toBe(variant);
+        const seen = variants.get(quest.id) ?? new Set<number>();
+        seen.add(variant);
+        variants.set(quest.id, seen);
+      }
+    }
+    expect(offered).toEqual(new Set(WORLD_QUESTS.map((quest) => quest.id)));
+    expect([...variants.keys()].sort()).toEqual([
+      'wq_farshore_salvage',
+      'wq_galecrest_wisps',
+      'wq_palmreach_confections',
+    ]);
+    for (const [questId, seen] of variants) expect(seen, questId).toEqual(new Set([0, 1, 2]));
   });
 
   it('does not start a catalog quest outside the current five-quest rotation', () => {
@@ -1032,7 +1101,7 @@ describe('world quest lifecycle', () => {
 
   it.each([
     ['2026-09-15', 2],
-    ['2026-10-03', 1],
+    ['2026-09-30', 1],
   ] as const)(
     'persists and completes the non-default shipwreck layout for %s',
     (resetDay, variant) => {

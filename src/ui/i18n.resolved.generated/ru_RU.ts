@@ -321,6 +321,39 @@ export const ru_RU: EnTranslations = {
     }
   },
   "hudChrome": {
+    "vehicle": {
+      "title": "North Watch Cannon",
+      "objective": "Defend the north watch",
+      "cannonball": "Cannonball",
+      "grapeshot": "Grapeshot",
+      "incendiary": "Incendiary Shot",
+      "integrity": "Cannon integrity",
+      "exit": "Leave cannon",
+      "wave": "Wave {wave}/{total}",
+      "enemies": "Enemies remaining: {count}",
+      "countdown": "Prepare: {seconds}",
+      "hint": "Choose a shot, then click the ground to fire.",
+      "aim": "Click to fire. Right click or Escape cancels aiming.",
+      "sapperWarning": "Sapper incoming! Stop the explosive carrier before it reaches the line.",
+      "chargeWarning": "Commander orders a charge! All surviving enemies move faster.",
+      "armorHint": "Break the silver shields with Cannonball, then use Incendiary Shot.",
+      "exposedHint": "Broken armor: Incendiary Shot deals double damage.",
+      "barrelHint": "Shoot the marked powder barrels when enemies gather around them.",
+      "barrelRules": "Direct hits ignite powder barrels: {damage} damage within {radius} yards, with chain explosions.",
+      "armorRules": "Armored troops take {reduction} less damage until Cannonball breaks their armor. Broken armor takes {bonus} more fire damage.",
+      "shake": "Camera shake",
+      "gold": "Gold medal",
+      "silver": "Silver medal",
+      "bronze": "Bronze medal",
+      "failed": "Defense failed",
+      "result": "{medal}: integrity {integrity}, accuracy {accuracy}.",
+      "medalRules": "Gold: at least {goldIntegrity} integrity and {goldAccuracy} accuracy. Silver: {silverIntegrity} and {silverAccuracy}. Any other victory earns Bronze. Enemy or barrel hits count; each shot counts once. Medals grant no extra money.",
+      "shotDamage": "Deal {damage} damage to each enemy within {radius} yards of the impact.",
+      "shotSlow": "Slow enemies hit by {amount} for {seconds} sec.",
+      "shotBurn": "Leave fire for {seconds} sec, dealing {damage} damage each second to enemies standing in it.",
+      "shotTiming": "Cooldown: {cooldown} sec. Impact after {flight} sec. All shots share {recovery} sec recovery.",
+      "shotRules": "Aim inside the marked field. No mana cost. Damage does not scale with gear or talents."
+    },
     "warlock": {
       "doomLabel": "Осуждение",
       "fateThreadsLabel": "Нити судьбы",
@@ -9731,6 +9764,43 @@ export const ru_RU: EnTranslations = {
       "loadFreight": "Загрузить груз в повозку",
       "escortCaravan": "Сопроводить караван: {zone}",
       "salvageWreckage": "Собрать обломки кораблекрушения",
+      "calligraphyTitle": "Тайная каллиграфия",
+      "traceOutline": "Обведите контур своими шагами",
+      "traceRoundInstruction": "Раунд {round}/{total}: {shape}. {instruction}",
+      "traceShape": {
+        "triangle": "Треугольник",
+        "square": "Квадрат",
+        "star": "Звезда",
+        "hourglass": "Песочные часы",
+        "lightning": "Руна молнии",
+        "spiral": "Угловая спираль",
+        "double-triangle": "Двойной треугольник"
+      },
+      "traceRating": {
+        "bronze": "Бронза",
+        "silver": "Серебро",
+        "gold": "Золото"
+      },
+      "traceScoreResult": "Готово! {rating}: {score}/{total}. Базовая награда прежняя. Золото: достижение, титул, +10 славы.",
+      "traceCompletionLog": "{completion} {result}",
+      "traceUnavailable": "Для этой руны нужна новая версия игры.",
+      "traceReaction": {
+        "tessaTriangle": "Три угла, и каждый на своём месте!",
+        "pipSquare": "Четыре стороны! Думаю, я тоже так смогу!",
+        "elianFinal": "Последняя руна. Линия может пересечь или повторно пройти точку; следуйте яркой метке к следующему углу.",
+        "elianGold": "Прекрасно начертано! Ваши шаги заслужили золотую оценку.",
+        "elianComplete": "Руна завершена! Старательная практика сделает следующую ещё лучше."
+      },
+      "traceReady": "Поговорите с наставником, чтобы начать.",
+      "tracePreview": "Посмотрите на контур. Золотые искры укажут путь.",
+      "traceStart": "Встаньте на стартовую метку. Выберите любое направление.",
+      "traceDrawing": "Золотые искры ведут к яркому углу. Ваш след синий.",
+      "traceSuccess": "Контур завершён!",
+      "traceRetry": "Поговорите с наставником, чтобы повторить попытку.",
+      "traceOffPath": "Вы вне контура. Повтор: у наставника.",
+      "traceMovement": "Спешьтесь, идите по земле. Повтор: у наставника.",
+      "traceTimeout": "Время вышло. Повтор: у наставника.",
+      "traceCombat": "Выйдите из боя. Повтор: у наставника.",
       "puzzleTitle": "Настройка силового луча",
       "puzzleLevel": "Еженедельный уровень {level}",
       "puzzleInstructions": "Поворачивайте плитки, чтобы провести луч от источника к цели.",
@@ -15497,6 +15567,21 @@ export const ru_RU: EnTranslations = {
       }
     },
     "npcs": {
+      "calligraphy_instructor": {
+        "name": "Наставник Элиан",
+        "title": "Тайная каллиграфия",
+        "greeting": "Ровный шаг рождает ровную линию. Научите моих учеников рисовать треугольник, квадрат и сложную руну."
+      },
+      "calligraphy_apprentice_1": {
+        "name": "Ученица Тесса",
+        "title": "Ученица каллиграфии",
+        "greeting": "Я всё время поворачиваю слишком рано. Покажете, где должны быть углы?"
+      },
+      "calligraphy_apprentice_2": {
+        "name": "Ученик Пип",
+        "title": "Ученик каллиграфии",
+        "greeting": "Сначала треугольник, потом квадрат, потом руна. Шаг за шагом!"
+      },
       "the_merchant": {
         "name": "Торговец",
         "title": "Хранитель мирового рынка",

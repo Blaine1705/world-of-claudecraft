@@ -892,6 +892,7 @@ export function castAbility(
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
+  if (meta.vehicle) return;
   let res = ctx.resolvedAbility(abilityId, p.id);
   if (!res) {
     ctx.error(p.id, 'You do not know that ability.');

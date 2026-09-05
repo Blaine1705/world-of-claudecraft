@@ -253,6 +253,9 @@ const MOB_IDS = [
 ] as const;
 
 const NPC_IDS = [
+  'calligraphy_instructor',
+  'calligraphy_apprentice_1',
+  'calligraphy_apprentice_2',
   'the_merchant',
   'marshal_redbrook',
   'trader_wilkes',

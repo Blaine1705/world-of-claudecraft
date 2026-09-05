@@ -321,6 +321,39 @@ export const zh_CN: EnTranslations = {
     }
   },
   "hudChrome": {
+    "vehicle": {
+      "title": "North Watch Cannon",
+      "objective": "Defend the north watch",
+      "cannonball": "Cannonball",
+      "grapeshot": "Grapeshot",
+      "incendiary": "Incendiary Shot",
+      "integrity": "Cannon integrity",
+      "exit": "Leave cannon",
+      "wave": "Wave {wave}/{total}",
+      "enemies": "Enemies remaining: {count}",
+      "countdown": "Prepare: {seconds}",
+      "hint": "Choose a shot, then click the ground to fire.",
+      "aim": "Click to fire. Right click or Escape cancels aiming.",
+      "sapperWarning": "Sapper incoming! Stop the explosive carrier before it reaches the line.",
+      "chargeWarning": "Commander orders a charge! All surviving enemies move faster.",
+      "armorHint": "Break the silver shields with Cannonball, then use Incendiary Shot.",
+      "exposedHint": "Broken armor: Incendiary Shot deals double damage.",
+      "barrelHint": "Shoot the marked powder barrels when enemies gather around them.",
+      "barrelRules": "Direct hits ignite powder barrels: {damage} damage within {radius} yards, with chain explosions.",
+      "armorRules": "Armored troops take {reduction} less damage until Cannonball breaks their armor. Broken armor takes {bonus} more fire damage.",
+      "shake": "Camera shake",
+      "gold": "Gold medal",
+      "silver": "Silver medal",
+      "bronze": "Bronze medal",
+      "failed": "Defense failed",
+      "result": "{medal}: integrity {integrity}, accuracy {accuracy}.",
+      "medalRules": "Gold: at least {goldIntegrity} integrity and {goldAccuracy} accuracy. Silver: {silverIntegrity} and {silverAccuracy}. Any other victory earns Bronze. Enemy or barrel hits count; each shot counts once. Medals grant no extra money.",
+      "shotDamage": "Deal {damage} damage to each enemy within {radius} yards of the impact.",
+      "shotSlow": "Slow enemies hit by {amount} for {seconds} sec.",
+      "shotBurn": "Leave fire for {seconds} sec, dealing {damage} damage each second to enemies standing in it.",
+      "shotTiming": "Cooldown: {cooldown} sec. Impact after {flight} sec. All shots share {recovery} sec recovery.",
+      "shotRules": "Aim inside the marked field. No mana cost. Damage does not scale with gear or talents."
+    },
     "warlock": {
       "doomLabel": "谴罪",
       "fateThreadsLabel": "命运丝线",
@@ -9731,6 +9764,43 @@ export const zh_CN: EnTranslations = {
       "loadFreight": "将货物装上马车",
       "escortCaravan": "护送{zone}商队",
       "salvageWreckage": "回收沉船残骸",
+      "calligraphyTitle": "奥术书法",
+      "traceOutline": "用脚步描绘轮廓",
+      "traceRoundInstruction": "第{round}/{total}轮：{shape}。{instruction}",
+      "traceShape": {
+        "triangle": "三角形",
+        "square": "正方形",
+        "star": "星形",
+        "hourglass": "沙漏",
+        "lightning": "闪电符文",
+        "spiral": "折角螺旋",
+        "double-triangle": "双三角印记"
+      },
+      "traceRating": {
+        "bronze": "铜",
+        "silver": "银",
+        "gold": "金"
+      },
+      "traceScoreResult": "完成！{rating}：{score}/{total}。基础奖励不变。金牌：功绩、称号、+10 声望。",
+      "traceCompletionLog": "{completion} {result}",
+      "traceUnavailable": "此符文需要更新游戏版本。",
+      "traceReaction": {
+        "tessaTriangle": "三个角，每个都在正确的位置！",
+        "pipSquare": "四条边！我想我也能做到！",
+        "elianFinal": "最后一道符文。线条可能交叉或再次经过同一点；跟随亮起的标记前往下一个拐角。",
+        "elianGold": "描绘得真漂亮！你的脚步赢得了金色的荣耀。",
+        "elianComplete": "符文完成了！用心练习，下次一定会更好。"
+      },
+      "traceReady": "与导师交谈开始练习。",
+      "tracePreview": "观察轮廓，金色光点会为你引路。",
+      "traceStart": "走到起点标记，任选一个方向描绘。",
+      "traceDrawing": "沿金色光点走向明亮的拐角。蓝色标记你的足迹。",
+      "traceSuccess": "轮廓完成！",
+      "traceRetry": "与导师交谈重试。",
+      "traceOffPath": "你偏离了轮廓。与导师交谈重试。",
+      "traceMovement": "请下坐骑并留在地面上。与导师交谈重试。",
+      "traceTimeout": "时间已到。与导师交谈重试。",
+      "traceCombat": "脱离战斗后，与导师交谈重试。",
       "puzzleTitle": "魔网光束校准",
       "puzzleLevel": "每周关卡 {level}",
       "puzzleInstructions": "旋转拼块，将光束从起点引导至终点。",
@@ -15497,6 +15567,21 @@ export const zh_CN: EnTranslations = {
       }
     },
     "npcs": {
+      "calligraphy_instructor": {
+        "name": "导师埃利安",
+        "title": "奥术书法",
+        "greeting": "步伐稳，线条才稳。教我的学徒描绘三角形、正方形和高级符文吧。"
+      },
+      "calligraphy_apprentice_1": {
+        "name": "学徒泰莎",
+        "title": "书法学徒",
+        "greeting": "我总是转弯太早。你能教我在哪里转弯吗？"
+      },
+      "calligraphy_apprentice_2": {
+        "name": "学徒皮普",
+        "title": "书法学徒",
+        "greeting": "先画三角形，再画正方形，最后画符文。一步一步稳稳地走！"
+      },
       "the_merchant": {
         "name": "商人",
         "title": "世界市场守护者",

@@ -5639,6 +5639,21 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "progression",
     "renown": 5,
     "feat": false
+  },
+  {
+    "id": "exp_arcane_calligraphy",
+    "name": "A Steady Hand",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "exp_arcane_calligraphy_gold",
+    "name": "Written in Starlight",
+    "category": "exploration",
+    "renown": 10,
+    "feat": false,
+    "rewardTitle": "the Runecaller"
   }
 ];
 

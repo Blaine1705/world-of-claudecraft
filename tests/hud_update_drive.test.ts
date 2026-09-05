@@ -870,6 +870,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the Start/Cancel Race button and the 3..2..1..GO countdown; each painter returns early on an unchanged mode',
   },
   {
+    call: 'this.vehicleControls.update',
+    band: 'frame',
+    gate: '',
+    surface: 'chrome',
+    why: 'vehicle integrity, aiming and cooldowns use the shared eliding writer facet',
+  },
+  {
     call: 'this.showSubzone',
     band: 'medium',
     gate: 'subzone !== this.lastSubzone && subzone',
@@ -1680,7 +1687,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // window 44 -> 46: the crucible vendor's out-of-range close (the third
       // #vendor-window tenant, on the heroic vendor's exact row shape).
       // Both deltas apply on the merged tree.
-    ).toEqual({ window: 46, chrome: 84, none: 17 });
+    ).toEqual({ window: 46, chrome: 85, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

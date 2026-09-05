@@ -28,6 +28,7 @@ import {
 import { ARENA_NEW, BASE_NEW, ITEM_NEW, PET_NEW, QUEST_NEW, RAID_NEW } from './sim_i18n.newlocales';
 import { localizeTalentTitle } from './talent_i18n';
 import { localizeWorldQuestFreightYell, worldQuestFreightSpeakerName } from './world_quest_freight_i18n';
+import { localizeWorldQuestTraceReaction } from './world_quest_trace_view';
 
 const baseEnTable = {
   'log.deathwardSaves': 'A deathward saves you!',
@@ -13153,6 +13154,8 @@ const RULES: Rule[] = [
 
 // Returns the localized form of a sim-emitted message, or null if not one of ours.
 export function localizeSimText(text: string): string | null {
+  const traceReaction = localizeWorldQuestTraceReaction(text);
+  if (traceReaction !== null) return traceReaction;
   const exactKey = EXACT[text];
   if (exactKey) return tSim(exactKey);
   for (const rule of RULES) {

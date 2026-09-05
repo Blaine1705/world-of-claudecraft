@@ -154,3 +154,16 @@ Dungeon (the Crucible of the Last Spring raid):
 - [v1] `dgn_varkhul`, The Forge Goes Cold: Varkhul's great anvil under a raised silent hammer, the forge glow fading to blue-grey ash, one thin line of spring water cutting through the coals.
 - [v1] `dgn_varkhul_heroic`, Heroic: The Forge Goes Cold: the cold anvil and hammer ringed by a gold heroic laurel, frost creeping over the anvil face.
 - [v1] `dgn_varkhul_flawless`, Not One Ember Lost: ten unbroken candle flames in a ring above the forge floor, none guttering, warm gold on deep bronze.
+
+## Arcane Calligraphy crests (2026-09-05)
+
+Two new ids from the Eastbrook Vale tracing world quest, using the same delivery
+contract as above: one 512x512 RGBA PNG per deed, named exactly by deed id and
+ingested with `npm run assets:deeds <source-dir>`. Both ride the procedural
+exploration category crest until the paintings land (enumerated in
+`DEED_ART_PENDING`, `src/ui/icons.ts`).
+
+Exploration (Arcane Calligraphy):
+
+- [v1] `exp_arcane_calligraphy`, A Steady Hand: a luminous quill completing a clean triangular rune over an old Eastbrook paving stone, restrained arcane blue on weathered gold.
+- [v1] `exp_arcane_calligraphy_gold`, Written in Starlight: five completed runes orbiting a brilliant star-written quill, the Gold score sealed below in a narrow laurel of living light.

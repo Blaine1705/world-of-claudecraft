@@ -80,6 +80,7 @@ const EXCLUDED: Record<string, string> = {
  *  auditing, and pinned equal to the sources' own `module` fields: a row added
  *  here to silence a hit, with no factory behind it, fails that pin. */
 const REGISTERED_MODULES = [
+  'world_quest_trace_materials.ts',
   'frost_nova_root_visual.ts',
   'ice_block_visual.ts',
   'temporal_hourglass_visual.ts',
@@ -231,11 +232,11 @@ describe('the lazy-material sweep', () => {
     const hits = sweep();
     const files = hits.map((hit) => basename(hit.file));
     for (const module of REGISTERED_MODULES) expect(files).toContain(module);
-    // Vacuity floor, kept just under the real count: the five registered
-    // bundles (the coach trail's guidance set among the four spell visuals),
+    // Vacuity floor, kept just under the real count: the registered
+    // bundles (coach and calligraphy guidance among the spell visuals),
     // the two excluded scenery bakes, and the battleground caches.
-    expect(hits.length).toBeGreaterThanOrEqual(8);
-    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(7);
+    expect(hits.length).toBeGreaterThanOrEqual(9);
+    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(8);
   });
 
   it('leaves no hit unregistered and unexcluded', () => {

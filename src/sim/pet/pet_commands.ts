@@ -92,6 +92,7 @@ function noPetError(e: Entity, fallback = 'You have no pet.'): string {
 // This guard intentionally lives only on user-issued commands: passive pet AI and
 // system lifecycle operations (summon/restore/stow) remain encounter-owned.
 function petCommandBlockedByControl(ctx: SimContext, owner: Entity): boolean {
+  if (ctx.players.get(owner.id)?.vehicle) return true;
   if (!hasUnbreakableMovementLock(owner)) return false;
   ctx.error(owner.id, 'You are stunned.');
   return true;

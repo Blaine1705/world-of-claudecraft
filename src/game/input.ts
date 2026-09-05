@@ -116,6 +116,8 @@ export interface InputCallbacks {
    *  grab must not spin the camera or retarget instead. Wheel zoom and keyboard
    *  movement stay live; only the mouse-on-canvas gestures are claimed. */
   isCameraLocked?: () => boolean;
+  /** Vehicle view: freeze orbit controls, but preserve ground-aim clicks. */
+  isCameraMotionLocked?: () => boolean;
   onInputIntent?(kind: 'move' | 'look' | 'zoom'): void;
 }
 
@@ -457,6 +459,7 @@ export class Input {
 
   /** Move the camera in/out, clamped to the zoom limits. */
   zoomBy(delta: number): void {
+    if (this.cb.isCameraMotionLocked?.()) return;
     const next = Math.min(22, Math.max(3, this.camDist + delta));
     if (next === this.camDist) return;
     this.camDist = next;
@@ -709,6 +712,7 @@ export class Input {
   }
 
   applyTouchLookDelta(dx: number, dy: number): void {
+    if (this.cb.isCameraMotionLocked?.()) return;
     const dragSens = this.lookSensitivity * TOUCH_DRAG_SENS_MULT * this.touchLookSpeed;
     this.camYaw -= dx * dragSens;
     this.camPitch = Math.min(
@@ -756,6 +760,7 @@ export class Input {
   // Apply the right-stick camera deltas (already in radians, computed by the
   // pure stickToLook core). Clamps pitch to the same range as touch/mouse look.
   applyGamepadLook(yawDelta: number, pitchDelta: number): void {
+    if (this.cb.isCameraMotionLocked?.()) return;
     if (yawDelta === 0 && pitchDelta === 0) return;
     this.camYaw += yawDelta;
     this.camPitch = Math.min(1.35, Math.max(-0.4, this.camPitch + pitchDelta));
@@ -772,6 +777,7 @@ export class Input {
   }
 
   updateTouchLook(dt: number): void {
+    if (this.cb.isCameraMotionLocked?.()) return;
     if (!this.touchLookActive) return;
     this.camYaw -= this.touchLookVector.x * TOUCH_LOOK_YAW_RATE * this.touchLookSpeed * dt;
     this.camPitch = Math.min(
@@ -791,6 +797,7 @@ export class Input {
 
   /** Snap the orbit camera back behind the character (mobile recenter gesture). */
   recenterCameraBehind(facing: number): void {
+    if (this.cb.isCameraMotionLocked?.()) return;
     if (Number.isFinite(facing)) this.camYaw = facing;
     this.camPitch = 0.32;
     this.swimAimPitch = 0.32;
@@ -1253,6 +1260,7 @@ export class Input {
     // click from a drag until it has already moved.
     this.pointerLockRequestedForDrag = false;
     if (
+      !this.cb.isCameraMotionLocked?.() &&
       shouldEngagePointerLockOnMouseDown({
         button: e.button,
         clickMoveButton: this.clickMoveMouseButton,
@@ -1464,6 +1472,7 @@ export class Input {
       this.hoverX = e.clientX;
       this.hoverY = e.clientY;
     }
+    if (this.cb.isCameraMotionLocked?.()) return;
     if (!this.leftDown && !this.rightDown) return;
     // Normalize the raw movement delta to Chromium's physical-pixel unit so
     // mouselook keeps the same speed and drag-start feel on Firefox, where the

@@ -19,6 +19,37 @@
    here, so neither leaks across entries. The shared #start-screen/#mobile-preflight
    game-active hide and the base/styling of #rotate-device stay here. */
 @layer hud-mobile {
+  /* ---------- vehicle action bar ---------- */
+  body.mobile-touch .vehicle-bar {
+    bottom: max(12px, env(safe-area-inset-bottom));
+    grid-template-columns: 38px 1fr 90px;
+    gap: 6px;
+    padding: 10px;
+  }
+  body.mobile-touch .vehicle-action-slots {
+    gap: 6px;
+  }
+  body.mobile-touch .vehicle-integrity {
+    min-height: 48px;
+  }
+  body.mobile-touch .vehicle-bar-title {
+    font-size: 14px;
+  }
+  body.mobile-touch .vehicle-bar-status,
+  body.mobile-touch .vehicle-bar-hint,
+  body.mobile-touch .vehicle-comfort {
+    font-size: 12px;
+  }
+  body.mobile-touch.operating-vehicle #player-frame:not(.pf-detached) {
+    top: calc(var(--app-vh, 100dvh) - 230px);
+    bottom: auto;
+    margin-bottom: 0;
+  }
+  body.mobile-touch .vehicle-action {
+    width: 48px;
+    height: 48px;
+    flex-basis: 48px;
+  }
   /* Endfield-inspired glass chrome tokens: dark-fantasy gold-brown palette kept,
      but permanent chrome (action row, quick-access rail, the More tray) reads as
      translucent glass over the world instead of solid opaque wood/stone panels.
@@ -1940,6 +1971,14 @@
   }
   body.mobile-touch .quest-strip-obj.done {
     color: var(--color-text-success);
+  }
+  /* The movement lesson has one actionable instruction, never an ellipsis.
+     Wrapping reuses the existing bounded objective band and fixed anchor. */
+  body.mobile-touch .quest-strip-obj.instruction {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-overflow: clip;
+    flex-shrink: 0;
   }
   body.mobile-touch .quest-strip-more {
     opacity: 0.75;

@@ -4,8 +4,10 @@
 
 import type { SimEvent } from '../sim/types';
 import { questTitle } from './entity_display_labels';
+import { cannonResultText } from './hud/vehicle/cannon_tactics_view';
 import { formatNumber, t } from './i18n';
 import { questProgressEventText } from './quest_progress_text';
+import { worldQuestTraceScoreText } from './world_quest_trace_view';
 import { worldQuestDisplayName, worldQuestObjectiveLabel } from './world_quest_view';
 
 export interface QuestEventPresentation {
@@ -21,6 +23,10 @@ export interface QuestEventPresentation {
 
 export function questEventPresentation(event: SimEvent): QuestEventPresentation | null {
   switch (event.type) {
+    case 'cannonResult': {
+      const text = cannonResultText(event);
+      return text ? { bannerText: text, logText: text, sound: 'quest_complete' } : null;
+    }
     case 'questAccepted':
       return { sound: 'quest_accept', refreshQuestDialog: true };
     case 'questProgress': {
@@ -69,7 +75,12 @@ export function questEventPresentation(event: SimEvent): QuestEventPresentation 
       });
       return {
         bannerText: text,
-        logText: text,
+        logText: event.traceResult
+          ? t('questUi.worldQuest.traceCompletionLog', {
+              completion: text,
+              result: worldQuestTraceScoreText(event.traceResult),
+            })
+          : text,
         sound: 'quest_complete',
         closeWorldQuestPuzzle: event.questId,
       };

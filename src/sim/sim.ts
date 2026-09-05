@@ -43,11 +43,12 @@ import * as bankSocketsMod from './bank_sockets';
 import { extractTradableCopyImpl, grantTradableCopyImpl } from './broker_custody';
 import { campSpawnOffset } from './camp_scatter';
 import type { CharacterState, PetState } from './character_state';
+import type { CannonActionId, CannonPoint, VehicleSession } from './types';
+import * as vehicleMod from './vehicles';
 
 export type { CharacterState, PetState } from './character_state';
 
 import { buildCivicServicePlacements } from './civic_service_placements';
-import { advanceClimb, tryStartClimb } from './climb';
 import {
   allocRiftCollisionToken,
   moverHeight,
@@ -114,7 +115,7 @@ import {
   healingThreat as healingThreatImpl,
   hexOutputMult as hexOutputMultImpl,
 } from './combat/heal';
-import { advanceHeroicLeap, heroicLeapPlacementPreview } from './combat/heroic_leap';
+import { heroicLeapPlacementPreview } from './combat/heroic_leap';
 import { resolveColdsightAbility } from './combat/hunter_coldsight';
 import { clearFieldcraftState, finishBloodhook } from './combat/hunter_fieldcraft';
 import { clearPacklordState } from './combat/hunter_packlord';
@@ -131,7 +132,6 @@ import {
   PALADIN_DEVOTION_ABILITY_IDS,
   stripPaladinDevotionsFromSource,
 } from './combat/paladin_support';
-import { advanceValkyrsCalling } from './combat/paladin_valkyrs_calling';
 import {
   completeVeilboundMarch,
   updateVeilboundMarchMovement,
@@ -632,6 +632,7 @@ import {
 } from './instances/dungeons';
 import { buyHeroicVendorItem as buyHeroicVendorItemImpl } from './instances/heroic_vendor';
 import { updatePortalTriggers } from './portals';
+import { interactNpcForQuests } from './quest_npc_interaction';
 import * as questCommands from './quests/quest_commands';
 import {
   checkQuestReady,
@@ -664,7 +665,6 @@ import {
   liftRiftEntities as liftRiftEntitiesImpl,
   riftInstanceAtPos,
   riftOpenTreasure as riftOpenTreasureImpl,
-  riftPlayerLift as riftPlayerLiftImpl,
   tickRiftBossDeathZones as tickRiftBossDeathZonesImpl,
   tickRiftLockpicks as tickRiftLockpicksImpl,
   updateRiftInstances as updateRiftInstancesImpl,
@@ -681,9 +681,9 @@ import * as worldQuestMod from './world_quests';
 // (online.ts) stays byte-identical.
 export { computeQuestState } from './quests/quest_commands';
 
+import { advanceExclusiveMovement } from './player_movement_modes';
 import { completeCurrentQuestsForDev, completeQuestForDev } from './quests/dev_quest_commands';
 import * as arenaMod from './social/arena';
-import { clearAfkOnMove } from './social/away';
 import * as bgMod from './social/battleground';
 import * as bgOutcomesMod from './social/battleground_outcomes';
 import * as bgProposalMod from './social/battleground_proposal';
@@ -790,7 +790,6 @@ import {
   type PlayerClass,
   type QuestProgress,
   type QuestState,
-  questObjectiveRequired,
   REVENGE_FREE_CHANCE,
   REVENGE_FREE_DURATION,
   type ReadyCheck,
@@ -1301,6 +1300,8 @@ export interface PlayerMeta extends worldQuestState.WorldQuestPlayerState {
   // persisted: src/sim/mount_race.ts owns the rules. Strictly per-player, so
   // simultaneous racers never share or contend on anything.
   mountRace?: MountRaceSession | null;
+  vehicle?: VehicleSession | null;
+  vehicleRetryAtTick?: number;
   // Optional QoL preference (issue #1358): when true, every target-switch
   // selector in targeting.ts (targetEntity, tabTarget, targetNearestEnemy,
   // targetNearestFriendly, friendlyTabTarget) disengages auto-attack instead of
@@ -3578,6 +3579,7 @@ export class Sim {
   }
 
   removePlayer(pid: number): void {
+    vehicleMod.leaveVehicle(this.ctx, pid);
     const meta = this.players.get(pid);
     if (!meta) return;
     // Offline/headless removals have no GameServer lifecycle hook. End an
@@ -4144,6 +4146,22 @@ export class Sim {
     return this.mountRaceViewFor(this.primaryId);
   }
 
+  get vehicleSession(): VehicleSession | null {
+    return this.vehicleSessionFor(this.primaryId);
+  }
+  vehicleSessionFor(pid?: number): VehicleSession | null {
+    return vehicleMod.vehicleSessionFor(this.ctx, pid);
+  }
+  enterVehicle(stationId: string, pid?: number): boolean {
+    return vehicleMod.enterVehicle(this.ctx, stationId, pid);
+  }
+  useVehicleAction(action: CannonActionId, point: CannonPoint, pid?: number): boolean {
+    return vehicleMod.useVehicleAction(this.ctx, action, point, pid);
+  }
+  leaveVehicle(pid?: number): void {
+    vehicleMod.leaveVehicle(this.ctx, pid);
+  }
+
   /** Replace a player's whole weapon-skin loadout (host seed: the server pushes
    *  the account-wide selection at join; offline keeps session-local state) and
    *  re-resolve the active skin against the equipped mainhand. Cosmetic only. */
@@ -4569,6 +4587,9 @@ export class Sim {
   }
   get worldQuestLog(): ReadonlyMap<string, WorldQuestProgress> {
     return this.primary.worldQuestLog;
+  }
+  get nearbyWorldQuestTraces() {
+    return worldQuestState.nearbyWorldQuestTraces(this, this.playerId);
   }
   // --- IWorldDeeds: the Book of Deeds read surface + title/border selection.
   // The reads expose the live per-player state (the questLog precedent above);
@@ -5879,12 +5900,15 @@ export class Sim {
       const p = this.entities.get(meta.entityId);
       if (!p) continue;
       if (p.dead) worldQuestMod.updateWorldQuests(this.ctx, meta, p);
+      vehicleMod.tickVehicle(this.ctx, meta, p);
       if (!p.dead) {
         ensureWarriorStance(this.ctx, p, meta);
         this.updatePlayerMovement(p, meta);
         updateVeilboundMarchMovement(this.ctx, p);
         completeVeilboundMarch(this.ctx, p);
         worldQuestMod.updateWorldQuests(this.ctx, meta, p);
+        if (worldQuestMod.hasActiveWorldQuest(meta, 'wq_evergarden_cannon'))
+          vehicleMod.ensureVehicleStation(this.ctx);
         lap?.('p.move');
         this.updateDoorTriggers(p);
         this.updateRiftTriggers(p);
@@ -6528,45 +6552,7 @@ export class Sim {
   }
 
   private updatePlayerMovement(p: Entity, meta: PlayerMeta): void {
-    // Verticality: strip last tick's rift raised-tier lift so the movement kernel
-    // (and the charge/follow/fear paths) integrate jumps + gravity against the true
-    // flat rift floor; updateRiftTriggers re-applies it after the step. Zero outside
-    // a rift or on a single-level floor, so non-rift movement is byte-identical.
-    const preLift = riftPlayerLiftImpl(this.ctx, p);
-    if (preLift !== 0) p.pos.y -= preLift;
-    // Any locomotion key counts as a deliberate action for the anti-AFK pet gate.
-    const mv = meta.moveInput;
-    if (
-      mv.forward ||
-      mv.back ||
-      mv.strafeLeft ||
-      mv.strafeRight ||
-      mv.turnLeft ||
-      mv.turnRight ||
-      mv.jump
-    ) {
-      meta.lastActiveTick = this.tickCount;
-      // Moving under your own input clears an AFK flag (classic behavior); a
-      // no-op unless the player is currently AFK. Do Not Disturb survives.
-      clearAfkOnMove(this.ctx, meta, p);
-    }
-    if (advanceValkyrsCalling(this.ctx, p)) return;
-    // The race countdown is a real start lock, not just a client animation.
-    // Hold every forced/manual locomotion mode until the authoritative GO tick.
-    if (meta.mountRace?.phase === 'countdown') return;
-    if (advanceHeroicLeap(this.ctx, p)) return;
-    // A ledge climb owns movement while it runs, and an airborne body that
-    // gets its hands on a reachable ledge starts one. Sits after the leap arc
-    // (a leap has its own landing contract) and before charge/follow/fear so
-    // those cannot fight a pull-up already in progress.
-    if (advanceClimb(p)) return;
-    // Grabbing is AUTOMATIC, not a second button. A player who jumps at a
-    // ledge has already expressed the intent; making them also hold a key at
-    // the exact frame their hands reach it is the difference between a move
-    // that feels like traversal and one that feels like a QTE. The grab is
-    // already gated on being airborne past the apex, moving toward the ledge,
-    // and the ledge being somewhere the body fits.
-    if (tryStartClimb(p, this.cfg.seed) && advanceClimb(p)) return;
+    if (advanceExclusiveMovement(this.ctx, p, meta)) return;
     if (this.updateChargeMovement(p)) return;
     if (this.updateFollowMovement(p, meta)) return;
     if (this.updateFearMovement(p)) return;
@@ -9666,6 +9652,7 @@ export class Sim {
     // Book of Deeds: chronicler talks feed their visited mark; talking to any
     // other NPC resets the Saul consecutive-talk counter.
     deedsMod.onNpcTalkedForDeeds(this.ctx, meta, npc.templateId);
+    if (worldQuestMod.talkToWorldQuestInstructor(this.ctx, npc, meta, p)) return;
     if (this.interactNpcForQuests(npc, meta)) return;
     for (const qid of npc.questIds) {
       const quest = QUESTS[qid];
@@ -9691,34 +9678,7 @@ export class Sim {
   }
 
   private interactNpcForQuests(npc: Entity, meta: PlayerMeta): boolean {
-    let progressed = false;
-    // Talking to the giver of an active quest re-grants a lost required item
-    // (quests/quest_commands.ts regrantMissingQuestItems, the accept grant's
-    // in-progress twin, on the same recoverable-stores predicate).
-    questCommands.regrantMissingQuestItems(this.ctx, meta, npc.templateId);
-    for (const qp of meta.questLog.values()) {
-      if (qp.state !== 'active') continue;
-      const quest = QUESTS[qp.questId];
-      quest.objectives.forEach((objective, objectiveIndex) => {
-        if (objective.type !== 'interact' || objective.targetNpcId !== npc.templateId) return;
-        const required = questObjectiveRequired(quest, qp, objectiveIndex);
-        if (qp.counts[objectiveIndex] >= required) return;
-        qp.counts[objectiveIndex]++;
-        progressed = true;
-        meta.counters.questProgress++;
-        this.emit({
-          type: 'questProgress',
-          questId: qp.questId,
-          objectiveIndex,
-          current: qp.counts[objectiveIndex],
-          required,
-          text: `${objective.label}: ${qp.counts[objectiveIndex]}/${required}`,
-          pid: meta.entityId,
-        });
-        this.ctx.checkQuestReady(qp, meta);
-      });
-    }
-    return progressed;
+    return interactNpcForQuests(this.ctx, npc, meta);
   }
 
   // -------------------------------------------------------------------------
@@ -9760,11 +9720,9 @@ export class Sim {
   ): void {
     worldQuestMod.swapWorldQuestMatch3Tiles(this.ctx, questId, fromIndex, toIndex, pid);
   }
-
   resetWorldQuestMatch3(questId: string, pid?: number): void {
     worldQuestMod.resetWorldQuestMatch3(this.ctx, questId, pid);
   }
-
   dropWorldQuestDeliveryCargo(pid = this.playerId): boolean {
     const player = this.entities.get(pid);
     return player ? dropWorldQuestDeliveryCargoImpl(this.ctx, player) : false;

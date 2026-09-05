@@ -6,6 +6,8 @@ import type {
   WorldQuestBeamPuzzleDef,
   WorldQuestDef,
 } from '../types';
+import { WORLD_QUEST_CANNON } from './vehicle_stations';
+import { WORLD_QUEST_CALLIGRAPHY_QUEST } from './world_quest_calligraphy';
 
 export const WORLD_QUEST_MIN_LEVEL = 10;
 
@@ -641,6 +643,8 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     count: 5,
     reward: { type: 'xp', rate: 0.12 },
   },
+  WORLD_QUEST_CALLIGRAPHY_QUEST,
+  WORLD_QUEST_CANNON,
 ];
 
 export const WORLD_QUESTS_BY_ID: Readonly<Record<string, WorldQuestDef>> = Object.fromEntries(

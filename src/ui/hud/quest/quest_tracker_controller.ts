@@ -5,6 +5,7 @@ import { esc } from '../../esc';
 import { formatNumber, t } from '../../i18n';
 import { ownEntry } from '../../known_item';
 import type { PainterHostWriters } from '../../painter_host';
+import { worldQuestTraceProgressInstruction } from '../../world_quest_trace_view';
 import { worldQuestDisplayName, worldQuestObjectiveLabel } from '../../world_quest_view';
 import { buildQuestStrip, type QuestStripController } from './quest_strip_controller';
 import { type QuestTrackerView, questTrackerView, type TrackedQuest } from './quest_tracker';
@@ -48,6 +49,9 @@ export class QuestTrackerController {
   // tracker rewrote itself each update and the pulse strobed as it was
   // stripped and re-added in a fight.
   private lastHtml: string | null = null;
+  /** A live movement lesson must remain readable. While it is present the
+   *  header is a truthful disabled control and cannot mutate the saved choice. */
+  private collapseLocked = false;
 
   constructor(private readonly deps: QuestTrackerControllerDeps) {
     this.strip = buildQuestStrip({
@@ -95,6 +99,7 @@ export class QuestTrackerController {
     this.lastNow = now;
     let collapsed = this.deps.settings.collapsed();
     const quests: TrackedQuest[] = [];
+    let traceQuestId: string | undefined;
     for (const progress of this.deps.world().questLog.values()) {
       // The log is SERVER truth: a quest id accepted on a current client can
       // reach a bundle that predates it (stale-client guard, R34), and the
@@ -124,19 +129,28 @@ export class QuestTrackerController {
       });
     }
     for (const progress of this.deps.world().worldQuestLog.values()) {
-      if (progress.state !== 'active') continue;
+      if (
+        progress.state !== 'active' &&
+        !(progress.traceResult && progress.tracing?.phase === 'success')
+      )
+        continue;
       const quest = ownEntry(WORLD_QUESTS_BY_ID, progress.questId);
       if (!quest) continue;
+      if (progress.tracing) traceQuestId = progress.questId;
       quests.push({
         id: progress.questId,
         number: quests.length + 1,
         title: worldQuestDisplayName(progress.questId),
-        complete: false,
+        complete: progress.state === 'completed',
         objectives: [
           {
-            label: worldQuestObjectiveLabel(progress.questId),
+            label:
+              quest.objective.type === 'tracing'
+                ? worldQuestTraceProgressInstruction(progress, quest)
+                : worldQuestObjectiveLabel(progress.questId),
             current: Math.min(progress.count, quest.count),
             total: quest.count,
+            ...(quest.objective.type === 'tracing' ? { instruction: true } : {}),
           },
         ],
       });
@@ -148,11 +162,12 @@ export class QuestTrackerController {
     // On touch the strip IS the tracker: the right-anchored markup is hidden in
     // hud.mobile.css, so rendering it would be a string build a phone never sees.
     if (this.strip?.active() === true) {
-      this.strip.update(quests, now);
+      this.strip.update(quests, now, traceQuestId);
       if (this.deps.element.innerHTML !== '') this.deps.element.innerHTML = '';
       return;
     }
-    const html = this.renderHtml(questTrackerView(quests, collapsed));
+    this.collapseLocked = traceQuestId !== undefined;
+    const html = this.renderHtml(questTrackerView(quests, this.collapseLocked ? false : collapsed));
     // First update adopts the live DOM as the baseline, so a host that
     // pre-seeded the element (or an empty tracker) still elides the write.
     if (this.lastHtml === null) this.lastHtml = this.deps.element.innerHTML;
@@ -163,7 +178,7 @@ export class QuestTrackerController {
   }
 
   toggleCollapsed(): void {
-    if (!this.deps.settings.available()) return;
+    if (this.collapseLocked || !this.deps.settings.available()) return;
     const active = this.deps.document.activeElement as HTMLElement | null;
     const refocus = active?.classList.contains('qt-header') === true;
     this.deps.settings.setCollapsed(!this.deps.settings.collapsed());
@@ -178,15 +193,18 @@ export class QuestTrackerController {
     const count = view.collapsed
       ? ` <span class="qt-count">${esc(t('hudChrome.questTracker.count', { count: this.number(view.count) }))}</span>`
       : '';
-    const hint = esc(
-      t(
-        view.collapsed
-          ? 'hudChrome.questTracker.expandHint'
-          : 'hudChrome.questTracker.collapseHint',
-      ),
-    );
+    const hint = this.collapseLocked
+      ? ''
+      : ` title="${esc(
+          t(
+            view.collapsed
+              ? 'hudChrome.questTracker.expandHint'
+              : 'hudChrome.questTracker.collapseHint',
+          ),
+        )}"`;
+    const locked = this.collapseLocked ? ' disabled aria-disabled="true"' : '';
     const header =
-      `<button type="button" class="qt-header" aria-expanded="${!view.collapsed}" aria-controls="qt-list" title="${hint}">` +
+      `<button type="button" class="qt-header" aria-expanded="${!view.collapsed}" aria-controls="qt-list"${hint}${locked}>` +
       `<span class="qt-chevron" aria-hidden="true">${chevron}</span>` +
       `<span class="qt-h-label">${esc(t('questUi.tracker.title'))}</span>${count}</button>`;
     let rows = '';
@@ -197,7 +215,10 @@ export class QuestTrackerController {
         : '';
       rows += `<div class="qt-title"${behavior}><span class="qt-num">${esc(this.number(quest.number))}</span>${esc(quest.title)}${quest.complete ? ` <span class="quest-complete">(${esc(t('questUi.tracker.complete'))})</span>` : ''}</div>`;
       for (const objective of quest.objectives) {
-        rows += `<div class="qt-obj${objective.done ? ' done' : ''}">- ${esc(this.progressText(objective.label, objective.current, objective.total))}</div>`;
+        const text = objective.instruction
+          ? objective.label
+          : this.progressText(objective.label, objective.current, objective.total);
+        rows += `<div class="qt-obj${objective.done ? ' done' : ''}">- ${esc(text)}</div>`;
       }
     }
     return `${header}<div id="qt-list">${rows}</div>`;

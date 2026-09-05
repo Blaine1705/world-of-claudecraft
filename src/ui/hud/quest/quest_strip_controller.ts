@@ -185,7 +185,7 @@ export class QuestStripController {
    *  core owns both halves of that decision (what counts as progress, and the
    *  grace that leaves a hand cycle alone for a few seconds), so `now` is the
    *  HUD's frame clock passed straight through. */
-  update(quests: readonly TrackedQuest[], now: number): void {
+  update(quests: readonly TrackedQuest[], now: number, focusQuestId?: string): void {
     this.nowMs = now;
     const jump = questStripProgressJump({
       previous: this.quests,
@@ -195,6 +195,9 @@ export class QuestStripController {
     });
     this.quests = quests;
     if (jump !== null) this.index = jump;
+    // A movement lesson's instructions stay visible while the player draws.
+    const focusIndex = focusQuestId ? quests.findIndex((quest) => quest.id === focusQuestId) : -1;
+    if (focusIndex >= 0) this.index = focusIndex;
     this.repaint();
     // The bounded periodic re-measure, counted on the TRACKER's tick rather
     // than on repaints, so a burst of gesture repaints cannot pull it forward.
@@ -252,10 +255,9 @@ export class QuestStripController {
     this.seat(false);
   }
 
-  /** Every raw input the resolve below reads, before a single t()/formatNumber
-   *  call: which quest (by id; the title/label strings TrackedQuest carries are
-   *  already locale-resolved by the tracker and cannot themselves be compared
-   *  for free), its complete flag, the counter's position/total, the overflow
+  /** Every input the resolve below reads, before a single t()/formatNumber
+   *  call: which quest, its already-resolved title and phase-sensitive labels,
+   *  its complete flag, the counter's position/total, the overflow
    *  count, and each objective's current/total/done. The locale generation
    *  covers what the strip resolves itself, which none of those raw fields
    *  would otherwise move on a language switch alone (see relocalize()). */
@@ -264,24 +266,31 @@ export class QuestStripController {
       this.localeGeneration,
       view.visible ? '1' : '0',
       view.id,
+      view.title,
       view.complete ? '1' : '0',
       view.counter.visible ? '1' : '0',
       view.counter.position,
       view.counter.total,
       view.hiddenObjectives,
-      ...view.objectives.map((o) => `${o.current}/${o.total}/${o.done ? '1' : '0'}`),
+      ...view.objectives.map(
+        (o) =>
+          `${o.label}/${o.current}/${o.total}/${o.done ? '1' : '0'}/${o.instruction ? '1' : '0'}`,
+      ),
     ].join('|');
   }
 
   /** The t()/formatNumber resolve, run only when rawKey() moved. */
   private resolve(view: QuestStripView): Omit<QuestStripPaintModel, 'pressed' | 'flash'> {
     const objectives = view.objectives.map<QuestStripObjectiveLine>((objective) => ({
-      text: t('questUi.detail.objectiveProgress', {
-        label: objective.label,
-        current: this.number(objective.current),
-        total: this.number(objective.total),
-      }),
+      text: objective.instruction
+        ? objective.label
+        : t('questUi.detail.objectiveProgress', {
+            label: objective.label,
+            current: this.number(objective.current),
+            total: this.number(objective.total),
+          }),
       done: objective.done,
+      ...(objective.instruction ? { instruction: true } : {}),
     }));
     const model = {
       visible: view.visible,

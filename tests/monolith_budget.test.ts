@@ -360,7 +360,9 @@ const MONOLITHS: MonolithRow[] = [
     // count, zero headroom.
     // Quest caravan animation and entity-body picking now share the tested
     // quest_entity_presentation.ts lifecycle adapter. Exact post-extraction count.
-    ceiling: 13210,
+    // Personal racing, mount lesson and island guidance now share world_guidance.ts.
+    // Vehicle camera composition and underwater ceiling live in tested camera siblings.
+    ceiling: 13189,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -470,7 +472,9 @@ const MONOLITHS: MonolithRow[] = [
     // moved behind their own modules. The feature's required facade and tick
     // wiring now land with zero net growth against release/v0.42.0.
     // World-quest credit callbacks moved behind world_quest_context.ts.
-    ceiling: 12268,
+    // Ordinary NPC quest-talk credit now lives in quest_npc_interaction.ts.
+    // Exclusive movement modes now live behind player_movement_modes.
+    ceiling: 12226,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -589,7 +593,8 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
     // merge: both parents had already ratcheted for their own work, so
     // the composite is the honest size. Exact count, zero slack.
-    ceiling: 10640,
+    // Owner activity keys are emitted by quest_snapshot_wire, outside heavy snapshots.
+    ceiling: 10639,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -651,7 +656,8 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
     // merge: both parents had already ratcheted for their own work, so
     // the composite is the honest size. Exact count, zero slack.
-    ceiling: 5908,
+    // Mount-race decoding and vehicle commands live in their existing wire state seams.
+    ceiling: 5888,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -678,7 +684,8 @@ const MONOLITHS: MonolithRow[] = [
     // stair ramps fold in there), then EMBER_LAVA_POOLS moved home to
     // ember_lava_layout.ts beside its flat-pool sibling (paying for the
     // fortress scatter screen); exact count.
-    ceiling: 5275,
+    // Named decoration clearings are independent of terrain generation.
+    ceiling: 5269,
     seam: 'zone/terrain data as content records; logic as sim sibling modules',
   },
   {

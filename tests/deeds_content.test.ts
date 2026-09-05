@@ -63,16 +63,17 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 281 deeds worth 3340 total Renown', () => {
+  it('ships exactly 283 deeds worth 3355 total Renown', () => {
     // Release base (262 / 3145 after the WARFARE lifetime-honor ladder) plus
     // four Reliquary Curator rank bridges and the five Phase 18 completion
     // ladder deeds (all nine renown 0: catalog prestige never scores the
     // board), the walk-in castle visit pair (exp_the_last_keep,
     // exp_dawnhold_castle, renown 5 each), the Proving Shore graduation
     // deed (prog_ready_for_an_adventure, renown 5), and the five Crucible
-    // raid deeds (four clears at 25 plus the flawless 50: +150).
-    expect(DEED_ORDER.length).toBe(281);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3340);
+    // raid deeds (four clears at 25 plus the flawless 50: +150), the Arcane
+    // Calligraphy completion deed (+5), and its Gold-rating title deed (+10).
+    expect(DEED_ORDER.length).toBe(283);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3355);
   });
 
   it('ships the audited per-category counts', () => {
@@ -95,7 +96,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // +2 bank socket ladder deeds (soc_strongbox_outfitter,
       // soc_four_bags_deep; Bank Storage phase 06).
       social: 20,
-      exploration: 11,
+      exploration: 13,
       feat: 3,
       hidden: 9,
     });
@@ -239,6 +240,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'dgn_varkhul',
       'dgn_varkhul_heroic',
       'dgn_varkhul_flawless',
+      'exp_arcane_calligraphy',
+      'exp_arcane_calligraphy_gold',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -551,18 +554,19 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     }
   });
 
-  it('ships exactly 43 titles and 4 borders', () => {
+  it('ships exactly 44 titles and 4 borders', () => {
     const titles = ALL.filter((d) => d.reward?.kind === 'title');
     const borders = ALL.filter((d) => d.reward?.kind === 'border');
     // Reliquary Curator ranks append 3 titles + 1 border, the WARFARE honor
     // ladder 3 more titles, the Phase 18 Reliquary completion ladder 5 more
     // on top of the release base (31 + 3), and the Crucible raid's flawless
-    // title (dgn_varkhul_flawless) one more.
-    expect(titles.length).toBe(43);
+    // title (dgn_varkhul_flawless) one more, and Arcane Calligraphy's Gold
+    // rating adds the Runecaller title.
+    expect(titles.length).toBe(44);
     expect(borders.length).toBe(4);
     // Titles and border slugs are unique (one deed per cosmetic).
     const titleTexts = titles.map((d) => (d.reward as { text: string }).text);
-    expect(new Set(titleTexts).size).toBe(43);
+    expect(new Set(titleTexts).size).toBe(44);
     const borderSlugs = borders.map((d) => (d.reward as { slug: string }).slug);
     expect([...borderSlugs].sort()).toEqual([
       'curators_gilt',
@@ -656,7 +660,10 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // deeds, the per-boss clear pairs (dgn_ignivar, dgn_ignivar_heroic,
   // dgn_varkhul, dgn_varkhul_heroic) and the Varkhul flawless task
   // (dgn_varkhul_flawless). No shipped trigger or renown changed.
-  const FROZEN_CATALOG_SHA256 = 'bd95099f837871f85329aefff1478adc621cc8e83a386b2535826cf29d730219';
+  // Two appended manual exploration deeds for Arcane Calligraphy: its normal
+  // completion deed is worth 5 Renown and its Gold-rating title deed is worth 10.
+  // Every previously shipped trigger and Renown value remains unchanged.
+  const FROZEN_CATALOG_SHA256 = '8ac73c74e8bea76c3e6db5659f8f8ee12eee539926122bb49c7ac8a7f53895dd';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -854,9 +861,8 @@ describe('table shape', () => {
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');
-    // The Crucible raid block closes the tail (appended behind the Proving
-    // Shore graduation deed; the flawless task is its final entry).
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('dgn_varkhul_flawless');
+    // The Gold-rating Arcane Calligraphy deed is the latest append-only entry.
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('exp_arcane_calligraphy_gold');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

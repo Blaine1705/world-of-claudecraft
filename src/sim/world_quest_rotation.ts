@@ -9,10 +9,9 @@ const WORLD_QUEST_CYCLE_PREFIX = 'wq3_';
 export const WORLD_QUEST_ROTATION_DAYS = 3;
 export const WORLD_QUESTS_PER_ROTATION = 5;
 
-// Preserve the three shipped rotations and their modulo-3 cadence. Cycle 3
-// replaces Eastbrook's bandit slot with its caravan. Cycles 4 and 5 offer
-// Frostveil and Willowfen caravans in their own region's slots, leaving the
-// first three rotations and the five-quest daily roster unchanged.
+// Preserve each existing roster and append new variants. Caravan groups swap
+// their own region's slot; calligraphy adds an Eastbrook variant. Selection
+// wraps over every group and still offers five quests per three-day cycle.
 const WORLD_QUEST_ROTATION_ID_GROUPS = Object.freeze([
   Object.freeze([
     'wq_eastbrook_bandits',
@@ -55,6 +54,28 @@ const WORLD_QUEST_ROTATION_ID_GROUPS = Object.freeze([
     'wq_wraithwood_restless',
     'wq_farshore_salvage',
     'wq_proving_shore_scuttlers',
+  ]),
+  Object.freeze([
+    'wq_eastbrook_calligraphy',
+    'wq_mirefen_gravecallers',
+    'wq_palmreach_confections',
+    'wq_evergarden_watch',
+    'wq_galecrest_wisps',
+  ]),
+  // Eight rosters avoid locking weekly puzzle variants to a single offering.
+  Object.freeze([
+    'wq_eastbrook_calligraphy',
+    'wq_nightbloom_barrow',
+    'wq_wraithwood_restless',
+    'wq_farshore_salvage',
+    'wq_proving_shore_scuttlers',
+  ]),
+  Object.freeze([
+    'wq_eastbrook_bandits',
+    'wq_mirefen_gravecallers',
+    'wq_palmreach_confections',
+    'wq_evergarden_cannon',
+    'wq_galecrest_wisps',
   ]),
 ] as const);
 

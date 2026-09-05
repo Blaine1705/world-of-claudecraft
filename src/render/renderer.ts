@@ -7,6 +7,7 @@ import {
   emptyPriestMarkerState,
   priestMarkerStateForAuras,
 } from '../sim/combat/priest/presentation';
+import { NORTH_WATCH_CANNON } from '../sim/content/vehicle_stations';
 import {
   ABILITIES,
   ARENA_SLOT_COUNT,
@@ -107,6 +108,7 @@ import {
   resolveCameraFov,
   stepCameraFeel,
   stepLandingDetector,
+  underwaterCameraCeiling,
 } from './camera_feel_core';
 import { buildCampBraziers, type CampBraziersView } from './camp_braziers';
 import { canopyDetailPrewarmTextures } from './canopy_detail';
@@ -383,7 +385,6 @@ import {
   type FogSceneState,
   isOpenAirFogState,
 } from './interior_light_rig';
-import { IslandGuidance } from './island_guidance';
 import { buildJailScene, type JailSceneView } from './jail_scene';
 import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features';
 import { stepLichHeartbeat } from './lich_audio_state_core';
@@ -414,7 +415,6 @@ import { buildMailboxPillar } from './mailbox';
 import { collectObjectTextures } from './material_texture_slots';
 import { buildMobNightGlow, type MobNightGlowView } from './mob_night_glow';
 import { buildMotes, type MotesView } from './motes';
-import { MountBeacon } from './mount_beacon';
 import { type MountGlows, updateMountGlows } from './mount_glow';
 import { applyMountJumpAttitude } from './mount_jump_attitude';
 import { type MountLamps, updateMountLamps } from './mount_lamps';
@@ -580,7 +580,6 @@ import {
 } from './quest_entity_presentation';
 import { makeQuestObjectGate, type QuestObjectGateOptions } from './quest_object_gate_core';
 import { buildGroundQuestObject, farshoreSalvagePrewarmPlan, prewarmFarshoreSalvageObjects } from './quest_objects';
-import { RaceLine } from './race_line';
 import {
   disposeRaidEncounterVisuals,
   raidEncounterBypassesCharacterCulling,
@@ -714,6 +713,7 @@ import {
 import { createPrewarmGroupSlot, createVariantPrewarmSlot } from './variant_prewarm_slot';
 import { routeVarkhulForgeHammer } from './varkhul_forge_hammer';
 import { VarkhulForgestormVisuals } from './varkhul_forgestorm_visual';
+import { createVehicleCamera, stepVehicleCamera } from './vehicle_camera_core';
 import { SCHOOL_COLORS, Vfx } from './vfx';
 import { createOffsetVfxAnchor, createVfxAnchor, type VfxAnchorPose } from './vfx_anchor';
 import {
@@ -757,6 +757,7 @@ import { weaponVfxShedScale } from './weapon_vfx_shed_core';
 import { Weather } from './weather';
 import { precipForBiome } from './weather_field_core';
 import { buildWorldAmbientSources, footstepSurfaceAt } from './world_audio';
+import { WorldGuidance } from './world_guidance';
 import { hasWorldQuestDeliveryCargo, syncWorldQuestCarryVisual, type WorldQuestCarryViewState } from './world_quest_carry_visual';
 import { surfaceDetailPrewarmTextures } from './worn_stone';
 import { buildYumiMaze, type YumiMazeView } from './yumi_maze';
@@ -940,8 +941,6 @@ const SWIM_KICK_HZ = 2.6;
 const SWIM_FOOT_TRAIL = 0.19;
 // Depth below the waterline over which the underwater wash fades fully in.
 const UNDERWATER_FADE_DEPTH = 0.45;
-// How far under the line the chase camera is pulled while the player is submerged.
-const UNDERWATER_CAMERA_DIP = 0.5;
 const FOOT_RUN_SPEED = 4.5; // u/s — matches the run threshold in characters/anim_state.ts
 // fire/torch point lights beyond this never shine (their falloff range is
 // shorter anyway); the nearest GFX.maxPointLights within it win the budget
@@ -1348,6 +1347,7 @@ export class Renderer {
   private readonly camBoom = createCameraBoom();
   private readonly camFeel = createCameraFeel();
   private readonly camDirector = createCameraDirector();
+  private readonly vehicleCamera = createVehicleCamera();
   private baseFov = CAMERA_BASE_FOV; // setCameraFov's value; camera.fov is overwritten below each frame
   // Player-pose mirror from last frame: any change while a directive runs is
   // manual camera input (or the follow system), which cancels the directive.
@@ -1606,7 +1606,7 @@ export class Renderer {
   private campBraziers: CampBraziersView | null = null;
   private decorTorchFx: DecorTorchFxView | null = null;
   // The island rail's guidance coordinator (beacon fizz + golden trail).
-  private islandGuidance!: IslandGuidance;
+  private worldGuidance!: WorldGuidance;
   private nightAccents: NightAccentsView | null = null;
   private mobNightGlow: MobNightGlowView | null = null;
   // Contact blobs under nearby bodies, built ONLY on the tiers that cast no
@@ -1826,8 +1826,6 @@ export class Renderer {
   // Thornhollow Fields flag/rune per-frame dressing + transition bursts; runs off
   // bgInfo and view userData only (battleground_fx.ts).
   private bgFx!: BattlegroundFx;
-  private raceLine: RaceLine;
-  private mountBeacon: MountBeacon;
   // Per-ability spell VFX subsystem: the spec-driven painter plus the pooled
   // primitive engine (ribbons, shock rings, decals, windup orbs, buff orbits;
   // see src/render/ability_vfx/).
@@ -3120,13 +3118,7 @@ export class Renderer {
     setRenderCategory(this.sentenceVfx.group, 'vfx');
 
     bd('vfx');
-    // Show-jumping racing line: self-scoped course guidance, hidden outside the
-    // player's own race (driven per frame from world.mountRaceView() below).
-    this.raceLine = new RaceLine(this.scene, this.groundSample);
-    // Riding-lesson start platform: the glowing square behind the start arch.
-    this.mountBeacon = new MountBeacon(this.scene, this.groundSample);
-    // The Proving Shore's guidance: beacon fizz, route ribbon, target ring.
-    this.islandGuidance = new IslandGuidance(this.scene, this.groundSample, (t) => this.compileGate(t));
+    this.worldGuidance = new WorldGuidance(this.scene, this.groundSample, (t, e) => this.compileGate(t, e));
 
     // ambient precipitation: biome-driven snow/rain that rides with the camera
     this.weather = new Weather(this.scene, this.lowGfx);
@@ -3270,6 +3262,7 @@ export class Renderer {
     // batch or any renderer DOM surface added after the explicit maps above.
     bestEffort(() => this.nameplateLayer.replaceChildren());
     bestEffort(() => this.travelSpeedFx?.dispose());
+    bestEffort(() => this.worldGuidance?.dispose());
     bestEffort(() => this.varkhulForgestormVisuals?.dispose());
     this.varkhulForgestormVisuals = undefined;
     // Renderer-owned (not a module singleton): the graphics-rebuild teardown
@@ -4701,7 +4694,7 @@ export class Renderer {
       player.pos,
     ).mandatory;
     const ids = mandatory.map((entity) => entity.id);
-    const compileWaits: Promise<void>[] = [];
+    const compileWaits: Promise<void>[] = [this.worldGuidance.readyForEntry];
     let created = 0;
     for (const entity of mandatory) {
       let view = this.views.get(entity.id);
@@ -10629,7 +10622,7 @@ export class Renderer {
       if (e.kind === 'npc') {
         // The island rail's go-here-next fizz (island_guidance.ts): gentle
         // holy sparkle over beacon NPCs, gold over the current target.
-        this.islandGuidance.npcFizz(this.sim, e, this.vfx, this.time, dt);
+        this.worldGuidance.npcFizz(this.sim, e, this.vfx, this.time, dt);
       }
       if (v.freightCaravanVisual) {
         syncQuestCaravanBody(
@@ -11980,15 +11973,7 @@ export class Renderer {
     this.bgFx.update(this.time);
     this.updateBgWards();
     this.vfx.update(dt);
-    // Racing line (cosmetic; reads the self race view only).
-    this.raceLine.update(this.sim.mountRaceView(), this.time, dt);
-    // Island guidance trail (actionable on every tier; island-gated inside).
-    this.islandGuidance.update(this.sim, this.time, dt);
-    // Start platform: visible while the riding quest is active and no race is live.
-    this.mountBeacon.update(
-      this.sim.questState('q_riding_lessons') === 'active' && !this.sim.mountRaceView(),
-      this.time,
-    );
+    this.worldGuidance.update(this.sim, this.time, dt, this.reducedMotion());
     this.abilityVfx.update(dt, this.reducedMotion());
     this.needleOfFateVfx.update(dt, this.reducedMotion());
     this.sentenceVfx.update(dt, this.reducedMotion());
@@ -12545,6 +12530,7 @@ export class Renderer {
     this.cancelTerrainStreaming();
     this.nameplatePainter.dispose();
     this.travelSpeedFx.dispose();
+    this.worldGuidance?.dispose();
     this.varkhulForgestormVisuals?.dispose();
     this.blobShadows?.dispose();
   }
@@ -12789,7 +12775,7 @@ export class Renderer {
       (Math.abs(this.camYaw - mirror.yaw) > 1e-4 ||
         Math.abs(this.camPitch - mirror.pitch) > 1e-4 ||
         Math.abs(this.camDist - mirror.dist) > 1e-4);
-    const pose = stepCameraDirector(
+    const directedPose = stepCameraDirector(
       this.camDirector,
       { yaw: this.camYaw, pitch: this.camPitch, dist: this.camDist },
       dt,
@@ -12799,26 +12785,19 @@ export class Renderer {
     mirror.pitch = this.camPitch;
     mirror.dist = this.camDist;
 
-    // Follow a submerged swimmer UNDER the surface: a height CEILING folded
-    // into the one cy assignment below (the graphics-overhaul contract pins
-    // that the chase camera's coordinates are each assigned exactly once).
-    // The chase boom rides well above the avatar, and the built-in lakes are
-    // only three or four yards deep, so left alone the camera stays dry
-    // however far you dive - and the whole underwater pass (blue wash,
-    // bubbles, the breaststroke you are actually playing) would only ever be
-    // visible from a zoomed-in view. The ground clamp below still keeps the
-    // camera off the lake bed.
-    const swimWaterLevel = waterLevelAt(selfPos.x, selfPos.z, seed);
-    const underwaterCeilingY =
-      this.selfSubmerged && Number.isFinite(swimWaterLevel)
-        ? swimWaterLevel - UNDERWATER_CAMERA_DIP
-        : Infinity;
+    const underwaterCeilingY = underwaterCameraCeiling(this.selfSubmerged, waterLevelAt(selfPos.x, selfPos.z, seed));
     // The camera orbits the lagged/led pivot at the player's requested
     // distance. Scene geometry never changes that distance; registered
     // obstructors fade through their subsystem's occluder-fade pass.
-    const px = this.camBoom.x + this.camFeel.leadX;
-    const py = this.camBoom.y;
-    const pz = this.camBoom.z + this.camFeel.leadZ;
+    const vehicle = this.sim.vehicleSession;
+    const pose = stepVehicleCamera(this.vehicleCamera,
+      { ...directedPose, x: this.camBoom.x + this.camFeel.leadX, y: this.camBoom.y,
+        z: this.camBoom.z + this.camFeel.leadZ },
+      vehicle ? { ...NORTH_WATCH_CANNON, y: vehicle.origin.y } : null,
+      this.camera.aspect, this.baseFov, dt, reduce);
+    const px = pose.x;
+    const py = pose.y;
+    const pz = pose.z;
     const eyeY = py + 2.0;
     const cx = px - Math.sin(pose.yaw) * Math.cos(pose.pitch) * pose.dist;
     const cy = Math.min(eyeY + Math.sin(pose.pitch) * pose.dist, underwaterCeilingY);

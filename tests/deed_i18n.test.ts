@@ -49,7 +49,7 @@ describe('deed_i18n English resolution', () => {
 
   it('manifests one row per name and desc plus one per title reward', () => {
     const manifest = deedTranslationManifest();
-    // 279 deeds x (name + desc) + the 43 shipped title rewards (both counts
+    // Catalog deeds x (name + desc) + the 44 shipped title rewards (both counts
     // pinned by tests/deeds_content.test.ts): the Drakelands brood pair, the
     // four Thornhollow Fields battleground deeds, the Rift coverage pair
     // (dgn_rift, dgn_rift_s_rank), the seven per-craft rare-tier profession
@@ -59,9 +59,10 @@ describe('deed_i18n English resolution', () => {
     // five Phase 18 Reliquary completion-ladder titles, the walk-in castle
     // visit pair (no title reward), the Proving Shore graduation deed
     // (no title reward), and the five Crucible raid deeds (the Varkhul
-    // flawless task carries the 43rd title).
-    expect(manifest.length).toBe(281 * 2 + 43);
-    expect(manifest.filter((row) => row.field === 'title').length).toBe(43);
+    // flawless task carries the 43rd title), Arcane Calligraphy's completion
+    // deed (no title), and its Gold-rating deed (the 44th title).
+    expect(manifest.length).toBe(283 * 2 + 44);
+    expect(manifest.filter((row) => row.field === 'title').length).toBe(44);
     expect(manifest).toContainEqual({
       id: 'prog_veteran',
       field: 'title',

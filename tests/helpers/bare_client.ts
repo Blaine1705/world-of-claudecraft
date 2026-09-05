@@ -96,6 +96,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.worldQuestCycle = '';
   c.worldQuestExpiresAtMs = 0;
   c.worldQuestLog = new Map();
+  c.nearbyWorldQuestTraces = [];
   c.activeWorldBossIds = new Set();
   c.pendingQuestCommands = new Map();
   c.partyInfo = null;

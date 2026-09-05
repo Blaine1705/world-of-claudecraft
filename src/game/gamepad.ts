@@ -65,6 +65,7 @@ import type { Input } from './input';
 import { markPadActivity } from './input_hint_mode';
 import { focusedPadAction } from './pad_focus_action';
 import { clickPadMouse, hidePadMouse, updatePadMouse } from './pad_mouse_cursor';
+import { vehiclePadAction } from './vehicle_gamepad_core';
 
 export interface GamepadCallbacks {
   // Record one physical button rising edge for the HUD's APM readout.
@@ -77,6 +78,9 @@ export interface GamepadCallbacks {
   // focus-driven UI-navigation mode (movement/camera/abilities are suspended).
   isPointerMode(): boolean;
   isGroundAimActive?(): boolean;
+  isVehicleActive?(): boolean;
+  onVehicleSlot?(slot: number): void;
+  onVehicleExit?(): void;
   onGroundAimStick?(x: number, y: number, dt: number): void;
   onGroundAimCommit?(): void;
   onGroundAimSnap?(direction: 1 | -1): void;
@@ -453,6 +457,51 @@ export class GamepadManager {
     this.checkRumble();
 
     const groundAimActive = this.cb.isGroundAimActive?.() === true;
+    if (this.cb.isVehicleActive?.() && !this.cb.isPointerMode()) {
+      this.input.clearGamepadMove();
+      this.input.setGamepadLookActive(false);
+      this.input.setAutorun(false);
+      this.releaseCrossHotbarEdit();
+      this.releaseCrossHotbar();
+      this.releaseHeldCasts();
+      const stick = applyRadialDeadzone(
+        pad.axes[AXIS.LEFT_X] ?? 0,
+        pad.axes[AXIS.LEFT_Y] ?? 0,
+        this.deadzone,
+      );
+      if (groundAimActive) this.cb.onGroundAimStick?.(stick.x, stick.y, dt);
+      const edges = risingEdges(this.prevPressed, cur);
+      for (const button of edges) {
+        this.cb.onInputEdge();
+        const action = vehiclePadAction(button);
+        switch (action?.kind) {
+          case 'slot':
+            this.cb.onVehicleSlot?.(action.slot);
+            break;
+          case 'confirm':
+            this.cb.onGroundAimCommit?.();
+            break;
+          case 'cancel':
+            this.cb.cancelGroundAim?.();
+            break;
+          case 'exit':
+            this.cb.onVehicleExit?.();
+            break;
+          case 'menu':
+            this.cb.onAction('escape');
+            break;
+          case 'snap':
+            this.cb.onGroundAimSnap?.(action.direction);
+            break;
+        }
+      }
+      if (edges.length || stick.x || stick.y) {
+        markPadActivity();
+        this.cb.onActivity?.();
+      }
+      this.prevPressed = cur;
+      return;
+    }
     if (groundAimActive && !this.cb.isPointerMode()) {
       this.input.clearGamepadMove();
       if (!this.placementActive) this.input.setAutorun(false);

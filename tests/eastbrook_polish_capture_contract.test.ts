@@ -357,7 +357,8 @@ interface AttributionTargetFixture {
 // Re-minted after integrating the world-quests renderer with the current
 // release/v0.42.0 renderer. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'f7dcf9b7ba79dff5a6faf12d1c13ed59c08c8d1f4b65f23ae22c3e7d65b6eb31';
+  // Calligraphy guidance integration moves the renderer leaf, not the town captures.
+  'eb58314270024977f35eb99ceed7dd234f76ded92a603dabb5f2af018420b101';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

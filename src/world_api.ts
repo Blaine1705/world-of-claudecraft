@@ -46,6 +46,7 @@
 //                                            with canEdit marking officer-plus EDITS,
 //                                            proximity-gated info + gold/item/buy-slots commands)
 //   mounts.ts           IWorldMounts         rideable ground mounts: pick + mount/dismount
+//   vehicles.ts         IWorldVehicles       personal vehicle session + enter/action/leave
 //   dungeon_finder.ts   IWorldDungeonFinder  Dungeon Finder queue/proposals/premade board
 //   deeds.ts            IWorldDeeds          earned deeds, lifetime stats, renown, active title,
 //                                            rarity + the account-Renown leaderboard reads
@@ -94,6 +95,7 @@ import type { IWorldTalents } from './world_api/talents';
 import type { IWorldTargeting } from './world_api/targeting';
 import type { IWorldTelemetry } from './world_api/telemetry';
 import type { IWorldTrade } from './world_api/trade';
+import type { IWorldVehicles } from './world_api/vehicles';
 
 // --- pass-through sim re-exports: downstream imports these FROM world_api ---
 // Account flair is defined in the host-agnostic sim core (src/sim/account_flair.ts)
@@ -113,6 +115,7 @@ export type {
   DeedStats,
   OverheadEmoteId,
 } from './sim/types';
+export type { VehicleSession } from './world_api/vehicles';
 
 // Online world and required-snapshot compatibility is encoded in the first
 // WebSocket frame's discriminator. Changing the authoritative town layout or
@@ -185,11 +188,14 @@ export type {
 // cannot gate, render, or select their stable object ids without leaking normal quest credit.
 // 31 = World Quests add a moving, interactable public caravan escort. Older clients
 // cannot identify its objective or render and start the authoritative escort entity.
+// 32 = World Quests add owner-only, session-bound movement tracing readouts.
+// Older clients cannot present the memorized outline or authoritative drawing trail.
+// 33 = Nearby calligraphy blue trails and final ratings are a public snapshot surface.
 // (12 is deliberately unassigned: 13 through 25 were numbered 11 through 23 on
 // the pre-merge raid branch, which forked before the Bank Storage and Materials
 // Vault bumps above; that branch's 11 through 20 were in turn 9 through 18
 // before the Eastbrook program bumps.)
-export const ONLINE_WORLD_LAYOUT_VERSION = 31 as const;
+export const ONLINE_WORLD_LAYOUT_VERSION = 33 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI
@@ -382,7 +388,8 @@ export interface IWorld
     IWorldActionBar,
     IWorldDeeds,
     IWorldReliquary,
-    IWorldMounts {}
+    IWorldMounts,
+    IWorldVehicles {}
 
 // ---------------------------------------------------------------------------
 // Command schema (W0b): the shared wire-token vocabulary.
@@ -725,6 +732,9 @@ export const COMMAND_NAMES = [
   'world_quest_puzzle_rotate',
   'world_quest_match3_swap',
   'world_quest_match3_reset',
+  'vehicle_enter',
+  'vehicle_action',
+  'vehicle_leave',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -806,7 +816,8 @@ export type WorldFacet =
   | 'IWorldActionBar'
   | 'IWorldDeeds'
   | 'IWorldReliquary'
-  | 'IWorldMounts';
+  | 'IWorldMounts'
+  | 'IWorldVehicles';
 
 export const COMMAND_FACETS = {
   // IWorldCombat: ability casts, auto-attack, spirit release.
@@ -1059,4 +1070,7 @@ export const COMMAND_FACETS = {
   // IWorldActionBar: the debounced action-bar layout upload. takeActionBarLayoutRestore
   // is a login-time read (no send, untagged).
   save_hotbar_layout: 'IWorldActionBar',
+  vehicle_enter: 'IWorldVehicles',
+  vehicle_action: 'IWorldVehicles',
+  vehicle_leave: 'IWorldVehicles',
 } as const satisfies Partial<Record<ClientCommand, WorldFacet>>;

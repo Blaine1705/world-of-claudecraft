@@ -12,6 +12,14 @@
 
 import { RUN_SPEED } from '../sim/types';
 
+/** Follow a submerged swimmer under the surface. The chase boom otherwise
+ * stays above shallow lakes even when the avatar is diving. The renderer folds
+ * this ceiling into its single camera-height assignment, then keeps the eye
+ * above the lake bed with its ordinary ground clamp. */
+export function underwaterCameraCeiling(submerged: boolean, waterLevel: number): number {
+  return submerged && Number.isFinite(waterLevel) ? waterLevel - 0.5 : Infinity;
+}
+
 export interface CameraFeelState {
   leadX: number;
   leadZ: number;

@@ -19,6 +19,137 @@
      @layer components would let the unlayered base win and invert the cascade, so they
      stay inline beside their bases and relocate later. */
 @layer components {
+  /* ---------- vehicle action bar ---------- */
+  body.operating-vehicle
+  :is(
+    #actionbar,
+    #actionbar2,
+    #actionbar3,
+    #cross-hotbar,
+    #stancebar,
+    #petbar,
+    #mobile-action-ring,
+    #mobile-action-radial
+  ) {
+    display: none !important;
+  }
+  /* Temporary layout only: the saved unit-frame position and action bindings stay intact. */
+  body.operating-vehicle #player-frame:not(.pf-detached) {
+    margin-bottom: 250px;
+  }
+  .vehicle-bar {
+    position: absolute;
+    bottom: max(24px, env(safe-area-inset-bottom));
+    left: 50%;
+    transform: translateX(-50%);
+    box-sizing: border-box;
+    width: min(540px, calc(100% - 24px));
+    grid-template-columns: 46px 1fr 90px;
+    gap: 8px 16px;
+    padding: 14px 18px;
+    border: 3px ridge var(--border);
+    border-radius: 22px 22px 10px 10px;
+    background: var(--panel-bg);
+    color: var(--gold);
+    pointer-events: auto;
+  }
+  .vehicle-bar-title,
+  .vehicle-bar-status,
+  .vehicle-bar-hint {
+    grid-column: 1 / -1;
+    text-align: center;
+  }
+  .vehicle-bar-title {
+    font-family: var(--title-font);
+    font-size: 16px;
+  }
+  .vehicle-bar-status,
+  .vehicle-bar-hint {
+    font-size: 14px;
+  }
+  .vehicle-integrity {
+    --vehicle-integrity: 1;
+    position: relative;
+    min-height: 72px;
+    overflow: hidden;
+    border: 2px ridge var(--border);
+    border-radius: 8px;
+  }
+  .vehicle-integrity-fill {
+    position: absolute;
+    inset: 0;
+    background: var(--color-vehicle-integrity);
+    transform: scaleY(var(--vehicle-integrity));
+    transform-origin: bottom;
+  }
+  .vehicle-integrity.low-integrity .vehicle-integrity-fill {
+    background: var(--color-vehicle-danger);
+  }
+  .vehicle-integrity-text {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-weight: bold;
+    color: var(--color-vehicle-text);
+    text-shadow: 0 1px 3px var(--panel-base);
+  }
+  .vehicle-action-slots {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .vehicle-bar .vehicle-action {
+    width: 64px;
+    height: 64px;
+    flex: 0 0 64px;
+    position: relative;
+    background-size: cover;
+    border: 2px ridge var(--border);
+    border-radius: 7px;
+  }
+  .vehicle-action .keybind {
+    position: absolute;
+    top: 2px;
+    left: 4px;
+    color: var(--color-vehicle-text);
+    text-shadow: 0 1px 3px var(--panel-base);
+  }
+  .vehicle-exit {
+    align-self: center;
+    min-height: 48px;
+    border: 2px ridge var(--border);
+    border-radius: 8px;
+    color: var(--gold);
+    background: var(--panel-base);
+  }
+  .vehicle-bar button:focus-visible,
+  .vehicle-integrity:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 3px;
+  }
+  .vehicle-comfort {
+    grid-column: 3;
+    grid-row: 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 40px;
+    font-size: 14px;
+  }
+  .vehicle-comfort input {
+    width: 20px;
+    height: 20px;
+  }
+  .vehicle-comfort:focus-within {
+    outline: 2px solid var(--gold);
+  }
+  .vehicle-bar-hint {
+    grid-column: 1 / 3;
+    min-height: 2.4em;
+  }
   /* ---------- nameplates ---------- */
   .nameplate {
     position: absolute;
@@ -4798,8 +4929,12 @@
     pointer-events: auto;
     text-shadow: 1px 1px 2px #000;
   }
-  #quest-tracker .qt-header:hover {
+  #quest-tracker .qt-header:not(:disabled):hover {
     color: #fff;
+  }
+  #quest-tracker .qt-header:disabled {
+    cursor: default;
+    opacity: 1;
   }
   #quest-tracker .qt-header:focus-visible {
     outline: 2px solid var(--gold);

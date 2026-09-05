@@ -10,6 +10,45 @@
 import { armoryCollectionStrings, armorySkinStrings } from './armory';
 
 export const hudChromeStrings = {
+  vehicle: {
+    title: 'North Watch Cannon',
+    objective: 'Defend the north watch',
+    cannonball: 'Cannonball',
+    grapeshot: 'Grapeshot',
+    incendiary: 'Incendiary Shot',
+    integrity: 'Cannon integrity',
+    exit: 'Leave cannon',
+    wave: 'Wave {wave}/{total}',
+    enemies: 'Enemies remaining: {count}',
+    countdown: 'Prepare: {seconds}',
+    hint: 'Choose a shot, then click the ground to fire.',
+    aim: 'Click to fire. Right click or Escape cancels aiming.',
+    sapperWarning: 'Sapper incoming! Stop the explosive carrier before it reaches the line.',
+    chargeWarning: 'Commander orders a charge! All surviving enemies move faster.',
+    armorHint: 'Break the silver shields with Cannonball, then use Incendiary Shot.',
+    exposedHint: 'Broken armor: Incendiary Shot deals double damage.',
+    barrelHint: 'Shoot the marked powder barrels when enemies gather around them.',
+    barrelRules:
+      'Direct hits ignite powder barrels: {damage} damage within {radius} yards, with chain explosions.',
+    armorRules:
+      'Armored troops take {reduction} less damage until Cannonball breaks their armor. Broken armor takes {bonus} more fire damage.',
+    shake: 'Camera shake',
+    gold: 'Gold medal',
+    silver: 'Silver medal',
+    bronze: 'Bronze medal',
+    failed: 'Defense failed',
+    result: '{medal}: integrity {integrity}, accuracy {accuracy}.',
+    medalRules:
+      'Gold: at least {goldIntegrity} integrity and {goldAccuracy} accuracy. Silver: {silverIntegrity} and {silverAccuracy}. Any other victory earns Bronze. Enemy or barrel hits count; each shot counts once. Medals grant no extra money.',
+    shotDamage: 'Deal {damage} damage to each enemy within {radius} yards of the impact.',
+    shotSlow: 'Slow enemies hit by {amount} for {seconds} sec.',
+    shotBurn:
+      'Leave fire for {seconds} sec, dealing {damage} damage each second to enemies standing in it.',
+    shotTiming:
+      'Cooldown: {cooldown} sec. Impact after {flight} sec. All shots share {recovery} sec recovery.',
+    shotRules:
+      'Aim inside the marked field. No mana cost. Damage does not scale with gear or talents.',
+  },
   warlock: {
     doomLabel: 'Condemnation',
     fateThreadsLabel: 'Fate Threads',

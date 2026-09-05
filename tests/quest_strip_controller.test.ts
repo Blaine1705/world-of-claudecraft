@@ -124,6 +124,26 @@ beforeEach(() => {
 });
 
 describe('the quest strip cycles through real pointer events', () => {
+  it('focuses a movement lesson and repaints phase instructions without numeric progress', () => {
+    const rig = mountStrip();
+    const lesson = quest('lesson');
+    const quests = [quest('other'), lesson];
+    rig.controller.update(quests, 0);
+    rig.controller.update(quests, 1, lesson.id);
+    expect(rig.title.textContent).toBe('Title lesson');
+    const drawing = {
+      ...lesson,
+      objectives: [{ label: 'Follow the outline', current: 0, total: 3, instruction: true }],
+    };
+    rig.controller.update([quests[0], drawing], 2, lesson.id);
+    expect(rig.objectives[0].textContent).toBe('Follow the outline');
+    expect(rig.objectives[0].classList.contains('instruction')).toBe(true);
+    rig.controller.update([quests[0], drawing], 3, lesson.id);
+    expect(rig.objectives[0].textContent).toContain('Follow the outline');
+    rig.controller.update([quests[0]], 4);
+    expect(rig.objectives[0].classList.contains('instruction')).toBe(false);
+  });
+
   it('advances on a tap and wraps at the end', () => {
     const rig = mountStrip();
     rig.controller.update([quest('a'), quest('b')], 0);

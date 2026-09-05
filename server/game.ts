@@ -55,7 +55,6 @@ import {
   partyFrameIncomingHeals,
   partyFrameRole,
 } from '../src/sim/party_frame_info';
-import { livePlaytimeSeconds } from '../src/sim/playtime';
 import { effectiveFishingBand } from '../src/sim/professions/fishing';
 import { RESPEC_TIER_CONFIG, type RespecPaymentTier } from '../src/sim/professions/focus';
 import { cancelProfessionSessionOnDisplacement } from '../src/sim/professions/session_teardown';
@@ -344,12 +343,20 @@ import {
 import { PartyFrameProjectionCache } from './party_frame_projection';
 import { applyBoostKitToPlayer, pbeBoostEnabled } from './pbe_boost';
 import type { PerfCaptureResult, PerfCaptureStatus } from './perf_capture_types';
+import { dispatchVehicleCommand } from './vehicle_command_wire';
 
 export type { PerfCaptureResult, PerfCaptureStatus } from './perf_capture_types';
 
 import { recordFtueDeath, recordFtueQuest, recordLevelUp } from './progress_events';
 import * as questWire from './quest_command_wire';
-import { emitQuestSelfKeys } from './quest_snapshot_wire';
+import {
+  activePublicWorldQuestTracePids,
+  emitActivitySelfKeys,
+  emitQuestSelfKeys,
+  nearbyQuestTraceWireJson,
+  PUBLIC_WORLD_QUEST_TRACE_RADIUS,
+  type PublicTraceCandidate,
+} from './quest_snapshot_wire';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
 import { createRealmReadoutMemo, realmReadoutJson, realmReadoutObject } from './realm_readout_memo';
 import { RiftAssetCoordinator, riftAssetConfigFromEnv } from './rift_assets';
@@ -4187,6 +4194,7 @@ export class GameServer {
     if (session.jailVisit) this.exitJailVisit(session, false);
     this.cancelAndRecordUnstuck(session);
     this.sim.dropWorldQuestDeliveryCargo(session.pid);
+    this.sim.leaveVehicle(session.pid);
     session.linkdead = true;
     session.graceUntil = Date.now() + LINKDEAD_GRACE_MS;
     this.botDetector.setTrackingConnection(session.botTrackingContext, false);
@@ -4265,6 +4273,7 @@ export class GameServer {
 
   async leave(session: ClientSession, _reason: string): Promise<void> {
     if (session.left || !this.clients.has(session.pid)) return;
+    this.sim.leaveVehicle(session.pid);
     if (session.spectating) this.exitSpectate(session, false);
     if (session.jailVisit) this.exitJailVisit(session, false);
     this.cancelAndRecordUnstuck(session);
@@ -7204,6 +7213,11 @@ export class GameServer {
         break;
       // Show-jumping race: the Sim re-validates the glowing platform, lesson or
       // mount eligibility, and liveness before arming the countdown.
+      case 'vehicle_enter':
+      case 'vehicle_action':
+      case 'vehicle_leave':
+        dispatchVehicleCommand(sim, pid, msg);
+        break;
       case 'mount_race_start':
         sim.mountRaceStartFor(pid);
         break;
@@ -8496,6 +8510,7 @@ export class GameServer {
     if (this.perfDetailActive) this.bcastGridNs += process.hrtime.bigint() - sharedStart;
     const queryLimitSq = INTEREST_QUERY_RADIUS * INTEREST_QUERY_RADIUS;
     const bgQueryLimitSq = BG_MATCH_DROP_RADIUS * BG_MATCH_DROP_RADIUS;
+    const publicTracePids = activePublicWorldQuestTracePids(this.sim);
 
     // Build each session's snapshot from its shared candidate list, still guarded
     // per session so one throw cannot starve the rest.
@@ -8505,6 +8520,7 @@ export class GameServer {
         const ents: string[] = [];
         const keep: number[] = [];
         const present = new Set<number>();
+        const publicTraceCandidates: PublicTraceCandidate[] = [];
         // Resolved ONCE per viewer per pass (a map lookup, no allocation): the
         // pid list of this viewer's own battleground team, which decides who
         // rides the raised match radius below.
@@ -8527,6 +8543,13 @@ export class GameServer {
           if (this.perfDetailActive) this.bcVisits++;
           if (e.id === anchorEntity.id) continue;
           if (!this.canObserveEntity(anchorEntity, e, d2)) continue;
+          if (
+            publicTracePids.size > 0 &&
+            d2 <= PUBLIC_WORLD_QUEST_TRACE_RADIUS * PUBLIC_WORLD_QUEST_TRACE_RADIUS &&
+            publicTracePids.has(e.id)
+          ) {
+            publicTraceCandidates.push({ player: e, distance: d2 });
+          }
           const known = session.sentEnts.get(e.id);
           // the viewer's current target stays in interest to the widest drop
           // radius so its unit frame doesn't vanish mid-chase
@@ -8598,7 +8621,7 @@ export class GameServer {
             : '';
         this.sendRaw(
           session,
-          `${head}${timerWireJson}${petSpecialWireJson},"self":${selfJson},"ents":[${ents.join(',')}]${telegraphJson}${keepJson}}`,
+          `${head}${timerWireJson}${petSpecialWireJson},"self":${selfJson},"ents":[${ents.join(',')}]${telegraphJson}${keepJson}${nearbyQuestTraceWireJson(this.sim, anchorEntity.id, publicTraceCandidates)}}`,
         );
         if (session.needsVarkhulPortalReplay) {
           session.needsVarkhulPortalReplay = false;
@@ -9251,27 +9274,7 @@ export class GameServer {
     const tslotRows = this.sim.toolEffectSlotsFor(anchorSession.pid);
     if (tslotRows.length === 0) maybeSerialized('tslot', '[]');
     else maybe('tslot', tslotRows);
-    // Riding skill: persisted, so the client knows whether to show the riding
-    // trainer UI without waiting on a mount/select command to fail. Wire key
-    // `mntRtd`; delta-guarded, only changes once (false to true, never back).
-    maybe('mntRtd', meta.ridingTrained === true ? true : null);
-    // Session-only lesson and race state must still reconcile after linkdead:
-    // events sent while the socket is absent are not replayed on resume. These
-    // self deltas are authoritative and clear stale client mirrors with false/null.
-    maybe('mntLesson', this.sim.mountLessonActiveFor(anchorSession.pid));
-    maybe('mntRace', this.sim.mountRaceViewFor(anchorSession.pid));
-    // Book of Deeds: the Renown total and the two selected cosmetic ids
-    // (title and nameplate border), cheap scalars diffed per tick (grants land
-    // from sim sites that never mark this session dirty, and neither cosmetic
-    // echo must wait on the heavy gate).
-    maybe('renown', meta.renown);
-    maybe('atitle', meta.activeTitle);
-    maybe('aborder', meta.activeBorder);
-    // Lifetime played time (IWorldProgressionXp.playtimeSeconds), quantized to
-    // whole minutes so the serialized form changes about once a minute and the
-    // delta gate drops it from every other tick; the sheet displays minutes at
-    // most, so no read loses precision.
-    maybe('ptime', Math.floor(livePlaytimeSeconds(meta, this.sim.time) / 60) * 60);
+    emitActivitySelfKeys(maybe, this.sim, meta, anchorSession.pid);
     selfLap?.('self.craft');
     // Heavy, rarely-changing fields: building + stringifying these every tick for
     // every player is the dominant avoidable broadcast cost. Skip them unless a

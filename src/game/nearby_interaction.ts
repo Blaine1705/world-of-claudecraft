@@ -13,6 +13,7 @@ import {
   isWorldQuestSalvageObject,
   isWorldQuestSalvageObjectHidden,
 } from '../sim/world_quest_salvage';
+import { isWorldQuestTraceInstructor } from '../sim/world_quest_trace_identity';
 import { corpseLootAvailability, localPartyMemberIds } from './corpse_loot_availability';
 import { decideEscortPress, handleEscortPress } from './escort_interact';
 import {
@@ -217,6 +218,9 @@ export function tryNearbyInteraction(
       // through the HUD's confirm gate rather than sending the command
       // directly (it applies The Keeper's Toll).
       hud.requestSpiritHealerResurrect();
+    } else if (isWorldQuestTraceInstructor(npc.templateId)) {
+      world.targetEntity(bestNpc);
+      world.interact();
     } else if (npc.templateId === 'brother_halven' || npc.templateId === 'brother_halven_marsh') {
       hud.openDelveBoard(bestNpc);
     } else {

@@ -75,6 +75,7 @@ import type { IWorldTalents } from '../src/world_api/talents';
 import type { IWorldTargeting } from '../src/world_api/targeting';
 import type { IWorldTelemetry } from '../src/world_api/telemetry';
 import type { IWorldTrade } from '../src/world_api/trade';
+import type { IWorldVehicles } from '../src/world_api/vehicles';
 
 type IWorldMemberKind = 'method' | 'data';
 
@@ -123,6 +124,7 @@ export const IWORLD_MEMBERS = [
   { name: 'worldQuestCycle', kind: 'data' },
   { name: 'worldQuestExpiresAtMs', kind: 'data' },
   { name: 'worldQuestLog', kind: 'data' },
+  { name: 'nearbyWorldQuestTraces', kind: 'data' },
   // --- commands + read-returning methods ---
   { name: 'questState', kind: 'method' }, // read-returning (1/6)
   { name: 'reactiveAbilityWindowRemaining', kind: 'method' },
@@ -445,6 +447,10 @@ export const IWORLD_MEMBERS = [
   { name: 'mountRaceStart', kind: 'method' },
   { name: 'mountRaceCancel', kind: 'method' },
   { name: 'mountRaceView', kind: 'method' }, // read-returning
+  { name: 'vehicleSession', kind: 'data' },
+  { name: 'enterVehicle', kind: 'method' },
+  { name: 'useVehicleAction', kind: 'method' },
+  { name: 'leaveVehicle', kind: 'method' },
   // --- Dungeon Finder facet (IWorldDungeonFinder) ---
   { name: 'dungeonFinderInfo', kind: 'data' },
   { name: 'dungeonFinderBoard', kind: 'data' },
@@ -668,9 +674,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // even when the total agrees. Only running the suite says what these
     // numbers really are; never reconcile them by arithmetic in the diff (the
     // numbers below were set from a suite run, not from this narrative).
-    expect(IWORLD_MEMBERS.length).toBe(350);
-    expect(DATA_MEMBERS.length).toBe(98);
-    expect(METHOD_MEMBERS.length).toBe(252);
+    expect(IWORLD_MEMBERS.length).toBe(355);
+    expect(DATA_MEMBERS.length).toBe(100);
+    expect(METHOD_MEMBERS.length).toBe(255);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -800,6 +806,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'enchantRiftItem',
       'enterDelve',
       'enterDungeon',
+      'enterVehicle',
       'entities',
       'equipBag',
       'equipItem',
@@ -859,6 +866,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'leaveCardDuelQueue',
       'leaveDelve',
       'leaveDungeon',
+      'leaveVehicle',
       'lifetimeHonor',
       'lifetimeXp',
       'loadouts',
@@ -892,6 +900,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'moveInput',
       'moveInventoryItem',
       'moveRaidMember',
+      'nearbyWorldQuestTraces',
       'nodeHarvestableByMe',
       'nodeRespawnSeconds',
       'openCommissionOrder',
@@ -1020,11 +1029,13 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'unstuck',
       'upgradeRiftItem',
       'useItem',
+      'useVehicleAction',
       'vaultBuyUpgrade',
       'vaultDeposit',
       'vaultDepositAll',
       'vaultInfo',
       'vaultWithdraw',
+      'vehicleSession',
       'vendorBuyback',
       'worldBossActive',
       'worldQuestCycle',
@@ -1099,6 +1110,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketCollectPending',
       'marketInfo',
       'moveInput',
+      'nearbyWorldQuestTraces',
       'partyInfo',
       'petSpecialCommandsSupported',
       'player',
@@ -1129,6 +1141,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'tradeInfo',
       'unlockedMilestones',
       'vaultInfo',
+      'vehicleSession',
       'vendorBuyback',
       'worldQuestCycle',
       'worldQuestExpiresAtMs',
@@ -1218,6 +1231,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'enchantRiftItem',
       'enterDelve',
       'enterDungeon',
+      'enterVehicle',
       'equipBag',
       'equipItem',
       'equipItemToSlot',
@@ -1263,6 +1277,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'leaveCardDuelQueue',
       'leaveDelve',
       'leaveDungeon',
+      'leaveVehicle',
       'lockpickAbort',
       'lockpickAction',
       'lockpickEngage',
@@ -1386,6 +1401,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'unstuck',
       'upgradeRiftItem',
       'useItem',
+      'useVehicleAction',
       'vaultBuyUpgrade',
       'vaultDeposit',
       'vaultDepositAll',
@@ -1599,6 +1615,7 @@ const FACET_QUESTS = [
   'worldQuestCycle',
   'worldQuestExpiresAtMs',
   'worldQuestLog',
+  'nearbyWorldQuestTraces',
   'questState',
   'acceptQuest',
   'turnInQuest',
@@ -1888,6 +1905,13 @@ const FACET_MOUNTS = [
   'mountRaceView',
 ] as const satisfies readonly (keyof IWorldMounts)[];
 type _ExhaustMounts = AssertNever<Exclude<keyof IWorldMounts, (typeof FACET_MOUNTS)[number]>>;
+const FACET_VEHICLES = [
+  'vehicleSession',
+  'enterVehicle',
+  'useVehicleAction',
+  'leaveVehicle',
+] as const satisfies readonly (keyof IWorldVehicles)[];
+type _ExhaustVehicles = AssertNever<Exclude<keyof IWorldVehicles, (typeof FACET_VEHICLES)[number]>>;
 const FACET_DUNGEON_FINDER = [
   'dungeonFinderInfo',
   'dungeonFinderBoard',
@@ -2008,6 +2032,7 @@ const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   telemetry: FACET_TELEMETRY,
   professions: FACET_PROFESSIONS,
   mounts: FACET_MOUNTS,
+  vehicles: FACET_VEHICLES,
   dungeonFinder: FACET_DUNGEON_FINDER,
   deeds: FACET_DEEDS,
   reliquary: FACET_RELIQUARY,
@@ -2019,7 +2044,7 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // +1 battleground facet (Thornhollow Fields) on the release line; +1
     // Reliquary facet on this branch: 33 total; -1 for the New Eastbrook
     // program's Vale Cup retirement: 32 total.
-    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(32);
+    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(33);
   });
 
   it('each facet array is non-empty and internally duplicate-free', () => {
@@ -2047,8 +2072,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(350);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(350);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(355);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(355);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

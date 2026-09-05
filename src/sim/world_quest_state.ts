@@ -6,6 +6,7 @@ import type { CharacterState } from './character_state';
 import type { PlayerMeta } from './sim';
 import type { Entity, WorldQuestDef, WorldQuestProgress } from './types';
 import { WORLD_BOSSES } from './world_boss';
+
 import {
   activeWorldQuestsForCycle,
   restoreWorldQuestClaims,
@@ -13,6 +14,8 @@ import {
   sanitizeWorldQuestProgress,
   worldQuestCycleForResetDay,
 } from './world_quests';
+
+export { nearbyWorldQuestTraces } from './world_quest_trace_public';
 
 export interface WorldQuestPlayerState {
   worldQuestCycle: string;
@@ -76,7 +79,7 @@ export function savedWorldQuestState(
   return {
     worldQuests: {
       cycle: meta.worldQuestCycle,
-      progress: [...meta.worldQuestLog.values()].map((progress) => ({
+      progress: [...meta.worldQuestLog.values()].map(({ tracing: _tracing, ...progress }) => ({
         ...progress,
         ...(progress.creditedObjects === undefined
           ? {}
@@ -85,6 +88,10 @@ export function savedWorldQuestState(
           ? {}
           : { puzzleRotations: [...progress.puzzleRotations] }),
         ...(progress.match3Board === undefined ? {} : { match3Board: [...progress.match3Board] }),
+        ...(progress.traceScores === undefined
+          ? {}
+          : { traceScores: progress.traceScores.map((score) => ({ ...score })) }),
+        ...(progress.traceResult === undefined ? {} : { traceResult: { ...progress.traceResult } }),
       })),
     },
   };

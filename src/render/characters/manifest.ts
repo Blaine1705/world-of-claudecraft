@@ -3753,6 +3753,9 @@ const FAMILY_KEYS: Record<string, string> = {
 };
 
 const NPC_KEYS: Record<string, string> = {
+  calligraphy_instructor: 'npc_villager_robed',
+  calligraphy_apprentice_1: 'npc_villager',
+  calligraphy_apprentice_2: 'npc_villager',
   bursar_fernando: 'npc_fernando',
   card_master: 'npc_villager_robed',
   marshal_redbrook: 'npc_knight',

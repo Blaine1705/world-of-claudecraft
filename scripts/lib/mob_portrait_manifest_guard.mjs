@@ -1,17 +1,59 @@
+import { isDeepStrictEqual } from 'node:util';
+
+function digestOf(file) {
+  return file ? `${file.bytes}:${file.sha256}` : null;
+}
+
+function withoutRowsAndBundleFingerprint(manifest) {
+  const { portraitCount: _portraitCount, portraits: _portraits, ...contract } = manifest;
+  return {
+    ...contract,
+    rendererFingerprint: null,
+    renderer: {
+      ...manifest.renderer,
+      browserBundle: manifest.renderer?.browserBundle
+        ? { ...manifest.renderer.browserBundle, bytes: null, sha256: null }
+        : manifest.renderer?.browserBundle,
+    },
+  };
+}
+
+// The browser bundle reaches unrelated gameplay modules. A bundle-digest-only
+// move is already treated as bookkeeping by the manifest freshness check. When
+// that same move accompanies newly added mobs, keep the same ruling for every
+// pre-existing byte-identical row and require a renderer receipt only for the
+// rows that actually changed. Any renderer script, output contract, bundle
+// metadata, bootstrap review, or existing portrait change stays fail-closed.
+function canScopeRendererDriftToChangedRows(previous, next) {
+  if (!previous?.renderer || !next?.renderer) return false;
+  if (
+    previous.portraitCount !== previous.portraits?.length ||
+    next.portraitCount !== next.portraits?.length
+  )
+    return false;
+  return (
+    previous.rendererFingerprint !== next.rendererFingerprint &&
+    digestOf(previous.renderer.browserBundle) !== digestOf(next.renderer.browserBundle) &&
+    isDeepStrictEqual(
+      withoutRowsAndBundleFingerprint(previous),
+      withoutRowsAndBundleFingerprint(next),
+    )
+  );
+}
+
 export function changedPortraitIds(previous, next) {
-  if (!previous || previous.rendererFingerprint !== next.rendererFingerprint) {
+  if (
+    !previous ||
+    (previous.rendererFingerprint !== next.rendererFingerprint &&
+      !canScopeRendererDriftToChangedRows(previous, next))
+  ) {
     return next.portraits.map((portrait) => portrait.id);
   }
   const before = new Map(previous.portraits.map((portrait) => [portrait.id, portrait]));
   return next.portraits
     .filter((portrait) => {
       const prior = before.get(portrait.id);
-      return (
-        !prior ||
-        prior.sourceFingerprint !== portrait.sourceFingerprint ||
-        prior.output.sha256 !== portrait.output.sha256 ||
-        prior.output.bytes !== portrait.output.bytes
-      );
+      return !prior || !isDeepStrictEqual(prior, portrait);
     })
     .map((portrait) => portrait.id);
 }

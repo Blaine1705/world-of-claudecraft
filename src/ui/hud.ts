@@ -423,7 +423,8 @@ import {
 import { bindEmpoweredActionHold } from './hud/action_bar/empowered_hold';
 import {
   type AimPoint,
-  quickAimPoint,
+  quickGroundTarget,
+  selectedGroundAimPoint,
   shouldUseGroundAim,
   XHB_ONLY_AIM_SLOT,
 } from './hud/action_bar/ground_aim';
@@ -518,6 +519,7 @@ import { RiftMapPainter } from './hud/rift';
 import { RiftFloorTrackerController } from './hud/rift/rift_floor_tracker_controller';
 import { StanceBarController } from './hud/stance';
 import { closeOpenTouchMenu } from './hud/tap_menu';
+import { VehicleActionBarController } from './hud/vehicle';
 import { dismissBuyQuantityPrompts } from './hud/vendor/buy_quantity_prompt_window';
 import { buildCrucibleVendorView } from './hud/vendor/crucible_vendor_view';
 import { renderCrucibleVendorWindow } from './hud/vendor/crucible_vendor_window';
@@ -835,7 +837,6 @@ import { promptWocMarketBrowserVisit, wocMarketToggleAction } from './woc_market
 import { type WocMarketHooks, WocMarketWindow } from './woc_market_window';
 import { installWorldDropTarget } from './world_drop_target';
 import { WorldQuestPuzzleWindow } from './world_quest_puzzle_window';
-import { worldQuestDisplayName } from './world_quest_view';
 import { formatXp, type XpBarView, xpBarView } from './xp_bar';
 import { XpBarPainter } from './xp_bar_painter';
 import { YumiMatchPainter } from './yumi_match_painter';
@@ -1372,11 +1373,32 @@ export class Hud {
   private set attackSlotAction(action: HotbarAction) {
     this.actionBarController.replaceAttackAction(action);
   }
-  private readonly groundAim = new GroundAimController({
+  private vehicleBar: VehicleActionBarController | null = null;
+  private get vehicleControls(): VehicleActionBarController {
+    this.vehicleBar ??= new VehicleActionBarController({
+      world: this.sim,
+      writers: this.writerFacet,
+      keyLabel: (slot) => keyCapLabel(this.keybinds.primaryLabel(`slot${slot}`)),
+      consumePeek: () => this.peekGuard.consume(),
+      presentation: this.renderer,
+      cancelOnEnter: [this.playerGroundAim, this.empowerHold],
+      attachTooltip: (element, html) => this.attachTooltip(element, html),
+    });
+    return this.vehicleBar;
+  }
+  private get groundAim() {
+    return this.sim.vehicleSession ? this.vehicleControls.aim : this.playerGroundAim;
+  }
+  private readonly playerGroundAim = new GroundAimController({
     player: () => this.sim.player,
     resolveAbility: (id) => this.sim.known.find((k) => k.def.id === id) ?? null,
-    seedTargetPoint: () => this.groundAimSeedTarget(),
-    fallbackPoint: () => this.groundTargetAim(),
+    seedTargetPoint: () =>
+      selectedGroundAimPoint(
+        this.sim.player,
+        this.sim.entities,
+        this.optionsHooks?.groundAimTargetAttackable,
+      ),
+    fallbackPoint: () => quickGroundTarget(this.sim.player, this.sim.entities),
     castAt: (id, point) => this.sim.castAbilityAt(id, point),
     clearReticle: () => this.renderer.setGroundAimReticle(null),
     projectPlacement: (id, point) => this.sim.groundAimPlacementPreview(id, point),
@@ -7280,25 +7302,6 @@ export class Hud {
     );
   }
 
-  // Where a ground-targeted ability should land: the current target's position if
-  // one is selected (the usual "cast on that pack" intent), else the caster's own
-  // spot for an open-ground cast. The sim clamps this to the ability's range.
-  private groundTargetAim(): { x: number; z: number } {
-    const me = this.sim.player;
-    const tid = me.targetId;
-    const t = tid !== null ? this.sim.entities.get(tid) : null;
-    if (t && !t.dead && t.id !== me.id) return { x: t.pos.x, z: t.pos.z };
-    return { x: me.pos.x, z: me.pos.z };
-  }
-
-  private groundAimSeedTarget(): AimPoint | null {
-    const me = this.sim.player;
-    const target = me.targetId !== null ? this.sim.entities.get(me.targetId) : null;
-    if (!target || target.dead || target.id === me.id) return null;
-    const attackable = this.optionsHooks?.groundAimTargetAttackable;
-    return !attackable || attackable(target.id) ? { x: target.pos.x, z: target.pos.z } : null;
-  }
-
   private empoweredAbilityIdForSlot(slot: number): string | null {
     const known = this.abilityForSlot(slot);
     return known?.def.empowerStages ? known.def.id : null;
@@ -7307,6 +7310,10 @@ export class Hud {
   // Slot key DOWN: every slot fires immediately (a tap is down + up, so this
   // is the press).
   pressSlot(slot: number): void {
+    if (this.sim.vehicleSession) {
+      this.vehicleControls.chooseSlot(slot);
+      return;
+    }
     if (this.empowerHold.press(slot, this.empoweredAbilityIdForSlot(slot), this.sim)) return;
     this.castSlot(slot);
   }
@@ -7314,6 +7321,7 @@ export class Hud {
   // Slot key UP: release an empowered hold. A non-charging slot already fired
   // on press, so this is a no-op.
   releaseSlot(slot: number): void {
+    if (this.sim.vehicleSession) return;
     this.empowerHold.releaseSlot(slot, this.sim, (released) => this.flashActionSlot(released));
   }
 
@@ -7345,10 +7353,6 @@ export class Hud {
 
   cancelGroundAim(): boolean {
     return this.groundAim.cancel();
-  }
-
-  private beginGroundAim(abilityId: string, slot: number): void {
-    this.groundAim.begin(abilityId, slot);
   }
 
   groundAimAbilityRange(): number | null {
@@ -7386,6 +7390,7 @@ export class Hud {
   // (reticle, empower charge, mouseover cast, the auto-attack QoL) rather than a
   // second cast path that would drift from it; the release edge is releaseCrossHotbarAction.
   pressCrossHotbarAction(action: { type: 'ability' | 'item'; id: string }): void {
+    if (this.sim.vehicleSession) return;
     if (action.id === CROSS_HOTBAR_ATTACK_ID || action.type === 'item') {
       this.castCrossHotbarAction(action);
       return;
@@ -7403,6 +7408,7 @@ export class Hud {
   }
 
   releaseCrossHotbarAction(action: { type: 'ability' | 'item'; id: string }): void {
+    if (this.sim.vehicleSession) return;
     this.empowerHold.releaseAction(action, this.sim, (slot) => this.flashActionSlot(slot));
   }
 
@@ -7411,6 +7417,7 @@ export class Hud {
   // the pad and nowhere else falls back to a plain cast (position abilities keep
   // the reticle via the ability-id aim identity) or the shared item-use seam.
   castCrossHotbarAction(action: { type: 'ability' | 'item'; id: string }): void {
+    if (this.sim.vehicleSession) return;
     // Attack is the fixed slot-0 toggle, not something the sim can cast by id.
     if (action.id === CROSS_HOTBAR_ATTACK_ID) {
       this.activateFixedAttackSlot();
@@ -7452,34 +7459,26 @@ export class Hud {
     this.showError(tSim('error.noItem'));
   }
 
-  // One decision for a position press (bar slots and the XHB-only fallback):
-  // enter aim when the reticle applies and the cast could start (alive, off
-  // cooldown; resources and the GCD change while aiming, so they never gate
-  // entry), else cast instantly. slotForAim is the re-press commit identity.
   private castPositionAbility(
     abilityId: string,
     resolved: ResolvedAbility,
     slotForAim: number,
   ): void {
-    const cooldown = actionBarCooldownRemaining(this.sim.player, resolved);
-    if (this.groundReticleEnabled() && !this.sim.player.dead && cooldown <= 0) {
-      this.beginGroundAim(abilityId, slotForAim);
-      return;
-    }
-    this.sim.castAbilityAt(
+    this.playerGroundAim.pressPosition(
       abilityId,
-      quickAimPoint(
-        this.sim.player,
-        this.groundAimSeedTarget(),
-        this.groundTargetAim(),
-        resolved.def.range,
-        resolved.def.minRange,
-        document.body.classList.contains('mobile-touch'),
-      ),
+      slotForAim,
+      this.groundReticleEnabled() &&
+        !this.sim.player.dead &&
+        actionBarCooldownRemaining(this.sim.player, resolved) <= 0,
+      document.body.classList.contains('mobile-touch'),
     );
   }
 
   castSlot(barSlot: number): void {
+    if (this.sim.vehicleSession) {
+      this.vehicleControls.chooseSlot(barSlot);
+      return;
+    }
     if (this.isGroundAimActive()) {
       if (this.groundAim.activeSlot() === barSlot) {
         this.commitGroundAimAt();
@@ -8973,6 +8972,7 @@ export class Hud {
     this.meters.update();
     this.mountRaceStrip.repaintIfChanged();
     this.mountRaceControls.update();
+    this.vehicleControls.update();
     this.lockpickController.repaintIfChanged();
     this.tutorial.update(sim, this.renderer, this.keybinds);
     this.bootcamp.update(sim, this.renderer, this.keybinds, this.optionsHooks?.gamepad ?? null);

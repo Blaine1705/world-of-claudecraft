@@ -104,6 +104,7 @@ export interface QuestStripObjectiveRow {
   current: number;
   total: number;
   done: boolean;
+  instruction?: boolean;
 }
 
 export interface QuestStripView {
@@ -151,6 +152,7 @@ export function questStripView(quests: readonly TrackedQuest[], index: number): 
     current: o.current,
     total: o.total,
     done: o.current >= o.total,
+    ...(o.instruction ? { instruction: true } : {}),
   }));
   return {
     visible: true,

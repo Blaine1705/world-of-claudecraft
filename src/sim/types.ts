@@ -3890,6 +3890,8 @@ export interface ZonePropsDef {
   // keep r and h matched to the SCALED footprint by hand.
   decorProps?: {
     key: string;
+    /** Small dressing seated on verified existing ground may opt out of terrain flattening. */
+    terrainCalm?: false;
     x: number;
     z: number;
     rot?: number;
@@ -4178,7 +4180,54 @@ export interface WorldQuestMatch3LevelDef {
   maxMoves: number;
 }
 
+export interface WorldQuestTraceDef {
+  kind: 'triangle' | 'square' | 'star' | 'hourglass' | 'lightning' | 'spiral' | 'double-triangle';
+  /** Closed outline, with the first vertex repeated at the end. */
+  points: readonly { x: number; z: number }[];
+}
+
+export interface WorldQuestTraceRoundScore {
+  precision: number;
+  efficiency: number;
+  time: number;
+}
+
+export interface WorldQuestTraceResult extends WorldQuestTraceRoundScore {
+  score: number;
+  rating: 'bronze' | 'silver' | 'gold';
+}
+
+export interface WorldQuestTraceMetrics {
+  startedAt: number;
+  distance: number;
+  deviationDistance: number;
+}
+
+export interface WorldQuestTraceState {
+  questId: string;
+  shapeIndex: number;
+  phase: 'preview' | 'drawing' | 'failed' | 'success';
+  previewUntil: number;
+  expiresAt: number;
+  /** Authoritative bounded trail, never supplied by a client or persisted. */
+  trail: { x: number; z: number }[];
+  lastPosition: { x: number; z: number };
+  segment: number;
+  direction: -1 | 0 | 1;
+  started: boolean;
+  /** Private scoring accumulation, never a client authority or persistence field. */
+  metrics?: WorldQuestTraceMetrics;
+  reason?: 'off-path' | 'movement' | 'timeout' | 'combat';
+}
+
 export type WorldQuestObjective =
+  | { type: 'vehicle'; stationId: string }
+  | {
+      type: 'tracing';
+      instructorNpcId: string;
+      shapes: readonly WorldQuestTraceDef[];
+      advancedShapes?: readonly WorldQuestTraceDef[];
+    }
   | { type: 'kill'; targetMobId: string }
   | { type: 'escort'; escortId: string }
   | { type: 'interact'; targetObjectItemId: string }
@@ -4224,6 +4273,12 @@ export interface WorldQuestProgress {
   questId: string;
   count: number;
   state: 'active' | 'completed';
+  /** Session-only tracing readout. Omitted from character saves. */
+  tracing?: WorldQuestTraceState;
+  /** Stable advanced figure id and earned scores survive interruption and save/load. */
+  traceVariant?: string;
+  traceScores?: WorldQuestTraceRoundScore[];
+  traceResult?: WorldQuestTraceResult;
   creditedObjects?: string[];
   puzzleVariant?: number;
   puzzleRotations?: number[];
@@ -5834,6 +5889,7 @@ export type SimEvent = { pid?: number } & (
   | { type: 'questReady'; questId: string }
   | { type: 'questDone'; questId: string }
   | { type: 'worldQuestStarted'; questId: string }
+  | ({ type: 'cannonResult' } & CannonResult)
   | {
       type: 'worldQuestProgress';
       questId: string;
@@ -5849,7 +5905,11 @@ export type SimEvent = { pid?: number } & (
       rotation: number;
     }
   | { type: 'worldQuestMatch3Updated'; questId: string }
-  | { type: 'worldQuestDone'; questId: string }
+  | {
+      type: 'worldQuestDone';
+      questId: string;
+      traceResult?: Pick<WorldQuestTraceResult, 'score' | 'rating'>;
+    }
   | {
       type: 'varkhulCallout';
       sourceId: number;
@@ -8531,4 +8591,115 @@ export interface DelveRestlessPending {
   x: number;
   z: number;
   mobId: string;
+}
+
+/** Vehicle encounters are private runtime actors, never shared combat entities. */
+export type CannonActionId = 'cannonball' | 'grapeshot' | 'incendiary';
+export type CannonEnemyKind = 'infantry' | 'runner' | 'armored' | 'commander' | 'sapper';
+export interface CannonPoint {
+  x: number;
+  z: number;
+}
+export interface CannonField {
+  minX: number;
+  maxX: number;
+  minZ: number;
+  maxZ: number;
+}
+export interface CannonActionDef {
+  damage: number;
+  radius: number;
+  cooldownTicks: number;
+  flightTicks: number;
+  slowTicks: number;
+  slowMultiplier: number;
+  burnTicks: number;
+  burnDamage: number;
+}
+export interface CannonEnemyDef {
+  hp: number;
+  speed: number;
+  breachDamage: number;
+}
+export interface CannonSpawnDef {
+  atTick: number;
+  lane: number;
+  kind: CannonEnemyKind;
+}
+export interface CannonEnemy extends CannonPoint {
+  id: number;
+  kind: CannonEnemyKind;
+  hp: number;
+  slowUntilTick: number;
+  armorBroken?: boolean;
+}
+export interface CannonBarrel extends CannonPoint {
+  id: number;
+  active: boolean;
+}
+export interface CannonFeedback extends CannonPoint {
+  id: number;
+  tick: number;
+  kind: 'shot' | 'impact' | 'barrel' | 'armor' | 'charge' | 'death';
+  enemyId?: number;
+}
+export interface CannonResult {
+  medal: 'bronze' | 'silver' | 'gold' | null;
+  integrity: number;
+  shotsFired: number;
+  shotsHit: number;
+}
+export interface CannonShot extends CannonPoint {
+  id: number;
+  action: CannonActionId;
+  firedTick: number;
+  impactTick: number;
+}
+export interface CannonFirePatch extends CannonPoint {
+  id: number;
+  nextPulseTick: number;
+  expiresTick: number;
+  hitCredited?: boolean;
+}
+/** Caller owns this state. Tick/action functions have no hidden world state. */
+export interface CannonEncounterState {
+  tick: number;
+  phase: 'countdown' | 'wave' | 'intermission' | 'won' | 'failed';
+  phaseUntilTick: number;
+  wave: number;
+  waveStartTick: number;
+  spawnCursor: number;
+  integrity: number;
+  killed: number;
+  breached: number;
+  commanderKilled: boolean;
+  nextId: number;
+  recoveryUntilTick: number;
+  readyAt: Record<CannonActionId, number>;
+  enemies: CannonEnemy[];
+  shots: CannonShot[];
+  fires: CannonFirePatch[];
+  barrels: CannonBarrel[];
+  feedback: CannonFeedback[];
+  shotsFired: number;
+  shotsHit: number;
+  commanderCharging: boolean;
+}
+
+export interface VehicleStationDef {
+  id: string;
+  entityId: number;
+  questId: string;
+  x: number;
+  z: number;
+  field: CannonField;
+}
+
+/** Transient personal vehicle session. Never included in character saves. */
+export interface VehicleSession {
+  kind: 'cannon';
+  stationId: string;
+  cycle: string;
+  origin: Vec3;
+  encounter: CannonEncounterState;
 }

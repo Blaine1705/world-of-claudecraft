@@ -97,6 +97,73 @@ function harness(entries: QuestProgress[] = [], worldEntries: WorldQuestProgress
 }
 
 describe('QuestTrackerController', () => {
+  it('shows authoritative movement instructions even when collapsed without changing the preference', () => {
+    const questId = 'wq_eastbrook_calligraphy';
+    const entry: WorldQuestProgress = {
+      questId,
+      state: 'active',
+      count: 0,
+      tracing: {
+        questId,
+        shapeIndex: 0,
+        phase: 'preview',
+        previewUntil: 6,
+        expiresAt: 80,
+        trail: [],
+        lastPosition: { x: 0, z: 0 },
+        segment: 0,
+        direction: 0,
+        started: false,
+      },
+    };
+    const rig = harness([], [entry]);
+    rig.setCollapsed(true);
+    rig.controller.update(0);
+    expect(rig.html()).toContain('Watch the outline. Golden sparkles will guide you.');
+    expect(rig.html()).toContain('Round 1 of 3: Triangle.');
+    expect(rig.html()).toContain('disabled aria-disabled="true"');
+    expect(rig.html()).not.toContain('title="Collapse quest tracker"');
+    rig.controller.toggleCollapsed();
+    expect(rig.collapsed()).toBe(true);
+    expect(rig.settings.setCollapsed).not.toHaveBeenCalled();
+    expect(rig.click).not.toHaveBeenCalled();
+    if (!entry.tracing) throw new Error('missing tracing fixture');
+    entry.tracing.phase = 'failed';
+    entry.tracing.reason = 'off-path';
+    rig.controller.update(1);
+    expect(rig.html()).toContain('You left the outline.');
+    const writes = rig.writes();
+    rig.controller.update(2);
+    expect(rig.writes()).toBe(writes);
+    entry.count = 1;
+    entry.tracing.shapeIndex = 1;
+    entry.tracing.phase = 'preview';
+    rig.controller.update(3);
+    expect(rig.html()).toContain('Round 2 of 3: Square.');
+    expect(rig.html()).not.toContain('You left the outline.');
+    entry.count = 2;
+    entry.tracing.shapeIndex = 2;
+    entry.traceVariant = 'hourglass';
+    rig.controller.update(4);
+    expect(rig.html()).toContain('Round 3 of 3: Hourglass.');
+    expect(rig.html()).not.toContain('2/3');
+    entry.state = 'completed';
+    entry.count = 3;
+    entry.tracing.phase = 'success';
+    entry.traceResult = { score: 87, rating: 'silver', precision: 80, efficiency: 90, time: 91 };
+    rig.controller.update(5);
+    expect(rig.html()).toContain(
+      'Silver: 87/100. Base reward unchanged. Gold: deed, title, +10 Renown.',
+    );
+    expect(rig.html()).not.toContain('3/3');
+    expect(rig.html()).toContain('quest-complete');
+    expect(rig.html()).not.toContain('You left the outline.');
+    delete entry.tracing;
+    rig.controller.update(6);
+    expect(rig.html()).not.toContain('87/100');
+    expect(entry.traceResult.score).toBe(87);
+  });
+
   it('renders authoritative quests in acceptance order and elides an identical paint', () => {
     const test = harness([progress('q_wolves'), progress('q_boars', 'ready')]);
 
@@ -114,12 +181,14 @@ describe('QuestTrackerController', () => {
   });
 
   it('tracks an active world quest without an accepted quest-log entry', () => {
-    const quest = WORLD_QUESTS[0];
+    const quest = WORLD_QUESTS.find((entry) => entry.id === 'wq_eastbrook_bandits');
+    expect(quest).toBeDefined();
+    if (!quest) throw new Error('missing Eastbrook bandit fixture');
     const test = harness(
       [],
       [
         { questId: quest.id, count: 2, state: 'active' },
-        { questId: WORLD_QUESTS[1].id, count: WORLD_QUESTS[1].count, state: 'completed' },
+        { questId: 'wq_eastbrook_calligraphy', count: 1, state: 'completed' },
       ],
     );
 
@@ -129,7 +198,7 @@ describe('QuestTrackerController', () => {
     expect(test.html()).not.toContain(`data-quest="${quest.id}"`);
     expect(test.html()).not.toMatch(/class="qt-title" role="button"[^>]*wq_/);
     expect(test.html()).toContain(`2/${quest.count}`);
-    expect(test.html()).not.toContain(WORLD_QUESTS[1].id);
+    expect(test.html()).not.toContain('Arcane Calligraphy');
   });
 
   it('makes an active puzzle world quest keyboard-openable from the tracker', () => {

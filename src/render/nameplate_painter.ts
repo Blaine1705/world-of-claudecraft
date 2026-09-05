@@ -45,6 +45,7 @@ import {
 import { type NameplatePlan, nameplatePlanInto, newNameplatePlan } from './nameplate_view';
 import { FRIENDLY, isFriendlyPet, mobNameColor } from './reaction';
 import type { EntityView } from './renderer';
+import { WorldQuestTraceLabels } from './world_quest_trace_labels';
 
 const NAMEPLATE_LEVEL_NUMBER_OPTIONS = { maximumFractionDigits: 0 } as const;
 const HOLDER_BADGE_URLS = new Map<number, string>();
@@ -118,6 +119,7 @@ export class NameplatePainter {
   private readonly isHostilePlayer: (e: Entity) => boolean;
   private readonly surface: NameplateCanvasSurface;
   private readonly states = new Map<number, NameplateCanvasState>();
+  private readonly traceLabels = new WorldQuestTraceLabels();
   private readonly tmpV = new THREE.Vector3();
   private readonly tmpV2 = new THREE.Vector3();
   private readonly plan: NameplatePlan = newNameplatePlan();
@@ -266,6 +268,7 @@ export class NameplatePainter {
       const state = this.states.get(anchor.id);
       if (state) this.surface.drawBase(state, anchor.sx, anchor.sy);
     }
+    this.traceLabels.draw(world, this.surface, this.camera, width, height);
     // Emotes paint last on the same canvas so they remain legible over other
     // nameplates without restoring a per-entity compositor layer.
     for (let i = 0; i < this.anchorCount; i++) {

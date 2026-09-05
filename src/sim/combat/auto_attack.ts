@@ -125,6 +125,7 @@ function autoAttackWeaponDamageMult(hand: AutoAttackHand): number {
 export function startAutoAttack(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
+  if (r.meta.vehicle) return;
   const p = r.e;
   if (p.dead) return;
   if (isInStasis(p)) return;

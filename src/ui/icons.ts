@@ -5379,6 +5379,11 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'dgn_varkhul',
   'dgn_varkhul_heroic',
   'dgn_varkhul_flawless',
+  // Arcane Calligraphy's completion and Gold-rating deeds are both
+  // 'exploration'. They use the category crest until their commissioned
+  // paintings land (docs/achievements/icon-brief.md).
+  'exp_arcane_calligraphy',
+  'exp_arcane_calligraphy_gold',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

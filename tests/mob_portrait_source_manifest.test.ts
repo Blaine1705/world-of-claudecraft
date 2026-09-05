@@ -83,13 +83,14 @@ describe('mob portrait source manifest', () => {
   it('covers every live mob and records each render dependency with a content hash', () => {
     const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as PortraitSourceManifest;
     const liveIds = Object.keys(MOBS).sort();
-    // 242: the 233 the v0.39.0 base carried, minus vale_cup_ball (retired with
+    // 245: the 233 the v0.39.0 base carried, minus vale_cup_ball (retired with
     // the Vale Cup by the New Eastbrook program), plus the Proving Shore
     // tutorial island's training_effigy, shore_scuttler, and mister_crabs
     // tide-pool miniboss, plus the seven Ignivar raid enemies (the herald,
     // the ember sentinel, cinder artificer, crucible warden, heart of the
-    // end, Varkhul the Forgefather, and the derelict mech bomber).
-    expect(liveIds).toHaveLength(242);
+    // end, Varkhul the Forgefather, and the derelict mech bomber), plus the
+    // Eastbrook, Willowfen, and Frostveil World Quest caravans.
+    expect(liveIds).toHaveLength(245);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);
@@ -174,6 +175,7 @@ describe('mob portrait source manifest', () => {
     }));
     const previous = {
       schemaVersion: 2,
+      purpose: 'test portrait provenance',
       rendererFingerprint: 'renderer-a',
       portraits: structuredClone(rows),
     };
@@ -242,6 +244,94 @@ describe('mob portrait source manifest', () => {
     expect(() => assertManifestWriteAuthorized({ previous, next, receipt })).toThrow(
       /stale source fingerprint/,
     );
+  });
+
+  it('scopes bundle-only renderer drift to genuinely changed portrait rows', () => {
+    const previous = {
+      schemaVersion: 2,
+      purpose: 'test portrait provenance',
+      bootstrapReview: { path: 'review.md', bytes: 10, sha256: 'review' },
+      rendererFingerprint: 'renderer-a',
+      renderer: {
+        trackedFiles: [{ path: 'render.mjs', bytes: 10, sha256: 'render' }],
+        browserBundle: {
+          entry: 'entry.js',
+          bytes: 100,
+          sha256: 'bundle-a',
+          esbuildVersion: '1.0.0',
+        },
+        output: { pixels: 128, format: 'webp' },
+      },
+      portraitCount: 1,
+      portraits: [
+        {
+          id: 'old',
+          sourceFingerprint: 'old-source',
+          output: { bytes: 100, sha256: 'old-output' },
+        },
+      ],
+    };
+    const next = structuredClone(previous);
+    next.rendererFingerprint = 'renderer-b';
+    next.renderer.browserBundle.bytes = 101;
+    next.renderer.browserBundle.sha256 = 'bundle-b';
+    next.portraitCount = 2;
+    next.portraits.push({
+      id: 'new',
+      sourceFingerprint: 'new-source',
+      output: { bytes: 101, sha256: 'new-output' },
+    });
+    const receipt = {
+      schemaVersion: 1,
+      generatedBy: 'scripts/render_finder_portraits.mjs',
+      rendererFingerprint: 'renderer-b',
+      portraits: [structuredClone(next.portraits[1])],
+    };
+
+    expect(changedPortraitIds(previous, next)).toEqual(['new']);
+    expect(() => assertManifestWriteAuthorized({ previous, next, receipt })).not.toThrow();
+
+    const expectFullReceipt = (
+      mutate: (manifest: typeof next) => void,
+      failure = /missing changed row old/,
+    ) => {
+      const unsafe = structuredClone(next);
+      mutate(unsafe);
+      expect(changedPortraitIds(previous, unsafe)).toEqual(['old', 'new']);
+      expect(() => assertManifestWriteAuthorized({ previous, next: unsafe, receipt })).toThrow(
+        failure,
+      );
+    };
+    expectFullReceipt((manifest) => {
+      manifest.renderer.trackedFiles[0].sha256 = 'changed-renderer-source';
+    });
+    expectFullReceipt((manifest) => {
+      manifest.bootstrapReview.sha256 = 'changed-review';
+    });
+    expectFullReceipt((manifest) => {
+      manifest.bootstrapReview.path = 'changed-review.md';
+    });
+    expectFullReceipt((manifest) => {
+      manifest.renderer.output.pixels = 256;
+    });
+    expectFullReceipt((manifest) => {
+      manifest.renderer.browserBundle.entry = 'changed-entry.js';
+    });
+    expectFullReceipt((manifest) => {
+      manifest.renderer.browserBundle.esbuildVersion = '2.0.0';
+    });
+    expectFullReceipt((manifest) => {
+      manifest.purpose = 'changed purpose';
+    });
+    expectFullReceipt((manifest) => {
+      Object.assign(manifest.renderer, { futureContractField: 'changed' });
+    });
+    expectFullReceipt((manifest) => {
+      manifest.portraitCount = 99;
+    });
+    expectFullReceipt((manifest) => {
+      manifest.schemaVersion = 3;
+    }, /bootstrap\/schema migration/);
   });
 
   // The acceptance is a bundle digest, and esbuild labels bundled modules with paths

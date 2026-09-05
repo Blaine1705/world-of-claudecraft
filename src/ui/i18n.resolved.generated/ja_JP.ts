@@ -321,6 +321,39 @@ export const ja_JP: EnTranslations = {
     }
   },
   "hudChrome": {
+    "vehicle": {
+      "title": "North Watch Cannon",
+      "objective": "Defend the north watch",
+      "cannonball": "Cannonball",
+      "grapeshot": "Grapeshot",
+      "incendiary": "Incendiary Shot",
+      "integrity": "Cannon integrity",
+      "exit": "Leave cannon",
+      "wave": "Wave {wave}/{total}",
+      "enemies": "Enemies remaining: {count}",
+      "countdown": "Prepare: {seconds}",
+      "hint": "Choose a shot, then click the ground to fire.",
+      "aim": "Click to fire. Right click or Escape cancels aiming.",
+      "sapperWarning": "Sapper incoming! Stop the explosive carrier before it reaches the line.",
+      "chargeWarning": "Commander orders a charge! All surviving enemies move faster.",
+      "armorHint": "Break the silver shields with Cannonball, then use Incendiary Shot.",
+      "exposedHint": "Broken armor: Incendiary Shot deals double damage.",
+      "barrelHint": "Shoot the marked powder barrels when enemies gather around them.",
+      "barrelRules": "Direct hits ignite powder barrels: {damage} damage within {radius} yards, with chain explosions.",
+      "armorRules": "Armored troops take {reduction} less damage until Cannonball breaks their armor. Broken armor takes {bonus} more fire damage.",
+      "shake": "Camera shake",
+      "gold": "Gold medal",
+      "silver": "Silver medal",
+      "bronze": "Bronze medal",
+      "failed": "Defense failed",
+      "result": "{medal}: integrity {integrity}, accuracy {accuracy}.",
+      "medalRules": "Gold: at least {goldIntegrity} integrity and {goldAccuracy} accuracy. Silver: {silverIntegrity} and {silverAccuracy}. Any other victory earns Bronze. Enemy or barrel hits count; each shot counts once. Medals grant no extra money.",
+      "shotDamage": "Deal {damage} damage to each enemy within {radius} yards of the impact.",
+      "shotSlow": "Slow enemies hit by {amount} for {seconds} sec.",
+      "shotBurn": "Leave fire for {seconds} sec, dealing {damage} damage each second to enemies standing in it.",
+      "shotTiming": "Cooldown: {cooldown} sec. Impact after {flight} sec. All shots share {recovery} sec recovery.",
+      "shotRules": "Aim inside the marked field. No mana cost. Damage does not scale with gear or talents."
+    },
     "warlock": {
       "doomLabel": "断罪",
       "fateThreadsLabel": "運命の糸",
@@ -9731,6 +9764,43 @@ export const ja_JP: EnTranslations = {
       "loadFreight": "荷物を荷馬車に積み込む",
       "escortCaravan": "{zone}の隊商を護衛する",
       "salvageWreckage": "難破船の残骸を回収",
+      "calligraphyTitle": "秘術の書道",
+      "traceOutline": "足取りで輪郭をなぞる",
+      "traceRoundInstruction": "{round}/{total}回目：{shape}。{instruction}",
+      "traceShape": {
+        "triangle": "三角形",
+        "square": "正方形",
+        "star": "星形",
+        "hourglass": "砂時計",
+        "lightning": "稲妻のルーン",
+        "spiral": "角張った渦巻き",
+        "double-triangle": "双三角の印"
+      },
+      "traceRating": {
+        "bronze": "銅",
+        "silver": "銀",
+        "gold": "金"
+      },
+      "traceScoreResult": "完成！{rating}：{score}/{total}。基本報酬は不変。ゴールド：功績、称号、名声+10。",
+      "traceCompletionLog": "{completion} {result}",
+      "traceUnavailable": "このルーンには新しいゲーム版が必要。",
+      "traceReaction": {
+        "tessaTriangle": "三つの角が全部ぴったり！",
+        "pipSquare": "辺が四つ！私にもできそう！",
+        "elianFinal": "最後のルーンだ。線が交差したり同じ点を通り直したりすることもある。明るい印をたどって次の角へ進もう。",
+        "elianGold": "見事な線だ！その足取りは金の評価にふさわしい。",
+        "elianComplete": "ルーンが完成した！丁寧に練習すれば次はもっと上手くなる。"
+      },
+      "traceReady": "先生に話しかけて始めよう。",
+      "tracePreview": "輪郭を見よう。金色の光が道を示してくれる。",
+      "traceStart": "開始地点の印へ。どちら向きでもなぞれる。",
+      "traceDrawing": "金色の光をたどって輝く角へ。青い線が歩いた跡だ。",
+      "traceSuccess": "輪郭が完成！",
+      "traceRetry": "先生に話しかけて再挑戦しよう。",
+      "traceOffPath": "輪郭から外れた。先生に話しかけて再挑戦しよう。",
+      "traceMovement": "騎乗せず地面を歩こう。先生に話しかけて再挑戦しよう。",
+      "traceTimeout": "時間切れ。先生に話しかけて再挑戦しよう。",
+      "traceCombat": "戦闘を離れ、先生に話しかけて再挑戦しよう。",
       "puzzleTitle": "レイビームの調整",
       "puzzleLevel": "週間レベル {level}",
       "puzzleInstructions": "タイルを回転させ、光線を始点から目的地までつなげてください。",
@@ -15497,6 +15567,21 @@ export const ja_JP: EnTranslations = {
       }
     },
     "npcs": {
+      "calligraphy_instructor": {
+        "name": "エリアン先生",
+        "title": "秘術の書道",
+        "greeting": "安定した足取りは安定した線を生む。弟子たちに三角形、四角形、高度なルーンを教えてくれ。"
+      },
+      "calligraphy_apprentice_1": {
+        "name": "見習いテッサ",
+        "title": "書道の生徒",
+        "greeting": "いつも早く曲がりすぎちゃうの。どこが角なのか教えてくれる？"
+      },
+      "calligraphy_apprentice_2": {
+        "name": "見習いピップ",
+        "title": "書道の生徒",
+        "greeting": "まず三角形、次は四角形、それからルーン。一歩ずつしっかり歩こう！"
+      },
       "the_merchant": {
         "name": "商人",
         "title": "世界市場の守り手",

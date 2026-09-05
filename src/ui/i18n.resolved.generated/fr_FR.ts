@@ -321,6 +321,39 @@ export const fr_FR: EnTranslations = {
     }
   },
   "hudChrome": {
+    "vehicle": {
+      "title": "North Watch Cannon",
+      "objective": "Defend the north watch",
+      "cannonball": "Cannonball",
+      "grapeshot": "Grapeshot",
+      "incendiary": "Incendiary Shot",
+      "integrity": "Cannon integrity",
+      "exit": "Leave cannon",
+      "wave": "Wave {wave}/{total}",
+      "enemies": "Enemies remaining: {count}",
+      "countdown": "Prepare: {seconds}",
+      "hint": "Choose a shot, then click the ground to fire.",
+      "aim": "Click to fire. Right click or Escape cancels aiming.",
+      "sapperWarning": "Sapper incoming! Stop the explosive carrier before it reaches the line.",
+      "chargeWarning": "Commander orders a charge! All surviving enemies move faster.",
+      "armorHint": "Break the silver shields with Cannonball, then use Incendiary Shot.",
+      "exposedHint": "Broken armor: Incendiary Shot deals double damage.",
+      "barrelHint": "Shoot the marked powder barrels when enemies gather around them.",
+      "barrelRules": "Direct hits ignite powder barrels: {damage} damage within {radius} yards, with chain explosions.",
+      "armorRules": "Armored troops take {reduction} less damage until Cannonball breaks their armor. Broken armor takes {bonus} more fire damage.",
+      "shake": "Camera shake",
+      "gold": "Gold medal",
+      "silver": "Silver medal",
+      "bronze": "Bronze medal",
+      "failed": "Defense failed",
+      "result": "{medal}: integrity {integrity}, accuracy {accuracy}.",
+      "medalRules": "Gold: at least {goldIntegrity} integrity and {goldAccuracy} accuracy. Silver: {silverIntegrity} and {silverAccuracy}. Any other victory earns Bronze. Enemy or barrel hits count; each shot counts once. Medals grant no extra money.",
+      "shotDamage": "Deal {damage} damage to each enemy within {radius} yards of the impact.",
+      "shotSlow": "Slow enemies hit by {amount} for {seconds} sec.",
+      "shotBurn": "Leave fire for {seconds} sec, dealing {damage} damage each second to enemies standing in it.",
+      "shotTiming": "Cooldown: {cooldown} sec. Impact after {flight} sec. All shots share {recovery} sec recovery.",
+      "shotRules": "Aim inside the marked field. No mana cost. Damage does not scale with gear or talents."
+    },
     "warlock": {
       "doomLabel": "Condamnation",
       "fateThreadsLabel": "Fils du destin",
@@ -9731,6 +9764,43 @@ export const fr_FR: EnTranslations = {
       "loadFreight": "Load freight into the wagon",
       "escortCaravan": "Escort the caravan: {zone}",
       "salvageWreckage": "Salvage shipwreck debris",
+      "calligraphyTitle": "Arcane Calligraphy",
+      "traceOutline": "Trace the outline with your footsteps",
+      "traceRoundInstruction": "Round {round} of {total}: {shape}. {instruction}",
+      "traceShape": {
+        "triangle": "Triangle",
+        "square": "Square",
+        "star": "Star",
+        "hourglass": "Hourglass",
+        "lightning": "Lightning Rune",
+        "spiral": "Angular Spiral",
+        "double-triangle": "Twin-Triangle Sigil"
+      },
+      "traceRating": {
+        "bronze": "Bronze",
+        "silver": "Silver",
+        "gold": "Gold"
+      },
+      "traceScoreResult": "Complete! {rating}: {score}/{total}. Base reward unchanged. Gold: deed, title, +10 Renown.",
+      "traceCompletionLog": "{completion} {result}",
+      "traceUnavailable": "This rune needs a newer game version.",
+      "traceReaction": {
+        "tessaTriangle": "Three corners, and every one in its place!",
+        "pipSquare": "Four sides! I think I can do that too!",
+        "elianFinal": "Final rune. A line may cross or revisit a point; follow the bright marker to the next corner.",
+        "elianGold": "Beautifully traced! Your steps have earned their place in gold.",
+        "elianComplete": "A complete rune! Care and practice will make your next one even finer."
+      },
+      "traceReady": "Speak to the instructor to begin.",
+      "tracePreview": "Watch the outline. Golden sparkles will guide you.",
+      "traceStart": "Move to the start marker. Trace either way.",
+      "traceDrawing": "Follow golden sparkles to the bright corner. Blue marks your trail.",
+      "traceSuccess": "Outline complete!",
+      "traceRetry": "Speak to the instructor to try again.",
+      "traceOffPath": "You left the outline. Speak to the instructor to retry.",
+      "traceMovement": "Stay on foot and on the ground. Speak to the instructor to retry.",
+      "traceTimeout": "Time ran out. Speak to the instructor to retry.",
+      "traceCombat": "Leave combat, then speak to the instructor to retry.",
       "puzzleTitle": "Ley Beam Alignment",
       "puzzleLevel": "Weekly level {level}",
       "puzzleInstructions": "Rotate the tiles to carry the beam from the source to the destination.",
@@ -15497,6 +15567,21 @@ export const fr_FR: EnTranslations = {
       }
     },
     "npcs": {
+      "calligraphy_instructor": {
+        "name": "Instructor Elian",
+        "title": "Arcane Calligraphy",
+        "greeting": "A steady step makes a steady line. Teach my apprentices a triangle, a square, and an advanced rune."
+      },
+      "calligraphy_apprentice_1": {
+        "name": "Apprentice Tessa",
+        "title": "Student of Calligraphy",
+        "greeting": "I keep turning too soon. Will you show me where the corners belong?"
+      },
+      "calligraphy_apprentice_2": {
+        "name": "Apprentice Pip",
+        "title": "Student of Calligraphy",
+        "greeting": "A triangle first, then a square, then a rune. One steady step at a time!"
+      },
       "the_merchant": {
         "name": "Le Marchand",
         "title": "Gardien du Marché mondial",

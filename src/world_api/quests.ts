@@ -1,4 +1,5 @@
 import type { QuestProgress, QuestState, WorldQuestProgress } from '../sim/types';
+import type { NearbyWorldQuestTrace } from '../sim/world_quest_trace_public';
 
 export interface IWorldQuests {
   questLog: Map<string, QuestProgress>;
@@ -7,6 +8,8 @@ export interface IWorldQuests {
   /** Authoritative epoch-ms boundary at which the current rotation is replaced. */
   worldQuestExpiresAtMs: number;
   worldQuestLog: ReadonlyMap<string, WorldQuestProgress>;
+  /** Nearby other players' blue trails/results, never their private drawing guidance. */
+  readonly nearbyWorldQuestTraces: readonly NearbyWorldQuestTrace[];
   questState(questId: string): QuestState;
   acceptQuest(questId: string, selection?: string): void;
   turnInQuest(questId: string): void;

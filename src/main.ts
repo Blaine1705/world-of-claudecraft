@@ -1987,6 +1987,7 @@ async function startGame(
       canUseGameKeys: () => !gameplayInputBlocked(),
       // The "Unlock interface" arrange mode claims the mouse for frame drags.
       isCameraLocked: () => hud.isInterfaceUnlocked(),
+      isCameraMotionLocked: () => world.vehicleSession !== null,
     },
     keybinds,
   );
@@ -4444,7 +4445,8 @@ async function startGame(
     // the camera prompt, and through the race countdown. The sim independently
     // enforces the same countdown lock, so online latency cannot move the
     // authoritative rider.
-    const raceMovementLocked = world.mountRaceView()?.phase === 'countdown';
+    const raceMovementLocked =
+      world.mountRaceView()?.phase === 'countdown' || world.vehicleSession !== null;
     if (raceMovementLocked && !raceMovementWasLocked) {
       input.clearClickMove();
       input.setAutorun(false);

@@ -206,12 +206,17 @@ describe('live graphics profile architecture', () => {
 // import), so it is registered here even though it lives in src/game. Paths are
 // repo-relative for the failure messages.
 const UI_PURE_CORES = [
+  'src/ui/hud/vehicle/vehicle_aim_core.ts',
+  'src/ui/hud/vehicle/vehicle_action_bar_view.ts',
+  'src/ui/hud/vehicle/cannon_feedback_core.ts',
+  'src/ui/hud/vehicle/cannon_tactics_view.ts',
   'src/ui/map_entity_disclosure_core.ts',
   'src/ui/map_navigation_landmarks_core.ts',
   'src/ui/map_marker_profile_core.ts',
   'src/ui/map_marker_semantics_core.ts',
   'src/ui/map_semantic_accessibility_core.ts',
   'src/ui/world_quest_view.ts',
+  'src/ui/world_quest_trace_view.ts',
   'src/ui/world_quest_puzzle_view.ts',
   'src/ui/world_quest_match3_view.ts',
   'src/ui/quest_event_view.ts',
@@ -568,6 +573,8 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // post_bloom_shader_core is the host-agnostic GLSL source patch for the
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
+  'src/render/world_quest_public_trace_core.ts',
+  'src/render/world_quest_trace_core.ts',
   'src/render/arena_wall_occlusion_core.ts',
   'src/render/wall_backface_cull_core.ts',
   'src/render/dungeon_banner_core.ts',
@@ -624,6 +631,7 @@ const RENDER_PURE_CORES = [
   'src/render/link_piece_core.ts',
   'src/render/program_variant_settle_core.ts',
   'src/render/camera_director_core.ts',
+  'src/render/vehicle_camera_core.ts',
   'src/render/camera_feel_core.ts',
   'src/render/cast_bar.ts',
   'src/render/character_effects_core.ts',
@@ -2244,6 +2252,7 @@ const UI_PAINTER_HELPERS = [
 // the English catalog, it is a maintainer fix during the release locale fill:
 // contributors do not edit those files.
 const UI_DOM_MODULES = [
+  'src/ui/hud/vehicle/vehicle_action_bar_controller.ts',
   'src/ui/account_portal_dom.ts',
   'src/ui/appearance_customizer.ts',
   'src/ui/arena_window.ts',

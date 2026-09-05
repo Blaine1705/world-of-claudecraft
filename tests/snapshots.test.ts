@@ -64,10 +64,12 @@ import {
 } from '../src/sim/combat/priest/presentation';
 import { MOUNT_RACE_START_PLATFORM, type MountKey } from '../src/sim/content/mounts';
 import { COMBO_RECIPES } from '../src/sim/content/recipes';
+import { NORTH_WATCH_CANNON } from '../src/sim/content/vehicle_stations';
 import { BUILTIN_WORLD, DELVES, GATHER_NODES, ITEMS, MOBS, WORLD_QUESTS } from '../src/sim/data';
 import { IGNIVAR_JUDGMENT_CAST_ID } from '../src/sim/encounters/ignivar';
 import { createMob } from '../src/sim/entity';
 import { emptySaleLog } from '../src/sim/market_sale_log';
+import { createCannonEncounter } from '../src/sim/minigames/cannon_encounter';
 import { MOUNT_RACE_COUNTDOWN_TICKS } from '../src/sim/mount_race';
 import { petOf, serializePet, summonPet } from '../src/sim/pet/pet_commands';
 import { livePlaytimeSeconds } from '../src/sim/playtime';
@@ -2036,8 +2038,10 @@ describe('delta snapshots', () => {
   });
 
   it('a self-starting world quest dirties and round-trips its heavy self state', () => {
-    const quest = WORLD_QUESTS[1];
-    if (quest.objective.type !== 'kill') throw new Error('Expected kill world quest fixture');
+    const quest = WORLD_QUESTS.find((candidate) => candidate.objective.type === 'kill');
+    if (!quest || quest.objective.type !== 'kill') {
+      throw new Error('Expected kill world quest fixture');
+    }
     const targetMobId = quest.objective.targetMobId;
     broadcast(server);
     fc.sent.length = 0;
@@ -5294,6 +5298,7 @@ const ALL_DELTA_KEYS = [
   'trade',
   'tslot',
   'vault',
+  'vehicle',
   'wba',
   'weapon',
   'wqday',
@@ -5407,6 +5412,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   tfocus: 'townFocus',
   tslot: 'toolEffectSlots',
   vault: 'vaultInfo',
+  vehicle: 'vehicleSession',
   wqday: 'worldQuestCycle',
   wqexp: 'worldQuestExpiresAtMs',
   wqlog: 'worldQuestLog',
@@ -5615,6 +5621,14 @@ function dirtyEveryDeltaField(): {
     goTick: sim.tickCount,
     deadlineTick: sim.tickCount + 200,
     clearedMask: 3,
+  };
+  // Encoder fixture deliberately seeds mutually exclusive activities without ticking.
+  meta.vehicle = {
+    kind: 'cannon',
+    stationId: NORTH_WATCH_CANNON.id,
+    cycle: 'wq3_8',
+    origin: { ...p.pos },
+    encounter: createCannonEncounter(),
   };
   // Book of Deeds: two earned deeds with DISTINCT utcDay stamps (an empty map
   // would be a vacuous pin), a non-zero stat block covering the counter, both
@@ -6384,7 +6398,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 94 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 95 unique keys in sorted order', () => {
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
     // sheet's lifetime played-time key ptime, for 67, then +16: the static
@@ -6412,8 +6426,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     // exactly offhandWeapon !== null, so the client derives it), for 90.
     // World quests add their rotation id, expiry, and per-character progress mirrors,
     // for 93. World-boss realm liveness adds wba, for 94.
-    expect(ALL_DELTA_KEYS).toHaveLength(94);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(94);
+    expect(ALL_DELTA_KEYS).toHaveLength(95);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(95);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -6504,7 +6518,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     // direct emits, auras and de, for 89. The off-hand bar adds offhandWeapon,
     // for 90. The three world-quest mirrors bring the set to 93, and the
     // realm-wide world-boss liveness mirror `wba` brings it to 94.
-    expect(scraped.size).toBe(94);
+    expect(scraped.size).toBe(95);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

@@ -3,6 +3,7 @@
 // dropped without throwing or partially replacing the last good mirror.
 
 import type { QuestProgress, WorldQuestProgress } from '../sim/types';
+import { decodeWorldQuestProgressTrace } from '../sim/world_quest_trace_wire';
 import { sanitizeWorldQuestCycle, sanitizeWorldQuestProgress } from '../sim/world_quests';
 
 export interface QuestSelfMirrors {
@@ -54,11 +55,19 @@ export function applyQuestSelfWire(
     target.worldQuestExpiresAtMs = self.wqexp;
   }
   if (Array.isArray(self.wqlog) && !malformedExplicitCycle) {
+    const rawRows = self.wqlog;
     target.worldQuestLog = new Map(
-      sanitizeWorldQuestProgress(self.wqlog, incomingCycle).map((progress) => [
-        progress.questId,
-        progress,
-      ]),
+      sanitizeWorldQuestProgress(rawRows, incomingCycle).map((progress) => {
+        const raw = rawRows.find(
+          (row) =>
+            row &&
+            typeof row === 'object' &&
+            row.questId === progress.questId &&
+            (row.state === 'active' || row.state === 'completed'),
+        );
+        const tracing = decodeWorldQuestProgressTrace(raw?.tracing, progress);
+        return [progress.questId, tracing ? { ...progress, tracing } : progress];
+      }),
     );
     if (incomingCycle) target.worldQuestCycle = incomingCycle;
   } else if (
