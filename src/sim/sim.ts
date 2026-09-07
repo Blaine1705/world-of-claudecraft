@@ -5907,8 +5907,7 @@ export class Sim {
         updateVeilboundMarchMovement(this.ctx, p);
         completeVeilboundMarch(this.ctx, p);
         worldQuestMod.updateWorldQuests(this.ctx, meta, p);
-        if (worldQuestMod.hasActiveWorldQuest(meta, 'wq_evergarden_cannon'))
-          vehicleMod.ensureVehicleStation(this.ctx);
+        vehicleMod.ensureActiveVehicleStations(this.ctx, meta);
         lap?.('p.move');
         this.updateDoorTriggers(p);
         this.updateRiftTriggers(p);
@@ -9681,18 +9680,10 @@ export class Sim {
     return interactNpcForQuests(this.ctx, npc, meta);
   }
 
-  // -------------------------------------------------------------------------
   // Quests
-  // -------------------------------------------------------------------------
 
-  // The quest command surface (questState + acceptQuest/acceptLinkedQuest/abandonQuest/
   // turnInQuest, plus the private helpers questNpcFor/finalizeQuestAccept and the pure
-  // computeQuestState) moved to quests/quest_commands.ts (W4) behind SimContext. Sim
-  // keeps these thin same-named PUBLIC delegates (the widened `pid?` overload preserved)
-  // so the IWorld surface, server/game.ts, and the in-file interaction path (talkToNpc
-  // above) resolve them on the Sim facade unchanged; each forwards via this.ctx. The
-  // moved questNpcFor reaches the still-on-Sim isQuestInteractionEntity predicate via the
-  // ctx.isQuestInteractionEntity callback.
+  // Quest commands delegate through SimContext for every host.
   questState(questId: string, pid?: number): QuestState {
     return questCommands.questState(this.ctx, questId, pid);
   }
@@ -9707,6 +9698,10 @@ export class Sim {
 
   abandonQuest(questId: string, pid?: number): void {
     questCommands.abandonQuest(this.ctx, questId, pid);
+  }
+
+  accuseWorldQuestSuspect(npcId: number, pid?: number): void {
+    worldQuestMod.accuseWorldQuestSuspect(this.ctx, npcId, pid);
   }
 
   rotateWorldQuestPuzzleTile(questId: string, tileIndex: number, pid?: number): void {

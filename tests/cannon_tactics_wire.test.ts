@@ -1,5 +1,6 @@
 import { expect, it } from 'vitest';
 import { decodeVehicleSession } from '../src/net/vehicle_session_wire';
+import { LAST_KEEP_CANNON } from '../src/sim/content/vehicle_stations';
 import { createCannonEncounter } from '../src/sim/minigames/cannon_encounter';
 import type { VehicleSession } from '../src/sim/types';
 
@@ -12,6 +13,13 @@ function session(): VehicleSession {
     encounter: createCannonEncounter(),
   };
 }
+it('accepts the second registered station and rejects unknown or malformed station identities', () => {
+  const s = { ...session(), stationId: LAST_KEEP_CANNON.id };
+  expect(decodeVehicleSession(s)).toEqual(s);
+  for (const stationId of ['missing_cannon', '__proto__', null, 9400011]) {
+    expect(decodeVehicleSession({ ...s, stationId })).toBeNull();
+  }
+});
 it('round-trips tactics by value, including sapper, armor, charge and shot statistics', () => {
   const s = session();
   s.encounter.enemies = [

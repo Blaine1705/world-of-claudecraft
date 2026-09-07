@@ -28,6 +28,7 @@ import {
   type WorldContent,
   type WorldQuestDef,
 } from '../src/sim/types';
+import { vehicleStationById } from '../src/sim/vehicle_stations';
 import {
   groundHeight,
   roadDistance,
@@ -297,6 +298,23 @@ describe('world quest content', () => {
             );
           }
         }
+      } else if (quest.objective.type === 'forging' || quest.objective.type === 'horde') {
+        expect(quest.count).toBe(1);
+        const instructor = NPCS[quest.objective.instructorNpcId];
+        expect(instructor, quest.id).toBeDefined();
+        expect(instructor.dynamic).toBe(true);
+        expect(
+          Math.hypot(instructor.pos.x - quest.area.x, instructor.pos.z - quest.area.z),
+        ).toBeLessThan(quest.area.radius);
+      } else if (quest.objective.type === 'vehicle') {
+        const station = vehicleStationById(quest.objective.stationId);
+        expect(station, quest.id).toBeDefined();
+        expect(station?.questId).toBe(quest.id);
+        expect(quest.count).toBe(1);
+        if (!station) throw new Error(`Missing vehicle station for ${quest.id}`);
+        expect(Math.hypot(station.x - quest.area.x, station.z - quest.area.z)).toBeLessThan(
+          quest.area.radius,
+        );
       } else {
         throw new Error(`Unchecked world quest objective ${quest.id}`);
       }
@@ -679,9 +697,27 @@ describe('world quest lifecycle', () => {
     expect(fourthIds).toEqual(['wq_eastbrook_caravan', ...firstIds.slice(1)]);
     expect(fifthIds).toEqual([...nextIds.slice(0, 3), 'wq_frostveil_caravan', nextIds[4]]);
     expect(sixthIds).toEqual(['wq_willowfen_caravan', ...thirdIds.slice(1)]);
-    expect(seventhIds).toEqual(['wq_eastbrook_calligraphy', ...firstIds.slice(1)]);
+    expect(seventhIds).toEqual([
+      'wq_eastbrook_calligraphy',
+      ...firstIds.slice(1, 3),
+      'wq_evergarden_forging',
+      firstIds[4],
+    ]);
     const eighthIds = activeWorldQuestsForCycle('wq3_7').map((quest) => quest.id);
-    expect(eighthIds).toEqual(['wq_eastbrook_calligraphy', ...thirdIds.slice(1)]);
+    expect(eighthIds).toEqual([
+      'wq_eastbrook_calligraphy',
+      thirdIds[1],
+      'wq_wraithwood_barricade',
+      ...thirdIds.slice(3),
+    ]);
+    const ninthIds = activeWorldQuestsForCycle('wq3_8').map((quest) => quest.id);
+    expect(ninthIds).toEqual([
+      'wq_eastbrook_bandits',
+      'wq_mirefen_gravecallers',
+      'wq_palmreach_confections',
+      'wq_evergarden_cannon',
+      'wq_last_keep_cannon',
+    ]);
     const allRotatedIds = [
       ...firstIds,
       ...nextIds,
@@ -691,20 +727,21 @@ describe('world quest lifecycle', () => {
       ...sixthIds,
       ...seventhIds,
       ...eighthIds,
+      ...ninthIds,
     ];
     expect(new Set(allRotatedIds)).toEqual(new Set(WORLD_QUESTS.map((quest) => quest.id)));
   });
 
   it('naturally offers every puzzle layout across the full roster and weekly-variant repeat', () => {
-    // Eight three-day rosters and three seven-day variants realign after 168 days.
+    // Nine three-day rosters and three seven-day variants realign after 189 days.
     const variants = new Map<string, Set<number>>();
     const offered = new Set<string>();
-    for (let cycle = 0; cycle < 56; cycle++) {
+    for (let cycle = 0; cycle < 63; cycle++) {
       const cycleId = `wq3_${cycle}`;
       const roster = activeWorldQuestsForCycle(cycleId);
       expect(roster).toHaveLength(5);
       expect(new Set(roster.map((quest) => quest.id)).size).toBe(5);
-      expect(activeWorldQuestsForCycle(`wq3_${cycle + 56}`)).toEqual(roster);
+      expect(activeWorldQuestsForCycle(`wq3_${cycle + 63}`)).toEqual(roster);
       for (const quest of roster) {
         offered.add(quest.id);
         const count =
@@ -717,7 +754,7 @@ describe('world quest lifecycle', () => {
                 : 0;
         if (!count) continue;
         const variant = worldQuestPuzzleVariantForCycle(cycleId, count);
-        expect(worldQuestPuzzleVariantForCycle(`wq3_${cycle + 56}`, count)).toBe(variant);
+        expect(worldQuestPuzzleVariantForCycle(`wq3_${cycle + 63}`, count)).toBe(variant);
         const seen = variants.get(quest.id) ?? new Set<number>();
         seen.add(variant);
         variants.set(quest.id, seen);
@@ -1101,7 +1138,7 @@ describe('world quest lifecycle', () => {
 
   it.each([
     ['2026-09-15', 2],
-    ['2026-09-30', 1],
+    ['2026-10-03', 1],
   ] as const)(
     'persists and completes the non-default shipwreck layout for %s',
     (resetDay, variant) => {

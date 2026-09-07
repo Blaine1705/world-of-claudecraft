@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import { QUESTS, WORLD_QUESTS } from '../src/sim/data';
+import { createForgeWorkshop } from '../src/sim/minigames/forge_workshop';
 import type { QuestProgress, WorldQuestProgress } from '../src/sim/types';
+import * as questStrip from '../src/ui/hud/quest/quest_strip_controller';
 import { QuestTrackerController } from '../src/ui/hud/quest/quest_tracker_controller';
 import { makeWriterFacet } from '../src/ui/painter_host';
 import { dropPointerFocus } from '../src/ui/pointer_blur';
@@ -97,6 +99,86 @@ function harness(entries: QuestProgress[] = [], worldEntries: WorldQuestProgress
 }
 
 describe('QuestTrackerController', () => {
+  it('releases collapse after forging succeeds while retaining the result row', () => {
+    const forging = createForgeWorkshop(42, 100);
+    const rig = harness(
+      [],
+      [{ questId: 'wq_evergarden_forging', state: 'completed', count: 1, forging }],
+    );
+    rig.controller.update(0);
+    rig.controller.toggleCollapsed();
+    expect(rig.collapsed()).toBe(false);
+    forging.phase = 'success';
+    forging.result = { elapsed: 30, adjustedTime: 30, mistakes: 0, rating: 'gold' };
+    rig.controller.update(1);
+    expect(rig.html()).toContain('Gold! 30s. Mistakes: 0.');
+    expect(rig.html()).not.toContain('disabled aria-disabled="true"');
+    rig.controller.toggleCollapsed();
+    expect(rig.collapsed()).toBe(true);
+    rig.controller.toggleCollapsed();
+    expect(rig.html()).toContain('Gold! 30s. Mistakes: 0.');
+  });
+
+  it('stops forcing touch selection on every update after forge success', () => {
+    const update = vi.fn();
+    const build = vi.spyOn(questStrip, 'buildQuestStrip').mockReturnValue({
+      active: () => true,
+      update,
+    } as unknown as questStrip.QuestStripController);
+    try {
+      const forging = createForgeWorkshop(42, 100);
+      const questId = 'wq_evergarden_forging';
+      const rig = harness(
+        [progress('q_wolves')],
+        [{ questId, state: 'completed', count: 1, forging }],
+      );
+      rig.controller.update(0);
+      expect(update.mock.lastCall?.[2]).toBe(questId);
+      forging.phase = 'working';
+      rig.controller.update(1);
+      expect(update.mock.lastCall?.[2]).toBe(questId);
+      forging.phase = 'success';
+      forging.result = { elapsed: 30, adjustedTime: 30, mistakes: 0, rating: 'gold' };
+      for (const now of [2, 3, 4]) {
+        rig.controller.update(now);
+        expect(update.mock.lastCall?.[2]).toBeUndefined();
+        expect(update.mock.lastCall?.[0].map((quest: { id: string }) => quest.id)).toEqual([
+          'q_wolves',
+          questId,
+        ]);
+      }
+    } finally {
+      build.mockRestore();
+    }
+  });
+
+  it('keeps completed-quest practice visible and reads the sim clock rather than frame milliseconds', () => {
+    const forging = createForgeWorkshop(42, 100);
+    forging.phase = 'working';
+    forging.requests[0] = ['fuel'];
+    forging.observedAt = 103;
+    const rig = harness(
+      [],
+      [
+        {
+          questId: 'wq_evergarden_forging',
+          state: 'completed',
+          count: 1,
+          forging,
+        },
+      ],
+    );
+    rig.setCollapsed(true);
+    rig.controller.update(500000);
+    expect(rig.html()).toContain('Request 1/10: step 1/1');
+    expect(rig.html()).not.toContain('Gold:');
+    expect(rig.html()).not.toContain('Stoke the fire');
+    expect(rig.html()).not.toContain('500000');
+    expect(rig.collapsed()).toBe(true);
+    rig.controller.toggleCollapsed();
+    expect(rig.collapsed()).toBe(true);
+  });
+
   it('shows authoritative movement instructions even when collapsed without changing the preference', () => {
     const questId = 'wq_eastbrook_calligraphy';
     const entry: WorldQuestProgress = {

@@ -26,7 +26,6 @@ import type {
   ZonePropsDef,
 } from '../types';
 import { emptyZoneProps } from '../types';
-import { CANNON_EMPLACEMENT_PROPS } from './cannon_emplacement';
 
 export const EVERGARDEN_ZONE: ZoneDef = {
   id: 'evergarden',
@@ -658,7 +657,6 @@ export const EVERGARDEN_PROPS: ZonePropsDef = {
   // against terrain, roads, camps, and the parterre plan by
   // tests/garden_parterre.test.ts.
   decorProps: [
-    ...CANNON_EMPLACEMENT_PROPS,
     // the mill lawn: three windmills turning over their own ring beds at the
     // end of the lakeshore walk (garden_parterre_core skips their center
     // bushes; the Old Mill at 504,760 stands tallest)

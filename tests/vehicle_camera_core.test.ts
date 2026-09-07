@@ -1,10 +1,38 @@
 import { describe, expect, it } from 'vitest';
-import { createVehicleCamera, stepVehicleCamera } from '../src/render/vehicle_camera_core';
-import { NORTH_WATCH_CANNON } from '../src/sim/content/vehicle_stations';
+import {
+  createVehicleCamera,
+  stepVehicleCamera,
+  vehicleCameraTarget,
+} from '../src/render/vehicle_camera_core';
+import { LAST_KEEP_CANNON, NORTH_WATCH_CANNON } from '../src/sim/content/vehicle_stations';
+import { createCannonEncounter } from '../src/sim/minigames/cannon_encounter';
+import type { VehicleSession } from '../src/sim/types';
 
 const live = Object.freeze({ x: 368, y: 4, z: 1144, yaw: 1.2, pitch: 0.32, dist: 12 });
 const target = { ...NORTH_WATCH_CANNON, y: 4 };
 describe('vehicle camera composition', () => {
+  it('resolves the live station for the renderer and drops unknown session identities', () => {
+    const session: VehicleSession = {
+      kind: 'cannon',
+      stationId: LAST_KEEP_CANNON.id,
+      cycle: 'wq3_8',
+      origin: { x: 0, y: 8, z: 0 },
+      encounter: createCannonEncounter(),
+    };
+    expect(vehicleCameraTarget(session)).toEqual({ ...LAST_KEEP_CANNON, y: 8 });
+    session.stationId = 'missing_cannon';
+    expect(vehicleCameraTarget(session)).toBeNull();
+    expect(vehicleCameraTarget(null)).toBeNull();
+  });
+  it('centers a second station after switching away from the first', () => {
+    const state = createVehicleCamera();
+    stepVehicleCamera(state, live, target, 16 / 9, 60, 0, true);
+    const station = LAST_KEEP_CANNON;
+    const pose = stepVehicleCamera(state, live, { ...station, y: 8 }, 16 / 9, 60, 0, true);
+    expect(pose.x).toBe((station.field.minX + station.field.maxX) / 2);
+    expect(pose.z).toBe((station.field.minZ + station.z) / 2);
+    expect(pose.y).toBe(8);
+  });
   it('leaves normal orbit untouched and reuses its output', () => {
     const state = createVehicleCamera();
     const frame = stepVehicleCamera(state, live, null, 16 / 9, 60, 1 / 60, false);

@@ -7,7 +7,6 @@ import {
   emptyPriestMarkerState,
   priestMarkerStateForAuras,
 } from '../sim/combat/priest/presentation';
-import { NORTH_WATCH_CANNON } from '../sim/content/vehicle_stations';
 import {
   ABILITIES,
   ARENA_SLOT_COUNT,
@@ -318,6 +317,7 @@ import {
   setFoliageShadowVolume,
 } from './foliage';
 import { activeFarFieldPolicy } from './foliage_impostor';
+import { updateForgeSpeech } from './forge_speech';
 import { roundMs, summarizeMs } from './frame_ms_stats_core';
 import { type FramePresentHost, presentFrame } from './frame_present';
 import {
@@ -359,6 +359,7 @@ import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
 import { usedJsHeapMb } from './heap_sample';
 import { createHitchFrameAligner } from './hitch_frame_align_core';
 import { buildHollowGates, type HollowGatesView } from './hollow_gates';
+import { hordeCameraTarget } from './horde_camera';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { idleSlot } from './idle_queue';
 import {
@@ -713,7 +714,7 @@ import {
 import { createPrewarmGroupSlot, createVariantPrewarmSlot } from './variant_prewarm_slot';
 import { routeVarkhulForgeHammer } from './varkhul_forge_hammer';
 import { VarkhulForgestormVisuals } from './varkhul_forgestorm_visual';
-import { createVehicleCamera, stepVehicleCamera } from './vehicle_camera_core';
+import { createVehicleCamera, stepVehicleCamera, vehicleCameraTarget } from './vehicle_camera_core';
 import { SCHOOL_COLORS, Vfx } from './vfx';
 import { createOffsetVfxAnchor, createVfxAnchor, type VfxAnchorPose } from './vfx_anchor';
 import {
@@ -12793,7 +12794,7 @@ export class Renderer {
     const pose = stepVehicleCamera(this.vehicleCamera,
       { ...directedPose, x: this.camBoom.x + this.camFeel.leadX, y: this.camBoom.y,
         z: this.camBoom.z + this.camFeel.leadZ },
-      vehicle ? { ...NORTH_WATCH_CANNON, y: vehicle.origin.y } : null,
+      vehicleCameraTarget(vehicle) ?? hordeCameraTarget(this.sim),
       this.camera.aspect, this.baseFov, dt, reduce);
     const px = pose.x;
     const py = pose.y;
@@ -12862,9 +12863,6 @@ export class Renderer {
     }
   }
 
-  // Hang a speech bubble over an entity's head; it follows the entity and
-  // fades out after a few seconds (longer for longer messages), or after the
-  // caller's explicit ttl (short reaction barks like Goad's grawlix).
   showChatBubble(
     entityId: number,
     text: string,
@@ -12889,12 +12887,14 @@ export class Renderer {
     // stylesheet default (and the `.yell` border) when a reused bubble switches
     // channel, so say/yell/emote stay byte-identical.
     b.el.style.borderColor = s.border ?? '';
+    b.el.style.marginTop = `${s.offsetY ?? 0}px`;
     // wall-clock ttl: sim/render time can run slower than real time under
     // frame-delta clamping, which would keep bubbles up too long
     b.until = performance.now() + 1000 * (ttlSec ?? Math.min(10, 3.5 + text.length * 0.045));
   }
 
   private updateChatBubbles(): void {
+    updateForgeSpeech(this.sim, this);
     if (this.chatBubbles.size === 0) return;
     const { width: w, height: h } = this.viewport;
     const now = performance.now();

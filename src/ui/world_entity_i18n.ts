@@ -47,6 +47,7 @@ const MOB_IDS = [
   'mire_widow',
   'mirefen_broodmother',
   'drowned_dead',
+  'fenbridge_infiltrator',
   'fen_troll',
   'grubjaw',
   'gravecaller_cultist',
@@ -253,6 +254,13 @@ const MOB_IDS = [
 ] as const;
 
 const NPC_IDS = [
+  'forge_instructor',
+  'infiltrator_captain',
+  'infiltrator_nella',
+  'infiltrator_orin',
+  'infiltrator_bram',
+  'infiltrator_tessa',
+  'barricade_captain',
   'calligraphy_instructor',
   'calligraphy_apprentice_1',
   'calligraphy_apprentice_2',

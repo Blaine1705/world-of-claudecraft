@@ -110,6 +110,7 @@ import {
   stampGraphicsRebuildProbe,
   updateGraphicsRebuildProbePhase,
 } from './game/graphics_rebuild_crash_guard';
+import { hordeControlsActive, hordeExitInput } from './game/horde_controls';
 import { tryIgnivarPlacerCommand } from './game/ignivar_placer';
 import { Input } from './game/input';
 import { InputActivityMeter, installInputActivityTracking } from './game/input_activity';
@@ -126,6 +127,7 @@ import {
 import { createIntroLogoOverlay } from './game/intro_logo_overlay';
 import { Keybinds } from './game/keybinds';
 import {
+  applyKeyboardTurnInput,
   type KeyboardTurnArgs,
   newKeyboardTurnState,
   seedKeyboardTurnRelease,
@@ -1987,7 +1989,7 @@ async function startGame(
       canUseGameKeys: () => !gameplayInputBlocked(),
       // The "Unlock interface" arrange mode claims the mouse for frame drags.
       isCameraLocked: () => hud.isInterfaceUnlocked(),
-      isCameraMotionLocked: () => world.vehicleSession !== null,
+      isCameraMotionLocked: () => world.vehicleSession !== null || hordeControlsActive(world),
     },
     keybinds,
   );
@@ -4097,7 +4099,7 @@ async function startGame(
     latencyMs = 0,
   ): { mi: ReturnType<typeof input.readMoveInput>; facing: number | null } {
     attackMoveTick();
-    const mi = input.readMoveInput();
+    const mi = hordeExitInput(world, input.readMoveInput());
     let facing: number | null = mouselook ? input.camYaw : null;
     // A teleport (door, portal, spirit release) invalidates any pending
     // click-to-move: the destination is across the transition, and chasing it
@@ -4689,6 +4691,7 @@ async function startGame(
     const interpServerFacing = interpolatedOnlineSelfFacing(net, pe, alpha);
     const foreignFacing = movementFacing ?? resolved.facing;
     if (edgeReleaseFacing !== null) seedKeyboardTurnRelease(kbTurn, edgeReleaseFacing);
+    kbTurnArgs.rawTurnIntent = hordeControlsActive(world);
     kbTurnArgs.turnLeft = resolved.mi.turnLeft;
     kbTurnArgs.turnRight = resolved.mi.turnRight;
     kbTurnArgs.turnAllowed = net.spectating === null && !movementFrozen() && !isStunned(pe);
@@ -4709,13 +4712,9 @@ async function startGame(
       kbFacing !== null &&
       (resolved.mi.turnLeft || resolved.mi.turnRight) &&
       !kbTurn.suppressTurnFlags;
-    Object.assign(net.moveInput, resolved.mi);
-    if (kbTurn.suppressTurnFlags) {
-      net.moveInput.turnLeft = false;
-      net.moveInput.turnRight = false;
-    }
+    applyKeyboardTurnInput(net.moveInput, resolved.mi, kbTurn);
     selfMotionGateArgs.spectating = net.spectating;
-    selfMotionGateArgs.movementFrozen = movementFrozen();
+    selfMotionGateArgs.movementFrozen = movementFrozen() || hordeControlsActive(world);
     selfMotionGateArgs.playerImmobilized = playerImmobilized();
     selfMotionGateArgs.posX = pe.pos.x;
     selfMotionGateArgs.climbing = pe.climbing;

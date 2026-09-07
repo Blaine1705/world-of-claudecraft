@@ -1,3 +1,10 @@
+import {
+  FORGE_INTERACT_RANGE,
+  FORGE_NPC_DEF,
+  FORGE_STATIONS,
+} from '../sim/content/world_quest_forging';
+import { HORDE_NPC_DEF } from '../sim/content/world_quest_horde';
+import { isInvestigationNpc } from '../sim/content/world_quest_investigation';
 import { isQuestGatedEntityHidden } from '../sim/quest_gated_entity';
 import {
   dist2d,
@@ -6,6 +13,7 @@ import {
   type Entity,
   INTERACT_RANGE,
 } from '../sim/types';
+import { investigationDisguiseHidden } from '../sim/world_quest_investigation_visibility';
 import { isWorldQuestTraceInstructor } from '../sim/world_quest_trace_identity';
 import { t } from '../ui/i18n';
 import { tSim } from '../ui/sim_i18n';
@@ -29,6 +37,7 @@ export interface PickInteractionWorld {
   // the other half of an escort run's only client entry point.
   questLog: IWorld['questLog'];
   worldQuestLog?: IWorld['worldQuestLog'];
+  worldQuestCycle?: IWorld['worldQuestCycle'];
   targetEntity(id: number | null): void;
   interact(): void;
   enterDungeon(dungeonId: string): InteractionOutcome;
@@ -163,6 +172,8 @@ export function hoverCursorKind(
 
 /** Resolve the client-side range for a lootable object before dispatch or approach. */
 export function objectInteractionRange(entity: Pick<Entity, 'templateId'>): number {
+  if (FORGE_STATIONS.some((station) => `ground_${station.objectItemId}` === entity.templateId))
+    return FORGE_INTERACT_RANGE;
   return entity.templateId === EASTBROOK_NOTICEBOARD_TEMPLATE_ID
     ? EASTBROOK_NOTICEBOARD_INTERACTION_RADIUS
     : INTERACT_RANGE;
@@ -221,7 +232,8 @@ export function handlePickedEntity(
 
   // Quest-gated mobs (Broodmother eggs) are inert scenery to a player not on the
   // gating quest: not targetable or interactable until they take the quest.
-  if (isQuestGatedEntityHidden(e, world.questLog)) return false;
+  if (isQuestGatedEntityHidden(e, world.questLog) || investigationDisguiseHidden(e, world))
+    return false;
 
   if (e.kind !== 'object') world.targetEntity(id);
 
@@ -284,7 +296,13 @@ export function handlePickedEntity(
           // command too); do not open the quest dialog client-side.
           hud.showError(tSim('error.cantWhileDead'));
           return false;
-        } else if (isWorldQuestTraceInstructor(e.templateId)) world.interact();
+        } else if (
+          isWorldQuestTraceInstructor(e.templateId) ||
+          e.templateId === FORGE_NPC_DEF.id ||
+          e.templateId === HORDE_NPC_DEF.id ||
+          isInvestigationNpc(e.templateId)
+        )
+          world.interact();
         else if (e.templateId === 'brother_halven' || e.templateId === 'brother_halven_marsh')
           hud.openDelveBoard(id);
         else hud.openQuestDialog(id);
@@ -365,7 +383,13 @@ export function handlePickedEntity(
       // No quest dialog while dead (the server refuses quest talk too); a ghost
       // takes the Spirit Healer res via right-click or the death panel button.
       if (d <= INTERACT_RANGE + 2 && !world.player.dead) {
-        if (isWorldQuestTraceInstructor(e.templateId)) world.interact();
+        if (
+          isWorldQuestTraceInstructor(e.templateId) ||
+          e.templateId === FORGE_NPC_DEF.id ||
+          e.templateId === HORDE_NPC_DEF.id ||
+          isInvestigationNpc(e.templateId)
+        )
+          world.interact();
         else if (e.templateId === 'brother_halven' || e.templateId === 'brother_halven_marsh')
           hud.openDelveBoard(id);
         else hud.openQuestDialog(id);

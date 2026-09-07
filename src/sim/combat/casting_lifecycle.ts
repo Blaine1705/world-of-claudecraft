@@ -32,6 +32,7 @@ import { nearestAttackerId } from '../auto_acquire_target';
 import { ITEMS, isDelvePos, MOBS, zoneAt } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { isShieldItem } from '../equipment_rules';
+import { hordeActionsLocked } from '../horde_action_lock';
 import { instanceInfoAt } from '../instances/dungeons';
 import { forceDismount } from '../mounts';
 import {
@@ -892,7 +893,7 @@ export function castAbility(
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
-  if (meta.vehicle) return;
+  if (meta.vehicle || hordeActionsLocked(meta.worldQuestLog)) return;
   let res = ctx.resolvedAbility(abilityId, p.id);
   if (!res) {
     ctx.error(p.id, 'You do not know that ability.');

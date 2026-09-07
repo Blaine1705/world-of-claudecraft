@@ -1,3 +1,4 @@
+import { INVESTIGATION_MOB, INVESTIGATION_NPCS } from './content/world_quest_investigation';
 // Content merge layer. Actual game content lives in sim/content/* — one
 // module per zone plus classes (abilities), shared items, and dungeons —
 // so content can grow without everything colliding in one file. This module
@@ -241,6 +242,8 @@ import {
   WILLOWFEN_ZONE,
 } from './content/willowfen';
 import { WORLD_QUEST_CALLIGRAPHY_NPCS } from './content/world_quest_calligraphy';
+import { FORGE_NPC_DEF } from './content/world_quest_forging';
+import { HORDE_NPC_DEF } from './content/world_quest_horde';
 import {
   WORLD_QUEST_ESCORTS,
   WORLD_QUEST_ITEMS,
@@ -406,6 +409,7 @@ export { aggregateSetBonuses, ITEM_SETS } from './content/item_sets';
 export const MOBS: Record<string, MobTemplate> = {
   ...ZONE1_MOBS,
   ...ZONE2_MOBS,
+  [INVESTIGATION_MOB.id]: INVESTIGATION_MOB,
   ...ZONE3_MOBS,
   ...PRACTICE_DUMMY_MOBS,
   ...DUNGEON_MOBS,
@@ -471,6 +475,9 @@ export const NPCS: Record<string, NpcDef> = {
   // resolve its name; spirit.ts spawns a copy at every graveyard.
   [SPIRIT_HEALER_NPC_ID]: SPIRIT_HEALER,
   ...WORLD_QUEST_CALLIGRAPHY_NPCS,
+  [FORGE_NPC_DEF.id]: FORGE_NPC_DEF,
+  [HORDE_NPC_DEF.id]: HORDE_NPC_DEF,
+  ...Object.fromEntries(INVESTIGATION_NPCS.map((npc) => [npc.id, npc])),
 };
 
 // Graveyards + the Spirit Healer: re-exported so the Sim and spirit.ts import the

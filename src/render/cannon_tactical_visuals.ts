@@ -24,6 +24,7 @@ export class CannonTacticalVisuals {
   private readonly bursts: THREE.Mesh[] = [];
   private recoilModel: THREE.Object3D | null = null;
   private recoilBaseZ = 0;
+  private stationId: string | null = null;
 
   constructor(
     template: THREE.Object3D,
@@ -55,6 +56,10 @@ export class CannonTacticalVisuals {
     reducedMotion: boolean,
   ): void {
     const state = session?.encounter;
+    if (this.stationId !== (session?.stationId ?? null)) {
+      this.restoreRecoil();
+      this.stationId = session?.stationId ?? null;
+    }
     this.root.visible = !!state;
     if (!state) {
       this.restoreRecoil();
@@ -62,7 +67,7 @@ export class CannonTacticalVisuals {
     }
     if (!this.recoilModel)
       this.scene.traverse((node) => {
-        if (node.userData.questObjectVisualItemId === 'north_watch_cannon' && node.children[0]) {
+        if (node.userData.questObjectVisualItemId === this.stationId && node.children[0]) {
           this.recoilModel = node.children[0];
           this.recoilBaseZ = this.recoilModel.position.z;
         }

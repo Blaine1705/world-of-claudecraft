@@ -1,4 +1,5 @@
-import type { CannonField } from '../sim/types';
+import type { CannonField, VehicleSession } from '../sim/types';
+import { vehicleStationById } from '../sim/vehicle_stations';
 import type { CameraDirectorPose } from './camera_director_core';
 
 export interface VehicleCameraFrame extends CameraDirectorPose {
@@ -7,6 +8,8 @@ export interface VehicleCameraFrame extends CameraDirectorPose {
   z: number;
 }
 export interface VehicleCameraTarget {
+  yaw?: number;
+  focusOffsetZ?: number;
   field: CannonField;
   x: number;
   y: number;
@@ -20,6 +23,13 @@ export interface VehicleCameraState {
 
 export function createVehicleCamera(): VehicleCameraState {
   return { weight: 0, target: null, frame: { yaw: 0, pitch: 0, dist: 0, x: 0, y: 0, z: 0 } };
+}
+
+export function vehicleCameraTarget(
+  session: VehicleSession | null | undefined,
+): VehicleCameraTarget | null {
+  const station = session && vehicleStationById(session.stationId);
+  return session && station ? { ...station, y: session.origin.y } : null;
 }
 
 /** Pure composition over the normal orbit; never changes the player's saved camera.
@@ -63,12 +73,15 @@ export function stepVehicleCamera(
     halfDepth * Math.cos(pitch) +
     12;
   const w = state.weight * state.weight * (3 - 2 * state.weight);
-  const yawDelta = Math.atan2(Math.sin(Math.PI - live.yaw), Math.cos(Math.PI - live.yaw));
+  const yawDelta = Math.atan2(
+    Math.sin((last.yaw ?? Math.PI) - live.yaw),
+    Math.cos((last.yaw ?? Math.PI) - live.yaw),
+  );
   out.yaw += yawDelta * w;
   out.pitch += (pitch - live.pitch) * w;
   out.dist += (dist - live.dist) * w;
   out.x += ((minX + maxX) / 2 - live.x) * w;
   out.y += (last.y - live.y) * w;
-  out.z += ((minZ + maxZ) / 2 - live.z) * w;
+  out.z += ((minZ + maxZ) / 2 + (last.focusOffsetZ ?? 0) - live.z) * w;
   return out;
 }

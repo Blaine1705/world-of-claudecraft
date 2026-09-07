@@ -1,8 +1,13 @@
 import { describe, expect, it, vi } from 'vitest';
 import { dispatchVehicleCommand } from '../server/vehicle_command_wire';
-import { NORTH_WATCH_CANNON } from '../src/sim/content/vehicle_stations';
+import { LAST_KEEP_CANNON, NORTH_WATCH_CANNON } from '../src/sim/content/vehicle_stations';
 
 describe('vehicle command authority boundary', () => {
+  it('admits the second registered station through the same authenticated command', () => {
+    const sim = { enterVehicle: vi.fn(), useVehicleAction: vi.fn(), leaveVehicle: vi.fn() };
+    dispatchVehicleCommand(sim, 7, { cmd: 'vehicle_enter', station: LAST_KEEP_CANNON.id, pid: 99 });
+    expect(sim.enterVehicle).toHaveBeenCalledExactlyOnceWith(LAST_KEEP_CANNON.id, 7);
+  });
   it('uses only the authenticated pid and discards client combat outcomes', () => {
     const sim = { enterVehicle: vi.fn(), useVehicleAction: vi.fn(), leaveVehicle: vi.fn() };
     dispatchVehicleCommand(sim, 7, {

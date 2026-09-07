@@ -3753,6 +3753,11 @@ const FAMILY_KEYS: Record<string, string> = {
 };
 
 const NPC_KEYS: Record<string, string> = {
+  infiltrator_captain: 'npc_knight',
+  infiltrator_nella: 'npc_knight',
+  infiltrator_orin: 'npc_knight',
+  infiltrator_bram: 'npc_knight',
+  infiltrator_tessa: 'npc_knight',
   calligraphy_instructor: 'npc_villager_robed',
   calligraphy_apprentice_1: 'npc_villager',
   calligraphy_apprentice_2: 'npc_villager',

@@ -1,7 +1,7 @@
 import { CANNON_ACTIONS } from '../../../sim/content/cannon_encounter';
-import { NORTH_WATCH_CANNON } from '../../../sim/content/vehicle_stations';
 import { cannonAimValid, isCannonActionId } from '../../../sim/minigames/cannon_encounter';
 import type { CannonActionId, CannonPoint } from '../../../sim/types';
+import { vehicleStationById } from '../../../sim/vehicle_stations';
 import type { IWorldVehicles } from '../../../world_api/vehicles';
 import type { GroundAimReticleView } from '../action_bar/ground_aim_controller';
 
@@ -43,10 +43,11 @@ export class VehicleAimCore {
   }
   begin(id: string, slot: number): void {
     const session = this.world.vehicleSession;
-    if (!isCannonActionId(id) || !session || session.encounter.phase !== 'wave') return;
+    const station = session && vehicleStationById(session.stationId);
+    if (!isCannonActionId(id) || !session || !station || session.encounter.phase !== 'wave') return;
     this.action = id;
     this.slot = slot;
-    const field = NORTH_WATCH_CANNON.field;
+    const field = station.field;
     this.point = { x: (field.minX + field.maxX) / 2, z: (field.minZ + field.maxZ) / 2 };
   }
   cancel(): boolean {
@@ -61,25 +62,28 @@ export class VehicleAimCore {
     this.point = point;
   }
   nudge(dx: number, dz: number): void {
-    if (!this.point || !this.isActive()) return;
-    const field = NORTH_WATCH_CANNON.field;
+    const station = vehicleStationById(this.world.vehicleSession?.stationId ?? '');
+    if (!this.point || !this.isActive() || !station) return;
+    const field = station.field;
     this.point = {
       x: Math.max(field.minX, Math.min(field.maxX, this.point.x + dx)),
       z: Math.max(field.minZ, Math.min(field.maxZ, this.point.z + dz)),
     };
   }
   reticle(): GroundAimReticleView | null {
-    if (!this.isActive() || !this.action || !this.point) return null;
+    const station = vehicleStationById(this.world.vehicleSession?.stationId ?? '');
+    if (!this.isActive() || !this.action || !this.point || !station) return null;
     this.view.point = this.point;
     this.view.radius = CANNON_ACTIONS[this.action].radius;
     this.view.school = this.action === 'incendiary' ? 'fire' : 'physical';
-    this.view.blocked = !cannonAimValid(NORTH_WATCH_CANNON.field, this.point);
+    this.view.blocked = !cannonAimValid(station.field, this.point);
     return this.view;
   }
   commitAt(point: CannonPoint | null | undefined = this.point): boolean {
-    if (!this.isActive() || !this.action) return false;
+    const station = vehicleStationById(this.world.vehicleSession?.stationId ?? '');
+    if (!this.isActive() || !this.action || !station) return false;
     // A refusing placement consumes the terrain click, not the cooldown or aim.
-    if (!point || !cannonAimValid(NORTH_WATCH_CANNON.field, point)) return true;
+    if (!point || !cannonAimValid(station.field, point)) return true;
     const action = this.action;
     this.world.useVehicleAction(action, point);
     this.cancel();

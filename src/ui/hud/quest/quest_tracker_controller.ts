@@ -5,6 +5,9 @@ import { esc } from '../../esc';
 import { formatNumber, t } from '../../i18n';
 import { ownEntry } from '../../known_item';
 import type { PainterHostWriters } from '../../painter_host';
+import { forgeInstructionLines } from '../../world_quest_forge_view';
+import { hordeInstructionLines } from '../../world_quest_horde_view';
+import { investigationInstructionLines } from '../../world_quest_investigation_view';
 import { worldQuestTraceProgressInstruction } from '../../world_quest_trace_view';
 import { worldQuestDisplayName, worldQuestObjectiveLabel } from '../../world_quest_view';
 import { buildQuestStrip, type QuestStripController } from './quest_strip_controller';
@@ -131,28 +134,52 @@ export class QuestTrackerController {
     for (const progress of this.deps.world().worldQuestLog.values()) {
       if (
         progress.state !== 'active' &&
-        !(progress.traceResult && progress.tracing?.phase === 'success')
+        !(progress.traceResult && progress.tracing?.phase === 'success') &&
+        !progress.forging &&
+        !progress.horde
       )
         continue;
       const quest = ownEntry(WORLD_QUESTS_BY_ID, progress.questId);
       if (!quest) continue;
-      if (progress.tracing) traceQuestId = progress.questId;
+      if (
+        progress.tracing ||
+        progress.forging?.phase === 'countdown' ||
+        progress.forging?.phase === 'working' ||
+        progress.horde?.phase === 'countdown' ||
+        progress.horde?.phase === 'active'
+      )
+        traceQuestId = progress.questId;
       quests.push({
         id: progress.questId,
         number: quests.length + 1,
         title: worldQuestDisplayName(progress.questId),
         complete: progress.state === 'completed',
-        objectives: [
-          {
-            label:
-              quest.objective.type === 'tracing'
-                ? worldQuestTraceProgressInstruction(progress, quest)
-                : worldQuestObjectiveLabel(progress.questId),
-            current: Math.min(progress.count, quest.count),
-            total: quest.count,
-            ...(quest.objective.type === 'tracing' ? { instruction: true } : {}),
-          },
-        ],
+        objectives:
+          quest.objective.type === 'forging' ||
+          quest.objective.type === 'horde' ||
+          quest.objective.type === 'investigation'
+            ? (quest.objective.type === 'forging'
+                ? forgeInstructionLines(progress)
+                : quest.objective.type === 'horde'
+                  ? hordeInstructionLines(progress)
+                  : investigationInstructionLines(progress)
+              ).map((label) => ({
+                label,
+                current: 0,
+                total: 1,
+                instruction: true,
+              }))
+            : [
+                {
+                  label:
+                    quest.objective.type === 'tracing'
+                      ? worldQuestTraceProgressInstruction(progress, quest)
+                      : worldQuestObjectiveLabel(progress.questId),
+                  current: Math.min(progress.count, quest.count),
+                  total: quest.count,
+                  ...(quest.objective.type === 'tracing' ? { instruction: true } : {}),
+                },
+              ],
       });
     }
     if (collapsed && quests.length === 0 && this.deps.settings.available()) {

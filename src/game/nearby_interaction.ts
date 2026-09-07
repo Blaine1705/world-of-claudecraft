@@ -1,3 +1,6 @@
+import { FORGE_NPC_DEF } from '../sim/content/world_quest_forging';
+import { HORDE_NPC_DEF } from '../sim/content/world_quest_horde';
+import { isInvestigationNpc } from '../sim/content/world_quest_investigation';
 import { WORLD_QUESTS_BY_ID } from '../sim/data';
 import { isQuestGatedGroundObjectHidden } from '../sim/quest_gated_entity';
 import { isObjectOpenedByViewer } from '../sim/quests/opened_object_view';
@@ -218,7 +221,12 @@ export function tryNearbyInteraction(
       // through the HUD's confirm gate rather than sending the command
       // directly (it applies The Keeper's Toll).
       hud.requestSpiritHealerResurrect();
-    } else if (isWorldQuestTraceInstructor(npc.templateId)) {
+    } else if (
+      isWorldQuestTraceInstructor(npc.templateId) ||
+      npc.templateId === FORGE_NPC_DEF.id ||
+      npc.templateId === HORDE_NPC_DEF.id ||
+      isInvestigationNpc(npc.templateId)
+    ) {
       world.targetEntity(bestNpc);
       world.interact();
     } else if (npc.templateId === 'brother_halven' || npc.templateId === 'brother_halven_marsh') {

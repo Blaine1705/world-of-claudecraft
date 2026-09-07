@@ -43,6 +43,7 @@ import {
   weaponHand,
 } from './equipment_rules';
 import { formatMoney } from './format_money';
+import { hordeActionsLocked } from './horde_action_lock';
 import { useBrinyLure } from './interactions/crab_summon';
 import { throwFirebottleAtNearestHut } from './interactions/firebottle_hut';
 import { moveStackToCell } from './inventory_order';
@@ -728,7 +729,7 @@ export function useItem(
   const { meta, e: p } = r;
   const def = ITEMS[itemId];
   // All three use branches (food/drink, potion, elixir) consume one unit, so the
-  if (meta.vehicle) return;
+  if (meta.vehicle || hordeActionsLocked(meta.worldQuestLog)) return;
   // selection is honored here once instead of at each arm. Returns the consumed
   // payload because the potion branch reads it (the crafting-provenance trickle).
   //

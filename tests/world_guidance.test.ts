@@ -59,6 +59,15 @@ vi.mock('../src/render/cannon_encounter_visual', () => ({
     dispose() {}
   },
 }));
+vi.mock('../src/render/horde_barricade_visual', () => ({
+  HordeBarricadeVisual: class {
+    readyForEntry = calls.ready;
+    update() {
+      calls.events.push('horde');
+    }
+    dispose() {}
+  },
+}));
 
 describe('personal world guidance coordinator', () => {
   it('marks the timed drawing gate as entry-required and exposes the readiness barrier', () => {
@@ -75,7 +84,14 @@ describe('personal world guidance coordinator', () => {
       const guidance = new WorldGuidance(new THREE.Scene(), () => 0);
       const world = { mountRaceView: () => race, questState: () => 'active' } as unknown as IWorld;
       guidance.update(world, 10, 0.05);
-      expect(calls.events).toEqual(['race', 'island', `mount:${!race}`, 'trace', 'cannon']);
+      expect(calls.events).toEqual([
+        'race',
+        'island',
+        `mount:${!race}`,
+        'trace',
+        'cannon',
+        'horde',
+      ]);
     },
   );
   it('forwards NPC fizz arguments unchanged and releases the new visual', () => {

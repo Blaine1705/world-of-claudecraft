@@ -57,6 +57,12 @@ it('elides unchanged frames, routes all three buttons, and restores normal contr
   controller.update();
   expect(cancel).toHaveBeenCalledTimes(1);
   expect(document.body.classList.contains('operating-vehicle')).toBe(true);
+  expect(document.querySelector('.vehicle-bar-title')!.textContent).toBe('North Watch Cannon');
+  world.vehicleSession.stationId = 'last_keep_cannon';
+  controller.update();
+  expect(document.querySelector('.vehicle-bar-title')!.textContent).toBe('The Last Keep Cannon');
+  world.vehicleSession.stationId = 'north_watch_cannon';
+  controller.update();
   const buttons = [...document.querySelectorAll<HTMLButtonElement>('.vehicle-action')];
   expect(buttons).toHaveLength(3);
   const meter = document.querySelector<HTMLElement>('.vehicle-integrity')!;

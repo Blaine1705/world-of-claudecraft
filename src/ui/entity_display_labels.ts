@@ -7,6 +7,7 @@ import { abilityDisplayNameFromSource } from './ability_display_name';
 import { classDisplayName, itemDisplayName, tEntity } from './entity_i18n';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { localizeSimAuraName } from './sim_i18n';
+import { forgeObjectLabel } from './world_quest_forge_view';
 
 const RESOURCE_LABEL_KEYS: Record<ResourceType, TranslationKey> = {
   mana: 'abilityUi.resources.mana',
@@ -91,7 +92,35 @@ export function delveText(delveId: string, field: 'enterText' | 'leaveText'): st
   return tEntity({ kind: 'delve', id: delveId, field });
 }
 
+export function vehicleStationDisplayName(stationId: string): string {
+  return t(
+    stationId === 'last_keep_cannon'
+      ? 'hudChrome.vehicle.lastKeepTitle'
+      : 'hudChrome.vehicle.title',
+  );
+}
+
+export function investigationObjectLabel(itemId: string | null | undefined): string | null {
+  if (itemId === 'wq_infiltrator_orders' || itemId === 'ground_wq_infiltrator_orders')
+    return t('questUi.worldQuest.investigation.clueNames.c0');
+  if (itemId === 'wq_infiltrator_ledger' || itemId === 'ground_wq_infiltrator_ledger')
+    return t('questUi.worldQuest.investigation.clueNames.c1');
+  return null;
+}
+
 export function entityDisplayName(entity: Entity): string {
+  if (entity.kind === 'object') {
+    const investigationLabel = investigationObjectLabel(entity.objectItemId ?? entity.templateId);
+    if (investigationLabel) return investigationLabel;
+    const forgeLabel = forgeObjectLabel(entity.objectItemId ?? entity.templateId);
+    if (forgeLabel) return forgeLabel;
+  }
+  if (
+    entity.kind === 'object' &&
+    (entity.templateId === 'north_watch_cannon' || entity.templateId === 'last_keep_cannon')
+  ) {
+    return vehicleStationDisplayName(entity.templateId);
+  }
   if (entity.kind === 'mob')
     return entity.ownerId !== null && !isNecromancyUndead(entity)
       ? (localizeSimAuraName(entity.name) ?? entity.name)

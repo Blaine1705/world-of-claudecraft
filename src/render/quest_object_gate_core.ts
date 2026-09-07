@@ -20,6 +20,7 @@
 import { WORLD_QUESTS_BY_ID } from '../sim/data';
 import { isQuestGatedGroundObjectHidden } from '../sim/quest_gated_entity';
 import type { Entity, QuestProgress, WorldQuestProgress } from '../sim/types';
+import { investigationDisguiseHidden } from '../sim/world_quest_investigation_visibility';
 import {
   isWorldQuestSalvageObject,
   isWorldQuestSalvageObjectHidden,
@@ -45,9 +46,10 @@ export function makeQuestObjectGate(
 ): QuestObjectGate {
   if (options.showAllQuestObjects === true) return () => false;
   const salvageQuest = WORLD_QUESTS_BY_ID.wq_farshore_salvage;
-  if (worldQuests && salvageQuest) {
+  if (worldQuests) {
     return (entity, questLog) => {
-      if (isWorldQuestSalvageObject(entity, salvageQuest)) {
+      if (investigationDisguiseHidden(entity, worldQuests)) return true;
+      if (salvageQuest && isWorldQuestSalvageObject(entity, salvageQuest)) {
         return isWorldQuestSalvageObjectHidden(
           entity,
           salvageQuest,

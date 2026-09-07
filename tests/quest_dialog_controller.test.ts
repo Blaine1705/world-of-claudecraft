@@ -1,6 +1,12 @@
 // @vitest-environment happy-dom
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  INVESTIGATION_CLUES,
+  INVESTIGATION_NPC_IDS,
+  INVESTIGATION_NPCS,
+  INVESTIGATION_QUEST_ID,
+} from '../src/sim/content/world_quest_investigation';
 import { DELVES, NPCS, QUESTS, STATIONS } from '../src/sim/data';
 import { CHRONICLER_TEMPLATE_IDS } from '../src/sim/deeds';
 import type { Entity } from '../src/sim/types';
@@ -739,5 +745,68 @@ describe('QuestDialogController', () => {
     test.controller.refreshIfChanged();
 
     expect(test.element.querySelector('[data-prof-intro-hint]')).toBe(hintNode);
+  });
+});
+
+describe('investigation quest dialogue', () => {
+  it('opens records using existing dialogue chrome and distance dismissal', () => {
+    const clue = INVESTIGATION_CLUES[0];
+    const entity = {
+      ...npc(clue.entityId, `ground_${clue.objectItemId}`),
+      kind: 'object',
+    } as Entity;
+    const h = harness(entity);
+    h.world.worldQuestCycle = 'wq3_0';
+    h.world.worldQuestLog = new Map([
+      [
+        INVESTIGATION_QUEST_ID,
+        {
+          questId: INVESTIGATION_QUEST_ID,
+          state: 'active',
+          count: 0,
+          investigation: { heard: 0, clues: 1, cleared: 0 },
+        },
+      ],
+    ]);
+    h.controller.open(entity.id);
+    expect(h.controller.isOpen).toBe(true);
+    expect(h.element.querySelector('#quest-dialog-title')?.textContent).toBe('Standing Orders');
+    expect(h.element.querySelector('[data-close]')).not.toBeNull();
+    expect(h.element.querySelector('[data-accuse]')).toBeNull();
+    const title = h.element.querySelector('#quest-dialog-title');
+    h.controller.refreshIfChanged();
+    expect(h.element.querySelector('#quest-dialog-title')).toBe(title);
+    h.world.player.pos.x = 100;
+    h.controller.updateProximity();
+    expect(h.controller.isOpen).toBe(false);
+    expect(h.release).toHaveBeenCalled();
+  });
+  it('refreshes after online snapshot arrival, emits only accusation intent and restores correction', () => {
+    const entity = npc(INVESTIGATION_NPC_IDS[1], INVESTIGATION_NPCS[1].id);
+    const h = harness(entity);
+    h.world.worldQuestCycle = 'wq3_0';
+    const progress = {
+      questId: INVESTIGATION_QUEST_ID,
+      state: 'active' as const,
+      count: 0,
+      investigation: { heard: 7, clues: 3, cleared: 0, mobId: undefined as number | undefined },
+    };
+    h.world.worldQuestLog = new Map([[INVESTIGATION_QUEST_ID, progress]]);
+    h.world.accuseWorldQuestSuspect = vi.fn();
+    h.controller.open(entity.id);
+    expect(h.element.querySelector('[data-accuse]')).toBeNull();
+    progress.investigation.heard = 15;
+    h.controller.refreshIfChanged();
+    h.element.querySelector<HTMLButtonElement>('[data-accuse]')?.click();
+    expect(h.world.accuseWorldQuestSuspect).toHaveBeenCalledWith(entity.id);
+    expect(progress.investigation.cleared).toBe(0);
+    expect(h.controller.isOpen).toBe(false);
+    progress.investigation.cleared = 1;
+    h.controller.open(entity.id);
+    expect(h.element.textContent).toContain('try again');
+    expect(h.element.querySelector('[data-accuse]')).toBeNull();
+    progress.investigation.mobId = 500;
+    h.controller.refreshIfChanged();
+    expect(h.controller.isOpen).toBe(false);
   });
 });

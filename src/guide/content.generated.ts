@@ -5654,6 +5654,27 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "renown": 10,
     "feat": false,
     "rewardTitle": "the Runecaller"
+  },
+  {
+    "id": "exp_forge_helper",
+    "name": "A Helping Hammer",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "exp_last_barricade",
+    "name": "The Last Barricade",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "exp_borrowed_face",
+    "name": "A Borrowed Face",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
   }
 ];
 

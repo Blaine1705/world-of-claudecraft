@@ -63,7 +63,7 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 283 deeds worth 3355 total Renown', () => {
+  it('ships exactly 285 deeds worth 3365 total Renown', () => {
     // Release base (262 / 3145 after the WARFARE lifetime-honor ladder) plus
     // four Reliquary Curator rank bridges and the five Phase 18 completion
     // ladder deeds (all nine renown 0: catalog prestige never scores the
@@ -72,8 +72,9 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // deed (prog_ready_for_an_adventure, renown 5), and the five Crucible
     // raid deeds (four clears at 25 plus the flawless 50: +150), the Arcane
     // Calligraphy completion deed (+5), and its Gold-rating title deed (+10).
-    expect(DEED_ORDER.length).toBe(283);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3355);
+    // The forging workshop and Last Barricade each add a completion deed (+5).
+    expect(DEED_ORDER.length).toBe(285);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3365);
   });
 
   it('ships the audited per-category counts', () => {
@@ -96,7 +97,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // +2 bank socket ladder deeds (soc_strongbox_outfitter,
       // soc_four_bags_deep; Bank Storage phase 06).
       social: 20,
-      exploration: 13,
+      exploration: 15,
       feat: 3,
       hidden: 9,
     });
@@ -242,6 +243,9 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'dgn_varkhul_flawless',
       'exp_arcane_calligraphy',
       'exp_arcane_calligraphy_gold',
+      'exp_forge_helper',
+      'exp_last_barricade',
+      'exp_borrowed_face',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -663,7 +667,10 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // Two appended manual exploration deeds for Arcane Calligraphy: its normal
   // completion deed is worth 5 Renown and its Gold-rating title deed is worth 10.
   // Every previously shipped trigger and Renown value remains unchanged.
-  const FROZEN_CATALOG_SHA256 = '8ac73c74e8bea76c3e6db5659f8f8ee12eee539926122bb49c7ac8a7f53895dd';
+  // Forging appends one manual deed and joins the derived book-completion list.
+  // Last Barricade appends one manual exploration deed (+5). Removing that row
+  // and its derived book dependency reproduces the previous catalog digest.
+  const FROZEN_CATALOG_SHA256 = '1c9379dc0bad0e0db088afab0d234dad7135fab26c98acb3587f96d06224bfbc';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -861,8 +868,8 @@ describe('table shape', () => {
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');
-    // The Gold-rating Arcane Calligraphy deed is the latest append-only entry.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('exp_arcane_calligraphy_gold');
+    // The investigation completion deed is the latest append-only entry.
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('exp_borrowed_face');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

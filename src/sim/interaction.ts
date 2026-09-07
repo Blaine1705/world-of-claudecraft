@@ -1,4 +1,4 @@
-import { NORTH_WATCH_CANNON } from './content/vehicle_stations';
+import { vehicleStationByEntityId } from './vehicle_stations';
 import { enterVehicle } from './vehicles';
 // Interaction: looting, quest NPCs, ground objects. The three IWorldInteraction
 // command bodies (lootCorpse / pickUpObject / interact) extracted from sim.ts
@@ -28,6 +28,7 @@ import { bagPools, canGrantItemInstance, fitsAll } from './bags';
 import { NOTICEBOARD_LISTINGS } from './content/noticeboard_listings';
 import { type NoticeboardDef, noticeboardDefByEntityId } from './content/noticeboards';
 import { HARVEST_COMPONENT_SPECIMENS, monsterMaterialTierFor } from './content/professions';
+import { FORGE_INTERACT_RANGE } from './content/world_quest_forging';
 import { corpseCanInteract, corpseInteractionAvailability } from './corpse_interaction';
 import { ITEMS, MOBS, QUESTS, SPIRIT_HEALER_NPC_ID } from './data';
 import * as deedsMod from './deeds';
@@ -87,6 +88,7 @@ import {
   OBJECT_RESPAWN,
 } from './types';
 import { markWorldBossLooted } from './world_boss';
+import { forgeStationForEntity } from './world_quest_forging';
 import { isFarshoreSalvageEntity } from './world_quest_salvage';
 
 const LOCKPICK_OFFER_COOLDOWN = 4; // seconds between repeated rift_locked_chest offer emits per player
@@ -777,12 +779,15 @@ export function pickUpObject(
   }
   const obj = ctx.entities.get(objId);
   if (obj?.kind !== 'object' || !obj.lootable) return false;
-  if (obj.id === NORTH_WATCH_CANNON.entityId) return enterVehicle(ctx, NORTH_WATCH_CANNON.id, p.id);
+  const vehicleStation = vehicleStationByEntityId(obj.id);
+  if (vehicleStation) return enterVehicle(ctx, vehicleStation.id, p.id);
   const noticeboardDef = noticeboardDefByEntityId(noticeboardDefinitions, obj.id);
   // Preserve the historical no-op for malformed/non-pickup objects. The board
   // is the one intentional lootable object without an item payload.
   if (!noticeboardDef && !obj.objectItemId) return false;
-  const interactionRange = noticeboardDef?.interactionRadius ?? INTERACT_RANGE;
+  const interactionRange =
+    noticeboardDef?.interactionRadius ??
+    (forgeStationForEntity(obj) ? FORGE_INTERACT_RANGE : INTERACT_RANGE);
   if (dist2d(p.pos, obj.pos) > interactionRange) {
     ctx.error(meta.entityId, 'Too far away.');
     return false;
@@ -922,7 +927,11 @@ export function interact(
   }
   if (p.targetId !== null) {
     const target = ctx.entities.get(p.targetId);
-    if (target && dist2d(p.pos, target.pos) <= INTERACT_RANGE + 2) {
+    if (
+      target &&
+      dist2d(p.pos, target.pos) <=
+        (forgeStationForEntity(target) ? FORGE_INTERACT_RANGE : INTERACT_RANGE + 2)
+    ) {
       if (target.kind === 'mob' && target.lootable) {
         const availability = corpseInteractionAvailability(ctx, target, p.id, true);
         if (availability.canInteract) {

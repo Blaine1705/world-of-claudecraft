@@ -6,9 +6,11 @@
 
 import { IGNIVAR_LORE_OBJECTS } from '../sim/content/ignivar_raid_lore';
 import type { Entity } from '../sim/types';
+import { investigationObjectLabel } from '../ui/entity_display_labels';
 import { dungeonDisplayName, tEntity } from '../ui/entity_i18n';
 import { t } from '../ui/i18n';
 import { localizeSimText } from '../ui/sim_i18n';
+import { forgeObjectLabel } from '../ui/world_quest_forge_view';
 
 export function mobDisplayName(mobId: string): string {
   return tEntity({ kind: 'mob', id: mobId, field: 'name' });
@@ -19,6 +21,10 @@ export function npcDisplayName(npcId: string): string {
 }
 
 export function objectDisplayName(entity: Entity): string {
+  const investigationLabel = investigationObjectLabel(entity.objectItemId ?? entity.templateId);
+  if (investigationLabel) return investigationLabel;
+  const forgeLabel = forgeObjectLabel(entity.objectItemId ?? entity.templateId);
+  if (forgeLabel) return forgeLabel;
   if (entity.templateId === 'mailbox') {
     return t('worldContent.mailboxName');
   }

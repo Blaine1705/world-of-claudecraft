@@ -17,6 +17,7 @@ export interface IWorldQuests {
   rotateWorldQuestPuzzleTile(questId: string, tileIndex: number): void;
   swapWorldQuestMatch3Tiles(questId: string, fromIndex: number, toIndex: number): void;
   resetWorldQuestMatch3(questId: string): void;
+  accuseWorldQuestSuspect(npcId: number): void;
   acceptLinkedQuest(questId: string, fromPid: number): void;
   // The tutorial greeting's accept button: asks the sim for the ferry ride to
   // the Proving Shore. Server-validated (level 1, alive, overworld); the

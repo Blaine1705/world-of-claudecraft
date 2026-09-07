@@ -14,6 +14,11 @@ it('normalizes existing barrels, shows authoritative bursts and restores recoil 
   cannon.userData.questObjectVisualItemId = 'north_watch_cannon';
   cannon.add(model);
   scene.add(cannon);
+  const secondCannon = new THREE.Group(),
+    secondModel = new THREE.Group();
+  secondCannon.userData.questObjectVisualItemId = 'last_keep_cannon';
+  secondCannon.add(secondModel);
+  scene.add(secondCannon);
   const visual = new CannonTacticalVisuals(template, scene);
   const s: VehicleSession = {
     kind: 'cannon',
@@ -32,9 +37,16 @@ it('normalizes existing barrels, shows authoritative bursts and restores recoil 
   visual.update(s, () => 3, false);
   expect(visual.root.children[0].position.toArray()).toEqual([10, 3, 20]);
   expect(model.position.z).toBeCloseTo(0.45);
+  expect(secondModel.position.z).toBe(0);
   expect(JSON.stringify(s)).toBe(before);
+  s.stationId = 'last_keep_cannon';
+  visual.update(s, () => 3, false);
+  expect(model.position.z).toBe(0);
+  expect(secondModel.position.z).toBeCloseTo(0.45);
+  s.stationId = 'north_watch_cannon';
   visual.update(s, () => 3, true);
   expect(model.position.z).toBe(0);
+  expect(secondModel.position.z).toBe(0);
   s.encounter.barrels[0].active = false;
   visual.update(s, () => 3, false);
   expect(visual.root.children[0].visible).toBe(false);

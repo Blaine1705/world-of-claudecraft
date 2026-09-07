@@ -59,14 +59,14 @@ const WORLD_QUEST_ROTATION_ID_GROUPS = Object.freeze([
     'wq_eastbrook_calligraphy',
     'wq_mirefen_gravecallers',
     'wq_palmreach_confections',
-    'wq_evergarden_watch',
+    'wq_evergarden_forging',
     'wq_galecrest_wisps',
   ]),
   // Eight rosters avoid locking weekly puzzle variants to a single offering.
   Object.freeze([
     'wq_eastbrook_calligraphy',
     'wq_nightbloom_barrow',
-    'wq_wraithwood_restless',
+    'wq_wraithwood_barricade',
     'wq_farshore_salvage',
     'wq_proving_shore_scuttlers',
   ]),
@@ -75,6 +75,13 @@ const WORLD_QUEST_ROTATION_ID_GROUPS = Object.freeze([
     'wq_mirefen_gravecallers',
     'wq_palmreach_confections',
     'wq_evergarden_cannon',
+    'wq_last_keep_cannon',
+  ]),
+  Object.freeze([
+    'wq_eastbrook_bandits',
+    'wq_mirefen_infiltrator',
+    'wq_palmreach_confections',
+    'wq_evergarden_watch',
     'wq_galecrest_wisps',
   ]),
 ] as const);

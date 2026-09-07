@@ -2,6 +2,75 @@
 
 ## Status
 
+### Last Keep second-station preview (2026-09-06)
+
+Wyrmwatch remains at (390, 1870). A second battery stands outside the northern
+wall of The Last Keep at (375, 1964), with its own `last_keep_cannon` station and
+`wq_last_keep_cannon` claim. Use `/dev cannon last_keep`, then `/dev tp 375 1966`.
+The shared encounter, actions and rewards are unchanged. Its field spans x 364 to
+386 and z 1912 to 1952: narrower lanes avoid existing roadside fixtures while
+retaining the encounter's full marching distance. Five named scatter placements
+are removed; terrain heights and lamps are unchanged. Both stations have the same
+existing supply-prop kit, with no new art assets.
+
+`vehicleStationById` is the shared lookup for authority, wire validation, camera,
+aiming and private encounter rendering. Winning credits only the active station's
+quest; completed quests allow practice without another payout. Both cannons occur
+in the existing cannon rotation roster, replacing its wisp offering. The number of
+rosters and existing cycle/claim IDs remain unchanged. Rolling this content onto a
+realm mid-cycle would stop offering an old wisp row in that roster; review that
+rollout before deployment.
+
+Browser evidence: [ground](../screenshots/world-quest-cannon/last-keep-ground.png),
+[desktop first wave](../screenshots/world-quest-cannon/last-keep-desktop.png), and
+[small touch-layout first wave](../screenshots/world-quest-cannon/last-keep-mobile.png).
+Captured with headless Chrome/SwiftShader, at 1280x800 and 960x540. These verify
+entry, active wave, station title and field framing; they do not measure physical
+mobile GPU performance or prove a manual touch playthrough.
+
+Validation:
+
+- `npx.cmd vitest run tests/vehicles.test.ts tests/dev_world_quest_cannon.test.ts tests/terrain_height_parity.test.ts tests/world_quests.test.ts tests/world_population_invariant.test.ts tests/world_api_parity.test.ts tests/vehicle_station_placement.test.ts tests/cannon_emplacement.test.ts`: seven suites passed, including both complete three-wave wins, claim isolation, cross-field rejection and terrain parity. The world-quest suite exposed old eight-roster assumptions and missing vehicle coverage; these were updated to the actual nine-roster catalog.
+- `npx.cmd vitest run tests/world_quests.test.ts -t 'authors level|rotates a deterministic|naturally offers|persists and completes the non-default'`: all five targeted cases passed after those corrections.
+- `npx.cmd vitest run tests/vehicle_command_wire.test.ts tests/cannon_tactics_wire.test.ts tests/vehicle_aim_core.test.ts tests/cannon_tactical_visuals.test.ts tests/cannon_encounter_visual.test.ts tests/vehicle_camera_core.test.ts`: passed.
+- `npx.cmd vitest run tests/world_quest_view.test.ts tests/vehicle_action_bar_controller.test.ts`: passed.
+- `npx.cmd vitest run tests/world_quests.test.ts tests/localization_fixes.test.ts tests/architecture.test.ts tests/monolith_budget.test.ts`: passed after the rotation-test corrections (208 passed, three skipped).
+- `npx.cmd tsc --noEmit` and `npm.cmd run ci:changed`: passed.
+- `npm.cmd run security:gate`, `npm.cmd run build:server` and `npm.cmd run build:bundle`: passed. Bundle pre-generation also regenerated wiki content and asset manifests through their owning scripts.
+- `npm.cmd run gate`: stopped at i18n freshness because generated catalog changes are unstaged. No staging or commits were authorized. This is a local placement preview, not release acceptance.
+
+Release obligations remain: complete the shared gate, fill pending translations,
+add quest-specific Book of Deeds support (the current evaluator has no world-quest
+completion trigger), and review the narrower field's balance. No new unique loot
+was introduced, so there is no new Reliquary entry or item-art requirement.
+
+### Wyrmwatch placement preview (2026-09-06)
+
+The existing battery is temporarily relocated to the north approach of Wyrmwatch
+in The Drakelands, at (390, 1870). Use `/dev cannon`, then `/dev tp 390 1872`.
+The firing field spans x 375 to 405 and z 1820 to 1860. Supply props follow the
+station, and six named rocks are excluded from its field and dressing area.
+Terrain heights, waves, rewards, original quest/station IDs and the North Watch
+display name remain unchanged. This is one relocated station for placement review,
+not a second assignment or the future multi-station system. Earlier coordinates
+and screenshots below describe the Evergarden version.
+
+Desktop browser evidence: [ground view](../screenshots/world-quest-cannon/wyrmwatch-ground.png)
+and [first wave](../screenshots/world-quest-cannon/wyrmwatch-desktop.png).
+Entering the vehicle and starting the first wave were verified in headless Chrome
+with SwiftShader. Touch viewport capture reloaded to the landing page, so mobile
+gameplay and physical GPU performance remain unverified for this placement.
+
+Validation for this preview:
+
+- `npx.cmd vitest run tests/vehicle_station_placement.test.ts tests/cannon_emplacement.test.ts tests/vehicles.test.ts tests/dev_world_quest_cannon.test.ts tests/architecture.test.ts tests/terrain_height_parity.test.ts`: passed, 126 tests.
+- After adding the explicit Wyrmwatch location pin, `npx.cmd vitest run tests/vehicle_station_placement.test.ts tests/cannon_emplacement.test.ts`: passed, 5 tests.
+- `npx.cmd tsc --noEmit`, `npm.cmd run ci:changed`, and `git diff --check`: passed.
+- `npm.cmd run gate`: interrupted after failures appeared in druid parity,
+  SFX export, CI shard planning/stall reruns, item art and icon asset audit tests.
+  Those failures are outside the edited surface; their cause was not investigated
+  for this preview. The full gate did not complete, so this is not release acceptance.
+
 ### Commit handoff
 
 Portable cannon dressing evidence is included under

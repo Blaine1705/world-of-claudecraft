@@ -20,6 +20,7 @@ import {
   fenbridgeSurfaceNormalTexture,
   fenbridgeSurfaceRoughnessTexture,
 } from './fenbridge_surface_atlas';
+import { buildForgeAnvilTarget } from './forge_anvil_target';
 import { GFX, surfaceMat } from './gfx';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 import { buildWorldQuestFreightWagon } from './world_quest_freight_visual';
@@ -29,7 +30,11 @@ import { applySurfaceDetail, wornFamilyFor } from './worn_stone';
 const TARGET_HEIGHT = 1.35;
 
 const QUEST_OBJECT_URLS: Record<string, string> = {
+  forge_fuel: '/models/resources/wood_log_stack.glb',
+  forge_metal: '/models/quest/supply_crate.glb',
+  forge_water: '/models/props/well.glb',
   north_watch_cannon: '/models/biome/hex_cannon.glb',
+  last_keep_cannon: '/models/biome/hex_cannon.glb',
   eastbrook_freight_crate: '/models/quest/supply_crate.glb',
   crypt_ritual_circle: '/models/quest/crypt_ritual_circle.glb',
   supply_crate: '/models/quest/supply_crate.glb',
@@ -62,7 +67,12 @@ const QUEST_OBJECT_URLS: Record<string, string> = {
 };
 
 const QUEST_OBJECT_HEIGHTS: Record<string, number> = {
+  forge_fuel: 1.5,
+  forge_metal: 1.6,
+  forge_water: 2.8,
+  forge_tools: 1.7,
   north_watch_cannon: 2.4,
+  last_keep_cannon: 2.4,
   // The Nythraxis soul wardstones are an active raid mechanic — make them a tall,
   // obvious glowing pillar rather than a small sigil so all three read at range.
   bastion_ward_stone: 3.4,
@@ -142,6 +152,8 @@ function castsDynamicShadow(itemId: string): boolean {
 }
 
 function visualItemIdForEntity(itemId: string, entityId: number): string {
+  if (itemId === 'wq_infiltrator_orders') return 'fen_muster_order';
+  if (itemId === 'wq_infiltrator_ledger') return 'morthen_grimoire';
   const salvageVisual = worldQuestSalvageVisualIndex(entityId);
   return salvageVisual === null ? itemId : `farshore_salvage_${salvageVisual}`;
 }
@@ -699,6 +711,7 @@ export function buildGroundQuestObject(
   itemId: string,
   entityId: number,
 ): { group: THREE.Group; height: number } {
+  if (itemId === 'forge_tools') return buildForgeAnvilTarget();
   if (itemId === 'eastbrook_freight_wagon') {
     const freightWagon = buildWorldQuestFreightWagon();
     if (freightWagon) return freightWagon;

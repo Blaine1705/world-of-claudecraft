@@ -19,6 +19,8 @@ import type {
   ZonePropsDef,
 } from '../types';
 import { emptyZoneProps } from '../types';
+import { CANNON_EMPLACEMENT_PROPS } from './cannon_emplacement';
+import { FORGE_WORKSHOP_DRESSING } from './forge_workshop_dressing';
 
 export const DRAKELANDS_ZONE: ZoneDef = {
   id: 'drakelands',
@@ -1019,7 +1021,12 @@ export const DRAKELANDS_PROPS: ZonePropsDef = {
   ],
   // the Last Keep's bailey: every building comes from the castle plan (one
   // source of truth with the walls, walks, and colliders)
-  decorProps: [...castleBuildingProps(), ...BULWARK_BUILDINGS],
+  decorProps: [
+    ...castleBuildingProps(),
+    ...BULWARK_BUILDINGS,
+    ...CANNON_EMPLACEMENT_PROPS,
+    ...FORGE_WORKSHOP_DRESSING,
+  ],
   crates: [
     [406, 1892],
     [396, 1912],

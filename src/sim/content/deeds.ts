@@ -2955,6 +2955,30 @@ export const DEEDS: Record<string, DeedDef> = {
     trigger: { kind: 'manual' },
     reward: { kind: 'title', text: 'the Runecaller' },
   },
+  exp_forge_helper: {
+    id: 'exp_forge_helper',
+    name: 'A Helping Hammer',
+    desc: 'Help Smith Mara complete a shield at The Last Keep.',
+    category: 'exploration',
+    renown: 5,
+    trigger: { kind: 'manual' },
+  },
+  exp_last_barricade: {
+    id: 'exp_last_barricade',
+    name: 'The Last Barricade',
+    desc: 'Hold the forest pass against the undead horde.',
+    category: 'exploration',
+    renown: 5,
+    trigger: { kind: 'manual' },
+  },
+  exp_borrowed_face: {
+    id: 'exp_borrowed_face',
+    name: 'A Borrowed Face',
+    desc: 'Expose and defeat the infiltrator among the Fenbridge watch.',
+    category: 'exploration',
+    renown: 5,
+    trigger: { kind: 'manual' },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

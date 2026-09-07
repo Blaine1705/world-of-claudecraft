@@ -1,6 +1,6 @@
-import { NORTH_WATCH_CANNON } from '../sim/content/vehicle_stations';
 import { isCannonActionId } from '../sim/minigames/cannon_encounter';
 import type { CannonEncounterState, CannonEnemyKind, VehicleSession } from '../sim/types';
+import { vehicleStationById } from '../sim/vehicle_stations';
 
 function record(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -26,7 +26,8 @@ export function decodeVehicleSession(value: unknown): VehicleSession | null {
   if (
     !record(value) ||
     value.kind !== 'cannon' ||
-    value.stationId !== NORTH_WATCH_CANNON.id ||
+    typeof value.stationId !== 'string' ||
+    !vehicleStationById(value.stationId) ||
     typeof value.cycle !== 'string' ||
     value.cycle.length > 32 ||
     !record(value.origin) ||

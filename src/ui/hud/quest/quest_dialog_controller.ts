@@ -19,6 +19,11 @@ import { NPC_WINDOW_CLOSE_RANGE } from '../../npc_service_range';
 import { archetypeImageUrl } from '../../profession_art';
 import { buildAttunementPreview } from '../../profession_identity_view';
 import { svgIcon } from '../../ui_icons';
+import {
+  investigationDialogue,
+  investigationSignature,
+  isInvestigationTarget,
+} from '../../world_quest_investigation_view';
 import { isStationMasterNpc } from '../vendor/train_view';
 import { isWarfareVendorNpc } from '../vendor/warfare_vendor_view';
 import { gossipMenuIsEmpty } from './gossip_menu';
@@ -95,6 +100,7 @@ interface ProfessionPreviewContent {
 /** Owns gossip, quest details, shared quest links, focus, and dialogue voice state. */
 export class QuestDialogController {
   private npcId: number | null = null;
+  private investigationSig: string | null = null;
   private detailQuestId: string | null = null;
   // The staleness signature refreshIfChanged watches, as of the last gossip
   // render (null = no gossip list currently painted): the profession-intro
@@ -117,7 +123,7 @@ export class QuestDialogController {
   open(npcId: number): void {
     const world = this.deps.world();
     const npc = world.entities.get(npcId);
-    if (npc?.kind !== 'npc') return;
+    if (!npc || (npc.kind !== 'npc' && !isInvestigationTarget(npcId))) return;
     if (NPCS[npc.templateId]?.banker) {
       world.targetEntity(npc.id);
       world.interact();
@@ -194,6 +200,7 @@ export class QuestDialogController {
     this.deps.element.style.display = 'none';
     this.npcId = null;
     this.detailQuestId = null;
+    this.investigationSig = null;
     this.lastIntroHintVisible = null;
     this.lastGossipRowSig = null;
     this.deps.hideTooltip();
@@ -224,6 +231,10 @@ export class QuestDialogController {
    *  (the dialog holds focus-trapped buttons). */
   refreshIfChanged(): void {
     if (this.npcId === null || this.deps.element.style.display !== 'block') return;
+    if (this.investigationSig !== null) {
+      if (investigationSignature(this.deps.world()) !== this.investigationSig) this.refresh();
+      return;
+    }
     if (this.detailQuestId !== null || this.lastIntroHintVisible === null) return;
     const npc = this.deps.world().entities.get(this.npcId);
     if (!npc) return;
@@ -325,6 +336,8 @@ export class QuestDialogController {
 
   private renderGossip(npc: Entity, closeIfEmpty = false): void {
     const world = this.deps.world();
+    if (this.renderInvestigation(npc)) return;
+    this.investigationSig = null;
     const definition = NPCS[npc.templateId];
     const interesting = this.offerableRows(npc);
     this.lastGossipRowSig = gossipRowSig(interesting);
@@ -714,6 +727,34 @@ export class QuestDialogController {
     if (row && rewardItemId) {
       this.deps.attachTooltip(row, () => this.deps.itemTooltip(ITEMS[rewardItemId]));
     }
+  }
+
+  private renderInvestigation(target: Entity): boolean {
+    const world = this.deps.world();
+    const view = investigationDialogue(world, target.id);
+    if (!view) return false;
+    if (view.finished) {
+      this.close();
+      return true;
+    }
+    this.npcId = target.id;
+    this.detailQuestId = null;
+    this.investigationSig = investigationSignature(world);
+    markDialogRoot(this.deps.element, { labelledBy: 'quest-dialog-title' });
+    const title = target.kind === 'npc' ? this.deps.text.npcName(target.templateId) : view.title;
+    this.deps.element.innerHTML = `<div class="panel-title"><span id="quest-dialog-title">${esc(title)}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div><div class="qd-sub">${esc(view.title)}</div><div class="qd-text">${esc(view.text)}</div><div class="qd-req">${esc(view.hint)}</div>`;
+    if (view.accuse) {
+      const button = this.makeButton(t('questUi.worldQuest.investigation.accuse'));
+      button.dataset.accuse = String(target.id);
+      button.addEventListener('click', () => {
+        this.close();
+        this.deps.world().accuseWorldQuestSuspect(target.id);
+      });
+      this.deps.element.appendChild(button);
+    }
+    this.bindClose();
+    this.showAndFocus();
+    return true;
   }
 
   private makeButton(label: string): HTMLButtonElement {

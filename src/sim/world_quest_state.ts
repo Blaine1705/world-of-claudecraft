@@ -79,20 +79,36 @@ export function savedWorldQuestState(
   return {
     worldQuests: {
       cycle: meta.worldQuestCycle,
-      progress: [...meta.worldQuestLog.values()].map(({ tracing: _tracing, ...progress }) => ({
-        ...progress,
-        ...(progress.creditedObjects === undefined
-          ? {}
-          : { creditedObjects: [...progress.creditedObjects] }),
-        ...(progress.puzzleRotations === undefined
-          ? {}
-          : { puzzleRotations: [...progress.puzzleRotations] }),
-        ...(progress.match3Board === undefined ? {} : { match3Board: [...progress.match3Board] }),
-        ...(progress.traceScores === undefined
-          ? {}
-          : { traceScores: progress.traceScores.map((score) => ({ ...score })) }),
-        ...(progress.traceResult === undefined ? {} : { traceResult: { ...progress.traceResult } }),
-      })),
+      progress: [...meta.worldQuestLog.values()].map(
+        ({
+          tracing: _tracing,
+          forging: _forging,
+          horde: _horde,
+          investigation: _investigation,
+          ...progress
+        }) => ({
+          ...progress,
+          ...(progress.hordeResult === undefined
+            ? {}
+            : { hordeResult: { ...progress.hordeResult } }),
+          ...(progress.forgeResult === undefined
+            ? {}
+            : { forgeResult: { ...progress.forgeResult } }),
+          ...(progress.creditedObjects === undefined
+            ? {}
+            : { creditedObjects: [...progress.creditedObjects] }),
+          ...(progress.puzzleRotations === undefined
+            ? {}
+            : { puzzleRotations: [...progress.puzzleRotations] }),
+          ...(progress.match3Board === undefined ? {} : { match3Board: [...progress.match3Board] }),
+          ...(progress.traceScores === undefined
+            ? {}
+            : { traceScores: progress.traceScores.map((score) => ({ ...score })) }),
+          ...(progress.traceResult === undefined
+            ? {}
+            : { traceResult: { ...progress.traceResult } }),
+        }),
+      ),
     },
   };
 }

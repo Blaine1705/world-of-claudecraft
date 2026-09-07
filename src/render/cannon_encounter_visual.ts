@@ -3,8 +3,9 @@
 // before the player can start the timed encounter.
 import * as THREE from 'three';
 import { CANNON_ACTIONS } from '../sim/content/cannon_encounter';
-import { NORTH_WATCH_CANNON } from '../sim/content/vehicle_stations';
+import { VEHICLE_STATIONS } from '../sim/content/vehicle_stations';
 import type { VehicleSession } from '../sim/types';
+import { vehicleStationById } from '../sim/vehicle_stations';
 import { loadGltf } from './assets/loader';
 import { timeBuildSpan } from './build_spans';
 import { CannonEnemyVisuals } from './cannon_enemy_visuals';
@@ -30,6 +31,8 @@ export class CannonEncounterVisual {
     this.mesh(this.ring, this.materials.red),
   );
   private disposed = false;
+  private stationId: string | null = null;
+  private readonly markers: { mesh: THREE.Mesh; u: number; v: number }[] = [];
 
   constructor(
     scene: THREE.Object3D,
@@ -38,7 +41,7 @@ export class CannonEncounterVisual {
   ) {
     this.group.name = 'personal-cannon-encounter';
     this.group.add(this.content);
-    const field = NORTH_WATCH_CANNON.field;
+    const field = VEHICLE_STATIONS[0].field;
     // Three marching lanes and the breach line are visible on every tier.
     for (const lane of [0.2, 0.5, 0.8]) {
       const x = field.minX + lane * (field.maxX - field.minX);
@@ -46,12 +49,18 @@ export class CannonEncounterVisual {
         const marker = this.mesh(this.box, this.materials.gold);
         marker.scale.set(0.22, 0.06, 1.2);
         marker.position.set(x, groundAt(x, z) + 0.12, z);
+        this.markers.push({
+          mesh: marker,
+          u: lane,
+          v: (z - field.minZ) / (field.maxZ - field.minZ),
+        });
       }
     }
     for (let x = field.minX; x <= field.maxX; x += 2) {
       const marker = this.mesh(this.box, this.materials.red);
       marker.scale.set(1.8, 0.08, 0.35);
       marker.position.set(x, groundAt(x, field.maxZ) + 0.12, field.maxZ);
+      this.markers.push({ mesh: marker, u: (x - field.minX) / (field.maxX - field.minX), v: 1 });
     }
     this.content.visible = false;
     this.readyForEntry = this.prepare(scene, compileGate);
@@ -89,10 +98,21 @@ export class CannonEncounterVisual {
 
   update(session: VehicleSession | null | undefined, dt = 0.05, reducedMotion = false): void {
     if (this.disposed) return;
+    const station = session && vehicleStationById(session.stationId);
+    if (!station) session = null;
     this.content.visible = !!session;
     this.enemies?.update(session, dt, this.groundAt, reducedMotion);
     this.tactics?.update(session, this.groundAt, reducedMotion);
-    if (!session) return;
+    if (!session || !station) return;
+    if (this.stationId !== station.id) {
+      this.stationId = station.id;
+      const field = station.field;
+      for (const { mesh, u, v } of this.markers) {
+        const x = field.minX + u * (field.maxX - field.minX);
+        const z = field.minZ + v * (field.maxZ - field.minZ);
+        mesh.position.set(x, this.groundAt(x, z) + 0.12, z);
+      }
+    }
     const state = session.encounter;
     for (let i = 0; i < this.shots.length; i++) {
       const mesh = this.shots[i],
@@ -103,8 +123,8 @@ export class CannonEncounterVisual {
         0,
         Math.min(1, (state.tick - shot.firedTick) / (shot.impactTick - shot.firedTick)),
       );
-      const x = NORTH_WATCH_CANNON.x + (shot.x - NORTH_WATCH_CANNON.x) * t;
-      const z = NORTH_WATCH_CANNON.z + (shot.z - NORTH_WATCH_CANNON.z) * t;
+      const x = station.x + (shot.x - station.x) * t;
+      const z = station.z + (shot.z - station.z) * t;
       mesh.position.set(x, this.groundAt(x, z) + 2 + 24 * t * (1 - t), z);
       mesh.scale.setScalar(shot.action === 'incendiary' ? 0.65 : 0.4);
     }

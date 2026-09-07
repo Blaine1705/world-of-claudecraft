@@ -6866,8 +6866,8 @@ export class GameServer {
       case 'world_quest_puzzle_rotate':
       case 'world_quest_match3_swap':
       case 'world_quest_match3_reset':
-        questWire.dispatchWorldQuestWire(sim, msg, pid);
-        break;
+      case 'world_quest_accuse':
+        return void questWire.dispatchWorldQuestWire(sim, msg, pid);
       case 'qlinkaccept':
         if (questWire.acceptLinkedQuestWire(sim, msg, pid)) this.resyncQuests(session);
         break;

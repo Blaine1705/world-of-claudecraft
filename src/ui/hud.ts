@@ -7310,7 +7310,7 @@ export class Hud {
   // Slot key DOWN: every slot fires immediately (a tap is down + up, so this
   // is the press).
   pressSlot(slot: number): void {
-    if (this.sim.vehicleSession) {
+    if (this.vehicleControls.blocksPlayerActions) {
       this.vehicleControls.chooseSlot(slot);
       return;
     }
@@ -7321,7 +7321,7 @@ export class Hud {
   // Slot key UP: release an empowered hold. A non-charging slot already fired
   // on press, so this is a no-op.
   releaseSlot(slot: number): void {
-    if (this.sim.vehicleSession) return;
+    if (this.vehicleControls.blocksPlayerActions) return;
     this.empowerHold.releaseSlot(slot, this.sim, (released) => this.flashActionSlot(released));
   }
 
@@ -7390,7 +7390,7 @@ export class Hud {
   // (reticle, empower charge, mouseover cast, the auto-attack QoL) rather than a
   // second cast path that would drift from it; the release edge is releaseCrossHotbarAction.
   pressCrossHotbarAction(action: { type: 'ability' | 'item'; id: string }): void {
-    if (this.sim.vehicleSession) return;
+    if (this.vehicleControls.blocksPlayerActions) return;
     if (action.id === CROSS_HOTBAR_ATTACK_ID || action.type === 'item') {
       this.castCrossHotbarAction(action);
       return;
@@ -7408,7 +7408,7 @@ export class Hud {
   }
 
   releaseCrossHotbarAction(action: { type: 'ability' | 'item'; id: string }): void {
-    if (this.sim.vehicleSession) return;
+    if (this.vehicleControls.blocksPlayerActions) return;
     this.empowerHold.releaseAction(action, this.sim, (slot) => this.flashActionSlot(slot));
   }
 
@@ -7417,7 +7417,7 @@ export class Hud {
   // the pad and nowhere else falls back to a plain cast (position abilities keep
   // the reticle via the ability-id aim identity) or the shared item-use seam.
   castCrossHotbarAction(action: { type: 'ability' | 'item'; id: string }): void {
-    if (this.sim.vehicleSession) return;
+    if (this.vehicleControls.blocksPlayerActions) return;
     // Attack is the fixed slot-0 toggle, not something the sim can cast by id.
     if (action.id === CROSS_HOTBAR_ATTACK_ID) {
       this.activateFixedAttackSlot();
@@ -7475,7 +7475,7 @@ export class Hud {
   }
 
   castSlot(barSlot: number): void {
-    if (this.sim.vehicleSession) {
+    if (this.vehicleControls.blocksPlayerActions) {
       this.vehicleControls.chooseSlot(barSlot);
       return;
     }
@@ -11441,7 +11441,6 @@ export class Hud {
 
   handleEvents(events: SimEvent[]): void {
     const sim = this.sim;
-    // Book of Deeds unlocks batch across the whole drain (handleDeedUnlocks):
     // banners coalesce to the last unlock, retro back-credits collapse into
     // one summary line, and the celebration sound plays once.
     const deedUnlocks: { deedId: string; retro?: boolean }[] = [];
@@ -11493,6 +11492,7 @@ export class Hud {
         this.worldQuestPuzzleWindow.applyEventPresentation(questEvent);
         continue;
       }
+      if (ev.type === 'worldQuestInvestigationDialogue') this.questDialog.open(ev.targetId);
       switch (ev.type) {
         case 'damage': {
           const src = sim.entities.get(ev.sourceId);

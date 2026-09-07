@@ -1,7 +1,9 @@
+import { hordeControlsActive } from '../../../game/horde_controls';
 import { sfx } from '../../../game/sfx';
 import { CANNON_TACTICS } from '../../../sim/content/cannon_encounter';
 import { TICK_RATE } from '../../../sim/types';
 import type { IWorldVehicles } from '../../../world_api/vehicles';
+import { vehicleStationDisplayName } from '../../entity_display_labels';
 import { esc } from '../../esc';
 import { formatNumber, t } from '../../i18n';
 import { iconDataUrl } from '../../icons';
@@ -9,17 +11,25 @@ import type { PainterHostWriters } from '../../painter_host';
 import { ActionBarPainter, type ActionBarSlotElements } from '../action_bar/action_bar_painter';
 import { CannonFeedbackCursor } from './cannon_feedback_core';
 import { cannonTacticsHint } from './cannon_tactics_view';
+import {
+  HordeActionBarController,
+  type HordeHudWorld,
+  type HordeProjection,
+} from './horde_action_bar_controller';
 import { createVehicleActionBarView } from './vehicle_action_bar_view';
 import { vehicleActionTooltip } from './vehicle_action_tooltip';
 import { VEHICLE_ACTION_SLOTS, VehicleAimCore } from './vehicle_aim_core';
 
 interface VehicleBarDeps {
-  world: IWorldVehicles;
+  world: IWorldVehicles & Partial<HordeHudWorld>;
   writers: PainterHostWriters;
   keyLabel(slot: number): string;
   consumePeek(): boolean;
   clearReticle?(): void;
-  presentation?: { setGroundAimReticle(value: null): void; addShake(amount: number): void };
+  presentation?: {
+    setGroundAimReticle(value: null): void;
+    addShake(amount: number): void;
+  } & Partial<HordeProjection>;
   attachTooltip(element: HTMLElement, html: () => string): void;
   cancelOnEnter: readonly { cancel(): void }[];
 }
@@ -40,8 +50,18 @@ export class VehicleActionBarController {
   private readonly view = createVehicleActionBarView();
   private readonly painter: ActionBarPainter;
   private mounted = false;
+  private readonly horde: HordeActionBarController | null;
 
   constructor(private readonly deps: VehicleBarDeps) {
+    this.horde =
+      deps.world.worldQuestLog && deps.world.cfg && deps.world.player
+        ? new HordeActionBarController(
+            deps.world as HordeHudWorld,
+            deps.writers,
+            deps.presentation?.worldToScreen ? (deps.presentation as HordeProjection) : undefined,
+            deps.cancelOnEnter,
+          )
+        : null;
     this.aim = new VehicleAimCore(deps.world, () => {
       deps.clearReticle?.();
       deps.presentation?.setGroundAimReticle(null);
@@ -111,11 +131,14 @@ export class VehicleActionBarController {
   }
 
   chooseSlot(slot: number): void {
+    if (this.deps.world.worldQuestLog && hordeControlsActive(this.deps.world as HordeHudWorld))
+      return;
     const action = VEHICLE_ACTION_SLOTS[slot];
     if (action) this.aim.begin(action, slot);
   }
 
   update(): void {
+    this.horde?.update();
     const session = this.deps.world.vehicleSession;
     const writers = this.deps.writers;
     const cues = this.feedback.consume(session);
@@ -142,7 +165,7 @@ export class VehicleActionBarController {
     if (!session) return;
     const encounter = session.encounter;
     writers.setText(this.shakeText, t('hudChrome.vehicle.shake'));
-    writers.setText(this.title, t('hudChrome.vehicle.title'));
+    writers.setText(this.title, vehicleStationDisplayName(session.stationId));
     writers.setText(this.exit, t('hudChrome.vehicle.exit'));
     writers.setAttr(this.gauge, 'role', 'meter');
     writers.setAttr(this.gauge, 'aria-label', t('hudChrome.vehicle.integrity'));
@@ -170,5 +193,12 @@ export class VehicleActionBarController {
       this.aim.isActive() ? t('hudChrome.vehicle.aim') : cannonTacticsHint(encounter),
     );
     this.painter.paint(this.view.tick(session, this.aim.activeSlot(), this.deps.keyLabel));
+  }
+
+  get blocksPlayerActions(): boolean {
+    return (
+      !!this.deps.world.vehicleSession ||
+      (!!this.deps.world.worldQuestLog && hordeControlsActive(this.deps.world as HordeHudWorld))
+    );
   }
 }

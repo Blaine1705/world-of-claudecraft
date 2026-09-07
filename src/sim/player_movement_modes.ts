@@ -1,6 +1,7 @@
 // Ordered exclusive locomotion modes before ordinary charge/follow/fear/walking.
 // True means this mode owns the step. Keep the order: vehicle freeze precedes
 // rift lift stripping, and the race lock precedes leap/climb but follows Valkyr.
+
 import { advanceClimb, tryStartClimb } from './climb';
 import { advanceHeroicLeap } from './combat/heroic_leap';
 import { advanceValkyrsCalling } from './combat/paladin_valkyrs_calling';
@@ -9,9 +10,11 @@ import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { clearAfkOnMove } from './social/away';
 import type { Entity } from './types';
+import { advanceHordeMovement } from './world_quest_horde';
 
 export function advanceExclusiveMovement(ctx: SimContext, p: Entity, meta: PlayerMeta): boolean {
   if (meta.vehicle) return true;
+  if (advanceHordeMovement(ctx, p, meta)) return true;
   // Strip the previous raised-tier lift before any movement integration.
   // updateRiftTriggers reapplies it after the step; non-rift movement is unchanged.
   const preLift = riftPlayerLift(ctx, p);

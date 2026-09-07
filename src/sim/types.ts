@@ -4,6 +4,7 @@ import type { ChatSenderFlair, StreamerLinks } from './account_flair';
 import type { MountKey } from './content/mounts';
 import type { GatheringProfessionId, ToolEffectId } from './content/professions';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
+import type { HordeResult, HordeState } from './minigames/horde_barricade';
 import type { HarvestYield } from './professions/harvest_yields';
 import type { RespawnWindow } from './respawn_policy';
 import type {
@@ -4220,7 +4221,34 @@ export interface WorldQuestTraceState {
   reason?: 'off-path' | 'movement' | 'timeout' | 'combat';
 }
 
+export type ForgeStationId = 'fuel' | 'metal' | 'water' | 'tools';
+
+export interface WorldQuestForgeResult {
+  elapsed: number;
+  mistakes: number;
+  adjustedTime: number;
+  rating: 'bronze' | 'silver' | 'gold';
+}
+
+export interface WorldQuestForgeState {
+  phase: 'countdown' | 'working' | 'success';
+  /** Last authoritative clock sample, published at bounded cadence for both hosts. */
+  observedAt: number;
+  requests: ForgeStationId[][];
+  requestIndex: number;
+  actionIndex: number;
+  readyAt: number;
+  startedAt: number;
+  lockUntil: number;
+  mistakes: number;
+  feedback: 'ready' | 'correct' | 'wrong';
+  result?: WorldQuestForgeResult;
+}
+
 export type WorldQuestObjective =
+  | { type: 'investigation'; targetMobId: string }
+  | { type: 'forging'; instructorNpcId: string }
+  | { type: 'horde'; instructorNpcId: string }
   | { type: 'vehicle'; stationId: string }
   | {
       type: 'tracing';
@@ -4269,10 +4297,25 @@ export interface WorldQuestDef {
 
 /** Per-character state for the current host-provided UTC cycle. Available
  *  quests are absent; only started and completed entries are persisted. */
+export interface WorldQuestInvestigationState {
+  heard: number;
+  clues: number;
+  cleared: number;
+  mobId?: number;
+}
+
 export interface WorldQuestProgress {
+  /** Personal investigation clues and live summon reference, omitted from saves. */
+  investigation?: WorldQuestInvestigationState;
   questId: string;
   count: number;
   state: 'active' | 'completed';
+  /** Personal workshop run, omitted from saves. */
+  horde?: HordeState;
+  hordeResult?: HordeResult;
+  forging?: WorldQuestForgeState;
+  /** Best completed workshop result for this rotation. */
+  forgeResult?: WorldQuestForgeResult;
   /** Session-only tracing readout. Omitted from character saves. */
   tracing?: WorldQuestTraceState;
   /** Stable advanced figure id and earned scores survive interruption and save/load. */
@@ -5994,6 +6037,7 @@ export type SimEvent = { pid?: number } & (
   // 'listings' carries the board's posted notices verbatim (guild names and
   // notes are world data, spliced by the client like player names, never
   // translated); a board with nothing posted stays the bare 'empty' shape.
+  | { type: 'worldQuestInvestigationDialogue'; targetId: number }
   | { type: 'noticeboard'; noticeboardId: string; state: 'empty' }
   | {
       type: 'noticeboard';

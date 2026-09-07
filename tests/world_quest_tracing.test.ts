@@ -351,7 +351,7 @@ describe('calligraphy content placement and rotation', () => {
       ID,
       'wq_mirefen_gravecallers',
       'wq_palmreach_confections',
-      'wq_evergarden_watch',
+      'wq_evergarden_forging',
       'wq_galecrest_wisps',
     ]);
     expect(activeWorldQuestsForCycle('wq3_5')[0].id).toBe('wq_willowfen_caravan');

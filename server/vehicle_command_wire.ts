@@ -1,6 +1,6 @@
-import { NORTH_WATCH_CANNON } from '../src/sim/content/vehicle_stations';
 import { isCannonActionId } from '../src/sim/minigames/cannon_encounter';
 import type { CannonActionId, CannonPoint } from '../src/sim/types';
+import { vehicleStationById } from '../src/sim/vehicle_stations';
 
 interface VehicleCommands {
   enterVehicle(station: string, pid: number): unknown;
@@ -14,7 +14,11 @@ export function dispatchVehicleCommand(
   msg: Record<string, unknown>,
 ): void {
   if (msg.cmd === 'vehicle_leave') sim.leaveVehicle(pid);
-  else if (msg.cmd === 'vehicle_enter' && msg.station === NORTH_WATCH_CANNON.id)
+  else if (
+    msg.cmd === 'vehicle_enter' &&
+    typeof msg.station === 'string' &&
+    vehicleStationById(msg.station)
+  )
     sim.enterVehicle(msg.station, pid);
   else if (
     msg.cmd === 'vehicle_action' &&

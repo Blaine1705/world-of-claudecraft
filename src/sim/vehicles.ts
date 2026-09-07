@@ -1,5 +1,5 @@
 // Authoritative session adapter. Private actors never enter the shared roster.
-import { NORTH_WATCH_CANNON } from './content/vehicle_stations';
+import { VEHICLE_STATIONS } from './content/vehicle_stations';
 import { createGroundObject } from './entity';
 import {
   CANNON_RETRY_TICKS,
@@ -17,24 +17,39 @@ import {
   type Entity,
   INTERACT_RANGE,
   type VehicleSession,
+  type VehicleStationDef,
 } from './types';
+import { vehicleStationById } from './vehicle_stations';
 import { activeWorldQuestsForCycle } from './world_quest_rotation';
 import { completeWorldQuestVehicle } from './world_quests';
 
 /** Lazily created without consuming allocator IDs or changing terrain anchors. */
 export function ensureVehicleStation(ctx: SimContext): void {
-  if (ctx.cfg.world || ctx.entities.has(NORTH_WATCH_CANNON.entityId)) return;
-  const station = createGroundObject(
-    NORTH_WATCH_CANNON.entityId,
-    NORTH_WATCH_CANNON.id,
-    'North Watch Cannon',
-    ctx.groundPos(NORTH_WATCH_CANNON.x, NORTH_WATCH_CANNON.z),
-  );
-  station.templateId = NORTH_WATCH_CANNON.id;
-  ctx.addEntity(station);
+  if (ctx.cfg.world) return;
+  for (const def of VEHICLE_STATIONS) {
+    if (ctx.entities.has(def.entityId)) continue;
+    const station = createGroundObject(
+      def.entityId,
+      def.id,
+      def.id === 'last_keep_cannon' ? 'The Last Keep Cannon' : 'North Watch Cannon',
+      ctx.groundPos(def.x, def.z),
+    );
+    station.templateId = def.id;
+    ctx.addEntity(station);
+  }
 }
 
-function eligible(ctx: SimContext, meta: PlayerMeta, player: Entity): boolean {
+export function ensureActiveVehicleStations(ctx: SimContext, meta: PlayerMeta): void {
+  if (activeWorldQuestsForCycle(meta.worldQuestCycle).some((q) => q.objective.type === 'vehicle'))
+    ensureVehicleStation(ctx);
+}
+
+function eligible(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  player: Entity,
+  station: Readonly<VehicleStationDef>,
+): boolean {
   const cycle = meta.devWorldQuestCycle ?? ctx.currentWorldQuestRotation().cycle;
   return (
     !ctx.cfg.world &&
@@ -44,25 +59,24 @@ function eligible(ctx: SimContext, meta: PlayerMeta, player: Entity): boolean {
     meta.worldQuestCycle === cycle &&
     player.level >= 10 &&
     activeWorldQuestsForCycle(meta.worldQuestCycle).some(
-      (q) => q.id === NORTH_WATCH_CANNON.questId,
+      (q) => q.id === station.questId && player.level >= q.minLevel,
     ) &&
-    ['active', 'completed'].includes(
-      meta.worldQuestLog.get(NORTH_WATCH_CANNON.questId)?.state ?? '',
-    )
+    ['active', 'completed'].includes(meta.worldQuestLog.get(station.questId)?.state ?? '')
   );
 }
 
 export function enterVehicle(ctx: SimContext, stationId: string, pid?: number): boolean {
   const resolved = ctx.resolve(pid);
-  if (!resolved || stationId !== NORTH_WATCH_CANNON.id) return false;
+  const def = vehicleStationById(stationId);
+  if (!resolved || !def) return false;
   const { meta, e: player } = resolved;
   if (
     meta.vehicle ||
     ctx.tickCount < (meta.vehicleRetryAtTick ?? 0) ||
-    !eligible(ctx, meta, player)
+    !eligible(ctx, meta, player, def)
   )
     return false;
-  const station = ctx.entities.get(NORTH_WATCH_CANNON.entityId);
+  const station = ctx.entities.get(def.entityId);
   if (
     !station ||
     station.templateId !== stationId ||
@@ -115,29 +129,33 @@ export function useVehicleAction(
 ): boolean {
   const resolved = ctx.resolve(pid);
   const session = resolved?.meta.vehicle;
+  const station = session && vehicleStationById(session.stationId);
   if (
     !resolved ||
     !session ||
-    !eligible(ctx, resolved.meta, resolved.e) ||
+    !station ||
+    !eligible(ctx, resolved.meta, resolved.e, station) ||
     session.cycle !== resolved.meta.worldQuestCycle ||
     !remainsAtStation(resolved.e, session)
   )
     return false;
-  return fireCannon(session.encounter, NORTH_WATCH_CANNON.field, action, point);
+  return fireCannon(session.encounter, station.field, action, point);
 }
 
 export function tickVehicle(ctx: SimContext, meta: PlayerMeta, player: Entity): void {
   const session = meta.vehicle;
   if (!session) return;
+  const station = vehicleStationById(session.stationId);
   if (
-    !eligible(ctx, meta, player) ||
+    !station ||
+    !eligible(ctx, meta, player, station) ||
     session.cycle !== meta.worldQuestCycle ||
     !remainsAtStation(player, session)
   ) {
     leaveVehicle(ctx, meta.entityId);
     return;
   }
-  tickCannonEncounter(session.encounter, NORTH_WATCH_CANNON.field);
+  tickCannonEncounter(session.encounter, station.field);
   if (session.encounter.phase === 'won') {
     completeWorldQuestVehicle(ctx, meta, session.stationId);
     ctx.emit({ type: 'cannonResult', pid: meta.entityId, ...cannonResult(session.encounter) });

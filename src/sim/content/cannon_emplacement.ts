@@ -1,9 +1,10 @@
 import type { ZonePropsDef } from '../types';
+import { VEHICLE_STATIONS } from './vehicle_stations';
 
-// Existing prop-kit instances, prepared and streamed through Evergarden's normal
-// scenery lane. Keep the approach at x=442 and the entire firing field clear.
+// Existing prop-kit instances, prepared through the owning zone's scenery lane.
+// The reference arrangement is translated as a unit to each station.
 // Dimensions measured from shipped GLBs; heights include the 0.05yd prop sink.
-export const CANNON_EMPLACEMENT_PROPS: NonNullable<ZonePropsDef['decorProps']> = [
+const DRESSING: NonNullable<ZonePropsDef['decorProps']> = [
   {
     key: 'hexCrateBig',
     terrainCalm: false,
@@ -75,3 +76,13 @@ export const CANNON_EMPLACEMENT_PROPS: NonNullable<ZonePropsDef['decorProps']> =
     h: 1.77,
   },
 ];
+
+// Keep the accepted arrangement relative to the station when trying another site.
+export const CANNON_EMPLACEMENT_PROPS: NonNullable<ZonePropsDef['decorProps']> =
+  VEHICLE_STATIONS.flatMap((station) =>
+    DRESSING.map((prop) => ({
+      ...prop,
+      x: prop.x - 442 + station.x,
+      z: prop.z - 1034 + station.z,
+    })),
+  );

@@ -40,6 +40,7 @@ import { clearPacklordState } from '../combat/hunter_packlord';
 import { isTemporaryNecromancyUndead } from '../combat/necromancy';
 import { ABILITIES, DUNGEON_X_THRESHOLD, ITEMS, isDelvePos, MOBS } from '../data';
 import { createMob } from '../entity';
+import { hordeActionsLocked } from '../horde_action_lock';
 import { consumeSelectedInventorySlot } from '../item_copy_ref';
 import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
 import type { PetState, PlayerMeta } from '../sim';
@@ -92,6 +93,8 @@ function noPetError(e: Entity, fallback = 'You have no pet.'): string {
 // This guard intentionally lives only on user-issued commands: passive pet AI and
 // system lifecycle operations (summon/restore/stow) remain encounter-owned.
 function petCommandBlockedByControl(ctx: SimContext, owner: Entity): boolean {
+  const meta = ctx.players.get(owner.id);
+  if (meta && hordeActionsLocked(meta.worldQuestLog)) return true;
   if (ctx.players.get(owner.id)?.vehicle) return true;
   if (!hasUnbreakableMovementLock(owner)) return false;
   ctx.error(owner.id, 'You are stunned.');

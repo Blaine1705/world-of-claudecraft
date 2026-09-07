@@ -3,6 +3,9 @@
 // dropped without throwing or partially replacing the last good mirror.
 
 import type { QuestProgress, WorldQuestProgress } from '../sim/types';
+import { decodeForgeState } from '../sim/world_quest_forge_wire';
+import { decodeHordeState } from '../sim/world_quest_horde_wire';
+import { decodeInvestigationState } from '../sim/world_quest_investigation_wire';
 import { decodeWorldQuestProgressTrace } from '../sim/world_quest_trace_wire';
 import { sanitizeWorldQuestCycle, sanitizeWorldQuestProgress } from '../sim/world_quests';
 
@@ -66,7 +69,19 @@ export function applyQuestSelfWire(
             (row.state === 'active' || row.state === 'completed'),
         );
         const tracing = decodeWorldQuestProgressTrace(raw?.tracing, progress);
-        return [progress.questId, tracing ? { ...progress, tracing } : progress];
+        const forging = decodeForgeState(raw?.forging, progress.questId);
+        const horde = decodeHordeState(raw?.horde, progress.questId);
+        const investigation = decodeInvestigationState(raw?.investigation, progress.questId);
+        return [
+          progress.questId,
+          {
+            ...progress,
+            ...(tracing ? { tracing } : {}),
+            ...(forging ? { forging } : {}),
+            ...(horde ? { horde } : {}),
+            ...(investigation ? { investigation } : {}),
+          },
+        ];
       }),
     );
     if (incomingCycle) target.worldQuestCycle = incomingCycle;

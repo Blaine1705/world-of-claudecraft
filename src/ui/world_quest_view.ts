@@ -1,7 +1,7 @@
 import { ITEMS, WORLD_QUESTS_BY_ID } from '../sim/data';
 import type { WorldQuestDef } from '../sim/types';
 import { worldQuestRewardAmount } from '../sim/world_quests';
-import { mobDisplayName } from './entity_display_labels';
+import { mobDisplayName, vehicleStationDisplayName } from './entity_display_labels';
 import { itemDisplayName, zoneDisplayName } from './entity_i18n';
 import { formatList, formatMoney, formatNumber, t } from './i18n';
 import { ownEntry } from './known_item';
@@ -13,7 +13,11 @@ export function worldQuestDef(questId: string): WorldQuestDef | null {
 export function worldQuestDisplayName(questId: string): string {
   const quest = worldQuestDef(questId);
   if (!quest) return t('questUi.worldQuest.unknown', { id: questId });
-  if (quest.objective.type === 'vehicle') return t('hudChrome.vehicle.title');
+  if (quest.objective.type === 'vehicle')
+    return vehicleStationDisplayName(quest.objective.stationId);
+  if (quest.objective.type === 'forging') return t('questUi.worldQuest.forge.title');
+  if (quest.objective.type === 'horde') return t('questUi.worldQuest.horde.title');
+  if (quest.objective.type === 'investigation') return t('questUi.worldQuest.investigation.title');
   if (quest.objective.type === 'tracing') return t('questUi.worldQuest.calligraphyTitle');
   return t('questUi.worldQuest.title', {
     zone: zoneDisplayName(quest.zoneId),
@@ -25,7 +29,17 @@ export function worldQuestObjectiveLabel(questId: string): string {
   const quest = worldQuestDef(questId);
   if (!quest) return t('questUi.worldQuest.unknown', { id: questId });
   if (quest.objective.type === 'kill') return mobDisplayName(quest.objective.targetMobId);
-  if (quest.objective.type === 'vehicle') return t('hudChrome.vehicle.objective');
+  if (quest.objective.type === 'vehicle') {
+    return t(
+      quest.objective.stationId === 'last_keep_cannon'
+        ? 'hudChrome.vehicle.lastKeepObjective'
+        : 'hudChrome.vehicle.objective',
+    );
+  }
+  if (quest.objective.type === 'forging') return t('questUi.worldQuest.forge.objective');
+  if (quest.objective.type === 'horde') return t('questUi.worldQuest.horde.objective');
+  if (quest.objective.type === 'investigation')
+    return t('questUi.worldQuest.investigation.objective');
   if (quest.objective.type === 'tracing') return t('questUi.worldQuest.traceOutline');
   if (quest.objective.type === 'escort') {
     return t('questUi.worldQuest.escortCaravan', { zone: zoneDisplayName(quest.zoneId) });

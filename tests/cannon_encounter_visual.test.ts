@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import { CannonEncounterVisual } from '../src/render/cannon_encounter_visual';
+import { LAST_KEEP_CANNON, NORTH_WATCH_CANNON } from '../src/sim/content/vehicle_stations';
 import { createCannonEncounter } from '../src/sim/minigames/cannon_encounter';
 import type { VehicleSession } from '../src/sim/types';
 
@@ -20,6 +21,45 @@ vi.mock('../src/render/characters', () => ({
 }));
 
 describe('private cannon scene', () => {
+  it('moves the existing marker pool and shot origin to the active station', async () => {
+    const visual = new CannonEncounterVisual(new THREE.Scene(), (x, z) => x + z);
+    await visual.readyForEntry;
+    const content = visual.group.children[0];
+    const meshCount = content.children.length;
+    for (const station of [NORTH_WATCH_CANNON, LAST_KEEP_CANNON, NORTH_WATCH_CANNON]) {
+      const session: VehicleSession = {
+        kind: 'cannon',
+        stationId: station.id,
+        cycle: 'wq3_8',
+        origin: { x: station.x, y: 0, z: station.z },
+        encounter: createCannonEncounter(),
+      };
+      session.encounter.tick = 2;
+      session.encounter.shots = [
+        {
+          id: 1,
+          action: 'cannonball',
+          x: station.field.minX,
+          z: station.field.minZ,
+          firedTick: 0,
+          impactTick: 4,
+        },
+      ];
+      visual.update(session);
+      const x = (station.x + station.field.minX) / 2;
+      const z = (station.z + station.field.minZ) / 2;
+      expect(content.children[0].position.toArray()).toEqual([x, x + z + 8, z]);
+      const marker = content.children[6];
+      const laneX = station.field.minX + 0.2 * (station.field.maxX - station.field.minX);
+      expect(marker.position.toArray()).toEqual([
+        laneX,
+        laneX + station.field.minZ + 0.12,
+        station.field.minZ,
+      ]);
+      expect(content.children).toHaveLength(meshCount);
+    }
+    visual.dispose();
+  });
   it('does not reattach or revive actors when disposed during the entry gate', async () => {
     let release = () => {};
     const pending = new Promise<void>((resolve) => {

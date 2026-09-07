@@ -3,6 +3,7 @@
 import type * as THREE from 'three';
 import type { IWorld } from '../world_api';
 import { CannonEncounterVisual } from './cannon_encounter_visual';
+import { HordeBarricadeVisual } from './horde_barricade_visual';
 import { IslandGuidance } from './island_guidance';
 import { MountBeacon } from './mount_beacon';
 import { RaceLine } from './race_line';
@@ -15,6 +16,7 @@ export class WorldGuidance {
   private readonly island: IslandGuidance;
   private readonly trace: WorldQuestTraceVisual;
   private readonly cannon: CannonEncounterVisual;
+  private readonly horde: HordeBarricadeVisual;
 
   constructor(
     scene: THREE.Object3D,
@@ -37,9 +39,16 @@ export class WorldGuidance {
       groundAt,
       compileGate && ((root) => compileGate(root, true)),
     );
-    this.readyForEntry = Promise.all([this.trace.readyForEntry, this.cannon.readyForEntry]).then(
-      () => {},
+    this.horde = new HordeBarricadeVisual(
+      scene,
+      groundAt,
+      compileGate && ((root) => compileGate(root, true)),
     );
+    this.readyForEntry = Promise.all([
+      this.trace.readyForEntry,
+      this.cannon.readyForEntry,
+      this.horde.readyForEntry,
+    ]).then(() => {});
   }
 
   npcFizz(...args: Parameters<IslandGuidance['npcFizz']>): void {
@@ -55,10 +64,12 @@ export class WorldGuidance {
     );
     this.trace.update(world);
     this.cannon.update(world.vehicleSession, dt, reducedMotion);
+    this.horde.update(world, reducedMotion);
   }
 
   dispose(): void {
     this.trace.dispose();
     this.cannon.dispose();
+    this.horde.dispose();
   }
 }

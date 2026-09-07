@@ -2,6 +2,9 @@
 // sanitizer instead: sim-clock deadlines and partial paths never survive a load.
 import { WORLD_QUESTS_BY_ID } from './content/world_quests';
 import type { WorldQuestProgress, WorldQuestTraceState } from './types';
+import { decodeForgeState } from './world_quest_forge_wire';
+import { decodeHordeState } from './world_quest_horde_wire';
+import { decodeInvestigationState } from './world_quest_investigation_wire';
 import { worldQuestTraceShape } from './world_quest_trace_variants';
 
 export const WORLD_QUEST_TRACE_WIRE_POINT_LIMIT = 256;
@@ -98,10 +101,24 @@ export function decodeWorldQuestProgressTrace(
 
 /** The owner-only wire projection retains normal progress and bounds the trace. */
 export function worldQuestProgressForWire(progress: WorldQuestProgress): WorldQuestProgress {
-  const { tracing: rawTrace, ...base } = progress;
+  const {
+    tracing: rawTrace,
+    forging: rawForge,
+    horde: rawHorde,
+    investigation: rawInvestigation,
+    ...base
+  } = progress;
+  const investigation = decodeInvestigationState(rawInvestigation, progress.questId);
+  const horde = decodeHordeState(rawHorde, progress.questId);
+  const forging = decodeForgeState(rawForge, progress.questId);
   const tracing = decodeWorldQuestProgressTrace(rawTrace, progress);
   return {
     ...base,
+    ...(investigation === undefined ? {} : { investigation }),
+    ...(horde === undefined ? {} : { horde }),
+    ...(base.hordeResult === undefined ? {} : { hordeResult: { ...base.hordeResult } }),
+    ...(forging === undefined ? {} : { forging }),
+    ...(base.forgeResult === undefined ? {} : { forgeResult: { ...base.forgeResult } }),
     ...(base.creditedObjects === undefined ? {} : { creditedObjects: [...base.creditedObjects] }),
     ...(base.puzzleRotations === undefined ? {} : { puzzleRotations: [...base.puzzleRotations] }),
     ...(base.match3Board === undefined ? {} : { match3Board: [...base.match3Board] }),

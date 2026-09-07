@@ -29,6 +29,7 @@
 import { MOUNT_KEYS, type MountKey, mountDef, TRAINING_MOUNT_KEY } from './content/mounts';
 import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
+import { hordeActionsLocked } from './horde_action_lock';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { bgInMatch } from './social/battleground';
@@ -215,6 +216,7 @@ export function summonMountItem(ctx: SimContext, pid: number, key: string): bool
   const meta = ctx.players.get(pid);
   const e = ctx.entities.get(pid);
   if (!meta || !e) return false;
+  if (hordeActionsLocked(meta.worldQuestLog)) return false;
   const def = mountDef(key);
   if (!def) return false;
   // Clicking the reins you are currently riding puts the mount away.
@@ -279,6 +281,7 @@ export function toggleMount(ctx: SimContext, pid: number): boolean {
   const meta = ctx.players.get(pid);
   const e = ctx.entities.get(pid);
   if (!meta || !e) return false;
+  if (hordeActionsLocked(meta.worldQuestLog)) return false;
   // A toggle while a summon/dismount is already channeling is ignored.
   if ((e.mountCastRemaining ?? 0) > 0) return false;
   if (e.mountKey) {

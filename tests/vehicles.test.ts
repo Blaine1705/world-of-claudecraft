@@ -1,22 +1,26 @@
 import { describe, expect, it } from 'vitest';
 import { decodeVehicleSession } from '../src/net/vehicle_session_wire';
-import { NORTH_WATCH_CANNON } from '../src/sim/content/vehicle_stations';
+import {
+  LAST_KEEP_CANNON,
+  NORTH_WATCH_CANNON,
+  VEHICLE_STATIONS,
+} from '../src/sim/content/vehicle_stations';
 import { Sim } from '../src/sim/sim';
 import { TICK_RATE } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 import { worldQuestCycleOfferingQuest } from '../src/sim/world_quest_rotation';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
-function rig() {
+function rig(station = NORTH_WATCH_CANNON) {
   const sim = new Sim({ seed: WORLD_SEED, playerClass: 'mage' });
   const player = sim.player;
   const meta = sim.meta(player.id)!;
   sim.setPlayerLevel(10);
-  meta.devWorldQuestCycle = worldQuestCycleOfferingQuest('wq3_0', NORTH_WATCH_CANNON.questId);
+  meta.devWorldQuestCycle = worldQuestCycleOfferingQuest('wq3_0', station.questId);
   player.pos = {
-    x: NORTH_WATCH_CANNON.x,
-    z: NORTH_WATCH_CANNON.z + 2,
-    y: terrainHeight(NORTH_WATCH_CANNON.x, NORTH_WATCH_CANNON.z + 2, WORLD_SEED),
+    x: station.x,
+    z: station.z + 2,
+    y: terrainHeight(station.x, station.z + 2, WORLD_SEED),
   };
   player.prevPos = { ...player.pos };
   sim.tick();
@@ -119,49 +123,78 @@ describe('authoritative personal vehicles', () => {
     expect(sim.enterVehicle(NORTH_WATCH_CANNON.id)).toBe(false);
   });
 
-  it('wins all three waves through authoritative actions and awards the quest only once', () => {
-    const { sim, player, meta } = rig();
-    expect(sim.enterVehicle(NORTH_WATCH_CANNON.id)).toBe(true);
-    const health = player.hp;
-    const copper = sim.copper;
-    const encounter = meta.vehicle!.encounter;
-    const resultEvents: ReturnType<Sim['tick']> = [];
-    for (let tick = 0; tick < 240 * TICK_RATE && meta.vehicle; tick++) {
-      const enemy = [...encounter.enemies].sort((a, b) => b.z - a.z)[0];
-      if (enemy) {
-        const point = { x: enemy.x, z: Math.min(NORTH_WATCH_CANNON.field.maxZ, enemy.z + 1) };
-        for (const action of ['cannonball', 'incendiary', 'grapeshot'] as const) {
-          if (sim.useVehicleAction(action, point)) break;
+  it.each(VEHICLE_STATIONS)(
+    'wins all three waves at $id and awards only its own quest once',
+    (station) => {
+      const { sim, player, meta } = rig(station);
+      expect(sim.enterVehicle(station.id)).toBe(true);
+      const health = player.hp;
+      const copper = sim.copper;
+      const encounter = meta.vehicle!.encounter;
+      const resultEvents: ReturnType<Sim['tick']> = [];
+      for (let tick = 0; tick < 240 * TICK_RATE && meta.vehicle; tick++) {
+        const enemy = [...encounter.enemies].sort((a, b) => b.z - a.z)[0];
+        if (enemy) {
+          const point = { x: enemy.x, z: Math.min(station.field.maxZ, enemy.z + 1) };
+          for (const action of ['cannonball', 'incendiary', 'grapeshot'] as const) {
+            if (sim.useVehicleAction(action, point)) break;
+          }
         }
+        resultEvents.push(...sim.tick().filter((e) => e.type === 'cannonResult'));
       }
-      resultEvents.push(...sim.tick().filter((e) => e.type === 'cannonResult'));
-    }
-    expect(encounter.phase).toBe('won');
-    expect(encounter.wave).toBe(2);
-    expect(encounter.commanderKilled).toBe(true);
-    expect(encounter.integrity).toBeGreaterThan(0);
-    expect(encounter.tick / TICK_RATE).toBeGreaterThan(120);
-    expect(encounter.tick / TICK_RATE).toBeLessThan(240);
-    expect(player.hp).toBe(health);
-    expect(meta.worldQuestLog.get(NORTH_WATCH_CANNON.questId)?.state).toBe('completed');
-    expect(sim.copper).toBe(copper + 2_500 + 175 * player.level);
-    expect(sim.vehicleSession).toBeNull();
-    const awarded = sim.copper;
-    expect(resultEvents).toHaveLength(1);
-    expect(resultEvents[0]).toMatchObject({
-      pid: player.id,
-      integrity: encounter.integrity,
-      shotsFired: encounter.shotsFired,
-      shotsHit: encounter.shotsHit,
-    });
-    expect(sim.enterVehicle(NORTH_WATCH_CANNON.id)).toBe(true);
-    meta.vehicle!.encounter.phase = 'won';
-    meta.vehicle!.encounter.commanderKilled = true;
-    const repeated = sim.tick();
-    expect(sim.copper).toBe(awarded);
-    expect(repeated.filter((e) => e.type === 'cannonResult')).toHaveLength(1);
-    expect(sim.tick().filter((e) => e.type === 'cannonResult')).toHaveLength(0);
-  }, 60_000); // Full-world integration advances over two minutes of canonical Sim ticks.
+      expect(encounter.phase).toBe('won');
+      expect(encounter.wave).toBe(2);
+      expect(encounter.commanderKilled).toBe(true);
+      expect(encounter.integrity).toBeGreaterThan(0);
+      expect(encounter.tick / TICK_RATE).toBeGreaterThan(120);
+      expect(encounter.tick / TICK_RATE).toBeLessThan(240);
+      expect(player.hp).toBe(health);
+      expect(meta.worldQuestLog.get(station.questId)?.state).toBe('completed');
+      for (const other of VEHICLE_STATIONS.filter((candidate) => candidate.id !== station.id))
+        expect(meta.worldQuestLog.get(other.questId)?.state).not.toBe('completed');
+      expect(sim.copper).toBe(copper + 2_500 + 175 * player.level);
+      expect(sim.vehicleSession).toBeNull();
+      const awarded = sim.copper;
+      expect(resultEvents).toHaveLength(1);
+      expect(resultEvents[0]).toMatchObject({
+        pid: player.id,
+        integrity: encounter.integrity,
+        shotsFired: encounter.shotsFired,
+        shotsHit: encounter.shotsHit,
+      });
+      expect(sim.enterVehicle(station.id)).toBe(true);
+      meta.vehicle!.encounter.phase = 'won';
+      meta.vehicle!.encounter.commanderKilled = true;
+      const repeated = sim.tick();
+      expect(sim.copper).toBe(awarded);
+      expect(repeated.filter((e) => e.type === 'cannonResult')).toHaveLength(1);
+      expect(sim.tick().filter((e) => e.type === 'cannonResult')).toHaveLength(0);
+    },
+    60_000,
+  ); // Full-world integration advances over two minutes of canonical Sim ticks.
+
+  it('keeps both stations present and rejects remote entry and shots into the other field', () => {
+    const { sim, meta } = rig(LAST_KEEP_CANNON);
+    for (const station of VEHICLE_STATIONS)
+      expect(sim.entities.get(station.entityId)?.templateId).toBe(station.id);
+    expect(sim.enterVehicle(NORTH_WATCH_CANNON.id)).toBe(false);
+    expect(sim.pickUpObject(LAST_KEEP_CANNON.entityId)).toBe(true);
+    for (let tick = 0; tick < 3 * TICK_RATE; tick++) sim.tick();
+    expect(
+      sim.useVehicleAction('cannonball', {
+        x: NORTH_WATCH_CANNON.x,
+        z: NORTH_WATCH_CANNON.field.minZ + 10,
+      }),
+    ).toBe(false);
+    expect(
+      sim.useVehicleAction('cannonball', {
+        x: LAST_KEEP_CANNON.x,
+        z: LAST_KEEP_CANNON.field.minZ + 10,
+      }),
+    ).toBe(true);
+    expect(decodeVehicleSession(sim.vehicleSession)).toEqual(sim.vehicleSession);
+    expect(meta.worldQuestLog.get(LAST_KEEP_CANNON.questId)?.count).toBe(0);
+  });
 
   it('mirrors bounded owner state by value and never persists the active encounter', () => {
     const { sim, meta } = rig();

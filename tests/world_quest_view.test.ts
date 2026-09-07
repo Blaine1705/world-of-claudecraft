@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { WORLD_QUESTS_BY_ID } from '../src/sim/data';
+import { createGroundObject } from '../src/sim/entity';
+import { entityDisplayName } from '../src/ui/entity_display_labels';
 import {
   worldQuestDisplayName,
   worldQuestObjectiveLabel,
@@ -10,6 +12,21 @@ import {
 } from '../src/ui/world_quest_view';
 
 describe('world quest view', () => {
+  it('distinguishes the Last Keep defense from the existing cannon quest', () => {
+    expect(worldQuestDisplayName('wq_last_keep_cannon')).toBe('The Last Keep Cannon');
+    expect(worldQuestObjectiveLabel('wq_last_keep_cannon')).toBe(
+      'Defend the approach to The Last Keep',
+    );
+    expect(worldQuestDisplayName('wq_evergarden_cannon')).toBe('North Watch Cannon');
+    expect(worldQuestObjectiveLabel('wq_evergarden_cannon')).toBe('Defend the north watch');
+    const cannon = createGroundObject(1, 'last_keep_cannon', 'raw station name', {
+      x: 0,
+      y: 0,
+      z: 0,
+    });
+    cannon.templateId = 'last_keep_cannon';
+    expect(entityDisplayName(cannon)).toBe('The Last Keep Cannon');
+  });
   it('renders complete localized templates for names, states, and every reward kind', () => {
     expect(worldQuestDisplayName('wq_eastbrook_bandits')).toContain(':');
     expect(worldQuestStatusText('available')).toBe('Available world quest');

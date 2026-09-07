@@ -1,8 +1,11 @@
-import { NORTH_WATCH_CANNON } from './content/vehicle_stations';
 import { WORLD_QUEST_CALLIGRAPHY_ID } from './content/world_quest_calligraphy';
+import { FORGE_QUEST_ID } from './content/world_quest_forging';
+import { HORDE_QUEST_ID } from './content/world_quest_horde';
+import { INVESTIGATION_QUEST_ID } from './content/world_quest_investigation';
 import { WORLD_QUEST_MIN_LEVEL, WORLD_QUESTS, WORLD_QUESTS_BY_ID } from './content/world_quests';
 import { grantDeed } from './deeds';
 import { formatMoney } from './format_money';
+import { sanitizeForgeResult } from './minigames/forge_workshop';
 import {
   hasInteractObjectCredit,
   interactObjectCreditKey,
@@ -19,11 +22,36 @@ import type {
   WorldQuestReward,
 } from './types';
 import { xpForLevel } from './types';
+import { vehicleStationById } from './vehicle_stations';
 import {
   dropWorldQuestDeliveryCargo,
   hasWorldQuestDeliveryCargo,
   takeWorldQuestDeliveryCargo,
 } from './world_quest_delivery';
+import {
+  clearForgeWorkshop,
+  ensureForgeWorkshop,
+  forgeStationForEntity,
+  respondForgeWorkshop,
+  startForgeWorkshop,
+  updateForgeWorkshop,
+} from './world_quest_forging';
+import {
+  clearHordeEncounter,
+  ensureHordeInstructor,
+  startHordeEncounter,
+  updateHordeEncounter,
+} from './world_quest_horde';
+import { sanitizeHordeResult } from './world_quest_horde_wire';
+import {
+  accuseInvestigationSuspect,
+  clearInvestigationEncounter,
+  ensureInvestigationPost,
+  investigationKillCounts,
+  readInvestigationClue,
+  talkToInvestigation,
+  updateInvestigationEncounter,
+} from './world_quest_investigation';
 import {
   applyWorldQuestMatch3Move,
   sanitizeWorldQuestMatch3Board,
@@ -175,6 +203,7 @@ function resetCycleIfNeeded(ctx: SimContext, meta: PlayerMeta, resolvedCycle?: s
       pid: meta.entityId,
     });
   }
+  clearInvestigationEncounter(ctx, meta);
   meta.worldQuestCycle = cycle;
   meta.worldQuestLog.clear();
   meta.worldQuestAreas.clear();
@@ -200,6 +229,9 @@ export function hasActiveWorldQuest(meta: PlayerMeta, questId: string): boolean 
 /** Starts every eligible objective whose area the living player enters. */
 export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Entity): void {
   if (player.level < WORLD_QUEST_MIN_LEVEL) {
+    clearInvestigationEncounter(ctx, meta);
+    for (const progress of meta.worldQuestLog.values()) clearForgeWorkshop(meta, progress);
+    for (const progress of meta.worldQuestLog.values()) clearHordeEncounter(meta, progress);
     for (const progress of meta.worldQuestLog.values()) clearWorldQuestTracing(meta, progress);
     return;
   }
@@ -207,7 +239,10 @@ export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Ent
   const devCycle = meta.devWorldQuestCycle ?? null;
   const cycle = devCycle ?? rotation.cycle;
   resetCycleIfNeeded(ctx, meta, cycle);
+  updateInvestigationEncounter(ctx, meta, player);
   if (player.dead) {
+    for (const progress of meta.worldQuestLog.values()) clearForgeWorkshop(meta, progress);
+    for (const progress of meta.worldQuestLog.values()) clearHordeEncounter(meta, progress);
     for (const progress of meta.worldQuestLog.values()) clearWorldQuestTracing(meta, progress);
     dropWorldQuestDeliveryCargo(ctx, player);
     if (meta.openWorldQuestPuzzleId) {
@@ -228,6 +263,8 @@ export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Ent
     const wasInside = meta.worldQuestAreas.has(quest.id);
     if (!inside) {
       const progress = meta.worldQuestLog.get(quest.id);
+      if (progress) clearForgeWorkshop(meta, progress);
+      if (progress) clearHordeEncounter(meta, progress);
       if (progress) clearWorldQuestTracing(meta, progress);
       if (wasInside && quest.objective.type === 'delivery')
         dropWorldQuestDeliveryCargo(ctx, player);
@@ -243,6 +280,16 @@ export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Ent
       continue;
     }
     const existing = meta.worldQuestLog.get(quest.id);
+    if (quest.objective.type === 'investigation') ensureInvestigationPost(ctx);
+    if (quest.objective.type === 'horde') {
+      ensureHordeInstructor(ctx);
+      if (existing && updateHordeEncounter(meta, player, existing) && existing.state === 'active')
+        creditWorldQuest(ctx, meta, quest, existing);
+    }
+    if (quest.objective.type === 'forging') {
+      ensureForgeWorkshop(ctx);
+      if (existing) updateForgeWorkshop(ctx, meta, player, existing);
+    }
     if (quest.objective.type === 'tracing') {
       ensureWorldQuestTraceInstructors(ctx);
       if (
@@ -310,14 +357,34 @@ export function talkToWorldQuestInstructor(
   meta: PlayerMeta,
   player: Entity,
 ): boolean {
+  resetCycleIfNeeded(ctx, meta);
+  if (talkToInvestigation(ctx, npc, meta, player)) return true;
   const quest = WORLD_QUESTS.find(
     (candidate) =>
-      candidate.objective.type === 'tracing' &&
+      (candidate.objective.type === 'tracing' ||
+        candidate.objective.type === 'forging' ||
+        candidate.objective.type === 'horde') &&
       candidate.objective.instructorNpcId === npc.templateId,
   );
   if (!quest) return false;
   resetCycleIfNeeded(ctx, meta);
   const progress = meta.worldQuestLog.get(quest.id);
+  if (quest.objective.type === 'forging' || quest.objective.type === 'horde') {
+    if (
+      player.level >= quest.minLevel &&
+      progress &&
+      inWorldQuestArea(player, quest) &&
+      activeWorldQuestsForCycle(meta.worldQuestCycle).some((active) => active.id === quest.id)
+    )
+      (quest.objective.type === 'horde' ? startHordeEncounter : startForgeWorkshop)(
+        ctx,
+        meta,
+        player,
+        npc,
+        progress,
+      );
+    return true;
+  }
   if (
     player.level >= quest.minLevel &&
     hasActiveWorldQuest(meta, quest.id) &&
@@ -379,6 +446,9 @@ function creditWorldQuest(
   meta.counters.questsCompleted++;
   meta.unlockedMilestones.add(claimToken(meta.worldQuestCycle, quest.id));
   awardWorldQuest(ctx, meta, quest);
+  if (quest.id === INVESTIGATION_QUEST_ID) grantDeed(ctx, meta, 'exp_borrowed_face');
+  if (quest.id === HORDE_QUEST_ID) grantDeed(ctx, meta, 'exp_last_barricade');
+  if (quest.id === FORGE_QUEST_ID) grantDeed(ctx, meta, 'exp_forge_helper');
   if (quest.id === WORLD_QUEST_CALLIGRAPHY_ID) {
     grantDeed(ctx, meta, 'exp_arcane_calligraphy');
     if (progress.traceResult?.rating === 'gold')
@@ -431,8 +501,10 @@ export function completeWorldQuestVehicle(
 ): void {
   resetCycleIfNeeded(ctx, meta);
   const session = meta.vehicle;
-  const quest = worldQuestById(NORTH_WATCH_CANNON.questId);
-  const progress = meta.worldQuestLog.get(NORTH_WATCH_CANNON.questId);
+  const station = vehicleStationById(stationId);
+  if (!station) return;
+  const quest = worldQuestById(station.questId);
+  const progress = meta.worldQuestLog.get(station.questId);
   const player = ctx.entities.get(meta.entityId);
   if (
     !session ||
@@ -464,7 +536,8 @@ export function onMobKilledForWorldQuests(ctx: SimContext, mob: Entity, meta: Pl
     const quest = activeQuests.find((candidate) => candidate.id === progress.questId);
     if (
       !quest ||
-      quest.objective.type !== 'kill' ||
+      (quest.objective.type !== 'kill' && quest.objective.type !== 'investigation') ||
+      (quest.objective.type === 'investigation' && !investigationKillCounts(meta, mob)) ||
       mob.templateId !== quest.objective.targetMobId ||
       !inWorldQuestArea(player, quest) ||
       !inWorldQuestArea(mob, quest)
@@ -507,6 +580,23 @@ export function onObjectInteractedForWorldQuests(
   resetCycleIfNeeded(ctx, meta);
   const player = ctx.entities.get(meta.entityId);
   if (!player || player.dead || !obj.objectItemId) return false;
+  if (readInvestigationClue(ctx, obj, meta, player)) return true;
+  if (forgeStationForEntity(obj)) {
+    const quest = worldQuestById(FORGE_QUEST_ID);
+    const progress = meta.worldQuestLog.get(FORGE_QUEST_ID);
+    if (
+      quest &&
+      progress &&
+      player.level >= quest.minLevel &&
+      inWorldQuestArea(player, quest) &&
+      activeWorldQuestsForCycle(meta.worldQuestCycle).some((active) => active.id === quest.id)
+    ) {
+      const completed = respondForgeWorkshop(ctx, meta, player, obj, progress);
+      if (completed && progress.state === 'active')
+        creditWorldQuest(ctx, meta, quest, progress, quest.count);
+    }
+    return true;
+  }
   let handled = false;
   // Salvage props deliberately reuse an existing non-inventory flotsam token.
   // Claim them here even when their world quest is unavailable, so a forced
@@ -720,6 +810,14 @@ export function sanitizeWorldQuestProgress(value: unknown, cycle?: unknown): Wor
       count,
       state: raw.state,
     };
+    if (quest.objective.type === 'horde' && raw.state === 'completed') {
+      const result = sanitizeHordeResult(raw.hordeResult);
+      if (result) normalized.hordeResult = result;
+    }
+    if (quest.objective.type === 'forging' && raw.state === 'completed') {
+      const result = sanitizeForgeResult(raw.forgeResult);
+      if (result) normalized.forgeResult = result;
+    }
     if (quest.objective.type === 'tracing') {
       normalized.traceVariant =
         raw.traceVariant === undefined
@@ -778,4 +876,11 @@ export function sanitizeWorldQuestProgress(value: unknown, cycle?: unknown): Wor
     if (output.length >= WORLD_QUESTS.length) break;
   }
   return output;
+}
+
+export function accuseWorldQuestSuspect(ctx: SimContext, npcId: number, pid?: number): void {
+  const resolved = ctx.resolve(pid);
+  if (!resolved) return;
+  updateWorldQuests(ctx, resolved.meta, resolved.e);
+  accuseInvestigationSuspect(ctx, npcId, resolved.meta, resolved.e);
 }

@@ -19,6 +19,77 @@
      @layer components would let the unlayered base win and invert the cascade, so they
      stay inline beside their bases and relocate later. */
 @layer components {
+  /* Horde mode keeps movement, health and an explicit exit, with no combat buttons. */
+  body.playing-horde
+  :is(
+    #actionbar,
+    #actionbar2,
+    #actionbar3,
+    #cross-hotbar,
+    #stancebar,
+    #petbar,
+    #mobile-action-ring,
+    #mobile-action-radial,
+    #mobile-consumable-strip,
+    #mobile-stance-radial,
+    #mobile-combat-controls,
+    #mobile-menu-strip
+  ) {
+    display: none !important;
+  }
+  .horde-controls {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .horde-exit {
+    position: absolute;
+    right: max(20px, env(safe-area-inset-right));
+    bottom: max(28px, env(safe-area-inset-bottom));
+    min-width: 110px;
+    min-height: 44px;
+    padding: 8px 14px;
+    border: 2px ridge var(--border);
+    border-radius: 6px;
+    background: var(--panel-bg);
+    color: var(--gold);
+    font: inherit;
+    pointer-events: auto;
+  }
+  .horde-exit:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 3px;
+  }
+  .horde-crate-label,
+  .horde-upgrade-feedback {
+    position: absolute;
+    top: 0;
+    left: 0;
+    white-space: nowrap;
+    font-weight: bold;
+    color: var(--gold);
+    text-shadow: 0 2px 2px #000;
+    pointer-events: none;
+  }
+  .horde-crate-label {
+    padding: 4px 7px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--panel-bg);
+    font-size: 15px;
+  }
+  .horde-upgrade-feedback {
+    font-size: 20px;
+  }
+  .horde-kill-feedback {
+    color: var(--gold);
+    font-size: 18px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-weight: bold;
+    text-shadow: 0 2px 2px #000;
+  }
   /* ---------- vehicle action bar ---------- */
   body.operating-vehicle
   :is(

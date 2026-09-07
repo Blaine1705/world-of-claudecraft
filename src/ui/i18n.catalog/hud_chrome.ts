@@ -13,6 +13,8 @@ export const hudChromeStrings = {
   vehicle: {
     title: 'North Watch Cannon',
     objective: 'Defend the north watch',
+    lastKeepTitle: 'The Last Keep Cannon',
+    lastKeepObjective: 'Defend the approach to The Last Keep',
     cannonball: 'Cannonball',
     grapeshot: 'Grapeshot',
     incendiary: 'Incendiary Shot',

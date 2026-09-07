@@ -29,6 +29,7 @@
 
 import { WARSPIRIT_EMBERSCALE_2PC_CADENCE_STEPS } from '../content/ignivar_set_bonuses';
 import { isArenaPos, MOBS } from '../data';
+import { hordeActionsLocked } from '../horde_action_lock';
 import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
 import { forceDismount } from '../mounts';
 import { grantDevotionFromBlock } from '../paladin_devotion';
@@ -125,7 +126,7 @@ function autoAttackWeaponDamageMult(hand: AutoAttackHand): number {
 export function startAutoAttack(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
-  if (r.meta.vehicle) return;
+  if (r.meta.vehicle || hordeActionsLocked(r.meta.worldQuestLog)) return;
   const p = r.e;
   if (p.dead) return;
   if (isInStasis(p)) return;

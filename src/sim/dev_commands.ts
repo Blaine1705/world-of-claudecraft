@@ -7,6 +7,9 @@ import { equipBestInSlotForDev } from './dev/bis_gear';
 import { applyDevKit } from './dev_kit';
 import { armWorldQuestCannonForDev } from './dev_world_quest_cannon';
 import { armWorldQuestCaravanForDev } from './dev_world_quest_caravan';
+import { armWorldQuestForgingForDev } from './dev_world_quest_forging';
+import { armWorldQuestHordeForDev } from './dev_world_quest_horde';
+import { armWorldQuestInvestigationForDev } from './dev_world_quest_investigation';
 import { armWorldQuestTracingForDev } from './dev_world_quest_tracing';
 import { createGroundObject, createMob } from './entity';
 import {
@@ -207,8 +210,21 @@ export function handleDevChat(
   }
 
   const caravanMatch = /^\/(?:dev\s+caravan|devcaravan)(?:\s+(\S+))?\s*$/i.exec(raw);
-  if (/^\/dev\s+cannon\s*$/i.test(raw)) {
-    armWorldQuestCannonForDev(ctx, pid);
+  const cannonMatch = /^\/dev\s+cannon(?:\s+(wyrmwatch|last_keep))?\s*$/i.exec(raw);
+  if (/^\/dev\s+(?:infiltrator|investigation|amongus)\s*$/i.test(raw)) {
+    armWorldQuestInvestigationForDev(ctx, pid);
+    return null;
+  }
+  if (/^\/dev\s+(?:horde|barricade)\s*$/i.test(raw)) {
+    armWorldQuestHordeForDev(ctx, pid);
+    return null;
+  }
+  if (/^\/dev\s+forge\s*$/i.test(raw)) {
+    armWorldQuestForgingForDev(ctx, pid);
+    return null;
+  }
+  if (cannonMatch) {
+    armWorldQuestCannonForDev(ctx, pid, cannonMatch[1]?.toLowerCase());
     return null;
   }
   if (/^\/dev\s+calligraphy\s*$/i.test(raw)) {
