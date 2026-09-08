@@ -6,8 +6,10 @@ import { formatNumber, t } from '../../i18n';
 import { ownEntry } from '../../known_item';
 import type { PainterHostWriters } from '../../painter_host';
 import { forgeInstructionLines } from '../../world_quest_forge_view';
+import { gliderInstructionLines } from '../../world_quest_glider_view';
 import { hordeInstructionLines } from '../../world_quest_horde_view';
 import { investigationInstructionLines } from '../../world_quest_investigation_view';
+import { shadowInstructionLines } from '../../world_quest_shadow_view';
 import { worldQuestTraceProgressInstruction } from '../../world_quest_trace_view';
 import { worldQuestDisplayName, worldQuestObjectiveLabel } from '../../world_quest_view';
 import { buildQuestStrip, type QuestStripController } from './quest_strip_controller';
@@ -136,7 +138,8 @@ export class QuestTrackerController {
         progress.state !== 'active' &&
         !(progress.traceResult && progress.tracing?.phase === 'success') &&
         !progress.forging &&
-        !progress.horde
+        !progress.horde &&
+        !progress.glider
       )
         continue;
       const quest = ownEntry(WORLD_QUESTS_BY_ID, progress.questId);
@@ -146,23 +149,34 @@ export class QuestTrackerController {
         progress.forging?.phase === 'countdown' ||
         progress.forging?.phase === 'working' ||
         progress.horde?.phase === 'countdown' ||
-        progress.horde?.phase === 'active'
+        progress.horde?.phase === 'active' ||
+        progress.glider?.phase === 'countdown' ||
+        progress.glider?.phase === 'flying'
       )
         traceQuestId = progress.questId;
       quests.push({
         id: progress.questId,
         number: quests.length + 1,
         title: worldQuestDisplayName(progress.questId),
-        complete: progress.state === 'completed',
+        complete:
+          progress.state === 'completed' &&
+          progress.glider?.phase !== 'countdown' &&
+          progress.glider?.phase !== 'flying',
         objectives:
           quest.objective.type === 'forging' ||
           quest.objective.type === 'horde' ||
+          quest.objective.type === 'glider' ||
+          quest.objective.type === 'shadow' ||
           quest.objective.type === 'investigation'
             ? (quest.objective.type === 'forging'
                 ? forgeInstructionLines(progress)
                 : quest.objective.type === 'horde'
                   ? hordeInstructionLines(progress)
-                  : investigationInstructionLines(progress)
+                  : quest.objective.type === 'glider'
+                    ? gliderInstructionLines(progress)
+                    : quest.objective.type === 'shadow'
+                      ? shadowInstructionLines(progress)
+                      : investigationInstructionLines(progress)
               ).map((label) => ({
                 label,
                 current: 0,

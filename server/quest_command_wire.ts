@@ -45,6 +45,17 @@ export function accuseWorldQuestSuspectWire(sim: Sim, msg: QuestWireMessage, pid
     sim.accuseWorldQuestSuspect(msg.npcId, pid);
 }
 
+export function shadowWorldQuestWire(sim: Sim, msg: QuestWireMessage, pid: number): void {
+  if (msg.action !== 'pickpocket' && msg.action !== 'leave') return;
+  if (
+    msg.targetId !== undefined &&
+    (typeof msg.targetId !== 'number' || !Number.isSafeInteger(msg.targetId) || msg.targetId <= 0)
+  )
+    return;
+  if (msg.action === 'pickpocket' && msg.targetId === undefined) return;
+  sim.shadowWorldQuestAction(msg.action, msg.targetId as number | undefined, pid);
+}
+
 /** Route the world-quest-only command family outside the server monolith. */
 export function dispatchWorldQuestWire(sim: Sim, msg: QuestWireMessage, pid: number): void {
   switch (msg.cmd) {
@@ -56,6 +67,9 @@ export function dispatchWorldQuestWire(sim: Sim, msg: QuestWireMessage, pid: num
       break;
     case 'world_quest_match3_reset':
       resetWorldQuestMatch3Wire(sim, msg, pid);
+      break;
+    case 'world_quest_shadow':
+      shadowWorldQuestWire(sim, msg, pid);
       break;
     case 'world_quest_accuse':
       accuseWorldQuestSuspectWire(sim, msg, pid);

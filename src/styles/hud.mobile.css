@@ -50,6 +50,20 @@
     height: 48px;
     flex-basis: 48px;
   }
+  body.mobile-touch .vehicle-bar.shadow-action-bar {
+    bottom: calc(100px + env(safe-area-inset-bottom));
+    grid-template-columns: 1fr;
+    width: min(360px, calc(100% - 24px));
+    gap: 4px;
+    padding: 8px;
+  }
+  body.mobile-touch .shadow-action-bar .vehicle-integrity {
+    min-height: 20px;
+    height: 20px;
+  }
+  body.mobile-touch .shadow-action-bar .vehicle-bar-hint {
+    grid-column: 1 / -1;
+  }
   /* Endfield-inspired glass chrome tokens: dark-fantasy gold-brown palette kept,
      but permanent chrome (action row, quick-access rail, the More tray) reads as
      translucent glass over the world instead of solid opaque wood/stone panels.

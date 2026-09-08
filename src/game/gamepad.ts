@@ -78,6 +78,8 @@ export interface GamepadCallbacks {
   // focus-driven UI-navigation mode (movement/camera/abilities are suspended).
   isPointerMode(): boolean;
   isGroundAimActive?(): boolean;
+  isTemporaryBarActive?(): boolean;
+  onTemporaryBarSlot?(slot: number): void;
   isVehicleActive?(): boolean;
   onVehicleSlot?(slot: number): void;
   onVehicleExit?(): void;
@@ -574,7 +576,7 @@ export class GamepadManager {
       !groundAimActive &&
       ((cur[GP.LB] && !this.prevPressed[GP.LB] && cur[GP.Y]) ||
         (cur[GP.Y] && !this.prevPressed[GP.Y] && cur[GP.LB]));
-    if (editChord && this.crossHotbar) {
+    if (editChord && this.crossHotbar && !this.cb.isTemporaryBarActive?.()) {
       chordButton = cur[GP.Y] && !this.prevPressed[GP.Y] ? GP.Y : GP.LB;
       this.toggleCrossHotbarEdit();
     }
@@ -666,7 +668,11 @@ export class GamepadManager {
     // The cross hotbar's trigger state advances BEFORE this poll's edges are
     // dispatched, so a trigger and a face button pressed in the same poll cast
     // the cross-hotbar slot rather than the button's flat binding.
-    this.updateCrossHotbarTriggers(cur);
+    if (this.cb.isTemporaryBarActive?.()) {
+      this.releaseCrossHotbarEdit();
+      this.releaseCrossHotbar();
+      this.releaseHeldCasts();
+    } else this.updateCrossHotbarTriggers(cur);
 
     // Movement: left stick.
     const lx = pad.axes[AXIS.LEFT_X] ?? 0;
@@ -712,6 +718,13 @@ export class GamepadManager {
     for (const idx of risingEdges(this.prevPressed, cur)) {
       acted = true;
       this.cb.onInputEdge();
+      if (this.cb.isTemporaryBarActive?.()) {
+        if (idx === GP.X) this.cb.onTemporaryBarSlot?.(0);
+        else if (idx === GP.Y) this.cb.onTemporaryBarSlot?.(1);
+        else if (idx === GP.START) this.cb.onAction('escape');
+        else if (idx === GP.A) this.input.triggerGamepadJump();
+        continue;
+      }
       if (idx === chordButton) continue;
       // The d-pad steps through the HUD WHILE the world keeps running: movement,
       // camera and the cross hotbar are all still live above and below this. Only

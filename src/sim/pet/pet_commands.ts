@@ -1,3 +1,5 @@
+import { gliderActionsLocked } from '../glider_action_lock';
+import { shadowActionsLocked } from '../shadow_action_lock';
 // Pet commands & lifecycle (P1b), extracted from the Sim monolith.
 //
 // This module owns the player-driven hunter/warlock pet command surface (abandon/
@@ -94,7 +96,13 @@ function noPetError(e: Entity, fallback = 'You have no pet.'): string {
 // system lifecycle operations (summon/restore/stow) remain encounter-owned.
 function petCommandBlockedByControl(ctx: SimContext, owner: Entity): boolean {
   const meta = ctx.players.get(owner.id);
-  if (meta && hordeActionsLocked(meta.worldQuestLog)) return true;
+  if (
+    meta &&
+    (hordeActionsLocked(meta.worldQuestLog) ||
+      shadowActionsLocked(meta.worldQuestLog) ||
+      gliderActionsLocked(meta.worldQuestLog))
+  )
+    return true;
   if (ctx.players.get(owner.id)?.vehicle) return true;
   if (!hasUnbreakableMovementLock(owner)) return false;
   ctx.error(owner.id, 'You are stunned.');

@@ -9680,10 +9680,6 @@ export class Sim {
     return interactNpcForQuests(this.ctx, npc, meta);
   }
 
-  // Quests
-
-  // turnInQuest, plus the private helpers questNpcFor/finalizeQuestAccept and the pure
-  // Quest commands delegate through SimContext for every host.
   questState(questId: string, pid?: number): QuestState {
     return questCommands.questState(this.ctx, questId, pid);
   }
@@ -9698,6 +9694,10 @@ export class Sim {
 
   abandonQuest(questId: string, pid?: number): void {
     questCommands.abandonQuest(this.ctx, questId, pid);
+  }
+
+  shadowWorldQuestAction(action: 'pickpocket' | 'leave', targetId?: number, pid?: number): void {
+    worldQuestMod.shadowWorldQuestAction(this.ctx, action, targetId, pid);
   }
 
   accuseWorldQuestSuspect(npcId: number, pid?: number): void {

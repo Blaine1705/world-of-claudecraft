@@ -21,10 +21,19 @@ import {
 import { BUILTIN_WORLD } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
-import { worldQuestPuzzleVariantForCycle } from '../src/sim/world_quest_rotation';
+import {
+  activeWorldQuestsForCycle,
+  worldQuestPuzzleVariantForCycle,
+} from '../src/sim/world_quest_rotation';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
-function setup(cycle = 'wq3_9') {
+function setup(variant = 0) {
+  const cycle = Array.from({ length: 210 }, (_, index) => `wq3_${index}`).find(
+    (candidate) =>
+      activeWorldQuestsForCycle(candidate).some((quest) => quest.id === ID) &&
+      worldQuestPuzzleVariantForCycle(candidate, 3) === variant,
+  );
+  if (!cycle) throw new Error(`No investigation rotation for variant ${variant}`);
   const sim = new Sim({
     seed: WORLD_SEED,
     playerClass: 'warrior',
@@ -69,10 +78,10 @@ function ctx(sim: Sim): SimContext {
 }
 
 describe('A Borrowed Face', () => {
-  it.each(['wq3_9', 'wq3_19', 'wq3_39'])(
-    'solves %s through real NPC/object commands and ordinary combat credit',
-    (cycle) => {
-      const sim = setup(cycle);
+  it.each([0, 1, 2])(
+    'solves variant %s through real NPC/object commands and ordinary combat credit',
+    (variant) => {
+      const sim = setup(variant);
       investigate(sim);
       const progress = sim.worldQuestLog.get(ID)!;
       expect(progress.investigation).toEqual({ heard: 15, clues: 3, cleared: 0 });

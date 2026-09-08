@@ -19,6 +19,45 @@
      @layer components would let the unlayered base win and invert the cascade, so they
      stay inline beside their bases and relocate later. */
 @layer components {
+  body.wearing-shadow-cloak
+    :is(
+      #actionbar,
+      #actionbar2,
+      #actionbar3,
+      #cross-hotbar,
+      #stancebar,
+      #petbar,
+      #mobile-action-ring,
+      #mobile-action-radial,
+      #mobile-consumable-strip,
+      #mobile-stance-radial,
+      #mobile-combat-controls
+    ) {
+    display: none !important;
+  }
+  .vehicle-bar.shadow-action-bar {
+    grid-template-columns: 1fr;
+    width: min(420px, calc(100% - 24px));
+  }
+  .vehicle-bar.shadow-action-bar > * {
+    grid-column: 1 / -1;
+  }
+  .vehicle-bar.shadow-action-bar .vehicle-integrity {
+    min-height: 22px;
+    height: 22px;
+    border-radius: 4px;
+  }
+  .vehicle-bar.shadow-action-bar .vehicle-integrity-fill {
+    transform: scaleX(var(--vehicle-integrity));
+    transform-origin: left;
+  }
+  .vehicle-bar.shadow-action-bar .vehicle-bar-hint {
+    grid-column: 1 / -1;
+  }
+  .shadow-action-bar .vehicle-action-slots {
+    justify-content: center;
+  }
+
   /* Horde mode keeps movement, health and an explicit exit, with no combat buttons. */
   body.playing-horde
   :is(

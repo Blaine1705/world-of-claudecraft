@@ -1,3 +1,5 @@
+import { gliderActionsLocked } from '../glider_action_lock';
+import { shadowActionsLocked } from '../shadow_action_lock';
 // Player cast lifecycle, extracted from the Sim monolith (C4a).
 //
 // This module owns how a cast STARTS (castAbility/castAbilityBySlot: the
@@ -893,7 +895,13 @@ export function castAbility(
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
-  if (meta.vehicle || hordeActionsLocked(meta.worldQuestLog)) return;
+  if (
+    meta.vehicle ||
+    hordeActionsLocked(meta.worldQuestLog) ||
+    shadowActionsLocked(meta.worldQuestLog) ||
+    gliderActionsLocked(meta.worldQuestLog)
+  )
+    return;
   let res = ctx.resolvedAbility(abilityId, p.id);
   if (!res) {
     ctx.error(p.id, 'You do not know that ability.');

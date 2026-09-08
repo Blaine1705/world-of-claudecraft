@@ -118,6 +118,8 @@ export interface InputCallbacks {
   isCameraLocked?: () => boolean;
   /** Vehicle view: freeze orbit controls, but preserve ground-aim clicks. */
   isCameraMotionLocked?: () => boolean;
+  /** Flight owns vertical intent; camera pitch must not activate swim steering. */
+  isGliderActive?: () => boolean;
   onInputIntent?(kind: 'move' | 'look' | 'zoom'): void;
 }
 
@@ -1572,6 +1574,7 @@ export class Input {
   /** Any horizontal movement input held, from any device — the gate the swim
    *  camera bands ride (readSwimSteer). Mirrors the readMoveInput sources. */
   private anyMoveHeld(): boolean {
+    if (this.cb.isGliderActive?.()) return false;
     return (
       this.heldAction('forward') ||
       this.heldAction('back') ||

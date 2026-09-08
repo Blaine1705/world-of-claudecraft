@@ -3,8 +3,10 @@ import {
   FORGE_NPC_DEF,
   FORGE_STATIONS,
 } from '../sim/content/world_quest_forging';
+import { GLIDER_APPRENTICE_NPC_DEF, GLIDER_NPC_DEF } from '../sim/content/world_quest_glider';
 import { HORDE_NPC_DEF } from '../sim/content/world_quest_horde';
 import { isInvestigationNpc } from '../sim/content/world_quest_investigation';
+import { isShadowNpc, SHADOW_NPC_ID } from '../sim/content/world_quest_shadow';
 import { isQuestGatedEntityHidden } from '../sim/quest_gated_entity';
 import {
   dist2d,
@@ -236,6 +238,7 @@ export function handlePickedEntity(
     return false;
 
   if (e.kind !== 'object') world.targetEntity(id);
+  if (e.kind === 'npc' && isShadowNpc(e.templateId) && e.id !== SHADOW_NPC_ID) return true;
 
   if (button === 2) {
     const d = dist2d(world.player.pos, e.pos);
@@ -300,7 +303,10 @@ export function handlePickedEntity(
           isWorldQuestTraceInstructor(e.templateId) ||
           e.templateId === FORGE_NPC_DEF.id ||
           e.templateId === HORDE_NPC_DEF.id ||
-          isInvestigationNpc(e.templateId)
+          e.templateId === GLIDER_NPC_DEF.id ||
+          e.templateId === GLIDER_APPRENTICE_NPC_DEF.id ||
+          isInvestigationNpc(e.templateId) ||
+          isShadowNpc(e.templateId)
         )
           world.interact();
         else if (e.templateId === 'brother_halven' || e.templateId === 'brother_halven_marsh')
@@ -387,7 +393,10 @@ export function handlePickedEntity(
           isWorldQuestTraceInstructor(e.templateId) ||
           e.templateId === FORGE_NPC_DEF.id ||
           e.templateId === HORDE_NPC_DEF.id ||
-          isInvestigationNpc(e.templateId)
+          e.templateId === GLIDER_NPC_DEF.id ||
+          e.templateId === GLIDER_APPRENTICE_NPC_DEF.id ||
+          isInvestigationNpc(e.templateId) ||
+          isShadowNpc(e.templateId)
         )
           world.interact();
         else if (e.templateId === 'brother_halven' || e.templateId === 'brother_halven_marsh')

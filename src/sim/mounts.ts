@@ -1,3 +1,5 @@
+import { gliderActionsLocked } from './glider_action_lock';
+import { shadowActionsLocked } from './shadow_action_lock';
 // Rideable ground mounts: collection + mount/dismount rules, a sibling sim
 // system behind the SimContext seam (module-first; sim.ts keeps thin delegates).
 //
@@ -216,7 +218,12 @@ export function summonMountItem(ctx: SimContext, pid: number, key: string): bool
   const meta = ctx.players.get(pid);
   const e = ctx.entities.get(pid);
   if (!meta || !e) return false;
-  if (hordeActionsLocked(meta.worldQuestLog)) return false;
+  if (
+    hordeActionsLocked(meta.worldQuestLog) ||
+    shadowActionsLocked(meta.worldQuestLog) ||
+    gliderActionsLocked(meta.worldQuestLog)
+  )
+    return false;
   const def = mountDef(key);
   if (!def) return false;
   // Clicking the reins you are currently riding puts the mount away.
@@ -281,7 +288,12 @@ export function toggleMount(ctx: SimContext, pid: number): boolean {
   const meta = ctx.players.get(pid);
   const e = ctx.entities.get(pid);
   if (!meta || !e) return false;
-  if (hordeActionsLocked(meta.worldQuestLog)) return false;
+  if (
+    hordeActionsLocked(meta.worldQuestLog) ||
+    shadowActionsLocked(meta.worldQuestLog) ||
+    gliderActionsLocked(meta.worldQuestLog)
+  )
+    return false;
   // A toggle while a summon/dismount is already channeling is ignored.
   if ((e.mountCastRemaining ?? 0) > 0) return false;
   if (e.mountKey) {

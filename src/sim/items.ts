@@ -1,3 +1,5 @@
+import { gliderActionsLocked } from './glider_action_lock';
+import { shadowActionsLocked } from './shadow_action_lock';
 // Inventory items + vendor: the player-facing equip/use/discard and buy/sell/buyback
 // command bodies. Extracted from sim.ts (session W2) as a pure MOVE behind SimContext,
 // exactly as PR #943 did for market.ts / loot/loot_roll.ts, and aligned to the
@@ -729,7 +731,13 @@ export function useItem(
   const { meta, e: p } = r;
   const def = ITEMS[itemId];
   // All three use branches (food/drink, potion, elixir) consume one unit, so the
-  if (meta.vehicle || hordeActionsLocked(meta.worldQuestLog)) return;
+  if (
+    meta.vehicle ||
+    hordeActionsLocked(meta.worldQuestLog) ||
+    shadowActionsLocked(meta.worldQuestLog) ||
+    gliderActionsLocked(meta.worldQuestLog)
+  )
+    return;
   // selection is honored here once instead of at each arm. Returns the consumed
   // payload because the potion branch reads it (the crafting-provenance trickle).
   //

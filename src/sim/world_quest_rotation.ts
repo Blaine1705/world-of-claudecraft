@@ -71,20 +71,13 @@ const WORLD_QUEST_ROTATION_ID_GROUPS = Object.freeze([
     'wq_proving_shore_scuttlers',
   ]),
   Object.freeze([
-    'wq_eastbrook_bandits',
-    'wq_mirefen_gravecallers',
-    'wq_palmreach_confections',
+    'wq_eastbrook_shadow',
+    'wq_mirefen_infiltrator',
+    'wq_galecrest_slalom',
     'wq_evergarden_cannon',
     'wq_last_keep_cannon',
   ]),
-  Object.freeze([
-    'wq_eastbrook_bandits',
-    'wq_mirefen_infiltrator',
-    'wq_palmreach_confections',
-    'wq_evergarden_watch',
-    'wq_galecrest_wisps',
-  ]),
-] as const);
+]);
 
 const WORLD_QUEST_ROTATIONS: readonly (readonly WorldQuestDef[])[] = Object.freeze(
   WORLD_QUEST_ROTATION_ID_GROUPS.map((ids) =>

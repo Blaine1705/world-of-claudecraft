@@ -6867,14 +6867,14 @@ export class GameServer {
       case 'world_quest_match3_swap':
       case 'world_quest_match3_reset':
       case 'world_quest_accuse':
+      case 'world_quest_shadow':
         return void questWire.dispatchWorldQuestWire(sim, msg, pid);
       case 'qlinkaccept':
         if (questWire.acceptLinkedQuestWire(sim, msg, pid)) this.resyncQuests(session);
         break;
       case 'equip':
         if (typeof msg.item === 'string') {
-          // The optional aimed slot (the paperdoll drop target) is accepted only
-          // when it names a real equipment key; anything else falls back to the
+          // Accept aimed slots only for real equipment keys; otherwise use the
           // sim's own resolver rather than trusting the client. The sim then
           // re-validates the slot against the item itself.
           const aimed =

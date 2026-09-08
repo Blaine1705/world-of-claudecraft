@@ -85,9 +85,14 @@ export function savedWorldQuestState(
           forging: _forging,
           horde: _horde,
           investigation: _investigation,
+          shadow: _shadow,
+          glider: _glider,
           ...progress
         }) => ({
           ...progress,
+          ...(progress.gliderResult === undefined
+            ? {}
+            : { gliderResult: { ...progress.gliderResult } }),
           ...(progress.hordeResult === undefined
             ? {}
             : { hordeResult: { ...progress.hordeResult } }),

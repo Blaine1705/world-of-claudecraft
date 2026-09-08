@@ -9,8 +9,10 @@ import type {
 import { WORLD_QUEST_CANNON, WORLD_QUEST_LAST_KEEP_CANNON } from './vehicle_stations';
 import { WORLD_QUEST_CALLIGRAPHY_QUEST } from './world_quest_calligraphy';
 import { WORLD_QUEST_FORGING } from './world_quest_forging';
+import { WORLD_QUEST_GLIDER } from './world_quest_glider';
 import { WORLD_QUEST_HORDE } from './world_quest_horde';
 import { WORLD_QUEST_INVESTIGATION } from './world_quest_investigation';
+import { WORLD_QUEST_SHADOW } from './world_quest_shadow';
 
 export const WORLD_QUEST_MIN_LEVEL = 10;
 
@@ -652,6 +654,8 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
   WORLD_QUEST_FORGING,
   WORLD_QUEST_HORDE,
   WORLD_QUEST_INVESTIGATION,
+  WORLD_QUEST_GLIDER,
+  WORLD_QUEST_SHADOW,
 ];
 
 export const WORLD_QUESTS_BY_ID: Readonly<Record<string, WorldQuestDef>> = Object.fromEntries(

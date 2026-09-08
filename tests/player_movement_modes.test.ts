@@ -24,7 +24,11 @@ import { advanceExclusiveMovement } from '../src/sim/player_movement_modes';
 describe('exclusive player movement ordering', () => {
   it('freezes vehicle before terrain lift and activity mutation, then preserves ordinary mode order', () => {
     const player = { pos: { y: 10 } } as Entity;
-    const meta = { vehicle: {}, moveInput: { forward: true } } as PlayerMeta;
+    const meta = {
+      vehicle: {},
+      moveInput: { forward: true },
+      worldQuestLog: new Map(),
+    } as PlayerMeta;
     const ctx = { tickCount: 30, cfg: { seed: 42 } } as SimContext;
     expect(advanceExclusiveMovement(ctx, player, meta)).toBe(true);
     expect(calls.rift).not.toHaveBeenCalled();

@@ -161,6 +161,7 @@ export const IWORLD_MEMBERS = [
   { name: 'reportTelemetry', kind: 'method' },
   { name: 'abandonQuest', kind: 'method' },
   { name: 'accuseWorldQuestSuspect', kind: 'method' },
+  { name: 'shadowWorldQuestAction', kind: 'method' },
   { name: 'acceptLinkedQuest', kind: 'method' },
   { name: 'rotateWorldQuestPuzzleTile', kind: 'method' },
   { name: 'swapWorldQuestMatch3Tiles', kind: 'method' },
@@ -675,9 +676,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // even when the total agrees. Only running the suite says what these
     // numbers really are; never reconcile them by arithmetic in the diff (the
     // numbers below were set from a suite run, not from this narrative).
-    expect(IWORLD_MEMBERS.length).toBe(356);
+    expect(IWORLD_MEMBERS.length).toBe(357);
     expect(DATA_MEMBERS.length).toBe(100);
-    expect(METHOD_MEMBERS.length).toBe(256);
+    expect(METHOD_MEMBERS.length).toBe(257);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -988,6 +989,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setSpec',
       'setStopAutoAttackOnTargetSwitch',
       'setTownFocus',
+      'shadowWorldQuestAction',
       'slotToolEffect',
       'socialInfo',
       'socketRiftGem',
@@ -1371,6 +1373,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setSpec',
       'setStopAutoAttackOnTargetSwitch',
       'setTownFocus',
+      'shadowWorldQuestAction',
       'slotToolEffect',
       'socketRiftGem',
       'sortInventory',
@@ -1627,6 +1630,7 @@ const FACET_QUESTS = [
   'swapWorldQuestMatch3Tiles',
   'resetWorldQuestMatch3',
   'accuseWorldQuestSuspect',
+  'shadowWorldQuestAction',
   'acceptLinkedQuest',
   'startTutorial',
 ] as const satisfies readonly (keyof IWorldQuests)[];
@@ -2076,8 +2080,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(356);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(356);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(357);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(357);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

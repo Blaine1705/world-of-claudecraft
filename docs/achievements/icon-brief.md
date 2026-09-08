@@ -167,3 +167,16 @@ Exploration (Arcane Calligraphy):
 
 - [v1] `exp_arcane_calligraphy`, A Steady Hand: a luminous quill completing a clean triangular rune over an old Eastbrook paving stone, restrained arcane blue on weathered gold.
 - [v1] `exp_arcane_calligraphy_gold`, Written in Starlight: five completed runes orbiting a brilliant star-written quill, the Gold score sealed below in a narrow laurel of living light.
+
+## World quest completion crests (2026-09-08)
+
+Five completion deeds await painted art under the same delivery contract: one
+512x512 RGBA PNG per deed, named exactly by deed id and ingested with
+`npm run assets:deeds <source-dir>`. Each uses the procedural exploration category
+crest while pending, explicitly recorded in `DEED_ART_PENDING` in `src/ui/icons.ts`.
+
+- [v1] `exp_forge_helper`, A Helping Hammer: a smith's hammer crossing a newly finished shield above an anvil, warm brass highlights on dark iron.
+- [v1] `exp_last_barricade`, The Last Barricade: a timber barricade holding against grasping skeletal hands, a bright crossbow bolt above the stakes, forest green on ember gold.
+- [v1] `exp_borrowed_face`, A Borrowed Face: a cracked watchman's mask revealing a shadowed eye beneath, a magnifying lens beside a torn seal, muted blue on silver.
+- [v1] `exp_windrider_slalom`, Windrider Slalom: a mechanical glider banking through a gold course ring above a steep canyon, sky blue on weathered bronze.
+- [v1] `exp_duskweave_dispatches`, Duskweave Dispatches: a sealed dispatch slipping beneath a violet cloak beside a hooded lantern, dusk purple on wax red.

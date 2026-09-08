@@ -1,7 +1,9 @@
 import { WORLD_QUEST_CALLIGRAPHY_ID } from './content/world_quest_calligraphy';
 import { FORGE_QUEST_ID } from './content/world_quest_forging';
+import { GLIDER_APPRENTICE_NPC_DEF, GLIDER_QUEST_ID } from './content/world_quest_glider';
 import { HORDE_QUEST_ID } from './content/world_quest_horde';
 import { INVESTIGATION_QUEST_ID } from './content/world_quest_investigation';
+import { SHADOW_QUEST_ID } from './content/world_quest_shadow';
 import { WORLD_QUEST_MIN_LEVEL, WORLD_QUESTS, WORLD_QUESTS_BY_ID } from './content/world_quests';
 import { grantDeed } from './deeds';
 import { formatMoney } from './format_money';
@@ -36,6 +38,14 @@ import {
   startForgeWorkshop,
   updateForgeWorkshop,
 } from './world_quest_forging';
+import {
+  cancelGliderForRotation,
+  clearGliderEncounter,
+  ensureGliderInstructor,
+  startGliderFlight,
+  updateGliderEncounter,
+} from './world_quest_glider';
+import { sanitizeGliderResult } from './world_quest_glider_wire';
 import {
   clearHordeEncounter,
   ensureHordeInstructor,
@@ -72,6 +82,14 @@ import {
   isWorldQuestSalvageObject,
   isWorldQuestSalvageObjectInCurrentLayout,
 } from './world_quest_salvage';
+import {
+  clearShadowEncounter,
+  ensureShadowPost,
+  performShadowAction,
+  startShadowEncounter,
+  updateShadowEncounter,
+} from './world_quest_shadow';
+import { sanitizeShadowCreditedObjects } from './world_quest_shadow_wire';
 import {
   sanitizeWorldQuestTraceScores,
   scoreWorldQuestTraceLesson,
@@ -203,6 +221,8 @@ function resetCycleIfNeeded(ctx: SimContext, meta: PlayerMeta, resolvedCycle?: s
       pid: meta.entityId,
     });
   }
+  cancelGliderForRotation(ctx, meta);
+  clearShadowEncounter(ctx, meta);
   clearInvestigationEncounter(ctx, meta);
   meta.worldQuestCycle = cycle;
   meta.worldQuestLog.clear();
@@ -229,6 +249,7 @@ export function hasActiveWorldQuest(meta: PlayerMeta, questId: string): boolean 
 /** Starts every eligible objective whose area the living player enters. */
 export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Entity): void {
   if (player.level < WORLD_QUEST_MIN_LEVEL) {
+    clearShadowEncounter(ctx, meta);
     clearInvestigationEncounter(ctx, meta);
     for (const progress of meta.worldQuestLog.values()) clearForgeWorkshop(meta, progress);
     for (const progress of meta.worldQuestLog.values()) clearHordeEncounter(meta, progress);
@@ -240,7 +261,11 @@ export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Ent
   const cycle = devCycle ?? rotation.cycle;
   resetCycleIfNeeded(ctx, meta, cycle);
   updateInvestigationEncounter(ctx, meta, player);
+  const shadowProgress = meta.worldQuestLog.get(SHADOW_QUEST_ID);
+  if (updateShadowEncounter(ctx, meta, player) && shadowProgress)
+    creditWorldQuest(ctx, meta, WORLD_QUESTS_BY_ID[SHADOW_QUEST_ID], shadowProgress);
   if (player.dead) {
+    for (const progress of meta.worldQuestLog.values()) clearGliderEncounter(meta, progress);
     for (const progress of meta.worldQuestLog.values()) clearForgeWorkshop(meta, progress);
     for (const progress of meta.worldQuestLog.values()) clearHordeEncounter(meta, progress);
     for (const progress of meta.worldQuestLog.values()) clearWorldQuestTracing(meta, progress);
@@ -281,9 +306,19 @@ export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Ent
     }
     const existing = meta.worldQuestLog.get(quest.id);
     if (quest.objective.type === 'investigation') ensureInvestigationPost(ctx);
+    if (quest.objective.type === 'shadow') ensureShadowPost(ctx);
     if (quest.objective.type === 'horde') {
       ensureHordeInstructor(ctx);
       if (existing && updateHordeEncounter(meta, player, existing) && existing.state === 'active')
+        creditWorldQuest(ctx, meta, quest, existing);
+    }
+    if (quest.objective.type === 'glider') {
+      ensureGliderInstructor(ctx);
+      if (
+        existing &&
+        updateGliderEncounter(ctx, meta, player, existing) &&
+        existing.state === 'active'
+      )
         creditWorldQuest(ctx, meta, quest, existing);
     }
     if (quest.objective.type === 'forging') {
@@ -359,16 +394,47 @@ export function talkToWorldQuestInstructor(
 ): boolean {
   resetCycleIfNeeded(ctx, meta);
   if (talkToInvestigation(ctx, npc, meta, player)) return true;
+  if (npc.templateId === GLIDER_APPRENTICE_NPC_DEF.id) {
+    const existing = meta.worldQuestLog.get(GLIDER_QUEST_ID) ?? {
+      questId: GLIDER_QUEST_ID,
+      count: 0,
+      state: 'active',
+    };
+    startGliderFlight(ctx, meta, player, npc, existing);
+    return true;
+  }
   const quest = WORLD_QUESTS.find(
     (candidate) =>
       (candidate.objective.type === 'tracing' ||
         candidate.objective.type === 'forging' ||
-        candidate.objective.type === 'horde') &&
+        candidate.objective.type === 'horde' ||
+        candidate.objective.type === 'glider' ||
+        candidate.objective.type === 'shadow') &&
       candidate.objective.instructorNpcId === npc.templateId,
   );
   if (!quest) return false;
   resetCycleIfNeeded(ctx, meta);
   const progress = meta.worldQuestLog.get(quest.id);
+  if (quest.objective.type === 'shadow') {
+    if (
+      player.level >= quest.minLevel &&
+      progress &&
+      hasActiveWorldQuest(meta, quest.id) &&
+      inWorldQuestArea(player, quest)
+    )
+      startShadowEncounter(ctx, meta, player, npc, progress);
+    return true;
+  }
+  if (quest.objective.type === 'glider') {
+    if (
+      player.level >= quest.minLevel &&
+      progress &&
+      inWorldQuestArea(player, quest) &&
+      activeWorldQuestsForCycle(meta.worldQuestCycle).some((active) => active.id === quest.id)
+    )
+      startGliderFlight(ctx, meta, player, npc, progress);
+    return true;
+  }
   if (quest.objective.type === 'forging' || quest.objective.type === 'horde') {
     if (
       player.level >= quest.minLevel &&
@@ -446,9 +512,14 @@ function creditWorldQuest(
   meta.counters.questsCompleted++;
   meta.unlockedMilestones.add(claimToken(meta.worldQuestCycle, quest.id));
   awardWorldQuest(ctx, meta, quest);
+  if (quest.id === SHADOW_QUEST_ID) {
+    clearShadowEncounter(ctx, meta);
+    grantDeed(ctx, meta, 'exp_duskweave_dispatches');
+  }
   if (quest.id === INVESTIGATION_QUEST_ID) grantDeed(ctx, meta, 'exp_borrowed_face');
   if (quest.id === HORDE_QUEST_ID) grantDeed(ctx, meta, 'exp_last_barricade');
   if (quest.id === FORGE_QUEST_ID) grantDeed(ctx, meta, 'exp_forge_helper');
+  if (quest.id === GLIDER_QUEST_ID) grantDeed(ctx, meta, 'exp_windrider_slalom');
   if (quest.id === WORLD_QUEST_CALLIGRAPHY_ID) {
     grantDeed(ctx, meta, 'exp_arcane_calligraphy');
     if (progress.traceResult?.rating === 'gold')
@@ -810,6 +881,13 @@ export function sanitizeWorldQuestProgress(value: unknown, cycle?: unknown): Wor
       count,
       state: raw.state,
     };
+    if (quest.objective.type === 'shadow' && raw.state === 'active') {
+      normalized.creditedObjects = sanitizeShadowCreditedObjects(raw.creditedObjects).slice(
+        0,
+        quest.count - 1,
+      );
+      normalized.count = normalized.creditedObjects.length;
+    }
     if (quest.objective.type === 'horde' && raw.state === 'completed') {
       const result = sanitizeHordeResult(raw.hordeResult);
       if (result) normalized.hordeResult = result;
@@ -817,6 +895,10 @@ export function sanitizeWorldQuestProgress(value: unknown, cycle?: unknown): Wor
     if (quest.objective.type === 'forging' && raw.state === 'completed') {
       const result = sanitizeForgeResult(raw.forgeResult);
       if (result) normalized.forgeResult = result;
+    }
+    if (quest.objective.type === 'glider' && raw.state === 'completed') {
+      const result = sanitizeGliderResult(raw.gliderResult);
+      if (result) normalized.gliderResult = result;
     }
     if (quest.objective.type === 'tracing') {
       normalized.traceVariant =
@@ -883,4 +965,17 @@ export function accuseWorldQuestSuspect(ctx: SimContext, npcId: number, pid?: nu
   if (!resolved) return;
   updateWorldQuests(ctx, resolved.meta, resolved.e);
   accuseInvestigationSuspect(ctx, npcId, resolved.meta, resolved.e);
+}
+
+export function shadowWorldQuestAction(
+  ctx: SimContext,
+  action: 'pickpocket' | 'leave',
+  targetId?: number,
+  pid?: number,
+): void {
+  const resolved = ctx.resolve(pid);
+  if (!resolved) return;
+  updateWorldQuests(ctx, resolved.meta, resolved.e);
+  if (action !== 'leave' && !hasActiveWorldQuest(resolved.meta, SHADOW_QUEST_ID)) return;
+  performShadowAction(ctx, resolved.meta, resolved.e, action, targetId);
 }

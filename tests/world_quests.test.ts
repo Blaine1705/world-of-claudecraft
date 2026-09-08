@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { isBlocked, resolveMovement } from '../src/sim/colliders';
 import { dealDamage } from '../src/sim/combat/damage';
+import { SHADOW_GUARDS } from '../src/sim/content/world_quest_shadow';
 import {
   BUILTIN_WORLD,
   ESCORTS,
@@ -298,7 +299,11 @@ describe('world quest content', () => {
             );
           }
         }
-      } else if (quest.objective.type === 'forging' || quest.objective.type === 'horde') {
+      } else if (
+        quest.objective.type === 'forging' ||
+        quest.objective.type === 'horde' ||
+        quest.objective.type === 'glider'
+      ) {
         expect(quest.count).toBe(1);
         const instructor = NPCS[quest.objective.instructorNpcId];
         expect(instructor, quest.id).toBeDefined();
@@ -315,6 +320,19 @@ describe('world quest content', () => {
         expect(Math.hypot(station.x - quest.area.x, station.z - quest.area.z)).toBeLessThan(
           quest.area.radius,
         );
+      } else if (quest.objective.type === 'shadow') {
+        expect(quest.count).toBe(SHADOW_GUARDS.filter((guard) => !guard.sentry).length);
+        const instructor = NPCS[quest.objective.instructorNpcId];
+        expect(instructor.dynamic).toBe(true);
+        for (const npc of [instructor, ...SHADOW_GUARDS.map((guard) => guard.npc)]) {
+          expect(NPCS[npc.id]).toBeDefined();
+          expect(Math.hypot(npc.pos.x - quest.area.x, npc.pos.z - quest.area.z)).toBeLessThan(
+            quest.area.radius,
+          );
+        }
+      } else if (quest.objective.type === 'investigation') {
+        expect(quest.count).toBe(1);
+        expect(quest.objective.targetMobId).toBeDefined();
       } else {
         throw new Error(`Unchecked world quest objective ${quest.id}`);
       }
@@ -338,7 +356,7 @@ describe('world quest content', () => {
       if (quest.reward.type === 'item') expect(ITEMS[quest.reward.itemId], quest.id).toBeDefined();
     }
     expect([...zoneFrequency.values()].every((count) => count >= 1)).toBe(true);
-    expect(zoneFrequency.get('eastbrook_vale')).toBe(3);
+    expect(zoneFrequency.get('eastbrook_vale')).toBe(4);
   });
 
   it('places both minigame activators on safe, walkable ground outside hostile aggro', () => {
@@ -712,9 +730,9 @@ describe('world quest lifecycle', () => {
     ]);
     const ninthIds = activeWorldQuestsForCycle('wq3_8').map((quest) => quest.id);
     expect(ninthIds).toEqual([
-      'wq_eastbrook_bandits',
-      'wq_mirefen_gravecallers',
-      'wq_palmreach_confections',
+      'wq_eastbrook_shadow',
+      'wq_mirefen_infiltrator',
+      'wq_galecrest_slalom',
       'wq_evergarden_cannon',
       'wq_last_keep_cannon',
     ]);

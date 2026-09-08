@@ -24,6 +24,7 @@
 // normalizeAppearance unchanged (a typo'd style id would silently clamp to the
 // default), and no two NPCs share an appearance.
 
+import { SHADOW_GUARDS } from '../../sim/content/world_quest_shadow';
 import type { EntityKind } from '../../sim/types';
 import {
   type ArmorLoadout,
@@ -106,6 +107,70 @@ const kit = (set: ArmorSetId, over: Partial<ArmorLoadout> = {}): ArmorLoadout =>
 // --- the roster --------------------------------------------------------------
 
 export const NPC_LOOKS: Record<string, NpcLookDef> = {
+  glider_instructor: {
+    app: {
+      gender: 'male',
+      hair: 'crew',
+      brows: 'thick',
+      eyeShape: 'almond',
+      ...hair(31, 0.25, 0.25),
+      ...skin(29, 0.4, 0.5),
+      ...eyes(194, 0.48, 0.43),
+      face: face({ cheeks: 0.12, chin: 0.15 }),
+      outfit: 'azure',
+    },
+    worn: kit('ranger'),
+    props: 'none',
+  },
+  glider_apprentice: {
+    app: {
+      gender: 'female',
+      hair: 'warriorbraid',
+      brows: 'angled',
+      eyeShape: 'almond',
+      ...hair(34, 0.65, 0.4),
+      ...skin(24, 0.35, 0.65),
+      ...eyes(180, 0.4, 0.48),
+      face: face({ cheeks: -0.1, chin: -0.12 }),
+      outfit: 'teal',
+    },
+    worn: kit('ranger'),
+    props: 'none',
+  },
+  shadow_cloak_scout: {
+    app: {
+      gender: 'female',
+      hair: 'warriorbraid',
+      brows: 'angled',
+      eyeShape: 'almond',
+      ...hair(23, 0.45, 0.17),
+      ...skin(27, 0.42, 0.53),
+      ...eyes(165, 0.4, 0.4),
+      face: face({ cheeks: -0.12, chin: 0.1 }),
+      outfit: 'violet',
+    },
+    worn: kit('rogue'),
+    props: 'knife',
+  },
+  ...Object.fromEntries(
+    SHADOW_GUARDS.map((guard, index): [string, NpcLookDef] => [
+      guard.npc.id,
+      {
+        app: {
+          gender: 'male',
+          hair: 'crew',
+          brows: 'thick',
+          eyeShape: 'narrow',
+          ...hair(21 + index * 3, 0.3, 0.23),
+          ...skin(25, 0.4, 0.43 + index * 0.025),
+          ...eyes(30 + index * 15, 0.3, 0.35),
+          outfit: guard.sentry ? 'gold' : 'onyx',
+        },
+        worn: kit(guard.sentry ? 'knight' : 'rogue', guard.sentry ? { head: 'knight' } : {}),
+        props: guard.sentry ? 'spear' : 'sword',
+      },
+    ]),
+  ),
   // === Eastbrook Vale: the starter valley, warm and rustic =================
   // The Merchant: gold on black, a man who owns the market and dresses like it.
   the_merchant: {

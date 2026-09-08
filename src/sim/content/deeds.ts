@@ -2979,6 +2979,22 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 5,
     trigger: { kind: 'manual' },
   },
+  exp_windrider_slalom: {
+    id: 'exp_windrider_slalom',
+    name: 'Windrider Slalom',
+    desc: 'Complete the mechanical glider descent through the Galecrest canyon.',
+    category: 'exploration',
+    renown: 5,
+    trigger: { kind: 'manual' },
+  },
+  exp_duskweave_dispatches: {
+    id: 'exp_duskweave_dispatches',
+    name: 'Duskweave Dispatches',
+    desc: "Recover the bandit dispatches while wearing Valerie's enchanted cloak.",
+    category: 'exploration',
+    renown: 5,
+    trigger: { kind: 'manual' },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

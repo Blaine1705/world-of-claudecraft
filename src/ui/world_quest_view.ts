@@ -15,8 +15,10 @@ export function worldQuestDisplayName(questId: string): string {
   if (!quest) return t('questUi.worldQuest.unknown', { id: questId });
   if (quest.objective.type === 'vehicle')
     return vehicleStationDisplayName(quest.objective.stationId);
+  if (quest.objective.type === 'shadow') return t('questUi.worldQuest.shadow.title');
   if (quest.objective.type === 'forging') return t('questUi.worldQuest.forge.title');
   if (quest.objective.type === 'horde') return t('questUi.worldQuest.horde.title');
+  if (quest.objective.type === 'glider') return t('questUi.worldQuest.glider.title');
   if (quest.objective.type === 'investigation') return t('questUi.worldQuest.investigation.title');
   if (quest.objective.type === 'tracing') return t('questUi.worldQuest.calligraphyTitle');
   return t('questUi.worldQuest.title', {
@@ -36,8 +38,10 @@ export function worldQuestObjectiveLabel(questId: string): string {
         : 'hudChrome.vehicle.objective',
     );
   }
+  if (quest.objective.type === 'shadow') return t('questUi.worldQuest.shadow.objective');
   if (quest.objective.type === 'forging') return t('questUi.worldQuest.forge.objective');
   if (quest.objective.type === 'horde') return t('questUi.worldQuest.horde.objective');
+  if (quest.objective.type === 'glider') return t('questUi.worldQuest.glider.objective');
   if (quest.objective.type === 'investigation')
     return t('questUi.worldQuest.investigation.objective');
   if (quest.objective.type === 'tracing') return t('questUi.worldQuest.traceOutline');

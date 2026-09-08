@@ -11974,7 +11974,7 @@ export class Renderer {
     this.bgFx.update(this.time);
     this.updateBgWards();
     this.vfx.update(dt);
-    this.worldGuidance.update(this.sim, this.time, dt, this.reducedMotion());
+    this.worldGuidance.update(this.sim, this.time, dt, this.reducedMotion(), this.views.get(p.id)?.group);
     this.abilityVfx.update(dt, this.reducedMotion());
     this.needleOfFateVfx.update(dt, this.reducedMotion());
     this.sentenceVfx.update(dt, this.reducedMotion());

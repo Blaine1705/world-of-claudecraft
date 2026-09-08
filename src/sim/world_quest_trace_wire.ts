@@ -5,6 +5,7 @@ import type { WorldQuestProgress, WorldQuestTraceState } from './types';
 import { decodeForgeState } from './world_quest_forge_wire';
 import { decodeHordeState } from './world_quest_horde_wire';
 import { decodeInvestigationState } from './world_quest_investigation_wire';
+import { decodeShadowState } from './world_quest_shadow_wire';
 import { worldQuestTraceShape } from './world_quest_trace_variants';
 
 export const WORLD_QUEST_TRACE_WIRE_POINT_LIMIT = 256;
@@ -106,8 +107,11 @@ export function worldQuestProgressForWire(progress: WorldQuestProgress): WorldQu
     forging: rawForge,
     horde: rawHorde,
     investigation: rawInvestigation,
+    shadow: rawShadow,
     ...base
   } = progress;
+  const shadow =
+    progress.state === 'active' ? decodeShadowState(rawShadow, progress.questId) : undefined;
   const investigation = decodeInvestigationState(rawInvestigation, progress.questId);
   const horde = decodeHordeState(rawHorde, progress.questId);
   const forging = decodeForgeState(rawForge, progress.questId);
@@ -115,6 +119,7 @@ export function worldQuestProgressForWire(progress: WorldQuestProgress): WorldQu
   return {
     ...base,
     ...(investigation === undefined ? {} : { investigation }),
+    ...(shadow === undefined ? {} : { shadow }),
     ...(horde === undefined ? {} : { horde }),
     ...(base.hordeResult === undefined ? {} : { hordeResult: { ...base.hordeResult } }),
     ...(forging === undefined ? {} : { forging }),

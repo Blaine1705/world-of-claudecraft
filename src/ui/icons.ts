@@ -5384,6 +5384,12 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   // paintings land (docs/achievements/icon-brief.md).
   'exp_arcane_calligraphy',
   'exp_arcane_calligraphy_gold',
+  // World-quest completion deeds use the exploration category crest pending art.
+  'exp_forge_helper',
+  'exp_last_barricade',
+  'exp_borrowed_face',
+  'exp_windrider_slalom',
+  'exp_duskweave_dispatches',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

@@ -144,7 +144,10 @@ describe('coach trail materials', () => {
   it('the renderer hands the guidance its compile gate (source pin)', () => {
     const renderer = read('src/render/renderer.ts');
     expect(renderer).toContain(
-      'new IslandGuidance(this.scene, this.groundSample, (t) => this.compileGate(t))',
+      'new WorldGuidance(this.scene, this.groundSample, (t, e) => this.compileGate(t, e))',
+    );
+    expect(read('src/render/world_guidance.ts')).toContain(
+      'new IslandGuidance(scene, groundAt, compileGate)',
     );
   });
 });

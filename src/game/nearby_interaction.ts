@@ -1,6 +1,8 @@
 import { FORGE_NPC_DEF } from '../sim/content/world_quest_forging';
+import { GLIDER_APPRENTICE_NPC_DEF, GLIDER_NPC_DEF } from '../sim/content/world_quest_glider';
 import { HORDE_NPC_DEF } from '../sim/content/world_quest_horde';
 import { isInvestigationNpc } from '../sim/content/world_quest_investigation';
+import { isShadowNpc, SHADOW_NPC_ID } from '../sim/content/world_quest_shadow';
 import { WORLD_QUESTS_BY_ID } from '../sim/data';
 import { isQuestGatedGroundObjectHidden } from '../sim/quest_gated_entity';
 import { isObjectOpenedByViewer } from '../sim/quests/opened_object_view';
@@ -216,6 +218,10 @@ export function tryNearbyInteraction(
   if (bestNpc !== null) {
     const npc = world.entities.get(bestNpc);
     if (npc?.kind !== 'npc') return false;
+    if (isShadowNpc(npc.templateId) && npc.id !== SHADOW_NPC_ID) {
+      world.targetEntity(bestNpc);
+      return true;
+    }
     if (npc.templateId === 'spirit_healer') {
       // The scan only picks a spirit healer for a ghost; route the revive
       // through the HUD's confirm gate rather than sending the command
@@ -225,7 +231,10 @@ export function tryNearbyInteraction(
       isWorldQuestTraceInstructor(npc.templateId) ||
       npc.templateId === FORGE_NPC_DEF.id ||
       npc.templateId === HORDE_NPC_DEF.id ||
-      isInvestigationNpc(npc.templateId)
+      npc.templateId === GLIDER_NPC_DEF.id ||
+      npc.templateId === GLIDER_APPRENTICE_NPC_DEF.id ||
+      isInvestigationNpc(npc.templateId) ||
+      isShadowNpc(npc.templateId)
     ) {
       world.targetEntity(bestNpc);
       world.interact();

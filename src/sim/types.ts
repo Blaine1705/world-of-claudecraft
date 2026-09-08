@@ -4,6 +4,7 @@ import type { ChatSenderFlair, StreamerLinks } from './account_flair';
 import type { MountKey } from './content/mounts';
 import type { GatheringProfessionId, ToolEffectId } from './content/professions';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
+import type { GliderFlightResult, GliderFlightState } from './minigames/glider_flight';
 import type { HordeResult, HordeState } from './minigames/horde_barricade';
 import type { HarvestYield } from './professions/harvest_yields';
 import type { RespawnWindow } from './respawn_policy';
@@ -4246,7 +4247,9 @@ export interface WorldQuestForgeState {
 }
 
 export type WorldQuestObjective =
+  | { type: 'glider'; instructorNpcId: string; courseId: string }
   | { type: 'investigation'; targetMobId: string }
+  | { type: 'shadow'; instructorNpcId: string }
   | { type: 'forging'; instructorNpcId: string }
   | { type: 'horde'; instructorNpcId: string }
   | { type: 'vehicle'; stationId: string }
@@ -4304,7 +4307,18 @@ export interface WorldQuestInvestigationState {
   mobId?: number;
 }
 
+export interface WorldQuestShadowState {
+  /** Internal fixed-tick guard, never wired. */
+  lastTick?: number;
+  phase: 'cloaked' | 'caught';
+  suspicion: number;
+  cooldown: number;
+  stealing?: { targetId: number; remaining: number; x: number; z: number };
+}
+
 export interface WorldQuestProgress {
+  /** Personal borrowed cloak and channel, omitted from saves. */
+  shadow?: WorldQuestShadowState;
   /** Personal investigation clues and live summon reference, omitted from saves. */
   investigation?: WorldQuestInvestigationState;
   questId: string;
@@ -4316,6 +4330,9 @@ export interface WorldQuestProgress {
   forging?: WorldQuestForgeState;
   /** Best completed workshop result for this rotation. */
   forgeResult?: WorldQuestForgeResult;
+  /** Personal glider flight, omitted from saves. */
+  glider?: GliderFlightState;
+  gliderResult?: GliderFlightResult;
   /** Session-only tracing readout. Omitted from character saves. */
   tracing?: WorldQuestTraceState;
   /** Stable advanced figure id and earned scores survive interruption and save/load. */

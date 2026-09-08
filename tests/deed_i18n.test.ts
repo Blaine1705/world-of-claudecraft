@@ -60,8 +60,9 @@ describe('deed_i18n English resolution', () => {
     // visit pair (no title reward), the Proving Shore graduation deed
     // (no title reward), and the five Crucible raid deeds (the Varkhul
     // flawless task carries the 43rd title), Arcane Calligraphy's completion
-    // deed (no title), and its Gold-rating deed (the 44th title).
-    expect(manifest.length).toBe(283 * 2 + 44);
+    // deed (no title), and its Gold-rating deed (the 44th title). Forging,
+    // barricade, investigation, glider, and shadow each add one untitled deed.
+    expect(manifest.length).toBe(288 * 2 + 44);
     expect(manifest.filter((row) => row.field === 'title').length).toBe(44);
     expect(manifest).toContainEqual({
       id: 'prog_veteran',

@@ -63,7 +63,7 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 285 deeds worth 3365 total Renown', () => {
+  it('ships exactly 288 deeds worth 3380 total Renown', () => {
     // Release base (262 / 3145 after the WARFARE lifetime-honor ladder) plus
     // four Reliquary Curator rank bridges and the five Phase 18 completion
     // ladder deeds (all nine renown 0: catalog prestige never scores the
@@ -73,8 +73,9 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // raid deeds (four clears at 25 plus the flawless 50: +150), the Arcane
     // Calligraphy completion deed (+5), and its Gold-rating title deed (+10).
     // The forging workshop and Last Barricade each add a completion deed (+5).
-    expect(DEED_ORDER.length).toBe(285);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3365);
+    // Investigation, glider slalom, and Duskweave Dispatches add three more (+15).
+    expect(DEED_ORDER.length).toBe(288);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3380);
   });
 
   it('ships the audited per-category counts', () => {
@@ -97,7 +98,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // +2 bank socket ladder deeds (soc_strongbox_outfitter,
       // soc_four_bags_deep; Bank Storage phase 06).
       social: 20,
-      exploration: 15,
+      exploration: 18,
       feat: 3,
       hidden: 9,
     });
@@ -246,6 +247,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'exp_forge_helper',
       'exp_last_barricade',
       'exp_borrowed_face',
+      'exp_windrider_slalom',
+      'exp_duskweave_dispatches',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -670,7 +673,7 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // Forging appends one manual deed and joins the derived book-completion list.
   // Last Barricade appends one manual exploration deed (+5). Removing that row
   // and its derived book dependency reproduces the previous catalog digest.
-  const FROZEN_CATALOG_SHA256 = '1c9379dc0bad0e0db088afab0d234dad7135fab26c98acb3587f96d06224bfbc';
+  const FROZEN_CATALOG_SHA256 = '6a54bc1aa1d786db5db1b6af4d332fe0359238b6b655a842984319545405ef50';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -868,8 +871,8 @@ describe('table shape', () => {
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');
-    // The investigation completion deed is the latest append-only entry.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('exp_borrowed_face');
+    // The cloak operation completion deed is the latest append-only entry.
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('exp_duskweave_dispatches');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

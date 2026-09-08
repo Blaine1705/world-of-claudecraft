@@ -8,8 +8,10 @@ import { applyDevKit } from './dev_kit';
 import { armWorldQuestCannonForDev } from './dev_world_quest_cannon';
 import { armWorldQuestCaravanForDev } from './dev_world_quest_caravan';
 import { armWorldQuestForgingForDev } from './dev_world_quest_forging';
+import { armWorldQuestGliderForDev } from './dev_world_quest_glider';
 import { armWorldQuestHordeForDev } from './dev_world_quest_horde';
 import { armWorldQuestInvestigationForDev } from './dev_world_quest_investigation';
+import { armWorldQuestShadowForDev } from './dev_world_quest_shadow';
 import { armWorldQuestTracingForDev } from './dev_world_quest_tracing';
 import { createGroundObject, createMob } from './entity';
 import {
@@ -209,10 +211,19 @@ export function handleDevChat(
     return null;
   }
 
+  if (/^\/dev\s+shadow\s*$/i.test(raw)) {
+    armWorldQuestShadowForDev(ctx, pid);
+    return null;
+  }
   const caravanMatch = /^\/(?:dev\s+caravan|devcaravan)(?:\s+(\S+))?\s*$/i.exec(raw);
   const cannonMatch = /^\/dev\s+cannon(?:\s+(wyrmwatch|last_keep))?\s*$/i.exec(raw);
   if (/^\/dev\s+(?:infiltrator|investigation|amongus)\s*$/i.test(raw)) {
     armWorldQuestInvestigationForDev(ctx, pid);
+    return null;
+  }
+  const gliderMatch = /^\/dev\s+(?:glider|slalom|windrider)(?:\s+(start))?\s*$/i.exec(raw);
+  if (gliderMatch) {
+    armWorldQuestGliderForDev(ctx, pid, Boolean(gliderMatch[1]));
     return null;
   }
   if (/^\/dev\s+(?:horde|barricade)\s*$/i.test(raw)) {

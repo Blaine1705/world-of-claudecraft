@@ -1282,7 +1282,6 @@ const CHEAT_DEATH_SAVE_TEXT = 'Cheat Death saves you!';
 function curatorRankDisplayName(rank: number): string {
   return t(curatorRankNameKey(rank), { rank: formatNumber(rank) });
 }
-
 export class Hud {
   // Ability slots across three rows: 1..11 primary, 12..22 secondary, and
   // 23..33 third (slot 0 is the Attack toggle on the primary row). Every row
@@ -1379,6 +1378,7 @@ export class Hud {
       world: this.sim,
       writers: this.writerFacet,
       keyLabel: (slot) => keyCapLabel(this.keybinds.primaryLabel(`slot${slot}`)),
+      padKind: () => this.optionsHooks?.gamepad.kind() ?? 'generic',
       consumePeek: () => this.peekGuard.consume(),
       presentation: this.renderer,
       cancelOnEnter: [this.playerGroundAim, this.empowerHold],
@@ -7310,7 +7310,7 @@ export class Hud {
   // Slot key DOWN: every slot fires immediately (a tap is down + up, so this
   // is the press).
   pressSlot(slot: number): void {
-    if (this.vehicleControls.blocksPlayerActions) {
+    if (VehicleActionBarController.blocksPlayerActions(this.sim)) {
       this.vehicleControls.chooseSlot(slot);
       return;
     }
@@ -7321,7 +7321,7 @@ export class Hud {
   // Slot key UP: release an empowered hold. A non-charging slot already fired
   // on press, so this is a no-op.
   releaseSlot(slot: number): void {
-    if (this.vehicleControls.blocksPlayerActions) return;
+    if (VehicleActionBarController.blocksPlayerActions(this.sim)) return;
     this.empowerHold.releaseSlot(slot, this.sim, (released) => this.flashActionSlot(released));
   }
 
@@ -7390,7 +7390,7 @@ export class Hud {
   // (reticle, empower charge, mouseover cast, the auto-attack QoL) rather than a
   // second cast path that would drift from it; the release edge is releaseCrossHotbarAction.
   pressCrossHotbarAction(action: { type: 'ability' | 'item'; id: string }): void {
-    if (this.vehicleControls.blocksPlayerActions) return;
+    if (VehicleActionBarController.blocksPlayerActions(this.sim)) return;
     if (action.id === CROSS_HOTBAR_ATTACK_ID || action.type === 'item') {
       this.castCrossHotbarAction(action);
       return;
@@ -7408,7 +7408,7 @@ export class Hud {
   }
 
   releaseCrossHotbarAction(action: { type: 'ability' | 'item'; id: string }): void {
-    if (this.vehicleControls.blocksPlayerActions) return;
+    if (VehicleActionBarController.blocksPlayerActions(this.sim)) return;
     this.empowerHold.releaseAction(action, this.sim, (slot) => this.flashActionSlot(slot));
   }
 
@@ -7417,7 +7417,7 @@ export class Hud {
   // the pad and nowhere else falls back to a plain cast (position abilities keep
   // the reticle via the ability-id aim identity) or the shared item-use seam.
   castCrossHotbarAction(action: { type: 'ability' | 'item'; id: string }): void {
-    if (this.vehicleControls.blocksPlayerActions) return;
+    if (VehicleActionBarController.blocksPlayerActions(this.sim)) return;
     // Attack is the fixed slot-0 toggle, not something the sim can cast by id.
     if (action.id === CROSS_HOTBAR_ATTACK_ID) {
       this.activateFixedAttackSlot();
@@ -7475,7 +7475,7 @@ export class Hud {
   }
 
   castSlot(barSlot: number): void {
-    if (this.vehicleControls.blocksPlayerActions) {
+    if (VehicleActionBarController.blocksPlayerActions(this.sim)) {
       this.vehicleControls.chooseSlot(barSlot);
       return;
     }

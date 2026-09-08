@@ -210,8 +210,13 @@ describe('v0.36 release-audit Reliquary deed art', () => {
       'dgn_varkhul_flawless',
       'exp_arcane_calligraphy',
       'exp_arcane_calligraphy_gold',
+      'exp_forge_helper',
+      'exp_last_barricade',
+      'exp_borrowed_face',
+      'exp_windrider_slalom',
+      'exp_duskweave_dispatches',
     ]);
-    expect(DEED_ORDER).toHaveLength(283);
+    expect(DEED_ORDER).toHaveLength(288);
     expect(DEED_IMAGE_IDS.size).toBe(271);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(

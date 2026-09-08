@@ -219,7 +219,9 @@ const UI_PURE_CORES = [
   'src/ui/world_quest_trace_view.ts',
   'src/ui/world_quest_forge_view.ts',
   'src/ui/world_quest_horde_view.ts',
+  'src/ui/world_quest_shadow_view.ts',
   'src/ui/world_quest_investigation_view.ts',
+  'src/ui/world_quest_glider_view.ts',
   'src/ui/world_quest_puzzle_view.ts',
   'src/ui/world_quest_match3_view.ts',
   'src/ui/quest_event_view.ts',
@@ -576,6 +578,7 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // post_bloom_shader_core is the host-agnostic GLSL source patch for the
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
+  'src/render/shadow_detection_core.ts',
   'src/render/world_quest_public_trace_core.ts',
   'src/render/world_quest_trace_core.ts',
   'src/render/arena_wall_occlusion_core.ts',
@@ -2257,6 +2260,7 @@ const UI_PAINTER_HELPERS = [
 const UI_DOM_MODULES = [
   'src/ui/hud/vehicle/vehicle_action_bar_controller.ts',
   'src/ui/hud/vehicle/horde_action_bar_controller.ts',
+  'src/ui/hud/vehicle/shadow_action_bar_controller.ts',
   'src/ui/account_portal_dom.ts',
   'src/ui/appearance_customizer.ts',
   'src/ui/arena_window.ts',

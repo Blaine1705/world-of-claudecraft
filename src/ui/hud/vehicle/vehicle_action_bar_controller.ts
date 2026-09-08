@@ -1,5 +1,11 @@
+import type { GamepadKind } from '../../../game/gamepad_map';
 import { hordeControlsActive } from '../../../game/horde_controls';
 import { sfx } from '../../../game/sfx';
+import {
+  type ShadowControlWorld,
+  shadowChooseSlot,
+  shadowControlsActive,
+} from '../../../game/shadow_controls';
 import { CANNON_TACTICS } from '../../../sim/content/cannon_encounter';
 import { TICK_RATE } from '../../../sim/types';
 import type { IWorldVehicles } from '../../../world_api/vehicles';
@@ -16,14 +22,16 @@ import {
   type HordeHudWorld,
   type HordeProjection,
 } from './horde_action_bar_controller';
+import { ShadowActionBarController } from './shadow_action_bar_controller';
 import { createVehicleActionBarView } from './vehicle_action_bar_view';
 import { vehicleActionTooltip } from './vehicle_action_tooltip';
 import { VEHICLE_ACTION_SLOTS, VehicleAimCore } from './vehicle_aim_core';
 
 interface VehicleBarDeps {
-  world: IWorldVehicles & Partial<HordeHudWorld>;
+  world: IWorldVehicles & Partial<HordeHudWorld & ShadowControlWorld>;
   writers: PainterHostWriters;
   keyLabel(slot: number): string;
+  padKind?(): GamepadKind;
   consumePeek(): boolean;
   clearReticle?(): void;
   presentation?: {
@@ -50,9 +58,25 @@ export class VehicleActionBarController {
   private readonly view = createVehicleActionBarView();
   private readonly painter: ActionBarPainter;
   private mounted = false;
+  private readonly shadow: ShadowActionBarController | null;
   private readonly horde: HordeActionBarController | null;
 
   constructor(private readonly deps: VehicleBarDeps) {
+    this.shadow =
+      deps.world.shadowWorldQuestAction &&
+      deps.world.worldQuestLog &&
+      deps.world.player &&
+      deps.world.entities
+        ? new ShadowActionBarController(
+            deps.world as ShadowControlWorld,
+            deps.writers,
+            deps.keyLabel,
+            deps.cancelOnEnter,
+            deps.attachTooltip,
+            deps.consumePeek,
+            deps.padKind,
+          )
+        : null;
     this.horde =
       deps.world.worldQuestLog && deps.world.cfg && deps.world.player
         ? new HordeActionBarController(
@@ -131,6 +155,10 @@ export class VehicleActionBarController {
   }
 
   chooseSlot(slot: number): void {
+    if (this.shadow && shadowControlsActive(this.deps.world as ShadowControlWorld)) {
+      shadowChooseSlot(this.deps.world as ShadowControlWorld, slot);
+      return;
+    }
     if (this.deps.world.worldQuestLog && hordeControlsActive(this.deps.world as HordeHudWorld))
       return;
     const action = VEHICLE_ACTION_SLOTS[slot];
@@ -139,6 +167,7 @@ export class VehicleActionBarController {
 
   update(): void {
     this.horde?.update();
+    this.shadow?.update();
     const session = this.deps.world.vehicleSession;
     const writers = this.deps.writers;
     const cues = this.feedback.consume(session);
@@ -195,10 +224,20 @@ export class VehicleActionBarController {
     this.painter.paint(this.view.tick(session, this.aim.activeSlot(), this.deps.keyLabel));
   }
 
-  get blocksPlayerActions(): boolean {
+  /** Action guards read session state without constructing the bar's DOM. */
+  static blocksPlayerActions(
+    world: Pick<IWorldVehicles, 'vehicleSession'> &
+      Partial<Pick<ShadowControlWorld, 'worldQuestLog'>>,
+  ): boolean {
+    const worldQuestLog = world.worldQuestLog;
     return (
-      !!this.deps.world.vehicleSession ||
-      (!!this.deps.world.worldQuestLog && hordeControlsActive(this.deps.world as HordeHudWorld))
+      !!world.vehicleSession ||
+      (!!worldQuestLog &&
+        (shadowControlsActive({ worldQuestLog }) || hordeControlsActive({ worldQuestLog })))
     );
+  }
+
+  get blocksPlayerActions(): boolean {
+    return VehicleActionBarController.blocksPlayerActions(this.deps.world);
   }
 }

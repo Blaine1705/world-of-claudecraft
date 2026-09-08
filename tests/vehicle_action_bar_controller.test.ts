@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import { afterEach, expect, it, vi } from 'vitest';
 import { createCannonEncounter } from '../src/sim/minigames/cannon_encounter';
-import type { VehicleSession } from '../src/sim/types';
+import type { VehicleSession, WorldQuestProgress } from '../src/sim/types';
 import { VehicleActionBarController } from '../src/ui/hud/vehicle/vehicle_action_bar_controller';
 import { makeWriterFacet } from '../src/ui/painter_host';
 
@@ -104,4 +104,31 @@ it('elides unchanged frames, routes all three buttons, and restores normal contr
   expect(controller.aim.isActive()).toBe(false);
   expect(document.body.classList.contains('operating-vehicle')).toBe(false);
   expect(document.getElementById('vehicle-action-bar')!.style.display).toBe('none');
+});
+
+it('checks live temporary action locks without building HUD chrome', () => {
+  const world = {
+    vehicleSession: null as VehicleSession | null,
+    worldQuestLog: new Map<string, WorldQuestProgress>(),
+  };
+  const createElement = vi.spyOn(document, 'createElement');
+  try {
+    expect(VehicleActionBarController.blocksPlayerActions(world)).toBe(false);
+    const entry: WorldQuestProgress = {
+      questId: 'wq_eastbrook_shadow',
+      state: 'active',
+      count: 0,
+      shadow: { phase: 'cloaked', suspicion: 0, cooldown: 0 },
+    };
+    world.worldQuestLog.set(entry.questId, entry);
+    expect(VehicleActionBarController.blocksPlayerActions(world)).toBe(true);
+    if (!entry.shadow) throw new Error('missing shadow');
+    entry.shadow.phase = 'caught';
+    expect(VehicleActionBarController.blocksPlayerActions(world)).toBe(false);
+    world.vehicleSession = { stationId: 'test' } as VehicleSession;
+    expect(VehicleActionBarController.blocksPlayerActions(world)).toBe(true);
+    expect(createElement).not.toHaveBeenCalled();
+  } finally {
+    createElement.mockRestore();
+  }
 });

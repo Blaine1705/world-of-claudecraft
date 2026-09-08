@@ -31,6 +31,11 @@ import { localizeWorldQuestFreightYell, worldQuestFreightSpeakerName } from './w
 import { localizeWorldQuestTraceReaction } from './world_quest_trace_view';
 
 const baseEnTable = {
+  'log.gliderReturn': 'A howling updraft carries you swiftly back up to The Shear!',
+  'log.gliderCountdown': 'Prepare for launch! 3... 2... 1...',
+  'log.gliderLaunch': 'The wind catches your glider! Steer through the rings and touch down in the marked landing zone!',
+  'log.gliderRetry': 'The updraft carries you back to Zephyr. Speak with him to try again.',
+
   'log.deathwardSaves': 'A deathward saves you!',
   'error.lineOfSight': 'Line of sight.',
   'error.notInGroup': 'That ally is not in your group.',
@@ -745,6 +750,7 @@ const baseEnTable = {
   'aura.destructionRuin': 'Ruin',
   'aura.ruinousBrand': 'Ruinous Brand',
   'aura.duskfireClaim': 'Duskfire Claim',
+  'aura.duskweaveCloak': 'Duskweave Cloak',
   'aura.pyreGuardian': 'Pyre Guardian',
   'aura.umbralMastery': 'Umbral Mastery',
   'aura.improvedFear': 'Improved Fear',
@@ -9724,6 +9730,12 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Ruin: 'aura.destructionRuin',
   'Ruinous Brand': 'aura.ruinousBrand',
   'Duskfire Claim': 'aura.duskfireClaim',
+  'Duskweave Cloak': 'aura.duskweaveCloak',
+  'A howling updraft carries you swiftly back up to The Shear!': 'log.gliderReturn',
+  'Prepare for launch! 3... 2... 1...': 'log.gliderCountdown',
+  'The wind catches your glider! Steer through the rings and touch down in the marked landing zone!': 'log.gliderLaunch',
+  'The updraft carries you back to Zephyr. Speak with him to try again.': 'log.gliderRetry',
+
   'Pyre Guardian': 'aura.pyreGuardian',
   'Umbral Mastery': 'aura.umbralMastery',
   'Improved Fear': 'aura.improvedFear',

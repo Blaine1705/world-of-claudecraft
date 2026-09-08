@@ -5675,6 +5675,20 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "exploration",
     "renown": 5,
     "feat": false
+  },
+  {
+    "id": "exp_windrider_slalom",
+    "name": "Windrider Slalom",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "exp_duskweave_dispatches",
+    "name": "Duskweave Dispatches",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
   }
 ];
 

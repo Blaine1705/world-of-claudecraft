@@ -1,3 +1,5 @@
+import { gliderActionsLocked } from '../glider_action_lock';
+import { shadowActionsLocked } from '../shadow_action_lock';
 // Player auto-attack + the melee/ranged white-hit table, extracted from the Sim
 // monolith (C5). This module owns:
 //   - startAutoAttack / stopAutoAttack: the public auto-attack toggle (validate
@@ -126,7 +128,13 @@ function autoAttackWeaponDamageMult(hand: AutoAttackHand): number {
 export function startAutoAttack(ctx: SimContext, pid?: number): void {
   const r = ctx.resolve(pid);
   if (!r) return;
-  if (r.meta.vehicle || hordeActionsLocked(r.meta.worldQuestLog)) return;
+  if (
+    r.meta.vehicle ||
+    hordeActionsLocked(r.meta.worldQuestLog) ||
+    shadowActionsLocked(r.meta.worldQuestLog) ||
+    gliderActionsLocked(r.meta.worldQuestLog)
+  )
+    return;
   const p = r.e;
   if (p.dead) return;
   if (isInStasis(p)) return;

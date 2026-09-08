@@ -44,6 +44,7 @@ function makeInput(userAgent?: string) {
   // drag / mouselook / click-pick may start. False unless a test flips it.
   let cameraLocked = false;
   let cameraMotionLocked = false;
+  let gliderActive = false;
   const canvas = {
     style: { cursor: '' },
     addEventListener: vi.fn((type: string, cb: (event: any) => void) => {
@@ -92,6 +93,7 @@ function makeInput(userAgent?: string) {
     canUseGameKeys: () => gameKeysAllowed,
     isCameraLocked: () => cameraLocked,
     isCameraMotionLocked: () => cameraMotionLocked,
+    isGliderActive: () => gliderActive,
   };
   const input = new Input(canvas as any, cb, new Keybinds());
   return {
@@ -101,6 +103,9 @@ function makeInput(userAgent?: string) {
     documentListeners,
     cb,
     input,
+    setGliderActive: (active: boolean) => {
+      gliderActive = active;
+    },
     setCameraMotionLocked: (locked: boolean) => {
       cameraMotionLocked = locked;
     },
@@ -1655,6 +1660,29 @@ describe('Input camera zoom (issue 1657)', () => {
 // and the steer inside the band is what turns the old on/off plunge into
 // something you can feather.
 describe('Input swim steer from the camera', () => {
+  it('gliding keeps camera pitch out of vertical intent, even while W is held', () => {
+    const { input, windowListeners, setGliderActive } = makeInput();
+    setGliderActive(true);
+    input.applyGamepadLook(0, 1.3 - input.camPitch);
+    expect(input.readMoveInput()).toMatchObject({ dive: false, surface: false, swimSteer: 0 });
+    windowListeners.get('keydown')!({ code: 'KeyW', repeat: false });
+    expect(input.readMoveInput()).toMatchObject({ forward: true, dive: false, surface: false });
+    input.applyGamepadLook(0, -0.4 - input.camPitch);
+    expect(input.readMoveInput()).toMatchObject({ forward: true, dive: false, surface: false });
+    setGliderActive(false);
+    expect(input.readMoveInput().surface).toBe(true);
+  });
+
+  it('gliding still accepts deliberate dive and jump controls', () => {
+    const { input, windowListeners, setGliderActive } = makeInput();
+    setGliderActive(true);
+    windowListeners.get('keydown')!({ code: 'ControlLeft', repeat: false });
+    expect(input.readMoveInput().dive).toBe(true);
+    windowListeners.get('keyup')!({ code: 'ControlLeft' });
+    windowListeners.get('keydown')!({ code: 'Space', repeat: false });
+    expect(input.readMoveInput()).toMatchObject({ jump: true, dive: false });
+  });
+
   it('holds depth at the resting camera pitch', () => {
     const { input } = makeInput();
     expect(input.camPitch).toBe(0.32);

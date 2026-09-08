@@ -16,7 +16,8 @@ export type QuestWorldCommand =
   | { cmd: 'world_quest_puzzle_rotate'; quest: string; tileIndex: number }
   | { cmd: 'world_quest_match3_swap'; quest: string; fromIndex: number; toIndex: number }
   | { cmd: 'world_quest_match3_reset'; quest: string }
-  | { cmd: 'world_quest_accuse'; npcId: number };
+  | { cmd: 'world_quest_accuse'; npcId: number }
+  | { cmd: 'world_quest_shadow'; action: 'pickpocket' | 'leave'; targetId?: number };
 
 /** Cold owner mirrors shared by quest snapshots and world-boss map state. */
 export class QuestWorldWireState {
@@ -64,6 +65,14 @@ export class QuestWorldWireState {
 
   accuseWorldQuestSuspect(npcId: number): void {
     this.sendQuestWorldCommand({ cmd: 'world_quest_accuse', npcId });
+  }
+
+  shadowWorldQuestAction(action: 'pickpocket' | 'leave', targetId?: number): void {
+    this.sendQuestWorldCommand({
+      cmd: 'world_quest_shadow',
+      action,
+      ...(targetId === undefined ? {} : { targetId }),
+    });
   }
 
   worldBossActive(bossId: string): boolean {

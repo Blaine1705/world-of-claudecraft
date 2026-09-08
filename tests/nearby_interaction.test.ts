@@ -617,3 +617,14 @@ describe('tryNearbyInteraction npc reach', () => {
     expect(r.calls).toEqual(['quest:3']);
   });
 });
+
+it('shadow sentries and guards are selected without opening dialogue or stealing on interact', () => {
+  const r = rig([entity({ id: 2146900041, kind: 'npc', templateId: 'shadow_guard_north' })]);
+  expect(interact(r)).toBe(true);
+  expect(r.calls).toEqual(['target:2146900041']);
+});
+it('shadow instructor starts the cloak through the ordinary authoritative interaction', () => {
+  const r = rig([entity({ id: 2146900040, kind: 'npc', templateId: 'shadow_cloak_scout' })]);
+  expect(interact(r)).toBe(true);
+  expect(r.calls).toEqual(['target:2146900040', 'interact']);
+});

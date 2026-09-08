@@ -1,3 +1,5 @@
+import type { IWorld } from '../world_api';
+import { shadowControlsActive } from './shadow_controls';
 // Composition glue between the pad placement mode, the Hud's ground-aim
 // surface, and the per-frame reticle sync, extracted from main.ts (which stays
 // a firewall). Pure math lives in pad_ground_aim.ts; this module only binds it
@@ -36,12 +38,14 @@ type GroundAimWorldFacet = Pick<
 
 export interface PadGroundAimWiringDeps {
   hud: GroundAimHudFacet;
-  world: () => GroundAimWorldFacet & Partial<IWorldVehicles>;
+  world: () => GroundAimWorldFacet & Partial<IWorldVehicles & Pick<IWorld, 'worldQuestLog'>>;
   camYaw: () => number;
   reticleSpeed: () => number;
 }
 
 export function padGroundAimCallbacks(deps: PadGroundAimWiringDeps): {
+  isTemporaryBarActive: () => boolean;
+  onTemporaryBarSlot: (slot: number) => void;
   isVehicleActive: () => boolean;
   onVehicleSlot: (slot: number) => void;
   onVehicleExit: () => void;
@@ -52,6 +56,11 @@ export function padGroundAimCallbacks(deps: PadGroundAimWiringDeps): {
   onGroundAimSnap: (direction: 1 | -1) => void;
 } {
   return {
+    isTemporaryBarActive: () => {
+      const world = deps.world();
+      return !!world.worldQuestLog && shadowControlsActive(world as Pick<IWorld, 'worldQuestLog'>);
+    },
+    onTemporaryBarSlot: (slot) => deps.hud.pressSlot?.(slot),
     isVehicleActive: () => !!deps.world().vehicleSession,
     onVehicleSlot: (slot) => deps.hud.pressSlot?.(slot),
     onVehicleExit: () => deps.world().leaveVehicle?.(),

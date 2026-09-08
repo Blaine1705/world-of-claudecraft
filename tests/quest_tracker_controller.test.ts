@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { QUESTS, WORLD_QUESTS } from '../src/sim/data';
 import { createForgeWorkshop } from '../src/sim/minigames/forge_workshop';
+import { createGliderFlightState, scoreGliderFlight } from '../src/sim/minigames/glider_flight';
 import type { QuestProgress, WorldQuestProgress } from '../src/sim/types';
 import * as questStrip from '../src/ui/hud/quest/quest_strip_controller';
 import { QuestTrackerController } from '../src/ui/hud/quest/quest_tracker_controller';
@@ -399,4 +400,44 @@ describe('QuestTrackerController', () => {
     expect(test.collapsed()).toBe(true);
     expect(test.header.focus).not.toHaveBeenCalled();
   });
+});
+
+it('tracks completed glider replays through flight and result without retaining stale saved medals', () => {
+  const update = vi.fn();
+  const build = vi
+    .spyOn(questStrip, 'buildQuestStrip')
+    .mockReturnValue({ active: () => true, update } as unknown as questStrip.QuestStripController);
+  try {
+    const glider = createGliderFlightState();
+    const questId = 'wq_galecrest_slalom';
+    const entry: WorldQuestProgress = { questId, state: 'completed', count: 1, glider };
+    const rig = harness([], [entry]);
+    for (const phase of ['countdown', 'flying'] as const) {
+      glider.phase = phase;
+      rig.controller.update(0);
+      expect(update.mock.lastCall?.[2]).toBe(questId);
+      expect(update.mock.lastCall?.[0]).toEqual([
+        expect.objectContaining({ id: questId, complete: false }),
+      ]);
+    }
+    glider.phase = 'won';
+    glider.result = scoreGliderFlight(6, 6, 20);
+    rig.controller.update(1);
+    expect(update.mock.lastCall?.[2]).toBeUndefined();
+    expect(update.mock.lastCall?.[0]).toEqual([
+      expect.objectContaining({
+        id: questId,
+        complete: true,
+        objectives: expect.arrayContaining([
+          expect.objectContaining({ label: expect.stringContaining('Gold') }),
+        ]),
+      }),
+    ]);
+    entry.gliderResult = glider.result;
+    delete entry.glider;
+    rig.controller.update(2);
+    expect(update.mock.lastCall?.[0]).toEqual([]);
+  } finally {
+    build.mockRestore();
+  }
 });
