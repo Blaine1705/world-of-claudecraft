@@ -44,7 +44,7 @@ import { isPersistentEngineAura } from '../persistent_aura';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
-import { tickAfflictionAura, tickMaledictGaze } from './affliction';
+import { tickAfflictionAura, tickHexOfViolence, tickMaledictGaze } from './affliction';
 import { isStunned } from './cc';
 import { regenerateRuinOutOfCombat, tickPyreGuardian } from './destruction';
 import { druidEngineOnBleedTick } from './druid_engines';
@@ -304,6 +304,8 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
           tickSacrilegiousMarch(ctx, e, a);
         } else if (a.kind === 'affliction_eye') {
           tickMaledictGaze(ctx, e, a);
+        } else if (a.kind === 'affliction_violence') {
+          tickHexOfViolence(ctx, e, a);
         } else if (a.kind === 'dot') {
           const dotSource = ctx.entities.get(a.sourceId) ?? null;
           let tickDamage = a.value;

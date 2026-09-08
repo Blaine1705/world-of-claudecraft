@@ -23,7 +23,6 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts).
 
-import { computeTalentModifiers } from '../content/talents';
 import { ABILITIES, DELVES, GROUP_XP_BONUS, ITEMS, MOBS } from '../data';
 import * as deedsMod from '../deeds';
 import { recalcPlayerStats } from '../entity';
@@ -65,6 +64,7 @@ import { WORLD_BOSS_CORPSE_SECONDS, worldBossLootContributors } from '../world_b
 import {
   afflictionOnDeath,
   clearAfflictionState,
+  hasAfflictionConsumePushbackImmunity,
   mitigateVicariousSuffering,
   onAfflictionDamage,
 } from './affliction';
@@ -147,7 +147,8 @@ function ignoresDamagePushback(ctx: SimContext, target: Entity, abilityId: strin
   return (
     abilityId === 'ghost_wolf' ||
     ABILITIES[abilityId]?.uninterruptible === true ||
-    ctx.resolvedAbility(abilityId, target.id)?.damagePushbackImmune === true
+    ctx.resolvedAbility(abilityId, target.id)?.damagePushbackImmune === true ||
+    (abilityId === 'drain_life' && hasAfflictionConsumePushbackImmunity(target))
   );
 }
 
