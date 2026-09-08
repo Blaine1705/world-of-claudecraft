@@ -55,7 +55,9 @@ export function decodeGliderState(value: unknown, questId: string): GliderFlight
     speed: row.speed,
     vy: row.vy,
     passedRings: [...row.passedRings],
-    ...(row.recentRingPassed && integer(row.recentRingPassed.id, 1, 100) && integer(row.recentRingPassed.tick, 0, row.tick)
+    ...(row.recentRingPassed &&
+    integer(row.recentRingPassed.id, 1, 100) &&
+    integer(row.recentRingPassed.tick, 0, row.tick)
       ? { recentRingPassed: { id: row.recentRingPassed.id, tick: row.recentRingPassed.tick } }
       : {}),
     ...(result ? { result } : {}),
