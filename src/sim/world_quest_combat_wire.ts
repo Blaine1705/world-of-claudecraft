@@ -13,8 +13,7 @@ export function decodeCombatQuestState(
   )
     return undefined;
   const row = value as WorldQuestCombatState;
-  if (!['ready', 'leaders', 'waves', 'boss', 'failed'].includes(row.phase))
-    return undefined;
+  if (!['ready', 'leaders', 'waves', 'boss', 'failed'].includes(row.phase)) return undefined;
   const bounds = {
     stage: 3,
     kills: 128,
