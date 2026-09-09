@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { COMBAT_QUEST_SITES } from '../src/sim/content/world_quest_combat';
 import { QUESTS, WORLD_QUESTS } from '../src/sim/data';
 import { createForgeWorkshop } from '../src/sim/minigames/forge_workshop';
 import { createGliderFlightState, scoreGliderFlight } from '../src/sim/minigames/glider_flight';
@@ -100,6 +101,49 @@ function harness(entries: QuestProgress[] = [], worldEntries: WorldQuestProgress
 }
 
 describe('QuestTrackerController', () => {
+  it('keeps Highwatch integrity visible despite collapse and updates its authoritative value', () => {
+    const entry: WorldQuestProgress = {
+      questId: COMBAT_QUEST_SITES.find((site) => site.encounterId === 'hold_highwatch')!.questId,
+      state: 'active',
+      count: 0,
+      combat: {
+        phase: 'waves',
+        stage: 1,
+        kills: 0,
+        required: 3,
+        trail: 0,
+        integrity: 25,
+        secondsRemaining: 120,
+      },
+    };
+    const rig = harness(
+      Array.from({ length: 20 }, (_, index) => ({
+        questId: `other_quest_${index}`,
+        state: 'active' as const,
+        counts: [],
+      })),
+      [entry],
+    );
+    rig.setCollapsed(true);
+    rig.controller.update(0);
+    expect(rig.html()).toContain('role="progressbar"');
+    expect(rig.html()).toContain('aria-valuenow="25"');
+    expect(rig.html()).toContain('aria-valuemax="100"');
+    expect(rig.html()).toContain('--quest-progress:25%');
+    expect(rig.html()).toContain('Defenses remaining: 25%');
+    expect(rig.html().indexOf('role="progressbar"')).toBeLessThan(
+      rig.html().indexOf('other_quest_0'),
+    );
+    expect(rig.html()).toContain('<span class="qt-num">21</span>');
+    expect(rig.collapsed()).toBe(true);
+    entry.combat!.integrity = 50;
+    rig.controller.update(1);
+    expect(rig.html()).toContain('aria-valuenow="50"');
+    entry.combat!.phase = 'failed';
+    rig.controller.update(2);
+    expect(rig.html()).not.toContain('role="progressbar"');
+    expect(rig.html()).toContain('aria-expanded="false"');
+  });
   it('releases collapse after forging succeeds while retaining the result row', () => {
     const forging = createForgeWorkshop(42, 100);
     const rig = harness(

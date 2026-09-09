@@ -274,7 +274,7 @@ export class QuestStripController {
       view.hiddenObjectives,
       ...view.objectives.map(
         (o) =>
-          `${o.label}/${o.current}/${o.total}/${o.done ? '1' : '0'}/${o.instruction ? '1' : '0'}`,
+          `${o.label}/${o.current}/${o.total}/${o.done ? '1' : '0'}/${o.instruction ? '1' : '0'}/${o.progressBar ? '1' : '0'}`,
       ),
     ].join('|');
   }
@@ -291,6 +291,9 @@ export class QuestStripController {
           }),
       done: objective.done,
       ...(objective.instruction ? { instruction: true } : {}),
+      ...(objective.progressBar
+        ? { progress: { current: objective.current, total: objective.total } }
+        : {}),
     }));
     const model = {
       visible: view.visible,

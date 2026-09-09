@@ -26,7 +26,7 @@ function setup() {
   });
   sim.resetDay = '2026-09-06';
   sim.chat('/dev shadow');
-  sim.talkToNpc(SHADOW_NPC_ID);
+  sim.startWorldQuest(SHADOW_NPC_ID);
   return sim;
 }
 function tick(sim: Sim, n = 22) {
@@ -60,7 +60,7 @@ describe('Duskweave dispatches world quest', () => {
     expect(hasShadowCloak(sim.player)).toBe(false);
     expect(shadowActionsLocked(sim.worldQuestLog)).toBe(false);
     const earned = sim.xp;
-    sim.talkToNpc(SHADOW_NPC_ID);
+    sim.startWorldQuest(SHADOW_NPC_ID);
     sim.shadowWorldQuestAction('pickpocket', 2146900041);
     tick(sim);
     expect(sim.xp).toBe(earned);
@@ -75,7 +75,7 @@ describe('Duskweave dispatches world quest', () => {
     tick(sim, 14);
     expect(sim.worldQuestLog.get(ID)?.shadow?.phase).toBe('caught');
     expect(hasShadowCloak(sim.player)).toBe(false);
-    sim.talkToNpc(SHADOW_NPC_ID);
+    sim.startWorldQuest(SHADOW_NPC_ID);
     expect(hasShadowCloak(sim.player)).toBe(true);
     near(sim, 2146900041);
     sim.shadowWorldQuestAction('pickpocket', 2146900041);
@@ -132,7 +132,7 @@ describe('Duskweave dispatches world quest', () => {
     safeGuards(sim);
     const pid = sim.addPlayer('warrior', 'Second');
     sim.chat('/dev shadow', pid);
-    sim.talkToNpc(SHADOW_NPC_ID, pid);
+    sim.startWorldQuest(SHADOW_NPC_ID, pid);
     const second = sim.entities.get(pid)!;
     near(sim, 2146900041);
     second.pos = { ...sim.player.pos };
@@ -157,7 +157,7 @@ describe('Duskweave dispatches world quest', () => {
     sim.shadowWorldQuestAction('leave');
     near(sim, SHADOW_NPC_ID);
     sim.player.pos.y += 30;
-    sim.talkToNpc(SHADOW_NPC_ID);
+    sim.startWorldQuest(SHADOW_NPC_ID);
     expect(hasShadowCloak(sim.player)).toBe(false);
   });
 

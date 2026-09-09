@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { isBlocked, resolveMovement } from '../src/sim/colliders';
 import { dealDamage } from '../src/sim/combat/damage';
+import { COMBAT_QUEST_SITES } from '../src/sim/content/world_quest_combat';
 import { SHADOW_GUARDS } from '../src/sim/content/world_quest_shadow';
 import {
   BUILTIN_WORLD,
@@ -210,7 +211,8 @@ describe('world quest content', () => {
     const zoneFrequency = new Map<string, number>();
     for (const quest of WORLD_QUESTS) {
       zoneFrequency.set(quest.zoneId, (zoneFrequency.get(quest.zoneId) ?? 0) + 1);
-      expect(quest.minLevel, quest.id).toBe(10);
+      if (quest.objective.type !== 'combat') expect(quest.minLevel, quest.id).toBe(10);
+      else expect(quest.minLevel, quest.id).toBeGreaterThanOrEqual(14);
       expect(zoneAt(quest.area.x, quest.area.z).id, quest.id).toBe(quest.zoneId);
       if (quest.objective.type === 'kill') {
         const targetMobId = quest.objective.targetMobId;
@@ -333,6 +335,11 @@ describe('world quest content', () => {
       } else if (quest.objective.type === 'investigation') {
         expect(quest.count).toBe(1);
         expect(quest.objective.targetMobId).toBeDefined();
+      } else if (quest.objective.type === 'combat') {
+        const site = COMBAT_QUEST_SITES.find((row) => row.questId === quest.id);
+        expect(site?.encounterId).toBe(quest.objective.encounterId);
+        expect(site?.minLevel).toBe(quest.minLevel);
+        expect(quest.count).toBe(1);
       } else {
         throw new Error(`Unchecked world quest objective ${quest.id}`);
       }
@@ -736,6 +743,12 @@ describe('world quest lifecycle', () => {
       'wq_evergarden_cannon',
       'wq_last_keep_cannon',
     ]);
+    const tenthIds = activeWorldQuestsForCycle('wq3_9').map((quest) => quest.id);
+    expect(tenthIds).toEqual([
+      'wq_thornpeak_warband',
+      'wq_thornpeak_restless_company',
+      'wq_thornpeak_hold_highwatch',
+    ]);
     const allRotatedIds = [
       ...firstIds,
       ...nextIds,
@@ -746,20 +759,22 @@ describe('world quest lifecycle', () => {
       ...seventhIds,
       ...eighthIds,
       ...ninthIds,
+      ...tenthIds,
     ];
     expect(new Set(allRotatedIds)).toEqual(new Set(WORLD_QUESTS.map((quest) => quest.id)));
   });
 
   it('naturally offers every puzzle layout across the full roster and weekly-variant repeat', () => {
-    // Nine three-day rosters and three seven-day variants realign after 189 days.
+    // Ten three-day rosters and three seven-day variants realign after 210 days.
     const variants = new Map<string, Set<number>>();
     const offered = new Set<string>();
-    for (let cycle = 0; cycle < 63; cycle++) {
+    for (let cycle = 0; cycle < 70; cycle++) {
       const cycleId = `wq3_${cycle}`;
       const roster = activeWorldQuestsForCycle(cycleId);
-      expect(roster).toHaveLength(5);
-      expect(new Set(roster.map((quest) => quest.id)).size).toBe(5);
-      expect(activeWorldQuestsForCycle(`wq3_${cycle + 63}`)).toEqual(roster);
+      const expectedSize = cycle % 10 === 9 ? 3 : 5;
+      expect(roster).toHaveLength(expectedSize);
+      expect(new Set(roster.map((quest) => quest.id)).size).toBe(expectedSize);
+      expect(activeWorldQuestsForCycle(`wq3_${cycle + 70}`)).toEqual(roster);
       for (const quest of roster) {
         offered.add(quest.id);
         const count =
@@ -772,7 +787,7 @@ describe('world quest lifecycle', () => {
                 : 0;
         if (!count) continue;
         const variant = worldQuestPuzzleVariantForCycle(cycleId, count);
-        expect(worldQuestPuzzleVariantForCycle(`wq3_${cycle + 63}`, count)).toBe(variant);
+        expect(worldQuestPuzzleVariantForCycle(`wq3_${cycle + 70}`, count)).toBe(variant);
         const seen = variants.get(quest.id) ?? new Set<number>();
         seen.add(variant);
         variants.set(quest.id, seen);
@@ -1156,7 +1171,7 @@ describe('world quest lifecycle', () => {
 
   it.each([
     ['2026-09-15', 2],
-    ['2026-10-03', 1],
+    ['2026-10-21', 1],
   ] as const)(
     'persists and completes the non-default shipwreck layout for %s',
     (resetDay, variant) => {

@@ -1,3 +1,5 @@
+import { COMBAT_QUEST_SITES } from '../src/sim/content/world_quest_combat';
+import { ESCORTS } from '../src/sim/data';
 // @vitest-environment happy-dom
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -808,5 +810,58 @@ describe('investigation quest dialogue', () => {
     progress.investigation.mobId = 500;
     h.controller.refreshIfChanged();
     expect(h.controller.isOpen).toBe(false);
+  });
+});
+
+describe('world quest start briefing', () => {
+  it('opens from the authoritative event and starts only on the explicit button', () => {
+    const site = COMBAT_QUEST_SITES[0];
+    const h = harness(npc(site.npcEntityId, site.npcId));
+    const start = vi.fn();
+    Object.assign(h.world, {
+      worldQuestLog: new Map([
+        [site.questId, { questId: site.questId, state: 'active', count: 0 }],
+      ]),
+      startWorldQuest: start,
+    });
+    h.controller.handleWorldQuestDialogue({
+      type: 'worldQuestStartDialogue',
+      targetId: site.npcEntityId,
+    });
+    const button = h.element.querySelector<HTMLButtonElement>('[data-world-quest-start]');
+    expect(button?.textContent).toBe(t('questUi.worldQuest.start'));
+    expect(start).not.toHaveBeenCalled();
+    expect(h.interact).not.toHaveBeenCalled();
+    button!.click();
+    expect(start).toHaveBeenCalledExactlyOnceWith(site.npcEntityId);
+    expect(h.controller.isOpen).toBe(false);
+  });
+
+  it('closing a caravan briefing leaves the encounter untouched', () => {
+    const escort = Object.values(ESCORTS).find((def) => def.worldQuestId)!;
+    const walker = { ...npc(123, escort.npcMobId), kind: 'mob' } as Entity;
+    const h = harness(walker);
+    const start = vi.fn();
+    Object.assign(h.world, {
+      worldQuestLog: new Map([[escort.worldQuestId!, { state: 'active' }]]),
+      startWorldQuest: start,
+    });
+    h.controller.open(walker.id);
+    expect(h.element.querySelector('[data-world-quest-start]')).not.toBeNull();
+    h.element.querySelector<HTMLButtonElement>('[data-close]')!.click();
+    expect(start).not.toHaveBeenCalled();
+    expect(h.controller.isOpen).toBe(false);
+  });
+
+  it('does not offer an enabled start for an unavailable quest', () => {
+    const site = COMBAT_QUEST_SITES[0];
+    const h = harness(npc(site.npcEntityId, site.npcId));
+    const start = vi.fn();
+    Object.assign(h.world, { worldQuestLog: new Map(), startWorldQuest: start });
+    h.controller.open(site.npcEntityId);
+    const button = h.element.querySelector<HTMLButtonElement>('[data-world-quest-start]')!;
+    expect(button.disabled).toBe(true);
+    button.click();
+    expect(start).not.toHaveBeenCalled();
   });
 });

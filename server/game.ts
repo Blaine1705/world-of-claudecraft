@@ -1381,6 +1381,7 @@ type RememberedChat =
 // changes. The client treats their absence in a record as "unchanged".
 function identityFields(e: Entity): Record<string, unknown> {
   const out: Record<string, unknown> = { k: e.kind, tid: e.templateId, nm: e.name, lv: e.level };
+  if (e.worldQuestCombatRole) out.wqcr = e.worldQuestCombatRole;
   if (e.skinCatalog === 'mech') out.cat = 'mech';
   if (e.skin) out.sk = e.skin;
   // Active rideable mount ('' omitted). This identity field is intentionally
@@ -6834,7 +6835,9 @@ export class GameServer {
         );
         break;
       case 'accept':
-        if (questWire.acceptQuestWire(sim, msg, pid)) this.resyncQuests(session);
+      case 'abandon':
+      case 'qlinkaccept':
+        if (questWire.dispatchQuestWire(sim, msg, pid)) this.resyncQuests(session);
         break;
       case 'tutorial_start':
         // No payload to validate: the sim re-runs every gate (alive, level 1,
@@ -6860,18 +6863,13 @@ export class GameServer {
           this.resyncQuests(session);
         }
         break;
-      case 'abandon':
-        if (questWire.abandonQuestWire(sim, msg, pid)) this.resyncQuests(session);
-        break;
       case 'world_quest_puzzle_rotate':
       case 'world_quest_match3_swap':
       case 'world_quest_match3_reset':
       case 'world_quest_accuse':
+      case 'world_quest_start':
       case 'world_quest_shadow':
         return void questWire.dispatchWorldQuestWire(sim, msg, pid);
-      case 'qlinkaccept':
-        if (questWire.acceptLinkedQuestWire(sim, msg, pid)) this.resyncQuests(session);
-        break;
       case 'equip':
         if (typeof msg.item === 'string') {
           // Accept aimed slots only for real equipment keys; otherwise use the

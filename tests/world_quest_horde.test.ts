@@ -29,7 +29,7 @@ function setup() {
 }
 function start(sim: Sim, pid = sim.playerId) {
   sim.entities.get(pid)!.pos = sim.groundPos(HORDE_NPC_DEF.pos.x, HORDE_NPC_DEF.pos.z + 4);
-  sim.talkToNpc(HORDE_NPC_ID, pid);
+  sim.startWorldQuest(HORDE_NPC_ID, pid);
 }
 function play(sim: Sim, pid = sim.playerId) {
   const meta = sim.meta(pid)!;

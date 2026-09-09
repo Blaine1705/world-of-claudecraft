@@ -50,6 +50,7 @@ export interface QuestStripObjectiveLine {
   text: string;
   done: boolean;
   instruction?: boolean;
+  progress?: { current: number; total: number };
 }
 
 /** Everything the painter renders, all of it already localized. */
@@ -102,6 +103,11 @@ export class QuestStripPainter {
     const d = this.descriptor;
     this.writers.toggleClass(d.root, CLASS_EMPTY, !model.visible);
     if (!model.visible) return;
+    this.writers.toggleClass(
+      d.root,
+      'has-progress',
+      model.objectives.some((line) => line.progress !== undefined),
+    );
 
     this.writers.setText(d.title, model.title);
     this.writers.toggleClass(d.title, CLASS_COMPLETE, model.complete);
@@ -119,6 +125,18 @@ export class QuestStripPainter {
       this.writers.setText(el, line.text);
       this.writers.toggleClass(el, CLASS_DONE, line.done);
       this.writers.toggleClass(el, 'instruction', line.instruction === true);
+      const progress = line.progress;
+      this.writers.toggleClass(el, 'quest-progress', progress !== undefined);
+      this.writers.setAttr(el, 'role', progress ? 'progressbar' : null);
+      this.writers.setAttr(el, 'aria-label', progress ? line.text : null);
+      this.writers.setAttr(el, 'aria-valuemin', progress ? '0' : null);
+      this.writers.setAttr(el, 'aria-valuemax', progress ? String(progress.total) : null);
+      this.writers.setAttr(el, 'aria-valuenow', progress ? String(progress.current) : null);
+      this.writers.setStyleProp(
+        el,
+        '--quest-progress',
+        progress ? `${(progress.current / progress.total) * 100}%` : '0%',
+      );
     }
     this.writers.setText(d.more, model.more);
     this.writers.setDisplay(d.more, model.more === '' ? HIDDEN : SHOWN);

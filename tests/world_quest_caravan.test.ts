@@ -161,6 +161,7 @@ describe('Eastbrook world-quest caravan', () => {
 
     teleport(sim, player(sim, starterPid), wagon.pos.x, wagon.pos.z);
     sim.interact(starterPid);
+    sim.startWorldQuest(wagon.id, starterPid);
     expect(sim.escortRuns.get(ESCORT_ID)?.run).toBeTruthy();
     const initial = { x: wagon.pos.x, z: wagon.pos.z };
     const starterCopper = sim.meta(starterPid)?.copper ?? 0;
@@ -241,6 +242,7 @@ describe('Eastbrook world-quest caravan', () => {
       if (!wagon) throw new Error('Missing active caravan');
       teleport(sim, player(sim, pid), wagon.pos.x, wagon.pos.z);
       sim.interact(pid);
+      sim.startWorldQuest(wagon.id, pid);
       const escortRun = sim.escortRuns.get(ESCORT_ID)?.run;
       if (!escortRun) throw new Error('Missing caravan run');
       escortRun.waypointIndex = 2;

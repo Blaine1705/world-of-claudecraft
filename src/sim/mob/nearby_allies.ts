@@ -17,6 +17,7 @@ export function findNearbyAllies(
   grid.forEachInRadius(mob.pos.x, mob.pos.z, radius, (e) => {
     if (e.kind !== 'mob' || e.dead || e.ownerId !== null) return; // skip players, pets, corpses
     if (e.hostile !== mob.hostile) return; // same-faction mobs only
+    if (e.worldQuestCombatOwnerId !== mob.worldQuestCombatOwnerId) return;
     if (!predicate(e)) return;
     found.push(e);
   });

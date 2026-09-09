@@ -594,7 +594,7 @@ const MONOLITHS: MonolithRow[] = [
     // merge: both parents had already ratcheted for their own work, so
     // the composite is the honest size. Exact count, zero slack.
     // Owner activity keys are emitted by quest_snapshot_wire, outside heavy snapshots.
-    ceiling: 10639,
+    ceiling: 10637,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

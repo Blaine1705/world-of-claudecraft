@@ -1,3 +1,4 @@
+import { COMBAT_QUEST_SITES } from '../sim/content/world_quest_combat';
 import {
   FORGE_INTERACT_RANGE,
   FORGE_NPC_DEF,
@@ -300,6 +301,7 @@ export function handlePickedEntity(
           hud.showError(tSim('error.cantWhileDead'));
           return false;
         } else if (
+          COMBAT_QUEST_SITES.some((site) => site.npcEntityId === e.id) ||
           isWorldQuestTraceInstructor(e.templateId) ||
           e.templateId === FORGE_NPC_DEF.id ||
           e.templateId === HORDE_NPC_DEF.id ||
@@ -390,6 +392,7 @@ export function handlePickedEntity(
       // takes the Spirit Healer res via right-click or the death panel button.
       if (d <= INTERACT_RANGE + 2 && !world.player.dead) {
         if (
+          COMBAT_QUEST_SITES.some((site) => site.npcEntityId === e.id) ||
           isWorldQuestTraceInstructor(e.templateId) ||
           e.templateId === FORGE_NPC_DEF.id ||
           e.templateId === HORDE_NPC_DEF.id ||

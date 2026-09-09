@@ -1986,6 +1986,12 @@
   body.mobile-touch .quest-strip-obj.done {
     color: var(--color-text-success);
   }
+  body.mobile-touch #quest-strip.has-progress .quest-strip-objs {
+    max-height: none;
+  }
+  body.mobile-touch .quest-strip-obj.quest-progress {
+    width: 100%;
+  }
   /* The movement lesson has one actionable instruction, never an ellipsis.
      Wrapping reuses the existing bounded objective band and fixed anchor. */
   body.mobile-touch .quest-strip-obj.instruction {

@@ -153,6 +153,24 @@ function harness(
 }
 
 describe('batched canvas nameplate state', () => {
+  it('shows world quest roles in the overhead name and updates their removal', () => {
+    const target = entity({
+      id: 2,
+      kind: 'mob',
+      templateId: 'wolf',
+      worldQuestCombatRole: 'leader',
+    });
+    const { painter } = harness([target]);
+    painter.update(true);
+    expect(stateOf(painter, 2).name).toMatch(/^\[WQ Leader\] /);
+    target.worldQuestCombatRole = 'boss';
+    painter.update(true);
+    expect(stateOf(painter, 2).name).toMatch(/^\[WQ Boss\] /);
+    target.worldQuestCombatRole = undefined;
+    painter.update(true);
+    expect(stateOf(painter, 2).name).not.toContain('[WQ');
+  });
+
   it('uses one canvas for many entities and creates no per-entity nameplate DOM', () => {
     const targets = [entity({ id: 2 }), entity({ id: 3, name: 'Other' })];
     const { painter, layer } = harness(targets);

@@ -18,6 +18,7 @@ export interface IWorldQuests {
   swapWorldQuestMatch3Tiles(questId: string, fromIndex: number, toIndex: number): void;
   resetWorldQuestMatch3(questId: string): void;
   accuseWorldQuestSuspect(npcId: number): void;
+  startWorldQuest(npcId: number): void;
   shadowWorldQuestAction(action: 'pickpocket' | 'leave', targetId?: number): void;
   acceptLinkedQuest(questId: string, fromPid: number): void;
   // The tutorial greeting's accept button: asks the sim for the ferry ride to

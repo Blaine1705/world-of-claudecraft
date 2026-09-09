@@ -8,6 +8,7 @@ import type {
 } from '../types';
 import { WORLD_QUEST_CANNON, WORLD_QUEST_LAST_KEEP_CANNON } from './vehicle_stations';
 import { WORLD_QUEST_CALLIGRAPHY_QUEST } from './world_quest_calligraphy';
+import { COMBAT_WORLD_QUESTS } from './world_quest_combat';
 import { WORLD_QUEST_FORGING } from './world_quest_forging';
 import { WORLD_QUEST_GLIDER } from './world_quest_glider';
 import { WORLD_QUEST_HORDE } from './world_quest_horde';
@@ -656,6 +657,7 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
   WORLD_QUEST_INVESTIGATION,
   WORLD_QUEST_GLIDER,
   WORLD_QUEST_SHADOW,
+  ...COMBAT_WORLD_QUESTS,
 ];
 
 export const WORLD_QUESTS_BY_ID: Readonly<Record<string, WorldQuestDef>> = Object.fromEntries(

@@ -7,6 +7,7 @@ import { abilityDisplayNameFromSource } from './ability_display_name';
 import { classDisplayName, itemDisplayName, tEntity } from './entity_i18n';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { localizeSimAuraName } from './sim_i18n';
+import { worldQuestCombatRoleName } from './world_quest_combat_role_view';
 import { forgeObjectLabel } from './world_quest_forge_view';
 
 const RESOURCE_LABEL_KEYS: Record<ResourceType, TranslationKey> = {
@@ -122,9 +123,12 @@ export function entityDisplayName(entity: Entity): string {
     return vehicleStationDisplayName(entity.templateId);
   }
   if (entity.kind === 'mob')
-    return entity.ownerId !== null && !isNecromancyUndead(entity)
-      ? (localizeSimAuraName(entity.name) ?? entity.name)
-      : mobDisplayName(entity.templateId);
+    return worldQuestCombatRoleName(
+      entity,
+      entity.ownerId !== null && !isNecromancyUndead(entity)
+        ? (localizeSimAuraName(entity.name) ?? entity.name)
+        : mobDisplayName(entity.templateId),
+    );
   if (entity.kind === 'npc') return npcDisplayName(entity.templateId);
   return entity.name;
 }

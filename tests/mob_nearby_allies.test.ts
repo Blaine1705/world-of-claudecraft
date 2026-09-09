@@ -18,6 +18,16 @@ function mob(id: number, x: number, z: number, opts: Partial<Entity> = {}): Enti
 }
 
 describe('findNearbyAllies', () => {
+  it('keeps event support within the same owner and ambient support outside event runs', () => {
+    const grid = new SpatialGrid();
+    const caster = mob(1, 0, 0, { worldQuestCombatOwnerId: 100 });
+    const ally = mob(2, 1, 0, { worldQuestCombatOwnerId: 100 });
+    const otherRun = mob(3, 1, 0, { worldQuestCombatOwnerId: 200 });
+    const ambient = mob(4, 1, 0);
+    for (const e of [caster, ally, otherRun, ambient]) grid.insert(e);
+    expect(findNearbyAllies(grid, caster, 40).map((e) => e.id)).toEqual([1, 2]);
+    expect(findNearbyAllies(grid, ambient, 40).map((e) => e.id)).toEqual([4]);
+  });
   it('finds same-faction mobs within radius via the grid, matching a brute-force scan', () => {
     const grid = new SpatialGrid();
     const caster = mob(1, 0, 0);

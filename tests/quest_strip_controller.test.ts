@@ -124,6 +124,35 @@ beforeEach(() => {
 });
 
 describe('the quest strip cycles through real pointer events', () => {
+  it('paints and clears accessible hunt progress on reused mobile objective rows', () => {
+    const rig = mountStrip();
+    const hunt = {
+      ...quest('hunt'),
+      objectives: [
+        {
+          label: 'Trail: 25/100. Time remaining: 120s',
+          current: 25,
+          total: 100,
+          instruction: true,
+          progressBar: true,
+        },
+      ],
+    };
+    rig.controller.update([quest('other'), hunt], 0, hunt.id);
+    const bar = rig.objectives[0];
+    expect(bar.getAttribute('role')).toBe('progressbar');
+    expect(bar.getAttribute('aria-valuenow')).toBe('25');
+    expect(bar.getAttribute('aria-valuemax')).toBe('100');
+    expect(bar.style.getPropertyValue('--quest-progress')).toBe('25%');
+    expect(bar.getAttribute('aria-label')).toBe(hunt.objectives[0].label);
+    hunt.objectives[0].current = 50;
+    rig.controller.update([hunt], 1, hunt.id);
+    expect(bar.getAttribute('aria-valuenow')).toBe('50');
+    rig.controller.update([quest('other')], 2);
+    expect(bar.hasAttribute('role')).toBe(false);
+    expect(bar.hasAttribute('aria-valuenow')).toBe(false);
+    expect(bar.classList.contains('quest-progress')).toBe(false);
+  });
   it('focuses a movement lesson and repaints phase instructions without numeric progress', () => {
     const rig = mountStrip();
     const lesson = quest('lesson');

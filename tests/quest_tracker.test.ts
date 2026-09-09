@@ -23,6 +23,20 @@ const QUESTS: TrackedQuest[] = [
 ];
 
 describe('questTrackerView', () => {
+  it('prioritizes the focused quest without renumbering or mutating acceptance order', () => {
+    const view = questTrackerView(QUESTS, false, 'webwood');
+    expect(view.quests.map((quest) => quest.id)).toEqual(['webwood', 'wolves']);
+    expect(view.quests.map((quest) => quest.number)).toEqual([2, 1]);
+    expect(QUESTS.map((quest) => quest.id)).toEqual(['wolves', 'webwood']);
+    expect(questTrackerView(QUESTS, false, 'unknown').quests.map((quest) => quest.id)).toEqual([
+      'wolves',
+      'webwood',
+    ]);
+    expect(questTrackerView(QUESTS, false).quests.map((quest) => quest.id)).toEqual([
+      'wolves',
+      'webwood',
+    ]);
+  });
   it('is hidden when no quests are tracked', () => {
     const v = questTrackerView([], false);
     expect(v.visible).toBe(false);

@@ -55,6 +55,7 @@ function run(state?: CharacterState) {
   const talk = () => {
     sim.targetEntity(WORLD_QUEST_CALLIGRAPHY_NPC_IDS.calligraphy_instructor, pid);
     sim.interact(pid);
+    sim.startWorldQuest(WORLD_QUEST_CALLIGRAPHY_NPC_IDS.calligraphy_instructor, pid);
   };
   const prepare = (shapeIndex: number) => {
     expect(meta.worldQuestLog.get(QUEST_ID)?.tracing).toMatchObject({

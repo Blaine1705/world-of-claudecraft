@@ -9752,6 +9752,37 @@ export const en: EnTranslations = {
       "requiresLevel": "Requires Level {level}"
     },
     "worldQuest": {
+      "start": "Start WQ",
+      "combat": {
+        "roleName": "[WQ {role}] {name}",
+        "role": {
+          "leader": "Leader",
+          "soldier": "Soldier",
+          "captain": "Captain",
+          "wave": "Enemy",
+          "sapper": "Sapper",
+          "boss": "Boss"
+        },
+        "highwatchRule": "Stop sappers before they reach the post.",
+        "warband": {
+          "title": "The Warband Must Fall",
+          "objective": "Defeat the three ogre lieutenants in any order, then their commander."
+        },
+        "restless_company": {
+          "title": "Restless Company",
+          "objective": "Survive three revenant waves. Choose which captain to defeat first, then defeat their commander."
+        },
+        "hold_highwatch": {
+          "title": "Hold Highwatch",
+          "objective": "Defend Highwatch through three assaults, each followed by a recovery pause and sappers. Stop the sappers before they reach the expedition post, then defeat the commander."
+        },
+        "start": "Speak with {npc} at the expedition post to begin.",
+        "failed": "The attempt failed. Speak with the expedition leader to try again.",
+        "boss": "Defeat the final enemy.",
+        "leaders": "Leaders defeated: {count}/{total}",
+        "wave": "Wave {wave}/{total}. Clear the attackers to advance.",
+        "gate": "Defenses remaining: {integrity}%"
+      },
       "title": "{zone}: {target}",
       "unknown": "Unknown world quest ({id})",
       "itemReward": "Item reward: {name}",

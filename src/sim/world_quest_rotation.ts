@@ -7,11 +7,11 @@ import type { WorldQuestDef } from './types';
 
 const WORLD_QUEST_CYCLE_PREFIX = 'wq3_';
 export const WORLD_QUEST_ROTATION_DAYS = 3;
-export const WORLD_QUESTS_PER_ROTATION = 5;
+export const MAX_WORLD_QUESTS_PER_ROTATION = 5;
 
 // Preserve each existing roster and append new variants. Caravan groups swap
 // their own region's slot; calligraphy adds an Eastbrook variant. Selection
-// wraps over every group and still offers five quests per three-day cycle.
+// wraps over every group and offers up to five quests per three-day cycle.
 const WORLD_QUEST_ROTATION_ID_GROUPS = Object.freeze([
   Object.freeze([
     'wq_eastbrook_bandits',
@@ -76,6 +76,11 @@ const WORLD_QUEST_ROTATION_ID_GROUPS = Object.freeze([
     'wq_galecrest_slalom',
     'wq_evergarden_cannon',
     'wq_last_keep_cannon',
+  ]),
+  Object.freeze([
+    'wq_thornpeak_warband',
+    'wq_thornpeak_restless_company',
+    'wq_thornpeak_hold_highwatch',
   ]),
 ]);
 
@@ -147,7 +152,7 @@ export function worldQuestPuzzleVariantForCycle(cycle: unknown, variantCount: nu
   return ((week % variantCount) + variantCount) % variantCount;
 }
 
-/** The five objectives offered by one rotation. No RNG or host clock reads. */
+/** The authored objectives offered by one rotation. No RNG or host clock reads. */
 export function activeWorldQuestsForCycle(cycle: unknown): readonly WorldQuestDef[] {
   const number = worldQuestCycleNumber(cycle);
   if (number === null) return [];

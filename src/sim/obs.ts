@@ -28,6 +28,7 @@ import {
   questObjectiveRequired,
   xpForLevel,
 } from './types';
+import { startNearbyWorldQuest } from './world_quest_start_action';
 
 // ---------------------------------------------------------------------------
 // Discrete action space for RL agents.
@@ -56,6 +57,7 @@ export const ACTIONS = [
   'interact', // loot corpse / pick up object / talk to quest npc
   'stop', // stop moving + stop attacking
   'eat_drink', // consume best food (or water for mana classes) from bags
+  'start_world_quest', // confirm the selected or nearest reachable WQ starter
 ] as const;
 
 export const NUM_ACTIONS = ACTIONS.length;
@@ -103,6 +105,9 @@ export function applyAction(sim: Sim, action: number): void {
       break;
     case 'interact':
       sim.interact();
+      break;
+    case 'start_world_quest':
+      startNearbyWorldQuest(sim);
       break;
     case 'stop':
       sim.stopAutoAttack();

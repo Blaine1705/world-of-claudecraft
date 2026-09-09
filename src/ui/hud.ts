@@ -11492,7 +11492,7 @@ export class Hud {
         this.worldQuestPuzzleWindow.applyEventPresentation(questEvent);
         continue;
       }
-      if (ev.type === 'worldQuestInvestigationDialogue') this.questDialog.open(ev.targetId);
+      this.questDialog.handleWorldQuestDialogue(ev);
       switch (ev.type) {
         case 'damage': {
           const src = sim.entities.get(ev.sourceId);

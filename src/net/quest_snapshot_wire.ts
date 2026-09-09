@@ -3,6 +3,7 @@
 // dropped without throwing or partially replacing the last good mirror.
 
 import type { QuestProgress, WorldQuestProgress } from '../sim/types';
+import { decodeCombatQuestState } from '../sim/world_quest_combat_wire';
 import { decodeForgeState } from '../sim/world_quest_forge_wire';
 import { decodeGliderState } from '../sim/world_quest_glider_wire';
 import { decodeHordeState } from '../sim/world_quest_horde_wire';
@@ -79,10 +80,12 @@ export function applyQuestSelfWire(
             ? decodeShadowState(raw?.shadow, progress.questId)
             : undefined;
         const investigation = decodeInvestigationState(raw?.investigation, progress.questId);
+        const combat = decodeCombatQuestState(raw?.combat, progress.questId);
         return [
           progress.questId,
           {
             ...progress,
+            ...(combat ? { combat } : {}),
             ...(tracing ? { tracing } : {}),
             ...(forging ? { forging } : {}),
             ...(horde ? { horde } : {}),

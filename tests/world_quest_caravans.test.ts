@@ -44,6 +44,11 @@ describe('regional world quest caravans', () => {
       ).toEqual({ kind: 'start', entityId: wagon?.id });
       sim.drainEvents();
       sim.interact();
+      expect(sim.escortRuns.get(def.id)?.run).toBeNull();
+      expect(sim.drainEvents()).toContainEqual(
+        expect.objectContaining({ type: 'worldQuestStartDialogue', targetId: wagon!.id }),
+      );
+      sim.startWorldQuest(wagon!.id);
       expect(sim.escortRuns.get(def.id)?.run).not.toBeNull();
       expect(sim.drainEvents()).toContainEqual(
         expect.objectContaining({
@@ -95,6 +100,7 @@ describe('regional world quest caravans', () => {
       player.prevPos = { ...player.pos };
       sim.tick();
       sim.interact(pid);
+      sim.startWorldQuest([...sim.entities.values()].find((e) => e.templateId === mobId)!.id, pid);
       const state = sim.escortRuns.get(def.id);
       const wagon = [...sim.entities.values()].find((e) => e.templateId === mobId);
       if (!state?.run || !wagon) throw new Error('Run failed to start');

@@ -60,6 +60,7 @@ describe('Arcane Calligraphy deed', () => {
     const begin = () => {
       sim.targetEntity(WORLD_QUEST_CALLIGRAPHY_NPC_IDS.calligraphy_instructor);
       sim.interact();
+      sim.startWorldQuest(WORLD_QUEST_CALLIGRAPHY_NPC_IDS.calligraphy_instructor);
       walk(objective.shapes[0].points[0]);
       for (let i = 0; i < 125; i++) tick();
       expect(meta.worldQuestLog.get(QUEST_ID)?.tracing?.phase).toBe('drawing');
@@ -116,6 +117,7 @@ describe('Arcane Calligraphy deed', () => {
     ).toHaveLength(1);
     sim.chat('/dev calligraphy');
     sim.interact();
+    sim.startWorldQuest(WORLD_QUEST_CALLIGRAPHY_NPC_IDS.calligraphy_instructor);
     for (let i = 0; i < 110; i++) tick();
     expect(meta.renown).toBe(renownBefore + 15);
     expect(

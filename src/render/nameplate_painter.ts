@@ -23,6 +23,7 @@ import { holderTierBadgeDataUrl, holderTierByIndex } from '../ui/holder_tier';
 import { formatNumber, getI18nRevision, t } from '../ui/i18n';
 import { raidMarkerDataUrl } from '../ui/icons';
 import { localizeSimAuraName } from '../ui/sim_i18n';
+import { worldQuestCombatRoleName } from '../ui/world_quest_combat_role_view';
 import { type IWorld, OVERHEAD_EMOTES } from '../world_api';
 
 import { castBarState } from './cast_bar';
@@ -492,10 +493,12 @@ export class NameplatePainter {
     const elite = !!template?.elite;
     const boss = !!template?.boss;
     state.friendlyPet = isFriendlyPet(entity, this.world.entities, this.isHostilePlayer);
-    const mobName =
+    const mobName = worldQuestCombatRoleName(
+      entity,
       entity.ownerId !== null
         ? (localizeSimAuraName(entity.name) ?? entity.name)
-        : mobDisplayName(entity.templateId);
+        : mobDisplayName(entity.templateId),
+    );
     state.name = entity.dead ? t('worldContent.corpseName', { name: mobName }) : mobName;
     state.nameColor = '#fff';
     state.level = entity.dead

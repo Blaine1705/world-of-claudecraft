@@ -114,8 +114,9 @@ describe('headless environment protocol validation', () => {
     for (const cls of ALL_CLASSES) {
       expect(CLASSES[cls].abilities.length).toBeLessThanOrEqual(abilitySlots);
     }
-    // 13 fixed actions (10 move/target + interact/stop/eat_drink) plus the ability slots
-    expect(NUM_ACTIONS).toBe(13 + abilitySlots);
+    // Existing actions retain their indices; WQ confirmation is appended last.
+    expect(ACTIONS.at(-1)).toBe('start_world_quest');
+    expect(NUM_ACTIONS).toBe(14 + abilitySlots);
   });
 
   it('observes Devotion, Ascension, and the real Divine Ascension readiness gate', () => {

@@ -2,6 +2,7 @@
 // sanitizer instead: sim-clock deadlines and partial paths never survive a load.
 import { WORLD_QUESTS_BY_ID } from './content/world_quests';
 import type { WorldQuestProgress, WorldQuestTraceState } from './types';
+import { decodeCombatQuestState } from './world_quest_combat_wire';
 import { decodeForgeState } from './world_quest_forge_wire';
 import { decodeHordeState } from './world_quest_horde_wire';
 import { decodeInvestigationState } from './world_quest_investigation_wire';
@@ -107,6 +108,7 @@ export function worldQuestProgressForWire(progress: WorldQuestProgress): WorldQu
     forging: rawForge,
     horde: rawHorde,
     investigation: rawInvestigation,
+    combat: rawCombat,
     shadow: rawShadow,
     ...base
   } = progress;
@@ -114,10 +116,12 @@ export function worldQuestProgressForWire(progress: WorldQuestProgress): WorldQu
     progress.state === 'active' ? decodeShadowState(rawShadow, progress.questId) : undefined;
   const investigation = decodeInvestigationState(rawInvestigation, progress.questId);
   const horde = decodeHordeState(rawHorde, progress.questId);
+  const combat = decodeCombatQuestState(rawCombat, progress.questId);
   const forging = decodeForgeState(rawForge, progress.questId);
   const tracing = decodeWorldQuestProgressTrace(rawTrace, progress);
   return {
     ...base,
+    ...(combat === undefined ? {} : { combat }),
     ...(investigation === undefined ? {} : { investigation }),
     ...(shadow === undefined ? {} : { shadow }),
     ...(horde === undefined ? {} : { horde }),

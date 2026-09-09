@@ -1,5 +1,6 @@
 import { gliderActionsLocked } from '../glider_action_lock';
 import { hasShadowCloak } from '../shadow_action_lock';
+import { updateCombatQuestSapper } from '../world_quest_combat';
 // Mob locomotion (M2), extracted from the Sim monolith.
 //
 // This module owns the mob-AI locomotion core: the updateMob dispatcher (its
@@ -219,7 +220,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       announceVarkhulDeath(ctx, mob);
       resetVarkhulEncounter(ctx, mob);
     }
-    ctx.onBossDeath(mob);
+    if (mob.worldQuestCombatOwnerId === undefined) ctx.onBossDeath(mob);
     if (
       mob.ownerId !== null &&
       MOBS[mob.templateId]?.family !== 'demon' &&
@@ -503,6 +504,8 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     }
     return;
   }
+
+  if (updateCombatQuestSapper(ctx, mob)) return;
 
   switch (mob.aiState) {
     case 'idle': {

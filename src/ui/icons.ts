@@ -5390,6 +5390,10 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'exp_borrowed_face',
   'exp_windrider_slalom',
   'exp_duskweave_dispatches',
+  // These combat WQs deliberately reuse the exploration crest: no new art assets.
+  'exp_wq_warband',
+  'exp_wq_restless_company',
+  'exp_wq_hold_highwatch',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

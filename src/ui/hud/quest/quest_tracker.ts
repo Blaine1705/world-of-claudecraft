@@ -16,6 +16,8 @@ export interface TrackedObjective {
   total: number;
   /** A movement lesson instruction, shown in full without a numeric suffix. */
   instruction?: boolean;
+  /** Render a labeled live meter using current/total. */
+  progressBar?: boolean;
 }
 
 export interface TrackedQuest {
@@ -57,6 +59,7 @@ export interface QuestTrackerView {
 export function questTrackerView(
   quests: readonly TrackedQuest[],
   collapsed: boolean,
+  focusedQuestId?: string,
 ): QuestTrackerView {
   const count = quests.length;
   if (count === 0) return { visible: false, collapsed, count: 0, quests: [] };
@@ -68,5 +71,9 @@ export function questTrackerView(
     complete: q.complete,
     objectives: q.objectives.map((o) => ({ ...o, done: o.current >= o.total })),
   }));
+  // Live encounter instructions must not sit below a long ordinary quest log.
+  // Only reorder the projected rows; map badges retain their acceptance numbers.
+  const focusIndex = questRows.findIndex((quest) => quest.id === focusedQuestId);
+  if (focusIndex > 0) questRows.unshift(...questRows.splice(focusIndex, 1));
   return { visible: true, collapsed: false, count, quests: questRows };
 }

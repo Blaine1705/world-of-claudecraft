@@ -4,7 +4,17 @@ import { CHRONICLER_TEMPLATE_IDS } from '../../../sim/deeds';
 import { craftsForPairTarget } from '../../../sim/professions/archetype';
 import { professionQuestSelectionTargets } from '../../../sim/quests/profession_quest_effects';
 import { npcQuestMarkerKind, type QuestMarkerKind } from '../../../sim/quests/quest_marker_kind';
-import { dist2d, type Entity, type ItemDef, questObjectiveRequired } from '../../../sim/types';
+import {
+  dist2d,
+  type Entity,
+  type ItemDef,
+  questObjectiveRequired,
+  type SimEvent,
+} from '../../../sim/types';
+import {
+  worldQuestStartAvailable,
+  worldQuestStarterFor,
+} from '../../../sim/world_quest_start_core';
 import type { IWorld } from '../../../world_api';
 import { archetypeTitleText, craftNameText } from '../../char_window';
 import { currencyIconHtml, heroicMarkIconHtml } from '../../currency_art';
@@ -24,6 +34,7 @@ import {
   investigationSignature,
   isInvestigationTarget,
 } from '../../world_quest_investigation_view';
+import { worldQuestDisplayName, worldQuestObjectiveLabel } from '../../world_quest_view';
 import { isStationMasterNpc } from '../vendor/train_view';
 import { isWarfareVendorNpc } from '../vendor/warfare_vendor_view';
 import { gossipMenuIsEmpty } from './gossip_menu';
@@ -101,6 +112,7 @@ interface ProfessionPreviewContent {
 export class QuestDialogController {
   private npcId: number | null = null;
   private investigationSig: string | null = null;
+  private startAvailable: boolean | null = null;
   private detailQuestId: string | null = null;
   // The staleness signature refreshIfChanged watches, as of the last gossip
   // render (null = no gossip list currently painted): the profession-intro
@@ -123,7 +135,8 @@ export class QuestDialogController {
   open(npcId: number): void {
     const world = this.deps.world();
     const npc = world.entities.get(npcId);
-    if (!npc || (npc.kind !== 'npc' && !isInvestigationTarget(npcId))) return;
+    if (!npc || (npc.kind !== 'npc' && !isInvestigationTarget(npcId) && !worldQuestStarterFor(npc)))
+      return;
     if (NPCS[npc.templateId]?.banker) {
       world.targetEntity(npc.id);
       world.interact();
@@ -142,6 +155,14 @@ export class QuestDialogController {
     this.deps.voice.play(`greeting__${npc.templateId}`);
     this.voiceNpcId = npc.id;
     this.renderGossip(npc);
+  }
+
+  handleWorldQuestDialogue(event: SimEvent): void {
+    if (
+      event.type === 'worldQuestStartDialogue' ||
+      event.type === 'worldQuestInvestigationDialogue'
+    )
+      this.open(event.targetId);
   }
 
   openLinked(questId: string, fromPid?: number): void {
@@ -197,6 +218,7 @@ export class QuestDialogController {
   }
 
   close(restoreFocus = true): void {
+    this.startAvailable = null;
     this.deps.element.style.display = 'none';
     this.npcId = null;
     this.detailQuestId = null;
@@ -231,6 +253,17 @@ export class QuestDialogController {
    *  (the dialog holds focus-trapped buttons). */
   refreshIfChanged(): void {
     if (this.npcId === null || this.deps.element.style.display !== 'block') return;
+    if (this.startAvailable !== null) {
+      const world = this.deps.world();
+      const npc = world.entities.get(this.npcId);
+      const quest = npc && worldQuestStarterFor(npc);
+      if (!quest) this.close();
+      else if (
+        worldQuestStartAvailable(quest, world.worldQuestLog?.get(quest.id)) !== this.startAvailable
+      )
+        this.refresh();
+      return;
+    }
     if (this.investigationSig !== null) {
       if (investigationSignature(this.deps.world()) !== this.investigationSig) this.refresh();
       return;
@@ -336,7 +369,8 @@ export class QuestDialogController {
 
   private renderGossip(npc: Entity, closeIfEmpty = false): void {
     const world = this.deps.world();
-    if (this.renderInvestigation(npc)) return;
+    this.startAvailable = null;
+    if (this.renderWorldQuestStart(npc) || this.renderInvestigation(npc)) return;
     this.investigationSig = null;
     const definition = NPCS[npc.templateId];
     const interesting = this.offerableRows(npc);
@@ -727,6 +761,30 @@ export class QuestDialogController {
     if (row && rewardItemId) {
       this.deps.attachTooltip(row, () => this.deps.itemTooltip(ITEMS[rewardItemId]));
     }
+  }
+
+  private renderWorldQuestStart(npc: Entity): boolean {
+    const quest = worldQuestStarterFor(npc);
+    if (!quest) return false;
+    const world = this.deps.world();
+    this.npcId = npc.id;
+    this.detailQuestId = null;
+    this.investigationSig = null;
+    this.lastIntroHintVisible = null;
+    markDialogRoot(this.deps.element, { labelledBy: 'quest-dialog-title' });
+    this.deps.element.innerHTML = `<div class="panel-title"><span id="quest-dialog-title">${esc(worldQuestDisplayName(quest.id))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div><div class="qd-text">${esc(worldQuestObjectiveLabel(quest.id))}</div>`;
+    const start = this.makeButton(t('questUi.worldQuest.start'));
+    start.dataset.worldQuestStart = quest.id;
+    this.startAvailable = worldQuestStartAvailable(quest, world.worldQuestLog?.get(quest.id));
+    start.disabled = !this.startAvailable;
+    start.addEventListener('click', () => {
+      this.close();
+      this.deps.world().startWorldQuest(npc.id);
+    });
+    this.deps.element.appendChild(start);
+    this.bindClose();
+    this.showAndFocus();
+    return true;
   }
 
   private renderInvestigation(target: Entity): boolean {

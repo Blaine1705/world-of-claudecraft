@@ -186,6 +186,7 @@ import {
   parseDesktopWalletHandoffStatus,
 } from './desktop_wallet_handoff';
 import { dungeonEntrySnapshotFacing } from './dungeon_entry_facing';
+import { applyEntityIdentity } from './entity_identity_wire';
 import {
   decodeConsecrations,
   decodeFrostRings,
@@ -2971,10 +2972,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         this.entities.set(w.id, e);
       }
       if (hasIdentity) {
-        e.kind = w.k;
-        e.templateId = w.tid;
-        e.name = w.nm;
-        e.level = w.lv;
+        applyEntityIdentity(e, w);
         e.skin = w.sk ?? 0;
         e.mountKey = w.mnt ?? ''; // active rideable mount ('' dismounted); feeds speed + render
         e.mainhandItemId = w.mh ?? null; // equipped mainhand → held weapon model (render-only)

@@ -215,8 +215,11 @@ describe('v0.36 release-audit Reliquary deed art', () => {
       'exp_borrowed_face',
       'exp_windrider_slalom',
       'exp_duskweave_dispatches',
+      'exp_wq_warband',
+      'exp_wq_restless_company',
+      'exp_wq_hold_highwatch',
     ]);
-    expect(DEED_ORDER).toHaveLength(288);
+    expect(DEED_ORDER).toHaveLength(291);
     expect(DEED_IMAGE_IDS.size).toBe(271);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(

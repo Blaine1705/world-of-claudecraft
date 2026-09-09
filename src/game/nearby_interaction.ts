@@ -1,3 +1,4 @@
+import { COMBAT_QUEST_SITES } from '../sim/content/world_quest_combat';
 import { FORGE_NPC_DEF } from '../sim/content/world_quest_forging';
 import { GLIDER_APPRENTICE_NPC_DEF, GLIDER_NPC_DEF } from '../sim/content/world_quest_glider';
 import { HORDE_NPC_DEF } from '../sim/content/world_quest_horde';
@@ -228,6 +229,7 @@ export function tryNearbyInteraction(
       // directly (it applies The Keeper's Toll).
       hud.requestSpiritHealerResurrect();
     } else if (
+      COMBAT_QUEST_SITES.some((site) => site.npcEntityId === npc.id) ||
       isWorldQuestTraceInstructor(npc.templateId) ||
       npc.templateId === FORGE_NPC_DEF.id ||
       npc.templateId === HORDE_NPC_DEF.id ||

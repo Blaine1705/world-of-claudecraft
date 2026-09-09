@@ -7,6 +7,7 @@ import { equipBestInSlotForDev } from './dev/bis_gear';
 import { applyDevKit } from './dev_kit';
 import { armWorldQuestCannonForDev } from './dev_world_quest_cannon';
 import { armWorldQuestCaravanForDev } from './dev_world_quest_caravan';
+import { armCombatWorldQuestForDev } from './dev_world_quest_combat';
 import { armWorldQuestForgingForDev } from './dev_world_quest_forging';
 import { armWorldQuestGliderForDev } from './dev_world_quest_glider';
 import { armWorldQuestHordeForDev } from './dev_world_quest_horde';
@@ -219,6 +220,12 @@ export function handleDevChat(
   const cannonMatch = /^\/dev\s+cannon(?:\s+(wyrmwatch|last_keep))?\s*$/i.exec(raw);
   if (/^\/dev\s+(?:infiltrator|investigation|amongus)\s*$/i.test(raw)) {
     armWorldQuestInvestigationForDev(ctx, pid);
+    return null;
+  }
+  const combatQuestMatch =
+    /^\/dev\s+wqcombat\s+(warband|restless_company|hold_highwatch)\s*$/i.exec(raw);
+  if (combatQuestMatch) {
+    armCombatWorldQuestForDev(ctx, pid, combatQuestMatch[1].toLowerCase());
     return null;
   }
   const gliderMatch = /^\/dev\s+(?:glider|slalom|windrider)(?:\s+(start))?\s*$/i.exec(raw);

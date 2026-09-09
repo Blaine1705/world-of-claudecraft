@@ -6,6 +6,7 @@ import type { CharacterState } from './character_state';
 import type { PlayerMeta } from './sim';
 import type { Entity, WorldQuestDef, WorldQuestProgress } from './types';
 import { WORLD_BOSSES } from './world_boss';
+import type { CombatQuestRun } from './world_quest_combat';
 
 import {
   activeWorldQuestsForCycle,
@@ -18,6 +19,7 @@ import {
 export { nearbyWorldQuestTraces } from './world_quest_trace_public';
 
 export interface WorldQuestPlayerState {
+  combatWorldQuestRuns: Map<string, CombatQuestRun>;
   worldQuestCycle: string;
   worldQuestLog: Map<string, WorldQuestProgress>;
   /** Session-only cycle override used by focused dev commands; never persisted. */
@@ -35,6 +37,7 @@ export interface WorldQuestRotationCache {
 
 export function freshWorldQuestPlayerState(): WorldQuestPlayerState {
   return {
+    combatWorldQuestRuns: new Map(),
     worldQuestCycle: '',
     worldQuestLog: new Map(),
     devWorldQuestCycle: null,
@@ -85,6 +88,7 @@ export function savedWorldQuestState(
           forging: _forging,
           horde: _horde,
           investigation: _investigation,
+          combat: _combat,
           shadow: _shadow,
           glider: _glider,
           ...progress

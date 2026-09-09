@@ -4247,6 +4247,7 @@ export interface WorldQuestForgeState {
 }
 
 export type WorldQuestObjective =
+  | { type: 'combat'; encounterId: WorldQuestCombatId }
   | { type: 'glider'; instructorNpcId: string; courseId: string }
   | { type: 'investigation'; targetMobId: string }
   | { type: 'shadow'; instructorNpcId: string }
@@ -4316,7 +4317,21 @@ export interface WorldQuestShadowState {
   stealing?: { targetId: number; remaining: number; x: number; z: number };
 }
 
+export type WorldQuestCombatId = 'warband' | 'restless_company' | 'hold_highwatch';
+
+/** Bounded owner readout; encounter entities and timers remain session-only. */
+export interface WorldQuestCombatState {
+  phase: 'ready' | 'leaders' | 'waves' | 'boss' | 'failed';
+  stage: number;
+  kills: number;
+  required: number;
+  trail: number;
+  integrity: number;
+  secondsRemaining: number;
+}
+
 export interface WorldQuestProgress {
+  combat?: WorldQuestCombatState;
   /** Personal borrowed cloak and channel, omitted from saves. */
   shadow?: WorldQuestShadowState;
   /** Personal investigation clues and live summon reference, omitted from saves. */
@@ -5097,6 +5112,9 @@ export interface Entity extends ClientMirroredEntityFields {
    *  this, every killed wave member returned as a permanent orphan spawn and
    *  the run's route accumulated mobs indefinitely. */
   runScoped?: boolean;
+  /** Scripted WQ enemies reuse wild models but never award wild loot or quest credit. */
+  worldQuestCombatOwnerId?: number;
+  worldQuestCombatRole?: 'leader' | 'soldier' | 'captain' | 'wave' | 'sapper' | 'boss';
   respawnTimer: number;
   corpseTimer: number;
   lootFfaTimer: number; // seconds of owner-lock left before tap loot opens to all (FFA); Infinity until rollLoot starts it
@@ -6054,6 +6072,7 @@ export type SimEvent = { pid?: number } & (
   // 'listings' carries the board's posted notices verbatim (guild names and
   // notes are world data, spliced by the client like player names, never
   // translated); a board with nothing posted stays the bare 'empty' shape.
+  | { type: 'worldQuestStartDialogue'; targetId: number }
   | { type: 'worldQuestInvestigationDialogue'; targetId: number }
   | { type: 'noticeboard'; noticeboardId: string; state: 'empty' }
   | {

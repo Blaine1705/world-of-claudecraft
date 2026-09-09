@@ -2,6 +2,20 @@ import type { Sim } from '../src/sim/sim';
 
 type QuestWireMessage = Record<string, unknown>;
 
+/** Accepted ordinary quest intents need an immediate quest readout refresh. */
+export function dispatchQuestWire(sim: Sim, msg: QuestWireMessage, pid: number): boolean {
+  switch (msg.cmd) {
+    case 'accept':
+      return acceptQuestWire(sim, msg, pid);
+    case 'abandon':
+      return abandonQuestWire(sim, msg, pid);
+    case 'qlinkaccept':
+      return acceptLinkedQuestWire(sim, msg, pid);
+    default:
+      return false;
+  }
+}
+
 export function acceptQuestWire(sim: Sim, msg: QuestWireMessage, pid: number): boolean {
   if (typeof msg.quest !== 'string') return false;
   sim.acceptQuest(msg.quest, typeof msg.selection === 'string' ? msg.selection : undefined, pid);
@@ -45,6 +59,11 @@ export function accuseWorldQuestSuspectWire(sim: Sim, msg: QuestWireMessage, pid
     sim.accuseWorldQuestSuspect(msg.npcId, pid);
 }
 
+export function startWorldQuestWire(sim: Sim, msg: QuestWireMessage, pid: number): void {
+  if (typeof msg.npcId === 'number' && Number.isSafeInteger(msg.npcId) && msg.npcId > 0)
+    sim.startWorldQuest(msg.npcId, pid);
+}
+
 export function shadowWorldQuestWire(sim: Sim, msg: QuestWireMessage, pid: number): void {
   if (msg.action !== 'pickpocket' && msg.action !== 'leave') return;
   if (
@@ -59,6 +78,9 @@ export function shadowWorldQuestWire(sim: Sim, msg: QuestWireMessage, pid: numbe
 /** Route the world-quest-only command family outside the server monolith. */
 export function dispatchWorldQuestWire(sim: Sim, msg: QuestWireMessage, pid: number): void {
   switch (msg.cmd) {
+    case 'world_quest_start':
+      startWorldQuestWire(sim, msg, pid);
+      break;
     case 'world_quest_puzzle_rotate':
       rotateWorldQuestPuzzleWire(sim, msg, pid);
       break;

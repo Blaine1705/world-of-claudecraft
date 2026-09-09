@@ -22,6 +22,7 @@
 // in a way the sim itself does not already expose.
 
 import { supportHeightAt } from '../../src/sim/colliders';
+import { COMBAT_QUEST_SITES } from '../../src/sim/content/world_quest_combat';
 import {
   arenaOrigin,
   DELVES,
@@ -6612,6 +6613,85 @@ function worldQuestLifecycle(): Scenario {
   };
 }
 
+function combatWorldQuestShared(): Scenario {
+  return {
+    name: 'combat_world_quest_shared',
+    coverage: [
+      'Start WQ interaction creates the Warband combat run and exact encounter members',
+      'a second player joins the same run without spawning a duplicate encounter',
+      'owner death teardown transfers run and mob ownership to the surviving participant',
+      'surviving participant defeats three leaders, spawns the boss, and earns completion',
+    ],
+    sampleEvery: 1,
+    build: () =>
+      new Sim({
+        seed: WORLD_SEED,
+        playerClass: 'warrior',
+        autoEquip: true,
+        devCommands: true,
+      }),
+    drive(rec: Recorder) {
+      const sim = rec.sim;
+      const site = requireValue(
+        COMBAT_QUEST_SITES.find((candidate) => candidate.encounterId === 'warband'),
+        'Warband combat site',
+      );
+      const owner = sim.player as AnyEntity;
+      const ownerMeta = requireValue(sim.meta(owner.id), 'Warband owner metadata');
+      beef(owner);
+      sim.resetDay = '2026-09-08';
+      sim.chat('/dev wqcombat warband', owner.id);
+      sim.startWorldQuest(site.npcEntityId, owner.id);
+      const run = requireValue(
+        ownerMeta.combatWorldQuestRuns.get(site.questId),
+        'Warband owner run',
+      );
+      rec.track(...run.members.map((member) => member.id));
+      rec.notes.initialMemberCount = run.members.length;
+      rec.snapshot('owner-started');
+
+      const secondId = sim.addPlayer('mage', 'ParitySecond');
+      const second = requireEntity(sim, secondId, 'Warband second player');
+      const secondMeta = requireValue(sim.meta(secondId), 'Warband second-player metadata');
+      beef(second);
+      sim.chat('/dev wqcombat warband', secondId);
+      const memberCountBeforeJoin = run.members.length;
+      sim.startWorldQuest(site.npcEntityId, secondId);
+      rec.notes.sharedRun = secondMeta.combatWorldQuestRuns.get(site.questId) === run;
+      rec.notes.joinAddedMembers = run.members.length - memberCountBeforeJoin;
+      rec.snapshot('second-joined');
+
+      owner.dead = true;
+      updateWorldQuests(sim.ctx, ownerMeta, owner);
+      rec.notes.ownerDetached = !ownerMeta.combatWorldQuestRuns.has(site.questId);
+      rec.notes.ownerTransferred = run.ownerId === secondId;
+      rec.notes.allMembersTransferred = run.members.every(
+        (member) => sim.entities.get(member.id)?.worldQuestCombatOwnerId === secondId,
+      );
+      rec.snapshot('owner-dead-transfer');
+
+      const copperBefore = secondMeta.copper;
+      for (const member of run.members.filter((candidate) => candidate.role === 'leader')) {
+        lethal(sim, second, requireEntity(sim, member.id, 'Warband leader'));
+        updateWorldQuests(sim.ctx, secondMeta, second);
+      }
+      const boss = requireValue(
+        run.members.find((member) => member.role === 'boss'),
+        'Warband commander',
+      );
+      rec.track(boss.id);
+      rec.snapshot('boss-spawned');
+      lethal(sim, second, requireEntity(sim, boss.id, 'Warband commander entity'));
+      updateWorldQuests(sim.ctx, secondMeta, second);
+      rec.notes.survivorCompleted =
+        secondMeta.worldQuestLog.get(site.questId)?.state === 'completed';
+      rec.notes.survivorCopperReward = secondMeta.copper - copperBefore;
+      rec.notes.survivorDeed = secondMeta.deedsEarned.has(site.deedId);
+      rec.snapshot('survivor-completed');
+    },
+  };
+}
+
 export const SCENARIOS: Scenario[] = [
   soloWarrior(),
   soloMage(),
@@ -6694,4 +6774,5 @@ export const SCENARIOS: Scenario[] = [
   ignivarRaidTuning(),
   varkhulRaidTuning(),
   worldQuestLifecycle(),
+  combatWorldQuestShared(),
 ];

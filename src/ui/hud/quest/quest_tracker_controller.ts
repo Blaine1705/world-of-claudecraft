@@ -5,6 +5,7 @@ import { esc } from '../../esc';
 import { formatNumber, t } from '../../i18n';
 import { ownEntry } from '../../known_item';
 import type { PainterHostWriters } from '../../painter_host';
+import { combatQuestTrackedObjectives } from '../../world_quest_combat_view';
 import { forgeInstructionLines } from '../../world_quest_forge_view';
 import { gliderInstructionLines } from '../../world_quest_glider_view';
 import { hordeInstructionLines } from '../../world_quest_horde_view';
@@ -151,7 +152,8 @@ export class QuestTrackerController {
         progress.horde?.phase === 'countdown' ||
         progress.horde?.phase === 'active' ||
         progress.glider?.phase === 'countdown' ||
-        progress.glider?.phase === 'flying'
+        progress.glider?.phase === 'flying' ||
+        (progress.combat && progress.combat.phase !== 'ready' && progress.combat.phase !== 'failed')
       )
         traceQuestId = progress.questId;
       quests.push({
@@ -163,37 +165,39 @@ export class QuestTrackerController {
           progress.glider?.phase !== 'countdown' &&
           progress.glider?.phase !== 'flying',
         objectives:
-          quest.objective.type === 'forging' ||
-          quest.objective.type === 'horde' ||
-          quest.objective.type === 'glider' ||
-          quest.objective.type === 'shadow' ||
-          quest.objective.type === 'investigation'
-            ? (quest.objective.type === 'forging'
-                ? forgeInstructionLines(progress)
-                : quest.objective.type === 'horde'
-                  ? hordeInstructionLines(progress)
-                  : quest.objective.type === 'glider'
-                    ? gliderInstructionLines(progress)
-                    : quest.objective.type === 'shadow'
-                      ? shadowInstructionLines(progress)
-                      : investigationInstructionLines(progress)
-              ).map((label) => ({
-                label,
-                current: 0,
-                total: 1,
-                instruction: true,
-              }))
-            : [
-                {
-                  label:
-                    quest.objective.type === 'tracing'
-                      ? worldQuestTraceProgressInstruction(progress, quest)
-                      : worldQuestObjectiveLabel(progress.questId),
-                  current: Math.min(progress.count, quest.count),
-                  total: quest.count,
-                  ...(quest.objective.type === 'tracing' ? { instruction: true } : {}),
-                },
-              ],
+          quest.objective.type === 'combat'
+            ? combatQuestTrackedObjectives(progress)
+            : quest.objective.type === 'forging' ||
+                quest.objective.type === 'horde' ||
+                quest.objective.type === 'glider' ||
+                quest.objective.type === 'shadow' ||
+                quest.objective.type === 'investigation'
+              ? (quest.objective.type === 'forging'
+                  ? forgeInstructionLines(progress)
+                  : quest.objective.type === 'horde'
+                    ? hordeInstructionLines(progress)
+                    : quest.objective.type === 'glider'
+                      ? gliderInstructionLines(progress)
+                      : quest.objective.type === 'shadow'
+                        ? shadowInstructionLines(progress)
+                        : investigationInstructionLines(progress)
+                ).map((label) => ({
+                  label,
+                  current: 0,
+                  total: 1,
+                  instruction: true,
+                }))
+              : [
+                  {
+                    label:
+                      quest.objective.type === 'tracing'
+                        ? worldQuestTraceProgressInstruction(progress, quest)
+                        : worldQuestObjectiveLabel(progress.questId),
+                    current: Math.min(progress.count, quest.count),
+                    total: quest.count,
+                    ...(quest.objective.type === 'tracing' ? { instruction: true } : {}),
+                  },
+                ],
       });
     }
     if (collapsed && quests.length === 0 && this.deps.settings.available()) {
@@ -208,7 +212,9 @@ export class QuestTrackerController {
       return;
     }
     this.collapseLocked = traceQuestId !== undefined;
-    const html = this.renderHtml(questTrackerView(quests, this.collapseLocked ? false : collapsed));
+    const html = this.renderHtml(
+      questTrackerView(quests, this.collapseLocked ? false : collapsed, traceQuestId),
+    );
     // First update adopts the live DOM as the baseline, so a host that
     // pre-seeded the element (or an empty tracker) still elides the write.
     if (this.lastHtml === null) this.lastHtml = this.deps.element.innerHTML;
@@ -259,7 +265,10 @@ export class QuestTrackerController {
         const text = objective.instruction
           ? objective.label
           : this.progressText(objective.label, objective.current, objective.total);
-        rows += `<div class="qt-obj${objective.done ? ' done' : ''}">- ${esc(text)}</div>`;
+        const meter = objective.progressBar
+          ? ` role="progressbar" aria-label="${esc(text)}" aria-valuemin="0" aria-valuemax="${objective.total}" aria-valuenow="${objective.current}" style="--quest-progress:${(objective.current / objective.total) * 100}%"`
+          : '';
+        rows += `<div class="qt-obj${objective.done ? ' done' : ''}${objective.progressBar ? ' quest-progress' : ''}"${meter}>- ${esc(text)}</div>`;
       }
     }
     return `${header}<div id="qt-list">${rows}</div>`;

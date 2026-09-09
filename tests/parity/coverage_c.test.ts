@@ -908,4 +908,22 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(trace.draws).toBe(0);
     expect(trace.drawDigest).toBe('811c9dc5');
   });
+
+  it('combat_world_quest_shared: joins once, transfers ownership, and rewards the survivor', () => {
+    const rec = run('combat_world_quest_shared');
+    expect(rec.notes.initialMemberCount).toBe(4);
+    expect(rec.notes.sharedRun).toBe(true);
+    expect(rec.notes.joinAddedMembers).toBe(0);
+    expect(rec.notes.ownerDetached).toBe(true);
+    expect(rec.notes.ownerTransferred).toBe(true);
+    expect(rec.notes.allMembersTransferred).toBe(true);
+    expect(rec.notes.survivorCompleted).toBe(true);
+    expect(rec.notes.survivorCopperReward).toBe(2500 + 17 * 175);
+    expect(rec.notes.survivorDeed).toBe(true);
+    expect(
+      (rec.allEvents as Ev[]).some(
+        (event) => event.type === 'worldQuestDone' && event.questId === 'wq_thornpeak_warband',
+      ),
+    ).toBe(true);
+  });
 });

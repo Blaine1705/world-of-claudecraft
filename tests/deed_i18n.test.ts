@@ -62,7 +62,8 @@ describe('deed_i18n English resolution', () => {
     // flawless task carries the 43rd title), Arcane Calligraphy's completion
     // deed (no title), and its Gold-rating deed (the 44th title). Forging,
     // barricade, investigation, glider, and shadow each add one untitled deed.
-    expect(manifest.length).toBe(288 * 2 + 44);
+    // The three combat expeditions also carry no title reward.
+    expect(manifest.length).toBe(291 * 2 + 44);
     expect(manifest.filter((row) => row.field === 'title').length).toBe(44);
     expect(manifest).toContainEqual({
       id: 'prog_veteran',

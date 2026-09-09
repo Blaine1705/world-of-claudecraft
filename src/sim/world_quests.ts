@@ -1,4 +1,7 @@
+export { startWorldQuest } from './world_quest_start';
+
 import { WORLD_QUEST_CALLIGRAPHY_ID } from './content/world_quest_calligraphy';
+import { COMBAT_QUEST_SITES } from './content/world_quest_combat';
 import { FORGE_QUEST_ID } from './content/world_quest_forging';
 import { GLIDER_APPRENTICE_NPC_DEF, GLIDER_QUEST_ID } from './content/world_quest_glider';
 import { HORDE_QUEST_ID } from './content/world_quest_horde';
@@ -25,6 +28,12 @@ import type {
 } from './types';
 import { xpForLevel } from './types';
 import { vehicleStationById } from './vehicle_stations';
+import {
+  clearCombatQuests,
+  onCombatQuestKill,
+  talkToCombatQuest,
+  updateCombatQuests,
+} from './world_quest_combat';
 import {
   dropWorldQuestDeliveryCargo,
   hasWorldQuestDeliveryCargo,
@@ -90,6 +99,7 @@ import {
   updateShadowEncounter,
 } from './world_quest_shadow';
 import { sanitizeShadowCreditedObjects } from './world_quest_shadow_wire';
+import { worldQuestStarterFor, worldQuestStarterInReach } from './world_quest_start_core';
 import {
   sanitizeWorldQuestTraceScores,
   scoreWorldQuestTraceLesson,
@@ -107,8 +117,8 @@ import {
 
 export {
   activeWorldQuestsForCycle,
+  MAX_WORLD_QUESTS_PER_ROTATION,
   WORLD_QUEST_ROTATION_DAYS,
-  WORLD_QUESTS_PER_ROTATION,
   worldQuestCycleForResetDay,
 } from './world_quest_rotation';
 
@@ -224,6 +234,7 @@ function resetCycleIfNeeded(ctx: SimContext, meta: PlayerMeta, resolvedCycle?: s
   cancelGliderForRotation(ctx, meta);
   clearShadowEncounter(ctx, meta);
   clearInvestigationEncounter(ctx, meta);
+  clearCombatQuests(ctx, meta);
   meta.worldQuestCycle = cycle;
   meta.worldQuestLog.clear();
   meta.worldQuestAreas.clear();
@@ -249,6 +260,7 @@ export function hasActiveWorldQuest(meta: PlayerMeta, questId: string): boolean 
 /** Starts every eligible objective whose area the living player enters. */
 export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Entity): void {
   if (player.level < WORLD_QUEST_MIN_LEVEL) {
+    clearCombatQuests(ctx, meta);
     clearShadowEncounter(ctx, meta);
     clearInvestigationEncounter(ctx, meta);
     for (const progress of meta.worldQuestLog.values()) clearForgeWorkshop(meta, progress);
@@ -260,6 +272,11 @@ export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Ent
   const devCycle = meta.devWorldQuestCycle ?? null;
   const cycle = devCycle ?? rotation.cycle;
   resetCycleIfNeeded(ctx, meta, cycle);
+  for (const questId of updateCombatQuests(ctx, meta, player)) {
+    const progress = meta.worldQuestLog.get(questId);
+    if (progress?.state === 'active')
+      creditWorldQuest(ctx, meta, WORLD_QUESTS_BY_ID[questId], progress);
+  }
   updateInvestigationEncounter(ctx, meta, player);
   const shadowProgress = meta.worldQuestLog.get(SHADOW_QUEST_ID);
   if (updateShadowEncounter(ctx, meta, player) && shadowProgress)
@@ -391,9 +408,16 @@ export function talkToWorldQuestInstructor(
   npc: Entity,
   meta: PlayerMeta,
   player: Entity,
+  confirmed = false,
 ): boolean {
+  if (!confirmed && worldQuestStarterFor(npc)) {
+    if (worldQuestStarterInReach(player, npc))
+      ctx.emit({ type: 'worldQuestStartDialogue', targetId: npc.id, pid: meta.entityId });
+    return true;
+  }
   resetCycleIfNeeded(ctx, meta);
   if (talkToInvestigation(ctx, npc, meta, player)) return true;
+  if (talkToCombatQuest(ctx, npc, meta, player)) return true;
   if (npc.templateId === GLIDER_APPRENTICE_NPC_DEF.id) {
     const existing = meta.worldQuestLog.get(GLIDER_QUEST_ID) ?? {
       questId: GLIDER_QUEST_ID,
@@ -512,6 +536,8 @@ function creditWorldQuest(
   meta.counters.questsCompleted++;
   meta.unlockedMilestones.add(claimToken(meta.worldQuestCycle, quest.id));
   awardWorldQuest(ctx, meta, quest);
+  const combatSite = COMBAT_QUEST_SITES.find((site) => site.questId === quest.id);
+  if (combatSite) grantDeed(ctx, meta, combatSite.deedId);
   if (quest.id === SHADOW_QUEST_ID) {
     clearShadowEncounter(ctx, meta);
     grantDeed(ctx, meta, 'exp_duskweave_dispatches');
@@ -599,6 +625,10 @@ export function completeWorldQuestVehicle(
 /** Credits an eligible participant for a target killed inside the active area. */
 export function onMobKilledForWorldQuests(ctx: SimContext, mob: Entity, meta: PlayerMeta): void {
   resetCycleIfNeeded(ctx, meta);
+  onCombatQuestKill(ctx, mob, meta);
+  if (mob.worldQuestCombatOwnerId !== undefined) {
+    return;
+  }
   const player = ctx.entities.get(meta.entityId);
   if (!player || player.dead) return;
   const activeQuests = activeWorldQuestsForCycle(meta.worldQuestCycle);

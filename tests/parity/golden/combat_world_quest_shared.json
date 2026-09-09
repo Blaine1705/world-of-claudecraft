@@ -1,0 +1,2921 @@
+{
+  "scenario": "combat_world_quest_shared",
+  "seed": 20061,
+  "sampleEvery": 1,
+  "ticks": 0,
+  "coverage": [
+    "Start WQ interaction creates the Warband combat run and exact encounter members",
+    "a second player joins the same run without spawning a duplicate encounter",
+    "owner death teardown transfers run and mob ownership to the surviving participant",
+    "surviving participant defeats three leaders, spawns the boss, and earns completion"
+  ],
+  "draws": 0,
+  "drawDigest": "811c9dc5",
+  "frames": [
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 999,
+      "state": "06cbf5e3",
+      "events": "741638a5",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "init",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "bgRating": 1500,
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 994,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          }
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 994
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 5,
+          "hp": 100,
+          "id": 994,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 100,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 1003,
+      "state": "6721bd53",
+      "events": "18aa53f1",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "owner-started",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "bgRating": 1500,
+          "cls": "warrior",
+          "combatWorldQuestRuns": [
+            [
+              "wq_thornpeak_warband",
+              {
+                "integrity": 100,
+                "members": [
+                  {
+                    "id": 999,
+                    "role": "leader"
+                  },
+                  {
+                    "group": 1,
+                    "id": 1000,
+                    "role": "leader"
+                  },
+                  {
+                    "group": 2,
+                    "id": 1001,
+                    "role": "leader"
+                  },
+                  {
+                    "id": 1002,
+                    "role": "soldier"
+                  }
+                ],
+                "nextWaveAt": 3,
+                "ownerId": 994,
+                "participants": [
+                  994
+                ]
+              }
+            ]
+          ],
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "devWorldQuestCycle": "wq3_9",
+          "entityId": 994,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "lifetimeXp": 108800,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
+          "worldQuestCycle": "wq3_9",
+          "worldQuestLog": [
+            [
+              "wq_thornpeak_warband",
+              {
+                "combat": {
+                  "integrity": 100,
+                  "phase": "leaders",
+                  "required": 3,
+                  "secondsRemaining": 600
+                },
+                "questId": "wq_thornpeak_warband",
+                "state": "active"
+              }
+            ]
+          ]
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 110,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 994
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.068,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.068,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 5,
+          "hp": 708,
+          "id": 994,
+          "kind": "player",
+          "level": 17,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 708,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -143,
+            "y": 16.995962,
+            "z": 607
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 36,
+            "armor": 368,
+            "int": 10,
+            "spi": 11,
+            "sta": 55,
+            "str": 55
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": 26.788255,
+          "fiveSecondRule": 99,
+          "hardDespawnTimer": 600,
+          "hostile": true,
+          "hp": 1564,
+          "id": 999,
+          "kind": "mob",
+          "level": 17,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 1564,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -163,
+            "y": 26.788255,
+            "z": 636
+          },
+          "potionCooldownUntil": -1,
+          "pulseTimer": 12,
+          "runScoped": true,
+          "spawnPos": {
+            "x": -163,
+            "y": 26.788255,
+            "z": 636
+          },
+          "stats": {
+            "armor": 448
+          },
+          "summonedAdd": true,
+          "tappedById": 994,
+          "templateId": "warlord_drogmar",
+          "wanderTimer": 600,
+          "weapon": {
+            "max": 104,
+            "min": 66,
+            "speed": 2.6
+          },
+          "worldQuestCombatOwnerId": 994,
+          "worldQuestCombatRole": "leader"
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": 11.662656,
+          "fiveSecondRule": 99,
+          "hardDespawnTimer": 600,
+          "hostile": true,
+          "hp": 3036,
+          "id": 1000,
+          "kind": "mob",
+          "level": 17,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 3036,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -128,
+            "y": 11.662656,
+            "z": 638
+          },
+          "potionCooldownUntil": -1,
+          "pulseTimer": 10,
+          "runScoped": true,
+          "spawnPos": {
+            "x": -128,
+            "y": 11.662656,
+            "z": 638
+          },
+          "stats": {
+            "armor": 480
+          },
+          "summonedAdd": true,
+          "tappedById": 994,
+          "templateId": "brutok_skullsmasher",
+          "wanderTimer": 600,
+          "weapon": {
+            "max": 138,
+            "min": 88,
+            "speed": 2.7
+          },
+          "worldQuestCombatOwnerId": 994,
+          "worldQuestCombatRole": "leader"
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": 12.985336,
+          "fiveSecondRule": 99,
+          "hardDespawnTimer": 600,
+          "hostile": true,
+          "hp": 994,
+          "id": 1001,
+          "kind": "mob",
+          "level": 17,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 994,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -145,
+            "y": 12.985336,
+            "z": 656
+          },
+          "potionCooldownUntil": -1,
+          "runScoped": true,
+          "spawnPos": {
+            "x": -145,
+            "y": 12.985336,
+            "z": 656
+          },
+          "stats": {
+            "armor": 384
+          },
+          "summonedAdd": true,
+          "tappedById": 994,
+          "templateId": "ogre_crusher",
+          "wanderTimer": 600,
+          "weapon": {
+            "max": 99,
+            "min": 63,
+            "speed": 2.6
+          },
+          "worldQuestCombatOwnerId": 994,
+          "worldQuestCombatRole": "leader"
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": 24.227921,
+          "fiveSecondRule": 99,
+          "hardDespawnTimer": 600,
+          "hostile": true,
+          "hp": 304,
+          "id": 1002,
+          "kind": "mob",
+          "level": 17,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 304,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -159,
+            "y": 24.227921,
+            "z": 638
+          },
+          "potionCooldownUntil": -1,
+          "runScoped": true,
+          "spawnPos": {
+            "x": -159,
+            "y": 24.227921,
+            "z": 638
+          },
+          "stats": {
+            "armor": 352
+          },
+          "summonedAdd": true,
+          "tappedById": 994,
+          "templateId": "thornpeak_ogre",
+          "wanderTimer": 600,
+          "weapon": {
+            "max": 66,
+            "min": 42,
+            "speed": 2.6
+          },
+          "worldQuestCombatOwnerId": 994,
+          "worldQuestCombatRole": "soldier"
+        }
+      ]
+    },
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 1004,
+      "state": "8e1710fd",
+      "events": "e3fb945d",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "second-joined",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "bgRating": 1500,
+          "cls": "warrior",
+          "combatWorldQuestRuns": [
+            [
+              "wq_thornpeak_warband",
+              {
+                "integrity": 100,
+                "members": [
+                  {
+                    "id": 999,
+                    "role": "leader"
+                  },
+                  {
+                    "group": 1,
+                    "id": 1000,
+                    "role": "leader"
+                  },
+                  {
+                    "group": 2,
+                    "id": 1001,
+                    "role": "leader"
+                  },
+                  {
+                    "id": 1002,
+                    "role": "soldier"
+                  }
+                ],
+                "nextWaveAt": 3,
+                "ownerId": 994,
+                "participants": [
+                  994,
+                  1003
+                ]
+              }
+            ]
+          ],
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "devWorldQuestCycle": "wq3_9",
+          "entityId": 994,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "lifetimeXp": 108800,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
+          "worldQuestCycle": "wq3_9",
+          "worldQuestLog": [
+            [
+              "wq_thornpeak_warband",
+              {
+                "combat": {
+                  "integrity": 100,
+                  "phase": "leaders",
+                  "required": 3,
+                  "secondsRemaining": 600
+                },
+                "questId": "wq_thornpeak_warband",
+                "state": "active"
+              }
+            ]
+          ]
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "bgRating": 1500,
+          "cls": "mage",
+          "combatWorldQuestRuns": [
+            [
+              "wq_thornpeak_warband",
+              {
+                "integrity": 100,
+                "members": [
+                  {
+                    "id": 999,
+                    "role": "leader"
+                  },
+                  {
+                    "group": 1,
+                    "id": 1000,
+                    "role": "leader"
+                  },
+                  {
+                    "group": 2,
+                    "id": 1001,
+                    "role": "leader"
+                  },
+                  {
+                    "id": 1002,
+                    "role": "soldier"
+                  }
+                ],
+                "nextWaveAt": 3,
+                "ownerId": 994,
+                "participants": [
+                  994,
+                  1003
+                ]
+              }
+            ]
+          ],
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "devWorldQuestCycle": "wq3_9",
+          "entityId": 1003,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "lifetimeXp": 108800,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
+          "worldQuestCycle": "wq3_9",
+          "worldQuestLog": [
+            [
+              "wq_thornpeak_warband",
+              {
+                "combat": {
+                  "integrity": 100,
+                  "phase": "leaders",
+                  "required": 3,
+                  "secondsRemaining": 600
+                },
+                "questId": "wq_thornpeak_warband",
+                "state": "active"
+              }
+            ]
+          ]
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 110,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 994
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.068,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.068,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 5,
+          "hp": 708,
+          "id": 994,
+          "kind": "player",
+          "level": 17,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 708,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -143,
+            "y": 16.995962,
+            "z": 607
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 36,
+            "armor": 368,
+            "int": 10,
+            "spi": 11,
+            "sta": 55,
+            "str": 55
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": 26.788255,
+          "fiveSecondRule": 99,
+          "hardDespawnTimer": 600,
+          "hostile": true,
+          "hp": 1564,
+          "id": 999,
+          "kind": "mob",
+          "level": 17,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 1564,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -163,
+            "y": 26.788255,
+            "z": 636
+          },
+          "potionCooldownUntil": -1,
+          "pulseTimer": 12,
+          "runScoped": true,
+          "spawnPos": {
+            "x": -163,
+            "y": 26.788255,
+            "z": 636
+          },
+          "stats": {
+            "armor": 448
+          },
+          "summonedAdd": true,
+          "tappedById": 994,
+          "templateId": "warlord_drogmar",
+          "wanderTimer": 600,
+          "weapon": {
+            "max": 104,
+            "min": 66,
+            "speed": 2.6
+          },
+          "worldQuestCombatOwnerId": 994,
+          "worldQuestCombatRole": "leader"
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": 11.662656,
+          "fiveSecondRule": 99,
+          "hardDespawnTimer": 600,
+          "hostile": true,
+          "hp": 3036,
+          "id": 1000,
+          "kind": "mob",
+          "level": 17,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 3036,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -128,
+            "y": 11.662656,
+            "z": 638
+          },
+          "potionCooldownUntil": -1,
+          "pulseTimer": 10,
+          "runScoped": true,
+          "spawnPos": {
+            "x": -128,
+            "y": 11.662656,
+            "z": 638
+          },
+          "stats": {
+            "armor": 480
+          },
+          "summonedAdd": true,
+          "tappedById": 994,
+          "templateId": "brutok_skullsmasher",
+          "wanderTimer": 600,
+          "weapon": {
+            "max": 138,
+            "min": 88,
+            "speed": 2.7
+          },
+          "worldQuestCombatOwnerId": 994,
+          "worldQuestCombatRole": "leader"
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": 12.985336,
+          "fiveSecondRule": 99,
+          "hardDespawnTimer": 600,
+          "hostile": true,
+          "hp": 994,
+          "id": 1001,
+          "kind": "mob",
+          "level": 17,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 994,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -145,
+            "y": 12.985336,
+            "z": 656
+          },
+          "potionCooldownUntil": -1,
+          "runScoped": true,
+          "spawnPos": {
+            "x": -145,
+            "y": 12.985336,
+            "z": 656
+          },
+          "stats": {
+            "armor": 384
+          },
+          "summonedAdd": true,
+          "tappedById": 994,
+          "templateId": "ogre_crusher",
+          "wanderTimer": 600,
+          "weapon": {
+            "max": 99,
+            "min": 63,
+            "speed": 2.6
+          },
+          "worldQuestCombatOwnerId": 994,
+          "worldQuestCombatRole": "leader"
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": 24.227921,
+          "fiveSecondRule": 99,
+          "hardDespawnTimer": 600,
+          "hostile": true,
+          "hp": 304,
+          "id": 1002,
+          "kind": "mob",
+          "level": 17,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 304,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -159,
+            "y": 24.227921,
+            "z": 638
+          },
+          "potionCooldownUntil": -1,
+          "runScoped": true,
+          "spawnPos": {
+            "x": -159,
+            "y": 24.227921,
+            "z": 638
+          },
+          "stats": {
+            "armor": 352
+          },
+          "summonedAdd": true,
+          "tappedById": 994,
+          "templateId": "thornpeak_ogre",
+          "wanderTimer": 600,
+          "weapon": {
+            "max": 66,
+            "min": 42,
+            "speed": 2.6
+          },
+          "worldQuestCombatOwnerId": 994,
+          "worldQuestCombatRole": "soldier"
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 37,
+          "hp": 352,
+          "id": 1003,
+          "kind": "player",
+          "level": 17,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 352,
+          "maxResource": 1299,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -143,
+            "y": 16.995962,
+            "z": 607
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1299,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 37,
+          "stats": {
+            "agi": 12,
+            "armor": 121,
+            "int": 73,
+            "spi": 54,
+            "sta": 30,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        }
+      ]
+    },
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 1004,
+      "state": "097d1414",
+      "events": "741638a5",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "owner-dead-transfer",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "bgRating": 1500,
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "devWorldQuestCycle": "wq3_9",
+          "entityId": 994,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "lifetimeXp": 108800,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
+          "worldQuestCycle": "wq3_9",
+          "worldQuestLog": [
+            [
+              "wq_thornpeak_warband",
+              {
+                "combat": {
+                  "integrity": 100,
+                  "phase": "failed"
+                },
+                "questId": "wq_thornpeak_warband",
+                "state": "active"
+              }
+            ]
+          ]
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "bgRating": 1500,
+          "cls": "mage",
+          "combatWorldQuestRuns": [
+            [
+              "wq_thornpeak_warband",
+              {
+                "integrity": 100,
+                "members": [
+                  {
+                    "id": 999,
+                    "role": "leader"
+                  },
+                  {
+                    "group": 1,
+                    "id": 1000,
+                    "role": "leader"
+                  },
+                  {
+                    "group": 2,
+                    "id": 1001,
+                    "role": "leader"
+                  },
+                  {
+                    "id": 1002,
+                    "role": "soldier"
+                  }
+                ],
+                "nextWaveAt": 3,
+                "ownerId": 1003,
+                "participants": [
+                  1003
+                ]
+              }
+            ]
+          ],
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "devWorldQuestCycle": "wq3_9",
+          "entityId": 1003,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "lifetimeXp": 108800,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
+          "worldQuestCycle": "wq3_9",
+          "worldQuestLog": [
+            [
+              "wq_thornpeak_warband",
+              {
+                "combat": {
+                  "integrity": 100,
+                  "phase": "leaders",
+                  "required": 3,
+                  "secondsRemaining": 600
+                },
+                "questId": "wq_thornpeak_warband",
+                "state": "active"
+              }
+            ]
+          ]
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 110,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 994
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.068,
+          "dead": true,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.068,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 5,
+          "hp": 708,
+          "id": 994,
+          "kind": "player",
+          "level": 17,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 708,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -143,
+            "y": 16.995962,
+            "z": 607
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 36,
+            "armor": 368,
+            "int": 10,
+            "spi": 11,
+            "sta": 55,
+            "str": 55
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": 26.788255,
+          "fiveSecondRule": 99,
+          "hardDespawnTimer": 600,
+          "hostile": true,
+          "hp": 1564,
+          "id": 999,
+          "kind": "mob",
+          "level": 17,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 1564,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -163,
+            "y": 26.788255,
+            "z": 636
+          },
+          "potionCooldownUntil": -1,
+          "pulseTimer": 12,
+          "runScoped": true,
+          "spawnPos": {
+            "x": -163,
+            "y": 26.788255,
+            "z": 636
+          },
+          "stats": {
+            "armor": 448
+          },
+          "summonedAdd": true,
+          "tappedById": 1003,
+          "templateId": "warlord_drogmar",
+          "wanderTimer": 600,
+          "weapon": {
+            "max": 104,
+            "min": 66,
+            "speed": 2.6
+          },
+          "worldQuestCombatOwnerId": 1003,
+          "worldQuestCombatRole": "leader"
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": 11.662656,
+          "fiveSecondRule": 99,
+          "hardDespawnTimer": 600,
+          "hostile": true,
+          "hp": 3036,
+          "id": 1000,
+          "kind": "mob",
+          "level": 17,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 3036,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -128,
+            "y": 11.662656,
+            "z": 638
+          },
+          "potionCooldownUntil": -1,
+          "pulseTimer": 10,
+          "runScoped": true,
+          "spawnPos": {
+            "x": -128,
+            "y": 11.662656,
+            "z": 638
+          },
+          "stats": {
+            "armor": 480
+          },
+          "summonedAdd": true,
+          "tappedById": 1003,
+          "templateId": "brutok_skullsmasher",
+          "wanderTimer": 600,
+          "weapon": {
+            "max": 138,
+            "min": 88,
+            "speed": 2.7
+          },
+          "worldQuestCombatOwnerId": 1003,
+          "worldQuestCombatRole": "leader"
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": 12.985336,
+          "fiveSecondRule": 99,
+          "hardDespawnTimer": 600,
+          "hostile": true,
+          "hp": 994,
+          "id": 1001,
+          "kind": "mob",
+          "level": 17,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 994,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -145,
+            "y": 12.985336,
+            "z": 656
+          },
+          "potionCooldownUntil": -1,
+          "runScoped": true,
+          "spawnPos": {
+            "x": -145,
+            "y": 12.985336,
+            "z": 656
+          },
+          "stats": {
+            "armor": 384
+          },
+          "summonedAdd": true,
+          "tappedById": 1003,
+          "templateId": "ogre_crusher",
+          "wanderTimer": 600,
+          "weapon": {
+            "max": 99,
+            "min": 63,
+            "speed": 2.6
+          },
+          "worldQuestCombatOwnerId": 1003,
+          "worldQuestCombatRole": "leader"
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": 24.227921,
+          "fiveSecondRule": 99,
+          "hardDespawnTimer": 600,
+          "hostile": true,
+          "hp": 304,
+          "id": 1002,
+          "kind": "mob",
+          "level": 17,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 304,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -159,
+            "y": 24.227921,
+            "z": 638
+          },
+          "potionCooldownUntil": -1,
+          "runScoped": true,
+          "spawnPos": {
+            "x": -159,
+            "y": 24.227921,
+            "z": 638
+          },
+          "stats": {
+            "armor": 352
+          },
+          "summonedAdd": true,
+          "tappedById": 1003,
+          "templateId": "thornpeak_ogre",
+          "wanderTimer": 600,
+          "weapon": {
+            "max": 66,
+            "min": 42,
+            "speed": 2.6
+          },
+          "worldQuestCombatOwnerId": 1003,
+          "worldQuestCombatRole": "soldier"
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 37,
+          "hp": 352,
+          "id": 1003,
+          "kind": "player",
+          "level": 17,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 352,
+          "maxResource": 1299,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -143,
+            "y": 16.995962,
+            "z": 607
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1299,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 37,
+          "stats": {
+            "agi": 12,
+            "armor": 121,
+            "int": 73,
+            "spi": 54,
+            "sta": 30,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        }
+      ]
+    },
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 1005,
+      "state": "e354095c",
+      "events": "6a9baa0c",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "boss-spawned",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "bgRating": 1500,
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "devWorldQuestCycle": "wq3_9",
+          "entityId": 994,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "lifetimeXp": 108800,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
+          "worldQuestCycle": "wq3_9",
+          "worldQuestLog": [
+            [
+              "wq_thornpeak_warband",
+              {
+                "combat": {
+                  "integrity": 100,
+                  "phase": "failed"
+                },
+                "questId": "wq_thornpeak_warband",
+                "state": "active"
+              }
+            ]
+          ]
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "bgRating": 1500,
+          "cls": "mage",
+          "combatWorldQuestRuns": [
+            [
+              "wq_thornpeak_warband",
+              {
+                "integrity": 100,
+                "members": [
+                  {
+                    "defeated": true,
+                    "id": 999,
+                    "role": "leader"
+                  },
+                  {
+                    "defeated": true,
+                    "group": 1,
+                    "id": 1000,
+                    "role": "leader"
+                  },
+                  {
+                    "defeated": true,
+                    "group": 2,
+                    "id": 1001,
+                    "role": "leader"
+                  },
+                  {
+                    "id": 1002,
+                    "role": "soldier"
+                  },
+                  {
+                    "id": 1004,
+                    "role": "boss"
+                  }
+                ],
+                "nextWaveAt": 3,
+                "ownerId": 1003,
+                "participants": [
+                  1003
+                ]
+              }
+            ]
+          ],
+          "companionUpgrades": {},
+          "counters": {
+            "damageDealt": 8594,
+            "kills": 3
+          },
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 8594
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "devWorldQuestCycle": "wq3_9",
+          "entityId": 1003,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "lifetimeXp": 108800,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
+          "worldQuestCycle": "wq3_9",
+          "worldQuestLog": [
+            [
+              "wq_thornpeak_warband",
+              {
+                "combat": {
+                  "integrity": 100,
+                  "kills": 3,
+                  "phase": "boss",
+                  "required": 3,
+                  "secondsRemaining": 600
+                },
+                "questId": "wq_thornpeak_warband",
+                "state": "active"
+              }
+            ]
+          ]
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 110,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 994
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.068,
+          "dead": true,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.068,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 5,
+          "hp": 708,
+          "id": 994,
+          "kind": "player",
+          "level": 17,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 708,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -143,
+            "y": 16.995962,
+            "z": 607
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 36,
+            "armor": 368,
+            "int": 10,
+            "spi": 11,
+            "sta": 55,
+            "str": 55
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "dead",
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "dead": true,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": 26.788255,
+          "fiveSecondRule": 99,
+          "hardDespawnTimer": 600,
+          "hostile": true,
+          "id": 999,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": -163,
+            "y": 26.788255,
+            "z": 636
+          },
+          "level": 17,
+          "lootFfaTimer": "Infinity",
+          "lootRecipientIds": [
+            1003
+          ],
+          "maxHp": 1564,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -163,
+            "y": 26.788255,
+            "z": 636
+          },
+          "potionCooldownUntil": -1,
+          "pulseTimer": 12,
+          "respawnTimer": "Infinity",
+          "runScoped": true,
+          "spawnPos": {
+            "x": -163,
+            "y": 26.788255,
+            "z": 636
+          },
+          "stats": {
+            "armor": 448
+          },
+          "summonedAdd": true,
+          "tappedById": 1003,
+          "templateId": "warlord_drogmar",
+          "wanderTimer": 600,
+          "weapon": {
+            "max": 104,
+            "min": 66,
+            "speed": 2.6
+          },
+          "worldQuestCombatOwnerId": 1003,
+          "worldQuestCombatRole": "leader"
+        },
+        {
+          "aiState": "dead",
+          "bossDamagers": [
+            1003
+          ],
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "dead": true,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": 11.662656,
+          "fiveSecondRule": 99,
+          "hardDespawnTimer": 600,
+          "hostile": true,
+          "id": 1000,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": -128,
+            "y": 11.662656,
+            "z": 638
+          },
+          "level": 17,
+          "lootFfaTimer": "Infinity",
+          "lootRecipientIds": [
+            1003
+          ],
+          "maxHp": 3036,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -128,
+            "y": 11.662656,
+            "z": 638
+          },
+          "potionCooldownUntil": -1,
+          "pulseTimer": 10,
+          "respawnTimer": "Infinity",
+          "runScoped": true,
+          "spawnPos": {
+            "x": -128,
+            "y": 11.662656,
+            "z": 638
+          },
+          "stats": {
+            "armor": 480
+          },
+          "summonedAdd": true,
+          "tappedById": 1003,
+          "templateId": "brutok_skullsmasher",
+          "wanderTimer": 600,
+          "weapon": {
+            "max": 138,
+            "min": 88,
+            "speed": 2.7
+          },
+          "worldQuestCombatOwnerId": 1003,
+          "worldQuestCombatRole": "leader"
+        },
+        {
+          "aiState": "dead",
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "dead": true,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": 12.985336,
+          "fiveSecondRule": 99,
+          "hardDespawnTimer": 600,
+          "hostile": true,
+          "id": 1001,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": -145,
+            "y": 12.985336,
+            "z": 656
+          },
+          "level": 17,
+          "lootFfaTimer": "Infinity",
+          "lootRecipientIds": [
+            1003
+          ],
+          "maxHp": 994,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -145,
+            "y": 12.985336,
+            "z": 656
+          },
+          "potionCooldownUntil": -1,
+          "respawnTimer": "Infinity",
+          "runScoped": true,
+          "spawnPos": {
+            "x": -145,
+            "y": 12.985336,
+            "z": 656
+          },
+          "stats": {
+            "armor": 384
+          },
+          "summonedAdd": true,
+          "tappedById": 1003,
+          "templateId": "ogre_crusher",
+          "wanderTimer": 600,
+          "weapon": {
+            "max": 99,
+            "min": 63,
+            "speed": 2.6
+          },
+          "worldQuestCombatOwnerId": 1003,
+          "worldQuestCombatRole": "leader"
+        },
+        {
+          "aiState": "idle",
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": 24.227921,
+          "fiveSecondRule": 99,
+          "hardDespawnTimer": 600,
+          "hostile": true,
+          "hp": 304,
+          "id": 1002,
+          "kind": "mob",
+          "level": 17,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 304,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -159,
+            "y": 24.227921,
+            "z": 638
+          },
+          "potionCooldownUntil": -1,
+          "runScoped": true,
+          "spawnPos": {
+            "x": -159,
+            "y": 24.227921,
+            "z": 638
+          },
+          "stats": {
+            "armor": 352
+          },
+          "summonedAdd": true,
+          "tappedById": 1003,
+          "templateId": "thornpeak_ogre",
+          "wanderTimer": 600,
+          "weapon": {
+            "max": 66,
+            "min": 42,
+            "speed": 2.6
+          },
+          "worldQuestCombatOwnerId": 1003,
+          "worldQuestCombatRole": "soldier"
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 37,
+          "hp": 352,
+          "id": 1003,
+          "inCombat": true,
+          "kind": "player",
+          "level": 17,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 352,
+          "maxResource": 1299,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -143,
+            "y": 16.995962,
+            "z": 607
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1299,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 37,
+          "stats": {
+            "agi": 12,
+            "armor": 121,
+            "int": 73,
+            "spi": 54,
+            "sta": 30,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        },
+        {
+          "aggroTargetId": 1003,
+          "aiState": "chase",
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.05,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.05,
+          "fallStartY": 14.208403,
+          "fiveSecondRule": 99,
+          "hardDespawnTimer": 600,
+          "hostile": true,
+          "hp": 1564,
+          "id": 1004,
+          "inCombat": true,
+          "kind": "mob",
+          "leashAnchor": {
+            "x": -145,
+            "y": 14.208403,
+            "z": 643
+          },
+          "level": 17,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 1564,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -145,
+            "y": 14.208403,
+            "z": 643
+          },
+          "potionCooldownUntil": -1,
+          "pulseTimer": 12,
+          "runScoped": true,
+          "spawnPos": {
+            "x": -145,
+            "y": 14.208403,
+            "z": 643
+          },
+          "stats": {
+            "armor": 448
+          },
+          "summonedAdd": true,
+          "tappedById": 1003,
+          "templateId": "warlord_drogmar",
+          "threat": [
+            [
+              1003,
+              1
+            ]
+          ],
+          "wanderTimer": 600,
+          "weapon": {
+            "max": 104,
+            "min": 66,
+            "speed": 2.6
+          },
+          "worldQuestCombatOwnerId": 1003,
+          "worldQuestCombatRole": "boss"
+        }
+      ]
+    },
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 1005,
+      "state": "040eeb29",
+      "events": "8d67c0a9",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "survivor-completed",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "bgRating": 1500,
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "devWorldQuestCycle": "wq3_9",
+          "entityId": 994,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "lifetimeXp": 108800,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
+          "worldQuestCycle": "wq3_9",
+          "worldQuestLog": [
+            [
+              "wq_thornpeak_warband",
+              {
+                "combat": {
+                  "integrity": 100,
+                  "phase": "failed"
+                },
+                "questId": "wq_thornpeak_warband",
+                "state": "active"
+              }
+            ]
+          ]
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "bgRating": 1500,
+          "cls": "mage",
+          "companionUpgrades": {},
+          "copper": 5475,
+          "counters": {
+            "damageDealt": 11158,
+            "kills": 4,
+            "questProgress": 1,
+            "questsCompleted": 1
+          },
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 11158
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "exp_wq_warband",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "devWorldQuestCycle": "wq3_9",
+          "entityId": 1003,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "lifetimeXp": 108800,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 5,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "unlockedMilestones": [
+            "__wq_claim__:wq3_9:wq_thornpeak_warband"
+          ],
+          "vault": {
+            "stock": {}
+          },
+          "worldQuestCycle": "wq3_9",
+          "worldQuestLog": [
+            [
+              "wq_thornpeak_warband",
+              {
+                "combat": {
+                  "integrity": 100,
+                  "phase": "ready"
+                },
+                "count": 1,
+                "questId": "wq_thornpeak_warband",
+                "state": "completed"
+              }
+            ]
+          ]
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 110,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 994
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.068,
+          "dead": true,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.068,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 5,
+          "hp": 708,
+          "id": 994,
+          "kind": "player",
+          "level": 17,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 708,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -143,
+            "y": 16.995962,
+            "z": 607
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 36,
+            "armor": 368,
+            "int": 10,
+            "spi": 11,
+            "sta": 55,
+            "str": 55
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 37,
+          "hp": 352,
+          "id": 1003,
+          "inCombat": true,
+          "kind": "player",
+          "level": 17,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 352,
+          "maxResource": 1299,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -143,
+            "y": 16.995962,
+            "z": 607
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1299,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 37,
+          "stats": {
+            "agi": 12,
+            "armor": 121,
+            "int": 73,
+            "spi": 54,
+            "sta": 30,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        }
+      ]
+    },
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 1005,
+      "state": "040eeb29",
+      "events": "741638a5",
+      "rng": {
+        "draws": 0,
+        "digest": "811c9dc5"
+      },
+      "label": "final",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "autoEquip": true,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "bgRating": 1500,
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "recruit_tunic",
+              "worn_sword"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "devWorldQuestCycle": "wq3_9",
+          "entityId": 994,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            }
+          ],
+          "lifetimeXp": 108800,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
+          "worldQuestCycle": "wq3_9",
+          "worldQuestLog": [
+            [
+              "wq_thornpeak_warband",
+              {
+                "combat": {
+                  "integrity": 100,
+                  "phase": "failed"
+                },
+                "questId": "wq_thornpeak_warband",
+                "state": "active"
+              }
+            ]
+          ]
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "bgRating": 1500,
+          "cls": "mage",
+          "companionUpgrades": {},
+          "copper": 5475,
+          "counters": {
+            "damageDealt": 11158,
+            "kills": 4,
+            "questProgress": 1,
+            "questsCompleted": 1
+          },
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {
+              "damageDealt": 11158
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "exp_wq_warband",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "devWorldQuestCycle": "wq3_9",
+          "entityId": 1003,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
+            }
+          ],
+          "lifetimeXp": 108800,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 5,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "unlockedMilestones": [
+            "__wq_claim__:wq3_9:wq_thornpeak_warband"
+          ],
+          "vault": {
+            "stock": {}
+          },
+          "worldQuestCycle": "wq3_9",
+          "worldQuestLog": [
+            [
+              "wq_thornpeak_warband",
+              {
+                "combat": {
+                  "integrity": 100,
+                  "phase": "ready"
+                },
+                "count": 1,
+                "questId": "wq_thornpeak_warband",
+                "state": "completed"
+              }
+            ]
+          ]
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 110,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 994
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "critChance": 0.068,
+          "dead": true,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.068,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 5,
+          "hp": 708,
+          "id": 994,
+          "kind": "player",
+          "level": 17,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 708,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -143,
+            "y": 16.995962,
+            "z": 607
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 36,
+            "armor": 368,
+            "int": 10,
+            "spi": 11,
+            "sta": 55,
+            "str": 55
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        },
+        {
+          "aiState": "idle",
+          "attackPower": 10,
+          "comboUntil": -1,
+          "critChance": 0.056,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.056,
+          "fallStartY": -2,
+          "fiveSecondRule": 99,
+          "healPower": 37,
+          "hp": 352,
+          "id": 1003,
+          "inCombat": true,
+          "kind": "player",
+          "level": 17,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 352,
+          "maxResource": 1299,
+          "moveSpeed": 7,
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": -143,
+            "y": 16.995962,
+            "z": 607
+          },
+          "potionCooldownUntil": -1,
+          "resource": 1299,
+          "resourceType": "mana",
+          "spawnPos": {
+            "x": -94,
+            "y": -2,
+            "z": -58
+          },
+          "spellPower": 37,
+          "stats": {
+            "agi": 12,
+            "armor": 121,
+            "int": 73,
+            "spi": 54,
+            "sta": 30,
+            "str": 10
+          },
+          "templateId": "mage",
+          "weapon": {
+            "max": 6,
+            "min": 3,
+            "speed": 2.9
+          }
+        }
+      ]
+    }
+  ]
+}

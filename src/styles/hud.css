@@ -5121,6 +5121,32 @@
     font-size: 11px;
     margin-left: 8px;
   }
+  .quest-progress {
+    --quest-progress: 0%;
+    position: relative;
+    padding-bottom: 10px;
+  }
+  .quest-progress::before,
+  .quest-progress::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 1px;
+    border-bottom: 6px solid var(--color-text-muted);
+    width: 100%;
+  }
+  .quest-progress::after {
+    width: var(--quest-progress);
+    border-color: var(--color-text-success);
+  }
+  @media (forced-colors: active) {
+    .quest-progress::before {
+      border-color: GrayText;
+    }
+    .quest-progress::after {
+      border-color: Highlight;
+    }
+  }
   #quest-tracker .qt-obj.done,
   .qd-obj.done,
   .quest-complete {

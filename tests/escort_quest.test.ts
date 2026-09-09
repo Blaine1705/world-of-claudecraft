@@ -555,6 +555,18 @@ describe('every escort route completes in the real world', () => {
       teleportTo(sim, def.start.x, def.start.z);
       sim.interact();
       const state = sim.escortRuns.get(def.id);
+      if (def.worldQuestId !== undefined) {
+        expect(state?.run, `${def.id} awaits confirmation`).toBeNull();
+        expect(sim.drainEvents()).toContainEqual(
+          expect.objectContaining({ type: 'worldQuestStartDialogue', targetId: state?.npcId }),
+        );
+        if (state?.npcId == null) throw new Error('Missing caravan starter');
+        sim.startWorldQuest(state.npcId);
+      } else {
+        expect(sim.drainEvents()).not.toContainEqual(
+          expect.objectContaining({ type: 'worldQuestStartDialogue' }),
+        );
+      }
       expect(state?.run, `${def.id} run started`).toBeTruthy();
       const npcId = state?.npcId;
       const npc = npcId !== null && npcId !== undefined ? sim.entities.get(npcId) : undefined;

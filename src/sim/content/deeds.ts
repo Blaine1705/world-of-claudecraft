@@ -2995,6 +2995,30 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 5,
     trigger: { kind: 'manual' },
   },
+  exp_wq_warband: {
+    id: 'exp_wq_warband',
+    name: 'The Warband Must Fall',
+    desc: "Defeat the warband expedition at Drogmar's War-Camp.",
+    category: 'exploration',
+    renown: 5,
+    trigger: { kind: 'manual' },
+  },
+  exp_wq_restless_company: {
+    id: 'exp_wq_restless_company',
+    name: 'Restless Company',
+    desc: 'Lay the revenant company to rest in the Revenant Fields.',
+    category: 'exploration',
+    renown: 5,
+    trigger: { kind: 'manual' },
+  },
+  exp_wq_hold_highwatch: {
+    id: 'exp_wq_hold_highwatch',
+    name: 'Hold Highwatch',
+    desc: "Repel the siege expedition before Highwatch's defenses fall.",
+    category: 'exploration',
+    renown: 5,
+    trigger: { kind: 'manual' },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

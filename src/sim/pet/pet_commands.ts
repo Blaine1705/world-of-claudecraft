@@ -318,6 +318,7 @@ function cleanPetName(raw: string): string | null {
 }
 
 export function tameError(ctx: SimContext, p: Entity, target: Entity): string | null {
+  if (target.worldQuestCombatOwnerId !== undefined) return 'You cannot tame that.';
   if (target.kind !== 'mob' || !target.hostile) return 'You cannot tame that.';
   const template = MOBS[target.templateId];
   if (!template || !isTameableFamily(template.family)) return 'Only beasts can be tamed.';

@@ -143,7 +143,7 @@ export function nameplatePlanInto(
     (!standIn &&
       (d2 > NAMEPLATE_RANGE_SQ ||
         (e.kind === 'object' && !isDoor && !delveInteractNear) ||
-        (!showNameplates && e.kind === 'mob' && !e.dead) ||
+        (!showNameplates && e.kind === 'mob' && !e.dead && !e.worldQuestCombatRole) ||
         (!showPlayerNameplates && e.kind === 'player' && !isSelf && e.id !== player.targetId)));
   out.anchorYOffset =
     viewHeight * e.scale +

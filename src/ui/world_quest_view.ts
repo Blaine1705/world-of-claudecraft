@@ -13,6 +13,8 @@ export function worldQuestDef(questId: string): WorldQuestDef | null {
 export function worldQuestDisplayName(questId: string): string {
   const quest = worldQuestDef(questId);
   if (!quest) return t('questUi.worldQuest.unknown', { id: questId });
+  if (quest.objective.type === 'combat')
+    return t(`questUi.worldQuest.combat.${quest.objective.encounterId}.title`);
   if (quest.objective.type === 'vehicle')
     return vehicleStationDisplayName(quest.objective.stationId);
   if (quest.objective.type === 'shadow') return t('questUi.worldQuest.shadow.title');
@@ -30,6 +32,8 @@ export function worldQuestDisplayName(questId: string): string {
 export function worldQuestObjectiveLabel(questId: string): string {
   const quest = worldQuestDef(questId);
   if (!quest) return t('questUi.worldQuest.unknown', { id: questId });
+  if (quest.objective.type === 'combat')
+    return t(`questUi.worldQuest.combat.${quest.objective.encounterId}.objective`);
   if (quest.objective.type === 'kill') return mobDisplayName(quest.objective.targetMobId);
   if (quest.objective.type === 'vehicle') {
     return t(

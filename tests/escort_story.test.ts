@@ -24,6 +24,12 @@ function setup() {
   const state = sim.escortRuns.get(DEF.id)!;
   const wagon = sim.entities.get(state.npcId!)!;
   sim.interact(pid);
+  expect(state.run).toBeNull();
+  expect(sim.drainEvents()).toContainEqual(
+    expect.objectContaining({ type: 'worldQuestStartDialogue', targetId: wagon.id }),
+  );
+  sim.startWorldQuest(wagon.id, pid);
+  expect(state.run).not.toBeNull();
   return { sim, pid, player, wagon, state };
 }
 
@@ -119,6 +125,11 @@ describe('escort checkpoint story', () => {
     player.prevPos = { ...replacement.pos };
     sim.drainEvents();
     sim.interact(pid);
+    expect(state.run).toBeNull();
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({ type: 'worldQuestStartDialogue', targetId: replacement.id }),
+    );
+    sim.startWorldQuest(replacement.id, pid);
     expect(state.run?.story).toEqual({ nextLine: 0, nextSpeechAt: sim.time + 7 });
     expect(speeches(sim.drainEvents(), replacement.id).map((event) => event.text)).toEqual([
       DEF.startText,

@@ -45,6 +45,7 @@ import { campSpawnOffset } from './camp_scatter';
 import type { CharacterState, PetState } from './character_state';
 import type { CannonActionId, CannonPoint, VehicleSession } from './types';
 import * as vehicleMod from './vehicles';
+import { clearCombatQuests } from './world_quest_combat';
 
 export type { CharacterState, PetState } from './character_state';
 
@@ -3582,6 +3583,7 @@ export class Sim {
     vehicleMod.leaveVehicle(this.ctx, pid);
     const meta = this.players.get(pid);
     if (!meta) return;
+    clearCombatQuests(this.ctx, meta);
     // Offline/headless removals have no GameServer lifecycle hook. End an
     // accepted recovery explicitly so every accepted attempt has one terminal
     // event; the online server calls the same delegate earlier so it can attach
@@ -9700,6 +9702,9 @@ export class Sim {
     worldQuestMod.shadowWorldQuestAction(this.ctx, action, targetId, pid);
   }
 
+  startWorldQuest(npcId: number, pid?: number): void {
+    worldQuestMod.startWorldQuest(this.ctx, npcId, pid);
+  }
   accuseWorldQuestSuspect(npcId: number, pid?: number): void {
     worldQuestMod.accuseWorldQuestSuspect(this.ctx, npcId, pid);
   }

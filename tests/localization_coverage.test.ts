@@ -384,6 +384,7 @@ describe('i18n Localization Key Coverage', () => {
     count: 5,
     row: 3,
     rotation: '90 degrees',
+    role: 'Leader',
     cost: 30,
     current: 120,
     cut: 5,
@@ -426,6 +427,10 @@ describe('i18n Localization Key Coverage', () => {
     minimum: 18,
     // World-quest workshop, horde and flight readouts use these values.
     barrier: 100,
+    integrity: 75,
+    npc: 'Captain Thessaly',
+    trail: 50,
+    wave: 2,
     gold: 52,
     kills: 20,
     mistakes: 1,

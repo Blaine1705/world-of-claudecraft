@@ -34,6 +34,7 @@ function setup() {
 function start(sim: Sim) {
   sim.targetEntity(FORGE_NPC_ID);
   sim.interact();
+  sim.startWorldQuest(FORGE_NPC_ID);
 }
 function state(sim: Sim) {
   return sim.worldQuestLog.get(ID)!.forging!;
@@ -166,7 +167,7 @@ describe('personal forging world quest', () => {
     const meta = sim.meta(pid)!;
     expect(meta.worldQuestLog.get(ID)?.state).toBe('completed');
     const xp = meta.xp;
-    sim.talkToNpc(FORGE_NPC_ID, pid);
+    sim.startWorldQuest(FORGE_NPC_ID, pid);
     for (let action = 0; action < 13; action++) {
       const current = meta.worldQuestLog.get(ID)!.forging!;
       for (
@@ -240,7 +241,7 @@ describe('personal forging world quest', () => {
     const second = sim.addPlayer('warrior', 'Other');
     expect(sim.meta(second)!.worldQuestLog.get(ID)?.forging).toBeUndefined();
     sim.chat('/dev forge', second);
-    sim.talkToNpc(FORGE_NPC_ID, second);
+    sim.startWorldQuest(FORGE_NPC_ID, second);
     const other = sim.meta(second)!.worldQuestLog.get(ID)!.forging!;
     expect(other.phase).toBe('countdown');
     expect(other).not.toBe(state(sim));

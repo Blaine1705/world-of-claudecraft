@@ -1619,7 +1619,8 @@ export function handleDeath(
       const tmpl = MOBS[e.templateId];
       // xpMult 0 marks a puzzle-object mob (the 1 HP spider egg-sac): killable
       // in one hit by design, so it must not pay full kill XP.
-      const eliteMult = (tmpl?.elite ? 2 : 1) * (tmpl?.xpMult ?? 1);
+      const eliteMult =
+        e.worldQuestCombatOwnerId !== undefined ? 0 : (tmpl?.elite ? 2 : 1) * (tmpl?.xpMult ?? 1);
       // party play: kill credit, xp split and quest progress shared with
       // members nearby (classic group rules + group bonus). A member downed
       // during the fight still counts while their corpse is in range: classic
@@ -1738,7 +1739,7 @@ export function handleDeath(
           (mobXpValue(e.level, mE.level) * eliteMult * bonus) / eligible.length,
         );
         if (xpGain > 0) grantXp(ctx, xpGain, member, { fromKill: true });
-        ctx.onMobKilledForQuests(e, member);
+        if (e.worldQuestCombatOwnerId === undefined) ctx.onMobKilledForQuests(e, member);
         ctx.onMobKilledForWorldQuests(e, member);
       }
       // A destroyed Broodmother egg may hatch a widow that swarms the killer.
@@ -1748,10 +1749,16 @@ export function handleDeath(
       // their own damage-contributor snapshot (rareContribs) so rollLoot's guaranteed
       // personal quest-item entries (questId, chance:1) can credit every contributing
       // quest-needer, not just the tap-credited party.
-      if (!template?.worldBoss) ctx.rollLoot(e, meta, eligible, rareContribs ?? undefined);
+      if (!template?.worldBoss && e.worldQuestCombatOwnerId === undefined)
+        ctx.rollLoot(e, meta, eligible, rareContribs ?? undefined);
       // Book of Deeds kill credit: lifetime counters, slain marks, dungeon
       // clears, and the encounter skill tasks that resolve at this death.
-      deedsMod.onMobKillCreditForDeeds(ctx, e, killer, meta, eligible);
+      if (e.worldQuestCombatOwnerId === undefined)
+        deedsMod.onMobKillCreditForDeeds(ctx, e, killer, meta, eligible);
+    }
+    if (e.worldQuestCombatOwnerId !== undefined) {
+      e.corpseTimer = 0;
+      return;
     }
     // Settle the heroic reward and its realm-reset lockout together. This runs
     // even without player credit so the owning group cannot dodge the lockout;

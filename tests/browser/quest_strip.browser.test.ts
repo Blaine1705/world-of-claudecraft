@@ -29,6 +29,7 @@ import type { TrackedQuest } from '../../src/ui/hud/quest/quest_tracker';
 import '../../src/styles/index.css';
 import { ensureLocaleLoaded, setLanguage, t } from '../../src/ui/i18n';
 import { makeWriterFacet } from '../../src/ui/painter_host';
+import { combatQuestTrackedObjectives } from '../../src/ui/world_quest_combat_view';
 import { worldQuestTraceScoreText } from '../../src/ui/world_quest_trace_view';
 import { cleanup } from './_harness';
 
@@ -238,6 +239,45 @@ describe.each(VIEWPORTS)('the touch quest strip at $label', ({ width, height, ti
     document.documentElement.style.setProperty('--app-vh', `${height}px`);
     return mountHud();
   }
+
+  it('keeps Highwatch integrity and wave status visible at the minimum strip width', async () => {
+    const rig = await setup();
+    const objectives = combatQuestTrackedObjectives({
+      questId: 'wq_thornpeak_hold_highwatch',
+      state: 'active',
+      count: 0,
+      combat: {
+        phase: 'waves',
+        stage: 2,
+        kills: 0,
+        required: 3,
+        trail: 0,
+        integrity: 25,
+        secondsRemaining: 120,
+      },
+    });
+    rig.controller.update(
+      [{ id: 'highwatch', number: 1, title: 'Hold Highwatch', complete: false, objectives }],
+      0,
+      'highwatch',
+    );
+    rig.root.style.maxWidth = '150px';
+    const band = rig.root.querySelector<HTMLElement>('.quest-strip-objs')!;
+    const lines = [...band.querySelectorAll<HTMLElement>('.quest-strip-obj')].filter(
+      (line) => getComputedStyle(line).display !== 'none',
+    );
+    expect(lines[0].textContent).toContain('Defenses remaining: 25%');
+    expect(lines[1].textContent).toContain('Wave 2/3');
+    expect(band.scrollHeight).toBeLessThanOrEqual(band.clientHeight + 1);
+    for (const line of lines) {
+      expect(line.getBoundingClientRect().bottom).toBeLessThanOrEqual(
+        band.getBoundingClientRect().bottom + 1,
+      );
+    }
+    expect(overlaps(rig.root.getBoundingClientRect(), rig.ring.getBoundingClientRect())).toBe(
+      false,
+    );
+  });
 
   it('shows full calligraphy instructions at the minimum strip width without overlapping controls', async () => {
     const rig = await setup();

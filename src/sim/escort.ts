@@ -121,13 +121,19 @@ export function isActiveEscortee(ctx: SimContext, e: Entity): boolean {
 // have active, start the run. Called with the player's explicit target first,
 // then with a proximity scan fallback (interaction.ts). Returns true when a
 // run started (the interact is consumed).
-export function tryStartEscort(ctx: SimContext, p: Entity, meta: PlayerMeta): boolean {
+export function tryStartEscort(
+  ctx: SimContext,
+  p: Entity,
+  meta: PlayerMeta,
+  confirmedNpcId?: number,
+): boolean {
   let best: { def: EscortDef; npc: Entity } | null = null;
   let bestD2 = INTERACT_RANGE * INTERACT_RANGE;
   for (const state of ctx.escortRuns.values()) {
     if (state.npcId === null || state.run !== null) continue;
     const npc = ctx.entities.get(state.npcId);
-    if (!npc || npc.dead) continue;
+    if (!npc || npc.dead || p.dead || Math.abs(npc.pos.y - p.pos.y) > INTERACT_RANGE) continue;
+    if (confirmedNpcId !== undefined && npc.id !== confirmedNpcId) continue;
     const dx = npc.pos.x - p.pos.x;
     const dz = npc.pos.z - p.pos.z;
     const d2 = dx * dx + dz * dz;
@@ -143,6 +149,10 @@ export function tryStartEscort(ctx: SimContext, p: Entity, meta: PlayerMeta): bo
     bestD2 = d2;
   }
   if (!best) return false;
+  if (best.def.worldQuestId && confirmedNpcId === undefined) {
+    ctx.emit({ type: 'worldQuestStartDialogue', targetId: best.npc.id, pid: meta.entityId });
+    return true;
+  }
   const state = escortState(ctx, best.def.id);
   state.run = {
     waypointIndex: 0,

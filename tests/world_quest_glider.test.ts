@@ -63,7 +63,7 @@ describe('World Quest Glider Integration', () => {
     const sim = setupSim();
     sim.chat('/dev glider');
 
-    sim.talkToNpc(GLIDER_NPC_ID);
+    sim.startWorldQuest(GLIDER_NPC_ID);
 
     const progress = sim.worldQuestLog.get(GLIDER_QUEST_ID);
     expect(progress?.glider).toBeDefined();
@@ -112,7 +112,7 @@ describe('World Quest Glider Integration', () => {
   it('completes the quest upon safe landing and grants deed', () => {
     const sim = setupSim();
     sim.chat('/dev glider');
-    sim.talkToNpc(GLIDER_NPC_ID);
+    sim.startWorldQuest(GLIDER_NPC_ID);
 
     const progress = sim.worldQuestLog.get(GLIDER_QUEST_ID)!;
     expect(progress.glider).toBeDefined();
@@ -182,7 +182,7 @@ describe('World Quest Glider Integration', () => {
       Math.hypot(sim.player.pos.x - GLIDER_NPC_DEF.pos.x, sim.player.pos.z - GLIDER_NPC_DEF.pos.z),
     ).toBeLessThan(3);
     Object.assign(sim.moveInput, emptyMoveInput());
-    sim.talkToNpc(GLIDER_NPC_ID);
+    sim.startWorldQuest(GLIDER_NPC_ID);
     expect(progress.glider?.phase).toBe('countdown');
     expect(progress.count).toBe(0);
   });

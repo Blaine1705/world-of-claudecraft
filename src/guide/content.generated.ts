@@ -5689,6 +5689,27 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "exploration",
     "renown": 5,
     "feat": false
+  },
+  {
+    "id": "exp_wq_warband",
+    "name": "The Warband Must Fall",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "exp_wq_restless_company",
+    "name": "Restless Company",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "exp_wq_hold_highwatch",
+    "name": "Hold Highwatch",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
   }
 ];
 

@@ -38,6 +38,7 @@ function setup(devCommands = true) {
 function talk(sim: Sim) {
   sim.targetEntity(NPC_ID);
   sim.interact();
+  sim.startWorldQuest(NPC_ID);
 }
 
 function walk(sim: Sim, point: { x: number; z: number }) {
@@ -211,7 +212,7 @@ describe('authoritative calligraphy world quest', () => {
       expect(meta.counters.questsCompleted).toBe(1);
       expect((sim as unknown as { nextId: number }).nextId).toBe(nextId);
       const paid = meta.xp;
-      sim.talkToNpc(NPC_ID);
+      sim.startWorldQuest(NPC_ID);
       for (let i = 0; i < 110; i++) sim.tick();
       expect(meta.xp).toBe(paid);
       expect(meta.counters.questsCompleted).toBe(1);
@@ -306,15 +307,15 @@ describe('authoritative calligraphy world quest', () => {
     const sim = setup();
     const npc = sim.entities.get(NPC_ID)!;
     sim.player.pos = sim.groundPos(0, 0);
-    sim.talkToNpc(NPC_ID);
+    sim.startWorldQuest(NPC_ID);
     expect(sim.worldQuestLog.get(ID)?.tracing).toBeUndefined();
     sim.player.pos = sim.groundPos(172, -35);
     sim.player.dead = true;
-    sim.talkToNpc(NPC_ID);
+    sim.startWorldQuest(NPC_ID);
     expect(sim.worldQuestLog.get(ID)?.tracing).toBeUndefined();
     sim.player.dead = false;
     npc.pos.x += 1;
-    sim.talkToNpc(NPC_ID);
+    sim.startWorldQuest(NPC_ID);
     expect(sim.worldQuestLog.get(ID)?.tracing).toBeUndefined();
   });
 
@@ -324,7 +325,7 @@ describe('authoritative calligraphy world quest', () => {
     sim.chat('/dev calligraphy', second);
     const other = sim.entities.get(second)!;
     other.pos = sim.groundPos(172, -35);
-    sim.talkToNpc(NPC_ID, second);
+    sim.startWorldQuest(NPC_ID, second);
     talk(sim);
     const firstTrace = sim.worldQuestLog.get(ID)!.tracing!;
     const secondTrace = sim.meta(second)!.worldQuestLog.get(ID)!.tracing!;

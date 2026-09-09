@@ -39,10 +39,10 @@ class WoWClassicEnv(gym.Env):
     """Single-agent World of Claudecraft environment.
 
     Observation: float32 vector (self, abilities, target, nearby mobs,
-    nearest interactable, quest states). Action: Discrete(23) —
-    movement/turn/strafe/jump, targeting, attack, 10 ability slots,
-    interact, stop, eat/drink. Sizes are content-dependent and queried
-    from the env's `info` cmd at startup — never hardcode them.
+    nearest interactable, quest states). The discrete actions cover
+    movement/turn/strafe/jump, targeting, attack, learned ability slots,
+    interact, stop, eat/drink and start_world_quest confirmation.
+    Sizes and action names come from the env's `info` command at startup.
     """
 
     metadata = {"render_modes": []}
