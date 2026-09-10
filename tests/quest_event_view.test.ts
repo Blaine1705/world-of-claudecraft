@@ -108,7 +108,7 @@ describe('quest event presentation', () => {
     expect(questEventPresentation({ type: 'error', text: 'none' } as SimEvent)).toBeNull();
   });
 
-  it('opens and closes the beam puzzle from authoritative area events', () => {
+  it('routes beam rotation receipts and keeps authoritative victory visible', () => {
     const questId = WORLD_QUESTS_BY_ID.wq_galecrest_wisps.id;
 
     expect(questEventPresentation({ type: 'worldQuestPuzzleOpened', questId, pid: 1 })).toEqual({
@@ -122,7 +122,7 @@ describe('quest event presentation', () => {
         rotation: 1,
         pid: 1,
       }),
-    ).toEqual({});
+    ).toEqual({ updateWorldQuestPuzzle: { questId, tileIndex: 4, rotation: 1 } });
     expect(questEventPresentation({ type: 'worldQuestPuzzleClosed', questId, pid: 1 })).toEqual({
       closeWorldQuestPuzzle: questId,
     });
@@ -130,6 +130,16 @@ describe('quest event presentation', () => {
     const done = questEventPresentation({ type: 'worldQuestDone', questId, pid: 1 });
     expect(done).toMatchObject({
       sound: 'quest_complete',
+      completeWorldQuestPuzzle: questId,
+    });
+  });
+
+  it('routes confection completion to its retained victory presentation', () => {
+    const questId = 'wq_palmreach_confections';
+    const done = questEventPresentation({ type: 'worldQuestDone', questId, pid: 1 });
+    expect(done).toMatchObject({ sound: 'quest_complete', completeWorldQuestPuzzle: questId });
+    expect(done?.closeWorldQuestPuzzle).toBeUndefined();
+    expect(questEventPresentation({ type: 'worldQuestPuzzleClosed', questId, pid: 1 })).toEqual({
       closeWorldQuestPuzzle: questId,
     });
   });

@@ -93,6 +93,34 @@ export interface WorldQuestMatch3MoveResult {
   refillIndex: number;
 }
 
+/** Post-swap snapshot, emitted only when the swap creates a match. */
+export interface WorldQuestMatch3SwapStage {
+  kind: 'swap';
+  fromIndex: number;
+  toIndex: number;
+  board: WorldQuestMatch3Candy[];
+}
+
+/** One authoritative clear, gravity and refill pass, using row-major cell indices. */
+export interface WorldQuestMatch3CascadeStage {
+  kind: 'cascade';
+  before: WorldQuestMatch3Candy[];
+  matchedIndices: number[];
+  /** Moving survivors only. Stationary survivors are implicit in before. */
+  falls: { candy: WorldQuestMatch3Candy; fromIndex: number; toIndex: number }[];
+  /** New pieces in the same row-major order as the deterministic refill pass. */
+  refills: { candy: WorldQuestMatch3Candy; index: number }[];
+  after: WorldQuestMatch3Candy[];
+}
+
+export type WorldQuestMatch3MoveStage = WorldQuestMatch3SwapStage | WorldQuestMatch3CascadeStage;
+
+export interface WorldQuestMatch3MoveTrace {
+  result: WorldQuestMatch3MoveResult;
+  /** Detached display snapshots; rejected moves have no stages. */
+  stages: WorldQuestMatch3MoveStage[];
+}
+
 /** Swap adjacent candies, clear all lines and resolve deterministic cascades. */
 export function applyWorldQuestMatch3Move(
   level: WorldQuestMatch3LevelDef,
@@ -100,6 +128,41 @@ export function applyWorldQuestMatch3Move(
   fromIndex: number,
   toIndex: number,
   refillIndex: number,
+): WorldQuestMatch3MoveResult {
+  return resolveWorldQuestMatch3Move(level, current, fromIndex, toIndex, refillIndex);
+}
+
+/**
+ * Opt-in display trace of the same move resolver. Does not mutate its inputs or
+ * allocate trace data on the ordinary apply path. Clients must confirm result
+ * against authoritative progress before presenting it as a completed move.
+ */
+export function traceWorldQuestMatch3Move(
+  level: WorldQuestMatch3LevelDef,
+  current: readonly WorldQuestMatch3Candy[],
+  fromIndex: number,
+  toIndex: number,
+  refillIndex: number,
+): WorldQuestMatch3MoveTrace {
+  const stages: WorldQuestMatch3MoveStage[] = [];
+  const result = resolveWorldQuestMatch3Move(
+    level,
+    current,
+    fromIndex,
+    toIndex,
+    refillIndex,
+    stages,
+  );
+  return { result, stages };
+}
+
+function resolveWorldQuestMatch3Move(
+  level: WorldQuestMatch3LevelDef,
+  current: readonly WorldQuestMatch3Candy[],
+  fromIndex: number,
+  toIndex: number,
+  refillIndex: number,
+  stages?: WorldQuestMatch3MoveStage[],
 ): WorldQuestMatch3MoveResult {
   const board = sanitizeWorldQuestMatch3Board(current, level);
   if (
@@ -119,9 +182,20 @@ export function applyWorldQuestMatch3Move(
     [board[fromIndex], board[toIndex]] = [board[toIndex], board[fromIndex]];
     return { accepted: false, board, cleared: 0, refillIndex };
   }
+  stages?.push({ kind: 'swap', fromIndex, toIndex, board: [...board] });
   let cleared = 0;
   let nextRefill = Math.max(0, Number.isSafeInteger(refillIndex) ? refillIndex : 0);
   for (let pass = 0; pass < MAX_CASCADE_PASSES && matches.size > 0; pass++) {
+    const stage: WorldQuestMatch3CascadeStage | undefined = stages
+      ? {
+          kind: 'cascade',
+          before: [...board],
+          matchedIndices: [...matches],
+          falls: [],
+          refills: [],
+          after: [],
+        }
+      : undefined;
     cleared += matches.size;
     const falling: Array<WorldQuestMatch3Candy | null> = board.map((value, index) =>
       matches.has(index) ? null : value,
@@ -130,7 +204,14 @@ export function applyWorldQuestMatch3Move(
       const kept: WorldQuestMatch3Candy[] = [];
       for (let row = level.rows - 1; row >= 0; row--) {
         const value = falling[row * level.columns + column];
-        if (value !== null) kept.push(value);
+        if (value !== null) {
+          if (stage) {
+            const fromIndex = row * level.columns + column;
+            const toIndex = (level.rows - 1 - kept.length) * level.columns + column;
+            if (fromIndex !== toIndex) stage.falls.push({ candy: value, fromIndex, toIndex });
+          }
+          kept.push(value);
+        }
       }
       let keptIndex = 0;
       for (let row = level.rows - 1; row >= 0; row--) {
@@ -142,9 +223,14 @@ export function applyWorldQuestMatch3Move(
       const filled = refillWithoutMatch(falling, index, level, nextRefill);
       falling[index] = filled.candy;
       nextRefill = filled.refillIndex;
+      stage?.refills.push({ candy: filled.candy, index });
     }
     for (let index = 0; index < board.length; index++)
       board[index] = falling[index] as WorldQuestMatch3Candy;
+    if (stage) {
+      stage.after = [...board];
+      stages?.push(stage);
+    }
     matches = worldQuestMatch3Matches(board, level.columns, level.rows);
   }
   return { accepted: true, board, cleared, refillIndex: nextRefill };

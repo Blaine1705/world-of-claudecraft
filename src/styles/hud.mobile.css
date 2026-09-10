@@ -4394,6 +4394,92 @@
     min-width: calc(40px / var(--ui-scale, 1));
     min-height: calc(40px / var(--ui-scale, 1));
   }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade {
+    --window-pad: calc(12px / var(--ui-scale, 1));
+    --confection-frame-pad: calc(17px / var(--ui-scale, 1));
+    --confection-frame-rail: calc(14px / var(--ui-scale, 1));
+    --confection-header-height: calc(84px / var(--ui-scale, 1));
+    --confection-footer-height: calc(104px / var(--ui-scale, 1));
+    --confection-cell-gap: calc(4px / var(--ui-scale, 1));
+    --confection-box-depth: calc(10px / var(--ui-scale, 1));
+    --confection-grid-pad: calc(8px / var(--ui-scale, 1));
+    --confection-cell-size: clamp(
+      calc(40px / var(--ui-scale, 1)),
+      calc((var(--app-vw) - 134px) / var(--wqm-columns, 6) / var(--ui-scale, 1)),
+      calc(60px / var(--ui-scale, 1))
+    );
+    max-width: none;
+    gap: calc(8px / var(--ui-scale, 1));
+    padding-bottom: calc(16px / var(--ui-scale, 1));
+  }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade > .panel-title {
+    padding: calc(16px / var(--ui-scale, 1)) calc(42px / var(--ui-scale, 1));
+  }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade > .panel-title > span {
+    font-size: clamp(19px, calc(27px / var(--ui-scale, 1)), 27px);
+  }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade .wqm-lid {
+    margin: 0 0 calc(16px / var(--ui-scale, 1));
+    padding: calc(18px / var(--ui-scale, 1)) calc(20px / var(--ui-scale, 1));
+  }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade .wqm-lid::before {
+    border-width: calc(24px / var(--ui-scale, 1));
+  }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade .wqp-level {
+    font-size: 11px;
+  }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade .wqp-instructions {
+    margin: 6px var(--spacing-xs) 10px;
+    font-size: 15px;
+  }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade .wqm-status {
+    font-size: 13px;
+    gap: var(--spacing-xs);
+  }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade .wqm-status > span {
+    padding: 5px;
+  }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade .wqm-grid {
+    --wqm-cell-size: var(--confection-cell-size);
+  }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade .wqm-box-hinge {
+    top: calc(-34px / var(--ui-scale, 1));
+    height: calc(44px / var(--ui-scale, 1));
+  }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade .wqm-box-hinge::before,
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade .wqm-box-hinge::after {
+    width: calc(64px / var(--ui-scale, 1));
+  }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade .wqm-box-front {
+    width: calc(184px / var(--ui-scale, 1));
+    height: calc(82px / var(--ui-scale, 1));
+    left: calc(50% - 92px / var(--ui-scale, 1));
+  }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade .wqm-frame-crest {
+    width: calc(208px / var(--ui-scale, 1));
+    height: calc(62px / var(--ui-scale, 1));
+    left: calc(50% - 104px / var(--ui-scale, 1));
+    top: calc(16px / var(--ui-scale, 1));
+  }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade .wqm-result {
+    --wqm-result-frame-outset: 12px;
+    padding: 18px 12px;
+  }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade .wqm-result-frame {
+    border-width: 24px;
+  }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade .wqm-result-emblem {
+    width: 58px;
+    height: 58px;
+    margin-bottom: 8px;
+  }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade .wqm-result-title {
+    margin-inline: -4px;
+    font-size: 27px;
+  }
+  body.mobile-touch #world-quest-puzzle-window.confection-cascade .wqm-result-detail {
+    font-size: 16px;
+  }
   body.mobile-touch #dev-command-window {
     height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
     max-height: none;
@@ -8549,5 +8635,98 @@
     outline: none;
     touch-action: auto;
     cursor: auto;
+  }
+}
+
+@layer hud-mobile {
+  body.mobile-touch #world-quest-puzzle-window.ley-beam {
+    --ley-window-width: calc(
+      (
+        var(--app-vw) -
+        max(10px, env(safe-area-inset-left)) -
+        max(10px, env(safe-area-inset-right)) -
+        12px
+      ) /
+      var(--ui-scale, 1)
+    );
+    --ley-frame-pad: calc(24px / var(--ui-scale, 1));
+    --ley-grid-pad: calc(10px / var(--ui-scale, 1));
+    --ley-gap: calc(8px / var(--ui-scale, 1));
+    --ley-tile-size: clamp(
+      calc(40px / var(--ui-scale, 1)),
+      calc(
+        (
+          var(--ley-window-width) -
+          36px /
+          var(--ui-scale, 1) -
+          var(--ley-frame-pad) *
+          2 -
+          var(--ley-grid-pad) *
+          2 -
+          (var(--wql-columns, 3) - 1) *
+          var(--ley-gap) -
+          2px
+        ) /
+        var(--wql-columns, 3)
+      ),
+      calc(92px / var(--ui-scale, 1))
+    );
+    width: auto;
+    top: calc(max(10px, env(safe-area-inset-top)) / var(--ui-scale, 1));
+    max-height: calc(
+      (
+        var(--app-vh) -
+        max(10px, env(safe-area-inset-top)) -
+        max(10px, env(safe-area-inset-bottom))
+      ) /
+      var(--ui-scale, 1)
+    );
+    gap: calc(10px / var(--ui-scale, 1));
+  }
+  body.mobile-touch #world-quest-puzzle-window.ley-beam > .panel-title {
+    padding: 16px 44px;
+  }
+  body.mobile-touch #world-quest-puzzle-window.ley-beam > .panel-title > span {
+    font-size: 21px;
+  }
+  body.mobile-touch #world-quest-puzzle-window.ley-beam .wql-heading {
+    padding-top: 4px;
+  }
+  body.mobile-touch #world-quest-puzzle-window.ley-beam .wql-heading-sigil {
+    width: calc(54px / var(--ui-scale, 1));
+    height: calc(54px / var(--ui-scale, 1));
+  }
+  body.mobile-touch #world-quest-puzzle-window.ley-beam .wql-heading::before,
+  body.mobile-touch #world-quest-puzzle-window.ley-beam .wql-heading::after {
+    top: calc(31px / var(--ui-scale, 1));
+  }
+  body.mobile-touch #world-quest-puzzle-window.ley-beam .wqp-grid {
+    --wqp-tile-size: var(--ley-tile-size);
+  }
+  body.mobile-touch #world-quest-puzzle-window.ley-beam .wql-status {
+    grid-template-columns: 1fr 1fr;
+    font-size: 12px;
+    padding: 9px 5px;
+  }
+  body.mobile-touch #world-quest-puzzle-window.ley-beam .wql-reach {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    padding-top: 6px;
+  }
+  body.mobile-touch #world-quest-puzzle-window.ley-beam .wql-result {
+    padding: 24px 20px;
+  }
+  body.mobile-touch #world-quest-puzzle-window.ley-beam .wql-result-frame {
+    border-width: 20px;
+  }
+  body.mobile-touch #world-quest-puzzle-window.ley-beam .wql-result-title {
+    font-size: 20px;
+  }
+  body.mobile-touch #world-quest-puzzle-window.ley-beam .wql-result-seal {
+    width: 60px;
+    height: 60px;
+  }
+  body.mobile-touch #world-quest-puzzle-window.ley-beam .wql-result-detail {
+    font-size: 16px;
   }
 }

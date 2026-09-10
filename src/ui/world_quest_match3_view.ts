@@ -19,11 +19,18 @@ export interface WorldQuestMatch3View {
   columns: number;
   rows: number;
   moves: number;
+  movesKnown: boolean;
   maxMoves: number;
   cleared: number;
   target: number;
+  outcome: 'playing' | 'won' | 'lost';
   exhausted: boolean;
   cells: WorldQuestMatch3CellView[];
+}
+
+/** UI-only metadata distinguishes a final counter from a retained pre-win counter. */
+export interface WorldQuestMatch3PresentationProgress extends WorldQuestProgress {
+  movesKnown?: boolean;
 }
 
 const CANDY_SYMBOLS = ['\u25c6', '\u25cf', '\u25b2', '\u25a0', '\u2605'] as const;
@@ -31,10 +38,11 @@ const CANDY_KEYS = ['berry', 'citrus', 'mint', 'grape', 'star'] as const;
 
 export function buildWorldQuestMatch3View(
   questId: string,
-  progress: WorldQuestProgress | undefined,
+  progress: WorldQuestMatch3PresentationProgress | undefined,
 ): WorldQuestMatch3View | null {
   const quest = ownEntry(WORLD_QUESTS_BY_ID, questId);
-  if (!quest || quest.objective.type !== 'match3' || progress?.state !== 'active') return null;
+  if (!quest || quest.objective.type !== 'match3' || !progress || progress.questId !== questId)
+    return null;
   const variant = Math.max(
     0,
     Math.min(quest.objective.levels.length - 1, progress.puzzleVariant ?? 0),
@@ -43,16 +51,20 @@ export function buildWorldQuestMatch3View(
   if (!level) return null;
   const board = sanitizeWorldQuestMatch3Board(progress.match3Board, level);
   const moves = Math.max(0, progress.match3Moves ?? 0);
+  const won = progress.state === 'completed' || progress.count >= level.target;
   return {
     questId,
     level: variant + 1,
     columns: level.columns,
     rows: level.rows,
     moves,
+    movesKnown:
+      progress.movesKnown ?? (progress.state === 'active' || progress.match3Moves !== undefined),
     maxMoves: level.maxMoves,
     cleared: Math.min(quest.count, progress.count),
     target: level.target,
-    exhausted: moves >= level.maxMoves,
+    outcome: won ? 'won' : moves >= level.maxMoves ? 'lost' : 'playing',
+    exhausted: !won && moves >= level.maxMoves,
     cells: board.map((candy, index) => ({
       index,
       row: Math.floor(index / level.columns) + 1,

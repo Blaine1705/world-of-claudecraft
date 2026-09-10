@@ -2,11 +2,14 @@
 // the returned effects through its existing banner/log/sound ports; keeping the
 // event-family switch here prevents the coordinator monolith from growing.
 
+import { WORLD_QUESTS_BY_ID } from '../sim/data';
 import type { SimEvent } from '../sim/types';
 import { questTitle } from './entity_display_labels';
 import { cannonResultText } from './hud/vehicle/cannon_tactics_view';
 import { formatNumber, t } from './i18n';
+import { ownEntry } from './known_item';
 import { questProgressEventText } from './quest_progress_text';
+import type { WorldQuestLeyRotation } from './world_quest_ley_view';
 import { worldQuestTraceScoreText } from './world_quest_trace_view';
 import { worldQuestDisplayName, worldQuestObjectiveLabel } from './world_quest_view';
 
@@ -19,6 +22,10 @@ export interface QuestEventPresentation {
   mountOwnedPrompt?: boolean;
   openWorldQuestPuzzle?: string;
   closeWorldQuestPuzzle?: string;
+  completeWorldQuestPuzzle?: string;
+  updateWorldQuestPuzzle?: WorldQuestLeyRotation;
+  /** Design-ready hook; current Ley rules have no authoritative loss signal. */
+  failWorldQuestPuzzle?: string;
 }
 
 export function questEventPresentation(event: SimEvent): QuestEventPresentation | null {
@@ -67,6 +74,13 @@ export function questEventPresentation(event: SimEvent): QuestEventPresentation 
     case 'worldQuestPuzzleClosed':
       return { closeWorldQuestPuzzle: event.questId };
     case 'worldQuestPuzzleUpdated':
+      return {
+        updateWorldQuestPuzzle: {
+          questId: event.questId,
+          tileIndex: event.tileIndex,
+          rotation: event.rotation,
+        },
+      };
     case 'worldQuestMatch3Updated':
       return {};
     case 'worldQuestDone': {
@@ -82,7 +96,11 @@ export function questEventPresentation(event: SimEvent): QuestEventPresentation 
             })
           : text,
         sound: 'quest_complete',
-        closeWorldQuestPuzzle: event.questId,
+        ...(['match3', 'puzzle'].includes(
+          ownEntry(WORLD_QUESTS_BY_ID, event.questId)?.objective.type ?? '',
+        )
+          ? { completeWorldQuestPuzzle: event.questId }
+          : { closeWorldQuestPuzzle: event.questId }),
       };
     }
     default:

@@ -32,7 +32,7 @@ describe('world quest match-three view', () => {
     expect(new Set(view?.cells.map((cell) => cell.symbol)).size).toBeGreaterThan(3);
   });
 
-  it('refuses non-match-three and completed rows', () => {
+  it('refuses non-match-three rows', () => {
     expect(
       buildWorldQuestMatch3View('wq_galecrest_wisps', {
         questId: 'wq_galecrest_wisps',
@@ -40,12 +40,43 @@ describe('world quest match-three view', () => {
         state: 'active',
       }),
     ).toBeNull();
+  });
+
+  it.each(['active', 'completed'] as const)(
+    'shows victory on the final move for %s progress',
+    (state) => {
+      const view = buildWorldQuestMatch3View('wq_palmreach_confections', {
+        questId: 'wq_palmreach_confections',
+        count: 72,
+        state,
+        match3Moves: 20,
+      });
+      expect(view).toMatchObject({
+        outcome: 'won',
+        exhausted: false,
+        cleared: 72,
+        movesKnown: true,
+      });
+    },
+  );
+
+  it('does not invent a terminal move counter when completed progress omits it', () => {
     expect(
       buildWorldQuestMatch3View('wq_palmreach_confections', {
         questId: 'wq_palmreach_confections',
-        count: 72,
         state: 'completed',
+        count: 72,
       }),
-    ).toBeNull();
+    ).toMatchObject({ outcome: 'won', movesKnown: false });
+  });
+
+  it('only loses when all moves are used below the target', () => {
+    const progress = { questId: 'wq_palmreach_confections', state: 'active' as const, count: 71 };
+    expect(
+      buildWorldQuestMatch3View(progress.questId, { ...progress, match3Moves: 19 }),
+    ).toMatchObject({ outcome: 'playing', exhausted: false });
+    expect(
+      buildWorldQuestMatch3View(progress.questId, { ...progress, match3Moves: 20 }),
+    ).toMatchObject({ outcome: 'lost', exhausted: true });
   });
 });

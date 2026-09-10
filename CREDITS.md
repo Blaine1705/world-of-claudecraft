@@ -348,6 +348,12 @@ non-commercial. For commercial use, arrange your own licence with the author.
 | Generated prop model (wreckage_fallen_anchor) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 | Generated prop model (wreckage_hull_fragment) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 | Generated prop model (wreckage_capsized_rowboat) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Confection Cascade candy atlas (`public/ui/minigames/confection-candies.webp`) | World of ClaudeCraft | Project-generated with OpenAI built-in image generation; [provenance and prompts](docs/screenshots/confection-cascade/README.md) | Project asset | With the project only |
+| Confection Cascade walnut coffer material (`public/ui/minigames/confection-walnut.webp`) | World of ClaudeCraft | Original project art generated with OpenAI built-in image generation from a text-only prompt, optimized to WebP; [provenance and exact prompt](docs/screenshots/confection-cascade-v3/material-provenance.md) | Project asset | With the project only |
+| Confection Cascade artisan frame, brass hardware and result seals (`public/ui/minigames/*-v4.webp`) | World of ClaudeCraft | Original project art generated and background-edited with OpenAI built-in image generation, optimized to WebP; [frame prompts](docs/screenshots/confection-cascade-v4/frame-provenance.md), [hardware prompts](docs/screenshots/confection-cascade-v4/hardware-provenance.md), [seal prompts](docs/screenshots/confection-cascade-v4/seals-provenance.md) | Project asset | With the project only |
+| Confection Cascade symmetrical emerald ornament (`public/ui/minigames/confection-jewels-v5.webp`) | World of ClaudeCraft | Original project art generated with OpenAI built-in image generation using the existing project crest as a style reference, optimized to WebP; [provenance and exact prompt](docs/screenshots/confection-cascade-v5/jewel-provenance.md) | Project asset | With the project only |
+| Confection Cascade solid emerald and winged lock hardware (`public/ui/minigames/*-v6.webp`) | World of ClaudeCraft | Original project art generated and background-edited with OpenAI built-in image generation, optimized to WebP; [provenance and exact prompts](docs/screenshots/confection-cascade-v6/hardware-provenance.md) | Project asset | With the project only |
+| Confection Cascade polished gold hardware mounts (`public/ui/minigames/*-v7.webp`) | World of ClaudeCraft | Project art edited with OpenAI built-in image generation using the v6 hardware, optimized to WebP; [provenance and exact prompts](docs/screenshots/confection-cascade-v7/hardware-provenance.md) | Project asset | With the project only |
 Assets were optimized for shipping (animation clip pruning, meshopt compression,
 texture resizing) via `scripts/assets/build_assets.mjs`; raw packs are not
 committed.
@@ -366,3 +372,4 @@ MIT License covering the source code.
 
 If you are unsure whether you may use an asset, or you want permission for
 something this file marks as restricted, ask first: tony@levystreet.com.
+| Ley Beam Alignment celestial frame and crystal heart (`public/ui/minigames/ley-*-v1.webp`) | World of ClaudeCraft | Project art generated with OpenAI built-in image generation, optimized to WebP; [provenance and prompts](docs/screenshots/ley-beam-v1/art-provenance.md) | Project asset | With the project only |

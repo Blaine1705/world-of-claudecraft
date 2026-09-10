@@ -1,0 +1,135 @@
+// @vitest-environment happy-dom
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { WORLD_QUESTS_BY_ID } from '../src/sim/data';
+import type { WorldQuestProgress } from '../src/sim/types';
+import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
+import { questEventPresentation } from '../src/ui/quest_event_view';
+import { WorldQuestPuzzleWindow } from '../src/ui/world_quest_puzzle_window';
+
+const questId = 'wq_galecrest_wisps';
+function rig() {
+  const quest = WORLD_QUESTS_BY_ID[questId];
+  if (quest.objective.type !== 'puzzle') throw new Error('Expected beam fixture');
+  const progress: WorldQuestProgress = {
+    questId,
+    state: 'active',
+    count: 0,
+    puzzleVariant: 0,
+    puzzleRotations: quest.objective.puzzles[0].tiles.map((tile) => tile.initialRotation),
+  };
+  const world = {
+    worldQuestCycle: 'cycle-a',
+    worldQuestLog: new Map([[questId, progress]]),
+    rotateWorldQuestPuzzleTile: vi.fn(),
+    swapWorldQuestMatch3Tiles: vi.fn(),
+    resetWorldQuestMatch3: vi.fn(),
+  };
+  const panel = new WorldQuestPuzzleWindow({
+    document,
+    world: () => world,
+    closeOthers: vi.fn(),
+    click: vi.fn(),
+    openFocusTrap: () => ({ release: vi.fn(), focusFirst: vi.fn(), opener: () => null }),
+  });
+  panel.open(questId);
+  const root = document.getElementById('world-quest-puzzle-window')!;
+  return { panel, root, world, progress };
+}
+
+describe('Ley Beam Alignment presentation', () => {
+  beforeEach(() => {
+    document.body.innerHTML = '<main id="ui"></main>';
+    setLanguage('en');
+  });
+  afterEach(() => setLanguage('en'));
+
+  it('keeps the observed winning circuit after authoritative completion removes rotations', () => {
+    const { panel, root, world } = rig();
+    for (const [tileIndex, rotation] of [
+      [1, 1],
+      [2, 1],
+      [3, 1],
+      [4, 3],
+    ]) {
+      panel.applyEventPresentation(
+        questEventPresentation({
+          type: 'worldQuestPuzzleUpdated',
+          questId,
+          pid: 1,
+          tileIndex,
+          rotation,
+        })!,
+      );
+    }
+    world.worldQuestLog.set(questId, { questId, state: 'completed', count: 1 });
+    panel.applyEventPresentation(
+      questEventPresentation({ type: 'worldQuestDone', questId, pid: 1 })!,
+    );
+    panel.refreshIfChanged();
+    expect(root.style.display).toBe('flex');
+    expect(root.dataset.leyOutcome).toBe('won');
+    expect(root.querySelectorAll('.wqp-tile')).toHaveLength(9);
+    expect(
+      [...root.querySelectorAll('.wqp-tile.powered')].map((e) =>
+        e.getAttribute('data-puzzle-tile'),
+      ),
+    ).toEqual(['1', '2', '3', '4']);
+    expect(root.querySelector('.wql-result-title')?.textContent).toBe('Perfect alignment');
+    expect(document.activeElement).toBe(root.querySelector('.wql-result'));
+    expect(root.querySelectorAll('.wqp-tile:disabled')).toHaveLength(9);
+    panel.close();
+  });
+
+  it('never awards a visual victory to an unconfirmed solved active board', () => {
+    const { panel, root, world, progress } = rig();
+    const rotations = [...progress.puzzleRotations!];
+    for (const [index, rotation] of [
+      [1, 1],
+      [2, 1],
+      [3, 1],
+      [4, 3],
+    ])
+      rotations[index] = rotation;
+    world.worldQuestLog.set(questId, { ...progress, puzzleRotations: rotations });
+    panel.refreshIfChanged();
+    expect(root.dataset.leyOutcome).toBe('playing');
+    expect((root.querySelector('.wql-result') as HTMLElement).hidden).toBe(true);
+    panel.close();
+  });
+  it('provides defeat only through the design hook and clears it on a new cycle', () => {
+    const { panel, root, world, progress } = rig();
+    panel.applyEventPresentation({ failWorldQuestPuzzle: questId });
+    expect(root.dataset.leyOutcome).toBe('lost');
+    expect(progress.state).toBe('active');
+    expect(root.querySelector('.wql-result-title')?.textContent).toBe('Alignment lost');
+    world.worldQuestCycle = 'cycle-b';
+    panel.refreshIfChanged();
+    expect(root.style.display).toBe('none');
+    expect(root.dataset.leyOutcome).toBeUndefined();
+  });
+  it('preserves a focused tile across confirmed turns and closes normally during play', () => {
+    const { panel, root, progress } = rig();
+    const tile = root.querySelector<HTMLButtonElement>('[data-puzzle-tile="3"]')!;
+    tile.focus();
+    progress.puzzleRotations![3] = 1;
+    panel.refreshIfChanged();
+    expect(root.querySelector('[data-puzzle-tile="3"]')).toBe(tile);
+    expect(document.activeElement).toBe(tile);
+    expect(tile.classList.contains('powered')).toBe(true);
+    panel.applyEventPresentation({ closeWorldQuestPuzzle: questId });
+    expect(root.style.display).toBe('none');
+  });
+  it('relocalizes tile labels while preserving the terminal board and focused result', async () => {
+    const { panel, root } = rig();
+    panel.applyEventPresentation({ completeWorldQuestPuzzle: questId });
+    const tile = root.querySelector<HTMLButtonElement>('[data-puzzle-tile="3"]')!;
+    const english = tile.getAttribute('aria-label');
+    await ensureLocaleLoaded('ja_JP');
+    setLanguage('ja_JP');
+    panel.relocalize();
+    expect(tile.getAttribute('aria-label')).not.toBe(english);
+    expect(root.dataset.leyOutcome).toBe('won');
+    expect(document.activeElement).toBe(root.querySelector('.wql-result'));
+    panel.close();
+  });
+});

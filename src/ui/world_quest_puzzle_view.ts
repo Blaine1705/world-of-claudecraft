@@ -24,6 +24,7 @@ export interface WorldQuestPuzzleView {
   columns: number;
   rows: number;
   solved: boolean;
+  path: readonly number[];
   tiles: WorldQuestPuzzleTileView[];
 }
 
@@ -48,6 +49,7 @@ export function buildWorldQuestPuzzleView(
     columns: puzzle.columns,
     rows: puzzle.rows,
     solved: trace.solved,
+    path: trace.path,
     tiles: puzzle.tiles.map((tile, index) => {
       const connectors = worldQuestPuzzleConnectors(tile.kind, rotations[index]);
       const isPowered = powered.has(index);

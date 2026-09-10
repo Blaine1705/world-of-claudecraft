@@ -178,7 +178,7 @@ describe('world quest puzzle window', () => {
     expect(announcer?.textContent).toBe('');
   });
 
-  it('moves focus to Restart when the focused candy becomes disabled', () => {
+  it('moves focus to the outcome when the focused candy becomes disabled', () => {
     const quest = WORLD_QUESTS_BY_ID.wq_palmreach_confections;
     if (quest.objective.type !== 'match3') throw new Error('Expected match-three fixture');
     const level = quest.objective.levels[0];
@@ -219,8 +219,10 @@ describe('world quest puzzle window', () => {
     window.refreshIfChanged();
 
     expect(root.querySelectorAll('[data-match3-cell]:not(:disabled)')).toHaveLength(0);
-    expect(document.activeElement).toBe(root.querySelector('[data-match3-reset]'));
-    expect(root.querySelector('.wqm-out')?.getAttribute('role')).toBe('alert');
+    expect(document.activeElement).toBe(root.querySelector('.wqm-result'));
+    expect(root.querySelector('.wqm-result')?.getAttribute('aria-labelledby')).toBe(
+      'wqm-result-title',
+    );
 
     window.close();
     window.open(quest.id);
