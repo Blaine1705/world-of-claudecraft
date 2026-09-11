@@ -128,14 +128,14 @@ export const INVESTIGATION_MOB: MobTemplate = {
   ...ZONE2_MOBS.drowned_dead,
   id: INVESTIGATION_MOB_ID,
   name: 'The Borrowed Face',
-  minLevel: 10,
+  minLevel: 6,
   maxLevel: 10,
   loot: [],
 };
 export const WORLD_QUEST_INVESTIGATION: WorldQuestDef = {
   id: INVESTIGATION_QUEST_ID,
   zoneId: 'mirefen_marsh',
-  minLevel: 10,
+  minLevel: 6,
   area: { x: -6, z: 284, radius: 35 },
   objective: { type: 'investigation', targetMobId: INVESTIGATION_MOB_ID },
   count: 1,

@@ -2210,7 +2210,7 @@ async function startGame(
       case 'targetFriendly':
         world.targetNearestFriendly();
         break;
-      // Select nearby NPCs for gamepad interaction.
+      // NPC selection follows the same personal visibility as interaction.
       case 'targetNpcNext':
       case 'targetNpcPrev': {
         const next = nextNpcTarget(
@@ -2218,6 +2218,8 @@ async function startGame(
           world.player.pos,
           world.player.targetId ?? null,
           id === 'targetNpcNext' ? 1 : -1,
+          undefined,
+          world,
         );
         if (next !== null) world.targetEntity(next);
         break;

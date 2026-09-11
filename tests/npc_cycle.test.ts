@@ -62,3 +62,21 @@ describe('nextNpcTarget', () => {
     expect(nextNpcTarget([], origin, null)).toBeNull();
   });
 });
+
+it('skips the revealed disguise for its investigator and restores it after completion', () => {
+  const progress = {
+    questId: 'wq_mirefen_infiltrator',
+    state: 'active' as 'active' | 'completed',
+    count: 0,
+    investigation: { heard: 15, clues: 3, cleared: 0, mobId: 90 },
+  };
+  const world = {
+    worldQuestCycle: 'wq3_9',
+    worldQuestLog: new Map([[progress.questId, progress]]),
+  };
+  const people = [npc(2146900022, 1), npc(2146900021, 2)];
+  expect(nextNpcTarget(people, origin, null, 1, 40, world)).toBe(2146900021);
+  expect(nextNpcTarget(people, origin, 2146900022, -1, 40, world)).toBe(2146900021);
+  progress.state = 'completed';
+  expect(nextNpcTarget(people, origin, null, 1, 40, world)).toBe(2146900022);
+});

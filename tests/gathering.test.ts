@@ -303,7 +303,8 @@ describe('isHarvestableCorpse', () => {
     // the Heart of the End): all elemental-family forge constructs, and a
     // construct corpse carries no skinnable or butcherable components.)
     const untagged = Object.values(MOBS).filter((m) => !m.componentTags?.length);
-    expect(untagged).toHaveLength(194);
+    // Three caravan enemies and the undead Fenbridge infiltrator add no components.
+    expect(untagged).toHaveLength(198);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read

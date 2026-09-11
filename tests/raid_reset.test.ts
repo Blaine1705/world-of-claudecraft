@@ -158,7 +158,7 @@ describe('resetDayKey: the ONE daily boundary a realm turns over on', () => {
   });
   it('expires the opening rotation exactly at realm-local 03:00', () => {
     const now = Date.UTC(2026, 8, 1, 12, 0, 0);
-    expect(nextWorldQuestRotationMs(now, 'America/New_York')).toBe(Date.UTC(2026, 8, 3, 7, 0, 0));
+    expect(nextWorldQuestRotationMs(now, 'America/New_York')).toBe(Date.UTC(2026, 8, 2, 7, 0, 0));
   });
   it('holds one key across a whole evening of play, where midnight UTC split it', () => {
     // The reported bug, as instants. Both are 2026-08-07 in US Pacific, either

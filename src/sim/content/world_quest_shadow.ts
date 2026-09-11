@@ -124,7 +124,7 @@ export const SHADOW_GUARDS: readonly {
 export const WORLD_QUEST_SHADOW: WorldQuestDef = {
   id: SHADOW_QUEST_ID,
   zoneId: 'eastbrook_vale',
-  minLevel: 10,
+  minLevel: 5,
   area: SHADOW_SITE,
   objective: { type: 'shadow', instructorNpcId: SHADOW_NPC_DEF.id },
   count: 4,

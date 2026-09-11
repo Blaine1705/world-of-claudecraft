@@ -198,7 +198,16 @@ describe('A Borrowed Face', () => {
     ctx(sim).onMobKilledForWorldQuests(mob, sim.meta(second)!);
     expect(sim.meta(second)!.worldQuestLog.get(ID)?.state).toBe('active');
     const secondStateBefore = sim.meta(second)!.worldQuestLog.get(ID);
-    dealDamage(ctx(sim), sim.player, mob, 99999, false, 'physical', 'Test Strike', 'hit');
+    dealDamage(
+      ctx(sim),
+      sim.entities.get(second)!,
+      mob,
+      99999,
+      false,
+      'physical',
+      'Test Strike',
+      'hit',
+    );
     expect(sim.worldQuestLog.get(ID)?.state).toBe('completed');
     expect(secondStateBefore?.state).toBe('active');
   });

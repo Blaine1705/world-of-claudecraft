@@ -6000,7 +6000,7 @@ describe('full self-state snapshot delta fixture', () => {
       { questId: 'q_widows', counts: [10, 0], state: 'active' },
     ]); // qlog -> questLog (Map)
     expect(client.questsDone.has('q_wolves')).toBe(true); // qdone -> questsDone (Set)
-    expect(client.worldQuestCycle).toBe('wq3_0'); // wqday -> canonical worldQuestCycle
+    expect(client.worldQuestCycle).toBe('wq1_0'); // wqday -> canonical worldQuestCycle
     expect(client.worldQuestExpiresAtMs).toBe(FAR_FUTURE_MS); // wqexp -> rotation deadline
     expect([...client.worldQuestLog.values()]).toEqual([
       { questId: 'wq_eastbrook_bandits', count: 2, state: 'active' },

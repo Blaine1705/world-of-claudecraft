@@ -618,6 +618,23 @@ describe('tryNearbyInteraction npc reach', () => {
   });
 });
 
+it('does not interact with a revealed disguise through the nearby key', () => {
+  const r = rig([
+    entity({ id: 2146900022, kind: 'npc', pos: { x: 1, y: 0, z: 0 }, questIds: [] }),
+    entity({ id: 2146900021, kind: 'npc', pos: { x: 2, y: 0, z: 0 }, questIds: [] }),
+  ]);
+  r.world.worldQuestCycle = 'wq3_9';
+  r.world.worldQuestLog.set('wq_mirefen_infiltrator', {
+    questId: 'wq_mirefen_infiltrator',
+    state: 'active',
+    count: 0,
+    investigation: { heard: 15, clues: 3, cleared: 0, mobId: 90 },
+  });
+  interact(r);
+  expect(r.calls).toContain('quest:2146900021');
+  expect(r.calls).not.toContain('quest:2146900022');
+});
+
 it('shadow sentries and guards are selected without opening dialogue or stealing on interact', () => {
   const r = rig([entity({ id: 2146900041, kind: 'npc', templateId: 'shadow_guard_north' })]);
   expect(interact(r)).toBe(true);

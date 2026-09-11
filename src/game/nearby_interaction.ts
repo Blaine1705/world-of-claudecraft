@@ -14,6 +14,7 @@ import {
   type QuestProgress,
   type WorldQuestProgress,
 } from '../sim/types';
+import { investigationDisguiseHidden } from '../sim/world_quest_investigation_visibility';
 import {
   isWorldQuestSalvageObject,
   isWorldQuestSalvageObjectHidden,
@@ -123,6 +124,7 @@ export function tryNearbyInteraction(
   }
 
   for (const entity of world.entities.values()) {
+    if (investigationDisguiseHidden(entity, world)) continue;
     const distance = dist2d(player.pos, entity.pos);
     if (
       !player.dead &&

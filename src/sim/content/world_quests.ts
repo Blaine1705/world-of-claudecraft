@@ -14,7 +14,8 @@ import { WORLD_QUEST_HORDE } from './world_quest_horde';
 import { WORLD_QUEST_INVESTIGATION } from './world_quest_investigation';
 import { WORLD_QUEST_SHADOW } from './world_quest_shadow';
 
-export const WORLD_QUEST_MIN_LEVEL = 10;
+export const WORLD_QUEST_MIN_LEVEL = 5;
+export const WORLD_QUEST_DEFAULT_MIN_LEVEL = 10;
 
 export const EASTBROOK_FREIGHT_CARAVAN_MOB_ID = 'eastbrook_freight_caravan';
 export const EASTBROOK_FREIGHT_CARAVAN_ESCORT_ID = 'esc_wq_eastbrook_caravan';
@@ -45,7 +46,7 @@ export const WORLD_QUEST_MOBS: Record<string, MobTemplate> = {
   [WILLOWFEN_REMEDY_CARAVAN_MOB_ID]: {
     id: WILLOWFEN_REMEDY_CARAVAN_MOB_ID,
     name: 'Willowfen Remedy Caravan',
-    minLevel: WORLD_QUEST_MIN_LEVEL,
+    minLevel: 19,
     maxLevel: 20,
     family: 'humanoid',
     hpBase: 650,
@@ -63,7 +64,7 @@ export const WORLD_QUEST_MOBS: Record<string, MobTemplate> = {
   [FROSTVEIL_SUPPLY_CARAVAN_MOB_ID]: {
     id: FROSTVEIL_SUPPLY_CARAVAN_MOB_ID,
     name: 'Frostveil Supply Caravan',
-    minLevel: WORLD_QUEST_MIN_LEVEL,
+    minLevel: 17,
     maxLevel: 20,
     family: 'humanoid',
     hpBase: 650,
@@ -495,7 +496,7 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
   {
     id: 'wq_mirefen_gravecallers',
     zoneId: 'mirefen_marsh',
-    minLevel: WORLD_QUEST_MIN_LEVEL,
+    minLevel: 6,
     area: { x: 0, z: 485, radius: 46 },
     objective: { type: 'kill', targetMobId: 'gravecaller_cultist' },
     count: 6,
@@ -504,7 +505,7 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
   {
     id: 'wq_thornpeak_stormcrag',
     zoneId: 'thornpeak_heights',
-    minLevel: WORLD_QUEST_MIN_LEVEL,
+    minLevel: 13,
     area: { x: 122, z: 778, radius: 46 },
     objective: { type: 'kill', targetMobId: 'stormcrag_elemental' },
     count: 6,
@@ -513,7 +514,7 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
   {
     id: 'wq_hollow_sporelings',
     zoneId: 'veiled_hollow',
-    minLevel: WORLD_QUEST_MIN_LEVEL,
+    minLevel: 15,
     area: { x: -42, z: 1222, radius: 38 },
     objective: { type: 'kill', targetMobId: 'corrupted_sporeling' },
     count: 5,
@@ -522,7 +523,7 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
   {
     id: 'wq_drakelands_brood',
     zoneId: 'drakelands',
-    minLevel: WORLD_QUEST_MIN_LEVEL,
+    minLevel: 16,
     area: { x: 382, z: 2310, radius: 132 },
     objective: { type: 'kill', targetMobId: 'dragonkin_broodguard' },
     count: 5,
@@ -531,7 +532,7 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
   {
     id: 'wq_frostveil_howlers',
     zoneId: 'frostveil',
-    minLevel: WORLD_QUEST_MIN_LEVEL,
+    minLevel: 17,
     area: { x: -85, z: 1760, radius: 20 },
     objective: { type: 'interact', targetObjectItemId: 'sprung_trap' },
     count: 4,
@@ -540,7 +541,7 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
   {
     id: 'wq_amberfall_lurkers',
     zoneId: 'amberfall',
-    minLevel: WORLD_QUEST_MIN_LEVEL,
+    minLevel: 18,
     area: { x: -298, z: 2192, radius: 46 },
     objective: { type: 'kill', targetMobId: 'mere_lurker' },
     count: 3,
@@ -549,7 +550,7 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
   {
     id: 'wq_willowfen_ore',
     zoneId: 'willowfen',
-    minLevel: WORLD_QUEST_MIN_LEVEL,
+    minLevel: 19,
     area: { x: -370, z: 355, radius: 108 },
     objective: { type: 'gather', nodeType: 'ore' },
     count: 3,
@@ -558,7 +559,7 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
   {
     id: 'wq_willowfen_caravan',
     zoneId: 'willowfen',
-    minLevel: WORLD_QUEST_MIN_LEVEL,
+    minLevel: 19,
     area: { x: -412, z: 442, radius: 145 },
     objective: { type: 'escort', escortId: WILLOWFEN_REMEDY_CARAVAN_ESCORT_ID },
     count: 1,
@@ -567,7 +568,7 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
   {
     id: 'wq_frostveil_caravan',
     zoneId: 'frostveil',
-    minLevel: WORLD_QUEST_MIN_LEVEL,
+    minLevel: 17,
     area: { x: -12, z: 1578, radius: 190 },
     objective: { type: 'escort', escortId: FROSTVEIL_SUPPLY_CARAVAN_ESCORT_ID },
     count: 1,
@@ -576,7 +577,7 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
   {
     id: 'wq_nightbloom_barrow',
     zoneId: 'nightbloom',
-    minLevel: WORLD_QUEST_MIN_LEVEL,
+    minLevel: 20,
     area: { x: -354, z: 1648, radius: 48 },
     objective: { type: 'kill', targetMobId: 'barrow_wight' },
     count: 4,
@@ -585,7 +586,7 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
   {
     id: 'wq_wraithwood_restless',
     zoneId: 'wraithwood',
-    minLevel: WORLD_QUEST_MIN_LEVEL,
+    minLevel: 20,
     area: { x: 360, z: 1592, radius: 72 },
     objective: { type: 'kill', targetMobId: 'wood_wraith' },
     count: 4,
@@ -594,7 +595,7 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
   {
     id: 'wq_palmreach_confections',
     zoneId: 'palmreach',
-    minLevel: WORLD_QUEST_MIN_LEVEL,
+    minLevel: 20,
     area: { x: -325, z: 820, radius: 18 },
     objective: {
       type: 'match3',
@@ -607,7 +608,7 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
   {
     id: 'wq_evergarden_watch',
     zoneId: 'evergarden',
-    minLevel: WORLD_QUEST_MIN_LEVEL,
+    minLevel: 20,
     area: { x: 410, z: 1110, radius: 42 },
     objective: { type: 'kill', targetMobId: 'hedge_knight' },
     count: 3,
@@ -616,7 +617,7 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
   {
     id: 'wq_galecrest_wisps',
     zoneId: 'galecrest',
-    minLevel: WORLD_QUEST_MIN_LEVEL,
+    minLevel: 20,
     area: { x: 420, z: 330, radius: 18 },
     objective: {
       type: 'puzzle',

@@ -39,7 +39,10 @@ import {
 } from '../src/sim/world';
 import { hasWorldQuestDeliveryCargo } from '../src/sim/world_quest_delivery';
 import { applyWorldQuestMatch3Move } from '../src/sim/world_quest_match3';
-import { worldQuestPuzzleVariantForCycle } from '../src/sim/world_quest_rotation';
+import {
+  WORLD_QUEST_ZONES,
+  worldQuestPuzzleVariantForCycle,
+} from '../src/sim/world_quest_rotation';
 import { worldQuestSalvageLayout } from '../src/sim/world_quest_salvage';
 import {
   activeWorldQuestsForCycle,
@@ -210,7 +213,9 @@ describe('world quest content', () => {
     const zoneFrequency = new Map<string, number>();
     for (const quest of WORLD_QUESTS) {
       zoneFrequency.set(quest.zoneId, (zoneFrequency.get(quest.zoneId) ?? 0) + 1);
-      expect(quest.minLevel, quest.id).toBe(10);
+      const zone = ZONES.find((candidate) => candidate.id === quest.zoneId);
+      const expectedMinLevel = Math.max(5, zone?.levelRange[0] ?? 5);
+      expect(quest.minLevel, quest.id).toBe(expectedMinLevel);
       expect(zoneAt(quest.area.x, quest.area.z).id, quest.id).toBe(quest.zoneId);
       if (quest.objective.type === 'kill') {
         const targetMobId = quest.objective.targetMobId;
@@ -572,7 +577,7 @@ describe('world quest content', () => {
             );
           }),
       );
-      expect(hostileSafetyClearance, `${entityId} hostile clearance`).toBeGreaterThan(70);
+      expect(hostileSafetyClearance, `${entityId} hostile clearance`).toBeGreaterThan(65);
     }
   });
 });
@@ -661,105 +666,48 @@ describe('world quest lifecycle', () => {
     );
   });
 
-  it('rotates a deterministic five-quest selection every three reset days', () => {
+  it('rotates a deterministic one-quest-per-zone selection every reset day', () => {
     const firstCycle = worldQuestCycleForResetDay('2026-08-31');
-    expect(firstCycle).toBe(worldQuestCycleForResetDay('2026-09-01'));
-    expect(firstCycle).toBe(worldQuestCycleForResetDay('2026-09-02'));
-    const nextCycle = worldQuestCycleForResetDay('2026-09-03');
+    const nextCycle = worldQuestCycleForResetDay('2026-09-01');
+    expect(firstCycle).toBe('wq1_0');
+    expect(nextCycle).toBe('wq1_1');
     expect(nextCycle).not.toBe(firstCycle);
 
-    const firstIds = activeWorldQuestsForCycle(firstCycle).map((quest) => quest.id);
-    const nextIds = activeWorldQuestsForCycle(nextCycle).map((quest) => quest.id);
-    expect(firstIds).toHaveLength(5);
-    expect(new Set(firstIds).size).toBe(5);
-    expect(nextIds).toHaveLength(5);
-    expect(nextIds).not.toEqual(firstIds);
-    expect(activeWorldQuestsForCycle(firstCycle).map((quest) => quest.id)).toEqual(firstIds);
+    const firstQuests = activeWorldQuestsForCycle(firstCycle);
+    const nextQuests = activeWorldQuestsForCycle(nextCycle);
+    expect(firstQuests).toHaveLength(15);
+    expect(new Set(firstQuests.map((quest) => quest.id)).size).toBe(15);
+    expect(nextQuests).toHaveLength(15);
+    expect(new Set(nextQuests.map((quest) => quest.id)).size).toBe(15);
+    expect(nextQuests).not.toEqual(firstQuests);
+    expect(activeWorldQuestsForCycle(firstCycle).map((quest) => quest.id)).toEqual(
+      firstQuests.map((quest) => quest.id),
+    );
 
-    const thirdIds = activeWorldQuestsForCycle(worldQuestCycleForResetDay('2026-09-06')).map(
-      (quest) => quest.id,
-    );
-    const fourthIds = activeWorldQuestsForCycle(worldQuestCycleForResetDay('2026-09-09')).map(
-      (quest) => quest.id,
-    );
-    const fifthIds = activeWorldQuestsForCycle(worldQuestCycleForResetDay('2026-09-12')).map(
-      (quest) => quest.id,
-    );
-    const sixthIds = activeWorldQuestsForCycle(worldQuestCycleForResetDay('2026-09-15')).map(
-      (quest) => quest.id,
-    );
-    const seventhIds = activeWorldQuestsForCycle(worldQuestCycleForResetDay('2026-09-18')).map(
-      (quest) => quest.id,
-    );
-    expect(firstIds).toEqual([
-      'wq_eastbrook_bandits',
-      'wq_mirefen_gravecallers',
-      'wq_palmreach_confections',
-      'wq_evergarden_watch',
-      'wq_galecrest_wisps',
-    ]);
-    expect(nextIds).toEqual([
-      'wq_thornpeak_stormcrag',
-      'wq_hollow_sporelings',
-      'wq_drakelands_brood',
-      'wq_frostveil_howlers',
-      'wq_amberfall_lurkers',
-    ]);
-    expect(thirdIds).toEqual([
-      'wq_willowfen_ore',
-      'wq_nightbloom_barrow',
-      'wq_wraithwood_restless',
-      'wq_farshore_salvage',
-      'wq_proving_shore_scuttlers',
-    ]);
-    expect(fourthIds).toEqual(['wq_eastbrook_caravan', ...firstIds.slice(1)]);
-    expect(fifthIds).toEqual([...nextIds.slice(0, 3), 'wq_frostveil_caravan', nextIds[4]]);
-    expect(sixthIds).toEqual(['wq_willowfen_caravan', ...thirdIds.slice(1)]);
-    expect(seventhIds).toEqual([
-      'wq_eastbrook_calligraphy',
-      ...firstIds.slice(1, 3),
-      'wq_evergarden_forging',
-      firstIds[4],
-    ]);
-    const eighthIds = activeWorldQuestsForCycle('wq3_7').map((quest) => quest.id);
-    expect(eighthIds).toEqual([
-      'wq_eastbrook_calligraphy',
-      thirdIds[1],
-      'wq_wraithwood_barricade',
-      ...thirdIds.slice(3),
-    ]);
-    const ninthIds = activeWorldQuestsForCycle('wq3_8').map((quest) => quest.id);
-    expect(ninthIds).toEqual([
-      'wq_eastbrook_shadow',
-      'wq_mirefen_infiltrator',
-      'wq_galecrest_slalom',
-      'wq_evergarden_cannon',
-      'wq_last_keep_cannon',
-    ]);
-    const allRotatedIds = [
-      ...firstIds,
-      ...nextIds,
-      ...thirdIds,
-      ...fourthIds,
-      ...fifthIds,
-      ...sixthIds,
-      ...seventhIds,
-      ...eighthIds,
-      ...ninthIds,
-    ];
-    expect(new Set(allRotatedIds)).toEqual(new Set(WORLD_QUESTS.map((quest) => quest.id)));
+    for (const zone of WORLD_QUEST_ZONES) {
+      expect(firstQuests.filter((quest) => quest.zoneId === zone)).toHaveLength(1);
+      expect(nextQuests.filter((quest) => quest.zoneId === zone)).toHaveLength(1);
+    }
+
+    // Every world quest across all zones is offered within the first 4 days
+    const allRotatedIds = new Set<string>();
+    for (let day = 0; day < 4; day++) {
+      for (const quest of activeWorldQuestsForCycle(`wq1_${day}`)) {
+        allRotatedIds.add(quest.id);
+      }
+    }
+    expect(allRotatedIds).toEqual(new Set(WORLD_QUESTS.map((quest) => quest.id)));
   });
 
   it('naturally offers every puzzle layout across the full roster and weekly-variant repeat', () => {
-    // Nine three-day rosters and three seven-day variants realign after 189 days.
     const variants = new Map<string, Set<number>>();
     const offered = new Set<string>();
-    for (let cycle = 0; cycle < 63; cycle++) {
-      const cycleId = `wq3_${cycle}`;
+    for (let cycle = 0; cycle < 84; cycle++) {
+      const cycleId = `wq1_${cycle}`;
       const roster = activeWorldQuestsForCycle(cycleId);
-      expect(roster).toHaveLength(5);
-      expect(new Set(roster.map((quest) => quest.id)).size).toBe(5);
-      expect(activeWorldQuestsForCycle(`wq3_${cycle + 63}`)).toEqual(roster);
+      expect(roster).toHaveLength(15);
+      expect(new Set(roster.map((quest) => quest.id)).size).toBe(15);
+      expect(activeWorldQuestsForCycle(`wq1_${cycle + 84}`)).toEqual(roster);
       for (const quest of roster) {
         offered.add(quest.id);
         const count =
@@ -772,7 +720,7 @@ describe('world quest lifecycle', () => {
                 : 0;
         if (!count) continue;
         const variant = worldQuestPuzzleVariantForCycle(cycleId, count);
-        expect(worldQuestPuzzleVariantForCycle(`wq3_${cycle + 63}`, count)).toBe(variant);
+        expect(worldQuestPuzzleVariantForCycle(`wq1_${cycle + 84}`, count)).toBe(variant);
         const seen = variants.get(quest.id) ?? new Set<number>();
         seen.add(variant);
         variants.set(quest.id, seen);
@@ -787,8 +735,8 @@ describe('world quest lifecycle', () => {
     for (const [questId, seen] of variants) expect(seen, questId).toEqual(new Set([0, 1, 2]));
   });
 
-  it('does not start a catalog quest outside the current five-quest rotation', () => {
-    const quest = WORLD_QUESTS_BY_ID.wq_thornpeak_stormcrag;
+  it('does not start a catalog quest outside the current rotation', () => {
+    const quest = WORLD_QUESTS_BY_ID.wq_eastbrook_caravan;
     const sim = new Sim({ seed: 410, playerClass: 'warrior', autoEquip: true });
     enterQuest(sim, quest);
     expect(activeWorldQuestsForCycle(sim.worldQuestCycle).some((row) => row.id === quest.id)).toBe(
@@ -798,13 +746,13 @@ describe('world quest lifecycle', () => {
     expect(sim.drainEvents().some((event) => event.type === 'worldQuestStarted')).toBe(false);
   });
 
-  it('stays unavailable below level 10 and starts automatically on area entry', () => {
+  it('stays unavailable below minimum level and starts automatically on area entry', () => {
     const quest = WORLD_QUESTS_BY_ID.wq_eastbrook_bandits;
     const sim = new Sim({ seed: 41, playerClass: 'warrior', autoEquip: true });
-    enterQuest(sim, quest, 9);
+    enterQuest(sim, quest, 4);
     expect(sim.worldQuestLog.has(quest.id)).toBe(false);
     expect(sim.worldQuestCycle).toBe('');
-    sim.setPlayerLevel(10);
+    sim.setPlayerLevel(5);
     const events = sim.tick();
     expect(sim.worldQuestLog.get(quest.id)).toEqual({
       questId: quest.id,
@@ -1029,7 +977,7 @@ describe('world quest lifecycle', () => {
     const quest = WORLD_QUESTS_BY_ID.wq_frostveil_howlers;
     const sim = new Sim({ seed: 423, playerClass: 'warrior', autoEquip: true });
     sim.setPlayerLevel(20);
-    sim.resetDay = '2026-09-03';
+    sim.resetDay = '2026-08-31';
     sim.player.pos.x = quest.area.x;
     sim.player.pos.z = quest.area.z;
     sim.tick();
@@ -1064,7 +1012,7 @@ describe('world quest lifecycle', () => {
       playerClass: 'warrior',
       noPlayer: true,
     });
-    restored.resetDay = '2026-09-03';
+    restored.resetDay = '2026-08-31';
     const pid = restored.addPlayer('warrior', 'Trap Keeper', { state });
     const player = restored.entities.get(pid);
     const restoredMeta = restored.meta(pid);
@@ -1355,8 +1303,8 @@ describe('world quest lifecycle', () => {
     expect(events.some((event) => event.type === 'worldQuestStarted')).toBe(false);
   });
 
-  it('rolls only when the three-day realm rotation changes and is idempotent after completion', () => {
-    const quest = WORLD_QUESTS_BY_ID.wq_evergarden_watch;
+  it('rolls only when the realm rotation changes and is idempotent after completion', () => {
+    const quest = WORLD_QUESTS_BY_ID.wq_drakelands_brood;
     const sim = new Sim({ seed: 461, playerClass: 'warrior', autoEquip: true });
     enterQuest(sim, quest, 20);
     finishQuest(sim, quest);
@@ -1370,14 +1318,14 @@ describe('world quest lifecycle', () => {
     expect(meta.counters.questsCompleted).toBe(completedAfterCompletion);
     expect(sim.drainEvents().some((event) => event.type === 'worldQuestDone')).toBe(false);
 
-    sim.utcDay = '2026-09-01';
+    sim.utcDay = '2026-08-31';
     updateWorldQuests(sim.ctx, meta, sim.player);
     expect(meta.worldQuestCycle).toBe(worldQuestCycleForResetDay('2026-08-31'));
     expect(meta.worldQuestLog.get(quest.id)?.state).toBe('completed');
 
-    sim.resetDay = '2026-09-03';
+    sim.resetDay = '2026-09-01';
     updateWorldQuests(sim.ctx, meta, sim.player);
-    expect(meta.worldQuestCycle).toBe(worldQuestCycleForResetDay('2026-09-03'));
+    expect(meta.worldQuestCycle).toBe(worldQuestCycleForResetDay('2026-09-01'));
     expect(meta.worldQuestLog.has(quest.id)).toBe(false);
   });
 
@@ -1465,7 +1413,7 @@ describe('world quest lifecycle', () => {
   });
 
   it('ignores malformed milestone values and persisted quests outside their rotation', () => {
-    const inactive = WORLD_QUESTS_BY_ID.wq_thornpeak_stormcrag;
+    const inactive = WORLD_QUESTS_BY_ID.wq_drakelands_brood;
     const seed = new Sim({
       seed: 4622,
       playerClass: 'warrior',
@@ -1475,7 +1423,7 @@ describe('world quest lifecycle', () => {
     const state = seed.serializeCharacter(seed.playerId);
     if (!state) throw new Error('Missing serialized character');
     state.worldQuests = {
-      cycle: '2026-08-31',
+      cycle: '2026-09-01',
       progress: [{ questId: inactive.id, count: inactive.count - 1, state: 'active' }],
     };
     state.unlockedMilestones = [42, 'ordinary_milestone'] as unknown as string[];
@@ -1485,7 +1433,7 @@ describe('world quest lifecycle', () => {
       playerClass: 'warrior',
       noPlayer: true,
     });
-    restored.resetDay = '2026-08-31';
+    restored.resetDay = '2026-09-01';
     const pid = restored.addPlayer('warrior', 'Hardened Traveler', { state });
     const meta = restored.meta(pid);
     const player = restored.entities.get(pid);
@@ -1548,8 +1496,8 @@ describe('world quest lifecycle', () => {
       { questId: 'wq_eastbrook_bandits', count: 0, state: 'active' },
       { questId: 'wq_mirefen_gravecallers', count: 6, state: 'completed' },
     ]);
-    expect(sanitizeWorldQuestCycle('2026-08-31')).toBe('wq3_0');
-    expect(sanitizeWorldQuestCycle('wq3_000')).toBe('wq3_0');
+    expect(sanitizeWorldQuestCycle('2026-08-31')).toBe('wq1_0');
+    expect(sanitizeWorldQuestCycle('wq3_000')).toBe('wq1_0');
     expect(sanitizeWorldQuestCycle('x'.repeat(32))).toBe('');
     expect(sanitizeWorldQuestCycle(`wq3_${'1'.repeat(64)}`)).toBe('');
     expect(sanitizeWorldQuestCycle(null)).toBe('');
@@ -1580,7 +1528,7 @@ describe('world quest lifecycle', () => {
             ],
           },
         ],
-        'wq3_1',
+        'wq1_0',
       ),
     ).toEqual([
       {

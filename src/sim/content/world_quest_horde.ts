@@ -19,7 +19,7 @@ export const HORDE_NPC_DEF: NpcDef = {
 export const WORLD_QUEST_HORDE: WorldQuestDef = {
   id: HORDE_QUEST_ID,
   zoneId: 'wraithwood',
-  minLevel: 10,
+  minLevel: 20,
   area: { x: 402, z: 1796, radius: 38 },
   objective: { type: 'horde', instructorNpcId: HORDE_NPC_DEF.id },
   count: 1,

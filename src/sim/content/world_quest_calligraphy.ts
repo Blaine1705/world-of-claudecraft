@@ -68,7 +68,7 @@ export const WORLD_QUEST_CALLIGRAPHY_ADVANCED: readonly WorldQuestTraceDef[] = [
 export const WORLD_QUEST_CALLIGRAPHY_QUEST: WorldQuestDef = {
   id: WORLD_QUEST_CALLIGRAPHY_ID,
   zoneId: 'eastbrook_vale',
-  minLevel: 10,
+  minLevel: 5,
   area: { x: 172, z: -28, radius: 24 },
   objective: {
     type: 'tracing',

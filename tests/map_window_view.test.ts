@@ -1083,10 +1083,10 @@ describe('world-quest zone markers', () => {
     return new Map([[quest.id, { questId: quest.id, count: 2, state }]]);
   }
 
-  it('projects only the five objectives selected for the current rotation', () => {
+  it('projects exactly one objective per zone selected for the current rotation', () => {
     let projected = 0;
     for (const zone of ZONES) {
-      const world = makeOverworldWorld('sim', new Map(), quest.minLevel);
+      const world = makeOverworldWorld('sim', new Map(), 20);
       world.player.pos.x = ((zone.xMin ?? -500) + (zone.xMax ?? 500)) / 2;
       world.player.pos.z = (zone.zMin + zone.zMax) / 2;
       const model = buildOverworldMapModel({ ...input(world, 1), zone });
@@ -1096,7 +1096,7 @@ describe('world-quest zone markers', () => {
         projected++;
       }
     }
-    expect(projected).toBe(5);
+    expect(projected).toBe(15);
   });
 
   it('appears from its minimum level in both hosts and changes to active state', () => {

@@ -346,15 +346,13 @@ describe('authoritative calligraphy world quest', () => {
 });
 
 describe('calligraphy content placement and rotation', () => {
-  it('offers a new five-quest rotation without replacing the first six', () => {
-    expect(activeWorldQuestsForCycle('wq3_6').map((q) => q.id)).toEqual([
-      ID,
-      'wq_mirefen_gravecallers',
-      'wq_palmreach_confections',
-      'wq_evergarden_forging',
-      'wq_galecrest_wisps',
-    ]);
-    expect(activeWorldQuestsForCycle('wq3_5')[0].id).toBe('wq_willowfen_caravan');
+  it('offers calligraphy in its zone rotation cycle', () => {
+    expect(activeWorldQuestsForCycle('wq1_2').some((q) => q.id === ID)).toBe(true);
+    expect(activeWorldQuestsForCycle('wq3_6').some((q) => q.id === ID)).toBe(true);
+    expect(activeWorldQuestsForCycle('wq1_1').some((q) => q.id === 'wq_willowfen_caravan')).toBe(
+      true,
+    );
+    expect(activeWorldQuestsForCycle('wq1_2')).toHaveLength(15);
     expect(POINTS).toHaveLength(4);
     expect(POINTS[0]).toEqual(POINTS[3]);
     expect(SHAPES.map((shape) => shape.kind)).toEqual(['triangle', 'square', 'star']);

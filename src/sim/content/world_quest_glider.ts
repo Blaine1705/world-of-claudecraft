@@ -88,7 +88,7 @@ export const GLIDER_COURSE: GliderCourseDef = {
 export const WORLD_QUEST_GLIDER: WorldQuestDef = {
   id: GLIDER_QUEST_ID,
   zoneId: 'galecrest',
-  minLevel: 10,
+  minLevel: 20,
   area: { x: 370, z: 440, radius: 330 },
   objective: {
     type: 'glider',

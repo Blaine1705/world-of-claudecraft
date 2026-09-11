@@ -1,3 +1,7 @@
+import {
+  type InvestigationVisibilityReader,
+  investigationDisguiseHidden,
+} from '../sim/world_quest_investigation_visibility';
 // Which entity a pad press acts on.
 //
 // A mouse player names the target with the cursor before they press anything. A
@@ -18,7 +22,7 @@ import { activePvpOpponentIds, isAttackableEntity } from './interactions';
 import { nearbyNpcs } from './npc_cycle';
 
 /** The slice of the world a pad press reads and selects through. */
-export interface PadTargetPickWorld {
+export interface PadTargetPickWorld extends InvestigationVisibilityReader {
   player: IWorld['player'];
   playerId: IWorld['playerId'];
   entities: IWorld['entities'];
@@ -69,9 +73,10 @@ export function createPadTargetPick(deps: PadTargetPickDeps): PadTargetPick {
       const current = targeted !== null ? world.entities.get(targeted) : undefined;
       const inReach = (e: Entity) => dist2d(world.player.pos, e.pos) <= INTERACT_RANGE;
       const prefer =
-        current?.kind === 'npc' && inReach(current)
+        current?.kind === 'npc' && inReach(current) && !investigationDisguiseHidden(current, world)
           ? targeted
-          : (nearbyNpcs(world.entities.values(), world.player.pos, INTERACT_RANGE)[0]?.id ?? null);
+          : (nearbyNpcs(world.entities.values(), world.player.pos, INTERACT_RANGE, world)[0]?.id ??
+            null);
       if (prefer !== null && prefer !== targeted) world.targetEntity(prefer);
       interactKey(prefer);
     },

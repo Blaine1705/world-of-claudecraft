@@ -1077,6 +1077,26 @@ export const VOICE_ALIAS = {
   glider_apprentice: 'apprentice_wren',
   // Valerie borrows the existing scout performance for this covert operation.
   shadow_cloak_scout: 'scout_maren',
+  // World-quest role casting, following the tutorial cast below. These are
+  // distinct people borrowing established performances, not recurring identities.
+  // The scholar teaches calmly; his adult apprentices sound tentative and eager.
+  calligraphy_instructor: 'loremaster_caddis',
+  calligraphy_apprentice_1: 'apprentice_wren',
+  calligraphy_apprentice_2: 'trader_wilkes',
+  // A working forgemistress and a watch captain projecting over a barricade.
+  forge_instructor: 'forgemistress_darva',
+  barricade_captain: 'gatecaptain_brannoc',
+  // Keep suspects vocally distinct without making any voice signal guilt.
+  infiltrator_captain: 'warden_fenwick',
+  infiltrator_nella: 'scout_maren',
+  infiltrator_orin: 'marshal_redbrook',
+  infiltrator_bram: 'gatecaptain_brannoc',
+  infiltrator_tessa: 'watcher_maren',
+  // Tobin keeps a promise to a lost friend; Mira carries remedies; Orin keeps
+  // the snowbound settlements supplied. Each uses the matching human register.
+  eastbrook_freight_caravan: 'mender_saul',
+  willowfen_remedy_caravan: 'apothecary_lin',
+  frostveil_supply_caravan: 'lampman_cobb',
   brother_aldric_fen: 'brother_aldric',
   brother_aldric_highwatch: 'brother_aldric',
   brother_aldric_raid: 'brother_aldric',

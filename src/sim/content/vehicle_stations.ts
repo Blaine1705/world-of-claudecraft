@@ -13,7 +13,7 @@ export const NORTH_WATCH_CANNON: Readonly<VehicleStationDef> = {
 export const WORLD_QUEST_CANNON: WorldQuestDef = {
   id: NORTH_WATCH_CANNON.questId,
   zoneId: 'drakelands',
-  minLevel: 10,
+  minLevel: 16,
   area: { x: 390, z: 1850, radius: 48 },
   objective: { type: 'vehicle', stationId: NORTH_WATCH_CANNON.id },
   count: 1,

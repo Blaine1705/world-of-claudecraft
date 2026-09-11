@@ -132,11 +132,11 @@ describe('feedSimCalendar', () => {
     expect(sim.worldQuestExpiresAtMs).toBeGreaterThan(at.getTime());
   });
 
-  it('targets the next local reset that changes the three-day rotation', () => {
+  it('targets the next local reset that changes the daily rotation', () => {
     const at = new Date(2026, 7, 31, 12, 0);
     const expiry = nextWorldQuestRotationOf(at);
     expect(expiry).toBeGreaterThan(at.getTime());
-    expect(expiry - at.getTime()).toBeLessThanOrEqual(3 * 24 * 60 * 60_000);
+    expect(expiry - at.getTime()).toBeLessThanOrEqual(24 * 60 * 60_000);
     expect(worldQuestCycleForResetDay(resetDayOf(new Date(expiry)))).not.toBe(
       worldQuestCycleForResetDay(resetDayOf(at)),
     );
@@ -151,6 +151,6 @@ describe('feedSimCalendar', () => {
       expiry.getHours(),
       expiry.getMinutes(),
       expiry.getSeconds(),
-    ]).toEqual([2026, 8, 3, 3, 0, 0]);
+    ]).toEqual([2026, 8, 2, 3, 0, 0]);
   });
 });

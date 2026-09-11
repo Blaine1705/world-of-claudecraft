@@ -1,4 +1,4 @@
-﻿import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { WORLD_QUESTS_BY_ID } from '../src/sim/data';
 import { CLASSIC_WORLD_QUEST_COMMANDS } from '../src/sim/dev_world_quest';
 import { Sim } from '../src/sim/sim';
@@ -29,7 +29,7 @@ describe('dev world quest commands', () => {
     expect(quest).toBeDefined();
 
     const meta = sim.players.get(sim.playerId);
-    expect(sim.player.level).toBeGreaterThanOrEqual(10);
+    expect(sim.player.level).toBeGreaterThanOrEqual(quest.minLevel);
     expect(meta?.devWorldQuestCycle).toBeTruthy();
     expect(meta?.worldQuestLog.get(questId)?.state).toBe('active');
     expect(meta?.worldQuestLog.get(questId)?.count).toBe(0);

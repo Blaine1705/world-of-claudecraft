@@ -64,7 +64,7 @@ export const FORGE_STATIONS: readonly {
 export const WORLD_QUEST_FORGING: WorldQuestDef = {
   id: FORGE_QUEST_ID,
   zoneId: 'drakelands',
-  minLevel: 10,
+  minLevel: 16,
   area: { x: 379, z: 2023, radius: 24 },
   objective: { type: 'forging', instructorNpcId: FORGE_NPC_DEF.id },
   count: 1,
