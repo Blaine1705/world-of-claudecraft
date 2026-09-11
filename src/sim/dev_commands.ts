@@ -5,6 +5,7 @@ import { GATHERING_PROFESSIONS } from './content/professions';
 import { DUNGEONS, ITEMS, MOBS, NPCS, WORLD_QUESTS_BY_ID } from './data';
 import { equipBestInSlotForDev } from './dev/bis_gear';
 import { applyDevKit } from './dev_kit';
+import { armWorldQuestForDev, listWorldQuestsForDev } from './dev_world_quest';
 import { armWorldQuestCannonForDev } from './dev_world_quest_cannon';
 import { armWorldQuestCaravanForDev } from './dev_world_quest_caravan';
 import { armWorldQuestForgingForDev } from './dev_world_quest_forging';
@@ -244,6 +245,26 @@ export function handleDevChat(
   }
   if (caravanMatch) {
     armWorldQuestCaravanForDev(ctx, pid, (caravanMatch[1] ?? 'eastbrook').toLowerCase());
+    return null;
+  }
+
+  const wqMatch = /^\/dev\s+wq(?:\s+(\S+))?\s*$/i.exec(raw);
+  if (wqMatch) {
+    const questKey = wqMatch[1];
+    if (!questKey) {
+      listWorldQuestsForDev(ctx, pid);
+    } else {
+      armWorldQuestForDev(ctx, pid, questKey);
+    }
+    return null;
+  }
+
+  const classicWqMatch =
+    /^\/dev\s+(eastbrook_bandits|hollow_sporelings|drakelands_brood|frostveil_howlers|amberfall_lurkers|willowfen_ore|nightbloom_barrow|wraithwood_restless|evergarden_watch|proving_shore_scuttlers)\s*$/i.exec(
+      raw,
+    );
+  if (classicWqMatch) {
+    armWorldQuestForDev(ctx, pid, classicWqMatch[1]);
     return null;
   }
 
@@ -1009,7 +1030,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev salvage, /dev caravan, /dev calligraphy, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev wq [name], /dev salvage, /dev caravan, /dev calligraphy, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill',
     );
     return null;
   }
