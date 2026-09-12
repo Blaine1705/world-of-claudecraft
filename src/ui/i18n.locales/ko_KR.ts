@@ -2879,7 +2879,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.loadFreight': '화물을 마차에 싣기',
   'questUi.worldQuest.escortCaravan': '{zone} 대상단 호위',
   'questUi.worldQuest.salvageWreckage': '난파선 잔해 회수',
-  'questUi.worldQuest.puzzleLevel': '주간 레벨 {level}',
+  'questUi.worldQuest.puzzleLevel': '일일 레벨 {level}',
   'questUi.worldQuest.match3Title': '과자 연쇄',
   'questUi.worldQuest.match3Instructions':
     '서로 인접한 과자 두 개를 선택하세요. 세 개 이상 한 줄을 만드는 교환만 이동으로 계산됩니다.',

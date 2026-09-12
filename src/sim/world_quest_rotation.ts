@@ -54,7 +54,16 @@ export const WORLD_QUESTS_BY_ZONE: Readonly<Record<string, readonly string[]>> =
   proving_shore: Object.freeze(['wq_proving_shore_scuttlers']),
 });
 
-export const WORLD_QUESTS_PER_ROTATION = WORLD_QUEST_ZONES.length;
+/** Daily activities offered alongside the ordinary zone rotation. */
+export const ALWAYS_ACTIVE_WORLD_QUEST_IDS: readonly string[] = Object.freeze([
+  'wq_galecrest_wisps',
+  'wq_galecrest_slalom',
+]);
+
+export const WORLD_QUESTS_PER_ROTATION =
+  WORLD_QUEST_ZONES.filter((zone) =>
+    WORLD_QUESTS_BY_ZONE[zone].some((id) => !ALWAYS_ACTIVE_WORLD_QUEST_IDS.includes(id)),
+  ).length + ALWAYS_ACTIVE_WORLD_QUEST_IDS.length;
 export const MAX_WORLD_QUESTS_PER_ROTATION = WORLD_QUESTS_PER_ROTATION;
 
 const DAYS_IN_MONTH = Object.freeze([31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]);
@@ -127,16 +136,22 @@ export function worldQuestPuzzleVariantForCycle(cycle: unknown, variantCount: nu
   return ((week % variantCount) + variantCount) % variantCount;
 }
 
-/** The authored objectives offered by one daily rotation (exactly one per zone). */
+/** One rotating quest per zone, plus the independently available daily activities. */
 export function activeWorldQuestsForCycle(cycle: unknown): readonly WorldQuestDef[] {
   const number = worldQuestCycleNumber(cycle);
   if (number === null) return [];
   const quests: WorldQuestDef[] = [];
   for (const zoneId of WORLD_QUEST_ZONES) {
-    const ids = WORLD_QUESTS_BY_ZONE[zoneId];
+    const ids = WORLD_QUESTS_BY_ZONE[zoneId]?.filter(
+      (id) => !ALWAYS_ACTIVE_WORLD_QUEST_IDS.includes(id),
+    );
     if (!ids || ids.length === 0) continue;
     const index = ((number % ids.length) + ids.length) % ids.length;
     const quest = WORLD_QUESTS_BY_ID[ids[index]];
+    if (quest) quests.push(quest);
+  }
+  for (const id of ALWAYS_ACTIVE_WORLD_QUEST_IDS) {
+    const quest = WORLD_QUESTS_BY_ID[id];
     if (quest) quests.push(quest);
   }
   return Object.freeze(quests);

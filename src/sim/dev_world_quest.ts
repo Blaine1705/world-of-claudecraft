@@ -122,7 +122,7 @@ export function listWorldQuestsForDev(ctx: SimContext, pid: number): void {
   ctx.emit({
     type: 'log',
     pid,
-    text: '[dev] World Quests: /dev wq <name> or individual commands:',
+    text: '[dev] World Quests: /dev wq <name>; generated daily levels: /dev wq candy <day> or /dev wq ley <day> (1-32, repeating after 32); glider practice: /dev wq glider <level> (1-3); or individual commands:',
   });
   ctx.emit({
     type: 'log',

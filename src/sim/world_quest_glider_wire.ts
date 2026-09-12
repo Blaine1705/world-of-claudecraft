@@ -1,5 +1,7 @@
 import { GLIDER_QUEST_ID } from './content/world_quest_glider';
+import { GLIDER_BOOST_COOLDOWN_TICKS } from './minigames/glider_boost';
 import type { GliderFlightResult, GliderFlightState } from './minigames/glider_flight';
+import { gliderCourseById } from './world_quest_glider_levels';
 
 function bounded(value: unknown, min: number, max: number): value is number {
   return typeof value === 'number' && Number.isFinite(value) && value >= min && value <= max;
@@ -47,14 +49,25 @@ export function decodeGliderState(value: unknown, questId: string): GliderFlight
   }
 
   const result = row.result ? sanitizeGliderResult(row.result) : undefined;
+  const course = gliderCourseById(row.courseId);
+  const tunnels = course.windTunnels ?? [];
+  const windBoosts = Array.isArray(row.windBoosts) ? row.windBoosts.slice(0, tunnels.length) : [];
 
   return {
+    ...(row.courseId === undefined ? {} : { courseId: course.id }),
+    ...(row.practiceOnly === true ? { practiceOnly: true } : {}),
     phase: row.phase as GliderFlightState['phase'],
     tick: row.tick,
     countdownTicks: integer(row.countdownTicks, 0, 20 * 60) ? row.countdownTicks : 0,
     speed: row.speed,
+    boostReadyTick: integer(row.boostReadyTick, 0, row.tick + GLIDER_BOOST_COOLDOWN_TICKS)
+      ? row.boostReadyTick
+      : 0,
     vy: row.vy,
     passedRings: [...row.passedRings],
+    windBoosts: tunnels
+      .filter((tunnel) => windBoosts.includes(tunnel.id))
+      .map((tunnel) => tunnel.id),
     ...(row.recentRingPassed &&
     integer(row.recentRingPassed.id, 1, 100) &&
     integer(row.recentRingPassed.tick, 0, row.tick)

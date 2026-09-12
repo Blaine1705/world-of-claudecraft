@@ -208,6 +208,7 @@ describe('live graphics profile architecture', () => {
 const UI_PURE_CORES = [
   'src/ui/hud/vehicle/vehicle_aim_core.ts',
   'src/ui/hud/vehicle/vehicle_action_bar_view.ts',
+  'src/ui/hud/vehicle/glider_action_bar_view.ts',
   'src/ui/hud/vehicle/cannon_feedback_core.ts',
   'src/ui/hud/vehicle/cannon_tactics_view.ts',
   'src/ui/map_entity_disclosure_core.ts',
@@ -551,6 +552,7 @@ const UI_PURE_CORES = [
   'src/game/perf_diagnosis_core.ts',
   'src/game/post_entry_warmups_core.ts',
   'src/game/ui_effects_profile.ts',
+  'src/game/glider_pitch_input.ts',
   'src/game/ui_tier_knobs.ts',
   'src/ui/trade_view.ts',
   'src/ui/trade_woc_view.ts',
@@ -583,6 +585,8 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // post_bloom_shader_core is the host-agnostic GLSL source patch for the
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
+  'src/render/glider_course_core.ts',
+  'src/render/glider_flight_pose_core.ts',
   'src/render/shadow_detection_core.ts',
   'src/render/world_quest_public_trace_core.ts',
   'src/render/world_quest_trace_core.ts',
@@ -812,6 +816,7 @@ const BARE_NAMED = [
   'src/render/frame_present.ts',
   'src/render/self_motion_rift_lift.ts',
   'src/game/presentation_gate.ts',
+  'src/game/glider_pitch_input.ts',
   'src/game/stale_chrome_focus.ts',
   'src/render/compile_gate.ts',
   'src/render/link_rate_budget.ts',
@@ -1864,6 +1869,7 @@ function deriveBareNamedCores(uiCores: string[], renderCores: string[]): string[
 // allowlist, so a synchronized delete leaves BARE_NAMED disagreeing with THIS list
 // instead of only agreeing with itself.
 const EXPECTED_BARE_NAMED = [
+  'src/game/glider_pitch_input.ts',
   'src/game/presentation_gate.ts',
   'src/game/stale_chrome_focus.ts',
   'src/game/ui_effects_profile.ts',

@@ -29,6 +29,10 @@
   body.mobile-touch .vehicle-action-slots {
     gap: 6px;
   }
+  body.mobile-touch .vehicle-bar.glider-action-bar {
+    grid-template-columns: 64px minmax(0, 1fr);
+    gap: 8px 12px;
+  }
   body.mobile-touch .vehicle-integrity {
     min-height: 48px;
   }

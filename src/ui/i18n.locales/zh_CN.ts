@@ -2789,7 +2789,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.loadFreight': '将货物装上马车',
   'questUi.worldQuest.escortCaravan': '护送{zone}商队',
   'questUi.worldQuest.salvageWreckage': '回收沉船残骸',
-  'questUi.worldQuest.puzzleLevel': '每周关卡 {level}',
+  'questUi.worldQuest.puzzleLevel': '每日关卡 {level}',
   'questUi.worldQuest.match3Title': '糖果连锁',
   'questUi.worldQuest.match3Instructions':
     '选择两个相邻的糖果。只有组成三个或更多相同糖果的一排时，交换才会计入。',

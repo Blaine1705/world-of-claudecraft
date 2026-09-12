@@ -5,7 +5,6 @@ import {
   createGliderFlightState,
   GLIDER_BASE_FORWARD_SPEED,
   GLIDER_BASE_SINK_RATE,
-  GLIDER_BRAKE_FORWARD_SPEED,
   type GliderCourseDef,
   scoreGliderFlight,
   tickGliderFlight,
@@ -59,7 +58,7 @@ describe('Glider Flight Minigame', () => {
     expect(player.facing).toBeLessThan(afterLeft);
   });
 
-  it('explicit dive and surface trim altitude independently of speed', () => {
+  it('explicit dive and surface exchange altitude and speed', () => {
     const flat: GliderCourseDef = {
       ...TEST_COURSE,
       rings: [{ id: 1, x: 0, y: 100, z: 100, radius: 5, boostY: 0 }],
@@ -78,8 +77,8 @@ describe('Glider Flight Minigame', () => {
       up = fly(false, true);
     expect(down.player.pos.y).toBeLessThan(neutral.player.pos.y);
     expect(up.player.pos.y).toBeGreaterThan(neutral.player.pos.y);
-    expect(down.state.speed).toBe(neutral.state.speed);
-    expect(up.state.speed).toBe(neutral.state.speed);
+    expect(down.state.speed).toBeGreaterThan(neutral.state.speed);
+    expect(up.state.speed).toBeLessThan(neutral.state.speed);
   });
 
   it('S brakes forward flight without requiring a climb', () => {
@@ -89,7 +88,7 @@ describe('Glider Flight Minigame', () => {
     for (let i = 0; i < 20; i++)
       tickGliderFlight(state, player, { ...emptyMoveInput(), back: true }, TEST_COURSE, WORLD_SEED);
     expect(state.speed).toBeLessThan(GLIDER_BASE_FORWARD_SPEED);
-    expect(state.speed).toBeGreaterThanOrEqual(GLIDER_BRAKE_FORWARD_SPEED);
+    expect(state.speed).toBeGreaterThanOrEqual(8);
     expect(state.vy).toBeLessThan(0);
   });
 
@@ -144,14 +143,15 @@ describe('Glider Flight Minigame', () => {
     expect(player.vz).toBe(0);
   });
 
-  it('bounces upward with thermal cushion when low over canyon terrain', () => {
+  it('fails on terrain contact without granting artificial lift up the ground', () => {
     const state = createGliderFlightState(false);
     const groundY = groundHeight(0, 40, WORLD_SEED);
     const player = createPlayer(1, 'warrior', { x: 0, y: groundY + 0.5, z: 40 }, 'Test');
     tickGliderFlight(state, player, emptyMoveInput(), TEST_COURSE, WORLD_SEED);
-    expect(player.pos.y).toBeGreaterThan(groundY + 0.5);
-    expect(state.vy).toBeGreaterThanOrEqual(0);
-    expect(state.phase).toBe('flying');
+    expect(player.pos.y).toBeLessThanOrEqual(groundY + 0.5);
+    expect(state.vy).toBeLessThan(0);
+    expect(state.phase).toBe('failed');
+    expect(player.vy).toBe(0);
   });
 
   it('computes ratings and scores properly', () => {
@@ -167,8 +167,8 @@ describe('Glider Flight Minigame', () => {
   });
 });
 
-describe('assisted authored glider flight', () => {
-  it('W changes speed without requesting extra vertical descent on a level flight profile', () => {
+describe('energy-controlled authored glider flight', () => {
+  it('W cannot create powered flight or extra vertical lift', () => {
     const flat: GliderCourseDef = {
       id: 'flat',
       rings: [
@@ -188,11 +188,11 @@ describe('assisted authored glider flight', () => {
     }
     const neutral = fly(false),
       boost = fly(true);
-    expect(boost.state.speed).toBeGreaterThan(neutral.state.speed);
+    expect(boost.state.speed).toBe(neutral.state.speed);
     expect(boost.player.pos.y).toBeCloseTo(neutral.player.pos.y, 8);
   });
   it.each([false, true])(
-    'flies the actual coastal circuit using only steering, with W=%s',
+    'flies the actual coastal circuit using steering and pitch, with W=%s',
     (forward) => {
       const state = createGliderFlightState(true);
       const player = createPlayer(1, 'warrior', { ...GLIDER_LAUNCH_SITE.playerLaunch }, 'Pilot');
@@ -209,6 +209,13 @@ describe('assisted authored glider flight', () => {
           forward,
           turnLeft: difference > 0.06,
           turnRight: difference < -0.06,
+          gliderPitch: Math.max(
+            -1,
+            Math.min(
+              1,
+              ((target.y - player.pos.y) * 1.5 + 0.55) / (target.y > player.pos.y ? 7 : 14),
+            ),
+          ),
         };
         const oldY = player.pos.y;
         tickGliderFlight(state, player, input, GLIDER_COURSE, WORLD_SEED);
@@ -217,8 +224,9 @@ describe('assisted authored glider flight', () => {
       }
       expect(state.phase).toBe('won');
       expect(state.passedRings).toEqual(GLIDER_COURSE.rings.map((r) => r.id));
-      expect(state.result?.elapsedSeconds).toBeGreaterThan(40);
-      expect(state.result?.elapsedSeconds).toBeLessThan(70);
+      expect(state.result?.elapsedSeconds).toBeGreaterThan(30);
+      expect(state.result?.elapsedSeconds).toBeLessThan(110);
+      expect(state.windBoosts?.length).toBeGreaterThan(0);
     },
   );
   it('sweeps across small rings between ticks and never credits one twice', () => {
@@ -236,7 +244,7 @@ describe('assisted authored glider flight', () => {
     player.facing = 0;
     tickGliderFlight(state, player, emptyMoveInput(), course, WORLD_SEED);
     expect(state.passedRings).toEqual([1]);
-    expect(player.pos.y).toBe(100);
+    expect(player.pos.y).toBeLessThan(100);
     player.facing = Math.PI;
     tickGliderFlight(state, player, emptyMoveInput(), course, WORLD_SEED);
     expect(state.passedRings).toEqual([1]);
@@ -262,8 +270,8 @@ describe('assisted authored glider flight', () => {
     };
     tickGliderFlight(state, player, hostile, course, WORLD_SEED);
     expect(player.facing).toBe(Math.PI / 2);
-    expect(state.speed).toBe(GLIDER_BASE_FORWARD_SPEED);
-    expect(player.pos.y).toBe(100);
+    expect(state.speed).toBeCloseTo(GLIDER_BASE_FORWARD_SPEED, 1);
+    expect(player.pos.y).toBeLessThan(100);
     for (let i = 0; i < 100 && state.phase === 'flying'; i++)
       tickGliderFlight(state, player, hostile, course, WORLD_SEED);
     expect(state.phase).toBe('failed');

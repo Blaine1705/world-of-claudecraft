@@ -2,6 +2,7 @@ import type {
   GliderCourseDef,
   GliderLandingPadDef,
   GliderRingDef,
+  GliderWindTunnelDef,
 } from '../minigames/glider_flight';
 import type { NpcDef, WorldQuestDef } from '../types';
 
@@ -70,6 +71,50 @@ export const GLIDER_COURSE_RINGS: readonly GliderRingDef[] = [
 
 export const GLIDER_MEDAL_TARGETS = { goldSeconds: 52, silverSeconds: 68, timeoutSeconds: 110 };
 
+// Horizontal wind lanes between rings, aligned with the direction of travel.
+export const GLIDER_WIND_TUNNELS: readonly GliderWindTunnelDef[] = [
+  {
+    id: 'opening',
+    x: 447,
+    y: 74,
+    z: 586,
+    yaw: Math.atan2(6, 68),
+    radius: 7,
+    length: 22,
+    speedBoost: 8,
+  },
+  {
+    id: 'northbound',
+    x: 509.5,
+    y: 70.5,
+    z: 488,
+    yaw: Math.atan2(-21, -84),
+    radius: 6,
+    length: 24,
+    speedBoost: 8,
+  },
+  {
+    id: 'ridge',
+    x: 435,
+    y: 61.5,
+    z: 199,
+    yaw: Math.atan2(-70, 16),
+    radius: 5,
+    length: 22,
+    speedBoost: 7,
+  },
+  {
+    id: 'homeward',
+    x: 222,
+    y: 43,
+    z: 458,
+    yaw: Math.atan2(2, 60),
+    radius: 4.5,
+    length: 20,
+    speedBoost: 7,
+  },
+];
+
 export const GLIDER_LANDING_PAD: GliderLandingPadDef = {
   x: 248,
   y: 1.36,
@@ -83,6 +128,7 @@ export const GLIDER_COURSE: GliderCourseDef = {
   landingPad: GLIDER_LANDING_PAD,
   minRings: 18,
   medals: GLIDER_MEDAL_TARGETS,
+  windTunnels: GLIDER_WIND_TUNNELS,
 };
 
 export const WORLD_QUEST_GLIDER: WorldQuestDef = {

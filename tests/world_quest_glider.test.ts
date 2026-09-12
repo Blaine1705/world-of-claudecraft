@@ -7,6 +7,7 @@ import {
   GLIDER_NPC_DEF,
   GLIDER_NPC_ID,
   GLIDER_QUEST_ID,
+  GLIDER_WIND_TUNNELS,
 } from '../src/sim/content/world_quest_glider';
 import { BUILTIN_WORLD, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
@@ -16,7 +17,7 @@ import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import { emptyMoveInput, normAngle } from '../src/sim/types';
 import { WATER_LEVEL } from '../src/sim/world';
-import { startGliderFlight } from '../src/sim/world_quest_glider';
+import { advanceGliderMovement, startGliderFlight } from '../src/sim/world_quest_glider';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
 function setupSim(fullWorld = false) {
@@ -41,6 +42,80 @@ function setupSim(fullWorld = false) {
 }
 
 describe('World Quest Glider Integration', () => {
+  it('publishes a wind-only crossing immediately between periodic snapshot ticks', () => {
+    const sim = setupSim();
+    sim.chat('/dev glider start');
+    const meta = sim.meta(sim.playerId)!;
+    const state = meta.worldQuestLog.get(GLIDER_QUEST_ID)!.glider!;
+    state.phase = 'flying';
+    state.speed = 22;
+    state.tick = 0;
+    const lane = GLIDER_WIND_TUNNELS[0];
+    sim.player.pos = {
+      x: lane.x - Math.sin(lane.yaw) * 0.5,
+      y: lane.y,
+      z: lane.z - Math.cos(lane.yaw) * 0.5,
+    };
+    sim.player.facing = lane.yaw;
+    Object.assign(meta.moveInput, emptyMoveInput(), { gliderPitch: 0 });
+    const revision = meta.wireRev;
+    advanceGliderMovement((sim as unknown as { ctx: SimContext }).ctx, sim.player, meta);
+    expect(state.tick).toBe(1);
+    expect(state.passedRings).toEqual([]);
+    expect(state.phase).toBe('flying');
+    expect(state.windBoosts).toEqual([lane.id]);
+    expect(meta.wireRev).toBe(revision + 1);
+  });
+
+  it('pitch-only steering clears AFK while a neutral camera does not', () => {
+    const sim = setupSim();
+    sim.chat('/dev glider start');
+    const meta = sim.meta(sim.playerId)!;
+    const ctx = (sim as unknown as { ctx: SimContext }).ctx;
+    meta.away = { mode: 'afk', message: '' };
+    sim.player.afk = true;
+    Object.assign(meta.moveInput, emptyMoveInput(), { gliderPitch: 0 });
+    advanceGliderMovement(ctx, sim.player, meta);
+    expect(meta.away?.mode).toBe('afk');
+    expect(sim.player.afk).toBe(true);
+    meta.moveInput.gliderPitch = 0.3;
+    advanceGliderMovement(ctx, sim.player, meta);
+    expect(meta.away).toBeNull();
+    expect(sim.player.afk).toBe(false);
+    expect(meta.lastActiveTick).toBe(ctx.tickCount);
+  });
+
+  it('replays pitch and tunnel inputs identically across independent seeded Sims', () => {
+    const sims = [setupSim(), setupSim()];
+    const lane = GLIDER_WIND_TUNNELS[0];
+    for (const sim of sims) {
+      sim.chat('/dev glider start');
+      const state = sim.worldQuestLog.get(GLIDER_QUEST_ID)!.glider!;
+      state.phase = 'flying';
+      state.speed = 22;
+      sim.player.pos = {
+        x: lane.x - Math.sin(lane.yaw),
+        y: lane.y,
+        z: lane.z - Math.cos(lane.yaw),
+      };
+      sim.player.facing = lane.yaw;
+    }
+    for (let tick = 0; tick < 20; tick++) {
+      for (const sim of sims) {
+        Object.assign(sim.moveInput, emptyMoveInput(), { gliderPitch: Math.sin(tick / 5) * 0.3 });
+        sim.tick();
+      }
+      expect(sims[0].player.pos).toEqual(sims[1].player.pos);
+      expect(sims[0].worldQuestLog.get(GLIDER_QUEST_ID)?.glider).toEqual(
+        sims[1].worldQuestLog.get(GLIDER_QUEST_ID)?.glider,
+      );
+    }
+    expect(sims[0].worldQuestLog.get(GLIDER_QUEST_ID)?.glider?.windBoosts).toEqual([lane.id]);
+    const tail = (sim: Sim) =>
+      Array.from({ length: 8 }, () => (sim as unknown as { ctx: SimContext }).ctx.rng.next());
+    expect(tail(sims[0])).toEqual(tail(sims[1]));
+  });
+
   it('arms quest and positions player with /dev glider', () => {
     const sim = setupSim();
     sim.chat('/dev glider');
@@ -154,11 +229,19 @@ describe('World Quest Glider Integration', () => {
         forward: true,
         turnLeft: difference > 0.06,
         turnRight: difference < -0.06,
+        gliderPitch: Math.max(
+          -1,
+          Math.min(
+            1,
+            ((target.y - sim.player.pos.y) * 1.5 + 0.55) / (target.y > sim.player.pos.y ? 7 : 14),
+          ),
+        ),
       });
       sim.tick();
     }
     expect(progress.state).toBe('completed');
     expect(progress.glider?.passedRings).toHaveLength(GLIDER_COURSE.rings.length);
+    expect(progress.glider?.windBoosts?.length).toBeGreaterThan(0);
     expect(progress.gliderResult?.elapsedSeconds).toBeLessThan(85);
     expect(sim.copper).toBeGreaterThan(before);
     const rewarded = sim.copper;
@@ -263,10 +346,10 @@ describe('World Quest Glider Integration', () => {
     expect(sim.player.hp).toBe(hp);
     expect(sim.player.dead).toBe(false);
   });
-  it('finishes the real populated world course at level 10 without ground mobs cancelling aerial flight', () => {
+  it('finishes the real populated world course at level 20 without ground mobs cancelling aerial flight', () => {
     const sim = setupSim(true);
     sim.chat('/dev glider start');
-    expect(sim.player.level).toBe(10);
+    expect(sim.player.level).toBe(20);
     expect(
       [...sim.entities.values()].filter((e) => e.kind === 'mob' && e.hostile).length,
     ).toBeGreaterThan(100);
@@ -296,6 +379,13 @@ describe('World Quest Glider Integration', () => {
         forward: true,
         turnLeft: difference > 0.06,
         turnRight: difference < -0.06,
+        gliderPitch: Math.max(
+          -1,
+          Math.min(
+            1,
+            ((target.y - sim.player.pos.y) * 1.5 + 0.55) / (target.y > sim.player.pos.y ? 7 : 14),
+          ),
+        ),
       });
       sim.tick();
     }

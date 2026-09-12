@@ -657,7 +657,8 @@ const MONOLITHS: MonolithRow[] = [
     // merge: both parents had already ratcheted for their own work, so
     // the composite is the honest size. Exact count, zero slack.
     // Mount-race decoding and vehicle commands live in their existing wire state seams.
-    ceiling: 5888,
+    // Shared analog movement encoding now lives in movement_frame_v2_wire.
+    ceiling: 5886,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

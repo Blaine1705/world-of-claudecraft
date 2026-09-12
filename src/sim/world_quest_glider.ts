@@ -1,7 +1,6 @@
 import {
   GLIDER_APPRENTICE_NPC_DEF,
   GLIDER_APPRENTICE_NPC_ID,
-  GLIDER_COURSE,
   GLIDER_LAUNCH_SITE,
   GLIDER_NPC_DEF,
   GLIDER_NPC_ID,
@@ -17,6 +16,7 @@ import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { clearAfkOnMove } from './social/away';
 import { type Entity, INTERACT_RANGE, type WorldQuestProgress } from './types';
+import { gliderCourseById } from './world_quest_glider_levels';
 
 export function ensureGliderInstructor(ctx: SimContext): void {
   if (ctx.cfg.world && !ctx.cfg.world.npcs[GLIDER_NPC_DEF.id]) return;
@@ -42,6 +42,10 @@ export function ensureGliderInstructor(ctx: SimContext): void {
 
 export function clearGliderEncounter(meta: PlayerMeta, progress: WorldQuestProgress): void {
   if (!progress.glider) return;
+  if (progress.glider.practiceOnly) {
+    progress.state = 'completed';
+    progress.count = 1;
+  }
   delete progress.glider;
   meta.wireRev++;
 }
@@ -154,7 +158,13 @@ export function startGliderFlight(
   player.prevPos = { ...player.pos };
   player.facing = GLIDER_LAUNCH_SITE.playerFacing;
 
-  progress.glider = createGliderFlightState(true);
+  const courseId = gliderCourseById(progress.glider?.courseId).id;
+  const practiceOnly = progress.glider?.practiceOnly;
+  progress.glider = {
+    ...createGliderFlightState(true),
+    courseId,
+    ...(practiceOnly ? { practiceOnly: true as const } : {}),
+  };
   player.vx = 0;
   player.vy = 0;
   player.vz = 0;
@@ -185,8 +195,9 @@ export function advanceGliderMovement(ctx: SimContext, player: Entity, meta: Pla
 
   const beforePhase = state.phase;
   const beforeRings = state.passedRings.length;
+  const beforeBoosts = state.windBoosts?.length ?? 0;
 
-  tickGliderFlight(state, player, meta.moveInput, GLIDER_COURSE, ctx.cfg.seed);
+  tickGliderFlight(state, player, meta.moveInput, gliderCourseById(state.courseId), ctx.cfg.seed);
   // The tick mutates phase beyond the entry guard's countdown/flying narrowing.
   const phaseAfterTick = state.phase as GliderFlightState['phase'];
   player.onGround = phaseAfterTick === 'won' || phaseAfterTick === 'failed';
@@ -217,7 +228,8 @@ export function advanceGliderMovement(ctx: SimContext, player: Entity, meta: Pla
     input.forward ||
     input.back ||
     input.dive ||
-    input.surface
+    input.surface ||
+    (input.gliderPitch !== undefined && input.gliderPitch !== 0)
   ) {
     meta.lastActiveTick = ctx.tickCount;
     clearAfkOnMove(ctx, meta, player);
@@ -226,7 +238,8 @@ export function advanceGliderMovement(ctx: SimContext, player: Entity, meta: Pla
   if (
     state.tick % 4 === 0 ||
     state.phase !== beforePhase ||
-    state.passedRings.length !== beforeRings
+    state.passedRings.length !== beforeRings ||
+    (state.windBoosts?.length ?? 0) !== beforeBoosts
   ) {
     meta.wireRev++;
   }
@@ -253,6 +266,14 @@ export function updateGliderEncounter(
   if (!progress.gliderResult || state.result.score > progress.gliderResult.score) {
     progress.gliderResult = { ...state.result };
     meta.wireRev++;
+  }
+  if (state.practiceOnly) {
+    if (progress.state !== 'completed') {
+      progress.state = 'completed';
+      progress.count = 1;
+      meta.wireRev++;
+    }
+    return false;
   }
   return true;
 }

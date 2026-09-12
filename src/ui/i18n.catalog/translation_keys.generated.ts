@@ -12089,6 +12089,8 @@ export type TranslationKeyFlat =
   | 'questUi.worldQuest.forge.tools'
   | 'questUi.worldQuest.forge.water'
   | 'questUi.worldQuest.forge.wrong'
+  | 'questUi.worldQuest.glider.boost'
+  | 'questUi.worldQuest.glider.boostTip'
   | 'questUi.worldQuest.glider.complete'
   | 'questUi.worldQuest.glider.controls'
   | 'questUi.worldQuest.glider.countdown'

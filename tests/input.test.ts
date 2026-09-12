@@ -134,6 +134,85 @@ afterEach(() => {
 });
 
 describe('Input camera zoom', () => {
+  it.each(['mouse', 'touch drag', 'touch stick', 'gamepad'] as const)(
+    'uses the flight camera bounds for %s without changing ground bounds',
+    (device) => {
+      const { input, setGliderActive, canvasListeners, windowListeners } = makeInput();
+      const look = (delta: number) => {
+        if (device === 'gamepad') input.applyGamepadLook(0, delta);
+        else if (device === 'touch drag') input.applyTouchLookDelta(0, delta * 10000);
+        else if (device === 'touch stick') {
+          input.setTouchLook(true);
+          input.setTouchLookVector({ x: 0, y: delta });
+          input.updateTouchLook(10);
+        } else {
+          canvasListeners.get('mousedown')!({ button: 2, ...CENTER, preventDefault: vi.fn() });
+          windowListeners.get('mousemove')!({ movementX: 10, movementY: 5, ...CENTER });
+          for (let i = 0; i < 100; i++) {
+            windowListeners.get('mousemove')!({ movementX: 0, movementY: delta * 10, ...CENTER });
+          }
+          windowListeners.get('mouseup')!({ button: 2, ...CENTER });
+        }
+      };
+      look(-10);
+      expect(input.camPitch).toBe(-0.4);
+      setGliderActive(true);
+      look(-10);
+      expect(input.camPitch).toBe(-1.15);
+      look(10);
+      expect(input.camPitch).toBe(1.35);
+    },
+  );
+  it('opens upward camera travel only in flight and restores the normal clamp on exit', () => {
+    const { input, setGliderActive } = makeInput();
+    input.applyGamepadLook(0, -10);
+    expect(input.camPitch).toBe(-0.4);
+    input.camPitch = 0.32;
+    setGliderActive(true);
+    input.readMoveInput();
+    expect(input.camPitch).toBe(0.32);
+    input.setGamepadLookActive(true);
+    input.applyGamepadLook(0, -10);
+    expect(input.camPitch).toBe(-1.15);
+    expect(input.readMoveInput().gliderPitch).toBe(1);
+    setGliderActive(false);
+    expect(input.readMoveInput().gliderPitch).toBeUndefined();
+    expect(input.camPitch).toBe(-0.4);
+  });
+  it('steers flight only while a steering look owns the camera and clears on cancel', () => {
+    const { input, setGliderActive, windowListeners } = makeInput();
+    setGliderActive(true);
+    input.camPitch = -0.4;
+    expect(input.readMoveInput().gliderPitch).toBeUndefined();
+    input.setTouchLook(true);
+    expect(input.readMoveInput().gliderPitch).toBe(1);
+    input.setTouchLook(false);
+    expect(input.readMoveInput().gliderPitch).toBeUndefined();
+    input.setMouseCameraEnabled(true);
+    expect(input.readMoveInput().gliderPitch).toBe(1);
+    input.suspendMovement = true;
+    expect(input.readMoveInput().gliderPitch).toBeUndefined();
+    input.suspendMovement = false;
+    windowListeners.get('blur')?.({});
+    expect(input.readMoveInput().gliderPitch).toBeUndefined();
+    input.applyGamepadLook(0, 0.01);
+    expect(input.readMoveInput().gliderPitch).toBe(1);
+    setGliderActive(false);
+    expect(input.readMoveInput().gliderPitch).toBeUndefined();
+  });
+  it('right drag sends pitch, left drag only orbits, and mouse release clears pitch', () => {
+    const { input, canvasListeners, windowListeners, setGliderActive } = makeInput();
+    setGliderActive(true);
+    for (const button of [0, 2]) {
+      canvasListeners.get('mousedown')!({ button, ...CENTER, preventDefault: vi.fn() });
+      windowListeners.get('mousemove')!({ movementX: 10, movementY: 5, ...CENTER });
+      windowListeners.get('mousemove')!({ movementX: 12, movementY: 0, ...CENTER });
+      input.camPitch = 1.35;
+      expect(input.readMoveInput().gliderPitch).toBe(button === 2 ? -1 : undefined);
+      windowListeners.get('mouseup')!({ button, ...CENTER });
+      expect(input.readMoveInput().gliderPitch).toBeUndefined();
+    }
+  });
   it('vehicle orbit lock freezes all look controls without consuming ground-aim clicks', () => {
     const { input, canvas, canvasListeners, windowListeners, cb, setCameraMotionLocked } =
       makeInput();

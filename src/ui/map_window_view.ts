@@ -17,6 +17,7 @@
 // the painter needs to resolve their localized text, never the resolved string.
 
 import type { GatheringProfessionId } from '../sim/content/professions';
+import { GLIDER_NPC_DEF } from '../sim/content/world_quest_glider';
 import {
   DUNGEON_LIST,
   GATHER_NODES,
@@ -1001,15 +1002,17 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     if (quest.zoneId !== zone.id || playerLevel < quest.minLevel) continue;
     const progress = world.worldQuestLog?.get(quest.id);
     if (progress?.state === 'completed') continue;
-    if (!inView(quest.area.x, quest.area.z)) continue;
-    const { mx, my } = toMap(quest.area.x, quest.area.z);
+    const isGlider = quest.objective.type === 'glider';
+    const position = isGlider ? GLIDER_NPC_DEF.pos : quest.area;
+    if (!inView(position.x, position.z)) continue;
+    const { mx, my } = toMap(position.x, position.z);
     worldQuests.push({
       questId: quest.id,
       mx,
       my,
-      radius: (quest.area.radius / spanX) * S,
+      radius: isGlider ? 0 : (quest.area.radius / spanX) * S,
       state: progress?.state === 'active' ? 'active' : 'available',
-      areaVisible: input.selectedWorldQuestId === quest.id,
+      areaVisible: !isGlider && input.selectedWorldQuestId === quest.id,
     });
   }
 

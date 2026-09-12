@@ -2,6 +2,11 @@ import type { Sim } from '../src/sim/sim';
 
 type QuestWireMessage = Record<string, unknown>;
 
+/** No payload: the sim rechecks alive, level one and overworld admission. */
+export function startTutorialWire(sim: Sim, pid: number): void {
+  sim.startTutorial(pid);
+}
+
 export function acceptQuestWire(sim: Sim, msg: QuestWireMessage, pid: number): boolean {
   if (typeof msg.quest !== 'string') return false;
   sim.acceptQuest(msg.quest, typeof msg.selection === 'string' ? msg.selection : undefined, pid);
@@ -63,6 +68,9 @@ export function shadowWorldQuestWire(sim: Sim, msg: QuestWireMessage, pid: numbe
 /** Route the world-quest-only command family outside the server monolith. */
 export function dispatchWorldQuestWire(sim: Sim, msg: QuestWireMessage, pid: number): void {
   switch (msg.cmd) {
+    case 'world_quest_glider_boost':
+      sim.boostWorldQuestGlider(pid);
+      break;
     case 'world_quest_puzzle_rotate':
       rotateWorldQuestPuzzleWire(sim, msg, pid);
       break;

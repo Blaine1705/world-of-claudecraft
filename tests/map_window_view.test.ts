@@ -10,6 +10,7 @@
 // getComputedStyle and are covered by the no-magic-values source guard instead.
 
 import { describe, expect, it } from 'vitest';
+import { GLIDER_NPC_DEF, WORLD_QUEST_GLIDER } from '../src/sim/content/world_quest_glider';
 import {
   BUILTIN_WORLD,
   CAMPS,
@@ -1073,6 +1074,30 @@ describe('active-quest objective areas (the classic POI blobs)', () => {
 });
 
 describe('world-quest zone markers', () => {
+  it.each(['sim', 'client'] as const)(
+    'marks only the glider instructor when selected (%s)',
+    (shape) => {
+      const world = makeOverworldWorld(shape, new Map(), 20);
+      const zone = ZONES.find((entry) => entry.id === 'galecrest')!;
+      const model = buildOverworldMapModel({
+        ...input(world, 1),
+        zone,
+        selectedWorldQuestId: WORLD_QUEST_GLIDER.id,
+      });
+      const marker = model.worldQuests.find((entry) => entry.questId === WORLD_QUEST_GLIDER.id)!;
+      expect(marker).toBeDefined();
+      expect(marker.areaVisible).toBe(false);
+      expect(marker.radius).toBe(0);
+      const { x, z } = GLIDER_NPC_DEF.pos;
+      expect(marker.mx).toBeCloseTo(
+        ((model.region.maxX - x) / (model.region.maxX - model.region.minX)) * CANVAS,
+      );
+      expect(marker.my).toBeCloseTo(
+        ((model.region.maxZ - z) / (model.region.maxZ - model.region.minZ)) * CANVAS,
+      );
+      expect(WORLD_QUEST_GLIDER.area.radius).toBe(330);
+    },
+  );
   const quest = (() => {
     const found = WORLD_QUESTS.find((candidate) => candidate.zoneId === ZONE.id);
     if (!found) throw new Error('expected a world quest in the first zone');
@@ -1083,14 +1108,14 @@ describe('world-quest zone markers', () => {
     return new Map([[quest.id, { questId: quest.id, count: 2, state }]]);
   }
 
-  it('projects exactly one objective per zone selected for the current rotation', () => {
+  it('projects the daily objectives, including both Galecrest challenges', () => {
     let projected = 0;
     for (const zone of ZONES) {
       const world = makeOverworldWorld('sim', new Map(), 20);
       world.player.pos.x = ((zone.xMin ?? -500) + (zone.xMax ?? 500)) / 2;
       world.player.pos.z = (zone.zMin + zone.zMax) / 2;
       const model = buildOverworldMapModel({ ...input(world, 1), zone });
-      expect(model.worldQuests.length, zone.id).toBeLessThanOrEqual(1);
+      expect(model.worldQuests.length, zone.id).toBe(zone.id === 'galecrest' ? 2 : 1);
       if (model.worldQuests[0]) {
         expect(model.worldQuests[0].radius, zone.id).toBeGreaterThan(0);
         projected++;

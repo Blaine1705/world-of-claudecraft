@@ -17,6 +17,7 @@ export type QuestWorldCommand =
   | { cmd: 'world_quest_match3_swap'; quest: string; fromIndex: number; toIndex: number }
   | { cmd: 'world_quest_match3_reset'; quest: string }
   | { cmd: 'world_quest_puzzle_reset'; quest: string }
+  | { cmd: 'world_quest_glider_boost' }
   | { cmd: 'world_quest_accuse'; npcId: number }
   | { cmd: 'world_quest_shadow'; action: 'pickpocket' | 'leave'; targetId?: number };
 
@@ -71,6 +72,10 @@ export class QuestWorldWireState {
 
   accuseWorldQuestSuspect(npcId: number): void {
     this.sendQuestWorldCommand({ cmd: 'world_quest_accuse', npcId });
+  }
+
+  boostWorldQuestGlider(): void {
+    this.sendQuestWorldCommand({ cmd: 'world_quest_glider_boost' });
   }
 
   shadowWorldQuestAction(action: 'pickpocket' | 'leave', targetId?: number): void {

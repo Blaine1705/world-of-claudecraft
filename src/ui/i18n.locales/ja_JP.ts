@@ -2901,7 +2901,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.loadFreight': '荷物を荷馬車に積み込む',
   'questUi.worldQuest.escortCaravan': '{zone}の隊商を護衛する',
   'questUi.worldQuest.salvageWreckage': '難破船の残骸を回収',
-  'questUi.worldQuest.puzzleLevel': '週間レベル {level}',
+  'questUi.worldQuest.puzzleLevel': 'デイリーレベル {level}',
   'questUi.worldQuest.match3Title': 'お菓子の連鎖',
   'questUi.worldQuest.match3Instructions':
     '隣り合うお菓子を2つ選んでください。3つ以上の列ができる入れ替えだけが手数に数えられます。',

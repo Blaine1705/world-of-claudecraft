@@ -227,12 +227,15 @@ const questStringsEn = {
       },
       glider: {
         title: 'Windrider Slalom',
+        boost: 'Extra Speed',
+        boostTip:
+          'Increase your flight speed by {speed} yd/s, up to {maximum} yd/s. Available while flying. Recharges in {seconds} seconds.',
         objective: 'Soar through the wind rings and land in the marked zone',
         ready: 'Speak to Flightmaster Zephyr to launch.',
         countdown: 'Launch in {count}... Hold tight!',
         flying: 'Rings: {rings}/{total} | Speed: {speed} yd/s',
         controls:
-          'Automatic forward glide and height assist. Move forward to speed up, backward to brake, left/right to steer. Jump or swim up to climb; dive to descend.',
+          'Hold right mouse and look up to climb at the cost of speed; look down to dive and gain speed. Slow flight loses lift. Left/right steer; backward brakes. Jump or swim up/down also control pitch. Fly forward through wind tunnels for a speed boost, once per tunnel per attempt.',
         landed: '{rating}! Passed {rings}/{total} rings in {time}s.',
         failed: 'Descent failed! Landed off course or missed too many rings.',
         retry:
@@ -287,7 +290,7 @@ const questStringsEn = {
       puzzleDefeatDetail: 'The current has faded. The ritual is unfinished.',
       puzzleReturn: 'Return to realm',
       puzzleResultAnnouncement: '{title}. {detail} {reach}.',
-      puzzleLevel: 'Weekly level {level}',
+      puzzleLevel: 'Daily level {level}',
       puzzleInstructions: 'Rotate the tiles to carry the beam from the source to the destination.',
       puzzleRotateTile: 'Rotate tile {tile}',
       puzzleConnectors: 'Connectors: {connectors}.',

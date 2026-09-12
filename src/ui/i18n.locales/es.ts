@@ -5942,7 +5942,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.matchConfections': 'Combina dulces encantados',
   'questUi.worldQuest.escortCaravan': 'Escolta la caravana: {zone}',
   'questUi.worldQuest.salvageWreckage': 'Recupera restos del naufragio',
-  'questUi.worldQuest.puzzleLevel': 'Nivel semanal {level}',
+  'questUi.worldQuest.puzzleLevel': 'Nivel diario {level}',
   'questUi.worldQuest.match3Title': 'Cascada de dulces',
   'questUi.worldQuest.match3Instructions':
     'Selecciona dos dulces adyacentes. El movimiento solo cuenta si forma una línea de tres o más.',

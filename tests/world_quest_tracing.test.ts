@@ -352,7 +352,7 @@ describe('calligraphy content placement and rotation', () => {
     expect(activeWorldQuestsForCycle('wq1_1').some((q) => q.id === 'wq_willowfen_caravan')).toBe(
       true,
     );
-    expect(activeWorldQuestsForCycle('wq1_2')).toHaveLength(15);
+    expect(activeWorldQuestsForCycle('wq1_2')).toHaveLength(16);
     expect(POINTS).toHaveLength(4);
     expect(POINTS[0]).toEqual(POINTS[3]);
     expect(SHAPES.map((shape) => shape.kind)).toEqual(['triangle', 'square', 'star']);

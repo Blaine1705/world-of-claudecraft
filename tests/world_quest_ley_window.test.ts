@@ -2,6 +2,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { WORLD_QUESTS_BY_ID } from '../src/sim/data';
 import type { WorldQuestProgress } from '../src/sim/types';
+import { generateDailyLeyPuzzle } from '../src/sim/world_quest_daily_generation';
+import { worldQuestPuzzleConnectors } from '../src/sim/world_quest_puzzle';
 import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
 import { questEventPresentation } from '../src/ui/quest_event_view';
 import { WorldQuestPuzzleWindow } from '../src/ui/world_quest_puzzle_window';
@@ -45,6 +47,55 @@ describe('Ley Beam Alignment presentation', () => {
     setLanguage('en');
   });
   afterEach(() => setLanguage('en'));
+
+  it('opens visibly different daily boards through puzzle events and repeats day 1 on day 33', () => {
+    const { panel, root, progress } = rig();
+    const signatures: string[] = [];
+    try {
+      for (const day of [1, 2, 16, 33]) {
+        const puzzle = generateDailyLeyPuzzle(day - 1);
+        progress.puzzleDay = day - 1;
+        progress.puzzleRotations = puzzle.tiles.map((tile) => tile.initialRotation);
+        panel.applyEventPresentation(
+          questEventPresentation({ type: 'worldQuestPuzzleOpened', questId })!,
+        );
+        expect(root.style.display).toBe('flex');
+        expect(root.querySelector('.wql-timer')?.textContent).toBe('90s');
+        const tiles = [...root.querySelectorAll<HTMLElement>('[data-puzzle-tile]')];
+        expect(tiles).toHaveLength(16);
+        for (const [kind, endpoint] of [
+          ['source', puzzle.source],
+          ['target', puzzle.target],
+        ] as const) {
+          const edge = root.querySelector(`.wqp-edge.${kind}`);
+          expect(edge?.parentElement?.dataset.puzzleTile).toBe(String(endpoint.tileIndex));
+          expect(edge?.classList.contains(endpoint.side)).toBe(true);
+        }
+        const visible = tiles.map((tile, index) => {
+          const arms = [...tile.querySelectorAll<HTMLElement>('.wqp-arm')]
+            .filter((arm) => !arm.hidden)
+            .map((arm) => [...arm.classList].find((name) => name !== 'wqp-arm'));
+          expect(arms.sort()).toEqual(
+            [
+              ...worldQuestPuzzleConnectors(
+                puzzle.tiles[index].kind,
+                puzzle.tiles[index].initialRotation,
+              ),
+            ].sort(),
+          );
+          return {
+            arms,
+            edges: [...tile.querySelectorAll('.wqp-edge')].map((edge) => edge.className),
+          };
+        });
+        signatures.push(JSON.stringify(visible));
+      }
+      expect(new Set(signatures.slice(0, 3)).size).toBe(3);
+      expect(signatures[3]).toBe(signatures[0]);
+    } finally {
+      panel.close();
+    }
+  });
 
   it('starts each alignment attempt with 90 seconds remaining', () => {
     const { panel, root } = rig();

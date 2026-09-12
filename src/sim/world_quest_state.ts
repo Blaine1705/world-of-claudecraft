@@ -59,6 +59,10 @@ export function currentWorldQuestRotation(
   return cache.rotation;
 }
 
+export function rotationBindings(cache: WorldQuestRotationCache, host: { resetDay: string }) {
+  return { currentWorldQuestRotation: () => currentWorldQuestRotation(cache, host.resetDay) };
+}
+
 export function restoreWorldQuestState(
   meta: PlayerMeta,
   saved: CharacterState['worldQuests'],

@@ -7,11 +7,20 @@ import {
   sanitizeWorldQuestMatch3Board,
   worldQuestMatch3Matches,
 } from '../src/sim/world_quest_match3';
-import { worldQuestPuzzleVariantForCycle } from '../src/sim/world_quest_rotation';
+import {
+  worldQuestCycleForResetDay,
+  worldQuestPuzzleVariantForCycle,
+} from '../src/sim/world_quest_rotation';
 
 type Match3Quest = WorldQuestDef & {
   objective: Extract<WorldQuestObjective, { type: 'match3' }>;
 };
+
+// Literal move scripts exercise legacy/dev boards; generated production boards
+// have separate end-to-end coverage in world_quest_daily_levels.test.ts.
+function useAuthoredLevels(sim: Sim): void {
+  sim.meta(sim.playerId)!.devWorldQuestCycle = worldQuestCycleForResetDay(sim.resetDay);
+}
 
 function fixture(): {
   quest: Match3Quest;
@@ -193,6 +202,7 @@ describe('weekly world quest match-three', () => {
     const sim = new Sim({ seed: 992, playerClass: 'warrior', autoEquip: true });
     sim.setPlayerLevel(20);
     sim.resetDay = '2026-08-31';
+    useAuthoredLevels(sim);
     sim.player.pos.x = quest.area.x;
     sim.player.pos.z = quest.area.z;
     const events = sim.tick();
@@ -283,6 +293,7 @@ describe('weekly world quest match-three', () => {
     });
     original.setPlayerLevel(20);
     original.resetDay = '2026-08-31';
+    useAuthoredLevels(original);
     original.player.pos.x = quest.area.x;
     original.player.pos.z = quest.area.z;
     original.tick();
@@ -349,6 +360,7 @@ describe('weekly world quest match-three', () => {
     const sim = new Sim({ seed: 994, playerClass: 'warrior', autoEquip: true });
     sim.setPlayerLevel(20);
     sim.resetDay = '2026-08-31';
+    useAuthoredLevels(sim);
     sim.player.pos.x = quest.area.x;
     sim.player.pos.z = quest.area.z;
     sim.tick();
@@ -414,6 +426,7 @@ describe('weekly world quest match-three', () => {
     const sim = new Sim({ seed: 995, playerClass: 'warrior', autoEquip: true });
     sim.setPlayerLevel(20);
     sim.resetDay = '2026-08-31';
+    useAuthoredLevels(sim);
     sim.player.pos.x = quest.area.x;
     sim.player.pos.z = quest.area.z;
     sim.tick();
@@ -469,6 +482,7 @@ describe('weekly world quest match-three', () => {
       });
       original.setPlayerLevel(20);
       original.resetDay = resetDay;
+      useAuthoredLevels(original);
       original.player.pos.x = quest.area.x;
       original.player.pos.z = quest.area.z;
       original.tick();

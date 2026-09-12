@@ -2934,7 +2934,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.loadFreight': 'Загрузить груз в повозку',
   'questUi.worldQuest.escortCaravan': 'Сопроводить караван: {zone}',
   'questUi.worldQuest.salvageWreckage': 'Собрать обломки кораблекрушения',
-  'questUi.worldQuest.puzzleLevel': 'Еженедельный уровень {level}',
+  'questUi.worldQuest.puzzleLevel': 'Ежедневный уровень {level}',
   'questUi.worldQuest.match3Title': 'Каскад сладостей',
   'questUi.worldQuest.match3Instructions':
     'Выберите две соседние сладости. Ход засчитывается, только если обмен создаёт ряд из трёх или более.',

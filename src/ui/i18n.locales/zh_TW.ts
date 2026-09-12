@@ -2791,7 +2791,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.loadFreight': '將貨物裝上馬車',
   'questUi.worldQuest.escortCaravan': '護送{zone}商隊',
   'questUi.worldQuest.salvageWreckage': '回收沉船殘骸',
-  'questUi.worldQuest.puzzleLevel': '每週關卡 {level}',
+  'questUi.worldQuest.puzzleLevel': '每日關卡 {level}',
   'questUi.worldQuest.match3Title': '糖果連鎖',
   'questUi.worldQuest.match3Instructions':
     '選擇兩個相鄰的糖果。只有組成三個或更多相同糖果的一排時，交換才會計入。',

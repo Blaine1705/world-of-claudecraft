@@ -217,6 +217,21 @@ describe('minimapMode (delve vs overworld discriminator)', () => {
 });
 
 describe('createMinimapMarkers: the discriminated union per draw kind', () => {
+  it.each(['sim', 'client'] as const)(
+    'centers the glider emblem on its instructor (%s)',
+    (shape) => {
+      const world = makeWorld(shape);
+      world.player.level = 20;
+      world.player.pos.x = 450;
+      world.player.pos.z = 520;
+      Object.assign(world, { worldQuestCycle: '2026-08-31', worldQuestLog: new Map() });
+      const model = buildMarkers(world);
+      const marker = model.find(
+        (entry) => entry.kind === 'world-quest' && entry.questId === 'wq_galecrest_slalom',
+      );
+      expect(marker).toMatchObject({ mx: S / 2, my: S / 2 });
+    },
+  );
   it('shows a nearby available world quest as a hit-testable small marker', () => {
     const quest = WORLD_QUESTS_BY_ID.wq_eastbrook_bandits;
     const world = makeWorld('sim') as unknown as {

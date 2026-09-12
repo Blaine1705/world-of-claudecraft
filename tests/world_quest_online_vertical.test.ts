@@ -38,7 +38,10 @@ vi.mock('../server/db', () => ({
 
 import { ClientWorld } from '../src/net/online';
 import { WORLD_QUESTS_BY_ID } from '../src/sim/data';
+import { solveDailyMatch3Level } from '../src/sim/world_quest_daily_generation';
+import { resolveWorldQuestMatch3Level } from '../src/sim/world_quest_daily_levels';
 import { hasWorldQuestDeliveryCargo } from '../src/sim/world_quest_delivery';
+import { applyWorldQuestMatch3Move } from '../src/sim/world_quest_match3';
 import { joinGroundTruthCharacter, teleportEntity } from './helpers/movement_ground_truth';
 
 class CapturingWebSocket {
@@ -109,13 +112,19 @@ describe('online world-quest command path', () => {
     expect(await pickup).toBe(true);
     expect(joined.server.sim.meta(joined.pid)?.openWorldQuestPuzzleId).toBe(quest.id);
 
-    client.swapWorldQuestMatch3Tiles(quest.id, 2, 3);
+    const dailyProgress = joined.server.sim.meta(joined.pid)!.worldQuestLog.get(quest.id)!;
+    expect(dailyProgress.puzzleDay).toBe(0);
+    const dailyLevel = resolveWorldQuestMatch3Level(quest, dailyProgress)!;
+    const firstMove = solveDailyMatch3Level(dailyLevel)![0];
+    const expectedMove = applyWorldQuestMatch3Move(dailyLevel, dailyLevel.board, ...firstMove, 0);
+    client.swapWorldQuestMatch3Tiles(quest.id, ...firstMove);
     const swapFrame = socket.sent.pop();
     if (!swapFrame) throw new Error('Client did not send match-three command');
     joined.server.handleMessage(joined.session, swapFrame);
     expect(joined.server.sim.meta(joined.pid)?.worldQuestLog.get(quest.id)).toMatchObject({
-      count: 3,
+      count: expectedMove.cleared,
       match3Moves: 1,
+      match3Board: expectedMove.board,
     });
 
     client.resetWorldQuestMatch3(quest.id);
@@ -126,6 +135,8 @@ describe('online world-quest command path', () => {
       count: 0,
       match3Moves: 0,
       match3RefillIndex: 0,
+      puzzleDay: 0,
+      match3Board: dailyLevel.board,
     });
 
     const beamQuest = WORLD_QUESTS_BY_ID.wq_galecrest_wisps;

@@ -20,6 +20,7 @@ export interface IWorldQuests {
   swapWorldQuestMatch3Tiles(questId: string, fromIndex: number, toIndex: number): void;
   resetWorldQuestMatch3(questId: string): void;
   resetWorldQuestPuzzle(questId: string): void;
+  boostWorldQuestGlider(): void;
   accuseWorldQuestSuspect(npcId: number): void;
   shadowWorldQuestAction(action: 'pickpocket' | 'leave', targetId?: number): void;
   acceptLinkedQuest(questId: string, fromPid: number): void;

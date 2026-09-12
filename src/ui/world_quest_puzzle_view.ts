@@ -1,6 +1,10 @@
 import { WORLD_QUESTS_BY_ID } from '../sim/data';
 import type { WorldQuestBeamSide, WorldQuestProgress } from '../sim/types';
 import {
+  resolveWorldQuestLeyPuzzle,
+  worldQuestDisplayedLevel,
+} from '../sim/world_quest_daily_levels';
+import {
   sanitizeWorldQuestPuzzleRotations,
   traceWorldQuestPuzzle,
   worldQuestPuzzleConnectors,
@@ -34,18 +38,14 @@ export function buildWorldQuestPuzzleView(
 ): WorldQuestPuzzleView | null {
   const quest = ownEntry(WORLD_QUESTS_BY_ID, questId);
   if (quest?.objective.type !== 'puzzle' || progress?.state !== 'active') return null;
-  const level = Math.max(
-    0,
-    Math.min(quest.objective.puzzles.length - 1, progress.puzzleVariant ?? 0),
-  );
-  const puzzle = quest.objective.puzzles[level];
+  const puzzle = resolveWorldQuestLeyPuzzle(quest, progress);
   if (!puzzle) return null;
   const rotations = sanitizeWorldQuestPuzzleRotations(progress.puzzleRotations, puzzle);
   const trace = traceWorldQuestPuzzle(puzzle, rotations);
   const powered = new Set(trace.path);
   return {
     questId,
-    level: level + 1,
+    level: worldQuestDisplayedLevel(progress, quest.objective.puzzles.length),
     columns: puzzle.columns,
     rows: puzzle.rows,
     solved: trace.solved,

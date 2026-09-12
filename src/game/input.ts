@@ -8,6 +8,7 @@ import { sanitizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import type { MoveInput } from '../sim/types';
 import { detectBrowserEngine } from './browser_env';
 import { cursorForHover, type HoverCursorKind } from './cursors';
+import { clampGliderCameraPitch, gliderPitchFromCamera } from './glider_pitch_input';
 import { comboCode, isModifierCode, type Keybinds, makeCombo } from './keybinds';
 import { bindableMouseCodeForButton, isReservedMouseButton } from './mouse_binds';
 import {
@@ -223,6 +224,7 @@ export class Input {
   hoverActive = false;
   private hoverKind: HoverCursorKind = 'default';
   private mouseCameraEnabled = false;
+  private gliderLookSuspended = false;
   // "Lock cursor while rotating" (settings: lockCursorOnRotate, default on).
   // When on, an active camera drag pointer-locks the canvas so the OS cursor
   // cannot reach the screen edge (camera freeze) or slip to a second monitor.
@@ -590,6 +592,7 @@ export class Input {
    * intent can resume when the transition curtain comes down.
    */
   resetForClientTransition(): void {
+    this.gliderLookSuspended = true;
     const emoteWheelWasOpen = this.emoteWheelHeldCodes.size > 0;
     this.keys.clear();
     this.keyJumpUntil = 0;
@@ -717,9 +720,9 @@ export class Input {
     if (this.cb.isCameraMotionLocked?.()) return;
     const dragSens = this.lookSensitivity * TOUCH_DRAG_SENS_MULT * this.touchLookSpeed;
     this.camYaw -= dx * dragSens;
-    this.camPitch = Math.min(
-      1.35,
-      Math.max(-0.4, this.camPitch + this.touchPitchSign * dy * dragSens),
+    this.camPitch = clampGliderCameraPitch(
+      this.camPitch + this.touchPitchSign * dy * dragSens,
+      this.cb.isGliderActive?.() === true,
     );
     this.swimAimPitch = this.camPitch;
     if (dx !== 0 || dy !== 0) this.noteIntent('look');
@@ -765,7 +768,10 @@ export class Input {
     if (this.cb.isCameraMotionLocked?.()) return;
     if (yawDelta === 0 && pitchDelta === 0) return;
     this.camYaw += yawDelta;
-    this.camPitch = Math.min(1.35, Math.max(-0.4, this.camPitch + pitchDelta));
+    this.camPitch = clampGliderCameraPitch(
+      this.camPitch + pitchDelta,
+      this.cb.isGliderActive?.() === true,
+    );
     this.swimAimPitch = this.camPitch;
     this.noteIntent('look');
   }
@@ -782,17 +788,14 @@ export class Input {
     if (this.cb.isCameraMotionLocked?.()) return;
     if (!this.touchLookActive) return;
     this.camYaw -= this.touchLookVector.x * TOUCH_LOOK_YAW_RATE * this.touchLookSpeed * dt;
-    this.camPitch = Math.min(
-      1.35,
-      Math.max(
-        -0.4,
-        this.camPitch +
-          this.touchPitchSign *
-            this.touchLookVector.y *
-            TOUCH_LOOK_PITCH_RATE *
-            this.touchLookSpeed *
-            dt,
-      ),
+    this.camPitch = clampGliderCameraPitch(
+      this.camPitch +
+        this.touchPitchSign *
+          this.touchLookVector.y *
+          TOUCH_LOOK_PITCH_RATE *
+          this.touchLookSpeed *
+          dt,
+      this.cb.isGliderActive?.() === true,
     );
     this.swimAimPitch = this.camPitch;
   }
@@ -896,6 +899,7 @@ export class Input {
   }
 
   private releaseCapture(reason: string): void {
+    if (reason !== 'pointerlock') this.gliderLookSuspended = true;
     const hadInput = this.keys.size > 0 || this.leftDown || this.rightDown;
     // Always drop the mouse-drag state so a button can't stick "held".
     this.leftDown = false;
@@ -1505,15 +1509,16 @@ export class Input {
     // player kept holding a drag button.
     this.maybeEngageDragPointerLock();
     this.camYaw -= mx * this.lookSensitivity;
-    this.camPitch = Math.min(
-      1.35,
-      Math.max(-0.4, this.camPitch + my * this.lookSensitivity * this.lookPitchSign),
+    this.camPitch = clampGliderCameraPitch(
+      this.camPitch + my * this.lookSensitivity * this.lookPitchSign,
+      this.cb.isGliderActive?.() === true,
     );
     if (this.rightDown || this.mouseCameraEnabled) this.swimAimPitch = this.camPitch;
     if (mx !== 0 || my !== 0) this.noteIntent('look');
   }
 
   private noteIntent(kind: 'move' | 'look' | 'zoom'): void {
+    if (kind === 'look') this.gliderLookSuspended = false;
     this.cb.onInputIntent?.(kind);
   }
 
@@ -1574,7 +1579,7 @@ export class Input {
   /** Any horizontal movement input held, from any device — the gate the swim
    *  camera bands ride (readSwimSteer). Mirrors the readMoveInput sources. */
   private anyMoveHeld(): boolean {
-    if (this.cb.isGliderActive?.()) return false;
+    if (this.cb?.isGliderActive?.()) return false;
     return (
       this.heldAction('forward') ||
       this.heldAction('back') ||
@@ -1637,7 +1642,16 @@ export class Input {
     // never moves the body (the WoW rule). Every flag here is only ever read
     // while swimming, so aiming the camera around on land is inert. See
     // SWIM_LOOK_* for the bands and swimSteer for the graded rate.
-    const { dive, surface, swimSteer } = this.readSwimSteer(this.anyMoveHeld());
+    const flying = this.cb?.isGliderActive?.() === true;
+    this.camPitch = clampGliderCameraPitch(this.camPitch, flying);
+    const { dive, surface, swimSteer } = flying
+      ? { dive: this.heldAction('dive') || this.touchDive, surface: false, swimSteer: 0 }
+      : this.readSwimSteer(this.anyMoveHeld());
+    const gliderPitch = gliderPitchFromCamera(
+      this.camPitch,
+      flying,
+      !this.gliderLookSuspended && (this.isMouselookActive() || this.mouseCameraEnabled),
+    );
 
     if (this.mouseCameraEnabled) {
       return {
@@ -1647,6 +1661,7 @@ export class Input {
         dive,
         surface,
         swimSteer,
+        gliderPitch,
         turnLeft: false,
         turnRight: false,
         strafeLeft:
@@ -1672,6 +1687,7 @@ export class Input {
       dive,
       surface,
       swimSteer,
+      gliderPitch,
       strafeLeft:
         held('strafeLeft') ||
         (mouselook && aHeld) ||

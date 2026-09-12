@@ -2,18 +2,123 @@ import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import { GliderCourseVisual } from '../src/render/glider_course_visual';
 import { GLIDER_COURSE, GLIDER_QUEST_ID } from '../src/sim/content/world_quest_glider';
+import { GLIDER_COURSES } from '../src/sim/content/world_quest_glider_levels';
 import type { IWorld } from '../src/world_api';
 
 function world(): IWorld {
   return {
     player: { pos: { x: 360, y: 90, z: 590 }, facing: 0 },
     worldQuestLog: new Map([
-      [GLIDER_QUEST_ID, { glider: { phase: 'flying', vy: -2, passedRings: [] } }],
+      [GLIDER_QUEST_ID, { state: 'active', glider: { phase: 'flying', vy: -2, passedRings: [] } }],
     ]),
   } as unknown as IWorld;
 }
 
 describe('glider course presentation lifecycle', () => {
+  it('switches all ring positions and wind corridors to the selected session without rebuilding', async () => {
+    const gate = vi.fn(async () => {});
+    const visual = new GliderCourseVisual(new THREE.Group(), () => 0, gate);
+    await visual.readyForEntry;
+    const state = world();
+    const ring = visual.group.children[0] as THREE.Mesh;
+    const geometry = ring.geometry;
+    for (const course of [...GLIDER_COURSES, GLIDER_COURSE]) {
+      Object.assign(state.worldQuestLog.get(GLIDER_QUEST_ID)!.glider!, { courseId: course.id });
+      visual.update(state);
+      for (let i = 0; i < course.rings.length; i++) {
+        const mesh = visual.group.children[i];
+        expect(mesh.position.toArray()).toEqual([
+          course.rings[i].x,
+          course.rings[i].y,
+          course.rings[i].z,
+        ]);
+      }
+      const visibleWinds = visual.group.children.filter(
+        (child) => child.name === 'glider-wind-tunnels' && child.visible,
+      );
+      expect(visibleWinds).toHaveLength(1);
+      expect(visibleWinds[0].children[0].position.toArray()).toEqual([
+        course.windTunnels![0].x,
+        course.windTunnels![0].y,
+        course.windTunnels![0].z,
+      ]);
+      expect(ring.geometry).toBe(geometry);
+    }
+    expect(gate).toHaveBeenCalledOnce();
+    visual.dispose();
+  });
+  it('warms wind geometry under the course gate and shares its attempt visibility', async () => {
+    let warmedWindCount = 0;
+    let hiddenAtCompile = false;
+    const gate = vi.fn(async (root: THREE.Object3D) => {
+      warmedWindCount = root.getObjectByName('glider-wind-tunnels')?.children.length ?? 0;
+      hiddenAtCompile = !root.visible;
+    });
+    const visual = new GliderCourseVisual(new THREE.Group(), () => 0, gate);
+    await visual.readyForEntry;
+    expect(gate).toHaveBeenCalledOnce();
+    expect(warmedWindCount).toBeGreaterThan(0);
+    expect(hiddenAtCompile).toBe(true);
+    const state = world();
+    visual.update(state);
+    const wind = visual.group.getObjectByName('glider-wind-tunnels')!;
+    expect(wind.parent).toBe(visual.group);
+    expect(visual.group.visible).toBe(true);
+    state.worldQuestLog = new Map();
+    visual.update(state);
+    const visible: THREE.Object3D[] = [];
+    visual.group.traverseVisible((child) => visible.push(child));
+    expect(visible).not.toContain(wind);
+    visual.dispose();
+  });
+
+  it.each([0, Math.PI / 2, Math.PI, -Math.PI / 2])(
+    'tilts the nose upward in its local facing frame at yaw %s',
+    async (yaw) => {
+      const visual = new GliderCourseVisual(new THREE.Group(), () => 0);
+      await visual.readyForEntry;
+      const state = world();
+      state.player.facing = yaw;
+      Object.assign(state.worldQuestLog.get(GLIDER_QUEST_ID)!.glider!, { vy: 8, speed: 16 });
+      visual.update(state);
+      visual.group.updateMatrixWorld(true);
+      const apparatus = visual.group.getObjectByName('glider-apparatus')!;
+      const nose = new THREE.Vector3(0, 0, 1).transformDirection(apparatus.matrixWorld);
+      expect(nose.y).toBeGreaterThan(0);
+      expect(Math.atan2(nose.x, nose.z)).toBeCloseTo(yaw);
+      visual.dispose();
+    },
+  );
+
+  it('hides the course before acceptance, after an attempt, and after a daily reset', async () => {
+    const visual = new GliderCourseVisual(new THREE.Group(), () => 0);
+    await visual.readyForEntry;
+    const state = world();
+    const progress = state.worldQuestLog.get(GLIDER_QUEST_ID)!;
+    state.worldQuestLog = new Map();
+    visual.update(state);
+    expect(visual.group.visible).toBe(false);
+
+    state.worldQuestLog = new Map([[GLIDER_QUEST_ID, progress]]);
+    for (const phase of ['countdown', 'flying', 'failed', 'countdown', 'won'] as const) {
+      progress.glider!.phase = phase;
+      visual.update(state);
+      expect(visual.group.visible).toBe(phase === 'countdown' || phase === 'flying');
+    }
+    progress.glider!.phase = 'flying';
+    progress.state = 'completed';
+    visual.update(state);
+    expect(visual.group.visible).toBe(false);
+    progress.state = 'active';
+    visual.update(state);
+    expect(visual.group.visible).toBe(true);
+    state.worldQuestLog = new Map();
+    visual.update(state);
+    expect(visual.group.visible).toBe(false);
+    expect(visual.group.getObjectByName('glider-apparatus')?.visible).toBe(false);
+    visual.dispose();
+  });
+
   it('keeps every landing-pad vertex above the sampled slope at the authored radius', async () => {
     const ground = (x: number, z: number) => 0.25 * x - 0.4 * z + 100;
     const visual = new GliderCourseVisual(new THREE.Group(), ground);
@@ -146,7 +251,7 @@ describe('glider course presentation lifecycle', () => {
     const state = world();
     state.worldQuestLog = new Map();
     visual.update(state);
-    expect(visual.group.visible).toBe(true);
+    expect(visual.group.visible).toBe(false);
     expect(visual.group.getObjectByName('glider-apparatus')?.visible).toBe(false);
     visual.dispose();
   });

@@ -8,6 +8,7 @@ import { applyDevKit } from './dev_kit';
 import { armWorldQuestForDev, listWorldQuestsForDev } from './dev_world_quest';
 import { armWorldQuestCannonForDev } from './dev_world_quest_cannon';
 import { armWorldQuestCaravanForDev } from './dev_world_quest_caravan';
+import { armDailyWorldQuestForDev } from './dev_world_quest_daily';
 import { armWorldQuestForgingForDev } from './dev_world_quest_forging';
 import { armWorldQuestGliderForDev } from './dev_world_quest_glider';
 import { armWorldQuestHordeForDev } from './dev_world_quest_horde';
@@ -245,6 +246,17 @@ export function handleDevChat(
   }
   if (caravanMatch) {
     armWorldQuestCaravanForDev(ctx, pid, (caravanMatch[1] ?? 'eastbrook').toLowerCase());
+    return null;
+  }
+
+  const dailyWqMatch = /^\/dev\s+wq\s+(candy|ley)(?:\s+(.*?))?\s*$/i.exec(raw);
+  if (dailyWqMatch) {
+    armDailyWorldQuestForDev(ctx, pid, dailyWqMatch[1].toLowerCase(), dailyWqMatch[2] ?? '');
+    return null;
+  }
+  const gliderLevelMatch = /^\/dev\s+wq\s+glider(?:\s+(.*?))?\s*$/i.exec(raw);
+  if (gliderLevelMatch) {
+    armWorldQuestGliderForDev(ctx, pid, true, gliderLevelMatch[1] ?? '1');
     return null;
   }
 

@@ -1,21 +1,19 @@
-// Mechanical glider descent flight model.
+// Mechanical glider flight coordinator: pitch energy, swept course credit and landing.
 // Pure deterministic sim logic: runs at 20 Hz, draws no DOM, Three.js or Math.random.
 
 import { DT, type Entity, type MoveInput, normAngle } from '../types';
 import { groundHeight } from '../world';
+import { GLIDER_NEUTRAL_SINK, stepGliderEnergy } from './glider_energy';
+import { applyGliderWind, type GliderWindTunnelDef } from './glider_wind';
+
+export type { GliderWindTunnelDef } from './glider_wind';
 
 export const GLIDER_BASE_FORWARD_SPEED = 22; // yards per second
-export const GLIDER_DIVE_FORWARD_SPEED = 28;
-export const GLIDER_BRAKE_FORWARD_SPEED = 16;
 
-// Vertical input trims the assisted descent; forward/back affect airspeed only.
-export const GLIDER_BASE_SINK_RATE = 0;
-export const GLIDER_DIVE_SINK_RATE = -3;
-export const GLIDER_BRAKE_SINK_RATE = 3;
+export const GLIDER_BASE_SINK_RATE = GLIDER_NEUTRAL_SINK;
 export const GLIDER_TURN_RATE = 2.4;
 export const GLIDER_COUNTDOWN_TICKS = 60;
 const GLIDER_MAX_DESCENT = 16;
-const GLIDER_MAX_CLIMB = 6;
 const GLIDER_COURSE_MARGIN = 55;
 const GLIDER_DEFAULT_TIMEOUT_SECONDS = 60;
 
@@ -47,6 +45,7 @@ export interface GliderCourseDef {
   landingPad: GliderLandingPadDef;
   minRings: number;
   medals?: GliderMedalTargets;
+  windTunnels?: readonly GliderWindTunnelDef[];
 }
 
 export interface GliderFlightResult {
@@ -58,12 +57,19 @@ export interface GliderFlightResult {
 }
 
 export interface GliderFlightState {
+  /** Session-only authored route; absent means the original daily course. */
+  courseId?: string;
+  /** Dev replay of an already claimed daily quest must never award another reward. */
+  practiceOnly?: true;
   phase: 'countdown' | 'flying' | 'won' | 'failed';
   tick: number;
   countdownTicks: number;
   speed: number;
   vy: number;
   passedRings: number[];
+  windBoosts?: string[];
+  /** Next allowed manual boost, measured against this flight's tick. */
+  boostReadyTick?: number;
   recentRingPassed?: { id: number; tick: number };
   result?: GliderFlightResult;
 }
@@ -76,6 +82,8 @@ export function createGliderFlightState(startCountdown = true): GliderFlightStat
     speed: startCountdown ? 0 : GLIDER_BASE_FORWARD_SPEED,
     vy: startCountdown ? 0 : GLIDER_BASE_SINK_RATE,
     passedRings: [],
+    windBoosts: [],
+    boostReadyTick: 0,
   };
 }
 
@@ -186,52 +194,40 @@ export function tickGliderFlight(
   if (left !== right)
     player.facing = normAngle(player.facing + (left ? 1 : -1) * GLIDER_TURN_RATE * DT);
 
-  const accelerate = Boolean(input.forward),
-    brake = Boolean(input.back);
-  let targetSpeed =
-    accelerate !== brake
-      ? accelerate
-        ? GLIDER_DIVE_FORWARD_SPEED
-        : GLIDER_BRAKE_FORWARD_SPEED
-      : GLIDER_BASE_FORWARD_SPEED;
   const pad = course.landingPad;
   const previous = { ...player.pos };
   const padDistance = Math.hypot(player.pos.x - pad.x, player.pos.z - pad.z);
-  const landing = padDistance <= pad.radius * 2 && state.passedRings.length >= course.minRings;
-  if (landing) targetSpeed = Math.min(targetSpeed, Math.max(8, padDistance * 0.6));
-  state.speed += (targetSpeed - state.speed) * 0.15;
+  const landing = padDistance <= pad.radius * 5 && state.passedRings.length >= course.minRings;
+  const energy = stepGliderEnergy(state.speed, state.vy, input);
+  state.speed = energy.speed;
+  state.vy = energy.vy;
+  if (landing)
+    state.speed += (Math.min(state.speed, Math.max(8, padDistance * 0.4)) - state.speed) * 0.15;
   player.pos.x += Math.sin(player.facing) * state.speed * DT;
   player.pos.z += Math.cos(player.facing) * state.speed * DT;
 
   const profile = courseProfile(player.pos, course);
-  const ahead = courseProfile(
-    {
-      x: player.pos.x + Math.sin(player.facing) * state.speed * 0.25,
-      y: player.pos.y,
-      z: player.pos.z + Math.cos(player.facing) * state.speed * 0.25,
-    },
-    course,
-  );
   const ground = groundHeight(player.pos.x, player.pos.z, worldSeed);
-  let targetHeight = Math.max(ahead.height, ground + 1.2);
   // Final approach trades speed for a gentle touchdown inside the actual pad.
-  if (landing) targetHeight = ground + Math.max(0, padDistance - pad.radius * 0.5) * 0.3;
-  const down = Boolean(input.dive),
-    up = Boolean(input.surface || input.jump);
-  const trim = down !== up ? (down ? GLIDER_DIVE_SINK_RATE : GLIDER_BRAKE_SINK_RATE) : 0;
-  const targetVy = Math.max(
-    -GLIDER_MAX_DESCENT,
-    Math.min(GLIDER_MAX_CLIMB, (targetHeight - player.pos.y) * 4 + (landing ? 0 : trim)),
-  );
-  state.vy += (targetVy - state.vy) * 0.25;
-  player.pos.y += state.vy * DT;
-  if (!landing && player.pos.y < ground + 1.2) {
-    player.pos.y = ground + 1.2;
-    state.vy = Math.max(0, state.vy);
+  if (landing) {
+    const targetHeight = ground + Math.max(0, padDistance - pad.radius * 0.5) * 0.3;
+    const targetVy = Math.max(-GLIDER_MAX_DESCENT, Math.min(0, (targetHeight - player.pos.y) * 4));
+    state.vy += (targetVy - state.vy) * 0.25;
   }
+  player.pos.y += state.vy * DT;
+  const terrainContact = !landing && player.pos.y <= ground + 1.2;
   player.vx = (player.pos.x - previous.x) / DT;
   player.vy = (player.pos.y - previous.y) / DT;
   player.vz = (player.pos.z - previous.z) / DT;
+  const wind = applyGliderWind(
+    state.speed,
+    state.windBoosts ?? [],
+    previous,
+    player.pos,
+    course.windTunnels ?? [],
+  );
+  state.speed = wind.speed;
+  state.windBoosts = wind.windBoosts;
 
   for (const ring of course.rings) {
     if (!state.passedRings.includes(ring.id) && segmentTouchesRing(previous, player.pos, ring)) {
@@ -250,6 +246,7 @@ export function tickGliderFlight(
     ((player.pos.x - pad.x) * endDx + (player.pos.z - pad.z) * endDz) / endLength > 25;
   if (
     touchedPad ||
+    terrainContact ||
     beyondEnd ||
     profile.distance > GLIDER_COURSE_MARGIN ||
     state.tick >= 20 * (course.medals?.timeoutSeconds ?? GLIDER_DEFAULT_TIMEOUT_SECONDS)

@@ -3,6 +3,7 @@
 import { WORLD_QUESTS_BY_ID } from './content/world_quests';
 import type { WorldQuestProgress, WorldQuestTraceState } from './types';
 import { decodeForgeState } from './world_quest_forge_wire';
+import { decodeGliderState } from './world_quest_glider_wire';
 import { decodeHordeState } from './world_quest_horde_wire';
 import { decodeInvestigationState } from './world_quest_investigation_wire';
 import { decodeShadowState } from './world_quest_shadow_wire';
@@ -108,6 +109,7 @@ export function worldQuestProgressForWire(progress: WorldQuestProgress): WorldQu
     horde: rawHorde,
     investigation: rawInvestigation,
     shadow: rawShadow,
+    glider: rawGlider,
     ...base
   } = progress;
   const shadow =
@@ -116,8 +118,10 @@ export function worldQuestProgressForWire(progress: WorldQuestProgress): WorldQu
   const horde = decodeHordeState(rawHorde, progress.questId);
   const forging = decodeForgeState(rawForge, progress.questId);
   const tracing = decodeWorldQuestProgressTrace(rawTrace, progress);
+  const glider = decodeGliderState(rawGlider, progress.questId);
   return {
     ...base,
+    ...(glider === undefined ? {} : { glider }),
     ...(investigation === undefined ? {} : { investigation }),
     ...(shadow === undefined ? {} : { shadow }),
     ...(horde === undefined ? {} : { horde }),

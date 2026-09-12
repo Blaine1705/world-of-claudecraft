@@ -4341,6 +4341,8 @@ export interface WorldQuestProgress {
   traceResult?: WorldQuestTraceResult;
   creditedObjects?: string[];
   puzzleVariant?: number;
+  /** Deterministic daily generation marker; absent on authored legacy/dev attempts. */
+  puzzleDay?: number;
   puzzleRotations?: number[];
   puzzleExpiresAt?: number;
   match3Board?: WorldQuestMatch3Candy[];
@@ -7313,6 +7315,9 @@ export interface MoveInput {
    *  key binding, a bot, and any client that never sends it all read as 1
    *  (`swimSteerRate`), which is exactly the old on/off behaviour. */
   swimSteer?: number;
+  /** Signed flight pitch intent, -1 dive to +1 climb. Absent uses keyboard
+   * controls; zero explicitly requests a neutral glide. */
+  gliderPitch?: number;
 }
 
 // A bounded height edit (the sculpt brush stamp), applied inside terrainHeight()
@@ -7681,6 +7686,7 @@ export interface SimConfig {
 
 export function emptyMoveInput(): MoveInput {
   return {
+    gliderPitch: undefined,
     forward: false,
     back: false,
     turnLeft: false,

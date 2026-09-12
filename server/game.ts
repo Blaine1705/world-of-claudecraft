@@ -6837,9 +6837,7 @@ export class GameServer {
         if (questWire.acceptQuestWire(sim, msg, pid)) this.resyncQuests(session);
         break;
       case 'tutorial_start':
-        // No payload to validate: the sim re-runs every gate (alive, level 1,
-        // overworld) on its authoritative copy before the teleport.
-        sim.startTutorial(pid);
+        questWire.startTutorialWire(sim, pid);
         break;
       case 'turnin':
         if (typeof msg.quest === 'string') {
@@ -6869,6 +6867,7 @@ export class GameServer {
       case 'world_quest_accuse':
       case 'world_quest_shadow':
       case 'world_quest_puzzle_reset':
+      case 'world_quest_glider_boost':
         return void questWire.dispatchWorldQuestWire(sim, msg, pid);
       case 'qlinkaccept':
         if (questWire.acceptLinkedQuestWire(sim, msg, pid)) this.resyncQuests(session);

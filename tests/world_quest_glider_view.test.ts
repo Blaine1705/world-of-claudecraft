@@ -13,6 +13,17 @@ function fixture(): WorldQuestProgress {
   return { questId: GLIDER_QUEST_ID, state: 'active', count: 0, glider: createGliderFlightState() };
 }
 describe('glider tracker instructions', () => {
+  it('explains camera pitch, energy loss and the wind tunnel attempt limit', () => {
+    const controls = t('questUi.worldQuest.glider.controls');
+    expect(controls).toContain('Hold right mouse');
+    expect(controls).toContain('climb at the cost of speed');
+    expect(controls).toContain('dive and gain speed');
+    expect(controls).toContain('Slow flight loses lift');
+    expect(controls).toContain('once per tunnel per attempt');
+    expect(controls).not.toContain('height assist');
+    expect(gliderInstructionLines(fixture())).toContain(controls);
+  });
+
   it('reports a failed flight even when no score was produced', () => {
     const progress = fixture();
     if (!progress.glider) throw new Error('missing fixture');

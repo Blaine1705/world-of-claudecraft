@@ -199,6 +199,7 @@ import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_c
 import { inputSignature } from './input_signature';
 import { decodeMountRaceMirror, type MountRaceMirror } from './mount_race_wire';
 import {
+  encodeAnalogMoveInput,
   type MovementFrameV2,
   MovementFrameV2Outbox,
   trackPendingInputSequence,
@@ -2407,11 +2408,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         sf: mi.surface ? 1 : 0,
       },
     };
-    // Swim camera steer is sparse: absent means full rate and preserves the
-    // legacy land-frame wire shape.
-    if (mi.swimSteer !== undefined && mi.swimSteer !== 1) {
-      (msg.mi as Record<string, number>).ss = mi.swimSteer;
-    }
+    Object.assign(msg.mi as object, encodeAnalogMoveInput(mi));
     if (this.mouselookFacing !== null) msg.facing = this.mouselookFacing;
     if (this.dungeonEntrySeq !== null) msg.de = this.dungeonEntrySeq;
     this.ws.send(JSON.stringify(msg));

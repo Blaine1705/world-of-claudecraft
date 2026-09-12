@@ -1,4 +1,5 @@
 import type { GamepadKind } from '../../../game/gamepad_map';
+import { gliderControlsActive } from '../../../game/glider_controls';
 import { hordeControlsActive } from '../../../game/horde_controls';
 import { sfx } from '../../../game/sfx';
 import {
@@ -7,6 +8,7 @@ import {
   shadowControlsActive,
 } from '../../../game/shadow_controls';
 import { CANNON_TACTICS } from '../../../sim/content/cannon_encounter';
+import { GLIDER_QUEST_ID } from '../../../sim/content/world_quest_glider';
 import { TICK_RATE } from '../../../sim/types';
 import type { IWorldVehicles } from '../../../world_api/vehicles';
 import { vehicleStationDisplayName } from '../../entity_display_labels';
@@ -17,6 +19,7 @@ import type { PainterHostWriters } from '../../painter_host';
 import { ActionBarPainter, type ActionBarSlotElements } from '../action_bar/action_bar_painter';
 import { CannonFeedbackCursor } from './cannon_feedback_core';
 import { cannonTacticsHint } from './cannon_tactics_view';
+import { createGliderActionBarView, gliderBoostDescription } from './glider_action_bar_view';
 import {
   HordeActionBarController,
   type HordeHudWorld,
@@ -28,7 +31,8 @@ import { vehicleActionTooltip } from './vehicle_action_tooltip';
 import { VEHICLE_ACTION_SLOTS, VehicleAimCore } from './vehicle_aim_core';
 
 interface VehicleBarDeps {
-  world: IWorldVehicles & Partial<HordeHudWorld & ShadowControlWorld>;
+  world: IWorldVehicles &
+    Partial<HordeHudWorld & ShadowControlWorld> & { boostWorldQuestGlider?(): void };
   writers: PainterHostWriters;
   keyLabel(slot: number): string;
   padKind?(): GamepadKind;
@@ -56,8 +60,12 @@ export class VehicleActionBarController {
   private readonly shakeText = document.createElement('span');
   private readonly feedback = new CannonFeedbackCursor();
   private readonly view = createVehicleActionBarView();
+  private readonly gliderView = createGliderActionBarView();
+  private readonly actionButtons: HTMLElement[] = [];
+  private comfort!: HTMLElement;
   private readonly painter: ActionBarPainter;
   private mounted = false;
+  private gliderMode: boolean | null = null;
   private readonly shadow: ShadowActionBarController | null;
   private readonly horde: HordeActionBarController | null;
 
@@ -102,6 +110,7 @@ export class VehicleActionBarController {
     this.exit.type = 'button';
     this.shake.type = 'checkbox';
     const comfort = document.createElement('label');
+    this.comfort = comfort;
     comfort.className = 'vehicle-comfort';
     comfort.append(this.shake, this.shakeText);
     deps.writers.setAttr(this.status, 'role', 'status');
@@ -124,6 +133,7 @@ export class VehicleActionBarController {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'action-btn vehicle-action';
+      this.actionButtons.push(btn);
       const label = document.createElement('span');
       const countEl = document.createElement('span');
       const keybindEl = document.createElement('span');
@@ -139,7 +149,11 @@ export class VehicleActionBarController {
       btn.addEventListener('click', () => {
         if (!deps.consumePeek()) this.chooseSlot(index);
       });
-      deps.attachTooltip(btn, () => vehicleActionTooltip(VEHICLE_ACTION_SLOTS[index]));
+      deps.attachTooltip(btn, () =>
+        this.gliderActive()
+          ? esc(gliderBoostDescription())
+          : vehicleActionTooltip(VEHICLE_ACTION_SLOTS[index]),
+      );
       bar.append(btn);
       return { btn, label, countEl, keybindEl, cdOverlay, cdText, rechargeOverlay };
     });
@@ -155,6 +169,12 @@ export class VehicleActionBarController {
   }
 
   chooseSlot(slot: number): void {
+    if (this.gliderActive()) {
+      const glider = this.deps.world.worldQuestLog?.get(GLIDER_QUEST_ID)?.glider;
+      if (slot === 0 && glider?.phase === 'flying' && (glider.boostReadyTick ?? 0) <= glider.tick)
+        this.deps.world.boostWorldQuestGlider?.();
+      return;
+    }
     if (this.shadow && shadowControlsActive(this.deps.world as ShadowControlWorld)) {
       shadowChooseSlot(this.deps.world as ShadowControlWorld, slot);
       return;
@@ -170,6 +190,8 @@ export class VehicleActionBarController {
     this.shadow?.update();
     const session = this.deps.world.vehicleSession;
     const writers = this.deps.writers;
+    const gliderActive = this.gliderActive();
+    const active = !!session || gliderActive;
     const cues = this.feedback.consume(session);
     let shot = false,
       explosion = false,
@@ -184,12 +206,27 @@ export class VehicleActionBarController {
     if (impact) sfx.playUi('impact_metal', { gain: 0.5 });
     if (this.shake.checked && (shot || explosion))
       this.deps.presentation?.addShake(explosion ? 0.12 : 0.06);
-    if (!!session !== this.mounted) {
-      this.mounted = !!session;
+    if (active !== this.mounted) {
+      this.mounted = active;
       this.aim.cancel();
-      if (session) for (const controller of this.deps.cancelOnEnter) controller.cancel();
-      writers.toggleClass(document.body, 'operating-vehicle', !!session);
-      writers.setDisplay(this.root, session ? 'grid' : 'none');
+      if (active) for (const controller of this.deps.cancelOnEnter) controller.cancel();
+      writers.toggleClass(document.body, 'operating-vehicle', active);
+      writers.setDisplay(this.root, active ? 'grid' : 'none');
+    }
+    if (active && this.gliderMode !== gliderActive) {
+      this.gliderMode = gliderActive;
+      writers.toggleClass(this.root, 'glider-action-bar', gliderActive);
+      for (const element of [this.gauge, this.exit, this.comfort, this.hint])
+        writers.setDisplay(element, gliderActive ? 'none' : '');
+      for (let i = 1; i < this.actionButtons.length; i++)
+        writers.setDisplay(this.actionButtons[i], gliderActive ? 'none' : '');
+    }
+    if (gliderActive) {
+      const glider = this.deps.world.worldQuestLog!.get(GLIDER_QUEST_ID)!.glider!;
+      writers.setText(this.title, t('questUi.worldQuest.glider.title'));
+      writers.setText(this.status, t('questUi.worldQuest.glider.boost'));
+      this.painter.paint(this.gliderView.tick(glider, this.deps.keyLabel(0)));
+      return;
     }
     if (!session) return;
     const encounter = session.encounter;
@@ -225,6 +262,11 @@ export class VehicleActionBarController {
   }
 
   /** Action guards read session state without constructing the bar's DOM. */
+  private gliderActive(): boolean {
+    const worldQuestLog = this.deps.world.worldQuestLog;
+    return !!worldQuestLog && gliderControlsActive({ worldQuestLog });
+  }
+
   static blocksPlayerActions(
     world: Pick<IWorldVehicles, 'vehicleSession'> &
       Partial<Pick<ShadowControlWorld, 'worldQuestLog'>>,
@@ -233,7 +275,9 @@ export class VehicleActionBarController {
     return (
       !!world.vehicleSession ||
       (!!worldQuestLog &&
-        (shadowControlsActive({ worldQuestLog }) || hordeControlsActive({ worldQuestLog })))
+        (gliderControlsActive({ worldQuestLog }) ||
+          shadowControlsActive({ worldQuestLog }) ||
+          hordeControlsActive({ worldQuestLog })))
     );
   }
 

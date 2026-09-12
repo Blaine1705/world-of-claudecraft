@@ -37,6 +37,7 @@ import {
   terrainSteepnessAt,
   waterLevel,
 } from '../src/sim/world';
+import { resolveWorldQuestMatch3Level } from '../src/sim/world_quest_daily_levels';
 import { hasWorldQuestDeliveryCargo } from '../src/sim/world_quest_delivery';
 import { applyWorldQuestMatch3Move } from '../src/sim/world_quest_match3';
 import {
@@ -99,8 +100,7 @@ function finishQuest(sim: Sim, quest: WorldQuestDef): void {
   }
   if (quest.objective.type === 'match3') {
     const progress = sim.worldQuestLog.get(quest.id);
-    const variant = progress?.puzzleVariant ?? 0;
-    const level = quest.objective.levels[variant];
+    const level = progress ? resolveWorldQuestMatch3Level(quest, progress) : undefined;
     const activationObjectItemId = quest.objective.activationObjectItemId;
     const activator = [...sim.entities.values()].find(
       (entity) => entity.objectItemId === activationObjectItemId,
@@ -371,7 +371,7 @@ describe('world quest content', () => {
       noPlayer: true,
     });
     const expectedPositions = new Map([
-      ['wq_galecrest_wisps', { x: 420, z: 330 }],
+      ['wq_galecrest_wisps', { x: 482, z: 306 }],
       ['wq_palmreach_confections', { x: -325, z: 820 }],
     ]);
 
@@ -666,7 +666,7 @@ describe('world quest lifecycle', () => {
     );
   });
 
-  it('rotates a deterministic one-quest-per-zone selection every reset day', () => {
+  it('rotates zone offers daily while keeping both Galecrest activities available', () => {
     const firstCycle = worldQuestCycleForResetDay('2026-08-31');
     const nextCycle = worldQuestCycleForResetDay('2026-09-01');
     expect(firstCycle).toBe('wq1_0');
@@ -675,18 +675,19 @@ describe('world quest lifecycle', () => {
 
     const firstQuests = activeWorldQuestsForCycle(firstCycle);
     const nextQuests = activeWorldQuestsForCycle(nextCycle);
-    expect(firstQuests).toHaveLength(15);
-    expect(new Set(firstQuests.map((quest) => quest.id)).size).toBe(15);
-    expect(nextQuests).toHaveLength(15);
-    expect(new Set(nextQuests.map((quest) => quest.id)).size).toBe(15);
+    expect(firstQuests).toHaveLength(16);
+    expect(new Set(firstQuests.map((quest) => quest.id)).size).toBe(16);
+    expect(nextQuests).toHaveLength(16);
+    expect(new Set(nextQuests.map((quest) => quest.id)).size).toBe(16);
     expect(nextQuests).not.toEqual(firstQuests);
     expect(activeWorldQuestsForCycle(firstCycle).map((quest) => quest.id)).toEqual(
       firstQuests.map((quest) => quest.id),
     );
 
     for (const zone of WORLD_QUEST_ZONES) {
-      expect(firstQuests.filter((quest) => quest.zoneId === zone)).toHaveLength(1);
-      expect(nextQuests.filter((quest) => quest.zoneId === zone)).toHaveLength(1);
+      const count = zone === 'galecrest' ? 2 : 1;
+      expect(firstQuests.filter((quest) => quest.zoneId === zone)).toHaveLength(count);
+      expect(nextQuests.filter((quest) => quest.zoneId === zone)).toHaveLength(count);
     }
 
     // Every world quest across all zones is offered within the first 4 days
@@ -705,8 +706,11 @@ describe('world quest lifecycle', () => {
     for (let cycle = 0; cycle < 84; cycle++) {
       const cycleId = `wq1_${cycle}`;
       const roster = activeWorldQuestsForCycle(cycleId);
-      expect(roster).toHaveLength(15);
-      expect(new Set(roster.map((quest) => quest.id)).size).toBe(15);
+      expect(roster).toHaveLength(16);
+      expect(new Set(roster.map((quest) => quest.id)).size).toBe(16);
+      expect(
+        roster.filter((quest) => quest.zoneId === 'galecrest').map((quest) => quest.id),
+      ).toEqual(['wq_galecrest_wisps', 'wq_galecrest_slalom']);
       expect(activeWorldQuestsForCycle(`wq1_${cycle + 84}`)).toEqual(roster);
       for (const quest of roster) {
         offered.add(quest.id);
@@ -1328,6 +1332,37 @@ describe('world quest lifecycle', () => {
     expect(meta.worldQuestCycle).toBe(worldQuestCycleForResetDay('2026-09-01'));
     expect(meta.worldQuestLog.has(quest.id)).toBe(false);
   });
+
+  it.each(['wq_galecrest_wisps', 'wq_galecrest_slalom'])(
+    'resets the completed daily activity %s without duplicating its next offer',
+    (questId) => {
+      const quest = WORLD_QUESTS_BY_ID[questId];
+      const sim = new Sim({ seed: 4612, playerClass: 'warrior', autoEquip: true });
+      enterQuest(sim, quest);
+      const meta = sim.meta(sim.playerId);
+      const progress = sim.worldQuestLog.get(questId);
+      if (!meta || !progress) throw new Error('Missing daily activity state');
+      progress.state = 'completed';
+      progress.count = quest.count;
+      sim.drainEvents();
+      updateWorldQuests(sim.ctx, meta, sim.player);
+      expect(meta.worldQuestLog.get(questId)?.state).toBe('completed');
+
+      sim.resetDay = '2026-09-01';
+      updateWorldQuests(sim.ctx, meta, sim.player);
+      expect(meta.worldQuestLog.get(questId)).toMatchObject({ state: 'active', count: 0 });
+      expect(meta.worldQuestLog.get(questId)).not.toBe(progress);
+      updateWorldQuests(sim.ctx, meta, sim.player);
+      expect(
+        sim
+          .drainEvents()
+          .filter((event) => event.type === 'worldQuestStarted' && event.questId === questId),
+      ).toHaveLength(1);
+      expect(
+        activeWorldQuestsForCycle(meta.worldQuestCycle).filter((row) => row.id === questId),
+      ).toHaveLength(1);
+    },
+  );
 
   it('clears an expired rotation for a dead player and dirties the owner snapshot', () => {
     const quest = WORLD_QUESTS_BY_ID.wq_eastbrook_bandits;

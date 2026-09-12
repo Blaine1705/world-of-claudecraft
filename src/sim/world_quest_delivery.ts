@@ -11,6 +11,12 @@ import type { Entity } from './types';
 export const WORLD_QUEST_DELIVERY_AURA_ID = 'world_quest_delivery_cargo';
 export const WORLD_QUEST_DELIVERY_SPEED_MULT = 0.75;
 
+/** Coordinator-facing lookup: unknown sessions have no cargo to drop. */
+export function dropWorldQuestDeliveryCargoForPlayer(ctx: SimContext, pid: number): boolean {
+  const player = ctx.entities.get(pid);
+  return player ? dropWorldQuestDeliveryCargo(ctx, player) : false;
+}
+
 export function hasWorldQuestDeliveryCargo(entity: Pick<Entity, 'auras'>): boolean {
   return entity.auras.some(
     (aura) => aura.id === WORLD_QUEST_DELIVERY_AURA_ID && aura.kind === 'world_quest_cargo',

@@ -1,5 +1,9 @@
 import { WORLD_QUESTS_BY_ID } from '../sim/data';
 import type { WorldQuestMatch3Candy, WorldQuestProgress } from '../sim/types';
+import {
+  resolveWorldQuestMatch3Level,
+  worldQuestDisplayedLevel,
+} from '../sim/world_quest_daily_levels';
 import { sanitizeWorldQuestMatch3Board } from '../sim/world_quest_match3';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { ownEntry } from './known_item';
@@ -43,18 +47,14 @@ export function buildWorldQuestMatch3View(
   const quest = ownEntry(WORLD_QUESTS_BY_ID, questId);
   if (!quest || quest.objective.type !== 'match3' || !progress || progress.questId !== questId)
     return null;
-  const variant = Math.max(
-    0,
-    Math.min(quest.objective.levels.length - 1, progress.puzzleVariant ?? 0),
-  );
-  const level = quest.objective.levels[variant];
+  const level = resolveWorldQuestMatch3Level(quest, progress);
   if (!level) return null;
   const board = sanitizeWorldQuestMatch3Board(progress.match3Board, level);
   const moves = Math.max(0, progress.match3Moves ?? 0);
   const won = progress.state === 'completed' || progress.count >= level.target;
   return {
     questId,
-    level: variant + 1,
+    level: worldQuestDisplayedLevel(progress, quest.objective.levels.length),
     columns: level.columns,
     rows: level.rows,
     moves,

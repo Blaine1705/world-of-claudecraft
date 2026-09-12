@@ -1,5 +1,6 @@
 import { WORLD_QUESTS_BY_ID } from '../sim/data';
 import type { WorldQuestProgress } from '../sim/types';
+import { resolveWorldQuestMatch3Level } from '../sim/world_quest_daily_levels';
 import {
   sanitizeWorldQuestMatch3Board,
   traceWorldQuestMatch3Move,
@@ -62,11 +63,7 @@ export function prepareWorldQuestConfectionMove(
 ): WorldQuestConfectionMove | null {
   const quest = ownEntry(WORLD_QUESTS_BY_ID, questId);
   if (!quest || quest.objective.type !== 'match3' || progress?.state !== 'active') return null;
-  const variant = Math.max(
-    0,
-    Math.min(quest.objective.levels.length - 1, progress.puzzleVariant ?? 0),
-  );
-  const level = quest.objective.levels[variant];
+  const level = resolveWorldQuestMatch3Level(quest, progress);
   if (!level || (progress.match3Moves ?? 0) >= level.maxMoves) return null;
   const board = sanitizeWorldQuestMatch3Board(progress.match3Board, level);
   const trace = traceWorldQuestMatch3Move(
@@ -92,7 +89,8 @@ export function worldQuestConfectionMoveState(
   if (
     progress?.state !== 'active' ||
     progress.questId !== before.questId ||
-    (progress.puzzleVariant ?? 0) !== (before.puzzleVariant ?? 0)
+    (progress.puzzleVariant ?? 0) !== (before.puzzleVariant ?? 0) ||
+    progress.puzzleDay !== before.puzzleDay
   )
     return 'discarded';
   const sameBoard = (board: readonly number[] | undefined) =>

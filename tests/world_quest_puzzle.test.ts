@@ -6,6 +6,7 @@ import {
   traceWorldQuestPuzzle,
   worldQuestPuzzleInitialRotations,
 } from '../src/sim/world_quest_puzzle';
+import { worldQuestCycleForResetDay } from '../src/sim/world_quest_rotation';
 
 function puzzleFixture() {
   const quest = WORLD_QUESTS_BY_ID.wq_galecrest_wisps;
@@ -21,6 +22,12 @@ function activatePuzzle(sim: Sim, questId: string, objectItemId: string): void {
   sim.player.pos.x = object.pos.x;
   sim.player.pos.z = object.pos.z;
   expect(sim.pickUpObject(object.id)).toBe(true);
+}
+
+// These literal move scripts pin the retained authored/dev levels. Procedural
+// production attempts are covered by world_quest_daily_levels.test.ts.
+function useAuthoredLevels(sim: Sim): void {
+  sim.meta(sim.playerId)!.devWorldQuestCycle = worldQuestCycleForResetDay(sim.resetDay);
 }
 
 const SOLVED_ROTATIONS = [
@@ -79,6 +86,7 @@ describe('world quest beam puzzle', () => {
     const sim = new Sim({ seed: 991, playerClass: 'warrior', autoEquip: true });
     sim.setPlayerLevel(20);
     sim.resetDay = '2026-08-31';
+    useAuthoredLevels(sim);
     sim.player.pos.x = quest.area.x;
     sim.player.pos.z = quest.area.z;
     let events = sim.tick();
@@ -164,6 +172,7 @@ describe('world quest beam puzzle', () => {
       });
       original.setPlayerLevel(20);
       original.resetDay = resetDay;
+      useAuthoredLevels(original);
       original.player.pos.x = quest.area.x;
       original.player.pos.z = quest.area.z;
       original.tick();
@@ -214,6 +223,7 @@ describe('world quest beam puzzle', () => {
     const sim = new Sim({ seed: 100, playerClass: 'mage' });
     sim.setPlayerLevel(60);
     sim.resetDay = '2026-08-31';
+    useAuthoredLevels(sim);
     sim.player.pos.x = quest.area.x;
     sim.player.pos.z = quest.area.z;
     sim.tick();

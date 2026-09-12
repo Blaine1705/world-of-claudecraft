@@ -672,7 +672,7 @@ import {
 } from './rift/runs';
 import type { RiftEvent, RiftInstance } from './rift/types';
 import { worldQuestCreditBindings } from './world_quest_context';
-import { dropWorldQuestDeliveryCargo as dropWorldQuestDeliveryCargoImpl } from './world_quest_delivery';
+import { dropWorldQuestDeliveryCargoForPlayer } from './world_quest_delivery';
 import * as worldQuestState from './world_quest_state';
 import * as worldQuestMod from './world_quests';
 
@@ -5270,7 +5270,7 @@ export class Sim {
         onRecipeCraftedForQuests(sim.ctx, recipeId, meta),
       onNodeGatheredForQuests: (node, itemId, meta) =>
         onNodeGatheredForQuests(sim.ctx, node, itemId, meta),
-      currentWorldQuestRotation: () => sim.currentWorldQuestRotation(),
+      ...worldQuestState.rotationBindings(this.worldQuestRotationCache, sim),
       onInventoryChangedForQuests: (meta) => onInventoryChangedForQuests(sim.ctx, meta),
       checkQuestReady: (qp, meta) => checkQuestReady(sim.ctx, qp, meta),
       countItem: sim.countItem.bind(sim),
@@ -5546,9 +5546,6 @@ export class Sim {
     return createSimContext(host);
   }
 
-  private currentWorldQuestRotation() {
-    return worldQuestState.currentWorldQuestRotation(this.worldQuestRotationCache, this.resetDay);
-  }
   private refreshKnownAbilities(meta: PlayerMeta, announce: boolean): void {
     const e = this.entities.get(meta.entityId);
     if (!e) return;
@@ -9724,9 +9721,11 @@ export class Sim {
   resetWorldQuestPuzzle(questId: string, pid?: number): void {
     worldQuestMod.resetWorldQuestPuzzle(this.ctx, questId, pid);
   }
+  boostWorldQuestGlider(pid?: number): void {
+    worldQuestMod.boostWorldQuestGlider(this.ctx, pid);
+  }
   dropWorldQuestDeliveryCargo(pid = this.playerId): boolean {
-    const player = this.entities.get(pid);
-    return player ? dropWorldQuestDeliveryCargoImpl(this.ctx, player) : false;
+    return dropWorldQuestDeliveryCargoForPlayer(this.ctx, pid);
   }
   turnInQuest(questId: string, pid?: number): void {
     questCommands.turnInQuest(this.ctx, questId, pid);

@@ -2,13 +2,14 @@
 // Procedural glowing wind rings and landing target rendered in Three.js.
 
 import * as THREE from 'three';
-import {
-  GLIDER_COURSE,
-  GLIDER_QUEST_ID,
-  WORLD_QUEST_GLIDER,
-} from '../sim/content/world_quest_glider';
+import { GLIDER_COURSE, GLIDER_QUEST_ID } from '../sim/content/world_quest_glider';
+import { GLIDER_COURSES } from '../sim/content/world_quest_glider_levels';
+import { gliderCourseById } from '../sim/world_quest_glider_levels';
 import type { IWorld } from '../world_api';
 import { attachSceneGroupGated } from './gated_scene_attach';
+import { gliderCourseVisible } from './glider_course_core';
+import { gliderApparatusPitch } from './glider_flight_pose_core';
+import { GliderWindVisual } from './glider_wind_visual';
 
 export class GliderCourseVisual {
   readonly group = new THREE.Group();
@@ -44,6 +45,8 @@ export class GliderCourseVisual {
   private readonly landingMesh: THREE.Mesh;
   private readonly landingBeacon: THREE.Mesh;
   private readonly apparatus: { group: THREE.Group; dispose: () => void };
+  private readonly winds = new Map<string, GliderWindVisual>();
+  private course = GLIDER_COURSE;
 
   constructor(
     scene: THREE.Object3D,
@@ -95,6 +98,13 @@ export class GliderCourseVisual {
 
     this.apparatus = createGliderApparatusMesh();
     this.group.add(this.apparatus.group);
+    // Stage every route under the existing gate; switching levels allocates no GPU resources.
+    for (const course of GLIDER_COURSES) {
+      const wind = new GliderWindVisual(course.windTunnels ?? []);
+      wind.group.visible = course === GLIDER_COURSE;
+      this.winds.set(course.id, wind);
+      this.group.add(wind.group);
+    }
 
     this.readyForEntry = attachSceneGroupGated(scene, this.group, compileGate, () => this.disposed)
       .then(() => {
@@ -115,24 +125,36 @@ export class GliderCourseVisual {
     const session = progress?.glider;
     const playerPos = world.player.pos;
 
-    const area = WORLD_QUEST_GLIDER.area;
-    const nearCourse = Math.hypot(playerPos.x - area.x, playerPos.z - area.z) <= area.radius + 90;
+    const isGliding = gliderCourseVisible(progress);
 
-    const isGliding = session?.phase === 'flying' || session?.phase === 'countdown';
-
-    if (!nearCourse && !isGliding) {
+    if (!isGliding) {
       this.group.visible = false;
       this.apparatus.group.visible = false;
       return;
     }
 
     this.group.visible = true;
-    const passed = new Set(session?.passedRings ?? []);
+    const course = gliderCourseById(session?.courseId);
+    if (course !== this.course) {
+      this.course = course;
+      for (let i = 0; i < this.ringMeshes.length; i++) {
+        const ring = course.rings[i];
+        const next = course.rings[i + 1] ?? course.landingPad;
+        this.ringMeshes[i].position.set(ring.x, ring.y, ring.z);
+        this.ringMeshes[i].lookAt(next.x, next.y, next.z);
+      }
+    }
+    for (const [id, wind] of this.winds) {
+      wind.group.visible = id === course.id;
+      if (wind.group.visible) wind.update(session?.windBoosts);
+    }
 
     for (let i = 0; i < this.ringMeshes.length; i++) {
-      const ring = GLIDER_COURSE.rings[i];
+      const ring = course.rings[i];
       const mesh = this.ringMeshes[i];
-      mesh.material = passed.has(ring.id) ? this.passedRingMat : this.activeRingMat;
+      mesh.material = session?.passedRings.includes(ring.id)
+        ? this.passedRingMat
+        : this.activeRingMat;
     }
 
     if (isGliding && session) {
@@ -142,7 +164,9 @@ export class GliderCourseVisual {
       this.apparatus.group.position.set(pose.x, pose.y + 1.22, pose.z);
       this.apparatus.group.rotation.y = renderedSelf?.rotation.y ?? world.player.facing;
 
-      const targetPitch = session.vy < -3.0 ? -0.22 : session.vy > -1.0 ? 0.12 : -0.05;
+      // YXZ applies pitch in the yawed glider's local frame, including east/west flight.
+      this.apparatus.group.rotation.order = 'YXZ';
+      const targetPitch = gliderApparatusPitch(session.vy, session.speed);
       this.apparatus.group.rotation.x += (targetPitch - this.apparatus.group.rotation.x) * 0.2;
     } else {
       this.apparatus.group.visible = false;
@@ -160,6 +184,7 @@ export class GliderCourseVisual {
     this.landingMesh.geometry.dispose();
     this.landingBeacon.geometry.dispose();
     this.apparatus.dispose();
+    for (const wind of this.winds.values()) wind.dispose();
     this.activeRingMat.dispose();
     this.passedRingMat.dispose();
     this.landingPadMat.dispose();

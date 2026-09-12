@@ -1,6 +1,9 @@
 // @vitest-environment happy-dom
 import { afterEach, expect, it, vi } from 'vitest';
+import { GLIDER_QUEST_ID } from '../src/sim/content/world_quest_glider';
 import { createCannonEncounter } from '../src/sim/minigames/cannon_encounter';
+import { applyGliderBoost } from '../src/sim/minigames/glider_boost';
+import { createGliderFlightState } from '../src/sim/minigames/glider_flight';
 import type { VehicleSession, WorldQuestProgress } from '../src/sim/types';
 import { VehicleActionBarController } from '../src/ui/hud/vehicle/vehicle_action_bar_controller';
 import { makeWriterFacet } from '../src/ui/painter_host';
@@ -11,6 +14,79 @@ vi.mock('../src/game/sfx', () => ({ sfx: { preload: vi.fn(), playUi: vi.fn() } }
 afterEach(() => {
   document.body.replaceChildren();
   document.body.className = '';
+});
+
+it('uses slot 1 for flight boost only, shows cooldown and restores the bar after flight', () => {
+  document.body.innerHTML = '<div id="ui"></div>';
+  const glider = createGliderFlightState();
+  const world = {
+    vehicleSession: null as VehicleSession | null,
+    worldQuestLog: new Map<string, WorldQuestProgress>([
+      [
+        GLIDER_QUEST_ID,
+        {
+          questId: GLIDER_QUEST_ID,
+          state: 'active',
+          count: 0,
+          glider,
+        },
+      ],
+    ]),
+    enterVehicle: vi.fn(),
+    useVehicleAction: vi.fn(),
+    leaveVehicle: vi.fn(),
+    boostWorldQuestGlider: vi.fn(() => {
+      applyGliderBoost(glider);
+    }),
+  };
+  const writes = vi.fn();
+  const bar = new VehicleActionBarController({
+    world,
+    writers: makeWriterFacet(new Map(), new Map(), new Map(), new Map(), writes, () => {}),
+    keyLabel: (slot) => String(slot + 1),
+    consumePeek: () => false,
+    cancelOnEnter: [],
+    attachTooltip: () => {},
+  });
+  bar.update();
+  const buttons = [...document.querySelectorAll<HTMLButtonElement>('.vehicle-action')];
+  expect(buttons[0].getAttribute('aria-disabled')).toBe('true');
+  expect(buttons[1].style.display).toBe('none');
+  expect(
+    document.getElementById('vehicle-action-bar')!.classList.contains('glider-action-bar'),
+  ).toBe(true);
+  expect(VehicleActionBarController.blocksPlayerActions(world)).toBe(true);
+  buttons[0].click();
+  bar.chooseSlot(0);
+  expect(world.boostWorldQuestGlider).not.toHaveBeenCalled();
+  glider.phase = 'flying';
+  bar.update();
+  expect(buttons[0].getAttribute('aria-disabled')).toBe('false');
+  expect(buttons[0].querySelector('.keybind')!.textContent).toBe('1');
+  expect(buttons[0].getAttribute('aria-description')).toContain('14 yd/s');
+  buttons[0].click();
+  expect(world.boostWorldQuestGlider).toHaveBeenCalledTimes(1);
+  bar.update();
+  expect(buttons[0].querySelector('.cdtext')!.textContent).toBe('10');
+  bar.chooseSlot(0);
+  bar.chooseSlot(1);
+  expect(world.boostWorldQuestGlider).toHaveBeenCalledTimes(1);
+  expect(world.useVehicleAction).not.toHaveBeenCalled();
+  writes.mockClear();
+  bar.update();
+  expect(writes).not.toHaveBeenCalled();
+  glider.tick += 200;
+  bar.chooseSlot(0);
+  expect(world.boostWorldQuestGlider).toHaveBeenCalledTimes(2);
+  for (const phase of ['won', 'failed'] as const) {
+    glider.phase = phase;
+    bar.update();
+    expect(VehicleActionBarController.blocksPlayerActions(world)).toBe(false);
+    expect(document.getElementById('vehicle-action-bar')!.style.display).toBe('none');
+  }
+  world.worldQuestLog.clear();
+  bar.update();
+  expect(document.body.classList.contains('operating-vehicle')).toBe(false);
 });
 
 it('elides unchanged frames, routes all three buttons, and restores normal controls on exit', () => {

@@ -8,6 +8,7 @@ import { WORLD_QUEST_MIN_LEVEL, WORLD_QUESTS, WORLD_QUESTS_BY_ID } from './conte
 import { grantDeed } from './deeds';
 import { formatMoney } from './format_money';
 import { sanitizeForgeResult } from './minigames/forge_workshop';
+import { applyGliderBoost } from './minigames/glider_boost';
 import {
   hasInteractObjectCredit,
   interactObjectCreditKey,
@@ -25,6 +26,10 @@ import type {
 } from './types';
 import { xpForLevel } from './types';
 import { vehicleStationById } from './vehicle_stations';
+import {
+  resolveWorldQuestLeyPuzzle as beamPuzzle,
+  resolveWorldQuestMatch3Level as match3Level,
+} from './world_quest_daily_levels';
 import {
   dropWorldQuestDeliveryCargo,
   hasWorldQuestDeliveryCargo,
@@ -194,22 +199,6 @@ function isWorldQuestMinigame(quest: WorldQuestDef): boolean {
   return quest.objective.type === 'puzzle' || quest.objective.type === 'match3';
 }
 
-function puzzleVariant(progress: WorldQuestProgress, variantCount: number): number {
-  if (variantCount <= 0) return 0;
-  const raw = Number.isSafeInteger(progress.puzzleVariant) ? (progress.puzzleVariant as number) : 0;
-  return ((raw % variantCount) + variantCount) % variantCount;
-}
-
-function beamPuzzle(quest: WorldQuestDef, progress: WorldQuestProgress) {
-  if (quest.objective.type !== 'puzzle') return null;
-  return quest.objective.puzzles[puzzleVariant(progress, quest.objective.puzzles.length)] ?? null;
-}
-
-function match3Level(quest: WorldQuestDef, progress: WorldQuestProgress) {
-  if (quest.objective.type !== 'match3') return null;
-  return quest.objective.levels[puzzleVariant(progress, quest.objective.levels.length)] ?? null;
-}
-
 function resetCycleIfNeeded(ctx: SimContext, meta: PlayerMeta, resolvedCycle?: string): void {
   const cycle = resolvedCycle ?? meta.devWorldQuestCycle ?? ctx.currentWorldQuestRotation().cycle;
   if (!cycle || meta.worldQuestCycle === cycle) return;
@@ -373,6 +362,8 @@ export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Ent
       };
       if (quest.objective.type === 'tracing')
         progress.traceVariant = worldQuestTraceVariantForCycle(meta.worldQuestCycle);
+      if (isWorldQuestMinigame(quest) && !meta.devWorldQuestCycle)
+        progress.puzzleDay = worldQuestCycleNumber(meta.worldQuestCycle) ?? 0;
       if (
         quest.objective.type === 'puzzle' ||
         quest.objective.type === 'match3' ||
@@ -526,6 +517,7 @@ function creditWorldQuest(
   if (player) dropWorldQuestDeliveryCargo(ctx, player);
   delete progress.creditedObjects;
   delete progress.puzzleVariant;
+  delete progress.puzzleDay;
   delete progress.puzzleRotations;
   delete progress.match3Board;
   delete progress.match3Moves;
@@ -888,6 +880,16 @@ export function resetWorldQuestMatch3(ctx: SimContext, questId: string, pid?: nu
   ctx.emit({ type: 'worldQuestMatch3Updated', questId, pid: meta.entityId });
 }
 
+export function boostWorldQuestGlider(ctx: SimContext, pid?: number): void {
+  const resolved = ctx.resolve(pid);
+  if (!resolved) return;
+  const { e: player, meta } = resolved;
+  resetCycleIfNeeded(ctx, meta);
+  const progress = meta.worldQuestLog.get(GLIDER_QUEST_ID);
+  if (player.dead || player.ghost || progress?.state !== 'active' || !progress.glider) return;
+  if (applyGliderBoost(progress.glider)) meta.wireRev++;
+}
+
 export function resetWorldQuestPuzzle(ctx: SimContext, questId: string, pid?: number): void {
   const resolved = ctx.resolve(pid);
   if (!resolved) return;
@@ -1002,7 +1004,9 @@ export function sanitizeWorldQuestProgress(
           ? Math.min(quest.objective.puzzles.length - 1, raw.puzzleVariant as number)
           : 0;
       normalized.puzzleVariant = variant;
-      const puzzle = quest.objective.puzzles[variant];
+      if (Number.isSafeInteger(raw.puzzleDay) && normalizeWorldQuestCycle(cycle))
+        normalized.puzzleDay = worldQuestCycleNumber(cycle) ?? 0;
+      const puzzle = beamPuzzle(quest, normalized)!;
       normalized.puzzleRotations = sanitizeWorldQuestPuzzleRotations(raw.puzzleRotations, puzzle);
       if (
         includeSessionDeadlines &&
@@ -1018,8 +1022,10 @@ export function sanitizeWorldQuestProgress(
         Number.isSafeInteger(raw.puzzleVariant) && (raw.puzzleVariant as number) >= 0
           ? Math.min(quest.objective.levels.length - 1, raw.puzzleVariant as number)
           : 0;
-      const level = quest.objective.levels[variant];
       normalized.puzzleVariant = variant;
+      if (Number.isSafeInteger(raw.puzzleDay) && normalizeWorldQuestCycle(cycle))
+        normalized.puzzleDay = worldQuestCycleNumber(cycle) ?? 0;
+      const level = match3Level(quest, normalized)!;
       normalized.match3Board = sanitizeWorldQuestMatch3Board(raw.match3Board, level);
       normalized.match3Moves = Number.isSafeInteger(raw.match3Moves)
         ? Math.max(0, Math.min(level.maxMoves, raw.match3Moves as number))

@@ -336,7 +336,7 @@ export const WORLD_QUEST_OBJECTS: GroundObjectDef[] = [
   {
     itemId: 'leyline_cache',
     name: 'Miniature Ley Cache',
-    positions: [{ x: 420, z: 330 }],
+    positions: [{ x: 482, z: 306 }],
     entityIds: [2_147_100_001],
   },
   {
@@ -618,7 +618,7 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     id: 'wq_galecrest_wisps',
     zoneId: 'galecrest',
     minLevel: 20,
-    area: { x: 420, z: 330, radius: 18 },
+    area: { x: 482, z: 306, radius: 18 },
     objective: {
       type: 'puzzle',
       activationObjectItemId: 'leyline_cache',

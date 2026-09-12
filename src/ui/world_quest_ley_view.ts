@@ -62,6 +62,7 @@ export function resolveWorldQuestLeyState(
     state: 'active',
     count: progress.count,
     puzzleVariant: board.level - 1,
+    ...(progress.puzzleDay === undefined ? {} : { puzzleDay: progress.puzzleDay }),
     puzzleRotations: board.tiles.map((tile) => tile.rotation),
     ...(expiresAt === null ? {} : { puzzleExpiresAt: expiresAt }),
   };
