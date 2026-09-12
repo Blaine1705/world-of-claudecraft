@@ -204,7 +204,8 @@ export type { VehicleSession } from './world_api/vehicles';
 // the pre-merge raid branch, which forked before the Bank Storage and Materials
 // Vault bumps above; that branch's 11 through 20 were in turn 9 through 18
 // before the Eastbrook program bumps.)
-export const ONLINE_WORLD_LAYOUT_VERSION = 40 as const;
+// 41 = Server-owned wisp maze session progress and instructor interaction.
+export const ONLINE_WORLD_LAYOUT_VERSION = 41 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI

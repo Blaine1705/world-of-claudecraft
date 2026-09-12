@@ -19,6 +19,19 @@
    here, so neither leaks across entries. The shared #start-screen/#mobile-preflight
    game-active hide and the base/styling of #rotate-device stay here. */
 @layer hud-mobile {
+  body.mobile-touch .wisp-maze-hud {
+    left: max(12px, env(safe-area-inset-left));
+    top: calc(max(8px, env(safe-area-inset-top)) + 220px);
+    transform: none;
+    width: min(250px, calc(100% - 24px));
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+  @media (orientation: landscape) and (max-height: 600px) {
+    body.mobile-touch .wisp-maze-hud {
+      top: calc(max(6px, env(safe-area-inset-top)) + 74px);
+    }
+  }
   /* ---------- vehicle action bar ---------- */
   body.mobile-touch .vehicle-bar {
     bottom: max(12px, env(safe-area-inset-bottom));

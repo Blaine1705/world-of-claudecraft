@@ -15,6 +15,7 @@ import { armWorldQuestHordeForDev } from './dev_world_quest_horde';
 import { armWorldQuestInvestigationForDev } from './dev_world_quest_investigation';
 import { armWorldQuestShadowForDev } from './dev_world_quest_shadow';
 import { armWorldQuestTracingForDev } from './dev_world_quest_tracing';
+import { armWorldQuestWispMazeForDev } from './dev_world_quest_wisp_maze';
 import { createGroundObject, createMob } from './entity';
 import {
   ignivarDevRaidTravelRoster,
@@ -260,6 +261,15 @@ export function handleDevChat(
     return null;
   }
 
+  const wispsMatch = /^\/dev\s+(?:wq\s+)?wisps(?:\s+(easy|normal|hard))?\s*$/i.exec(raw);
+  if (wispsMatch) {
+    armWorldQuestWispMazeForDev(
+      ctx,
+      pid,
+      wispsMatch[1]?.toLowerCase() as 'easy' | 'normal' | 'hard' | undefined,
+    );
+    return null;
+  }
   const wqMatch = /^\/dev\s+wq(?:\s+(\S+))?\s*$/i.exec(raw);
   if (wqMatch) {
     const questKey = wqMatch[1];

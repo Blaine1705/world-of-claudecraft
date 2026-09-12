@@ -2995,6 +2995,14 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 5,
     trigger: { kind: 'manual' },
   },
+  exp_wisp_maze: {
+    id: 'exp_wisp_maze',
+    name: 'A Light in the Maze',
+    desc: 'Collect the wandering lights and escape the Evergarden maze.',
+    category: 'exploration',
+    renown: 5,
+    trigger: { kind: 'manual' },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

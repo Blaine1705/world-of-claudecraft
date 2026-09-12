@@ -1,6 +1,10 @@
 /** Authored clearings remove only named scatter, never terrain anchors or heights.
  * Both collision and rendering consume this same deterministic placement gate. */
 const EXCLUSIONS = [
+  // Wisp maze lawn: this ordinary tree overlaps the southeast trial corner.
+  { x: 470.83139702072367, z: 1049.3634334169328 },
+  { x: 430.56771796988323, z: 1058.3339893245138 },
+  { x: 469.0259377551265, z: 1059.0917784823105 },
   // Wyrmroad horde lane: edge trees and a rock obscure incoming private actors.
   { x: 390.4622943964787, z: 1802.078793170862 },
   { x: 390.9927746313624, z: 1815.7276418884285 },
@@ -25,4 +29,9 @@ const EXCLUSIONS = [
 
 export function isExcludedDecoration(x: number, z: number): boolean {
   return EXCLUSIONS.some((point) => Math.hypot(x - point.x, z - point.z) < 1.2);
+}
+
+/** Keep the private trial clear without replanning any other road-light placement. */
+export function isExcludedStreetlamp(x: number, z: number): boolean {
+  return Math.hypot(x - 460.6305996347541, z - 1028.5178347589988) < 0.01;
 }

@@ -247,6 +247,7 @@ import { WORLD_QUEST_CALLIGRAPHY_NPCS } from './content/world_quest_calligraphy'
 import { FORGE_NPC_DEF } from './content/world_quest_forging';
 import { GLIDER_APPRENTICE_NPC_DEF, GLIDER_NPC_DEF } from './content/world_quest_glider';
 import { HORDE_NPC_DEF } from './content/world_quest_horde';
+import { WISP_MAZE_NPC_DEF } from './content/world_quest_wisp_maze';
 import {
   WORLD_QUEST_ESCORTS,
   WORLD_QUEST_ITEMS,
@@ -480,6 +481,7 @@ export const NPCS: Record<string, NpcDef> = {
   ...WORLD_QUEST_CALLIGRAPHY_NPCS,
   [FORGE_NPC_DEF.id]: FORGE_NPC_DEF,
   [HORDE_NPC_DEF.id]: HORDE_NPC_DEF,
+  [WISP_MAZE_NPC_DEF.id]: WISP_MAZE_NPC_DEF,
   [SHADOW_NPC_DEF.id]: SHADOW_NPC_DEF,
   ...Object.fromEntries(SHADOW_GUARDS.map(({ npc }) => [npc.id, npc])),
   [GLIDER_NPC_DEF.id]: GLIDER_NPC_DEF,

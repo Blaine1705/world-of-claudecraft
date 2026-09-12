@@ -8,6 +8,7 @@ import { decodeHordeState } from './world_quest_horde_wire';
 import { decodeInvestigationState } from './world_quest_investigation_wire';
 import { decodeShadowState } from './world_quest_shadow_wire';
 import { worldQuestTraceShape } from './world_quest_trace_variants';
+import { decodeWispMazeState } from './world_quest_wisp_maze_wire';
 
 export const WORLD_QUEST_TRACE_WIRE_POINT_LIMIT = 256;
 
@@ -107,6 +108,7 @@ export function worldQuestProgressForWire(progress: WorldQuestProgress): WorldQu
     tracing: rawTrace,
     forging: rawForge,
     horde: rawHorde,
+    wispMaze: rawMaze,
     investigation: rawInvestigation,
     shadow: rawShadow,
     glider: rawGlider,
@@ -116,6 +118,7 @@ export function worldQuestProgressForWire(progress: WorldQuestProgress): WorldQu
     progress.state === 'active' ? decodeShadowState(rawShadow, progress.questId) : undefined;
   const investigation = decodeInvestigationState(rawInvestigation, progress.questId);
   const horde = decodeHordeState(rawHorde, progress.questId);
+  const wispMaze = decodeWispMazeState(rawMaze, progress.questId);
   const forging = decodeForgeState(rawForge, progress.questId);
   const tracing = decodeWorldQuestProgressTrace(rawTrace, progress);
   const glider = decodeGliderState(rawGlider, progress.questId);
@@ -125,6 +128,7 @@ export function worldQuestProgressForWire(progress: WorldQuestProgress): WorldQu
     ...(investigation === undefined ? {} : { investigation }),
     ...(shadow === undefined ? {} : { shadow }),
     ...(horde === undefined ? {} : { horde }),
+    ...(wispMaze === undefined ? {} : { wispMaze }),
     ...(base.hordeResult === undefined ? {} : { hordeResult: { ...base.hordeResult } }),
     ...(forging === undefined ? {} : { forging }),
     ...(base.forgeResult === undefined ? {} : { forgeResult: { ...base.forgeResult } }),

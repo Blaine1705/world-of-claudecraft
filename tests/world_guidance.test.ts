@@ -8,6 +8,7 @@ const calls = vi.hoisted(() => ({
   dispose: vi.fn(),
   traceGate: vi.fn(),
   ready: Promise.resolve(),
+  wispReady: Promise.resolve(),
 }));
 vi.mock('../src/render/race_line', () => ({
   RaceLine: class {
@@ -68,8 +69,43 @@ vi.mock('../src/render/horde_barricade_visual', () => ({
     dispose() {}
   },
 }));
+vi.mock('../src/render/wisp_maze_visual', () => ({
+  WispMazeVisual: class {
+    readyForEntry = calls.wispReady;
+    constructor(
+      scene: THREE.Object3D,
+      _ground: unknown,
+      gate?: (root: THREE.Object3D) => Promise<unknown>,
+    ) {
+      if (gate) gate(scene);
+    }
+    update() {
+      calls.events.push('wisp-maze');
+    }
+    dispose() {}
+  },
+}));
 
 describe('personal world guidance coordinator', () => {
+  it('does not finish entry while the private maze actors are still linking', async () => {
+    let release = () => {};
+    calls.wispReady = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const guidance = new WorldGuidance(new THREE.Scene(), () => 0);
+    let ready = false;
+    const pending = guidance.readyForEntry.then(() => {
+      ready = true;
+    });
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(ready).toBe(false);
+    release();
+    await pending;
+    expect(ready).toBe(true);
+    calls.wispReady = Promise.resolve();
+    guidance.dispose();
+  });
   it('marks the timed drawing gate as entry-required and exposes the readiness barrier', () => {
     const gate = vi.fn(() => Promise.resolve());
     const scene = new THREE.Scene();
@@ -82,7 +118,12 @@ describe('personal world guidance coordinator', () => {
     (race) => {
       calls.events.length = 0;
       const guidance = new WorldGuidance(new THREE.Scene(), () => 0);
-      const world = { mountRaceView: () => race, questState: () => 'active' } as unknown as IWorld;
+      const world = {
+        mountRaceView: () => race,
+        questState: () => 'active',
+        worldQuestLog: new Map(),
+        player: { dead: false },
+      } as unknown as IWorld;
       guidance.update(world, 10, 0.05);
       expect(calls.events).toEqual([
         'race',
@@ -91,6 +132,7 @@ describe('personal world guidance coordinator', () => {
         'trace',
         'cannon',
         'horde',
+        'wisp-maze',
       ]);
     },
   );

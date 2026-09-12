@@ -99,7 +99,14 @@ export function worldQuestInstructorDialog(
   } else if (!active || world.player.dead || world.player.level < quest.minLevel) {
     canStart = false;
   } else if (progress?.state === 'active') {
-    if (quest.objective.type === 'horde' && progress.horde?.phase === 'active') {
+    if (
+      quest.objective.type === 'wisp_maze' &&
+      !progress.wispMaze?.paused &&
+      (progress.wispMaze?.phase === 'countdown' || progress.wispMaze?.phase === 'active')
+    ) {
+      canStart = false;
+      hint = t('questUi.worldQuest.inProgress');
+    } else if (quest.objective.type === 'horde' && progress.horde?.phase === 'active') {
       canStart = false;
       hint = t('questUi.worldQuest.inProgress');
     } else if (

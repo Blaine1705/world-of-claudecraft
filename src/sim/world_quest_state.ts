@@ -88,6 +88,7 @@ export function savedWorldQuestState(
           tracing: _tracing,
           forging: _forging,
           horde: _horde,
+          wispMaze: _wispMaze,
           investigation: _investigation,
           shadow: _shadow,
           glider: _glider,

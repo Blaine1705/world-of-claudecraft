@@ -66,6 +66,7 @@ import {
   rockHeight,
   rockRadius,
 } from './decoration_dims';
+import { isExcludedStreetlamp } from './decoration_exclusions';
 import { type DelveModuleId, delveModuleColliders } from './delve_layout';
 import { isLitanyModuleId, litanyModuleLosColliders } from './delve_litany_layout';
 import { dungeonDoorJambColliders } from './dungeon_door_jambs';
@@ -1590,7 +1591,9 @@ function buildStreetlampPlacements(seed: number): PlacedStreetlamp[] {
       authoredClearMin: MAX_BODY_RADIUS + Math.max(...Object.values(STREETLAMP_COLLIDER_RADIUS)),
     },
   );
-  return styleStreetlampSites(plan.sites, content.zones);
+  return styleStreetlampSites(plan.sites, content.zones).filter(
+    (site) => !isExcludedStreetlamp(site.x, site.z),
+  );
 }
 
 /**

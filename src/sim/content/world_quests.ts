@@ -13,6 +13,7 @@ import { WORLD_QUEST_GLIDER } from './world_quest_glider';
 import { WORLD_QUEST_HORDE } from './world_quest_horde';
 import { WORLD_QUEST_INVESTIGATION } from './world_quest_investigation';
 import { WORLD_QUEST_SHADOW } from './world_quest_shadow';
+import { WORLD_QUEST_WISP_MAZE } from './world_quest_wisp_maze';
 
 export const WORLD_QUEST_MIN_LEVEL = 5;
 export const WORLD_QUEST_DEFAULT_MIN_LEVEL = 10;
@@ -654,6 +655,7 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
   WORLD_QUEST_LAST_KEEP_CANNON,
   WORLD_QUEST_FORGING,
   WORLD_QUEST_HORDE,
+  WORLD_QUEST_WISP_MAZE,
   WORLD_QUEST_INVESTIGATION,
   WORLD_QUEST_GLIDER,
   WORLD_QUEST_SHADOW,

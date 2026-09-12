@@ -4,6 +4,7 @@ import { GLIDER_APPRENTICE_NPC_DEF, GLIDER_QUEST_ID } from './content/world_ques
 import { HORDE_QUEST_ID } from './content/world_quest_horde';
 import { INVESTIGATION_QUEST_ID } from './content/world_quest_investigation';
 import { SHADOW_QUEST_ID } from './content/world_quest_shadow';
+import { WISP_MAZE_QUEST_ID } from './content/world_quest_wisp_maze';
 import { WORLD_QUEST_MIN_LEVEL, WORLD_QUESTS, WORLD_QUESTS_BY_ID } from './content/world_quests';
 import { grantDeed } from './deeds';
 import { formatMoney } from './format_money';
@@ -109,6 +110,12 @@ import {
   startWorldQuestTracing,
   updateWorldQuestTracing,
 } from './world_quest_tracing';
+import {
+  ensureWispMazeInstructor,
+  pauseWispMaze,
+  startWispMaze,
+  updateWispMaze,
+} from './world_quest_wisp_maze';
 
 export {
   activeWorldQuestsForCycle,
@@ -255,6 +262,7 @@ export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Ent
   if (updateShadowEncounter(ctx, meta, player) && shadowProgress)
     creditWorldQuest(ctx, meta, WORLD_QUESTS_BY_ID[SHADOW_QUEST_ID], shadowProgress);
   if (player.dead) {
+    pauseWispMaze(meta);
     for (const progress of meta.worldQuestLog.values()) clearGliderEncounter(meta, progress);
     for (const progress of meta.worldQuestLog.values()) clearForgeWorkshop(meta, progress);
     for (const progress of meta.worldQuestLog.values()) clearHordeEncounter(meta, progress);
@@ -277,6 +285,7 @@ export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Ent
     const inside = inWorldQuestArea(player, quest);
     const wasInside = meta.worldQuestAreas.has(quest.id);
     if (!inside) {
+      if (quest.objective.type === 'wisp_maze') pauseWispMaze(meta);
       const progress = meta.worldQuestLog.get(quest.id);
       if (progress) clearForgeWorkshop(meta, progress);
       if (progress) clearHordeEncounter(meta, progress);
@@ -322,6 +331,11 @@ export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Ent
     if (quest.objective.type === 'horde') {
       ensureHordeInstructor(ctx);
       if (existing && updateHordeEncounter(meta, player, existing) && existing.state === 'active')
+        creditWorldQuest(ctx, meta, quest, existing);
+    }
+    if (quest.objective.type === 'wisp_maze') {
+      ensureWispMazeInstructor(ctx);
+      if (existing && updateWispMaze(ctx, meta, player, existing) && existing.state === 'active')
         creditWorldQuest(ctx, meta, quest, existing);
     }
     if (quest.objective.type === 'glider') {
@@ -422,6 +436,7 @@ export function talkToWorldQuestInstructor(
       (candidate.objective.type === 'tracing' ||
         candidate.objective.type === 'forging' ||
         candidate.objective.type === 'horde' ||
+        candidate.objective.type === 'wisp_maze' ||
         candidate.objective.type === 'glider' ||
         candidate.objective.type === 'shadow') &&
       candidate.objective.instructorNpcId === npc.templateId,
@@ -449,20 +464,22 @@ export function talkToWorldQuestInstructor(
       startGliderFlight(ctx, meta, player, npc, progress);
     return true;
   }
-  if (quest.objective.type === 'forging' || quest.objective.type === 'horde') {
+  if (
+    quest.objective.type === 'forging' ||
+    quest.objective.type === 'horde' ||
+    quest.objective.type === 'wisp_maze'
+  ) {
     if (
       player.level >= quest.minLevel &&
       progress &&
       inWorldQuestArea(player, quest) &&
       activeWorldQuestsForCycle(meta.worldQuestCycle).some((active) => active.id === quest.id)
     )
-      (quest.objective.type === 'horde' ? startHordeEncounter : startForgeWorkshop)(
-        ctx,
-        meta,
-        player,
-        npc,
-        progress,
-      );
+      (quest.objective.type === 'horde'
+        ? startHordeEncounter
+        : quest.objective.type === 'wisp_maze'
+          ? startWispMaze
+          : startForgeWorkshop)(ctx, meta, player, npc, progress);
     return true;
   }
   if (
@@ -535,6 +552,7 @@ function creditWorldQuest(
   if (quest.id === HORDE_QUEST_ID) grantDeed(ctx, meta, 'exp_last_barricade');
   if (quest.id === FORGE_QUEST_ID) grantDeed(ctx, meta, 'exp_forge_helper');
   if (quest.id === GLIDER_QUEST_ID) grantDeed(ctx, meta, 'exp_windrider_slalom');
+  if (quest.id === WISP_MAZE_QUEST_ID) grantDeed(ctx, meta, 'exp_wisp_maze');
   if (quest.id === WORLD_QUEST_CALLIGRAPHY_ID) {
     grantDeed(ctx, meta, 'exp_arcane_calligraphy');
     if (progress.traceResult?.rating === 'gold')

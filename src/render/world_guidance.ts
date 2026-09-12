@@ -9,6 +9,7 @@ import { IslandGuidance } from './island_guidance';
 import { MountBeacon } from './mount_beacon';
 import { RaceLine } from './race_line';
 import { ShadowInfiltrationVisual } from './shadow_infiltration_visual';
+import { WispMazeVisual } from './wisp_maze_visual';
 import { WorldQuestTraceVisual } from './world_quest_trace_visual';
 
 export class WorldGuidance {
@@ -21,6 +22,7 @@ export class WorldGuidance {
   private readonly horde: HordeBarricadeVisual;
   private readonly glider: GliderCourseVisual;
   private readonly shadow: ShadowInfiltrationVisual;
+  private readonly wispMaze: WispMazeVisual;
 
   constructor(
     scene: THREE.Object3D,
@@ -58,7 +60,13 @@ export class WorldGuidance {
       groundAt,
       compileGate && ((root) => compileGate(root, true)),
     );
+    this.wispMaze = new WispMazeVisual(
+      scene,
+      groundAt,
+      compileGate && ((root) => compileGate(root, true)),
+    );
     this.readyForEntry = Promise.all([
+      this.wispMaze.readyForEntry,
       this.shadow.readyForEntry,
       this.trace.readyForEntry,
       this.cannon.readyForEntry,
@@ -89,6 +97,7 @@ export class WorldGuidance {
     this.horde.update(world, reducedMotion);
     this.glider.update(world, renderedSelf);
     this.shadow.update(world);
+    this.wispMaze.update(world, reducedMotion);
   }
 
   dispose(): void {
@@ -97,5 +106,6 @@ export class WorldGuidance {
     this.horde.dispose();
     this.glider.dispose();
     this.shadow.dispose();
+    this.wispMaze.dispose();
   }
 }

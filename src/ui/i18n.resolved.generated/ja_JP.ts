@@ -9864,6 +9864,21 @@ export const ja_JP: EnTranslations = {
           "bronze": "Bronze"
         }
       },
+      "wispMaze": {
+        "leave": "Leave maze",
+        "title": "Wispwood Maze",
+        "objective": "Gather every lost wisp in the maze",
+        "ready": "Speak to the wisp keeper to begin.",
+        "controls": "Move through the maze to collect wisps. Avoid the shadows. Power wisps let you banish shadows for a short time.",
+        "collected": "Wisps: {count}/{total}",
+        "lives": "Lives: {count}/3",
+        "power": "Wisp power: {seconds}s",
+        "countdown": "Starting in {seconds}s",
+        "collect": "Collect wisps. Avoid shadows.",
+        "powered": "Power surge! Touch shadows to banish them.",
+        "finished": "Every wisp is safe!",
+        "retry": "Three lives restored. Try the maze again."
+      },
       "forge": {
         "title": "A Helping Hammer",
         "objective": "Help Smith Mara forge a shield",
@@ -15824,6 +15839,11 @@ export const ja_JP: EnTranslations = {
         "name": "Captain Rowan",
         "title": "Wyrmroad Rearguard",
         "greeting": "Hold the forest pass! The repeater fires itself. Move sideways, break supply crates, and stop the dead before they reach our barricade."
+      },
+      "wisp_maze_keeper": {
+        "name": "Keeper Liora",
+        "title": "Warden of Wandering Lights",
+        "greeting": "Gather every wandering light in my maze. Avoid its guardians, or take a radiant light to banish them. Three lost lives return you to the entrance, but the lights you gathered remain safe."
       },
       "calligraphy_instructor": {
         "name": "エリアン先生",

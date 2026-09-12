@@ -270,6 +270,7 @@ const NPC_IDS = [
   'infiltrator_bram',
   'infiltrator_tessa',
   'barricade_captain',
+  'wisp_maze_keeper',
   'calligraphy_instructor',
   'calligraphy_apprentice_1',
   'calligraphy_apprentice_2',

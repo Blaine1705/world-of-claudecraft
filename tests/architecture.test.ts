@@ -219,6 +219,7 @@ const UI_PURE_CORES = [
   'src/ui/world_quest_view.ts',
   'src/ui/world_quest_trace_view.ts',
   'src/ui/world_quest_forge_view.ts',
+  'src/ui/world_quest_wisp_maze_view.ts',
   'src/ui/world_quest_horde_view.ts',
   'src/ui/world_quest_shadow_view.ts',
   'src/ui/world_quest_investigation_view.ts',
@@ -585,6 +586,7 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // post_bloom_shader_core is the host-agnostic GLSL source patch for the
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
+  'src/render/wisp_maze_core.ts',
   'src/render/glider_course_core.ts',
   'src/render/glider_flight_pose_core.ts',
   'src/render/shadow_detection_core.ts',
@@ -2345,6 +2347,7 @@ const UI_DOM_MODULES = [
   'src/ui/hud/player_card/player_card_controller.ts',
   'src/ui/hud/quest/quest_dialog_controller.ts',
   'src/ui/hud/quest/quest_tracker_controller.ts',
+  'src/ui/hud/quest/wisp_maze_hud_controller.ts',
   'src/ui/hud/quest/questlog_window.ts',
   'src/ui/world_quest_puzzle_window.ts',
   'src/ui/world_quest_confection_window.ts',

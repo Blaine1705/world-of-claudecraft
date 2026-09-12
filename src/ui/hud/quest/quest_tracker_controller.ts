@@ -1,5 +1,7 @@
+import { WISP_MAZE_QUEST_ID } from '../../../sim/content/world_quest_wisp_maze';
 import { QUESTS, WORLD_QUESTS_BY_ID } from '../../../sim/data';
 import { questObjectiveRequired } from '../../../sim/types';
+import { wispMazeActionsLocked } from '../../../sim/wisp_maze_action_lock';
 import type { IWorld } from '../../../world_api';
 import { esc } from '../../esc';
 import { formatNumber, t } from '../../i18n';
@@ -12,8 +14,10 @@ import { investigationInstructionLines } from '../../world_quest_investigation_v
 import { shadowInstructionLines } from '../../world_quest_shadow_view';
 import { worldQuestTraceProgressInstruction } from '../../world_quest_trace_view';
 import { worldQuestDisplayName, worldQuestObjectiveLabel } from '../../world_quest_view';
+import { wispMazeInstructionLines } from '../../world_quest_wisp_maze_view';
 import { buildQuestStrip, type QuestStripController } from './quest_strip_controller';
 import { type QuestTrackerView, questTrackerView, type TrackedQuest } from './quest_tracker';
+import { buildWispMazeHud, type WispMazeHudController } from './wisp_maze_hud_controller';
 
 export interface QuestTrackerSettingsPort {
   available(): boolean;
@@ -27,7 +31,7 @@ export interface QuestTrackerControllerDeps {
   writers: PainterHostWriters;
   element: HTMLElement;
   document: Document;
-  world(): Pick<IWorld, 'questLog' | 'worldQuestLog'>;
+  world(): Pick<IWorld, 'questLog' | 'worldQuestLog'> & Partial<Pick<IWorld, 'abandonQuest'>>;
   settings: QuestTrackerSettingsPort;
   questTitle(questId: string): string;
   objectiveLabel(questId: string, objectiveIndex: number): string;
@@ -41,6 +45,7 @@ export interface QuestTrackerControllerDeps {
  *  rather than projecting the log a second time. */
 export class QuestTrackerController {
   private readonly strip: QuestStripController | null;
+  private readonly wispHud: WispMazeHudController | null;
   /** The last frame time Hud handed down. The collapse toggle re-renders off a
    *  user gesture rather than a frame, so it reuses it instead of minting a
    *  clock here; the strip's grace is measured in seconds and cannot see the
@@ -59,6 +64,9 @@ export class QuestTrackerController {
   private collapseLocked = false;
 
   constructor(private readonly deps: QuestTrackerControllerDeps) {
+    this.wispHud = buildWispMazeHud(deps.writers, () =>
+      deps.world().abandonQuest?.(WISP_MAZE_QUEST_ID),
+    );
     this.strip = buildQuestStrip({
       writers: deps.writers,
       click: () => this.deps.click(),
@@ -102,6 +110,11 @@ export class QuestTrackerController {
 
   update(now: number): void {
     this.lastNow = now;
+    const worldQuestLog = this.deps.world().worldQuestLog;
+    this.wispHud?.update(
+      worldQuestLog.get(WISP_MAZE_QUEST_ID),
+      wispMazeActionsLocked(worldQuestLog),
+    );
     let collapsed = this.deps.settings.collapsed();
     const quests: TrackedQuest[] = [];
     let traceQuestId: string | undefined;
@@ -139,6 +152,7 @@ export class QuestTrackerController {
         !(progress.traceResult && progress.tracing?.phase === 'success') &&
         !progress.forging &&
         !progress.horde &&
+        !progress.wispMaze &&
         !progress.glider
       )
         continue;
@@ -150,6 +164,7 @@ export class QuestTrackerController {
         progress.forging?.phase === 'working' ||
         progress.horde?.phase === 'countdown' ||
         progress.horde?.phase === 'active' ||
+        (!!progress.wispMaze && !progress.wispMaze.paused && progress.wispMaze.phase !== 'won') ||
         progress.glider?.phase === 'countdown' ||
         progress.glider?.phase === 'flying'
       )
@@ -160,23 +175,27 @@ export class QuestTrackerController {
         title: worldQuestDisplayName(progress.questId),
         complete:
           progress.state === 'completed' &&
+          !(progress.wispMaze && progress.wispMaze.phase !== 'won') &&
           progress.glider?.phase !== 'countdown' &&
           progress.glider?.phase !== 'flying',
         objectives:
           quest.objective.type === 'forging' ||
+          quest.objective.type === 'wisp_maze' ||
           quest.objective.type === 'horde' ||
           quest.objective.type === 'glider' ||
           quest.objective.type === 'shadow' ||
           quest.objective.type === 'investigation'
-            ? (quest.objective.type === 'forging'
-                ? forgeInstructionLines(progress)
-                : quest.objective.type === 'horde'
-                  ? hordeInstructionLines(progress)
-                  : quest.objective.type === 'glider'
-                    ? gliderInstructionLines(progress)
-                    : quest.objective.type === 'shadow'
-                      ? shadowInstructionLines(progress)
-                      : investigationInstructionLines(progress)
+            ? (quest.objective.type === 'wisp_maze'
+                ? wispMazeInstructionLines(progress)
+                : quest.objective.type === 'forging'
+                  ? forgeInstructionLines(progress)
+                  : quest.objective.type === 'horde'
+                    ? hordeInstructionLines(progress)
+                    : quest.objective.type === 'glider'
+                      ? gliderInstructionLines(progress)
+                      : quest.objective.type === 'shadow'
+                        ? shadowInstructionLines(progress)
+                        : investigationInstructionLines(progress)
               ).map((label) => ({
                 label,
                 current: 0,

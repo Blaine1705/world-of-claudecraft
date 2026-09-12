@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ESCORTS, WORLD_QUESTS } from '../src/sim/data';
 import { createHordeBarricade } from '../src/sim/minigames/horde_barricade';
+import { createWispMaze } from '../src/sim/minigames/wisp_maze';
 import type { Entity, WorldQuestProgress } from '../src/sim/types';
 import {
   isWorldQuestInstructorOrEscort,
@@ -36,6 +37,7 @@ describe('worldQuestInstructorDialog presentation', () => {
         'glider_apprentice',
         'glider_instructor',
         'shadow_cloak_scout',
+        'wisp_maze_keeper',
       ].sort(),
     );
     expect([...new Set(worldQuestEscortIds)].sort()).toEqual(
@@ -60,6 +62,21 @@ describe('worldQuestInstructorDialog presentation', () => {
     const randomNpc = { id: 200, kind: 'npc', templateId: 'innkeeper_elena' } as Entity;
     expect(isWorldQuestInstructorOrEscort(skye)).toBe(true);
     expect(isWorldQuestInstructorOrEscort(randomNpc)).toBe(false);
+  });
+
+  it('allows a paused maze to resume but blocks duplicate active starts', () => {
+    const progress: WorldQuestProgress = {
+      questId: 'wq_evergarden_wisp_maze',
+      count: 0,
+      state: 'active',
+      wispMaze: createWispMaze(1),
+    };
+    const world = makeWorld([[progress.questId, progress]]);
+    const keeper = { id: 7, kind: 'npc', templateId: 'wisp_maze_keeper' } as Entity;
+    expect(worldQuestInstructorDialog(world, keeper)?.canStart).toBe(false);
+    if (!progress.wispMaze) throw new Error('Missing trial');
+    progress.wispMaze.paused = true;
+    expect(worldQuestInstructorDialog(world, keeper)?.canStart).toBe(true);
   });
 
   it('provides dialogue briefing and start button for calligraphy instructor Elian', () => {

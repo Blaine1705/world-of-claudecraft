@@ -5689,6 +5689,13 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "exploration",
     "renown": 5,
     "feat": false
+  },
+  {
+    "id": "exp_wisp_maze",
+    "name": "A Light in the Maze",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
   }
 ];
 

@@ -198,6 +198,22 @@ const questStringsEn = {
         replay: 'Speak to the captain to retry. Rewards once per rotation.',
         medals: { gold: 'Gold', silver: 'Silver', bronze: 'Bronze' },
       },
+      wispMaze: {
+        leave: 'Leave maze',
+        title: 'Wispwood Maze',
+        objective: 'Gather every lost wisp in the maze',
+        ready: 'Speak to the wisp keeper to begin.',
+        controls:
+          'Move through the maze to collect wisps. Avoid the shadows. Power wisps let you banish shadows for a short time.',
+        collected: 'Wisps: {count}/{total}',
+        lives: 'Lives: {count}/3',
+        power: 'Wisp power: {seconds}s',
+        countdown: 'Starting in {seconds}s',
+        collect: 'Collect wisps. Avoid shadows.',
+        powered: 'Power surge! Touch shadows to banish them.',
+        finished: 'Every wisp is safe!',
+        retry: 'Three lives restored. Try the maze again.',
+      },
       forge: {
         title: 'A Helping Hammer',
         objective: 'Help Smith Mara forge a shield',
