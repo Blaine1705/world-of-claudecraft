@@ -16,6 +16,7 @@ export type QuestWorldCommand =
   | { cmd: 'world_quest_puzzle_rotate'; quest: string; tileIndex: number }
   | { cmd: 'world_quest_match3_swap'; quest: string; fromIndex: number; toIndex: number }
   | { cmd: 'world_quest_match3_reset'; quest: string }
+  | { cmd: 'world_quest_puzzle_reset'; quest: string }
   | { cmd: 'world_quest_accuse'; npcId: number }
   | { cmd: 'world_quest_shadow'; action: 'pickpocket' | 'leave'; targetId?: number };
 
@@ -26,6 +27,7 @@ export class QuestWorldWireState {
   questsDone = new Set<string>();
   worldQuestCycle = '';
   worldQuestExpiresAtMs = 0;
+  worldQuestTime = 0;
   worldQuestLog: ReadonlyMap<string, WorldQuestProgress> = new Map();
   nearbyWorldQuestTraces: readonly NearbyWorldQuestTrace[] = [];
   private activeWorldBossIds = new Set<string>();
@@ -63,6 +65,10 @@ export class QuestWorldWireState {
     this.sendQuestWorldCommand({ cmd: 'world_quest_match3_reset', quest: questId });
   }
 
+  resetWorldQuestPuzzle(questId: string): void {
+    this.sendQuestWorldCommand({ cmd: 'world_quest_puzzle_reset', quest: questId });
+  }
+
   accuseWorldQuestSuspect(npcId: number): void {
     this.sendQuestWorldCommand({ cmd: 'world_quest_accuse', npcId });
   }
@@ -87,6 +93,7 @@ export class QuestWorldWireState {
     this.vehicleSession = null;
     this.worldQuestCycle = '';
     this.worldQuestExpiresAtMs = 0;
+    this.worldQuestTime = 0;
     this.worldQuestLog = new Map();
     this.nearbyWorldQuestTraces = [];
     this.activeWorldBossIds = new Set();

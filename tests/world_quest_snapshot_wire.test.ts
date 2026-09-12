@@ -52,7 +52,7 @@ describe('world quest snapshot wire', () => {
   it('adopts valid empty arrays and filters malformed, future, and prototype rows', () => {
     const target = mirrors();
     applyQuestSelfWire(target, {
-      wqday: '2026-09-01',
+      wqday: '2026-08-31',
       wqexp: 1_900_000_000_000,
       wqlog: [
         { questId: 'constructor', count: 1, state: 'completed' },
@@ -60,7 +60,7 @@ describe('world quest snapshot wire', () => {
         { questId: 'wq_eastbrook_bandits', count: Number.NaN, state: 'active' },
       ],
     });
-    expect(target.worldQuestCycle).toBe('wq3_0');
+    expect(target.worldQuestCycle).toBe('wq1_0');
     expect(target.worldQuestExpiresAtMs).toBe(1_900_000_000_000);
     expect([...target.worldQuestLog.values()]).toEqual([
       { questId: 'wq_eastbrook_bandits', count: 0, state: 'active' },
@@ -78,6 +78,7 @@ describe('world quest snapshot wire', () => {
           questId: 'wq_galecrest_wisps',
           count: 0,
           state: 'active',
+          puzzleExpiresAt: 125,
           puzzleRotations: [1, 5, -1, 2, Number.NaN, 0, 3, 2, 1],
         },
       ],
@@ -89,13 +90,23 @@ describe('world quest snapshot wire', () => {
       state: 'active',
       puzzleVariant: 0,
       puzzleRotations: [1, 1, 3, 2, 0, 0, 3, 2, 1],
+      puzzleExpiresAt: 125,
     });
+  });
+
+  it('tracks authoritative simulation time without accepting invalid clocks', () => {
+    const target = mirrors();
+    applyQuestSelfWire(target, {}, 35);
+    expect(target.worldQuestTime).toBe(35);
+    applyQuestSelfWire(target, {}, Number.NaN);
+    applyQuestSelfWire(target, {}, -1);
+    expect(target.worldQuestTime).toBe(35);
   });
 
   it('adopts a rollover atomically and filters rows against its active rotation', () => {
     const target = mirrors();
     applyQuestSelfWire(target, {
-      wqday: '2026-09-03',
+      wqday: '2026-09-02',
       wqlog: [
         { questId: 'wq_eastbrook_bandits', count: 1, state: 'active' },
         {
@@ -111,7 +122,7 @@ describe('world quest snapshot wire', () => {
       ],
     });
 
-    expect(target.worldQuestCycle).toBe('wq3_1');
+    expect(target.worldQuestCycle).toBe('wq1_2');
     expect([...target.worldQuestLog.values()]).toEqual([
       {
         questId: 'wq_frostveil_howlers',
@@ -136,7 +147,7 @@ describe('world quest snapshot wire', () => {
       ],
     });
 
-    expect(target.worldQuestCycle).toBe('wq3_2');
+    expect(target.worldQuestCycle).toBe('wq1_6');
     expect(target.worldQuestLog.get('wq_farshore_salvage')).toEqual({
       questId: 'wq_farshore_salvage',
       count: 0,

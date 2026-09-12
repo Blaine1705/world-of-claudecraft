@@ -845,6 +845,24 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
       },
     ],
   },
+  // The Ley-alignment clock updates its whole-second text only while an attempt is open.
+  // Element refs are captured when the board is built, and the urgent class changes once.
+  {
+    file: 'world_quest_ley_window.ts',
+    reflowAllow: {},
+    driverAllow: { setInterval: 1 },
+    drivers: [
+      {
+        driver: 'setInterval',
+        everyMs: 1000,
+        why: 'the open Ley attempt countdown: paint the cached timer once per second and stop at zero, on defeat, completion, close, or rebuild.',
+        writeAllow: { '.textContent': 1, '.classList': 1, '.setAttribute': 1 },
+        queryAllow: {},
+        idlAllow: {},
+        reflowAllow: {},
+      },
+    ],
+  },
   // SIX, and the count is the shape of the fix rather than growth. WHICH element
   // scrolls the personal pane depends on the viewport (Bank Storage phase 18: the
   // .bank-scroll region normally, the window itself in the short-phone pinned-footer
@@ -1613,6 +1631,7 @@ describe('hud_perf_budget ARM 1: every src/ui painter holds its bucket contract 
     // over zero callbacks and reads as a pass.
     expect(sweep.scanned).toEqual([
       'gather_node_tooltip_controller.ts#0',
+      'world_quest_ley_window.ts#0',
       'daily_rewards_window.ts#0',
       'daily_rewards_window.ts#1',
       'hud/delve/lockpick_window.ts#0',

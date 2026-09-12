@@ -64,6 +64,7 @@ describe('world quest puzzle window', () => {
         rotateWorldQuestPuzzleTile,
         swapWorldQuestMatch3Tiles,
         resetWorldQuestMatch3,
+        resetWorldQuestPuzzle: vi.fn(),
       }),
       closeOthers: vi.fn(),
       openFocusTrap,
@@ -133,6 +134,7 @@ describe('world quest puzzle window', () => {
         rotateWorldQuestPuzzleTile: vi.fn(),
         swapWorldQuestMatch3Tiles,
         resetWorldQuestMatch3,
+        resetWorldQuestPuzzle: vi.fn(),
       }),
       closeOthers: vi.fn(),
       openFocusTrap: () => ({
@@ -202,6 +204,7 @@ describe('world quest puzzle window', () => {
         rotateWorldQuestPuzzleTile: vi.fn(),
         swapWorldQuestMatch3Tiles: vi.fn(),
         resetWorldQuestMatch3: vi.fn(),
+        resetWorldQuestPuzzle: vi.fn(),
       }),
       closeOthers: vi.fn(),
       openFocusTrap: () => ({

@@ -7,6 +7,8 @@ export interface IWorldQuests {
   worldQuestCycle: string;
   /** Authoritative epoch-ms boundary at which the current rotation is replaced. */
   worldQuestExpiresAtMs: number;
+  /** Latest authoritative simulation time used by session-bound World Quest deadlines. */
+  readonly worldQuestTime?: number;
   worldQuestLog: ReadonlyMap<string, WorldQuestProgress>;
   /** Nearby other players' blue trails/results, never their private drawing guidance. */
   readonly nearbyWorldQuestTraces: readonly NearbyWorldQuestTrace[];
@@ -17,6 +19,7 @@ export interface IWorldQuests {
   rotateWorldQuestPuzzleTile(questId: string, tileIndex: number): void;
   swapWorldQuestMatch3Tiles(questId: string, fromIndex: number, toIndex: number): void;
   resetWorldQuestMatch3(questId: string): void;
+  resetWorldQuestPuzzle(questId: string): void;
   accuseWorldQuestSuspect(npcId: number): void;
   shadowWorldQuestAction(action: 'pickpocket' | 'leave', targetId?: number): void;
   acceptLinkedQuest(questId: string, fromPid: number): void;

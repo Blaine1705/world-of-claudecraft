@@ -16,19 +16,32 @@ export interface WorldQuestLeyState {
   board: WorldQuestPuzzleView | null;
   outcome: WorldQuestLeyOutcome;
   receiptsClosed: boolean;
+  expiresAt: number | null;
+  secondsRemaining: number;
 }
 
 /** Retain only observed presentation data when completion strips the live board. */
 export function resolveWorldQuestLeyState(
   questId: string,
   progress: WorldQuestProgress | undefined,
+  now: number,
   previous: WorldQuestLeyState | null,
 ): WorldQuestLeyState | null {
   if (ownEntry(WORLD_QUESTS_BY_ID, questId)?.objective.type !== 'puzzle' || !progress) return null;
   const prior = previous?.questId === questId ? previous : null;
   const sourceSignature = JSON.stringify(progress);
-  // A delayed active snapshot cannot undo an authoritative terminal presentation.
-  if (prior && prior.outcome !== 'playing') return prior;
+  const expiresAt =
+    typeof progress.puzzleExpiresAt === 'number' && Number.isFinite(progress.puzzleExpiresAt)
+      ? progress.puzzleExpiresAt
+      : null;
+  const secondsRemaining = expiresAt === null ? 0 : Math.max(0, expiresAt - now);
+  // Completion is permanent. A loss reopens only after the server publishes a new attempt.
+  if (prior?.outcome === 'won') return prior;
+  if (
+    prior?.outcome === 'lost' &&
+    !(expiresAt !== null && expiresAt > now && expiresAt !== prior.expiresAt)
+  )
+    return prior;
   if (progress.state === 'completed') {
     return {
       questId,
@@ -37,6 +50,8 @@ export function resolveWorldQuestLeyState(
       board: prior?.board ?? null,
       outcome: 'won',
       receiptsClosed: false,
+      expiresAt: prior?.expiresAt ?? null,
+      secondsRemaining: 0,
     };
   }
   if (prior?.sourceSignature === sourceSignature) return prior;
@@ -48,8 +63,20 @@ export function resolveWorldQuestLeyState(
     count: progress.count,
     puzzleVariant: board.level - 1,
     puzzleRotations: board.tiles.map((tile) => tile.rotation),
+    ...(expiresAt === null ? {} : { puzzleExpiresAt: expiresAt }),
   };
-  return { questId, sourceSignature, snapshot, board, outcome: 'playing', receiptsClosed: false };
+  const outcome =
+    expiresAt === 0 || (expiresAt !== null && secondsRemaining <= 0) ? 'lost' : 'playing';
+  return {
+    questId,
+    sourceSignature,
+    snapshot,
+    board,
+    outcome,
+    receiptsClosed: outcome === 'lost',
+    expiresAt,
+    secondsRemaining,
+  };
 }
 
 /** Absolute receipts preserve every accepted turn, including turns between paints. */
@@ -78,7 +105,7 @@ export function applyWorldQuestLeyRotation(
   return { ...state, snapshot, board: buildWorldQuestPuzzleView(state.questId, snapshot) };
 }
 
-/** The lost face is a presentation hook; current Ley rules never emit a loss. */
+/** Latch an authoritative terminal event until a distinct retry deadline arrives. */
 export function setWorldQuestLeyOutcome(
   state: WorldQuestLeyState | null,
   outcome: 'won' | 'lost',

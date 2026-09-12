@@ -166,6 +166,21 @@ describe('online world-quest command path', () => {
       ?.worldQuestLog.get(beamQuest.id)?.puzzleRotations;
     expect(rotationsAfter?.[0]).toBe(((rotationsBefore[0] ?? 0) + 1) % 4);
 
+    const beamProgress = joined.server.sim.meta(joined.pid)?.worldQuestLog.get(beamQuest.id);
+    if (!beamProgress?.puzzleExpiresAt) throw new Error('Missing beam deadline');
+    joined.server.sim.time = beamProgress.puzzleExpiresAt;
+    joined.server.sim.tick();
+    expect(beamProgress.puzzleExpiresAt).toBe(0);
+    client.resetWorldQuestPuzzle(beamQuest.id);
+    const beamResetFrame = socket.sent.pop();
+    if (!beamResetFrame) throw new Error('Client did not send beam reset command');
+    expect(JSON.parse(beamResetFrame)).toMatchObject({
+      cmd: 'world_quest_puzzle_reset',
+      quest: beamQuest.id,
+    });
+    joined.server.handleMessage(joined.session, beamResetFrame);
+    expect(beamProgress.puzzleExpiresAt).toBe(joined.server.sim.time + 90);
+
     const deliveryQuest = WORLD_QUESTS_BY_ID.wq_eastbrook_bandits;
     if (deliveryQuest.objective.type !== 'delivery') {
       throw new Error('Expected delivery fixture');

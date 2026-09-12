@@ -13,6 +13,13 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'questUi.worldQuest.puzzleRetry': '다시 시도',
+  'questUi.worldQuest.puzzleTimerAria': '남은 시간: {seconds}초',
+  'questUi.worldQuest.startQuest': '전역 퀘스트 시작',
+  'questUi.worldQuest.startEscort': '호위 시작',
+  'questUi.worldQuest.escortTitle': '대상단',
+  'questUi.worldQuest.alreadyCompleted': '이번 주기의 전역 퀘스트를 이미 완료했습니다.',
+  'questUi.worldQuest.inProgress': '이 전역 퀘스트는 이미 진행 중입니다.',
   'hudChrome.barEditor.pageTab': '페이지 {page}',
   'hudChrome.bootcamp.promptHold': '누르고 있기',
   'hudChrome.bootcamp.promptJump': '점프',

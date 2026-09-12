@@ -4342,6 +4342,7 @@ export interface WorldQuestProgress {
   creditedObjects?: string[];
   puzzleVariant?: number;
   puzzleRotations?: number[];
+  puzzleExpiresAt?: number;
   match3Board?: WorldQuestMatch3Candy[];
   match3Moves?: number;
   match3RefillIndex?: number;
@@ -5964,6 +5965,7 @@ export type SimEvent = { pid?: number } & (
       tileIndex: number;
       rotation: number;
     }
+  | { type: 'worldQuestPuzzleFailed'; questId: string }
   | { type: 'worldQuestMatch3Updated'; questId: string }
   | {
       type: 'worldQuestDone';

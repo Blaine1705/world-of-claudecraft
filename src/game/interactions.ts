@@ -1,12 +1,7 @@
-import {
-  FORGE_INTERACT_RANGE,
-  FORGE_NPC_DEF,
-  FORGE_STATIONS,
-} from '../sim/content/world_quest_forging';
-import { GLIDER_APPRENTICE_NPC_DEF, GLIDER_NPC_DEF } from '../sim/content/world_quest_glider';
-import { HORDE_NPC_DEF } from '../sim/content/world_quest_horde';
+import { FORGE_INTERACT_RANGE, FORGE_STATIONS } from '../sim/content/world_quest_forging';
 import { isInvestigationNpc } from '../sim/content/world_quest_investigation';
 import { isShadowNpc, SHADOW_NPC_ID } from '../sim/content/world_quest_shadow';
+import { ESCORTS } from '../sim/data';
 import { isQuestGatedEntityHidden } from '../sim/quest_gated_entity';
 import {
   dist2d,
@@ -16,7 +11,6 @@ import {
   INTERACT_RANGE,
 } from '../sim/types';
 import { investigationDisguiseHidden } from '../sim/world_quest_investigation_visibility';
-import { isWorldQuestTraceInstructor } from '../sim/world_quest_trace_identity';
 import { t } from '../ui/i18n';
 import { tSim } from '../ui/sim_i18n';
 import type { IWorld } from '../world_api';
@@ -299,19 +293,13 @@ export function handlePickedEntity(
           // command too); do not open the quest dialog client-side.
           hud.showError(tSim('error.cantWhileDead'));
           return false;
-        } else if (
-          isWorldQuestTraceInstructor(e.templateId) ||
-          e.templateId === FORGE_NPC_DEF.id ||
-          e.templateId === HORDE_NPC_DEF.id ||
-          e.templateId === GLIDER_NPC_DEF.id ||
-          e.templateId === GLIDER_APPRENTICE_NPC_DEF.id ||
-          isInvestigationNpc(e.templateId) ||
-          isShadowNpc(e.templateId)
-        )
+        } else if (isInvestigationNpc(e.templateId)) {
           world.interact();
-        else if (e.templateId === 'brother_halven' || e.templateId === 'brother_halven_marsh')
+        } else if (e.templateId === 'brother_halven' || e.templateId === 'brother_halven_marsh') {
           hud.openDelveBoard(id);
-        else hud.openQuestDialog(id);
+        } else {
+          hud.openQuestDialog(id);
+        }
         return true;
       }
       hud.showError(t('questUi.errors.tooFar'));
@@ -335,6 +323,15 @@ export function handlePickedEntity(
         world.worldQuestLog,
       );
       if (verdict.kind === 'none') return false;
+      if (verdict.kind === 'start') {
+        const escortDef = Object.values(ESCORTS).find(
+          (entry) => entry.npcMobId === e.templateId && entry.worldQuestId !== undefined,
+        );
+        if (escortDef) {
+          hud.openQuestDialog(verdict.entityId);
+          return true;
+        }
+      }
       return handleEscortPress(world, hud, verdict, t('questUi.errors.escortAway'));
     } else if (
       isAttackableEntity(e, world.playerId ?? world.player.id, activePvpOpponentIds(world))
@@ -389,19 +386,13 @@ export function handlePickedEntity(
       // No quest dialog while dead (the server refuses quest talk too); a ghost
       // takes the Spirit Healer res via right-click or the death panel button.
       if (d <= INTERACT_RANGE + 2 && !world.player.dead) {
-        if (
-          isWorldQuestTraceInstructor(e.templateId) ||
-          e.templateId === FORGE_NPC_DEF.id ||
-          e.templateId === HORDE_NPC_DEF.id ||
-          e.templateId === GLIDER_NPC_DEF.id ||
-          e.templateId === GLIDER_APPRENTICE_NPC_DEF.id ||
-          isInvestigationNpc(e.templateId) ||
-          isShadowNpc(e.templateId)
-        )
+        if (isInvestigationNpc(e.templateId)) {
           world.interact();
-        else if (e.templateId === 'brother_halven' || e.templateId === 'brother_halven_marsh')
+        } else if (e.templateId === 'brother_halven' || e.templateId === 'brother_halven_marsh') {
           hud.openDelveBoard(id);
-        else hud.openQuestDialog(id);
+        } else {
+          hud.openQuestDialog(id);
+        }
         return true;
       }
     }

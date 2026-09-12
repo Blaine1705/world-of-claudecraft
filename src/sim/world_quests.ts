@@ -112,6 +112,7 @@ export {
   worldQuestCycleForResetDay,
 } from './world_quest_rotation';
 
+export const WORLD_QUEST_LEY_TIMER_SECONDS = 90;
 const WORLD_QUEST_CLAIM_PREFIX = '__wq_claim__:';
 
 function worldQuestById(questId: string): WorldQuestDef | undefined {
@@ -305,6 +306,28 @@ export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Ent
       continue;
     }
     const existing = meta.worldQuestLog.get(quest.id);
+    if (quest.objective.type === 'puzzle') {
+      if (
+        meta.openWorldQuestPuzzleId === quest.id &&
+        existing &&
+        existing.state === 'active' &&
+        existing.puzzleExpiresAt !== undefined &&
+        existing.puzzleExpiresAt > 0 &&
+        ctx.time >= existing.puzzleExpiresAt
+      ) {
+        const puzzle = beamPuzzle(quest, existing);
+        if (puzzle) {
+          existing.puzzleRotations = worldQuestPuzzleInitialRotations(puzzle);
+        }
+        existing.puzzleExpiresAt = 0;
+        meta.wireRev++;
+        ctx.emit({
+          type: 'worldQuestPuzzleFailed',
+          questId: quest.id,
+          pid: meta.entityId,
+        });
+      }
+    }
     if (quest.objective.type === 'investigation') ensureInvestigationPost(ctx);
     if (quest.objective.type === 'shadow') ensureShadowPost(ctx);
     if (quest.objective.type === 'horde') {
@@ -698,6 +721,20 @@ export function onObjectInteractedForWorldQuests(
       if (quest.objective.activationObjectItemId !== obj.objectItemId) continue;
       handled = true;
       meta.openWorldQuestPuzzleId = quest.id;
+      if (quest.objective.type === 'puzzle') {
+        const puzzle = beamPuzzle(quest, progress);
+        if (
+          puzzle &&
+          (!progress.puzzleRotations ||
+            progress.puzzleExpiresAt === undefined ||
+            progress.puzzleExpiresAt === 0 ||
+            ctx.time >= progress.puzzleExpiresAt)
+        ) {
+          progress.puzzleRotations = worldQuestPuzzleInitialRotations(puzzle);
+          progress.puzzleExpiresAt = ctx.time + WORLD_QUEST_LEY_TIMER_SECONDS;
+        }
+        meta.wireRev++;
+      }
       ctx.emit({
         type: 'worldQuestPuzzleOpened',
         questId: quest.id,
@@ -759,6 +796,8 @@ export function rotateWorldQuestPuzzleTile(
     progress?.state !== 'active' ||
     meta.openWorldQuestPuzzleId !== questId ||
     !inWorldQuestArea(player, quest) ||
+    (progress.puzzleExpiresAt !== undefined &&
+      (progress.puzzleExpiresAt === 0 || ctx.time >= progress.puzzleExpiresAt)) ||
     !Number.isSafeInteger(tileIndex) ||
     tileIndex < 0 ||
     tileIndex >= puzzle.tiles.length
@@ -776,6 +815,7 @@ export function rotateWorldQuestPuzzleTile(
     pid: meta.entityId,
   });
   if (traceWorldQuestPuzzle(puzzle, rotations).solved) {
+    delete progress.puzzleExpiresAt;
     creditWorldQuest(ctx, meta, quest, progress, quest.count);
   }
 }
@@ -848,11 +888,45 @@ export function resetWorldQuestMatch3(ctx: SimContext, questId: string, pid?: nu
   ctx.emit({ type: 'worldQuestMatch3Updated', questId, pid: meta.entityId });
 }
 
+export function resetWorldQuestPuzzle(ctx: SimContext, questId: string, pid?: number): void {
+  const resolved = ctx.resolve(pid);
+  if (!resolved) return;
+  const { e: player, meta } = resolved;
+  resetCycleIfNeeded(ctx, meta);
+  const quest = worldQuestById(questId);
+  const progress = meta.worldQuestLog.get(questId);
+  const puzzle = quest && progress ? beamPuzzle(quest, progress) : null;
+  if (
+    player.dead ||
+    !quest ||
+    quest.objective.type !== 'puzzle' ||
+    !puzzle ||
+    progress?.state !== 'active' ||
+    meta.openWorldQuestPuzzleId !== questId ||
+    !inWorldQuestArea(player, quest) ||
+    (progress.puzzleExpiresAt !== 0 &&
+      (progress.puzzleExpiresAt === undefined || ctx.time < progress.puzzleExpiresAt))
+  )
+    return;
+  progress.puzzleRotations = worldQuestPuzzleInitialRotations(puzzle);
+  progress.puzzleExpiresAt = ctx.time + WORLD_QUEST_LEY_TIMER_SECONDS;
+  meta.wireRev++;
+  ctx.emit({
+    type: 'worldQuestPuzzleOpened',
+    questId,
+    pid: meta.entityId,
+  });
+}
+
 export function sanitizeWorldQuestCycle(value: unknown): string {
   return normalizeWorldQuestCycle(value);
 }
 
-export function sanitizeWorldQuestProgress(value: unknown, cycle?: unknown): WorldQuestProgress[] {
+export function sanitizeWorldQuestProgress(
+  value: unknown,
+  cycle?: unknown,
+  includeSessionDeadlines = false,
+): WorldQuestProgress[] {
   if (!Array.isArray(value)) return [];
   const output: WorldQuestProgress[] = [];
   const seen = new Set<string>();
@@ -930,6 +1004,14 @@ export function sanitizeWorldQuestProgress(value: unknown, cycle?: unknown): Wor
       normalized.puzzleVariant = variant;
       const puzzle = quest.objective.puzzles[variant];
       normalized.puzzleRotations = sanitizeWorldQuestPuzzleRotations(raw.puzzleRotations, puzzle);
+      if (
+        includeSessionDeadlines &&
+        typeof raw.puzzleExpiresAt === 'number' &&
+        Number.isFinite(raw.puzzleExpiresAt) &&
+        raw.puzzleExpiresAt >= 0
+      ) {
+        normalized.puzzleExpiresAt = raw.puzzleExpiresAt;
+      }
     }
     if (raw.state === 'active' && quest.objective.type === 'match3') {
       const variant =

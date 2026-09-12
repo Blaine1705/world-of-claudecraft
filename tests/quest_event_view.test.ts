@@ -126,6 +126,9 @@ describe('quest event presentation', () => {
     expect(questEventPresentation({ type: 'worldQuestPuzzleClosed', questId, pid: 1 })).toEqual({
       closeWorldQuestPuzzle: questId,
     });
+    expect(questEventPresentation({ type: 'worldQuestPuzzleFailed', questId, pid: 1 })).toEqual({
+      failWorldQuestPuzzle: questId,
+    });
 
     const done = questEventPresentation({ type: 'worldQuestDone', questId, pid: 1 });
     expect(done).toMatchObject({

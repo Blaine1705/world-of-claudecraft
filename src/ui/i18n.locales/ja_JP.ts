@@ -13,6 +13,13 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'questUi.worldQuest.puzzleRetry': 'もう一度',
+  'questUi.worldQuest.puzzleTimerAria': '残り時間：{seconds}秒',
+  'questUi.worldQuest.startQuest': 'ワールドクエストを開始',
+  'questUi.worldQuest.startEscort': '護衛を開始',
+  'questUi.worldQuest.escortTitle': 'キャラバン',
+  'questUi.worldQuest.alreadyCompleted': 'このサイクルのワールドクエストは完了済みです。',
+  'questUi.worldQuest.inProgress': 'このワールドクエストは進行中です。',
   'hudChrome.barEditor.pageTab': 'ページ{page}',
   'hudChrome.bootcamp.promptHold': 'つかむ',
   'hudChrome.bootcamp.promptJump': 'ジャンプ',

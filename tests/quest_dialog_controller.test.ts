@@ -746,6 +746,32 @@ describe('QuestDialogController', () => {
 
     expect(test.element.querySelector('[data-prof-intro-hint]')).toBe(hintNode);
   });
+
+  it('opens a caravan briefing and confirms through target then interact', () => {
+    const caravan = {
+      ...npc(80, 'eastbrook_freight_caravan'),
+      kind: 'mob',
+      dead: false,
+    } as Entity;
+    const test = harness(caravan);
+    test.world.player.level = 60;
+    test.world.player.dead = false;
+    test.world.worldQuestLog = new Map([
+      ['wq_eastbrook_caravan', { questId: 'wq_eastbrook_caravan', state: 'active', count: 0 }],
+    ]);
+
+    test.controller.open(caravan.id);
+    const start = test.element.querySelector<HTMLButtonElement>('[data-start-wq]');
+    expect(test.controller.isOpen).toBe(true);
+    expect(start).not.toBeNull();
+    expect(start?.hidden).toBe(false);
+    start?.click();
+    expect(test.targetEntity).toHaveBeenCalledWith(caravan.id);
+    expect(test.interact).toHaveBeenCalledTimes(1);
+    expect(test.targetEntity.mock.invocationCallOrder[0]).toBeLessThan(
+      test.interact.mock.invocationCallOrder[0],
+    );
+  });
 });
 
 describe('investigation quest dialogue', () => {

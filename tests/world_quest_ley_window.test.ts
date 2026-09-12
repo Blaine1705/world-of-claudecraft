@@ -14,15 +14,18 @@ function rig() {
     questId,
     state: 'active',
     count: 0,
+    puzzleExpiresAt: 90,
     puzzleVariant: 0,
     puzzleRotations: quest.objective.puzzles[0].tiles.map((tile) => tile.initialRotation),
   };
   const world = {
     worldQuestCycle: 'cycle-a',
+    worldQuestTime: 0,
     worldQuestLog: new Map([[questId, progress]]),
     rotateWorldQuestPuzzleTile: vi.fn(),
     swapWorldQuestMatch3Tiles: vi.fn(),
     resetWorldQuestMatch3: vi.fn(),
+    resetWorldQuestPuzzle: vi.fn(),
   };
   const panel = new WorldQuestPuzzleWindow({
     document,
@@ -42,6 +45,27 @@ describe('Ley Beam Alignment presentation', () => {
     setLanguage('en');
   });
   afterEach(() => setLanguage('en'));
+
+  it('starts each alignment attempt with 90 seconds remaining', () => {
+    const { panel, root } = rig();
+    expect(root.querySelector('.wql-timer')?.textContent).toBe('90s');
+    panel.close();
+  });
+
+  it('counts down once per second and releases the timer when closed', () => {
+    vi.useFakeTimers();
+    try {
+      const { panel, root } = rig();
+      const timer = root.querySelector('.wql-timer');
+      vi.advanceTimersByTime(1_000);
+      expect(timer?.textContent).toBe('89s');
+      panel.close();
+      vi.advanceTimersByTime(5_000);
+      expect(timer?.textContent).toBe('89s');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 
   it('keeps the observed winning circuit after authoritative completion removes rotations', () => {
     const { panel, root, world } = rig();
@@ -96,12 +120,33 @@ describe('Ley Beam Alignment presentation', () => {
     expect((root.querySelector('.wql-result') as HTMLElement).hidden).toBe(true);
     panel.close();
   });
+  it('shows defeat from an authoritative expired snapshot even when its event was missed', () => {
+    const { panel, root, world, progress } = rig();
+    progress.puzzleExpiresAt = 0;
+    world.worldQuestTime = 90;
+    panel.refreshIfChanged();
+    const timer = root.querySelector<HTMLElement>('.wql-timer');
+    expect(root.dataset.leyOutcome).toBe('lost');
+    expect(timer?.hidden).toBe(true);
+    expect(timer?.getAttribute('aria-label')).toBeNull();
+    panel.close();
+  });
   it('provides defeat only through the design hook and clears it on a new cycle', () => {
     const { panel, root, world, progress } = rig();
     panel.applyEventPresentation({ failWorldQuestPuzzle: questId });
     expect(root.dataset.leyOutcome).toBe('lost');
     expect(progress.state).toBe('active');
     expect(root.querySelector('.wql-result-title')?.textContent).toBe('Alignment lost');
+    const retryBtn = root.querySelector<HTMLButtonElement>('[data-ley-retry]')!;
+    expect(retryBtn.hidden).toBe(false);
+    retryBtn.click();
+    expect(world.resetWorldQuestPuzzle).toHaveBeenCalledWith(questId);
+    expect(root.dataset.leyOutcome).toBe('lost');
+    progress.puzzleExpiresAt = 180;
+    world.worldQuestTime = 90;
+    panel.refreshIfChanged();
+    expect(root.dataset.leyOutcome).toBe('playing');
+    expect(root.querySelector('.wql-timer')?.textContent).toBe('90s');
     world.worldQuestCycle = 'cycle-b';
     panel.refreshIfChanged();
     expect(root.style.display).toBe('none');

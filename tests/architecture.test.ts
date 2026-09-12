@@ -228,6 +228,7 @@ const UI_PURE_CORES = [
   'src/ui/world_quest_confection_fx_view.ts',
   'src/ui/world_quest_ley_view.ts',
   'src/ui/world_quest_ley_fx_view.ts',
+  'src/ui/world_quest_instructor_view.ts',
   'src/ui/quest_event_view.ts',
   'src/ui/paladin_devotion_view.ts',
   'src/ui/aura_icon_view.ts',

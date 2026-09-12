@@ -13,6 +13,13 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
+  'questUi.worldQuest.puzzleRetry': '重试',
+  'questUi.worldQuest.puzzleTimerAria': '剩余时间：{seconds} 秒',
+  'questUi.worldQuest.startQuest': '开始世界任务',
+  'questUi.worldQuest.startEscort': '开始护送',
+  'questUi.worldQuest.escortTitle': '商队',
+  'questUi.worldQuest.alreadyCompleted': '你已完成本轮世界任务。',
+  'questUi.worldQuest.inProgress': '此世界任务已在进行中。',
   'hudChrome.barEditor.pageTab': '第{page}页',
   'hudChrome.bootcamp.promptHold': '按住',
   'hudChrome.bootcamp.promptJump': '跳跃',

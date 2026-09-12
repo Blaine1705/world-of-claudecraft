@@ -90,6 +90,7 @@ describe('world quest beam puzzle', () => {
     const activationObjectItemId = quest.objective.activationObjectItemId;
     activatePuzzle(sim, quest.id, activationObjectItemId);
     expect(sim.drainEvents().map((event) => event.type)).toContain('worldQuestPuzzleOpened');
+    const firstDeadline = sim.worldQuestLog.get(quest.id)?.puzzleExpiresAt;
 
     sim.rotateWorldQuestPuzzleTile(quest.id, 3);
     sim.rotateWorldQuestPuzzleTile(quest.id, 4);
@@ -124,6 +125,7 @@ describe('world quest beam puzzle', () => {
     expect(sim.worldQuestLog.get(quest.id)?.puzzleRotations).toEqual(beforeReactivation);
     activatePuzzle(sim, quest.id, activationObjectItemId);
     sim.drainEvents();
+    expect(sim.worldQuestLog.get(quest.id)?.puzzleExpiresAt).toBe(firstDeadline);
     sim.rotateWorldQuestPuzzleTile(quest.id, 4);
     sim.rotateWorldQuestPuzzleTile(quest.id, 4);
     sim.rotateWorldQuestPuzzleTile(quest.id, 1);
@@ -151,8 +153,8 @@ describe('world quest beam puzzle', () => {
     if (quest.objective.type !== 'puzzle') throw new Error('Expected beam-puzzle fixture');
     const weeks = [
       ['2026-08-31', 0],
-      ['2026-09-09', 1],
-      ['2026-09-18', 2],
+      ['2026-09-08', 1],
+      ['2026-09-14', 2],
     ] as const;
     for (const [resetDay, variant] of weeks) {
       const original = new Sim({
@@ -172,6 +174,7 @@ describe('world quest beam puzzle', () => {
       const state = original.serializeCharacter(original.playerId);
       const before = original.worldQuestLog.get(quest.id);
       if (!state || !before) throw new Error('Missing weekly circuit save');
+      expect(state.worldQuests?.progress[0]?.puzzleExpiresAt).toBeUndefined();
 
       const restored = new Sim({
         seed: 1_100 + variant,
@@ -191,7 +194,9 @@ describe('world quest beam puzzle', () => {
         puzzleVariant: variant,
         puzzleRotations: before.puzzleRotations,
       });
+      expect(loaded?.puzzleExpiresAt).toBeUndefined();
       activatePuzzle(restored, quest.id, quest.objective.activationObjectItemId);
+      expect(loaded?.puzzleExpiresAt).toBe(restored.time + 90);
       for (const [rawIndex, desired] of Object.entries(SOLVED_ROTATIONS[variant])) {
         const index = Number(rawIndex);
         const current = loaded?.puzzleRotations?.[index] ?? 0;
@@ -202,5 +207,60 @@ describe('world quest beam puzzle', () => {
       }
       expect(restored.meta(pid)?.worldQuestLog.get(quest.id)?.state).toBe('completed');
     }
+  });
+
+  it('expires the puzzle after the 90s timer and allows reset and retry', () => {
+    const { quest } = puzzleFixture();
+    const sim = new Sim({ seed: 100, playerClass: 'mage' });
+    sim.setPlayerLevel(60);
+    sim.resetDay = '2026-08-31';
+    sim.player.pos.x = quest.area.x;
+    sim.player.pos.z = quest.area.z;
+    sim.tick();
+    if (quest.objective.type !== 'puzzle') throw new Error('Expected beam-puzzle fixture');
+    activatePuzzle(sim, quest.id, quest.objective.activationObjectItemId);
+
+    const progress = sim.worldQuestLog.get(quest.id);
+    if (!progress) throw new Error('Expected active Ley progress');
+    expect(progress.puzzleExpiresAt).toBe(sim.time + 90);
+
+    // Make a move
+    sim.rotateWorldQuestPuzzleTile(quest.id, 1);
+    expect(progress?.puzzleRotations?.[1]).toBe(1);
+
+    const deadline = progress?.puzzleExpiresAt;
+    if (deadline === undefined) throw new Error('Expected active Ley deadline');
+    const rotationsBeforeEarlyReset = [...(progress.puzzleRotations ?? [])];
+    sim.resetWorldQuestPuzzle(quest.id);
+    expect(progress.puzzleExpiresAt).toBe(deadline);
+    expect(progress.puzzleRotations).toEqual(rotationsBeforeEarlyReset);
+
+    sim.time = deadline - 0.01;
+    sim.rotateWorldQuestPuzzleTile(quest.id, 1);
+    expect(progress.puzzleRotations?.[1]).toBe(2);
+
+    // The attempt expires at the exact authoritative 90-second boundary.
+    sim.time = deadline;
+    const events = sim.tick();
+    expect(events).toContainEqual({
+      type: 'worldQuestPuzzleFailed',
+      questId: quest.id,
+      pid: sim.playerId,
+    });
+    expect(progress?.puzzleExpiresAt).toBe(0);
+    expect(sim.tick().some((event) => event.type === 'worldQuestPuzzleFailed')).toBe(false);
+
+    // Rotations refused while expired
+    const rotationBefore = progress?.puzzleRotations?.[1];
+    sim.rotateWorldQuestPuzzleTile(quest.id, 1);
+    expect(progress?.puzzleRotations?.[1]).toBe(rotationBefore);
+
+    // Reset the puzzle
+    sim.resetWorldQuestPuzzle(quest.id);
+    expect(progress?.puzzleExpiresAt).toBe(sim.time + 90);
+
+    // After reset, rotations work again
+    sim.rotateWorldQuestPuzzleTile(quest.id, 1);
+    expect(progress?.puzzleRotations?.[1]).not.toBe(rotationBefore);
   });
 });

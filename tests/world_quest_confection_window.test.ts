@@ -31,6 +31,7 @@ function setup() {
     swapWorldQuestMatch3Tiles: swap,
     resetWorldQuestMatch3: reset,
     rotateWorldQuestPuzzleTile: vi.fn(),
+    resetWorldQuestPuzzle: vi.fn(),
   };
   const puzzle = new WorldQuestPuzzleWindow({
     document,

@@ -3587,7 +3587,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         this.accountCosmetics = normalizeAccountCosmetics(s.cosmetics);
         this.cosmeticsChanged = true;
       }
-      applyQuestSelfWire(this, s);
+      applyQuestSelfWire(this, s, timerWire.time);
       if (s.lockouts !== undefined) this.selfLockouts = s.lockouts as Record<string, number>;
       if (s.wba !== undefined) this.applyWorldBossWire(s.wba);
       // IWorldMounts self-decode: mntOwn is delta-guarded (omitted keeps the prior

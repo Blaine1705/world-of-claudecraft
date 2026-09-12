@@ -8708,10 +8708,23 @@
     font-size: 12px;
     padding: 9px 5px;
   }
+  body.mobile-touch #world-quest-puzzle-window.ley-beam .wql-source-label {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  body.mobile-touch #world-quest-puzzle-window.ley-beam .wql-target-label {
+    grid-column: 2;
+    grid-row: 1;
+  }
   body.mobile-touch #world-quest-puzzle-window.ley-beam .wql-reach {
-    grid-column: 1 / -1;
+    grid-column: 1;
     grid-row: 2;
     padding-top: 6px;
+  }
+  body.mobile-touch #world-quest-puzzle-window.ley-beam .wql-timer {
+    grid-column: 2;
+    grid-row: 2;
+    margin-top: 6px;
   }
   body.mobile-touch #world-quest-puzzle-window.ley-beam .wql-result {
     padding: 24px 20px;

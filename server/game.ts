@@ -6868,6 +6868,7 @@ export class GameServer {
       case 'world_quest_match3_reset':
       case 'world_quest_accuse':
       case 'world_quest_shadow':
+      case 'world_quest_puzzle_reset':
         return void questWire.dispatchWorldQuestWire(sim, msg, pid);
       case 'qlinkaccept':
         if (questWire.acceptLinkedQuestWire(sim, msg, pid)) this.resyncQuests(session);

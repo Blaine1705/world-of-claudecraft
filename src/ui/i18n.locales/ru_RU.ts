@@ -13,6 +13,13 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'questUi.worldQuest.puzzleRetry': 'Повторить',
+  'questUi.worldQuest.puzzleTimerAria': 'Осталось времени: {seconds} сек.',
+  'questUi.worldQuest.startQuest': 'Начать локальное задание',
+  'questUi.worldQuest.startEscort': 'Начать сопровождение',
+  'questUi.worldQuest.escortTitle': 'Караван',
+  'questUi.worldQuest.alreadyCompleted': 'Вы уже выполнили это локальное задание в текущем цикле.',
+  'questUi.worldQuest.inProgress': 'Это локальное задание уже выполняется.',
   'hudChrome.barEditor.pageTab': 'Страница {page}',
   'hudChrome.bootcamp.promptHold': 'Удерживать',
   'hudChrome.bootcamp.promptJump': 'Прыгнуть',

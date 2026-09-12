@@ -20,6 +20,10 @@ import { archetypeImageUrl } from '../../profession_art';
 import { buildAttunementPreview } from '../../profession_identity_view';
 import { svgIcon } from '../../ui_icons';
 import {
+  isWorldQuestInstructorOrEscort,
+  worldQuestInstructorDialog,
+} from '../../world_quest_instructor_view';
+import {
   investigationDialogue,
   investigationSignature,
   isInvestigationTarget,
@@ -123,7 +127,11 @@ export class QuestDialogController {
   open(npcId: number): void {
     const world = this.deps.world();
     const npc = world.entities.get(npcId);
-    if (!npc || (npc.kind !== 'npc' && !isInvestigationTarget(npcId))) return;
+    if (
+      !npc ||
+      (npc.kind !== 'npc' && !isInvestigationTarget(npcId) && !isWorldQuestInstructorOrEscort(npc))
+    )
+      return;
     if (NPCS[npc.templateId]?.banker) {
       world.targetEntity(npc.id);
       world.interact();
@@ -338,6 +346,7 @@ export class QuestDialogController {
     const world = this.deps.world();
     if (this.renderInvestigation(npc)) return;
     this.investigationSig = null;
+    if (this.renderWorldQuestInstructor(npc)) return;
     const definition = NPCS[npc.templateId];
     const interesting = this.offerableRows(npc);
     this.lastGossipRowSig = gossipRowSig(interesting);
@@ -749,6 +758,45 @@ export class QuestDialogController {
       button.addEventListener('click', () => {
         this.close();
         this.deps.world().accuseWorldQuestSuspect(target.id);
+      });
+      this.deps.element.appendChild(button);
+    }
+    this.bindClose();
+    this.showAndFocus();
+    return true;
+  }
+
+  private renderWorldQuestInstructor(npc: Entity): boolean {
+    const world = this.deps.world();
+    const view = worldQuestInstructorDialog(world, npc);
+    if (!view) return false;
+    this.npcId = npc.id;
+    this.detailQuestId = null;
+    markDialogRoot(this.deps.element, { labelledBy: 'quest-dialog-title' });
+    const subtitle = view.speakerTitle
+      ? `<span class="quest-muted"> &lt;${esc(view.speakerTitle)}&gt;</span>`
+      : '';
+    let html = `<div class="panel-title"><span id="quest-dialog-title">${esc(view.speakerName)}${subtitle}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>`;
+    if (view.greeting) {
+      html += `<div class="qd-text">"${esc(view.greeting)}"</div>`;
+    }
+    if (view.questTitle) {
+      html += `<div class="qd-sub">${esc(view.questTitle)}</div>`;
+    }
+    if (view.objectiveText) {
+      html += `<div class="qd-obj">${esc(view.objectiveText)}</div>`;
+    }
+    if (view.hint) {
+      html += `<div class="qd-req">${esc(view.hint)}</div>`;
+    }
+    this.deps.element.innerHTML = html;
+    if (view.canStart) {
+      const button = this.makeButton(view.buttonLabel);
+      button.dataset.startWq = String(npc.id);
+      button.addEventListener('click', () => {
+        this.close();
+        this.deps.world().targetEntity(npc.id);
+        this.deps.world().interact();
       });
       this.deps.element.appendChild(button);
     }

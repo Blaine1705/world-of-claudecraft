@@ -1,4 +1,5 @@
 import { apiUrl } from '../client_origin';
+import { WORLD_QUEST_LEY_TIMER_SECONDS } from '../sim/world_quests';
 import {
   captureFocusKey,
   FOCUS_KEY_ATTR,
@@ -26,6 +27,10 @@ export class WorldQuestLeyWindow {
   private rotations: number[] = [];
   private outcome: WorldQuestLeyOutcome = 'playing';
   private fx: WorldQuestLeyFxController | null = null;
+  private timerInterval: number | null = null;
+  private timerDeadline = 0;
+  private timerSourceDeadline: number | null | undefined;
+  private timerUrgent = false;
   private title!: HTMLElement;
   private closeButton!: HTMLButtonElement;
   private level!: HTMLElement;
@@ -33,10 +38,12 @@ export class WorldQuestLeyWindow {
   private source!: HTMLElement;
   private target!: HTMLElement;
   private reach!: HTMLElement;
+  private timer!: HTMLElement;
   private grid!: HTMLElement;
   private result!: HTMLElement;
   private resultTitle!: HTMLElement;
   private resultDetail!: HTMLElement;
+  private retryButton!: HTMLButtonElement;
   private returnButton!: HTMLButtonElement;
 
   constructor(
@@ -49,6 +56,10 @@ export class WorldQuestLeyWindow {
 
   leave(): void {
     if (!this.active) return;
+    this.stopTimer();
+    this.timerDeadline = 0;
+    this.timerSourceDeadline = undefined;
+    this.timerUrgent = false;
     this.fx?.dispose();
     this.fx = null;
     this.active = false;
@@ -113,6 +124,22 @@ export class WorldQuestLeyWindow {
             : 'questUi.worldQuest.puzzleDefeatDetail',
         )
       : '';
+    if (terminal) {
+      this.stopTimer();
+      if (this.timer) {
+        this.timer.textContent = '';
+        this.timer.removeAttribute('aria-label');
+        this.timer.hidden = true;
+        this.timer.classList.remove('urgent');
+        this.timerUrgent = false;
+      }
+      this.retryButton.hidden = state.outcome !== 'lost';
+      this.retryButton.textContent = t('questUi.worldQuest.puzzleRetry');
+    } else {
+      this.retryButton.hidden = true;
+      this.timer.hidden = false;
+      this.startTimer(state);
+    }
     this.returnButton.textContent = t(
       terminal ? 'questUi.dialog.continue' : 'questUi.worldQuest.puzzleReturn',
     );
@@ -169,10 +196,11 @@ export class WorldQuestLeyWindow {
     this.root.innerHTML =
       `<div class="panel-title"><span id="world-quest-puzzle-title"></span><button type="button" class="x-btn" data-close>${svgIcon('close')}</button></div>` +
       '<div class="wql-heading"><span class="wql-heading-sigil" aria-hidden="true"></span><div class="wqp-level"></div><p class="wqp-instructions"></p></div>' +
-      '<div class="wql-status"><span class="wql-source-label"></span><span class="wql-reach"></span><span class="wql-target-label"></span></div>' +
+      '<div class="wql-status"><span class="wql-source-label"></span><span class="wql-reach"></span><span class="wql-timer" id="wql-timer"></span><span class="wql-target-label"></span></div>' +
       '<div class="wql-frame"><span class="wql-frame-art" aria-hidden="true"></span><div class="wqp-grid" role="group"></div>' +
       `<section class="wql-result" tabindex="-1" ${focusKeyAttr('ley:result')} aria-labelledby="wql-result-title" aria-describedby="wql-result-detail" hidden>` +
-      '<span class="wql-result-frame" aria-hidden="true"></span><span class="wql-result-seal" aria-hidden="true"></span><h2 id="wql-result-title" class="wql-result-title"></h2><p id="wql-result-detail" class="wql-result-detail"></p></section>' +
+      '<span class="wql-result-frame" aria-hidden="true"></span><span class="wql-result-seal" aria-hidden="true"></span><h2 id="wql-result-title" class="wql-result-title"></h2><p id="wql-result-detail" class="wql-result-detail"></p>' +
+      `<button type="button" class="btn wql-retry" data-ley-retry ${focusKeyAttr('ley:retry')} hidden></button></section>` +
       '<div class="wql-fx-layer" aria-hidden="true"></div></div>' +
       `<button type="button" class="wql-return" data-close ${focusKeyAttr('ley:return')}></button>`;
     const get = <T extends HTMLElement>(selector: string): T =>
@@ -184,10 +212,12 @@ export class WorldQuestLeyWindow {
     this.source = get('.wql-source-label');
     this.target = get('.wql-target-label');
     this.reach = get('.wql-reach');
+    this.timer = get('.wql-timer');
     this.grid = get('.wqp-grid');
     this.result = get('.wql-result');
     this.resultTitle = get('.wql-result-title');
     this.resultDetail = get('.wql-result-detail');
+    this.retryButton = get('.wql-retry');
     this.returnButton = get('.wql-return');
     for (const tile of state.board?.tiles ?? []) {
       const button = this.document.createElement('button');
@@ -210,5 +240,48 @@ export class WorldQuestLeyWindow {
       this.cells.push({ button, arms: [...button.querySelectorAll<HTMLElement>('.wqp-arm')] });
     }
     this.fx = new WorldQuestLeyFxController(this.root, get('.wql-fx-layer'), this.document);
+  }
+
+  private startTimer(state: WorldQuestLeyState): void {
+    if (this.timerSourceDeadline === state.expiresAt) return;
+    this.stopTimer();
+    this.timerSourceDeadline = state.expiresAt;
+    const remaining =
+      state.expiresAt === null ? WORLD_QUEST_LEY_TIMER_SECONDS : state.secondsRemaining;
+    this.timerDeadline = performance.now() + remaining * 1_000;
+    this.paintTimer(Math.ceil(remaining));
+    if (remaining <= 0) return;
+    this.timerInterval = window.setInterval(() => {
+      const remaining = Math.max(0, Math.ceil((this.timerDeadline - performance.now()) / 1000));
+      this.paintTimer(remaining);
+      if (remaining <= 0) {
+        this.stopTimer();
+      }
+    }, 1000);
+  }
+
+  private stopTimer(): void {
+    if (this.timerInterval !== null) {
+      clearInterval(this.timerInterval);
+      this.timerInterval = null;
+    }
+  }
+
+  private paintTimer(seconds: number): void {
+    if (!this.timer) return;
+    this.timer.textContent = t('questUi.worldQuest.puzzleTimer', {
+      seconds: formatNumber(seconds, { maximumFractionDigits: 0 }),
+    });
+    this.timer.setAttribute(
+      'aria-label',
+      t('questUi.worldQuest.puzzleTimerAria', {
+        seconds: formatNumber(seconds, { maximumFractionDigits: 0 }),
+      }),
+    );
+    const urgent = seconds <= 10;
+    if (urgent !== this.timerUrgent) {
+      this.timer.classList.toggle('urgent', urgent);
+      this.timerUrgent = urgent;
+    }
   }
 }

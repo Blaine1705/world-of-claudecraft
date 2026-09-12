@@ -81,6 +81,8 @@ export function questEventPresentation(event: SimEvent): QuestEventPresentation 
           rotation: event.rotation,
         },
       };
+    case 'worldQuestPuzzleFailed':
+      return { failWorldQuestPuzzle: event.questId };
     case 'worldQuestMatch3Updated':
       return {};
     case 'worldQuestDone': {

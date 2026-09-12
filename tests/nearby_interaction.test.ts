@@ -640,8 +640,8 @@ it('shadow sentries and guards are selected without opening dialogue or stealing
   expect(interact(r)).toBe(true);
   expect(r.calls).toEqual(['target:2146900041']);
 });
-it('shadow instructor starts the cloak through the ordinary authoritative interaction', () => {
+it('shadow instructor opens a briefing before the authoritative interaction', () => {
   const r = rig([entity({ id: 2146900040, kind: 'npc', templateId: 'shadow_cloak_scout' })]);
   expect(interact(r)).toBe(true);
-  expect(r.calls).toEqual(['target:2146900040', 'interact']);
+  expect(r.calls).toEqual(['quest:2146900040']);
 });

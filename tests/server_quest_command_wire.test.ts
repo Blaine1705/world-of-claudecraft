@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
   resetWorldQuestMatch3Wire,
+  resetWorldQuestPuzzleWire,
   rotateWorldQuestPuzzleWire,
   swapWorldQuestMatch3Wire,
 } from '../server/quest_command_wire';
@@ -9,6 +10,7 @@ import type { Sim } from '../src/sim/sim';
 function simStub() {
   return {
     rotateWorldQuestPuzzleTile: vi.fn(),
+    resetWorldQuestPuzzle: vi.fn(),
     swapWorldQuestMatch3Tiles: vi.fn(),
     resetWorldQuestMatch3: vi.fn(),
   } as unknown as Sim;
@@ -71,5 +73,10 @@ describe('quest command wire', () => {
     resetWorldQuestMatch3Wire(sim, { quest: 4 }, 17);
     expect(sim.resetWorldQuestMatch3).toHaveBeenCalledOnce();
     expect(sim.resetWorldQuestMatch3).toHaveBeenCalledWith('wq_palmreach_confections', 17);
+
+    resetWorldQuestPuzzleWire(sim, { quest: 'wq_galecrest_wisps' }, 17);
+    resetWorldQuestPuzzleWire(sim, { quest: 4 }, 17);
+    expect(sim.resetWorldQuestPuzzle).toHaveBeenCalledOnce();
+    expect(sim.resetWorldQuestPuzzle).toHaveBeenCalledWith('wq_galecrest_wisps', 17);
   });
 });

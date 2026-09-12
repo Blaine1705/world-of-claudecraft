@@ -44,14 +44,12 @@ describe('calligraphy NPC interaction', () => {
   });
 
   it.each([0, 2])(
-    'starts and retries with mouse button %i without opening a movement-blocking dialog',
+    'opens quest dialog with mouse button %i to confirm starting the WQ',
     (button) => {
       const r = rig();
       expect(handlePickedEntity(r.world, r.hud, 2, button, 0, 0)).toBe(true);
-      expect(r.calls).toEqual(['target:2', 'interact']);
-      expect(r.hud.openQuestDialog).not.toHaveBeenCalled();
-      handlePickedEntity(r.world, r.hud, 2, button, 0, 0);
-      expect(r.calls).toEqual(['target:2', 'interact', 'target:2', 'interact']);
+      expect(r.calls).toEqual(['target:2']);
+      expect(r.hud.openQuestDialog).toHaveBeenCalledWith(2);
     },
   );
 
@@ -93,8 +91,7 @@ describe('calligraphy NPC interaction', () => {
           preferred,
         ),
       ).toBe(true);
-      expect(r.calls).toEqual(['target:2', 'interact']);
-      expect(r.hud.openQuestDialog).not.toHaveBeenCalled();
+      expect(r.hud.openQuestDialog).toHaveBeenCalledWith(2);
     },
   );
 

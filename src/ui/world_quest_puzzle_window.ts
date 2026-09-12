@@ -24,9 +24,11 @@ export interface WorldQuestPuzzleWindowDeps {
   world(): Pick<
     IWorld,
     | 'worldQuestLog'
+    | 'worldQuestTime'
     | 'rotateWorldQuestPuzzleTile'
     | 'swapWorldQuestMatch3Tiles'
     | 'resetWorldQuestMatch3'
+    | 'resetWorldQuestPuzzle'
   > &
     Partial<Pick<IWorld, 'worldQuestCycle'>>;
   closeOthers(selector: string): void;
@@ -88,6 +90,11 @@ export class WorldQuestPuzzleWindow {
         this.confection.cancelMove();
         this.deps.world().resetWorldQuestMatch3(this.questId);
         this.render();
+        return;
+      }
+      if (target.closest('[data-ley-retry]') && this.questId) {
+        this.deps.click();
+        this.deps.world().resetWorldQuestPuzzle(this.questId);
         return;
       }
       const cell = target.closest<HTMLElement>('[data-match3-cell]');
@@ -172,6 +179,7 @@ export class WorldQuestPuzzleWindow {
       this.leyState = resolveWorldQuestLeyState(
         this.questId,
         this.deps.world().worldQuestLog.get(this.questId),
+        this.deps.world().worldQuestTime ?? 0,
         this.leyState,
       );
       if (presentation.updateWorldQuestPuzzle)
@@ -244,7 +252,12 @@ export class WorldQuestPuzzleWindow {
     if (!this.questId) return;
     if (this.syncCycle()) return;
     const progress = this.deps.world().worldQuestLog.get(this.questId);
-    this.leyState = resolveWorldQuestLeyState(this.questId, progress, this.leyState);
+    this.leyState = resolveWorldQuestLeyState(
+      this.questId,
+      progress,
+      this.deps.world().worldQuestTime ?? 0,
+      this.leyState,
+    );
     this.match3Progress = resolveWorldQuestConfectionProgress(
       this.questId,
       progress,

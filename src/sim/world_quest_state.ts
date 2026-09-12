@@ -87,6 +87,7 @@ export function savedWorldQuestState(
           investigation: _investigation,
           shadow: _shadow,
           glider: _glider,
+          puzzleExpiresAt: _puzzleExpiresAt,
           ...progress
         }) => ({
           ...progress,

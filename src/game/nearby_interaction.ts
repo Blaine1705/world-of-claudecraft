@@ -1,9 +1,6 @@
-import { FORGE_NPC_DEF } from '../sim/content/world_quest_forging';
-import { GLIDER_APPRENTICE_NPC_DEF, GLIDER_NPC_DEF } from '../sim/content/world_quest_glider';
-import { HORDE_NPC_DEF } from '../sim/content/world_quest_horde';
 import { isInvestigationNpc } from '../sim/content/world_quest_investigation';
 import { isShadowNpc, SHADOW_NPC_ID } from '../sim/content/world_quest_shadow';
-import { WORLD_QUESTS_BY_ID } from '../sim/data';
+import { ESCORTS, WORLD_QUESTS_BY_ID } from '../sim/data';
 import { isQuestGatedGroundObjectHidden } from '../sim/quest_gated_entity';
 import { isObjectOpenedByViewer } from '../sim/quests/opened_object_view';
 import {
@@ -19,7 +16,6 @@ import {
   isWorldQuestSalvageObject,
   isWorldQuestSalvageObjectHidden,
 } from '../sim/world_quest_salvage';
-import { isWorldQuestTraceInstructor } from '../sim/world_quest_trace_identity';
 import { corpseLootAvailability, localPartyMemberIds } from './corpse_loot_availability';
 import { decideEscortPress, handleEscortPress } from './escort_interact';
 import {
@@ -229,15 +225,7 @@ export function tryNearbyInteraction(
       // through the HUD's confirm gate rather than sending the command
       // directly (it applies The Keeper's Toll).
       hud.requestSpiritHealerResurrect();
-    } else if (
-      isWorldQuestTraceInstructor(npc.templateId) ||
-      npc.templateId === FORGE_NPC_DEF.id ||
-      npc.templateId === HORDE_NPC_DEF.id ||
-      npc.templateId === GLIDER_NPC_DEF.id ||
-      npc.templateId === GLIDER_APPRENTICE_NPC_DEF.id ||
-      isInvestigationNpc(npc.templateId) ||
-      isShadowNpc(npc.templateId)
-    ) {
+    } else if (isInvestigationNpc(npc.templateId)) {
       world.targetEntity(bestNpc);
       world.interact();
     } else if (npc.templateId === 'brother_halven' || npc.templateId === 'brother_halven_marsh') {
@@ -254,7 +242,18 @@ export function tryNearbyInteraction(
   const escort = player.dead
     ? ({ kind: 'none' } as const)
     : decideEscortPress(player.pos, world.entities, world.questLog, world.worldQuestLog);
-  if (escort.kind === 'start') return handleEscortPress(world, hud, escort, escortAwayText);
+  if (escort.kind === 'start') {
+    const escortDef = Object.values(ESCORTS).find((entry) => {
+      const ent = world.entities.get(escort.entityId);
+      return ent && entry.npcMobId === ent.templateId && entry.worldQuestId !== undefined;
+    });
+    if (escortDef) {
+      world.targetEntity(escort.entityId);
+      hud.openQuestDialog(escort.entityId);
+      return true;
+    }
+    return handleEscortPress(world, hud, escort, escortAwayText);
+  }
   if (bestNode !== null) {
     return handleGatherNodeInteract(
       world,

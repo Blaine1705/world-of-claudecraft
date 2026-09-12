@@ -191,11 +191,13 @@ export type { VehicleSession } from './world_api/vehicles';
 // 32 = World Quests add owner-only, session-bound movement tracing readouts.
 // Older clients cannot present the memorized outline or authoritative drawing trail.
 // 33 = Nearby calligraphy blue trails and final ratings are a public snapshot surface.
+// 34 = Ley Beam Alignment adds an authoritative attempt deadline and retry command.
+// Older clients cannot render the remaining time or request a validated retry.
 // (12 is deliberately unassigned: 13 through 25 were numbered 11 through 23 on
 // the pre-merge raid branch, which forked before the Bank Storage and Materials
 // Vault bumps above; that branch's 11 through 20 were in turn 9 through 18
 // before the Eastbrook program bumps.)
-export const ONLINE_WORLD_LAYOUT_VERSION = 33 as const;
+export const ONLINE_WORLD_LAYOUT_VERSION = 34 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI
@@ -737,6 +739,7 @@ export const COMMAND_NAMES = [
   'vehicle_leave',
   'world_quest_accuse',
   'world_quest_shadow',
+  'world_quest_puzzle_reset',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -837,6 +840,7 @@ export const COMMAND_FACETS = {
   world_quest_match3_reset: 'IWorldQuests',
   world_quest_accuse: 'IWorldQuests',
   world_quest_shadow: 'IWorldQuests',
+  world_quest_puzzle_reset: 'IWorldQuests',
   // Ghost resurrection: run the spirit to its corpse, or accept the Spirit Healer's
   // resurrection (with Resurrection Sickness). Wire strings are snake_case by design.
   resurrect_corpse: 'IWorldCombat',

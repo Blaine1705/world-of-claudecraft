@@ -16,6 +16,7 @@ export interface QuestSelfMirrors {
   questsDone: Set<string>;
   worldQuestCycle: string;
   worldQuestExpiresAtMs: number;
+  worldQuestTime?: number;
   worldQuestLog: ReadonlyMap<string, WorldQuestProgress>;
 }
 
@@ -39,7 +40,11 @@ export function applyQuestSelfWire(
     wqexp?: unknown;
     wqlog?: unknown;
   },
+  simTime?: unknown,
 ): void {
+  if (typeof simTime === 'number' && Number.isFinite(simTime) && simTime >= 0) {
+    target.worldQuestTime = simTime;
+  }
   if (Array.isArray(self.qlog)) {
     target.questLog = new Map(
       self.qlog.filter(isQuestProgress).map((progress) => [progress.questId, progress]),
@@ -62,7 +67,7 @@ export function applyQuestSelfWire(
   if (Array.isArray(self.wqlog) && !malformedExplicitCycle) {
     const rawRows = self.wqlog;
     target.worldQuestLog = new Map(
-      sanitizeWorldQuestProgress(rawRows, incomingCycle).map((progress) => {
+      sanitizeWorldQuestProgress(rawRows, incomingCycle, true).map((progress) => {
         const raw = rawRows.find(
           (row) =>
             row &&

@@ -40,6 +40,10 @@ export function resetWorldQuestMatch3Wire(sim: Sim, msg: QuestWireMessage, pid: 
   if (typeof msg.quest === 'string') sim.resetWorldQuestMatch3(msg.quest, pid);
 }
 
+export function resetWorldQuestPuzzleWire(sim: Sim, msg: QuestWireMessage, pid: number): void {
+  if (typeof msg.quest === 'string') sim.resetWorldQuestPuzzle(msg.quest, pid);
+}
+
 export function accuseWorldQuestSuspectWire(sim: Sim, msg: QuestWireMessage, pid: number): void {
   if (typeof msg.npcId === 'number' && Number.isSafeInteger(msg.npcId) && msg.npcId > 0)
     sim.accuseWorldQuestSuspect(msg.npcId, pid);
@@ -67,6 +71,9 @@ export function dispatchWorldQuestWire(sim: Sim, msg: QuestWireMessage, pid: num
       break;
     case 'world_quest_match3_reset':
       resetWorldQuestMatch3Wire(sim, msg, pid);
+      break;
+    case 'world_quest_puzzle_reset':
+      resetWorldQuestPuzzleWire(sim, msg, pid);
       break;
     case 'world_quest_shadow':
       shadowWorldQuestWire(sim, msg, pid);

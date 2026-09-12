@@ -124,6 +124,7 @@ export const IWORLD_MEMBERS = [
   { name: 'worldQuestCycle', kind: 'data' },
   { name: 'worldQuestExpiresAtMs', kind: 'data' },
   { name: 'worldQuestLog', kind: 'data' },
+  { name: 'worldQuestTime', kind: 'data' },
   { name: 'nearbyWorldQuestTraces', kind: 'data' },
   // --- commands + read-returning methods ---
   { name: 'questState', kind: 'method' }, // read-returning (1/6)
@@ -166,6 +167,7 @@ export const IWORLD_MEMBERS = [
   { name: 'rotateWorldQuestPuzzleTile', kind: 'method' },
   { name: 'swapWorldQuestMatch3Tiles', kind: 'method' },
   { name: 'resetWorldQuestMatch3', kind: 'method' },
+  { name: 'resetWorldQuestPuzzle', kind: 'method' },
   { name: 'equipItem', kind: 'method' },
   { name: 'equipItemToSlot', kind: 'method' },
   { name: 'moveInventoryItem', kind: 'method' },
@@ -676,9 +678,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // even when the total agrees. Only running the suite says what these
     // numbers really are; never reconcile them by arithmetic in the diff (the
     // numbers below were set from a suite run, not from this narrative).
-    expect(IWORLD_MEMBERS.length).toBe(357);
-    expect(DATA_MEMBERS.length).toBe(100);
-    expect(METHOD_MEMBERS.length).toBe(257);
+    expect(IWORLD_MEMBERS.length).toBe(359);
+    expect(DATA_MEMBERS.length).toBe(101);
+    expect(METHOD_MEMBERS.length).toBe(258);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -955,6 +957,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'renown',
       'reportTelemetry',
       'resetWorldQuestMatch3',
+      'resetWorldQuestPuzzle',
       'respec',
       'respondToResurrection',
       'restedXp',
@@ -1045,6 +1048,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'worldQuestCycle',
       'worldQuestExpiresAtMs',
       'worldQuestLog',
+      'worldQuestTime',
       'xp',
     ]);
   });
@@ -1150,6 +1154,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'worldQuestCycle',
       'worldQuestExpiresAtMs',
       'worldQuestLog',
+      'worldQuestTime',
       'xp',
     ]);
   });
@@ -1342,6 +1347,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'renamePet',
       'reportTelemetry',
       'resetWorldQuestMatch3',
+      'resetWorldQuestPuzzle',
       'respec',
       'respondToResurrection',
       'resurrectAtCorpse',
@@ -1621,6 +1627,7 @@ const FACET_QUESTS = [
   'worldQuestCycle',
   'worldQuestExpiresAtMs',
   'worldQuestLog',
+  'worldQuestTime',
   'nearbyWorldQuestTraces',
   'questState',
   'acceptQuest',
@@ -1629,6 +1636,7 @@ const FACET_QUESTS = [
   'rotateWorldQuestPuzzleTile',
   'swapWorldQuestMatch3Tiles',
   'resetWorldQuestMatch3',
+  'resetWorldQuestPuzzle',
   'accuseWorldQuestSuspect',
   'shadowWorldQuestAction',
   'acceptLinkedQuest',
@@ -2080,8 +2088,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(357);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(357);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(359);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(359);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

@@ -1767,6 +1767,9 @@ export class Sim {
   readonly civicServicePlacements: readonly CivicServicePlacement[];
   rng: Rng;
   time = 0;
+  get worldQuestTime(): number {
+    return this.time;
+  }
   tickCount = 0;
   entities = new Map<number, Entity>();
   // The shared SimContext seam (S0b): a live view of rng/time/tickCount/entities +
@@ -9717,6 +9720,9 @@ export class Sim {
   }
   resetWorldQuestMatch3(questId: string, pid?: number): void {
     worldQuestMod.resetWorldQuestMatch3(this.ctx, questId, pid);
+  }
+  resetWorldQuestPuzzle(questId: string, pid?: number): void {
+    worldQuestMod.resetWorldQuestPuzzle(this.ctx, questId, pid);
   }
   dropWorldQuestDeliveryCargo(pid = this.playerId): boolean {
     const player = this.entities.get(pid);

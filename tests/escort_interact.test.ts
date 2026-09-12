@@ -335,7 +335,7 @@ describe('the Interact action reaches the escort run (tryNearbyInteraction)', ()
     expect(r.calls).toEqual([`target:${wren.id}`, 'interact']);
   });
 
-  it('dispatches the interact command for an active world-quest caravan', () => {
+  it('opens a start dialog for an active world-quest caravan', () => {
     const caravan = caravanAt();
     const r = rig(
       [caravan],
@@ -345,7 +345,7 @@ describe('the Interact action reaches the escort run (tryNearbyInteraction)', ()
     );
 
     expect(r.press()).toBe(true);
-    expect(r.calls).toEqual([`target:${caravan.id}`, 'interact']);
+    expect(r.calls).toEqual([`target:${caravan.id}`, `quest:${caravan.id}`]);
   });
 
   it('explains an empty post instead of the generic nothing-to-interact line', () => {
@@ -456,7 +456,7 @@ describe('a right-click reaches the escort run (handlePickedEntity)', () => {
     expect(r.startAutoAttack).not.toHaveBeenCalled();
   });
 
-  it('starts an active world-quest caravan through the picked-entity path', () => {
+  it('opens a start dialog for an active world-quest caravan through the picked path', () => {
     const caravan = caravanAt();
     const r = rig(
       caravan,
@@ -466,8 +466,9 @@ describe('a right-click reaches the escort run (handlePickedEntity)', () => {
     );
 
     expect(handlePickedEntity(r.world, r.hud, caravan.id, 2, 0, 0)).toBe(true);
+    expect(r.hud.openQuestDialog).toHaveBeenCalledWith(caravan.id);
     expect(r.world.targetEntity).toHaveBeenCalledWith(caravan.id);
-    expect(r.interact).toHaveBeenCalledTimes(1);
+    expect(r.interact).not.toHaveBeenCalled();
   });
 
   it('reports too far beyond the click range', () => {
