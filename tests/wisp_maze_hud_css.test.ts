@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { expect, it } from 'vitest';
+
 it('keeps maze instruments nonblocking and restores combat bar geometry with a touch-sized exit', () => {
   const css = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
   const mobile = readFileSync(new URL('../src/styles/hud.mobile.css', import.meta.url), 'utf8');
