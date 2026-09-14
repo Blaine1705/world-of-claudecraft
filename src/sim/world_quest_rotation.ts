@@ -67,7 +67,7 @@ export const MAX_WORLD_QUESTS_PER_ROTATION = WORLD_QUESTS_PER_ROTATION;
 
 const DAYS_IN_MONTH = Object.freeze([31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]);
 
-function civilDayNumber(value: string): number | null {
+export function civilDayNumber(value: string): number | null {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
   if (!match) return null;
   const year = Number(match[1]);

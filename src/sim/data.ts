@@ -228,6 +228,7 @@ import {
   TEMPLE_QUESTS,
 } from './content/temple';
 import { WARLOCK_PET_MOBS } from './content/warlock_pets';
+import { WEEKLY_EMISSARY_NPC_DEF } from './content/weekly_quests';
 import { WILDHEART_DUNGEON_DEFS, WILDHEART_ITEMS, WILDHEART_MOBS } from './content/wildheart';
 import {
   WILLOWFEN_CAMPS,
@@ -482,6 +483,7 @@ export const NPCS: Record<string, NpcDef> = {
   [FORGE_NPC_DEF.id]: FORGE_NPC_DEF,
   [HORDE_NPC_DEF.id]: HORDE_NPC_DEF,
   [WISP_MAZE_NPC_DEF.id]: WISP_MAZE_NPC_DEF,
+  [WEEKLY_EMISSARY_NPC_DEF.id]: WEEKLY_EMISSARY_NPC_DEF,
   [SHADOW_NPC_DEF.id]: SHADOW_NPC_DEF,
   ...Object.fromEntries(SHADOW_GUARDS.map(({ npc }) => [npc.id, npc])),
   [GLIDER_NPC_DEF.id]: GLIDER_NPC_DEF,

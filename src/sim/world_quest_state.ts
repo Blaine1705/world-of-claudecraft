@@ -4,7 +4,8 @@
 
 import type { CharacterState } from './character_state';
 import type { PlayerMeta } from './sim';
-import type { Entity, WorldQuestDef, WorldQuestProgress } from './types';
+import type { Entity, WeeklyQuestProgress, WorldQuestDef, WorldQuestProgress } from './types';
+import { sanitizeWeeklyQuestProgress, savedWeeklyQuestProgress } from './weekly_quests';
 import { WORLD_BOSSES } from './world_boss';
 
 import {
@@ -26,6 +27,8 @@ export interface WorldQuestPlayerState {
   worldQuestAreas: Set<string>;
   /** Minigame unlocked by the area's physical activator for this session. */
   openWorldQuestPuzzleId: string | null;
+  /** The weekly emissary's pick (src/sim/weekly_quests.ts); null while none is taken. */
+  weeklyQuest: WeeklyQuestProgress | null;
 }
 
 export interface WorldQuestRotationCache {
@@ -40,6 +43,7 @@ export function freshWorldQuestPlayerState(): WorldQuestPlayerState {
     devWorldQuestCycle: null,
     worldQuestAreas: new Set(),
     openWorldQuestPuzzleId: null,
+    weeklyQuest: null,
   };
 }
 
@@ -66,7 +70,9 @@ export function rotationBindings(cache: WorldQuestRotationCache, host: { resetDa
 export function restoreWorldQuestState(
   meta: PlayerMeta,
   saved: CharacterState['worldQuests'],
+  savedWeekly?: CharacterState['weeklyQuest'],
 ): void {
+  meta.weeklyQuest = sanitizeWeeklyQuestProgress(savedWeekly);
   if (saved) {
     meta.worldQuestCycle = sanitizeWorldQuestCycle(saved.cycle);
     for (const progress of sanitizeWorldQuestProgress(saved.progress, meta.worldQuestCycle)) {
@@ -78,9 +84,12 @@ export function restoreWorldQuestState(
 
 export function savedWorldQuestState(
   meta: PlayerMeta,
-): Pick<CharacterState, 'worldQuests'> | Record<never, never> {
-  if (!meta.worldQuestCycle && meta.worldQuestLog.size === 0) return {};
+): Pick<CharacterState, 'worldQuests' | 'weeklyQuest'> | Record<never, never> {
+  const weekly = savedWeeklyQuestProgress(meta);
+  const weeklyPart = weekly ? { weeklyQuest: weekly } : {};
+  if (!meta.worldQuestCycle && meta.worldQuestLog.size === 0) return weeklyPart;
   return {
+    ...weeklyPart,
     worldQuests: {
       cycle: meta.worldQuestCycle,
       progress: [...meta.worldQuestLog.values()].map(

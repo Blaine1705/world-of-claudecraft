@@ -27,6 +27,7 @@ import type {
 } from './types';
 import { xpForLevel } from './types';
 import { vehicleStationById } from './vehicle_stations';
+import { ensureWeeklyEmissary } from './weekly_quests';
 import {
   FARSHORE_SALVAGE_AMBUSH,
   triggerWorldQuestAmbush,
@@ -264,6 +265,7 @@ export function hasActiveWorldQuest(meta: PlayerMeta, questId: string): boolean 
 
 /** Starts every eligible objective whose area the living player enters. */
 export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Entity): void {
+  ensureWeeklyEmissary(ctx);
   if (player.level < WORLD_QUEST_MIN_LEVEL) {
     clearShadowEncounter(ctx, meta);
     clearInvestigationEncounter(ctx, meta);

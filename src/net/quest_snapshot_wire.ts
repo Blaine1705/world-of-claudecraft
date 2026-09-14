@@ -2,7 +2,8 @@
 // ClientWorld-free by design: malformed/version-skewed world-quest rows are
 // dropped without throwing or partially replacing the last good mirror.
 
-import type { QuestProgress, WorldQuestProgress } from '../sim/types';
+import type { QuestProgress, WeeklyQuestProgress, WorldQuestProgress } from '../sim/types';
+import { sanitizeWeeklyQuestProgress } from '../sim/weekly_quests';
 import { decodeForgeState } from '../sim/world_quest_forge_wire';
 import { decodeGliderState } from '../sim/world_quest_glider_wire';
 import { decodeHordeState } from '../sim/world_quest_horde_wire';
@@ -19,6 +20,8 @@ export interface QuestSelfMirrors {
   worldQuestExpiresAtMs: number;
   worldQuestTime?: number;
   worldQuestLog: ReadonlyMap<string, WorldQuestProgress>;
+  weeklyQuest: WeeklyQuestProgress | null;
+  weeklyQuestResetAtMs: number;
 }
 
 function isQuestProgress(value: unknown): value is QuestProgress {
@@ -40,11 +43,19 @@ export function applyQuestSelfWire(
     wqday?: unknown;
     wqexp?: unknown;
     wqlog?: unknown;
+    wkq?: unknown;
+    wkexp?: unknown;
   },
   simTime?: unknown,
 ): void {
   if (typeof simTime === 'number' && Number.isFinite(simTime) && simTime >= 0) {
     target.worldQuestTime = simTime;
+  }
+  // The weekly pick is delta-guarded: an omitted key keeps the mirror, an
+  // explicit null (or a malformed row) clears it.
+  if (self.wkq !== undefined) target.weeklyQuest = sanitizeWeeklyQuestProgress(self.wkq);
+  if (typeof self.wkexp === 'number' && Number.isSafeInteger(self.wkexp) && self.wkexp > 0) {
+    target.weeklyQuestResetAtMs = self.wkexp;
   }
   if (Array.isArray(self.qlog)) {
     target.questLog = new Map(

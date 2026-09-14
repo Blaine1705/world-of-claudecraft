@@ -23,6 +23,8 @@ function mirror(): QuestSelfMirrors {
     worldQuestCycle: 'wq3_7',
     worldQuestExpiresAtMs: 0,
     worldQuestLog: new Map(),
+    weeklyQuest: null,
+    weeklyQuestResetAtMs: 0,
   };
 }
 

@@ -218,6 +218,8 @@ describe('personal forging world quest', () => {
       worldQuestCycle: '',
       worldQuestExpiresAtMs: 0,
       worldQuestLog: new Map(),
+      weeklyQuest: null,
+      weeklyQuestResetAtMs: 0,
     };
     applyQuestSelfWire(mirror, { wqday: sim.worldQuestCycle, wqlog: [encoded] });
     expect(mirror.worldQuestLog.get(ID)?.forging).toEqual(progress.forging);

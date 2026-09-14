@@ -5,6 +5,7 @@ import { GATHERING_PROFESSIONS } from './content/professions';
 import { DUNGEONS, ITEMS, MOBS, NPCS, WORLD_QUESTS_BY_ID } from './data';
 import { equipBestInSlotForDev } from './dev/bis_gear';
 import { applyDevKit } from './dev_kit';
+import { armWeeklyQuestForDev } from './dev_weekly_quest';
 import { armWorldQuestForDev, listWorldQuestsForDev } from './dev_world_quest';
 import { armWorldQuestCannonForDev } from './dev_world_quest_cannon';
 import { armWorldQuestCaravanForDev } from './dev_world_quest_caravan';
@@ -231,6 +232,11 @@ export function handleDevChat(
   }
   if (/^\/dev\s+(?:horde|barricade)\s*$/i.test(raw)) {
     armWorldQuestHordeForDev(ctx, pid);
+    return null;
+  }
+  const weeklyMatch = /^\/dev\s+weekly(?:\s+(credit))?\s*$/i.exec(raw);
+  if (weeklyMatch) {
+    armWeeklyQuestForDev(ctx, pid, Boolean(weeklyMatch[1]));
     return null;
   }
   if (/^\/dev\s+forge\s*$/i.test(raw)) {

@@ -132,7 +132,7 @@ export class QuestDialogController {
       (npc.kind !== 'npc' && !isInvestigationTarget(npcId) && !isWorldQuestInstructorOrEscort(npc))
     )
       return;
-    if (NPCS[npc.templateId]?.banker) {
+    if (NPCS[npc.templateId]?.banker || NPCS[npc.templateId]?.weeklyEmissary) {
       world.targetEntity(npc.id);
       world.interact();
       return;

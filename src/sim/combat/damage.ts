@@ -61,6 +61,7 @@ import {
   virtualLevel,
   xpForLevel,
 } from '../types';
+import { onWorldBossKilledForWeeklyQuests } from '../weekly_quests';
 import { WORLD_BOSS_CORPSE_SECONDS, worldBossLootContributors } from '../world_boss';
 import {
   afflictionOnDeath,
@@ -1771,6 +1772,7 @@ export function handleDeath(
       ctx.rollWorldBossLoot(e, worldBossContribs);
       // World-boss deeds ride the same never-pruned contributor roster.
       deedsMod.onWorldBossKilledForDeeds(ctx, e, worldBossContribs);
+      onWorldBossKilledForWeeklyQuests(ctx, worldBossContribs);
     }
   }
 }

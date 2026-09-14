@@ -15833,6 +15833,354 @@
   }
 
   /* ---------- event calendar ---------- */
+  /* The weekly emissary's window (weekly_quests_window.ts): four offer cards
+     over the town's violet-and-gold ledger chrome, plus the inner confirm
+     dialog (.wk-backdrop / .wk-dialog). A flex column so the card grid can
+     take the leftover height once the user resizes the window. */
+  #weekly-quests-window {
+    width: min(1100px, calc(100vw - 40px));
+    max-height: calc(100vh - 40px);
+    display: none;
+    flex-direction: column;
+    overflow: hidden auto;
+    min-height: 0;
+    padding-bottom: 12px;
+    background:
+      radial-gradient(ellipse 60% 40% at 50% 0%, #6d3fd42e, transparent 60%),
+      linear-gradient(180deg, #1c1531f5, #120c20f5 40%, #0c0816f8);
+    border-color: #8f6a2c;
+  }
+  #weekly-quests-window .wk-title span:first-child {
+    font-size: 20px;
+    letter-spacing: 0.03em;
+    color: #fbf6ff;
+    text-shadow:
+      0 1px 0 #000,
+      0 0 18px #c4a6ff55;
+  }
+  #weekly-quests-window .wk-sub {
+    text-align: center;
+    color: #c4a6ff;
+    font-size: 13px;
+    margin: -2px 0 12px;
+  }
+  #weekly-quests-window .wk-sub b {
+    color: #f2d998;
+    font-weight: 600;
+  }
+  #weekly-quests-window .wk-cards {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+    padding: 0 2px;
+  }
+  #weekly-quests-window .wk-card {
+    position: relative;
+    display: grid;
+    grid-template-rows: auto auto auto 1fr auto auto;
+    gap: 8px;
+    min-width: 0;
+    padding: 10px 10px 12px;
+    background: linear-gradient(180deg, #1c1531f2, #120c20f2 40%, #0c0816f5);
+    border: 1px solid #8f6a2c;
+    box-shadow:
+      inset 0 0 0 1px #000,
+      inset 0 0 0 2px #d4a95522,
+      0 10px 24px #000c;
+    clip-path: polygon(
+      0 8px,
+      8px 0,
+      calc(100% - 8px) 0,
+      100% 8px,
+      100% calc(100% - 8px),
+      calc(100% - 8px) 100%,
+      8px 100%,
+      0 calc(100% - 8px)
+    );
+  }
+  #weekly-quests-window .wk-card-active {
+    border-color: #8b5cf6;
+    box-shadow:
+      inset 0 0 0 1px #000,
+      inset 0 0 0 2px #8b5cf655,
+      0 10px 24px #000c,
+      0 0 22px #8b5cf655;
+  }
+  #weekly-quests-window .wk-card-locked {
+    filter: saturate(0.45) brightness(0.72);
+  }
+  #weekly-quests-window .wk-cat {
+    text-align: center;
+    font-family: var(--title-font);
+    font-size: 16px;
+    color: #fbf6ff;
+    text-shadow: 0 1px 0 #000;
+    padding-top: 2px;
+  }
+  #weekly-quests-window .wk-art {
+    position: relative;
+    aspect-ratio: 312 / 184;
+    background: #000 center / cover no-repeat;
+    border: 1px solid #8f6a2c;
+    box-shadow:
+      inset 0 0 0 1px #000,
+      0 4px 12px #000a;
+    margin-bottom: 26px;
+  }
+  #weekly-quests-window .wk-medal {
+    position: absolute;
+    left: 50%;
+    bottom: -28px;
+    width: 56px;
+    height: 56px;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: center / cover no-repeat;
+    box-shadow: 0 6px 14px #000c;
+  }
+  #weekly-quests-window .wk-pill {
+    justify-self: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: #efe6ff;
+    padding: 5px 18px;
+    background: linear-gradient(180deg, #2b1f4a, #171029);
+    border: 1px solid #4c2f8a;
+    clip-path: polygon(7px 0, calc(100% - 7px) 0, 100% 50%, calc(100% - 7px) 100%, 7px 100%, 0 50%);
+  }
+  #weekly-quests-window .wk-lore {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: 13.5px;
+    line-height: 1.45;
+    color: #f1e9ff;
+    text-align: center;
+  }
+  #weekly-quests-window .wk-goal {
+    margin: 0;
+    align-self: start;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 12.5px;
+    color: #c9bde4;
+    text-align: center;
+  }
+  #weekly-quests-window .wk-btn {
+    font-family: var(--title-font);
+    font-size: 13px;
+    letter-spacing: 0.03em;
+    color: #f1e9ff;
+    background: linear-gradient(180deg, #2a1f47, #150f24);
+    border: 1px solid #4c2f8a;
+    box-shadow:
+      inset 0 1px 0 #ffffff14,
+      0 4px 12px #0009;
+    padding: 10px 10px;
+    cursor: pointer;
+    text-align: center;
+  }
+  #weekly-quests-window .wk-btn:hover:not(:disabled) {
+    color: #fff;
+    border-color: #c4a6ff;
+    background: linear-gradient(180deg, #3a2b62, #1d1533);
+    box-shadow:
+      inset 0 1px 0 #ffffff1a,
+      0 0 16px #8b5cf655;
+  }
+  #weekly-quests-window .wk-btn:disabled {
+    cursor: default;
+  }
+  #weekly-quests-window .wk-btn-active {
+    color: #7ef25f;
+    border-color: #5fd13f;
+    background: linear-gradient(180deg, #1e3a15, #0e2009);
+    box-shadow:
+      inset 0 1px 0 #ffffff12,
+      0 0 16px #7ef25f44;
+  }
+  #weekly-quests-window .wk-btn-done {
+    color: #f2d998;
+    border-color: #8f6a2c;
+    background: linear-gradient(180deg, #3a2d12, #1c150a);
+  }
+  #weekly-quests-window .wk-btn-locked {
+    color: #8d82a8;
+    border-color: #2a2140;
+    background: linear-gradient(180deg, #171226, #0e0a18);
+    box-shadow: none;
+  }
+  #weekly-quests-window .wk-btn-accept {
+    color: #f2d998;
+    border-color: #5fd13f;
+    background: linear-gradient(180deg, #2f6a1c, #173a0c);
+  }
+  #weekly-quests-window .wk-foot {
+    margin: 12px auto 0;
+    padding: 8px 16px;
+    max-width: 640px;
+    text-align: center;
+    font-family: var(--font-serif);
+    font-size: 13px;
+    color: #c9bde4;
+    border: 1px solid #8f6a2c;
+    background: linear-gradient(180deg, #1c1531e6, #0e0a1ae6);
+    clip-path: polygon(
+      12px 0,
+      calc(100% - 12px) 0,
+      100% 50%,
+      calc(100% - 12px) 100%,
+      12px 100%,
+      0 50%
+    );
+  }
+  #weekly-quests-window .wk-backdrop {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    background: #0a0713cc;
+    z-index: 2;
+  }
+  #weekly-quests-window .wk-dialog {
+    width: min(460px, 100%);
+    max-height: 100%;
+    overflow: auto;
+    padding: 14px 16px 16px;
+    background: linear-gradient(180deg, #1e1633fa, #130d22fa 40%, #0d0918fc);
+    border: 1px solid #8f6a2c;
+    box-shadow:
+      inset 0 0 0 1px #000,
+      inset 0 0 0 2px #d4a95533,
+      0 24px 60px #000e,
+      0 0 40px #8b5cf62a;
+  }
+  #weekly-quests-window .wk-dialog-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #d4a95533;
+    margin-bottom: 10px;
+  }
+  #weekly-quests-window .wk-portrait {
+    flex: none;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: center / cover no-repeat;
+    border: 2px solid #d4a955;
+    box-shadow:
+      0 0 0 2px #0a0713,
+      0 0 12px #d4a95555;
+  }
+  #weekly-quests-window .wk-who {
+    flex: 1;
+    min-width: 0;
+    display: grid;
+  }
+  #weekly-quests-window .wk-who-name {
+    font-family: var(--title-font);
+    font-size: 15px;
+    color: #fbf6ff;
+  }
+  #weekly-quests-window .wk-who-title {
+    font-size: 12px;
+    color: #c4a6ff;
+  }
+  #weekly-quests-window .wk-dialog-art {
+    aspect-ratio: 458 / 160;
+    background: #000 center / cover no-repeat;
+    border: 1px solid #8f6a2c;
+    box-shadow:
+      inset 0 0 0 1px #000,
+      0 6px 16px #000a;
+    margin-bottom: 10px;
+  }
+  #weekly-quests-window .wk-dialog-title {
+    font-family: var(--title-font);
+    font-size: 17px;
+    color: #f2d998;
+    margin-bottom: 6px;
+  }
+  #weekly-quests-window .wk-dialog-lore {
+    margin: 0 0 8px;
+    font-family: var(--font-serif);
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: #f1e9ff;
+  }
+  #weekly-quests-window .wk-dialog-sub {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--title-font);
+    font-size: 13px;
+    color: #f2d998;
+    margin: 8px 0 4px;
+  }
+  #weekly-quests-window .wk-dialog-sub::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, #d4a95566, transparent);
+  }
+  #weekly-quests-window .wk-dialog-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 13px;
+    color: #c9bde4;
+  }
+  #weekly-quests-window .wk-dialog-row b {
+    color: #f1e9ff;
+  }
+  #weekly-quests-window .wk-reward {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 10px;
+    align-items: center;
+    margin-top: 8px;
+    padding: 8px 10px 8px 8px;
+    border: 1px solid #8b5cf6;
+    background: linear-gradient(90deg, #8b5cf61f, #8b5cf608 60%), #0e0a1a;
+  }
+  #weekly-quests-window .wk-reward-icon {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    color: #f2d998;
+    background: radial-gradient(circle at 50% 30%, #3b2564, #120b20 72%);
+    border: 1px solid #c58bff;
+  }
+  #weekly-quests-window .wk-reward-name {
+    display: block;
+    color: #c58bff;
+    font-weight: 700;
+    font-size: 13.5px;
+  }
+  #weekly-quests-window .wk-reward-desc {
+    display: block;
+    color: #c9bde4;
+    font-size: 12px;
+    margin-top: 2px;
+  }
+  #weekly-quests-window .wk-note {
+    margin-top: 8px;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 12px;
+    color: #8d82a8;
+  }
+  #weekly-quests-window .wk-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  #weekly-quests-window .wk-actions .wk-btn {
+    flex: 1;
+  }
   #calendar-window {
     width: 520px;
     height: min(620px, calc(85vh - 24px));

@@ -671,6 +671,7 @@ import {
   updateRiftTriggers as updateRiftTriggersImpl,
 } from './rift/runs';
 import type { RiftEvent, RiftInstance } from './rift/types';
+import * as weeklyQuestMod from './weekly_quests';
 import { startWorldQuestActivity as startWorldQuestActivityImpl } from './world_quest_activity';
 import { worldQuestCreditBindings } from './world_quest_context';
 import { dropWorldQuestDeliveryCargoForPlayer } from './world_quest_delivery';
@@ -3052,7 +3053,7 @@ export class Sim {
         }
       }
       for (const q of s.questsDone) meta.questsDone.add(q);
-      worldQuestState.restoreWorldQuestState(meta, s.worldQuests);
+      worldQuestState.restoreWorldQuestState(meta, s.worldQuests, s.weeklyQuest);
       // A rev reset zeroes COLLECT counts too, and those are derived state only
       // onInventoryChangedForQuests re-credits: re-sync once (inventory is already
       // restored above) so a migrated character holding the collect items is not
@@ -9625,16 +9626,13 @@ export class Sim {
     deedsMod.markDeedsDirty(this.ctx, meta.entityId); // soc_civic_duty reads the allocation
     this.notice(meta.entityId, 'Your focus re-spec is complete.');
   }
-
   interact(pid?: number): void {
     interaction.interact(this.ctx, pid, this.noticeboardDefinitions);
   }
-
   private isQuestInteractionEntity(e: Entity): boolean {
     if (e.kind === 'npc') return true;
     return e.kind === 'mob' && !e.hostile && !e.dead && e.questIds.length > 0;
   }
-
   talkToNpc(npcId: number, pid?: number): void {
     const r = this.resolve(pid);
     if (!r) return;
@@ -9652,6 +9650,7 @@ export class Sim {
     // other NPC resets the Saul consecutive-talk counter.
     deedsMod.onNpcTalkedForDeeds(this.ctx, meta, npc.templateId);
     if (worldQuestMod.talkToWorldQuestInstructor(this.ctx, npc, meta, p)) return;
+    if (weeklyQuestMod.talkToWeeklyEmissary(this.ctx, npc, meta, p)) return;
     if (this.interactNpcForQuests(npc, meta)) return;
     for (const qid of npc.questIds) {
       const quest = QUESTS[qid];
@@ -9675,11 +9674,9 @@ export class Sim {
       }
     }
   }
-
   private interactNpcForQuests(npc: Entity, meta: PlayerMeta): boolean {
     return interactNpcForQuests(this.ctx, npc, meta);
   }
-
   questState(questId: string, pid?: number): QuestState {
     return questCommands.questState(this.ctx, questId, pid);
   }
@@ -9700,6 +9697,16 @@ export class Sim {
   }
   startWorldQuestActivity(questId: string, difficulty: 'normal' | 'hard', pid?: number): void {
     startWorldQuestActivityImpl(this.ctx, questId, difficulty, pid);
+  }
+  chooseWeeklyQuest(questId: string, pid?: number): void {
+    weeklyQuestMod.chooseWeeklyQuest(this.ctx, questId, pid);
+  }
+  get weeklyQuest() {
+    weeklyQuestMod.resetWeeklyQuestIfNeeded(this.ctx, this.primary);
+    return this.primary.weeklyQuest;
+  }
+  get weeklyQuestResetAtMs(): number {
+    return this.ctx.weeklyRaidResetMs(this.ctx.lockoutNowMs());
   }
   worldQuestLeaderboard(board: string, page = 0, pageSize = LEADERBOARD_PAGE_SIZE) {
     return Promise.resolve(emptyWorldQuestLeaderboardPage(board, page, pageSize));
@@ -9730,29 +9737,23 @@ export class Sim {
   turnInQuest(questId: string, pid?: number): void {
     questCommands.turnInQuest(this.ctx, questId, pid);
   }
-
   completeQuestForDev(questId: string, pid?: number): boolean {
     return completeQuestForDev(this.ctx, questId, pid);
   }
-
   completeCurrentQuestsForDev(pid?: number): number {
     return completeCurrentQuestsForDev(this.ctx, pid);
   }
-
   // No-op in offline mode
   reportTelemetry(): void {}
-
   // Quest-credit math (onMobKilledForQuests / onInventoryChangedForQuests /
   // checkQuestReady) moved to quests/quest_credit.ts (Q1) behind SimContext. Foreign
   // callers reach the trio via this.ctx.<name>: the handleDeath party loop calls
   // ctx.onMobKilledForQuests, the inventory hub (addItem/removeItem/buyBackItem) and
   // finalizeQuestAccept call ctx.onInventoryChangedForQuests, and interactNpcForQuests
   // plus the N1 crypt interactObjectForQuests call ctx.checkQuestReady.
-
   // -------------------------------------------------------------------------
   // Player death / respawn
   // -------------------------------------------------------------------------
-
   // Player death/respawn lives in entity_roster.ts (E1, merged E2). Thin delegate
   // keeps the public IWorld surface (`sim.releaseSpirit`) resolving unchanged.
   releaseSpirit(pid?: number): void {
@@ -9763,7 +9764,6 @@ export class Sim {
       this.worldContent.playerStart,
     );
   }
-
   // Ghost resurrection (src/sim/spirit.ts): run the spirit back to its corpse to
   // resurrect penalty-free, or accept a Spirit Healer's resurrection (with
   // Resurrection Sickness). Thin delegates so the IWorld surface resolves unchanged.

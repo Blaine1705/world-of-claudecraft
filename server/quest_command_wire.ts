@@ -71,6 +71,11 @@ export function startWorldQuestActivityWire(sim: Sim, msg: QuestWireMessage, pid
   sim.startWorldQuestActivity(msg.quest, msg.difficulty, pid);
 }
 
+export function chooseWeeklyQuestWire(sim: Sim, msg: QuestWireMessage, pid: number): void {
+  if (typeof msg.quest !== 'string') return;
+  sim.chooseWeeklyQuest(msg.quest, pid);
+}
+
 /** The world-quest-only command family; game.ts routes every member here. */
 const WORLD_QUEST_WIRE_COMMANDS = [
   'world_quest_glider_boost',
@@ -81,6 +86,7 @@ const WORLD_QUEST_WIRE_COMMANDS = [
   'world_quest_shadow',
   'world_quest_accuse',
   'world_quest_start',
+  'world_quest_weekly_choose',
 ] as const;
 export type WorldQuestWireCommand = (typeof WORLD_QUEST_WIRE_COMMANDS)[number];
 const WORLD_QUEST_WIRE_COMMAND_SET: ReadonlySet<unknown> = new Set(WORLD_QUEST_WIRE_COMMANDS);
@@ -95,6 +101,9 @@ export function dispatchWorldQuestWire(sim: Sim, msg: QuestWireMessage, pid: num
   switch (msg.cmd) {
     case 'world_quest_start':
       startWorldQuestActivityWire(sim, msg, pid);
+      break;
+    case 'world_quest_weekly_choose':
+      chooseWeeklyQuestWire(sim, msg, pid);
       break;
     case 'world_quest_glider_boost':
       sim.boostWorldQuestGlider(pid);

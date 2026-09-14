@@ -52,4 +52,6 @@ export function emitQuestSelfKeys(emit: EmitSelfKey, sim: Sim, meta: PlayerMeta)
   emit('wqday', meta.worldQuestCycle);
   emit('wqexp', sim.worldQuestExpiresAtMs);
   emit('wqlog', [...meta.worldQuestLog.values()].map(worldQuestProgressForWire));
+  emit('wkq', meta.weeklyQuest);
+  emit('wkexp', sim.weeklyQuestResetAtMs);
 }
