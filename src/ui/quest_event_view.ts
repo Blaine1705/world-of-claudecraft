@@ -2,6 +2,7 @@
 // the returned effects through its existing banner/log/sound ports; keeping the
 // event-family switch here prevents the coordinator monolith from growing.
 
+import { WEEKLY_QUESTS_BY_ID } from '../sim/content/weekly_quests';
 import { WORLD_QUESTS_BY_ID } from '../sim/data';
 import type { SimEvent } from '../sim/types';
 import { questTitle } from './entity_display_core';
@@ -12,6 +13,14 @@ import { questProgressEventText } from './quest_progress_text';
 import type { WorldQuestLeyRotation } from './world_quest_ley_view';
 import { worldQuestTraceScoreText } from './world_quest_trace_view';
 import { worldQuestDisplayName, worldQuestObjectiveLabel } from './world_quest_view';
+
+function weeklyKind(questId: string): 'dungeons' | 'raid' | 'battlegrounds' | 'worldboss' {
+  return WEEKLY_QUESTS_BY_ID[questId]?.kind ?? 'dungeons';
+}
+
+function weeklyCategory(questId: string): string {
+  return t(`hudChrome.weekly.kinds.${weeklyKind(questId)}.category`);
+}
 
 export interface QuestEventPresentation {
   bannerText?: string;
@@ -70,6 +79,22 @@ export function questEventPresentation(event: SimEvent): QuestEventPresentation 
         logText: text,
         sound: event.banner === 'championFallen' ? 'quest_complete' : 'quest_ready',
       };
+    }
+    case 'worldQuestWeeklyChosen': {
+      const text = t('hudChrome.weekly.chosen', { category: weeklyCategory(event.questId) });
+      return { bannerText: text, logText: text, sound: 'quest_accept' };
+    }
+    case 'worldQuestWeeklyProgress': {
+      const text = t('hudChrome.weekly.progress', {
+        label: t(`hudChrome.weekly.kinds.${weeklyKind(event.questId)}.goalLabel`),
+        count: formatNumber(event.count, { maximumFractionDigits: 0 }),
+        required: formatNumber(event.required, { maximumFractionDigits: 0 }),
+      });
+      return { logText: text, flashText: text };
+    }
+    case 'worldQuestWeeklyDone': {
+      const text = t('hudChrome.weekly.done', { category: weeklyCategory(event.questId) });
+      return { bannerText: text, logText: text, sound: 'quest_complete' };
     }
     case 'worldQuestProgress': {
       const text = t('questUi.detail.objectiveProgress', {

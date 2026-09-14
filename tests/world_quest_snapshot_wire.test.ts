@@ -12,6 +12,8 @@ function mirrors(): QuestSelfMirrors {
     worldQuestLog: new Map([
       ['wq_eastbrook_bandits', { questId: 'wq_eastbrook_bandits', count: 2, state: 'active' }],
     ]),
+    weeklyQuest: null,
+    weeklyQuestResetAtMs: 0,
   };
 }
 

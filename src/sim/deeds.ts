@@ -63,6 +63,7 @@ import {
   MAX_LEVEL,
   NYTHRAXIS_ROOM_RADIUS,
 } from './types';
+import { onDungeonClearedForWeeklyQuests } from './weekly_quests';
 
 // ---------------------------------------------------------------------------
 // Pinned site data. These literals are deliberately NOT read live from the
@@ -1840,6 +1841,7 @@ export function onMobKillCreditForDeeds(
   const inst = instanceForMob(ctx, mob);
   if (FINAL_BOSS_DUNGEONS[mob.templateId] && mob.templateId !== 'nythraxis_scourge_of_thornpeak') {
     onDungeonFinalBossKilledForDeeds(ctx, mob, inst, eligible);
+    onDungeonClearedForWeeklyQuests(ctx, FINAL_BOSS_DUNGEONS[mob.templateId], eligible);
   }
 
   // Encounter skill tasks resolve at the tracked boss's death; recipients are
@@ -1899,6 +1901,7 @@ export function onNythraxisKillForDeeds(
   roomMetas: PlayerMeta[],
 ): void {
   onDungeonFinalBossKilledForDeeds(ctx, boss, instanceForMob(ctx, boss), roomMetas);
+  onDungeonClearedForWeeklyQuests(ctx, FINAL_BOSS_DUNGEONS[boss.templateId], roomMetas);
 }
 
 /** World-boss credit: the loot-roster snapshot (never pruned by dying). */

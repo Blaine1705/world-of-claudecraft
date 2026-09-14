@@ -25,6 +25,7 @@ import type {
   QuestProgress,
   SkinCatalog,
   SkinRank,
+  WeeklyQuestProgress,
   WorldQuestProgress,
 } from './types';
 
@@ -113,6 +114,9 @@ export interface CharacterState {
   };
   // Faction standing (JSONB; optional so pre-reputation saves load cleanly).
   factions?: Partial<Record<string, number>>;
+  // The weekly emissary's pick. Optional and omitted while there is none, so
+  // every pre-feature save loads with no charge taken.
+  weeklyQuest?: WeeklyQuestProgress;
   // Legacy arenaRating/Wins/Losses are treated as 1v1 data. The explicit
   // 1v1 fields are written by new saves, while old saves fall back cleanly.
   arenaRating?: number;

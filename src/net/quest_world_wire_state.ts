@@ -5,6 +5,7 @@ import type {
   CannonPoint,
   QuestProgress,
   VehicleSession,
+  WeeklyQuestProgress,
   WorldQuestProgress,
 } from '../sim/types';
 import type { WorldQuestDifficulty } from '../sim/world_quest_activity';
@@ -27,7 +28,8 @@ export type QuestWorldCommand =
   | { cmd: 'world_quest_accuse'; npcId: number }
   | { cmd: 'world_quest_shadow'; action: 'pickpocket' | 'leave'; targetId?: number }
   | { cmd: 'world_quest_start'; quest: string; difficulty: WorldQuestDifficulty }
-  | { cmd: 'world_quest_reroll'; quest: string };
+  | { cmd: 'world_quest_reroll'; quest: string }
+  | { cmd: 'world_quest_weekly_choose'; quest: string };
 
 /** Cold owner mirrors shared by quest snapshots and world-boss map state. */
 export class QuestWorldWireState {
@@ -38,6 +40,8 @@ export class QuestWorldWireState {
   worldQuestExpiresAtMs = 0;
   worldQuestTime = 0;
   worldQuestLog: ReadonlyMap<string, WorldQuestProgress> = new Map();
+  weeklyQuest: WeeklyQuestProgress | null = null;
+  weeklyQuestResetAtMs = 0;
   nearbyWorldQuestTraces: readonly NearbyWorldQuestTrace[] = [];
   factions: Readonly<Record<FactionId, number>> = freshFactionReputation();
   worldQuestReplacements: Readonly<Record<string, string>> = Object.freeze({});
@@ -151,6 +155,10 @@ export class QuestWorldWireState {
     return true;
   }
 
+  chooseWeeklyQuest(questId: string): void {
+    this.sendQuestWorldCommand({ cmd: 'world_quest_weekly_choose', quest: questId });
+  }
+
   worldBossActive(bossId: string): boolean {
     return this.activeWorldBossIds.has(bossId);
   }
@@ -168,6 +176,8 @@ export class QuestWorldWireState {
     this.worldQuestReplacements = Object.freeze({});
     this.worldQuestRerollCycle = '';
     this.worldQuestZoneCounts = Object.freeze({});
+    this.weeklyQuest = null;
+    this.weeklyQuestResetAtMs = 0;
     this.nearbyWorldQuestTraces = [];
     this.activeWorldBossIds = new Set();
   }

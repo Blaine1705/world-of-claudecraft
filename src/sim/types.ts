@@ -3914,6 +3914,9 @@ export interface NpcDef {
   // widened. Vending stays emergent from vendorItems; the watch fee is a
   // plant-time bag payment and never gates on this flag (D9).
   farmer?: true;
+  // The weekly emissary: talking to this NPC opens the weekly-quest window
+  // (src/sim/weekly_quests.ts) instead of the gossip menu.
+  weeklyEmissary?: boolean;
   greeting: string;
   // Registered but not surface-placed at world init. The owning system spawns
   // the entity on demand (e.g. the Nythraxis encounter walks Brother Aldric in
@@ -4828,6 +4831,15 @@ export interface WorldQuestShadowState {
   suspicion: number;
   cooldown: number;
   stealing?: { targetId: number; remaining: number; x: number; z: number };
+}
+
+/** The one weekly charge a character holds (src/sim/weekly_quests.ts). */
+export interface WeeklyQuestProgress {
+  questId: string;
+  /** The week the pick belongs to; a different current week means it is over. */
+  week: string;
+  count: number;
+  state: 'active' | 'completed';
 }
 
 export interface WorldQuestProgress {
@@ -6651,6 +6663,13 @@ export type SimEvent = { pid?: number } & (
   | { type: 'questReady'; questId: string }
   | { type: 'questDone'; questId: string }
   | { type: 'worldQuestStarted'; questId: string }
+  // The weekly emissary (src/sim/weekly_quests.ts): open the window, the pick,
+  // progress, and the paid completion. All personal (pid); the client owns
+  // every visible string.
+  | { type: 'worldQuestWeeklyOpen' }
+  | { type: 'worldQuestWeeklyChosen'; questId: string }
+  | { type: 'worldQuestWeeklyProgress'; questId: string; count: number; required: number }
+  | { type: 'worldQuestWeeklyDone'; questId: string }
   /** A big on-screen line for a shared world-quest moment (the client owns the
    *  wording under questUi.worldQuest.banner.<banner>). */
   | { type: 'worldQuestBanner'; banner: WorldQuestBannerId }

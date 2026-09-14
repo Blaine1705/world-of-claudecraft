@@ -134,6 +134,9 @@ export const IWORLD_MEMBERS = [
   { name: 'questsDone', kind: 'data' },
   { name: 'worldQuestCycle', kind: 'data' },
   { name: 'worldQuestExpiresAtMs', kind: 'data' },
+  { name: 'weeklyQuest', kind: 'data' },
+  { name: 'weeklyQuestResetAtMs', kind: 'data' },
+  { name: 'chooseWeeklyQuest', kind: 'method' },
   { name: 'worldQuestLeaderboard', kind: 'method' }, // async
   { name: 'worldQuestLog', kind: 'data' },
   { name: 'worldQuestTime', kind: 'data' },
@@ -895,9 +898,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // rerollWorldQuest (+2 methods). Counted 403/117/286 on
     // feature/wq-regional-mastery: plus the Regional Mastery per-zone counts
     // readout worldQuestZoneCounts (+1 data).
-    expect(IWORLD_MEMBERS.length).toBe(403);
-    expect(DATA_MEMBERS.length).toBe(117);
-    expect(METHOD_MEMBERS.length).toBe(286);
+    // Counted 406/119/287 on feature/weekly-quests rebased onto it: plus the
+    // weekly emissary's weeklyQuest and weeklyQuestResetAtMs (+2 data) and
+    // chooseWeeklyQuest (+1 method).
+    expect(IWORLD_MEMBERS.length).toBe(406);
+    expect(DATA_MEMBERS.length).toBe(119);
+    expect(METHOD_MEMBERS.length).toBe(287);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -982,6 +988,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'changeWeaponSkin',
       'characterProfile',
       'chat',
+      'chooseWeeklyQuest',
       'civicServicePlacements',
       'claimEventSkin',
       'clearGatheringGoal',
@@ -1299,6 +1306,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'vaultWithdraw',
       'vehicleSession',
       'vendorBuyback',
+      'weeklyQuest',
+      'weeklyQuestResetAtMs',
       'whoInfo',
       'whoRequest',
       'worldBossActive',
@@ -1424,6 +1433,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'vaultInfo',
       'vehicleSession',
       'vendorBuyback',
+      'weeklyQuest',
+      'weeklyQuestResetAtMs',
       'whoInfo',
       'worldQuestCycle',
       'worldQuestExpiresAtMs',
@@ -1483,6 +1494,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'changeWeaponSkin',
       'characterProfile',
       'chat',
+      'chooseWeeklyQuest',
       'claimEventSkin',
       'clearGatheringGoal',
       'clearMarker',
@@ -1938,6 +1950,9 @@ type _ExhaustCosmetics = AssertNever<
 const FACET_QUESTS = [
   'questLog',
   'questsDone',
+  'chooseWeeklyQuest',
+  'weeklyQuest',
+  'weeklyQuestResetAtMs',
   'worldQuestCycle',
   'worldQuestExpiresAtMs',
   'worldQuestLeaderboard',
@@ -2500,10 +2515,10 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    // Mirrors the IWORLD_MEMBERS.length pin above (403); this pin and the one above
+    // Mirrors the IWORLD_MEMBERS.length pin above (406); this pin and the one above
     // must always agree.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(403);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(403);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(406);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(406);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

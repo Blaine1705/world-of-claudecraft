@@ -7,7 +7,8 @@ import type { FactionId } from './factions';
 import { freshFactionReputation, sanitizeFactionReputation } from './factions';
 import { sanitizeZoneCompletionCounts } from './regional_mastery';
 import type { PlayerMeta } from './sim';
-import type { Entity, WorldQuestDef, WorldQuestProgress } from './types';
+import type { Entity, WeeklyQuestProgress, WorldQuestDef, WorldQuestProgress } from './types';
+import { sanitizeWeeklyQuestProgress, savedWeeklyQuestProgress } from './weekly_quests';
 import { WORLD_BOSSES } from './world_boss';
 import { sanitizeWorldQuestReplacements } from './world_quest_reroll';
 import {
@@ -41,6 +42,8 @@ export interface WorldQuestPlayerState {
    * reset by a rollover, a reroll, or a missed day (src/sim/regional_mastery.ts).
    */
   worldQuestZoneCounts: Record<string, number>;
+  /** The weekly emissary's pick (src/sim/weekly_quests.ts); null while none is taken. */
+  weeklyQuest: WeeklyQuestProgress | null;
 }
 
 export interface WorldQuestRotationCache {
@@ -59,6 +62,7 @@ export function freshWorldQuestPlayerState(): WorldQuestPlayerState {
     worldQuestRerollCycle: '',
     worldQuestReplacements: {},
     worldQuestZoneCounts: {},
+    weeklyQuest: null,
   };
 }
 
@@ -86,6 +90,7 @@ export function restoreWorldQuestState(
   meta: PlayerMeta,
   saved: CharacterState['worldQuests'],
   characterFactions?: CharacterState['factions'],
+  savedWeekly?: CharacterState['weeklyQuest'],
 ): void {
   meta.factions = freshFactionReputation();
   const rawFactions = characterFactions ?? saved?.factions;
@@ -97,6 +102,7 @@ export function restoreWorldQuestState(
   // The mastery counts outlive every cycle: restored whatever the board holds
   // (a legacy save without the field restores to an empty map).
   meta.worldQuestZoneCounts = sanitizeZoneCompletionCounts(saved?.zoneCounts);
+  meta.weeklyQuest = sanitizeWeeklyQuestProgress(savedWeekly);
   if (saved) {
     meta.worldQuestCycle = sanitizeWorldQuestCycle(saved.cycle);
     if (typeof saved.rerollCycle === 'string' && saved.rerollCycle === meta.worldQuestCycle) {
@@ -121,7 +127,10 @@ export function restoreWorldQuestState(
 export function savedWorldQuestState(meta: PlayerMeta): {
   worldQuests?: CharacterState['worldQuests'];
   factions?: CharacterState['factions'];
+  weeklyQuest?: CharacterState['weeklyQuest'];
 } {
+  const weekly = savedWeeklyQuestProgress(meta);
+  const weeklyPart = weekly ? { weeklyQuest: weekly } : {};
   const hasRep = meta.factions && Object.values(meta.factions).some((v) => v > 0);
   const hasReroll =
     meta.worldQuestRerollCycle && meta.worldQuestRerollCycle === meta.worldQuestCycle;
@@ -136,10 +145,11 @@ export function savedWorldQuestState(meta: PlayerMeta): {
     !hasReroll &&
     !hasZoneCounts
   ) {
-    return {};
+    return weeklyPart;
   }
   const factionsObj = hasRep ? { ...meta.factions } : undefined;
   return {
+    ...weeklyPart,
     worldQuests: {
       cycle: meta.worldQuestCycle,
       progress: [...meta.worldQuestLog.values()].map(

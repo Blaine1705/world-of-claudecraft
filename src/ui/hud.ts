@@ -921,6 +921,7 @@ import { onWalletUiChange, walletConnectionView } from './wallet_balance';
 import { requestWalletVerify } from './wallet_verify_request';
 import { type WeaponProcEffectDesc, weaponProcLines } from './weapon_proc_view';
 import { weaponTypeLabelKey } from './weapon_type_label';
+import { WeeklyQuestsWindow } from './weekly_quests_window';
 import { promptWikiVisit } from './wiki_link';
 import {
   installWindowDrag,
@@ -3643,6 +3644,9 @@ export class Hud {
       case 'bank-window':
         this.closeBank();
         break;
+      case 'weekly-quests-window':
+        this.weeklyQuestsWindow.close();
+        break;
       case 'calendar-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.calendarWindow.close();
@@ -5603,6 +5607,12 @@ export class Hud {
     closeOthers: () => this.closeOtherWindows('#calendar-window'),
     ...this.windowFocus('#calendar-window'),
     showError: (text) => this.showError(text),
+  });
+  private readonly weeklyQuestsWindow = new WeeklyQuestsWindow({
+    root: () => $('#weekly-quests-window'),
+    world: () => this.sim,
+    closeOthers: () => this.closeOtherWindows('#weekly-quests-window'),
+    ...this.windowFocus('#weekly-quests-window'),
   });
   // Ashen Coliseum window painter (arena_window_view.ts offline/live model +
   // arena_window.ts painter). It owns the selected bracket, the all-time-ladder
@@ -9809,6 +9819,7 @@ export class Hud {
     // Re-seat the tracker stack under the minimap column (bounded layout read).
     if (slowHud) this.trackerStackAnchor.apply();
     if (slowHud && this.calendarWindow.isOpen) this.calendarWindow.refreshIfChanged();
+    if (slowHud && this.weeklyQuestsWindow.isOpen) this.weeklyQuestsWindow.refreshIfChanged();
     if (slowHud) this.updateMailIndicator();
     if (slowHud) this.updateMarketIndicator();
   }
@@ -11359,6 +11370,7 @@ export class Hud {
       if (this.isNythraxisEvent(ev)) this.lastNythraxisCombatEventAt = performance.now();
       if (applyQuestEventPresentation(this, ev)) continue;
       if (ev.type === 'worldQuestInvestigationDialogue') this.questDialog.open(ev.targetId);
+      if (ev.type === 'worldQuestWeeklyOpen') this.weeklyQuestsWindow.open();
       switch (ev.type) {
         case 'damage': {
           const src = sim.entities.get(ev.sourceId);
@@ -17916,7 +17928,6 @@ export class Hud {
   private playerSocialFlags(name: string): PlayerSocialFlags {
     return resolvePlayerSocialFlags(name, this.sim.socialInfo, this.localIgnoredNames);
   }
-
   private loadLocalIgnoredNames(): Set<string> {
     try {
       return parseIgnoreList(localStorage.getItem(LOCAL_IGNORES_KEY));
@@ -17924,7 +17935,6 @@ export class Hud {
       return new Set();
     }
   }
-
   private saveLocalIgnoredNames(): void {
     try {
       localStorage.setItem(LOCAL_IGNORES_KEY, serializeIgnoreList(this.localIgnoredNames));
@@ -17960,7 +17970,6 @@ export class Hud {
     if (this.sim.socialInfo === null) return;
     blocked ? this.sim.blockRemove(name) : this.sim.blockAdd(name);
   }
-
   closeContextMenu(): void {
     const el = $('#ctx-menu');
     el.style.display = 'none';
@@ -17997,7 +18006,6 @@ export class Hud {
   noteDevCommandsAdvertised(): void {
     this.devCommandsAdvertised = true;
   }
-
   toggleDevCommandWindow(): boolean {
     return this.devCommandWindow.toggle();
   }
@@ -18023,7 +18031,6 @@ export class Hud {
     this.resurrectionPromptEl?.remove();
     this.resurrectionPromptEl = null;
   }
-
   private showPrompt(
     text: string,
     acceptLabel: string,
@@ -18084,7 +18091,6 @@ export class Hud {
   get tradeOpen(): boolean {
     return this.sim.tradeInfo !== null;
   }
-
   addItemToTrade(itemId: string): void {
     if (!this.tradeOpen || this.stagedTrade.items.length >= 6) return;
     const existing = this.stagedTrade.items.find((s) => s.itemId === itemId);
@@ -18096,7 +18102,6 @@ export class Hud {
     }
     this.pushTradeOffer();
   }
-
   private pushTradeOffer(): void {
     this.sim.tradeSetOffer(this.stagedTrade.items, this.stagedTrade.copper);
   }
@@ -18128,15 +18133,12 @@ export class Hud {
   attachDiscordHook(toggle: () => void): void {
     this.discordHook = toggle;
   }
-
   get optionsOpen(): boolean {
     return this.optionsWindow.isOpen;
   }
-
   get characterOpen(): boolean {
     return this.charWindow.isOpen;
   }
-
   get questDialogOpen(): boolean {
     return this.questDialog.isOpen;
   }
@@ -18179,7 +18181,6 @@ export class Hud {
   isWindowOpen(): boolean {
     return this.isModalOpen() || this.topmostOpenWindow() !== null;
   }
-
   toggleOptionsMenu(): void {
     this.optionsWindow.toggle();
   }
@@ -18193,7 +18194,6 @@ export class Hud {
         this.confirmDialog(title, body, okText, cancelText, onOk),
     });
   }
-
   closeOptions(): void {
     this.optionsWindow.close();
   }

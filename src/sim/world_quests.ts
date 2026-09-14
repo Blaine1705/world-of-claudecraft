@@ -33,6 +33,7 @@ import type {
 } from './types';
 import { xpForLevel } from './types';
 import { vehicleStationById } from './vehicle_stations';
+import { ensureWeeklyEmissary } from './weekly_quests';
 import {
   FARSHORE_SALVAGE_AMBUSH,
   triggerWorldQuestAmbush,
@@ -275,6 +276,7 @@ export function hasActiveWorldQuest(meta: PlayerMeta, questId: string): boolean 
 export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Entity): void {
   ensureGliderInstructor(ctx);
   updateGliderLaunchUpdraft(ctx, meta, player);
+  ensureWeeklyEmissary(ctx);
   if (player.level < WORLD_QUEST_MIN_LEVEL) {
     clearShadowEncounter(ctx, meta);
     clearInvestigationEncounter(ctx, meta);

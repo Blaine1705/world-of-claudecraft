@@ -8,6 +8,7 @@ import { equipBestInSlotForDev } from './dev/bis_gear';
 import { displacePlayerForDev } from './dev/dev_displace';
 import { devTownList, resolveDevTown } from './dev/town_teleport';
 import { applyDevKit } from './dev_kit';
+import { armWeeklyQuestForDev } from './dev_weekly_quest';
 import { armWorldQuestForDev, listWorldQuestsForDev } from './dev_world_quest';
 import { armWorldQuestCannonForDev } from './dev_world_quest_cannon';
 import { armWorldQuestCaravanForDev } from './dev_world_quest_caravan';
@@ -236,6 +237,11 @@ export function handleDevChat(
   const gliderMatch = /^\/dev\s+(?:glider|slalom|windrider)(?:\s+(start))?\s*$/i.exec(raw);
   if (gliderMatch) {
     armWorldQuestGliderForDev(ctx, pid, Boolean(gliderMatch[1]));
+    return null;
+  }
+  const weeklyMatch = /^\/dev\s+weekly(?:\s+(credit))?\s*$/i.exec(raw);
+  if (weeklyMatch) {
+    armWeeklyQuestForDev(ctx, pid, Boolean(weeklyMatch[1]));
     return null;
   }
   if (/^\/dev\s+forge\s*$/i.test(raw)) {

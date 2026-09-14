@@ -4680,6 +4680,7 @@
   body.mobile-touch #market-window,
   body.mobile-touch #quest-dialog,
   body.mobile-touch #calendar-window,
+  body.mobile-touch #weekly-quests-window,
   body.mobile-touch #crafting-window,
   body.mobile-touch #mailbox-window,
   body.mobile-touch #emote-editor,
@@ -5446,6 +5447,14 @@
     height: auto;
     max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
     overflow: hidden;
+  }
+  /* The weekly window: two cards per row on a phone, the sheet scrolls. */
+  body.mobile-touch #weekly-quests-window {
+    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
+    overflow-y: auto;
+  }
+  body.mobile-touch #weekly-quests-window .wk-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   /* The leaderboard body (.lb-body) has its own 56vh scroll; cap the whole sheet to
      the viewport so a long board never runs the window past the bottom edge. */
