@@ -10,7 +10,7 @@ describe('wisp maze content registration', () => {
       const ids = activeWorldQuestsForCycle(`wq1_${day}`).map((quest) => quest.id);
       expect(ids.filter((id) => id === WISP_MAZE_QUEST_ID)).toHaveLength(1);
       expect(ids).toContain('wq_evergarden_watch');
-      expect(ids).toHaveLength(17);
+      expect(ids).toHaveLength(16);
     }
   });
   it('registers the instructor and a cosmetic-only completion deed', () => {

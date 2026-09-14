@@ -749,6 +749,7 @@ export const COMMAND_NAMES = [
   'world_quest_shadow',
   'world_quest_puzzle_reset',
   'world_quest_glider_boost',
+  'world_quest_start',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch

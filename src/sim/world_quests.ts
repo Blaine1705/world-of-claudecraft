@@ -28,6 +28,11 @@ import type {
 import { xpForLevel } from './types';
 import { vehicleStationById } from './vehicle_stations';
 import {
+  awardWorldQuestBonusCopper,
+  WISP_MAZE_HARD_BONUS,
+  worldQuestBonusCopper,
+} from './world_quest_bonus';
+import {
   resolveWorldQuestLeyPuzzle as beamPuzzle,
   resolveWorldQuestMatch3Level as match3Level,
 } from './world_quest_daily_levels';
@@ -336,8 +341,20 @@ export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Ent
     }
     if (quest.objective.type === 'wisp_maze') {
       ensureWispMazeInstructor(ctx);
-      if (existing && updateWispMaze(ctx, meta, player, existing) && existing.state === 'active')
+      if (existing && updateWispMaze(ctx, meta, player, existing) && existing.state === 'active') {
+        const hard = existing.wispMaze?.difficulty === 'hard';
         creditWorldQuest(ctx, meta, quest, existing);
+        if (hard)
+          awardWorldQuestBonusCopper(
+            ctx,
+            meta,
+            worldQuestBonusCopper(
+              WISP_MAZE_HARD_BONUS.base,
+              WISP_MAZE_HARD_BONUS.perLevel,
+              player.level,
+            ),
+          );
+      }
     }
     if (quest.objective.type === 'glider') {
       ensureGliderInstructor(ctx);
@@ -417,6 +434,18 @@ export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Ent
   }
 }
 
+/** The plain keeper talk enters the maze on the Normal profile; the dialog's
+ *  explicit pick (world_quest_activity.ts) is the only way to the Hard one. */
+function startWispMazeNormal(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  player: Entity,
+  npc: Entity,
+  progress: WorldQuestProgress,
+): void {
+  startWispMaze(ctx, meta, player, npc, progress, 'normal');
+}
+
 /** Existing target-and-interact command, with no client-supplied trace or credit. */
 export function talkToWorldQuestInstructor(
   ctx: SimContext,
@@ -486,7 +515,7 @@ export function talkToWorldQuestInstructor(
       (quest.objective.type === 'horde'
         ? startHordeEncounter
         : quest.objective.type === 'wisp_maze'
-          ? startWispMaze
+          ? startWispMazeNormal
           : startForgeWorkshop)(ctx, meta, player, npc, progress);
     return true;
   }

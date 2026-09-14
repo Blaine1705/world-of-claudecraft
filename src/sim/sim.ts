@@ -671,6 +671,7 @@ import {
   updateRiftTriggers as updateRiftTriggersImpl,
 } from './rift/runs';
 import type { RiftEvent, RiftInstance } from './rift/types';
+import { startWorldQuestActivity as startWorldQuestActivityImpl } from './world_quest_activity';
 import { worldQuestCreditBindings } from './world_quest_context';
 import { dropWorldQuestDeliveryCargoForPlayer } from './world_quest_delivery';
 import * as worldQuestState from './world_quest_state';
@@ -9683,27 +9684,24 @@ export class Sim {
   questState(questId: string, pid?: number): QuestState {
     return questCommands.questState(this.ctx, questId, pid);
   }
-
   acceptQuest(questId: string, selectionOrPid?: string | number, pid?: number): void {
     questCommands.acceptQuest(this.ctx, questId, selectionOrPid, pid);
   }
-
   acceptLinkedQuest(questId: string, sharerPid: number, pid?: number): void {
     questCommands.acceptLinkedQuest(this.ctx, questId, sharerPid, pid);
   }
-
   abandonQuest(questId: string, pid?: number): void {
     questCommands.abandonQuest(this.ctx, questId, pid);
   }
-
   shadowWorldQuestAction(action: 'pickpocket' | 'leave', targetId?: number, pid?: number): void {
     worldQuestMod.shadowWorldQuestAction(this.ctx, action, targetId, pid);
   }
-
   accuseWorldQuestSuspect(npcId: number, pid?: number): void {
     worldQuestMod.accuseWorldQuestSuspect(this.ctx, npcId, pid);
   }
-
+  startWorldQuestActivity(questId: string, difficulty: 'normal' | 'hard', pid?: number): void {
+    startWorldQuestActivityImpl(this.ctx, questId, difficulty, pid);
+  }
   rotateWorldQuestPuzzleTile(questId: string, tileIndex: number, pid?: number): void {
     worldQuestMod.rotateWorldQuestPuzzleTile(this.ctx, questId, tileIndex, pid);
   }

@@ -3,9 +3,11 @@ import { surfaceMat } from './gfx';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { markOwnedMaterial } from './shared_resource';
 
-export const WISP_GUARDIAN_COLORS = [0xeb6354, 0xb879ec, 0x59baff, 0x70dba4] as const;
+export const WISP_GUARDIAN_COLORS = [0xeb6354, 0xb879ec, 0x59baff, 0x70dba4, 0xf0c04a] as const;
+/** One actor per authored spawn post; the hard profile fills all of them. */
+export const WISP_GUARDIAN_COUNT = WISP_GUARDIAN_COLORS.length;
 
-/** Four original construct silhouettes, each recognizable without relying on tint. */
+/** Five original construct silhouettes, each recognizable without relying on tint. */
 export class WispMazeGuardians {
   readonly group = new THREE.Group();
   readonly actors: THREE.Group[] = [];
@@ -15,7 +17,7 @@ export class WispMazeGuardians {
   private readonly materials: (THREE.MeshLambertMaterial | THREE.MeshStandardMaterial)[] = [];
 
   constructor() {
-    for (let index = 0; index < 4; index++) {
+    for (let index = 0; index < WISP_GUARDIAN_COUNT; index++) {
       const material = markOwnedMaterial(
         cloneMaterialWithHooks(
           surfaceMat({
@@ -61,12 +63,20 @@ export class WispMazeGuardians {
           for (const z of [-0.4, 0.4]) {
             part(this.box, x, 0.35, z, 0.18, 0.55, 0.18);
           }
-      } else {
+      } else if (index === 3) {
         part(this.crystal, 0, 1.05, 0, 0.4, 0.7, 0.35);
         part(this.crystal, 0, 1.85, 0, 0.22, 0.25, 0.22);
         for (const side of [-1, 1]) {
           const wing = part(this.crystal, side * 0.55, 1.2, 0, 0.55, 0.18, 0.3);
           wing.rotation.z = side * 0.4;
+        }
+      } else {
+        // The hard-profile hunter: a tall spire on a broad base with a stacked
+        // triple ring, unlike any of the four originals.
+        part(this.box, 0, 0.3, 0, 0.9, 0.3, 0.9);
+        part(this.crystal, 0, 1.3, 0, 0.3, 1.3, 0.3);
+        for (const y of [0.75, 1.15, 1.55]) {
+          part(this.ring, 0, y, 0, 0.8, 0.8, 0.8).rotation.x = Math.PI / 2;
         }
       }
       this.actors.push(root);

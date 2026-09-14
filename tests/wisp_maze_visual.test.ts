@@ -68,12 +68,13 @@ describe('personal wisp maze world projection', () => {
     visual.dispose();
   });
 
-  it('keeps four different construct silhouettes, pale frightened state and power aura on reduced motion', async () => {
+  it('keeps five different construct silhouettes, pale frightened state and power aura on reduced motion', async () => {
     const visual = new WispMazeVisual(new THREE.Scene(), () => 0);
     await visual.readyForEntry;
     const state = createWispMaze(7, 'hard');
+    expect(state.enemies).toHaveLength(5);
     const actors = Array.from(
-      { length: 4 },
+      { length: 5 },
       (_, i) => visual.group.getObjectByName(`wisp-guardian-${i}`)!,
     );
     const shapeSignatures = actors.map((actor) =>
@@ -84,7 +85,7 @@ describe('personal wisp maze world projection', () => {
         })),
       ),
     );
-    expect(new Set(shapeSignatures).size).toBe(4);
+    expect(new Set(shapeSignatures).size).toBe(5);
     const childCounts = actors.map((actor) => actor.children.length);
     for (const reduce of [false, true]) {
       state.powerUntilTick = 10;

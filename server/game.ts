@@ -6717,6 +6717,10 @@ export class GameServer {
     if (typeof msg.cmd === 'string' && MAIL_WIRE_PROMPT_CMDS.has(msg.cmd)) {
       session.lastMailWireTick = -MAIL_WIRE_INTERVAL_TICKS;
     }
+    // The world-quest-only family (puzzles, minigames, cloak, accusations,
+    // explicit-difficulty starts) is owned by server/quest_command_wire.ts.
+    if (questWire.isWorldQuestWireCommand(command))
+      return void questWire.dispatchWorldQuestWire(sim, msg, pid);
     switch (command) {
       case 'castSlot':
         if (typeof msg.slot === 'number') sim.castAbilityBySlot(msg.slot | 0, pid);
@@ -6861,14 +6865,6 @@ export class GameServer {
       case 'abandon':
         if (questWire.abandonQuestWire(sim, msg, pid)) this.resyncQuests(session);
         break;
-      case 'world_quest_puzzle_rotate':
-      case 'world_quest_match3_swap':
-      case 'world_quest_match3_reset':
-      case 'world_quest_accuse':
-      case 'world_quest_shadow':
-      case 'world_quest_puzzle_reset':
-      case 'world_quest_glider_boost':
-        return void questWire.dispatchWorldQuestWire(sim, msg, pid);
       case 'qlinkaccept':
         if (questWire.acceptLinkedQuestWire(sim, msg, pid)) this.resyncQuests(session);
         break;

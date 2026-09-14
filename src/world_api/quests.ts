@@ -1,4 +1,5 @@
 import type { QuestProgress, QuestState, WorldQuestProgress } from '../sim/types';
+import type { WorldQuestDifficulty } from '../sim/world_quest_activity';
 import type { NearbyWorldQuestTrace } from '../sim/world_quest_trace_public';
 
 export interface IWorldQuests {
@@ -23,6 +24,9 @@ export interface IWorldQuests {
   boostWorldQuestGlider(): void;
   accuseWorldQuestSuspect(npcId: number): void;
   shadowWorldQuestAction(action: 'pickpocket' | 'leave', targetId?: number): void;
+  /** The instructor dialog's explicit-difficulty start (Normal / Hard) for an
+   *  activity that offers the choice; the plain talk keeps its default profile. */
+  startWorldQuestActivity(questId: string, difficulty: WorldQuestDifficulty): void;
   acceptLinkedQuest(questId: string, fromPid: number): void;
   // The tutorial greeting's accept button: asks the sim for the ferry ride to
   // the Proving Shore. Server-validated (level 1, alive, overworld); the

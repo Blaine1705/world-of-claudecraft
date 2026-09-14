@@ -9877,7 +9877,9 @@ export const zh_CN: EnTranslations = {
         "collect": "Pick up the coin purses. Avoid shadows.",
         "powered": "Power surge! Touch shadows to banish them.",
         "finished": "Every coin purse is recovered!",
-        "retry": "Three lives restored. Try the maze again."
+        "retry": "Three lives restored. Try the maze again.",
+        "startNormal": "Enter the maze: Normal ({shadows} shadows)",
+        "startHard": "Enter the maze: Hard ({shadows} shadows, bonus purse)"
       },
       "forge": {
         "title": "A Helping Hammer",

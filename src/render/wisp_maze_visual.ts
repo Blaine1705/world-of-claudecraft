@@ -89,7 +89,7 @@ export class WispMazeVisual {
     this.aura.name = 'wisp-maze-player-aura';
     this.aura.rotation.x = -Math.PI / 2;
     this.content.add(this.aura);
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < this.guardians.actors.length; i++) {
       const shield = new THREE.Mesh(this.ring, this.materials.gold);
       shield.rotation.x = -Math.PI / 2;
       this.content.add(shield);

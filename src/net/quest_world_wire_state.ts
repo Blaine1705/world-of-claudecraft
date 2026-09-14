@@ -5,6 +5,7 @@ import type {
   VehicleSession,
   WorldQuestProgress,
 } from '../sim/types';
+import type { WorldQuestDifficulty } from '../sim/world_quest_activity';
 import type { NearbyWorldQuestTrace } from '../sim/world_quest_trace_public';
 import { decodeActiveWorldBossIds } from './world_boss_snapshot_wire';
 import { decodeNearbyWorldQuestTraces } from './world_quest_trace_public_wire';
@@ -19,7 +20,8 @@ export type QuestWorldCommand =
   | { cmd: 'world_quest_puzzle_reset'; quest: string }
   | { cmd: 'world_quest_glider_boost' }
   | { cmd: 'world_quest_accuse'; npcId: number }
-  | { cmd: 'world_quest_shadow'; action: 'pickpocket' | 'leave'; targetId?: number };
+  | { cmd: 'world_quest_shadow'; action: 'pickpocket' | 'leave'; targetId?: number }
+  | { cmd: 'world_quest_start'; quest: string; difficulty: WorldQuestDifficulty };
 
 /** Cold owner mirrors shared by quest snapshots and world-boss map state. */
 export class QuestWorldWireState {
@@ -84,6 +86,10 @@ export class QuestWorldWireState {
       action,
       ...(targetId === undefined ? {} : { targetId }),
     });
+  }
+
+  startWorldQuestActivity(questId: string, difficulty: WorldQuestDifficulty): void {
+    this.sendQuestWorldCommand({ cmd: 'world_quest_start', quest: questId, difficulty });
   }
 
   worldBossActive(bossId: string): boolean {

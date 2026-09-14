@@ -1,4 +1,5 @@
 import type { Sim } from '../src/sim/sim';
+import { isWorldQuestDifficulty } from '../src/sim/world_quest_activity';
 
 type QuestWireMessage = Record<string, unknown>;
 
@@ -65,9 +66,36 @@ export function shadowWorldQuestWire(sim: Sim, msg: QuestWireMessage, pid: numbe
   sim.shadowWorldQuestAction(msg.action, msg.targetId as number | undefined, pid);
 }
 
+export function startWorldQuestActivityWire(sim: Sim, msg: QuestWireMessage, pid: number): void {
+  if (typeof msg.quest !== 'string' || !isWorldQuestDifficulty(msg.difficulty)) return;
+  sim.startWorldQuestActivity(msg.quest, msg.difficulty, pid);
+}
+
+/** The world-quest-only command family; game.ts routes every member here. */
+const WORLD_QUEST_WIRE_COMMANDS = [
+  'world_quest_glider_boost',
+  'world_quest_puzzle_rotate',
+  'world_quest_match3_swap',
+  'world_quest_match3_reset',
+  'world_quest_puzzle_reset',
+  'world_quest_shadow',
+  'world_quest_accuse',
+  'world_quest_start',
+] as const;
+export type WorldQuestWireCommand = (typeof WORLD_QUEST_WIRE_COMMANDS)[number];
+const WORLD_QUEST_WIRE_COMMAND_SET: ReadonlySet<unknown> = new Set(WORLD_QUEST_WIRE_COMMANDS);
+
+/** Type predicate so the server's exhaustive command switch narrows past the family. */
+export function isWorldQuestWireCommand(cmd: unknown): cmd is WorldQuestWireCommand {
+  return WORLD_QUEST_WIRE_COMMAND_SET.has(cmd);
+}
+
 /** Route the world-quest-only command family outside the server monolith. */
 export function dispatchWorldQuestWire(sim: Sim, msg: QuestWireMessage, pid: number): void {
   switch (msg.cmd) {
+    case 'world_quest_start':
+      startWorldQuestActivityWire(sim, msg, pid);
+      break;
     case 'world_quest_glider_boost':
       sim.boostWorldQuestGlider(pid);
       break;

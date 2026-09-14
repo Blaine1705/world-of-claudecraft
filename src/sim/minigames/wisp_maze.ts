@@ -203,7 +203,9 @@ export function createWispMazeKernel(definition: WispMazeDefinition) {
 
   function createWispMaze(seed: number, difficulty: WispMazeDifficulty = 'easy'): WispMazeState {
     const spawn = wispMazeCellCenter(WISP_MAZE_SPAWN_CELL);
-    const kinds: WispMazeEnemyKind[] = ['chaser', 'ambusher', 'patroller', 'wanderer'];
+    // The fifth shadow (hard only) is a second chaser: the profile's pressure comes
+    // from pursuit, not from another wanderer.
+    const kinds: WispMazeEnemyKind[] = ['chaser', 'ambusher', 'patroller', 'wanderer', 'chaser'];
     return {
       phase: 'countdown',
       tick: 0,

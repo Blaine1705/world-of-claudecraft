@@ -316,6 +316,8 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.powered",
     "questUi.worldQuest.wispMaze.ready",
     "questUi.worldQuest.wispMaze.retry",
+    "questUi.worldQuest.wispMaze.startHard",
+    "questUi.worldQuest.wispMaze.startNormal",
     "questUi.worldQuest.wispMaze.title"
   ],
   "es_ES": [
@@ -625,6 +627,8 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.powered",
     "questUi.worldQuest.wispMaze.ready",
     "questUi.worldQuest.wispMaze.retry",
+    "questUi.worldQuest.wispMaze.startHard",
+    "questUi.worldQuest.wispMaze.startNormal",
     "questUi.worldQuest.wispMaze.title"
   ],
   "fr_FR": [
@@ -985,6 +989,8 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.powered",
     "questUi.worldQuest.wispMaze.ready",
     "questUi.worldQuest.wispMaze.retry",
+    "questUi.worldQuest.wispMaze.startHard",
+    "questUi.worldQuest.wispMaze.startNormal",
     "questUi.worldQuest.wispMaze.title"
   ],
   "fr_CA": [
@@ -1345,6 +1351,8 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.powered",
     "questUi.worldQuest.wispMaze.ready",
     "questUi.worldQuest.wispMaze.retry",
+    "questUi.worldQuest.wispMaze.startHard",
+    "questUi.worldQuest.wispMaze.startNormal",
     "questUi.worldQuest.wispMaze.title"
   ],
   "en_CA": [],
@@ -1706,6 +1714,8 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.powered",
     "questUi.worldQuest.wispMaze.ready",
     "questUi.worldQuest.wispMaze.retry",
+    "questUi.worldQuest.wispMaze.startHard",
+    "questUi.worldQuest.wispMaze.startNormal",
     "questUi.worldQuest.wispMaze.title"
   ],
   "de_DE": [
@@ -2066,6 +2076,8 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.powered",
     "questUi.worldQuest.wispMaze.ready",
     "questUi.worldQuest.wispMaze.retry",
+    "questUi.worldQuest.wispMaze.startHard",
+    "questUi.worldQuest.wispMaze.startNormal",
     "questUi.worldQuest.wispMaze.title"
   ],
   "zh_CN": [
@@ -2304,6 +2316,8 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.powered",
     "questUi.worldQuest.wispMaze.ready",
     "questUi.worldQuest.wispMaze.retry",
+    "questUi.worldQuest.wispMaze.startHard",
+    "questUi.worldQuest.wispMaze.startNormal",
     "questUi.worldQuest.wispMaze.title"
   ],
   "zh_TW": [
@@ -2542,6 +2556,8 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.powered",
     "questUi.worldQuest.wispMaze.ready",
     "questUi.worldQuest.wispMaze.retry",
+    "questUi.worldQuest.wispMaze.startHard",
+    "questUi.worldQuest.wispMaze.startNormal",
     "questUi.worldQuest.wispMaze.title"
   ],
   "ko_KR": [
@@ -2780,6 +2796,8 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.powered",
     "questUi.worldQuest.wispMaze.ready",
     "questUi.worldQuest.wispMaze.retry",
+    "questUi.worldQuest.wispMaze.startHard",
+    "questUi.worldQuest.wispMaze.startNormal",
     "questUi.worldQuest.wispMaze.title"
   ],
   "ja_JP": [
@@ -3018,6 +3036,8 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.powered",
     "questUi.worldQuest.wispMaze.ready",
     "questUi.worldQuest.wispMaze.retry",
+    "questUi.worldQuest.wispMaze.startHard",
+    "questUi.worldQuest.wispMaze.startNormal",
     "questUi.worldQuest.wispMaze.title"
   ],
   "pt_BR": [
@@ -3378,6 +3398,8 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.powered",
     "questUi.worldQuest.wispMaze.ready",
     "questUi.worldQuest.wispMaze.retry",
+    "questUi.worldQuest.wispMaze.startHard",
+    "questUi.worldQuest.wispMaze.startNormal",
     "questUi.worldQuest.wispMaze.title"
   ],
   "ru_RU": [
@@ -3616,6 +3638,8 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.powered",
     "questUi.worldQuest.wispMaze.ready",
     "questUi.worldQuest.wispMaze.retry",
+    "questUi.worldQuest.wispMaze.startHard",
+    "questUi.worldQuest.wispMaze.startNormal",
     "questUi.worldQuest.wispMaze.title"
   ],
   "cs_CZ": [
@@ -3976,6 +4000,8 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.powered",
     "questUi.worldQuest.wispMaze.ready",
     "questUi.worldQuest.wispMaze.retry",
+    "questUi.worldQuest.wispMaze.startHard",
+    "questUi.worldQuest.wispMaze.startNormal",
     "questUi.worldQuest.wispMaze.title"
   ],
   "nl_NL": [
@@ -4336,6 +4362,8 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.powered",
     "questUi.worldQuest.wispMaze.ready",
     "questUi.worldQuest.wispMaze.retry",
+    "questUi.worldQuest.wispMaze.startHard",
+    "questUi.worldQuest.wispMaze.startNormal",
     "questUi.worldQuest.wispMaze.title"
   ],
   "pl_PL": [
@@ -4696,6 +4724,8 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.powered",
     "questUi.worldQuest.wispMaze.ready",
     "questUi.worldQuest.wispMaze.retry",
+    "questUi.worldQuest.wispMaze.startHard",
+    "questUi.worldQuest.wispMaze.startNormal",
     "questUi.worldQuest.wispMaze.title"
   ],
   "id_ID": [
@@ -5056,6 +5086,8 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.powered",
     "questUi.worldQuest.wispMaze.ready",
     "questUi.worldQuest.wispMaze.retry",
+    "questUi.worldQuest.wispMaze.startHard",
+    "questUi.worldQuest.wispMaze.startNormal",
     "questUi.worldQuest.wispMaze.title"
   ],
   "tr_TR": [
@@ -5416,6 +5448,8 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.powered",
     "questUi.worldQuest.wispMaze.ready",
     "questUi.worldQuest.wispMaze.retry",
+    "questUi.worldQuest.wispMaze.startHard",
+    "questUi.worldQuest.wispMaze.startNormal",
     "questUi.worldQuest.wispMaze.title"
   ],
   "sv_SE": [
@@ -5776,6 +5810,8 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.powered",
     "questUi.worldQuest.wispMaze.ready",
     "questUi.worldQuest.wispMaze.retry",
+    "questUi.worldQuest.wispMaze.startHard",
+    "questUi.worldQuest.wispMaze.startNormal",
     "questUi.worldQuest.wispMaze.title"
   ],
   "vi_VN": [
@@ -6136,6 +6172,8 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.powered",
     "questUi.worldQuest.wispMaze.ready",
     "questUi.worldQuest.wispMaze.retry",
+    "questUi.worldQuest.wispMaze.startHard",
+    "questUi.worldQuest.wispMaze.startNormal",
     "questUi.worldQuest.wispMaze.title"
   ],
   "da_DK": [
@@ -6496,6 +6534,8 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.powered",
     "questUi.worldQuest.wispMaze.ready",
     "questUi.worldQuest.wispMaze.retry",
+    "questUi.worldQuest.wispMaze.startHard",
+    "questUi.worldQuest.wispMaze.startNormal",
     "questUi.worldQuest.wispMaze.title"
   ]
 };

@@ -1,12 +1,18 @@
 // Pure presentation model for World Quest instructors and escort starters.
 // Resolves dialogue briefings and explicit start options for QuestDialogController.
 
+import { WISP_MAZE_PROFILES } from '../sim/content/wisp_maze_layouts';
 import { GLIDER_APPRENTICE_NPC_DEF, GLIDER_QUEST_ID } from '../sim/content/world_quest_glider';
 import { ESCORTS, NPCS, WORLD_QUESTS, WORLD_QUESTS_BY_ID } from '../sim/data';
 import type { Entity } from '../sim/types';
+import {
+  WORLD_QUEST_DIFFICULTIES,
+  type WorldQuestDifficulty,
+  worldQuestOffersDifficulty,
+} from '../sim/world_quest_activity';
 import type { IWorld } from '../world_api';
 import { tEntity } from './entity_i18n';
-import { t } from './i18n';
+import { formatNumber, t } from './i18n';
 import { worldQuestDisplayName, worldQuestObjectiveLabel } from './world_quest_view';
 
 export interface WorldQuestInstructorDialogView {
@@ -20,6 +26,27 @@ export interface WorldQuestInstructorDialogView {
   completed: boolean;
   buttonLabel: string;
   hint?: string;
+  /** Present when the activity offers a difficulty pick: one start button per
+   *  entry replaces the single start button. Order is the display order. */
+  difficulties?: readonly { difficulty: WorldQuestDifficulty; label: string }[];
+  questId?: string;
+}
+
+function difficultyChoices(
+  questId: string,
+): WorldQuestInstructorDialogView['difficulties'] | undefined {
+  if (!worldQuestOffersDifficulty(questId)) return undefined;
+  return WORLD_QUEST_DIFFICULTIES.map((difficulty) => ({
+    difficulty,
+    label: t(
+      difficulty === 'hard'
+        ? 'questUi.worldQuest.wispMaze.startHard'
+        : 'questUi.worldQuest.wispMaze.startNormal',
+      {
+        shadows: formatNumber(WISP_MAZE_PROFILES[difficulty].enemyCount),
+      },
+    ),
+  }));
 }
 
 function instructorQuestId(templateId: string): string | null {
@@ -120,6 +147,7 @@ export function worldQuestInstructorDialog(
     }
   }
 
+  const difficulties = canStart ? difficultyChoices(questId) : undefined;
   return {
     speakerName,
     speakerTitle,
@@ -131,5 +159,7 @@ export function worldQuestInstructorDialog(
     completed,
     buttonLabel,
     hint,
+    questId,
+    ...(difficulties ? { difficulties } : {}),
   };
 }

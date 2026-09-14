@@ -37,7 +37,7 @@ it('projects live collection, lives and power using authoritative ticks and reus
   s.tick = 160;
   view.tick(p);
   expect(first.powerPercent).toBe(0);
-  expect(first.cue).toBe('Collect wisps. Avoid shadows.');
+  expect(first.cue).toBe('Pick up the coin purses. Avoid shadows.');
   s.paused = true;
   expect(view.tick(p).active).toBe(false);
   expect(view.tick(p).visible).toBe(false);
@@ -70,7 +70,7 @@ it('deduplicates pickups, ten-wisp milestones, hit, banish and completion withou
   s.feedbackSerial++;
   expect(view.tick(p).sound).toBe('ui_quest_done');
   expect(view.tick(p).active).toBe(false);
-  expect(wispMazeInstructionLines(p)).toEqual(['Every wisp is safe!']);
+  expect(wispMazeInstructionLines(p)).toEqual(['Every coin purse is recovered!']);
   s.tick = 0;
   s.phase = 'countdown';
   s.feedbackSerial = 0;

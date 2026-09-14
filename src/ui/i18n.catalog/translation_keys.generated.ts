@@ -12300,6 +12300,8 @@ export type TranslationKeyFlat =
   | 'questUi.worldQuest.wispMaze.powered'
   | 'questUi.worldQuest.wispMaze.ready'
   | 'questUi.worldQuest.wispMaze.retry'
+  | 'questUi.worldQuest.wispMaze.startHard'
+  | 'questUi.worldQuest.wispMaze.startNormal'
   | 'questUi.worldQuest.wispMaze.title'
   | 'realm.characterCountOne'
   | 'realm.characterCountOther'

@@ -790,7 +790,22 @@ export class QuestDialogController {
       html += `<div class="qd-req">${esc(view.hint)}</div>`;
     }
     this.deps.element.innerHTML = html;
-    if (view.canStart) {
+    if (view.canStart && view.difficulties && view.questId) {
+      // One button per profile; the pick travels as its own command so the
+      // server starts the kernel with that profile after its own revalidation.
+      const questId = view.questId;
+      for (const choice of view.difficulties) {
+        const button = this.makeButton(choice.label);
+        button.dataset.startWq = String(npc.id);
+        button.dataset.difficulty = choice.difficulty;
+        button.addEventListener('click', () => {
+          this.close();
+          this.deps.world().targetEntity(npc.id);
+          this.deps.world().startWorldQuestActivity(questId, choice.difficulty);
+        });
+        this.deps.element.appendChild(button);
+      }
+    } else if (view.canStart) {
       const button = this.makeButton(view.buttonLabel);
       button.dataset.startWq = String(npc.id);
       button.addEventListener('click', () => {

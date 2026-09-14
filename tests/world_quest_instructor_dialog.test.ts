@@ -79,6 +79,33 @@ describe('worldQuestInstructorDialog presentation', () => {
     expect(worldQuestInstructorDialog(world, keeper)?.canStart).toBe(true);
   });
 
+  it('offers the maze keeper a Normal and a Hard entry and nobody else a choice', () => {
+    const progress: WorldQuestProgress = {
+      questId: 'wq_evergarden_wisp_maze',
+      count: 0,
+      state: 'active',
+    };
+    const world = makeWorld([[progress.questId, progress]]);
+    const keeper = { id: 7, kind: 'npc', templateId: 'wisp_maze_keeper' } as Entity;
+    const view = worldQuestInstructorDialog(world, keeper);
+    expect(view?.questId).toBe('wq_evergarden_wisp_maze');
+    expect(view?.difficulties?.map((choice) => choice.difficulty)).toEqual(['normal', 'hard']);
+    expect(view?.difficulties?.map((choice) => choice.label)).toEqual([
+      'Enter the maze: Normal (3 shadows)',
+      'Enter the maze: Hard (5 shadows, bonus purse)',
+    ]);
+    progress.state = 'completed';
+    expect(worldQuestInstructorDialog(world, keeper)?.difficulties).toBeUndefined();
+    const elian = { id: 8, kind: 'npc', templateId: 'calligraphy_instructor' } as Entity;
+    const elianWorld = makeWorld([
+      [
+        'wq_eastbrook_calligraphy',
+        { questId: 'wq_eastbrook_calligraphy', count: 0, state: 'active' },
+      ],
+    ]);
+    expect(worldQuestInstructorDialog(elianWorld, elian)?.difficulties).toBeUndefined();
+  });
+
   it('provides dialogue briefing and start button for calligraphy instructor Elian', () => {
     const world = makeWorld([
       [
