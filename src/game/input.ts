@@ -294,6 +294,8 @@ export class Input {
   // Swim-down held by an on-screen/controller control (the keyboard path is the
   // 'dive' held action). Not latched like the jump tap: descending is a hold.
   private touchDive = false;
+  // Flight bar Climb/Dive hold (+1 / -1); 0 hands pitch back to the camera.
+  private gliderPitchHold: -1 | 0 | 1 = 0;
   // Latched sides of the camera-steer bands (see readSwimSteer): which one the
   // view is currently inside, so the threshold can hysteresis rather than
   // chatter when the camera rests on it.
@@ -678,6 +680,12 @@ export class Input {
   setTouchDive(on: boolean): void {
     if (this.touchDive !== on) this.noteMovementIntent();
     this.touchDive = on;
+  }
+
+  /** Flight bar Climb (+1) / Dive (-1) hold; 0 releases. Read only while gliding. */
+  setGliderPitchHold(value: -1 | 0 | 1): void {
+    if (this.gliderPitchHold !== value) this.noteMovementIntent();
+    this.gliderPitchHold = value;
   }
 
   // Touch-reachable autorun toggle (the keyboard path is the 'autorun' edge action).
@@ -1647,11 +1655,16 @@ export class Input {
     const { dive, surface, swimSteer } = flying
       ? { dive: this.heldAction('dive') || this.touchDive, surface: false, swimSteer: 0 }
       : this.readSwimSteer(this.anyMoveHeld());
-    const gliderPitch = gliderPitchFromCamera(
-      this.camPitch,
-      flying,
-      !this.gliderLookSuspended && (this.isMouselookActive() || this.mouseCameraEnabled),
-    );
+    // A held Climb/Dive slot on the flight bar (mouse or touch) overrides the
+    // camera-derived pitch for as long as it is held; released, the camera rules.
+    const gliderPitch =
+      flying && this.gliderPitchHold !== 0
+        ? this.gliderPitchHold
+        : gliderPitchFromCamera(
+            this.camPitch,
+            flying,
+            !this.gliderLookSuspended && (this.isMouselookActive() || this.mouseCameraEnabled),
+          );
 
     if (this.mouseCameraEnabled) {
       return {

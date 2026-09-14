@@ -44,6 +44,7 @@ export function gliderInstructionLines(progress: WorldQuestProgress): string[] {
     t('questUi.worldQuest.glider.flying', {
       rings: number(session.passedRings.length),
       total: number(GLIDER_COURSE_RINGS.length),
+      time: formatNumber(session.tick / TICK_RATE, { maximumFractionDigits: 1 }),
       speed: number(session.speed),
     }),
     session.passedRings.length === GLIDER_COURSE_RINGS.length

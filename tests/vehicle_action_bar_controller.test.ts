@@ -5,7 +5,10 @@ import { createCannonEncounter } from '../src/sim/minigames/cannon_encounter';
 import { applyGliderBoost } from '../src/sim/minigames/glider_boost';
 import { createGliderFlightState } from '../src/sim/minigames/glider_flight';
 import type { VehicleSession, WorldQuestProgress } from '../src/sim/types';
-import { VehicleActionBarController } from '../src/ui/hud/vehicle/vehicle_action_bar_controller';
+import {
+  GLIDER_PITCH_TAP_MS,
+  VehicleActionBarController,
+} from '../src/ui/hud/vehicle/vehicle_action_bar_controller';
 import { makeWriterFacet } from '../src/ui/painter_host';
 
 vi.mock('../src/ui/icons', () => ({ iconDataUrl: (_kind: string, key: string) => `/${key}.webp` }));
@@ -40,6 +43,7 @@ it('uses slot 1 for flight boost only, shows cooldown and restores the bar after
     }),
   };
   const writes = vi.fn();
+  const pitchHold = vi.fn();
   const bar = new VehicleActionBarController({
     world,
     writers: makeWriterFacet(new Map(), new Map(), new Map(), new Map(), writes, () => {}),
@@ -47,11 +51,17 @@ it('uses slot 1 for flight boost only, shows cooldown and restores the bar after
     consumePeek: () => false,
     cancelOnEnter: [],
     attachTooltip: () => {},
+    gliderPitchHold: pitchHold,
   });
   bar.update();
   const buttons = [...document.querySelectorAll<HTMLButtonElement>('.vehicle-action')];
   expect(buttons[0].getAttribute('aria-disabled')).toBe('true');
-  expect(buttons[1].style.display).toBe('none');
+  // Flight keeps Climb (slot 2) and Dive (slot 3) on the bar, disabled until airborne.
+  expect(buttons[1].style.display).toBe('');
+  expect(buttons[2].style.display).toBe('');
+  expect(buttons[1].getAttribute('aria-disabled')).toBe('true');
+  bar.chooseSlot(1);
+  expect(pitchHold).not.toHaveBeenCalled();
   expect(
     document.getElementById('vehicle-action-bar')!.classList.contains('glider-action-bar'),
   ).toBe(true);
@@ -69,9 +79,30 @@ it('uses slot 1 for flight boost only, shows cooldown and restores the bar after
   bar.update();
   expect(buttons[0].querySelector('.cdtext')!.textContent).toBe('10');
   bar.chooseSlot(0);
-  bar.chooseSlot(1);
   expect(world.boostWorldQuestGlider).toHaveBeenCalledTimes(1);
   expect(world.useVehicleAction).not.toHaveBeenCalled();
+  // A tap on Climb nudges the pitch and lets go on its own; a hold pins it until
+  // the pointer releases; Dive mirrors it with -1.
+  vi.useFakeTimers();
+  try {
+    expect(buttons[1].getAttribute('aria-disabled')).toBe('false');
+    bar.chooseSlot(1);
+    expect(pitchHold).toHaveBeenLastCalledWith(1);
+    expect(bar.heldGliderPitch).toBe(1);
+    vi.advanceTimersByTime(GLIDER_PITCH_TAP_MS + 1);
+    expect(pitchHold).toHaveBeenLastCalledWith(0);
+    expect(bar.heldGliderPitch).toBe(0);
+    buttons[2].dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    expect(bar.heldGliderPitch).toBe(-1);
+    vi.advanceTimersByTime(GLIDER_PITCH_TAP_MS * 4);
+    expect(bar.heldGliderPitch).toBe(-1);
+    buttons[2].dispatchEvent(new PointerEvent('pointerup', { bubbles: true }));
+    expect(bar.heldGliderPitch).toBe(0);
+    expect(pitchHold).toHaveBeenLastCalledWith(0);
+    expect(world.useVehicleAction).not.toHaveBeenCalled();
+  } finally {
+    vi.useRealTimers();
+  }
   writes.mockClear();
   bar.update();
   expect(writes).not.toHaveBeenCalled();

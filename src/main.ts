@@ -3083,6 +3083,7 @@ async function startGame(
   // the options menu drives logout + key-capture + settings, all of which need
   // refs that only exist now (input/renderer) or are page-level (reload)
   hud.attachOptions({
+    gliderPitchHold: (value) => input.setGliderPitchHold(value),
     logout: () => {
       // Signal the server to leave immediately, skipping the linkdead grace, so
       // the character is not held in-world after a deliberate logout.

@@ -50,15 +50,18 @@ it('shows progress and the next ring instruction without pointing to a missed ri
   progress.glider.phase = 'flying';
   progress.glider.passedRings = [2, 3];
   progress.glider.speed = 22;
+  progress.glider.tick = 250;
   progress.gliderResult = scoreGliderFlight(6, 6, 20);
   const lines = gliderInstructionLines(progress);
   expect(lines[0]).toBe(
     t('questUi.worldQuest.glider.flying', {
       rings: formatNumber(2),
       total: formatNumber(GLIDER_COURSE_RINGS.length),
+      time: formatNumber(12.5, { maximumFractionDigits: 1 }),
       speed: formatNumber(22),
     }),
   );
+  expect(lines[0]).toContain('12.5');
   expect(lines[1]).toBe(
     t('questUi.worldQuest.glider.nextRing', { minimum: formatNumber(GLIDER_COURSE.minRings) }),
   );

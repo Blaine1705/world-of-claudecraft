@@ -44,7 +44,15 @@ interface VehicleBarDeps {
   } & Partial<HordeProjection>;
   attachTooltip(element: HTMLElement, html: () => string): void;
   cancelOnEnter: readonly { cancel(): void }[];
+  /** Flight bar Climb/Dive slots: a held pointer pins the glider pitch (+1 climb,
+   *  -1 dive) until release; 0 hands control back to the camera. */
+  gliderPitchHold?(value: -1 | 0 | 1): void;
 }
+
+/** Flight bar slot layout: 0 boost, 1 climb, 2 dive (see glider_action_bar_view). */
+export const GLIDER_PITCH_SLOTS: Readonly<Record<number, -1 | 1>> = Object.freeze({ 1: 1, 2: -1 });
+/** A tap (click or hotkey) nudges the pitch for this long instead of latching. */
+export const GLIDER_PITCH_TAP_MS = 250;
 
 export class VehicleActionBarController {
   readonly aim: VehicleAimCore;
@@ -149,6 +157,19 @@ export class VehicleActionBarController {
       btn.addEventListener('click', () => {
         if (!deps.consumePeek()) this.chooseSlot(index);
       });
+      const pitch = GLIDER_PITCH_SLOTS[index];
+      if (pitch !== undefined) {
+        // Hold-to-pitch: pointer down pins the pitch, any release lets go. The
+        // click above still fires on release and turns into a short tap nudge,
+        // which is what a keyboard or pad press gets too.
+        btn.addEventListener('pointerdown', (event) => {
+          if (!this.gliderActive()) return;
+          event.preventDefault();
+          this.holdPitch(pitch);
+        });
+        for (const type of ['pointerup', 'pointercancel', 'pointerleave'] as const)
+          btn.addEventListener(type, () => this.holdPitch(0));
+      }
       deps.attachTooltip(btn, () =>
         this.gliderActive()
           ? esc(gliderBoostDescription())
@@ -168,11 +189,41 @@ export class VehicleActionBarController {
     document.getElementById('ui')?.append(this.root);
   }
 
+  private pitchHeld: -1 | 0 | 1 = 0;
+  private pitchTap: ReturnType<typeof setTimeout> | null = null;
+
+  private holdPitch(value: -1 | 0 | 1): void {
+    if (this.pitchTap) {
+      clearTimeout(this.pitchTap);
+      this.pitchTap = null;
+    }
+    if (this.pitchHeld === value) return;
+    this.pitchHeld = value;
+    this.deps.gliderPitchHold?.(value);
+  }
+
+  /** Test-only window into the held pitch. */
+  get heldGliderPitch(): -1 | 0 | 1 {
+    return this.pitchHeld;
+  }
+
   chooseSlot(slot: number): void {
     if (this.gliderActive()) {
       const glider = this.deps.world.worldQuestLog?.get(GLIDER_QUEST_ID)?.glider;
-      if (slot === 0 && glider?.phase === 'flying' && (glider.boostReadyTick ?? 0) <= glider.tick)
+      if (glider?.phase !== 'flying') return;
+      if (slot === 0 && (glider.boostReadyTick ?? 0) <= glider.tick)
         this.deps.world.boostWorldQuestGlider?.();
+      const pitch = GLIDER_PITCH_SLOTS[slot];
+      if (pitch !== undefined) {
+        // A tap that arrives while the pointer is still held changes nothing; a
+        // bare tap nudges the pitch and lets go on its own.
+        if (this.pitchHeld !== 0) return;
+        this.holdPitch(pitch);
+        this.pitchTap = setTimeout(() => {
+          this.pitchTap = null;
+          this.holdPitch(0);
+        }, GLIDER_PITCH_TAP_MS);
+      }
       return;
     }
     if (this.shadow && shadowControlsActive(this.deps.world as ShadowControlWorld)) {
@@ -218,14 +269,20 @@ export class VehicleActionBarController {
       writers.toggleClass(this.root, 'glider-action-bar', gliderActive);
       for (const element of [this.gauge, this.exit, this.comfort, this.hint])
         writers.setDisplay(element, gliderActive ? 'none' : '');
+      // Flight keeps three slots (boost, climb, dive); any further vehicle slot hides.
       for (let i = 1; i < this.actionButtons.length; i++)
-        writers.setDisplay(this.actionButtons[i], gliderActive ? 'none' : '');
+        writers.setDisplay(
+          this.actionButtons[i],
+          gliderActive && GLIDER_PITCH_SLOTS[i] === undefined ? 'none' : '',
+        );
+      if (!gliderActive) this.holdPitch(0);
     }
+    if (!active && this.pitchHeld !== 0) this.holdPitch(0);
     if (gliderActive) {
       const glider = this.deps.world.worldQuestLog!.get(GLIDER_QUEST_ID)!.glider!;
       writers.setText(this.title, t('questUi.worldQuest.glider.title'));
       writers.setText(this.status, t('questUi.worldQuest.glider.boost'));
-      this.painter.paint(this.gliderView.tick(glider, this.deps.keyLabel(0)));
+      this.painter.paint(this.gliderView.tick(glider, (slot) => this.deps.keyLabel(slot)));
       return;
     }
     if (!session) return;

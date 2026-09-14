@@ -15,6 +15,22 @@ export function gliderBoostDescription(): string {
   });
 }
 
+/** Slot 1 climbs, slot 2 dives: hold the button (or tap it for a nudge). */
+const PITCH_SLOTS = [
+  {
+    abilityId: 'glider_climb',
+    iconKey: 'aspect_of_the_hawk',
+    label: 'questUi.worldQuest.glider.climb',
+    tip: 'questUi.worldQuest.glider.climbTip',
+  },
+  {
+    abilityId: 'glider_dive',
+    iconKey: 'wing_clip',
+    label: 'questUi.worldQuest.glider.dive',
+    tip: 'questUi.worldQuest.glider.diveTip',
+  },
+] as const;
+
 export function createGliderActionBarView() {
   const state: ActionBarState = {
     slots: [makeSlotState(), makeSlotState(), makeSlotState()],
@@ -23,7 +39,7 @@ export function createGliderActionBarView() {
   return {
     tick(
       glider: { tick: number; phase: string; boostReadyTick?: number },
-      keyLabel: string,
+      keyLabel: (slot: number) => string,
     ): ActionBarState {
       const slot = state.slots[0];
       const remaining = Math.max(0, (glider.boostReadyTick ?? 0) - glider.tick) / TICK_RATE;
@@ -37,7 +53,21 @@ export function createGliderActionBarView() {
       slot.usable = glider.phase === 'flying' && remaining === 0;
       slot.ariaLabel = t('questUi.worldQuest.glider.boost');
       slot.ariaDescription = gliderBoostDescription();
-      slot.keybindLabel = keyLabel;
+      slot.keybindLabel = keyLabel(0);
+      for (const [offset, def] of PITCH_SLOTS.entries()) {
+        const pitch = state.slots[offset + 1];
+        pitch.kind = 'ability';
+        pitch.abilityId = def.abilityId;
+        pitch.iconKey = def.iconKey;
+        pitch.cooldownTotal = 1;
+        pitch.cooldownRemaining = 0;
+        pitch.cooldownPercent = 0;
+        pitch.cdText = '';
+        pitch.usable = glider.phase === 'flying';
+        pitch.ariaLabel = t(def.label);
+        pitch.ariaDescription = t(def.tip);
+        pitch.keybindLabel = keyLabel(offset + 1);
+      }
       return state;
     },
   };

@@ -849,6 +849,7 @@ let lpAdvancedLast = -1;
 // perf_overlay_settings.ts alongside the panel that consumes it.
 export interface OptionsHooks {
   logout(): void;
+  gliderPitchHold?(value: -1 | 0 | 1): void;
   captureKey(cb: ((code: string | null) => void) | null): void;
   settings: Settings;
   onSettingChange(key: keyof GameSettings, value: GameSettings[keyof GameSettings]): void;
@@ -1383,6 +1384,7 @@ export class Hud {
       presentation: this.renderer,
       cancelOnEnter: [this.playerGroundAim, this.empowerHold],
       attachTooltip: (element, html) => this.attachTooltip(element, html),
+      gliderPitchHold: (value) => this.optionsHooks?.gliderPitchHold?.(value),
     });
     return this.vehicleBar;
   }
@@ -18641,11 +18643,9 @@ export class Hud {
   attachOptions(hooks: OptionsHooks): void {
     this.optionsHooks = hooks;
   }
-
   refreshMapMarkerArtPalette(): void {
     this.mapMarkerArt.refreshPalette();
   }
-
   attachReporting(hooks: ReportHooks): void {
     this.reportHooks = hooks;
   }
