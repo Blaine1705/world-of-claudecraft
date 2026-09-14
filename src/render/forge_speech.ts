@@ -26,7 +26,7 @@ export function updateForgeSpeech(world: Pick<IWorld, 'worldQuestLog'>, host: Sp
     return;
   }
   const active = session.phase !== 'success';
-  const key = `${session.startedAt}:${session.phase}:${session.requestIndex}:${session.actionIndex}:${text}`;
+  const key = `${session.startedAt}:${session.phase}:${session.strikes}:${session.feedback}:${text}`;
   if (previous?.key === key) return;
   states.set(host, { key, active });
   // A required instruction cannot expire while the player is still choosing.

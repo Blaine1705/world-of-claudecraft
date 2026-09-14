@@ -5,8 +5,15 @@ import {
   FORGE_NPC_ID,
   FORGE_STATIONS,
   FORGE_QUEST_ID as ID,
+  WORLD_QUEST_FORGING,
 } from '../src/sim/content/world_quest_forging';
 import { BUILTIN_WORLD } from '../src/sim/data';
+import {
+  FORGE_HEAT_FLOOR,
+  FORGE_STRIKES,
+  forgeHeatAt,
+  forgeNeedleAt,
+} from '../src/sim/minigames/forge_workshop';
 import { Sim } from '../src/sim/sim';
 import { decodeForgeState } from '../src/sim/world_quest_forge_wire';
 import { forgeStationForEntity } from '../src/sim/world_quest_forging';
@@ -43,16 +50,27 @@ function waitReady(sim: Sim) {
   for (let tick = 0; tick < 100 && sim.time < Math.max(current.readyAt, current.lockUntil); tick++)
     sim.tick();
 }
-function clickRight(sim: Sim) {
+const ANVIL = FORGE_STATIONS.find((entry) => entry.id === 'tools')!;
+const WOODPILE = FORGE_STATIONS.find((entry) => entry.id === 'fuel')!;
+/** Tick until the sim clock puts the needle inside the band, then hammer the anvil. */
+function clickRight(sim: Sim, pid?: number) {
   waitReady(sim);
-  const current = state(sim);
-  const station = FORGE_STATIONS.find(
-    (entry) => entry.id === current.requests[current.requestIndex][current.actionIndex],
-  )!;
-  sim.pickUpObject(station.entityId);
+  const current = pid === undefined ? state(sim) : sim.meta(pid)!.worldQuestLog.get(ID)!.forging!;
+  for (let tick = 0; tick < 200; tick++) {
+    if (
+      sim.time >= current.lockUntil &&
+      forgeHeatAt(current, sim.time) >= FORGE_HEAT_FLOOR &&
+      Math.abs(forgeNeedleAt(current, sim.time) - current.band) <= current.bandHalf
+    )
+      break;
+    if (forgeHeatAt(current, sim.time) < FORGE_HEAT_FLOOR + 10 && sim.time >= current.stokeReadyAt)
+      sim.pickUpObject(WOODPILE.entityId, pid);
+    sim.tick();
+  }
+  sim.pickUpObject(ANVIL.entityId, pid);
 }
-function finish(sim: Sim) {
-  for (let action = 0; action < 13; action++) clickRight(sim);
+function finish(sim: Sim, pid?: number) {
+  for (let blow = 0; blow < FORGE_STRIKES; blow++) clickRight(sim, pid);
 }
 
 describe('personal forging world quest', () => {
@@ -74,8 +92,8 @@ describe('personal forging world quest', () => {
   });
   it('starts from natural area arrival on its offering date without developer commands', () => {
     const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', world: WORLD });
-    sim.resetDay = '2026-09-18';
-    sim.setPlayerLevel(10);
+    sim.resetDay = '2026-09-17';
+    sim.setPlayerLevel(WORLD_QUEST_FORGING.minLevel);
     sim.player.pos = sim.groundPos(FORGE_NPC_DEF.pos.x, FORGE_NPC_DEF.pos.z + 4);
     sim.player.prevPos = { ...sim.player.pos };
     sim.tick();
@@ -99,7 +117,7 @@ describe('personal forging world quest', () => {
       expect(forgeStationForEntity({ ...fixture, ...invalid })).toBeUndefined();
     }
   });
-  it('requires NPC start, completes all ten requests once, and allows practice without replaying reward', () => {
+  it('requires NPC start, lands all ten blows once, and allows practice without replaying reward', () => {
     const sim = setup();
     sim.pickUpObject(FORGE_STATIONS[0].entityId);
     expect(sim.worldQuestLog.get(ID)?.count).toBe(0);
@@ -157,7 +175,9 @@ describe('personal forging world quest', () => {
     // Mixed-release writers can drop the WQ blob but retain milestone claims.
     delete saved.worldQuests;
     const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior', world: WORLD, noPlayer: true });
-    sim.resetDay = '2026-09-18';
+    // The source armed the forge from 2026-09-06, whose nearest forge day is
+    // wq1_9 (2026-09-09): a completion claim is bound to that cycle.
+    sim.resetDay = '2026-09-09';
     const pid = sim.addPlayer('warrior', 'Restored', { state: saved });
     const player = sim.entities.get(pid)!;
     player.pos = sim.groundPos(FORGE_NPC_DEF.pos.x, FORGE_NPC_DEF.pos.z + 4);
@@ -167,19 +187,7 @@ describe('personal forging world quest', () => {
     expect(meta.worldQuestLog.get(ID)?.state).toBe('completed');
     const xp = meta.xp;
     sim.talkToNpc(FORGE_NPC_ID, pid);
-    for (let action = 0; action < 13; action++) {
-      const current = meta.worldQuestLog.get(ID)!.forging!;
-      for (
-        let tick = 0;
-        tick < 100 && sim.time < Math.max(current.readyAt, current.lockUntil);
-        tick++
-      )
-        sim.tick();
-      const station = FORGE_STATIONS.find(
-        (entry) => entry.id === current.requests[current.requestIndex][current.actionIndex],
-      )!;
-      sim.pickUpObject(station.entityId, pid);
-    }
+    finish(sim, pid);
     expect(meta.worldQuestLog.get(ID)?.forging?.phase).toBe('success');
     expect(meta.xp).toBe(xp);
   });
@@ -202,20 +210,18 @@ describe('personal forging world quest', () => {
     };
     applyQuestSelfWire(mirror, { wqday: sim.worldQuestCycle, wqlog: [encoded] });
     expect(mirror.worldQuestLog.get(ID)?.forging).toEqual(progress.forging);
-    encoded.forging!.requests[0][0] = 'tools';
-    expect(encoded.forging!.requests).not.toBe(progress.forging!.requests);
-    expect(decodeForgeState({ ...state(sim), requestIndex: 10 }, ID)).toBeUndefined();
-    const invalidRequests = state(sim).requests.map((request) => [...request]);
-    (invalidRequests[0] as string[])[0] = 'invented';
-    expect(decodeForgeState({ ...state(sim), requests: invalidRequests }, ID)).toBeUndefined();
+    expect(encoded.forging).not.toBe(progress.forging);
+    expect(decodeForgeState({ ...state(sim), strikes: FORGE_STRIKES }, ID)).toBeUndefined();
     for (const invalid of [
       { readyAt: NaN },
       { observedAt: NaN },
       { observedAt: -1 },
       { startedAt: -1 },
       { lockUntil: Infinity },
-      { actionIndex: 1 },
+      { band: 2 },
+      { heat: -1 },
       { mistakes: 0.5 },
+      { feedback: 'correct' },
       { phase: 'success' },
     ]) {
       expect(decodeForgeState({ ...state(sim), ...invalid }, ID)).toBeUndefined();
@@ -246,11 +252,13 @@ describe('personal forging world quest', () => {
     expect(other).not.toBe(state(sim));
     waitReady(sim);
     clickRight(sim);
-    expect(state(sim).requestIndex).toBe(1);
-    expect(other.requestIndex).toBe(0);
+    expect(state(sim).strikes).toBe(1);
+    expect(other.strikes).toBe(0);
     sim.player.pos = sim.groundPos(500, 1034);
-    sim.pickUpObject(FORGE_STATIONS[0].entityId);
-    expect(state(sim).requestIndex).toBe(1);
+    sim.pickUpObject(ANVIL.entityId);
+    sim.pickUpObject(WOODPILE.entityId);
+    expect(state(sim).strikes).toBe(1);
+    expect(state(sim).mistakes).toBe(0);
   });
 
   it.each([

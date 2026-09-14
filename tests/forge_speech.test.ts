@@ -24,15 +24,16 @@ it('keeps owner instructions above Mara until a step changes, then clears cancel
   expect(host.showChatBubble).toHaveBeenCalledTimes(1);
   const session = progress.forging!;
   Object.assign(session, { phase: 'working', observedAt: 103 });
-  session.requests[0] = ['fuel'];
   updateForgeSpeech(world, host);
   expect(host.showChatBubble).toHaveBeenLastCalledWith(
     FORGE_NPC_ID,
-    'Stoke the fire! Add some wood!',
+    'Watch the needle. Strike inside the dark band!',
     { offsetY: -32 },
     Infinity,
   );
+  // The clock alone (with the forge kept warm) never re-issues the same coaching line.
   session.observedAt = 1000;
+  session.heatAt = 1000;
   updateForgeSpeech(world, host);
   expect(host.showChatBubble).toHaveBeenCalledTimes(2);
   const spectator = { showChatBubble: vi.fn() };

@@ -1,37 +1,95 @@
-import { Rng } from '../rng';
-import type { ForgeStationId, WorldQuestForgeResult, WorldQuestForgeState } from '../types';
+// The forge workshop: a timing hammer and a heat gauge.
+//
+// A needle sweeps a bar back and forth; a dark band marks where the blow must
+// land. Strike (the anvil) while the needle is inside the band and the piece
+// takes shape; every good strike narrows the band and quickens the needle.
+// The forge cools the whole time: Stoke (the woodpile) throws heat back in,
+// and a blow on a forge below the heat floor is a cold strike that counts as
+// a mistake. Ten good strikes finish the piece; the medal comes from the
+// clock plus a penalty per mistake, exactly as before.
+//
+// Pure, deterministic and clock-driven: the needle and the heat are FUNCTIONS
+// of the authoritative time, so both hosts and the owner's client read the
+// same value from the same clock with no per-tick mutation. An isolated seeded
+// stream picks each band centre so workshop input never perturbs world RNG.
 
-export const FORGE_REQUEST_COUNT = 10;
+import { Rng } from '../rng';
+import type { WorldQuestForgeResult, WorldQuestForgeState } from '../types';
+
+export const FORGE_STRIKES = 10;
 export const FORGE_WRONG_PENALTY = 3;
 export const FORGE_GOLD_SECONDS = 40;
 export const FORGE_SILVER_SECONDS = 60;
 export const FORGE_CLOCK_INTERVAL = 0.2;
-const STATIONS: readonly ForgeStationId[] = ['fuel', 'metal', 'water', 'tools'];
+export const FORGE_COUNTDOWN_SECONDS = 3;
+/** Needle sweeps per second at the first strike; grows with every strike landed. */
+export const FORGE_NEEDLE_SWEEPS = 0.55;
+export const FORGE_NEEDLE_SWEEP_GROWTH = 0.07;
+/** Band half-width (0..1 of the bar) at the first strike, its shrink per strike and floor. */
+export const FORGE_BAND_HALF = 0.16;
+export const FORGE_BAND_SHRINK = 0.011;
+export const FORGE_BAND_MIN_HALF = 0.055;
+/** Heat: percent floor for a warm strike, decay per second, gain per stoke, stoke cooldown. */
+export const FORGE_HEAT_FLOOR = 70;
+export const FORGE_HEAT_DECAY = 7;
+export const FORGE_STOKE_HEAT = 30;
+export const FORGE_STOKE_COOLDOWN = 1;
+export const FORGE_STRIKE_LOCK = 0.35;
+export const FORGE_MISS_LOCK = 0.45;
 
-/** An isolated seeded stream keeps workshop input from perturbing world RNG. */
 export function createForgeWorkshop(seed: number, now: number): WorldQuestForgeState {
-  const rng = new Rng(seed);
-  let previous: ForgeStationId | undefined;
-  const requests = Array.from({ length: FORGE_REQUEST_COUNT }, (_, index) =>
-    Array.from({ length: index < 7 ? 1 : 2 }, () => {
-      const options = STATIONS.filter((station) => station !== previous);
-      const next = options[Math.floor(rng.next() * options.length)];
-      previous = next;
-      return next;
-    }),
-  );
+  const readyAt = now + FORGE_COUNTDOWN_SECONDS;
   return {
     phase: 'countdown',
     observedAt: now,
-    requests,
-    requestIndex: 0,
-    actionIndex: 0,
-    readyAt: now + 3,
-    startedAt: now + 3,
-    lockUntil: now + 3,
+    seed: seed >>> 0,
+    readyAt,
+    startedAt: readyAt,
+    strikes: 0,
+    band: forgeBandCentre(seed >>> 0, 0),
+    bandHalf: FORGE_BAND_HALF,
+    heat: 100,
+    heatAt: readyAt,
+    stokeReadyAt: readyAt,
+    lockUntil: readyAt,
     mistakes: 0,
     feedback: 'ready',
   };
+}
+
+/** Where the band sits for strike number `strike` (0-based), in [0.15, 0.85]. */
+export function forgeBandCentre(seed: number, strike: number): number {
+  const rng = new Rng((seed ^ Math.imul(strike + 1, 0x9e3779b1)) >>> 0);
+  return 0.15 + rng.next() * 0.7;
+}
+
+/** The needle's position on the bar (0..1) at authoritative time `now`. */
+export function forgeNeedleAt(
+  state: Pick<WorldQuestForgeState, 'startedAt' | 'strikes'>,
+  now: number,
+): number {
+  const sweeps = FORGE_NEEDLE_SWEEPS * (1 + FORGE_NEEDLE_SWEEP_GROWTH * state.strikes);
+  const phase = Math.max(0, now - state.startedAt) * sweeps;
+  const cycle = phase - Math.floor(phase / 2) * 2;
+  return cycle <= 1 ? cycle : 2 - cycle;
+}
+
+/** The forge heat (0..100) at authoritative time `now`, decaying since the last sample. */
+export function forgeHeatAt(
+  state: Pick<WorldQuestForgeState, 'heat' | 'heatAt'>,
+  now: number,
+): number {
+  return Math.max(
+    0,
+    Math.min(100, state.heat - FORGE_HEAT_DECAY * Math.max(0, now - state.heatAt)),
+  );
+}
+
+export function forgeNeedleInBand(
+  state: Pick<WorldQuestForgeState, 'band' | 'bandHalf'>,
+  needle: number,
+): boolean {
+  return Math.abs(needle - state.band) <= state.bandHalf;
 }
 
 export function forgeResult(elapsed: number, mistakes: number): WorldQuestForgeResult {
@@ -49,6 +107,7 @@ export function forgeResult(elapsed: number, mistakes: number): WorldQuestForgeR
   };
 }
 
+/** Clock publication at a bounded cadence; returns true when the owner readout changed. */
 export function advanceForgeWorkshop(state: WorldQuestForgeState, now: number): boolean {
   if (state.phase === 'success') return false;
   const becameReady = state.observedAt < state.readyAt && now >= state.readyAt;
@@ -60,34 +119,48 @@ export function advanceForgeWorkshop(state: WorldQuestForgeState, now: number): 
   return true;
 }
 
-/** Returns true only on accepted input. Clicks during transitions do nothing. */
-export function clickForgeWorkshop(
-  state: WorldQuestForgeState,
-  station: ForgeStationId,
-  now: number,
-): boolean {
+function working(state: WorldQuestForgeState, now: number): boolean {
   if (state.phase === 'countdown' && now >= state.readyAt) state.phase = 'working';
-  if (state.phase !== 'working' || now < state.readyAt || now < state.lockUntil) return false;
+  return state.phase === 'working' && now >= state.readyAt;
+}
+
+/** The anvil: returns true only on accepted input (a blow, hit or miss). */
+export function strikeForge(state: WorldQuestForgeState, now: number): boolean {
+  if (!working(state, now) || now < state.lockUntil) return false;
   state.observedAt = now;
-  const request = state.requests[state.requestIndex];
-  if (request[state.actionIndex] !== station) {
+  if (forgeHeatAt(state, now) < FORGE_HEAT_FLOOR) {
     state.mistakes++;
-    state.feedback = 'wrong';
-    state.lockUntil = now + 0.45;
+    state.feedback = 'cold';
+    state.lockUntil = now + FORGE_MISS_LOCK;
     return true;
   }
-  state.feedback = 'correct';
-  state.lockUntil = now + 0.2;
-  state.actionIndex++;
-  if (state.actionIndex < request.length) return true;
-  state.requestIndex++;
-  state.actionIndex = 0;
-  if (state.requestIndex === FORGE_REQUEST_COUNT) {
+  if (!forgeNeedleInBand(state, forgeNeedleAt(state, now))) {
+    state.mistakes++;
+    state.feedback = 'miss';
+    state.lockUntil = now + FORGE_MISS_LOCK;
+    return true;
+  }
+  state.strikes++;
+  state.feedback = 'hit';
+  state.lockUntil = now + FORGE_STRIKE_LOCK;
+  if (state.strikes >= FORGE_STRIKES) {
     state.phase = 'success';
     state.result = forgeResult(Math.max(0, now - state.startedAt), state.mistakes);
-  } else {
-    state.readyAt = now + (state.requestIndex < 4 ? 2 : state.requestIndex < 7 ? 1.5 : 1);
+    return true;
   }
+  state.band = forgeBandCentre(state.seed, state.strikes);
+  state.bandHalf = Math.max(FORGE_BAND_MIN_HALF, state.bandHalf - FORGE_BAND_SHRINK);
+  return true;
+}
+
+/** The woodpile: returns true only when a stoke was accepted. */
+export function stokeForge(state: WorldQuestForgeState, now: number): boolean {
+  if (!working(state, now) || now < state.stokeReadyAt) return false;
+  state.observedAt = now;
+  state.heat = Math.min(100, forgeHeatAt(state, now) + FORGE_STOKE_HEAT);
+  state.heatAt = now;
+  state.stokeReadyAt = now + FORGE_STOKE_COOLDOWN;
+  state.feedback = 'stoked';
   return true;
 }
 

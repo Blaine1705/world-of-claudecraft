@@ -156,7 +156,6 @@ describe('QuestTrackerController', () => {
   it('keeps completed-quest practice visible and reads the sim clock rather than frame milliseconds', () => {
     const forging = createForgeWorkshop(42, 100);
     forging.phase = 'working';
-    forging.requests[0] = ['fuel'];
     forging.observedAt = 103;
     const rig = harness(
       [],
@@ -171,7 +170,7 @@ describe('QuestTrackerController', () => {
     );
     rig.setCollapsed(true);
     rig.controller.update(500000);
-    expect(rig.html()).toContain('Request 1/10: step 1/1');
+    expect(rig.html()).toContain('Strikes: 0/10');
     expect(rig.html()).not.toContain('Gold:');
     expect(rig.html()).not.toContain('Stoke the fire');
     expect(rig.html()).not.toContain('500000');

@@ -4248,14 +4248,22 @@ export interface WorldQuestForgeState {
   phase: 'countdown' | 'working' | 'success';
   /** Last authoritative clock sample, published at bounded cadence for both hosts. */
   observedAt: number;
-  requests: ForgeStationId[][];
-  requestIndex: number;
-  actionIndex: number;
+  /** Isolated stream for the band centres (minigames/forge_workshop.ts). */
+  seed: number;
   readyAt: number;
   startedAt: number;
+  /** Good strikes landed so far (FORGE_STRIKES finishes the piece). */
+  strikes: number;
+  /** The strike band: centre and half-width on the 0..1 bar. */
+  band: number;
+  bandHalf: number;
+  /** Heat sample (0..100) and the clock it was taken at; decays lazily from there. */
+  heat: number;
+  heatAt: number;
+  stokeReadyAt: number;
   lockUntil: number;
   mistakes: number;
-  feedback: 'ready' | 'correct' | 'wrong';
+  feedback: 'ready' | 'hit' | 'miss' | 'cold' | 'stoked';
   result?: WorldQuestForgeResult;
 }
 

@@ -252,6 +252,21 @@ const questStringsEn = {
         result: '{rating}! {seconds}s. Mistakes: {mistakes}.',
         replay: 'Speak to Mara to try again. Rewards are earned once per rotation.',
         medals: { gold: 'Gold', silver: 'Silver', bronze: 'Bronze' },
+        strike: 'Strike',
+        strikeTip:
+          'Hammer the piece. Press when the needle crosses the dark band; the band narrows and the needle quickens with every good blow. A blow outside the band, or on a cold forge, costs three seconds.',
+        stoke: 'Stoke',
+        stokeTip:
+          'Throw wood on the fire. The forge cools all the time; keep its heat above {floor} or your blows land cold.',
+        strikes: 'Strikes: {count}/{total}',
+        heat: 'Forge heat: {value} (keep above {floor})',
+        mistakes: 'Mistakes: {count}',
+        meterAria: 'Hammer timing meter',
+        hintStrike: 'Watch the needle. Strike inside the dark band!',
+        hintStoke: 'The forge is cooling! Stoke the fire before you strike.',
+        hit: 'Clean blow! The band narrows.',
+        miss: 'Missed the band! +{penalty}s.',
+        cold: 'Cold strike! Stoke the fire first. +{penalty}s.',
       },
       glider: {
         title: 'Windrider Slalom',

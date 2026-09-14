@@ -2274,6 +2274,7 @@ const UI_DOM_MODULES = [
   'src/ui/hud/vehicle/vehicle_action_bar_controller.ts',
   'src/ui/hud/vehicle/horde_action_bar_controller.ts',
   'src/ui/hud/vehicle/shadow_action_bar_controller.ts',
+  'src/ui/hud/vehicle/forge_action_bar_controller.ts',
   'src/ui/account_portal_dom.ts',
   'src/ui/appearance_customizer.ts',
   'src/ui/arena_window.ts',

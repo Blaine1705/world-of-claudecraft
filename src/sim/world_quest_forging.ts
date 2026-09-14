@@ -8,8 +8,9 @@ import {
 import { createGroundObject, createNpc } from './entity';
 import {
   advanceForgeWorkshop,
-  clickForgeWorkshop,
   createForgeWorkshop,
+  stokeForge,
+  strikeForge,
 } from './minigames/forge_workshop';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
@@ -127,7 +128,16 @@ export function respondForgeWorkshop(
   )
     return false;
   const state = progress.forging;
-  if (!state || !clickForgeWorkshop(state, station.id, ctx.time)) return false;
+  if (!state) return false;
+  // The anvil is the hammer blow, the woodpile the stoke; the ingot crate and
+  // the well stay scenery of the workshop (ordinary props, no input).
+  const accepted =
+    station.id === 'tools'
+      ? strikeForge(state, ctx.time)
+      : station.id === 'fuel'
+        ? stokeForge(state, ctx.time)
+        : false;
+  if (!accepted) return false;
   meta.wireRev++;
   if (state.phase !== 'success' || !state.result) return false;
   if (!progress.forgeResult || state.result.adjustedTime < progress.forgeResult.adjustedTime)

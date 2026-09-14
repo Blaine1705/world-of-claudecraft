@@ -142,6 +142,63 @@
     justify-content: center;
   }
 
+  /* The forge workshop bar: timing meter over a heat gauge over Strike / Stoke. */
+  .vehicle-bar.forge-action-bar {
+    grid-template-columns: 1fr;
+    width: min(440px, calc(100% - 24px));
+  }
+  .vehicle-bar.forge-action-bar > * {
+    grid-column: 1 / -1;
+  }
+  .forge-action-bar .vehicle-action-slots {
+    justify-content: center;
+  }
+  .forge-action-bar .forge-heat {
+    min-height: 18px;
+    height: 18px;
+    border-radius: 4px;
+  }
+  .forge-action-bar .forge-heat .vehicle-integrity-fill {
+    transform: scaleX(var(--vehicle-integrity));
+    transform-origin: left;
+    background: linear-gradient(90deg, #7a2d12, #f0a030);
+  }
+  .forge-meter {
+    position: relative;
+    height: 26px;
+    border: 2px ridge var(--border);
+    border-radius: 6px;
+    background: linear-gradient(90deg, #2a2320, #4a3a2a 50%, #2a2320);
+    overflow: hidden;
+  }
+  .forge-meter-band {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: calc(var(--forge-band-start, 0.4) * 100%);
+    width: calc((var(--forge-band-end, 0.6) - var(--forge-band-start, 0.4)) * 100%);
+    background: rgba(12, 8, 6, 0.85);
+    border-left: 1px solid #b07a3a;
+    border-right: 1px solid #b07a3a;
+  }
+  .forge-meter.in-band .forge-meter-band {
+    background: rgba(60, 20, 8, 0.95);
+    box-shadow: inset 0 0 8px #ffb347;
+  }
+  .forge-meter-needle {
+    position: absolute;
+    top: -2px;
+    bottom: -2px;
+    left: calc(var(--forge-needle, 0) * 100%);
+    width: 4px;
+    margin-left: -2px;
+    background: #f5e6c8;
+    box-shadow: 0 0 6px #fff3c4;
+  }
+  .forge-meter:not(.working) .forge-meter-needle {
+    opacity: 0.35;
+  }
+
   /* Horde mode keeps movement, health and an explicit exit, with no combat buttons. */
   body.playing-horde
   :is(

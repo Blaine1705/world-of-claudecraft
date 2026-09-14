@@ -1,3 +1,4 @@
+import { forgeChooseSlot, forgeControlsActive } from '../../../game/forge_controls';
 import type { GamepadKind } from '../../../game/gamepad_map';
 import { gliderControlsActive } from '../../../game/glider_controls';
 import { hordeControlsActive } from '../../../game/horde_controls';
@@ -20,6 +21,7 @@ import type { PainterHostWriters } from '../../painter_host';
 import { ActionBarPainter, type ActionBarSlotElements } from '../action_bar/action_bar_painter';
 import { CannonFeedbackCursor } from './cannon_feedback_core';
 import { cannonTacticsHint } from './cannon_tactics_view';
+import { ForgeActionBarController, type ForgeBarWorld } from './forge_action_bar_controller';
 import { createGliderActionBarView, gliderBoostDescription } from './glider_action_bar_view';
 import {
   HordeActionBarController,
@@ -33,7 +35,9 @@ import { VEHICLE_ACTION_SLOTS, VehicleAimCore } from './vehicle_aim_core';
 
 interface VehicleBarDeps {
   world: IWorldVehicles &
-    Partial<HordeHudWorld & ShadowControlWorld> & { boostWorldQuestGlider?(): void };
+    Partial<HordeHudWorld & ShadowControlWorld & ForgeBarWorld> & {
+      boostWorldQuestGlider?(): void;
+    };
   writers: PainterHostWriters;
   keyLabel(slot: number): string;
   padKind?(): GamepadKind;
@@ -76,6 +80,7 @@ export class VehicleActionBarController {
   private mounted = false;
   private gliderMode: boolean | null = null;
   private readonly shadow: ShadowActionBarController | null;
+  private readonly forge: ForgeActionBarController | null;
   private readonly horde: HordeActionBarController | null;
 
   constructor(private readonly deps: VehicleBarDeps) {
@@ -86,6 +91,18 @@ export class VehicleActionBarController {
       deps.world.entities
         ? new ShadowActionBarController(
             deps.world as ShadowControlWorld,
+            deps.writers,
+            deps.keyLabel,
+            deps.cancelOnEnter,
+            deps.attachTooltip,
+            deps.consumePeek,
+            deps.padKind,
+          )
+        : null;
+    this.forge =
+      deps.world.worldQuestLog && deps.world.player && deps.world.pickUpObject
+        ? new ForgeActionBarController(
+            deps.world as ForgeBarWorld,
             deps.writers,
             deps.keyLabel,
             deps.cancelOnEnter,
@@ -231,6 +248,10 @@ export class VehicleActionBarController {
       shadowChooseSlot(this.deps.world as ShadowControlWorld, slot);
       return;
     }
+    if (this.forge && forgeControlsActive(this.deps.world)) {
+      forgeChooseSlot(this.deps.world as ForgeBarWorld, slot);
+      return;
+    }
     if (this.deps.world.worldQuestLog && hordeControlsActive(this.deps.world as HordeHudWorld))
       return;
     const action = VEHICLE_ACTION_SLOTS[slot];
@@ -240,6 +261,7 @@ export class VehicleActionBarController {
   update(): void {
     this.horde?.update();
     this.shadow?.update();
+    this.forge?.update();
     const session = this.deps.world.vehicleSession;
     const writers = this.deps.writers;
     const gliderActive = this.gliderActive();
@@ -340,6 +362,7 @@ export class VehicleActionBarController {
       (!!worldQuestLog &&
         (gliderControlsActive({ worldQuestLog }) ||
           shadowControlsActive({ worldQuestLog }) ||
+          forgeControlsActive({ worldQuestLog }) ||
           hordeControlsActive({ worldQuestLog })))
     );
   }
