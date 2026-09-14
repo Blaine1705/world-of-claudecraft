@@ -5884,7 +5884,7 @@ export const fr_FR: EnTranslations = {
       "rewards": "Rewards",
       "alsoReceive": "You will also receive:",
       "tally": "{count} / {required}",
-      "cacheDesc": "Opens into one Normal raid piece for your class, plus {count} x {item}.",
+      "cacheDesc": "Opens into one Normal raid piece for your class (never a tier-set piece), plus {count} x {item}.",
       "dialogNote": "Only one weekly charge can be active. It {reset}",
       "accept": "Accept",
       "decline": "Decline",

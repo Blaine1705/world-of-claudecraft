@@ -26,7 +26,7 @@ const CLASSES: PlayerClass[] = [
 ];
 
 describe('the cache pool', () => {
-  it('holds only Normal epic raid gear: Nythraxis drops and the Crucible tables, no tokens or heroic copies', () => {
+  it('holds only Normal epic raid gear: Nythraxis drops and the Crucible tables, no tokens, heroic copies, or tier pieces', () => {
     const pool = emissaryCacheRaidPool();
     expect(pool.length).toBeGreaterThan(20);
     expect(new Set(pool).size).toBe(pool.length);
@@ -36,8 +36,12 @@ describe('the cache pool', () => {
       expect(def.quality, id).toBe('epic');
       expect(def.kind, id).not.toBe('tool');
       expect(def.heroicOf, id).toBeUndefined();
+      expect(def.set, id).toBeUndefined();
     }
-    expect(pool).toContain('crownforged_dreadhelm');
+    expect(pool).toContain('bonewrought_greatsword');
+    expect(pool).toContain('seal_of_the_forgewall');
+    expect(pool).not.toContain('crownforged_dreadhelm');
+    expect(pool).not.toContain('slagbreaker_helmet');
     expect(pool.some((id) => IGNIVAR_LOOT_ITEM_IDS.includes(id))).toBe(true);
     expect(pool.some((id) => id.startsWith('sigil_'))).toBe(false);
   });
@@ -51,8 +55,8 @@ describe('the cache pool', () => {
         expect(!locked || locked.includes(cls), `${cls} ${id}`).toBe(true);
       }
     }
-    expect(emissaryCachePoolForClass('shaman')).toContain('stormcallers_crown');
-    expect(emissaryCachePoolForClass('mage')).not.toContain('stormcallers_crown');
+    expect(emissaryCachePoolForClass('shaman')).toContain('stormkindled_chain');
+    expect(emissaryCachePoolForClass('mage')).not.toContain('stormkindled_chain');
   });
 });
 
