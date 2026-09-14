@@ -37,6 +37,7 @@ import {
   WISP_MAZE_HARD_BONUS,
   worldQuestBonusCopper,
 } from './world_quest_bonus';
+import { summonWorldQuestChampion, updateWorldQuestChampions } from './world_quest_champion';
 import {
   resolveWorldQuestLeyPuzzle as beamPuzzle,
   resolveWorldQuestMatch3Level as match3Level,
@@ -278,6 +279,7 @@ export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Ent
   // Shared-site machinery advances once per tick from whichever player ticks
   // first, inside or outside the site, so an abandoned rift still tears down.
   updateWorldQuestAmbush(ctx, FARSHORE_SALVAGE_AMBUSH);
+  updateWorldQuestChampions(ctx);
   const shadowProgress = meta.worldQuestLog.get(SHADOW_QUEST_ID);
   if (updateShadowEncounter(ctx, meta, player) && shadowProgress)
     creditWorldQuest(ctx, meta, WORLD_QUESTS_BY_ID[SHADOW_QUEST_ID], shadowProgress);
@@ -595,6 +597,8 @@ function creditWorldQuest(
   meta.counters.questsCompleted++;
   meta.unlockedMilestones.add(claimToken(meta.worldQuestCycle, quest.id));
   awardWorldQuest(ctx, meta, quest);
+  // A plain quest's optional encore: a champion of the site for anyone to fight.
+  summonWorldQuestChampion(ctx, quest, meta);
   if (quest.id === SHADOW_QUEST_ID) {
     clearShadowEncounter(ctx, meta);
     grantDeed(ctx, meta, 'exp_duskweave_dispatches');
