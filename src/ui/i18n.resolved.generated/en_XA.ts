@@ -4671,8 +4671,7 @@ export const en_XA: EnTranslations = {
       "rewards": "[Ŕéŵáŕðš]",
       "alsoReceive": "[Ýóú ŵíļļ áļšó ŕéçéíʋé:]",
       "tally": "[{count} / {required}]",
-      "cacheName": "[Éɱíššáŕý'š Çáçĥé]",
-      "cacheDesc": "[Çóñţáíñš {count} ẋ {item} áñð ţĥé þúŕšé áƀóʋé.]",
+      "cacheDesc": "[Óþéñš íñţó óñé Ñóŕɱáļ ŕáíð þíéçé ƒóŕ ýóúŕ çļášš, þļúš {count} ẋ {item}.]",
       "dialogNote": "[Óñļý óñé ŵééķļý çĥáŕĝé çáñ ƀé áçţíʋé. Íţ {reset}]",
       "accept": "[Áççéþţ]",
       "decline": "[Ðéçļíñé]",
@@ -14847,6 +14846,9 @@ export const en_XA: EnTranslations = {
       },
       "event_skin_token": {
         "name": "[Ɱýšţéŕíóúš Çóšɱéţíç Çáçĥé]"
+      },
+      "emissary_cache": {
+        "name": "[Éɱíššáŕý'š Çáçĥé]"
       },
       "heroic_mark": {
         "name": "[Ĥéŕóíç Ɱáŕķ]"

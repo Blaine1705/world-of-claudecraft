@@ -342,8 +342,8 @@ describe('item-art consistency accepted-art provenance', () => {
       },
       {
         path: `${evidenceDir}/final-item-art-audit-verdict.json`,
-        acceptedSha256: 'dd07d5126d8b8aaa6276d285f2f305d01bc75d0eba3564cfc45f808f741b0f72',
-        acceptedBytes: 121_943,
+        acceptedSha256: 'b0b3ad255251b4fdb6e485c6367e0099d674ebfac0465c45c7b9b0f8998c139b',
+        acceptedBytes: 122_657,
       },
     ]);
     for (const evidence of [...value.sourceEvidence, ...value.generationReports]) {
@@ -458,9 +458,9 @@ describe('item-art consistency accepted-art provenance', () => {
     expect(readme).toContain('node scripts/item_art_audit.mjs\n');
     expect(readme).toContain('node scripts/item_art_audit.mjs --refresh-verdict');
     const verdictBytes = readFileSync(path.join(repoRoot, verdictPath));
-    expect(verdictBytes.length).toBe(121_943);
+    expect(verdictBytes.length).toBe(122_657);
     expect(sha256(verdictBytes)).toBe(
-      'dd07d5126d8b8aaa6276d285f2f305d01bc75d0eba3564cfc45f808f741b0f72',
+      'b0b3ad255251b4fdb6e485c6367e0099d674ebfac0465c45c7b9b0f8998c139b',
     );
     const verdict = JSON.parse(verdictBytes.toString('utf8')) as FinalAuditVerdict;
 
@@ -470,8 +470,8 @@ describe('item-art consistency accepted-art provenance', () => {
       baselineCommit: 'aee195551b5aef628eb7a72192117d7e3079818e',
       branch: 'feature/placeholder-art-completion-v036',
       shippingDirectory: 'public/ui/items',
-      itemArtFilesReviewed: 1048,
-      liveItemDefinitions: 1063,
+      itemArtFilesReviewed: 1049,
+      liveItemDefinitions: 1064,
       generatedHeroicDefinitions: 64,
       heroicDefinitionsWithOwnWebp: 48,
       heroicWeaponArtAliases: 16,
@@ -481,16 +481,16 @@ describe('item-art consistency accepted-art provenance', () => {
       manifest().targetSets.items.map((id) => `public/ui/items/${id}.webp`),
     );
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
-      1048,
+      1049,
     );
     expect(Object.keys(verdict.auditScope.groups)).toHaveLength(22);
     expect(verdict.auditScope.incrementalReviews.at(-1)).toEqual({
-      reviewedAt: '2026-09-01',
+      reviewedAt: '2026-09-14',
       branch: 'feature/world-quests',
       reviewer: 'implementation agent',
-      addedIds: ['eastbrook_freight_crate', 'eastbrook_freight_wagon'],
+      addedIds: ['emissary_cache'],
       provenance: ['public/ui/items/mapping.json'],
-      note: 'The Eastbrook freight crate and wagon icons were generated with the built-in OpenAI image generator, passed the deterministic complete item-art machine audit, and were visually reviewed at the 512px masters and every canonical 128px, 40px, 28px, 22px, grayscale, circular-crop, multiview, and identity sheet mode on 2026-09-01; all earlier item-art reviews stand unchanged.',
+      note: "The Emissary's Cache icon (the weekly emissary's reward chest, painted for this game from a user-directed prompt, normalized to the 128px woc-item-icon-v1 shipping square by scripts/convert_item_icons_webp.mjs) passed the deterministic complete item-art machine audit and was visually reviewed at the 1250px master and every canonical 128px, 40px, 28px, 22px, grayscale, circular-crop, multiview, and identity sheet mode on 2026-09-14; all earlier item-art reviews stand unchanged.",
     });
     const shippingIds = new Set(
       readdirSync(path.join(repoRoot, 'public/ui/items'))
@@ -534,17 +534,17 @@ describe('item-art consistency accepted-art provenance', () => {
     ]);
     expect(verdict.visualVerdict).toMatchObject({
       status: 'pass',
-      passCount: 1048,
+      passCount: 1049,
       watchCount: 0,
       watch: [],
       rejectCount: 0,
       reject: [],
     });
     expect(verdict.visualVerdict.summary).toMatch(
-      /^All 1048 shipping item-art files pass the visual contract\./,
+      /^All 1049 shipping item-art files pass the visual contract\./,
     );
     expect(verdict.visualVerdict.summary).toContain(
-      'the two world-quest puzzle activator icons and the Eastbrook freight crate and wagon icons generated with the built-in OpenAI image generator were implementation-agent reviewed and passed across every canonical audit mode on 2026-09-01.',
+      "the Emissary's Cache icon painted for the weekly emissary was implementation-agent reviewed and passed across every canonical audit mode on 2026-09-14.",
     );
     expect(verdict.visualVerdict.passIds).toEqual(currentIds);
     expect(verdict.nonVisualContentWatch).toEqual([
@@ -584,8 +584,8 @@ describe('item-art consistency accepted-art provenance', () => {
 
     expect(verdict.evidence.catalog).toEqual({
       path: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      sha256: '9d110ac08f4b2246f0d6b5379a007947819db2e910c7a92303e5dd1d774af54b',
-      bytes: 571_388,
+      sha256: '623f7a2712dc0155cdc56bae9cad25cb70e76bcdeb44cd0328659577c7b3379b',
+      bytes: 571_894,
     });
     expect(verdict.evidence.rendererFingerprint).toBe(
       'd80ff4868f979e1717e106c889b7d6505841caf8d4cf887776ecb60848b1b2b7',
@@ -638,7 +638,7 @@ describe('item-art consistency accepted-art provenance', () => {
       sheetSetDigest.update(`${sheet.path}\0${sheet.sha256}\0${sheet.bytes}\n`);
     }
     expect(verdict.evidence.sheetSetSha256).toBe(
-      '4231c4465d73f05d0b6c0f1b7f3fc9d466d548ac6a113eb64be3519f91eda7b5',
+      '9963e5dadbbeba29a7392c253f5d15813c000a5ed6f71b694880519c9743f6cc',
     );
     expect(sheetSetDigest.digest('hex')).toBe(verdict.evidence.sheetSetSha256);
 
@@ -648,7 +648,7 @@ describe('item-art consistency accepted-art provenance', () => {
       shippingCatalogDigest.update(`${id}\0${sha256(bytes)}\0${bytes.length}\n`);
     }
     expect(verdict.evidence.shippingCatalogSha256).toBe(
-      '6ec3101a64788d35a8894a4b091e5f728c960bc7c525dbc250df85ab30f26a8b',
+      'bb88fefe238496297946d45b0e1d3114d199481aa8b364ad9ffe59a4798396da',
     );
     expect(shippingCatalogDigest.digest('hex')).toBe(verdict.evidence.shippingCatalogSha256);
   });
@@ -758,7 +758,7 @@ describe('item-art consistency accepted-art provenance', () => {
       mapping.license,
       'no ordinary item inherits the retired CraftPix default',
     ).toBeUndefined();
-    expect(mapping.entries).toHaveLength(43);
+    expect(mapping.entries).toHaveLength(44);
     expect(mapping.entries.every(({ license }) => Boolean(license))).toBe(true);
     expect(mapping.generatedBatches).toHaveLength(26);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
@@ -782,8 +782,8 @@ describe('item-art consistency accepted-art provenance', () => {
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(1048);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1048);
+    expect(allCurrentOwnerIds).toHaveLength(1049);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1049);
     expect(batch?.provenanceRecords).toEqual([
       `${evidenceDir}/accepted-art.json`,
       `${evidenceDir}/supersession-audit.json`,
@@ -919,9 +919,9 @@ describe('item-art consistency accepted-art provenance', () => {
     for (const id of ownerIds) ownerCountById.set(id, (ownerCountById.get(id) ?? 0) + 1);
 
     const violations: string[] = [];
-    if (ownerIds.length !== 1048)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1048`);
-    if (fileIds.length !== 1048) violations.push(`shipping WebP count: ${fileIds.length} != 1048`);
+    if (ownerIds.length !== 1049)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1049`);
+    if (fileIds.length !== 1049) violations.push(`shipping WebP count: ${fileIds.length} != 1049`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

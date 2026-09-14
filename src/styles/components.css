@@ -16153,10 +16153,7 @@
   #weekly-quests-window .wk-reward-icon {
     width: clamp(44px, 4.6cqw, 72px);
     height: clamp(44px, 4.6cqw, 72px);
-    display: grid;
-    place-items: center;
-    color: #f2d998;
-    background: radial-gradient(circle at 50% 30%, #3b2564, #120b20 72%);
+    background: #120b20 center / cover no-repeat;
     border: 1px solid #c58bff;
   }
   #weekly-quests-window .wk-reward-name {

@@ -4671,8 +4671,7 @@ export const nl_NL: EnTranslations = {
       "rewards": "Rewards",
       "alsoReceive": "You will also receive:",
       "tally": "{count} / {required}",
-      "cacheName": "Emissary's Cache",
-      "cacheDesc": "Contains {count} x {item} and the purse above.",
+      "cacheDesc": "Opens into one Normal raid piece for your class, plus {count} x {item}.",
       "dialogNote": "Only one weekly charge can be active. It {reset}",
       "accept": "Accept",
       "decline": "Decline",
@@ -14847,6 +14846,9 @@ export const nl_NL: EnTranslations = {
       },
       "event_skin_token": {
         "name": "Mysterieuze Cosmetische Buidel"
+      },
+      "emissary_cache": {
+        "name": "Emissary's Cache"
       },
       "heroic_mark": {
         "name": "Heroïsch Merk"

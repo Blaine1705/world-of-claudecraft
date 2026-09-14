@@ -2,7 +2,6 @@
 // talk that opens the window, the guarded pick, credit from the three hook
 // families, the one-time purse, the weekly roll, and the save shape.
 import { describe, expect, it } from 'vitest';
-import { HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
 import {
   WEEKLY_EMISSARY_NPC_DEF,
   WEEKLY_EMISSARY_NPC_ID,
@@ -101,7 +100,7 @@ describe('the emissary', () => {
     sim.chooseWeeklyQuest('wk_dungeons');
     sim.tick();
     const copper = meta.copper;
-    const marks = sim.countItem(HEROIC_MARK_ITEM_ID);
+    const caches = sim.countItem(WEEKLY_QUEST_REWARD.cacheItemId);
     // A raid room is the raid charge, not this one.
     onDungeonClearedForWeeklyQuests(sim.ctx, 'ignivar_raid_arena', [meta]);
     expect(meta.weeklyQuest?.count).toBe(0);
@@ -120,7 +119,9 @@ describe('the emissary', () => {
       state: 'completed',
     });
     expect(meta.copper).toBe(copper + weeklyQuestRewardCopper(sim.player.level));
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID)).toBe(marks + WEEKLY_QUEST_REWARD.marks);
+    expect(sim.countItem(WEEKLY_QUEST_REWARD.cacheItemId)).toBe(
+      caches + WEEKLY_QUEST_REWARD.cacheCount,
+    );
     expect(eventsOf(sim, 'worldQuestWeeklyDone')).toMatchObject([{ questId: 'wk_dungeons' }]);
     // Done is done: no second purse, no reopening this week.
     onDungeonClearedForWeeklyQuests(sim.ctx, 'hollow_crypt', [meta]);

@@ -11,6 +11,7 @@ import {
   type WeeklyQuestKind,
 } from '../sim/content/weekly_quests';
 import { ITEMS } from '../sim/data';
+import { EMISSARY_CACHE_MARKS } from '../sim/emissary_cache';
 import type { WeeklyQuestProgress } from '../sim/types';
 import { weeklyQuestRewardCopper } from '../sim/weekly_quests';
 import { npcDisplayName, npcDisplayTitle } from './entity_display_labels';
@@ -55,6 +56,7 @@ export interface WeeklyQuestDialogView {
   goalCount: string;
   rewardMoney: string;
   rewardItem: string;
+  rewardItemIcon: string;
   rewardItemDesc: string;
   note: string;
   art: string;
@@ -140,7 +142,8 @@ export function buildWeeklyQuestDialog(
   resetText: string,
 ): WeeklyQuestDialogView {
   const mark = ITEMS[HEROIC_MARK_ITEM_ID];
-  const marks = formatNumber(WEEKLY_QUEST_REWARD.marks, { maximumFractionDigits: 0 });
+  const cache = ITEMS[WEEKLY_QUEST_REWARD.cacheItemId];
+  const marks = formatNumber(EMISSARY_CACHE_MARKS, { maximumFractionDigits: 0 });
   return {
     questId: quest.id,
     heading: t('hudChrome.weekly.dialogHeading', { category: categoryText(quest.kind) }),
@@ -151,7 +154,8 @@ export function buildWeeklyQuestDialog(
       required: formatNumber(quest.count, { maximumFractionDigits: 0 }),
     }),
     rewardMoney: formatMoney(weeklyQuestRewardCopper(level)),
-    rewardItem: t('hudChrome.weekly.cacheName'),
+    rewardItem: cache ? itemDisplayName(cache) : WEEKLY_QUEST_REWARD.cacheItemId,
+    rewardItemIcon: `ui/items/${WEEKLY_QUEST_REWARD.cacheItemId}.webp`,
     rewardItemDesc: t('hudChrome.weekly.cacheDesc', {
       count: marks,
       item: mark ? itemDisplayName(mark) : HEROIC_MARK_ITEM_ID,

@@ -893,7 +893,10 @@ export type ItemUse =
   // single source of the effect-to-item mapping; a guard derives the craftable
   // set from these defs against the R9 slot policy so no item can exist for an
   // effect the policy refuses everywhere.
-  | { type: 'toolEffect'; effectId: ToolEffectId };
+  | { type: 'toolEffect'; effectId: ToolEffectId }
+  // A container: using it hands the owner its contents and consumes one unit
+  // (src/sim/emissary_cache.ts owns the one container shipped so far).
+  | { type: 'container'; container: 'emissary_cache' };
 
 // Rarity ranks for the cosmetic skin-select event, ordered low → high. A rolled
 // rank unlocks its own tier and every tier below it (epic unlocks rare+uncommon).

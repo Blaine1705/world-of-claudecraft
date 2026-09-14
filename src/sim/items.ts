@@ -30,6 +30,7 @@ import {
 import { isRawCookingCatch } from './content/items';
 import { ITEMS, NPCS } from './data';
 import { markItemDiscovered } from './deeds';
+import { openEmissaryCache } from './emissary_cache';
 import { recalcPlayerStats } from './entity';
 import {
   canDualWield,
@@ -819,6 +820,10 @@ export function useItem(
     return;
   }
   if (p.dead) return;
+  if (def.use?.type === 'container') {
+    openEmissaryCache(ctx, meta, consumeOneUnit);
+    return;
+  }
   if (def.use?.type === 'throw') {
     throwFirebottleAtNearestHut(ctx, p, meta);
     return;

@@ -5055,6 +5055,7 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'crimson_amber_armor_plate',
   'cyan_magenta_armor_plate',
   'event_skin_token',
+  'emissary_cache',
   'forest_pink_armor_plate',
   'imperial_crimson_armor_plate',
   'imperial_gold_armor_plate',

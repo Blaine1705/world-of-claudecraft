@@ -110,11 +110,12 @@ const build = await buildItemArtAudit({
     // moves with it.
     // + the two painted world-quest puzzle activators and two Eastbrook
     // freight-delivery icons.
-    catalogCount: 1048,
+    // + the weekly emissary's cache chest.
+    catalogCount: 1049,
     // 844 + the 201 Crucible raid loot definitions (192 of them art-pending)
     // + the base's 2 Varkhul legendary definitions, + the release sync's 7
     // bank-storage painted bags, + the two developer mount reins.
-    liveItemCount: 1063,
+    liveItemCount: 1064,
     generatedHeroicDefinitions: 64,
     heroicDefinitionsWithOwnWebp: 48,
     heroicWeaponArtAliases: 16,

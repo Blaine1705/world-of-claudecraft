@@ -1627,6 +1627,7 @@ export const en = {
       crypt_ritual_circle: { name: 'Ritual Circle' },
       kings_signet: { name: "King's Signet" },
       event_skin_token: { name: 'Mysterious Cosmetic Cache' },
+      emissary_cache: { name: "Emissary's Cache" },
       heroic_mark: { name: 'Heroic Mark' },
       eastbrook_buckler: { name: 'Eastbrook Buckler' },
       eastbrook_greatsword: { name: 'Eastbrook Greatsword' },

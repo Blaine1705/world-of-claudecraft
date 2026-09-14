@@ -5,8 +5,8 @@
     "baselineCommit": "aee195551b5aef628eb7a72192117d7e3079818e",
     "branch": "feature/placeholder-art-completion-v036",
     "shippingDirectory": "public/ui/items",
-    "itemArtFilesReviewed": 1048,
-    "liveItemDefinitions": 1063,
+    "itemArtFilesReviewed": 1049,
+    "liveItemDefinitions": 1064,
     "generatedHeroicDefinitions": 64,
     "heroicDefinitionsWithOwnWebp": 48,
     "heroicWeaponArtAliases": 16,
@@ -307,7 +307,7 @@
       "mount": 13,
       "potion": 13,
       "quest": 106,
-      "tool": 60,
+      "tool": 61,
       "ui-backpack": 1,
       "weapon": 133
     },
@@ -411,6 +411,18 @@
           "public/ui/items/mapping.json"
         ],
         "note": "The Eastbrook freight crate and wagon icons were generated with the built-in OpenAI image generator, passed the deterministic complete item-art machine audit, and were visually reviewed at the 512px masters and every canonical 128px, 40px, 28px, 22px, grayscale, circular-crop, multiview, and identity sheet mode on 2026-09-01; all earlier item-art reviews stand unchanged."
+      },
+      {
+        "reviewedAt": "2026-09-14",
+        "branch": "feature/world-quests",
+        "reviewer": "implementation agent",
+        "addedIds": [
+          "emissary_cache"
+        ],
+        "provenance": [
+          "public/ui/items/mapping.json"
+        ],
+        "note": "The Emissary's Cache icon (the weekly emissary's reward chest, painted for this game from a user-directed prompt, normalized to the 128px woc-item-icon-v1 shipping square by scripts/convert_item_icons_webp.mjs) passed the deterministic complete item-art machine audit and was visually reviewed at the 1250px master and every canonical 128px, 40px, 28px, 22px, grayscale, circular-crop, multiview, and identity sheet mode on 2026-09-14; all earlier item-art reviews stand unchanged."
       }
     ]
   },
@@ -453,7 +465,7 @@
   },
   "visualVerdict": {
     "status": "pass",
-    "passCount": 1048,
+    "passCount": 1049,
     "passIds": [
       "abyssal_loop",
       "abysswrought_band",
@@ -720,6 +732,7 @@
       "emberwing_scale",
       "emberwood_staff",
       "embroidered_mantle",
+      "emissary_cache",
       "event_skin_token",
       "evergarden_bloom_clipping",
       "evergarden_statue_rubbing",
@@ -1508,7 +1521,7 @@
     "watch": [],
     "rejectCount": 0,
     "reject": [],
-    "summary": "All 1048 shipping item-art files pass the visual contract. The prior 1044 reviewed files remain unchanged; the two world-quest puzzle activator icons and the Eastbrook freight crate and wagon icons generated with the built-in OpenAI image generator were implementation-agent reviewed and passed across every canonical audit mode on 2026-09-01."
+    "summary": "All 1049 shipping item-art files pass the visual contract. The prior 1048 reviewed files remain unchanged; the Emissary's Cache icon painted for the weekly emissary was implementation-agent reviewed and passed across every canonical audit mode on 2026-09-14."
   },
   "nonVisualContentWatch": [
     {
@@ -1665,8 +1678,8 @@
   "evidence": {
     "catalog": {
       "path": "tmp/imagegen/item-art-consistency/final-audit/catalog.json",
-      "sha256": "9d110ac08f4b2246f0d6b5379a007947819db2e910c7a92303e5dd1d774af54b",
-      "bytes": 571388
+      "sha256": "623f7a2712dc0155cdc56bae9cad25cb70e76bcdeb44cd0328659577c7b3379b",
+      "bytes": 571894
     },
     "rendererFingerprint": "d80ff4868f979e1717e106c889b7d6505841caf8d4cf887776ecb60848b1b2b7",
     "sheetCount": 216,
@@ -1680,7 +1693,7 @@
       "small-multiview": 27,
       "identity": 27
     },
-    "sheetSetSha256": "4231c4465d73f05d0b6c0f1b7f3fc9d466d548ac6a113eb64be3519f91eda7b5",
+    "sheetSetSha256": "9963e5dadbbeba29a7392c253f5d15813c000a5ed6f71b694880519c9743f6cc",
     "sheets": [
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p01--128-color.png",
@@ -3156,66 +3169,66 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/tool--p01--128-color.png",
-        "sha256": "e049a3482b70164036c818991fb4f288deb20a25a4b7dd8bd61add8794db3860",
-        "bytes": 1880007,
+        "sha256": "40e66ba4ec1db0a9a8db145b0258389719fcdc61872bd24da41e6212c507e154",
+        "bytes": 1931990,
         "width": 1600,
-        "height": 1040,
+        "height": 1206,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/tool--p01--40-color.png",
-        "sha256": "86fdc8b6415090d7b039a62b0a9383198b4178e026698cbcde7efed9b587592f",
-        "bytes": 323511,
+        "sha256": "b43d4fa8ad928b01f42d35fe48c3ef8c9ae23b68fe19ead2e236571a30a8d45f",
+        "bytes": 332329,
         "width": 1600,
-        "height": 776,
+        "height": 898,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/tool--p01--28-color.png",
-        "sha256": "2530ed15ee9612bbd14077ccbe29624edcdba3e946952c6c25a00274c41be1e8",
-        "bytes": 208979,
+        "sha256": "7aa1bdc2addda2649079255ddc4babaa2bb0cc3477cd8f707d4d3a6bf4601c37",
+        "bytes": 215499,
         "width": 1600,
-        "height": 1040,
+        "height": 1206,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/tool--p01--22-color.png",
-        "sha256": "b3821468de8044dded4e0b6c6904415dc000f2dc641b6d00162ad2643ed9ff1e",
-        "bytes": 156574,
+        "sha256": "f7b517547bd242e45e4096c684b4337e2dd99757b454da46f10916bc50f74da8",
+        "bytes": 161788,
         "width": 1600,
-        "height": 1040,
+        "height": 1206,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/tool--p01--28-grayscale.png",
-        "sha256": "677780ca5f18221f6cf4c7c732dec7ced61873049c728ff7ca3724d401f5f6a9",
-        "bytes": 143427,
+        "sha256": "76378320896605fccfc46ed0796d18481b061250363129b9fe7c89e21b6d43fe",
+        "bytes": 149633,
         "width": 1600,
-        "height": 1040,
+        "height": 1206,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/tool--p01--64-circle.png",
-        "sha256": "f1098e07c6131bd730b81f046d72ea4d93e1abe65fc9d52b90613adea0e29d1d",
-        "bytes": 576421,
+        "sha256": "fc913cb87844f1b063b19e39cdf23c7b60978cba99a6a09ba5c552abf08d3694",
+        "bytes": 591449,
         "width": 1600,
-        "height": 1040,
+        "height": 1206,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/tool--p01--small-multiview.png",
-        "sha256": "820c7707eb66765a0a28ee43d91974a5bde6c4fa96a17d16f0eeaea29b924f62",
-        "bytes": 1077064,
+        "sha256": "9391bd8fc9cf03d48713790a4a953aa4d583c549158ff297d88046179402f45f",
+        "bytes": 1105214,
         "width": 1800,
-        "height": 1352,
+        "height": 1570,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/tool--p01--identity.png",
-        "sha256": "06eb887e5ebd602e2a99a70b153573f1eea05438b99307a2db7e61784f850c94",
-        "bytes": 1928385,
+        "sha256": "65ecb8d1651fe5955cc6e1d1083018a64db532769d6e03b744ad6074381e4a37",
+        "bytes": 1981619,
         "width": 1800,
-        "height": 1268,
+        "height": 1472,
         "format": "png"
       },
       {
@@ -3411,6 +3424,6 @@
         "format": "png"
       }
     ],
-    "shippingCatalogSha256": "6ec3101a64788d35a8894a4b091e5f728c960bc7c525dbc250df85ab30f26a8b"
+    "shippingCatalogSha256": "bb88fefe238496297946d45b0e1d3114d199481aa8b364ad9ffe59a4798396da"
   }
 }
