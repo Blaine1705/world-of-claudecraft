@@ -23,10 +23,14 @@ export function cannonResultText(result: CannonResult): string | null {
     result.shotsFired > 1000000 ||
     !Number.isSafeInteger(result.shotsHit) ||
     result.shotsHit < 0 ||
-    result.shotsHit > result.shotsFired
+    result.shotsHit > result.shotsFired ||
+    (result.wavesCleared !== undefined &&
+      (!Number.isSafeInteger(result.wavesCleared) ||
+        result.wavesCleared < 0 ||
+        result.wavesCleared > 1000))
   )
     return null;
-  return t('hudChrome.vehicle.result', {
+  const line = t('hudChrome.vehicle.result', {
     medal: t(
       result.medal === 'gold'
         ? 'hudChrome.vehicle.gold'
@@ -41,4 +45,8 @@ export function cannonResultText(result: CannonResult): string | null {
       style: 'percent',
     }),
   });
+  // Endless play reports the waves held after the authored three.
+  return result.wavesCleared !== undefined && result.wavesCleared > 3
+    ? `${line} ${t('hudChrome.vehicle.resultWaves', { waves: formatNumber(result.wavesCleared) })}`
+    : line;
 }

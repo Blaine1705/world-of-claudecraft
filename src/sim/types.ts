@@ -8737,6 +8737,8 @@ export interface CannonResult {
   integrity: number;
   shotsFired: number;
   shotsHit: number;
+  /** Waves held in total, endless rounds included (absent on pre-endless payloads). */
+  wavesCleared?: number;
 }
 export interface CannonShot extends CannonPoint {
   id: number;
@@ -8773,6 +8775,11 @@ export interface CannonEncounterState {
   shotsFired: number;
   shotsHit: number;
   commanderCharging: boolean;
+  /** Endless play past the authored victory (minigames/cannon_endless.ts): the
+   *  medal latched at the victory, and the running count of waves held. */
+  endless?: boolean;
+  wavesCleared?: number;
+  victoryMedal?: CannonResult['medal'];
 }
 
 export interface VehicleStationDef {

@@ -16,6 +16,13 @@ import {
 } from '../types';
 
 import {
+  cannonEndlessAtCap,
+  cannonEndlessHpScale,
+  cannonEndlessRound,
+  cannonEndlessSpeedScale,
+  cannonWaveSpawns,
+} from './cannon_endless';
+import {
   cannonFeedback,
   cannonMarchMultiplier,
   damageCannonEnemies,
@@ -141,14 +148,15 @@ function resolveImpacts(state: CannonEncounterState): void {
 }
 
 function spawnDue(state: CannonEncounterState, field: CannonField): void {
-  const wave = CANNON_WAVES[state.wave];
+  const wave = cannonWaveSpawns(state);
+  const hpScale = cannonEndlessHpScale(cannonEndlessRound(state));
   while (state.spawnCursor < wave.length) {
     const spawn = wave[state.spawnCursor];
     if (state.tick - state.waveStartTick < spawn.atTick) break;
     state.enemies.push({
       id: state.nextId++,
       kind: spawn.kind,
-      hp: CANNON_ENEMIES[spawn.kind].hp,
+      hp: Math.round(CANNON_ENEMIES[spawn.kind].hp * hpScale),
       x: field.minX + spawn.lane * (field.maxX - field.minX),
       z: field.minZ,
       slowUntilTick: 0,
@@ -175,11 +183,12 @@ export function tickCannonEncounter(state: CannonEncounterState, field: CannonFi
   spawnDue(state, field);
   // Impact before movement makes a hit on the defense line save the cannon.
   resolveImpacts(state);
+  const speedScale = cannonEndlessSpeedScale(cannonEndlessRound(state));
   for (const enemy of state.enemies) {
     if (enemy.hp <= 0) continue;
     const def = CANNON_ENEMIES[enemy.kind];
     const slow = enemy.slowUntilTick > state.tick ? CANNON_ACTIONS.grapeshot.slowMultiplier : 1;
-    enemy.z += def.speed * slow * cannonMarchMultiplier(state, enemy.kind) * DT;
+    enemy.z += def.speed * speedScale * slow * cannonMarchMultiplier(state, enemy.kind) * DT;
     if (enemy.z >= field.maxZ) {
       state.integrity = Math.max(0, state.integrity - def.breachDamage);
       state.breached++;
@@ -193,11 +202,23 @@ export function tickCannonEncounter(state: CannonEncounterState, field: CannonFi
     state.fires = [];
     return;
   }
-  if (state.spawnCursor < CANNON_WAVES[state.wave].length || state.enemies.length) return;
+  if (state.spawnCursor < cannonWaveSpawns(state).length || state.enemies.length) return;
   state.shots = [];
   state.fires = [];
+  if (state.endless) {
+    // Endless play: every held wave counts; the run ends only at the wall or the cap.
+    state.wavesCleared = (state.wavesCleared ?? CANNON_WAVES.length) + 1;
+    if (cannonEndlessAtCap(state)) {
+      state.phase = 'failed';
+      return;
+    }
+    state.phase = 'intermission';
+    state.phaseUntilTick = state.tick + CANNON_INTERMISSION_TICKS;
+    return;
+  }
   if (state.wave === CANNON_WAVES.length - 1) {
     state.phase = state.commanderKilled ? 'won' : 'failed';
+    if (state.phase === 'won') state.wavesCleared = CANNON_WAVES.length;
   } else {
     state.phase = 'intermission';
     state.phaseUntilTick = state.tick + CANNON_INTERMISSION_TICKS;

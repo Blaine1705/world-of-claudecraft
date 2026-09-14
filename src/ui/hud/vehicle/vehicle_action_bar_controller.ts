@@ -9,6 +9,7 @@ import {
 } from '../../../game/shadow_controls';
 import { CANNON_TACTICS } from '../../../sim/content/cannon_encounter';
 import { GLIDER_QUEST_ID } from '../../../sim/content/world_quest_glider';
+import { cannonEndlessRound } from '../../../sim/minigames/cannon_endless';
 import { TICK_RATE } from '../../../sim/types';
 import type { IWorldVehicles } from '../../../world_api/vehicles';
 import { vehicleStationDisplayName } from '../../entity_display_labels';
@@ -301,10 +302,15 @@ export class VehicleActionBarController {
     writers.setText(
       this.status,
       encounter.phase === 'wave'
-        ? t('hudChrome.vehicle.wave', {
-            wave: formatNumber(encounter.wave + 1),
-            total: formatNumber(3),
-          })
+        ? encounter.endless
+          ? t('hudChrome.vehicle.endlessWave', {
+              wave: formatNumber(encounter.wave + 1),
+              round: formatNumber(cannonEndlessRound(encounter)),
+            })
+          : t('hudChrome.vehicle.wave', {
+              wave: formatNumber(encounter.wave + 1),
+              total: formatNumber(3),
+            })
         : t('hudChrome.vehicle.countdown', {
             seconds: formatNumber(
               Math.ceil((encounter.phaseUntilTick - encounter.tick) / TICK_RATE),

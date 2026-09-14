@@ -125,19 +125,24 @@ export function cannonMarchMultiplier(state: CannonEncounterState, kind: string)
 
 export function cannonResult(state: CannonEncounterState): CannonResult {
   const accuracy = state.shotsFired > 0 ? state.shotsHit / state.shotsFired : 0;
+  // Endless play latches the medal earned at the authored victory: a later fall
+  // at the wall never takes it back.
   const medal =
-    state.phase !== 'won'
-      ? null
-      : state.integrity >= CANNON_TACTICS.goldIntegrity && accuracy >= CANNON_TACTICS.goldAccuracy
-        ? 'gold'
-        : state.integrity >= CANNON_TACTICS.silverIntegrity &&
-            accuracy >= CANNON_TACTICS.silverAccuracy
-          ? 'silver'
-          : 'bronze';
+    state.victoryMedal !== undefined
+      ? state.victoryMedal
+      : state.phase !== 'won'
+        ? null
+        : state.integrity >= CANNON_TACTICS.goldIntegrity && accuracy >= CANNON_TACTICS.goldAccuracy
+          ? 'gold'
+          : state.integrity >= CANNON_TACTICS.silverIntegrity &&
+              accuracy >= CANNON_TACTICS.silverAccuracy
+            ? 'silver'
+            : 'bronze';
   return {
     medal,
     integrity: state.integrity,
     shotsFired: state.shotsFired,
     shotsHit: state.shotsHit,
+    ...(state.wavesCleared === undefined ? {} : { wavesCleared: state.wavesCleared }),
   };
 }

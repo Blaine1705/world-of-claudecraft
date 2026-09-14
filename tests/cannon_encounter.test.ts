@@ -276,3 +276,61 @@ describe('private cannon encounter', () => {
     expect(winner).toEqual(terminal);
   });
 });
+
+describe('endless cannon play past the authored victory', () => {
+  it('keeps the medal, scales every round and ends only at the wall or the cap', async () => {
+    const { beginCannonEndless, CANNON_ENDLESS, cannonEndlessRound, cannonWaveSpawns } =
+      await import('../src/sim/minigames/cannon_endless');
+    const { cannonResult } = await import('../src/sim/minigames/cannon_tactics');
+    const state = createCannonEncounter();
+    state.phase = 'won';
+    state.wave = CANNON_WAVES.length - 1;
+    state.commanderKilled = true;
+    state.integrity = 96;
+    state.shotsFired = 10;
+    state.shotsHit = 9;
+    const medal = cannonResult(state).medal;
+    expect(medal).toBe('gold');
+    beginCannonEndless(state, medal, 20);
+    expect(state.endless).toBe(true);
+    expect(state.phase).toBe('intermission');
+    expect(cannonResult(state)).toMatchObject({ medal: 'gold', wavesCleared: 3 });
+    // Round one steps through the first authored pattern on a tighter cadence with more health.
+    advance(state, 20);
+    expect(state.phase).toBe('wave');
+    expect(state.wave).toBe(3);
+    expect(cannonEndlessRound(state)).toBe(1);
+    const spawns = cannonWaveSpawns(state);
+    expect(spawns.map((s) => s.kind)).toEqual(CANNON_WAVES[0].map((s) => s.kind));
+    const last = CANNON_WAVES[0][CANNON_WAVES[0].length - 1].atTick;
+    expect(spawns[spawns.length - 1].atTick).toBe(
+      Math.round(last * (1 - CANNON_ENDLESS.cadencePerRound)),
+    );
+    advance(state, 1);
+    const first = state.enemies[0];
+    expect(first.hp).toBe(
+      Math.round(CANNON_ENEMIES[first.kind].hp * (1 + CANNON_ENDLESS.hpPerRound)),
+    );
+    // Clearing a round counts it and never returns to 'won'; falling keeps the medal.
+    state.enemies = [];
+    state.spawnCursor = spawns.length;
+    advance(state, 1);
+    expect(state.phase).toBe('intermission');
+    expect(state.wavesCleared).toBe(4);
+    state.integrity = 1;
+    advance(state, CANNON_INTERMISSION_TICKS);
+    expect(state.phase).toBe('wave');
+    state.enemies = [{ id: 999, kind: 'runner', hp: 80, x: 20, z: 39.99, slowUntilTick: 0 }];
+    advance(state, 1);
+    expect(state.phase).toBe('failed');
+    expect(cannonResult(state)).toMatchObject({ medal: 'gold', wavesCleared: 4 });
+    // The cap ends a run that somehow keeps holding.
+    const capped = createCannonEncounter();
+    beginCannonEndless(capped, 'bronze', 1);
+    capped.wave = CANNON_WAVES.length - 1 + CANNON_ENDLESS.maxRounds;
+    capped.phase = 'wave';
+    capped.spawnCursor = cannonWaveSpawns(capped).length;
+    advance(capped, 1);
+    expect(capped.phase).toBe('failed');
+  });
+});

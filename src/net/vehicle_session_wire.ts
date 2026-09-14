@@ -60,10 +60,25 @@ export function decodeVehicleSession(value: unknown): VehicleSession | null {
     'recoveryUntilTick',
   ] as const;
   for (const key of numeric) if (!integer(source[key])) return null;
+  // Endless play (minigames/cannon_endless.ts) runs the wave index well past the
+  // three authored waves; the cap bounds a forged payload, not the game.
+  const endless = source.endless ?? false;
+  const wavesCleared = source.wavesCleared;
+  const victoryMedal = source.victoryMedal;
   if (
-    (source.wave as number) > 2 ||
+    (source.wave as number) > 200 ||
     (source.integrity as number) > 100 ||
     typeof source.commanderKilled !== 'boolean' ||
+    typeof endless !== 'boolean' ||
+    (wavesCleared !== undefined &&
+      (!integer(wavesCleared) ||
+        (wavesCleared as number) < 0 ||
+        (wavesCleared as number) > 1000)) ||
+    (victoryMedal !== undefined &&
+      victoryMedal !== null &&
+      victoryMedal !== 'bronze' &&
+      victoryMedal !== 'silver' &&
+      victoryMedal !== 'gold') ||
     !record(source.readyAt) ||
     !integer(source.readyAt.cannonball) ||
     !integer(source.readyAt.grapeshot) ||
@@ -218,6 +233,11 @@ export function decodeVehicleSession(value: unknown): VehicleSession | null {
       shotsFired,
       shotsHit,
       commanderCharging,
+      ...(endless ? { endless: true } : {}),
+      ...(wavesCleared === undefined ? {} : { wavesCleared: wavesCleared as number }),
+      ...(victoryMedal === undefined
+        ? {}
+        : { victoryMedal: victoryMedal as CannonEncounterState['victoryMedal'] }),
     },
   };
 }

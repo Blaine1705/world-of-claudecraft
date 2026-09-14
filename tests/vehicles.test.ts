@@ -6,7 +6,7 @@ import {
   VEHICLE_STATIONS,
 } from '../src/sim/content/vehicle_stations';
 import { Sim } from '../src/sim/sim';
-import { TICK_RATE } from '../src/sim/types';
+import { type SimEvent, TICK_RATE } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 import { worldQuestCycleOfferingQuest } from '../src/sim/world_quest_rotation';
 import { WORLD_SEED } from '../src/sim/world_seed';
@@ -142,33 +142,37 @@ describe('authoritative personal vehicles', () => {
         }
         resultEvents.push(...sim.tick().filter((e) => e.type === 'cannonResult'));
       }
-      expect(encounter.phase).toBe('won');
-      expect(encounter.wave).toBe(2);
+      // The authored victory credits the quest, then the cannon stays manned in
+      // endless play (the loop above ran until the session ended or time ran out).
+      expect(resultEvents.length).toBeGreaterThanOrEqual(1);
+      const victory = resultEvents[0] as Extract<SimEvent, { type: 'cannonResult' }>;
+      expect(victory).toMatchObject({ pid: player.id });
+      expect(victory.medal).not.toBeNull();
       expect(encounter.commanderKilled).toBe(true);
-      expect(encounter.integrity).toBeGreaterThan(0);
-      expect(encounter.tick / TICK_RATE).toBeGreaterThan(120);
-      expect(encounter.tick / TICK_RATE).toBeLessThan(240);
+      expect(encounter.endless).toBe(true);
+      expect(encounter.victoryMedal).toBe(victory.medal);
+      expect(encounter.wave).toBeGreaterThanOrEqual(2);
       expect(player.hp).toBe(health);
       expect(meta.worldQuestLog.get(station.questId)?.state).toBe('completed');
       for (const other of VEHICLE_STATIONS.filter((candidate) => candidate.id !== station.id))
         expect(meta.worldQuestLog.get(other.questId)?.state).not.toBe('completed');
       expect(sim.copper).toBe(copper + 2_500 + 175 * player.level);
-      expect(sim.vehicleSession).toBeNull();
       const awarded = sim.copper;
-      expect(resultEvents).toHaveLength(1);
-      expect(resultEvents[0]).toMatchObject({
-        pid: player.id,
-        integrity: encounter.integrity,
-        shotsFired: encounter.shotsFired,
-        shotsHit: encounter.shotsHit,
-      });
+      // Leaving during endless play ends the session with no second reward and
+      // no retry lockout; a fresh entry starts a fresh authored defense.
+      if (sim.vehicleSession) sim.leaveVehicle();
+      expect(sim.vehicleSession).toBeNull();
+      expect(meta.vehicleRetryAtTick ?? 0).toBeLessThanOrEqual(sim.ctx.tickCount);
       expect(sim.enterVehicle(station.id)).toBe(true);
+      expect(meta.vehicle!.encounter.endless ?? false).toBe(false);
       meta.vehicle!.encounter.phase = 'won';
       meta.vehicle!.encounter.commanderKilled = true;
       const repeated = sim.tick();
       expect(sim.copper).toBe(awarded);
       expect(repeated.filter((e) => e.type === 'cannonResult')).toHaveLength(1);
       expect(sim.tick().filter((e) => e.type === 'cannonResult')).toHaveLength(0);
+      expect(meta.vehicle?.encounter.endless).toBe(true);
+      sim.leaveVehicle();
     },
     60_000,
   ); // Full-world integration advances over two minutes of canonical Sim ticks.

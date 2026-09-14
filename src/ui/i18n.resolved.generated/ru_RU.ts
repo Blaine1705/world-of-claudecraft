@@ -332,6 +332,8 @@ export const ru_RU: EnTranslations = {
       "integrity": "Cannon integrity",
       "exit": "Leave cannon",
       "wave": "Wave {wave}/{total}",
+      "endlessWave": "Endless wave {wave} (round {round})",
+      "resultWaves": "Waves held: {waves}.",
       "enemies": "Enemies remaining: {count}",
       "countdown": "Prepare: {seconds}",
       "hint": "Choose a shot, then click the ground to fire.",

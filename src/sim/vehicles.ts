@@ -2,11 +2,13 @@
 import { VEHICLE_STATIONS } from './content/vehicle_stations';
 import { createGroundObject } from './entity';
 import {
+  CANNON_INTERMISSION_TICKS,
   CANNON_RETRY_TICKS,
   createCannonEncounter,
   fireCannon,
   tickCannonEncounter,
 } from './minigames/cannon_encounter';
+import { beginCannonEndless } from './minigames/cannon_endless';
 import { cannonResult } from './minigames/cannon_tactics';
 import { forceDismount } from './mounts';
 import type { PlayerMeta } from './sim';
@@ -157,13 +159,23 @@ export function tickVehicle(ctx: SimContext, meta: PlayerMeta, player: Entity): 
   }
   tickCannonEncounter(session.encounter, station.field);
   if (session.encounter.phase === 'won') {
+    // The authored victory: quest credit, result and medal exactly as before,
+    // then the defender keeps the line in endless play until they leave or fall.
     completeWorldQuestVehicle(ctx, meta, session.stationId);
-    ctx.emit({ type: 'cannonResult', pid: meta.entityId, ...cannonResult(session.encounter) });
-    leaveVehicle(ctx, meta.entityId);
+    const result = cannonResult(session.encounter);
+    ctx.emit({ type: 'cannonResult', pid: meta.entityId, ...result });
+    beginCannonEndless(session.encounter, result.medal, CANNON_INTERMISSION_TICKS);
+    ctx.emit({
+      type: 'log',
+      pid: meta.entityId,
+      text: 'The line holds! Endless waves begin: each one comes harder. Leave the cannon whenever you like.',
+      color: '#f7b955',
+    });
   } else if (session.encounter.phase === 'failed') {
     ctx.emit({ type: 'cannonResult', pid: meta.entityId, ...cannonResult(session.encounter) });
     // The encounter's local clock freezes at failure; retry uses the live Sim clock.
-    meta.vehicleRetryAtTick = ctx.tickCount + CANNON_RETRY_TICKS;
+    // A fall in endless play is not a failed defense: no retry lockout.
+    if (!session.encounter.endless) meta.vehicleRetryAtTick = ctx.tickCount + CANNON_RETRY_TICKS;
     leaveVehicle(ctx, meta.entityId);
   }
 }

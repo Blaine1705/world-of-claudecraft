@@ -332,6 +332,8 @@ export const en_XA: EnTranslations = {
       "integrity": "[Çáññóñ íñţéĝŕíţý]",
       "exit": "[Ļéáʋé çáññóñ]",
       "wave": "[Ŵáʋé {wave}/{total}]",
+      "endlessWave": "[Éñðļéšš ŵáʋé {wave} (ŕóúñð {round})]",
+      "resultWaves": "[Ŵáʋéš ĥéļð: {waves}.]",
       "enemies": "[Éñéɱíéš ŕéɱáíñíñĝ: {count}]",
       "countdown": "[Þŕéþáŕé: {seconds}]",
       "hint": "[Çĥóóšé á šĥóţ, ţĥéñ çļíçķ ţĥé ĝŕóúñð ţó ƒíŕé.]",
