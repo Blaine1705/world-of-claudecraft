@@ -14,9 +14,13 @@ function progress(): WorldQuestProgress {
     wispMaze: createWispMaze(42),
   };
 }
+function maze(p: WorldQuestProgress) {
+  if (!p.wispMaze) throw new Error('Missing maze fixture');
+  return p.wispMaze;
+}
 it('projects live collection, lives and power using authoritative ticks and reusable storage', () => {
   const p = progress(),
-    s = p.wispMaze!,
+    s = maze(p),
     view = createWispMazeHudView();
   const first = view.tick(p);
   expect(first.cue).toBe('Starting in 3s');
@@ -46,7 +50,7 @@ it('projects live collection, lives and power using authoritative ticks and reus
 });
 it('deduplicates pickups, ten-wisp milestones, hit, banish and completion without replaying snapshots', () => {
   const p = progress(),
-    s = p.wispMaze!,
+    s = maze(p),
     view = createWispMazeHudView();
   s.phase = 'active';
   s.tick = 100;
