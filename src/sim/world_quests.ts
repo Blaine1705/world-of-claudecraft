@@ -73,6 +73,7 @@ import {
   sanitizeWorldQuestMatch3Board,
   worldQuestMatch3InitialBoard,
 } from './world_quest_match3';
+import { dismountForWorldQuestInstructor } from './world_quest_mount_gate';
 import {
   sanitizeWorldQuestPuzzleRotations,
   traceWorldQuestPuzzle,
@@ -423,6 +424,9 @@ export function talkToWorldQuestInstructor(
   resetCycleIfNeeded(ctx, meta);
   if (talkToInvestigation(ctx, npc, meta, player)) return true;
   if (npc.templateId === GLIDER_APPRENTICE_NPC_DEF.id) {
+    // The rider's mount is put away on the talk (see world_quest_mount_gate); a
+    // vehicle seat or a race still owns the player, so the talk is consumed idle.
+    if (!dismountForWorldQuestInstructor(ctx, player, meta)) return true;
     const existing = meta.worldQuestLog.get(GLIDER_QUEST_ID) ?? {
       questId: GLIDER_QUEST_ID,
       count: 0,
@@ -442,6 +446,7 @@ export function talkToWorldQuestInstructor(
       candidate.objective.instructorNpcId === npc.templateId,
   );
   if (!quest) return false;
+  if (!dismountForWorldQuestInstructor(ctx, player, meta)) return true;
   resetCycleIfNeeded(ctx, meta);
   const progress = meta.worldQuestLog.get(quest.id);
   if (quest.objective.type === 'shadow') {

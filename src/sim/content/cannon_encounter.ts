@@ -37,16 +37,20 @@ export const CANNON_ACTIONS: Readonly<Record<CannonActionId, Readonly<CannonActi
     slowTicks: 0,
     slowMultiplier: 1,
     burnTicks: 5 * TICK_RATE,
-    burnDamage: 20,
+    burnDamage: 30,
   },
 };
 
+// Breach damage is the cannon's effective health bar (integrity is a 0..100
+// percent on the wire and the HUD). Playtest feedback: a single commander reaching
+// the line one-shot the emplacement, so no breach may end a healthy run on its own;
+// the commander now costs 60 and the rest scale down with it.
 export const CANNON_ENEMIES: Readonly<Record<CannonEnemyKind, Readonly<CannonEnemyDef>>> = {
-  infantry: { hp: 100, speed: 2.1, breachDamage: 10 },
-  runner: { hp: 80, speed: 3.78, breachDamage: 12 },
-  armored: { hp: 220, speed: 1.4, breachDamage: 18 },
-  commander: { hp: 800, speed: 0.98, breachDamage: 100 },
-  sapper: { hp: 80, speed: 4.2, breachDamage: 35 },
+  infantry: { hp: 100, speed: 2.1, breachDamage: 7 },
+  runner: { hp: 80, speed: 3.78, breachDamage: 8 },
+  armored: { hp: 220, speed: 1.4, breachDamage: 12 },
+  commander: { hp: 800, speed: 0.98, breachDamage: 60 },
+  sapper: { hp: 80, speed: 4.2, breachDamage: 25 },
 };
 
 export const CANNON_TACTICS = {

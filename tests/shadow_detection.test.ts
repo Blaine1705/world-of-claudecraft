@@ -55,7 +55,7 @@ describe('shadow detection guidance', () => {
       ]),
     );
     const world = {
-      player: { dead: false, pos: { x: 46, y: 3, z: 12 } },
+      player: { dead: false, pos: { x: 35, y: 3, z: 138 } },
       worldQuestLog: new Map([[SHADOW_QUEST_ID, p]]),
       entities,
     } as unknown as IWorld;

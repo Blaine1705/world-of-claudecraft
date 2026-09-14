@@ -9867,16 +9867,16 @@ export const fr_CA: EnTranslations = {
       "wispMaze": {
         "leave": "Leave maze",
         "title": "Wispwood Maze",
-        "objective": "Gather every lost wisp in the maze",
-        "ready": "Speak to the wisp keeper to begin.",
-        "controls": "Move through the maze to collect wisps. Avoid the shadows. Power wisps let you banish shadows for a short time.",
-        "collected": "Wisps: {count}/{total}",
+        "objective": "Recover every stolen coin purse from the maze",
+        "ready": "Speak to the maze keeper to begin.",
+        "controls": "Move through the maze to pick up the coin purses. Avoid the shadows. Radiant wisps let you banish shadows for a short time.",
+        "collected": "Coin purses: {count}/{total}",
         "lives": "Lives: {count}/3",
         "power": "Wisp power: {seconds}s",
         "countdown": "Starting in {seconds}s",
-        "collect": "Collect wisps. Avoid shadows.",
+        "collect": "Pick up the coin purses. Avoid shadows.",
         "powered": "Power surge! Touch shadows to banish them.",
-        "finished": "Every wisp is safe!",
+        "finished": "Every coin purse is recovered!",
         "retry": "Three lives restored. Try the maze again."
       },
       "forge": {
@@ -15842,8 +15842,8 @@ export const fr_CA: EnTranslations = {
       },
       "wisp_maze_keeper": {
         "name": "Keeper Liora",
-        "title": "Warden of Wandering Lights",
-        "greeting": "Gather every wandering light in my maze. Avoid its guardians, or take a radiant light to banish them. Three lost lives return you to the entrance, but the lights you gathered remain safe."
+        "title": "Warden of the Hedge Maze",
+        "greeting": "Thieves hid their stolen gold all through my maze, and the shadows guard it now. Recover every coin purse. Avoid the guardians, or take a radiant wisp to banish them. Three lost lives return you to the entrance, but the purses you gathered remain safe."
       },
       "calligraphy_instructor": {
         "name": "Instructor Elian",

@@ -3,6 +3,7 @@ import {
   SHADOW_NPC_DEF,
   SHADOW_NPC_ID,
   SHADOW_QUEST_ID,
+  SHADOW_SAFE_SPOT,
   SHADOW_SITE,
 } from './content/world_quest_shadow';
 import { createNpc } from './entity';
@@ -189,7 +190,7 @@ export function updateShadowEncounter(ctx: SimContext, meta: PlayerMeta, player:
   if (state.suspicion >= 1) {
     clearShadowEncounter(ctx, meta);
     progress.shadow = { phase: 'caught', suspicion: 0, cooldown: 0 };
-    player.pos = ctx.groundPos(SHADOW_NPC_DEF.pos.x + 2, SHADOW_NPC_DEF.pos.z);
+    player.pos = ctx.groundPos(SHADOW_SAFE_SPOT.x, SHADOW_SAFE_SPOT.z);
     player.prevPos = { ...player.pos };
     player.vx = player.vy = player.vz = 0;
     player.autoAttack = false;

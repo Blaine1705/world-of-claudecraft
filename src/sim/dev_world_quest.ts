@@ -39,11 +39,6 @@ const WORLD_QUEST_ALIASES: Readonly<Record<string, string>> = Object.freeze({
   evergarden_watch: 'wq_evergarden_watch',
   watch: 'wq_evergarden_watch',
   evergarden: 'wq_evergarden_watch',
-
-  proving_shore_scuttlers: 'wq_proving_shore_scuttlers',
-  scuttlers: 'wq_proving_shore_scuttlers',
-  proving_shore: 'wq_proving_shore_scuttlers',
-  shore: 'wq_proving_shore_scuttlers',
 });
 
 export const CLASSIC_WORLD_QUEST_COMMANDS: readonly string[] = Object.freeze([
@@ -56,7 +51,6 @@ export const CLASSIC_WORLD_QUEST_COMMANDS: readonly string[] = Object.freeze([
   'nightbloom_barrow',
   'wraithwood_restless',
   'evergarden_watch',
-  'proving_shore_scuttlers',
 ]);
 
 export function resolveWorldQuestId(key: string): string | undefined {
@@ -168,10 +162,5 @@ export function listWorldQuestsForDev(ctx: SimContext, pid: number): void {
     type: 'log',
     pid,
     text: '- /dev evergarden_watch (Evergarden: Hedge Knights)',
-  });
-  ctx.emit({
-    type: 'log',
-    pid,
-    text: '- /dev proving_shore_scuttlers (Proving Shore: Shore scuttlers)',
   });
 }

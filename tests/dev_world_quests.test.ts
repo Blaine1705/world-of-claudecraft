@@ -52,7 +52,6 @@ describe('dev world quest commands', () => {
     { input: '/dev wq barrow', expectedId: 'wq_nightbloom_barrow' },
     { input: '/dev wq wraithwood', expectedId: 'wq_wraithwood_restless' },
     { input: '/dev wq evergarden', expectedId: 'wq_evergarden_watch' },
-    { input: '/dev wq scuttlers', expectedId: 'wq_proving_shore_scuttlers' },
   ])('arms through alias $input -> $expectedId', ({ input, expectedId }) => {
     const sim = new Sim({ seed: 20061, playerClass: 'mage', devCommands: true });
     sim.chat(input);

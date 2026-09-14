@@ -2,12 +2,22 @@ import type { NpcDef, WorldQuestDef } from '../types';
 
 export const SHADOW_QUEST_ID = 'wq_eastbrook_shadow';
 export const SHADOW_NPC_ID = 2_146_900_040;
-export const SHADOW_SITE = { x: 65, z: 20, radius: 34 };
+// The courier post sits on the open meadow of Brightwood Glade, the pocket the
+// Wolf Run, Old Greyjaw's prowl, the Copper Dig and the Fallen Chapel undead all
+// leave alone (every quest point clears each camp disc, its wander margin and the
+// mob's aggro radius by 14 yd or more). It used to sit inside the Vale Bandit
+// camp disc (centre 80,15 r28.5), so roaming bandits walked onto the guard posts
+// and every pull broke the cloak. Every position below is the old layout
+// translated rigidly by (-11, +126); the patrol geometry (and its pinned rear
+// openings) is unchanged.
+export const SHADOW_SITE = { x: 54, z: 146, radius: 34 };
+/** Where a caught player (and the dev arm) lands: behind the scout, outside every ring. */
+export const SHADOW_SAFE_SPOT = { x: 31, z: 138 };
 export const SHADOW_NPC_DEF: NpcDef = {
   id: 'shadow_cloak_scout',
   name: 'Scout Valerie',
   title: 'Covert Operations',
-  pos: { x: 46, z: 12 },
+  pos: { x: 35, z: 138 },
   facing: 1.2,
   color: 0x637591,
   questIds: [],
@@ -31,7 +41,7 @@ export const SHADOW_GUARDS: readonly {
       name: 'Dispatch Guard',
       title: 'Dispatch Carrier',
       greeting: 'These sealed orders are for the captain. Keep your distance.',
-      pos: { x: 55, z: 18 },
+      pos: { x: 44, z: 144 },
       facing: 0,
       color: 0x875641,
       questIds: [],
@@ -47,7 +57,7 @@ export const SHADOW_GUARDS: readonly {
       name: 'Dispatch Guard',
       title: 'Dispatch Carrier',
       greeting: 'I have a dispatch to deliver. Move along.',
-      pos: { x: 62, z: 32 },
+      pos: { x: 51, z: 158 },
       facing: 2,
       color: 0x875641,
       questIds: [],
@@ -63,7 +73,7 @@ export const SHADOW_GUARDS: readonly {
       name: 'Dispatch Guard',
       title: 'Dispatch Carrier',
       greeting: 'No delays. The watch is waiting for these orders.',
-      pos: { x: 73, z: 24 },
+      pos: { x: 62, z: 150 },
       facing: 1,
       color: 0x875641,
       questIds: [],
@@ -79,7 +89,7 @@ export const SHADOW_GUARDS: readonly {
       name: 'Dispatch Guard',
       title: 'Dispatch Carrier',
       greeting: 'Official business. Keep the path clear.',
-      pos: { x: 77, z: 10 },
+      pos: { x: 66, z: 136 },
       facing: 3,
       color: 0x875641,
       questIds: [],
@@ -90,13 +100,13 @@ export const SHADOW_GUARDS: readonly {
     entityId: 2146900045,
     sentry: true,
     detectionRadius: 6,
-    patrol: { x: 78, z: 8, period: 12, pause: 3 },
+    patrol: { x: 67, z: 134, period: 12, pause: 3 },
     npc: {
       id: 'shadow_sentry_south',
       name: 'Lantern Sentry',
       title: 'True Sight',
       greeting: 'My lantern reveals more than shadows. Stay where I can see you.',
-      pos: { x: 58, z: 34 },
+      pos: { x: 47, z: 160 },
       facing: 1.5,
       color: 0xd4a553,
       questIds: [],
@@ -107,13 +117,13 @@ export const SHADOW_GUARDS: readonly {
     entityId: 2146900046,
     sentry: true,
     detectionRadius: 6,
-    patrol: { x: 79, z: 30, period: 14, pause: 3 },
+    patrol: { x: 68, z: 156, period: 14, pause: 3 },
     npc: {
       id: 'shadow_sentry_north',
       name: 'Lantern Sentry',
       title: 'True Sight',
       greeting: 'Nothing slips past the lantern watch.',
-      pos: { x: 54, z: 16 },
+      pos: { x: 43, z: 142 },
       facing: 1.5,
       color: 0xd4a553,
       questIds: [],

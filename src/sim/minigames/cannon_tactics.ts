@@ -31,13 +31,17 @@ export function cannonFeedback(
     state.feedback.splice(0, state.feedback.length - CANNON_TACTICS.feedbackLimit);
 }
 
+/** A barrel the player never lit survives into the next wave; only spent ones are
+ *  cleared, and a wave adds its authored placements on the spots still empty. */
 export function prepareCannonBarrels(state: CannonEncounterState, field: CannonField): void {
-  state.barrels = (CANNON_WAVE_BARREL_INDICES[state.wave] ?? []).map((index) => ({
-    id: state.nextId++,
-    active: true,
-    x: field.minX + CANNON_BARREL_PLACEMENTS[index].lane * (field.maxX - field.minX),
-    z: field.minZ + CANNON_BARREL_PLACEMENTS[index].depth * (field.maxZ - field.minZ),
-  }));
+  const kept = state.barrels.filter((barrel) => barrel.active);
+  for (const index of CANNON_WAVE_BARREL_INDICES[state.wave] ?? []) {
+    const x = field.minX + CANNON_BARREL_PLACEMENTS[index].lane * (field.maxX - field.minX);
+    const z = field.minZ + CANNON_BARREL_PLACEMENTS[index].depth * (field.maxZ - field.minZ);
+    if (kept.some((barrel) => barrel.x === x && barrel.z === z)) continue;
+    kept.push({ id: state.nextId++, active: true, x, z });
+  }
+  state.barrels = kept;
 }
 
 export function damageCannonEnemies(

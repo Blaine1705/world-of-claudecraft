@@ -24,6 +24,9 @@ export class WispMazeVisual {
   private readonly content = new THREE.Group();
   private readonly box = new THREE.BoxGeometry(1, 1, 1);
   private readonly sphere = new THREE.OctahedronGeometry(1);
+  // The pickups are the thieves' coin purses: a squat low-poly sack, tied at the
+  // neck by the flattened top ring, so it reads as loot beside the radiant wisps.
+  private readonly pouch = new THREE.SphereGeometry(1, 7, 5);
   private readonly ring = new THREE.RingGeometry(0.82, 1.04, 24);
   private readonly scratch = new THREE.Object3D();
   private readonly collected = new Uint8Array(WISP_MAZE_LAYOUT.cols * WISP_MAZE_LAYOUT.rows);
@@ -75,6 +78,7 @@ export class WispMazeVisual {
       'wisp-maze-lights',
       this.materials.gold,
       WISP_MAZE_LAYOUT.openCells.length,
+      this.pouch,
     );
     this.powers = this.pool(
       'wisp-maze-radiant-lights',
@@ -102,8 +106,13 @@ export class WispMazeVisual {
       });
   }
 
-  private pool(name: string, material: THREE.Material, capacity: number): THREE.InstancedMesh {
-    const pool = new THREE.InstancedMesh(this.sphere, material, capacity);
+  private pool(
+    name: string,
+    material: THREE.Material,
+    capacity: number,
+    geometry: THREE.BufferGeometry = this.sphere,
+  ): THREE.InstancedMesh {
+    const pool = new THREE.InstancedMesh(geometry, material, capacity);
     pool.name = name;
     pool.count = 0;
     pool.frustumCulled = false;
@@ -145,9 +154,11 @@ export class WispMazeVisual {
       const position = WISP_MAZE_WORLD_CELLS[cell];
       const power = this.powerCells.has(cell);
       const pool = power ? this.powers : this.wisps;
-      const size = power ? 0.44 : 0.17;
-      const lift =
-        (power ? 0.95 : 0.65) + (reducedMotion ? 0 : Math.sin(state.tick * 0.07 + cell) * 0.09);
+      const size = power ? 0.44 : 0.24;
+      // Purses sit on the ground; only the radiant wisps hover and bob.
+      const lift = power
+        ? 0.95 + (reducedMotion ? 0 : Math.sin(state.tick * 0.07 + cell) * 0.09)
+        : size * 0.8;
       this.instance(
         pool,
         pool.count++,
@@ -155,7 +166,7 @@ export class WispMazeVisual {
         position.z,
         lift,
         size,
-        size * 1.3,
+        power ? size * 1.3 : size * 0.8,
         size,
         this.cellGroundHeights[cell],
       );
@@ -189,6 +200,7 @@ export class WispMazeVisual {
     this.powers.dispose();
     this.box.dispose();
     this.sphere.dispose();
+    this.pouch.dispose();
     this.ring.dispose();
     this.guardians.dispose();
   }

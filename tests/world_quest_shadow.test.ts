@@ -4,6 +4,7 @@ import {
   SHADOW_GUARDS,
   SHADOW_NPC_DEF,
   SHADOW_NPC_ID,
+  SHADOW_SAFE_SPOT,
 } from '../src/sim/content/world_quest_shadow';
 import { BUILTIN_WORLD } from '../src/sim/data';
 import { hasShadowCloak, shadowActionsLocked } from '../src/sim/shadow_action_lock';
@@ -119,7 +120,7 @@ describe('Duskweave dispatches world quest', () => {
     sim.player.pos = sim.groundPos(sentry.pos.x, sentry.pos.z);
     tick(sim, 4);
     expect(sim.worldQuestLog.get(ID)?.shadow?.suspicion).toBeGreaterThan(0);
-    sim.player.pos = sim.groundPos(48, 12);
+    sim.player.pos = sim.groundPos(SHADOW_SAFE_SPOT.x, SHADOW_SAFE_SPOT.z);
     tick(sim, 10);
     expect(sim.worldQuestLog.get(ID)?.shadow?.suspicion).toBe(0);
     expect(hasShadowCloak(sim.player)).toBe(true);

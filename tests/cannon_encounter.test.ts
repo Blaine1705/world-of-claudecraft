@@ -111,7 +111,8 @@ describe('private cannon encounter', () => {
 
   it('fails at zero integrity from ordinary troops and clears outstanding effects', () => {
     const state = active();
-    state.integrity = 10;
+    // Exactly one breach of this trooper's kind empties the bar.
+    state.integrity = CANNON_ENEMIES[state.enemies[0].kind].breachDamage;
     state.enemies[0].z = field.maxZ - 0.001;
     fireCannon(state, field, 'incendiary', { x: 0, z: 0 });
     state.fires.push({
@@ -169,23 +170,26 @@ describe('private cannon encounter', () => {
     state.enemies = [{ id: 999, kind: 'commander', hp: 800, x: 20, z: 2, slowUntilTick: 0 }];
     fireCannon(state, field, 'incendiary', { x: 20, z: 4 });
     advance(state, CANNON_ACTIONS.incendiary.flightTicks);
-    expect(state.enemies[0].hp).toBe(770);
+    expect(state.enemies[0].hp).toBe(800 - CANNON_ACTIONS.incendiary.damage);
+    const afterBurn =
+      800 - CANNON_ACTIONS.incendiary.damage - 5 * CANNON_ACTIONS.incendiary.burnDamage;
     advance(state, 5 * TICK_RATE);
-    expect(state.enemies[0].hp).toBe(670);
+    expect(state.enemies[0].hp).toBe(afterBurn);
     expect(state.fires).toEqual([]);
     advance(state, TICK_RATE);
-    expect(state.enemies[0].hp).toBe(670);
+    expect(state.enemies[0].hp).toBe(afterBurn);
   });
 
   it('damages only cannon integrity when an enemy breaches and counts it once', () => {
     const state = active();
     state.enemies = [{ id: 999, kind: 'runner', hp: 80, x: 20, z: 39.99, slowUntilTick: 0 }];
     advance(state, 1);
-    expect(state.integrity).toBe(88);
+    const afterBreach = 100 - CANNON_ENEMIES.runner.breachDamage;
+    expect(state.integrity).toBe(afterBreach);
     expect(state.breached).toBe(1);
     expect(state.killed).toBe(0);
     advance(state, TICK_RATE);
-    expect(state.integrity).toBe(88);
+    expect(state.integrity).toBe(afterBreach);
   });
 
   it('lets an impact at the defense line save the cannon before breach movement', () => {
@@ -227,7 +231,10 @@ describe('private cannon encounter', () => {
     state.enemies = [{ id: 999, kind: 'commander', hp: 1, x: 20, z: 39.999, slowUntilTick: 0 }];
     advance(state, 1);
     expect(state.phase).toBe('failed');
-    expect(state.integrity).toBe(0);
+    // A commander breach no longer one-shots a healthy emplacement; the run still
+    // fails here because the final wave ended with the commander alive.
+    expect(state.integrity).toBe(100 - CANNON_ENEMIES.commander.breachDamage);
+    expect(state.integrity).toBeGreaterThan(0);
     expect(state.commanderKilled).toBe(false);
     const terminal = structuredClone(state);
     advance(state, 100);

@@ -2998,7 +2998,7 @@ export const DEEDS: Record<string, DeedDef> = {
   exp_wisp_maze: {
     id: 'exp_wisp_maze',
     name: 'A Light in the Maze',
-    desc: 'Collect the wandering lights and escape the Evergarden maze.',
+    desc: 'Recover the stolen coin purses and escape the Evergarden maze.',
     category: 'exploration',
     renown: 5,
     trigger: { kind: 'manual' },

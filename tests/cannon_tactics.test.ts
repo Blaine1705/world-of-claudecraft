@@ -13,7 +13,7 @@ import {
   detonateCannonBarrels,
   prepareCannonBarrels,
 } from '../src/sim/minigames/cannon_tactics';
-import { TICK_RATE } from '../src/sim/types';
+import { type CannonEncounterState, TICK_RATE } from '../src/sim/types';
 
 const field = { minX: 0, maxX: 30, minZ: 0, maxZ: 40 };
 const point = { x: 15, z: 20 };
@@ -31,6 +31,33 @@ describe('cannon tactical decisions', () => {
       expect(s.barrels.every((b) => b.active)).toBe(true);
       detonateCannonBarrels(s, point, 50);
     }
+  });
+  it('carries an unlit barrel into the next wave and never doubles an occupied spot', () => {
+    const runToWave = (s: CannonEncounterState) => {
+      while (s.phase !== 'wave') tickCannonEncounter(s, field);
+    };
+    const s = createCannonEncounter();
+    runToWave(s);
+    expect(s.barrels).toHaveLength(3);
+    // Spend only the flanks; the centre barrel (x 15) stays untouched into wave two.
+    s.barrels[0].active = false;
+    s.barrels[2].active = false;
+    const keptId = s.barrels[1].id;
+    s.phase = 'intermission';
+    s.phaseUntilTick = s.tick + 1;
+    runToWave(s);
+    expect(s.wave).toBe(1);
+    expect(s.barrels.map((b) => b.x).sort((a, b) => a - b)).toEqual([7.5, 15, 22.5]);
+    expect(s.barrels.every((b) => b.active)).toBe(true);
+    expect(s.barrels.find((b) => b.x === 15)?.id).toBe(keptId);
+    // Wave three authors only the centre: the kept centre wins, nothing is added.
+    s.barrels = s.barrels.filter((b) => b.x === 15);
+    s.phase = 'intermission';
+    s.phaseUntilTick = s.tick + 1;
+    runToWave(s);
+    expect(s.wave).toBe(2);
+    expect(s.barrels).toHaveLength(1);
+    expect(s.barrels[0].id).toBe(keptId);
   });
   it('places authored barrels close enough to chain across the actual thirty-yard field', () => {
     const s = createCannonEncounter();

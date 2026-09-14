@@ -201,17 +201,17 @@ const questStringsEn = {
       wispMaze: {
         leave: 'Leave maze',
         title: 'Wispwood Maze',
-        objective: 'Gather every lost wisp in the maze',
-        ready: 'Speak to the wisp keeper to begin.',
+        objective: 'Recover every stolen coin purse from the maze',
+        ready: 'Speak to the maze keeper to begin.',
         controls:
-          'Move through the maze to collect wisps. Avoid the shadows. Power wisps let you banish shadows for a short time.',
-        collected: 'Wisps: {count}/{total}',
+          'Move through the maze to pick up the coin purses. Avoid the shadows. Radiant wisps let you banish shadows for a short time.',
+        collected: 'Coin purses: {count}/{total}',
         lives: 'Lives: {count}/3',
         power: 'Wisp power: {seconds}s',
         countdown: 'Starting in {seconds}s',
-        collect: 'Collect wisps. Avoid shadows.',
+        collect: 'Pick up the coin purses. Avoid shadows.',
         powered: 'Power surge! Touch shadows to banish them.',
-        finished: 'Every wisp is safe!',
+        finished: 'Every coin purse is recovered!',
         retry: 'Three lives restored. Try the maze again.',
       },
       forge: {

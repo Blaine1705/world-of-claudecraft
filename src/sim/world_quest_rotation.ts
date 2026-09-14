@@ -23,7 +23,6 @@ export const WORLD_QUEST_ZONES: readonly string[] = Object.freeze([
   'evergarden',
   'galecrest',
   'farshore_isle',
-  'proving_shore',
 ]);
 
 export const WORLD_QUESTS_BY_ZONE: Readonly<Record<string, readonly string[]>> = Object.freeze({
@@ -51,7 +50,6 @@ export const WORLD_QUESTS_BY_ZONE: Readonly<Record<string, readonly string[]>> =
   evergarden: Object.freeze(['wq_evergarden_watch', 'wq_evergarden_wisp_maze']),
   galecrest: Object.freeze(['wq_galecrest_wisps', 'wq_galecrest_slalom']),
   farshore_isle: Object.freeze(['wq_farshore_salvage']),
-  proving_shore: Object.freeze(['wq_proving_shore_scuttlers']),
 });
 
 /** Daily activities offered alongside the ordinary zone rotation. */
