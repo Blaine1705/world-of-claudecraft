@@ -15838,20 +15838,22 @@
      dialog (.wk-backdrop / .wk-dialog). A flex column so the card grid can
      take the leftover height once the user resizes the window. */
   #weekly-quests-window {
-    width: min(1100px, calc(100vw - 40px));
-    max-height: calc(100vh - 40px);
+    width: min(1500px, calc(100vw - 32px));
+    max-height: calc(100vh - 32px);
     display: none;
     flex-direction: column;
     overflow: hidden auto;
     min-height: 0;
-    padding-bottom: 12px;
     background:
       radial-gradient(ellipse 60% 40% at 50% 0%, #6d3fd42e, transparent 60%),
       linear-gradient(180deg, #1c1531f5, #120c20f5 40%, #0c0816f8);
     border-color: #8f6a2c;
+    container-type: inline-size;
+    height: min(960px, calc(100vh - 32px));
+    padding: clamp(10px, 1.2cqw, 22px) clamp(12px, 1.6cqw, 28px);
   }
   #weekly-quests-window .wk-title span:first-child {
-    font-size: 20px;
+    font-size: clamp(18px, 2.2cqw, 36px);
     letter-spacing: 0.03em;
     color: #fbf6ff;
     text-shadow:
@@ -15861,8 +15863,8 @@
   #weekly-quests-window .wk-sub {
     text-align: center;
     color: #c4a6ff;
-    font-size: 13px;
-    margin: -2px 0 12px;
+    font-size: clamp(12px, 1.25cqw, 20px);
+    margin: -2px 0 clamp(8px, 1.2cqw, 20px);
   }
   #weekly-quests-window .wk-sub b {
     color: #f2d998;
@@ -15871,16 +15873,19 @@
   #weekly-quests-window .wk-cards {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 14px;
+    gap: clamp(10px, 1.5cqw, 28px);
     padding: 0 2px;
+    flex: 1 1 auto;
+    min-height: 0;
+    align-content: start;
   }
   #weekly-quests-window .wk-card {
     position: relative;
     display: grid;
     grid-template-rows: auto auto auto 1fr auto auto;
-    gap: 8px;
+    gap: clamp(6px, 0.8cqw, 14px);
     min-width: 0;
-    padding: 10px 10px 12px;
+    padding: clamp(8px, 0.9cqw, 16px) clamp(8px, 0.9cqw, 16px) clamp(10px, 1cqw, 18px);
     background: linear-gradient(180deg, #1c1531f2, #120c20f2 40%, #0c0816f5);
     border: 1px solid #8f6a2c;
     box-shadow:
@@ -15912,7 +15917,7 @@
   #weekly-quests-window .wk-cat {
     text-align: center;
     font-family: var(--title-font);
-    font-size: 16px;
+    font-size: clamp(15px, 1.6cqw, 26px);
     color: #fbf6ff;
     text-shadow: 0 1px 0 #000;
     padding-top: 2px;
@@ -15925,14 +15930,14 @@
     box-shadow:
       inset 0 0 0 1px #000,
       0 4px 12px #000a;
-    margin-bottom: 26px;
+    margin-bottom: clamp(24px, 3.2cqw, 48px);
   }
   #weekly-quests-window .wk-medal {
     position: absolute;
     left: 50%;
-    bottom: -28px;
-    width: 56px;
-    height: 56px;
+    bottom: calc(clamp(48px, 6.4cqw, 96px) / -2);
+    width: clamp(48px, 6.4cqw, 96px);
+    height: clamp(48px, 6.4cqw, 96px);
     transform: translateX(-50%);
     border-radius: 50%;
     background: center / cover no-repeat;
@@ -15940,10 +15945,10 @@
   }
   #weekly-quests-window .wk-pill {
     justify-self: center;
-    font-size: 11px;
+    font-size: clamp(11px, 1cqw, 16px);
     font-weight: 700;
     color: #efe6ff;
-    padding: 5px 18px;
+    padding: clamp(4px, 0.45cqw, 8px) clamp(14px, 1.8cqw, 30px);
     background: linear-gradient(180deg, #2b1f4a, #171029);
     border: 1px solid #4c2f8a;
     clip-path: polygon(7px 0, calc(100% - 7px) 0, 100% 50%, calc(100% - 7px) 100%, 7px 100%, 0 50%);
@@ -15951,7 +15956,7 @@
   #weekly-quests-window .wk-lore {
     margin: 0;
     font-family: var(--font-serif);
-    font-size: 13.5px;
+    font-size: clamp(13px, 1.3cqw, 21px);
     line-height: 1.45;
     color: #f1e9ff;
     text-align: center;
@@ -15961,13 +15966,13 @@
     align-self: start;
     font-family: var(--font-serif);
     font-style: italic;
-    font-size: 12.5px;
+    font-size: clamp(12px, 1.15cqw, 19px);
     color: #c9bde4;
     text-align: center;
   }
   #weekly-quests-window .wk-btn {
     font-family: var(--title-font);
-    font-size: 13px;
+    font-size: clamp(13px, 1.25cqw, 20px);
     letter-spacing: 0.03em;
     color: #f1e9ff;
     background: linear-gradient(180deg, #2a1f47, #150f24);
@@ -15975,7 +15980,7 @@
     box-shadow:
       inset 0 1px 0 #ffffff14,
       0 4px 12px #0009;
-    padding: 10px 10px;
+    padding: clamp(9px, 0.9cqw, 16px) clamp(8px, 0.9cqw, 16px);
     cursor: pointer;
     text-align: center;
   }
@@ -16015,12 +16020,12 @@
     background: linear-gradient(180deg, #2f6a1c, #173a0c);
   }
   #weekly-quests-window .wk-foot {
-    margin: 12px auto 0;
-    padding: 8px 16px;
-    max-width: 640px;
+    margin: clamp(10px, 1.2cqw, 20px) auto 0;
+    padding: clamp(6px, 0.7cqw, 12px) clamp(12px, 1.6cqw, 28px);
+    max-width: 70cqw;
     text-align: center;
     font-family: var(--font-serif);
-    font-size: 13px;
+    font-size: clamp(12px, 1.2cqw, 19px);
     color: #c9bde4;
     border: 1px solid #8f6a2c;
     background: linear-gradient(180deg, #1c1531e6, #0e0a1ae6);
@@ -16043,10 +16048,10 @@
     z-index: 2;
   }
   #weekly-quests-window .wk-dialog {
-    width: min(460px, 100%);
+    width: min(clamp(420px, 44cqw, 720px), 100%);
     max-height: 100%;
     overflow: auto;
-    padding: 14px 16px 16px;
+    padding: clamp(12px, 1.3cqw, 22px) clamp(14px, 1.5cqw, 26px);
     background: linear-gradient(180deg, #1e1633fa, #130d22fa 40%, #0d0918fc);
     border: 1px solid #8f6a2c;
     box-shadow:
@@ -16065,8 +16070,8 @@
   }
   #weekly-quests-window .wk-portrait {
     flex: none;
-    width: 48px;
-    height: 48px;
+    width: clamp(48px, 5cqw, 80px);
+    height: clamp(48px, 5cqw, 80px);
     border-radius: 50%;
     background: center / cover no-repeat;
     border: 2px solid #d4a955;
@@ -16081,11 +16086,11 @@
   }
   #weekly-quests-window .wk-who-name {
     font-family: var(--title-font);
-    font-size: 15px;
+    font-size: clamp(15px, 1.5cqw, 24px);
     color: #fbf6ff;
   }
   #weekly-quests-window .wk-who-title {
-    font-size: 12px;
+    font-size: clamp(12px, 1.1cqw, 17px);
     color: #c4a6ff;
   }
   #weekly-quests-window .wk-dialog-art {
@@ -16099,14 +16104,14 @@
   }
   #weekly-quests-window .wk-dialog-title {
     font-family: var(--title-font);
-    font-size: 17px;
+    font-size: clamp(17px, 1.8cqw, 28px);
     color: #f2d998;
     margin-bottom: 6px;
   }
   #weekly-quests-window .wk-dialog-lore {
     margin: 0 0 8px;
     font-family: var(--font-serif);
-    font-size: 13.5px;
+    font-size: clamp(13.5px, 1.3cqw, 21px);
     line-height: 1.5;
     color: #f1e9ff;
   }
@@ -16115,7 +16120,7 @@
     align-items: center;
     gap: 10px;
     font-family: var(--title-font);
-    font-size: 13px;
+    font-size: clamp(13px, 1.3cqw, 20px);
     color: #f2d998;
     margin: 8px 0 4px;
   }
@@ -16129,7 +16134,7 @@
     display: flex;
     justify-content: space-between;
     gap: 12px;
-    font-size: 13px;
+    font-size: clamp(13px, 1.2cqw, 19px);
     color: #c9bde4;
   }
   #weekly-quests-window .wk-dialog-row b {
@@ -16137,7 +16142,7 @@
   }
   #weekly-quests-window .wk-reward {
     display: grid;
-    grid-template-columns: 44px 1fr;
+    grid-template-columns: clamp(44px, 4.6cqw, 72px) 1fr;
     gap: 10px;
     align-items: center;
     margin-top: 8px;
@@ -16146,8 +16151,8 @@
     background: linear-gradient(90deg, #8b5cf61f, #8b5cf608 60%), #0e0a1a;
   }
   #weekly-quests-window .wk-reward-icon {
-    width: 44px;
-    height: 44px;
+    width: clamp(44px, 4.6cqw, 72px);
+    height: clamp(44px, 4.6cqw, 72px);
     display: grid;
     place-items: center;
     color: #f2d998;
@@ -16158,19 +16163,19 @@
     display: block;
     color: #c58bff;
     font-weight: 700;
-    font-size: 13.5px;
+    font-size: clamp(13.5px, 1.3cqw, 21px);
   }
   #weekly-quests-window .wk-reward-desc {
     display: block;
     color: #c9bde4;
-    font-size: 12px;
+    font-size: clamp(12px, 1.1cqw, 17px);
     margin-top: 2px;
   }
   #weekly-quests-window .wk-note {
     margin-top: 8px;
     font-family: var(--font-serif);
     font-style: italic;
-    font-size: 12px;
+    font-size: clamp(12px, 1.1cqw, 17px);
     color: #8d82a8;
   }
   #weekly-quests-window .wk-actions {

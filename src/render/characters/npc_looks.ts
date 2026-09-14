@@ -2093,7 +2093,7 @@ export const NPC_LOOKS: Record<string, NpcLookDef> = {
   },
   // === World quests: instructors and the Fenbridge watch ==================
   // Elian: a silver-haired scholar whose open face stays visible above his book.
-  // Herald Ansel Moorcroft: the weekly emissary on the Eastbrook green, a
+  // Cham Pete: the weekly emissary on the Eastbrook green, a
   // hooded ledger-keeper in the town's violet.
   weekly_emissary: {
     app: {

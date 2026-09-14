@@ -55,7 +55,7 @@ describe('weekly quests window', () => {
     expect(dialog?.querySelector('#weekly-quest-dialog-title')?.textContent).toBe(
       'Weekly quest: Raid',
     );
-    expect(dialog?.querySelector('.wk-who-name')?.textContent).toBe('Herald Ansel Moorcroft');
+    expect(dialog?.querySelector('.wk-who-name')?.textContent).toBe('Cham Pete');
     (r.el.querySelector('[data-wk-decline]') as HTMLButtonElement).click();
     expect(r.el.querySelector('.wk-dialog')).toBeNull();
     expect(r.chooseWeeklyQuest).not.toHaveBeenCalled();
