@@ -28,6 +28,11 @@ import type {
 import { xpForLevel } from './types';
 import { vehicleStationById } from './vehicle_stations';
 import {
+  FARSHORE_SALVAGE_AMBUSH,
+  triggerWorldQuestAmbush,
+  updateWorldQuestAmbush,
+} from './world_quest_ambush';
+import {
   awardWorldQuestBonusCopper,
   WISP_MAZE_HARD_BONUS,
   worldQuestBonusCopper,
@@ -270,6 +275,9 @@ export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Ent
   const cycle = devCycle ?? rotation.cycle;
   resetCycleIfNeeded(ctx, meta, cycle);
   updateInvestigationEncounter(ctx, meta, player);
+  // Shared-site machinery advances once per tick from whichever player ticks
+  // first, inside or outside the site, so an abandoned rift still tears down.
+  updateWorldQuestAmbush(ctx, FARSHORE_SALVAGE_AMBUSH);
   const shadowProgress = meta.worldQuestLog.get(SHADOW_QUEST_ID);
   if (updateShadowEncounter(ctx, meta, player) && shadowProgress)
     creditWorldQuest(ctx, meta, WORLD_QUESTS_BY_ID[SHADOW_QUEST_ID], shadowProgress);
@@ -764,6 +772,9 @@ export function onObjectInteractedForWorldQuests(
     if (hasInteractObjectCredit(progress, key)) continue;
     recordInteractObjectCredit(progress, key);
     creditWorldQuest(ctx, meta, quest, progress);
+    // Half the debris gone: the wreck's raiders contest the strand.
+    if (quest.id === FARSHORE_SALVAGE_AMBUSH.questId)
+      triggerWorldQuestAmbush(ctx, FARSHORE_SALVAGE_AMBUSH, meta, progress.count);
   }
   if (handled) return true;
   for (const progress of meta.worldQuestLog.values()) {
