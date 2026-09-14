@@ -18168,8 +18168,8 @@ export const zh_TW: EnTranslations = {
         "greeting": "盜賊把偷來的金幣藏遍了我的迷宮，現在由暗影看守著。找回每一個錢袋。避開守衛者，或者拿一團光輝微光去驅散它們。失去三條生命會把你送回入口，但你已收集的錢袋仍會安全保留。"
       },
       "weekly_emissary": {
-        "name": "Herald Ansel Moorcroft",
-        "title": "Weekly Emissary",
+        "name": "Cham Pete",
+        "title": "Emissary",
         "greeting": "The Vale keeps a ledger of deeds, and I keep the ledger. Pick one charge for the week, see it through, and the purse is yours."
       },
       "calligraphy_instructor": {

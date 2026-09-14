@@ -32,7 +32,7 @@ describe('weekly quests view', () => {
     expect(view.resetText).toBe(weeklyResetText(3 * HOUR, 0));
     expect(view.resetText).toContain('resets in');
     expect(view.footer).toContain('Pick a card');
-    expect(view.emissaryName).toBe('Herald Ansel Moorcroft');
+    expect(view.emissaryName).toBe('Cham Pete');
     expect(view.emissaryPortrait).toBe('ui/weekly/emissary.webp');
   });
 

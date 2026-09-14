@@ -18168,8 +18168,8 @@ export const ru_RU: EnTranslations = {
         "greeting": "Воры спрятали украденное золото по всему моему лабиринту, и теперь его стерегут тени. Верните все кошели с монетами. Избегайте стражей или возьмите сияющий огонёк, чтобы изгнать их. Потеряв три жизни, вы вернётесь ко входу, но собранные кошели останутся при вас."
       },
       "weekly_emissary": {
-        "name": "Herald Ansel Moorcroft",
-        "title": "Weekly Emissary",
+        "name": "Cham Pete",
+        "title": "Emissary",
         "greeting": "The Vale keeps a ledger of deeds, and I keep the ledger. Pick one charge for the week, see it through, and the purse is yours."
       },
       "calligraphy_instructor": {

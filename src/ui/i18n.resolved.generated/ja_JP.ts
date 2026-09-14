@@ -18168,8 +18168,8 @@ export const ja_JP: EnTranslations = {
         "greeting": "盗賊どもが盗んだ金を迷宮のあちこちに隠し、今は影がそれを守っている。財布をすべて取り戻してほしい。守護者は避けるか、輝くウィスプを取って追い払うこと。ライフを3つ失うと入口に戻されるが、集めた財布は無事なままだ。"
       },
       "weekly_emissary": {
-        "name": "Herald Ansel Moorcroft",
-        "title": "Weekly Emissary",
+        "name": "Cham Pete",
+        "title": "Emissary",
         "greeting": "The Vale keeps a ledger of deeds, and I keep the ledger. Pick one charge for the week, see it through, and the purse is yours."
       },
       "calligraphy_instructor": {

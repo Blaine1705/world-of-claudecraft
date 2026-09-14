@@ -43,8 +43,8 @@ export const WEEKLY_EMISSARY_NPC_ID = 2_146_900_060;
 // Redbrook, facing the civic square (the same lawn the marshal watches from).
 export const WEEKLY_EMISSARY_NPC_DEF: NpcDef = {
   id: 'weekly_emissary',
-  name: 'Herald Ansel Moorcroft',
-  title: 'Weekly Emissary',
+  name: 'Cham Pete',
+  title: 'Emissary',
   pos: { x: -52, z: -108 },
   facing: 1.41,
   color: 0x6b4fa8,

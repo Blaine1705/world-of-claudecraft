@@ -18168,8 +18168,8 @@ export const pl_PL: EnTranslations = {
         "greeting": "Thieves hid their stolen gold all through my maze, and the shadows guard it now. Recover every coin purse. Avoid the guardians, or take a radiant wisp to banish them. Three lost lives return you to the entrance, but the purses you gathered remain safe."
       },
       "weekly_emissary": {
-        "name": "Herald Ansel Moorcroft",
-        "title": "Weekly Emissary",
+        "name": "Cham Pete",
+        "title": "Emissary",
         "greeting": "The Vale keeps a ledger of deeds, and I keep the ledger. Pick one charge for the week, see it through, and the purse is yours."
       },
       "calligraphy_instructor": {

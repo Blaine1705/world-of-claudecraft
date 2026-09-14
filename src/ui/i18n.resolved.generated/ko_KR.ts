@@ -18168,8 +18168,8 @@ export const ko_KR: EnTranslations = {
         "greeting": "도둑들이 훔친 금화를 내 미로 곳곳에 숨겼고, 이제는 그림자들이 그걸 지키고 있어요. 동전 주머니를 모두 되찾아 주세요. 수호자들을 피하거나, 빛나는 위습을 먹고 쫓아내세요. 생명을 셋 다 잃으면 입구로 돌아가지만, 모은 주머니는 그대로 남아요."
       },
       "weekly_emissary": {
-        "name": "Herald Ansel Moorcroft",
-        "title": "Weekly Emissary",
+        "name": "Cham Pete",
+        "title": "Emissary",
         "greeting": "The Vale keeps a ledger of deeds, and I keep the ledger. Pick one charge for the week, see it through, and the purse is yours."
       },
       "calligraphy_instructor": {
