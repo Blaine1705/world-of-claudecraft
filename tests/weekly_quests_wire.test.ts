@@ -78,7 +78,13 @@ describe('weekly quest wire', () => {
       weeklyQuest: { questId: 'wk_raid', week: 'wk_2', count: 0, state: 'active' },
     };
     const sim = { worldQuestExpiresAtMs: 5, weeklyQuestResetAtMs: 9 };
-    emitQuestSelfKeys((key, value) => void (emitted[key] = value), sim as never, meta as never);
+    emitQuestSelfKeys(
+      (key, value) => {
+        emitted[key] = value;
+      },
+      sim as never,
+      meta as never,
+    );
     expect(emitted.wkq).toEqual(meta.weeklyQuest);
     expect(emitted.wkexp).toBe(9);
   });
