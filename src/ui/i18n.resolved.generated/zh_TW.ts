@@ -9768,6 +9768,14 @@ export const zh_TW: EnTranslations = {
       "loadFreight": "將貨物裝上馬車",
       "escortCaravan": "護送{zone}商隊",
       "salvageWreckage": "回收沉船殘骸",
+      "banner": {
+        "riftOpens": "A rift tears open on the strand! Raiders are coming for the salvage.",
+        "captainSteps": "The raider captain steps through the rift!",
+        "riftRouted": "The raiders are routed. The strand is yours again.",
+        "championRises": "Extra loot! A champion rises at the site. Bring it down together.",
+        "championFallen": "Extra loot! The champion falls: a bonus purse for everyone who fought it.",
+        "endlessBegins": "The line holds! Endless waves begin, each one harder. Leave the cannon whenever you like."
+      },
       "shadow": {
         "title": "Under Cover of Shadow",
         "objective": "Steal four sealed orders without being caught",

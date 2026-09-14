@@ -9768,6 +9768,14 @@ export const sv_SE: EnTranslations = {
       "loadFreight": "Load freight into the wagon",
       "escortCaravan": "Escort the caravan: {zone}",
       "salvageWreckage": "Salvage debris washed along the strand from the wreck northwest of Gullhaven",
+      "banner": {
+        "riftOpens": "A rift tears open on the strand! Raiders are coming for the salvage.",
+        "captainSteps": "The raider captain steps through the rift!",
+        "riftRouted": "The raiders are routed. The strand is yours again.",
+        "championRises": "Extra loot! A champion rises at the site. Bring it down together.",
+        "championFallen": "Extra loot! The champion falls: a bonus purse for everyone who fought it.",
+        "endlessBegins": "The line holds! Endless waves begin, each one harder. Leave the cannon whenever you like."
+      },
       "shadow": {
         "title": "Under Cover of Shadow",
         "objective": "Steal four sealed orders without being caught",

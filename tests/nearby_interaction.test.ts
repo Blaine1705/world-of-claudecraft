@@ -637,6 +637,17 @@ it('does not interact with a revealed disguise through the nearby key', () => {
 
 it('shadow sentries and guards are selected without opening dialogue or stealing on interact', () => {
   const r = rig([entity({ id: 2146900041, kind: 'npc', templateId: 'shadow_guard_north' })]);
+  // The guards exist only for a cloaked infiltrator: an uncloaked viewer cannot
+  // see or select them (the renderer withholds the body, the scan must agree).
+  expect(interact(r)).toBe(false);
+  expect(r.calls).toEqual(['error:nothing']);
+  r.calls.length = 0;
+  r.world.worldQuestLog.set('wq_eastbrook_shadow', {
+    questId: 'wq_eastbrook_shadow',
+    state: 'active',
+    count: 0,
+    shadow: { phase: 'cloaked', suspicion: 0, cooldown: 0 },
+  });
   expect(interact(r)).toBe(true);
   expect(r.calls).toEqual(['target:2146900041']);
 });

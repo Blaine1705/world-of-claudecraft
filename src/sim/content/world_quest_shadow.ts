@@ -146,6 +146,8 @@ export const SHADOW_GUARDS: readonly {
     sentry: true,
     detectionRadius: 1.5,
     cone: SHADOW_LANTERN_CONE,
+    // A short beat along the west lane; the beam sweeps with the walk.
+    patrol: { x: 44, z: 160, period: 8, pause: 3 },
     npc: {
       id: 'shadow_watch_west',
       name: 'Lantern Watchman',
@@ -163,6 +165,8 @@ export const SHADOW_GUARDS: readonly {
     sentry: true,
     detectionRadius: 1.5,
     cone: SHADOW_LANTERN_CONE,
+    // A short beat along the east lane.
+    patrol: { x: 71, z: 138, period: 8, pause: 3 },
     npc: {
       id: 'shadow_watch_east',
       name: 'Lantern Watchman',

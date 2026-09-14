@@ -18,7 +18,7 @@ import { createMob } from './entity';
 import { applyDungeonSpawnMinibossTuning } from './instances/dungeon_spawn_miniboss';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
-import type { Entity, MobTemplate, WorldQuestDef } from './types';
+import type { Entity, MobTemplate, WorldQuestBannerId, WorldQuestDef } from './types';
 import { awardWorldQuestBonusCopper, worldQuestBonusCopper } from './world_quest_bonus';
 
 export const WORLD_QUEST_CHAMPION_TYPES: ReadonlySet<WorldQuestDef['objective']['type']> = new Set([
@@ -87,7 +87,7 @@ function championTemplate(ctx: SimContext, quest: WorldQuestDef): MobTemplate | 
   return best?.templateId ? (MOBS[best.templateId] ?? null) : null;
 }
 
-function tellNear(ctx: SimContext, quest: WorldQuestDef, text: string): void {
+function tellNear(ctx: SimContext, quest: WorldQuestDef, banner: WorldQuestBannerId): void {
   for (const meta of ctx.players.values()) {
     const e = ctx.entities.get(meta.entityId);
     if (!e || e.dead) continue;
@@ -95,7 +95,7 @@ function tellNear(ctx: SimContext, quest: WorldQuestDef, text: string): void {
       Math.hypot(e.pos.x - quest.area.x, e.pos.z - quest.area.z) <=
       WORLD_QUEST_CHAMPION_TUNING.alertYards
     )
-      ctx.emit({ type: 'log', text, color: '#f7b955', pid: meta.entityId });
+      ctx.emit({ type: 'worldQuestBanner', banner, pid: meta.entityId });
   }
 }
 
@@ -139,11 +139,7 @@ export function summonWorldQuestChampion(
     lastTick: -1,
     participants: [],
   });
-  tellNear(
-    ctx,
-    quest,
-    `A champion ${template.name} rises at the site! Bring it down together for a bonus purse.`,
-  );
+  tellNear(ctx, quest, 'championRises');
   void meta;
   return true;
 }

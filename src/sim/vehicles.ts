@@ -165,12 +165,7 @@ export function tickVehicle(ctx: SimContext, meta: PlayerMeta, player: Entity): 
     const result = cannonResult(session.encounter);
     ctx.emit({ type: 'cannonResult', pid: meta.entityId, ...result });
     beginCannonEndless(session.encounter, result.medal, CANNON_INTERMISSION_TICKS);
-    ctx.emit({
-      type: 'log',
-      pid: meta.entityId,
-      text: 'The line holds! Endless waves begin: each one comes harder. Leave the cannon whenever you like.',
-      color: '#f7b955',
-    });
+    ctx.emit({ type: 'worldQuestBanner', banner: 'endlessBegins', pid: meta.entityId });
   } else if (session.encounter.phase === 'failed') {
     ctx.emit({ type: 'cannonResult', pid: meta.entityId, ...cannonResult(session.encounter) });
     // The encounter's local clock freezes at failure; retry uses the live Sim clock.

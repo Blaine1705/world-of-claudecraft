@@ -112,6 +112,7 @@ import {
   performShadowAction,
   startShadowEncounter,
   updateShadowEncounter,
+  updateShadowPatrols,
 } from './world_quest_shadow';
 import { sanitizeShadowCreditedObjects } from './world_quest_shadow_wire';
 import {
@@ -349,7 +350,10 @@ export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Ent
       }
     }
     if (quest.objective.type === 'investigation') ensureInvestigationPost(ctx);
-    if (quest.objective.type === 'shadow') ensureShadowPost(ctx);
+    if (quest.objective.type === 'shadow') {
+      ensureShadowPost(ctx);
+      updateShadowPatrols(ctx);
+    }
     if (quest.objective.type === 'horde') {
       ensureHordeInstructor(ctx);
       if (existing && updateHordeEncounter(meta, player, existing) && existing.state === 'active')

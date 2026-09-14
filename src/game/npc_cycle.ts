@@ -2,6 +2,7 @@ import {
   type InvestigationVisibilityReader,
   investigationDisguiseHidden,
 } from '../sim/world_quest_investigation_visibility';
+import { shadowGuardHidden } from '../sim/world_quest_shadow_visibility';
 // Stepping through the NPCs standing near you, for the pad's d-pad.
 //
 // Why this is not the sim's friendly cycle: `isFriendlyTo` answers "may I heal or
@@ -40,7 +41,12 @@ export function nearbyNpcs(
 ): CycleEntity[] {
   const found: { e: CycleEntity; d: number }[] = [];
   for (const e of entities) {
-    if (e.kind !== 'npc' || e.dead || investigationDisguiseHidden({ id: e.id, kind: 'npc' }, world))
+    if (
+      e.kind !== 'npc' ||
+      e.dead ||
+      investigationDisguiseHidden({ id: e.id, kind: 'npc' }, world) ||
+      shadowGuardHidden({ id: e.id, kind: 'npc' }, world)
+    )
       continue;
     const d = distance2d(origin, e.pos);
     if (d <= range) found.push({ e, d });

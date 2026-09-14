@@ -16,6 +16,7 @@ import {
   isWorldQuestSalvageObject,
   isWorldQuestSalvageObjectHidden,
 } from '../sim/world_quest_salvage';
+import { shadowGuardHidden } from '../sim/world_quest_shadow_visibility';
 import { corpseLootAvailability, localPartyMemberIds } from './corpse_loot_availability';
 import { decideEscortPress, handleEscortPress } from './escort_interact';
 import {
@@ -120,7 +121,7 @@ export function tryNearbyInteraction(
   }
 
   for (const entity of world.entities.values()) {
-    if (investigationDisguiseHidden(entity, world)) continue;
+    if (investigationDisguiseHidden(entity, world) || shadowGuardHidden(entity, world)) continue;
     const distance = dist2d(player.pos, entity.pos);
     if (
       !player.dead &&

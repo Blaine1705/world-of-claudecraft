@@ -17,11 +17,37 @@ import {
   shadowPatrolPosition,
 } from './world_quest_shadow_patrol';
 
+/** Seconds inside a lantern beam before you are caught. */
+export const SHADOW_BEAM_FILL_SECONDS = 0.6;
+/** Seconds brushing a carrier's contact circle before you are caught. */
+export const SHADOW_CONTACT_FILL_SECONDS = 1.6;
+
 export function ensureShadowPost(ctx: SimContext): void {
   if (ctx.cfg.world && !ctx.cfg.world.npcs[SHADOW_NPC_DEF.id]) return;
   for (const row of [{ entityId: SHADOW_NPC_ID, npc: SHADOW_NPC_DEF }, ...SHADOW_GUARDS]) {
     if (!ctx.entities.has(row.entityId))
       ctx.addEntity(createNpc(row.entityId, row.npc, ctx.groundPos(row.npc.pos.x, row.npc.pos.z)));
+  }
+}
+
+const PATROL_TICKS = new WeakMap<SimContext, number>();
+
+/** Walk every patrolling guard along its beat, once per tick, whether or not
+ *  anyone wears the cloak: the camp is alive for every passer-by. */
+export function updateShadowPatrols(ctx: SimContext): void {
+  if (PATROL_TICKS.get(ctx) === ctx.tickCount) return;
+  PATROL_TICKS.set(ctx, ctx.tickCount);
+  for (const row of SHADOW_GUARDS) {
+    if (!row.patrol) continue;
+    const guard = ctx.entities.get(row.entityId);
+    if (!guard || guard.templateId !== row.npc.id || guard.dead) continue;
+    const patrol = shadowPatrolPosition(row.npc.pos, row.patrol, ctx.tickCount * DT);
+    const pos = ctx.groundPos(patrol.x, patrol.z);
+    if (guard.pos.x !== pos.x || guard.pos.z !== pos.z) {
+      guard.prevPos = { ...guard.pos };
+      guard.pos = pos;
+    }
+    guard.facing = patrol.facing;
   }
 }
 export function clearShadowEncounter(ctx: SimContext, meta: PlayerMeta): void {
@@ -171,23 +197,28 @@ export function updateShadowEncounter(ctx: SimContext, meta: PlayerMeta, player:
   }
   if (state.phase !== 'cloaked' || state.lastTick === ctx.tickCount) return false;
   state.lastTick = ctx.tickCount;
-  let exposed = false;
+  // Patrols advance for everyone in updateShadowPatrols; here we only look.
+  // A lantern beam fills suspicion fast; brushing a carrier's contact circle
+  // fills it slower, so a mistimed step behind a carrier is survivable.
+  let exposed: 'beam' | 'contact' | null = null;
   for (const row of SHADOW_GUARDS) {
     const guard = ctx.entities.get(row.entityId);
     if (!guard || guard.templateId !== row.npc.id || guard.dead) continue;
-    if (row.patrol) {
-      const patrol = shadowPatrolPosition(row.npc.pos, row.patrol, ctx.tickCount * DT);
-      const pos = ctx.groundPos(patrol.x, patrol.z);
-      if (guard.pos.x !== pos.x || guard.pos.z !== pos.z) {
-        guard.prevPos = { ...guard.pos };
-        guard.pos = pos;
-      }
-      guard.facing = patrol.facing;
-    }
-    if (shadowGuardDetects(row, guard, player.pos)) exposed = true;
+    if (!shadowGuardDetects(row, guard, player.pos)) continue;
+    const contactOnly = !shadowGuardDetects(
+      { detectionRadius: 0, cone: row.cone },
+      guard,
+      player.pos,
+    );
+    if (!contactOnly) exposed = 'beam';
+    else if (exposed === null) exposed = 'contact';
   }
   state.suspicion = exposed
-    ? Math.min(1, state.suspicion + DT / 0.6)
+    ? Math.min(
+        1,
+        state.suspicion +
+          DT / (exposed === 'beam' ? SHADOW_BEAM_FILL_SECONDS : SHADOW_CONTACT_FILL_SECONDS),
+      )
     : Math.max(0, state.suspicion - DT * 2);
   state.cooldown = Math.max(0, state.cooldown - DT);
   if (state.suspicion >= 1) {

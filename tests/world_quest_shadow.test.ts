@@ -73,7 +73,11 @@ describe('Duskweave dispatches world quest', () => {
     sim.shadowWorldQuestAction('pickpocket', 2146900041);
     tick(sim, 40);
     near(sim, 2146900042, 0);
+    // A carrier's contact circle fills suspicion slowly (SHADOW_CONTACT_FILL_SECONDS):
+    // a brush is survivable, standing on him is not.
     tick(sim, 14);
+    expect(sim.worldQuestLog.get(ID)?.shadow?.phase).toBe('cloaked');
+    tick(sim, 20);
     expect(sim.worldQuestLog.get(ID)?.shadow?.phase).toBe('caught');
     expect(hasShadowCloak(sim.player)).toBe(false);
     sim.talkToNpc(SHADOW_NPC_ID);

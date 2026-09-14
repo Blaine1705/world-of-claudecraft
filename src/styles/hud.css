@@ -253,11 +253,19 @@
     grid-column: 1 / -1;
     text-align: center;
   }
+  /* Flight keeps three slots (boost, climb, dive): the slot column sizes to its
+     content and the status text takes what is left, centered as one block. */
   .vehicle-bar.glider-action-bar {
-    width: min(250px, calc(100% - 24px));
-    grid-template-columns: 64px minmax(0, 1fr);
-    gap: 8px 12px;
+    width: min(420px, calc(100% - 24px));
+    grid-template-columns: auto minmax(0, 1fr);
+    justify-content: center;
+    align-items: center;
+    gap: 8px 14px;
     padding: 10px 14px;
+  }
+  .glider-action-bar .vehicle-action-slots {
+    gap: 8px;
+    flex-wrap: nowrap;
   }
   .glider-action-bar .vehicle-action-slots {
     grid-column: 1;

@@ -19,6 +19,9 @@ import {
 } from './world_quest_trace_core';
 import { traceRibbonGeometry, worldQuestTraceMaterials } from './world_quest_trace_materials';
 
+/** Marker pool: the largest authored figure (the cross) has twelve vertices. */
+const TRACE_CORNER_MARKERS = 12;
+
 export class WorldQuestTraceVisual {
   readonly group = new THREE.Group();
   /** Entry waits for this gate before input can start a timed preview. */
@@ -31,6 +34,11 @@ export class WorldQuestTraceVisual {
   private readonly endpoint = this.ribbon('endpoint', 64, this.mats.red);
   private readonly sparkles = this.ribbon('sparkles', 256, this.mats.gold);
   private readonly nextCorner = this.ribbon('next-corner', 4, this.mats.gold);
+  /** One small ring per authored vertex, shown while drawing from memory: the
+   *  student keeps the corners (the "points"), never the line between them. */
+  private readonly corners = Array.from({ length: TRACE_CORNER_MARKERS }, (_, i) =>
+    this.ribbon(`corner-${i}`, 34, this.mats.gold),
+  );
   private readonly circle: TracePoint[] = Array.from({ length: 33 }, () => ({ x: 0, z: 0 }));
   private readonly plan: TracePresentation = { state: null, points: null, outline: false };
   private readonly guide: TraceGuidancePlan = {
@@ -114,6 +122,11 @@ export class WorldQuestTraceVisual {
     this.sparkles.visible = guided;
     this.nextCorner.visible = guided;
     this.paintGuidance();
+    // Corner rings for every figure drawn without stars: the exact points stay
+    // visible while the connecting line must come from memory.
+    const cornersShown = !!state && !!points && state.phase === 'drawing' && !guided;
+    for (let i = 0; i < this.corners.length; i++)
+      this.corners[i].visible = cornersShown && i < points.length - 1;
     this.outline.visible = !!state && this.plan.outline;
     this.start.visible = !!state;
     this.trail.visible = !!state && state.phase !== 'preview';
@@ -129,6 +142,14 @@ export class WorldQuestTraceVisual {
       this.paint(this.outline, points, 0.46);
       traceCircleInto(this.circle, points[0], 0.9);
       this.paint(this.start, this.circle, 0.2);
+      for (let i = 0; i < this.corners.length; i++) {
+        if (i >= points.length - 1) {
+          this.corners[i].geometry.setDrawRange(0, 0);
+          continue;
+        }
+        traceCircleInto(this.circle, points[i], 0.38);
+        this.paint(this.corners[i], this.circle, 0.14);
+      }
       this.trailCount = -1;
     }
     this.outline.material = state.phase === 'success' ? this.mats.green : this.mats.gold;

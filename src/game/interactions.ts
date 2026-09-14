@@ -11,6 +11,7 @@ import {
   INTERACT_RANGE,
 } from '../sim/types';
 import { investigationDisguiseHidden } from '../sim/world_quest_investigation_visibility';
+import { shadowGuardHidden } from '../sim/world_quest_shadow_visibility';
 import { t } from '../ui/i18n';
 import { tSim } from '../ui/sim_i18n';
 import type { IWorld } from '../world_api';
@@ -228,7 +229,11 @@ export function handlePickedEntity(
 
   // Quest-gated mobs (Broodmother eggs) are inert scenery to a player not on the
   // gating quest: not targetable or interactable until they take the quest.
-  if (isQuestGatedEntityHidden(e, world.questLog) || investigationDisguiseHidden(e, world))
+  if (
+    isQuestGatedEntityHidden(e, world.questLog) ||
+    investigationDisguiseHidden(e, world) ||
+    shadowGuardHidden(e, world)
+  )
     return false;
 
   if (e.kind !== 'object') world.targetEntity(id);

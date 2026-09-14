@@ -61,6 +61,14 @@ export function questEventPresentation(event: SimEvent): QuestEventPresentation 
       });
       return { bannerText: text, logText: text, sound: 'quest_accept' };
     }
+    case 'worldQuestBanner': {
+      const text = t(`questUi.worldQuest.banner.${event.banner}` as const);
+      return {
+        bannerText: text,
+        logText: text,
+        sound: event.banner === 'championFallen' ? 'quest_complete' : 'quest_ready',
+      };
+    }
     case 'worldQuestProgress': {
       const text = t('questUi.detail.objectiveProgress', {
         label: worldQuestObjectiveLabel(event.questId),

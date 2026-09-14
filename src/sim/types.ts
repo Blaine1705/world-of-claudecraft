@@ -5972,6 +5972,9 @@ export type SimEvent = { pid?: number } & (
   | { type: 'questReady'; questId: string }
   | { type: 'questDone'; questId: string }
   | { type: 'worldQuestStarted'; questId: string }
+  /** A big on-screen line for a shared world-quest moment (the client owns the
+   *  wording under questUi.worldQuest.banner.<banner>). */
+  | { type: 'worldQuestBanner'; banner: WorldQuestBannerId }
   | ({ type: 'cannonResult' } & CannonResult)
   | {
       type: 'worldQuestProgress';
@@ -8732,6 +8735,16 @@ export interface CannonFeedback extends CannonPoint {
   kind: 'shot' | 'impact' | 'barrel' | 'armor' | 'charge' | 'death';
   enemyId?: number;
 }
+export const WORLD_QUEST_BANNER_IDS = [
+  'riftOpens',
+  'captainSteps',
+  'riftRouted',
+  'championRises',
+  'championFallen',
+  'endlessBegins',
+] as const;
+export type WorldQuestBannerId = (typeof WORLD_QUEST_BANNER_IDS)[number];
+
 export interface CannonResult {
   medal: 'bronze' | 'silver' | 'gold' | null;
   integrity: number;

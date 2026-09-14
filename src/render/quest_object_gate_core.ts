@@ -25,6 +25,7 @@ import {
   isWorldQuestSalvageObject,
   isWorldQuestSalvageObjectHidden,
 } from '../sim/world_quest_salvage';
+import { shadowGuardHidden } from '../sim/world_quest_shadow_visibility';
 
 export interface QuestObjectGateOptions {
   /** Draw every ground quest collectable regardless of the viewer's quest log. The
@@ -49,6 +50,7 @@ export function makeQuestObjectGate(
   if (worldQuests) {
     return (entity, questLog) => {
       if (investigationDisguiseHidden(entity, worldQuests)) return true;
+      if (shadowGuardHidden(entity, worldQuests)) return true;
       if (salvageQuest && isWorldQuestSalvageObject(entity, salvageQuest)) {
         return isWorldQuestSalvageObjectHidden(
           entity,

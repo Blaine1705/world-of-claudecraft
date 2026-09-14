@@ -21,10 +21,11 @@
 import { MOBS } from './data';
 import { createMob } from './entity';
 import { applyDungeonSpawnMinibossTuning } from './instances/dungeon_spawn_miniboss';
+import { emitMobYell } from './mob/yells';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { addThreat } from './threat';
-import type { Entity } from './types';
+import type { Entity, WorldQuestBannerId } from './types';
 import { awardWorldQuestBonusCopper, worldQuestBonusCopper } from './world_quest_bonus';
 
 export interface WorldQuestAmbushWave {
@@ -41,6 +42,8 @@ export interface WorldQuestAmbushDef {
   triggerCount: number;
   waves: readonly WorldQuestAmbushWave[];
   leader: { mobId: string; level: number; healthMultiplier: number; scale: number };
+  /** What the captain shouts as he steps through (content text, relocalized by the client). */
+  leaderYell: string;
   /** Purse for the player who opened the portal, paid when the leader falls. */
   purse: { base: number; perLevel: number };
   /** Seconds the rift telegraphs before a wave steps out. */
@@ -66,6 +69,7 @@ export const FARSHORE_SALVAGE_AMBUSH: WorldQuestAmbushDef = {
     { mobId: 'vale_bandit', count: 4, level: 5 },
   ],
   leader: { mobId: 'vale_bandit', level: 7, healthMultiplier: 4, scale: 1.3 },
+  leaderYell: 'You will not have our plunder! Take the beach, lads!',
   purse: { base: 1_200, perLevel: 90 },
   telegraphSeconds: 2,
   cooldownSeconds: 180,
@@ -119,9 +123,9 @@ function playersNear(ctx: SimContext, def: WorldQuestAmbushDef, yards: number): 
   return out;
 }
 
-function tellNearby(ctx: SimContext, def: WorldQuestAmbushDef, text: string): void {
+function tellNearby(ctx: SimContext, def: WorldQuestAmbushDef, banner: WorldQuestBannerId): void {
   for (const meta of playersNear(ctx, def, def.abandonYards))
-    ctx.emit({ type: 'log', text, color: '#f7b955', pid: meta.entityId });
+    ctx.emit({ type: 'worldQuestBanner', banner, pid: meta.entityId });
 }
 
 function telegraph(ctx: SimContext, def: WorldQuestAmbushDef, seconds: number): void {
@@ -221,7 +225,7 @@ export function triggerWorldQuestAmbush(
     lastTick: -1,
   });
   telegraph(ctx, def, def.telegraphSeconds);
-  tellNearby(ctx, def, 'A rift tears open on the strand. Raiders are coming for the salvage!');
+  tellNearby(ctx, def, 'riftOpens');
   return true;
 }
 
@@ -269,7 +273,9 @@ export function updateWorldQuestAmbush(ctx: SimContext, def: WorldQuestAmbushDef
     state.phase = 'leader';
     state.since = ctx.time;
     telegraph(ctx, def, def.telegraphSeconds / 2);
-    tellNearby(ctx, def, 'The raiders’ captain steps through the rift!');
+    tellNearby(ctx, def, 'captainSteps');
+    const captain = state.leaderId === null ? undefined : ctx.entities.get(state.leaderId);
+    if (captain) emitMobYell(ctx, captain, def.leaderYell);
     return;
   }
   if (state.phase === 'leader') {
@@ -278,7 +284,7 @@ export function updateWorldQuestAmbush(ctx: SimContext, def: WorldQuestAmbushDef
     state.cooldownUntil = ctx.time + def.cooldownSeconds;
     state.mobIds = [];
     state.leaderId = null;
-    tellNearby(ctx, def, 'The raiders are routed. The strand is yours again.');
+    tellNearby(ctx, def, 'riftRouted');
     const opener = ctx.players.get(state.openedBy);
     const openerEntity = opener && ctx.entities.get(opener.entityId);
     if (

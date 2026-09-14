@@ -3,6 +3,14 @@
 import type { WorldQuestTraceDef, WorldQuestTraceState } from './types';
 
 export const WORLD_QUEST_TRACE_PREVIEW_SECONDS = 4;
+/** Extra memorization time per corner past a simple four-point figure. */
+export const WORLD_QUEST_TRACE_PREVIEW_PER_CORNER_SECONDS = 0.4;
+
+/** A complex sigil earns a longer look: the base clock plus a little per corner. */
+export function worldQuestTracePreviewSeconds(shape: WorldQuestTraceDef): number {
+  const corners = Math.max(0, shape.points.length - 4);
+  return WORLD_QUEST_TRACE_PREVIEW_SECONDS + WORLD_QUEST_TRACE_PREVIEW_PER_CORNER_SECONDS * corners;
+}
 export const WORLD_QUEST_TRACE_RUN_SECONDS = 120;
 export const WORLD_QUEST_TRACE_TOLERANCE = 1.25;
 export const WORLD_QUEST_TRACE_MAX_STEP = 1.5;
@@ -63,12 +71,13 @@ export function createWorldQuestTrace(
   shapeIndex = 0,
 ): WorldQuestTraceState {
   const startTime = Number.isFinite(time) ? time : 0;
+  const preview = worldQuestTracePreviewSeconds(shape);
   const state: WorldQuestTraceState = {
     questId,
     shapeIndex,
     phase: 'preview',
-    previewUntil: startTime + WORLD_QUEST_TRACE_PREVIEW_SECONDS,
-    expiresAt: startTime + WORLD_QUEST_TRACE_PREVIEW_SECONDS + WORLD_QUEST_TRACE_RUN_SECONDS,
+    previewUntil: startTime + preview,
+    expiresAt: startTime + preview + WORLD_QUEST_TRACE_RUN_SECONDS,
     trail: [],
     lastPosition: finite(position) ? { ...position } : { x: 0, z: 0 },
     segment: 0,
