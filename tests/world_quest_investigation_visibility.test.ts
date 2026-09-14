@@ -27,8 +27,8 @@ const progress = (): WorldQuestProgress => ({
 describe('personal investigation disguise visibility', () => {
   it('hides exactly the revealed culprit for each variant, never the shared entity or other investigators', () => {
     const variants = new Set<number>();
-    for (const cycle of ['wq3_0', 'wq3_3', 'wq3_5', 'wq3_7', 'wq3_14']) {
-      const variant = worldQuestPuzzleVariantForCycle(cycle, 3);
+    for (const cycle of Array.from({ length: 60 }, (_, index) => `wq3_${index}`)) {
+      const variant = worldQuestPuzzleVariantForCycle(cycle, INVESTIGATION_VARIANTS.length);
       variants.add(variant);
       const world = {
         worldQuestCycle: cycle,
@@ -48,12 +48,12 @@ describe('personal investigation disguise visibility', () => {
         expect(entity).toEqual(original);
       }
     }
-    expect(variants.size).toBe(3);
+    expect(variants.size).toBe(INVESTIGATION_VARIANTS.length);
   });
 
   it('restores admission after reset or completion, including selected NPC views', () => {
     const cycle = 'wq3_0';
-    const variant = worldQuestPuzzleVariantForCycle(cycle, 3);
+    const variant = worldQuestPuzzleVariantForCycle(cycle, INVESTIGATION_VARIANTS.length);
     const entity = guard(INVESTIGATION_NPC_IDS[INVESTIGATION_VARIANTS[variant].culprit + 1]);
     const entry = progress();
     const world = {
@@ -76,7 +76,7 @@ describe('personal investigation disguise visibility', () => {
 
   it('blocks stale click picks before targeting or opening dialogue', () => {
     const cycle = 'wq3_0';
-    const variant = worldQuestPuzzleVariantForCycle(cycle, 3);
+    const variant = worldQuestPuzzleVariantForCycle(cycle, INVESTIGATION_VARIANTS.length);
     const entity = guard(INVESTIGATION_NPC_IDS[INVESTIGATION_VARIANTS[variant].culprit + 1]);
     const target = vi.fn(),
       dialog = vi.fn();

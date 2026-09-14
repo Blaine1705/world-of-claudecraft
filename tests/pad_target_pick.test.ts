@@ -176,7 +176,8 @@ it('ignores a selected disguise after reveal and talks to a visible guard', () =
     2146900022,
   );
   Object.assign(world, {
-    worldQuestCycle: 'wq3_9',
+    // A cycle whose story names Orin (2146900022): variant 0 of the rotation.
+    worldQuestCycle: 'wq3_0',
     worldQuestLog: new Map([
       [
         'wq_mirefen_infiltrator',

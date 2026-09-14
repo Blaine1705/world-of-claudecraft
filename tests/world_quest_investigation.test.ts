@@ -31,7 +31,7 @@ function setup(variant = 0) {
   const cycle = Array.from({ length: 210 }, (_, index) => `wq3_${index}`).find(
     (candidate) =>
       activeWorldQuestsForCycle(candidate).some((quest) => quest.id === ID) &&
-      worldQuestPuzzleVariantForCycle(candidate, 3) === variant,
+      worldQuestPuzzleVariantForCycle(candidate, INVESTIGATION_VARIANTS.length) === variant,
   );
   if (!cycle) throw new Error(`No investigation rotation for variant ${variant}`);
   const sim = new Sim({
@@ -66,11 +66,15 @@ function investigate(sim: Sim, pid = sim.playerId) {
   }
 }
 function culprit(sim: Sim, pid = sim.playerId) {
-  const variant = worldQuestPuzzleVariantForCycle(sim.meta(pid)!.worldQuestCycle, 3);
+  const variant = worldQuestPuzzleVariantForCycle(
+    sim.meta(pid)!.worldQuestCycle,
+    INVESTIGATION_VARIANTS.length,
+  );
   return INVESTIGATION_NPC_IDS[INVESTIGATION_VARIANTS[variant].culprit + 1];
 }
+/** The accusation is made at the sergeant's post, naming a guard. */
 function accuse(sim: Sim, id = culprit(sim), pid = sim.playerId) {
-  near(sim, id, pid);
+  near(sim, INVESTIGATION_NPC_IDS[0], pid);
   sim.accuseWorldQuestSuspect(id, pid);
 }
 function ctx(sim: Sim): SimContext {
@@ -78,7 +82,7 @@ function ctx(sim: Sim): SimContext {
 }
 
 describe('A Borrowed Face', () => {
-  it.each([0, 1, 2])(
+  it.each(INVESTIGATION_VARIANTS.map((_, index) => index))(
     'solves variant %s through real NPC/object commands and ordinary combat credit',
     (variant) => {
       const sim = setup(variant);
@@ -121,7 +125,11 @@ describe('A Borrowed Face', () => {
     sim.player.pos = sim.groundPos(0, 200);
     sim.accuseWorldQuestSuspect(id);
     expect(sim.worldQuestLog.get(ID)?.investigation?.mobId).toBeUndefined();
+    // Standing beside the accused guard is not enough: the sergeant hears accusations.
     near(sim, id);
+    sim.accuseWorldQuestSuspect(id);
+    expect(sim.worldQuestLog.get(ID)?.investigation?.mobId).toBeUndefined();
+    near(sim, INVESTIGATION_NPC_IDS[0]);
     sim.player.dead = true;
     sim.accuseWorldQuestSuspect(id);
     sim.player.dead = false;

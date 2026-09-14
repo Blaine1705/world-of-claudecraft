@@ -808,7 +808,7 @@ describe('investigation quest dialogue', () => {
     expect(h.release).toHaveBeenCalled();
   });
   it('refreshes after online snapshot arrival, emits only accusation intent and restores correction', () => {
-    const entity = npc(INVESTIGATION_NPC_IDS[1], INVESTIGATION_NPCS[1].id);
+    const entity = npc(INVESTIGATION_NPC_IDS[0], INVESTIGATION_NPCS[0].id);
     const h = harness(entity);
     h.world.worldQuestCycle = 'wq3_0';
     const progress = {
@@ -823,14 +823,28 @@ describe('investigation quest dialogue', () => {
     expect(h.element.querySelector('[data-accuse]')).toBeNull();
     progress.investigation.heard = 15;
     h.controller.refreshIfChanged();
-    h.element.querySelector<HTMLButtonElement>('[data-accuse]')?.click();
-    expect(h.world.accuseWorldQuestSuspect).toHaveBeenCalledWith(entity.id);
+    // One option per guard, in post order, each naming the guard.
+    const options = Array.from(h.element.querySelectorAll<HTMLButtonElement>('[data-accuse]'));
+    expect(options.map((b) => Number(b.dataset.accuse))).toEqual(INVESTIGATION_NPC_IDS.slice(1));
+    expect(options[0].textContent).toBe('Accuse npc:infiltrator_nella');
+    options[1].click();
+    expect(h.world.accuseWorldQuestSuspect).toHaveBeenCalledWith(INVESTIGATION_NPC_IDS[2]);
     expect(progress.investigation.cleared).toBe(0);
     expect(h.controller.isOpen).toBe(false);
-    progress.investigation.cleared = 1;
+    progress.investigation.cleared = 2;
     h.controller.open(entity.id);
     expect(h.element.textContent).toContain('try again');
+    expect(
+      Array.from(h.element.querySelectorAll<HTMLButtonElement>('[data-accuse]')).map((b) =>
+        Number(b.dataset.accuse),
+      ),
+    ).toEqual([INVESTIGATION_NPC_IDS[1], INVESTIGATION_NPC_IDS[3], INVESTIGATION_NPC_IDS[4]]);
+    // A guard's own dialog never carries the option.
+    const guard = npc(INVESTIGATION_NPC_IDS[2], INVESTIGATION_NPCS[2].id);
+    h.world.entities.set(guard.id, guard);
+    h.controller.open(guard.id);
     expect(h.element.querySelector('[data-accuse]')).toBeNull();
+    h.controller.open(entity.id);
     progress.investigation.mobId = 500;
     h.controller.refreshIfChanged();
     expect(h.controller.isOpen).toBe(false);

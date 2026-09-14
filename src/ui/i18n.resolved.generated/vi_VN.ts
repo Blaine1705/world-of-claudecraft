@@ -9815,11 +9815,13 @@ export const vi_VN: EnTranslations = {
       "investigation": {
         "title": "A Borrowed Face",
         "objective": "Unmask and defeat the infiltrator",
-        "briefing": "A creature has stolen a soldier's face. Read the standing orders and watch ledger, question all four guards, then confront the one whose story contradicts our records.",
+        "briefing": "A creature has stolen a soldier's face. Read the standing orders and the watch ledger, question all four guards, then come back and name the one whose story contradicts our records.",
         "instructions": "Read the standing orders and watch ledger, then question all four guards. Compare their stories with the records.",
-        "confront": "Confront the guard whose story contradicts the records.",
-        "accuse": "Your story does not add up.",
+        "confront": "Report to Sergeant Alric and name the guard whose story contradicts the records.",
+        "name": "Which of my guards is wearing a borrowed face?",
+        "accuseOption": "Accuse {name}",
         "cleared": "Sergeant Alric: That soldier is accounted for. Compare the other stories with our records and try again.",
+        "guardCleared": "Sergeant Alric has already accounted for this soldier.",
         "revealed": "The creature has shed this face. Defeat it.",
         "defeat": "Defeat the revealed infiltrator.",
         "heard": "Guards questioned: {count}/4",
@@ -9852,6 +9854,30 @@ export const vi_VN: EnTranslations = {
             "guard1": "We only accept crates sealed with blue wax.",
             "guard2": "The ledger records blue seals on today's delivery.",
             "guard3": "No crates with red seals were accepted today."
+          },
+          "v3": {
+            "clue0": "The night watch relights the east beacon at dusk. The west beacon stays dark until the ferry signals.",
+            "clue1": "Nella and Orin held the gate through the night. Bram and Tessa walked the causeway and relit the east beacon at dusk.",
+            "guard0": "Orin and I had the gate all night. Nothing came through but the fog.",
+            "guard1": "Gate duty with Nella. We watched the east beacon come alight at dusk, as ordered.",
+            "guard2": "Tessa and I walked the causeway. We lit the west beacon at dusk so the ferry could see us.",
+            "guard3": "Causeway patrol with Bram. We relit the east beacon the moment the sun went down."
+          },
+          "v4": {
+            "clue0": "The quartermaster's cart arrives at noon by the north road. No supplies come by water while the marsh is flooded.",
+            "clue1": "Noon delivery received from the north road. Tessa signed for it; Bram and Nella unloaded; Orin was at the well.",
+            "guard0": "I helped Bram unload the cart at noon. Salt pork and lamp oil, the usual.",
+            "guard1": "I unloaded the noon delivery myself, straight off the supply barge.",
+            "guard2": "Nella and I carried the crates in. Tessa signed the ledger.",
+            "guard3": "The cart came up the north road at noon. I signed for it."
+          },
+          "v5": {
+            "clue0": "The fallen from the last raid lie in the chapel crypt. Nobody enters the crypt without the sergeant's key.",
+            "clue1": "The sergeant's key has not left his belt since the raid. Nella, Orin and Bram stood the wall; Tessa kept the yard.",
+            "guard0": "I stood the wall. The crypt has stayed locked since the raid; only the sergeant holds the key.",
+            "guard1": "Wall duty with Nella and Bram. Quiet, except for the frogs.",
+            "guard2": "The wall, all day. Nobody has been near the crypt.",
+            "guard3": "I kept the yard and looked in on the crypt this morning. The fallen are resting."
           }
         }
       },
@@ -15878,7 +15904,7 @@ export const vi_VN: EnTranslations = {
       "infiltrator_captain": {
         "name": "Sergeant Alric",
         "title": "Fenbridge Watch",
-        "greeting": "A creature has stolen a soldier's face. Read the standing orders and watch ledger, question all four guards, then confront the one whose story contradicts our records."
+        "greeting": "A creature has stolen a soldier's face. Read the standing orders and the watch ledger, question all four guards, then come back and name the one whose story contradicts our records."
       },
       "infiltrator_nella": {
         "name": "Guard Nella",

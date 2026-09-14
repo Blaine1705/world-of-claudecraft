@@ -153,8 +153,12 @@ export function accuseInvestigationSuspect(
     player.mountKey
   )
     return;
+  // The accusation is spoken to the sergeant (the player stands at his post
+  // and names a guard); the named guard is resolved only for the reveal.
+  const captain = ctx.entities.get(INVESTIGATION_NPC_IDS[0]);
+  if (!captain || npcIndex(captain) !== 0 || !nearby(player, captain)) return;
   const npc = ctx.entities.get(npcId);
-  if (!npc || !nearby(player, npc)) return;
+  if (!npc) return;
   const index = npcIndex(npc) - 1;
   if (index < 0) return;
   const state = stateFor(meta);
@@ -166,7 +170,7 @@ export function accuseInvestigationSuspect(
     ];
   if (index !== variant.culprit) {
     state.cleared |= 1 << index;
-    openDialogue(ctx, meta, npc.id);
+    openDialogue(ctx, meta, captain.id);
     return;
   }
   const expectedId = ctx.nextId;

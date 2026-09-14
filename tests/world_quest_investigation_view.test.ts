@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   INVESTIGATION_CLUES,
   INVESTIGATION_NPC_IDS,
+  INVESTIGATION_NPCS,
   INVESTIGATION_QUEST_ID,
   INVESTIGATION_VARIANTS,
 } from '../src/sim/content/world_quest_investigation';
@@ -26,27 +27,47 @@ function fixture(cycle = 'wq3_0') {
   };
 }
 describe('investigation dialogue projection', () => {
-  it('keeps accusations locked until every guard and both records are examined', () => {
+  it('keeps the sergeant from hearing accusations until every guard and both records are examined', () => {
     const { world, progress } = fixture();
-    expect(investigationDialogue(world, INVESTIGATION_NPC_IDS[1])?.accuse).toBe(false);
+    const captain = INVESTIGATION_NPC_IDS[0];
+    expect(investigationDialogue(world, captain)?.accuse).toBe(false);
+    expect(investigationDialogue(world, captain)?.suspects).toEqual([]);
     progress.investigation.heard = 15;
     progress.investigation.clues = 1;
-    expect(investigationDialogue(world, INVESTIGATION_NPC_IDS[1])?.accuse).toBe(false);
+    expect(investigationDialogue(world, captain)?.accuse).toBe(false);
     progress.investigation.clues = 3;
-    expect(investigationDialogue(world, INVESTIGATION_NPC_IDS[1])?.accuse).toBe(true);
-    expect(investigationDialogue(world, INVESTIGATION_NPC_IDS[0])?.accuse).toBe(false);
-    progress.investigation.cleared = 1;
+    const ready = investigationDialogue(world, captain);
+    expect(ready?.accuse).toBe(true);
+    expect(ready?.hint).toBe('Which of my guards is wearing a borrowed face?');
+    expect(ready?.suspects).toEqual(
+      INVESTIGATION_NPCS.slice(1).map((npc, index) => ({
+        npcId: INVESTIGATION_NPC_IDS[index + 1],
+        templateId: npc.id,
+      })),
+    );
+    // Guards only tell their story; the accusation is never made to them.
     expect(investigationDialogue(world, INVESTIGATION_NPC_IDS[1])).toMatchObject({
       accuse: false,
-      hint: expect.stringContaining('try again'),
+      suspects: [],
+      hint: expect.stringContaining('Sergeant Alric'),
     });
-    expect(investigationDialogue(world, INVESTIGATION_NPC_IDS[2])?.accuse).toBe(true);
+    progress.investigation.cleared = 1;
+    const afterMiss = investigationDialogue(world, captain);
+    expect(afterMiss?.hint).toContain('try again');
+    expect(afterMiss?.suspects.map((s) => s.npcId)).toEqual(INVESTIGATION_NPC_IDS.slice(2));
+    expect(investigationDialogue(world, INVESTIGATION_NPC_IDS[1])?.hint).toContain(
+      'already accounted',
+    );
+    expect(investigationDialogue(world, INVESTIGATION_NPC_IDS[2])?.accuse).toBe(false);
   });
   it('resolves clues and all statements from the same cycle variant', () => {
     const covered = new Set<number>();
     for (let i = 0; i < 30; i++) {
       const { world } = fixture(`wq3_${i}`);
-      const variant = worldQuestPuzzleVariantForCycle(world.worldQuestCycle, 3);
+      const variant = worldQuestPuzzleVariantForCycle(
+        world.worldQuestCycle,
+        INVESTIGATION_VARIANTS.length,
+      );
       covered.add(variant);
       INVESTIGATION_CLUES.forEach((clue, index) => {
         expect(investigationDialogue(world, clue.entityId)?.text).toBe(
@@ -59,7 +80,7 @@ describe('investigation dialogue projection', () => {
         );
       });
     }
-    expect(covered.size).toBe(3);
+    expect(covered.size).toBe(INVESTIGATION_VARIANTS.length);
   });
   it('tracks counts, confrontation and ordinary combat, with snapshot and rotation invalidation', () => {
     const { world, progress } = fixture();
@@ -71,7 +92,7 @@ describe('investigation dialogue projection', () => {
     progress.investigation.heard = 15;
     progress.investigation.clues = 3;
     expect(investigationSignature(world)).not.toBe(initial);
-    expect(investigationInstructionLines(progress)[0]).toContain('Confront');
+    expect(investigationInstructionLines(progress)[0]).toContain('Sergeant Alric');
     progress.investigation.mobId = 100;
     expect(investigationDialogue(world, INVESTIGATION_NPC_IDS[1])?.finished).toBe(true);
     expect(investigationInstructionLines(progress)).toEqual(['Defeat the revealed infiltrator.']);

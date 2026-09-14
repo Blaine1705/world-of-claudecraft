@@ -1,8 +1,13 @@
 import { describe, expect, it, vi } from 'vitest';
 import { tryNearbyInteraction } from '../src/game/nearby_interaction';
+import {
+  INVESTIGATION_NPC_IDS,
+  INVESTIGATION_VARIANTS,
+} from '../src/sim/content/world_quest_investigation';
 import { ITEMS } from '../src/sim/data';
 import { interactObjectCreditKey } from '../src/sim/quests/interact_object_credit';
 import type { Entity, GatherNodeDef, QuestProgress, WorldQuestProgress } from '../src/sim/types';
+import { worldQuestPuzzleVariantForCycle } from '../src/sim/world_quest_rotation';
 import { worldQuestCycleForResetDay } from '../src/sim/world_quests';
 
 function entity(overrides: Partial<Entity> & Pick<Entity, 'id' | 'kind'>): Entity {
@@ -619,9 +624,13 @@ describe('tryNearbyInteraction npc reach', () => {
 });
 
 it('does not interact with a revealed disguise through the nearby key', () => {
+  // The culprit follows the cycle's story variant; the other guard stays selectable.
+  const variant = worldQuestPuzzleVariantForCycle('wq3_9', INVESTIGATION_VARIANTS.length);
+  const culprit = INVESTIGATION_NPC_IDS[INVESTIGATION_VARIANTS[variant].culprit + 1];
+  const honest = INVESTIGATION_NPC_IDS.slice(1).find((id) => id !== culprit)!;
   const r = rig([
-    entity({ id: 2146900022, kind: 'npc', pos: { x: 1, y: 0, z: 0 }, questIds: [] }),
-    entity({ id: 2146900021, kind: 'npc', pos: { x: 2, y: 0, z: 0 }, questIds: [] }),
+    entity({ id: culprit, kind: 'npc', pos: { x: 1, y: 0, z: 0 }, questIds: [] }),
+    entity({ id: honest, kind: 'npc', pos: { x: 2, y: 0, z: 0 }, questIds: [] }),
   ]);
   r.world.worldQuestCycle = 'wq3_9';
   r.world.worldQuestLog.set('wq_mirefen_infiltrator', {
@@ -631,8 +640,8 @@ it('does not interact with a revealed disguise through the nearby key', () => {
     investigation: { heard: 15, clues: 3, cleared: 0, mobId: 90 },
   });
   interact(r);
-  expect(r.calls).toContain('quest:2146900021');
-  expect(r.calls).not.toContain('quest:2146900022');
+  expect(r.calls).toContain('quest:' + honest);
+  expect(r.calls).not.toContain('quest:' + culprit);
 });
 
 it('shadow sentries and guards are selected without opening dialogue or stealing on interact', () => {

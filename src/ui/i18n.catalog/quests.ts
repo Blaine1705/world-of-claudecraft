@@ -137,10 +137,14 @@ const questStringsEn = {
         briefing: INVESTIGATION_NPCS[0].greeting,
         instructions:
           'Read the standing orders and watch ledger, then question all four guards. Compare their stories with the records.',
-        confront: 'Confront the guard whose story contradicts the records.',
-        accuse: 'Your story does not add up.',
+        confront:
+          'Report to Sergeant Alric and name the guard whose story contradicts the records.',
+        // The sergeant's dialog once the evidence is complete: pick a name.
+        name: 'Which of my guards is wearing a borrowed face?',
+        accuseOption: 'Accuse {name}',
         cleared:
           'Sergeant Alric: That soldier is accounted for. Compare the other stories with our records and try again.',
+        guardCleared: 'Sergeant Alric has already accounted for this soldier.',
         revealed: 'The creature has shed this face. Defeat it.',
         defeat: 'Defeat the revealed infiltrator.',
         heard: 'Guards questioned: {count}/4',
@@ -173,6 +177,30 @@ const questStringsEn = {
             guard1: INVESTIGATION_VARIANTS[2].statements[1] as string,
             guard2: INVESTIGATION_VARIANTS[2].statements[2] as string,
             guard3: INVESTIGATION_VARIANTS[2].statements[3] as string,
+          },
+          v3: {
+            clue0: INVESTIGATION_VARIANTS[3].clues[0] as string,
+            clue1: INVESTIGATION_VARIANTS[3].clues[1] as string,
+            guard0: INVESTIGATION_VARIANTS[3].statements[0] as string,
+            guard1: INVESTIGATION_VARIANTS[3].statements[1] as string,
+            guard2: INVESTIGATION_VARIANTS[3].statements[2] as string,
+            guard3: INVESTIGATION_VARIANTS[3].statements[3] as string,
+          },
+          v4: {
+            clue0: INVESTIGATION_VARIANTS[4].clues[0] as string,
+            clue1: INVESTIGATION_VARIANTS[4].clues[1] as string,
+            guard0: INVESTIGATION_VARIANTS[4].statements[0] as string,
+            guard1: INVESTIGATION_VARIANTS[4].statements[1] as string,
+            guard2: INVESTIGATION_VARIANTS[4].statements[2] as string,
+            guard3: INVESTIGATION_VARIANTS[4].statements[3] as string,
+          },
+          v5: {
+            clue0: INVESTIGATION_VARIANTS[5].clues[0] as string,
+            clue1: INVESTIGATION_VARIANTS[5].clues[1] as string,
+            guard0: INVESTIGATION_VARIANTS[5].statements[0] as string,
+            guard1: INVESTIGATION_VARIANTS[5].statements[1] as string,
+            guard2: INVESTIGATION_VARIANTS[5].statements[2] as string,
+            guard3: INVESTIGATION_VARIANTS[5].statements[3] as string,
           },
         },
       },

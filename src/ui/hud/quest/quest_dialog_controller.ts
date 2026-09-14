@@ -752,12 +752,19 @@ export class QuestDialogController {
     markDialogRoot(this.deps.element, { labelledBy: 'quest-dialog-title' });
     const title = target.kind === 'npc' ? this.deps.text.npcName(target.templateId) : view.title;
     this.deps.element.innerHTML = `<div class="panel-title"><span id="quest-dialog-title">${esc(title)}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div><div class="qd-sub">${esc(view.title)}</div><div class="qd-text">${esc(view.text)}</div><div class="qd-req">${esc(view.hint)}</div>`;
-    if (view.accuse) {
-      const button = this.makeButton(t('questUi.worldQuest.investigation.accuse'));
-      button.dataset.accuse = String(target.id);
+    // The sergeant's dialog: one option per guard still under suspicion. A
+    // wrong name clears that guard server-side and reopens this dialog with
+    // the shorter list; the right one closes it as the creature sheds its face.
+    for (const suspect of view.suspects) {
+      const name = this.deps.text.npcName(suspect.templateId);
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'qd-list-item';
+      button.dataset.accuse = String(suspect.npcId);
+      button.textContent = t('questUi.worldQuest.investigation.accuseOption', { name });
       button.addEventListener('click', () => {
         this.close();
-        this.deps.world().accuseWorldQuestSuspect(target.id);
+        this.deps.world().accuseWorldQuestSuspect(suspect.npcId);
       });
       this.deps.element.appendChild(button);
     }

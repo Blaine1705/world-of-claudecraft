@@ -17,7 +17,7 @@ export const INVESTIGATION_NPCS: readonly NpcDef[] = [
     questIds: [],
     dynamic: true,
     greeting:
-      "A creature has stolen a soldier's face. Read the standing orders and watch ledger, question all four guards, then confront the one whose story contradicts our records.",
+      "A creature has stolen a soldier's face. Read the standing orders and the watch ledger, question all four guards, then come back and name the one whose story contradicts our records.",
   },
   {
     id: 'infiltrator_nella',
@@ -121,6 +121,45 @@ export const INVESTIGATION_VARIANTS = [
       'We only accept crates sealed with blue wax.',
       "The ledger records blue seals on today's delivery.",
       'No crates with red seals were accepted today.',
+    ],
+  },
+  {
+    culprit: 2,
+    clues: [
+      'The night watch relights the east beacon at dusk. The west beacon stays dark until the ferry signals.',
+      'Nella and Orin held the gate through the night. Bram and Tessa walked the causeway and relit the east beacon at dusk.',
+    ],
+    statements: [
+      'Orin and I had the gate all night. Nothing came through but the fog.',
+      'Gate duty with Nella. We watched the east beacon come alight at dusk, as ordered.',
+      'Tessa and I walked the causeway. We lit the west beacon at dusk so the ferry could see us.',
+      'Causeway patrol with Bram. We relit the east beacon the moment the sun went down.',
+    ],
+  },
+  {
+    culprit: 1,
+    clues: [
+      "The quartermaster's cart arrives at noon by the north road. No supplies come by water while the marsh is flooded.",
+      'Noon delivery received from the north road. Tessa signed for it; Bram and Nella unloaded; Orin was at the well.',
+    ],
+    statements: [
+      'I helped Bram unload the cart at noon. Salt pork and lamp oil, the usual.',
+      'I unloaded the noon delivery myself, straight off the supply barge.',
+      'Nella and I carried the crates in. Tessa signed the ledger.',
+      'The cart came up the north road at noon. I signed for it.',
+    ],
+  },
+  {
+    culprit: 3,
+    clues: [
+      "The fallen from the last raid lie in the chapel crypt. Nobody enters the crypt without the sergeant's key.",
+      "The sergeant's key has not left his belt since the raid. Nella, Orin and Bram stood the wall; Tessa kept the yard.",
+    ],
+    statements: [
+      'I stood the wall. The crypt has stayed locked since the raid; only the sergeant holds the key.',
+      'Wall duty with Nella and Bram. Quiet, except for the frogs.',
+      'The wall, all day. Nobody has been near the crypt.',
+      'I kept the yard and looked in on the crypt this morning. The fallen are resting.',
     ],
   },
 ] as const;

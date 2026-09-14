@@ -71,7 +71,8 @@ it('skips the revealed disguise for its investigator and restores it after compl
     investigation: { heard: 15, clues: 3, cleared: 0, mobId: 90 },
   };
   const world = {
-    worldQuestCycle: 'wq3_9',
+    // A cycle whose story names Orin (2146900022): variant 0 of the rotation.
+    worldQuestCycle: 'wq3_0',
     worldQuestLog: new Map([[progress.questId, progress]]),
   };
   const people = [npc(2146900022, 1), npc(2146900021, 2)];
