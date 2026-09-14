@@ -1,7 +1,8 @@
 // The Emissary's Cache: the weekly quest's container item. Opening it hands
 // the character one Normal-mode raid piece their class can wear, drawn from
 // every raid's normal loot (the Nythraxis drops and the Crucible of the Last
-// Flame tables), plus a small stack of Heroic Marks. Server-authoritative:
+// Flame tables) minus the tier sets, which stay a raid-only earn, plus a small
+// stack of Heroic Marks. Server-authoritative:
 // the pick draws ctx.rng once, and the item leaves the bag only when the
 // contents have landed.
 import { HEROIC_MARK_ITEM_ID } from './content/dungeon_difficulty';
@@ -17,9 +18,10 @@ export const EMISSARY_CACHE_ITEM_ID = 'emissary_cache';
 /** Marks tucked in beside the raid piece. */
 export const EMISSARY_CACHE_MARKS = 3;
 
-/** A wearable epic raid piece (never a token, never a generated heroic copy). */
+/** A wearable epic raid piece: never a token, never a generated heroic copy,
+ *  and never a tier-set piece (set bonuses are earned in the raid itself). */
 function isRaidGear(def: ItemDef | undefined): def is ItemDef {
-  return !!def && def.quality === 'epic' && def.kind !== 'tool' && !def.heroicOf;
+  return !!def && def.quality === 'epic' && def.kind !== 'tool' && !def.heroicOf && !def.set;
 }
 
 /** Every Normal raid piece the cache can hold, in a fixed order (Nythraxis

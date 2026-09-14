@@ -4671,7 +4671,7 @@ export const en_XA: EnTranslations = {
       "rewards": "[Ŕéŵáŕðš]",
       "alsoReceive": "[Ýóú ŵíļļ áļšó ŕéçéíʋé:]",
       "tally": "[{count} / {required}]",
-      "cacheDesc": "[Óþéñš íñţó óñé Ñóŕɱáļ ŕáíð þíéçé ƒóŕ ýóúŕ çļášš, þļúš {count} ẋ {item}.]",
+      "cacheDesc": "[Óþéñš íñţó óñé Ñóŕɱáļ ŕáíð þíéçé ƒóŕ ýóúŕ çļášš (ñéʋéŕ á ţíéŕ-šéţ þíéçé), þļúš {count} ẋ {item}.]",
       "dialogNote": "[Óñļý óñé ŵééķļý çĥáŕĝé çáñ ƀé áçţíʋé. Íţ {reset}]",
       "accept": "[Áççéþţ]",
       "decline": "[Ðéçļíñé]",
