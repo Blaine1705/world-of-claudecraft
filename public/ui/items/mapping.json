@@ -402,6 +402,14 @@
       "sourceFile": "WoC_Bag_06.png",
       "confidence": "high",
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "emissary_cache",
+      "name": "Emissary's Cache",
+      "sourcePack": "project-authored",
+      "sourceFile": "weekly-emissary/cofre.png master (1250px square, opaque violet ground, generated for this game on 2026-09-14), normalized to the 128px woc-item-icon-v1 shipping square by scripts/convert_item_icons_webp.mjs",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     }
   ],
   "generatedBatches": [

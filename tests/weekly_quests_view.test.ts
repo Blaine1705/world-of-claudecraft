@@ -1,6 +1,7 @@
 // The weekly window's pure core (src/ui/weekly_quests_view.ts).
 import { describe, expect, it } from 'vitest';
-import { WEEKLY_QUEST_REWARD, WEEKLY_QUESTS_BY_ID } from '../src/sim/content/weekly_quests';
+import { WEEKLY_QUESTS_BY_ID } from '../src/sim/content/weekly_quests';
+import { EMISSARY_CACHE_MARKS } from '../src/sim/emissary_cache';
 import { weeklyQuestRewardCopper } from '../src/sim/weekly_quests';
 import { formatMoney } from '../src/ui/i18n';
 import {
@@ -69,7 +70,9 @@ describe('weekly quests view', () => {
     expect(dialog.goalCount).toBe('0 / 1');
     expect(dialog.rewardMoney).toBe(formatMoney(weeklyQuestRewardCopper(12)));
     expect(dialog.rewardItem).toBe("Emissary's Cache");
-    expect(dialog.rewardItemDesc).toContain(`${WEEKLY_QUEST_REWARD.marks} x Heroic Mark`);
+    expect(dialog.rewardItemIcon).toBe('ui/items/emissary_cache.webp');
+    expect(dialog.rewardItemDesc).toContain('Normal raid piece');
+    expect(dialog.rewardItemDesc).toContain(`${EMISSARY_CACHE_MARKS} x Heroic Mark`);
     expect(dialog.note).toContain('resets in 3 days.');
     expect(dialog.art).toBe('ui/weekly/raid.webp');
   });

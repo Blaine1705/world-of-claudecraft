@@ -7,7 +7,6 @@
 // credit hooks the existing systems call (dungeon and raid clears from the
 // deeds credit path, battleground results, world-boss kills), the reward, and
 // the save shape. Nothing here draws randomness.
-import { HEROIC_MARK_ITEM_ID } from './content/dungeon_difficulty';
 import {
   WEEKLY_EMISSARY_NPC_DEF,
   WEEKLY_EMISSARY_NPC_ID,
@@ -154,7 +153,7 @@ export function creditWeeklyQuest(ctx: SimContext, meta: PlayerMeta, kind: Weekl
   const copper = weeklyQuestRewardCopper(player?.level ?? 1);
   meta.copper += copper;
   ctx.emit({ type: 'loot', text: `You receive ${formatMoney(copper)}.`, pid: meta.entityId });
-  ctx.addItem(HEROIC_MARK_ITEM_ID, WEEKLY_QUEST_REWARD.marks, meta.entityId);
+  ctx.addItem(WEEKLY_QUEST_REWARD.cacheItemId, WEEKLY_QUEST_REWARD.cacheCount, meta.entityId);
   ctx.emit({ type: 'worldQuestWeeklyDone', questId: quest.id, pid: meta.entityId });
 }
 

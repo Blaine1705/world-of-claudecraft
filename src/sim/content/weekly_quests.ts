@@ -23,12 +23,13 @@ export const WEEKLY_QUESTS_BY_ID: Readonly<Record<string, WeeklyQuestDef>> = Obj
   Object.fromEntries(WEEKLY_QUESTS.map((quest) => [quest.id, quest])),
 );
 
-/** Every weekly pays the same purse (scaled by level) plus the emissary's
- *  cache: a stack of Heroic Marks, the dungeon token the Highwatch
- *  quartermaster trades. */
+/** Every weekly pays the same purse (scaled by level) plus one Emissary's
+ *  Cache (src/sim/emissary_cache.ts: a Normal raid piece for the owner's
+ *  class and a few Heroic Marks). */
 export const WEEKLY_QUEST_REWARD = Object.freeze({
   copper: Object.freeze({ base: 20_000, perLevel: 500 }),
-  marks: 3,
+  cacheItemId: 'emissary_cache',
+  cacheCount: 1,
 });
 
 /** Weeks roll at the realm's weekly reset (a Tuesday); this anchor is one. */

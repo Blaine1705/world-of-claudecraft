@@ -168,7 +168,7 @@ export class WeeklyQuestsWindow {
       `<div class="wk-dialog-row"><span>${esc(dialog.goalLabel)}</span><b>${esc(dialog.goalCount)}</b></div>` +
       `<div class="wk-dialog-sub">${esc(t('hudChrome.weekly.rewards'))}</div>` +
       `<div class="wk-dialog-row"><span>${esc(t('hudChrome.weekly.alsoReceive'))}</span><b>${esc(dialog.rewardMoney)}</b></div>` +
-      `<div class="wk-reward"><span class="wk-reward-icon">${svgIcon('chest')}</span><span><span class="wk-reward-name">${esc(dialog.rewardItem)}</span><span class="wk-reward-desc">${esc(dialog.rewardItemDesc)}</span></span></div>` +
+      `<div class="wk-reward"><span class="wk-reward-icon" style="background-image:url('${esc(dialog.rewardItemIcon)}')"></span><span><span class="wk-reward-name">${esc(dialog.rewardItem)}</span><span class="wk-reward-desc">${esc(dialog.rewardItemDesc)}</span></span></div>` +
       `<div class="wk-note">${esc(dialog.note)}</div>` +
       `<div class="wk-actions"><button type="button" class="wk-btn wk-btn-accept" data-wk-accept>${esc(dialog.accept)}</button>` +
       `<button type="button" class="wk-btn" data-wk-decline>${esc(dialog.decline)}</button></div>` +

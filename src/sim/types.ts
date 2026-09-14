@@ -998,7 +998,10 @@ export type ItemUse =
   // narrowest named craft-id type the professions content has (there is no
   // craft-id union today; CRAFT_RING types its ids as string), so this
   // documents the domain without changing the checked type.
-  | { type: 'placeMobileStation'; stationCraftId: CraftDef['id'] };
+  | { type: 'placeMobileStation'; stationCraftId: CraftDef['id'] }
+  // A container: using it hands the owner its contents and consumes one unit
+  // (src/sim/emissary_cache.ts owns the one container shipped so far).
+  | { type: 'container'; container: 'emissary_cache' };
 
 // Rarity ranks for the cosmetic skin-select event, ordered low → high. A rolled
 // rank unlocks its own tier and every tier below it (epic unlocks rare+uncommon).

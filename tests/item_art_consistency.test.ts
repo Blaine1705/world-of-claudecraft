@@ -840,7 +840,7 @@ describe('item-art consistency accepted-art provenance', () => {
     // OSSBrain PR #3781 reconcile's two disjoint reins item definitions
     // (reins_goblin_rocket_sled, reins_rallycart_rxt) add two more: 1,301.
     // The wq-reputation merge's 15 faction quartermaster items: 1,320.
-    expect(Object.keys(ITEMS)).toHaveLength(1320);
+    expect(Object.keys(ITEMS)).toHaveLength(1321);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -999,9 +999,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // release/v0.43.0 merge: 1,287.
     // The faction quartermaster icons (faction-vendor-icons-2026-09-16, 15
     // SVG compositions) join at the wq-reputation merge: 1,302.
-    expect(new Set(currentOwnerIds).size).toBe(1302);
-    expect(shippingIds).toHaveLength(1302);
-    expect(Object.keys(ITEMS)).toHaveLength(1320);
+    expect(new Set(currentOwnerIds).size).toBe(1303);
+    expect(shippingIds).toHaveLength(1303);
+    expect(Object.keys(ITEMS)).toHaveLength(1321);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1075,6 +1075,8 @@ describe('item-art consistency accepted-art provenance', () => {
         'field_kit',
         'reins_goblin_rocket_sled',
         'reins_rallycart_rxt',
+        // The weekly emissary's cache chest, additive the same way.
+        'emissary_cache',
       ]),
     ).toEqual(sorted(currentOwnerIds));
 
@@ -1226,7 +1228,8 @@ describe('item-art consistency accepted-art provenance', () => {
     ).toBeUndefined();
     // The completion wave consolidates 68 interim per-entry/SVG owners into
     // one generated batch. The surviving ordinary-art cohort stays explicit.
-    expect(mapping.entries).toHaveLength(43);
+    // 43 -> 44 at the weekly emissary: the Emissary's Cache chest.
+    expect(mapping.entries).toHaveLength(44);
     expect(mapping.entries.every(({ license }) => Boolean(license))).toBe(true);
     // 24 base + this branch's 3 Masterwrought-completion batches (fine
     // materials, apex-flask, professions coverage) + the release's 2
@@ -1307,8 +1310,8 @@ describe('item-art consistency accepted-art provenance', () => {
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(1302);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1302);
+    expect(allCurrentOwnerIds).toHaveLength(1303);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1303);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1316,7 +1319,7 @@ describe('item-art consistency accepted-art provenance', () => {
       masterwroughtCompletion: completionBatch?.itemIds.length,
       crucibleProfessions: crucibleBatch?.itemIds.length,
     }).toEqual({
-      entries: 43,
+      entries: 44,
       // 755 + the world-quest branch's four batch ids (release/v0.43.0 merge)
       // + the 15 faction quartermaster ids (wq-reputation merge) = 774.
       priorGenerated: 774,
@@ -1395,8 +1398,11 @@ describe('item-art consistency accepted-art provenance', () => {
         'field_kit',
         'reins_goblin_rocket_sled',
         'reins_rallycart_rxt',
+        // The weekly emissary's cache chest (feature/weekly-quests), additive
+        // beyond the historical chain like the Field Kit.
+        'emissary_cache',
       ]),
-      'the dated catalog plus the release batches, the world-quest and faction-vendor batches, the Field Kit, and the OSSBrain reins icons is the full current catalog',
+      'the dated catalog plus the release batches, the world-quest and faction-vendor batches, the Field Kit, the OSSBrain reins icons and the Emissary Cache is the full current catalog',
     ).toEqual(sorted(allCurrentOwnerIds));
     expect(batch?.provenanceRecords).toEqual([
       `${evidenceDir}/accepted-art.json`,
@@ -1526,10 +1532,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // batch ids + 274 historical-audit batch ids + 165 Masterwrought-completion
     // batch ids + 46 Crucible-professions batch ids = 1283.
     // Plus the world-quest branch's four quest-item owners at the release/v0.43.0
-    // merge = 1302.
-    if (ownerIds.length !== 1302)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1302`);
-    if (fileIds.length !== 1302) violations.push(`shipping WebP count: ${fileIds.length} != 1302`);
+    // merge = 1302. Plus the weekly emissary's cache chest = 1303.
+    if (ownerIds.length !== 1303)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1303`);
+    if (fileIds.length !== 1303) violations.push(`shipping WebP count: ${fileIds.length} != 1303`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);
