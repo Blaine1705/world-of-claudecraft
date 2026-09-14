@@ -1,6 +1,9 @@
-// A revealed disguise disappears only for its investigator. The shared NPC
-// stays intact, and returning/completing the encounter restores its view.
+// A revealed disguise disappears only for its investigator, and once the
+// case is closed the whole post (sergeant, guards, records) leaves for that
+// viewer alone. The shared entities stay intact for everyone else; the next
+// rotation restores the view.
 import {
+  INVESTIGATION_CLUES,
   INVESTIGATION_NPC_IDS,
   INVESTIGATION_QUEST_ID,
   INVESTIGATION_VARIANTS,
@@ -13,13 +16,20 @@ export interface InvestigationVisibilityReader {
   worldQuestLog?: ReadonlyMap<string, WorldQuestProgress>;
 }
 
+const POST_ENTITY_IDS: ReadonlySet<number> = new Set<number>([
+  ...INVESTIGATION_NPC_IDS,
+  ...INVESTIGATION_CLUES.map((clue) => clue.entityId),
+]);
+
 export function investigationDisguiseHidden(
   entity: Pick<Entity, 'id' | 'kind'>,
   world: InvestigationVisibilityReader,
 ): boolean {
-  if (entity.kind !== 'npc' || !world.worldQuestCycle) return false;
-  if (!INVESTIGATION_NPC_IDS.some((id, index) => index > 0 && id === entity.id)) return false;
+  if (!world.worldQuestCycle || !POST_ENTITY_IDS.has(entity.id)) return false;
   const progress = world.worldQuestLog?.get(INVESTIGATION_QUEST_ID);
+  if (progress?.state === 'completed') return true;
+  if (entity.kind !== 'npc') return false;
+  if (!INVESTIGATION_NPC_IDS.some((id, index) => index > 0 && id === entity.id)) return false;
   if (progress?.state !== 'active' || progress.investigation?.mobId === undefined) return false;
   const variant = worldQuestPuzzleVariantForCycle(
     world.worldQuestCycle,

@@ -12,6 +12,7 @@ import {
   strongerQuestMarker,
 } from '../sim/quests/quest_marker_kind';
 import { type Entity, GATHER_CAST_ID } from '../sim/types';
+import { investigationDisguiseHidden } from '../sim/world_quest_investigation_visibility';
 import { shadowGuardHidden } from '../sim/world_quest_shadow_visibility';
 import { abilityDisplayNameFromSource } from '../ui/ability_display_name';
 import { cheaterTagLabel } from '../ui/cheater_tag';
@@ -196,7 +197,7 @@ export class NameplatePainter {
       if (isQuestGatedEntityHidden(entity, world.questLog)) continue;
       // The courier guards exist only for a cloaked infiltrator (their bodies are
       // withheld by the renderer gate; the plate must not outlive the body).
-      if (shadowGuardHidden(entity, world)) continue;
+      if (shadowGuardHidden(entity, world) || investigationDisguiseHidden(entity, world)) continue;
       // A compile gate can leave this entity with no body at all (the arrival
       // gate hides the whole group). Its plate is then the only thing that says
       // an enemy is there, so it is forced on over the nameplate toggles for

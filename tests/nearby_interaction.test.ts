@@ -644,6 +644,19 @@ it('does not interact with a revealed disguise through the nearby key', () => {
   expect(r.calls).not.toContain('quest:' + culprit);
 });
 
+it('the scout leaves the glade for a viewer who finished the dispatch run', () => {
+  const r = rig([entity({ id: 2146900040, kind: 'npc', templateId: 'shadow_scout_valerie' })]);
+  expect(interact(r)).toBe(true);
+  r.calls.length = 0;
+  r.world.worldQuestLog.set('wq_eastbrook_shadow', {
+    questId: 'wq_eastbrook_shadow',
+    state: 'completed',
+    count: 4,
+  });
+  expect(interact(r)).toBe(false);
+  expect(r.calls).toEqual(['error:nothing']);
+});
+
 it('shadow sentries and guards are selected without opening dialogue or stealing on interact', () => {
   const r = rig([entity({ id: 2146900041, kind: 'npc', templateId: 'shadow_guard_north' })]);
   // The guards exist only for a cloaked infiltrator: an uncloaked viewer cannot

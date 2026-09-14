@@ -32,8 +32,8 @@ export const FORGE_BAND_MIN_HALF = 0.055;
 /** Heat: percent floor for a warm strike, decay per second, gain per stoke, stoke cooldown. */
 export const FORGE_HEAT_FLOOR = 70;
 export const FORGE_HEAT_DECAY = 7;
-export const FORGE_STOKE_HEAT = 30;
-export const FORGE_STOKE_COOLDOWN = 1;
+export const FORGE_STOKE_HEAT = 12;
+export const FORGE_STOKE_COOLDOWN = 0.5;
 export const FORGE_STRIKE_LOCK = 0.35;
 export const FORGE_MISS_LOCK = 0.45;
 

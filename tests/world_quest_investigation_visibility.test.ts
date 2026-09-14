@@ -7,6 +7,7 @@ import {
 import { entityViewIsAdmitted, entityViewShouldDrop } from '../src/render/entity_view_policy_core';
 import { makeQuestObjectGate } from '../src/render/quest_object_gate_core';
 import {
+  INVESTIGATION_CLUES,
   INVESTIGATION_NPC_IDS,
   INVESTIGATION_QUEST_ID,
   INVESTIGATION_VARIANTS,
@@ -68,8 +69,20 @@ describe('personal investigation disguise visibility', () => {
     delete entry.investigation?.mobId;
     expect(entityViewIsAdmitted(entity, questLog, gate)).toBe(true);
     entry.investigation = { heard: 15, clues: 3, cleared: 0, mobId: 42 };
+    // A closed case empties the whole post for its investigator: every guard,
+    // the sergeant and both records; the next rotation (no log entry) restores it.
     entry.state = 'completed';
-    expect(entityViewShouldDrop(entity, player, questLog, gate, 10000)).toBe(false);
+    expect(entityViewShouldDrop(entity, player, questLog, gate, 10000)).toBe(true);
+    for (const id of INVESTIGATION_NPC_IDS)
+      expect(investigationDisguiseHidden({ id, kind: 'npc' }, world)).toBe(true);
+    for (const clue of INVESTIGATION_CLUES)
+      expect(investigationDisguiseHidden({ id: clue.entityId, kind: 'object' }, world)).toBe(true);
+    expect(investigationDisguiseHidden({ id: 5, kind: 'npc' }, world)).toBe(false);
+    world.worldQuestLog.clear();
+    expect(investigationDisguiseHidden({ id: INVESTIGATION_NPC_IDS[0], kind: 'npc' }, world)).toBe(
+      false,
+    );
+    world.worldQuestLog.set(INVESTIGATION_QUEST_ID, entry);
     entry.state = 'active';
     expect(makeQuestObjectGate({ showAllQuestObjects: true }, world)(entity, questLog)).toBe(false);
   });

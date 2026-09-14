@@ -66,8 +66,10 @@ describe('forge workshop timing hammer', () => {
     expect(forgeHeatAt(state, start + 2)).toBeCloseTo(100 - 2 * FORGE_HEAT_DECAY, 6);
     expect(stokeForge(state, start - 1)).toBe(false);
     expect(stokeForge(state, start + 2)).toBe(true);
-    expect(state.heat).toBe(100);
-    expect(stokeForge(state, start + 2.5)).toBe(false);
+    // One throw of wood never refills a cooling forge on its own.
+    expect(state.heat).toBeCloseTo(Math.min(100, 100 - 2 * FORGE_HEAT_DECAY + FORGE_STOKE_HEAT), 6);
+    expect(state.heat).toBeLessThan(100);
+    expect(stokeForge(state, start + 2 + FORGE_STOKE_COOLDOWN / 2)).toBe(false);
     expect(stokeForge(state, start + 2 + FORGE_STOKE_COOLDOWN)).toBe(true);
     const cold = { ...createForgeWorkshop(3, 0) };
     cold.heat = 40;

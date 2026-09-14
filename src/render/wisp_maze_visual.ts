@@ -181,7 +181,8 @@ export class WispMazeVisual {
       if (!enemy || !actor.visible) continue;
       const x = WISP_MAZE_SITE.x + enemy.x,
         z = WISP_MAZE_SITE.z + enemy.z;
-      actor.position.set(x, this.groundAt(x, z), z);
+      const hover = reducedMotion ? 0.25 : 0.25 + Math.sin(state.tick * 0.16 + i * 1.7) * 0.08;
+      actor.position.set(x, this.groundAt(x, z) + hover, z);
       actor.rotation.y = wispGuardianFacing(enemy);
       this.shields[i].position.set(x, this.groundAt(x, z) + 0.12, z);
       this.guardians.setFrightened(i, powered);

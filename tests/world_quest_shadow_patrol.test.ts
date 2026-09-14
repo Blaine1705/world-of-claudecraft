@@ -3,6 +3,7 @@ import {
   SHADOW_GUARDS,
   SHADOW_LANTERN_CONE,
   SHADOW_SAFE_SPOT,
+  SHADOW_WIDE_CIRCLE_FILL_SECONDS,
 } from '../src/sim/content/world_quest_shadow';
 import {
   shadowBehindCarrier,
@@ -44,15 +45,25 @@ describe('lantern detection rule', () => {
     expect(shadowGuardDetects(cone, west, { x: 6, z: 0 })).toBe(false);
   });
   it('gives every lantern guard the same wide beam and every carrier a bare contact circle', () => {
+    let wide = 0;
     for (const row of SHADOW_GUARDS) {
       if (row.sentry) {
         expect(row.cone, row.npc.id).toBe(SHADOW_LANTERN_CONE);
         expect(row.detectionRadius).toBeLessThanOrEqual(2);
       } else {
         expect(row.cone, row.npc.id).toBeUndefined();
-        expect(row.detectionRadius).toBeLessThanOrEqual(1.5);
+        if (row.detectionRadius > 1.5) {
+          // A wide circle must fill slowly enough to lift the dispatch and leave.
+          wide++;
+          expect(row.contactFillSeconds, row.npc.id).toBe(SHADOW_WIDE_CIRCLE_FILL_SECONDS);
+          // The steal itself lasts one second; the circle must allow it twice over.
+          expect(row.contactFillSeconds).toBeGreaterThan(2);
+        } else {
+          expect(row.contactFillSeconds, row.npc.id).toBeUndefined();
+        }
       }
     }
+    expect(wide).toBe(2);
     expect(SHADOW_LANTERN_CONE.radius).toBeGreaterThanOrEqual(8);
     expect(SHADOW_LANTERN_CONE.halfAngle).toBeGreaterThanOrEqual(0.7);
   });

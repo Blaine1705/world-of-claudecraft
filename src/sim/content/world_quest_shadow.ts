@@ -29,15 +29,23 @@ export const SHADOW_NPC_DEF: NpcDef = {
 /** Every lantern cone is the same wide beam: a bright, readable wedge, not a sliver. */
 export const SHADOW_LANTERN_CONE: ShadowCone = { radius: 10, halfAngle: 0.85 };
 
+/** A wide carrier circle fills suspicion this slowly: long enough to lift the
+ *  dispatch (a one-second steal) and step back out, not long enough to loiter. */
+export const SHADOW_WIDE_CIRCLE_FILL_SECONDS = 4.5;
+
 // Two guard families: dispatch carriers (circle-only, the steal targets; you slip
 // in behind them) and lantern guards (a small contact circle plus a forward cone
 // that pierces the cloak). Two lantern sentries patrol, two lantern watchmen hold
-// fixed posts facing the approach lanes.
+// fixed posts facing the approach lanes. Two carriers keep a tight circle (a
+// brush is survivable, standing on them is not); the other two wear a wide one
+// with the slow fill above, a different rhythm of the same rule.
 export const SHADOW_GUARDS: readonly {
   entityId: number;
   npc: NpcDef;
   sentry: boolean;
   detectionRadius: number;
+  /** Seconds inside the contact circle before capture (default: SHADOW_CONTACT_FILL_SECONDS). */
+  contactFillSeconds?: number;
   cone?: ShadowCone;
   patrol?: { x: number; z: number; period: number; pause: number };
 }[] = [
@@ -76,7 +84,8 @@ export const SHADOW_GUARDS: readonly {
   {
     entityId: 2146900043,
     sentry: false,
-    detectionRadius: 1.2,
+    detectionRadius: 5.5,
+    contactFillSeconds: SHADOW_WIDE_CIRCLE_FILL_SECONDS,
     npc: {
       id: 'shadow_guard_east',
       name: 'Dispatch Guard',
@@ -92,7 +101,8 @@ export const SHADOW_GUARDS: readonly {
   {
     entityId: 2146900044,
     sentry: false,
-    detectionRadius: 1.2,
+    detectionRadius: 5.5,
+    contactFillSeconds: SHADOW_WIDE_CIRCLE_FILL_SECONDS,
     npc: {
       id: 'shadow_guard_west',
       name: 'Dispatch Guard',

@@ -105,9 +105,9 @@ export const WORLD_QUEST_ESCORTS: Record<string, EscortDef> = {
     ],
     moveSpeed: 4,
     ambushes: [
-      { atWaypoint: 2, mobId: 'vale_bandit', count: 3, level: 10, radius: 6 },
-      { atWaypoint: 5, mobId: 'vale_bandit', count: 4, level: 10, radius: 7 },
-      { atWaypoint: 8, mobId: 'vale_bandit', count: 5, level: 10, radius: 8 },
+      { atWaypoint: 2, mobId: 'vale_bandit', count: 3, level: 5, radius: 6 },
+      { atWaypoint: 5, mobId: 'vale_bandit', count: 4, level: 5, radius: 7 },
+      { atWaypoint: 8, mobId: 'vale_bandit', count: 5, level: 5, radius: 8 },
     ],
     creditRadius: 35,
     respawnSeconds: 30,

@@ -78,6 +78,10 @@ it('skips the revealed disguise for its investigator and restores it after compl
   const people = [npc(2146900022, 1), npc(2146900021, 2)];
   expect(nextNpcTarget(people, origin, null, 1, 40, world)).toBe(2146900021);
   expect(nextNpcTarget(people, origin, 2146900022, -1, 40, world)).toBe(2146900021);
+  // A closed case empties the post for its investigator; the next rotation
+  // (no log entry) brings everyone back.
   progress.state = 'completed';
+  expect(nextNpcTarget(people, origin, null, 1, 40, world)).toBeNull();
+  world.worldQuestLog.clear();
   expect(nextNpcTarget(people, origin, null, 1, 40, world)).toBe(2146900022);
 });

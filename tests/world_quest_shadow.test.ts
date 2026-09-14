@@ -5,6 +5,7 @@ import {
   SHADOW_NPC_DEF,
   SHADOW_NPC_ID,
   SHADOW_SAFE_SPOT,
+  SHADOW_WIDE_CIRCLE_FILL_SECONDS,
 } from '../src/sim/content/world_quest_shadow';
 import { BUILTIN_WORLD } from '../src/sim/data';
 import { hasShadowCloak, shadowActionsLocked } from '../src/sim/shadow_action_lock';
@@ -86,6 +87,19 @@ describe('Duskweave dispatches world quest', () => {
     sim.shadowWorldQuestAction('pickpocket', 2146900041);
     tick(sim);
     expect(sim.worldQuestLog.get(ID)?.count).toBe(1);
+  });
+  it('lets a thief lift a wide-circle dispatch and leave, but not loiter inside the circle', () => {
+    const sim = setup();
+    safeGuards(sim);
+    // The east carrier's circle is wide: standing beside him is inside it.
+    near(sim, 2146900043, 2);
+    sim.shadowWorldQuestAction('pickpocket', 2146900043);
+    tick(sim);
+    expect(sim.worldQuestLog.get(ID)?.count).toBe(1);
+    expect(sim.worldQuestLog.get(ID)?.shadow?.phase).toBe('cloaked');
+    // Loitering fills the slow circle all the way.
+    tick(sim, Math.ceil(SHADOW_WIDE_CIRCLE_FILL_SECONDS * 20));
+    expect(sim.worldQuestLog.get(ID)?.shadow?.phase).toBe('caught');
   });
   it('rejects remote and sentry targets, cancels a moving steal, and ignores command spam', () => {
     const sim = setup();

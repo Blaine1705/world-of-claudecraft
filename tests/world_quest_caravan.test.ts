@@ -104,9 +104,9 @@ describe('Eastbrook world-quest caravan', () => {
       ],
       moveSpeed: 4,
       ambushes: [
-        { atWaypoint: 2, mobId: 'vale_bandit', count: 3, level: 10, radius: 6 },
-        { atWaypoint: 5, mobId: 'vale_bandit', count: 4, level: 10, radius: 7 },
-        { atWaypoint: 8, mobId: 'vale_bandit', count: 5, level: 10, radius: 8 },
+        { atWaypoint: 2, mobId: 'vale_bandit', count: 3, level: 5, radius: 6 },
+        { atWaypoint: 5, mobId: 'vale_bandit', count: 4, level: 5, radius: 7 },
+        { atWaypoint: 8, mobId: 'vale_bandit', count: 5, level: 5, radius: 8 },
       ],
       creditRadius: 35,
     });
@@ -178,7 +178,7 @@ describe('Eastbrook world-quest caravan', () => {
         .filter((entity): entity is Entity => !!entity && !entity.dead);
       if (run && run.ambushIds.length > (waveSizes.at(-1) ?? 0)) {
         waveSizes.push(run.ambushIds.length);
-        expect(live.every((mob) => mob.level === 10)).toBe(true);
+        expect(live.every((mob) => mob.level === 5)).toBe(true);
         const held = { x: wagon.pos.x, z: wagon.pos.z };
         sim.tick();
         expect(Math.hypot(wagon.pos.x - held.x, wagon.pos.z - held.z)).toBeLessThan(0.05);

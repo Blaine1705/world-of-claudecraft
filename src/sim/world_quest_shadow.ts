@@ -145,6 +145,21 @@ function guardTarget(
     return;
   return entity;
 }
+/** Suspicion this high (or any lantern beam) refuses a new steal: the thief is
+ *  already half-noticed, so the wide circles reward darting in, not loitering. */
+export const SHADOW_STEAL_SUSPICION_LIMIT = 0.5;
+
+/** True while any lantern guard's beam holds the player. */
+function shadowBeamExposure(ctx: SimContext, player: Entity): boolean {
+  for (const row of SHADOW_GUARDS) {
+    if (!row.cone) continue;
+    const guard = ctx.entities.get(row.entityId);
+    if (!guard || guard.templateId !== row.npc.id || guard.dead) continue;
+    if (shadowGuardDetects({ detectionRadius: 0, cone: row.cone }, guard, player.pos)) return true;
+  }
+  return false;
+}
+
 export function performShadowAction(
   ctx: SimContext,
   meta: PlayerMeta,
@@ -166,7 +181,8 @@ export function performShadowAction(
     !hasShadowCloak(player) ||
     state.cooldown > 0 ||
     state.stealing ||
-    state.suspicion > 0
+    state.suspicion >= SHADOW_STEAL_SUSPICION_LIMIT ||
+    shadowBeamExposure(ctx, player)
   )
     return;
   const guard = guardTarget(ctx, player, targetId ?? player.targetId ?? undefined);
@@ -200,7 +216,11 @@ export function updateShadowEncounter(ctx: SimContext, meta: PlayerMeta, player:
   // Patrols advance for everyone in updateShadowPatrols; here we only look.
   // A lantern beam fills suspicion fast; brushing a carrier's contact circle
   // fills it slower, so a mistimed step behind a carrier is survivable.
-  let exposed: 'beam' | 'contact' | null = null;
+  // Overlapping exposures take the fastest fill (the most dangerous guard wins).
+  let fillSeconds = Number.POSITIVE_INFINITY;
+  // A lantern beam also breaks a steal in progress; a contact circle does not
+  // (its slow fill is the price of lifting a dispatch inside a wide one).
+  let beam = false;
   for (const row of SHADOW_GUARDS) {
     const guard = ctx.entities.get(row.entityId);
     if (!guard || guard.templateId !== row.npc.id || guard.dead) continue;
@@ -210,15 +230,14 @@ export function updateShadowEncounter(ctx: SimContext, meta: PlayerMeta, player:
       guard,
       player.pos,
     );
-    if (!contactOnly) exposed = 'beam';
-    else if (exposed === null) exposed = 'contact';
+    const seconds = contactOnly
+      ? (row.contactFillSeconds ?? SHADOW_CONTACT_FILL_SECONDS)
+      : SHADOW_BEAM_FILL_SECONDS;
+    if (!contactOnly) beam = true;
+    fillSeconds = Math.min(fillSeconds, seconds);
   }
-  state.suspicion = exposed
-    ? Math.min(
-        1,
-        state.suspicion +
-          DT / (exposed === 'beam' ? SHADOW_BEAM_FILL_SECONDS : SHADOW_CONTACT_FILL_SECONDS),
-      )
+  state.suspicion = Number.isFinite(fillSeconds)
+    ? Math.min(1, state.suspicion + DT / fillSeconds)
     : Math.max(0, state.suspicion - DT * 2);
   state.cooldown = Math.max(0, state.cooldown - DT);
   if (state.suspicion >= 1) {
@@ -235,7 +254,7 @@ export function updateShadowEncounter(ctx: SimContext, meta: PlayerMeta, player:
   const steal = state.stealing;
   if (steal) {
     if (
-      exposed ||
+      beam ||
       !guardTarget(ctx, player, steal.targetId) ||
       Math.hypot(player.pos.x - steal.x, player.pos.z - steal.z) > 0.1
     )
