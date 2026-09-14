@@ -4,6 +4,7 @@ import {
   resolveWorldQuestLeyPuzzle,
   worldQuestDisplayedLevel,
 } from '../sim/world_quest_daily_levels';
+import { leyBonusPending } from '../sim/world_quest_ley_bonus';
 import {
   sanitizeWorldQuestPuzzleRotations,
   traceWorldQuestPuzzle,
@@ -25,6 +26,8 @@ export interface WorldQuestPuzzleTileView {
 export interface WorldQuestPuzzleView {
   questId: string;
   level: number;
+  /** Set on a charged bonus board (1 or 2) after the daily solve. */
+  bonusLevel?: number;
   columns: number;
   rows: number;
   solved: boolean;
@@ -37,7 +40,10 @@ export function buildWorldQuestPuzzleView(
   progress: WorldQuestProgress | undefined,
 ): WorldQuestPuzzleView | null {
   const quest = ownEntry(WORLD_QUESTS_BY_ID, questId);
-  if (quest?.objective.type !== 'puzzle' || progress?.state !== 'active') return null;
+  if (quest?.objective.type !== 'puzzle' || !progress) return null;
+  // A completed quest only has a board while a bonus level is charged AND open.
+  const bonus = leyBonusPending(progress) && progress.puzzleRotations !== undefined;
+  if (progress.state !== 'active' && !bonus) return null;
   const puzzle = resolveWorldQuestLeyPuzzle(quest, progress);
   if (!puzzle) return null;
   const rotations = sanitizeWorldQuestPuzzleRotations(progress.puzzleRotations, puzzle);
@@ -45,7 +51,10 @@ export function buildWorldQuestPuzzleView(
   const powered = new Set(trace.path);
   return {
     questId,
-    level: worldQuestDisplayedLevel(progress, quest.objective.puzzles.length),
+    level: bonus
+      ? 1 + (progress.puzzleBonusLevel as number)
+      : worldQuestDisplayedLevel(progress, quest.objective.puzzles.length),
+    ...(bonus ? { bonusLevel: progress.puzzleBonusLevel as number } : {}),
     columns: puzzle.columns,
     rows: puzzle.rows,
     solved: trace.solved,

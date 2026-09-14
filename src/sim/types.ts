@@ -4357,6 +4357,10 @@ export interface WorldQuestProgress {
   traceResult?: WorldQuestTraceResult;
   creditedObjects?: string[];
   puzzleVariant?: number;
+  /** Ley bonus boards past the daily solve (sim/world_quest_ley_bonus.ts): the
+   *  charged level (1 or 2) and how many this offer already paid. Persisted. */
+  puzzleBonusLevel?: number;
+  puzzleBonusClaimed?: number;
   /** Deterministic daily generation marker; absent on authored legacy/dev attempts. */
   puzzleDay?: number;
   puzzleRotations?: number[];

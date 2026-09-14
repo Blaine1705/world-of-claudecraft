@@ -1,4 +1,5 @@
 import { apiUrl } from '../client_origin';
+import { WORLD_QUEST_LEY_BONUS_LEVELS } from '../sim/world_quest_daily_generation';
 import { WORLD_QUEST_LEY_TIMER_SECONDS } from '../sim/world_quests';
 import {
   captureFocusKey,
@@ -91,9 +92,14 @@ export class WorldQuestLeyWindow {
     this.closeButton.setAttribute('aria-label', t('questUi.worldQuest.puzzleClose'));
     this.level.hidden = !board;
     this.level.textContent = board
-      ? t('questUi.worldQuest.puzzleLevel', {
-          level: formatNumber(board.level, { maximumFractionDigits: 0 }),
-        })
+      ? board.bonusLevel
+        ? t('questUi.worldQuest.puzzleBonusLevel', {
+            level: formatNumber(board.bonusLevel, { maximumFractionDigits: 0 }),
+            total: formatNumber(WORLD_QUEST_LEY_BONUS_LEVELS, { maximumFractionDigits: 0 }),
+          })
+        : t('questUi.worldQuest.puzzleLevel', {
+            level: formatNumber(board.level, { maximumFractionDigits: 0 }),
+          })
       : '';
     this.instructions.textContent = t('questUi.worldQuest.puzzleInstructions');
     this.source.textContent = t('questUi.worldQuest.puzzleSource');
@@ -110,19 +116,29 @@ export class WorldQuestLeyWindow {
     this.grid.style.setProperty('--wqp-columns', String(board?.columns ?? 3));
     this.grid.style.setProperty('--wqp-rows', String(board?.rows ?? 3));
     this.result.hidden = !terminal;
+    // A win past the daily solve is a bonus purse; the detail then points at the
+    // next charged board, or closes the offer once both are cleared.
+    const bonusPaid = state.outcome === 'won' && (state.bonusPaid ?? 0) > 0;
     this.resultTitle.textContent = terminal
       ? t(
           state.outcome === 'won'
-            ? 'questUi.worldQuest.puzzleVictoryTitle'
+            ? bonusPaid
+              ? 'questUi.worldQuest.puzzleBonusPaid'
+              : 'questUi.worldQuest.puzzleVictoryTitle'
             : 'questUi.worldQuest.puzzleDefeatTitle',
         )
       : '';
     this.resultDetail.textContent = terminal
-      ? t(
-          state.outcome === 'won'
-            ? 'questUi.worldQuest.puzzleVictoryDetail'
-            : 'questUi.worldQuest.puzzleDefeatDetail',
-        )
+      ? state.outcome === 'won'
+        ? state.bonusCharged
+          ? t('questUi.worldQuest.puzzleBonusCharged', {
+              level: formatNumber(state.bonusCharged, { maximumFractionDigits: 0 }),
+              total: formatNumber(WORLD_QUEST_LEY_BONUS_LEVELS, { maximumFractionDigits: 0 }),
+            })
+          : bonusPaid
+            ? t('questUi.worldQuest.puzzleBonusDone')
+            : t('questUi.worldQuest.puzzleVictoryDetail')
+        : t('questUi.worldQuest.puzzleDefeatDetail')
       : '';
     if (terminal) {
       this.stopTimer();

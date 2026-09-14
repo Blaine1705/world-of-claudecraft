@@ -20,49 +20,65 @@ function variant(day: number): number {
   );
 }
 
-function outsideSides(index: number): WorldQuestBeamSide[] {
+// The grid side is a parameter so the daily 4x4 and the bonus 5x5 / 6x6 boards
+// share one constructor. Every draw below happens in the same order for size 4
+// as it did before the parameter existed, so the certified daily catalog is
+// byte-identical (tests/world_quest_daily_generation.test.ts).
+function outsideSides(index: number, size = 4): WorldQuestBeamSide[] {
   const sides: WorldQuestBeamSide[] = [];
-  if (index < 4) sides.push('north');
-  if (index % 4 === 3) sides.push('east');
-  if (index >= 12) sides.push('south');
-  if (index % 4 === 0) sides.push('west');
+  if (index < size) sides.push('north');
+  if (index % size === size - 1) sides.push('east');
+  if (index >= size * (size - 1)) sides.push('south');
+  if (index % size === 0) sides.push('west');
   return sides;
 }
 
-function sideToward(from: number, to: number): WorldQuestBeamSide {
-  if (to === from - 4) return 'north';
+function sideToward(from: number, to: number, size = 4): WorldQuestBeamSide {
+  if (to === from - size) return 'north';
   if (to === from + 1) return 'east';
-  if (to === from + 4) return 'south';
+  if (to === from + size) return 'south';
   return 'west';
 }
 
+function borderCells(size: number): number[] {
+  const cells: number[] = [];
+  for (let index = 0; index < size * size; index++)
+    if (outsideSides(index, size).length > 0) cells.push(index);
+  return cells;
+}
+
 /** Construct a simple route first, then scramble its connectors. */
-function buildDailyLeyCandidate(rng: Rng): {
+function buildLeyCandidate(
+  rng: Rng,
+  size: number,
+): {
   puzzle: WorldQuestBeamPuzzleDef;
   solution: number[];
 } | null {
-  const path = [rng.pick([0, 1, 2, 3, 4, 7, 8, 11, 12, 13, 14, 15])];
-  const length = rng.int(7, 10);
+  const cellCount = size * size;
+  const path = [rng.pick(borderCells(size))];
+  // 7..10 on the daily 4x4; a longer route on the larger bonus boards.
+  const length = rng.int(2 * size - 1, 3 * size - 2);
   while (path.length < length) {
     const current = path[path.length - 1];
-    const neighbors = [current - 4, current + 1, current + 4, current - 1].filter(
+    const neighbors = [current - size, current + 1, current + size, current - 1].filter(
       (next) =>
         next >= 0 &&
-        next < 16 &&
+        next < cellCount &&
         !path.includes(next) &&
-        Math.abs((next % 4) - (current % 4)) +
-          Math.abs(Math.floor(next / 4) - Math.floor(current / 4)) ===
+        Math.abs((next % size) - (current % size)) +
+          Math.abs(Math.floor(next / size) - Math.floor(current / size)) ===
           1,
     );
     if (neighbors.length === 0) return null;
     path.push(rng.pick(neighbors));
   }
-  const exits = outsideSides(path[path.length - 1]);
+  const exits = outsideSides(path[path.length - 1], size);
   if (exits.length === 0) return null;
-  const source = { tileIndex: path[0], side: rng.pick(outsideSides(path[0])) };
+  const source = { tileIndex: path[0], side: rng.pick(outsideSides(path[0], size)) };
   const target = { tileIndex: path[path.length - 1], side: rng.pick(exits) };
   const tiles: Array<{ kind: 'straight' | 'corner'; initialRotation: number }> = Array.from(
-    { length: 16 },
+    { length: cellCount },
     () => ({
       kind: rng.chance(0.5) ? 'corner' : 'straight',
       initialRotation: rng.int(0, 3),
@@ -72,9 +88,9 @@ function buildDailyLeyCandidate(rng: Rng): {
   for (let step = 0; step < path.length; step++) {
     const index = path[step];
     const incoming: WorldQuestBeamSide =
-      step === 0 ? source.side : sideToward(index, path[step - 1]);
+      step === 0 ? source.side : sideToward(index, path[step - 1], size);
     const outgoing: WorldQuestBeamSide =
-      step === path.length - 1 ? target.side : sideToward(index, path[step + 1]);
+      step === path.length - 1 ? target.side : sideToward(index, path[step + 1], size);
     const kind =
       worldQuestPuzzleConnectors('straight', 0).includes(incoming) ===
       worldQuestPuzzleConnectors('straight', 0).includes(outgoing)
@@ -93,14 +109,14 @@ function buildDailyLeyCandidate(rng: Rng): {
     };
   }
   const puzzle: WorldQuestBeamPuzzleDef = {
-    columns: 4,
-    rows: 4,
+    columns: size,
+    rows: size,
     source,
     target,
     tiles,
   };
   if (
-    path.filter((index) => tiles[index].kind === 'corner').length < 3 ||
+    path.filter((index) => tiles[index].kind === 'corner').length < size - 1 ||
     !traceWorldQuestPuzzle(puzzle, solution).solved ||
     traceWorldQuestPuzzle(
       puzzle,
@@ -109,6 +125,10 @@ function buildDailyLeyCandidate(rng: Rng): {
   )
     return null;
   return { puzzle, solution };
+}
+
+function buildDailyLeyCandidate(rng: Rng) {
+  return buildLeyCandidate(rng, 4);
 }
 
 export function generateDailyLeyPuzzle(day: number): WorldQuestBeamPuzzleDef {
@@ -120,6 +140,25 @@ export function generateDailyLeyChallenge(day: number): {
   readonly solution: readonly number[];
 } {
   return leyCatalog[variant(day)];
+}
+
+/** Bonus boards past the daily solve: level 1 is 5x5, level 2 is 6x6. */
+export const WORLD_QUEST_LEY_BONUS_SIZES = [5, 6] as const;
+export const WORLD_QUEST_LEY_BONUS_LEVELS = WORLD_QUEST_LEY_BONUS_SIZES.length;
+
+export function generateBonusLeyChallenge(
+  day: number,
+  level: number,
+): {
+  readonly puzzle: WorldQuestBeamPuzzleDef;
+  readonly solution: readonly number[];
+} {
+  const index = Math.max(1, Math.min(WORLD_QUEST_LEY_BONUS_LEVELS, Math.floor(level))) - 1;
+  return leyBonusCatalogs[index][variant(day)];
+}
+
+export function generateBonusLeyPuzzle(day: number, level: number): WorldQuestBeamPuzzleDef {
+  return generateBonusLeyChallenge(day, level).puzzle;
 }
 
 export type DailyMatch3Move = readonly [number, number];
@@ -190,14 +229,14 @@ function buildDailyMatch3Level(day: number): WorldQuestMatch3LevelDef {
 
 // Immutable derived content, built and certified once per host. Repeated UI,
 // snapshot and command reads are O(1), without any mutable module-global memo.
-function buildDailyLeyCatalog() {
+function buildLeyCatalog(size: number, seedBase: number) {
   // Construction-only uniqueness state: lookup never mutates the frozen catalog.
   const routes = new Set<string>();
   return Object.freeze(
     Array.from({ length: WORLD_QUEST_DAILY_GENERATION_CYCLE }, (_, day) => {
-      const rng = new Rng(0x1e7be000 + day);
+      const rng = new Rng(seedBase + day);
       for (let attempt = 0; attempt < 256; attempt++) {
-        const challenge = buildDailyLeyCandidate(rng);
+        const challenge = size === 4 ? buildDailyLeyCandidate(rng) : buildLeyCandidate(rng, size);
         if (!challenge) continue;
         const path = traceWorldQuestPuzzle(challenge.puzzle, challenge.solution).path;
         const signature = [path.join(','), [...path].reverse().join(',')].sort()[0];
@@ -215,7 +254,11 @@ function buildDailyLeyCatalog() {
     }),
   );
 }
-const leyCatalog = buildDailyLeyCatalog();
+const leyCatalog = buildLeyCatalog(4, 0x1e7be000);
+// Bonus catalogs: their own seed lanes, so neither depends on the daily draws.
+const leyBonusCatalogs = Object.freeze(
+  WORLD_QUEST_LEY_BONUS_SIZES.map((size) => buildLeyCatalog(size, 0x1e7be000 + size * 0x10000)),
+);
 const match3Catalog = Object.freeze(
   Array.from({ length: WORLD_QUEST_DAILY_GENERATION_CYCLE }, (_, day) =>
     buildDailyMatch3Level(day),

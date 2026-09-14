@@ -74,6 +74,12 @@ import {
   updateInvestigationEncounter,
 } from './world_quest_investigation';
 import {
+  claimLeyBonus,
+  leyBonusPending,
+  sanitizeLeyBonusProgress,
+  unlockLeyBonus,
+} from './world_quest_ley_bonus';
+import {
   applyWorldQuestMatch3Move,
   sanitizeWorldQuestMatch3Board,
   worldQuestMatch3InitialBoard,
@@ -314,7 +320,7 @@ export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Ent
       if (
         meta.openWorldQuestPuzzleId === quest.id &&
         existing &&
-        existing.state === 'active' &&
+        (existing.state === 'active' || leyBonusPending(existing)) &&
         existing.puzzleExpiresAt !== undefined &&
         existing.puzzleExpiresAt > 0 &&
         ctx.time >= existing.puzzleExpiresAt
@@ -761,7 +767,8 @@ export function onObjectInteractedForWorldQuests(
   }
   if (handled) return true;
   for (const progress of meta.worldQuestLog.values()) {
-    if (progress.state !== 'active') continue;
+    // A completed ley quest still answers its cache while a bonus board is charged.
+    if (progress.state !== 'active' && !leyBonusPending(progress)) continue;
     const quest = worldQuestById(progress.questId);
     if (!quest || !inWorldQuestArea(player, quest) || !inWorldQuestArea(obj, quest)) continue;
     if (quest.objective.type === 'puzzle' || quest.objective.type === 'match3') {
@@ -840,7 +847,8 @@ export function rotateWorldQuestPuzzleTile(
     !quest ||
     quest.objective.type !== 'puzzle' ||
     !puzzle ||
-    progress?.state !== 'active' ||
+    !progress ||
+    (progress.state !== 'active' && !leyBonusPending(progress)) ||
     meta.openWorldQuestPuzzleId !== questId ||
     !inWorldQuestArea(player, quest) ||
     (progress.puzzleExpiresAt !== undefined &&
@@ -863,7 +871,15 @@ export function rotateWorldQuestPuzzleTile(
   });
   if (traceWorldQuestPuzzle(puzzle, rotations).solved) {
     delete progress.puzzleExpiresAt;
-    creditWorldQuest(ctx, meta, quest, progress, quest.count);
+    if (progress.state === 'active') {
+      // The daily solve completes the quest and charges the first bonus board.
+      const day = progress.puzzleDay;
+      creditWorldQuest(ctx, meta, quest, progress, quest.count);
+      unlockLeyBonus(progress, day);
+    } else {
+      claimLeyBonus(ctx, meta, progress);
+    }
+    meta.wireRev++;
   }
 }
 
@@ -958,7 +974,8 @@ export function resetWorldQuestPuzzle(ctx: SimContext, questId: string, pid?: nu
     !quest ||
     quest.objective.type !== 'puzzle' ||
     !puzzle ||
-    progress?.state !== 'active' ||
+    !progress ||
+    (progress.state !== 'active' && !leyBonusPending(progress)) ||
     meta.openWorldQuestPuzzleId !== questId ||
     !inWorldQuestArea(player, quest) ||
     (progress.puzzleExpiresAt !== 0 &&
@@ -1063,6 +1080,28 @@ export function sanitizeWorldQuestProgress(
         normalized.puzzleDay = worldQuestCycleNumber(cycle) ?? 0;
       const puzzle = beamPuzzle(quest, normalized)!;
       normalized.puzzleRotations = sanitizeWorldQuestPuzzleRotations(raw.puzzleRotations, puzzle);
+      if (
+        includeSessionDeadlines &&
+        typeof raw.puzzleExpiresAt === 'number' &&
+        Number.isFinite(raw.puzzleExpiresAt) &&
+        raw.puzzleExpiresAt >= 0
+      ) {
+        normalized.puzzleExpiresAt = raw.puzzleExpiresAt;
+      }
+    }
+    if (
+      raw.state === 'completed' &&
+      quest.objective.type === 'puzzle' &&
+      sanitizeLeyBonusProgress(
+        raw,
+        normalized,
+        quest,
+        normalizeWorldQuestCycle(cycle) ? (worldQuestCycleNumber(cycle) ?? 0) : undefined,
+      )
+    ) {
+      const puzzle = beamPuzzle(quest, normalized);
+      if (puzzle && Array.isArray(raw.puzzleRotations))
+        normalized.puzzleRotations = sanitizeWorldQuestPuzzleRotations(raw.puzzleRotations, puzzle);
       if (
         includeSessionDeadlines &&
         typeof raw.puzzleExpiresAt === 'number' &&
