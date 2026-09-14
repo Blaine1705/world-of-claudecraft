@@ -209,7 +209,7 @@ export function handleDevChat(
     emitDevLog(
       ctx,
       pid,
-      `[dev] Shipwreck salvage weekly layout ${variant + 1} armed. Use /dev tp 287 89.`,
+      `[dev] Shipwreck salvage weekly layout ${variant + 1} armed. Use /dev tp 284 92 (beside the wreck).`,
     );
     return null;
   }

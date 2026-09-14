@@ -123,11 +123,16 @@ describe('world quest tracing visual', () => {
         { x: 1, z: 0 },
       ];
       visual.update(world);
-      expect(mesh('sparkles').visible).toBe(true);
+      // Guide stars and the corner marker teach the first figure only; later
+      // figures are drawn from memory, so both stay hidden while the trail paints.
+      expect(mesh('sparkles').visible).toBe(shapeIndex === 0);
+      expect(mesh('next-corner').visible).toBe(shapeIndex === 0);
       expect(mesh('trail').material).toBe(worldQuestTraceMaterials().blue);
-      const corner = mesh('next-corner').geometry.getAttribute('position').array;
-      expect(corner[0]).toBeCloseTo(objective.shapes[shapeIndex].points[1].x);
-      expect(corner[2]).toBeCloseTo(objective.shapes[shapeIndex].points[1].z);
+      if (shapeIndex === 0) {
+        const corner = mesh('next-corner').geometry.getAttribute('position').array;
+        expect(corner[0]).toBeCloseTo(objective.shapes[shapeIndex].points[1].x);
+        expect(corner[2]).toBeCloseTo(objective.shapes[shapeIndex].points[1].z);
+      }
     }
     tracing.phase = 'success';
     visual.update(world);

@@ -7,12 +7,29 @@ export const WORLD_QUEST_TRACE_VARIANTS = [
   'lightning',
   'spiral',
   'double-triangle',
+  'diamond',
+  'pentagon',
+  'arrow',
+  'zigzag',
+  'cross',
 ] as const;
 
-export function worldQuestTraceVariantForCycle(cycle: string): string {
+function fnv(text: string): number {
   let hash = 2166136261;
-  for (let i = 0; i < cycle.length; i++) hash = Math.imul(hash ^ cycle.charCodeAt(i), 16777619);
-  return WORLD_QUEST_TRACE_VARIANTS[(hash >>> 0) % WORLD_QUEST_TRACE_VARIANTS.length];
+  for (let i = 0; i < text.length; i++) hash = Math.imul(hash ^ text.charCodeAt(i), 16777619);
+  return hash >>> 0;
+}
+
+export function worldQuestTraceVariantForCycle(cycle: string): string {
+  return WORLD_QUEST_TRACE_VARIANTS[fnv(cycle) % WORLD_QUEST_TRACE_VARIANTS.length];
+}
+
+/** The offered figure differs per player as well as per day, so two students at
+ *  the same clearing trace different sigils and a returning student meets a new
+ *  one each morning; still a pure hash, never a simulation RNG draw. */
+export function worldQuestTraceVariantForStudent(cycle: string, studentId: number): string {
+  const salt = Number.isSafeInteger(studentId) ? studentId : 0;
+  return WORLD_QUEST_TRACE_VARIANTS[fnv(`${cycle}:${salt}`) % WORLD_QUEST_TRACE_VARIANTS.length];
 }
 
 /** Unknown future identifiers fail closed, never silently changing a saved puzzle. */

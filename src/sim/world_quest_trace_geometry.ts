@@ -2,7 +2,7 @@
 // run; sampled presentation trails never determine quest completion.
 import type { WorldQuestTraceDef, WorldQuestTraceState } from './types';
 
-export const WORLD_QUEST_TRACE_PREVIEW_SECONDS = 6;
+export const WORLD_QUEST_TRACE_PREVIEW_SECONDS = 4;
 export const WORLD_QUEST_TRACE_RUN_SECONDS = 120;
 export const WORLD_QUEST_TRACE_TOLERANCE = 1.25;
 export const WORLD_QUEST_TRACE_MAX_STEP = 1.5;

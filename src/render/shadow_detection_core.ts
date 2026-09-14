@@ -9,7 +9,9 @@ export function shadowDetectionVisible(
   return !dead && progress?.state === 'active' && progress.shadow?.phase === 'cloaked';
 }
 
-/** Conform a circular strip to the actual ground without changing its gameplay radius. */
+/** Conform a circular strip to the actual ground without changing its gameplay radius.
+ *  `startAngle` and `sweep` (radians, the sim's facing convention: x = sin, z = cos)
+ *  turn the full ring into a lantern wedge; the defaults keep the whole circle. */
 export function writeShadowRing(
   positions: Float32Array,
   x: number,
@@ -17,9 +19,11 @@ export function writeShadowRing(
   inner: number,
   outer: number,
   groundAt: (x: number, z: number) => number,
+  startAngle = 0,
+  sweep = Math.PI * 2,
 ): void {
   for (let i = 0; i <= SHADOW_RING_SEGMENTS; i++) {
-    const angle = (i / SHADOW_RING_SEGMENTS) * Math.PI * 2;
+    const angle = startAngle + (i / SHADOW_RING_SEGMENTS) * sweep;
     for (let side = 0; side < 2; side++) {
       const radius = side === 0 ? inner : outer;
       const px = x + Math.sin(angle) * radius;

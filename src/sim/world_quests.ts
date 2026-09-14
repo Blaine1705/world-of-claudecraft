@@ -103,7 +103,7 @@ import {
 } from './world_quest_trace_score';
 import {
   sanitizeWorldQuestTraceVariant,
-  worldQuestTraceVariantForCycle,
+  worldQuestTraceVariantForStudent,
 } from './world_quest_trace_variants';
 import {
   clearWorldQuestTracing,
@@ -376,7 +376,10 @@ export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Ent
         state: 'active',
       };
       if (quest.objective.type === 'tracing')
-        progress.traceVariant = worldQuestTraceVariantForCycle(meta.worldQuestCycle);
+        progress.traceVariant = worldQuestTraceVariantForStudent(
+          meta.worldQuestCycle,
+          meta.entityId,
+        );
       if (isWorldQuestMinigame(quest) && !meta.devWorldQuestCycle)
         progress.puzzleDay = worldQuestCycleNumber(meta.worldQuestCycle) ?? 0;
       if (

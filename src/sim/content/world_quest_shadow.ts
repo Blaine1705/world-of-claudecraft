@@ -1,4 +1,5 @@
 import type { NpcDef, WorldQuestDef } from '../types';
+import type { ShadowCone } from '../world_quest_shadow_patrol';
 
 export const SHADOW_QUEST_ID = 'wq_eastbrook_shadow';
 export const SHADOW_NPC_ID = 2_146_900_040;
@@ -23,13 +24,21 @@ export const SHADOW_NPC_DEF: NpcDef = {
   questIds: [],
   dynamic: true,
   greeting:
-    'Borrow my duskweave cloak. Take a dispatch from each guard, and stay clear of the sentries. Their lanterns can pierce the enchantment.',
+    'Borrow my duskweave cloak. Slip in behind each dispatch carrier and lift his orders. Stay out of the lantern beams: a lantern guard sees straight through the enchantment, and a carrier feels you if you brush against him.',
 };
+/** Every lantern cone is the same wide beam: a bright, readable wedge, not a sliver. */
+export const SHADOW_LANTERN_CONE: ShadowCone = { radius: 10, halfAngle: 0.85 };
+
+// Two guard families: dispatch carriers (circle-only, the steal targets; you slip
+// in behind them) and lantern guards (a small contact circle plus a forward cone
+// that pierces the cloak). Two lantern sentries patrol, two lantern watchmen hold
+// fixed posts facing the approach lanes.
 export const SHADOW_GUARDS: readonly {
   entityId: number;
   npc: NpcDef;
   sentry: boolean;
   detectionRadius: number;
+  cone?: ShadowCone;
   patrol?: { x: number; z: number; period: number; pause: number };
 }[] = [
   {
@@ -99,7 +108,8 @@ export const SHADOW_GUARDS: readonly {
   {
     entityId: 2146900045,
     sentry: true,
-    detectionRadius: 6,
+    detectionRadius: 1.5,
+    cone: SHADOW_LANTERN_CONE,
     patrol: { x: 67, z: 134, period: 12, pause: 3 },
     npc: {
       id: 'shadow_sentry_south',
@@ -116,7 +126,8 @@ export const SHADOW_GUARDS: readonly {
   {
     entityId: 2146900046,
     sentry: true,
-    detectionRadius: 6,
+    detectionRadius: 1.5,
+    cone: SHADOW_LANTERN_CONE,
     patrol: { x: 68, z: 156, period: 14, pause: 3 },
     npc: {
       id: 'shadow_sentry_north',
@@ -125,6 +136,40 @@ export const SHADOW_GUARDS: readonly {
       greeting: 'Nothing slips past the lantern watch.',
       pos: { x: 43, z: 142 },
       facing: 1.5,
+      color: 0xd4a553,
+      questIds: [],
+      dynamic: true,
+    },
+  },
+  {
+    entityId: 2146900047,
+    sentry: true,
+    detectionRadius: 1.5,
+    cone: SHADOW_LANTERN_CONE,
+    npc: {
+      id: 'shadow_watch_west',
+      name: 'Lantern Watchman',
+      title: 'True Sight',
+      greeting: 'Hold there. The lantern sees what the eye misses.',
+      pos: { x: 44, z: 152 },
+      facing: 1.5708,
+      color: 0xd4a553,
+      questIds: [],
+      dynamic: true,
+    },
+  },
+  {
+    entityId: 2146900048,
+    sentry: true,
+    detectionRadius: 1.5,
+    cone: SHADOW_LANTERN_CONE,
+    npc: {
+      id: 'shadow_watch_east',
+      name: 'Lantern Watchman',
+      title: 'True Sight',
+      greeting: 'Nobody crosses my light unseen.',
+      pos: { x: 71, z: 146 },
+      facing: -1.5708,
       color: 0xd4a553,
       questIds: [],
       dynamic: true,

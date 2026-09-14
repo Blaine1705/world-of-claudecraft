@@ -4184,7 +4184,19 @@ export interface WorldQuestMatch3LevelDef {
 }
 
 export interface WorldQuestTraceDef {
-  kind: 'triangle' | 'square' | 'star' | 'hourglass' | 'lightning' | 'spiral' | 'double-triangle';
+  kind:
+    | 'triangle'
+    | 'square'
+    | 'star'
+    | 'hourglass'
+    | 'lightning'
+    | 'spiral'
+    | 'double-triangle'
+    | 'diamond'
+    | 'pentagon'
+    | 'arrow'
+    | 'zigzag'
+    | 'cross';
   /** Closed outline, with the first vertex repeated at the end. */
   points: readonly { x: number; z: number }[];
 }

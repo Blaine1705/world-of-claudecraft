@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { SHADOW_GUARDS, SHADOW_QUEST_ID } from '../sim/content/world_quest_shadow';
+import { shadowGuardDetects } from '../sim/world_quest_shadow_patrol';
 import type { IWorld } from '../world_api';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import {
@@ -55,6 +56,34 @@ export class ShadowInfiltrationVisual {
     fill.renderOrder = 4;
     return { guard, edge, fill, x: Number.NaN, z: Number.NaN };
   });
+  // Lantern wedges, one pair per cone guard, appended AFTER every ring so the ring
+  // child order (pinned by tests/shadow_detection.test.ts) is unchanged.
+  private readonly wedges = SHADOW_GUARDS.filter((guard) => guard.cone).map((guard) => {
+    const edge = new THREE.Mesh(
+      strip(),
+      new THREE.MeshBasicMaterial({
+        color: 0xffbd49,
+        transparent: true,
+        opacity: 0.9,
+        depthWrite: false,
+        side: THREE.DoubleSide,
+      }),
+    );
+    const fill = new THREE.Mesh(
+      strip(),
+      new THREE.MeshBasicMaterial({
+        color: 0xff842d,
+        transparent: true,
+        opacity: 0.18,
+        depthWrite: false,
+        side: THREE.DoubleSide,
+      }),
+    );
+    edge.frustumCulled = fill.frustumCulled = false;
+    edge.renderOrder = 5;
+    fill.renderOrder = 4;
+    return { guard, edge, fill, x: Number.NaN, z: Number.NaN, facing: Number.NaN };
+  });
 
   constructor(
     scene: THREE.Object3D,
@@ -66,6 +95,10 @@ export class ShadowInfiltrationVisual {
     for (const zone of this.zones) {
       this.group.add(zone.fill, zone.edge);
       this.position(zone, zone.guard.npc.pos.x, zone.guard.npc.pos.z);
+    }
+    for (const wedge of this.wedges) {
+      this.group.add(wedge.fill, wedge.edge);
+      this.aim(wedge, wedge.guard.npc.pos.x, wedge.guard.npc.pos.z, wedge.guard.npc.facing);
     }
     this.readyForEntry = attachSceneGroupGated(scene, this.group, compileGate, () => this.disposed)
       .then(() => {
@@ -91,6 +124,33 @@ export class ShadowInfiltrationVisual {
     zone.z = z;
   }
 
+  private aim(wedge: (typeof this.wedges)[number], x: number, z: number, facing: number): void {
+    const cone = wedge.guard.cone;
+    if (!cone) return;
+    const start = facing - cone.halfAngle;
+    const sweep = cone.halfAngle * 2;
+    for (const [mesh, inner] of [
+      [wedge.fill, 0],
+      [wedge.edge, Math.max(0, cone.radius - 0.12)],
+    ] as const) {
+      const attribute = mesh.geometry.getAttribute('position') as THREE.BufferAttribute;
+      writeShadowRing(
+        attribute.array as Float32Array,
+        x,
+        z,
+        inner,
+        cone.radius,
+        this.groundAt,
+        start,
+        sweep,
+      );
+      attribute.needsUpdate = true;
+    }
+    wedge.x = x;
+    wedge.z = z;
+    wedge.facing = facing;
+  }
+
   update(world: IWorld): void {
     const progress = world.worldQuestLog.get(SHADOW_QUEST_ID);
     this.group.visible =
@@ -103,18 +163,26 @@ export class ShadowInfiltrationVisual {
       if (zone.x !== guard.pos.x || zone.z !== guard.pos.z)
         this.position(zone, guard.pos.x, guard.pos.z);
       const stolen = progress?.creditedObjects?.includes(String(guard.id)) ?? false;
-      const inside =
-        Math.hypot(world.player.pos.x - guard.pos.x, world.player.pos.z - guard.pos.z) <=
-        zone.guard.detectionRadius;
+      const inside = shadowGuardDetects(zone.guard, guard, world.player.pos);
       zone.edge.material.color.setHex(inside ? 0xff4438 : stolen ? 0x73e6a4 : 0xffbd49);
       zone.fill.material.color.copy(zone.edge.material.color);
+    }
+    for (const wedge of this.wedges) {
+      const guard = world.entities.get(wedge.guard.entityId);
+      wedge.edge.visible = wedge.fill.visible = !!guard && !guard.dead;
+      if (!guard || guard.dead) continue;
+      if (wedge.x !== guard.pos.x || wedge.z !== guard.pos.z || wedge.facing !== guard.facing)
+        this.aim(wedge, guard.pos.x, guard.pos.z, guard.facing);
+      const inside = shadowGuardDetects(wedge.guard, guard, world.player.pos);
+      wedge.edge.material.color.setHex(inside ? 0xff4438 : 0xffbd49);
+      wedge.fill.material.color.copy(wedge.edge.material.color);
     }
   }
 
   dispose(): void {
     this.disposed = true;
     this.group.removeFromParent();
-    for (const zone of this.zones) {
+    for (const zone of [...this.zones, ...this.wedges]) {
       zone.edge.geometry.dispose();
       zone.fill.geometry.dispose();
       zone.edge.material.dispose();

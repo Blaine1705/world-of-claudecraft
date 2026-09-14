@@ -62,6 +62,75 @@ export const WORLD_QUEST_CALLIGRAPHY_ADVANCED: readonly WorldQuestTraceDef[] = [
       { x: 172, z: -27 },
     ],
   },
+  // Round-two additions (append-only, see WORLD_QUEST_TRACE_VARIANTS): five more
+  // closed single strokes in the same clearing, every edge longer than twice the
+  // 1.25 yd tolerance so no two corners blur together.
+  {
+    kind: 'diamond',
+    points: [
+      { x: 172, z: -20 },
+      { x: 178, z: -26.5 },
+      { x: 172, z: -32 },
+      { x: 166, z: -26.5 },
+      { x: 172, z: -20 },
+    ],
+  },
+  {
+    kind: 'pentagon',
+    points: [
+      { x: 172, z: -20 },
+      { x: 177.7, z: -24.1 },
+      { x: 175.5, z: -30.9 },
+      { x: 168.5, z: -30.9 },
+      { x: 166.3, z: -24.1 },
+      { x: 172, z: -20 },
+    ],
+  },
+  {
+    kind: 'arrow',
+    points: [
+      { x: 172, z: -20 },
+      { x: 178, z: -26 },
+      { x: 174.5, z: -26 },
+      { x: 174.5, z: -32 },
+      { x: 169.5, z: -32 },
+      { x: 169.5, z: -26 },
+      { x: 166, z: -26 },
+      { x: 172, z: -20 },
+    ],
+  },
+  {
+    // Kept south of z -21: the clearing's north-west corner rises past the
+    // walking-slope limit there (tests/world_quest_tracing.test.ts).
+    kind: 'zigzag',
+    points: [
+      { x: 167, z: -22 },
+      { x: 177, z: -22 },
+      { x: 169, z: -26 },
+      { x: 177, z: -30 },
+      { x: 167, z: -30 },
+      { x: 175, z: -26 },
+      { x: 167, z: -22 },
+    ],
+  },
+  {
+    kind: 'cross',
+    points: [
+      { x: 169.5, z: -21 },
+      { x: 174.5, z: -21 },
+      { x: 174.5, z: -24.5 },
+      { x: 178, z: -24.5 },
+      { x: 178, z: -29.5 },
+      { x: 174.5, z: -29.5 },
+      { x: 174.5, z: -33 },
+      { x: 169.5, z: -33 },
+      { x: 169.5, z: -29.5 },
+      { x: 166, z: -29.5 },
+      { x: 166, z: -24.5 },
+      { x: 169.5, z: -24.5 },
+      { x: 169.5, z: -21 },
+    ],
+  },
 ];
 
 /** A dry, gently sloped clearing. No terrain stamps or calm pads are added. */

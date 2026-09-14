@@ -11,7 +11,11 @@ import { hasShadowCloak, SHADOW_CLOAK_AURA_ID } from './shadow_action_lock';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { DT, type Entity, INTERACT_RANGE, type WorldQuestProgress } from './types';
-import { shadowBehindCarrier, shadowPatrolPosition } from './world_quest_shadow_patrol';
+import {
+  shadowBehindCarrier,
+  shadowGuardDetects,
+  shadowPatrolPosition,
+} from './world_quest_shadow_patrol';
 
 export function ensureShadowPost(ctx: SimContext): void {
   if (ctx.cfg.world && !ctx.cfg.world.npcs[SHADOW_NPC_DEF.id]) return;
@@ -180,8 +184,7 @@ export function updateShadowEncounter(ctx: SimContext, meta: PlayerMeta, player:
       }
       guard.facing = patrol.facing;
     }
-    if (Math.hypot(player.pos.x - guard.pos.x, player.pos.z - guard.pos.z) < row.detectionRadius)
-      exposed = true;
+    if (shadowGuardDetects(row, guard, player.pos)) exposed = true;
   }
   state.suspicion = exposed
     ? Math.min(1, state.suspicion + DT / 0.6)

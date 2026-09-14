@@ -242,34 +242,42 @@ export const WORLD_QUEST_ESCORTS: Record<string, EscortDef> = {
 export const FARSHORE_SALVAGE_OBJECT_ITEM_ID = 'wreckfield_flotsam_crate';
 export const FARSHORE_SALVAGE_ENTITY_ID_START = 2_147_100_100;
 
+// Every piece lies on the dry strand (7 to 13 yd above the waterline, walkable
+// slope), at least 6 yd from any other piece and clear of every Gullhaven NPC and
+// prop, chosen by farthest-point sampling from the wreck at (270, 106) so each
+// weekly layout spans the whole beach from the hull to the town's north edge
+// (about 50 by 40 yd) instead of one tight grid. The strand is boxed by the
+// Riftfields hostiles to the east (tests/world_quests.test.ts pins a quiet
+// shoreline), so the scatter runs west and south of the hull instead.
+// tests/world_quest_salvage.test.ts pins the band, spacing and spread.
 const FARSHORE_SALVAGE_POSITIONS = [
-  // Layout 1: the high-tide line north of Gullhaven.
-  { x: 277, z: 82 },
-  { x: 285, z: 82 },
-  { x: 293, z: 82 },
-  { x: 301, z: 82 },
-  { x: 281, z: 90 },
-  { x: 289, z: 90 },
-  { x: 297, z: 90 },
-  { x: 289, z: 102 },
-  // Layout 2: debris washed farther south after a change in current.
-  { x: 273, z: 78 },
-  { x: 281, z: 78 },
-  { x: 289, z: 78 },
-  { x: 301, z: 78 },
-  { x: 277, z: 86 },
-  { x: 285, z: 86 },
-  { x: 289, z: 86 },
-  { x: 301, z: 86 },
-  // Layout 3: a broad scatter along the northern strand.
-  { x: 273, z: 90 },
-  { x: 281, z: 94 },
-  { x: 285, z: 94 },
-  { x: 293, z: 94 },
-  { x: 301, z: 94 },
-  { x: 285, z: 98 },
-  { x: 293, z: 98 },
-  { x: 297, z: 98 },
+  // Layout 1: from the hull along the high-tide line to the town's north edge.
+  { x: 281, z: 86 },
+  { x: 252, z: 72 },
+  { x: 279, z: 67 },
+  { x: 288, z: 80 },
+  { x: 304, z: 85 },
+  { x: 303, z: 102 },
+  { x: 299, z: 108 },
+  { x: 287, z: 99 },
+  // Layout 2: debris washed farther along after a change in current.
+  { x: 267, z: 81 },
+  { x: 270, z: 72 },
+  { x: 283, z: 73 },
+  { x: 305, z: 75 },
+  { x: 304, z: 95 },
+  { x: 305, z: 112 },
+  { x: 288, z: 91 },
+  { x: 279, z: 94 },
+  // Layout 3: a broad scatter from the Landing road to the northern strand.
+  { x: 259, z: 77 },
+  { x: 277, z: 78 },
+  { x: 290, z: 69 },
+  { x: 295, z: 85 },
+  { x: 298, z: 93 },
+  { x: 295, z: 99 },
+  { x: 292, z: 105 },
+  { x: 272, z: 88 },
 ] as const;
 
 const FARSHORE_SALVAGE_ENTITY_IDS = FARSHORE_SALVAGE_POSITIONS.map(
@@ -632,7 +640,9 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     id: 'wq_farshore_salvage',
     zoneId: 'farshore_isle',
     minLevel: WORLD_QUEST_MIN_LEVEL,
-    area: { x: 287, z: 89, radius: 24 },
+    // Covers every authored piece plus its interact reach (farthest 37 + 5 yd)
+    // and the wreck itself (25 yd).
+    area: { x: 286, z: 87, radius: 44 },
     objective: {
       type: 'salvage',
       objectItemId: FARSHORE_SALVAGE_OBJECT_ITEM_ID,

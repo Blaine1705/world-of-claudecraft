@@ -107,8 +107,12 @@ export class WorldQuestTraceVisual {
       !!state && !!points && (this.shape !== points || this.shapeIndex !== state.shapeIndex);
     if (roundChanged) this.resetRound();
     traceGuidanceInto(this.guide, state, points);
-    this.sparkles.visible = this.guide.visible;
-    this.nextCorner.visible = this.guide.visible;
+    // The guide stars and the next-corner marker teach the first figure only; from
+    // the second figure on the student draws from memory (the preview outline still
+    // shows during memorization, the blue trail still paints the stroke).
+    const guided = this.guide.visible && state?.shapeIndex === 0;
+    this.sparkles.visible = guided;
+    this.nextCorner.visible = guided;
     this.paintGuidance();
     this.outline.visible = !!state && this.plan.outline;
     this.start.visible = !!state;

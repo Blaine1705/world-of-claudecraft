@@ -93,7 +93,7 @@ describe('world quest trace geometry', () => {
   });
 
   it('pins fair timing, error tolerance, fixed-tick motion and bounded trail tuning', () => {
-    expect([WORLD_QUEST_TRACE_PREVIEW_SECONDS, WORLD_QUEST_TRACE_RUN_SECONDS]).toEqual([6, 120]);
+    expect([WORLD_QUEST_TRACE_PREVIEW_SECONDS, WORLD_QUEST_TRACE_RUN_SECONDS]).toEqual([4, 120]);
     expect([WORLD_QUEST_TRACE_TOLERANCE, WORLD_QUEST_TRACE_MAX_STEP]).toEqual([1.25, 1.5]);
     expect([WORLD_QUEST_TRACE_TRAIL_SPACING, WORLD_QUEST_TRACE_MAX_TRAIL_POINTS]).toEqual([
       0.35, 256,
@@ -125,9 +125,9 @@ describe('world quest trace geometry', () => {
 
   it('does not record preview movement or require standing on the start when preview ends', () => {
     const state = createWorldQuestTrace('wq_trace', triangle, { x: 5, z: 5 }, 0);
-    stepWorldQuestTrace(state, triangle, { x: 4, z: 5 }, 5.99);
+    stepWorldQuestTrace(state, triangle, { x: 4, z: 5 }, 3.99);
     expect(state).toMatchObject({ phase: 'preview', trail: [], started: false });
-    stepWorldQuestTrace(state, triangle, { x: 4, z: 5 }, 6);
+    stepWorldQuestTrace(state, triangle, { x: 4, z: 5 }, 4);
     expect(state).toMatchObject({ phase: 'drawing', trail: [], started: false });
     walk(state, [
       { x: 4, z: 5 },
@@ -179,12 +179,12 @@ describe('world quest trace geometry', () => {
     expect(state.trail.every((p) => Number.isFinite(p.x) && Number.isFinite(p.z))).toBe(true);
   });
 
-  it('expires at 120 seconds after the six-second preview, including waiting to start', () => {
+  it('expires at 120 seconds after the four-second preview, including waiting to start', () => {
     const state = createWorldQuestTrace('wq_trace', triangle, { x: 5, z: 5 }, 20);
-    expect(state.expiresAt).toBe(146);
-    stepWorldQuestTrace(state, triangle, { x: 5, z: 5 }, 145.99);
+    expect(state.expiresAt).toBe(144);
+    stepWorldQuestTrace(state, triangle, { x: 5, z: 5 }, 143.99);
     expect(state.phase).toBe('drawing');
-    stepWorldQuestTrace(state, triangle, { x: 5, z: 5 }, 146);
+    stepWorldQuestTrace(state, triangle, { x: 5, z: 5 }, 144);
     expect(state).toMatchObject({ phase: 'failed', reason: 'timeout' });
   });
 

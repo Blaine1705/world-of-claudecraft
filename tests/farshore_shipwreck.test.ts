@@ -50,12 +50,14 @@ describe('Farshore moored shipwreck', () => {
         terrainHeight(FARSHORE_SHIPWRECK_PLAN.dock.x, FARSHORE_SHIPWRECK_PLAN.dock.z, seed),
       ).toBeLessThan(WATER_LEVEL);
     }
+    // The hull is the quest's landmark: it sits inside the work area, so the
+    // minimap emblem, the "The Wreck" map label and the debris read as one site.
     expect(
       Math.hypot(
         FARSHORE_SHIPWRECK_PLAN.ship.x - quest.area.x,
         FARSHORE_SHIPWRECK_PLAN.ship.z - quest.area.z,
       ),
-    ).toBeLessThan(30);
+    ).toBeLessThan(quest.area.radius);
     expect(
       Math.hypot(
         FARSHORE_SHIPWRECK_PLAN.ship.x - FARSHORE_SHIPWRECK_PLAN.dock.x,

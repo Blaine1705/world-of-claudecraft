@@ -11,7 +11,7 @@ import { scoreWorldQuestTraceLesson, scoreWorldQuestTraceRound } from './world_q
 import { emitWorldQuestTraceRoundSpeech } from './world_quest_trace_speech';
 import { worldQuestTraceShape, worldQuestTraceVariantForCycle } from './world_quest_trace_variants';
 
-export const WORLD_QUEST_TRACE_RESULT_SECONDS = 5;
+export const WORLD_QUEST_TRACE_RESULT_SECONDS = 3;
 
 /** Stable session fixtures do not change the old allocator or draw any RNG. */
 export function ensureWorldQuestTraceInstructors(ctx: SimContext): void {

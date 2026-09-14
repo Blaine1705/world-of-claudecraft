@@ -9772,11 +9772,11 @@ export const zh_CN: EnTranslations = {
         "cloak": "Duskweave Cloak",
         "pickpocket": "Pick Pocket",
         "leave": "Remove Cloak",
-        "stealTip": "Approach from behind and remain still while taking the orders. Wait for lantern patrols to pass.",
+        "stealTip": "Approach from behind and remain still while taking the orders. Stay out of the lantern beams.",
         "leaveTip": "Remove the cloak. Your recovered orders are kept.",
         "documents": "Orders recovered: {count}/4",
         "suspicion": "Suspicion: {value}",
-        "safe": "Steal from behind. Lantern patrols cross the camp and stop to watch; wait for a clear opening.",
+        "safe": "Steal from behind. Lantern guards sweep wide beams that see through the cloak; wait for a clear opening.",
         "behind": "Move behind the guard before stealing.",
         "danger": "You are being spotted! Get out of sight!",
         "channel": "Stealing... {seconds}s",
@@ -9942,7 +9942,12 @@ export const zh_CN: EnTranslations = {
         "hourglass": "沙漏",
         "lightning": "闪电符文",
         "spiral": "折角螺旋",
-        "double-triangle": "双三角印记"
+        "double-triangle": "双三角印记",
+        "diamond": "Diamond",
+        "pentagon": "Pentagon",
+        "arrow": "Arrow Rune",
+        "zigzag": "Zigzag Sigil",
+        "cross": "Cross Rune"
       },
       "traceRating": {
         "bronze": "铜",
@@ -15773,7 +15778,7 @@ export const zh_CN: EnTranslations = {
       "shadow_cloak_scout": {
         "name": "Scout Valerie",
         "title": "Covert Operations",
-        "greeting": "Borrow my duskweave cloak. Take a dispatch from each guard, and stay clear of the sentries. Their lanterns can pierce the enchantment."
+        "greeting": "Borrow my duskweave cloak. Slip in behind each dispatch carrier and lift his orders. Stay out of the lantern beams: a lantern guard sees straight through the enchantment, and a carrier feels you if you brush against him."
       },
       "shadow_guard_north": {
         "name": "Dispatch Guard",
@@ -15804,6 +15809,16 @@ export const zh_CN: EnTranslations = {
         "name": "Lantern Sentry",
         "title": "True Sight",
         "greeting": "Nothing slips past the lantern watch."
+      },
+      "shadow_watch_west": {
+        "name": "Lantern Watchman",
+        "title": "True Sight",
+        "greeting": "Hold there. The lantern sees what the eye misses."
+      },
+      "shadow_watch_east": {
+        "name": "Lantern Watchman",
+        "title": "True Sight",
+        "greeting": "Nobody crosses my light unseen."
       },
       "forge_instructor": {
         "name": "Smith Mara",
@@ -19027,6 +19042,9 @@ export const zh_CN: EnTranslations = {
           },
           "4": {
             "label": "裂野"
+          },
+          "5": {
+            "label": "The Wreck"
           }
         }
       },

@@ -137,6 +137,22 @@ export const NPC_LOOKS: Record<string, NpcLookDef> = {
     worn: kit('ranger'),
     props: 'none',
   },
+  // Keeper Liora: the Evergarden maze warden, mossy and unhurried.
+  wisp_maze_keeper: {
+    app: {
+      gender: 'female',
+      hair: 'warriorbraid',
+      brows: 'angled',
+      eyeShape: 'almond',
+      ...hair(96, 0.35, 0.3),
+      ...skin(26, 0.38, 0.6),
+      ...eyes(150, 0.45, 0.45),
+      face: face({ cheeks: 0.05, chin: -0.05 }),
+      outfit: 'teal',
+    },
+    worn: kit('ranger'),
+    props: 'none',
+  },
   shadow_cloak_scout: {
     app: {
       gender: 'female',

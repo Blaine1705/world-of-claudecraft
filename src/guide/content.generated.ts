@@ -2381,7 +2381,8 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "The Landing",
       "The Watch Meadow",
       "The Sundered Cliffs",
-      "The Riftfields"
+      "The Riftfields",
+      "The Wreck"
     ],
     "welcome": "Cross the sandbar and Gullhaven's bell will find you before the town does. The breaks tear open without warning, and the redoubt holds its shore against whatever pours through. They have been waiting a long while for someone like you.",
     "families": [

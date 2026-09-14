@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { WORLD_QUEST_MIN_LEVEL } from '../src/sim/content/world_quests';
 import { parseBisGearFor } from '../src/sim/dev/parse_bis_loadouts';
 import { Sim } from '../src/sim/sim';
 import { MAX_LEVEL } from '../src/sim/types';
@@ -21,10 +22,12 @@ function devSpawns(sim: Sim, ownerId = sim.playerId) {
 }
 
 describe('dev commands', () => {
+  // Daily cycles (wq1_<day>) select the weekly layout by calendar week; the
+  // arm lifts the tester to the world-quest floor level.
   it.each([
-    ['2026-09-02', 'wq3_2', 0],
-    ['2026-09-13', 'wq3_5', 1],
-    ['2026-09-15', 'wq3_5', 2],
+    ['2026-09-02', 'wq1_2', 0],
+    ['2026-09-13', 'wq1_13', 1],
+    ['2026-09-15', 'wq1_15', 2],
   ] as const)(
     '/dev salvage arms the weekly layout online on %s',
     (resetDay, expectedCycle, expectedVariant) => {
@@ -33,7 +36,7 @@ describe('dev commands', () => {
 
       sim.chat('/dev salvage');
 
-      expect(sim.player.level).toBe(10);
+      expect(sim.player.level).toBe(WORLD_QUEST_MIN_LEVEL);
       expect(sim.worldQuestCycle).toBe(expectedCycle);
       expect(sim.meta(sim.playerId)?.devWorldQuestCycle).toBe(expectedCycle);
       expect(sim.worldQuestLog.get('wq_farshore_salvage')).toEqual({

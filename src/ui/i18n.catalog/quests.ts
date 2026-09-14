@@ -100,7 +100,8 @@ const questStringsEn = {
       matchConfections: 'Match enchanted confections',
       loadFreight: 'Load freight into the wagon',
       escortCaravan: 'Escort the caravan: {zone}',
-      salvageWreckage: 'Salvage shipwreck debris',
+      salvageWreckage:
+        'Salvage debris washed along the strand from the wreck northwest of Gullhaven',
       shadow: {
         title: 'Under Cover of Shadow',
         objective: 'Steal four sealed orders without being caught',
@@ -108,11 +109,11 @@ const questStringsEn = {
         pickpocket: 'Pick Pocket',
         leave: 'Remove Cloak',
         stealTip:
-          'Approach from behind and remain still while taking the orders. Wait for lantern patrols to pass.',
+          'Approach from behind and remain still while taking the orders. Stay out of the lantern beams.',
         leaveTip: 'Remove the cloak. Your recovered orders are kept.',
         documents: 'Orders recovered: {count}/4',
         suspicion: 'Suspicion: {value}',
-        safe: 'Steal from behind. Lantern patrols cross the camp and stop to watch; wait for a clear opening.',
+        safe: 'Steal from behind. Lantern guards sweep wide beams that see through the cloak; wait for a clear opening.',
         behind: 'Move behind the guard before stealing.',
         danger: 'You are being spotted! Get out of sight!',
         channel: 'Stealing... {seconds}s',
@@ -274,6 +275,11 @@ const questStringsEn = {
         lightning: 'Lightning Rune',
         spiral: 'Angular Spiral',
         'double-triangle': 'Twin-Triangle Sigil',
+        diamond: 'Diamond',
+        pentagon: 'Pentagon',
+        arrow: 'Arrow Rune',
+        zigzag: 'Zigzag Sigil',
+        cross: 'Cross Rune',
       },
       traceRating: { bronze: 'Bronze', silver: 'Silver', gold: 'Gold' },
       traceScoreResult:

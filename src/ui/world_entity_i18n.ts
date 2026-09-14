@@ -263,6 +263,8 @@ const NPC_IDS = [
   'shadow_guard_west',
   'shadow_sentry_south',
   'shadow_sentry_north',
+  'shadow_watch_west',
+  'shadow_watch_east',
   'forge_instructor',
   'infiltrator_captain',
   'infiltrator_nella',
