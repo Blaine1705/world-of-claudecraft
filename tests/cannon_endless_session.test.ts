@@ -5,6 +5,7 @@ import { Sim } from '../src/sim/sim';
 import { type SimEvent, TICK_RATE } from '../src/sim/types';
 
 type CannonResultEvent = Extract<SimEvent, { type: 'cannonResult' }>;
+type ScoreEvent = Extract<SimEvent, { type: 'worldQuestScore' }>;
 
 function armed(): Sim {
   const sim = new Sim({ seed: 5, playerClass: 'mage', devCommands: true });
@@ -37,12 +38,15 @@ describe('endless cannon play at the manned station', () => {
       return;
     }
     const results: CannonResultEvent[] = [];
+    const scores: ScoreEvent[] = [];
     const copperBefore = sim.copper;
     let victoryTick = -1;
     for (let tick = 0; tick < 300 * TICK_RATE && sim.vehicleSession; tick++) {
       autoFire(sim);
-      for (const event of sim.tick())
+      for (const event of sim.tick()) {
         if (event.type === 'cannonResult') results.push(event as CannonResultEvent);
+        if (event.type === 'worldQuestScore') scores.push(event as ScoreEvent);
+      }
       if (
         victoryTick < 0 &&
         meta.worldQuestLog.get(NORTH_WATCH_CANNON.questId)?.state === 'completed'
@@ -54,6 +58,16 @@ describe('endless cannon play at the manned station', () => {
     expect(victoryTick).toBeGreaterThan(0);
     expect(results).toHaveLength(1);
     expect(results[0].medal).not.toBeNull();
+    // The victory posts the authored line as a ladder row (waves held so far).
+    expect(scores).toEqual([
+      {
+        type: 'worldQuestScore',
+        pid: sim.playerId,
+        board: 'north_watch_cannon',
+        medal: results[0].medal,
+        metric: results[0].wavesCleared,
+      },
+    ]);
     const session = sim.vehicleSession;
     expect(session?.encounter.endless).toBe(true);
     expect(session?.encounter.victoryMedal).toBe(results[0].medal);
@@ -61,11 +75,21 @@ describe('endless cannon play at the manned station', () => {
     expect(rewarded).toBeGreaterThan(copperBefore);
     // Hold fire: the endless waves breach the line and the run ends with the medal intact.
     for (let tick = 0; tick < 240 * TICK_RATE && sim.vehicleSession; tick++) {
-      for (const event of sim.tick())
+      for (const event of sim.tick()) {
         if (event.type === 'cannonResult') results.push(event as CannonResultEvent);
+        if (event.type === 'worldQuestScore') scores.push(event as ScoreEvent);
+      }
     }
     expect(sim.vehicleSession).toBeNull();
     expect(results).toHaveLength(2);
+    // The endless fall posts the total waves held with the victory medal intact.
+    expect(scores).toHaveLength(2);
+    expect(scores[1]).toMatchObject({
+      board: 'north_watch_cannon',
+      medal: results[0].medal,
+      metric: results[1].wavesCleared,
+    });
+    expect(scores[1].metric).toBeGreaterThanOrEqual(scores[0].metric);
     expect(results[1].medal).toBe(results[0].medal);
     expect(results[1].wavesCleared).toBeGreaterThanOrEqual(3);
     expect(results[1].wavesCleared).toBeLessThanOrEqual(3 + CANNON_ENDLESS.maxRounds);

@@ -6,6 +6,7 @@ import { createNpc } from './entity';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { type Entity, INTERACT_RANGE, type WorldQuestDef, type WorldQuestProgress } from './types';
+import { emitWorldQuestScore } from './world_quest_score_events';
 import { createWorldQuestTrace, stepWorldQuestTrace } from './world_quest_trace_geometry';
 import { scoreWorldQuestTraceLesson, scoreWorldQuestTraceRound } from './world_quest_trace_score';
 import { emitWorldQuestTraceRoundSpeech } from './world_quest_trace_speech';
@@ -137,7 +138,16 @@ export function updateWorldQuestTracing(
         emitWorldQuestTraceRoundSpeech(ctx, trace.shapeIndex);
         return true;
       }
+      const previous = progress.traceResult;
       progress.traceResult = scoreWorldQuestTraceLesson(progress.traceScores);
+      if (!previous || progress.traceResult.score > previous.score)
+        emitWorldQuestScore(
+          ctx,
+          meta.entityId,
+          quest.id,
+          progress.traceResult.rating,
+          progress.traceResult.score,
+        );
       emitWorldQuestTraceRoundSpeech(ctx, trace.shapeIndex, progress.traceResult.rating === 'gold');
       result.expiresAt = ctx.time + WORLD_QUEST_TRACE_RESULT_SECONDS;
       return true;

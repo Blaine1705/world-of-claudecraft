@@ -17,6 +17,7 @@ import type { SimContext } from './sim_context';
 import { clearAfkOnMove } from './social/away';
 import { type Entity, INTERACT_RANGE, type WorldQuestProgress } from './types';
 import { gliderCourseById } from './world_quest_glider_levels';
+import { emitWorldQuestScore } from './world_quest_score_events';
 
 export function ensureGliderInstructor(ctx: SimContext): void {
   if (ctx.cfg.world && !ctx.cfg.world.npcs[GLIDER_NPC_DEF.id]) return;
@@ -266,6 +267,13 @@ export function updateGliderEncounter(
   if (!progress.gliderResult || state.result.score > progress.gliderResult.score) {
     progress.gliderResult = { ...state.result };
     meta.wireRev++;
+    emitWorldQuestScore(
+      ctx,
+      meta.entityId,
+      GLIDER_QUEST_ID,
+      state.result.rating,
+      state.result.score,
+    );
   }
   if (state.practiceOnly) {
     if (progress.state !== 'completed') {

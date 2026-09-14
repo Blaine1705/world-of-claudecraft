@@ -1253,7 +1253,21 @@ export const de_DE: EnTranslations = {
       "devName": "Mitwirkender",
       "devTierCol": "Abzeichen",
       "mergedPrs": "Zusammengeführte PRs",
-      "devEmpty": "Noch keine platzierten Mitwirkenden."
+      "devEmpty": "Noch keine platzierten Mitwirkenden.",
+      "tabWorldQuests": "World Quests",
+      "wqBoardsLabel": "World quest scoreboards",
+      "wqMedal": "Medal",
+      "wqWaves": "Waves held",
+      "wqTime": "Time",
+      "wqPoints": "Score",
+      "wqSeconds": "{seconds}s",
+      "wqNoMedal": "None",
+      "wqMedals": {
+        "gold": "Gold",
+        "silver": "Silver",
+        "bronze": "Bronze"
+      },
+      "wqEmpty": "No scores on this board yet. Finish the world quest to claim a spot."
     },
     "pledge": {
       "open": "Nimmt Gelöbnisse an",
@@ -4745,6 +4759,9 @@ export const de_DE: EnTranslations = {
     "guilds": {
       "invalid_roster_name": "Ungültiger Gildenname.",
       "unknown": "Keine Gilde mit diesem Namen."
+    },
+    "world_quests": {
+      "unknown_board": "No scoreboard by that name."
     },
     "steam": {
       "disabled": "Die Steam-Verknüpfung ist derzeit nicht verfügbar.",

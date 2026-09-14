@@ -1253,7 +1253,21 @@ export const fr_FR: EnTranslations = {
       "devName": "Contributeur",
       "devTierCol": "Badge",
       "mergedPrs": "PR fusionnées",
-      "devEmpty": "Aucun contributeur classé pour l'instant."
+      "devEmpty": "Aucun contributeur classé pour l'instant.",
+      "tabWorldQuests": "World Quests",
+      "wqBoardsLabel": "World quest scoreboards",
+      "wqMedal": "Medal",
+      "wqWaves": "Waves held",
+      "wqTime": "Time",
+      "wqPoints": "Score",
+      "wqSeconds": "{seconds}s",
+      "wqNoMedal": "None",
+      "wqMedals": {
+        "gold": "Gold",
+        "silver": "Silver",
+        "bronze": "Bronze"
+      },
+      "wqEmpty": "No scores on this board yet. Finish the world quest to claim a spot."
     },
     "pledge": {
       "open": "Candidatures ouvertes",
@@ -4745,6 +4759,9 @@ export const fr_FR: EnTranslations = {
     "guilds": {
       "invalid_roster_name": "Nom de guilde invalide.",
       "unknown": "Aucune guilde ne porte ce nom."
+    },
+    "world_quests": {
+      "unknown_board": "No scoreboard by that name."
     },
     "steam": {
       "disabled": "La liaison Steam n'est pas disponible pour le moment.",

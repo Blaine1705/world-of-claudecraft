@@ -1253,7 +1253,21 @@ export const tr_TR: EnTranslations = {
       "devName": "Katkıcı",
       "devTierCol": "Rozet",
       "mergedPrs": "Birleştirilen PR'ler",
-      "devEmpty": "Henüz sıralı katkıcı yok."
+      "devEmpty": "Henüz sıralı katkıcı yok.",
+      "tabWorldQuests": "World Quests",
+      "wqBoardsLabel": "World quest scoreboards",
+      "wqMedal": "Medal",
+      "wqWaves": "Waves held",
+      "wqTime": "Time",
+      "wqPoints": "Score",
+      "wqSeconds": "{seconds}s",
+      "wqNoMedal": "None",
+      "wqMedals": {
+        "gold": "Gold",
+        "silver": "Silver",
+        "bronze": "Bronze"
+      },
+      "wqEmpty": "No scores on this board yet. Finish the world quest to claim a spot."
     },
     "pledge": {
       "open": "Başvuru kabul ediliyor",
@@ -4745,6 +4759,9 @@ export const tr_TR: EnTranslations = {
     "guilds": {
       "invalid_roster_name": "Geçersiz lonca adı.",
       "unknown": "Bu adda bir lonca yok."
+    },
+    "world_quests": {
+      "unknown_board": "No scoreboard by that name."
     },
     "steam": {
       "disabled": "Steam bağlama şu anda kullanılamıyor.",

@@ -89,6 +89,9 @@ import type { IWorldPet } from './world_api/pet';
 import type { IWorldProfessions } from './world_api/professions';
 import type { IWorldProgressionXp } from './world_api/progression_xp';
 import type { IWorldQuests } from './world_api/quests';
+
+export type { WorldQuestLeaderboardEntry, WorldQuestLeaderboardPage } from './world_api/quests';
+
 import type { IWorldReliquary } from './world_api/reliquary';
 import type { IWorldSocialGraph } from './world_api/social_graph';
 import type { IWorldTalents } from './world_api/talents';

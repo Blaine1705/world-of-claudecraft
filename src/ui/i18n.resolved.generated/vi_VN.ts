@@ -1253,7 +1253,21 @@ export const vi_VN: EnTranslations = {
       "devName": "Người đóng góp",
       "devTierCol": "Huy hiệu",
       "mergedPrs": "PR đã hợp nhất",
-      "devEmpty": "Chưa có người đóng góp nào được xếp hạng."
+      "devEmpty": "Chưa có người đóng góp nào được xếp hạng.",
+      "tabWorldQuests": "World Quests",
+      "wqBoardsLabel": "World quest scoreboards",
+      "wqMedal": "Medal",
+      "wqWaves": "Waves held",
+      "wqTime": "Time",
+      "wqPoints": "Score",
+      "wqSeconds": "{seconds}s",
+      "wqNoMedal": "None",
+      "wqMedals": {
+        "gold": "Gold",
+        "silver": "Silver",
+        "bronze": "Bronze"
+      },
+      "wqEmpty": "No scores on this board yet. Finish the world quest to claim a spot."
     },
     "pledge": {
       "open": "Đang Nhận Cam Kết",
@@ -4745,6 +4759,9 @@ export const vi_VN: EnTranslations = {
     "guilds": {
       "invalid_roster_name": "Tên bang hội không hợp lệ.",
       "unknown": "Không có bang hội nào mang tên đó."
+    },
+    "world_quests": {
+      "unknown_board": "No scoreboard by that name."
     },
     "steam": {
       "disabled": "Hiện không thể liên kết Steam.",

@@ -23,6 +23,7 @@ import {
 } from './types';
 import { vehicleStationById } from './vehicle_stations';
 import { activeWorldQuestsForCycle } from './world_quest_rotation';
+import { emitWorldQuestScore } from './world_quest_score_events';
 import { completeWorldQuestVehicle } from './world_quests';
 
 /** Lazily created without consuming allocator IDs or changing terrain anchors. */
@@ -164,10 +165,22 @@ export function tickVehicle(ctx: SimContext, meta: PlayerMeta, player: Entity): 
     completeWorldQuestVehicle(ctx, meta, session.stationId);
     const result = cannonResult(session.encounter);
     ctx.emit({ type: 'cannonResult', pid: meta.entityId, ...result });
+    emitWorldQuestScore(
+      ctx,
+      meta.entityId,
+      station.questId,
+      result.medal,
+      result.wavesCleared ?? 0,
+    );
     beginCannonEndless(session.encounter, result.medal, CANNON_INTERMISSION_TICKS);
     ctx.emit({ type: 'worldQuestBanner', banner: 'endlessBegins', pid: meta.entityId });
   } else if (session.encounter.phase === 'failed') {
-    ctx.emit({ type: 'cannonResult', pid: meta.entityId, ...cannonResult(session.encounter) });
+    const fall = cannonResult(session.encounter);
+    ctx.emit({ type: 'cannonResult', pid: meta.entityId, ...fall });
+    // Only a breached ENDLESS line is a ladder row: the medal was earned at the
+    // victory, and the waves held past it are what the board ranks.
+    if (session.encounter.endless)
+      emitWorldQuestScore(ctx, meta.entityId, station.questId, fall.medal, fall.wavesCleared ?? 0);
     // The encounter's local clock freezes at failure; retry uses the live Sim clock.
     // A fall in endless play is not a failed defense: no retry lockout.
     if (!session.encounter.endless) meta.vehicleRetryAtTick = ctx.tickCount + CANNON_RETRY_TICKS;

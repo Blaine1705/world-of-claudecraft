@@ -1354,6 +1354,19 @@ export const hudChromeStrings = {
     devTierCol: 'Badge',
     mergedPrs: 'Merged PRs',
     devEmpty: 'No ranked contributors yet.',
+    // World Quests tab: the medal world quests' public ladders (best attempt
+    // per character). One chip per scoreboard, then rank / name / medal and
+    // the board's own number (waves held, seconds, or points).
+    tabWorldQuests: 'World Quests',
+    wqBoardsLabel: 'World quest scoreboards',
+    wqMedal: 'Medal',
+    wqWaves: 'Waves held',
+    wqTime: 'Time',
+    wqPoints: 'Score',
+    wqSeconds: '{seconds}s',
+    wqNoMedal: 'None',
+    wqMedals: { gold: 'Gold', silver: 'Silver', bronze: 'Bronze' },
+    wqEmpty: 'No scores on this board yet. Finish the world quest to claim a spot.',
   },
   // Guild pledge board (docs/prd/guild-pledge-board.md): shared strings for the
   // guild high-score tab's pledge affordances AND the social window's Pledges

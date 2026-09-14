@@ -1253,7 +1253,21 @@ export const nl_NL: EnTranslations = {
       "devName": "Bijdrager",
       "devTierCol": "Insigne",
       "mergedPrs": "Samengevoegde PR's",
-      "devEmpty": "Nog geen gerangschikte bijdragers."
+      "devEmpty": "Nog geen gerangschikte bijdragers.",
+      "tabWorldQuests": "World Quests",
+      "wqBoardsLabel": "World quest scoreboards",
+      "wqMedal": "Medal",
+      "wqWaves": "Waves held",
+      "wqTime": "Time",
+      "wqPoints": "Score",
+      "wqSeconds": "{seconds}s",
+      "wqNoMedal": "None",
+      "wqMedals": {
+        "gold": "Gold",
+        "silver": "Silver",
+        "bronze": "Bronze"
+      },
+      "wqEmpty": "No scores on this board yet. Finish the world quest to claim a spot."
     },
     "pledge": {
       "open": "Accepteert geloften",
@@ -4745,6 +4759,9 @@ export const nl_NL: EnTranslations = {
     "guilds": {
       "invalid_roster_name": "Ongeldige gildenaam.",
       "unknown": "Geen gilde met die naam."
+    },
+    "world_quests": {
+      "unknown_board": "No scoreboard by that name."
     },
     "steam": {
       "disabled": "Koppelen met Steam is op dit moment niet beschikbaar.",

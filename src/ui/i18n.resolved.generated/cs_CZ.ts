@@ -1253,7 +1253,21 @@ export const cs_CZ: EnTranslations = {
       "devName": "Přispěvatel",
       "devTierCol": "Odznak",
       "mergedPrs": "Sloučené PR",
-      "devEmpty": "Zatím žádní hodnocení přispěvatelé."
+      "devEmpty": "Zatím žádní hodnocení přispěvatelé.",
+      "tabWorldQuests": "World Quests",
+      "wqBoardsLabel": "World quest scoreboards",
+      "wqMedal": "Medal",
+      "wqWaves": "Waves held",
+      "wqTime": "Time",
+      "wqPoints": "Score",
+      "wqSeconds": "{seconds}s",
+      "wqNoMedal": "None",
+      "wqMedals": {
+        "gold": "Gold",
+        "silver": "Silver",
+        "bronze": "Bronze"
+      },
+      "wqEmpty": "No scores on this board yet. Finish the world quest to claim a spot."
     },
     "pledge": {
       "open": "Přijímá přihlášky",
@@ -4745,6 +4759,9 @@ export const cs_CZ: EnTranslations = {
     "guilds": {
       "invalid_roster_name": "Neplatný název cechu.",
       "unknown": "Cech s tímto názvem neexistuje."
+    },
+    "world_quests": {
+      "unknown_board": "No scoreboard by that name."
     },
     "steam": {
       "disabled": "Propojení účtu Steam není momentálně k dispozici.",

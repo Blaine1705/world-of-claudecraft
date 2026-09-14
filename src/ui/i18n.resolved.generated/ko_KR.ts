@@ -1253,7 +1253,21 @@ export const ko_KR: EnTranslations = {
       "devName": "기여자",
       "devTierCol": "배지",
       "mergedPrs": "병합된 PR",
-      "devEmpty": "아직 순위에 오른 기여자가 없습니다."
+      "devEmpty": "아직 순위에 오른 기여자가 없습니다.",
+      "tabWorldQuests": "World Quests",
+      "wqBoardsLabel": "World quest scoreboards",
+      "wqMedal": "Medal",
+      "wqWaves": "Waves held",
+      "wqTime": "Time",
+      "wqPoints": "Score",
+      "wqSeconds": "{seconds}s",
+      "wqNoMedal": "None",
+      "wqMedals": {
+        "gold": "Gold",
+        "silver": "Silver",
+        "bronze": "Bronze"
+      },
+      "wqEmpty": "No scores on this board yet. Finish the world quest to claim a spot."
     },
     "pledge": {
       "open": "서약 받는 중",
@@ -4745,6 +4759,9 @@ export const ko_KR: EnTranslations = {
     "guilds": {
       "invalid_roster_name": "길드 이름이 유효하지 않습니다.",
       "unknown": "그런 이름의 길드가 없습니다."
+    },
+    "world_quests": {
+      "unknown_board": "No scoreboard by that name."
     },
     "steam": {
       "disabled": "현재 Steam 연동을 사용할 수 없습니다.",

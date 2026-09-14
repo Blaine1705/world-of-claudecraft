@@ -26,6 +26,7 @@ import type {
   GuildLeaderboardPage,
   IWorld,
   LeaderboardPage,
+  WorldQuestLeaderboardPage,
 } from '../world_api';
 import { deedTitleText } from './deed_i18n';
 import {
@@ -49,10 +50,18 @@ import {
 } from './leaderboard_view';
 import { rovingTarget } from './roving_index';
 import { svgIcon } from './ui_icons';
+import {
+  DEFAULT_WORLD_QUEST_BOARD,
+  resolveWorldQuestBoard,
+  type WorldQuestLeaderboardRowView,
+  worldQuestBoardChips,
+  worldQuestLeaderboardRow,
+  worldQuestMetricHeader,
+} from './world_quest_leaderboard_view';
 import { formatXp } from './xp_bar';
 
 /** Which high-score board the window is showing. */
-type LeaderboardBoard = 'players' | 'guilds' | 'deeds' | 'devs' | 'daily';
+type LeaderboardBoard = 'players' | 'guilds' | 'deeds' | 'devs' | 'daily' | 'worldQuests';
 
 /**
  * Hud-supplied glue. The leaderboard window renders entirely from IWorld + these
@@ -85,6 +94,10 @@ export class LeaderboardWindow {
   private deedsPage = 0;
   private devPage = 0;
   private dailyPage = 0;
+  private worldQuestPage = 0;
+  // Which world-quest scoreboard the World Quests tab shows (a chip strip
+  // inside the tab, not a top-level tab per board).
+  private worldQuestBoard: string = DEFAULT_WORLD_QUEST_BOARD;
   // Render epoch (the DailyRewardsWindow renderSeq pattern). The five boards
   // share one .lb-body, so every board arm re-checks this after its await: a
   // slow response for an older tab or page must neither repaint the shared
@@ -99,6 +112,7 @@ export class LeaderboardWindow {
     if (this.board === 'deeds') return this.deedsPage;
     if (this.board === 'devs') return this.devPage;
     if (this.board === 'daily') return this.dailyPage;
+    if (this.board === 'worldQuests') return this.worldQuestPage;
     return this.playerPage;
   }
 
@@ -107,6 +121,7 @@ export class LeaderboardWindow {
     else if (this.board === 'deeds') this.deedsPage = value;
     else if (this.board === 'devs') this.devPage = value;
     else if (this.board === 'daily') this.dailyPage = value;
+    else if (this.board === 'worldQuests') this.worldQuestPage = value;
     else this.playerPage = value;
   }
 
@@ -136,6 +151,7 @@ export class LeaderboardWindow {
     this.deedsPage = 0;
     this.devPage = 0;
     this.dailyPage = 0;
+    this.worldQuestPage = 0;
     this.deps.root().style.display = 'flex';
     this.deps.onVisibilityChange?.();
     void this.render('open');
@@ -192,6 +208,10 @@ export class LeaderboardWindow {
     }
     if (this.board === 'daily') {
       await this.renderDailyBoard(el, world, focus, seq);
+      return;
+    }
+    if (this.board === 'worldQuests') {
+      await this.renderWorldQuestBoard(el, world, focus, seq);
       return;
     }
 
@@ -437,6 +457,106 @@ export class LeaderboardWindow {
     this.wirePager(body as HTMLElement, focus);
   }
 
+  // The World Quests tab: the medal world quests' public ladders. One chip
+  // per scoreboard above the rows (selection is window state, like the page),
+  // the same async + epoch + pager shape as the daily board.
+  private async renderWorldQuestBoard(
+    el: HTMLElement,
+    world: IWorld,
+    focus: FocusTarget,
+    seq: number,
+  ): Promise<void> {
+    const board = resolveWorldQuestBoard(this.worldQuestBoard);
+    let result: WorldQuestLeaderboardPage | null = null;
+    try {
+      result = await world.worldQuestLeaderboard(board.id, this.page, LEADERBOARD_PAGE_SIZE);
+    } catch {
+      result = null;
+    }
+    if (seq !== this.renderSeq || el.style.display !== 'flex') return;
+    const body = el.querySelector('.lb-body');
+    if (!body) return;
+    const chips = this.worldQuestChipsHtml();
+    if (result === null) {
+      body.innerHTML =
+        chips +
+        `<div class="lb-empty lb-error" role="alert">${esc(t('game.leaderboard.retry'))}</div>`;
+      this.wireWorldQuestChips(body as HTMLElement);
+      this.focusCloseAfterPage(focus);
+      return;
+    }
+    if (result.leaders.length === 0) {
+      body.innerHTML =
+        chips + `<div class="lb-empty">${esc(t('hudChrome.leaderboard.wqEmpty'))}</div>`;
+      this.wireWorldQuestChips(body as HTMLElement);
+      this.focusCloseAfterPage(focus);
+      return;
+    }
+    this.page = result.page;
+    const viewer = world.player.name;
+    body.innerHTML =
+      chips +
+      this.worldQuestHeaderHtml(worldQuestMetricHeader(board)) +
+      result.leaders
+        .map((entry) => this.worldQuestRowHtml(worldQuestLeaderboardRow(board, entry, viewer)))
+        .join('') +
+      this.pagerHtml(
+        result.pageCount > 1
+          ? {
+              page: result.page,
+              pageCount: result.pageCount,
+              prevDisabled: result.page <= 0,
+              nextDisabled: result.page >= result.pageCount - 1,
+            }
+          : null,
+      );
+    this.wireWorldQuestChips(body as HTMLElement);
+    this.wirePager(body as HTMLElement, focus);
+  }
+
+  private worldQuestChipsHtml(): string {
+    const chips = worldQuestBoardChips(resolveWorldQuestBoard(this.worldQuestBoard).id)
+      .map(
+        (chip) =>
+          `<button type="button" class="lb-wq-chip${chip.active ? ' lb-wq-chip-active' : ''}" ` +
+          `data-leaderboard-wq-board="${esc(chip.id)}" aria-pressed="${chip.active ? 'true' : 'false'}">${esc(chip.label)}</button>`,
+      )
+      .join('');
+    return `<div class="lb-wq-chips" role="group" aria-label="${esc(t('hudChrome.leaderboard.wqBoardsLabel'))}">${chips}</div>`;
+  }
+
+  private wireWorldQuestChips(body: HTMLElement): void {
+    body.querySelectorAll<HTMLButtonElement>('[data-leaderboard-wq-board]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const next = button.dataset.leaderboardWqBoard ?? '';
+        if (next === this.worldQuestBoard) return;
+        this.worldQuestBoard = next;
+        this.worldQuestPage = 0;
+        void this.render('action');
+      });
+    });
+  }
+
+  private worldQuestHeaderHtml(metric: string): string {
+    return (
+      `<div class="lb-row lb-wq lb-head"><span class="lb-rank">${esc(t('game.leaderboard.rank'))}</span>` +
+      `<span class="lb-name">${esc(t('game.leaderboard.name'))}</span>` +
+      `<span class="lb-medal">${esc(t('hudChrome.leaderboard.wqMedal'))}</span>` +
+      `<span class="lb-xp">${esc(metric)}</span></div>`
+    );
+  }
+
+  private worldQuestRowHtml(r: WorldQuestLeaderboardRowView): string {
+    const you = r.me ? ` <span class="lb-you">(${esc(t('game.leaderboard.you'))})</span>` : '';
+    const medalClass = r.medal ? ` lb-medal-${r.medal}` : '';
+    return (
+      `<div class="lb-row lb-wq${r.me ? ' lb-mine' : ''}"><span class="lb-rank">${esc(r.rank)}</span>` +
+      `<span class="lb-name">${esc(r.name)}${you}</span>` +
+      `<span class="lb-medal${medalClass}">${esc(r.medalText)}</span>` +
+      `<span class="lb-xp">${esc(r.metricText)}</span></div>`
+    );
+  }
+
   // ---- HTML builders (the localized DOM the pure view-model drives) ----------
 
   private titleHtml(realm: string): string {
@@ -479,6 +599,7 @@ export class LeaderboardWindow {
       tab('deeds', t('hudChrome.deeds.lbTab')) +
       (this.deps.showDevBadges() ? tab('devs', t('hudChrome.leaderboard.tabDevs')) : '') +
       tab('daily', t('hudChrome.dailyRewards.leaderboard')) +
+      tab('worldQuests', t('hudChrome.leaderboard.tabWorldQuests')) +
       `</div>`
     );
   }

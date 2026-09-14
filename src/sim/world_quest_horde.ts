@@ -10,6 +10,7 @@ import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { clearAfkOnMove } from './social/away';
 import { type Entity, INTERACT_RANGE, type WorldQuestProgress } from './types';
+import { emitWorldQuestScore } from './world_quest_score_events';
 
 export function ensureHordeInstructor(ctx: SimContext): void {
   if ((ctx.cfg.world && !ctx.cfg.world.npcs[HORDE_NPC_DEF.id]) || ctx.entities.has(HORDE_NPC_ID))
@@ -109,6 +110,7 @@ export function advanceHordeMovement(ctx: SimContext, player: Entity, meta: Play
 
 /** Returning true authorizes canonical WQ credit; failed attempts never qualify. */
 export function updateHordeEncounter(
+  ctx: Pick<SimContext, 'emit'>,
   meta: PlayerMeta,
   player: Entity,
   progress: WorldQuestProgress,
@@ -123,6 +125,13 @@ export function updateHordeEncounter(
   if (!progress.hordeResult || state.result.score > progress.hordeResult.score) {
     progress.hordeResult = { ...state.result };
     meta.wireRev++;
+    emitWorldQuestScore(
+      ctx,
+      meta.entityId,
+      HORDE_QUEST_ID,
+      state.result.rating,
+      state.result.score,
+    );
   }
   return true;
 }

@@ -1253,7 +1253,21 @@ export const zh_TW: EnTranslations = {
       "devName": "貢獻者",
       "devTierCol": "徽章",
       "mergedPrs": "已合併 PR",
-      "devEmpty": "還沒有上榜的貢獻者。"
+      "devEmpty": "還沒有上榜的貢獻者。",
+      "tabWorldQuests": "World Quests",
+      "wqBoardsLabel": "World quest scoreboards",
+      "wqMedal": "Medal",
+      "wqWaves": "Waves held",
+      "wqTime": "Time",
+      "wqPoints": "Score",
+      "wqSeconds": "{seconds}s",
+      "wqNoMedal": "None",
+      "wqMedals": {
+        "gold": "Gold",
+        "silver": "Silver",
+        "bronze": "Bronze"
+      },
+      "wqEmpty": "No scores on this board yet. Finish the world quest to claim a spot."
     },
     "pledge": {
       "open": "接受宣誓",
@@ -4745,6 +4759,9 @@ export const zh_TW: EnTranslations = {
     "guilds": {
       "invalid_roster_name": "公會名稱無效。",
       "unknown": "沒有這個名字的公會。"
+    },
+    "world_quests": {
+      "unknown_board": "No scoreboard by that name."
     },
     "steam": {
       "disabled": "Steam 連結目前無法使用。",

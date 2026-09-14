@@ -219,6 +219,7 @@ const UI_PURE_CORES = [
   'src/ui/world_quest_view.ts',
   'src/ui/world_quest_trace_view.ts',
   'src/ui/world_quest_forge_view.ts',
+  'src/ui/world_quest_leaderboard_view.ts',
   'src/ui/world_quest_wisp_maze_view.ts',
   'src/ui/world_quest_horde_view.ts',
   'src/ui/world_quest_shadow_view.ts',

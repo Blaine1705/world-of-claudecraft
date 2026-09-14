@@ -674,6 +674,7 @@ import type { RiftEvent, RiftInstance } from './rift/types';
 import { startWorldQuestActivity as startWorldQuestActivityImpl } from './world_quest_activity';
 import { worldQuestCreditBindings } from './world_quest_context';
 import { dropWorldQuestDeliveryCargoForPlayer } from './world_quest_delivery';
+import { emptyWorldQuestLeaderboardPage } from './world_quest_leaderboard_page';
 import * as worldQuestState from './world_quest_state';
 import * as worldQuestMod from './world_quests';
 
@@ -4567,12 +4568,10 @@ export class Sim {
       pageSize,
     });
   }
-
   async spinDailyReward(): Promise<DailyRewardSpinResult> {
     const status = await this.dailyRewards();
     return { ...status, awardedPoints: 0, outcomeKey: '' };
   }
-
   dailyRewardHistory(): Promise<DailyRewardHistory> {
     return Promise.resolve({ payouts: [] });
   }
@@ -9701,6 +9700,9 @@ export class Sim {
   }
   startWorldQuestActivity(questId: string, difficulty: 'normal' | 'hard', pid?: number): void {
     startWorldQuestActivityImpl(this.ctx, questId, difficulty, pid);
+  }
+  worldQuestLeaderboard(board: string, page = 0, pageSize = LEADERBOARD_PAGE_SIZE) {
+    return Promise.resolve(emptyWorldQuestLeaderboardPage(board, page, pageSize));
   }
   rotateWorldQuestPuzzleTile(questId: string, tileIndex: number, pid?: number): void {
     worldQuestMod.rotateWorldQuestPuzzleTile(this.ctx, questId, tileIndex, pid);

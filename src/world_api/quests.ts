@@ -1,6 +1,25 @@
 import type { QuestProgress, QuestState, WorldQuestProgress } from '../sim/types';
 import type { WorldQuestDifficulty } from '../sim/world_quest_activity';
+import type { WorldQuestMedal, WorldQuestScoreboardId } from '../sim/world_quest_scoreboards';
 import type { NearbyWorldQuestTrace } from '../sim/world_quest_trace_public';
+
+/** One ranked row of a world-quest scoreboard (src/sim/world_quest_scoreboards.ts). */
+export interface WorldQuestLeaderboardEntry {
+  rank: number;
+  name: string;
+  medal: WorldQuestMedal | null;
+  /** The board's number: waves held, seconds, or points (the board says which). */
+  metric: number;
+}
+
+export interface WorldQuestLeaderboardPage {
+  board: WorldQuestScoreboardId;
+  leaders: WorldQuestLeaderboardEntry[];
+  page: number;
+  pageSize: number;
+  pageCount: number;
+  total: number;
+}
 
 export interface IWorldQuests {
   questLog: Map<string, QuestProgress>;
@@ -27,6 +46,13 @@ export interface IWorldQuests {
   /** The instructor dialog's explicit-difficulty start (Normal / Hard) for an
    *  activity that offers the choice; the plain talk keeps its default profile. */
   startWorldQuestActivity(questId: string, difficulty: WorldQuestDifficulty): void;
+  /** One page of a medal world quest's public ladder (best row per character;
+   *  the offline world has no ladder and resolves an empty page). */
+  worldQuestLeaderboard(
+    board: WorldQuestScoreboardId,
+    page?: number,
+    pageSize?: number,
+  ): Promise<WorldQuestLeaderboardPage>;
   acceptLinkedQuest(questId: string, fromPid: number): void;
   // The tutorial greeting's accept button: asks the sim for the ferry ride to
   // the Proving Shore. Server-validated (level 1, alive, overworld); the

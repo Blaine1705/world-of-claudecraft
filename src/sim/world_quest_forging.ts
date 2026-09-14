@@ -15,6 +15,7 @@ import {
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { type Entity, INTERACT_RANGE, type WorldQuestProgress } from './types';
+import { emitWorldQuestScore } from './world_quest_score_events';
 
 export function forgeStationForEntity(entity: Entity) {
   return FORGE_STATIONS.find(
@@ -140,7 +141,15 @@ export function respondForgeWorkshop(
   if (!accepted) return false;
   meta.wireRev++;
   if (state.phase !== 'success' || !state.result) return false;
-  if (!progress.forgeResult || state.result.adjustedTime < progress.forgeResult.adjustedTime)
+  if (!progress.forgeResult || state.result.adjustedTime < progress.forgeResult.adjustedTime) {
     progress.forgeResult = { ...state.result };
+    emitWorldQuestScore(
+      ctx,
+      meta.entityId,
+      FORGE_QUEST_ID,
+      state.result.rating,
+      state.result.adjustedTime,
+    );
+  }
   return true;
 }

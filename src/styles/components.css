@@ -2884,6 +2884,48 @@
   .lb-row.lb-daily {
     grid-template-columns: 44px 1fr 96px;
   }
+  /* World Quests board: rank, name, medal, the board's number. */
+  .lb-row.lb-wq {
+    grid-template-columns: 44px 1fr 72px 96px;
+  }
+  .lb-medal {
+    text-align: center;
+    color: var(--color-text-muted);
+  }
+  .lb-medal-gold {
+    color: var(--gold);
+  }
+  .lb-medal-silver {
+    color: #c9ccd3;
+  }
+  .lb-medal-bronze {
+    color: #c98a4b;
+  }
+  /* The scoreboard chips inside the World Quests tab (a pressed-state group,
+     not a second tablist: the tab strip above already owns the tab role). */
+  .lb-wq-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: 2px 0 8px;
+  }
+  .lb-wq-chip {
+    padding: 3px 8px;
+    font-size: 11px;
+    color: #cabb8c;
+    background: #ffffff08;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  .lb-wq-chip:hover {
+    background: #ffffff12;
+  }
+  .lb-wq-chip-active {
+    color: var(--gold);
+    background: #f5c84322;
+    border-color: #b8902a;
+  }
   /* .lb-scope-note is the Renown tab's account-scope teaching line, visible
      on every deeds-board state (never a title-attr tooltip: touch has none). */
   .lb-total,

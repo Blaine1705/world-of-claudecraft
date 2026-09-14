@@ -1253,7 +1253,21 @@ export const pl_PL: EnTranslations = {
       "devName": "Kontrybutor",
       "devTierCol": "Odznaka",
       "mergedPrs": "Scalone PR-y",
-      "devEmpty": "Brak sklasyfikowanych kontrybutorów."
+      "devEmpty": "Brak sklasyfikowanych kontrybutorów.",
+      "tabWorldQuests": "World Quests",
+      "wqBoardsLabel": "World quest scoreboards",
+      "wqMedal": "Medal",
+      "wqWaves": "Waves held",
+      "wqTime": "Time",
+      "wqPoints": "Score",
+      "wqSeconds": "{seconds}s",
+      "wqNoMedal": "None",
+      "wqMedals": {
+        "gold": "Gold",
+        "silver": "Silver",
+        "bronze": "Bronze"
+      },
+      "wqEmpty": "No scores on this board yet. Finish the world quest to claim a spot."
     },
     "pledge": {
       "open": "Przyjmuje przysięgi",
@@ -4745,6 +4759,9 @@ export const pl_PL: EnTranslations = {
     "guilds": {
       "invalid_roster_name": "Nieprawidłowa nazwa gildii.",
       "unknown": "Nie znaleziono gildii o tej nazwie."
+    },
+    "world_quests": {
+      "unknown_board": "No scoreboard by that name."
     },
     "steam": {
       "disabled": "Łączenie kont Steam jest obecnie niedostępne.",

@@ -1253,7 +1253,21 @@ export const da_DK: EnTranslations = {
       "devName": "Bidragyder",
       "devTierCol": "Mærke",
       "mergedPrs": "Flettede PR'er",
-      "devEmpty": "Ingen rangerede bidragydere endnu."
+      "devEmpty": "Ingen rangerede bidragydere endnu.",
+      "tabWorldQuests": "World Quests",
+      "wqBoardsLabel": "World quest scoreboards",
+      "wqMedal": "Medal",
+      "wqWaves": "Waves held",
+      "wqTime": "Time",
+      "wqPoints": "Score",
+      "wqSeconds": "{seconds}s",
+      "wqNoMedal": "None",
+      "wqMedals": {
+        "gold": "Gold",
+        "silver": "Silver",
+        "bronze": "Bronze"
+      },
+      "wqEmpty": "No scores on this board yet. Finish the world quest to claim a spot."
     },
     "pledge": {
       "open": "Accepterer løfter",
@@ -4745,6 +4759,9 @@ export const da_DK: EnTranslations = {
     "guilds": {
       "invalid_roster_name": "Ugyldigt laugsnavn.",
       "unknown": "Intet laug med det navn."
+    },
+    "world_quests": {
+      "unknown_board": "No scoreboard by that name."
     },
     "steam": {
       "disabled": "Steam-tilknytning er ikke tilgængelig lige nu.",

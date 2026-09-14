@@ -1253,7 +1253,21 @@ export const sv_SE: EnTranslations = {
       "devName": "Bidragsgivare",
       "devTierCol": "Märke",
       "mergedPrs": "Sammanslagna PR:er",
-      "devEmpty": "Inga rankade bidragsgivare ännu."
+      "devEmpty": "Inga rankade bidragsgivare ännu.",
+      "tabWorldQuests": "World Quests",
+      "wqBoardsLabel": "World quest scoreboards",
+      "wqMedal": "Medal",
+      "wqWaves": "Waves held",
+      "wqTime": "Time",
+      "wqPoints": "Score",
+      "wqSeconds": "{seconds}s",
+      "wqNoMedal": "None",
+      "wqMedals": {
+        "gold": "Gold",
+        "silver": "Silver",
+        "bronze": "Bronze"
+      },
+      "wqEmpty": "No scores on this board yet. Finish the world quest to claim a spot."
     },
     "pledge": {
       "open": "Tar emot löften",
@@ -4745,6 +4759,9 @@ export const sv_SE: EnTranslations = {
     "guilds": {
       "invalid_roster_name": "Ogiltigt gillesnamn.",
       "unknown": "Inget gille med det namnet."
+    },
+    "world_quests": {
+      "unknown_board": "No scoreboard by that name."
     },
     "steam": {
       "disabled": "Steam-länkning är inte tillgänglig just nu.",

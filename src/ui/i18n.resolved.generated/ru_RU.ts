@@ -1253,7 +1253,21 @@ export const ru_RU: EnTranslations = {
       "devName": "Участник",
       "devTierCol": "Значок",
       "mergedPrs": "Слито PR",
-      "devEmpty": "Пока нет участников в рейтинге."
+      "devEmpty": "Пока нет участников в рейтинге.",
+      "tabWorldQuests": "World Quests",
+      "wqBoardsLabel": "World quest scoreboards",
+      "wqMedal": "Medal",
+      "wqWaves": "Waves held",
+      "wqTime": "Time",
+      "wqPoints": "Score",
+      "wqSeconds": "{seconds}s",
+      "wqNoMedal": "None",
+      "wqMedals": {
+        "gold": "Gold",
+        "silver": "Silver",
+        "bronze": "Bronze"
+      },
+      "wqEmpty": "No scores on this board yet. Finish the world quest to claim a spot."
     },
     "pledge": {
       "open": "Принимает присяги",
@@ -4745,6 +4759,9 @@ export const ru_RU: EnTranslations = {
     "guilds": {
       "invalid_roster_name": "Недопустимое название гильдии.",
       "unknown": "Гильдии с таким названием нет."
+    },
+    "world_quests": {
+      "unknown_board": "No scoreboard by that name."
     },
     "steam": {
       "disabled": "Привязка Steam сейчас недоступна.",

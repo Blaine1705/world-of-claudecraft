@@ -398,6 +398,7 @@ import { dispatchVaultCommand, emitVaultSelfKeys } from './vault_wire';
 import { holderInfoForPubkey } from './woc_balance';
 import type { CharacterSaveArgs } from './woc_market';
 import { activeWorldBossIdsWireJson } from './world_boss_wire';
+import { recordWorldQuestScore } from './world_quest_leaderboard';
 import { isBackpressureExceeded } from './ws_backpressure';
 
 const ALDRIC_METEOR_QUEST_ID = 'q_aldrics_fallen_star';
@@ -1486,7 +1487,6 @@ function identityFields(e: Entity): Record<string, unknown> {
   if (e.color !== 0xffffff) out.c = e.color;
   return out;
 }
-
 /**
  * The flair a chat line carries for its SENDER, or undefined when the account has
  * none, so an ordinary player's chat event is byte-unchanged on the wire. The links
@@ -1501,7 +1501,6 @@ function chatSenderFlair(flair: AccountFlair): ChatSenderFlair | undefined {
   if (links) out.links = links;
   return out;
 }
-
 // Dynamic fields are re-sent whole in every full or lite record, so the
 // conditional ones keep their absent-means-unset semantics.
 function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> {
@@ -1617,11 +1616,9 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
   }
   return out;
 }
-
 export function wireEntity(e: Entity, includeAuras = true): Record<string, unknown> {
   return { id: e.id, ...identityFields(e), ...dynamicFields(e, includeAuras) };
 }
-
 // npcs stay visible to the legacy radius (see the constants above);
 // everything else enters at INTEREST_RADIUS and known entities persist to
 // the drop radius — hysteresis against churn at the boundary
@@ -1631,7 +1628,6 @@ function interestLimitSq(e: Entity, known: boolean): number {
   }
   return known ? INTEREST_DROP_RADIUS * INTEREST_DROP_RADIUS : INTEREST_RADIUS * INTEREST_RADIUS;
 }
-
 function isStealthed(e: Entity): boolean {
   return e.stealthed; // cached in the sim's updateAuras; see Entity.stealthed
 }
@@ -9490,6 +9486,10 @@ export class GameServer {
             ev,
           );
         }
+      }
+      if (ev.type === 'worldQuestScore' && ev.pid !== undefined) {
+        const scorer = this.clients.get(ev.pid);
+        if (scorer) recordWorldQuestScore(scorer, ev);
       }
       if (ev.type === 'deedUnlocked' && ev.pid !== undefined) {
         const s = this.clients.get(ev.pid);

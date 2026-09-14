@@ -1253,7 +1253,21 @@ export const ja_JP: EnTranslations = {
       "devName": "コントリビューター",
       "devTierCol": "バッジ",
       "mergedPrs": "マージ済みPR",
-      "devEmpty": "ランク入りのコントリビューターはまだいません。"
+      "devEmpty": "ランク入りのコントリビューターはまだいません。",
+      "tabWorldQuests": "World Quests",
+      "wqBoardsLabel": "World quest scoreboards",
+      "wqMedal": "Medal",
+      "wqWaves": "Waves held",
+      "wqTime": "Time",
+      "wqPoints": "Score",
+      "wqSeconds": "{seconds}s",
+      "wqNoMedal": "None",
+      "wqMedals": {
+        "gold": "Gold",
+        "silver": "Silver",
+        "bronze": "Bronze"
+      },
+      "wqEmpty": "No scores on this board yet. Finish the world quest to claim a spot."
     },
     "pledge": {
       "open": "誓約受付中",
@@ -4745,6 +4759,9 @@ export const ja_JP: EnTranslations = {
     "guilds": {
       "invalid_roster_name": "ギルド名が無効です。",
       "unknown": "その名前のギルドはありません。"
+    },
+    "world_quests": {
+      "unknown_board": "No scoreboard by that name."
     },
     "steam": {
       "disabled": "Steam連携は現在利用できません。",

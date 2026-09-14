@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { decodeVehicleSession } from '../src/net/vehicle_session_wire';
+import { CANNON_ENEMIES } from '../src/sim/content/cannon_encounter';
 import {
   LAST_KEEP_CANNON,
   NORTH_WATCH_CANNON,
   VEHICLE_STATIONS,
 } from '../src/sim/content/vehicle_stations';
+import { WORLD_QUESTS_BY_ID } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import { type SimEvent, TICK_RATE } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
@@ -15,7 +17,9 @@ function rig(station = NORTH_WATCH_CANNON) {
   const sim = new Sim({ seed: WORLD_SEED, playerClass: 'mage' });
   const player = sim.player;
   const meta = sim.meta(player.id)!;
-  sim.setPlayerLevel(10);
+  // The station quest carries the zone floor (WorldQuestDef.minLevel); the rig
+  // reads it rather than pinning a number the rotation content can move.
+  sim.setPlayerLevel(WORLD_QUESTS_BY_ID[station.questId].minLevel);
   meta.devWorldQuestCycle = worldQuestCycleOfferingQuest('wq3_0', station.questId);
   player.pos = {
     x: station.x,
@@ -96,7 +100,8 @@ describe('authoritative personal vehicles', () => {
     sim.enterVehicle(NORTH_WATCH_CANNON.id);
     const state = meta.vehicle!.encounter;
     state.phase = 'wave';
-    state.integrity = 10;
+    // One breach must end the defense: leave exactly the infantry breach cost.
+    state.integrity = CANNON_ENEMIES.infantry.breachDamage;
     state.enemies.push({
       id: 999,
       kind: 'infantry',
@@ -132,7 +137,13 @@ describe('authoritative personal vehicles', () => {
       const copper = sim.copper;
       const encounter = meta.vehicle!.encounter;
       const resultEvents: ReturnType<Sim['tick']> = [];
+      let victoryTick = -1;
       for (let tick = 0; tick < 240 * TICK_RATE && meta.vehicle; tick++) {
+        // Once the authored victory lands, a couple of seconds of endless play
+        // is all the assertions below need; the endless machine has its own suite.
+        if (victoryTick < 0 && meta.worldQuestLog.get(station.questId)?.state === 'completed')
+          victoryTick = tick;
+        if (victoryTick >= 0 && tick > victoryTick + 2 * TICK_RATE) break;
         const enemy = [...encounter.enemies].sort((a, b) => b.z - a.z)[0];
         if (enemy) {
           const point = { x: enemy.x, z: Math.min(station.field.maxZ, enemy.z + 1) };
@@ -174,7 +185,7 @@ describe('authoritative personal vehicles', () => {
       expect(meta.vehicle?.encounter.endless).toBe(true);
       sim.leaveVehicle();
     },
-    60_000,
+    150_000,
   ); // Full-world integration advances over two minutes of canonical Sim ticks.
 
   it('keeps both stations present and rejects remote entry and shots into the other field', () => {

@@ -1253,7 +1253,21 @@ export const id_ID: EnTranslations = {
       "devName": "Kontributor",
       "devTierCol": "Lencana",
       "mergedPrs": "PR Digabungkan",
-      "devEmpty": "Belum ada kontributor berperingkat."
+      "devEmpty": "Belum ada kontributor berperingkat.",
+      "tabWorldQuests": "World Quests",
+      "wqBoardsLabel": "World quest scoreboards",
+      "wqMedal": "Medal",
+      "wqWaves": "Waves held",
+      "wqTime": "Time",
+      "wqPoints": "Score",
+      "wqSeconds": "{seconds}s",
+      "wqNoMedal": "None",
+      "wqMedals": {
+        "gold": "Gold",
+        "silver": "Silver",
+        "bronze": "Bronze"
+      },
+      "wqEmpty": "No scores on this board yet. Finish the world quest to claim a spot."
     },
     "pledge": {
       "open": "Menerima lamaran",
@@ -4745,6 +4759,9 @@ export const id_ID: EnTranslations = {
     "guilds": {
       "invalid_roster_name": "Nama guild tidak valid.",
       "unknown": "Tidak ada guild dengan nama itu."
+    },
+    "world_quests": {
+      "unknown_board": "No scoreboard by that name."
     },
     "steam": {
       "disabled": "Penautan Steam sedang tidak tersedia.",

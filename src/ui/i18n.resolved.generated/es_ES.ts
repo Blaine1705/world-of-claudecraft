@@ -1253,7 +1253,21 @@ export const es_ES: EnTranslations = {
       "devName": "Colaborador",
       "devTierCol": "Insignia",
       "mergedPrs": "PR fusionadas",
-      "devEmpty": "Aún no hay colaboradores clasificados."
+      "devEmpty": "Aún no hay colaboradores clasificados.",
+      "tabWorldQuests": "World Quests",
+      "wqBoardsLabel": "World quest scoreboards",
+      "wqMedal": "Medal",
+      "wqWaves": "Waves held",
+      "wqTime": "Time",
+      "wqPoints": "Score",
+      "wqSeconds": "{seconds}s",
+      "wqNoMedal": "None",
+      "wqMedals": {
+        "gold": "Gold",
+        "silver": "Silver",
+        "bronze": "Bronze"
+      },
+      "wqEmpty": "No scores on this board yet. Finish the world quest to claim a spot."
     },
     "pledge": {
       "open": "Acepta compromisos",
@@ -4745,6 +4759,9 @@ export const es_ES: EnTranslations = {
     "guilds": {
       "invalid_roster_name": "Nombre de hermandad no válido.",
       "unknown": "No existe ninguna hermandad con ese nombre."
+    },
+    "world_quests": {
+      "unknown_board": "No scoreboard by that name."
     },
     "steam": {
       "disabled": "La vinculación con Steam no está disponible en este momento.",

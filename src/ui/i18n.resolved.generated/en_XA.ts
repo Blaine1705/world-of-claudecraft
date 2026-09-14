@@ -1253,7 +1253,21 @@ export const en_XA: EnTranslations = {
       "devName": "[Çóñţŕíƀúţóŕ]",
       "devTierCol": "[Ɓáðĝé]",
       "mergedPrs": "[Ɱéŕĝéð ÞŔš]",
-      "devEmpty": "[Ñó ŕáñķéð çóñţŕíƀúţóŕš ýéţ.]"
+      "devEmpty": "[Ñó ŕáñķéð çóñţŕíƀúţóŕš ýéţ.]",
+      "tabWorldQuests": "[Ŵóŕļð Ɋúéšţš]",
+      "wqBoardsLabel": "[Ŵóŕļð ɋúéšţ šçóŕéƀóáŕðš]",
+      "wqMedal": "[Ɱéðáļ]",
+      "wqWaves": "[Ŵáʋéš ĥéļð]",
+      "wqTime": "[Ţíɱé]",
+      "wqPoints": "[Šçóŕé]",
+      "wqSeconds": "[{seconds}š]",
+      "wqNoMedal": "[Ñóñé]",
+      "wqMedals": {
+        "gold": "[Ĝóļð]",
+        "silver": "[Šíļʋéŕ]",
+        "bronze": "[Ɓŕóñžé]"
+      },
+      "wqEmpty": "[Ñó šçóŕéš óñ ţĥíš ƀóáŕð ýéţ. Ƒíñíšĥ ţĥé ŵóŕļð ɋúéšţ ţó çļáíɱ á šþóţ.]"
     },
     "pledge": {
       "open": "[Áççéþţíñĝ þļéðĝéš]",
@@ -4745,6 +4759,9 @@ export const en_XA: EnTranslations = {
     "guilds": {
       "invalid_roster_name": "[Íñʋáļíð ĝúíļð ñáɱé.]",
       "unknown": "[Ñó ĝúíļð ƀý ţĥáţ ñáɱé.]"
+    },
+    "world_quests": {
+      "unknown_board": "[Ñó šçóŕéƀóáŕð ƀý ţĥáţ ñáɱé.]"
     },
     "steam": {
       "disabled": "[Šţéáɱ ļíñķíñĝ íš ñóţ áʋáíļáƀļé ŕíĝĥţ ñóŵ.]",

@@ -356,7 +356,7 @@ export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Ent
     }
     if (quest.objective.type === 'horde') {
       ensureHordeInstructor(ctx);
-      if (existing && updateHordeEncounter(meta, player, existing) && existing.state === 'active')
+      if (existing && updateHordeEncounter(ctx, meta, player, existing) && existing.state === 'active')
         creditWorldQuest(ctx, meta, quest, existing);
     }
     if (quest.objective.type === 'wisp_maze') {

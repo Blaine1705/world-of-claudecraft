@@ -129,8 +129,19 @@ describe('personal forging world quest', () => {
     const position = { ...sim.player.pos };
     const initialXp = sim.xp;
     finish(sim);
+    // The finishing blow queues the ladder row; the next tick delivers it.
+    const scores = sim.tick().filter((event) => event.type === 'worldQuestScore');
     expect(sim.xp).toBeGreaterThan(initialXp);
     expect(state(sim).phase).toBe('success');
+    expect(scores).toEqual([
+      {
+        type: 'worldQuestScore',
+        pid: sim.playerId,
+        board: 'forge',
+        medal: state(sim).result?.rating,
+        metric: state(sim).result?.adjustedTime,
+      },
+    ]);
     expect(sim.worldQuestLog.get(ID)?.state).toBe('completed');
     expect(sim.meta(sim.playerId)!.deedsEarned.has('exp_forge_helper')).toBe(true);
     expect(sim.player.pos.x).toBeCloseTo(position.x);

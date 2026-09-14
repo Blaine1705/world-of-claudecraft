@@ -229,6 +229,7 @@ import {
 import { vaultWithdrawPayload } from './vault_snapshot_wire';
 import { decodeVehicleSession } from './vehicle_session_wire';
 import { buildWebSocketAuthMessage } from './world_auth_message';
+import { fetchWorldQuestLeaderboard } from './world_quest_leaderboard_wire';
 
 export { buildWebSocketAuthMessage } from './world_auth_message';
 
@@ -5732,7 +5733,6 @@ export class ClientWorld extends ReconWireState implements IWorld {
       return empty;
     }
   }
-
   // Renown board (REST GET, no wire command): ?board=deeds ranks ACCOUNTS by
   // lifetime deed Renown, character-faced and global-only. The bearer rides
   // the read so a ranked caller's `self` standing comes back on the page; any
@@ -5768,7 +5768,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
       return empty;
     }
   }
-
+  worldQuestLeaderboard(board: string, page = 0, pageSize = LEADERBOARD_PAGE_SIZE) {
+    return fetchWorldQuestLeaderboard(this.base, board, page, pageSize);
+  }
   async dailyRewards(): Promise<DailyRewardStatus> {
     const res = await fetch(apiUrl('/api/daily-rewards', this.base), {
       headers: { Authorization: `Bearer ${this.token}` },
@@ -5776,7 +5778,6 @@ export class ClientWorld extends ReconWireState implements IWorld {
     if (!res.ok) throw new Error('daily rewards unavailable');
     return (await res.json()) as DailyRewardStatus;
   }
-
   async dailyRewardLeaderboard(
     page = 0,
     pageSize = LEADERBOARD_PAGE_SIZE,

@@ -1253,7 +1253,21 @@ export const it_IT: EnTranslations = {
       "devName": "Contributore",
       "devTierCol": "Distintivo",
       "mergedPrs": "PR integrate",
-      "devEmpty": "Ancora nessun contributore in classifica."
+      "devEmpty": "Ancora nessun contributore in classifica.",
+      "tabWorldQuests": "World Quests",
+      "wqBoardsLabel": "World quest scoreboards",
+      "wqMedal": "Medal",
+      "wqWaves": "Waves held",
+      "wqTime": "Time",
+      "wqPoints": "Score",
+      "wqSeconds": "{seconds}s",
+      "wqNoMedal": "None",
+      "wqMedals": {
+        "gold": "Gold",
+        "silver": "Silver",
+        "bronze": "Bronze"
+      },
+      "wqEmpty": "No scores on this board yet. Finish the world quest to claim a spot."
     },
     "pledge": {
       "open": "Accetta giuramenti",
@@ -4745,6 +4759,9 @@ export const it_IT: EnTranslations = {
     "guilds": {
       "invalid_roster_name": "Nome di gilda non valido.",
       "unknown": "Nessuna gilda con questo nome."
+    },
+    "world_quests": {
+      "unknown_board": "No scoreboard by that name."
     },
     "steam": {
       "disabled": "Il collegamento a Steam non è disponibile al momento.",

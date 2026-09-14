@@ -16,6 +16,7 @@ import type {
 } from './varkhul_assembly';
 import type { VarkhulEngageState } from './varkhul_engage';
 import type { VarkhulForgeBeamWindow } from './varkhul_forge_intermission';
+import type { WorldQuestMedal } from './world_quest_scoreboards';
 
 export const TICK_RATE = 20; // sim ticks per second
 export const DT = 1 / TICK_RATE;
@@ -5984,6 +5985,9 @@ export type SimEvent = { pid?: number } & (
    *  wording under questUi.worldQuest.banner.<banner>). */
   | { type: 'worldQuestBanner'; banner: WorldQuestBannerId }
   | ({ type: 'cannonResult' } & CannonResult)
+  /** One finished scoreboard attempt (src/sim/world_quest_scoreboards.ts); the
+   *  server keeps the character's best row per board. */
+  | { type: 'worldQuestScore'; board: string; medal: WorldQuestMedal | null; metric: number }
   | {
       type: 'worldQuestProgress';
       questId: string;
