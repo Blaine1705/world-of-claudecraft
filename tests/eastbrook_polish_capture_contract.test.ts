@@ -675,8 +675,11 @@ interface AttributionTargetFixture {
 // Re-minted again for its review round: the ranked and required view
 // candidates now share the scan module's liveViewCandidate check, so the
 // same leaf moved once more. No capture was retaken.
+// Re-minted at the release/v0.43.0 merge into feature/world-quests: the merged
+// renderer.ts (the world-quest caravan cull and prewarm wiring on the release
+// cull core) moved the runtimeRender.renderer leaf. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '07b43fcb404bb316c61f8efff90e4e54755fe3392de832f2aee8e09fbcaa8abf';
+  '76b8eb0ecadfb3c808769dc3d9a07ad68fdea1c84177d62e1000f2403bf6616f';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
