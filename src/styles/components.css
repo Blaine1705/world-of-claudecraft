@@ -2934,8 +2934,9 @@
      layers its image over a gradient, so a missing file still reads as chrome. */
   #world-quest-leaderboard-window {
     width: min(1280px, calc(100vw - 32px));
-    height: min(900px, calc(100vh - 32px));
-    max-height: calc(100vh - 32px);
+    /* The generic .window clamp (top 10vh, 85% of the app viewport) is the
+       ceiling; the window fills it up to a comfortable 860px. */
+    height: min(860px, calc(var(--app-vh, 100vh) * 0.85 / var(--window-scale) - 24px));
     flex-direction: column;
     overflow: hidden;
     min-height: 0;
@@ -3128,36 +3129,54 @@
     border-color: #4c2f8a;
     opacity: 0.7;
   }
-  #world-quest-leaderboard-window .wql-plinth {
+  /* The name card the medal disc overlaps; every place shares its height, so
+     the stepped plinth under it is what lifts gold above silver and bronze. */
+  #world-quest-leaderboard-window .wql-slot-card {
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
     gap: 2px;
-    padding: calc(clamp(48px, 6cqw, 88px) / 2.4 + 6px) 6px 8px;
+    padding: calc(clamp(48px, 6cqw, 88px) / 2.4 + 6px) 8px 8px;
     box-sizing: border-box;
     background:
-      linear-gradient(180deg, color-mix(in srgb, var(--wql-tint) 26%, transparent), transparent 70%),
+      linear-gradient(180deg, color-mix(in srgb, var(--wql-tint) 22%, transparent), transparent 75%),
       linear-gradient(180deg, #2a1f47, #150f24);
+    border: 1px solid var(--wql-tint);
+    border-bottom: 0;
+    box-shadow: inset 0 1px 0 #ffffff1a;
+    clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%, 0 10px);
+  }
+  #world-quest-leaderboard-window .wql-plinth {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--wql-tint) 34%, #150f24),
+      #120c20 85%
+    );
     border: 1px solid var(--wql-tint);
     border-bottom-width: 3px;
     box-shadow:
-      inset 0 1px 0 #ffffff1a,
+      inset 0 1px 0 #ffffff26,
       0 8px 20px #000b;
-    clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%, 0 10px);
   }
   #world-quest-leaderboard-window .wql-plinth-1 {
-    height: clamp(120px, 15cqw, 200px);
+    height: clamp(64px, 8cqw, 108px);
   }
   #world-quest-leaderboard-window .wql-plinth-2 {
-    height: clamp(96px, 11.5cqw, 158px);
+    height: clamp(44px, 5.4cqw, 74px);
   }
   #world-quest-leaderboard-window .wql-plinth-3 {
-    height: clamp(80px, 9.5cqw, 130px);
+    height: clamp(30px, 3.6cqw, 50px);
   }
   #world-quest-leaderboard-window .wql-slot-name {
+    flex: none;
     max-width: 100%;
+    line-height: 1.3;
     font-family: var(--title-font);
     font-size: clamp(13px, 1.4cqw, 21px);
     color: #fbf6ff;
@@ -3181,8 +3200,12 @@
     font-size: clamp(11px, 1cqw, 14px);
     color: #c9bde4;
   }
+  #world-quest-leaderboard-window .wql-slot-metric,
+  #world-quest-leaderboard-window .wql-slot-medal-text {
+    flex: none;
+    line-height: 1.25;
+  }
   #world-quest-leaderboard-window .wql-plinth-rank {
-    margin-top: auto;
     font-family: var(--title-font);
     font-size: clamp(20px, 2.6cqw, 40px);
     line-height: 1;
@@ -3190,11 +3213,10 @@
     opacity: 0.85;
     text-shadow: 0 2px 0 #000;
   }
-  #world-quest-leaderboard-window .wql-mine .wql-plinth {
+  #world-quest-leaderboard-window .wql-mine .wql-slot-card {
     box-shadow:
       inset 0 1px 0 #ffffff1a,
-      0 8px 20px #000b,
-      0 0 22px #8b5cf688;
+      inset 0 0 18px #8b5cf666;
   }
   #world-quest-leaderboard-window .wql-list {
     max-width: 860px;
