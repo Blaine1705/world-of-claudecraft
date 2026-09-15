@@ -79,12 +79,18 @@ describe('Destruction full-BiS five-minute inert-boss balance', () => {
   // filler's mana cost does not move it at all (a +1 on Gloom Bolt reproduced
   // 0.18037518 to every digit). The invariants that actually bite here are the
   // dps band and starvedPct; the end-pool pin is widened to match the cycle.
+  //
+  // The release/v0.43.0 merge into feature/world-quests forks the shared Rng
+  // stream (the hedge_knight camp move in src/sim/content/evergarden.ts,
+  // c43178a68c, proven by reverting that one line), which moves where the five
+  // minutes land in the tap cycle: measured 0.2436, starvedPct 0. The pin
+  // follows Affliction's 0.30 for the same reason it was widened there.
   it('spends the mana pool by five minutes inside the sanity corridor', () => {
     const result = runWarlockBalanceProbe('destruction', 42, 300);
 
     expect(result.dps).toBeGreaterThanOrEqual(170);
     expect(result.dps).toBeLessThanOrEqual(230);
-    expect(result.manaEndPct).toBeLessThan(0.2);
+    expect(result.manaEndPct).toBeLessThan(0.3);
     expect(result.starvedPct).toBeLessThan(0.45);
   }, 120_000);
 });
