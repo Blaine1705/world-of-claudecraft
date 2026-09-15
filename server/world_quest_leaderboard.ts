@@ -146,6 +146,17 @@ function shed(): void {
   }
 }
 
+/** The server event-loop hook: a pid-scoped worldQuestScore event records for its
+ *  connected scorer; every other event, and an unknown pid, is a no-op. */
+export function recordWorldQuestScoreEvent(
+  clients: { get(pid: number): WorldQuestScoreWho | undefined },
+  ev: { type: string; pid?: number },
+): void {
+  if (ev.type !== 'worldQuestScore' || ev.pid === undefined) return;
+  const scorer = clients.get(ev.pid);
+  if (scorer) recordWorldQuestScore(scorer, ev as unknown as WorldQuestScoreObservation);
+}
+
 /** Record one finished attempt (fire-and-forget; never throws, never awaits). */
 export function recordWorldQuestScore(
   who: WorldQuestScoreWho,

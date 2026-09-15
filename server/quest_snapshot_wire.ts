@@ -1,5 +1,6 @@
 import { livePlaytimeSeconds } from '../src/sim/playtime';
 import type { PlayerMeta, Sim } from '../src/sim/sim';
+import type { Entity } from '../src/sim/types';
 import {
   activePublicWorldQuestTracePids,
   nearbyWorldQuestTraces,
@@ -22,20 +23,48 @@ export function emitActivitySelfKeys(
   meta: PlayerMeta,
   pid: number,
 ): void {
-  // Riding is durable; the activity sessions themselves are not.
+  // Riding skill: persisted, so the client knows whether to show the riding
+  // trainer UI without waiting on a mount/select command to fail. Wire key
+  // `mntRtd`; delta-guarded, only changes once (false to true, never back).
   emit('mntRtd', meta.ridingTrained === true ? true : null);
+  // Session-only lesson and race state must still reconcile after linkdead:
+  // events sent while the socket is absent are not replayed on resume. These
+  // self deltas are authoritative and clear stale client mirrors with false/null.
   emit('mntLesson', sim.mountLessonActiveFor(pid));
   emit('mntRace', sim.mountRaceViewFor(pid));
   emit('vehicle', sim.vehicleSessionFor(pid));
-  // Deed rewards can arrive without marking this session's heavy mirrors dirty.
+  // Book of Deeds: the Renown total and the two selected cosmetic ids
+  // (title and nameplate border), cheap scalars diffed per tick (grants land
+  // from sim sites that never mark this session dirty, and neither cosmetic
+  // echo must wait on the heavy gate).
   emit('renown', meta.renown);
   emit('atitle', meta.activeTitle);
   emit('aborder', meta.activeBorder);
-  // The sheet displays whole minutes, so unchanged ticks need no larger payload.
+  // Lifetime played time (IWorldProgressionXp.playtimeSeconds), quantized to
+  // whole minutes so the serialized form changes about once a minute and the
+  // delta gate drops it from every other tick; the sheet displays minutes at
+  // most, so no read loses precision.
   emit('ptime', Math.floor(livePlaytimeSeconds(meta, sim.time) / 60) * 60);
 }
 /** Per-viewer, unconditional snapshot suffix: absence is an explicit clear. */
 export { activePublicWorldQuestTracePids, PUBLIC_WORLD_QUEST_TRACE_RADIUS };
+
+/** Keep one observed entity as a public trace candidate: it must be an active tracer
+ *  within the public trace radius of the viewer (squared distance, as the grid walk has). */
+export function collectPublicTraceCandidate(
+  tracerPids: ReadonlySet<number>,
+  entity: Entity,
+  distanceSq: number,
+  out: PublicTraceCandidate[],
+): void {
+  if (
+    tracerPids.size > 0 &&
+    distanceSq <= PUBLIC_WORLD_QUEST_TRACE_RADIUS * PUBLIC_WORLD_QUEST_TRACE_RADIUS &&
+    tracerPids.has(entity.id)
+  ) {
+    out.push({ player: entity, distance: distanceSq });
+  }
+}
 
 export function nearbyQuestTraceWireJson(
   world: PublicTraceWorld,
@@ -47,6 +76,8 @@ export function nearbyQuestTraceWireJson(
 
 /** Emit the heavy owner-only quest snapshot family through the host's delta gate. */
 export function emitQuestSelfKeys(emit: EmitSelfKey, sim: Sim, meta: PlayerMeta): void {
+  // qlog carries creditedObjects (the opened-crate per-viewer hide,
+  // src/sim/quests/opened_object_view.ts): bounded, personal, on-change.
   emit('qlog', [...meta.questLog.values()]);
   emit('qdone', [...meta.questsDone]);
   emit('wqday', meta.worldQuestCycle);

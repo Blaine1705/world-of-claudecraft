@@ -30,6 +30,7 @@ import {
   configureWorldQuestScoreDbForTests,
   MAX_PENDING_WORLD_QUEST_SCORES,
   recordWorldQuestScore,
+  recordWorldQuestScoreEvent,
   routes,
   worldQuestScoresIdle,
   worldQuestScoresPending,
@@ -367,5 +368,30 @@ describe('world_quest_scores SQL boundary', () => {
     expect(sql).toContain('SELECT ctid FROM world_quest_scores');
     expect(sql).toContain("updated_at < now() - ($1::int * INTERVAL '1 day')");
     expect(params).toEqual([365, 100]);
+  });
+});
+
+describe('recordWorldQuestScoreEvent', () => {
+  it('records a worldQuestScore event for its connected scorer only', async () => {
+    const upsert = vi.fn<typeof upsertWorldQuestScore>(async () => true);
+    configureWorldQuestScoreDbForTests({
+      upsert,
+      rows: vi.fn<typeof worldQuestScoreboardRows>(async () => []),
+    });
+    const clients = new Map([[3, who]]);
+    const score = { type: 'worldQuestScore', board: 'forge', medal: 'gold', metric: 30 };
+    recordWorldQuestScoreEvent(clients, { ...score, pid: 3 });
+    recordWorldQuestScoreEvent(clients, { ...score, pid: 4 });
+    recordWorldQuestScoreEvent(clients, score);
+    recordWorldQuestScoreEvent(clients, { ...score, type: 'worldQuestDone', pid: 3 });
+    await worldQuestScoresIdle();
+    expect(upsert).toHaveBeenCalledTimes(1);
+    expect(upsert.mock.calls[0][1]).toMatchObject({
+      board: 'forge',
+      medal: 'gold',
+      metric: 30,
+      accountId: 7,
+      characterId: 42,
+    });
   });
 });

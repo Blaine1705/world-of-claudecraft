@@ -1,6 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
-import { emitQuestSelfKeys } from '../server/quest_snapshot_wire';
+import {
+  collectPublicTraceCandidate,
+  emitQuestSelfKeys,
+  PUBLIC_WORLD_QUEST_TRACE_RADIUS,
+  type PublicTraceCandidate,
+} from '../server/quest_snapshot_wire';
 import type { PlayerMeta, Sim } from '../src/sim/sim';
+import type { Entity } from '../src/sim/types';
 
 describe('quest snapshot wire', () => {
   it('emits the ordinary and rotating quest owner fields together', () => {
@@ -24,5 +30,28 @@ describe('quest snapshot wire', () => {
       ['wqexp', 1_893_542_400_000],
       ['wqlog', [worldQuest]],
     ]);
+  });
+});
+
+describe('public trace candidate collection', () => {
+  const player = { id: 7 } as Entity;
+  const edge = PUBLIC_WORLD_QUEST_TRACE_RADIUS * PUBLIC_WORLD_QUEST_TRACE_RADIUS;
+
+  it('keeps an active tracer at or inside the public radius, with its squared distance', () => {
+    const out: PublicTraceCandidate[] = [];
+    collectPublicTraceCandidate(new Set([7]), player, 4, out);
+    collectPublicTraceCandidate(new Set([7]), player, edge, out);
+    expect(out).toEqual([
+      { player, distance: 4 },
+      { player, distance: edge },
+    ]);
+  });
+
+  it('skips a player beyond the radius, a non-tracer, and every entity when nobody traces', () => {
+    const out: PublicTraceCandidate[] = [];
+    collectPublicTraceCandidate(new Set([7]), player, edge + 1, out);
+    collectPublicTraceCandidate(new Set([8]), player, 4, out);
+    collectPublicTraceCandidate(new Set(), player, 4, out);
+    expect(out).toEqual([]);
   });
 });

@@ -1,4 +1,3 @@
-// biome-ignore-all format: Legacy coordinator is line-ratcheted; format extracted wire modules instead.
 import { randomUUID } from 'node:crypto';
 import type { WebSocket } from 'ws';
 import { createBotDetector } from '#bot-detector';
@@ -301,7 +300,7 @@ import { GuildBookHolderIndex, requestGuildBookFlush } from './guild_book_holder
 import { createPaidGuildWithLeaderAtomic } from './guild_create_db';
 import { buyGuildRosterPageAtomic } from './guild_roster_page_db';
 import { guildRosterTransport } from './guild_roster_transport';
-import { HEAVY_SELF_EVENTS, heavySelfMarkOnAccept, heavySelfMarkOnReceipt } from './heavy_self';
+import { heavySelfMarkOnAccept, heavySelfMarkOnReceipt, isHeavySelfEvent } from './heavy_self';
 import { type HotbarLayoutState, HotbarLayoutStore, hotbarLayoutState } from './hotbar_layout';
 import { gameMetricsCounters, type WsDropCause } from './http/game_signals';
 import { buildSharedInterestCandidates } from './interest_candidates';
@@ -398,10 +397,10 @@ import { recordFtueDeath, recordFtueQuest, recordLevelUp } from './progress_even
 import * as questWire from './quest_command_wire';
 import {
   activePublicWorldQuestTracePids,
+  collectPublicTraceCandidate,
   emitActivitySelfKeys,
   emitQuestSelfKeys,
   nearbyQuestTraceWireJson,
-  PUBLIC_WORLD_QUEST_TRACE_RADIUS,
   type PublicTraceCandidate,
 } from './quest_snapshot_wire';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
@@ -458,7 +457,7 @@ import { dispatchVaultCommand, emitVaultSelfKeys } from './vault_wire';
 import { holderInfoForPubkey } from './woc_balance';
 import type { CharacterSaveArgs } from './woc_market';
 import { activeWorldBossIdsWireJson } from './world_boss_wire';
-import { recordWorldQuestScore } from './world_quest_leaderboard';
+import { recordWorldQuestScoreEvent } from './world_quest_leaderboard';
 import { isBackpressureExceeded } from './ws_backpressure';
 
 const ALDRIC_METEOR_QUEST_ID = 'q_aldrics_fallen_star';
@@ -1377,6 +1376,7 @@ function identityFields(e: Entity): Record<string, unknown> {
   if (e.color !== 0xffffff) out.c = e.color;
   return out;
 }
+
 // Dynamic fields are re-sent whole in every full or lite record, so the
 // conditional ones keep their absent-means-unset semantics.
 function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> {
@@ -1492,9 +1492,11 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
   }
   return out;
 }
+
 export function wireEntity(e: Entity, includeAuras = true): Record<string, unknown> {
   return { id: e.id, ...identityFields(e), ...dynamicFields(e, includeAuras) };
 }
+
 // Per-entity wire fragments, refreshed lazily at most once per tick and
 // shared by every recipient. The version counters bump only when the
 // serialized form actually changes, making per-session diffing O(1).
@@ -1634,6 +1636,8 @@ export class GameServer {
   // are GLOBAL (identical for every grouped session), yet partyWire runs once for
   // each grouped session. Memoize both for one broadcast so each party does one
   // scan, not one per member. (see review #1864, finding 1)
+  // The realm-identical world-boss fragment, built once per broadcast pass.
+  private worldBossIdsJson = '[]';
   private partyFrameGlobalsCache: {
     tick: number;
     aggroTargets: ReturnType<typeof partyFrameAggroTargets>;
@@ -3883,8 +3887,6 @@ export class GameServer {
     if (session.jailVisit) this.exitJailVisit(session, false);
     this.cancelAndRecordUnstuck(session);
     cancelCorpseHarvestCastOnDisconnect(this.sim, session.pid);
-    this.sim.dropWorldQuestDeliveryCargo(session.pid);
-    this.sim.leaveVehicle(session.pid);
     session.linkdead = true;
     session.graceUntil = Date.now() + LINKDEAD_GRACE_MS;
     this.botDetector.setTrackingConnection(session.botTrackingContext, false);
@@ -6464,7 +6466,8 @@ export class GameServer {
         break;
       case 'equip':
         if (typeof msg.item === 'string') {
-          // Accept aimed slots only for real equipment keys; otherwise use the
+          // The optional aimed slot (the paperdoll drop target) is accepted only
+          // when it names a real equipment key; anything else falls back to the
           // sim's own resolver rather than trusting the client. The sim then
           // re-validates the slot against the item itself.
           const aimed =
@@ -8064,7 +8067,7 @@ export class GameServer {
     this.partyFrameGlobalsCache = null;
     this.partyFrameProjectionCache.beginBroadcast();
     const tick = this.sim.tickCount;
-    const bossIdsJson = activeWorldBossIdsWireJson(this.sim);
+    this.worldBossIdsJson = activeWorldBossIdsWireJson(this.sim);
     // Vale Cup wire dueness, decided ONCE per broadcast pass and realm-global so the
     // tickHz rides the head at ~2 Hz, not on every snapshot: it is omitted while
     // the meter warms up (first ~1s, so a fresh server never shows a bogus
@@ -8198,13 +8201,7 @@ export class GameServer {
           if (this.perfDetailActive) this.bcVisits++;
           if (e.id === anchorEntity.id) continue;
           if (!this.canObserveEntity(anchorEntity, e, d2)) continue;
-          if (
-            publicTracePids.size > 0 &&
-            d2 <= PUBLIC_WORLD_QUEST_TRACE_RADIUS * PUBLIC_WORLD_QUEST_TRACE_RADIUS &&
-            publicTracePids.has(e.id)
-          ) {
-            publicTraceCandidates.push({ player: e, distance: d2 });
-          }
+          collectPublicTraceCandidate(publicTracePids, e, d2, publicTraceCandidates);
           const known = session.sentEnts.get(e.id);
           // the viewer's current target stays in interest to the widest drop
           // radius so its unit frame doesn't vanish mid-chase
@@ -8264,7 +8261,7 @@ export class GameServer {
         }
         const selfStart = this.perfDetailActive ? process.hrtime.bigint() : 0n;
         if (this.perfDetailActive) this.bcastGridNs += selfStart - gridStart;
-        const selfJson = this.selfWireJson(session, anchorEntity, anchorMeta, anchorSession, bossIdsJson);
+        const selfJson = this.selfWireJson(session, anchorEntity, anchorMeta, anchorSession);
         if (this.perfDetailActive) this.bcastSelfNs += process.hrtime.bigint() - selfStart;
         const keepJson = keep.length > 0 ? `,"keep":[${keep.join(',')}]` : '';
         const aoeBase = isBgPos(anchorEntity.pos.x) ? BG_MATCH_DROP_RADIUS : INTEREST_QUERY_RADIUS;
@@ -8460,7 +8457,6 @@ export class GameServer {
     p: Entity,
     meta: PlayerMeta,
     anchorSession: ClientSession = session,
-    activeWorldBossIdsJson = '[]',
   ): string {
     // Per-bucket attribution for bcastSelf (SELF_WIRE_PHASES): one clock read
     // per bucket boundary, active only during a detailed capture, accumulated
@@ -8582,7 +8578,7 @@ export class GameServer {
       'lockouts',
       Object.fromEntries([...meta.raidLockouts].filter(([, until]) => until > Date.now())),
     );
-    maybeRaw('wba', activeWorldBossIdsJson);
+    maybeRaw('wba', this.worldBossIdsJson);
     // Where the player's corpse lies while their spirit is a ghost (null otherwise).
     // Delta-guarded: ships on death-release and clears on resurrect. The client
     // draws the corpse marker and gates the resurrect-at-corpse button on it.
@@ -9112,10 +9108,7 @@ export class GameServer {
           );
         }
       }
-      if (ev.type === 'worldQuestScore' && ev.pid !== undefined) {
-        const scorer = this.clients.get(ev.pid);
-        if (scorer) recordWorldQuestScore(scorer, ev);
-      }
+      recordWorldQuestScoreEvent(this.clients, ev);
       if (ev.type === 'deedUnlocked' && ev.pid !== undefined) {
         const s = this.clients.get(ev.pid);
         if (s) {
@@ -9402,9 +9395,9 @@ export class GameServer {
                 return;
               }
               mine.push(fragments[i]);
-              // Sim-driven heavy-self changes refresh those fields on the next snapshot.
-              if (HEAVY_SELF_EVENTS.has(ev.type) || ev.type.startsWith('worldQuest'))
-                session.selfHeavyDirty = true;
+              // a sim-driven change to a heavy self field (loot, level-up, quest
+              // credit, ...) refreshes those fields on the next snapshot
+              if (isHeavySelfEvent(ev.type)) session.selfHeavyDirty = true;
               // A match concluding (win, loss, draw, or forfeit) changes rating
               // and standings on the throttled `arena` self key (ARENA_WIRE_HZ):
               // force it fresh next snapshot instead of leaving the Arena
