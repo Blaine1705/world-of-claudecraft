@@ -7237,46 +7237,102 @@
     min-height: 40px;
     box-sizing: border-box;
   }
-  /* World Quest rankings: the whole sheet scrolls (the board gives up its own
-     scroll), three board cards per row, and a shorter podium that keeps its
-     three columns; the card and pager buttons meet the touch floor. */
+  /* World Quest rankings on a phone: the sheet fills the screen as the same
+     flex column as desktop (cards, then the board whose ladder list scrolls,
+     then the self bar in flow), so nothing ever draws over the podium or the
+     rows. The cards become one horizontally scrolling strip of compact chips,
+     and the podium shrinks; card and pager buttons keep the touch floor. */
   body.mobile-touch #world-quest-leaderboard-window {
-    height: auto;
+    height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
     max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
-    overflow-y: auto;
+    overflow: hidden;
   }
-  body.mobile-touch #world-quest-leaderboard-window .wql-board {
-    flex: none;
-    overflow: visible;
+  body.mobile-touch #world-quest-leaderboard-window .wql-sub {
+    display: none;
   }
   body.mobile-touch #world-quest-leaderboard-window .wql-cards {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    padding-bottom: 2px;
   }
-  /* A short banner strip instead of a 16:9 frame, so two card rows never
-     swallow a landscape phone's whole sheet before the podium. */
+  body.mobile-touch #world-quest-leaderboard-window .wql-card {
+    flex: 0 0 132px;
+    gap: 2px;
+    padding: 4px;
+  }
   body.mobile-touch #world-quest-leaderboard-window .wql-card-art {
     aspect-ratio: auto;
-    height: 44px;
+    height: 20px;
+  }
+  body.mobile-touch #world-quest-leaderboard-window .wql-card-name {
+    font-size: 11px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  body.mobile-touch #world-quest-leaderboard-window .wql-card-metric {
+    display: none;
   }
   body.mobile-touch #world-quest-leaderboard-window .wql-card,
   body.mobile-touch #world-quest-leaderboard-window .wql-page-btn {
     min-height: 40px;
     box-sizing: border-box;
   }
+  body.mobile-touch #world-quest-leaderboard-window .wql-board {
+    margin-top: 6px;
+    padding: 4px 8px;
+  }
+  body.mobile-touch #world-quest-leaderboard-window .wql-board-title {
+    font-size: 14px;
+  }
+  body.mobile-touch #world-quest-leaderboard-window .wql-board-rule,
+  body.mobile-touch #world-quest-leaderboard-window .wql-total {
+    font-size: 11px;
+  }
+  body.mobile-touch #world-quest-leaderboard-window .wql-podium {
+    max-width: 520px;
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+  body.mobile-touch #world-quest-leaderboard-window .wql-slot-medal {
+    width: 26px;
+    height: 26px;
+    margin-bottom: -13px;
+    border-width: 1px;
+  }
+  body.mobile-touch #world-quest-leaderboard-window .wql-slot-card {
+    padding: 15px 4px 2px;
+  }
+  body.mobile-touch #world-quest-leaderboard-window .wql-slot-name,
+  body.mobile-touch #world-quest-leaderboard-window .wql-slot-metric {
+    font-size: 12px;
+  }
+  body.mobile-touch #world-quest-leaderboard-window .wql-slot-medal-text {
+    font-size: 10px;
+  }
+  body.mobile-touch #world-quest-leaderboard-window .wql-plinth-rank {
+    font-size: 9px;
+  }
   body.mobile-touch #world-quest-leaderboard-window .wql-plinth-1 {
-    height: 44px;
+    height: 20px;
   }
   body.mobile-touch #world-quest-leaderboard-window .wql-plinth-2 {
-    height: 32px;
+    height: 16px;
   }
   body.mobile-touch #world-quest-leaderboard-window .wql-plinth-3 {
-    height: 22px;
+    height: 12px;
   }
-  /* Pinned over the scrolling sheet, above the podium's medal discs. */
+  body.mobile-touch #world-quest-leaderboard-window .wql-row {
+    grid-template-columns: 36px minmax(0, 1fr) 96px 88px;
+    padding: 3px 8px;
+    font-size: 12px;
+  }
   body.mobile-touch #world-quest-leaderboard-window .wql-self {
-    position: sticky;
-    bottom: 0;
-    z-index: 3;
+    margin-top: 6px;
+    padding: 4px 22px;
+    font-size: 12px;
   }
   /* Loot Settings: the loot-mode / threshold selects (40px + 16px iOS no-zoom). */
   body.mobile-touch #loot-settings-window select {

@@ -2959,8 +2959,8 @@
     text-align: center;
     color: #c4a6ff;
     font-family: var(--font-serif);
-    font-size: clamp(12px, 1.2cqw, 18px);
-    margin: -2px 0 clamp(8px, 1cqw, 16px);
+    font-size: clamp(12px, 1.05cqw, 16px);
+    margin: -4px 0 clamp(6px, 0.7cqw, 10px);
   }
   #world-quest-leaderboard-window .wql-cards {
     display: grid;
@@ -3011,7 +3011,7 @@
   }
   #world-quest-leaderboard-window .wql-card-art {
     display: block;
-    aspect-ratio: 16 / 9;
+    aspect-ratio: 21 / 9;
     background-color: #120b20;
     background-image:
       var(--wql-art, none), radial-gradient(ellipse at 50% 35%, #6d3fd455, transparent 70%),
@@ -3037,12 +3037,17 @@
     font-size: clamp(10px, 0.9cqw, 13px);
     color: #a99bc8;
   }
+  /* The selected board is itself a flex column: the header, podium and pager
+     keep their natural height and the rest of the ladder takes what is left,
+     scrolling on its own, so the pinned self bar below never covers a row. */
   #world-quest-leaderboard-window .wql-board {
     flex: 1 1 auto;
     min-height: 0;
-    overflow: hidden auto;
-    margin-top: clamp(8px, 1cqw, 16px);
-    padding: clamp(8px, 1cqw, 16px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    margin-top: clamp(6px, 0.8cqw, 12px);
+    padding: clamp(6px, 0.8cqw, 12px) clamp(8px, 1cqw, 16px);
     background: linear-gradient(180deg, #150f26e6, #0c0816f0);
     border: 1px solid #8f6a2c;
     box-shadow:
@@ -3055,12 +3060,13 @@
     align-items: baseline;
     justify-content: center;
     gap: 4px 14px;
+    flex: none;
     text-align: center;
-    margin-bottom: clamp(6px, 0.8cqw, 12px);
+    margin-bottom: clamp(4px, 0.5cqw, 8px);
   }
   #world-quest-leaderboard-window .wql-board-title {
     font-family: var(--title-font);
-    font-size: clamp(16px, 1.9cqw, 28px);
+    font-size: clamp(15px, 1.6cqw, 24px);
     color: #f2d998;
     text-shadow: 0 1px 0 #000;
   }
@@ -3085,9 +3091,11 @@
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     align-items: end;
-    gap: clamp(6px, 1.2cqw, 20px);
-    max-width: 760px;
-    margin: 0 auto clamp(10px, 1.2cqw, 18px);
+    gap: clamp(6px, 1cqw, 16px);
+    flex: none;
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto clamp(6px, 0.7cqw, 10px);
     padding: 0;
     list-style: none;
   }
@@ -3108,9 +3116,9 @@
   #world-quest-leaderboard-window .wql-slot-medal {
     position: relative;
     z-index: 1;
-    width: clamp(48px, 6cqw, 88px);
-    height: clamp(48px, 6cqw, 88px);
-    margin-bottom: calc(clamp(48px, 6cqw, 88px) / -2.4);
+    width: clamp(36px, 3.6cqw, 50px);
+    height: clamp(36px, 3.6cqw, 50px);
+    margin-bottom: calc(clamp(36px, 3.6cqw, 50px) / -2);
     border-radius: 50%;
     background-color: #120b20;
     background-image:
@@ -3136,8 +3144,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2px;
-    padding: calc(clamp(48px, 6cqw, 88px) / 2.4 + 6px) 8px 8px;
+    gap: 0;
+    padding: calc(clamp(36px, 3.6cqw, 50px) / 2 + 3px) 8px 5px;
     box-sizing: border-box;
     background:
       linear-gradient(180deg, color-mix(in srgb, var(--wql-tint) 22%, transparent), transparent 75%),
@@ -3165,20 +3173,20 @@
       0 8px 20px #000b;
   }
   #world-quest-leaderboard-window .wql-plinth-1 {
-    height: clamp(64px, 8cqw, 108px);
+    height: clamp(32px, 3.6cqw, 48px);
   }
   #world-quest-leaderboard-window .wql-plinth-2 {
-    height: clamp(44px, 5.4cqw, 74px);
+    height: clamp(24px, 2.6cqw, 34px);
   }
   #world-quest-leaderboard-window .wql-plinth-3 {
-    height: clamp(30px, 3.6cqw, 50px);
+    height: clamp(17px, 1.8cqw, 24px);
   }
   #world-quest-leaderboard-window .wql-slot-name {
     flex: none;
     max-width: 100%;
-    line-height: 1.3;
+    line-height: 1.25;
     font-family: var(--title-font);
-    font-size: clamp(13px, 1.4cqw, 21px);
+    font-size: clamp(12px, 1.2cqw, 17px);
     color: #fbf6ff;
     text-shadow: 0 1px 0 #000;
     overflow: hidden;
@@ -3191,7 +3199,7 @@
     color: #8d82a8;
   }
   #world-quest-leaderboard-window .wql-slot-metric {
-    font-size: clamp(14px, 1.6cqw, 24px);
+    font-size: clamp(13px, 1.3cqw, 19px);
     font-weight: 700;
     color: var(--wql-tint);
     text-shadow: 0 1px 0 #000;
@@ -3207,7 +3215,7 @@
   }
   #world-quest-leaderboard-window .wql-plinth-rank {
     font-family: var(--title-font);
-    font-size: clamp(20px, 2.6cqw, 40px);
+    font-size: clamp(10px, 1.05cqw, 14px);
     line-height: 1;
     color: var(--wql-tint);
     opacity: 0.85;
@@ -3219,6 +3227,11 @@
       inset 0 0 18px #8b5cf666;
   }
   #world-quest-leaderboard-window .wql-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    width: 100%;
     max-width: 860px;
     margin: 0 auto;
   }
@@ -3227,7 +3240,7 @@
     grid-template-columns: 56px minmax(0, 1fr) minmax(90px, 140px) minmax(80px, 120px);
     align-items: center;
     gap: 8px;
-    padding: 6px 10px;
+    padding: 5px 10px;
     font-size: clamp(12px, 1.15cqw, 16px);
     color: #f1e9ff;
   }
@@ -3238,7 +3251,10 @@
     font-family: var(--title-font);
     font-size: clamp(11px, 1cqw, 14px);
     color: #f2d998;
-    background: none;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: #130d22;
     border-bottom: 1px solid #d4a95544;
   }
   #world-quest-leaderboard-window .wql-row.wql-mine {
@@ -3297,7 +3313,8 @@
     align-items: center;
     justify-content: center;
     gap: 12px;
-    margin-top: 10px;
+    flex: none;
+    margin-top: 6px;
     color: #c9bde4;
   }
   #world-quest-leaderboard-window .wql-page-btn {
@@ -3322,7 +3339,7 @@
     align-items: center;
     justify-content: center;
     gap: 6px 16px;
-    margin: clamp(8px, 1cqw, 14px) auto 0;
+    margin: clamp(6px, 0.8cqw, 12px) auto 0;
     padding: clamp(6px, 0.7cqw, 11px) clamp(18px, 2.4cqw, 40px);
     max-width: 90cqw;
     font-size: clamp(12px, 1.2cqw, 18px);
