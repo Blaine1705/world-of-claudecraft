@@ -511,7 +511,7 @@
       "tick": 9,
       "time": 0.45,
       "nextId": 1028,
-      "state": "59a494f0",
+      "state": "6c92b02e",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -609,6 +609,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestCycle": "wq1_26596",
           "wyrmfallDaily": {}
         }
       ],

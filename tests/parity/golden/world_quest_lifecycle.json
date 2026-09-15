@@ -16,8 +16,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "06cbf5e3",
+      "nextId": 1007,
+      "state": "b8206c6f",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -49,6 +49,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -62,7 +63,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 994,
+          "entityId": 999,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -70,6 +71,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -90,7 +94,8 @@
           "townFocus": {},
           "vault": {
             "stock": {}
-          }
+          },
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -105,7 +110,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 994
+              "sourceId": 999
             }
           ],
           "blockChance": 0.05,
@@ -119,7 +124,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 994,
+          "id": 999,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -163,9 +168,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "629f53e7",
-      "events": "a45a9ac3",
+      "nextId": 1007,
+      "state": "43557b2d",
+      "events": "32669ff8",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -196,6 +201,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -209,7 +215,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 994,
+          "entityId": 999,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -217,6 +223,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -239,7 +248,7 @@
           "vault": {
             "stock": {}
           },
-          "worldQuestCycle": "wq3_0",
+          "worldQuestCycle": "wq1_0",
           "worldQuestLog": [
             [
               "wq_eastbrook_bandits",
@@ -248,7 +257,8 @@
                 "state": "active"
               }
             ]
-          ]
+          ],
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -263,7 +273,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 994
+              "sourceId": 999
             }
           ],
           "blockChance": 0.05,
@@ -277,7 +287,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 822,
-          "id": 994,
+          "id": 999,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -321,9 +331,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "d210033d",
-      "events": "c4a40b1b",
+      "nextId": 1007,
+      "state": "eec8911c",
+      "events": "946b17dd",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -354,6 +364,7 @@
           "cls": "warrior",
           "companionUpgrades": {},
           "counters": {},
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -367,7 +378,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 994,
+          "entityId": 999,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -375,6 +386,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -397,7 +411,7 @@
           "vault": {
             "stock": {}
           },
-          "worldQuestCycle": "wq3_0",
+          "worldQuestCycle": "wq1_0",
           "worldQuestLog": [
             [
               "wq_eastbrook_bandits",
@@ -406,7 +420,8 @@
                 "state": "active"
               }
             ]
-          ]
+          ],
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -421,7 +436,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 994
+              "sourceId": 999
             },
             {
               "id": "world_quest_delivery_cargo",
@@ -429,7 +444,7 @@
               "name": "Carrying Freight",
               "permanent": true,
               "school": "physical",
-              "sourceId": 994,
+              "sourceId": 999,
               "undispellable": true,
               "value": 0.75
             }
@@ -445,7 +460,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 822,
-          "id": 994,
+          "id": 999,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -489,9 +504,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "619e95a0",
-      "events": "07b8ee0d",
+      "nextId": 1007,
+      "state": "51b840b6",
+      "events": "4a38ce4c",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -524,6 +539,7 @@
           "counters": {
             "questProgress": 1
           },
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -537,7 +553,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 994,
+          "entityId": 999,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -545,6 +561,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -567,7 +586,7 @@
           "vault": {
             "stock": {}
           },
-          "worldQuestCycle": "wq3_0",
+          "worldQuestCycle": "wq1_0",
           "worldQuestLog": [
             [
               "wq_eastbrook_bandits",
@@ -577,7 +596,8 @@
                 "state": "active"
               }
             ]
-          ]
+          ],
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -592,7 +612,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 994
+              "sourceId": 999
             }
           ],
           "blockChance": 0.05,
@@ -606,7 +626,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 822,
-          "id": 994,
+          "id": 999,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -650,9 +670,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "4f47be04",
-      "events": "348c8495",
+      "nextId": 1008,
+      "state": "4923636a",
+      "events": "c0ef1c4c",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -687,6 +707,7 @@
             "questsCompleted": 1,
             "xpGained": 2784
           },
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -700,7 +721,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 994,
+          "entityId": 999,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -708,6 +729,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -728,12 +752,12 @@
           },
           "townFocus": {},
           "unlockedMilestones": [
-            "__wq_claim__:wq3_0:wq_eastbrook_bandits"
+            "__wq_claim__:wq1_0:wq_eastbrook_bandits"
           ],
           "vault": {
             "stock": {}
           },
-          "worldQuestCycle": "wq3_0",
+          "worldQuestCycle": "wq1_0",
           "worldQuestLog": [
             [
               "wq_eastbrook_bandits",
@@ -743,7 +767,8 @@
                 "state": "completed"
               }
             ]
-          ]
+          ],
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -758,7 +783,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 994
+              "sourceId": 999
             }
           ],
           "blockChance": 0.05,
@@ -772,7 +797,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 822,
-          "id": 994,
+          "id": 999,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -816,9 +841,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "643ec6ad",
-      "events": "db9e6e94",
+      "nextId": 1009,
+      "state": "95484167",
+      "events": "3922916b",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -850,10 +875,11 @@
           "companionUpgrades": {},
           "copper": 6000,
           "counters": {
-            "questProgress": 31,
+            "questProgress": 22,
             "questsCompleted": 3,
             "xpGained": 2784
           },
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -871,7 +897,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 994,
+          "entityId": 999,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -879,6 +905,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -903,14 +932,14 @@
           },
           "townFocus": {},
           "unlockedMilestones": [
-            "__wq_claim__:wq3_0:wq_eastbrook_bandits",
-            "__wq_claim__:wq3_0:wq_mirefen_gravecallers",
-            "__wq_claim__:wq3_0:wq_palmreach_confections"
+            "__wq_claim__:wq1_0:wq_eastbrook_bandits",
+            "__wq_claim__:wq1_0:wq_mirefen_gravecallers",
+            "__wq_claim__:wq1_0:wq_palmreach_confections"
           ],
           "vault": {
             "stock": {}
           },
-          "worldQuestCycle": "wq3_0",
+          "worldQuestCycle": "wq1_0",
           "worldQuestLog": [
             [
               "wq_eastbrook_bandits",
@@ -936,7 +965,8 @@
                 "state": "completed"
               }
             ]
-          ]
+          ],
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -951,7 +981,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 994
+              "sourceId": 999
             }
           ],
           "blockChance": 0.05,
@@ -965,7 +995,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 822,
-          "id": 994,
+          "id": 999,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1009,9 +1039,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "40a39574",
-      "events": "9be0680e",
+      "nextId": 1009,
+      "state": "d6e22bd8",
+      "events": "714d8ecd",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -1043,10 +1073,11 @@
           "companionUpgrades": {},
           "copper": 6000,
           "counters": {
-            "questProgress": 31,
+            "questProgress": 22,
             "questsCompleted": 3,
             "xpGained": 2784
           },
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1064,7 +1095,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 994,
+          "entityId": 999,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1072,6 +1103,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -1098,7 +1132,7 @@
           "vault": {
             "stock": {}
           },
-          "worldQuestCycle": "wq3_1",
+          "worldQuestCycle": "wq1_3",
           "worldQuestLog": [
             [
               "wq_thornpeak_stormcrag",
@@ -1107,7 +1141,8 @@
                 "state": "active"
               }
             ]
-          ]
+          ],
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -1122,7 +1157,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 994
+              "sourceId": 999
             }
           ],
           "blockChance": 0.05,
@@ -1136,7 +1171,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 822,
-          "id": 994,
+          "id": 999,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1180,8 +1215,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
-      "state": "40a39574",
+      "nextId": 1009,
+      "state": "d6e22bd8",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1214,10 +1249,11 @@
           "companionUpgrades": {},
           "copper": 6000,
           "counters": {
-            "questProgress": 31,
+            "questProgress": 22,
             "questsCompleted": 3,
             "xpGained": 2784
           },
+          "craftDaily": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -1235,7 +1271,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 994,
+          "entityId": 999,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1243,6 +1279,9 @@
           },
           "equipmentInstance": {},
           "gatheringProficiency": {},
+          "harvestPreference": {
+            "kind": "all"
+          },
           "heroicDaily": {},
           "inventory": [
             {
@@ -1269,7 +1308,7 @@
           "vault": {
             "stock": {}
           },
-          "worldQuestCycle": "wq3_1",
+          "worldQuestCycle": "wq1_3",
           "worldQuestLog": [
             [
               "wq_thornpeak_stormcrag",
@@ -1278,7 +1317,8 @@
                 "state": "active"
               }
             ]
-          ]
+          ],
+          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -1293,7 +1333,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 994
+              "sourceId": 999
             }
           ],
           "blockChance": 0.05,
@@ -1307,7 +1347,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 822,
-          "id": 994,
+          "id": 999,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
