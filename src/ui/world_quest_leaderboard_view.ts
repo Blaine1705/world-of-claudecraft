@@ -14,6 +14,12 @@ import {
 } from '../sim/world_quest_scoreboards';
 import type { WorldQuestLeaderboardEntry, WorldQuestLeaderboardPage } from '../world_api';
 import { formatNumber, t } from './i18n';
+import {
+  LEADERBOARD_MEDAL_ART_DIR,
+  leaderboardMedalArt,
+  type PodiumSlot,
+  podiumSplit,
+} from './leaderboard_podium_view';
 import { worldQuestDisplayName } from './world_quest_view';
 
 export interface WorldQuestBoardChip {
@@ -99,14 +105,14 @@ export function resolveWorldQuestBoard(id: string): WorldQuestScoreboard {
 
 /** Where the rankings art lives (public/, served verbatim). A missing file
  *  degrades to the stylesheet's gradient, so the window never breaks on art. */
-export const WORLD_QUEST_LADDER_ART_DIR = 'ui/world-quests/leaderboard';
+export const WORLD_QUEST_LADDER_ART_DIR = LEADERBOARD_MEDAL_ART_DIR;
 
 export function worldQuestBoardArt(boardId: string): string {
   return `${WORLD_QUEST_LADDER_ART_DIR}/${boardId}.webp`;
 }
 
 export function worldQuestMedalArt(medal: WorldQuestMedal): string {
-  return `${WORLD_QUEST_LADDER_ART_DIR}/medal_${medal}.webp`;
+  return leaderboardMedalArt(medal);
 }
 
 export interface WorldQuestLadderCardView {
@@ -212,14 +218,6 @@ export function worldQuestBoardRule(board: WorldQuestScoreboard): string {
     : t(`hudChrome.wqLadder.rankedByMedal.${board.metric}`);
 }
 
-const PODIUM_DISPLAY_ORDER: readonly WorldQuestPodiumPlace[] = [2, 1, 3];
-
-const PLACE_MEDAL: Record<WorldQuestPodiumPlace, WorldQuestMedal> = {
-  1: 'gold',
-  2: 'silver',
-  3: 'bronze',
-};
-
 function whole(value: number): string {
   return formatNumber(value, { maximumFractionDigits: 0 });
 }
@@ -230,33 +228,33 @@ function sameName(a: string, b: string): boolean {
 
 function podiumSlot(
   board: WorldQuestScoreboard,
-  place: WorldQuestPodiumPlace,
-  entry: WorldQuestLeaderboardEntry | undefined,
+  slot: PodiumSlot<WorldQuestLeaderboardEntry>,
   viewerName: string,
 ): WorldQuestPodiumSlotView {
+  const entry = slot.entry;
   if (!entry) {
     return {
-      place,
+      place: slot.place,
       filled: false,
-      rank: whole(place),
+      rank: slot.rankText,
       name: t('hudChrome.wqLadder.unclaimed'),
       medal: null,
       medalText: '',
       medalArt: null,
-      placeArt: worldQuestMedalArt(PLACE_MEDAL[place]),
+      placeArt: slot.placeArt,
       metricText: '',
       me: false,
     };
   }
   return {
-    place,
+    place: slot.place,
     filled: true,
-    rank: whole(place),
+    rank: slot.rankText,
     name: entry.name,
     medal: entry.medal,
     medalText: worldQuestMedalText(entry.medal),
     medalArt: entry.medal ? worldQuestMedalArt(entry.medal) : null,
-    placeArt: worldQuestMedalArt(PLACE_MEDAL[place]),
+    placeArt: slot.placeArt,
     metricText: worldQuestMetricText(board, entry.metric),
     me: sameName(entry.name, viewerName),
   };
@@ -341,18 +339,9 @@ export function buildWorldQuestLadderView(
   if (page.leaders.length === 0) {
     return { ...base, state: 'empty', message: t('hudChrome.leaderboard.wqEmpty'), self };
   }
-  const onFirstPage = page.page === 0;
-  const podium = onFirstPage
-    ? PODIUM_DISPLAY_ORDER.map((place) =>
-        podiumSlot(
-          board,
-          place,
-          page.leaders.find((entry) => entry.rank === place),
-          viewerName,
-        ),
-      )
-    : [];
-  const listed = onFirstPage ? page.leaders.filter((entry) => entry.rank > 3) : page.leaders;
+  const split = podiumSplit(page.page, page.leaders, (entry) => entry.rank);
+  const podium = split.podium.map((slot) => podiumSlot(board, slot, viewerName));
+  const listed = split.listed;
   return {
     ...base,
     state: 'ranked',

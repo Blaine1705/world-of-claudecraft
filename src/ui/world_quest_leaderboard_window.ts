@@ -13,6 +13,7 @@ import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
 import type { IWorld, WorldQuestLeaderboardPage } from '../world_api';
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
+import { type PodiumSlotHtml, podiumHtml } from './leaderboard_podium_html';
 import { svgIcon } from './ui_icons';
 import {
   buildWorldQuestLadderView,
@@ -185,9 +186,10 @@ export class WorldQuestLeaderboardWindow {
     if (view.state === 'error')
       return `<div class="wql-state wql-error" role="alert">${esc(view.message)}</div>`;
     if (view.state === 'empty') return `<div class="wql-state">${esc(view.message)}</div>`;
-    const podium = view.podium.length
-      ? `<ol class="wql-podium" aria-label="${esc(view.podiumLabel)}">${view.podium.map((slot) => this.slotHtml(slot, view.youLabel)).join('')}</ol>`
-      : '';
+    const podium = podiumHtml(
+      view.podium.map((slot) => this.slotHtml(slot, view.youLabel)),
+      view.podiumLabel,
+    );
     const list = view.rows.length
       ? `<div class="wql-list"><div class="wql-row wql-head"><span>${esc(view.columns.rank)}</span>` +
         `<span>${esc(view.columns.name)}</span><span>${esc(view.columns.medal)}</span>` +
@@ -205,23 +207,18 @@ export class WorldQuestLeaderboardWindow {
     return podium + list + pager;
   }
 
-  private slotHtml(slot: WorldQuestPodiumSlotView, youLabel: string): string {
-    const classes =
-      `wql-slot wql-slot-${slot.place}` +
-      (slot.filled ? '' : ' wql-slot-empty') +
-      (slot.me ? ' wql-mine' : '');
+  private slotHtml(slot: WorldQuestPodiumSlotView, youLabel: string): PodiumSlotHtml {
     const you = slot.me ? ` <span class="wql-you">(${esc(youLabel)})</span>` : '';
-    return (
-      `<li class="${classes}" data-wql-place="${slot.place}">` +
-      `<span class="wql-slot-medal"${artStyle('--wql-medal', slot.placeArt)} aria-hidden="true"></span>` +
-      `<span class="wql-slot-card"><span class="wql-slot-name">${esc(slot.name)}${you}</span>` +
-      (slot.filled
-        ? `<span class="wql-slot-metric">${esc(slot.metricText)}</span>` +
-          `<span class="wql-slot-medal-text">${this.medalCellHtml(slot.medal, slot.medalArt, slot.medalText)}</span>`
-        : '') +
-      `</span><span class="wql-plinth wql-plinth-${slot.place}">` +
-      `<span class="wql-plinth-rank">${esc(slot.rank)}</span></span></li>`
-    );
+    return {
+      place: slot.place,
+      rankText: slot.rank,
+      placeArt: slot.placeArt,
+      filled: slot.filled,
+      me: slot.me,
+      nameHtml: `${esc(slot.name)}${you}`,
+      metricHtml: slot.filled ? esc(slot.metricText) : '',
+      detailHtml: slot.filled ? this.medalCellHtml(slot.medal, slot.medalArt, slot.medalText) : '',
+    };
   }
 
   private medalCellHtml(medal: string | null, art: string | null, text: string): string {

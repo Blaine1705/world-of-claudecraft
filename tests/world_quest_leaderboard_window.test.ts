@@ -67,7 +67,9 @@ describe('world quest rankings window', () => {
     expect(active?.getAttribute('data-wql-board')).toBe('north_watch_cannon');
     expect(active?.getAttribute('aria-pressed')).toBe('true');
     expect(
-      Array.from(r.el.querySelectorAll('.wql-slot')).map((s) => s.getAttribute('data-wql-place')),
+      Array.from(r.el.querySelectorAll('.lbp-slot')).map((s) =>
+        s.getAttribute('data-podium-place'),
+      ),
     ).toEqual(['2', '1', '3']);
     expect(r.el.querySelectorAll('.wql-row:not(.wql-head)')).toHaveLength(3);
     expect(r.el.querySelector('.wql-self-rank')?.textContent).toBe('Rank 40');
@@ -107,7 +109,7 @@ describe('world quest rankings window', () => {
     releaseSlow!(ladderPage('north_watch_cannon'));
     await flush();
     expect(r.el.querySelector('.wql-card-active')?.getAttribute('data-wql-board')).toBe('slalom');
-    expect(r.el.querySelector('.wql-slot')).toBeNull();
+    expect(r.el.querySelector('.lbp-slot')).toBeNull();
     expect(r.el.querySelector('.wql-state')?.textContent).toMatch(/No scores on this board yet/);
   });
 
@@ -129,7 +131,7 @@ describe('world quest rankings window', () => {
     await flush();
     expect(r.worldQuestLeaderboard).toHaveBeenLastCalledWith('north_watch_cannon', 1, 50, 'Ari');
     expect(r.el.querySelector('.wql-page-status')?.textContent).toBe('Page 2 of 3');
-    expect(r.el.querySelector('.wql-slot')).toBeNull();
+    expect(r.el.querySelector('.lbp-slot')).toBeNull();
     expect(document.activeElement?.getAttribute('data-wql-page')).toBe('next');
   });
 });

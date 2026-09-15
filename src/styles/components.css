@@ -3087,7 +3087,7 @@
   #world-quest-leaderboard-window .wql-error {
     color: #ff9a8a;
   }
-  #world-quest-leaderboard-window .wql-podium {
+  :is(#world-quest-leaderboard-window, #leaderboard-window) .lbp-podium {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     align-items: end;
@@ -3099,21 +3099,21 @@
     padding: 0;
     list-style: none;
   }
-  #world-quest-leaderboard-window .wql-slot {
-    --wql-tint: #d4a955;
+  :is(#world-quest-leaderboard-window, #leaderboard-window) .lbp-slot {
+    --lbp-tint: #d4a955;
     display: flex;
     flex-direction: column;
     align-items: center;
     min-width: 0;
     text-align: center;
   }
-  #world-quest-leaderboard-window .wql-slot-2 {
-    --wql-tint: #c9ccd3;
+  :is(#world-quest-leaderboard-window, #leaderboard-window) .lbp-slot-2 {
+    --lbp-tint: #c9ccd3;
   }
-  #world-quest-leaderboard-window .wql-slot-3 {
-    --wql-tint: #c98a4b;
+  :is(#world-quest-leaderboard-window, #leaderboard-window) .lbp-slot-3 {
+    --lbp-tint: #c98a4b;
   }
-  #world-quest-leaderboard-window .wql-slot-medal {
+  :is(#world-quest-leaderboard-window, #leaderboard-window) .lbp-slot-medal {
     position: relative;
     z-index: 1;
     width: clamp(36px, 3.6cqw, 50px);
@@ -3122,26 +3122,26 @@
     border-radius: 50%;
     background-color: #120b20;
     background-image:
-      var(--wql-medal, none), radial-gradient(circle at 35% 30%, #ffffff33, transparent 55%),
-      linear-gradient(160deg, var(--wql-tint), #2b1f4a);
+      var(--lbp-medal, none), radial-gradient(circle at 35% 30%, #ffffff33, transparent 55%),
+      linear-gradient(160deg, var(--lbp-tint), #2b1f4a);
     background-position: center;
     background-size: cover;
-    border: 2px solid var(--wql-tint);
+    border: 2px solid var(--lbp-tint);
     box-shadow:
       0 0 0 2px #0a0713,
       0 6px 14px #000c,
       0 0 16px #00000080;
   }
-  #world-quest-leaderboard-window .wql-slot-empty .wql-slot-medal {
+  :is(#world-quest-leaderboard-window, #leaderboard-window) .lbp-slot-empty .lbp-slot-medal {
     filter: grayscale(0.7) brightness(0.7);
     opacity: 0.7;
   }
-  #world-quest-leaderboard-window .wql-slot-medal-text .wql-medal {
+  :is(#world-quest-leaderboard-window, #leaderboard-window) .lbp-slot-detail .wql-medal {
     justify-content: center;
   }
   /* The name card the medal disc overlaps; every place shares its height, so
      the stepped plinth under it is what lifts gold above silver and bronze. */
-  #world-quest-leaderboard-window .wql-slot-card {
+  :is(#world-quest-leaderboard-window, #leaderboard-window) .lbp-slot-card {
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -3150,14 +3150,14 @@
     padding: calc(clamp(36px, 3.6cqw, 50px) / 2 + 3px) 8px 5px;
     box-sizing: border-box;
     background:
-      linear-gradient(180deg, color-mix(in srgb, var(--wql-tint) 22%, transparent), transparent 75%),
+      linear-gradient(180deg, color-mix(in srgb, var(--lbp-tint) 22%, transparent), transparent 75%),
       linear-gradient(180deg, #2a1f47, #150f24);
-    border: 1px solid var(--wql-tint);
+    border: 1px solid var(--lbp-tint);
     border-bottom: 0;
     box-shadow: inset 0 1px 0 #ffffff1a;
     clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%, 0 10px);
   }
-  #world-quest-leaderboard-window .wql-plinth {
+  :is(#world-quest-leaderboard-window, #leaderboard-window) .lbp-plinth {
     width: 100%;
     display: flex;
     align-items: center;
@@ -3165,25 +3165,25 @@
     box-sizing: border-box;
     background: linear-gradient(
       180deg,
-      color-mix(in srgb, var(--wql-tint) 34%, #150f24),
+      color-mix(in srgb, var(--lbp-tint) 34%, #150f24),
       #120c20 85%
     );
-    border: 1px solid var(--wql-tint);
+    border: 1px solid var(--lbp-tint);
     border-bottom-width: 3px;
     box-shadow:
       inset 0 1px 0 #ffffff26,
       0 8px 20px #000b;
   }
-  #world-quest-leaderboard-window .wql-plinth-1 {
+  :is(#world-quest-leaderboard-window, #leaderboard-window) .lbp-plinth-1 {
     height: clamp(40px, 4.2cqw, 58px);
   }
-  #world-quest-leaderboard-window .wql-plinth-2 {
+  :is(#world-quest-leaderboard-window, #leaderboard-window) .lbp-plinth-2 {
     height: clamp(33px, 3.4cqw, 47px);
   }
-  #world-quest-leaderboard-window .wql-plinth-3 {
+  :is(#world-quest-leaderboard-window, #leaderboard-window) .lbp-plinth-3 {
     height: clamp(27px, 2.7cqw, 38px);
   }
-  #world-quest-leaderboard-window .wql-slot-name {
+  :is(#world-quest-leaderboard-window, #leaderboard-window) .lbp-slot-name {
     flex: none;
     max-width: 100%;
     line-height: 1.25;
@@ -3195,35 +3195,35 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  #world-quest-leaderboard-window .wql-slot-empty .wql-slot-name {
+  :is(#world-quest-leaderboard-window, #leaderboard-window) .lbp-slot-empty .lbp-slot-name {
     font-family: var(--font-serif);
     font-style: italic;
     color: #8d82a8;
   }
-  #world-quest-leaderboard-window .wql-slot-metric {
+  :is(#world-quest-leaderboard-window, #leaderboard-window) .lbp-slot-metric {
     font-size: clamp(13px, 1.3cqw, 19px);
     font-weight: 700;
-    color: var(--wql-tint);
+    color: var(--lbp-tint);
     text-shadow: 0 1px 0 #000;
   }
-  #world-quest-leaderboard-window .wql-slot-medal-text {
+  :is(#world-quest-leaderboard-window, #leaderboard-window) .lbp-slot-detail {
     font-size: clamp(11px, 1cqw, 14px);
     color: #c9bde4;
   }
-  #world-quest-leaderboard-window .wql-slot-metric,
-  #world-quest-leaderboard-window .wql-slot-medal-text {
+  :is(#world-quest-leaderboard-window, #leaderboard-window) .lbp-slot-metric,
+  :is(#world-quest-leaderboard-window, #leaderboard-window) .lbp-slot-detail {
     flex: none;
     line-height: 1.25;
   }
-  #world-quest-leaderboard-window .wql-plinth-rank {
+  :is(#world-quest-leaderboard-window, #leaderboard-window) .lbp-plinth-rank {
     font-family: var(--title-font);
     font-size: clamp(17px, 1.8cqw, 26px);
     line-height: 1;
-    color: var(--wql-tint);
+    color: var(--lbp-tint);
     opacity: 0.9;
     text-shadow: 0 2px 0 #000;
   }
-  #world-quest-leaderboard-window .wql-mine .wql-slot-card {
+  :is(#world-quest-leaderboard-window, #leaderboard-window) .lbp-mine .lbp-slot-card {
     box-shadow:
       inset 0 1px 0 #ffffff1a,
       inset 0 0 18px #8b5cf666;
