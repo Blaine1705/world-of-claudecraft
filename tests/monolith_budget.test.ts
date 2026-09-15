@@ -455,11 +455,7 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 18352 -> 18350 in the review-fix round: the prompt countdown bar
     // moved to createPromptTimeoutBar in src/ui/prompt_dialog.ts alongside the
     // PROMPT_TIMEOUT_MS the sheet's --prompt-timeout-dur mirrors.
-    // 18350 -> 18399 at the release/v0.43.0 merge into feature/world-quests:
-    // the release's ceiling plus the world-quest wiring the merge keeps,
-    // measured on the merged working tree (wc -l), well under the branch
-    // pre-merge ceiling.
-    ceiling: 18399,
+    ceiling: 18350,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -858,11 +854,7 @@ const MONOLITHS: MonolithRow[] = [
     // CPU-hygiene review: the ranked and required view candidates share the
     // scan module's liveViewCandidate check (present, view-less, admitted),
     // which drops the coordinator's own admission call. Exact count.
-    // 12850 -> 12855 at the release/v0.43.0 merge into feature/world-quests:
-    // the release's ceiling plus the world-quest wiring the merge keeps,
-    // measured on the merged working tree (wc -l), well under the branch
-    // pre-merge ceiling.
-    ceiling: 12855,
+    ceiling: 12850,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1241,11 +1233,7 @@ const MONOLITHS: MonolithRow[] = [
     // Re-measured at the release/v0.43.0 sync that brought PR 3778 in: the
     // release count 11327 minus the redesign's own 6 extracted lines = 11321
     // (exact wc -l on the merged tree, zero headroom).
-    // 11321 -> 11329 at the release/v0.43.0 merge into feature/world-quests:
-    // the release's ceiling plus the world-quest wiring the merge keeps,
-    // measured on the merged working tree (wc -l), well under the branch
-    // pre-merge ceiling.
-    ceiling: 11329,
+    ceiling: 11321,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1460,11 +1448,7 @@ const MONOLITHS: MonolithRow[] = [
     // below both parent pins. Exact merged count, zero slack.
     // Mount skins: bank the coordinator extraction at its measured size.
     // Main hotfix integration: combined extractions, exact merged count.
-    // 10095 -> 10099 at the release/v0.43.0 merge into feature/world-quests:
-    // the release's ceiling plus the world-quest wiring the merge keeps,
-    // measured on the merged working tree (wc -l), well under the branch
-    // pre-merge ceiling.
-    ceiling: 10099,
+    ceiling: 10095,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1610,11 +1594,7 @@ const MONOLITHS: MonolithRow[] = [
     // Down 5540 -> 5523 at the CPU-hygiene lot: the interest-boundary despawn
     // grace moved to src/net/despawn_grace.ts, and the lot's entityRosterVersion
     // field and bumps landed under the old count. Exact count, zero slack.
-    // 5523 -> 5526 at the release/v0.43.0 merge into feature/world-quests:
-    // the release's ceiling plus the world-quest wiring the merge keeps,
-    // measured on the merged working tree (wc -l), well under the branch
-    // pre-merge ceiling.
-    ceiling: 5526,
+    ceiling: 5523,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -1626,11 +1606,7 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned 4943 -> 4935: the molten-assembly music row paid for itself by
     // moving the DUNGEON_MUSIC table to dungeon_music_zones.ts. Exact count.
     // Pure location/rift routing moved to music_zones.ts; floor streams reuse the director.
-    // 4850 -> 4921 at the release/v0.43.0 merge into feature/world-quests:
-    // the release's ceiling plus the world-quest wiring the merge keeps,
-    // measured on the merged working tree (wc -l), well under the branch
-    // pre-merge ceiling.
-    ceiling: 4921,
+    ceiling: 4850,
     seam: 'a src/game sibling module (the refactor/game-music split is the template)',
   },
   {
@@ -1907,11 +1883,7 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at the 2026-09-07 release/v0.42.0 sync of the Drakelands
     // map-improvements epic (PR #3746): the keep wall-ledge and parapet loops retired and the Wildheart static set moved beside its field data. Measured with wc -l on the
     // merged tree. Exact merged count, zero headroom.
-    // 2548 -> 2551 at the release/v0.43.0 merge into feature/world-quests:
-    // the release's ceiling plus the world-quest wiring the merge keeps,
-    // measured on the merged working tree (wc -l), well under the branch
-    // pre-merge ceiling.
-    ceiling: 2551,
+    ceiling: 2548,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {
