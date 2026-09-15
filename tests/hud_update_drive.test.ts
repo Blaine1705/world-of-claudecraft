@@ -915,11 +915,11 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the subzone banner on a landmark crossing',
   },
   {
-    call: 'music.setMinigameTrack',
+    call: 'syncMinigameMusic',
     band: 'medium',
     gate: '',
     surface: 'none',
-    why: 'the world-quest minigame track override the music machine reads next; audio only, so it rides above the hidden-frame cut',
+    why: 'the world-quest minigame track override (minigame_music_sync.ts) the music machine reads next; audio only, so it rides above the hidden-frame cut',
   },
   {
     call: 'this.instanceMusic.update',
@@ -1632,7 +1632,7 @@ describe('the hidden-frame paint cut', () => {
       'this.chatAnnouncer.flush',
       'this.questDialog.updateVoice',
       'this.lootRolls.update',
-      'music.setMinigameTrack',
+      'syncMinigameMusic',
       // Music keeps playing on hidden frames, so its state machine must keep
       // transitioning there too (phase 4 QA F1: a minimized player heard the
       // stale track until restore while this sat below the cut).

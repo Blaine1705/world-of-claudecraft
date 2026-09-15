@@ -1,4 +1,4 @@
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
@@ -6,6 +6,7 @@ import {
   type MinigameTrack,
   resolveActiveMinigameTrack,
 } from '../src/game/minigame_music';
+import { minigameLayerFor } from '../src/game/minigame_music_layer';
 import { MusicDirector } from '../src/game/music';
 import type { WorldQuestProgress } from '../src/sim/types';
 
@@ -82,7 +83,6 @@ interface DirectorInternals {
   timer: number;
   zoneStreams: Partial<Record<string, FakeStream>>;
   combatStreams: FakeStream[];
-  minigameStreams: Partial<Record<MinigameTrack, FakeStream>>;
   streamKeeper(): void;
 }
 
@@ -339,11 +339,11 @@ describe('MusicDirector minigame track playback and ducking', () => {
     expect(internals(director).zoneStreams.vale?.target).toBe(1);
 
     // Enter glider minigame
-    director.setMinigameTrack('glider');
-    expect(director.activeMinigameTrack).toBe('glider');
+    minigameLayerFor(director).set('glider');
+    expect(minigameLayerFor(director).active).toBe('glider');
 
     // Glider stream target should be 1, loop should be true, vale should be ducked to 0
-    const gliderStream = internals(director).minigameStreams.glider;
+    const gliderStream = minigameLayerFor(director).streamsByTrack.glider;
     expect(gliderStream?.target).toBe(1);
     expect(gliderStream?.el?.src).toBe(MINIGAME_MUSIC_URLS.glider);
     expect(gliderStream?.el?.loop).toBe(true);
@@ -360,10 +360,10 @@ describe('MusicDirector minigame track playback and ducking', () => {
     const combatActiveBefore = internals(director).combatStreams.some((s) => s.target === 1);
     expect(combatActiveBefore).toBe(true);
 
-    director.setMinigameTrack('cannon');
-    expect(director.activeMinigameTrack).toBe('cannon');
+    minigameLayerFor(director).set('cannon');
+    expect(minigameLayerFor(director).active).toBe('cannon');
 
-    const cannonStream = internals(director).minigameStreams.cannon;
+    const cannonStream = minigameLayerFor(director).streamsByTrack.cannon;
     expect(cannonStream?.target).toBe(1);
     for (const combat of internals(director).combatStreams) {
       expect(combat.target).toBe(0);
@@ -372,23 +372,44 @@ describe('MusicDirector minigame track playback and ducking', () => {
 
   it('restores ambient music when minigame ends', () => {
     director.update('vale', false);
-    director.setMinigameTrack('forge');
-    expect(internals(director).minigameStreams.forge?.target).toBe(1);
+    minigameLayerFor(director).set('forge');
+    expect(minigameLayerFor(director).streamsByTrack.forge?.target).toBe(1);
     expect(internals(director).zoneStreams.vale?.target).toBe(0);
 
     // Exit minigame
-    director.setMinigameTrack(null);
-    expect(director.activeMinigameTrack).toBeNull();
-    expect(internals(director).minigameStreams.forge?.target).toBe(0);
+    minigameLayerFor(director).set(null);
+    expect(minigameLayerFor(director).active).toBeNull();
+    expect(minigameLayerFor(director).streamsByTrack.forge?.target).toBe(0);
     expect(internals(director).zoneStreams.vale?.target).toBe(1);
   });
 
   it('smoothly transitions between two different minigames', () => {
-    director.setMinigameTrack('match3');
-    expect(internals(director).minigameStreams.match3?.target).toBe(1);
+    minigameLayerFor(director).set('match3');
+    expect(minigameLayerFor(director).streamsByTrack.match3?.target).toBe(1);
 
-    director.setMinigameTrack('puzzle');
-    expect(internals(director).minigameStreams.match3?.target).toBe(0);
-    expect(internals(director).minigameStreams.puzzle?.target).toBe(1);
+    minigameLayerFor(director).set('puzzle');
+    expect(minigameLayerFor(director).streamsByTrack.match3?.target).toBe(0);
+    expect(minigameLayerFor(director).streamsByTrack.puzzle?.target).toBe(1);
+  });
+});
+
+describe('the minigame layer host seam', () => {
+  it('stays welded to the private MusicDirector members it reads and its three hooks', () => {
+    const source = readFileSync(new URL('../src/game/music.ts', import.meta.url), 'utf8');
+    for (const anchor of [
+      'private ctx: AudioContext | null = null;',
+      'private zoneStreams: Partial<Record<MusicZone, StreamTrack>> = {};',
+      'private combatStreams: StreamTrack[] = [];',
+      'private zone: MusicZone | null = null;',
+      'private combat = false;',
+      'private makeStream(url: string): StreamTrack | null {',
+      'private setStreamTarget(stream: StreamTrack, target: number, fadeSeconds: number): void {',
+      'update(zone: MusicZone, inCombat: boolean, crucibleFloor: CrucibleFloor | null = null): void {',
+      'minigameLayerFor(this).rewind();',
+      'yield* minigameLayerFor<StreamTrack>(this).streams();',
+      'if (minigameLayerFor(this).active !== null) return;',
+    ]) {
+      expect(source, anchor).toContain(anchor);
+    }
   });
 });

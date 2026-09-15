@@ -12,8 +12,7 @@
 import { resumeWhenAllowed } from './audio_unlock';
 import { CRUCIBLE_STREAM_URLS, type CrucibleFloor } from './crucible_music';
 import { dungeonMusicZoneForDungeon } from './dungeon_music_zones';
-import type { MinigameTrack } from './minigame_music';
-import { MINIGAME_MUSIC_URLS } from './minigame_music';
+import { minigameLayerFor } from './minigame_music_layer';
 import type { MusicMixState } from './music_mix_policy';
 import { isMusicMixAudible, musicMixMasterTarget } from './music_mix_policy';
 import { MUSIC_OVERRIDES } from './music_overrides.generated';
@@ -4438,15 +4437,9 @@ export class MusicDirector {
   private crucibleStreams: Partial<Record<CrucibleFloor, StreamTrack>> = {};
   private crucibleFloor: CrucibleFloor | null = null;
   private combatIdx = 0;
-  private minigameStreams: Partial<Record<MinigameTrack, StreamTrack>> = {};
-  private activeMinigame: MinigameTrack | null = null;
   // null until the first update() so the initial state always applies
   private zone: MusicZone | null = null;
   private combat = false;
-
-  get activeMinigameTrack(): MinigameTrack | null {
-    return this.activeMinigame;
-  }
   // try/catch: sandboxed documents throw on the localStorage property access itself
   private _enabled = (() => {
     try {
@@ -4523,15 +4516,7 @@ export class MusicDirector {
         /* browser may reject seeking before metadata */
       }
     }
-    for (const stream of Object.values(this.minigameStreams)) {
-      if (stream?.el) {
-        try {
-          stream.el.currentTime = 0;
-        } catch {
-          /* browser may reject seeking before metadata */
-        }
-      }
-    }
+    minigameLayerFor(this).rewind();
     this.stopBossSource();
   }
 
@@ -4717,14 +4702,6 @@ export class MusicDirector {
     }
   }
 
-  private ensureMinigameStream(track: MinigameTrack): void {
-    if (this.minigameStreams[track]) return;
-    const url = MINIGAME_MUSIC_URLS[track];
-    if (!url) return;
-    const stream = this.makeStream(url);
-    if (stream) this.minigameStreams[track] = stream;
-  }
-
   // Streams are audible only when nothing has the master ducked to zero: the
   // toggle, the menu fade, the volume slider, and the dedicated boss and
   // Sowfield file tracks (which own the mix while active). While inaudible,
@@ -4752,7 +4729,7 @@ export class MusicDirector {
 
   private *allStreams(): Iterable<StreamTrack> {
     for (const stream of Object.values(this.zoneStreams)) yield stream;
-    for (const stream of Object.values(this.minigameStreams)) yield stream;
+    yield* minigameLayerFor<StreamTrack>(this).streams();
     yield* this.combatStreams;
     yield* Object.values(this.crucibleStreams);
   }
@@ -4836,9 +4813,7 @@ export class MusicDirector {
     this.setCrucibleFloor(crucibleFloor);
     this.zone = zone;
     this.combat = combat;
-    if (this.activeMinigame !== null) {
-      return;
-    }
+    if (minigameLayerFor(this).active !== null) return;
     // Combat music replaces the zone theme rather than layering over it: the
     // zone is silenced for the duration of combat and fades back in when it
     // ends. Fade out faster than fade in so instance music does not bleed
@@ -4873,48 +4848,6 @@ export class MusicDirector {
         target > 0 || crucibleFloor !== null ? 0.35 : FADE_SECONDS / 3,
       );
     });
-  }
-
-  /** Override zone and combat soundtrack with a dedicated minigame/activity track. */
-  setMinigameTrack(track: MinigameTrack | null): void {
-    if (track === this.activeMinigame && this.ctx) return;
-    this.activeMinigame = track;
-    if (!this.ctx) return;
-
-    if (track !== null) {
-      this.ensureMinigameStream(track);
-      const activeStream = this.minigameStreams[track];
-      if (activeStream?.el?.paused) {
-        try {
-          activeStream.el.currentTime = 0;
-        } catch {
-          /* browser may reject seeking before metadata */
-        }
-      }
-      for (const [name, stream] of Object.entries(this.minigameStreams) as [
-        MinigameTrack,
-        StreamTrack,
-      ][]) {
-        const target = name === track ? 1 : 0;
-        this.setStreamTarget(stream, target, target > 0 ? 0.4 : 0.3);
-      }
-      for (const stream of Object.values(this.zoneStreams)) {
-        if (stream) this.setStreamTarget(stream, 0, 0.35);
-      }
-      for (const stream of this.combatStreams) {
-        this.setStreamTarget(stream, 0, 0.35);
-      }
-    } else {
-      for (const stream of Object.values(this.minigameStreams)) {
-        if (stream) this.setStreamTarget(stream, 0, 0.5);
-      }
-      const prevZone = this.zone;
-      const prevCombat = this.combat;
-      this.zone = null;
-      if (prevZone !== null) {
-        this.update(prevZone, prevCombat);
-      }
-    }
   }
 }
 
