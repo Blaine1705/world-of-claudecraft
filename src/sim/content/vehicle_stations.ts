@@ -6,11 +6,11 @@ export const NORTH_WATCH_CANNON: Readonly<VehicleStationDef> = {
   entityId: 9_400_010,
   questId: 'wq_evergarden_cannon',
   // Moved north-west of the release's Wyrmwatch church, which now stands on
-  // the old battery at (390, 1870); the narrower field matches the Last Keep
-  // battery, and the encounter scales its lanes to the field.
+  // the old battery at (390, 1870). The field is 26 wide: the wave lanes need
+  // 25 yards to keep simultaneous bodies a yard apart.
   x: 384,
   z: 1862,
-  field: { minX: 375, maxX: 397, minZ: 1812, maxZ: 1852 },
+  field: { minX: 375, maxX: 401, minZ: 1812, maxZ: 1852 },
 };
 
 export const WORLD_QUEST_CANNON: WorldQuestDef = {

@@ -34,7 +34,15 @@ export function isExcludedDecoration(x: number, z: number): boolean {
   return EXCLUSIONS.some((point) => Math.hypot(x - point.x, z - point.z) < 1.2);
 }
 
-/** Keep the private trial clear without replanning any other road-light placement. */
+/** Road lamps kept off authored clearings, matched to the exact planned site so no
+ * other road-light placement is replanned. */
+const STREETLAMP_EXCLUSIONS = [
+  // The private wisp maze trial.
+  { x: 460.6305996347541, z: 1028.5178347589988 },
+  // The North Watch battery: a Wraithwood lamp inside the east firing lane.
+  { x: 400.2, z: 1817 },
+];
+
 export function isExcludedStreetlamp(x: number, z: number): boolean {
-  return Math.hypot(x - 460.6305996347541, z - 1028.5178347589988) < 0.01;
+  return STREETLAMP_EXCLUSIONS.some((point) => Math.hypot(x - point.x, z - point.z) < 0.01);
 }
