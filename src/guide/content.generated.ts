@@ -7218,6 +7218,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "title",
+        "name": "the Runecaller"
+      },
+      {
+        "kind": "title",
         "name": "the Unscorched"
       }
     ]

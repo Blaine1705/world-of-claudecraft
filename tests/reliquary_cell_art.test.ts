@@ -188,9 +188,11 @@ describe('title relics resolve the deed crest', () => {
     // A shelf title without committed art must be an enumerated DEED_ART_PENDING
     // member (the docs/design/deeds.md "art can trail the deed" contract), never
     // an unreviewed fallback; those route to their category crest until the
-    // commissioned painting lands. Exactly the Crucible flawless title today.
+    // commissioned painting lands. The Arcane Calligraphy gold title (world
+    // quests, still art-pending) and the Crucible flawless title today.
     const pending = RELIQUARY_HORIZON_TITLES.filter((id) => deedImageUrl(`deed_${id}`) === null);
     expect(pending, 'artless shelf titles must be the pinned art-pending set').toEqual([
+      'exp_arcane_calligraphy_gold',
       'dgn_varkhul_flawless',
     ]);
     for (const id of pending) expect(DEED_ART_PENDING.has(id), id).toBe(true);

@@ -431,6 +431,9 @@ export const RELIQUARY_HORIZON_TITLES = [
   // The farming capstone (the celebrations phase): Harvestmaster pages here
   // per the locked titles-page rule like every non-hidden title deed.
   'prog_farming_100',
+  // The Arcane Calligraphy gold rating (world quests): its Runecaller title
+  // pages here per the locked titles-page rule.
+  'exp_arcane_calligraphy_gold',
   // The Crucible raid's flawless title (the obligations closeout,
   // docs/prd/ignivar-raid-loot.md): every non-hidden title deed pages here
   // per the locked titles-page rule.
