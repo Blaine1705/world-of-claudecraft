@@ -1269,6 +1269,28 @@ export const zh_CN: EnTranslations = {
       },
       "wqEmpty": "No scores on this board yet. Finish the world quest to claim a spot."
     },
+    "wqLadder": {
+      "title": "世界任务排行榜",
+      "subtitle": "每位英雄的最佳成绩，每个奖牌世界任务各有一个排行榜。",
+      "close": "关闭世界任务排行榜",
+      "rankedBy": {
+        "waves": "按坚守波数排名",
+        "seconds": "按最快时间排名",
+        "points": "按最高分排名"
+      },
+      "rankedByMedal": {
+        "waves": "按奖牌排名，其次坚守波数",
+        "seconds": "按奖牌排名，其次最快时间",
+        "points": "按奖牌排名，其次最高分"
+      },
+      "podiumLabel": "前三名",
+      "unclaimed": "虚位以待",
+      "totalOne": "1 位英雄上榜",
+      "totalMany": "{count} 位英雄上榜",
+      "selfLabel": "你的最佳成绩",
+      "selfRank": "第 {rank} 名",
+      "selfNone": "你在此榜单上还没有成绩。完成该世界任务即可上榜。"
+    },
     "pledge": {
       "open": "接受宣誓",
       "closed": "不接受宣誓",

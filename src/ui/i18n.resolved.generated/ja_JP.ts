@@ -1269,6 +1269,28 @@ export const ja_JP: EnTranslations = {
       },
       "wqEmpty": "No scores on this board yet. Finish the world quest to claim a spot."
     },
+    "wqLadder": {
+      "title": "ワールドクエストランキング",
+      "subtitle": "各ヒーローの最高記録。メダル付きワールドクエストごとのランキングです。",
+      "close": "ワールドクエストランキングを閉じる",
+      "rankedBy": {
+        "waves": "耐えたウェーブ数順",
+        "seconds": "最速タイム順",
+        "points": "最高スコア順"
+      },
+      "rankedByMedal": {
+        "waves": "メダル順、次に耐えたウェーブ数",
+        "seconds": "メダル順、次に最速タイム",
+        "points": "メダル順、次に最高スコア"
+      },
+      "podiumLabel": "トップ3",
+      "unclaimed": "空席",
+      "totalOne": "1人がランクイン",
+      "totalMany": "{count}人がランクイン",
+      "selfLabel": "自己ベスト",
+      "selfRank": "{rank}位",
+      "selfNone": "このボードにはまだ記録がありません。ワールドクエストをクリアしてランキングに参加しましょう。"
+    },
     "pledge": {
       "open": "誓約受付中",
       "closed": "誓約停止中",

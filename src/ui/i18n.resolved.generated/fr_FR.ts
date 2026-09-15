@@ -1269,6 +1269,28 @@ export const fr_FR: EnTranslations = {
       },
       "wqEmpty": "No scores on this board yet. Finish the world quest to claim a spot."
     },
+    "wqLadder": {
+      "title": "World Quest Rankings",
+      "subtitle": "The best attempt of every hero, one ladder per medal world quest.",
+      "close": "Close World Quest Rankings",
+      "rankedBy": {
+        "waves": "Ranked by waves held",
+        "seconds": "Ranked by fastest time",
+        "points": "Ranked by highest score"
+      },
+      "rankedByMedal": {
+        "waves": "Ranked by medal, then waves held",
+        "seconds": "Ranked by medal, then fastest time",
+        "points": "Ranked by medal, then highest score"
+      },
+      "podiumLabel": "Top three",
+      "unclaimed": "Unclaimed",
+      "totalOne": "One hero ranked",
+      "totalMany": "{count} heroes ranked",
+      "selfLabel": "Your best",
+      "selfRank": "Rank {rank}",
+      "selfNone": "You have no score on this board yet. Finish the world quest to join the ladder."
+    },
     "pledge": {
       "open": "Candidatures ouvertes",
       "closed": "Candidatures fermées",

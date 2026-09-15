@@ -1269,6 +1269,28 @@ export const es: EnTranslations = {
       },
       "wqEmpty": "No scores on this board yet. Finish the world quest to claim a spot."
     },
+    "wqLadder": {
+      "title": "Clasificación de misiones de mundo",
+      "subtitle": "El mejor intento de cada héroe, una clasificación por cada misión de mundo con medalla.",
+      "close": "Cerrar la clasificación de misiones de mundo",
+      "rankedBy": {
+        "waves": "Por oleadas resistidas",
+        "seconds": "Por el tiempo más rápido",
+        "points": "Por la puntuación más alta"
+      },
+      "rankedByMedal": {
+        "waves": "Por medalla y luego oleadas resistidas",
+        "seconds": "Por medalla y luego el tiempo más rápido",
+        "points": "Por medalla y luego la puntuación más alta"
+      },
+      "podiumLabel": "Los tres mejores",
+      "unclaimed": "Sin reclamar",
+      "totalOne": "Un héroe clasificado",
+      "totalMany": "{count} héroes clasificados",
+      "selfLabel": "Tu mejor marca",
+      "selfRank": "Puesto {rank}",
+      "selfNone": "Aún no tienes puntuación en esta tabla. Completa la misión de mundo para entrar en la clasificación."
+    },
     "pledge": {
       "open": "Acepta compromisos",
       "closed": "No acepta compromisos",

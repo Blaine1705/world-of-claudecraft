@@ -1269,6 +1269,28 @@ export const ko_KR: EnTranslations = {
       },
       "wqEmpty": "No scores on this board yet. Finish the world quest to claim a spot."
     },
+    "wqLadder": {
+      "title": "전역 퀘스트 순위",
+      "subtitle": "모든 영웅의 최고 기록을 메달 전역 퀘스트별로 보여줍니다.",
+      "close": "전역 퀘스트 순위 닫기",
+      "rankedBy": {
+        "waves": "버틴 웨이브 순",
+        "seconds": "가장 빠른 시간 순",
+        "points": "가장 높은 점수 순"
+      },
+      "rankedByMedal": {
+        "waves": "메달 순, 그다음 버틴 웨이브",
+        "seconds": "메달 순, 그다음 가장 빠른 시간",
+        "points": "메달 순, 그다음 가장 높은 점수"
+      },
+      "podiumLabel": "상위 3명",
+      "unclaimed": "비어 있음",
+      "totalOne": "영웅 1명 순위 등록",
+      "totalMany": "영웅 {count}명 순위 등록",
+      "selfLabel": "내 최고 기록",
+      "selfRank": "{rank}위",
+      "selfNone": "이 순위표에 아직 기록이 없습니다. 전역 퀘스트를 완료해 순위에 오르세요."
+    },
     "pledge": {
       "open": "서약 받는 중",
       "closed": "서약 받지 않음",
