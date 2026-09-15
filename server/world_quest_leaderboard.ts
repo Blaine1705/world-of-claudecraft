@@ -19,7 +19,10 @@
 // Moderation busts every board at once (bustWorldQuestLeaderboardCaches, wired
 // from server/main.ts bustBoardCaches) so a banned account delists at once.
 // Anonymous and rate-limited like the other public boards
-// (server/leaderboard.ts); `me` is resolved client-side by name.
+// (server/leaderboard.ts). An optional `viewer` (a character name, already
+// public on the ladder) resolves that character's standing from the SAME
+// cached ladder into the page's `self`, so the window can pin "your best"
+// even when the row sits pages away; it never costs a query of its own.
 import { LEADERBOARD_PAGE_SIZE } from '../src/sim/leaderboard_page';
 import { paginateWorldQuestLeaderboard } from '../src/sim/world_quest_leaderboard_page';
 import {
@@ -177,11 +180,16 @@ export function recordWorldQuestScore(
     });
 }
 
-/** Rank the cached ladder and slice one page. */
+/** Longest `viewer` the route looks up; a longer string names no character. */
+export const WORLD_QUEST_VIEWER_MAX_LENGTH = 64;
+
+/** Rank the cached ladder and slice one page; `viewer` names the character
+ *  whose own standing rides along as `self` (case-insensitive exact match). */
 export async function worldQuestLeaderboardPage(
   board: WorldQuestScoreboard,
   page: number,
   pageSize: number,
+  viewer?: string,
 ): Promise<WorldQuestLeaderboardPage> {
   const rows = await cacheFor(board).read();
   const ranked: WorldQuestLeaderboardEntry[] = rows.map((row, i) => ({
@@ -190,7 +198,12 @@ export async function worldQuestLeaderboardPage(
     medal: row.medal,
     metric: row.metric,
   }));
-  return paginateWorldQuestLeaderboard(board.id, ranked, page, pageSize);
+  const wanted = (viewer ?? '').trim().toLowerCase();
+  const self =
+    wanted && wanted.length <= WORLD_QUEST_VIEWER_MAX_LENGTH
+      ? (ranked.find((entry) => entry.name.toLowerCase() === wanted) ?? null)
+      : null;
+  return paginateWorldQuestLeaderboard(board.id, ranked, page, pageSize, self);
 }
 
 async function worldQuestLeaderboardHandler(ctx: Ctx): Promise<void> {
@@ -209,7 +222,8 @@ async function worldQuestLeaderboardHandler(ctx: Ctx): Promise<void> {
   }
   const page = Number(queryValue(ctx.query.page)) || 0;
   const pageSize = Number(queryValue(ctx.query.pageSize)) || LEADERBOARD_PAGE_SIZE;
-  json(ctx.res, 200, await worldQuestLeaderboardPage(board, page, pageSize));
+  const viewer = queryValue(ctx.query.viewer);
+  json(ctx.res, 200, await worldQuestLeaderboardPage(board, page, pageSize, viewer));
 }
 
 export const routes: RouteDef[] = [

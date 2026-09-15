@@ -5768,8 +5768,13 @@ export class ClientWorld extends ReconWireState implements IWorld {
       return empty;
     }
   }
-  worldQuestLeaderboard(board: string, page = 0, pageSize = LEADERBOARD_PAGE_SIZE) {
-    return fetchWorldQuestLeaderboard(this.base, board, page, pageSize);
+  worldQuestLeaderboard(
+    board: string,
+    page = 0,
+    pageSize = LEADERBOARD_PAGE_SIZE,
+    viewer?: string,
+  ) {
+    return fetchWorldQuestLeaderboard(this.base, board, page, pageSize, viewer);
   }
   async dailyRewards(): Promise<DailyRewardStatus> {
     const res = await fetch(apiUrl('/api/daily-rewards', this.base), {

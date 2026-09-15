@@ -19,6 +19,9 @@ export interface WorldQuestLeaderboardPage {
   pageSize: number;
   pageCount: number;
   total: number;
+  /** The viewer's own best row on the WHOLE ladder (not just this page), when a
+   *  viewer name was asked for and that character holds a row; null otherwise. */
+  self?: WorldQuestLeaderboardEntry | null;
 }
 
 export interface IWorldQuests {
@@ -47,11 +50,13 @@ export interface IWorldQuests {
    *  activity that offers the choice; the plain talk keeps its default profile. */
   startWorldQuestActivity(questId: string, difficulty: WorldQuestDifficulty): void;
   /** One page of a medal world quest's public ladder (best row per character;
-   *  the offline world has no ladder and resolves an empty page). */
+   *  the offline world has no ladder and resolves an empty page). `viewer` is a
+   *  character name: the page's `self` carries that character's standing. */
   worldQuestLeaderboard(
     board: WorldQuestScoreboardId,
     page?: number,
     pageSize?: number,
+    viewer?: string,
   ): Promise<WorldQuestLeaderboardPage>;
   acceptLinkedQuest(questId: string, fromPid: number): void;
   // The tutorial greeting's accept button: asks the sim for the ferry ride to

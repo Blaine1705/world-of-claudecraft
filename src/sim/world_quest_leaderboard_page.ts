@@ -10,8 +10,9 @@ export function paginateWorldQuestLeaderboard(
   entries: readonly WorldQuestLeaderboardEntry[],
   page: number,
   pageSize: number = LEADERBOARD_PAGE_SIZE,
+  self: WorldQuestLeaderboardEntry | null = null,
 ): WorldQuestLeaderboardPage {
-  return { board, ...paginateRanked(entries, page, pageSize) };
+  return { board, ...paginateRanked(entries, page, pageSize), self };
 }
 
 export function emptyWorldQuestLeaderboardPage(

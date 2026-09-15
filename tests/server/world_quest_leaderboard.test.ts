@@ -251,6 +251,39 @@ describe('GET /api/world-quests/leaderboard', () => {
     }
     expect(status).toBe(429);
   });
+
+  it('resolves the viewer standing from the whole cached ladder, case-insensitively', async () => {
+    const rows = vi.fn<typeof worldQuestScoreboardRows>(async () => rowsOf(120));
+    configureWorldQuestScoreDbForTests({ upsert: vi.fn<typeof upsertWorldQuestScore>(), rows });
+    // Page 0 holds ranks 1..50; the viewer sits at rank 97, two pages away.
+    const ctx = fakeCtx({ query: { board: 'forge', page: '0', pageSize: '50', viewer: 'P97' } });
+    await handler(ctx);
+    const body = captured(ctx.res).body as {
+      leaders: { rank: number }[];
+      self: unknown;
+    };
+    expect(body.leaders.at(-1)?.rank).toBe(50);
+    expect(body.self).toEqual({ rank: 97, name: 'p97', medal: 'gold', metric: 4 });
+    expect(rows).toHaveBeenCalledTimes(1);
+  });
+
+  it('answers self null for an absent, omitted, or oversized viewer without another read', async () => {
+    const rows = vi.fn<typeof worldQuestScoreboardRows>(async () => rowsOf(5));
+    configureWorldQuestScoreDbForTests({ upsert: vi.fn<typeof upsertWorldQuestScore>(), rows });
+    for (const query of <Record<string, string>[]>[
+      { board: 'forge', viewer: 'nobody' },
+      { board: 'forge' },
+      { board: 'forge', viewer: '   ' },
+      { board: 'forge', viewer: 'p1'.padEnd(80, 'x') },
+    ]) {
+      const ctx = fakeCtx({ query });
+      await handler(ctx);
+      const { status, body } = captured(ctx.res);
+      expect(status).toBe(200);
+      expect((body as { self: unknown }).self).toBeNull();
+    }
+    expect(rows).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe('world_quest_scores SQL boundary', () => {
