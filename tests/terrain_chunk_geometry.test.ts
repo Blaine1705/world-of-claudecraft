@@ -377,7 +377,14 @@ describe('generated chunk geometry is stable', () => {
     // The branch's gap super-chunk pin (c4839177e825dbcf8dc5bcf501336fc2) is
     // gone with the gap chunks themselves: the island claims the old vale gap
     // cells, and gapFill.length above pins their absence.
-    expect(digestOf(inRect)).toBe('1d9b0a4a7e0d97c5a11c918b1a8f29c3');
+    // MERGE OF release/v0.43.0 INTO feature/world-quests: parents' values for
+    // the record, the release 1d9b0a4a7e0d97c5a11c918b1a8f29c3 and the branch
+    // 034fe8c22a222adac06adbccb42baa2f. The branch's intended calm-pad changes
+    // (src/sim/terrain_calm_anchors.ts: calligraphy instructors, world-quest
+    // caravan routes and terrainCalm:false dressing no longer calm terrain)
+    // land on the release's Eastbrook ground, so the merged digest matches
+    // neither parent. Measured on the merged tree, twice in separate processes.
+    expect(digestOf(inRect)).toBe('31c623326ee3050ffb9443b2c4115518');
     // The gap super-chunk digest pin is gone with the gap chunks themselves
     // (the island claims the old vale gap cells); gapFill.length above pins
     // their absence.
