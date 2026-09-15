@@ -496,7 +496,11 @@ describe('world quest content', () => {
 
     const hostileSafetyClearance = Math.min(
       ...[...sim.entities.values()]
-        .filter((entity) => entity.kind === 'mob' && !entity.dead)
+        // The release's hub practice dummies stand on the docks but never pull.
+        .filter(
+          (entity) =>
+            entity.kind === 'mob' && !entity.dead && !MOBS[entity.templateId ?? '']?.dummy,
+        )
         .map((entity) => {
           const baseAggroRadius = MOBS[entity.templateId ?? '']?.aggroRadius ?? 0;
           const effectiveAggroRadius = Math.max(
