@@ -6581,6 +6581,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wqLadder.selfRank': 'Место {rank}',
   'hudChrome.wqLadder.selfNone':
     'У вас пока нет результата в этом рейтинге. Выполните задание, чтобы попасть в рейтинг.',
+  'hudChrome.leaderboard.podiumLabel': 'Тройка лучших',
+  'hudChrome.leaderboard.unclaimed': 'Свободно',
   'hudChrome.widgets.worldCoordinates': 'Координаты мира',
   'hudChrome.plurals.guildMembers.one': 'вы {rank}, {count} участник',
   'hudChrome.plurals.guildMembers.few': 'вы {rank}, {count} участника',

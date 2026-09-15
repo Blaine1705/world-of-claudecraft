@@ -1272,7 +1272,9 @@ export const ja_JP: EnTranslations = {
         "silver": "銀",
         "bronze": "銅"
       },
-      "wqEmpty": "このボードにはまだスコアがありません。ワールドクエストを完了して、ランクに名を刻もう。"
+      "wqEmpty": "このボードにはまだスコアがありません。ワールドクエストを完了して、ランクに名を刻もう。",
+      "podiumLabel": "トップ3",
+      "unclaimed": "空席"
     },
     "wqLadder": {
       "title": "ワールドクエストランキング",

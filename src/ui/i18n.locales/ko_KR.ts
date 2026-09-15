@@ -6439,6 +6439,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wqLadder.selfRank': '{rank}위',
   'hudChrome.wqLadder.selfNone':
     '이 순위표에 아직 기록이 없습니다. 전역 퀘스트를 완료해 순위에 오르세요.',
+  'hudChrome.leaderboard.podiumLabel': '상위 3명',
+  'hudChrome.leaderboard.unclaimed': '비어 있음',
   'hudChrome.widgets.worldCoordinates': '세계 좌표',
   'hudChrome.plurals.guildMembers.one': '당신은 {rank}, {count}명 회원',
   'hudChrome.plurals.guildMembers.few': '당신은 {rank}, {count}명 회원',

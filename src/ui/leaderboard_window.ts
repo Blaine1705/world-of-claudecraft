@@ -311,7 +311,7 @@ export class LeaderboardWindow {
     this.page = view.page;
     const split = podiumSplit(view.page, view.rows, (row) => row.rank);
     body.innerHTML =
-      this.podiumHtml(split.podium.map(playersPodiumSlot)) +
+      this.podiumHtml(split.podium.map((slot) => playersPodiumSlot(slot, deedTitleText))) +
       this.headerHtml() +
       split.listed.map((r) => this.rowHtml(r)).join('') +
       this.stickyHtml(playersStandingBar(view.rows, view.standing)) +
@@ -361,7 +361,7 @@ export class LeaderboardWindow {
     const split = podiumSplit(view.page, view.rows, (row) => row.rank);
     const ownGuild = guildStandingRow(view.rows, world.player.guild);
     body.innerHTML =
-      this.podiumHtml(split.podium.map(guildPodiumSlot)) +
+      this.podiumHtml(split.podium.map((slot) => guildPodiumSlot(slot, world.player.guild))) +
       this.guildHeaderHtml() +
       split.listed.map((r) => this.guildRowHtml(r)).join('') +
       this.standingHtml(ownGuild ? this.guildRowHtml(ownGuild) : '') +
@@ -883,7 +883,10 @@ export class LeaderboardWindow {
     );
   }
 
-  // The sticky "your standing" row, shown when the viewer is off the visible page.
+  // The sticky "your standing" pill: the viewer's ranked row when it is on this
+  // page, else their off-page standing with the placeholder rank. The compact
+  // pill hides the level, virtual level and title cells; they stay in the
+  // markup so the row keeps the players grid variant the source pins read.
   // &mdash; is the unranked-rank placeholder, kept as an entity so the source
   // carries no literal em dash (project style rule).
   private stickyHtml(standing: (LeaderboardStanding & { rank: number | null }) | null): string {
@@ -906,7 +909,7 @@ export class LeaderboardWindow {
 
   // The shared top-three podium (leaderboard_podium_html.ts), first page only.
   private podiumHtml(slots: PodiumSlotHtml[]): string {
-    return podiumHtml(slots, t('hudChrome.wqLadder.podiumLabel'));
+    return podiumHtml(slots, t('hudChrome.leaderboard.podiumLabel'));
   }
 
   // The viewer's own row pinned under the list, in the sticky standing bar the

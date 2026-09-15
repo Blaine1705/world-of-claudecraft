@@ -1272,7 +1272,9 @@ export const pt_BR: EnTranslations = {
         "silver": "Silver",
         "bronze": "Bronze"
       },
-      "wqEmpty": "No scores on this board yet. Finish the world quest to claim a spot."
+      "wqEmpty": "No scores on this board yet. Finish the world quest to claim a spot.",
+      "podiumLabel": "Top three",
+      "unclaimed": "Unclaimed"
     },
     "wqLadder": {
       "title": "World Quest Rankings",

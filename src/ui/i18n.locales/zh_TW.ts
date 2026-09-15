@@ -6244,6 +6244,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wqLadder.selfLabel': '你的最佳成績',
   'hudChrome.wqLadder.selfRank': '第 {rank} 名',
   'hudChrome.wqLadder.selfNone': '你在此榜單上還沒有成績。完成該世界任務即可上榜。',
+  'hudChrome.leaderboard.podiumLabel': '前三名',
+  'hudChrome.leaderboard.unclaimed': '虛位以待',
   'hudChrome.widgets.worldCoordinates': '世界座標',
   'hudChrome.plurals.guildMembers.one': '你是{rank}，{count}名成員',
   'hudChrome.plurals.guildMembers.few': '你是{rank}，{count}名成員',

@@ -7949,16 +7949,17 @@
     box-sizing: border-box;
   }
   /* The leaderboard on a phone: the tabs become one horizontally scrolling
-     strip that never wraps or clips, and the rows tighten. The shared podium
-     rules above (.lbp-*) already shrink its top three. */
+     strip that never wraps or clips, and the rows tighten. */
   body.mobile-touch #leaderboard-window .lb-tabs {
     flex-wrap: nowrap;
     justify-content: flex-start;
     overflow-x: auto;
     overscroll-behavior-x: contain;
-    padding-bottom: 2px;
+    /* Room for the 2px focus ring and its 2px offset: an overflow strip clips
+       anything drawn outside its padding box. */
+    padding: 5px;
   }
-  body.mobile-touch #leaderboard-window .lb-tab {
+  body.mobile-touch #leaderboard-window .lb-tab.ui-tab {
     flex: 0 0 auto;
     font-size: 12px;
     padding: 4px 12px;
@@ -7983,8 +7984,8 @@
     grid-template-columns: 36px minmax(0, 1fr) 96px;
   }
   /* A phone gets the whole sheet: the board takes every pixel under the tabs
-     (not the desktop 56vh cap), and the podium cards drop their detail line so
-     the list and the standing bar keep room under the top three. */
+     (not the desktop 56vh cap), and the podium shrinks, keeping its detail line
+     as one compact ellipsized row so no top-three stat is hidden on touch. */
   body.mobile-touch #leaderboard-window {
     height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
   }
@@ -7995,7 +7996,42 @@
     margin-top: 6px;
   }
   body.mobile-touch #leaderboard-window .lbp-slot-detail {
-    display: none;
+    font-size: 10px;
+    line-height: 1.2;
+  }
+  body.mobile-touch #leaderboard-window .lbp-stat {
+    gap: 2px;
+    margin: 0 3px;
+  }
+  body.mobile-touch #leaderboard-window .lbp-podium {
+    max-width: 520px;
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+  body.mobile-touch #leaderboard-window .lbp-slot-medal {
+    width: 26px;
+    height: 26px;
+    margin-bottom: -13px;
+    border-width: 1px;
+  }
+  body.mobile-touch #leaderboard-window .lbp-slot-card {
+    padding: 15px 4px 2px;
+  }
+  body.mobile-touch #leaderboard-window .lbp-slot-name,
+  body.mobile-touch #leaderboard-window .lbp-slot-metric {
+    font-size: 12px;
+  }
+  body.mobile-touch #leaderboard-window .lbp-plinth-rank {
+    font-size: 13px;
+  }
+  body.mobile-touch #leaderboard-window .lbp-plinth-1 {
+    height: 26px;
+  }
+  body.mobile-touch #leaderboard-window .lbp-plinth-2 {
+    height: 23px;
+  }
+  body.mobile-touch #leaderboard-window .lbp-plinth-3 {
+    height: 20px;
   }
   /* World Quest rankings on a phone: the sheet fills the screen as the same
      flex column as desktop (cards, then the board whose ladder list scrolls,
@@ -8051,37 +8087,37 @@
   body.mobile-touch #world-quest-leaderboard-window .wql-total {
     font-size: 11px;
   }
-  body.mobile-touch :is(#world-quest-leaderboard-window, #leaderboard-window) .lbp-podium {
+  body.mobile-touch #world-quest-leaderboard-window .lbp-podium {
     max-width: 520px;
     gap: 6px;
     margin-bottom: 4px;
   }
-  body.mobile-touch :is(#world-quest-leaderboard-window, #leaderboard-window) .lbp-slot-medal {
+  body.mobile-touch #world-quest-leaderboard-window .lbp-slot-medal {
     width: 26px;
     height: 26px;
     margin-bottom: -13px;
     border-width: 1px;
   }
-  body.mobile-touch :is(#world-quest-leaderboard-window, #leaderboard-window) .lbp-slot-card {
+  body.mobile-touch #world-quest-leaderboard-window .lbp-slot-card {
     padding: 15px 4px 2px;
   }
-  body.mobile-touch :is(#world-quest-leaderboard-window, #leaderboard-window) .lbp-slot-name,
-  body.mobile-touch :is(#world-quest-leaderboard-window, #leaderboard-window) .lbp-slot-metric {
+  body.mobile-touch #world-quest-leaderboard-window .lbp-slot-name,
+  body.mobile-touch #world-quest-leaderboard-window .lbp-slot-metric {
     font-size: 12px;
   }
-  body.mobile-touch :is(#world-quest-leaderboard-window, #leaderboard-window) .lbp-slot-detail {
+  body.mobile-touch #world-quest-leaderboard-window .lbp-slot-detail {
     font-size: 10px;
   }
-  body.mobile-touch :is(#world-quest-leaderboard-window, #leaderboard-window) .lbp-plinth-rank {
+  body.mobile-touch #world-quest-leaderboard-window .lbp-plinth-rank {
     font-size: 13px;
   }
-  body.mobile-touch :is(#world-quest-leaderboard-window, #leaderboard-window) .lbp-plinth-1 {
+  body.mobile-touch #world-quest-leaderboard-window .lbp-plinth-1 {
     height: 26px;
   }
-  body.mobile-touch :is(#world-quest-leaderboard-window, #leaderboard-window) .lbp-plinth-2 {
+  body.mobile-touch #world-quest-leaderboard-window .lbp-plinth-2 {
     height: 23px;
   }
-  body.mobile-touch :is(#world-quest-leaderboard-window, #leaderboard-window) .lbp-plinth-3 {
+  body.mobile-touch #world-quest-leaderboard-window .lbp-plinth-3 {
     height: 20px;
   }
   body.mobile-touch #world-quest-leaderboard-window .wql-row {

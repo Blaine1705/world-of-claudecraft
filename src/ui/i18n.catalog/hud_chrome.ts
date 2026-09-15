@@ -1369,6 +1369,10 @@ export const hudChromeStrings = {
     wqNoMedal: 'None',
     wqMedals: { gold: 'Gold', silver: 'Silver', bronze: 'Bronze' },
     wqEmpty: 'No scores on this board yet. Finish the world quest to claim a spot.',
+    // The top-three podium every tab shows on its first page: its list label and
+    // the stand-in name on a place nobody holds yet.
+    podiumLabel: 'Top three',
+    unclaimed: 'Unclaimed',
   },
   // The World Quest rankings window (world_quest_leaderboard_window.ts): a
   // card per medal world quest, the top-three podium, the rest of the ladder,

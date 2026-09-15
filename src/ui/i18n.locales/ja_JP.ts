@@ -6472,6 +6472,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wqLadder.selfRank': '{rank}位',
   'hudChrome.wqLadder.selfNone':
     'このボードにはまだ記録がありません。ワールドクエストをクリアしてランキングに参加しましょう。',
+  'hudChrome.leaderboard.podiumLabel': 'トップ3',
+  'hudChrome.leaderboard.unclaimed': '空席',
   'hudChrome.widgets.worldCoordinates': 'ワールド座標',
   'hudChrome.plurals.guildMembers.one': 'あなたは{rank}、{count}人のメンバー',
   'hudChrome.plurals.guildMembers.few': 'あなたは{rank}、{count}人のメンバー',

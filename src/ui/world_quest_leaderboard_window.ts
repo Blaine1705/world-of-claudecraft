@@ -212,7 +212,6 @@ export class WorldQuestLeaderboardWindow {
     return {
       place: slot.place,
       rankText: slot.rank,
-      placeArt: slot.placeArt,
       filled: slot.filled,
       me: slot.me,
       nameHtml: `${esc(slot.name)}${you}`,

@@ -1272,7 +1272,9 @@ export const ko_KR: EnTranslations = {
         "silver": "은",
         "bronze": "동"
       },
-      "wqEmpty": "아직 이 점수판에 기록이 없습니다. 전역 퀘스트를 완료해 자리를 차지하세요."
+      "wqEmpty": "아직 이 점수판에 기록이 없습니다. 전역 퀘스트를 완료해 자리를 차지하세요.",
+      "podiumLabel": "상위 3명",
+      "unclaimed": "비어 있음"
     },
     "wqLadder": {
       "title": "전역 퀘스트 순위",

@@ -14,12 +14,7 @@ import {
 } from '../sim/world_quest_scoreboards';
 import type { WorldQuestLeaderboardEntry, WorldQuestLeaderboardPage } from '../world_api';
 import { formatNumber, t } from './i18n';
-import {
-  LEADERBOARD_MEDAL_ART_DIR,
-  leaderboardMedalArt,
-  type PodiumSlot,
-  podiumSplit,
-} from './leaderboard_podium_view';
+import { type PodiumSlot, podiumSplit } from './leaderboard_podium_view';
 import { worldQuestDisplayName } from './world_quest_view';
 
 export interface WorldQuestBoardChip {
@@ -105,14 +100,14 @@ export function resolveWorldQuestBoard(id: string): WorldQuestScoreboard {
 
 /** Where the rankings art lives (public/, served verbatim). A missing file
  *  degrades to the stylesheet's gradient, so the window never breaks on art. */
-export const WORLD_QUEST_LADDER_ART_DIR = LEADERBOARD_MEDAL_ART_DIR;
+export const WORLD_QUEST_LADDER_ART_DIR = 'ui/world-quests/leaderboard';
 
 export function worldQuestBoardArt(boardId: string): string {
   return `${WORLD_QUEST_LADDER_ART_DIR}/${boardId}.webp`;
 }
 
 export function worldQuestMedalArt(medal: WorldQuestMedal): string {
-  return leaderboardMedalArt(medal);
+  return `${WORLD_QUEST_LADDER_ART_DIR}/medal_${medal}.webp`;
 }
 
 export interface WorldQuestLadderCardView {
@@ -135,8 +130,6 @@ export interface WorldQuestPodiumSlotView {
   medalText: string;
   /** The medal this character EARNED in the quest (two places can both hold gold). */
   medalArt: string | null;
-  /** The podium disc: always gold, silver, bronze by place, never the earned medal. */
-  placeArt: string;
   metricText: string;
   me: boolean;
 }
@@ -241,7 +234,6 @@ function podiumSlot(
       medal: null,
       medalText: '',
       medalArt: null,
-      placeArt: slot.placeArt,
       metricText: '',
       me: false,
     };
@@ -254,7 +246,6 @@ function podiumSlot(
     medal: entry.medal,
     medalText: worldQuestMedalText(entry.medal),
     medalArt: entry.medal ? worldQuestMedalArt(entry.medal) : null,
-    placeArt: slot.placeArt,
     metricText: worldQuestMetricText(board, entry.metric),
     me: sameName(entry.name, viewerName),
   };

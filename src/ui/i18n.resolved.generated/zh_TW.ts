@@ -1272,7 +1272,9 @@ export const zh_TW: EnTranslations = {
         "silver": "銀牌",
         "bronze": "銅牌"
       },
-      "wqEmpty": "此榜單尚無成績。完成該世界任務即可上榜。"
+      "wqEmpty": "此榜單尚無成績。完成該世界任務即可上榜。",
+      "podiumLabel": "前三名",
+      "unclaimed": "虛位以待"
     },
     "wqLadder": {
       "title": "世界任務排行榜",

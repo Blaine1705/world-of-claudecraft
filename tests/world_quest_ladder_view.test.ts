@@ -111,16 +111,17 @@ describe('fetch states', () => {
 });
 
 describe('ranked board', () => {
-  it('orders the podium silver, gold, bronze and lists only rank 4 onward on page 0', () => {
+  it('lists the podium first place first and only rank 4 onward on page 0', () => {
     const view = buildWorldQuestLadderView(
       'north_watch_cannon',
       { kind: 'page', page: page() },
       'x',
     );
     expect(view.state).toBe('ranked');
-    expect(view.podium.map((s) => s.place)).toEqual([2, 1, 3]);
-    expect(view.podium.map((s) => s.name)).toEqual(['Hero2', 'Hero1', 'Hero3']);
-    expect(view.podium[1]).toMatchObject({
+    // First place first; the stylesheet stands it silver, gold, bronze.
+    expect(view.podium.map((s) => s.place)).toEqual([1, 2, 3]);
+    expect(view.podium.map((s) => s.name)).toEqual(['Hero1', 'Hero2', 'Hero3']);
+    expect(view.podium[0]).toMatchObject({
       filled: true,
       rank: '1',
       medal: 'gold',
@@ -149,10 +150,12 @@ describe('ranked board', () => {
       { kind: 'page', page: page({ leaders, total: 3 }) },
       'x',
     );
-    expect(view.podium.map((s) => [s.place, s.placeArt, s.medalArt])).toEqual([
-      [2, worldQuestMedalArt('silver'), worldQuestMedalArt('gold')],
-      [1, worldQuestMedalArt('gold'), worldQuestMedalArt('gold')],
-      [3, worldQuestMedalArt('bronze'), worldQuestMedalArt('silver')],
+    // The disc art itself is a stylesheet concern now (.lbp-slot-1/2/3 in
+    // src/styles/components.css); the slots list first place first.
+    expect(view.podium.map((s) => [s.place, s.medalArt])).toEqual([
+      [1, worldQuestMedalArt('gold')],
+      [2, worldQuestMedalArt('gold')],
+      [3, worldQuestMedalArt('silver')],
     ]);
   });
 
@@ -163,13 +166,12 @@ describe('ranked board', () => {
       'Hero1',
     );
     expect(view.podium.map((s) => [s.place, s.filled, s.name])).toEqual([
-      [2, false, 'Unclaimed'],
       [1, true, 'Hero1'],
+      [2, false, 'Unclaimed'],
       [3, false, 'Unclaimed'],
     ]);
-    expect(view.podium[0]).toMatchObject({
+    expect(view.podium[1]).toMatchObject({
       medalArt: null,
-      placeArt: worldQuestMedalArt('silver'),
       metricText: '',
       rank: '2',
     });
