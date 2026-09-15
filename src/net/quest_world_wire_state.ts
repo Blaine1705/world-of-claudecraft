@@ -7,7 +7,10 @@ import type {
 } from '../sim/types';
 import type { WorldQuestDifficulty } from '../sim/world_quest_activity';
 import type { NearbyWorldQuestTrace } from '../sim/world_quest_trace_public';
+import { applyQuestSelfWire } from './quest_snapshot_wire';
+import { decodeVehicleSession } from './vehicle_session_wire';
 import { decodeActiveWorldBossIds } from './world_boss_snapshot_wire';
+import { fetchWorldQuestLeaderboard } from './world_quest_leaderboard_wire';
 import { decodeNearbyWorldQuestTraces } from './world_quest_trace_public_wire';
 
 export type QuestWorldCommand =
@@ -34,9 +37,34 @@ export class QuestWorldWireState {
   worldQuestLog: ReadonlyMap<string, WorldQuestProgress> = new Map();
   nearbyWorldQuestTraces: readonly NearbyWorldQuestTrace[] = [];
   private activeWorldBossIds = new Set<string>();
+  private questWorldTransport: ((command: QuestWorldCommand) => void) | null = null;
+  private questWorldRestBase = '';
 
-  protected sendQuestWorldCommand(_command: QuestWorldCommand): void {
-    throw new Error('Quest world command transport is not configured');
+  /** The host's command transport and REST origin, bound once at construction. */
+  protected bindQuestWorldWire(restBase: string, send: (command: QuestWorldCommand) => void): void {
+    this.questWorldRestBase = restBase;
+    this.questWorldTransport = send;
+  }
+
+  protected sendQuestWorldCommand(command: QuestWorldCommand): void {
+    if (!this.questWorldTransport) {
+      throw new Error('Quest world command transport is not configured');
+    }
+    this.questWorldTransport(command);
+  }
+
+  worldQuestLeaderboard(board: string, page = 0, pageSize?: number, viewer?: string) {
+    return fetchWorldQuestLeaderboard(this.questWorldRestBase, board, page, pageSize, viewer);
+  }
+
+  /** The owner-only quest family plus the world-boss and vehicle mirrors of one self record. */
+  applyQuestSelfSnapshot(
+    self: Parameters<typeof applyQuestSelfWire>[1] & { wba?: unknown; vehicle?: unknown },
+    simTime?: unknown,
+  ): void {
+    applyQuestSelfWire(this, self, simTime);
+    if (self.wba !== undefined) this.applyWorldBossWire(self.wba);
+    if (self.vehicle !== undefined) this.vehicleSession = decodeVehicleSession(self.vehicle);
   }
 
   enterVehicle(stationId: string): void {

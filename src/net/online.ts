@@ -239,9 +239,7 @@ import {
   perfectingSwapInfoForMirror,
 } from './perfecting_swap_command';
 import { applyProfessionsSelfMirror } from './professions_self_mirror';
-import { applyQuestSelfWire } from './quest_snapshot_wire';
 import { optimisticQuestState } from './quest_state_optimistic';
-import type { QuestWorldCommand } from './quest_world_wire_state';
 import { isTransientReconnectRejection, isTransientTimeoutRejection } from './reconnect_policy';
 import { isInputSendBackpressured } from './send_backpressure';
 import { snapshotAlpha } from './snapshot_alpha';
@@ -253,11 +251,9 @@ import {
   stableDeadlineRemaining,
 } from './snapshot_timer_wire';
 import { vaultWithdrawPayload } from './vault_snapshot_wire';
-import { decodeVehicleSession } from './vehicle_session_wire';
 import { optimisticWeaponSkinChange } from './weapon_skin_optimistic';
 import { buildWebSocketAuthMessage } from './world_auth_message';
 import { WorldInteractionRequests } from './world_interaction_requests';
-import { fetchWorldQuestLeaderboard } from './world_quest_leaderboard_wire';
 
 export { buildWebSocketAuthMessage } from './world_auth_message';
 
@@ -1305,7 +1301,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
   loadouts: SavedLoadout[] = [];
   activeLoadout = -1;
   // --- IWorldParty: party/raid roster, mirrored from the snapshot self (`party`).
-  // Raid markers ride `markers`; pet state lives on the owned-mob entity wire. ---
+  // The raid-target markers ride the `markers` map below; IWorldPet keeps no mirror
+  // field (pet state lives on the owned-mob entity wire). ---
   partyInfo: PartyInfo | null = null;
   private selectedDungeonDifficulty: DungeonDifficulty = 'normal';
   // --- IWorldTrade: active trade-window state, mirrored from the snapshot self
@@ -1780,6 +1777,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     this.characterId = characterId;
     this.token = token;
     this.base = normalizeOrigin(base) || NATIVE_API_ORIGIN || DESKTOP_API_ORIGIN;
+    this.bindQuestWorldWire(this.base, (command) => this.cmd(command));
     this.clientSeed = clientSeed;
     this.ownPlayerClass = cls;
     // Placeholder until the server's hello supplies the authoritative seed;
@@ -2352,7 +2350,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
         // before the socket died, so it trivially matches the window's own
         // query and the reconnect resync (issue #2416) would never detect the
         // fresh-join reset. Nulling it here forces MarketWindow to treat the
-        // resync stays pending until a genuinely post-reconnect market snapshot decodes.
+        // resync as pending until a genuinely post-reconnect market snapshot
+        // decodes.
         this.marketInfo = null;
         // Same reasoning as marketInfo above: hpref is delta-omitted, so this
         // resets it to the unsynced state rather than showing a stale choice.
@@ -2363,7 +2362,6 @@ export class ClientWorld extends ReconWireState implements IWorld {
         // Same idea for a corpse-harvest-info query issued just before the drop.
         this.worldInteractionRequests?.resetQuery();
         this.resetQuestWorldWireState();
-        this.vehicleSession = null;
         this.onReconnected?.();
       }
       this.connected = true;
@@ -3261,9 +3259,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
         this.accountCosmetics = normalizeAccountCosmetics(s.cosmetics);
         this.cosmeticsChanged = true;
       }
-      applyQuestSelfWire(this, s, timerWire.time);
+      this.applyQuestSelfSnapshot(s, timerWire.time);
       if (s.lockouts !== undefined) this.selfLockouts = s.lockouts as Record<string, number>;
-      if (s.wba !== undefined) this.applyWorldBossWire(s.wba);
       // IWorldMounts self-decode: mntOwn is delta-guarded (omitted keeps the prior
       // mirror). The owned collection is mirrored VERBATIM (no horse prepend): the
       // horse is no longer auto-owned, so an empty owned list is legal and the
@@ -3276,7 +3273,6 @@ export class ClientWorld extends ReconWireState implements IWorld {
       }
       if (s.mntRtd !== undefined) this.selfRidingTrained = s.mntRtd === true;
       if (s.mntLesson !== undefined) this.mountLessonActiveMirror = s.mntLesson === true;
-      if (s.vehicle !== undefined) this.vehicleSession = decodeVehicleSession(s.vehicle);
       if (s.mntRace !== undefined) this.mountRaceMirror = decodeMountRaceView(s.mntRace, now);
       if (s.ddiff === 'normal' || s.ddiff === 'heroic') this.selectedDungeonDifficulty = s.ddiff;
       if (s.qlog !== undefined || s.qdone !== undefined) this.pendingQuestCommands?.clear();
@@ -3743,9 +3739,6 @@ export class ClientWorld extends ReconWireState implements IWorld {
     this.questLog.delete(questId);
     this.pendingQuestCommands.delete(questId);
     this.cmd({ cmd: 'abandon', quest: questId });
-  }
-  protected sendQuestWorldCommand(command: QuestWorldCommand): void {
-    this.cmd(command);
   }
   acceptLinkedQuest(questId: string, fromPid: number): void {
     this.cmd({ cmd: 'qlinkaccept', quest: questId, from: fromPid });
@@ -5373,6 +5366,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       return empty;
     }
   }
+
   // Renown board (REST GET, no wire command): ?board=deeds ranks ACCOUNTS by
   // lifetime deed Renown, character-faced and global-only. The bearer rides
   // the read so a ranked caller's `self` standing comes back on the page; any
@@ -5408,9 +5402,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       return empty;
     }
   }
-  worldQuestLeaderboard(board: string, page = 0, pageSize?: number, viewer?: string) {
-    return fetchWorldQuestLeaderboard(this.base, board, page, pageSize, viewer);
-  }
+
   async dailyRewards(): Promise<DailyRewardStatus> {
     const res = await fetch(apiUrl('/api/daily-rewards', this.base), {
       headers: { Authorization: `Bearer ${this.token}` },
@@ -5418,6 +5410,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     if (!res.ok) throw new Error('daily rewards unavailable');
     return (await res.json()) as DailyRewardStatus;
   }
+
   async dailyRewardLeaderboard(
     page = 0,
     pageSize = LEADERBOARD_PAGE_SIZE,

@@ -15,6 +15,8 @@ export interface MovementFrameSocket {
 /** Optional analog movement channels shared by both input send paths. */
 export function encodeAnalogMoveInput(mi: MoveInput): Record<string, number> {
   const fields: Record<string, number> = {};
+  // Swim camera steer is sparse: absent means full rate and preserves the
+  // legacy land-frame wire shape.
   if (mi.swimSteer !== undefined && mi.swimSteer !== 1) fields.ss = mi.swimSteer;
   if (mi.gliderPitch !== undefined) fields.gp = mi.gliderPitch;
   return fields;

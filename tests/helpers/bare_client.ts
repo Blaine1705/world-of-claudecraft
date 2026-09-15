@@ -263,6 +263,10 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.actionBarRestore = undefined;
   c.actionBarRestoreResolved = false;
   c.actionBarUploader = new ActionBarLayoutUploader((command) => c.cmd(command));
+  // The constructor binds the world-quest command transport and REST origin the
+  // same way (QuestWorldWireState.bindQuestWorldWire), resolving cmd per call so
+  // a suite that stamps its own cmd spy still sees every send.
+  c.bindQuestWorldWire('', (command: unknown) => c.cmd(command));
   c.profanityDirty = false;
   c.pendingTargetEcho = null;
   // The lazy WorldInteractionRequests holder (src/net/world_interaction_requests.ts):
