@@ -43,6 +43,20 @@ import { buildGuildLeaderboardView, type GuildLeaderboardRow } from './guild_lea
 import { guildTagHtml } from './guild_tag';
 import { formatNumber, t } from './i18n';
 import {
+  dailyPodiumSlot,
+  deedsPodiumSlot,
+  devPodiumSlot,
+  guildPodiumSlot,
+  playersPodiumSlot,
+} from './leaderboard_board_html';
+import { type PodiumSlotHtml, podiumHtml } from './leaderboard_podium_html';
+import {
+  guildStandingRow,
+  playersStandingBar,
+  podiumSplit,
+  viewerRowOnPage,
+} from './leaderboard_podium_view';
+import {
   buildLeaderboardView,
   type LeaderboardPager,
   type LeaderboardRow,
@@ -128,7 +142,9 @@ export class LeaderboardWindow {
     this.rankings = new WorldQuestLeaderboardWindow({
       root: () => root,
       world: () => this.deps.world(),
-      closeOthers: () => this.deps.closeOthers(),
+      // The deps method, not a call written here: toggle() owns the one
+      // captureFocus-then-closeOthers order the source pin checks.
+      closeOthers: this.deps.closeOthers.bind(this.deps),
       ...focusFor(`#${WORLD_QUEST_RANKINGS_ROOT_ID}`),
       onVisibilityChange: () => this.deps.onVisibilityChange?.(),
     });
@@ -293,10 +309,12 @@ export class LeaderboardWindow {
     if (view.kind !== 'ranked') return;
     // Mirror the server's clamped page back into the pager state.
     this.page = view.page;
+    const split = podiumSplit(view.page, view.rows, (row) => row.rank);
     body.innerHTML =
+      this.podiumHtml(split.podium.map(playersPodiumSlot)) +
       this.headerHtml() +
-      view.rows.map((r) => this.rowHtml(r)).join('') +
-      this.stickyHtml(view.standing) +
+      split.listed.map((r) => this.rowHtml(r)).join('') +
+      this.stickyHtml(playersStandingBar(view.rows, view.standing)) +
       this.pagerHtml(view.pager);
     this.wirePager(body as HTMLElement, focus);
   }
@@ -340,9 +358,13 @@ export class LeaderboardWindow {
     }
     if (view.kind !== 'ranked') return;
     this.page = view.page;
+    const split = podiumSplit(view.page, view.rows, (row) => row.rank);
+    const ownGuild = guildStandingRow(view.rows, world.player.guild);
     body.innerHTML =
+      this.podiumHtml(split.podium.map(guildPodiumSlot)) +
       this.guildHeaderHtml() +
-      view.rows.map((r) => this.guildRowHtml(r)).join('') +
+      split.listed.map((r) => this.guildRowHtml(r)).join('') +
+      this.standingHtml(ownGuild ? this.guildRowHtml(ownGuild) : '') +
       this.pagerHtml(view.pager);
     this.wirePager(body as HTMLElement, focus);
   }
@@ -391,10 +413,12 @@ export class LeaderboardWindow {
     }
     if (view.kind !== 'ranked') return;
     this.page = view.page;
+    const split = podiumSplit(view.page, view.rows, (row) => row.rank);
     body.innerHTML =
       this.deedsScopeNoteHtml() +
+      this.podiumHtml(split.podium.map((slot) => deedsPodiumSlot(slot, deedTitleText))) +
       this.deedsHeaderHtml() +
-      view.rows.map((r) => this.deedsRowHtml(r)).join('') +
+      split.listed.map((r) => this.deedsRowHtml(r)).join('') +
       this.deedsSelfHtml(view.self) +
       this.pagerHtml(view.pager);
     this.wirePager(body as HTMLElement, focus);
@@ -439,9 +463,13 @@ export class LeaderboardWindow {
     }
     if (view.kind !== 'ranked') return;
     this.page = view.page;
+    const split = podiumSplit(view.page, view.rows, (row) => row.rank);
+    const ownDev = viewerRowOnPage(view.rows);
     body.innerHTML =
+      this.podiumHtml(split.podium.map(devPodiumSlot)) +
       this.devHeaderHtml() +
-      view.rows.map((r) => this.devRowHtml(r)).join('') +
+      split.listed.map((r) => this.devRowHtml(r)).join('') +
+      this.standingHtml(ownDev ? this.devRowHtml(ownDev) : '') +
       this.pagerHtml(view.pager);
     this.wirePager(body as HTMLElement, focus);
   }
@@ -474,10 +502,14 @@ export class LeaderboardWindow {
       return;
     }
     this.page = result.page;
+    const split = podiumSplit(result.page, result.leaders, (row) => row.rank);
+    const ownDaily = viewerRowOnPage(result.leaders);
     body.innerHTML =
       this.dailyTotalHtml(result.total) +
+      this.podiumHtml(split.podium.map(dailyPodiumSlot)) +
       this.dailyHeaderHtml() +
-      result.leaders.map((r) => this.dailyRowHtml(r)).join('') +
+      split.listed.map((r) => this.dailyRowHtml(r)).join('') +
+      this.standingHtml(ownDaily ? this.dailyRowHtml(ownDaily) : '') +
       this.pagerHtml(
         result.pageCount > 1
           ? {
@@ -805,7 +837,7 @@ export class LeaderboardWindow {
             renown: formatNumber(self.renown, { maximumFractionDigits: 0 }),
           })
         : t('hudChrome.deeds.lbSelfRank', { rank, percent });
-    return `<div class="lb-self">${esc(line)}</div>`;
+    return `<div class="lb-self lb-standing">${esc(line)}</div>`;
   }
 
   private dailyHeaderHtml(): string {
@@ -854,18 +886,33 @@ export class LeaderboardWindow {
   // The sticky "your standing" row, shown when the viewer is off the visible page.
   // &mdash; is the unranked-rank placeholder, kept as an entity so the source
   // carries no literal em dash (project style rule).
-  private stickyHtml(standing: LeaderboardStanding | null): string {
+  private stickyHtml(standing: (LeaderboardStanding & { rank: number | null }) | null): string {
     if (!standing) return '';
+    const rankCell =
+      standing.rank === null
+        ? '&mdash;'
+        : formatNumber(standing.rank, { maximumFractionDigits: 0 });
     // The Renown-tab title-cell treatment, mirroring rowHtml: a deed id in the
     // view-model, localized here; '' (untitled/stale) renders an empty cell.
     const deedTitle = standing.title ? deedTitleText(standing.title) : '';
     return (
-      `<div class="lb-sticky"><div class="lb-row lb-row-players lb-mine"><span class="lb-rank">&mdash;</span>` +
+      `<div class="lb-sticky lb-standing"><div class="lb-row lb-row-players lb-mine"><span class="lb-rank">${rankCell}</span>` +
       `<span class="lb-name">${esc(standing.name)}${guildTagHtml(standing.guild, 'lb-guild')} <span class="lb-you">(${esc(t('game.leaderboard.you'))})</span></span>` +
       `<span class="lb-lvl">${formatNumber(standing.level, { maximumFractionDigits: 0 })}</span><span class="lb-vlvl">${formatNumber(standing.virtualLevel, { maximumFractionDigits: 0 })}</span>` +
       `<span class="lb-xp">${formatXp(standing.lifetimeXp)}</span>` +
       `<span class="lb-deed-title">${esc(deedTitle)}</span></div></div>`
     );
+  }
+
+  // The shared top-three podium (leaderboard_podium_html.ts), first page only.
+  private podiumHtml(slots: PodiumSlotHtml[]): string {
+    return podiumHtml(slots, t('hudChrome.wqLadder.podiumLabel'));
+  }
+
+  // The viewer's own row pinned under the list, in the sticky standing bar the
+  // players tab uses; '' when the viewer is not on this page.
+  private standingHtml(rowHtml: string): string {
+    return rowHtml ? `<div class="lb-sticky lb-standing">${rowHtml}</div>` : '';
   }
 
   // Prev/Next pager, mirroring the World Market browse pager (it reuses the same

@@ -3636,6 +3636,240 @@
     opacity: 0.45;
     cursor: var(--cursor-arrow);
   }
+  /* The leaderboard window in the rankings ledger chrome (the same violet
+     gradients, gold rules and cqw scale as #world-quest-leaderboard-window):
+     wider, tabs that never clip their label, the shared .lbp-* podium on the
+     first page of every tab, violet-striped rows, and the viewer's standing as
+     a sticky bar at the foot of the board. .lb-body stays the scroller with its
+     56vh cap and the .window-fill contract, so resizing still grows the board;
+     the padding stays inside --window-pad so nothing sits under the body. */
+  #leaderboard-window {
+    width: min(1100px, calc(100vw - 32px));
+    background:
+      radial-gradient(ellipse 60% 40% at 50% 0%, #6d3fd42e, transparent 60%),
+      linear-gradient(180deg, #1c1531f5, #120c20f5 40%, #0c0816f8);
+    border-color: #8f6a2c;
+    container-type: inline-size;
+    padding: clamp(10px, 1.2cqw, 14px) clamp(12px, 1.6cqw, 22px);
+  }
+  #leaderboard-window #leaderboard-title {
+    font-size: clamp(18px, 2cqw, 28px);
+    letter-spacing: 0.03em;
+    color: #fbf6ff;
+    text-shadow:
+      0 1px 0 #000,
+      0 0 18px #c4a6ff55;
+  }
+  #leaderboard-window .lb-subtitle {
+    font-family: var(--font-serif);
+    font-size: clamp(12px, 1.1cqw, 16px);
+    letter-spacing: 0;
+    color: #c4a6ff;
+    text-shadow: none;
+  }
+  #leaderboard-window .lb-tabs {
+    flex: none;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: clamp(6px, 0.8cqw, 12px);
+  }
+  #leaderboard-window .lb-tab {
+    flex: 1 1 auto;
+    min-width: max-content;
+    white-space: nowrap;
+    padding: clamp(6px, 0.7cqw, 10px) clamp(12px, 1.4cqw, 22px);
+    font-size: clamp(12px, 1.15cqw, 16px);
+    letter-spacing: 0.02em;
+    color: #d9ccf2;
+    background: linear-gradient(180deg, #2a1f47, #150f24);
+    border: 1px solid #4c2f8a;
+    box-shadow:
+      inset 0 1px 0 #ffffff14,
+      0 4px 10px #0008;
+  }
+  #leaderboard-window .lb-tab:hover {
+    color: #fff;
+    border-color: #c4a6ff;
+    background: linear-gradient(180deg, #3a2b62, #1d1533);
+  }
+  #leaderboard-window .lb-tab-active {
+    color: #f2d998;
+    border-color: #8b5cf6;
+    background: linear-gradient(180deg, #3a2b62, #1d1533);
+    box-shadow:
+      inset 0 0 0 1px #8b5cf655,
+      inset 0 -2px 0 #d4a955,
+      0 0 18px #8b5cf666;
+  }
+  #leaderboard-window .lb-body {
+    padding: 0 clamp(8px, 1cqw, 16px);
+    background: linear-gradient(180deg, #150f26e6, #0c0816f0);
+    border: 1px solid #8f6a2c;
+    box-shadow:
+      inset 0 0 0 1px #000,
+      inset 0 0 0 2px #d4a95518;
+    overscroll-behavior: contain;
+  }
+  #leaderboard-window .lbp-podium {
+    margin-top: clamp(8px, 1cqw, 14px);
+  }
+  #leaderboard-window .lbp-slot-detail {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  :is(#world-quest-leaderboard-window, #leaderboard-window) .lbp-stat {
+    display: inline-flex;
+    gap: 4px;
+    margin: 0 5px;
+  }
+  :is(#world-quest-leaderboard-window, #leaderboard-window) .lbp-stat-label {
+    color: #a99bc8;
+  }
+  :is(#world-quest-leaderboard-window, #leaderboard-window) .lbp-stat-value {
+    color: #f1e9ff;
+    font-weight: 700;
+  }
+  #leaderboard-window .lbp-slot-name .lb-dev-badge {
+    margin-right: 4px;
+  }
+  #leaderboard-window .lb-total,
+  #leaderboard-window .lb-scope-note {
+    margin: clamp(6px, 0.8cqw, 10px) 0 0;
+    text-align: center;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: clamp(12px, 1.1cqw, 15px);
+    color: #c9bde4;
+  }
+  #leaderboard-window .lb-loading,
+  #leaderboard-window .lb-empty,
+  #leaderboard-window .lb-error {
+    padding: clamp(24px, 4cqw, 56px) 12px;
+    font-family: var(--font-serif);
+    font-size: clamp(13px, 1.3cqw, 18px);
+    color: #c9bde4;
+  }
+  #leaderboard-window .lb-error {
+    color: #ff9a8a;
+  }
+  #leaderboard-window .lb-row {
+    padding: 5px 10px;
+    font-size: clamp(12px, 1.15cqw, 16px);
+    color: #f1e9ff;
+    border-radius: 0;
+  }
+  #leaderboard-window .lb-row-players {
+    grid-template-columns: 56px minmax(0, 1.9fr) 56px 64px minmax(96px, 150px) minmax(0, 1fr);
+  }
+  #leaderboard-window .lb-row-guild {
+    grid-template-columns: 56px minmax(0, 1fr) 96px 64px minmax(96px, 150px);
+  }
+  #leaderboard-window .lb-row-deeds {
+    grid-template-columns: 56px minmax(0, 1fr) 96px minmax(110px, 240px);
+  }
+  #leaderboard-window .lb-row-dev {
+    grid-template-columns: 56px minmax(0, 1fr) 170px 110px;
+  }
+  #leaderboard-window .lb-row.lb-daily {
+    grid-template-columns: 56px minmax(0, 1fr) 140px;
+  }
+  #leaderboard-window .lb-row:nth-child(odd) {
+    background: none;
+  }
+  #leaderboard-window .lb-row:nth-child(even) {
+    background: #ffffff07;
+  }
+  #leaderboard-window .lb-row.lb-head {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    font-size: clamp(11px, 1cqw, 14px);
+    color: #f2d998;
+    background: #130d22;
+    border-bottom: 1px solid #d4a95544;
+  }
+  #leaderboard-window .lb-row.lb-mine {
+    outline: 0;
+    background: linear-gradient(90deg, #8b5cf633, #8b5cf60f 70%);
+    box-shadow: inset 2px 0 0 #8b5cf6;
+  }
+  #leaderboard-window .lb-rank {
+    font-weight: 700;
+    color: #c4a6ff;
+  }
+  #leaderboard-window .lb-row.lb-head .lb-rank {
+    font-weight: 400;
+    color: inherit;
+  }
+  #leaderboard-window .lb-name {
+    color: #fbf6ff;
+  }
+  #leaderboard-window .lb-lvl,
+  #leaderboard-window .lb-vlvl,
+  #leaderboard-window .lb-members,
+  #leaderboard-window .lb-dev-tier,
+  #leaderboard-window .lb-deed-title,
+  #leaderboard-window .lb-realm,
+  #leaderboard-window .lb-guild {
+    color: #a99bc8;
+  }
+  #leaderboard-window .lb-xp,
+  #leaderboard-window .lb-renown,
+  #leaderboard-window .lb-commits {
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    color: #f2d998;
+  }
+  #leaderboard-window .lb-row.lb-head :is(.lb-xp, .lb-renown, .lb-commits) {
+    font-weight: 400;
+  }
+  #leaderboard-window .lb-you {
+    color: #c4a6ff;
+  }
+  /* The standing bar: the players tab's off-page standing (or the viewer's
+     ranked row), the viewer's guild, contributor or daily row, and the Renown
+     tab's account line, all pinned at the foot of the scrolling board. */
+  #leaderboard-window .lb-standing {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    margin: clamp(6px, 0.8cqw, 10px) 0 0;
+    padding: 3px 4px;
+    border: 1px solid #8f6a2c;
+    background: linear-gradient(180deg, #2a1f47, #0e0a1a);
+    box-shadow: 0 -6px 14px #000a;
+  }
+  #leaderboard-window .lb-standing .lb-row {
+    background: none;
+    box-shadow: inset 2px 0 0 #8b5cf6;
+  }
+  #leaderboard-window .lb-self.lb-standing {
+    padding: clamp(5px, 0.6cqw, 9px) 12px;
+    text-align: center;
+    font-size: clamp(12px, 1.15cqw, 16px);
+    color: #f2d998;
+  }
+  #leaderboard-window .lb-pager {
+    border-top-color: #d4a95544;
+    padding-bottom: 8px;
+    color: #c9bde4;
+  }
+  #leaderboard-window .lb-page-status {
+    color: #c9bde4;
+  }
+  #leaderboard-window .lb-page-btn {
+    color: #f1e9ff;
+    background: linear-gradient(180deg, #2a1f47, #150f24);
+    border: 1px solid #4c2f8a;
+    border-radius: 0;
+  }
+  #leaderboard-window .lb-page-btn:hover:not(:disabled),
+  #leaderboard-window .lb-page-btn:focus-visible {
+    color: #fff;
+    border-color: #c4a6ff;
+  }
 
   /* ---------- mount picker (character sheet) ---------- */
   .mount-picker .mp-cards {
