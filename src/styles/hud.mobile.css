@@ -7313,16 +7313,16 @@
     font-size: 10px;
   }
   body.mobile-touch #world-quest-leaderboard-window .wql-plinth-rank {
-    font-size: 9px;
+    font-size: 13px;
   }
   body.mobile-touch #world-quest-leaderboard-window .wql-plinth-1 {
-    height: 20px;
+    height: 26px;
   }
   body.mobile-touch #world-quest-leaderboard-window .wql-plinth-2 {
-    height: 16px;
+    height: 23px;
   }
   body.mobile-touch #world-quest-leaderboard-window .wql-plinth-3 {
-    height: 12px;
+    height: 20px;
   }
   body.mobile-touch #world-quest-leaderboard-window .wql-row {
     grid-template-columns: 36px minmax(0, 1fr) 96px 88px;

@@ -3173,13 +3173,13 @@
       0 8px 20px #000b;
   }
   #world-quest-leaderboard-window .wql-plinth-1 {
-    height: clamp(32px, 3.6cqw, 48px);
+    height: clamp(40px, 4.2cqw, 58px);
   }
   #world-quest-leaderboard-window .wql-plinth-2 {
-    height: clamp(24px, 2.6cqw, 34px);
+    height: clamp(33px, 3.4cqw, 47px);
   }
   #world-quest-leaderboard-window .wql-plinth-3 {
-    height: clamp(17px, 1.8cqw, 24px);
+    height: clamp(27px, 2.7cqw, 38px);
   }
   #world-quest-leaderboard-window .wql-slot-name {
     flex: none;
@@ -3215,10 +3215,10 @@
   }
   #world-quest-leaderboard-window .wql-plinth-rank {
     font-family: var(--title-font);
-    font-size: clamp(10px, 1.05cqw, 14px);
+    font-size: clamp(17px, 1.8cqw, 26px);
     line-height: 1;
     color: var(--wql-tint);
-    opacity: 0.85;
+    opacity: 0.9;
     text-shadow: 0 2px 0 #000;
   }
   #world-quest-leaderboard-window .wql-mine .wql-slot-card {
