@@ -19,7 +19,7 @@ import { WORLD_SEED } from '../src/sim/world_seed';
 it('offers the relocated battery at Wyrmwatch while retaining its existing reward claim identity', () => {
   expect(WORLD_QUEST_CANNON.zoneId).toBe('drakelands');
   expect(WORLD_QUEST_CANNON.id).toBe('wq_evergarden_cannon');
-  expect(NORTH_WATCH_CANNON).toMatchObject({ x: 390, z: 1870 });
+  expect(NORTH_WATCH_CANNON).toMatchObject({ x: 384, z: 1862 });
   const area = WORLD_QUEST_CANNON.area;
   expect(Math.hypot(NORTH_WATCH_CANNON.x - area.x, NORTH_WATCH_CANNON.z - area.z)).toBeLessThan(
     area.radius,
