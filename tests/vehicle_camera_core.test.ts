@@ -1,6 +1,8 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   createVehicleCamera,
+  stepRendererVehicleCamera,
   stepVehicleCamera,
   vehicleCameraTarget,
 } from '../src/render/vehicle_camera_core';
@@ -71,5 +73,49 @@ describe('vehicle camera composition', () => {
       (70 * Math.PI) / 180,
     );
     expect(stepVehicleCamera(state, live, null, 1, 60, 0, true)).toEqual(live);
+  });
+});
+
+describe('the renderer vehicle camera host seam', () => {
+  it('composes the boom pivot and the manned station exactly as the direct call does', () => {
+    const session = {
+      kind: 'cannon',
+      stationId: NORTH_WATCH_CANNON.id,
+      cycle: 'wq3_8',
+      origin: { x: 0, y: 4, z: 0 },
+      encounter: createCannonEncounter(),
+    } as VehicleSession;
+    const host = {
+      vehicleCamera: createVehicleCamera(),
+      camBoom: { x: 360, y: 4, z: 1140 },
+      camFeel: { leadX: 0.5, leadZ: -0.25 },
+      sim: { vehicleSession: session },
+      camera: { aspect: 1.6 },
+      baseFov: 60,
+    };
+    const expected = stepVehicleCamera(
+      createVehicleCamera(),
+      { ...live, x: 360.5, y: 4, z: 1139.75 },
+      vehicleCameraTarget(session),
+      1.6,
+      60,
+      0.1,
+      false,
+    );
+    expect({ ...stepRendererVehicleCamera(host, live, 0.1, false) }).toEqual({ ...expected });
+  });
+
+  it('stays welded to the private renderer members the host cast reads', () => {
+    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    for (const anchor of [
+      'private readonly vehicleCamera = createVehicleCamera();',
+      'private readonly camBoom = createCameraBoom();',
+      'private readonly camFeel = createCameraFeel();',
+      'private baseFov = CAMERA_BASE_FOV;',
+      'camera: THREE.PerspectiveCamera;',
+      'const pose = stepRendererVehicleCamera(this, directedPose, dt, reduce);',
+    ]) {
+      expect(renderer, anchor).toContain(anchor);
+    }
   });
 });

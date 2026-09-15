@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import type { CharacterLodBands } from '../src/render/crowd_lod';
@@ -7,6 +8,7 @@ import {
   isQuestCaravanEntity,
   QUEST_CARAVAN_CULL_RADIUS,
   syncQuestCaravanBody,
+  syncQuestCaravanView,
 } from '../src/render/quest_entity_presentation';
 import { buildGroundQuestObject } from '../src/render/quest_objects';
 import { buildMovingWorldQuestFreightWagon } from '../src/render/world_quest_freight_visual';
@@ -120,5 +122,49 @@ describe('quest entity presentation lifecycle', () => {
     expect(body.parent).toBeNull();
     expect(attachEntityViewBody(group, body, 42, { clickProxy }, false)).toBe(clickProxy);
     expect(clickProxy.userData.entityId).toBe(42);
+  });
+});
+
+describe('the per-frame caravan pass behind the renderer host seam', () => {
+  it('runs only for a caravan view, with the renderer frame phase and motion setting', () => {
+    const update = vi.fn();
+    const group = new THREE.Group();
+    const view = {
+      group,
+      height: 3,
+      liveScale: 1,
+      lastX: 0,
+      lastY: 0,
+      lastZ: 0,
+      freightCaravanVisual: { group, height: 3, update, dispose: vi.fn() },
+    };
+    const host = {
+      cullCharacters: false,
+      characterCull: null,
+      frameIdx: 1,
+      reducedMotion: () => false,
+    };
+    expect(
+      syncQuestCaravanView(host, { ...view, freightCaravanVisual: null }, 5, 0.05, 1, bands),
+    ).toBe(false);
+    expect(update).not.toHaveBeenCalled();
+    expect(syncQuestCaravanView(host, view, 5, 0.05, 1, bands)).toBe(true);
+    expect(update).toHaveBeenLastCalledWith(0.05, false, true);
+    host.reducedMotion = () => true;
+    syncQuestCaravanView(host, view, 5, 0.05, 1, bands);
+    expect(update).toHaveBeenLastCalledWith(0.05, false, false);
+  });
+
+  it('stays welded to the private renderer members the host cast reads', () => {
+    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    for (const anchor of [
+      'private cullCharacters = false;',
+      'private readonly characterCull = createCharacterCullPass();',
+      'private frameIdx = 0;',
+      'private reducedMotion(): boolean {',
+      'if (syncQuestCaravanView(this, v, e.id, dt, d2, lodBands)) continue;',
+    ]) {
+      expect(renderer, anchor).toContain(anchor);
+    }
   });
 });

@@ -679,7 +679,7 @@ interface AttributionTargetFixture {
 // renderer.ts (the world-quest caravan cull and prewarm wiring on the release
 // cull core) moved the runtimeRender.renderer leaf. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'e645ff2a357d8d133776d03cc6dae59188d760ad68fb229c7b890756951a3d45';
+  '085f1c6512330becf384d0a06977544fdad9034620e9129d81cff26327597f24';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

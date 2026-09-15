@@ -27,8 +27,12 @@ export class WorldGuidance {
     groundAt: (x: number, z: number) => number,
     compileGate?: (target: THREE.Object3D, requiredForEntry?: boolean) => Promise<unknown>,
   ) {
+    // Show-jumping racing line: self-scoped course guidance, hidden outside the
+    // player's own race (driven per frame from world.mountRaceView() below).
     this.race = new RaceLine(scene, groundAt);
+    // Riding-lesson start platform: the glowing square behind the start arch.
     this.mount = new MountBeacon(scene, groundAt);
+    // The Proving Shore's guidance: beacon fizz, route ribbon, target ring.
     this.island = new IslandGuidance(scene, groundAt, compileGate);
     // Unlike an untimed coach ribbon, a hidden six-second preview has no
     // actionable stand-in. Run its gate before first paint and include it in
@@ -76,17 +80,20 @@ export class WorldGuidance {
     time: number,
     dt: number,
     reducedMotion = false,
-    renderedSelf?: Pick<THREE.Object3D, 'position' | 'rotation'>,
+    renderedSelf?: { group: Pick<THREE.Object3D, 'position' | 'rotation'> },
   ): void {
+    // Racing line (cosmetic; reads the self race view only).
     this.race.update(world.mountRaceView(), time, dt);
+    // Island guidance trail (actionable on every tier; island-gated inside).
     this.island.update(world, time, dt);
+    // Start platform: visible while the riding quest is active and no race is live.
     this.mount.update(
       world.questState('q_riding_lessons') === 'active' && !world.mountRaceView(),
       time,
     );
     this.trace.update(world);
     this.cannon.update(world.vehicleSession, dt, reducedMotion);
-    this.glider.update(world, renderedSelf);
+    this.glider.update(world, renderedSelf?.group);
     this.shadow.update(world);
     this.wispMaze.update(world, reducedMotion);
   }

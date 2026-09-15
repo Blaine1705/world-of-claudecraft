@@ -1,4 +1,3 @@
-// biome-ignore-all format: Legacy monolith has exact-source contracts; format new seams in their modules.
 import * as THREE from 'three';
 import { NumberSampleRing } from '../game/sample_ring';
 import { coerceFxTier, nameplateIntervalSec, nameplatePixelRatio } from '../game/ui_tier_knobs';
@@ -607,8 +606,7 @@ import {
   buildQuestCaravanBody,
   isQuestCaravanEntity,
   type MovingWorldQuestFreightWagonVisual,
-  QUEST_CARAVAN_CULL_RADIUS,
-  syncQuestCaravanBody,
+  syncQuestCaravanView,
 } from './quest_entity_presentation';
 import { makeQuestObjectGate, type QuestObjectGateOptions } from './quest_object_gate_core';
 import { buildGroundQuestObject, farshoreSalvagePrewarmPlan } from './quest_objects';
@@ -766,7 +764,7 @@ import {
 import { createPrewarmGroupSlot, createVariantPrewarmSlot } from './variant_prewarm_slot';
 import { routeVarkhulForgeHammer } from './varkhul_forge_hammer';
 import { VarkhulForgestormVisuals } from './varkhul_forgestorm_visual';
-import { createVehicleCamera, stepVehicleCamera, vehicleCameraTarget } from './vehicle_camera_core';
+import { createVehicleCamera, stepRendererVehicleCamera } from './vehicle_camera_core';
 import type { VehicleSuspensionRig } from './vehicle_suspension_fx';
 import { SCHOOL_COLORS, Vfx } from './vfx';
 import { createOffsetVfxAnchor, createVfxAnchor, type VfxAnchorPose } from './vfx_anchor';
@@ -816,7 +814,7 @@ import { precipForBiome } from './weather_field_core';
 import { createRendererWebGL, type WebGLPowerPreference } from './webgl_context_fallback';
 import { buildWorldAmbientSources, footstepSurfaceAt } from './world_audio';
 import { WorldGuidance } from './world_guidance';
-import { hasWorldQuestDeliveryCargo, syncWorldQuestCarryVisual, type WorldQuestCarryViewState } from './world_quest_carry_visual';
+import { syncWorldQuestCarryView, type WorldQuestCarryViewState } from './world_quest_carry_visual';
 import { surfaceDetailPrewarmTextures } from './worn_stone';
 import { buildYumiMaze, type YumiMazeView } from './yumi_maze';
 import { YumiTeamMarkers } from './yumi_team_markers';
@@ -5161,7 +5159,6 @@ export class Renderer {
       prewarmedMobTemplates: this.prewarmedMobTemplates,
       prewarmedNpcModels: this.prewarmedNpcModels,
     };
-
   }
 
   private prewarmTexture(texture: THREE.Texture | null | undefined): void {
@@ -10312,34 +10309,8 @@ export class Renderer {
         // holy sparkle over beacon NPCs, gold over the current target.
         this.worldGuidance.npcFizz(this.sim, e, this.vfx, this.time, dt);
       }
-      if (v.freightCaravanVisual) {
-        const caravanPos = v.group.position;
-        const caravanOnScreen =
-          !this.cullCharacters ||
-          (characterCullBits(
-            this.characterCull,
-            caravanPos.x,
-            caravanPos.y,
-            caravanPos.z,
-            v.height,
-            v.liveScale,
-            QUEST_CARAVAN_CULL_RADIUS * v.liveScale,
-            d2,
-          ) &
-            CHARACTER_CULL_DRAWS) !==
-            0;
-        syncQuestCaravanBody(
-          v,
-          dt,
-          this.frameIdx + e.id,
-          d2,
-          lodBands,
-          this.reducedMotion(),
-          caravanOnScreen,
-        );
-        continue;
-      }
-      v.worldQuestCarryVisual = syncWorldQuestCarryVisual(v.worldQuestCarryVisual, v.group, !e.dead && !e.mountKey && hasWorldQuestDeliveryCargo(e));
+      if (syncQuestCaravanView(this, v, e.id, dt, d2, lodBands)) continue;
+      syncWorldQuestCarryView(v, e);
       const sunVerdictPlan = paladinSunVerdictVisualPlanForAuraInto(
         e.dead,
         sunVerdictAura,
@@ -11659,7 +11630,7 @@ export class Renderer {
     this.bgFx.update(this.time);
     updateBattlegroundViews(this.bgViews, this.bgViewState, this.sim.bgInfo, this.sim.playerId);
     this.vfx.update(dt);
-    this.worldGuidance.update(this.sim, this.time, dt, this.reducedMotion(), this.views.get(p.id)?.group);
+    this.worldGuidance.update(this.sim, this.time, dt, this.reducedMotion(), this.views.get(p.id));
     this.abilityVfx.update(dt, this.reducedMotion());
     this.needleOfFateVfx.update(dt, this.reducedMotion());
     this.sentenceVfx.update(dt, this.reducedMotion());
@@ -12452,16 +12423,23 @@ export class Renderer {
     mirror.pitch = this.camPitch;
     mirror.dist = this.camDist;
 
-    const underwaterCeilingY = underwaterCameraCeiling(this.selfSubmerged, waterLevelAt(selfPos.x, selfPos.z, seed));
+    // Follow a submerged swimmer UNDER the surface: a height CEILING folded
+    // into the one cy assignment below (the graphics-overhaul contract pins
+    // that the chase camera's coordinates are each assigned exactly once).
+    // The chase boom rides well above the avatar, and the built-in lakes are
+    // only three or four yards deep, so left alone the camera stays dry
+    // however far you dive - and the whole underwater pass (blue wash,
+    // bubbles, the breaststroke you are actually playing) would only ever be
+    // visible from a zoomed-in view. The ground clamp below still keeps the
+    // camera off the lake bed.
+    const underwaterCeilingY = underwaterCameraCeiling(
+      this.selfSubmerged,
+      waterLevelAt(selfPos.x, selfPos.z, seed),
+    );
     // The camera orbits the lagged/led pivot at the player's requested
     // distance. Scene geometry never changes that distance; registered
     // obstructors fade through their subsystem's occluder-fade pass.
-    const vehicle = this.sim.vehicleSession;
-    const pose = stepVehicleCamera(this.vehicleCamera,
-      { ...directedPose, x: this.camBoom.x + this.camFeel.leadX, y: this.camBoom.y,
-        z: this.camBoom.z + this.camFeel.leadZ },
-      vehicleCameraTarget(vehicle),
-      this.camera.aspect, this.baseFov, dt, reduce);
+    const pose = stepRendererVehicleCamera(this, directedPose, dt, reduce);
     const px = pose.x;
     const py = pose.y;
     const pz = pose.z;
@@ -12529,6 +12507,9 @@ export class Renderer {
     }
   }
 
+  // Hang a speech bubble over an entity's head; it follows the entity and
+  // fades out after a few seconds (longer for longer messages), or after the
+  // caller's explicit ttl (short reaction barks like Goad's grawlix).
   showChatBubble(
     entityId: number,
     text: string,

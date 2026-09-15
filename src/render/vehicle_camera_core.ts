@@ -85,3 +85,40 @@ export function stepVehicleCamera(
   out.z += ((minZ + maxZ) / 2 + (last.focusOffsetZ ?? 0) - live.z) * w;
   return out;
 }
+
+/** The renderer members the per-frame vehicle composition reads. They are private on
+ *  Renderer, so the call site passes `this` untyped; the declarations are welded to
+ *  renderer.ts in tests/vehicle_camera_core.test.ts. */
+interface VehicleCameraHost {
+  vehicleCamera: VehicleCameraState;
+  camBoom: { x: number; y: number; z: number };
+  camFeel: { leadX: number; leadZ: number };
+  sim: { vehicleSession: VehicleSession | null };
+  camera: { aspect: number };
+  baseFov: number;
+}
+
+/** The renderer's frame composition: the directed orbit pose around the lagged, led
+ *  boom pivot, fitted to the manned station's field (a pass-through with no vehicle). */
+export function stepRendererVehicleCamera(
+  host: object,
+  directed: CameraDirectorPose,
+  dt: number,
+  reducedMotion: boolean,
+): VehicleCameraFrame {
+  const h = host as VehicleCameraHost;
+  return stepVehicleCamera(
+    h.vehicleCamera,
+    {
+      ...directed,
+      x: h.camBoom.x + h.camFeel.leadX,
+      y: h.camBoom.y,
+      z: h.camBoom.z + h.camFeel.leadZ,
+    },
+    vehicleCameraTarget(h.sim.vehicleSession),
+    h.camera.aspect,
+    h.baseFov,
+    dt,
+    reducedMotion,
+  );
+}

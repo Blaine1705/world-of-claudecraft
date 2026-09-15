@@ -158,8 +158,15 @@ describe('world quest freight visual', () => {
       new URL('../src/render/quest_objects.ts', import.meta.url),
       'utf8',
     );
-    expect(renderer).toContain('v.worldQuestCarryVisual = syncWorldQuestCarryVisual(');
-    expect(renderer).toContain('!e.dead && !e.mountKey && hasWorldQuestDeliveryCargo(e)');
+    const carry = readFileSync(
+      new URL('../src/render/world_quest_carry_visual.ts', import.meta.url),
+      'utf8',
+    );
+    expect(renderer).toContain('syncWorldQuestCarryView(v, e);');
+    expect(carry).toContain('view.worldQuestCarryVisual = syncWorldQuestCarryVisual(');
+    expect(carry).toContain(
+      '!entity.dead && !entity.mountKey && hasWorldQuestDeliveryCargo(entity)',
+    );
     expect(questObjects).toContain("if (itemId === 'eastbrook_freight_wagon')");
     expect(questObjects).toContain('const freightWagon = buildWorldQuestFreightWagon();');
     expect(questObjects).toContain('if (freightWagon) return freightWagon;');
@@ -167,7 +174,10 @@ describe('world quest freight visual', () => {
     expect(presentation).toContain("e.kind === 'mob' && !!worldQuestCaravanForMob(e.templateId)");
     expect(renderer).toContain('freightCaravanVisual = buildQuestCaravanBody(e);');
     expect(presentation).toContain('buildMovingWorldQuestFreightWagon(e.templateId)');
-    expect(renderer).toContain('syncQuestCaravanBody(');
+    expect(renderer).toContain(
+      'if (syncQuestCaravanView(this, v, e.id, dt, d2, lodBands)) continue;',
+    );
+    expect(presentation).toContain('syncQuestCaravanBody(');
     expect(presentation).toContain('view.freightCaravanVisual?.update(dt, moving, animateDriver);');
     expect(renderer).toContain('v.freightCaravanVisual?.dispose();');
     expect(freightVisual).toContain('clone as cloneSkinned');
