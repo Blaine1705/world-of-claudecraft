@@ -136,6 +136,26 @@ describe('ranked board', () => {
     expect(view.totalText).toBe('12 heroes ranked');
   });
 
+  it('colors the podium discs by place, not by the medal each hero earned', () => {
+    // Ranks 1 and 2 both earned gold and rank 3 earned silver: the discs still
+    // read gold, silver, bronze, and each slot keeps its earned medal separately.
+    const leaders: WorldQuestLeaderboardEntry[] = [
+      { rank: 1, name: 'Seraphine', medal: 'gold', metric: 48 },
+      { rank: 2, name: 'Brannoc', medal: 'gold', metric: 45 },
+      { rank: 3, name: 'Ysolde', medal: 'silver', metric: 42 },
+    ];
+    const view = buildWorldQuestLadderView(
+      'north_watch_cannon',
+      { kind: 'page', page: page({ leaders, total: 3 }) },
+      'x',
+    );
+    expect(view.podium.map((s) => [s.place, s.placeArt, s.medalArt])).toEqual([
+      [2, worldQuestMedalArt('silver'), worldQuestMedalArt('gold')],
+      [1, worldQuestMedalArt('gold'), worldQuestMedalArt('gold')],
+      [3, worldQuestMedalArt('bronze'), worldQuestMedalArt('silver')],
+    ]);
+  });
+
   it('leaves unheld podium places standing as unclaimed placeholders', () => {
     const view = buildWorldQuestLadderView(
       'forge',
@@ -147,7 +167,12 @@ describe('ranked board', () => {
       [1, true, 'Hero1'],
       [3, false, 'Unclaimed'],
     ]);
-    expect(view.podium[0]).toMatchObject({ medalArt: null, metricText: '', rank: '2' });
+    expect(view.podium[0]).toMatchObject({
+      medalArt: null,
+      placeArt: worldQuestMedalArt('silver'),
+      metricText: '',
+      rank: '2',
+    });
     expect(view.rows).toEqual([]);
     expect(view.totalText).toBe('One hero ranked');
   });

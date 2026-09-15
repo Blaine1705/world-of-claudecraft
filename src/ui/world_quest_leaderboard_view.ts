@@ -127,7 +127,10 @@ export interface WorldQuestPodiumSlotView {
   name: string;
   medal: WorldQuestMedal | null;
   medalText: string;
+  /** The medal this character EARNED in the quest (two places can both hold gold). */
   medalArt: string | null;
+  /** The podium disc: always gold, silver, bronze by place, never the earned medal. */
+  placeArt: string;
   metricText: string;
   me: boolean;
 }
@@ -211,6 +214,12 @@ export function worldQuestBoardRule(board: WorldQuestScoreboard): string {
 
 const PODIUM_DISPLAY_ORDER: readonly WorldQuestPodiumPlace[] = [2, 1, 3];
 
+const PLACE_MEDAL: Record<WorldQuestPodiumPlace, WorldQuestMedal> = {
+  1: 'gold',
+  2: 'silver',
+  3: 'bronze',
+};
+
 function whole(value: number): string {
   return formatNumber(value, { maximumFractionDigits: 0 });
 }
@@ -234,6 +243,7 @@ function podiumSlot(
       medal: null,
       medalText: '',
       medalArt: null,
+      placeArt: worldQuestMedalArt(PLACE_MEDAL[place]),
       metricText: '',
       me: false,
     };
@@ -246,6 +256,7 @@ function podiumSlot(
     medal: entry.medal,
     medalText: worldQuestMedalText(entry.medal),
     medalArt: entry.medal ? worldQuestMedalArt(entry.medal) : null,
+    placeArt: worldQuestMedalArt(PLACE_MEDAL[place]),
     metricText: worldQuestMetricText(board, entry.metric),
     me: sameName(entry.name, viewerName),
   };

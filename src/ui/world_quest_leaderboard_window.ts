@@ -213,11 +213,11 @@ export class WorldQuestLeaderboardWindow {
     const you = slot.me ? ` <span class="wql-you">(${esc(youLabel)})</span>` : '';
     return (
       `<li class="${classes}" data-wql-place="${slot.place}">` +
-      `<span class="wql-slot-medal"${artStyle('--wql-medal', slot.medalArt)} aria-hidden="true"></span>` +
+      `<span class="wql-slot-medal"${artStyle('--wql-medal', slot.placeArt)} aria-hidden="true"></span>` +
       `<span class="wql-slot-card"><span class="wql-slot-name">${esc(slot.name)}${you}</span>` +
       (slot.filled
         ? `<span class="wql-slot-metric">${esc(slot.metricText)}</span>` +
-          `<span class="wql-slot-medal-text">${esc(slot.medalText)}</span>`
+          `<span class="wql-slot-medal-text">${this.medalCellHtml(slot.medal, slot.medalArt, slot.medalText)}</span>`
         : '') +
       `</span><span class="wql-plinth wql-plinth-${slot.place}">` +
       `<span class="wql-plinth-rank">${esc(slot.rank)}</span></span></li>`

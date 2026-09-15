@@ -3133,9 +3133,11 @@
       0 0 16px #00000080;
   }
   #world-quest-leaderboard-window .wql-slot-empty .wql-slot-medal {
-    background-image: linear-gradient(160deg, #2b1f4a, #120c20);
-    border-color: #4c2f8a;
+    filter: grayscale(0.7) brightness(0.7);
     opacity: 0.7;
+  }
+  #world-quest-leaderboard-window .wql-slot-medal-text .wql-medal {
+    justify-content: center;
   }
   /* The name card the medal disc overlaps; every place shares its height, so
      the stepped plinth under it is what lifts gold above silver and bronze. */
