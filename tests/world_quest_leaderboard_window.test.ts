@@ -62,7 +62,8 @@ describe('world quest rankings window', () => {
     await flush();
     expect(r.worldQuestLeaderboard).toHaveBeenCalledWith('north_watch_cannon', 0, 50, 'Ari');
     expect(r.el.querySelector('#wql-title')?.textContent).toBe('World Quest Rankings');
-    expect(r.el.querySelectorAll('.wql-card')).toHaveLength(6);
+    // Five medal world quests since the barricade horde was removed.
+    expect(r.el.querySelectorAll('.wql-card')).toHaveLength(5);
     const active = r.el.querySelector('.wql-card-active');
     expect(active?.getAttribute('data-wql-board')).toBe('north_watch_cannon');
     expect(active?.getAttribute('aria-pressed')).toBe('true');
@@ -70,7 +71,7 @@ describe('world quest rankings window', () => {
       Array.from(r.el.querySelectorAll('.lbp-slot')).map((s) =>
         s.getAttribute('data-podium-place'),
       ),
-    ).toEqual(['2', '1', '3']);
+    ).toEqual(['1', '2', '3']);
     expect(r.el.querySelectorAll('.wql-row:not(.wql-head)')).toHaveLength(3);
     expect(r.el.querySelector('.wql-self-rank')?.textContent).toBe('Rank 40');
     // Art rides a custom property so the stylesheet gradient stays underneath.
@@ -179,7 +180,7 @@ describe('leaderboard World Quests tab', () => {
     (r.el.querySelector('[data-leaderboard-tab="worldQuests"]') as HTMLButtonElement).click();
     expect(r.el.style.display).toBe('none');
     expect(r.rankings.style.display).toBe('flex');
-    expect(r.rankings.querySelectorAll('.wql-card')).toHaveLength(6);
+    expect(r.rankings.querySelectorAll('.wql-card')).toHaveLength(5);
     expect(r.windowFocusFor).toHaveBeenCalledExactlyOnceWith('#world-quest-leaderboard-window');
     expect(r.el.querySelector('.lb-wq-chips')).toBeNull();
     expect(r.world.worldQuestLeaderboard).toHaveBeenCalledWith('north_watch_cannon', 0, 50, 'Ari');

@@ -13843,6 +13843,7 @@ export function simDictProvidedKeys(lang: SupportedLanguage): ReadonlySet<string
   const provided = new Set<string>();
   const tables: ReadonlyArray<Readonly<Record<string, string>> | undefined> = [
     BASE_DICT[lang],
+    WORLD_QUEST_DICT[lang],
     PET_DICT[lang],
     RAID_BOSS_DIALOGUE_DICT[lang],
     IGNIVAR_DICT[lang],
