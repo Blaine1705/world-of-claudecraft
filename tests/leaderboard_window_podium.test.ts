@@ -97,7 +97,7 @@ describe('leaderboard window podium', () => {
     const { el, lb } = rig({ leaderboard: () => paged(players(4)) });
     await openOn(el, lb);
     const standing = el.querySelector('.lb-standing');
-    expect(standing?.querySelector('.lb-rank')?.textContent).toBe('—');
+    expect(standing?.querySelector('.lb-rank')?.textContent).toBe(String.fromCharCode(0x2014));
     expect(standing?.textContent).toContain('Ari');
   });
 
