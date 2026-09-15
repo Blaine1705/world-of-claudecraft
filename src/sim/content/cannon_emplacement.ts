@@ -77,12 +77,26 @@ const DRESSING: NonNullable<ZonePropsDef['decorProps']> = [
   },
 ];
 
+// A station whose site already carries authored content moves one piece of the
+// arrangement clear of it, by key, instead of re-laying the whole set. The Last Keep
+// battery's stacked crates otherwise cover the Scorched Supply Crate quest pickup at
+// (372, 1968), which the quest needs reachable; they step a yard west and north onto
+// flat ground clear of the pickup, the approach and the rest of the set.
+const STATION_DRESSING_SHIFTS: Readonly<
+  Record<string, Readonly<Record<string, { dx: number; dz: number }>>>
+> = {
+  last_keep_cannon: { kcasCratesStacked: { dx: -1, dz: 1 } },
+};
+
 // Keep the accepted arrangement relative to the station when trying another site.
 export const CANNON_EMPLACEMENT_PROPS: NonNullable<ZonePropsDef['decorProps']> =
   VEHICLE_STATIONS.flatMap((station) =>
-    DRESSING.map((prop) => ({
-      ...prop,
-      x: prop.x - 442 + station.x,
-      z: prop.z - 1034 + station.z,
-    })),
+    DRESSING.map((prop) => {
+      const shift = STATION_DRESSING_SHIFTS[station.id]?.[prop.key];
+      return {
+        ...prop,
+        x: prop.x - 442 + station.x + (shift?.dx ?? 0),
+        z: prop.z - 1034 + station.z + (shift?.dz ?? 0),
+      };
+    }),
   );
