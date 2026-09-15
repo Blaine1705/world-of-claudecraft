@@ -3907,10 +3907,10 @@
     color: var(--gold);
   }
   .lb-medal-silver {
-    color: #c9ccd3;
+    color: var(--color-ranking-place-second);
   }
   .lb-medal-bronze {
-    color: #c98a4b;
+    color: var(--color-ranking-place-third);
   }
   /* The scoreboard chips inside the World Quests tab (a pressed-state group,
      not a second tablist: the tab strip above already owns the tab role). */
@@ -3923,19 +3923,19 @@
   .lb-wq-chip {
     padding: 3px 8px;
     font-size: 11px;
-    color: #cabb8c;
-    background: #ffffff08;
+    color: var(--color-wq-chip-text);
+    background: color-mix(in srgb, var(--color-white) 3.1%, transparent);
     border: 1px solid var(--color-border-showcase);
     border-radius: 3px;
     cursor: pointer;
   }
   .lb-wq-chip:hover {
-    background: #ffffff12;
+    background: color-mix(in srgb, var(--color-white) 7.1%, transparent);
   }
   .lb-wq-chip-active {
     color: var(--gold);
-    background: #f5c84322;
-    border-color: #b8902a;
+    background: color-mix(in srgb, var(--color-wq-chip-active) 13.3%, transparent);
+    border-color: var(--color-wq-chip-active-edge);
   }
   /* The World Quest rankings window (world_quest_leaderboard_window.ts): the
      weekly ledger chrome (violet gradients, gold rules, clipped corners) over
@@ -3952,23 +3952,32 @@
     overflow: hidden;
     min-height: 0;
     background:
-      radial-gradient(ellipse 60% 40% at 50% 0%, #6d3fd42e, transparent 60%),
-      linear-gradient(180deg, #1c1531f5, #120c20f5 40%, #0c0816f8);
-    border-color: #8f6a2c;
+      radial-gradient(
+        ellipse 60% 40% at 50% 0%,
+        color-mix(in srgb, var(--color-ranking-ground-glow) 18%, transparent),
+        transparent 60%
+      ),
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--color-ranking-ground-top) 96%, transparent),
+        color-mix(in srgb, var(--color-ranking-ground) 96%, transparent) 40%,
+        color-mix(in srgb, var(--color-ranking-ground-deep) 97.3%, transparent)
+      );
+    border-color: var(--color-wq-ranking-edge);
     container-type: inline-size;
     padding: clamp(10px, 1.2cqw, 20px) clamp(12px, 1.6cqw, 26px);
   }
   #world-quest-leaderboard-window .wql-title span:first-child {
     font-size: clamp(18px, 2.2cqw, 32px);
     letter-spacing: 0.03em;
-    color: #fbf6ff;
+    color: var(--color-ranking-text);
     text-shadow:
-      0 1px 0 #000,
-      0 0 18px #c4a6ff55;
+      0 1px 0 var(--color-keyline),
+      0 0 18px color-mix(in srgb, var(--color-ranking-emphasis) 33.3%, transparent);
   }
   #world-quest-leaderboard-window .wql-sub {
     text-align: center;
-    color: #c4a6ff;
+    color: var(--color-ranking-emphasis);
     font-family: var(--font-serif);
     font-size: clamp(12px, 1.05cqw, 16px);
     margin: -4px 0 clamp(6px, 0.7cqw, 10px);
@@ -3987,14 +3996,19 @@
     padding: clamp(5px, 0.6cqw, 9px);
     font: inherit;
     text-align: center;
-    color: #f1e9ff;
+    color: var(--color-wq-ranking-text-bright);
     cursor: pointer;
-    background: linear-gradient(180deg, #1c1531f2, #120c20f2 40%, #0c0816f5);
-    border: 1px solid #8f6a2c;
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-ranking-ground-top) 95%, transparent),
+      color-mix(in srgb, var(--color-ranking-ground) 95%, transparent) 40%,
+      color-mix(in srgb, var(--color-ranking-ground-deep) 96%, transparent)
+    );
+    border: 1px solid var(--color-wq-ranking-edge);
     box-shadow:
-      inset 0 0 0 1px #000,
-      inset 0 0 0 2px #d4a95522,
-      0 8px 18px #000a;
+      inset 0 0 0 1px var(--color-keyline),
+      inset 0 0 0 2px color-mix(in srgb, var(--color-wq-ranking-gilt) 13.3%, transparent),
+      0 8px 18px color-mix(in srgb, var(--color-keyline) 66.7%, transparent);
     clip-path: polygon(
       0 7px,
       7px 0,
@@ -4007,15 +4021,15 @@
     );
   }
   #world-quest-leaderboard-window .wql-card:hover {
-    border-color: #c4a6ff;
+    border-color: var(--color-ranking-emphasis);
   }
   #world-quest-leaderboard-window .wql-card-active {
-    border-color: #8b5cf6;
+    border-color: var(--color-ranking-selected);
     box-shadow:
-      inset 0 0 0 1px #000,
-      inset 0 0 0 2px #8b5cf655,
-      0 8px 18px #000a,
-      0 0 22px #8b5cf666;
+      inset 0 0 0 1px var(--color-keyline),
+      inset 0 0 0 2px color-mix(in srgb, var(--color-ranking-selected) 33.3%, transparent),
+      0 8px 18px color-mix(in srgb, var(--color-keyline) 66.7%, transparent),
+      0 0 22px color-mix(in srgb, var(--color-ranking-selected) 40%, transparent);
   }
   #world-quest-leaderboard-window .wql-card:not(.wql-card-active) .wql-card-art {
     filter: saturate(0.7) brightness(0.8);
@@ -4023,30 +4037,40 @@
   #world-quest-leaderboard-window .wql-card-art {
     display: block;
     aspect-ratio: 21 / 9;
-    background-color: #120b20;
+    background-color: var(--color-wq-ranking-art-ground);
     background-image:
-      var(--wql-art, none), radial-gradient(ellipse at 50% 35%, #6d3fd455, transparent 70%),
-      linear-gradient(160deg, #2b1f4a, #120c20 60%, #3a2d12);
+      var(--wql-art, none),
+      radial-gradient(
+        ellipse at 50% 35%,
+        color-mix(in srgb, var(--color-ranking-ground-glow) 33.3%, transparent),
+        transparent 70%
+      ),
+      linear-gradient(
+        160deg,
+        var(--color-wq-ranking-art-violet),
+        var(--color-ranking-ground) 60%,
+        var(--color-wq-ranking-art-bronze)
+      );
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
-    border: 1px solid #8f6a2c;
-    box-shadow: inset 0 0 0 1px #000;
+    border: 1px solid var(--color-wq-ranking-edge);
+    box-shadow: inset 0 0 0 1px var(--color-keyline);
   }
   #world-quest-leaderboard-window .wql-card-name {
     font-family: var(--title-font);
     font-size: clamp(11px, 1.15cqw, 17px);
     line-height: 1.15;
-    color: #fbf6ff;
-    text-shadow: 0 1px 0 #000;
+    color: var(--color-ranking-text);
+    text-shadow: 0 1px 0 var(--color-keyline);
     overflow-wrap: anywhere;
   }
   #world-quest-leaderboard-window .wql-card-active .wql-card-name {
-    color: #f2d998;
+    color: var(--color-wq-ranking-heading);
   }
   #world-quest-leaderboard-window .wql-card-metric {
     font-size: clamp(10px, 0.9cqw, 13px);
-    color: #a99bc8;
+    color: var(--color-ranking-text-muted);
   }
   /* The selected board is itself a flex column: the header, podium and pager
      keep their natural height and the rest of the ladder takes what is left,
@@ -4059,11 +4083,15 @@
     overflow: hidden;
     margin-top: clamp(6px, 0.8cqw, 12px);
     padding: clamp(6px, 0.8cqw, 12px) clamp(8px, 1cqw, 16px);
-    background: linear-gradient(180deg, #150f26e6, #0c0816f0);
-    border: 1px solid #8f6a2c;
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-ranking-well) 90.2%, transparent),
+      color-mix(in srgb, var(--color-ranking-ground-deep) 94%, transparent)
+    );
+    border: 1px solid var(--color-wq-ranking-edge);
     box-shadow:
-      inset 0 0 0 1px #000,
-      inset 0 0 0 2px #d4a95518;
+      inset 0 0 0 1px var(--color-keyline),
+      inset 0 0 0 2px color-mix(in srgb, var(--color-wq-ranking-gilt) 9.4%, transparent);
   }
   #world-quest-leaderboard-window .wql-board-head {
     display: flex;
@@ -4078,25 +4106,25 @@
   #world-quest-leaderboard-window .wql-board-title {
     font-family: var(--title-font);
     font-size: clamp(15px, 1.6cqw, 24px);
-    color: #f2d998;
-    text-shadow: 0 1px 0 #000;
+    color: var(--color-wq-ranking-heading);
+    text-shadow: 0 1px 0 var(--color-keyline);
   }
   #world-quest-leaderboard-window .wql-board-rule,
   #world-quest-leaderboard-window .wql-total {
     font-family: var(--font-serif);
     font-style: italic;
     font-size: clamp(12px, 1.1cqw, 16px);
-    color: #c9bde4;
+    color: var(--color-ranking-text-soft);
   }
   #world-quest-leaderboard-window .wql-state {
     padding: clamp(24px, 4cqw, 60px) 12px;
     text-align: center;
     font-family: var(--font-serif);
     font-size: clamp(13px, 1.3cqw, 19px);
-    color: #c9bde4;
+    color: var(--color-ranking-text-soft);
   }
   #world-quest-leaderboard-window .wql-error {
-    color: #ff9a8a;
+    color: var(--color-wq-ranking-error);
   }
   #world-quest-leaderboard-window .lbp-podium {
     display: grid;
@@ -4111,7 +4139,7 @@
     list-style: none;
   }
   #world-quest-leaderboard-window .lbp-slot {
-    --lbp-tint: #d4a955;
+    --lbp-tint: var(--color-wq-ranking-gilt);
     grid-row: 1;
     display: flex;
     flex-direction: column;
@@ -4127,12 +4155,12 @@
     grid-column: 2;
   }
   #world-quest-leaderboard-window .lbp-slot-2 {
-    --lbp-tint: #c9ccd3;
+    --lbp-tint: var(--color-ranking-place-second);
     --lbp-medal: url("/ui/world-quests/leaderboard/medal_silver.webp");
     grid-column: 1;
   }
   #world-quest-leaderboard-window .lbp-slot-3 {
-    --lbp-tint: #c98a4b;
+    --lbp-tint: var(--color-ranking-place-third);
     --lbp-medal: url("/ui/world-quests/leaderboard/medal_bronze.webp");
     grid-column: 3;
   }
@@ -4143,17 +4171,22 @@
     height: clamp(36px, 3.6cqw, 50px);
     margin-bottom: calc(clamp(36px, 3.6cqw, 50px) / -2);
     border-radius: 50%;
-    background-color: #120b20;
+    background-color: var(--color-wq-ranking-art-ground);
     background-image:
-      var(--lbp-medal, none), radial-gradient(circle at 35% 30%, #ffffff33, transparent 55%),
-      linear-gradient(160deg, var(--lbp-tint), #2b1f4a);
+      var(--lbp-medal, none),
+      radial-gradient(
+        circle at 35% 30%,
+        color-mix(in srgb, var(--color-white) 20%, transparent),
+        transparent 55%
+      ),
+      linear-gradient(160deg, var(--lbp-tint), var(--color-wq-ranking-art-violet));
     background-position: center;
     background-size: cover;
     border: 2px solid var(--lbp-tint);
     box-shadow:
-      0 0 0 2px #0a0713,
-      0 6px 14px #000c,
-      0 0 16px #00000080;
+      0 0 0 2px var(--color-wq-ranking-medal-ring),
+      0 6px 14px color-mix(in srgb, var(--color-keyline) 80%, transparent),
+      0 0 16px color-mix(in srgb, var(--color-keyline) 50.2%, transparent);
   }
   #world-quest-leaderboard-window .lbp-slot-empty .lbp-slot-medal {
     filter: grayscale(0.7) brightness(0.7);
@@ -4174,10 +4207,10 @@
     box-sizing: border-box;
     background:
       linear-gradient(180deg, color-mix(in srgb, var(--lbp-tint) 22%, transparent), transparent 75%),
-      linear-gradient(180deg, #2a1f47, #150f24);
+      linear-gradient(180deg, var(--color-ranking-control), var(--color-wq-ranking-card-deep));
     border: 1px solid var(--lbp-tint);
     border-bottom: 0;
-    box-shadow: inset 0 1px 0 #ffffff1a;
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--color-white) 10.2%, transparent);
     clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%, 0 10px);
   }
   #world-quest-leaderboard-window .lbp-plinth {
@@ -4188,14 +4221,14 @@
     box-sizing: border-box;
     background: linear-gradient(
       180deg,
-      color-mix(in srgb, var(--lbp-tint) 34%, #150f24),
-      #120c20 85%
+      color-mix(in srgb, var(--lbp-tint) 34%, var(--color-wq-ranking-card-deep)),
+      var(--color-ranking-ground) 85%
     );
     border: 1px solid var(--lbp-tint);
     border-bottom-width: 3px;
     box-shadow:
-      inset 0 1px 0 #ffffff26,
-      0 8px 20px #000b;
+      inset 0 1px 0 color-mix(in srgb, var(--color-white) 15%, transparent),
+      0 8px 20px color-mix(in srgb, var(--color-keyline) 73.3%, transparent);
   }
   #world-quest-leaderboard-window .lbp-plinth-1 {
     height: clamp(40px, 4.2cqw, 58px);
@@ -4212,8 +4245,8 @@
     line-height: 1.25;
     font-family: var(--title-font);
     font-size: clamp(12px, 1.2cqw, 17px);
-    color: #fbf6ff;
-    text-shadow: 0 1px 0 #000;
+    color: var(--color-ranking-text);
+    text-shadow: 0 1px 0 var(--color-keyline);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -4221,17 +4254,17 @@
   #world-quest-leaderboard-window .lbp-slot-empty .lbp-slot-name {
     font-family: var(--font-serif);
     font-style: italic;
-    color: #8d82a8;
+    color: var(--color-wq-ranking-text-faint);
   }
   #world-quest-leaderboard-window .lbp-slot-metric {
     font-size: clamp(13px, 1.3cqw, 19px);
     font-weight: 700;
     color: var(--lbp-tint);
-    text-shadow: 0 1px 0 #000;
+    text-shadow: 0 1px 0 var(--color-keyline);
   }
   #world-quest-leaderboard-window .lbp-slot-detail {
     font-size: clamp(11px, 1cqw, 14px);
-    color: #c9bde4;
+    color: var(--color-ranking-text-soft);
   }
   #world-quest-leaderboard-window .lbp-slot-metric,
   #world-quest-leaderboard-window .lbp-slot-detail {
@@ -4244,12 +4277,12 @@
     line-height: 1;
     color: var(--lbp-tint);
     opacity: 0.9;
-    text-shadow: 0 2px 0 #000;
+    text-shadow: 0 2px 0 var(--color-keyline);
   }
   #world-quest-leaderboard-window .lbp-mine .lbp-slot-card {
     box-shadow:
-      inset 0 1px 0 #ffffff1a,
-      inset 0 0 18px #8b5cf666;
+      inset 0 1px 0 color-mix(in srgb, var(--color-white) 10.2%, transparent),
+      inset 0 0 18px color-mix(in srgb, var(--color-ranking-selected) 40%, transparent);
   }
   #world-quest-leaderboard-window .wql-list {
     flex: 1 1 auto;
@@ -4267,28 +4300,32 @@
     gap: 8px;
     padding: 5px 10px;
     font-size: clamp(12px, 1.15cqw, 16px);
-    color: #f1e9ff;
+    color: var(--color-wq-ranking-text-bright);
   }
   #world-quest-leaderboard-window .wql-row:nth-child(even) {
-    background: #ffffff07;
+    background: color-mix(in srgb, var(--color-white) 2.7%, transparent);
   }
   #world-quest-leaderboard-window .wql-row.wql-head {
     font-family: var(--title-font);
     font-size: clamp(11px, 1cqw, 14px);
-    color: #f2d998;
+    color: var(--color-wq-ranking-heading);
     position: sticky;
     top: 0;
     z-index: 1;
-    background: #130d22;
-    border-bottom: 1px solid #d4a95544;
+    background: var(--color-wq-ranking-head-ground);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-wq-ranking-gilt) 26.7%, transparent);
   }
   #world-quest-leaderboard-window .wql-row.wql-mine {
-    background: linear-gradient(90deg, #8b5cf633, #8b5cf60f 70%);
-    box-shadow: inset 2px 0 0 #8b5cf6;
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--color-ranking-selected) 20%, transparent),
+      color-mix(in srgb, var(--color-ranking-selected) 5.9%, transparent) 70%
+    );
+    box-shadow: inset 2px 0 0 var(--color-ranking-selected);
   }
   #world-quest-leaderboard-window .wql-rank {
     font-weight: 700;
-    color: #c4a6ff;
+    color: var(--color-ranking-emphasis);
   }
   #world-quest-leaderboard-window .wql-name {
     overflow: hidden;
@@ -4296,37 +4333,42 @@
     white-space: nowrap;
   }
   #world-quest-leaderboard-window .wql-you {
-    color: #c4a6ff;
+    color: var(--color-ranking-emphasis);
   }
   #world-quest-leaderboard-window .wql-medal {
     display: flex;
     align-items: center;
     gap: 6px;
-    color: #8d82a8;
+    color: var(--color-wq-ranking-text-faint);
   }
   #world-quest-leaderboard-window .wql-medal-gold {
-    --wql-tint: #d4a955;
-    color: #f2d998;
+    --wql-tint: var(--color-wq-ranking-gilt);
+    color: var(--color-wq-ranking-heading);
   }
   #world-quest-leaderboard-window .wql-medal-silver {
-    --wql-tint: #c9ccd3;
-    color: #dfe2e8;
+    --wql-tint: var(--color-ranking-place-second);
+    color: var(--color-wq-ranking-silver-text);
   }
   #world-quest-leaderboard-window .wql-medal-bronze {
-    --wql-tint: #c98a4b;
-    color: #e0a36a;
+    --wql-tint: var(--color-ranking-place-third);
+    color: var(--color-wq-ranking-bronze-text);
   }
   #world-quest-leaderboard-window .wql-medal-icon {
     flex: none;
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background-color: #120b20;
+    background-color: var(--color-wq-ranking-art-ground);
     background-image:
-      var(--wql-medal, none), linear-gradient(160deg, var(--wql-tint, #4c2f8a), #2b1f4a);
+      var(--wql-medal, none),
+      linear-gradient(
+        160deg,
+        var(--wql-tint, var(--color-ranking-control-border)),
+        var(--color-wq-ranking-art-violet)
+      );
     background-position: center;
     background-size: cover;
-    border: 1px solid var(--wql-tint, #4c2f8a);
+    border: 1px solid var(--wql-tint, var(--color-ranking-control-border));
   }
   #world-quest-leaderboard-window .wql-metric {
     text-align: right;
@@ -4340,18 +4382,22 @@
     gap: 12px;
     flex: none;
     margin-top: 6px;
-    color: #c9bde4;
+    color: var(--color-ranking-text-soft);
   }
   #world-quest-leaderboard-window .wql-page-btn {
     font-family: var(--title-font);
-    color: #f1e9ff;
+    color: var(--color-wq-ranking-text-bright);
     padding: 6px 14px;
     cursor: pointer;
-    background: linear-gradient(180deg, #2a1f47, #150f24);
-    border: 1px solid #4c2f8a;
+    background: linear-gradient(
+      180deg,
+      var(--color-ranking-control),
+      var(--color-wq-ranking-card-deep)
+    );
+    border: 1px solid var(--color-ranking-control-border);
   }
   #world-quest-leaderboard-window .wql-page-btn:hover:not(:disabled) {
-    border-color: #c4a6ff;
+    border-color: var(--color-ranking-emphasis);
   }
   #world-quest-leaderboard-window .wql-page-btn:disabled {
     cursor: default;
@@ -4368,9 +4414,13 @@
     padding: clamp(6px, 0.7cqw, 11px) clamp(18px, 2.4cqw, 40px);
     max-width: 90cqw;
     font-size: clamp(12px, 1.2cqw, 18px);
-    color: #f1e9ff;
-    border: 1px solid #8f6a2c;
-    background: linear-gradient(180deg, #2a1f47f0, #0e0a1af0);
+    color: var(--color-wq-ranking-text-bright);
+    border: 1px solid var(--color-wq-ranking-edge);
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-ranking-control) 94%, transparent),
+      color-mix(in srgb, var(--color-wq-ranking-self-deep) 94%, transparent)
+    );
     clip-path: polygon(
       14px 0,
       calc(100% - 14px) 0,
@@ -4382,16 +4432,16 @@
   }
   #world-quest-leaderboard-window .wql-self-label {
     font-family: var(--title-font);
-    color: #f2d998;
+    color: var(--color-wq-ranking-heading);
   }
   #world-quest-leaderboard-window .wql-self-rank {
     font-weight: 700;
-    color: #c4a6ff;
+    color: var(--color-ranking-emphasis);
   }
   #world-quest-leaderboard-window .wql-self-none {
     font-family: var(--font-serif);
     font-style: italic;
-    color: #c9bde4;
+    color: var(--color-ranking-text-soft);
   }
   /* .lb-scope-note is the Renown tab's account-scope teaching line, visible
      on every deeds-board state (never a title-attr tooltip: touch has none). */

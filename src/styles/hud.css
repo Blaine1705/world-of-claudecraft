@@ -161,14 +161,19 @@
   .forge-action-bar .forge-heat .vehicle-integrity-fill {
     transform: scaleX(var(--vehicle-integrity));
     transform-origin: left;
-    background: linear-gradient(90deg, #7a2d12, #f0a030);
+    background: linear-gradient(90deg, var(--color-forge-heat-cold), var(--color-forge-heat-hot));
   }
   .forge-meter {
     position: relative;
     height: 26px;
     border: 2px ridge var(--border);
     border-radius: 6px;
-    background: linear-gradient(90deg, #2a2320, #4a3a2a 50%, #2a2320);
+    background: linear-gradient(
+      90deg,
+      var(--color-forge-meter-iron),
+      var(--color-forge-meter-iron-light) 50%,
+      var(--color-forge-meter-iron)
+    );
     overflow: hidden;
   }
   .forge-meter-band {
@@ -177,13 +182,13 @@
     bottom: 0;
     left: calc(var(--forge-band-start, 0.4) * 100%);
     width: calc((var(--forge-band-end, 0.6) - var(--forge-band-start, 0.4)) * 100%);
-    background: rgba(12, 8, 6, 0.85);
-    border-left: 1px solid #b07a3a;
-    border-right: 1px solid #b07a3a;
+    background: var(--color-forge-band);
+    border-left: 1px solid var(--color-forge-band-edge);
+    border-right: 1px solid var(--color-forge-band-edge);
   }
   .forge-meter.in-band .forge-meter-band {
-    background: rgba(60, 20, 8, 0.95);
-    box-shadow: inset 0 0 8px #ffb347;
+    background: var(--color-forge-band-hot);
+    box-shadow: inset 0 0 8px var(--color-forge-band-glow);
   }
   .forge-meter-needle {
     position: absolute;
@@ -192,8 +197,8 @@
     left: calc(var(--forge-needle, 0) * 100%);
     width: 4px;
     margin-left: -2px;
-    background: #f5e6c8;
-    box-shadow: 0 0 6px #fff3c4;
+    background: var(--color-forge-needle);
+    box-shadow: 0 0 6px var(--color-forge-needle-glow);
   }
   .forge-meter:not(.working) .forge-meter-needle {
     opacity: 0.35;

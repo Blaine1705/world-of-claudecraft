@@ -17,6 +17,20 @@
     --color-vehicle-integrity: #2f8c4a;
     --color-vehicle-danger: #b72b27;
     --color-vehicle-text: #ffffff;
+    /* The forge workshop bar (hud.css .forge-action-bar / .forge-meter): the
+       heat gauge ramp, the iron timing meter, its strike band (cold and in-band
+       hot) and the needle. Fixed craft colors over the vehicle bar; no preset
+       re-emits them. */
+    --color-forge-heat-cold: #7a2d12;
+    --color-forge-heat-hot: #f0a030;
+    --color-forge-meter-iron: #2a2320;
+    --color-forge-meter-iron-light: #4a3a2a;
+    --color-forge-band: rgba(12, 8, 6, 0.85);
+    --color-forge-band-edge: #b07a3a;
+    --color-forge-band-hot: rgba(60, 20, 8, 0.95);
+    --color-forge-band-glow: #ffb347;
+    --color-forge-needle: #f5e6c8;
+    --color-forge-needle-glow: #fff3c4;
     --gold: #ffd100;
     --gold-dim: #c8a838;
     /* The deed-unlock banner plate (#banner.banner-deed). Echoes the Book of
@@ -1182,6 +1196,30 @@
     --color-ranking-text-muted: #a99bc8;
     --color-ranking-place-second: #c9ccd3;
     --color-ranking-place-third: #c98a4b;
+    /* The World Quest rankings window (#world-quest-leaderboard-window, the
+       .wql-* and .lbp-* rules in components.css) and the World Quests tab
+       chips (.lb-wq-*). The window stands on the same fixed ranking ground and
+       reads the --color-ranking-* steps above wherever its value matches one;
+       these are the values it spells that no ranking or gold ramp step
+       matches exactly. Fixed like the ranking family: no preset re-emits them. */
+    --color-wq-ranking-edge: #8f6a2c;
+    --color-wq-ranking-gilt: #d4a955;
+    --color-wq-ranking-heading: #f2d998;
+    --color-wq-ranking-text-bright: #f1e9ff;
+    --color-wq-ranking-text-faint: #8d82a8;
+    --color-wq-ranking-error: #ff9a8a;
+    --color-wq-ranking-art-ground: #120b20;
+    --color-wq-ranking-art-violet: #2b1f4a;
+    --color-wq-ranking-art-bronze: #3a2d12;
+    --color-wq-ranking-medal-ring: #0a0713;
+    --color-wq-ranking-card-deep: #150f24;
+    --color-wq-ranking-head-ground: #130d22;
+    --color-wq-ranking-self-deep: #0e0a1a;
+    --color-wq-ranking-silver-text: #dfe2e8;
+    --color-wq-ranking-bronze-text: #e0a36a;
+    --color-wq-chip-text: #cabb8c;
+    --color-wq-chip-active: #f5c843;
+    --color-wq-chip-active-edge: #b8902a;
     /* target size */
     /* Stance socket on a coarse pointer: the same 40px box, kept as its own
        token so touch can diverge from the desktop row without a rule rewrite. */
