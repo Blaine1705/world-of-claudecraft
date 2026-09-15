@@ -18,7 +18,6 @@
 // incoming stack is NOT part of `inventory`: a caller repacking a held stack
 // takes it out first, which is also where a transfer strips the owner's grouping.
 
-import { isMergeableInstancePayload } from './item_instance_merge';
 import { type MaterialComposition, mergeMaterialCompositions } from './material_sources';
 import {
   compatibleMaterialStacks,
@@ -133,9 +132,19 @@ function buildPackingModel(request: MaterialPackRequest): MaterialPackingResult<
     room = addUpTo(room, free, want);
   }
 
-  // A charge-bearing or locked payload stays one per slot (the bags rule), so
-  // each fresh stack absorbs one unit rather than a full cap.
-  const perFreshSlot = isMergeableInstancePayload(arriving.value.instance) ? stackSize : 1;
+  // Only a CHARGE-bearing payload stays one per fresh slot: charges are the one
+  // payload field with mutate-in-place per-unit semantics, so distinct units
+  // cannot share a slot (bags.ts instancedCountCap draws the same line for the
+  // load path). A LOCKED payload has no such per-unit identity: locking is one
+  // flag over the WHOLE counted stack (item_lock.ts setItemLocked locks every
+  // unit in place, never peeling one off), so it packs a fresh slot up to the
+  // normal cap exactly like an unlocked stack. `isMergeableInstancePayload`
+  // still keeps two SEPARATE locked (or charged) stacks from topping up into
+  // one another above (compatibleMaterialStacks): that anti-taint rule is a
+  // different question from how big ONE incoming stack's fresh slots are, and
+  // conflating the two was what split a whole locked stack into one-unit
+  // slots on every deposit into a new container (vault, bank, guild bank).
+  const perFreshSlot = arriving.value.instance?.charges === undefined ? stackSize : 1;
   room = addUpTo(room, freshSlotRoom(maxNewSlots, perFreshSlot, want), want);
   return succeed({ incoming: arriving.value, targets, perFreshSlot, fit: room });
 }

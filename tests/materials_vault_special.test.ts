@@ -278,3 +278,47 @@ describe('identity-preserving Materials Vault stacks', () => {
     expect(meta.deedStats.visited.has('quality:rare')).toBe(true);
   });
 });
+
+// Locking a stack of material is one flag over the WHOLE counted stack
+// (item_lock.ts setItemLocked), never a per-unit identity like a charge-bearing
+// payload; a deposit into the vault's identity collection must land it as ONE
+// row carrying the full count, exactly like an unlocked stack would, rather
+// than splitting it into a row per unit (the material_stack_packing.ts
+// perFreshSlot regression a player hit locking a stack of 20 and depositing).
+describe('a LOCKED material stack deposits as one whole vault row, never one row per unit', () => {
+  it('vaultDeposit: lands the whole locked stack in a single special row', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const meta = metaOf(sim);
+    meta.inventory.push({ itemId: 'bone_fragments', count: 20 });
+
+    sim.setItemLocked('bone_fragments', true, pid, 0);
+    expect(meta.inventory).toHaveLength(1);
+    expect(meta.inventory[0].instance).toEqual({ locked: true });
+
+    sim.vaultDeposit(0);
+
+    expect(meta.inventory).toEqual([]);
+    expect(meta.vault.stock).toEqual({});
+    const rows = meta.vault.special.filter((s) => s.itemId === 'bone_fragments');
+    expect(rows).toHaveLength(1);
+    expect(rows[0].count).toBe(20);
+    expect(rows[0].instance).toEqual({ locked: true });
+    expect(vaultStoredCount(meta.vault, 'bone_fragments')).toBe(20);
+  });
+
+  it('vaultDepositAll ("add all materials"): the same whole-stack result as the targeted deposit', () => {
+    const sim = makeSim();
+    const meta = metaOf(sim);
+    meta.inventory.push({ itemId: 'bone_fragments', count: 20 });
+
+    sim.setItemLocked('bone_fragments', true, sim.playerId, 0);
+    sim.vaultDepositAll();
+
+    expect(meta.inventory).toEqual([]);
+    const rows = meta.vault.special.filter((s) => s.itemId === 'bone_fragments');
+    expect(rows).toHaveLength(1);
+    expect(rows[0].count).toBe(20);
+    expect(rows[0].instance).toEqual({ locked: true });
+  });
+});
