@@ -77,3 +77,22 @@ export function nextNpcTarget(
   if (at < 0) return list[step === 1 ? 0 : list.length - 1].id;
   return list[(at + step + list.length) % list.length].id;
 }
+
+/** The world the pad cycles through: its entities, the viewer's own player, and the
+ *  personal quest visibility that hides disguised and shadow guards. */
+export interface NpcCycleWorld extends InvestigationVisibilityReader {
+  entities: { values(): Iterable<CycleEntity> };
+  player: { pos: { x: number; z: number }; targetId?: number | null };
+}
+
+/** nextNpcTarget from the world's own player and target, honoring its visibility. */
+export function nextNpcTargetForWorld(world: NpcCycleWorld, step: 1 | -1): number | null {
+  return nextNpcTarget(
+    world.entities.values(),
+    world.player.pos,
+    world.player.targetId ?? null,
+    step,
+    NPC_CYCLE_RANGE,
+    world,
+  );
+}

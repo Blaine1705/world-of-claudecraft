@@ -1,6 +1,7 @@
 import { GLIDER_QUEST_ID } from '../sim/content/world_quest_glider';
 import { wispMazeActionsLocked } from '../sim/wisp_maze_action_lock';
 import type { IWorld } from '../world_api';
+import { diagonalMovementVisualFacing, type MovementVisualInput } from './movement_visual';
 
 /** Countdown and flight both belong to the authoritative flight kernel. */
 export function gliderControlsActive(world: Pick<IWorld, 'worldQuestLog'>): boolean {
@@ -38,4 +39,33 @@ export function resolveGliderMove(world: Pick<IWorld, 'worldQuestLog'>, input: G
     mi: input.readMoveInput(),
     facing: maze ? (input.isMouselookActive() ? input.camYaw : null) : gliderCameraFacing(input),
   };
+}
+
+/** The input callbacks for the activity kernels: a manned cannon pauses camera motion
+ *  and glider flight steers by the flight kernel. Both read the world live. */
+export function activityInputLocks(
+  world: Pick<IWorld, 'worldQuestLog'> & { readonly vehicleSession: unknown },
+): { isCameraMotionLocked: () => boolean; isGliderActive: () => boolean } {
+  return {
+    isCameraMotionLocked: () => world.vehicleSession !== null,
+    isGliderActive: () => gliderControlsActive(world),
+  };
+}
+
+/** The local diagonal visual yaw, withheld while the flight kernel owns facing. */
+export function gliderAwareVisualFacing(
+  world: Pick<IWorld, 'worldQuestLog'>,
+  mi: MovementVisualInput,
+  baseFacing: number,
+): number | null {
+  return gliderControlsActive(world) ? null : diagonalMovementVisualFacing(mi, baseFacing);
+}
+
+/** Local movement freezes through a mount race countdown and while a cannon is manned;
+ *  the sim enforces both locks independently. */
+export function raceOrVehicleMovementLocked(world: {
+  mountRaceView(): { phase: string } | null;
+  readonly vehicleSession: unknown;
+}): boolean {
+  return world.mountRaceView()?.phase === 'countdown' || world.vehicleSession !== null;
 }

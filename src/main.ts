@@ -98,12 +98,7 @@ import { createGamepadSettingApplier } from './game/gamepad_settings';
 import { isGameplayInputBlocked } from './game/gameplay_input_gate';
 import { handleGatherNodeInteract } from './game/gather_node_interact';
 import { gatherToolProfessionFor, nearestGatherNodeForProfession } from './game/gather_tool_use';
-import {
-  gliderCameraFacing,
-  gliderControlsActive,
-  resolveGliderMove,
-  scriptedMovementActive,
-} from './game/glider_controls';
+import * as glider from './game/glider_controls';
 import { publishGpuHitchRuntimeReceipt } from './game/gpu_hitch_receipt';
 import { GraphicsRebuildCoordinator } from './game/graphics_rebuild_coordinator';
 import {
@@ -166,10 +161,9 @@ import { applyMobileHudLayout } from './game/mobile_hud_layout_applier';
 import { watchMobileMoreState } from './game/mobile_more_diagnostics';
 import { mobilePlatform, mobilePreflightCopy } from './game/mobile_preflight';
 import { mouselookReleaseFacing } from './game/mouselook_release';
-import { diagonalMovementVisualFacing } from './game/movement_visual';
 import { music } from './game/music';
 import { tryNearbyInteraction } from './game/nearby_interaction';
-import { nextNpcTarget } from './game/npc_cycle';
+import { nextNpcTargetForWorld } from './game/npc_cycle';
 import { isOfflineModeAvailable } from './game/offline_mode_gate';
 import { offlineWorldConfig } from './game/offline_world_config';
 import { interpolatedOnlineSelfFacing } from './game/online_facing_mirror';
@@ -1881,10 +1875,9 @@ async function startGame(
       onClickPick: (x, y, button) => handlePick(x, y, button),
       onAttackMove: (x, y) => handleAttackMove(x, y),
       canUseGameKeys: () => !gameplayInputBlocked(),
-      // Interface arrangement claims the mouse for frame drags.
+      // The "Unlock interface" arrange mode claims the mouse for frame drags.
       isCameraLocked: () => hud.isInterfaceUnlocked(),
-      isCameraMotionLocked: () => world.vehicleSession !== null,
-      isGliderActive: () => gliderControlsActive(world),
+      ...glider.activityInputLocks(world),
     },
     keybinds,
   );
@@ -1896,6 +1889,7 @@ async function startGame(
     chatOpen: chatInput.style.display === 'block',
     gameInputReady,
   }));
+
   // The ring's attack toggle acquires the nearest attackable enemy when tapped
   // with no live hostile target (the HUD falls back to plain castSlot(0) until
   // this is wired); the Target button cycles targets via the Tab path below.
@@ -2101,17 +2095,12 @@ async function startGame(
       case 'targetFriendly':
         world.targetNearestFriendly();
         break;
-      // NPC selection follows the same personal visibility as interaction.
+      // Selecting the people you talk to. The sim's friendly cycle answers heal
+      // eligibility and so skips every quest giver, which left a pad player with
+      // no way to pick one; targetEntity is the seam that already exists for it.
       case 'targetNpcNext':
       case 'targetNpcPrev': {
-        const next = nextNpcTarget(
-          world.entities.values(),
-          world.player.pos,
-          world.player.targetId ?? null,
-          id === 'targetNpcNext' ? 1 : -1,
-          undefined,
-          world,
-        );
+        const next = nextNpcTargetForWorld(world, id === 'targetNpcNext' ? 1 : -1);
         if (next !== null) world.targetEntity(next);
         break;
       }
@@ -3982,7 +3971,7 @@ async function startGame(
     playerFacing: number,
     latencyMs = 0,
   ): { mi: ReturnType<typeof input.readMoveInput>; facing: number | null } {
-    const flight = resolveGliderMove(world, input);
+    const flight = glider.resolveGliderMove(world, input);
     if (flight) return flight;
     attackMoveTick();
     const mi = input.readMoveInput();
@@ -4202,7 +4191,9 @@ async function startGame(
   });
 
   function renderFacingOverride(): number | null {
-    if (gliderControlsActive(world)) return gliderCameraFacing(input);
+    if (glider.gliderControlsActive(world)) return glider.gliderCameraFacing(input);
+    // A ghost (dead && ghost) is not movement-frozen and keeps camera-driven
+    // facing; only a corpse-bound dead player loses it, so pass movementFrozen().
     return isCameraDrivenFacingActive(
       input.isMouseCameraMode(),
       cameraMoveActive(),
@@ -4214,7 +4205,7 @@ async function startGame(
   }
 
   function cameraMoveActive(): boolean {
-    if (!input.isMouseCameraMode() || gliderControlsActive(world)) return false;
+    if (!input.isMouseCameraMode() || glider.gliderControlsActive(world)) return false;
     const mi = input.readMoveInput();
     return !!(mi.forward || mi.back || mi.strafeLeft || mi.strafeRight) && !movementFrozen();
   }
@@ -4248,9 +4239,7 @@ async function startGame(
     mi: ReturnType<typeof input.readMoveInput>,
     baseFacing: number,
   ): number | null {
-    return !movementFrozen() && !gliderControlsActive(world)
-      ? diagonalMovementVisualFacing(mi, baseFacing)
-      : null;
+    return !movementFrozen() ? glider.gliderAwareVisualFacing(world, mi, baseFacing) : null;
   }
   const perfNetworkStats = {
     connected: false,
@@ -4334,8 +4323,7 @@ async function startGame(
     // the camera prompt, and through the race countdown. The sim independently
     // enforces the same countdown lock, so online latency cannot move the
     // authoritative rider.
-    const raceMovementLocked =
-      world.mountRaceView()?.phase === 'countdown' || world.vehicleSession !== null;
+    const raceMovementLocked = glider.raceOrVehicleMovementLocked(world);
     if (raceMovementLocked && !raceMovementWasLocked) {
       input.clearClickMove();
       input.setAutorun(false);
@@ -4399,11 +4387,13 @@ async function startGame(
       input.camYaw,
     );
     prevCameraDrivenFacing = cameraDrivenFacing;
-    if (renderFacing !== null || controllerFacing !== null || gliderControlsActive(world)) {
+    if (renderFacing !== null || controllerFacing !== null || glider.gliderControlsActive(world)) {
       pendingReleaseFacing = null;
     } else if (edgeReleaseFacing !== null) {
       pendingReleaseFacing = edgeReleaseFacing;
     }
+    // A ghost (dead && ghost) is not movement-frozen and keeps its facing; only a
+    // corpse-bound dead player (dead && !ghost) loses it.
     let movementFacing = !movementFrozen()
       ? (renderFacing ?? controllerFacing ?? pendingReleaseFacing)
       : null;
@@ -4576,7 +4566,7 @@ async function startGame(
     const interpServerFacing = interpolatedOnlineSelfFacing(net, pe, alpha);
     const foreignFacing = movementFacing ?? resolved.facing;
     if (edgeReleaseFacing !== null) seedKeyboardTurnRelease(kbTurn, edgeReleaseFacing);
-    kbTurnArgs.rawTurnIntent = scriptedMovementActive(world);
+    kbTurnArgs.rawTurnIntent = glider.scriptedMovementActive(world);
     kbTurnArgs.turnLeft = resolved.mi.turnLeft;
     kbTurnArgs.turnRight = resolved.mi.turnRight;
     kbTurnArgs.turnAllowed = net.spectating === null && !movementFrozen() && !isStunned(pe);
@@ -4599,7 +4589,7 @@ async function startGame(
       !kbTurn.suppressTurnFlags;
     applyKeyboardTurnInput(net.moveInput, resolved.mi, kbTurn);
     selfMotionGateArgs.spectating = net.spectating;
-    selfMotionGateArgs.movementFrozen = movementFrozen() || scriptedMovementActive(world);
+    selfMotionGateArgs.movementFrozen = movementFrozen() || glider.scriptedMovementActive(world);
     selfMotionGateArgs.playerImmobilized = playerImmobilized();
     selfMotionGateArgs.posX = pe.pos.x;
     selfMotionGateArgs.climbing = pe.climbing;

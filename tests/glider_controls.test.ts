@@ -1,8 +1,11 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
+  activityInputLocks,
+  gliderAwareVisualFacing,
   gliderCameraFacing,
   gliderControlsActive,
+  raceOrVehicleMovementLocked,
   resolveGliderMove,
   scriptedMovementActive,
 } from '../src/game/glider_controls';
@@ -11,6 +14,7 @@ import {
   newKeyboardTurnState,
   stepKeyboardTurnFacing,
 } from '../src/game/keyboard_turn_facing';
+import { diagonalMovementVisualFacing } from '../src/game/movement_visual';
 import { selfMotionPredictionEnabled } from '../src/game/self_motion_gate';
 import { GLIDER_QUEST_ID } from '../src/sim/content/world_quest_glider';
 import { createGliderFlightState } from '../src/sim/minigames/glider_flight';
@@ -111,10 +115,59 @@ describe('glider input mode', () => {
   });
   it('the live client connects flight to both prediction and raw-turn gates', () => {
     const source = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
-    expect(source).toContain('kbTurnArgs.rawTurnIntent = scriptedMovementActive(world)');
-    expect(source).toContain(
-      'selfMotionGateArgs.movementFrozen = movementFrozen() || scriptedMovementActive(world)',
+    const controls = readFileSync(
+      new URL('../src/game/glider_controls.ts', import.meta.url),
+      'utf8',
     );
-    expect(source).toContain('isGliderActive: () => gliderControlsActive(world)');
+    expect(source).toContain('kbTurnArgs.rawTurnIntent = glider.scriptedMovementActive(world)');
+    expect(source).toContain(
+      'selfMotionGateArgs.movementFrozen = movementFrozen() || glider.scriptedMovementActive(world)',
+    );
+    expect(source).toContain('...glider.activityInputLocks(world),');
+    expect(controls).toContain('isGliderActive: () => gliderControlsActive(world)');
+  });
+});
+
+describe('activity wiring helpers', () => {
+  const flying = (phase: 'flying' | 'failed') =>
+    new Map([
+      [
+        GLIDER_QUEST_ID,
+        {
+          questId: GLIDER_QUEST_ID,
+          state: 'active',
+          count: 0,
+          glider: { ...createGliderFlightState(), phase },
+        } as WorldQuestProgress,
+      ],
+    ]);
+
+  it('reads the cannon session and the flight phase live through the input locks', () => {
+    const world = { worldQuestLog: flying('failed'), vehicleSession: null as unknown };
+    const locks = activityInputLocks(world);
+    expect([locks.isCameraMotionLocked(), locks.isGliderActive()]).toEqual([false, false]);
+    world.vehicleSession = { stationId: 'north_watch_cannon' };
+    world.worldQuestLog = flying('flying');
+    expect([locks.isCameraMotionLocked(), locks.isGliderActive()]).toEqual([true, true]);
+  });
+
+  it('withholds the diagonal visual yaw only while flying', () => {
+    const mi = { forward: true, back: false, strafeLeft: true, strafeRight: false };
+    expect(gliderAwareVisualFacing({ worldQuestLog: flying('flying') }, mi, 1)).toBeNull();
+    expect(gliderAwareVisualFacing({ worldQuestLog: flying('failed') }, mi, 1)).toBe(
+      diagonalMovementVisualFacing(mi, 1),
+    );
+  });
+
+  it('locks movement through a race countdown or a manned cannon, and not otherwise', () => {
+    const lock = (phase: string | null, vehicleSession: unknown) =>
+      raceOrVehicleMovementLocked({
+        mountRaceView: () => (phase === null ? null : { phase }),
+        vehicleSession,
+      });
+    expect(lock(null, null)).toBe(false);
+    expect(lock('racing', null)).toBe(false);
+    expect(lock('countdown', null)).toBe(true);
+    expect(lock(null, { stationId: 'north_watch_cannon' })).toBe(true);
   });
 });

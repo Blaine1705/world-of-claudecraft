@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { type CycleEntity, nearbyNpcs, nextNpcTarget } from '../src/game/npc_cycle';
+import {
+  type CycleEntity,
+  nearbyNpcs,
+  nextNpcTarget,
+  nextNpcTargetForWorld,
+} from '../src/game/npc_cycle';
 
 const npc = (id: number, x: number, z = 0, over: Partial<CycleEntity> = {}): CycleEntity => ({
   id,
@@ -84,4 +89,19 @@ it('skips the revealed disguise for its investigator and restores it after compl
   expect(nextNpcTarget(people, origin, null, 1, 40, world)).toBeNull();
   world.worldQuestLog.clear();
   expect(nextNpcTarget(people, origin, null, 1, 40, world)).toBe(2146900022);
+});
+
+describe('nextNpcTargetForWorld', () => {
+  it('cycles from the world player exactly as nextNpcTarget does with the same inputs', () => {
+    const list = [npc(1, 5), npc(2, 10), npc(3, 30)];
+    const entities = new Map(list.map((e) => [e.id, e]));
+    for (const targetId of [null, 1, 2, 3]) {
+      for (const step of [1, -1] as const) {
+        const world = { entities, player: { pos: origin, targetId } };
+        expect(nextNpcTargetForWorld(world, step)).toBe(
+          nextNpcTarget(list, origin, targetId, step),
+        );
+      }
+    }
+  });
 });
