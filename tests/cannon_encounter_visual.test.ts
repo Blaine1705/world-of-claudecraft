@@ -118,4 +118,67 @@ describe('private cannon scene', () => {
     visual.update(session);
     expect(content.visible).toBe(false);
   });
+  it('spawns three rift portals at the lane entries and cleans up on exit', async () => {
+    const scene = new THREE.Scene();
+    const visual = new CannonEncounterVisual(scene, () => 2);
+    await visual.readyForEntry;
+    const portalsRoot = visual.group.getObjectByName('cannon-portals') as THREE.Group;
+    expect(portalsRoot).toBeDefined();
+    expect(portalsRoot.children).toHaveLength(0);
+
+    const session: VehicleSession = {
+      kind: 'cannon',
+      stationId: 'north_watch_cannon',
+      cycle: 'wq3_8',
+      origin: { x: NORTH_WATCH_CANNON.x, y: 0, z: NORTH_WATCH_CANNON.z },
+      encounter: createCannonEncounter(),
+    };
+    visual.update(session, 0.05);
+    expect(portalsRoot.children).toHaveLength(3);
+    for (const portal of portalsRoot.children) {
+      expect(portal.name).toBe('cannon-rift-portal');
+      const membrane = portal.getObjectByName('cannon-rift-portal-membrane') as THREE.Mesh;
+      expect(membrane).toBeDefined();
+    }
+    const membrane0 = portalsRoot.children[0].getObjectByName(
+      'cannon-rift-portal-membrane',
+    ) as THREE.Mesh;
+    const prevRot = membrane0.rotation.z;
+    visual.update(session, 0.1);
+    expect(membrane0.rotation.z).toBeGreaterThan(prevRot);
+
+    const field = NORTH_WATCH_CANNON.field;
+    const lanes = [0.2, 0.5, 0.8];
+    for (let i = 0; i < 3; i++) {
+      const lane = lanes[i];
+      const portal = portalsRoot.children[i];
+      const expectedX = field.minX + lane * (field.maxX - field.minX);
+      expect(portal.position.x).toBeCloseTo(expectedX, 1);
+      expect(portal.position.z).toBeCloseTo(field.minZ, 1);
+    }
+
+    // Switch to Last Keep cannon updates portal positions
+    const lastKeepSession: VehicleSession = {
+      ...session,
+      stationId: LAST_KEEP_CANNON.id,
+      origin: { x: LAST_KEEP_CANNON.x, y: 0, z: LAST_KEEP_CANNON.z },
+      encounter: createCannonEncounter(),
+    };
+    visual.update(lastKeepSession, 0.05);
+    expect(portalsRoot.children).toHaveLength(3);
+    const lkField = LAST_KEEP_CANNON.field;
+    for (let i = 0; i < 3; i++) {
+      const lane = lanes[i];
+      const portal = portalsRoot.children[i];
+      const expectedX = lkField.minX + lane * (lkField.maxX - lkField.minX);
+      expect(portal.position.x).toBeCloseTo(expectedX, 1);
+      expect(portal.position.z).toBeCloseTo(lkField.minZ, 1);
+    }
+
+    // On session exit, portals are cleared
+    visual.update(null);
+    expect(portalsRoot.children).toHaveLength(0);
+
+    visual.dispose();
+  });
 });

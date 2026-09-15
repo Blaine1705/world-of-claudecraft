@@ -16,11 +16,11 @@ import { WORLD_SEED } from '../src/sim/world_seed';
 
 it('separates all four workshop supplies while keeping them clickable from Mara', () => {
   expect(WORLD_QUEST_FORGING.zoneId).toBe('drakelands');
-  expect(FORGE_NPC_DEF.pos).toEqual({ x: 379, z: 2024 });
+  expect(FORGE_NPC_DEF.pos).toEqual({ x: 419, z: 1900 });
   expect(FORGE_STATIONS).toHaveLength(4);
   expect(FORGE_INTERACT_RANGE).toBe(22);
   for (const station of FORGE_STATIONS) {
-    expect(Math.hypot(station.x - 379, station.z - 2028)).toBeLessThan(FORGE_INTERACT_RANGE);
+    expect(Math.hypot(station.x - 419, station.z - 1904)).toBeLessThan(FORGE_INTERACT_RANGE);
     expect(objectInteractionRange({ templateId: `ground_${station.objectItemId}` })).toBe(
       FORGE_INTERACT_RANGE,
     );
@@ -32,17 +32,24 @@ it('separates all four workshop supplies while keeping them clickable from Mara'
   expect(objectInteractionRange({ templateId: 'supply_crate' })).toBe(5);
 });
 
-it('reuses the grey smithy and brings the well into the work area', () => {
+it('relocates the smithy to Wyrmwatch and brings the well into the work area', () => {
   const byId = Object.fromEntries(FORGE_STATIONS.map((station) => [station.id, station]));
-  expect(byId.tools).toMatchObject({ x: 374.14, z: 2020.92 });
-  expect(byId.fuel).toMatchObject({ x: 379, z: 2019 });
-  expect(byId.metal).toMatchObject({ x: 376, z: 2014 });
-  expect(byId.water).toMatchObject({ x: 385, z: 2026 });
+  expect(byId.tools).toMatchObject({ x: 422.86, z: 1902.08 });
+  expect(byId.fuel).toMatchObject({ x: 422, z: 1894 });
+  expect(byId.metal).toMatchObject({ x: 422, z: 1910 });
+  expect(byId.water).toMatchObject({ x: 410, z: 1902 });
   expect(PROPS.decorProps?.some((prop) => prop.key === 'workshopForge')).toBe(false);
-  expect(Math.hypot(byId.water.x - 379, byId.water.z - 2024)).toBeLessThan(8);
+  expect(
+    PROPS.decorProps?.some(
+      (prop) => prop.key === 'hexrBlacksmith' && prop.x === 426 && prop.z === 1902,
+    ),
+  ).toBe(true);
+  expect(Math.hypot(byId.water.x - 419, byId.water.z - 1900)).toBeLessThan(10);
   for (const prop of FORGE_WORKSHOP_DRESSING) {
     expect(PROPS.decorProps).toContainEqual(prop);
-    expect(prop.terrainCalm).toBe(false);
+    if (prop.key === 'hexSack') {
+      expect(prop.terrainCalm).toBe(false);
+    }
     for (const [dx, dz] of [
       [0, 0],
       [1, 0],
@@ -60,11 +67,11 @@ it('reuses the grey smithy and brings the well into the work area', () => {
 });
 
 it('keeps workshop fixtures on dry walkable ground clear of colliders and hostile camps', () => {
-  // The built-in anvil is deliberately inside the smithy collider: clicked remotely.
+  // The built-in anvil and the town well are inside colliders: clicked remotely.
   const points = [
-    ...FORGE_STATIONS.filter((station) => station.id !== 'tools'),
+    ...FORGE_STATIONS.filter((station) => station.id !== 'tools' && station.id !== 'water'),
     FORGE_NPC_DEF.pos,
-    { x: 379, z: 2028 },
+    { x: 419, z: 1904 },
   ];
   for (const point of points) {
     for (const [dx, dz] of [

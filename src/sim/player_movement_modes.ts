@@ -11,14 +11,12 @@ import type { SimContext } from './sim_context';
 import { clearAfkOnMove } from './social/away';
 import type { Entity } from './types';
 import { advanceGliderMovement } from './world_quest_glider';
-import { advanceHordeMovement } from './world_quest_horde';
 import { advanceWispMazeMovement } from './world_quest_wisp_maze';
 
 export function advanceExclusiveMovement(ctx: SimContext, p: Entity, meta: PlayerMeta): boolean {
   if (meta.vehicle) return true;
   if (advanceWispMazeMovement(ctx, p, meta)) return true;
   if (advanceGliderMovement(ctx, p, meta)) return true;
-  if (advanceHordeMovement(ctx, p, meta)) return true;
   // Strip the previous raised-tier lift before any movement integration.
   // updateRiftTriggers reapplies it after the step; non-rift movement is unchanged.
   const preLift = riftPlayerLift(ctx, p);

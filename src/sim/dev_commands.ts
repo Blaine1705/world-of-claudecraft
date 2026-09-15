@@ -11,7 +11,6 @@ import { armWorldQuestCaravanForDev } from './dev_world_quest_caravan';
 import { armDailyWorldQuestForDev } from './dev_world_quest_daily';
 import { armWorldQuestForgingForDev } from './dev_world_quest_forging';
 import { armWorldQuestGliderForDev } from './dev_world_quest_glider';
-import { armWorldQuestHordeForDev } from './dev_world_quest_horde';
 import { armWorldQuestInvestigationForDev } from './dev_world_quest_investigation';
 import { armWorldQuestShadowForDev } from './dev_world_quest_shadow';
 import { armWorldQuestTracingForDev } from './dev_world_quest_tracing';
@@ -227,10 +226,6 @@ export function handleDevChat(
   const gliderMatch = /^\/dev\s+(?:glider|slalom|windrider)(?:\s+(start))?\s*$/i.exec(raw);
   if (gliderMatch) {
     armWorldQuestGliderForDev(ctx, pid, Boolean(gliderMatch[1]));
-    return null;
-  }
-  if (/^\/dev\s+(?:horde|barricade)\s*$/i.test(raw)) {
-    armWorldQuestHordeForDev(ctx, pid);
     return null;
   }
   if (/^\/dev\s+forge\s*$/i.test(raw)) {

@@ -17,6 +17,7 @@ import { Rng } from '../rng';
 import type { WorldQuestForgeResult, WorldQuestForgeState } from '../types';
 
 export const FORGE_STRIKES = 10;
+export const FORGE_MAX_MISTAKES = 3;
 export const FORGE_WRONG_PENALTY = 3;
 export const FORGE_GOLD_SECONDS = 40;
 export const FORGE_SILVER_SECONDS = 60;
@@ -109,7 +110,7 @@ export function forgeResult(elapsed: number, mistakes: number): WorldQuestForgeR
 
 /** Clock publication at a bounded cadence; returns true when the owner readout changed. */
 export function advanceForgeWorkshop(state: WorldQuestForgeState, now: number): boolean {
-  if (state.phase === 'success') return false;
+  if (state.phase === 'success' || state.phase === 'failed') return false;
   const becameReady = state.observedAt < state.readyAt && now >= state.readyAt;
   const phaseChanged = state.phase === 'countdown' && now >= state.readyAt;
   if (phaseChanged) state.phase = 'working';
@@ -132,12 +133,18 @@ export function strikeForge(state: WorldQuestForgeState, now: number): boolean {
     state.mistakes++;
     state.feedback = 'cold';
     state.lockUntil = now + FORGE_MISS_LOCK;
+    if (state.mistakes >= FORGE_MAX_MISTAKES) {
+      state.phase = 'failed';
+    }
     return true;
   }
   if (!forgeNeedleInBand(state, forgeNeedleAt(state, now))) {
     state.mistakes++;
     state.feedback = 'miss';
     state.lockUntil = now + FORGE_MISS_LOCK;
+    if (state.mistakes >= FORGE_MAX_MISTAKES) {
+      state.phase = 'failed';
+    }
     return true;
   }
   state.strikes++;

@@ -31,13 +31,13 @@ import { shadowActionsLocked } from '../shadow_action_lock';
 
 import { WARSPIRIT_EMBERSCALE_2PC_CADENCE_STEPS } from '../content/ignivar_set_bonuses';
 import { isArenaPos, MOBS } from '../data';
-import { hordeActionsLocked } from '../horde_action_lock';
 import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
 import { forceDismount } from '../mounts';
 import { grantDevotionFromBlock } from '../paladin_devotion';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
+import { wispMazeActionsLocked } from '../wisp_maze_action_lock';
 import { resolveTalentHitMult } from '../talent_hit_mult';
 import { addThreat, hasEscapeStealth } from '../threat';
 import { creditAbilityDrill } from '../tutorial/ability_drill';
@@ -130,7 +130,7 @@ export function startAutoAttack(ctx: SimContext, pid?: number): void {
   if (!r) return;
   if (
     r.meta.vehicle ||
-    hordeActionsLocked(r.meta.worldQuestLog) ||
+    wispMazeActionsLocked(r.meta.worldQuestLog) ||
     shadowActionsLocked(r.meta.worldQuestLog) ||
     gliderActionsLocked(r.meta.worldQuestLog)
   )

@@ -1,4 +1,4 @@
-﻿// Pure world-quest rotation leaf shared by the sim, hosts, and map projections.
+// Pure world-quest rotation leaf shared by the sim, hosts, and map projections.
 // The host supplies a realm-reset civil day; this module only performs bounded
 // Gregorian arithmetic and deterministic content selection. No clock or RNG reads.
 
@@ -45,7 +45,7 @@ export const WORLD_QUESTS_BY_ZONE: Readonly<Record<string, readonly string[]>> =
   amberfall: Object.freeze(['wq_amberfall_lurkers']),
   willowfen: Object.freeze(['wq_willowfen_ore', 'wq_willowfen_caravan']),
   nightbloom: Object.freeze(['wq_nightbloom_barrow']),
-  wraithwood: Object.freeze(['wq_wraithwood_restless', 'wq_wraithwood_barricade']),
+  wraithwood: Object.freeze(['wq_wraithwood_restless']),
   palmreach: Object.freeze(['wq_palmreach_confections']),
   evergarden: Object.freeze(['wq_evergarden_watch', 'wq_evergarden_wisp_maze']),
   galecrest: Object.freeze(['wq_galecrest_wisps', 'wq_galecrest_slalom']),

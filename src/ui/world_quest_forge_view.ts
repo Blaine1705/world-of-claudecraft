@@ -43,6 +43,7 @@ export function forgeSpeechText(progress: WorldQuestProgress): string | null {
   const session = progress.forging;
   if (!session) return null;
   if (session.phase === 'success') return t('questUi.worldQuest.forge.finished');
+  if (session.phase === 'failed') return t('questUi.worldQuest.forge.failed');
   const now = session.observedAt;
   if (session.phase === 'countdown' || now < session.readyAt) {
     return t('questUi.worldQuest.forge.countdown', {
@@ -78,6 +79,8 @@ export function forgeInstructionLines(progress: WorldQuestProgress): string[] {
     ];
   }
   if (!session) return [t('questUi.worldQuest.forge.ready')];
+  if (session.phase === 'failed')
+    return [t('questUi.worldQuest.forge.failed'), t('questUi.worldQuest.forge.ready')];
   if (session.phase === 'countdown') return [t('questUi.worldQuest.forge.starting')];
   const lines = [
     t('questUi.worldQuest.forge.strikes', {

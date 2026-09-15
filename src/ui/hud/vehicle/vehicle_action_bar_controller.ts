@@ -1,7 +1,6 @@
 import { forgeChooseSlot, forgeControlsActive } from '../../../game/forge_controls';
 import type { GamepadKind } from '../../../game/gamepad_map';
 import { gliderControlsActive } from '../../../game/glider_controls';
-import { hordeControlsActive } from '../../../game/horde_controls';
 import { sfx } from '../../../game/sfx';
 import {
   type ShadowControlWorld,
@@ -23,11 +22,6 @@ import { CannonFeedbackCursor } from './cannon_feedback_core';
 import { cannonTacticsHint } from './cannon_tactics_view';
 import { ForgeActionBarController, type ForgeBarWorld } from './forge_action_bar_controller';
 import { createGliderActionBarView, gliderBoostDescription } from './glider_action_bar_view';
-import {
-  HordeActionBarController,
-  type HordeHudWorld,
-  type HordeProjection,
-} from './horde_action_bar_controller';
 import { ShadowActionBarController } from './shadow_action_bar_controller';
 import { createVehicleActionBarView } from './vehicle_action_bar_view';
 import { vehicleActionTooltip } from './vehicle_action_tooltip';
@@ -35,7 +29,7 @@ import { VEHICLE_ACTION_SLOTS, VehicleAimCore } from './vehicle_aim_core';
 
 interface VehicleBarDeps {
   world: IWorldVehicles &
-    Partial<HordeHudWorld & ShadowControlWorld & ForgeBarWorld> & {
+    Partial<ShadowControlWorld & ForgeBarWorld> & {
       boostWorldQuestGlider?(): void;
     };
   writers: PainterHostWriters;
@@ -46,7 +40,7 @@ interface VehicleBarDeps {
   presentation?: {
     setGroundAimReticle(value: null): void;
     addShake(amount: number): void;
-  } & Partial<HordeProjection>;
+  };
   attachTooltip(element: HTMLElement, html: () => string): void;
   cancelOnEnter: readonly { cancel(): void }[];
   /** Flight bar Climb/Dive slots: a held pointer pins the glider pitch (+1 climb,
@@ -69,19 +63,15 @@ export class VehicleActionBarController {
   private readonly integrity = document.createElement('span');
   private readonly hint = document.createElement('div');
   private readonly exit = document.createElement('button');
-  private readonly shake = document.createElement('input');
-  private readonly shakeText = document.createElement('span');
   private readonly feedback = new CannonFeedbackCursor();
   private readonly view = createVehicleActionBarView();
   private readonly gliderView = createGliderActionBarView();
   private readonly actionButtons: HTMLElement[] = [];
-  private comfort!: HTMLElement;
   private readonly painter: ActionBarPainter;
   private mounted = false;
   private gliderMode: boolean | null = null;
   private readonly shadow: ShadowActionBarController | null;
   private readonly forge: ForgeActionBarController | null;
-  private readonly horde: HordeActionBarController | null;
 
   constructor(private readonly deps: VehicleBarDeps) {
     this.shadow =
@@ -111,15 +101,6 @@ export class VehicleActionBarController {
             deps.padKind,
           )
         : null;
-    this.horde =
-      deps.world.worldQuestLog && deps.world.cfg && deps.world.player
-        ? new HordeActionBarController(
-            deps.world as HordeHudWorld,
-            deps.writers,
-            deps.presentation?.worldToScreen ? (deps.presentation as HordeProjection) : undefined,
-            deps.cancelOnEnter,
-          )
-        : null;
     this.aim = new VehicleAimCore(deps.world, () => {
       deps.clearReticle?.();
       deps.presentation?.setGroundAimReticle(null);
@@ -134,11 +115,6 @@ export class VehicleActionBarController {
     this.hint.className = 'vehicle-bar-hint';
     this.exit.className = 'vehicle-exit';
     this.exit.type = 'button';
-    this.shake.type = 'checkbox';
-    const comfort = document.createElement('label');
-    this.comfort = comfort;
-    comfort.className = 'vehicle-comfort';
-    comfort.append(this.shake, this.shakeText);
     deps.writers.setAttr(this.status, 'role', 'status');
     this.gauge.tabIndex = 0;
     deps.attachTooltip(this.gauge, () =>
@@ -197,7 +173,7 @@ export class VehicleActionBarController {
       return { btn, label, countEl, keybindEl, cdOverlay, cdText, rechargeOverlay };
     });
     this.gauge.append(this.fill, this.integrity);
-    this.root.append(this.title, this.status, this.gauge, bar, this.exit, this.hint, comfort);
+    this.root.append(this.title, this.status, this.gauge, bar, this.exit, this.hint);
     this.painter = new ActionBarPainter(
       deps.writers,
       { container: bar, slots },
@@ -252,14 +228,11 @@ export class VehicleActionBarController {
       forgeChooseSlot(this.deps.world as ForgeBarWorld, slot);
       return;
     }
-    if (this.deps.world.worldQuestLog && hordeControlsActive(this.deps.world as HordeHudWorld))
-      return;
     const action = VEHICLE_ACTION_SLOTS[slot];
     if (action) this.aim.begin(action, slot);
   }
 
   update(): void {
-    this.horde?.update();
     this.shadow?.update();
     this.forge?.update();
     const session = this.deps.world.vehicleSession;
@@ -278,8 +251,6 @@ export class VehicleActionBarController {
     if (shot) sfx.playUi('meteor', { gain: 0.5 });
     if (explosion) sfx.playUi('flamestrike', { gain: 0.5 });
     if (impact) sfx.playUi('impact_metal', { gain: 0.5 });
-    if (this.shake.checked && (shot || explosion))
-      this.deps.presentation?.addShake(explosion ? 0.12 : 0.06);
     if (active !== this.mounted) {
       this.mounted = active;
       this.aim.cancel();
@@ -290,7 +261,7 @@ export class VehicleActionBarController {
     if (active && this.gliderMode !== gliderActive) {
       this.gliderMode = gliderActive;
       writers.toggleClass(this.root, 'glider-action-bar', gliderActive);
-      for (const element of [this.gauge, this.exit, this.comfort, this.hint])
+      for (const element of [this.gauge, this.exit, this.hint])
         writers.setDisplay(element, gliderActive ? 'none' : '');
       // Flight keeps three slots (boost, climb, dive); any further vehicle slot hides.
       for (let i = 1; i < this.actionButtons.length; i++)
@@ -310,7 +281,6 @@ export class VehicleActionBarController {
     }
     if (!session) return;
     const encounter = session.encounter;
-    writers.setText(this.shakeText, t('hudChrome.vehicle.shake'));
     writers.setText(this.title, vehicleStationDisplayName(session.stationId));
     writers.setText(this.exit, t('hudChrome.vehicle.exit'));
     writers.setAttr(this.gauge, 'role', 'meter');
@@ -362,8 +332,7 @@ export class VehicleActionBarController {
       (!!worldQuestLog &&
         (gliderControlsActive({ worldQuestLog }) ||
           shadowControlsActive({ worldQuestLog }) ||
-          forgeControlsActive({ worldQuestLog }) ||
-          hordeControlsActive({ worldQuestLog })))
+          forgeControlsActive({ worldQuestLog })))
     );
   }
 

@@ -308,7 +308,6 @@ describe('world quest content', () => {
         }
       } else if (
         quest.objective.type === 'forging' ||
-        quest.objective.type === 'horde' ||
         quest.objective.type === 'wisp_maze' ||
         quest.objective.type === 'glider'
       ) {

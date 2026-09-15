@@ -224,7 +224,6 @@ const UI_PURE_CORES = [
   'src/ui/leaderboard_podium_html.ts',
   'src/ui/leaderboard_board_html.ts',
   'src/ui/world_quest_wisp_maze_view.ts',
-  'src/ui/world_quest_horde_view.ts',
   'src/ui/world_quest_shadow_view.ts',
   'src/ui/world_quest_investigation_view.ts',
   'src/ui/world_quest_glider_view.ts',
@@ -2280,7 +2279,6 @@ const UI_PAINTER_HELPERS = [
 // contributors do not edit those files.
 const UI_DOM_MODULES = [
   'src/ui/hud/vehicle/vehicle_action_bar_controller.ts',
-  'src/ui/hud/vehicle/horde_action_bar_controller.ts',
   'src/ui/hud/vehicle/shadow_action_bar_controller.ts',
   'src/ui/hud/vehicle/forge_action_bar_controller.ts',
   'src/ui/account_portal_dom.ts',

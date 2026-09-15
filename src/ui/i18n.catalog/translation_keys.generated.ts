@@ -12114,6 +12114,7 @@ export type TranslationKeyFlat =
   | 'questUi.worldQuest.forge.cold'
   | 'questUi.worldQuest.forge.correct'
   | 'questUi.worldQuest.forge.countdown'
+  | 'questUi.worldQuest.forge.failed'
   | 'questUi.worldQuest.forge.finished'
   | 'questUi.worldQuest.forge.fuel'
   | 'questUi.worldQuest.forge.heat'

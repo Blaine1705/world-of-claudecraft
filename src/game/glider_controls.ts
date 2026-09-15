@@ -1,7 +1,6 @@
 import { GLIDER_QUEST_ID } from '../sim/content/world_quest_glider';
 import { wispMazeActionsLocked } from '../sim/wisp_maze_action_lock';
 import type { IWorld } from '../world_api';
-import { hordeControlsActive } from './horde_controls';
 
 /** Countdown and flight both belong to the authoritative flight kernel. */
 export function gliderControlsActive(world: Pick<IWorld, 'worldQuestLog'>): boolean {
@@ -14,7 +13,6 @@ export function gliderControlsActive(world: Pick<IWorld, 'worldQuestLog'>): bool
 export function scriptedMovementActive(world: Pick<IWorld, 'worldQuestLog'>): boolean {
   return (
     gliderControlsActive(world) ||
-    hordeControlsActive(world) ||
     wispMazeActionsLocked(world.worldQuestLog)
   );
 }

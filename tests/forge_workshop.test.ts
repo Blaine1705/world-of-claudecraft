@@ -10,6 +10,7 @@ import {
   FORGE_GOLD_SECONDS,
   FORGE_HEAT_DECAY,
   FORGE_HEAT_FLOOR,
+  FORGE_MAX_MISTAKES,
   FORGE_SILVER_SECONDS,
   FORGE_STOKE_COOLDOWN,
   FORGE_STOKE_HEAT,
@@ -103,6 +104,21 @@ describe('forge workshop timing hammer', () => {
     expect(state.feedback).toBe('cold');
     expect(state.mistakes).toBe(2);
     expect(state.strikes).toBe(1);
+  });
+
+  it('fails the minigame on the third mistake and locks out further input', () => {
+    const state = createForgeWorkshop(11, 0);
+    let t = state.readyAt;
+    for (let i = 0; i < FORGE_MAX_MISTAKES; i++) {
+      while (Math.abs(forgeNeedleAt(state, t) - state.band) <= state.bandHalf) t += 0.05;
+      expect(strikeForge(state, t)).toBe(true);
+      expect(state.mistakes).toBe(i + 1);
+      t = state.lockUntil + 0.01;
+    }
+    expect(state.phase).toBe('failed');
+    expect(strikeForge(state, t + 1)).toBe(false);
+    expect(stokeForge(state, t + 1)).toBe(false);
+    expect(advanceForgeWorkshop(state, t + 2)).toBe(false);
   });
 
   it('finishes on the tenth blow with the band floored and a medal from adjusted time', () => {

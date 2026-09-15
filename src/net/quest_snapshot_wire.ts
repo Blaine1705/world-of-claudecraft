@@ -5,7 +5,6 @@
 import type { QuestProgress, WorldQuestProgress } from '../sim/types';
 import { decodeForgeState } from '../sim/world_quest_forge_wire';
 import { decodeGliderState } from '../sim/world_quest_glider_wire';
-import { decodeHordeState } from '../sim/world_quest_horde_wire';
 import { decodeInvestigationState } from '../sim/world_quest_investigation_wire';
 import { decodeShadowState } from '../sim/world_quest_shadow_wire';
 import { decodeWorldQuestProgressTrace } from '../sim/world_quest_trace_wire';
@@ -78,7 +77,6 @@ export function applyQuestSelfWire(
         );
         const tracing = decodeWorldQuestProgressTrace(raw?.tracing, progress);
         const forging = decodeForgeState(raw?.forging, progress.questId);
-        const horde = decodeHordeState(raw?.horde, progress.questId);
         const wispMaze = decodeWispMazeState(raw?.wispMaze, progress.questId);
         const glider = decodeGliderState(raw?.glider, progress.questId);
         const shadow =
@@ -92,7 +90,6 @@ export function applyQuestSelfWire(
             ...progress,
             ...(tracing ? { tracing } : {}),
             ...(forging ? { forging } : {}),
-            ...(horde ? { horde } : {}),
             ...(wispMaze ? { wispMaze } : {}),
             ...(glider ? { glider } : {}),
             ...(investigation ? { investigation } : {}),

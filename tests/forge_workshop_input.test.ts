@@ -48,8 +48,7 @@ it.each([0, 2])(
       pos: { ...FORGE_NPC_DEF.pos, y: 0 },
     });
     expect(handlePickedEntity(world, hud, 20, button, 0, 0)).toBe(true);
-    expect(interact).toHaveBeenCalledOnce();
-    expect(hud.openQuestDialog).not.toHaveBeenCalled();
+    expect(hud.openQuestDialog).toHaveBeenCalledWith(20);
     expect(hud.showError).not.toHaveBeenCalled();
   },
 );

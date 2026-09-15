@@ -20,7 +20,7 @@ import {
   fenbridgeSurfaceNormalTexture,
   fenbridgeSurfaceRoughnessTexture,
 } from './fenbridge_surface_atlas';
-import { buildForgeAnvilTarget } from './forge_anvil_target';
+import { buildForgeAnvilTarget, buildForgeWellTarget } from './forge_anvil_target';
 import { GFX, surfaceMat } from './gfx';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 import { buildWorldQuestFreightWagon } from './world_quest_freight_visual';
@@ -32,7 +32,6 @@ const TARGET_HEIGHT = 1.35;
 const QUEST_OBJECT_URLS: Record<string, string> = {
   forge_fuel: '/models/resources/wood_log_stack.glb',
   forge_metal: '/models/quest/supply_crate.glb',
-  forge_water: '/models/props/well.glb',
   north_watch_cannon: '/models/biome/hex_cannon.glb',
   last_keep_cannon: '/models/biome/hex_cannon.glb',
   eastbrook_freight_crate: '/models/quest/supply_crate.glb',
@@ -712,6 +711,7 @@ export function buildGroundQuestObject(
   entityId: number,
 ): { group: THREE.Group; height: number } {
   if (itemId === 'forge_tools') return buildForgeAnvilTarget();
+  if (itemId === 'forge_water') return buildForgeWellTarget();
   if (itemId === 'eastbrook_freight_wagon') {
     const freightWagon = buildWorldQuestFreightWagon();
     if (freightWagon) return freightWagon;

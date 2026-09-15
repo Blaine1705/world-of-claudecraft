@@ -17,7 +17,7 @@ export function decodeForgeState(
   if (questId !== FORGE_QUEST_ID || !value || typeof value !== 'object') return;
   const row = value as Partial<WorldQuestForgeState>;
   if (
-    !['countdown', 'working', 'success'].includes(row.phase ?? '') ||
+    !['countdown', 'working', 'success', 'failed'].includes(row.phase ?? '') ||
     !['ready', 'hit', 'miss', 'cold', 'stoked'].includes(row.feedback ?? '')
   )
     return;

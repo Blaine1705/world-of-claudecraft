@@ -31,11 +31,11 @@ import { shadowActionsLocked } from './shadow_action_lock';
 import { MOUNT_KEYS, type MountKey, mountDef, TRAINING_MOUNT_KEY } from './content/mounts';
 import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
-import { hordeActionsLocked } from './horde_action_lock';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { bgInMatch } from './social/battleground';
 import { DT, type Entity, FORM_AURA_KINDS, isNonSpellCast } from './types';
+import { wispMazeActionsLocked } from './wisp_maze_action_lock';
 import { hasWorldQuestDeliveryCargo } from './world_quest_delivery';
 
 // Summon channel duration (seconds). Mounting is a short cast the player can
@@ -219,7 +219,7 @@ export function summonMountItem(ctx: SimContext, pid: number, key: string): bool
   const e = ctx.entities.get(pid);
   if (!meta || !e) return false;
   if (
-    hordeActionsLocked(meta.worldQuestLog) ||
+    wispMazeActionsLocked(meta.worldQuestLog) ||
     shadowActionsLocked(meta.worldQuestLog) ||
     gliderActionsLocked(meta.worldQuestLog)
   )
@@ -289,7 +289,7 @@ export function toggleMount(ctx: SimContext, pid: number): boolean {
   const e = ctx.entities.get(pid);
   if (!meta || !e) return false;
   if (
-    hordeActionsLocked(meta.worldQuestLog) ||
+    wispMazeActionsLocked(meta.worldQuestLog) ||
     shadowActionsLocked(meta.worldQuestLog) ||
     gliderActionsLocked(meta.worldQuestLog)
   )

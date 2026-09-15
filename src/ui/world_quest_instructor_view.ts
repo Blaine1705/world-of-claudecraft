@@ -132,10 +132,6 @@ export function worldQuestInstructorDialog(
       (progress.wispMaze?.phase === 'countdown' || progress.wispMaze?.phase === 'active')
     ) {
       canStart = false;
-      hint = t('questUi.worldQuest.inProgress');
-    } else if (quest.objective.type === 'horde' && progress.horde?.phase === 'active') {
-      canStart = false;
-      hint = t('questUi.worldQuest.inProgress');
     } else if (
       quest.objective.type === 'forging' &&
       (progress.forging?.phase === 'countdown' || progress.forging?.phase === 'working')

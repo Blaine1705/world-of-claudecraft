@@ -45,7 +45,7 @@ import {
   weaponHand,
 } from './equipment_rules';
 import { formatMoney } from './format_money';
-import { hordeActionsLocked } from './horde_action_lock';
+import { wispMazeActionsLocked } from './wisp_maze_action_lock';
 import { useBrinyLure } from './interactions/crab_summon';
 import { throwFirebottleAtNearestHut } from './interactions/firebottle_hut';
 import { moveStackToCell } from './inventory_order';
@@ -733,7 +733,7 @@ export function useItem(
   // All three use branches (food/drink, potion, elixir) consume one unit, so the
   if (
     meta.vehicle ||
-    hordeActionsLocked(meta.worldQuestLog) ||
+    wispMazeActionsLocked(meta.worldQuestLog) ||
     shadowActionsLocked(meta.worldQuestLog) ||
     gliderActionsLocked(meta.worldQuestLog)
   )

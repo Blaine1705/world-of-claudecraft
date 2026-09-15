@@ -89,7 +89,12 @@ export function startForgeWorkshop(
     !canWork(ctx, player)
   )
     return;
-  if (progress.forging && progress.forging.phase !== 'success') return;
+  if (
+    progress.forging &&
+    progress.forging.phase !== 'success' &&
+    progress.forging.phase !== 'failed'
+  )
+    return;
   progress.forging = createForgeWorkshop(
     Math.imul(meta.entityId, 0x45d9f3b) ^ ctx.tickCount,
     ctx.time,

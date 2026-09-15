@@ -60,15 +60,6 @@ vi.mock('../src/render/cannon_encounter_visual', () => ({
     dispose() {}
   },
 }));
-vi.mock('../src/render/horde_barricade_visual', () => ({
-  HordeBarricadeVisual: class {
-    readyForEntry = calls.ready;
-    update() {
-      calls.events.push('horde');
-    }
-    dispose() {}
-  },
-}));
 vi.mock('../src/render/wisp_maze_visual', () => ({
   WispMazeVisual: class {
     readyForEntry = calls.wispReady;
@@ -131,7 +122,6 @@ describe('personal world guidance coordinator', () => {
         `mount:${!race}`,
         'trace',
         'cannon',
-        'horde',
         'wisp-maze',
       ]);
     },

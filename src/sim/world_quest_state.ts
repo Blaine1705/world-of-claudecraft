@@ -87,7 +87,6 @@ export function savedWorldQuestState(
         ({
           tracing: _tracing,
           forging: _forging,
-          horde: _horde,
           wispMaze: _wispMaze,
           investigation: _investigation,
           shadow: _shadow,
@@ -99,9 +98,6 @@ export function savedWorldQuestState(
           ...(progress.gliderResult === undefined
             ? {}
             : { gliderResult: { ...progress.gliderResult } }),
-          ...(progress.hordeResult === undefined
-            ? {}
-            : { hordeResult: { ...progress.hordeResult } }),
           ...(progress.forgeResult === undefined
             ? {}
             : { forgeResult: { ...progress.forgeResult } }),

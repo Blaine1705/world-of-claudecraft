@@ -84,22 +84,19 @@ export function damageCannonEnemies(
   return hit;
 }
 
-/** Only direct shots ignite barrels. Each barrel explodes once, including chains. */
+/** Only direct shots ignite barrels. Barrels damage enemies but do not chain-ignite other barrels. */
 export function detonateCannonBarrels(
   state: CannonEncounterState,
   point: CannonPoint,
   radius: number,
 ): boolean {
   const pending: CannonPoint[] = [];
-  const ignite = (center: CannonPoint, reach: number) => {
-    for (const barrel of state.barrels) {
-      if (!barrel.active || (barrel.x - center.x) ** 2 + (barrel.z - center.z) ** 2 > reach ** 2)
-        continue;
-      barrel.active = false;
-      pending.push(barrel);
-    }
-  };
-  ignite(point, radius);
+  for (const barrel of state.barrels) {
+    if (!barrel.active || (barrel.x - point.x) ** 2 + (barrel.z - point.z) ** 2 > radius ** 2)
+      continue;
+    barrel.active = false;
+    pending.push(barrel);
+  }
   for (let i = 0; i < pending.length; i++) {
     const barrel = pending[i];
     cannonFeedback(state, 'barrel', barrel);
@@ -110,7 +107,6 @@ export function detonateCannonBarrels(
       CANNON_TACTICS.barrelDamage,
       'barrel',
     );
-    ignite(barrel, CANNON_TACTICS.barrelRadius);
   }
   return pending.length > 0;
 }

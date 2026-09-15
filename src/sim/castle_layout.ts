@@ -442,8 +442,7 @@ export const CASTLE_BUILDINGS: readonly CastleBuilding[] = [
   },
   { key: 'hexrArcheryrange', x: 384, z: 1998.5, rot: 0, scale: 7, r: 5.5, h: 12.5, boxed: true },
   { key: 'hexrHomeB', x: 370.5, z: 2008.5, rot: Math.PI / 2, scale: 7, r: 4.5, h: 9, boxed: true },
-  // the forge and market quarter by the gate road
-  { key: 'hexrBlacksmith', x: 371, z: 2021, rot: Math.PI / 2, scale: 7, r: 5, h: 7, boxed: true },
+  // the market quarter by the gate road
   // The market and the stables are the two entries whose real box is BIGGER
   // than the circle they were given, not smaller, so boxing them would take
   // bailey away rather than give it back. Both are open compounds (a stall run

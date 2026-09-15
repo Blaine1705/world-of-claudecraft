@@ -34,7 +34,6 @@ export const WORLD_QUEST_SCOREBOARDS: readonly WorldQuestScoreboard[] = [
   { id: 'calligraphy', questId: 'wq_eastbrook_calligraphy', metric: 'points', primary: 'medal' },
   { id: 'slalom', questId: 'wq_galecrest_slalom', metric: 'points', primary: 'medal' },
   { id: 'forge', questId: 'wq_evergarden_forging', metric: 'seconds', primary: 'medal' },
-  { id: 'barricade', questId: 'wq_wraithwood_barricade', metric: 'points', primary: 'medal' },
 ];
 
 export type WorldQuestScoreboardId = (typeof WORLD_QUEST_SCOREBOARDS)[number]['id'];

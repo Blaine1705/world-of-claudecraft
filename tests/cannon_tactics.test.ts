@@ -59,11 +59,14 @@ describe('cannon tactical decisions', () => {
     expect(s.barrels).toHaveLength(1);
     expect(s.barrels[0].id).toBe(keptId);
   });
-  it('places authored barrels close enough to chain across the actual thirty-yard field', () => {
+  it('detonates only the targeted barrel and does not chain-explode neighboring barrels', () => {
     const s = createCannonEncounter();
     prepareCannonBarrels(s, field);
+    expect(s.barrels).toHaveLength(3);
     detonateCannonBarrels(s, s.barrels[0], 1);
-    expect(s.barrels.every((b) => !b.active)).toBe(true);
+    expect(s.barrels[0].active).toBe(false);
+    expect(s.barrels[1].active).toBe(true);
+    expect(s.barrels[2].active).toBe(true);
   });
   it('credits a missed initial incendiary impact once when later burn pulses hit', () => {
     const s = createCannonEncounter();
@@ -92,14 +95,21 @@ describe('cannon tactical decisions', () => {
     expect(s.feedback.filter((e) => e.kind === 'armor')).toHaveLength(1);
     expect(s.feedback.filter((e) => e.kind === 'death')).toHaveLength(1);
   });
-  it('chains nearby barrels once and refreshes their positions for a new wave', () => {
+  it('detonates targeted barrels independently and refreshes their positions for a new wave', () => {
     const s = createCannonEncounter();
     s.barrels = [0, 1, 2].map((i) => ({ id: 100 + i, active: true, x: i * 7, z: 20 }));
-    s.enemies = [{ id: 99, kind: 'infantry', hp: 100, slowUntilTick: 0, x: 15, z: 20 }];
+    s.enemies = [{ id: 99, kind: 'infantry', hp: 100, slowUntilTick: 0, x: 5, z: 20 }];
     expect(detonateCannonBarrels(s, { x: 0, z: 20 }, 1)).toBe(true);
-    expect(s.barrels.every((b) => !b.active)).toBe(true);
+    expect(s.barrels[0].active).toBe(false);
+    expect(s.barrels[1].active).toBe(true);
+    expect(s.barrels[2].active).toBe(true);
     expect(s.killed).toBe(1);
-    expect(s.feedback.filter((e) => e.kind === 'barrel')).toHaveLength(3);
+    expect(s.feedback.filter((e) => e.kind === 'barrel')).toHaveLength(1);
+    expect(detonateCannonBarrels(s, { x: 7, z: 20 }, 1)).toBe(true);
+    expect(s.barrels[1].active).toBe(false);
+    expect(s.barrels[2].active).toBe(true);
+    expect(detonateCannonBarrels(s, { x: 14, z: 20 }, 1)).toBe(true);
+    expect(s.barrels[2].active).toBe(false);
     expect(detonateCannonBarrels(s, point, 50)).toBe(false);
     prepareCannonBarrels(s, field);
     expect(s.barrels).toHaveLength(3);

@@ -34,7 +34,6 @@ import { nearestAttackerId } from '../auto_acquire_target';
 import { ITEMS, isDelvePos, MOBS, zoneAt } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { isShieldItem } from '../equipment_rules';
-import { hordeActionsLocked } from '../horde_action_lock';
 import { instanceInfoAt } from '../instances/dungeons';
 import { forceDismount } from '../mounts';
 import {
@@ -43,6 +42,7 @@ import {
   paladinExecuteWindowActive,
   spendDevotion,
 } from '../paladin_devotion';
+import { wispMazeActionsLocked } from '../wisp_maze_action_lock';
 import { effectiveFishingBand, fishReelWindowSecFor } from '../professions/fishing';
 import { bestOwnedGatherToolFor } from '../professions/tools';
 import { scheduleProjectile } from '../projectile_travel';
@@ -897,7 +897,7 @@ export function castAbility(
   const { meta, e: p } = r;
   if (
     meta.vehicle ||
-    hordeActionsLocked(meta.worldQuestLog) ||
+    wispMazeActionsLocked(meta.worldQuestLog) ||
     shadowActionsLocked(meta.worldQuestLog) ||
     gliderActionsLocked(meta.worldQuestLog)
   )

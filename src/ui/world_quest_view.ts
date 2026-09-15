@@ -17,7 +17,6 @@ export function worldQuestDisplayName(questId: string): string {
     return vehicleStationDisplayName(quest.objective.stationId);
   if (quest.objective.type === 'shadow') return t('questUi.worldQuest.shadow.title');
   if (quest.objective.type === 'forging') return t('questUi.worldQuest.forge.title');
-  if (quest.objective.type === 'horde') return t('questUi.worldQuest.horde.title');
   if (quest.objective.type === 'wisp_maze') return t('questUi.worldQuest.wispMaze.title');
   if (quest.objective.type === 'glider') return t('questUi.worldQuest.glider.title');
   if (quest.objective.type === 'investigation') return t('questUi.worldQuest.investigation.title');
@@ -41,7 +40,6 @@ export function worldQuestObjectiveLabel(questId: string): string {
   }
   if (quest.objective.type === 'shadow') return t('questUi.worldQuest.shadow.objective');
   if (quest.objective.type === 'forging') return t('questUi.worldQuest.forge.objective');
-  if (quest.objective.type === 'horde') return t('questUi.worldQuest.horde.objective');
   if (quest.objective.type === 'wisp_maze') return t('questUi.worldQuest.wispMaze.objective');
   if (quest.objective.type === 'glider') return t('questUi.worldQuest.glider.objective');
   if (quest.objective.type === 'investigation')

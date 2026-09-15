@@ -11,6 +11,7 @@ import { timeBuildSpan } from './build_spans';
 import { CannonEnemyVisuals } from './cannon_enemy_visuals';
 import { CannonTacticalVisuals, cannonBarrelTemplate } from './cannon_tactical_visuals';
 import { charactersReady } from './characters/assets';
+import { buildDoorBody, buildRiftGateBody } from './door_portal';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import { worldQuestTraceMaterials } from './world_quest_trace_materials';
 
@@ -33,11 +34,14 @@ export class CannonEncounterVisual {
   private disposed = false;
   private stationId: string | null = null;
   private readonly markers: { mesh: THREE.Mesh; u: number; v: number }[] = [];
+  private readonly portalsRoot = new THREE.Group();
+  private readonly portals: { body: THREE.Group; portal?: THREE.Mesh }[] = [];
 
   constructor(
     scene: THREE.Object3D,
     private readonly groundAt: (x: number, z: number) => number,
     compileGate?: (target: THREE.Object3D) => Promise<unknown>,
+    private readonly lowGfx = false,
   ) {
     this.group.name = 'personal-cannon-encounter';
     this.group.add(this.content);
@@ -62,6 +66,8 @@ export class CannonEncounterVisual {
       marker.position.set(x, groundAt(x, field.maxZ) + 0.12, field.maxZ);
       this.markers.push({ mesh: marker, u: (x - field.minX) / (field.maxX - field.minX), v: 1 });
     }
+    this.portalsRoot.name = 'cannon-portals';
+    this.content.add(this.portalsRoot);
     this.content.visible = false;
     this.readyForEntry = this.prepare(scene, compileGate);
   }
@@ -103,7 +109,18 @@ export class CannonEncounterVisual {
     this.content.visible = !!session;
     this.enemies?.update(session, dt, this.groundAt, reducedMotion);
     this.tactics?.update(session, this.groundAt, reducedMotion);
-    if (!session || !station) return;
+    if (!reducedMotion) {
+      for (const p of this.portals) {
+        if (p.portal) p.portal.rotation.z += dt * 1.4;
+      }
+    }
+    if (!session || !station) {
+      if (this.stationId !== null) {
+        this.stationId = null;
+        this.clearPortals();
+      }
+      return;
+    }
     if (this.stationId !== station.id) {
       this.stationId = station.id;
       const field = station.field;
@@ -111,6 +128,19 @@ export class CannonEncounterVisual {
         const x = field.minX + u * (field.maxX - field.minX);
         const z = field.minZ + v * (field.maxZ - field.minZ);
         mesh.position.set(x, this.groundAt(x, z) + 0.12, z);
+      }
+      this.clearPortals();
+      for (const lane of [0.2, 0.5, 0.8]) {
+        const x = field.minX + lane * (field.maxX - field.minX);
+        const z = field.minZ;
+        const built =
+          buildRiftGateBody(this.lowGfx, 'A') ?? buildDoorBody(true, undefined, this.lowGfx);
+        built.body.name = 'cannon-rift-portal';
+        if (built.portal) built.portal.name = 'cannon-rift-portal-membrane';
+        built.body.scale.setScalar(0.85);
+        built.body.position.set(x, this.groundAt(x, z), z);
+        this.portalsRoot.add(built.body);
+        this.portals.push(built);
       }
     }
     const state = session.encounter;
@@ -139,11 +169,19 @@ export class CannonEncounterVisual {
     }
   }
 
+  private clearPortals(): void {
+    for (const portal of this.portals) {
+      portal.body.removeFromParent();
+    }
+    this.portals.length = 0;
+  }
+
   dispose(): void {
     this.disposed = true;
     this.group.removeFromParent();
     this.enemies?.dispose();
     this.tactics?.dispose();
+    this.clearPortals();
     this.sphere.dispose();
     this.box.dispose();
     this.ring.dispose();

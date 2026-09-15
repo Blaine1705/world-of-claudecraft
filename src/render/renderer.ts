@@ -359,7 +359,6 @@ import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
 import { usedJsHeapMb } from './heap_sample';
 import { createHitchFrameAligner } from './hitch_frame_align_core';
 import { buildHollowGates, type HollowGatesView } from './hollow_gates';
-import { hordeCameraTarget } from './horde_camera';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { idleSlot } from './idle_queue';
 import {
@@ -8358,20 +8357,22 @@ export class Renderer {
       height = result.object.height;
       if (result.reused) body.rotation.y = (e.id % 7) * 0.45;
       objectMesh = body;
-      if (!this.sparkleMat) {
-        this.sparkleMat = markSharedMaterial(
-          new THREE.SpriteMaterial({
-            map: sparkleTexture(),
-            transparent: true,
-            depthWrite: false,
-          }),
-        );
-        if (!this.lowGfx) this.sparkleMat.color.setScalar(SPARKLE_BOOST); // gold glint via bloom
+      if (!e.objectItemId?.startsWith('forge_')) {
+        if (!this.sparkleMat) {
+          this.sparkleMat = markSharedMaterial(
+            new THREE.SpriteMaterial({
+              map: sparkleTexture(),
+              transparent: true,
+              depthWrite: false,
+            }),
+          );
+          if (!this.lowGfx) this.sparkleMat.color.setScalar(SPARKLE_BOOST); // gold glint via bloom
+        }
+        sparkle = new THREE.Sprite(this.sparkleMat);
+        sparkle.scale.set(0.9, 0.9, 1);
+        sparkle.position.y = 1.35;
+        group.add(sparkle);
       }
-      sparkle = new THREE.Sprite(this.sparkleMat);
-      sparkle.scale.set(0.9, 0.9, 1);
-      sparkle.position.y = 1.35;
-      group.add(sparkle);
     } else {
       const visualKey = visualKeyFor(e);
       // The in-flight cooldown stops the deferring entity from burning a
@@ -12794,7 +12795,7 @@ export class Renderer {
     const pose = stepVehicleCamera(this.vehicleCamera,
       { ...directedPose, x: this.camBoom.x + this.camFeel.leadX, y: this.camBoom.y,
         z: this.camBoom.z + this.camFeel.leadZ },
-      vehicleCameraTarget(vehicle) ?? hordeCameraTarget(this.sim),
+      vehicleCameraTarget(vehicle),
       this.camera.aspect, this.baseFov, dt, reduce);
     const px = pose.x;
     const py = pose.y;

@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { resolveGliderMove, scriptedMovementActive } from '../src/game/glider_controls';
 import { WISP_MAZE_QUEST_ID } from '../src/sim/content/world_quest_wisp_maze';
-import { hordeActionsLocked } from '../src/sim/horde_action_lock';
 import { createWispMaze } from '../src/sim/minigames/wisp_maze';
 import { emptyMoveInput, type WorldQuestProgress } from '../src/sim/types';
 import { wispMazeActionsLocked } from '../src/sim/wisp_maze_action_lock';
@@ -23,7 +22,6 @@ describe('personal maze action and prediction ownership', () => {
       const { progress, worldQuestLog } = fixture();
       progress.wispMaze!.phase = phase;
       expect(wispMazeActionsLocked(worldQuestLog)).toBe(true);
-      expect(hordeActionsLocked(worldQuestLog)).toBe(true);
       expect(scriptedMovementActive({ worldQuestLog })).toBe(true);
     },
   );
@@ -32,11 +30,10 @@ describe('personal maze action and prediction ownership', () => {
     const { progress, worldQuestLog } = fixture();
     progress.wispMaze!.paused = true;
     expect(wispMazeActionsLocked(worldQuestLog)).toBe(false);
-    expect(hordeActionsLocked(worldQuestLog)).toBe(false);
     expect(scriptedMovementActive({ worldQuestLog })).toBe(false);
     progress.wispMaze!.paused = false;
     progress.wispMaze!.phase = 'won';
-    expect(hordeActionsLocked(worldQuestLog)).toBe(false);
+    expect(wispMazeActionsLocked(worldQuestLog)).toBe(false);
     expect(scriptedMovementActive({ worldQuestLog })).toBe(false);
     worldQuestLog.clear();
     expect(wispMazeActionsLocked(worldQuestLog)).toBe(false);
@@ -45,7 +42,7 @@ describe('personal maze action and prediction ownership', () => {
   it('also owns a live practice session after daily credit was already earned', () => {
     const { progress, worldQuestLog } = fixture();
     progress.state = 'completed';
-    expect(hordeActionsLocked(worldQuestLog)).toBe(true);
+    expect(wispMazeActionsLocked(worldQuestLog)).toBe(true);
     expect(scriptedMovementActive({ worldQuestLog })).toBe(true);
   });
 

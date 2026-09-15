@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { ESCORTS, WORLD_QUESTS } from '../src/sim/data';
-import { createHordeBarricade } from '../src/sim/minigames/horde_barricade';
 import { createWispMaze } from '../src/sim/minigames/wisp_maze';
 import type { Entity, WorldQuestProgress } from '../src/sim/types';
 import {
@@ -31,7 +30,6 @@ describe('worldQuestInstructorDialog presentation', () => {
     );
     expect([...new Set(instructorIds), 'glider_apprentice'].sort()).toEqual(
       [
-        'barricade_captain',
         'calligraphy_instructor',
         'forge_instructor',
         'glider_apprentice',
@@ -155,26 +153,6 @@ describe('worldQuestInstructorDialog presentation', () => {
     ]);
     const elian = { id: 2, kind: 'npc', templateId: 'calligraphy_instructor' } as Entity;
     const dialog = worldQuestInstructorDialog(world, elian);
-
-    expect(dialog).not.toBeNull();
-    expect(dialog?.canStart).toBe(false);
-    expect(dialog?.hint).toBeTruthy();
-  });
-
-  it('disallows starting horde defense when a wave is already in progress', () => {
-    const world = makeWorld([
-      [
-        'wq_wraithwood_barricade',
-        {
-          questId: 'wq_wraithwood_barricade',
-          count: 0,
-          state: 'active',
-          horde: { ...createHordeBarricade(1), phase: 'active' },
-        },
-      ],
-    ]);
-    const rowan = { id: 6, kind: 'npc', templateId: 'barricade_captain' } as Entity;
-    const dialog = worldQuestInstructorDialog(world, rowan);
 
     expect(dialog).not.toBeNull();
     expect(dialog?.canStart).toBe(false);

@@ -9977,6 +9977,7 @@ export const id_ID: EnTranslations = {
         "thresholds": "Gold: {gold}s or less. Silver: {silver}s or less.",
         "starting": "Getting ready...",
         "finished": "Fine work! A shield fit for the garrison!",
+        "failed": "Too many mistakes! The metal cracked. Speak to Mara to try again.",
         "wrong": "Wrong tool! +{penalty}s. Try the requested object.",
         "correct": "That is it! Keep going.",
         "result": "{rating}! {seconds}s. Mistakes: {mistakes}.",
@@ -15920,7 +15921,7 @@ export const id_ID: EnTranslations = {
       },
       "forge_instructor": {
         "name": "Smith Mara",
-        "title": "Last Keep Smith",
+        "title": "Wyrmwatch Smith",
         "greeting": "Help me finish a shield! Click the supplies I call for. Quick hands earn a better medal."
       },
       "infiltrator_captain": {

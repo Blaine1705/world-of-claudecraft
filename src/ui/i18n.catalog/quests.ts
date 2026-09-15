@@ -275,6 +275,7 @@ const questStringsEn = {
         thresholds: 'Gold: {gold}s or less. Silver: {silver}s or less.',
         starting: 'Getting ready...',
         finished: 'Fine work! A shield fit for the garrison!',
+        failed: 'Too many mistakes! The metal cracked. Speak to Mara to try again.',
         wrong: 'Wrong tool! +{penalty}s. Try the requested object.',
         correct: 'That is it! Keep going.',
         result: '{rating}! {seconds}s. Mistakes: {mistakes}.',

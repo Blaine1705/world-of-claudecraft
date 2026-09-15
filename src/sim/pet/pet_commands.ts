@@ -42,12 +42,12 @@ import { clearPacklordState } from '../combat/hunter_packlord';
 import { isTemporaryNecromancyUndead } from '../combat/necromancy';
 import { ABILITIES, DUNGEON_X_THRESHOLD, ITEMS, isDelvePos, MOBS } from '../data';
 import { createMob } from '../entity';
-import { hordeActionsLocked } from '../horde_action_lock';
 import { consumeSelectedInventorySlot } from '../item_copy_ref';
 import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
 import type { PetState, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { addThreat, clearThreat } from '../threat';
+import { wispMazeActionsLocked } from '../wisp_maze_action_lock';
 import {
   type Aura,
   DEMON_HEAL_CAST_ID,
@@ -98,7 +98,7 @@ function petCommandBlockedByControl(ctx: SimContext, owner: Entity): boolean {
   const meta = ctx.players.get(owner.id);
   if (
     meta &&
-    (hordeActionsLocked(meta.worldQuestLog) ||
+    (wispMazeActionsLocked(meta.worldQuestLog) ||
       shadowActionsLocked(meta.worldQuestLog) ||
       gliderActionsLocked(meta.worldQuestLog))
   )

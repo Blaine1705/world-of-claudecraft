@@ -4,7 +4,6 @@ import type * as THREE from 'three';
 import type { IWorld } from '../world_api';
 import { CannonEncounterVisual } from './cannon_encounter_visual';
 import { GliderCourseVisual } from './glider_course_visual';
-import { HordeBarricadeVisual } from './horde_barricade_visual';
 import { IslandGuidance } from './island_guidance';
 import { MountBeacon } from './mount_beacon';
 import { RaceLine } from './race_line';
@@ -19,7 +18,6 @@ export class WorldGuidance {
   private readonly island: IslandGuidance;
   private readonly trace: WorldQuestTraceVisual;
   private readonly cannon: CannonEncounterVisual;
-  private readonly horde: HordeBarricadeVisual;
   private readonly glider: GliderCourseVisual;
   private readonly shadow: ShadowInfiltrationVisual;
   private readonly wispMaze: WispMazeVisual;
@@ -45,11 +43,6 @@ export class WorldGuidance {
       groundAt,
       compileGate && ((root) => compileGate(root, true)),
     );
-    this.horde = new HordeBarricadeVisual(
-      scene,
-      groundAt,
-      compileGate && ((root) => compileGate(root, true)),
-    );
     this.glider = new GliderCourseVisual(
       scene,
       groundAt,
@@ -70,7 +63,6 @@ export class WorldGuidance {
       this.shadow.readyForEntry,
       this.trace.readyForEntry,
       this.cannon.readyForEntry,
-      this.horde.readyForEntry,
       this.glider.readyForEntry,
     ]).then(() => {});
   }
@@ -94,7 +86,6 @@ export class WorldGuidance {
     );
     this.trace.update(world);
     this.cannon.update(world.vehicleSession, dt, reducedMotion);
-    this.horde.update(world, reducedMotion);
     this.glider.update(world, renderedSelf);
     this.shadow.update(world);
     this.wispMaze.update(world, reducedMotion);
@@ -103,7 +94,6 @@ export class WorldGuidance {
   dispose(): void {
     this.trace.dispose();
     this.cannon.dispose();
-    this.horde.dispose();
     this.glider.dispose();
     this.shadow.dispose();
     this.wispMaze.dispose();

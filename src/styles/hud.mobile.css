@@ -53,8 +53,7 @@
     font-size: 14px;
   }
   body.mobile-touch .vehicle-bar-status,
-  body.mobile-touch .vehicle-bar-hint,
-  body.mobile-touch .vehicle-comfort {
+  body.mobile-touch .vehicle-bar-hint {
     font-size: 12px;
   }
   body.mobile-touch.operating-vehicle #player-frame:not(.pf-detached) {

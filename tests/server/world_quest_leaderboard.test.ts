@@ -129,7 +129,7 @@ describe('recordWorldQuestScore', () => {
       rows: vi.fn<typeof worldQuestScoreboardRows>(async () => []),
     });
     for (let i = 0; i < MAX_PENDING_WORLD_QUEST_SCORES + 3; i++)
-      recordWorldQuestScore(who, { board: 'barricade', medal: 'bronze', metric: i });
+      recordWorldQuestScore(who, { board: 'forge', medal: 'bronze', metric: i });
     await Promise.resolve();
     // ONE write in flight (the FIFO tail), the rest queued up to the bound, 3 shed.
     expect(upsert).toHaveBeenCalledTimes(1);

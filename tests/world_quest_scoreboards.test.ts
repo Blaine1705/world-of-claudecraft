@@ -5,7 +5,6 @@ import { LAST_KEEP_CANNON, NORTH_WATCH_CANNON } from '../src/sim/content/vehicle
 import { WORLD_QUEST_CALLIGRAPHY_ID } from '../src/sim/content/world_quest_calligraphy';
 import { FORGE_QUEST_ID } from '../src/sim/content/world_quest_forging';
 import { GLIDER_QUEST_ID } from '../src/sim/content/world_quest_glider';
-import { HORDE_QUEST_ID } from '../src/sim/content/world_quest_horde';
 import { WORLD_QUESTS_BY_ID } from '../src/sim/data';
 import { LEADERBOARD_MAX, LEADERBOARD_PAGE_SIZE } from '../src/sim/leaderboard_page';
 import type { SimEvent } from '../src/sim/types';
@@ -37,7 +36,6 @@ describe('scoreboard catalog', () => {
       WORLD_QUEST_CALLIGRAPHY_ID,
       GLIDER_QUEST_ID,
       FORGE_QUEST_ID,
-      HORDE_QUEST_ID,
     ]);
     for (const b of WORLD_QUEST_SCOREBOARDS) expect(WORLD_QUESTS_BY_ID[b.questId]).toBeDefined();
     expect(new Set(WORLD_QUEST_SCOREBOARDS.map((b) => b.id)).size).toBe(
@@ -134,6 +132,7 @@ describe('shared paging', () => {
       pageCount: 1,
       total: 0,
       pageSize: LEADERBOARD_PAGE_SIZE,
+      self: null,
     });
   });
 });

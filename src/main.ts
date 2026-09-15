@@ -116,7 +116,6 @@ import {
   stampGraphicsRebuildProbe,
   updateGraphicsRebuildProbePhase,
 } from './game/graphics_rebuild_crash_guard';
-import { hordeControlsActive, hordeExitInput } from './game/horde_controls';
 import { tryIgnivarPlacerCommand } from './game/ignivar_placer';
 import { Input } from './game/input';
 import { InputActivityMeter, installInputActivityTracking } from './game/input_activity';
@@ -1995,7 +1994,7 @@ async function startGame(
       canUseGameKeys: () => !gameplayInputBlocked(),
       // Interface arrangement claims the mouse for frame drags.
       isCameraLocked: () => hud.isInterfaceUnlocked(),
-      isCameraMotionLocked: () => world.vehicleSession !== null || hordeControlsActive(world),
+      isCameraMotionLocked: () => world.vehicleSession !== null,
       isGliderActive: () => gliderControlsActive(world),
     },
     keybinds,
@@ -4108,7 +4107,7 @@ async function startGame(
     const flight = resolveGliderMove(world, input);
     if (flight) return flight;
     attackMoveTick();
-    const mi = hordeExitInput(world, input.readMoveInput());
+    const mi = input.readMoveInput();
     let facing: number | null = mouselook ? input.camYaw : null;
     // A teleport (door, portal, spirit release) invalidates any pending
     // click-to-move: the destination is across the transition, and chasing it

@@ -6,7 +6,9 @@ import {
   GLIDER_NPC_ID,
   GLIDER_QUEST_ID,
 } from './content/world_quest_glider';
+import { displacePlayer } from './displacement';
 import { createNpc } from './entity';
+import { GLIDER_TOWER } from './glider_tower_layout';
 import {
   createGliderFlightState,
   type GliderFlightState,
@@ -62,6 +64,33 @@ function returnGliderToLaunch(ctx: SimContext, player: Entity): void {
   player.fallStartY = player.pos.y;
 }
 
+export function updateGliderLaunchUpdraft(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  player: Entity,
+): boolean {
+  if (player.dead || player.inCombat || meta.vehicle) return false;
+  if (player.pos.y >= 40) return false;
+  const dx = player.pos.x - GLIDER_TOWER.updraft.x;
+  const dz = player.pos.z - GLIDER_TOWER.updraft.z;
+  if (dx * dx + dz * dz > GLIDER_TOWER.updraft.radius * GLIDER_TOWER.updraft.radius) {
+    return false;
+  }
+  if (player.mountKey) ctx.forceDismount(player);
+  displacePlayer(
+    ctx,
+    player,
+    {
+      x: GLIDER_NPC_DEF.pos.x + 1,
+      z: GLIDER_NPC_DEF.pos.z,
+      facing: GLIDER_LAUNCH_SITE.playerFacing,
+    },
+    'A howling updraft carries you swiftly back up to The Shear!',
+  );
+  meta.wireRev++;
+  return true;
+}
+
 function abortGliderFlight(
   ctx: SimContext,
   meta: PlayerMeta,
@@ -96,6 +125,7 @@ export function startGliderFlight(
   player: Entity,
   npc: Entity,
   progress: WorldQuestProgress,
+  practice = false,
 ): void {
   if (
     npc.dead ||
@@ -160,7 +190,7 @@ export function startGliderFlight(
   player.facing = GLIDER_LAUNCH_SITE.playerFacing;
 
   const courseId = gliderCourseById(progress.glider?.courseId).id;
-  const practiceOnly = progress.glider?.practiceOnly;
+  const practiceOnly = practice || progress.glider?.practiceOnly;
   progress.glider = {
     ...createGliderFlightState(true),
     courseId,

@@ -5,7 +5,6 @@ import type { MountKey } from './content/mounts';
 import type { GatheringProfessionId, ToolEffectId } from './content/professions';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
 import type { GliderFlightResult, GliderFlightState } from './minigames/glider_flight';
-import type { HordeResult, HordeState } from './minigames/horde_barricade';
 import type { WispMazeState } from './minigames/wisp_maze';
 import type { HarvestYield } from './professions/harvest_yields';
 import type { RespawnWindow } from './respawn_policy';
@@ -4246,7 +4245,7 @@ export interface WorldQuestForgeResult {
 }
 
 export interface WorldQuestForgeState {
-  phase: 'countdown' | 'working' | 'success';
+  phase: 'countdown' | 'working' | 'success' | 'failed';
   /** Last authoritative clock sample, published at bounded cadence for both hosts. */
   observedAt: number;
   /** Isolated stream for the band centres (minigames/forge_workshop.ts). */
@@ -4273,7 +4272,6 @@ export type WorldQuestObjective =
   | { type: 'investigation'; targetMobId: string }
   | { type: 'shadow'; instructorNpcId: string }
   | { type: 'forging'; instructorNpcId: string }
-  | { type: 'horde'; instructorNpcId: string }
   | { type: 'wisp_maze'; instructorNpcId: string }
   | { type: 'vehicle'; stationId: string }
   | {
@@ -4347,11 +4345,8 @@ export interface WorldQuestProgress {
   questId: string;
   count: number;
   state: 'active' | 'completed';
-  /** Personal workshop run, omitted from saves. */
-  horde?: HordeState;
   /** Private maze actors and collection, session only. */
   wispMaze?: WispMazeState & { paused?: boolean };
-  hordeResult?: HordeResult;
   forging?: WorldQuestForgeState;
   /** Best completed workshop result for this rotation. */
   forgeResult?: WorldQuestForgeResult;
