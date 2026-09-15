@@ -4,7 +4,7 @@
 
 import { WORLD_QUESTS_BY_ID } from '../sim/data';
 import type { SimEvent } from '../sim/types';
-import { questTitle } from './entity_display_labels';
+import { questTitle } from './entity_display_core';
 import { cannonResultText } from './hud/vehicle/cannon_tactics_view';
 import { formatNumber, t } from './i18n';
 import { ownEntry } from './known_item';

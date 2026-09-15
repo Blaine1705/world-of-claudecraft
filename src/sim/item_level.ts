@@ -11,7 +11,8 @@
 // tests import it directly.
 //
 // Two distinct outputs:
-//   - itemLevel(item): the tier number shown in the tooltip ("Item Level 10").
+//   - itemLevel(item): the definition's baseline tier. itemInstanceLevel adds
+//     an earned Perfected collection tier for the tooltip, never cosmetic rarity.
 //   - primaryStatBudget(...): the total primary-stat points an item of that tier
 //     SHOULD grant. normalizePrimaryStats() distributes that budget back across an
 //     item's existing stats so two drops from the same place carry the same total
@@ -19,6 +20,7 @@
 //     str/sta, a mage cloth piece stays int/spi). itemScore() is the realized
 //     power (stats + armor + weapon dps) for at-a-glance comparison.
 
+import { crucibleCollectionForItem } from './content/crucible_collections';
 import {
   HEROIC_BOSS_LOOT,
   HEROIC_LOOT_SOURCE_LEVEL,
@@ -40,33 +42,54 @@ import { ALL_RECIPES, DUNGEONS, ITEMS, MOBS, QUESTS } from './data';
 // cycle). Imported for internal use and re-exported so every existing importer of
 // item_level keeps working unchanged.
 import {
+  checkStaminaModel,
+  expectedStatTotal,
   HEROIC_VARIANT_SOURCE_LEVEL,
   normalizePrimaryStats,
+  normalizeToStaminaModel,
   PRIMARY_STATS,
   type PrimaryStat,
   primaryStatBudget,
   QUALITY_ILVL_BONUS,
   QUALITY_STAT_MULT,
+  realizedLineBudget,
   SLOT_STAT_MULT,
+  STAMINA_BASELINE_SHARE,
+  STAMINA_PREMIUM,
   STAT_PER_ILVL,
+  type StaminaModelCheck,
+  type StatIdentity,
   slotStatMultForItem,
+  staminaBaseline,
+  statIdentity,
   TWOHAND_DPS_MULT,
   TWOHAND_STAT_MULT,
   WORN_OFFHAND_STAT_MULT,
 } from './item_budget';
-import type { ItemDef } from './types';
+import { COLLECTION_PERFECTING_SOURCE_INCREASE } from './professions/perfecting_bonus';
+import type { ItemDef, ItemInstancePayload } from './types';
 
 export {
+  checkStaminaModel,
+  expectedStatTotal,
   HEROIC_VARIANT_SOURCE_LEVEL,
   normalizePrimaryStats,
+  normalizeToStaminaModel,
   PRIMARY_STATS,
   type PrimaryStat,
   primaryStatBudget,
   QUALITY_ILVL_BONUS,
   QUALITY_STAT_MULT,
+  realizedLineBudget,
   SLOT_STAT_MULT,
+  STAMINA_BASELINE_SHARE,
+  STAMINA_PREMIUM,
   STAT_PER_ILVL,
+  type StaminaModelCheck,
+  type StatIdentity,
   slotStatMultForItem,
+  staminaBaseline,
+  statIdentity,
   TWOHAND_DPS_MULT,
   TWOHAND_STAT_MULT,
   WORN_OFFHAND_STAT_MULT,
@@ -203,14 +226,15 @@ function buildSourceIndex(): Map<string, ItemSource> {
   // five-man epic pieces read item level 31 (25 + the epic bump). The 10-player
   // raid (Heroic Nythraxis) is one tier ABOVE the five-mans: its heroic-only
   // weapons register at NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL (27) so they land at
-  // item level 33.
+  // item level 33. Migrated base-table paths preserve their original source
+  // index; listing them in the shared heroic slot must not increase their level.
   for (const [bossId, entries] of Object.entries(HEROIC_BOSS_LOOT)) {
     const src =
       bossId === NYTHRAXIS_RAID_BOSS_ID
         ? NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL
         : HEROIC_LOOT_SOURCE_LEVEL;
     for (const entry of entries) {
-      if (entry.itemId) bump(entry.itemId, src, false);
+      if (entry.itemId && !entry.preserveSourceTier) bump(entry.itemId, src, false);
     }
   }
   // Heroic upgraded drop variants (content/heroic_variants.ts): the "Heroic X"
@@ -297,6 +321,41 @@ function sourceIndexOf(): Map<string, ItemSource> {
   return sourceIndex;
 }
 
+// itemId -> "this drops from the HEROIC Nythraxis raid", the question the raid
+// flag above cannot answer. The heroic raid's loot registers raid: false on
+// purpose: its source level IS the raid tier (27), so OR-ing the raid bonus in
+// would price it a second time. Two arms, the two ways a heroic raid pays:
+// the heroic-ONLY extras on the boss's own heroic table (the three bespoke
+// weapons), and the heroic variants of the boss's normal drops, which the
+// claim swaps in. Built once, lazily, from the same static tables, and reset
+// with the source index.
+let heroicRaidIndex: Set<string> | null = null;
+
+function buildHeroicRaidIndex(): Set<string> {
+  const idx = new Set<string>();
+  for (const entry of HEROIC_BOSS_LOOT[NYTHRAXIS_RAID_BOSS_ID] ?? []) {
+    if (entry.itemId) idx.add(entry.itemId);
+  }
+  const raidBases = new Set(
+    (MOBS[NYTHRAXIS_RAID_BOSS_ID]?.loot ?? []).flatMap((e) => (e.itemId ? [e.itemId] : [])),
+  );
+  for (const item of Object.values(ITEMS)) {
+    if (item.heroicOf && raidBases.has(item.heroicOf)) idx.add(item.id);
+  }
+  return idx;
+}
+
+// Whether the HEROIC Nythraxis raid is a source for this item. Separate from
+// itemFromRaid because the two answer different questions: that one drives the
+// item-level raid bonus (which the heroic tier already prices into its source
+// level), this one says the piece was won in a raid encounter. Sundering is
+// the consumer: the Phase 05 QA ruling admits heroic-raid epics, and reading
+// the source here keeps that eligibility flip out of the item-level math.
+export function itemFromHeroicRaid(itemId: string): boolean {
+  if (!heroicRaidIndex) heroicRaidIndex = buildHeroicRaidIndex();
+  return heroicRaidIndex.has(itemId);
+}
+
 // The level of the content an item drops from, or undefined for items with no
 // drop/quest source (vendor stock, starter gear, junk, conjured/quest items).
 export function itemSourceLevel(itemId: string): number | undefined {
@@ -330,17 +389,48 @@ export function itemLevel(item: ItemDef): number | undefined {
   return Math.max(1, src.level + bonus + raid);
 }
 
-// The budget an item is expected to carry given its own source/quality/slot, or
-// undefined when the item has no derivable item level. A two-handed weapon carries
-// only the modest TWOHAND_STAT_MULT premium over the mainhand line (its real
-// compensation is weapon dps, TWOHAND_DPS_MULT); rounded so budgets stay integral.
-export function expectedStatBudget(item: ItemDef): number | undefined {
+/** Display a copy's earned tier without repricing static budgets or cosmetic
+ *  promotion. Only the new collections earn three item levels when Perfected;
+ *  their partial ranks and the 17 legacy Masterwrought items keep the base tier. */
+export function itemInstanceLevel(
+  item: ItemDef,
+  instance?: ItemInstancePayload,
+): number | undefined {
+  const level = itemLevel(item);
+  return level !== undefined && instance?.perfected === true && crucibleCollectionForItem(item.id)
+    ? level + COLLECTION_PERFECTING_SOURCE_INCREASE
+    : level;
+}
+
+// The offense-and-resource LINE an item is expected to spend on its identity
+// (str/agi or int/spi, plus any stamina above the baseline) given its own
+// source/quality/slot, or undefined when the item has no derivable item level. A
+// two-handed weapon carries only the modest TWOHAND_STAT_MULT premium over the
+// mainhand line (its real compensation is weapon dps, TWOHAND_DPS_MULT); rounded
+// so budgets stay integral. This is the number the stamina baseline is taken from.
+export function expectedLineBudget(item: ItemDef): number | undefined {
   const level = itemLevel(item);
   if (level === undefined) return undefined;
   const base = primaryStatBudget(level, item.quality, item.slot, slotStatMultForItem(item));
   return item.kind === 'weapon' && item.hand === 'twohand'
     ? Math.round(base * TWOHAND_STAT_MULT)
     : base;
+}
+
+// The primary-stat TOTAL (all five attributes) an item is expected to carry: the
+// line above plus, for a caster identity, its free stamina baseline (a physical
+// identity already holds its baseline inside the line). primaryStatSum(item) equals
+// this for every item on the model; see item_budget.ts for the model.
+export function expectedStatBudget(item: ItemDef): number | undefined {
+  const line = expectedLineBudget(item);
+  if (line === undefined) return undefined;
+  return expectedStatTotal(line, statIdentity(item.stats));
+}
+
+// The stamina-model readout for an item with a derivable line, or undefined.
+export function itemStaminaModel(item: ItemDef): StaminaModelCheck | undefined {
+  const line = expectedLineBudget(item);
+  return line === undefined ? undefined : checkStaminaModel(item.stats, line);
 }
 
 // The sum of an item's primary stats (its realized stat budget).
@@ -368,4 +458,5 @@ export function itemScore(item: ItemDef): number {
 export function resetItemLevelCache(): void {
   sourceIndex = null;
   encounterIndex = null;
+  heroicRaidIndex = null;
 }

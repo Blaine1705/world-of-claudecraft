@@ -54,6 +54,8 @@ interface Harness {
   storage: MemoryStorage;
   sent: string[];
   errors: string[];
+  activateContextAction(action: string): void;
+  shownPanes: HTMLElement[];
 }
 
 function makeHarness(
@@ -71,7 +73,9 @@ function makeHarness(
   const storage = new MemoryStorage(initialStorage);
   const sent: string[] = [];
   const errors: string[] = [];
+  const shownPanes: HTMLElement[] = [];
   let opener: HTMLElement | null = null;
+  let handleContextAction: (action: string) => void = () => {};
   const contextMenu: ChatContextMenuPort = {
     element: menu as unknown as HTMLElement,
     opener: () => opener,
@@ -83,7 +87,9 @@ function makeHarness(
       opener = null;
     },
     place: () => {},
-    bind: () => {},
+    bind: (onActivate) => {
+      handleContextAction = onActivate;
+    },
   };
   const controller = new ChatWindowController({
     document: document as unknown as Document,
@@ -101,8 +107,20 @@ function makeHarness(
     selectedQuestId: () => selectedQuest,
     hasQuest: (questId) => questId === 'q_wolves' || questId === ODD_QUEST_ID,
     showError: (text) => errors.push(text),
+    afterTabShown: (pane) => shownPanes.push(pane),
   });
-  return { controller, document, input, chatLog, combatLog, storage, sent, errors };
+  return {
+    controller,
+    document,
+    input,
+    chatLog,
+    combatLog,
+    storage,
+    sent,
+    errors,
+    shownPanes,
+    activateContextAction: (action) => handleContextAction(action),
+  };
 }
 
 function tabsBar(harness: Harness): FakeElement {
@@ -145,8 +163,75 @@ describe('ChatWindowController', () => {
     expect(partyLine.classList.contains('chat-hidden')).toBe(true);
     expect(harness.chatLog.classList.contains('active')).toBe(true);
     expect(harness.combatLog.classList.contains('active')).toBe(false);
+    expect(harness.shownPanes.at(-1)).toBe(harness.chatLog);
     expect(harness.controller.composeSend('need one tank')).toBe('/world need one tank');
     expect(harness.input.style.color).toBe('#ff9d5c');
+  });
+
+  it('uses tab primitives and clears an inactive channel unread badge when selected', () => {
+    const harness = makeHarness({ woc_chat_tabs: '["party"]' });
+    harness.controller.init();
+
+    const party = tabButton(harness, 'party');
+    expect(tabButton(harness, 'all').classList.contains('ui-tab')).toBe(true);
+    expect(party.classList.contains('ui-tab')).toBe(true);
+    expect(addButton(harness).classList.contains('ui-tab--add')).toBe(true);
+
+    const first = harness.document.createElement('div');
+    const second = harness.document.createElement('div');
+    harness.controller.hideIfFiltered(first as unknown as HTMLElement, 'party');
+    harness.controller.hideIfFiltered(second as unknown as HTMLElement, 'party');
+
+    const badge = party.children.find((child) => child.classList.contains('ui-badge'));
+    expect(badge?.textContent).toBe('2');
+    expect(badge?.getAttribute('aria-hidden')).toBe('true');
+
+    party.dispatchEvent(new Event('click'));
+
+    expect(party.children.some((child) => child.classList.contains('ui-badge'))).toBe(false);
+
+    const activeLine = harness.document.createElement('div');
+    harness.controller.hideIfFiltered(activeLine as unknown as HTMLElement, 'party');
+    expect(party.children.some((child) => child.classList.contains('ui-badge'))).toBe(false);
+  });
+
+  it('preserves unread counts across reorder and discards them when a channel closes', () => {
+    const harness = makeHarness({ woc_chat_tabs: '["party","world"]' });
+    harness.controller.init();
+
+    for (let i = 0; i < 2; i += 1) {
+      const line = harness.document.createElement('div');
+      harness.controller.hideIfFiltered(line as unknown as HTMLElement, 'party');
+    }
+
+    tabButton(harness, 'party').dispatchEvent(keydown('ArrowRight', true));
+
+    const reorderedParty = tabButton(harness, 'party');
+    expect(
+      reorderedParty.children.find((child) => child.classList.contains('ui-badge'))?.textContent,
+    ).toBe('2');
+
+    reorderedParty.dispatchEvent(new Event('contextmenu', { cancelable: true }));
+    const closedLine = harness.document.createElement('div');
+    harness.controller.hideIfFiltered(closedLine as unknown as HTMLElement, 'party');
+
+    addButton(harness).dispatchEvent(new Event('click'));
+    harness.activateContextAction('party');
+
+    expect(
+      tabButton(harness, 'party').children.some((child) => child.classList.contains('ui-badge')),
+    ).toBe(false);
+  });
+
+  it('reports the visible pane after activating a tab', () => {
+    const harness = makeHarness();
+    harness.controller.init();
+
+    tabButton(harness, 'combat').dispatchEvent(new Event('click'));
+
+    expect(harness.chatLog.classList.contains('active')).toBe(false);
+    expect(harness.combatLog.classList.contains('active')).toBe(true);
+    expect(harness.shownPanes.at(-1)).toBe(harness.combatLog);
   });
 
   it('mirrors typed joins without sending a duplicate command or changing the send tab', () => {

@@ -7,6 +7,7 @@ import { esc } from '../../esc';
 import { formatNumber, t } from '../../i18n';
 import { ownEntry } from '../../known_item';
 import type { PainterHostWriters } from '../../painter_host';
+import { type QuestTrackingState, sharedQuestTracking } from '../../quest_tracking_core';
 import { forgeInstructionLines } from '../../world_quest_forge_view';
 import { gliderInstructionLines } from '../../world_quest_glider_view';
 import { investigationInstructionLines } from '../../world_quest_investigation_view';
@@ -30,18 +31,22 @@ export interface QuestTrackerControllerDeps {
   writers: PainterHostWriters;
   element: HTMLElement;
   document: Document;
-  world(): Pick<IWorld, 'questLog' | 'worldQuestLog'> & Partial<Pick<IWorld, 'abandonQuest'>>;
+  world(): Pick<IWorld, 'questLog' | 'cfg' | 'player' | 'worldQuestLog'> &
+    Partial<Pick<IWorld, 'abandonQuest'>>;
+  /** Injectable tracking set; production leaves it out and shares the HUD's one. */
+  tracking?: QuestTrackingState;
   settings: QuestTrackerSettingsPort;
   questTitle(questId: string): string;
   objectiveLabel(questId: string, objectiveIndex: number): string;
-  openQuest?(questId: string): void;
   click(): void;
 }
 
 /** Owns quest tracker projection, collapse persistence, and elided DOM updates.
  *  The projection has TWO presentations: this right-anchored tracker on desktop,
  *  and the top-band strip on touch, which is handed the same TrackedQuest[]
- *  rather than projecting the log a second time. */
+ *  rather than projecting the log a second time. Active world quests join the
+ *  projection after the quest log; a live movement lesson (tracing, forging,
+ *  the wisp maze, a glider flight) holds the tracker open while it runs. */
 export class QuestTrackerController {
   private readonly strip: QuestStripController | null;
   private readonly wispHud: WispMazeHudController | null;
@@ -66,35 +71,7 @@ export class QuestTrackerController {
     this.wispHud = buildWispMazeHud(deps.writers, () =>
       deps.world().abandonQuest?.(WISP_MAZE_QUEST_ID),
     );
-    this.strip = buildQuestStrip({
-      writers: deps.writers,
-      click: () => this.deps.click(),
-      activate: () => false,
-    });
-    deps.element.addEventListener('click', (event) => {
-      const target = event.target as HTMLElement;
-      if (target.closest('.qt-header')) this.toggleCollapsed();
-      this.activateRow(target.closest<HTMLElement>('.qt-title'));
-    });
-    deps.element.addEventListener('keydown', (event) => {
-      if (event.key !== 'Enter' && event.key !== ' ' && event.code !== 'Space') return;
-      const target = event.target as HTMLElement;
-      if (target.closest('.qt-header')) {
-        event.preventDefault();
-        event.stopPropagation();
-        this.toggleCollapsed();
-        return;
-      }
-      const row = target.closest<HTMLElement>('.qt-title');
-      if (!row?.dataset.quest) return;
-      event.preventDefault();
-      event.stopPropagation();
-      this.activateRow(row);
-    });
-  }
-
-  private activateRow(row: HTMLElement | null): void {
-    if (row?.dataset.quest) this.deps.openQuest?.(row.dataset.quest);
+    this.strip = buildQuestStrip({ writers: deps.writers, click: () => this.deps.click() });
   }
 
   /** Language switch: the desktop rows already re-resolve unconditionally in
@@ -109,26 +86,35 @@ export class QuestTrackerController {
 
   update(now: number): void {
     this.lastNow = now;
-    const worldQuestLog = this.deps.world().worldQuestLog;
+    const world = this.deps.world();
+    const worldQuestLog = world.worldQuestLog;
     this.wispHud?.update(
       worldQuestLog.get(WISP_MAZE_QUEST_ID),
       wispMazeActionsLocked(worldQuestLog),
     );
     let collapsed = this.deps.settings.collapsed();
     const quests: TrackedQuest[] = [];
-    let traceQuestId: string | undefined;
-    for (const progress of this.deps.world().questLog.values()) {
+    let focusQuestId: string | undefined;
+    const tracking = this.deps.tracking ?? sharedQuestTracking();
+    tracking.useCharacter(world.cfg.playerClass, world.player.name);
+    const untracked = tracking.untrackedIds();
+    // The acceptance-order position in the WHOLE log, not this array's length: an
+    // untracked quest keeps its number reserved, so every remaining row still
+    // matches the world map's gold badge for the same quest.
+    let logPosition = 0;
+    for (const progress of world.questLog.values()) {
+      logPosition++;
+      if (untracked.has(progress.questId)) continue;
       // The log is SERVER truth: a quest id accepted on a current client can
       // reach a bundle that predates it (stale-client guard, R34), and the
       // tracker runs inside hud.update() every frame, so an unguarded deref
       // here killed the whole HUD tail. The unknown entry still PUSHES (raw
-      // id as its title, no objectives): the tracker numbers must match the
-      // world map's badges, and the map numbers every log entry, so a skip
-      // here would silently desync every number after it.
+      // id as its title, no objectives): a player must be able to see, and
+      // untrack, a row the client cannot name.
       const quest = ownEntry(QUESTS, progress.questId);
       quests.push({
         id: progress.questId,
-        number: quests.length + 1,
+        number: logPosition,
         // The unknown title SAYS unknown (a localizable sentence carrying the
         // raw id) instead of handing the player a bare content slug; the raw
         // id stays present so the row still matches a bug report.
@@ -145,7 +131,7 @@ export class QuestTrackerController {
           : [],
       });
     }
-    for (const progress of this.deps.world().worldQuestLog.values()) {
+    for (const progress of worldQuestLog.values()) {
       if (
         progress.state !== 'active' &&
         !(progress.traceResult && progress.tracing?.phase === 'success') &&
@@ -164,7 +150,7 @@ export class QuestTrackerController {
         progress.glider?.phase === 'countdown' ||
         progress.glider?.phase === 'flying'
       )
-        traceQuestId = progress.questId;
+        focusQuestId = progress.questId;
       quests.push({
         id: progress.questId,
         number: quests.length + 1,
@@ -215,11 +201,11 @@ export class QuestTrackerController {
     // On touch the strip IS the tracker: the right-anchored markup is hidden in
     // hud.mobile.css, so rendering it would be a string build a phone never sees.
     if (this.strip?.active() === true) {
-      this.strip.update(quests, now, traceQuestId);
+      this.strip.update(quests, now, focusQuestId);
       if (this.deps.element.innerHTML !== '') this.deps.element.innerHTML = '';
       return;
     }
-    this.collapseLocked = traceQuestId !== undefined;
+    this.collapseLocked = focusQuestId !== undefined;
     const html = this.renderHtml(questTrackerView(quests, this.collapseLocked ? false : collapsed));
     // First update adopts the live DOM as the baseline, so a host that
     // pre-seeded the element (or an empty tracker) still elides the write.
@@ -243,9 +229,7 @@ export class QuestTrackerController {
   private renderHtml(view: QuestTrackerView): string {
     if (!view.visible) return '';
     const chevron = view.collapsed ? '▸' : '▾';
-    const count = view.collapsed
-      ? ` <span class="qt-count">${esc(t('hudChrome.questTracker.count', { count: this.number(view.count) }))}</span>`
-      : '';
+    const count = ` <span class="qt-count ui-num">${esc(this.number(view.count))}</span>`;
     const hint = this.collapseLocked
       ? ''
       : ` title="${esc(
@@ -257,21 +241,29 @@ export class QuestTrackerController {
         )}"`;
     const locked = this.collapseLocked ? ' disabled aria-disabled="true"' : '';
     const header =
-      `<button type="button" class="qt-header" aria-expanded="${!view.collapsed}" aria-controls="qt-list"${hint}${locked}>` +
+      `<button type="button" class="qt-header ui-cin" aria-expanded="${!view.collapsed}" aria-controls="qt-list"${hint}${locked}>` +
       `<span class="qt-chevron" aria-hidden="true">${chevron}</span>` +
       `<span class="qt-h-label">${esc(t('questUi.tracker.title'))}</span>${count}</button>`;
     let rows = '';
     for (const quest of view.quests) {
+      // A world quest has no quest-log entry to jump to, so its row is plain text.
       const worldQuest = ownEntry(WORLD_QUESTS_BY_ID, quest.id);
       const behavior = !worldQuest
         ? ` role="button" tabindex="0" data-quest="${esc(quest.id)}"`
         : '';
-      rows += `<div class="qt-title"${behavior}><span class="qt-num">${esc(this.number(quest.number))}</span>${esc(quest.title)}${quest.complete ? ` <span class="quest-complete">(${esc(t('questUi.tracker.complete'))})</span>` : ''}</div>`;
+      rows += `<div class="qt-title ui-cin"${behavior}><span class="qt-num ui-badge ui-num">${esc(this.number(quest.number))}</span>${esc(quest.title)}${quest.complete ? ` <span class="quest-complete">(${esc(t('questUi.tracker.complete'))})</span>` : ''}</div>`;
       for (const objective of quest.objectives) {
-        const text = objective.instruction
-          ? objective.label
-          : this.progressText(objective.label, objective.current, objective.total);
-        rows += `<div class="qt-obj${objective.done ? ' done' : ''}">- ${esc(text)}</div>`;
+        if (objective.instruction) {
+          // A movement lesson instruction is shown in full, with no count.
+          rows += `<div class="qt-obj ui-meta${objective.done ? ' done' : ''}"><span>- ${esc(objective.label)}</span></div>`;
+          continue;
+        }
+        const state = objective.done ? ' done' : objective.counted ? ' counted' : ' muted';
+        const value =
+          !objective.done && objective.counted
+            ? `<span class="qt-obj-count ui-num">${esc(this.progressValue(objective.current, objective.total))}</span>`
+            : '';
+        rows += `<div class="qt-obj ui-meta${state}"><span>- ${esc(objective.label)}</span>${value}</div>`;
       }
     }
     return `${header}<div id="qt-list">${rows}</div>`;
@@ -281,9 +273,8 @@ export class QuestTrackerController {
     return formatNumber(value, { maximumFractionDigits: 0 });
   }
 
-  private progressText(label: string, current: number, total: number): string {
-    return t('questUi.detail.objectiveProgress', {
-      label,
+  private progressValue(current: number, total: number): string {
+    return t('hudChrome.questTracker.objectiveValue', {
       current: this.number(current),
       total: this.number(total),
     });

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { WORLD_QUESTS_BY_ID } from '../src/sim/data';
 import { createGroundObject } from '../src/sim/entity';
-import { entityDisplayName } from '../src/ui/entity_display_labels';
+import { entityDisplayName } from '../src/ui/entity_display_core';
 import {
   worldQuestDisplayName,
   worldQuestObjectiveLabel,

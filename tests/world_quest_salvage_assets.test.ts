@@ -33,9 +33,9 @@ describe('Farshore salvage render assets', () => {
   it('pins all six shipped GLBs to their visual slots, manifest, credits, and boot prewarm', () => {
     const manifest = readFileSync('src/render/assets/manifest.generated.ts', 'utf8');
     const credits = readFileSync('CREDITS.md', 'utf8');
-    const renderer = readFileSync('src/render/renderer.ts', 'utf8');
+    const renderer = readFileSync('src/render/zone_prewarm_groups.ts', 'utf8');
     expect(renderer).toMatch(
-      /prewarmFarshoreSalvageObjects\(\s*buildGroundQuestObject,\s*\(poolKey, object\) =>\s*this\.storePooledObject\(poolKey, object\)/,
+      /prewarmFarshoreSalvageObjects\(\s*buildGroundQuestObject,\s*\(poolKey, built\) =>\s*h\.storePooledObject\(poolKey, built\)/,
     );
 
     const expectedPlan = WRECKAGE_ASSETS.map((_, visual) => ({

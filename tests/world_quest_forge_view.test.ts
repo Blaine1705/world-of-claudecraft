@@ -6,7 +6,7 @@ import {
   forgeNeedleAt,
 } from '../src/sim/minigames/forge_workshop';
 import type { Entity, WorldQuestProgress } from '../src/sim/types';
-import { entityDisplayName } from '../src/ui/entity_display_labels';
+import { entityDisplayName } from '../src/ui/entity_display_core';
 import {
   createForgeActionBarView,
   forgeInstructionLines,

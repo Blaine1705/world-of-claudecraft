@@ -63,6 +63,13 @@ function makeCtx() {
   const pulseGroundAoE = vi.fn();
   const host: SimContextHost = {
     riftCollisionToken: 1,
+    accountCosmetics: {
+      completedQuestIds: [],
+      mechChromaIds: [],
+      weaponSkinIds: [],
+      weaponSkinLoadout: {},
+      mountSkinIds: [],
+    },
     storagePrices: DEFAULT_STORAGE_PRICES,
     naturalRiftPortals: [],
     riftEvents: [],
@@ -81,9 +88,11 @@ function makeCtx() {
     get entities() {
       return entities;
     },
+    entityRosterVersion: 0,
     primaryId: -1,
     tradeInvites: new Map(),
     duelInvites: new Map(),
+    feasts: new Map(),
     nextId: 1,
     get grid() {
       return grid;
@@ -154,6 +163,7 @@ function makeCtx() {
     utcDay: '',
     resetDay: '',
     eventLeadDay: '',
+    dailyResetRemainingSec: 0,
     pendingMobRespawns: [],
     partyInvites: new Map(),
     readyChecks: new Map(),
@@ -203,6 +213,7 @@ function makeCtx() {
     isControlAura: vi.fn(() => false),
     applyRootAura: vi.fn(),
     applyKnockback: vi.fn(() => 0),
+    isIceBlocked: vi.fn(() => false),
     diminishedCrowdControlDuration: vi.fn(() => null),
     hostilesInRadius: vi.fn(() => []),
     friendliesInRadius: vi.fn(() => []),
@@ -225,6 +236,7 @@ function makeCtx() {
     onMobKilledForWorldQuests: vi.fn(),
     onRecipeCraftedForQuests: vi.fn(),
     onNodeGatheredForQuests: vi.fn(),
+    onCropFarmedForQuests: vi.fn(),
     onNodeGatheredForWorldQuests: vi.fn(),
     onObjectInteractedForWorldQuests: vi.fn(() => false),
     currentWorldQuestRotation: vi.fn(() => ({ cycle: '', quests: [] })),
@@ -254,6 +266,7 @@ function makeCtx() {
     dungeonDifficulty: vi.fn(() => 'normal' as const),
     setDungeonDifficulty: vi.fn(),
     awardHeroicMarks: vi.fn(),
+    awardWyrmfallCores: vi.fn(),
     addEntity: vi.fn(),
     dropEntity: vi.fn(),
     rebucket: vi.fn(),
@@ -281,6 +294,7 @@ function makeCtx() {
     deedRuntime: createDeedRuntime(),
     fiestaBotPids: [],
     mobScanCounters: createMobScanCounters(),
+    engagedPids: new Set<number>(),
     bumpDeedStat: vi.fn(),
     bumpCommissionOrderBoardRev: vi.fn(),
     markItemDiscovered: vi.fn(),
@@ -373,6 +387,7 @@ function makeCtx() {
     breakGhostWolf: vi.fn(),
     forceDismount: vi.fn(),
     startAutoAttack: vi.fn(),
+    tryPlayerSwing: vi.fn(),
     revivePet: vi.fn(),
     completeFishing: vi.fn(),
     completeGatherCast: vi.fn(),
@@ -380,6 +395,7 @@ function makeCtx() {
     completeDisenchantCast: vi.fn(),
     completeApplyEnchantCast: vi.fn(),
     completeSalvageCast: vi.fn(),
+    completeSunderCast: vi.fn(),
     completeRechargeCast: vi.fn(),
     applyDemonHealTick: vi.fn(),
     awardCombo: vi.fn(),
@@ -398,6 +414,7 @@ function makeCtx() {
     spawnDevVendor: vi.fn(),
     startCascadePlaytest: vi.fn(),
     startDevSandbox: vi.fn(),
+    setDevMobsFrozen: vi.fn(() => false),
     seedDungeonFinderDev: vi.fn(() => ({ spawned: 0, note: 'ok' as const })),
     // L2 inventory/vendor (W2): the four still-on-Sim helpers the moved useItem dispatches to.
     startFishing: vi.fn(),
@@ -414,6 +431,7 @@ function makeCtx() {
     // Ravenpost mail: the quest turn-in letter hook.
     queueQuestLetter: vi.fn(),
     mailHeroicMarks: vi.fn(),
+    mailWyrmfallCores: vi.fn(),
     mailAuthoredLetter: vi.fn(),
     mailboxHoldsItem: vi.fn(() => false),
     applySetProcs: vi.fn(),

@@ -150,7 +150,9 @@ export const WILLOWFEN_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1,
     color: 0x7aa848,
-    componentTags: ['gills', 'hide'],
+    // A poison toad: the venom gland is the same family the spiders yield.
+    // Phase 11m added the tag as the band-3 open-world venomSac source.
+    componentTags: ['gills', 'venomSac', 'hide'],
   },
   drowsy_croaker: {
     id: 'drowsy_croaker',
@@ -471,7 +473,7 @@ export const WILLOWFEN_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'feet',
     quality: 'uncommon',
-    stats: { armor: 60, sta: 3, spi: 2 },
+    stats: { armor: 60, sta: 3, spi: 4 },
     sellValue: 1000,
   },
   lilybed_mantle: {
@@ -481,7 +483,7 @@ export const WILLOWFEN_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'shoulder',
     quality: 'rare',
-    stats: { armor: 76, sta: 6, spi: 4 },
+    stats: { armor: 76, sta: 6, spi: 7 },
     sellValue: 2400,
   },
 };

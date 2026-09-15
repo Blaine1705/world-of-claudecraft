@@ -36,8 +36,13 @@ interface CaravanEntityPresentation {
   freightCaravanVisual: MovingWorldQuestFreightWagonVisual | null;
 }
 
-/** Uses the interpolated group pose and the renderer's scratch sphere, with no
- * per-frame allocation. Only the cosmetic driver's animation is culled. */
+/** The wagon's cull radius floor: the freight body is wider than a character,
+ *  so the renderer's per-character cull core is asked for at least this much. */
+export const QUEST_CARAVAN_CULL_RADIUS = 6;
+
+/** Uses the interpolated group pose, with no per-frame allocation. Only the
+ * cosmetic driver's animation is culled: `onScreen` is the renderer's own
+ * character-cull verdict for this body (always true when culling is off). */
 export function syncQuestCaravanBody(
   view: CaravanEntityPresentation,
   dt: number,
@@ -45,21 +50,15 @@ export function syncQuestCaravanBody(
   distSq: number,
   lodBands: CharacterLodBands,
   reducedMotion: boolean,
-  frustum: THREE.Frustum | null,
-  sphere: THREE.Sphere,
+  onScreen: boolean,
 ): void {
   const { x, y, z } = view.group.position;
   const moving = Math.hypot(x - view.lastX, z - view.lastZ) > 0.001;
   view.lastX = x;
   view.lastY = y;
   view.lastZ = z;
-  sphere.center.set(x, y + view.height * 0.5 * view.liveScale, z);
-  sphere.radius = 6 * view.liveScale;
   const cadence = animCadenceFrames(distSq, lodBands);
-  const animateDriver =
-    !reducedMotion &&
-    (!frustum || frustum.intersectsSphere(sphere)) &&
-    (cadence <= 1 || framePhase % cadence === 0);
+  const animateDriver = !reducedMotion && onScreen && (cadence <= 1 || framePhase % cadence === 0);
   view.freightCaravanVisual?.update(dt, moving, animateDriver);
 }
 

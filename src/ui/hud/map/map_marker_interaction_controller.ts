@@ -15,6 +15,7 @@ import {
   type OverworldSemanticMapModel,
 } from '../../map_semantic_accessibility_core';
 import type {
+  MapFarmPatchMarker,
   MapGatherNodeMarker,
   MapNavigationMarker,
   MapNpcMarker,
@@ -39,6 +40,7 @@ export interface MapMarkerInteractionDeps {
   station(marker: MapStationMarker): string;
   service(marker: MapServiceMarker): string;
   gather(marker: MapGatherNodeMarker): string;
+  farm(marker: MapFarmPatchMarker): string;
   worldQuest(marker: MapWorldQuestMarker): string;
   worldBoss(marker: MapWorldBossMarker): string;
   questArea(refs: readonly QuestObjectiveRef[], activeCount: number): string;
@@ -56,6 +58,7 @@ export class MapMarkerInteractionController {
   gatherNodes: readonly MapGatherNodeMarker[] = EMPTY_MARKERS;
   stations: readonly MapStationMarker[] = EMPTY_MARKERS;
   services: readonly MapServiceMarker[] = EMPTY_MARKERS;
+  farmPatches: readonly MapFarmPatchMarker[] = EMPTY_MARKERS;
   navigation: readonly MapNavigationMarker[] = EMPTY_MARKERS;
   readonly semantics: MapSemanticAccessibilityCore;
   readonly pointHits: MapPointMarkerHit[] = [];
@@ -82,6 +85,7 @@ export class MapMarkerInteractionController {
       station: deps.station,
       service: deps.service,
       gather: deps.gather,
+      farm: deps.farm,
       worldQuest: deps.worldQuest,
       worldBoss: deps.worldBoss,
       questArea: deps.questArea,
@@ -123,6 +127,7 @@ export class MapMarkerInteractionController {
       this.stations,
       this.services,
       this.navigation,
+      this.farmPatches,
       this.pointHits,
       this.questObjectives,
       this.semantics,
@@ -163,6 +168,7 @@ export class MapMarkerInteractionController {
     this.gatherNodes = EMPTY_MARKERS;
     this.stations = EMPTY_MARKERS;
     this.services = EMPTY_MARKERS;
+    this.farmPatches = EMPTY_MARKERS;
     this.navigation = EMPTY_MARKERS;
     this.selectedWorldQuestId = null;
     this.semantics.clear();
@@ -178,6 +184,7 @@ export class MapMarkerInteractionController {
     this.gatherNodes = model.gatherNodes;
     this.stations = model.stations;
     this.services = model.services;
+    this.farmPatches = model.farmPatches;
     this.navigation = model.navigation;
     if (
       this.selectedWorldQuestId &&

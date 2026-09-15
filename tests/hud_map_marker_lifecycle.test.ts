@@ -9,6 +9,7 @@ import { MapMarkerInteractionController, MapMarkerTooltipContent } from '../src/
 import type { RiftMapModel } from '../src/ui/hud/rift/rift_map_core';
 import { MapSemanticAccessibilityCore } from '../src/ui/map_semantic_accessibility_core';
 import type {
+  MapFarmPatchMarker,
   MapGatherNodeMarker,
   MapNavigationMarker,
   MapNpcMarker,
@@ -110,6 +111,7 @@ interface MapHudHarness {
   mapGatherNodes: MapGatherNodeMarker[];
   mapStations: MapStationMarker[];
   mapServices: MapServiceMarker[];
+  mapFarmPatches: MapFarmPatchMarker[];
   mapNavigationMarkers: MapNavigationMarker[];
   mapPointHitsScratch: MapPointMarkerHit[];
   mapQuestObjectiveScratch: QuestObjectiveRef[];
@@ -120,6 +122,7 @@ interface MapHudHarness {
   questGiverTooltipHtml(marker: MapNpcMarker): string;
   stationMapTooltipHtml(marker: MapStationMarker): string;
   serviceMapTooltipHtml(marker: MapServiceMarker): string;
+  farmPatchMapTooltipHtml(marker: MapFarmPatchMarker): string;
   navigationMapTooltipHtml(marker: MapNavigationMarker): string;
   gatherNodeMapTooltipHtml(marker: MapGatherNodeMarker): string;
   questAreaTooltipHtml(refs: readonly QuestObjectiveRef[], activeCount?: number): string;
@@ -139,6 +142,7 @@ interface MapHudHarness {
       gatherNodes: MapGatherNodeMarker[];
       stations: MapStationMarker[];
       services: MapServiceMarker[];
+      farmPatches: MapFarmPatchMarker[];
       navigation: MapNavigationMarker[];
       cursor: 'default' | 'grab';
     };
@@ -147,7 +151,7 @@ interface MapHudHarness {
   delvePainter: { paintWorldMapDelve(): DelveDrawModel | null };
   riftPainter: { paintWorldMap(): RiftMapModel | null };
   interiorMaps: {
-    paintCastleWorldMap(): string | null;
+    paintWorldMap(): { title: string; model: null } | null;
   };
   continentPainter: {
     paintContinent(): { regions: ContinentZoneRegion[] };
@@ -186,6 +190,7 @@ function wireTooltipResolvers(hud: MapHudHarness): void {
     station: (marker) => hud.stationMapTooltipHtml(marker),
     service: (marker) => hud.serviceMapTooltipHtml(marker),
     gather: (marker) => hud.gatherNodeMapTooltipHtml(marker),
+    farm: (marker) => hud.farmPatchMapTooltipHtml(marker),
     worldQuest: () => '<div>world quest</div>',
     worldBoss: () => '<div>world boss</div>',
     questArea: (refs, count) => hud.questAreaTooltipHtml(refs, count),
@@ -199,6 +204,7 @@ function wireTooltipResolvers(hud: MapHudHarness): void {
   controller.gatherNodes = hud.mapGatherNodes;
   controller.stations = hud.mapStations;
   controller.services = hud.mapServices;
+  controller.farmPatches = hud.mapFarmPatches;
   controller.navigation = hud.mapNavigationMarkers;
   hud.mapMarkerInteraction = controller;
   const proxy = <K extends keyof MapMarkerInteractionController>(
@@ -218,6 +224,7 @@ function wireTooltipResolvers(hud: MapHudHarness): void {
   proxy('mapGatherNodes', 'gatherNodes');
   proxy('mapStations', 'stations');
   proxy('mapServices', 'services');
+  proxy('mapFarmPatches', 'farmPatches');
   proxy('mapNavigationMarkers', 'navigation');
   Object.defineProperty(hud, 'mapPointHitsScratch', {
     configurable: true,
@@ -246,6 +253,12 @@ const STATION: MapStationMarker = {
   type: 'forge' as StationType,
 };
 const SERVICE: MapServiceMarker = { mx: 140, my: 200, kind: 'mailbox' };
+const FARM_PATCH: MapFarmPatchMarker = {
+  mx: 140,
+  my: 200,
+  patchId: 'patch_eastbrook',
+  zoneId: 'eastbrook_vale',
+};
 const NAVIGATION: MapNavigationMarker = {
   mx: 140,
   my: 200,
@@ -333,10 +346,12 @@ function markerHarness(): {
     mapGatherNodes: [GATHER],
     mapStations: [STATION],
     mapServices: [SERVICE],
+    mapFarmPatches: [FARM_PATCH],
     mapNavigationMarkers: [],
     mapPointHitsScratch: [],
     mapQuestObjectiveScratch: [],
     mapSemanticAccessibility: semanticCore(),
+    mapSidebar: { update() {}, filterState: () => undefined, shownRoute: () => null },
     questGiverTooltipHtml: () => {
       calls.push('npc');
       return '';
@@ -347,6 +362,10 @@ function markerHarness(): {
     },
     serviceMapTooltipHtml: () => {
       calls.push('service');
+      return '';
+    },
+    farmPatchMapTooltipHtml: () => {
+      calls.push('farm');
       return '';
     },
     navigationMapTooltipHtml: () => {
@@ -415,10 +434,12 @@ function lifecycleHarness(): {
     mapGatherNodes: [],
     mapStations: [],
     mapServices: [],
+    mapFarmPatches: [],
     mapNavigationMarkers: [],
     mapPointHitsScratch: [],
     mapQuestObjectiveScratch: [],
     mapSemanticAccessibility: semanticCore(),
+    mapSidebar: { update() {}, filterState: () => undefined, shownRoute: () => null },
     mapGatherTipMemo: { nodeId: 'stale' },
     continentRegions: [],
     setDisplay: vi.fn(),
@@ -436,6 +457,7 @@ function lifecycleHarness(): {
         gatherNodes: [GATHER],
         stations: [STATION],
         services: [SERVICE],
+        farmPatches: [FARM_PATCH],
         navigation: [NAVIGATION],
         player: { mx: 280, my: 280, angle: 0 },
         allies: [],
@@ -448,7 +470,7 @@ function lifecycleHarness(): {
     bgMapPainter: { paint: vi.fn() },
     delvePainter: { paintWorldMapDelve: vi.fn(() => null) },
     riftPainter: { paintWorldMap: vi.fn(() => null) },
-    interiorMaps: { paintCastleWorldMap: vi.fn(() => null) },
+    interiorMaps: { paintWorldMap: vi.fn(() => null) },
     continentPainter: {
       paintContinent: () => ({
         regions: [
@@ -468,6 +490,7 @@ function lifecycleHarness(): {
     questGiverTooltipHtml: () => '<div>npc</div>',
     stationMapTooltipHtml: () => '<div>station</div>',
     serviceMapTooltipHtml: () => '<div>service</div>',
+    farmPatchMapTooltipHtml: () => '<div>farm</div>',
     navigationMapTooltipHtml: () => '<div>navigation</div>',
     gatherNodeMapTooltipHtml: () => '<div>gather</div>',
     questAreaTooltipHtml: () => '<div>area</div>',
@@ -547,6 +570,7 @@ describe('Hud zone-map marker interaction', () => {
       [SERVICE],
       [STATION],
       [GATHER],
+      [FARM_PATCH],
       140,
       200,
       10,
@@ -563,12 +587,13 @@ describe('Hud zone-map marker interaction', () => {
     hud.mapNpcMarkers = [];
     hud.mapStations = [];
     hud.mapServices = [];
+    hud.mapFarmPatches = [];
     hud.mapGatherNodes = [{ ...GATHER, mx: 175 }];
 
     expect(hud.showMapTipAt(canvas, 170, 150)).toBe(false);
     expect(hud.showMapTipAt(canvas, 170, 150, true)).toBe(true);
 
-    expect(mapPointMarkerHitsIntoCalls.mock.calls.map((call) => call[7])).toEqual([10, 40]);
+    expect(mapPointMarkerHitsIntoCalls.mock.calls.map((call) => call[8])).toEqual([10, 40]);
     expect(paint).toHaveBeenCalledTimes(1);
   });
 
@@ -584,6 +609,7 @@ describe('Hud zone-map marker interaction', () => {
     hud.mapNpcMarkers = [];
     hud.mapStations = [];
     hud.mapServices = [];
+    hud.mapFarmPatches = [];
     hud.mapGatherNodes = [];
     hud.mapQuestAreas = [area];
     hud.questAreaTooltipHtml = areaTip;
@@ -615,6 +641,7 @@ describe('Hud zone-map marker interaction', () => {
     hud.mapStations = [{ ...STATION, mx: 146 }];
     hud.mapServices = [{ ...SERVICE, mx: 144 }];
     hud.mapGatherNodes = [{ ...GATHER, mx: 142 }];
+    hud.mapFarmPatches = [{ ...FARM_PATCH, mx: 150 }];
     hud.questGiverTooltipHtml = () => {
       calls.push('npc');
       return '<div>npc</div>';
@@ -637,6 +664,40 @@ describe('Hud zone-map marker interaction', () => {
     expect(hud.showMapTipAt(canvas, 170, 150)).toBe(true);
     expect(calls).toEqual(['npc', 'navigation']);
     expect(paint).toHaveBeenCalledWith('<div>navigation</div>', 170, 150);
+  });
+
+  it('routes a farm-patch hit to the farm resolver and paints its html', () => {
+    const canvas = canvasFixture();
+    const { hud, calls, paint } = markerHarness();
+    hud.mapMarkerInteraction.refreshGeometry(canvas);
+    // Only the patch is under the pointer, so nothing above it can answer.
+    hud.mapNpcMarkers = [];
+    hud.mapStations = [];
+    hud.mapServices = [];
+    hud.mapGatherNodes = [];
+    hud.farmPatchMapTooltipHtml = () => {
+      calls.push('farm');
+      return '<div>farm</div>';
+    };
+
+    expect(hud.showMapTipAt(canvas, 170, 150)).toBe(true);
+    expect(calls).toEqual(['farm']);
+    expect(paint).toHaveBeenCalledWith('<div>farm</div>', 170, 150);
+  });
+
+  it('answers no pointer at all when the patch layer is the only empty one left', () => {
+    const canvas = canvasFixture();
+    const { hud, calls, paint } = markerHarness();
+    hud.mapMarkerInteraction.refreshGeometry(canvas);
+    hud.mapNpcMarkers = [];
+    hud.mapStations = [];
+    hud.mapServices = [];
+    hud.mapGatherNodes = [];
+    hud.mapFarmPatches = [];
+
+    expect(hud.showMapTipAt(canvas, 170, 150)).toBe(false);
+    expect(calls).toEqual([]);
+    expect(paint).not.toHaveBeenCalled();
   });
 
   it('uses content names for route tooltips and escapes generated Rift names', () => {
@@ -930,7 +991,9 @@ describe('Hud zone-map marker lifecycle', () => {
     hud.mapDrag = {};
     hud.updateMapWindow();
     assertNoZoneHits();
-    expect(hud.mapLevel).toBe('zone');
+    // A mode transition opens the new band on ITS default level: the rift plan
+    // here (map_surface_core.ts defaultMapLevel); the toggle can still leave it.
+    expect(hud.mapLevel).toBe('instance');
     expect(hud.mapCenter).toBeNull();
     expect(hud.mapPing).toBeNull();
     expect(hud.mapZoneOverride).toBeNull();

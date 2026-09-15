@@ -4,7 +4,7 @@ import { objectDisplayName } from '../src/render/entity_labels';
 import { questObjectPreloadInternalsForTest } from '../src/render/quest_objects';
 import { INVESTIGATION_NPCS } from '../src/sim/content/world_quest_investigation';
 import type { Entity } from '../src/sim/types';
-import { entityDisplayName } from '../src/ui/entity_display_labels';
+import { entityDisplayName } from '../src/ui/entity_display_core';
 import { t } from '../src/ui/i18n';
 
 describe('investigation reused presentation', () => {

@@ -21,6 +21,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { QUESTS } from '../src/sim/data';
 import type { QuestProgress } from '../src/sim/types';
+import type { IWorld } from '../src/world_api';
 import { buildQuestStrip } from '../src/ui/hud/quest/quest_strip_controller';
 import { QUEST_STRIP_MAX_OBJECTIVES } from '../src/ui/hud/quest/quest_strip_core';
 import type { TrackedQuest } from '../src/ui/hud/quest/quest_tracker';
@@ -344,7 +345,13 @@ describe('the tracker hands its projection to the strip on touch', () => {
       writers: writers(),
       element,
       document,
-      world: () => ({ questLog, worldQuestLog: new Map() }),
+      world: () =>
+        ({
+          cfg: { playerClass: 'warrior' },
+          player: { name: 'Adventurer' },
+          questLog,
+          worldQuestLog: new Map(),
+        }) as unknown as Pick<IWorld, 'questLog' | 'cfg' | 'player' | 'worldQuestLog'>,
       settings: {
         available: () => true,
         collapsed: () => false,
@@ -383,12 +390,15 @@ describe('the tracker hands its projection to the strip on touch', () => {
       writers: writers(),
       element,
       document,
-      world: () => ({
-        questLog: new Map(),
-        worldQuestLog: new Map([
-          [questId, { questId, count: 0, state: 'active', puzzleRotations: Array(9).fill(0) }],
-        ]),
-      }),
+      world: () =>
+        ({
+          cfg: { playerClass: 'warrior' },
+          player: { name: 'Adventurer' },
+          questLog: new Map(),
+          worldQuestLog: new Map([
+            [questId, { questId, count: 0, state: 'active', puzzleRotations: Array(9).fill(0) }],
+          ]),
+        }) as unknown as Pick<IWorld, 'questLog' | 'cfg' | 'player' | 'worldQuestLog'>,
       settings: {
         available: () => true,
         collapsed: () => false,

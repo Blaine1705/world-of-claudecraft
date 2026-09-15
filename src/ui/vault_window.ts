@@ -23,6 +23,7 @@
 import { audio } from '../game/audio';
 import { ITEMS } from '../sim/data';
 import { isItemLocked } from '../sim/item_lock';
+import type { MaterialComposition } from '../sim/material_sources';
 import { resolveVaultSpecialIndex, vaultMaterialIds } from '../sim/materials_vault';
 import type { InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
 import type { IWorld, VaultSpecialRef } from '../world_api';
@@ -32,6 +33,7 @@ import { showBuyConfirmPrompt } from './bank_buy_prompt';
 import { showQuantityPrompt } from './bank_quantity_prompt';
 import { appendBankStatusLine, type BankStatusAnnouncementState } from './bank_status_line';
 import { formatCount } from './count_format';
+import { depositAllNotableParams } from './deposit_all_status_text';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { FOCUS_KEY_ATTR, findFocusKey, restoreFirstEnabled } from './focus_restore';
@@ -44,6 +46,13 @@ import {
   UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS,
 } from './item_instance_glyph_mark';
 import { knownItemDef } from './known_item';
+import { vaultMaterialWithdrawSelection } from './material_source_storage_actions';
+import {
+  appendMaterialSourcesActionAfter,
+  attachMaterialSourcesContextMenu,
+  type MaterialSourcesDialogOptions,
+} from './material_sources_dialog';
+import { materialSourcesForDisplay } from './material_sources_view';
 import { StorageRungEchoLatch } from './storage_rung_echo_core';
 import { svgIcon } from './ui_icons';
 import { unknownItemIconHtml } from './unknown_item_icon';
@@ -108,8 +117,13 @@ export interface VaultTabDeps {
   world(): IWorld;
   itemIcon(item: ItemDef): string;
   moneyHtml(copper: number): string;
-  itemTooltip(item: ItemDef, instance?: ItemInstancePayload): string;
+  itemTooltip(
+    item: ItemDef,
+    instance?: ItemInstancePayload,
+    materialSources?: MaterialComposition,
+  ): string;
   attachTooltip(el: HTMLElement, html: () => string): void;
+  openMaterialSources?(options: MaterialSourcesDialogOptions): void;
   hideTooltip(): void;
   /** True when this click released a long-press tooltip peek (suppress the
    *  withdraw, the bank grid rule). */
@@ -264,7 +278,7 @@ export class VaultTab {
   // snapshot) renders the pitch without a buy row rather than a 0-price offer.
   private buildLockedPane(panel: HTMLElement, unlockCost: number | null, unlockCap: number): void {
     const intro = document.createElement('div');
-    intro.className = 'vault-locked-intro';
+    intro.className = 'vault-locked-intro ui-card';
     intro.textContent = t('hudChrome.bank.vaultLockedIntro', {
       cap: formatCount(unlockCap),
     });
@@ -283,7 +297,7 @@ export class VaultTab {
     // visible shortfall marker instead, which is what the purse term in
     // BankWindow's repaint signature repaints.
     const affordable = this.deps.world().copper >= unlockCost;
-    btn.className = `bank-buy-btn vault-unlock-btn${affordable ? '' : ' bank-buy-short'}`;
+    btn.className = `bank-buy-btn ui-btn ui-btn--gold vault-unlock-btn${affordable ? '' : ' bank-buy-short'}`;
     btn.innerHTML =
       `<span class="bank-buy-label">${esc(t('hudChrome.bank.vaultUnlockButton'))}</span>` +
       this.deps.moneyHtml(unlockCost) +
@@ -327,7 +341,7 @@ export class VaultTab {
     const glyphKind = model.kind === 'special' ? bagInstanceGlyphKind(model.instance) : null;
     const cornerMark = bagCornerMark(glyphKind, null, model.fine);
     const locked = model.kind === 'special' && isItemLocked(model.instance);
-    row.className = `vault-row vault-row-${model.kind}${model.atCap ? ' at-cap' : ''}${model.overCap ? ' over-cap' : ''}${bagRimClasses(null, model.fine)}`;
+    row.className = `vault-row ui-card vault-row-${model.kind}${model.atCap ? ' at-cap' : ''}${model.overCap ? ' over-cap' : ''}${bagRimClasses(null, model.fine)}`;
     row.dataset.itemId = itemId;
     if (model.kind === 'special') row.dataset.vaultSpecialIndex = String(model.specialRef.index);
     row.setAttribute(FOCUS_KEY_ATTR, vaultFocusKey(model, 'row'));
@@ -371,7 +385,7 @@ export class VaultTab {
       lockMarkHtml(locked) +
       `<span class="vault-row-name">${esc(name)}</span>` +
       (model.kind === 'special'
-        ? `<span class="vault-row-stack-count">${esc(t('itemUi.bags.stackCount', { count: countLabel }))}</span>`
+        ? `<span class="vault-row-stack-count ui-chip">${esc(t('itemUi.bags.stackCount', { count: countLabel }))}</span>`
         : '') +
       `<span class="vault-row-count">${esc(t('hudChrome.bank.capacity', { used: totalLabel, total: capLabel }))}</span>` +
       `<span class="visually-hidden" id="${rowStateId}">${esc(t('hudChrome.bank.vaultRowAria', { item: name, count: totalLabel, cap: capLabel }))}</span>` +
@@ -385,23 +399,49 @@ export class VaultTab {
       }
       this.onRowClick(model, ev.shiftKey);
     });
+    const displayedSources =
+      model.kind === 'special' ? materialSourcesForDisplay({ ...model, itemId }) : undefined;
     this.deps.attachTooltip(row, () => {
+      // A vault row is owned material stock, so it carries provenance too. A
+      // 'special' row keeps per-copy identity (payload AND composition); a
+      // COMPACT row is a plain count with nowhere to record a gatherer, which
+      // is exactly what the vault's own routing rule guarantees, so it shows no
+      // source lines rather than an invented one.
       const body = item
-        ? this.deps.itemTooltip(item, model.kind === 'special' ? model.instance : undefined)
+        ? this.deps.itemTooltip(
+            item,
+            model.kind === 'special' ? model.instance : undefined,
+            displayedSources,
+          )
         : `<div class="tt-title">${esc(itemId)}</div><div class="tt-sub">${esc(t('itemUi.bags.unknownItem'))}</div>`;
       const partial = model.canChooseQuantity
         ? `<div class="tt-sub">${esc(t('hudChrome.bank.withdrawPartialHint'))}</div>`
         : '';
       return `${body}<div class="tt-sub">${esc(t('hudChrome.bank.withdrawHint'))}</div>${partial}`;
     });
+    attachMaterialSourcesContextMenu(row, name, displayedSources, this.deps.openMaterialSources);
+    if (displayedSources) wrap.classList.add('material-source-item');
     wrap.appendChild(row);
+    appendMaterialSourcesActionAfter(
+      row,
+      name,
+      displayedSources,
+      this.deps.openMaterialSources,
+      model.kind === 'special'
+        ? vaultMaterialWithdrawSelection(this.deps.world(), itemId, model.specialRef.index, () => {
+            this.deps.hideTooltip();
+            this.deps.onInventoryChanged();
+            this.deps.requestRender();
+          })
+        : undefined,
+    );
     if (model.canChooseQuantity && model.partialMax !== null) {
       // A visible sibling action gives touch and switch users the same partial
       // withdraw path desktop users have through Shift-click. It is a sibling,
       // not a nested button, so both controls retain valid native semantics.
       const partial = document.createElement('button');
       partial.type = 'button';
-      partial.className = 'vault-row-partial';
+      partial.className = 'vault-row-partial ui-btn';
       partial.setAttribute(FOCUS_KEY_ATTR, vaultFocusKey(model, 'partial'));
       // Label-in-name (WCAG 2.5.3): the accessible name embeds the chip's
       // visible label text in every filled locale (the English value leads
@@ -584,7 +624,7 @@ export class VaultTab {
 
     const deposit = document.createElement('button');
     deposit.type = 'button';
-    deposit.className = 'bank-deposit-all vault-deposit-all';
+    deposit.className = 'bank-deposit-all ui-btn vault-deposit-all';
     deposit.textContent = t('hudChrome.bank.vaultDepositAll');
     const tooltip = t('hudChrome.bank.vaultDepositAllTooltip');
     deposit.title = tooltip;
@@ -612,7 +652,7 @@ export class VaultTab {
     // The unlock button's rule: enabled always, marked when the purse is short
     // (the wording reuses the guild key; the English is target-neutral).
     const affordable = this.deps.world().copper >= nextCost;
-    btn.className = `bank-buy-btn vault-upgrade-btn${affordable ? '' : ' bank-buy-short'}`;
+    btn.className = `bank-buy-btn ui-btn ui-btn--gold vault-upgrade-btn${affordable ? '' : ' bank-buy-short'}`;
     btn.innerHTML =
       `<span class="bank-buy-label">${esc(t('hudChrome.bank.vaultUpgrade', { cap: formatCount(nextCap) }))}</span>` +
       this.deps.moneyHtml(nextCost) +
@@ -649,7 +689,9 @@ export class VaultTab {
     // pending guard, and the bags repaint with it). Online the mirror lags a
     // tick either way. The dead flag is captured on the same snapshot.
     const dead = world.player.dead;
-    const prediction = predictVaultDepositAll(world.inventory, info, vaultMaterialIds());
+    const prediction = predictVaultDepositAll(world.inventory, info, vaultMaterialIds(), (id) =>
+      knownItemDef(ITEMS, id),
+    );
     world.vaultDepositAll();
     // While dead the sim silently no-ops the sweep (the town-service idiom):
     // the command still goes (server decides), but the predicted "Materials
@@ -670,9 +712,14 @@ export class VaultTab {
       this.deps.onInventoryChanged();
     }
     const key = vaultDepositAllSummaryKey(prediction);
+    const notableDef = prediction.notableItemId
+      ? knownItemDef(ITEMS, prediction.notableItemId)
+      : undefined;
     this.setStatus(
       key,
-      prediction.items === 0 ? undefined : { count: formatCount(prediction.items) },
+      prediction.items === 0
+        ? undefined
+        : depositAllNotableParams(formatCount(prediction.items), notableDef),
     );
     this.deps.requestRender();
   }

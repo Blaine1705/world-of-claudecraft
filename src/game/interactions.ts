@@ -9,6 +9,8 @@ import {
   EASTBROOK_NOTICEBOARD_TEMPLATE_ID,
   type Entity,
   INTERACT_RANGE,
+  REALM_BUILDER_MONUMENT_INTERACT_RADIUS,
+  REALM_BUILDER_MONUMENT_TEMPLATE_ID,
 } from '../sim/types';
 import { investigationDisguiseHidden } from '../sim/world_quest_investigation_visibility';
 import { shadowGuardHidden } from '../sim/world_quest_shadow_visibility';
@@ -171,9 +173,17 @@ export function hoverCursorKind(
 export function objectInteractionRange(entity: Pick<Entity, 'templateId'>): number {
   if (FORGE_STATIONS.some((station) => `ground_${station.objectItemId}` === entity.templateId))
     return FORGE_INTERACT_RANGE;
-  return entity.templateId === EASTBROOK_NOTICEBOARD_TEMPLATE_ID
-    ? EASTBROOK_NOTICEBOARD_INTERACTION_RADIUS
-    : INTERACT_RANGE;
+  if (entity.templateId === EASTBROOK_NOTICEBOARD_TEMPLATE_ID) {
+    return EASTBROOK_NOTICEBOARD_INTERACTION_RADIUS;
+  }
+  // Mirrors the sim's catchment (interaction.ts): a click from 4 to 5 yd walks
+  // the player closer instead of drawing the server's refusal, and the
+  // nearby-prompt slot cannot hand the monument the interact key in the band
+  // where the sim would give it to the mailbox.
+  if (entity.templateId === REALM_BUILDER_MONUMENT_TEMPLATE_ID) {
+    return REALM_BUILDER_MONUMENT_INTERACT_RADIUS;
+  }
+  return INTERACT_RANGE;
 }
 
 /** Whether an otherwise incomplete entity click represents a useful movement intent. */

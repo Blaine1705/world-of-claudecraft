@@ -3,11 +3,6 @@ import { isWorldQuestDifficulty } from '../src/sim/world_quest_activity';
 
 type QuestWireMessage = Record<string, unknown>;
 
-/** No payload: the sim rechecks alive, level one and overworld admission. */
-export function startTutorialWire(sim: Sim, pid: number): void {
-  sim.startTutorial(pid);
-}
-
 export function acceptQuestWire(sim: Sim, msg: QuestWireMessage, pid: number): boolean {
   if (typeof msg.quest !== 'string') return false;
   sim.acceptQuest(msg.quest, typeof msg.selection === 'string' ? msg.selection : undefined, pid);

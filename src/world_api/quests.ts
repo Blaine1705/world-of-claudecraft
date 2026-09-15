@@ -59,8 +59,4 @@ export interface IWorldQuests {
     viewer?: string,
   ): Promise<WorldQuestLeaderboardPage>;
   acceptLinkedQuest(questId: string, fromPid: number): void;
-  // The tutorial greeting's accept button: asks the sim for the ferry ride to
-  // the Proving Shore. Server-validated (level 1, alive, overworld); the
-  // decline path needs no command at all (the one-shot flag latched at emit).
-  startTutorial(): void;
 }

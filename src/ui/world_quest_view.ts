@@ -1,7 +1,7 @@
 import { ITEMS, WORLD_QUESTS_BY_ID } from '../sim/data';
 import type { WorldQuestDef } from '../sim/types';
 import { worldQuestRewardAmount } from '../sim/world_quests';
-import { mobDisplayName, vehicleStationDisplayName } from './entity_display_labels';
+import { mobDisplayName, vehicleStationDisplayName } from './entity_display_core';
 import { itemDisplayName, zoneDisplayName } from './entity_i18n';
 import { formatList, formatMoney, formatNumber, t } from './i18n';
 import { ownEntry } from './known_item';

@@ -5,6 +5,7 @@ import {
   attachEntityViewBody,
   buildQuestCaravanBody,
   isQuestCaravanEntity,
+  QUEST_CARAVAN_CULL_RADIUS,
   syncQuestCaravanBody,
 } from '../src/render/quest_entity_presentation';
 import { buildGroundQuestObject } from '../src/render/quest_objects';
@@ -79,18 +80,18 @@ describe('quest entity presentation lifecycle', () => {
         lastZ: -3,
         freightCaravanVisual: { group, height: 3, update, dispose: vi.fn() },
       };
-      const sphere = new THREE.Sphere();
-      const frustum = new THREE.Frustum();
-      vi.spyOn(frustum, 'intersectsSphere').mockReturnValue(visible);
-      syncQuestCaravanBody(view, 0.05, phase, d2, bands, reduced, frustum, sphere);
+      syncQuestCaravanBody(view, 0.05, phase, d2, bands, reduced, visible);
       expect(update).toHaveBeenLastCalledWith(0.05, true, expected);
       expect(view).toMatchObject({ lastX: 10, lastY: 2, lastZ: -3 });
-      expect(sphere.center.toArray()).toEqual([10, 5, -3]);
-      expect(sphere.radius).toBe(12);
-      syncQuestCaravanBody(view, 0.05, 0, 1, bands, false, null, sphere);
+      // Culling off hands the driver an on-screen verdict: only cadence gates it.
+      syncQuestCaravanBody(view, 0.05, 0, 1, bands, false, true);
       expect(update).toHaveBeenLastCalledWith(0.05, false, true);
     },
   );
+
+  it('asks the renderer cull core for at least the wagon radius', () => {
+    expect(QUEST_CARAVAN_CULL_RADIUS).toBe(6);
+  });
 
   it('attaches object bodies, tags nested pick targets and hoists only defined ambience', () => {
     const group = new THREE.Group();

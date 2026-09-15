@@ -4,7 +4,11 @@ import {
   type PickInteractionHud,
   type PickInteractionWorld,
 } from '../src/game/interactions';
-import { type NearbyInteractionWorld, tryNearbyInteraction } from '../src/game/nearby_interaction';
+import {
+  type NearbyInteractionHud,
+  type NearbyInteractionWorld,
+  tryNearbyInteraction,
+} from '../src/game/nearby_interaction';
 import { type Entity, INTERACT_RANGE } from '../src/sim/types';
 import { isWorldQuestTraceInstructor } from '../src/sim/world_quest_trace_identity';
 
@@ -25,6 +29,7 @@ function rig(templateId = 'calligraphy_instructor', distance = 1) {
       [2, npc],
     ]),
     questLog: new Map(),
+    farmPatches: [],
     targetEntity: (id: number | null) => calls.push(`target:${id}`),
     interact: () => calls.push('interact'),
   } as unknown as PickInteractionWorld & NearbyInteractionWorld;
@@ -32,7 +37,8 @@ function rig(templateId = 'calligraphy_instructor', distance = 1) {
     openQuestDialog: vi.fn(),
     closeContextMenu: vi.fn(),
     showError: vi.fn(),
-  } as unknown as PickInteractionHud;
+    openPlantSheet: vi.fn(),
+  } as unknown as PickInteractionHud & NearbyInteractionHud;
   return { world, hud, calls, player, npc };
 }
 
@@ -76,21 +82,7 @@ describe('calligraphy NPC interaction', () => {
         };
         (r.world.entities as Map<number, Entity>).set(3, nearerApprentice);
       }
-      expect(
-        tryNearbyInteraction(
-          r.world,
-          r.hud,
-          [],
-          null,
-          'far',
-          'not ready',
-          'away',
-          'nothing',
-          true,
-          undefined,
-          preferred,
-        ),
-      ).toBe(true);
+      expect(tryNearbyInteraction(r.world, r.hud, 'away', 'nothing', true, preferred)).toBe(true);
       expect(r.hud.openQuestDialog).toHaveBeenCalledWith(2);
     },
   );
@@ -98,14 +90,10 @@ describe('calligraphy NPC interaction', () => {
   it('does not dispatch a nearby lesson while dead or beyond interaction range', () => {
     const r = rig();
     r.player.dead = true;
-    expect(tryNearbyInteraction(r.world, r.hud, [], null, 'far', 'ready', 'away', 'nothing')).toBe(
-      false,
-    );
+    expect(tryNearbyInteraction(r.world, r.hud, 'away', 'nothing')).toBe(false);
     r.player.dead = false;
     r.npc.pos.x = INTERACT_RANGE + 3;
-    expect(tryNearbyInteraction(r.world, r.hud, [], null, 'far', 'ready', 'away', 'nothing')).toBe(
-      false,
-    );
+    expect(tryNearbyInteraction(r.world, r.hud, 'away', 'nothing')).toBe(false);
     expect(r.calls).not.toContain('interact');
   });
 

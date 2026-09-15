@@ -16,9 +16,10 @@ import type { FocusTrapHandle } from '../../focus_manager';
 import { t } from '../../i18n';
 import { QUALITY_COLOR } from '../../icons';
 import { NPC_WINDOW_CLOSE_RANGE } from '../../npc_service_range';
-import { archetypeImageUrl } from '../../profession_art';
-import { buildAttunementPreview } from '../../profession_identity_view';
+import type { PainterHostPresentation } from '../../painter_host';
 import { svgIcon } from '../../ui_icons';
+import { archetypeImageUrl } from '../professions/profession_art';
+import { buildAttunementPreview } from '../professions/profession_identity_view';
 import {
   isWorldQuestInstructorOrEscort,
   worldQuestInstructorDialog,
@@ -63,7 +64,10 @@ export interface QuestDialogControllerDeps {
   openFocusTrap(root: () => HTMLElement | null): FocusTrapHandle;
   closeTransient(): void;
   hideTooltip(): void;
-  itemIcon(item: ItemDef): string;
+  /** The PainterHostPresentation.itemIcon signature, named from the seam
+   *  rather than re-typed; the quality parameter is shape uniformity only
+   *  here, since no copy payload reaches this surface, and is never passed. */
+  itemIcon: PainterHostPresentation['itemIcon'];
   itemTooltip(item: ItemDef): string;
   attachTooltip(element: HTMLElement, html: () => string): void;
   openChronicles(): void;
@@ -132,7 +136,9 @@ export class QuestDialogController {
       (npc.kind !== 'npc' && !isInvestigationTarget(npcId) && !isWorldQuestInstructorOrEscort(npc))
     )
       return;
-    if (NPCS[npc.templateId]?.banker) {
+    // The banker and the Riftwright both short-circuit the gossip menu: the
+    // sim's interact emits the window-opening event, identical on every host.
+    if (NPCS[npc.templateId]?.banker || NPCS[npc.templateId]?.riftForge) {
       world.targetEntity(npc.id);
       world.interact();
       return;
@@ -165,9 +171,9 @@ export class QuestDialogController {
       fromPid !== undefined &&
       (world.partyInfo?.members.some((member) => member.pid === fromPid) ?? false);
     markDialogRoot(this.deps.element, { labelledBy: 'quest-dialog-title' });
-    let html = `<div class="panel-title"><span id="quest-dialog-title">${esc(this.deps.text.questTitle(questId))}${this.deps.text.suggestedPlayers(quest.suggestedPlayers)} <span class="quest-muted">&lt;${esc(t('hudChrome.questShare.dialogTitle'))}&gt;</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>`;
+    let html = `<div class="panel-title ui-win-head"><span class="ui-win-title" id="quest-dialog-title">${esc(this.deps.text.questTitle(questId))}${this.deps.text.suggestedPlayers(quest.suggestedPlayers)} <span class="quest-muted ui-win-sub">&lt;${esc(t('hudChrome.questShare.dialogTitle'))}&gt;</span></span><button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>`;
     if (quest.minLevel) {
-      html += `<div class="qd-req">${esc(t('questUi.detail.requiresLevel', { level: this.deps.text.number(quest.minLevel) }))}</div>`;
+      html += `<div class="qd-req ui-chip">${esc(t('questUi.detail.requiresLevel', { level: this.deps.text.number(quest.minLevel) }))}</div>`;
     }
     html += `<div class="qd-text">${esc(this.deps.text.questNarrative(questId, 'text', world.player.name))}</div>`;
     html += `<div class="qd-sub">${esc(t('questUi.detail.objectives'))}</div>`;
@@ -182,6 +188,7 @@ export class QuestDialogController {
     this.attachRewardTooltip(questId);
     if (inSharerParty && state === 'available') {
       const button = this.makeButton(t('questUi.dialog.accept'));
+      button.classList.add('ui-btn--red');
       button.addEventListener('click', () => {
         if (fromPid === undefined) return;
         this.deps.world().acceptLinkedQuest(questId, fromPid);
@@ -190,7 +197,7 @@ export class QuestDialogController {
       this.deps.element.appendChild(button);
     } else {
       const hint = this.deps.document.createElement('div');
-      hint.className = 'qd-req';
+      hint.className = 'qd-req ui-chip';
       hint.textContent = !inSharerParty
         ? t('hudChrome.questShare.viewOnlyHint')
         : state === 'done'
@@ -402,6 +409,14 @@ export class QuestDialogController {
       (delve) => delve.boardNpcId === npc.templateId,
     );
     const hasCardMaster = !!definition?.cardMaster;
+    // A farmer NPC (the farming go-live) offers the husk-to-compost trade,
+    // the one UI affordance that sends convert_husks; gated on the NpcDef
+    // flag like the card master, never on an id. STATIC BY CONTRACT: the row
+    // sits outside the gossip-row write-elision signature (gossipRowSig reads
+    // the quest rows only), which is sound only while its predicate is this
+    // content flag. Gate it on live state (a husk count, the farmer range)
+    // and it must join the signature or the row goes stale between refreshes.
+    const hasFarmer = definition?.farmer === true;
     if (
       closeIfEmpty &&
       gossipMenuIsEmpty({
@@ -415,6 +430,7 @@ export class QuestDialogController {
         hasDelveBoard,
         hasCardMaster,
         hasTraining,
+        hasFarmer,
       })
     ) {
       this.close();
@@ -427,7 +443,7 @@ export class QuestDialogController {
       ? this.deps.text.npcName(npc.templateId)
       : this.deps.text.mobName(npc.templateId);
     const npcTitle = definition ? this.deps.text.npcTitle(definition.id) : '';
-    let html = `<div class="panel-title"><span id="quest-dialog-title">${esc(npcName)}<span class="quest-muted"> &lt;${esc(npcTitle)}&gt;</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>`;
+    let html = `<div class="panel-title ui-win-head"><span class="ui-win-title" id="quest-dialog-title">${esc(npcName)}<span class="quest-muted ui-win-sub"> &lt;${esc(npcTitle)}&gt;</span></span><button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>`;
     html += `<div class="qd-text">"${esc(definition ? this.deps.text.npcGreeting(definition.id, world.cfg.playerClass, world.player.name) : t('questUi.dialog.greetingFallback'))}"</div>`;
     // Locked-quest hint row: a profession master's
     // dialog points a pre-q_prof_intro viewer at the intro quest's giver, so
@@ -437,7 +453,7 @@ export class QuestDialogController {
     const introHintVisible = this.introHintVisibleFor(npc);
     this.lastIntroHintVisible = introHintVisible;
     if (introHintVisible) {
-      html += `<div class="qd-req" data-prof-intro-hint="1">${esc(
+      html += `<div class="qd-req ui-chip" data-prof-intro-hint="1">${esc(
         t('questUi.dialog.profIntroHint', {
           name: this.deps.text.npcName(QUESTS[PROF_INTRO_QUEST_ID].giverNpcId),
           quest: this.deps.text.questTitle(PROF_INTRO_QUEST_ID),
@@ -462,14 +478,14 @@ export class QuestDialogController {
           : kind === 'repeat'
             ? t('questUi.dialog.repeatableQuestAria', { name: title })
             : t('questUi.dialog.availableQuestAria', { name: title });
-      html += `<button type="button" class="qd-list-item${coachClass}" data-quest="${esc(questId)}" aria-label="${esc(aria)}">${icon}${esc(title)}</button>`;
+      html += `<button type="button" class="qd-list-item ui-btn ui-btn--plate${coachClass}" data-quest="${esc(questId)}" aria-label="${esc(aria)}">${icon}${esc(title)}</button>`;
     }
     for (const questId of discussionQuests) {
       const title = this.deps.text.questTitle(questId);
-      html += `<button type="button" class="qd-list-item" data-discuss="${esc(questId)}" aria-label="${esc(t('questUi.dialog.discussQuestAria', { name: title }))}"><span class="gold">?</span> ${esc(t('questUi.dialog.discussQuest', { name: title }))}</button>`;
+      html += `<button type="button" class="qd-list-item ui-btn ui-btn--plate" data-discuss="${esc(questId)}" aria-label="${esc(t('questUi.dialog.discussQuestAria', { name: title }))}"><span class="gold">?</span> ${esc(t('questUi.dialog.discussQuest', { name: title }))}</button>`;
     }
     if (hasVendor) {
-      html += `<button type="button" class="qd-list-item" data-vendor="1" aria-label="${esc(t('questUi.dialog.browseGoodsAria', { name: npcName }))}">${currencyIconHtml('coin_gold')} ${esc(t('questUi.dialog.browseGoods'))}</button>`;
+      html += `<button type="button" class="qd-list-item ui-btn ui-btn--plate" data-vendor="1" aria-label="${esc(t('questUi.dialog.browseGoodsAria', { name: npcName }))}">${currencyIconHtml('coin_gold')} ${esc(t('questUi.dialog.browseGoods'))}</button>`;
     }
     // Crafting shortcut: the master's Crafting option opens the crafting
     // window straight to their own craft's tab (the viewer's stronger craft
@@ -488,38 +504,44 @@ export class QuestDialogController {
         )
       : null;
     if (hasTraining) {
-      html += `<button type="button" class="qd-list-item" data-train="1" aria-label="${esc(t('hudChrome.training.dialogOptionAria', { name: npcName }))}"><span class="gold">${svgIcon('crafting')}</span> ${esc(t('hudChrome.training.dialogOption'))}</button>`;
+      html += `<button type="button" class="qd-list-item ui-btn ui-btn--plate" data-train="1" aria-label="${esc(t('hudChrome.training.dialogOptionAria', { name: npcName }))}"><span class="gold">${svgIcon('crafting')}</span> ${esc(t('hudChrome.training.dialogOption'))}</button>`;
       if (masterCraft !== null) {
-        html += `<button type="button" class="qd-list-item" data-crafting="1" aria-label="${esc(t('hudChrome.crafting.dialogOptionAria', { craft: craftNameText(masterCraft) }))}"><span class="gold">${svgIcon('crafting')}</span> ${esc(t('hudChrome.crafting.dialogOption'))}</button>`;
+        html += `<button type="button" class="qd-list-item ui-btn ui-btn--plate" data-crafting="1" aria-label="${esc(t('hudChrome.crafting.dialogOptionAria', { craft: craftNameText(masterCraft) }))}"><span class="gold">${svgIcon('crafting')}</span> ${esc(t('hudChrome.crafting.dialogOption'))}</button>`;
       }
       // Maker's Bond unbind service (Professions 2.0): every
       // station master offers it beside training (the same isStationMasterNpc
       // gate, so the empty-menu check needs no new arm).
-      html += `<button type="button" class="qd-list-item" data-unbind="1" aria-label="${esc(t('hudChrome.unbind.dialogOptionAria', { name: npcName }))}"><span class="gold">${svgIcon('crafting')}</span> ${esc(t('hudChrome.unbind.dialogOption'))}</button>`;
+      html += `<button type="button" class="qd-list-item ui-btn ui-btn--plate" data-unbind="1" aria-label="${esc(t('hudChrome.unbind.dialogOptionAria', { name: npcName }))}"><span class="gold">${svgIcon('crafting')}</span> ${esc(t('hudChrome.unbind.dialogOption'))}</button>`;
     }
     if (hasMarket) {
-      html += `<button type="button" class="qd-list-item" data-market="1" aria-label="${esc(t('questUi.dialog.worldMarketAria'))}"><span class="gold">${svgIcon('market')}</span> ${esc(t('questUi.dialog.worldMarket'))}</button>`;
+      html += `<button type="button" class="qd-list-item ui-btn ui-btn--plate" data-market="1" aria-label="${esc(t('questUi.dialog.worldMarketAria'))}"><span class="gold">${svgIcon('market')}</span> ${esc(t('questUi.dialog.worldMarket'))}</button>`;
     }
     if (hasHeroicVendor) {
-      html += `<button type="button" class="qd-list-item" data-heroic-shop="1" aria-label="${esc(t('questUi.dialog.browseGoodsAria', { name: npcName }))}">${heroicMarkIconHtml()} ${esc(t('questUi.dialog.browseGoods'))}</button>`;
+      html += `<button type="button" class="qd-list-item ui-btn ui-btn--plate" data-heroic-shop="1" aria-label="${esc(t('questUi.dialog.browseGoodsAria', { name: npcName }))}">${heroicMarkIconHtml()} ${esc(t('questUi.dialog.browseGoods'))}</button>`;
     }
     if (hasCrucibleVendor) {
       // Its OWN label and accessible name (the hasWarfareVendor rule): a sigil
       // redemption counter never reads as generic "Browse Goods".
-      html += `<button type="button" class="qd-list-item" data-crucible-shop="1" aria-label="${esc(t('crucibleShop.browseAria', { name: npcName }))}"><span class="gold">${svgIcon('crafting')}</span> ${esc(t('crucibleShop.browse'))}</button>`;
+      html += `<button type="button" class="qd-list-item ui-btn ui-btn--plate" data-crucible-shop="1" aria-label="${esc(t('crucibleShop.browseAria', { name: npcName }))}"><span class="gold">${svgIcon('crafting')}</span> ${esc(t('crucibleShop.browse'))}</button>`;
     }
     if (hasWarfareVendor) {
       // Its OWN label and accessible name: this row sits beside the generic
       // goods row above at a flagged NPC, so it can never reuse "Browse Goods".
-      html += `<button type="button" class="qd-list-item" data-warfare-shop="1" aria-label="${esc(t('hudChrome.warfareShop.gossipOptionAria', { name: npcName }))}">${currencyIconHtml('honor')} ${esc(t('hudChrome.warfareShop.gossipOption'))}</button>`;
+      html += `<button type="button" class="qd-list-item ui-btn ui-btn--plate" data-warfare-shop="1" aria-label="${esc(t('hudChrome.warfareShop.gossipOptionAria', { name: npcName }))}">${currencyIconHtml('honor')} ${esc(t('hudChrome.warfareShop.gossipOption'))}</button>`;
     }
     if (hasDelveBoard) {
       const delve = Object.values(DELVES).find((entry) => entry.boardNpcId === npc.templateId);
       const label = delve ? this.deps.text.delveName(delve.id) : t('delveUi.board.openDelve');
-      html += `<button type="button" class="qd-list-item" data-delve-board="1" aria-label="${esc(t('delveUi.board.openDelveAria', { name: npcName }))}"><span class="gold">${svgIcon('skull')}</span> ${esc(label)}</button>`;
+      html += `<button type="button" class="qd-list-item ui-btn ui-btn--plate" data-delve-board="1" aria-label="${esc(t('delveUi.board.openDelveAria', { name: npcName }))}"><span class="gold">${svgIcon('skull')}</span> ${esc(label)}</button>`;
     }
     if (hasCardMaster) {
-      html += `<button type="button" class="qd-list-item" data-card-duel="1" aria-label="${esc(t('cardDuel.title'))}"><span class="gold">&#9824;</span> ${esc(t('cardDuel.title'))}</button>`;
+      html += `<button type="button" class="qd-list-item ui-btn ui-btn--plate" data-card-duel="1" aria-label="${esc(t('cardDuel.title'))}"><span class="gold">&#9824;</span> ${esc(t('cardDuel.title'))}</button>`;
+    }
+    if (hasFarmer) {
+      // The trade's feedback is the sim's own: the farmHusksConverted line
+      // and the farmDenied toasts (farm_event_feedback.ts), so the row sends
+      // and closes like the market row rather than opening a window.
+      html += `<button type="button" class="qd-list-item" data-husk-trade="1" aria-label="${esc(t('hudChrome.farming.huskTradeAria', { name: npcName }))}"><span class="gold">${svgIcon('crafting')}</span> ${esc(t('hudChrome.farming.huskTrade'))}</button>`;
     }
     this.deps.element.innerHTML = html;
     this.deps.element.querySelectorAll<HTMLElement>('[data-quest]').forEach((item) => {
@@ -547,6 +569,19 @@ export class QuestDialogController {
     this.bindRoute('[data-market]', this.deps.openMarket);
     this.bindRoute('[data-delve-board]', () => this.deps.openDelveBoard(npc.id));
     this.bindRoute('[data-card-duel]', this.deps.openCardDuel);
+    // The husk trade goes straight to the world (IWorldFarming.convertHusks,
+    // both worlds; online it is the convert_husks command): no new dep, no
+    // window. The live world is read at click time, never captured at render.
+    // The husk trade opens NO successor window (the sim's own event lines are
+    // the feedback), so it is deliberately NOT a bindRoute consumer: that
+    // family closes with release(false) because it hands the trap opener to a
+    // successor window that restores focus when IT closes; with no successor
+    // that chain would drop keyboard focus to <body>. Send, then close WITH
+    // the trap's own focus restore.
+    this.deps.element.querySelector('[data-husk-trade]')?.addEventListener('click', () => {
+      this.deps.world().convertHusks();
+      this.close(true);
+    });
     this.bindClose();
     this.showAndFocus();
   }
@@ -566,9 +601,9 @@ export class QuestDialogController {
     );
     this.voiceNpcId = npc.id;
     markDialogRoot(this.deps.element, { labelledBy: 'quest-dialog-title' });
-    let html = `<div class="panel-title"><span id="quest-dialog-title">${esc(this.deps.text.questTitle(questId))}${this.deps.text.suggestedPlayers(quest.suggestedPlayers)}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>`;
+    let html = `<div class="panel-title ui-win-head"><span class="ui-win-title" id="quest-dialog-title">${esc(this.deps.text.questTitle(questId))}${this.deps.text.suggestedPlayers(quest.suggestedPlayers)}</span><button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('questUi.dialog.close'))}">${svgIcon('close')}</button></div>`;
     if (state === 'available' && quest.minLevel) {
-      html += `<div class="qd-req">${esc(t('questUi.detail.requiresLevel', { level: this.deps.text.number(quest.minLevel) }))}</div>`;
+      html += `<div class="qd-req ui-chip">${esc(t('questUi.detail.requiresLevel', { level: this.deps.text.number(quest.minLevel) }))}</div>`;
     }
     html += `<div class="qd-text">${esc(narrative)}</div>`;
     if (state !== 'ready') {
@@ -653,7 +688,7 @@ export class QuestDialogController {
       initialProfessionPreview = professionTargets[0]
         ? professionPreviewContent(professionTargets[0])
         : { text: t('hudChrome.crafting.noProfessionChoice'), crestUrl: null };
-      html += `<label class="qd-profession-choice">${esc(t('hudChrome.crafting.professionChoice'))}<select data-profession-selection aria-label="${esc(t('hudChrome.crafting.professionChoice'))}">${options}</select></label><div class="qd-profession-preview" data-profession-preview></div>`;
+      html += `<label class="qd-profession-choice">${esc(t('hudChrome.crafting.professionChoice'))}<select class="ui-input" data-profession-selection aria-label="${esc(t('hudChrome.crafting.professionChoice'))}">${options}</select></label><div class="qd-profession-preview ui-card" data-profession-preview></div>`;
     }
     html += this.rewardsHtml(questId);
     this.deps.element.innerHTML = html;
@@ -680,6 +715,7 @@ export class QuestDialogController {
     this.attachRewardTooltip(questId);
     if (state === 'available') {
       const button = this.makeButton(t('questUi.dialog.accept'));
+      button.classList.add('ui-btn--red');
       // Island Accept glows gold: the same press-this-next treatment as the
       // gossip rows, so the accept step reads as the obvious next click.
       if (this.coachGlow()) button.classList.add('qd-coach');
@@ -699,6 +735,7 @@ export class QuestDialogController {
       this.deps.element.appendChild(button);
     } else if (state === 'ready') {
       const button = this.makeButton(t('questUi.dialog.completeQuest'));
+      button.classList.add('ui-btn--red');
       if (this.coachGlow()) button.classList.add('qd-coach');
       button.addEventListener('click', () => {
         const liveWorld = this.deps.world();
@@ -725,7 +762,7 @@ export class QuestDialogController {
     const rewardItemId = questRewardItem(quest, world.cfg.playerClass);
     if (rewardItemId) {
       const item = ITEMS[rewardItemId];
-      html += `<div class="qd-reward-row" data-reward><span class="qd-reward-label">${esc(t('questUi.detail.itemReward'))}</span>${this.deps.itemIcon(item)}<span class="qd-reward-name" style="color:${QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff'}">${esc(itemDisplayName(item))}</span></div>`;
+      html += `<div class="qd-reward-row" data-reward><span class="qd-reward-label">${esc(t('questUi.detail.itemReward'))}</span><span class="ui-socket ui-socket--bag">${this.deps.itemIcon(item)}</span><span class="qd-reward-name" style="color:${QUALITY_COLOR[item.quality ?? 'common'] ?? 'var(--color-quality-default)'}">${esc(itemDisplayName(item))}</span></div>`;
     }
     return html;
   }
@@ -829,7 +866,7 @@ export class QuestDialogController {
 
   private makeButton(label: string): HTMLButtonElement {
     const button = this.deps.document.createElement('button');
-    button.className = 'btn';
+    button.className = 'btn ui-btn';
     button.type = 'button';
     button.textContent = label;
     return button;

@@ -125,6 +125,12 @@ const FILTER_LABEL_KEYS: Record<ReliquaryOwnedFilter, TranslationKey> = {
   owned: 'hudChrome.reliquary.filterOwned',
   missing: 'hudChrome.reliquary.filterMissing',
 };
+/** The shelf's reading of the same chip state: whole pages, by illumination. */
+const SHELF_FILTER_LABEL_KEYS: Record<ReliquaryOwnedFilter, TranslationKey> = {
+  all: 'hudChrome.reliquary.filterAll',
+  owned: 'hudChrome.reliquary.filterIlluminated',
+  missing: 'hudChrome.reliquary.filterRemaining',
+};
 
 /**
  * Hud-supplied glue: shared presentation bag plus the window surface (world
@@ -194,6 +200,8 @@ export class ReliquaryWindow {
   /** Last LOGICAL (pre-marker) announcement, so a world-driven repaint with an
    *  unchanged count never re-marks the region (see announceResults). */
   private lastAnnounced = '';
+  /** The narrowing controls behind lastAnnounced (nav, page, needle, chip). */
+  private lastAnnouncedKey = '';
   // Forces a byte-different write when two keystrokes narrow to the SAME count,
   // so the region still re-reads (the shared DOM-free deterministic marker).
   private readonly liveReannounce = new ReannounceMarker();
@@ -580,9 +588,9 @@ export class ReliquaryWindow {
     // browse-mode AT reading a false "tracker is full" state on every open.
     this.anyAtCap = false;
     el.innerHTML =
-      `<div class="panel-title"><span>${esc(t('hudChrome.reliquary.title'))}</span>` +
-      `<input type="search" class="reliquary-search" data-focus-key="search" value="${esc(this.search)}" placeholder="${esc(t('hudChrome.reliquary.searchPlaceholder'))}" aria-label="${esc(t('hudChrome.reliquary.searchAria'))}">` +
-      `<button type="button" class="x-btn" data-close data-focus-key="close" aria-label="${esc(t('hudChrome.reliquary.close'))}">${svgIcon('close')}</button></div>` +
+      `<div class="panel-title ui-win-head"><span class="ui-win-title">${esc(t('hudChrome.reliquary.title'))}</span>` +
+      `<input type="search" class="reliquary-search ui-input" data-focus-key="search" value="${esc(this.search)}" placeholder="${esc(t('hudChrome.reliquary.searchPlaceholder'))}" aria-label="${esc(t('hudChrome.reliquary.searchAria'))}">` +
+      `<button type="button" class="x-btn ui-x-btn" data-close data-focus-key="close" aria-label="${esc(t('hudChrome.reliquary.close'))}">${svgIcon('close')}</button></div>` +
       this.summaryHtml(model) +
       `<div class="reliquary-body">${this.railHtml(model)}<div class="reliquary-scroll">${this.contentHtml(model, flash)}</div></div>`;
 
@@ -715,6 +723,7 @@ export class ReliquaryWindow {
       // re-narrowing to the same count later still announces cleanly.
       live.textContent = '';
       this.lastAnnounced = '';
+      this.lastAnnouncedKey = '';
       this.liveReannounce.reset();
       return;
     }
@@ -730,8 +739,18 @@ export class ReliquaryWindow {
     // it would make the reader re-read "N results." the player never asked
     // about. Player-driven renders always mark, so two keystrokes landing on
     // the same count still announce.
-    if (worldDriven && text === this.lastAnnounced) return;
+    // A player-driven repaint that changed NEITHER narrowing control (needle,
+    // chip) nor the surface, with the same count, stays silent too: a pin
+    // toggle on a shelf the sticky chip narrows is not a new narrowing, and
+    // re-reading "N results." for it is the noise the chip-on-shelf reach
+    // would otherwise add. Two keystrokes landing on the same count still
+    // announce, because the needle moved.
+    const narrowKey = `${model.nav}|${model.pageId ?? ''}|${this.search}|${this.ownedFilter}`;
+    if (text === this.lastAnnounced && (worldDriven || narrowKey === this.lastAnnouncedKey)) {
+      return;
+    }
     this.lastAnnounced = text;
+    this.lastAnnouncedKey = narrowKey;
     live.textContent = this.liveReannounce.mark(text);
   }
 
@@ -859,34 +878,32 @@ export class ReliquaryWindow {
       firstFindCount,
       pageOwned,
     });
-    return (
-      reliquaryRefreshSig({
-        owned: catalog.owned,
-        total: catalog.total,
-        curatorRank: world.reliquaryCuratorRank(),
-        recentSig: reliquaryRecentSig(input.recent),
-        marksSize: world.reliquaryMarks.size,
-        nav: input.nav,
-        pageId: input.pageId,
-        clearsDigest,
-        ownershipDigest,
-        // A repeat obtain of a relic already on the wall moves nothing else in
-        // this signature: no set grows, no first-find key is minted, no total
-        // changes. Without this dimension an open window would keep painting the
-        // previous tally until something unrelated happened to repaint it.
-        countsDigest: reliquaryObtainCountsDigest(world.reliquaryObtainCounts),
-        search: input.search,
-        ownedFilter: input.ownedFilter,
-        // Painter-side dimension: the rarity aggregate is window state (fetched
-        // per open), not world state, so the generation rides here rather than
-        // in the pure sig fold. The tracker-visibility switch rides beside it
-        // for the same reason: the summary's eye renders from
-        // deps.trackerShown(), and without this dimension a flip landing while
-        // the window is open (today unreachable, the options window closes
-        // others, but that is a coincidence not a contract) would strand the
-        // eye's pressed state until an unrelated repaint.
-      }) + `|r${this.rarityGen}|t${this.deps.trackerShown() ? 1 : 0}`
-    );
+    return `${reliquaryRefreshSig({
+      owned: catalog.owned,
+      total: catalog.total,
+      curatorRank: world.reliquaryCuratorRank(),
+      recentSig: reliquaryRecentSig(input.recent),
+      marksSize: world.reliquaryMarks.size,
+      nav: input.nav,
+      pageId: input.pageId,
+      clearsDigest,
+      ownershipDigest,
+      // A repeat obtain of a relic already on the wall moves nothing else in
+      // this signature: no set grows, no first-find key is minted, no total
+      // changes. Without this dimension an open window would keep painting the
+      // previous tally until something unrelated happened to repaint it.
+      countsDigest: reliquaryObtainCountsDigest(world.reliquaryObtainCounts),
+      search: input.search,
+      ownedFilter: input.ownedFilter,
+      // Painter-side dimension: the rarity aggregate is window state (fetched
+      // per open), not world state, so the generation rides here rather than
+      // in the pure sig fold. The tracker-visibility switch rides beside it
+      // for the same reason: the summary's eye renders from
+      // deps.trackerShown(), and without this dimension a flip landing while
+      // the window is open (today unreachable, the options window closes
+      // others, but that is a coincidence not a contract) would strand the
+      // eye's pressed state until an unrelated repaint.
+    })}|r${this.rarityGen}|t${this.deps.trackerShown() ? 1 : 0}`;
   }
 
   /**
@@ -896,10 +913,10 @@ export class ReliquaryWindow {
    * and a single declaration in one rule now covers every bar.
    */
   private barHtml(pct: number, extraClass = ''): string {
-    const cls = extraClass === '' ? 'reliquary-bar' : `reliquary-bar ${extraClass}`;
+    const cls = extraClass === '' ? 'reliquary-bar ui-bar' : `reliquary-bar ui-bar ${extraClass}`;
     return (
       `<span class="${cls}">` +
-      `<span class="reliquary-bar-fill" style="--reliquary-fill:${pct}%"></span></span>`
+      `<span class="reliquary-bar-fill ui-bar-fill" style="--reliquary-fill:${pct}%"></span></span>`
     );
   }
 
@@ -972,12 +989,12 @@ export class ReliquaryWindow {
                 total: this.fmt(s.total),
               });
         return (
-          `<button type="button" class="reliquary-nav${on ? ' active' : ''}" data-nav="${esc(s.id)}" data-focus-key="${esc(`nav:${s.id}`)}" aria-pressed="${on}" aria-label="${esc(aria)}">` +
+          `<button type="button" class="reliquary-nav ui-seg-tab${on ? ' active is-on' : ''}" data-nav="${esc(s.id)}" data-focus-key="${esc(`nav:${s.id}`)}" aria-pressed="${on}" aria-label="${esc(aria)}">` +
           `<span class="reliquary-nav-name">${esc(label)}</span>${count}</button>`
         );
       })
       .join('');
-    return `<nav class="reliquary-rail" aria-label="${esc(t('hudChrome.reliquary.shelvesAria'))}">${rows}</nav>`;
+    return `<nav class="reliquary-rail ui-seg" aria-label="${esc(t('hudChrome.reliquary.shelvesAria'))}">${rows}</nav>`;
   }
 
   private contentHtml(model: ReliquaryViewModel, flash: ReadonlySet<string>): string {
@@ -1122,10 +1139,10 @@ export class ReliquaryWindow {
       `${this.cellIconHtml(find, this.cellQuality(find))}</span>` +
       `<span class="reliquary-recent-name">${esc(name)}</span>`;
     if (find.pageId === null) {
-      return `<span class="reliquary-recent-item" data-recent-name="${esc(name)}">${body}</span>`;
+      return `<span class="reliquary-recent-item ui-chip" data-recent-name="${esc(name)}">${body}</span>`;
     }
     return (
-      `<button type="button" class="reliquary-recent-item" data-page="${esc(find.pageId)}" ` +
+      `<button type="button" class="reliquary-recent-item ui-chip" data-page="${esc(find.pageId)}" ` +
       `data-recent-name="${esc(name)}" data-focus-key="${esc(`recent:${find.kind}:${find.id}`)}" ` +
       `aria-label="${esc(t('hudChrome.reliquary.recentJumpAria', { name }))}">${body}</button>`
     );
@@ -1150,7 +1167,7 @@ export class ReliquaryWindow {
         // from the model's raw catalog English.
         const name = reliquaryPageName(n.pageId);
         return (
-          `<button type="button" class="reliquary-nearly-row" data-page="${esc(n.pageId)}" data-focus-key="${esc(`nearly:${n.pageId}`)}" aria-label="${esc(
+          `<button type="button" class="reliquary-nearly-row ui-card" data-page="${esc(n.pageId)}" data-focus-key="${esc(`nearly:${n.pageId}`)}" aria-label="${esc(
             t('hudChrome.reliquary.nearlyJumpAria', {
               name,
               owned: this.fmt(n.owned),
@@ -1210,7 +1227,7 @@ export class ReliquaryWindow {
         // of the pair); aria-describedby folds it back in after the name.
         const recentDomId = `reliquary-shelf-recent-${card.shelf}`;
         return (
-          `<button type="button" class="reliquary-shelf-card" data-nav="${esc(card.shelf)}" ` +
+          `<button type="button" class="reliquary-shelf-card ui-card" data-nav="${esc(card.shelf)}" ` +
           `data-focus-key="${esc(`card:${card.shelf}`)}" aria-label="${esc(
             t('hudChrome.reliquary.shelfOpenAria', { name, owned, total }),
           )}"${latest !== null ? ` aria-describedby="${esc(recentDomId)}"` : ''}>` +
@@ -1228,12 +1245,12 @@ export class ReliquaryWindow {
   }
 
   private shelfListHtml(model: ReliquaryViewModel): string {
+    // The same chip row the open page paints, so hiding illuminated pages is
+    // one click on the shelf itself: the chip is shared state, and it carries
+    // into the page a player opens from the narrowed list.
+    const filterBar = this.filterBarHtml('shelf');
     if (model.shelfPages.length === 0) {
-      return `<div class="reliquary-empty">${esc(
-        this.searchActive()
-          ? t('hudChrome.reliquary.searchEmpty')
-          : t('hudChrome.reliquary.shelfEmpty'),
-      )}</div>`;
+      return `${filterBar}<div class="reliquary-empty">${esc(this.emptyGridText(model.filtered, 'shelf'))}</div>`;
     }
     // A real ul/li list, the professions window's structure: the row stays a
     // button (button semantics, one tab stop each) inside its own listitem, so
@@ -1250,13 +1267,13 @@ export class ReliquaryWindow {
             ? `<span class="reliquary-clears">${esc(t('hudChrome.reliquary.clearsLabel', { count: this.fmt(page.clears) }))}</span>`
             : '';
         const done = page.complete
-          ? `<span class="reliquary-complete-badge">${esc(t('hudChrome.reliquary.pageComplete'))}</span>`
+          ? `<span class="reliquary-complete-badge ui-chip">${esc(t('hudChrome.reliquary.pageComplete'))}</span>`
           : '';
         const desc = reliquaryPageDesc(page.pageId);
         const sub = desc === '' ? '' : `<span class="reliquary-page-sub">${esc(desc)}</span>`;
         return (
           `<li class="reliquary-page-item">` +
-          `<button type="button" class="reliquary-page-row" data-page="${esc(page.pageId)}" data-focus-key="${esc(`page:${page.pageId}`)}">` +
+          `<button type="button" class="reliquary-page-row ui-card" data-page="${esc(page.pageId)}" data-focus-key="${esc(`page:${page.pageId}`)}">` +
           `<span class="reliquary-page-main">` +
           `<span class="reliquary-page-name">${esc(reliquaryPageName(page.pageId))}</span>${sub}` +
           `</span>` +
@@ -1266,7 +1283,7 @@ export class ReliquaryWindow {
         );
       })
       .join('');
-    return `<ul class="reliquary-page-list" role="list" aria-label="${esc(t(NAV_LABEL_KEYS[model.nav]))}">${rows}</ul>`;
+    return `${filterBar}<ul class="reliquary-page-list" role="list" aria-label="${esc(t(NAV_LABEL_KEYS[model.nav]))}">${rows}</ul>`;
   }
 
   /**
@@ -1295,7 +1312,7 @@ export class ReliquaryWindow {
       name,
     });
     return (
-      `<button type="button" class="reliquary-pin${pinned ? ' pinned' : ''}" data-pin="${esc(pageId)}" ` +
+      `<button type="button" class="reliquary-pin ui-btn${pinned ? ' pinned' : ''}" data-pin="${esc(pageId)}" ` +
       `data-focus-key="${esc(`pin:${pageId}`)}" aria-pressed="${pinned}" aria-label="${esc(aria)}"` +
       `${atCap ? ' aria-disabled="true" aria-describedby="reliquary-pin-cap-note"' : ''}>${esc(label)}</button>`
     );
@@ -1325,7 +1342,7 @@ export class ReliquaryWindow {
       personal: { attr: 'data-personal', key: 'hudChrome.reliquary.personalLabel' },
     } as const satisfies Record<'retired' | 'personal', { attr: string; key: string }>;
     const chip = chips[reason];
-    return `<span class="reliquary-complete-badge" ${chip.attr}="1">${esc(t(chip.key))}</span>`;
+    return `<span class="reliquary-complete-badge ui-chip" ${chip.attr}="1">${esc(t(chip.key))}</span>`;
   }
 
   private pageDetailHtml(
@@ -1362,7 +1379,7 @@ export class ReliquaryWindow {
       ? `<p class="reliquary-account-scope" data-account-scope="1">${esc(t('hudChrome.reliquary.accountScopeNote'))}</p>`
       : '';
     const done = page.illuminated
-      ? `<span class="reliquary-complete-badge reliquary-page-illuminated">${esc(t('hudChrome.reliquary.pageComplete'))}</span>`
+      ? `<span class="reliquary-complete-badge reliquary-page-illuminated ui-chip">${esc(t('hudChrome.reliquary.pageComplete'))}</span>`
       : '';
     // A page tells you what it is: the authored blurb, localized through the
     // reliquary_i18n channel (English fallback until the release locale fill).
@@ -1407,8 +1424,8 @@ export class ReliquaryWindow {
       // same page paints the standing illuminated treatment instead of the
       // arrival. Reduced motion is the stylesheet's job (a static bright frame),
       // which is why the gate above never asks the browser about it.
-      `<section class="reliquary-page-detail${page.illuminated ? ' is-illuminated' : ''}${page.accountScoped ? ' is-account-scoped' : ''}${celebrate ? ' reliquary-page-celebrate' : ''}">` +
-      `<button type="button" class="reliquary-back" data-back data-focus-key="back">${esc(t('hudChrome.reliquary.backToShelf'))}</button>` +
+      `<section class="reliquary-page-detail ui-card${page.illuminated ? ' is-illuminated' : ''}${page.accountScoped ? ' is-account-scoped' : ''}${celebrate ? ' reliquary-page-celebrate' : ''}">` +
+      `<button type="button" class="reliquary-back ui-btn" data-back data-focus-key="back">${esc(t('hudChrome.reliquary.backToShelf'))}</button>` +
       // tabindex -1 + a focus key: spotlightPage parks the reading position
       // here on a deep link, and the key is what lets a fetch-driven or
       // slow-band rebuild RESTORE that position instead of dropping a
@@ -1437,28 +1454,45 @@ export class ReliquaryWindow {
   }
 
   /**
-   * Which "nothing here" line an empty grid shows. Search wins when a needle is
+   * Which "nothing here" line an empty grid or an empty shelf list shows. Search wins when a needle is
    * live (it is the narrowing the player just performed), then the chip, then
    * the page is genuinely empty. Blaming a search a player never typed, because
    * they clicked Catalogued on a page they own nothing on, sends them looking
    * for a search box to clear.
    */
-  private emptyGridText(filtered: boolean): string {
+  private emptyGridText(filtered: boolean, surface: 'grid' | 'shelf' = 'grid'): string {
     if (this.searchActive()) return t('hudChrome.reliquary.searchEmpty');
-    if (filtered || this.ownedFilter !== 'all') return t('hudChrome.reliquary.filterEmpty');
+    if (filtered || this.ownedFilter !== 'all') {
+      // The shelf narrows PAGES, so its line says pages: blaming missing
+      // relics on a list that holds none would send the player into a page.
+      return surface === 'shelf'
+        ? t('hudChrome.reliquary.filterEmptyPages')
+        : t('hudChrome.reliquary.filterEmpty');
+    }
     return t('hudChrome.reliquary.shelfEmpty');
   }
 
-  private filterBarHtml(): string {
+  /**
+   * The chip row. One state, two readings: on a grid the chips split relics
+   * by ownership; on a shelf the same state splits pages by illumination, so
+   * the shelf paints its own labels and group name while the data-filter ids
+   * and focus keys stay identical (the pressed chip carries across surfaces).
+   */
+  private filterBarHtml(surface: 'grid' | 'shelf' = 'grid'): string {
+    const labels = surface === 'shelf' ? SHELF_FILTER_LABEL_KEYS : FILTER_LABEL_KEYS;
     const chips = RELIQUARY_OWNED_FILTERS.map((filter) => {
       const on = this.ownedFilter === filter;
       return (
-        `<button type="button" class="reliquary-filter-chip${on ? ' active' : ''}" ` +
+        `<button type="button" class="reliquary-filter-chip ui-chip${on ? ' active' : ''}" ` +
         `data-filter="${esc(filter)}" data-focus-key="${esc(`filter:${filter}`)}" aria-pressed="${on}">` +
-        `${esc(t(FILTER_LABEL_KEYS[filter]))}</button>`
+        `${esc(t(labels[filter]))}</button>`
       );
     }).join('');
-    return `<div class="reliquary-filterbar" role="group" aria-label="${esc(t('hudChrome.reliquary.filterGroupAria'))}">${chips}</div>`;
+    const groupAria =
+      surface === 'shelf'
+        ? t('hudChrome.reliquary.filterGroupAriaPages')
+        : t('hudChrome.reliquary.filterGroupAria');
+    return `<div class="reliquary-filterbar" role="group" aria-label="${esc(groupAria)}">${chips}</div>`;
   }
 
   private cellHtml(
@@ -1491,7 +1525,7 @@ export class ReliquaryWindow {
       // The flash rides the same one-shot as the celebration: a class composed
       // into this rebuild only, so a filter click or the next slow band paints
       // the settled cell.
-      `<div class="reliquary-cell reliquary-cell--${stateClass} q-${esc(quality)}${flash ? ' reliquary-cell-flash' : ''}" role="listitem" tabindex="${index === activeIndex ? '0' : '-1'}" ` +
+      `<div class="reliquary-cell ui-card-tile reliquary-cell--${stateClass} q-${esc(quality)}${flash ? ' reliquary-cell-flash' : ''}" role="listitem" tabindex="${index === activeIndex ? '0' : '-1'}" ` +
       `data-cell-id="${esc(cell.id)}" data-cell-kind="${esc(cell.kind)}" data-cell-owned="${cell.owned ? '1' : '0'}" ` +
       `${opaqueArt ? 'data-cell-art="opaque" ' : ''}` +
       // data-cell-source marks cells with at least one RESOLVABLE source line,

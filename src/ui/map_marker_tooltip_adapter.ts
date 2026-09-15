@@ -8,6 +8,7 @@ import type { MapSemanticAccessibilityCore } from './map_semantic_accessibility_
 import {
   MAP_NPC_GLYPH_HIT_RADIUS,
   MAP_TOUCH_POINT_HIT_RADIUS_CSS_PX,
+  type MapFarmPatchMarker,
   type MapGatherNodeMarker,
   type MapNavigationMarker,
   type MapNpcMarker,
@@ -29,6 +30,7 @@ export interface MapMarkerTooltipResolvers {
   station(marker: MapStationMarker): string;
   service(marker: MapServiceMarker): string;
   gather(marker: MapGatherNodeMarker): string;
+  farm(marker: MapFarmPatchMarker): string;
   worldQuest(marker: MapWorldQuestMarker): string;
   worldBoss(marker: MapWorldBossMarker): string;
   questArea(refs: readonly QuestObjectiveRef[], activeCount: number): string;
@@ -57,6 +59,7 @@ export function showMapMarkerTooltipAt(
   stations: readonly MapStationMarker[],
   services: readonly MapServiceMarker[],
   navigation: readonly MapNavigationMarker[],
+  farmPatches: readonly MapFarmPatchMarker[],
   pointHits: MapPointMarkerHit[],
   questObjectives: QuestObjectiveRef[],
   semantics: MapSemanticAccessibilityCore,
@@ -71,6 +74,7 @@ export function showMapMarkerTooltipAt(
     stations.length === 0 &&
     services.length === 0 &&
     navigation.length === 0 &&
+    farmPatches.length === 0 &&
     semantics.instanceMarkers.length === 0
   )
     return false;
@@ -97,6 +101,7 @@ export function showMapMarkerTooltipAt(
         services,
         stations,
         gatherNodes,
+        farmPatches,
         cx,
         cy,
         radius,
@@ -108,6 +113,7 @@ export function showMapMarkerTooltipAt(
     else if (hit.kind === 'navigation') html = resolvers.navigation(hit.marker);
     else if (hit.kind === 'station') html = resolvers.station(hit.marker);
     else if (hit.kind === 'service') html = resolvers.service(hit.marker);
+    else if (hit.kind === 'farm') html = resolvers.farm(hit.marker);
     else html = resolvers.gather(hit.marker);
     if (html) break;
   }

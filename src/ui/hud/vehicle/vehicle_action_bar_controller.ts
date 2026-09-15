@@ -12,7 +12,7 @@ import { GLIDER_QUEST_ID } from '../../../sim/content/world_quest_glider';
 import { cannonEndlessRound } from '../../../sim/minigames/cannon_endless';
 import { TICK_RATE } from '../../../sim/types';
 import type { IWorldVehicles } from '../../../world_api/vehicles';
-import { vehicleStationDisplayName } from '../../entity_display_labels';
+import { vehicleStationDisplayName } from '../../entity_display_core';
 import { esc } from '../../esc';
 import { formatNumber, t } from '../../i18n';
 import { iconDataUrl } from '../../icons';

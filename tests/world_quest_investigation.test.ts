@@ -284,9 +284,7 @@ describe('A Borrowed Face', () => {
       showError: vi.fn(),
     } as unknown as NearbyInteractionHud;
 
-    expect(tryNearbyInteraction(world, hud, [], null, 'far', 'not ready', 'away', 'nothing')).toBe(
-      true,
-    );
+    expect(tryNearbyInteraction(world, hud, 'away', 'nothing')).toBe(true);
     expect(targetEntity).toHaveBeenCalledWith(guardId);
     expect(interact).toHaveBeenCalledOnce();
     expect(hud.openQuestDialog).not.toHaveBeenCalled();
