@@ -253,8 +253,8 @@ import {
   stableDeadlineRemaining,
 } from './snapshot_timer_wire';
 import { vaultWithdrawPayload } from './vault_snapshot_wire';
-import { optimisticWeaponSkinChange } from './weapon_skin_optimistic';
 import { decodeVehicleSession } from './vehicle_session_wire';
+import { optimisticWeaponSkinChange } from './weapon_skin_optimistic';
 import { buildWebSocketAuthMessage } from './world_auth_message';
 import { WorldInteractionRequests } from './world_interaction_requests';
 import { fetchWorldQuestLeaderboard } from './world_quest_leaderboard_wire';

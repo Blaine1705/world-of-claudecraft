@@ -21,13 +21,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { QUESTS } from '../src/sim/data';
 import type { QuestProgress } from '../src/sim/types';
-import type { IWorld } from '../src/world_api';
 import { buildQuestStrip } from '../src/ui/hud/quest/quest_strip_controller';
 import { QUEST_STRIP_MAX_OBJECTIVES } from '../src/ui/hud/quest/quest_strip_core';
 import type { TrackedQuest } from '../src/ui/hud/quest/quest_tracker';
 import { QuestTrackerController } from '../src/ui/hud/quest/quest_tracker_controller';
 import * as i18nModule from '../src/ui/i18n';
 import { makeWriterFacet } from '../src/ui/painter_host';
+import type { IWorld } from '../src/world_api';
 
 /** A private facet per rig: the controller takes Hud's shared one in
  *  production, and a test needs only the elision behaviour. */

@@ -28,8 +28,8 @@ import { bagPools, canGrantItemInstance } from './bags';
 import { NOTICEBOARD_LISTINGS } from './content/noticeboard_listings';
 import { type NoticeboardDef, noticeboardDefByEntityId } from './content/noticeboards';
 import { currentRealmBuilder, pastRealmBuilders } from './content/realm_builders';
-import { corpseInteractionAvailability } from './corpse_interaction';
 import { FORGE_INTERACT_RANGE } from './content/world_quest_forging';
+import { corpseInteractionAvailability } from './corpse_interaction';
 import { ITEMS, MOBS, QUESTS, SPIRIT_HEALER_NPC_ID } from './data';
 import * as deedsMod from './deeds';
 import {

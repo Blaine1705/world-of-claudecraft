@@ -34,8 +34,8 @@
 // to a color, never the resolved color.
 
 import type { GatheringProfessionId } from '../sim/content/professions';
-import { corpseIndicatorFor } from '../sim/corpse_loot_state';
 import { GLIDER_NPC_DEF } from '../sim/content/world_quest_glider';
+import { corpseIndicatorFor } from '../sim/corpse_loot_state';
 import { GATHER_NODES, isBgPos, isDelvePos, isYumiMazePos, QUESTS, zoneAt } from '../sim/data';
 import { NODE_HARVEST_TABLE } from '../sim/professions/gathering';
 import { canGatherTier } from '../sim/professions/tools';

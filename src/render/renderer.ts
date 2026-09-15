@@ -766,8 +766,8 @@ import {
 import { createPrewarmGroupSlot, createVariantPrewarmSlot } from './variant_prewarm_slot';
 import { routeVarkhulForgeHammer } from './varkhul_forge_hammer';
 import { VarkhulForgestormVisuals } from './varkhul_forgestorm_visual';
-import type { VehicleSuspensionRig } from './vehicle_suspension_fx';
 import { createVehicleCamera, stepVehicleCamera, vehicleCameraTarget } from './vehicle_camera_core';
+import type { VehicleSuspensionRig } from './vehicle_suspension_fx';
 import { SCHOOL_COLORS, Vfx } from './vfx';
 import { createOffsetVfxAnchor, createVfxAnchor, type VfxAnchorPose } from './vfx_anchor';
 import { buildCastVfxBasicStandIns } from './vfx_basic_materials';

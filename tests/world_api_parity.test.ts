@@ -78,9 +78,9 @@ import type { IWorldTalents } from '../src/world_api/talents';
 import type { IWorldTargeting } from '../src/world_api/targeting';
 import type { IWorldTelemetry } from '../src/world_api/telemetry';
 import type { IWorldTrade } from '../src/world_api/trade';
+import type { IWorldVehicles } from '../src/world_api/vehicles';
 import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
 import { tsFilesUnder } from './helpers/ts_files_under';
-import type { IWorldVehicles } from '../src/world_api/vehicles';
 
 type IWorldMemberKind = 'method' | 'data';
 

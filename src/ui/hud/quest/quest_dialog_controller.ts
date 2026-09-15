@@ -18,8 +18,6 @@ import { QUALITY_COLOR } from '../../icons';
 import { NPC_WINDOW_CLOSE_RANGE } from '../../npc_service_range';
 import type { PainterHostPresentation } from '../../painter_host';
 import { svgIcon } from '../../ui_icons';
-import { archetypeImageUrl } from '../professions/profession_art';
-import { buildAttunementPreview } from '../professions/profession_identity_view';
 import {
   isWorldQuestInstructorOrEscort,
   worldQuestInstructorDialog,
@@ -29,6 +27,8 @@ import {
   investigationSignature,
   isInvestigationTarget,
 } from '../../world_quest_investigation_view';
+import { archetypeImageUrl } from '../professions/profession_art';
+import { buildAttunementPreview } from '../professions/profession_identity_view';
 import { isStationMasterNpc } from '../vendor/train_view';
 import { isWarfareVendorNpc } from '../vendor/warfare_vendor_view';
 import { gossipMenuIsEmpty } from './gossip_menu';

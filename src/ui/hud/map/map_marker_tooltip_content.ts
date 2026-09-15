@@ -21,8 +21,6 @@ import type {
   MapWorldQuestMarker,
 } from '../../map_window_view';
 import { questMarkerTooltipTag } from '../../quest_marker_tags';
-import { stationNameText } from '../professions/crafting_window';
-import { buildGatherNodeTooltip } from '../professions/gathering_view';
 import {
   worldQuestDef,
   worldQuestDisplayName,
@@ -31,6 +29,8 @@ import {
   worldQuestStatusText,
   worldQuestTimeRemainingText,
 } from '../../world_quest_view';
+import { stationNameText } from '../professions/crafting_window';
+import { buildGatherNodeTooltip } from '../professions/gathering_view';
 
 function questTitle(questId: string): string {
   return tEntity({ kind: 'quest', id: questId, field: 'title' });

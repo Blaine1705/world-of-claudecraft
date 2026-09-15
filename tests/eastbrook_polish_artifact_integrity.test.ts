@@ -1371,9 +1371,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // renderer leaf): the composite first, then this seal from the swept file. No
 // capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '91ab6f5f17a16521fcd612ad892a1952417ab77a46fe20a9eed57c3620e1d04f';
+  'd8c48993eb107912b6db4f1715068d28f3f06dd7b2a5b775f9ffbc7e463a6634';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '76b8eb0ecadfb3c808769dc3d9a07ad68fdea1c84177d62e1000f2403bf6616f';
+  'e645ff2a357d8d133776d03cc6dae59188d760ad68fb229c7b890756951a3d45';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2738,7 +2738,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // evidence. No capture was retaken.
       // Release/v0.43.0 merge into feature/world-quests: recomputed LAST over
       // the re-swept evidence. No capture was retaken.
-    ).toBe('707a22c3d0f9fd182310e09fa2fb2603a5a0e7dd16426c4467954dc2298461e7');
+    ).toBe('96135b0e0705682122c43f1a091a297ab40c1bccdee999bd414f640018ab6d9b');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

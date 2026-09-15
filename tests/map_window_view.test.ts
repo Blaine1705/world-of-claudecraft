@@ -45,8 +45,8 @@ import {
   type ZonePropsDef,
 } from '../src/sim/types';
 import type { Decoration } from '../src/sim/world';
-import { isNodeToolLockedFor } from '../src/ui/hud/professions/gathering_view';
 import { WORLD_BOSSES, worldBossLockoutId } from '../src/sim/world_boss';
+import { isNodeToolLockedFor } from '../src/ui/hud/professions/gathering_view';
 import { STABLE_MAP_NAVIGATION_LANDMARKS } from '../src/ui/map_navigation_landmarks_core';
 import {
   buildingFootprintCorners,
