@@ -9701,12 +9701,7 @@ export class Sim {
   startWorldQuestActivity(questId: string, difficulty: 'normal' | 'hard', pid?: number): void {
     startWorldQuestActivityImpl(this.ctx, questId, difficulty, pid);
   }
-  worldQuestLeaderboard(
-    board: string,
-    page = 0,
-    pageSize = LEADERBOARD_PAGE_SIZE,
-    _viewer?: string,
-  ) {
+  worldQuestLeaderboard(board: string, page = 0, pageSize = LEADERBOARD_PAGE_SIZE) {
     return Promise.resolve(emptyWorldQuestLeaderboardPage(board, page, pageSize));
   }
   rotateWorldQuestPuzzleTile(questId: string, tileIndex: number, pid?: number): void {
