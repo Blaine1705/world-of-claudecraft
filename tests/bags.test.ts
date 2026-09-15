@@ -210,6 +210,32 @@ describe('stack sizes and stacking math', () => {
     expect(instancedCountCap(undefined, { locked: true })).toBe(Number.POSITIVE_INFINITY);
   });
 
+  it('a LOCKED (uncharged) payload packs a fresh slot up to the normal cap, never tops up its twin', () => {
+    // The non-material twin of material_stack_packing.ts's locked-stack fix:
+    // locking is one flag over the WHOLE counted stack (item_lock.ts
+    // setItemLocked), not a per-unit identity like charges, so a fresh slot
+    // for a locked but uncharged payload absorbs a full cap's worth, exactly
+    // like the instancedCountCap load cap above already allows. Anti-taint
+    // (never topping up an existing, differently-provenanced locked stack)
+    // is unaffected: canStackInstancePayloads still refuses the merge.
+    const lockedTwin: InvSlot[] = [
+      { itemId: 'baked_bread', count: 5, instance: { signer: 'Bru', locked: true } },
+    ];
+    const locked = { signer: 'Ana', locked: true };
+    // The existing Bru-locked stack already occupies one general slot, so
+    // `general: N` leaves (N - 1) FREE slots for the incoming stack.
+    // No top-up into the existing (differently-signed) locked stack, however
+    // much room it has left; one fresh slot holds a full cap's worth.
+    expect(countFit(lockedTwin, { general: 1, materials: 0 }, 'baked_bread', 25, locked)).toBe(0);
+    expect(countFit(lockedTwin, { general: 2, materials: 0 }, 'baked_bread', 25, locked)).toBe(20);
+    expect(countFit(lockedTwin, { general: 3, materials: 0 }, 'baked_bread', 25, locked)).toBe(25);
+
+    addStacked(lockedTwin, 'baked_bread', 25, locked);
+    const fresh = lockedTwin.filter((s) => s.instance?.signer === 'Ana');
+    expect(fresh.map((s) => s.count)).toEqual([20, 5]);
+    for (const s of fresh) expect(s.instance).toEqual(locked);
+  });
+
   it('fresh instanced slots each carry their own deep clone of the payload', () => {
     const payload = { signer: 'Ana', rolled: { stats: { str: 1 } } };
     const inv: InvSlot[] = [];
