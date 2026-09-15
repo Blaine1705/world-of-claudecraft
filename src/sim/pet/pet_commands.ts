@@ -47,7 +47,6 @@ import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
 import type { PetState, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { addThreat, clearThreat } from '../threat';
-import { wispMazeActionsLocked } from '../wisp_maze_action_lock';
 import {
   type Aura,
   DEMON_HEAL_CAST_ID,
@@ -57,6 +56,7 @@ import {
   PET_GROWL_INTERVAL,
   type PetMode,
 } from '../types';
+import { wispMazeActionsLocked } from '../wisp_maze_action_lock';
 import { applyPetOwnerScaling, petRangedAttack, startWaterJet } from './pet_ai';
 import { isTameableFamily } from './pet_scaling';
 import { isPrimaryOwnedPetEntity } from './pet_selection';

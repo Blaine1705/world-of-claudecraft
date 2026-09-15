@@ -12,13 +12,13 @@
 import type { BiomeId } from '../sim/types';
 import { resumeWhenAllowed } from './audio_unlock';
 import { dungeonMusicZoneForDungeon } from './dungeon_music_zones';
+import type { MinigameTrack } from './minigame_music';
+import { MINIGAME_MUSIC_URLS } from './minigame_music';
 import type { MusicMixState } from './music_mix_policy';
 import { isMusicMixAudible, musicMixMasterTarget } from './music_mix_policy';
 import { MUSIC_OVERRIDES } from './music_overrides.generated';
 import { composeDungeonGravewyrmSanctum } from './music_theme_gravewyrm_sanctum';
 import { COMBAT_STREAM_URLS, pickCombatTrackIndex, ZONE_STREAM_URLS } from './music_tracks';
-import type { MinigameTrack } from './minigame_music';
-import { MINIGAME_MUSIC_URLS } from './minigame_music';
 import { buildIgnivarRaidThemes } from './raid_music_themes';
 
 export type MusicZone =
@@ -4976,7 +4976,10 @@ export class MusicDirector {
           /* browser may reject seeking before metadata */
         }
       }
-      for (const [name, stream] of Object.entries(this.minigameStreams) as [MinigameTrack, StreamTrack][]) {
+      for (const [name, stream] of Object.entries(this.minigameStreams) as [
+        MinigameTrack,
+        StreamTrack,
+      ][]) {
         const target = name === track ? 1 : 0;
         this.setStreamTarget(stream, target, target > 0 ? 0.4 : 0.3);
       }

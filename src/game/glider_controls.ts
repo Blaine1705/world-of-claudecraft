@@ -11,10 +11,7 @@ export function gliderControlsActive(world: Pick<IWorld, 'worldQuestLog'>): bool
 
 /** Walking prediction and keyboard yaw integration cannot model these modes. */
 export function scriptedMovementActive(world: Pick<IWorld, 'worldQuestLog'>): boolean {
-  return (
-    gliderControlsActive(world) ||
-    wispMazeActionsLocked(world.worldQuestLog)
-  );
+  return gliderControlsActive(world) || wispMazeActionsLocked(world.worldQuestLog);
 }
 
 interface GliderInput {

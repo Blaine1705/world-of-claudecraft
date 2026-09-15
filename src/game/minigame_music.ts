@@ -58,9 +58,7 @@ export interface ActiveMinigameMusicInput {
 }
 
 /** Resolves which minigame music track (if any) should override the ambient score. */
-export function resolveActiveMinigameTrack(
-  input: ActiveMinigameMusicInput,
-): MinigameTrack | null {
+export function resolveActiveMinigameTrack(input: ActiveMinigameMusicInput): MinigameTrack | null {
   // 1. Interactive puzzle modal (Match-3 or Leyline puzzle)
   if (input.activePuzzleQuestId) {
     if (input.activePuzzleQuestId === 'wq_palmreach_confections') {
@@ -91,7 +89,11 @@ export function resolveActiveMinigameTrack(
 
   // 5. Wisp maze (Pacman)
   const wispMaze = log.get('wq_evergarden_wisp_maze')?.wispMaze;
-  if (wispMaze && !wispMaze.paused && (wispMaze.phase === 'active' || wispMaze.phase === 'countdown')) {
+  if (
+    wispMaze &&
+    !wispMaze.paused &&
+    (wispMaze.phase === 'active' || wispMaze.phase === 'countdown')
+  ) {
     return 'pacman';
   }
 

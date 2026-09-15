@@ -37,7 +37,6 @@ import { grantDevotionFromBlock } from '../paladin_devotion';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import { wispMazeActionsLocked } from '../wisp_maze_action_lock';
 import { resolveTalentHitMult } from '../talent_hit_mult';
 import { addThreat, hasEscapeStealth } from '../threat';
 import { creditAbilityDrill } from '../tutorial/ability_drill';
@@ -57,6 +56,7 @@ import {
   type WeaponInfo,
 } from '../types';
 import { drawWeapon } from '../weapon_stow';
+import { wispMazeActionsLocked } from '../wisp_maze_action_lock';
 import { applyRageSpendCooldownRefund, spendResource } from './casting_lifecycle';
 import { blindMissBonus, isDisarmed, isInStasis, isStunned } from './cc';
 import { druidEngineOnLandedStrike } from './druid_engines';

@@ -42,7 +42,6 @@ import {
   paladinExecuteWindowActive,
   spendDevotion,
 } from '../paladin_devotion';
-import { wispMazeActionsLocked } from '../wisp_maze_action_lock';
 import { effectiveFishingBand, fishReelWindowSecFor } from '../professions/fishing';
 import { bestOwnedGatherToolFor } from '../professions/tools';
 import { scheduleProjectile } from '../projectile_travel';
@@ -78,6 +77,7 @@ import {
   TOOL_RECHARGE_CAST_ID,
 } from '../types';
 import { drawWeapon } from '../weapon_stow';
+import { wispMazeActionsLocked } from '../wisp_maze_action_lock';
 import { sharedCooldownIds } from './ability_cooldown_groups';
 import {
   afflictionAdjustedCastTime,

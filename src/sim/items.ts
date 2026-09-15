@@ -45,7 +45,6 @@ import {
   weaponHand,
 } from './equipment_rules';
 import { formatMoney } from './format_money';
-import { wispMazeActionsLocked } from './wisp_maze_action_lock';
 import { useBrinyLure } from './interactions/crab_summon';
 import { throwFirebottleAtNearestHut } from './interactions/firebottle_hut';
 import { moveStackToCell } from './inventory_order';
@@ -90,6 +89,7 @@ import {
   type VendorBuyOptions,
   vendorCountForced,
 } from './vendor_buy_stack';
+import { wispMazeActionsLocked } from './wisp_maze_action_lock';
 
 const VENDOR_BUYBACK_LIMIT = 12;
 
