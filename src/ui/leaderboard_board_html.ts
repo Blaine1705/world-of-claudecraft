@@ -59,7 +59,8 @@ export function playersPodiumSlot(slot: PodiumSlot<LeaderboardRow>): PodiumSlotH
     const title = row.knownClass ? ` title="${esc(classDisplayName(row.cls))}"` : '';
     return {
       me: row.me,
-      nameHtml: `<span${title}>${star}${esc(row.name)}${guildTagHtml(row.guild, 'lb-guild')}${youHtml(row.me)}</span>`,
+      // "(You)" stays beside the name; the guild tag follows it, on its own line on the card.
+      nameHtml: `<span${title}>${star}${esc(row.name)}${youHtml(row.me)}${guildTagHtml(row.guild, 'lb-guild')}</span>`,
       metricHtml: esc(formatXp(row.lifetimeXp)),
       detailHtml:
         statHtml(t('game.leaderboard.level'), whole(row.level)) +

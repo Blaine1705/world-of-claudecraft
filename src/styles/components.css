@@ -3851,6 +3851,64 @@
     font-size: clamp(12px, 1.15cqw, 16px);
     color: #f2d998;
   }
+  /* The pinned row reads as a short centred summary pill (the rankings
+     window's .wql-self look), never as a repeated ladder row: a lead-in label,
+     then only the rank, the name, and the board's number. */
+  #leaderboard-window .lb-sticky.lb-standing {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px 16px;
+    width: fit-content;
+    max-width: 100%;
+    margin-inline: auto;
+    padding: clamp(5px, 0.6cqw, 9px) clamp(18px, 2.4cqw, 40px);
+    font-size: clamp(12px, 1.15cqw, 16px);
+    clip-path: polygon(
+      12px 0,
+      calc(100% - 12px) 0,
+      100% 50%,
+      calc(100% - 12px) 100%,
+      12px 100%,
+      0 50%
+    );
+  }
+  #leaderboard-window .lb-standing-label {
+    font-family: var(--title-font);
+    color: #f2d998;
+    white-space: nowrap;
+  }
+  #leaderboard-window .lb-sticky.lb-standing .lb-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    padding: 0;
+    box-shadow: none;
+  }
+  #leaderboard-window
+    .lb-sticky.lb-standing
+    .lb-row
+    > :not(.lb-rank, .lb-name, .lb-xp, .lb-commits) {
+    display: none;
+  }
+  #leaderboard-window .lb-sticky.lb-standing .lb-rank {
+    width: auto;
+    font-weight: 700;
+    color: #c4a6ff;
+  }
+  #leaderboard-window .lb-sticky.lb-standing .lb-name {
+    min-width: 0;
+  }
+  /* On a podium card a player's guild tag takes its own quieter line, so a long
+     name plus tag never ellipsizes inside the narrow card (touch especially). */
+  #leaderboard-window .lbp-slot-name .lb-guild {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.72em;
+    line-height: 1.3;
+  }
   #leaderboard-window .lb-pager {
     border-top-color: #d4a95544;
     padding-bottom: 8px;

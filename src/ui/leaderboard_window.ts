@@ -896,7 +896,7 @@ export class LeaderboardWindow {
     // view-model, localized here; '' (untitled/stale) renders an empty cell.
     const deedTitle = standing.title ? deedTitleText(standing.title) : '';
     return (
-      `<div class="lb-sticky lb-standing"><div class="lb-row lb-row-players lb-mine"><span class="lb-rank">${rankCell}</span>` +
+      `<div class="lb-sticky lb-standing">${this.standingLabelHtml()}<div class="lb-row lb-row-players lb-mine"><span class="lb-rank">${rankCell}</span>` +
       `<span class="lb-name">${esc(standing.name)}${guildTagHtml(standing.guild, 'lb-guild')} <span class="lb-you">(${esc(t('game.leaderboard.you'))})</span></span>` +
       `<span class="lb-lvl">${formatNumber(standing.level, { maximumFractionDigits: 0 })}</span><span class="lb-vlvl">${formatNumber(standing.virtualLevel, { maximumFractionDigits: 0 })}</span>` +
       `<span class="lb-xp">${formatXp(standing.lifetimeXp)}</span>` +
@@ -912,7 +912,15 @@ export class LeaderboardWindow {
   // The viewer's own row pinned under the list, in the sticky standing bar the
   // players tab uses; '' when the viewer is not on this page.
   private standingHtml(rowHtml: string): string {
-    return rowHtml ? `<div class="lb-sticky lb-standing">${rowHtml}</div>` : '';
+    return rowHtml
+      ? `<div class="lb-sticky lb-standing">${this.standingLabelHtml()}${rowHtml}</div>`
+      : '';
+  }
+
+  // The compact bar's lead-in ("Your Standing"), so the pinned row reads as the
+  // viewer's own summary and not as a repeated ladder row.
+  private standingLabelHtml(): string {
+    return `<span class="lb-standing-label">${esc(t('game.leaderboard.yourRank'))}</span>`;
   }
 
   // Prev/Next pager, mirroring the World Market browse pager (it reuses the same
