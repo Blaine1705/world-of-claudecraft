@@ -1805,7 +1805,10 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     if (!scenario) return;
     const { trace, rec } = record(scenario);
     const events = rec.allEvents as Ev[];
-    expect(events.filter((event) => event.type === 'worldQuestStarted')).toHaveLength(4);
+    // Five starts: the 2026-09-01 step opens a new daily cycle, which restarts
+    // the confection board (WORLD_QUEST_ROTATION_DAYS is 1 since the zone
+    // minimum levels playtest round).
+    expect(events.filter((event) => event.type === 'worldQuestStarted')).toHaveLength(5);
     expect(events.filter((event) => event.type === 'worldQuestDone')).toHaveLength(3);
     expect(events.some((event) => event.type === 'worldQuestProgress')).toBe(true);
     expect(
@@ -1827,9 +1830,9 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     expect(rec.notes.xpReward).toBe(2_784);
     expect(rec.notes.copperReward).toBe(6_000);
     expect(rec.notes.itemReward).toBe(1);
-    expect(rec.notes.questProgress).toBe(31);
+    expect(rec.notes.questProgress).toBe(22);
     expect(rec.notes.questsCompleted).toBe(3);
-    expect(rec.notes.sameCycleAfterOneDay).toBe(true);
+    expect(rec.notes.sameCycleAfterOneDay).toBe(false);
     expect(rec.notes.rotationChanged).toBe(true);
     expect(rec.notes.rotatedQuestIds).toEqual(['wq_thornpeak_stormcrag']);
     expect(trace.draws).toBe(0);

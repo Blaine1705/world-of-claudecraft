@@ -17,8 +17,18 @@ import { worldQuestCycleOfferingQuest } from '../src/sim/world_quest_rotation';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
 const CASES = [
-  { id: WILLOWFEN_REMEDY_CARAVAN_ESCORT_ID, zone: 'willowfen', roads: WILLOWFEN_ROADS },
-  { id: FROSTVEIL_SUPPLY_CARAVAN_ESCORT_ID, zone: 'frostveil', roads: FROSTVEIL_ROADS },
+  {
+    id: WILLOWFEN_REMEDY_CARAVAN_ESCORT_ID,
+    zone: 'willowfen',
+    minLevel: 19,
+    roads: WILLOWFEN_ROADS,
+  },
+  {
+    id: FROSTVEIL_SUPPLY_CARAVAN_ESCORT_ID,
+    zone: 'frostveil',
+    minLevel: 17,
+    roads: FROSTVEIL_ROADS,
+  },
 ];
 
 function distanceToRoad(x: number, z: number, roads: { x: number; z: number }[][]): number {
@@ -36,7 +46,7 @@ function distanceToRoad(x: number, z: number, roads: { x: number; z: number }[][
   return nearest;
 }
 
-describe.each(CASES)('$zone caravan content', ({ id, zone, roads }) => {
+describe.each(CASES)('$zone caravan content', ({ id, zone, minLevel, roads }) => {
   const def = WORLD_QUEST_ESCORTS[id];
   const questId = def.worldQuestId;
   const story = def.story;
@@ -44,7 +54,7 @@ describe.each(CASES)('$zone caravan content', ({ id, zone, roads }) => {
   const quest = WORLD_QUESTS_BY_ID[questId];
 
   it('registers a local story and three regional waves without changing the terrain', () => {
-    expect(quest).toMatchObject({ zoneId: zone, minLevel: 10, count: 1 });
+    expect(quest).toMatchObject({ zoneId: zone, minLevel, count: 1 });
     expect(quest.objective).toEqual({ type: 'escort', escortId: id });
     expect(MOBS[def.npcMobId]).toMatchObject({ aggroRadius: 0, moveSpeed: 0, loot: [] });
     expect(def.story?.lines).toHaveLength(3);
@@ -99,7 +109,7 @@ describe.each(CASES)('$zone caravan content', ({ id, zone, roads }) => {
     const guard = sim.entities.get(pid);
     const meta = sim.meta(pid);
     if (!guard || !meta) throw new Error('Missing road tester');
-    guard.level = 10;
+    guard.level = quest.minLevel;
     meta.devWorldQuestCycle = worldQuestCycleOfferingQuest('wq3_0', questId);
     guard.pos = sim.groundPos(def.start.x, def.start.z);
     guard.prevPos = { ...guard.pos };

@@ -3,7 +3,11 @@ import {
   WORLD_QUEST_CALLIGRAPHY_ADVANCED,
   WORLD_QUEST_CALLIGRAPHY_QUEST,
 } from '../src/sim/content/world_quest_calligraphy';
-import { createWorldQuestTrace, stepWorldQuestTrace } from '../src/sim/world_quest_trace_geometry';
+import {
+  createWorldQuestTrace,
+  stepWorldQuestTrace,
+  worldQuestTracePreviewSeconds,
+} from '../src/sim/world_quest_trace_geometry';
 import {
   sanitizeWorldQuestTraceVariant,
   WORLD_QUEST_TRACE_VARIANTS,
@@ -61,8 +65,9 @@ describe('deterministic advanced calligraphy variants', () => {
       for (const reverse of [false, true]) {
         const points = reverse ? [...shape.points].reverse() : shape.points;
         const state = createWorldQuestTrace('q', shape, points[0], 0, 2);
-        stepWorldQuestTrace(state, shape, points[0], 6);
-        let time = 6;
+        const drawAt = worldQuestTracePreviewSeconds(shape);
+        stepWorldQuestTrace(state, shape, points[0], drawAt);
+        let time = drawAt;
         for (let edge = 1; edge < points.length; edge++) {
           const a = points[edge - 1];
           const b = points[edge];

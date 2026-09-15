@@ -1149,13 +1149,20 @@ describe('world-quest zone markers', () => {
       world.player.pos.x = ((zone.xMin ?? -500) + (zone.xMax ?? 500)) / 2;
       world.player.pos.z = (zone.zMin + zone.zMax) / 2;
       const model = buildOverworldMapModel({ ...input(world, 1), zone });
-      expect(model.worldQuests.length, zone.id).toBe(zone.id === 'galecrest' ? 2 : 1);
+      expect(model.worldQuests.length, zone.id).toBe(
+        zone.id === 'proving_shore'
+          ? 0
+          : zone.id === 'galecrest' || zone.id === 'evergarden'
+            ? 2
+            : 1,
+      );
       if (model.worldQuests[0]) {
         expect(model.worldQuests[0].radius, zone.id).toBeGreaterThan(0);
         projected++;
       }
     }
-    expect(projected).toBe(15);
+    // 14: Proving Shore left the daily rotation.
+    expect(projected).toBe(14);
   });
 
   it('appears from its minimum level in both hosts and changes to active state', () => {

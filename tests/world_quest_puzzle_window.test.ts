@@ -148,7 +148,7 @@ describe('world quest puzzle window', () => {
     window.open(quest.id);
     const root = document.getElementById('world-quest-puzzle-window') as HTMLElement;
     expect(root.querySelectorAll('[data-match3-cell]')).toHaveLength(36);
-    expect(root.textContent).toContain('Weekly level 1');
+    expect(root.textContent).toContain('Daily level 1');
     expect(root.querySelector('.wqm-grid')?.getAttribute('role')).toBe('group');
     expect(root.querySelector('.wqm-status')?.hasAttribute('aria-live')).toBe(false);
     const announcer = document.querySelector('[role="status"]');

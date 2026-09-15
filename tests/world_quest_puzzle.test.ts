@@ -143,6 +143,9 @@ describe('world quest beam puzzle', () => {
       questId: quest.id,
       count: 1,
       state: 'completed',
+      puzzleBonusClaimed: 0,
+      puzzleBonusLevel: 1,
+      puzzleDay: 0,
     });
     expect(sim.lifetimeXp - lifetimeBeforeSolution).toBe(2_784);
     const doneEvents = sim.drainEvents().filter((event) => event.type === 'worldQuestDone');

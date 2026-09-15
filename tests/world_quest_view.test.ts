@@ -62,7 +62,9 @@ describe('world quest view', () => {
     expect(worldQuestObjectiveLabel('wq_palmreach_confections')).toBe(
       'Match enchanted confections',
     );
-    expect(worldQuestObjectiveLabel('wq_farshore_salvage')).toBe('Salvage shipwreck debris');
+    expect(worldQuestObjectiveLabel('wq_farshore_salvage')).toBe(
+      'Salvage debris washed along the strand from the wreck northwest of Gullhaven',
+    );
     expect(worldQuestObjectiveLabel('wq_eastbrook_caravan')).toBe(
       'Escort the caravan: Eastbrook Vale',
     );

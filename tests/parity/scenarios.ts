@@ -94,6 +94,7 @@ import {
 } from '../../src/sim/types';
 import { groundHeight, terrainHeight } from '../../src/sim/world';
 import { WORLD_QUEST_DELIVERY_AURA_ID } from '../../src/sim/world_quest_delivery';
+import { resolveWorldQuestMatch3Level } from '../../src/sim/world_quest_daily_levels';
 import { applyWorldQuestMatch3Move } from '../../src/sim/world_quest_match3';
 import {
   onMobKilledForWorldQuests,
@@ -7671,11 +7672,11 @@ function worldQuestLifecycle(): Scenario {
           sim.pickUpObject(activator.id);
           const progress = requireValue(meta.worldQuestLog.get(quest.id), `${quest.id} progress`);
           const level = requireValue(
-            quest.objective.levels[progress.puzzleVariant ?? 0],
+            resolveWorldQuestMatch3Level(quest, progress),
             `${quest.id} level`,
           );
-          let board = [...level.board];
-          let refillIndex = 0;
+          let board = [...(progress.match3Board ?? level.board)];
+          let refillIndex = progress.match3RefillIndex ?? 0;
           for (let move = 0; move < level.maxMoves && progress.state === 'active'; move++) {
             let best:
               | {

@@ -38,9 +38,9 @@ it.each(['cannonball', 'grapeshot', 'incendiary'] as const)(
       expect(state.enemies[0].slowUntilTick - state.tick).toBe(3 * TICK_RATE);
     }
     if (action === 'incendiary') {
-      expect(text).toContain('fire for 5 sec, dealing 20 damage each second');
+      expect(text).toContain('fire for 5 sec, dealing 30 damage each second');
       for (let tick = 0; tick < def.burnTicks; tick++) tickCannonEncounter(state, field);
-      expect(800 - state.enemies[0].hp).toBe(130);
+      expect(800 - state.enemies[0].hp).toBe(180);
       expect(state.fires).toEqual([]);
     }
     expect(vehicleActionTooltip(action)).toContain('tt-title');

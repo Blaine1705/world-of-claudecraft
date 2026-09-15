@@ -433,6 +433,9 @@ describe('i18n Localization Key Coverage', () => {
     minimum: 18,
     // World-quest workshop, horde and flight readouts use these values.
     barrier: 100,
+    shadows: 7,
+    floor: 35,
+    maximum: 90,
     gold: 52,
     kills: 20,
     mistakes: 1,

@@ -28,6 +28,6 @@ describe('authoritative server calendar feed', () => {
       dailyResetRemainingSec: dailyResetRemainingSec(now, zone),
       worldQuestExpiresAtMs: nextWorldQuestRotationMs(now, zone),
     });
-    expect(sink.worldQuestExpiresAtMs).toBe(Date.UTC(2026, 8, 3, 7, 0, 0));
+    expect(sink.worldQuestExpiresAtMs).toBe(Date.UTC(2026, 8, 2, 7, 0, 0));
   });
 });
