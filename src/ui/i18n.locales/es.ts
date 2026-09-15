@@ -6514,8 +6514,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.startQuest': 'Iniciar World Quest',
   'questUi.worldQuest.startEscort': 'Iniciar escolta',
   'questUi.worldQuest.escortTitle': 'Caravana',
-  'questUi.worldQuest.alreadyCompleted':
-    'Ya has completado esta World Quest en este ciclo.',
+  'questUi.worldQuest.alreadyCompleted': 'Ya has completado esta World Quest en este ciclo.',
   'questUi.worldQuest.inProgress': 'Esta World Quest ya está en curso.',
   'questUi.worldQuest.matchConfections': 'Combina dulces encantados',
   'questUi.worldQuest.escortCaravan': 'Escolta la caravana: {zone}',
