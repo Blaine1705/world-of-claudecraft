@@ -815,7 +815,9 @@ describe('Masterwrought art completion evidence', () => {
     // weapon_icons.test.ts, so their mapping owners are genuine, not fabricated.
     // OSSBrain adds the Goblin Rocket Sled and Rallycart RXT reins owners;
     // these do not alter the dated completion/approval universe below.
-    expect(currentOwnerIds).toHaveLength(1283);
+    // The world-quest branch adds its two batches (four quest-object icons) at
+    // the release/v0.43.0 merge: 1,287.
+    expect(currentOwnerIds).toHaveLength(1287);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -866,6 +868,15 @@ describe('Masterwrought art completion evidence', () => {
     expect(completionDatedIds).toHaveLength(1209);
 
     const ossBrainMountIds = new Set(['reins_goblin_rocket_sled', 'reins_rallycart_rxt']);
+    // The world-quest branch's two quest-object batches (release/v0.43.0 merge).
+    const worldQuestObjectIds = new Set([
+      'confection_game_box',
+      'leyline_cache',
+      'eastbrook_freight_crate',
+      'eastbrook_freight_wagon',
+    ]);
+    expect(datedIds.filter((id) => worldQuestObjectIds.has(id))).toEqual([]);
+    expect(currentOwnerIds.filter((id) => worldQuestObjectIds.has(id))).toHaveLength(4);
     expect(datedIds.filter((id) => ossBrainMountIds.has(id))).toEqual([]);
     expect(currentOwnerIds.filter((id) => ossBrainMountIds.has(id))).toHaveLength(2);
 
@@ -882,7 +893,8 @@ describe('Masterwrought art completion evidence', () => {
         !crucibleIds.has(id) &&
         id !== 'field_kit' &&
         !laterGapFillIds.has(id) &&
-        !ossBrainMountIds.has(id),
+        !ossBrainMountIds.has(id) &&
+        !worldQuestObjectIds.has(id),
     );
     expect(completionOwnerIds).toHaveLength(1209);
     expect(sorted(completionOwnerIds)).toEqual(completionDatedIds);
