@@ -2510,7 +2510,9 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
     // hub_training_dummy and hub_healing_dummy) ship untagged too, the same shape as the
     // Bone Spike above: they are struck or healed, never harvested, so they grow MOBS
     // without touching `tagged` either.
-    expect(Object.keys(MOBS).length - tagged.length).toBe(191);
+    // 195, not 191: the world-quest infiltrator and the three regional freight
+    // caravans ship untagged the same way (a disguised NPC and three wagons).
+    expect(Object.keys(MOBS).length - tagged.length).toBe(195);
     withMixedTemplates(() => {
       const mixed = mixedTemplates();
       expect(mixed.map(([id]) => id).sort()).toEqual(

@@ -567,10 +567,9 @@ interface ScannedPainter {
 const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
   { file: 'micro_menu_state_painter.ts', allow: {}, reflowAllow: {} },
   // Fifteen construction-only class assignments; all update writes use the shared facet.
+  // (Sixteen until b358c6c5ac removed the camera-shake comfort checkbox.)
   {
     file: 'hud/vehicle/vehicle_action_bar_controller.ts',
-    // Fifteen construction-time class writes (the camera-shake label folded
-    // into an existing one), measured on the merged controller.
     allow: { '.className': 15 },
     reflowAllow: {},
   },
