@@ -6,6 +6,7 @@ import type { GamepadKind } from '../game/gamepad_map';
 import type { GraphicsSettingsSnapshot } from '../game/graphics_rebuild_core';
 import { InstanceMusicController, type InstanceMusicDecision } from '../game/instance_music';
 import { type Keybinds, keyCapLabel, keyLabel } from '../game/keybinds';
+import { resolveActiveMinigameTrack } from '../game/minigame_music';
 import { music } from '../game/music';
 import {
   type GameSettings,
@@ -8950,6 +8951,15 @@ export class Hud {
     // cadence the painted path always drove it at; the paint half reads the
     // stored decision instead of driving the machine itself.
     if (mediumHud) {
+      const minigameTrack = resolveActiveMinigameTrack({
+        worldQuestLog: sim.worldQuestLog,
+        vehicleSession: sim.vehicleSession,
+        activePuzzleQuestId: this.worldQuestPuzzleWindow.activeQuestId,
+        playerPos: p.pos,
+        entities: sim.entities.values(),
+      });
+      music.setMinigameTrack(minigameTrack);
+
       this.lastMusicDecision = this.instanceMusic.update({
         now,
         lastCombatEventAt: this.lastCombatEventAt,

@@ -40,6 +40,10 @@ export class WorldQuestPuzzleWindow {
   private readonly root: HTMLElement;
   private readonly match3Announcer: HTMLElement;
   private questId: string | null = null;
+
+  get activeQuestId(): string | null {
+    return this.root.style.display !== 'none' ? this.questId : null;
+  }
   private lastSignature = '';
   private focusTrap: FocusTrapHandle | null = null;
   private selectedMatch3Cell: number | null = null;
