@@ -236,6 +236,22 @@ describe('stack sizes and stacking math', () => {
     for (const s of fresh) expect(s.instance).toEqual(locked);
   });
 
+  it('a LOCKED payload carrying a craftedRecipeId still packs a fresh slot up to the cap', () => {
+    // addStacked keys its merge on craftedRecipeId as a separate dimension
+    // (never topping a marked stack up into an unmarked one, or vice versa),
+    // threaded through the SAME fresh-slot branch the plain locked case above
+    // exercises: a locked, crafted-provenance stack must not silently fall
+    // back to one-per-slot just because it carries an extra marker.
+    const locked = { locked: true };
+    const inv: InvSlot[] = [];
+    addStacked(inv, 'baked_bread', 25, locked, 'recipe_baked_bread');
+    expect(inv.map((s) => s.count)).toEqual([20, 5]);
+    for (const s of inv) {
+      expect(s.instance).toEqual(locked);
+      expect(s.craftedRecipeId).toBe('recipe_baked_bread');
+    }
+  });
+
   it('fresh instanced slots each carry their own deep clone of the payload', () => {
     const payload = { signer: 'Ana', rolled: { stats: { str: 1 } } };
     const inv: InvSlot[] = [];

@@ -321,4 +321,45 @@ describe('a LOCKED material stack deposits as one whole vault row, never one row
     expect(rows[0].count).toBe(20);
     expect(rows[0].instance).toEqual({ locked: true });
   });
+
+  it('vaultWithdraw: the deposited locked row returns as ONE carried stack, not 20 withdrawals', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const meta = metaOf(sim);
+    meta.inventory.push({ itemId: 'bone_fragments', count: 20 });
+    sim.setItemLocked('bone_fragments', true, pid, 0);
+    sim.vaultDeposit(0);
+    const deposited = meta.vault.special.find((s) => s.itemId === 'bone_fragments');
+    if (!deposited) throw new Error('expected the deposited locked row');
+
+    sim.vaultWithdraw('bone_fragments', undefined, ref(0, deposited));
+
+    expect(meta.vault.special.some((s) => s.itemId === 'bone_fragments')).toBe(false);
+    const carried = meta.inventory.filter((s) => s.itemId === 'bone_fragments');
+    expect(carried).toHaveLength(1);
+    expect(carried[0].count).toBe(20);
+    expect(carried[0].instance).toEqual({ locked: true });
+  });
+
+  it('deposits a tolerated OVER-CAP locked stack as two capped rows, not 25 one-unit rows', () => {
+    // A single carried slot never legitimately exceeds the item's own stack
+    // cap (item_lock.ts / bags.ts instancedCountCap holds a locked stack to
+    // stackSizeOf), so the only way a locked stack of 25 carries a stack cap
+    // of 20 is a tolerated legacy/hand-edited holding; the vault's own
+    // per-material ceiling (40 at rung 1) still has room for all 25. The
+    // deposit must split it into TWO capped rows [20, 5], not 25 rows of 1.
+    const sim = makeSim();
+    const meta = metaOf(sim);
+    meta.inventory.push({ itemId: 'bone_fragments', count: 25, instance: { locked: true } });
+
+    sim.vaultDeposit(0);
+
+    expect(meta.inventory).toEqual([]);
+    const rows = meta.vault.special
+      .filter((s) => s.itemId === 'bone_fragments')
+      .sort((a, b) => b.count - a.count);
+    expect(rows.map((s) => s.count)).toEqual([20, 5]);
+    for (const row of rows) expect(row.instance).toEqual({ locked: true });
+    expect(vaultStoredCount(meta.vault, 'bone_fragments')).toBe(25);
+  });
 });

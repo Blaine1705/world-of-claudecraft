@@ -112,7 +112,7 @@ export function instancedCountCap(
   instance: ItemInstancePayload | undefined,
 ): number {
   if (!instance) return Number.POSITIVE_INFINITY;
-  if (instance.charges !== undefined) return 1;
+  if (isChargeBearingPayload(instance)) return 1;
   return def ? stackSizeOf(def) : Number.POSITIVE_INFINITY;
 }
 

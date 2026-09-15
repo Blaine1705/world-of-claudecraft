@@ -320,6 +320,30 @@ describe('materialStackFit: payload, marker and separation compatibility', () =>
     expect(plan.appended[0].instance).toEqual({ locked: true });
     expect(plan.appended[1].instance).toEqual({ locked: true });
   });
+
+  it('splits a MIXED-provenance locked stack across its fresh slots, conserving every bucket', () => {
+    // The provenance-conservation twin of the case above: a locked stack can
+    // still carry real per-source buckets (a locked stack of gathered
+    // material, not just a bare payload), and the default spend order must
+    // split them across the two fresh slots exactly like an UNLOCKED mixed
+    // stack would, with the `locked` flag riding every appended slot.
+    const locked = composed(
+      COPPER,
+      [
+        { source: A, count: 15 },
+        { source: B, count: 10 },
+      ],
+      { instance: { locked: true } },
+    );
+
+    const plan = planOf([], locked, 2);
+    expect(plan.replacements).toEqual([]);
+    expect(plan.appended.map((s) => s.count)).toEqual([STACK, 5]);
+    for (const slot of plan.appended) expect(slot.instance).toEqual({ locked: true });
+    expectCountsAgree(plan);
+    expect(plannedUnits(plan, A)).toBe(15);
+    expect(plannedUnits(plan, B)).toBe(10);
+  });
 });
 
 describe('separation: the owner grouping this module never overrides', () => {
