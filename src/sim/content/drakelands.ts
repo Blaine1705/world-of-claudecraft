@@ -1022,6 +1022,9 @@ export const DRAKELANDS_PROPS: ZonePropsDef = {
   // Watch and Last Keep cannon emplacements and Smith Mara's forge workshop
   // (world quests own these props, not the placer rebuild).
   decorProps: [...CANNON_EMPLACEMENT_PROPS, ...FORGE_WORKSHOP_DRESSING],
+  // The forge quest's Water Well: the release removed Wyrmwatch's town well,
+  // so the workshop brings its own beside Smith Mara.
+  wells: [{ x: 419, z: 1891, r: 1.5 }],
   tents: [
     { x: 497, z: 2097, rot: -2.2, scale: 1 }, // Scout Yerrin's ridge camp above the wargate
   ],
