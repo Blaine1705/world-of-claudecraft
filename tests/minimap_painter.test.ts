@@ -9,6 +9,7 @@
 // cadence + the '#zone-label' setText preserved from the inline site.
 
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { BG_HALF_X, BG_HALF_Z, bgFieldPlanWalls } from '../src/sim/battleground_layout';
 import { battlegroundOrigin, GATHER_NODES, QUESTS, YUMI_BAND_X_MIN } from '../src/sim/data';
@@ -161,11 +162,18 @@ describe('minimap_painter: cached background + ~10Hz cadence preserved', () => {
   });
 
   it('wires the small emblem through the touch-safe 40px hit target and opens its zone', () => {
-    expect(hud).toContain('bindTouchTap(mm,');
-    expect(hud).toContain('this.minimapPainter.worldObjectiveAt(');
-    expect(hud).toContain('20 * Math.max(mm.width / rect.width, mm.height / rect.height)');
-    expect(hud).toContain('this.mapZoneOverride = marker.zoneId;');
-    expect(hud).toContain("marker.kind === 'world-quest' ? marker.questId : null");
+    const tap = readFileSync(
+      fileURLToPath(new URL('../src/ui/hud/map/minimap_objective_tap.ts', import.meta.url)),
+      'utf8',
+    );
+    expect(hud).toContain('bindMinimapObjectiveTap(mm, this);');
+    expect(tap).toContain('bindTouchTap(mm,');
+    expect(tap).toContain('h.minimapPainter.worldObjectiveAt(');
+    expect(tap.replace(/\s+/g, ' ')).toContain(
+      'MINIMAP_OBJECTIVE_TAP_RADIUS_PX * Math.max(canvas.width / rect.width, canvas.height / rect.height)',
+    );
+    expect(tap).toContain('h.mapZoneOverride = marker.zoneId;');
+    expect(tap).toContain("marker.kind === 'world-quest' ? marker.questId : null");
   });
 
   it('keeps the cached Thornhollow Fields sheet bounded for the 240x452yd field', () => {

@@ -2456,6 +2456,7 @@ const UI_PAINTER_HELPERS = [
 const UI_DOM_MODULES = [
   'src/ui/mobile_frame_long_press.ts',
   'src/ui/hud/vehicle/vehicle_action_bar_controller.ts',
+  'src/ui/hud/map/minimap_objective_tap.ts',
   'src/ui/hud/vehicle/shadow_action_bar_controller.ts',
   'src/ui/hud/vehicle/forge_action_bar_controller.ts',
   'src/ui/account_portal_dom.ts',

@@ -37,6 +37,8 @@ export function questEventPresentation(event: SimEvent): QuestEventPresentation 
     case 'questAccepted':
       return { sound: 'quest_accept', refreshQuestDialog: true };
     case 'questProgress': {
+      // The classic yellow top-center flash ("Forest Wolf slain: 3/8"); the
+      // log line stays the durable, announced copy.
       const text = questProgressEventText(event);
       return { logText: text, flashText: text, refreshQuestDialog: true };
     }

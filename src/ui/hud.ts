@@ -462,7 +462,11 @@ import { lootSettingsView } from './hud/loot/loot_settings_view';
 import { renderLootSettingsWindow } from './hud/loot/loot_settings_window';
 import { LootWindowController } from './hud/loot/loot_window_controller';
 import { LootExplorerWindow } from './hud/loot_explorer/loot_explorer_window';
-import { MapMarkerInteractionController, MapMarkerTooltipContent } from './hud/map';
+import {
+  bindMinimapObjectiveTap,
+  MapMarkerInteractionController,
+  MapMarkerTooltipContent,
+} from './hud/map';
 import { refreshSideButtonLabels } from './hud/menu/side_buttons';
 import { livingSecondaryPet } from './hud/pet_bar_core';
 import { CARD_POSES } from './hud/player_card/player_card';
@@ -561,6 +565,7 @@ import {
 import { toolEffectResultLine } from './hud/professions/tool_effect_result_view';
 import { wellFedTooltipLines } from './hud/professions/wellfed_tooltip_view';
 import { QuestDialogController } from './hud/quest/quest_dialog_controller';
+import { applyQuestEventPresentation } from './hud/quest/quest_event_router';
 import { parseChatSegments } from './hud/quest/quest_link';
 import { QuestProgressBanner } from './hud/quest/quest_progress_banner';
 import { QuestTrackerController } from './hud/quest/quest_tracker_controller';
@@ -571,7 +576,7 @@ import { RiftForgeWindow, riftForgeInReach } from './hud/rift_forge';
 import { StanceBarController } from './hud/stance';
 import { closeOpenTouchMenu } from './hud/tap_menu';
 import { createTargetDotsView, type TargetDotsInput, TargetDotsPainter } from './hud/target_dots';
-import { VehicleActionBarController } from './hud/vehicle';
+import { createHudVehicleBar, VehicleActionBarController } from './hud/vehicle';
 import { dismissBuyQuantityPrompts } from './hud/vendor/buy_quantity_prompt_window';
 import { buildCrucibleVendorView } from './hud/vendor/crucible_vendor_view';
 import { renderCrucibleVendorWindow } from './hud/vendor/crucible_vendor_window';
@@ -784,7 +789,6 @@ import {
 } from './proc_overlay_view';
 import { maskProfanity } from './profanity';
 import { createPromptTimeoutBar, PROMPT_TIMEOUT_MS } from './prompt_dialog';
-import { questEventPresentation } from './quest_event_view';
 import {
   QUEST_ITEM_TOOLTIP_COLOR,
   type QuestItemTooltipModel,
@@ -1346,17 +1350,7 @@ export class Hud {
   }
   private vehicleBar: VehicleActionBarController | null = null;
   private get vehicleControls(): VehicleActionBarController {
-    this.vehicleBar ??= new VehicleActionBarController({
-      world: this.sim,
-      writers: this.writerFacet,
-      keyLabel: (slot) => keyCapLabel(this.keybinds.primaryLabel(`slot${slot}`)),
-      padKind: () => this.optionsHooks?.gamepad.kind() ?? 'generic',
-      consumePeek: () => this.peekGuard.consume(),
-      presentation: this.renderer,
-      cancelOnEnter: [this.playerGroundAim, this.empowerHold],
-      attachTooltip: (element, html) => this.attachTooltip(element, html),
-      gliderPitchHold: (value) => this.optionsHooks?.gliderPitchHold?.(value),
-    });
+    this.vehicleBar ??= createHudVehicleBar(this);
     return this.vehicleBar;
   }
   private get groundAim() {
@@ -2671,35 +2665,7 @@ export class Hud {
     }
     mm.style.cursor = 'var(--cursor-point)';
     mm.title = t('controls.worldMap');
-    // A touch-safe activation keeps the emblem usable while another thumb is
-    // steering. The 20 CSS-pixel radius meets the 40x40 touch-target floor;
-    // projection/layout is read only on activation, never in the painter.
-    bindTouchTap(mm, (event) => {
-      const ev = event as MouseEvent | PointerEvent;
-      const rect = mm.getBoundingClientRect();
-      const marker =
-        minimapMode(this.sim) === 'overworld' && rect.width > 0 && rect.height > 0
-          ? this.minimapPainter.worldObjectiveAt(
-              ((ev.clientX - rect.left) * mm.width) / rect.width,
-              ((ev.clientY - rect.top) * mm.height) / rect.height,
-              20 * Math.max(mm.width / rect.width, mm.height / rect.height),
-            )
-          : null;
-      if (!marker) {
-        this.toggleMap();
-        return;
-      }
-      if ($('#map-window').style.display !== 'block') this.toggleMap();
-      this.mapLevel = 'zone';
-      this.mapZoneOverride = marker.zoneId;
-      this.mapZoom = MAP_OPEN_ZOOM;
-      this.mapCenter = null;
-      this.mapPing = null;
-      this.mapMarkerInteraction.selectWorldQuest(
-        marker.kind === 'world-quest' ? marker.questId : null,
-      );
-      this.updateMapWindow();
-    });
+    bindMinimapObjectiveTap(mm, this);
     window.addEventListener('pointermove', (ev) => {
       if (this.emoteWheelOpen) this.updateEmoteWheelPointer(ev.clientX, ev.clientY);
     });
@@ -5858,8 +5824,10 @@ export class Hud {
       localStorage.setItem('chatClock', clock);
     },
   });
-  // Leaderboard window painter (leaderboard_view.ts core + leaderboard_window.ts,
-  // which also owns the World Quest rankings window its tab launches). Lazy closures.
+  // Leaderboard window painter (leaderboard_view.ts async-free core + leaderboard_
+  // window.ts painter). It owns the page index + focus opener and the one
+  // consumed-new signature: it awaits the paged leaderboard() and renders the page
+  // (or the loading / empty / error state). All closures are lazy.
   private readonly leaderboardWindow = new LeaderboardWindow({
     root: () => $('#leaderboard-window'),
     world: () => this.sim,
@@ -6094,6 +6062,7 @@ export class Hud {
     openFocusTrap: (root) => this.focusManager.open({ root }),
     click: () => audio.click(),
   });
+
   /** The player's own frame portrait.
    *
    *  Their COMPOSED character when they have an authored look, the face they
@@ -7613,6 +7582,10 @@ export class Hud {
     this.showError(tSim('error.noItem'));
   }
 
+  // One decision for a position press (bar slots and the XHB-only fallback):
+  // enter aim when the reticle applies and the cast could start (alive, off
+  // cooldown; resources and the GCD change while aiming, so they never gate
+  // entry), else cast instantly. slotForAim is the re-press commit identity.
   private castPositionAbility(
     abilityId: string,
     resolved: ResolvedAbility,
@@ -10081,6 +10054,13 @@ export class Hud {
     this.questTracker.update(now);
     this.worldQuestPuzzleWindow.refreshIfChanged();
   }
+
+  /** Flip the persisted tracker-collapsed preference (the header click/keyboard
+   *  activation), preserving keyboard focus across the innerHTML rebuild. */
+  private toggleQuestTrackerCollapsed(): void {
+    this.questTracker.toggleCollapsed();
+  }
+
   // -------------------------------------------------------------------------
   // Delve board & tracker
   // -------------------------------------------------------------------------
@@ -11384,6 +11364,7 @@ export class Hud {
 
   handleEvents(events: SimEvent[]): void {
     const sim = this.sim;
+    // Book of Deeds unlocks batch across the whole drain (handleDeedUnlocks):
     // banners coalesce to the last unlock, retro back-credits collapse into
     // one summary line, and the celebration sound plays once.
     const deedUnlocks: { deedId: string; retro?: boolean }[] = [];
@@ -11416,25 +11397,7 @@ export class Hud {
       this.playEventSfx(ev); // positional sound for nearby combat/creatures
       this.meters.onEvent(ev);
       if (this.isNythraxisEvent(ev)) this.lastNythraxisCombatEventAt = performance.now();
-      const questEvent = questEventPresentation(ev);
-      if (questEvent) {
-        if (questEvent.logText) this.log(questEvent.logText, HUD_LOG.PROGRESS);
-        if (questEvent.flashText) this.questBanner.show(questEvent.flashText);
-        if (questEvent.bannerText) this.showBanner(questEvent.bannerText);
-        if (questEvent.sound) sfx.playUi(questEvent.sound);
-        if (questEvent.mountOwnedPrompt)
-          this.showBanner(
-            t('hudChrome.mountTraining.ownedMountPrompt'),
-            true,
-            undefined,
-            'default',
-            undefined,
-            6000,
-          );
-        if (questEvent.refreshQuestDialog) this.questDialog.refresh();
-        this.worldQuestPuzzleWindow.applyEventPresentation(questEvent);
-        continue;
-      }
+      if (applyQuestEventPresentation(this, ev)) continue;
       if (ev.type === 'worldQuestInvestigationDialogue') this.questDialog.open(ev.targetId);
       switch (ev.type) {
         case 'damage': {
@@ -16072,12 +16035,6 @@ export class Hud {
   }
 
   /** Flip the persisted deed-tracker collapse (header click/keyboard delegation). */
-  /** Flip the persisted tracker-collapsed preference (the header click/keyboard
-   *  activation), preserving keyboard focus across the innerHTML rebuild. */
-  private toggleQuestTrackerCollapsed(): void {
-    this.questTracker.toggleCollapsed();
-  }
-
   private toggleDeedTrackerCollapsed(): void {
     const settings = this.optionsHooks?.settings;
     if (!settings) return;
@@ -18201,9 +18158,11 @@ export class Hud {
   attachOptions(hooks: OptionsHooks): void {
     this.optionsHooks = hooks;
   }
+
   refreshMapMarkerArtPalette(): void {
     this.mapMarkerArt.refreshPalette();
   }
+
   attachReporting(hooks: ReportHooks): void {
     this.reportHooks = hooks;
   }

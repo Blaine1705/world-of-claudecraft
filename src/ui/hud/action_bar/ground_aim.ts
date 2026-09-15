@@ -18,6 +18,9 @@ export function selectedGroundAimPoint(
   return { x: target.pos.x, z: target.pos.z };
 }
 
+// Where a ground-targeted ability should land: the current target's position if
+// one is selected (the usual "cast on that pack" intent), else the caster's own
+// spot for an open-ground cast. The sim clamps this to the ability's range.
 /** Without a valid selected target, instant desktop casts use the player's feet. */
 export function quickGroundTarget(player: Entity, entities: ReadonlyMap<number, Entity>): AimPoint {
   return selectedGroundAimPoint(player, entities) ?? { x: player.pos.x, z: player.pos.z };
