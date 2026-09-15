@@ -1077,6 +1077,24 @@ export const VOICE_ALIAS = {
   glider_apprentice: 'apprentice_wren',
   // Valerie borrows the existing scout performance for this covert operation.
   shadow_cloak_scout: 'scout_maren',
+  // The shadow infiltration's own watch, cast by ROLE the way the tutorial cast
+  // below is (docs/design/npc_voices.md): the four Dispatch Guards carry sealed
+  // orders and warn you off in clipped soldier's lines, so they borrow the
+  // Marshal's weathered parade register; the four lantern sentries and watchmen
+  // keep a light against what the eye misses, which is the lamplighter's own
+  // trade and his lantern gold. Promote either group to its own VOICE_PROMPTS
+  // entry once an ElevenLabs key is available to design and render it.
+  shadow_guard_north: 'marshal_redbrook',
+  shadow_guard_south: 'marshal_redbrook',
+  shadow_guard_east: 'marshal_redbrook',
+  shadow_guard_west: 'marshal_redbrook',
+  shadow_sentry_north: 'lampman_cobb',
+  shadow_sentry_south: 'lampman_cobb',
+  shadow_watch_east: 'lampman_cobb',
+  shadow_watch_west: 'lampman_cobb',
+  // Keeper Liora wardens a hedge maze of wisps and speaks her instructions with
+  // the same unhurried, luminous calm as the keeper of the sealed hollow.
+  wisp_maze_keeper: 'keeper_saelwyn',
   // World-quest role casting, following the tutorial cast below. These are
   // distinct people borrowing established performances, not recurring identities.
   // The scholar teaches calmly; his adult apprentices sound tentative and eager.
