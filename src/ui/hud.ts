@@ -3740,6 +3740,7 @@ export class Hud {
       case 'quest-log-window':
         this.questlogWindow.close();
         break;
+      case 'world-quest-leaderboard-window':
       case 'leaderboard-window':
         this.leaderboardWindow.close();
         break;
@@ -5644,10 +5645,8 @@ export class Hud {
       localStorage.setItem('chatClock', clock);
     },
   });
-  // Leaderboard window painter (leaderboard_view.ts async-free core + leaderboard_
-  // window.ts painter). It owns the page index + focus opener and the one
-  // consumed-new signature: it awaits the paged leaderboard() and renders the page
-  // (or the loading / empty / error state). All closures are lazy.
+  // Leaderboard window painter (leaderboard_view.ts core + leaderboard_window.ts,
+  // which also owns the World Quest rankings window its tab launches). Lazy closures.
   private readonly leaderboardWindow = new LeaderboardWindow({
     root: () => $('#leaderboard-window'),
     world: () => this.sim,
@@ -5655,6 +5654,7 @@ export class Hud {
     ...this.windowFocus('#leaderboard-window'),
     onVisibilityChange: () => this.syncAnyWindowOpenState(),
     showDevBadges: () => this.optionsHooks?.settings.get('showDevBadges') ?? true,
+    windowFocusFor: (selector) => this.windowFocus(selector),
   });
   // The signpost guild board (src/ui/hud/guild_board/): opened by the world's
   // noticeboard interaction, never a menu button; the board lives in the world.

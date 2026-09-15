@@ -4364,6 +4364,7 @@
   body.mobile-touch #card-duel-window,
   body.mobile-touch #delve-board,
   body.mobile-touch #leaderboard-window,
+  body.mobile-touch #world-quest-leaderboard-window,
   body.mobile-touch #guild-board-window,
   body.mobile-touch #loot-settings-window,
   body.mobile-touch #town-focus-window,
@@ -7235,6 +7236,39 @@
   body.mobile-touch #leaderboard-window .lb-tab {
     min-height: 40px;
     box-sizing: border-box;
+  }
+  /* World Quest rankings: the whole sheet scrolls (the board gives up its own
+     scroll), three board cards per row, and a shorter podium that keeps its
+     three columns; the card and pager buttons meet the touch floor. */
+  body.mobile-touch #world-quest-leaderboard-window {
+    height: auto;
+    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
+    overflow-y: auto;
+  }
+  body.mobile-touch #world-quest-leaderboard-window .wql-board {
+    flex: none;
+    overflow: visible;
+  }
+  body.mobile-touch #world-quest-leaderboard-window .wql-cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  body.mobile-touch #world-quest-leaderboard-window .wql-card,
+  body.mobile-touch #world-quest-leaderboard-window .wql-page-btn {
+    min-height: 40px;
+    box-sizing: border-box;
+  }
+  body.mobile-touch #world-quest-leaderboard-window .wql-plinth-1 {
+    height: 64px;
+  }
+  body.mobile-touch #world-quest-leaderboard-window .wql-plinth-2 {
+    height: 48px;
+  }
+  body.mobile-touch #world-quest-leaderboard-window .wql-plinth-3 {
+    height: 36px;
+  }
+  body.mobile-touch #world-quest-leaderboard-window .wql-self {
+    position: sticky;
+    bottom: 0;
   }
   /* Loot Settings: the loot-mode / threshold selects (40px + 16px iOS no-zoom). */
   body.mobile-touch #loot-settings-window select {

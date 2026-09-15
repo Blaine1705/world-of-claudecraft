@@ -58,6 +58,10 @@ import {
   worldQuestLeaderboardRow,
   worldQuestMetricHeader,
 } from './world_quest_leaderboard_view';
+import {
+  WORLD_QUEST_RANKINGS_ROOT_ID,
+  WorldQuestLeaderboardWindow,
+} from './world_quest_leaderboard_window';
 import { formatXp } from './xp_bar';
 
 /** Which high-score board the window is showing. */
@@ -77,6 +81,12 @@ export interface LeaderboardWindowDeps {
   onVisibilityChange?(): void;
   /** The viewer's developer-badge display preference; also hides the Developers tab. */
   showDevBadges(): boolean;
+  /** Builds the focus bridge for a sibling window root. When wired (and the
+   *  rankings root exists in the page), the World Quests tab launches the World
+   *  Quest rankings window this one owns instead of rendering its chip board. */
+  windowFocusFor?(
+    rootSelector: string,
+  ): Pick<LeaderboardWindowDeps, 'captureFocus' | 'restoreFocus'>;
 }
 
 /** Where focus should land after a (re)render: into the window on open, back onto
@@ -105,7 +115,25 @@ export class LeaderboardWindow {
   // pager state (this.page dispatches on the CURRENT this.board).
   private renderSeq = 0;
   private openerFocus: HTMLElement | null = null;
+  // The World Quest rankings window the World Quests tab launches, built on
+  // first use; null when the page has no rankings root or no focus bridge.
+  private rankings: WorldQuestLeaderboardWindow | null = null;
   constructor(private readonly deps: LeaderboardWindowDeps) {}
+
+  private worldQuestRankings(): WorldQuestLeaderboardWindow | null {
+    if (this.rankings) return this.rankings;
+    const focusFor = this.deps.windowFocusFor;
+    const root = this.deps.root().ownerDocument.getElementById(WORLD_QUEST_RANKINGS_ROOT_ID);
+    if (!focusFor || !root) return null;
+    this.rankings = new WorldQuestLeaderboardWindow({
+      root: () => root,
+      world: () => this.deps.world(),
+      closeOthers: () => this.deps.closeOthers(),
+      ...focusFor(`#${WORLD_QUEST_RANKINGS_ROOT_ID}`),
+      onVisibilityChange: () => this.deps.onVisibilityChange?.(),
+    });
+    return this.rankings;
+  }
 
   private get page(): number {
     if (this.board === 'guilds') return this.guildPage;
@@ -137,6 +165,11 @@ export class LeaderboardWindow {
 
   /** Open if closed, close if open (the minimap / menu leaderboard button). */
   toggle(): void {
+    // The rankings window stands in for this one: the same toggle closes it.
+    if (this.rankings?.isOpen) {
+      this.rankings.close();
+      return;
+    }
     if (this.isOpen) {
       this.close();
       return;
@@ -158,6 +191,7 @@ export class LeaderboardWindow {
   }
 
   close(): void {
+    this.rankings?.close();
     const el = this.deps.root();
     if (el.style.display !== 'flex') {
       this.openerFocus = null;
@@ -609,7 +643,17 @@ export class LeaderboardWindow {
     // Switch the board and re-render with focus:'tab' so the rebuilt strip puts
     // focus back on the now-active tab (selection-follows-focus) instead of letting
     // the innerHTML swap drop it to <body>. A no-op when the board is unchanged.
+    // The World Quests tab launches its own rankings window when Hud wires it:
+    // activation opens it, while arrowing onto it only moves focus (opening a
+    // window from roving focus would yank the keyboard user out of the strip).
+    const opensRankings = (next: LeaderboardBoard): boolean =>
+      next === 'worldQuests' && this.worldQuestRankings() !== null;
     const switchBoard = (next: LeaderboardBoard): void => {
+      if (opensRankings(next)) {
+        this.close();
+        this.worldQuestRankings()?.open();
+        return;
+      }
       if (next === this.board) return;
       this.board = next;
       void this.render('tab');
@@ -623,7 +667,10 @@ export class LeaderboardWindow {
         if (next !== null) {
           ke.preventDefault();
           const target = tabs[next];
-          if (target) switchBoard(target.dataset.leaderboardTab as LeaderboardBoard);
+          if (!target) return;
+          const nextBoard = target.dataset.leaderboardTab as LeaderboardBoard;
+          if (opensRankings(nextBoard)) target.focus();
+          else switchBoard(nextBoard);
           return;
         }
         // Enter / Space activate the focused tab. preventDefault suppresses the

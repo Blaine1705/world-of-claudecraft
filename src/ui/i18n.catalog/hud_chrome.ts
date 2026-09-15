@@ -1368,6 +1368,32 @@ export const hudChromeStrings = {
     wqMedals: { gold: 'Gold', silver: 'Silver', bronze: 'Bronze' },
     wqEmpty: 'No scores on this board yet. Finish the world quest to claim a spot.',
   },
+  // The World Quest rankings window (world_quest_leaderboard_window.ts): a
+  // card per medal world quest, the top-three podium, the rest of the ladder,
+  // and the viewer's own best pinned at the bottom. Column headers, the
+  // loading / error / empty lines, and the medal names reuse the leaderboard keys.
+  wqLadder: {
+    title: 'World Quest Rankings',
+    subtitle: 'The best attempt of every hero, one ladder per medal world quest.',
+    close: 'Close World Quest Rankings',
+    rankedBy: {
+      waves: 'Ranked by waves held',
+      seconds: 'Ranked by fastest time',
+      points: 'Ranked by highest score',
+    },
+    rankedByMedal: {
+      waves: 'Ranked by medal, then waves held',
+      seconds: 'Ranked by medal, then fastest time',
+      points: 'Ranked by medal, then highest score',
+    },
+    podiumLabel: 'Top three',
+    unclaimed: 'Unclaimed',
+    totalOne: 'One hero ranked',
+    totalMany: '{count} heroes ranked',
+    selfLabel: 'Your best',
+    selfRank: 'Rank {rank}',
+    selfNone: 'You have no score on this board yet. Finish the world quest to join the ladder.',
+  },
   // Guild pledge board (docs/prd/guild-pledge-board.md): shared strings for the
   // guild high-score tab's pledge affordances AND the social window's Pledges
   // tab, so the two surfaces can never word the same state differently. Wordy
