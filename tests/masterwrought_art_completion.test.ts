@@ -817,7 +817,9 @@ describe('Masterwrought art completion evidence', () => {
     // these do not alter the dated completion/approval universe below.
     // The world-quest branch adds its two batches (four quest-object icons) at
     // the release/v0.43.0 merge: 1,287.
-    expect(currentOwnerIds).toHaveLength(1287);
+    // The wq-reputation merge adds the 15 faction quartermaster icons
+    // (faction-vendor-icons-2026-09-16): 1,302.
+    expect(currentOwnerIds).toHaveLength(1302);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -877,6 +879,16 @@ describe('Masterwrought art completion evidence', () => {
     ]);
     expect(datedIds.filter((id) => worldQuestObjectIds.has(id))).toEqual([]);
     expect(currentOwnerIds.filter((id) => worldQuestObjectIds.has(id))).toHaveLength(4);
+    // The wq-reputation merge's faction quartermaster stock, one SVG batch
+    // (faction-vendor-icons-2026-09-16): 15 ids, additive the same way.
+    const factionVendorIds = new Set(
+      mapping.generatedBatches
+        .filter(({ batchId }) => batchId === 'faction-vendor-icons-2026-09-16')
+        .flatMap(({ itemIds }) => itemIds),
+    );
+    expect(factionVendorIds.size).toBe(15);
+    expect(datedIds.filter((id) => factionVendorIds.has(id))).toEqual([]);
+    expect(currentOwnerIds.filter((id) => factionVendorIds.has(id))).toHaveLength(15);
     expect(datedIds.filter((id) => ossBrainMountIds.has(id))).toEqual([]);
     expect(currentOwnerIds.filter((id) => ossBrainMountIds.has(id))).toHaveLength(2);
 
@@ -894,7 +906,8 @@ describe('Masterwrought art completion evidence', () => {
         id !== 'field_kit' &&
         !laterGapFillIds.has(id) &&
         !ossBrainMountIds.has(id) &&
-        !worldQuestObjectIds.has(id),
+        !worldQuestObjectIds.has(id) &&
+        !factionVendorIds.has(id),
     );
     expect(completionOwnerIds).toHaveLength(1209);
     expect(sorted(completionOwnerIds)).toEqual(completionDatedIds);

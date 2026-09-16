@@ -151,7 +151,8 @@ const STAT_DRIFT_ALLOWLIST: ReadonlySet<string> = new Set([
 // The ratchet ceiling for the allowlist above and the count of untiered items the
 // proxy floor binds on (see the catalog test).
 const STAT_DRIFT_ALLOWLIST_CEILING = 103;
-const UNTIERED_WITH_PROXY_FLOOR = 51;
+// 64 with the faction quartermaster stock (13 untiered pieces with a line).
+const UNTIERED_WITH_PROXY_FLOOR = 64;
 const GENERATED_ITEM_COUNT = 111;
 const WARFARE_STOCK_COUNT = 47;
 const HEROIC_VARIANT_COUNT = 78;

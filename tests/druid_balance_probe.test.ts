@@ -61,8 +61,13 @@ const FERAL_LOADOUT = {
   legs: 'ashveil_legs',
   gloves: 'ashveil_gloves',
   feet: 'heroic_bramblehide_treads',
-  ring1: 'band_of_marked_strikes',
-  ring2: 'seal_of_the_forgewall',
+  // wq-reputation merge (2026-09-16): the Automaton quartermaster's
+  // Champion's Forged Loop (epic, sta 10 str 8) out-scores the Forgewall seal
+  // on the feral line, so ring1 is the faction ring and the Band slides to
+  // ring2 (a reputation ring displacing raid jewelry: a balance call for
+  // review; the pin records what the probe wears).
+  ring1: 'champion_forged_loop',
+  ring2: 'band_of_marked_strikes',
 } as const;
 
 // MEASURED 2026-09-08 on the merged release catalog (integration dca7476) at
@@ -84,7 +89,11 @@ const FERAL_LOADOUT = {
 // 1003.86) and keeps its 2026-09-08 anchors.
 const LIVE_MOB_MEASURED = {
   moongrove: { damage: 5956, incomingDamage: 212, threat: 5957, payoffs: 7 },
-  wildfang: { damage: 6378, incomingDamage: 286, threat: 7473.827, payoffs: 12 },
+  // RE-MEASURED 2026-09-16 at the wq-reputation merge for wildfang alone: the
+  // Champion's Forged Loop on ring1 (the loadout pin above) moved its damage
+  // 6378 to 7033 and its threat with it; moongrove and bruin stayed inside
+  // their 2026-09-10 bands and keep those anchors.
+  wildfang: { damage: 7033, incomingDamage: 199, threat: 8241.1595, payoffs: 12 },
   bruin: { damage: 3082, incomingDamage: 131, threat: 10651.925, payoffs: 4 },
 } as const;
 const BRUIN_TANK_MEASURED = {

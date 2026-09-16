@@ -522,6 +522,9 @@ describe('item webp icons', () => {
       ...BANK_STORAGE_PAINTED_BAG_IDS,
       'silkspun_satchel',
       'sunspun_haversack',
+      // The two faction quartermaster bags (faction-vendor-icons-2026-09-16).
+      'clockwork_tinkers_pack',
+      'rift_surveyors_satchel',
     ]);
     for (const id of [...BAG_IDS.filter((bagId) => !generatedBagIds.has(bagId)), 'backpack']) {
       const entry = m.entries.find((e) => e.itemId === id);

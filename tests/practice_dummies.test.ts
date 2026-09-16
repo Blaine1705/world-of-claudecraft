@@ -238,7 +238,7 @@ describe('the Highwatch practice row', () => {
     // jewelry a raw five-stat sum tied them with, and the two stamina-free
     // physical pieces gained their floor. Reviewed: the body is the tank's own
     // gear now; the difficulty floors are not retuned here.
-    expect(vitals.maxHp, 'the derived reference-player pool').toBe(1822);
+    expect(vitals.maxHp, 'the derived reference-player pool').toBe(1842);
     // Armor moved by six points with the same swap (Agility feeds armor).
     expect(vitals.armor, 'and its armor').toBe(3271);
     // A player-sized pool, not the practice targets near-immortal one: heals
