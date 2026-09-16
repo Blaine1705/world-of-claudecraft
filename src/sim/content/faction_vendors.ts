@@ -324,8 +324,8 @@ export const FACTION_VENDOR_NPCS: Record<string, NpcDef> = {
     id: 'npc_church_order_quartermaster',
     name: 'Templar Liora',
     title: 'Church Order Quartermaster',
-    pos: { x: -18, z: -12 },
-    facing: 1.2,
+    pos: { x: 8, z: -80 },
+    facing: 3.14,
     color: 0xecd57a,
     questIds: [],
     greeting:
@@ -364,8 +364,8 @@ export const FACTION_VENDOR_NPCS: Record<string, NpcDef> = {
     id: 'npc_wq_taskmaster',
     name: 'Taskmaster Kaelen',
     title: 'World Quest Taskmaster',
-    pos: { x: -10, z: -6 },
-    facing: 2.1,
+    pos: { x: -5, z: -95 },
+    facing: -2.1,
     color: 0x8a6a50,
     questIds: [],
     greeting:
