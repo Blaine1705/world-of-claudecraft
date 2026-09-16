@@ -92,6 +92,14 @@
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
+      "itemId": "artificers_welding_cowl",
+      "name": "Artificer's Welding Cowl",
+      "sourcePack": "woc_faction_vendors_art",
+      "sourceFile": "faction_vendors/masters/artificers_welding_cowl.png",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "ashwood_log",
       "name": "Ashwood Log",
       "sourcePack": "woc_professions_art",
@@ -100,10 +108,50 @@
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
+      "itemId": "automaton_cog_ring",
+      "name": "Automaton Cog Ring",
+      "sourcePack": "woc_faction_vendors_art",
+      "sourceFile": "faction_vendors/masters/automaton_cog_ring.png",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "backpack",
       "name": "Backpack (implicit bag-bar slot; UI id, not an item)",
       "sourcePack": "woc_bags",
       "sourceFile": "WoC_Bag_10.png",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "champion_dawn_medallion",
+      "name": "Champion's Dawn Medallion",
+      "sourcePack": "woc_faction_vendors_art",
+      "sourceFile": "faction_vendors/masters/champion_dawn_medallion.png",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "champion_forged_loop",
+      "name": "Champion's Forged Loop",
+      "sourcePack": "woc_faction_vendors_art",
+      "sourceFile": "faction_vendors/masters/champion_forged_loop.png",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "champion_rift_band",
+      "name": "Champion's Rift Band",
+      "sourcePack": "woc_faction_vendors_art",
+      "sourceFile": "faction_vendors/masters/champion_rift_band.png",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "clockwork_tinkers_pack",
+      "name": "Clockwork Tinker's Pack",
+      "sourcePack": "woc_faction_vendors_art",
+      "sourceFile": "faction_vendors/masters/clockwork_tinkers_pack.png",
       "confidence": "high",
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
@@ -132,10 +180,26 @@
       "license": "World of ClaudeCraft project-authored vector illustration (original SVG rendered to WebP), project asset, rights reserved"
     },
     {
+      "itemId": "dawnkeeper_consecrated_mace",
+      "name": "Dawnkeeper's Consecrated Mace",
+      "sourcePack": "woc_faction_vendors_art",
+      "sourceFile": "faction_vendors/masters/dawnkeeper_consecrated_mace.png",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "elderwood_log",
       "name": "Highpine Log",
       "sourcePack": "woc_professions_art",
       "sourceFile": "batch-7/masters/elderwood_log.png (accepted v1)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "forgemaster_crag_cleaver",
+      "name": "Forgemaster's Crag Cleaver",
+      "sourcePack": "woc_faction_vendors_art",
+      "sourceFile": "faction_vendors/masters/forgemaster_crag_cleaver.png",
       "confidence": "high",
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
@@ -212,6 +276,14 @@
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
+      "itemId": "order_prayer_beads",
+      "name": "Order Prayer Beads",
+      "sourcePack": "woc_faction_vendors_art",
+      "sourceFile": "faction_vendors/masters/order_prayer_beads.png",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "prime_cut",
       "name": "Prime Cut",
       "sourcePack": "woc_professions_art",
@@ -242,6 +314,30 @@
       "sourceFile": "batch-9/masters/pristine_venom_gland.png (accepted v4)",
       "confidence": "high",
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "reins_chimeglass_tortoise",
+      "name": "Roadwarden's Bellstrap: Tolliver",
+      "sourcePack": "project-authored",
+      "sourceFile": "three-quarter head render of the shipped mount model (public/models/mounts/chimeglass_tortoise.glb) by scripts/render_mount_icons.mjs, background keyed and downscaled to the 128px opaque woc-item-icon-v1 shipping format (re-rendered 2026-08-16 with the lens-glow pass)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "reins_lanternback_troll",
+      "name": "Lamplighter's Yoke: Grumbol",
+      "sourcePack": "woc_owner_supplied_art",
+      "sourceFile": "troll icon 2.png (owner-supplied painted master, 624x624)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "reins_rickshaw_mount",
+      "name": "Bonebound Rickshaw Reins",
+      "sourcePack": "woc_item_icon_v1_generated",
+      "sourceFile": "reins_rickshaw_mount.png master (OpenAI image generation, user-directed prompt following docs/design/item-icon-art-style.md woc-item-icon-v1, cart-only three-quarter mount portrait, puller omitted to avoid misrepresenting the actual skel_rickshaw_puller rig)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved"
     },
     {
       "itemId": "resonant_hide",
@@ -280,6 +376,38 @@
       "name": "Resonant Timber",
       "sourcePack": "woc_professions_art",
       "sourceFile": "batch-12/masters/resonant_timber.png (accepted v2)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "rift_surveyors_satchel",
+      "name": "Rift Surveyor's Satchel",
+      "sourcePack": "woc_faction_vendors_art",
+      "sourceFile": "faction_vendors/masters/rift_surveyors_satchel.png",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "rift_watchers_band",
+      "name": "Rift Watcher's Band",
+      "sourcePack": "woc_faction_vendors_art",
+      "sourceFile": "faction_vendors/masters/rift_watchers_band.png",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "riftwalkers_tunic",
+      "name": "Riftwalker's Tunic",
+      "sourcePack": "woc_faction_vendors_art",
+      "sourceFile": "faction_vendors/masters/riftwalkers_tunic.png",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "riftwarden_voidblade",
+      "name": "Riftwarden's Voidblade",
+      "sourcePack": "woc_faction_vendors_art",
+      "sourceFile": "faction_vendors/masters/riftwarden_voidblade.png",
       "confidence": "high",
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
@@ -348,6 +476,14 @@
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
+      "itemId": "templar_dawn_shield",
+      "name": "Templar's Dawn Shield",
+      "sourcePack": "woc_faction_vendors_art",
+      "sourceFile": "faction_vendors/masters/templar_dawn_shield.png",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "thorium_ore",
       "name": "Osmium Ore",
       "sourcePack": "woc_professions_art",
@@ -372,34 +508,18 @@
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
+      "itemId": "vestments_of_the_acolyte",
+      "name": "Vestments of the Acolyte",
+      "sourcePack": "woc_faction_vendors_art",
+      "sourceFile": "faction_vendors/masters/vestments_of_the_acolyte.png",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "wolfhide_satchel",
       "name": "Wolfhide Satchel",
       "sourcePack": "woc_bags",
       "sourceFile": "WoC_Bag_06.png",
-      "confidence": "high",
-      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
-    },
-    {
-      "itemId": "reins_rickshaw_mount",
-      "name": "Bonebound Rickshaw Reins",
-      "sourcePack": "woc_item_icon_v1_generated",
-      "sourceFile": "reins_rickshaw_mount.png master (OpenAI image generation, user-directed prompt following docs/design/item-icon-art-style.md woc-item-icon-v1, cart-only three-quarter mount portrait, puller omitted to avoid misrepresenting the actual skel_rickshaw_puller rig)",
-      "confidence": "high",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved"
-    },
-    {
-      "itemId": "reins_lanternback_troll",
-      "name": "Lamplighter's Yoke: Grumbol",
-      "sourcePack": "woc_owner_supplied_art",
-      "sourceFile": "troll icon 2.png (owner-supplied painted master, 624x624)",
-      "confidence": "high",
-      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
-    },
-    {
-      "itemId": "reins_chimeglass_tortoise",
-      "name": "Roadwarden's Bellstrap: Tolliver",
-      "sourcePack": "project-authored",
-      "sourceFile": "three-quarter head render of the shipped mount model (public/models/mounts/chimeglass_tortoise.glb) by scripts/render_mount_icons.mjs, background keyed and downscaled to the 128px opaque woc-item-icon-v1 shipping format (re-rendered 2026-08-16 with the lens-glow pass)",
       "confidence": "high",
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     }

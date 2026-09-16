@@ -4,7 +4,6 @@ import {
   canRerollWorldQuest,
   playerActiveWorldQuests,
   rerollWorldQuest,
-  sanitizeWorldQuestReplacements,
 } from '../src/sim/world_quest_reroll';
 import { activeWorldQuestsForCycle } from '../src/sim/world_quest_rotation';
 import { restoreWorldQuestState, savedWorldQuestState } from '../src/sim/world_quest_state';
@@ -16,7 +15,9 @@ describe('World Quest Reroll Mechanism', () => {
   it('validates reroll eligibility correctly', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true });
     sim.setPlayerLevel(20);
-    const meta = sim.meta(sim.playerId)!;
+    const meta = sim.meta(sim.playerId);
+    expect(meta).toBeDefined();
+    if (!meta) return;
     meta.devWorldQuestCycle = cycle;
     meta.worldQuestCycle = cycle;
     const active = playerActiveWorldQuests(meta, cycle);
@@ -60,7 +61,9 @@ describe('World Quest Reroll Mechanism', () => {
   it('enforces one reroll per cycle limit', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true });
     sim.setPlayerLevel(20);
-    const meta = sim.meta(sim.playerId)!;
+    const meta = sim.meta(sim.playerId);
+    expect(meta).toBeDefined();
+    if (!meta) return;
     meta.devWorldQuestCycle = cycle;
     meta.worldQuestCycle = cycle;
     const active = playerActiveWorldQuests(meta, cycle);
@@ -85,7 +88,9 @@ describe('World Quest Reroll Mechanism', () => {
   it('replaces active quests cleanly and updates player offering', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true });
     sim.setPlayerLevel(20);
-    const meta = sim.meta(sim.playerId)!;
+    const meta = sim.meta(sim.playerId);
+    expect(meta).toBeDefined();
+    if (!meta) return;
     meta.devWorldQuestCycle = cycle;
     meta.worldQuestCycle = cycle;
     const baseQuests = activeWorldQuestsForCycle(cycle);
@@ -108,7 +113,9 @@ describe('World Quest Reroll Mechanism', () => {
   it('persists and restores reroll cycle and replacements across save/load', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true });
     sim.setPlayerLevel(20);
-    const meta = sim.meta(sim.playerId)!;
+    const meta = sim.meta(sim.playerId);
+    expect(meta).toBeDefined();
+    if (!meta) return;
     meta.devWorldQuestCycle = cycle;
     meta.worldQuestCycle = cycle;
     const active = playerActiveWorldQuests(meta, cycle);
@@ -126,7 +133,9 @@ describe('World Quest Reroll Mechanism', () => {
     // Restore into a fresh PlayerMeta on the SAME cycle
     const freshSim = new Sim({ seed: 43, playerClass: 'mage', autoEquip: true });
     freshSim.setPlayerLevel(20);
-    const freshMeta = freshSim.meta(freshSim.playerId)!;
+    const freshMeta = freshSim.meta(freshSim.playerId);
+    expect(freshMeta).toBeDefined();
+    if (!freshMeta) return;
     restoreWorldQuestState(freshMeta, saved.worldQuests, saved.factions);
     expect(freshMeta.worldQuestRerollCycle).toBe(cycle);
     const freshActive = playerActiveWorldQuests(freshMeta, cycle);
@@ -143,7 +152,9 @@ describe('World Quest Reroll Mechanism', () => {
     };
     const nextSim = new Sim({ seed: 44, playerClass: 'priest', autoEquip: true });
     nextSim.setPlayerLevel(20);
-    const nextMeta = nextSim.meta(nextSim.playerId)!;
+    const nextMeta = nextSim.meta(nextSim.playerId);
+    expect(nextMeta).toBeDefined();
+    if (!nextMeta) return;
     restoreWorldQuestState(nextMeta, nextSaved as typeof saved.worldQuests, saved.factions);
     expect(nextMeta.worldQuestRerollCycle).toBe('');
     expect(Object.keys(nextMeta.worldQuestReplacements).length).toBe(0);
@@ -152,7 +163,9 @@ describe('World Quest Reroll Mechanism', () => {
   it('awards faction standing when completing the replacement quest', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true });
     sim.setPlayerLevel(20);
-    const meta = sim.meta(sim.playerId)!;
+    const meta = sim.meta(sim.playerId);
+    expect(meta).toBeDefined();
+    if (!meta) return;
     meta.devWorldQuestCycle = cycle;
     meta.worldQuestCycle = cycle;
     const active = playerActiveWorldQuests(meta, cycle);

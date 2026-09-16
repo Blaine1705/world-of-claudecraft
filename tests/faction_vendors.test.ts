@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import {
   FACTION_VENDOR_GATES,
   FACTION_VENDOR_ITEMS,
-  FACTION_VENDOR_NPCS,
   resolveFactionVendorRowGate,
 } from '../src/sim/content/faction_vendors';
 import { ITEMS, NPCS } from '../src/sim/data';
@@ -68,7 +67,7 @@ describe('Faction Vendors & Reroll NPC content', () => {
   });
 
   it('correctly maps FACTION_VENDOR_GATES to the exact standing thresholds', () => {
-    for (const [itemId, gate] of Object.entries(FACTION_VENDOR_GATES)) {
+    for (const [_itemId, gate] of Object.entries(FACTION_VENDOR_GATES)) {
       expect(gate.requiredStanding).toBe(STANDING_THRESHOLDS[gate.standingTier]);
       expect(FACTION_IDS).toContain(gate.factionId);
       expect(STANDING_TIERS).toContain(gate.standingTier);
@@ -103,7 +102,9 @@ describe('Faction Vendors & Reroll NPC content', () => {
 describe('Faction vendor purchase authoritative simulation & UI', () => {
   it('enforces standing gates during sim.buyItem authoritative purchase', () => {
     const sim = new Sim({ seed: 777, playerClass: 'warrior', autoEquip: false });
-    const meta = sim.meta(sim.playerId)!;
+    const meta = sim.meta(sim.playerId);
+    expect(meta).toBeDefined();
+    if (!meta) return;
     meta.copper = 100_000; // 10 gold, plenty of copper
     meta.factions.church_order = 500; // Not yet Recognized (requires 1,000)
 
@@ -112,12 +113,13 @@ describe('Faction vendor purchase authoritative simulation & UI', () => {
       (e) => e.templateId === 'npc_church_order_quartermaster',
     );
     expect(qm).toBeDefined();
-    sim.player.pos.x = qm!.pos.x;
-    sim.player.pos.z = qm!.pos.z;
+    if (!qm) return;
+    sim.player.pos.x = qm.pos.x;
+    sim.player.pos.z = qm.pos.z;
 
     // Purchase should be refused due to standing
     sim.drainEvents();
-    sim.buyItem(qm!.id, 'order_prayer_beads');
+    sim.buyItem(qm.id, 'order_prayer_beads');
     const deniedEvents = sim.drainEvents();
     expect(
       deniedEvents.some((e) => e.type === 'error' && e.text.includes('Requires Recognized')),
@@ -127,17 +129,17 @@ describe('Faction vendor purchase authoritative simulation & UI', () => {
 
     // Increase standing to Recognized (1,000)
     meta.factions.church_order = 1_000;
-    sim.buyItem(qm!.id, 'order_prayer_beads');
+    sim.buyItem(qm.id, 'order_prayer_beads');
     expect(sim.countItem('order_prayer_beads')).toBe(1);
     expect(meta.copper).toBe(95_000); // 100,000 - 5,000 buyValue
 
     // Attempting to buy Tier 2 (Trusted - 3,000) still fails
-    sim.buyItem(qm!.id, 'vestments_of_the_acolyte');
+    sim.buyItem(qm.id, 'vestments_of_the_acolyte');
     expect(sim.countItem('vestments_of_the_acolyte')).toBe(0);
 
     // Elevate to Trusted (3,000)
     meta.factions.church_order = 3_000;
-    sim.buyItem(qm!.id, 'vestments_of_the_acolyte');
+    sim.buyItem(qm.id, 'vestments_of_the_acolyte');
     expect(sim.countItem('vestments_of_the_acolyte')).toBe(1);
     expect(meta.copper).toBe(80_000); // 95,000 - 15,000 buyValue
   });
@@ -165,21 +167,26 @@ describe('Faction vendor purchase authoritative simulation & UI', () => {
     const view = buildVendorView(vendorStock, [], ITEMS, balances);
     expect(view.goods.length).toBe(5);
 
-    const r1 = view.goods.find((g) => g.itemId === 'rift_watchers_band')!;
-    expect(r1.requirementUnmet).toBe(false);
+    const r1 = view.goods.find((g) => g.itemId === 'rift_watchers_band');
+    expect(r1).toBeDefined();
+    expect(r1?.requirementUnmet).toBe(false);
 
-    const r2 = view.goods.find((g) => g.itemId === 'rift_surveyors_satchel')!;
-    expect(r2.requirementUnmet).toBe(true);
-    expect(r2.factionRequirement?.standingTier).toBe('trusted');
+    const r2 = view.goods.find((g) => g.itemId === 'rift_surveyors_satchel');
+    expect(r2).toBeDefined();
+    expect(r2?.requirementUnmet).toBe(true);
+    expect(r2?.factionRequirement?.standingTier).toBe('trusted');
 
-    const a1 = view.goods.find((g) => g.itemId === 'automaton_cog_ring')!;
-    expect(a1.requirementUnmet).toBe(false);
+    const a1 = view.goods.find((g) => g.itemId === 'automaton_cog_ring');
+    expect(a1).toBeDefined();
+    expect(a1?.requirementUnmet).toBe(false);
 
-    const a3 = view.goods.find((g) => g.itemId === 'artificers_welding_cowl')!;
-    expect(a3.requirementUnmet).toBe(false);
+    const a3 = view.goods.find((g) => g.itemId === 'artificers_welding_cowl');
+    expect(a3).toBeDefined();
+    expect(a3?.requirementUnmet).toBe(false);
 
-    const a4 = view.goods.find((g) => g.itemId === 'forgemaster_crag_cleaver')!;
-    expect(a4.requirementUnmet).toBe(true);
-    expect(a4.factionRequirement?.standingTier).toBe('vanguard');
+    const a4 = view.goods.find((g) => g.itemId === 'forgemaster_crag_cleaver');
+    expect(a4).toBeDefined();
+    expect(a4?.requirementUnmet).toBe(true);
+    expect(a4?.factionRequirement?.standingTier).toBe('vanguard');
   });
 });
