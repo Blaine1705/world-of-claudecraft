@@ -1248,7 +1248,12 @@ const MONOLITHS: MonolithRow[] = [
     // release count 11327 minus the redesign's own 6 extracted lines = 11321
     // (exact wc -l on the merged tree, zero headroom).
     // Renderer construction and rebuild validation now share game/game_renderer.ts.
-    ceiling: 11317,
+    // The Discord OAuth flow (web popup, native handoff, and the in-game
+    // link-error notice a failed relink now needs) moved out to
+    // src/net/discord_oauth_flow.ts behind an injected deps bag; main.ts keeps
+    // only the deps bag and the one-time wiring calls. Measured after the move
+    // (wc -l < src/main.ts): 11209. Zero headroom.
+    ceiling: 11209,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
