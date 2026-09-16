@@ -1377,19 +1377,27 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
   // the Eastbrook handoff): the merged renderer leaf, the moved NPC layout and
   // the ground-sample leaves compose in one tree. No capture was retaken.
-  // Re-minted at the second release/v0.43.0 merge into feature/world-quests
-  // (the handoff's renderer leaf composed with the branch's WorldGuidance
-  // wiring). No capture was retaken.
-  '7953992fb6dd2d34b62a3d00e7a56cd7c34062fab1fc58aee487ba2d54292ece';
+  // Re-minted for the v0.42.2 hotfix line forward merge into release/v0.43.0:
+  // the merged renderer leaf (main's flanking-platform ground lift and
+  // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
+  // leaves) matches neither parent. No capture was retaken.
+  // Re-minted at the third release/v0.43.0 merge into feature/world-quests
+  // (the hotfix-line renderer leaf composed with the branch's guidance wiring).
+  // No capture was retaken.
+  'e9216c460d8656182ec22c88fa7c685ee3009647cdac328ad9621e03d5b5ca57';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
   // the Eastbrook handoff): the merged renderer leaf, the moved NPC layout and
   // the ground-sample leaves compose in one tree. No capture was retaken.
-  // Re-minted at the second release/v0.43.0 merge into feature/world-quests
-  // (the handoff's renderer leaf composed with the branch's WorldGuidance
-  // wiring). No capture was retaken.
-  '1f6897145bb50059603a97423dc00785eeb2fe5f5439326a403f449b4074c2e2';
+  // Re-minted for the v0.42.2 hotfix line forward merge into release/v0.43.0:
+  // the merged renderer leaf (main's flanking-platform ground lift and
+  // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
+  // leaves) matches neither parent. No capture was retaken.
+  // Re-minted at the third release/v0.43.0 merge into feature/world-quests
+  // (the hotfix-line renderer leaf composed with the branch's guidance wiring).
+  // No capture was retaken.
+  'cb3585ee0788cbaa3befd04c3c0971ea7a4cbd165c741e81bbb8d3391748c119';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2760,9 +2768,11 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking the Eastbrook
       // handoff): recomputed LAST again over the re-swept evidence. No capture
       // was retaken.
-      // Second release/v0.43.0 merge into feature/world-quests: recomputed LAST
+      // v0.42.2 hotfix line forward merge into release/v0.43.0: recomputed LAST
       // again over the re-swept evidence. No capture was retaken.
-    ).toBe('59332c178d2c7fea57ffcd40d68cd5f9ee4dd68248fc42d9085230249355b989');
+      // Third release/v0.43.0 merge into feature/world-quests: recomputed LAST
+      // again over the re-swept evidence. No capture was retaken.
+    ).toBe('99ebc1ece3554d5946158a424745558226bec1f680b72d5f5e7867c4cb132614');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
