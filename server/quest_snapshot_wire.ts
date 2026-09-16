@@ -83,4 +83,10 @@ export function emitQuestSelfKeys(emit: EmitSelfKey, sim: Sim, meta: PlayerMeta)
   emit('wqday', meta.worldQuestCycle);
   emit('wqexp', sim.worldQuestExpiresAtMs);
   emit('wqlog', [...meta.worldQuestLog.values()].map(worldQuestProgressForWire));
+  // Faction standing and the daily reroll ride the same owner-only gate: a
+  // completion (every worldQuest* event is heavy-self) or a reroll (which bumps
+  // wireRev) re-diffs them, and the three-key record is cheap to compare.
+  emit('fac', meta.factions);
+  emit('wqrr', meta.worldQuestRerollCycle);
+  emit('wqrep', meta.worldQuestReplacements ?? {});
 }

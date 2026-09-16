@@ -18,6 +18,9 @@ describe('quest snapshot wire', () => {
       questsDone: new Set(['q_done']),
       worldQuestCycle: '2030-01-02',
       worldQuestLog: new Map([['wq_test', worldQuest]]),
+      factions: { rift_watch: 30, church_order: 0, automatons: 0 },
+      worldQuestRerollCycle: 'wq1_1',
+      worldQuestReplacements: { wq_test: 'wq_other' },
     } as unknown as PlayerMeta;
     const sim = { worldQuestExpiresAtMs: 1_893_542_400_000 } as Sim;
 
@@ -29,6 +32,9 @@ describe('quest snapshot wire', () => {
       ['wqday', '2030-01-02'],
       ['wqexp', 1_893_542_400_000],
       ['wqlog', [worldQuest]],
+      ['fac', meta.factions],
+      ['wqrr', meta.worldQuestRerollCycle],
+      ['wqrep', { wq_test: 'wq_other' }],
     ]);
   });
 });

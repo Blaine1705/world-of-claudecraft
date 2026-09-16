@@ -134,6 +134,9 @@ const DELTA_KEYS = [
   'wqday',
   'wqexp',
   'wqlog',
+  'fac',
+  'wqrr',
+  'wqrep',
   'lockouts',
   'cds',
   'stats',
@@ -5578,6 +5581,7 @@ const ALL_DELTA_KEYS = [
   'einst',
   'ench',
   'equip',
+  'fac',
   'fplot',
   'ggoal',
   'gprof',
@@ -5632,6 +5636,8 @@ const ALL_DELTA_KEYS = [
   'wqday',
   'wqexp',
   'wqlog',
+  'wqrep',
+  'wqrr',
   'xp',
 ] as const;
 
@@ -5703,6 +5709,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   einst: 'equipmentInstances',
   ench: 'lastEnchantResult',
   equip: 'equipment',
+  fac: 'factions',
   fplot: 'myFarmPlots',
   ggoal: 'gatheringGoal',
   gprof: 'gatheringProficiency',
@@ -5748,6 +5755,8 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   wqday: 'worldQuestCycle',
   wqexp: 'worldQuestExpiresAtMs',
   wqlog: 'worldQuestLog',
+  wqrep: 'worldQuestReplacements',
+  wqrr: 'worldQuestRerollCycle',
 };
 
 // Year ~2223 in epoch ms. Beats selfWireJson's `until > Date.now()` lockout
@@ -6929,7 +6938,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 100 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 103 unique keys in sorted order', () => {
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
     // sheet's lifetime played-time key ptime, for 67, then +16: the static
@@ -6976,8 +6985,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The World Quests branch adds its rotation id, expiry and progress mirrors
     // (wqday, wqexp, wqlog), the vehicle session and the world-boss liveness
     // key wba, for 100.
-    expect(ALL_DELTA_KEYS).toHaveLength(100);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(100);
+    // The faction standing (fac) and daily reroll (wqrr, wqrep) owner keys, for 103.
+    expect(ALL_DELTA_KEYS).toHaveLength(103);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(103);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7141,7 +7151,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The candidate self in-combat key cbt brings the combined inventory to 94;
     // the account ledger's acct key (server/deeds_wire.ts) makes it 95.
     // The World Quests branch adds its five self keys, for 100.
-    expect(scraped.size).toBe(100);
+    // Plus the faction standing and daily reroll owner keys, for 103.
+    expect(scraped.size).toBe(103);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

@@ -10,8 +10,9 @@ import { decodeShadowState } from '../sim/world_quest_shadow_wire';
 import { decodeWorldQuestProgressTrace } from '../sim/world_quest_trace_wire';
 import { decodeWispMazeState } from '../sim/world_quest_wisp_maze_wire';
 import { sanitizeWorldQuestCycle, sanitizeWorldQuestProgress } from '../sim/world_quests';
+import { applyFactionSelfWire, type FactionSelfMirrors } from './faction_snapshot_wire';
 
-export interface QuestSelfMirrors {
+export interface QuestSelfMirrors extends Partial<FactionSelfMirrors> {
   questLog: Map<string, QuestProgress>;
   questsDone: Set<string>;
   worldQuestCycle: string;
@@ -39,6 +40,9 @@ export function applyQuestSelfWire(
     wqday?: unknown;
     wqexp?: unknown;
     wqlog?: unknown;
+    fac?: unknown;
+    wqrr?: unknown;
+    wqrep?: unknown;
   },
   simTime?: unknown,
 ): void {
@@ -108,4 +112,6 @@ export function applyQuestSelfWire(
     // adopt a new cycle beside a retained non-empty log from the old cycle.
     target.worldQuestCycle = incomingCycle;
   }
+  // Faction standing and the daily reroll, after the cycle above is settled.
+  applyFactionSelfWire(target, self);
 }
