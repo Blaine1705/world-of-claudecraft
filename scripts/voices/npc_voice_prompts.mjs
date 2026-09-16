@@ -1118,6 +1118,15 @@ export const VOICE_ALIAS = {
   // Edda's steel-and-salt Redoubt register (the same forge-and-anvil trade, the
   // same shore) until the forge receives its own designed voice.
   riftwright_maelis: 'quartermaster_edda',
+  // The faction quartermasters and the World Quest taskmaster, cast by ROLE
+  // until an ElevenLabs key designs their own voices: Vaelen keeps stores for
+  // the same Rift Watch Ollun serves; Templar Liora speaks with the aurorist's
+  // hushed, luminous calm; Artificer Kael is another smith of exacting work;
+  // Taskmaster Kaelen hands out the day's work the way the foreman does.
+  npc_rift_watch_quartermaster: 'riftwatch_ollun',
+  npc_church_order_quartermaster: 'aurorist_veyla',
+  npc_automaton_quartermaster: 'wardsmith_orun',
+  npc_wq_taskmaster: 'foreman_odell',
   brother_aldric_fen: 'brother_aldric',
   brother_aldric_highwatch: 'brother_aldric',
   brother_aldric_raid: 'brother_aldric',

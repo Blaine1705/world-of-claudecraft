@@ -372,6 +372,12 @@ const NPC_IDS = [
   'bellkeeper_tam',
   'fisher_nell',
   'riftwright_maelis', // the Rift Forge (Gullhaven, Farshore)
+  // The faction quartermasters and the World Quest taskmaster
+  // (src/sim/content/faction_vendors.ts).
+  'npc_rift_watch_quartermaster',
+  'npc_church_order_quartermaster',
+  'npc_automaton_quartermaster',
+  'npc_wq_taskmaster',
   'forgemistress_darva', // crafting-station master: forge (Eastbrook, zone 1)
   'cook_marlow', // crafting-station master: kitchens (Eastbrook, zone 1)
   'weaver_ottilie', // crafting-station master: loom (Eastbrook, zone 1)

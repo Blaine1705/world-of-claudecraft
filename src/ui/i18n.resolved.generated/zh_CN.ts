@@ -17171,49 +17171,49 @@ export const zh_CN: EnTranslations = {
         "name": "烬卫，瓦库尔的壁垒"
       },
       "rift_watchers_band": {
-        "name": "Rift Watcher's Band"
+        "name": "裂隙守望者指环"
       },
       "rift_surveyors_satchel": {
-        "name": "Rift Surveyor's Satchel"
+        "name": "裂隙勘测员挎包"
       },
       "riftwalkers_tunic": {
-        "name": "Riftwalker's Tunic"
+        "name": "裂隙行者外衣"
       },
       "riftwarden_voidblade": {
-        "name": "Riftwarden's Voidblade"
+        "name": "裂隙守卫者虚空之刃"
       },
       "champion_rift_band": {
-        "name": "Champion's Rift Band"
+        "name": "勇士裂隙指环"
       },
       "order_prayer_beads": {
-        "name": "Order Prayer Beads"
+        "name": "教团祈祷念珠"
       },
       "vestments_of_the_acolyte": {
-        "name": "Vestments of the Acolyte"
+        "name": "侍僧法衣"
       },
       "templar_dawn_shield": {
-        "name": "Templar's Dawn Shield"
+        "name": "圣殿骑士黎明之盾"
       },
       "dawnkeeper_consecrated_mace": {
-        "name": "Dawnkeeper's Consecrated Mace"
+        "name": "黎明守护者祝圣锤"
       },
       "champion_dawn_medallion": {
-        "name": "Champion's Dawn Medallion"
+        "name": "勇士黎明勋章"
       },
       "automaton_cog_ring": {
-        "name": "Automaton Cog Ring"
+        "name": "机械齿轮指环"
       },
       "clockwork_tinkers_pack": {
-        "name": "Clockwork Tinker's Pack"
+        "name": "发条工匠背包"
       },
       "artificers_welding_cowl": {
-        "name": "Artificer's Welding Cowl"
+        "name": "工匠焊接兜帽"
       },
       "forgemaster_crag_cleaver": {
-        "name": "Forgemaster's Crag Cleaver"
+        "name": "锻造大师峭壁劈砍斧"
       },
       "champion_forged_loop": {
-        "name": "Champion's Forged Loop"
+        "name": "勇士锻造指环"
       }
     },
     "mobs": {
@@ -18520,6 +18520,26 @@ export const zh_CN: EnTranslations = {
         "name": "裂隙锻匠梅莉丝",
         "title": "裂隙熔炉大师",
         "greeting": "裂隙之戒记得造就它的那道裂隙，{className}。把戒指和裂隙散落的精华带来，我会教它记住更多。"
+      },
+      "npc_rift_watch_quartermaster": {
+        "name": "军需官维伦",
+        "title": "裂隙守望补给官",
+        "greeting": "裂隙守望守护海岸，监视深处的裂口。我们的库房向获得认可声望的人开放。"
+      },
+      "npc_church_order_quartermaster": {
+        "name": "圣殿骑士莉奥拉",
+        "title": "教团军需官",
+        "greeting": "行走于黎明之光中。教团为与我们并肩效力者提供补给。"
+      },
+      "npc_automaton_quartermaster": {
+        "name": "工匠凯尔",
+        "title": "机械军团征用官",
+        "greeting": "精密齿轮、锻造钢材与校准动力。授权操作员可从我们的库存中领取。"
+      },
+      "npc_wq_taskmaster": {
+        "name": "监工凯伦",
+        "title": "世界任务监工",
+        "greeting": "各盟友阵营每天都会在全境发布任务。若某项任务不适合你的技能，你每天可以申请一次重新分配。"
       },
       "forgemistress_darva": {
         "name": "达尔瓦锻造师",

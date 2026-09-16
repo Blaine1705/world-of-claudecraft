@@ -92,14 +92,6 @@
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
-      "itemId": "artificers_welding_cowl",
-      "name": "Artificer's Welding Cowl",
-      "sourcePack": "woc_faction_vendors_art",
-      "sourceFile": "faction_vendors/masters/artificers_welding_cowl.png",
-      "confidence": "high",
-      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
-    },
-    {
       "itemId": "ashwood_log",
       "name": "Ashwood Log",
       "sourcePack": "woc_professions_art",
@@ -108,50 +100,10 @@
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
-      "itemId": "automaton_cog_ring",
-      "name": "Automaton Cog Ring",
-      "sourcePack": "woc_faction_vendors_art",
-      "sourceFile": "faction_vendors/masters/automaton_cog_ring.png",
-      "confidence": "high",
-      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
-    },
-    {
       "itemId": "backpack",
       "name": "Backpack (implicit bag-bar slot; UI id, not an item)",
       "sourcePack": "woc_bags",
       "sourceFile": "WoC_Bag_10.png",
-      "confidence": "high",
-      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
-    },
-    {
-      "itemId": "champion_dawn_medallion",
-      "name": "Champion's Dawn Medallion",
-      "sourcePack": "woc_faction_vendors_art",
-      "sourceFile": "faction_vendors/masters/champion_dawn_medallion.png",
-      "confidence": "high",
-      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
-    },
-    {
-      "itemId": "champion_forged_loop",
-      "name": "Champion's Forged Loop",
-      "sourcePack": "woc_faction_vendors_art",
-      "sourceFile": "faction_vendors/masters/champion_forged_loop.png",
-      "confidence": "high",
-      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
-    },
-    {
-      "itemId": "champion_rift_band",
-      "name": "Champion's Rift Band",
-      "sourcePack": "woc_faction_vendors_art",
-      "sourceFile": "faction_vendors/masters/champion_rift_band.png",
-      "confidence": "high",
-      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
-    },
-    {
-      "itemId": "clockwork_tinkers_pack",
-      "name": "Clockwork Tinker's Pack",
-      "sourcePack": "woc_faction_vendors_art",
-      "sourceFile": "faction_vendors/masters/clockwork_tinkers_pack.png",
       "confidence": "high",
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
@@ -180,26 +132,10 @@
       "license": "World of ClaudeCraft project-authored vector illustration (original SVG rendered to WebP), project asset, rights reserved"
     },
     {
-      "itemId": "dawnkeeper_consecrated_mace",
-      "name": "Dawnkeeper's Consecrated Mace",
-      "sourcePack": "woc_faction_vendors_art",
-      "sourceFile": "faction_vendors/masters/dawnkeeper_consecrated_mace.png",
-      "confidence": "high",
-      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
-    },
-    {
       "itemId": "elderwood_log",
       "name": "Highpine Log",
       "sourcePack": "woc_professions_art",
       "sourceFile": "batch-7/masters/elderwood_log.png (accepted v1)",
-      "confidence": "high",
-      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
-    },
-    {
-      "itemId": "forgemaster_crag_cleaver",
-      "name": "Forgemaster's Crag Cleaver",
-      "sourcePack": "woc_faction_vendors_art",
-      "sourceFile": "faction_vendors/masters/forgemaster_crag_cleaver.png",
       "confidence": "high",
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
@@ -272,14 +208,6 @@
       "name": "Fogbinder's Duffel",
       "sourcePack": "woc_bags",
       "sourceFile": "WoC_Bag_07.png",
-      "confidence": "high",
-      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
-    },
-    {
-      "itemId": "order_prayer_beads",
-      "name": "Order Prayer Beads",
-      "sourcePack": "woc_faction_vendors_art",
-      "sourceFile": "faction_vendors/masters/order_prayer_beads.png",
       "confidence": "high",
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
@@ -380,38 +308,6 @@
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
-      "itemId": "rift_surveyors_satchel",
-      "name": "Rift Surveyor's Satchel",
-      "sourcePack": "woc_faction_vendors_art",
-      "sourceFile": "faction_vendors/masters/rift_surveyors_satchel.png",
-      "confidence": "high",
-      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
-    },
-    {
-      "itemId": "rift_watchers_band",
-      "name": "Rift Watcher's Band",
-      "sourcePack": "woc_faction_vendors_art",
-      "sourceFile": "faction_vendors/masters/rift_watchers_band.png",
-      "confidence": "high",
-      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
-    },
-    {
-      "itemId": "riftwalkers_tunic",
-      "name": "Riftwalker's Tunic",
-      "sourcePack": "woc_faction_vendors_art",
-      "sourceFile": "faction_vendors/masters/riftwalkers_tunic.png",
-      "confidence": "high",
-      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
-    },
-    {
-      "itemId": "riftwarden_voidblade",
-      "name": "Riftwarden's Voidblade",
-      "sourcePack": "woc_faction_vendors_art",
-      "sourceFile": "faction_vendors/masters/riftwarden_voidblade.png",
-      "confidence": "high",
-      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
-    },
-    {
       "itemId": "rough_hide",
       "name": "Rough Hide",
       "sourcePack": "woc_professions_art",
@@ -476,14 +372,6 @@
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
-      "itemId": "templar_dawn_shield",
-      "name": "Templar's Dawn Shield",
-      "sourcePack": "woc_faction_vendors_art",
-      "sourceFile": "faction_vendors/masters/templar_dawn_shield.png",
-      "confidence": "high",
-      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
-    },
-    {
       "itemId": "thorium_ore",
       "name": "Osmium Ore",
       "sourcePack": "woc_professions_art",
@@ -504,14 +392,6 @@
       "name": "Venom Gland",
       "sourcePack": "woc_professions_art",
       "sourceFile": "batch-8/masters/venom_gland.png (accepted v2)",
-      "confidence": "high",
-      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
-    },
-    {
-      "itemId": "vestments_of_the_acolyte",
-      "name": "Vestments of the Acolyte",
-      "sourcePack": "woc_faction_vendors_art",
-      "sourceFile": "faction_vendors/masters/vestments_of_the_acolyte.png",
       "confidence": "high",
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
@@ -6922,6 +6802,36 @@
       "itemIds": [
         "eastbrook_freight_crate",
         "eastbrook_freight_wagon"
+      ]
+    },
+    {
+      "batchId": "faction-vendor-icons-2026-09-16",
+      "source": "Deterministic SVG compositions rendered to WebP with Sharp (scripts/generate_faction_vendor_icons.mjs); no image model",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "woc-item-icon-v1; existing painted item catalog (opaque dark vignette, warm top-left key, cool bottom-right shadow, centered silhouette with safe padding)",
+      "commonPrompt": "Not a text-to-image prompt: each icon is an authored SVG composition (per-item vector art over a three-stop radial ground) rasterized to an opaque 128x128 sRGB WebP. The exact vector source of every item is the ITEMS_TO_GENERATE table in scripts/generate_faction_vendor_icons.mjs.",
+      "provenanceRecord": "docs/achievements/faction-vendor-icons-2026-09-16/",
+      "itemIds": [
+        "artificers_welding_cowl",
+        "automaton_cog_ring",
+        "champion_dawn_medallion",
+        "champion_forged_loop",
+        "champion_rift_band",
+        "clockwork_tinkers_pack",
+        "dawnkeeper_consecrated_mace",
+        "forgemaster_crag_cleaver",
+        "order_prayer_beads",
+        "rift_surveyors_satchel",
+        "rift_watchers_band",
+        "riftwalkers_tunic",
+        "riftwarden_voidblade",
+        "templar_dawn_shield",
+        "vestments_of_the_acolyte"
       ]
     }
   ]

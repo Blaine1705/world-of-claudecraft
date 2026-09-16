@@ -1158,6 +1158,7 @@ export const ITEM_OFFHAND_MODELS: Readonly<Record<string, string>> = {
   bulwark_of_the_inner_crucible: 'shield_square',
   ember_wardens_barrier: 'shield_round',
   votive_ward_of_the_deathless_court: 'shield_round', // Nythraxis gap-fill healer shield
+  templar_dawn_shield: 'shield_square', // Church Order quartermaster's mail shield (faction_vendors.ts)
   varkhul_emberward: 'varkhul_emberward', // Ignivar raid legendary (Varkhul drop)
 };
 

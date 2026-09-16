@@ -17171,49 +17171,49 @@ export const ja_JP: EnTranslations = {
         "name": "エンバーウォード、ヴァルクールの大盾"
       },
       "rift_watchers_band": {
-        "name": "Rift Watcher's Band"
+        "name": "裂け目の監視者の指輪"
       },
       "rift_surveyors_satchel": {
-        "name": "Rift Surveyor's Satchel"
+        "name": "裂け目測量士の鞄"
       },
       "riftwalkers_tunic": {
-        "name": "Riftwalker's Tunic"
+        "name": "裂け目歩きのチュニック"
       },
       "riftwarden_voidblade": {
-        "name": "Riftwarden's Voidblade"
+        "name": "裂け目の守護者の虚空剣"
       },
       "champion_rift_band": {
-        "name": "Champion's Rift Band"
+        "name": "勇者の裂け目の指輪"
       },
       "order_prayer_beads": {
-        "name": "Order Prayer Beads"
+        "name": "教団の祈りの数珠"
       },
       "vestments_of_the_acolyte": {
-        "name": "Vestments of the Acolyte"
+        "name": "侍祭の法衣"
       },
       "templar_dawn_shield": {
-        "name": "Templar's Dawn Shield"
+        "name": "テンプラーの暁の盾"
       },
       "dawnkeeper_consecrated_mace": {
-        "name": "Dawnkeeper's Consecrated Mace"
+        "name": "暁の守り手の聖別メイス"
       },
       "champion_dawn_medallion": {
-        "name": "Champion's Dawn Medallion"
+        "name": "勇者の暁のメダリオン"
       },
       "automaton_cog_ring": {
-        "name": "Automaton Cog Ring"
+        "name": "オートマトンの歯車の指輪"
       },
       "clockwork_tinkers_pack": {
-        "name": "Clockwork Tinker's Pack"
+        "name": "ぜんまい職人の背嚢"
       },
       "artificers_welding_cowl": {
-        "name": "Artificer's Welding Cowl"
+        "name": "工匠の溶接フード"
       },
       "forgemaster_crag_cleaver": {
-        "name": "Forgemaster's Crag Cleaver"
+        "name": "鍛冶頭の岩壁の大鉈"
       },
       "champion_forged_loop": {
-        "name": "Champion's Forged Loop"
+        "name": "勇者の鍛造の指輪"
       }
     },
     "mobs": {
@@ -18520,6 +18520,26 @@ export const ja_JP: EnTranslations = {
         "name": "リフトライトのマエリス",
         "title": "リフト鍛冶の親方",
         "greeting": "リフトバウンドリングは、自分を生んだ裂け目を覚えている、{className}。リングと、裂け目が落とすエッセンスを持ってくれば、もっと多くを覚えさせてやろう。"
+      },
+      "npc_rift_watch_quartermaster": {
+        "name": "需品係ヴェイレン",
+        "title": "裂け目の監視団の補給係",
+        "greeting": "裂け目の監視団は岸を守り、深き裂け目を見張っている。我らの物資は、認められた地位を持つ者に開かれている。"
+      },
+      "npc_church_order_quartermaster": {
+        "name": "テンプラー・リオラ",
+        "title": "教団の需品係",
+        "greeting": "暁の光の中を歩め。教団は我らと共に仕える者に物資を供する。"
+      },
+      "npc_automaton_quartermaster": {
+        "name": "工匠ケイル",
+        "title": "オートマトンの調達官",
+        "greeting": "精密な歯車、鍛えた鋼、調整済みの動力。認可された操作者は我らの在庫から受け取れる。"
+      },
+      "npc_wq_taskmaster": {
+        "name": "監督官ケイレン",
+        "title": "ワールドクエスト監督官",
+        "greeting": "同盟の各勢力は毎日、領土中に任務を掲示する。任務が自分の技能に合わなければ、一日に一度だけ再割り当てを求められる。"
       },
       "forgemistress_darva": {
         "name": "鍛冶長ダルヴァ",

@@ -17171,49 +17171,49 @@ export const ko_KR: EnTranslations = {
         "name": "잉걸수호자, 바르쿨의 방벽"
       },
       "rift_watchers_band": {
-        "name": "Rift Watcher's Band"
+        "name": "균열 감시자의 반지"
       },
       "rift_surveyors_satchel": {
-        "name": "Rift Surveyor's Satchel"
+        "name": "균열 측량사의 가방"
       },
       "riftwalkers_tunic": {
-        "name": "Riftwalker's Tunic"
+        "name": "균열 방랑자의 튜닉"
       },
       "riftwarden_voidblade": {
-        "name": "Riftwarden's Voidblade"
+        "name": "균열 수호자의 공허검"
       },
       "champion_rift_band": {
-        "name": "Champion's Rift Band"
+        "name": "용사의 균열 반지"
       },
       "order_prayer_beads": {
-        "name": "Order Prayer Beads"
+        "name": "교단의 기도 염주"
       },
       "vestments_of_the_acolyte": {
-        "name": "Vestments of the Acolyte"
+        "name": "수련사의 제의"
       },
       "templar_dawn_shield": {
-        "name": "Templar's Dawn Shield"
+        "name": "성전기사의 여명 방패"
       },
       "dawnkeeper_consecrated_mace": {
-        "name": "Dawnkeeper's Consecrated Mace"
+        "name": "여명 수호자의 축성된 철퇴"
       },
       "champion_dawn_medallion": {
-        "name": "Champion's Dawn Medallion"
+        "name": "용사의 여명 메달"
       },
       "automaton_cog_ring": {
-        "name": "Automaton Cog Ring"
+        "name": "자동인형 톱니 반지"
       },
       "clockwork_tinkers_pack": {
-        "name": "Clockwork Tinker's Pack"
+        "name": "태엽 수리공의 배낭"
       },
       "artificers_welding_cowl": {
-        "name": "Artificer's Welding Cowl"
+        "name": "기술자의 용접 두건"
       },
       "forgemaster_crag_cleaver": {
-        "name": "Forgemaster's Crag Cleaver"
+        "name": "대장장이 장인의 바위 절단기"
       },
       "champion_forged_loop": {
-        "name": "Champion's Forged Loop"
+        "name": "용사의 단조 반지"
       }
     },
     "mobs": {
@@ -18520,6 +18520,26 @@ export const ko_KR: EnTranslations = {
         "name": "균열장인 마엘리스",
         "title": "균열 화로장",
         "greeting": "균열결속 반지는 자신을 만든 균열을 기억한다네, {className}. 반지와 균열이 흘린 정수를 가져오게. 더 많은 것을 기억하도록 가르쳐 주지."
+      },
+      "npc_rift_watch_quartermaster": {
+        "name": "병참관 바엘렌",
+        "title": "균열 감시대 보급관",
+        "greeting": "균열 감시대는 해안을 지키고 깊은 균열을 감시한다. 우리의 창고는 인정받은 평판을 가진 이에게 열려 있다."
+      },
+      "npc_church_order_quartermaster": {
+        "name": "성전기사 리오라",
+        "title": "교단 병참관",
+        "greeting": "여명의 빛 속을 걸으라. 교단은 우리와 함께 봉사하는 이들에게 물자를 공급한다."
+      },
+      "npc_automaton_quartermaster": {
+        "name": "기술자 카엘",
+        "title": "자동인형 조달관",
+        "greeting": "정밀 톱니, 단조 강철, 보정된 동력. 승인된 조작자는 우리 재고에서 물품을 받을 수 있다."
+      },
+      "npc_wq_taskmaster": {
+        "name": "감독관 카엘렌",
+        "title": "세계 임무 감독관",
+        "greeting": "동맹 세력들은 매일 왕국 전역에 임무를 게시한다. 임무가 네 기술에 맞지 않는다면 하루에 한 번 재배정을 요청할 수 있다."
       },
       "forgemistress_darva": {
         "name": "단조사 다르바",

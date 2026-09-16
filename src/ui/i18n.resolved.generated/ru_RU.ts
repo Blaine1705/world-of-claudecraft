@@ -17171,49 +17171,49 @@ export const ru_RU: EnTranslations = {
         "name": "Углестраж, бастион Варкула"
       },
       "rift_watchers_band": {
-        "name": "Rift Watcher's Band"
+        "name": "Кольцо Стража Разлома"
       },
       "rift_surveyors_satchel": {
-        "name": "Rift Surveyor's Satchel"
+        "name": "Сумка Разведчика Разлома"
       },
       "riftwalkers_tunic": {
-        "name": "Riftwalker's Tunic"
+        "name": "Туника Странника Разлома"
       },
       "riftwarden_voidblade": {
-        "name": "Riftwarden's Voidblade"
+        "name": "Клинок Пустоты Хранителя Разлома"
       },
       "champion_rift_band": {
-        "name": "Champion's Rift Band"
+        "name": "Кольцо Разлома Чемпиона"
       },
       "order_prayer_beads": {
-        "name": "Order Prayer Beads"
+        "name": "Молитвенные Чётки Ордена"
       },
       "vestments_of_the_acolyte": {
-        "name": "Vestments of the Acolyte"
+        "name": "Облачение Послушника"
       },
       "templar_dawn_shield": {
-        "name": "Templar's Dawn Shield"
+        "name": "Щит Рассвета Храмовника"
       },
       "dawnkeeper_consecrated_mace": {
-        "name": "Dawnkeeper's Consecrated Mace"
+        "name": "Освящённая Булава Хранителя Рассвета"
       },
       "champion_dawn_medallion": {
-        "name": "Champion's Dawn Medallion"
+        "name": "Медальон Рассвета Чемпиона"
       },
       "automaton_cog_ring": {
-        "name": "Automaton Cog Ring"
+        "name": "Кольцо-Шестерня Автоматона"
       },
       "clockwork_tinkers_pack": {
-        "name": "Clockwork Tinker's Pack"
+        "name": "Ранец Заводного Механика"
       },
       "artificers_welding_cowl": {
-        "name": "Artificer's Welding Cowl"
+        "name": "Сварочный Капюшон Механика"
       },
       "forgemaster_crag_cleaver": {
-        "name": "Forgemaster's Crag Cleaver"
+        "name": "Утёсный Колун Мастера-Кузнеца"
       },
       "champion_forged_loop": {
-        "name": "Champion's Forged Loop"
+        "name": "Кованое Кольцо Чемпиона"
       }
     },
     "mobs": {
@@ -18520,6 +18520,26 @@ export const ru_RU: EnTranslations = {
         "name": "Кузнец разлома Маэлис",
         "title": "Мастер горна разлома",
         "greeting": "Кольцо разлома помнит разлом, что его создал, {className}. Принесите мне кольцо и эссенцию, что роняют разломы, и я научу его помнить больше."
+      },
+      "npc_rift_watch_quartermaster": {
+        "name": "Интендант Ваэлен",
+        "title": "Снабженец Стражи Разлома",
+        "greeting": "Стража Разлома охраняет берег и следит за глубокими разрывами. Наши склады открыты для тех, чья репутация признана."
+      },
+      "npc_church_order_quartermaster": {
+        "name": "Храмовница Лиора",
+        "title": "Интендант Церковного Ордена",
+        "greeting": "Ступай в Свете Рассвета. Церковный Орден снабжает тех, кто служит вместе с нами."
+      },
+      "npc_automaton_quartermaster": {
+        "name": "Механик Каэль",
+        "title": "Снабженец Автоматонов",
+        "greeting": "Точные шестерни, кованая сталь и выверенная мощь. Допущенные операторы могут получать снаряжение с наших складов."
+      },
+      "npc_wq_taskmaster": {
+        "name": "Надзиратель Каэлен",
+        "title": "Надзиратель Мировых Заданий",
+        "greeting": "Союзные фракции каждый день размещают задания по всему королевству. Если задание не подходит твоим навыкам, раз в день можно запросить его замену."
       },
       "forgemistress_darva": {
         "name": "Мастерица кузни Дарва",

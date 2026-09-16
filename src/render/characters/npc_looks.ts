@@ -1964,6 +1964,86 @@ export const NPC_LOOKS: Record<string, NpcLookDef> = {
     props: 'tome',
   },
 
+  // === Faction quartermasters and the World Quest taskmaster ==============
+  // Quartermaster Vaelen (Rift Watch, Drifthaven): salt-grey braid, sea-glass
+  // eyes, ranger leathers over Palmreach sun-dark skin; a spear for the shore.
+  npc_rift_watch_quartermaster: {
+    app: {
+      gender: 'male',
+      hair: 'warriorbraid',
+      ...hair(200, 0.12, 0.55),
+      beard: 'shortbox',
+      brows: 'flat',
+      eyeShape: 'sharp',
+      ...eyes(185, 0.5, 0.45),
+      ...skin(23, 0.55, 0.36),
+      mouth: 'neutral',
+      face: face({ jaw: 0.2, cheeks: -0.1 }),
+      body: body({ shoulders: 0.15 }),
+      outfit: 'teal',
+    },
+    worn: kit('ranger'),
+    props: 'spear',
+  },
+  // Templar Liora (Church Order, the Eastbrook chapel): gilded paladin plate,
+  // braided crown, a calm smile; sword and shield of the Dawn.
+  npc_church_order_quartermaster: {
+    app: {
+      gender: 'female',
+      hair: 'braidcrown',
+      ...hair(38, 0.55, 0.62),
+      brows: 'arched',
+      eyeShape: 'almond',
+      ...eyes(42, 0.5, 0.45),
+      ...skin(27, 0.42, 0.62),
+      mouth: 'smile',
+      face: face({ chin: 0.1 }),
+      body: body({ shoulders: 0.15 }),
+      outfit: 'gold',
+    },
+    worn: kit('paladin'),
+    props: 'sword_shield',
+  },
+  // Artificer Kael (Automatons, Wyrmwatch): soot-dark hair swept back, a
+  // verdigris smith's kit with the sleeves rolled, hammer in hand.
+  npc_automaton_quartermaster: {
+    app: {
+      gender: 'male',
+      hair: 'sweptback',
+      ...hair(20, 0.3, 0.2),
+      beard: 'goatee',
+      brows: 'thick',
+      eyeShape: 'wide',
+      ...eyes(35, 0.55, 0.4),
+      ...skin(24, 0.45, 0.45),
+      mouth: 'grin',
+      face: face({ nose: 0.15, brow: 0.1 }),
+      body: body({ shoulders: 0.2, hands: 0.25 }),
+      outfit: 'verdigris',
+    },
+    worn: kit('barbarian', { arms: null }),
+    props: 'hammer',
+  },
+  // Taskmaster Kaelen (Eastbrook square): a clerk of assignments, crimson
+  // rogue leathers, a ledger under the arm and a pencil-line moustache.
+  npc_wq_taskmaster: {
+    app: {
+      gender: 'male',
+      hair: 'sidepart',
+      ...hair(28, 0.35, 0.28),
+      beard: 'stache',
+      brows: 'angled',
+      eyeShape: 'droopy',
+      ...eyes(28, 0.4, 0.3),
+      ...skin(26, 0.42, 0.55),
+      mouth: 'frown',
+      face: face({ chin: -0.1, cheeks: -0.15 }),
+      body: body({ chest: -0.1 }),
+      outfit: 'crimson',
+    },
+    worn: kit('rogue'),
+    props: 'tome',
+  },
   // === Palmreach and the far shores ========================================
   // Castaway Navigator: sun-bleached, half-dressed, still reading the stars.
   castaway_navigator: {

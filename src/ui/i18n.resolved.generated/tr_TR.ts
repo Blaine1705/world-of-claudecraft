@@ -18521,6 +18521,26 @@ export const tr_TR: EnTranslations = {
         "title": "Yarık Demirci Ustası",
         "greeting": "Bir Riftbound grubu, onu yaratan kırılma noktasını hatırlıyor: {className}. Bana grubu ve molaların döktüğü özü getirin, ben de ona daha fazlasını hatırlamayı öğreteyim."
       },
+      "npc_rift_watch_quartermaster": {
+        "name": "Quartermaster Vaelen",
+        "title": "Rift Watch Provisioner",
+        "greeting": "The Rift Watch protects the shore and watches the deep tears. Our stores are open to those of recognized standing."
+      },
+      "npc_church_order_quartermaster": {
+        "name": "Templar Liora",
+        "title": "Church Order Quartermaster",
+        "greeting": "Walk in the Light of the Dawn. The Church Order supplies those who stand with us in service."
+      },
+      "npc_automaton_quartermaster": {
+        "name": "Artificer Kael",
+        "title": "Automaton Requisitioner",
+        "greeting": "Precision gears, forged steel, and calibrated power. Authorized operators may draw from our inventory."
+      },
+      "npc_wq_taskmaster": {
+        "name": "Taskmaster Kaelen",
+        "title": "World Quest Taskmaster",
+        "greeting": "The allied factions post assignments across the realm every day. If an assignment does not suit your skills, you may request one daily reassignment."
+      },
       "forgemistress_darva": {
         "name": "Dövme Ustası Darva",
         "title": "Demirci Ustası",
