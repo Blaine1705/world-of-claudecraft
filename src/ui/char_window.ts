@@ -327,6 +327,7 @@ export class CharWindow {
     // beneath; every other tab takes the whole body. The one tabpanel keeps
     // its id, tab stop and name in both shapes (the WAI-ARIA tabs pattern,
     // axe's scrollable-region-focusable).
+    html += '<div class="char-sheet">';
     if (sidebar.selected === 'stats') {
       html += `<div class="char-body char-body--sheet">${paperdoll}<aside id="char-sidebar-panel" class="char-sidebar-panel char-stats-rail" role="tabpanel" tabindex="0" ${panelLabel}>${this.statsRailHtml()}</aside></div><div class="char-attr-row stat-panel attrs-tiles">${this.attributeTilesHtml()}</div>`;
     } else {
@@ -346,7 +347,7 @@ export class CharWindow {
         })),
         selected: sidebar.selected,
       }),
-    )}<div class="pc-share-row"><button type="button" class="btn ui-btn char-cosmetics-btn" data-act="open-cosmetics">${esc(t('hudChrome.cosmetics.title'))}</button><button type="button" class="pc-share-btn ui-btn ui-btn--red" data-act="share-card">${SHARE_GLYPH}<span>${esc(t('playerCard.shareButton'))}</span></button></div></footer>`;
+    )}<div class="pc-share-row"><button type="button" class="btn ui-btn char-cosmetics-btn" data-act="open-cosmetics">${esc(t('hudChrome.cosmetics.title'))}</button><button type="button" class="pc-share-btn ui-btn ui-btn--red" data-act="share-card">${SHARE_GLYPH}<span>${esc(t('playerCard.shareButton'))}</span></button></div></footer></div>`;
     el.innerHTML = html;
     hydratePortraits(el);
     wireTabStrip(el, 'char-sidebar-tab', (id, focusFollow) => {

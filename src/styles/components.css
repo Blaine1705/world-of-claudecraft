@@ -1727,16 +1727,23 @@
     display: inline-flex;
     align-items: center;
     gap: var(--spacing-xs);
-    margin-inline: auto var(--spacing-lg);
+    /* The inline-end margin clears the close button, which layout.css pins
+       absolutely at the head's inline end (8px inset + 26px wide) outside the
+       flex flow; the library head padding cannot be raised from this layer. */
+    margin-inline: auto calc(var(--spacing-lg) + 26px);
     color: var(--color-text-secondary);
     white-space: nowrap;
   }
-  /* The sheet stacks: head, body, (attribute row), footer with the tab strip.
-     Character keeps the paperdoll with the stats rail beside it (Offense and
-     Defense scroll on the wheel); every other tab takes the whole body. */
-  #char-window {
+  /* The sheet stacks under the 64px head: body, (attribute row), footer with
+     the tab strip. Character keeps the paperdoll with the stats rail beside it
+     (Offense and Defense scroll on the wheel); every other tab takes the whole
+     body. The stack is a wrapper, not the window: the HUD shows the window with
+     an inline display:block, which would override a flex on the window itself. */
+  #char-window .char-sheet {
     display: flex;
     flex-direction: column;
+    height: calc(100% - 64px);
+    min-height: 0;
   }
   #char-window .char-body {
     display: grid;
@@ -1785,6 +1792,9 @@
     margin-top: 0;
     flex: 0 0 auto;
     gap: var(--spacing-sm);
+  }
+  body.mobile-touch #char-window .char-sheet {
+    height: auto;
   }
   body.mobile-touch #char-window .char-body,
   body.mobile-touch #char-window .char-attr-row {
