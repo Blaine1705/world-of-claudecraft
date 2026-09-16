@@ -2310,9 +2310,71 @@ export const ru_RU: EnTranslations = {
       "stats": "Характеристики",
       "progression": "Прогресс",
       "skills": "Навыки",
+      "reputation": "Репутация",
       "gathering": "Сбор",
       "crafting": "Ремесло",
       "openProfessions": "Открыть профессии"
+    },
+    "reputation": {
+      "intro": "Все три фракции развиваются одновременно: каждое мировое задание идёт в зачёт фракции своей зоны.",
+      "faction": {
+        "rift_watch": "Дозор Разлома",
+        "church_order": "Церковный орден",
+        "automatons": "Автоматоны"
+      },
+      "hub": {
+        "rift_watch": "Дрифтхейвен",
+        "church_order": "Брат Олдрик",
+        "automatons": "Вирмвотч"
+      },
+      "hubLine": "{hub} . {zone}",
+      "tier": {
+        "unknown": "Незнакомец",
+        "recognized": "Признанный",
+        "trusted": "Доверенный",
+        "proven": "Проверенный",
+        "vanguard": "Авангард",
+        "champion": "Чемпион"
+      },
+      "factionTitle": {
+        "rift_watch": {
+          "unknown": "Чужак",
+          "recognized": "Дозорный",
+          "trusted": "Странник Разлома",
+          "proven": "Хранитель",
+          "vanguard": "Страж Разлома",
+          "champion": "Чемпион"
+        },
+        "church_order": {
+          "unknown": "Чужак",
+          "recognized": "Послушник",
+          "trusted": "Хранитель",
+          "proven": "Храмовник",
+          "vanguard": "Хранитель Рассвета",
+          "champion": "Чемпион"
+        },
+        "automatons": {
+          "unknown": "Чужак",
+          "recognized": "Оператор",
+          "trusted": "Механик",
+          "proven": "Мастер",
+          "vanguard": "Кузнец-мастер",
+          "champion": "Чемпион"
+        }
+      },
+      "progress": "{current} / {next}",
+      "next": "Далее: {tier}",
+      "maxed": "Достигнута высшая репутация",
+      "cappedByLevel": "Репутация остаётся на уровне {tier} до 16-го уровня",
+      "today": "Сегодня",
+      "questsDone": "Выполнено мировых заданий",
+      "questsDoneValue": "{done} / {total}",
+      "resetsIn": "Доска",
+      "resetsUnknown": "Сегодня доски нет",
+      "title": "Титул фракции",
+      "titleLine": "{faction} . {tier}",
+      "legend": "Ступени репутации",
+      "vendorGate": "Требуется {tier} с фракцией {faction}."
     },
     "questLog": {
       "completed": "Завершённые",

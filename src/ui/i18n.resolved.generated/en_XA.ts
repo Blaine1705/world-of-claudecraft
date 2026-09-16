@@ -2310,9 +2310,71 @@ export const en_XA: EnTranslations = {
       "stats": "[Šţáţš]",
       "progression": "[Þŕóĝŕéššíóñ]",
       "skills": "[Šķíļļš]",
+      "reputation": "[Ŕéþúţáţíóñ]",
       "gathering": "[Ĝáţĥéŕíñĝ]",
       "crafting": "[Çŕáƒţíñĝ]",
       "openProfessions": "[Óþéñ Þŕóƒéššíóñš]"
+    },
+    "reputation": {
+      "intro": "[Áļļ ţĥŕéé ƒáçţíóñš þŕóĝŕéšš áţ óñçé: éʋéŕý ŵóŕļð ɋúéšţ çóúñţš ţóŵáŕð ţĥé ƒáçţíóñ óƒ íţš žóñé.]",
+      "faction": {
+        "rift_watch": "[Ŕíƒţ Ŵáţçĥ]",
+        "church_order": "[Çĥúŕçĥ Óŕðéŕ]",
+        "automatons": "[Áúţóɱáţóñš]"
+      },
+      "hub": {
+        "rift_watch": "[Ðŕíƒţĥáʋéñ]",
+        "church_order": "[Ɓŕóţĥéŕ Áļðŕíç]",
+        "automatons": "[Ŵýŕɱŵáţçĥ]"
+      },
+      "hubLine": "[{hub} . {zone}]",
+      "tier": {
+        "unknown": "[Úñķñóŵñ]",
+        "recognized": "[Ŕéçóĝñížéð]",
+        "trusted": "[Ţŕúšţéð]",
+        "proven": "[Þŕóʋéñ]",
+        "vanguard": "[Ʋáñĝúáŕð]",
+        "champion": "[Çĥáɱþíóñ]"
+      },
+      "factionTitle": {
+        "rift_watch": {
+          "unknown": "[Óúţšíðéŕ]",
+          "recognized": "[Ŵáţçĥéŕ]",
+          "trusted": "[Ŕíƒţŵáļķéŕ]",
+          "proven": "[Ŵáŕðéñ]",
+          "vanguard": "[Ŕíƒţŵáŕðéñ]",
+          "champion": "[Çĥáɱþíóñ]"
+        },
+        "church_order": {
+          "unknown": "[Óúţšíðéŕ]",
+          "recognized": "[Áçóļýţé]",
+          "trusted": "[Ķééþéŕ]",
+          "proven": "[Ţéɱþļáŕ]",
+          "vanguard": "[Ðáŵñķééþéŕ]",
+          "champion": "[Çĥáɱþíóñ]"
+        },
+        "automatons": {
+          "unknown": "[Óúţšíðéŕ]",
+          "recognized": "[Óþéŕáţóŕ]",
+          "trusted": "[Ɱéçĥáñíšţ]",
+          "proven": "[Áŕţíƒíçéŕ]",
+          "vanguard": "[Ƒóŕĝéɱášţéŕ]",
+          "champion": "[Çĥáɱþíóñ]"
+        }
+      },
+      "progress": "[{current} / {next}]",
+      "next": "[Ñéẋţ: {tier}]",
+      "maxed": "[Ĥíĝĥéšţ šţáñðíñĝ ŕéáçĥéð]",
+      "cappedByLevel": "[Šţáñðíñĝ þáúšéš áţ {tier} úñţíļ ļéʋéļ 16]",
+      "today": "[Ţóðáý]",
+      "questsDone": "[Ŵóŕļð ɋúéšţš çóɱþļéţéð]",
+      "questsDoneValue": "[{done} / {total}]",
+      "resetsIn": "[Ɓóáŕð]",
+      "resetsUnknown": "[Ñó ƀóáŕð ţóðáý]",
+      "title": "[Ƒáçţíóñ ţíţļé]",
+      "titleLine": "[{faction} . {tier}]",
+      "legend": "[Šţáñðíñĝ ţíéŕš]",
+      "vendorGate": "[Ŕéɋúíŕéš {tier} ŵíţĥ {faction}.]"
     },
     "questLog": {
       "completed": "[Çóɱþļéţéð]",

@@ -2310,9 +2310,71 @@ export const zh_TW: EnTranslations = {
       "stats": "屬性",
       "progression": "進度",
       "skills": "技能",
+      "reputation": "聲望",
       "gathering": "採集",
       "crafting": "製作",
       "openProfessions": "開啟專業"
+    },
+    "reputation": {
+      "intro": "三個陣營同時推進：每個世界任務都會計入其所在區域的陣營。",
+      "faction": {
+        "rift_watch": "裂隙守望",
+        "church_order": "教會修會",
+        "automatons": "機械造物"
+      },
+      "hub": {
+        "rift_watch": "漂流港",
+        "church_order": "奧德里克修士",
+        "automatons": "望龍哨"
+      },
+      "hubLine": "{hub} . {zone}",
+      "tier": {
+        "unknown": "陌生",
+        "recognized": "初識",
+        "trusted": "信任",
+        "proven": "認可",
+        "vanguard": "先鋒",
+        "champion": "冠軍"
+      },
+      "factionTitle": {
+        "rift_watch": {
+          "unknown": "局外人",
+          "recognized": "守望者",
+          "trusted": "裂隙行者",
+          "proven": "守護者",
+          "vanguard": "裂隙守衛",
+          "champion": "冠軍"
+        },
+        "church_order": {
+          "unknown": "局外人",
+          "recognized": "侍僧",
+          "trusted": "守護人",
+          "proven": "聖殿騎士",
+          "vanguard": "晨曦守護者",
+          "champion": "冠軍"
+        },
+        "automatons": {
+          "unknown": "局外人",
+          "recognized": "操作員",
+          "trusted": "機械師",
+          "proven": "工匠",
+          "vanguard": "鍛造大師",
+          "champion": "冠軍"
+        }
+      },
+      "progress": "{current} / {next}",
+      "next": "下一級：{tier}",
+      "maxed": "已達最高聲望",
+      "cappedByLevel": "聲望在{tier}停留，直到 16 級",
+      "today": "今日",
+      "questsDone": "已完成的世界任務",
+      "questsDoneValue": "{done} / {total}",
+      "resetsIn": "任務板",
+      "resetsUnknown": "今日沒有任務板",
+      "title": "陣營頭銜",
+      "titleLine": "{faction} . {tier}",
+      "legend": "聲望等級",
+      "vendorGate": "需要與{faction}達到{tier}。"
     },
     "questLog": {
       "completed": "已完成",

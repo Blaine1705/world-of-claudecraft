@@ -39,6 +39,7 @@ import { craftNameText } from './hud/professions/craft_name_view';
 import { gatheringProfessionNameKey } from './hud/professions/gathering_profession_name';
 import { buildGatheringProficiencyRows } from './hud/professions/gathering_view';
 import { archetypeImageUrl } from './hud/professions/profession_art';
+import { reputationTabHtml } from './hud/reputation';
 import { formatNumber, type TranslationKey, t, tPlural } from './i18n';
 import { iconDataUrl, professionIconUrl, professionImageUrl } from './icons';
 import type { ItemDragState } from './item_drag_state';
@@ -90,6 +91,7 @@ const CHARACTER_SIDEBAR_LABEL_KEYS: Record<CharacterSidebarTab, TranslationKey> 
   stats: 'hudChrome.charSidebar.stats',
   progression: 'hudChrome.charSidebar.progression',
   skills: 'hudChrome.charSidebar.skills',
+  reputation: 'hudChrome.charSidebar.reputation',
 };
 
 const charSidebarTabId = (id: CharacterSidebarTab): string => `char-sidebar-tab-${id}`;
@@ -436,6 +438,7 @@ export class CharWindow {
   private sidebarHtml(world: IWorld, selected: CharacterSidebarTab): string {
     if (selected === 'progression') return this.deps.progressionHtml(world.player.level);
     if (selected === 'skills') return this.skillsHtml(world);
+    if (selected === 'reputation') return reputationTabHtml(world, Date.now());
     const stats = `<div class="stat-panels">${STAT_PANELS.map((panel) => {
       const cellClasses = panel.kind === 'tiles' ? 'ui-stat-row ui-card' : 'ui-stat-row';
       const cells = panel.stats

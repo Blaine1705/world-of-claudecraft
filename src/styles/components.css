@@ -1742,6 +1742,173 @@
   #char-window .char-sidebar {
     min-height: 0;
   }
+  /* The Reputation tab (src/ui/hud/reputation/): one card per faction with the
+     standing pill and the tier bar. Tier colours ride the quality ramp tokens so
+     the ladder reads like item quality; the pill paints keyline text over the
+     tier colour, which stays readable on every preset because the ramp is static. */
+  .char-rep {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    min-height: 0;
+  }
+  .char-rep-intro {
+    margin: 0;
+    font-size: 12px;
+    line-height: 15px;
+    color: var(--color-text-muted);
+  }
+  .char-rep-row {
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    --char-rep-tier: var(--color-quality-poor);
+  }
+  .char-rep-tier-unknown {
+    --char-rep-tier: var(--color-quality-poor);
+  }
+  .char-rep-tier-recognized {
+    --char-rep-tier: var(--color-quality-common);
+  }
+  .char-rep-tier-trusted {
+    --char-rep-tier: var(--color-quality-uncommon);
+  }
+  .char-rep-tier-proven {
+    --char-rep-tier: var(--color-quality-rare);
+  }
+  .char-rep-tier-vanguard {
+    --char-rep-tier: var(--color-quality-epic);
+  }
+  .char-rep-tier-champion {
+    --char-rep-tier: var(--color-quality-legendary);
+  }
+  .char-rep-head {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+  .char-rep-crest {
+    flex: 0 0 28px;
+    width: 28px;
+    height: 32px;
+    border: 2px solid var(--char-rep-tier);
+    border-radius: 4px 4px 14px 14px;
+    background: var(--socket-fill);
+    box-shadow: inset 0 0 8px color-mix(in srgb, var(--color-keyline) 60%, transparent);
+  }
+  .char-rep-copy {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .char-rep-name {
+    font-family: var(--font-display);
+    font-size: 13px;
+    line-height: 16px;
+    letter-spacing: 0.5px;
+    text-shadow: var(--title-shadow);
+    color: var(--color-text-light);
+  }
+  .char-rep-hub,
+  .char-rep-next,
+  .char-rep-progress {
+    font-size: 12px;
+    line-height: 15px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+  }
+  .char-rep-progress {
+    color: var(--color-text-light);
+  }
+  .char-rep-pill {
+    display: inline-flex;
+    align-items: center;
+    height: 20px;
+    padding: 0 8px;
+    border-radius: var(--radius-xs);
+    border: 1px solid color-mix(in srgb, var(--color-keyline) 50%, transparent);
+    background: var(--char-rep-tier);
+    color: var(--color-keyline);
+    font-family: var(--font-display);
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+  .char-rep-bar {
+    position: relative;
+    height: 12px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: var(--radius-xs);
+    background: linear-gradient(var(--color-bar-well-hi), var(--color-bar-well-lo));
+    overflow: hidden;
+  }
+  .char-rep-bar > span {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: var(--char-rep-pct, 0%);
+    background: linear-gradient(
+      180deg,
+      var(--char-rep-tier),
+      color-mix(in srgb, var(--char-rep-tier) 65%, var(--color-keyline))
+    );
+  }
+  .char-rep-foot {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+  }
+  .char-rep-today,
+  .char-rep-title {
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .char-rep-today h3,
+  .char-rep-title h3 {
+    margin: 0 0 2px;
+    font-family: var(--font-display);
+    font-size: 13px;
+    line-height: 18px;
+    letter-spacing: 0.5px;
+    text-shadow: var(--title-shadow);
+    color: var(--color-accent);
+  }
+  .char-rep-kv {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+    font-size: 13px;
+    line-height: 18px;
+  }
+  .char-rep-kv > span {
+    color: var(--color-text-muted);
+  }
+  .char-rep-kv > b {
+    font-weight: 500;
+    color: var(--color-text-light);
+  }
+  .char-rep-title > b {
+    font-family: var(--font-display);
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    text-shadow: var(--title-shadow);
+    color: var(--char-rep-tier, var(--color-text-light));
+  }
+  .char-rep-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--spacing-xs) var(--spacing-sm);
+    margin-top: auto;
+  }
+  .char-rep-legend-pill {
+    height: 18px;
+    padding: 0 6px;
+    font-size: 10px;
+  }
   #char-window .char-equipment-pane {
     display: flex;
     flex-direction: column;

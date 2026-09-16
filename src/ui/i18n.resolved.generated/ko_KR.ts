@@ -2310,9 +2310,71 @@ export const ko_KR: EnTranslations = {
       "stats": "능력치",
       "progression": "진행도",
       "skills": "기술",
+      "reputation": "평판",
       "gathering": "채집",
       "crafting": "제작",
       "openProfessions": "전문 기술 열기"
+    },
+    "reputation": {
+      "intro": "세 세력이 동시에 진행됩니다. 모든 월드 퀘스트는 해당 지역의 세력에 반영됩니다.",
+      "faction": {
+        "rift_watch": "균열 감시단",
+        "church_order": "교회 수도회",
+        "automatons": "오토마톤"
+      },
+      "hub": {
+        "rift_watch": "드리프트헤이븐",
+        "church_order": "알드릭 수사",
+        "automatons": "웜워치"
+      },
+      "hubLine": "{hub} . {zone}",
+      "tier": {
+        "unknown": "미지",
+        "recognized": "인지",
+        "trusted": "신뢰",
+        "proven": "입증",
+        "vanguard": "선봉",
+        "champion": "챔피언"
+      },
+      "factionTitle": {
+        "rift_watch": {
+          "unknown": "외부인",
+          "recognized": "감시자",
+          "trusted": "균열 방랑자",
+          "proven": "수호자",
+          "vanguard": "균열 수호관",
+          "champion": "챔피언"
+        },
+        "church_order": {
+          "unknown": "외부인",
+          "recognized": "시종",
+          "trusted": "수호인",
+          "proven": "성전 기사",
+          "vanguard": "여명 수호자",
+          "champion": "챔피언"
+        },
+        "automatons": {
+          "unknown": "외부인",
+          "recognized": "조작자",
+          "trusted": "기계공",
+          "proven": "장인",
+          "vanguard": "대장장인",
+          "champion": "챔피언"
+        }
+      },
+      "progress": "{current} / {next}",
+      "next": "다음: {tier}",
+      "maxed": "최고 평판 도달",
+      "cappedByLevel": "16레벨까지 평판이 {tier}에서 멈춥니다",
+      "today": "오늘",
+      "questsDone": "완료한 월드 퀘스트",
+      "questsDoneValue": "{done} / {total}",
+      "resetsIn": "게시판",
+      "resetsUnknown": "오늘은 게시판이 없습니다",
+      "title": "세력 칭호",
+      "titleLine": "{faction} . {tier}",
+      "legend": "평판 단계",
+      "vendorGate": "{faction}과(와) {tier} 평판이 필요합니다."
     },
     "questLog": {
       "completed": "완료됨",

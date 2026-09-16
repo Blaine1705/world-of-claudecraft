@@ -13,6 +13,12 @@
 // every player-facing emit site, and fails if any is no longer recognized by a client
 // matcher — so a new unhandled sim string cannot ship silently.
 import { ABILITIES, CLASSES, DELVES, ITEMS, MOBS, ZONES } from '../sim/data';
+import {
+  FACTION_IDS,
+  FACTIONS,
+  STANDING_TIER_LABELS,
+  STANDING_TIERS,
+} from '../sim/factions';
 import { DELVE_MODULE_NAMES } from '../sim/sim';
 import type { EntityKind, PlayerClass } from '../sim/types';
 import { tEntity } from './entity_i18n';
@@ -16666,6 +16672,22 @@ function locTalentTail(s: string): string {
 
 type Rule = { re: RegExp; build: (m: RegExpExecArray) => string };
 const RULES: Rule[] = [
+  // Standing-gated vendor row (src/sim/items.ts buyItem): the sim names the
+  // tier and the faction by their English identifiers; resolve both back to
+  // their ids so the catalog carries the words (hudChrome.reputation.*).
+  {
+    re: /^Requires (.+) with (.+)\.$/,
+    build: (m) => {
+      const tier = STANDING_TIERS.find((id) => STANDING_TIER_LABELS[id] === m[1]);
+      const faction = FACTION_IDS.find((id) => FACTIONS[id].name === m[2]);
+      return t('hudChrome.reputation.vendorGate', {
+        tier: tier ? t(`hudChrome.reputation.tier.${tier}` as TranslationKey) : m[1],
+        faction: faction
+          ? t(`hudChrome.reputation.faction.${faction}` as TranslationKey)
+          : m[2],
+      });
+    },
+  },
   {
     re: /^Your Umbral Anchor is out of range\.$/,
     build: () =>

@@ -2310,9 +2310,71 @@ export const ja_JP: EnTranslations = {
       "stats": "能力値",
       "progression": "進行状況",
       "skills": "スキル",
+      "reputation": "評判",
       "gathering": "採集",
       "crafting": "製作",
       "openProfessions": "職業を開く"
+    },
+    "reputation": {
+      "intro": "3つの勢力は同時に進行します。各ワールドクエストは、その地域の勢力に加算されます。",
+      "faction": {
+        "rift_watch": "リフトの見張り",
+        "church_order": "教会修道会",
+        "automatons": "オートマトン"
+      },
+      "hub": {
+        "rift_watch": "ドリフトヘイヴン",
+        "church_order": "アルドリック修士",
+        "automatons": "ワームウォッチ"
+      },
+      "hubLine": "{hub} . {zone}",
+      "tier": {
+        "unknown": "未知",
+        "recognized": "認知",
+        "trusted": "信頼",
+        "proven": "実証",
+        "vanguard": "先鋒",
+        "champion": "チャンピオン"
+      },
+      "factionTitle": {
+        "rift_watch": {
+          "unknown": "部外者",
+          "recognized": "見張り",
+          "trusted": "リフトウォーカー",
+          "proven": "守護者",
+          "vanguard": "リフトの守り手",
+          "champion": "チャンピオン"
+        },
+        "church_order": {
+          "unknown": "部外者",
+          "recognized": "侍者",
+          "trusted": "守り人",
+          "proven": "聖堂騎士",
+          "vanguard": "暁の守り手",
+          "champion": "チャンピオン"
+        },
+        "automatons": {
+          "unknown": "部外者",
+          "recognized": "操作者",
+          "trusted": "機械技師",
+          "proven": "工匠",
+          "vanguard": "鍛冶頭",
+          "champion": "チャンピオン"
+        }
+      },
+      "progress": "{current} / {next}",
+      "next": "次：{tier}",
+      "maxed": "最高の評判に到達",
+      "cappedByLevel": "レベル16まで評判は{tier}で止まります",
+      "today": "今日",
+      "questsDone": "完了したワールドクエスト",
+      "questsDoneValue": "{done} / {total}",
+      "resetsIn": "掲示板",
+      "resetsUnknown": "今日は掲示板がありません",
+      "title": "勢力の称号",
+      "titleLine": "{faction} . {tier}",
+      "legend": "評判の段階",
+      "vendorGate": "{faction}との評判が{tier}以上必要です。"
     },
     "questLog": {
       "completed": "完了済み",
