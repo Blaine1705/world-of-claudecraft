@@ -260,6 +260,8 @@ describe('char_window: profession art placements', () => {
       ['stats', 'true'],
       ['progression', 'false'],
       ['skills', 'false'],
+      ['reputation', 'false'],
+      ['currencies', 'false'],
     ]);
     // The sidebar panel scrolls and the Stats board holds no focusable
     // content, so it carries its own tab stop and takes its name from the
@@ -1008,6 +1010,8 @@ describe('char_window: lifetime Time Played line (issue: character-sheet playtim
       attachTooltip,
     });
     win.render();
+    // Playtime lives on the Progression tab now; the sheet opens on Stats.
+    root.querySelector<HTMLButtonElement>('#char-sidebar-tab-progression')?.click();
     return { root, togglePlaytimeVisible, restoreFocus, attachTooltip };
   }
 

@@ -320,7 +320,7 @@ export class CharWindow {
         </div>
         <div class="equip-col equip-col-right" id="equip-col-right"></div>
         <div class="equip-row-weapons" id="equip-row-weapons"></div>
-      </div>${this.masterwroughtSlotsHtml(world)}<div class="ui-divider char-footer-divider"></div><footer class="char-footer">${this.playtimeHtml(world)}<div class="pc-share-row"><button type="button" class="btn ui-btn char-cosmetics-btn" data-act="open-cosmetics">${esc(t('hudChrome.cosmetics.title'))}</button><button type="button" class="pc-share-btn ui-btn ui-btn--red" data-act="share-card">${SHARE_GLYPH}<span>${esc(t('playerCard.shareButton'))}</span></button></div></footer></section>`;
+      </div>${this.masterwroughtSlotsHtml(world)}<div class="ui-divider char-footer-divider"></div><footer class="char-footer"><div class="pc-share-row"><button type="button" class="btn ui-btn char-cosmetics-btn" data-act="open-cosmetics">${esc(t('hudChrome.cosmetics.title'))}</button><button type="button" class="pc-share-btn ui-btn ui-btn--red" data-act="share-card">${SHARE_GLYPH}<span>${esc(t('playerCard.shareButton'))}</span></button></div></footer></section>`;
     html += `<section class="char-sidebar">${tabStripHtml(
       tabStripModel({
         ariaLabel: t('hudChrome.charSidebar.label'),
@@ -438,7 +438,10 @@ export class CharWindow {
   }
 
   private sidebarHtml(world: IWorld, selected: CharacterSidebarTab): string {
-    if (selected === 'progression') return this.deps.progressionHtml(world.player.level);
+    // Playtime lives with the rest of the character's progression readouts
+    // (the footer keeps only the share and cosmetics actions).
+    if (selected === 'progression')
+      return this.deps.progressionHtml(world.player.level) + this.playtimeHtml(world);
     if (selected === 'skills') return this.skillsHtml(world);
     if (selected === 'reputation') return reputationTabHtml(world, Date.now());
     if (selected === 'currencies') return currenciesTabHtml(world);
