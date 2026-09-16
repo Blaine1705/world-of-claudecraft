@@ -3,7 +3,7 @@
 // Zero RNG, zero wall-clock, zero DOM/Three.js imports.
 
 import type { FactionId, StandingTier } from '../factions';
-import { FACTION_IDS, STANDING_THRESHOLDS } from '../factions';
+import { STANDING_THRESHOLDS } from '../factions';
 import type { ItemDef, NpcDef } from '../types';
 
 export interface FactionVendorGate {
@@ -160,6 +160,7 @@ export const FACTION_VENDOR_ITEMS: Record<string, ItemDef> = {
     critRating: 12,
     sellValue: 20000,
     buyValue: 80000,
+    requiredClass: ['warrior', 'rogue', 'hunter', 'shaman', 'paladin'],
   },
   champion_rift_band: {
     id: 'champion_rift_band',
@@ -208,6 +209,7 @@ export const FACTION_VENDOR_ITEMS: Record<string, ItemDef> = {
     stats: { armor: 110, sta: 7, str: 5 },
     sellValue: 8750,
     buyValue: 35000,
+    requiredClass: ['warrior', 'paladin', 'shaman'],
   },
   dawnkeeper_consecrated_mace: {
     id: 'dawnkeeper_consecrated_mace',
@@ -221,6 +223,7 @@ export const FACTION_VENDOR_ITEMS: Record<string, ItemDef> = {
     healPower: 15,
     sellValue: 20000,
     buyValue: 80000,
+    requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
   },
   champion_dawn_medallion: {
     id: 'champion_dawn_medallion',
@@ -278,6 +281,7 @@ export const FACTION_VENDOR_ITEMS: Record<string, ItemDef> = {
     critRating: 10,
     sellValue: 20000,
     buyValue: 80000,
+    requiredClass: ['warrior', 'rogue', 'hunter', 'shaman', 'paladin'],
   },
   champion_forged_loop: {
     id: 'champion_forged_loop',
