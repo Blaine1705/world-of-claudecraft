@@ -10,6 +10,7 @@
 // which src/render/ must never import.
 
 import type { DelveRunInfo } from '../../world_api/delves';
+import type { RiftFloorView } from '../../world_api/dungeons';
 import { delveModuleZOffset as delveModuleZOffsetLayout } from '../data';
 import { DELVE_MODULE_LAYOUTS, type DelveModuleId } from '../delve_layout';
 import { DUNGEON_WALL_HW, DUNGEON_WALL_X } from '../dungeon_layout';
@@ -207,4 +208,17 @@ export function delveMotionState(net: {
     ? delveDoorClampSolidsFromEntities(net.entities.values())
     : EMPTY_DELVE_SOLIDS;
   return { delveRun, delveSolids };
+}
+
+/** Bundles the rift-floor descriptor in beside the delve state above for
+ *  SelfMotionFrameBuffer.write()'s one trailing arg (src/game/self_motion_frame_buffer.ts
+ *  InstancedMotionState, matched structurally, not imported: that module lives
+ *  in src/game/, which src/sim/ never imports). A function call, not an
+ *  object-literal expression, so src/main.ts's animation-frame hot path stays
+ *  clean of direct allocation syntax (tests/client_frame_allocations.test.ts). */
+export function instancedMotionState(
+  riftFloor: RiftFloorView | null,
+  delve: DelveMotionState,
+): DelveMotionState & { riftFloor: RiftFloorView | null } {
+  return { riftFloor, delveRun: delve.delveRun, delveSolids: delve.delveSolids };
 }

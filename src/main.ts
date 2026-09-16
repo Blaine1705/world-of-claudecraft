@@ -396,7 +396,7 @@ import {
   setActiveWorldContent,
   ZONES,
 } from './sim/data';
-import { delveMotionState } from './sim/delves/geometry';
+import { delveMotionState, instancedMotionState } from './sim/delves/geometry';
 import { canEquipItem } from './sim/equipment_rules';
 import { MARKET_HOUSE_STOCK } from './sim/market';
 import { bagOwnedMounts } from './sim/mounts';
@@ -4660,7 +4660,7 @@ async function startGame(
               frameDt,
               Math.max(0, cameraLastSnapAge),
               net.snapInterval,
-              { riftFloor: net.riftFloor, ...delveMotionState(net) },
+              instancedMotionState(net.riftFloor, delveMotionState(net)),
             );
     traceStart = perf.startTrace();
     try {
