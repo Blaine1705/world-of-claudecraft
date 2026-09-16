@@ -172,7 +172,6 @@ export interface CharWindowDeps extends Omit<PainterHostPresentation, 'itemToolt
   slotName(slot: EquipSlot): string;
   statCellHtml(stat: StatId): string;
   statTooltipHtml(stat: StatId): string;
-  talentSummaryHtml(): string;
   progressionHtml(level: number): string;
   /** Remove the equipped piece in `slot` to bags and repaint bags + the sheet. */
   unequip(slot: EquipSlot): void;
@@ -449,11 +448,7 @@ export class CharWindow {
     // Playtime lives with the rest of the character's progression readouts
     // (the footer keeps only the share and cosmetics actions).
     if (selected === 'progression')
-      return (
-        this.deps.progressionHtml(world.player.level) +
-        this.deps.talentSummaryHtml() +
-        this.playtimeHtml(world)
-      );
+      return this.deps.progressionHtml(world.player.level) + this.playtimeHtml(world);
     if (selected === 'skills') return this.skillsHtml(world);
     if (selected === 'reputation') return reputationTabHtml(world, Date.now());
     if (selected === 'currencies') return currenciesTabHtml(world);

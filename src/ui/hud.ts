@@ -198,7 +198,7 @@ import { charSheetRefreshSigFor } from './char_sheet_sig_core';
 import { type CharSkinPainterHost, paintCharSkinPicker } from './char_skin_window';
 import { archetypeTitleText, CharWindow, craftNameText } from './char_window';
 import { activeCharacterAppearancePreview } from './character_appearance';
-import { progressionHtml, talentSummaryHtml } from './character_progression_view';
+import { progressionHtml } from './character_progression_view';
 import { chatBubbleStyle } from './chat_bubble_style';
 import {
   ignoreKey,
@@ -5657,7 +5657,6 @@ export class Hud {
     slotName: (slot) => itemSlotName(slot),
     statCellHtml: (stat) => statCellHtml(this.statModel(stat), STAT_VIEW_DEPS, { colon: false }),
     statTooltipHtml: (stat) => statTooltipHtml(this.statModel(stat), STAT_VIEW_DEPS),
-    talentSummaryHtml: () => talentSummaryHtml(this.sim),
     progressionHtml: (level) => progressionHtml(this.sim, level),
     unequip: (slot) => {
       this.sim.unequipItem(slot);
