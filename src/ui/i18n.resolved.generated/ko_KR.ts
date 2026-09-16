@@ -2311,9 +2311,26 @@ export const ko_KR: EnTranslations = {
       "progression": "진행도",
       "skills": "기술",
       "reputation": "평판",
+      "currencies": "화폐",
       "gathering": "채집",
       "crafting": "제작",
       "openProfessions": "전문 기술 열기"
+    },
+    "currencies": {
+      "intro": "모두 가방 칸을 차지하지 않습니다. 동전은 늘 그렇듯 가방에 있습니다.",
+      "activities": "활동",
+      "factions": "세력",
+      "honor": "명예",
+      "delveMark": "델브 징표",
+      "wocToken": "WoC 토큰",
+      "heroicMarkNote": "영웅 던전 . 영웅 보급관에게서 사용",
+      "honorNote": "전장과 투기장",
+      "delveMarkNote": "완료한 델브",
+      "wocTokenNote": "연동된 지갑 잔액",
+      "walletNotLinked": "연동된 지갑 없음",
+      "wocPreview": "미검증 미리보기 잔액",
+      "lifetime": "누적 {amount}",
+      "factionPending": "세력 화폐: 2단계에서 결정"
     },
     "reputation": {
       "intro": "세 세력이 동시에 진행됩니다. 모든 월드 퀘스트는 해당 지역의 세력에 반영됩니다.",

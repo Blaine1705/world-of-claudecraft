@@ -2311,9 +2311,26 @@ export const it_IT: EnTranslations = {
       "progression": "Progressione",
       "skills": "Competenze",
       "reputation": "Reputation",
+      "currencies": "Currencies",
       "gathering": "Assembramento",
       "crafting": "Creazione",
       "openProfessions": "Professioni aperte"
+    },
+    "currencies": {
+      "intro": "None of these take bag space. Coin stays in your bag as always.",
+      "activities": "Activities",
+      "factions": "Factions",
+      "honor": "Honor",
+      "delveMark": "Delve Mark",
+      "wocToken": "WoC Token",
+      "heroicMarkNote": "Heroic dungeons . spend at the heroic quartermaster",
+      "honorNote": "Battlegrounds and the arena",
+      "delveMarkNote": "Delves completed",
+      "wocTokenNote": "Linked wallet balance",
+      "walletNotLinked": "No wallet linked",
+      "wocPreview": "Preview balance, not yet verified",
+      "lifetime": "Lifetime {amount}",
+      "factionPending": "Faction currency: pending Stage 2"
     },
     "reputation": {
       "intro": "All three factions progress at once: every world quest counts toward the faction of its zone.",

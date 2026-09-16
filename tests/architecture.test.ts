@@ -240,6 +240,8 @@ const UI_PURE_CORES = [
   'src/ui/world_quest_trace_view.ts',
   // The Reputation tab's rows and day summary (src/ui/hud/reputation/).
   'src/ui/hud/reputation/reputation_view.ts',
+  // The Currencies tab's balances (src/ui/hud/currencies/).
+  'src/ui/hud/currencies/currencies_view.ts',
   // The map rail's world-quest section: the character's board, the shared
   // selection and the daily replacement's availability (src/ui/hud/map/).
   'src/ui/hud/map/world_quest_rail_view.ts',

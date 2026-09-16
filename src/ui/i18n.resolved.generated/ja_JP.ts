@@ -2311,9 +2311,26 @@ export const ja_JP: EnTranslations = {
       "progression": "進行状況",
       "skills": "スキル",
       "reputation": "評判",
+      "currencies": "通貨",
       "gathering": "採集",
       "crafting": "製作",
       "openProfessions": "職業を開く"
+    },
+    "currencies": {
+      "intro": "いずれもバッグの枠を使いません。コインはこれまで通りバッグにあります。",
+      "activities": "アクティビティ",
+      "factions": "勢力",
+      "honor": "名誉",
+      "delveMark": "デルブの印",
+      "wocToken": "WoCトークン",
+      "heroicMarkNote": "ヒロイックダンジョン . ヒロイック補給官で使用",
+      "honorNote": "戦場とアリーナ",
+      "delveMarkNote": "完了したデルブ",
+      "wocTokenNote": "連携済みウォレットの残高",
+      "walletNotLinked": "ウォレット未連携",
+      "wocPreview": "プレビュー残高（未検証）",
+      "lifetime": "累計 {amount}",
+      "factionPending": "勢力通貨：第2段階で決定"
     },
     "reputation": {
       "intro": "3つの勢力は同時に進行します。各ワールドクエストは、その地域の勢力に加算されます。",

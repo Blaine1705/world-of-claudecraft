@@ -2311,9 +2311,26 @@ export const zh_CN: EnTranslations = {
       "progression": "进度",
       "skills": "技能",
       "reputation": "声望",
+      "currencies": "货币",
       "gathering": "采集",
       "crafting": "制作",
       "openProfessions": "打开专业"
+    },
+    "currencies": {
+      "intro": "这些都不占背包空间。金币照旧放在背包里。",
+      "activities": "活动",
+      "factions": "阵营",
+      "honor": "荣誉",
+      "delveMark": "探险印记",
+      "wocToken": "WoC 代币",
+      "heroicMarkNote": "英雄地下城 . 在英雄军需官处兑换",
+      "honorNote": "战场与竞技场",
+      "delveMarkNote": "已完成的探险",
+      "wocTokenNote": "已关联钱包的余额",
+      "walletNotLinked": "未关联钱包",
+      "wocPreview": "预览余额，尚未验证",
+      "lifetime": "累计 {amount}",
+      "factionPending": "阵营货币：待第二阶段"
     },
     "reputation": {
       "intro": "三个阵营同时推进：每个世界任务都会计入其所在区域的阵营。",

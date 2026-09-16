@@ -2311,9 +2311,26 @@ export const ru_RU: EnTranslations = {
       "progression": "Прогресс",
       "skills": "Навыки",
       "reputation": "Репутация",
+      "currencies": "Валюты",
       "gathering": "Сбор",
       "crafting": "Ремесло",
       "openProfessions": "Открыть профессии"
+    },
+    "currencies": {
+      "intro": "Ничто из этого не занимает место в сумке. Монеты остаются в сумке, как и раньше.",
+      "activities": "Активности",
+      "factions": "Фракции",
+      "honor": "Честь",
+      "delveMark": "Знак вылазки",
+      "wocToken": "Токен WoC",
+      "heroicMarkNote": "Героические подземелья . тратится у героического интенданта",
+      "honorNote": "Поля боя и арена",
+      "delveMarkNote": "Пройденные вылазки",
+      "wocTokenNote": "Баланс привязанного кошелька",
+      "walletNotLinked": "Кошелёк не привязан",
+      "wocPreview": "Предварительный баланс, ещё не подтверждён",
+      "lifetime": "Всего {amount}",
+      "factionPending": "Валюта фракции: ожидает этапа 2"
     },
     "reputation": {
       "intro": "Все три фракции развиваются одновременно: каждое мировое задание идёт в зачёт фракции своей зоны.",

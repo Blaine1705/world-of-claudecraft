@@ -2924,9 +2924,29 @@ export const hudChromeStrings = {
     progression: 'Progression',
     skills: 'Skills',
     reputation: 'Reputation',
+    currencies: 'Currencies',
     gathering: 'Gathering',
     crafting: 'Crafting',
     openProfessions: 'Open Professions',
+  },
+  // The Currencies tab (src/ui/hud/currencies/): every spendable balance that
+  // is not coin. The faction rows stay pending until the World Quests scope's
+  // Stage 2 chooses the currency model.
+  currencies: {
+    intro: 'None of these take bag space. Coin stays in your bag as always.',
+    activities: 'Activities',
+    factions: 'Factions',
+    honor: 'Honor',
+    delveMark: 'Delve Mark',
+    wocToken: 'WoC Token',
+    heroicMarkNote: 'Heroic dungeons . spend at the heroic quartermaster',
+    honorNote: 'Battlegrounds and the arena',
+    delveMarkNote: 'Delves completed',
+    wocTokenNote: 'Linked wallet balance',
+    walletNotLinked: 'No wallet linked',
+    wocPreview: 'Preview balance, not yet verified',
+    lifetime: 'Lifetime {amount}',
+    factionPending: 'Faction currency: pending Stage 2',
   },
   // The Reputation tab (src/ui/hud/reputation/). Faction and tier names are
   // PROVISIONAL: the World Quests scope leaves the final names to narrative.

@@ -2311,9 +2311,26 @@ export const zh_TW: EnTranslations = {
       "progression": "進度",
       "skills": "技能",
       "reputation": "聲望",
+      "currencies": "貨幣",
       "gathering": "採集",
       "crafting": "製作",
       "openProfessions": "開啟專業"
+    },
+    "currencies": {
+      "intro": "這些都不佔背包空間。金幣照舊放在背包裡。",
+      "activities": "活動",
+      "factions": "陣營",
+      "honor": "榮譽",
+      "delveMark": "探險印記",
+      "wocToken": "WoC 代幣",
+      "heroicMarkNote": "英雄地下城 . 在英雄軍需官處兌換",
+      "honorNote": "戰場與競技場",
+      "delveMarkNote": "已完成的探險",
+      "wocTokenNote": "已連結錢包的餘額",
+      "walletNotLinked": "未連結錢包",
+      "wocPreview": "預覽餘額，尚未驗證",
+      "lifetime": "累計 {amount}",
+      "factionPending": "陣營貨幣：待第二階段"
     },
     "reputation": {
       "intro": "三個陣營同時推進：每個世界任務都會計入其所在區域的陣營。",

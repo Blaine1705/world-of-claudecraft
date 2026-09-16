@@ -1909,6 +1909,104 @@
     padding: 0 6px;
     font-size: 10px;
   }
+  /* The Currencies tab (src/ui/hud/currencies/): grouped rows, icon, name and
+     note on the left, the amount (and a lifetime or preview line) on the right.
+     Pending faction rows keep the same row shape at muted strength. */
+  .char-cur {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    min-height: 0;
+  }
+  .char-cur-intro {
+    margin: 0;
+    font-size: 12px;
+    line-height: 15px;
+    color: var(--color-text-muted);
+  }
+  .char-cur-group {
+    overflow: hidden;
+  }
+  .char-cur-group h3 {
+    margin: 0;
+    padding: 7px 12px;
+    font-family: var(--font-display);
+    font-size: 13px;
+    line-height: 18px;
+    letter-spacing: 0.5px;
+    text-shadow: var(--title-shadow);
+    color: var(--color-accent);
+    border-bottom: 1px solid var(--color-border-showcase);
+    background: color-mix(in srgb, var(--color-keyline) 20%, transparent);
+  }
+  .char-cur-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: 8px 12px;
+    border-bottom: 1px solid color-mix(in srgb, var(--color-border-showcase) 60%, transparent);
+  }
+  .char-cur-row:last-child {
+    border-bottom: 0;
+  }
+  .char-cur-row.is-pending {
+    color: var(--color-text-muted);
+  }
+  .char-cur-icon {
+    flex: 0 0 28px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .char-cur-icon .currency-inline {
+    width: 28px;
+    height: 28px;
+  }
+  .char-cur-icon-empty {
+    box-sizing: border-box;
+    border: 1px dashed var(--color-control-border);
+    border-radius: var(--radius-socket);
+    opacity: 0.6;
+  }
+  .char-cur-copy {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .char-cur-copy > b {
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 18px;
+  }
+  .char-cur-note,
+  .char-cur-lifetime {
+    font-size: 12px;
+    line-height: 15px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+  }
+  .char-cur-value {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    text-align: right;
+  }
+  .char-cur-amount {
+    font-family: var(--font-display);
+    font-size: 16px;
+    line-height: 20px;
+    color: var(--color-quality-default);
+  }
+  .char-cur-amount.is-muted {
+    font-family: var(--font-ui);
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
   #char-window .char-equipment-pane {
     display: flex;
     flex-direction: column;
