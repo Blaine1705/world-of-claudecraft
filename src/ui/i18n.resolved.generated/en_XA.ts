@@ -17062,6 +17062,51 @@ export const en_XA: EnTranslations = {
       },
       "varkhul_emberward": {
         "name": "[Éɱƀéŕŵáŕð, Ɓúļŵáŕķ óƒ Ʋáŕķĥúļ]"
+      },
+      "rift_watchers_band": {
+        "name": "[Ŕíƒţ Ŵáţçĥéŕ'š Ɓáñð]"
+      },
+      "rift_surveyors_satchel": {
+        "name": "[Ŕíƒţ Šúŕʋéýóŕ'š Šáţçĥéļ]"
+      },
+      "riftwalkers_tunic": {
+        "name": "[Ŕíƒţŵáļķéŕ'š Ţúñíç]"
+      },
+      "riftwarden_voidblade": {
+        "name": "[Ŕíƒţŵáŕðéñ'š Ʋóíðƀļáðé]"
+      },
+      "champion_rift_band": {
+        "name": "[Çĥáɱþíóñ'š Ŕíƒţ Ɓáñð]"
+      },
+      "order_prayer_beads": {
+        "name": "[Óŕðéŕ Þŕáýéŕ Ɓéáðš]"
+      },
+      "vestments_of_the_acolyte": {
+        "name": "[Ʋéšţɱéñţš óƒ ţĥé Áçóļýţé]"
+      },
+      "templar_dawn_shield": {
+        "name": "[Ţéɱþļáŕ'š Ðáŵñ Šĥíéļð]"
+      },
+      "dawnkeeper_consecrated_mace": {
+        "name": "[Ðáŵñķééþéŕ'š Çóñšéçŕáţéð Ɱáçé]"
+      },
+      "champion_dawn_medallion": {
+        "name": "[Çĥáɱþíóñ'š Ðáŵñ Ɱéðáļļíóñ]"
+      },
+      "automaton_cog_ring": {
+        "name": "[Áúţóɱáţóñ Çóĝ Ŕíñĝ]"
+      },
+      "clockwork_tinkers_pack": {
+        "name": "[Çļóçķŵóŕķ Ţíñķéŕ'š Þáçķ]"
+      },
+      "artificers_welding_cowl": {
+        "name": "[Áŕţíƒíçéŕ'š Ŵéļðíñĝ Çóŵļ]"
+      },
+      "forgemaster_crag_cleaver": {
+        "name": "[Ƒóŕĝéɱášţéŕ'š Çŕáĝ Çļéáʋéŕ]"
+      },
+      "champion_forged_loop": {
+        "name": "[Çĥáɱþíóñ'š Ƒóŕĝéð Ļóóþ]"
       }
     },
     "mobs": {
