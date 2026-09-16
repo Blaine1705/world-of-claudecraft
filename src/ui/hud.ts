@@ -2363,6 +2363,15 @@ export class Hud {
       click: () => audio.click(),
       onRepaintMap: () => this.repaintOpenMap(),
       onShowRoute: (route) => this.showFinderOnMap(route.x, route.z),
+      worldQuests: {
+        selectedId: () => this.mapMarkerInteraction.selectedWorldQuestId,
+        select: (questId) => {
+          this.mapMarkerInteraction.selectWorldQuest(questId);
+        },
+        confirmDialog: (title, body, okText, cancelText, onOk) =>
+          this.confirmDialog(title, body, okText, cancelText, onOk),
+        nowMs: () => Date.now(),
+      },
     });
     this.fiesta = new FiestaController({
       document,

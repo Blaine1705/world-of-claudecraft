@@ -8276,6 +8276,37 @@ export const hudChromeStrings = {
     // the quest log's per-quest toggle, which is the way back from untracked.
     untrack: 'Untrack',
     track: 'Track',
+    // The rail's world-quest section (src/ui/hud/map/world_quest_rail_*): the
+    // day's board, the shared marker selection, and the one daily replacement,
+    // which always confirms before it reaches the world. The refusal reasons
+    // re-localize the sim's canRerollWorldQuest texts by identity.
+    worldQuests: {
+      heading: 'World quests today',
+      count: '{done} / {total}',
+      empty: 'No world quests today',
+      replacement: 'Replacement',
+      state: {
+        active: 'In progress',
+        completed: 'Done',
+      },
+      reroll: 'Replace quest',
+      rerollNote: 'One replacement available today',
+      rerollUsed: 'Replacement used today',
+      rerollReason: {
+        noCycle: 'No board today',
+        usedToday: 'Replacement used today',
+        completed: 'A completed quest cannot be replaced',
+        inProgress: 'A quest in progress cannot be replaced',
+        notActive: 'This quest is not on your board',
+        noAlternative: 'No other quest is available in that zone today',
+        unknown: 'This quest cannot be replaced today',
+      },
+      confirmTitle: 'Replace this world quest?',
+      confirmBody:
+        'You can replace only one world quest a day, and it cannot be undone. {quest} will be swapped for another quest in its zone.',
+      confirmOk: 'Replace',
+      confirmCancel: 'Cancel',
+    },
     legend: {
       dungeon: 'Dungeon',
       ore: 'Ore',

@@ -5526,6 +5526,32 @@ export const zh_CN: EnTranslations = {
       "showRoute": "显示路线",
       "untrack": "取消追踪",
       "track": "追踪",
+      "worldQuests": {
+        "heading": "今日世界任务",
+        "count": "{done} / {total}",
+        "empty": "今日没有世界任务",
+        "replacement": "替换",
+        "state": {
+          "active": "进行中",
+          "completed": "已完成"
+        },
+        "reroll": "替换任务",
+        "rerollNote": "今日还可替换一次",
+        "rerollUsed": "今日已使用替换",
+        "rerollReason": {
+          "noCycle": "今日没有任务板",
+          "usedToday": "今日已使用替换",
+          "completed": "已完成的任务无法替换",
+          "inProgress": "进行中的任务无法替换",
+          "notActive": "此任务不在你的任务板上",
+          "noAlternative": "今日该区域没有其他可用任务",
+          "unknown": "此任务今日无法替换"
+        },
+        "confirmTitle": "要替换这个世界任务吗？",
+        "confirmBody": "每天只能替换一个世界任务，且无法撤销。{quest}将被换成该区域的另一个任务。",
+        "confirmOk": "替换",
+        "confirmCancel": "取消"
+      },
       "legend": {
         "dungeon": "地下城",
         "ore": "矿石",

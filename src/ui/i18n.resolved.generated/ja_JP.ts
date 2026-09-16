@@ -5526,6 +5526,32 @@ export const ja_JP: EnTranslations = {
       "showRoute": "ルートを表示",
       "untrack": "追跡を解除",
       "track": "追跡",
+      "worldQuests": {
+        "heading": "今日のワールドクエスト",
+        "count": "{done} / {total}",
+        "empty": "今日はワールドクエストがありません",
+        "replacement": "差し替え",
+        "state": {
+          "active": "進行中",
+          "completed": "完了"
+        },
+        "reroll": "クエストを差し替える",
+        "rerollNote": "今日はあと1回差し替えできます",
+        "rerollUsed": "今日の差し替えは使用済みです",
+        "rerollReason": {
+          "noCycle": "今日は掲示板がありません",
+          "usedToday": "今日の差し替えは使用済みです",
+          "completed": "完了したクエストは差し替えできません",
+          "inProgress": "進行中のクエストは差し替えできません",
+          "notActive": "このクエストはあなたの掲示板にありません",
+          "noAlternative": "今日はその地域に他のクエストがありません",
+          "unknown": "このクエストは今日は差し替えできません"
+        },
+        "confirmTitle": "このワールドクエストを差し替えますか？",
+        "confirmBody": "ワールドクエストの差し替えは1日1回だけで、元に戻せません。{quest}は同じ地域の別のクエストに差し替えられます。",
+        "confirmOk": "差し替える",
+        "confirmCancel": "キャンセル"
+      },
       "legend": {
         "dungeon": "ダンジョン",
         "ore": "鉱石",

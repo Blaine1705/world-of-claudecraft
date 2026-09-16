@@ -45,6 +45,7 @@ import type {
 } from '../sim/types';
 import type { Decoration } from '../sim/world';
 import { WORLD_BOSSES, worldBossLockoutId } from '../sim/world_boss';
+import { playerActiveWorldQuests } from '../sim/world_quest_reroll';
 import { activeWorldQuestsForCycle } from '../sim/world_quest_rotation';
 import type { FriendInfo, IWorld } from '../world_api';
 import { buildCastlePlanMarkers, type CastlePlanMarker } from './castle_plan_core';
@@ -1057,7 +1058,12 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
   // never sends wqday, so a newer client must not advertise phantom objectives.
   const worldQuests: MapWorldQuestMarker[] = [];
   const playerLevel = Number.isFinite(p.level) ? p.level : 0;
-  for (const quest of activeWorldQuestsForCycle(world.worldQuestCycle)) {
+  // The character's board, not the bare rotation: a rerolled slot shows its
+  // replacement here exactly as the rail and the sim's credit path see it.
+  for (const quest of playerActiveWorldQuests({
+    worldQuestCycle: world.worldQuestCycle,
+    worldQuestReplacements: { ...(world.worldQuestReplacements ?? {}) },
+  })) {
     if (quest.zoneId !== zone.id || playerLevel < quest.minLevel) continue;
     const progress = world.worldQuestLog?.get(quest.id);
     if (progress?.state === 'completed') continue;

@@ -17181,6 +17181,28 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.marketWindow.mixedListingsFooter':
     '商人はコモンの商品を補充し、プレイヤーの出品は希望価格でその隣に並びます。',
   'hudChrome.mapAtlas.track': '追跡',
+  'hudChrome.mapAtlas.worldQuests.heading': '今日のワールドクエスト',
+  'hudChrome.mapAtlas.worldQuests.empty': '今日はワールドクエストがありません',
+  'hudChrome.mapAtlas.worldQuests.replacement': '差し替え',
+  'hudChrome.mapAtlas.worldQuests.state.active': '進行中',
+  'hudChrome.mapAtlas.worldQuests.state.completed': '完了',
+  'hudChrome.mapAtlas.worldQuests.reroll': 'クエストを差し替える',
+  'hudChrome.mapAtlas.worldQuests.rerollNote': '今日はあと1回差し替えできます',
+  'hudChrome.mapAtlas.worldQuests.rerollUsed': '今日の差し替えは使用済みです',
+  'hudChrome.mapAtlas.worldQuests.rerollReason.noCycle': '今日は掲示板がありません',
+  'hudChrome.mapAtlas.worldQuests.rerollReason.usedToday': '今日の差し替えは使用済みです',
+  'hudChrome.mapAtlas.worldQuests.rerollReason.completed': '完了したクエストは差し替えできません',
+  'hudChrome.mapAtlas.worldQuests.rerollReason.inProgress': '進行中のクエストは差し替えできません',
+  'hudChrome.mapAtlas.worldQuests.rerollReason.notActive':
+    'このクエストはあなたの掲示板にありません',
+  'hudChrome.mapAtlas.worldQuests.rerollReason.noAlternative':
+    '今日はその地域に他のクエストがありません',
+  'hudChrome.mapAtlas.worldQuests.rerollReason.unknown': 'このクエストは今日は差し替えできません',
+  'hudChrome.mapAtlas.worldQuests.confirmTitle': 'このワールドクエストを差し替えますか？',
+  'hudChrome.mapAtlas.worldQuests.confirmBody':
+    'ワールドクエストの差し替えは1日1回だけで、元に戻せません。{quest}は同じ地域の別のクエストに差し替えられます。',
+  'hudChrome.mapAtlas.worldQuests.confirmOk': '差し替える',
+  'hudChrome.mapAtlas.worldQuests.confirmCancel': 'キャンセル',
   'hudChrome.mapAtlas.level': 'レベル {level}',
   'hudChrome.mapAtlas.landmarkCount': 'ランドマーク {count} 個',
   'hudChrome.mapAtlas.filtersAria': 'マップレイヤー',

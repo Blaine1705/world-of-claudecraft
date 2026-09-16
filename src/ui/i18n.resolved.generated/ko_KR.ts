@@ -5526,6 +5526,32 @@ export const ko_KR: EnTranslations = {
       "showRoute": "경로 표시",
       "untrack": "추적 해제",
       "track": "추적",
+      "worldQuests": {
+        "heading": "오늘의 월드 퀘스트",
+        "count": "{done} / {total}",
+        "empty": "오늘은 월드 퀘스트가 없습니다",
+        "replacement": "교체됨",
+        "state": {
+          "active": "진행 중",
+          "completed": "완료"
+        },
+        "reroll": "퀘스트 교체",
+        "rerollNote": "오늘 교체 1회 가능",
+        "rerollUsed": "오늘 교체를 사용했습니다",
+        "rerollReason": {
+          "noCycle": "오늘은 게시판이 없습니다",
+          "usedToday": "오늘 교체를 사용했습니다",
+          "completed": "완료한 퀘스트는 교체할 수 없습니다",
+          "inProgress": "진행 중인 퀘스트는 교체할 수 없습니다",
+          "notActive": "이 퀘스트는 내 게시판에 없습니다",
+          "noAlternative": "오늘 그 지역에는 다른 퀘스트가 없습니다",
+          "unknown": "이 퀘스트는 오늘 교체할 수 없습니다"
+        },
+        "confirmTitle": "이 월드 퀘스트를 교체할까요?",
+        "confirmBody": "월드 퀘스트는 하루에 하나만 교체할 수 있으며 되돌릴 수 없습니다. {quest}이(가) 같은 지역의 다른 퀘스트로 바뀝니다.",
+        "confirmOk": "교체",
+        "confirmCancel": "취소"
+      },
       "legend": {
         "dungeon": "던전",
         "ore": "광석",

@@ -45,6 +45,8 @@ import {
 } from '../src/sim/types';
 import type { Decoration } from '../src/sim/world';
 import { WORLD_BOSSES, worldBossLockoutId } from '../src/sim/world_boss';
+import { worldQuestCycleForResetDay } from '../src/sim/world_quest_rotation';
+import { activeWorldQuestsForCycle } from '../src/sim/world_quests';
 import { isNodeToolLockedFor } from '../src/ui/hud/professions/gathering_view';
 import { STABLE_MAP_NAVIGATION_LANDMARKS } from '../src/ui/map_navigation_landmarks_core';
 import {
@@ -290,6 +292,28 @@ describe('buildOverworldMapModel (pure draw model)', () => {
     const fromSim = buildOverworldMapModel(input(sim, 3));
     const fromClient = buildOverworldMapModel(input(client, 3));
     expect(fromSim).toEqual(fromClient);
+  });
+
+  it('draws a rerolled slot as its replacement, never the quest it replaced', () => {
+    const cycle = worldQuestCycleForResetDay('2026-08-31');
+    const replaced = activeWorldQuestsForCycle(cycle).find((quest) => quest.zoneId === ZONE.id);
+    const replacement = WORLD_QUESTS.find(
+      (quest) => quest.zoneId === ZONE.id && quest.id !== replaced?.id,
+    );
+    expect(replaced, 'a board quest in the first zone').toBeDefined();
+    expect(replacement, 'another authored quest in the first zone').toBeDefined();
+    if (!replaced || !replacement) return;
+    const base = makeOverworldWorld('sim', new Map(), 20, new Map(), cycle);
+    const plain = buildOverworldMapModel(input(base, 1));
+    expect(plain.worldQuests.map((marker) => marker.questId)).toContain(replaced.id);
+    const rerolled = {
+      ...base,
+      worldQuestReplacements: { [replaced.id]: replacement.id },
+    } as IWorld;
+    const model = buildOverworldMapModel(input(rerolled, 1));
+    const ids = model.worldQuests.map((marker) => marker.questId);
+    expect(ids).toContain(replacement.id);
+    expect(ids).not.toContain(replaced.id);
   });
 
   it('is deterministic: identical inputs produce a deep-equal model', () => {
