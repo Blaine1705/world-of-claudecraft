@@ -12,8 +12,8 @@ import type { Entity } from '../sim/types';
  *  the server's clampDelveModuleBounds + clampDelveDoors chain: the module
  *  shell/bounds view (matches either host's DelveRun/DelveRunInfo shape) plus
  *  this frame's door/prop solids, derived from the mirrored entity roster
- *  (delveDoorClampSolidsFromEntities, src/sim/delves/runs.ts). Null outside a
- *  delve, so every other position keeps resolving exactly as before. */
+ *  (delveDoorClampSolidsFromEntities, src/sim/delves/geometry.ts). Null
+ *  outside a delve, so every other position keeps resolving exactly as before. */
 export interface ClientDelveMotionState {
   run: DelveModuleBoundsRun;
   solids: readonly DelveDoorClampSolid[];
