@@ -7,6 +7,7 @@
 // stays in Hud because it needs Hud's private state; this module only renders
 // one panel and reports clicks back through the injected callbacks.
 
+import { factionDisplayName, STANDING_TIER_LABELS } from '../../../sim/factions';
 import type { ItemInstancePayload } from '../../../sim/types';
 import type { VendorBuyOptions } from '../../../sim/vendor_buy_stack';
 import { currencyIconHtml } from '../../currency_art';
@@ -19,7 +20,6 @@ import { itemNameColor } from '../../item_name_color';
 import type { PainterHostPresentation } from '../../painter_host';
 import { svgIcon } from '../../ui_icons';
 import { wornItemCellParts } from '../../worn_item_cell_view';
-import { factionDisplayName, STANDING_TIER_LABELS } from '../../../sim/factions';
 import { gatheringProfessionNameKey } from '../professions/gathering_profession_name';
 import { showBuyQuantityPrompt } from './buy_quantity_prompt_window';
 import {

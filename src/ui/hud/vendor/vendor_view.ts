@@ -11,8 +11,8 @@
 
 import { stackSizeOf } from '../../../sim/bags';
 import {
-  resolveFactionVendorRowGate,
   type FactionVendorGate,
+  resolveFactionVendorRowGate,
 } from '../../../sim/content/faction_vendors';
 import { resolveVendorRowGate, type VendorRowGate } from '../../../sim/content/vendor_row_gates';
 import type { FactionId } from '../../../sim/factions';

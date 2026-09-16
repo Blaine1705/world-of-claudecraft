@@ -28,11 +28,10 @@ import {
   stackSizeOf,
 } from './bags';
 import { buildConsuming } from './consuming';
-import { isRawCookingCatch } from './content/items';
 import { resolveFactionVendorRowGate } from './content/faction_vendors';
+import { isRawCookingCatch } from './content/items';
 import { ITEMS, NPCS } from './data';
 import { markItemDiscovered } from './deeds';
-import { factionDisplayName, STANDING_TIER_LABELS } from './factions';
 import { recalcPlayerStats } from './entity';
 import {
   canDualWield,
@@ -50,6 +49,7 @@ import {
   uniqueEquipFamily,
   weaponHand,
 } from './equipment_rules';
+import { factionDisplayName, STANDING_TIER_LABELS } from './factions';
 import { formatMoney } from './format_money';
 import { useBrinyLure } from './interactions/crab_summon';
 import { throwFirebottleAtNearestHut } from './interactions/firebottle_hut';

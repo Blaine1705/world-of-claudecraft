@@ -88,10 +88,7 @@ export function restoreWorldQuestState(
   meta.worldQuestReplacements = {};
   if (saved) {
     meta.worldQuestCycle = sanitizeWorldQuestCycle(saved.cycle);
-    if (
-      typeof saved.rerollCycle === 'string' &&
-      saved.rerollCycle === meta.worldQuestCycle
-    ) {
+    if (typeof saved.rerollCycle === 'string' && saved.rerollCycle === meta.worldQuestCycle) {
       meta.worldQuestRerollCycle = saved.rerollCycle;
       meta.worldQuestReplacements = sanitizeWorldQuestReplacements(
         saved.replacements,
@@ -118,9 +115,7 @@ export function savedWorldQuestState(meta: PlayerMeta): {
   const hasReroll =
     meta.worldQuestRerollCycle && meta.worldQuestRerollCycle === meta.worldQuestCycle;
   const hasReplacements =
-    hasReroll &&
-    meta.worldQuestReplacements &&
-    Object.keys(meta.worldQuestReplacements).length > 0;
+    hasReroll && meta.worldQuestReplacements && Object.keys(meta.worldQuestReplacements).length > 0;
   if (!meta.worldQuestCycle && meta.worldQuestLog.size === 0 && !hasRep && !hasReroll) return {};
   const factionsObj = hasRep ? { ...meta.factions } : undefined;
   return {

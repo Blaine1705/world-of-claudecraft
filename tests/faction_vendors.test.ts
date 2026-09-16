@@ -53,9 +53,7 @@ describe('Faction Vendors & Reroll NPC content', () => {
       expect(itemsForFaction.length).toBe(5);
 
       // Verify one item per tier
-      const tiersCovered = itemsForFaction.map(
-        (id) => FACTION_VENDOR_GATES[id]?.standingTier,
-      );
+      const tiersCovered = itemsForFaction.map((id) => FACTION_VENDOR_GATES[id]?.standingTier);
       expect(tiersCovered).toEqual(
         expect.arrayContaining(['recognized', 'trusted', 'proven', 'vanguard', 'champion']),
       );
@@ -121,7 +119,9 @@ describe('Faction vendor purchase authoritative simulation & UI', () => {
     sim.drainEvents();
     sim.buyItem(qm!.id, 'order_prayer_beads');
     const deniedEvents = sim.drainEvents();
-    expect(deniedEvents.some((e) => e.type === 'error' && e.text.includes('Requires Recognized'))).toBe(true);
+    expect(
+      deniedEvents.some((e) => e.type === 'error' && e.text.includes('Requires Recognized')),
+    ).toBe(true);
     expect(sim.countItem('order_prayer_beads')).toBe(0);
     expect(meta.copper).toBe(100_000);
 

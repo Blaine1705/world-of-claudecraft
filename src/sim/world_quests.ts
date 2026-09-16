@@ -95,13 +95,13 @@ import {
   traceWorldQuestPuzzle,
   worldQuestPuzzleInitialRotations,
 } from './world_quest_puzzle';
+import { playerActiveWorldQuests } from './world_quest_reroll';
 import {
   activeWorldQuestsForCycle,
   normalizeWorldQuestCycle,
   worldQuestCycleNumber,
   worldQuestPuzzleVariantForCycle,
 } from './world_quest_rotation';
-import { playerActiveWorldQuests } from './world_quest_reroll';
 import {
   isWorldQuestSalvageObject,
   isWorldQuestSalvageObjectInCurrentLayout,
@@ -137,17 +137,17 @@ import {
 } from './world_quest_wisp_maze';
 
 export {
+  canRerollWorldQuest,
+  playerActiveWorldQuests,
+  rerollWorldQuest,
+  sanitizeWorldQuestReplacements,
+} from './world_quest_reroll';
+export {
   activeWorldQuestsForCycle,
   WORLD_QUEST_ROTATION_DAYS,
   WORLD_QUESTS_PER_ROTATION,
   worldQuestCycleForResetDay,
 } from './world_quest_rotation';
-export {
-  canRerollWorldQuest,
-  rerollWorldQuest,
-  playerActiveWorldQuests,
-  sanitizeWorldQuestReplacements,
-} from './world_quest_reroll';
 
 export const WORLD_QUEST_LEY_TIMER_SECONDS = 90;
 const WORLD_QUEST_CLAIM_PREFIX = '__wq_claim__:';

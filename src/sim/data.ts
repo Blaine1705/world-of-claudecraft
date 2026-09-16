@@ -91,6 +91,7 @@ import {
   EVERGARDEN_ROADS,
   EVERGARDEN_ZONE,
 } from './content/evergarden';
+import { FACTION_VENDOR_ITEMS, FACTION_VENDOR_NPCS } from './content/faction_vendors';
 import {
   FARSHORE_CAMPS,
   FARSHORE_ESCORTS,
@@ -105,7 +106,6 @@ import {
   FARSHORE_ROADS,
   FARSHORE_ZONE,
 } from './content/farshore';
-import { FACTION_VENDOR_ITEMS, FACTION_VENDOR_NPCS } from './content/faction_vendors';
 import {
   FROSTVEIL_CAMPS,
   FROSTVEIL_ESCORTS,
