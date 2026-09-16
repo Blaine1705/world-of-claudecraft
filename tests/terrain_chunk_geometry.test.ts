@@ -377,18 +377,14 @@ describe('generated chunk geometry is stable', () => {
     // The branch's gap super-chunk pin (c4839177e825dbcf8dc5bcf501336fc2) is
     // gone with the gap chunks themselves: the island claims the old vale gap
     // cells, and gapFill.length above pins their absence.
-    // MERGE OF release/v0.43.0 INTO feature/world-quests: parents' values for
-    // the record, the release 1d9b0a4a7e0d97c5a11c918b1a8f29c3 and the branch's
-    // stale 034fe8c22a222adac06adbccb42baa2f (the pre-merge branch tree already
-    // produced this merged value). Two world-quest additions calm new pads
-    // inside the rect: the shadow quest guard NPCs (2e6508f52b, re-sited by
-    // 46cdedc400) and the Eastbrook freight crate and wagon ground objects
-    // (c5d5fe1718). Skipping both reproduces the release digest; skipping only
-    // the guards reproduces 034fe8c2. The branch's calm-pad exclusions
-    // (terrain_calm_anchors.ts) hold the digest back rather than move it:
-    // restoring the release exclusion file gives a third value. Measured on the
-    // merged tree, twice in separate processes.
-    expect(digestOf(inRect)).toBe('31c623326ee3050ffb9443b2c4115518');
+    // Eastbrook handoff: the five starter givers carry their existing calm
+    // pads into spaced town-square positions; the terrain generator is unchanged.
+    // Desktop/mobile captures and the rendered wolf-route collision checks
+    // were reviewed before refreshing this intentional layout fingerprint.
+    // Second release/v0.43.0 merge into feature/world-quests: the handoff's
+    // spaced givers compose with the branch's calm pads (shadow guards, freight
+    // crate and wagon). Measured on the merged tree, twice in separate processes.
+    expect(digestOf(inRect)).toBe('606ee2407082adeef9f271d20e37f91c');
     // The gap super-chunk digest pin is gone with the gap chunks themselves
     // (the island claims the old vale gap cells); gapFill.length above pins
     // their absence.

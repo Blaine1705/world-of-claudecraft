@@ -4,7 +4,9 @@ import { isObjectOpenedByViewer } from '../sim/quests/opened_object_view';
 import {
   dist2d,
   type Entity,
+  type GatherNodeDef,
   INTERACT_RANGE,
+  type InvSlot,
   type QuestProgress,
   type WorldQuestProgress,
 } from '../sim/types';
@@ -19,6 +21,7 @@ import { corpseLootAvailability, localPartyMemberIds } from './corpse_loot_avail
 import { decideEscortPress } from './escort_interact';
 import { nearestInteractableBed } from './farm_bed_interact';
 import { nearestInteractableFeast } from './feast_interact';
+import { pickHarvestBody } from './harvest_body_pick';
 import { objectInteractionRange } from './interactions';
 
 export interface NearbyInteractionScanWorld {
@@ -32,14 +35,30 @@ export interface NearbyInteractionScanWorld {
   // progress, and a world-quest escort is startable from its own log.
   worldQuestCycle?: string;
   worldQuestLog?: ReadonlyMap<string, WorldQuestProgress>;
+  /** The viewer's bags, read ONLY by the last-resort corpse harvest-choice arm
+   *  (a carried Field Kit is what makes a harvest-only body openable at all,
+   *  `harvest_body_pick.ts`). Optional so a scan slice that carries no bags (a
+   *  bare fixture, a host with no inventory mirror) simply has no such arm;
+   *  IWorld satisfies it structurally. */
+  inventory?: readonly Pick<InvSlot, 'itemId' | 'count'>[];
 }
+
+/** The slice of a gather node the scan needs: where it stands (the reach
+ *  check) and what it is (the tool-tier gate the press resolves against it). */
+export type NearbyGatherNode = Pick<GatherNodeDef, 'id' | 'pos' | 'type' | 'tier'>;
 
 export type NearbyInteractionCandidate =
   | { kind: 'corpse'; id: number; entity: Entity }
+  /** A harvest-only body the press OPENS the corpse choice for (never harvests):
+   *  the keyboard, pad and touch route to the popup's own Harvest control. */
+  | { kind: 'harvest'; id: number; entity: Entity }
   | { kind: 'delve'; id: number; entity: Entity }
   | { kind: 'object'; id: number; entity: Entity }
   | { kind: 'npc'; id: number; entity: Entity }
   | { kind: 'escort'; id: number; entity: Entity }
+  /** The nearest offered gather node in reach: the one gathering the press
+   *  DOES perform (through the node click's own core), never a body or crop. */
+  | { kind: 'node'; id: string; node: NearbyGatherNode }
   | { kind: 'feast'; id: number; entity: Entity }
   | { kind: 'bed'; id: string }
   | { kind: 'escortAway'; id: null };
@@ -48,15 +67,30 @@ export type NearbyInteractionCandidate =
  *  running it. This is dispatch's shared candidate resolution: the ladder IS
  *  the press ladder in nearby_interaction.ts, arm for arm, so the two can never
  *  read a different world: corpse (ordinary loot only), delve, ground object,
- *  npc, escort start, placed feast, garden bed, then the escort-away last
- *  resort. Intentional gathering made the generic press ORDINARY INTERACTION
- *  ONLY, so there is deliberately no gather or corpse-harvest arm here: those
- *  are explicit actions with their own entry points (node/tool/crop click, the
- *  corpse picker, the bed sheet's own Harvest control). */
+ *  npc, escort start, the offered gather node, placed feast, garden bed, the
+ *  corpse harvest CHOICE, then the escort-away last resort. Intentional
+ *  gathering made the generic press ORDINARY INTERACTION for bodies and crops,
+ *  so there is deliberately no corpse-harvest or crop arm here: those are
+ *  explicit actions with their own entry points (the corpse picker, the bed
+ *  sheet's own Harvest control). A gather NODE is the one exception (restored
+ *  in v0.42.1): an ore vein, herb, or tree has no ordinary half a press could
+ *  confuse, so the nearest node in reach resolves here whenever the caller
+ *  offers a node list (`nodes`), below escort start (an escortee in front of
+ *  you beats the node you stand over) and above the feast and bed arms. The
+ *  harvest-choice arm is the bed arm's shape applied to a body: it OPENS the
+ *  corpse popup (whose Harvest control is the only thing that ever sends
+ *  harvestCorpse) for a Field Kit carrier, and it sits last so a harvest-only
+ *  body still never swallows an eligible ordinary interaction standing behind
+ *  it. Before v0.42 the press harvested on the spot; without this rung a
+ *  keyboard, pad or mobile-button player had no natural way to reach the popup
+ *  at all. */
 export function resolveNearbyInteractionCandidate(
   world: NearbyInteractionScanWorld,
   harvestStateReliable = true,
   preferNpcId?: number | null,
+  // The gather nodes the caller offers the press; absent means the scan knows
+  // no nodes and the node arm never resolves.
+  nodes?: readonly NearbyGatherNode[],
 ): NearbyInteractionCandidate | null {
   const player = world.player;
   const playerId = world.playerId ?? player.id;
@@ -70,6 +104,20 @@ export function resolveNearbyInteractionCandidate(
   let bestDelve: Entity | null = null;
   let bestDelveDistance = INTERACT_RANGE + 1;
   const salvageQuest = WORLD_QUESTS_BY_ID.wq_farshore_salvage;
+  let bestNode: NearbyGatherNode | null = null;
+  let bestNodeDistance = INTERACT_RANGE;
+
+  // Nodes stand on the ground plane, so reach is the flat distance (the same
+  // measure the node click's core takes in decideGatherNodeAction).
+  if (nodes && !player.dead) {
+    for (const node of nodes) {
+      const distance = dist2d(player.pos, { x: node.pos.x, y: player.pos.y, z: node.pos.z });
+      if (distance < bestNodeDistance) {
+        bestNode = node;
+        bestNodeDistance = distance;
+      }
+    }
+  }
 
   for (const entity of world.entities.values()) {
     // A disguised infiltrator or a shadow-mission guard the viewer cannot see is
@@ -173,6 +221,17 @@ export function resolveNearbyInteractionCandidate(
         }
       : null;
   }
+  // The gather-node arm: below escort start, above the feast and bed arms (a
+  // node in reach keeps winning the press). A corpse WITH ordinary loot above
+  // still wins (the shipped corpses-over-nodes order); a harvest-only or
+  // blocked corpse is no candidate up there and cannot shadow the node beside it.
+  if (bestNode) {
+    return {
+      kind: 'node',
+      id: bestNode.id,
+      node: bestNode,
+    };
+  }
   // A PLACED TRANSIENT outranks permanent world furniture (ruling 11b-R3c-1):
   // a feast despawns on a timer and is what the player just walked to, so it
   // sits above the garden bed that is always there.
@@ -195,6 +254,29 @@ export function resolveNearbyInteractionCandidate(
       return {
         kind: 'bed',
         id: bedId,
+      };
+    }
+  }
+  // The corpse harvest CHOICE, last among real actions: only a Field Kit
+  // carrier, only a body whose harvest is still open and within harvest
+  // reach (pickHarvestBody: the viewer's target first, else the nearest, the
+  // Professions entry's own pick). A body that still has ordinary loot for
+  // this viewer was already taken by the corpse arm above, so this rung only
+  // ever names a harvest-only body. It opens a window; nothing here harvests.
+  if (!player.dead) {
+    const bodyId = pickHarvestBody({
+      player,
+      inventory: world.inventory ?? [],
+      playerId: world.playerId,
+      partyInfo: world.partyInfo,
+      entities: world.entities,
+    });
+    const body = bodyId === null ? undefined : world.entities.get(bodyId);
+    if (body) {
+      return {
+        kind: 'harvest',
+        id: body.id,
+        entity: body,
       };
     }
   }

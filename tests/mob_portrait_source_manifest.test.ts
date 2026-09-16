@@ -92,7 +92,11 @@ describe('mob portrait source manifest', () => {
     // Nythraxis Bone Spike the mechanics redo raises under impaled raiders.
     // 245: plus the Eastbrook hub practice yard's own two dummies
     // (hub_training_dummy, hub_healing_dummy).
-    expect(liveIds).toHaveLength(245);
+    // 250: plus the five Eastbrook healing-training role dummies, each with
+    // its own rendered portrait.
+    // 254: plus the world quest branch's Fenbridge infiltrator and its three
+    // regional freight caravans (Eastbrook, Willowfen, Frostveil).
+    expect(liveIds).toHaveLength(254);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);
@@ -177,7 +181,6 @@ describe('mob portrait source manifest', () => {
     }));
     const previous = {
       schemaVersion: 2,
-      purpose: 'test portrait provenance',
       rendererFingerprint: 'renderer-a',
       portraits: structuredClone(rows),
     };
@@ -272,6 +275,54 @@ describe('mob portrait source manifest', () => {
     ).not.toThrow();
   });
 
+  it('re-proves only the rows that moved when just the render bundle digest drifted', () => {
+    const trackedFiles = [
+      { path: 'scripts/render_finder_portraits.mjs', bytes: 10, sha256: 'render' },
+      { path: 'scripts/lib/mob_portrait_jobs.mjs', bytes: 11, sha256: 'jobs' },
+      { path: 'scripts/lib/mob_portrait_background.mjs', bytes: 12, sha256: 'background' },
+    ];
+    const rows = Array.from({ length: 4 }, (_, index) => ({
+      id: `mob_${index}`,
+      sourceFingerprint: `source-${index}`,
+      output: { bytes: 100 + index, sha256: `output-${index}` },
+    }));
+    const previous = {
+      schemaVersion: 2,
+      rendererFingerprint: 'renderer-a',
+      renderer: { trackedFiles: structuredClone(trackedFiles) },
+      portraits: structuredClone(rows),
+    };
+    // Bundle-only drift (the tracked renderer files are byte-identical): one
+    // re-rendered output is the only row that needs a receipt.
+    const bundleDrift = structuredClone(previous);
+    bundleDrift.rendererFingerprint = 'renderer-b';
+    bundleDrift.portraits[2].output = { bytes: 555, sha256: 'rerendered' };
+    expect(changedPortraitIds(previous, bundleDrift)).toEqual(['mob_2']);
+    const receipt = {
+      schemaVersion: 1,
+      generatedBy: 'scripts/render_finder_portraits.mjs',
+      rendererFingerprint: 'renderer-b',
+      portraits: [structuredClone(bundleDrift.portraits[2])],
+    };
+    expect(() =>
+      assertManifestWriteAuthorized({ previous, next: bundleDrift, receipt }),
+    ).not.toThrow();
+    expect(() =>
+      assertManifestWriteAuthorized({ previous, next: bundleDrift, receipt: null }),
+    ).toThrow(/without a renderer receipt: mob_2$/);
+    // A tracked renderer file moving with the same fingerprint drift is a
+    // renderer change: every row is back on the hook.
+    const rendererEdit = structuredClone(bundleDrift);
+    rendererEdit.renderer.trackedFiles[1].sha256 = 'jobs-edited';
+    expect(changedPortraitIds(previous, rendererEdit)).toHaveLength(4);
+    expect(() => assertManifestWriteAuthorized({ previous, next: rendererEdit, receipt })).toThrow(
+      /missing changed row mob_0/,
+    );
+    // A manifest with no tracked-file ledger cannot prove bundle-only drift.
+    const { renderer: _renderer, ...unledgered } = structuredClone(bundleDrift);
+    expect(changedPortraitIds(previous, unledgered)).toHaveLength(4);
+  });
+
   it('accepts a renderer receipt only when every changed source and output matches', () => {
     const previous = {
       schemaVersion: 2,
@@ -305,94 +356,6 @@ describe('mob portrait source manifest', () => {
     expect(() => assertManifestWriteAuthorized({ previous, next, receipt })).toThrow(
       /stale source fingerprint/,
     );
-  });
-
-  it('scopes bundle-only renderer drift to genuinely changed portrait rows', () => {
-    const previous = {
-      schemaVersion: 2,
-      purpose: 'test portrait provenance',
-      bootstrapReview: { path: 'review.md', bytes: 10, sha256: 'review' },
-      rendererFingerprint: 'renderer-a',
-      renderer: {
-        trackedFiles: [{ path: 'render.mjs', bytes: 10, sha256: 'render' }],
-        browserBundle: {
-          entry: 'entry.js',
-          bytes: 100,
-          sha256: 'bundle-a',
-          esbuildVersion: '1.0.0',
-        },
-        output: { pixels: 128, format: 'webp' },
-      },
-      portraitCount: 1,
-      portraits: [
-        {
-          id: 'old',
-          sourceFingerprint: 'old-source',
-          output: { bytes: 100, sha256: 'old-output' },
-        },
-      ],
-    };
-    const next = structuredClone(previous);
-    next.rendererFingerprint = 'renderer-b';
-    next.renderer.browserBundle.bytes = 101;
-    next.renderer.browserBundle.sha256 = 'bundle-b';
-    next.portraitCount = 2;
-    next.portraits.push({
-      id: 'new',
-      sourceFingerprint: 'new-source',
-      output: { bytes: 101, sha256: 'new-output' },
-    });
-    const receipt = {
-      schemaVersion: 1,
-      generatedBy: 'scripts/render_finder_portraits.mjs',
-      rendererFingerprint: 'renderer-b',
-      portraits: [structuredClone(next.portraits[1])],
-    };
-
-    expect(changedPortraitIds(previous, next)).toEqual(['new']);
-    expect(() => assertManifestWriteAuthorized({ previous, next, receipt })).not.toThrow();
-
-    const expectFullReceipt = (
-      mutate: (manifest: typeof next) => void,
-      failure = /missing changed row old/,
-    ) => {
-      const unsafe = structuredClone(next);
-      mutate(unsafe);
-      expect(changedPortraitIds(previous, unsafe)).toEqual(['old', 'new']);
-      expect(() => assertManifestWriteAuthorized({ previous, next: unsafe, receipt })).toThrow(
-        failure,
-      );
-    };
-    expectFullReceipt((manifest) => {
-      manifest.renderer.trackedFiles[0].sha256 = 'changed-renderer-source';
-    });
-    expectFullReceipt((manifest) => {
-      manifest.bootstrapReview.sha256 = 'changed-review';
-    });
-    expectFullReceipt((manifest) => {
-      manifest.bootstrapReview.path = 'changed-review.md';
-    });
-    expectFullReceipt((manifest) => {
-      manifest.renderer.output.pixels = 256;
-    });
-    expectFullReceipt((manifest) => {
-      manifest.renderer.browserBundle.entry = 'changed-entry.js';
-    });
-    expectFullReceipt((manifest) => {
-      manifest.renderer.browserBundle.esbuildVersion = '2.0.0';
-    });
-    expectFullReceipt((manifest) => {
-      manifest.purpose = 'changed purpose';
-    });
-    expectFullReceipt((manifest) => {
-      Object.assign(manifest.renderer, { futureContractField: 'changed' });
-    });
-    expectFullReceipt((manifest) => {
-      manifest.portraitCount = 99;
-    });
-    expectFullReceipt((manifest) => {
-      manifest.schemaVersion = 3;
-    }, /bootstrap\/schema migration/);
   });
 
   // The acceptance is a bundle digest, and esbuild labels bundled modules with paths

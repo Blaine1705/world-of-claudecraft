@@ -1,53 +1,32 @@
-import { isDeepStrictEqual } from 'node:util';
 import { describeManifestDrift } from './mob_portrait_manifest_diff.mjs';
 import { describeRenderEnvDrift, formatRenderEnvDrift } from './mob_portrait_render_env.mjs';
 
-function digestOf(file) {
-  return file ? `${file.bytes}:${file.sha256}` : null;
-}
-
-function withoutRowsAndBundleFingerprint(manifest) {
-  const { portraitCount: _portraitCount, portraits: _portraits, ...contract } = manifest;
-  return {
-    ...contract,
-    rendererFingerprint: null,
-    renderer: {
-      ...manifest.renderer,
-      browserBundle: manifest.renderer?.browserBundle
-        ? { ...manifest.renderer.browserBundle, bytes: null, sha256: null }
-        : manifest.renderer?.browserBundle,
-    },
-  };
-}
-
-// The browser bundle reaches unrelated gameplay modules. A bundle-digest-only
-// move is already treated as bookkeeping by the manifest freshness check. When
-// that same move accompanies newly added mobs, keep the same ruling for every
-// pre-existing byte-identical row and require a renderer receipt only for the
-// rows that actually changed. Any renderer script, output contract, bundle
-// metadata, bootstrap review, or existing portrait change stays fail-closed.
-function canScopeRendererDriftToChangedRows(previous, next) {
-  if (!previous?.renderer || !next?.renderer) return false;
-  if (
-    previous.portraitCount !== previous.portraits?.length ||
-    next.portraitCount !== next.portraits?.length
-  )
+// The renderer fingerprint folds two things together: the digests of the tracked renderer
+// source files and the digest of the browser render bundle. A tracked-file change is a
+// renderer CODE change and re-proves every row (any output could move). The bundle digest
+// alone moves on unrelated gameplay or content churn (its import graph reaches the world
+// and content modules; mob_portrait_manifest_diff.mjs explains why), the same drift
+// `--check` already tolerates as bookkeeping. A write under bundle-only drift therefore
+// re-proves exactly the rows whose source or output actually changed, so a contributor who
+// re-renders a handful of newly catalogued encounters is never asked to re-mint the
+// whole set on a machine that cannot reproduce the committed bytes.
+function trackedRendererFilesMatch(previous, next) {
+  const before = previous?.renderer?.trackedFiles;
+  const after = next?.renderer?.trackedFiles;
+  if (!Array.isArray(before) || !Array.isArray(after) || before.length !== after.length) {
     return false;
-  return (
-    previous.rendererFingerprint !== next.rendererFingerprint &&
-    digestOf(previous.renderer.browserBundle) !== digestOf(next.renderer.browserBundle) &&
-    isDeepStrictEqual(
-      withoutRowsAndBundleFingerprint(previous),
-      withoutRowsAndBundleFingerprint(next),
-    )
-  );
+  }
+  return before.every((file, index) => {
+    const other = after[index];
+    return file.path === other?.path && file.bytes === other.bytes && file.sha256 === other.sha256;
+  });
 }
 
 export function changedPortraitIds(previous, next) {
+  if (!previous) return next.portraits.map((portrait) => portrait.id);
   if (
-    !previous ||
-    (previous.rendererFingerprint !== next.rendererFingerprint &&
-      !canScopeRendererDriftToChangedRows(previous, next))
+    previous.rendererFingerprint !== next.rendererFingerprint &&
+    !trackedRendererFilesMatch(previous, next)
   ) {
     return next.portraits.map((portrait) => portrait.id);
   }
@@ -62,9 +41,20 @@ export function rowChangedPortraitIds(previous, next) {
   return next.portraits
     .filter((portrait) => {
       const prior = before.get(portrait.id);
-      return !prior || !isDeepStrictEqual(prior, portrait);
+      return (
+        !prior ||
+        prior.sourceFingerprint !== portrait.sourceFingerprint ||
+        prior.output.sha256 !== portrait.output.sha256 ||
+        prior.output.bytes !== portrait.output.bytes
+      );
     })
-    .map((portrait) => portrait.id);
+    .map((portrait) => portrait.id)
+    .concat(removedPortraitIds(previous, next));
+}
+
+function removedPortraitIds(previous, next) {
+  const after = new Set(next.portraits.map((portrait) => portrait.id));
+  return previous.portraits.map((portrait) => portrait.id).filter((id) => !after.has(id));
 }
 
 export function assertManifestWriteAuthorized({
@@ -165,6 +155,7 @@ export function assertManifestWriteAuthorized({
   for (const id of changedIds) {
     const expected = nextRows.get(id);
     const rendered = receiptRows.get(id);
+    if (!expected) throw new Error(`portrait manifest removed changed row ${id}`);
     if (!rendered) throw new Error(`portrait renderer receipt is missing changed row ${id}`);
     if (rendered.sourceFingerprint !== expected.sourceFingerprint) {
       throw new Error(`portrait renderer receipt has stale source fingerprint for ${id}`);

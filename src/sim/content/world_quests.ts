@@ -541,7 +541,11 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     id: 'wq_frostveil_howlers',
     zoneId: 'frostveil',
     minLevel: 17,
-    area: { x: -85, z: 1760, radius: 20 },
+    // Covers Brosk's four authored traps plus their interact reach: the west
+    // trap stands up the bank at (-116, 1756), 24 yd from this centre, so the
+    // ring reaches it with 5 yd to spare and never counts the Shiverfen pool
+    // floor as a trap site.
+    area: { x: -92, z: 1758, radius: 30 },
     objective: { type: 'interact', targetObjectItemId: 'sprung_trap' },
     count: 4,
     reward: { type: 'xp', rate: 0.12 },

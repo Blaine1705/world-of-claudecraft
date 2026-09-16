@@ -73,6 +73,7 @@ describe('glider input mode', () => {
         playerImmobilized: false,
         posX: 448,
         climbing: false,
+        leaping: false,
       });
     expect(gliderControlsActive(world)).toBe(true);
     expect(gate()).toBe(false);
