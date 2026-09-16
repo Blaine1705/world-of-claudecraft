@@ -1,4 +1,3 @@
-import { isDeepStrictEqual } from 'node:util';
 import { describeManifestDrift } from './mob_portrait_manifest_diff.mjs';
 import { describeRenderEnvDrift, formatRenderEnvDrift } from './mob_portrait_render_env.mjs';
 
@@ -42,7 +41,12 @@ export function rowChangedPortraitIds(previous, next) {
   return next.portraits
     .filter((portrait) => {
       const prior = before.get(portrait.id);
-      return !prior || !isDeepStrictEqual(prior, portrait);
+      return (
+        !prior ||
+        prior.sourceFingerprint !== portrait.sourceFingerprint ||
+        prior.output.sha256 !== portrait.output.sha256 ||
+        prior.output.bytes !== portrait.output.bytes
+      );
     })
     .map((portrait) => portrait.id)
     .concat(removedPortraitIds(previous, next));
