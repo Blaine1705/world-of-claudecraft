@@ -467,6 +467,7 @@ import {
   MapMarkerInteractionController,
   MapMarkerTooltipContent,
 } from './hud/map';
+import { resolveMapZone } from './hud/map/map_zone_focus_core';
 import { refreshSideButtonLabels } from './hud/menu/side_buttons';
 import { livingSecondaryPet } from './hud/pet_bar_core';
 import { CARD_POSES } from './hud/player_card/player_card';
@@ -10872,17 +10873,12 @@ export class Hud {
     }
     this.continentRegions = [];
 
-    // inside a dungeon, show the zone the dungeon's door is in (dungeonAt owns
-    // the instance x-band layout); in any other instance band lastZoneId is the
-    // zone the player entered from (the zone tracker freezes past
-    // DUNGEON_X_THRESHOLD); outdoors, follow the committed zone so
-    // border-straddling can't thrash the cached terrain regen.
-    const dungeon = dungeonAt(p.pos.x);
-    const zone: ZoneDef = this.mapZoneOverride
-      ? (ZONES.find((z) => z.id === this.mapZoneOverride) ?? zoneAt(p.pos.x, p.pos.z))
-      : dungeon
-        ? zoneAt(dungeon.doorPos.x, dungeon.doorPos.z)
-        : (ZONES.find((z) => z.id === this.lastZoneId) ?? zoneAt(p.pos.x, p.pos.z));
+    // map_zone_focus_core.ts: dungeon door, frozen last zone, committed zone, override first.
+    const zone = resolveMapZone(this.mapZoneOverride, this.lastZoneId, p.pos, {
+      zones: ZONES,
+      zoneAt,
+      dungeonAt,
+    });
     this.mapSidebar.update(this.sim, zone);
     // Crossing a zone while the map is open starts that zone at its full frame;
     // a pan target from the previous zone must never leak into the new one.

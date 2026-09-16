@@ -473,7 +473,10 @@ const MONOLITHS: MonolithRow[] = [
     // screenshot and HUD extractions compose with aura overlay wiring and the
     // account-wide Book of Deeds / Reliquary work to 18309 by wc -l on the
     // merged tree. Exact count, zero slack.
-    ceiling: 18309,
+    // Re-pinned on feature/wq-standing-online: the map rail and Reputation tab
+    // wiring (11 lines) was paid for by lifting the map zone focus rule into
+    // hud/map/map_zone_focus_core.ts; exact merged count.
+    ceiling: 18306,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

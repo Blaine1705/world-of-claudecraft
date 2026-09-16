@@ -243,6 +243,9 @@ const UI_PURE_CORES = [
   // The map rail's world-quest section: the character's board, the shared
   // selection and the daily replacement's availability (src/ui/hud/map/).
   'src/ui/hud/map/world_quest_rail_view.ts',
+  // Which zone the overworld map frames (dungeon door, frozen last zone,
+  // committed zone, override), lifted out of Hud.updateMapWindow.
+  'src/ui/hud/map/map_zone_focus_core.ts',
   'src/ui/world_quest_forge_view.ts',
   'src/ui/world_quest_leaderboard_view.ts',
   'src/ui/leaderboard_podium_view.ts',
