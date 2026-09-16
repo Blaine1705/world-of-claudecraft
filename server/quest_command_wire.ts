@@ -76,6 +76,7 @@ const WORLD_QUEST_WIRE_COMMANDS = [
   'world_quest_shadow',
   'world_quest_accuse',
   'world_quest_start',
+  'world_quest_reroll',
 ] as const;
 export type WorldQuestWireCommand = (typeof WORLD_QUEST_WIRE_COMMANDS)[number];
 const WORLD_QUEST_WIRE_COMMAND_SET: ReadonlySet<unknown> = new Set(WORLD_QUEST_WIRE_COMMANDS);
@@ -90,6 +91,9 @@ export function dispatchWorldQuestWire(sim: Sim, msg: QuestWireMessage, pid: num
   switch (msg.cmd) {
     case 'world_quest_start':
       startWorldQuestActivityWire(sim, msg, pid);
+      break;
+    case 'world_quest_reroll':
+      sim.rerollWorldQuest(String((msg as unknown as { quest?: unknown }).quest ?? ''), pid);
       break;
     case 'world_quest_glider_boost':
       sim.boostWorldQuestGlider(pid);

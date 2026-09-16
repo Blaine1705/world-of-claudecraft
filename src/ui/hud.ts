@@ -14942,6 +14942,7 @@ export class Hud {
           // new wire field, exactly as the delve shop resolves its lock badge
           // from the mirrored clears map.
           gatheringProficiency: this.sim.gatheringProficiency,
+          factions: this.sim.factions,
         },
         this.vendorQtyMultiple,
       ),

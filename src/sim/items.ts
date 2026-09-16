@@ -29,8 +29,10 @@ import {
 } from './bags';
 import { buildConsuming } from './consuming';
 import { isRawCookingCatch } from './content/items';
+import { resolveFactionVendorRowGate } from './content/faction_vendors';
 import { ITEMS, NPCS } from './data';
 import { markItemDiscovered } from './deeds';
+import { factionDisplayName, STANDING_TIER_LABELS } from './factions';
 import { recalcPlayerStats } from './entity';
 import {
   canDualWield,
@@ -1242,6 +1244,15 @@ export function buyItem(
   const gateQuest = NPCS[npc.templateId ?? '']?.vendorQuestGates?.[itemId];
   if (gateQuest && !meta.questLog.has(gateQuest) && !meta.questsDone.has(gateQuest)) {
     ctx.error(meta.entityId, 'That item is not for sale to you yet.');
+    return;
+  }
+  // Faction standing gate (FACTION_VENDOR_GATES): the row is sold only once
+  // the buyer's standing with the faction meets or exceeds the required threshold.
+  const factionGate = resolveFactionVendorRowGate(itemId, meta.factions);
+  if (factionGate.locked && factionGate.requirement) {
+    const title = STANDING_TIER_LABELS[factionGate.requirement.standingTier];
+    const factionName = factionDisplayName(factionGate.requirement.factionId);
+    ctx.error(meta.entityId, `Requires ${title} with ${factionName}.`);
     return;
   }
   // Dev free-epic vendor: on a dev-command realm this vendor sells its whole

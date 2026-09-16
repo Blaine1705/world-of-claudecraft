@@ -884,6 +884,7 @@ export const COMMAND_NAMES = [
   'world_quest_puzzle_reset',
   'world_quest_glider_boost',
   'world_quest_start',
+  'world_quest_reroll',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -993,6 +994,8 @@ export const COMMAND_FACETS = {
   world_quest_shadow: 'IWorldQuests',
   world_quest_puzzle_reset: 'IWorldQuests',
   world_quest_glider_boost: 'IWorldQuests',
+  world_quest_start: 'IWorldQuests',
+  world_quest_reroll: 'IWorldQuests',
   // Ghost resurrection: run the spirit to its corpse, or accept the Spirit Healer's
   // resurrection (with Resurrection Sickness). Wire strings are snake_case by design.
   resurrect_corpse: 'IWorldCombat',

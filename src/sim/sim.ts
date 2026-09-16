@@ -46,6 +46,7 @@ import * as bankSocketsMod from './bank_sockets';
 import { extractTradableCopyImpl, grantTradableCopyImpl } from './broker_custody';
 import { campSpawnOffset } from './camp_scatter';
 import type { CharacterState, PetState } from './character_state';
+import type { FactionId } from './factions';
 import type { ItemCopyAnchor } from './item_copy_anchor';
 import type { CannonActionId, CannonPoint, VehicleSession } from './types';
 import * as vehicleMod from './vehicles';
@@ -3285,7 +3286,7 @@ export class Sim {
         }
       }
       for (const q of s.questsDone) meta.questsDone.add(q);
-      worldQuestState.restoreWorldQuestState(meta, s.worldQuests);
+      worldQuestState.restoreWorldQuestState(meta, s.worldQuests, s.factions);
       // A rev reset zeroes COLLECT counts too, and those are derived state only
       // onInventoryChangedForQuests re-credits: re-sync once (inventory is already
       // restored above) so a migrated character holding the collect items is not
@@ -4849,6 +4850,28 @@ export class Sim {
   }
   get nearbyWorldQuestTraces() {
     return worldQuestState.nearbyWorldQuestTraces(this, this.playerId);
+  }
+  get factions(): Readonly<Record<FactionId, number>> {
+    return this.primary.factions;
+  }
+  get worldQuestReplacements(): Readonly<Record<string, string>> {
+    return this.primary.worldQuestReplacements;
+  }
+  get worldQuestRerollCycle(): string {
+    return this.primary.worldQuestRerollCycle;
+  }
+  canRerollWorldQuest(questId: string, pid?: number): { canReroll: boolean; reason?: string } {
+    const meta = pid !== undefined ? this.players.get(pid) : this.primary;
+    if (!meta) return { canReroll: false, reason: 'Player not found.' };
+    const player = this.entities.get(meta.entityId);
+    const level = player?.level ?? 20;
+    const cycle = meta.devWorldQuestCycle ?? this.ctx.currentWorldQuestRotation().cycle;
+    return worldQuestMod.canRerollWorldQuest(meta, questId, cycle, level);
+  }
+  rerollWorldQuest(questId: string, pid?: number): boolean {
+    const meta = pid !== undefined ? this.players.get(pid) : this.primary;
+    if (!meta) return false;
+    return worldQuestMod.rerollWorldQuest(this.ctx, meta, questId);
   }
   // --- IWorldDeeds: the Book of Deeds read surface + title/border selection.
   // The reads expose the live per-player state (the questLog precedent above);

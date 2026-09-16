@@ -171,9 +171,9 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // release's 222/236/14 plus the branch's eleven world-quest and vehicle
 // commands, each one both sent by ClientWorld and dispatched by the server
 // (eight of them through the delegated world-quest family below). Measured
-// by the suite on the merged tree: 233/247/14.
-const EXPECTED_SEND_COUNT = 233;
-const EXPECTED_DISPATCH_COUNT = 247;
+// by the suite on the merged tree: 233/247/14, plus world_quest_reroll (234/248/14).
+const EXPECTED_SEND_COUNT = 234;
+const EXPECTED_DISPATCH_COUNT = 248;
 const EXPECTED_DISPATCH_ONLY_COUNT = 14;
 
 // The chat sub-channel routing switch (server/game.ts `switch

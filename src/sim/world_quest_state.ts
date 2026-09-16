@@ -3,10 +3,12 @@
 // here, behind explicit arguments.
 
 import type { CharacterState } from './character_state';
+import type { FactionId } from './factions';
+import { freshFactionReputation, sanitizeFactionReputation } from './factions';
 import type { PlayerMeta } from './sim';
 import type { Entity, WorldQuestDef, WorldQuestProgress } from './types';
 import { WORLD_BOSSES } from './world_boss';
-
+import { sanitizeWorldQuestReplacements } from './world_quest_reroll';
 import {
   activeWorldQuestsForCycle,
   restoreWorldQuestClaims,
@@ -26,6 +28,12 @@ export interface WorldQuestPlayerState {
   worldQuestAreas: Set<string>;
   /** Minigame unlocked by the area's physical activator for this session. */
   openWorldQuestPuzzleId: string | null;
+  /** Persistent faction standing earned across world quests. */
+  factions: Record<FactionId, number>;
+  /** The cycle for which the character used their single daily reroll. */
+  worldQuestRerollCycle: string;
+  /** Personal quest replacement: oldQuestId -> newQuestId for the current cycle. */
+  worldQuestReplacements: Record<string, string>;
 }
 
 export interface WorldQuestRotationCache {
@@ -40,6 +48,9 @@ export function freshWorldQuestPlayerState(): WorldQuestPlayerState {
     devWorldQuestCycle: null,
     worldQuestAreas: new Set(),
     openWorldQuestPuzzleId: null,
+    factions: freshFactionReputation(),
+    worldQuestRerollCycle: '',
+    worldQuestReplacements: {},
   };
 }
 
@@ -66,20 +77,52 @@ export function rotationBindings(cache: WorldQuestRotationCache, host: { resetDa
 export function restoreWorldQuestState(
   meta: PlayerMeta,
   saved: CharacterState['worldQuests'],
+  characterFactions?: CharacterState['factions'],
 ): void {
+  meta.factions = freshFactionReputation();
+  const rawFactions = characterFactions ?? saved?.factions;
+  if (rawFactions) {
+    meta.factions = sanitizeFactionReputation(rawFactions);
+  }
+  meta.worldQuestRerollCycle = '';
+  meta.worldQuestReplacements = {};
   if (saved) {
     meta.worldQuestCycle = sanitizeWorldQuestCycle(saved.cycle);
-    for (const progress of sanitizeWorldQuestProgress(saved.progress, meta.worldQuestCycle)) {
+    if (
+      typeof saved.rerollCycle === 'string' &&
+      saved.rerollCycle === meta.worldQuestCycle
+    ) {
+      meta.worldQuestRerollCycle = saved.rerollCycle;
+      meta.worldQuestReplacements = sanitizeWorldQuestReplacements(
+        saved.replacements,
+        meta.worldQuestCycle,
+      );
+    }
+    for (const progress of sanitizeWorldQuestProgress(
+      saved.progress,
+      meta.worldQuestCycle,
+      false,
+      meta.worldQuestReplacements,
+    )) {
       meta.worldQuestLog.set(progress.questId, progress);
     }
   }
   restoreWorldQuestClaims(meta);
 }
 
-export function savedWorldQuestState(
-  meta: PlayerMeta,
-): Pick<CharacterState, 'worldQuests'> | Record<never, never> {
-  if (!meta.worldQuestCycle && meta.worldQuestLog.size === 0) return {};
+export function savedWorldQuestState(meta: PlayerMeta): {
+  worldQuests?: CharacterState['worldQuests'];
+  factions?: CharacterState['factions'];
+} {
+  const hasRep = meta.factions && Object.values(meta.factions).some((v) => v > 0);
+  const hasReroll =
+    meta.worldQuestRerollCycle && meta.worldQuestRerollCycle === meta.worldQuestCycle;
+  const hasReplacements =
+    hasReroll &&
+    meta.worldQuestReplacements &&
+    Object.keys(meta.worldQuestReplacements).length > 0;
+  if (!meta.worldQuestCycle && meta.worldQuestLog.size === 0 && !hasRep && !hasReroll) return {};
+  const factionsObj = hasRep ? { ...meta.factions } : undefined;
   return {
     worldQuests: {
       cycle: meta.worldQuestCycle,
@@ -116,7 +159,11 @@ export function savedWorldQuestState(
             : { traceResult: { ...progress.traceResult } }),
         }),
       ),
+      ...(factionsObj ? { factions: factionsObj } : {}),
+      ...(hasReroll ? { rerollCycle: meta.worldQuestRerollCycle } : {}),
+      ...(hasReplacements ? { replacements: { ...meta.worldQuestReplacements } } : {}),
     },
+    ...(factionsObj ? { factions: factionsObj } : {}),
   };
 }
 

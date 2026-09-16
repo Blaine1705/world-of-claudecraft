@@ -19,6 +19,7 @@ import { itemNameColor } from '../../item_name_color';
 import type { PainterHostPresentation } from '../../painter_host';
 import { svgIcon } from '../../ui_icons';
 import { wornItemCellParts } from '../../worn_item_cell_view';
+import { factionDisplayName, STANDING_TIER_LABELS } from '../../../sim/factions';
 import { gatheringProfessionNameKey } from '../professions/gathering_profession_name';
 import { showBuyQuantityPrompt } from './buy_quantity_prompt_window';
 import {
@@ -91,6 +92,11 @@ function goodsPriceText(price: VendorPrice): string {
  *  merchant. Empty string for a profession with no display-name key, matching
  *  every other consumer of that table: no name is printable, so no line is. */
 function requirementText(row: VendorGoodsRow): string {
+  if (row.factionRequirement) {
+    const tier = STANDING_TIER_LABELS[row.factionRequirement.standingTier];
+    const faction = factionDisplayName(row.factionRequirement.factionId);
+    return `Requires ${tier} with ${faction}`;
+  }
   const requirement = row.requirement;
   if (!requirement) return '';
   const nameKey = gatheringProfessionNameKey(requirement.professionId);
@@ -209,7 +215,8 @@ export function renderVendorWindow(
     // gates on the whole-count total; force-1 and custom rows keep the 1x
     // baseline (the custom prompt's typed amount decides the rest).
     const countBuy = goods.countBuy;
-    row.disabled = countBuy ? !countBuy.affordable : !goods.affordable;
+    const lockedByFaction = goods.requirementUnmet && !!goods.factionRequirement;
+    row.disabled = lockedByFaction || (countBuy ? !countBuy.affordable : !goods.affordable);
     const price = countBuy ? formatLocalizedMoney(countBuy.copper) : goodsPriceText(goods.price);
     const itemName = itemDisplayName(item);
     const stack =

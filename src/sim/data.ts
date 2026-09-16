@@ -105,6 +105,7 @@ import {
   FARSHORE_ROADS,
   FARSHORE_ZONE,
 } from './content/farshore';
+import { FACTION_VENDOR_ITEMS, FACTION_VENDOR_NPCS } from './content/faction_vendors';
 import {
   FROSTVEIL_CAMPS,
   FROSTVEIL_ESCORTS,
@@ -413,6 +414,7 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   IGNIVAR_DROP_ITEMS,
   CRUCIBLE_PROFESSION_ITEMS,
   WORLD_QUEST_ITEMS,
+  FACTION_VENDOR_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';
@@ -498,6 +500,7 @@ export const NPCS: Record<string, NpcDef> = {
   [GLIDER_NPC_DEF.id]: GLIDER_NPC_DEF,
   [GLIDER_APPRENTICE_NPC_DEF.id]: GLIDER_APPRENTICE_NPC_DEF,
   ...Object.fromEntries(INVESTIGATION_NPCS.map((npc) => [npc.id, npc])),
+  ...FACTION_VENDOR_NPCS,
 };
 
 // Graveyards + the Spirit Healer: re-exported so the Sim and spirit.ts import the

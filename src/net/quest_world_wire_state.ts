@@ -1,3 +1,5 @@
+import type { FactionId } from '../sim/factions';
+import { freshFactionReputation } from '../sim/factions';
 import type {
   CannonActionId,
   CannonPoint,
@@ -24,7 +26,8 @@ export type QuestWorldCommand =
   | { cmd: 'world_quest_glider_boost' }
   | { cmd: 'world_quest_accuse'; npcId: number }
   | { cmd: 'world_quest_shadow'; action: 'pickpocket' | 'leave'; targetId?: number }
-  | { cmd: 'world_quest_start'; quest: string; difficulty: WorldQuestDifficulty };
+  | { cmd: 'world_quest_start'; quest: string; difficulty: WorldQuestDifficulty }
+  | { cmd: 'world_quest_reroll'; quest: string };
 
 /** Cold owner mirrors shared by quest snapshots and world-boss map state. */
 export class QuestWorldWireState {
@@ -36,6 +39,9 @@ export class QuestWorldWireState {
   worldQuestTime = 0;
   worldQuestLog: ReadonlyMap<string, WorldQuestProgress> = new Map();
   nearbyWorldQuestTraces: readonly NearbyWorldQuestTrace[] = [];
+  factions: Readonly<Record<FactionId, number>> = freshFactionReputation();
+  worldQuestReplacements: Readonly<Record<string, string>> = Object.freeze({});
+  worldQuestRerollCycle = '';
   private activeWorldBossIds = new Set<string>();
   private questWorldTransport: ((command: QuestWorldCommand) => void) | null = null;
   private questWorldRestBase = '';
@@ -120,6 +126,30 @@ export class QuestWorldWireState {
     this.sendQuestWorldCommand({ cmd: 'world_quest_start', quest: questId, difficulty });
   }
 
+  canRerollWorldQuest(questId: string): { canReroll: boolean; reason?: string } {
+    if (!this.worldQuestCycle) {
+      return { canReroll: false, reason: 'No active world quest cycle.' };
+    }
+    if (this.worldQuestRerollCycle === this.worldQuestCycle) {
+      return { canReroll: false, reason: 'Daily world quest reroll already used today.' };
+    }
+    const progress = this.worldQuestLog.get(questId);
+    if (progress?.state === 'completed') {
+      return { canReroll: false, reason: 'Completed world quests cannot be rerolled.' };
+    }
+    if (progress && progress.count > 0) {
+      return { canReroll: false, reason: 'In-progress world quests cannot be rerolled.' };
+    }
+    return { canReroll: true };
+  }
+
+  rerollWorldQuest(questId: string): boolean {
+    const check = this.canRerollWorldQuest(questId);
+    if (!check.canReroll) return false;
+    this.sendQuestWorldCommand({ cmd: 'world_quest_reroll', quest: questId });
+    return true;
+  }
+
   worldBossActive(bossId: string): boolean {
     return this.activeWorldBossIds.has(bossId);
   }
@@ -134,6 +164,8 @@ export class QuestWorldWireState {
     this.worldQuestExpiresAtMs = 0;
     this.worldQuestTime = 0;
     this.worldQuestLog = new Map();
+    this.worldQuestReplacements = Object.freeze({});
+    this.worldQuestRerollCycle = '';
     this.nearbyWorldQuestTraces = [];
     this.activeWorldBossIds = new Set();
   }

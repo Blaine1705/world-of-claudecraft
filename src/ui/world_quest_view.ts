@@ -1,4 +1,5 @@
 import { ITEMS, WORLD_QUESTS_BY_ID } from '../sim/data';
+import { factionDisplayName, worldQuestFaction, worldQuestStandingReward } from '../sim/factions';
 import type { WorldQuestDef } from '../sim/types';
 import { worldQuestRewardAmount } from '../sim/world_quests';
 import { mobDisplayName, vehicleStationDisplayName } from './entity_display_core';
@@ -80,8 +81,25 @@ export function worldQuestRewardText(quest: WorldQuestDef, level: number): strin
   return t('questUi.worldQuest.itemReward', { name });
 }
 
+export function worldQuestFactionName(quest: WorldQuestDef): string {
+  return factionDisplayName(worldQuestFaction(quest));
+}
+
+export function worldQuestFactionLine(quest: WorldQuestDef): string {
+  return `Faction: ${worldQuestFactionName(quest)}`;
+}
+
+export function worldQuestStandingRewardText(quest: WorldQuestDef, level: number): string {
+  const amount = worldQuestStandingReward(quest, level);
+  const factionName = worldQuestFactionName(quest);
+  return `+${amount} ${factionName} Standing`;
+}
+
 export function worldQuestRewardLine(quest: WorldQuestDef, level: number): string {
-  return t('questUi.worldQuest.rewardLine', { reward: worldQuestRewardText(quest, level) });
+  const baseReward = worldQuestRewardText(quest, level);
+  const standingReward = worldQuestStandingRewardText(quest, level);
+  const reward = baseReward ? `${baseReward} · ${standingReward}` : standingReward;
+  return t('questUi.worldQuest.rewardLine', { reward });
 }
 
 function durationUnit(value: number, unit: 'day' | 'hour' | 'minute'): string {

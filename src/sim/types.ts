@@ -4805,6 +4805,7 @@ export type WorldQuestObjective =
 export interface WorldQuestDef {
   id: string;
   zoneId: string;
+  faction?: 'rift_watch' | 'church_order' | 'automatons';
   minLevel: number;
   area: { x: number; z: number; radius: number };
   objective: WorldQuestObjective;

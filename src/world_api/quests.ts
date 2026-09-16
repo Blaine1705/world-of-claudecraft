@@ -1,3 +1,4 @@
+import type { FactionId } from '../sim/factions';
 import type { QuestProgress, QuestState, WorldQuestProgress } from '../sim/types';
 import type { WorldQuestDifficulty } from '../sim/world_quest_activity';
 import type { WorldQuestMedal, WorldQuestScoreboardId } from '../sim/world_quest_scoreboards';
@@ -35,6 +36,14 @@ export interface IWorldQuests {
   worldQuestLog: ReadonlyMap<string, WorldQuestProgress>;
   /** Nearby other players' blue trails/results, never their private drawing guidance. */
   readonly nearbyWorldQuestTraces: readonly NearbyWorldQuestTrace[];
+  /** Persistent reputation standing across all allied factions. */
+  readonly factions: Readonly<Record<FactionId, number>>;
+  /** Personal world quest replacement mappings for the current daily cycle. */
+  readonly worldQuestReplacements?: Readonly<Record<string, string>>;
+  /** Cycle key for which the player used their daily world quest reroll. */
+  readonly worldQuestRerollCycle?: string;
+  canRerollWorldQuest?(questId: string): { canReroll: boolean; reason?: string };
+  rerollWorldQuest?(questId: string): boolean;
   questState(questId: string): QuestState;
   acceptQuest(questId: string, selection?: string): void;
   turnInQuest(questId: string): void;

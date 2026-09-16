@@ -24,6 +24,7 @@ import { questMarkerTooltipTag } from '../../quest_marker_tags';
 import {
   worldQuestDef,
   worldQuestDisplayName,
+  worldQuestFactionLine,
   worldQuestObjectiveLabel,
   worldQuestRewardLine,
   worldQuestStatusText,
@@ -120,6 +121,7 @@ export class MapMarkerTooltipContent {
     const timeRemaining = worldQuestTimeRemainingText(this.world.worldQuestExpiresAtMs, nowMs);
     return (
       `<div class="tt-title">${esc(worldQuestDisplayName(marker.questId))}</div>` +
+      `<div>${esc(worldQuestFactionLine(quest))}</div>` +
       `<div>${esc(worldQuestStatusText(marker.state))}</div>` +
       `<div>${esc(
         questProgressText(worldQuestObjectiveLabel(marker.questId), current, quest.count),

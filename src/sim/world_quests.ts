@@ -6,6 +6,12 @@ import { SHADOW_QUEST_ID } from './content/world_quest_shadow';
 import { WISP_MAZE_QUEST_ID } from './content/world_quest_wisp_maze';
 import { WORLD_QUEST_MIN_LEVEL, WORLD_QUESTS, WORLD_QUESTS_BY_ID } from './content/world_quests';
 import { grantDeed } from './deeds';
+import {
+  awardFactionReputation,
+  factionDisplayName,
+  worldQuestFaction,
+  worldQuestStandingReward,
+} from './factions';
 import { formatMoney } from './format_money';
 import { sanitizeForgeResult } from './minigames/forge_workshop';
 import { applyGliderBoost } from './minigames/glider_boost';
@@ -95,6 +101,7 @@ import {
   worldQuestCycleNumber,
   worldQuestPuzzleVariantForCycle,
 } from './world_quest_rotation';
+import { playerActiveWorldQuests } from './world_quest_reroll';
 import {
   isWorldQuestSalvageObject,
   isWorldQuestSalvageObjectInCurrentLayout,
@@ -135,6 +142,12 @@ export {
   WORLD_QUESTS_PER_ROTATION,
   worldQuestCycleForResetDay,
 } from './world_quest_rotation';
+export {
+  canRerollWorldQuest,
+  rerollWorldQuest,
+  playerActiveWorldQuests,
+  sanitizeWorldQuestReplacements,
+} from './world_quest_reroll';
 
 export const WORLD_QUEST_LEY_TIMER_SECONDS = 90;
 const WORLD_QUEST_CLAIM_PREFIX = '__wq_claim__:';
@@ -237,6 +250,8 @@ function resetCycleIfNeeded(ctx: SimContext, meta: PlayerMeta, resolvedCycle?: s
   meta.worldQuestLog.clear();
   meta.worldQuestAreas.clear();
   meta.openWorldQuestPuzzleId = null;
+  meta.worldQuestRerollCycle = '';
+  meta.worldQuestReplacements = {};
   for (const id of meta.unlockedMilestones) {
     if (typeof id === 'string' && id.startsWith(WORLD_QUEST_CLAIM_PREFIX)) {
       meta.unlockedMilestones.delete(id);
@@ -252,7 +267,7 @@ function resetCycleIfNeeded(ctx: SimContext, meta: PlayerMeta, resolvedCycle?: s
 export function hasActiveWorldQuest(meta: PlayerMeta, questId: string): boolean {
   const progress = meta.worldQuestLog.get(questId);
   if (progress?.state !== 'active') return false;
-  return activeWorldQuestsForCycle(meta.worldQuestCycle).some((quest) => quest.id === questId);
+  return playerActiveWorldQuests(meta).some((quest) => quest.id === questId);
 }
 
 /** Starts every eligible objective whose area the living player enters. */
@@ -295,7 +310,10 @@ export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Ent
     return;
   }
   if (player.mountKey) dropWorldQuestDeliveryCargo(ctx, player);
-  const activeQuests = devCycle === null ? rotation.quests : activeWorldQuestsForCycle(devCycle);
+  const activeQuests =
+    devCycle === null
+      ? playerActiveWorldQuests(meta, rotation.cycle, rotation.quests)
+      : playerActiveWorldQuests(meta, devCycle);
   for (const quest of activeQuests) {
     if (player.level < quest.minLevel) continue;
     const inside = inWorldQuestArea(player, quest);
@@ -501,7 +519,7 @@ export function talkToWorldQuestInstructor(
       player.level >= quest.minLevel &&
       progress &&
       inWorldQuestArea(player, quest) &&
-      activeWorldQuestsForCycle(meta.worldQuestCycle).some((active) => active.id === quest.id);
+      playerActiveWorldQuests(meta).some((active) => active.id === quest.id);
     if (isQuestActive && progress) {
       startGliderFlight(ctx, meta, player, npc, progress);
     } else {
@@ -520,7 +538,7 @@ export function talkToWorldQuestInstructor(
       player.level >= quest.minLevel &&
       progress &&
       inWorldQuestArea(player, quest) &&
-      activeWorldQuestsForCycle(meta.worldQuestCycle).some((active) => active.id === quest.id)
+      playerActiveWorldQuests(meta).some((active) => active.id === quest.id)
     )
       (quest.objective.type === 'wisp_maze' ? startWispMazeNormal : startForgeWorkshop)(
         ctx,
@@ -541,7 +559,7 @@ export function talkToWorldQuestInstructor(
   return true;
 }
 
-function awardWorldQuest(ctx: SimContext, meta: PlayerMeta, quest: WorldQuestDef): void {
+export function awardWorldQuest(ctx: SimContext, meta: PlayerMeta, quest: WorldQuestDef): void {
   const player = ctx.entities.get(meta.entityId);
   if (!player) return;
   if (quest.reward.type === 'xp') {
@@ -556,6 +574,17 @@ function awardWorldQuest(ctx: SimContext, meta: PlayerMeta, quest: WorldQuestDef
     });
   } else {
     ctx.addItem(quest.reward.itemId, quest.reward.count, meta.entityId);
+  }
+
+  const factionId = worldQuestFaction(quest);
+  const standingAward = worldQuestStandingReward(quest, player.level);
+  const standingResult = awardFactionReputation(meta, factionId, standingAward, player.level);
+  if (standingResult.gained > 0) {
+    ctx.emit({
+      type: 'loot',
+      text: `+${standingResult.gained} ${factionDisplayName(factionId)} Standing.`,
+      pid: meta.entityId,
+    });
   }
 }
 
@@ -684,7 +713,7 @@ export function onMobKilledForWorldQuests(ctx: SimContext, mob: Entity, meta: Pl
   resetCycleIfNeeded(ctx, meta);
   const player = ctx.entities.get(meta.entityId);
   if (!player || player.dead) return;
-  const activeQuests = activeWorldQuestsForCycle(meta.worldQuestCycle);
+  const activeQuests = playerActiveWorldQuests(meta);
   for (const progress of meta.worldQuestLog.values()) {
     if (progress.state !== 'active') continue;
     const quest = activeQuests.find((candidate) => candidate.id === progress.questId);
@@ -743,7 +772,7 @@ export function onObjectInteractedForWorldQuests(
       progress &&
       player.level >= quest.minLevel &&
       inWorldQuestArea(player, quest) &&
-      activeWorldQuestsForCycle(meta.worldQuestCycle).some((active) => active.id === quest.id)
+      playerActiveWorldQuests(meta).some((active) => active.id === quest.id)
     ) {
       const completed = respondForgeWorkshop(ctx, meta, player, obj, progress);
       if (completed && progress.state === 'active')
@@ -1010,12 +1039,18 @@ export function sanitizeWorldQuestProgress(
   value: unknown,
   cycle?: unknown,
   includeSessionDeadlines = false,
+  replacements?: Record<string, string>,
 ): WorldQuestProgress[] {
   if (!Array.isArray(value)) return [];
   const output: WorldQuestProgress[] = [];
   const seen = new Set<string>();
   const activeIds =
-    cycle === undefined ? null : new Set(activeWorldQuestsForCycle(cycle).map((quest) => quest.id));
+    cycle === undefined
+      ? null
+      : new Set([
+          ...activeWorldQuestsForCycle(cycle).map((quest) => quest.id),
+          ...(replacements ? Object.values(replacements) : []),
+        ]);
   const scanLimit = Math.min(value.length, WORLD_QUESTS.length * 4);
   for (let entryIndex = 0; entryIndex < scanLimit; entryIndex++) {
     const entry = value[entryIndex];

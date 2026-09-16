@@ -138,7 +138,12 @@ export const IWORLD_MEMBERS = [
   { name: 'worldQuestLog', kind: 'data' },
   { name: 'worldQuestTime', kind: 'data' },
   { name: 'nearbyWorldQuestTraces', kind: 'data' },
+  { name: 'factions', kind: 'data' },
+  { name: 'worldQuestReplacements', kind: 'data' },
+  { name: 'worldQuestRerollCycle', kind: 'data' },
   // --- commands + read-returning methods ---
+  { name: 'canRerollWorldQuest', kind: 'method' },
+  { name: 'rerollWorldQuest', kind: 'method' },
   { name: 'questState', kind: 'method' }, // read-returning (1/6)
   { name: 'reactiveAbilityWindowRemaining', kind: 'method' },
   { name: 'groundAimPlacementPreview', kind: 'method' },
@@ -879,9 +884,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // 391/110/281 at the release/v0.43.0 merge into feature/world-quests:
     // the release's contract plus the branch's world-quest, vehicle and
     // minigame members, counted off the resolved IWORLD_MEMBERS literal.
-    expect(IWORLD_MEMBERS.length).toBe(391);
-    expect(DATA_MEMBERS.length).toBe(110);
-    expect(METHOD_MEMBERS.length).toBe(281);
+    expect(IWORLD_MEMBERS.length).toBe(396);
+    expect(DATA_MEMBERS.length).toBe(113);
+    expect(METHOD_MEMBERS.length).toBe(283);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -951,6 +956,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'buyCrucibleVendorItem',
       'buyHeroicVendorItem',
       'buyItem',
+      'canRerollWorldQuest',
       'cancelAura',
       'cancelCommissionOrder',
       'cardMinigameInfo',
@@ -1031,6 +1037,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'equipment',
       'equipmentInstances',
       'extractEssence',
+      'factions',
       'farmNowMs',
       'farmPatches',
       'feedPet',
@@ -1182,6 +1189,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'renamePet',
       'renown',
       'reportTelemetry',
+      'rerollWorldQuest',
       'resetWorldQuestMatch3',
       'resetWorldQuestPuzzle',
       'resolvedAbility',
@@ -1281,6 +1289,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'worldQuestExpiresAtMs',
       'worldQuestLeaderboard',
       'worldQuestLog',
+      'worldQuestReplacements',
+      'worldQuestRerollCycle',
       'worldQuestTime',
       'xp',
     ]);
@@ -1336,6 +1346,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'entityRosterVersion',
       'equipment',
       'equipmentInstances',
+      'factions',
       'farmPatches',
       'gatheringGoal',
       'gatheringProficiency',
@@ -1396,6 +1407,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'worldQuestCycle',
       'worldQuestExpiresAtMs',
       'worldQuestLog',
+      'worldQuestReplacements',
+      'worldQuestRerollCycle',
       'worldQuestTime',
       'xp',
     ]);
@@ -1436,6 +1449,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'buyCrucibleVendorItem',
       'buyHeroicVendorItem',
       'buyItem',
+      'canRerollWorldQuest',
       'cancelAura',
       'cancelCommissionOrder',
       'castAbility',
@@ -1604,6 +1618,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'reliquaryRarity',
       'renamePet',
       'reportTelemetry',
+      'rerollWorldQuest',
       'resetWorldQuestMatch3',
       'resetWorldQuestPuzzle',
       'resolvedAbility',
@@ -1917,6 +1932,11 @@ const FACET_QUESTS = [
   'shadowWorldQuestAction',
   'startWorldQuestActivity',
   'acceptLinkedQuest',
+  'factions',
+  'worldQuestReplacements',
+  'worldQuestRerollCycle',
+  'canRerollWorldQuest',
+  'rerollWorldQuest',
 ] as const satisfies readonly (keyof IWorldQuests)[];
 type _ExhaustQuests = AssertNever<Exclude<keyof IWorldQuests, (typeof FACET_QUESTS)[number]>>;
 
@@ -2457,8 +2477,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // tests/world_api_parity.test.ts` before merge lands to confirm the
     // facet arrays actually reconstruct IWORLD_MEMBERS with no gaps or
     // collisions; this pin and the one above must always agree.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(391);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(391);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(396);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(396);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);
