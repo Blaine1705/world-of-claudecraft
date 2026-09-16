@@ -89,9 +89,9 @@ const ARCHETYPE_PAIR_TITLE_KEYS: Record<string, TranslationKey> = {
 };
 
 const CHARACTER_SIDEBAR_LABEL_KEYS: Record<CharacterSidebarTab, TranslationKey> = {
-  stats: 'hudChrome.charSidebar.stats',
+  stats: 'hudChrome.charSidebar.character',
   progression: 'hudChrome.charSidebar.progression',
-  skills: 'hudChrome.charSidebar.skills',
+  skills: 'hudChrome.charSidebar.professions',
   reputation: 'hudChrome.charSidebar.reputation',
   currencies: 'hudChrome.charSidebar.currencies',
 };
@@ -312,7 +312,8 @@ export class CharWindow {
             hobby: hobbyCraft,
           });
     let html = `<div class="panel-title char-title-portrait ui-win-head">${portraitChipHtml({ cls: world.cfg.playerClass, skin: p.skin ?? 0, name: p.name, variant: 'sm', catalog: p.skinCatalog, look: isMechWearer(world.player) ? null : modularLookFor(world.player) })}<span class="char-title-text ui-win-title" id="char-title">${esc(p.name)}<span class="ui-win-sub char-title-sub">${archetypeCrest}${esc(subtitle)}</span></span><span class="char-honor-balance">${currencyIconHtml('honor')}${esc(t('hudChrome.warfare.balance', { amount: formatNumber(world.honor, { maximumFractionDigits: 0 }) }))}</span><button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
-    html += `<div class="char-body"><section class="char-equipment-pane"><div class="paperdoll">
+    const panelLabel = `aria-labelledby="${esc(charSidebarTabId(sidebar.selected))}"`;
+    const paperdoll = `<section class="char-equipment-pane"><div class="paperdoll">
         <div class="equip-col" id="equip-col-left"></div>
         <div class="char-model-panel ui-card">
           <div id="char-model-preview" class="char-model-preview" role="img" aria-label="${esc(t('hudChrome.character.modelPreview'))}"></div>
@@ -320,8 +321,18 @@ export class CharWindow {
         </div>
         <div class="equip-col equip-col-right" id="equip-col-right"></div>
         <div class="equip-row-weapons" id="equip-row-weapons"></div>
-      </div>${this.masterwroughtSlotsHtml(world)}<div class="ui-divider char-footer-divider"></div><footer class="char-footer"><div class="pc-share-row"><button type="button" class="btn ui-btn char-cosmetics-btn" data-act="open-cosmetics">${esc(t('hudChrome.cosmetics.title'))}</button><button type="button" class="pc-share-btn ui-btn ui-btn--red" data-act="share-card">${SHARE_GLYPH}<span>${esc(t('playerCard.shareButton'))}</span></button></div></footer></section>`;
-    html += `<section class="char-sidebar">${tabStripHtml(
+      </div>${this.masterwroughtSlotsHtml(world)}</section>`;
+    // The Character tab keeps the paperdoll and adds the stats rail beside it
+    // (Offense and Defense, scrolling), with the primary attributes in a row
+    // beneath; every other tab takes the whole body. The one tabpanel keeps
+    // its id, tab stop and name in both shapes (the WAI-ARIA tabs pattern,
+    // axe's scrollable-region-focusable).
+    if (sidebar.selected === 'stats') {
+      html += `<div class="char-body char-body--sheet">${paperdoll}<aside id="char-sidebar-panel" class="char-sidebar-panel char-stats-rail" role="tabpanel" tabindex="0" ${panelLabel}>${this.statsRailHtml()}</aside></div><div class="char-attr-row stat-panel attrs-tiles">${this.attributeTilesHtml()}</div>`;
+    } else {
+      html += `<div class="char-body char-body--tab"><div id="char-sidebar-panel" class="char-sidebar-panel char-tab-panel" role="tabpanel" tabindex="0" ${panelLabel}>${this.sidebarHtml(world, sidebar.selected)}</div></div>`;
+    }
+    html += `<footer class="char-footer">${tabStripHtml(
       tabStripModel({
         ariaLabel: t('hudChrome.charSidebar.label'),
         panelId: 'char-sidebar-panel',
@@ -335,11 +346,7 @@ export class CharWindow {
         })),
         selected: sidebar.selected,
       }),
-      // The panel scrolls (overflow-y: auto) and the Stats tab holds no
-      // focusable content, so it needs its own tab stop plus the selected
-      // tab's label as its name: the WAI-ARIA tabs pattern, and what
-      // axe's scrollable-region-focusable asks for.
-    )}<div id="char-sidebar-panel" class="char-sidebar-panel" role="tabpanel" tabindex="0" aria-labelledby="${esc(charSidebarTabId(sidebar.selected))}">${this.sidebarHtml(world, sidebar.selected)}</div></section></div>`;
+    )}<div class="pc-share-row"><button type="button" class="btn ui-btn char-cosmetics-btn" data-act="open-cosmetics">${esc(t('hudChrome.cosmetics.title'))}</button><button type="button" class="pc-share-btn ui-btn ui-btn--red" data-act="share-card">${SHARE_GLYPH}<span>${esc(t('playerCard.shareButton'))}</span></button></div></footer>`;
     el.innerHTML = html;
     hydratePortraits(el);
     wireTabStrip(el, 'char-sidebar-tab', (id, focusFollow) => {
@@ -441,26 +448,46 @@ export class CharWindow {
     // Playtime lives with the rest of the character's progression readouts
     // (the footer keeps only the share and cosmetics actions).
     if (selected === 'progression')
-      return this.deps.progressionHtml(world.player.level) + this.playtimeHtml(world);
+      return (
+        this.deps.progressionHtml(world.player.level) +
+        this.deps.talentSummaryHtml() +
+        this.playtimeHtml(world)
+      );
     if (selected === 'skills') return this.skillsHtml(world);
     if (selected === 'reputation') return reputationTabHtml(world, Date.now());
     if (selected === 'currencies') return currenciesTabHtml(world);
-    const stats = `<div class="stat-panels">${STAT_PANELS.map((panel) => {
-      const cellClasses = panel.kind === 'tiles' ? 'ui-stat-row ui-card' : 'ui-stat-row';
-      const cells = panel.stats
-        .map((stat) =>
-          this.deps
-            .statCellHtml(stat)
-            .replace('class="stat-cell"', `class="stat-cell ${cellClasses}"`),
-        )
-        .join('');
-      const title = panel.titleKey
-        ? `<div class="sp-title">${esc(t(panel.titleKey as TranslationKey))}</div>`
-        : '';
-      const cls = panel.kind === 'tiles' ? 'stat-panel attrs-tiles' : 'stat-panel ui-card';
-      return `<div class="${cls}">${title}${cells}</div>`;
-    }).join('')}</div>`;
-    return stats + this.deps.talentSummaryHtml();
+    return this.statsRailHtml();
+  }
+
+  /** The titled stat boards (Offense, Defense): the Character tab's rail. */
+  private statsRailHtml(): string {
+    return `<div class="char-rail-panels">${STAT_PANELS.filter((panel) => panel.kind !== 'tiles')
+      .map((panel) => {
+        const cells = panel.stats
+          .map((stat) =>
+            this.deps
+              .statCellHtml(stat)
+              .replace('class="stat-cell"', 'class="stat-cell ui-stat-row"'),
+          )
+          .join('');
+        const title = panel.titleKey
+          ? `<div class="sp-title">${esc(t(panel.titleKey as TranslationKey))}</div>`
+          : '';
+        return `<div class="stat-panel ui-card">${title}${cells}</div>`;
+      })
+      .join('')}</div>`;
+  }
+
+  /** The five primary attributes as tiles: the row under the paperdoll. */
+  private attributeTilesHtml(): string {
+    return STAT_PANELS.filter((panel) => panel.kind === 'tiles')
+      .flatMap((panel) => panel.stats)
+      .map((stat) =>
+        this.deps
+          .statCellHtml(stat)
+          .replace('class="stat-cell"', 'class="stat-cell ui-stat-row ui-card"'),
+      )
+      .join('');
   }
 
   private skillsHtml(world: IWorld): string {

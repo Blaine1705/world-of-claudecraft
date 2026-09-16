@@ -2312,6 +2312,8 @@ export const da_DK: EnTranslations = {
       "skills": "Færdigheder",
       "reputation": "Reputation",
       "currencies": "Currencies",
+      "character": "Character",
+      "professions": "Professions",
       "gathering": "Indsamling",
       "crafting": "Håndværk",
       "openProfessions": "Åbne erhverv"

@@ -2312,6 +2312,8 @@ export const ko_KR: EnTranslations = {
       "skills": "기술",
       "reputation": "평판",
       "currencies": "화폐",
+      "character": "캐릭터",
+      "professions": "전문 기술",
       "gathering": "채집",
       "crafting": "제작",
       "openProfessions": "전문 기술 열기"

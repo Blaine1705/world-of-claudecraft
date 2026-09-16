@@ -44,10 +44,10 @@ export type CharacterSidebarTab = 'stats' | 'progression' | 'skills' | 'reputati
 
 export const CHARACTER_SIDEBAR_TABS: readonly CharacterSidebarTab[] = [
   'stats',
-  'progression',
-  'skills',
   'reputation',
   'currencies',
+  'progression',
+  'skills',
 ];
 
 export interface CharacterSidebarView {

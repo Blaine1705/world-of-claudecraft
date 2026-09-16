@@ -2312,6 +2312,8 @@ export const tr_TR: EnTranslations = {
       "skills": "Yetenekler",
       "reputation": "Reputation",
       "currencies": "Currencies",
+      "character": "Character",
+      "professions": "Professions",
       "gathering": "Toplama",
       "crafting": "işçiliği",
       "openProfessions": "Açık Meslekler"

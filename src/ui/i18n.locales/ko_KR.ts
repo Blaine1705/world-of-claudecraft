@@ -17087,6 +17087,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.charSidebar.skills': '기술',
   'hudChrome.charSidebar.reputation': '평판',
   'hudChrome.charSidebar.currencies': '화폐',
+  'hudChrome.charSidebar.character': '캐릭터',
+  'hudChrome.charSidebar.professions': '전문 기술',
   'hudChrome.charSidebar.gathering': '채집',
   'hudChrome.charSidebar.crafting': '제작',
   'hudChrome.charSidebar.openProfessions': '전문 기술 열기',

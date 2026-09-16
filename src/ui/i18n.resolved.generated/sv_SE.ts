@@ -2312,6 +2312,8 @@ export const sv_SE: EnTranslations = {
       "skills": "Färdigheter",
       "reputation": "Reputation",
       "currencies": "Currencies",
+      "character": "Character",
+      "professions": "Professions",
       "gathering": "anfångning",
       "crafting": "Crafting",
       "openProfessions": "Öppna yrken"

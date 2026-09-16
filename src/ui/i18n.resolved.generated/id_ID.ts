@@ -2312,6 +2312,8 @@ export const id_ID: EnTranslations = {
       "skills": "Keterampilan",
       "reputation": "Reputation",
       "currencies": "Currencies",
+      "character": "Character",
+      "professions": "Professions",
       "gathering": "Mengumpulkan",
       "crafting": "kerajinan",
       "openProfessions": "Profesi Terbuka"

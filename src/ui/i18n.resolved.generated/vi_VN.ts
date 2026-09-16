@@ -2312,6 +2312,8 @@ export const vi_VN: EnTranslations = {
       "skills": "Kỹ năng",
       "reputation": "Reputation",
       "currencies": "Currencies",
+      "character": "Character",
+      "professions": "Professions",
       "gathering": "Quy tụ",
       "crafting": "Chế tạo",
       "openProfessions": "Nghề nghiệp đang mở"

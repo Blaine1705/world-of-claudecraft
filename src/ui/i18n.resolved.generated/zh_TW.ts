@@ -2312,6 +2312,8 @@ export const zh_TW: EnTranslations = {
       "skills": "技能",
       "reputation": "聲望",
       "currencies": "貨幣",
+      "character": "角色",
+      "professions": "專業",
       "gathering": "採集",
       "crafting": "製作",
       "openProfessions": "開啟專業"

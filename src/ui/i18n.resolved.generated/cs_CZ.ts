@@ -2312,6 +2312,8 @@ export const cs_CZ: EnTranslations = {
       "skills": "Dovednosti",
       "reputation": "Reputation",
       "currencies": "Currencies",
+      "character": "Character",
+      "professions": "Professions",
       "gathering": "Shromáždění",
       "crafting": "Řemeslnictví",
       "openProfessions": "Otevřené profese"

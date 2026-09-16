@@ -2312,6 +2312,8 @@ export const en_XA: EnTranslations = {
       "skills": "[Šķíļļš]",
       "reputation": "[Ŕéþúţáţíóñ]",
       "currencies": "[Çúŕŕéñçíéš]",
+      "character": "[Çĥáŕáçţéŕ]",
+      "professions": "[Þŕóƒéššíóñš]",
       "gathering": "[Ĝáţĥéŕíñĝ]",
       "crafting": "[Çŕáƒţíñĝ]",
       "openProfessions": "[Óþéñ Þŕóƒéššíóñš]"

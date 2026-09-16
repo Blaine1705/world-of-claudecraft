@@ -16273,6 +16273,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.charSidebar.skills': '技能',
   'hudChrome.charSidebar.reputation': '聲望',
   'hudChrome.charSidebar.currencies': '貨幣',
+  'hudChrome.charSidebar.character': '角色',
+  'hudChrome.charSidebar.professions': '專業',
   'hudChrome.charSidebar.gathering': '採集',
   'hudChrome.charSidebar.crafting': '製作',
   'hudChrome.charSidebar.openProfessions': '開啟專業',

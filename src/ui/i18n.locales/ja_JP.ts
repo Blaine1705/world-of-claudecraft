@@ -17121,6 +17121,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.charSidebar.skills': 'スキル',
   'hudChrome.charSidebar.reputation': '評判',
   'hudChrome.charSidebar.currencies': '通貨',
+  'hudChrome.charSidebar.character': 'キャラクター',
+  'hudChrome.charSidebar.professions': '専門技能',
   'hudChrome.charSidebar.gathering': '採集',
   'hudChrome.charSidebar.crafting': '製作',
   'hudChrome.charSidebar.openProfessions': '職業を開く',

@@ -2312,6 +2312,8 @@ export const ja_JP: EnTranslations = {
       "skills": "スキル",
       "reputation": "評判",
       "currencies": "通貨",
+      "character": "キャラクター",
+      "professions": "専門技能",
       "gathering": "採集",
       "crafting": "製作",
       "openProfessions": "職業を開く"

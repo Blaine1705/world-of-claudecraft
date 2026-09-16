@@ -2925,6 +2925,10 @@ export const hudChromeStrings = {
     skills: 'Skills',
     reputation: 'Reputation',
     currencies: 'Currencies',
+    // The sheet's bottom tab strip: the paperdoll tab and the skills tab read
+    // as Character and Professions there (stats/skills keep their ids).
+    character: 'Character',
+    professions: 'Professions',
     gathering: 'Gathering',
     crafting: 'Crafting',
     openProfessions: 'Open Professions',

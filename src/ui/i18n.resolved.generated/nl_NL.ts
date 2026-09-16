@@ -2312,6 +2312,8 @@ export const nl_NL: EnTranslations = {
       "skills": "Vaardigheden",
       "reputation": "Reputation",
       "currencies": "Currencies",
+      "character": "Character",
+      "professions": "Professions",
       "gathering": "Bijeenkomst",
       "crafting": "Knutselen",
       "openProfessions": "Open beroepen"

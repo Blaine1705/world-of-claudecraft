@@ -2312,6 +2312,8 @@ export const es: EnTranslations = {
       "skills": "Habilidades",
       "reputation": "Reputation",
       "currencies": "Currencies",
+      "character": "Character",
+      "professions": "Professions",
       "gathering": "Reunión",
       "crafting": "Elaboración",
       "openProfessions": "Profesiones abiertas"

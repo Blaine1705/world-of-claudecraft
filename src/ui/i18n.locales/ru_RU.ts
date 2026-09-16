@@ -17357,6 +17357,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.charSidebar.skills': 'Навыки',
   'hudChrome.charSidebar.reputation': 'Репутация',
   'hudChrome.charSidebar.currencies': 'Валюты',
+  'hudChrome.charSidebar.character': 'Персонаж',
+  'hudChrome.charSidebar.professions': 'Профессии',
   'hudChrome.charSidebar.gathering': 'Сбор',
   'hudChrome.charSidebar.crafting': 'Ремесло',
   'hudChrome.charSidebar.openProfessions': 'Открыть профессии',

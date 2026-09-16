@@ -258,10 +258,10 @@ describe('char_window: profession art placements', () => {
     const tabs = [...root.querySelectorAll<HTMLElement>('.char-sidebar-tab')];
     expect(tabs.map((tab) => [tab.dataset.tab, tab.getAttribute('aria-selected')])).toEqual([
       ['stats', 'true'],
-      ['progression', 'false'],
-      ['skills', 'false'],
       ['reputation', 'false'],
       ['currencies', 'false'],
+      ['progression', 'false'],
+      ['skills', 'false'],
     ]);
     // The sidebar panel scrolls and the Stats board holds no focusable
     // content, so it carries its own tab stop and takes its name from the

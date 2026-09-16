@@ -2312,6 +2312,8 @@ export const ru_RU: EnTranslations = {
       "skills": "Навыки",
       "reputation": "Репутация",
       "currencies": "Валюты",
+      "character": "Персонаж",
+      "professions": "Профессии",
       "gathering": "Сбор",
       "crafting": "Ремесло",
       "openProfessions": "Открыть профессии"

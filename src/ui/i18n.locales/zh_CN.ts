@@ -16265,6 +16265,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.charSidebar.skills': '技能',
   'hudChrome.charSidebar.reputation': '声望',
   'hudChrome.charSidebar.currencies': '货币',
+  'hudChrome.charSidebar.character': '角色',
+  'hudChrome.charSidebar.professions': '专业',
   'hudChrome.charSidebar.gathering': '采集',
   'hudChrome.charSidebar.crafting': '制作',
   'hudChrome.charSidebar.openProfessions': '打开专业',
