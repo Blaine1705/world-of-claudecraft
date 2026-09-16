@@ -18,9 +18,8 @@
 // by the extraction.
 
 import { isInstancedRegion, MANTLE_REACH, slopeGlueHeight } from './colliders';
-import { afflictionCanCastWhileMoving } from './combat/affliction';
+import { abilityCastSurvivesMovement, movementInputWouldMove } from './combat/cast_move_gate';
 import { isRooted, isStunned } from './combat/cc';
-import { iceFloesAuraForAbility } from './combat/empower_next';
 import { isVeilboundMarchActive } from './combat/paladin_veilbound_state';
 import { mountMoveSpeedPct } from './content/mounts';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from './pathfind';
@@ -41,6 +40,7 @@ import {
 } from './ride_height';
 import { GHOST_RUN_MULT } from './spirit';
 import {
+  CAT_FORM_MOVE_MULT,
   DT,
   ENRAGE_MOVE_MULT,
   type Entity,
@@ -48,7 +48,6 @@ import {
   normAngle,
   RUN_SPEED,
   TURN_SPEED,
-  WOLF_FORM_MOVE_MULT,
 } from './types';
 import {
   groundHeight,
@@ -246,9 +245,9 @@ export function moveSpeedMult(e: Entity, extraSpeedPct = 0): number {
     }
     // Fury Enrage: +10% move speed (non-stacking with other speed buffs).
     if (a.kind === 'enrage') speed = Math.max(speed, ENRAGE_MOVE_MULT);
-    // Druid Wolf Form: +15% passive move speed. form_cat's value is the threat
+    // Druid Cat Form: +15% passive move speed. form_cat's value is the threat
     // multiplier, not a speed, so the constant is what rides the max.
-    if (a.kind === 'form_cat') speed = Math.max(speed, WOLF_FORM_MOVE_MULT);
+    if (a.kind === 'form_cat') speed = Math.max(speed, CAT_FORM_MOVE_MULT);
     if (a.id === WORLD_QUEST_DELIVERY_AURA_ID && a.kind === 'world_quest_cargo') {
       cargo = Math.min(cargo, WORLD_QUEST_DELIVERY_SPEED_MULT);
     }
@@ -395,7 +394,7 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
   // Keep the root ONLY during the dismount channel (mountCastKey === '' means dismounting).
   // During a summon channel, movement is allowed (and handled above via move-to-cancel).
   const mountLocked = p.mountCastRemaining > 0 && p.mountCastKey === '';
-  const moving = hasMoveInput && !isRooted(p) && !steepGround && !mountLocked;
+  const moving = movementInputWouldMove(p, inp, steepGround, mountLocked);
   let wishX = 0,
     wishZ = 0,
     wishSpeed = 0;
@@ -407,13 +406,7 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
       // cast survives, and COMPLETING the hard cast spends one of the aura's
       // protected uses (casting_lifecycle), so moving mid-cast never overspends.
       const casting = deps.resolvedAbility(p.castingAbility, p.id);
-      const mobile =
-        casting != null &&
-        (casting.def.castWhileMoving ||
-          casting.castWhileMoving ||
-          iceFloesAuraForAbility(p, p.castingAbility) !== undefined ||
-          afflictionCanCastWhileMoving(p, p.castingAbility) ||
-          p.auras.some((a) => a.kind === 'processional_grace'));
+      const mobile = casting != null && abilityCastSurvivesMovement(p, p.castingAbility, casting);
       if (!mobile) deps.cancelCast(p);
     }
     const len = Math.hypot(mx, mz);

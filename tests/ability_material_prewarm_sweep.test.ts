@@ -85,6 +85,8 @@ const REGISTERED_MODULES = [
   'ice_block_visual.ts',
   'temporal_hourglass_visual.ts',
   'fireball_travel_visual.ts',
+  'ignivar_fire_vfx.ts',
+  'ring_of_frost_visual.ts',
   'coach_trail_materials.ts',
 ];
 
@@ -232,11 +234,13 @@ describe('the lazy-material sweep', () => {
     const hits = sweep();
     const files = hits.map((hit) => basename(hit.file));
     for (const module of REGISTERED_MODULES) expect(files).toContain(module);
-    // Vacuity floor, kept just under the real count: the registered
-    // bundles (coach and calligraphy guidance among the spell visuals),
-    // the two excluded scenery bakes, and the battleground caches.
-    expect(hits.length).toBeGreaterThanOrEqual(9);
-    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(8);
+    // Vacuity floor, kept just under the real count: the seven registered
+    // bundles (the coach trail's guidance set, the ground fire AoE anchor and
+    // the Ring of Frost stand-in among the four spell visuals), the two
+    // excluded scenery bakes, and the battleground caches.
+    // Plus the World Quests branch's calligraphy guidance bundle.
+    expect(hits.length).toBeGreaterThanOrEqual(11);
+    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(10);
   });
 
   it('leaves no hit unregistered and unexcluded', () => {

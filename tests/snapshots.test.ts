@@ -988,6 +988,32 @@ describe('ledge climb over the wire (cl progress)', () => {
     expect(client.entities.get(e.id)!.climbing).toBe(false);
     expect(client.entities.get(e.id)!.climbProgress).toBeUndefined();
   });
+
+  it('mirrors active Vaulting Charge flight and clears when the leap is absent', () => {
+    const { e } = climbingPlayer();
+    expect(wireEntity(e)).not.toHaveProperty('lp');
+
+    e.leap = {
+      from: { x: e.pos.x, y: e.pos.y, z: e.pos.z },
+      to: { x: e.pos.x + 8, y: e.pos.y, z: e.pos.z + 12 },
+      elapsed: 0.1,
+      duration: 0.5,
+      apex: 4,
+      landingAoe: { min: 1, max: 2, radius: 3 },
+      abilityName: 'Vaulting Charge',
+      abilityId: 'heroic_leap',
+      school: 'physical',
+    };
+    expect(wireEntity(e).lp).toBe(1);
+
+    const client = bareClient(9);
+    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(e)] });
+    expect(client.entities.get(e.id)!.leaping).toBe(true);
+
+    e.leap = null;
+    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(e)] });
+    expect(client.entities.get(e.id)!.leaping).toBe(false);
+  });
 });
 
 // Loot owner-lock lapse (FFA) over the wire. The rights-aware corpse picker
@@ -2355,6 +2381,34 @@ describe('raid party wire', () => {
       role: 'healer',
       connected: 0,
     });
+  });
+
+  it('wires a Wildfang druid in Wolf Form as damage so role-sorted raid frames keep the tanks adjacent', () => {
+    const entity = server.sim.entities.get(member.pid)!;
+    const meta = server.sim.meta(member.pid)!;
+    meta.cls = 'druid';
+    meta.talentMods.role = 'tank';
+    entity.auras.push({
+      id: 'cat_form',
+      name: 'Wolf Form',
+      kind: 'form_cat',
+      remaining: 999,
+      duration: 999,
+      value: 1,
+      sourceId: member.pid,
+      school: 'physical',
+    });
+
+    broadcast(server);
+    const wolf = lastSnap(fcLeader.sent).self.party.members.find((m: any) => m.pid === member.pid);
+    expect(wolf.role).toBe('dps');
+
+    entity.auras.length = 0;
+    broadcast(server);
+    const caster = lastSnap(fcLeader.sent).self.party.members.find(
+      (m: any) => m.pid === member.pid,
+    );
+    expect(caster.role).toBe('tank');
   });
 
   it('projects common party member history once per broadcast and refreshes same-tick broadcasts', () => {
@@ -3888,7 +3942,7 @@ describe('guild nameplate wire', () => {
         motdSetBy: '',
         members: [],
         events: [],
-        pledgeSettings: { enabled: true, minLevel: 1, note: '' },
+        pledgeSettings: { enabled: true, minLevel: 1, note: '', newPlayerFriendly: false },
         pledges: [],
         tier: 0,
       },
@@ -5479,6 +5533,7 @@ describe('online mount command and race-event transport', () => {
 // that stay unconditional.
 const ALL_DELTA_KEYS = [
   'aborder',
+  'acct',
   'achg',
   'achr',
   'ap',
@@ -6873,7 +6928,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 99 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 100 unique keys in sorted order', () => {
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
     // sheet's lifetime played-time key ptime, for 67, then +16: the static
@@ -6915,12 +6970,13 @@ describe('delta-key contract pins (anti-drift)', () => {
     // hpref (a gathering-adjacent self scalar, sibling of gprof/tfocus/tslot),
     // for 92. Intentional Gathering PR4 adds the owner-only tracked-goal
     // full-view key ggoal (its own leaf, gathering_goal_wire.ts, not folded
-    // into the gprof/tfocus/tslot/hpref cluster), for 94.
-    // The World Quests branch merge (release/v0.43.0 sync) adds its rotation
-    // id, expiry and progress mirrors (wqday, wqexp, wqlog), the vehicle
-    // session and the world-boss liveness key wba, for 99.
-    expect(ALL_DELTA_KEYS).toHaveLength(99);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(99);
+    // into the gprof/tfocus/tslot/hpref cluster), for 94. The account ledger
+    // (src/sim/account_ledger.ts) adds the heavy self key acct, for 95.
+    // The World Quests branch adds its rotation id, expiry and progress mirrors
+    // (wqday, wqexp, wqlog), the vehicle session and the world-boss liveness
+    // key wba, for 100.
+    expect(ALL_DELTA_KEYS).toHaveLength(100);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(100);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7081,9 +7137,10 @@ describe('delta-key contract pins (anti-drift)', () => {
     // inside the recursive server-tree scrape) makes 92. Intentional
     // Gathering PR4's ggoal (emitted from the new gathering_goal_wire.ts
     // sibling, likewise inside the recursive scrape) makes 93.
-    // The candidate self in-combat key cbt brings the combined inventory to 94.
-    // The World Quests branch merge adds its five self keys, for 99.
-    expect(scraped.size).toBe(99);
+    // The candidate self in-combat key cbt brings the combined inventory to 94;
+    // the account ledger's acct key (server/deeds_wire.ts) makes it 95.
+    // The World Quests branch adds its five self keys, for 100.
+    expect(scraped.size).toBe(100);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

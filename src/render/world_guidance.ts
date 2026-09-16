@@ -26,6 +26,8 @@ export class WorldGuidance {
     scene: THREE.Object3D,
     groundAt: (x: number, z: number) => number,
     compileGate?: (target: THREE.Object3D, requiredForEntry?: boolean) => Promise<unknown>,
+    isQuestTracked?: (questId: string) => boolean,
+    isEastbrookGuidanceEnabled?: () => boolean,
   ) {
     // Show-jumping racing line: self-scoped course guidance, hidden outside the
     // player's own race (driven per frame from world.mountRaceView() below).
@@ -33,7 +35,13 @@ export class WorldGuidance {
     // Riding-lesson start platform: the glowing square behind the start arch.
     this.mount = new MountBeacon(scene, groundAt);
     // The Proving Shore's guidance: beacon fizz, route ribbon, target ring.
-    this.island = new IslandGuidance(scene, groundAt, compileGate);
+    this.island = new IslandGuidance(
+      scene,
+      groundAt,
+      compileGate,
+      isQuestTracked,
+      isEastbrookGuidanceEnabled,
+    );
     // Unlike an untimed coach ribbon, a hidden six-second preview has no
     // actionable stand-in. Run its gate before first paint and include it in
     // the required-landmark entry barrier on every graphics profile.

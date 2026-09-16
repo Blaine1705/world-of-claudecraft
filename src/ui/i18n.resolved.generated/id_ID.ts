@@ -62,6 +62,7 @@ export const id_ID: EnTranslations = {
       "x": "X",
       "z": "Z",
       "dungeon": "Dungeon",
+      "town": "Kota",
       "difficulty": "Tingkat kesulitan",
       "name": "Nama",
       "spec": "Spesialisasi",
@@ -159,6 +160,10 @@ export const id_ID: EnTranslations = {
       "teleport": {
         "label": "Teleportasi",
         "description": "Pindah ke koordinat dunia yang tepat."
+      },
+      "town": {
+        "label": "Pusat kota",
+        "description": "Teleportasi ke pusat kota berdasarkan nama."
       },
       "dungeon": {
         "label": "Masuk dungeon",
@@ -326,6 +331,18 @@ export const id_ID: EnTranslations = {
     }
   },
   "hudChrome": {
+    "professionTrainers": {
+      "blacksmithing": "Blacksmithing Trainer",
+      "cooking": "Cooking Trainer",
+      "tailoring": "Tailoring Trainer",
+      "engineering": "Engineering Trainer",
+      "leatherworking": "Leatherworking Trainer",
+      "alchemy": "Alchemy Trainer",
+      "farming": "Farming Trainer",
+      "mining": "Mining Trainer",
+      "hobby": "Hobby Trainer",
+      "nameplate": "<{title}>"
+    },
     "materialStackSelectionUnavailable": "Pilihan material itu tidak lagi tersedia.",
     "vehicle": {
       "title": "North Watch Cannon",
@@ -385,12 +402,25 @@ export const id_ID: EnTranslations = {
       "banner": "Menonton {name}"
     },
     "readyCheck": {
+      "title": "Cek Siap",
+      "close": "Menutup",
       "prompt": "{name} memulai pemeriksaan kesiapan. Apakah kamu siap?",
       "ready": "Siap",
       "notReady": "Belum Siap",
+      "status": "Siap: {ready}/{total}",
+      "waiting": "Menunggu tanggapan...",
+      "memberReady": "{name} sudah siap.",
+      "memberNotReady": "{name} belum siap.",
+      "memberPending": "{name} belum merespons.",
       "result": "Pemeriksaan kesiapan: {ready} siap, {notReady} belum siap, {noResponse} tidak merespons.",
       "notInPartyError": "Kamu harus berada dalam grup untuk memulai pemeriksaan kesiapan.",
       "inProgressError": "Pemeriksaan kesiapan sedang berlangsung."
+    },
+    "pullTimer": {
+      "start": "Tarik dalam {seconds} detik!",
+      "cancel": "Tarikan dibatalkan.",
+      "countdown": "{seconds}",
+      "pull": "MENARIK!"
     },
     "death": {
       "resurrectAtCorpse": "Bangkit di Jasad",
@@ -615,6 +645,11 @@ export const id_ID: EnTranslations = {
       "mountsTitle": "Mesin Stabil",
       "mountBuyAria": "Beli {item}",
       "mountSkinType": "Skin tunggangan",
+      "mountInspectAria": "Pratinjau {item}",
+      "mountRideIt": "Naiklah",
+      "mountOnly": "Pasang saja",
+      "mountBuy": "Beli Kulit Gunung",
+      "mountScopeLine": "Kulit seluruh akun. Dipakai oleh satu karakter pada satu waktu.",
       "loading": "Memuat Toko WOC...",
       "error": "Toko WOC tidak tersedia saat ini. Silakan coba lagi sebentar lagi.",
       "balance": "Saldo Claudium",
@@ -1079,6 +1114,10 @@ export const id_ID: EnTranslations = {
       "clearArmed": "Ketuk slot untuk mengosongkannya."
     },
     "tutorialGreeting": {
+      "eastbrookGuidanceNote": "Welcome to Eastbrook! Marshal Redbrook has work for you in the town square. Turn on golden guidance to find him and follow Wolves at the Door, or explore on your own. You can change this later in Options, Interface, Combat.",
+      "guidanceOn": "Turn guidance on",
+      "guidanceOff": "Turn guidance off",
+      "guidanceSetting": "Eastbrook golden guidance",
       "bellHomeNote": "Sudah kembali dari pesisir? Itu tadi lonceng feri yang kamu bunyikan. Kembarnya tergantung persis di sana, dekat kotak surat Pos Gagak: bunyikan kapan saja dan penyeberangan itu akan membawamu kembali ke Pesisir Pembuktian. Tak ada ruginya, bagaimanapun jadinya.",
       "islandArrivalNote": "Selamat datang di Pesisir Pembuktian. Penjaga Tam sedang menunggu tak jauh di sepanjang pantai: temuilah dia. Jika ingin pergi, bunyikan bel di samping dermagaku dan bel itu akan membawamu ke lembah kapan saja.",
       "noteClose": "Mengerti"
@@ -1274,7 +1313,8 @@ export const id_ID: EnTranslations = {
       },
       "wqEmpty": "No scores on this board yet. Finish the world quest to claim a spot.",
       "podiumLabel": "Top three",
-      "unclaimed": "Unclaimed"
+      "unclaimed": "Unclaimed",
+      "prestigeTitle": "Prestige {rank}"
     },
     "wqLadder": {
       "title": "World Quest Rankings",
@@ -1319,6 +1359,8 @@ export const id_ID: EnTranslations = {
       "noteLabel": "Catatan papan",
       "notePlaceholder": "Ceritakan apa yang dicari guildmu kepada calon anggota",
       "save": "Simpan",
+      "newPlayerFriendlyLabel": "New player friendly",
+      "newPlayerFriendlyHint": "Shown on the recruits' board at the Proving Shore signpost.",
       "yourPledge": "Lamaranmu: {guild}",
       "since": "Melamar {date}",
       "withdraw": "Tarik lamaran"
@@ -1344,7 +1386,7 @@ export const id_ID: EnTranslations = {
       "runSummary": "{total} dalam {time}"
     },
     "talkingHead": {
-      "label": "Dialogue"
+      "label": "Dialog"
     },
     "hubLesson": {
       "target": "Targetkan boneka untuk memulai.",
@@ -1474,7 +1516,9 @@ export const id_ID: EnTranslations = {
       "targetPrev": "Putar Bidikan Mundur",
       "discord": "Discord",
       "bgFlag": "Aksi Bendera Medan Pertempuran",
+      "friendlyNameplates": "Toggle Friendly Nameplates",
       "sheathe": "Sarungkan/Cabut Senjata",
+      "hideInterface": "Sembunyikan Antarmuka",
       "dive": "Berenang ke Bawah",
       "categoryPet": "Peliharaan",
       "petAttack": "Peliharaan: Serang",
@@ -1483,8 +1527,22 @@ export const id_ID: EnTranslations = {
       "petDefensive": "Peliharaan: Defensif",
       "petAggressive": "Peliharaan: Agresif",
       "targetPet": "Peliharaan: Bidik",
+      "targetSelf": "Sasaran Diri",
+      "targetParty1": "Anggota Partai Sasaran 1",
+      "targetParty2": "Anggota Partai Sasaran 2",
+      "targetParty3": "Anggota Partai Sasaran 3",
+      "targetParty4": "Anggota Partai Sasaran 4",
+      "targetParty5": "Anggota Partai Sasaran 5",
+      "targetParty6": "Anggota Partai Sasaran 6",
+      "targetParty7": "Anggota Partai Sasaran 7",
+      "targetParty8": "Anggota Partai Sasaran 8",
+      "targetParty9": "Anggota Partai Sasaran 9",
       "mount": "Naiki / Turun",
-      "mouseHint": "Tombol tetikus juga berfungsi: tekan tombol tengah (M3) atau tombol ibu jari (M4, M5) saat mengikat. Tombol kiri dan kanan tetap dicadangkan untuk kamera, Klik untuk Bergerak, dan mengeklik sesuatu di dunia."
+      "mouseHint": "Tombol tetikus juga berfungsi: tekan tombol tengah (M3) atau tombol ibu jari (M4, M5) saat mengikat. Tombol kiri dan kanan tetap dicadangkan untuk kamera, Klik untuk Bergerak, dan mengeklik sesuatu di dunia.",
+      "zoomIn": "Perbesar Kamera",
+      "zoomOut": "Perbesar Kamera",
+      "wheelHint": "Roda mouse juga mengikat: gulung ke atas atau ke bawah sambil mengikat, dengan menahan Ctrl, Alt, atau Shift jika Anda mau. Zoom Kamera Masuk dan Keluar berada di atas roda telanjang secara default; pindahkan mereka ke akord seperti Ctrl+roda untuk membebaskan roda untuk kemampuan.",
+      "wheelHeldRefused": "Takik roda tidak dapat menggerakkan tindakan yang ditahan seperti gerakan. Pilih kunci atau tombol mouse untuk itu."
     },
     "actionBar": {
       "editKeys": "Ubah tombol bilah aksi",
@@ -1755,6 +1813,8 @@ export const id_ID: EnTranslations = {
       "showReliquaryTracker": "Tampilkan Pelacak Relikui",
       "confirmVendorSell": "Konfirmasi Sebelum Menjual",
       "confirmVendorSellNote": "Menonaktifkan ini menjual barang dengan sekali klik tanpa konfirmasi, sehingga slot tas yang bergeser dapat menjual barang yang salah ke pedagang.",
+      "confirmVendorSellMinQuality": "Konfirmasikan Penjualan Dari Kualitas",
+      "confirmVendorSellMinQualityNote": "Barang di bawah kualitas ini dijual dengan satu klik; barang yang salah terjual masih dapat dibeli kembali dari vendor.",
       "itemLevelLine": "Level Item {level}",
       "itemScoreLine": "Skor {score}",
       "showSecondaryActionBar": "Tampilkan Bilah Aksi Sekunder",
@@ -1808,9 +1868,9 @@ export const id_ID: EnTranslations = {
     },
     "controller": {
       "title": "Kontroler",
-      "device": "Connected Device",
-      "deviceConnected": "Connected",
-      "deviceDisconnected": "No controller detected",
+      "device": "Perangkat Terhubung",
+      "deviceConnected": "Terhubung",
+      "deviceDisconnected": "Tidak ada pengontrol yang terdeteksi",
       "glyphStyle": "Label Tombol",
       "glyphStyleAuto": "Otomatis",
       "glyphStyleXbox": "Xbox",
@@ -2125,6 +2185,52 @@ export const id_ID: EnTranslations = {
       "spellOrder": "Urutan mantra",
       "reset": "Atur Ulang Posisi",
       "spellPosition": "Urutan mantra {position} / {count}",
+      "watchlist": "Watched Spells",
+      "watchlistHint": "Pick any spell that buffs you to give it its own aura. Picked spells get a full card below, with their own icon, color, position and ground ring.",
+      "watchlistEmpty": "No other spell in your spellbook puts a buff on you.",
+      "watchlistWatch": "Watch {spell}",
+      "watchlistUnwatch": "Stop watching {spell}",
+      "watchlistCount": "{count} watched",
+      "sound": "Alert Sound",
+      "soundNone": "No sound",
+      "soundVolume": "Sound Volume",
+      "soundPreview": "Play",
+      "soundPreviewAria": "Preview the {sound} alert sound",
+      "soundHint": "A sound plays each time this spell procs. Turn the icon, crescents and ground ring off to have the sound alone announce it.",
+      "readyGlow": "Hotbar Glow",
+      "readyGlowHint": "Lights this spell on your action bar while its buff is up.",
+      "reticleTick": "Reticle Tick",
+      "reticleTickHint": "Adds a mark near the centre of the screen that lights when this spell procs.",
+      "haptic": "Rumble",
+      "hapticNone": "Off",
+      "hapticHint": "Vibrates a connected controller, or your phone. Ignored where the device has no haptics.",
+      "haptics": {
+        "tap": "Tap",
+        "double": "Double",
+        "long": "Long"
+      },
+      "cues": {
+        "softChime": "Soft Chime",
+        "musicBox": "Music Box",
+        "glassPing": "Glass Ping",
+        "waterDrop": "Water Drop",
+        "bubblePop": "Bubble Pop",
+        "hardBell": "Hard Bell",
+        "templeGong": "Temple Gong",
+        "anvilStrike": "Anvil Strike",
+        "coinDrop": "Coin Drop",
+        "swordDraw": "Sword Draw",
+        "blaringHorn": "Blaring Horn",
+        "carKlaxon": "Car Klaxon",
+        "sonarPing": "Sonar Ping",
+        "electricZap": "Electric Zap",
+        "catMeow": "Cat Meow",
+        "owlHoot": "Owl Hoot",
+        "wolfHowl": "Wolf Howl",
+        "frogCroak": "Frog Croak",
+        "windWhoosh": "Wind Whoosh",
+        "steamHiss": "Steam Hiss"
+      },
       "procs": {
         "revenge": "Balas Dendam!",
         "battleTrance": "Kesurupan Pertempuran",
@@ -2198,20 +2304,20 @@ export const id_ID: EnTranslations = {
       "hidePlaytimeAria": "Sembunyikan waktu bermain"
     },
     "charSidebar": {
-      "label": "Character details",
-      "subtitle": "Level {level} {className} . {archetype} . Hobby: {hobby}",
-      "subtitleNoHobby": "Level {level} {className} . {archetype}",
-      "stats": "Stats",
-      "progression": "Progression",
-      "skills": "Skills",
-      "gathering": "Gathering",
-      "crafting": "Crafting",
-      "openProfessions": "Open Professions"
+      "label": "Detail karakter",
+      "subtitle": "Tingkat {level} {className}. {archetype}. Hobi: {hobby}",
+      "subtitleNoHobby": "Tingkat {level} {className}. {archetype}",
+      "stats": "Statistik",
+      "progression": "Kemajuan",
+      "skills": "Keterampilan",
+      "gathering": "Mengumpulkan",
+      "crafting": "kerajinan",
+      "openProfessions": "Profesi Terbuka"
     },
     "questLog": {
-      "completed": "Completed",
-      "zoneSummary": "{count} ({ready} ready)",
-      "shiftHint": "Shift-click a quest to link it in chat."
+      "completed": "Selesai",
+      "zoneSummary": "{count} ({ready} siap)",
+      "shiftHint": "Shift-klik misi untuk menghubungkannya dalam obrolan."
     },
     "statInfo": {
       "fromYour": "Dari {value} {stat} Anda:",
@@ -2326,6 +2432,12 @@ export const id_ID: EnTranslations = {
       "linkHint": "Shift-klik untuk menautkan item ini di obrolan."
     },
     "plurals": {
+      "guildBoardShown": {
+        "one": "{count} guild shown",
+        "few": "{count} guilds shown",
+        "many": "{count} guilds shown",
+        "other": "{count} guilds shown"
+      },
       "commissionMasterworks": {
         "one": "{count} mahakarya",
         "few": "{count} mahakarya",
@@ -2455,7 +2567,7 @@ export const id_ID: EnTranslations = {
     },
     "bugReport": {
       "menuButton": "Laporkan Bug",
-      "online": "Online",
+      "online": "On line",
       "realm": "Dunia",
       "character": "Karakter",
       "position": "Posisi",
@@ -3061,8 +3173,8 @@ export const id_ID: EnTranslations = {
         "kingsWrathSummary": "Nythraxis menghasilkan {bonusNormal} lebih banyak kerusakan pada Normal atau {bonusHeroic} pada Heroic selama sisa pertarungan. Erupsi Makam terjadi setiap {eruptionEveryNormal} dtk ({eruptionEveryHeroic} pada Heroic) dan Api Makam setiap {gravefireEveryNormal} dtk ({gravefireEveryHeroic} pada Heroic).",
         "kingsWrathResponse": "Gunakan cooldown defensif yang tersisa untuk kerusakan yang tidak bisa dihindari. Jaga semua mekanik sebelumnya tetap bersih sementara raid menyelesaikan pertarungan.",
         "boneStormName": "Badai Tulang",
-        "boneStormSummary": "Mulai {first} dtk setelah Murka Raja dan setiap {everyNormal} dtk sesudahnya, Nythraxis memulai Badai Tulang selama {duration} dtk. Ia mengabaikan ancaman, bergerak {speed} kali kecepatan normal, dan melakukan {charges} terjangan masing-masing selama {chargeSeconds} dtk. Pusarannya menghasilkan {whirlNormal} kesehatan maksimum setiap detik dalam {radius} yd. Setiap terjangan berakhir dengan Hantaman Tulang dalam radius yang sama sebesar {slamNormal} kesehatan maksimum. Ia merapal Pancang Tulang {spikeAt} dtk setelah badai dimulai, lalu Penghancur Makam siap lagi {rearm} dtk setelah berakhir.",
-        "boneStormHeroicSummary": "Mulai {first} dtk setelah Murka Raja dan setiap {everyHeroic} dtk sesudahnya, Nythraxis memulai Badai Tulang selama {duration} dtk. Ia mengabaikan ancaman, bergerak {speed} kali kecepatan normal, dan melakukan {charges} terjangan masing-masing selama {chargeSeconds} dtk. Pusarannya menghasilkan {whirlHeroic} kesehatan maksimum setiap detik dalam {radius} yd. Setiap terjangan berakhir dengan Hantaman Tulang dalam radius yang sama sebesar {slamHeroic} kesehatan maksimum. Ia merapal Pancang Tulang {spikeAt} dtk setelah badai dimulai, lalu Penghancur Makam siap lagi {rearm} dtk setelah berakhir.",
+        "boneStormSummary": "Mulai {first} dtk setelah Murka Raja dan setiap {everyNormal} dtk sesudahnya, Nythraxis memulai Badai Tulang selama {duration} dtk. Ia mengabaikan ancaman, bergerak {speed} kali kecepatan normal, dan melakukan {charges} terjangan masing-masing selama {chargeSeconds} dtk. Pusarannya menghasilkan {whirlNormal} kesehatan maksimum setiap detik dalam {radius} yd. Setiap terjangan berakhir dengan Hantaman Tulang dalam radius yang sama sebesar {slamNormal} kesehatan maksimum. Hantaman pertama setiap badai sebesar {openingSlamNormal} sebagai gantinya. Penghancur Makam siap lagi {rearm} dtk setelah berakhir.",
+        "boneStormHeroicSummary": "Mulai {first} dtk setelah Murka Raja dan setiap {everyHeroic} dtk sesudahnya, Nythraxis memulai Badai Tulang selama {duration} dtk. Ia mengabaikan ancaman, bergerak {speed} kali kecepatan normal, dan melakukan {charges} terjangan masing-masing selama {chargeSeconds} dtk. Pusarannya menghasilkan {whirlHeroic} kesehatan maksimum setiap detik dalam {radius} yd. Setiap terjangan berakhir dengan Hantaman Tulang dalam radius yang sama sebesar {slamHeroic} kesehatan maksimum. Hantaman pertama setiap badai sebesar {openingSlamHeroic} sebagai gantinya. Penghancur Makam siap lagi {rearm} dtk setelah berakhir.",
         "boneStormResponse": "Menyebarlah dan terus lari dari Nythraxis. Raider yang diterjang berlari menjauh sementara semua orang memberi ruang di sekitar jalur terjangan, lalu tank mengambilnya kembali saat badai berakhir.",
         "crownEnduresName": "Mahkota Bertahan",
         "crownEnduresSummary": "Pada {enrageNormal} dtk sejak pull (jam berhenti saat Bruder Aldric masuk pada 70%), Mahkota Bertahan terpicu sebagai enrage keras. Nythraxis mendapat {damage} lebih banyak kerusakan dan serangan {haste} lebih cepat, lalu tambahan {rampStep} kerusakan setiap {rampEveryNormal} dtk. Tidak ada bilah timer. Peringatan datang sebagai teriakan pada sisa {warn60}, {warn30}, dan {warn10} dtk.",
@@ -3227,7 +3339,7 @@ export const id_ID: EnTranslations = {
       "elementalTrance": "Kerusakan yang diterima berkurang {pct}%. {mana}% dari semua kerusakan yang kamu berikan diubah menjadi mana",
       "stealth": "Oculto; velocidad de movimiento reducida un {pct}%",
       "formBear": "Wujud Bruin: nyawa dan zirah meningkat",
-      "wolfForm": "Wolf Form: melee damage and energy; movement speed increased by {pct}%",
+      "wolfForm": "Cat Form: melee damage and energy; movement speed increased by {pct}%",
       "formTravel": "Wujud Fleet: kecepatan gerak meningkat sebesar {pct}%",
       "formFireball": "Ember Form: kecepatan gerak meningkat {pct}%; serangan dan mantra dinonaktifkan",
       "formMoonkin": "Wujud Burung Bulan: kerusakan sihir meningkat {pct}% dan zirah meningkat {armorPct}%",
@@ -3316,7 +3428,30 @@ export const id_ID: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
       "cheaterTag": "< Pemain Curang >",
-      "pledgeTag": "Ikrar {guild}"
+      "pledgeTag": "Ikrar {guild}",
+      "npcRoleTag": "<{role}>",
+      "npcRole": {
+        "auctioneer": "Juru lelang",
+        "banker": "Bankir",
+        "riftForgemaster": "Rift Forgemaster",
+        "cardMaster": "Master Kartu",
+        "crucibleQuartermaster": "Quartermaster Wadah",
+        "heroicQuartermaster": "Quartermaster yang Heroik",
+        "pvpVendor": "Penjual PvP",
+        "weaponsmithTrainer": "Pelatih Pandai Besi",
+        "cookingTrainer": "Pelatih Memasak",
+        "tailoringTrainer": "Pelatih Menjahit",
+        "engineeringTrainer": "Pelatih Teknik",
+        "leatherworkingTrainer": "Pelatih Pengerjaan Kulit",
+        "alchemyTrainer": "Pelatih Alkimia",
+        "weaponVendor": "Penjual Senjata",
+        "armorVendor": "Penjual Armor",
+        "armsDealer": "Pedagang Senjata",
+        "foodVendor": "Penjual Makanan & Minuman",
+        "potionVendor": "Penjual Ramuan",
+        "stableMaster": "Tuan Stabil",
+        "generalGoods": "Barang Umum"
+      }
     },
     "mobTooltip": {
       "levelFamily": "{family} Level {level}",
@@ -3335,7 +3470,7 @@ export const id_ID: EnTranslations = {
       "lock": "Kunci bingkai pemain"
     },
     "partyFrames": {
-      "header": "Party",
+      "header": "Berpesta",
       "section": "Bingkai Grup dan Raid",
       "optionsSection": "Opsi Bingkai Party",
       "unlock": "Pindahkan bingkai grup dan raid",
@@ -3550,6 +3685,7 @@ export const id_ID: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Mutu halus. Dikumpulkan dari urat tingkat penuh dengan alat berperingkat di atas materialnya, dan dihitung sebagai versi biasa di mana pun versi biasa dibutuhkan.",
+      "fineFarmGrade": "Nilai bagus. Beberapa hasil panen muncul dengan baik, lebih sering pada skill Farming yang lebih tinggi atau dengan Artisan's Eye yang terisi. Produk biasa tidak pernah diperhitungkan jika diperlukan kualitas yang baik.",
       "cookingCatch": "Bahan masakan. Harus dimasak sebelum dimakan.",
       "usedBy": "Digunakan oleh {crafts}.",
       "arcaneDust": "Reagen kerajinan. Diperoleh dengan membongkar perlengkapan biasa dan tidak biasa.",
@@ -3834,6 +3970,15 @@ export const id_ID: EnTranslations = {
       "subtitle": "Guild-guild di realm",
       "rosterTitle": "Lihat daftar anggota {guild}",
       "back": "Kembali",
+      "filters": "Board filters",
+      "newPlayerFriendly": "New player friendly",
+      "newPlayerFriendlyTitle": "This guild welcomes new players",
+      "filterNewPlayersTitle": "Show only guilds that welcome new players",
+      "filterEmpty": "No guild has opened its doors to new players yet.",
+      "showAll": "Show all guilds",
+      "officersOnline": "Officers online",
+      "officersOnlineLabel": "Officers online: {names}",
+      "officerEntry": "{name} ({rank})",
       "popupTitle": "Papan Petunjuk Guild",
       "close": "Tutup"
     },
@@ -4081,6 +4226,25 @@ export const id_ID: EnTranslations = {
       "lastSeenNever": "tidak pernah",
       "ignoredTab": "Diabaikan",
       "blockedTab": "Diblokir",
+      "who": {
+        "tab": "Siapa",
+        "searchPlaceholder": "Nama, zona, atau guild",
+        "search": "Mencari",
+        "loading": "Menanyakan dunia siapa yang online...",
+        "empty": "Tidak ada pemain yang cocok.",
+        "count": "{total} daring",
+        "countFiltered": "{shown} dari {total} daring",
+        "capped": "Menampilkan {delivered} pertama. Persempit pencarian untuk melihat sisanya.",
+        "classFilter": "Saring berdasarkan kelas",
+        "allClasses": "Semua kelas",
+        "colStatus": "Status",
+        "colName": "Nama",
+        "colLevel": "Tingkat",
+        "colClass": "Kelas",
+        "colZone": "Daerah",
+        "colGuild": "Persekutuan",
+        "sortTitle": "Urutkan berdasarkan {column}"
+      },
       "ignoredEmpty": "Kamu tidak mengabaikan siapa pun.",
       "blockedEmpty": "Kamu belum memblokir siapa pun.",
       "blockSearchPlaceholder": "Nama pemain",
@@ -4202,6 +4366,7 @@ export const id_ID: EnTranslations = {
           "farming": "Bekerja dari tasmu saat kamu menanam di bedeng."
         },
         "speed": "Mengumpulkan lebih cepat di simpul di bawah tingkat {tier}.",
+        "wieldDegrade": "Di bawah keterampilan itu, ia masih berfungsi sebagai alat tingkat rendah.",
         "rodRequired": "Diperlukan untuk memancing.",
         "rodBite": "Ikan menggigit hingga {seconds} dtk lebih cepat.",
         "rodReel": "Memperpanjang jendela penarikan sebesar {seconds} dtk.",
@@ -4474,8 +4639,20 @@ export const id_ID: EnTranslations = {
       "majorsLabel": "Jurusan: {a} dan {b}",
       "pairsHeld": "Pasangan yang dimiliki: {count}",
       "returnsLabel": "Pengembalian: {count}",
-      "retentionFooter": "Returns on respec: 60% of skill kept.",
-      "tutorialLink": "Profession tutorial"
+      "retentionFooter": "Pengembalian sesuai spesifikasi: 60% keterampilan dipertahankan.",
+      "tutorialLink": "Tutorial profesi"
+    },
+    "recipeTracker": {
+      "trackerLabel": "Resep",
+      "collapseHint": "Ciutkan pelacak resep",
+      "expandHint": "Luaskan pelacak resep",
+      "pin": "Pin",
+      "unpin": "Membuka peniti",
+      "pinFull": "Pelacak resep sudah penuh (hingga {cap} resep)",
+      "pinAria": "Sematkan {name} ke pelacak HUD",
+      "unpinAria": "Lepas sematan {name} dari pelacak HUD",
+      "haveNeed": "{have}/{need}",
+      "resultCount": "{name} x{count}"
     },
     "crafting": {
       "title": "kerajinan",
@@ -4507,10 +4684,11 @@ export const id_ID: EnTranslations = {
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(menghabiskan {count} bahan halus)",
       "reagentVaultDraw": "(mengambil {count} dari brankasmu)",
+      "reagentOrdinaryHeld": "({name} diadakan: {count}, tetapi hanya nilai bagus yang dihitung di sini)",
       "vaultUnreachable": "Brankas Material tidak terjangkau di sini.",
       "craftFeeLine": "Biaya kerajinan: {fee} per buah",
       "empty": "Belum ada resep yang diketahui.",
-      "materialsFooter": "Materials in your vault are drawn automatically. Learn more recipes at the station.",
+      "materialsFooter": "Materi di brankas Anda diambil secara otomatis. Pelajari lebih banyak resep di stasiun.",
       "resultAria": "Kerajinan {name}",
       "craftedToast": "Dibuat: {name}",
       "craftedToastQty": "Dibuat: {name} x{qty}",
@@ -4600,8 +4778,8 @@ export const id_ID: EnTranslations = {
       "attunedBanner": "Selaras: {title}",
       "tierTutorial": {
         "title": "Tingkat Pertamamu",
-        "tierCap": "Sebuah kerajinan mencapai tingkat pertamanya pada keahlian {skill}, dan setiap tingkat meningkatkan apa yang bisa dibuatnya. Tetapi sebuah kerajinan hanya naik melampaui pekerjaan langka setelah menjadi salah satu dari dua bidang utamamu.",
-        "radar": "Profesimu membentuk sebuah roda. Selaraskan ke pasangan yang berdekatan dan dua kerajinan itu menjadi bidang utama tanpa batas, satu kerajinan di seberang roda menjadi hobi terbatas langka, dan sisanya terbengkalai: pengetahuannya tersimpan, tetapi terbatas di umum sampai kamu mengambilnya kembali.",
+        "tierCap": "Sebuah kerajinan mencapai tingkat pertamanya pada keterampilan {skill}, dan setiap tingkat meningkatkan kemampuannya. Tapi sebuah kerajinan hanya bisa melewati karya langka jika itu adalah salah satu dari dua jurusan Anda.",
+        "radar": "Profesi Anda membentuk roda. Selaraskan dengan pasangan yang berdekatan dan kedua kerajinan itu menjadi jurusan yang belum dibuka, satu kerajinan di roda menjadi hobi yang jarang ditutup, dan sisanya tidak aktif: pengetahuan mereka disimpan, tetapi dibatasi secara umum sampai Anda mempelajarinya lagi.",
         "masters": "Para master kerajinan di kota menawarkan misi penyelarasan. Kunjungi salah satu untuk memilih pasanganmu kapan pun kamu siap. Tidak ada yang pernah kamu pelajari yang hilang.",
         "dismiss": "Mengerti"
       },
@@ -4614,7 +4792,7 @@ export const id_ID: EnTranslations = {
       "commissionBound": "Karya pesanan: terikat pada penerimanya"
     },
     "marketWindow": {
-      "mixedListingsFooter": "The Merchant restocks common goods; player listings sit beside them at their asking price."
+      "mixedListingsFooter": "Pedagang mengisi kembali barang-barang umum; daftar pemain duduk di samping mereka dengan harga yang diminta."
     },
     "itemMenu": {
       "use": "Gunakan",
@@ -4895,6 +5073,7 @@ export const id_ID: EnTranslations = {
       "roleDps": "Penyerang",
       "freeRoles": "Semua peran diterima",
       "lockoutDaily": "Penguncian harian pada bos terakhir",
+      "lockoutWeekly": "Penguncian mingguan pada setiap bos",
       "lockoutNone": "Tanpa penguncian",
       "lockedFor": "Terkunci sekitar {minutes} menit",
       "attunement": "Memerlukan penyelarasan: {quest}",
@@ -4908,6 +5087,8 @@ export const id_ID: EnTranslations = {
       "lootMaybe": "Paling banyak salah satu dari ini mungkin jatuh:",
       "lootChance": "Peluang jatuhan tambahan:",
       "lootHeroic": "Bonus heroik, salah satu dari ini selalu jatuh:",
+      "lootHeroicMaybe": "Heroic bonus, at most one of these may drop:",
+      "lootHeroicChance": "Heroic bonus, additional chance drops:",
       "pct": "{pct} persen",
       "blockedLevel": "Khusus level {min} hingga {max}",
       "blockedSpec": "Memerlukan spesialisasi",
@@ -4981,7 +5162,33 @@ export const id_ID: EnTranslations = {
         "kings_wrath": "Murka Raja (30%: bonus kerusakan permanen, bahaya lantai lebih cepat)",
         "bone_storm": "Badai Tulang (dia mengabaikan ancaman, berputar, dan menerjang raid)",
         "crown_endures": "Mahkota Bertahan (enrage keras pada 6:00, heroic 5:00)",
-        "deathless_court": "Istana Tanpa Kematian (khusus heroic, istana kerajaan bangkit setelah Amarah Tanpa Kematian)"
+        "deathless_court": "Istana Tanpa Kematian (khusus heroic, istana kerajaan bangkit setelah Amarah Tanpa Kematian)",
+        "bloodmane_rend": "Bloodmane Rend (berdarah, perhatikan pertukaran target)",
+        "tusk_sweep": "Sapu Tusk (belah depan)",
+        "ancestral_sap": "Getah Leluhur (menyembuhkan sekutunya)",
+        "call_of_the_hunt": "Call of the Hunt (mempercepat sekutu terdekat)",
+        "thickhide_ward": "Thickhide Ward (melindungi sekutu terdekat)",
+        "beast_pit_quake": "Beast Pit Quake (kerusakan area)",
+        "wildheart_pulse": "Wildheart Pulse (kerusakan area berdenyut)",
+        "jaguar_roar": "Jaguar Roar (knockback)",
+        "brand_of_the_pyre": "Merek Pyre (menumpuk bekas api, bilas dengan air saluran)",
+        "forge_strike": "Forge Strike (menumpuk debuff pertukaran tank)",
+        "rain_of_cinders": "Rain of Cinders (tiga kerucut api, berdiri di antara keduanya)",
+        "falling_cinders": "Falling Cinders (meteor berputar pada pemain, keluar)",
+        "revolving_inferno": "Revolving Inferno (memutar sinar api, bergerak melewati celah)",
+        "forge_wave": "Forge Wave (perluas tembok api, gunakan dua jalur aman)",
+        "apocalypse_add": "Ignivar Ashcaller (prioritas tambahkan casting Apocalypse, bunuh dengan cepat)",
+        "judgment_of_the_forge": "Judgment of the Forge (istirahat, berbagi satu tempat perlindungan yang aman)",
+        "last_inferno": "Inferno Terakhir (pembakaran 45 detik dengan kesehatan 20%)",
+        "chains_of_the_forge": "Chains of the Forge (khusus heroik, tetap dekat dengan mitra tertaut Anda)",
+        "makers_brand": "Merek Pembuat (debuff penukaran tangki susun)",
+        "forgefathers_sweep": "Sapu Forgefather (kerucut depan lebar pada non-tank)",
+        "tempering_ray": "Tempering Ray (garis ke pemain yang ditandai, intersepsi)",
+        "cinder_orbs": "Cinder Orbs (pemain yang ditandai menyebar ke tepi ruangan)",
+        "forgestorm": "Forgestorm (lingkaran meteor jatuh, keluar)",
+        "shared_pyre": "Shared Pyre (mengumpulkan lingkaran, membagi damage)",
+        "anvils_decree": "Dekrit Anvil (tiga serangan palu di seluruh serangan, sembuhkan)",
+        "masters_assembly": "Majelis Master (memblokir balok tempa, memutar pemblokir)"
       }
     },
     "cosmetics": {
@@ -5002,6 +5209,8 @@ export const id_ID: EnTranslations = {
       "applied": "Diterapkan",
       "owned": "Dimiliki",
       "storeOnly": "Tersedia di Toko WOC",
+      "preview": "Pratinjau",
+      "previewAria": "Pratinjau {name}",
       "cardAria": "{name}, {rarity}",
       "mountsIntro": "Skin tunggangan digambar di atas tunggangan yang dinaiki karakter ini. Skin tidak pernah mengubah kecepatan.",
       "mountsNoMount": "Miliki tunggangan terlebih dahulu: skin membutuhkan sesuatu untuk ditunggangi.",
@@ -5050,6 +5259,10 @@ export const id_ID: EnTranslations = {
       "ownedTooltipStatus": "Terkatalog di Relikuari",
       "missingTooltipStatus": "Belum ditemukan",
       "firstFindClears": "Pertama ditemukan pada penyelesaian ke-{count}",
+      "foundBy": "Found by {names}",
+      "finderWithDate": "{name} ({date})",
+      "sharedScopeNote": "Shared by every character on your account",
+      "sharedScopeHint": "A relic found by any character on your account fills the page here too.",
       "unlockToast": "Relik terkatalog: {name}",
       "illuminateBanner": "Halaman diterangi: {name}",
       "illuminateToast": "Setiap relik pada {name} sudah terisi.",
@@ -5183,6 +5396,10 @@ export const id_ID: EnTranslations = {
       "progressAria": "Kemajuan: {current} dari {target}",
       "renownChip": "{renown} Kemasyhuran",
       "earnedDate": "Diraih {date}",
+      "earnedBy": "Earned by {names}",
+      "earnerWithDate": "{name} ({date})",
+      "accountScopeNote": "Shared by every character on your account",
+      "accountScopeHint": "A deed any character on your account accomplishes is earned here too, and the Book names who earned it.",
       "featRibbon": "Mahajasa",
       "hiddenBadge": "Tersembunyi",
       "titleChip": "Hadiah gelar",
@@ -5233,30 +5450,30 @@ export const id_ID: EnTranslations = {
       "levels": "Level {min} hingga {max}"
     },
     "mapAtlas": {
-      "level": "Level {level}",
-      "landmarkCount": "{count} landmarks",
-      "filtersAria": "Map layers",
+      "level": "Tingkat {level}",
+      "landmarkCount": "{count} bangunan terkenal",
+      "filtersAria": "Lapisan peta",
       "filters": {
-        "quests": "Quests",
-        "gather": "Gather",
-        "dungeons": "Dungeons",
-        "services": "Services",
-        "players": "Players"
+        "quests": "Pencarian",
+        "gather": "Mengumpulkan",
+        "dungeons": "ruang bawah tanah",
+        "services": "Layanan",
+        "players": "Pemain"
       },
-      "trackedQuests": "Tracked quests",
-      "noTrackedQuests": "No tracked quests",
-      "availableNearby": "Available nearby",
-      "noNearbyQuests": "No nearby quests",
-      "distance": "{distance} yards",
-      "showRoute": "Show Route",
-      "untrack": "Untrack",
-      "track": "Track",
+      "trackedQuests": "Pencarian terlacak",
+      "noTrackedQuests": "Tidak ada misi terlacak",
+      "availableNearby": "Tersedia di dekatnya",
+      "noNearbyQuests": "Tidak ada misi terdekat",
+      "distance": "{distance} yard",
+      "showRoute": "Tampilkan Rute",
+      "untrack": "Hapus jejak",
+      "track": "Melacak",
       "legend": {
-        "dungeon": "Dungeon",
-        "ore": "Ore",
-        "herb": "Herb",
-        "mail": "Mail",
-        "passage": "Passage"
+        "dungeon": "penjara bawah tanah",
+        "ore": "Bijih",
+        "herb": "Herba",
+        "mail": "Surat",
+        "passage": "Jalan"
       }
     },
     "arenaGate": {
@@ -5277,7 +5494,7 @@ export const id_ID: EnTranslations = {
       "tabBrowse": "Jelajahi",
       "tabSell": "Jual",
       "tabActivity": "Aktivitasku",
-      "tabHistory": "Sales History",
+      "tabHistory": "Sejarah Penjualan",
       "tabsLabel": "Bagian Bursa $WOC",
       "loading": "Memuat Bursa...",
       "loadFailed": "Bursa tidak dapat dihubungi. Coba lagi sebentar lagi.",
@@ -5302,16 +5519,16 @@ export const id_ID: EnTranslations = {
       "colCurrentBid": "Penawaran saat ini",
       "colBuyNow": "Beli sekarang",
       "colTimeLeft": "Waktu tersisa",
-      "colBuyer": "Buyer",
-      "colSoldAt": "Sold",
-      "colSalePrice": "Sale price",
-      "colSaleType": "Type",
-      "saleTypeAuction": "Auction",
-      "saleTypeBuyNow": "Buy now",
-      "saleTypeDirected": "Directed",
-      "saleTypeUnknown": "Unknown",
-      "historyEmpty": "No sales recorded yet.",
-      "historyError": "Sales history could not be loaded.",
+      "colBuyer": "Pembeli",
+      "colSoldAt": "Terjual",
+      "colSalePrice": "Harga penjualan",
+      "colSaleType": "Jenis",
+      "saleTypeAuction": "Lelang",
+      "saleTypeBuyNow": "Beli sekarang",
+      "saleTypeDirected": "Diarahkan",
+      "saleTypeUnknown": "Tidak dikenal",
+      "historyEmpty": "Belum ada penjualan yang tercatat.",
+      "historyError": "Riwayat penjualan tidak dapat dimuat.",
       "reserveMet": "Cadangan terpenuhi",
       "reserveNotMet": "Cadangan belum terpenuhi",
       "yourListing": "Daftarmu",
@@ -5987,6 +6204,7 @@ export const id_ID: EnTranslations = {
       "deeds": "Kitab Jasa",
       "reliquary": "Relikuari",
       "sheathe": "Sarungkan/Cabut Senjata",
+      "hideInterface": "Sembunyikan antarmuka (tangkapan layar dan video)",
       "crafting": "Kriya",
       "mount": "Naiki / Turun",
       "calendar": "Kalender Acara",
@@ -6016,6 +6234,8 @@ export const id_ID: EnTranslations = {
       "attackMove": "Serang Bergerak (hanya setelah kamu mengaktifkan opsinya)",
       "meters": "Meter kerusakan (kerusakan, penyembuhan, dan ancaman)",
       "petMark": "Peliharaan: Tandai, pilih peliharaanmu sendiri (sama seperti mengklik bingkainya)",
+      "targetSelf": "Targetkan diri Anda sendiri",
+      "targetParty": "Targetkan anggota partai 1 hingga 9, dari atas ke bawah seperti yang ditunjukkan oleh bingkai partai",
       "onBarBinding": "Kamu juga bisa mengikat tombol langsung dari bilahnya: pilih Ubah tombol bilah aksi di panel Pengaturan Tombol, lalu klik sebuah slot di bilah yang aktif dan tekan tombol yang kamu inginkan. Klik Selesai saat kamu sudah selesai. Fitur ini hanya untuk desktop, karena membutuhkan papan ketik fisik.",
       "clickMoveNote": "Klik untuk Bergerak nonaktif sampai kamu menyalakannya: buka panel Pengaturan Tombol di menu permainan, nyalakan Klik untuk Bergerak, lalu gunakan baris Tombol Klik untuk Bergerak di bawahnya untuk memilih tombol mouse mana yang akan menjalankanmu (Klik Kiri secara bawaan, atau Klik Kanan). Setelah aktif, mengklik sebuah titik di tanah akan membuatmu berjalan ke sana, dengan penanda di tanah menunjukkan tujuanmu. Mengklik seekor makhluk atau pemain lain akan membuatmu berjalan mendekatinya dan berhenti dalam jangkauan, sementara klik itu tetap menjalankan tugas biasanya untuk menargetkan atau berinteraksi; jika kamu sudah cukup dekat untuk menjangkau apa yang kamu klik, kamu langsung berinteraksi dan tetap di tempatmu. Salah satu tombol pergerakan mana pun akan langsung mengambil alih kendali dan mengakhiri perjalanan itu, begitu pula menahan tombol mouse untuk melihat sekeliling. Melompat tidak demikian, sehingga kamu tetap melanjutkan perjalanan melewati lompatan itu, dan membuka menu permainan hanya menjeda perjalanan, yang akan berlanjut saat kamu menutup menunya."
     },
@@ -6153,7 +6373,8 @@ export const id_ID: EnTranslations = {
       "ifLockBars": "Mengunci bilah Anda sehingga Anda tidak bisa menyeret sebuah kemampuan keluar dari slotnya secara tidak sengaja.",
       "keybindsHeading": "Panel Pengaturan Tombol",
       "keybindsBody": "Daftar tombol hanyalah separuh dari panel itu. Di atasnya ada sakelar-sakelar yang menentukan bagaimana mouse Anda mengendalikan permainan: kamera mouse, apakah kursor terkunci saat Anda memutar pandangan, klik untuk bergerak dan tombol mouse mana yang memicunya, serang sambil bergerak, tata letak sentuh untuk tangan kiri, dan penyaring kata kasar untuk obrolan.",
-      "keybindsMouseBody": "Ada dua hal di sana yang mudah terlewat. Tombol mouse bisa diikat seperti tombol papan ketik, sehingga klik roda dan tombol jempol bisa membawa kemampuan, sementara klik kiri dan kanan tetap dicadangkan untuk kamera dan untuk mengeklik dunia. Dan Anda bisa mengikat langsung dari bilah aksi: aktifkan mode pengikatan pada-bilah di sini, lalu klik sebuah slot dan tekan tombol yang Anda inginkan."
+      "keybindsMouseBody": "Ada dua hal di sana yang mudah terlewat. Tombol mouse bisa diikat seperti tombol papan ketik, sehingga klik roda dan tombol jempol bisa membawa kemampuan, sementara klik kiri dan kanan tetap dicadangkan untuk kamera dan untuk mengeklik dunia. Dan Anda bisa mengikat langsung dari bilah aksi: aktifkan mode pengikatan pada-bilah di sini, lalu klik sebuah slot dan tekan tombol yang Anda inginkan.",
+      "keybindsWheelBody": "Roda itu sendiri juga mengikat. Zoom Camera In dan Zoom Camera Out adalah binding biasa yang diletakkan di roda kosong secara default, jadi Anda dapat memindahkannya ke Ctrl plus roda, atau ke tombol, lalu memutar roda yang dibebaskan untuk mengaktifkan slot bilah tindakan. Takik roda tidak memiliki pelepasan, sehingga tidak dapat menggerakkan tindakan yang ditahan seperti bergerak maju."
     },
     "combat": {
       "intro": "Pertarungan mengikuti aturan MMO klasik yang familier. Kamu tak perlu mempelajari semuanya untuk bermain baik, ini sekadar gambaran cara kerja pertarungan.",
@@ -6207,7 +6428,7 @@ export const id_ID: EnTranslations = {
       "framesMoveBodyEditFrames": "Bingkai kamu, bingkai sasaranmu, dan bingkai partymu semuanya dapat dipindahkan. Masing-masing membawa tombol pindah kecil di sudutnya: buka kuncinya, seret bingkai ke tempat yang kamu inginkan, lalu kunci lagi agar klik tak sengaja tidak menggesernya. Edit Bingkai, di bagian atas tab Bingkai pada opsi Antarmuka, melonggarkan seluruh antarmuka sekaligus, termasuk ketiga bingkai itu: bilah aksi, bilah rapal, bilah ayunan, bilah pengalaman, peta mini, rel tombol, bingkai pet, bilah sikap, baris buff dan debuff, serta chip Pengingat Wishlist, masing-masing memakai chip nama saat longgar. Jika posisinya akhirnya tidak kamu sukai, Atur Ulang ke Bawaan di bagian bawah tab Bingkai yang sama mengembalikan semuanya ke posisi awal.",
       "framesGovernedExtra": "Edit Bingkai juga melonggarkan tumpukan pelacak di bawahnya, yaitu misi dan tujuan yang kamu lacak, kemajuan jasamu, halaman Relikvarium, delve yang sedang kamu jalani, rift yang sedang kamu ikuti, serta resep atau komisi yang kamu lacak, bilah aksi pet di samping bingkai pet, bingkai Titik Sasaran untuk debuffmu pada musuh terdekat, medali Devosi paladin, Bilah Penderitaan warlock, hamparan proc mantra, timer ayunan tangan kedua untuk pemakai dua senjata, dan jendela meter kerusakan bertab, semuanya memakai chip nama sendiri saat dilonggarkan.",
       "framesGovernedAuraTracks": "Edit Bingkai juga melonggarkan enam jalur aura pilihan setelah kamu menyalakannya dari tab Tempur pada opsi Antarmuka yang sama: jalur Buffku, jalur Masa Tunggu Defensif, jalur Perisaiku, jalur Masa Tunggu Ofensif, jalur Pergerakan dan Sembunyi, serta jalur Buffku pada Sekutu. Semua jalur mati secara bawaan, dan masing-masing memakai chip nama sendiri saat dilonggarkan.",
-      "framesGovernedTalkingHead": "Edit Frames also loosens the Dialogue panel, which carries an NPC's spoken line while that NPC is out of your view; it wears its name chip while it is loose.",
+      "framesGovernedTalkingHead": "Edit Frames juga melonggarkan panel Dialog, yang membawa kalimat lisan NPC saat NPC tersebut berada di luar pandangan Anda; ia memakai chip namanya saat longgar.",
       "barsTitle": "Bilah, penghitung waktu, dan teks pertarungan",
       "barsBody": "Bilah rapalanmu muncul di tengah layar, tepat di atas bilah aksimu, setiap kali kamu merapal atau menyalurkan mantra, dan menampilkan nama mantra serta waktu yang tersisa. Targetmu mendapatkan bilah rapalannya sendiri pada bingkainya, sehingga kamu bisa melihat apa yang akan datang dan meresponsnya.\n\nSebuah bilah ayunan tipis berada di bawah bilah rapalanmu dan terisi di antara ayunan senjatamu, sehingga penyerang jarak dekat atau jarak jauh bisa melihat kapan pukulan otomatis berikutnya akan mendarat.\n\nBilah pengalamanmu membentang selebar penuh di bawah bilah aksimu, terbagi menjadi segmen-segmen, dengan sebuah bagian yang lebih terang menunjukkan pengalaman istirahat yang telah kamu tabung.\n\nBerenang di bawah air dan sebuah bilah napas biru muncul di bagian atas layar. Bilah itu berkurang selama kepalamu terendam, berkedip merah begitu habis dan kamu mulai tenggelam, lalu terisi cepat begitu kamu muncul ke permukaan. Space membuatmu berenang ke atas, dan tombol Berenang Turun, Ctrl secara bawaan, membawamu lebih dalam.\n\nKerusakan dan penyembuhan melayang ke atas dari apa pun yang menerimanya sebagai angka-angka kecil, sehingga kamu bisa membaca sebuah pertarungan tanpa membaca teks. Tab Catatan Tempur di kotak obrolanmu menyimpan catatan tertulis yang lengkap.",
       "aurasTitle": "Buff dan debuff",
@@ -7133,7 +7354,7 @@ export const id_ID: EnTranslations = {
     "reliquaryPage": {
       "intro": "Relikuari adalah museum rampasan unik yang telah kamu katalogkan: benda buruan dari ruang bawah tanah, trofi profesi, tunggangan, tampilan senjata, dan gelar. Ia berpasangan dengan Kitab Jasa seperti aula trofi berpasangan dengan buku pencapaian.",
       "howHeading": "Cara kerja koleksinya",
-      "howBody": "Buka Relikuari di dalam game (bawaan Shift+X). Setiap rak memuat halaman berisi relik unik. Kamu mengisi sebuah siluet saat pertama kali memperoleh benda itu pada karakter tersebut, dan menerangi sebuah halaman saat setiap relik di dalamnya sudah terisi. Beberapa halaman berlabel Ditarik atau Pribadi: halaman itu berada di luar penuntasan, jadi tidak pernah mengunci sebuah rak maupun seluruh katalog. Temuan langsung memunculkan pemberitahuan dan menyegarkan jendela yang terbuka; kemajuan bersifat per karakter, kecuali tampilan senjata, yang merupakan kosmetik akun.",
+      "howBody": "Buka Relikuari dalam game (bawaan Shift+X). Setiap rak menampung halaman relik unik. Siluet terisi saat karakter mana pun di akunmu memperoleh benda itu untuk pertama kalinya, dan halaman menyala saat setiap relik di dalamnya terisi. Beberapa halaman berlabel Pensiun atau Pribadi: halaman itu berada di luar penyelesaian, jadi tidak pernah menghalangi rak atau seluruh katalog. Temuan langsung memunculkan pemberitahuan dan menyegarkan jendela yang terbuka; kemajuan dibagi oleh semua karakter di akun, sehingga relik yang ditemukan satu karakter mengisi halaman untuk semuanya.",
       "ranksHeading": "Peringkat Kurator",
       "ranksBody": "Peringkat Kurator naik seiring setiap relik unik yang terkatalog dan hanya memberi gelar serta bingkai kosmetik. Peringkat itu tidak pernah memberi kekuatan tempur, peluang jarahan, atau kompensasi kesialan. Tampilan senjata milik akun tidak menambah peringkat Kurator agar prestise tetap melekat pada karakter, dan relik pada halaman Ditarik atau Pribadi juga tidak menambahnya.",
       "retiredTag": "Ditarik",
@@ -7543,7 +7764,7 @@ export const id_ID: EnTranslations = {
         "bonusFmt": "+{value} {stat}",
         "enchantsNoteOffhand": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove them all sits the Lucent tier, the capstone work of the craft and the only enchants that ask for any skill in it at all: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected, and no piece can be yet: it is authored ahead of the Perfecting work it waits on.",
         "enchantsNoteInfusionLive": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove them all sits the Lucent tier, the capstone work of the craft and the only enchants that ask for any skill in it at all: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected: Perfecting is the wearer's own work, not the enchanter's, and the Professions page tells how a piece earns it.",
-        "enchantsNoteRaidFormula": "Mantra hadir dalam empat tingkat. Tingkat dasar menggunakan Debu Dentingan, dengan sedikit Esensi di ujung atas, dan mencakup slot senjata, tangan kedua, serta setiap slot zirah, dengan cukup pilihan sumbu stat sehingga setiap build menemukan sesuatu untuk tiap slot: perisai dan tangan kedua perapal yang dipegang menggunakan mantra Stamina tersendiri, jadi tidak ada slot yang dikenakan tanpa mantra. Tingkat Unggul membutuhkan satu Serpihan Dentingan ditambah Esensi: bonus lebih kuat pada slot paling berdampak. Serpihan juga memiliki tiga penggunaan lain: dua resep jimat seharga lima masing-masing, anak tangga teratas pengisian ulang efek alat, serta tingkat Bercahaya, tempat mantra senjata dan dada memakai satu, dan Infusi memakai dua, jadi simpan beberapa sebelum membelanjakannya.\n\nDi antara keduanya ada lima mantra Bersura, satu konsumen untuk setiap sekunder bertipe, sehingga tidak ada hasil gilingan yang buntu: Tepian Bersura, senjata dan Kekuatan, menghabiskan Baja Resonant; Segel Bersura, senjata dan Intelijen, Kayu Resonant; Tenun Bersura, dada dan Roh, Benang Resonant; Kulit Bersura, kaki dan Kelincahan, Kulit Resonant; serta Tautan Bersura, helm dan Stamina, Tautan Resonant. Masing-masing juga membutuhkan dua Esensi Dentingan; saat slot dan stat memiliki mantra dasar serta Unggul, bonus Bersura berada di antara keduanya, sedangkan Tenun Bersura adalah mantra Roh dada terkuat secara mutlak dan Kulit Bersura adalah satu-satunya mantra Kelincahan kaki. Bonus persisnya ada di tabel di bawah.\n\nDi atas tingkat rendah biasa terdapat tingkat Bercahaya, karya biasa puncak kerajinan: Pemantraan 100 untuk empat mantra, 125 untuk Infusi, seperti ditunjukkan pada kolom Keahlian di bawah. Masing-masing memakai satu Reagen Bercahaya dan menambah satu langkah pada slotnya sendiri: senjata, dengan pilihan Kekuatan dan Kekuatan Mantra, dada, serta sepatu. Yang terakhir, Infusi Bercahaya, hanya berlaku pada potongan yang telah Disempurnakan: penyempurnaan adalah pekerjaan pemakai sendiri, bukan pemantrai, dan halaman Profesi menjelaskan cara sebuah potongan mendapatkannya.\n\nSemangat Api Terakhir adalah formula raid terpisah, bukan mantra biasa gratis. Pelajari formulanya yang dapat diperdagangkan pada Pemantraan 100 sebelum menerapkannya. Setiap penerapan memakai 3 Inti Api Terakhir dan 2 Serpihan Dentingan; formula dapat jatuh di Tungku atau dibeli dari quartermasternya seharga satu inti. Proc jarak dekat dan aturan kecepatan senjatanya ditampilkan lengkap di bawah.",
+        "enchantsNoteRaidFormula": "Mantra hadir dalam empat tingkat. Tingkat dasar menggunakan Debu Dentingan, dengan sedikit Esensi di ujung atas, dan mencakup slot senjata, tangan kedua, serta setiap slot zirah, dengan cukup pilihan sumbu stat sehingga setiap build menemukan sesuatu untuk tiap slot: perisai dan tangan kedua perapal yang dipegang menggunakan mantra Stamina tersendiri, jadi tidak ada slot yang dikenakan tanpa mantra. Tingkat Unggul membutuhkan satu Serpihan Dentingan ditambah Esensi: bonus lebih kuat pada slot paling berdampak. Serpihan juga memiliki tiga penggunaan lain: dua resep jimat seharga satu masing-masing (sisa biaya jimat adalah esens dan debu), anak tangga teratas pengisian ulang efek alat, serta tingkat Bercahaya, tempat mantra senjata dan dada memakai satu, dan Infusi memakai dua, jadi simpan beberapa sebelum membelanjakannya.\n\nDi antara keduanya ada lima mantra Bersura, satu konsumen untuk setiap sekunder bertipe, sehingga tidak ada hasil gilingan yang buntu: Tepian Bersura, senjata dan Kekuatan, menghabiskan Baja Resonant; Segel Bersura, senjata dan Intelijen, Kayu Resonant; Tenun Bersura, dada dan Roh, Benang Resonant; Kulit Bersura, kaki dan Kelincahan, Kulit Resonant; serta Tautan Bersura, helm dan Stamina, Tautan Resonant. Masing-masing juga membutuhkan dua Esensi Dentingan; saat slot dan stat memiliki mantra dasar serta Unggul, bonus Bersura berada di antara keduanya, sedangkan Tenun Bersura adalah mantra Roh dada terkuat secara mutlak dan Kulit Bersura adalah satu-satunya mantra Kelincahan kaki. Bonus persisnya ada di tabel di bawah.\n\nDi atas tingkat rendah biasa terdapat tingkat Bercahaya, karya biasa puncak kerajinan: Pemantraan 100 untuk empat mantra, 125 untuk Infusi, seperti ditunjukkan pada kolom Keahlian di bawah. Masing-masing memakai satu Reagen Bercahaya dan menambah satu langkah pada slotnya sendiri: senjata, dengan pilihan Kekuatan dan Kekuatan Mantra, dada, serta sepatu. Yang terakhir, Infusi Bercahaya, hanya berlaku pada potongan yang telah Disempurnakan: penyempurnaan adalah pekerjaan pemakai sendiri, bukan pemantrai, dan halaman Profesi menjelaskan cara sebuah potongan mendapatkannya.\n\nSemangat Api Terakhir adalah formula raid terpisah, bukan mantra biasa gratis. Pelajari formulanya yang dapat diperdagangkan pada Pemantraan 100 sebelum menerapkannya. Setiap penerapan memakai 3 Inti Api Terakhir dan 2 Serpihan Dentingan; formula dapat jatuh di Tungku atau dibeli dari quartermasternya seharga satu inti. Proc jarak dekat dan aturan kecepatan senjatanya ditampilkan lengkap di bawah.",
         "charmsHeading": "Jimat untuk alat pengumpul",
         "formulaRequired": "Membutuhkan formula",
         "charmsBody": "Pemantraan juga tempat asal jimat seorang pengumpul. Gizzel Tinker mengajarkan keduanya di bengkel perkakas Eastbrook begitu Pemantraanmu mencapai 25: Simpanan Sang Pengumpul, yang menambah satu unit pada sebuah panen, dan Mata Sang Perajin, yang menaikkan tingkat dari apa yang keluar. Masing-masing dibuat sekali, lalu dipasang pada beliung, kapak, atau sabit, tempat ia menghabiskan satu muatan hanya pada panen yang benar-benar diperbaikinya.\n\nPengisian ulang adalah tempat perdagangan ini terus menghasilkan. Muatan dipulihkan oleh siapa pun yang memiliki alat itu, bukan oleh pemantra yang lewat, dan pengisian ulang menelan separuh material saat pemiliknya adalah pemantra yang menandatangani jimat itu, lebih sedikit lagi dengan spesialisasi Pemantraan. Jadi sebuah jimat yang dijual di konter adalah penjualan satu kali, sementara jimat yang menumpang di alatmu sendiri adalah yang murah untuk terus dijalankan. Tangga muatan dan material lengkapnya ada di halaman profesi pengumpulan mana pun, di bawah Efek Alat."
@@ -7612,7 +7833,7 @@ export const id_ID: EnTranslations = {
       },
       "farm": {
         "rhythmHeading": "Irama pertanian",
-        "rhythmBody": "Menanam adalah rapal singkat yang terlihat: tepat {plant} detik pada setiap anak tangga, karena cangkul membuka tanah, bukan membeli kecepatan. Menarik tanaman matang berlangsung seketika. Tidak ada rapal yang bisa disela dan tidak ada pemeriksaan tas untuk menolaknya, dan petak yang sudah siap menunggu selama kamu membiarkannya, sehingga tas penuh hanya menghabiskan langkah petani untuk mengosongkannya.\n\nYang dibayar panen adalah hasil dan keahlian Pertanian. Berbeda dari urat bijih, panen sama sekali tidak memberi XP karakter, jadi petak adalah perdagangan untuk dikerjakan, bukan cara menaikkan level.",
+        "rhythmBody": "Menanam berlangsung seketika, karena cangkul membuka tanah, bukan membeli kecepatan: tidak ada rapal yang harus ditunggu, jadi petani yang berjalan pergi tetap sudah menanam. Menarik tanaman matang juga seketika. Tidak ada rapal yang bisa disela dan tidak ada pemeriksaan tas untuk menolaknya, dan petak yang sudah siap menunggu selama kamu membiarkannya, sehingga tas penuh hanya menghabiskan langkah petani untuk mengosongkannya.\n\nYang dibayar panen adalah hasil dan keahlian Pertanian. Berbeda dari urat bijih, panen sama sekali tidak memberi XP karakter, jadi petak adalah perdagangan untuk dikerjakan, bukan cara menaikkan level.",
         "gainHeading": "Yang diajarkan panen",
         "gainBody": "Perolehan bersifat deterministik dan mengikuti penghitungmu sendiri, bukan tanaman: keahlian {g1} untuk panen di bawah {p1}, {g2} di bawah {p2}, {g3} di bawah {p3}, dan {g4} untuk sisa perjalanan menuju batas {cap}. Ini bukan lemparan kenaikan keahlian, jadi pendakiannya tepat sepanjang yang ditentukan aritmetika.\n\nYang ditentukan tingkat tanaman adalah sejauh apa petak dapat membawamu. Tanaman tingkat 1 mengajar sampai {c1} lalu menjadi abu-abu, tanaman tingkat 2 sampai {c2}, dan tingkat 3 ke atas sampai batas, sehingga berpindah ke petak yang lebih tinggi adalah satu-satunya cara penghitung terus bergerak.",
         "yieldsHeading": "Hasil sebuah panen",
@@ -10205,6 +10426,7 @@ export const id_ID: EnTranslations = {
       "templates": {
         "battleground": "[Medan Thornhollow] {name}: {message}",
         "party": "[Party] {name}: {message}",
+        "raidWarning": "[Peringatan Serangan] {name}: {message}",
         "yell": "{name} berteriak: {message}",
         "whisper": "{name} berbisik: {message}",
         "toWhisper": "Kepada {name}: {message}",
@@ -10343,6 +10565,7 @@ export const id_ID: EnTranslations = {
       "stunned": "Kamu terhuyung!",
       "silenced": "Kamu dibungkam!",
       "busy": "Kamu sedang sibuk.",
+      "cannotCastWhileMoving": "You can't cast while moving.",
       "abilityNotReady": "Kemampuan itu belum siap.",
       "notEnoughRage": "Amarah tidak cukup!",
       "notEnoughEnergy": "Energi tidak cukup!",
@@ -10691,7 +10914,6 @@ export const id_ID: EnTranslations = {
     },
     "cast": {
       "fishing": "Memancing",
-      "farming": "Menanam",
       "gathering": "Mengumpulkan",
       "crafting": "Membuat",
       "disenchanting": "Menghancurkan Pemantraan",
@@ -11372,6 +11594,19 @@ export const id_ID: EnTranslations = {
       "buyConfirmAccept": "Beli",
       "buyConfirmCancel": "Batal",
       "buyChanged": "Daftar itu berubah sebelum kamu mengonfirmasi. Periksa harganya dan coba lagi.",
+      "sweep": "Menyapu",
+      "sweepAria": "Menyapu pasar untuk {item}",
+      "sweepTitle": "Sapu Pasar: {item}",
+      "sweepClose": "Menutup",
+      "sweepNote": "Beli seluruh listingan dari penjual lain, yang termurah per unit terlebih dahulu, hingga hitungan Anda tercakup. Anda mungkin menerima lebih banyak dari yang Anda minta.",
+      "sweepQuantity": "Unit diinginkan",
+      "sweepQuoteNone": "Tidak ada daftar item ini untuk disapu.",
+      "sweepQuoteLine": "{units} unit di {listings} listingan untuk {total} (masing-masing {each})",
+      "sweepQuoteShort": "Hanya {units} unit di {listings} listingan yang tersedia, untuk {total} (masing-masing {each})",
+      "sweepButton": "Menyapu",
+      "sweepConfirmTitle": "Konfirmasikan Sapuan Pasar",
+      "sweepConfirmBody": "Beli {item} x{units} di {listings} listingan seharga {total} (masing-masing {each})?",
+      "sweepChanged": "Kutipan sapuan berubah sebelum Anda mengonfirmasi. Periksa totalnya dan coba lagi.",
       "sellNote": "Pajang barang dari tasmu. Pedagang mengambil potongan {cut}% saat barang terjual. Kamu memakai {used}/{max} slot daftar jual.",
       "sellPickEmpty": "Klik barang di tasmu untuk memilih yang akan dijual.",
       "quantity": "Jumlah",
@@ -11411,7 +11646,9 @@ export const id_ID: EnTranslations = {
       "ownListing": "Itu daftar jualanmu sendiri. Batalkan untuk mengambilnya kembali.",
       "cannotAfford": "Kamu tidak mampu membelinya.",
       "notYourListing": "Itu bukan daftar jualanmu.",
-      "nothingToCollect": "Tidak ada yang bisa kamu ambil."
+      "nothingToCollect": "Tidak ada yang bisa kamu ambil.",
+      "sweepNoListings": "Tidak ada daftar item tersebut yang tersedia untuk disapu.",
+      "sweepPriceChanged": "Harga berubah sebelum sapuan Anda mendarat. Periksa penawarannya dan coba lagi."
     },
     "loot": {
       "takeAll": "Ambil Semua",
@@ -16924,6 +17161,21 @@ export const id_ID: EnTranslations = {
       },
       "hub_healing_dummy": {
         "name": "Boneka Latihan Penyembuhan"
+      },
+      "healing_dummy_tank": {
+        "name": "Boneka Vanguard yang Terluka"
+      },
+      "healing_dummy_soldier": {
+        "name": "Boneka Prajurit yang Terluka"
+      },
+      "healing_dummy_scout": {
+        "name": "Boneka Pramuka Kritis"
+      },
+      "healing_dummy_caster": {
+        "name": "Boneka Perapal Mantra yang Terluka"
+      },
+      "healing_dummy_ranger": {
+        "name": "Boneka Penjaga Hutan yang babak belur"
       },
       "ridge_stalker": {
         "name": "Pengintai Punggung Bukit"

@@ -573,6 +573,16 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
     allow: { '.className': 15 },
     reflowAllow: {},
   },
+  // Both writes are build-time. The .className is the base class stamped on a tick
+  // as it is MINTED into the pool (the pool only grows to the high-water tick
+  // count), and the .setAttribute is the one aria-hidden on the ring root in
+  // buildRoot, which runs once at HUD construction. Every state write after that
+  // (angle, colour, lit, present) is facet-routed.
+  {
+    file: 'reticle_ticks_painter.ts',
+    allow: { '.className': 1, '.setAttribute': 1 },
+    reflowAllow: {},
+  },
   { file: 'xp_bar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'swing_timer_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'proc_overlay_painter.ts', allow: {}, reflowAllow: {} },
@@ -711,6 +721,14 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
   {
     file: 'reliquary_tracker_painter.ts',
     allow: { '.innerHTML': 1, '.setAttribute': 3, '.removeAttribute': 3 },
+    reflowAllow: {},
+  },
+  // recipe_tracker is the same painter contract: ONE constructor innerHTML
+  // write for the whole skeleton (block pool times reagent pool), every refresh
+  // write facet-routed. No chip mode (hidden on touch), so no ARIA swap pairs.
+  {
+    file: 'recipe_tracker_painter.ts',
+    allow: { '.innerHTML': 1 },
     reflowAllow: {},
   },
   // The Thornhollow Fields scoreboard rebuilds its skeleton in ONE innerHTML write

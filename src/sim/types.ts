@@ -188,15 +188,6 @@ export const SUNDER_CAST_ID = 'sundering';
 // activity-marker shape as craft/enchant-family. Separate id keeps cast-bar
 // labels and audio routing clean.
 export const TOOL_RECHARGE_CAST_ID = 'tool_recharge';
-// The planting cast sentinel (Farming, the growth-engine phase): same
-// activity-marker shape as the craft/gather family. UNLIKE every other
-// sentinel here, this cast decides NOTHING: plantCrop resolves the whole
-// plant at command time and the cast is pure flavor, so its completion arm in
-// combat/casting_lifecycle.ts dispatches no work (see the comment there).
-// Membership in isNonSpellCast below is what buys it the shared bundle
-// (silence exemption, no spell queue, damage cancels instead of pushing back,
-// item use blocked while it runs).
-export const FARMING_CAST_ID = 'farming';
 // The corpse-harvest cast (Intentional Gathering, PR3): same activity-marker
 // shape as gather/craft/fishing. HARVEST_CAST_SECONDS (professions/
 // harvest_admission.ts) is the frozen duration; professions/
@@ -219,7 +210,6 @@ export function isNonSpellCast(castId: string | null): boolean {
     castId === SALVAGE_CAST_ID ||
     castId === SUNDER_CAST_ID ||
     castId === TOOL_RECHARGE_CAST_ID ||
-    castId === FARMING_CAST_ID ||
     castId === CORPSE_HARVEST_CAST_ID
   );
 }
@@ -421,7 +411,7 @@ export type AuraKind =
   // (Moonseed becomes Moonsurge, Skyfall becomes Sunwake); pressing either
   // spends the bank. old_blood is Wildfang's shared bank: form strikes fill
   // it in either form and the form worn at the spend decides the payoff
-  // (Redharvest in Wolf, Marrowbreak in Bruin). verdance is Groveheart's
+  // (Redharvest in Cat, Marrowbreak in Bruin). verdance is Groveheart's
   // garden: completed HoT casts plant stages toward Overbloom.
   | 'moontide'
   | 'old_blood'
@@ -713,6 +703,8 @@ export interface Aura {
   value3?: number; // imbue: judgement max; Greater Invisibility: aftereffect duration
   tickInterval?: number;
   tickTimer?: number;
+  tickDamage?: number;
+  tickDoom?: number;
   // Sim-only periodic ramp: after each resolved DoT tick, increase `stacks`
   // and recompute `value` as per-stack damage times stacks, up to this cap.
   // The wire already mirrors the resulting value/stacks, so clients do not
@@ -1968,6 +1960,8 @@ export interface MobTemplate {
   /** Optional mandatory encounter threshold. Damage cannot move the mob below
    * this max-HP fraction until encounter logic clears its runtime floor. */
   damageFloorPct?: number;
+  /** Optional resting HP fraction for friendly practice targets that should stay healable. */
+  restHpFraction?: number;
   loot: LootEntry[];
   scale: number; // render hint
   color: number; // render hint
@@ -3556,6 +3550,8 @@ export type AbilityEffect =
       charges: number;
       doomPerProc: number;
       damage: number;
+      interval?: number;
+      tickDoom?: number;
     }
   | {
       type: 'afflictionCruelPact';
@@ -5013,6 +5009,8 @@ export interface ClientMirroredEntityFields {
    *  0..1 through the pull at the snapshot cadence; the visual smooths it. */
   climbing?: boolean;
   climbProgress?: number;
+  /** Mirror of an in-flight Vaulting Charge: a bare server-owned movement bit. */
+  leaping?: boolean;
 }
 
 export interface Entity extends ClientMirroredEntityFields {
@@ -5972,6 +5970,11 @@ export interface NythraxisEncounterState {
   // Dread Curse (the tank swap, both difficulties): only the cadence lives
   // here; the stacks live on the victim's aura (nythraxis_dread_curse.ts).
   dreadCurseTimer?: number;
+  // Who Dread Curse currently treats as the settled tank, tracked separately
+  // from the live boss.aggroTargetId so a taunt back onto a still-cursed
+  // player can be told apart from a genuine swap-in and refused (see
+  // enforceNythraxisDreadCurseSwap in encounters/nythraxis.ts).
+  dreadCurseHolderId?: number | null;
   // Bone Spike cadence and the live spike/victim pairs (nythraxis_bone_spike.ts).
   boneSpikeTimer?: number;
   boneSpikes?: NythraxisBoneSpike[];
@@ -6043,8 +6046,8 @@ export interface NythraxisEncounterState {
     chargeIndex: number;
     chargeTargetId: number | null;
     slammed: boolean;
+    openingSlamSpent: boolean;
     whirlTickTimer: number;
-    spikeCast: boolean;
     chargedIds: number[];
   } | null;
   wardChannels: NythraxisWardChannel[];
@@ -6312,6 +6315,21 @@ export interface ReadyCheck {
   responses: Map<number, 'ready' | 'notready' | 'pending'>; // pid -> answer
 }
 
+export interface ReadyCheckMemberResponse {
+  pid: number;
+  name: string;
+  state: 'ready' | 'notready' | 'pending';
+}
+
+// An active party/raid pull timer (/pull X).
+export interface PullTimer {
+  partyId: number;
+  initiator: number;
+  endsAt: number;
+  totalSeconds: number;
+  lastAnnounced: number;
+}
+
 // A player's active riding-lesson attempt (src/sim/mounts_training.ts), kept on
 // PlayerMeta.mountTraining. Session-only: never persisted/serialized (unlike the
 // one-time mountTrainingFeePaid flag also on PlayerMeta), so a save/load never
@@ -6527,6 +6545,14 @@ export type SimEvent = { pid?: number } & (
   // ID only, never English text; `retro` marks the on-join back-credit pass so
   // the client can batch those into one summary line instead of banner spam.
   | { type: 'deedUnlocked'; deedId: string; retro?: boolean }
+  // Account ledger relic record (always personal: emitted with pid). Fired
+  // when the acting character is appended as a finder of a catalogued relic
+  // (an item, an authored mark, or a mount) on its account ledger
+  // (src/sim/account_ledger.ts). `key` is the accountRelicKey. Never English;
+  // NOT presentation: the client ignores it (the heavy `acct` self key is the
+  // membership authority), the server persists the row and fans the entry out
+  // to the account's other live sessions. `retro` marks the on-join seed pass.
+  | { type: 'relicRecorded'; key: string; retro?: boolean }
   // Reliquary first fill (always personal: emitted with pid). Id-only: exactly
   // one of itemId / markId is set for a catalogued relic or authored mark.
   // pageIds list pages that list the relic; illuminatedPageId is set when a
@@ -6765,10 +6791,14 @@ export type SimEvent = { pid?: number } & (
       past: readonly RealmBuilderHonour[];
     }
   | { type: 'worldQuestInvestigationDialogue'; targetId: number }
-  | { type: 'noticeboard'; noticeboardId: string; state: 'empty' }
+  // `boardId` is the authored NoticeboardDef id (every board shares one
+  // templateId), so the client can tell the Proving Shore's recruits' signpost
+  // from a town board and open the guild board on its default view.
+  | { type: 'noticeboard'; noticeboardId: string; boardId: string; state: 'empty' }
   | {
       type: 'noticeboard';
       noticeboardId: string;
+      boardId: string;
       state: 'listings';
       listings: readonly NoticeboardListing[];
     }
@@ -6833,6 +6863,8 @@ export type SimEvent = { pid?: number } & (
         // purpose: talking to the opposing side is the whole reason it exists
         // (players were falling back to General for it).
         | 'battleground'
+        // Party/raid leader alert broadcast to all party members.
+        | 'raidWarning'
         | 'guild'
         | 'officer'
         | 'world'
@@ -6856,11 +6888,24 @@ export type SimEvent = { pid?: number } & (
       // for every player-sourced chat line (mob/boss yells omit it, same as
       // fromTitle).
       classId?: PlayerClass;
+      // Optional localization identity for generated system chat. Player-authored
+      // chat stays literal `text`; generated lines carry this so clients render
+      // them through the catalog while older clients can still fall back to text.
+      textKey?: string;
+      textValues?: Record<string, string | number>;
     }
   | { type: 'partyInvite'; fromPid: number; fromName: string }
   // The party/raid leader started a ready check: the recipient's client plays a
   // sound and shows a yes/no prompt (social/ready_check.ts). Personal (pid set).
   | { type: 'readyCheckStart'; fromName: string }
+  // Live status update for the party/raid leader during a ready check. Personal (pid set to leader).
+  | {
+      type: 'readyCheckStatus';
+      initiatorPid: number;
+      partyId: number;
+      responses: ReadyCheckMemberResponse[];
+      done: boolean;
+    }
   // A player resurrection is never automatic: the dead recipient chooses whether
   // to return. Personal (pid set), with all visible copy composed client-side.
   | { type: 'resurrectionOffer'; fromName: string }
@@ -8332,13 +8377,13 @@ export const EASTBROOK_NOTICEBOARD_NATIVE_DIMENSIONS = Object.freeze({
 } as const);
 export const EASTBROOK_NOTICEBOARD_INTERACTION_RADIUS = 4 as const;
 // Static world services use their own namespace above the sequential allocator
-// and the reserved 1_000_000_000/1_000_000_001/1_000_000_002 singleton NPC ids
-// (the Vale Cup groundskeeper, FURY in Eastbrook, and Warmarshal Draven Kole in
-// Highwatch). A singleton NPC takes a reserved id AND `dynamic: true` so the
-// generic world-init loop skips it: that loop allocates ids by iterating the
-// merged NPC table in insertion order, so a plain insertion would shift the id
-// of every NPC, camp mob and object created after it, which the parity goldens
-// pin per frame.
+// and reserved 1_000_000_x singleton ids (the Vale Cup groundskeeper, FURY in
+// Eastbrook, Warmarshal Draven Kole in Highwatch, the Crucible vendor, and
+// authored practice dummies). A singleton NPC takes a reserved id AND
+// `dynamic: true` so the generic world-init loop skips it: that loop allocates
+// ids by iterating the merged NPC table in insertion order, so a plain
+// insertion would shift the id of every NPC, camp mob and object created after
+// it, which the parity goldens pin per frame.
 export const STATIC_WORLD_SERVICE_ENTITY_ID_MIN = 2_000_000_001;
 
 /** The one static, interactable noticeboard contract supported by every host. */
@@ -9116,11 +9161,11 @@ export const SHIELD_BLOCK_BASE = 0.05;
 export const ENRAGE_DMG_DONE = 0.07;
 export const ENRAGE_HASTE_PCT = 0.25;
 export const ENRAGE_MOVE_MULT = 1.1;
-// Druid Wolf Form: +15% passive move speed. The form_cat aura's VALUE is the
+// Druid Cat Form: +15% passive move speed. The form_cat aura's VALUE is the
 // threat multiplier (0.71), so moveSpeedMult reads this constant, never
 // a.value. Sits under Loping Stride (1.6), Dash (1.5), and every mount, and
 // rides the same non-stacking Math.max path as those speed auras.
-export const WOLF_FORM_MOVE_MULT = 1.15;
+export const CAT_FORM_MOVE_MULT = 1.15;
 // Avatar's colossus body-size multiplier while the buff_avatar aura is worn.
 export const AVATAR_SCALE = 1.15;
 export const REVENGE_FREE_CHANCE = 0.3;

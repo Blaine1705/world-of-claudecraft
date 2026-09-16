@@ -166,14 +166,16 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // 220+14+1=235, dispatch-only 13+0+1=14), NOT a suite run, which the NOTE
 // above explicitly warns against trusting: confirm with
 // `npx vitest run tests/command_schema.test.ts` before merge lands.
-//
-// RE-PINNED at the merge of release/v0.43.0 into feature/world-quests: the
-// release's 222/236/14 plus the branch's eleven world-quest and vehicle
-// commands, each one both sent by ClientWorld and dispatched by the server
-// (eight of them through the delegated world-quest family below). Measured
-// by the suite on the merged tree: 233/247/14.
-const EXPECTED_SEND_COUNT = 233;
-const EXPECTED_DISPATCH_COUNT = 247;
+// +1 send / +1 dispatch for the Social window's Who tab (`who`: a structured
+// realm roster answered by the `who` frame; the chat /who stays as it was).
+// Market Sweep composes on top of it with `market_sweep_quote` and
+// `market_sweep`, both client-sent and server-dispatched.
+// RE-PINNED at the second release/v0.43.0 merge into feature/world-quests:
+// the release's 225/239 plus the branch's eleven world-quest and vehicle
+// commands, each one both sent by ClientWorld and dispatched by the server.
+// Measured by the suite on the merged tree: 236/250.
+const EXPECTED_SEND_COUNT = 236;
+const EXPECTED_DISPATCH_COUNT = 250;
 const EXPECTED_DISPATCH_ONLY_COUNT = 14;
 
 // The chat sub-channel routing switch (server/game.ts `switch

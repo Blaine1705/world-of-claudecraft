@@ -1362,18 +1362,34 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // v0.42.0 dependency-floor bump (sharp, js-yaml, vitest): the lockfile is a
 // fingerprint input, so every shipping GLB was size-preserving re-minted and this
 // seal follows the swept evidence. No capture was retaken.
+// Handoff experiment: canonical runtime-input reseal for the NPC layout and
+// renderer wiring. Historical pixels, performance values and capture identity stay frozen.
 // Re-minted for the CPU-hygiene lot (renderer.ts consumer edits and the
 // view-candidate scan extraction): the composite first, then this metadata
 // seal from the swept file. No capture was retaken.
 // Re-minted again for the lot's review round (the shared liveViewCandidate
 // check moved the renderer leaf once more). No capture was retaken.
-// Re-minted at the release/v0.43.0 merge into feature/world-quests (the merged
-// renderer leaf): the composite first, then this seal from the swept file. No
-// capture was retaken.
+// Re-minted for reconciling the latest v0.43.0 base: the release-side
+// CPU-hygiene renderer leaf and the druid Cat Form renderer leaf compose in
+// one tree. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '6745861579e8fe7fee6faba3bc4efa51785a3884897aab95c1bee48abef315c9';
+  // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
+  // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
+  // the Eastbrook handoff): the merged renderer leaf, the moved NPC layout and
+  // the ground-sample leaves compose in one tree. No capture was retaken.
+  // Re-minted at the second release/v0.43.0 merge into feature/world-quests
+  // (the handoff's renderer leaf composed with the branch's WorldGuidance
+  // wiring). No capture was retaken.
+  '7953992fb6dd2d34b62a3d00e7a56cd7c34062fab1fc58aee487ba2d54292ece';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '085f1c6512330becf384d0a06977544fdad9034620e9129d81cff26327597f24';
+  // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
+  // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
+  // the Eastbrook handoff): the merged renderer leaf, the moved NPC layout and
+  // the ground-sample leaves compose in one tree. No capture was retaken.
+  // Re-minted at the second release/v0.43.0 merge into feature/world-quests
+  // (the handoff's renderer leaf composed with the branch's WorldGuidance
+  // wiring). No capture was retaken.
+  '1f6897145bb50059603a97423dc00785eeb2fe5f5439326a403f449b4074c2e2';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2736,9 +2752,17 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // second-order seal over the swept evidence bytes. No capture was retaken.
       // Review round of the same lot: recomputed LAST again over the re-swept
       // evidence. No capture was retaken.
-      // Release/v0.43.0 merge into feature/world-quests: recomputed LAST over
+      // Druid Cat Form merge with release/v0.43.0: recomputed LAST again over
       // the re-swept evidence. No capture was retaken.
-    ).toBe('2535f328fb9819f107a371ebf34176c0233e2254c92d563df8f52f1babdf137c');
+      // Latest v0.43.0 base reconciliation: recomputed LAST again over the
+      // re-swept evidence. No capture was retaken.
+      // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
+      // v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking the Eastbrook
+      // handoff): recomputed LAST again over the re-swept evidence. No capture
+      // was retaken.
+      // Second release/v0.43.0 merge into feature/world-quests: recomputed LAST
+      // again over the re-swept evidence. No capture was retaken.
+    ).toBe('59332c178d2c7fea57ffcd40d68cd5f9ee4dd68248fc42d9085230249355b989');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
