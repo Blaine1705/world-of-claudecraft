@@ -42,7 +42,10 @@ export function isWorldQuestZone(zoneId: string): boolean {
 }
 
 /** The character's completion count for one zone (zero when never credited). */
-export function zoneCompletionCount(counts: ZoneCompletionCounts | undefined, zoneId: string): number {
+export function zoneCompletionCount(
+  counts: ZoneCompletionCounts | undefined,
+  zoneId: string,
+): number {
   const value = counts?.[zoneId];
   return typeof value === 'number' && value > 0 ? Math.floor(value) : 0;
 }
@@ -50,7 +53,8 @@ export function zoneCompletionCount(counts: ZoneCompletionCounts | undefined, zo
 /** The highest count across every zone: what the "in a single zone" deeds read. */
 export function bestZoneCompletionCount(counts: ZoneCompletionCounts | undefined): number {
   let best = 0;
-  for (const zoneId of WORLD_QUEST_ZONES) best = Math.max(best, zoneCompletionCount(counts, zoneId));
+  for (const zoneId of WORLD_QUEST_ZONES)
+    best = Math.max(best, zoneCompletionCount(counts, zoneId));
   return best;
 }
 
