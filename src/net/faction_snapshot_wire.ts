@@ -4,23 +4,27 @@
 // is clamped by the same sanitizers the save/load boundary uses, so a hostile
 // or skewed snapshot can never leave the client holding out-of-range standing.
 import type { FactionId } from '../sim/factions';
-import { sanitizeFactionReputation } from '../sim/factions';
+import { sanitizeFactionCurrencies, sanitizeFactionReputation } from '../sim/factions';
 import { sanitizeWorldQuestReplacements } from '../sim/world_quest_reroll';
 import { sanitizeWorldQuestCycle } from '../sim/world_quests';
 
 export interface FactionSelfMirrors {
   factions: Readonly<Record<FactionId, number>>;
+  factionCurrencies: Readonly<Record<FactionId, number>>;
   worldQuestRerollCycle: string;
   worldQuestReplacements: Readonly<Record<string, string>>;
 }
 
-/** Apply the `fac`, `wqrr` and `wqrep` self keys; each is independent. */
+/** Apply the `fac`, `facCur`, `wqrr` and `wqrep` self keys; each is independent. */
 export function applyFactionSelfWire(
   target: Partial<FactionSelfMirrors> & { worldQuestCycle?: string },
-  self: { fac?: unknown; wqrr?: unknown; wqrep?: unknown },
+  self: { fac?: unknown; facCur?: unknown; wqrr?: unknown; wqrep?: unknown },
 ): void {
   if (self.fac !== undefined) {
     target.factions = Object.freeze(sanitizeFactionReputation(self.fac));
+  }
+  if (self.facCur !== undefined) {
+    target.factionCurrencies = Object.freeze(sanitizeFactionCurrencies(self.facCur));
   }
   if (self.wqrr !== undefined) {
     target.worldQuestRerollCycle = sanitizeWorldQuestCycle(self.wqrr);

@@ -1620,6 +1620,14 @@ export interface PlayerMeta extends worldQuestState.WorldQuestPlayerState {
   // change (recomputeTalents), never walked on the combat or stat hot path.
   talents: TalentAllocation;
   talentMods: TalentModifiers;
+  // Allied faction reward and toy tracking (session-only, cooldown timers)
+  alliedHearthstoneReadyAt?: number;
+  alliedHearthstoneAttunement?: FactionId;
+  riftGliderReadyAt?: number;
+  targetDummyReadyAt?: number;
+  dawnStandardReadyAt?: number;
+  dawnStandardSeconds?: number;
+  shockBombReadyAt?: number;
   // Battle Rhythm's every-third-ability counter. Session-only: a new login
   // starts a fresh rhythm and persistence never needs to migrate it.
   abilityRhythm: number;
@@ -3274,7 +3282,7 @@ export class Sim {
         }
       }
       for (const q of s.questsDone) meta.questsDone.add(q);
-      worldQuestState.restoreWorldQuestState(meta, s.worldQuests, s.factions);
+      worldQuestState.restoreWorldQuestState(meta, s.worldQuests, s.factions, s.factionCurrencies);
       // A rev reset zeroes COLLECT counts too, and those are derived state only
       // onInventoryChangedForQuests re-credits: re-sync once (inventory is already
       // restored above) so a migrated character holding the collect items is not
@@ -4804,6 +4812,12 @@ export class Sim {
   }
   get factions(): Readonly<Record<FactionId, number>> {
     return this.primary.factions;
+  }
+  get factionCurrencies(): Readonly<Record<FactionId, number>> {
+    return this.primary.factionCurrencies;
+  }
+  get alliedHearthstoneAttunement(): FactionId | undefined {
+    return this.primary.alliedHearthstoneAttunement;
   }
   get worldQuestReplacements(): Readonly<Record<string, string>> {
     return this.primary.worldQuestReplacements;
@@ -8509,11 +8523,20 @@ export class Sim {
 
   useItem(
     itemId: string,
-    pidOrTarget?: number | { slotIndex: number },
+    pidOrTarget?: number | { slotIndex?: number; aim?: { x: number; z: number } },
     slotIndex?: number,
+    aim?: { x: number; z: number },
   ): ItemUseResult | undefined {
-    const { pid, named } = foldNamedSlotTarget(pidOrTarget, slotIndex);
-    return items.useItem(this.ctx, itemId, pid, named);
+    const slotTarget =
+      typeof pidOrTarget === 'object' && pidOrTarget !== null && pidOrTarget.slotIndex !== undefined
+        ? { slotIndex: pidOrTarget.slotIndex }
+        : typeof pidOrTarget === 'number'
+          ? pidOrTarget
+          : undefined;
+    const { pid, named } = foldNamedSlotTarget(slotTarget, slotIndex);
+    const targetAim =
+      typeof pidOrTarget === 'object' && pidOrTarget !== null ? (pidOrTarget.aim ?? aim) : aim;
+    return items.useItem(this.ctx, itemId, pid, named, targetAim);
   }
 
   // ONE explicit shape, no overloads (phase 21): the request rides an options

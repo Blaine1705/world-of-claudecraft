@@ -106,6 +106,9 @@ export function objectDisplayName(entity: Entity): string {
   if (entity.objectItemId && Object.hasOwn(IGNIVAR_LORE_OBJECTS, entity.objectItemId)) {
     return localizeSimText(entity.name) ?? entity.name;
   }
+  if (entity.templateId === 'dawn_battle_standard') {
+    return tEntity({ kind: 'item', id: 'dawn_battle_standard', field: 'name' });
+  }
   // Collectible/quest ground objects carry the item id they grant; localize the
   // nameplate through the item dictionary instead of the raw English name.
   if (entity.objectItemId) return tEntity({ kind: 'item', id: entity.objectItemId, field: 'name' });

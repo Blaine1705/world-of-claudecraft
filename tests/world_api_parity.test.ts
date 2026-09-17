@@ -139,6 +139,7 @@ export const IWORLD_MEMBERS = [
   { name: 'worldQuestTime', kind: 'data' },
   { name: 'nearbyWorldQuestTraces', kind: 'data' },
   { name: 'factions', kind: 'data' },
+  { name: 'factionCurrencies', kind: 'data' },
   { name: 'worldQuestReplacements', kind: 'data' },
   { name: 'worldQuestRerollCycle', kind: 'data' },
   // --- commands + read-returning methods ---
@@ -892,8 +893,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // 402/116/286 on feature/wq-reputation: 397/113/284 plus factions,
     // worldQuestReplacements, worldQuestRerollCycle (+3 data), and canRerollWorldQuest,
     // rerollWorldQuest (+2 methods).
-    expect(IWORLD_MEMBERS.length).toBe(402);
-    expect(DATA_MEMBERS.length).toBe(116);
+    expect(IWORLD_MEMBERS.length).toBe(403);
+    expect(DATA_MEMBERS.length).toBe(117);
     expect(METHOD_MEMBERS.length).toBe(286);
   });
   it('has no duplicate member names', () => {
@@ -1046,6 +1047,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'equipment',
       'equipmentInstances',
       'extractEssence',
+      'factionCurrencies',
       'factions',
       'farmNowMs',
       'farmPatches',
@@ -1361,6 +1363,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'entityRosterVersion',
       'equipment',
       'equipmentInstances',
+      'factionCurrencies',
       'factions',
       'farmPatches',
       'gatheringGoal',
@@ -1953,6 +1956,7 @@ const FACET_QUESTS = [
   'startWorldQuestActivity',
   'acceptLinkedQuest',
   'factions',
+  'factionCurrencies',
   'worldQuestReplacements',
   'worldQuestRerollCycle',
   'canRerollWorldQuest',
@@ -2494,10 +2498,10 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    // Mirrors the IWORLD_MEMBERS.length pin above (402); this pin and the one above
+    // Mirrors the IWORLD_MEMBERS.length pin above (403); this pin and the one above
     // must always agree.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(402);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(402);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(403);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(403);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

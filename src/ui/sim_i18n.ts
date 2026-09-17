@@ -212,6 +212,9 @@ const baseEnTable = {
   // Unique-equipped refusal: a second worn copy of the same legendary item
   // (src/sim/items.ts equipItem, rule in src/sim/equipment_rules.ts).
   'error.uniqueEquipped': 'You can only equip one of those.',
+  // Unique-carried refusal: duplicate unique item in bags/equipment
+  // (src/sim/items.ts buyItem, rule on BaseItemDef.unique).
+  'error.uniqueCarried': 'You can only carry one of that item.',
   // Masterwrought counted-family refusals: the crafted-apex tier is worn at most
   // two pieces at a time, and at most ONE of those two may be legendary
   // (src/sim/items.ts equipItem, rule in src/sim/equipment_rules.ts

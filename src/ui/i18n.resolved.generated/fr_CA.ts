@@ -2332,7 +2332,13 @@ export const fr_CA: EnTranslations = {
       "walletNotLinked": "No wallet linked",
       "wocPreview": "Preview balance, not yet verified",
       "lifetime": "Lifetime {amount}",
-      "factionPending": "Faction currency: pending Stage 2"
+      "factionPending": "Faction currency: pending Stage 2",
+      "riftWatchMark": "Rift Watch Mark",
+      "riftWatchMarkNote": "World Quests in Rift Watch zones",
+      "churchOrderCrest": "Order Crest",
+      "churchOrderCrestNote": "World Quests in Church Order zones",
+      "automatonCog": "Automaton Cog",
+      "automatonCogNote": "World Quests in Automaton zones"
     },
     "reputation": {
       "intro": "All three factions progress at once: every world quest counts toward the faction of its zone.",
@@ -4624,10 +4630,29 @@ export const fr_CA: EnTranslations = {
       "enchant_weapon_lucent_spellpower": "Gravure d’arme : Puissance des sorts lumineuse",
       "enchant_chest_lucent_stamina": "Gravure de torse : Endurance lumineuse",
       "enchant_feet_lucent_agility": "Gravure de bottes : Agilité lumineuse",
-      "enchant_lucent_infusion": "Infusion lumineuse"
+      "enchant_lucent_infusion": "Infusion lumineuse",
+      "enchant_offhand_spirit": "Offhand Etching: Spirit",
+      "enchant_feet_shadowstride": "Boot Etching: Shadowstride",
+      "enchant_gloves_forged_might": "Glove Etching: Forged Might"
     },
     "enchantDescription": {
       "enchant_weapon_lastflame_zeal": "Vos attaques de mêlée qui touchent peuvent vous conférer 50 de Force pendant 15 s et vous rendre 200 points de vie. Les modificateurs de soins s’appliquent. Chaque coup a 1 % de chances de se déclencher par tranche de 0,6 s de la vitesse de base de l’arme qui frappe. Aucun temps de recharge interne. Les deux mains partagent un seul effet, chaque déclenchement le renouvelle et il ne se cumule jamais. Les attaques à distance ne déclenchent pas cet effet. La Forme de loup utilise à la place sa vitesse d’attaque de base de 1 s."
+    },
+    "factionRewards": {
+      "alliedHearthstoneUse": "Use: Teleports you to your attuned faction hub. (10 sec cast, 15 min cooldown)",
+      "alliedHearthstoneAttuned": "Attuned to: {hub}",
+      "hub_none": "None (Use near a faction hub to attune)",
+      "hub_rift_watch": "Drifthaven (The Rift Watch)",
+      "hub_church_order": "Eastbrook Vale (The Church of the Holy Light Order)",
+      "hub_automatons": "South Reach (The Automaton Foundry)",
+      "riftGliderUse": "Use: Unfolds the glider, slowing falling speed for 30 sec. Landing or taking damage cancels the effect. (2 min cooldown)",
+      "targetDummyUse": "Use: Deploys a mechanical target dummy in the open world for 2 minutes to practice combat abilities. (5 min cooldown)",
+      "battleStandardUse": "Use: Plants the Consecrated Dawn Battle Standard for 5 minutes, significantly increasing out-of-combat health and mana regeneration for all nearby allies. Remaining near it for 10 seconds also grants Blessing of the Dawn (+5% to all stats for 30 min). (5 min cooldown)",
+      "shockBombUse": "Use: Throws a shock bomb up to 30 yards, dealing 120 to 160 Nature damage to all enemies within 5 yards. (1 min cooldown)",
+      "invisibilityUse": "Use: Shrouds you in stealth for 6 sec. (2 min cooldown)",
+      "armorKitUse": "Use: Reinforces your chest armor, increasing Armor by 12 for 1 hour.",
+      "sharpeningStoneUse": "Use: Sharpens your main hand weapon, increasing Attack Power by 6 for 30 min.",
+      "manaElixirUse": "Use: Increases Spirit by 6 for 1 hour."
     },
     "professions": {
       "title": "Métiers",
@@ -16408,6 +16433,60 @@ export const fr_CA: EnTranslations = {
       },
       "stormhymn_chain_treads": {
         "name": "Bottes en mailles Hymne de tempête"
+      },
+      "allied_hearthstone": {
+        "name": "Allied Hearthstone"
+      },
+      "allied_vanguard_duffel": {
+        "name": "Allied Vanguard Duffel"
+      },
+      "rift_feather_glider": {
+        "name": "Rift Feather Glider"
+      },
+      "formula_enchant_feet_shadowstride": {
+        "name": "Formula: Enchant Boots - Shadowstride"
+      },
+      "recipe_potion_of_invisibility": {
+        "name": "Recipe: Potion of Invisibility"
+      },
+      "potion_of_invisibility": {
+        "name": "Potion of Invisibility"
+      },
+      "pattern_reinforced_armor_kit": {
+        "name": "Pattern: Reinforced Armor Kit"
+      },
+      "reinforced_armor_kit": {
+        "name": "Reinforced Armor Kit"
+      },
+      "dawn_battle_standard": {
+        "name": "Dawn Battle Standard"
+      },
+      "formula_enchant_offhand_spirit": {
+        "name": "Formula: Enchant Off-Hand - Spirit"
+      },
+      "recipe_elixir_of_mana_regeneration": {
+        "name": "Recipe: Elixir of Mana Regeneration"
+      },
+      "elixir_of_mana_regeneration": {
+        "name": "Elixir of Mana Regeneration"
+      },
+      "clockwork_target_dummy": {
+        "name": "Clockwork Target Dummy"
+      },
+      "schematic_clockwork_shock_bomb": {
+        "name": "Schematic: Clockwork Shock Bomb"
+      },
+      "clockwork_shock_bomb": {
+        "name": "Clockwork Shock Bomb"
+      },
+      "plans_dense_sharpening_stone": {
+        "name": "Plans: Dense Sharpening Stone"
+      },
+      "dense_sharpening_stone": {
+        "name": "Dense Sharpening Stone"
+      },
+      "formula_enchant_gloves_forged_might": {
+        "name": "Formula: Enchant Gloves - Forged Might"
       },
       "conjured_water4": {
         "name": "Eau de source conjurée"

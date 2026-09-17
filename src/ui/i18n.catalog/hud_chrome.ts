@@ -2951,6 +2951,12 @@ export const hudChromeStrings = {
     wocPreview: 'Preview balance, not yet verified',
     lifetime: 'Lifetime {amount}',
     factionPending: 'Faction currency: pending Stage 2',
+    riftWatchMark: 'Rift Watch Mark',
+    riftWatchMarkNote: 'World Quests in Rift Watch zones',
+    churchOrderCrest: 'Order Crest',
+    churchOrderCrestNote: 'World Quests in Church Order zones',
+    automatonCog: 'Automaton Cog',
+    automatonCogNote: 'World Quests in Automaton zones',
   },
   // The Reputation tab (src/ui/hud/reputation/). Faction and tier names are
   // PROVISIONAL: the World Quests scope leaves the final names to narrative.
@@ -6767,10 +6773,35 @@ export const hudChromeStrings = {
     enchant_chest_lucent_stamina: 'Chest Etching: Lucent Stamina',
     enchant_feet_lucent_agility: 'Boot Etching: Lucent Agility',
     enchant_lucent_infusion: 'Lucent Infusion',
+    enchant_offhand_spirit: 'Offhand Etching: Spirit',
+    enchant_feet_shadowstride: 'Boot Etching: Shadowstride',
+    enchant_gloves_forged_might: 'Glove Etching: Forged Might',
   },
   enchantDescription: {
     enchant_weapon_lastflame_zeal:
       "Your landed melee attacks can grant 50 Strength for 15 sec and heal you for 200 health. Healing modifiers apply. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Both hands share one buff; any trigger refreshes it, and it never stacks. Ranged attacks do not trigger this effect. Cat Form uses its 1 sec base swing speed instead.",
+  },
+  factionRewards: {
+    alliedHearthstoneUse:
+      'Use: Teleports you to your attuned faction hub. (10 sec cast, 15 min cooldown)',
+    alliedHearthstoneAttuned: 'Attuned to: {hub}',
+    hub_none: 'None (Use near a faction hub to attune)',
+    hub_rift_watch: 'Drifthaven (The Rift Watch)',
+    hub_church_order: 'Eastbrook Vale (The Church of the Holy Light Order)',
+    hub_automatons: 'South Reach (The Automaton Foundry)',
+    riftGliderUse:
+      'Use: Unfolds the glider, slowing falling speed for 30 sec. Landing or taking damage cancels the effect. (2 min cooldown)',
+    targetDummyUse:
+      'Use: Deploys a mechanical target dummy in the open world for 2 minutes to practice combat abilities. (5 min cooldown)',
+    battleStandardUse:
+      'Use: Plants the Consecrated Dawn Battle Standard for 5 minutes, significantly increasing out-of-combat health and mana regeneration for all nearby allies. Remaining near it for 10 seconds also grants Blessing of the Dawn (+5% to all stats for 30 min). (5 min cooldown)',
+    shockBombUse:
+      'Use: Throws a shock bomb up to 30 yards, dealing 120 to 160 Nature damage to all enemies within 5 yards. (1 min cooldown)',
+    invisibilityUse: 'Use: Shrouds you in stealth for 6 sec. (2 min cooldown)',
+    armorKitUse: 'Use: Reinforces your chest armor, increasing Armor by 12 for 1 hour.',
+    sharpeningStoneUse:
+      'Use: Sharpens your main hand weapon, increasing Attack Power by 6 for 30 min.',
+    manaElixirUse: 'Use: Increases Spirit by 6 for 1 hour.',
   },
   // Professions window (Professions 2.0): the read-only craft-wheel
   // window. Craft and pair NAMES resolve through craftName / archetypePair

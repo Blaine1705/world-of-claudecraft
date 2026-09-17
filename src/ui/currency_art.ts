@@ -5,6 +5,9 @@ export const CURRENCY_IMAGE_IDS: ReadonlySet<string> = new Set([
   'woc_token',
   'honor',
   'delve_mark',
+  'rift_watch_mark',
+  'church_order_crest',
+  'automaton_cog',
 ]);
 
 const CURRENCY_ICON_DIR = '/ui/currency';

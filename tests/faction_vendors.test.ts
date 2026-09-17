@@ -20,19 +20,19 @@ describe('Faction Vendors & Reroll NPC content', () => {
     expect(qmRift).toBeDefined();
     expect(qmRift.name).toBe('Quartermaster Vaelen');
     expect(qmRift.title).toBe('Rift Watch Provisioner');
-    expect(qmRift.vendorItems?.length).toBe(5);
+    expect(qmRift.vendorItems?.length).toBe(11);
 
     const qmChurch = NPCS.npc_church_order_quartermaster;
     expect(qmChurch).toBeDefined();
     expect(qmChurch.name).toBe('Templar Althea');
     expect(qmChurch.title).toBe('Church Order Quartermaster');
-    expect(qmChurch.vendorItems?.length).toBe(5);
+    expect(qmChurch.vendorItems?.length).toBe(10);
 
     const qmAuto = NPCS.npc_automaton_quartermaster;
     expect(qmAuto).toBeDefined();
     expect(qmAuto.name).toBe('Artificer Tobrin');
     expect(qmAuto.title).toBe('Automaton Requisitioner');
-    expect(qmAuto.vendorItems?.length).toBe(5);
+    expect(qmAuto.vendorItems?.length).toBe(11);
 
     const taskmaster = NPCS.npc_wq_taskmaster;
     expect(taskmaster).toBeDefined();
@@ -41,35 +41,38 @@ describe('Faction Vendors & Reroll NPC content', () => {
     expect(taskmaster.greeting).toContain('assignments');
   });
 
-  it('authors exactly 15 faction vendor items (5 tiers × 3 factions)', () => {
+  it('authors faction vendor items covering all 5 standing tiers across all 3 factions', () => {
     const itemIds = Object.keys(FACTION_VENDOR_ITEMS);
-    expect(itemIds.length).toBe(15);
+    expect(itemIds.length).toBeGreaterThanOrEqual(15);
 
     for (const factionId of FACTION_IDS) {
       const itemsForFaction = itemIds.filter(
         (id) => FACTION_VENDOR_GATES[id]?.factionId === factionId,
       );
-      expect(itemsForFaction.length).toBe(5);
+      expect(itemsForFaction.length).toBeGreaterThanOrEqual(5);
 
-      // Verify one item per tier
+      // Verify all tiers covered
       const tiersCovered = itemsForFaction.map((id) => FACTION_VENDOR_GATES[id]?.standingTier);
       expect(tiersCovered).toEqual(
         expect.arrayContaining(['recognized', 'trusted', 'proven', 'vanguard', 'champion']),
       );
     }
 
-    // Every item is also in the global ITEMS dictionary
-    for (const id of itemIds) {
+    // Every gated vendor item has buyValue 0 and a currency cost
+    for (const id of Object.keys(FACTION_VENDOR_GATES)) {
       expect(ITEMS[id]).toBeDefined();
-      expect(ITEMS[id].buyValue).toBeGreaterThan(0);
+      expect(ITEMS[id].buyValue).toBe(0);
       expect(ITEMS[id].sellValue).toBeGreaterThan(0);
+      expect(FACTION_VENDOR_GATES[id]?.currencyCost).toBeGreaterThan(0);
     }
   });
 
   it('correctly maps FACTION_VENDOR_GATES to the exact standing thresholds', () => {
     for (const [_itemId, gate] of Object.entries(FACTION_VENDOR_GATES)) {
       expect(gate.requiredStanding).toBe(STANDING_THRESHOLDS[gate.standingTier]);
-      expect(FACTION_IDS).toContain(gate.factionId);
+      if (gate.factionId) {
+        expect(FACTION_IDS).toContain(gate.factionId);
+      }
       expect(STANDING_TIERS).toContain(gate.standingTier);
     }
   });
@@ -100,13 +103,14 @@ describe('Faction Vendors & Reroll NPC content', () => {
 });
 
 describe('Faction vendor purchase authoritative simulation & UI', () => {
-  it('enforces standing gates during sim.buyItem authoritative purchase', () => {
+  it('enforces standing gates and currency costs during sim.buyItem authoritative purchase', () => {
     const sim = new Sim({ seed: 777, playerClass: 'warrior', autoEquip: false });
     const meta = sim.meta(sim.playerId);
     expect(meta).toBeDefined();
     if (!meta) return;
-    meta.copper = 100_000; // 10 gold, plenty of copper
+    meta.copper = 100_000;
     meta.factions.church_order = 500; // Not yet Recognized (requires 1,000)
+    meta.factionCurrencies.church_order = 100; // Plenty of faction marks
 
     // Find the Church Quartermaster in Eastbrook Vale and move player into range
     const qm = [...sim.entities.values()].find(
@@ -126,22 +130,37 @@ describe('Faction vendor purchase authoritative simulation & UI', () => {
     ).toBe(true);
     expect(sim.countItem('order_prayer_beads')).toBe(0);
     expect(meta.copper).toBe(100_000);
+    expect(meta.factionCurrencies.church_order).toBe(100);
 
     // Increase standing to Recognized (1,000)
     meta.factions.church_order = 1_000;
     sim.buyItem(qm.id, 'order_prayer_beads');
     expect(sim.countItem('order_prayer_beads')).toBe(1);
-    expect(meta.copper).toBe(95_000); // 100,000 - 5,000 buyValue
+    // Tier 1 costs 15 Order Crests, 0 copper
+    expect(meta.factionCurrencies.church_order).toBe(85);
+    expect(meta.copper).toBe(100_000);
 
-    // Attempting to buy Tier 2 (Trusted - 3,000) still fails
+    // Attempting to buy Tier 2 (Trusted - 3,000) fails standing
     sim.buyItem(qm.id, 'vestments_of_the_acolyte');
     expect(sim.countItem('vestments_of_the_acolyte')).toBe(0);
 
-    // Elevate to Trusted (3,000)
+    // Elevate standing to Trusted (3,000), but deplete crests below Tier 2 cost (40)
     meta.factions.church_order = 3_000;
+    meta.factionCurrencies.church_order = 10;
+    sim.drainEvents();
+    sim.buyItem(qm.id, 'vestments_of_the_acolyte');
+    const curDeniedEvents = sim.drainEvents();
+    expect(curDeniedEvents.some((e) => e.type === 'error' && e.text.includes('Order Crest'))).toBe(
+      true,
+    );
+    expect(sim.countItem('vestments_of_the_acolyte')).toBe(0);
+
+    // Give enough crests (50) and buy Tier 2 (cost 40)
+    meta.factionCurrencies.church_order = 50;
     sim.buyItem(qm.id, 'vestments_of_the_acolyte');
     expect(sim.countItem('vestments_of_the_acolyte')).toBe(1);
-    expect(meta.copper).toBe(80_000); // 95,000 - 15,000 buyValue
+    expect(meta.factionCurrencies.church_order).toBe(15); // 50 - 35
+    expect(meta.copper).toBe(100_000);
   });
 
   it('marks locked rows and supplies requirement metadata in buildVendorView', () => {

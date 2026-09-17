@@ -87,6 +87,7 @@ export function emitQuestSelfKeys(emit: EmitSelfKey, sim: Sim, meta: PlayerMeta)
   // completion (every worldQuest* event is heavy-self) or a reroll (which bumps
   // wireRev) re-diffs them, and the three-key record is cheap to compare.
   emit('fac', meta.factions);
+  emit('facCur', meta.factionCurrencies);
   emit('wqrr', meta.worldQuestRerollCycle);
   emit('wqrep', meta.worldQuestReplacements ?? {});
 }

@@ -8019,23 +8019,23 @@ export class Renderer {
         sparkle.position.y = 1.35;
         group.add(sparkle);
       }
-    } else if (e.kind === 'object' && e.templateId?.startsWith('bg_')) {
-      // Battleground flags/runes: stateful (team color, carrier), so skip the
+    } else if (
+      e.kind === 'object' &&
+      (e.templateId?.startsWith('bg_') || e.templateId === 'dawn_battle_standard')
+    ) {
+      // Battleground flags/runes and Dawn Battle Standard: stateful (team color, carrier), so skip the
       // object pool (the delve_ precedent) and build the dedicated body. No
       // loot sparkle: the flag pennant / rune glow is the beacon.
       objectPoolKey = null;
-      const built = buildBattlegroundObject(e.templateId, e.color, this.lowGfx);
+      const template = e.templateId === 'dawn_battle_standard' ? 'bg_flag' : e.templateId;
+      const flagColor = e.templateId === 'dawn_battle_standard' ? (e.color ?? 0xffd700) : e.color;
+      const built = buildBattlegroundObject(template, flagColor, this.lowGfx);
       body = built.group;
       height = built.height;
       objectMesh = body;
-      // Hoist the per-frame handles onto the VIEW group. battleground_fx.ts
-      // reads `view.group.userData.bg`, and view.group is this method's own
-      // wrapper, the built body goes in as a CHILD of it further down, so the
-      // refs the props builder set are one level too deep to be found. Without
-      // this the fx pass hits `if (!bg) continue` for every rune and flag and
-      // silently animates nothing: no rune spin or bob, no pad light pulse, no
-      // Ward shard orbit, and no flag carrier ring or lean.
-      group.userData.bg = built.group.userData.bg;
+      if (e.templateId !== 'dawn_battle_standard') {
+        group.userData.bg = built.group.userData.bg;
+      }
     } else if (e.kind === 'object') {
       // Pool MISS keeps its pool key (mirrors the character-visual pool's
       // "Pool MISS: build a fresh visual but KEEP its pool key" above): see

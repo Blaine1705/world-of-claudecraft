@@ -104,11 +104,14 @@ export interface CharacterState {
     cycle: string;
     progress: WorldQuestProgress[];
     factions?: Partial<Record<string, number>>;
+    factionCurrencies?: Partial<Record<string, number>>;
     rerollCycle?: string;
     replacements?: Record<string, string>;
   };
   // Faction standing (JSONB; optional so pre-reputation saves load cleanly).
   factions?: Partial<Record<string, number>>;
+  // Spendable faction currencies (JSONB; optional so pre-feature saves load cleanly).
+  factionCurrencies?: Partial<Record<string, number>>;
   // Legacy arenaRating/Wins/Losses are treated as 1v1 data. The explicit
   // 1v1 fields are written by new saves, while old saves fall back cleanly.
   arenaRating?: number;

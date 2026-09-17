@@ -38,6 +38,8 @@ export interface IWorldQuests {
   readonly nearbyWorldQuestTraces: readonly NearbyWorldQuestTrace[];
   /** Persistent reputation standing across all allied factions. */
   readonly factions: Readonly<Record<FactionId, number>>;
+  /** Persistent balances of allied faction currencies (marks, crests, cogs). */
+  readonly factionCurrencies: Readonly<Record<FactionId, number>>;
   /** Personal world quest replacement mappings for the current daily cycle. */
   readonly worldQuestReplacements?: Readonly<Record<string, string>>;
   /** Cycle key for which the player used their daily world quest reroll. */

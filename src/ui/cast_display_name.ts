@@ -5,6 +5,7 @@
 
 import { ABILITIES } from '../sim/data';
 import {
+  ALLIED_HEARTHSTONE_CAST_ID,
   CORPSE_HARVEST_CAST_ID,
   CRAFT_CAST_ID,
   DISENCHANT_CAST_ID,
@@ -55,6 +56,7 @@ export const castDisplayName = (id: string): string => {
   // pre-extraction resolver order (between SALVAGE and TOOL_RECHARGE).
   if (id === SUNDER_CAST_ID) return t('abilityUi.cast.sundering');
   if (id === TOOL_RECHARGE_CAST_ID) return t('abilityUi.cast.tool_recharge');
+  if (id === ALLIED_HEARTHSTONE_CAST_ID) return t('entities.items.allied_hearthstone.name');
   if (id === 'demon_heal') return t('abilityUi.cast.demonHeal');
   if (id === 'thunzharr_stormcall') return t('abilityUi.cast.thunzharrStormcall');
   const riftKey = `abilityUi.cast.${id}` as TranslationKey;

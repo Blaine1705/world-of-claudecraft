@@ -193,6 +193,7 @@ export const TOOL_RECHARGE_CAST_ID = 'tool_recharge';
 // harvest_admission.ts) is the frozen duration; professions/
 // corpse_harvest_session.ts owns the whole session.
 export const CORPSE_HARVEST_CAST_ID = 'corpse_harvest';
+export const ALLIED_HEARTHSTONE_CAST_ID = 'allied_hearthstone';
 // The non-spell casts: castingAbility sentinels that are activities, not
 // abilities. They share one semantics bundle at the casting choke points:
 // exempt from silence and school lockouts, no blink-through, no spell queue,
@@ -210,7 +211,8 @@ export function isNonSpellCast(castId: string | null): boolean {
     castId === SALVAGE_CAST_ID ||
     castId === SUNDER_CAST_ID ||
     castId === TOOL_RECHARGE_CAST_ID ||
-    castId === CORPSE_HARVEST_CAST_ID
+    castId === CORPSE_HARVEST_CAST_ID ||
+    castId === ALLIED_HEARTHSTONE_CAST_ID
   );
 }
 
@@ -355,6 +357,7 @@ export type AiState = 'idle' | 'chase' | 'attack' | 'flee' | 'evade' | 'dead';
 export type AuraKind =
   | 'dot'
   | 'doctrine'
+  | 'slow_fall'
   // Temporary authoritative displacement state (Oath Chain). It is harmful for
   // UI/dispel classification, but intentionally bypasses root/slow immunity.
   | 'forced_move'
@@ -998,7 +1001,16 @@ export type ItemUse =
   // narrowest named craft-id type the professions content has (there is no
   // craft-id union today; CRAFT_RING types its ids as string), so this
   // documents the domain without changing the checked type.
-  | { type: 'placeMobileStation'; stationCraftId: CraftDef['id'] };
+  | { type: 'placeMobileStation'; stationCraftId: CraftDef['id'] }
+  | { type: 'alliedHearthstone' }
+  | { type: 'riftGlider' }
+  | { type: 'targetDummy' }
+  | { type: 'dawnStandard' }
+  | { type: 'manaElixir' }
+  | { type: 'invisibility' }
+  | { type: 'sharpeningStone' }
+  | { type: 'shockBomb' }
+  | { type: 'armorKit' };
 
 // Rarity ranks for the cosmetic skin-select event, ordered low → high. A rolled
 // rank unlocks its own tier and every tier below it (epic unlocks rare+uncommon).
@@ -1140,6 +1152,8 @@ interface BaseItemDef {
   // `duration` the buff length in seconds. Folds through the normal aura/stat path.
   elixir?: TimedStatBuffPayload;
   quality?: 'poor' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'; // gray/white/green/blue/purple/orange name colors
+  // Unique: only one copy of this item can be carried or equipped at a time.
+  unique?: boolean;
   // bags (kind:'bag'): extra inventory slots granted while equipped in one of
   // the 4 bag sockets (see src/sim/bags.ts; the 16-slot backpack is implicit).
   bagSlots?: number;
