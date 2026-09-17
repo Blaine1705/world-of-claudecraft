@@ -30,6 +30,12 @@ export const WEEKLY_QUEST_REWARD = Object.freeze({
   copper: Object.freeze({ base: 20_000, perLevel: 500 }),
   cacheItemId: 'emissary_cache',
   cacheCount: 1,
+  /** The emissary's commendation: standing with ONE faction of the owner's
+   *  choice, claimed from the window once the charge is finished. It goes
+   *  through awardFactionReputation like a world-quest turn-in, so the level
+   *  cap applies; a faction paused at the cap cannot take it (the choice
+   *  stays open rather than being wasted). */
+  commendationStanding: 1_000,
 });
 
 /** Weeks roll at the realm's weekly reset (a Tuesday); this anchor is one. */

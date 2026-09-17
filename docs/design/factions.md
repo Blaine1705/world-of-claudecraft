@@ -38,6 +38,14 @@ narrative's final names).
   can tell a tier from a plain gain.
 - One confirmed reroll per day, from the map's World Quests board
   (`src/sim/world_quest_reroll.ts`); Taskmaster Kaelen's dialog opens the board.
+- The second source is the weekly emissary's commendation
+  (`commendWeeklyQuest` in `src/sim/weekly_quests.ts`,
+  `WEEKLY_QUEST_REWARD.commendationStanding`): once the week's charge is
+  finished, the owner names ONE faction from the emissary's window and it
+  receives the commendation through `awardFactionReputation`. One claim a
+  week, recorded on the weekly pick (`commended`), so it rides the `wkq` self
+  key and the character save; a faction with no headroom at the level cap is
+  refused and the choice stays open rather than being wasted.
 
 ## Tiers
 
@@ -109,7 +117,6 @@ with its count, the milestones passed and the next milestone.
 
 - The pace to Champion in the upper bracket is a maintainer call; the daily
   synchronization rule is fixed, the amounts are the knob.
-- A second standing source (regular quests, dungeon kills, a weekly emissary
-  turn-in with a chosen faction) is the natural next step; any new source goes
-  through `awardFactionReputation` and marks deeds dirty exactly like the world
-  quest site.
+- Further standing sources (regular quests, dungeon kills) stay open; any new
+  source goes through `awardFactionReputation` and marks deeds dirty exactly
+  like the world-quest site and the weekly commendation.

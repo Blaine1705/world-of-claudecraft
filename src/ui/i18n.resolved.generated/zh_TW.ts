@@ -5914,6 +5914,10 @@ export const zh_TW: EnTranslations = {
           "goalLabel": "已擊敗的世界首領"
         }
       },
+      "commendHeading": "使者的嘉獎",
+      "commendNote": "{amount}點聲望，贈予你選擇的一個陣營，每週一次。",
+      "commendClaimed": "本週的嘉獎已授予{faction}。",
+      "commendRewardLine": "{amount}點聲望，陣營由你選擇",
       "chosen": "已接取每週任務：{category}",
       "progress": "{label}：{count}/{required}",
       "done": "每週任務完成：{category}"
@@ -7494,6 +7498,7 @@ export const zh_TW: EnTranslations = {
       "automatonsBody": "機械軍團看守遠方的熔爐：龍嶺、霜幕荒野、琥珀瀑和常青園。他們的據點是龍嶺的巨龍哨站。",
       "earningHeading": "獲取聲望",
       "earningBody": "聲望來自世界任務。每個世界任務都計入其所在區域對應的陣營，而三個陣營覆蓋不同的區域，所以當你走遍地圖時，三方聲望會同時增長。東溪的工頭凱倫會在地圖上打開世界任務板；如果當天的任務不合心意，也可以在任務板上每天更換一個世界任務。",
+      "weeklyBody": "東溪谷的每週使者提供了第二條路：完成本週的委託後，你可以在接取委託的窗口指定一個陣營，接受他的聲望嘉獎，每週一次。",
       "lowLevelNote": "低等級角色的聲望會在某一等級暫停，隨著升級再繼續，所以新角色可以盡早開始累積，而不會很快無路可走。",
       "tiersHeading": "聲望等級",
       "tiersBody": "每個陣營都經歷相同的六個等級：陌生、認可、信任、可靠、先鋒和冠軍。每個陣營會為每一級賦予自己的稱呼，那個稱呼就是你在該陣營的頭銜。",

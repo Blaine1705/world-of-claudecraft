@@ -1576,6 +1576,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.factionsPage.automatonsBody':
     '오토마톤은 먼 변경의 용광로를 지킵니다. 드레이크랜드, 프로스트베일, 앰버폴, 에버가든. 거점은 드레이크랜드의 웜워치입니다.',
   'guide.factionsPage.earningHeading': '평판 얻기',
+  'guide.factionsPage.weeklyBody':
+    '이스트브룩 계곡의 주간 사절이 두 번째 길을 엽니다. 이번 주 임무를 마치면, 임무를 맡았던 창에서 진영 하나를 지목해 주당 한 번 그의 평판 표창을 받을 수 있습니다.',
   'guide.factionsPage.earningBody':
     '평판은 월드 퀘스트에서 나옵니다. 각 월드 퀘스트는 그 퀘스트가 놓인 지역의 진영에 집계되고, 세 진영이 서로 다른 지역을 맡고 있으므로 지도를 누비는 동안 세 평판이 동시에 오릅니다. 이스트브룩의 감독관 카엘렌이 지도에서 월드 퀘스트 게시판을 열어 주며, 그날의 배정이 마음에 들지 않으면 게시판에서 하루에 하나의 월드 퀘스트를 교체할 수도 있습니다.',
   'guide.factionsPage.lowLevelNote':
@@ -17278,6 +17280,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.chosen': '주간 퀘스트 수락: {category}',
   'hudChrome.weekly.progress': '{label}: {count}/{required}',
   'hudChrome.weekly.done': '주간 퀘스트 완료: {category}',
+  'hudChrome.weekly.commendHeading': '사절의 표창',
+  'hudChrome.weekly.commendNote': '선택한 진영 하나에 평판 {amount}, 주 1회.',
+  'hudChrome.weekly.commendClaimed': '이번 주 표창은 {faction}에게 돌아갔습니다.',
+  'hudChrome.weekly.commendRewardLine': '선택한 진영과의 평판 {amount}',
   'hudChrome.reputation.mastery': '지역 숙련',
   'hudChrome.reputation.masteryIntro':
     '각 지역에서 완료한 월드 퀘스트 수는 영구히 남습니다. 매일 이어 갈 필요도 없고 소모되지도 않습니다. 이정표에 도달할 때마다 업적이 기록됩니다.',

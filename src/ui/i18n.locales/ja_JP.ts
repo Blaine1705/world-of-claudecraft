@@ -1588,6 +1588,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.factionsPage.automatonsBody':
     'オートマトンは辺境の炉を守っています。ドレイクランド、フロストヴェイル、アンバーフォール、エヴァーガーデン。拠点はドレイクランドのワームウォッチです。',
   'guide.factionsPage.earningHeading': '評判を得る',
+  'guide.factionsPage.weeklyBody':
+    'イーストブルック渓谷の週間の使者がもう一つの道を開きます。今週の任務を終えると、任務を受けた窓口で勢力を一つ指名し、週に一度、彼の評判の推挙を受け取れます。',
   'guide.factionsPage.earningBody':
     '評判はワールドクエストから得られます。各ワールドクエストは、それが置かれたゾーンの勢力に加算され、三勢力は異なるゾーンを担当しているので、地図を渡り歩くうちに三つの評判が同時に進みます。イーストブルックの現場監督ケイレンが地図上のワールドクエスト掲示板を開いてくれ、その日の割り当てが気に入らなければ、掲示板で一日に一つだけワールドクエストを差し替えることもできます。',
   'guide.factionsPage.lowLevelNote':
@@ -17312,6 +17314,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.chosen': '週間クエストを受注：{category}',
   'hudChrome.weekly.progress': '{label}：{count}/{required}',
   'hudChrome.weekly.done': '週間クエスト完了：{category}',
+  'hudChrome.weekly.commendHeading': '使者の推挙',
+  'hudChrome.weekly.commendNote': '選んだ一つの勢力に評判{amount}、週に一度。',
+  'hudChrome.weekly.commendClaimed': '今週の推挙は{faction}に贈られました。',
+  'hudChrome.weekly.commendRewardLine': '選んだ勢力との評判{amount}',
   'hudChrome.reputation.mastery': '地域の熟達',
   'hudChrome.reputation.masteryIntro':
     '各ゾーンで完了したワールドクエストの数は永久に残ります。連続ログインは不要で、消費されることもありません。節目ごとに偉業が記録されます。',

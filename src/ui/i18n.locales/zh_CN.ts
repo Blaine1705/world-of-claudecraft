@@ -1531,6 +1531,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.factionsPage.automatonsBody':
     '机械军团看守远方的熔炉：龙岭、霜幕荒野、琥珀瀑和常青园。他们的据点是龙岭的巨龙哨站。',
   'guide.factionsPage.earningHeading': '获取声望',
+  'guide.factionsPage.weeklyBody':
+    '东溪谷的每周使者提供了第二条路：完成本周的委托后，你可以在接取委托的窗口指定一个阵营，接受他的声望嘉奖，每周一次。',
   'guide.factionsPage.earningBody':
     '声望来自世界任务。每个世界任务都计入其所在区域对应的阵营，而三个阵营覆盖不同的区域，所以当你走遍地图时，三方声望会同时增长。东溪的工头凯伦会在地图上打开世界任务板；如果当天的任务不合心意，也可以在任务板上每天更换一个世界任务。',
   'guide.factionsPage.lowLevelNote':
@@ -16453,6 +16455,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.chosen': '已接取每周任务：{category}',
   'hudChrome.weekly.progress': '{label}：{count}/{required}',
   'hudChrome.weekly.done': '每周任务完成：{category}',
+  'hudChrome.weekly.commendHeading': '使者的嘉奖',
+  'hudChrome.weekly.commendNote': '{amount}点声望，赠予你选择的一个阵营，每周一次。',
+  'hudChrome.weekly.commendClaimed': '本周的嘉奖已授予{faction}。',
+  'hudChrome.weekly.commendRewardLine': '{amount}点声望，阵营由你选择',
   'hudChrome.reputation.mastery': '区域精通',
   'hudChrome.reputation.masteryIntro':
     '在每个区域完成的世界任务数，永久保留：没有每日连续要求，也不会被消耗。每达到一个里程碑都会记录一项功绩。',

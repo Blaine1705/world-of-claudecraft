@@ -199,3 +199,80 @@ describe('the emissary', () => {
     ).toEqual({ questId: 'wk_raid', week: 'wk_1', count: 1, state: 'active' });
   });
 });
+
+describe('the commendation', () => {
+  function finished(): Sim {
+    const sim = armed();
+    sim.chat('/dev level 20');
+    sim.chooseWeeklyQuest('wk_dungeons');
+    for (let i = 0; i < 3; i++) sim.chat('/dev weekly credit');
+    sim.tick();
+    expect(sim.meta(sim.playerId)?.weeklyQuest?.state).toBe('completed');
+    return sim;
+  }
+
+  it('gives one faction the standing once the charge is finished, once a week', () => {
+    const sim = finished();
+    sim.commendWeeklyQuest('rift_watch');
+    const loot = eventsOf(sim, 'loot');
+    expect(loot.map((event) => (event as { text: string }).text)).toContain(
+      '+1000 Rift Watch Standing.',
+    );
+    const meta = sim.meta(sim.playerId);
+    expect(meta?.factions.rift_watch).toBe(1000);
+    expect(meta?.weeklyQuest?.commended).toBe('rift_watch');
+    // The choice is spent: a second faction gets nothing, and so does the same one.
+    sim.commendWeeklyQuest('church_order');
+    sim.commendWeeklyQuest('rift_watch');
+    expect(meta?.factions).toEqual({ rift_watch: 1000, church_order: 0, automatons: 0 });
+    expect(sim.weeklyQuest?.commended).toBe('rift_watch');
+  });
+
+  it('refuses before the charge is finished, an unknown faction, and a faction with no headroom', () => {
+    const sim = armed();
+    sim.chooseWeeklyQuest('wk_dungeons');
+    sim.commendWeeklyQuest('rift_watch');
+    expect(sim.meta(sim.playerId)?.factions.rift_watch).toBe(0);
+    for (let i = 0; i < 3; i++) sim.chat('/dev weekly credit');
+    sim.tick();
+    sim.commendWeeklyQuest('nobody');
+    expect(sim.meta(sim.playerId)?.weeklyQuest?.commended).toBeUndefined();
+    // Level 1 sits under the low-level cap; a faction already at it is refused
+    // and the choice stays open for another.
+    sim.chat('/dev rep automatons 3000');
+    sim.commendWeeklyQuest('automatons');
+    expect(sim.meta(sim.playerId)?.weeklyQuest?.commended).toBeUndefined();
+    expect(sim.meta(sim.playerId)?.factions.automatons).toBe(3000);
+    sim.commendWeeklyQuest('church_order');
+    expect(sim.meta(sim.playerId)?.factions.church_order).toBe(1000);
+    expect(sim.meta(sim.playerId)?.weeklyQuest?.commended).toBe('church_order');
+  });
+
+  it('rides the character save and drops a malformed claim on restore', () => {
+    const sim = finished();
+    sim.commendWeeklyQuest('automatons');
+    const state = sim.serializeCharacter(sim.playerId);
+    if (!state) throw new Error('Missing serialized character');
+    expect(state.weeklyQuest?.commended).toBe('automatons');
+    const restored = new Sim({ seed: 4711, playerClass: 'warrior', noPlayer: true });
+    restored.resetDay = sim.resetDay;
+    const pid = restored.addPlayer('warrior', 'Commended', { state });
+    expect(restored.meta(pid)?.weeklyQuest?.commended).toBe('automatons');
+    // A junk claim restores as none, so the choice is open again rather than lost.
+    const junk = new Sim({ seed: 4711, playerClass: 'warrior', noPlayer: true });
+    junk.resetDay = sim.resetDay;
+    const junkPid = junk.addPlayer('warrior', 'Junk', {
+      state: {
+        ...state,
+        weeklyQuest: {
+          questId: 'wk_dungeons',
+          week: state.weeklyQuest?.week ?? '',
+          count: 3,
+          state: 'completed',
+          commended: 'nobody',
+        },
+      },
+    });
+    expect(junk.meta(junkPid)?.weeklyQuest?.commended).toBeUndefined();
+  });
+});

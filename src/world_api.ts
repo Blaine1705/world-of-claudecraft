@@ -895,6 +895,7 @@ export const COMMAND_NAMES = [
   'world_quest_start',
   'world_quest_reroll',
   'world_quest_weekly_choose',
+  'world_quest_weekly_commend',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch

@@ -12,6 +12,7 @@ import {
 } from '../sim/content/weekly_quests';
 import { ITEMS } from '../sim/data';
 import { EMISSARY_CACHE_MARKS } from '../sim/emissary_cache';
+import { FACTION_IDS, type FactionId, maxStandingForLevel } from '../sim/factions';
 import type { WeeklyQuestProgress } from '../sim/types';
 import { weeklyQuestRewardCopper } from '../sim/weekly_quests';
 import { npcDisplayName, npcDisplayTitle } from './entity_display_core';
@@ -37,12 +38,32 @@ export interface WeeklyQuestCardView {
   required: number;
 }
 
+/** One faction the finished charge's commendation can go to. */
+export interface WeeklyCommendationOption {
+  factionId: FactionId;
+  label: string;
+  /** No standing headroom at this level: the sim would refuse, so the button is off. */
+  capped: boolean;
+  /** This is the faction the week's commendation already went to. */
+  claimed: boolean;
+}
+
+export interface WeeklyCommendationView {
+  heading: string;
+  note: string;
+  options: WeeklyCommendationOption[];
+  /** Set once claimed; every option is then inert. */
+  claimedText: string | null;
+}
+
 export interface WeeklyQuestsView {
   title: string;
   subtitle: string;
   resetText: string;
   cards: WeeklyQuestCardView[];
   footer: string;
+  /** The commendation choice, shown only while the week's charge is finished. */
+  commendation: WeeklyCommendationView | null;
   emissaryName: string;
   emissaryTitle: string;
   emissaryPortrait: string;
@@ -55,6 +76,8 @@ export interface WeeklyQuestDialogView {
   goalLabel: string;
   goalCount: string;
   rewardMoney: string;
+  /** The commendation line: standing with a faction of the owner's choice. */
+  rewardStanding: string;
   rewardItem: string;
   rewardItemIcon: string;
   rewardItemDesc: string;
@@ -66,7 +89,48 @@ export interface WeeklyQuestDialogView {
 
 export const WEEKLY_ART_DIR = 'ui/weekly';
 
-type WeeklyWorld = { weeklyQuest: WeeklyQuestProgress | null; weeklyQuestResetAtMs: number };
+type WeeklyWorld = {
+  weeklyQuest: WeeklyQuestProgress | null;
+  weeklyQuestResetAtMs: number;
+  /** Standing per faction and the level, for the commendation's cap check. */
+  factions?: Readonly<Partial<Record<FactionId, number>>>;
+  player?: { level: number };
+};
+
+const whole = (value: number): string => formatNumber(value, { maximumFractionDigits: 0 });
+
+function factionLabel(factionId: FactionId): string {
+  return t(`hudChrome.reputation.faction.${factionId}`);
+}
+
+/** The commendation choice for a finished charge: one option per faction, a
+ *  capped faction inert (the sim would refuse it), and the claimed one
+ *  marked once the choice is made. Null while the charge is not finished. */
+export function buildWeeklyCommendation(world: WeeklyWorld): WeeklyCommendationView | null {
+  const held = world.weeklyQuest;
+  if (!held || held.state !== 'completed') return null;
+  const cap = maxStandingForLevel(world.player?.level ?? 1);
+  const claimed = held.commended ?? null;
+  const options = FACTION_IDS.map(
+    (factionId): WeeklyCommendationOption => ({
+      factionId,
+      label: factionLabel(factionId),
+      capped: (world.factions?.[factionId] ?? 0) >= cap,
+      claimed: claimed === factionId,
+    }),
+  );
+  return {
+    heading: t('hudChrome.weekly.commendHeading'),
+    note: t('hudChrome.weekly.commendNote', {
+      amount: whole(WEEKLY_QUEST_REWARD.commendationStanding),
+    }),
+    options,
+    claimedText:
+      claimed === null
+        ? null
+        : t('hudChrome.weekly.commendClaimed', { faction: factionLabel(claimed as FactionId) }),
+  };
+}
 
 function categoryText(kind: WeeklyQuestKind): string {
   return t(`hudChrome.weekly.kinds.${kind}.category`);
@@ -129,6 +193,7 @@ export function buildWeeklyQuestsView(world: WeeklyWorld, nowMs: number): Weekly
     resetText: weeklyResetText(world.weeklyQuestResetAtMs, nowMs),
     cards,
     footer: held ? t('hudChrome.weekly.footerHeld') : t('hudChrome.weekly.footerPick'),
+    commendation: buildWeeklyCommendation(world),
     emissaryName: npcDisplayName(WEEKLY_EMISSARY_NPC_DEF.id),
     emissaryTitle: npcDisplayTitle(WEEKLY_EMISSARY_NPC_DEF.id),
     emissaryPortrait: `${WEEKLY_ART_DIR}/emissary.webp`,
@@ -154,6 +219,9 @@ export function buildWeeklyQuestDialog(
       required: formatNumber(quest.count, { maximumFractionDigits: 0 }),
     }),
     rewardMoney: formatMoney(weeklyQuestRewardCopper(level)),
+    rewardStanding: t('hudChrome.weekly.commendRewardLine', {
+      amount: whole(WEEKLY_QUEST_REWARD.commendationStanding),
+    }),
     rewardItem: cache ? itemDisplayName(cache) : WEEKLY_QUEST_REWARD.cacheItemId,
     rewardItemIcon: `ui/items/${WEEKLY_QUEST_REWARD.cacheItemId}.webp`,
     rewardItemDesc: t('hudChrome.weekly.cacheDesc', {

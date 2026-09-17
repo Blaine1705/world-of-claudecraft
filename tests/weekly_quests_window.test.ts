@@ -12,11 +12,14 @@ function rig(weeklyQuest: WeeklyQuestProgress | null = null) {
   el.className = 'window panel';
   document.body.appendChild(el);
   const chooseWeeklyQuest = vi.fn();
+  const commendWeeklyQuest = vi.fn();
   const world = {
     weeklyQuest,
     weeklyQuestResetAtMs: Date.now() + 3_600_000,
     player: { level: 8, name: 'Ari' },
+    factions: { rift_watch: 3000, church_order: 0, automatons: 0 },
     chooseWeeklyQuest,
+    commendWeeklyQuest,
   };
   const closeOthers = vi.fn();
   const restoreFocus = vi.fn();
@@ -27,7 +30,7 @@ function rig(weeklyQuest: WeeklyQuestProgress | null = null) {
     captureFocus: () => null,
     restoreFocus,
   });
-  return { el, world, window, chooseWeeklyQuest, closeOthers, restoreFocus };
+  return { el, world, window, chooseWeeklyQuest, commendWeeklyQuest, closeOthers, restoreFocus };
 }
 
 describe('weekly quests window', () => {
@@ -78,6 +81,40 @@ describe('weekly quests window', () => {
     r.window.refreshIfChanged();
     expect(r.el.querySelector('[data-wk-choose="wk_dungeons"]')?.textContent).toBe(
       'Completed this week',
+    );
+  });
+
+  it('offers the commendation once the charge is finished and sends the faction on a click', () => {
+    const active = rig({ questId: 'wk_raid', week: 'wk_2', count: 0, state: 'active' });
+    active.window.open();
+    expect(active.el.querySelector('.wk-commend')).toBeNull();
+    const r = rig({ questId: 'wk_raid', week: 'wk_2', count: 1, state: 'completed' });
+    r.window.open();
+    const buttons = [...r.el.querySelectorAll<HTMLButtonElement>('[data-wk-commend]')];
+    expect(buttons.map((b) => [b.dataset.wkCommend, b.disabled])).toEqual([
+      // Level 8 sits under the low-level cap and the Rift Watch is already there.
+      ['rift_watch', true],
+      ['church_order', false],
+      ['automatons', false],
+    ]);
+    expect(r.el.querySelector('.wk-foot')).toBeNull();
+    expect(r.el.querySelector('.wk-commend-note')?.textContent).toContain('1,000');
+    buttons[1].click();
+    expect(r.commendWeeklyQuest).toHaveBeenCalledExactlyOnceWith('church_order');
+    // Once the mirror carries the claim, every button is inert and the line names it.
+    r.world.weeklyQuest = {
+      questId: 'wk_raid',
+      week: 'wk_2',
+      count: 1,
+      state: 'completed',
+      commended: 'church_order',
+    };
+    r.window.refreshIfChanged();
+    expect(
+      [...r.el.querySelectorAll<HTMLButtonElement>('[data-wk-commend]')].every((b) => b.disabled),
+    ).toBe(true);
+    expect(r.el.querySelector('.wk-commend-note')?.textContent).toBe(
+      "This week's commendation went to the Church Order.",
     );
   });
 });

@@ -8,6 +8,7 @@
 // reference and reaches Hud only through its deps.
 import { audio } from '../game/audio';
 import { WEEKLY_QUESTS_BY_ID } from '../sim/content/weekly_quests';
+import type { FactionId } from '../sim/factions';
 import type { IWorld } from '../world_api';
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
@@ -16,6 +17,7 @@ import { svgIcon } from './ui_icons';
 import {
   buildWeeklyQuestDialog,
   buildWeeklyQuestsView,
+  type WeeklyCommendationView,
   type WeeklyQuestCardView,
   type WeeklyQuestDialogView,
 } from './weekly_quests_view';
@@ -72,7 +74,13 @@ export class WeeklyQuestsWindow {
   // on its own slow cadence below, so it stays out of the signature.
   private sig(): string {
     const world = this.deps.world();
-    return JSON.stringify([world.weeklyQuest, world.weeklyQuestResetAtMs, this.dialogQuestId]);
+    return JSON.stringify([
+      world.weeklyQuest,
+      world.weeklyQuestResetAtMs,
+      this.dialogQuestId,
+      world.factions,
+      world.player.level,
+    ]);
   }
 
   /** Slow-band refresh: repaint when the pick changes or every minute for the clock. */
@@ -103,7 +111,10 @@ export class WeeklyQuestsWindow {
       `<button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.weekly.close'))}">${svgIcon('close')}</button></div>` +
       `<div class="wk-sub">${esc(view.subtitle)} <b>${esc(view.resetText)}</b></div>` +
       `<div class="wk-cards">${view.cards.map((card) => this.cardHtml(card)).join('')}</div>` +
-      `<div class="wk-foot">${esc(view.footer)}</div>` +
+      // The finished charge swaps the footer line for the commendation strip.
+      (view.commendation
+        ? this.commendHtml(view.commendation)
+        : `<div class="wk-foot">${esc(view.footer)}</div>`) +
       (dialog ? this.dialogHtml(dialog, view) : '');
     root.querySelector('[data-close]')?.addEventListener('click', () => this.close());
     root.querySelectorAll<HTMLButtonElement>('[data-wk-choose]').forEach((button) => {
@@ -124,6 +135,14 @@ export class WeeklyQuestsWindow {
       this.dialogQuestId = null;
       this.lastSig = '';
       this.render(null);
+    });
+    root.querySelectorAll<HTMLButtonElement>('[data-wk-commend]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const factionId = button.dataset.wkCommend as FactionId | undefined;
+        if (factionId) world.commendWeeklyQuest(factionId);
+        this.lastSig = '';
+        this.render(null);
+      });
     });
     if (focus === 'open') (root.querySelector('[data-close]') as HTMLElement | null)?.focus();
     if (focus === 'dialog') (root.querySelector('[data-wk-accept]') as HTMLElement | null)?.focus();
@@ -152,6 +171,23 @@ export class WeeklyQuestsWindow {
     );
   }
 
+  // The commendation strip in the footer's slot: one button per faction, off
+  // while the faction has no headroom or once the week's choice is made.
+  private commendHtml(view: WeeklyCommendationView): string {
+    const claimedAny = view.claimedText !== null;
+    const options = view.options
+      .map(
+        (option) =>
+          `<button type="button" class="wk-btn${option.claimed ? ' wk-btn-done' : ''}" data-wk-commend="${esc(option.factionId)}"${option.capped || claimedAny ? ' disabled' : ''}>${esc(option.label)}</button>`,
+      )
+      .join('');
+    return (
+      `<section class="wk-commend"><span class="wk-commend-copy"><b class="wk-commend-heading">${esc(view.heading)}</b> ` +
+      `<span class="wk-commend-note">${esc(view.claimedText ?? view.note)}</span></span>` +
+      `<span class="wk-commend-options">${options}</span></section>`
+    );
+  }
+
   private dialogHtml(
     dialog: WeeklyQuestDialogView,
     view: { emissaryName: string; emissaryTitle: string; emissaryPortrait: string },
@@ -168,6 +204,7 @@ export class WeeklyQuestsWindow {
       `<div class="wk-dialog-row"><span>${esc(dialog.goalLabel)}</span><b>${esc(dialog.goalCount)}</b></div>` +
       `<div class="wk-dialog-sub">${esc(t('hudChrome.weekly.rewards'))}</div>` +
       `<div class="wk-dialog-row"><span>${esc(t('hudChrome.weekly.alsoReceive'))}</span><b>${esc(dialog.rewardMoney)}</b></div>` +
+      `<div class="wk-dialog-row wk-dialog-row-standing"><span>${esc(dialog.rewardStanding)}</span></div>` +
       `<div class="wk-reward"><span class="wk-reward-icon" style="background-image:url('${esc(dialog.rewardItemIcon)}')"></span><span><span class="wk-reward-name">${esc(dialog.rewardItem)}</span><span class="wk-reward-desc">${esc(dialog.rewardItemDesc)}</span></span></div>` +
       `<div class="wk-note">${esc(dialog.note)}</div>` +
       `<div class="wk-actions"><button type="button" class="wk-btn wk-btn-accept" data-wk-accept>${esc(dialog.accept)}</button>` +

@@ -19,6 +19,12 @@ import {
   type WeeklyQuestKind,
 } from './content/weekly_quests';
 import { createNpc } from './entity';
+import {
+  awardFactionReputation,
+  FACTION_IDS,
+  type FactionId,
+  factionDisplayName,
+} from './factions';
 import { formatMoney } from './format_money';
 import { DAILY_LOCKOUT_RAID_ROOMS, WEEKLY_LOCKOUT_RAID_ROOMS } from './instances/dungeons';
 import type { PlayerMeta } from './sim';
@@ -119,6 +125,36 @@ export function chooseWeeklyQuest(ctx: SimContext, questId: string, pid?: number
   ctx.emit({ type: 'worldQuestWeeklyChosen', questId: quest.id, pid: meta.entityId });
 }
 
+/** The emissary's commendation: once the week's charge is finished, one
+ *  faction of the owner's choice receives WEEKLY_QUEST_REWARD.commendationStanding.
+ *  One claim per week; a faction with no standing headroom at this level is
+ *  refused and the choice stays open. The award rides awardFactionReputation,
+ *  so the tier plate, the chat line and the standing deeds all follow. */
+export function commendWeeklyQuest(ctx: SimContext, factionId: string, pid?: number): void {
+  const resolved = ctx.resolve(pid);
+  if (!resolved) return;
+  const { meta, e: player } = resolved;
+  if (!(FACTION_IDS as readonly string[]).includes(factionId)) return;
+  resetWeeklyQuestIfNeeded(ctx, meta);
+  const progress = meta.weeklyQuest;
+  if (!progress || progress.state !== 'completed' || progress.commended) return;
+  const result = awardFactionReputation(
+    meta,
+    factionId as FactionId,
+    WEEKLY_QUEST_REWARD.commendationStanding,
+    player.level,
+  );
+  if (result.gained <= 0) return;
+  progress.commended = factionId;
+  meta.wireRev++;
+  ctx.markDeedsDirty(meta.entityId);
+  ctx.emit({
+    type: 'loot',
+    text: `+${result.gained} ${factionDisplayName(factionId as FactionId)} Standing.`,
+    pid: meta.entityId,
+  });
+}
+
 function activeWeeklyQuest(
   ctx: Pick<SimContext, 'resetDay'>,
   meta: PlayerMeta,
@@ -197,11 +233,18 @@ export function sanitizeWeeklyQuestProgress(value: unknown): WeeklyQuestProgress
     typeof row.count === 'number' && Number.isFinite(row.count)
       ? Math.max(0, Math.min(quest.count, Math.floor(row.count)))
       : 0;
+  const commended =
+    row.state === 'completed' &&
+    typeof row.commended === 'string' &&
+    (FACTION_IDS as readonly string[]).includes(row.commended)
+      ? row.commended
+      : undefined;
   return {
     questId: quest.id,
     week: row.week,
     count: row.state === 'completed' ? quest.count : count,
     state: row.state,
+    ...(commended === undefined ? {} : { commended }),
   };
 }
 

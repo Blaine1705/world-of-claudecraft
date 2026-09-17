@@ -8854,6 +8854,12 @@ export const hudChromeStrings = {
         goalLabel: 'World bosses defeated',
       },
     },
+    // The commendation: standing with one faction of the owner's choice,
+    // claimed from the window once the charge is finished.
+    commendHeading: "Emissary's commendation",
+    commendNote: '{amount} standing to one faction of your choice, once a week.',
+    commendClaimed: "This week's commendation went to the {faction}.",
+    commendRewardLine: '{amount} standing with a faction of your choice',
     // Chat and banner lines for the emissary's events.
     chosen: 'Weekly quest taken: {category}',
     progress: '{label}: {count}/{required}',

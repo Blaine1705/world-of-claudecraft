@@ -4843,6 +4843,9 @@ export interface WeeklyQuestProgress {
   week: string;
   count: number;
   state: 'active' | 'completed';
+  /** The faction id that took the week's commendation (standing), once the
+   *  finished charge's one choice is made; absent until then. */
+  commended?: string;
 }
 
 export interface WorldQuestProgress {

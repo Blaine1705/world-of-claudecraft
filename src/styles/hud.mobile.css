@@ -5450,11 +5450,15 @@
   }
   /* The weekly window: two cards per row on a phone, the sheet scrolls. */
   body.mobile-touch #weekly-quests-window {
+    /* The sheet takes its content's height (the desktop rule pins a fixed one)
+       so the cards never paint over the footer or the commendation strip. */
+    height: auto;
     max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);
     overflow-y: auto;
   }
   body.mobile-touch #weekly-quests-window .wk-cards {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    flex: 0 0 auto;
   }
   /* The leaderboard body (.lb-body) has its own 56vh scroll; cap the whole sheet to
      the viewport so a long board never runs the window past the bottom edge. */

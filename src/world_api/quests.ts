@@ -75,6 +75,8 @@ export interface IWorldQuests {
   startWorldQuestActivity(questId: string, difficulty: WorldQuestDifficulty): void;
   /** Take one of the emissary's weekly charges (server-validated: beside him, none taken). */
   chooseWeeklyQuest(questId: string): void;
+  /** Claim the finished weekly charge's commendation for one faction. */
+  commendWeeklyQuest(factionId: FactionId): void;
   /** One page of a medal world quest's public ladder (best row per character;
    *  the offline world has no ladder and resolves an empty page). `viewer` is a
    *  character name: the page's `self` carries that character's standing. */

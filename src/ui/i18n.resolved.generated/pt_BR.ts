@@ -5914,6 +5914,10 @@ export const pt_BR: EnTranslations = {
           "goalLabel": "World bosses defeated"
         }
       },
+      "commendHeading": "Emissary's commendation",
+      "commendNote": "{amount} standing to one faction of your choice, once a week.",
+      "commendClaimed": "This week's commendation went to the {faction}.",
+      "commendRewardLine": "{amount} standing with a faction of your choice",
       "chosen": "Weekly quest taken: {category}",
       "progress": "{label}: {count}/{required}",
       "done": "Weekly quest complete: {category}"
@@ -7494,6 +7498,7 @@ export const pt_BR: EnTranslations = {
       "automatonsBody": "The Automatons keep the forges of the far reaches: the Drakelands, the Frostveil Reach, the Amberfall and the Evergarden. Their hub is Wyrmwatch, in the Drakelands.",
       "earningHeading": "Earning standing",
       "earningBody": "Standing comes from world quests. Every world quest counts toward the faction of the zone it is set in, and because the three factions cover different zones, all three progress at once as you work your way across the map. Taskmaster Kaelen in Eastbrook opens the World Quests board on the map, and the board is also where you may replace one world quest each day if the day's assignment does not suit you.",
+      "weeklyBody": "The weekly emissary in Eastbrook Vale adds a second road: finish the week's charge and you may name one faction to receive his commendation of standing, once a week, at the window where you took the charge.",
       "lowLevelNote": "Standing pauses at a tier for lower-level characters and resumes as you level, so a young character can start earning early without running out of road.",
       "tiersHeading": "Standing tiers",
       "tiersBody": "Every faction climbs the same six tiers: Unknown, Recognized, Trusted, Proven, Vanguard and Champion. Each faction gives its own name to each rung, and that name becomes your title with them.",

@@ -9192,6 +9192,10 @@ export class Sim {
   chooseWeeklyQuest(questId: string, pid?: number): void {
     weeklyQuestMod.chooseWeeklyQuest(this.ctx, questId, pid);
   }
+
+  commendWeeklyQuest(factionId: string, pid?: number): void {
+    weeklyQuestMod.commendWeeklyQuest(this.ctx, factionId, pid);
+  }
   get weeklyQuest() {
     weeklyQuestMod.resetWeeklyQuestIfNeeded(this.ctx, this.primary);
     return this.primary.weeklyQuest;

@@ -19248,7 +19248,10 @@
      take the leftover height once the user resizes the window. */
   #weekly-quests-window {
     width: min(1500px, calc(100vw - 32px));
-    max-height: calc(100vh - 32px);
+    /* The window sits at the base 10vh offset, so its height is the room UNDER
+       that offset (the old 100vh clamp pushed the footer below the viewport on
+       a 900px screen). Container-relative sizes inside scale with it. */
+    max-height: calc(var(--app-vh, 100vh) * 0.9 - 16px);
     display: none;
     flex-direction: column;
     overflow: hidden auto;
@@ -19258,7 +19261,7 @@
       linear-gradient(180deg, #1c1531f5, #120c20f5 40%, #0c0816f8);
     border-color: #8f6a2c;
     container-type: inline-size;
-    height: min(960px, calc(100vh - 32px));
+    height: min(960px, calc(var(--app-vh, 100vh) * 0.9 - 16px));
     padding: clamp(10px, 1.2cqw, 22px) clamp(12px, 1.6cqw, 28px);
   }
   #weekly-quests-window .wk-title span:first-child {
@@ -19427,6 +19430,52 @@
     color: #f2d998;
     border-color: #5fd13f;
     background: linear-gradient(180deg, #2f6a1c, #173a0c);
+  }
+  /* The commendation strip takes the footer's slot once the charge is done:
+     the heading and note on the left, one faction button each on the right,
+     on the footer's plate so the window keeps its height. */
+  #weekly-quests-window .wk-commend {
+    margin: clamp(8px, 0.8cqw, 12px) auto 0;
+    padding: clamp(4px, 0.5cqw, 8px) clamp(12px, 1.6cqw, 28px);
+    max-width: 92cqw;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm) var(--spacing-lg);
+    border: 1px solid #8f6a2c;
+    background: linear-gradient(180deg, #1c1531e6, #0e0a1ae6);
+  }
+  #weekly-quests-window .wk-commend-copy {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: var(--spacing-sm);
+    min-width: 0;
+    text-align: left;
+  }
+  #weekly-quests-window .wk-commend-heading {
+    font-family: var(--font-display);
+    font-size: clamp(12px, 1.1cqw, 17px);
+    letter-spacing: 0.5px;
+    color: var(--color-accent);
+  }
+  #weekly-quests-window .wk-commend-note {
+    font-family: var(--font-serif);
+    font-size: clamp(11px, 1cqw, 15px);
+    color: #c9bde4;
+  }
+  #weekly-quests-window .wk-commend-options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--spacing-sm);
+  }
+  #weekly-quests-window .wk-commend-options .wk-btn {
+    width: auto;
+    min-width: 0;
+    padding: clamp(4px, 0.5cqw, 8px) clamp(10px, 1.2cqw, 20px);
+    font-size: clamp(11px, 1cqw, 15px);
   }
   #weekly-quests-window .wk-foot {
     margin: clamp(10px, 1.2cqw, 20px) auto 0;

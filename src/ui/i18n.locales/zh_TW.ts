@@ -1532,6 +1532,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.factionsPage.automatonsBody':
     '機械軍團看守遠方的熔爐：龍嶺、霜幕荒野、琥珀瀑和常青園。他們的據點是龍嶺的巨龍哨站。',
   'guide.factionsPage.earningHeading': '獲取聲望',
+  'guide.factionsPage.weeklyBody':
+    '東溪谷的每週使者提供了第二條路：完成本週的委託後，你可以在接取委託的窗口指定一個陣營，接受他的聲望嘉獎，每週一次。',
   'guide.factionsPage.earningBody':
     '聲望來自世界任務。每個世界任務都計入其所在區域對應的陣營，而三個陣營覆蓋不同的區域，所以當你走遍地圖時，三方聲望會同時增長。東溪的工頭凱倫會在地圖上打開世界任務板；如果當天的任務不合心意，也可以在任務板上每天更換一個世界任務。',
   'guide.factionsPage.lowLevelNote':
@@ -16461,6 +16463,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.chosen': '已接取每週任務：{category}',
   'hudChrome.weekly.progress': '{label}：{count}/{required}',
   'hudChrome.weekly.done': '每週任務完成：{category}',
+  'hudChrome.weekly.commendHeading': '使者的嘉獎',
+  'hudChrome.weekly.commendNote': '{amount}點聲望，贈予你選擇的一個陣營，每週一次。',
+  'hudChrome.weekly.commendClaimed': '本週的嘉獎已授予{faction}。',
+  'hudChrome.weekly.commendRewardLine': '{amount}點聲望，陣營由你選擇',
   'hudChrome.reputation.mastery': '區域精通',
   'hudChrome.reputation.masteryIntro':
     '在每個區域完成的世界任務數，永久保留：沒有每日連續要求，也不會被消耗。每達到一個里程碑都會記錄一項功績。',

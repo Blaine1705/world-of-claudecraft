@@ -5914,6 +5914,10 @@ export const zh_CN: EnTranslations = {
           "goalLabel": "已击败的世界首领"
         }
       },
+      "commendHeading": "使者的嘉奖",
+      "commendNote": "{amount}点声望，赠予你选择的一个阵营，每周一次。",
+      "commendClaimed": "本周的嘉奖已授予{faction}。",
+      "commendRewardLine": "{amount}点声望，阵营由你选择",
       "chosen": "已接取每周任务：{category}",
       "progress": "{label}：{count}/{required}",
       "done": "每周任务完成：{category}"
@@ -7494,6 +7498,7 @@ export const zh_CN: EnTranslations = {
       "automatonsBody": "机械军团看守远方的熔炉：龙岭、霜幕荒野、琥珀瀑和常青园。他们的据点是龙岭的巨龙哨站。",
       "earningHeading": "获取声望",
       "earningBody": "声望来自世界任务。每个世界任务都计入其所在区域对应的阵营，而三个阵营覆盖不同的区域，所以当你走遍地图时，三方声望会同时增长。东溪的工头凯伦会在地图上打开世界任务板；如果当天的任务不合心意，也可以在任务板上每天更换一个世界任务。",
+      "weeklyBody": "东溪谷的每周使者提供了第二条路：完成本周的委托后，你可以在接取委托的窗口指定一个阵营，接受他的声望嘉奖，每周一次。",
       "lowLevelNote": "低等级角色的声望会在某一等级暂停，随着升级再继续，所以新角色可以尽早开始积累，而不会很快无路可走。",
       "tiersHeading": "声望等级",
       "tiersBody": "每个阵营都经历相同的六个等级：陌生、认可、信任、可靠、先锋和冠军。每个阵营会为每一级赋予自己的称呼，那个称呼就是你在该阵营的头衔。",

@@ -3,6 +3,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
   chooseWeeklyQuestWire,
+  commendWeeklyQuestWire,
   dispatchWorldQuestWire,
   isWorldQuestWireCommand,
 } from '../server/quest_command_wire';
@@ -87,5 +88,43 @@ describe('weekly quest wire', () => {
     );
     expect(emitted.wkq).toEqual(meta.weeklyQuest);
     expect(emitted.wkexp).toBe(9);
+  });
+
+  it('sends the commendation claim as its own command and validates the faction before the call', () => {
+    expect(COMMAND_NAMES).toContain('world_quest_weekly_commend');
+    expect(isWorldQuestWireCommand('world_quest_weekly_commend')).toBe(true);
+    const client = bareClient(7);
+    const send = vi.fn();
+    Object.assign(client, { cmd: send });
+    client.commendWeeklyQuest('church_order');
+    expect(send).toHaveBeenCalledExactlyOnceWith({
+      cmd: 'world_quest_weekly_commend',
+      faction: 'church_order',
+    });
+    const commend = vi.fn();
+    const sim = { commendWeeklyQuest: commend } as unknown as Sim;
+    dispatchWorldQuestWire(sim, send.mock.calls[0][0], 7);
+    expect(commend).toHaveBeenCalledExactlyOnceWith('church_order', 7);
+    for (const faction of [undefined, null, 3, {}, ['rift_watch']])
+      commendWeeklyQuestWire(sim, { cmd: 'world_quest_weekly_commend', faction } as never, 7);
+    expect(commend).toHaveBeenCalledTimes(1);
+  });
+
+  it('mirrors the claimed commendation on the pick and drops a junk one', () => {
+    const target = mirrors();
+    applyQuestSelfWire(target, {
+      wkq: {
+        questId: 'wk_raid',
+        week: 'wk_2',
+        count: 1,
+        state: 'completed',
+        commended: 'automatons',
+      },
+    });
+    expect(target.weeklyQuest?.commended).toBe('automatons');
+    applyQuestSelfWire(target, {
+      wkq: { questId: 'wk_raid', week: 'wk_2', count: 1, state: 'completed', commended: 'nobody' },
+    });
+    expect(target.weeklyQuest?.commended).toBeUndefined();
   });
 });

@@ -29,7 +29,8 @@ export type QuestWorldCommand =
   | { cmd: 'world_quest_shadow'; action: 'pickpocket' | 'leave'; targetId?: number }
   | { cmd: 'world_quest_start'; quest: string; difficulty: WorldQuestDifficulty }
   | { cmd: 'world_quest_reroll'; quest: string }
-  | { cmd: 'world_quest_weekly_choose'; quest: string };
+  | { cmd: 'world_quest_weekly_choose'; quest: string }
+  | { cmd: 'world_quest_weekly_commend'; faction: string };
 
 /** Cold owner mirrors shared by quest snapshots and world-boss map state. */
 export class QuestWorldWireState {
@@ -157,6 +158,10 @@ export class QuestWorldWireState {
 
   chooseWeeklyQuest(questId: string): void {
     this.sendQuestWorldCommand({ cmd: 'world_quest_weekly_choose', quest: questId });
+  }
+
+  commendWeeklyQuest(factionId: FactionId): void {
+    this.sendQuestWorldCommand({ cmd: 'world_quest_weekly_commend', faction: factionId });
   }
 
   worldBossActive(bossId: string): boolean {

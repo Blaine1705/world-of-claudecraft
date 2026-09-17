@@ -77,3 +77,58 @@ describe('weekly quests view', () => {
     expect(dialog.art).toBe('ui/weekly/raid.webp');
   });
 });
+
+describe('the commendation view', () => {
+  it('is absent until the charge is finished, then offers every faction with the capped ones off', () => {
+    expect(
+      buildWeeklyQuestsView(
+        {
+          weeklyQuest: { questId: 'wk_raid', week: 'wk_2', count: 0, state: 'active' },
+          weeklyQuestResetAtMs: 0,
+        },
+        0,
+      ).commendation,
+    ).toBeNull();
+    const view = buildWeeklyQuestsView(
+      {
+        weeklyQuest: { questId: 'wk_raid', week: 'wk_2', count: 1, state: 'completed' },
+        weeklyQuestResetAtMs: 0,
+        factions: { rift_watch: 3000, church_order: 0, automatons: 0 },
+        player: { level: 10 },
+      },
+      0,
+    );
+    expect(view.commendation?.heading).toBe("Emissary's commendation");
+    expect(view.commendation?.note).toContain('1,000');
+    expect(view.commendation?.options.map((o) => [o.factionId, o.capped, o.claimed])).toEqual([
+      ['rift_watch', true, false],
+      ['church_order', false, false],
+      ['automatons', false, false],
+    ]);
+    expect(view.commendation?.claimedText).toBeNull();
+  });
+
+  it('marks the claimed faction and names it once the choice is made', () => {
+    const view = buildWeeklyQuestsView(
+      {
+        weeklyQuest: {
+          questId: 'wk_raid',
+          week: 'wk_2',
+          count: 1,
+          state: 'completed',
+          commended: 'church_order',
+        },
+        weeklyQuestResetAtMs: 0,
+        factions: {},
+        player: { level: 20 },
+      },
+      0,
+    );
+    expect(view.commendation?.options.find((o) => o.factionId === 'church_order')?.claimed).toBe(
+      true,
+    );
+    expect(view.commendation?.claimedText).toBe(
+      "This week's commendation went to the Church Order.",
+    );
+  });
+});
