@@ -69,7 +69,6 @@ import {
   carriedPools,
   materialsOnlyEmptyCells,
   resolveDepositSubmit,
-  vendorSellIsInstant,
 } from './bags_view';
 import { showQuantityPrompt } from './bank_quantity_prompt';
 import { hasOpenBankSocket } from './bank_view';
@@ -105,6 +104,8 @@ import {
   appendMaterialSourcesActionAfter,
   closeMaterialSourcesDialogForOwner,
   type MaterialSourcesSelectionFactory,
+  materialSourcesButtonShown,
+  openMaterialSourcesForRow,
 } from './material_sources_dialog';
 import { materialSourcesForDisplay } from './material_sources_view';
 import type { PainterHostPresentation } from './painter_host';
@@ -117,6 +118,7 @@ import { tSim } from './sim_i18n';
 import { bindTouchItemDrag } from './touch_item_drag';
 import { svgIcon } from './ui_icons';
 import { unknownItemIconHtml } from './unknown_item_icon';
+import { type VendorSellConfirmPolicy, vendorSaleNeedsConfirm } from './vendor_sell_confirm_policy';
 import { totalHeldCount } from './vendor_sell_quantity';
 import { dropOnWorld } from './world_drop_target';
 import { wornItemCellParts } from './worn_item_cell_view';
@@ -290,10 +292,10 @@ export interface BagsWindowDeps extends PainterHostPresentation {
   dragState: ItemDragState;
   /** True on the touch HUD: the pointer drag replaces HTML5 drag-and-drop there. */
   isTouchHud(): boolean;
-  /** The confirmVendorSell setting (on by default): whether a vendor sale of
-   *  anything beyond true junk (vendorSellIsInstant) should confirm first.
-   *  False restores the classic one-click instant sale for every item. */
-  confirmVendorSell(): boolean;
+  /** The vendor sell-confirm policy (vendor_sell_confirm_policy.ts): the
+   *  confirmVendorSell master switch plus the lowest quality that confirms.
+   *  Read per click, never cached, so an Options change applies at once. */
+  sellConfirmPolicy(): VendorSellConfirmPolicy;
   /** Light up (or clear) the paperdoll sockets that accept the stack in flight, so
    *  the drag advertises where it can land. Cleared on every drag teardown.
    *  `slotIndex` names the drag source's bag cell, so the lit set judges the
@@ -1231,6 +1233,25 @@ export class BagsWindow {
           }
           return;
         }
+        // At an open storage pane (bank, guild bank, vault) a sourced material
+        // stack's right-click opens the exact-source deposit picker: the same
+        // session the touch-only Sources button opens, captured now, so the
+        // stack pin is fixed the moment the gesture fires. A sourceless stack
+        // keeps the whole-stack deposit the classic action runs below.
+        const storageSources = materialSourcesForDisplay(s);
+        const storageSelection = this.storageSourceSelection(s);
+        if (storageSources && storageSelection && this.deps.openMaterialSources) {
+          ev.preventDefault();
+          this.deps.hideTooltip();
+          openMaterialSourcesForRow(
+            this.deps.openMaterialSources,
+            itemName,
+            storageSources,
+            row,
+            storageSelection,
+          );
+          return;
+        }
         ev.preventDefault();
         // The action menu opens, whose FIRST row is the classic left-click
         // action so that binding survives (right-click never destroys;
@@ -1341,7 +1362,16 @@ export class BagsWindow {
       this.attachRowTooltip(row, item, s);
       const displayedSources = materialSourcesForDisplay(s);
       const sourceSelection = this.storageSourceSelection(s);
-      if (displayedSources && sourceSelection && this.deps.openMaterialSources) {
+      // Touch only (materialSourcesButtonShown): the per-cell button doubled
+      // every material cell's height at an open storage pane. Desktop reaches
+      // the same exact-source deposit picker through the cell's right-click
+      // (the contextmenu arm above), so it grows no button.
+      if (
+        displayedSources &&
+        sourceSelection &&
+        this.deps.openMaterialSources &&
+        materialSourcesButtonShown()
+      ) {
         const wrapper = document.createElement('div');
         wrapper.className = 'material-source-item material-source-item-cell';
         wrapper.appendChild(row);
@@ -1709,6 +1739,7 @@ export class BagsWindow {
       this.bagMode(),
       s.instance,
       s.craftedRecipeId,
+      this.partyTradeWindowActive(s.instance),
     );
     switch (action) {
       case 'transferBlockedSoulbound':
@@ -1909,6 +1940,7 @@ export class BagsWindow {
         mode,
         s.instance,
         s.craftedRecipeId,
+        this.partyTradeWindowActive(s.instance),
       );
       const extra = key ? `<div class="tt-sub">${esc(t(key))}</div>` : '';
       // Advertise the shift-click partial deposit on a splittable stack, the bank
@@ -2037,6 +2069,19 @@ export class BagsWindow {
       vaultDeposit: this.deps.isVaultBankTab(),
       petFeed: this.deps.pendingPetFeed(),
     };
+  }
+
+  // Whether a bind-on-pickup party-trade marker on this copy is still live
+  // on the host clock (the world owns which clock stamped `untilMs`), so the
+  // bag click and hint stage a still-tradable soulbound copy instead of
+  // refusing it before the authoritative trade path ever sees it.
+  private partyTradeWindowActive(instance: ItemInstancePayload | undefined): boolean {
+    const untilMs = instance?.partyTrade?.untilMs;
+    return (
+      typeof untilMs === 'number' &&
+      Number.isFinite(untilMs) &&
+      this.deps.world().partyTradeMsRemaining(untilMs) > 0
+    );
   }
 
   // Whether the action menu should open for this item. Offered ONLY in
@@ -2192,15 +2237,18 @@ export class BagsWindow {
 
   private sellBagItem(item: ItemDef, slot: InvSlot, ev: MouseEvent): void {
     const count = Math.max(1, Math.floor(slot.count));
-    // The confirmVendorSell setting folds into the same instant gate
-    // vendorSellIsInstant already uses: turning it off (a player accepting the
-    // risk in exchange for speed) treats every item as instant for
-    // CONFIRMATION purposes, restoring the classic one-click sale. HOW MUCH
-    // sells is still decided below exactly as it already is for true junk
-    // (one unit on a plain click, the whole stack on ctrl/meta).
-    const instant =
-      !this.deps.confirmVendorSell() ||
-      vendorSellIsInstant(item, slot.instance, slot.craftedRecipeId);
+    // The sell-confirm policy (the confirmVendorSell switch and the quality
+    // threshold) folds into the same instant gate vendorSellIsInstant already
+    // draws around true junk: a sale the policy does not confirm is instant for
+    // CONFIRMATION purposes, the classic one-click sale. HOW MUCH sells is
+    // still decided below exactly as it already is for true junk (one unit on
+    // a plain click, the whole stack on ctrl/meta).
+    const instant = !vendorSaleNeedsConfirm(
+      item,
+      slot.instance,
+      slot.craftedRecipeId,
+      this.deps.sellConfirmPolicy(),
+    );
     if (ev.ctrlKey || ev.metaKey) {
       if (instant) {
         this.deps.world().sellItem(slot.itemId, count);
@@ -2264,7 +2312,15 @@ export class BagsWindow {
     for (const slot of this.deps.world().inventory) {
       if (slot.itemId !== itemId) continue;
       matched = true;
-      if (!vendorSellIsInstant(item, slot.instance, slot.craftedRecipeId)) return false;
+      if (
+        vendorSaleNeedsConfirm(
+          item,
+          slot.instance,
+          slot.craftedRecipeId,
+          this.deps.sellConfirmPolicy(),
+        )
+      )
+        return false;
     }
     return matched;
   }

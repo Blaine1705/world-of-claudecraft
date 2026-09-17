@@ -6230,9 +6230,11 @@
     bottom: auto;
     top: calc(100% + 4px);
   }
-  /* options language picker: it is the first row of the Interface panel, so the
-     default upward menu clips off the panel top; drop it downward instead. */
-  .set-lang-select .ui-dd-menu {
+  /* options language picker and UI theme preset: they are the first rows of the
+     Interface panel, so the default upward menu clips off the panel top (the
+     theme menu landed on the tab strip); drop them downward instead. */
+  .set-lang-select .ui-dd-menu,
+  .set-theme-select .ui-dd-menu {
     bottom: auto;
     top: calc(100% + 4px);
   }
@@ -7244,6 +7246,11 @@
   .crafting-vault-draw {
     color: var(--gold-dim);
   }
+  /* The ordinary-grade note (the Bronze Hoe report): same rule again, a
+     tint over words that already carry the signal. */
+  .crafting-ordinary-held {
+    color: var(--gold-dim);
+  }
   /* The Create affordance is decoration inside the row-button; the whole row
      remains the target and disabled rows inherit the shared disabled state. */
   .crafting-craft-chip {
@@ -7713,6 +7720,30 @@
   .crafting-commission-chip[aria-pressed="true"] .crafting-commission-pip {
     border-color: var(--gold-dim);
     background: var(--gold);
+  }
+  /* The HUD-tracker pin chip in the batch row: the commission chip's pill
+     language, pressed = pinned. */
+  .crafting-pin-chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 26px;
+    padding: 4px 12px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 999px;
+    background: var(--color-card-inset);
+    color: var(--color-text-muted);
+    font-family: var(--title-font);
+    font-size: 11px;
+    cursor: var(--cursor-point);
+  }
+  .crafting-pin-chip:hover {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+  }
+  .crafting-pin-chip[aria-pressed="true"] {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+    background: color-mix(in srgb, var(--gold) 12%, transparent);
   }
   .train-row.train-known {
     cursor: default;
@@ -9552,9 +9583,10 @@
   }
   .vault-row-partial {
     display: inline-flex;
+    flex: none; /* sized by its full label; the row name is what shrinks */
     align-items: center;
     justify-content: center;
-    gap: 5px;
+    gap: 6px;
     min-width: 40px;
     min-height: 40px;
     padding: 4px 8px;
@@ -9566,6 +9598,9 @@
     border-color: var(--color-primary-dim);
     filter: brightness(1.12);
   }
+  .vault-row-partial:active {
+    filter: brightness(0.95);
+  }
   .vault-row-partial:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
@@ -9576,9 +9611,8 @@
     height: 14px;
   }
   .vault-row-partial-label {
-    max-width: 72px;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    /* The full label, never elided: the button grows to fit it in every
+       locale and the row name beside it is what gives way. */
     white-space: nowrap;
   }
   @media (pointer: coarse) {
@@ -9601,8 +9635,30 @@
   body.mobile-touch .vault-footer button {
     min-height: 44px;
   }
+  /* On a phone the two row actions (the touch-only Sources button and the
+     quantity button) sit on their own line UNDER the row, so the item name
+     keeps its full width instead of eliding beside them. */
+  body.mobile-touch .vault-row-wrap {
+    flex-wrap: wrap;
+  }
+  body.mobile-touch .vault-row-wrap .vault-row {
+    flex: 1 0 100%;
+  }
   body.mobile-touch .vault-row-partial {
+    /* Shrinkable (unlike desktop) with a wrapping label, so a long localized
+       label still fits beside the Sources button on the actions line. */
+    flex: 0 1 auto;
     min-width: 44px;
+  }
+  body.mobile-touch .vault-row-partial-label {
+    white-space: normal;
+    text-align: center;
+  }
+  /* The touch-only Sources button in the same row keeps its word whole; the
+     row name and the wrapping quantity button are what give way. */
+  body.mobile-touch .vault-row-wrap .material-sources-action {
+    flex: none;
+    white-space: nowrap;
   }
   .vault-locked-intro {
     flex: none;
@@ -10584,6 +10640,7 @@
   }
   .cos-card-actions {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     gap: var(--spacing-sm);
@@ -10596,7 +10653,8 @@
   .cos-state.worn {
     color: var(--gold);
   }
-  .cos-action {
+  .cos-action,
+  .cos-preview {
     min-height: 40px;
     min-width: 40px;
     padding: 0 var(--spacing-md);
@@ -10607,13 +10665,16 @@
     font: inherit;
     cursor: pointer;
   }
-  .cos-action:hover {
+  .cos-action:hover,
+  .cos-preview:hover {
     border-color: var(--gold);
   }
-  .cos-action:active {
+  .cos-action:active,
+  .cos-preview:active {
     transform: translateY(1px);
   }
-  .cos-action:focus-visible {
+  .cos-action:focus-visible,
+  .cos-preview:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
   }
@@ -12977,6 +13038,104 @@
   .soc-group-head:first-of-type {
     border-top: 0;
   }
+  /* Who tab: the count line + class chip band, then a sortable table. Both
+     escape the responsive two-column .soc-body grid (grid-column: 1 / -1) and
+     the table keeps its own column tracks so the header buttons and every
+     row's cells line up; rows use display: contents so the cells are the grid
+     items. The dot and name cells reuse the friend-row look. */
+  .soc-who-head {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 4px 6px;
+    font-size: 12px;
+    color: var(--color-text-light);
+  }
+  .soc-who-count {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .soc-who-capped {
+    color: var(--color-text-muted);
+  }
+  .soc-who-cls {
+    flex: 0 0 auto;
+    max-width: 12em;
+    padding: 3px 6px;
+    font-size: 12px;
+  }
+  .soc-who-list {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: auto minmax(7em, 1.4fr) 3em minmax(5em, 1fr) minmax(6em, 1.4fr) minmax(
+        5em,
+        1fr
+      );
+    align-items: center;
+    column-gap: 8px;
+  }
+  .soc-who-row,
+  .soc-who-meta {
+    display: contents;
+  }
+  .soc-who-cell {
+    min-width: 0;
+    padding: 6px 2px;
+    border-bottom: 1px solid var(--color-border-showcase);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 13px;
+  }
+  .soc-who-cell.who-level {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .soc-who-cell.who-cls,
+  .soc-who-cell.who-zone,
+  .soc-who-cell.who-guild {
+    color: var(--color-text-muted);
+  }
+  .soc-who-cell .soc-name {
+    display: inline;
+  }
+  /* The dot is a flex item in the friend rows; here it sits in an inline cell,
+     so it needs an inline-block box to keep its width and height. */
+  .soc-who-cell .soc-dot {
+    display: inline-block;
+    vertical-align: middle;
+  }
+  .soc-who-header .soc-who-cell {
+    padding: 2px 2px 4px;
+    border-bottom: 1px solid var(--gold-dim);
+  }
+  .soc-who-sort {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 0;
+    border: 0;
+    background: none;
+    font-family: var(--title-font);
+    font-size: 12px;
+    color: var(--color-text-muted);
+    cursor: var(--cursor-point);
+  }
+  .soc-who-sort:hover,
+  .soc-who-sort.on {
+    color: var(--gold);
+  }
+  .soc-who-sort:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+  .soc-who-dir svg {
+    width: 10px;
+    height: 10px;
+    fill: currentColor;
+  }
   /* Raid tab: the two groups sit side by side in the landscape window (falling
      back to stacked on mobile-touch). It escapes the `.soc-body` grid flow
      above with `grid-column: 1 / -1` so it keeps its own explicit grid instead
@@ -15157,6 +15316,54 @@
     text-align: center;
   }
   /* The staged item uses the shared card surface so Sell matches Browse. */
+  /* The Market Sweep card (market_sweep_panel.ts) heads the Browse list while a
+     sweep is staged. It spans the whole grid like the range note, reuses the Sell
+     tab's .mkt-price-row field shape for the count, and keeps the quote line
+     muted like the Sell tab's price reference so the number the player is about
+     to agree to (in the confirm prompt) stays the emphasis. */
+  .mkt-sweep {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px;
+    margin-bottom: 6px;
+  }
+  .mkt-sweep-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .mkt-sweep-title {
+    font-family: var(--font-serif);
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .mkt-sweep-note,
+  .mkt-sweep-quote {
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: var(--color-text-muted);
+    font-family: var(--font-ui);
+  }
+  .mkt-sweep-quote:empty {
+    display: none;
+  }
+  .mkt-sweep-go {
+    align-self: flex-start;
+    padding: 4px 14px;
+  }
+  .mkt-sweep-btn {
+    cursor: var(--cursor-point);
+    padding: 4px 10px;
+    white-space: nowrap;
+  }
+  /* A row that offers Sweep carries a fifth cell; without it the button wraps
+     under the icon on a second grid row. */
+  .mkt-row:has(.mkt-sweep-btn) {
+    grid-template-columns: 40px minmax(0, 1fr) auto auto auto;
+  }
   .mkt-sell-pick {
     display: flex;
     gap: 10px;
@@ -15318,8 +15525,10 @@
     pointer-events: none;
     background: var(--color-options-scrim);
   }
-  #ui:has(> #options-menu[style*="display: block"])::before,
-  #ui:has(> #options-menu[style*="display: flex"])::before {
+  /* Stamped by the window-open mirror (src/ui/window_open_state.ts) while
+     #options-menu is visible; a :has() on #ui over the menu's inline style
+     re-styled the whole HUD on every inline write. */
+  #ui.options-open::before {
     display: block;
   }
   #options-menu {
@@ -15381,7 +15590,16 @@
     align-items: stretch;
     padding: 2px 0;
   }
-  .opt-btn {
+  /* The row plates sit under the `all: revert-layer` reset on
+     `#options-menu button.ui-btn` (above), whose id + element + class
+     specificity outranks a bare class selector, so a plain `.opt-btn` rule
+     is silently discarded. That left the Wiki chevron and the Report a Bug
+     status (absolutely positioned children, below) resolving against the
+     whole window instead of their own plate: they hung past the plate's edge
+     at rest, then snapped inside on hover once the hover filter created a
+     containing block. Match the reset's specificity so the plate is the
+     positioning host. */
+  #options-menu .opt-btn.ui-btn {
     position: relative;
     width: 100%;
     margin: 0;
@@ -15398,6 +15616,11 @@
   .opt-btn-status {
     position: absolute;
     inset-inline-end: 10px;
+    /* Centre on the label line explicitly rather than trusting the flex
+       static position: the chevron is a 12px box and the status is 10px text,
+       so the height-agnostic pair is the one value that centres both. */
+    top: 50%;
+    transform: translateY(-50%);
   }
   .opt-btn-chevron {
     width: 12px;
@@ -16760,10 +16983,12 @@
     border-radius: 0;
     padding: 7px var(--window-pad);
   }
-  /* The one child that actually scrolls. Bottom padding reserves room for the
-     corner motif's ink reach past the footer buttons (moved off
-     #options-menu.perf-wide itself, which no longer scrolls; see above). */
-  #options-menu.perf-wide .perf-scroll {
+  /* The one child that actually scrolls. Under the Fancy Gold theme its bottom
+     padding reserves room for the corner motif's ink reach past the footer
+     buttons (moved off #options-menu.perf-wide itself, which no longer scrolls;
+     see above); the other presets have no ornament to clear and keep the shared
+     .ui-win-body inset. */
+  .fancy-gold-ui #options-menu.perf-wide .perf-scroll {
     padding-bottom: 64px;
   }
   .perf-panel {
@@ -16915,12 +17140,18 @@
   /* ---------- performance overlay gilded ornament (pilot) ---------- */
   /* A hand-gilded filigree frame, scoped strictly to #options-menu.perf-wide (the
      Performance sub-view only): does not touch the shared .panel/.window
-     primitive or any other window. Shapes come from perf_ornament_svg.ts
+     primitive or any other window. Since the Fancy Gold preset made the
+     gilding a theme opt-in (the .fancy-gold-ui root class applyTheme stamps
+     in main.ts; see the window-frame section below), every rule here that
+     paints the ornament, gilds the title bar, or clears room for the corner
+     ink carries that same gate: Classic, Midnight, Parchment and High
+     Contrast keep the flat panel on this sub-view like everywhere else
+     (tests/perf_ornament_header_clearance.test.ts pins the gate). Shapes come from perf_ornament_svg.ts
      (applyPerfOrnamentVars, called once at boot); colors read the new
      --color-gold-* ramp (tokens.css) and --perf-ornament-* mask vars, never a
      literal hex. See the PR body for why this is scoped narrowly rather than
      landed as a DESIGN.md-phase-ordered, repo-wide chrome retune. */
-  #options-menu.perf-wide {
+  .fancy-gold-ui #options-menu.perf-wide {
     /* The base .panel border stays fully transparent (not `border: 0`, which
        would reflow the box): the gilded ::before below is the only visible
        frame color, so there is no flat border peeking through the noisy
@@ -16949,7 +17180,7 @@
        above), so its own padding-bottom would sit on a box that never
        scrolls and could not carry the footer's last pixels into view. */
   }
-  #options-menu.perf-wide::before {
+  .fancy-gold-ui #options-menu.perf-wide::before {
     content: "";
     position: absolute;
     /* Negative inset: the gilded frame sits just OUTSIDE the dark panel's own
@@ -17046,7 +17277,7 @@
      background ABOVE the ornament and silently hid the top-left/top-right
      corner flourish entirely; verified live via a getBoundingClientRect +
      forced-z-index probe before landing this fix. */
-  #options-menu.perf-wide .panel-title {
+  .fancy-gold-ui #options-menu.perf-wide .panel-title {
     color: var(--color-gold-400);
     border-bottom-color: var(--color-gold-700);
     /* Room for the corner motif's ~60px ink reach along the top edge (the
@@ -17063,7 +17294,7 @@
      inline start next to the now-padded title): move its absolute inset
      in by the same ~60px the ornament needs, so the button box never sits
      under the top-right corner's ink. */
-  #options-menu.perf-wide .panel-title > .x-btn:not(.back-btn) {
+  .fancy-gold-ui #options-menu.perf-wide .panel-title > .x-btn:not(.back-btn) {
     inset-inline-end: 64px;
   }
   /* The Fancy Gold theme's window frame: every desktop feature window wears
@@ -17241,10 +17472,10 @@
      src/ui/CLAUDE.md); restore a plain system-color border so the window frame
      stays visible in high-contrast mode instead of vanishing with the mask. */
   @media (forced-colors: active) {
-    #options-menu.perf-wide {
+    .fancy-gold-ui #options-menu.perf-wide {
       border-color: CanvasText;
     }
-    #options-menu.perf-wide::before {
+    .fancy-gold-ui #options-menu.perf-wide::before {
       display: none;
     }
     .fancy-gold-ui body:not(.mobile-touch) .window.panel:not(.perf-wide) {
@@ -20077,10 +20308,14 @@
   }
   .material-sources-quantity {
     display: grid;
-    grid-template-columns: 40px 64px 40px;
+    /* Bag-stack step, unit step, the count, unit step, bag-stack step. */
+    grid-template-columns: 46px 40px 64px 40px 46px;
     gap: 4px;
     align-items: stretch;
     flex: none;
+  }
+  .material-sources-step-big {
+    font-size: 12px;
   }
   .material-sources-step {
     margin: 0;
@@ -20131,8 +20366,28 @@
       min-width: 44px;
     }
     .material-sources-quantity {
-      grid-template-columns: 44px 64px 44px;
+      grid-template-columns: 48px 44px 64px 44px 48px;
     }
+  }
+  /* The touch sheet is 340px wide (hud.mobile.css, the #prompt-stack .prompt
+     rule outranks the dialog's 460px), and the five coarse-target columns are
+     264px, which would leave the source label a sliver. Each row wraps: the
+     label takes the first line and the stepper centres on its own line below,
+     every target keeping its 44px. */
+  body.mobile-touch .material-sources-row {
+    flex-wrap: wrap;
+  }
+  body.mobile-touch .material-sources-quantity {
+    flex: 1 0 100%;
+    justify-content: center;
+  }
+  /* Three footer verbs do not fit one 340px line: let them wrap, each taking
+     the full width when it does (the mobile prompt-actions rule's idiom). */
+  body.mobile-touch .material-sources-footer {
+    flex-wrap: wrap;
+  }
+  body.mobile-touch .material-sources-footer .btn {
+    flex: 1 1 auto;
   }
   @media (forced-colors: active) {
     .material-sources-action:focus-visible,

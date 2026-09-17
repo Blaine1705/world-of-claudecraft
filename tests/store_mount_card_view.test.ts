@@ -3,18 +3,22 @@
 // UI_PURE_CORES proves it is PURE; these arms prove it is CORRECT: the card is
 // the Armory card family (so the shipped .armory-* CSS styles it), the rarity
 // class sits on the SECTION where the CSS keys the border, the three card
-// states, and the buy attribute the store body binding reads back
-// (src/ui/store_body_actions.ts).
+// states, and the inspect attribute the store body binding reads back
+// (src/ui/store_body_actions.ts) to open the mount preview overlay.
 //
 // Rows come from the real projection (buildStoreMountRows over the shipped
 // catalog), never from hand-rolled literals, so a catalog or projection change
 // reaches these arms instead of sailing past a fixture.
 
 import { describe, expect, it } from 'vitest';
-import { MOUNT_SKIN_IDS, MOUNT_SKINS } from '../src/sim/content/mount_skins';
+import {
+  MOUNT_SKIN_IDS,
+  MOUNT_SKINS,
+  RETIRED_MOUNT_SKIN_IDS,
+} from '../src/sim/content/mount_skins';
 import { t } from '../src/ui/i18n';
 import {
-  STORE_MOUNT_BUY_ATTR,
+  STORE_MOUNT_INSPECT_ATTR,
   storeMountCardHtml,
   storeMountName,
   storeMountsSectionHtml,
@@ -57,10 +61,10 @@ describe('storeMountCardHtml', () => {
     const priced = row(5000, [service()]);
     const html = storeMountCardHtml(priced);
     expect(html).toMatch(new RegExp(`^<article class="armory-card rarity-${rarityOf(priced)}">`));
-    expect(html).toContain(`<button type="button" ${STORE_MOUNT_BUY_ATTR}="${REINS}"`);
+    expect(html).toContain(`<button type="button" ${STORE_MOUNT_INSPECT_ATTR}="${REINS}"`);
     expect(html).not.toContain(' disabled');
     expect(html).toContain(
-      `aria-label="${t('hudChrome.wocStore.mountBuyAria', { item: storeMountName(REINS) })}"`,
+      `aria-label="${t('hudChrome.wocStore.mountInspectAria', { item: storeMountName(REINS) })}"`,
     );
     // The art and copy slots the shipped .armory-card CSS lays out.
     expect(html).toContain(
@@ -73,18 +77,19 @@ describe('storeMountCardHtml', () => {
     expect(html).not.toContain('armory-state');
   });
 
-  it('renders an owned row as the owned state with a disabled card button', () => {
+  it('renders an owned row as the owned state, the card still opening the preview', () => {
     const html = storeMountCardHtml(row(5000, [service()], ['mech_bird']));
     expect(html).toMatch(/^<article class="armory-card rarity-\w+ owned">/);
     expect(html).toContain('<span class="armory-state">');
-    expect(html).toContain(' disabled ');
+    // Owned is not the end of the card: the preview is where the skin is worn.
+    expect(html).not.toContain(' disabled');
     expect(html).not.toContain('armory-cost');
   });
 
-  it('renders a row the service snapshot lacks as unavailable, disabled, with no price', () => {
+  it('renders a row the service snapshot lacks as unavailable with no price, still previewable', () => {
     const html = storeMountCardHtml(row(5000, []));
     expect(html).toContain('<span class="armory-state unavailable">');
-    expect(html).toContain(' disabled ');
+    expect(html).not.toContain(' disabled');
     expect(html).not.toContain('claudium_coin_64.webp');
   });
 
@@ -116,11 +121,22 @@ describe('storeMountsSectionHtml', () => {
     expect(html).toContain('<div class="armory-grid"><article class="armory-card');
   });
 
-  it('groups all five paid skins in one epic Machine Stable section', () => {
+  it('groups all four live paid skins in one epic Machine Stable section', () => {
     const html = storeMountsSectionHtml(buildStoreMountRows(10000, [], []));
     expect(html.match(/<section /g)).toHaveLength(1);
     expect(html).toContain('store-mounts rarity-epic');
-    expect(html.match(/armory-card rarity-epic/g)).toHaveLength(5);
+    expect(html.match(/armory-card rarity-epic/g)).toHaveLength(4);
+  });
+
+  it('projects no card for a retired skin even when the service still prices it', () => {
+    // The economy catalog row went first; should a stale service snapshot ever
+    // hand the id back, the projection is registry-first and drops it.
+    const stale = RETIRED_MOUNT_SKIN_IDS.map((id) =>
+      service({ itemId: id, kind: 'skin', costClaudium: 2000 }),
+    );
+    const rows = buildStoreMountRows(10000, stale, [...RETIRED_MOUNT_SKIN_IDS]);
+    expect(rows.map((r) => r.skinId)).toEqual([...MOUNT_SKIN_IDS]);
+    expect(storeMountsSectionHtml(rows)).not.toContain('rallycart');
   });
 
   it('is empty with no rows, so the store paints no empty strip', () => {

@@ -469,7 +469,11 @@ const MONOLITHS: MonolithRow[] = [
     // src/ui/aura_overlay_wiring.ts (its own arm re-pinned 18472 -> 18463), and
     // the release's extractions compose with it to 18334 by wc -l on the
     // merged tree, below both parent pins (18463 / 18343). Exact count, zero slack.
-    ceiling: 18334,
+    // Re-measured while reconciling the latest v0.43.0 base: the release-side
+    // screenshot and HUD extractions compose with aura overlay wiring and the
+    // account-wide Book of Deeds / Reliquary work to 18309 by wc -l on the
+    // merged tree. Exact count, zero slack.
+    ceiling: 18309,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -485,7 +489,11 @@ const MONOLITHS: MonolithRow[] = [
     // bespoke rows (the chat timestamp pair, the chat-window reset, the Unlock
     // Interface action) moved to src/ui/options_interface_rows.ts. Exact count,
     // zero slack.
-    ceiling: 2840,
+    // LOWERED 2840 -> 2831 when the main menu's button list (and the Unlock
+    // Interface entry that joined it) moved to
+    // src/ui/options_main_menu_controller.ts; the window keeps only the
+    // routing and the touch gate. Exact count, zero slack.
+    ceiling: 2831,
     seam: 'a pure view model (src/ui/options_view.ts) painted with the shared settings_controls.ts builders; sub-panels as sibling modules',
   },
   {
@@ -1048,7 +1056,13 @@ const MONOLITHS: MonolithRow[] = [
     // and join-retro passes into src/sim/deeds_restore.ts and the ownership
     // union into accountReliquaryOwnershipOpts (src/sim/reliquary.ts). Exact
     // count, zero slack.
-    ceiling: 11843,
+    // Down 11843 -> 11822 at the v0.42.2 hotfix line forward merge: the
+    // Crucible binding restore moved the per-slot payload-bound blocks to
+    // item_instance_load.ts's sanitizeSlotInstanceOnLoad and the party-trade
+    // retire hooks to src/sim/loot/bop_trade_persistence.ts (main, v0.42.1),
+    // composed with the release's own extractions above. Exact merged count,
+    // zero slack.
+    ceiling: 11822,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1248,12 +1262,17 @@ const MONOLITHS: MonolithRow[] = [
     // release count 11327 minus the redesign's own 6 extracted lines = 11321
     // (exact wc -l on the merged tree, zero headroom).
     // Renderer construction and rebuild validation now share game/game_renderer.ts.
-    // The Discord OAuth flow (web popup, native handoff, and the in-game
+    // Down 11317 -> 11281 at the v0.42.2 hotfix line forward merge: the
+    // interact-key gather extraction (src/game/interact_key_gather.ts took the
+    // R40 confirm gate and the node bundle out of interactKey, main v0.42.1)
+    // composed with the release's game_renderer.ts extraction.
+    // Then the Discord OAuth flow (web popup, native handoff, and the in-game
     // link-error notice a failed relink now needs) moved out to
     // src/net/discord_oauth_flow.ts behind an injected deps bag; main.ts keeps
-    // only the deps bag and the one-time wiring calls. Measured after the move
-    // (wc -l < src/main.ts): 11209. Zero headroom.
-    ceiling: 11209,
+    // only the deps bag and the one-time wiring calls. Measured after both
+    // extractions composed on the v0.44.0 line (wc -l < src/main.ts): 11173.
+    // Zero headroom.
+    ceiling: 11173,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1959,7 +1978,10 @@ const MONOLITHS: MonolithRow[] = [
     // disagreement about TEXT; this gate is about SIZE). BOTH parent pins for
     // the record: ours 2804, the release 2433. Measured on the merged tree,
     // never reconciled by arithmetic. Exact merged count, zero slack.
-    ceiling: 2432,
+    // Lowered again after the dais foundation-block stacking (and its
+    // per-position hash) moved to src/render/dais_blocks_core.ts for the
+    // Nythraxis flanking platforms (v0.42.2). Exact count, zero slack.
+    ceiling: 2420,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {

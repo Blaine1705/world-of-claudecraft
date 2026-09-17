@@ -1369,14 +1369,29 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // seal from the swept file. No capture was retaken.
 // Re-minted again for the lot's review round (the shared liveViewCandidate
 // check moved the renderer leaf once more). No capture was retaken.
-// Re-minted for the druid Cat Form merge with release/v0.43.0: the merged
-// runtimeRender.renderer leaf matches neither parent. No capture was retaken.
+// Re-minted for reconciling the latest v0.43.0 base: the release-side
+// CPU-hygiene renderer leaf and the druid Cat Form renderer leaf compose in
+// one tree. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
-  'e0c52678540867675650654c2730fabb3ca6336e8d7fb0811390437a0c48adb9';
+  // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
+  // the Eastbrook handoff): the merged renderer leaf, the moved NPC layout and
+  // the ground-sample leaves compose in one tree. No capture was retaken.
+  // Re-minted for the v0.42.2 hotfix line forward merge into release/v0.43.0:
+  // the merged renderer leaf (main's flanking-platform ground lift and
+  // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
+  // leaves) matches neither parent. No capture was retaken.
+  '9a08435a1a0fca561d272adace7835c51d77742e86a201b83554e78620d9d1b3';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
-  'bf18f96c5fb175b9730fe1705f2fa3bd00eb7315d14699831327c95b8d511793';
+  // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
+  // the Eastbrook handoff): the merged renderer leaf, the moved NPC layout and
+  // the ground-sample leaves compose in one tree. No capture was retaken.
+  // Re-minted for the v0.42.2 hotfix line forward merge into release/v0.43.0:
+  // the merged renderer leaf (main's flanking-platform ground lift and
+  // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
+  // leaves) matches neither parent. No capture was retaken.
+  'f429f724ca7ab90873b4a86950c0046585ef66bec7c2052cda12ae578ecee3d0';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2741,8 +2756,15 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // evidence. No capture was retaken.
       // Druid Cat Form merge with release/v0.43.0: recomputed LAST again over
       // the re-swept evidence. No capture was retaken.
+      // Latest v0.43.0 base reconciliation: recomputed LAST again over the
+      // re-swept evidence. No capture was retaken.
       // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
-    ).toBe('564186f2d0250588a7d89824a81bbb677e1e24e730a68e70e8f07d058528f6a7');
+      // v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking the Eastbrook
+      // handoff): recomputed LAST again over the re-swept evidence. No capture
+      // was retaken.
+      // v0.42.2 hotfix line forward merge into release/v0.43.0: recomputed LAST
+      // again over the re-swept evidence. No capture was retaken.
+    ).toBe('88176ae77a5c2ccec01ed97b5ab9d3a54a7f97e788b36bb1432bc7ee1103fca6');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

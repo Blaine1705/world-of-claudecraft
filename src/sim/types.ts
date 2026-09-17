@@ -185,15 +185,6 @@ export const SUNDER_CAST_ID = 'sundering';
 // activity-marker shape as craft/enchant-family. Separate id keeps cast-bar
 // labels and audio routing clean.
 export const TOOL_RECHARGE_CAST_ID = 'tool_recharge';
-// The planting cast sentinel (Farming, the growth-engine phase): same
-// activity-marker shape as the craft/gather family. UNLIKE every other
-// sentinel here, this cast decides NOTHING: plantCrop resolves the whole
-// plant at command time and the cast is pure flavor, so its completion arm in
-// combat/casting_lifecycle.ts dispatches no work (see the comment there).
-// Membership in isNonSpellCast below is what buys it the shared bundle
-// (silence exemption, no spell queue, damage cancels instead of pushing back,
-// item use blocked while it runs).
-export const FARMING_CAST_ID = 'farming';
 // The corpse-harvest cast (Intentional Gathering, PR3): same activity-marker
 // shape as gather/craft/fishing. HARVEST_CAST_SECONDS (professions/
 // harvest_admission.ts) is the frozen duration; professions/
@@ -216,7 +207,6 @@ export function isNonSpellCast(castId: string | null): boolean {
     castId === SALVAGE_CAST_ID ||
     castId === SUNDER_CAST_ID ||
     castId === TOOL_RECHARGE_CAST_ID ||
-    castId === FARMING_CAST_ID ||
     castId === CORPSE_HARVEST_CAST_ID
   );
 }
@@ -706,6 +696,8 @@ export interface Aura {
   value3?: number; // imbue: judgement max; Greater Invisibility: aftereffect duration
   tickInterval?: number;
   tickTimer?: number;
+  tickDamage?: number;
+  tickDoom?: number;
   // Sim-only periodic ramp: after each resolved DoT tick, increase `stacks`
   // and recompute `value` as per-stack damage times stacks, up to this cap.
   // The wire already mirrors the resulting value/stacks, so clients do not
@@ -1961,6 +1953,8 @@ export interface MobTemplate {
   /** Optional mandatory encounter threshold. Damage cannot move the mob below
    * this max-HP fraction until encounter logic clears its runtime floor. */
   damageFloorPct?: number;
+  /** Optional resting HP fraction for friendly practice targets that should stay healable. */
+  restHpFraction?: number;
   loot: LootEntry[];
   scale: number; // render hint
   color: number; // render hint
@@ -3549,6 +3543,8 @@ export type AbilityEffect =
       charges: number;
       doomPerProc: number;
       damage: number;
+      interval?: number;
+      tickDoom?: number;
     }
   | {
       type: 'afflictionCruelPact';
@@ -4757,6 +4753,8 @@ export interface ClientMirroredEntityFields {
    *  0..1 through the pull at the snapshot cadence; the visual smooths it. */
   climbing?: boolean;
   climbProgress?: number;
+  /** Mirror of an in-flight Vaulting Charge: a bare server-owned movement bit. */
+  leaping?: boolean;
 }
 
 export interface Entity extends ClientMirroredEntityFields {
@@ -5432,6 +5430,10 @@ export interface Entity extends ClientMirroredEntityFields {
   lootable: boolean;
   loot: CorpseLoot | null;
   lootRecipientIds?: number[];
+  /** Runtime-only stable identity for a soulbound drop's party-trade window.
+   *  Captured synchronously when loot rolls, so a later disconnect cannot
+   *  erase a kill-eligible character from the copy's transfer group. */
+  lootPartyTradeEligibility?: { names: string[]; characterIds: number[] };
   xpValue: number;
   // npc
   questIds: string[];
@@ -5686,6 +5688,12 @@ export interface NythraxisBoneSpike {
   tickTimer: number;
 }
 
+/** One raider's Bone Spike cooldown: seconds until a cast may pick them again. */
+export interface NythraxisBoneSpikeCooldown {
+  playerId: number;
+  remaining: number;
+}
+
 export interface NythraxisEncounterState {
   phase: 1 | 'transition' | 2 | 3 | 'dead';
   introSpoken: boolean;
@@ -5716,9 +5724,16 @@ export interface NythraxisEncounterState {
   // Dread Curse (the tank swap, both difficulties): only the cadence lives
   // here; the stacks live on the victim's aura (nythraxis_dread_curse.ts).
   dreadCurseTimer?: number;
-  // Bone Spike cadence and the live spike/victim pairs (nythraxis_bone_spike.ts).
+  // Who Dread Curse currently treats as the settled tank, tracked separately
+  // from the live boss.aggroTargetId so a taunt back onto a still-cursed
+  // player can be told apart from a genuine swap-in and refused (see
+  // enforceNythraxisDreadCurseSwap in encounters/nythraxis.ts).
+  dreadCurseHolderId?: number | null;
+  // Bone Spike cadence, the live spike/victim pairs, and the per-raider
+  // cooldown ledger that spreads waves across the raid (nythraxis_bone_spike.ts).
   boneSpikeTimer?: number;
   boneSpikes?: NythraxisBoneSpike[];
+  boneSpikeCooldowns?: NythraxisBoneSpikeCooldown[];
   // Spikes and fire never overlap: seconds left in the settle window after an
   // eruption lands (spikes hold) and after a spike wave (eruptions hold).
   eruptionSettleTimer?: number;
@@ -5730,8 +5745,9 @@ export interface NythraxisEncounterState {
   eruptionCastKey?: number;
   eruptionImpactRemaining?: number;
   eruptionPoints?: { x: number; z: number }[];
-  // Every burning patch, Grave Flame and Soulfire alike (kind tells them
-  // apart; nythraxis_soulfire.ts pushes the Soul Rend pools into this list).
+  // Every burning patch. In play these are all Grave Flame; the 'soul' kind
+  // (the Soulfire pools Soul Rend used to leave) was retired from play in
+  // v0.42.2 and survives only so the wire and renderer keep their shape.
   graveFlames?: {
     seq: number;
     kind: 'grave' | 'soul';
@@ -5742,12 +5758,6 @@ export interface NythraxisEncounterState {
     tickTimer: number;
   }[];
   graveFlameSeq?: number;
-  // Heroic-only: the last boss-clock time (ctx.time) each player took a
-  // Soulfire tick, so standing in more than one heroic pool, or catching two
-  // staggered Soul Rend casts, never yields more than one normal-strength
-  // tick per second (nythraxis_soulfire.ts admitNythraxisSoulfireTick owns
-  // the gate; encounters/nythraxis.ts is the sole reader/writer).
-  soulfireTickAt?: { playerId: number; at: number }[];
   // Gravefire: the cadence and the live traveling lines (nythraxis_gravefire.ts).
   gravefireTimer?: number;
   gravefires?: {
@@ -5764,6 +5774,10 @@ export interface NythraxisEncounterState {
   // gap timer that keeps the body-owning majors (Deathless Rage, the sigil
   // drag) from overlapping (nythraxis_binding_sigil.ts).
   sigilTimer?: number;
+  // The side the LAST sigil landed on (+1 world +x, the raid's left facing
+  // the dais; -1 world -x, its right); null before the first cast. The next
+  // cast takes the other side.
+  sigilSide?: 1 | -1 | null;
   sigil?: {
     castKey: number;
     x: number;
@@ -6054,6 +6068,21 @@ export interface ReadyCheck {
   initiator: number; // pid who ran /ready
   endsAt: number; // sim-clock seconds (ctx.time) when the check auto-finalizes
   responses: Map<number, 'ready' | 'notready' | 'pending'>; // pid -> answer
+}
+
+export interface ReadyCheckMemberResponse {
+  pid: number;
+  name: string;
+  state: 'ready' | 'notready' | 'pending';
+}
+
+// An active party/raid pull timer (/pull X).
+export interface PullTimer {
+  partyId: number;
+  initiator: number;
+  endsAt: number;
+  totalSeconds: number;
+  lastAnnounced: number;
 }
 
 // A player's active riding-lesson attempt (src/sim/mounts_training.ts), kept on
@@ -6559,6 +6588,8 @@ export type SimEvent = { pid?: number } & (
         // purpose: talking to the opposing side is the whole reason it exists
         // (players were falling back to General for it).
         | 'battleground'
+        // Party/raid leader alert broadcast to all party members.
+        | 'raidWarning'
         | 'guild'
         | 'officer'
         | 'world'
@@ -6582,11 +6613,24 @@ export type SimEvent = { pid?: number } & (
       // for every player-sourced chat line (mob/boss yells omit it, same as
       // fromTitle).
       classId?: PlayerClass;
+      // Optional localization identity for generated system chat. Player-authored
+      // chat stays literal `text`; generated lines carry this so clients render
+      // them through the catalog while older clients can still fall back to text.
+      textKey?: string;
+      textValues?: Record<string, string | number>;
     }
   | { type: 'partyInvite'; fromPid: number; fromName: string }
   // The party/raid leader started a ready check: the recipient's client plays a
   // sound and shows a yes/no prompt (social/ready_check.ts). Personal (pid set).
   | { type: 'readyCheckStart'; fromName: string }
+  // Live status update for the party/raid leader during a ready check. Personal (pid set to leader).
+  | {
+      type: 'readyCheckStatus';
+      initiatorPid: number;
+      partyId: number;
+      responses: ReadyCheckMemberResponse[];
+      done: boolean;
+    }
   // A player resurrection is never automatic: the dead recipient chooses whether
   // to return. Personal (pid set), with all visible copy composed client-side.
   | { type: 'resurrectionOffer'; fromName: string }
@@ -8055,13 +8099,13 @@ export const EASTBROOK_NOTICEBOARD_NATIVE_DIMENSIONS = Object.freeze({
 } as const);
 export const EASTBROOK_NOTICEBOARD_INTERACTION_RADIUS = 4 as const;
 // Static world services use their own namespace above the sequential allocator
-// and the reserved 1_000_000_000/1_000_000_001/1_000_000_002 singleton NPC ids
-// (the Vale Cup groundskeeper, FURY in Eastbrook, and Warmarshal Draven Kole in
-// Highwatch). A singleton NPC takes a reserved id AND `dynamic: true` so the
-// generic world-init loop skips it: that loop allocates ids by iterating the
-// merged NPC table in insertion order, so a plain insertion would shift the id
-// of every NPC, camp mob and object created after it, which the parity goldens
-// pin per frame.
+// and reserved 1_000_000_x singleton ids (the Vale Cup groundskeeper, FURY in
+// Eastbrook, Warmarshal Draven Kole in Highwatch, the Crucible vendor, and
+// authored practice dummies). A singleton NPC takes a reserved id AND
+// `dynamic: true` so the generic world-init loop skips it: that loop allocates
+// ids by iterating the merged NPC table in insertion order, so a plain
+// insertion would shift the id of every NPC, camp mob and object created after
+// it, which the parity goldens pin per frame.
 export const STATIC_WORLD_SERVICE_ENTITY_ID_MIN = 2_000_000_001;
 
 /** The one static, interactable noticeboard contract supported by every host. */
