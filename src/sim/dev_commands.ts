@@ -19,6 +19,7 @@ import { armWorldQuestShadowForDev } from './dev_world_quest_shadow';
 import { armWorldQuestTracingForDev } from './dev_world_quest_tracing';
 import { armWorldQuestWispMazeForDev } from './dev_world_quest_wisp_maze';
 import { createGroundObject, createMob } from './entity';
+import { awardFactionReputation, FACTION_IDS } from './factions';
 import {
   ignivarDevRaidTravelRoster,
   setupIgnivarDevRaid,
@@ -251,6 +252,37 @@ export function handleDevChat(
   }
   if (caravanMatch) {
     armWorldQuestCaravanForDev(ctx, pid, (caravanMatch[1] ?? 'eastbrook').toLowerCase());
+    return null;
+  }
+
+  // /dev rep <rift_watch|church_order|automatons|all> <amount>: award faction
+  // standing the way a world-quest turn-in does (same level cap), so the
+  // quartermasters' standing gates can be exercised without the daily grind.
+  const repMatch = /^\/dev\s+rep\s+(\S+)\s+(\d+)\s*$/i.exec(raw);
+  if (repMatch) {
+    const meta = ctx.players.get(pid);
+    const player = ctx.entities.get(pid);
+    if (!meta || !player) return null;
+    const key = repMatch[1].toLowerCase();
+    const factionIds = key === 'all' ? FACTION_IDS : FACTION_IDS.filter((id) => id === key);
+    if (factionIds.length === 0) {
+      emitDevLog(
+        ctx,
+        pid,
+        `[dev] Unknown faction "${repMatch[1]}": rift_watch, church_order, automatons or all.`,
+      );
+      return null;
+    }
+    for (const factionId of factionIds) {
+      const result = awardFactionReputation(meta, factionId, Number(repMatch[2]), player.level);
+      emitDevLog(
+        ctx,
+        pid,
+        `[dev] ${factionId}: +${result.gained} standing, now ${result.total} (${result.tier})${
+          result.capped ? ', capped by level' : ''
+        }.`,
+      );
+    }
     return null;
   }
 
