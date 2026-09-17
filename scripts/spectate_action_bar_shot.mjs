@@ -11,7 +11,7 @@
 //     (WOC_DEV_API_TARGET=http://127.0.0.1:8790 npx vite --port 5183)
 //
 //   GAME_URL=http://localhost:5183 SERVER_URL=http://127.0.0.1:8790 \
-//     SHOTS_DIR=docs/screenshots/spectate-action-bar TAG=after \
+//     SHOTS_DIR=tmp/spectate-action-bar TAG=after \
 //     node scripts/spectate_action_bar_shot.mjs
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -21,7 +21,7 @@ import { assertLoopbackDatabaseUrl, assertLoopbackUrl } from './lib/loopback_gua
 
 const GAME_URL = process.env.GAME_URL ?? 'http://localhost:5183';
 const SERVER_URL = process.env.SERVER_URL ?? 'http://127.0.0.1:8790';
-const OUT = process.env.SHOTS_DIR ?? 'docs/screenshots/spectate-action-bar';
+const OUT = process.env.SHOTS_DIR ?? 'tmp/spectate-action-bar';
 const TAG = process.env.TAG ?? 'after';
 assertLoopbackUrl(SERVER_URL, 'SERVER_URL');
 assertLoopbackUrl(GAME_URL, 'GAME_URL');

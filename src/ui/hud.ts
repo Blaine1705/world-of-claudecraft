@@ -2278,7 +2278,7 @@ export class Hud {
       // store). The controller always writes the localStorage mirror itself.
       persistLayout: (profile, layout) => this.sim.saveActionBarLayout(profile, layout),
       // A /spectate view remaps every live dep above to the watched character.
-      spectating: () => this.sim.spectating !== null,
+      spectating: () => typeof this.sim.spectating === 'string',
     });
     this.delveTracker = new DelveTrackerController({
       element: $('#delve-body'), // never the frame root: rebuilds wipe chrome
@@ -7268,7 +7268,7 @@ export class Hud {
   }
 
   private syncSlotMap(): void {
-    if (this.sim.spectating !== null) return; // a foreign kit must not reseed any bar
+    if (typeof this.sim.spectating === 'string') return; // a foreign kit must not reseed any bar
     this.actionBarController.syncKnownAbilities();
     // The pad's bar gets the same offer minus passives, and stances ride along
     // because pad mode hides the stance bar: a stance learned after the seed
@@ -18215,7 +18215,7 @@ export class Hud {
    *  plus stance-style abilities, known but unbound and so unreachable on a pad. */
   crossHotbarSeed(): { bar: CrossHotbarOverlayAction[]; extras: string[] } {
     // A spectated kit never seeds the pad bar (same freeze as syncSlotMap).
-    const known = this.sim.spectating !== null ? [] : this.sim.known;
+    const known = typeof this.sim.spectating === 'string' ? [] : this.sim.known;
     return crossHotbarSeedActions(this.hotbarActions, known);
   }
 
