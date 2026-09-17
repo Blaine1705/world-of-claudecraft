@@ -764,13 +764,14 @@ Every window adopts the grammar; these carry specific intent:
 - **Character** (`char_window.ts`): a sheet in four bands. The head; the body; a row
   of the five attribute tiles; and a footer that carries the tab strip (Character,
   Reputation, Currencies, Progression, Professions) beside the Cosmetics and Share Player
-  Card actions. The Character tab keeps the paperdoll and seats the Offense and Defense
+  Card actions. The Character tab keeps the paperdoll and seats the Offense, Defense and Specialization
   boards in a rail at its right that scrolls on the wheel; every other tab takes the whole
   body: Reputation (`src/ui/hud/reputation/`, one card per faction with the standing pill
   and tier bar on the quality ramp), Currencies (`src/ui/hud/currencies/`, the activity
   currencies and the faction rows), Progression (milestones, title, Reliquary and Time
-  Played) and Professions (the gathering and crafting boards). There is no Specialization
-  block: the talents window owns that. Stat labels remain muted with parchment values;
+  Played) and Professions (the gathering and crafting boards). The Specialization board is
+  a readout only (spec, role, mastery): the talents window owns the picker. Stat labels
+  remain muted with parchment values;
   `item_compare.ts` continues to provide success and danger deltas. (Amended at the
   world-quest reputation work: the earlier note seated Stats, Progression and Skills in a
   300px side rail, which left no room for the reputation and currency surfaces.)

@@ -253,6 +253,11 @@ describe('char_window: profession art placements', () => {
     });
 
     win.render();
+    // The Character tab's rail seats the Specialization board after the stat
+    // boards (a fresh warrior reads the no-spec line there).
+    const specPanel = root.querySelector('.char-stats-rail .char-rail-panels > .char-spec-panel');
+    expect(specPanel?.querySelector('.sp-title')?.textContent).toBe('Specialization');
+    expect(specPanel?.querySelector('.stat-cell b')?.textContent).toBe('No specialization chosen');
     const tabs = [...root.querySelectorAll<HTMLElement>('.char-sidebar-tab')];
     expect(tabs.map((tab) => [tab.dataset.tab, tab.getAttribute('aria-selected')])).toEqual([
       ['stats', 'true'],

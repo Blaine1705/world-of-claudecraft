@@ -29,6 +29,7 @@ import {
   type CharacterSidebarTab,
   type PaperdollSlot,
 } from './char_view';
+import { specializationPanelHtml } from './character_progression_view';
 import { currencyIconHtml } from './currency_art';
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName, itemDisplayName } from './entity_i18n';
@@ -328,7 +329,7 @@ export class CharWindow {
     // axe's scrollable-region-focusable).
     html += '<div class="char-sheet">';
     if (sidebar.selected === 'stats') {
-      html += `<div class="char-body char-body--sheet">${paperdoll}<aside id="char-sidebar-panel" class="char-sidebar-panel char-stats-rail" role="tabpanel" tabindex="0" ${panelLabel}>${this.statsRailHtml()}</aside></div><div class="char-attr-row stat-panel attrs-tiles">${this.attributeTilesHtml()}</div>`;
+      html += `<div class="char-body char-body--sheet">${paperdoll}<aside id="char-sidebar-panel" class="char-sidebar-panel char-stats-rail" role="tabpanel" tabindex="0" ${panelLabel}>${this.statsRailHtml(world)}</aside></div><div class="char-attr-row stat-panel attrs-tiles">${this.attributeTilesHtml()}</div>`;
     } else {
       html += `<div class="char-body char-body--tab"><div id="char-sidebar-panel" class="char-sidebar-panel char-tab-panel" role="tabpanel" tabindex="0" ${panelLabel}>${this.sidebarHtml(world, sidebar.selected)}</div></div>`;
     }
@@ -452,11 +453,12 @@ export class CharWindow {
     if (selected === 'skills') return this.skillsHtml(world);
     if (selected === 'reputation') return reputationTabHtml(world, Date.now());
     if (selected === 'currencies') return currenciesTabHtml(world);
-    return this.statsRailHtml();
+    return this.statsRailHtml(world);
   }
 
-  /** The titled stat boards (Offense, Defense): the Character tab's rail. */
-  private statsRailHtml(): string {
+  /** The titled stat boards (Offense, Defense, then Specialization): the
+   *  Character tab's rail. */
+  private statsRailHtml(world: IWorld): string {
     return `<div class="char-rail-panels">${STAT_PANELS.filter((panel) => panel.kind !== 'tiles')
       .map((panel) => {
         const cells = panel.stats
@@ -471,7 +473,7 @@ export class CharWindow {
           : '';
         return `<div class="stat-panel ui-card">${title}${cells}</div>`;
       })
-      .join('')}</div>`;
+      .join('')}${specializationPanelHtml(world)}</div>`;
   }
 
   /** The five primary attributes as tiles: the row under the paperdoll. */
