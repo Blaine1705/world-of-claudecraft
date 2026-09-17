@@ -5868,55 +5868,55 @@ export const ru_RU: EnTranslations = {
       "resultCount": "Результатов: {count}"
     },
     "weekly": {
-      "title": "Weekly Quests",
-      "close": "Close weekly quests",
-      "subtitle": "Pick one of the four charges. It",
-      "resetsIn": "resets in {time}.",
-      "anyDifficulty": "Any difficulty",
-      "choose": "Choose quest",
-      "inProgress": "In progress ({count}/{required})",
-      "completed": "Completed this week",
-      "lockedThisWeek": "Locked this week",
-      "footerPick": "You may hold one weekly charge at a time. Pick a card to read its terms.",
-      "footerHeld": "Your charge for the week is set. The other three unlock at the reset.",
-      "dialogHeading": "Weekly quest: {category}",
-      "objectives": "Quest objectives",
-      "rewards": "Rewards",
-      "alsoReceive": "You will also receive:",
+      "title": "Еженедельные задания",
+      "close": "Закрыть еженедельные задания",
+      "subtitle": "Выберите одно из четырёх поручений. Оно",
+      "resetsIn": "обновится через {time}.",
+      "anyDifficulty": "Любая сложность",
+      "choose": "Выбрать задание",
+      "inProgress": "В процессе ({count}/{required})",
+      "completed": "Выполнено на этой неделе",
+      "lockedThisWeek": "Закрыто на этой неделе",
+      "footerPick": "Одновременно можно держать только одно еженедельное поручение. Выберите карточку, чтобы прочитать условия.",
+      "footerHeld": "Поручение на неделю выбрано. Остальные три откроются после обновления.",
+      "dialogHeading": "Еженедельное задание: {category}",
+      "objectives": "Цели задания",
+      "rewards": "Награды",
+      "alsoReceive": "Вы также получите:",
       "tally": "{count} / {required}",
-      "cacheDesc": "Opens into one Normal raid piece for your class (never a tier-set piece), plus {count} x {item}.",
-      "dialogNote": "Only one weekly charge can be active. It {reset}",
-      "accept": "Accept",
-      "decline": "Decline",
+      "cacheDesc": "Открывается в один предмет из обычного рейда для вашего класса (никогда не часть комплекта), плюс {item} x {count}.",
+      "dialogNote": "Активным может быть только одно еженедельное поручение. Оно {reset}",
+      "accept": "Принять",
+      "decline": "Отклонить",
       "kinds": {
         "dungeons": {
-          "category": "Dungeons",
-          "lore": "The depths of the realm never rest: the Derelict Mech stirs again and the Hollow Crypt wakes. Gather your allies and cleanse the dungeons of their corruption.",
-          "goal": "Complete {count} dungeons on any difficulty.",
-          "goalLabel": "Dungeons completed"
+          "category": "Подземелья",
+          "lore": "Глубины королевства не знают покоя: Брошенный Мех снова шевелится, а Пустой Склеп пробуждается. Соберите союзников и очистите подземелья от скверны.",
+          "goal": "Пройдите {count} подземелья на любой сложности.",
+          "goalLabel": "Пройдено подземелий"
         },
         "raid": {
-          "category": "Raid",
-          "lore": "Ancient powers wake in the Crucible of the Last Flame and on the heights of Thornpeak. Face Ignivar or Nythraxis and bring down the enemy commander.",
-          "goal": "Take part in {count} raid on any difficulty.",
-          "goalLabel": "Raids completed"
+          "category": "Рейд",
+          "lore": "Древние силы пробуждаются в Горниле Последнего Пламени и на высотах Тернистого пика. Встретьте Игнивара или Нитраксиса и сразите вражеского командира.",
+          "goal": "Примите участие в {count} рейде на любой сложности.",
+          "goalLabel": "Пройдено рейдов"
         },
         "battlegrounds": {
-          "category": "Battlegrounds",
-          "lore": "War banners fly over Thornhollow Fields. Fight beside your faction, hold the flag and prove your worth in battle; every match counts, won or lost.",
-          "goal": "Complete {count} battlegrounds.",
-          "goalLabel": "Battlegrounds completed"
+          "category": "Поля боя",
+          "lore": "Над Тернистой лощиной реют боевые знамёна. Сражайтесь бок о бок со своей фракцией, удерживайте флаг и докажите свою доблесть; каждый матч засчитывается, выигран он или проигран.",
+          "goal": "Завершите {count} поля боя.",
+          "goalLabel": "Завершено полей боя"
         },
         "worldboss": {
-          "category": "World boss",
-          "lore": "Mighty foes roam the wild lands, each strong enough to defy whole armies. Join whoever is near and bring down one colossal aberration.",
-          "goal": "Defeat {count} world boss in the wild lands.",
-          "goalLabel": "World bosses defeated"
+          "category": "Мировой босс",
+          "lore": "По диким землям бродят могучие враги, каждый способен противостоять целым армиям. Присоединитесь к тем, кто рядом, и сразите одно исполинское чудовище.",
+          "goal": "Победите {count} мирового босса в диких землях.",
+          "goalLabel": "Побеждено мировых боссов"
         }
       },
-      "chosen": "Weekly quest taken: {category}",
+      "chosen": "Взято еженедельное задание: {category}",
       "progress": "{label}: {count}/{required}",
-      "done": "Weekly quest complete: {category}"
+      "done": "Еженедельное задание выполнено: {category}"
     }
   },
   "gatherEvent": {
@@ -16954,7 +16954,7 @@ export const ru_RU: EnTranslations = {
         "name": "Загадочный косметический тайник"
       },
       "emissary_cache": {
-        "name": "Emissary's Cache"
+        "name": "Тайник эмиссара"
       },
       "heroic_mark": {
         "name": "Героический знак"
@@ -18170,9 +18170,9 @@ export const ru_RU: EnTranslations = {
         "greeting": "Воры спрятали украденное золото по всему моему лабиринту, и теперь его стерегут тени. Верните все кошели с монетами. Избегайте стражей или возьмите сияющий огонёк, чтобы изгнать их. Потеряв три жизни, вы вернётесь ко входу, но собранные кошели останутся при вас."
       },
       "weekly_emissary": {
-        "name": "Cham Pete",
-        "title": "Emissary",
-        "greeting": "The Vale keeps a ledger of deeds, and I keep the ledger. Pick one charge for the week, see it through, and the purse is yours."
+        "name": "Чам Пит",
+        "title": "Эмиссар",
+        "greeting": "Долина ведёт книгу деяний, а книгу веду я. Выбери одно поручение на неделю, доведи его до конца, и кошель твой."
       },
       "calligraphy_instructor": {
         "name": "Наставник Элиан",

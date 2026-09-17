@@ -1272,6 +1272,14 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the market window',
   },
   {
+    call: 'this.weeklyQuestsWindow.refreshIfChanged',
+    band: 'slow',
+    gate: 'this.weeklyQuestsWindow.isOpen',
+    surface: 'window',
+    guard: { kind: 'module', module: 'weekly_quests_window.ts', proof: SIG_RETURN },
+    why: 'the weekly emissary window (charge progress and the reset clock, minute-granular)',
+  },
+  {
     call: 'this.wocMarketWindow.refreshIfChanged',
     band: 'slow',
     gate: 'this.wocMarketWindow.isOpen',
@@ -1813,7 +1821,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // tracker's exact slow-band row shape.
       // chrome 91 -> 92 and none 17 -> 18 on the World Quests branch: its
       // vehicle bar chrome row and its minigame music override.
-    ).toEqual({ window: 49, chrome: 92, none: 18 });
+    ).toEqual({ window: 50, chrome: 92, none: 18 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1836,7 +1844,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // loot window's corpse arm moved OUT of the `none` bucket below into
       // this one: it gained a corpseSig latch when the popup started
       // refreshing instead of only closing.
-      module: 27,
+      module: 28,
       // Phase 20's refreshCharSheetIfChanged and its siblings. Their latches are
       // HUD fields (lastCharSheetSig et al) because the cold char_window painter
       // holds no signature of its own to diff. The release's trade row left this
@@ -1918,6 +1926,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         // per-frame allocation.
         'spellbook_window.ts: if (this.knownChanged(this.deps.world().known)) {',
         'target_auras_window.ts: if (this.cleared) return;',
+        'weekly_quests_window.ts: if (sig === this.lastSig) return;',
         'woc_market_window.ts: if (sig === this.lastSig && !this.walletRepaintDue) return;',
       ].sort(),
     );

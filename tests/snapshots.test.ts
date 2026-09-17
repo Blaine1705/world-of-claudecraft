@@ -131,6 +131,8 @@ const DELTA_KEYS = [
   'equip',
   'qlog',
   'qdone',
+  'wkexp',
+  'wkq',
   'wqday',
   'wqexp',
   'wqlog',
@@ -5634,6 +5636,8 @@ const ALL_DELTA_KEYS = [
   'vehicle',
   'wba',
   'weapon',
+  'wkexp',
+  'wkq',
   'wqday',
   'wqexp',
   'wqlog',
@@ -5754,6 +5758,8 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   tslot: 'toolEffectSlots',
   vault: 'vaultInfo',
   vehicle: 'vehicleSession',
+  wkexp: 'weeklyQuestResetAtMs',
+  wkq: 'weeklyQuest',
   wqday: 'worldQuestCycle',
   wqexp: 'worldQuestExpiresAtMs',
   wqlog: 'worldQuestLog',
@@ -5847,6 +5853,8 @@ function dirtyEveryDeltaField(): {
   // default and the decode-target assertion could not tell them apart.
   meta.vault.stock = { copper_ore: 7 };
   meta.vault.upgrades = 2;
+  // The weekly emissary's charge (wkq): held mid-week so the key rides non-null.
+  meta.weeklyQuest = { questId: 'wk_dungeons', week: '2030-W01', count: 1, state: 'active' };
   // `cvault`: craftVaultStockFor is gated on the craft-draw context predicate,
   // not the banker. This harness player carries a live DELVE RUN (the drun
   // key's seeding below), which the gate refuses by design, so cvault's
@@ -6941,7 +6949,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 104 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 106 unique keys in sorted order', () => {
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
     // sheet's lifetime played-time key ptime, for 67, then +16: the static
@@ -6990,7 +6998,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     // key wba, for 100.
     // The faction standing (fac) and daily reroll (wqrr, wqrep) owner keys, for 103.
     // The Regional Mastery per-zone completion counts key wqzc, for 104.
-    expect(ALL_DELTA_KEYS).toHaveLength(104);
+    expect(ALL_DELTA_KEYS).toHaveLength(106);
     expect(new Set(ALL_DELTA_KEYS).size).toBe(104);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
@@ -7156,8 +7164,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // the account ledger's acct key (server/deeds_wire.ts) makes it 95.
     // The World Quests branch adds its five self keys, for 100.
     // Plus the faction standing and daily reroll owner keys, for 103, and the
-    // Regional Mastery per-zone counts key wqzc, for 104.
-    expect(scraped.size).toBe(104);
+    // Regional Mastery per-zone counts key wqzc, for 104. The weekly emissary's
+    // wkq and wkexp self keys make 106.
+    expect(scraped.size).toBe(106);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

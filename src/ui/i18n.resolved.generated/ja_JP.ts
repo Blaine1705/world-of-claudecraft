@@ -5868,55 +5868,55 @@ export const ja_JP: EnTranslations = {
       "resultCount": "{count} 件の結果"
     },
     "weekly": {
-      "title": "Weekly Quests",
-      "close": "Close weekly quests",
-      "subtitle": "Pick one of the four charges. It",
-      "resetsIn": "resets in {time}.",
-      "anyDifficulty": "Any difficulty",
-      "choose": "Choose quest",
-      "inProgress": "In progress ({count}/{required})",
-      "completed": "Completed this week",
-      "lockedThisWeek": "Locked this week",
-      "footerPick": "You may hold one weekly charge at a time. Pick a card to read its terms.",
-      "footerHeld": "Your charge for the week is set. The other three unlock at the reset.",
-      "dialogHeading": "Weekly quest: {category}",
-      "objectives": "Quest objectives",
-      "rewards": "Rewards",
-      "alsoReceive": "You will also receive:",
+      "title": "週間クエスト",
+      "close": "週間クエストを閉じる",
+      "subtitle": "四つの任務から一つを選んでください。",
+      "resetsIn": "{time}後にリセットされます。",
+      "anyDifficulty": "難易度は問わない",
+      "choose": "クエストを選ぶ",
+      "inProgress": "進行中（{count}/{required}）",
+      "completed": "今週は完了",
+      "lockedThisWeek": "今週はロック中",
+      "footerPick": "週間の任務は一度に一つだけ持てます。カードを選んで条件を読んでください。",
+      "footerHeld": "今週の任務は決まりました。残りの三つはリセット時に解放されます。",
+      "dialogHeading": "週間クエスト：{category}",
+      "objectives": "クエストの目標",
+      "rewards": "報酬",
+      "alsoReceive": "さらに受け取れるもの：",
       "tally": "{count} / {required}",
-      "cacheDesc": "Opens into one Normal raid piece for your class (never a tier-set piece), plus {count} x {item}.",
-      "dialogNote": "Only one weekly charge can be active. It {reset}",
-      "accept": "Accept",
-      "decline": "Decline",
+      "cacheDesc": "開けると自分のクラスが装備できるノーマルレイド装備が一つ（ティアセットは除く）と、{item} x {count}が手に入ります。",
+      "dialogNote": "週間の任務は同時に一つしか受けられません。{reset}",
+      "accept": "受諾",
+      "decline": "辞退",
       "kinds": {
         "dungeons": {
-          "category": "Dungeons",
-          "lore": "The depths of the realm never rest: the Derelict Mech stirs again and the Hollow Crypt wakes. Gather your allies and cleanse the dungeons of their corruption.",
-          "goal": "Complete {count} dungeons on any difficulty.",
-          "goalLabel": "Dungeons completed"
+          "category": "ダンジョン",
+          "lore": "王国の深部は休むことを知らない。廃棄されたメックが再び動き出し、うつろの地下墓所が目を覚ます。仲間を集め、ダンジョンの汚染を清めよ。",
+          "goal": "任意の難易度でダンジョンを{count}回クリアする。",
+          "goalLabel": "クリアしたダンジョン"
         },
         "raid": {
-          "category": "Raid",
-          "lore": "Ancient powers wake in the Crucible of the Last Flame and on the heights of Thornpeak. Face Ignivar or Nythraxis and bring down the enemy commander.",
-          "goal": "Take part in {count} raid on any difficulty.",
-          "goalLabel": "Raids completed"
+          "category": "レイド",
+          "lore": "最後の炎のるつぼとソーンピークの高地で古の力が目覚める。イグニヴァルかニスラクシスに立ち向かい、敵の指揮官を討て。",
+          "goal": "任意の難易度でレイドに{count}回参加する。",
+          "goalLabel": "クリアしたレイド"
         },
         "battlegrounds": {
-          "category": "Battlegrounds",
-          "lore": "War banners fly over Thornhollow Fields. Fight beside your faction, hold the flag and prove your worth in battle; every match counts, won or lost.",
-          "goal": "Complete {count} battlegrounds.",
-          "goalLabel": "Battlegrounds completed"
+          "category": "バトルグラウンド",
+          "lore": "ソーンホロウの野に軍旗が翻る。勢力と共に戦い、旗を守り、戦場で己の価値を示せ。勝っても負けても、すべての試合が数えられる。",
+          "goal": "バトルグラウンドを{count}回完了する。",
+          "goalLabel": "完了したバトルグラウンド"
         },
         "worldboss": {
-          "category": "World boss",
-          "lore": "Mighty foes roam the wild lands, each strong enough to defy whole armies. Join whoever is near and bring down one colossal aberration.",
-          "goal": "Defeat {count} world boss in the wild lands.",
-          "goalLabel": "World bosses defeated"
+          "category": "ワールドボス",
+          "lore": "軍勢すら退ける強大な敵が荒野を徘徊している。近くにいる者と力を合わせ、巨大な異形を一体討ち取れ。",
+          "goal": "荒野でワールドボスを{count}体倒す。",
+          "goalLabel": "倒したワールドボス"
         }
       },
-      "chosen": "Weekly quest taken: {category}",
-      "progress": "{label}: {count}/{required}",
-      "done": "Weekly quest complete: {category}"
+      "chosen": "週間クエストを受注：{category}",
+      "progress": "{label}：{count}/{required}",
+      "done": "週間クエスト完了：{category}"
     }
   },
   "gatherEvent": {
@@ -16954,7 +16954,7 @@ export const ja_JP: EnTranslations = {
         "name": "謎めいた装いの宝箱"
       },
       "emissary_cache": {
-        "name": "Emissary's Cache"
+        "name": "使者の宝箱"
       },
       "heroic_mark": {
         "name": "英雄の証"
@@ -18170,9 +18170,9 @@ export const ja_JP: EnTranslations = {
         "greeting": "盗賊どもが盗んだ金を迷宮のあちこちに隠し、今は影がそれを守っている。財布をすべて取り戻してほしい。守護者は避けるか、輝くウィスプを取って追い払うこと。ライフを3つ失うと入口に戻されるが、集めた財布は無事なままだ。"
       },
       "weekly_emissary": {
-        "name": "Cham Pete",
-        "title": "Emissary",
-        "greeting": "The Vale keeps a ledger of deeds, and I keep the ledger. Pick one charge for the week, see it through, and the purse is yours."
+        "name": "チャム・ピート",
+        "title": "使者",
+        "greeting": "谷は功績の台帳を持ち、その台帳を預かるのが私だ。今週の任務を一つ選び、やり遂げれば、その財布は君のものだ。"
       },
       "calligraphy_instructor": {
         "name": "エリアン先生",

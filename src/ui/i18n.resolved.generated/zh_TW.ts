@@ -5868,55 +5868,55 @@ export const zh_TW: EnTranslations = {
       "resultCount": "{count} 個結果"
     },
     "weekly": {
-      "title": "Weekly Quests",
-      "close": "Close weekly quests",
-      "subtitle": "Pick one of the four charges. It",
-      "resetsIn": "resets in {time}.",
-      "anyDifficulty": "Any difficulty",
-      "choose": "Choose quest",
-      "inProgress": "In progress ({count}/{required})",
-      "completed": "Completed this week",
-      "lockedThisWeek": "Locked this week",
-      "footerPick": "You may hold one weekly charge at a time. Pick a card to read its terms.",
-      "footerHeld": "Your charge for the week is set. The other three unlock at the reset.",
-      "dialogHeading": "Weekly quest: {category}",
-      "objectives": "Quest objectives",
-      "rewards": "Rewards",
-      "alsoReceive": "You will also receive:",
+      "title": "每週任務",
+      "close": "關閉每週任務",
+      "subtitle": "從四項委託中選擇一項。它",
+      "resetsIn": "將在{time}後重置。",
+      "anyDifficulty": "任意難度",
+      "choose": "選擇任務",
+      "inProgress": "進行中（{count}/{required}）",
+      "completed": "本週已完成",
+      "lockedThisWeek": "本週已鎖定",
+      "footerPick": "你一次只能持有一項每週委託。點擊卡片閱讀條款。",
+      "footerHeld": "本週的委託已定。其餘三項將在重置時解鎖。",
+      "dialogHeading": "每週任務：{category}",
+      "objectives": "任務目標",
+      "rewards": "獎勵",
+      "alsoReceive": "你還將獲得：",
       "tally": "{count} / {required}",
-      "cacheDesc": "Opens into one Normal raid piece for your class (never a tier-set piece), plus {count} x {item}.",
-      "dialogNote": "Only one weekly charge can be active. It {reset}",
-      "accept": "Accept",
-      "decline": "Decline",
+      "cacheDesc": "開啟後獲得一件你職業可用的普通團隊副本裝備（不含套裝），外加{count}個{item}。",
+      "dialogNote": "同一時間只能有一項每週委託生效。它{reset}",
+      "accept": "接受",
+      "decline": "拒絕",
       "kinds": {
         "dungeons": {
-          "category": "Dungeons",
-          "lore": "The depths of the realm never rest: the Derelict Mech stirs again and the Hollow Crypt wakes. Gather your allies and cleanse the dungeons of their corruption.",
-          "goal": "Complete {count} dungeons on any difficulty.",
-          "goalLabel": "Dungeons completed"
+          "category": "地下城",
+          "lore": "王國的深處從不安寧：廢棄機甲再度躁動，空心地穴甦醒。召集盟友，肅清地下城中的腐化。",
+          "goal": "在任意難度下完成{count}個地下城。",
+          "goalLabel": "已完成的地下城"
         },
         "raid": {
-          "category": "Raid",
-          "lore": "Ancient powers wake in the Crucible of the Last Flame and on the heights of Thornpeak. Face Ignivar or Nythraxis and bring down the enemy commander.",
-          "goal": "Take part in {count} raid on any difficulty.",
-          "goalLabel": "Raids completed"
+          "category": "團隊副本",
+          "lore": "遠古力量在最後火焰熔爐和荊峰高地甦醒。直面伊格尼瓦或尼斯拉克西斯，擊倒敵軍統帥。",
+          "goal": "在任意難度下參與{count}次團隊副本。",
+          "goalLabel": "已完成的團隊副本"
         },
         "battlegrounds": {
-          "category": "Battlegrounds",
-          "lore": "War banners fly over Thornhollow Fields. Fight beside your faction, hold the flag and prove your worth in battle; every match counts, won or lost.",
-          "goal": "Complete {count} battlegrounds.",
-          "goalLabel": "Battlegrounds completed"
+          "category": "戰場",
+          "lore": "戰旗在荊谷原野上飄揚。與你的陣營並肩作戰，守住旗幟，在戰鬥中證明自己；無論勝負，每場比賽都算數。",
+          "goal": "完成{count}場戰場。",
+          "goalLabel": "已完成的戰場"
         },
         "worldboss": {
-          "category": "World boss",
-          "lore": "Mighty foes roam the wild lands, each strong enough to defy whole armies. Join whoever is near and bring down one colossal aberration.",
-          "goal": "Defeat {count} world boss in the wild lands.",
-          "goalLabel": "World bosses defeated"
+          "category": "世界首領",
+          "lore": "強大的敵人在荒野遊蕩，每一個都足以抗衡整支軍隊。加入附近的玩家，擊倒一隻巨大的畸變體。",
+          "goal": "在荒野中擊敗{count}隻世界首領。",
+          "goalLabel": "已擊敗的世界首領"
         }
       },
-      "chosen": "Weekly quest taken: {category}",
-      "progress": "{label}: {count}/{required}",
-      "done": "Weekly quest complete: {category}"
+      "chosen": "已接取每週任務：{category}",
+      "progress": "{label}：{count}/{required}",
+      "done": "每週任務完成：{category}"
     }
   },
   "gatherEvent": {
@@ -16954,7 +16954,7 @@ export const zh_TW: EnTranslations = {
         "name": "神秘外觀寶箱"
       },
       "emissary_cache": {
-        "name": "Emissary's Cache"
+        "name": "使者的寶箱"
       },
       "heroic_mark": {
         "name": "英雄徽記"
@@ -18170,9 +18170,9 @@ export const zh_TW: EnTranslations = {
         "greeting": "盜賊把偷來的金幣藏遍了我的迷宮，現在由暗影看守著。找回每一個錢袋。避開守衛者，或者拿一團光輝微光去驅散它們。失去三條生命會把你送回入口，但你已收集的錢袋仍會安全保留。"
       },
       "weekly_emissary": {
-        "name": "Cham Pete",
-        "title": "Emissary",
-        "greeting": "The Vale keeps a ledger of deeds, and I keep the ledger. Pick one charge for the week, see it through, and the purse is yours."
+        "name": "查姆·皮特",
+        "title": "使者",
+        "greeting": "山谷記著一本功績簿，而我掌管這本簿子。選一項本週的委託，把它完成，錢袋就是你的。"
       },
       "calligraphy_instructor": {
         "name": "導師埃利安",

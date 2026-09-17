@@ -5868,55 +5868,55 @@ export const ko_KR: EnTranslations = {
       "resultCount": "결과 {count}개"
     },
     "weekly": {
-      "title": "Weekly Quests",
-      "close": "Close weekly quests",
-      "subtitle": "Pick one of the four charges. It",
-      "resetsIn": "resets in {time}.",
-      "anyDifficulty": "Any difficulty",
-      "choose": "Choose quest",
-      "inProgress": "In progress ({count}/{required})",
-      "completed": "Completed this week",
-      "lockedThisWeek": "Locked this week",
-      "footerPick": "You may hold one weekly charge at a time. Pick a card to read its terms.",
-      "footerHeld": "Your charge for the week is set. The other three unlock at the reset.",
-      "dialogHeading": "Weekly quest: {category}",
-      "objectives": "Quest objectives",
-      "rewards": "Rewards",
-      "alsoReceive": "You will also receive:",
+      "title": "주간 퀘스트",
+      "close": "주간 퀘스트 닫기",
+      "subtitle": "네 가지 임무 중 하나를 고르세요.",
+      "resetsIn": "{time} 후에 초기화됩니다.",
+      "anyDifficulty": "난이도 무관",
+      "choose": "퀘스트 선택",
+      "inProgress": "진행 중 ({count}/{required})",
+      "completed": "이번 주 완료",
+      "lockedThisWeek": "이번 주 잠김",
+      "footerPick": "주간 임무는 한 번에 하나만 맡을 수 있습니다. 카드를 골라 조건을 읽어 보세요.",
+      "footerHeld": "이번 주 임무가 정해졌습니다. 나머지 셋은 초기화 때 열립니다.",
+      "dialogHeading": "주간 퀘스트: {category}",
+      "objectives": "퀘스트 목표",
+      "rewards": "보상",
+      "alsoReceive": "추가로 받는 것:",
       "tally": "{count} / {required}",
-      "cacheDesc": "Opens into one Normal raid piece for your class (never a tier-set piece), plus {count} x {item}.",
-      "dialogNote": "Only one weekly charge can be active. It {reset}",
-      "accept": "Accept",
-      "decline": "Decline",
+      "cacheDesc": "열면 직업에 맞는 일반 공격대 장비 하나(티어 세트 제외)와 {item} x {count}를 얻습니다.",
+      "dialogNote": "주간 임무는 동시에 하나만 활성화됩니다. {reset}",
+      "accept": "수락",
+      "decline": "거절",
       "kinds": {
         "dungeons": {
-          "category": "Dungeons",
-          "lore": "The depths of the realm never rest: the Derelict Mech stirs again and the Hollow Crypt wakes. Gather your allies and cleanse the dungeons of their corruption.",
-          "goal": "Complete {count} dungeons on any difficulty.",
-          "goalLabel": "Dungeons completed"
+          "category": "던전",
+          "lore": "왕국의 깊은 곳은 쉬지 않습니다. 버려진 기계가 다시 꿈틀대고 텅 빈 지하 묘지가 깨어납니다. 동료를 모아 던전의 타락을 씻어 내십시오.",
+          "goal": "아무 난이도로 던전 {count}개를 완료하세요.",
+          "goalLabel": "완료한 던전"
         },
         "raid": {
-          "category": "Raid",
-          "lore": "Ancient powers wake in the Crucible of the Last Flame and on the heights of Thornpeak. Face Ignivar or Nythraxis and bring down the enemy commander.",
-          "goal": "Take part in {count} raid on any difficulty.",
-          "goalLabel": "Raids completed"
+          "category": "공격대",
+          "lore": "마지막 불꽃의 도가니와 손피크 고지에서 고대의 힘이 깨어납니다. 이그니바르나 니스락시스와 맞서 적의 지휘관을 쓰러뜨리세요.",
+          "goal": "아무 난이도로 공격대에 {count}번 참여하세요.",
+          "goalLabel": "완료한 공격대"
         },
         "battlegrounds": {
-          "category": "Battlegrounds",
-          "lore": "War banners fly over Thornhollow Fields. Fight beside your faction, hold the flag and prove your worth in battle; every match counts, won or lost.",
-          "goal": "Complete {count} battlegrounds.",
-          "goalLabel": "Battlegrounds completed"
+          "category": "전장",
+          "lore": "손할로우 벌판 위로 전쟁 깃발이 나부낍니다. 진영과 함께 싸우고 깃발을 지키며 전투에서 실력을 증명하세요. 이기든 지든 모든 경기가 집계됩니다.",
+          "goal": "전장 {count}회를 완료하세요.",
+          "goalLabel": "완료한 전장"
         },
         "worldboss": {
-          "category": "World boss",
-          "lore": "Mighty foes roam the wild lands, each strong enough to defy whole armies. Join whoever is near and bring down one colossal aberration.",
-          "goal": "Defeat {count} world boss in the wild lands.",
-          "goalLabel": "World bosses defeated"
+          "category": "월드 보스",
+          "lore": "군대 전체에 맞설 만큼 강한 적들이 황야를 떠돕니다. 근처의 누구와든 힘을 합쳐 거대한 괴물 하나를 쓰러뜨리세요.",
+          "goal": "황야에서 월드 보스 {count}마리를 처치하세요.",
+          "goalLabel": "처치한 월드 보스"
         }
       },
-      "chosen": "Weekly quest taken: {category}",
+      "chosen": "주간 퀘스트 수락: {category}",
       "progress": "{label}: {count}/{required}",
-      "done": "Weekly quest complete: {category}"
+      "done": "주간 퀘스트 완료: {category}"
     }
   },
   "gatherEvent": {
@@ -16954,7 +16954,7 @@ export const ko_KR: EnTranslations = {
         "name": "신비한 외형 상자"
       },
       "emissary_cache": {
-        "name": "Emissary's Cache"
+        "name": "사절의 보관함"
       },
       "heroic_mark": {
         "name": "영웅의 징표"
@@ -18170,9 +18170,9 @@ export const ko_KR: EnTranslations = {
         "greeting": "도둑들이 훔친 금화를 내 미로 곳곳에 숨겼고, 이제는 그림자들이 그걸 지키고 있어요. 동전 주머니를 모두 되찾아 주세요. 수호자들을 피하거나, 빛나는 위습을 먹고 쫓아내세요. 생명을 셋 다 잃으면 입구로 돌아가지만, 모은 주머니는 그대로 남아요."
       },
       "weekly_emissary": {
-        "name": "Cham Pete",
-        "title": "Emissary",
-        "greeting": "The Vale keeps a ledger of deeds, and I keep the ledger. Pick one charge for the week, see it through, and the purse is yours."
+        "name": "참 피트",
+        "title": "사절",
+        "greeting": "계곡은 공적 장부를 두고, 그 장부는 내가 맡고 있지. 이번 주 임무를 하나 골라 끝까지 해내면 그 주머니는 자네 것이야."
       },
       "calligraphy_instructor": {
         "name": "교관 엘리안",
