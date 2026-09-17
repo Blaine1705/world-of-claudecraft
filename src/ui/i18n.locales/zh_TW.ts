@@ -1800,6 +1800,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.talents.gearRestored': '已從此配置恢復 {n} 件裝備。',
   'hudChrome.talents.defaultBuildName': '配置 {n}',
   'hudChrome.tips.joinChannels': '提示：輸入 /join world 或 /join lfg 可與全世界的玩家聊天。',
+  'hudChrome.zoneEntry.townQuestsDone': '{zone} 的居民已沒有更多任務交給你了。做得好。',
   'meta.builtOn': '建置於 {date}',
   'realmTypes.normal': '一般',
   'realmTypes.pvp': 'PvP',

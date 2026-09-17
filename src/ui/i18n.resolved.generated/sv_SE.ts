@@ -2317,6 +2317,9 @@ export const sv_SE: EnTranslations = {
     "tips": {
       "joinChannels": "Tips: skriv /join world eller /join lfg för att chatta med spelare över hela världen."
     },
+    "zoneEntry": {
+      "townQuestsDone": "The folk of {zone} have no more tasks for you. Well done."
+    },
     "itemHeroicTag": "[HEROISK]",
     "itemHeroicLabel": "Heroisk",
     "itemSoulbound": "Själabunden",

@@ -2317,6 +2317,9 @@ export const zh_TW: EnTranslations = {
     "tips": {
       "joinChannels": "提示：輸入 /join world 或 /join lfg 可與全世界的玩家聊天。"
     },
+    "zoneEntry": {
+      "townQuestsDone": "{zone} 的居民已沒有更多任務交給你了。做得好。"
+    },
     "itemHeroicTag": "[英雄]",
     "itemHeroicLabel": "英雄",
     "itemSoulbound": "靈魂綁定",

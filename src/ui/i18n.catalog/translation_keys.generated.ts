@@ -12894,6 +12894,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.wocStore.wtype.sword'
   | 'hudChrome.wocStore.wtype.wand'
   | 'hudChrome.worldBoss.spawn'
+  | 'hudChrome.zoneEntry.townQuestsDone'
   | 'itemUi.bags.close'
   | 'itemUi.bags.destroyCancel'
   | 'itemUi.bags.destroyConfirm'

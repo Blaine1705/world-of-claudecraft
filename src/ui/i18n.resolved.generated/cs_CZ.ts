@@ -2317,6 +2317,9 @@ export const cs_CZ: EnTranslations = {
     "tips": {
       "joinChannels": "Tip: napiš /join world nebo /join lfg a chatuj s hráči napříč světem."
     },
+    "zoneEntry": {
+      "townQuestsDone": "The folk of {zone} have no more tasks for you. Well done."
+    },
     "itemHeroicTag": "[HRDINSKÉ]",
     "itemHeroicLabel": "Hrdinský",
     "itemSoulbound": "Vázáno na duši",

@@ -2317,6 +2317,9 @@ export const ja_JP: EnTranslations = {
     "tips": {
       "joinChannels": "ヒント：/join world または /join lfg と入力すると、ワールド全体のプレイヤーとチャットできます。"
     },
+    "zoneEntry": {
+      "townQuestsDone": "{zone}の人々からの依頼はもうありません。お見事です。"
+    },
     "itemHeroicTag": "[ヒロイック]",
     "itemHeroicLabel": "ヒロイック",
     "itemSoulbound": "魂縛",

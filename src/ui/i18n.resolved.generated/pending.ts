@@ -9,25 +9,55 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.zoneEntry.townQuestsDone"
+  ],
+  "es_ES": [
+    "hudChrome.zoneEntry.townQuestsDone"
+  ],
+  "fr_FR": [
+    "hudChrome.zoneEntry.townQuestsDone"
+  ],
+  "fr_CA": [
+    "hudChrome.zoneEntry.townQuestsDone"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.zoneEntry.townQuestsDone"
+  ],
+  "de_DE": [
+    "hudChrome.zoneEntry.townQuestsDone"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.zoneEntry.townQuestsDone"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.zoneEntry.townQuestsDone"
+  ],
+  "nl_NL": [
+    "hudChrome.zoneEntry.townQuestsDone"
+  ],
+  "pl_PL": [
+    "hudChrome.zoneEntry.townQuestsDone"
+  ],
+  "id_ID": [
+    "hudChrome.zoneEntry.townQuestsDone"
+  ],
+  "tr_TR": [
+    "hudChrome.zoneEntry.townQuestsDone"
+  ],
+  "sv_SE": [
+    "hudChrome.zoneEntry.townQuestsDone"
+  ],
+  "vi_VN": [
+    "hudChrome.zoneEntry.townQuestsDone"
+  ],
+  "da_DK": [
+    "hudChrome.zoneEntry.townQuestsDone"
+  ]
 };

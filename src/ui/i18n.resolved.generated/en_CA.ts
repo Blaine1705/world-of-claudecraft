@@ -2317,6 +2317,9 @@ export const en_CA: EnTranslations = {
     "tips": {
       "joinChannels": "Tip: type /join world or /join lfg to chat with players across the world."
     },
+    "zoneEntry": {
+      "townQuestsDone": "The folk of {zone} have no more tasks for you. Well done."
+    },
     "itemHeroicTag": "[HEROIC]",
     "itemHeroicLabel": "Heroic",
     "itemSoulbound": "Soulbound",

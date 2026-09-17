@@ -2317,6 +2317,9 @@ export const tr_TR: EnTranslations = {
     "tips": {
       "joinChannels": "İpucu: Dünya genelindeki oyuncularla sohbet etmek için /join world ya da /join lfg yaz."
     },
+    "zoneEntry": {
+      "townQuestsDone": "The folk of {zone} have no more tasks for you. Well done."
+    },
     "itemHeroicTag": "[KAHRAMANCA]",
     "itemHeroicLabel": "Heroik",
     "itemSoulbound": "Ruha Bağlı",

@@ -1884,6 +1884,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.talents.defaultBuildName': 'Билд {n}',
   'hudChrome.tips.joinChannels':
     'Совет: введите /join world или /join lfg, чтобы общаться с игроками по всему миру.',
+  'hudChrome.zoneEntry.townQuestsDone': 'У жителей {zone} больше нет для вас поручений. Отличная работа.',
   'meta.builtOn': 'Сборка от {date}',
   'realmTypes.normal': 'Обычный',
   'realmTypes.pvp': 'PvP',

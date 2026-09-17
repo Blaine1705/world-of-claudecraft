@@ -1860,6 +1860,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.talents.defaultBuildName': '빌드 {n}',
   'hudChrome.tips.joinChannels':
     '팁: /join world 또는 /join lfg를 입력하면 월드 전역의 플레이어와 대화할 수 있습니다.',
+  'hudChrome.zoneEntry.townQuestsDone': '{zone}의 주민들에게는 더 이상 맡길 일이 없습니다. 잘하셨습니다.',
   'meta.builtOn': '{date} 빌드',
   'realmTypes.normal': '일반',
   'realmTypes.pvp': 'PvP',

@@ -2317,6 +2317,9 @@ export const en_XA: EnTranslations = {
     "tips": {
       "joinChannels": "[Ţíþ: ţýþé /ĵóíñ ŵóŕļð óŕ /ĵóíñ ļƒĝ ţó çĥáţ ŵíţĥ þļáýéŕš áçŕóšš ţĥé ŵóŕļð.]"
     },
+    "zoneEntry": {
+      "townQuestsDone": "[Ţĥé ƒóļķ óƒ {zone} ĥáʋé ñó ɱóŕé ţášķš ƒóŕ ýóú. Ŵéļļ ðóñé.]"
+    },
     "itemHeroicTag": "[[ĤÉŔÓÍÇ]]",
     "itemHeroicLabel": "[Ĥéŕóíç]",
     "itemSoulbound": "[Šóúļƀóúñð]",

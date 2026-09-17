@@ -2317,6 +2317,9 @@ export const id_ID: EnTranslations = {
     "tips": {
       "joinChannels": "Tips: ketik /join world atau /join lfg untuk mengobrol dengan pemain di seluruh dunia."
     },
+    "zoneEntry": {
+      "townQuestsDone": "The folk of {zone} have no more tasks for you. Well done."
+    },
     "itemHeroicTag": "[HEROIK]",
     "itemHeroicLabel": "Heroik",
     "itemSoulbound": "Terikat Jiwa",

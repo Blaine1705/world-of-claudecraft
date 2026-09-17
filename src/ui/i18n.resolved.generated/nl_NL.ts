@@ -2317,6 +2317,9 @@ export const nl_NL: EnTranslations = {
     "tips": {
       "joinChannels": "Tip: typ /join world of /join lfg om te chatten met spelers over de hele wereld."
     },
+    "zoneEntry": {
+      "townQuestsDone": "The folk of {zone} have no more tasks for you. Well done."
+    },
     "itemHeroicTag": "[HELDHAFTIG]",
     "itemHeroicLabel": "Heroïsch",
     "itemSoulbound": "Zielsgebonden",

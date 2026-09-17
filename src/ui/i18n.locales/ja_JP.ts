@@ -1870,6 +1870,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.talents.defaultBuildName': 'ビルド {n}',
   'hudChrome.tips.joinChannels':
     'ヒント：/join world または /join lfg と入力すると、ワールド全体のプレイヤーとチャットできます。',
+  'hudChrome.zoneEntry.townQuestsDone': '{zone}の人々からの依頼はもうありません。お見事です。',
   'meta.builtOn': 'ビルド日：{date}',
   'realmTypes.normal': 'ノーマル',
   'realmTypes.pvp': 'PvP',
