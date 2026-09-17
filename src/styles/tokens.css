@@ -163,6 +163,16 @@
     --panel-edge: #08080d;
     --color-text-error: #ff8f85;
     --color-text-success: #7fdc4f;
+    /* The signpost guild board's category family (the sprout chip and the
+       filter strip, src/ui/hud/guild_board/): one soft green read at four
+       strengths through color-mix, its icon tint, its two text weights, and
+       the filter chip's resting text. Softer than --color-text-success on
+       purpose: a tag, not a status. */
+    --color-category: #6fbf7a;
+    --color-category-icon: #8fe09a;
+    --color-category-text: #bfeec6;
+    --color-category-text-active: #d6f5da;
+    --color-filter-chip-text: #e6dcc0;
     /* Raid boss journal palette. These tokens keep its forged-fire treatment in one
        themeable source while the component sheets own only layout and composition. */
     --color-rbg-frame-border-base: #2e180d;
@@ -850,6 +860,25 @@
        src/ui/prompt_dialog.ts is the same duration and dismisses the prompt;
        tests/prompt_timeout_duration.test.ts pins the two equal. */
     --prompt-timeout-dur: 28s;
+    --color-raid-warning-text: #ff5500;
+    --color-raid-warning-border: rgb(255 85 0 / 45%);
+    --color-raid-warning-bg: rgb(20 10 5 / 80%);
+    --shadow-raid-warning-glow: 0 0 18px rgb(255 85 0 / 35%);
+    --shadow-raid-warning-text: 0 0 16px rgb(255 85 0 / 85%), 2px 2px 6px var(--color-keyline);
+    --color-ready-check-bg: rgb(14 18 24 / 95%);
+    --color-ready-check-border: #d4af37;
+    --shadow-ready-check: 0 6px 20px rgb(0 0 0 / 75%), 0 0 10px rgb(212 175 55 / 25%);
+    --color-ready-check-text: #e8e8e8;
+    --color-ready-check-title: var(--gold);
+    --color-ready-check-muted: #999999;
+    --color-ready-check-muted-soft: #aaaaaa;
+    --color-ready-check-row: rgb(255 255 255 / 3%);
+    --color-ready-check-rule: rgb(212 175 55 / 30%);
+    --color-ready-check-rule-muted: rgb(255 255 255 / 8%);
+    --color-ready-check-yes: #2ed573;
+    --color-ready-check-no: #ff4757;
+    --shadow-ready-check-yes: 0 0 8px rgb(46 213 115 / 70%);
+    --shadow-ready-check-no: 0 0 8px rgb(255 71 87 / 70%);
     /* Dim the live world while the modal options family is open. */
     --color-options-scrim: color-mix(in srgb, var(--color-keyline) 74%, transparent);
 
@@ -1095,6 +1124,29 @@
     /* The Claudium store hero's cool wash over its coin artwork. */
     --color-woc-store-hero-hi: #030a10;
     --color-woc-store-hero-lo: #04111b;
+    /* The leaderboard window's ranking ledger (src/styles/components.css,
+       leaderboard section). A FIXED dark ground whose foregrounds are fixed
+       light values, so no preset re-emits any of these (DESIGN.md 4.1; pinned
+       with their contrast pairs by tests/leaderboard_ranking_tokens.test.ts).
+       Gold edges, rules and headings reuse the --color-gold-* ramp, shadows the
+       --color-keyline, highlights --color-white; alpha steps compose through
+       color-mix. The first podium place reads --color-gold-500. */
+    --color-ranking-ground-top: #1c1531;
+    --color-ranking-ground: #120c20;
+    --color-ranking-ground-deep: #0c0816;
+    --color-ranking-ground-glow: #6d3fd4;
+    --color-ranking-well: #150f26;
+    --color-ranking-control: #2a1f47;
+    --color-ranking-control-hover: #3a2b62;
+    --color-ranking-control-hover-deep: #1d1533;
+    --color-ranking-control-border: #4c2f8a;
+    --color-ranking-selected: #8b5cf6;
+    --color-ranking-emphasis: #c4a6ff;
+    --color-ranking-text: #fbf6ff;
+    --color-ranking-text-soft: #c9bde4;
+    --color-ranking-text-muted: #a99bc8;
+    --color-ranking-place-second: #c9ccd3;
+    --color-ranking-place-third: #c98a4b;
     /* target size */
     /* Stance socket on a coarse pointer: the same 40px box, kept as its own
        token so touch can diverge from the desktop row without a rule rewrite. */

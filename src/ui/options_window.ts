@@ -59,7 +59,7 @@ import {
 import {
   BIND_ACTIONS,
   BIND_CATEGORIES,
-  isReservedCode,
+  bindRefusalReason,
   type Keybinds,
   keyLabel,
 } from '../game/keybinds';
@@ -95,6 +95,7 @@ import {
 import type { TranslationKey } from './i18n.catalog';
 import { BIND_CATEGORY_LABEL_KEYS, bindActionDisplayName } from './keybind_action_names_core';
 import { keybindConflictPrompt } from './keybind_conflict_prompt_core';
+import { keybindDeviceNoteKeys, keybindRefusalNote } from './keybind_device_notes_core';
 import { buildKeybindCode, parseKeybindCode } from './keybind_transfer_core';
 import {
   type KeyboardMapHandle,
@@ -108,6 +109,7 @@ import {
   buildChatWindowResetRow,
   buildInterfaceUnlockRow,
 } from './options_interface_rows';
+import { buildOptionsMenuList, type OptionsMenuRoutedAction } from './options_main_menu_controller';
 import {
   type BoolToggleControl,
   boolToggleNextValue,
@@ -653,49 +655,18 @@ export class OptionsWindow {
   private renderMain(): void {
     const el = this.deps.root();
     const scroll = this.viewShell(t('hud.options.gameMenu'));
-    const list = document.createElement('div');
-    list.className = 'opt-list';
-    for (const entry of buildOptionsMenu({ bugReportAvailable: this.deps.bugReport() !== null })) {
-      const b = document.createElement('button');
-      b.className = 'btn ui-btn opt-btn';
-      b.textContent = t(entry.labelKey);
-      if (entry.action.kind === 'close') b.classList.add('ui-btn--red', 'ui-btn--lg');
-      if (entry.action.kind === 'logout') b.classList.add('opt-btn-hostile');
-      if (entry.action.kind === 'wiki') {
-        const chevron = document.createElement('span');
-        chevron.className = 'opt-btn-chevron';
-        chevron.setAttribute('aria-hidden', 'true');
-        chevron.innerHTML = svgIcon('next');
-        b.appendChild(chevron);
-      }
-      if (entry.action.kind === 'goto' && entry.action.view === 'bugreport') {
-        const status = document.createElement('span');
-        status.className = 'opt-btn-status ui-muted';
-        status.textContent = t('hudChrome.bugReport.online');
-        status.setAttribute('aria-hidden', 'true');
-        b.setAttribute('aria-label', `${t(entry.labelKey)}: ${t('hudChrome.bugReport.online')}`);
-        b.appendChild(status);
-      }
-      b.addEventListener('click', () => {
-        audio.click();
-        const a = entry.action;
-        if (a.kind === 'goto') {
-          this.view = a.view;
-          this.keybindNote = '';
-          this.render();
-        } else if (a.kind === 'wiki') {
-          this.deps.openWiki();
-        } else if (a.kind === 'logout') {
-          this.deps.options()?.logout();
-        } else if (a.kind === 'unstuck') {
-          this.deps.world().unstuck();
-          this.close();
-        } else {
-          this.close();
-        }
-      });
-      list.appendChild(b);
-    }
+    const entries = buildOptionsMenu({
+      bugReportAvailable: this.deps.bugReport() !== null,
+      // Frame editing is desktop-only: the same gate as the Frames tab's row,
+      // and the same union that raises the touch HUD (mobile_controls
+      // setActive), which is what Hud.toggleInterfaceUnlock refuses on.
+      interfaceUnlockAvailable: !(useTouchInterface() || isNativeAppShell()),
+      interfaceUnlocked: this.deps.isInterfaceUnlocked(),
+    });
+    const list = buildOptionsMenuList(entries, {
+      toggleInterfaceUnlock: () => this.deps.toggleInterfaceUnlock(),
+      dispatch: (action) => this.routeMenuAction(action),
+    });
     scroll.appendChild(list);
     // Running build, as small secondary text at the foot of the menu, so players can
     // confirm their version without leaving the settings window (issue 1541).
@@ -705,6 +676,25 @@ export class OptionsWindow {
     ver.textContent = t('hudChrome.options.version', { version, build });
     scroll.appendChild(ver);
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
+  }
+
+  /** Route a main-menu press. The sub-views, the wiki hop, logout, unstuck and
+   *  close all mutate window state, so the list painter hands them back here. */
+  private routeMenuAction(a: OptionsMenuRoutedAction): void {
+    if (a.kind === 'goto') {
+      this.view = a.view;
+      this.keybindNote = '';
+      this.render();
+    } else if (a.kind === 'wiki') {
+      this.deps.openWiki();
+    } else if (a.kind === 'logout') {
+      this.deps.options()?.logout();
+    } else if (a.kind === 'unstuck') {
+      this.deps.world().unstuck();
+      this.close();
+    } else {
+      this.close();
+    }
   }
 
   // -------------------------------------------------------------------------
@@ -1545,10 +1535,9 @@ export class OptionsWindow {
     presetName.textContent = t('hudChrome.theme.preset');
     const presetLabel = (id: PresetId): string =>
       t(`hudChrome.theme.presets.${id}` as TranslationKey);
-    // The themed dropdown the language picker uses (owner request: a dropdown
-    // rather than a row of segment buttons). Through render(), not
-    // renderInterface(): the dispatcher re-wires the title-bar [data-back]
-    // control the rebuild just destroyed.
+    // The language picker's themed dropdown (owner request, not segment buttons). Through
+    // render(), not renderInterface(): the dispatcher re-wires the title-bar [data-back]
+    // control the rebuild just destroyed. Carries the picker's downward-menu override too.
     const presetDropdown = this.buildDropdown(
       PRESET_ORDER.map((id) => ({ value: id, label: presetLabel(id) })),
       theme.get().preset,
@@ -1562,6 +1551,7 @@ export class OptionsWindow {
       undefined,
       { ariaLabel: t('hudChrome.theme.preset') },
     );
+    presetDropdown.classList.add('set-theme-select');
     presetRow.append(presetName, presetDropdown);
     body.appendChild(presetRow);
 
@@ -1679,11 +1669,13 @@ export class OptionsWindow {
     // tune the party frames (owner request: one labelled subsection), since
     // every non-party knob moved into the editor's Frames Settings menu.
     if (tab === 'frames') {
-      // Frame editing is desktop-only (every gesture refuses touch layouts),
-      // so the touch HUD never offers the entry row; Hud.toggleInterfaceUnlock
-      // refuses on mobile as the backstop.
-      if (!env.touch) buildInterfaceUnlockRow(body, this.deps);
-      this.transferRows(body, 'frames');
+      // Frame editing is desktop-only (every gesture refuses touch layouts), so
+      // the touch HUD offers neither the entry row nor the layout code rows that
+      // carry its saved spots; Hud.toggleInterfaceUnlock refuses as the backstop.
+      // The native shell forces the touch HUD whatever the Interface Mode override
+      // says, so it is gated too (the same union as the Esc menu's row).
+      if (!env.touch && !env.nativeShell) buildInterfaceUnlockRow(body, this.deps);
+      if (!env.touch && !env.nativeShell) this.transferRows(body, 'frames');
       subhead(body, t('hudChrome.partyFrames.optionsSection'), 'set-subhead');
     }
 
@@ -2625,15 +2617,13 @@ export class OptionsWindow {
     note.className = 'kb-note';
     note.textContent = this.keybindNote || t('hud.options.keybindHelpMouseCamera');
     scroll.appendChild(note);
-    // Mouse buttons bind like keys (src/game/mouse_binds.ts); say so once here
-    // rather than rewording every capture prompt. Pointless on touch, which has
-    // no mouse, so it follows the same useTouchInterface() gate the rest of the
-    // desktop-only rows use.
-    if (!useTouchInterface()) {
-      const mouseNote = document.createElement('div');
-      mouseNote.className = 'kb-note';
-      mouseNote.textContent = t('hudChrome.keybinds.mouseHint');
-      scroll.appendChild(mouseNote);
+    // Mouse buttons and the wheel bind like keys; say so once here rather than
+    // rewording every capture prompt (keybind_device_notes_core.ts owns the list).
+    for (const key of keybindDeviceNoteKeys(useTouchInterface())) {
+      const deviceNote = document.createElement('div');
+      deviceNote.className = 'kb-note';
+      deviceNote.textContent = t(key);
+      scroll.appendChild(deviceNote);
     }
     // The Attack Move key is only meaningful (and only rebindable) while its mode
     // is on; otherwise hide its row so it can't shadow Turn Left's A in the list.
@@ -2833,8 +2823,9 @@ export class OptionsWindow {
       });
       this.deps.refreshKeybindLabels();
       this.keyboardWindow.repaint();
-    } else if (isReservedCode(code)) {
-      this.keybindNote = t('hud.options.keybindReserved', { key: keyLabel(code) });
+    } else {
+      const refusal = keybindRefusalNote(bindRefusalReason(actionId, code), keyLabel(code));
+      if (refusal) this.keybindNote = t(refusal.key, refusal.params);
     }
   }
 }

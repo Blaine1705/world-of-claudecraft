@@ -15,7 +15,10 @@ import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
-import { offhandMirrorsWeaponSkin } from '../../sim/content/weapon_skin_rules';
+import {
+  mainhandShowsWeaponSkin,
+  offhandMirrorsWeaponSkin,
+} from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import { retryDelayMs as gltfRetryDelayMs } from '../assets/load_retry';
 import { loadGltf, loadKtx2Texture, loadTexture } from '../assets/loader';
@@ -476,8 +479,12 @@ function swapAttachDef(
   // body that a hunter can wear, so a drawn bow must move to the left handslot
   // (the front arm) on it exactly as it does on the hunter rig. Keyed off the
   // RESIDENT skin url, so a skin still streaming leaves the equipped item's
-  // model in its authored hand rather than relocating a sword.
-  const skinUrl = residentOrEnsure(weaponSkinModelUrl(weaponSkinId));
+  // model in its authored hand rather than relocating a sword. A melee skin
+  // dresses this hand only while it holds the skin's weapon type (the pure
+  // rule): a dagger mainhand beside a skinned offhand mace keeps its dagger.
+  const skinUrl = mainhandShowsWeaponSkin(weaponSkinId, weaponItemId)
+    ? residentOrEnsure(weaponSkinModelUrl(weaponSkinId))
+    : null;
   if (skinUrl) {
     const skin = weaponSkinId ? WEAPON_SKINS[weaponSkinId] : null;
     const bone = skin ? weaponSkinAttachBone(weaponSkinHandling(skin), base.bone) : base.bone;
@@ -1758,8 +1765,12 @@ function attachAllProps(
   // A skin mirrored onto the offhand rides the same rarity-VFX + material path as
   // the mainhand skin, so its payload joins the returned set (the caller runs the
   // VFX/isolation pass over these). A plain offhand (shield/held-offhand/different
-  // -type weapon) stays out, untouched.
+  // -type weapon) stays out, untouched. The mainhand joins that set only while it
+  // shows the skin itself (a melee skin held in the offhand alone leaves the
+  // mainhand's own item model out of the VFX pass); a bare rig with no skin
+  // keeps returning every weapon payload, as before.
   const offhandSkinned = offhandMirrorsWeaponSkin(weaponSkinId, offhandItemId);
+  const mainhandSkinned = !weaponSkinId || mainhandShowsWeaponSkin(weaponSkinId, weaponItemId);
   const payloads: THREE.Object3D[] = [];
   for (let i = 0; i < attachments.length; i++) {
     const base = attachments[i];
@@ -1776,7 +1787,7 @@ function attachAllProps(
     if (!bone) continue;
     const swapKind = isOffhandSwap ? 'offhand' : isWeapon ? 'mainhand' : null;
     const payload = attachProp(root, bone, att, swapKind, stowed);
-    if (isWeapon || (isOffhandSwap && offhandSkinned)) payloads.push(payload);
+    if ((isWeapon && mainhandSkinned) || (isOffhandSwap && offhandSkinned)) payloads.push(payload);
   }
   return payloads;
 }
@@ -2003,6 +2014,29 @@ export function releaseTintedMaterials(claims: Iterable<string>): void {
   for (const key of claims) matCache.release(key);
 }
 
+/** The click-capsule cap ordinary defs get: a footprint-derived radius never
+ *  grows past this, so a huge model cannot swallow its neighbours' clicks. */
+export const CLICK_RADIUS_CAP = 2.2;
+/** ...and the floor, so a sliver of a model still takes a click. */
+export const CLICK_RADIUS_FLOOR = 0.5;
+
+/**
+ * The click-capsule radius for a def: its explicit `clickRadius` override
+ * when set (uncapped, presentation-only targeting help), otherwise 0.9 of
+ * the normalized footprint clamped to [CLICK_RADIUS_FLOOR, CLICK_RADIUS_CAP].
+ * Pure, so the override arm is unit-tested without a loaded GLB.
+ */
+export function resolveClickRadius(
+  def: Pick<VisualDef, 'clickRadius'>,
+  footprintRadius: number,
+  normScale: number,
+): number {
+  return (
+    def.clickRadius ??
+    Math.min(CLICK_RADIUS_CAP, Math.max(CLICK_RADIUS_FLOOR, footprintRadius * normScale * 0.9))
+  );
+}
+
 /** Which mesh family mounts a tinted clone. The far LOD gets its OWN clone
  *  objects (same inputs, separate cache entry): three's compileAsync waits on
  *  a material's `currentProgram`, the variant its LAST draw or compile picked,
@@ -2050,7 +2084,7 @@ export function tintedMaterial(
   // no GLB is shared across matte and non-matte defs today, and keying on
   // the derivation INPUTS keeps the key honest if the derivation changes.
   // authored partitions it too, and that one IS load-bearing on a shared GLB:
-  // mob_wolf (authoredAtlas) and the druid form_cat (never flagged) both load
+  // mob_wolf (authoredAtlas) and form_ghost_wolf (never flagged) both load
   // wolf_basic.glb and reach here with the same source uuid. Without the
   // suffix, whichever derived first would hand its Lambert clone to the
   // other, and the low-tier emissiveMap would land on a player form
@@ -2208,7 +2242,12 @@ function buildTintedClone(
     }
     if (selfIllumination > 0 && std.map && !std.emissiveMap) {
       std.emissiveMap = std.map;
-      std.emissive.set(0xffffff);
+      // The lift follows the albedo the def asked for: a tinted body (the
+      // Bone Spike's ember recolour) glows in its tinted colour, since a
+      // white lift would add the atlas's own hue back and wash the recolour
+      // out; an untinted body keeps the white, atlas-scaled lift it always had.
+      if (tint !== null) std.emissive.copy(mat.color);
+      else std.emissive.set(0xffffff);
       std.emissiveIntensity = selfIllumination;
       std.needsUpdate = true;
     }
@@ -2491,12 +2530,10 @@ export function prepareVisual(key: string): PreparedVisual {
   const rawHeight = Math.max(1e-3, bounds.max.y - bounds.min.y);
   const normScale = def.height / rawHeight;
   const yOffset = (def.hover ?? 0) - bounds.min.y * normScale;
-  const clickRadius = Math.min(
-    2.2,
-    Math.max(
-      0.5,
-      Math.max(bounds.max.x, -bounds.min.x, bounds.max.z, -bounds.min.z) * normScale * 0.9,
-    ),
+  const clickRadius = resolveClickRadius(
+    def,
+    Math.max(bounds.max.x, -bounds.min.x, bounds.max.z, -bounds.min.z),
+    normScale,
   );
 
   const norm = new THREE.Matrix4()

@@ -116,7 +116,12 @@ describe('painter hygiene', () => {
     const start = painter.indexOf('private pruneWatchedIfStale(');
     expect(start).toBeGreaterThan(-1);
     const body = painter.slice(start, painter.indexOf('private ensureWatchLoaded(', start));
+    // The prune stays keyed on THIS character's own earns: a deed an alt earned
+    // is still watchable and trackable here (the jump category reads the union).
     expect(body).toContain('pruneWatched(this.watchedSet, this.deps.world().deedsEarned, DEEDS)');
+    expect(painter).toContain(
+      'accountEarnedDays(world.deedsEarned, { deeds: world.accountDeeds })',
+    );
     expect(body).toContain('this.watchRev++;');
     expect(body).toContain('this.persistWatched();');
     expect(body).toContain('this.deps.onWatchChanged();');
@@ -149,8 +154,10 @@ describe('hud wiring', () => {
     // which drive the painter with a descriptor the call site builds here: drop
     // either line and the picker changes nothing on screen with every test green.
     expect(hud).toContain('playerFrame.borderSlug = deedBorderSlug(sim.activeBorder);');
-    expect(hud).toContain(
-      'targetFrame.borderSlug = deedTargetBorderSlug(target.kind, target.border ?? null);',
+    // The target fill lives in src/ui/target_frame_descriptor.ts (called from hud.ts).
+    expect(hud).toContain('const targetFrame = fillTargetFrameDescriptor(');
+    expect(read('../src/ui/target_frame_descriptor.ts')).toContain(
+      'd.borderSlug = deedTargetBorderSlug(target.kind, target.border ?? null);',
     );
     // The painter can only write the ring on a frame it was handed.
     expect(hud).toContain("private pfPortraitWrapEl = $('#pf-portrait-wrap');");
@@ -588,7 +595,8 @@ describe('hud wiring', () => {
     expect(progressionView).toMatch(
       /class="ms-badge ms-deed-border\$\{worn \? ' ms-active' : ''\}"/,
     );
-    expect(progressionView).toMatch(/reward\?\.kind === 'border' && sim\.deedsEarned\.has\(id\)/);
+    // Account-wide: the badge row filters through the ledger union.
+    expect(progressionView).toMatch(/reward\?\.kind === 'border' && earnedBorders\.has\(id\)/);
     // The WORN badge is state, not decoration: it is picked by comparing deed
     // ids against the facet read, and it says so in its own LABEL rather than
     // leaning on the ms-active colour alone (WCAG 1.4.1).
@@ -689,18 +697,21 @@ describe('tracker accessibility (quest-tracker contract)', () => {
     expect(tracker).toMatch(/dt-bar ui-bar" aria-hidden="true"/);
   });
 
-  it('arms Enter/Space on #deed-tracker, stopped before the game binds hijack them', () => {
+  it('arms Enter/Space on #deed-tracker through the shared tracker-header wiring', () => {
+    // The click plus Enter/Space arms live in src/ui/tracker_header_wiring.ts
+    // (pinned behaviorally in tests/tracker_header_wiring.test.ts); hud.ts
+    // hands it the two actions: the count chip opens the Book on the compact
+    // touch tier, the desktop header toggles the collapse.
     const arm = hud.match(
-      /\$\('#deed-tracker'\)\.addEventListener\('keydown',[\s\S]*?\n {4}\}\);/,
+      /wireTrackerHeader\(\$\('#deed-tracker'\), \{[\s\S]*?\n {4}\}\);/,
     )?.[0] as string;
     expect(arm).toBeTruthy();
-    expect(arm).toContain("if (e.key !== 'Enter' && e.key !== ' ' && e.code !== 'Space') return;");
-    expect(arm).toContain('e.preventDefault();');
-    expect(arm).toContain('e.stopPropagation();');
-    // The same compact-touch branch as the click delegation: the count chip
-    // opens the Book, the desktop header toggles the collapse.
-    expect(arm).toContain('this.openDeeds();');
-    expect(arm).toContain('this.toggleDeedTrackerCollapsed();');
+    expect(arm).toContain('toggle: () => this.toggleDeedTrackerCollapsed(),');
+    expect(arm).toContain('isCompact: compactTouch,');
+    expect(arm).toContain('openCompact: () => this.openDeeds(),');
+    expect(hud).toMatch(
+      /const compactTouch = \(\): boolean =>\s*document\.body\.classList\.contains\('mobile-touch'\) &&\s*document\.body\.classList\.contains\('hud-mobile-compact'\);/,
+    );
   });
 
   it('paints the gold focus ring on the focused header', () => {
@@ -813,9 +824,9 @@ describe('mobile layout (hud.mobile.css)', () => {
       /body\.mobile-touch #deed-tracker \.dt-list \{\s*max-height: 88px;\s*overflow: hidden;/,
     );
     // The hud delegation: compact touch tap opens the window, desktop keeps
-    // the collapse toggle.
+    // the collapse toggle (the shared wiring's openCompact/toggle pair).
     expect(hud).toMatch(
-      /body\.contains\('mobile-touch'\) && body\.contains\('hud-mobile-compact'\)[\s\S]{0,80}?this\.openDeeds\(\);/,
+      /toggle: \(\) => this\.toggleDeedTrackerCollapsed\(\),\s*isCompact: compactTouch,\s*openCompact: \(\) => this\.openDeeds\(\),/,
     );
   });
 });

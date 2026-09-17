@@ -8,6 +8,8 @@
 // procs retain their trigger, dead-target, and duel-end grace guards BEFORE their
 // rng draws. The self-only melee enchant rolls separately on a landed melee hit,
 // including a killing blow; no living primary target is required for that buff.
+// Each hand rolls at its own weapon's speed, but both hands feed ONE buff (one
+// aura id per enchant), so a second trigger refreshes rather than stacks.
 //
 // src/sim-pure: reaches Sim only through SimContext (rng/emit/applyAura/dealDamage/
 // hostilesInRadius); no DOM/Three/Math.random.
@@ -75,14 +77,19 @@ export function runWeaponProcs(
   const enchant = enchantId ? ENCHANTS[enchantId] : undefined;
   const enchantProc = enchant?.weaponProc;
   if (!enchant || !enchantProc) return;
-  // Wolf Form has a fixed natural cadence; a slow carried stat stick must not
+  // Cat Form has a fixed natural cadence; a slow carried stat stick must not
   // multiply its proc frequency. Bear and ordinary swings keep item base speed.
   const baseSpeed =
     meleeHand === 'mainhand' && isCatForm(wielder) ? baseSwingSpeed(wielder) : item.weapon.speed;
   const chance = Math.min(1, Math.max(0, (enchantProc.ppm * baseSpeed) / 60));
   if (!ctx.rng.chance(chance)) return;
+  // ONE buff per wielder, keyed by the enchant alone: a dual-wielder with both
+  // weapons enchanted must never stack two copies (the v0.42 live bug, where a
+  // per-hand id suffix let the two hands grant 100 Strength together). Either
+  // hand's trigger lands on the same id, which applyAura treats as a REFRESH
+  // (timer back to full, no second application, `refresh: true` on the event).
   ctx.applyAura(wielder, {
-    id: `${enchant.id}_${meleeHand}`,
+    id: enchant.id,
     name: enchant.name,
     kind: 'buff_str',
     value: enchantProc.strength,
