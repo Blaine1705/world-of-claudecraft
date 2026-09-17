@@ -6999,7 +6999,7 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The faction standing (fac) and daily reroll (wqrr, wqrep) owner keys, for 103.
     // The Regional Mastery per-zone completion counts key wqzc, for 104.
     expect(ALL_DELTA_KEYS).toHaveLength(106);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(104);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(106);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
