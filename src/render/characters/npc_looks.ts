@@ -1985,7 +1985,7 @@ export const NPC_LOOKS: Record<string, NpcLookDef> = {
     worn: kit('ranger'),
     props: 'spear',
   },
-  // Templar Liora (Church Order, the Eastbrook chapel): gilded paladin plate,
+  // Templar Althea (Church Order, the Eastbrook chapel): gilded paladin plate,
   // braided crown, a calm smile; sword and shield of the Dawn.
   npc_church_order_quartermaster: {
     app: {
@@ -2004,7 +2004,7 @@ export const NPC_LOOKS: Record<string, NpcLookDef> = {
     worn: kit('paladin'),
     props: 'sword_shield',
   },
-  // Artificer Kael (Automatons, Wyrmwatch): soot-dark hair swept back, a
+  // Artificer Zarek (Automatons, Wyrmwatch): soot-dark hair swept back, a
   // verdigris smith's kit with the sleeves rolled, hammer in hand.
   npc_automaton_quartermaster: {
     app: {

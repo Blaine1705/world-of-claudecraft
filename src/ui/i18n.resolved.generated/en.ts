@@ -18531,12 +18531,12 @@ export const en: EnTranslations = {
         "greeting": "The Rift Watch protects the shore and watches the deep tears. Our stores are open to those of recognized standing."
       },
       "npc_church_order_quartermaster": {
-        "name": "Templar Liora",
+        "name": "Templar Althea",
         "title": "Church Order Quartermaster",
         "greeting": "Walk in the Light of the Dawn. The Church Order supplies those who stand with us in service."
       },
       "npc_automaton_quartermaster": {
-        "name": "Artificer Kael",
+        "name": "Artificer Zarek",
         "title": "Automaton Requisitioner",
         "greeting": "Precision gears, forged steel, and calibrated power. Authorized operators may draw from our inventory."
       },

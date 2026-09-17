@@ -24,13 +24,13 @@ describe('Faction Vendors & Reroll NPC content', () => {
 
     const qmChurch = NPCS.npc_church_order_quartermaster;
     expect(qmChurch).toBeDefined();
-    expect(qmChurch.name).toBe('Templar Liora');
+    expect(qmChurch.name).toBe('Templar Althea');
     expect(qmChurch.title).toBe('Church Order Quartermaster');
     expect(qmChurch.vendorItems?.length).toBe(5);
 
     const qmAuto = NPCS.npc_automaton_quartermaster;
     expect(qmAuto).toBeDefined();
-    expect(qmAuto.name).toBe('Artificer Kael');
+    expect(qmAuto.name).toBe('Artificer Zarek');
     expect(qmAuto.title).toBe('Automaton Requisitioner');
     expect(qmAuto.vendorItems?.length).toBe(5);
 

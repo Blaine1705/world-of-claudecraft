@@ -17147,11 +17147,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.npc_rift_watch_quartermaster.title': '裂け目の監視団の補給係',
   'entities.npcs.npc_rift_watch_quartermaster.greeting':
     '裂け目の監視団は岸を守り、深き裂け目を見張っている。我らの物資は、認められた地位を持つ者に開かれている。',
-  'entities.npcs.npc_church_order_quartermaster.name': 'テンプラー・リオラ',
+  'entities.npcs.npc_church_order_quartermaster.name': 'テンプラー・アルセア',
   'entities.npcs.npc_church_order_quartermaster.title': '教団の需品係',
   'entities.npcs.npc_church_order_quartermaster.greeting':
     '暁の光の中を歩め。教団は我らと共に仕える者に物資を供する。',
-  'entities.npcs.npc_automaton_quartermaster.name': '工匠ケイル',
+  'entities.npcs.npc_automaton_quartermaster.name': '工匠ザレク',
   'entities.npcs.npc_automaton_quartermaster.title': 'オートマトンの調達官',
   'entities.npcs.npc_automaton_quartermaster.greeting':
     '精密な歯車、鍛えた鋼、調整済みの動力。認可された操作者は我らの在庫から受け取れる。',
