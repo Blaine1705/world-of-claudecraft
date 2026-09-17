@@ -11,7 +11,14 @@
 import type { Entity } from '../types';
 
 /** Snap an immobile mob onto its spawn point. Returns false, touching nothing,
- *  for a mob that can walk (it takes the normal evade walk instead). */
+ *  for a mob that can walk (it takes the normal evade walk instead).
+ *
+ *  The guard reads the LIVE moveSpeed on purpose: "a zero step never arrives"
+ *  is a fact about the speed the walk would use, not about the template.
+ *  Slows go through moveSpeedMult, so today only an authored 0 reaches it.
+ *  spawnPos.y is kept as is (camp spawns already sit on groundHeight, and an
+ *  instance spawn's y is not a world ground sample), and the spatial grid
+ *  re-buckets at the end of the tick like every other in-tick teleport. */
 export function immobileEvadeSnapsHome(mob: Entity): boolean {
   if (mob.moveSpeed > 0) return false;
   mob.pos = { ...mob.spawnPos };
