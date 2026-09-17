@@ -476,7 +476,13 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned on feature/wq-standing-online: the map rail and Reputation tab
     // wiring (11 lines) was paid for by lifting the map zone focus rule into
     // hud/map/map_zone_focus_core.ts; exact merged count.
-    ceiling: 18301,
+    // RE-PINNED at the merge of release/v0.43.0 (tip f48bebefcb) into
+    // feature/world-quests (the standing and quartermaster round). BOTH parent
+    // pins for the record: ours 18301, the release 18309. The release side's
+    // Unlock Interface menu row and touch engine-indicator drag land +4 on the
+    // coordinator, so the merged file measures 18305 (wc -l < src/ui/hud.ts).
+    // Exact merged count, zero slack.
+    ceiling: 18305,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
