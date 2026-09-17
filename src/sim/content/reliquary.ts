@@ -438,6 +438,11 @@ export const RELIQUARY_HORIZON_TITLES = [
   // docs/prd/ignivar-raid-loot.md): every non-hidden title deed pages here
   // per the locked titles-page rule.
   'dgn_varkhul_flawless',
+  // The faction standing Champion titles (world quests): the three vanguard
+  // flavor titles page here per the locked titles-page rule.
+  'prog_rift_watch_champion',
+  'prog_church_order_champion',
+  'prog_automatons_champion',
 ] as const;
 
 // Profession lifetime mark ids (Phase 7). Prefer existing visited namespaces

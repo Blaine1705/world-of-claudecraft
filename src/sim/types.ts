@@ -8985,7 +8985,13 @@ export type DeedMeterId =
   | 'poorItemsDiscoveredCount'
   // Career Honor earned, never spent: PlayerMeta.lifetimeHonor is monotonic, so
   // spending at the WARFARE quartermaster can never cost a rank title.
-  | 'lifetimeHonor';
+  | 'lifetimeHonor'
+  // Faction standing (PlayerMeta.factions, src/sim/factions.ts): one meter
+  // per allied faction. awardFactionReputation only ever adds, so a standing
+  // tier once reached is never lost.
+  | 'standingRiftWatch'
+  | 'standingChurchOrder'
+  | 'standingAutomatons';
 
 // Boolean predicates over already-persisted state (see the flag table in
 // deeds.ts). Like meters, they retro-grant on load.

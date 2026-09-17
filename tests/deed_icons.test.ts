@@ -372,10 +372,12 @@ describe('Book of Deeds webp icons', () => {
     // The self-crafted hammer's hidden celebration adds one explicit pending crest.
     // The world-quest branch's eight exploration deeds join the pending set on
     // category crests at the release/v0.43.0 merge: 308 live, 289 painted.
-    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(308);
+    // The seven faction standing progression deeds join the pending set on
+    // the progression crest: 315 live, still 289 painted.
+    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(315);
     expect(DEED_IMAGE_IDS.size, 'every live deed but the pending set is painted').toBe(289);
-    expect(DEED_ART_PENDING_IDS).toHaveLength(19);
-    expect(DEED_ART_PENDING_IDS.at(-1)).toBe('exp_wisp_maze');
+    expect(DEED_ART_PENDING_IDS).toHaveLength(26);
+    expect(DEED_ART_PENDING_IDS.at(-1)).toBe('prog_faction_champion_all');
     expect(DEED_ORDER.length - DEED_IMAGE_IDS.size).toBe(DEED_ART_PENDING_IDS.length);
     for (const id of artless) {
       const catCrestId = deedCrestId(id, DEEDS[id].category);

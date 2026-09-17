@@ -8,6 +8,7 @@
 // persisted in character saves and, later, on Steam, where API names are
 // stable forever).
 
+import { STANDING_THRESHOLDS } from '../factions';
 import type { DeedDef } from '../types';
 import { FARM_CROP_IDS } from './farm_crops';
 
@@ -3457,6 +3458,89 @@ export const DEEDS: Record<string, DeedDef> = {
     category: 'exploration',
     renown: 5,
     trigger: { kind: 'manual' },
+  },
+  // Faction standing (world quests): one Trusted and one Champion deed per
+  // allied faction, the exact shape of the WARFARE lifetime-honor ladder
+  // above. Each meter reads PlayerMeta.factions, which awardFactionReputation
+  // only ever grows, so a tier once reached is never lost and a veteran who
+  // reached it before these deeds shipped is credited by the join-time retro
+  // pass. Amounts are the live STANDING_THRESHOLDS, so the deed can never
+  // drift from the quartermasters' standing gates. The Champion titles are
+  // the factions' vanguard flavor titles (FACTION_TIER_TITLES): the top of
+  // each standing ladder is the one place a player can wear them.
+  prog_rift_watch_trusted: {
+    id: 'prog_rift_watch_trusted',
+    name: 'Trusted by the Rift Watch',
+    desc: 'Reach Trusted standing with the Rift Watch.',
+    category: 'progression',
+    renown: 5,
+    trigger: { kind: 'meter', meter: 'standingRiftWatch', amount: STANDING_THRESHOLDS.trusted },
+  },
+  prog_church_order_trusted: {
+    id: 'prog_church_order_trusted',
+    name: 'Trusted by the Church Order',
+    desc: 'Reach Trusted standing with the Church Order.',
+    category: 'progression',
+    renown: 5,
+    trigger: {
+      kind: 'meter',
+      meter: 'standingChurchOrder',
+      amount: STANDING_THRESHOLDS.trusted,
+    },
+  },
+  prog_automatons_trusted: {
+    id: 'prog_automatons_trusted',
+    name: 'Trusted by the Automatons',
+    desc: 'Reach Trusted standing with the Automatons.',
+    category: 'progression',
+    renown: 5,
+    trigger: { kind: 'meter', meter: 'standingAutomatons', amount: STANDING_THRESHOLDS.trusted },
+  },
+  prog_rift_watch_champion: {
+    id: 'prog_rift_watch_champion',
+    name: 'Champion of the Rift Watch',
+    desc: 'Reach Champion standing with the Rift Watch.',
+    category: 'progression',
+    renown: 25,
+    trigger: { kind: 'meter', meter: 'standingRiftWatch', amount: STANDING_THRESHOLDS.champion },
+    reward: { kind: 'title', text: 'Riftwarden' },
+  },
+  prog_church_order_champion: {
+    id: 'prog_church_order_champion',
+    name: 'Champion of the Church Order',
+    desc: 'Reach Champion standing with the Church Order.',
+    category: 'progression',
+    renown: 25,
+    trigger: {
+      kind: 'meter',
+      meter: 'standingChurchOrder',
+      amount: STANDING_THRESHOLDS.champion,
+    },
+    reward: { kind: 'title', text: 'Dawnkeeper' },
+  },
+  prog_automatons_champion: {
+    id: 'prog_automatons_champion',
+    name: 'Champion of the Automatons',
+    desc: 'Reach Champion standing with the Automatons.',
+    category: 'progression',
+    renown: 25,
+    trigger: { kind: 'meter', meter: 'standingAutomatons', amount: STANDING_THRESHOLDS.champion },
+    reward: { kind: 'title', text: 'Forgemaster' },
+  },
+  prog_faction_champion_all: {
+    id: 'prog_faction_champion_all',
+    name: 'Champion of Every Banner',
+    desc: 'Reach Champion standing with the Rift Watch, the Church Order and the Automatons.',
+    category: 'progression',
+    renown: 50,
+    trigger: {
+      kind: 'meta',
+      deedIds: [
+        'prog_rift_watch_champion',
+        'prog_church_order_champion',
+        'prog_automatons_champion',
+      ],
+    },
   },
 };
 

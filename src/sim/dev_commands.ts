@@ -275,6 +275,9 @@ export function handleDevChat(
     }
     for (const factionId of factionIds) {
       const result = awardFactionReputation(meta, factionId, Number(repMatch[2]), player.level);
+      // Same full-pass mark the world-quest turn-in requests, so the standing
+      // deeds grant on the tick the cheat crosses a tier.
+      if (result.gained > 0) ctx.markDeedsDirty(pid);
       emitDevLog(
         ctx,
         pid,

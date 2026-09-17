@@ -458,8 +458,9 @@ describe('Reliquary Conqueror catalog structure', () => {
     // on the merged tree. UNION MERGE: base plus both deltas, the professions
     // and release branches content is disjoint.
     // The world-quest branch's Arcane Calligraphy gold title joins the titles
-    // page at the release/v0.43.0 merge: 441.
-    expect(full).toEqual({ owned: 441, total: 441 });
+    // page at the release/v0.43.0 merge: 441. The three faction standing
+    // Champion titles (Riftwarden, Dawnkeeper, Forgemaster) join it: 444.
+    expect(full).toEqual({ owned: 444, total: 444 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -488,7 +489,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // above: 416, MEASURED on the merged tree. UNION MERGE: base plus both
     // deltas, see the overview pair's note above.
     // 412 at the release/v0.43.0 merge: the Arcane Calligraphy gold title slot.
-    expect(character).toEqual({ owned: 412, total: 412 });
+    // 415 with the three faction standing Champion title slots.
+    expect(character).toEqual({ owned: 415, total: 415 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -538,11 +540,12 @@ describe('Reliquary Conqueror catalog structure', () => {
     // horizons_mounts slots (goblin_rocket_sled, rallycart_rxt): 488,
     // MEASURED on the merged tree. UNION MERGE: base plus both deltas, see
     // the completion pair note above. The Arcane Calligraphy gold title adds
-    // one titles-page slot at the release/v0.43.0 merge into feature/world-quests.
+    // one titles-page slot at the release/v0.43.0 merge into feature/world-quests:
+    // 484. The three faction standing Champion titles add three more: 487.
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(484);
+    ).toBe(487);
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -3053,8 +3056,9 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // Every title relic's source is its own deed, so the count tracks the page
   // rows: 36 + the four Phase 18 completion-ladder titles + the Grandmaster
   // Jewelcrafting and Inscription titles + the farming Harvestmaster + the
-  // Crucible raid's flawless title.
-  horizons_titles: 45,
+  // Crucible raid's flawless title + the three faction standing Champion
+  // titles.
+  horizons_titles: 48,
   // 29 = 27 distinct rift mobs across the ten rare multi-hints (eight theme
   // bosses + both citadel bosses + 17 trash carriers), plus the B and S rank
   // doors. The rift_first_clear activity left with the bands.

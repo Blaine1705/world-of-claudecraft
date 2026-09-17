@@ -580,6 +580,9 @@ export function awardWorldQuest(ctx: SimContext, meta: PlayerMeta, quest: WorldQ
   const standingAward = worldQuestStandingReward(quest, player.level);
   const standingResult = awardFactionReputation(meta, factionId, standingAward, player.level);
   if (standingResult.gained > 0) {
+    // Standing feeds the prog_<faction>_* meter deeds; no narrow key covers
+    // PlayerMeta.factions, so the award site requests a full pass.
+    ctx.markDeedsDirty(meta.entityId);
     ctx.emit({
       type: 'loot',
       text: `+${standingResult.gained} ${factionDisplayName(factionId)} Standing.`,

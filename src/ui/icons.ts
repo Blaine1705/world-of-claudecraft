@@ -5546,6 +5546,14 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'exp_windrider_slalom',
   'exp_duskweave_dispatches',
   'exp_wisp_maze',
+  // Faction standing deeds use the progression category crest pending art.
+  'prog_rift_watch_trusted',
+  'prog_church_order_trusted',
+  'prog_automatons_trusted',
+  'prog_rift_watch_champion',
+  'prog_church_order_champion',
+  'prog_automatons_champion',
+  'prog_faction_champion_all',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

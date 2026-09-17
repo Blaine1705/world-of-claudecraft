@@ -90,12 +90,16 @@ describe('deed_i18n English resolution', () => {
     // chain read 282 * 2 + 43), so the title count stays at 46.
     // Retired Vale Cup and Fiesta deeds keep names but drop 19 descriptions.
     // 308 at the release/v0.43.0 merge: plus the eight world-quest deeds.
-    expect(manifest.filter((row) => row.field === 'name').length).toBe(308);
+    // 315 with the seven faction standing deeds (Trusted and Champion per
+    // allied faction plus the all-factions meta), each with a name and desc.
+    expect(manifest.filter((row) => row.field === 'name').length).toBe(315);
     // 289 descs at the release/v0.43.0 merge: plus the eight world-quest deeds.
-    expect(manifest.filter((row) => row.field === 'desc').length).toBe(289);
-    // 644 rows at the release/v0.43.0 merge: 308 names + 289 descs + 47 titles.
-    expect(manifest.length).toBe(644);
-    expect(manifest.filter((row) => row.field === 'title').length).toBe(47);
+    // 296 with the seven faction standing deeds.
+    expect(manifest.filter((row) => row.field === 'desc').length).toBe(296);
+    // 661 rows: 315 names + 296 descs + 50 titles (the three faction Champion
+    // titles Riftwarden, Dawnkeeper and Forgemaster join the 47).
+    expect(manifest.length).toBe(661);
+    expect(manifest.filter((row) => row.field === 'title').length).toBe(50);
     expect(manifest.filter((row) => row.id === 'hid_forgebreaker')).toEqual([
       { id: 'hid_forgebreaker', field: 'name', source: 'A Spring Unchained' },
       {
