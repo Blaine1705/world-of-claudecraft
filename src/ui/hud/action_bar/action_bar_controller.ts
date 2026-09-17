@@ -71,6 +71,12 @@ export interface ActionBarControllerDeps {
   // save. Optional so an offline/test controller with no server persistence just
   // skips it and keeps its byte-identical localStorage behavior.
   persistLayout?(profile: ActionBarLayoutProfile, layout: ActionBarLayout): void;
+  // True while this session views ANOTHER character (a moderator's /spectate):
+  // the live deps above (spec, level, known abilities) then describe the
+  // watched character, not the owner of this bar. Every per-frame sync freezes
+  // until the view returns, so a foreign kit never prunes, re-seeds, or uploads
+  // the moderator's own layout. Absent means never spectating (offline, tests).
+  spectating?(): boolean;
 }
 
 /** Owns action-bar pages, migrations, persistence, and attack-slot assignment. */
@@ -202,6 +208,7 @@ export class ActionBarController {
    *  the bar in view, never uploaded (the "follow until edited" rule). Later
    *  activations reload the profile's own keys. Returns true on a switch. */
   syncProfile(): boolean {
+    if (this.isSpectating()) return false;
     const next = this.resolveProfile();
     if (next === this.activeProfile) return false;
     // Flush the outgoing profile to storage, as a form swap does, so an
@@ -291,6 +298,7 @@ export class ActionBarController {
   }
 
   syncActiveForm(): boolean {
+    if (this.isSpectating()) return false;
     const next = this.resolveActiveForm();
     if (next === this.activeFormState) return false;
     this.saveActions();
@@ -306,6 +314,7 @@ export class ActionBarController {
   }
 
   syncSpec(): boolean {
+    if (this.isSpectating()) return false;
     const next = this.deps.talentSpec();
     if (next === this.activeSpecState) return false;
     this.saveActions();
@@ -318,6 +327,7 @@ export class ActionBarController {
   }
 
   syncKnownAbilities(): void {
+    if (this.isSpectating()) return;
     const liveKnownAbilityIds = [...this.deps.knownAbilityIds()];
     if (
       this.pendingLoadoutKnownAbilityIds &&
@@ -380,6 +390,10 @@ export class ActionBarController {
     this.knownAbilityIdsAtLastSync = knownAbilityIdSet;
     this.talentSpecAtLastSync = talentSpec;
     this.playerLevelAtLastSync = playerLevel;
+  }
+
+  private isSpectating(): boolean {
+    return this.deps.spectating?.() === true;
   }
 
   private trySeedOwnedSpecDefault(

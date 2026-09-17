@@ -1427,3 +1427,90 @@ describe('ActionBarController per-spec action bar memory and talent choice swaps
     expect(controller.attackAction).toEqual({ type: 'ability', id: 'frostbolt' });
   });
 });
+
+describe('ActionBarController while spectating (/spectate, /unspectate)', () => {
+  // A moderator's IWorld deps (spec, level, known abilities) follow the
+  // SPECTATED character for the whole spectate window, so every per-frame sync
+  // sees a foreign kit. The controller must freeze until the view returns.
+  function spectateHarness(): {
+    controller: ActionBarController;
+    storage: MemoryStorage;
+    persisted: ActionBarLayoutSave[];
+    state: { spec: string | null; known: string[]; spectating: string | null };
+  } {
+    const storage = new MemoryStorage();
+    const persisted: ActionBarLayoutSave[] = [];
+    const state = {
+      spec: 'arms' as string | null,
+      known: ['heroic_strike', 'sunder_armor', 'charge'],
+      spectating: null as string | null,
+    };
+    const controller = new ActionBarController({
+      storage,
+      playerClass: 'warrior',
+      playerName: 'ActionbarTester',
+      playerLevel: () => 20,
+      talentSpec: () => state.spec,
+      knownAbilityIds: () => state.known,
+      hasAura: () => false,
+      showAttackButton: () => true,
+      spectating: () => state.spectating !== null,
+      persistLayout: (profile, layout) => persisted.push({ profile, layout }),
+    });
+    return { controller, storage, persisted, state };
+  }
+
+  function frame(controller: ActionBarController): void {
+    controller.syncProfile();
+    controller.syncSpec();
+    controller.syncActiveForm();
+    controller.syncKnownAbilities();
+  }
+
+  it('keeps the moderator bar intact through a spectate of another class and back', () => {
+    const { controller, persisted, state } = spectateHarness();
+    controller.init();
+    frame(controller);
+    const own = bar('charge', 'heroic_strike', 'sunder_armor');
+    controller.replaceActions(own);
+    controller.saveActions();
+    persisted.length = 0;
+
+    // /spectate: the self view becomes a mage's spec and kit.
+    state.spectating = 'Watched';
+    state.spec = 'fire';
+    state.known = ['fireball', 'frostbolt'];
+    for (let i = 0; i < 3; i++) frame(controller);
+
+    expect(controller.actions).toEqual(own);
+    expect(persisted).toEqual([]);
+
+    // /unspectate: the moderator's own kit returns unchanged.
+    state.spectating = null;
+    state.spec = 'arms';
+    state.known = ['heroic_strike', 'sunder_armor', 'charge'];
+    for (let i = 0; i < 3; i++) frame(controller);
+
+    expect(controller.actions).toEqual(own);
+    expect(persisted).toEqual([]);
+  });
+
+  it('still picks up an ability learned after /unspectate', () => {
+    const { controller, state } = spectateHarness();
+    controller.init();
+    frame(controller);
+    controller.replaceActions(bar('charge'));
+    controller.saveActions();
+
+    state.spectating = 'Watched';
+    state.known = ['fireball'];
+    frame(controller);
+    state.spectating = null;
+    state.known = ['heroic_strike', 'sunder_armor', 'charge', 'rend'];
+    frame(controller);
+
+    expect(controller.actions[0]).toEqual({ type: 'ability', id: 'charge' });
+    expect(controller.actions.some((action) => action?.id === 'rend')).toBe(true);
+    expect(controller.actions.some((action) => action?.id === 'fireball')).toBe(false);
+  });
+});
