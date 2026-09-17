@@ -177,6 +177,12 @@ import {
   pushMuteChange,
   pushStrikesChange,
 } from './chat_mod_live';
+import {
+  type ChatRateLimitState,
+  consumeChatToken as consumeChatRateToken,
+  createChatRateLimitState,
+  refundChatToken as refundChatRateToken,
+} from './chat_rate_limit';
 import { chatSenderFlair } from './chat_sender_flair';
 import {
   applyCheaterMarkLive as applyCheaterMarkLiveRuntime,
@@ -503,11 +509,6 @@ const MARKET_WRITE_QUEUE_WARN_DEPTH = 16;
 const IGNORE_USAGE = 'Usage: /ignore <name>, /unignore <name>, /ignorelist.';
 const BLOCK_USAGE = 'Usage: /block <name>, /unblock <name>, /blocklist.';
 
-const CHAT_RATE_BURST = 5;
-const CHAT_RATE_REFILL_PER_SECOND = 1 / 3; // sustained 20 messages/minute
-const CHAT_RATE_ERROR_COOLDOWN_SECONDS = 4;
-const CHAT_COOLDOWN_SECONDS = 20;
-const CHAT_RATE_VIOLATIONS_FOR_COOLDOWN = 3;
 // One live session per account: Ravenpost mail (v0.20.0) moves coin and goods
 // between an account's characters, so the old allowance of a second online
 // character (self-trade by dual-boxing) is no longer needed. GMs are exempt.
@@ -888,7 +889,10 @@ const DAILY_REWARD_ACTIVITY_MS = 60_000;
 const RELAY_COOLDOWN_MS = 8_000; // min gap between a player's "!" community posts
 const ADMIN_LOCATION_POI_RADIUS = 32;
 
-export interface ClientSession extends MovementInputSessionState, HotbarLayoutState {
+export interface ClientSession
+  extends MovementInputSessionState,
+    HotbarLayoutState,
+    ChatRateLimitState {
   ws: WebSocket;
   accountId: number;
   accountCosmetics: AccountCosmetics;
@@ -934,11 +938,6 @@ export interface ClientSession extends MovementInputSessionState, HotbarLayoutSt
   // next to the close/error handlers in ws_auth.ts) clears it. Still set at
   // the next sweep means the socket is black-holed: terminate into the grace.
   awaitingPong: boolean;
-  chatTokens: number;
-  chatLastRefill: number;
-  chatLastRateError: number;
-  chatRateViolations: number;
-  chatCooldownUntil: number;
   // Advances only when rememberedChat is written (rememberChatChannel), so the
   // async General quota path can fence its sticky-channel set against a NEWER
   // channel selection without unrelated commands (/who, /unstuck) tripping it.
@@ -3492,11 +3491,7 @@ export class GameServer {
       linkdead: false,
       graceUntil: 0,
       awaitingPong: false,
-      chatTokens: CHAT_RATE_BURST,
-      chatLastRefill: Date.now() / 1000,
-      chatLastRateError: 0,
-      chatRateViolations: 0,
-      chatCooldownUntil: 0,
+      ...createChatRateLimitState(Date.now() / 1000),
       chatChannelSequence: 0,
       generalChatRateLimit: meta.generalChatRateLimit ?? null,
       msgRate: createMsgRateBucket(Date.now() / 1000),
@@ -9834,62 +9829,15 @@ export class GameServer {
   }
 
   private consumeChatToken(session: ClientSession): boolean {
-    const now = Date.now() / 1000;
-    if (session.chatCooldownUntil > now) {
-      if (now - session.chatLastRateError >= CHAT_RATE_ERROR_COOLDOWN_SECONDS) {
-        session.chatLastRateError = now;
-        const remaining = Math.ceil(session.chatCooldownUntil - now);
-        this.send(session, {
-          t: 'events',
-          list: [{ type: 'error', text: `Chat is on cooldown for ${remaining}s.` }],
-        });
-      }
-      return false;
+    const verdict = consumeChatRateToken(session, Date.now() / 1000);
+    if (verdict.notice !== null) {
+      this.send(session, { t: 'events', list: [{ type: 'error', text: verdict.notice }] });
     }
-    if (session.chatCooldownUntil > 0) {
-      session.chatCooldownUntil = 0;
-      session.chatRateViolations = 0;
-      session.chatTokens = CHAT_RATE_BURST;
-    }
-    const elapsed = Math.max(0, now - session.chatLastRefill);
-    session.chatTokens = Math.min(
-      CHAT_RATE_BURST,
-      session.chatTokens + elapsed * CHAT_RATE_REFILL_PER_SECOND,
-    );
-    session.chatLastRefill = now;
-    if (session.chatTokens >= 1) {
-      session.chatTokens -= 1;
-      session.chatRateViolations = 0;
-      return true;
-    }
-    session.chatRateViolations++;
-    if (session.chatRateViolations >= CHAT_RATE_VIOLATIONS_FOR_COOLDOWN) {
-      session.chatCooldownUntil = now + CHAT_COOLDOWN_SECONDS;
-      session.chatTokens = 0;
-      session.chatLastRateError = now;
-      this.send(session, {
-        t: 'events',
-        list: [
-          {
-            type: 'error',
-            text: `Chat locked for ${CHAT_COOLDOWN_SECONDS}s because you are sending messages too quickly.`,
-          },
-        ],
-      });
-      return false;
-    }
-    if (now - session.chatLastRateError >= CHAT_RATE_ERROR_COOLDOWN_SECONDS) {
-      session.chatLastRateError = now;
-      this.send(session, {
-        t: 'events',
-        list: [{ type: 'error', text: 'You are sending messages too quickly. Slow down.' }],
-      });
-    }
-    return false;
+    return verdict.ok;
   }
 
   private refundChatToken(session: ClientSession): void {
-    session.chatTokens = Math.min(CHAT_RATE_BURST, session.chatTokens + 1);
+    refundChatRateToken(session);
   }
 
   private isChatMuted(session: ClientSession): boolean {
