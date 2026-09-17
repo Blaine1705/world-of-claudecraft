@@ -13,6 +13,8 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.noticeboard.officerEntry': '{name}（{rank}）',
+  'hudChrome.professionTrainers.nameplate': '＜{title}＞',
   'guide.professions.endgameBodyRaidCollections':
     '大师锻造是带有“唯一装备：大师锻造”标记的共同装备家族。旧有的巅峰制作路线仍需寻找图样、制作每日限次的中间材料，并消耗共同的终局材料。熔炉套装则是由团队副本材料支持的独立路线，并非在旧路线之上再加一套费用。两条路线共用最多穿戴两件的限制，因此会竞争配装中的同两个位置。成品在臻至完美或委托绑定该件物品之前都可自由交易。',
   'guide.professions.endgamePatternsBodyCollections':
@@ -27,7 +29,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '附魔分四个层级。基础层级消耗铃音之尘（高端配方还需少量铃音精华），覆盖武器槽、副手以及每一个护甲槽，属性轴选项之丰令每种配装都能在每个槽位找到合适的附魔：盾牌与施法者手持副手有属于自己的耐力附魔，因此没有哪个装备槽是附魔的死角。强效层级每件消耗一个铃音碎片加若干铃音精华：对影响最大的槽位给出更强的加成。碎片此外还有三个去处：两个护符配方各要一个（护符其余的材料是精华和粉尘），工具效果充能的最高一档，以及莹光层级（其中武器附魔与胸甲附魔各要一个，灌注要两个），所以动手花用之前先攒下几个。\n\n夹在两者之间的是五种符文附魔，各对应一种定向副产物，确保你磨出的任何材料都不会白费：符文利刃（武器，力量，消耗共鸣钢材），符文印记（武器，智力，共鸣木材），符文织纹（胸甲，精神，共鸣丝线），符文兽皮（护腿，敏捷，共鸣兽皮），符文锁环（头盔，耐力，共鸣锁环）。每件还各需两个铃音精华；对于同时拥有基础与强效附魔的槽位和属性，符文附魔的加成介于两者之间，唯有符文织纹是迄今最强的胸甲精神附魔，符文兽皮则是唯一的护腿敏捷附魔。确切加成详见下方表格。\n\n在普通低阶附魔之上的是莹光层级，即本行当普通附魔的巅峰之作：那四件需要附魔100，莹光灌注需要125，见下方表格的“技能”一列。每一件都需要一份莹光试剂，并在武器（威力与法术强度两种选择）、胸甲与长靴各自的槽位上再迈出一级。其中最后一件莹光灌注，只会在臻至完美的物品上生效：臻至完美是佩戴者自己的工作，而非附魔师的，物品如何走到那一步由专业页面讲述。\n\n末焰热忱是独立的团队副本配方，并非免费掌握的普通附魔。施加之前，须在附魔技能100时学习这张可交易的配方。每次附魔消耗3个末焰之核和2个铃音碎片；配方可在熔炉掉落，也可向熔炉军需官支付1个末焰之核购买。其近战触发效果与武器速度规则完整列于下方。',
   'guide.profPages.ench.formulaRequired': '需要配方',
   'guide.profPages.econ.provenanceBodyUndiscounted':
-    '有些物品带着名字。素材的来源行会说明是谁采集了每一组单位，若存在高级署名者，则会有单独的署名标记指明其身份。这两个事实相互独立：普通采集素材会记录采集者，却不一定获得署名；旧有的已署名库存可能只写明署名者，同时如实说明未记录采集者。成品则改为说明是谁制作了它。这些记录会随物品经历交易、银行、邮件、世界市场，甚至商人回购而保留，永不褪去。\n\n采集会自动为最佳成果署名：掷出精良及以上品质的收获都会带有署名，稀有发现则为其整份五倍额外收获全部署名。尸体采集触发幸运结果时，如果该分类没有可给出的标本，则为产出署名；如果有标本，则让产出保持无署名，并在旁边额外铸造一个已署名的完美标本。制作遵循相同原则：每件精良及以上的产出都会铸造为已署名，杰作无论品质如何都会署名，因此任何物品的最佳版本都会记录制作者之名。普通素材的署名附着在单位本身上，不会仅因为兼容的堆叠中已经包含另一位采集者或署名者而丢失。独立的完美标本是单独的物品，仍然需要空间；如果放不下，普通的尸体产出会保留，但标本会遗失。\n\n成品保持单一的严格身份，因此两件物品只有在所有标记完全一致时才会合并：同一物品、同一署名者、同一杰作属性、同一附魔、同一绑定。兼容的素材会在不同采集者与署名者之间共用同一个格子，同时为每个来源分别保留数量。悬停提示会概括来源；打开”来源”可查看完整列表。选择按采集者拆分会让背包中的这些堆叠保持分开，排序也会遵循这一选择。转移得到的素材可以照常与接收者的素材堆叠在一起。\n\n署名也会回报工匠：在工作台旁持有任意一份所需材料的已署名个体，无论由谁署名，都会让杰作几率增加2个百分点；若材料由你亲自署名，其所需数量还会减少1个（最低为1个），但被标记为不可折扣的材料除外，团队副本核心的用量始终保持全额。亲手署名的精良及以上作品目前仍只通过制作的药水继续传授技能：喝下自己酿造并署名的稀有饮品，只要对应专业仍是你启用的主修专业之一，就会有少量技能回流到制作它的专业。这的确只是药水的效果，别无其他：无论签署得多么精美，药剂、卷轴或巅峰长颈瓶都不会回馈技能。',
+    '有些物品带着名字。素材的来源行会说明是谁采集了每一组单位，若存在高级署名者，则会有单独的署名标记指明其身份。这两个事实相互独立：普通采集素材会记录采集者，却不一定获得署名；旧有的已署名库存可能只写明署名者，同时如实说明未记录采集者。成品则改为说明是谁制作了它。这些记录会随物品经历交易、银行、邮件、世界市场，甚至商人回购而保留，永不褪去。\n\n采集会自动为最佳成果署名：掷出精良及以上品质的收获都会带有署名，稀有发现则为其整份五倍额外收获全部署名。尸体采集触发幸运结果时，如果该分类没有可给出的标本，则为产出署名；如果有标本，则让产出保持无署名，并在旁边额外铸造一个已署名的完美标本。制作遵循相同原则：每件精良及以上的产出都会铸造为已署名，杰作无论品质如何都会署名，因此任何物品的最佳版本都会记录制作者之名。普通素材的署名附着在单位本身上，不会仅因为兼容的堆叠中已经包含另一位采集者或署名者而丢失。独立的完美标本是单独的物品，仍然需要空间；如果放不下，普通的尸体产出会保留，但标本会遗失。\n\n成品保持单一的严格身份，因此两件物品只有在所有标记完全一致时才会合并：同一物品、同一署名者、同一杰作属性、同一附魔、同一绑定。兼容的素材会在不同采集者与署名者之间共用同一个格子，同时为每个来源分别保留数量。悬停提示会概括来源；右键点击该堆叠可查看完整列表（触屏设备请点击其”来源”按钮）。选择按采集者拆分会让背包中的这些堆叠保持分开，排序也会遵循这一选择。转移得到的素材可以照常与接收者的素材堆叠在一起。\n\n署名也会回报工匠：在工作台旁持有任意一份所需材料的已署名个体，无论由谁署名，都会让杰作几率增加2个百分点；若材料由你亲自署名，其所需数量还会减少1个（最低为1个），但被标记为不可折扣的材料除外，团队副本核心的用量始终保持全额。亲手署名的精良及以上作品目前仍只通过制作的药水继续传授技能：喝下自己酿造并署名的稀有饮品，只要对应专业仍是你启用的主修专业之一，就会有少量技能回流到制作它的专业。这的确只是药水的效果，别无其他：无论签署得多么精美，药剂、卷轴或巅峰长颈瓶都不会回馈技能。',
   'guide.profPages.econ.introRaidCollections':
     '专业经济中的金币流向：确切费用与消耗、真正畅销的物品、世界市场规则、工单、委托，以及由团队副本材料支持的套装在普通制作之外的定位。',
   'guide.profPages.econ.doctrineBodyRaidCollections':
@@ -113,7 +115,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.formula_lastflame_zeal.name': '配方：末焰热忱',
   'hudChrome.enchantName.enchant_weapon_lastflame_zeal': '末焰热忱',
   'hudChrome.enchantDescription.enchant_weapon_lastflame_zeal':
-    '命中的近战攻击有几率使你获得50点力量，持续15秒，并为你恢复200点生命值。治疗加成与减益生效。每次命中的触发几率为攻击武器基础速度每0.6秒对应1%。没有内置冷却时间。双手各有独立增益；同一只手再次触发会刷新其增益。远程攻击不会触发此效果。狼形态改用其1秒的基础挥击速度。',
+    '命中的近战攻击有几率使你获得50点力量，持续15秒，并为你恢复200点生命值。治疗加成与减益生效。每次命中的触发几率为攻击武器基础速度每0.6秒对应1%。没有内置冷却时间。双手共享同一个增益；任一只手触发都会刷新该增益，且永不叠加。远程攻击不会触发此效果。狼形态改用其1秒的基础挥击速度。',
   'hudChrome.enchanting.recipeNotLearned': '施加此附魔前，请先学习配方。',
   'hudChrome.pattern.teachesEnchant': '使用：教你如何施加{enchant}。',
   'hudChrome.barEditor.pageTab': '第{page}页',
@@ -184,7 +186,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '平安上岸啦，朋友。看见脚下这条金色路径了吗？它比我还认得路，跟着走就是。',
   'hudChrome.lastkeepMap.title': '{keep}：{story}',
   'hudChrome.dawnholdMap.title': '{keep}：{story}',
-  'guide.classPage.formName.form_cat': '狼形态',
+  'guide.classPage.formName.form_cat': '豹形态',
   'guide.gear.slotOffhand': '副手',
   'guide.glossary.claudiumTerm': 'Claudium',
   'guide.glossary.riftTerm': '裂隙',
@@ -208,10 +210,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.crossHotbarArrangeChord': '{bumper} + {button}',
   'hudChrome.controller.crossHotbarCarrying': '正在拿着{action}：在格子上按确认放置，按取消放回。',
   'hudChrome.controller.crossHotbarEditHint':
-    '整理中：确认键可从格子或法术书中拿起技能并放到格子上，取消键清空格子。',
+    '整理中 · 方向键移动 · 确认键拾取并放置 · 取消键清空格子',
   'hudChrome.controller.crossHotbarEditHelp': '按住左肩键并按上方面键，即可用手柄整理十字热键栏。',
   'hudChrome.controller.crossHotbarOwnsButtons':
-    '十字热键栏启用时，扳机键和方向键归它所有，请在下方设置，而非此处。',
+    '十字热键栏启用时，扳机键用于操作该热键栏。方向键在此处仍可编辑，用于菜单与移动。',
   'hudChrome.controller.crossHotbar': '十字热键栏',
   'hudChrome.controller.crossHotbarEnable': '启用十字热键栏',
   'hudChrome.controller.crossHotbarExpand': '双十字热键栏',
@@ -2704,7 +2706,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.errors.requiresCombo': '该技能需要连击点。',
   'hud.errors.requiresForm': '你必须处于{form}形态。',
   'hud.errors.bear': '巨熊',
-  'hud.errors.cat': '狼',
+  'hud.errors.cat': '猫',
   'hud.errors.travel': '迅捷',
   'hud.errors.cantInForm': '{form}形态下无法这样做。',
   'hud.errors.shapeshifted': '变形状态下不能这样做。',
@@ -2958,7 +2960,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'abilityUi.resources.rage': '怒气',
   'abilityUi.resources.energy': '能量',
   'abilityUi.forms.bear': '熊',
-  'abilityUi.forms.cat': '狼',
+  'abilityUi.forms.cat': '猫',
   'abilityUi.cast.fishing': '钓鱼',
   'abilityUi.cast.gathering': '采集',
   'abilityUi.cast.thunzharrStormcall': '风暴召唤',
@@ -3680,7 +3682,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.entangling_roots.description': '将目标缠绕在原地，最多持续 12 秒。',
   'entities.abilities.bear_form.name': '巨熊形态',
   'entities.abilities.bear_form.description':
-    '变形为熊：护甲 +110%，最大生命值 +30%，攻击强度大幅提高，你的攻击会产生怒气并额外产生 30% 威胁值。再次施放可返回施法者形态。',
+    '变形为熊：护甲 +110%，最大生命值 +30%，攻击强度大幅提高，你的攻击会产生怒气并额外产生 30% 威胁值。变形进入任意形态都会获得大步疾驰，带来短暂的移动速度提升。再次施放可返回施法者形态。',
   'entities.abilities.maul.name': '碎骨击',
   'entities.abilities.maul.description':
     '一次猛击攻击，使近战伤害提高 {damage}，并产生大量威胁值。在你的下一次挥击时触发。仅限巨熊形态。',
@@ -3690,14 +3692,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.growl.name': '威吓',
   'entities.abilities.growl.description':
     '对目标低吼：你的威胁值提高到其最仇恨敌人的水平，并强迫其攻击你 3 秒。仅限巨熊形态。',
-  'entities.abilities.cat_form.name': '狼形态',
+  'entities.abilities.cat_form.name': '豹形态',
   'entities.abilities.cat_form.description':
     '将你化为一头狼：敏捷随你的等级提升，攻击强度 +8 外加每级 2 点，你的攻击消耗能量与连击点，并且你产生的威胁降低 29%。变为任意形态都会获得疾跃步伐：移动速度提高 60%，持续 3 秒，每 20 秒一次。再次施放即可变回施法形态。',
   'entities.abilities.claw.name': '裂爪',
   'entities.abilities.claw.description':
-    '用利爪攻击敌人，造成武器伤害加 {damage}。奖励 1 个连击点。仅限狼形态。',
+    '用利爪攻击敌人，造成武器伤害加 {damage}。奖励 1 个连击点。仅限豹形态。',
   'entities.abilities.ferocious_bite.name': '血噬',
-  'entities.abilities.ferocious_bite.description': '终结技，造成 {damage}。仅限狼形态。',
+  'entities.abilities.ferocious_bite.description': '终结技，造成 {damage}。仅限豹形态。',
   'entities.abilities.swipe.name': '横扫利爪',
   'entities.abilities.swipe.description':
     '横扫附近敌人，造成 {damage} 点伤害。造成额外威胁值。仅限巨熊形态。',
@@ -3716,7 +3718,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.starfire.description': '召下一道星辰之火，造成 {damage} 点奥术伤害。',
   'entities.abilities.travel_form.name': '迅捷形态',
   'entities.abilities.travel_form.description':
-    '立刻化为轻捷的迅捷形态，使移动速度提高 40%。变形状态下你无法使用其他技能，但可以在战斗中或脱离战斗时变形，非常适合逃离。',
+    '立刻化为轻捷的迅捷形态，使移动速度提高 40%，并解除可解除的定身与减速效果。变形状态下你无法使用其他技能，但可以在战斗中或脱离战斗时变形，非常适合逃离。变形进入任意形态都会获得大步疾驰，带来短暂的移动速度提升。',
   'entities.abilities.enrage.name': '煽怒',
   'entities.abilities.enrage.description': '立即生成 20 点怒气。仅限巨熊形态。',
   'entities.abilities.bash.name': '震荡击',
@@ -3727,7 +3729,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hibernate.description':
     '迫使目标陷入深度睡眠，最多持续 8 秒。任何伤害都会将其唤醒。',
   'entities.abilities.dash.name': '急奔',
-  'entities.abilities.dash.description': '向前冲刺，使移动速度提高 50%，持续 15 秒。仅限狼形态。',
+  'entities.abilities.dash.description': '向前冲刺，使移动速度提高 50%，持续 15 秒。仅限豹形态。',
   'entities.abilities.pounce.name': '匿袭',
   'entities.abilities.lunge.description':
     '扑向最远12码外的敌人，造成60%武器伤害并获得1个连击点。仅限狼形态使用。',
@@ -3740,12 +3742,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.insect_swarm.name': '蜇刺虫群',
   'entities.abilities.insect_swarm.description':
     '敌人被虫群侵袭，在 12 秒内受到 {damage} 点自然伤害。',
-  'entities.abilities.tigers_fury.name': '狼血',
+  'entities.abilities.tigers_fury.name': '豹血',
   'entities.abilities.tigers_fury.description':
-    '涌起{rage}点能量，并使攻击强度提高 {buff}，持续 {duration} 秒。仅限狼形态。',
+    '涌起{rage}点能量，并使攻击强度提高 {buff}，持续 {duration} 秒。仅限豹形态。',
   'entities.abilities.rip.name': '血隙',
   'entities.abilities.rip.description':
-    '终结技，使目标每 2 秒流血一次，持续 24 秒：36 点伤害外加每消耗 1 点连击点 24 点（5 点连击点：共 {damage} 点）。仅限狼形态。',
+    '终结技，使目标每 2 秒流血一次，持续 24 秒：36 点伤害外加每消耗 1 点连击点 24 点（5 点连击点：共 {damage} 点）。仅限豹形态。',
   'entities.abilities.mortal_strike.name': '致残打击',
   'entities.abilities.mortal_strike.description':
     '凶狠打击，造成武器伤害外加 {damage} 点伤害。（武器专精标志技能）',
@@ -3791,7 +3793,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.prowl.description': '在狼形态下进入潜行状态。无法在战斗中使用。',
   'entities.abilities.rake.name': '剐削',
   'entities.abilities.rake.description':
-    '撕裂敌人，造成武器伤害外加 {damage} 点，并造成持续 18 秒的流血伤害。给予 1 点连击点。仅限狼形态。',
+    '撕裂敌人，造成武器伤害外加 {damage} 点，并造成持续 18 秒的流血伤害。给予 1 点连击点。仅限豹形态。',
   'entities.abilities.revive_pet.name': '修补',
   'entities.abilities.revive_pet.description':
     '修补你的宠物。若其存活，在12秒内每3秒恢复一次生命值，共恢复{overTime}点；若其死亡，则以35%生命值将其复活。',
@@ -3847,10 +3849,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '将你燃烧契约未来的一跳提前，随后点燃目标，造成 {damage} 点火焰伤害。产生 1 点毁坏和 1 点毁灭性。可存 {charges} 层充能。（毁灭标志技能）',
   'entities.abilities.moonkin_form.name': '枭兽形态',
   'entities.abilities.moonkin_form.description':
-    '进入枭兽形态，强化施法直到你切换回来。再次施放可返回普通形态。（平衡专精招牌）',
+    '进入枭兽形态，强化施法直到你切换回来。变形进入任意形态都会获得大步疾驰，带来短暂的移动速度提升。再次施放可返回普通形态。（平衡专精招牌）',
   'entities.abilities.feral_charge.name': '原始涌动',
   'entities.abilities.feral_charge.description':
-    '释放一股原始涌动。狼形态下，能量恢复速度提高100%，持续10秒。巨熊形态下，立即产生50点怒气。（野性专精招牌）',
+    '释放一股原始涌动。豹形态下，能量恢复速度提高100%，持续10秒。巨熊形态下，立即产生50点怒气。（野性专精招牌）',
   'entities.abilities.swiftmend.name': '迅捷治愈',
   'entities.abilities.swiftmend.description':
     '消耗友方目标身上的一个持续治疗效果，治疗其 {damage} 点生命。野性绽放与二度绽放的播撒会累加青翠；在 5 层青翠时，此按钮会变为盛放，立即为每一位带有你持续治疗效果的盟友治疗这些效果所剩余量的 60%。（恢复标志技能）',
@@ -8219,7 +8221,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '生命值降至{health}时，震颤践踏使团队定身，奥德里克修士随后赶到并点亮护符石。所有骨刺随即粉碎，地面停止燃烧，接着灵魂撕裂和不死之怒会加入王座阶段的机制。',
   'hudChrome.raidBossGuide.nythraxis.phaseKingsWrathName': '国王之怒',
   'hudChrome.raidBossGuide.nythraxis.phaseKingsWrathSummary':
-    '生命值降至{health}时，尼思拉克西斯怒吼着进入国王之怒，此后在战斗剩余时间内获得 {bonusNormal} 伤害加成（英雄难度为 {bonusHeroic}）。坟场爆裂的间隔缩短为每 {eruptionEveryNormal} 秒（英雄难度为 {eruptionEveryHeroic} 秒），墓火的间隔缩短为每 {gravefireEveryNormal} 秒（英雄难度为 {gravefireEveryHeroic} 秒）。其余机制的节奏保持不变。',
+    '生命值降至{health}时，尼思拉克西斯怒吼着进入国王之怒，此后在战斗剩余时间内获得 {bonusNormal} 伤害加成（英雄难度为 {bonusHeroic}）。坟场爆裂的间隔缩短为每 {eruptionEveryNormal} 秒（英雄难度为 {eruptionEveryHeroic} 秒）。其余机制的节奏保持不变。',
   'hudChrome.raidBossGuide.nythraxis.gravebreakerName': '碎墓打击',
   'hudChrome.raidBossGuide.nythraxis.gravebreakerSummary':
     '每 {seconds} 秒，尼思拉克西斯蓄力下一次命中的挥击。他的目标只承受挥击本身的伤害，但站在他正面 {arc} 度扇形范围内 {range} 码内的其他所有人，都会承受该次挥击 {splash} 的物理伤害，并按自身护甲减免。',
@@ -8234,11 +8236,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '坦克应在 {stacks} 层时轮换：另一名坦克嘲讽接怪，被诅咒的坦克则远离碎墓打击的扇形范围，直到层数消退。治疗在轮换前为即将接怪的坦克做好准备。',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeName': '骨刺',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
-    '每 {everyNormal} 秒，尼思拉克西斯会用骨刺穿刺除当前目标外的 {victimsNormal} 名队员。被穿刺的队员无法行动，每秒损失 {drainNormal} 最大生命值，直到骨刺被摧毁。',
+    '每 {everyNormal} 秒，尼思拉克西斯会用骨刺穿刺除当前目标外的 {victimsNormal} 名队员。被穿刺的队员无法行动，每秒损失 {drainNormal} 最大生命值，直到骨刺被摧毁。任何人命中骨刺 {hitsNormal} 次即可将其击碎，无论伤害多少。已被穿刺过的队员在 {cooldown} 秒内不会再次被选中，因此骨刺会分散到整个团队。',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeHeroicSummary':
-    '每 {everyHeroic} 秒，尼思拉克西斯会用骨刺穿刺除当前目标外的 {victimsHeroic} 名队员。被穿刺的队员无法行动，每秒损失 {drainHeroic} 最大生命值，直到骨刺被摧毁。',
+    '每 {everyHeroic} 秒，尼思拉克西斯会用骨刺穿刺除当前目标外的 {victimsHeroic} 名队员。被穿刺的队员无法行动，每秒损失 {drainHeroic} 最大生命值，直到骨刺被摧毁。任何人命中骨刺 {hitsHeroic} 次即可将其击碎，无论伤害多少。已被穿刺过的队员在 {cooldown} 秒内不会再次被选中，因此骨刺会分散到整个团队。',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeResponse':
-    '输出职业立即转火骨刺并将其摧毁，以解救被穿刺的队员。治疗在骨刺被摧毁前为被穿刺者续命。',
+    '离得最近的人攻击骨刺：任何人命中几次即可击碎，无论伤害多少。治疗者在骨刺被击碎前保住被穿刺队员的性命。',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionName': '坟场爆裂',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionSummary':
     '每 {everyNormal} 秒，森森白骨之手会在队员脚下标记 {countNormal} 个半径 {radius} 码的圆圈。{warning} 秒后，每个圆圈都会爆裂，造成 {burstNormal} 最大生命值的暗影伤害，随后化为坟场烈焰燃烧 {flameNormal} 秒，对站在其中的任何人每秒造成 {tickNormal} 最大生命值的伤害。',
@@ -8248,9 +8250,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '在每个预警圆圈爆裂前离开，并远离燃烧地面。坦克应将尼思拉克西斯拉离火焰区域，为近战输出留出空间。',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilName': '束缚法阵',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilSummary':
-    '每 {everyNormal} 秒，一座古老结界的法阵会在距尼思拉克西斯 {minDist} 至 {maxDist} 码处的地面浮现，同时他开始不死飞升，每 {ascensionEvery} 秒获得 {ascensionNormal} 伤害与攻击速度加成。若他在 {bindNormal} 秒内站上法阵，便会受缚：不死飞升被清除，他被眩晕 {stunNormal} 秒，并在接下来的 {boundNormal} 秒内受到的伤害提高 {vulnerability}。否则每名队员都会受到 {unboundHitNormal} 最大生命值的暗影伤害，且他会一直保持 {unboundBonusNormal} 的伤害加成，直到下一次束缚。',
+    '每 {everyNormal} 秒，一座古老结界的法阵会在王座两侧的两座平台之一浮现（以团队视角，位于开战时尼思拉克西斯所站位置左侧或右侧 {sideOffset} 码处），每次施放交替换边，同时他开始不死飞升，每 {ascensionEvery} 秒获得 {ascensionNormal} 伤害与攻击速度加成。若他在 {bindNormal} 秒内站上法阵，便会受缚：不死飞升被清除，他被眩晕 {stunNormal} 秒，并在接下来的 {boundNormal} 秒内受到的伤害提高 {vulnerability}。否则每名队员都会受到 {unboundHitNormal} 最大生命值的暗影伤害，且他会一直保持 {unboundBonusNormal} 的伤害加成，直到下一次束缚。',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilHeroicSummary':
-    '每 {everyHeroic} 秒，一座古老结界的法阵会在距尼思拉克西斯 {minDist} 至 {maxDist} 码处的地面浮现，同时他开始不死飞升，每 {ascensionEvery} 秒获得 {ascensionHeroic} 伤害与攻击速度加成。若他在 {bindHeroic} 秒内站上法阵，便会受缚：不死飞升被清除，他被眩晕 {stunHeroic} 秒，并在接下来的 {boundHeroic} 秒内受到的伤害提高 {vulnerability}。否则每名队员都会受到 {unboundHitHeroic} 最大生命值的暗影伤害，且他会一直保持 {unboundBonusHeroic} 的伤害加成，直到下一次束缚。',
+    '每 {everyHeroic} 秒，一座古老结界的法阵会在王座两侧的两座平台之一浮现（以团队视角，位于开战时尼思拉克西斯所站位置左侧或右侧 {sideOffset} 码处），每次施放交替换边，同时他开始不死飞升，每 {ascensionEvery} 秒获得 {ascensionHeroic} 伤害与攻击速度加成。若他在 {bindHeroic} 秒内站上法阵，便会受缚：不死飞升被清除，他被眩晕 {stunHeroic} 秒，并在接下来的 {boundHeroic} 秒内受到的伤害提高 {vulnerability}。否则每名队员都会受到 {unboundHitHeroic} 最大生命值的暗影伤害，且他会一直保持 {unboundBonusHeroic} 的伤害加成，直到下一次束缚。',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilResponse':
     '坦克应立即将尼思拉克西斯拖上法阵，无视团队留下的任何燃烧地面。近战跟随拖拽路线，远程则避开新的碎墓打击扇形范围。他受缚期间，全队火力全开。',
   'hudChrome.raidBossGuide.nythraxis.raiseFallenName': '亡者复生',
@@ -8264,20 +8266,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '尼思拉克西斯会用灵魂撕裂标记除当前目标外的 {marksHeroic} 名队员。{fuse} 秒后，每个标记都会对其携带者造成相当于其 {damageHeroic} 最大生命值的暗影伤害，并按其 {range} 码内被标记队员的数量分摊。若某个标记独自结算，将是致命的。',
   'hudChrome.raidBossGuide.nythraxis.soulRendResponse':
     '每名被标记的队员都应在 {fuse} 秒的引爆时间结束前跑到集合点，并站在其他标记 {range} 码范围内。治疗应在标记结算时为团队补满生命。',
-  'hudChrome.raidBossGuide.nythraxis.soulfireName': '魂火',
-  'hudChrome.raidBossGuide.nythraxis.soulfireSummary':
-    '每次灵魂撕裂引爆都会在每个标记所在位置留下一片半径 {radius} 码的紫色火池，燃烧 {seconds} 秒，每秒造成 {tickNormal} 最大生命值的伤害。若多个火池重叠，站在其中会承受每个火池各自的伤害。火池不会在护符石 {clearance} 码范围内形成。',
-  'hudChrome.raidBossGuide.nythraxis.soulfireHeroicSummary':
-    '每次灵魂撕裂引爆，每一组聚集的标记只会留下一片半径 {radius} 码的紫色火池，燃烧 {secondsHeroic} 秒，每秒造成 {tickHeroic} 最大生命值的伤害。若多个火池重叠，只会承受一次伤害，而非叠加。火池不会在护符石 {clearance} 码范围内形成。',
-  'hudChrome.raidBossGuide.nythraxis.soulfireResponse':
-    '标记引爆后应立刻离开紫色火池。选择下一个集合点时，务必避开仍在燃烧的火焰。',
-  'hudChrome.raidBossGuide.nythraxis.gravefireName': '墓火',
-  'hudChrome.raidBossGuide.nythraxis.gravefireSummary':
-    '每 {everyNormal} 秒，一道幽紫色的墓火线会从尼思拉克西斯延伸向一名队员，每秒延长 {speed} 码，直至 {length} 码。每一码火线都会燃烧 {burnNormal} 秒，对站在其中的任何人每秒造成 {tickNormal} 最大生命值的伤害。',
-  'hudChrome.raidBossGuide.nythraxis.gravefireHeroicSummary':
-    '每 {everyHeroic} 秒，一道幽紫色的墓火线会从尼思拉克西斯延伸向一名队员，每秒延长 {speed} 码，直至 {length} 码。每一码火线都会燃烧 {burnHeroic} 秒，对站在其中的任何人每秒造成 {tickHeroic} 最大生命值的伤害。',
-  'hudChrome.raidBossGuide.nythraxis.gravefireResponse':
-    '火线袭来时侧身闪避即可：它很窄且从不转向。远程队员应持续走动，而非站在原地。',
   'hudChrome.raidBossGuide.nythraxis.deathlessRageName': '不死之怒',
   'hudChrome.raidBossGuide.nythraxis.deathlessRageSummary':
     '每 {every} 秒，尼思拉克西斯会施放持续 {cast} 秒的不死之怒。施法期间，每座已点亮的护符石都可由一名队员引导 {channel} 秒。若在施法结束前，三名不同的队员各自完成一座护符石的引导，不死之怒便会被打断，尼思拉克西斯将被眩晕 {stun} 秒。否则每名队员都会受到 {damageNormal} 最大生命值的暗影伤害。',
@@ -8292,7 +8280,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '坦克接管奥德伦并使其劈砍背对团队。马尔里克的治疗一旦开始引导，立即眩晕或沉默他并优先将其击杀；随后用定身或眩晕将沃斯从治疗身边引开（他无法被嘲讽），并第二个将其击杀。',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathName': '国王之怒',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathSummary':
-    '尼思拉克西斯在本场战斗剩余时间内，普通难度造成 {bonusNormal} 更多伤害，英雄难度为 {bonusHeroic}。坟场爆裂每 {eruptionEveryNormal} 秒发生一次（英雄难度为 {eruptionEveryHeroic} 秒），墓火每 {gravefireEveryNormal} 秒发生一次（英雄难度为 {gravefireEveryHeroic} 秒）。',
+    '尼思拉克西斯在本场战斗剩余时间内，普通难度造成 {bonusNormal} 更多伤害，英雄难度为 {bonusHeroic}。坟场爆裂每 {eruptionEveryNormal} 秒发生一次（英雄难度为 {eruptionEveryHeroic} 秒）。',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathResponse':
     '使用剩余的防御技能应对无法躲避的伤害。在团队结束战斗前，继续干净地应对此前的所有机制。',
   'hudChrome.raidBossGuide.nythraxis.boneStormName': '白骨风暴',
@@ -10608,6 +10596,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.priceChanged': '购买完成前价格已发生变化。请查看刷新后的价格并再次确认。',
   'hudChrome.bank.withdrawQuantityInput': '要取出的数量',
   'hudChrome.bank.withdrawQuantityConfirm': '取出',
+  'hudChrome.bank.quantityStepDownAria': '数量减少{count}',
+  'hudChrome.bank.quantityStepUpAria': '数量增加{count}',
   'hudChrome.bank.withdrawQuantityAction': '选择 {item} 要取出的数量',
   'hudChrome.bank.filterGroupAria': '按类别筛选银行',
   'hudChrome.bank.sortAria': '排序银行物品',
@@ -10904,15 +10894,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.sealbreak_shockwave': '破印冲击波（范围爆发）',
   'hudChrome.finder.mech.gravebreaker': '碎墓打击（正面扇形，背对团队）',
   'hudChrome.finder.mech.raise_fallen': '亡者复生（周期性召唤小怪）',
-  'hudChrome.finder.mech.soul_rend': '灵魂撕裂（被标记者应集合，然后离开火焰）',
+  'hudChrome.finder.mech.soul_rend': '灵魂撕裂（被标记者集合以分摊伤害）',
   'hudChrome.finder.mech.deathless_rage': '不死之怒（需在护符石处打断）',
   'hudChrome.finder.mech.wardstones': '护符石引导（阶段转换）',
   'hudChrome.finder.mech.dread_curse': '恐惧诅咒（累加坦克轮换减益，2层后轮换）',
-  'hudChrome.finder.mech.bone_spike': '骨刺（被穿刺者会持续掉血，直到骨刺被摧毁）',
+  'hudChrome.finder.mech.bone_spike':
+    '骨刺（被穿刺的玩家持续损失生命值，直到有人用几次攻击击碎骨刺）',
   'hudChrome.finder.mech.grave_eruption': '坟场爆裂（预警圆圈会留下燃烧地面）',
   'hudChrome.finder.mech.binding_sigil': '束缚法阵（把首领拖上法阵，否则全团遭殃）',
-  'hudChrome.finder.mech.gravefire': '墓火（需要闪避的移动火线）',
-  'hudChrome.finder.mech.soulfire': '魂火（灵魂撕裂引爆后留下燃烧的火池）',
   'hudChrome.finder.mech.kings_wrath': '国王之怒（30%时触发：永久伤害加成，地面机制加快）',
   'hudChrome.finder.mech.bone_storm': '白骨风暴（他无视仇恨，旋转攻击并冲向团队）',
   'hudChrome.finder.mech.crown_endures': '王冠不朽（6:00时触发强制狂暴，英雄难度为5:00）',
@@ -11191,7 +11180,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '任何小队或团队成员都能标在目标头上的符号，让所有人集火或避开同一个目标。共八种符号，每种符号对应一个目标。',
   'guide.glossary.targetMarkerTerm': '目标标记',
   'guide.models.formBear': '巨熊形态',
-  'guide.models.formCat': '狼形态',
+  'guide.models.formCat': '豹形态',
   'guide.models.formTravel': '迅捷形态',
   'guide.models.groupForms': '德鲁伊形态',
   'guide.nav.sidebarLabel': '指南主题',
@@ -11282,7 +11271,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.chain_lightning.description':
     '击中 10 米内至多 3 名敌人，每名造成 {damage} 点自然伤害。元素：命中可给予 1 点雷霆。伤害随法术强度提升。',
   'entities.abilities.chaos_bolt.description':
-    '消耗 3 点毁坏，掷出一发沉重的混乱之火，造成 {damage} 点火焰伤害。毁灭性使其施法时间缩短 30%。',
+    '消耗 3 点毁坏，掷出一发沉重的混乱之火，造成 {damage} 点火焰伤害（暴击加成生效前）。命中时必定暴击。毁灭性使其施法时间缩短 30%。',
   'entities.abilities.cloak_of_shadows.description':
     '以暗影包裹你，在5秒内吸收420点伤害。（潜行者天赋）',
   'entities.abilities.curse_of_exhaustion.description':
@@ -11405,7 +11394,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '加快队伍或团队的时间流速，使攻击、施法和引导速度提高 30%，持续 15 秒。近期受到时间加速或嗜血影响的盟友过于疲惫，无法再次受益。（时光术）',
   'entities.abilities.perfect_moment.name': '完美时刻',
   'entities.abilities.perfect_moment.description':
-    '抓住完美时刻：立即获得 4 层奥术充能，并且在 10 秒内，以太飞矢不会消耗这些充能。（时光术）',
+    '抓住完美时刻：立即获得 4 层奥术充能，并且在 10 秒内，以太飞镖不会消耗这些充能，且造成的伤害提高 20%。（时光术）',
   'entities.abilities.arcane_surge.name': '以太涌动',
   'entities.abilities.arcane_surge.description':
     '以原始奥术能量冲击敌人，造成 {damage} 点伤害。每次施放都会留下奥术充能，使你的下一次以太涌动伤害提高、施法加快（每层快 5%），但法力消耗也会急剧提高，最多叠加 4 层；以太飞矢会消耗这些充能。每次施放还有机会触发以太奔流，使你的下一次以太涌动不消耗法力且施法速度翻倍。',
@@ -13682,7 +13671,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '立即向 20 米内的敌人掷出圣锤，造成 {damage} 点伤害，恢复 70 点法力，为自己恢复相当于伤害量 50% 的生命值，并在造成伤害时产生 1 点虔诚。烈阳反击会使恩典之锤无视冷却时间，并为你恢复相当于伤害量 100% 的生命值。',
   'entities.abilities.hammer_of_grace.name': '恩典之锤',
   'entities.abilities.hex_of_violence.description':
-    '诅咒敌人8秒。其接下来的3次伤害行为各生成7点谴罪，并反噬17点暗影伤害。',
+    '诅咒敌人8秒，造成暗影伤害并每2秒生成2点谴罪。其接下来的3次伤害行为各生成7点谴罪，并反噬17点暗影伤害。',
   'entities.abilities.hex_of_violence.name': '暴行咒',
   'entities.abilities.hour_of_judgment.description':
     '对你的主要邪眼降下持续15秒的审判，获得40点谴罪和3层命运丝线，激活附身，使通过主要邪眼生成的谴罪翻倍，并使裁决伤害提高20%。第一次裁决返还50点谴罪。',
@@ -13784,7 +13773,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '种下新的绽放会累积1层繁茂（最多5层）。繁茂达到5层时，迅捷治愈变为盛放。',
   'entities.abilities.rip.specNote_feral': '命中的这一击累积1层古血（最多3层）。',
   'entities.abilities.ruinous_brand.description':
-    '为敌人烙印15秒。你接下来的3个直接法术会对被烙印的敌人回响25%的伤害；若对其他目标施放，则会向其复制50%的伤害。',
+    '为敌人烙印15秒。你接下来的3个直接法术会对被烙印的敌人回响25%的伤害；若对其他目标施放，则会向其复制50%的伤害。毁灭箭的回响伤害同样视为暴击，但不会因此再叠加额外的暴击伤害加成。',
   'entities.abilities.ruinous_brand.name': '毁灭烙印',
   'entities.abilities.sacred_challenge.description':
     '迫使一名敌人攻击你。升华期间还会使你受到的所有伤害降低 15%，持续 4 秒，且不消耗充能。',
@@ -14828,7 +14817,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '储存你和亡灵造成伤害的 {storedPct}%，并额外储存灵魂长枪伤害的 {lancePct}%；再次施放引爆。目标死亡时在 {radius} 码内爆炸并生成 1 个灵魂碎片',
   'hudChrome.auraEffect.nextAttackCrit': '下一次攻击必定暴击',
   'hudChrome.auraEffect.oldBlood':
-    '古血：第{stacks}/{max}层。裂爪、剐削、血裂、血噬、横扫利爪与碎骨击的命中各累积1层。达到{max}层时：狼形态下血噬变为血收，巨熊形态下碎骨击变为碎髓',
+    '古血：第{stacks}/{max}层。裂爪、剐削、血裂、血噬、横扫利爪与碎骨击的命中各累积1层。达到{max}层时：豹形态下血噬变为血收，巨熊形态下碎骨击变为碎髓',
   'hudChrome.auraEffect.overpowerCharge': '{stacks} 层充能：下一次致残打击伤害提高 {pct}%',
   'hudChrome.auraEffect.perfectMoment': '以太飞弹不会消耗奥术充能',
   'hudChrome.auraEffect.petDamage': '宠物造成的伤害提高 {pct}%',
@@ -14920,7 +14909,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.home.world.subCount':
     '一片连绵不绝的大陆，共 {zones} 个区域，从静谧的山谷、沉没的沼泽，到余烬荒原、冰封高地与树篱迷宫花园。',
   'guide.combat.threatBody':
-    '每个敌人都在心里记着一笔账，算清是谁最惹恼了它。伤害会加到账上，治疗同样如此：一次治疗会把威胁值加到正与被治疗者交战的那些敌人身上，并在它们之间分摊，因此最安全的治疗，是治疗那位已经被坦克拉稳的同伴。坦克会开启防御姿态或防护形态，让自己产生的一切威胁成倍增加，而德鲁伊的狼形态则相反，会甩掉威胁；嘲讽则把施放者直接抬到账目顶端，并在几秒内把敌人钉在他身上。敌人不会在有人刚刚超过坦克的那一瞬间就转火：要把它拉走需要明显的领先，远程需要的领先幅度又比近战更大，因此起手时稍有耐心，就能让战斗留在它该在的地方。',
+    '每个敌人都在心里记着一笔账，算清是谁最惹恼了它。伤害会加到账上，治疗同样如此：一次治疗会把威胁值加到正与被治疗者交战的那些敌人身上，并在它们之间分摊，因此最安全的治疗，是治疗那位已经被坦克拉稳的同伴。坦克会开启防御姿态或防护形态，让自己产生的一切威胁成倍增加，而德鲁伊的豹形态则相反，会甩掉威胁；嘲讽则把施放者直接抬到账目顶端，并在几秒内把敌人钉在他身上。敌人不会在有人刚刚超过坦克的那一瞬间就转火：要把它拉走需要明显的领先，远程需要的领先幅度又比近战更大，因此起手时稍有耐心，就能让战斗留在它该在的地方。',
   'guide.classPage.formLine.form_bear':
     '坦克形态：厚实的兽皮，以怒气取代法力，还有额外的威胁值，让敌人始终朝你挥拳。',
   'guide.riftsPage.floorsBody':
@@ -15105,7 +15094,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.report.status.needsAttention': '需要注意',
   // The Proving Shore (tutorial island) + the spawn greeting dialog.
   'hudChrome.tutorialGreeting.eastbrookGuidanceNote':
-    '欢迎来到东溪镇！雷德布鲁克元帅在城镇广场有工作交给你。开启金色引导，找到他并完成“门前之狼”，也可以自行探索。你可以稍后在选项、界面、战斗中更改此设置。',
+    '欢迎来到东溪镇！雷德布鲁克元帅在城镇广场有工作交给你。开启金色引导，找到他并完成“狼群来袭”，也可以自行探索。你可以稍后在选项、界面、战斗中更改此设置。',
   'hudChrome.tutorialGreeting.guidanceOn': '开启引导',
   'hudChrome.tutorialGreeting.guidanceOff': '关闭引导',
   'hudChrome.tutorialGreeting.guidanceSetting': '东溪金色引导',
@@ -15946,13 +15935,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.interfacePage.framesMoveBodyEditFrames':
     '你的框体、目标框体和队伍框体都可以移动。每个框体角上都有一个小小的移动按钮：解开它，把框体拖到你想要的位置，再锁上，这样一次误点就挪不动它。界面选项里“头像框”标签页顶部的“编辑框体”会一次松开界面的其余部分，这三个框体也随之一起松开：动作条、施法条、挥击条、经验条、小地图、按钮栏、宠物框体、姿态条、增益行与减益行，还有“愿望单提醒”小标签，松开期间每一件都挂着自己的名牌。如果挪到了让你后悔的地方，同一个“头像框”标签页底部的“恢复默认”会把它们统统弹回最初的位置。',
   'guide.interfacePage.framesGovernedExtra':
-    '“编辑框体”还会一并松开下方的追踪器堆栈(你追踪的任务及其目标、你的功绩进度、你的圣物库页面、你所在的探秘、你正在参与的任何裂隙，以及你正在追踪的配方或委托)、宠物框体旁的宠物动作条、显示你对附近敌人所施减益的“目标减益”框体、圣骑士的“虔诚”勋章、术士的“痛苦资源条”、法术触发浮层、双持武器时的副手挥击条，以及带标签页的伤害统计窗口，松开期间每一件都挂着自己的名牌。',
+    '“编辑框体”还会一并松开下方的追踪器堆栈(你追踪的任务及其目标、你的功绩进度、你的圣物库页面、你从制作中置顶的配方、你所在的探秘、你正在参与的任何裂隙，以及你正在追踪的配方或委托)、宠物框体旁的宠物动作条、显示你对附近敌人所施减益的“目标减益”框体、圣骑士的“虔诚”勋章、术士的“痛苦资源条”、法术触发浮层、双持武器时的副手挥击条，以及带标签页的伤害统计窗口，松开期间每一件都挂着自己的名牌。',
   'guide.interfacePage.framesGovernedTalkingHead':
     '“编辑框体”也会解锁对话面板：当某个 NPC 不在你的视野内时，它承载该 NPC 说出的台词；处于解锁状态时它会显示自己的名称标签。',
   'guide.interfacePage.framesGovernedAuraTracks':
     '“编辑框体”还会松开六条可选的光环轨道，前提是你已在同一“界面”选项的“战斗”页中开启它们：“我的增益”轨道、“防御性冷却”轨道、“我的护盾”轨道、“攻击性冷却”轨道、“移动与潜行”轨道，以及“我给队友的增益”轨道。所有轨道默认关闭，松开期间每一条都挂着自己的名牌。',
   'guide.interfacePage.mapBodyZoneFirst':
-    'M 打开世界地图，直接落在你所站的区域上，上面有你自己的箭头、你周围的兴趣点、带着标记的任务发布者和你的任务目标所在的地带、制作站、邮箱、告示板和菜畦、地下城入口，还有这个区域里的每一处采集资源点，它们在重新生长期间显示为灰色，你的工具不够格时则带上标记。你的队伍也会显示在上面。右键点击地图，或按下它的“世界地图”按钮，视野便拉远到整块大陆，每个区域都连同名称一起画出，点击某个区域即可打开那个区域的地图。走进探秘、地下城、裂隙或城堡，地图会切换成你所在之处的平面图；荆谷原野战场则有自己专属的战场地图。\n\n右侧、小地图下方，一叠追踪器让你不必打开任何窗口就能盯住手头的事：你追踪的任务及其目标、你的功绩进度、你的圣物库页面、你所在的探秘，以及你正在参与的任何裂隙。想把屏幕空间要回来时，任务追踪器可以折叠。',
+    'M 打开世界地图，直接落在你所站的区域上，上面有你自己的箭头、你周围的兴趣点、带着标记的任务发布者和你的任务目标所在的地带、制作站、邮箱、告示板和菜畦、地下城入口，还有这个区域里的每一处采集资源点，它们在重新生长期间显示为灰色，你的工具不够格时则带上标记。你的队伍也会显示在上面。右键点击地图，或按下它的“世界地图”按钮，视野便拉远到整块大陆，每个区域都连同名称一起画出，点击某个区域即可打开那个区域的地图。走进探秘、地下城、裂隙或城堡，地图会切换成你所在之处的平面图；荆谷原野战场则有自己专属的战场地图。\n\n右侧、小地图下方，一叠追踪器让你不必打开任何窗口就能盯住手头的事：你追踪的任务及其目标、你的功绩进度、你的圣物库页面、你从制作中置顶的配方、你所在的探秘，以及你正在参与的任何裂隙。想把屏幕空间要回来时，任务追踪器可以折叠。',
   'guide.interfacePage.gatheringGoalTrackerBody':
     '在制作窗口追踪一个配方，或在委托公告栏追踪一个委托后，采集目标追踪器就会加入这个堆栈：它会显示你正在追踪的配方或委托、你要收集的数量，以及你随身携带和仓库中的材料能满足多少。追踪会替换你当前的目标，清除则会明确取消它；两者都不会改变你的采集偏好。',
   'guide.interfacePage.hubPracticeTrackerBody':
@@ -15989,6 +15978,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.materialSources.quantityAria': '来自{source}的单位，最多{count}个',
   'hudChrome.materialSources.decreaseAria': '减少来自{source}的单位',
   'hudChrome.materialSources.increaseAria': '增加来自{source}的单位',
+  'hudChrome.materialSources.decreaseByAria': '将来自{source}的单位减少{count}',
+  'hudChrome.materialSources.increaseByAria': '将来自{source}的单位增加{count}',
+  'hudChrome.materialSources.moveAll': '移动全部单位',
+  'hudChrome.materialSources.fits': '当前最多可放入{units}个',
   'hudChrome.itemMenu.viewSources': '查看来源',
   'hudChrome.itemMenu.separateByGatherer': '按采集者拆分',
   'hudChrome.itemMenu.takeChosenQuantity': '取出指定数量',
