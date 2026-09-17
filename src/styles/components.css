@@ -20023,8 +20023,9 @@
   }
   /* The halo: a true circle centred on the doorway, sized to the tile
      (closest-side, so its fade reaches transparent at the tile's edges and the
-     corners stay dark), blurred so it bleeds over the frame around the door.
-     Never a rounded box: a box's straight sides read as a square glow. */
+     corners stay dark); its own gradient is the softness, the tier-scaled
+     box-shadow is the bloom that bleeds over the frame around the door. Never
+     a rounded box: a box's straight sides read as a square glow. */
   .vault-seam-glow {
     inset: 0;
     border-radius: 50%;
@@ -20042,7 +20043,6 @@
       color-mix(in srgb, var(--weekly-vault-glow) 45%, transparent),
       0 0 calc(44px * var(--fx-shadow)) calc(14px * var(--fx-shadow))
       color-mix(in srgb, var(--weekly-vault-glow) 25%, transparent);
-    filter: blur(calc(5px * var(--fx-shadow)));
     transform: scale(0.96);
   }
   /* The seam itself igniting: a thin ring straddling the door edge (evenodd,
@@ -20153,7 +20153,7 @@
   }
   .vault-ray-wide::before {
     clip-path: polygon(0 40%, 55% 0, 100% 50%, 55% 100%, 0 60%);
-    filter: blur(calc(1.4px * var(--fx-shadow)));
+    filter: drop-shadow(0 0 calc(2px * var(--fx-shadow)) var(--weekly-vault-glow));
   }
   .vault-ray-thin::before {
     background: linear-gradient(

@@ -116,7 +116,7 @@ the swinging door, so nothing crosses into a neighbouring card; on the hinge sid
 the light container is clipped at the doorway's inner edge, so nothing lit ever
 sits behind the open door.
 Rarity colouring is untouched: every light element derives from the vault's
-`--weekly-vault-glow` token and the loot keeps its `quality-*` class. Blur and glow
+`--weekly-vault-glow` token and the loot keeps its `quality-*` class. Bloom and glow
 scale with `--fx-shadow`; reduced motion and an already revealed vault show the
 resting open state with no replay. Pinned by `tests/weekly_vault_burst_core.test.ts`,
 `tests/weekly_vault_reveal_styles.test.ts` and the reveal controller suite.

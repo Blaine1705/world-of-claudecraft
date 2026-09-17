@@ -31,13 +31,18 @@ export interface VaultTimeline {
   revealMs: number;
 }
 
+/** The doorway shows about two thirds of the way through the swing, and the
+ *  loot pops the moment it does. (A duration, not a price: the bank/vault
+ *  family price scan carries an anchored allowance for this one literal.) */
+const DOOR_CLEAR_MS = 1000;
+
 export const VAULT_TIMELINE: Readonly<VaultTimeline> = Object.freeze({
   chargeMs: 0,
   swingMs: 320,
   burstMs: 560,
-  doorClearMs: 1000,
+  doorClearMs: DOOR_CLEAR_MS,
   doorOpenMs: 1760,
-  lootMs: 1000,
+  lootMs: DOOR_CLEAR_MS,
   lootFadeMs: 420,
   settleMs: 2900,
   revealMs: 3000,
@@ -127,22 +132,35 @@ function jitter(index: number, salt: number): number {
 }
 
 const round1 = (value: number) => Math.round(value * 10) / 10;
+/** A value inside [min, max] at jitter t. */
+const within = (t: number, min: number, max: number) => min + t * (max - min);
 
 function ray(index: number, burstMs: number): VaultRay {
   const tier = RAY_TIERS[index % RAY_TIERS.length];
   const j = (salt: number) => jitter(index, salt);
   const angle = Math.round((index * GOLDEN_ANGLE + 12) % 360);
+  // Per tier: thickness, length and life as [min, max] ranges (% and ms).
   const size =
     tier === 'wide'
-      ? { width: 8 + j(1) * 5, length: 52 + j(2) * 22, duration: 1350 + j(3) * 550, peak: 0.75 }
+      ? {
+          width: within(j(1), 8, 13),
+          length: within(j(2), 52, 74),
+          duration: within(j(3), 1350, 1900),
+          peak: 0.75,
+        }
       : tier === 'mid'
         ? {
-            width: 3.5 + j(1) * 2.5,
-            length: 68 + j(2) * 26,
-            duration: 1050 + j(3) * 550,
+            width: within(j(1), 3.5, 6),
+            length: within(j(2), 68, 94),
+            duration: within(j(3), 1050, 1600),
             peak: 0.95,
           }
-        : { width: 1.4 + j(1) * 1.2, length: 84 + j(2) * 30, duration: 900 + j(3) * 500, peak: 1 };
+        : {
+            width: within(j(1), 1.4, 2.6),
+            length: within(j(2), 84, 114),
+            duration: within(j(3), 900, 1400),
+            peak: 1,
+          };
   return {
     x: round1(50 + (j(4) - 0.5) * 10),
     y: round1(50 + (j(5) - 0.5) * 10),
