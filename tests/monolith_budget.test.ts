@@ -476,7 +476,7 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned on feature/wq-standing-online: the map rail and Reputation tab
     // wiring (11 lines) was paid for by lifting the map zone focus rule into
     // hud/map/map_zone_focus_core.ts; exact merged count.
-    ceiling: 18305,
+    ceiling: 18301,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

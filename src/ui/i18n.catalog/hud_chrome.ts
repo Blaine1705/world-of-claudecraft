@@ -8282,6 +8282,9 @@ export const hudChromeStrings = {
     level: 'Level {level}',
     landmarkCount: '{count} landmarks',
     filtersAria: 'Map layers',
+    // The Side panel button folds the rail away (mapSidebarCollapsed).
+    railToggle: 'Side panel',
+    railToggleAria: 'Show or hide the map side panel',
     filters: {
       quests: 'Quests',
       gather: 'Gather',

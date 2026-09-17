@@ -5530,6 +5530,8 @@ export const de_DE: EnTranslations = {
       "level": "Level {level}",
       "landmarkCount": "{count} Sehenswürdigkeiten",
       "filtersAria": "Kartenebenen",
+      "railToggle": "Side panel",
+      "railToggleAria": "Show or hide the map side panel",
       "filters": {
         "quests": "Quests",
         "gather": "Versammeln",
@@ -11086,6 +11088,8 @@ export const de_DE: EnTranslations = {
       "browseGoodsAria": "Waren von {name} ansehen",
       "worldMarket": "Zeigt mir den Weltmarkt.",
       "worldMarketAria": "Weltmarkt öffnen",
+      "worldQuestBoard": "Show me the world quest board.",
+      "worldQuestBoardAria": "Open the world quest board on the map",
       "accept": "Annehmen",
       "decline": "Ablehnen",
       "continue": "Weiter",

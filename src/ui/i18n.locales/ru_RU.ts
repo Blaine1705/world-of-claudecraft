@@ -17359,6 +17359,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.charSidebar.currencies': 'Валюты',
   'hudChrome.charSidebar.character': 'Персонаж',
   'hudChrome.charSidebar.professions': 'Профессии',
+  'hudChrome.mapAtlas.railToggle': 'Боковая панель',
+  'hudChrome.mapAtlas.railToggleAria': 'Показать или скрыть боковую панель карты',
+  'questUi.dialog.worldQuestBoard': 'Покажи мне доску мировых заданий.',
+  'questUi.dialog.worldQuestBoardAria': 'Открыть доску мировых заданий на карте',
   // Faction quartermaster stock and the faction NPCs (M16 non-Latin fills).
   'entities.items.rift_watchers_band.name': 'Кольцо Стража Разлома',
   'entities.items.rift_surveyors_satchel.name': 'Сумка Разведчика Разлома',

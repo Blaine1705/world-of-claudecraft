@@ -5530,6 +5530,8 @@ export const da_DK: EnTranslations = {
       "level": "Niveau {level}",
       "landmarkCount": "{count} vartegn",
       "filtersAria": "Kortlag",
+      "railToggle": "Side panel",
+      "railToggleAria": "Show or hide the map side panel",
       "filters": {
         "quests": "Quests",
         "gather": "Samle",
@@ -11086,6 +11088,8 @@ export const da_DK: EnTranslations = {
       "browseGoodsAria": "Gennemse varer fra {name}",
       "worldMarket": "Vis mig World Market.",
       "worldMarketAria": "Åbn World Market",
+      "worldQuestBoard": "Show me the world quest board.",
+      "worldQuestBoardAria": "Open the world quest board on the map",
       "accept": "Accepter",
       "decline": "Afslå",
       "continue": "Fortsæt",

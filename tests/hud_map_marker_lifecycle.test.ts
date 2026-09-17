@@ -413,6 +413,7 @@ function lifecycleHarness(): {
   appendHudElement('map-summary');
   appendHudElement('map-marker-summary');
   appendHudElement('map-level-toggle');
+  appendHudElement('map-sidebar-toggle');
   appendHudElement('map-zoom');
   const zone = ZONES[0];
   const paintTooltip = vi.fn();

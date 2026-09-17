@@ -5530,6 +5530,8 @@ export const ru_RU: EnTranslations = {
       "level": "Уровень {level}",
       "landmarkCount": "Ориентиров: {count}",
       "filtersAria": "Слои карты",
+      "railToggle": "Боковая панель",
+      "railToggleAria": "Показать или скрыть боковую панель карты",
       "filters": {
         "quests": "Задания",
         "gather": "Сбор",
@@ -11086,6 +11088,8 @@ export const ru_RU: EnTranslations = {
       "browseGoodsAria": "Посмотреть товары у {name}",
       "worldMarket": "Покажите мне мировой рынок.",
       "worldMarketAria": "Открыть мировой рынок",
+      "worldQuestBoard": "Покажи мне доску мировых заданий.",
+      "worldQuestBoardAria": "Открыть доску мировых заданий на карте",
       "accept": "Принять",
       "decline": "Отклонить",
       "continue": "Продолжить",

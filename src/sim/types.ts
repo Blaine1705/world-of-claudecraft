@@ -3883,6 +3883,9 @@ export interface NpcDef {
   // The Heroic Quartermaster: talking to this NPC opens the Heroic Marks
   // shop (src/sim/content/heroic_vendor.ts) instead of a copper vendor stock.
   heroicVendor?: boolean;
+  // The World Quest taskmaster: talking to this NPC offers the world-quest
+  // board (the map's world-quest rail, where the daily reroll lives).
+  worldQuestBoard?: boolean;
   // A WARFARE quartermaster: talking to this NPC opens the set-divided honor
   // shop instead of the flat vendor grid. A FLAG rather than a hard-keyed NPC id
   // deliberately, so a second placement needs no constant widened: the Heroic

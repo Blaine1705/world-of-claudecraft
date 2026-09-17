@@ -16267,6 +16267,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.charSidebar.currencies': '货币',
   'hudChrome.charSidebar.character': '角色',
   'hudChrome.charSidebar.professions': '专业',
+  'hudChrome.mapAtlas.railToggle': '侧边栏',
+  'hudChrome.mapAtlas.railToggleAria': '显示或隐藏地图侧边栏',
+  'questUi.dialog.worldQuestBoard': '让我看看世界任务板。',
+  'questUi.dialog.worldQuestBoardAria': '在地图上打开世界任务板',
   // Faction quartermaster stock and the faction NPCs (M16 non-Latin fills).
   'entities.items.rift_watchers_band.name': '裂隙守望者指环',
   'entities.items.rift_surveyors_satchel.name': '裂隙勘测员挎包',

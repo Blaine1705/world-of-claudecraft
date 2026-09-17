@@ -5530,6 +5530,8 @@ export const zh_CN: EnTranslations = {
       "level": "等级 {level}",
       "landmarkCount": "{count} 个地标",
       "filtersAria": "地图图层",
+      "railToggle": "侧边栏",
+      "railToggleAria": "显示或隐藏地图侧边栏",
       "filters": {
         "quests": "任务",
         "gather": "采集",
@@ -11086,6 +11088,8 @@ export const zh_CN: EnTranslations = {
       "browseGoodsAria": "查看 {name} 的货物",
       "worldMarket": "让我看看世界市场。",
       "worldMarketAria": "打开世界市场",
+      "worldQuestBoard": "让我看看世界任务板。",
+      "worldQuestBoardAria": "在地图上打开世界任务板",
       "accept": "接受",
       "decline": "拒绝",
       "continue": "继续",

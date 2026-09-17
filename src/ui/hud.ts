@@ -467,6 +467,7 @@ import {
   MapMarkerInteractionController,
   MapMarkerTooltipContent,
 } from './hud/map';
+import { MapSidebarCollapse } from './hud/map/map_sidebar_collapse';
 import { resolveMapZone } from './hud/map/map_zone_focus_core';
 import { refreshSideButtonLabels } from './hud/menu/side_buttons';
 import { livingSecondaryPet } from './hud/pet_bar_core';
@@ -727,7 +728,7 @@ import { MountRaceStrip } from './mount_race_strip';
 import { mouseoverCastTargetPid } from './mouseover_cast_core';
 import { type FrameDimension, MovableFrame } from './movable_frame';
 import { NoticeboardPopup } from './noticeboard_popup';
-import { NPC_WINDOW_CLOSE_RANGE } from './npc_service_range';
+import { NPC_WINDOW_CLOSE_RANGE, nearbyServiceNpc } from './npc_service_range';
 import { type AccountToggleSeam, OptionsWindow } from './options_window';
 import {
   makeWriterFacet,
@@ -1395,6 +1396,13 @@ export class Hud {
   private readonly itemDragState = new ItemDragState();
   private suppressNextActionClick = false;
   private optionsHooks: OptionsHooks | null = null;
+  private readonly mapSidebarCollapse = new MapSidebarCollapse({
+    window: $('#map-window'),
+    button: $('#map-sidebar-toggle'),
+    settings: () => this.optionsHooks?.settings ?? null,
+    onChange: () => this.updateMapWindow(),
+    openMap: () => this.toggleMap(),
+  });
   private reportHooks: ReportHooks | null = null;
   private bugReportHooks: BugReportHooks | null = null;
   // Only wired online (main.ts owns the Discord account/panel state); its presence
@@ -2441,6 +2449,7 @@ export class Hud {
       openUnbind: (npcId) => this.openUnbind(npcId),
       openCrafting: (craftId) => this.openCrafting(craftId),
       openMarket: () => this.openMarket(),
+      openWorldQuestBoard: () => this.mapSidebarCollapse.openBoard(),
       openDelveBoard: (npcId) => this.openDelveBoard(npcId),
       openCardDuel: () => this.toggleCardDuel(),
       onOpenChange: (open) => this.onQuestDialogStateChange?.(open),
@@ -9727,7 +9736,7 @@ export class Hud {
     if (slowHud) this.socialWindow.refreshIfChanged();
     if (slowHud) this.updateGuildBillboardEcho();
     if (slowHud && this.marketWindow.isOpen) {
-      if (!this.nearbyMarketNpc()) this.marketWindow.close();
+      if (!nearbyServiceNpc(this.sim, 'market')) this.marketWindow.close();
       else this.marketWindow.refreshIfChanged();
     }
     // The forge window follows the player out of the Riftwright's reach (the
@@ -9868,7 +9877,7 @@ export class Hud {
       // At the Merchant the coin opens the World Market (the same gate the
       // market window itself lives behind); anywhere else it is informational
       // only: the tooltip already says the proceeds wait at the Merchant.
-      if (this.nearbyMarketNpc()) this.openMarket();
+      if (nearbyServiceNpc(this.sim, 'market')) this.openMarket();
     };
     el.addEventListener('click', (ev) => {
       ev.preventDefault();
@@ -10676,6 +10685,7 @@ export class Hud {
     this.mapLevel = defaultMapLevel(mapWindowMode(this.sim)); // own instance plan, else zone
     this.mapHoverZone = null;
     el.style.display = 'block';
+    this.mapSidebarCollapse.sync();
     this.updateMapWindow();
     this.syncAnyWindowOpenState();
   }
@@ -16055,20 +16065,6 @@ export class Hud {
 
   get calendarWindowOpen(): boolean {
     return this.calendarWindow.isOpen;
-  }
-
-  private nearbyMarketNpc(): Entity | null {
-    const p = this.sim.player;
-    for (const e of this.sim.entities.values()) {
-      if (
-        e.kind === 'npc' &&
-        NPCS[e.templateId]?.market &&
-        dist2d(p.pos, e.pos) <= NPC_WINDOW_CLOSE_RANGE
-      ) {
-        return e;
-      }
-    }
-    return null;
   }
 
   // -------------------------------------------------------------------------

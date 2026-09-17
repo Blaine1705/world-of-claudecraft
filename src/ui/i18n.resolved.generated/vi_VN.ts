@@ -5530,6 +5530,8 @@ export const vi_VN: EnTranslations = {
       "level": "Cấp {level}",
       "landmarkCount": "{count} mốc",
       "filtersAria": "Các Tầng Lớp Ánh Xạ UV",
+      "railToggle": "Side panel",
+      "railToggleAria": "Show or hide the map side panel",
       "filters": {
         "quests": "Nhiệm Vụ",
         "gather": "Tập họp",
@@ -11086,6 +11088,8 @@ export const vi_VN: EnTranslations = {
       "browseGoodsAria": "Xem hàng hóa từ {name}",
       "worldMarket": "Cho ta xem Chợ Thế Giới.",
       "worldMarketAria": "Mở Chợ Thế Giới",
+      "worldQuestBoard": "Show me the world quest board.",
+      "worldQuestBoardAria": "Open the world quest board on the map",
       "accept": "Nhận",
       "decline": "Từ Chối",
       "continue": "Tiếp Tục",

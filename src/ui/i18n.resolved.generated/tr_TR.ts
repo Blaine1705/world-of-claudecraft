@@ -5530,6 +5530,8 @@ export const tr_TR: EnTranslations = {
       "level": "Seviye {level}",
       "landmarkCount": "{count} önemli noktalar",
       "filtersAria": "Harita katmanları",
+      "railToggle": "Side panel",
+      "railToggleAria": "Show or hide the map side panel",
       "filters": {
         "quests": "Görevler",
         "gather": "Toplamak",
@@ -11086,6 +11088,8 @@ export const tr_TR: EnTranslations = {
       "browseGoodsAria": "{name} kişisinin mallarına göz at",
       "worldMarket": "Bana Dünya Pazarı'nı göster.",
       "worldMarketAria": "Dünya Pazarı'nı aç",
+      "worldQuestBoard": "Show me the world quest board.",
+      "worldQuestBoardAria": "Open the world quest board on the map",
       "accept": "Kabul Et",
       "decline": "Reddet",
       "continue": "Devam Et",

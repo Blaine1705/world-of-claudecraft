@@ -17123,6 +17123,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.charSidebar.currencies': '通貨',
   'hudChrome.charSidebar.character': 'キャラクター',
   'hudChrome.charSidebar.professions': '専門技能',
+  'hudChrome.mapAtlas.railToggle': 'サイドパネル',
+  'hudChrome.mapAtlas.railToggleAria': '地図のサイドパネルを表示または非表示',
+  'questUi.dialog.worldQuestBoard': 'ワールドクエスト掲示板を見せてくれ。',
+  'questUi.dialog.worldQuestBoardAria': '地図でワールドクエスト掲示板を開く',
   // Faction quartermaster stock and the faction NPCs (M16 non-Latin fills).
   'entities.items.rift_watchers_band.name': '裂け目の監視者の指輪',
   'entities.items.rift_surveyors_satchel.name': '裂け目測量士の鞄',

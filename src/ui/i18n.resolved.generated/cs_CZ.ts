@@ -5530,6 +5530,8 @@ export const cs_CZ: EnTranslations = {
       "level": "Úroveň {level}",
       "landmarkCount": "{count} památek",
       "filtersAria": "Mapové vrstvy",
+      "railToggle": "Side panel",
+      "railToggleAria": "Show or hide the map side panel",
       "filters": {
         "quests": "Úkoly",
         "gather": "Shromáždit",
@@ -11086,6 +11088,8 @@ export const cs_CZ: EnTranslations = {
       "browseGoodsAria": "Procházet zboží od {name}",
       "worldMarket": "Ukaž mi Světový trh.",
       "worldMarketAria": "Otevřít Světový trh",
+      "worldQuestBoard": "Show me the world quest board.",
+      "worldQuestBoardAria": "Open the world quest board on the map",
       "accept": "Přijmout",
       "decline": "Odmítnout",
       "continue": "Pokračovat",

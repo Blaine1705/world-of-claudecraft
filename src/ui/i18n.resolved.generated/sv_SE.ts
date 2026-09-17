@@ -5530,6 +5530,8 @@ export const sv_SE: EnTranslations = {
       "level": "Nivå {level}",
       "landmarkCount": "{count} landmärken",
       "filtersAria": "Kartlager",
+      "railToggle": "Side panel",
+      "railToggleAria": "Show or hide the map side panel",
       "filters": {
         "quests": "Uppdrag",
         "gather": "Samla",
@@ -11086,6 +11088,8 @@ export const sv_SE: EnTranslations = {
       "browseGoodsAria": "Bläddra bland varor från {name}",
       "worldMarket": "Visa mig Världsmarknaden.",
       "worldMarketAria": "Öppna Världsmarknaden",
+      "worldQuestBoard": "Show me the world quest board.",
+      "worldQuestBoardAria": "Open the world quest board on the map",
       "accept": "Acceptera",
       "decline": "Avböj",
       "continue": "Fortsätt",

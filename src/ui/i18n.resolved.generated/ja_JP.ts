@@ -5530,6 +5530,8 @@ export const ja_JP: EnTranslations = {
       "level": "レベル {level}",
       "landmarkCount": "ランドマーク {count} 個",
       "filtersAria": "マップレイヤー",
+      "railToggle": "サイドパネル",
+      "railToggleAria": "地図のサイドパネルを表示または非表示",
       "filters": {
         "quests": "クエスト",
         "gather": "採集",
@@ -11086,6 +11088,8 @@ export const ja_JP: EnTranslations = {
       "browseGoodsAria": "{name}の品物を見る",
       "worldMarket": "ワールドマーケットを見せてください。",
       "worldMarketAria": "ワールドマーケットを開く",
+      "worldQuestBoard": "ワールドクエスト掲示板を見せてくれ。",
+      "worldQuestBoardAria": "地図でワールドクエスト掲示板を開く",
       "accept": "受諾",
       "decline": "辞退",
       "continue": "続ける",

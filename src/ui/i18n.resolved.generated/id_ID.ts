@@ -5530,6 +5530,8 @@ export const id_ID: EnTranslations = {
       "level": "Tingkat {level}",
       "landmarkCount": "{count} bangunan terkenal",
       "filtersAria": "Lapisan peta",
+      "railToggle": "Side panel",
+      "railToggleAria": "Show or hide the map side panel",
       "filters": {
         "quests": "Pencarian",
         "gather": "Mengumpulkan",
@@ -11086,6 +11088,8 @@ export const id_ID: EnTranslations = {
       "browseGoodsAria": "Lihat dagangan dari {name}",
       "worldMarket": "Tunjukkan World Market kepadaku.",
       "worldMarketAria": "Buka World Market",
+      "worldQuestBoard": "Show me the world quest board.",
+      "worldQuestBoardAria": "Open the world quest board on the map",
       "accept": "Terima",
       "decline": "Tolak",
       "continue": "Lanjutkan",

@@ -90,6 +90,8 @@ export interface QuestDialogControllerDeps {
    *  master's Crafting shortcut; master_craft_core.ts resolves the craft). */
   openCrafting(craftId: string): void;
   openMarket(): void;
+  /** The World Quest taskmaster's board: the map window with its rail unfolded. */
+  openWorldQuestBoard(): void;
   openDelveBoard(npcId: number): void;
   openCardDuel(): void;
   onOpenChange(open: boolean): void;
@@ -403,6 +405,7 @@ export class QuestDialogController {
     // crafting station (stations content masterNpcId) offers recipe training.
     const hasTraining = isStationMasterNpc(npc.templateId, world.stationPlacements);
     const hasMarket = !!definition?.market;
+    const hasWorldQuestBoard = !!definition?.worldQuestBoard;
     const hasHeroicVendor = !!definition?.heroicVendor;
     const hasCrucibleVendor = !!definition?.crucibleVendor;
     const hasDelveBoard = Object.values(DELVES).some(
@@ -431,6 +434,7 @@ export class QuestDialogController {
         hasCardMaster,
         hasTraining,
         hasFarmer,
+        hasWorldQuestBoard,
       })
     ) {
       this.close();
@@ -516,6 +520,9 @@ export class QuestDialogController {
     if (hasMarket) {
       html += `<button type="button" class="qd-list-item ui-btn ui-btn--plate" data-market="1" aria-label="${esc(t('questUi.dialog.worldMarketAria'))}"><span class="gold">${svgIcon('market')}</span> ${esc(t('questUi.dialog.worldMarket'))}</button>`;
     }
+    if (hasWorldQuestBoard) {
+      html += `<button type="button" class="qd-list-item ui-btn ui-btn--plate" data-world-quest-board="1" aria-label="${esc(t('questUi.dialog.worldQuestBoardAria'))}"><span class="gold">${svgIcon('map')}</span> ${esc(t('questUi.dialog.worldQuestBoard'))}</button>`;
+    }
     if (hasHeroicVendor) {
       html += `<button type="button" class="qd-list-item ui-btn ui-btn--plate" data-heroic-shop="1" aria-label="${esc(t('questUi.dialog.browseGoodsAria', { name: npcName }))}">${heroicMarkIconHtml()} ${esc(t('questUi.dialog.browseGoods'))}</button>`;
     }
@@ -567,6 +574,7 @@ export class QuestDialogController {
     }
     this.bindRoute('[data-unbind]', () => this.deps.openUnbind(npc.id));
     this.bindRoute('[data-market]', this.deps.openMarket);
+    this.bindRoute('[data-world-quest-board]', this.deps.openWorldQuestBoard);
     this.bindRoute('[data-delve-board]', () => this.deps.openDelveBoard(npc.id));
     this.bindRoute('[data-card-duel]', this.deps.openCardDuel);
     // The husk trade goes straight to the world (IWorldFarming.convertHusks,

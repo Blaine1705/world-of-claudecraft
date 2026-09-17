@@ -368,6 +368,7 @@ export const FACTION_VENDOR_NPCS: Record<string, NpcDef> = {
     facing: -2.1,
     color: 0x8a6a50,
     questIds: [],
+    worldQuestBoard: true,
     greeting:
       'The allied factions post assignments across the realm every day. If an assignment does not suit your skills, you may request one daily reassignment.',
   },

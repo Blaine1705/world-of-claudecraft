@@ -5530,6 +5530,8 @@ export const it_IT: EnTranslations = {
       "level": "Livello {level}",
       "landmarkCount": "{count} punti di riferimento",
       "filtersAria": "Livelli della mappa",
+      "railToggle": "Side panel",
+      "railToggleAria": "Show or hide the map side panel",
       "filters": {
         "quests": "Missioni",
         "gather": "Raccogliere",
@@ -11086,6 +11088,8 @@ export const it_IT: EnTranslations = {
       "browseGoodsAria": "Vedi la merce di {name}",
       "worldMarket": "Mostrami il Mercato Mondiale.",
       "worldMarketAria": "Apri il Mercato Mondiale",
+      "worldQuestBoard": "Show me the world quest board.",
+      "worldQuestBoardAria": "Open the world quest board on the map",
       "accept": "Accetta",
       "decline": "Rifiuta",
       "continue": "Continua",

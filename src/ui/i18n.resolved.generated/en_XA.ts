@@ -5530,6 +5530,8 @@ export const en_XA: EnTranslations = {
       "level": "[Ļéʋéļ {level}]",
       "landmarkCount": "[{count} ļáñðɱáŕķš]",
       "filtersAria": "[Ɱáþ ļáýéŕš]",
+      "railToggle": "[Šíðé þáñéļ]",
+      "railToggleAria": "[Šĥóŵ óŕ ĥíðé ţĥé ɱáþ šíðé þáñéļ]",
       "filters": {
         "quests": "[Ɋúéšţš]",
         "gather": "[Ĝáţĥéŕ]",
@@ -11086,6 +11088,8 @@ export const en_XA: EnTranslations = {
       "browseGoodsAria": "[Ɓŕóŵšé ĝóóðš ƒŕóɱ {name}]",
       "worldMarket": "[Šĥóŵ ɱé ţĥé Ŵóŕļð Ɱáŕķéţ.]",
       "worldMarketAria": "[Óþéñ ţĥé Ŵóŕļð Ɱáŕķéţ]",
+      "worldQuestBoard": "[Šĥóŵ ɱé ţĥé ŵóŕļð ɋúéšţ ƀóáŕð.]",
+      "worldQuestBoardAria": "[Óþéñ ţĥé ŵóŕļð ɋúéšţ ƀóáŕð óñ ţĥé ɱáþ]",
       "accept": "[Áççéþţ]",
       "decline": "[Ðéçļíñé]",
       "continue": "[Çóñţíñúé]",

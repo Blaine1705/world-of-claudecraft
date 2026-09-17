@@ -106,6 +106,7 @@ function harness(
   const openCrucibleVendor = vi.fn();
   const openWarfareVendor = vi.fn();
   const openMarket = vi.fn();
+  const openWorldQuestBoard = vi.fn();
   const openDelveBoard = vi.fn();
   const openCardDuel = vi.fn();
   const openTrain = vi.fn();
@@ -143,6 +144,7 @@ function harness(
     openCrucibleVendor,
     openWarfareVendor,
     openMarket,
+    openWorldQuestBoard,
     openDelveBoard,
     openCardDuel,
     openTrain,
@@ -176,6 +178,7 @@ function harness(
     openCrucibleVendor,
     openWarfareVendor,
     openMarket,
+    openWorldQuestBoard,
     openDelveBoard,
     openCardDuel,
     openTrain,
@@ -511,6 +514,15 @@ describe('QuestDialogController', () => {
     market.controller.open(41);
     market.element.querySelector<HTMLButtonElement>('[data-market]')?.click();
     expect(market.openMarket).toHaveBeenCalledTimes(1);
+
+    // The World Quest taskmaster offers the board row and nothing else; the
+    // row routes to the map rail through openWorldQuestBoard.
+    const boardId = Object.values(NPCS).find((definition) => definition.worldQuestBoard)?.id;
+    if (!boardId) throw new Error('world quest board fixture not found');
+    const taskmaster = harness(npc(45, boardId));
+    taskmaster.controller.open(45);
+    taskmaster.element.querySelector<HTMLButtonElement>('[data-world-quest-board]')?.click();
+    expect(taskmaster.openWorldQuestBoard).toHaveBeenCalledTimes(1);
 
     const heroic = harness(npc(42, heroicId));
     heroic.controller.open(42);

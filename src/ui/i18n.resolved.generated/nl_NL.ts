@@ -5530,6 +5530,8 @@ export const nl_NL: EnTranslations = {
       "level": "Niveau {level}",
       "landmarkCount": "{count} oriëntatiepunten",
       "filtersAria": "Kaartlagen",
+      "railToggle": "Side panel",
+      "railToggleAria": "Show or hide the map side panel",
       "filters": {
         "quests": "Zoektochten",
         "gather": "Bijeenkomen",
@@ -11086,6 +11088,8 @@ export const nl_NL: EnTranslations = {
       "browseGoodsAria": "Bekijk waren van {name}",
       "worldMarket": "Toon me de Wereldmarkt.",
       "worldMarketAria": "Open de Wereldmarkt",
+      "worldQuestBoard": "Show me the world quest board.",
+      "worldQuestBoardAria": "Open the world quest board on the map",
       "accept": "Aanvaarden",
       "decline": "Weigeren",
       "continue": "Doorgaan",

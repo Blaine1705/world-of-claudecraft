@@ -17089,6 +17089,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.charSidebar.currencies': '화폐',
   'hudChrome.charSidebar.character': '캐릭터',
   'hudChrome.charSidebar.professions': '전문 기술',
+  'hudChrome.mapAtlas.railToggle': '사이드 패널',
+  'hudChrome.mapAtlas.railToggleAria': '지도 사이드 패널 표시 또는 숨기기',
+  'questUi.dialog.worldQuestBoard': '세계 임무 게시판을 보여 주게.',
+  'questUi.dialog.worldQuestBoardAria': '지도에서 세계 임무 게시판 열기',
   // Faction quartermaster stock and the faction NPCs (M16 non-Latin fills).
   'entities.items.rift_watchers_band.name': '균열 감시자의 반지',
   'entities.items.rift_surveyors_satchel.name': '균열 측량사의 가방',

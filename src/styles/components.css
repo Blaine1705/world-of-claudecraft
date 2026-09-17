@@ -14086,6 +14086,28 @@
   body:not(.mobile-touch) #map-window:has(> .map-atlas-sidebar:empty) .map-atlas-stage {
     inset: var(--window-pad);
   }
+  /* The Side panel button folds the rail away by choice (mapSidebarCollapsed,
+     src/ui/hud/map/map_sidebar_collapse.ts): the same single-pane shape as the
+     unfed rail above. The button sits under the map-level toggle. */
+  body:not(.mobile-touch) #map-window.map-sidebar-collapsed {
+    width: 596px;
+  }
+  #map-window.map-sidebar-collapsed .map-atlas-sidebar {
+    display: none;
+  }
+  body:not(.mobile-touch) #map-window.map-sidebar-collapsed .map-atlas-stage {
+    inset: var(--window-pad);
+  }
+  #map-sidebar-toggle {
+    position: absolute;
+    left: 8px;
+    top: 40px;
+    z-index: 2;
+    font-size: 13px;
+  }
+  body.mobile-touch #map-sidebar-toggle {
+    display: none;
+  }
   /* Touch keeps the shipped single-pane map: the rail and the map-face chrome
      the atlas adds have no room on a 330px sheet (W13 owns the touch rail). */
   body.mobile-touch .map-atlas-sidebar,

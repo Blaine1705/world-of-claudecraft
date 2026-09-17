@@ -5530,6 +5530,8 @@ export const ko_KR: EnTranslations = {
       "level": "레벨 {level}",
       "landmarkCount": "랜드마크 {count}개",
       "filtersAria": "지도 레이어",
+      "railToggle": "사이드 패널",
+      "railToggleAria": "지도 사이드 패널 표시 또는 숨기기",
       "filters": {
         "quests": "퀘스트",
         "gather": "채집",
@@ -11086,6 +11088,8 @@ export const ko_KR: EnTranslations = {
       "browseGoodsAria": "{name}의 물건 보기",
       "worldMarket": "세계 시장을 보여 주세요.",
       "worldMarketAria": "세계 시장 열기",
+      "worldQuestBoard": "세계 임무 게시판을 보여 주게.",
+      "worldQuestBoardAria": "지도에서 세계 임무 게시판 열기",
       "accept": "수락",
       "decline": "거절",
       "continue": "계속",
