@@ -1574,6 +1574,45 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.map.ruinCourtyard': '廃墟の中庭',
   'hudChrome.bg.map.graveyard': '墓地',
   'guide.nav.thornhollow': 'ソーンホロウ平原',
+  'guide.nav.factions': '勢力と評判',
+  'guide.factionsPage.heading': '勢力と評判',
+  'guide.factionsPage.intro':
+    '三つの同盟勢力がそれぞれ王国の一角を見守っており、彼らの土地でワールドクエストを終えるたびに、その勢力からの評判が上がります。評判は六つの段階を昇り、段階ごとに固有の称号があり、補給係の品揃えを一つずつ開いていきます。',
+  'guide.factionsPage.whoHeading': '三つの勢力',
+  'guide.factionsPage.whoBody':
+    '各勢力は一群のゾーンに結びついており、どこでワールドクエストをこなすかで、どの勢力に評判が入るかが決まります。陣営を選ぶ必要はありません。三勢力はそれぞれ独自に集計し、他の勢力と敵対するよう求めることもありません。',
+  'guide.factionsPage.riftWatchBody':
+    '裂け目の監視団は岸を守り、深い裂け目を見張っています。彼らの土地は沿岸部です。ファーショア、パームリーチ、ゲイルクレスト、ウィローフェン、ヴェールド・ホロウ。拠点はパームリーチのドリフトヘイヴンです。',
+  'guide.factionsPage.churchOrderBody':
+    '教団は王国の中心地を治めています。イーストブルック渓谷、マイアフェン湿地、ソーンピーク高地、ナイトブルーム、レイスウッド。ブラザー・アルドリックがイーストブルック渓谷から彼らを代表して語ります。',
+  'guide.factionsPage.automatonsBody':
+    'オートマトンは辺境の炉を守っています。ドレイクランド、フロストヴェイル、アンバーフォール、エヴァーガーデン。拠点はドレイクランドのワームウォッチです。',
+  'guide.factionsPage.earningHeading': '評判を得る',
+  'guide.factionsPage.earningBody':
+    '評判はワールドクエストから得られます。各ワールドクエストは、それが置かれたゾーンの勢力に加算され、三勢力は異なるゾーンを担当しているので、地図を渡り歩くうちに三つの評判が同時に進みます。イーストブルックの現場監督ケイレンが地図上のワールドクエスト掲示板を開いてくれ、その日の割り当てが気に入らなければ、掲示板で一日に一つだけワールドクエストを差し替えることもできます。',
+  'guide.factionsPage.lowLevelNote':
+    '低レベルのキャラクターは評判がある段階で一時停止し、レベルが上がると再開します。若いキャラクターでも早くから稼ぎ始められ、すぐに行き止まりになることはありません。',
+  'guide.factionsPage.tiersHeading': '評判の段階',
+  'guide.factionsPage.tiersBody':
+    'どの勢力も同じ六つの段階を昇ります。未知、承認、信頼、実証、先鋒、そしてチャンピオンです。各勢力はそれぞれの段階に独自の名を与え、その名がその勢力におけるあなたの称号になります。',
+  'guide.factionsPage.riftWatchTitles':
+    '裂け目の監視団では、部外者から始まり、監視者、裂け目歩き、守護者、裂け目の番人、そして最後にチャンピオンとなります。',
+  'guide.factionsPage.churchOrderTitles':
+    '教団では、部外者から始まり、侍祭、守り手、テンプラー、暁の番人、そして最後にチャンピオンとなります。',
+  'guide.factionsPage.automatonsTitles':
+    'オートマトンでは、部外者から始まり、操作者、機械技師、工匠、鍛冶長、そして最後にチャンピオンとなります。',
+  'guide.factionsPage.quartermastersHeading': '補給係',
+  'guide.factionsPage.quartermastersBody':
+    '各勢力は拠点に補給係を置いています。ドリフトヘイヴンの裂け目の監視団の補給係ヴェイレン、イーストブルック礼拝堂の教団のテンプラー・アルセア、ワームウォッチのオートマトンの工匠トブリンです。それぞれが装飾品、防具、武器、バッグの小さな品揃えを持ち、その勢力での評判が上がるにつれて段階ごとに解放され、通常の硬貨で買えます。',
+  'guide.factionsPage.readingHeading': 'どこで確認するか',
+  'guide.factionsPage.readingBody':
+    'キャラクターシート（C）の評判タブに、各勢力の現在の評判、次の段階までのバー、評判で得た称号が表示されます。チャットログは評判を得るたびに報告し、新しい段階に達すると画面に祝いのバナーが出ます。',
+  'guide.factionsPage.deedsHeading': '偉業',
+  'guide.factionsPage.masteryHeading': '地域の熟達',
+  'guide.factionsPage.masteryBody':
+    '各ゾーンには、そこで完了したワールドクエストの数が永久に記録されます。通貨ではなく、何かに使われることもありません。数字は増えるだけで、毎日続ける必要もなく、数週間ぶりに戻っても次のワールドクエストが一つ加わるだけです。定められた節目に達すると偉業の書に偉業が記録されるので、キャラクターのレベル上げが終わって久しくても、古いゾーンを訪れる価値が残ります。評判タブには各ゾーンの数と次の節目が並びます。',
+  'guide.factionsPage.deedsBody':
+    '偉業の書も評判を記録します。ある勢力で信頼に達すること、ある勢力でチャンピオンに達することがそれぞれ偉業として記録され、三勢力すべてでチャンピオンに達することは独自の偉業です。他の偉業と同じく、これらは見た目だけで力にはならず、チャンピオンの偉業は身に着けられる称号を授けます。',
   'guide.thornhollowPage.heading': 'ソーンホロウ平原',
   'guide.thornhollowPage.intro':
     'ソーンピークの下、古い森に抱かれた壁に囲まれた窪地で戦うランク制5対5の旗奪取戦場。峡谷の両端で二つの廃城が向かい合い、その間にはどちらの手にも落ちたことのない、より古い中庭が横たわる。五人ずつ、城は二つ、目的は一つ。相手の旗を奪い、こちらの旗を奪われる前に持ち帰れ。',
@@ -13404,6 +13443,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.worldQuestsCompletedInZone.few': 'ワールドクエスト{count}件完了',
   'hudChrome.plurals.worldQuestsCompletedInZone.many': 'ワールドクエスト{count}件完了',
   'hudChrome.plurals.worldQuestsCompletedInZone.other': 'ワールドクエスト{count}件完了',
+  'hudChrome.plurals.worldQuestsCompletedInZone.one': 'ワールドクエスト{count}件完了',
+  'hudChrome.plurals.worldQuestsCompletedInZone.few': 'ワールドクエスト{count}件完了',
+  'hudChrome.plurals.worldQuestsCompletedInZone.many': 'ワールドクエスト{count}件完了',
+  'hudChrome.plurals.worldQuestsCompletedInZone.other': 'ワールドクエスト{count}件完了',
   'hudChrome.commissionBoard.statusOpen': '募集中',
   'hudChrome.commissionBoard.statusAccepted': '引き受け済み',
   'hudChrome.commissionBoard.statusDelivered': '納品済み',
@@ -17223,6 +17266,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reputation.title': '勢力の称号',
   'hudChrome.reputation.legend': '評判の段階',
   'hudChrome.reputation.vendorGate': '{faction}との評判が{tier}以上必要です。',
+  'hudChrome.reputation.mastery': '地域の熟達',
+  'hudChrome.reputation.masteryIntro':
+    '各ゾーンで完了したワールドクエストの数は永久に残ります。連続ログインは不要で、消費されることもありません。節目ごとに偉業が記録されます。',
+  'hudChrome.reputation.masteryNext': '次の節目：{count}',
+  'hudChrome.reputation.masteryMaxed': 'すべての節目を達成',
+  'hudChrome.reputation.masteryReached': '{reached} / {total} の節目',
   'hudChrome.reputation.mastery': '地域の熟達',
   'hudChrome.reputation.masteryIntro':
     '各ゾーンで完了したワールドクエストの数は永久に残ります。連続ログインは不要で、消費されることもありません。節目ごとに偉業が記録されます。',

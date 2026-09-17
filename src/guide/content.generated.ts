@@ -5963,6 +5963,41 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "progression",
     "renown": 50,
     "feat": false
+  },
+  {
+    "id": "exp_regional_mastery_10",
+    "name": "Regional Regular",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "exp_regional_mastery_25",
+    "name": "Regional Fixture",
+    "category": "exploration",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "exp_regional_mastery_50",
+    "name": "Regional Veteran",
+    "category": "exploration",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "exp_regional_mastery_100",
+    "name": "Regional Master",
+    "category": "exploration",
+    "renown": 25,
+    "feat": false
+  },
+  {
+    "id": "exp_regional_mastery_250",
+    "name": "Regional Legend",
+    "category": "exploration",
+    "renown": 50,
+    "feat": false
   }
 ];
 

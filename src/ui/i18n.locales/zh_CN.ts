@@ -1517,6 +1517,45 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.map.ruinCourtyard': '废墟庭院',
   'hudChrome.bg.map.graveyard': '墓地',
   'guide.nav.thornhollow': '荆谷原野',
+  'guide.nav.factions': '阵营与声望',
+  'guide.factionsPage.heading': '阵营与声望',
+  'guide.factionsPage.intro':
+    '三个盟友阵营各自守护着王国的一隅，你在他们的领地完成的每个世界任务都会提升你在该阵营的声望。声望共有六个等级，每级都有专属头衔，并逐件解锁军需官的货品。',
+  'guide.factionsPage.whoHeading': '三个阵营',
+  'guide.factionsPage.whoBody':
+    '每个阵营都对应一组区域，所以你在哪里做世界任务，就决定了声望记在哪个阵营名下。你不必选边站：三个阵营各自计数，也没有任何一方要求你与另一方为敌。',
+  'guide.factionsPage.riftWatchBody':
+    '裂隙守望守卫海岸，监视深处的裂口。他们的领地是沿海地带：远岸、棕榈滩、疾风崖、柳泽和隐幕谷。他们的据点是棕榈滩的漂流港。',
+  'guide.factionsPage.churchOrderBody':
+    '教团掌管王国的腹地：东溪谷、迷雾沼泽、荆峰高地、夜华林和幽魂林。奥德里克修士在东溪谷代表他们发言。',
+  'guide.factionsPage.automatonsBody':
+    '机械军团看守远方的熔炉：龙岭、霜幕荒野、琥珀瀑和常青园。他们的据点是龙岭的巨龙哨站。',
+  'guide.factionsPage.earningHeading': '获取声望',
+  'guide.factionsPage.earningBody':
+    '声望来自世界任务。每个世界任务都计入其所在区域对应的阵营，而三个阵营覆盖不同的区域，所以当你走遍地图时，三方声望会同时增长。东溪的工头凯伦会在地图上打开世界任务板；如果当天的任务不合心意，也可以在任务板上每天更换一个世界任务。',
+  'guide.factionsPage.lowLevelNote':
+    '低等级角色的声望会在某一等级暂停，随着升级再继续，所以新角色可以尽早开始积累，而不会很快无路可走。',
+  'guide.factionsPage.tiersHeading': '声望等级',
+  'guide.factionsPage.tiersBody':
+    '每个阵营都经历相同的六个等级：陌生、认可、信任、可靠、先锋和冠军。每个阵营会为每一级赋予自己的称呼，那个称呼就是你在该阵营的头衔。',
+  'guide.factionsPage.riftWatchTitles':
+    '在裂隙守望，你依次是局外人、守望者、裂隙行者、守卫、裂隙护卫，最终成为冠军。',
+  'guide.factionsPage.churchOrderTitles':
+    '在教团，你依次是局外人、侍僧、守护者、圣殿骑士、黎明守卫，最终成为冠军。',
+  'guide.factionsPage.automatonsTitles':
+    '在机械军团，你依次是局外人、操作员、机械师、工匠、锻造大师，最终成为冠军。',
+  'guide.factionsPage.quartermastersHeading': '军需官',
+  'guide.factionsPage.quartermastersBody':
+    '每个阵营都在据点设有一名军需官：漂流港的裂隙守望军需官维伦、东溪礼拜堂的教团圣殿骑士阿尔西娅，以及巨龙哨站的机械军团工匠托布林。每人出售少量首饰、护甲、武器和背包，随着你在该阵营的声望提升逐级解锁，以普通金币购买。',
+  'guide.factionsPage.readingHeading': '在哪里查看',
+  'guide.factionsPage.readingBody':
+    '角色面板（C）的声望页会显示每个阵营的当前声望、通往下一等级的进度条，以及声望为你赢得的头衔。聊天记录会在每次获得声望时报告，达到新等级时屏幕上还会显示庆祝横幅。',
+  'guide.factionsPage.deedsHeading': '功绩',
+  'guide.factionsPage.masteryHeading': '区域精通',
+  'guide.factionsPage.masteryBody':
+    '每个区域还会永久记录你在那里完成的世界任务数。它不是货币，也不会被花掉：这个数字只会上升，不需要每日连续登录，哪怕几周后再回来，下一个世界任务也只是再加一。达到设定的里程碑时，这个计数会在功绩之书中记录一项功绩，因此即便你的角色早已不再升级，旧区域依然值得一去。声望页会列出每个区域的计数和下一个里程碑。',
+  'guide.factionsPage.deedsBody':
+    '功绩之书也会记录你的声望：与某个阵营达到信任、与某个阵营达到冠军各记为一项功绩，与三个阵营都达到冠军则是另一项功绩。和所有功绩一样，它们只是装饰，从不带来战力，而冠军功绩会授予一个可佩戴的头衔。',
   'guide.thornhollowPage.heading': '荆谷原野',
   'guide.thornhollowPage.intro':
     '一场排位 5v5 夺旗战场，战场位于棘峰之下老林中的围墙山谷：两座废弃要塞沿着峡谷两端遥遥相对，中间是一座更古老的庭院，谁都不曾真正占据。每方五人，两座要塞，一个目标：夺走敌方战旗并抢在对方之前带回家。',
@@ -12743,6 +12782,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.worldQuestsCompletedInZone.few': '已完成{count}个世界任务',
   'hudChrome.plurals.worldQuestsCompletedInZone.many': '已完成{count}个世界任务',
   'hudChrome.plurals.worldQuestsCompletedInZone.other': '已完成{count}个世界任务',
+  'hudChrome.plurals.worldQuestsCompletedInZone.one': '已完成{count}个世界任务',
+  'hudChrome.plurals.worldQuestsCompletedInZone.few': '已完成{count}个世界任务',
+  'hudChrome.plurals.worldQuestsCompletedInZone.many': '已完成{count}个世界任务',
+  'hudChrome.plurals.worldQuestsCompletedInZone.other': '已完成{count}个世界任务',
   'hudChrome.commissionBoard.statusOpen': '待接单',
   'hudChrome.commissionBoard.statusAccepted': '已接单',
   'hudChrome.commissionBoard.statusDelivered': '已交付',
@@ -16365,6 +16408,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reputation.title': '阵营头衔',
   'hudChrome.reputation.legend': '声望等级',
   'hudChrome.reputation.vendorGate': '需要与{faction}达到{tier}。',
+  'hudChrome.reputation.mastery': '区域精通',
+  'hudChrome.reputation.masteryIntro':
+    '在每个区域完成的世界任务数，永久保留：没有每日连续要求，也不会被消耗。每达到一个里程碑都会记录一项功绩。',
+  'hudChrome.reputation.masteryNext': '下一个里程碑：{count}',
+  'hudChrome.reputation.masteryMaxed': '已达成全部里程碑',
+  'hudChrome.reputation.masteryReached': '{reached} / {total} 个里程碑',
   'hudChrome.reputation.mastery': '区域精通',
   'hudChrome.reputation.masteryIntro':
     '在每个区域完成的世界任务数，永久保留：没有每日连续要求，也不会被消耗。每达到一个里程碑都会记录一项功绩。',

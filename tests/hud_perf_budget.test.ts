@@ -590,6 +590,11 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
   { file: 'cast_bar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'unit_frame_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'paladin_devotion_painter.ts', allow: {}, reflowAllow: {} },
+  // Event-time celebration painters (a skill level-up, a faction standing
+  // tier): they draw only through the CelebrationHost seam (log, banner
+  // slot, announcer), so they make no raw DOM write at all.
+  { file: 'hud/professions/skill_level_toast_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'hud/reputation/faction_tier_celebration_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/action_bar/action_bar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/action_bar/mobile_action_ring_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/action_bar/radial_petal_painter.ts', allow: {}, reflowAllow: {} },
