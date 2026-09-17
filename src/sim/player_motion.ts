@@ -22,6 +22,7 @@ import { abilityCastSurvivesMovement, movementInputWouldMove } from './combat/ca
 import { isRooted, isStunned } from './combat/cc';
 import { isVeilboundMarchActive } from './combat/paladin_veilbound_state';
 import { mountMoveSpeedPct } from './content/mounts';
+import { guardAndReportPose } from './finite_pose_guard';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from './pathfind';
 import {
   type CharacterMoveParams,
@@ -295,6 +296,11 @@ export interface PlayerMotionDeps {
     kind: 'hit',
     noRage: boolean,
   ): void;
+  /**
+   * Called on every restore by the finite-pose guard, with the input the body
+   * was holding. Absent: the throttled dev-channel warning (warnNonFinitePose).
+   */
+  onNonFinitePose?(p: Entity, inp: MoveInput | undefined): void;
 }
 
 export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInput): void {
@@ -507,6 +513,9 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
 
   verticalPass(deps, p, inp, wishX, wishZ, wishSpeed, swimming, steepGround, mountLocked);
   standoffPass(deps, p, stepStartX, stepStartZ, wishX, wishZ, wishSpeed, movingOnGround);
+  // Backstop for the NaN freeze class (finite_pose_guard.ts): whatever the
+  // step did, the pose it hands to the rest of the tick is finite.
+  guardAndReportPose(deps, p, inp, deps.onNonFinitePose);
 }
 
 // Instanced interiors (dungeons, delves, arena, the Yumi maze): flat floors
@@ -534,11 +543,12 @@ function stepInstancedRegion(
     // step-out onto a low standable lip. (Off-world this branch only ever runs
     // in an instanced interior, where waterLevelAt is -Infinity and the ridden
     // surface IS the terrain; the open world runs the physics kernel.)
-    // A rise within MAX_STEP_HEIGHT is a STRIDE, never a wall: the only
-    // interior elevation is the boss dais, a single discrete plateau, so the
-    // step allowance cannot ladder the way a per-tick allowance on continuous
-    // terrain would (the open-world kerb rule, applied to the one kerb
-    // interiors have).
+    // A rise within MAX_STEP_HEIGHT is a STRIDE, never a wall: interior
+    // elevation is a few discrete, non-overlapping plateaus (the boss dais,
+    // the Nythraxis flanking platforms; daisLiftAt returns the first hit, so
+    // they never stack), so the step allowance cannot ladder the way a
+    // per-tick allowance on continuous terrain would (the open-world kerb
+    // rule, applied to the kerbs interiors have).
     if (p.onGround && !swimming) {
       // ride heights clamp to the STEP's waterline (the higher of both ends'),
       // so stepping back into a water body from the submerged bed just outside

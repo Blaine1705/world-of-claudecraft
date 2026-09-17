@@ -209,6 +209,9 @@ describe('live graphics profile architecture', () => {
 // import), so it is registered here even though it lives in src/game. Paths are
 // repo-relative for the failure messages.
 const UI_PURE_CORES = [
+  // The one clamp and disabled rule the source picker's row steppers and the
+  // bank quantity prompt share (quantity_stepper.ts is their DOM consumer).
+  'src/ui/quantity_step_core.ts',
   'src/ui/party_pids_core.ts',
   // The one face-button tone rule, shared by the interact prompt and the pad
   // hint strip so a printed glyph and its colour can never disagree.
@@ -301,6 +304,7 @@ const UI_PURE_CORES = [
   'src/ui/interface_unlock_core.ts',
   'src/ui/interface_visibility_core.ts',
   'src/ui/interface_unlock_menu_core.ts',
+  'src/ui/touch_frame_drag_core.ts',
   'src/ui/keybind_transfer_core.ts',
   'src/ui/keyboard_map_core.ts',
   'src/ui/keybind_conflict_prompt_core.ts',
@@ -685,6 +689,7 @@ const RENDER_PURE_CORES = [
   'src/render/arena_wall_occlusion_core.ts',
   'src/render/outdoor_light_rig_core.ts',
   'src/render/wall_backface_cull_core.ts',
+  'src/render/dais_blocks_core.ts',
   'src/render/dungeon_banner_core.ts',
   'src/render/dungeon_tile_kind_core.ts',
   'src/render/rift_platform_core.ts',
@@ -2456,6 +2461,9 @@ const UI_PAINTER_HELPERS = [
 // the English catalog, it is a maintainer fix during the release locale fill:
 // contributors do not edit those files.
 const UI_DOM_MODULES = [
+  // Mints the shared unit and bag-stack step buttons around a number input and
+  // writes the input on a press; the rules are quantity_step_core.ts.
+  'src/ui/quantity_stepper.ts',
   'src/ui/mobile_frame_long_press.ts',
   'src/ui/account_portal_dom.ts',
   'src/ui/appearance_customizer.ts',
@@ -2490,6 +2498,7 @@ const UI_DOM_MODULES = [
   'src/ui/hud/cross_hotbar/cross_hotbar_controller.ts',
   'src/ui/options_window_shell.ts',
   'src/ui/options_interface_rows.ts',
+  'src/ui/options_main_menu_controller.ts',
   'src/ui/hud/talking_head/talking_head_controller.ts',
   'src/ui/char_skin_window.ts',
   'src/ui/char_window.ts',
@@ -2668,6 +2677,10 @@ const UI_DOM_MODULES = [
   // once in its constructor, the same DOM-owning shape as its sibling above.
   'src/ui/target_swing_timer_bars.ts',
   'src/ui/theme.ts',
+  // The engine indicators' touch drag: pointer events on the frame, a resize
+  // listener, localStorage and the document's safe-area probe (the math is the
+  // touch_frame_drag_core pure core).
+  'src/ui/touch_frame_drag.ts',
   'src/ui/touch_item_drag.ts',
   'src/ui/touch_tap.ts',
   'src/ui/town_focus_window.ts',

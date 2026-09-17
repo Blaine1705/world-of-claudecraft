@@ -882,6 +882,7 @@ import {
   paintMobTooltipBottomRight as paintMobTooltipBottomRightCore,
   paintTooltipAt as paintTooltipAtCore,
 } from './tooltip_paint';
+import { attachTouchFrameDrags, type TouchFrameDrags } from './touch_frame_drag';
 import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
 import { bindTouchDoubleTap, bindTouchTap } from './touch_tap';
 import { buildTownFocusView, stepTownFocus, townFocusRenderSig } from './town_focus_view';
@@ -2020,6 +2021,7 @@ export class Hud {
     },
     () => petBarPreviewIconIds(this.sim.cfg.playerClass),
   );
+  private touchFrameDrags: TouchFrameDrags | null = null;
   private readonly interfaceUnlock = new InterfaceUnlock({
     document,
     onUnlockedChanged: (unlocked) => {
@@ -3873,6 +3875,7 @@ export class Hud {
       },
     });
     this.initInterfaceUnlock(isMobileLayout);
+    this.touchFrameDrags = attachTouchFrameDrags(document, isMobileLayout);
   }
 
   // resizeMode 'dimensions' plumbing for the movers above: each axis reads
@@ -4069,6 +4072,7 @@ export class Hud {
     // seam; show/hide settings keep the player's choice. The buff row's
     // reset can seat it in the aura column: re-anchor.
     this.interfaceUnlock.resetAll();
+    this.touchFrameDrags?.resetAll();
     this.applyAuraAnchor();
     this.chatGeometry.reset();
     this.meters.resetFrames();
@@ -6539,11 +6543,11 @@ export class Hud {
     // classic "Soulbound" line so a player can see it cannot be traded or destroyed.
     if (item.soulbound) {
       html += `<div class="tt-sub" style="color:var(--gold)">${esc(t('hudChrome.itemSoulbound'))}</div>`;
+      // BoP party trade window: qualifies the Soulbound line while this copy can
+      // still be traded to the players who shared its drop; def-gated, so a legacy
+      // marker on a since-freed drop renders nothing (the world owns the clock).
+      html += instancePartyTradeLine(instance, (ms) => this.sim.partyTradeMsRemaining(ms));
     }
-    // BoP party trade window: qualifies the Soulbound line above while this
-    // copy can still be traded to the players who shared its drop
-    // (item_instance_tooltip.ts owns the copy rules; the world owns the clock).
-    html += instancePartyTradeLine(instance, (untilMs) => this.sim.partyTradeMsRemaining(untilMs));
     // Maker's Bond lines (Professions 2.0): the commission
     // binds-on-first-trade warning or the bound lock, beside the def-level
     // soulbound line it parallels (item_instance_tooltip.ts owns the copy
