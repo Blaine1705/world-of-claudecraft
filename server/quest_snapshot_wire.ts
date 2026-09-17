@@ -90,6 +90,11 @@ export function emitQuestSelfKeys(emit: EmitSelfKey, sim: Sim, meta: PlayerMeta)
   // Regional Mastery: the permanent per-zone tally moves only on a completion
   // (heavy-self already), and the record is at most one small int per zone.
   emit('wqzc', meta.worldQuestZoneCounts);
+  // Clue Scrolls: the active hunt cursor (null when none). Every hunt
+  // transition bumps wireRev (src/sim/clue_scrolls.ts), so the heavy gate
+  // re-diffs it the tick it moves; the explicit null clears a finished or
+  // abandoned hunt on the client.
+  emit('cluh', meta.clueHunt);
   emit('wqrr', meta.worldQuestRerollCycle);
   emit('wqrep', meta.worldQuestReplacements ?? {});
 }

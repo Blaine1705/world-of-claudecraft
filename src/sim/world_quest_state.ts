@@ -3,6 +3,7 @@
 // here, behind explicit arguments.
 
 import type { CharacterState } from './character_state';
+import { type ClueHuntProgress, sanitizeClueCasketsOpened, sanitizeClueHunt } from './clue_scrolls';
 import type { FactionId } from './factions';
 import { freshFactionReputation, sanitizeFactionReputation } from './factions';
 import { sanitizeZoneCompletionCounts } from './regional_mastery';
@@ -41,6 +42,17 @@ export interface WorldQuestPlayerState {
    * reset by a rollover, a reroll, or a missed day (src/sim/regional_mastery.ts).
    */
   worldQuestZoneCounts: Record<string, number>;
+  /**
+   * Clue Scrolls (src/sim/clue_scrolls.ts). The active hunt cursor (null when
+   * none); the world-quest cycle that already paid a scroll ('' when none);
+   * the lifetime Treasure Caskets opened (the clueCasketsOpened deed meter).
+   * None of the three is touched by a cycle rollover: a hunt survives the
+   * daily reset by design, and the paid-cycle mark is what makes the next
+   * day's slate a fresh entitlement.
+   */
+  clueHunt: ClueHuntProgress | null;
+  clueScrollCycle: string;
+  clueCasketsOpened: number;
 }
 
 export interface WorldQuestRotationCache {
@@ -59,6 +71,9 @@ export function freshWorldQuestPlayerState(): WorldQuestPlayerState {
     worldQuestRerollCycle: '',
     worldQuestReplacements: {},
     worldQuestZoneCounts: {},
+    clueHunt: null,
+    clueScrollCycle: '',
+    clueCasketsOpened: 0,
   };
 }
 
@@ -97,6 +112,14 @@ export function restoreWorldQuestState(
   // The mastery counts outlive every cycle: restored whatever the board holds
   // (a legacy save without the field restores to an empty map).
   meta.worldQuestZoneCounts = sanitizeZoneCompletionCounts(saved?.zoneCounts);
+  // Clue Scrolls: cycle-independent like the mastery counts. A hunt whose id
+  // is no longer in the pool restores to null (a retired hunt returns nothing,
+  // by design; sanitizeClueHunt says the same); the step is clamped to the
+  // hunt's length. The paid-cycle mark is kept whatever cycle it names: a
+  // stale one simply never matches the current cycle again.
+  meta.clueHunt = sanitizeClueHunt(saved?.clueHunt);
+  meta.clueScrollCycle = sanitizeWorldQuestCycle(saved?.clueScrollCycle);
+  meta.clueCasketsOpened = sanitizeClueCasketsOpened(saved?.clueCasketsOpened);
   if (saved) {
     meta.worldQuestCycle = sanitizeWorldQuestCycle(saved.cycle);
     if (typeof saved.rerollCycle === 'string' && saved.rerollCycle === meta.worldQuestCycle) {
@@ -129,12 +152,18 @@ export function savedWorldQuestState(meta: PlayerMeta): {
     hasReroll && meta.worldQuestReplacements && Object.keys(meta.worldQuestReplacements).length > 0;
   const hasZoneCounts =
     meta.worldQuestZoneCounts !== undefined && Object.keys(meta.worldQuestZoneCounts).length > 0;
+  const hasClueHunt = meta.clueHunt !== null && meta.clueHunt !== undefined;
+  const hasClueCycle = typeof meta.clueScrollCycle === 'string' && meta.clueScrollCycle !== '';
+  const hasCaskets = (meta.clueCasketsOpened ?? 0) > 0;
   if (
     !meta.worldQuestCycle &&
     meta.worldQuestLog.size === 0 &&
     !hasRep &&
     !hasReroll &&
-    !hasZoneCounts
+    !hasZoneCounts &&
+    !hasClueHunt &&
+    !hasClueCycle &&
+    !hasCaskets
   ) {
     return {};
   }
@@ -179,6 +208,9 @@ export function savedWorldQuestState(meta: PlayerMeta): {
       ...(hasReroll ? { rerollCycle: meta.worldQuestRerollCycle } : {}),
       ...(hasReplacements ? { replacements: { ...meta.worldQuestReplacements } } : {}),
       ...(hasZoneCounts ? { zoneCounts: { ...meta.worldQuestZoneCounts } } : {}),
+      ...(hasClueHunt && meta.clueHunt ? { clueHunt: { ...meta.clueHunt } } : {}),
+      ...(hasClueCycle ? { clueScrollCycle: meta.clueScrollCycle } : {}),
+      ...(hasCaskets ? { clueCasketsOpened: meta.clueCasketsOpened } : {}),
     },
     ...(factionsObj ? { factions: factionsObj } : {}),
   };

@@ -1,3 +1,4 @@
+import { maybeAwardClueScroll, updateClueHunt } from './clue_scrolls';
 import { WORLD_QUEST_CALLIGRAPHY_ID } from './content/world_quest_calligraphy';
 import { FORGE_QUEST_ID } from './content/world_quest_forging';
 import { GLIDER_APPRENTICE_NPC_DEF, GLIDER_QUEST_ID } from './content/world_quest_glider';
@@ -286,6 +287,9 @@ export function updateWorldQuests(ctx: SimContext, meta: PlayerMeta, player: Ent
   const devCycle = meta.devWorldQuestCycle ?? null;
   const cycle = devCycle ?? rotation.cycle;
   resetCycleIfNeeded(ctx, meta, cycle);
+  // Clue Scrolls: the landmark-step sweep rides this per-player site (one
+  // null check per tick with no hunt); the hook itself skips a dead player.
+  updateClueHunt(ctx, meta, player);
   updateInvestigationEncounter(ctx, meta, player);
   // Shared-site machinery advances once per tick from whichever player ticks
   // first, inside or outside the site, so an abandoned rift still tears down.
@@ -633,6 +637,9 @@ function creditWorldQuest(
   ctx.markDeedsDirty(meta.entityId);
   meta.unlockedMilestones.add(claimToken(meta.worldQuestCycle, quest.id));
   awardWorldQuest(ctx, meta, quest);
+  // Clue Scrolls: with the day's rewards and standing already landed above,
+  // the last zone slot of the slate pays the scroll (once per cycle).
+  if (player) maybeAwardClueScroll(ctx, meta, player);
   // A plain quest's optional encore: a champion of the site for anyone to fight.
   summonWorldQuestChampion(ctx, quest, meta);
   if (quest.id === SHADOW_QUEST_ID) {

@@ -683,8 +683,9 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // same pending side.
     // 308 at the release/v0.43.0 merge: plus the eight world-quest deeds.
     // 315 with the seven faction standing deeds, 320 with the five Regional
-    // Mastery deeds; all twelve sit on the pending side on category crests.
-    expect(DEED_ORDER).toHaveLength(320);
+    // Mastery deeds, 322 with the two Clue Scroll casket deeds; all fourteen
+    // sit on the pending side on category crests.
+    expect(DEED_ORDER).toHaveLength(322);
     expect(DEED_ART_PENDING.has('hid_forgebreaker')).toBe(true);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');

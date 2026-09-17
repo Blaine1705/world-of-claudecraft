@@ -44,6 +44,7 @@ export function applyQuestSelfWire(
     wqrr?: unknown;
     wqrep?: unknown;
     wqzc?: unknown;
+    cluh?: unknown;
   },
   simTime?: unknown,
 ): void {

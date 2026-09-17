@@ -919,6 +919,10 @@ export const METER_DIRTY_KEYS: Record<DeedMeterId, readonly string[]> = {
   // ledger, so no narrow key could name it; the one writer (the world-quest
   // credit site in world_quests.ts) marks a full pass right after the increment.
   regionalMasteryBest: [],
+  // Reads the top-level PlayerMeta.clueCasketsOpened count, never a deedStats
+  // ledger, so no narrow key could name it; the one writer (the casket open
+  // site in clue_casket.ts) marks a full pass right after the increment.
+  clueCasketsOpened: [],
   vcupWins: [],
   vcupGuildWins: [],
   bankPurchasedSlots: [],
@@ -1039,6 +1043,8 @@ const METERS: Record<DeedMeterId, (meta: PlayerMeta) => number> = {
   // The best single zone's world quest completion count (the "in a single
   // zone" ladder). Tolerates a missing map for the same legacy-save reason.
   regionalMasteryBest: (m) => bestZoneCompletionCount(m.worldQuestZoneCounts),
+  // Lifetime Treasure Caskets opened. Tolerates a missing field the same way.
+  clueCasketsOpened: (m) => m.clueCasketsOpened ?? 0,
   vcupWins: (m) => m.vcupWins,
   vcupGuildWins: (m) => m.vcupGuildWins,
   bankPurchasedSlots: (m) => m.bank.purchasedSlots,

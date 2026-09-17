@@ -142,9 +142,11 @@ export const IWORLD_MEMBERS = [
   { name: 'worldQuestReplacements', kind: 'data' },
   { name: 'worldQuestRerollCycle', kind: 'data' },
   { name: 'worldQuestZoneCounts', kind: 'data' },
+  { name: 'clueHunt', kind: 'data' },
   // --- commands + read-returning methods ---
   { name: 'canRerollWorldQuest', kind: 'method' },
   { name: 'rerollWorldQuest', kind: 'method' },
+  { name: 'abandonClueHunt', kind: 'method' },
   { name: 'questState', kind: 'method' }, // read-returning (1/6)
   { name: 'reactiveAbilityWindowRemaining', kind: 'method' },
   { name: 'groundAimPlacementPreview', kind: 'method' },
@@ -894,10 +896,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // worldQuestReplacements, worldQuestRerollCycle (+3 data), and canRerollWorldQuest,
     // rerollWorldQuest (+2 methods). Counted 403/117/286 on
     // feature/wq-regional-mastery: plus the Regional Mastery per-zone counts
-    // readout worldQuestZoneCounts (+1 data).
-    expect(IWORLD_MEMBERS.length).toBe(403);
-    expect(DATA_MEMBERS.length).toBe(117);
-    expect(METHOD_MEMBERS.length).toBe(286);
+    // readout worldQuestZoneCounts (+1 data). Counted 405/118/287 on
+    // feature/clue-scrolls: plus the active clue hunt readout clueHunt
+    // (+1 data) and abandonClueHunt (+1 method).
+    expect(IWORLD_MEMBERS.length).toBe(405);
+    expect(DATA_MEMBERS.length).toBe(118);
+    expect(METHOD_MEMBERS.length).toBe(287);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -908,6 +912,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
   // these deliberately, forcing a reviewed edit. NOT length-only.
   it('the full sorted member set is exactly the pinned contract', () => {
     expect(IWORLD_MEMBERS.map((m) => m.name).sort()).toEqual([
+      'abandonClueHunt',
       'abandonPet',
       'abandonQuest',
       'acceptCommissionOrder',
@@ -986,6 +991,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'claimEventSkin',
       'clearGatheringGoal',
       'clearMarker',
+      'clueHunt',
       'collectDelveChestLoot',
       'combineMaterialStacks',
       'commissionOrders',
@@ -1346,6 +1352,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'cardMinigameInfo',
       'cfg',
       'civicServicePlacements',
+      'clueHunt',
       'commissionOrders',
       'companionState',
       'companionUpgrades',
@@ -1438,6 +1445,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
 
   it('the sorted method-kind set is exactly the pinned contract', () => {
     expect(METHOD_MEMBERS.map((m) => m.name).sort()).toEqual([
+      'abandonClueHunt',
       'abandonPet',
       'abandonQuest',
       'acceptCommissionOrder',
@@ -1963,6 +1971,8 @@ const FACET_QUESTS = [
   'worldQuestZoneCounts',
   'canRerollWorldQuest',
   'rerollWorldQuest',
+  'clueHunt',
+  'abandonClueHunt',
 ] as const satisfies readonly (keyof IWorldQuests)[];
 type _ExhaustQuests = AssertNever<Exclude<keyof IWorldQuests, (typeof FACET_QUESTS)[number]>>;
 
@@ -2500,10 +2510,10 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    // Mirrors the IWORLD_MEMBERS.length pin above (403); this pin and the one above
+    // Mirrors the IWORLD_MEMBERS.length pin above (405); this pin and the one above
     // must always agree.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(403);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(403);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(405);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(405);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

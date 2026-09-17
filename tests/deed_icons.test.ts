@@ -376,10 +376,12 @@ describe('Book of Deeds webp icons', () => {
     // the progression crest: 315 live, still 289 painted.
     // The five Regional Mastery exploration deeds join the pending set on the
     // exploration crest: 320 live, still 289 painted.
-    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(320);
+    // The two Clue Scroll casket exploration deeds join the pending set on the
+    // same crest: 322 live, still 289 painted.
+    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(322);
     expect(DEED_IMAGE_IDS.size, 'every live deed but the pending set is painted').toBe(289);
-    expect(DEED_ART_PENDING_IDS).toHaveLength(31);
-    expect(DEED_ART_PENDING_IDS.at(-1)).toBe('exp_regional_mastery_250');
+    expect(DEED_ART_PENDING_IDS).toHaveLength(33);
+    expect(DEED_ART_PENDING_IDS.at(-1)).toBe('exp_clue_ten_caskets');
     expect(DEED_ORDER.length - DEED_IMAGE_IDS.size).toBe(DEED_ART_PENDING_IDS.length);
     for (const id of artless) {
       const catCrestId = deedCrestId(id, DEEDS[id].category);

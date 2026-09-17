@@ -818,8 +818,9 @@ describe('Masterwrought art completion evidence', () => {
     // The world-quest branch adds its two batches (four quest-object icons) at
     // the release/v0.43.0 merge: 1,287.
     // The wq-reputation merge adds the 15 faction quartermaster icons
-    // (faction-vendor-icons-2026-09-16): 1,302.
-    expect(currentOwnerIds).toHaveLength(1302);
+    // (faction-vendor-icons-2026-09-16): 1,302. The Clue Scroll items add
+    // their two (clue-scroll-icons-2026-09-17): 1,304.
+    expect(currentOwnerIds).toHaveLength(1304);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -889,6 +890,16 @@ describe('Masterwrought art completion evidence', () => {
     expect(factionVendorIds.size).toBe(15);
     expect(datedIds.filter((id) => factionVendorIds.has(id))).toEqual([]);
     expect(currentOwnerIds.filter((id) => factionVendorIds.has(id))).toHaveLength(15);
+    // The Clue Scroll items, one SVG batch (clue-scroll-icons-2026-09-17): 2
+    // ids, additive the same way.
+    const clueScrollIds = new Set(
+      mapping.generatedBatches
+        .filter(({ batchId }) => batchId === 'clue-scroll-icons-2026-09-17')
+        .flatMap(({ itemIds }) => itemIds),
+    );
+    expect(clueScrollIds.size).toBe(2);
+    expect(datedIds.filter((id) => clueScrollIds.has(id))).toEqual([]);
+    expect(currentOwnerIds.filter((id) => clueScrollIds.has(id))).toHaveLength(2);
     expect(datedIds.filter((id) => ossBrainMountIds.has(id))).toEqual([]);
     expect(currentOwnerIds.filter((id) => ossBrainMountIds.has(id))).toHaveLength(2);
 
@@ -907,7 +918,8 @@ describe('Masterwrought art completion evidence', () => {
         !laterGapFillIds.has(id) &&
         !ossBrainMountIds.has(id) &&
         !worldQuestObjectIds.has(id) &&
-        !factionVendorIds.has(id),
+        !factionVendorIds.has(id) &&
+        !clueScrollIds.has(id),
     );
     expect(completionOwnerIds).toHaveLength(1209);
     expect(sorted(completionOwnerIds)).toEqual(completionDatedIds);

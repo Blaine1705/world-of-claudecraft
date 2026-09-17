@@ -1,9 +1,10 @@
-// Delta-safe decode for the faction standing, daily reroll and Regional Mastery
-// owner keys. The server emits them beside the world-quest family
+// Delta-safe decode for the faction standing, daily reroll, Regional Mastery
+// and clue hunt owner keys. The server emits them beside the world-quest family
 // (server/quest_snapshot_wire.ts, emitQuestSelfKeys); omission retains the
 // previous mirror and a malformed value is clamped by the same sanitizers the
 // save/load boundary uses, so a hostile or skewed snapshot can never leave the
 // client holding out-of-range standing or counts.
+import { sanitizeClueHunt } from '../sim/clue_scrolls';
 import type { FactionId } from '../sim/factions';
 import { sanitizeFactionReputation } from '../sim/factions';
 import { sanitizeZoneCompletionCounts } from '../sim/regional_mastery';
@@ -15,12 +16,13 @@ export interface FactionSelfMirrors {
   worldQuestRerollCycle: string;
   worldQuestReplacements: Readonly<Record<string, string>>;
   worldQuestZoneCounts: Readonly<Record<string, number>>;
+  clueHunt: Readonly<{ huntId: string; step: number }> | null;
 }
 
-/** Apply the `fac`, `wqrr`, `wqrep` and `wqzc` self keys; each is independent. */
+/** Apply the `fac`, `wqrr`, `wqrep`, `wqzc` and `cluh` self keys; each is independent. */
 export function applyFactionSelfWire(
   target: Partial<FactionSelfMirrors> & { worldQuestCycle?: string },
-  self: { fac?: unknown; wqrr?: unknown; wqrep?: unknown; wqzc?: unknown },
+  self: { fac?: unknown; wqrr?: unknown; wqrep?: unknown; wqzc?: unknown; cluh?: unknown },
 ): void {
   if (self.fac !== undefined) {
     target.factions = Object.freeze(sanitizeFactionReputation(self.fac));
@@ -39,5 +41,12 @@ export function applyFactionSelfWire(
     // Regional Mastery counts are cycle-independent: the same clamp the save
     // boundary applies (world quest zones only, whole positive numbers).
     target.worldQuestZoneCounts = Object.freeze(sanitizeZoneCompletionCounts(self.wqzc));
+  }
+  if (self.cluh !== undefined) {
+    // The clue hunt cursor: the same sanitizer the save boundary runs (an
+    // unknown hunt id or any junk decodes to null, the step is clamped), so
+    // the mirror can never name a hunt the tracker has no clues for.
+    const hunt = sanitizeClueHunt(self.cluh);
+    target.clueHunt = hunt ? Object.freeze(hunt) : null;
   }
 }

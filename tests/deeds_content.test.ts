@@ -144,8 +144,10 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // three Champion at 25, and the all-factions meta at 50: +140).
     // 320 / 3595 with the five Regional Mastery exploration deeds (the per-zone
     // world quest ladder at 5, 10, 10, 25 and 50: +100).
-    expect(DEED_ORDER.length).toBe(320);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3595);
+    // 322 / 3630 with the two Clue Scroll casket deeds (the first casket at
+    // 10 and the tenth at 25: +35).
+    expect(DEED_ORDER.length).toBe(322);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3630);
   });
 
   it('ships the audited per-category counts', () => {
@@ -184,7 +186,9 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       social: 20,
       // +5 the Regional Mastery per-zone world quest ladder
       // (exp_regional_mastery_10 through _250).
-      exploration: 24,
+      // +2 the Clue Scroll casket pair (exp_clue_first_casket and
+      // exp_clue_ten_caskets, both on the clueCasketsOpened meter).
+      exploration: 26,
       feat: 3,
       hidden: 10,
     });
@@ -403,6 +407,10 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'exp_regional_mastery_50',
       'exp_regional_mastery_100',
       'exp_regional_mastery_250',
+      // The Clue Scroll casket pair: two meter deeds on clueCasketsOpened
+      // (the first casket and the tenth, which grants Treasure Hunter).
+      'exp_clue_first_casket',
+      'exp_clue_ten_caskets',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -798,12 +806,13 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // mandate), and the Crucible raid's flawless title (dgn_varkhul_flawless,
     // the 2026-08-30 release/v0.41.0 sync merge) one more, and the three
     // faction standing Champion titles (Riftwarden, Dawnkeeper, Forgemaster)
-    // three more.
-    expect(titles.length).toBe(50);
+    // three more, and the Clue Scroll tenth-casket title (Treasure Hunter)
+    // one more.
+    expect(titles.length).toBe(51);
     expect(borders.length).toBe(4);
     // Titles and border slugs are unique (one deed per cosmetic).
     const titleTexts = titles.map((d) => (d.reward as { text: string }).text);
-    expect(new Set(titleTexts).size).toBe(50);
+    expect(new Set(titleTexts).size).toBe(51);
     const borderSlugs = borders.map((d) => (d.reward as { slug: string }).slug);
     expect([...borderSlugs].sort()).toEqual([
       'curators_gilt',
@@ -1026,7 +1035,12 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // 2b8d9d03... literal rotated down into PRE_APPEND_CATALOG_SHA256 and the
   // proof below reproduces it exactly. No shipped trigger or renown value
   // was touched.
-  const FROZEN_CATALOG_SHA256 = '4c6954a08a0a3b6c098e0bfaae30452743903af2d739f2ff1251071737212fac';
+  // Re-baselined for the two appended Clue Scroll casket deeds (the
+  // exp_clue_first_casket / exp_clue_ten_caskets meter pair on the new
+  // clueCasketsOpened meter), re-minted THE AUDITABLE WAY: the 4c6954a0...
+  // literal rotated down into PRE_APPEND_CATALOG_SHA256 and the proof below
+  // reproduces it exactly. No shipped trigger or renown value was touched.
+  const FROZEN_CATALOG_SHA256 = '29a1422f6fe1eb0336674e3366dd348a9d3db0b6ebab30654bbe5949a6815a5d';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1086,30 +1100,28 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   //
   // The Regional Mastery ladder appends five deeds after
   // prog_faction_champion_all; the previous mint is the faction ladder's
-  // 2b8d9d03... literal (rotated down here), and stripping the five must
-  // reproduce it exactly.
+  // 2b8d9d03... literal, and stripping the five reproduced it exactly.
+  //
+  // The Clue Scroll casket pair appends two deeds after
+  // exp_regional_mastery_250; the previous mint is the Regional Mastery
+  // ladder's 4c6954a0... literal (rotated down here), and stripping the two
+  // must reproduce it exactly.
   const PRE_APPEND_CATALOG_SHA256 =
-    '2b8d9d03740487fde602cfb2c610880747113a59c98539eab242e498840c422a';
-  const APPENDED_SINCE: readonly string[] = [
-    'exp_regional_mastery_10',
-    'exp_regional_mastery_25',
-    'exp_regional_mastery_50',
-    'exp_regional_mastery_100',
-    'exp_regional_mastery_250',
-  ];
+    '4c6954a08a0a3b6c098e0bfaae30452743903af2d739f2ff1251071737212fac';
+  const APPENDED_SINCE: readonly string[] = ['exp_clue_first_casket', 'exp_clue_ten_caskets'];
 
   it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
     const appended = new Set(APPENDED_SINCE);
     for (const id of APPENDED_SINCE) {
       expect(DEED_ORDER.includes(id), `${id} is in the live catalog`).toBe(true);
     }
-    // The Regional Mastery ladder sits at the true tail after the faction
-    // standing block. Pin its two predecessors too: this is an append into a
+    // The Clue Scroll casket pair sits at the true tail after the Regional
+    // Mastery ladder. Pin its two predecessors too: this is an append into a
     // known seat, never a scattered insert or a retro-edit (the digest below
     // proves it).
     expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
-      'prog_automatons_champion',
-      'prog_faction_champion_all',
+      'exp_regional_mastery_100',
+      'exp_regional_mastery_250',
       ...APPENDED_SINCE,
     ]);
     const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
@@ -1328,8 +1340,9 @@ describe('table shape', () => {
     // raid block (whose flawless task was the previous final entry).
     // The one-time Forgebreaker quest's hidden celebration appends after it,
     // then the world-quest block, then the faction standing ladder, then the
-    // Regional Mastery ladder whose 250-turn-in rung is the final entry.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('exp_regional_mastery_250');
+    // Regional Mastery ladder, then the Clue Scroll casket pair whose tenth
+    // casket title deed is the final entry.
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('exp_clue_ten_caskets');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {
@@ -1687,6 +1700,11 @@ describe('trigger references resolve against the real content tables', () => {
     ).toEqual([
       'col_deepest_cast:Clockreel Fishing Rod',
       'col_glimmerfin:Sunglint Koi',
+      // Reviewed at the Clue Scroll casket deeds: the first-casket desc names
+      // the Treasure Casket, and the casket-opening site that bumps the
+      // clueCasketsOpened meter consumes exactly that item
+      // (TREASURE_CASKET_ITEM_ID), so the desc names the RIGHT one.
+      'exp_clue_first_casket:Treasure Casket',
       'feat_brightwood_relic:Bramblehide Jerkin',
       "feat_brightwood_relic:Monarch's Crown",
       'hid_codfather:The Codfather',

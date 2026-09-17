@@ -27,6 +27,8 @@ import {
   equipBag as equipBagCmd,
   stackSizeOf,
 } from './bags';
+import { openTreasureCasket } from './clue_casket';
+import { useClueScroll } from './clue_scrolls';
 import { buildConsuming } from './consuming';
 import { resolveFactionVendorRowGate } from './content/faction_vendors';
 import { isRawCookingCatch } from './content/items';
@@ -968,6 +970,17 @@ export function useItem(
   }
   if (def.use?.type === 'passingStone') {
     usePassingStone(ctx, p, meta);
+    return;
+  }
+  // Clue Scrolls: the module owns every rule (start / dig / refuse) and decides
+  // whether the scroll is spent; the arm's consumeOneUnit is threaded so the
+  // clicked copy is the one spent, like every consumable arm here.
+  if (def.use?.type === 'clueScroll') {
+    useClueScroll(ctx, meta, p, consumeOneUnit);
+    return;
+  }
+  if (def.use?.type === 'clueCasket') {
+    openTreasureCasket(ctx, meta, p, consumeOneUnit);
     return;
   }
   // Buff dishes mint their Well Fed aura at COMPLETION of the sit-restore,

@@ -173,8 +173,11 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // RE-PINNED at the third release/v0.43.0 merge into feature/world-quests:
 // the release's 225/239 plus the branch's eleven world-quest and vehicle
 // commands, plus world_quest_reroll: 237/251/14.
-const EXPECTED_SEND_COUNT = 237;
-const EXPECTED_DISPATCH_COUNT = 251;
+// +1 send / +1 dispatch for the Clue Scrolls tracker abandon
+// (`clue_hunt_abandon`, sent by QuestWorldWireState.abandonClueHunt and
+// routed through the delegated world-quest switch): 238/252/14.
+const EXPECTED_SEND_COUNT = 238;
+const EXPECTED_DISPATCH_COUNT = 252;
 const EXPECTED_DISPATCH_ONLY_COUNT = 14;
 
 // The chat sub-channel routing switch (server/game.ts `switch

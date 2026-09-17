@@ -2340,6 +2340,12 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // ids in the same deeds row (117 characters of ids plus 5 x 16).
     // Predicted from the literals BEFORE the run and MEASURED EXACTLY
     // (56,241 to 56,438; the deeds row below moves 599 to 796).
+    // Plus 105 at the Clue Scroll content: the two exp_clue_* deed ids in the
+    // deeds row (41 characters of ids plus 2 x 16 = 73) and the two clue item
+    // ids (clue_scroll, treasure_casket) in deedStats.itemsDiscovered (26
+    // characters of ids plus 2 x 3 = 32). Predicted from the literals BEFORE
+    // the run and MEASURED EXACTLY (56,438 to 56,543; the deeds row below
+    // moves 796 to 869 and deedStats 469 to 501).
     expect(counterfactualBytes - 156144).toBe(
       Object.values(fixtureDelta).reduce((sum, value) => sum + value, 0) +
         183 +
@@ -2349,7 +2355,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         375 +
         358 +
         282 +
-        197,
+        197 +
+        105,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2375,8 +2382,10 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // (+90) attributed in the +375 above. deedStats 111 -> 469 at the
       // wq-reputation merge: the faction quartermaster items (+358 above).
       // deeds 317 -> 599 at the faction standing deeds (+282 above) and
-      // 599 -> 796 at the Regional Mastery deeds (+197 above).
-    ).toEqual({ questsDone: 100, knownRecipes: 30, deeds: 796, deedStats: 469, reliquary: 80 });
+      // 599 -> 796 at the Regional Mastery deeds (+197 above). deeds 796 -> 869
+      // and deedStats 469 -> 501 at the Clue Scroll content (+73 and +32 of
+      // the +105 above).
+    ).toEqual({ questsDone: 100, knownRecipes: 30, deeds: 869, deedStats: 501, reliquary: 80 });
     // Removing field_kit AND the Bramblehide release content reproduces the
     // pre-field-kit, pre-Bramblehide baseline WITH the hammer content still
     // applied: 3884 alone measured 209,261 here (hammer content absent); the
@@ -2396,8 +2405,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // quartermaster item ids (+358, attributed above) stay here too.
       // 210,506 -> 210,788 at the faction standing deeds (+282) and
       // 210,788 -> 210,985 at the Regional Mastery deeds (+197), both in the
-      // deeds row this counterfactual keeps.
-    ).toBe(210985);
+      // deeds row this counterfactual keeps. 210,985 -> 211,090 at the Clue
+      // Scroll content (+105: the two deed ids and the two item ids).
+    ).toBe(211090);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 49-byte
@@ -2413,7 +2423,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 211,745 -> 212,103 at the wq-reputation merge (+358, the faction items).
       // 212,103 -> 212,385 at the faction standing deeds (+282) and
       // 212,385 -> 212,582 at the Regional Mastery deeds (+197).
-    ).toBe(212582);
+      // 212,582 -> 212,687 at the Clue Scroll content (+105).
+    ).toBe(212687);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2481,8 +2492,14 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // deeds row (+197, attributed above); no container or ceiling changed
     // shape. Floor at measurement minus 380, edge at measurement plus one:
     // 212,214..212,595.
-    expect(bytes, reMint).toBeGreaterThan(212214);
-    expect(bytes, reMint).toBeLessThan(212595);
+    // RE-BASED at the Clue Scroll content: 212,699 bytes, up 105 from
+    // 212,594. The movers are the two exp_clue_* deed ids in the deeds row
+    // (+73) and the two clue item ids in deedStats.itemsDiscovered (+32), both
+    // attributed in the growth equation above; no container or ceiling changed
+    // shape. Floor at measurement minus 380, edge at measurement plus one:
+    // 212,319..212,700.
+    expect(bytes, reMint).toBeGreaterThan(212319);
+    expect(bytes, reMint).toBeLessThan(212700);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

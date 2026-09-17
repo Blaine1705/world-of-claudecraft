@@ -6077,6 +6077,70 @@ export const id_ID: EnTranslations = {
       "stepup_signature_invalid": "Tanda tangan dompet itu tidak terverifikasi. Mulai penjualan lagi dari awal."
     }
   },
+  "clues": {
+    "items": {
+      "clue_scroll": {
+        "desc": "A sealed riddle earned by finishing every zone slot of the day. Use it to begin a treasure hunt, and use it again on the hidden spot when the last clue says to dig."
+      },
+      "treasure_casket": {
+        "desc": "A locked casket dug up at the end of a treasure hunt. Use it to open it and claim what the hunt buried."
+      }
+    },
+    "hunt_drakelands_gate_ashes": {
+      "0": "The road out of Wyrmwatch runs west into a stand of old trees that guards the gate. Stand beneath the Gatewood and the trail begins.",
+      "1": "A far-dune watcher keeps to the eastern sands, north of the garrison. Find Scout Yerrin and ask what the wind carried in.",
+      "2": "The keeper of the garrison stores has not eaten since the last patrol. Bring Quartermaster Sela 2 x Cottage Loaf.",
+      "3": "East and a little south of where the cinders drift into dunes, a scorched patch of ground hides what the ash buried. Use the scroll there and dig.",
+      "title": "Ashes at the Gate"
+    },
+    "hunt_frostveil_aurora_vigil": {
+      "0": "Where the terraces climb toward the lights that dance at night, kneel on the Aurora Steps and let the sky notice you.",
+      "1": "The one who reads the lights waits close by the steps. Speak with Aurorist Veyla about what the sky spelled out.",
+      "2": "East of the howling terraces, a little to the south, the snow lies flatter than it should. Use the scroll there and dig.",
+      "title": "Lights over the Steps"
+    },
+    "hunt_amberfall_lantern_ferry": {
+      "0": "At the water's edge north of Lanternmere, the keeper of the lantern ferries knows which light went out. Speak with Ferrymaster Caddow.",
+      "1": "A single stone leans against the sky northeast of the great mere, older than the town. Stand at the Leaning Monolith.",
+      "2": "The keeper of the gilded rows waters her orchard by hand and thirsts for it. Bring Orchardist Pomeline 3 x Cold Well Water.",
+      "3": "Northeast of the rise where the cindermaples burn red, the leaves lie in a circle that no wind made. Use the scroll there and dig.",
+      "title": "Lanterns on the Mere"
+    },
+    "hunt_willowfen_fenwitch_salt": {
+      "0": "The fen-witch of Willowweep will not talk to anyone who comes empty-handed. Bring Mother Sedge 1 x Cooking Salt.",
+      "1": "Where the fen goes flat and the air makes everyone drowsy, stand on the Drowsy Flats and sigh, as the witch told you.",
+      "2": "Southeast of the pools that shine in the bog, a hummock of dry ground stays dry all year. Use the scroll there and dig.",
+      "title": "The Fen-Witch's Salt"
+    },
+    "hunt_nightbloom_sleepless_vigil": {
+      "0": "Northeast of Moonrest, where the stones keep a watch that never ends, stand at the Standing Vigil.",
+      "1": "The watcher at the vigil counts stars the way others count coins. Speak with Astronomer Cassian about the one that fell.",
+      "2": "North of the town lies a barrow whose sleeper never rests. Salute the Sleepless Barrow so the sleeper knows a friend has come.",
+      "3": "Southeast of the field where the gloam gathers, the moonlight pools on one bare patch of soil. Use the scroll there and dig.",
+      "title": "Vigil of the Sleepless"
+    },
+    "hunt_wraithwood_mournstone_candles": {
+      "0": "The candlewright of Gibbetmere sells light to people who fear the dark. Speak with Widow Tansy about a candle that was never paid for.",
+      "1": "The last vicar of the Mournstone has been fasting on prayers alone. Bring Vicar Creel 2 x Salted Jerky.",
+      "2": "Northeast of the town, past the crows, a glade hangs its own strange fruit. Stand in the Hanging Glade.",
+      "3": "Southeast of the clearing where the huntsman set his snares, the leaf litter has been turned over recently. Use the scroll there and dig.",
+      "title": "Candles for the Mournstone"
+    },
+    "hunt_palmreach_sunken_idol": {
+      "0": "Deep in the tangle, northwest of the lagoon, the vines pour down like a waterfall. Stand at the Vinefall.",
+      "1": "A hermit who went into the tangle and came back out lives close to the falling vines. Speak with Okrim about what he saw down there.",
+      "2": "To the east, an idol sits half-drowned and still watching. Cower before the Sunken Idol, the way the hermit said the divers do.",
+      "3": "Northeast of where the tangle opens its mouth to the sea, the sand has been heaped higher than the tide reaches. Use the scroll there and dig.",
+      "title": "The Idol's Secret"
+    },
+    "hunt_evergarden_beacon_road": {
+      "0": "The parterre gardener along the walk north of Hedgewick swears her beds are starving. Bring Farmer Verbena 2 x Compost.",
+      "1": "In the far southeast corner of the garden, an old mill still turns for no miller. Stand at the Old Mill.",
+      "2": "Follow the road south over the border into the Galecrest and out to the coast. The keeper of the old beacon, Keeper Bram, has the last word.",
+      "3": "Northwest of the old beacon, just off the path down from the light, the turf has been cut and laid back. Use the scroll there and dig.",
+      "title": "Beacon and Bloom"
+    }
+  },
   "guide": {
     "brand": "World of ClaudeCraft",
     "brandShort": "ClaudeCraft",
@@ -7258,6 +7322,14 @@ export const id_ID: EnTranslations = {
       "sideWardenBody": "Di samping kisah utama, para marsekal dan penjaga Lembah serta fen membagikan tangga sayembara tetap. Naiki setapak demi setapak, musuh demi musuh, sebagaimana setiap pemburu sayembara sebelummu meraih tempatnya. Ini menaikkan level dengan jujur sekaligus tur ke para pembuat onar terburuk di tiap zona.",
       "sideCryptTitle": "Raja yang terlupakan",
       "sideCryptBody": "Tinggi di atas puncak terbentang misteri yang lebih hening: makam-makam tua bertanda mahkota yang tak terekam catatan mana pun. Baca para mati, kumpulkan apa yang mereka jaga, dan buka segel makam yang seharusnya tetap tertutup. Ini jejak ala detektif yang membuka jalan menuju raid akhir sepuluh pemain milik realm.",
+      "cluesTitle": "Clue Scrolls",
+      "cluesBody": "Out in the far zones, the daily world-quest board hides one more reward for anyone who clears the whole slate: a Clue Scroll, and the treasure hunt written on it.",
+      "cluesEarnTitle": "Earning a scroll",
+      "cluesEarnBody": "Once your character is far enough along, completing every zone slot on the day's world-quest board hands you a Clue Scroll on top of the usual rewards. A rerolled slot counts once it is done; the always-open dailies are not required. You can hold a few scrolls at a time, so there is no need to spend one the day you earn it.",
+      "cluesHuntTitle": "Following the clues",
+      "cluesHuntBody": "Using a scroll starts a hunt: a short chain of riddles that shows in your quest tracker one step at a time. Each riddle points at something real in the world, a landmark to stand at, a person to talk to, an emote to perform somewhere, or a small errand to run, and the last one always asks you to dig. Only one hunt runs at a time, and it keeps your place across the daily reset and between sessions, so take your time.",
+      "cluesCasketTitle": "The casket",
+      "cluesCasketBody": "Solve the last clue and use the scroll on the spot it names to dig up a Treasure Casket. Open it for coin, a piece of gear for your class, a few marks, and now and then something only a casket can hold. Your first casket and your tenth are recorded in the Book of Deeds.",
       "sideTempleTitle": "Kuil yang tenggelam",
       "sideTempleBody": "Sebuah gerbang cahaya pucat di atas telaga tinggi di pegunungan terbuka menuju kuil yang tenggelam tempat sebuah kultus yang karam masih bernyanyi. Rangkaian pendeknya berdiri terpisah dari kisah utama, sebuah misteri mandiri bagi siapa pun yang mendaki ke tepiannya, membaca peringatan yang terukir di bebatuan, dan turun untuk melihat untuk apa semua itu.",
       "availableTitle": "Mengapa seorang NPC tidak punya apa-apa untukmu",
@@ -11088,6 +11160,7 @@ export const id_ID: EnTranslations = {
   },
   "questUi": {
     "tracker": {
+      "clueHuntTitle": "{title} (clue {step} of {total})",
       "title": "Misi",
       "complete": "Selesai",
       "showOnMap": "Tampilkan {name} di peta",
@@ -11491,7 +11564,14 @@ export const id_ID: EnTranslations = {
       "abandoned": "Misi ditinggalkan: {name}",
       "completed": "Misi tuntas: {name}",
       "ready": "{name} ({status})",
-      "progress": "{label}: {current}/{total}"
+      "progress": "{label}: {current}/{total}",
+      "clueScrollEarned": "Every world quest of the day is done: a Clue Scroll is yours.",
+      "clueScrollLost": "Every world quest of the day is done, but you cannot hold another Clue Scroll.",
+      "clueHuntStarted": "Treasure hunt begun: {title}",
+      "clueHuntStep": "Clue {step} of {total} solved: {title}",
+      "clueHuntDone": "Treasure hunt complete: {title}. The casket is yours.",
+      "clueHuntAbandoned": "Treasure hunt abandoned: {title}",
+      "clueCasketOpened": "The casket holds {money} and {items}."
     },
     "errors": {
       "unavailable": "Misi itu tidak tersedia.",
@@ -16901,6 +16981,12 @@ export const id_ID: EnTranslations = {
       },
       "event_skin_token": {
         "name": "Peti Kosmetik Misterius"
+      },
+      "clue_scroll": {
+        "name": "Clue Scroll"
+      },
+      "treasure_casket": {
+        "name": "Treasure Casket"
       },
       "heroic_mark": {
         "name": "Tanda Heroik"

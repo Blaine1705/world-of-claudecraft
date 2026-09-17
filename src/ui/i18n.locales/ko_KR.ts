@@ -3242,6 +3242,16 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.match3Candy.star': '설탕 별',
   'questUi.logs.accepted': '퀘스트 수락: {name}',
   'questUi.logs.worldQuestStarted': '전역 퀘스트 시작: {name}',
+  'questUi.logs.clueScrollEarned':
+    '오늘의 월드 퀘스트를 모두 완료했습니다. 단서 두루마리를 얻었습니다.',
+  'questUi.logs.clueScrollLost':
+    '오늘의 월드 퀘스트를 모두 완료했지만 단서 두루마리를 더 가질 수 없습니다.',
+  'questUi.logs.clueHuntStarted': '보물찾기 시작: {title}',
+  'questUi.logs.clueHuntStep': '단서 {step}/{total} 해결: {title}',
+  'questUi.logs.clueHuntDone': '보물찾기 완료: {title}. 보물 상자는 당신 것입니다.',
+  'questUi.logs.clueHuntAbandoned': '보물찾기 포기: {title}',
+  'questUi.logs.clueCasketOpened': '보물 상자에는 {money}과(와) {items}이(가) 들어 있었습니다.',
+  'questUi.tracker.clueHuntTitle': '{title} (단서 {step}/{total})',
   'questUi.logs.abandoned': '퀘스트 포기: {name}',
   'questUi.logs.completed': '퀘스트 완료: {name}',
   'questUi.logs.ready': '{name} ({status})',
@@ -7863,6 +7873,19 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.questsPage.sagaValeBody':
     '동부개울에서는 죽은 자가 쉬지 못하고, 그 배후의 표식은 사라진 지 오래라 여겨지던 종파의 것입니다. 자취를 좇으면 예배당 묘실에서 일하는 무덤부름에 닿고, 그의 문서가 당신을 북쪽 습지로 가리킵니다.',
   'guide.questsPage.sagaValeTitle': '골짜기: 인장에 새겨진 이름',
+  // The Clue Scrolls section of the Guide quests page (M16 non-Latin fills).
+  'guide.questsPage.cluesTitle': '단서 두루마리',
+  'guide.questsPage.cluesBody':
+    '먼 지역에서는 그날의 세계 임무 게시판이 판 전체를 비운 이에게 보상을 하나 더 숨겨 둡니다. 단서 두루마리와 그 위에 적힌 보물찾기입니다.',
+  'guide.questsPage.cluesEarnTitle': '두루마리 얻기',
+  'guide.questsPage.cluesEarnBody':
+    '캐릭터가 충분히 성장하면, 그날의 세계 임무 게시판에 있는 지역 칸을 모두 완료했을 때 평소의 보상에 더해 단서 두루마리를 받습니다. 다시 굴린 칸도 끝내면 인정되고, 항상 열려 있는 일일 임무는 필요하지 않습니다. 두루마리는 몇 장까지 지닐 수 있으니 얻은 날에 바로 쓸 필요는 없습니다.',
+  'guide.questsPage.cluesHuntTitle': '단서 따라가기',
+  'guide.questsPage.cluesHuntBody':
+    '두루마리를 사용하면 보물찾기가 시작됩니다. 짧은 수수께끼의 연쇄가 임무 추적기에 한 단계씩 표시됩니다. 각 수수께끼는 세상에 실제로 있는 무언가를 가리킵니다. 서야 할 명소, 이야기할 사람, 어딘가에서 해야 할 감정 표현, 또는 작은 심부름이며, 마지막 단서는 언제나 파라고 합니다. 보물찾기는 한 번에 하나만 진행되고, 일일 초기화를 지나도 접속 사이에도 진행 상황이 유지되니 천천히 하셔도 됩니다.',
+  'guide.questsPage.cluesCasketTitle': '보물 상자',
+  'guide.questsPage.cluesCasketBody':
+    '마지막 단서를 풀고 그것이 가리키는 자리에서 두루마리를 사용하면 보물 상자를 파낼 수 있습니다. 열면 동전, 자기 직업에 맞는 장비 한 점, 영웅의 징표 몇 개, 그리고 이따금 상자에서만 나오는 무언가를 얻습니다. 첫 번째 상자와 열 번째 상자는 업적의 서에 기록됩니다.',
   'guide.questsPage.sideCryptBody':
     '봉우리 높은 곳에 한층 조용한 수수께끼가 흐릅니다. 어떤 기록에도 남지 않은 왕관이 새겨진 오래된 무덤들이지요. 죽은 자를 읽고, 그들이 지키던 것을 모아, 닫힌 채로 두려던 무덤의 봉인을 푸세요. 서버의 10인 최종 공격대로 가는 길을 여는 추리의 자취입니다.',
   'guide.questsPage.sideCryptTitle': '잊힌 왕',
@@ -17152,6 +17175,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.artificers_welding_cowl.name': '기술자의 용접 두건',
   'entities.items.forgemaster_crag_cleaver.name': '대장장이 장인의 바위 절단기',
   'entities.items.champion_forged_loop.name': '용사의 단조 반지',
+  // Clue Scrolls: the scroll and the casket (M16 non-Latin fills).
+  'entities.items.clue_scroll.name': '단서 두루마리',
+  'entities.items.treasure_casket.name': '보물 상자',
   'entities.npcs.npc_rift_watch_quartermaster.name': '병참관 바엘렌',
   'entities.npcs.npc_rift_watch_quartermaster.title': '균열 감시대 보급관',
   'entities.npcs.npc_rift_watch_quartermaster.greeting':
@@ -17238,6 +17264,80 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reputation.tierReachedSubtext': '진영 칭호: {title}',
   'hudChrome.reputation.tierReachedLine':
     '{faction}과(와)의 평판이 {tier}에 도달했습니다. 진영 칭호가 {title}(으)로 바뀌었습니다.',
+  // Clue Scrolls (world quests, Stage 3): hunt titles, per-step riddles and the two item
+  // descriptions (M16 non-Latin fills; src/ui/i18n.catalog/clues.ts).
+  'clues.items.clue_scroll.desc':
+    '그날의 지역 칸을 모두 끝내고 얻은 봉인된 수수께끼입니다. 사용하면 보물찾기가 시작되고, 마지막 단서가 파라고 하면 숨겨진 장소에서 다시 사용하세요.',
+  'clues.items.treasure_casket.desc':
+    '보물찾기의 끝에서 파낸 잠긴 상자입니다. 사용해서 열고, 보물찾기가 묻어 둔 것을 받으세요.',
+  'clues.hunt_drakelands_gate_ashes.title': '관문 앞의 재',
+  'clues.hunt_drakelands_gate_ashes.0':
+    '와이름 감시탑을 나서는 길은 서쪽으로, 관문을 지키는 오래된 나무들 사이로 이어집니다. 관문숲 아래에 서면 길이 시작됩니다.',
+  'clues.hunt_drakelands_gate_ashes.1':
+    '먼 사구의 감시자가 주둔지 북쪽, 동쪽 모래밭에 머물고 있습니다. 정찰병 예린을 찾아 바람이 무엇을 실어 왔는지 물으세요.',
+  'clues.hunt_drakelands_gate_ashes.2':
+    '주둔지 창고를 지키는 이는 지난 순찰 이후로 아무것도 먹지 못했습니다. 병참관 셀라에게 2 x 시골 빵 을 가져다주세요.',
+  'clues.hunt_drakelands_gate_ashes.3':
+    '잿가루가 사구로 흘러드는 곳의 동쪽, 조금 남쪽에 재가 묻어 둔 것을 감춘 그을린 땅이 있습니다. 그곳에서 두루마리를 사용해 파세요.',
+  'clues.hunt_frostveil_aurora_vigil.title': '계단 위의 빛',
+  'clues.hunt_frostveil_aurora_vigil.0':
+    '밤마다 춤추는 빛을 향해 단구가 올라가는 곳, 오로라 계단에 무릎을 꿇고 하늘이 당신을 알아보게 하세요.',
+  'clues.hunt_frostveil_aurora_vigil.1':
+    '빛을 읽는 이가 계단 가까이에서 기다립니다. 오로라술사 베일라에게 하늘이 무엇을 써 내려갔는지 물으세요.',
+  'clues.hunt_frostveil_aurora_vigil.2':
+    '울부짖는 단구의 동쪽, 조금 남쪽에 눈이 있어야 할 것보다 더 평평하게 쌓여 있습니다. 그곳에서 두루마리를 사용해 파세요.',
+  'clues.hunt_amberfall_lantern_ferry.title': '호수 위의 등불',
+  'clues.hunt_amberfall_lantern_ferry.0':
+    '랜턴미어 북쪽 물가에서 등불 나룻배를 맡은 이가 어느 불이 꺼졌는지 압니다. 나루지기 캐도우와 이야기하세요.',
+  'clues.hunt_amberfall_lantern_ferry.1':
+    '큰 호수의 북동쪽에 마을보다 오래된 돌 하나가 하늘에 기대어 있습니다. 기운 비석 앞에 서세요.',
+  'clues.hunt_amberfall_lantern_ferry.2':
+    '금빛 과수원을 지키는 이는 손수 나무에 물을 주느라 정작 자신은 목이 마릅니다. 과수원지기 포멜린에게 3 x 차가운 우물물 을 가져다주세요.',
+  'clues.hunt_amberfall_lantern_ferry.3':
+    '잿단풍이 붉게 타는 언덕의 북동쪽에 바람이 만든 것이 아닌 원을 그리며 잎이 놓여 있습니다. 그곳에서 두루마리를 사용해 파세요.',
+  'clues.hunt_willowfen_fenwitch_salt.title': '늪 마녀의 소금',
+  'clues.hunt_willowfen_fenwitch_salt.0':
+    '수양버들 만의 늪 마녀는 빈손으로 오는 이와는 말을 섞지 않습니다. 세지 어멈에게 1 x 요리용 소금 을 가져다주세요.',
+  'clues.hunt_willowfen_fenwitch_salt.1':
+    '늪이 평평해지고 공기가 모두를 졸리게 하는 곳, 나른한 여울에 서서 마녀가 일러 준 대로 한숨을 쉬세요.',
+  'clues.hunt_willowfen_fenwitch_salt.2':
+    '늪에서 빛나는 웅덩이의 남동쪽에 일 년 내내 마른 채로 남는 둔덕이 있습니다. 그곳에서 두루마리를 사용해 파세요.',
+  'clues.hunt_nightbloom_sleepless_vigil.title': '잠들지 않는 자의 불침번',
+  'clues.hunt_nightbloom_sleepless_vigil.0':
+    '문레스트의 북동쪽, 돌들이 끝나지 않는 불침번을 서는 곳, 불침번 선돌 앞에 서세요.',
+  'clues.hunt_nightbloom_sleepless_vigil.1':
+    '불침번 자리의 관측자는 남들이 동전을 세듯 별을 셉니다. 천문학자 카시안에게 떨어진 별 하나에 대해 물으세요.',
+  'clues.hunt_nightbloom_sleepless_vigil.2':
+    '마을 북쪽에 잠든 이가 결코 쉬지 못하는 봉분이 있습니다. 잠들지 않는 봉분에 경례해서 잠든 이에게 친구가 왔음을 알리세요.',
+  'clues.hunt_nightbloom_sleepless_vigil.3':
+    '어스름이 모이는 꽃벌판의 남동쪽에 달빛이 맨땅 한 곳에 고여 있습니다. 그곳에서 두루마리를 사용해 파세요.',
+  'clues.hunt_wraithwood_mournstone_candles.title': '애도석의 양초',
+  'clues.hunt_wraithwood_mournstone_candles.0':
+    '기빗미어의 양초장이는 어둠을 두려워하는 이들에게 빛을 팝니다. 과부 탠지에게 끝내 값을 치르지 않은 양초에 대해 물으세요.',
+  'clues.hunt_wraithwood_mournstone_candles.1':
+    '애도석의 마지막 사제는 기도만으로 금식하고 있습니다. 사제 크릴에게 2 x 소금에 절인 육포 를 가져다주세요.',
+  'clues.hunt_wraithwood_mournstone_candles.2':
+    '마을 북동쪽, 까마귀들을 지나면 스스로 기이한 열매를 매단 공터가 있습니다. 교수대 공터에 서세요.',
+  'clues.hunt_wraithwood_mournstone_candles.3':
+    '사냥꾼이 덫을 놓은 공터의 남동쪽에 낙엽이 최근에 뒤집힌 자리가 있습니다. 그곳에서 두루마리를 사용해 파세요.',
+  'clues.hunt_palmreach_sunken_idol.title': '신상의 비밀',
+  'clues.hunt_palmreach_sunken_idol.0':
+    '밀림 깊은 곳, 석호의 북서쪽에서 덩굴이 폭포처럼 쏟아져 내립니다. 덩굴폭포 숲에 서세요.',
+  'clues.hunt_palmreach_sunken_idol.1':
+    '밀림에 들어갔다가 다시 나온 은둔자가 쏟아지는 덩굴 가까이에 삽니다. 오크림에게 그 아래에서 무엇을 보았는지 물으세요.',
+  'clues.hunt_palmreach_sunken_idol.2':
+    '동쪽에는 반쯤 가라앉은 신상이 여전히 지켜보고 있습니다. 은둔자가 말한 잠수부들처럼 가라앉은 신상 앞에서 움츠리세요.',
+  'clues.hunt_palmreach_sunken_idol.3':
+    '밀림이 바다를 향해 어귀를 여는 곳의 북동쪽에 모래가 밀물이 닿는 곳보다 높게 쌓여 있습니다. 그곳에서 두루마리를 사용해 파세요.',
+  'clues.hunt_evergarden_beacon_road.title': '등대와 꽃',
+  'clues.hunt_evergarden_beacon_road.0':
+    '헤지윅 북쪽 산책로의 화단 정원사가 자기 화단이 굶주리고 있다고 장담합니다. 농부 버베나에게 2 x 퇴비 를 가져다주세요.',
+  'clues.hunt_evergarden_beacon_road.1':
+    '정원의 먼 남동쪽 구석에서 방앗간지기 없는 오래된 풍차가 아직도 돌아갑니다. 오래된 풍차 앞에 서세요.',
+  'clues.hunt_evergarden_beacon_road.2':
+    '길을 따라 남쪽으로 경계를 넘어 게일크레스트로 들어가 해안까지 나가세요. 오래된 등대를 지키는 등불지기 브람이 마지막 말을 쥐고 있습니다.',
+  'clues.hunt_evergarden_beacon_road.3':
+    '올드 비컨의 북서쪽, 등대에서 내려오는 오솔길 바로 옆에 잔디가 잘렸다가 다시 덮여 있습니다. 그곳에서 두루마리를 사용해 파세요.',
   'hudChrome.questLog.completed': '완료됨',
   'hudChrome.questLog.zoneSummary': '{count}개（완료 {ready}개）',
   'hudChrome.questLog.shiftHint': 'Shift를 누른 채 퀘스트를 클릭하면 채팅에 링크됩니다.',

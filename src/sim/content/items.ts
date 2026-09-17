@@ -1,4 +1,5 @@
 import type { ItemDef, PlayerClass } from '../types';
+import { CLUE_SCROLL_STACK_MAX } from './clue_hunts';
 
 // Archetype groups for class-locked rewards (REWARD_ARCHETYPE hands warrior
 // rewards to paladins/shamans etc., so the lock must admit the whole group).
@@ -1899,6 +1900,44 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     use: { type: 'skinSelect', catalog: 'class' },
     sellValue: 0,
+  },
+  // Clue Scrolls (world quests, Stage 3; docs/design/clue-scrolls.md): the
+  // scroll a level 16+ character earns by finishing every zone slot of the
+  // day's board. Using it starts a hunt drawn from CLUE_HUNTS, and using it
+  // again on the hunt's hidden spot digs (src/sim/clue_scrolls.ts). A quest-
+  // kind item WITH a use resolves to 'use' on bag click (ui/bags_view.ts).
+  // Soulbound and never sold, listed or vendored; a player may still discard
+  // one. Stacks to CLUE_SCROLL_STACK_MAX so a lost entitlement is a choice.
+  // Tooltip prose: clues.items.clue_scroll.desc (src/ui/i18n.catalog/clues.ts).
+  clue_scroll: {
+    id: 'clue_scroll',
+    name: 'Clue Scroll',
+    kind: 'quest',
+    quality: 'rare',
+    use: { type: 'clueScroll' },
+    stackSize: CLUE_SCROLL_STACK_MAX,
+    sellValue: 0,
+    soulbound: true,
+    noVendorSell: true,
+    noMarketList: true,
+    noDiscard: false,
+  },
+  // The casket the last step of a hunt hands over; opening it pays the
+  // treasure table (src/sim/clue_casket.ts). Bound to the digger like the
+  // Emissary's Cache, one per bag slot so a stack never hides a second roll.
+  // Tooltip prose: clues.items.treasure_casket.desc.
+  treasure_casket: {
+    id: 'treasure_casket',
+    name: 'Treasure Casket',
+    kind: 'quest',
+    quality: 'epic',
+    use: { type: 'clueCasket' },
+    stackSize: 1,
+    sellValue: 0,
+    soulbound: true,
+    noVendorSell: true,
+    noMarketList: true,
+    noDiscard: false,
   },
   // Heroic-dungeon participation token: the final boss of a heroic instance
   // directly awards marks to every eligible participant (awardHeroicMarks in

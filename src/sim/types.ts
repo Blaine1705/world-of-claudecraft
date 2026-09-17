@@ -965,6 +965,12 @@ export type ItemUse =
   // player meets their first death somewhere nothing is hunting them.
   // Consumed on use and refused unless the lesson is active.
   | { type: 'passingStone' }
+  // A Clue Scroll (src/sim/clue_scrolls.ts): with no hunt active, consumed to
+  // start one; on a dig step, used on the spot to advance it (not consumed);
+  // refused otherwise.
+  | { type: 'clueScroll' }
+  // A Treasure Casket (src/sim/clue_casket.ts): consumed to pay the hunt's reward.
+  | { type: 'clueCasket' }
   // Starts the one-time hammer quest; the Ember is consumed by crafting.
   | { type: 'forgebreakerEmber' }
   | { type: 'mechChroma'; chromaId: string }
@@ -6679,6 +6685,19 @@ export type SimEvent = { pid?: number } & (
       questId: string;
       traceResult?: Pick<WorldQuestTraceResult, 'score' | 'rating'>;
     }
+  // Clue Scrolls (src/sim/clue_scrolls.ts, src/sim/clue_casket.ts): ids and
+  // indices only, the client resolves every clue and line (clues.<huntId>.<step>).
+  /** The day's slate paid a scroll and it landed in the bags. */
+  | { type: 'clueScrollEarned' }
+  /** The slate paid a scroll but the stack or the bags could not hold it: lost for the day. */
+  | { type: 'clueScrollLost' }
+  | { type: 'clueHuntStarted'; huntId: string; total: number }
+  /** `step` is the index of the step that just completed; `total` is steps.length. */
+  | { type: 'clueHuntStep'; huntId: string; step: number; total: number }
+  | { type: 'clueHuntDone'; huntId: string }
+  | { type: 'clueHuntAbandoned'; huntId: string }
+  /** One id per grant (the Heroic Marks stack appears once) plus the copper paid. */
+  | { type: 'clueCasketOpened'; itemIds: string[]; copper: number }
   | {
       type: 'varkhulCallout';
       sourceId: number;
@@ -8995,7 +9014,10 @@ export type DeedMeterId =
   // Regional Mastery: the highest per-zone world quest completion count
   // (PlayerMeta.worldQuestZoneCounts, src/sim/regional_mastery.ts). The map
   // only ever climbs, so a milestone once reached is never lost.
-  | 'regionalMasteryBest';
+  | 'regionalMasteryBest'
+  // Clue Scrolls: lifetime Treasure Caskets opened (PlayerMeta.clueCasketsOpened,
+  // src/sim/clue_casket.ts). Only ever climbs.
+  | 'clueCasketsOpened';
 
 // Boolean predicates over already-persisted state (see the flag table in
 // deeds.ts). Like meters, they retro-grant on load.

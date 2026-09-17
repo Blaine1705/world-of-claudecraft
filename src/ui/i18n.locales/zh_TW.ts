@@ -3135,6 +3135,14 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.match3Candy.star': '糖霜星',
   'questUi.logs.accepted': '已接受任務：{name}',
   'questUi.logs.worldQuestStarted': '世界任務已開始：{name}',
+  'questUi.logs.clueScrollEarned': '今日的世界任務已全部完成：你獲得了一張線索卷軸。',
+  'questUi.logs.clueScrollLost': '今日的世界任務已全部完成，但你無法再持有更多線索卷軸。',
+  'questUi.logs.clueHuntStarted': '尋寶開始：{title}',
+  'questUi.logs.clueHuntStep': '已解開第{step}/{total}條線索：{title}',
+  'questUi.logs.clueHuntDone': '尋寶完成：{title}。寶箱歸你了。',
+  'questUi.logs.clueHuntAbandoned': '已放棄尋寶：{title}',
+  'questUi.logs.clueCasketOpened': '寶箱中有{money}和{items}。',
+  'questUi.tracker.clueHuntTitle': '{title}（線索 {step}/{total}）',
   'questUi.logs.abandoned': '已放棄任務：{name}',
   'questUi.logs.completed': '已完成任務：{name}',
   'questUi.logs.ready': '{name}（{status}）',
@@ -7564,6 +7572,19 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.questsPage.sagaValeBody':
     '在東溪，亡者不得安息，而其背後的印記屬於一個早被認為消亡已久的教派。將它追溯到一名在禮拜堂地穴中作祟的喚墓者身上，而他自己的文件又把你指向北方的沼澤。',
   'guide.questsPage.sagaValeTitle': '谷地：印記上的一個名字',
+  // The Clue Scrolls section of the Guide quests page (M16 non-Latin fills).
+  'guide.questsPage.cluesTitle': '線索卷軸',
+  'guide.questsPage.cluesBody':
+    '在遠方的區域，每日世界任務板為清空整個任務欄的人藏著另一份獎勵：一張線索卷軸，以及寫在上面的尋寶之旅。',
+  'guide.questsPage.cluesEarnTitle': '獲得卷軸',
+  'guide.questsPage.cluesEarnBody':
+    '當你的角色足夠強大後，完成當日世界任務板上的每一個區域欄位，就會在常規獎勵之外得到一張線索卷軸。重擲的欄位完成後同樣計數；始終開放的日常任務不作要求。你可以同時持有幾張卷軸，因此不必在獲得當天就用掉。',
+  'guide.questsPage.cluesHuntTitle': '跟隨線索',
+  'guide.questsPage.cluesHuntBody':
+    '使用卷軸會開始一場尋寶：一連串簡短的謎題，會在任務追蹤器中逐步顯示。每條謎題都指向世界中真實存在的東西：要站到的地標、要交談的人、要在某處做出的表情，或是一件小差事，而最後一條總會要你挖掘。同一時間只能進行一場尋寶，它會跨越每日重置並在不同遊戲時段之間保留你的進度，所以不必著急。',
+  'guide.questsPage.cluesCasketTitle': '寶匣',
+  'guide.questsPage.cluesCasketBody':
+    '解開最後一條線索，在它指明的地點使用卷軸，挖出一只寶藏匣。打開它可以得到錢幣、一件適合你職業的裝備、幾枚英雄徽記，偶爾還有只有寶匣才裝得下的東西。你的第一只寶匣和第十只都會記入功績之書。',
   'guide.questsPage.sideCryptBody':
     '在群峰高處流傳著一樁更為靜謐的謎團：古老的墳墓上刻著一頂無任何記載記得的王冠。讀懂亡者，蒐集他們所守護之物，解封一座本應永遠緊閉的陵墓。這是一條偵探般的線索，為你開啟通往這個王國十人終局團隊副本的道路。',
   'guide.questsPage.sideCryptTitle': '被遺忘的國王',
@@ -16338,6 +16359,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.artificers_welding_cowl.name': '工匠焊接兜帽',
   'entities.items.forgemaster_crag_cleaver.name': '鍛造大師峭壁劈砍斧',
   'entities.items.champion_forged_loop.name': '勇士鍛造指環',
+  // Clue Scrolls: the scroll and the casket (M16 non-Latin fills).
+  'entities.items.clue_scroll.name': '線索卷軸',
+  'entities.items.treasure_casket.name': '寶藏匣',
   'entities.npcs.npc_rift_watch_quartermaster.name': '軍需官維倫',
   'entities.npcs.npc_rift_watch_quartermaster.title': '裂隙守望補給官',
   'entities.npcs.npc_rift_watch_quartermaster.greeting':
@@ -16422,6 +16446,77 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reputation.tierReachedSubtext': '陣營頭銜：{title}',
   'hudChrome.reputation.tierReachedLine':
     '你與{faction}的聲望已達到{tier}。你的陣營頭銜現在是{title}。',
+  // Clue Scrolls (world quests, Stage 3): hunt titles, per-step riddles and the two item
+  // descriptions (M16 non-Latin fills; src/ui/i18n.catalog/clues.ts).
+  'clues.items.clue_scroll.desc':
+    '完成當日全部區域任務欄位後獲得的密封謎題。使用它開始一場尋寶；當最後一條線索要你挖掘時，在隱密地點再次使用。',
+  'clues.items.treasure_casket.desc':
+    '尋寶終點挖出的上鎖寶匣。使用它打開匣子，領取這場尋寶埋藏的東西。',
+  'clues.hunt_drakelands_gate_ashes.title': '門前餘燼',
+  'clues.hunt_drakelands_gate_ashes.0':
+    '出望龍哨的大路向西通入一片守著關門的古樹林。站到門林之下，線索便開始了。',
+  'clues.hunt_drakelands_gate_ashes.1':
+    '一位遠沙丘的守望者守在東邊的沙地上，在駐軍以北。找到斥候耶林，問問風帶來了什麼。',
+  'clues.hunt_drakelands_gate_ashes.2':
+    '駐軍倉庫的守護者自上次巡邏以來就沒吃過東西。給軍需官賽拉帶去 2 x 鄉村麵包。',
+  'clues.hunt_drakelands_gate_ashes.3':
+    '在餘燼堆成沙丘之處以東略偏南，一片焦土藏著灰燼掩埋的東西。在那裡使用卷軸並挖掘。',
+  'clues.hunt_frostveil_aurora_vigil.title': '台階上的極光',
+  'clues.hunt_frostveil_aurora_vigil.0':
+    '在台地向夜裡舞動的光攀升之處，跪在極光台階上，讓天空注意到你。',
+  'clues.hunt_frostveil_aurora_vigil.1': '讀光之人就等在台階附近。和極光師薇拉談談天空拼出了什麼。',
+  'clues.hunt_frostveil_aurora_vigil.2': '呼嘯台地以東略偏南，積雪平得反常。在那裡使用卷軸並挖掘。',
+  'clues.hunt_amberfall_lantern_ferry.title': '湖上燈火',
+  'clues.hunt_amberfall_lantern_ferry.0':
+    '在燈湖鎮以北的水邊，燈渡船的掌管者知道哪盞燈滅了。和渡船長卡多談談。',
+  'clues.hunt_amberfall_lantern_ferry.1':
+    '大湖東北方，一塊比鎮子還古老的孤石斜倚著天空。站到斜碑旁。',
+  'clues.hunt_amberfall_lantern_ferry.2':
+    '鎏金果園的守護者親手澆灌果園，自己卻渴得很。給果園師波梅琳帶去 3 x 冰涼井水。',
+  'clues.hunt_amberfall_lantern_ferry.3':
+    '燼楓燒得通紅的山坡東北方，落葉圍成一個不是風擺出來的圓圈。在那裡使用卷軸並挖掘。',
+  'clues.hunt_willowfen_fenwitch_salt.title': '沼澤女巫的鹽',
+  'clues.hunt_willowfen_fenwitch_salt.0':
+    '垂柳灣的沼澤女巫不會理睬空手而來的人。給莎草大娘帶去 1 x 烹飪用鹽。',
+  'clues.hunt_willowfen_fenwitch_salt.1':
+    '在沼澤變得平坦、空氣讓人昏昏欲睡的地方，站在沉眠淺灘上嘆氣，就像女巫吩咐的那樣。',
+  'clues.hunt_willowfen_fenwitch_salt.2':
+    '沼中閃光的水池東南方，有一處旱丘終年乾燥。在那裡使用卷軸並挖掘。',
+  'clues.hunt_nightbloom_sleepless_vigil.title': '不眠者的守望',
+  'clues.hunt_nightbloom_sleepless_vigil.0': '月棲鎮東北方，石頭守著永不結束的崗，站到守望石陣旁。',
+  'clues.hunt_nightbloom_sleepless_vigil.1':
+    '守望處的觀星者數星星像別人數錢幣一樣。和天文學家卡西安談談那顆墜落的星。',
+  'clues.hunt_nightbloom_sleepless_vigil.2':
+    '鎮子以北躺著一座古塚，裡面的長眠者從不安息。向不眠古塚敬禮，讓長眠者知道有朋友來了。',
+  'clues.hunt_nightbloom_sleepless_vigil.3':
+    '暮色聚集的花田東南方，月光積在一塊光禿的泥土上。在那裡使用卷軸並挖掘。',
+  'clues.hunt_wraithwood_mournstone_candles.title': '哀石的蠟燭',
+  'clues.hunt_wraithwood_mournstone_candles.0':
+    '絞湖鎮的製燭人把光賣給怕黑的人。和寡婦坦西談談那支從未付錢的蠟燭。',
+  'clues.hunt_wraithwood_mournstone_candles.1':
+    '哀石最後的牧師一直只靠禱告果腹。給牧師克里爾帶去 2 x 鹽漬肉乾。',
+  'clues.hunt_wraithwood_mournstone_candles.2':
+    '鎮子東北方，穿過烏鴉，有一片林地掛著它自己的怪異果實。站到吊影林地中。',
+  'clues.hunt_wraithwood_mournstone_candles.3':
+    '獵手設下陷阱的林隙東南方，落葉層最近被翻動過。在那裡使用卷軸並挖掘。',
+  'clues.hunt_palmreach_sunken_idol.title': '神像的秘密',
+  'clues.hunt_palmreach_sunken_idol.0':
+    '在叢林深處、潟湖西北方，藤蔓像瀑布一樣傾瀉而下。站到垂藤林旁。',
+  'clues.hunt_palmreach_sunken_idol.1':
+    '一位走進叢林又走了出來的隱士住在垂藤附近。和奧克里姆談談他在下面看到了什麼。',
+  'clues.hunt_palmreach_sunken_idol.2':
+    '往東，一尊神像半沉水中，仍在注視。在沉沒神像前畏縮，就像隱士說的潛水者那樣。',
+  'clues.hunt_palmreach_sunken_idol.3':
+    '叢林向大海張開的入口東北方，沙子堆得比潮水能到的地方還高。在那裡使用卷軸並挖掘。',
+  'clues.hunt_evergarden_beacon_road.title': '燈塔與花',
+  'clues.hunt_evergarden_beacon_road.0':
+    '籬苑鎮以北步道旁的花壇園丁發誓她的花床快餓死了。給農婦維貝娜帶去 2 x 堆肥。',
+  'clues.hunt_evergarden_beacon_road.1':
+    '在花園的東南角落，一座老磨坊仍在為不存在的磨坊主轉動。站到老磨坊旁。',
+  'clues.hunt_evergarden_beacon_road.2':
+    '沿大路向南越過邊界進入疾風崖，一直走到海岸。老燈塔的守護者守燈人布蘭姆掌握著最後一句話。',
+  'clues.hunt_evergarden_beacon_road.3':
+    '老燈塔西北方，就在從燈塔下來的小路旁，草皮被切開又鋪了回去。在那裡使用卷軸並挖掘。',
   'hudChrome.questLog.completed': '已完成',
   'hudChrome.questLog.zoneSummary': '{count}個（{ready}個可交付）',
   'hudChrome.questLog.shiftHint': '按住 Shift 點擊任務可將其連結到聊天中。',

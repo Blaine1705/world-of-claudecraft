@@ -27,7 +27,8 @@ export type QuestWorldCommand =
   | { cmd: 'world_quest_accuse'; npcId: number }
   | { cmd: 'world_quest_shadow'; action: 'pickpocket' | 'leave'; targetId?: number }
   | { cmd: 'world_quest_start'; quest: string; difficulty: WorldQuestDifficulty }
-  | { cmd: 'world_quest_reroll'; quest: string };
+  | { cmd: 'world_quest_reroll'; quest: string }
+  | { cmd: 'clue_hunt_abandon' };
 
 /** Cold owner mirrors shared by quest snapshots and world-boss map state. */
 export class QuestWorldWireState {
@@ -43,6 +44,8 @@ export class QuestWorldWireState {
   worldQuestReplacements: Readonly<Record<string, string>> = Object.freeze({});
   worldQuestRerollCycle = '';
   worldQuestZoneCounts: Readonly<Record<string, number>> = Object.freeze({});
+  /** The active clue hunt mirrored from the `cluh` self key (null when none). */
+  clueHunt: Readonly<{ huntId: string; step: number }> | null = null;
   private activeWorldBossIds = new Set<string>();
   private questWorldTransport: ((command: QuestWorldCommand) => void) | null = null;
   private questWorldRestBase = '';
@@ -127,6 +130,10 @@ export class QuestWorldWireState {
     this.sendQuestWorldCommand({ cmd: 'world_quest_start', quest: questId, difficulty });
   }
 
+  abandonClueHunt(): void {
+    this.sendQuestWorldCommand({ cmd: 'clue_hunt_abandon' });
+  }
+
   canRerollWorldQuest(questId: string): { canReroll: boolean; reason?: string } {
     if (!this.worldQuestCycle) {
       return { canReroll: false, reason: 'No active world quest cycle.' };
@@ -168,6 +175,7 @@ export class QuestWorldWireState {
     this.worldQuestReplacements = Object.freeze({});
     this.worldQuestRerollCycle = '';
     this.worldQuestZoneCounts = Object.freeze({});
+    this.clueHunt = null;
     this.nearbyWorldQuestTraces = [];
     this.activeWorldBossIds = new Set();
   }
