@@ -1518,6 +1518,42 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.map.ruinCourtyard': '廢墟庭院',
   'hudChrome.bg.map.graveyard': '墓地',
   'guide.nav.thornhollow': '荊谷原野',
+  'guide.nav.factions': '陣營與聲望',
+  'guide.factionsPage.heading': '陣營與聲望',
+  'guide.factionsPage.intro':
+    '三個盟友陣營各自守護著王國的一隅，你在他們的領地完成的每個世界任務都會提升你在該陣營的聲望。聲望共有六個等級，每級都有專屬頭銜，並逐件解鎖軍需官的貨品。',
+  'guide.factionsPage.whoHeading': '三個陣營',
+  'guide.factionsPage.whoBody':
+    '每個陣營都對應一組區域，所以你在哪裡做世界任務，就決定了聲望記在哪個陣營名下。你不必選邊站：三個陣營各自計數，也沒有任何一方要求你與另一方為敵。',
+  'guide.factionsPage.riftWatchBody':
+    '裂隙守望守衛海岸，監視深處的裂口。他們的領地是沿海地帶：遠岸、棕櫚灘、疾風崖、柳澤和隱幕谷。他們的據點是棕櫚灘的漂流港。',
+  'guide.factionsPage.churchOrderBody':
+    '教團掌管王國的腹地：東溪谷、迷霧沼澤、荊峰高地、夜華林和幽魂林。奧德里克修士在東溪谷代表他們發言。',
+  'guide.factionsPage.automatonsBody':
+    '機械軍團看守遠方的熔爐：龍嶺、霜幕荒野、琥珀瀑和常青園。他們的據點是龍嶺的巨龍哨站。',
+  'guide.factionsPage.earningHeading': '獲取聲望',
+  'guide.factionsPage.earningBody':
+    '聲望來自世界任務。每個世界任務都計入其所在區域對應的陣營，而三個陣營覆蓋不同的區域，所以當你走遍地圖時，三方聲望會同時增長。東溪的工頭凱倫會在地圖上打開世界任務板；如果當天的任務不合心意，也可以在任務板上每天更換一個世界任務。',
+  'guide.factionsPage.lowLevelNote':
+    '低等級角色的聲望會在某一等級暫停，隨著升級再繼續，所以新角色可以盡早開始累積，而不會很快無路可走。',
+  'guide.factionsPage.tiersHeading': '聲望等級',
+  'guide.factionsPage.tiersBody':
+    '每個陣營都經歷相同的六個等級：陌生、認可、信任、可靠、先鋒和冠軍。每個陣營會為每一級賦予自己的稱呼，那個稱呼就是你在該陣營的頭銜。',
+  'guide.factionsPage.riftWatchTitles':
+    '在裂隙守望，你依次是局外人、守望者、裂隙行者、守衛、裂隙護衛，最終成為冠軍。',
+  'guide.factionsPage.churchOrderTitles':
+    '在教團，你依次是局外人、侍僧、守護者、聖殿騎士、黎明守衛，最終成為冠軍。',
+  'guide.factionsPage.automatonsTitles':
+    '在機械軍團，你依次是局外人、操作員、機械師、工匠、鍛造大師，最終成為冠軍。',
+  'guide.factionsPage.quartermastersHeading': '軍需官',
+  'guide.factionsPage.quartermastersBody':
+    '每個陣營都在據點設有一名軍需官：漂流港的裂隙守望軍需官維倫、東溪禮拜堂的教團聖殿騎士阿爾西婭，以及巨龍哨站的機械軍團工匠托布林。每人出售少量首飾、護甲、武器和背包，隨著你在該陣營的聲望提升逐級解鎖，以普通金幣購買。',
+  'guide.factionsPage.readingHeading': '在哪裡查看',
+  'guide.factionsPage.readingBody':
+    '角色面板（C）的聲望頁會顯示每個陣營的當前聲望、通往下一等級的進度條，以及聲望為你贏得的頭銜。聊天記錄會在每次獲得聲望時報告，達到新等級時螢幕上還會顯示慶祝橫幅。',
+  'guide.factionsPage.deedsHeading': '功績',
+  'guide.factionsPage.deedsBody':
+    '功績之書也會記錄你的聲望：與某個陣營達到信任、與某個陣營達到冠軍各記為一項功績，與三個陣營都達到冠軍則是另一項功績。和所有功績一樣，它們只是裝飾，從不帶來戰力，而冠軍功績會授予一個可佩戴的頭銜。',
   'guide.thornhollowPage.heading': '荊谷原野',
   'guide.thornhollowPage.intro':
     '一場排位 5v5 奪旗戰場，戰場位於棘峰之下老林中的圍牆山谷：兩座廢棄要塞沿著峽谷兩端遙遙相對，中間是一座更古老的庭院，誰都不曾真正佔據。每方五人，兩座要塞，一個目標：奪走敵方戰旗並趕在對方之前帶回家。',

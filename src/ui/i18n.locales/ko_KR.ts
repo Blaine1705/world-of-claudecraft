@@ -1562,6 +1562,42 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.map.ruinCourtyard': '폐허 안뜰',
   'hudChrome.bg.map.graveyard': '묘지',
   'guide.nav.thornhollow': '쏜할로우 평원',
+  'guide.nav.factions': '진영과 평판',
+  'guide.factionsPage.heading': '진영과 평판',
+  'guide.factionsPage.intro':
+    '세 동맹 진영이 각자 왕국의 한 구석을 지키고 있으며, 그들의 땅에서 월드 퀘스트를 완료할 때마다 해당 진영에 대한 평판이 오릅니다. 평판은 여섯 단계를 오르며, 단계마다 고유한 칭호가 있고 보급관의 물품을 하나씩 열어 줍니다.',
+  'guide.factionsPage.whoHeading': '세 진영',
+  'guide.factionsPage.whoBody':
+    '각 진영은 한 무리의 지역에 묶여 있어서, 어디에서 월드 퀘스트를 하느냐에 따라 어느 진영에 공로가 쌓이는지 정해집니다. 편을 고를 필요는 없습니다. 세 진영은 각자 집계하며, 어느 쪽도 다른 진영과 맞서라고 요구하지 않습니다.',
+  'guide.factionsPage.riftWatchBody':
+    '균열 감시단은 해안을 지키고 깊은 균열을 감시합니다. 그들의 땅은 해안 지대입니다. 파쇼어, 팜리치, 게일크레스트, 윌로우펜, 베일드 할로우. 거점은 팜리치의 드리프트헤이븐입니다.',
+  'guide.factionsPage.churchOrderBody':
+    '교단은 왕국의 심장부를 다스립니다. 이스트브룩 계곡, 마이어펜 습지, 손피크 고지, 나이트블룸, 레이스우드. 알드릭 수사가 이스트브룩 계곡에서 그들을 대변합니다.',
+  'guide.factionsPage.automatonsBody':
+    '오토마톤은 먼 변경의 용광로를 지킵니다. 드레이크랜드, 프로스트베일, 앰버폴, 에버가든. 거점은 드레이크랜드의 웜워치입니다.',
+  'guide.factionsPage.earningHeading': '평판 얻기',
+  'guide.factionsPage.earningBody':
+    '평판은 월드 퀘스트에서 나옵니다. 각 월드 퀘스트는 그 퀘스트가 놓인 지역의 진영에 집계되고, 세 진영이 서로 다른 지역을 맡고 있으므로 지도를 누비는 동안 세 평판이 동시에 오릅니다. 이스트브룩의 감독관 카엘렌이 지도에서 월드 퀘스트 게시판을 열어 주며, 그날의 배정이 마음에 들지 않으면 게시판에서 하루에 하나의 월드 퀘스트를 교체할 수도 있습니다.',
+  'guide.factionsPage.lowLevelNote':
+    '저레벨 캐릭터는 평판이 한 단계에서 멈추었다가 레벨이 오르면 다시 이어지므로, 어린 캐릭터도 일찍부터 쌓기 시작하면서 금방 막히지 않습니다.',
+  'guide.factionsPage.tiersHeading': '평판 단계',
+  'guide.factionsPage.tiersBody':
+    '모든 진영은 같은 여섯 단계를 오릅니다. 미지, 인정, 신뢰, 입증, 선봉, 그리고 챔피언입니다. 각 진영은 단계마다 고유한 이름을 붙이며, 그 이름이 그 진영에서의 당신의 칭호가 됩니다.',
+  'guide.factionsPage.riftWatchTitles':
+    '균열 감시단에서는 외부인으로 시작해 감시자, 균열 행자, 수호자, 균열 파수꾼을 거쳐 마침내 챔피언이 됩니다.',
+  'guide.factionsPage.churchOrderTitles':
+    '교단에서는 외부인으로 시작해 수련사, 수호자, 성전기사, 여명의 파수꾼을 거쳐 마침내 챔피언이 됩니다.',
+  'guide.factionsPage.automatonsTitles':
+    '오토마톤에서는 외부인으로 시작해 조작자, 기계공, 기술자, 대장장이 장인을 거쳐 마침내 챔피언이 됩니다.',
+  'guide.factionsPage.quartermastersHeading': '보급관',
+  'guide.factionsPage.quartermastersBody':
+    '각 진영은 거점에 보급관을 둡니다. 드리프트헤이븐의 균열 감시단 보급관 바엘렌, 이스트브룩 예배당의 교단 성전기사 알테아, 웜워치의 오토마톤 기술자 토브린입니다. 각자 장신구, 방어구, 무기, 가방을 소량 판매하며, 해당 진영 평판이 오를수록 단계별로 열리고 일반 화폐로 살 수 있습니다.',
+  'guide.factionsPage.readingHeading': '어디에서 확인하나',
+  'guide.factionsPage.readingBody':
+    '캐릭터 창(C)의 평판 탭에 각 진영의 현재 평판, 다음 단계까지의 막대, 평판으로 얻은 칭호가 표시됩니다. 대화 기록은 평판을 얻을 때마다 알려 주고, 새 단계에 도달하면 화면에 축하 배너가 뜹니다.',
+  'guide.factionsPage.deedsHeading': '업적',
+  'guide.factionsPage.deedsBody':
+    '업적의 서도 평판을 기록합니다. 한 진영에서 신뢰에 도달하는 것과 한 진영에서 챔피언에 도달하는 것이 각각 업적으로 기록되고, 세 진영 모두에서 챔피언에 도달하면 별도의 업적이 됩니다. 다른 업적과 마찬가지로 이는 장식일 뿐 힘이 되지 않으며, 챔피언 업적은 착용할 수 있는 칭호를 줍니다.',
   'guide.thornhollowPage.heading': '쏜할로우 평원',
   'guide.thornhollowPage.intro':
     '가시봉 아래 오래된 숲의 성벽으로 둘러싸인 분지에서 벌어지는 랭크 5대 5 깃발 뺏기 전장. 협곡 양 끝에서 두 폐허 요새가 마주 보고, 그 사이에는 누구도 차지한 적 없는 더 오래된 안뜰이 있다. 다섯 명씩, 요새 둘, 목표 하나. 적의 깃발을 빼앗아 우리 깃발을 빼앗기기 전에 가져와라.',

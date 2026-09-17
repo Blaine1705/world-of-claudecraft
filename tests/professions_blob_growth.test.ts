@@ -2331,6 +2331,10 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // ids in the maximal character's deedStats.itemsDiscovered (sorted array
     // rows of `"<id>",`). MEASURED on the merged tree (55,601 to 55,959;
     // the deedStats row below moves 111 to 469 by the same 358).
+    // Plus 282 at the faction standing deeds (2026-09-17): the seven
+    // prog_*_trusted / prog_*_champion / prog_faction_champion_all ids in the
+    // maximal character's deeds row (the deeds row below moves 317 to 599 by
+    // the same 282). MEASURED on the tree (55,959 to 56,241).
     expect(counterfactualBytes - 156144).toBe(
       Object.values(fixtureDelta).reduce((sum, value) => sum + value, 0) +
         183 +
@@ -2338,7 +2342,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         50 +
         49 +
         375 +
-        358,
+        358 +
+        282,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2363,7 +2368,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // release/v0.43.0 merge: the world-quest deeds (+285) and quest items
       // (+90) attributed in the +375 above. deedStats 111 -> 469 at the
       // wq-reputation merge: the faction quartermaster items (+358 above).
-    ).toEqual({ questsDone: 100, knownRecipes: 30, deeds: 317, deedStats: 469, reliquary: 80 });
+    ).toEqual({ questsDone: 100, knownRecipes: 30, deeds: 599, deedStats: 469, reliquary: 80 });
     // Removing field_kit AND the Bramblehide release content reproduces the
     // pre-field-kit, pre-Bramblehide baseline WITH the hammer content still
     // applied: 3884 alone measured 209,261 here (hammer content absent); the
@@ -2379,9 +2384,10 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 209,773 -> 210,148 at the release/v0.43.0 merge into feature/world-quests:
       // the world-quest deeds and items (+375, attributed above) stay in this
       // counterfactual, which removes only field_kit and the Bramblehide content.
+      // 210,506 -> 210,788 at the faction standing deeds (+282, the seven ids).
       // 210,148 -> 210,506 at the wq-reputation merge: the 15 faction
       // quartermaster item ids (+358, attributed above) stay here too.
-    ).toBe(210506);
+    ).toBe(210788);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 49-byte
@@ -2394,8 +2400,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       'field_kit removed, must reproduce the current staged Crucible+hammer+Bramblehide+dev-mount baseline',
       // 211,370 -> 211,745 at the release/v0.43.0 merge into feature/world-quests:
       // plus the world-quest deeds and items (+375), which this baseline keeps.
+      // 212,103 -> 212,385 at the faction standing deeds (+282, the seven ids).
       // 211,745 -> 212,103 at the wq-reputation merge (+358, the faction items).
-    ).toBe(212103);
+    ).toBe(212385);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2455,8 +2462,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // item ids in deedStats.itemsDiscovered (+358, attributed in the growth
     // equation above); no container or ceiling changed shape. Floor at
     // measurement minus 380, edge at measurement plus one: 211,735..212,116.
-    expect(bytes, reMint).toBeGreaterThan(211735);
-    expect(bytes, reMint).toBeLessThan(212116);
+    // Shifted +282 at the faction standing deeds (the seven ids in the deeds row).
+    expect(bytes, reMint).toBeGreaterThan(212017);
+    expect(bytes, reMint).toBeLessThan(212398);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was
