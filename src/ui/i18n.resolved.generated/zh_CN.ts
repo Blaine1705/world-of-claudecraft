@@ -18536,7 +18536,7 @@ export const zh_CN: EnTranslations = {
         "greeting": "行走于黎明之光中。教团为与我们并肩效力者提供补给。"
       },
       "npc_automaton_quartermaster": {
-        "name": "工匠扎雷克",
+        "name": "工匠托布林",
         "title": "机械军团征用官",
         "greeting": "精密齿轮、锻造钢材与校准动力。授权操作员可从我们的库存中领取。"
       },

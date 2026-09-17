@@ -18536,7 +18536,7 @@ export const es_ES: EnTranslations = {
         "greeting": "Walk in the Light of the Dawn. The Church Order supplies those who stand with us in service."
       },
       "npc_automaton_quartermaster": {
-        "name": "Artificer Zarek",
+        "name": "Artificer Tobrin",
         "title": "Automaton Requisitioner",
         "greeting": "Precision gears, forged steel, and calibrated power. Authorized operators may draw from our inventory."
       },

@@ -17385,7 +17385,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.npc_church_order_quartermaster.name': 'Храмовница Альтея',
   'entities.npcs.npc_church_order_quartermaster.title': 'Интендант Церковного Ордена',
   'entities.npcs.npc_church_order_quartermaster.greeting': 'Ступай в Свете Рассвета. Церковный Орден снабжает тех, кто служит вместе с нами.',
-  'entities.npcs.npc_automaton_quartermaster.name': 'Механик Зарек',
+  'entities.npcs.npc_automaton_quartermaster.name': 'Механик Тобрин',
   'entities.npcs.npc_automaton_quartermaster.title': 'Снабженец Автоматонов',
   'entities.npcs.npc_automaton_quartermaster.greeting': 'Точные шестерни, кованая сталь и выверенная мощь. Допущенные операторы могут получать снаряжение с наших складов.',
   'entities.npcs.npc_wq_taskmaster.name': 'Надзиратель Каэлен',

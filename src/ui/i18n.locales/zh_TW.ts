@@ -16303,7 +16303,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.npc_church_order_quartermaster.title': '教團軍需官',
   'entities.npcs.npc_church_order_quartermaster.greeting':
     '行走於黎明之光中。教團為與我們並肩效力者提供補給。',
-  'entities.npcs.npc_automaton_quartermaster.name': '工匠扎雷克',
+  'entities.npcs.npc_automaton_quartermaster.name': '工匠托布林',
   'entities.npcs.npc_automaton_quartermaster.title': '機械軍團徵用官',
   'entities.npcs.npc_automaton_quartermaster.greeting':
     '精密齒輪、鍛造鋼材與校準動力。授權操作員可從我們的庫存中領取。',

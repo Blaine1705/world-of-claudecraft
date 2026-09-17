@@ -18536,7 +18536,7 @@ export const ja_JP: EnTranslations = {
         "greeting": "暁の光の中を歩め。教団は我らと共に仕える者に物資を供する。"
       },
       "npc_automaton_quartermaster": {
-        "name": "工匠ザレク",
+        "name": "工匠トブリン",
         "title": "オートマトンの調達官",
         "greeting": "精密な歯車、鍛えた鋼、調整済みの動力。認可された操作者は我らの在庫から受け取れる。"
       },

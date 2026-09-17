@@ -30,7 +30,7 @@ describe('Faction Vendors & Reroll NPC content', () => {
 
     const qmAuto = NPCS.npc_automaton_quartermaster;
     expect(qmAuto).toBeDefined();
-    expect(qmAuto.name).toBe('Artificer Zarek');
+    expect(qmAuto.name).toBe('Artificer Tobrin');
     expect(qmAuto.title).toBe('Automaton Requisitioner');
     expect(qmAuto.vendorItems?.length).toBe(5);
 

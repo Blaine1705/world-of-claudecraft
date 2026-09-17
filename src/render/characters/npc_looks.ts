@@ -2004,7 +2004,7 @@ export const NPC_LOOKS: Record<string, NpcLookDef> = {
     worn: kit('paladin'),
     props: 'sword_shield',
   },
-  // Artificer Zarek (Automatons, Wyrmwatch): soot-dark hair swept back, a
+  // Artificer Tobrin (Automatons, Wyrmwatch): soot-dark hair swept back, a
   // verdigris smith's kit with the sleeves rolled, hammer in hand.
   npc_automaton_quartermaster: {
     app: {

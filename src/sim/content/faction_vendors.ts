@@ -342,7 +342,7 @@ export const FACTION_VENDOR_NPCS: Record<string, NpcDef> = {
   // Automaton Quartermaster: Wyrmwatch (drakelands)
   npc_automaton_quartermaster: {
     id: 'npc_automaton_quartermaster',
-    name: 'Artificer Zarek',
+    name: 'Artificer Tobrin',
     title: 'Automaton Requisitioner',
     pos: { x: 402, z: 1912 },
     facing: -0.4,

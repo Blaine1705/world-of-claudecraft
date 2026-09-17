@@ -18536,7 +18536,7 @@ export const ko_KR: EnTranslations = {
         "greeting": "여명의 빛 속을 걸으라. 교단은 우리와 함께 봉사하는 이들에게 물자를 공급한다."
       },
       "npc_automaton_quartermaster": {
-        "name": "기술자 자렉",
+        "name": "기술자 토브린",
         "title": "자동인형 조달관",
         "greeting": "정밀 톱니, 단조 강철, 보정된 동력. 승인된 조작자는 우리 재고에서 물품을 받을 수 있다."
       },

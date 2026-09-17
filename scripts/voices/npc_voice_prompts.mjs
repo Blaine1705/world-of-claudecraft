@@ -1120,8 +1120,8 @@ export const VOICE_ALIAS = {
   riftwright_maelis: 'quartermaster_edda',
   // The faction quartermasters and the World Quest taskmaster, cast by ROLE
   // until an ElevenLabs key designs their own voices: Vaelen keeps stores for
-  // the same Rift Watch Ollun serves; Templar Liora speaks with the aurorist's
-  // hushed, luminous calm; Artificer Kael is another smith of exacting work;
+  // the same Rift Watch Ollun serves; Templar Althea speaks with the aurorist's
+  // hushed, luminous calm; Artificer Tobrin is another smith of exacting work;
   // Taskmaster Kaelen hands out the day's work the way the foreman does.
   npc_rift_watch_quartermaster: 'riftwatch_ollun',
   npc_church_order_quartermaster: 'aurorist_veyla',
