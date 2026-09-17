@@ -233,9 +233,9 @@ describe('map sidebar controller: rail collapse toggle', () => {
 
     expect(test.settings.setCollapsed).toHaveBeenLastCalledWith(false);
     expect(test.root.classList.contains('is-collapsed')).toBe(false);
-    expect(test.root.querySelector('[data-map-sidebar-toggle]')?.getAttribute('aria-expanded')).toBe(
-      'true',
-    );
+    expect(
+      test.root.querySelector('[data-map-sidebar-toggle]')?.getAttribute('aria-expanded'),
+    ).toBe('true');
   });
 
   it('keeps the toggle focused across the rail swap', () => {
