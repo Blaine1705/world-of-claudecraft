@@ -151,8 +151,9 @@ const STAT_DRIFT_ALLOWLIST: ReadonlySet<string> = new Set([
 // The ratchet ceiling for the allowlist above and the count of untiered items the
 // proxy floor binds on (see the catalog test).
 const STAT_DRIFT_ALLOWLIST_CEILING = 103;
-// 64 with the faction quartermaster stock (13 untiered pieces with a line).
-const UNTIERED_WITH_PROXY_FLOOR = 64;
+// 63 with the faction quartermaster stock: 12 untiered pieces whose own line
+// rounds to a floor (the Order Prayer Beads' spi 1 rounds to none).
+const UNTIERED_WITH_PROXY_FLOOR = 63;
 const GENERATED_ITEM_COUNT = 111;
 const WARFARE_STOCK_COUNT = 47;
 const HEROIC_VARIANT_COUNT = 78;

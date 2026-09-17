@@ -257,17 +257,16 @@ describe('kit construction', () => {
       ).toEqual(FRESH_TWENTY_JEWELRY);
     }
     //
-    // Neck: burnished_thorium_amulet (agi 5, sta 3) outscores iron_link_choker
-    // (agi 3, sta 1) on stamina alone for every physical role. Since the
-    // wq-reputation merge the Church Order's Order Prayer Beads (spi 3, sta 3,
-    // Recognized standing, content/faction_vendors.ts) take the caster necks:
-    // spirit scores on the caster line where the amulet's agility scores zero.
+    // Neck is archetype-blind: burnished_thorium_amulet (agi 5, sta 3) outscores
+    // iron_link_choker (agi 3, sta 1) on stamina alone, so even a pure-intellect
+    // caster scoring its agility at zero still takes it. The Recognized-standing
+    // faction jewelry (content/faction_vendors.ts, 1/1 lines) sits below every
+    // pick here by design: standing stock must not displace the crafted rungs.
     const NECK = 'burnished_thorium_amulet';
-    const CASTER_NECK = 'order_prayer_beads';
-    // Strength roles: the rung-50 str ring, then the Automaton Cog Ring (str 3,
-    // sta 3, faction_vendors.ts), which clears the rung-25 signet (str 3,
-    // sta 1) outright on its two extra stamina since the wq-reputation merge.
-    const STR_RINGS = ['weighted_thorium_band', 'automaton_cog_ring'] as const;
+    // Strength roles: the rung-50 str ring, then the rung-25 str ring, an
+    // outright win for ring2 (str 3 at full weight clears the int loop's 3
+    // stamina, and the keepsake's 1/1/1 scores 2.1 against the signet's 3.6).
+    const STR_RINGS = ['weighted_thorium_band', 'riveted_iron_signet'] as const;
     // Agility roles: the rung-50 str ring, then the tutorial keepsake. Before
     // Mother of Pearl, ring2 here was a REAL TIE: the rung-25 str ring (str 3
     // x 0.4 + sta 1 x 0.6) and the rung-50 int ring (sta 3 x 0.6) both score
@@ -278,10 +277,7 @@ describe('kit construction', () => {
     // clears both outright (agi 1 + str 1 x 0.4 + sta 1 x 0.6 = 2.0 against
     // 1.8), a real score gap, so the tie no longer decides this camp. A pick
     // that moves here means a weights retune (admit it) or the scorer broke.
-    // Since the wq-reputation merge the Rift Watcher's Band (agi 3, sta 3,
-    // faction_vendors.ts) leads the agility line outright and the rung-50 str
-    // ring keeps the second slot over the keepsake.
-    const AGI_RINGS = ['rift_watchers_band', 'weighted_thorium_band'] as const;
+    const AGI_RINGS = ['weighted_thorium_band', 'mother_of_pearl'] as const;
     // Intellect roles: the rung-50 int ring, then the rung-25 int ring (the
     // keepsake scores 1.75 caster / 2.1 healer against the loop's 3.4).
     const CASTER_RINGS = ['gleaming_thorium_loop', 'etched_iron_loop'] as const;
@@ -317,12 +313,13 @@ describe('kit construction', () => {
       'druid/balance',
       'druid/restoration',
     ];
-    // druid/feral is the one TANK_AGI role, where stamina leads outright
-    // (sta 1.0). Before the wq-reputation merge it took the str ring and then
-    // the rung-50 INT ring for its 3 stamina; the Rift Watcher's Band (agi 3,
-    // sta 3) now carries the same stamina on the role's own line, so the tank
-    // wears the same pair as the agility roles and the int loop no longer places.
-    const FERAL_RINGS = ['rift_watchers_band', 'weighted_thorium_band'] as const;
+    // druid/feral takes the str ring and then the rung-50 INT ring, and it is
+    // not a mistake. It is the one TANK_AGI role, and stamina leads outright
+    // there (sta 1.0), so after the str ring it takes the int loop for its 3
+    // stamina rather than the rung-25 str ring or the keepsake: 3.0 against
+    // 1.9 and 2.1, real score gaps, not the epsilon tie above. A tank wearing
+    // an intellect ring looks wrong and is the scorer working as designed.
+    const FERAL_RINGS = ['weighted_thorium_band', 'gleaming_thorium_loop'] as const;
 
     const expected = new Map<string, readonly [string, string]>();
     for (const key of STR_SPECS) expected.set(key, STR_RINGS);
@@ -338,7 +335,7 @@ describe('kit construction', () => {
       const rings = expected.get(key);
       expect(rings, `${key} is not classified above`).toBeDefined();
       const kit = buildDevKit(cls, spec);
-      expect(kit?.equip.neck, `${key} neck`).toBe(CASTER_SPECS.includes(key) ? CASTER_NECK : NECK);
+      expect(kit?.equip.neck, `${key} neck`).toBe(NECK);
       expect(kit?.equip.ring1, `${key} ring1`).toBe(rings?.[0]);
       expect(kit?.equip.ring2, `${key} ring2`).toBe(rings?.[1]);
     }

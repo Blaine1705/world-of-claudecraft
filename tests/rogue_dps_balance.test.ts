@@ -77,22 +77,15 @@ describe('Rogue fight-6498 deterministic DPS bands', () => {
       // bag (an Intellect amulet, an Intellect ring) gives way to Ignivar's
       // Ember Choker and the Seal of the Forgewall; the three-seed averages
       // stayed inside the bands below (185.8 / 207.6 / 152.6) and the sibling
-      // order held, so only the identity pins move.
-      // 2026-09-16, the wq-reputation merge: the Automaton quartermaster's
-      // Champion's Forged Loop (epic, sta 10 str 8, content/faction_vendors.ts)
-      // out-scores the Seal of the Forgewall on the physical line, so the picker
-      // wears it on ring1 and the Band of Marked Strikes slides to ring2. A
-      // reputation ring displacing raid jewelry is a balance call for review;
-      // the pin records what the probe wears, not an endorsement.
+      // order held, so only the identity pins move. The Champion-standing
+      // faction rings (content/faction_vendors.ts) are tuned to sit below the
+      // Nythraxis jewelry on every line, so standing stock never places here.
       expect(Object.keys(gear).length, `${spec} fills every slot`).toBe(12);
       expect(gear.neck, `${spec} neck is the physical Ignivar choker`).toBe(
         'ignivars_ember_choker',
       );
-      expect(gear.ring1, `${spec} ring1 is the Champion's Forged Loop`).toBe(
-        'champion_forged_loop',
-      );
-      expect(gear.ring2, `${spec} ring2 is the physical Band of Marked Strikes`).toBe(
-        'band_of_marked_strikes',
+      expect(gear.ring2, `${spec} ring2 is the physical Forgewall seal`).toBe(
+        'seal_of_the_forgewall',
       );
       expect(
         Object.values(gear).every((itemId) => ITEMS[itemId]?.quality === 'epic'),
