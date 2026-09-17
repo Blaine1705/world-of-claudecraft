@@ -49,6 +49,8 @@
 //   dungeon_finder.ts   IWorldDungeonFinder  Dungeon Finder queue/proposals/premade board
 //   deeds.ts            IWorldDeeds          earned deeds, lifetime stats, renown, active title,
 //                                            rarity + the account-Renown leaderboard reads
+//   farming.ts          IWorldFarming        the static garden-bed geography + the caller's own
+//                                            plot rows (reads only in the patches-and-plots phase)
 //   reliquary.ts        IWorldReliquary      sparse firstFind / marks / recent + pure completion
 //
 // THREE GATES pin this seam (run before any facet edit; the literal counts are
@@ -76,6 +78,7 @@ import type { IWorldDuelArena } from './world_api/duel_arena';
 import type { IWorldDungeonFinder } from './world_api/dungeon_finder';
 import type { IWorldDungeons } from './world_api/dungeons';
 import type { IWorldEntityRoster } from './world_api/entity_roster';
+import type { IWorldFarming } from './world_api/farming';
 import type { IWorldGuildBank } from './world_api/guild_bank';
 import type { IWorldInteraction } from './world_api/interaction';
 import type { IWorldInventory } from './world_api/inventory';
@@ -130,8 +133,9 @@ export type {
 // the Mirefen road, and the harbor-town plat's basin lobes and grading stamps
 // land where the Sowfield stood. (8 on the pre-merge eastbrook branch.)
 // 10 = Bank Storage adds required BankInfo socket and two-pool capacity fields.
-// Release v0.41.0's auth-world-9 payload lacks them, so mixed binaries must be
-// rejected before the new client can consume the old six-field snapshot.
+// The pre-bank-storage release/v0.41.0 payload (then auth-world-9) lacks them,
+// so mixed binaries must be rejected before the new client can consume the old
+// six-field snapshot.
 // 11 = Materials Vault snapshots require the identity-preserving `special`
 // collection. An epoch-10 client can neither render nor select those rows, and
 // an epoch-10 server would omit them, stranding deposited special materials.
@@ -175,8 +179,38 @@ export type {
 // (12 is deliberately unassigned: 13 through 25 were numbered 11 through 23 on
 // the pre-merge raid branch, which forked before the Bank Storage and Materials
 // Vault bumps above; that branch's 11 through 20 were in turn 9 through 18
-// before the Eastbrook program bumps.)
-export const ONLINE_WORLD_LAYOUT_VERSION = 25 as const;
+// before the Eastbrook program bumps. The Masterwrought branch had also
+// numbered its own bump 12 pre-merge, off the epoch-11 base; the v0.41.0 sync
+// renumbered it 26 below so it sits above every raid epoch.)
+// 26 = Masterwrought and farming ship together: equipped-instance snapshots
+// carry required Perfecting fields (rank progress, the Perfected quality, an
+// orange piece's chosen name) and the self wire carries the `fplot` farm-plot
+// delta. An epoch-25 client can neither render Perfected copies nor a farm,
+// and an epoch-25 server omits both, stranding Perfecting progress and plots.
+// 27 = Material stacks carry exact per-source counts. Older clients cannot
+// describe a selected source or preserve its identity through item commands.
+// 28 = Corpse harvesting replaced the raw components array with a remembered,
+// id-only per-material harvest preference plus a correlated status query.
+// Epoch 27 clients still send the old components-array harvest command, which
+// the server now rejects outright, and cannot render the new preference or
+// query state, so mixed binaries must fail closed.
+// 29 = The latest release branch landed two compiled changes together: the
+// Nythraxis mechanics redo added Grave Eruption warning rings and Grave Flame
+// patches as two server-authored snapshot families, `nythraxisEruptions` (the
+// meteor row shape) and `nythraxisFlames`, encoded by server/nythraxis_wire.ts
+// and decoded by src/net/ground_telegraph_wire.ts, plus Binding Sigil and
+// Gravefire snapshot families, the Grave Flame kind field, the
+// `nythraxisCallout` event, and the Bone Spike mob; and the Drakelands site
+// swap (docs/design/drakelands-improvements) removed the Last Keep's castle
+// to flat build land on the old Trollmoot rise, moots the trolls on the old
+// keep grounds by the restored ruin ring, strips Wyrmwatch's dressing for the
+// placer rebuild, and re-aims roads. An epoch-28 client would stand in rings
+// and fire it cannot see, and would render a castle, a town, and camps the
+// server no longer stands anywhere near, colliding with walls that are not
+// there. A bump moves this constant, scripts/lib/world_auth.mjs and its
+// .d.mts, tests/bank_wire_epoch.test.ts, and tests/world_auth_scripts.test.ts
+// together.
+export const ONLINE_WORLD_LAYOUT_VERSION = 29 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI
@@ -235,6 +269,10 @@ export type {
   ActiveConsecration,
   ActiveFrostRing,
   ActiveIgnivarMeteorWarning,
+  ActiveNythraxisBindingSigil,
+  ActiveNythraxisGraveEruption,
+  ActiveNythraxisGraveFlame,
+  ActiveNythraxisGravefire,
   ActiveTemporalHourglass,
   ActiveVarkhulAnvilMeteorWarning,
   ActiveVarkhulAssembly,
@@ -285,20 +323,31 @@ export type {
   DungeonFinderQueueView,
 } from './world_api/dungeon_finder';
 export type { RaidLockout, RiftFloorView } from './world_api/dungeons';
+export type {
+  FarmPatchDef,
+  FarmPlantKnobs,
+  FarmPlotStatus,
+  FarmPlotView,
+} from './world_api/farming';
 export {
+  GUILD_BANK_LOG_KINDS,
   GUILD_BANK_LOG_LIMIT,
+  GUILD_BANK_LOG_OP_KIND,
   type GuildBankInfo,
   type GuildBankLogEntry,
+  type GuildBankLogKind,
   type GuildBankLogOp,
   type GuildBankLogView,
+  guildBankLogKindOf,
 } from './world_api/guild_bank';
 export type {
   CivicServiceKind,
   CivicServicePlacement,
+  CorpseHarvestInfo,
   WorldInteractionOutcome,
 } from './world_api/interaction';
 export type { MailInfo, MailKindView, MailMessageView } from './world_api/mail';
-export type { MarketInfo, MarketListingView } from './world_api/market';
+export type { MarketInfo, MarketListingView, MarketSweepQuote } from './world_api/market';
 export { queryDiffersFromEcho, searchDiffersFromEcho } from './world_api/market';
 export type { MountRaceView } from './world_api/mounts';
 export type { PartyInfo, PartyMemberAura, PartyMemberInfo } from './world_api/party';
@@ -306,12 +355,16 @@ export type {
   CraftingIdentityView,
   CraftResultView,
   DisenchantResultView,
+  PerfectingSwapInfoView,
+  PerfectingSwapRequest,
   PlayerProfessionsView,
   RecipeDef,
   ToolEffectSlotView,
 } from './world_api/professions';
 export type {
   DevLeaderboardEntry,
+  GuildBoardCategory,
+  GuildBoardOfficer,
   GuildLeaderboardEntry,
   GuildRosterEntry,
   GuildRosterInfo,
@@ -336,6 +389,8 @@ export type {
   MyPledgeInfo,
   PresenceStatus,
   SocialInfo,
+  WhoRosterEntry,
+  WhoRosterInfo,
 } from './world_api/social_graph';
 export type { TradeInfo, TradeOffer } from './world_api/trade';
 
@@ -374,7 +429,8 @@ export interface IWorld
     IWorldActionBar,
     IWorldDeeds,
     IWorldReliquary,
-    IWorldMounts {}
+    IWorldMounts,
+    IWorldFarming {}
 
 // ---------------------------------------------------------------------------
 // Command schema (W0b): the shared wire-token vocabulary.
@@ -512,6 +568,8 @@ export const COMMAND_NAMES = [
   'market_list',
   'market_list_instance',
   'market_buy',
+  'market_sweep_quote',
+  'market_sweep',
   'market_cancel',
   'market_collect',
   'dev_level',
@@ -606,6 +664,7 @@ export const COMMAND_NAMES = [
   // held piece into generic materials (Sim.disenchantItem/applyEnchant/salvageItem
   // via src/sim/professions/enchanting.ts and salvage.ts).
   'disenchant_item',
+  'extract_essence',
   'apply_enchant',
   'salvage_item',
   // Maker's Bond unbind service (Professions 2.0): clear the
@@ -684,6 +743,29 @@ export const COMMAND_NAMES = [
   // payload, the sim resolves the previous enemy in the same ordered list Tab
   // walks forward. Appended because wire tokens are never reordered.
   'tabPrev',
+  // Farming's growth phase: sow a crop into a garden bed, and pull it back
+  // out (Sim.plantCrop / Sim.harvestCrop via src/sim/professions/farming.ts).
+  // Both carry IDS ONLY (`bed`, and `crop` on the plant): the seed cost, the
+  // pre-rolled growth script, the deadline and the yield are all resolved
+  // sim-side, so there is no item payload on this wire to forge. Appended
+  // because wire tokens are never reordered.
+  'plant_crop',
+  'harvest_crop',
+  // Farming's knobs phase: trade withered husks for compost at the sim's
+  // fixed ratio (Sim.convertHusks via src/sim/professions/farming.ts). NO
+  // PAYLOAD AT ALL: the ratio, the batch count and both item ids are resolved
+  // sim-side from the sender's own bags, so there is nothing on this wire to
+  // forge. Appended because wire tokens are never reordered.
+  'convert_husks',
+  // The shared feast (Sim.placeFeast / Sim.consumeFeast via
+  // src/sim/professions/feast.ts). place_feast carries only an optional bag
+  // slot naming the copy to spend (the feast item id, charges, expiry and the
+  // anti-abuse rule resolve sim-side); consume_feast carries the feast ENTITY
+  // id only, and every outcome (ledger, charges, range, the Well Fed mint) is
+  // server state.
+  // Appended because wire tokens are never reordered.
+  'place_feast',
+  'consume_feast',
   // The Materials Vault: the per-material, gold-upgraded material store beside the
   // personal slot bank (src/sim/materials_vault.ts). Appended at the END because
   // wire tokens are never reordered, so these deliberately do NOT sit beside the
@@ -712,11 +794,52 @@ export const COMMAND_NAMES = [
   'bank_unlock_socket',
   'bank_socket_bag',
   'bank_unsocket_bag',
-  // The tutorial greeting's accept: the ferry ride to the Proving Shore
-  // (IWorldQuests.startTutorial; sim/tutorial/greeting.ts re-validates level,
-  // life, and band server-side). Appended because wire tokens are never
-  // reordered.
-  'tutorial_start',
+  // The Perfecting stage (Masterwrought phase 12, IWorldProfessions.perfectItem):
+  // one attempt on a worn (`slot`) or bagged (`bag`) apex piece; the server
+  // validates the ref shape and the sim resolves every gate and the one roll.
+  // Appended because wire tokens are never reordered.
+  'perfect_item',
+  'material_separate',
+  'material_combine',
+  // The corpse-harvest preference (Intentional Gathering PR3): a stored
+  // player setting, never a harvest action (no kit/location/combat/cost
+  // gate). `raw` is a material item id or the 'all' token
+  // (HARVEST_PREFERENCE_ALL_TOKEN), re-validated server-side through the
+  // same parseHarvestPreferenceCommand the sim's own load path uses.
+  // Appended at the END because wire tokens are never reordered. Like
+  // harvest_node/craft_item and the rest of the IWorldProfessions surface,
+  // this is deliberately UNTAGGED in COMMAND_FACETS below (the row-less W6
+  // PARTIAL design; see FACET_PROFESSIONS in tests/world_api_parity.test.ts).
+  'set_harvest_preference',
+  // The selected-corpse status query (corpse-status-contract.md): a
+  // correlated, non-mutating read (`{id, rid}` in, `{t:'corpseHarvestInfo',
+  // id, rid, info}` out), never a harvest action. Appended at the END, like
+  // every wire token above.
+  'inspectCorpseHarvest',
+  // Intentional Gathering PR4 (docs/prd/intentional-gathering/goal-projection-
+  // contract.md): track/clear the viewer's single explicit gathering goal.
+  // `track_gathering_recipe` carries a recipe id plus the requested batch
+  // count; `track_gathering_commission` carries only the order id (the sim
+  // resolves and captures the live accepted order itself); `clear_gathering_
+  // goal` carries no payload. Like harvest_node/craft_item and the rest of the
+  // IWorldProfessions surface, these are deliberately UNTAGGED in
+  // COMMAND_FACETS below (the row-less W6 PARTIAL design; see
+  // FACET_PROFESSIONS in tests/world_api_parity.test.ts). Appended at the END
+  // because wire tokens are never reordered.
+  'track_gathering_recipe',
+  'track_gathering_commission',
+  'clear_gathering_goal',
+  // The Perfecting rank exchange (Masterwrought phase 15): swap the rank
+  // progress of two owned pinned copies from the same Crucible collection
+  // (which may be different slots or item ids) after explicit confirmation.
+  // Appended at the END, after the gathering-goal cluster above, because wire
+  // tokens are never reordered.
+  'swap_perfecting_ranks',
+  // Wear or take off an owned account mount skin on this character.
+  'change_mount_skin',
+  // The Social window's Who tab: ask for the realm roster (answered by the
+  // `who` frame, mirrored as IWorldSocialGraph.whoInfo).
+  'who',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -782,6 +905,7 @@ export type WorldFacet =
   | 'IWorldCosmetics'
   | 'IWorldQuests'
   | 'IWorldProgressionXp'
+  | 'IWorldProfessions'
   | 'IWorldTalents'
   | 'IWorldPet'
   | 'IWorldParty'
@@ -803,7 +927,8 @@ export type WorldFacet =
   | 'IWorldActionBar'
   | 'IWorldDeeds'
   | 'IWorldReliquary'
-  | 'IWorldMounts';
+  | 'IWorldMounts'
+  | 'IWorldFarming';
 
 export const COMMAND_FACETS = {
   // IWorldCombat: ability casts, auto-attack, spirit release.
@@ -833,13 +958,18 @@ export const COMMAND_FACETS = {
   // IWorldInventory: non-fungible Rift gear progression. These mutate the
   // authoritative inventory copy; every cost and payload is validated again
   // in the sim before the item instance is changed. (salvage_item rides the
-  // professions surface and, like the other enchanting-family commands, has
-  // no facet row here.)
+  // professions surface and, like the other enchanting-family commands and
+  // perfect_item, has no facet row here: the legacy professions commands
+  // remain row-less by the W6 PARTIAL design, their members pinned by
+  // tests/world_api_parity.test.ts FACET_PROFESSIONS instead.)
   rift_upgrade_item: 'IWorldInventory',
   rift_socket_gem: 'IWorldInventory',
+  swap_perfecting_ranks: 'IWorldProfessions',
   // IWorldInventory: the one-shot bag clean-up; the sim re-derives the whole
   // arrangement, so there is no payload to validate.
   inv_sort: 'IWorldInventory',
+  material_separate: 'IWorldInventory',
+  material_combine: 'IWorldInventory',
   // IWorldTelemetry: fire-and-forget metrics sink.
   telemetry: 'IWorldTelemetry',
   // IWorldProgressionXp: opt-in cosmetic prestige (leaderboard is a REST GET, no
@@ -952,6 +1082,7 @@ export const COMMAND_FACETS = {
   guild_event_remove: 'IWorldSocialGraph',
   guild_set_motd: 'IWorldSocialGraph',
   guild_buy_roster_page: 'IWorldSocialGraph',
+  who: 'IWorldSocialGraph',
   // IWorldMarket: World Market browse/list/buy/cancel/collect (snake_case wire
   // strings, by design). marketInfo is a snapshot read (no send, untagged).
   market_search: 'IWorldMarket',
@@ -960,6 +1091,8 @@ export const COMMAND_FACETS = {
   market_list: 'IWorldMarket',
   market_list_instance: 'IWorldMarket',
   market_buy: 'IWorldMarket',
+  market_sweep_quote: 'IWorldMarket',
+  market_sweep: 'IWorldMarket',
   market_cancel: 'IWorldMarket',
   market_collect: 'IWorldMarket',
   // IWorldMail: Ravenpost letters (snake_case wire strings, by design). mailInfo /
@@ -1053,4 +1186,13 @@ export const COMMAND_FACETS = {
   // IWorldActionBar: the debounced action-bar layout upload. takeActionBarLayoutRestore
   // is a login-time read (no send, untagged).
   save_hotbar_layout: 'IWorldActionBar',
+  // IWorldFarming: the two growth-phase plot mutations (snake_case wire
+  // strings, by design). farmPatches (a static content read served from the
+  // client bundle) and myFarmPlots (the `fplot` self-delta mirror) carry no
+  // wire command and stay untagged.
+  plant_crop: 'IWorldFarming',
+  harvest_crop: 'IWorldFarming',
+  convert_husks: 'IWorldFarming',
+  place_feast: 'IWorldFarming',
+  consume_feast: 'IWorldFarming',
 } as const satisfies Partial<Record<ClientCommand, WorldFacet>>;

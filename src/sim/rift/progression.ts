@@ -3,6 +3,7 @@
 // shells; everything a band grants lives in ItemInstancePayload.rift, and the
 // ladder that prices it is rift/band_ladder.ts.
 
+import { ENCHANTS, type EnchantDef } from '../content/enchants';
 import {
   RIFT_ESSENCE_ITEM_ID,
   RIFT_GEM_IDS,
@@ -63,8 +64,9 @@ export interface RiftForgeResult {
 }
 
 /** The three class shells, each a stat-free ItemDef; the copy's rift record
- *  prices the ring (band_ladder.ts). Bands are forge-only: the enchanting
- *  profession refuses them by id (professions/enchanting.ts). */
+ *  prices the ring (band_ladder.ts). A band also takes an ordinary ring
+ *  enchant (professions/enchanting.ts) at any rung: the marker rides the
+ *  rebuild and its bonus is re-added on top of the ladder line every time. */
 const SHELL_STATS: Readonly<Record<string, RiftBandShell>> = {
   riftbound_band_of_might: { primary: 'str', secondary: 'sta' },
   riftbound_band_of_insight: { primary: 'int', secondary: 'spi' },
@@ -77,15 +79,45 @@ function shellItemIdForClass(cls: PlayerClass): string {
   return 'riftbound_band_of_insight';
 }
 
+/** The enchant a band copy may carry: a known enchant whose slot kind is the
+ *  shell's own (a ring enchant) and that the apply could have admitted on a
+ *  band (never a requiresPerfected enchant: a band is never Perfected), read
+ *  off the copy's top-level marker, the same field every other enchanted copy
+ *  carries (isEnchantedInstance). Any other marker (unknown id, an enchant for
+ *  another slot, a Perfected-only enchant) is not a band enchant and is
+ *  dropped by the rebuild. The bonus is re-priced from the live ENCHANTS table
+ *  at every rebuild, the same way the ladder line is (docs/design/rift-mode.md). */
+function riftBandEnchant(itemId: string, instance: ItemInstancePayload): EnchantDef | undefined {
+  if (instance.enchant === undefined) return undefined;
+  const enchant = ENCHANTS[instance.enchant];
+  if (!enchant || enchant.itemSlot !== ITEMS[itemId]?.slot) return undefined;
+  return enchant.requiresPerfected === true ? undefined : enchant;
+}
+
 /** Rebuild the copy's rolled aggregate from its bounded progression inputs
- *  (tier, upgradeLevel, gems). The rolled block is never trusted from JSONB or
- *  the wire; this is the ONLY writer, so a band's stats can never drift from
- *  what the ladder prices for its item level. */
+ *  (tier, upgradeLevel, gems) plus the enchant marker's bonus, summed
+ *  additively on top of the ladder line exactly as enchantedPayloadFor sums it
+ *  on any other copy. The rolled block is never trusted from JSONB or the
+ *  wire; this is the ONLY writer, so a band's stats can never drift from what
+ *  the ladder prices for its item level, and an apply's additive mint equals
+ *  this rebuild by construction (pinned in tests/professions_enchanting.test.ts). */
 function rebuildRolledStats(itemId: string, instance: ItemInstancePayload): void {
   const rift = instance.rift;
   const shell = SHELL_STATS[itemId];
   if (!rift || !shell) return;
-  const stats = riftBandRolledStats(shell, rift.tier, rift.upgradeLevel, rift.gems);
+  const stats: Record<string, number> = riftBandRolledStats(
+    shell,
+    rift.tier,
+    rift.upgradeLevel,
+    rift.gems,
+  );
+  const enchant = riftBandEnchant(itemId, instance);
+  if (enchant) {
+    for (const [stat, value] of Object.entries(enchant.statBonus)) {
+      if (value === undefined) continue;
+      stats[stat] = (stats[stat] ?? 0) + value;
+    }
+  }
   instance.rolled = { ...(instance.rolled ?? {}), quality: 'epic', stats };
 }
 
@@ -93,9 +125,11 @@ const RIFT_TIERS: readonly RiftTier[] = ['C', 'B', 'A', 'S'];
 
 /** Rebuild a persisted copy from bounded progression inputs; rolled stats are
  *  never trusted from JSONB. Every band a player has ever been handed loads
- *  (tier, upgrade level, and socketed gems are all that is read; the legacy
- *  `baseStats` and `enchant` fields of the pre-ladder payload are ignored and
- *  dropped, and an over-socketed gem list is truncated to the rank's sockets),
+ *  (tier, upgrade level, socketed gems, and a valid top-level ring-enchant
+ *  marker are all that is read; the legacy `baseStats` and `rift.enchant`
+ *  fields of the pre-ladder payload are ignored and dropped, an unknown or
+ *  wrong-slot enchant marker is dropped, and an over-socketed gem list is
+ *  truncated to the rank's sockets),
  *  so a ladder retune resizes existing bands at load instead of voiding them.
  *  Null is reserved for a copy that is not a band at all: an unknown shell id,
  *  a tier or upgrade level outside the ladder, or no source event. */
@@ -127,6 +161,9 @@ export function sanitizeRiftGearInstance(
     // The player item lock (item_lock.ts) is the owner's own safety mark and
     // rides the rebuild; every other per-copy field is re-derived below.
     ...(input.locked === true && { locked: true }),
+    // The ring enchant (if any) rides the rebuild; its bonus is re-priced on
+    // top of the ladder line by rebuildRolledStats below.
+    ...(riftBandEnchant(itemId, input) && { enchant: input.enchant }),
     rolled: { quality: 'epic', stats: {} },
     rift: {
       sourceEventId: source.sourceEventId,
@@ -234,6 +271,55 @@ export const RIFT_EPIC_MOUNT_REINS = [
 ] as const;
 export const RIFT_EPIC_MOUNT_CHANCE = 0.003; // 0.3% per S clear
 
+/** Masterwrought apex ARMOR patterns (Phase 11, R8 channel doctrine): the rift
+ *  pillar carries the ten armorcrafting/leatherworking/tailoring patterns
+ *  (content/apex_patterns.ts) as the final appended draw on every winning
+ *  B/A/S clear. SORTED, and exported for tests: the rng.int pick below indexes
+ *  it, so the order is part of the draw contract. */
+export const RIFT_PATTERN_ITEM_IDS = [
+  'pattern_barksong_handguards',
+  'pattern_briarstep_jerkin',
+  'pattern_fenbloom_breeches',
+  'pattern_forgefold_legguards',
+  'pattern_spiritweld_girdle',
+  'pattern_sunspun_handwraps',
+  'pattern_sunspun_haversack',
+  'pattern_sunspun_leggings',
+  'pattern_sunspun_vestments',
+  'pattern_wardspeaker_sabatons',
+] as const;
+export const RIFT_PATTERN_CHANCE = 0.08; // one draw per winning B/A/S clear
+
+/** Farming's RIFT channel (Phase 11f, masterwrought R8): the three rung-100
+ *  farm patterns the raid does not carry, plus every tier-3 and tier-4 seed, as
+ *  the appended draw AFTER the apex-pattern roll on winning B/A/S clears.
+ *
+ *  SORTED, and exported for tests, for exactly the reason RIFT_PATTERN_ITEM_IDS
+ *  above is: the rng.int pick below indexes this array, so its ORDER is part of
+ *  the draw contract and a re-sort is a determinism change, not a tidy-up.
+ *
+ *  One list rather than two (patterns and seeds) because it must cost ONE
+ *  appended draw, not two: a rift clear either sheds a farming reward or it does
+ *  not, and which kind it is comes out of the same pick. That also keeps the
+ *  repeatable pillar from becoming the fastest route to a pattern, since a
+ *  pattern is 3 of the 11 slots behind an 8% gate. */
+export const FARM_RIFT_DROP_ITEM_IDS = [
+  'evergarden_greens_seed',
+  'evergarden_pumpkin_seed',
+  'frost_gourd_seed',
+  'frost_lentils_seed',
+  'gilded_sunmelon_seed',
+  'gilded_yam_seed',
+  'highland_barley_seed',
+  'pattern_evergarden_braised_greens',
+  'pattern_evergarden_harvest_platter',
+  'pattern_evergarden_sunmelon_tart',
+  'thornpeak_cabbage_seed',
+] as const;
+/** The SHIPPED rift pattern rate, reused rather than re-derived: farming's
+ *  appended draw is the same 8% gate the apex patterns ride. */
+export const FARM_RIFT_DROP_CHANCE = RIFT_PATTERN_CHANCE;
+
 /** Rank-gated gear payout on the winning clear: pushed onto the final boss's
  * corpse as PLAIN drops, so the normal party loot rules (rolls) decide who
  * takes them. Runs for every winning clear, ranked race or dev portal, with
@@ -249,6 +335,15 @@ export const RIFT_EPIC_MOUNT_CHANCE = 0.003; // 0.3% per S clear
  *         in array order (RIFT_LEGENDARY_CHANCE_S each)
  *   5. B/A/S: exactly one mount roll, for the rank's own tier only
  *         (green/blue/epic chance + rng.int pick)
+ *   6. B/A/S: one apex-pattern roll (RIFT_PATTERN_CHANCE, then an rng.int
+ *         pick over the sorted RIFT_PATTERN_ITEM_IDS). C never reaches this
+ *         draw BY DESIGN: the C arm returns after draw 0, so the pattern
+ *         channel stays a winning ranked-clear reward (the R8 channel split).
+ *   7. B/A/S: one FARMING roll (FARM_RIFT_DROP_CHANCE, then an rng.int pick
+ *         over the sorted FARM_RIFT_DROP_ITEM_IDS: three rung-100 farm
+ *         patterns plus every tier-3 and tier-4 seed). Appended by
+ *         masterwrought Phase 11f under the same append-only rule, and C
+ *         never reaches it either.
  *
  * B/A/S draws are unaffected by the new C draw (C returns after draw 0).
  */
@@ -300,6 +395,29 @@ export function addRiftClearGearLoot(ctx: SimContext, boss: Entity, baseLevel: n
   if (ctx.rng.chance(mount.chance)) {
     loot.items.push({
       itemId: mount.reins[ctx.rng.int(0, mount.reins.length - 1)],
+      count: 1,
+    });
+  }
+
+  // --- Draw 6: the apex armor pattern roll (see RIFT_PATTERN_ITEM_IDS) ---
+  // Appended AFTER the mount roll so every existing draw keeps its stream
+  // position; a plain tradable drop like the draws above, so party loot rules
+  // decide who takes it.
+  if (ctx.rng.chance(RIFT_PATTERN_CHANCE)) {
+    loot.items.push({
+      itemId: RIFT_PATTERN_ITEM_IDS[ctx.rng.int(0, RIFT_PATTERN_ITEM_IDS.length - 1)],
+      count: 1,
+    });
+  }
+
+  // --- Draw 7: the farming roll (see FARM_RIFT_DROP_ITEM_IDS) ---
+  // Appended AFTER draw 6 for the same reason draw 6 sits after the mount roll:
+  // every existing draw keeps its stream position, and only the goldens that
+  // reach this far move. C never arrives here, since its arm returned after
+  // draw 0, which is the same designed split the pattern channel already has.
+  if (ctx.rng.chance(FARM_RIFT_DROP_CHANCE)) {
+    loot.items.push({
+      itemId: FARM_RIFT_DROP_ITEM_IDS[ctx.rng.int(0, FARM_RIFT_DROP_ITEM_IDS.length - 1)],
       count: 1,
     });
   }

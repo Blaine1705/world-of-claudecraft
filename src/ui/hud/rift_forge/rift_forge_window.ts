@@ -21,7 +21,7 @@ import { RIFT_GEM_RATING, RIFT_GEM_RATING_STAT } from '../../../sim/rift/band_la
 import type { ItemDef, ItemInstancePayload, SimEvent } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
 import { markDialogRoot } from '../../dialog_root';
-import { npcGreeting } from '../../entity_display_labels';
+import { npcGreeting } from '../../entity_display_core';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { formatNumber, type TranslationKey, t } from '../../i18n';

@@ -1,6 +1,8 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { apiGet, apiPost } from '../api';
+  import { type AdminLoadFailure, classifyAdminLoadFailure } from '../load_failure';
+  import PermissionDenied from '../components/PermissionDenied.svelte';
   import { auth } from '../state/auth.svelte';
   import { localizeAdminError, t } from '../i18n';
   import { fmtDate } from '../format';
@@ -27,7 +29,7 @@
   }
 
   let rows = $state<RealmBuilderRow[]>([]);
-  let failed = $state(false);
+  let failed = $state<AdminLoadFailure>('none');
   let loaded = $state(false);
   let saving = $state(false);
   let formYear = $state(new Date().getFullYear());
@@ -50,10 +52,10 @@
     try {
       const data = await apiGet<{ rows: RealmBuilderRow[] }>('/admin/api/realm-builders');
       rows = data.rows;
-      failed = false;
+      failed = 'none';
       loaded = true;
     } catch (err) {
-      if (!auth.handleAuthFailure(err)) failed = true;
+      if (!auth.handleAuthFailure(err)) failed = classifyAdminLoadFailure(err);
     }
   }
 
@@ -115,7 +117,11 @@
   });
 </script>
 
-{#if failed}
+{#if failed === 'forbidden'}
+  <Panel title={t('nav.realmBuilders')}>
+    <PermissionDenied />
+  </Panel>
+{:else if failed === 'error'}
   <Panel title={t('nav.realmBuilders')}>
     <div class="empty">{t('realmBuilders.loadFailed')}</div>
   </Panel>

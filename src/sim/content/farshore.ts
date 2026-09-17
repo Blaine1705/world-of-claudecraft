@@ -193,6 +193,13 @@ export const FARSHORE_MOBS: Record<string, MobTemplate> = {
     loot: [{ copper: 35, chance: 1 }],
     scale: 1.45,
     color: 0x8a2f6a,
+    // Ogre stock like the Thornpeak ogres, so tusked (the game ships
+    // cracked_ogre_tusk). Phase 11m added the tag as the band-1 open-world tusk
+    // source in place of dune_troll, whose fang beside tusk would put two
+    // specimen-less families on one corpse (the capacity pre-gate premise,
+    // tests/corpse_harvest_sim.test.ts). A count-1 elite, so a hollow tusk
+    // floor member: the ledger records its density.
+    componentTags: ['tusk'],
   },
   // Nell's husband (q_fs_bram_come_home), thrown back by the sea at the
   // nets-break and holed up in his wrecked boat past the Landing's point.
@@ -297,13 +304,19 @@ export const FARSHORE_NPCS: Record<string, NpcDef> = {
       'It opened right where the nets dry. Right there, where I stood every morning of my life. I do not go down to the shore anymore. I do not go much of anywhere anymore.',
   },
   // The Riftwright: the Rift Forge NPC (riftForge flag). Stands in the Watch
-  // Meadow beside Riftwatch Ollun, the one authored rift place in the world,
-  // so the ring a first clear mints is upgraded where the breaks are studied.
+  // Meadow a few yards south-west of Riftwatch Ollun, the one authored rift
+  // place in the world, so the ring a first clear mints is upgraded where the
+  // breaks are studied. The spot is deliberately off the meadow's road ends
+  // and clear of the Hilltop Spring's shore ring: every NPC gets a calm-anchor
+  // flatten pad (terrain_calm_anchors.ts), and at the original (377, 7) that
+  // pad deformed the spring's shoreline and two road edges by up to a yard
+  // (tests/terrain_height_parity.test.ts). Here it touches two open-meadow
+  // atlas points and nothing else.
   riftwright_maelis: {
     id: 'riftwright_maelis',
     name: 'Riftwright Maelis',
     title: 'Rift Forgemaster',
-    pos: { x: 377, z: 7 },
+    pos: { x: 366, z: 10 },
     facing: Math.PI,
     color: 0x7a3f8a,
     questIds: [],

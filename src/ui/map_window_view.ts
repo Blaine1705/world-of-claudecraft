@@ -26,6 +26,7 @@ import {
   STRIP_MIN_X,
   type ZoneDef,
 } from '../sim/data';
+import { KIT_BUILDINGS } from '../sim/kit_buildings';
 import { NODE_HARVEST_TABLE } from '../sim/professions/gathering';
 import { canGatherTier } from '../sim/professions/tools';
 import {
@@ -45,7 +46,8 @@ import type { Decoration } from '../sim/world';
 import type { FriendInfo, IWorld } from '../world_api';
 import { buildCastlePlanMarkers, type CastlePlanMarker } from './castle_plan_core';
 import { dungeonMapActive } from './dungeon_map_view';
-import { viewerUsableToolTier } from './gathering_view';
+import { viewerUsableToolTier } from './hud/professions/gathering_view';
+import { dawnholdMapActive, lastKeepMapActive } from './lastkeep_map_view';
 import { overworldDungeonPortals } from './map_dungeon_portals';
 import type { MapMarkerProfile } from './map_marker_profile_core';
 import {
@@ -53,6 +55,11 @@ import {
   STABLE_MAP_NAVIGATION_LANDMARKS,
 } from './map_navigation_landmarks_core';
 import { questNumbersByLog } from './map_quest_list_view';
+import {
+  DEFAULT_MAP_ATLAS_FILTERS,
+  type MapAtlasFilters,
+  type MapAtlasRoute,
+} from './map_sidebar_view';
 
 // World-map zoom band. zoom 1 = the whole current zone framed square;
 // MAP_MAX_ZOOM is a close local view. The view scales uniformly between the two,
@@ -91,7 +98,7 @@ const CAMPFIRE_RADIUS_PPU = 0.5;
  *  overworld surface: the band sits past WORLD_MAX_X, so the player/ally
  *  markers self-suppress; the minimap owns the in-band field raster), or the
  *  overworld map (this core). */
-export type MapWindowMode = 'rift' | 'delve' | 'battleground' | 'dungeon' | 'overworld';
+export type MapWindowMode = 'rift' | 'delve' | 'battleground' | 'dungeon' | 'castle' | 'overworld';
 
 /** A map region in world coords, used with two meanings for spanX/spanZ. The
  *  internal `full` rect carries the current-zone square (its full spans). The
@@ -154,9 +161,6 @@ export const MAP_NPC_GLYPH_HIT_RADIUS = 10;
 /** Hit radius for a zone-map gather node icon (ready radius ~5px plus slack for
  *  the type silhouette and soft glow). Same nearest-wins rule as NPC glyphs. */
 export const MAP_GATHER_NODE_HIT_RADIUS = 10;
-
-/** Hit radius for a crafting-station badge on the zone map. */
-export const MAP_STATION_HIT_RADIUS = 10;
 
 /** Hit radius for a civic-service badge on the zone map. */
 export const MAP_SERVICE_HIT_RADIUS = 10;
@@ -287,24 +291,16 @@ export interface MapStationMarker {
   type: StationType;
 }
 
-/** The nearest crafting-station badge within its hit radius, or null. */
-export function stationMarkerAt(
-  stations: readonly MapStationMarker[],
-  mx: number,
-  my: number,
-): MapStationMarker | null {
-  let best: MapStationMarker | null = null;
-  let bestD2 = MAP_STATION_HIT_RADIUS * MAP_STATION_HIT_RADIUS;
-  for (const station of stations) {
-    const dx = mx - station.mx;
-    const dy = my - station.my;
-    const d2 = dx * dx + dy * dy;
-    if (d2 <= bestD2) {
-      bestD2 = d2;
-      best = station;
-    }
-  }
-  return best;
+/** A farming garden-bed site on the zone map. Patches are STATIC content
+ * positions (the crafting-station doctrine, never entities and never per-viewer
+ * state), so both IWorld hosts project the same badge; the badge can be
+ * displaced a few canvas pixels to keep a nearby quest glyph clear, while
+ * patchId/zoneId remain the authoritative content identity for its tooltip. */
+export interface MapFarmPatchMarker {
+  mx: number;
+  my: number;
+  patchId: string;
+  zoneId: string;
 }
 
 /** A static mailbox or interactive noticeboard on the zone map. Positions
@@ -365,14 +361,16 @@ export type MapPointMarkerHit =
   | { kind: 'navigation'; marker: MapNavigationMarker; distance2: number }
   | { kind: 'station'; marker: MapStationMarker; distance2: number }
   | { kind: 'service'; marker: MapServiceMarker; distance2: number }
-  | { kind: 'gather'; marker: MapGatherNodeMarker; distance2: number };
+  | { kind: 'gather'; marker: MapGatherNodeMarker; distance2: number }
+  | { kind: 'farm'; marker: MapFarmPatchMarker; distance2: number };
 
 type MapPointMarker =
   | MapNpcMarker
   | MapNavigationMarker
   | MapStationMarker
   | MapServiceMarker
-  | MapGatherNodeMarker;
+  | MapGatherNodeMarker
+  | MapFarmPatchMarker;
 
 const MAP_POINT_HIT_TIE_PRIORITY: Readonly<Record<MapPointMarkerHit['kind'], number>> = {
   npc: 0,
@@ -380,6 +378,7 @@ const MAP_POINT_HIT_TIE_PRIORITY: Readonly<Record<MapPointMarkerHit['kind'], num
   station: 2,
   service: 3,
   gather: 4,
+  farm: 5,
 };
 
 function mapPointHitBefore(a: MapPointMarkerHit, b: MapPointMarkerHit): boolean {
@@ -454,6 +453,7 @@ export function mapPointMarkerHitsInto(
   services: readonly MapServiceMarker[],
   stations: readonly MapStationMarker[],
   gatherNodes: readonly MapGatherNodeMarker[],
+  farmPatches: readonly MapFarmPatchMarker[],
   mx: number,
   my: number,
   radius: number,
@@ -474,6 +474,7 @@ export function mapPointMarkerHitsInto(
   activeCount = appendMapPointHits(output, activeCount, 'station', stations, mx, my, radius2);
   activeCount = appendMapPointHits(output, activeCount, 'service', services, mx, my, radius2);
   activeCount = appendMapPointHits(output, activeCount, 'gather', gatherNodes, mx, my, radius2);
+  activeCount = appendMapPointHits(output, activeCount, 'farm', farmPatches, mx, my, radius2);
   return activeCount;
 }
 
@@ -486,6 +487,7 @@ export function mapPointMarkerHits(
   services: readonly MapServiceMarker[],
   stations: readonly MapStationMarker[],
   gatherNodes: readonly MapGatherNodeMarker[],
+  farmPatches: readonly MapFarmPatchMarker[],
   mx: number,
   my: number,
   radius: number,
@@ -497,6 +499,7 @@ export function mapPointMarkerHits(
     services,
     stations,
     gatherNodes,
+    farmPatches,
     mx,
     my,
     radius,
@@ -690,6 +693,33 @@ const MAP_MARKER_KIND: Readonly<Record<BuildingDef['kind'], MapBuildingMarker['k
 /** Resolve a map footprint independently from a building's gameplay kind. The
  *  Grand Armoury keeps the replaced inn lot's rest semantics, but must read as
  *  the civic landmark on the map. */
+/** The four world-space corners of a footprint rect, in the transform the
+ *  colliders, the renderer, and buildingLocalToWorld share (the three.js
+ *  rotation.y sense). The map used to rotate the other way, which is
+ *  invisible on an axis-aligned rect but mirrors every rotated one: the
+ *  rectangle the map strokes must be the one that blocks a body. Pure and
+ *  exported so a test can pin the sense against buildingContainsPoint. */
+export function buildingFootprintCorners(placement: {
+  x: number;
+  z: number;
+  w: number;
+  d: number;
+  rot: number;
+}): { x: number; z: number }[] {
+  const c = Math.cos(placement.rot);
+  const s = Math.sin(placement.rot);
+  const corner = (dx: number, dz: number): { x: number; z: number } => ({
+    x: placement.x + dx * c + dz * s,
+    z: placement.z - dx * s + dz * c,
+  });
+  return [
+    corner(-placement.w / 2, -placement.d / 2),
+    corner(placement.w / 2, -placement.d / 2),
+    corner(placement.w / 2, placement.d / 2),
+    corner(-placement.w / 2, placement.d / 2),
+  ];
+}
+
 export function mapBuildingMarkerKind(building: {
   kind: BuildingDef['kind'];
   landmark?: 'eastbrook_grand_armoury';
@@ -743,6 +773,9 @@ export interface OverworldMapModel {
   stations: MapStationMarker[];
   /** Active-world mailboxes and noticeboards, collision-safe with other landmarks. */
   services: MapServiceMarker[];
+  /** Farming garden-bed sites in the committed zone, on the same collision-safe
+   *  landmark layer. Empty in a zone with no authored patch. */
+  farmPatches: MapFarmPatchMarker[];
   /** Collision-safe route badges and nearby live Rift entrances. */
   navigation: MapNavigationMarker[];
   player: MapPlayerMarker | null;
@@ -754,6 +787,8 @@ export interface OverworldMapModel {
   detail: MapDetail | null;
   /** Canvas-space "Show on Map" highlight, or null when absent / out of view. */
   ping: { mx: number; my: number } | null;
+  /** Canvas-space route from the player to the selected quest objective. */
+  route: { from: { mx: number; my: number }; to: { mx: number; my: number } } | null;
   /** When the player is inside a rift, its floor name + C/B/A/S rank (rank null
    *  for dev-portal runs), so the painter can show this instead of the
    *  overworld zone title. Mirrors MinimapModel.rift; null outside a rift. */
@@ -778,16 +813,27 @@ export interface OverworldMapInput {
   decorations: readonly Decoration[];
   /** Dungeon Finder "Show on Map" highlight in world coords, or null. */
   ping?: { x: number; z: number } | null;
+  /** Selected atlas quest route in world coordinates, or null. */
+  route?: MapAtlasRoute | null;
   /** Responsive marker profile, resolved once by the painter per redraw. */
   markerProfile?: MapMarkerProfile;
+  /** Player-controlled atlas layers. Omitted by legacy callers and tests to
+   *  preserve the complete shipped map. */
+  filters?: Readonly<MapAtlasFilters>;
+  /** Quests this client has untracked (quest_tracking_core): their gold objective
+   *  badges leave the map, exactly as their rows leave the atlas rail and the HUD
+   *  tracker. The quest itself stays accepted and keeps its acceptance number. */
+  untrackedQuestIds?: ReadonlySet<string>;
 }
 
-/** Which world-map surface this world renders. Delve when the player stands in a
- *  delve band and a run is active (matches the inline guard); overworld otherwise. */
+/** Which world-map surface the player's POSITION selects: rift, delve, battleground,
+ *  dungeon, or castle (lastkeep / dawnhold interiors) when standing in that band, overworld
+ *  otherwise. The window can still show another level (map_surface_core.ts). */
 export function mapWindowMode(world: IWorld): MapWindowMode {
   if (world.riftFloor) return 'rift';
   if (isBgPos(world.player.pos.x)) return 'battleground';
   if (dungeonMapActive(world)) return 'dungeon';
+  if (lastKeepMapActive(world) || dawnholdMapActive(world)) return 'castle';
   return isDelvePos(world.player.pos.x) && world.delveRun ? 'delve' : 'overworld';
 }
 
@@ -801,6 +847,7 @@ export function mapWindowMode(world: IWorld): MapWindowMode {
  */
 export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapModel {
   const { world, props, zone, zoom, center, canvasSize: S, decorations } = input;
+  const filters = input.filters ?? DEFAULT_MAP_ATLAS_FILTERS;
   const landmarkPlacement = MAP_LANDMARK_PLACEMENT_BY_PROFILE[input.markerProfile ?? 'standard'];
   const p = world.player;
 
@@ -882,6 +929,12 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     input.ping.z <= region.maxZ
       ? toMap(input.ping.x, input.ping.z)
       : null;
+  const route = input.route
+    ? {
+        from: toMap(p.pos.x, p.pos.z),
+        to: toMap(input.route.x, input.route.z),
+      }
+    : null;
   const detail =
     spanX < DETAIL_SPAN ? buildDetail(region, toMap, inZone, S / spanX, decorations, props) : null;
 
@@ -908,10 +961,16 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
   // map rect (inView) like every other grid-map marker; radius scales with zoom.
   // Each area carries its quests' acceptance-order numbers for the badges.
   const questNumbers = questNumbersByLog(world.questLog);
+  // Numbering stays over the WHOLE log so an untracked quest leaves a gap rather
+  // than renumbering the badges after it; only the DRAWING is filtered.
+  const untrackedQuests = input.untrackedQuestIds;
   const questAreas: MapQuestAreaMarker[] = [];
-  for (const area of questObjectiveAreas(world.questLog)) {
+  for (const area of filters.quests ? questObjectiveAreas(world.questLog) : []) {
     if (!inZone(area.center.x, area.center.z) || !inView(area.center.x, area.center.z)) continue;
-    const objectives = area.objectives;
+    const objectives =
+      untrackedQuests === undefined || untrackedQuests.size === 0
+        ? area.objectives
+        : area.objectives.filter((ref) => !untrackedQuests.has(ref.questId));
     if (objectives.length === 0) continue;
     const numbers: number[] = [];
     for (const ref of objectives) {
@@ -925,7 +984,9 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
 
   // Dungeon portals owned by the current zone (shown at every zoom).
   const portals: MapPortalMarker[] = [];
-  for (const portal of overworldDungeonPortals(DUNGEON_LIST, zone.zMin, zone.zMax)) {
+  for (const portal of filters.dungeons
+    ? overworldDungeonPortals(DUNGEON_LIST, zone.zMin, zone.zMax)
+    : []) {
     if (!inZone(portal.x, portal.z) || !inView(portal.x, portal.z)) continue;
     const { mx, my } = toMap(portal.x, portal.z);
     portals.push({ mx, my, dungeonId: portal.id });
@@ -942,7 +1003,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
   const gatherNodes: MapGatherNodeMarker[] = [];
   let bestToolTiers: Map<GatheringProfessionId, number> | null = null;
   let proficiency: Readonly<Record<string, number>> | undefined;
-  for (const node of GATHER_NODES) {
+  for (const node of filters.gather ? GATHER_NODES : []) {
     if (node.zoneId !== zone.id) continue;
     if (!inView(node.pos.x, node.pos.z)) continue;
     bestToolTiers ??= new Map();
@@ -978,11 +1039,10 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
   const npcs: MapNpcMarker[] = [];
   const blocked = world.craftingIdentity?.cadenceBlockedQuests;
   const cadenceBlocked = blocked && blocked.length > 0 ? new Set(blocked) : undefined;
-  for (const marker of questGiverNpcMarkers(
-    (q) => world.questState(q),
-    world.questsDone,
-    cadenceBlocked,
-  )) {
+  const questNpcMarkers = filters.quests
+    ? questGiverNpcMarkers((q) => world.questState(q), world.questsDone, cadenceBlocked)
+    : [];
+  for (const marker of questNpcMarkers) {
     if (!inZone(marker.pos.x, marker.pos.z) || !inView(marker.pos.x, marker.pos.z)) continue;
     const { mx, my } = toMap(marker.pos.x, marker.pos.z);
     npcs.push({ mx, my, kind: marker.kind, quests: marker.quests });
@@ -1067,7 +1127,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     services.push(marker);
     landmarks.push(marker);
   };
-  for (const service of world.civicServicePlacements) {
+  for (const service of filters.services ? world.civicServicePlacements : []) {
     appendService(service.x, service.z, service.kind);
   }
 
@@ -1080,7 +1140,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
   // closer zoom the authored distance exceeds the threshold and no nudge
   // occurs.
   const stations: MapStationMarker[] = [];
-  for (const station of world.stationPlacements) {
+  for (const station of filters.services ? world.stationPlacements : []) {
     if (station.zoneId !== zone.id || !inVisibleRegion(station.pos.x, station.pos.z)) continue;
     const projected = toMap(station.pos.x, station.pos.z);
     const placed = placeLandmarkBadge(
@@ -1102,6 +1162,40 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     landmarks.push(marker);
   }
 
+  // Farming garden beds (the fifth gathering profession): static content sites
+  // read through IWorld exactly like stations, so a custom-map playtest never
+  // inherits the built-in patch table. A patch anchor is the grid centroid, and
+  // its individual beds project within a few pixels of it at the full-zone
+  // scale, so one badge stands for the whole site. Placed on the shared
+  // landmark layer so later badges clear it deterministically.
+  const farmPatches: MapFarmPatchMarker[] = [];
+  for (const patch of world.farmPatches) {
+    if (patch.zoneId !== zone.id || !inVisibleRegion(patch.x, patch.z)) continue;
+    const projected = toMap(patch.x, patch.z);
+    // The same world-yard nudge cap every other landmark badge takes
+    // (MAP_LANDMARK_MAX_NUDGE_YD): a farm badge that drifts off its beds is
+    // the defect the cap exists to prevent, and this call landed without it at
+    // the release/v0.41.0 merge (the cap arrived on the release while the loop
+    // was authored on the branch).
+    const placed = placeLandmarkBadge(
+      projected.mx,
+      projected.my,
+      npcs,
+      landmarks,
+      S,
+      landmarkPlacement,
+      landmarkMaxNudge,
+    );
+    const marker: MapFarmPatchMarker = {
+      mx: placed.mx,
+      my: placed.my,
+      patchId: patch.id,
+      zoneId: patch.zoneId,
+    };
+    farmPatches.push(marker);
+    landmarks.push(marker);
+  }
+
   let player: MapPlayerMarker | null = null;
   if (inZone(p.pos.x, p.pos.z) && inView(p.pos.x, p.pos.z)) {
     const { mx, my } = toMap(p.pos.x, p.pos.z);
@@ -1116,7 +1210,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
   const party: MapPartyMarker[] = [];
   const partyNames = new Set<string>();
   const partyInfo = world.partyInfo;
-  if (labels && partyInfo) {
+  if (filters.players && labels && partyInfo) {
     for (const m of partyInfo.members) {
       if (m.pid === p.id) continue;
       partyNames.add(m.name);
@@ -1135,7 +1229,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
   // same double dot.
   const allies: MapAllyMarker[] = [];
   const social = world.socialInfo;
-  if (labels && social) {
+  if (filters.players && labels && social) {
     const selfName = p.name;
     const drawn = new Set<number>();
     const plotAlly = (m: FriendInfo, kind: 'friend' | 'guild'): void => {
@@ -1170,12 +1264,14 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     gatherNodes,
     stations,
     services,
+    farmPatches,
     navigation,
     player,
     allies,
     party,
     detail,
     ping,
+    route,
     rift,
   };
 }
@@ -1228,19 +1324,19 @@ function buildDetail(
     kind: MapBuildingMarker['kind'],
   ): void => {
     if (!inView(placement.x, placement.z)) return;
-    const c = Math.cos(placement.rot);
-    const s = Math.sin(placement.rot);
-    const corner = (dx: number, dz: number): { mx: number; my: number } =>
-      toMap(placement.x + dx * c - dz * s, placement.z + dx * s + dz * c);
-    const points = [
-      corner(-placement.w / 2, -placement.d / 2),
-      corner(placement.w / 2, -placement.d / 2),
-      corner(placement.w / 2, placement.d / 2),
-      corner(-placement.w / 2, placement.d / 2),
-    ];
+    const points = buildingFootprintCorners(placement).map((corner) => toMap(corner.x, corner.z));
     buildings.push({ id: placement.id ?? null, points, kind });
   };
   for (const building of authoredProps.buildings) {
+    footprint(building, mapBuildingMarkerKind(building));
+  }
+  // The placed-kit architecture (the Drakelands rebuild's keep halls, chapel,
+  // tavern, and stables) draws through the env-prop pipeline, never through
+  // props.buildings, so its silhouettes come from the derived footprints
+  // (sim/kit_buildings.ts): the same OBBs the kit collides with. Like those
+  // colliders (staticWorldColliders bakes the fortress table into every
+  // world), the kit stands wherever the world does, so it draws unguarded.
+  for (const building of KIT_BUILDINGS) {
     footprint(building, mapBuildingMarkerKind(building));
   }
   // Walls are authored beside the active world's other static props. Treat each

@@ -161,7 +161,7 @@ const MAGE_SPECS: SpecDef[] = [
     '#',
     'A spellcaster who controls the battlefield with ice, slows, and freezes. They build glacial power to destroy enemies with precise attacks.',
     // Signature swapped to the proc spender (owner leveling pass 2026-07-14):
-    // Icy Veins moved into the spec kit at level 12 (see combustion above).
+    // Coldsurge moved into the spec kit at level 12 (see combustion above).
     'ice_lance',
     'Brittlebreak',
     'Increases your Frost spell damage by 25%. Increases armor by 10%.',
@@ -311,7 +311,7 @@ const SHAMAN_SPECS: SpecDef[] = [
   spec(
     'restoration',
     'shaman',
-    'Spiritmend',
+    'Spiritcall',
     'healer',
     '+',
     'A healer using ancestral waves and efficient nature magic.',
@@ -394,7 +394,7 @@ const DRUID_SPECS: SpecDef[] = [
     'Wildfang',
     'tank',
     'x',
-    'A shapeshifter whose landed hits build Old Blood in both forms: Wolf spends it for damage, Bruin spends it to tank.',
+    'A shapeshifter whose landed hits build Old Blood in both forms: Cat spends it for damage, Bruin spends it to tank.',
     'feral_charge',
     'Primal Heart',
     // The +15% armor carries the v0.27 Dire Bruin retune (the old feral_choice_bear

@@ -1,6 +1,9 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import {
+  BG_BASES,
   BG_GRAVEYARDS,
+  BG_HALF_X,
+  BG_HALF_Z,
   battlegroundColliders,
   bgFieldPlanWalls,
 } from '../src/sim/battleground_layout';
@@ -31,7 +34,13 @@ import {
   nearestOverworldGraveyard,
   RES_HEALER_HP_FRACTION,
 } from '../src/sim/spirit';
-import { type BlockerDef, MAX_LEVEL, type SimEvent, type WorldContent } from '../src/sim/types';
+import {
+  type BlockerDef,
+  emptyMoveInput,
+  MAX_LEVEL,
+  type SimEvent,
+  type WorldContent,
+} from '../src/sim/types';
 import {
   UNSTUCK_COOLDOWN_ID,
   UNSTUCK_COUNTDOWN_SECONDS,
@@ -168,6 +177,42 @@ function forceBattlegroundWallTrap(
   return p;
 }
 
+function forceOutboardBattlegroundWallTrap(
+  sim: Sim,
+  match: NonNullable<ReturnType<Sim['bgMatchFor']>>,
+  pid: number,
+): Sim['player'] {
+  const wall = required(
+    battlegroundColliders().find(
+      (candidate) =>
+        candidate.type === 'obb' &&
+        !candidate.standable &&
+        (Math.abs(candidate.x) > BG_HALF_X + PLAYER_BODY_RADIUS + 1 ||
+          Math.abs(candidate.z) > BG_HALF_Z + PLAYER_BODY_RADIUS + 1),
+    ),
+    'outboard battleground wall collider',
+  );
+  const origin = battlegroundOrigin(match.slot);
+  const p = required(sim.entities.get(pid), 'trapped battleground player');
+  p.pos = sim.groundPos(origin.x + wall.x, origin.z + wall.z);
+  p.prevPos = { ...p.pos };
+  p.vx = 0;
+  p.vy = 0;
+  p.vz = 0;
+  p.onGround = true;
+  p.jumping = false;
+  p.inCombat = false;
+  p.combatTimer = 999;
+  sim.ctx.rebucket(p);
+  expect(
+    Math.abs(p.pos.x - origin.x) > BG_HALF_X + PLAYER_BODY_RADIUS + 1 ||
+      Math.abs(p.pos.z - origin.z) > BG_HALF_Z + PLAYER_BODY_RADIUS + 1,
+  ).toBe(true);
+  const resolved = resolvePosition(sim.cfg.seed, p.pos.x, p.pos.z, PLAYER_BODY_RADIUS);
+  expect(Math.hypot(resolved.x - p.pos.x, resolved.z - p.pos.z)).toBeGreaterThan(0.01);
+  return p;
+}
+
 function forceBattlegroundWallContact(
   sim: Sim,
   match: NonNullable<ReturnType<Sim['bgMatchFor']>>,
@@ -209,6 +254,51 @@ function forceBattlegroundWallContact(
   p.combatTimer = 999;
   const meta = required(sim.meta(pid), 'battleground player metadata');
   meta.moveInput.forward = true;
+  sim.ctx.rebucket(p);
+  const resolved = resolvePosition(sim.cfg.seed, p.pos.x, p.pos.z, PLAYER_BODY_RADIUS);
+  expect(Math.hypot(resolved.x - p.pos.x, resolved.z - p.pos.z)).toBe(0);
+  return p;
+}
+
+function forceExactBattlegroundWallContact(
+  sim: Sim,
+  match: NonNullable<ReturnType<Sim['bgMatchFor']>>,
+  pid: number,
+): Sim['player'] {
+  const origin = battlegroundOrigin(match.slot);
+  const p = required(sim.entities.get(pid), 'exact-contact battleground player');
+  let contact: { x: number; z: number } | null = null;
+  for (const wall of battlegroundColliders()) {
+    if (wall.type !== 'obb' || wall.moveTopY !== undefined || wall.hw < 1 || wall.hd < 1) continue;
+    const axes = [
+      { x: Math.cos(wall.rot), z: -Math.sin(wall.rot), d: wall.hw },
+      { x: -Math.cos(wall.rot), z: Math.sin(wall.rot), d: wall.hw },
+      { x: Math.sin(wall.rot), z: Math.cos(wall.rot), d: wall.hd },
+      { x: -Math.sin(wall.rot), z: -Math.cos(wall.rot), d: wall.hd },
+    ];
+    for (const axis of axes) {
+      const x = origin.x + wall.x + axis.x * (axis.d + PLAYER_BODY_RADIUS);
+      const z = origin.z + wall.z + axis.z * (axis.d + PLAYER_BODY_RADIUS);
+      const resolved = resolvePosition(sim.cfg.seed, x, z, PLAYER_BODY_RADIUS);
+      if (Math.hypot(resolved.x - x, resolved.z - z) <= 1e-6) {
+        contact = { x, z };
+        break;
+      }
+    }
+    if (contact) break;
+  }
+  contact = required(contact, 'exact battleground wall-contact point');
+  p.pos = sim.groundPos(contact.x, contact.z);
+  p.prevPos = { ...p.pos };
+  p.vx = 0;
+  p.vy = 0;
+  p.vz = 0;
+  p.onGround = true;
+  p.jumping = false;
+  p.inCombat = false;
+  p.combatTimer = 999;
+  const meta = required(sim.meta(pid), 'battleground player metadata');
+  meta.moveInput = emptyMoveInput();
   sim.ctx.rebucket(p);
   const resolved = resolvePosition(sim.cfg.seed, p.pos.x, p.pos.z, PLAYER_BODY_RADIUS);
   expect(Math.hypot(resolved.x - p.pos.x, resolved.z - p.pos.z)).toBe(0);
@@ -822,6 +912,88 @@ describe('unstuck while dead', () => {
 });
 
 describe('unstuck area identity', () => {
+  it('accepts a battleground inside-wall location through match-owned area identity', () => {
+    const { sim, match, pid } = activeBattleground();
+    const player = forceBattlegroundWallTrap(sim, match, pid);
+    const origin = battlegroundOrigin(match.slot);
+    const localX = player.pos.x - origin.x;
+    const localZ = player.pos.z - origin.z;
+
+    expect(Math.abs(localX)).toBeLessThan(BG_HALF_X);
+    expect(Math.abs(localZ)).toBeLessThan(BG_HALF_Z);
+    expect(unstuckLocationAt(sim.ctx, pid, player.pos)?.area).toMatchObject({
+      kind: 'battleground',
+      id: 'thornhollow_fields',
+      instanceId: String(match.id),
+      slot: match.slot,
+    });
+
+    expect(sim.unstuck(pid)).toBe(true);
+    const startEvents = eventsOf(sim.drainEvents());
+    expect(startEvents).toContainEqual({
+      type: 'unstuck',
+      phase: 'started',
+      seconds: UNSTUCK_COUNTDOWN_SECONDS,
+      pid,
+    });
+    expect(startEvents).not.toContainEqual(
+      expect.objectContaining({ phase: 'blocked', reason: 'invalid_area', pid }),
+    );
+
+    const completed = eventsOf(tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20)).find(
+      (event): event is Extract<Event, { phase: 'completed' }> => event.phase === 'completed',
+    );
+
+    expect(completed?.reason).toBe('moved_to_graveyard');
+    expect(completed?.area).toMatchObject({
+      kind: 'battleground',
+      id: 'thornhollow_fields',
+      instanceId: String(match.id),
+      slot: match.slot,
+    });
+    expect(sim.bgMatchFor(pid)).toBe(match);
+    expect(isBgPos(player.pos.x)).toBe(true);
+    const plot = BG_GRAVEYARDS[0];
+    expect(Math.abs(player.pos.x - (origin.x + plot.x))).toBeLessThanOrEqual(plot.hw);
+    expect(Math.abs(player.pos.z - (origin.z + plot.z))).toBeLessThanOrEqual(plot.hd);
+  });
+
+  it('keeps battleground identity when the team graveyard falls back to a clear spawn', () => {
+    const { sim, match, pid } = activeBattleground();
+    const player = forceBattlegroundWallTrap(sim, match, pid);
+    const origin = battlegroundOrigin(match.slot);
+    const originalPlot = { ...BG_GRAVEYARDS[0] };
+
+    Object.assign(BG_GRAVEYARDS[0], { x: 50, z: -140, hw: 0.25, hd: 0.25 });
+    try {
+      expect(sim.unstuck(pid)).toBe(true);
+      sim.drainEvents();
+      const completed = eventsOf(tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20)).find(
+        (event): event is Extract<Event, { phase: 'completed' }> => event.phase === 'completed',
+      );
+
+      expect(completed?.area).toMatchObject({
+        kind: 'battleground',
+        id: 'thornhollow_fields',
+        instanceId: String(match.id),
+        slot: match.slot,
+      });
+      expect(completed?.reason).toBe('moved_to_graveyard');
+      expect(sim.bgMatchFor(pid)).toBe(match);
+      expect(
+        BG_BASES[0].spawns.some(
+          (spawn) =>
+            Math.abs(player.pos.x - (origin.x + spawn.x)) < 1e-6 &&
+            Math.abs(player.pos.z - (origin.z + spawn.z)) < 1e-6,
+        ),
+      ).toBe(true);
+      expect(completed?.destination.localX).toBeCloseTo(player.pos.x - origin.x, 6);
+      expect(completed?.destination.localZ).toBeCloseTo(player.pos.z - origin.z, 6);
+    } finally {
+      Object.assign(BG_GRAVEYARDS[0], originalPlot);
+    }
+  });
+
   it('completes a battleground wall-trap attempt at a safe team graveyard location', () => {
     const { sim, match, pid } = activeBattleground();
     const player = forceBattlegroundWallTrap(sim, match, pid);
@@ -857,6 +1029,93 @@ describe('unstuck area identity', () => {
     const plot = BG_GRAVEYARDS[0];
     expect(Math.abs(player.pos.x - (origin.x + plot.x))).toBeLessThanOrEqual(plot.hw);
     expect(Math.abs(player.pos.z - (origin.z + plot.z))).toBeLessThanOrEqual(plot.hd);
+  });
+
+  it('accepts a battleground perimeter-wall trap beyond the playable footprint margin', () => {
+    const { sim, match, pid } = activeBattleground();
+    const player = required(sim.entities.get(pid), 'battleground player');
+    const origin = battlegroundOrigin(match.slot);
+    player.pos = sim.groundPos(origin.x + BG_HALF_X + PLAYER_BODY_RADIUS + 0.05, origin.z);
+    player.prevPos = { ...player.pos };
+    player.vx = 0;
+    player.vy = 0;
+    player.vz = 0;
+    player.onGround = true;
+    player.jumping = false;
+    player.inCombat = false;
+    player.combatTimer = 999;
+    sim.ctx.rebucket(player);
+
+    const resolved = resolvePosition(sim.cfg.seed, player.pos.x, player.pos.z, PLAYER_BODY_RADIUS);
+    expect(Math.hypot(resolved.x - player.pos.x, resolved.z - player.pos.z)).toBeGreaterThan(0.01);
+    expect(unstuckLocationAt(sim.ctx, pid, player.pos)?.area).toMatchObject({
+      kind: 'battleground',
+      id: 'thornhollow_fields',
+      instanceId: String(match.id),
+      slot: match.slot,
+    });
+
+    expect(sim.unstuck(pid)).toBe(true);
+    sim.drainEvents();
+    const events = tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20);
+    const completed = eventsOf(events).find((event) => event.phase === 'completed');
+
+    expect(completed?.area).toMatchObject({
+      kind: 'battleground',
+      id: 'thornhollow_fields',
+      instanceId: String(match.id),
+      slot: match.slot,
+    });
+    expect(sim.bgMatchFor(pid)).toBe(match);
+    expect(isBgPos(player.pos.x)).toBe(true);
+    const plot = BG_GRAVEYARDS[0];
+    expect(Math.abs(player.pos.x - (origin.x + plot.x))).toBeLessThanOrEqual(plot.hw);
+    expect(Math.abs(player.pos.z - (origin.z + plot.z))).toBeLessThanOrEqual(plot.hd);
+  });
+
+  it('accepts a battleground trap in generated outboard wall geometry', () => {
+    const { sim, match, pid } = activeBattleground();
+    const player = forceOutboardBattlegroundWallTrap(sim, match, pid);
+    const origin = battlegroundOrigin(match.slot);
+
+    expect(unstuckLocationAt(sim.ctx, pid, player.pos)?.area).toMatchObject({
+      kind: 'battleground',
+      id: 'thornhollow_fields',
+      instanceId: String(match.id),
+      slot: match.slot,
+    });
+
+    expect(sim.unstuck(pid)).toBe(true);
+    sim.drainEvents();
+    const events = tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20);
+    const completed = eventsOf(events).find((event) => event.phase === 'completed');
+
+    expect(completed?.area).toMatchObject({
+      kind: 'battleground',
+      id: 'thornhollow_fields',
+      instanceId: String(match.id),
+      slot: match.slot,
+    });
+    expect(sim.bgMatchFor(pid)).toBe(match);
+    const plot = BG_GRAVEYARDS[0];
+    expect(Math.abs(player.pos.x - (origin.x + plot.x))).toBeLessThanOrEqual(plot.hw);
+    expect(Math.abs(player.pos.z - (origin.z + plot.z))).toBeLessThanOrEqual(plot.hd);
+  });
+
+  it('rejects exact battleground wall contact without wall pressure as a shortcut', () => {
+    const { sim, match, pid } = activeBattleground();
+    forceExactBattlegroundWallContact(sim, match, pid);
+
+    expect(sim.unstuck(pid)).toBe(false);
+    expect(eventsOf(sim.drainEvents())).toContainEqual(
+      expect.objectContaining({
+        type: 'unstuck',
+        phase: 'blocked',
+        reason: 'competitive',
+        pid,
+      }),
+    );
+    expect(required(sim.meta(pid), 'battleground player metadata').pendingUnstuck).toBeNull();
   });
 
   it('completes a battleground wall-press ESC attempt while movement input is still held', () => {
@@ -927,6 +1186,102 @@ describe('unstuck area identity', () => {
       ),
     ).toBeLessThanOrEqual(Math.hypot(BG_GRAVEYARDS[0].hw, BG_GRAVEYARDS[0].hd));
     expect(meta.moveInput.forward).toBe(false);
+  });
+
+  it('completes a battleground ESC attempt when menu neutral input leaves residual wall velocity', () => {
+    const { sim, match, pid } = activeBattleground();
+    const player = forceBattlegroundWallContact(sim, match, pid);
+    const meta = required(sim.meta(pid), 'battleground player metadata');
+    const origin = battlegroundOrigin(match.slot);
+    const wallX = Math.sin(player.facing);
+    const wallZ = Math.cos(player.facing);
+
+    meta.moveInput.forward = false;
+    player.vx = wallX * 0.2;
+    player.vz = wallZ * 0.2;
+    sim.drainEvents();
+
+    expect(sim.unstuck(pid)).toBe(true);
+    sim.drainEvents();
+    const events = tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20);
+    const completed = eventsOf(events).find((event) => event.phase === 'completed');
+
+    expect(completed?.area).toMatchObject({
+      kind: 'battleground',
+      id: 'thornhollow_fields',
+      instanceId: String(match.id),
+      slot: match.slot,
+    });
+    expect(completed?.destination.localX).toBeCloseTo(player.pos.x - origin.x, 6);
+    expect(completed?.destination.localZ).toBeCloseTo(player.pos.z - origin.z, 6);
+    expect(sim.bgMatchFor(pid)).toBe(match);
+    expect(isBgPos(player.pos.x)).toBe(true);
+    expect(
+      Math.hypot(
+        player.pos.x - (origin.x + BG_GRAVEYARDS[0].x),
+        player.pos.z - (origin.z + BG_GRAVEYARDS[0].z),
+      ),
+    ).toBeLessThanOrEqual(Math.hypot(BG_GRAVEYARDS[0].hw, BG_GRAVEYARDS[0].hd));
+    expect(meta.moveInput.forward).toBe(false);
+  });
+
+  it('cancels a residual-velocity battleground ESC attempt after fresh clear movement input', () => {
+    const { sim, match, pid } = activeBattleground();
+    const player = forceBattlegroundWallContact(sim, match, pid);
+    const meta = required(sim.meta(pid), 'battleground player metadata');
+    const wallX = Math.sin(player.facing);
+    const wallZ = Math.cos(player.facing);
+
+    meta.moveInput.forward = false;
+    player.vx = wallX * 0.2;
+    player.vz = wallZ * 0.2;
+    sim.drainEvents();
+
+    expect(sim.unstuck(pid)).toBe(true);
+    sim.drainEvents();
+
+    player.facing += Math.PI / 2;
+    player.prevFacing = player.facing;
+    meta.moveInput.forward = true;
+    expect(eventsOf(sim.tick())).toContainEqual(
+      expect.objectContaining({
+        type: 'unstuck',
+        phase: 'cancelled',
+        reason: 'moved',
+        pid,
+      }),
+    );
+    expect(meta.pendingUnstuck).toBeNull();
+    expect(sim.bgMatchFor(pid)).toBe(match);
+  });
+
+  it('cancels a battleground wall-press ESC attempt that reaches clear footing', () => {
+    const { sim, match, pid } = activeBattleground();
+    const player = forceBattlegroundWallContact(sim, match, pid);
+    const meta = required(sim.meta(pid), 'battleground player metadata');
+    const origin = battlegroundOrigin(match.slot);
+    const spawn = BG_BASES[0].spawns[0];
+
+    expect(sim.unstuck(pid)).toBe(true);
+    sim.drainEvents();
+    meta.moveInput.forward = false;
+    placeOnGround(sim, pid, origin.x + spawn.x, origin.z + spawn.z);
+
+    const resolved = resolvePosition(sim.cfg.seed, player.pos.x, player.pos.z, PLAYER_BODY_RADIUS);
+    expect(Math.hypot(resolved.x - player.pos.x, resolved.z - player.pos.z)).toBeLessThanOrEqual(
+      1e-6,
+    );
+    expect(eventsOf(sim.tick())).toContainEqual(
+      expect.objectContaining({
+        type: 'unstuck',
+        phase: 'cancelled',
+        reason: 'moved',
+        pid,
+      }),
+    );
+    expect(meta.pendingUnstuck).toBeNull();
+    expect(sim.bgMatchFor(pid)).toBe(match);
+    expect(isBgPos(player.pos.x)).toBe(true);
   });
 
   it('expires the battleground wall-press ESC grace instead of creating a delayed shortcut', () => {

@@ -5,12 +5,16 @@
 // and the localized countdown formatter) arrive through ErrorTextLockoutDeps.
 // Falls through to the shared localizeServerText / localizeSimText matchers, and
 // finally returns the input unchanged when nothing recognizes it.
-// The two display-name resolvers the instances-busy arm reads came across with
-// the body and stay exported: hud.ts's own remaining call sites import them back
-// rather than keeping a second copy of the same one-line delegation.
+// The two display-name resolvers the instances-busy arm reads live in
+// ./entity_display_core, the display-name family's one home, and are RE-EXPORTED
+// here for this module's own consumers. Both branches of the 2026-08-24 release
+// sync had extracted the same two one-line delegations independently (this
+// module and entity_display_core), so the merge kept ONE authority rather than
+// two identical bodies that can drift apart.
 
 import { DELVES, DUNGEON_LIST } from '../sim/data';
-import { dungeonDisplayName, tEntity } from './entity_i18n';
+import { delveDisplayName, dungeonDisplayNameFromSource } from './entity_display_core';
+import { dungeonDisplayName } from './entity_i18n';
 import { formatDuration, formatNumber, type TranslationKey, t } from './i18n';
 import type { RaidLockout } from './raid_lockout';
 import { localizeServerText } from './server_i18n';
@@ -88,6 +92,7 @@ export function localizeErrorText(text: string, deps: ErrorTextLockoutDeps): str
     // translation ask for no player-visible gain.
     "Can't move!": 'hud.combat.cannotMove',
     'You are busy.': 'hud.errors.busy',
+    "You can't cast while moving.": 'hud.errors.cannotCastWhileMoving',
     'That ability is not ready yet.': 'hud.errors.abilityNotReady',
     'Not enough rage!': 'hud.errors.notEnoughRage',
     'Not enough energy!': 'hud.errors.notEnoughEnergy',
@@ -168,6 +173,9 @@ export function localizeErrorText(text: string, deps: ErrorTextLockoutDeps): str
     'You cannot afford that.': 'itemUi.errors.cannotAfford',
     'That is not your listing.': 'itemUi.errors.notYourListing',
     'You have nothing to collect.': 'itemUi.errors.nothingToCollect',
+    'No listings of that item are available to sweep.': 'itemUi.errors.sweepNoListings',
+    'Prices changed before your sweep landed. Check the quote and try again.':
+      'itemUi.errors.sweepPriceChanged',
     "You can't assist yourself.": 'hud.errors.assistSelf',
     'Assist whom? Target a player or use /assist <name>.': 'hud.errors.assistWhom',
     'Invite whom? Usage: /invite <name>.': 'hudChrome.party.inviteUsage',
@@ -175,12 +183,12 @@ export function localizeErrorText(text: string, deps: ErrorTextLockoutDeps): str
   const key = exact[text];
   if (key) return t(key);
 
-  let match = /^You must be in (Bruin|Wolf) Form\.$/.exec(text);
+  let match = /^You must be in (Bruin|Cat) Form\.$/.exec(text);
   if (match)
     return t('hud.errors.requiresForm', {
       form: t(match[1] === 'Bruin' ? 'hud.errors.bear' : 'hud.errors.cat'),
     });
-  match = /^You can't do that in (Bruin|Wolf|Fleet) Form\.$/.exec(text);
+  match = /^You can't do that in (Bruin|Cat|Fleet) Form\.$/.exec(text);
   if (match)
     return t('hud.errors.cantInForm', {
       form: t(
@@ -251,11 +259,4 @@ export function localizeErrorText(text: string, deps: ErrorTextLockoutDeps): str
   return text;
 }
 
-export function delveDisplayName(delveId: string): string {
-  return tEntity({ kind: 'delve', id: delveId, field: 'name' });
-}
-
-export function dungeonDisplayNameFromSource(name: string): string {
-  const dungeon = DUNGEON_LIST.find((candidate) => candidate.name === name);
-  return dungeon ? dungeonDisplayName(dungeon.id) : name;
-}
+export { delveDisplayName, dungeonDisplayNameFromSource };

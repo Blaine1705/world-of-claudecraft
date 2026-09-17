@@ -16,6 +16,10 @@ export interface InteriorEncounterPrewarmSpec {
   soulRendLivePlayerVisuals: boolean;
   varkhulVisuals?: boolean;
   ignivarVisuals?: boolean;
+  /** Nythraxis's Grave Eruption, Grave Flame, Gravefire, and Binding Sigil
+   *  floor materials: crypt-only actionable telegraphs warm here, never in
+   *  the boot manifest. */
+  nythraxisGraveVisuals?: boolean;
 }
 
 export const INTERIOR_ENCOUNTER_PREWARM: Record<string, InteriorEncounterPrewarmSpec> = {
@@ -23,12 +27,24 @@ export const INTERIOR_ENCOUNTER_PREWARM: Record<string, InteriorEncounterPrewarm
     soulRendPlayerClasses: true,
     soulRendVfxWeaponSkins: true,
     soulRendLivePlayerVisuals: true,
+    nythraxisGraveVisuals: true,
   },
   ignivar_depths: {
     soulRendPlayerClasses: false,
     soulRendVfxWeaponSkins: false,
     soulRendLivePlayerVisuals: false,
     varkhulVisuals: true,
+    ignivarVisuals: true,
+  },
+  // The Crucible arena where Ignivar itself is fought (interior 'ignivar'):
+  // the same fire beams, rotating rays and Judgment as the depths, without
+  // Varkhul. Without this row the arena had no spec at all, so every mechanic
+  // linked its programs at first onset (2026-09-12 hunt: fire beams, rotating
+  // rays and the water cleanse runes, 15 live programs in one pull).
+  ignivar: {
+    soulRendPlayerClasses: false,
+    soulRendVfxWeaponSkins: false,
+    soulRendLivePlayerVisuals: false,
     ignivarVisuals: true,
   },
 };

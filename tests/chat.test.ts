@@ -499,7 +499,7 @@ describe('chat channels', () => {
     let delivered = 0;
     let throttled = false;
     for (let i = 0; i < 40; i++) {
-      sim.chat('/g spam ' + i, a);
+      sim.chat(`/g spam ${i}`, a);
       const events = sim.tick(); // ~0.05s of refill per tick
       if (events.some((e) => e.type === 'chat')) delivered++;
       if (events.some((e) => e.type === 'error' && /too quickly/i.test(e.text))) throttled = true;
@@ -1235,13 +1235,13 @@ describe('chat module (direct, no Sim)', () => {
     // the only level that still matters in the mount flow (mounts themselves have
     // no per-mount level gate).
     expect(sim.entities.get(pid)?.level).toBe(20);
-    // 12 since the Chimeglass Tortoise and the Bonebound Rickshaw joined the
+    // 15 since both release-line and candidate mount reins joined the
     // catalog. Spelled as a literal on
     // purpose rather than derived from MOUNT_KEYS.length: the row above already
     // proves ownership against the catalog, so deriving this one too would let a
     // catalog that silently lost a mount pass both.
     expect(
-      events.some((e: any) => e.type === 'log' && /^\[dev\] Granted 13 mount reins/.test(e.text)),
+      events.some((e: any) => e.type === 'log' && /^\[dev\] Granted 10 mount reins/.test(e.text)),
     ).toBe(true);
     // A second run is idempotent: everything already owned, nothing granted twice.
     sim.chat('/dev mounts', pid);
@@ -1514,5 +1514,102 @@ describe('chat speaker titles (Book of Deeds)', () => {
     const toTarget = msgs.find((m) => m.pid === b)!;
     expect(toTarget.fromTitle).toBe('prog_veteran');
     expect(toTarget.classId).toBe('warrior');
+  });
+});
+
+describe('raid warning (/rw, /ab, /raidwarning)', () => {
+  it('party leader broadcasts raid warning to all party members', () => {
+    const sim = makeWorld();
+    const leader = sim.addPlayer('warrior', 'Leader');
+    const member1 = sim.addPlayer('priest', 'Healer');
+    const member2 = sim.addPlayer('mage', 'Caster');
+    const outsider = sim.addPlayer('rogue', 'Outsider');
+    teleport(sim, leader, 0, -40);
+    teleport(sim, member1, 10, -40);
+    teleport(sim, member2, 500, 500); // far away
+    teleport(sim, outsider, 2, -40);
+
+    sim.partyInvite(member1, leader);
+    sim.partyAccept(member1);
+    sim.partyInvite(member2, leader);
+    sim.partyAccept(member2);
+    sim.tick();
+
+    // /rw
+    sim.chat('/rw Stack on boss now!', leader);
+    const msgsRw = chatEvents(sim.tick());
+    expect(msgsRw).toHaveLength(3);
+    expect(
+      msgsRw.every((m) => m.channel === 'raidWarning' && m.text === 'Stack on boss now!'),
+    ).toBe(true);
+    const pidsRw = msgsRw.map((m) => m.pid).sort();
+    expect(pidsRw).toEqual([leader, member1, member2].sort());
+
+    // /ab (Spanish client alias: alerta de banda)
+    sim.chat('/ab Cuidado con el fuego!', leader);
+    const msgsAb = chatEvents(sim.tick());
+    expect(msgsAb).toHaveLength(3);
+    expect(
+      msgsAb.every((m) => m.channel === 'raidWarning' && m.text === 'Cuidado con el fuego!'),
+    ).toBe(true);
+
+    // /raidwarning (full command name)
+    sim.chat('/raidwarning Phase two incoming!', leader);
+    const msgsFull = chatEvents(sim.tick());
+    expect(msgsFull).toHaveLength(3);
+    expect(
+      msgsFull.every((m) => m.channel === 'raidWarning' && m.text === 'Phase two incoming!'),
+    ).toBe(true);
+  });
+
+  it('rejects raid warning from a non-leader party member', () => {
+    const sim = makeWorld();
+    const leader = sim.addPlayer('warrior', 'Leader');
+    const member = sim.addPlayer('priest', 'Healer');
+
+    sim.partyInvite(member, leader);
+    sim.partyAccept(member);
+    sim.tick();
+
+    sim.chat('/rw I want to be heard', member);
+    const events = sim.tick();
+    const chatMsgs = chatEvents(events);
+    expect(chatMsgs).toHaveLength(0);
+
+    const err = events.find((e): e is Extract<SimEvent, { type: 'error' }> => e.type === 'error');
+    expect(err).toBeDefined();
+    expect(err?.pid).toBe(member);
+    expect(err?.text).toBe('You are not the party leader.');
+  });
+
+  it('rejects raid warning when not in a party', () => {
+    const sim = makeWorld();
+    const solo = sim.addPlayer('warrior', 'Solo');
+    sim.tick();
+
+    sim.chat('/rw Nobody will hear this', solo);
+    const events = sim.tick();
+    const chatMsgs = chatEvents(events);
+    expect(chatMsgs).toHaveLength(0);
+
+    const err = events.find((e): e is Extract<SimEvent, { type: 'error' }> => e.type === 'error');
+    expect(err).toBeDefined();
+    expect(err?.pid).toBe(solo);
+    expect(err?.text).toBe('You are not in a party.');
+  });
+
+  it('drops empty raid warning messages without error', () => {
+    const sim = makeWorld();
+    const leader = sim.addPlayer('warrior', 'Leader');
+    const member = sim.addPlayer('priest', 'Healer');
+
+    sim.partyInvite(member, leader);
+    sim.partyAccept(member);
+    sim.tick();
+
+    sim.chat('/rw     ', leader);
+    const events = sim.tick();
+    expect(chatEvents(events)).toHaveLength(0);
+    expect(events.filter((e) => e.type === 'error')).toHaveLength(0);
   });
 });

@@ -29,19 +29,19 @@ import {
 // surface, where its callers and tests have always read it.
 export { NAMEPLATE_IMAGE_CACHE_LIMIT, NAMEPLATE_IMAGE_RETRY_BASE_FRAMES };
 
-import { drawNameplateLootIcon } from './nameplate_loot_icon';
+import { drawNameplateCorpseIcon, type NameplateMarkerTone } from './nameplate_markers';
+import {
+  drawNameplateBadge,
+  drawNameplateComboPips,
+  drawNameplateImage,
+  type NameplateBadge,
+  roundedRect,
+} from './nameplate_paint_primitives';
 import { NAMEPLATE_BASE_WIDTH, nameplateHealthBarWidth } from './nameplate_pick_core';
 
 export type NameplateFrame = '' | 'elite' | 'boss';
-export type NameplateMarkerTone = 'none' | 'quest' | 'active' | 'loot' | 'repeat' | 'cooldown';
-
-export interface NameplateBadge {
-  url: string;
-  size: number;
-  circular?: boolean;
-  border?: string;
-  glow?: string;
-}
+export type { NameplateMarkerTone } from './nameplate_markers';
+export type { NameplateBadge } from './nameplate_paint_primitives';
 
 export interface NameplateCanvasState {
   initialized: boolean;
@@ -144,7 +144,16 @@ export function createNameplateCanvasState(): NameplateCanvasState {
 }
 
 export const NAMEPLATE_MARKER_ROW_HEIGHT = 26;
+// The surface's own defensive clamp on the backing-store ratio it is handed.
+// The POLICY that picks that ratio lives in the pure knob module under
+// src/game (nameplatePixelRatio, bounded by the renderer's effective ratio) and
+// is applied by nameplate_painter.ts; this file deliberately imports nothing
+// from there, because the deed-accent fairness guard
+// (tests/deed_border_accent.test.ts) requires every module on the plate-drawing
+// path to be free of quality-knob and governor reads. The two bounds are pinned
+// equal in tests/nameplate_paint_gate.test.ts.
 export const NAMEPLATE_MAX_PIXEL_RATIO = 2;
+export const NAMEPLATE_MIN_PIXEL_RATIO = 1;
 // Nameplate labels scale their backing stores with DPR. The count remains a
 // secondary guard, while the 16 MiB RGBA budget is the hard memory ceiling.
 // At DPR 2 a representative 126x43 logical label retains about 85 KiB, so the
@@ -242,28 +251,6 @@ const HERALDRY_FRAME_WIDTH = 1;
 const HERALDRY_MOTIF_WIDTH = 1.25;
 const HERALDRY_RIVET_RADIUS = 1;
 
-function roundedRect(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  radius: number,
-): void {
-  const r = Math.min(radius, width / 2, height / 2);
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.lineTo(x + width - r, y);
-  ctx.quadraticCurveTo(x + width, y, x + width, y + r);
-  ctx.lineTo(x + width, y + height - r);
-  ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
-  ctx.lineTo(x + r, y + height);
-  ctx.quadraticCurveTo(x, y + height, x, y + height - r);
-  ctx.lineTo(x, y + r);
-  ctx.quadraticCurveTo(x, y, x + r, y);
-  ctx.closePath();
-}
-
 export class NameplateCanvasSurface {
   readonly canvas: HTMLCanvasElement;
   private readonly ctx: CanvasRenderingContext2D;
@@ -300,6 +287,12 @@ export class NameplateCanvasSurface {
   private readonly emoteStyle: TextSpriteStyle = { ...EMOTE_STYLE };
   private width = 0;
   private height = 0;
+  private layerHidden = false;
+  // Bumped by anything that changes how an UNCHANGED plate would be drawn: a
+  // late web-font load (which clears the sprite cache) and a forced-colors flip
+  // (which repaints every fill and stroke through the system palette). The
+  // repaint gate folds it in, so those two never leave a stale surface up.
+  private styleRev = 0;
   private readonly heraldry = createNameplateHeraldry();
   private readonly heraldryInput: NameplateHeraldryInput = {
     screenX: 0,
@@ -325,15 +318,47 @@ export class NameplateCanvasSurface {
       typeof window !== 'undefined' && typeof window.matchMedia === 'function'
         ? window.matchMedia('(forced-colors: active)')
         : null;
+    // Feature-detected: older WebKit MediaQueryList has only addListener, and a
+    // stub host may have neither. A missing listener costs a repaint on a
+    // forced-colors flip, never correctness on any frame that draws.
+    if (typeof this.forcedColorsMql?.addEventListener === 'function') {
+      this.forcedColorsMql.addEventListener('change', this.handleStyleChange);
+    }
     parent.appendChild(canvas);
     if (document.fonts) {
-      void document.fonts.ready.then(() => this.text.clear());
-      document.fonts.addEventListener('loadingdone', this.handleFontsLoaded);
+      void document.fonts.ready.then(this.handleStyleChange);
+      document.fonts.addEventListener('loadingdone', this.handleStyleChange);
     }
   }
 
-  beginFrame(width: number, height: number, devicePixelRatio: number): void {
-    const pixelRatio = Math.max(1, Math.min(NAMEPLATE_MAX_PIXEL_RATIO, devicePixelRatio || 1));
+  /** Monotonic stamp of everything that changes an unchanged plate's pixels:
+   *  the style changes above PLUS every image decode outcome, because a badge
+   *  or emote icon arrives asynchronously long after the state naming its url
+   *  stopped changing. Both counters only ever increase, so the sum does too. */
+  styleRevision(): number {
+    return this.styleRev + this.images.revision();
+  }
+
+  /** Drop the layer out of the compositor while nothing is drawn on it, and put
+   *  it back the moment a plate returns. An always-present full-viewport canvas
+   *  is a second full-screen surface Chrome keeps composited even when every one
+   *  of its pixels is transparent; `hidden` removes it from the tree's boxes
+   *  entirely. The backing store is cleared on the way out, so an unhide can
+   *  never flash the plates of a previous frame. */
+  setLayerHidden(hidden: boolean): void {
+    if (hidden === this.layerHidden) return;
+    this.layerHidden = hidden;
+    this.canvas.hidden = hidden;
+    if (!hidden) return;
+    this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  }
+
+  beginFrame(width: number, height: number, surfacePixelRatio: number): void {
+    const pixelRatio = Math.max(
+      NAMEPLATE_MIN_PIXEL_RATIO,
+      Math.min(NAMEPLATE_MAX_PIXEL_RATIO, surfacePixelRatio || 1),
+    );
     const backingWidth = Math.max(1, Math.ceil(width * pixelRatio));
     const backingHeight = Math.max(1, Math.ceil(height * pixelRatio));
     if (
@@ -357,8 +382,10 @@ export class NameplateCanvasSurface {
     this.images.beginFrame();
   }
 
+  /** Drop every baked label sprite (a language switch). Bumps the style
+   *  revision too: the same plate must be repainted in the new language. */
   clearTextCache(): void {
-    this.text.clear();
+    this.handleStyleChange();
   }
 
   drawBase(state: NameplateCanvasState, screenX: number, screenY: number): void {
@@ -405,15 +432,8 @@ export class NameplateCanvasSurface {
     y -= rowHeight;
     y -= NAMEPLATE_MARKER_ROW_HEIGHT;
     if (state.marker) {
-      if (state.markerTone === 'loot') {
-        const forced = this.forcedColorsActive();
-        drawNameplateLootIcon(
-          ctx,
-          screenX,
-          y + 14,
-          forced ? 'CanvasText' : '#f2c84b',
-          forced ? 'Canvas' : '#1b1205',
-        );
+      if (state.markerTone === 'loot' || state.markerTone === 'harvest') {
+        drawNameplateCorpseIcon(ctx, screenX, y + 14, state.markerTone, this.forcedColorsActive());
       } else {
         const style = this.markerStyle;
         // The glyph channel's cross-surface color contract (pinned by
@@ -507,12 +527,16 @@ export class NameplateCanvasSurface {
   }
 
   dispose(): void {
-    document.fonts?.removeEventListener('loadingdone', this.handleFontsLoaded);
+    document.fonts?.removeEventListener('loadingdone', this.handleStyleChange);
+    if (typeof this.forcedColorsMql?.removeEventListener === 'function') {
+      this.forcedColorsMql.removeEventListener('change', this.handleStyleChange);
+    }
     this.canvas.remove();
   }
 
-  private readonly handleFontsLoaded = (): void => {
+  private readonly handleStyleChange = (): void => {
     this.text.clear();
+    this.styleRev++;
   };
 
   private heraldryLift(state: NameplateCanvasState): number {
@@ -777,63 +801,18 @@ export class NameplateCanvasSurface {
   }
 
   private drawCombo(count: number, centerX: number, y: number): void {
-    const forcedColors = this.forcedColorsActive();
-    const total = 5 * 7 + 4 * 3;
-    let x = centerX - total / 2;
-    for (let i = 0; i < 5; i++) {
-      this.ctx.beginPath();
-      this.ctx.arc(x + 3.5, y + 3.5, 3.5, 0, Math.PI * 2);
-      this.ctx.fillStyle = forcedColors
-        ? i < count
-          ? 'Highlight'
-          : 'Canvas'
-        : i < count
-          ? '#e8453a'
-          : '#3a1010';
-      this.ctx.fill();
-      this.ctx.lineWidth = 1;
-      this.ctx.strokeStyle = forcedColors ? 'CanvasText' : i < count ? '#5a0c08' : '#000';
-      this.ctx.stroke();
-      x += 10;
-    }
+    drawNameplateComboPips(this.ctx, count, centerX, y, this.forcedColorsActive());
   }
 
   private drawBadge(badge: NameplateBadge, x: number, y: number): void {
-    const ctx = this.ctx;
-    ctx.save();
-    if (badge.glow) {
-      ctx.shadowColor = badge.glow;
-      ctx.shadowBlur = 5;
-    }
-    if (badge.circular) {
-      ctx.beginPath();
-      ctx.arc(x + badge.size / 2, y + badge.size / 2, badge.size / 2, 0, Math.PI * 2);
-      ctx.clip();
-    }
-    this.drawImage(badge.url, x, y, badge.size, false);
-    ctx.restore();
-    if (badge.circular && badge.border) {
-      ctx.beginPath();
-      ctx.arc(x + badge.size / 2, y + badge.size / 2, badge.size / 2 - 0.75, 0, Math.PI * 2);
-      ctx.lineWidth = 1.5;
-      ctx.strokeStyle = this.forcedColorsActive() ? 'CanvasText' : badge.border;
-      ctx.stroke();
-    }
+    const blit = (url: string, bx: number, by: number, size: number): void =>
+      this.drawImage(url, bx, by, size, false);
+    drawNameplateBadge(this.ctx, badge, x, y, blit, this.forcedColorsActive());
   }
 
   private drawImage(url: string, x: number, y: number, size: number, circular: boolean): void {
     const image = this.images.get(url);
-    if (!image) return;
-    if (!circular) {
-      this.ctx.drawImage(image, x, y, size, size);
-      return;
-    }
-    this.ctx.save();
-    this.ctx.beginPath();
-    this.ctx.arc(x + size / 2, y + size / 2, size / 2, 0, Math.PI * 2);
-    this.ctx.clip();
-    this.ctx.drawImage(image, x, y, size, size);
-    this.ctx.restore();
+    if (image) drawNameplateImage(this.ctx, image, x, y, size, circular);
   }
 
   private configureTextStyle(style: TextSpriteStyle, fill: string): TextSpriteStyle {

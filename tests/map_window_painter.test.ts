@@ -15,12 +15,14 @@ import {
   BUILTIN_WORLD,
   CAMPS,
   DUNGEON_LIST,
+  NPCS,
   QUESTS,
   STRIP_MAX_X,
   STRIP_MIN_X,
   setActiveWorldContent,
   ZONES,
 } from '../src/sim/data';
+import { isProfessionQuest } from '../src/sim/quests/ambient_quest_marker';
 import { emptyZoneProps, isQuestTurnInNpc, type QuestProgress } from '../src/sim/types';
 import { overworldDungeonPortals } from '../src/ui/map_dungeon_portals';
 import {
@@ -440,12 +442,17 @@ function mapWorld(): IWorld {
     inventory: [],
     gatheringProficiency: {},
     stationPlacements: [],
+    farmPatches: [],
     civicServicePlacements: [],
     nodeHarvestableByMe: () => true,
   } as unknown as IWorld;
 }
 
+let restoreRepeatGiver: (() => void) | undefined;
 afterEach(() => {
+  restoreRepeatGiver?.();
+  restoreRepeatGiver = undefined;
+  delete QUESTS.q_test_map_painter_repeat;
   setActiveWorldContent(null);
   vi.unstubAllGlobals();
 });
@@ -583,7 +590,7 @@ describe('map_window_painter: cadence + cached background preserved', () => {
     expect(markerInteraction).toContain('this.stations = EMPTY_MARKERS;');
     expect(markerInteraction).toContain('this.services = EMPTY_MARKERS;');
     expect(markerInteraction).toContain('this.navigation = EMPTY_MARKERS;');
-    expect(hud.match(/this\.clearMapHitState\(canvas\);/g)).toHaveLength(6);
+    expect(hud.match(/this\.clearMapHitState\(canvas\);/g)).toHaveLength(5);
     // The gather-tip resolve memo resets inside the shared clear and beside the
     // overworld store, bounding its staleness at the same
     // mediumHud repaint that refreshes the painted icon.
@@ -677,10 +684,9 @@ describe('map_window_painter: cadence + cached background preserved', () => {
 const LABEL_ZONE = ZONES[0];
 const LABEL_ZONE_CZ = (LABEL_ZONE.zMin + LABEL_ZONE.zMax) / 2;
 
-// Real content rather than a synthetic fixture, so a rename in the quest tables
-// cannot leave this passing against a stale expectation.
+// A real combat offer: ambient profession offers are intentionally hidden.
 function questWithGiver() {
-  const quest = Object.values(QUESTS).find((q) => q.giverNpcId);
+  const quest = QUESTS.q_boars;
   if (!quest) throw new Error('expected a quest with a giverNpcId');
   return quest;
 }
@@ -746,6 +752,7 @@ function labelWorld(): IWorld {
     inventory: [],
     gatheringProficiency: {},
     stationPlacements: [],
+    farmPatches: [],
     civicServicePlacements: [],
     nodeHarvestableByMe: () => true,
   } as unknown as IWorld;
@@ -755,7 +762,7 @@ function labelWorld(): IWorld {
  *  (ready) glyph rather than the '!' (available) one. */
 function turnInQuestWithGiver() {
   const quest = Object.values(QUESTS).find(
-    (q) => q.giverNpcId && isQuestTurnInNpc(q, q.giverNpcId),
+    (q) => !isProfessionQuest(q) && q.giverNpcId && isQuestTurnInNpc(q, q.giverNpcId),
   );
   if (!quest) throw new Error('expected a quest whose giver is also a turn-in npc');
   return quest;
@@ -780,8 +787,21 @@ function readyGlyphWorld(): IWorld {
 function questVariantWorld(state: 'available' | 'ready' | 'repeat' | 'cooldown'): IWorld {
   if (state === 'ready') return readyGlyphWorld();
   if (state === 'available') return labelWorld();
-  const workOrder = Object.values(QUESTS).find((q) => q.repeatable && q.repeatCadenceTicks);
-  if (!workOrder) throw new Error('expected a cadenced work order');
+  // Current repeatables are profession offers and do not produce ambient
+  // markers. A synthetic combat repeatable preserves the painter's generic
+  // repeat/cooldown art, geometry, and alpha contract without changing that policy.
+  const workOrder = {
+    ...questWithGiver(),
+    id: 'q_test_map_painter_repeat',
+    repeatable: true,
+    repeatCadenceTicks: 100,
+  };
+  QUESTS[workOrder.id] = workOrder;
+  const giver = NPCS[workOrder.giverNpcId];
+  restoreRepeatGiver = () => {
+    NPCS[giver.id] = giver;
+  };
+  NPCS[giver.id] = { ...giver, questIds: [...giver.questIds, workOrder.id] };
   const world = labelWorld() as unknown as {
     entities: Map<number, { templateId: string; questIds: string[] }>;
     questState: (q: string) => string;
@@ -963,6 +983,21 @@ function stationTypesLabelWorld(types: readonly (typeof TEST_STATION_TYPES)[numb
 
 function stationLabelWorld(): IWorld {
   return stationTypesLabelWorld(['forge']);
+}
+
+function farmPatchLabelWorld(): IWorld {
+  const world = labelWorld() as unknown as { farmPatches: unknown[] };
+  world.farmPatches = [
+    {
+      id: 'patch_painter',
+      zoneId: LABEL_ZONE.id,
+      tier: 1,
+      x: 18,
+      z: LABEL_ZONE_CZ + 22,
+      beds: [],
+    },
+  ];
+  return world as unknown as IWorld;
 }
 
 function serviceWorldContent() {
@@ -1468,6 +1503,153 @@ describe('map_window_painter: painted stable marker sprites', () => {
       style: 'paint:--color-map-outline',
       lineWidth: 1.5,
       commands: ['moveTo', 'lineTo', 'lineTo', 'lineTo', 'closePath'],
+    });
+  });
+
+  it('centers farm-patch art at the station landmark size', () => {
+    const markerArt = fakeMarkerArt(['farm-patch']);
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+
+    const result = new MapWindowPainter(classColor, markerArt.art).paintOverworld(
+      fakeMapContext(trace),
+      farmPatchLabelWorld(),
+      labelPaintOptions(),
+    );
+
+    expect(result.farmPatches).toHaveLength(1);
+    const patch = result.farmPatches[0];
+    expect(markerArt.calls.filter((call) => call.id === 'farm-patch')).toEqual([
+      { id: 'farm-patch', size: 'mapStation' },
+    ]);
+    expect(trace.markerBlits.find((blit) => blit.sprite.markerId === 'farm-patch')).toMatchObject({
+      sprite: { markerId: 'farm-patch', sizeId: 'mapStation' },
+      dx: Math.round(patch.mx - MAP_MARKER_SIZES.mapStation / 2),
+      dy: Math.round(patch.my - MAP_MARKER_SIZES.mapStation / 2),
+      alpha: 1,
+    });
+  });
+
+  it('centers farm-patch art at the compact station landmark size', () => {
+    const markerArt = fakeMarkerArt(['farm-patch']);
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+
+    const result = new MapWindowPainter(classColor, markerArt.art, () => 'compact').paintOverworld(
+      fakeMapContext(trace),
+      farmPatchLabelWorld(),
+      labelPaintOptions(),
+    );
+
+    const patch = result.farmPatches[0];
+    expect(patch).toBeDefined();
+    expect(markerArt.calls.filter((call) => call.id === 'farm-patch')).toEqual([
+      { id: 'farm-patch', size: 'mapStationCompact' },
+    ]);
+    expect(trace.markerBlits.find((blit) => blit.sprite.markerId === 'farm-patch')).toMatchObject({
+      sprite: { markerId: 'farm-patch', sizeId: 'mapStationCompact' },
+      dx: Math.round((patch?.mx ?? 0) - MAP_MARKER_SIZES.mapStationCompact / 2),
+      dy: Math.round((patch?.my ?? 0) - MAP_MARKER_SIZES.mapStationCompact / 2),
+      alpha: 1,
+    });
+  });
+
+  it('falls back to the procedural farm-patch sprout when its art is unavailable', () => {
+    const markerArt = fakeMarkerArt([]);
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+
+    const result = new MapWindowPainter(classColor, markerArt.art).paintOverworld(
+      fakeMapContext(trace),
+      farmPatchLabelWorld(),
+      labelPaintOptions(),
+    );
+
+    expect(result.farmPatches).toHaveLength(1);
+    const patch = result.farmPatches[0];
+    expect(patch.patchId).toBe('patch_painter');
+    expect(markerArt.calls.filter((call) => call.id === 'farm-patch')).toEqual([
+      { id: 'farm-patch', size: 'mapStation' },
+    ]);
+    expect(trace.markerBlits.some((blit) => blit.sprite.markerId === 'farm-patch')).toBe(false);
+    // Two leaves in ONE filled path (two closed triangles), in the STATION
+    // family's token on this surface (the stall fill the station diamond takes
+    // with no sprite; the minimap paints the same pin in its own station
+    // token), never the oak green it once borrowed and never any gather-node
+    // readiness color.
+    const leaves = trace.fills.find(
+      (fill) =>
+        fill.style === 'paint:--color-map-stall' &&
+        fill.commands.join() === 'moveTo,lineTo,lineTo,closePath,moveTo,lineTo,lineTo,closePath',
+    );
+    expect(leaves, 'the farm pin must paint its two-leaf sprout').toBeDefined();
+    // The leaves are keyed off the badge position and the standard radius, and
+    // fan symmetrically to either side of the stem.
+    const radius = 6.5;
+    expect(leaves?.args.slice(0, 6)).toEqual([
+      patch.mx,
+      patch.my - radius * 0.2,
+      patch.mx - radius,
+      patch.my - radius,
+      patch.mx - radius * 0.15,
+      patch.my + radius * 0.25,
+    ]);
+    // The stem is a separate two-point stroke below the crown, outlined like
+    // every other painted landmark.
+    const stem = trace.strokes.find(
+      (stroke) =>
+        stroke.at > (leaves?.at ?? Number.MAX_VALUE) && stroke.commands.join() === 'moveTo,lineTo',
+    );
+    expect(stem).toMatchObject({
+      style: 'paint:--color-map-outline',
+      lineWidth: 1.5,
+      args: [patch.mx, patch.my - radius * 0.2, patch.mx, patch.my + radius],
+    });
+  });
+
+  it('scales the procedural farm-patch fallback with the compact profile', () => {
+    const markerArt = fakeMarkerArt([]);
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+
+    const result = new MapWindowPainter(classColor, markerArt.art, () => 'compact').paintOverworld(
+      fakeMapContext(trace),
+      farmPatchLabelWorld(),
+      labelPaintOptions(),
+    );
+
+    const patch = result.farmPatches[0];
+    expect(patch).toBeDefined();
+    expect(markerArt.calls.filter((call) => call.id === 'farm-patch')).toEqual([
+      { id: 'farm-patch', size: 'mapStationCompact' },
+    ]);
+    expect(trace.markerBlits).toEqual([]);
+    const leaves = trace.fills.find(
+      (fill) =>
+        fill.style === 'paint:--color-map-stall' &&
+        fill.commands.join() === 'moveTo,lineTo,lineTo,closePath,moveTo,lineTo,lineTo,closePath',
+    );
+    const radius = 9;
+    expect(leaves?.args.slice(0, 6)).toEqual([
+      patch?.mx,
+      (patch?.my ?? 0) - radius * 0.2,
+      (patch?.mx ?? 0) - radius,
+      (patch?.my ?? 0) - radius,
+      (patch?.mx ?? 0) - radius * 0.15,
+      (patch?.my ?? 0) + radius * 0.25,
+    ]);
+    const stem = trace.strokes.find(
+      (stroke) =>
+        stroke.at > (leaves?.at ?? Number.MAX_VALUE) && stroke.commands.join() === 'moveTo,lineTo',
+    );
+    expect(stem).toMatchObject({
+      style: 'paint:--color-map-outline',
+      lineWidth: 2,
+      args: [patch?.mx, (patch?.my ?? 0) - radius * 0.2, patch?.mx, (patch?.my ?? 0) + radius],
     });
   });
 

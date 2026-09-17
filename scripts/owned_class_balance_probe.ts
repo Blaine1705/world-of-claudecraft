@@ -840,6 +840,7 @@ export function runOwnedClassDpsProbe(
   // isolates un-geared spec parity, the same low-gear axis a leveling or
   // fresh-alt player experiences.
   gear: 'pbe' | 'naked' = 'pbe',
+  setupEquipment?: (sim: Sim) => void,
 ): OwnedClassBalanceResult {
   const fixture = FIXTURES[spec];
   const sim = new Sim({ seed, playerClass: fixture.cls, autoEquip: false }) as ProbeSim;
@@ -853,6 +854,7 @@ export function runOwnedClassDpsProbe(
     throw new Error(`failed to apply ${fixture.talentSpec}`);
   }
   if (gear === 'pbe') equipPbeLoadout(sim, spec);
+  setupEquipment?.(sim);
   // Keep all three targets in one unobstructed cluster. The starter-world origin
   // has a static collider just left of the player, so a negative offset turns the
   // third target into a line-of-sight fixture instead of an area-damage fixture.
@@ -1125,6 +1127,7 @@ export function runOwnedHealerProbe(
   head = 'working-tree',
   talentRows?: Record<number, string>,
   seconds = 60,
+  setupEquipment?: (sim: Sim) => void,
 ): OwnedHealerBalanceResult {
   const fixture = healerFixture(spec);
   const sim = new Sim({ seed, playerClass: fixture.cls, autoEquip: false }) as ProbeSim;
@@ -1136,6 +1139,7 @@ export function runOwnedHealerProbe(
     throw new Error(`failed to apply ${fixture.talentSpec}`);
   }
   equipExactLoadout(sim, fixture.loadout);
+  setupEquipment?.(sim);
   const healer = sim.player;
   placeEntity(sim, healer, 720, 0);
   const allies: Entity[] = [];
@@ -1300,7 +1304,14 @@ function incomingDamageForPosture(
     throw new Error('failed to apply enhancement');
   }
   equipExactLoadout(sim, WARSPIRIT_PBE_LOADOUT);
-  const attacker = createMob(sim.nextId++, MOBS.forest_wolf, 20, sim.groundPos(0, 3));
+  // Beside the anchored player (the druid probe's idiom): a mob spawned at the
+  // world origin sits beyond THREAT_DROP_RANGE and forgets the player at once.
+  const attacker = createMob(
+    sim.nextId++,
+    MOBS.forest_wolf,
+    20,
+    sim.groundPos(sim.player.pos.x, sim.player.pos.z + 3),
+  );
   attacker.hostile = true;
   attacker.hp = attacker.maxHp = 1_000_000;
   sim.addEntity(attacker);
@@ -1346,7 +1357,12 @@ export function runWarspiritOfftankProbe(
   sim.setPlayerLevel(20, rivalId);
   const rival = sim.entities.get(rivalId);
   if (!rival) throw new Error('missing threat rival');
-  const target = createMob(sim.nextId++, MOBS.forest_wolf, 20, sim.groundPos(0, 3));
+  const target = createMob(
+    sim.nextId++,
+    MOBS.forest_wolf,
+    20,
+    sim.groundPos(sim.player.pos.x, sim.player.pos.z + 3),
+  );
   target.hostile = true;
   target.hp = target.maxHp = 1_000_000;
   target.inCombat = true;

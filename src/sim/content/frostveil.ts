@@ -228,7 +228,7 @@ export const FROSTVEIL_MOBS: Record<string, MobTemplate> = {
   },
   frostmane_yeti: {
     id: 'frostmane_yeti',
-    name: 'Frostmane Yeti',
+    name: 'Rimemane Yeti',
     minLevel: 19,
     maxLevel: 20,
     // A beast, not a brute: it renders on the yeti body and was only in the ogre
@@ -523,14 +523,14 @@ export const FROSTVEIL_QUESTS: Record<string, QuestDef> = {
   },
   q_fv_frostmane_tyrant: {
     id: 'q_fv_frostmane_tyrant',
-    name: 'The Frostmane Tyrant',
+    name: 'The Rimemane Tyrant',
     giverNpcId: 'warden_kaldra',
     turnInNpcId: 'warden_kaldra',
-    text: 'The howlers were not hunting when they came down the terraces. They were fleeing. A yeti has claimed the high ground, the mountain folk call it the Frostmane, and even the packs will not share a slope with it. It has to end, $N, before winter drives it down to my walls. Bring a friend. Bring two.',
+    text: 'The howlers were not hunting when they came down the terraces. They were fleeing. A yeti has claimed the high ground, the mountain folk call it the Rimemane, and even the packs will not share a slope with it. It has to end, $N, before winter drives it down to my walls. Bring a friend. Bring two.',
     completionText:
-      'When the wind dropped last night the whole village heard the silence where the Frostmane used to be. The Reach owes you a debt it will be years in paying, $N. Wear this, and every door in Icemantle is open to you.',
+      'When the wind dropped last night the whole village heard the silence where the Rimemane used to be. The Reach owes you a debt it will be years in paying, $N. Wear this, and every door in Icemantle is open to you.',
     objectives: [
-      { type: 'kill', targetMobId: 'frostmane_yeti', count: 1, label: 'The Frostmane slain' },
+      { type: 'kill', targetMobId: 'frostmane_yeti', count: 1, label: 'The Rimemane slain' },
     ],
     xpReward: 6000,
     copperReward: 3600,
@@ -607,7 +607,7 @@ export const FROSTVEIL_ITEMS: Record<string, ItemDef> = {
   },
   frostmane_mantle: {
     id: 'frostmane_mantle',
-    name: 'Mantle of the Frostmane',
+    name: 'Mantle of the Rimemane',
     kind: 'armor',
     armorType: 'cloth',
     slot: 'shoulder',
@@ -639,10 +639,16 @@ export const FROSTVEIL_OBJECTS: GroundObjectDef[] = [
   {
     itemId: 'sprung_trap',
     name: 'Sprung Fen Trap',
-    // Brosk's scattered trapline in the Shiverfen reeds.
+    // Brosk's scattered trapline in the Shiverfen reeds. The reeds ring a
+    // pool (-90,1760); every trap sits on dry ground, never on the pool
+    // floor, or it is a swim-deep click target the player cannot see (the
+    // swim-depth arm of tests/ground_object_placement.test.ts). Each authored
+    // spot also anchors a terrain calm pad (terrain_calm_anchors.ts), so the
+    // west trap stands far enough up the bank that its pad ring never reaches
+    // the water and cannot raise a sandbar in the pool.
     positions: [
       { x: -92, z: 1750 },
-      { x: -98, z: 1764 },
+      { x: -116, z: 1756 },
       { x: -80, z: 1770 },
       { x: -72, z: 1756 },
     ],

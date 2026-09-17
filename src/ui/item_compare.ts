@@ -1,6 +1,8 @@
 // Pure item-comparison helper (no DOM), so the stat-delta math can be unit
 // tested directly the way xp_bar.ts / player_context_menu.ts are. The HUD turns
 // these deltas into coloured tooltip lines; see Hud.itemCompareBlock.
+
+import { activeItemInstanceStats } from '../sim/item_instance_stats';
 import type { CoreStats, ItemDef, ItemInstancePayload } from '../sim/types';
 
 // Stable stat identifier; the HUD maps it to a localized label via t().
@@ -63,13 +65,18 @@ type CopyStat = Exclude<CompareStat, 'dps' | 'warfare'>;
 // A stat as the wearer would feel it: the definition's line plus whatever the
 // specific copy carries in rolled.stats (an enchant, a masterwork bake, or a
 // Riftbound band's whole ladder-priced line: its shell is stat-free, so without
-// the copy a band would compare as an empty ring).
+// the copy a band would compare as an empty ring). The rolled bonus reads
+// through activeItemInstanceStats, the recalcPlayerStats merge semantics
+// (including its Number.isFinite guard over the persisted rolled values), so
+// a per-copy bake (masterwork, enchant, the Perfected R5 delta) moves the
+// delta the same way it moves the worn numbers.
 function effectiveStat(
   def: ItemDef,
   instance: ItemInstancePayload | undefined,
   key: CopyStat,
 ): number {
-  const bonus = instance?.rolled?.stats?.[key] ?? 0;
+  const rolled = activeItemInstanceStats(instance)?.[key];
+  const bonus = Number.isFinite(rolled) ? (rolled as number) : 0;
   const base =
     key === 'armor' ||
     key === 'str' ||
@@ -85,8 +92,11 @@ function effectiveStat(
 // Ordered, human-readable stat lines. Only changes worth showing are returned:
 // integer stats need a full point of difference, DPS a tenth, so a same-for-
 // same swap yields an empty list (the HUD then shows no "If you equip" section).
-// The optional instances are the hovered copy and the worn copy; a plain piece
-// passes none and reads exactly as its definition.
+// `itemInstance` / `equippedInstance` are the per-copy payloads of the two
+// sides (the hovered candidate copy and the worn copy); the core-stat rows
+// compare MERGED def + rolled stats per side, so a worn copy whose bake makes
+// the swap a net loss shows its honest negative delta. Callers without a
+// payload in hand omit them and keep the def-only comparison.
 export function itemStatDeltas(
   item: ItemDef,
   equipped: ItemDef,

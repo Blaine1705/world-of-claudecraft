@@ -44,6 +44,22 @@ describe('runBackgroundPrewarm', () => {
     expect(groups.map((entry) => entry.visible)).toEqual([true, false]);
   });
 
+  it('keeps a reveal that lands inside the window (a gated attach settling)', async () => {
+    // A lazily built zone feature arrives hidden by its own gated attach and
+    // that gate reveals it when its programs link, which can happen while the
+    // prewarm window is open. The captured "hidden" must not clobber it: the
+    // Willowfen dressing stayed invisible for good this way once its parent
+    // group was no longer rewritten by the per-frame distance cull.
+    const groups = [group(1), group(1)];
+    groups[0].visible = false; // gate pending at capture
+    groups[1].visible = false;
+    await withHiddenPrewarmGroups(groups, async () => {
+      expect(groups.map((entry) => entry.visible)).toEqual([false, false]);
+      groups[0].visible = true; // the gate's reveal, mid-window
+    });
+    expect(groups.map((entry) => entry.visible)).toEqual([true, false]);
+  });
+
   it('restores hidden-group state when awaited compilation fails', async () => {
     const groups = [group(1), group(1)];
     groups[1].visible = false;
@@ -417,9 +433,14 @@ describe('runBackgroundPrewarm', () => {
     const zoneStart = source.indexOf('private async prepareZoneSky(');
     const zoneEnd = source.indexOf('\n  /** Blocking-path neighborhood prepare', zoneStart);
     const zoneSlice = source.slice(zoneStart, zoneEnd);
-    const shadowStart = source.indexOf('private async compileShadowPrograms(');
+    const shadowStart = source.indexOf('private compileShadowPrograms(');
+    expect(shadowStart).toBeGreaterThan(-1);
     const shadowEnd = source.indexOf('\n  // A tiny throwaway target', shadowStart);
-    const shadowSlice = source.slice(shadowStart, shadowEnd);
+    expect(shadowEnd).toBeGreaterThan(shadowStart);
+    // The wrapper's body lives in the extracted arm; scan both halves.
+    const shadowSlice =
+      source.slice(shadowStart, shadowEnd) +
+      readFileSync(new URL('../src/render/compile_arms.ts', import.meta.url), 'utf8');
     const bootStart = source.indexOf("id: 'programs.compile'");
     const bootEnd = source.indexOf("id: 'sky.current-zone'", bootStart);
     const bootSlice = source.slice(bootStart, bootEnd);

@@ -3,15 +3,14 @@
 // projection, decluttering, text/image caches, and the single canvas surface.
 
 import * as THREE from 'three';
+import { friendlyNameplatesShown } from '../game/nameplate_view_prefs';
 import { isOwnAura } from '../sim/aura_classify';
+import { corpseIndicatorFor } from '../sim/corpse_loot_state';
 import { ABILITIES, MOBS, QUESTS } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
 import { isQuestGatedEntityHidden } from '../sim/quest_gated_entity';
-import {
-  npcQuestMarkerKind,
-  type QuestMarkerKind,
-  strongerQuestMarker,
-} from '../sim/quests/quest_marker_kind';
+import { ambientNpcQuestMarkerKind } from '../sim/quests/ambient_quest_marker';
+import { type QuestMarkerKind, strongerQuestMarker } from '../sim/quests/quest_marker_kind';
 import { type Entity, GATHER_CAST_ID } from '../sim/types';
 import { abilityDisplayNameFromSource } from '../ui/ability_display_name';
 import { resolveHudAuraIconId } from '../ui/aura_icon_runtime';
@@ -29,6 +28,7 @@ import {
   proceduralIconDataUrl,
   raidMarkerDataUrl,
 } from '../ui/icons';
+import { professionTrainerNameplateLabel } from '../ui/profession_trainer_label_core';
 import { localizeSimAuraName } from '../ui/sim_i18n';
 import { type IWorld, OVERHEAD_EMOTES } from '../world_api';
 import { castBarState } from './cast_bar';
@@ -49,13 +49,16 @@ import {
   nameplateDotRowHeight,
   nameplateDotsInto,
 } from './nameplate_dots_core';
+import { isFriendlyNameplateHidden } from './nameplate_friendly_core';
 import { nameplateHeraldryLift } from './nameplate_heraldry_core';
+import { NameplatePaintGate } from './nameplate_paint_gate_core';
 import { type NameplatePickCandidate, pickNameplateHealthBarAt } from './nameplate_pick_core';
 import {
   isNameplateScreenAnchorVisible,
   isProjectedNameplateAnchorVisible,
 } from './nameplate_projection';
 import { type NameplatePlan, nameplatePlanInto, newNameplatePlan } from './nameplate_view';
+import { npcRoleLabel, npcRoleLineCarriesTrainerTitle } from './npc_role_label';
 import { FRIENDLY, isFriendlyPet, mobNameColor } from './reaction';
 import type { EntityView } from './renderer';
 
@@ -138,7 +141,20 @@ export interface NameplatePainterDeps {
   layer: HTMLElement;
   getViewport: () => { width: number; height: number };
   getDevicePixelRatio?: () => number;
+  /** The backing-store pixel ratio the plate surface should size itself at,
+   *  already bounded by the renderer's own effective ratio so a downscaled 3D
+   *  frame is never overlaid by a native-resolution text layer. The renderer
+   *  resolves it through the pure knob module under src/game; this whole file
+   *  is on the deed-accent fairness path (tests/deed_border_accent.test.ts) and
+   *  so reads no quality knob of its own. Absent (the editor viewport, a test
+   *  host) means the device ratio. */
+  getSurfacePixelRatio?: () => number;
   showNameplates: () => boolean;
+  /** The Toggle Friendly Nameplates keybind's state. Defaults to the live
+   *  preference (game/nameplate_view_prefs), which is why the renderer carries no
+   *  pass-through field for it; injectable so a test drives it. Read once per
+   *  pass; the rule it feeds is nameplate_friendly_core.ts. */
+  showFriendlyNameplates?: () => boolean;
   showDevBadges: () => boolean;
   showOwnNameplate: () => boolean;
   showPlayerNameplates: () => boolean;
@@ -156,7 +172,9 @@ export class NameplatePainter {
   private readonly world: IWorld;
   private readonly getViewport: () => { width: number; height: number };
   private readonly getDevicePixelRatio: () => number;
+  private readonly getSurfacePixelRatio: () => number;
   private readonly showNameplates: () => boolean;
+  private readonly showFriendlyNameplates: () => boolean;
   private readonly showDevBadges: () => boolean;
   private readonly showOwnNameplate: () => boolean;
   private readonly showPlayerNameplates: () => boolean;
@@ -173,6 +191,9 @@ export class NameplatePainter {
   private readonly anchorScratch: Array<NameplateAnchor & NameplatePickCandidate> = [];
   private anchorCount = 0;
   private i18nRevision = -1;
+  private readonly paintGate = new NameplatePaintGate();
+  private paints = 0;
+  private paintsSkipped = 0;
   // Quest-marker inputs (the shared quest_marker_kind rule), resolved lazily
   // on the first quest-bearing plate of a pass and dropped at every full
   // pass: craftingIdentity is a per-access allocation on the offline Sim,
@@ -194,6 +215,10 @@ export class NameplatePainter {
     questsDone: ReadonlySet<string>;
     cadenceBlocked: ReadonlySet<string> | undefined;
   } | null = null;
+  // The viewer's party roster (pids), refilled in place at the top of every
+  // pass so the corpse indicator (corpseIndicatorFor) can answer loot rights
+  // without a per-plate allocation; empty when solo.
+  private readonly viewerPartyIds: number[] = [];
 
   constructor(deps: NameplatePainterDeps) {
     this.views = deps.views;
@@ -203,7 +228,9 @@ export class NameplatePainter {
     this.getDevicePixelRatio =
       deps.getDevicePixelRatio ??
       (() => (typeof window === 'undefined' ? 1 : window.devicePixelRatio || 1));
+    this.getSurfacePixelRatio = deps.getSurfacePixelRatio ?? this.getDevicePixelRatio;
     this.showNameplates = deps.showNameplates;
+    this.showFriendlyNameplates = deps.showFriendlyNameplates ?? friendlyNameplatesShown;
     this.showDevBadges = deps.showDevBadges;
     this.showOwnNameplate = deps.showOwnNameplate;
     this.showPlayerNameplates = deps.showPlayerNameplates;
@@ -222,16 +249,21 @@ export class NameplatePainter {
       this.i18nRevision = revision;
       this.surface.clearTextCache();
     }
-    this.surface.beginFrame(width, height, this.getDevicePixelRatio());
     this.anchorCount = 0;
 
     const showNameplates = this.showNameplates();
+    const showFriendlyNameplates = this.showFriendlyNameplates();
     const showDevBadges = this.showDevBadges();
     const showOwnNameplate = this.showOwnNameplate();
     const showPlayerNameplates = this.showPlayerNameplates();
     // Drop the quest-marker snapshot at every full pass so it re-resolves
     // lazily below; throttled passes reuse it (see the field's rationale).
     if (fullPass) this.questMarkerCtx = null;
+    this.viewerPartyIds.length = 0;
+    const partyMembers = world.partyInfo?.members;
+    if (partyMembers) {
+      for (const member of partyMembers) this.viewerPartyIds.push(member.pid);
+    }
 
     for (const [id, view] of this.views) {
       const entity = world.entities.get(id);
@@ -252,6 +284,23 @@ export class NameplatePainter {
         !!view.visual,
         anyCharacterRigDrawing(view),
       );
+      // The Toggle Friendly Nameplates keybind, gated here rather than inside the
+      // plan because resolving a mob's reaction needs the entity map. Skipping
+      // the entity is the whole hide, so a gated plate leaves no pick anchor
+      // behind, and `standIn` wins over it exactly as it wins over the other
+      // nameplate toggles: a body the compile gate is still hiding keeps the
+      // plate that says it is there.
+      if (
+        !standIn &&
+        isFriendlyNameplateHidden(
+          entity,
+          world.entities,
+          this.isHostilePlayer,
+          showFriendlyNameplates,
+        )
+      ) {
+        continue;
+      }
       // the saddle lift rides the anchor so a mounted player's plate clears the head
       const plan = nameplatePlanInto(
         this.plan,
@@ -319,6 +368,36 @@ export class NameplatePainter {
     }
 
     declutterNameplatesInPlace(this.anchorScratch, this.anchorCount);
+
+    // The repaint decision comes AFTER decluttering, because decluttering is
+    // what moves an anchor: the gate must compare the anchors that will
+    // actually be drawn. A pass whose plates, anchors, viewport, surface ratio
+    // and style revision all match the last PAINTED pass would redraw the same
+    // pixels, so the whole clear-and-repaint of this full-viewport surface is
+    // skipped. Anything a player reads (a moved plate, HP, cast, selection,
+    // threat, content, opacity) differs and paints on its own frame.
+    const surfacePixelRatio = this.getSurfacePixelRatio();
+    this.paintGate.beginPass(width, height, surfacePixelRatio, this.surface.styleRevision());
+    for (let i = 0; i < this.anchorCount; i++) {
+      const anchor = this.anchorScratch[i];
+      const state = this.states.get(anchor.id);
+      if (state) this.paintGate.notePlate(anchor.id, anchor.sx, anchor.sy, state);
+    }
+    if (!this.paintGate.needsPaint()) {
+      this.paintsSkipped++;
+      return;
+    }
+    this.paints++;
+    // Zero plates drawn (the toggle is off, or none are in view): drop the
+    // layer so the compositor stops carrying a full-screen surface for it. The
+    // first plate back unhides it below, before anything is drawn.
+    this.surface.setLayerHidden(this.anchorCount === 0);
+    if (this.anchorCount === 0) {
+      this.paintGate.commit();
+      return;
+    }
+
+    this.surface.beginFrame(width, height, surfacePixelRatio);
     for (let i = 0; i < this.anchorCount; i++) {
       const anchor = this.anchorScratch[i];
       const state = this.states.get(anchor.id);
@@ -331,6 +410,13 @@ export class NameplatePainter {
       const state = this.states.get(anchor.id);
       if (state) this.surface.drawEmote(state, anchor.sx, anchor.sy);
     }
+    this.paintGate.commit();
+  }
+
+  /** Surface repaint accounting for `Renderer.perfStats()`: how many passes
+   *  painted the plate canvas and how many were skipped as identical. */
+  paintStats(): { paints: number; paintsSkipped: number } {
+    return { paints: this.paints, paintsSkipped: this.paintsSkipped };
   }
 
   remove(id: number): void {
@@ -350,6 +436,7 @@ export class NameplatePainter {
   dispose(): void {
     this.anchorCount = 0;
     this.states.clear();
+    this.paintGate.invalidate();
     this.surface.dispose();
   }
 
@@ -450,7 +537,7 @@ export class NameplatePainter {
     state.nameColor = '#fff';
     state.level = '';
     state.levelColor = '#fff';
-    state.guild = '';
+    state.guild = entity.kind === 'npc' ? (npcRoleLabel(entity.templateId) ?? '') : '';
     state.guildLabel = '';
     state.guildTier = 0;
     state.title = '';
@@ -583,6 +670,24 @@ export class NameplatePainter {
           ? npcDisplayName(entity.templateId)
           : tEntity({ kind: 'mob', id: entity.templateId, field: 'name' });
       state.nameColor = FRIENDLY;
+      // The role line: what this NPC DOES, on the same line a player's
+      // `<Guild>` uses (npc_role.ts owns the rule; the tag wrapper is the
+      // catalog VALUE so a locale owns its brackets). Built here, never in the
+      // per-frame draw path, the same cadence contract as guildLabel.
+      if (entity.kind === 'npc') {
+        const roleLabel = state.guild;
+        if (roleLabel) {
+          state.guildLabel = t('hudChrome.nameplate.npcRoleTag', { role: roleLabel });
+        }
+        // The profession-trainer service title beneath the name, unless the
+        // role line already says it (the resident master's trainer role, or
+        // the flavour fallback that resolves to the same service title). A
+        // trainer with a distinct service role, the hobby smith who also
+        // deals arms, keeps both lines.
+        if (!(roleLabel && npcRoleLineCarriesTrainerTitle(entity.templateId))) {
+          state.title = professionTrainerNameplateLabel(entity.templateId);
+        }
+      }
       const questMarker = this.questMarker(entity);
       state.marker = questMarker.marker;
       state.markerTone = questMarker.tone;
@@ -606,8 +711,14 @@ export class NameplatePainter {
         });
     state.levelColor = mobNameColor(entity.level - player.level, entity.dead, state.friendlyPet);
     state.hpVisible = !entity.dead;
-    state.marker = entity.lootable ? 'loot' : elite && !entity.dead ? '◆' : '';
-    state.markerTone = entity.lootable ? 'loot' : 'none';
+    // What this body still offers THIS viewer, never the bare lootable flag: a
+    // harvest-only body keeps `lootable` true through its grace window, and a
+    // stranger's owner-locked kill is lootable for someone else. Ordinary loot
+    // wins the satchel; an open harvest with no ordinary loot shows the blade;
+    // neither shows nothing.
+    const corpse = corpseIndicatorFor(entity, player.id, this.viewerPartyIds);
+    state.marker = corpse !== 'none' ? corpse : elite && !entity.dead ? '◆' : '';
+    state.markerTone = corpse;
     state.frame = entity.dead ? '' : boss ? 'boss' : elite ? 'elite' : '';
   }
 
@@ -641,7 +752,7 @@ export class NameplatePainter {
       if (!quest || !this.questMarkerCtx) continue;
       folded = strongerQuestMarker(
         folded,
-        npcQuestMarkerKind(
+        ambientNpcQuestMarkerKind(
           quest,
           entity.templateId,
           this.world.questState(questId),

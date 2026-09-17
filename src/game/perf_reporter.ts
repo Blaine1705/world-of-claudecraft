@@ -1,6 +1,8 @@
+import { apiUrl } from '../client_origin';
 import { graphicsPresetLabel } from '../render/gfx';
 import { isSoftwareRendererName } from '../render/software_renderer';
 import { crowdBucketLabel } from './crowd_bucket';
+import { createGpuAdapterProbe } from './gpu_adapter_probe';
 import { collectLoadSpans } from './load_profiler';
 import { localDevPerfTraceEnabled, type PerfMonitor, type PerfSnapshot } from './perf';
 import { type BootPhaseDurations, bootPhaseDurations } from './perf_boot_phases_core';
@@ -253,6 +255,8 @@ function rendererPrewarmBudgetVariantSummary(
         vfx: variant.levels.vfx,
         lighting: variant.levels.lighting,
         resolution: variant.levels.resolution,
+        detail: variant.levels.detail,
+        post: variant.levels.post,
       },
       elapsedMs: variant.elapsedMs,
       syncMs: variant.syncMs,
@@ -542,6 +546,9 @@ function payloadFromSnapshot(
   characterId: number | null,
   worldTelemetry: WorldTelemetry | null = null,
   desktopShell = false,
+  // The WebGPU high-performance adapter description, or null while the probe
+  // is still in flight or on any browser that has no WebGPU to ask.
+  gpuHpAdapter: string | null = null,
   bootPhases: BootPhaseDurations | null = null,
 ): Record<string, unknown> | null {
   const renderer = snapshot.renderer;
@@ -612,11 +619,20 @@ function payloadFromSnapshot(
     deviceMemory: device.deviceMemory,
     hardwareConcurrency: device.hardwareConcurrency,
     mobileTouch: device.mobileTouch,
+    // The Electron shell is Chromium loading the same web bundle, so neither
+    // browserFamily nor buildId can tell it apart; this flag is the only
+    // fleet-visible desktop-versus-browser marker (the server also falls back
+    // on the Electron user-agent token).
+    desktopShell,
     browserFamily: browserFamily(device.userAgent),
     osFamily: osFamily(device.userAgent),
     glVendor: renderer.glVendor,
     glRenderer: renderer.glRenderer,
     glRendererBucket: gpuBucket(renderer.glRenderer),
+    // What the browser hands a page that ASKS for the discrete GPU. Sent raw;
+    // the server buckets it with the same parser it uses on glRenderer, and a
+    // disagreement between the two is a hybrid laptop rendering on its iGPU.
+    gpuHpAdapter,
     source: scenario.source,
     zoneOrScenario,
     simEntities: worldTelemetry?.simEntities ?? null,
@@ -636,12 +652,31 @@ function payloadFromSnapshot(
       // the only fleet-visible proof the skip is working. Rides in rawSummary
       // (the no-DDL home, like the longtask block below), not as a column.
       hiddenPresentSkips: snapshot.hiddenPresentSkips,
+      // The fps denominator itself (wall seconds minus hidden time, both
+      // arms): beside `seconds` it says how much of the session the
+      // cumulative fps actually covers.
+      visibleSeconds: snapshot.visibleSeconds,
       windows: snapshot.windows,
       mainMs: snapshot.mainMs,
       rendererPhaseMs: renderer.phaseMs,
       rendererFoliage: renderer.foliage,
       rendererBudget: renderer.renderBudget,
       rendererQualityBuckets: renderer.qualityBuckets,
+      // The resolution the 3D scene is drawn at. The columns above cannot say
+      // it: `dpr` is the raw window.devicePixelRatio, never the renderer's
+      // capped ratio, and the viewport columns are window.innerWidth/Height,
+      // never the canvas rect. `dynamicResolution` rides along because a
+      // governor-backed-off session allocates at the manual ceiling and
+      // rasterizes a sub-rect, so without the flag it would read as full size
+      // (the reconstruction rule is on DrawingBufferStats). Five bounded
+      // scalars in rawSummary, the no-DDL home: no column, no metric.
+      rendererDrawingBuffer: {
+        width: renderer.drawingBuffer.width,
+        height: renderer.drawingBuffer.height,
+        cssWidth: renderer.drawingBuffer.cssWidth,
+        cssHeight: renderer.drawingBuffer.cssHeight,
+        dynamicResolution: renderer.drawingBuffer.dynamicResolution,
+      },
       rendererDiagnostics: renderer.renderDiagnostics,
       // The summary above is the whole prewarm payload. The live stats object
       // used to ride along beside it as `rendererPrewarm`, from before the
@@ -702,6 +737,12 @@ export function startPerfReporter(options: PerfReporterOptions): () => void {
 
   const sessionId = storedSessionId();
   const status = makeStatus(true, devTrace, sessionId);
+  // Started here rather than in main.ts on purpose: startPerfReporter already
+  // runs after world entry, and start() is fire-and-forget, so the probe can
+  // never delay a frame or the entry chain. The first beacon is 75s out; a
+  // report built before it settles just carries null.
+  const gpuAdapterProbe = createGpuAdapterProbe();
+  gpuAdapterProbe.start();
   let stopped = false;
   let timer: number | null = null;
   let lastFinalFlushAt = 0;
@@ -749,6 +790,7 @@ export function startPerfReporter(options: PerfReporterOptions): () => void {
       options.characterIdProvider(),
       options.worldTelemetryProvider?.() ?? null,
       options.desktopShell ?? false,
+      gpuAdapterProbe.value(),
       currentBootPhases(),
     );
     if (!body) {
@@ -774,7 +816,7 @@ export function startPerfReporter(options: PerfReporterOptions): () => void {
         `final post too large for keepalive: ${status.lastBodyBytes} bytes`,
       );
     }
-    void fetch('/api/perf-report', {
+    void fetch(apiUrl('/api/perf-report'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

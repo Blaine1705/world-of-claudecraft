@@ -1,11 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { shaderWarmToken } from '../server/perf_report_entry_blocks';
+import { RAW_SUMMARY_KNOWN_KEYS } from '../server/perf_report_shed';
 import { loadSpan, resetLoadProfile } from '../src/game/load_profiler';
 import type { PerfMonitor, PerfSnapshot } from '../src/game/perf';
 import { jitteredPerfReportDelay } from '../src/game/perf_report_schedule';
 import { perfReporterInternalsForTest, startPerfReporter } from '../src/game/perf_reporter';
 import { SHADER_WARM_BEACON_TEXT_MAX } from '../src/game/perf_shader_warm_core';
 import { Settings } from '../src/game/settings';
+import { GPU_TIMER_UNAVAILABLE } from '../src/render/gpu_timer_probe_core';
 import { POST_REVEAL_LINK_WINDOW_MS } from '../src/render/post_reveal_links_core';
 import { shaderWarmAuditSnapshot } from '../src/render/shader_warm_audit';
 import { shaderWarmSnapshot } from '../src/render/shader_warm_client';
@@ -68,6 +70,8 @@ function qualityBuckets(): NonNullable<PerfSnapshot['renderer']>['qualityBuckets
         governable: true,
       },
       ui: { min: 0.86, baseline: 1, max: 1, roi: 0.86, cost: 'cpu', governable: false },
+      detail: { min: 0, baseline: 1, max: 1, roi: 0.92, cost: 'gpu', governable: true },
+      post: { min: 0, baseline: 1, max: 1, roi: 0.9, cost: 'gpu', governable: true },
     },
     baseline: {
       resolution: 1,
@@ -82,6 +86,8 @@ function qualityBuckets(): NonNullable<PerfSnapshot['renderer']>['qualityBuckets
       weapons: 1,
       worldStreaming: 0.88,
       ui: 1,
+      detail: 1,
+      post: 1,
     },
     levels: {
       resolution: 0.9,
@@ -96,6 +102,8 @@ function qualityBuckets(): NonNullable<PerfSnapshot['renderer']>['qualityBuckets
       weapons: 1,
       worldStreaming: 0.88,
       ui: 1,
+      detail: 0.66,
+      post: 0.75,
     },
     features: {
       composer: true,
@@ -172,7 +180,15 @@ function prewarmStats(): NonNullable<NonNullable<PerfSnapshot['renderer']>['prew
         budgetVariants: [
           {
             index: 0,
-            levels: { grass: 1, foliage: 0.86, vfx: 0.92, lighting: 0.9, resolution: 0.9 },
+            levels: {
+              grass: 1,
+              foliage: 0.86,
+              vfx: 0.92,
+              lighting: 0.9,
+              resolution: 0.9,
+              detail: 1,
+              post: 1,
+            },
             elapsedMs: 24,
             syncMs: 18,
             programsBefore: 10,
@@ -182,7 +198,15 @@ function prewarmStats(): NonNullable<NonNullable<PerfSnapshot['renderer']>['prew
           },
           {
             index: 1,
-            levels: { grass: 0.86, foliage: 0.72, vfx: 0.84, lighting: 0.78, resolution: 0.9 },
+            levels: {
+              grass: 0.86,
+              foliage: 0.72,
+              vfx: 0.84,
+              lighting: 0.78,
+              resolution: 0.9,
+              detail: 1,
+              post: 1,
+            },
             elapsedMs: 20,
             syncMs: 15,
             programsBefore: 14,
@@ -275,6 +299,7 @@ function prewarmStats(): NonNullable<NonNullable<PerfSnapshot['renderer']>['prew
         submittedUnits: 2,
         settledUnits: 1,
         failedUnits: 0,
+        rejectedUnits: 0,
         backoffCount: 0,
         noProgressCount: 0,
         lastSettlementMs: 120,
@@ -319,6 +344,7 @@ function foliageCostStats(): Pick<
 function snapshot(): PerfSnapshot {
   return {
     seconds: 80,
+    visibleSeconds: 78,
     frames: 4800,
     fps: 60,
     hiddenPresentSkips: 0,
@@ -453,6 +479,7 @@ function snapshot(): PerfSnapshot {
         },
       },
       nightAmount: 0,
+      gpuTimer: GPU_TIMER_UNAVAILABLE,
       gpuPrep: {
         budget: {
           frameEmaMs: 16.7,
@@ -528,6 +555,11 @@ function snapshot(): PerfSnapshot {
       renderScale: 1,
       effectiveRenderScale: 0.9,
       shadowCadenceHalfRate: false,
+      shadowExtentStep: 0,
+      shadowExtentScale: 1,
+      shadowExtentHalf: 105,
+      terrainDetailLevel: 1,
+      postShedRung: 'full',
       renderBudget: {
         enabled: true,
         mode: 'stable',
@@ -542,7 +574,7 @@ function snapshot(): PerfSnapshot {
         stallHoldSeconds: 0,
         stableSeconds: 0,
         cooldownSeconds: 0,
-        levels: { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 0.9 },
+        levels: { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 0.9, detail: 1, post: 1 },
         caps: {
           targetCalls: 330,
           urgentCalls: 500,
@@ -559,6 +591,15 @@ function snapshot(): PerfSnapshot {
       pixelRatio: 1.5,
       width: 1440,
       height: 900,
+      // A governor-backed-off medium session: the allocation stands at the
+      // manual ceiling and the flag says the scene rasterizes a sub-rect of it.
+      drawingBuffer: {
+        width: 1728,
+        height: 1080,
+        cssWidth: 1440,
+        cssHeight: 900,
+        dynamicResolution: true,
+      },
       calls: 500,
       triangles: 300000,
       geometries: 120,
@@ -600,6 +641,7 @@ function snapshot(): PerfSnapshot {
         submit: { count: 1, avg: 1, p95: 1, max: 1 },
         total: { count: 1, avg: 5, p95: 5, max: 5 },
       },
+      nameplates: { paints: 0, paintsSkipped: 0 },
       renderDiagnostics: renderDiagnostics(),
       prewarm: prewarmStats(),
       castVfx: { ready: true, refused: 0, pending: 0, forced: false },
@@ -688,13 +730,34 @@ describe('perf reporter payload', () => {
     expect(body.source).toBe('benchmark');
     expect(body.zoneOrScenario).toBe('bench_dense_foliage');
     expect(JSON.stringify(body.rawSummary)).not.toContain('Safari/605');
+    // The GPU timer probe's table (perfStats().gpuTimer) is a dev diagnostic
+    // that never leaves the machine: the snapshot above carries the field, so
+    // a reporter that started spreading renderer stats would ship it here.
+    expect(JSON.stringify(body)).not.toContain('gpuTimer');
     // hiddenPresentSkips ships in rawSummary (review reversal of the phase 4
     // decision): sends are skipped while hidden, but an after-restore session
     // still beacons cumulative numbers whose spans included minimized time,
     // and the counter is the only fleet-visible evidence of that residue. It
     // rides in rawSummary (the no-DDL home), never as a top-level column.
     expect((body.rawSummary as { hiddenPresentSkips?: number }).hiddenPresentSkips).toBe(0);
+    // The fps denominator rides beside `seconds`: a reader can tell a session
+    // whose fps was discounted for hidden time from one that was diluted.
+    expect((body.rawSummary as { seconds?: number }).seconds).toBe(80);
+    expect((body.rawSummary as { visibleSeconds?: number }).visibleSeconds).toBe(78);
     expect((body.rawSummary as { graphicsConfigVersion?: number }).graphicsConfigVersion).toBe(16);
+    // The 3D drawing buffer rides in rawSummary (the no-DDL home): the report's
+    // own columns cannot say what a session rasterizes, because `dpr` is the raw
+    // window.devicePixelRatio and the viewport columns are window.innerWidth /
+    // innerHeight, neither of which is the renderer's capped ratio or the canvas
+    // rect. The dynamicResolution flag has to survive with the numbers: without
+    // it a governor-backed-off session reads as if it drew at full allocation.
+    expect((body.rawSummary as { rendererDrawingBuffer?: unknown }).rendererDrawingBuffer).toEqual({
+      width: 1728,
+      height: 1080,
+      cssWidth: 1440,
+      cssHeight: 900,
+      dynamicResolution: true,
+    });
     // The entry reveal wait rides in rawSummary too (the fleet-side watch for the
     // establishing-shot bound): the counters verbatim, the waits from the ring.
     expect((body.rawSummary as { entryReveal?: unknown }).entryReveal).toEqual({
@@ -749,7 +812,15 @@ describe('perf reporter payload', () => {
     expect(summaryEntries?.[1]?.budgetVariants).toEqual([
       {
         index: 0,
-        levels: { grass: 1, foliage: 0.86, vfx: 0.92, lighting: 0.9, resolution: 0.9 },
+        levels: {
+          grass: 1,
+          foliage: 0.86,
+          vfx: 0.92,
+          lighting: 0.9,
+          resolution: 0.9,
+          detail: 1,
+          post: 1,
+        },
         elapsedMs: 24,
         syncMs: 18,
         programsBefore: 10,
@@ -759,7 +830,15 @@ describe('perf reporter payload', () => {
       },
       {
         index: 1,
-        levels: { grass: 0.86, foliage: 0.72, vfx: 0.84, lighting: 0.78, resolution: 0.9 },
+        levels: {
+          grass: 0.86,
+          foliage: 0.72,
+          vfx: 0.84,
+          lighting: 0.78,
+          resolution: 0.9,
+          detail: 1,
+          post: 1,
+        },
         elapsedMs: 20,
         syncMs: 15,
         programsBefore: 14,
@@ -1164,7 +1243,15 @@ describe('perf reporter payload', () => {
               stallHoldSeconds: 0,
               stableSeconds: 0,
               cooldownSeconds: 0,
-              levels: { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 0.9 },
+              levels: {
+                grass: 1,
+                foliage: 1,
+                vfx: 1,
+                lighting: 1,
+                resolution: 0.9,
+                detail: 1,
+                post: 1,
+              },
               caps: {
                 targetCalls: 330,
                 urgentCalls: 500,
@@ -1289,6 +1376,28 @@ describe('perf reporter report dimensions', () => {
     >['lastFrame'];
   }
 
+  it('carries the WebGPU high-performance adapter, and null until the probe settles', () => {
+    (globalThis as any).location = { search: '' };
+    // The reporter passes the probe's cached value straight through, so a
+    // beacon built before it settles (or on a browser with no WebGPU at all)
+    // ships null rather than waiting on it. The server reads a missing or null
+    // field as "no adapter" and stores '' for it.
+    const pending = payloadFromSnapshot(snapshot(), new Settings(), 'sess1', 42, null, false)!;
+    expect(pending.gpuHpAdapter).toBe(null);
+    const settled = payloadFromSnapshot(
+      snapshot(),
+      new Settings(),
+      'sess1',
+      42,
+      null,
+      false,
+      'NVIDIA GeForce RTX 4070 Laptop GPU',
+    )!;
+    // Sent RAW: the server buckets it with the same parser it runs on
+    // glRenderer, so the client never gets to name a family key itself.
+    expect(settled.gpuHpAdapter).toBe('NVIDIA GeForce RTX 4070 Laptop GPU');
+  });
+
   it('emits the provider zone id as zoneOrScenario for gameplay sessions', () => {
     (globalThis as any).location = { search: '' };
     const body = payloadFromSnapshot(snapshot(), new Settings(), 'sess1', 42, {
@@ -1374,6 +1483,45 @@ describe('perf reporter suggestion ids', () => {
     expect(body.suggestionIds).toEqual(['hardware-acceleration']);
   });
 
+  it('sends only raw summary keys the server ladder knows, so no field is shed as unlisted', () => {
+    // The ingest sheds an unknown key first on every oversized report, and
+    // nearly every first report is oversized: a client field added without
+    // its server-side entry would vanish from the fleet under the anonymous
+    // 'unlisted' rung. This is the lockstep pin.
+    const body = perfReporterInternalsForTest.payloadFromSnapshot(
+      snapshot(),
+      new Settings(),
+      'sess1',
+      42,
+    )!;
+    for (const key of Object.keys(body.rawSummary as Record<string, unknown>)) {
+      expect(RAW_SUMMARY_KNOWN_KEYS, key).toContain(key);
+    }
+  });
+
+  it('carries the desktop shell flag as a top-level field, false for a browser tab', () => {
+    // The shell is Chromium loading the same bundle: browserFamily and buildId
+    // read identical to a Chrome tab, so this flag is the fleet's only
+    // desktop-versus-browser marker (stored as the desktop_shell column).
+    const settings = new Settings();
+    const shell = perfReporterInternalsForTest.payloadFromSnapshot(
+      snapshot(),
+      settings,
+      'sess1',
+      42,
+      null,
+      true,
+    )!;
+    expect(shell.desktopShell).toBe(true);
+    const tab = perfReporterInternalsForTest.payloadFromSnapshot(
+      snapshot(),
+      settings,
+      'sess1',
+      42,
+    )!;
+    expect(tab.desktopShell).toBe(false);
+  });
+
   it('emits integrated-gpu on a bad-frames iGPU session only outside the desktop shell', () => {
     (globalThis as any).location = { search: '' };
     const badSnap = (): PerfSnapshot => {
@@ -1448,6 +1596,13 @@ describe('perf reporter worst-window drain', () => {
       expect(fetchImpl).not.toHaveBeenCalled();
       await vi.advanceTimersByTimeAsync(1);
       expect(fetchImpl).toHaveBeenCalledTimes(1);
+      // The URL, not only the count and the body: this harness drives the real
+      // startPerfReporter, and the beacon posting to the wrong origin is what
+      // kept every desktop session out of the fleet (tests/client_api_origin.test.ts).
+      expect(fetchImpl).toHaveBeenCalledWith(
+        '/api/perf-report',
+        expect.objectContaining({ method: 'POST' }),
+      );
       await Promise.resolve();
       await Promise.resolve();
     } finally {
@@ -1875,6 +2030,7 @@ describe('perf reporter world-entry blocks', () => {
       1,
       null,
       false,
+      null,
       phases,
     )!;
     expect((body.rawSummary as { bootPhases?: unknown }).bootPhases).toEqual(phases);
@@ -1935,6 +2091,9 @@ describe('perf reporter world-entry blocks', () => {
       heldWarm: 3,
       heldTimedOut: 1,
       holdMs: 120,
+      holdWallMs: 90,
+      releases: 0,
+      abArm: 'on',
       workerStats: {
         pending: 2,
         inFlight: 1,
@@ -1975,6 +2134,10 @@ describe('perf reporter world-entry blocks', () => {
       warmed: 8,
       held: 4,
       heldTimedOut: 1,
+      holdMs: 120,
+      holdWallMs: 90,
+      releases: 0,
+      abArm: 'on',
     });
     // The two typed fields the server stores as columns.
     expect(body.shaderWarmWorkerActive).toBe(true);

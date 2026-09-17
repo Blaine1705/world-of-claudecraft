@@ -15,6 +15,7 @@ import { randomUUID } from 'node:crypto';
 import type { EventEmitter } from 'node:events';
 import type * as http from 'node:http';
 import type { WebSocket, WebSocketServer } from 'ws';
+import { type AccountLedger, freshAccountLedger } from '../src/sim/account_ledger';
 import {
   type BankBonusSource,
   DUNGEON_ENTRY_FACING_WIRE_VERSION,
@@ -32,6 +33,7 @@ import type {
   TokenScope,
 } from './db';
 import type { GameServer } from './game';
+import { noteClientFrame } from './keepalive_sweep';
 import { negotiateMovementWireVersion } from './movement_wire_version';
 import { kickStoragePurchaseRecovery } from './storage_purchases';
 import type { HandshakeFlushMode } from './ws_buffer';
@@ -113,6 +115,9 @@ export interface WsAuthDeps {
   ) => { fbp?: string | null; fbc?: string | null };
   metaEventSourceUrl: (req: http.IncomingMessage) => string | undefined;
   loadAccountCosmetics: (accountId: number) => Promise<AccountCosmetics>;
+  /** The account ledger load (server/account_ledger_db.ts): which characters
+   *  on the account earned each deed and found each relic. */
+  loadAccountLedger: (accountId: number) => Promise<AccountLedger>;
   isConnectionRefused: (input: {
     blocked: boolean;
     isAdmin: boolean;
@@ -146,13 +151,10 @@ export interface WsAuthDeps {
   // Recomputes the account's bank bonus slots from live facts (email/Discord/wallet/
   // referrals) so a fresh join stamps the current entitlement into the character state.
   // Called on the FRESH-JOIN arm only, never on a resume (no mid-session recompute); a
-  // rejection fails the handshake exactly like a getCharacter failure. characterCount
-  // (the tutorial greeting's firstCharacter fact; the row being joined is already
-  // counted, so first means <= 1) rides the same single round trip rather than a
-  // second serial await on every handshake.
+  // rejection fails the handshake exactly like a getCharacter failure.
   bankBonusForAccount: (
     accountId: number,
-  ) => Promise<{ bonusSlots: number; sources: BankBonusSource[]; characterCount: number }>;
+  ) => Promise<{ bonusSlots: number; sources: BankBonusSource[] }>;
 }
 
 export interface WsAuthHandlers {
@@ -173,6 +175,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
     metaRequestUserData,
     metaEventSourceUrl,
     loadAccountCosmetics,
+    loadAccountLedger,
     isConnectionRefused,
     bufferHandshakeMessages,
     requestMetadata,
@@ -255,14 +258,16 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
     raw: string,
     req: http.IncomingMessage,
   ): Promise<void> {
-    let msg: any;
+    let parsed: unknown;
     try {
-      msg = JSON.parse(raw);
+      parsed = JSON.parse(raw);
     } catch (err) {
       console.error('ws auth: malformed first frame, rejecting handshake', err);
       rejectHandshake(ws, WS_AUTH_ERROR.badAuthMessage);
       return;
     }
+    const msg =
+      parsed !== null && typeof parsed === 'object' ? (parsed as Record<string, unknown>) : {};
     if (msg?.t !== ONLINE_WORLD_AUTH_TYPE) {
       const authType = msg?.t;
       const isWorldAuthAttempt =
@@ -352,12 +357,20 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
         rejectHandshake(ws, WS_AUTH_ERROR.tooManyConnections);
         return;
       }
-      const accountCosmetics = await loadAccountCosmetics(accountId);
+      // The account ledger rides beside the cosmetics: both are account-wide
+      // state the join hands the sim, so one round trip covers the pair.
+      const [accountCosmetics, accountLedger] = await Promise.all([
+        loadAccountCosmetics(accountId),
+        // A cosmetic table must never gate login: a failed read joins with a
+        // fresh ledger (the sim's own default) and the next join retries.
+        loadAccountLedger(accountId).catch(() => freshAccountLedger()),
+      ]);
       const joinMeta = {
         ...meta,
         ...metaRequestUserData(req, meta),
         sourceUrl: metaEventSourceUrl(req),
         accountCosmetics,
+        accountLedger,
         isAdmin,
         adminPermissions,
         clientSeed,
@@ -462,11 +475,6 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
             // Computed BEFORE the lease acquire so the lease-held window stays tight; a bare
             // await means a DB error fails the handshake exactly like a getCharacter failure.
             const bankBonus = await bankBonusForAccount(accountId);
-            // The tutorial greeting's account fact: this join's character is
-            // the account's first when the account-wide count is at most 1
-            // (the row being joined is already counted). Fresh-join arm only,
-            // like bankBonus, whose single query carries the count.
-            const firstCharacter = bankBonus.characterCount <= 1;
             leaseNonce = randomUUID();
             const leased = await acquireCharacterLease(character.id, accountId, leaseNonce);
             if (!leased) {
@@ -534,7 +542,6 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
                 hotbarLayout: queuedHotbarLayout ?? admittedCharacter.hotbar_layout ?? null,
                 leaseNonce,
                 bankBonus,
-                firstCharacter,
                 mutedUntil: moderation.mutedUntil,
                 reason: moderation.reason,
                 chatStrikes: moderation.strikes,
@@ -575,7 +582,14 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
         // here too: an in-flight purchase still holds the per-character mutex
         // and the recovery yields to it immediately.
         kickStoragePurchaseRecovery(session.characterId);
+        // Every processed frame (input here, pong below) stamps the socket's
+        // liveness clock for the sweep's hard silence deadline
+        // (server/keepalive_sweep.ts socketSilentPastDeadline); the handshake
+        // itself counts as the first frame so a fresh socket is never judged
+        // against a clock it has not started.
+        noteClientFrame(ws);
         ws.on('message', (data) => {
+          noteClientFrame(ws);
           game.handleMessage(session, String(data));
         });
         // A dropped socket starts the linkdead grace instead of logging the
@@ -596,6 +610,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
         // on socket identity so a late pong from a pre-resume socket cannot mask
         // a black-holed replacement.
         ws.on('pong', () => {
+          noteClientFrame(ws);
           if (session.ws === ws) session.awaitingPong = false;
         });
         // The socket can die DURING the handshake's awaits, before the close

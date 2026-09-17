@@ -8,6 +8,7 @@ import {
   awardSharedLootItem,
   CORPSE_INTERACT_GRACE_SECONDS,
   distributeLootCopper,
+  killSnapshotEligibility,
   lootRollGroupStatus,
   lootSlotVisibleTo,
   partyLootCandidatesForMob,
@@ -22,6 +23,11 @@ import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { Entity, LootEntry, LootSlot, SimEvent } from '../src/sim/types';
 import { expectDefined } from './helpers/defined';
+import {
+  UNMAPPED_FAMILY,
+  UNMAPPED_FAMILY_2,
+  withRetaggedTemplates,
+} from './helpers/unmapped_family';
 
 // Direct unit tests for the extracted loot-distribution module (L1). These drive the
 // module's exported `(ctx, ...)` functions through `sim.ctx` (the real SimContext
@@ -671,20 +677,19 @@ describe('loot_roll: corpse-loot helpers (module entry)', () => {
     // The fourth arm, and the reason the harvest half is isHarvestableCorpse
     // here and not a tag COUNT. fen_troll carried claw and tusk, neither
     // mapped at the time, so the command boundary refused a harvest and the
-    // claim could never be spent. Both are mapped now (this branch's own
-    // fix), so no shipped template is left in that shape: gills and horn are
-    // still waiting on theirs, so this retags a real, otherwise-untagged
-    // template (warlock_imp) for the duration of the case, restored in a
-    // finally. Counting tags held the 30s grace window open forever waiting
-    // on it, which is worse than the pre-#2513 world where a player could at
-    // least burn the claim to collapse the corpse.
+    // claim could never be spent. Both are mapped now (#2905), and Phase 11m
+    // mapped gills and horn after them, so no shipped template is left in
+    // that shape: this retags a real, otherwise-untagged template
+    // (warlock_imp) with the synthetic never-mapped families
+    // (tests/helpers/unmapped_family.ts) for the duration of the case,
+    // restored in a finally. Counting tags held the 30s grace window open
+    // forever waiting on it, which is worse than the pre-#2513 world where a
+    // player could at least burn the claim to collapse the corpse.
     const template = MOBS.warlock_imp;
-    const priorTags = template.componentTags;
-    template.componentTags = ['gills', 'horn'];
-    const sim = makeSim();
-    try {
+    const sim = withRetaggedTemplates({ warlock_imp: [UNMAPPED_FAMILY, UNMAPPED_FAMILY_2] }, () => {
+      const retaggedSim = makeSim();
       expect(isHarvestableCorpse(template.componentTags)).toBe(false);
-      const mob = createMob(sim.nextId++, template, 12, { x: 0, y: 0, z: 0 });
+      const mob = createMob(retaggedSim.nextId++, template, 12, { x: 0, y: 0, z: 0 });
       mob.dead = true;
       mob.lootable = true;
       mob.corpseTimer = 60;
@@ -692,14 +697,13 @@ describe('loot_roll: corpse-loot helpers (module entry)', () => {
       // the arm is chosen by the corpse's families, not by the claim.
       expect(mob.harvestClaimedBy).toBeNull();
       mob.loot = { copper: 0, items: [{ itemId: 'x', count: 0 }] };
-      sim.entities.set(mob.id, mob);
-      pruneCorpseLoot(sim.ctx, mob);
+      retaggedSim.entities.set(mob.id, mob);
+      pruneCorpseLoot(retaggedSim.ctx, mob);
       expect(mob.loot).toBeNull();
       expect(mob.lootable).toBe(false);
       expect(mob.corpseTimer).toBe(4);
-    } finally {
-      template.componentTags = priorTags;
-    }
+      return retaggedSim;
+    });
     // The discriminator, identical rig and identical unspent claim: a corpse
     // with a MAPPED family still takes the grace arm, so this is the predicate
     // narrowing and not the grace arm being deleted.
@@ -754,13 +758,15 @@ describe('loot_roll: heroic-append cross-group dedup arm', () => {
     expect(problems).toEqual([]);
   });
 
-  it('never shares an item id with the same mob’s base loot table', () => {
+  it('never shares an item id with base loot that also rolls on Heroic', () => {
     const problems: string[] = [];
     for (const [mobId, heroicEntries] of Object.entries(HEROIC_BOSS_LOOT)) {
       const template = MOBS[mobId];
       if (!template) continue;
       const baseIds = new Set(
-        template.loot.flatMap((entry: LootEntry) => (entry.itemId ? [entry.itemId] : [])),
+        template.loot.flatMap((entry: LootEntry) =>
+          entry.itemId && !entry.normalOnly ? [entry.itemId] : [],
+        ),
       );
       for (const entry of heroicEntries) {
         if (entry.itemId && baseIds.has(entry.itemId)) {
@@ -813,6 +819,30 @@ describe('loot_roll: heroic-append cross-group dedup arm', () => {
 });
 
 describe('loot_roll: bind-on-pickup party trade window on soulbound awards', () => {
+  it('keeps the exact drop group eligible when a member disconnects before distribution', () => {
+    const { sim, a, b, c } = partyOfThree();
+    playerMeta(sim, a).characterId = 101;
+    playerMeta(sim, b).characterId = 102;
+    playerMeta(sim, c).characterId = 103;
+    const mob = createMob(sim.nextId++, MOBS.ignivar_herald_of_the_last_flame, 20, {
+      x: 0,
+      y: 0,
+      z: 0,
+    });
+    mob.lootRecipientIds = [a, b, c];
+    rollLoot(sim.ctx, mob, playerMeta(sim, a), [
+      playerMeta(sim, a),
+      playerMeta(sim, b),
+      playerMeta(sim, c),
+    ]);
+    playerMeta(sim, b).leaving = true;
+
+    expect(killSnapshotEligibility(sim.ctx, mob)).toEqual({
+      names: ['Aaa', 'Bbb', 'Ccc'],
+      characterIds: [101, 102, 103],
+    });
+  });
+
   it('stamps the drop-moment candidate snapshot onto a need/greed win of a soulbound item', () => {
     const { sim, a, b, c } = partyOfThree();
     const mob = deadCorpse(sim, a, [a, b, c], {

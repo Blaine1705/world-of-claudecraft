@@ -643,7 +643,7 @@ at least matching the retired flat-stat package it replaces.
 
 | Set | Spec | 2-piece | 4-piece |
 |---|---|---|---|
-| Aetherweave Vestments (chronoweave) | arcane, Chronomancy | Temporal Echo converts 50 percent of your single-target Arcane damage into healing. Damage taken no longer delays your spellcasting. | Temporal Cascade's cooldown is reduced by 5 sec. |
+| Aetherweave Vestments (chronoweave) | arcane, Chronomancy | Temporal Echo converts 50 percent of your other single-target Arcane damage into healing. Aether Surge and Aether Darts instead convert 200 percent of their damage. Damage taken no longer delays your spellcasting. | Temporal Cascade's cooldown is reduced by 5 sec and its mana cost is reduced by 30 percent. |
 | Pyroclast Regalia (pyroclast) | fire, Pyromancy | Scald always critically strikes targets at or below 50 percent health. Damage taken no longer delays your spellcasting. | Your Fire spells' critical strikes outside Phoenix Trance reduce its remaining cooldown by 2 sec. |
 | Frostquench Weave (frostquench) | frost, Cryomancy | Rimelance critical strikes bank a second Icicle, up to the maximum of 5. Damage taken no longer delays your spellcasting. | Winterlash plants 3 Winter's Chill charges, up from 2. |
 
@@ -707,7 +707,7 @@ contested across the whole raid rather than inside one armor class:
 Token items: "Helm Sigil of the Anvil", "Mantle Sigil of the Ember", "Robe
 Sigil of the Tempest", and so on for all 15 (slot nouns Helm, Mantle, Robe,
 Grip, Legging). Ids follow `sigil_<group>_<slot>`. Each token is kind 'tool',
-epic quality, soulbound, noDiscard, stackSize 20, requiredClass locked to its
+epic quality, soulbound, discardable, stackSize 20, requiredClass locked to its
 three classes, exactly the heroic_mark pattern.
 
 ### Redemption
@@ -1052,9 +1052,12 @@ Each phase is a reviewable commit (or small commit series) with its tests:
    catalog of 58 bonuses lives in the set tables above and in the item
    catalog; implementation rides the TalentEffect seam.
 
-## Binding rules: the party trade window (maintainer directives, 2026-08-29)
+## Binding rules: sigils and tier pieces bind, ordinary drops trade
 
-Implemented alongside the soulbound rulings above:
+The 15 class-tier redemption sigils and the 145 redeemed tier set pieces
+are soulbound. The ordinary boss drops (offset, jewelry, held, weapons)
+are transferable. The party trade window applies when a soulbound item,
+in this tier a sigil, is awarded from party loot:
 
 - Every SOULBOUND item awarded from party boss loot (need/greed win,
   master-loot assignment, round-robin, or a shared direct pickup) is

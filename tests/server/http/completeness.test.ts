@@ -112,6 +112,7 @@ const REGISTRY_ONLY_PATHS = new Set<string>([
   '/api/guilds/roster',
   '/api/reliquary/rarity',
   '/api/deeds/broadcasts',
+  '/api/discord/queue-pings',
   '/api/characters/:id/deeds-recent',
   '/api/characters/:id/appearance-reroll',
   '/api/steam/link',
@@ -140,6 +141,7 @@ const REGISTRY_ONLY_PATHS = new Set<string>([
   '/api/woc-market/step-up/challenge',
   '/api/woc-market/history/:itemId',
   '/api/woc-market/seller-history/:name',
+  '/api/woc-market/sales',
   '/api/woc-market/listings/:id/cancel',
   '/api/woc-market/listings/:id/bids',
   '/api/woc-market/bids/:id/bond-quote',
@@ -352,6 +354,10 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     { method: 'GET', path: '/api/guilds/roster' },
     { method: 'GET', path: '/api/deeds/broadcasts' },
     { method: 'POST', path: '/api/deeds/broadcasts' },
+    // The queue-pop Discord DM opt-in toggle (server/discord_queue_pings.ts):
+    // registry-only on the deeds broadcasts shape.
+    { method: 'GET', path: '/api/discord/queue-pings' },
+    { method: 'POST', path: '/api/discord/queue-pings' },
     // The reliquary rarity read (server/reliquary.ts): registry-only on the
     // same terms as the deeds family, and it shares their cache and flight.
     { method: 'GET', path: '/api/reliquary/rarity' },
@@ -406,6 +412,7 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     { method: 'POST', path: '/api/woc-market/offers/:id/withdraw' },
     { method: 'GET', path: '/api/woc-market/history/:itemId' },
     { method: 'GET', path: '/api/woc-market/seller-history/:name' },
+    { method: 'GET', path: '/api/woc-market/sales' },
     { method: 'POST', path: '/api/woc-market/step-up/challenge' },
     { method: 'POST', path: '/api/woc-market/listings' },
     { method: 'POST', path: '/api/woc-market/listings/:id/cancel' },

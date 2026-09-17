@@ -8,9 +8,11 @@ import {
 } from '../src/ui/hud/action_bar/action_bar_layout_sync';
 import { attackSlotStorageKey } from '../src/ui/hud/action_bar/hotbar';
 import {
+  ACTION_BAR_LAYOUT_FORMS,
   ACTION_BAR_LAYOUT_MAX_ID_LEN,
   ACTION_BAR_LAYOUT_MAX_PROFILE_KEYS,
   ACTION_BAR_LAYOUT_MAX_SLOTS,
+  ACTION_BAR_LAYOUT_MAX_SPEC_KEYS,
   ACTION_BAR_LAYOUT_PROFILES,
   type ActionBarLayout,
   type ActionBarLayoutProfile,
@@ -89,6 +91,22 @@ describe('sanitizeActionBarLayout (untrusted payload bounds)', () => {
     expect(Object.keys(clean?.forms ?? {})).toEqual(['normal']);
   });
 
+  it('drops the retired Vale Cup sport form like any other unknown key', () => {
+    // The release retired the Vale Cup, so a sport bar can no longer be
+    // arranged or shown and the token was left in the form list as residue.
+    // Both halves are pinned: the token is GONE from the live list, and a
+    // layout persisted before the retirement still DEGRADES the ignore-unknown
+    // way rather than rejecting the whole payload, which would cost a player
+    // their real bars over a dead form.
+    const clean = sanitizeActionBarLayout({
+      v: 1,
+      forms: { normal: { bar: [] }, sport: { bar: [] } },
+    });
+    expect(clean).not.toBeNull();
+    expect(Object.keys(clean?.forms ?? {})).toEqual(['normal']);
+    expect(ACTION_BAR_LAYOUT_FORMS).toEqual(['normal', 'bear', 'cat', 'cat_stealth', 'stealth']);
+  });
+
   it('rejects a payload with an abusive number of form keys', () => {
     const forms: Record<string, unknown> = {};
     for (let i = 0; i < 64; i++) forms[`junk${i}`] = { bar: [] };
@@ -105,9 +123,73 @@ describe('sanitizeActionBarLayout (untrusted payload bounds)', () => {
     expect(clean?.forms.normal?.bar).toEqual([null, null, null, null]);
   });
 
+  it('accepts per-spec normal-form layouts beside the forms', () => {
+    const clean = sanitizeActionBarLayout({
+      v: 1,
+      forms: { normal: { bar: [] } },
+      specs: { arms: { bar: [{ type: 'ability', id: 'mortal_strike' }], attack: null } },
+    });
+    expect(clean?.specs?.arms?.bar).toEqual([{ type: 'ability', id: 'mortal_strike' }]);
+    expect(clean?.specs?.arms?.attack).toBeNull();
+    expect(Object.keys(clean?.forms ?? {})).toEqual(['normal']);
+  });
+
+  it('omits specs entirely when the payload carries none', () => {
+    expect(sanitizeActionBarLayout({ v: 1, forms: {} })?.specs).toBeUndefined();
+    expect(sanitizeActionBarLayout({ v: 1, forms: {}, specs: {} })?.specs).toBeUndefined();
+  });
+
+  it('drops a spec key outside the spec-id charset but keeps the well-formed ones', () => {
+    const clean = sanitizeActionBarLayout({
+      v: 1,
+      forms: {},
+      specs: {
+        ['x'.repeat(33)]: { bar: [] },
+        Arms: { bar: [] },
+        '': { bar: [] },
+        ['__proto__']: { bar: [] },
+        fury: { bar: [] },
+      },
+    });
+    expect(clean).not.toBeNull();
+    expect(Object.keys(clean?.specs ?? {})).toEqual(['fury']);
+  });
+
+  it('rejects a payload with an abusive number of spec keys', () => {
+    const specs: Record<string, unknown> = {};
+    for (let i = 0; i <= ACTION_BAR_LAYOUT_MAX_SPEC_KEYS; i++) specs[`spec${i}`] = { bar: [] };
+    expect(sanitizeActionBarLayout({ v: 1, forms: {}, specs })).toBeNull();
+  });
+
+  it('rejects a garbage spec layout or an oversized spec bar outright', () => {
+    expect(sanitizeActionBarLayout({ v: 1, forms: {}, specs: { arms: 'garbage' } })).toBeNull();
+    expect(
+      sanitizeActionBarLayout({ v: 1, forms: {}, specs: { arms: { bar: 'nope' } } }),
+    ).toBeNull();
+    const bar = Array.from({ length: ACTION_BAR_LAYOUT_MAX_SLOTS + 1 }, () => null);
+    expect(sanitizeActionBarLayout({ v: 1, forms: {}, specs: { arms: { bar } } })).toBeNull();
+  });
+
+  it('nulls a garbage slot inside a spec bar instead of rejecting the payload', () => {
+    const clean = sanitizeActionBarLayout({
+      v: 1,
+      forms: {},
+      specs: {
+        arms: {
+          bar: [
+            { type: 'nope', id: 'x' },
+            { type: 'item', id: 'field_kit' },
+          ],
+        },
+      },
+    });
+    expect(clean?.specs?.arms?.bar).toEqual([null, { type: 'item', id: 'field_kit' }]);
+  });
+
   it('reports emptiness', () => {
     expect(actionBarLayoutIsEmpty({ v: 1, forms: {} })).toBe(true);
     expect(actionBarLayoutIsEmpty({ v: 1, forms: { normal: { bar: [] } } })).toBe(false);
+    expect(actionBarLayoutIsEmpty({ v: 1, forms: {}, specs: { arms: { bar: [] } } })).toBe(false);
   });
 });
 
@@ -249,6 +331,15 @@ describe('the per-profile localStorage key scheme', () => {
     );
   });
 
+  it('suffixes the specialization when provided for normal form', () => {
+    expect(actionBarSlotMapKey(CLS, NAME, 'desktop', 'normal', 'arms')).toBe(
+      'woc_hotbar_warrior_LayoutTester_arms',
+    );
+    expect(actionBarSlotMapKey(CLS, NAME, 'touch', 'normal', 'fury')).toBe(
+      'woc_hotbar_warrior_LayoutTester_touch_fury',
+    );
+  });
+
   it('resolves the touch interface to the touch profile and everything else to desktop', () => {
     expect(actionBarLayoutProfileForSurface(true)).toBe('touch');
     expect(actionBarLayoutProfileForSurface(false)).toBe('desktop');
@@ -348,6 +439,22 @@ describe('capture/apply round trip', () => {
     const captured = captureActionBarLayout(storage, CLS, NAME, 'touch');
     expect(captured.forms.normal?.bar).toEqual(layout.forms.normal?.bar);
     expect(captured.forms.stealth?.bar).toEqual(layout.forms.stealth?.bar);
+  });
+
+  it('captures and applies spec-specific action bar layouts', () => {
+    const storage = new MemoryStorage();
+    const layout: ActionBarLayout = {
+      v: 1,
+      forms: { normal: { bar: [{ type: 'ability', id: 'mortal_strike' }] } },
+      specs: {
+        arms: { bar: [{ type: 'ability', id: 'mortal_strike' }] },
+        fury: { bar: [{ type: 'ability', id: 'bloodthirst' }] },
+      },
+    };
+    applyActionBarLayout(storage, CLS, NAME, 'desktop', layout);
+    const captured = captureActionBarLayout(storage, CLS, NAME, 'desktop');
+    expect(captured.specs?.arms?.bar).toEqual(layout.specs?.arms?.bar);
+    expect(captured.specs?.fury?.bar).toEqual(layout.specs?.fury?.bar);
   });
 
   it('leaves an absent form untouched on the device (version-tolerant)', () => {

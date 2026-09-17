@@ -40,6 +40,7 @@
   import Staff from './pages/Staff.svelte';
   import TopHolders from './pages/TopHolders.svelte';
   import Flags from './pages/Flags.svelte';
+  import MarketMetrics from './pages/MarketMetrics.svelte';
 
   // Root of the admin SPA. Shows the login overlay until authed, then the shared
   // navigation shell and the routed page. The {#key session.locale} wrapper
@@ -49,6 +50,7 @@
   let route = $state<AdminRoute>(currentAdminRoute());
   const PAGE_COMPONENTS = {
     overview: Overview,
+    'market-metrics': MarketMetrics,
     accounts: Accounts,
     characters: Characters,
     'online-players': OnlinePlayers,

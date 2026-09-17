@@ -7,7 +7,7 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { FINDER_ACTIVITIES } from '../src/sim/content/dungeon_finder';
 import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
-import { ITEMS, MOBS } from '../src/sim/data';
+import { ITEMS, MOBS, zoneAt } from '../src/sim/data';
 import {
   buildDungeonFinderView,
   buildFinderProposalPopupView,
@@ -166,47 +166,61 @@ describe('dungeon finder view core', () => {
       ),
     );
     const boss = view.detail?.encounters.find((e) => e.final);
+    // One guaranteed equipment group, plus the unchanged bonus farming group.
     expect(boss?.heroicGroups.length).toBe(2);
-    expect(boss?.heroicGroups.every((g) => g.guaranteed)).toBe(true);
+    expect(boss?.heroicGroups.filter((g) => g.guaranteed).length).toBe(1);
+    expect(boss?.heroicGroups.filter((g) => !g.guaranteed).length).toBe(1);
+    expect(boss?.groups).toEqual([]);
     expect(view.detail?.heroicMarks).toBe(1);
     // The heroic finale preview advertises the raised heroicCopper base the
     // kill actually pays; a non-finale encounter keeps its normal copper.
     expect(boss?.copper).toBe(100000);
     const sexton = view.detail?.encounters.find((e) => e.mobId === 'sexton_marrow');
     expect(sexton?.copper).toBe(400);
-    // The heroic-slot gate mirrors the roller: keyed on the encounter having a
-    // HEROIC_BOSS_LOOT table, not on it being the finale, so a non-finale
-    // encounter without a table previews no heroic slot.
-    expect(HEROIC_BOSS_LOOT.sexton_marrow).toBeUndefined();
-    expect(sexton?.heroicGroups).toEqual([]);
+    expect(sexton?.heroicGroups).toHaveLength(1);
+    expect(sexton?.heroicGroups[0].guaranteed).toBe(true);
+
+    const wildheart = live(
+      buildDungeonFinderView(
+        input({
+          playerLevel: 20,
+          specRole: 'tank',
+          selectedActivityId: 'wildheart_basin_heroic',
+        }),
+      ),
+    );
+    const beastmaster = wildheart.detail?.encounters.find(
+      (e) => e.mobId === 'wildheart_beastmaster',
+    );
+    expect(beastmaster?.final).toBe(false);
+    expect(beastmaster?.heroicSingles.map((i) => i.itemId)).toContain('heroic_duskwhisper');
   });
 
-  it('previews a NON-finale encounter heroic table on Heroic only (the roller gate, not enc.final)', () => {
-    // The positive arm of the gate above: inject a heroic table for a
-    // catalogued non-finale encounter and the Heroic preview must show it
-    // while the Normal preview must not. With the old `enc.final` gate this
-    // assertion fails, which is exactly the regression it protects against
-    // (no live catalogue row exercises the branch yet).
-    expect(HEROIC_BOSS_LOOT.sexton_marrow).toBeUndefined();
-    HEROIC_BOSS_LOOT.sexton_marrow = [
-      { itemId: 'mistveil_cord', chance: 1, rollGroup: 'finder_test_nonfinal_heroic' },
-    ];
-    try {
-      const sextonOn = (activityId: string) =>
-        live(
-          buildDungeonFinderView(
-            input({ playerLevel: 20, specRole: 'tank', selectedActivityId: activityId }),
-          ),
-        ).detail?.encounters.find((e) => e.mobId === 'sexton_marrow');
-      const heroic = sextonOn('hollow_crypt_heroic');
-      expect(heroic?.final).toBe(false);
-      expect(heroic?.heroicGroups).toMatchObject([
-        { guaranteed: true, items: [{ itemId: 'mistveil_cord', chance: 1 }] },
-      ]);
-      expect(sextonOn('hollow_crypt_normal')?.heroicGroups).toEqual([]);
-    } finally {
-      delete HEROIC_BOSS_LOOT.sexton_marrow;
-    }
+  it('previews the live non-finale equipment budget on Heroic only', () => {
+    const sextonOn = (activityId: string) =>
+      live(
+        buildDungeonFinderView(
+          input({
+            playerLevel: 20,
+            specRole: 'tank',
+            selectedActivityId: activityId,
+          }),
+        ),
+      ).detail?.encounters.find((e) => e.mobId === 'sexton_marrow');
+    const heroic = sextonOn('hollow_crypt_heroic');
+    expect(heroic?.final).toBe(false);
+    expect(heroic?.heroicGroups).toMatchObject([
+      {
+        guaranteed: true,
+        items: [
+          { itemId: 'quilted_trousers', chance: 0.5 },
+          { itemId: 'oiled_boots', chance: 0.5 },
+        ],
+      },
+    ]);
+    expect(heroic?.groups).toEqual([]);
+    expect(heroic?.singles).toEqual([]);
+    expect(sextonOn('hollow_crypt_normal')?.heroicGroups).toEqual([]);
   });
 
   it('maps raid entrances to the Abandoned Crypt door with its zone', () => {
@@ -222,6 +236,51 @@ describe('dungeon finder view core', () => {
     expect(view.detail?.entrance.x).toBe(-152);
     expect(view.detail?.entrance.z).toBe(610);
     expect(view.detail?.entrance.zoneId.length).toBeGreaterThan(0);
+  });
+
+  it('surfaces the Ignivar raid weekly lockout under the arena id per difficulty', () => {
+    const normal = live(
+      buildDungeonFinderView(
+        input({
+          playerLevel: 20,
+          specRole: 'tank',
+          selectedActivityId: 'ignivar_raid_arena_normal',
+          lockouts: [{ id: 'ignivar_raid_arena', msRemaining: 3 * 86_400_000 }],
+        }),
+      ),
+    );
+    expect(normal.detail?.lockout).toBe('weekly');
+    expect(normal.detail?.lockedMinutes).toBe(3 * 24 * 60);
+    expect(normal.detail?.entrance.zoneId).toBe(zoneAt(503.05, 2243.7).id);
+    const heroic = live(
+      buildDungeonFinderView(
+        input({
+          playerLevel: 20,
+          specRole: 'tank',
+          selectedActivityId: 'ignivar_raid_arena_heroic',
+          lockouts: [{ id: 'ignivar_raid_arena', msRemaining: 3 * 86_400_000 }],
+        }),
+      ),
+    );
+    expect(heroic.detail?.lockout).toBe('weekly');
+    expect(heroic.detail?.lockedMinutes).toBe(0);
+    // The family locks per boss room: a Varkhul-only lock (the Inner Crucible)
+    // still surfaces on the one catalogue row, and the longest lock wins.
+    const varkhulOnly = live(
+      buildDungeonFinderView(
+        input({
+          playerLevel: 20,
+          specRole: 'tank',
+          selectedActivityId: 'ignivar_raid_arena_heroic',
+          lockouts: [
+            { id: 'ignivar_raid_arena:heroic', msRemaining: 60_000 },
+            { id: 'ignivar_inner_crucible:heroic', msRemaining: 2 * 86_400_000 },
+            { id: 'ignivar_inner_crucible', msRemaining: 5 * 86_400_000 },
+          ],
+        }),
+      ),
+    );
+    expect(varkhulOnly.detail?.lockedMinutes).toBe(2 * 24 * 60);
   });
 
   it('surfaces my lockout on the matching difficulty only (minute granularity)', () => {

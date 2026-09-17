@@ -13,7 +13,11 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { TargetDotRow, TargetDotsState } from '../src/ui/hud/target_dots';
 import { TargetDotsPainter } from '../src/ui/hud/target_dots';
-import type { PainterHostWriters } from '../src/ui/painter_host';
+import {
+  makeWriterFacet,
+  type PainterHostWriters,
+  type SingleSlotEntry,
+} from '../src/ui/painter_host';
 
 /** A writers facet that records every call and elides nothing, so a test sees
  *  exactly the writes the painter asked for. */
@@ -163,22 +167,33 @@ describe('TargetDotsPainter', () => {
   it('shows the stack badge only above one stack', () => {
     painter.update(stateOf([makeRow({ key: '1:corruption', stacks: 3 })]));
     const stacksEl = root.querySelector('.td-stacks') as HTMLElement;
-    expect(rec.calls.some((c) => c.el === stacksEl && c.kind === 'display' && c.a === '')).toBe(
-      true,
-    );
+    // Display rides setStyleProp('display', ...), not setDisplay: this node
+    // also takes setText for the count, and the two single-slot writers
+    // share one cache entry per element (painter_host.ts single-slot
+    // collision), so a second facet on the same node must take its own slot.
+    expect(
+      rec.calls.some(
+        (c) => c.el === stacksEl && c.kind === 'style' && c.a === 'display' && c.b === '',
+      ),
+    ).toBe(true);
     expect(rec.calls.some((c) => c.el === stacksEl && c.kind === 'text' && c.a === '3')).toBe(true);
     rec.calls.length = 0;
     painter.update(stateOf([makeRow({ key: '1:corruption', stacks: 0 })]));
-    expect(rec.calls.some((c) => c.el === stacksEl && c.kind === 'display' && c.a === 'none')).toBe(
-      true,
-    );
+    expect(
+      rec.calls.some(
+        (c) => c.el === stacksEl && c.kind === 'style' && c.a === 'display' && c.b === 'none',
+      ),
+    ).toBe(true);
   });
 
   it('reveals the overflow line only when the cap dropped rows', () => {
     const overflowEl = root.querySelector('.td-overflow') as HTMLElement;
     painter.update(stateOf([makeRow({ key: '1:corruption' })], 0));
+    // Same slot-collision fix as the stacks badge: display is setStyleProp.
     expect(
-      rec.calls.some((c) => c.el === overflowEl && c.kind === 'display' && c.a === 'none'),
+      rec.calls.some(
+        (c) => c.el === overflowEl && c.kind === 'style' && c.a === 'display' && c.b === 'none',
+      ),
     ).toBe(true);
     rec.calls.length = 0;
     painter.update(stateOf([makeRow({ key: '1:corruption' })], 6));
@@ -213,5 +228,74 @@ describe('TargetDotsPainter', () => {
     // Structure is identical; only attributes/text the writers stub recorded
     // (and never applied) would have changed it.
     expect(root.innerHTML).toBe(before);
+  });
+});
+
+describe('TargetDotsPainter: stacks + overflow elide across steady frames (real facet)', () => {
+  // recordingWriters above never elides (it has no cache to collide in), so it
+  // cannot show the single-slot collision painter_host.ts documents: setDisplay
+  // and setText sharing one (kind, value) cache entry per element (the exact
+  // shape that shipped on the aura stacks badge). This drives the SAME painter
+  // over the REAL facet and REAL caches instead, the way
+  // tests/painter_slot_collision.test.ts proves it for auras_painter.
+  function realFacet() {
+    const counts = { writes: 0, skips: 0 };
+    const facet = makeWriterFacet(
+      new WeakMap<HTMLElement, SingleSlotEntry>(),
+      new WeakMap<HTMLElement, Map<string, string>>(),
+      new WeakMap<HTMLElement, Map<string, string>>(),
+      new WeakMap<HTMLElement, Map<string, string>>(),
+      () => {
+        counts.writes++;
+      },
+      () => {
+        counts.skips++;
+      },
+    );
+    return { facet, counts };
+  }
+
+  it('a positive-stacks row with overflow writes nothing on a steady repaint, and hide/show still work', () => {
+    const { facet, counts } = realFacet();
+    const r = document.createElement('div');
+    document.body.appendChild(r);
+    const p = new TargetDotsPainter({
+      root: () => r,
+      writers: facet,
+      iconBackground: (key) => `url(${key})`,
+      rowLabel: (aura, target) => `${aura} on ${target}`,
+      frameLabel: () => 'Target Dots',
+      overflowLabel: (n) => `${n} more not shown`,
+      secondsSuffix: () => 's',
+    });
+    const positive = () => stateOf([makeRow({ key: '1:corruption', stacks: 3 })], 2);
+    const stacksEl = () => r.querySelector('.td-stacks') as HTMLElement;
+    const overflowEl = () => r.querySelector('.td-overflow') as HTMLElement;
+
+    p.update(positive()); // establishing frame: writes expected
+    expect(stacksEl().style.display).toBe('');
+    expect(stacksEl().textContent).toBe('3');
+    expect(overflowEl().style.display).toBe('');
+    expect(overflowEl().textContent).toBe('2 more not shown');
+
+    counts.writes = 0;
+    counts.skips = 0;
+    p.update(positive()); // steady frame, identical model: nothing should write
+    // Before the fix, setDisplay + setText shared one cache entry on both
+    // nodes, so BOTH writes bypassed elision every frame, forever.
+    expect(counts.writes).toBe(0);
+    expect(counts.skips).toBeGreaterThan(0);
+
+    // Hide still writes and reads correctly.
+    p.update(stateOf([makeRow({ key: '1:corruption', stacks: 0 })], 0));
+    expect(stacksEl().style.display).toBe('none');
+    expect(overflowEl().style.display).toBe('none');
+
+    // Show again still writes and reads correctly.
+    p.update(positive());
+    expect(stacksEl().style.display).toBe('');
+    expect(stacksEl().textContent).toBe('3');
+    expect(overflowEl().style.display).toBe('');
+    expect(overflowEl().textContent).toBe('2 more not shown');
   });
 });

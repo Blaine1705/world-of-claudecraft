@@ -1,7 +1,9 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { GUILD_CREATION_FEE_COPPER } from '../src/sim/guild_bank';
-import { ensureLocaleLoaded, setLanguage, supportedLanguages } from '../src/ui/i18n';
-import { localizeServerText, tServer } from '../src/ui/server_i18n';
+import { ensureLocaleLoaded, formatMoney, setLanguage, supportedLanguages } from '../src/ui/i18n';
+import { localizeServerText, parseEnglishCompactMoney, tServer } from '../src/ui/server_i18n';
 
 // Messages the authoritative server emits as plain English; the client must
 // re-render them in the active locale (friends/guild/world/who/moderation).
@@ -48,7 +50,15 @@ describe('server-sent message localization', () => {
     // because both files are S3 blind spots and a drift between the emit
     // literal and these matchers ships English to every locale.
     'You need 1 gold to found a guild.',
+    // Guild bank gold movement notices (server/guild_bank_gold_notice.ts), an
+    // S3 blind spot like the two above; the money token covers every unit mix.
+    'Ada deposited 5g 20s 3c into the guild bank.',
+    'Ada deposited 5g 0s into the guild bank.',
+    'Bob withdrew 25s from the guild bank.',
+    'Bob withdrew 7c from the guild bank.',
     'The guild bank must be emptied before the guild can be disbanded.',
+    'You are busy. Try again in a moment.',
+    'The guild bank is still saving a recent change. Try again in a moment.',
     // guildCreate's screened-name refusal (guild.nameNotAllowed): emitted from
     // server/social.ts, which the S3 guard does not scan, so the emit literal
     // is pinned to the EXACT matcher here like the tiers above.
@@ -132,6 +142,23 @@ describe('server-sent message localization', () => {
       expect(who).toContain('Carl');
       expect(who).toContain('12');
     }
+    setLanguage('en');
+  });
+
+  it('parses the guild bank notice money back to copper and re-renders it per locale', async () => {
+    expect(parseEnglishCompactMoney('5g 20s 3c')).toBe(52_003);
+    expect(parseEnglishCompactMoney('5g 0s')).toBe(50_000);
+    expect(parseEnglishCompactMoney('25s')).toBe(2_500);
+    expect(parseEnglishCompactMoney('7c')).toBe(7);
+    expect(parseEnglishCompactMoney('')).toBe(0);
+    await ensureLocaleLoaded('de_DE');
+    setLanguage('de_DE');
+    const out = localizeServerText('Ada deposited 5g 20s 3c into the guild bank.');
+    expect(out).toBe(
+      tServer('guild.bankGoldDeposited', { name: 'Ada', amount: formatMoney(52_003) }),
+    );
+    expect(out).toContain('Ada');
+    expect(out).toContain('Gildenbank');
     setLanguage('en');
   });
 
@@ -337,6 +364,42 @@ describe('localizeServerDuration maps formatDuration output (via the filter-mute
       expect(localizeServerText(input), `es duration ${c.duration}`).toBe(
         `Estás silenciado y no puedes chatear durante ${c.es} más.`,
       );
+    }
+    setLanguage('en');
+  });
+});
+
+// The S3 emit scanner (tests/localization_fixes.test.ts) reads server/game.ts
+// only, and the guild bank op coordinator emits its own player notices
+// (host.sendPlayerNotice literals) from a sibling module, so those literals
+// would drift from the matcher unguarded. Pin them here: every literal the
+// coordinator emits must be recognized and must not stay English.
+describe('guild bank op coordinator notices stay matchable', () => {
+  const src = fs.readFileSync(
+    path.resolve(process.cwd(), 'server/guild_bank_op_coordinator.ts'),
+    'utf8',
+  );
+  const literals = [...src.matchAll(/sendPlayerNotice\(\s*'((?:[^'\\]|\\.)*)'/g)].map((m) => m[1]);
+
+  it('finds the coordinator notices, the unsettled gate refusal included', () => {
+    expect(literals).toContain(
+      'The guild bank is still saving a recent change. Try again in a moment.',
+    );
+    expect(literals).toContain('The guild bank is closing. Try again in a moment.');
+    expect(literals).toContain('You are busy. Try again in a moment.');
+  });
+
+  it('localizes every coordinator notice in every non-English locale', async () => {
+    for (const lang of supportedLanguages) {
+      await ensureLocaleLoaded(lang);
+      setLanguage(lang);
+      for (const text of literals) {
+        const out = localizeServerText(text);
+        expect(out, `${lang}: "${text}" should be recognized`).not.toBeNull();
+        if (lang !== 'en' && lang !== 'en_CA') {
+          expect(out, `${lang}: "${text}" should not stay English`).not.toBe(text);
+        }
+      }
     }
     setLanguage('en');
   });

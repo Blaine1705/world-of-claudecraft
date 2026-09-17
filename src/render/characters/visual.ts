@@ -6,7 +6,10 @@
 // on the shared tinted-material cache (which disposes a clone only once no
 // visual mounts it).
 import * as THREE from 'three';
-import { offhandMirrorsWeaponSkin } from '../../sim/content/weapon_skin_rules';
+import {
+  mainhandShowsWeaponSkin,
+  offhandMirrorsWeaponSkin,
+} from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import type { OverheadEmoteId } from '../../world_api';
 import { recordBuildSpan, timeBuildSpan } from '../build_spans';
@@ -33,7 +36,9 @@ import {
   drivesPose,
   locomotionTimeScale,
   pickProxyHeight,
+  SUBMERGED_HEAD_FRACTION,
   scanAnimRepair,
+  shouldInterruptLanding,
   shouldPlayLanding,
   shouldPlayOutCastExit,
 } from './anim_state';
@@ -97,6 +102,7 @@ import {
   weaponSkinOrientPin,
 } from './skin_attack';
 import { configureTightBoneTextures } from './skin_gpu_layout';
+import { applySkinnedCullBounds } from './skinned_cull_bounds';
 import { applySoulRendOverlay } from './soul_rend_overlay';
 import { soulRendPrewarmTargets } from './soul_rend_prewarm_core';
 import { createStowTransition, forceStow, requestStow, tickStow } from './stow_transition';
@@ -158,6 +164,10 @@ const BOW_PIN_BLEND_S = 0.12; // engage/disengage fade for the orientation pins
 
 const FADE = 0.22;
 const ONESHOT_FADE = 0.1;
+/** Near-instant crossfade for a `cutToIdle` visual: not zero, because three
+ *  needs a frame to hand the pose over cleanly, but short enough to read as a
+ *  hard stop. */
+const CUT_FADE = 0.02;
 /** Idle-breaker cadence (seconds): a floor plus a per-fire jitter, so several
  *  copies of the same rig standing together never fidget in lockstep.
  *
@@ -227,18 +237,6 @@ const CLIMB_BLEND_RATE = 14;
 /** Ride (straddle) pose bones. The foot chain is only needed here, so it is not
  *  folded into the climb's arrays. Names are the three.js-sanitized KayKit
  *  Rig_Medium ones (the GLB spells them `upperleg.l`; the loader drops the dot). */
-/** Base states in which the body is TRAVELLING. A touchdown one-shot yields to
- *  any of them (see the landing cancel in update): finishing a recovery pose
- *  while sliding forward reads as a freeze, whatever the clip is doing. */
-const MOVING_STATES: ReadonlySet<BaseState> = new Set<BaseState>([
-  'walk',
-  'walkBack',
-  'run',
-  'wade',
-  'swim',
-  'swimSurface',
-]);
-
 const RIDE_FOOT_BONES = ['footl', 'footr'] as const;
 const RIDE_HIP_BONE = 'hips';
 /** Blend in/out rate for the straddle (1/s): a mount summon should settle the
@@ -510,7 +508,7 @@ export class CharacterVisual {
       attachSharedDepthMaterials(decal, decal.material);
       decal.castShadow = this.shadowOn;
       decal.receiveShadow = false;
-      decal.frustumCulled = false;
+      applySkinnedCullBounds(decal, this.root, this.height);
       this.casters.push(decal);
       this.revealDecalOnCompile(decal);
     }
@@ -900,9 +898,11 @@ export class CharacterVisual {
         mesh.castShadow = castsShadow;
         mesh.receiveShadow = false;
         if (!castsShadow) return;
-        // skinned bounds drift outside bind-pose spheres; entity-level culling
-        // (80u draw range) already bounds the cost
-        if ((mesh as unknown as THREE.SkinnedMesh).isSkinnedMesh) mesh.frustumCulled = false;
+        // a padded sphere lets three cull this caster in each pass on its own
+        // question (the camera frustum, then the shadow camera's own ortho
+        // box), which a bind-pose sphere could not answer: skinned_cull_bounds
+        const skinned = mesh as unknown as THREE.SkinnedMesh;
+        if (skinned.isSkinnedMesh) applySkinnedCullBounds(skinned, this.root, this.height);
         this.casters.push(mesh);
       });
 
@@ -1032,7 +1032,7 @@ export class CharacterVisual {
     const landClip = this.def.clips.land;
     if (
       landClip &&
-      shouldPlayLanding(this.wasAirborne, s.airborne, s.dead, !!this.action(landClip))
+      shouldPlayLanding(this.wasAirborne, s.airborne, s.dead, !!this.action(landClip), s.swimming)
     ) {
       this.playOneShot(landClip, 1);
       this.currentOneShotIsLanding = true;
@@ -1061,14 +1061,13 @@ export class CharacterVisual {
       } else if (
         this.currentIsOneShot &&
         this.currentOneShotIsLanding &&
-        MOVING_STATES.has(desired)
+        shouldInterruptLanding(s)
       ) {
         // Same trap as the idle-breaker above, one state over: a touchdown
         // one-shot is still a one-shot, so it suppresses the fade to walk/run
         // AND the foot-speed match beneath it. Landing at speed therefore held
         // the recovery pose and skated forward for the whole clip. A body that
-        // touches down already travelling has no business finishing a recovery
-        // it never stood still for, so the clip yields to the gait at once.
+        // travels, jumps again or enters water yields to its real pose at once.
         this.currentIsOneShot = false;
         this.currentOneShotIsLanding = false;
         this.fadeTo(this.baseAction(), this.baseTransitionFade(desired), false);
@@ -1102,7 +1101,15 @@ export class CharacterVisual {
       this.tickIdleVariant(dt, desired);
       // foot-speed matching on locomotion cycles
       if (!this.currentIsOneShot && this.current) {
-        const timeScale = locomotionTimeScale(this.baseState, s, this.def.walkRef, this.def.runRef);
+        const timeScale = locomotionTimeScale(
+          this.baseState,
+          s,
+          this.def.walkRef,
+          this.def.runRef,
+          this.def.prowlRef,
+          this.def.walkBackRef,
+          this.def.runTimeScaleMin,
+        );
         if (timeScale !== null) {
           if (timeScale < 0 && this.current.time <= 1e-3)
             this.current.time = Math.max(0, this.current.getClip().duration - 1e-3);
@@ -1193,8 +1200,9 @@ export class CharacterVisual {
       this.baseState === 'swimIdle' && !!this.action(this.def.clips.swimIdle),
       dt,
     );
-    const strokeRise = authoredSwim ? SWIM_RISE_AUTHORED : SWIM_RISE;
-    const swimRise = strokeRise + (SWIM_RISE_TREAD - strokeRise) * this.treadBlend;
+    const strokeRise = this.def.swimRise?.stroke ?? (authoredSwim ? SWIM_RISE_AUTHORED : SWIM_RISE);
+    const treadRise = this.def.swimRise?.tread ?? SWIM_RISE_TREAD;
+    const swimRise = strokeRise + (treadRise - strokeRise) * this.treadBlend;
     this.swimBlend = advanceSwimBlend(this.swimBlend, s.swimming && !s.dead, dt);
     this.swimBobTime += dt;
     // windup lean/recoil spring: while fed (setWindupLean each ceremony frame)
@@ -2044,7 +2052,7 @@ export class CharacterVisual {
       tintedFarMaterials(
         prep.def,
         this.entityColor,
-        farSourceMaterials(this.model, bake.isBody.length),
+        farSourceMaterials(this.model, bake.slots),
         bake.isBody,
         skinTexture(this.key, this.skinIndex),
         skinEmissiveTexture(this.key, this.skinIndex),
@@ -2482,7 +2490,7 @@ export class CharacterVisual {
       const mats = tintedFarMaterials(
         this.def,
         this.entityColor,
-        composed ? farSourceMaterials(this.model, composed.isBody.length) : prep.idleSrcMats,
+        composed ? farSourceMaterials(this.model, composed.slots) : prep.idleSrcMats,
         composed ? composed.isBody : prep.idleSrcIsBody,
         skinTexture(this.key, skinIndex),
         skinEmissiveTexture(this.key, skinIndex),
@@ -2665,16 +2673,25 @@ export class CharacterVisual {
       this.weaponSkinId,
       this.stow.attached,
     );
-    if (offhandMirrorsWeaponSkin(this.weaponSkinId, this.offhandItemId)) {
-      payloads.push(...offPayloads);
-      this.finishWeaponAttach(payloads);
-      return payloads;
+    // The skin material/VFX set is exactly the hands that SHOW the skin: the
+    // mainhand while it holds the skin's type (or always with no skin, so a
+    // bare rig keeps its authored pass), the offhand while the skin mirrors
+    // onto it. A hand left out is pixel-untouched, but its freshly attached
+    // nodes must still reach the caller's compile gate: dropped from the
+    // return, a re-attached shield's first draw linked its programs
+    // synchronously.
+    const mainhandSkinned =
+      !this.weaponSkinId || mainhandShowsWeaponSkin(this.weaponSkinId, this.weaponItemId);
+    const skinned = [
+      ...(mainhandSkinned ? payloads : []),
+      ...(offhandMirrorsWeaponSkin(this.weaponSkinId, this.offhandItemId) ? offPayloads : []),
+    ];
+    // A hand outside the skin set still needs its bone-texture pass (the skin
+    // set gets it inside finishWeaponAttach).
+    for (const payload of [...payloads, ...offPayloads]) {
+      if (!skinned.includes(payload)) configureTightBoneTextures(payload);
     }
-    // The non-mirrored offhand stays OUT of the skin material/VFX set
-    // (pixel-untouched), but its freshly attached nodes must still reach the
-    // caller's compile gate: dropped from the return, a re-attached shield's
-    // first draw linked its programs synchronously.
-    this.finishWeaponAttach(payloads);
+    this.finishWeaponAttach(skinned);
     return [...payloads, ...offPayloads];
   }
 
@@ -2725,9 +2742,15 @@ export class CharacterVisual {
         payload.traverse((o) => {
           const mesh = o as THREE.Mesh;
           if (!mesh.isMesh) return;
+          // cloneMaterialWithHooks, never a bare clone: a rig material carries
+          // the silhouette rim glow (assets.ts buildTintedClone), and
+          // Material.clone() drops onBeforeCompile. The bare clone therefore
+          // rendered the isolated weapon WITHOUT its rim AND, since three's
+          // default program cache key IS the hook source, linked a program the
+          // source had already linked. See ../material_clone_hooks.ts.
           mesh.material = Array.isArray(mesh.material)
-            ? mesh.material.map((m) => m.clone())
-            : mesh.material.clone();
+            ? mesh.material.map((m) => cloneMaterialWithHooks(m))
+            : cloneMaterialWithHooks(mesh.material);
           mesh.userData.weaponSkinIsolated = true;
           markOwnedWeaponSkinMaterials(mesh);
         });
@@ -2924,10 +2947,17 @@ export class CharacterVisual {
     // from it, so it must be kept rather than only pushed once.
     this.weaponVfxAuthored = weaponVfxTuningFor(skin.model, spec.tier);
     this.weaponVfxShed = 1;
+    // A skin whose hand-tuned row mutes the light (weapon_vfx_tuning.ts
+    // `light: 0`) gets no PointLight at all: built anyway it would hold one of
+    // the renderer's fixed counted point-light slots away from a light that
+    // actually shines, and pay a per-frame ancestor walk, while every update()
+    // drove its intensity straight back to zero.
+    const withLight = (this.weaponVfxAuthored.light ?? 1) > 0;
     for (const payload of payloads) {
       const handle = createWeaponVfx(payload, spec, {
         grounded: false,
         budgetedLight: this.budgetedWeaponLight,
+        withLight,
       });
       handle.setBackdropVisible(false);
       handle.setTuning(this.weaponVfxAuthored);
@@ -3143,6 +3173,10 @@ export class CharacterVisual {
       this.stow.attached,
       this.offhandItemId,
     );
+    // The returned set is the hands that SHOW the skin (attachAllProps); a
+    // hand outside it still needs its bone-texture pass, and the whole-rig
+    // sweep is idempotent (skeletons already cropped are skipped).
+    configureTightBoneTextures(this.model);
     this.finishWeaponAttach(payloads);
   }
 
@@ -3175,7 +3209,8 @@ export class CharacterVisual {
       }
       mesh.castShadow = this.shadowOn;
       mesh.receiveShadow = false;
-      if ((mesh as unknown as THREE.SkinnedMesh).isSkinnedMesh) mesh.frustumCulled = false;
+      const skinned = mesh as unknown as THREE.SkinnedMesh;
+      if (skinned.isSkinnedMesh) applySkinnedCullBounds(skinned, this.root, this.height);
       this.originalMaterials.set(mesh, mesh.material);
       this.casters.push(mesh);
     });
@@ -3252,7 +3287,18 @@ export class CharacterVisual {
       !!this.action(this.def.clips.walkBack),
       !!this.action(this.def.clips.wade),
       !!this.action(this.def.clips.combatIdle),
+      !!this.action(this.def.clips.prowlIdle),
+      !!this.action(this.def.clips.prowlWalk),
     );
+  }
+
+  /** The posed head height used by the renderer's surface/submerged latch. */
+  get swimHeadHeight(): number {
+    return this.def.swimHeadHeight ?? this.height * SUBMERGED_HEAD_FRACTION;
+  }
+
+  get gait(): VisualDef['gait'] {
+    return this.def.gait;
   }
 
   /** Refill the weight scratch from the live mixer (see `weightScan`). */
@@ -3293,7 +3339,12 @@ export class CharacterVisual {
     // A winged form without an authored Jump clip must leave its locomotion
     // stride almost immediately. The normal crossfade preserves too much of a
     // forward-leaning Run pose after takeoff and reads as a frozen leap.
-    return this.key === 'form_metamorph' && next === 'jump' ? 0.04 : FADE;
+    if (this.key === 'form_metamorph' && next === 'jump') return 0.04;
+    // A wheeled vehicle stops turning its wheels the moment it stops moving.
+    // The outgoing clip keeps playing through a crossfade, so any real fade
+    // here spins the wheels on after the throttle is released.
+    if (this.def.cutToIdle && next === 'idle') return CUT_FADE;
+    return FADE;
   }
 
   private effectMaterial<T extends THREE.Material | THREE.Material[]>(material: T): T {
@@ -3439,6 +3490,10 @@ export class CharacterVisual {
   private baseAction(): THREE.AnimationAction | null {
     const c = this.def.clips;
     switch (this.baseState) {
+      case 'prowlIdle':
+        return this.action(c.prowlIdle) ?? this.action(c.idle);
+      case 'prowlWalk':
+        return this.action(c.prowlWalk) ?? this.action(c.walk);
       case 'combatIdle':
         // desiredBaseState only picks this for a rig that HAS the loop, so the
         // fallback is unreachable belt-and-braces (a def whose clip name misses
@@ -3840,6 +3895,8 @@ function clipNamesOf(def: VisualDef): string[] {
   return [
     c.idle,
     c.combatIdle,
+    c.prowlIdle,
+    c.prowlWalk,
     c.walk,
     c.run,
     c.death,

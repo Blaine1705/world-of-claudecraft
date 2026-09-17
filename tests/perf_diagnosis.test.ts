@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import type { PerfSnapshot } from '../src/game/perf';
 import { diagnosePerfSnapshot, formatPerfDiagnosisMarkdown } from '../src/game/perf_diagnosis_core';
+import { GPU_TIMER_UNAVAILABLE } from '../src/render/gpu_timer_probe_core';
 import { shaderWarmAuditSnapshot } from '../src/render/shader_warm_audit';
 import { shaderWarmSnapshot } from '../src/render/shader_warm_client';
 
@@ -13,6 +14,7 @@ function digest(value = 0) {
 function baseSnapshot(): PerfSnapshot {
   return {
     seconds: 20,
+    visibleSeconds: 20,
     frames: 1200,
     hiddenPresentSkips: 0,
     fps: 60,
@@ -66,6 +68,11 @@ function baseSnapshot(): PerfSnapshot {
       renderScale: 1,
       effectiveRenderScale: 1,
       shadowCadenceHalfRate: false,
+      shadowExtentStep: 0,
+      shadowExtentScale: 1,
+      shadowExtentHalf: 105,
+      terrainDetailLevel: 1,
+      postShedRung: 'full',
       renderBudget: {
         enabled: true,
         mode: 'stable',
@@ -80,7 +87,7 @@ function baseSnapshot(): PerfSnapshot {
         stallHoldSeconds: 0,
         stableSeconds: 20,
         cooldownSeconds: 0,
-        levels: { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 1 },
+        levels: { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 1, detail: 1, post: 1 },
         caps: {
           targetCalls: 620,
           urgentCalls: 860,
@@ -97,6 +104,13 @@ function baseSnapshot(): PerfSnapshot {
       pixelRatio: 1.5,
       width: 1440,
       height: 900,
+      drawingBuffer: {
+        width: 1728,
+        height: 1080,
+        cssWidth: 1440,
+        cssHeight: 900,
+        dynamicResolution: false,
+      },
       calls: 300,
       triangles: 1_000_000,
       geometries: 200,
@@ -117,6 +131,7 @@ function baseSnapshot(): PerfSnapshot {
         submit: digest(4),
         total: digest(9),
       },
+      nameplates: { paints: 0, paintsSkipped: 0 },
       renderDiagnostics: {} as never,
       nightAmount: 0,
       prewarm: null,
@@ -160,6 +175,7 @@ function baseSnapshot(): PerfSnapshot {
           lanes: [],
         },
       },
+      gpuTimer: GPU_TIMER_UNAVAILABLE,
       gpuPrep: {
         budget: {
           frameEmaMs: 16.7,

@@ -151,6 +151,34 @@ export function actionForAttackSlot(showAttackButton: boolean, action: HotbarAct
   return showAttackButton ? null : action;
 }
 
+// The freed Attack slot's (barSlot 0, "Show Attack Button" off) DISPLAY fallback
+// for an ability the ACTIVE build does not currently grant. The assignment is
+// deliberately not scoped to any one talent build (ActionBarController keeps it
+// across a reload/build switch instead of treating "not granted right now" as
+// garbage, see isAttackSlotStoredAbilityEligible), so the bar must still paint
+// SOMETHING for it: resolving only against the live known-ability list painted
+// the slot fully empty the moment the granting build went inactive, which looked
+// exactly like the assignment being cleared even though it survives in storage.
+// Returns a display-only stub (no talent resolution, since the granting build is
+// not the active one), typed to satisfy ActionBarAbility with known:false, which
+// action_bar_view.ts renders dimmed and unusable without the live cost/cooldown/
+// proc math (none of it applies to an ability the player cannot currently cast).
+export type FreedAttackSlotAbility = { def: AbilityDef; cost: number; known: false };
+
+export function freedAttackSlotDisplayAbility(
+  action: HotbarAction,
+  abilityDef: (id: string) => AbilityDef | undefined,
+): FreedAttackSlotAbility | null {
+  if (action?.type !== 'ability') return null;
+  const def = abilityDef(action.id);
+  // Defense in depth: the stored action is already filtered to a real,
+  // non-passive/non-hidden ability by ActionBarController on every write path
+  // (isAttackSlotStoredAbilityEligible / isAbilityPlacementAllowed both apply
+  // isAbilityActionBarEligible), but this display path re-derives straight from
+  // the static table, so it re-checks the module's own rule rather than trust it.
+  return def && isAbilityActionBarEligible(def) ? { def, cost: 0, known: false } : null;
+}
+
 export function assignAttackSlotAction(
   action: Exclude<HotbarAction, null>,
   sourceIndex: number | null | undefined,
@@ -377,12 +405,66 @@ export function syncHotbarActions(
   // this sweeps a passive left on a bar saved by an older build (and, with the
   // auto-place set already excluding passives, blocks it from ever re-landing).
   isPassive: (id: string) => boolean = () => false,
+  choiceGroups?: readonly (readonly string[])[],
 ): { actions: HotbarAction[]; changed: boolean } {
   const known = new Set(knownAbilityIds);
+
+  // Map each removed ability ID to the slot it occupied
+  const removedSlots = new Map<string, number>();
+  for (let i = 0; i < actions.length; i++) {
+    const action = actions[i];
+    if (action?.type === 'ability' && (!known.has(action.id) || isPassive(action.id))) {
+      removedSlots.set(action.id, i);
+    }
+  }
+
+  // Build choice group map: abilityId -> group
+  const groupMap = new Map<string, readonly string[]>();
+  if (choiceGroups) {
+    for (const group of choiceGroups) {
+      for (const id of group) {
+        groupMap.set(id, group);
+      }
+    }
+  }
+
+  // Check if any ability to be auto-placed can inherit a slot vacated by a sibling choice
+  const reservedSlots = new Map<string, number>();
+  const usedRemovedSlots = new Set<number>();
+  for (const id of knownAbilityIds) {
+    if (isPassive(id)) continue;
+    if (
+      actions.some(
+        (action) => action?.type === 'ability' && action.id === id && !removedSlots.has(id),
+      )
+    ) {
+      continue;
+    }
+
+    const group = groupMap.get(id);
+    if (group) {
+      for (const siblingId of group) {
+        if (siblingId === id) continue;
+        const slot = removedSlots.get(siblingId);
+        if (slot !== undefined && !usedRemovedSlots.has(slot)) {
+          reservedSlots.set(id, slot);
+          usedRemovedSlots.add(slot);
+          break;
+        }
+      }
+    }
+  }
+
   const next = actions.map((action) =>
     action?.type === 'ability' && (!known.has(action.id) || isPassive(action.id)) ? null : action,
   );
-  let changed = next.some((action, i) => action !== actions[i]);
+
+  // Put reserved choice replacements in their inherited slot
+  for (const [id, slot] of reservedSlots) {
+    next[slot] = { type: 'ability', id };
+  }
+
+  // Put any other newly known abilities in the first available null slot
   for (const id of knownAbilityIds) {
     if (isPassive(id)) continue;
     if (next.some((action) => action?.type === 'ability' && action.id === id)) continue;
@@ -390,7 +472,12 @@ export function syncHotbarActions(
     const empty = next.indexOf(null);
     if (empty === -1) continue;
     next[empty] = { type: 'ability', id };
-    changed = true;
   }
+
+  const changed = next.some((action, i) => {
+    const orig = actions[i];
+    if (action === null || orig === null) return action !== orig;
+    return action.type !== orig.type || action.id !== orig.id;
+  });
   return { actions: next, changed };
 }

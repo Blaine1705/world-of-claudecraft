@@ -3,7 +3,8 @@ import {
   GRAPHICS_REBUILD_KEYS,
   normalizeGraphicsSettingsSnapshot,
 } from '../src/game/graphics_rebuild_core';
-import { SETTING_RANGES } from '../src/game/settings';
+import { BOOL_SETTINGS, SETTING_RANGES } from '../src/game/settings';
+import { AURA_TRACKS } from '../src/ui/hud/aura_tracks';
 import {
   boolToggleNextValue,
   buildAudioControls,
@@ -255,8 +256,9 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
         ).toEqual([0, 0.5, 1, 2]);
     }
     // Effects & Lighting stops at High (the full high-tier post stack), and
-    // so does Shadow Quality (High is the 4096 map; the 8192 Insane rung is
-    // retired, so the dial no longer offers it).
+    // so does Shadow Quality (High is the dial's 4096 map, above the High
+    // tier's own 2560 base; the 8192 Insane rung is retired, so the dial no
+    // longer offers it).
     for (const key of ['effectsQuality', 'shadowQuality']) {
       const dial = find(controls, key);
       if (dial?.control === 'choice')
@@ -775,6 +777,8 @@ const GENERAL_KEYS = [
   'showPlayerNameplates',
   'confirmVendorSell',
   'note:hudChrome.options.confirmVendorSellNote',
+  'confirmVendorSellMinQuality',
+  'note:hudChrome.options.confirmVendorSellMinQualityNote',
 ];
 const FRAMES_KEYS = [
   'partyFrameStyle',
@@ -788,14 +792,18 @@ const FRAMES_KEYS = [
   'partyFrameShowAuras',
   'partyFrameShowPets',
   'partyFrameShowSelf',
+  'playerFrameHealthText',
+  'targetFrameHealthText',
   'aurasOnPlayerFrame',
+  'auraBarBelowFrame',
   'alwaysShowAllBuffs',
   'showTargetOfTarget',
   'showTargetSwingTimer',
   'showPetFrame',
 ];
-const CHAT_KEYS = ['chatFontScale', 'chatOpacity', 'compactChat'];
+const CHAT_KEYS = ['chatFontScale', 'chatOpacity', 'compactChat', 'filterProfanity'];
 const COMBAT_KEYS = [
+  'eastbrookGuidance',
   'startAttackOnAbilityUse',
   'stopAutoAttackOnTargetSwitch',
   'showAttackButton',
@@ -807,6 +815,15 @@ const COMBAT_KEYS = [
   'showNameplateDots',
   'nameplateDotScale',
   'showTargetDots',
+  // The six aura tracks, in the order the descriptor table declares them, plus
+  // the mode sub-option that rides with the utility track.
+  'showDefensivesTrack',
+  'showSelfBuffTrack',
+  'showOffensiveTrack',
+  'showUtilityTrack',
+  'showUtilityModes',
+  'showFriendlyTrack',
+  'showShieldTrack',
   'fctScale',
 ];
 const INTERFACE_KEYS_BY_TAB: Record<InterfaceTab, string[]> = {
@@ -863,6 +880,29 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
     });
   });
 
+  it('renders one Combat toggle per aura track, each labelled by its own key', () => {
+    // Six frames need six independent opt-ins: a single "show aura tracks"
+    // switch would put roughly twenty rows on a healer at once, which is the
+    // thing the per-track defaults exist to prevent. Pinned by KEY rather than
+    // by count so a track that loses its row fails here, and pinned against the
+    // descriptor table so the two can never drift.
+    const controls = buildInterfaceControls(makeSource());
+    for (const track of AURA_TRACKS) {
+      expect(find(controls, track.settingKey)).toMatchObject({
+        control: 'boolToggle',
+        category: 'combat',
+        labelKey: `hudChrome.options.${track.settingKey}`,
+      });
+    }
+    // Every track is OFF until asked for, and the mode sub-option rides on.
+    for (const track of AURA_TRACKS) {
+      expect(BOOL_SETTINGS[track.settingKey as keyof typeof BOOL_SETTINGS]).toEqual({
+        def: false,
+      });
+    }
+    expect(BOOL_SETTINGS.showUtilityModes).toEqual({ def: true });
+  });
+
   it('renders NO menu rows for the optional action bars (the on-bar toggle owns them)', () => {
     // The plus/minus buttons on the primary action bar are the one control for
     // the secondary/third rows; duplicate checkboxes here would fight them.
@@ -889,6 +929,11 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
     });
     expect(desktop.filter((c) => c.control === 'note')).toEqual([
       { control: 'note', textKey: 'hudChrome.options.confirmVendorSellNote', category: 'general' },
+      {
+        control: 'note',
+        textKey: 'hudChrome.options.confirmVendorSellMinQualityNote',
+        category: 'general',
+      },
       { control: 'note', textKey: 'hudChrome.options.forceHighPerfGpuNote', category: 'general' },
     ]);
 
@@ -1040,6 +1085,39 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
     expect(find(off, 'forceHighPerfGpu')).toMatchObject({ control: 'boolToggle', on: false });
   });
 
+  // Regression pin for the buff-placement bug (issue: buffs on the player
+  // frame flip above/below unpredictably): the above/below choice is now the
+  // player's OWN setting (auraBarBelowFrame), gated on aurasOnPlayerFrame the
+  // same way a dependent BoolToggleControl always gates on its parent
+  // (disabled until the parent is on, rebuilt immediately via rerender: true
+  // so the disabled state never goes stale).
+  it('enables the below-frame buff placement toggle only while buffs anchor to the player frame', () => {
+    const hidden = buildInterfaceControls(makeSource());
+    expect(find(hidden, 'aurasOnPlayerFrame')).toMatchObject({
+      control: 'boolToggle',
+      rerender: true,
+    });
+    expect(find(hidden, 'auraBarBelowFrame')).toMatchObject({
+      control: 'boolToggle',
+      disabled: true,
+    });
+
+    const visible = buildInterfaceControls(makeSource({}, { aurasOnPlayerFrame: true }));
+    expect(find(visible, 'auraBarBelowFrame')).toMatchObject({ disabled: false });
+  });
+
+  it('reads the stored buff-placement choice straight through, independent of aurasOnPlayerFrame', () => {
+    const on = buildInterfaceControls(
+      makeSource({}, { aurasOnPlayerFrame: true, auraBarBelowFrame: true }),
+    );
+    expect(find(on, 'auraBarBelowFrame')).toMatchObject({ control: 'boolToggle', on: true });
+
+    const off = buildInterfaceControls(
+      makeSource({}, { aurasOnPlayerFrame: true, auraBarBelowFrame: false }),
+    );
+    expect(find(off, 'auraBarBelowFrame')).toMatchObject({ control: 'boolToggle', on: false });
+  });
+
   it('renders NO uiScale row (owner request); the comfort sliders stay live', () => {
     const controls = buildInterfaceControls(makeSource());
     // The UI Scale slider is retired from the menu: the stored setting still
@@ -1164,10 +1242,20 @@ describe('options_view: interface tab taxonomy', () => {
 // ---------------------------------------------------------------------------
 // Main menu routing (cluster 5)
 // ---------------------------------------------------------------------------
+// The desktop menu with the frames locked: what the painter asks for on a
+// mouse-and-keyboard HUD with nothing loose (the touch HUD flips
+// interfaceUnlockAvailable off, see the touch case below).
+const DESKTOP_MENU = {
+  bugReportAvailable: false,
+  interfaceUnlockAvailable: true,
+  interfaceUnlocked: false,
+};
+
 describe('options_view: main menu routing', () => {
   it('routes each row to its sub-view, with unstuck before logout + close, omitting bug report offline', () => {
-    const offline = buildOptionsMenu({ bugReportAvailable: false });
+    const offline = buildOptionsMenu(DESKTOP_MENU);
     expect(offline.map((e) => e.labelKey)).toEqual([
+      'hudChrome.interfaceUnlock.unlock',
       'hud.options.keyBindings',
       'hudChrome.controller.title',
       'hud.options.graphics',
@@ -1175,6 +1263,7 @@ describe('options_view: main menu routing', () => {
       'hudChrome.auraOverlay.title',
       'hud.options.audio',
       'hudChrome.perf.title',
+      'hudChrome.fullTransfer.menu',
       'nav.wiki',
       'hudChrome.unstuck.menuButton',
       'hud.options.logout',
@@ -1196,10 +1285,51 @@ describe('options_view: main menu routing', () => {
     const wikiRows = offline.filter((e) => e.labelKey === 'nav.wiki');
     expect(wikiRows).toHaveLength(1);
     expect(wikiRows[0].action).toEqual({ kind: 'wiki' });
+    // The full-settings Import / Export row routes to its own sub-view.
+    expect(offline.find((e) => e.labelKey === 'hudChrome.fullTransfer.menu')?.action).toEqual({
+      kind: 'goto',
+      view: 'transfer',
+    });
+  });
+
+  it('leads with Unlock Interface, relabelled Lock Interface while the frames are loose', () => {
+    // Owner request for the frame lock-down: arranging frames is one press
+    // from Esc, not three levels into Interface > Frames. The row is the
+    // same action the Frames tab's row fires, so its label follows the same
+    // rule (interfaceUnlockLabelKey), and only the label changes with state.
+    const locked = buildOptionsMenu(DESKTOP_MENU);
+    expect(locked[0]).toEqual({
+      labelKey: 'hudChrome.interfaceUnlock.unlock',
+      action: { kind: 'interfaceUnlock', unlocked: false },
+    });
+    expect(locked.filter((e) => e.action.kind === 'interfaceUnlock')).toHaveLength(1);
+    const unlocked = buildOptionsMenu({ ...DESKTOP_MENU, interfaceUnlocked: true });
+    expect(unlocked[0]).toEqual({
+      labelKey: 'hudChrome.interfaceUnlock.lock',
+      action: { kind: 'interfaceUnlock', unlocked: true },
+    });
+    expect(unlocked.slice(1)).toEqual(locked.slice(1));
+  });
+
+  it('omits the Unlock Interface row on the touch HUD, where Key Bindings leads again', () => {
+    // Frame editing is desktop-only (every gesture refuses touch layouts), the
+    // same gate the Frames tab's row sits behind. Unavailable wins even if the
+    // state somehow reads unlocked: the row must never appear on touch.
+    const locked = buildOptionsMenu(DESKTOP_MENU);
+    for (const interfaceUnlocked of [false, true]) {
+      const touch = buildOptionsMenu({
+        ...DESKTOP_MENU,
+        interfaceUnlockAvailable: false,
+        interfaceUnlocked,
+      });
+      expect(touch.some((e) => e.action.kind === 'interfaceUnlock')).toBe(false);
+      expect(touch[0]?.labelKey).toBe('hud.options.keyBindings');
+      expect(touch).toEqual(locked.slice(1));
+    }
   });
 
   it('adds the online-only Report a Bug row when bug reporting is available', () => {
-    const online = buildOptionsMenu({ bugReportAvailable: true });
+    const online = buildOptionsMenu({ ...DESKTOP_MENU, bugReportAvailable: true });
     const bug = online.find((e) => e.labelKey === 'hudChrome.bugReport.menuButton');
     expect(bug?.action).toEqual({ kind: 'goto', view: 'bugreport' });
     // The Wiki row keeps its place above the report row in both modes.
@@ -1288,9 +1418,8 @@ describe('options_view: determinism', () => {
       buildInterfaceControls(src, DESKTOP_ENV),
     );
     expect(buildControllerControls(src)).toEqual(buildControllerControls(src));
-    expect(buildOptionsMenu({ bugReportAvailable: true })).toEqual(
-      buildOptionsMenu({ bugReportAvailable: true }),
-    );
+    const menuOpts = { ...DESKTOP_MENU, bugReportAvailable: true };
+    expect(buildOptionsMenu(menuOpts)).toEqual(buildOptionsMenu(menuOpts));
   });
 });
 

@@ -7,6 +7,7 @@
 // this is the one place the real statements, locks, and constraints meet.
 import { Pool } from 'pg';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import { materialSourceConnection } from '../server/material_source_connection';
 import type { CharacterState } from '../src/sim/character_state';
 import { Sim } from '../src/sim/sim';
 
@@ -20,7 +21,7 @@ function verifyUrl(admin: string): string {
 }
 
 // server/db.ts reads DATABASE_URL at module load and builds its pool from it.
-// Nothing above is a static import of a server module, so this assignment runs
+// No database module is statically imported above, so this assignment runs
 // first and points the boot path at the disposable database.
 if (ADMIN_URL) process.env.DATABASE_URL = verifyUrl(ADMIN_URL);
 
@@ -58,7 +59,9 @@ describeDb('guild roster page purchase against real Postgres', () => {
     db = await import('../server/db');
     pageDb = await import('../server/guild_roster_page_db');
     await db.ensureSchema();
-    pool = new Pool({ connectionString: verifyUrl(ADMIN_URL as string), max: 8 });
+    // The fixture writer uses the same guarded capability as production;
+    // the admin pool above only creates and drops the disposable database.
+    pool = new Pool({ ...materialSourceConnection(verifyUrl(ADMIN_URL as string)), max: 8 });
   }, 120_000);
 
   afterAll(async () => {

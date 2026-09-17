@@ -1,6 +1,7 @@
 import { DEV_KIT_ROLES } from '../sim/content/dev_kit_roles';
 import { GATHERING_PROFESSIONS } from '../sim/content/professions';
-import { DUNGEONS, ITEMS, MOBS, QUESTS } from '../sim/data';
+import { DUNGEONS, getActiveWorldContent, ITEMS, MOBS, QUESTS } from '../sim/data';
+import { devTownTargets } from '../sim/dev/town_teleport';
 import { ALL_CLASSES, MAX_LEVEL } from '../sim/types';
 import type { IWorld } from '../world_api';
 import {
@@ -67,9 +68,9 @@ export interface DevCommandWindowDeps {
   restoreFocus(target: HTMLElement | null): void;
 }
 
-function optionsHtml(
-  values: readonly { id: string }[],
-  displayName: (value: { id: string }) => string,
+function optionsHtml<T extends { id: string }>(
+  values: readonly T[],
+  displayName: (value: T) => string,
 ): string {
   return [...values]
     .sort((a, b) => displayName(a).localeCompare(displayName(b)) || a.id.localeCompare(b.id))
@@ -166,6 +167,15 @@ function actionFields(actionId: string): string {
       )}${textField('devCommand.fields.amount', 'gatherAmount', '10', 'number')}`;
     case 'teleport':
       return `${textField('devCommand.fields.x', 'x', '0', 'number')}${textField('devCommand.fields.z', 'z', '0', 'number')}`;
+    case 'town':
+      // Hub names are proper nouns the zone content spells once (no entity
+      // translation exists for them); the slug beside each is what the
+      // command sends.
+      return selectField(
+        'devCommand.fields.town',
+        'town',
+        optionsHtml(devTownTargets(getActiveWorldContent().zones), (town) => town.name),
+      );
     case 'dungeon':
       return `${selectField(
         'devCommand.fields.dungeon',
@@ -180,6 +190,12 @@ function actionFields(actionId: string): string {
         'raidDifficulty',
         `<option value="heroic">${esc(t('devCommand.difficulty.heroic'))}</option><option value="normal">${esc(t('devCommand.difficulty.normal'))}</option>`,
       );
+    case 'farmgrow':
+      // Free text with NO default, unlike every other text field here: the
+      // empty value is the useful one (advance every planted bed), and the
+      // bed table carries ids only (no display name), so a select would be a
+      // list of raw save keys 23 rows long.
+      return textField('devCommand.fields.bed', 'bed', '');
     case 'bot':
       return textField('devCommand.fields.name', 'botName', 'TestBot');
     default:

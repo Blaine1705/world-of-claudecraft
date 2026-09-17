@@ -16,10 +16,10 @@
 
 import type { WocQuoteView } from '../../../net/woc_market_sdk';
 import { ITEMS } from '../../../sim/data';
+import type { MaterialComposition } from '../../../sim/material_sources';
 import type { InvSlot, ItemDef, ItemInstancePayload } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
 import { userFacingApiError } from '../../api_error_i18n';
-import { bagQualityKey } from '../../bags_view';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { captureFocusKey } from '../../focus_restore';
@@ -27,6 +27,12 @@ import { formatDateTime, formatMoney as formatLocalizedMoney, t } from '../../i1
 import type { TranslationKey } from '../../i18n.catalog';
 import { itemNameColor } from '../../item_name_color';
 import { knownItemDef } from '../../known_item';
+import {
+  appendMaterialSourcesActionAfter,
+  attachMaterialSourcesContextMenu,
+  closeMaterialSourcesDialogForOwner,
+  type MaterialSourcesDialogOpener,
+} from '../../material_sources_dialog';
 
 import { termsUrlFor } from '../../terms_link';
 import { buildTradeItemRow, tradeRowTooltipTarget } from '../../trade_view';
@@ -57,6 +63,7 @@ import { WOC_LOG_BAD, WOC_LOG_GOOD, WOC_LOG_NOTE } from '../../woc_log_tones';
 import { wocPaymentPendingText } from '../../woc_market_reason_text';
 import type { WocMarketHooks } from '../../woc_market_window';
 import { wocTokensText } from '../../woc_tokens_text';
+import { wornItemCellParts } from '../../worn_item_cell_view';
 import {
   adoptedWocOffer,
   selectStandingWocOffer,
@@ -110,9 +117,15 @@ export interface WocTradeControllerDeps {
   /** Re-read the wallet footer balance after tokens moved on-chain. */
   refreshWocBalance(): void;
   log(text: string, color?: string): void;
-  itemIcon(item: ItemDef): string;
+  itemIcon(item: ItemDef, quality?: ItemDef['quality']): string;
   attachTooltip(el: HTMLElement, html: () => string): void;
-  itemTooltip(item: ItemDef, compare?: boolean, instance?: ItemInstancePayload): string;
+  openMaterialSources?: MaterialSourcesDialogOpener;
+  itemTooltip(
+    item: ItemDef,
+    compare?: boolean,
+    instance?: ItemInstancePayload,
+    materialSources?: MaterialComposition,
+  ): string;
   renderBags(): void;
 }
 
@@ -245,14 +258,19 @@ export class WocTradeController {
   private log(text: string, color?: string): void {
     this.deps.log(text, color);
   }
-  private itemIcon(item: ItemDef): string {
-    return this.deps.itemIcon(item);
+  private itemIcon(item: ItemDef, quality?: ItemDef['quality']): string {
+    return this.deps.itemIcon(item, quality);
   }
   private attachTooltip(el: HTMLElement, html: () => string): void {
     this.deps.attachTooltip(el, html);
   }
-  private itemTooltip(item: ItemDef, compare = true, instance?: ItemInstancePayload): string {
-    return this.deps.itemTooltip(item, compare, instance);
+  private itemTooltip(
+    item: ItemDef,
+    compare = true,
+    instance?: ItemInstancePayload,
+    materialSources?: MaterialComposition,
+  ): string {
+    return this.deps.itemTooltip(item, compare, instance, materialSources);
   }
   private renderBags(): void {
     this.deps.renderBags();
@@ -1216,6 +1234,7 @@ export class WocTradeController {
     const info = this.sim.tradeInfo;
     if (!info) {
       if (this.tradeWasOpen) {
+        closeMaterialSourcesDialogForOwner(el);
         el.style.display = 'none';
         this.tradeWasOpen = false;
         this.stagedTrade = { items: [], copper: 0 };
@@ -1422,38 +1441,54 @@ export class WocTradeController {
         // family: it carries border-color plus an epic and legendary glow and
         // never a text colour, so on a bare span it painted a stray halo and
         // left the name the inherited grey.
-        const qColor = item
-          ? itemNameColor({ kind: item.kind, quality: bagQualityKey(item) })
-          : QUALITY_DEFAULT_COLOR;
-        const inner = `${item ? this.itemIcon(item) : unknownItemIconHtml(s.itemId)}<span style="color:${qColor}">${esc(label)}</span>`;
+        // The staged COPY's own quality (a legacy legendary-rolled copy is
+        // tradable and reads legendary here, the all-surfaces item-cell rule;
+        // a promoted copy is bound and never reaches the table).
+        // One cell-authority read for the color AND the rim (the label keeps
+        // the def name plus count from buildTradeItemRow: a promoted copy is
+        // bound and never reaches the table, so only a persisted named-but-
+        // unbound payload, which the load arm admits but the live shape never
+        // mints, would show the def here beside the chosen name in its tooltip).
+        const parts = item ? wornItemCellParts(item, s.instance) : null;
+        const qColor =
+          item && parts
+            ? itemNameColor({ kind: item.kind, quality: parts.quality ?? 'common' })
+            : QUALITY_DEFAULT_COLOR;
+        const inner = `<span class="ui-socket ui-socket--bag">${item && parts ? this.itemIcon(item, parts.quality) : unknownItemIconHtml(s.itemId)}</span><span style="color:${qColor}">${esc(label)}</span>`;
         return mine
-          ? `<button type="button" class="trade-item mine" data-item="${esc(s.itemId)}">${inner}</button>`
-          : `<div class="trade-item">${inner}</div>`;
+          ? `<button type="button" class="trade-item mine ui-card" data-item="${esc(s.itemId)}">${inner}</button>`
+          : `<div class="trade-item ui-card">${inner}</div>`;
       };
+      const emptyRows = (count: number, label: string) =>
+        Array.from(
+          { length: Math.max(0, 4 - count) },
+          (_, index) =>
+            `<div class="trade-item trade-item-empty"><span class="ui-socket ui-socket--bag empty" aria-hidden="true"></span>${index === 0 && count === 0 ? `<span class="trade-empty">${esc(label)}</span>` : ''}</div>`,
+        ).join('');
       el.innerHTML = `
-        <div class="panel-title"><span>${esc(t('hud.trade.title', { name: info.otherName }))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.trade.cancel'))}">${svgIcon('close')}</button></div>
+        <div class="panel-title ui-win-head"><span class="ui-win-title">${esc(t('hud.trade.title', { name: info.otherName }))}</span><button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('hud.trade.cancel'))}">${svgIcon('close')}</button></div>
         <div class="trade-cols">
           <div class="trade-col ${info.myAccepted ? 'accepted' : ''}">
             <h4>${esc(t('hud.trade.yourOffer'))}</h4>
-            <div class="trade-items">${info.myOffer.items.map((s) => itemRow(s, true)).join('') || `<div class="trade-empty">${esc(t('hud.trade.emptyMine'))}</div>`}</div>
+            <div class="trade-items ui-well">${info.myOffer.items.map((s) => itemRow(s, true)).join('')}${emptyRows(info.myOffer.items.length, t('hud.trade.emptyMine'))}</div>
             <div class="trade-money"><span class="trade-money-label">${esc(t('hud.trade.money'))}:</span>${wocMoneyMine}
               <span class="trade-coins"${wocModel.wocDealStanding ? ' hidden' : ''}>
-                <input class="coininput" id="trade-g"${goldAttr} type="number" min="0" value="${Math.floor(this.stagedTrade.copper / 10000)}" aria-label="${esc(t('itemUi.money.gold'))}"><span class="coin g" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.goldShort'))}</span>
-                <input class="coininput" id="trade-s"${goldAttr} type="number" min="0" max="99" value="${Math.floor((this.stagedTrade.copper % 10000) / 100)}" aria-label="${esc(t('itemUi.money.silver'))}"><span class="coin s" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.silverShort'))}</span>
-                <input class="coininput" id="trade-c"${goldAttr} type="number" min="0" max="99" value="${this.stagedTrade.copper % 100}" aria-label="${esc(t('itemUi.money.copper'))}"><span class="coin c" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.copperShort'))}</span>
+                <input class="coininput ui-input" id="trade-g"${goldAttr} type="number" min="0" value="${Math.floor(this.stagedTrade.copper / 10000)}" aria-label="${esc(t('itemUi.money.gold'))}"><span class="coin g" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.goldShort'))}</span>
+                <input class="coininput ui-input" id="trade-s"${goldAttr} type="number" min="0" max="99" value="${Math.floor((this.stagedTrade.copper % 10000) / 100)}" aria-label="${esc(t('itemUi.money.silver'))}"><span class="coin s" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.silverShort'))}</span>
+                <input class="coininput ui-input" id="trade-c"${goldAttr} type="number" min="0" max="99" value="${this.stagedTrade.copper % 100}" aria-label="${esc(t('itemUi.money.copper'))}"><span class="coin c" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.copperShort'))}</span>
               </span>
             </div>
           </div>
           <div class="trade-col ${info.theirAccepted ? 'accepted' : ''}">
             <h4>${esc(t('hud.trade.theirOffer', { name: info.otherName }))}</h4>
-            <div class="trade-items">${info.theirOffer.items.map((s) => itemRow(s, false)).join('') || `<div class="trade-empty">${esc(t('hud.trade.emptyTheirs'))}</div>`}</div>
+            <div class="trade-items ui-well">${info.theirOffer.items.map((s) => itemRow(s, false)).join('')}${emptyRows(info.theirOffer.items.length, t('hud.trade.emptyTheirs'))}</div>
             <div class="trade-money">${esc(t('hud.trade.money'))}: ${wocMoneyTheirs || `<span class="gold">${formatLocalizedMoney(info.theirOffer.copper)}</span>`}</div>
           </div>
         </div>
         <div class="trade-hint">${esc(t('hud.trade.hint'))}</div>
         ${wocTradeArmHtml(wocModel, this.wocTradeUsdCents)}`;
       const acceptBtn = document.createElement('button');
-      acceptBtn.className = 'btn';
+      acceptBtn.className = 'btn ui-btn ui-btn--red';
       // With a $WOC offer standing, agreement lives on the OFFER, not on the sim
       // trade (which this deal never confirms). Reading myAccepted here left the
       // button saying "Accept" after the player had already accepted, and
@@ -1500,7 +1535,7 @@ export class WocTradeController {
         this.sim.tradeConfirm();
       });
       const cancelBtn = document.createElement('button');
-      cancelBtn.className = 'btn';
+      cancelBtn.className = 'btn ui-btn';
       cancelBtn.textContent = t('hud.trade.cancel');
       cancelBtn.addEventListener('click', () => this.sim.tradeCancel());
       // The two window actions in one row (the sheet pins it to the bottom
@@ -1535,8 +1570,22 @@ export class WocTradeController {
         rows.forEach((row, i) => {
           const target = tradeRowTooltipTarget(slots, i);
           if (!target) return;
-          this.attachTooltip(row as HTMLElement, () =>
-            this.itemTooltip(target.item, true, target.instance),
+          const rowElement = row as HTMLElement;
+          this.attachTooltip(rowElement, () =>
+            this.itemTooltip(target.item, true, target.instance, target.materialSources),
+          );
+          const itemName = itemDisplayName(target.item);
+          attachMaterialSourcesContextMenu(
+            rowElement,
+            itemName,
+            target.materialSources,
+            this.deps.openMaterialSources,
+          );
+          appendMaterialSourcesActionAfter(
+            rowElement,
+            itemName,
+            target.materialSources,
+            this.deps.openMaterialSources,
           );
         });
       };

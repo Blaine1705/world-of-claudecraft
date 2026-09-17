@@ -362,8 +362,20 @@ const INTERFACE_TABS: InterfaceTabBlock[] = [
       { setting: 'hudChrome.partyFrames.sort', body: 'guide.settingsPage.ifPartySort' },
       { setting: 'hudChrome.partyFrames.showAuras', body: 'guide.settingsPage.ifPartyShowAuras' },
       {
+        setting: 'hudChrome.options.playerHealthText',
+        body: 'guide.settingsPage.ifPlayerHealthText',
+      },
+      {
+        setting: 'hudChrome.options.targetHealthText',
+        body: 'guide.settingsPage.ifTargetHealthText',
+      },
+      {
         setting: 'hudChrome.options.aurasOnPlayerFrame',
         body: 'guide.settingsPage.ifAurasOnPlayerFrame',
+      },
+      {
+        setting: 'hudChrome.options.auraBarBelowFrame',
+        body: 'guide.settingsPage.ifAuraBarBelowFrame',
       },
       {
         setting: 'hudChrome.options.alwaysShowAllBuffs',
@@ -384,6 +396,7 @@ const INTERFACE_TABS: InterfaceTabBlock[] = [
       { setting: 'hud.options.chatOpacity', body: 'guide.settingsPage.ifChatOpacity' },
       { setting: 'hud.options.compactChat', body: 'guide.settingsPage.ifCompactChat' },
       { setting: 'hudChrome.chatTimestamps.show', body: 'guide.settingsPage.ifChatTimestamps' },
+      { setting: 'hud.options.filterProfanity', body: 'guide.settingsPage.ifFilterProfanity' },
     ],
   },
   {
@@ -527,7 +540,9 @@ export const settings: GuidePage = {
         )}
         ${section(
           'guide.settingsPage.keybindsHeading',
-          p('guide.settingsPage.keybindsBody') + p('guide.settingsPage.keybindsMouseBody'),
+          p('guide.settingsPage.keybindsBody') +
+            p('guide.settingsPage.keybindsMouseBody') +
+            p('guide.settingsPage.keybindsWheelBody'),
         )}
         ${section('guide.settingsPage.audioTitle', p('guide.settingsPage.audioBody') + p('guide.settingsPage.autolootBody'))}
         ${callout(

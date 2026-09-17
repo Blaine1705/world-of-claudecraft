@@ -165,12 +165,18 @@ export class TargetDotsPainter {
         els.time,
         `${formatNumber(model.remaining, NUMBER_OPTIONS[model.decimals])}${this.secondsSuffix}`,
       );
-      w.setDisplay(els.stacks, model.stacks > 0 ? SHOWN : HIDDEN);
+      // setStyleProp, not setDisplay: this node also takes setText for the
+      // count (line below), and the two single-slot writers share ONE cache
+      // entry per element (painter_host.ts), so a display write here would
+      // flip that entry every frame and BOTH writes would bypass elision
+      // forever (the auras_painter stacks-badge fix, same shape, same fix).
+      w.setStyleProp(els.stacks, 'display', model.stacks > 0 ? SHOWN : HIDDEN);
       if (model.stacks > 0) w.setText(els.stacks, formatNumber(model.stacks));
       w.toggleClass(els.row, TARGET_CLASS, model.onCurrentTarget);
       w.toggleClass(els.row, EXPIRING_CLASS, model.expiring);
     }
-    w.setDisplay(this.overflowEl, state.overflow > 0 ? SHOWN : HIDDEN);
+    // Same collision, same fix: this.overflowEl also takes setText below.
+    w.setStyleProp(this.overflowEl, 'display', state.overflow > 0 ? SHOWN : HIDDEN);
     if (state.overflow > 0) {
       w.setText(this.overflowEl, this.deps.overflowLabel(state.overflow));
     }

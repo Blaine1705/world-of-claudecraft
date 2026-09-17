@@ -1210,6 +1210,28 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: null,
     requireOwnedExpected: null,
   },
+  // The queue-pop Discord DM opt-in toggle (server/discord_queue_pings.ts):
+  // the deeds broadcasts pair's shape exactly (read-tier GET, full-scope POST).
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'GET',
+    path: '/api/discord/queue-pings',
+    handler: 'server/discord_queue_pings.ts queuePingsReadHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.bearer,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/discord/queue-pings',
+    handler: 'server/discord_queue_pings.ts queuePingsHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.full,
+    limiter: null,
+    requireOwnedExpected: null,
+  },
   // Reliquary (server/reliquary.ts): the population-rarity aggregate, a
   // registry-only RouteDef born after the migration like the deeds family, and
   // the deeds-rarity row shape exactly (anonymous public JSON read, budgeted
@@ -1392,6 +1414,19 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     authScope: AUTH_SCOPE.bearer,
     limiter: null,
     requireOwnedExpected: REQUIRE_OWNED.publicRead,
+  },
+  {
+    // The Sales History tab: every completed sale on the realm, paged and
+    // most-recent-first, over the Browse filter axes (no :param, so no
+    // requireOwned; the account gate is the shared read guard).
+    dispatcher: DISPATCH.mainApi,
+    method: 'GET',
+    path: '/api/woc-market/sales',
+    handler: 'server/woc_market_routes.ts salesHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.bearer,
+    limiter: null,
+    requireOwnedExpected: null,
   },
   {
     // Step-up challenge issuance (B6/R1): mints the single-use wallet
@@ -1819,6 +1854,18 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: null,
     requireOwnedExpected: REQUIRE_OWNED.operator404,
   },
+  // The admin-panel kick (server/admin_kick_api.ts): registry-only like the
+  // Cheater mark pair, same shape, same REGISTRY_ONLY_PARAM_PATHS listing.
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'POST',
+    path: '/admin/api/moderation/accounts/:id/kick',
+    handler: 'server/admin.ts adminKickHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: REQUIRE_OWNED.operator404,
+  },
   {
     dispatcher: DISPATCH.admin,
     method: 'POST',
@@ -1907,6 +1954,19 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     requireOwnedExpected: REQUIRE_OWNED.operator404,
     match: /^\/admin\/api\/moderation\/characters\/(\d+)\/restore-slot$/,
   },
+  // The phase 13 legendary-name strip: registry-only like the cheater-mark
+  // pair (no legacy *Match regex; the RouteDef path template is its one
+  // dispatch source, listed in REGISTRY_ONLY_PARAM_PATHS).
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'POST',
+    path: '/admin/api/moderation/characters/:id/clear-item-name',
+    handler: 'server/admin.ts clearItemNameHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
+    requireOwnedExpected: REQUIRE_OWNED.operator404,
+  },
   {
     dispatcher: DISPATCH.admin,
     method: 'POST',
@@ -1972,6 +2032,20 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     contentType: PROBLEM_JSON,
     authScope: AUTH_SCOPE.admin,
     limiter: 'adminOversightReadRateLimited',
+    requireOwnedExpected: null,
+  },
+  // Live market listing metrics (Masterwrought supply oversight): registry-only
+  // like the clear-item-name route (no legacy ladder arm; the RouteDef path is
+  // the one dispatch source). No limiter: a warm in-memory cached read with
+  // zero DB cost, the overview precedent.
+  {
+    dispatcher: DISPATCH.admin,
+    method: 'GET',
+    path: '/admin/api/market/metrics',
+    handler: 'server/admin.ts marketMetricsHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.admin,
+    limiter: null,
     requireOwnedExpected: null,
   },
   {

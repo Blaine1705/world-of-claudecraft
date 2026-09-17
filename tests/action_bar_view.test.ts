@@ -377,6 +377,67 @@ describe('actionBarView: the four slot kinds classify correctly', () => {
     expect(view.tick(world()).slots[0].kind).toBe('attack');
   });
 
+  it('a freed-slot ability the active build does not currently grant stays visible, dimmed and unusable, instead of painting empty', () => {
+    // The freed Attack slot (barSlot 0, "Show Attack Button" off) is deliberately
+    // not scoped to any one talent build (ActionBarController.loadAttackAction), so
+    // its assignment can outlive a build switch. Before this fix, hud.ts's
+    // abilityForSlot() only resolved against the live known-ability list, so the
+    // slot fell into the ability===null/item===null branch and rendered fully
+    // 'empty' the instant the granting build went inactive: from the player's
+    // perspective the ability looked deleted even though it survives in storage.
+    const view = createActionBarView(
+      descriptor(slot(0, { attack: false, ability: { ...ability('stormstrike'), known: false } })),
+      fakeDeps(),
+    );
+    const s = view.tick(world()).slots[0];
+    expect(s.kind).toBe('ability');
+    expect(s.iconKey).toBe(`${ABILITY_ICON_PREFIX}stormstrike`);
+    expect(s.abilityId).toBe('stormstrike');
+    expect(s.usable).toBe(false);
+    expect(s.cooldownPercent).toBe(0);
+    expect(s.procGlow).toBe(false);
+    expect(s.ariaDescription).toBe('abilityUi.tooltip.unavailable');
+  });
+
+  it('transitions cleanly between a live ability and its freed-slot known:false stub across ticks (no stale field, no new slot object)', () => {
+    // The reused per-slot state object (not the returned array) is what a build
+    // switch mutates in place every frame; a forgotten field reset in either
+    // direction would leak a stale cooldown/proc/usable value across the switch.
+    let live = true;
+    const s0: ActionBarSlotDescriptor = {
+      slotIndex: 0,
+      isAttack: () => false,
+      hasAction: () => true,
+      ability: () =>
+        live
+          ? ability('stormstrike', { cooldown: 10 })
+          : { ...ability('stormstrike', { cooldown: 10 }), known: false },
+      item: () => null,
+      keybindLabel: () => 'K0',
+    };
+    const view = createActionBarView(descriptor(s0), fakeDeps());
+
+    const cooldowns = new Map([['stormstrike', 8]]);
+    const knownSlot = view.tick(world({ cooldowns })).slots[0];
+    expect(knownSlot.usable).toBe(true);
+    expect(knownSlot.cooldownPercent).toBeGreaterThan(0);
+    expect(knownSlot.cdText).not.toBe('');
+
+    live = false;
+    const stubSlot = view.tick(world({ cooldowns })).slots[0];
+    expect(stubSlot).toBe(knownSlot); // same reused object, per-slot state is mutated in place
+    expect(stubSlot.usable).toBe(false);
+    expect(stubSlot.cooldownPercent).toBe(0);
+    expect(stubSlot.cdText).toBe('');
+    expect(stubSlot.ariaDescription).toBe('abilityUi.tooltip.unavailable');
+
+    live = true;
+    const backToKnown = view.tick(world({ cooldowns })).slots[0];
+    expect(backToKnown.usable).toBe(true);
+    expect(backToKnown.cooldownPercent).toBeGreaterThan(0);
+    expect(backToKnown.ariaDescription).toBe('');
+  });
+
   it('an item slot wins over a stale ability binding (item-first precedence)', () => {
     const view = createActionBarView(
       descriptor(slot(1, { ability: ability('fireball'), item: item('potion') })),
@@ -651,7 +712,7 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
     const view = createActionBarView(
       descriptor(
         slot(1, {
-          ability: ability('hour_of_judgment', { requiresTarget: true, range: 30 }),
+          ability: ability('coven', { requiresTarget: true, range: 30, cost: 0 }),
         }),
       ),
       fakeDeps(),
@@ -677,6 +738,24 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
         }),
       ).slots[0].usable,
     ).toBe(true);
+  });
+
+  it('leaves Possess and Hour of Judgment usable without targeting the primary Eye', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(1, {
+          ability: ability('hour_of_judgment', { requiresTarget: false, cost: 0 }),
+        }),
+        slot(2, {
+          ability: ability('possess_evil_eye', { requiresTarget: false, cost: 75 }),
+        }),
+      ),
+      fakeDeps(),
+    );
+
+    const withoutTarget = view.tick(world({ playerId: 7, resource: 100 }));
+    expect(withoutTarget.slots[0].usable).toBe(true);
+    expect(withoutTarget.slots[1].usable).toBe(true);
   });
 
   it('dims duplicate and over-cap Dominion summons without hiding valid composition choices', () => {
@@ -1514,6 +1593,23 @@ describe('actionBarView: attack + item slots', () => {
     expect(ready.cdText).toBe('');
   });
 
+  it('paints no potion swipe on an elixir slot: elixirs have no shared cooldown', () => {
+    // src/sim/items.ts kind 'elixir' applies its aura with no potionCd write, so a
+    // placed elixir must stay usable while the potion timer runs.
+    const view = createActionBarView(
+      descriptor(slot(1, { item: item('elixir_of_the_bear', 'elixir') })),
+      fakeDeps(),
+    );
+    const s = view.tick(
+      world({ potionCdRemaining: 60, inventory: [{ itemId: 'elixir_of_the_bear', count: 1 }] }),
+    ).slots[0];
+    expect(s.kind).toBe('item');
+    expect(s.cooldownRemaining).toBe(0);
+    expect(s.cooldownPercent).toBe(0);
+    expect(s.cdText).toBe('');
+    expect(s.usable).toBe(true);
+  });
+
   it('does not paint a cooldown on a non-potion item even while the potion timer runs', () => {
     const view = createActionBarView(
       descriptor(slot(1, { item: item('iron_dagger', 'weapon') })),
@@ -1751,5 +1847,54 @@ describe('actionBarView: an auto-unshifting cast is affordable against parked ma
         world({ auras: [], resourceType: 'mana', resource: 5, savedMana: 500 }),
       ).slots[0].usable,
     ).toBe(false);
+  });
+});
+
+describe('actionBarView: watched proc glow from the Auras panel', () => {
+  // The Auras panel's Hotbar Glow channel (src/ui/proc_ready_glow_core.ts) hands
+  // the bar a set of ability ids to light; the view ORs it in after every
+  // authored predicate, so it can only ever ADD a glow.
+  it('lights the button a watched proc names, and no other', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(0, { ability: ability('stormstrike') }),
+        slot(1, { ability: ability('earth_shock') }),
+      ),
+      { ...fakeDeps(), watchedGlowAbilityIds: () => new Set(['stormstrike']) },
+    );
+    const slots = view.tick(world()).slots;
+    expect(slots[0].procGlow).toBe(true);
+    expect(slots[1].procGlow).toBe(false);
+  });
+
+  it('is additive only: an authored glow survives an empty set, and no dep at all', () => {
+    // Divine Ascension at full devotion is an AUTHORED glow (the paladin
+    // predicate in the view), so it stays lit whether the Auras panel contributes
+    // nothing this frame or the host never wired the dep.
+    const ready = world({
+      paladinSpec: 'retribution',
+      paladinDevotion: { value: 20, ascensionCharges: 0, ascensionRemaining: 0 },
+    });
+    const withEmptySet = createActionBarView(
+      descriptor(slot(0, { ability: ability('divine_ascension') })),
+      { ...fakeDeps(), watchedGlowAbilityIds: () => new Set() },
+    );
+    expect(withEmptySet.tick(ready).slots[0].procGlow).toBe(true);
+    const withoutDep = createActionBarView(
+      descriptor(slot(0, { ability: ability('divine_ascension') })),
+      fakeDeps(),
+    );
+    expect(withoutDep.tick(ready).slots[0].procGlow).toBe(true);
+  });
+
+  it('follows the set frame by frame, so the glow drops when the aura does', () => {
+    let lit: ReadonlySet<string> = new Set(['stormstrike']);
+    const view = createActionBarView(descriptor(slot(0, { ability: ability('stormstrike') })), {
+      ...fakeDeps(),
+      watchedGlowAbilityIds: () => lit,
+    });
+    expect(view.tick(world()).slots[0].procGlow).toBe(true);
+    lit = new Set();
+    expect(view.tick(world()).slots[0].procGlow).toBe(false);
   });
 });
