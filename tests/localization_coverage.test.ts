@@ -414,6 +414,9 @@ describe('i18n Localization Key Coverage', () => {
     moveKeys: 'W/A/S/D',
     questKey: 'L',
     item: 'Rough Bracers',
+    // The casket contents list (questUi.logs.clueCasketOpened): a formatted
+    // item-name list, not a count.
+    items: 'Heroic Mark and Rough Bracers',
     key: 'K',
     // The death recap's slayer (hud.system.deathRecapKiller[Ability]): a mob
     // or player display name spliced verbatim. One sample only, the base and
