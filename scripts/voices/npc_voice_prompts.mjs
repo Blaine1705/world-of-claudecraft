@@ -1127,6 +1127,9 @@ export const VOICE_ALIAS = {
   npc_church_order_quartermaster: 'aurorist_veyla',
   npc_automaton_quartermaster: 'wardsmith_orun',
   npc_wq_taskmaster: 'foreman_odell',
+  // The weekly emissary keeps the Vale's ledger of deeds: the same civic,
+  // matter-of-fact register as the foreman until a voice of his own is cast.
+  weekly_emissary: 'foreman_odell',
   brother_aldric_fen: 'brother_aldric',
   brother_aldric_highwatch: 'brother_aldric',
   brother_aldric_raid: 'brother_aldric',

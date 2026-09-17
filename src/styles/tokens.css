@@ -1282,6 +1282,72 @@
       var(--unit-frame-bar-gap) +
       70px
     );
+    /* The weekly emissary window (src/ui/weekly_quests_window.ts): its own
+       violet-and-gilt palette, named here so the sheet holds no raw literal. */
+    --wk-black: #000;
+    --wk-edge-gold: #8f6a2c;
+    --wk-gilt-text: #f2d998;
+    --wk-gold: #d4a955;
+    --wk-gold-1-a33: #d4a95533;
+    --wk-gold-2: #3a2d12;
+    --wk-gold-3-a22: #d4a95522;
+    --wk-gold-4-a55: #d4a95555;
+    --wk-gold-5-a66: #d4a95566;
+    --wk-green: #5fd13f;
+    --wk-green-1: #173a0c;
+    --wk-green-2: #1e3a15;
+    --wk-green-3: #2f6a1c;
+    --wk-green-4-a44: #7ef25f44;
+    --wk-green-bright: #7ef25f;
+    --wk-grey-1-a12: #ffffff12;
+    --wk-grey-2-a14: #ffffff14;
+    --wk-grey-3-a1a: #ffffff1a;
+    --wk-ink: #c9bde4;
+    --wk-muted: #8d82a8;
+    --wk-night-1-acc: #000c;
+    --wk-night-10: #0e0a1a;
+    --wk-night-11: #0e2009;
+    --wk-night-12: #120b20;
+    --wk-night-13-af2: #120c20f2;
+    --wk-night-14-afa: #130d22fa;
+    --wk-night-15: #150f24;
+    --wk-night-16: #171029;
+    --wk-night-17: #171226;
+    --wk-night-18: #1c150a;
+    --wk-night-2-aaa: #000a;
+    --wk-night-3-a99: #0009;
+    --wk-night-4-aee: #000e;
+    --wk-night-5: #0a0713;
+    --wk-night-6-acc: #0a0713cc;
+    --wk-night-7-af5: #0c0816f5;
+    --wk-night-8-afc: #0d0918fc;
+    --wk-night-9: #0e0a18;
+    --wk-plate-bottom: #0e0a1ae6;
+    --wk-plate-top: #1c1531e6;
+    --wk-sheet-bottom: #0c0816f8;
+    --wk-sheet-mid: #120c20f5;
+    --wk-sheet-top: #1c1531f5;
+    --wk-text-bright: #f1e9ff;
+    --wk-text-brightest: #fbf6ff;
+    --wk-text-soft: #efe6ff;
+    --wk-violet: #8b5cf6;
+    --wk-violet-1-a55: #8b5cf655;
+    --wk-violet-10-a08: #8b5cf608;
+    --wk-violet-11-a1f: #8b5cf61f;
+    --wk-violet-12-a2a: #8b5cf62a;
+    --wk-violet-13-a55: #c4a6ff55;
+    --wk-violet-2-af2: #1c1531f2;
+    --wk-violet-3: #1d1533;
+    --wk-violet-4-afa: #1e1633fa;
+    --wk-violet-5: #2a1f47;
+    --wk-violet-6: #2a2140;
+    --wk-violet-7: #2b1f4a;
+    --wk-violet-8: #3a2b62;
+    --wk-violet-9-a2e: #6d3fd42e;
+    --wk-violet-accent: #c58bff;
+    --wk-violet-deep: #4c2f8a;
+    --wk-violet-text: #c4a6ff;
+    --wk-white: #fff;
   }
 
   /* Glass is dropped WHOLE-RULE at the low effect tier: a universal removal

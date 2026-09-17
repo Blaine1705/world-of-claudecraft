@@ -84,6 +84,14 @@ export class WeeklyQuestsWindow {
   }
 
   /** Slow-band refresh: repaint when the pick changes or every minute for the clock. */
+  /** Language fan-out arm: the sheet is signature-gated on locale-free data,
+   *  so a switch rebuilds it once here; render() re-latches the signature. */
+  relocalize(): void {
+    if (!this.opened) return;
+    this.lastSig = '';
+    this.render(null);
+  }
+
   refreshIfChanged(): void {
     if (!this.opened) return;
     const sig = `${this.sig()}:${Math.floor(Date.now() / 60_000)}`;

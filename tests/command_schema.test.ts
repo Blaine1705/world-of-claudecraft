@@ -172,9 +172,11 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // `market_sweep`, both client-sent and server-dispatched.
 // RE-PINNED at the third release/v0.43.0 merge into feature/world-quests:
 // the release's 225/239 plus the branch's eleven world-quest and vehicle
-// commands, plus world_quest_reroll: 237/251/14.
-const EXPECTED_SEND_COUNT = 237;
-const EXPECTED_DISPATCH_COUNT = 251;
+// commands, plus world_quest_reroll: 237/251/14. Plus the weekly emissary's
+// pick and commendation (world_quest_weekly_choose, world_quest_weekly_commend):
+// 239/253/14.
+const EXPECTED_SEND_COUNT = 239;
+const EXPECTED_DISPATCH_COUNT = 253;
 const EXPECTED_DISPATCH_ONLY_COUNT = 14;
 
 // The chat sub-channel routing switch (server/game.ts `switch

@@ -819,7 +819,8 @@ describe('Masterwrought art completion evidence', () => {
     // the release/v0.43.0 merge: 1,287.
     // The wq-reputation merge adds the 15 faction quartermaster icons
     // (faction-vendor-icons-2026-09-16): 1,302.
-    expect(currentOwnerIds).toHaveLength(1302);
+    // 1303 with the weekly emissary's cache chest (feature/weekly-quests).
+    expect(currentOwnerIds).toHaveLength(1303);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -907,7 +908,10 @@ describe('Masterwrought art completion evidence', () => {
         !laterGapFillIds.has(id) &&
         !ossBrainMountIds.has(id) &&
         !worldQuestObjectIds.has(id) &&
-        !factionVendorIds.has(id),
+        !factionVendorIds.has(id) &&
+        // The weekly emissary's cache chest (feature/weekly-quests) is additive
+        // beyond the dated completion union, like the Field Kit.
+        id !== 'emissary_cache',
     );
     expect(completionOwnerIds).toHaveLength(1209);
     expect(sorted(completionOwnerIds)).toEqual(completionDatedIds);

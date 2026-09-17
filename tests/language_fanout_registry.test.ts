@@ -132,6 +132,7 @@ const FANOUT_ARMS: readonly string[] = [
   'this.bgScoreboard.relocalize|',
   'this.syncDailyRewardsSurfaceLabels|',
   'this.wocMarketWindow.relocalize|',
+  'this.weeklyQuestsWindow.relocalize|',
   'this.storePromoCard.relocalize|',
   'this.refreshKeybindLabels|',
   'this.questTracker.relocalize|',
@@ -491,6 +492,12 @@ const ANSWERED: readonly AnsweredSurface[] = [
     memos: ['lastSig', 'lastSellPriceRefSig', 'searchEcho'],
     answer: 'this.marketWindow.render',
     why: 'the listing ids, prices and the active tab; render() carries no self-gate. lastSellPriceRefSig (issue 3043) is the Sell tab price reference: render() rebuilds it via renderSell -> sellPriceRefHtml with the CURRENT language, the same full-rebuild path that already answers lastSig. searchEcho is answered DIFFERENTLY and deliberately: it memoizes the typed-to-sent Browse search translation, whose resolution reads localized item names, so it keys the active language into the memo itself (LANGUAGE_KEYED below verifies that structurally) rather than riding this arm. A repaint cannot fix it: the stale value is the string the client SENDS to the server, so it has to be re-resolved rather than re-painted',
+  },
+  {
+    file: 'weekly_quests_window.ts',
+    memos: ['lastSig'],
+    answer: 'this.weeklyQuestsWindow.relocalize',
+    why: 'the held pick, the reset instant, the dialog and the standing map digest into lastSig, none of them text; relocalize() self-gates on the open sheet, clears the latch and rebuilds once, and render() re-latches the signature in the current language',
   },
   {
     file: 'woc_market_window.ts',

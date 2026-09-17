@@ -1808,9 +1808,7 @@ export class Hud {
   private prevCraftSkillLevels: Record<string, number> | null = null;
   private prevGatheringSkillLevels: Record<string, number> | null = null;
   private prevFactionStanding: Record<FactionId, number> | null = null;
-  // The host seam the celebration painters draw through (hud/professions/
-  // skill_level_toast_painter.ts): the chat log, the queued celebration
-  // banner slot, the polite announcer and the reduced-motion query. Built per
+  // The CelebrationHost seam the celebration painters draw through, built per
   // celebration (a rare drain) so a prototype-only test double still resolves.
   private celebrationHost(): CelebrationHost {
     return {
@@ -7059,6 +7057,7 @@ export class Hud {
     this.relocalizeCoordinatorMemos();
     this.syncDailyRewardsSurfaceLabels();
     this.wocMarketWindow.relocalize();
+    this.weeklyQuestsWindow.relocalize();
     // Self-gated on its own open check (root src/ui/CLAUDE.md); refreshes the
     // root accessible name and row labels, preserving the uncommitted draft
     // and exact focus (Intentional Gathering PR3).

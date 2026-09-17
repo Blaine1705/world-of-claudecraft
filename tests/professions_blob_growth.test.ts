@@ -203,6 +203,9 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
   // Faction standing rows (src/sim/factions.ts), persisted beside the
   // world-quest log they are earned from.
   'factions',
+  // The weekly emissary's pick (src/sim/weekly_quests.ts), beside the world
+  // quests it stands next to.
+  'weeklyQuest',
   'arenaRating',
   'arenaWins',
   'arenaLosses',
@@ -2348,8 +2351,12 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         49 +
         375 +
         358 +
+        // Plus 17 at the weekly emissary rebase: the Emissary's Cache id in the
+        // maximal character's deedStats.itemsDiscovered (the deedStats row
+        // below moves 469 to 486 by the same 17). MEASURED (56,438 to 56,455).
         282 +
-        197,
+        197 +
+        17,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2376,7 +2383,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // wq-reputation merge: the faction quartermaster items (+358 above).
       // deeds 317 -> 599 at the faction standing deeds (+282 above) and
       // 599 -> 796 at the Regional Mastery deeds (+197 above).
-    ).toEqual({ questsDone: 100, knownRecipes: 30, deeds: 796, deedStats: 469, reliquary: 80 });
+    ).toEqual({ questsDone: 100, knownRecipes: 30, deeds: 796, deedStats: 486, reliquary: 80 });
     // Removing field_kit AND the Bramblehide release content reproduces the
     // pre-field-kit, pre-Bramblehide baseline WITH the hammer content still
     // applied: 3884 alone measured 209,261 here (hammer content absent); the
@@ -2397,7 +2404,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 210,506 -> 210,788 at the faction standing deeds (+282) and
       // 210,788 -> 210,985 at the Regional Mastery deeds (+197), both in the
       // deeds row this counterfactual keeps.
-    ).toBe(210985);
+    ).toBe(211002);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 49-byte
@@ -2413,7 +2420,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 211,745 -> 212,103 at the wq-reputation merge (+358, the faction items).
       // 212,103 -> 212,385 at the faction standing deeds (+282) and
       // 212,385 -> 212,582 at the Regional Mastery deeds (+197).
-    ).toBe(212582);
+    ).toBe(212599);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2481,8 +2488,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // deeds row (+197, attributed above); no container or ceiling changed
     // shape. Floor at measurement minus 380, edge at measurement plus one:
     // 212,214..212,595.
-    expect(bytes, reMint).toBeGreaterThan(212214);
-    expect(bytes, reMint).toBeLessThan(212595);
+    // Shifted +17 at the weekly emissary rebase: the held weekly pick row.
+    expect(bytes, reMint).toBeGreaterThan(212231);
+    expect(bytes, reMint).toBeLessThan(212612);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was
