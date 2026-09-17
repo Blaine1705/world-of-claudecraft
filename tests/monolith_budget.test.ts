@@ -482,7 +482,13 @@ const MONOLITHS: MonolithRow[] = [
     // Unlock Interface menu row and touch engine-indicator drag land +4 on the
     // coordinator, so the merged file measures 18305 (wc -l < src/ui/hud.ts).
     // Exact merged count, zero slack.
-    ceiling: 18305,
+    // LOWERED 18305 -> 18300 at the faction standing celebration (2026-09-17):
+    // the skill level-up paint body moved out to
+    // hud/professions/skill_level_toast_painter.ts behind the CelebrationHost
+    // seam, and the new faction tier observer landed as a thin call on the
+    // same seam (hud/reputation/faction_tier_celebration_*.ts). Exact count,
+    // zero slack.
+    ceiling: 18300,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

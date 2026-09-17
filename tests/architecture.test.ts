@@ -239,6 +239,7 @@ const UI_PURE_CORES = [
   'src/ui/world_quest_view.ts',
   'src/ui/world_quest_trace_view.ts',
   // The Reputation tab's rows and day summary (src/ui/hud/reputation/).
+  'src/ui/hud/reputation/faction_tier_celebration_view.ts',
   'src/ui/hud/reputation/reputation_view.ts',
   // The Currencies tab's balances (src/ui/hud/currencies/).
   'src/ui/hud/currencies/currencies_view.ts',

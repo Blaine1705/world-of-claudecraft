@@ -6,6 +6,7 @@ import {
   FACTIONS,
   factionForZone,
   factionTierTitle,
+  freshFactionReputation,
   LOW_LEVEL_MAX_STANDING,
   MAX_STANDING,
   maxStandingForLevel,
@@ -199,6 +200,28 @@ describe('level brackets and synchronized daily reward math', () => {
     expect(r3.gained).toBe(80);
     expect(r3.total).toBe(3_080);
     expect(r3.capped).toBe(false);
+  });
+
+  it('reports the tier before the award so a caller can tell a tier from a plain gain', () => {
+    const meta = { ...freshWorldQuestPlayerState() } as unknown as PlayerMeta;
+    meta.factions = freshFactionReputation();
+    meta.factions.rift_watch = 980;
+    const crossed = awardFactionReputation(meta, 'rift_watch', 30, 16);
+    expect(crossed.previousTier).toBe('unknown');
+    expect(crossed.tier).toBe('recognized');
+    const plain = awardFactionReputation(meta, 'rift_watch', 30, 16);
+    expect(plain.previousTier).toBe('recognized');
+    expect(plain.tier).toBe('recognized');
+    // A capped award that lands exactly on the threshold still reports the tier.
+    meta.factions.rift_watch = 2_990;
+    const capped = awardFactionReputation(meta, 'rift_watch', 500, 10);
+    expect(capped.capped).toBe(true);
+    expect(capped.previousTier).toBe('recognized');
+    expect(capped.tier).toBe('trusted');
+    // Nothing gained, nothing crossed.
+    const stuck = awardFactionReputation(meta, 'rift_watch', 500, 10);
+    expect(stuck.gained).toBe(0);
+    expect(stuck.previousTier).toBe(stuck.tier);
   });
 
   it('synchronizes daily progression at levels 16-20 (400 rep/day per faction)', () => {

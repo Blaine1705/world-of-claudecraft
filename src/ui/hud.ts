@@ -87,6 +87,7 @@ import {
 } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
 import { canEquipItem, isUniqueEquipped, weaponHand } from '../sim/equipment_rules';
+import type { FactionId } from '../sim/factions';
 import { isItemLevelEligible, itemInstanceLevel, itemScore } from '../sim/item_level';
 import type { Ante, PickAction } from '../sim/lockpick';
 import type { MaterialComposition } from '../sim/material_sources';
@@ -539,7 +540,6 @@ import { materialHintLine } from './hud/professions/material_hint_view';
 import { materialProfessionHintText } from './hud/professions/material_profession_hint_view';
 import { mobileStationTooltipLines } from './hud/professions/mobile_station_tooltip';
 import { PerfectingWindow } from './hud/professions/perfecting_window';
-import { professionImageUrl } from './hud/professions/profession_art';
 import {
   isSunderCompletionLog,
   type ProfessionEventInput,
@@ -559,10 +559,12 @@ import { renderProfessionTutorial } from './hud/professions/profession_tutorial_
 import { ProfessionsWindow } from './hud/professions/professions_window';
 import { recipePatternTooltipLines } from './hud/professions/recipe_pattern_tooltip_view';
 import {
+  type CelebrationHost,
+  paintSkillLevelCelebrations,
+} from './hud/professions/skill_level_toast_painter';
+import {
   advanceSkillLevelObservation,
-  buildSkillLevelCelebrationPlan,
   type SkillLevelUp,
-  skillLevelArtId,
 } from './hud/professions/skill_level_toast_view';
 import { toolEffectResultLine } from './hud/professions/tool_effect_result_view';
 import { wellFedTooltipLines } from './hud/professions/wellfed_tooltip_view';
@@ -572,6 +574,8 @@ import { parseChatSegments } from './hud/quest/quest_link';
 import { QuestProgressBanner } from './hud/quest/quest_progress_banner';
 import { QuestTrackerController } from './hud/quest/quest_tracker_controller';
 import { QuestLogWindow } from './hud/quest/questlog_window';
+import { paintFactionTierCelebrations } from './hud/reputation/faction_tier_celebration_painter';
+import { advanceFactionTierObservation } from './hud/reputation/faction_tier_celebration_view';
 import { RiftMapPainter } from './hud/rift';
 import { RiftFloorTrackerController } from './hud/rift/rift_floor_tracker_controller';
 import { RiftForgeWindow, riftForgeInReach } from './hud/rift_forge';
@@ -1802,6 +1806,20 @@ export class Hud {
   // either consumer, and so gathering proficiency has its own baseline.
   private prevCraftSkillLevels: Record<string, number> | null = null;
   private prevGatheringSkillLevels: Record<string, number> | null = null;
+  private prevFactionStanding: Record<FactionId, number> | null = null;
+  // The host seam the celebration painters draw through (hud/professions/
+  // skill_level_toast_painter.ts): the chat log, the queued celebration
+  // banner slot, the polite announcer and the reduced-motion query. Built per
+  // celebration (a rare drain) so a prototype-only test double still resolves.
+  private celebrationHost(): CelebrationHost {
+    return {
+      log: (text, color) => this.log(text, color),
+      showCelebrationBanner: (text, bannerClass, variant, motion, iconUrl, subtext) =>
+        this.showCelebrationBanner(text, bannerClass, variant, motion, iconUrl, subtext),
+      announce: (text) => this.combatAnnouncer.push(text, performance.now()),
+      reducedMotion: () => window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    };
+  }
   // Signature of the in-range station-type set as of the last crafting-window
   // paint (stations.ts stationTypesSignature): the slow band compares the live
   // set against this to keep an OPEN window fresh without per-frame repaints
@@ -13599,61 +13617,38 @@ export class Hud {
         // quiets a login catch-up, never a live earned moment).
         masterworkItemId !== null || obs.tierUps.length > 0 || deedUnlocks.length > 0,
       );
+    // Faction standing tiers ride the same diff-observer family over
+    // IWorld.factions (hud/reputation/faction_tier_celebration_view.ts), on
+    // the same sync flag: `fac` ships in the self snapshot beside cprof.
+    const factionObs = advanceFactionTierObservation(
+      identitySynced,
+      this.prevFactionStanding,
+      sim.factions,
+    );
+    this.prevFactionStanding = factionObs.prev;
+    if (factionObs.tierUps.length > 0)
+      paintFactionTierCelebrations(
+        this.celebrationHost(),
+        factionObs.tierUps,
+        masterworkItemId !== null || obs.tierUps.length > 0 || deedUnlocks.length > 0,
+      );
   }
 
   // Profession skill level-ups (gathering + craft counters): pure plan in
-  // skill_level_toast_view.ts. Chat log for EVERY floor climb (the classic
-  // per-point skill message); the copper skill plate, polite announce, and
-  // celebration chime only for a gathering milestone crossing (the plan's
-  // cadence rules; craft boundaries belong to the tier-up celebration).
-  // Presentation is deliberately NOT the bare gold level-up language
-  // (players used to misread gathering milestones as character levels).
+  // skill_level_toast_view.ts, drawn by skill_level_toast_painter.ts through
+  // the celebration host seam. Kept as a method so the drain tail and the
+  // paint-contract tests call one name.
   private handleSkillLevelCelebrations(
     craftUps: SkillLevelUp[],
     gatherUps: SkillLevelUp[],
     celebrationAlreadyChimed: boolean,
   ): void {
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const plan = buildSkillLevelCelebrationPlan(
+    paintSkillLevelCelebrations(
+      this.celebrationHost(),
       craftUps,
       gatherUps,
-      reducedMotion,
       celebrationAlreadyChimed,
     );
-    const skillName = (skillId: string): string => {
-      const gatherKey = gatheringProfessionNameKey(skillId);
-      if (gatherKey) return t(gatherKey);
-      return craftNameText(skillId);
-    };
-    const toastText = (up: SkillLevelUp) =>
-      t('hudChrome.crafting.skillUpToast', {
-        skill: skillName(up.skillId),
-        level: formatNumber(up.toLevel, { maximumFractionDigits: 0 }),
-      });
-    for (const up of plan.skillUpLogs) this.log(toastText(up), HUD_LOG.NOTICE);
-    if (plan.banner !== null) {
-      const artUrl = professionImageUrl(skillLevelArtId(plan.banner.skillId));
-      // Celebration class 'deed': queues behind level-ups, never ambient
-      // replace, so a milestone landing after a ding still plays in order.
-      // The skill VARIANT is the copper plate; class and variant are
-      // orthogonal. The title is the skill name, already localized through
-      // gatheringProfessionNameKey above, so no wrapper key is needed.
-      this.showCelebrationBanner(
-        skillName(plan.banner.skillId),
-        'deed',
-        'skill',
-        plan.motion,
-        artUrl ?? undefined,
-        t('hudChrome.crafting.skillUpSubtext', {
-          level: formatNumber(plan.banner.toLevel, { maximumFractionDigits: 0 }),
-        }),
-      );
-      // The banner div carries no live semantics, so the polite #combat-live
-      // region carries the combined line (skill name AND level in one string,
-      // the level the visual title omits).
-      this.combatAnnouncer.push(toastText(plan.banner), performance.now());
-    }
-    if (plan.playSound) audio.achievement();
   }
 
   // The crafted earned moment, planned purely (craft_celebration_view) so the

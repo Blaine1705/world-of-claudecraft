@@ -293,6 +293,8 @@ export interface AwardStandingResult {
   readonly gained: number;
   readonly total: number;
   readonly tier: StandingTier;
+  /** The tier before the award; differs from `tier` exactly when a new tier was reached. */
+  readonly previousTier: StandingTier;
   readonly capped: boolean;
 }
 
@@ -313,6 +315,7 @@ export function awardFactionReputation(
   const gained = newTotal - current;
   meta.factions[factionId] = newTotal;
   const tier = standingTierForReputation(newTotal);
+  const previousTier = standingTierForReputation(current);
   const capped = current + add > cap;
-  return { gained, total: newTotal, tier, capped };
+  return { gained, total: newTotal, tier, previousTier, capped };
 }

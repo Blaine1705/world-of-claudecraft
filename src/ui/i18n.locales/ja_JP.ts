@@ -17219,6 +17219,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reputation.title': '勢力の称号',
   'hudChrome.reputation.legend': '評判の段階',
   'hudChrome.reputation.vendorGate': '{faction}との評判が{tier}以上必要です。',
+  'hudChrome.reputation.tierReachedBanner': '{faction}との評判が{tier}になりました',
+  'hudChrome.reputation.tierReachedSubtext': '勢力の称号：{title}',
+  'hudChrome.reputation.tierReachedLine': '{faction}との評判が{tier}になりました。勢力の称号は{title}になりました。',
   'hudChrome.questLog.completed': '完了済み',
   'hudChrome.questLog.zoneSummary': '{count}件（{ready}件完了）',
   'hudChrome.questLog.shiftHint':
