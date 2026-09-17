@@ -2393,7 +2393,10 @@ export const nl_NL: EnTranslations = {
       "title": "Faction title",
       "titleLine": "{faction} . {tier}",
       "legend": "Standing tiers",
-      "vendorGate": "Requires {tier} with {faction}."
+      "vendorGate": "Requires {tier} with {faction}.",
+      "tierReachedBanner": "Now {tier} with the {faction}",
+      "tierReachedSubtext": "Faction title: {title}",
+      "tierReachedLine": "You are now {tier} with the {faction}. Your faction title is now {title}."
     },
     "questLog": {
       "completed": "Voltooid",
@@ -6085,6 +6088,7 @@ export const nl_NL: EnTranslations = {
       "progression": "Levelen & Voortgang",
       "world": "Wereld",
       "quests": "Quests",
+      "factions": "Factions & Standing",
       "dungeons": "Kerkers & Raids",
       "delves": "Delves",
       "rifts": "Rifts",
@@ -7417,6 +7421,29 @@ export const nl_NL: EnTranslations = {
       "ladderBody": "Elke partij verschuift een blijvende, aan het personage gebonden slagveldwaardering, of je nu wint of verliest, en het aller-tijden-bord rangschikt de kampioenen van het rijk.",
       "rewardsHeading": "Wat een wedstrijd oplevert",
       "rewardsBody": "Elke afgeronde wedstrijd betaalt Eer uit: meer voor een overwinning, een troostprijs voor een nederlaag of een gelijkspel, plus een klein bedrag voor elke fatale klap die je uitdeelt en elke waar je aan bijdraagt, dus vechten ver van de vlaggen blijft de moeite waard. Je eerste overwinning van elke dag levert daarbovenop een bonus op, en het paneel laat je weten zolang die bonus nog op je wacht. Die dag is van Eer zelf, en hij vernieuwt zich op zijn eigen klok in plaats van met de instantiereset van het rijk. Hetzelfde team steeds opnieuw tegenkomen levert na de eerste keer minder op voor de wedstrijd zelf, en zakt snel naar een bodem in plaats van weg te vallen naar niets, en een opgegeven wedstrijd levert helemaal niets op. Geef uit wat je verdient bij een van beide Erekwartiermeesters."
+    },
+    "factionsPage": {
+      "heading": "Factions and Standing",
+      "intro": "Three allied factions each keep watch over their own corner of the realm, and every world quest you finish in their lands raises your standing with them. Standing climbs through six tiers, each with a title of its own, and opens a quartermaster stock piece by piece along the way.",
+      "whoHeading": "The three factions",
+      "whoBody": "Each faction is tied to a group of zones, so where you are doing world quests decides which faction the credit goes to. You never pick a side: all three keep their own tally, and none of them ever asks you to turn on another.",
+      "riftWatchBody": "The Rift Watch guards the shore and watches the deep tears. Their lands are the coast: the Farshore, the Palmreach, the Galecrest, the Willowfen and the Veiled Hollow. Their hub is Drifthaven, on the Palmreach.",
+      "churchOrderBody": "The Church Order holds the heartland of the realm: Eastbrook Vale, Mirefen Marsh, Thornpeak Heights, the Nightbloom and the Wraithwood. Brother Aldric speaks for them from Eastbrook Vale.",
+      "automatonsBody": "The Automatons keep the forges of the far reaches: the Drakelands, the Frostveil Reach, the Amberfall and the Evergarden. Their hub is Wyrmwatch, in the Drakelands.",
+      "earningHeading": "Earning standing",
+      "earningBody": "Standing comes from world quests. Every world quest counts toward the faction of the zone it is set in, and because the three factions cover different zones, all three progress at once as you work your way across the map. Taskmaster Kaelen in Eastbrook opens the World Quests board on the map, and the board is also where you may replace one world quest each day if the day's assignment does not suit you.",
+      "lowLevelNote": "Standing pauses at a tier for lower-level characters and resumes as you level, so a young character can start earning early without running out of road.",
+      "tiersHeading": "Standing tiers",
+      "tiersBody": "Every faction climbs the same six tiers: Unknown, Recognized, Trusted, Proven, Vanguard and Champion. Each faction gives its own name to each rung, and that name becomes your title with them.",
+      "riftWatchTitles": "With the Rift Watch you are an Outsider, then a Watcher, a Riftwalker, a Warden, a Riftwarden and at last a Champion.",
+      "churchOrderTitles": "With the Church Order you are an Outsider, then an Acolyte, a Keeper, a Templar, a Dawnkeeper and at last a Champion.",
+      "automatonsTitles": "With the Automatons you are an Outsider, then an Operator, a Mechanist, an Artificer, a Forgemaster and at last a Champion.",
+      "quartermastersHeading": "Quartermasters",
+      "quartermastersBody": "Each faction keeps a quartermaster at its hub: Quartermaster Vaelen for the Rift Watch in Drifthaven, Templar Althea for the Church Order at the Eastbrook chapel, and Artificer Tobrin for the Automatons in Wyrmwatch. Each sells a small stock of jewelry, armor, weapons and bags, unlocked tier by tier as your standing with that faction grows, and paid for in ordinary coin.",
+      "readingHeading": "Where to read it",
+      "readingBody": "The Reputation tab of the character sheet (C) shows each faction with its current standing, a bar toward the next tier, and the title that standing has earned you. The chat log reports every standing gain as it lands, and reaching a new tier shows a celebration banner on screen.",
+      "deedsHeading": "Deeds",
+      "deedsBody": "The Book of Deeds keeps score of your standing too: reaching Trusted with a faction and reaching Champion with a faction each record a deed, and reaching Champion with all three is a deed of its own. Like every deed these are cosmetic, never power, and the Champion deeds grant a title you can wear."
     },
     "deedsPage": {
       "intro": "In het Boek der Daden houdt de wereld de stand bij van alles wat je hebt verricht, van je eerste stappen buiten het dal waar je begon tot de zwaarste gevechten die het rijk te bieden heeft. Behaal daden terwijl je speelt, draag de titels die ze schenken en zie je Roem stijgen.",

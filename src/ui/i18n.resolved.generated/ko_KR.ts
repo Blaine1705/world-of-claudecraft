@@ -2393,7 +2393,10 @@ export const ko_KR: EnTranslations = {
       "title": "세력 칭호",
       "titleLine": "{faction} . {tier}",
       "legend": "평판 단계",
-      "vendorGate": "{faction}과(와) {tier} 평판이 필요합니다."
+      "vendorGate": "{faction}과(와) {tier} 평판이 필요합니다.",
+      "tierReachedBanner": "{faction}과(와) {tier} 평판 달성",
+      "tierReachedSubtext": "진영 칭호: {title}",
+      "tierReachedLine": "{faction}과(와)의 평판이 {tier}에 도달했습니다. 진영 칭호가 {title}(으)로 바뀌었습니다."
     },
     "questLog": {
       "completed": "완료됨",
@@ -6085,6 +6088,7 @@ export const ko_KR: EnTranslations = {
       "progression": "레벨과 성장",
       "world": "세계",
       "quests": "퀘스트",
+      "factions": "Factions & Standing",
       "dungeons": "던전과 공격대",
       "delves": "탐굴",
       "rifts": "균열",
@@ -7417,6 +7421,29 @@ export const ko_KR: EnTranslations = {
       "ladderBody": "모든 경기가 캐릭터에 매인 지속되는 전장 평점을 승패와 상관없이 움직이며, 역대 순위표가 세계의 용사들을 차례로 세웁니다.",
       "rewardsHeading": "경기가 주는 보상",
       "rewardsBody": "끝까지 치른 경기는 모두 명예를 줍니다. 승리는 더 많이, 패배나 무승부는 위로의 몫을 주며, 직접 넣은 결정타와 거든 처치마다 조금씩 더 붙으므로 깃발에서 떨어진 곳에서 싸우는 일도 값어치가 있습니다. 하루의 첫 승리는 그 위에 보너스를 얹어 주고, 그 보너스가 아직 남아 있는지는 패널이 알려 줍니다. 이 하루는 명예만의 하루라서, 왕국의 인스턴스 초기화가 아니라 자기만의 시계로 넘어갑니다. 같은 팀을 거듭 만나면 첫 경기 이후로는 경기 자체의 보상이 줄어들지만, 0으로 사라지지 않고 금세 바닥값에 자리 잡습니다. 몰수한 경기는 아무것도 주지 않습니다. 벌어들인 것은 어느 워페어 병참장교에게든 쓰세요."
+    },
+    "factionsPage": {
+      "heading": "Factions and Standing",
+      "intro": "Three allied factions each keep watch over their own corner of the realm, and every world quest you finish in their lands raises your standing with them. Standing climbs through six tiers, each with a title of its own, and opens a quartermaster stock piece by piece along the way.",
+      "whoHeading": "The three factions",
+      "whoBody": "Each faction is tied to a group of zones, so where you are doing world quests decides which faction the credit goes to. You never pick a side: all three keep their own tally, and none of them ever asks you to turn on another.",
+      "riftWatchBody": "The Rift Watch guards the shore and watches the deep tears. Their lands are the coast: the Farshore, the Palmreach, the Galecrest, the Willowfen and the Veiled Hollow. Their hub is Drifthaven, on the Palmreach.",
+      "churchOrderBody": "The Church Order holds the heartland of the realm: Eastbrook Vale, Mirefen Marsh, Thornpeak Heights, the Nightbloom and the Wraithwood. Brother Aldric speaks for them from Eastbrook Vale.",
+      "automatonsBody": "The Automatons keep the forges of the far reaches: the Drakelands, the Frostveil Reach, the Amberfall and the Evergarden. Their hub is Wyrmwatch, in the Drakelands.",
+      "earningHeading": "Earning standing",
+      "earningBody": "Standing comes from world quests. Every world quest counts toward the faction of the zone it is set in, and because the three factions cover different zones, all three progress at once as you work your way across the map. Taskmaster Kaelen in Eastbrook opens the World Quests board on the map, and the board is also where you may replace one world quest each day if the day's assignment does not suit you.",
+      "lowLevelNote": "Standing pauses at a tier for lower-level characters and resumes as you level, so a young character can start earning early without running out of road.",
+      "tiersHeading": "Standing tiers",
+      "tiersBody": "Every faction climbs the same six tiers: Unknown, Recognized, Trusted, Proven, Vanguard and Champion. Each faction gives its own name to each rung, and that name becomes your title with them.",
+      "riftWatchTitles": "With the Rift Watch you are an Outsider, then a Watcher, a Riftwalker, a Warden, a Riftwarden and at last a Champion.",
+      "churchOrderTitles": "With the Church Order you are an Outsider, then an Acolyte, a Keeper, a Templar, a Dawnkeeper and at last a Champion.",
+      "automatonsTitles": "With the Automatons you are an Outsider, then an Operator, a Mechanist, an Artificer, a Forgemaster and at last a Champion.",
+      "quartermastersHeading": "Quartermasters",
+      "quartermastersBody": "Each faction keeps a quartermaster at its hub: Quartermaster Vaelen for the Rift Watch in Drifthaven, Templar Althea for the Church Order at the Eastbrook chapel, and Artificer Tobrin for the Automatons in Wyrmwatch. Each sells a small stock of jewelry, armor, weapons and bags, unlocked tier by tier as your standing with that faction grows, and paid for in ordinary coin.",
+      "readingHeading": "Where to read it",
+      "readingBody": "The Reputation tab of the character sheet (C) shows each faction with its current standing, a bar toward the next tier, and the title that standing has earned you. The chat log reports every standing gain as it lands, and reaching a new tier shows a celebration banner on screen.",
+      "deedsHeading": "Deeds",
+      "deedsBody": "The Book of Deeds keeps score of your standing too: reaching Trusted with a faction and reaching Champion with a faction each record a deed, and reaching Champion with all three is a deed of its own. Like every deed these are cosmetic, never power, and the Champion deeds grant a title you can wear."
     },
     "deedsPage": {
       "intro": "업적의 서는 시작의 골짜기를 벗어나는 첫걸음부터 왕국이 내놓을 수 있는 가장 힘든 싸움까지, 당신이 이룬 모든 것을 세계가 기록해 두는 곳입니다. 플레이하며 업적을 얻고, 그것이 주는 칭호를 걸치고, 명성이 오르는 것을 지켜보세요.",

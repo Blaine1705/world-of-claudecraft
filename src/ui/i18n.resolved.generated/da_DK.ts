@@ -2393,7 +2393,10 @@ export const da_DK: EnTranslations = {
       "title": "Faction title",
       "titleLine": "{faction} . {tier}",
       "legend": "Standing tiers",
-      "vendorGate": "Requires {tier} with {faction}."
+      "vendorGate": "Requires {tier} with {faction}.",
+      "tierReachedBanner": "Now {tier} with the {faction}",
+      "tierReachedSubtext": "Faction title: {title}",
+      "tierReachedLine": "You are now {tier} with the {faction}. Your faction title is now {title}."
     },
     "questLog": {
       "completed": "Færdiggjort",
@@ -6085,6 +6088,7 @@ export const da_DK: EnTranslations = {
       "progression": "Levelling & Fremgang",
       "world": "Verden",
       "quests": "Quests",
+      "factions": "Factions & Standing",
       "dungeons": "Fangehuller & Raids",
       "delves": "Delve",
       "rifts": "Rifter",
@@ -7417,6 +7421,29 @@ export const da_DK: EnTranslations = {
       "ladderBody": "Hver kamp flytter en vedvarende slagmarksrangering knyttet til figuren, sejr eller nederlag, og tavlen gennem alle tider rangordner rigets mestre.",
       "rewardsHeading": "Hvad en kamp udbetaler",
       "rewardsBody": "Hver afsluttet kamp udbetaler Ære: mere for en sejr, en trøstepræmie for et nederlag eller en uafgjort, plus et lille beløb for hvert dræbende slag, du lander, og hvert ét, du medvirker til, så det stadig kan betale sig at kæmpe væk fra flagene. Din første sejr hver dag udbetaler en bonus oveni, og panelet fortæller dig det, mens den bonus stadig venter på dig. Den dag er Ærens egen, og den ruller videre efter sit eget ur i stedet for med rigets instans-nulstilling. At møde det samme hold igen og igen betaler mindre for selve kampen efter den første gang, og det falder hurtigt til ro på et gulv i stedet for at forsvinde helt, og en opgivet kamp betaler slet intet. Brug det, du tjener, hos en af Krigsførelsens kvartermestre."
+    },
+    "factionsPage": {
+      "heading": "Factions and Standing",
+      "intro": "Three allied factions each keep watch over their own corner of the realm, and every world quest you finish in their lands raises your standing with them. Standing climbs through six tiers, each with a title of its own, and opens a quartermaster stock piece by piece along the way.",
+      "whoHeading": "The three factions",
+      "whoBody": "Each faction is tied to a group of zones, so where you are doing world quests decides which faction the credit goes to. You never pick a side: all three keep their own tally, and none of them ever asks you to turn on another.",
+      "riftWatchBody": "The Rift Watch guards the shore and watches the deep tears. Their lands are the coast: the Farshore, the Palmreach, the Galecrest, the Willowfen and the Veiled Hollow. Their hub is Drifthaven, on the Palmreach.",
+      "churchOrderBody": "The Church Order holds the heartland of the realm: Eastbrook Vale, Mirefen Marsh, Thornpeak Heights, the Nightbloom and the Wraithwood. Brother Aldric speaks for them from Eastbrook Vale.",
+      "automatonsBody": "The Automatons keep the forges of the far reaches: the Drakelands, the Frostveil Reach, the Amberfall and the Evergarden. Their hub is Wyrmwatch, in the Drakelands.",
+      "earningHeading": "Earning standing",
+      "earningBody": "Standing comes from world quests. Every world quest counts toward the faction of the zone it is set in, and because the three factions cover different zones, all three progress at once as you work your way across the map. Taskmaster Kaelen in Eastbrook opens the World Quests board on the map, and the board is also where you may replace one world quest each day if the day's assignment does not suit you.",
+      "lowLevelNote": "Standing pauses at a tier for lower-level characters and resumes as you level, so a young character can start earning early without running out of road.",
+      "tiersHeading": "Standing tiers",
+      "tiersBody": "Every faction climbs the same six tiers: Unknown, Recognized, Trusted, Proven, Vanguard and Champion. Each faction gives its own name to each rung, and that name becomes your title with them.",
+      "riftWatchTitles": "With the Rift Watch you are an Outsider, then a Watcher, a Riftwalker, a Warden, a Riftwarden and at last a Champion.",
+      "churchOrderTitles": "With the Church Order you are an Outsider, then an Acolyte, a Keeper, a Templar, a Dawnkeeper and at last a Champion.",
+      "automatonsTitles": "With the Automatons you are an Outsider, then an Operator, a Mechanist, an Artificer, a Forgemaster and at last a Champion.",
+      "quartermastersHeading": "Quartermasters",
+      "quartermastersBody": "Each faction keeps a quartermaster at its hub: Quartermaster Vaelen for the Rift Watch in Drifthaven, Templar Althea for the Church Order at the Eastbrook chapel, and Artificer Tobrin for the Automatons in Wyrmwatch. Each sells a small stock of jewelry, armor, weapons and bags, unlocked tier by tier as your standing with that faction grows, and paid for in ordinary coin.",
+      "readingHeading": "Where to read it",
+      "readingBody": "The Reputation tab of the character sheet (C) shows each faction with its current standing, a bar toward the next tier, and the title that standing has earned you. The chat log reports every standing gain as it lands, and reaching a new tier shows a celebration banner on screen.",
+      "deedsHeading": "Deeds",
+      "deedsBody": "The Book of Deeds keeps score of your standing too: reaching Trusted with a faction and reaching Champion with a faction each record a deed, and reaching Champion with all three is a deed of its own. Like every deed these are cosmetic, never power, and the Champion deeds grant a title you can wear."
     },
     "deedsPage": {
       "intro": "Bedrifternes Bog er stedet, hvor verden holder regnskab med alt, hvad du har udrettet, fra dine første skridt ud af startdalen til de hårdeste kampe, riget kan byde på. Opnå bedrifter, mens du spiller, bær de titler, de skænker, og se din hæder stige.",

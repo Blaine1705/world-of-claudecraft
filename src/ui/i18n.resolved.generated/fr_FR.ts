@@ -2393,7 +2393,10 @@ export const fr_FR: EnTranslations = {
       "title": "Faction title",
       "titleLine": "{faction} . {tier}",
       "legend": "Standing tiers",
-      "vendorGate": "Requires {tier} with {faction}."
+      "vendorGate": "Requires {tier} with {faction}.",
+      "tierReachedBanner": "Now {tier} with the {faction}",
+      "tierReachedSubtext": "Faction title: {title}",
+      "tierReachedLine": "You are now {tier} with the {faction}. Your faction title is now {title}."
     },
     "questLog": {
       "completed": "Complété",
@@ -6085,6 +6088,7 @@ export const fr_FR: EnTranslations = {
       "progression": "Niveaux et progression",
       "world": "Monde",
       "quests": "Quêtes",
+      "factions": "Factions & Standing",
       "dungeons": "Donjons et raids",
       "delves": "Plongées",
       "rifts": "Failles",
@@ -7417,6 +7421,29 @@ export const fr_FR: EnTranslations = {
       "ladderBody": "Chaque match fait bouger un classement de champ de bataille persistant, propre au personnage, victoire ou défaite, et le tableau de tous les temps range les champions du royaume.",
       "rewardsHeading": "Ce que rapporte un match",
       "rewardsBody": "Chaque match terminé rapporte de l'honneur : davantage pour une victoire, une compensation pour une défaite ou un match nul, plus un petit montant pour chaque coup fatal que vous portez et chaque coup fatal auquel vous prêtez main-forte, si bien que se battre loin des drapeaux reste toujours utile. Votre première victoire de la journée rapporte un bonus supplémentaire, et le panneau vous indique tant que ce bonus vous attend encore. Cette journée appartient à l'honneur : elle tourne sur sa propre horloge plutôt que sur la réinitialisation des instances du royaume. Affronter la même équipe encore et encore rapporte moins pour le match lui-même après la première fois, se stabilisant vite à un plancher plutôt que de tomber jusqu'à rien, et un match abandonné ne rapporte absolument rien. Dépensez ce que vous gagnez auprès de l'un ou l'autre quartier-maître de Guerre."
+    },
+    "factionsPage": {
+      "heading": "Factions and Standing",
+      "intro": "Three allied factions each keep watch over their own corner of the realm, and every world quest you finish in their lands raises your standing with them. Standing climbs through six tiers, each with a title of its own, and opens a quartermaster stock piece by piece along the way.",
+      "whoHeading": "The three factions",
+      "whoBody": "Each faction is tied to a group of zones, so where you are doing world quests decides which faction the credit goes to. You never pick a side: all three keep their own tally, and none of them ever asks you to turn on another.",
+      "riftWatchBody": "The Rift Watch guards the shore and watches the deep tears. Their lands are the coast: the Farshore, the Palmreach, the Galecrest, the Willowfen and the Veiled Hollow. Their hub is Drifthaven, on the Palmreach.",
+      "churchOrderBody": "The Church Order holds the heartland of the realm: Eastbrook Vale, Mirefen Marsh, Thornpeak Heights, the Nightbloom and the Wraithwood. Brother Aldric speaks for them from Eastbrook Vale.",
+      "automatonsBody": "The Automatons keep the forges of the far reaches: the Drakelands, the Frostveil Reach, the Amberfall and the Evergarden. Their hub is Wyrmwatch, in the Drakelands.",
+      "earningHeading": "Earning standing",
+      "earningBody": "Standing comes from world quests. Every world quest counts toward the faction of the zone it is set in, and because the three factions cover different zones, all three progress at once as you work your way across the map. Taskmaster Kaelen in Eastbrook opens the World Quests board on the map, and the board is also where you may replace one world quest each day if the day's assignment does not suit you.",
+      "lowLevelNote": "Standing pauses at a tier for lower-level characters and resumes as you level, so a young character can start earning early without running out of road.",
+      "tiersHeading": "Standing tiers",
+      "tiersBody": "Every faction climbs the same six tiers: Unknown, Recognized, Trusted, Proven, Vanguard and Champion. Each faction gives its own name to each rung, and that name becomes your title with them.",
+      "riftWatchTitles": "With the Rift Watch you are an Outsider, then a Watcher, a Riftwalker, a Warden, a Riftwarden and at last a Champion.",
+      "churchOrderTitles": "With the Church Order you are an Outsider, then an Acolyte, a Keeper, a Templar, a Dawnkeeper and at last a Champion.",
+      "automatonsTitles": "With the Automatons you are an Outsider, then an Operator, a Mechanist, an Artificer, a Forgemaster and at last a Champion.",
+      "quartermastersHeading": "Quartermasters",
+      "quartermastersBody": "Each faction keeps a quartermaster at its hub: Quartermaster Vaelen for the Rift Watch in Drifthaven, Templar Althea for the Church Order at the Eastbrook chapel, and Artificer Tobrin for the Automatons in Wyrmwatch. Each sells a small stock of jewelry, armor, weapons and bags, unlocked tier by tier as your standing with that faction grows, and paid for in ordinary coin.",
+      "readingHeading": "Where to read it",
+      "readingBody": "The Reputation tab of the character sheet (C) shows each faction with its current standing, a bar toward the next tier, and the title that standing has earned you. The chat log reports every standing gain as it lands, and reaching a new tier shows a celebration banner on screen.",
+      "deedsHeading": "Deeds",
+      "deedsBody": "The Book of Deeds keeps score of your standing too: reaching Trusted with a faction and reaching Champion with a faction each record a deed, and reaching Champion with all three is a deed of its own. Like every deed these are cosmetic, never power, and the Champion deeds grant a title you can wear."
     },
     "deedsPage": {
       "intro": "Le Livre des hauts faits est l'endroit où le monde tient le compte de tout ce que vous avez accompli, de vos premiers pas hors de la vallée de départ aux combats les plus rudes que le royaume puisse offrir. Obtenez des hauts faits au fil du jeu, portez les titres qu'ils confèrent et regardez votre Renommée grimper.",

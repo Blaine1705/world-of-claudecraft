@@ -2393,7 +2393,10 @@ export const zh_CN: EnTranslations = {
       "title": "阵营头衔",
       "titleLine": "{faction} . {tier}",
       "legend": "声望等级",
-      "vendorGate": "需要与{faction}达到{tier}。"
+      "vendorGate": "需要与{faction}达到{tier}。",
+      "tierReachedBanner": "与{faction}的声望达到{tier}",
+      "tierReachedSubtext": "阵营头衔：{title}",
+      "tierReachedLine": "你与{faction}的声望已达到{tier}。你的阵营头衔现在是{title}。"
     },
     "questLog": {
       "completed": "已完成",
@@ -6085,6 +6088,7 @@ export const zh_CN: EnTranslations = {
       "progression": "升级与进阶",
       "world": "世界",
       "quests": "任务",
+      "factions": "Factions & Standing",
       "dungeons": "地下城与团队副本",
       "delves": "探秘",
       "rifts": "裂隙",
@@ -7417,6 +7421,29 @@ export const zh_CN: EnTranslations = {
       "ladderBody": "每场比赛都会牵动一份与角色绑定的持久战场评级，无论胜负，而历代榜单则为国度的勇士们排定名次。",
       "rewardsHeading": "一场比赛给什么",
       "rewardsBody": "每一场打完的比赛都会给荣誉：获胜给得更多，落败或平局也有一份安慰；此外你每拿下一个击杀、每协助一次，都会额外得到少量荣誉，所以在远离旗帜的地方厮杀同样值得。每天的首胜还会额外给一份奖励，只要这份奖励还等着你，面板就会告诉你。这个“每天”属于荣誉自己，它按自己的时钟翻篇，而不跟着王国的副本重置走。反复遇上同一支队伍，从第二次起比赛本身给的荣誉会减少，但很快就会稳定在一个下限，而不会一路跌到零；被判弃权的比赛则一点都不给。赚到的荣誉可以在任意一位战争军需官处消费。"
+    },
+    "factionsPage": {
+      "heading": "Factions and Standing",
+      "intro": "Three allied factions each keep watch over their own corner of the realm, and every world quest you finish in their lands raises your standing with them. Standing climbs through six tiers, each with a title of its own, and opens a quartermaster stock piece by piece along the way.",
+      "whoHeading": "The three factions",
+      "whoBody": "Each faction is tied to a group of zones, so where you are doing world quests decides which faction the credit goes to. You never pick a side: all three keep their own tally, and none of them ever asks you to turn on another.",
+      "riftWatchBody": "The Rift Watch guards the shore and watches the deep tears. Their lands are the coast: the Farshore, the Palmreach, the Galecrest, the Willowfen and the Veiled Hollow. Their hub is Drifthaven, on the Palmreach.",
+      "churchOrderBody": "The Church Order holds the heartland of the realm: Eastbrook Vale, Mirefen Marsh, Thornpeak Heights, the Nightbloom and the Wraithwood. Brother Aldric speaks for them from Eastbrook Vale.",
+      "automatonsBody": "The Automatons keep the forges of the far reaches: the Drakelands, the Frostveil Reach, the Amberfall and the Evergarden. Their hub is Wyrmwatch, in the Drakelands.",
+      "earningHeading": "Earning standing",
+      "earningBody": "Standing comes from world quests. Every world quest counts toward the faction of the zone it is set in, and because the three factions cover different zones, all three progress at once as you work your way across the map. Taskmaster Kaelen in Eastbrook opens the World Quests board on the map, and the board is also where you may replace one world quest each day if the day's assignment does not suit you.",
+      "lowLevelNote": "Standing pauses at a tier for lower-level characters and resumes as you level, so a young character can start earning early without running out of road.",
+      "tiersHeading": "Standing tiers",
+      "tiersBody": "Every faction climbs the same six tiers: Unknown, Recognized, Trusted, Proven, Vanguard and Champion. Each faction gives its own name to each rung, and that name becomes your title with them.",
+      "riftWatchTitles": "With the Rift Watch you are an Outsider, then a Watcher, a Riftwalker, a Warden, a Riftwarden and at last a Champion.",
+      "churchOrderTitles": "With the Church Order you are an Outsider, then an Acolyte, a Keeper, a Templar, a Dawnkeeper and at last a Champion.",
+      "automatonsTitles": "With the Automatons you are an Outsider, then an Operator, a Mechanist, an Artificer, a Forgemaster and at last a Champion.",
+      "quartermastersHeading": "Quartermasters",
+      "quartermastersBody": "Each faction keeps a quartermaster at its hub: Quartermaster Vaelen for the Rift Watch in Drifthaven, Templar Althea for the Church Order at the Eastbrook chapel, and Artificer Tobrin for the Automatons in Wyrmwatch. Each sells a small stock of jewelry, armor, weapons and bags, unlocked tier by tier as your standing with that faction grows, and paid for in ordinary coin.",
+      "readingHeading": "Where to read it",
+      "readingBody": "The Reputation tab of the character sheet (C) shows each faction with its current standing, a bar toward the next tier, and the title that standing has earned you. The chat log reports every standing gain as it lands, and reaching a new tier shows a celebration banner on screen.",
+      "deedsHeading": "Deeds",
+      "deedsBody": "The Book of Deeds keeps score of your standing too: reaching Trusted with a faction and reaching Champion with a faction each record a deed, and reaching Champion with all three is a deed of its own. Like every deed these are cosmetic, never power, and the Champion deeds grant a title you can wear."
     },
     "deedsPage": {
       "intro": "功绩之书记录着你在这个世界所做的一切，从走出新手山谷的第一步，到王国所能提供的最艰难的战斗。一边游玩一边赢得功绩，佩戴它们授予的头衔，看着你的名望不断攀升。",

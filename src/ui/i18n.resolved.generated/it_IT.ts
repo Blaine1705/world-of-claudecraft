@@ -2393,7 +2393,10 @@ export const it_IT: EnTranslations = {
       "title": "Faction title",
       "titleLine": "{faction} . {tier}",
       "legend": "Standing tiers",
-      "vendorGate": "Requires {tier} with {faction}."
+      "vendorGate": "Requires {tier} with {faction}.",
+      "tierReachedBanner": "Now {tier} with the {faction}",
+      "tierReachedSubtext": "Faction title: {title}",
+      "tierReachedLine": "You are now {tier} with the {faction}. Your faction title is now {title}."
     },
     "questLog": {
       "completed": "Completato",
@@ -6085,6 +6088,7 @@ export const it_IT: EnTranslations = {
       "progression": "Avanzamento di livello",
       "world": "Mondo",
       "quests": "Missioni",
+      "factions": "Factions & Standing",
       "dungeons": "Dungeon e Incursioni",
       "delves": "Incursioni",
       "rifts": "Squarci",
@@ -7417,6 +7421,29 @@ export const it_IT: EnTranslations = {
       "ladderBody": "Ogni incontro muove una classifica di campo di battaglia persistente e legata al personaggio, vittoria o sconfitta, e la tabella di tutti i tempi ordina i campioni del reame.",
       "rewardsHeading": "Cosa paga una partita",
       "rewardsBody": "Ogni partita conclusa paga Onore: di più per una vittoria, una consolazione per una sconfitta o un pareggio, più una piccola quantità per ogni colpo di grazia che infliggi e ogni assistenza che fornisci, così combattere lontano dalle bandiere vale comunque la pena. La tua prima vittoria di ogni giorno paga un bonus in più, e il pannello ti avvisa finché quel bonus ti sta ancora aspettando. Quel giorno è tutto dell'Onore, e si rinnova secondo il proprio orologio anziché con il reset delle istanze del reame. Affrontare la stessa squadra più e più volte paga sempre meno per la partita in sé dopo la prima, assestandosi rapidamente su un minimo anziché scendere fino a zero, e una partita abbandonata non paga assolutamente nulla. Spendi ciò che guadagni presso uno dei due quartiermastri della Guerra."
+    },
+    "factionsPage": {
+      "heading": "Factions and Standing",
+      "intro": "Three allied factions each keep watch over their own corner of the realm, and every world quest you finish in their lands raises your standing with them. Standing climbs through six tiers, each with a title of its own, and opens a quartermaster stock piece by piece along the way.",
+      "whoHeading": "The three factions",
+      "whoBody": "Each faction is tied to a group of zones, so where you are doing world quests decides which faction the credit goes to. You never pick a side: all three keep their own tally, and none of them ever asks you to turn on another.",
+      "riftWatchBody": "The Rift Watch guards the shore and watches the deep tears. Their lands are the coast: the Farshore, the Palmreach, the Galecrest, the Willowfen and the Veiled Hollow. Their hub is Drifthaven, on the Palmreach.",
+      "churchOrderBody": "The Church Order holds the heartland of the realm: Eastbrook Vale, Mirefen Marsh, Thornpeak Heights, the Nightbloom and the Wraithwood. Brother Aldric speaks for them from Eastbrook Vale.",
+      "automatonsBody": "The Automatons keep the forges of the far reaches: the Drakelands, the Frostveil Reach, the Amberfall and the Evergarden. Their hub is Wyrmwatch, in the Drakelands.",
+      "earningHeading": "Earning standing",
+      "earningBody": "Standing comes from world quests. Every world quest counts toward the faction of the zone it is set in, and because the three factions cover different zones, all three progress at once as you work your way across the map. Taskmaster Kaelen in Eastbrook opens the World Quests board on the map, and the board is also where you may replace one world quest each day if the day's assignment does not suit you.",
+      "lowLevelNote": "Standing pauses at a tier for lower-level characters and resumes as you level, so a young character can start earning early without running out of road.",
+      "tiersHeading": "Standing tiers",
+      "tiersBody": "Every faction climbs the same six tiers: Unknown, Recognized, Trusted, Proven, Vanguard and Champion. Each faction gives its own name to each rung, and that name becomes your title with them.",
+      "riftWatchTitles": "With the Rift Watch you are an Outsider, then a Watcher, a Riftwalker, a Warden, a Riftwarden and at last a Champion.",
+      "churchOrderTitles": "With the Church Order you are an Outsider, then an Acolyte, a Keeper, a Templar, a Dawnkeeper and at last a Champion.",
+      "automatonsTitles": "With the Automatons you are an Outsider, then an Operator, a Mechanist, an Artificer, a Forgemaster and at last a Champion.",
+      "quartermastersHeading": "Quartermasters",
+      "quartermastersBody": "Each faction keeps a quartermaster at its hub: Quartermaster Vaelen for the Rift Watch in Drifthaven, Templar Althea for the Church Order at the Eastbrook chapel, and Artificer Tobrin for the Automatons in Wyrmwatch. Each sells a small stock of jewelry, armor, weapons and bags, unlocked tier by tier as your standing with that faction grows, and paid for in ordinary coin.",
+      "readingHeading": "Where to read it",
+      "readingBody": "The Reputation tab of the character sheet (C) shows each faction with its current standing, a bar toward the next tier, and the title that standing has earned you. The chat log reports every standing gain as it lands, and reaching a new tier shows a celebration banner on screen.",
+      "deedsHeading": "Deeds",
+      "deedsBody": "The Book of Deeds keeps score of your standing too: reaching Trusted with a faction and reaching Champion with a faction each record a deed, and reaching Champion with all three is a deed of its own. Like every deed these are cosmetic, never power, and the Champion deeds grant a title you can wear."
     },
     "deedsPage": {
       "intro": "Il Libro delle Imprese è il luogo dove il mondo tiene il conto di tutto ciò che hai fatto, dai primi passi fuori dalla valle iniziale agli scontri più duri che il reame possa offrire. Ottieni imprese giocando, indossa i titoli che concedono e guarda salire la tua Fama.",

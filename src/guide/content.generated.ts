@@ -5911,6 +5911,58 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "exploration",
     "renown": 5,
     "feat": false
+  },
+  {
+    "id": "prog_rift_watch_trusted",
+    "name": "Trusted by the Rift Watch",
+    "category": "progression",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "prog_church_order_trusted",
+    "name": "Trusted by the Church Order",
+    "category": "progression",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "prog_automatons_trusted",
+    "name": "Trusted by the Automatons",
+    "category": "progression",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "prog_rift_watch_champion",
+    "name": "Champion of the Rift Watch",
+    "category": "progression",
+    "renown": 25,
+    "feat": false,
+    "rewardTitle": "Riftwarden"
+  },
+  {
+    "id": "prog_church_order_champion",
+    "name": "Champion of the Church Order",
+    "category": "progression",
+    "renown": 25,
+    "feat": false,
+    "rewardTitle": "Dawnkeeper"
+  },
+  {
+    "id": "prog_automatons_champion",
+    "name": "Champion of the Automatons",
+    "category": "progression",
+    "renown": 25,
+    "feat": false,
+    "rewardTitle": "Forgemaster"
+  },
+  {
+    "id": "prog_faction_champion_all",
+    "name": "Champion of Every Banner",
+    "category": "progression",
+    "renown": 50,
+    "feat": false
   }
 ];
 
@@ -7220,6 +7272,18 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "title",
         "name": "the Unscorched"
+      },
+      {
+        "kind": "title",
+        "name": "Riftwarden"
+      },
+      {
+        "kind": "title",
+        "name": "Dawnkeeper"
+      },
+      {
+        "kind": "title",
+        "name": "Forgemaster"
       }
     ]
   },
