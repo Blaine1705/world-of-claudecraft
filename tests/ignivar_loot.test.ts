@@ -33,10 +33,12 @@ import {
 } from '../src/sim/ignivar_raid_ids';
 import {
   expectedStatBudget,
+  expectedStatTotal,
   itemFromRaid,
   itemLevel,
   itemSourceLevel,
   primaryStatSum,
+  statIdentity,
 } from '../src/sim/item_level';
 import { rollLoot } from '../src/sim/loot/loot_roll';
 import { Rng } from '../src/sim/rng';
@@ -106,7 +108,6 @@ describe('ignivar loot: every gear piece is item level 35 and budget-exact', () 
       expect(item.quality, item.id).toBe('epic');
       expect(itemLevel(item), `${item.id} ilvl`).toBe(35);
       expect(item.requiredLevel, item.id).toBe(20);
-      expect(item.soulbound, item.id).toBe(true);
     }
   });
 
@@ -128,13 +129,91 @@ describe('ignivar loot: every gear piece is item level 35 and budget-exact', () 
     };
     for (const item of gearItems()) {
       const isTwoHand = item.kind === 'weapon' && item.hand === 'twohand';
+      // SLOT_BUDGET stays the LINE budget the plan was reviewed against
+      // (unaffected by identity). stamina baseline model: the item's TOTAL
+      // adds the free caster baseline on top of that line, so the line is
+      // priced here and the total is checked against expectedStatBudget,
+      // an independent formula derived from the item's own level and slot.
+      const line =
+        // Two-handers carry the TWOHAND_STAT_MULT premium over the mainhand line.
+        isTwoHand ? 33 : SLOT_BUDGET[item.slot as string];
       const want = expectedStatBudget(item);
       expect(want, `${item.id} has a derivable budget`).toBe(
-        // Two-handers carry the TWOHAND_STAT_MULT premium over the mainhand line.
-        isTwoHand ? 33 : SLOT_BUDGET[item.slot as string],
+        expectedStatTotal(line, statIdentity(item.stats)),
       );
       expect(primaryStatSum(item), `${item.id} stat sum == budget`).toBe(want);
     }
+  });
+});
+
+describe('ignivar loot: binding policy (sigils and tier pieces bind, drops trade)', () => {
+  it('keeps every class-tier redemption sigil soulbound', () => {
+    for (const sigil of Object.values(IGNIVAR_SIGIL_ITEMS)) {
+      expect(sigil.soulbound, sigil.id).toBe(true);
+    }
+  });
+
+  it('keeps every redeemed tier set piece soulbound', () => {
+    for (const item of Object.values(IGNIVAR_SET_ITEMS)) {
+      expect(item.soulbound, item.id).toBe(true);
+    }
+  });
+
+  it('keeps every ordinary raid gear drop transferable', () => {
+    const droppedGear = [
+      ...Object.values(IGNIVAR_OFFSET_ITEMS),
+      ...Object.values(IGNIVAR_JEWELRY_ITEMS),
+      ...Object.values(IGNIVAR_HELD_ITEMS),
+      ...Object.values(IGNIVAR_WEAPON_ITEMS),
+    ];
+    expect(droppedGear.length).toBe(41);
+    for (const item of droppedGear) {
+      expect(item.soulbound, item.id).toBeFalsy();
+    }
+  });
+
+  function partyOfTwo(playerClass: 'warrior' | 'priest') {
+    const sim = new Sim({ seed: 7, playerClass, noPlayer: true });
+    const recipient = sim.addPlayer(playerClass, 'Recipient');
+    const partyMember = sim.addPlayer(playerClass, 'PartyMember');
+    for (const pid of [recipient, partyMember]) {
+      const entity = sim.entities.get(pid);
+      if (!entity) throw new Error(`missing player ${pid}`);
+      entity.pos = { x: 0, y: 0, z: 0 };
+      entity.prevPos = { x: 0, y: 0, z: 0 };
+      sim.rebucket(entity);
+    }
+    sim.partyInvite(partyMember, recipient);
+    sim.partyAccept(partyMember);
+    return { sim, recipient, partyMember };
+  }
+
+  function tradeOne(sim: Sim, from: number, to: number, itemId: string): void {
+    sim.tradeRequest(to, from);
+    sim.tradeAccept(to);
+    sim.tradeSetOffer([{ itemId, count: 1 }], 0, from);
+    sim.tradeConfirm(from);
+    sim.tradeConfirm(to);
+  }
+
+  it('refuses trading a redeemed tier piece even inside the party', () => {
+    const { sim, recipient, partyMember } = partyOfTwo('warrior');
+    sim.addItem('slagbreaker_helmet', 1, recipient);
+
+    tradeOne(sim, recipient, partyMember, 'slagbreaker_helmet');
+
+    expect(sim.countItem('slagbreaker_helmet', recipient)).toBe(1);
+    expect(sim.countItem('slagbreaker_helmet', partyMember)).toBe(0);
+  });
+
+  it('lets a Heartspring Amulet recipient trade it to a party member', () => {
+    const { sim, recipient, partyMember } = partyOfTwo('priest');
+    sim.addItem('heartspring_amulet', 1, recipient);
+
+    tradeOne(sim, recipient, partyMember, 'heartspring_amulet');
+
+    expect(sim.countItem('heartspring_amulet', recipient)).toBe(0);
+    expect(sim.countItem('heartspring_amulet', partyMember)).toBe(1);
   });
 });
 

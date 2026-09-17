@@ -102,7 +102,8 @@ See `server/CLAUDE.md` for server conventions; read `server/game.ts` directly fo
 - **Server to client**: the live frame list is the `msg.t` branches in `onMessage`
   (`online.ts`). Semantics worth knowing: `hello` carries pid/seed/realm and resets
   a reconnected transport; `events` push to `eventQueue` (drained by `drainEvents`);
-  `social` sets `socialInfo` and flips `socialDirty`; `censor` live-updates the
+  `social` sets `socialInfo` and flips `socialDirty`; `who` answers one `whoRequest` with
+  the roster mirror `whoInfo` (`who_frame_wire.ts`); `censor` live-updates the
   soft-profanity word list; an `error` frame ends the session (subject to
   `reconnect_policy.ts`).
 - **Client to server**: versioned world auth (`ONLINE_WORLD_AUTH_TYPE`, built by
@@ -253,7 +254,9 @@ failure, kept as stable English that `main.ts` re-localizes.
   is really on the wire, never an outcome guess; (c) corrections exist only on
   server override epochs (`ovE`/`ovA`) and genuine reconcile mismatches, and
   the display absorbs them through the handoff offset bounded by
-  `MAX_SELF_REWIND_YD_PER_SEC`; (d) the feel bar is
+  `MAX_SELF_REWIND_YD_PER_SEC`, except that a gap past the shared six-yard
+  teleport rule (`SELF_MOTION_SNAP_DIST_SQ`) is an authoritative relocation
+  and snaps outright instead of gliding; (d) the feel bar is
   `tests/movement_latency_baseline.test.ts` in strict mode, and any change here
   must keep it green. Changing this model is a maintainer decision. The legacy
   display extrapolator (`src/render/self_motion.ts`, leash + servo + block

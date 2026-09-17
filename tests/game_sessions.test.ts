@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
+import { RETIRED_MOUNT_SKIN_IDS } from '../src/sim/content/mount_skins';
 import { MECH_CHROMAS } from '../src/sim/content/skins';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
@@ -1347,6 +1348,36 @@ describe('GameServer mount skin commands', () => {
     expect(session.accountCosmetics.mountSkinIds).toEqual(['chimeglass_tortoise']);
   });
 
+  it('takes a retired saved skin off at join even though the account row still grants it', () => {
+    // A v0.42.0 save wearing the Rallycart RXT, joined on a binary where the
+    // skin is retired (RETIRED_MOUNT_SKIN_IDS) while the prod mirror row still
+    // lists the grant as dormant data. The character comes up bare, the row
+    // is untouched, and the next save no longer names the skin.
+    const seedServer = new GameServer();
+    const seedPid = seedServer.sim.addPlayer('mage', 'Driver');
+    const state = seedServer.sim.serializeCharacter(seedPid);
+    if (!state) throw new Error('missing saved state');
+    for (const retired of RETIRED_MOUNT_SKIN_IDS) {
+      expect(seedServer.sim.setMountSkin(seedPid, retired)).toBe(false);
+      const legacySave = { ...state, mountSkinId: retired };
+      const server = new GameServer();
+      const session = expectJoined(
+        server.join(fakeWs(), 11, 101, 'Driver', 'mage', legacySave, false, {
+          ...ownedMountSkins([retired, 'mech_bird']),
+        }),
+      );
+      expect(server.sim.entities.get(session.pid)?.mountSkinId).toBeNull();
+      expect(server.sim.meta(session.pid)?.mountSkinId).toBeNull();
+      expect(session.accountCosmetics.mountSkinIds).toEqual([retired, 'mech_bird']);
+      expect(server.sim.serializeCharacter(session.pid)?.mountSkinId).toBeUndefined();
+      // The owned live skin still wears; the retired one is refused outright.
+      changeMountSkin(server, session, retired);
+      expect(server.sim.entities.get(session.pid)?.mountSkinId).toBeNull();
+      changeMountSkin(server, session, 'mech_bird');
+      expect(server.sim.entities.get(session.pid)?.mountSkinId).toBe('mech_bird');
+    }
+  });
+
   it('mirrors a store grant to every live session on the account and persists it', async () => {
     grantAccountMountSkins.mockClear();
     const server = new GameServer();
@@ -1470,6 +1501,33 @@ describe('GameServer weapon skin commands', () => {
     expect(server.sim.entities.get(session.pid)?.weaponSkinId).toBeNull();
     expect(session.accountCosmetics.weaponSkinLoadout).toEqual({});
     expect(setAccountWeaponSkinLoadout).not.toHaveBeenCalled();
+  });
+
+  it('applies an owned skin whose type is held in the OFFHAND only (rogue mace)', async () => {
+    setAccountWeaponSkinLoadout.mockClear();
+    const server = new GameServer();
+    // Reported from live play: a rogue's mace lands in the offhand, and the
+    // owned legendary mace skin could never apply because the type gate read
+    // the mainhand alone.
+    const session = expectJoined(
+      server.join(fakeWs(), 11, 101, 'Offhander', 'rogue', null, false, {
+        ...ownedSkins(['starfall_mace']),
+      }),
+    );
+    server.sim.setPlayerLevel(30, session.pid);
+    server.sim.addItem('forgefathers_warhammer', 1, session.pid);
+    server.sim.equipItemToSlot('forgefathers_warhammer', 'offhand', session.pid);
+    const e = server.sim.entities.get(session.pid);
+    expect(e?.mainhandItemId).toBe('rusty_dagger');
+    expect(e?.offhandItemId).toBe('forgefathers_warhammer');
+
+    changeSkin(server, session, 'starfall_mace', 'mace');
+
+    expect(e?.weaponSkinId).toBe('starfall_mace');
+    expect(session.accountCosmetics.weaponSkinLoadout).toEqual({ mace: 'starfall_mace' });
+    await vi.waitFor(() => {
+      expect(setAccountWeaponSkinLoadout).toHaveBeenCalledWith(11, { mace: 'starfall_mace' });
+    });
   });
 
   it('rejects an owned skin whose type does not match the equipped weapon', () => {
