@@ -56,6 +56,7 @@ import {
   priestMarkerStateForAuras,
 } from '../src/sim/combat/priest/presentation';
 import { FARM_PATCHES } from '../src/sim/content/farm_patches';
+import { RETIRED_MOUNT_SKIN_IDS } from '../src/sim/content/mount_skins';
 import { MOUNT_RACE_START_PLATFORM, type MountKey } from '../src/sim/content/mounts';
 import { CRAFT_RING, STATION_RADIUS } from '../src/sim/content/professions';
 import { COMBO_RECIPES } from '../src/sim/content/recipes';
@@ -941,6 +942,32 @@ describe('ledge climb over the wire (cl progress)', () => {
     (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(e)] });
     expect(client.entities.get(e.id)!.climbing).toBe(false);
     expect(client.entities.get(e.id)!.climbProgress).toBeUndefined();
+  });
+
+  it('mirrors active Vaulting Charge flight and clears when the leap is absent', () => {
+    const { e } = climbingPlayer();
+    expect(wireEntity(e)).not.toHaveProperty('lp');
+
+    e.leap = {
+      from: { x: e.pos.x, y: e.pos.y, z: e.pos.z },
+      to: { x: e.pos.x + 8, y: e.pos.y, z: e.pos.z + 12 },
+      elapsed: 0.1,
+      duration: 0.5,
+      apex: 4,
+      landingAoe: { min: 1, max: 2, radius: 3 },
+      abilityName: 'Vaulting Charge',
+      abilityId: 'heroic_leap',
+      school: 'physical',
+    };
+    expect(wireEntity(e).lp).toBe(1);
+
+    const client = bareClient(9);
+    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(e)] });
+    expect(client.entities.get(e.id)!.leaping).toBe(true);
+
+    e.leap = null;
+    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(e)] });
+    expect(client.entities.get(e.id)!.leaping).toBe(false);
   });
 });
 
@@ -2097,6 +2124,34 @@ describe('raid party wire', () => {
       role: 'healer',
       connected: 0,
     });
+  });
+
+  it('wires a Wildfang druid in Wolf Form as damage so role-sorted raid frames keep the tanks adjacent', () => {
+    const entity = server.sim.entities.get(member.pid)!;
+    const meta = server.sim.meta(member.pid)!;
+    meta.cls = 'druid';
+    meta.talentMods.role = 'tank';
+    entity.auras.push({
+      id: 'cat_form',
+      name: 'Wolf Form',
+      kind: 'form_cat',
+      remaining: 999,
+      duration: 999,
+      value: 1,
+      sourceId: member.pid,
+      school: 'physical',
+    });
+
+    broadcast(server);
+    const wolf = lastSnap(fcLeader.sent).self.party.members.find((m: any) => m.pid === member.pid);
+    expect(wolf.role).toBe('dps');
+
+    entity.auras.length = 0;
+    broadcast(server);
+    const caster = lastSnap(fcLeader.sent).self.party.members.find(
+      (m: any) => m.pid === member.pid,
+    );
+    expect(caster.role).toBe('tank');
   });
 
   it('projects common party member history once per broadcast and refreshes same-tick broadcasts', () => {
@@ -3579,7 +3634,7 @@ describe('guild nameplate wire', () => {
         motdSetBy: '',
         members: [],
         events: [],
-        pledgeSettings: { enabled: true, minLevel: 1, note: '' },
+        pledgeSettings: { enabled: true, minLevel: 1, note: '', newPlayerFriendly: false },
         pledges: [],
         tier: 0,
       },
@@ -5100,6 +5155,7 @@ describe('online mount command and race-event transport', () => {
 // that stay unconditional.
 const ALL_DELTA_KEYS = [
   'aborder',
+  'acct',
   'achg',
   'achr',
   'ap',
@@ -6404,7 +6460,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 94 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 95 unique keys in sorted order', () => {
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
     // sheet's lifetime played-time key ptime, for 67, then +16: the static
@@ -6446,9 +6502,10 @@ describe('delta-key contract pins (anti-drift)', () => {
     // hpref (a gathering-adjacent self scalar, sibling of gprof/tfocus/tslot),
     // for 92. Intentional Gathering PR4 adds the owner-only tracked-goal
     // full-view key ggoal (its own leaf, gathering_goal_wire.ts, not folded
-    // into the gprof/tfocus/tslot/hpref cluster), for 94.
-    expect(ALL_DELTA_KEYS).toHaveLength(94);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(94);
+    // into the gprof/tfocus/tslot/hpref cluster), for 94. The account ledger
+    // (src/sim/account_ledger.ts) adds the heavy self key acct, for 95.
+    expect(ALL_DELTA_KEYS).toHaveLength(95);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(95);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -6609,8 +6666,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // inside the recursive server-tree scrape) makes 92. Intentional
     // Gathering PR4's ggoal (emitted from the new gathering_goal_wire.ts
     // sibling, likewise inside the recursive scrape) makes 93.
-    // The candidate self in-combat key cbt brings the combined inventory to 94.
-    expect(scraped.size).toBe(94);
+    // The candidate self in-combat key cbt brings the combined inventory to 94;
+    // the account ledger's acct key (server/deeds_wire.ts) makes it 95.
+    expect(scraped.size).toBe(95);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -9268,42 +9326,51 @@ describe('negotiated stable timer wire v3', () => {
 });
 
 describe('mount skin identity round trip', () => {
-  it.each([
-    'mech_bird',
-    'chimeglass_tortoise',
-    'rickshaw_mount',
-    'goblin_rocket_sled',
-    'rallycart_rxt',
-  ])('ships %s to another client and clears it on takeoff', (skin) => {
-    const server = new GameServer();
-    const fc = fakeWs();
-    const wearer = joinServer(server, fakeWs(), 1, 'Skinned');
-    const observer = joinServer(server, fc, 2, 'Observer');
-    const rider = server.sim.entities.get(wearer.pid)!;
-    wearer.accountCosmetics.mountSkinIds = [skin];
-    server.handleMessage(wearer, JSON.stringify({ t: 'cmd', cmd: 'change_mount_skin', skin }));
-    expect(rider.mountSkinId).toBe(skin);
-    expect(rider.mountKey).toBe('');
-    const viewer = bareClient(observer.pid);
-    server.sim.tick();
-    broadcast(server);
-    (viewer as unknown as SnapshotApplier).applySnapshot(lastSnap(fc.sent));
-    expect(viewer.entities.get(wearer.pid)?.mountSkinId).toBe(skin);
-    server.handleMessage(
-      wearer,
-      JSON.stringify({ t: 'cmd', cmd: 'change_mount_skin', skin: null }),
-    );
-    server.sim.tick();
-    broadcast(server);
-    (viewer as unknown as SnapshotApplier).applySnapshot(lastSnap(fc.sent));
-    expect(viewer.entities.get(wearer.pid)?.mountSkinId).toBeNull();
-  });
+  it.each(['mech_bird', 'chimeglass_tortoise', 'rickshaw_mount', 'goblin_rocket_sled'])(
+    'ships %s to another client and clears it on takeoff',
+    (skin) => {
+      const server = new GameServer();
+      const fc = fakeWs();
+      const wearer = joinServer(server, fakeWs(), 1, 'Skinned');
+      const observer = joinServer(server, fc, 2, 'Observer');
+      const rider = server.sim.entities.get(wearer.pid)!;
+      wearer.accountCosmetics.mountSkinIds = [skin];
+      server.handleMessage(wearer, JSON.stringify({ t: 'cmd', cmd: 'change_mount_skin', skin }));
+      expect(rider.mountSkinId).toBe(skin);
+      expect(rider.mountKey).toBe('');
+      const viewer = bareClient(observer.pid);
+      server.sim.tick();
+      broadcast(server);
+      (viewer as unknown as SnapshotApplier).applySnapshot(lastSnap(fc.sent));
+      expect(viewer.entities.get(wearer.pid)?.mountSkinId).toBe(skin);
+      server.handleMessage(
+        wearer,
+        JSON.stringify({ t: 'cmd', cmd: 'change_mount_skin', skin: null }),
+      );
+      server.sim.tick();
+      broadcast(server);
+      (viewer as unknown as SnapshotApplier).applySnapshot(lastSnap(fc.sent));
+      expect(viewer.entities.get(wearer.pid)?.mountSkinId).toBeNull();
+    },
+  );
+  it.each([...RETIRED_MOUNT_SKIN_IDS])(
+    'refuses to wear the retired %s even when the account row grants it',
+    (skin) => {
+      const server = new GameServer();
+      const wearer = joinServer(server, fakeWs(), 1, 'Skinned');
+      const rider = server.sim.entities.get(wearer.pid)!;
+      wearer.accountCosmetics.mountSkinIds = [skin];
+      server.handleMessage(wearer, JSON.stringify({ t: 'cmd', cmd: 'change_mount_skin', skin }));
+      expect(rider.mountSkinId).toBeNull();
+      expect(server.sim.meta(wearer.pid)?.mountSkinId ?? null).toBeNull();
+    },
+  );
   it('shares the identity-update rate limit with other cosmetics', () => {
     const now = vi.spyOn(Date, 'now').mockReturnValue(1_700_000_000_000);
     try {
       const server = new GameServer();
       const session = joinServer(server, fakeWs(), 1, 'Limiter');
-      session.accountCosmetics.mountSkinIds = ['rallycart_rxt'];
+      session.accountCosmetics.mountSkinIds = ['goblin_rocket_sled'];
       const setter = vi.spyOn(server.sim, 'setMountSkin');
       for (let i = 0; i < COSMETIC_OP_BURST + 5; i++) {
         server.handleMessage(
@@ -9311,7 +9378,7 @@ describe('mount skin identity round trip', () => {
           JSON.stringify({
             t: 'cmd',
             cmd: 'change_mount_skin',
-            skin: i % 2 ? null : 'rallycart_rxt',
+            skin: i % 2 ? null : 'goblin_rocket_sled',
           }),
         );
       }
