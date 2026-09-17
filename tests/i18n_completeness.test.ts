@@ -464,6 +464,9 @@ describe('i18n CLDR pluralization', () => {
       'secondsRemaining',
       'wocMarketSellChoose',
       'wocTradeIneligible',
+      // Regional Mastery rows on the Reputation tab (the permanent per-zone
+      // world-quest completion count).
+      'worldQuestsCompletedInZone',
     ]);
     for (const base of bases) {
       for (const cat of ['one', 'few', 'many', 'other']) {

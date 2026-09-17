@@ -13410,10 +13410,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.worldQuestsCompletedInZone.few': '월드 퀘스트 {count}개 완료',
   'hudChrome.plurals.worldQuestsCompletedInZone.many': '월드 퀘스트 {count}개 완료',
   'hudChrome.plurals.worldQuestsCompletedInZone.other': '월드 퀘스트 {count}개 완료',
-  'hudChrome.plurals.worldQuestsCompletedInZone.one': '월드 퀘스트 {count}개 완료',
-  'hudChrome.plurals.worldQuestsCompletedInZone.few': '월드 퀘스트 {count}개 완료',
-  'hudChrome.plurals.worldQuestsCompletedInZone.many': '월드 퀘스트 {count}개 완료',
-  'hudChrome.plurals.worldQuestsCompletedInZone.other': '월드 퀘스트 {count}개 완료',
   'hudChrome.commissionBoard.statusOpen': '모집 중',
   'hudChrome.commissionBoard.statusAccepted': '수락됨',
   'hudChrome.commissionBoard.statusDelivered': '전달 완료',
@@ -17232,12 +17228,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reputation.title': '세력 칭호',
   'hudChrome.reputation.legend': '평판 단계',
   'hudChrome.reputation.vendorGate': '{faction}과(와) {tier} 평판이 필요합니다.',
-  'hudChrome.reputation.mastery': '지역 숙련',
-  'hudChrome.reputation.masteryIntro':
-    '각 지역에서 완료한 월드 퀘스트 수는 영구히 남습니다. 매일 이어 갈 필요도 없고 소모되지도 않습니다. 이정표에 도달할 때마다 업적이 기록됩니다.',
-  'hudChrome.reputation.masteryNext': '다음 이정표: {count}',
-  'hudChrome.reputation.masteryMaxed': '모든 이정표 달성',
-  'hudChrome.reputation.masteryReached': '{reached} / {total} 이정표',
   'hudChrome.reputation.mastery': '지역 숙련',
   'hudChrome.reputation.masteryIntro':
     '각 지역에서 완료한 월드 퀘스트 수는 영구히 남습니다. 매일 이어 갈 필요도 없고 소모되지도 않습니다. 이정표에 도달할 때마다 업적이 기록됩니다.',

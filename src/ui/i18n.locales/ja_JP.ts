@@ -13443,10 +13443,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.worldQuestsCompletedInZone.few': 'ワールドクエスト{count}件完了',
   'hudChrome.plurals.worldQuestsCompletedInZone.many': 'ワールドクエスト{count}件完了',
   'hudChrome.plurals.worldQuestsCompletedInZone.other': 'ワールドクエスト{count}件完了',
-  'hudChrome.plurals.worldQuestsCompletedInZone.one': 'ワールドクエスト{count}件完了',
-  'hudChrome.plurals.worldQuestsCompletedInZone.few': 'ワールドクエスト{count}件完了',
-  'hudChrome.plurals.worldQuestsCompletedInZone.many': 'ワールドクエスト{count}件完了',
-  'hudChrome.plurals.worldQuestsCompletedInZone.other': 'ワールドクエスト{count}件完了',
   'hudChrome.commissionBoard.statusOpen': '募集中',
   'hudChrome.commissionBoard.statusAccepted': '引き受け済み',
   'hudChrome.commissionBoard.statusDelivered': '納品済み',
@@ -17266,12 +17262,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reputation.title': '勢力の称号',
   'hudChrome.reputation.legend': '評判の段階',
   'hudChrome.reputation.vendorGate': '{faction}との評判が{tier}以上必要です。',
-  'hudChrome.reputation.mastery': '地域の熟達',
-  'hudChrome.reputation.masteryIntro':
-    '各ゾーンで完了したワールドクエストの数は永久に残ります。連続ログインは不要で、消費されることもありません。節目ごとに偉業が記録されます。',
-  'hudChrome.reputation.masteryNext': '次の節目：{count}',
-  'hudChrome.reputation.masteryMaxed': 'すべての節目を達成',
-  'hudChrome.reputation.masteryReached': '{reached} / {total} の節目',
   'hudChrome.reputation.mastery': '地域の熟達',
   'hudChrome.reputation.masteryIntro':
     '各ゾーンで完了したワールドクエストの数は永久に残ります。連続ログインは不要で、消費されることもありません。節目ごとに偉業が記録されます。',

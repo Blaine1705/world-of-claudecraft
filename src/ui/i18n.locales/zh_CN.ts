@@ -12782,10 +12782,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.worldQuestsCompletedInZone.few': '已完成{count}个世界任务',
   'hudChrome.plurals.worldQuestsCompletedInZone.many': '已完成{count}个世界任务',
   'hudChrome.plurals.worldQuestsCompletedInZone.other': '已完成{count}个世界任务',
-  'hudChrome.plurals.worldQuestsCompletedInZone.one': '已完成{count}个世界任务',
-  'hudChrome.plurals.worldQuestsCompletedInZone.few': '已完成{count}个世界任务',
-  'hudChrome.plurals.worldQuestsCompletedInZone.many': '已完成{count}个世界任务',
-  'hudChrome.plurals.worldQuestsCompletedInZone.other': '已完成{count}个世界任务',
   'hudChrome.commissionBoard.statusOpen': '待接单',
   'hudChrome.commissionBoard.statusAccepted': '已接单',
   'hudChrome.commissionBoard.statusDelivered': '已交付',
@@ -16408,12 +16404,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reputation.title': '阵营头衔',
   'hudChrome.reputation.legend': '声望等级',
   'hudChrome.reputation.vendorGate': '需要与{faction}达到{tier}。',
-  'hudChrome.reputation.mastery': '区域精通',
-  'hudChrome.reputation.masteryIntro':
-    '在每个区域完成的世界任务数，永久保留：没有每日连续要求，也不会被消耗。每达到一个里程碑都会记录一项功绩。',
-  'hudChrome.reputation.masteryNext': '下一个里程碑：{count}',
-  'hudChrome.reputation.masteryMaxed': '已达成全部里程碑',
-  'hudChrome.reputation.masteryReached': '{reached} / {total} 个里程碑',
   'hudChrome.reputation.mastery': '区域精通',
   'hudChrome.reputation.masteryIntro':
     '在每个区域完成的世界任务数，永久保留：没有每日连续要求，也不会被消耗。每达到一个里程碑都会记录一项功绩。',
