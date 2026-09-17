@@ -140,8 +140,11 @@ export class QuestDialogController {
       return;
     // The banker and the Riftwright both short-circuit the gossip menu: the
     // sim's interact emits the window-opening event, identical on every host.
-    if (NPCS[npc.templateId]?.banker || NPCS[npc.templateId]?.riftForge ||
-      NPCS[npc.templateId]?.weeklyEmissary) {
+    if (
+      NPCS[npc.templateId]?.banker ||
+      NPCS[npc.templateId]?.riftForge ||
+      NPCS[npc.templateId]?.weeklyEmissary
+    ) {
       world.targetEntity(npc.id);
       world.interact();
       return;
