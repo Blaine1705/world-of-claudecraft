@@ -5,6 +5,7 @@ import { craftsForPairTarget } from '../../../sim/professions/archetype';
 import { professionQuestSelectionTargets } from '../../../sim/quests/profession_quest_effects';
 import { npcQuestMarkerKind, type QuestMarkerKind } from '../../../sim/quests/quest_marker_kind';
 import { dist2d, type Entity, type ItemDef, questObjectiveRequired } from '../../../sim/types';
+import { WEEKLY_KEEPER_ID } from '../../../sim/weekly_rewards';
 import type { IWorld } from '../../../world_api';
 import { archetypeTitleText, craftNameText } from '../../char_window';
 import { currencyIconHtml, heroicMarkIconHtml } from '../../currency_art';
@@ -122,9 +123,13 @@ export class QuestDialogController {
     const world = this.deps.world();
     const npc = world.entities.get(npcId);
     if (npc?.kind !== 'npc') return;
-    // The banker and the Riftwright both short-circuit the gossip menu: the
+    // Service NPCs short-circuit the gossip menu:
     // sim's interact emits the window-opening event, identical on every host.
-    if (NPCS[npc.templateId]?.banker || NPCS[npc.templateId]?.riftForge) {
+    if (
+      NPCS[npc.templateId]?.banker ||
+      NPCS[npc.templateId]?.riftForge ||
+      npc.templateId === WEEKLY_KEEPER_ID
+    ) {
       world.targetEntity(npc.id);
       world.interact();
       return;

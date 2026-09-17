@@ -105,6 +105,7 @@ export interface VaultSpecialRef {
 export interface IWorldBank {
   readonly weeklyRewardInfo: WeeklyRewardInfo | null;
   claimWeeklyReward(choice: string): void;
+  openWeeklyReward(choice: string): void;
   // Non-null only while standing at a banker NPC.
   bankInfo: BankInfo | null;
   // Copper- and Claudium-bought ladder slots on the CALLER'S OWN character,

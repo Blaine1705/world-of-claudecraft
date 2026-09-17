@@ -98,7 +98,7 @@ import { svgIcon } from './ui_icons';
 import { unknownItemIconHtml } from './unknown_item_icon';
 import { hasVaultDepositable, vaultSpecialContentKey } from './vault_view';
 import { VAULT_PANEL_ID, VAULT_TAB_ID, VaultTab } from './vault_window';
-import { WeeklyRewardsTab } from './weekly_rewards_window';
+import { createWeeklyRewardsTab, type WeeklyRewardsTab } from './weekly_rewards_window';
 
 // Grace before a null bankInfo closes the window: online the bank mirror rides the
 // proximity snapshot, so it can lag the open by about a tick (copies the mailbox's
@@ -358,11 +358,7 @@ export class BankWindow {
   private rungAnnounceSeq = 0;
 
   constructor(private readonly deps: BankWindowDeps) {
-    this.weeklyPane = new WeeklyRewardsTab({
-      world: () => this.deps.world(),
-      presentation: this.deps,
-      onInventoryChanged: () => this.deps.onInventoryChanged(),
-    });
+    this.weeklyPane = createWeeklyRewardsTab(this.deps);
 
     this.guildPane = new GuildBankTab({
       root: () => this.deps.root(),
@@ -499,6 +495,7 @@ export class BankWindow {
 
   close(): void {
     if (!this.opened) return;
+    this.weeklyPane.close();
     const el = this.deps.root();
     // A confirm / quantity prompt is a modal CHILD that sets #bank-window inert. The
     // window can be force-closed out from under it (Esc / keybind), a path that never
@@ -671,6 +668,7 @@ export class BankWindow {
     // the pane onto another tab, where its firing would rebuild the whole
     // window for a line nobody can see.
     if (this.tab !== 'vault') this.vaultPane.pauseStatusTimer();
+    if (this.tab !== 'rewards') this.weeklyPane.close();
     if (this.tab === 'rewards') {
       this.weeklyPane.renderInto(el);
       this.restoreScroll(el, prevScroll);

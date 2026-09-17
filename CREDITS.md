@@ -378,3 +378,5 @@ MIT License covering the source code.
 
 If you are unsure whether you may use an asset, or you want permission for
 something this file marks as restricted, ask first: tony@levystreet.com.
+
+Weekly Vault milestone illustrations (public/ui/weekly-vault/) are project-generated art made with OpenAI's built-in image generation for World of ClaudeCraft. Matching square front-face doors with antique-gold trim and corners, plus bronze empty, silver Normal, or gold Heroic center accents; completed doors remain closed with matching light glowing through their seams. Project asset, with the project only.

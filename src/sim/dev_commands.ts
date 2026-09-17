@@ -147,8 +147,9 @@ export function handleDevChat(
   raw: string,
   pid: number,
 ): SentChat | null | undefined {
-  if (/^\/dev\s+weeklyvault\s*$/i.test(raw)) {
-    prepareWeeklyVaultPlaytest(ctx, pid);
+  const weeklyVaultMatch = /^\/dev\s+weeklyvault(?:\s+(rollover))?\s*$/i.exec(raw);
+  if (weeklyVaultMatch) {
+    prepareWeeklyVaultPlaytest(ctx, pid, !!weeklyVaultMatch[1]);
     return null;
   }
   const levelMatch = /^\/(?:dev\s+level|devlevel)\s+(\d+)\s*$/i.exec(raw);

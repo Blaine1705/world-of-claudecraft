@@ -1,8 +1,7 @@
 import type { MaterialComposition } from '../sim/material_sources';
 import type { MaterialStackSelection } from '../sim/material_stack_selection';
-import type { WeeklyRewardInfo } from '../sim/weekly_rewards';
 import { materialStorageTransferPayload } from './material_storage_command';
-import { decodeWeeklyRewardInfo } from './weekly_rewards_wire';
+import { decodeWeeklyRewardInfo, sendWeekly, type WeeklyRewardInfo } from './weekly_rewards_wire';
 
 // Online play: REST auth client + WebSocket world mirror.
 
@@ -4813,9 +4812,10 @@ export class ClientWorld extends ReconWireState implements IWorld {
     this.cmd({ cmd: 'vault_deposit_all' });
   }
   claimWeeklyReward(choice: string): void {
-    const s = this.weeklyRewardInfo?.state;
-    if (s)
-      this.cmd({ cmd: 'weekly_reward_claim', choice, token: `${s.resetAtMs}:${s.claimSequence}` });
+    sendWeekly(this.weeklyRewardInfo, choice, 'claim', (m) => this.cmd(m));
+  }
+  openWeeklyReward(choice: string): void {
+    sendWeekly(this.weeklyRewardInfo, choice, 'open', (m) => this.cmd(m));
   }
   vaultBuyUpgrade(): void {
     this.cmd({ cmd: 'vault_buy_upgrade' });

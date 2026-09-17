@@ -2086,7 +2086,8 @@ const MONOLITHS: MonolithRow[] = [
     // RE-CONFIRMED at the final line-budget reconciliation: still 1810,
     // below both parent pins. Exact merged count, zero slack.
     // Held by extracting the pane tab model and markup to bank_tabs_view.
-    ceiling: 1810,
+    // Weekly reward host binding now lives with the weekly pane.
+    ceiling: 1808,
     seam: 'a pure view-core plus a thin painter sibling (src/ui/CLAUDE.md)',
   },
   {

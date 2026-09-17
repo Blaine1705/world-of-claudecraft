@@ -388,6 +388,7 @@ import type { PerfCaptureResult, PerfCaptureStatus } from './perf_capture_types'
 import { dispatchPerfectItemCommand } from './perfect_item_command';
 import { parsePerfectingSwapCommand } from './perfecting_swap_command';
 import { runPeriodicSaveFlush } from './periodic_save_flush';
+import { dispatchWeeklyRewardCommand } from './weekly_reward_open';
 
 export type { PerfCaptureResult, PerfCaptureStatus } from './perf_capture_types';
 
@@ -7730,10 +7731,9 @@ export class GameServer {
           this.scheduleBankLedgerHighWaterSave(session);
         }
         break;
-      // Materials Vault uses the same row-aware retained-ledger admission.
+      case 'weekly_reward_open':
       case 'weekly_reward_claim':
-        if (typeof msg.choice === 'string' && typeof msg.token === 'string')
-          this.sim.claimWeeklyReward(msg.choice, pid, msg.token);
+        void dispatchWeeklyRewardCommand(this, session, command, msg);
         break;
       case 'vault_deposit':
       case 'vault_withdraw':

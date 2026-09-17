@@ -27,11 +27,27 @@ export function buildWeeklyRewardsView(info: WeeklyRewardInfo, playerClass: Play
     info.state.world,
     info.state.pvp,
   ];
+  const tiers = {
+    raid: info.state.raids.filter(Boolean).sort((a, b) => b - a),
+    dungeon: info.state.dungeons,
+  };
   return (['raid', 'dungeon', 'world', 'pvp'] as const).map((category, index) => ({
     category,
     progress: progress[index],
     thresholds: WEEKLY_THRESHOLDS[category],
     available: category !== 'world' || info.worldQuestsAvailable,
+    milestones: WEEKLY_THRESHOLDS[category].map((required) => {
+      const available = category !== 'world' || info.worldQuestsAvailable;
+      const completed = available && progress[index] >= required;
+      const tiered = category === 'raid' || category === 'dungeon';
+      const clears = tiered ? tiers[category].slice(0, required) : [];
+      const heroic = clears.filter((tier) => tier === 2).length;
+      const normal = clears.filter((tier) => tier === 1).length;
+      const difficulty: 'normal' | 'heroic' | null =
+        completed && tiered ? (heroic === required ? 'heroic' : 'normal') : null;
+      const heroicRemaining = difficulty === 'normal' ? required - heroic : 0;
+      return { required, completed, difficulty, heroic, normal, heroicRemaining };
+    }),
     pools: WEEKLY_POOL_IDS.flatMap((pool, poolIndex) => {
       if (pool !== category && pool !== `${category}_heroic`) return [];
       const items = weeklyLootPool(pool, playerClass, info.state.raidUnlocks);

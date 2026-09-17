@@ -333,6 +333,7 @@ export const IWORLD_MEMBERS = [
   //     deposit/withdraw/buy-upgrade commands ---
   { name: 'weeklyRewardInfo', kind: 'data' },
   { name: 'claimWeeklyReward', kind: 'method' },
+  { name: 'openWeeklyReward', kind: 'method' },
   { name: 'vaultInfo', kind: 'data' },
   { name: 'vaultDeposit', kind: 'method' },
   { name: 'vaultWithdraw', kind: 'method' },
@@ -857,9 +858,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // tests/world_api_parity.test.ts` before merge lands to confirm the
     // facet-file exhaustiveness checks (AssertNever) also pass on the fully
     // resolved production tree.
-    expect(IWORLD_MEMBERS.length).toBe(373);
+    expect(IWORLD_MEMBERS.length).toBe(374);
     expect(DATA_MEMBERS.length).toBe(104);
-    expect(METHOD_MEMBERS.length).toBe(269);
+    expect(METHOD_MEMBERS.length).toBe(270);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -1103,6 +1104,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'nodeHarvestableByMe',
       'nodeRespawnSeconds',
       'openCommissionOrder',
+      'openWeeklyReward',
       'ownedMounts',
       'partyAccept',
       'partyDecline',
@@ -1519,6 +1521,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'nodeHarvestableByMe',
       'nodeRespawnSeconds',
       'openCommissionOrder',
+      'openWeeklyReward',
       'ownedMounts',
       'partyAccept',
       'partyDecline',
@@ -2033,6 +2036,7 @@ type _ExhaustMail = AssertNever<Exclude<keyof IWorldMail, (typeof FACET_MAIL)[nu
 const FACET_BANK = [
   'weeklyRewardInfo',
   'claimWeeklyReward',
+  'openWeeklyReward',
   'bankInfo',
   'bankPurchasedSlots',
   'bankDeposit',
@@ -2375,8 +2379,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // tests/world_api_parity.test.ts` before merge lands to confirm the
     // facet arrays actually reconstruct IWORLD_MEMBERS with no gaps or
     // collisions; this pin and the one above must always agree.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(373);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(373);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(374);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(374);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

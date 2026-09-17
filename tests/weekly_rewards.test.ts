@@ -18,6 +18,8 @@ import {
   advanceWeeklyRewards,
   earnedWeeklyRolls,
   emptyWeeklyRewards,
+  finishWeeklyRewardOpen,
+  prepareWeeklyRewardOpen,
   sanitizeWeeklyRewards,
   WEEKLY_BACKLOG_LIMIT,
   WEEKLY_KEEPER_ENTITY_ID,
@@ -34,13 +36,13 @@ const WORLD = {
   npcs: { [WEEKLY_KEEPER_ID]: NPCS[WEEKLY_KEEPER_ID] },
   groundObjects: [],
 };
-function make(seed = 42) {
+function make(seed = 42, devCommands = true) {
   let now = 1000;
   const sim = new Sim({
     seed,
     playerClass: 'mage',
     noPlayer: true,
-    devCommands: true,
+    devCommands,
     world: WORLD,
     lockoutNowMs: () => now,
     weeklyRaidResetMs: (n) => (Math.floor(n / WEEK) + 1) * WEEK,
@@ -64,6 +66,88 @@ function make(seed = 42) {
 }
 
 describe('weekly vault choices', () => {
+  it('rolls only on opening and conceals pending items until the host acknowledges durability', () => {
+    const { sim, pid, meta } = make();
+    const roll = vi.spyOn(sim.ctx.rng, 'pick');
+    prepareWeeklyVaultPlaytest(sim.ctx, pid, true);
+    const info = weeklyRewardInfoFor(sim.ctx, pid)!;
+    const batch = meta.weeklyRewards!.vaults[0];
+    expect(roll).not.toHaveBeenCalled();
+    expect(info.state.vaults[0].choices.every((choice) => !choice.itemId)).toBe(true);
+    const opening = prepareWeeklyRewardOpen(sim.ctx, `${batch.resetAtMs}:0`, pid)!;
+    expect(roll).toHaveBeenCalledOnce();
+    expect(JSON.stringify(weeklyRewardInfoFor(sim.ctx, pid))).not.toContain(opening.itemId);
+    const saved = sim.serializeCharacter(pid)!;
+    expect(saved.weeklyRewards!.vaults[0].choices[0]).toEqual({
+      pool: opening.choice.pool,
+      itemId: opening.itemId,
+      opened: true,
+    });
+    finishWeeklyRewardOpen(opening, false);
+    expect(weeklyRewardInfoFor(sim.ctx, pid)!.state.vaults[0].choices[0].itemId).toBeUndefined();
+    const retry = prepareWeeklyRewardOpen(sim.ctx, `${batch.resetAtMs}:0`, pid)!;
+    expect(retry.itemId).toBe(opening.itemId);
+    expect(roll).toHaveBeenCalledOnce();
+    finishWeeklyRewardOpen(retry, true);
+    expect(weeklyRewardInfoFor(sim.ctx, pid)!.state.vaults[0].choices[0].itemId).toBe(
+      opening.itemId,
+    );
+    const restored = sim.addPlayer('mage', 'AfterCrash', { state: saved });
+    const loaded = sim.players.get(restored)!.weeklyRewards!.vaults[0].choices[0];
+    expect(loaded.opened).toBe(true);
+    expect(loaded.itemId).toBe(opening.itemId);
+    expect(loaded.pendingSave).toBeUndefined();
+  });
+
+  it('keeps legacy fixed items hidden until opening and freezes earned raid eligibility', () => {
+    const { sim, pid, meta, setNow } = make();
+    meta.weeklyRewards = emptyWeeklyRewards(2000);
+    meta.weeklyRewards.raids = [1, 0, 0];
+    meta.weeklyRewards.raidUnlocks = [1, 0, 0];
+    setNow(2000);
+    weeklyRewardInfoFor(sim.ctx, pid);
+    expect(meta.weeklyRewards.vaults[0].raidUnlocks).toEqual([1, 0, 0]);
+    meta.weeklyRewards.raidUnlocks = [2, 2, 2];
+    const opening = prepareWeeklyRewardOpen(sim.ctx, '2000:0', pid)!;
+    expect(weeklyLootPool('raid', 'mage', [1, 0, 0])).toContain(opening.itemId);
+    finishWeeklyRewardOpen(opening, true);
+    const fixed = 'orb_of_the_last_spring';
+    meta.weeklyRewards = sanitizeWeeklyRewards({
+      resetAtMs: 9000,
+      vaults: [{ resetAtMs: 1000, choices: [{ pool: 'raid', itemId: fixed }] }],
+    });
+    expect(weeklyRewardInfoFor(sim.ctx, pid)!.state.vaults[0].choices[0]).toEqual({ pool: 'raid' });
+    const roll = vi.spyOn(sim.ctx.rng, 'pick');
+    sim.claimWeeklyReward('1000:0', pid);
+    expect(meta.weeklyRewards!.vaults).toHaveLength(1);
+    sim.openWeeklyReward('1000:0', pid);
+    expect(weeklyRewardInfoFor(sim.ctx, pid)!.state.vaults[0].choices[0].itemId).toBe(fixed);
+    expect(roll).not.toHaveBeenCalled();
+  });
+
+  it('stages a rollover without opening the vault and rolls rewards on the next visit', () => {
+    const { sim, pid, meta } = make();
+    const emit = vi.spyOn(sim.ctx, 'emit');
+    sim.chat('/dev weeklyvault rollover', pid);
+    expect(emit.mock.calls.some(([event]) => event.type === 'weekly_rewards')).toBe(false);
+    expect(meta.weeklyRewards!.vaults).toEqual([]);
+    expect(meta.weeklyRewards!.raids).toEqual([2, 1, 2]);
+    const info = weeklyRewardInfoFor(sim.ctx, pid)!;
+    expect(info.readyWeeks).toBe(1);
+    expect(info.state.vaults[0].choices).toHaveLength(7);
+    expect(info.state.raids).toEqual([0, 0, 0]);
+    expect(info.state.dungeons).toEqual([]);
+    expect(weeklyRewardInfoFor(sim.ctx, pid)!.state.vaults).toEqual(info.state.vaults);
+  });
+
+  it('does not stage rollover rewards when dev commands are disabled', () => {
+    const { sim, pid, meta, player } = make(42, false);
+    const position = { ...player.pos };
+    sim.chat('/dev weeklyvault rollover', pid);
+    expect(meta.weeklyRewards).toBeUndefined();
+    expect(player.pos).toEqual(position);
+  });
+
   it('uses the best difficulty at each milestone and caps rows at three choices', () => {
     const state = emptyWeeklyRewards(WEEK);
     state.raids = [2, 1, 2];
@@ -72,21 +156,22 @@ describe('weekly vault choices', () => {
     state.pvp = 3;
     expect(earnedWeeklyRolls(state)).toEqual([1, 2, 2, 1, 2, 2]);
   });
-  it('rolls once at reset, keeps weeks distinct, and grants nothing for inactivity', () => {
+  it('earns unopened slots at reset, keeps weeks distinct, and grants nothing for inactivity', () => {
     const state = emptyWeeklyRewards(WEEK);
     state.pvp = 5;
-    const roll = vi.fn(() => weeklyLootPool('pvp', 'mage')[0]);
-    advanceWeeklyRewards(state, WEEK - 1, (n) => n + WEEK, roll);
-    expect(roll).not.toHaveBeenCalled();
-    advanceWeeklyRewards(state, WEEK, (n) => n + WEEK, roll);
+    advanceWeeklyRewards(state, WEEK - 1, (n) => n + WEEK);
+    expect(state.vaults).toHaveLength(0);
+    advanceWeeklyRewards(state, WEEK, (n) => n + WEEK);
     expect(state.vaults[0].choices).toHaveLength(3);
     expect(state.pvp).toBe(0);
     state.pvp = 1;
-    advanceWeeklyRewards(state, WEEK * 2, (n) => n + WEEK, roll);
+    advanceWeeklyRewards(state, WEEK * 2, (n) => n + WEEK);
     expect(state.vaults.map((v) => v.choices.length)).toEqual([3, 1]);
-    advanceWeeklyRewards(state, WEEK * 100, (n) => n + WEEK, roll);
-    advanceWeeklyRewards(state, WEEK, (n) => n + WEEK, roll);
-    expect(roll).toHaveBeenCalledTimes(4);
+    advanceWeeklyRewards(state, WEEK * 100, (n) => n + WEEK);
+    advanceWeeklyRewards(state, WEEK, (n) => n + WEEK);
+    expect(state.vaults.flatMap((batch) => batch.choices).every((choice) => !choice.itemId)).toBe(
+      true,
+    );
     expect(state.resetAtMs).toBe(WEEK * 101);
   });
   it('chooses exactly the displayed item and consumes the whole week across all rows', () => {
@@ -95,6 +180,9 @@ describe('weekly vault choices', () => {
       prepareWeeklyVaultPlaytest(sim.ctx, pid);
       const state = meta.weeklyRewards!;
       const batch = state.vaults[0];
+      batch.choices.forEach((_, index) => {
+        sim.openWeeklyReward(`${batch.resetAtMs}:${index}`, pid);
+      });
       const token = `${state.resetAtMs}:${state.claimSequence}`;
       const itemId = batch.choices[1].itemId;
       const before = meta.inventory.length;
@@ -113,6 +201,9 @@ describe('weekly vault choices', () => {
     const { sim, pid, meta, player } = make();
     prepareWeeklyVaultPlaytest(sim.ctx, pid);
     const state = meta.weeklyRewards!;
+    state.vaults[0].choices.forEach((_, index) => {
+      sim.openWeeklyReward(`${state.vaults[0].resetAtMs}:${index}`, pid);
+    });
     const key = `${state.vaults[0].resetAtMs}:0`;
     const before = JSON.stringify(state);
     const pick = vi.spyOn(sim.ctx.rng, 'pick');
@@ -133,11 +224,14 @@ describe('weekly vault choices', () => {
   it('preserves exact candidates across reads, save/load and later resets; mirrors only the oldest week', () => {
     const { sim, pid, meta, setNow } = make();
     prepareWeeklyVaultPlaytest(sim.ctx, pid);
+    meta.weeklyRewards!.vaults[0].choices.forEach((_, index) => {
+      sim.openWeeklyReward(`${meta.weeklyRewards!.vaults[0].resetAtMs}:${index}`, pid);
+    });
     const first = structuredClone(meta.weeklyRewards!.vaults[0]);
     setNow(WEEK * 2);
     const info = weeklyRewardInfoFor(sim.ctx, pid)!;
     expect(info.readyWeeks).toBe(2);
-    expect(info.state.vaults).toEqual([first]);
+    expect(info.state.vaults[0].choices).toEqual(first.choices);
     const saved = sim.serializeCharacter(pid)!;
     meta.weeklyRewards!.vaults[0].choices[0].itemId = 'changed';
     expect(saved.weeklyRewards!.vaults[0]).toEqual(first);
@@ -146,7 +240,9 @@ describe('weekly vault choices', () => {
     e.pos = { ...sim.entities.get(pid)!.pos };
     sim.ctx.rebucket(e);
     const pick = vi.spyOn(sim.ctx.rng, 'pick');
-    expect(weeklyRewardInfoFor(sim.ctx, restoredPid)!.state.vaults).toEqual([first]);
+    expect(weeklyRewardInfoFor(sim.ctx, restoredPid)!.state.vaults[0].choices).toEqual(
+      first.choices,
+    );
     sim.claimWeeklyReward(`${first.resetAtMs}:0`, restoredPid);
     expect(weeklyRewardInfoFor(sim.ctx, restoredPid)!.readyWeeks).toBe(1);
     expect(pick).not.toHaveBeenCalled();
@@ -182,12 +278,10 @@ describe('weekly vault choices', () => {
     expect(state.claimSequence).toBe(0);
     expect(state.vaults).toHaveLength(WEEKLY_BACKLOG_LIMIT);
     expect(state.vaults[0].choices).toHaveLength(12);
-    const roll = vi.fn();
-    advanceWeeklyRewards(state, WEEK, (n) => n + WEEK, roll);
+    advanceWeeklyRewards(state, WEEK, (n) => n + WEEK);
     expect(state.resetAtMs).toBe(WEEK * 2);
     expect(state.overflowed).toBe(true);
     expect(state.raids).toEqual([0, 0, 0]);
-    expect(roll).not.toHaveBeenCalled();
     expect(sanitizeWeeklyRewards([])).toBeUndefined();
   });
   it('unlocks raid pools only at the defeated difficulty and keeps world rewards unavailable', () => {
@@ -231,12 +325,7 @@ describe('weekly vault choices', () => {
       const now = Date.parse(instant);
       const state = emptyWeeklyRewards(now);
       state.pvp = 1;
-      advanceWeeklyRewards(
-        state,
-        now,
-        nextWeeklyRaidResetMs,
-        () => weeklyLootPool('pvp', 'mage')[0],
-      );
+      advanceWeeklyRewards(state, now, nextWeeklyRaidResetMs, () => true);
       expect(state.resetAtMs).toBe(nextWeeklyRaidResetMs(now));
       expect(state.resetAtMs - now).not.toBe(WEEK);
     },

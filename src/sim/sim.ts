@@ -9162,10 +9162,7 @@ export class Sim {
     interaction.interact(this.ctx, pid, this.noticeboardDefinitions);
   }
 
-  private isQuestInteractionEntity(e: Entity): boolean {
-    if (e.kind === 'npc') return true;
-    return e.kind === 'mob' && !e.hostile && !e.dead && e.questIds.length > 0;
-  }
+  private isQuestInteractionEntity = interaction.isQuestInteractionEntity;
 
   talkToNpc(npcId: number, pid?: number): void {
     const r = this.resolve(pid);
@@ -10955,6 +10952,9 @@ export class Sim {
   }
   claimWeeklyReward(pool: string, pid?: number, token?: string): void {
     weeklyMod.claimWeeklyReward(this.ctx, pool, pid, token);
+  }
+  openWeeklyReward(choice: string, pid?: number): void {
+    weeklyMod.openWeeklyReward(this.ctx, choice, pid);
   }
   get vaultInfo(): import('../world_api').VaultInfo | null {
     return this.primaryId === -1 ? null : this.vaultInfoFor(this.primaryId);

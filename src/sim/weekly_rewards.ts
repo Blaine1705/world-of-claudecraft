@@ -1,5 +1,5 @@
 // Weekly choices. The host supplies the same calendar used by the Crucible.
-// A completed week offers fixed candidates; choosing one consumes that entire week.
+// A completed week earns unopened slots; opening fixes an item after host persistence.
 import { bagsFullError } from './bags';
 import { HEROIC_DUNGEON_TUNING } from './content/dungeon_difficulty';
 import { HEROIC_BOSS_LOOT } from './content/heroic_loot';
@@ -52,11 +52,16 @@ const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 export const WEEKLY_BACKLOG_LIMIT = 520;
 export interface WeeklyChoice {
   pool: WeeklyPoolId;
-  itemId: string;
+  itemId?: string;
+  opened?: true;
+  /** Runtime only. Never serialized; an unacknowledged item stays off the wire. */
+  pendingSave?: true;
+  opening?: boolean;
 }
 export interface WeeklyVaultBatch {
   resetAtMs: number;
   choices: WeeklyChoice[];
+  raidUnlocks?: number[];
 }
 export interface WeeklyRewardState {
   resetAtMs: number;
@@ -93,7 +98,10 @@ export function emptyWeeklyRewards(resetAtMs = 0): WeeklyRewardState {
 function bounded(n: unknown, max: number): number {
   return typeof n === 'number' && Number.isSafeInteger(n) && n >= 0 ? Math.min(n, max) : 0;
 }
-export function sanitizeWeeklyRewards(raw: unknown): WeeklyRewardState | undefined {
+export function sanitizeWeeklyRewards(
+  raw: unknown,
+  publicView = false,
+): WeeklyRewardState | undefined {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return undefined;
   const r = raw as Record<string, unknown>;
   const state = emptyWeeklyRewards(bounded(r.resetAtMs, Number.MAX_SAFE_INTEGER));
@@ -122,23 +130,35 @@ export function sanitizeWeeklyRewards(raw: unknown): WeeklyRewardState | undefin
       if (!resetAtMs || !Array.isArray(rawBatch.choices)) continue;
       const choices: WeeklyChoice[] = [];
       for (const choice of rawBatch.choices.slice(0, 12)) {
-        if (
-          !choice ||
-          !WEEKLY_POOL_IDS.includes(choice.pool) ||
-          typeof choice.itemId !== 'string' ||
-          choice.itemId.length > 128
-        )
+        if (!choice || !WEEKLY_POOL_IDS.includes(choice.pool)) continue;
+        if (choice.itemId === undefined || (publicView && choice.opened !== true)) {
+          choices.push({
+            pool: choice.pool,
+            ...(publicView && choice.opening === true ? { opening: true } : {}),
+          });
           continue;
+        }
+        if (typeof choice.itemId !== 'string' || choice.itemId.length > 128) continue;
         const item = ITEMS[choice.itemId];
         if (
           item &&
           ['weapon', 'armor', 'held_offhand'].includes(item.kind) &&
           (item.quality === 'rare' || item.quality === 'epic')
         )
-          choices.push({ pool: choice.pool, itemId: choice.itemId });
+          choices.push({
+            pool: choice.pool,
+            itemId: choice.itemId,
+            ...(choice.opened === true ? { opened: true as const } : {}),
+          });
       }
       if (choices.length && !state.vaults.some((batch) => batch.resetAtMs === resetAtMs))
-        state.vaults.push({ resetAtMs, choices });
+        state.vaults.push({
+          resetAtMs,
+          choices,
+          ...(Array.isArray(rawBatch.raidUnlocks)
+            ? { raidUnlocks: WEEKLY_RAID_BOSSES.map((_, i) => bounded(rawBatch.raidUnlocks[i], 2)) }
+            : {}),
+        });
     }
     state.vaults.sort((a, b) => a.resetAtMs - b.resetAtMs);
   }
@@ -161,7 +181,7 @@ export function advanceWeeklyRewards(
   state: WeeklyRewardState,
   nowMs: number,
   nextReset: (now: number) => number,
-  roll: (pool: WeeklyPoolId) => string | undefined,
+  available: (pool: WeeklyPoolId) => boolean = () => true,
 ): void {
   if (!Number.isFinite(nowMs) || nowMs < 0) return;
   if (state.resetAtMs > nowMs) return;
@@ -172,11 +192,15 @@ export function advanceWeeklyRewards(
       for (const [i, count] of earned.entries()) {
         for (let slot = 0; slot < count; slot++) {
           const pool = WEEKLY_POOL_IDS[i];
-          const itemId = roll(pool);
-          if (itemId) choices.push({ pool, itemId });
+          if (available(pool)) choices.push({ pool });
         }
       }
-      if (choices.length) state.vaults.push({ resetAtMs: state.resetAtMs, choices });
+      if (choices.length)
+        state.vaults.push({
+          resetAtMs: state.resetAtMs,
+          choices,
+          raidUnlocks: [...state.raidUnlocks],
+        });
     } else if (earned.some(Boolean)) state.overflowed = true;
     state.raids.fill(0);
     state.dungeons = [];
@@ -185,26 +209,27 @@ export function advanceWeeklyRewards(
   const next = nextReset(nowMs);
   state.resetAtMs = Number.isSafeInteger(next) && next > nowMs ? next : Math.floor(nowMs) + WEEK_MS;
 }
-function stateFor(ctx: SimContext, meta: PlayerMeta): WeeklyRewardState {
+export function stateFor(ctx: SimContext, meta: PlayerMeta): WeeklyRewardState {
   meta.weeklyRewards ??= emptyWeeklyRewards();
   const state = meta.weeklyRewards;
   if (state.legacyPending) {
     const choices: WeeklyChoice[] = [];
     for (const [i, count] of state.legacyPending.entries()) {
       const pool = WEEKLY_POOL_IDS[i];
-      const items = weeklyLootPool(pool, meta.cls);
+      if (!weeklyLootPool(pool, meta.cls).length) continue;
       const rowCount = choices.filter((c) => c.pool.split('_')[0] === pool.split('_')[0]).length;
-      for (let n = 0; n < Math.min(count, 3 - rowCount) && items.length; n++)
-        choices.push({ pool, itemId: ctx.rng.pick(items) });
+      for (let n = 0; n < Math.min(count, 3 - rowCount); n++) choices.push({ pool });
     }
     if (choices.length)
       state.vaults.push({ resetAtMs: Math.max(1, state.resetAtMs - WEEK_MS), choices });
     delete state.legacyPending;
   }
-  advanceWeeklyRewards(state, ctx.lockoutNowMs(), ctx.weeklyRaidResetMs, (pool) => {
-    const items = weeklyLootPool(pool, meta.cls, state.raidUnlocks);
-    return items.length ? ctx.rng.pick(items) : undefined;
-  });
+  advanceWeeklyRewards(
+    state,
+    ctx.lockoutNowMs(),
+    ctx.weeklyRaidResetMs,
+    (pool) => weeklyLootPool(pool, meta.cls, state.raidUnlocks).length > 0,
+  );
   return state;
 }
 export function nearWeeklyKeeper(ctx: SimContext, player: Entity): boolean {
@@ -229,13 +254,23 @@ export function weeklyRewardInfoFor(ctx: SimContext, pid: number): WeeklyRewardI
   const state = stateFor(ctx, r.meta);
   return {
     state: {
-      ...state,
+      resetAtMs: state.resetAtMs,
+      claimSequence: state.claimSequence,
+      world: state.world,
+      pvp: state.pvp,
+      overflowed: state.overflowed,
       raids: [...state.raids],
       dungeons: [...state.dungeons],
       raidUnlocks: [...state.raidUnlocks],
       vaults: state.vaults.slice(0, 1).map((batch) => ({
         resetAtMs: batch.resetAtMs,
-        choices: batch.choices.map((choice) => ({ ...choice })),
+        choices: batch.choices.map((choice) => ({
+          pool: choice.pool,
+          ...(choice.opened && !choice.pendingSave && choice.itemId
+            ? { itemId: choice.itemId, opened: true as const }
+            : {}),
+          ...(choice.opening ? { opening: true } : {}),
+        })),
       })),
     },
     nowMs: Math.floor(ctx.lockoutNowMs() / 1000) * 1000,
@@ -349,12 +384,19 @@ export function claimWeeklyReward(
   if (!r || !nearWeeklyKeeper(ctx, r.e)) return;
   const state = stateFor(ctx, r.meta);
   const batch = state.vaults[0];
-  if (!batch || state.claimSequence >= Number.MAX_SAFE_INTEGER) return;
+  if (
+    !batch ||
+    batch.resetAtMs > ctx.lockoutNowMs() ||
+    state.claimSequence >= Number.MAX_SAFE_INTEGER
+  )
+    return;
+  if (batch.choices.some((choice) => !choice.opened || choice.pendingSave || !choice.itemId))
+    return;
   if (expectedToken !== undefined && expectedToken !== `${state.resetAtMs}:${state.claimSequence}`)
     return;
   const index = batch.choices.findIndex((_, i) => choiceKey === `${batch.resetAtMs}:${i}`);
   const choice = batch.choices[index];
-  if (!choice) return;
+  if (!choice?.itemId) return;
   const item = ITEMS[choice.itemId];
   if (!item || (item.requiredClass && !item.requiredClass.includes(r.meta.cls))) return;
   // Candidates are already fixed. Failed claims cannot reroll or consume the week.
@@ -373,3 +415,11 @@ export function spawnWeeklyKeeper(ctx: SimContext, def: NpcDef | undefined): voi
   if (!def || ctx.entities.has(id)) return;
   ctx.addEntity(createNpc(id, def, ctx.groundPos(def.pos.x, def.pos.z)));
 }
+
+export {
+  finishWeeklyRewardOpen,
+  isWeeklyRewardOpeningCurrent,
+  openWeeklyReward,
+  prepareWeeklyRewardOpen,
+  type WeeklyRewardOpening,
+} from './weekly_reward_open';

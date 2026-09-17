@@ -4,6 +4,33 @@ import { emptyWeeklyRewards } from '../src/sim/weekly_rewards';
 import { bareClient } from './helpers/bare_client';
 
 describe('weekly reward wire', () => {
+  it('preserves concealed slots and opening status without accepting unopened item details', () => {
+    const state = emptyWeeklyRewards(604800000);
+    state.vaults = [
+      {
+        resetAtMs: 1000,
+        choices: [
+          { pool: 'raid' },
+          { pool: 'dungeon', opening: true },
+          { pool: 'raid', itemId: 'orb_of_the_last_spring' },
+          { pool: 'raid', itemId: 'orb_of_the_last_spring', opened: true },
+        ],
+      },
+    ];
+    const info = decodeWeeklyRewardInfo({
+      state,
+      nowMs: 2000,
+      canClaim: true,
+      worldQuestsAvailable: false,
+      readyWeeks: 1,
+    })!;
+    expect(info.state.vaults[0].choices).toEqual([
+      { pool: 'raid' },
+      { pool: 'dungeon', opening: true },
+      { pool: 'raid' },
+      { pool: 'raid', itemId: 'orb_of_the_last_spring', opened: true },
+    ]);
+  });
   it('round-trips the bounded ledger and rejects malformed envelopes', () => {
     const info = {
       state: emptyWeeklyRewards(604800000),
