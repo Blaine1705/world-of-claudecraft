@@ -322,7 +322,7 @@ export const FACTION_VENDOR_NPCS: Record<string, NpcDef> = {
   // Church Order Quartermaster: Eastbrook Vale chapel (eastbrook_vale)
   npc_church_order_quartermaster: {
     id: 'npc_church_order_quartermaster',
-    name: 'Templar Liora',
+    name: 'Templar Althea',
     title: 'Church Order Quartermaster',
     pos: { x: 8, z: -80 },
     facing: 3.14,
@@ -342,7 +342,7 @@ export const FACTION_VENDOR_NPCS: Record<string, NpcDef> = {
   // Automaton Quartermaster: Wyrmwatch (drakelands)
   npc_automaton_quartermaster: {
     id: 'npc_automaton_quartermaster',
-    name: 'Artificer Kael',
+    name: 'Artificer Zarek',
     title: 'Automaton Requisitioner',
     pos: { x: 402, z: 1912 },
     facing: -0.4,

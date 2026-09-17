@@ -18531,12 +18531,12 @@ export const zh_CN: EnTranslations = {
         "greeting": "裂隙守望守护海岸，监视深处的裂口。我们的库房向获得认可声望的人开放。"
       },
       "npc_church_order_quartermaster": {
-        "name": "圣殿骑士莉奥拉",
+        "name": "圣殿骑士阿尔西娅",
         "title": "教团军需官",
         "greeting": "行走于黎明之光中。教团为与我们并肩效力者提供补给。"
       },
       "npc_automaton_quartermaster": {
-        "name": "工匠凯尔",
+        "name": "工匠扎雷克",
         "title": "机械军团征用官",
         "greeting": "精密齿轮、锻造钢材与校准动力。授权操作员可从我们的库存中领取。"
       },

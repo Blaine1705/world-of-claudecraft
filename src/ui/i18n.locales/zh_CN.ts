@@ -16291,11 +16291,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.npc_rift_watch_quartermaster.title': '裂隙守望补给官',
   'entities.npcs.npc_rift_watch_quartermaster.greeting':
     '裂隙守望守护海岸，监视深处的裂口。我们的库房向获得认可声望的人开放。',
-  'entities.npcs.npc_church_order_quartermaster.name': '圣殿骑士莉奥拉',
+  'entities.npcs.npc_church_order_quartermaster.name': '圣殿骑士阿尔西娅',
   'entities.npcs.npc_church_order_quartermaster.title': '教团军需官',
   'entities.npcs.npc_church_order_quartermaster.greeting':
     '行走于黎明之光中。教团为与我们并肩效力者提供补给。',
-  'entities.npcs.npc_automaton_quartermaster.name': '工匠凯尔',
+  'entities.npcs.npc_automaton_quartermaster.name': '工匠扎雷克',
   'entities.npcs.npc_automaton_quartermaster.title': '机械军团征用官',
   'entities.npcs.npc_automaton_quartermaster.greeting':
     '精密齿轮、锻造钢材与校准动力。授权操作员可从我们的库存中领取。',

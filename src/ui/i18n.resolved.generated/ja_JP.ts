@@ -18531,12 +18531,12 @@ export const ja_JP: EnTranslations = {
         "greeting": "裂け目の監視団は岸を守り、深き裂け目を見張っている。我らの物資は、認められた地位を持つ者に開かれている。"
       },
       "npc_church_order_quartermaster": {
-        "name": "テンプラー・リオラ",
+        "name": "テンプラー・アルセア",
         "title": "教団の需品係",
         "greeting": "暁の光の中を歩め。教団は我らと共に仕える者に物資を供する。"
       },
       "npc_automaton_quartermaster": {
-        "name": "工匠ケイル",
+        "name": "工匠ザレク",
         "title": "オートマトンの調達官",
         "greeting": "精密な歯車、鍛えた鋼、調整済みの動力。認可された操作者は我らの在庫から受け取れる。"
       },
