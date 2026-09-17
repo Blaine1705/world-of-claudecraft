@@ -1514,3 +1514,60 @@ describe('ActionBarController while spectating (/spectate, /unspectate)', () => 
     expect(controller.actions.some((action) => action?.id === 'fireball')).toBe(false);
   });
 });
+
+describe('ActionBarController mutators while spectating', () => {
+  function frozenHarness(): {
+    controller: ActionBarController;
+    persisted: ActionBarLayoutSave[];
+    state: { known: string[]; spectating: boolean };
+  } {
+    const persisted: ActionBarLayoutSave[] = [];
+    const state = { known: ['heroic_strike', 'sunder_armor', 'charge'], spectating: false };
+    const controller = new ActionBarController({
+      storage: new MemoryStorage(),
+      playerClass: 'warrior',
+      playerName: 'ActionbarTester',
+      playerLevel: () => 20,
+      talentSpec: () => null,
+      knownAbilityIds: () => state.known,
+      hasAura: () => false,
+      showAttackButton: () => true,
+      spectating: () => state.spectating,
+      persistLayout: (profile, layout) => persisted.push({ profile, layout }),
+    });
+    controller.init();
+    controller.replaceActions(bar('charge', 'heroic_strike'));
+    controller.replaceAttackAction({ type: 'ability', id: 'sunder_armor' });
+    controller.saveActions();
+    controller.saveAttackAction();
+    persisted.length = 0;
+    return { controller, persisted, state };
+  }
+
+  it('refuses every write path (spellbook, drop, reset, loadout, attack slot) under a foreign kit', () => {
+    const { controller, persisted, state } = frozenHarness();
+    const own = controller.actions;
+    state.spectating = true;
+    state.known = ['fireball', 'frostbolt'];
+
+    expect(controller.addAbility('fireball')).toBe(false);
+    expect(controller.removeAbility('charge')).toBe(false);
+    controller.replaceActions(bar('fireball'));
+    controller.replaceActionsForLoadout(bar('frostbolt'), new Set(['frostbolt']));
+    controller.replaceAttackAction({ type: 'ability', id: 'fireball' });
+    controller.resetActiveBar();
+    controller.saveActions();
+    controller.saveAttackAction();
+
+    expect(controller.actions).toEqual(own);
+    expect(controller.attackAction).toEqual({ type: 'ability', id: 'sunder_armor' });
+    expect(persisted).toEqual([]);
+
+    // Back in the own view, the same writes work again.
+    state.spectating = false;
+    state.known = ['heroic_strike', 'sunder_armor', 'charge'];
+    expect(controller.removeAbility('charge')).toBe(true);
+    expect(controller.actions.some((action) => action?.id === 'charge')).toBe(false);
+    expect(persisted.length).toBeGreaterThan(0);
+  });
+});

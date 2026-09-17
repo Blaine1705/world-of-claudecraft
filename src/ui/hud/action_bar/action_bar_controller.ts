@@ -73,9 +73,13 @@ export interface ActionBarControllerDeps {
   persistLayout?(profile: ActionBarLayoutProfile, layout: ActionBarLayout): void;
   // True while this session views ANOTHER character (a moderator's /spectate):
   // the live deps above (spec, level, known abilities) then describe the
-  // watched character, not the owner of this bar. Every per-frame sync freezes
-  // until the view returns, so a foreign kit never prunes, re-seeds, or uploads
-  // the moderator's own layout. Absent means never spectating (offline, tests).
+  // watched character, not the owner of this bar. Every per-frame sync AND every
+  // user-driven mutator (drop, spellbook add/remove, reset, loadout apply, the
+  // saves behind them) freezes until the view returns, so a foreign kit never
+  // prunes, re-seeds, or uploads the moderator's own layout. The ClientWorld
+  // holds the flag through the exit frame until its own presentation is
+  // rebuilt, so "not spectating" always means the deps describe this bar's
+  // owner. Absent means never spectating (offline, tests).
   spectating?(): boolean;
 }
 
@@ -256,6 +260,7 @@ export class ActionBarController {
   }
 
   replaceActions(actions: HotbarAction[]): void {
+    if (this.isSpectating()) return;
     this.actionState = sanitizeHotbarActions(actions, (id) => this.isAbilityPlacementAllowed(id));
     this.unsavedChanges = true;
   }
@@ -264,6 +269,7 @@ export class ActionBarController {
     actions: HotbarAction[],
     targetKnownAbilityIds: ReadonlySet<string>,
   ): void {
+    if (this.isSpectating()) return;
     this.activeSpecState = this.deps.talentSpec();
     this.actionState = sanitizeHotbarActions(actions, (id) => this.isAbilityPlacementAllowed(id));
     this.unsavedChanges = true;
@@ -279,6 +285,7 @@ export class ActionBarController {
   }
 
   replaceAttackAction(action: HotbarAction): void {
+    if (this.isSpectating()) return;
     this.attackActionState = sanitizeHotbarAction(action, (id) =>
       this.isAbilityPlacementAllowed(id),
     );
@@ -439,6 +446,7 @@ export class ActionBarController {
   }
 
   addAbility(abilityId: string): boolean {
+    if (this.isSpectating()) return false;
     // A passive is never castable: reject a manual drag/spellbook add so it
     // cannot occupy a dead action slot (auto-place already skips passives).
     if (!this.isAbilityPlacementAllowed(abilityId)) return false;
@@ -457,6 +465,7 @@ export class ActionBarController {
   }
 
   removeAbility(abilityId: string): boolean {
+    if (this.isSpectating()) return false;
     const target = this.actionState.findIndex(
       (action) => action?.type === 'ability' && action.id === abilityId,
     );
@@ -467,6 +476,7 @@ export class ActionBarController {
   }
 
   resetActiveBar(): void {
+    if (this.isSpectating()) return;
     const knownAbilityIds = [...this.deps.knownAbilityIds()];
     const ownedSpecDefault =
       this.activeFormState === 'normal'
@@ -559,12 +569,14 @@ export class ActionBarController {
   }
 
   saveActions(): void {
+    if (this.isSpectating()) return;
     this.writeActions();
     this.persist();
     this.unsavedChanges = false;
   }
 
   saveAttackAction(): void {
+    if (this.isSpectating()) return;
     this.writeAttackAction();
     this.persist();
     this.unsavedChanges = false;
