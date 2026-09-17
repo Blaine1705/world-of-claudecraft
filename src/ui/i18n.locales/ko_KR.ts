@@ -17187,7 +17187,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reputation.vendorGate': '{faction}과(와) {tier} 평판이 필요합니다.',
   'hudChrome.reputation.tierReachedBanner': '{faction}과(와) {tier} 평판 달성',
   'hudChrome.reputation.tierReachedSubtext': '진영 칭호: {title}',
-  'hudChrome.reputation.tierReachedLine': '{faction}과(와)의 평판이 {tier}에 도달했습니다. 진영 칭호가 {title}(으)로 바뀌었습니다.',
+  'hudChrome.reputation.tierReachedLine':
+    '{faction}과(와)의 평판이 {tier}에 도달했습니다. 진영 칭호가 {title}(으)로 바뀌었습니다.',
   'hudChrome.questLog.completed': '완료됨',
   'hudChrome.questLog.zoneSummary': '{count}개（완료 {ready}개）',
   'hudChrome.questLog.shiftHint': 'Shift를 누른 채 퀘스트를 클릭하면 채팅에 링크됩니다.',

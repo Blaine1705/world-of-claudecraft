@@ -16371,7 +16371,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reputation.vendorGate': '需要與{faction}達到{tier}。',
   'hudChrome.reputation.tierReachedBanner': '與{faction}的聲望達到{tier}',
   'hudChrome.reputation.tierReachedSubtext': '陣營頭銜：{title}',
-  'hudChrome.reputation.tierReachedLine': '你與{faction}的聲望已達到{tier}。你的陣營頭銜現在是{title}。',
+  'hudChrome.reputation.tierReachedLine':
+    '你與{faction}的聲望已達到{tier}。你的陣營頭銜現在是{title}。',
   'hudChrome.questLog.completed': '已完成',
   'hudChrome.questLog.zoneSummary': '{count}個（{ready}個可交付）',
   'hudChrome.questLog.shiftHint': '按住 Shift 點擊任務可將其連結到聊天中。',
