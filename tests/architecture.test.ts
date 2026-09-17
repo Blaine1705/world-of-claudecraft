@@ -253,6 +253,9 @@ const UI_PURE_CORES = [
   'src/ui/known_item.ts',
   'src/ui/log_event_route.ts',
   'src/ui/mob_idle_sfx.ts',
+  // The weekly vault opening choreography (timeline + per-element ray / star /
+  // streak / ring layout): the reveal controller maps it onto --vault-* vars.
+  'src/ui/weekly_vault_burst_core.ts',
   'src/ui/unit_portrait.ts',
   'src/ui/xp_bar.ts',
   'src/ui/absorb_bar.ts',

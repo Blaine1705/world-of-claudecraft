@@ -19628,6 +19628,24 @@
     aspect-ratio: 1;
     overflow: hidden;
     border-radius: var(--radius-sm);
+    /* The opening's motion vocabulary lives on the STAGE so the trigger's
+       light layers and the loot (a trigger sibling) both inherit it: one
+       fast-out, long-settle curve for everything that leaves the door (it
+       bursts, then it fades) and one gentle curve for what lands or dims. The
+       timeline (--vault-t-*) and every per-element start, life, reach and
+       drift (--vault-ray-* / -star-* / -streak-* / -ring-*) are stamped inline
+       by the reveal controller from src/ui/weekly_vault_burst_core.ts; this
+       sheet never retypes a number (tests/weekly_vault_reveal_styles.test.ts
+       pins the contract). */
+    --vault-ease-burst: cubic-bezier(0.08, 0.82, 0.17, 1);
+    --vault-ease-settle: cubic-bezier(0.22, 0.61, 0.36, 1);
+    /* How far into the show this stage was mounted (the reveal controller
+       stamps it on a mid-show repaint); every open-state delay subtracts it,
+       so a rebuilt tile resumes where the torn-down one was. */
+    --vault-elapsed: 0ms;
+    /* The white-hot core of every light element, warmed toward the vault's
+       rarity glow so silver and heroic gold keep their own colour. */
+    --vault-light-core: color-mix(in srgb, var(--color-white) 78%, var(--weekly-vault-glow));
   }
   .weekly-vault-art {
     position: absolute;
@@ -19961,66 +19979,126 @@
     position: relative;
     z-index: 20;
   }
-  .vault-light-spill {
+  /* The light stays inside the card: the tile's own overflow clip masks the
+     burst at the card edge exactly as it masks the swinging door, so no light
+     ever crosses into a neighbouring card or the sheet's scroll area. */
+  /* Every light layer lives in this container, above the frame art (z 6) and
+     under the door (z 8): the shut door hides the middle, so only what escapes
+     the seam shows. The clip removes everything left of the doorway's inner
+     edge (13% between the chamfers, 18% at them) and nothing else: on the
+     hinge side the light ends at the frame instead of running behind the open
+     door, while it still leaves the tile on the other three sides (the card
+     clips it there). */
+  .vault-light {
     position: absolute;
     inset: 0;
     z-index: 7;
     pointer-events: none;
-    opacity: 0;
-  }
-  .vault-light-spill i {
-    position: absolute;
-    left: var(--ray-x);
-    top: var(--ray-y);
-    width: var(--ray-length);
-    height: var(--ray-width);
-    transform-origin: 0 50%;
-    transform: translateY(-50%) rotate(var(--ray-angle));
-    filter: blur(0.6px);
-  }
-  .vault-light-spill i::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    opacity: 0.65;
-    clip-path: polygon(0 48%, 72% 0, 100% 50%, 72% 100%, 0 52%);
-    background: linear-gradient(
-      90deg,
-      var(--color-text-on-ink),
-      color-mix(in srgb, var(--weekly-vault-glow) 90%, transparent) 24%,
-      color-mix(in srgb, var(--weekly-vault-glow) 35%, transparent) 60%,
-      transparent
+    clip-path: polygon(
+      13% 21%,
+      18% 15%,
+      18% -300%,
+      400% -300%,
+      400% 400%,
+      18% 400%,
+      18% 85%,
+      13% 79%
     );
-    transform-origin: left center;
   }
-  .vault-opening-flash {
+  .vault-seam-glow,
+  .vault-seam-line,
+  .vault-opening-flash,
+  .vault-light-spill,
+  .vault-opening-rings,
+  .vault-burst-streaks,
+  .vault-burst-stars {
     position: absolute;
-    inset: 16% 14%;
-    z-index: 2;
     pointer-events: none;
+  }
+  .vault-light-spill,
+  .vault-opening-rings,
+  .vault-burst-streaks,
+  .vault-burst-stars {
+    inset: 0;
+  }
+  /* The halo: a true circle centred on the doorway, sized to the tile
+     (closest-side, so its fade reaches transparent at the tile's edges and the
+     corners stay dark), blurred so it bleeds over the frame around the door.
+     Never a rounded box: a box's straight sides read as a square glow. */
+  .vault-seam-glow {
+    inset: 0;
+    border-radius: 50%;
     opacity: 0;
     background: radial-gradient(
-      ellipse at 66% 48%,
-      var(--color-text-on-ink),
-      var(--weekly-vault-glow) 25%,
-      transparent 70%
+      circle closest-side at 50% 50%,
+      var(--vault-light-core),
+      var(--weekly-vault-glow) 26%,
+      color-mix(in srgb, var(--weekly-vault-glow) 60%, transparent) 50%,
+      color-mix(in srgb, var(--weekly-vault-glow) 28%, transparent) 74%,
+      transparent 100%
+    );
+    box-shadow:
+      0 0 calc(18px * var(--fx-shadow)) calc(6px * var(--fx-shadow))
+      color-mix(in srgb, var(--weekly-vault-glow) 45%, transparent),
+      0 0 calc(44px * var(--fx-shadow)) calc(14px * var(--fx-shadow))
+      color-mix(in srgb, var(--weekly-vault-glow) 25%, transparent);
+    filter: blur(calc(5px * var(--fx-shadow)));
+    transform: scale(0.96);
+  }
+  /* The seam itself igniting: a thin ring straddling the door edge (evenodd,
+     so the middle stays clear); the door hides the inner half. */
+  .vault-seam-line {
+    inset: 0;
+    opacity: 0;
+    background: var(--vault-light-core);
+    clip-path: polygon(
+      evenodd,
+      17.4% 13.6%,
+      82.6% 13.6%,
+      88.4% 20.4%,
+      88.4% 79.6%,
+      82.6% 86.4%,
+      17.4% 86.4%,
+      11.6% 79.6%,
+      11.6% 20.4%,
+      17.4% 13.6%,
+      18.4% 15.6%,
+      81.6% 15.6%,
+      86.4% 21.4%,
+      86.4% 78.6%,
+      81.6% 84.4%,
+      18.4% 84.4%,
+      13.6% 78.6%,
+      13.6% 21.4%,
+      18.4% 15.6%
     );
   }
-  .vault-opening-ring {
-    position: absolute;
-    left: 60%;
-    top: 49%;
-    width: 48%;
-    aspect-ratio: 1;
-    z-index: 7;
-    pointer-events: none;
+  /* Awaiting the host's saved opening: the seam already glows on the click.
+     Cosmetic (aria-busy and the status line carry the state); the loop rides
+     the ambient play-state token and paused still shows its resting glow. */
+  .vault-is-charging:not(.vault-is-open) .vault-seam-glow {
+    opacity: 0.55;
+    animation: vault-seam-throb 1.1s ease-in-out infinite alternate;
+    animation-play-state: var(--fx-ambient-anim, running);
+  }
+  .vault-is-charging:not(.vault-is-open) .vault-seam-line {
+    opacity: 0.5;
+  }
+  /* The core bloom inside the doorway once it swings clear: a circle whose
+     fade ends at the door's edge, so it reads round, not as a lit square. */
+  .vault-opening-flash {
+    inset: 6%;
     opacity: 0;
     border-radius: 50%;
-    border: 2px solid var(--weekly-vault-glow);
-    box-shadow:
-      0 0 5px var(--weekly-vault-glow),
-      inset 0 0 4px var(--weekly-vault-glow);
-    transform: translate(-50%, -50%) scale(0.1);
+    background: radial-gradient(
+      circle closest-side at 50% 50%,
+      var(--vault-light-core),
+      var(--weekly-vault-glow) 12%,
+      color-mix(in srgb, var(--weekly-vault-glow) 55%, transparent) 34%,
+      color-mix(in srgb, var(--weekly-vault-glow) 22%, transparent) 60%,
+      transparent 86%
+    );
+    transform: scale(0.25);
   }
   .vault-door-shadow {
     position: absolute;
@@ -20030,6 +20108,128 @@
     opacity: 0;
     background: linear-gradient(90deg, var(--color-ink-deep) 10%, transparent 90%);
     transform-origin: left center;
+  }
+  /* Rays: one element each, aimed from its own origin, sized and timed by its
+     own vars, so no two fire or leave together. The ::before is the static
+     beam; the outer <i> aims it, slowly fans it, and TRIMS it with a sliding
+     soft-edged mask window (twice the beam long, feathered at both ends): the
+     window slides in from the centre so the head shoots out with a feathered
+     edge, then slides on so the tail follows it out, feathered too, until the
+     stroke has left the doorway. The mask rides the ray's own axis whatever
+     its rotation. At rest the window sits wholly behind the centre (nothing
+     shows). */
+  .vault-light-spill i {
+    position: absolute;
+    left: var(--vault-ray-x);
+    top: var(--vault-ray-y);
+    width: var(--vault-ray-length);
+    height: var(--vault-ray-width);
+    transform-origin: 0 50%;
+    transform: translateY(-50%) rotate(var(--vault-ray-angle));
+    mask-image: linear-gradient(
+      90deg,
+      transparent,
+      var(--color-white) 15%,
+      var(--color-white) 85%,
+      transparent
+    );
+    mask-size: 200% 100%;
+    mask-repeat: no-repeat;
+    mask-position: 200% 0;
+  }
+  .vault-light-spill i::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: var(--vault-ray-peak);
+    clip-path: polygon(0 46%, 62% 0, 100% 50%, 62% 100%, 0 54%);
+    background: linear-gradient(
+      90deg,
+      var(--vault-light-core),
+      var(--weekly-vault-glow) 30%,
+      var(--weekly-vault-glow) 72%,
+      color-mix(in srgb, var(--weekly-vault-glow) 55%, transparent)
+    );
+  }
+  .vault-ray-wide::before {
+    clip-path: polygon(0 40%, 55% 0, 100% 50%, 55% 100%, 0 60%);
+    filter: blur(calc(1.4px * var(--fx-shadow)));
+  }
+  .vault-ray-thin::before {
+    background: linear-gradient(
+      90deg,
+      var(--vault-light-core),
+      var(--vault-light-core) 40%,
+      var(--weekly-vault-glow) 80%,
+      color-mix(in srgb, var(--weekly-vault-glow) 60%, transparent)
+    );
+  }
+  /* Shockwaves: two rings, the second later, slower and wider. */
+  .vault-opening-rings i {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 46%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 2px solid var(--vault-light-core);
+    box-shadow:
+      0 0 calc(10px * var(--fx-shadow)) var(--weekly-vault-glow),
+      inset 0 0 calc(8px * var(--fx-shadow)) var(--weekly-vault-glow);
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.12);
+  }
+  /* Particles travel in multiples of their own box (VAULT_PARTICLE_BOX, 10% of
+     the illustration), so the core's illustration-percent offsets scale with
+     the tile on every viewport. */
+  .vault-burst-streaks i,
+  .vault-burst-stars i {
+    position: absolute;
+    left: 45%;
+    top: 45%;
+    width: 10%;
+    height: 10%;
+    opacity: 0;
+  }
+  /* Highlight streaks: short bright lines that shoot from the centre, then
+     sparkle in place before they go. The bright head leads. */
+  .vault-burst-streaks i::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: var(--vault-streak-length);
+    height: 2px;
+    border-radius: 1px;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--weekly-vault-glow) 35%,
+      var(--vault-light-core) 72%,
+      var(--vault-light-core)
+    );
+    box-shadow: 0 0 calc(4px * var(--fx-shadow)) var(--weekly-vault-glow);
+  }
+  /* Stylised four-point stars: they burst out, spin, twinkle for the longest
+     and are the last thing to fade. */
+  .vault-burst-stars i::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: var(--vault-star-size);
+    height: var(--vault-star-size);
+    opacity: 0.7;
+    transform: translate(-50%, -50%) scale(0.55);
+    clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
+    background: radial-gradient(
+      circle at 50% 50%,
+      var(--color-white),
+      var(--vault-light-core) 30%,
+      var(--weekly-vault-glow) 70%
+    );
+    filter: drop-shadow(0 0 calc(3px * var(--fx-shadow)) var(--weekly-vault-glow));
   }
   .vault-reveal-interior {
     position: absolute;
@@ -20041,6 +20241,11 @@
     );
     box-shadow: inset 0 0 22px var(--weekly-vault-glow);
   }
+  /* The loot: hidden until its keyframe reveal, which starts only after the
+     door is fully open. A keyframe with a backwards fill, never a transition:
+     the open class can land before the element's first style pass, and a
+     transition then has no start value and never runs, which is how the item
+     name once appeared over a shut door (the regression this pins). */
   .vault-reveal-loot {
     position: absolute;
     z-index: 12;
@@ -20058,15 +20263,16 @@
     cursor: help;
     visibility: hidden;
     opacity: 0;
-    transform: translateY(12px);
-    transition:
-      opacity 0.45s ease,
-      transform 0.65s ease;
+    transform: scale(0.35);
     pointer-events: none;
   }
-  .vault-is-open .vault-reveal-loot {
+  .vault-is-open :where(.vault-reveal-loot) {
     visibility: visible;
+    opacity: 1;
+    transform: none;
     pointer-events: auto;
+    animation: vault-loot-reveal var(--vault-t-loot-fade) var(--vault-ease-settle)
+      calc(var(--vault-t-loot) - var(--vault-elapsed)) both;
   }
   .vault-reveal-loot:disabled {
     pointer-events: none;
@@ -20096,62 +20302,63 @@
     font-size: 11px;
     color: var(--weekly-vault-glow);
   }
-  .vault-is-open .vault-reveal-door {
+  .vault-is-open :where(.vault-reveal-door) {
     transform: translateX(-10px) rotateY(-94deg);
-    animation: vault-heavy-swing 2s linear both;
+    animation: vault-heavy-swing 2s linear calc(0ms - var(--vault-elapsed)) both;
   }
-  .vault-is-open .vault-door-shading {
-    animation: vault-door-depth 2s both;
+  .vault-is-open :where(.vault-door-shading) {
+    animation: vault-door-depth 2s calc(0ms - var(--vault-elapsed)) both;
   }
-  .vault-is-open .vault-door-shadow {
-    animation: vault-cast-shadow 1.7s 0.25s both;
+  .vault-is-open :where(.vault-door-shadow) {
+    animation: vault-cast-shadow 1.7s calc(0.25s - var(--vault-elapsed)) both;
   }
-  .vault-is-open .vault-light-spill {
-    opacity: 0;
-    animation: vault-overflow-light 1.65s 0.57s both;
+  .vault-is-open :where(.vault-door-latch) {
+    animation: vault-latch-release 0.48s ease-in-out calc(0ms - var(--vault-elapsed)) both;
   }
-  .vault-is-open .vault-light-spill i::before {
-    animation: vault-ray-punch 1.55s calc(0.57s + var(--ray-delay)) both;
+  .vault-is-open :where(.vault-reveal-frame) {
+    animation: vault-unlock-jolt 0.48s ease-out calc(0ms - var(--vault-elapsed));
   }
-  .vault-is-open .vault-opening-flash {
-    animation: vault-core-flash 1.3s 0.48s both;
+  .vault-is-open :where(.vault-reveal-loot > :first-child) {
+    animation: vault-loot-arrival calc(var(--vault-t-loot-fade) + 180ms) var(--vault-ease-settle)
+      calc(var(--vault-t-loot) - var(--vault-elapsed)) both;
   }
-  .vault-is-open .vault-opening-ring {
-    animation: vault-light-shockwave 0.85s 0.72s both;
+  /* Every open-state rule uses :where() so the blanket suppressions below
+     (revealed, reduced motion) always outrank them whatever a selector's
+     type-count is; the styles test pins that no open-state rule escapes it. */
+  .vault-is-open :where(.vault-seam-glow) {
+    animation: vault-seam-charge calc(var(--vault-t-open) + 260ms) var(--vault-ease-settle)
+      calc(var(--vault-t-charge) - var(--vault-elapsed)) both;
   }
-  .vault-is-open .vault-door-latch {
-    animation: vault-latch-release 0.48s ease-in-out both;
+  .vault-is-open :where(.vault-seam-line) {
+    animation: vault-seam-ignite calc(var(--vault-t-open) + 100ms) linear
+      calc(var(--vault-t-charge) - var(--vault-elapsed)) both;
   }
-  .vault-is-open .vault-reveal-frame {
-    animation: vault-unlock-jolt 0.48s ease-out;
+  .vault-is-open :where(.vault-opening-flash) {
+    animation: vault-core-flash 1.5s var(--vault-ease-settle)
+      calc(var(--vault-t-burst) - 60ms - var(--vault-elapsed)) both;
   }
-  .vault-is-open .vault-reveal-loot {
-    opacity: 1;
-    transform: translateY(0);
-    transition-delay: 1.1s;
+  .vault-is-open :where(.vault-light-spill i) {
+    animation:
+      vault-ray-drift var(--vault-ray-duration) linear
+      calc(var(--vault-ray-delay) - var(--vault-elapsed)) both,
+      vault-ray-sweep var(--vault-ray-duration) calc(var(--vault-ray-delay) - var(--vault-elapsed))
+      both;
   }
-  .vault-is-open .vault-reveal-loot > :first-child {
-    animation: vault-loot-arrival 0.7s 1.12s both;
+  .vault-is-open :where(.vault-opening-rings i) {
+    animation: vault-light-shockwave var(--vault-ring-duration) var(--vault-ease-burst)
+      calc(var(--vault-ring-delay) - var(--vault-elapsed)) both;
   }
-  .vault-unlock-sparks {
-    position: absolute;
-    inset: 0;
-    z-index: 7;
-    pointer-events: none;
+  .vault-is-open :where(.vault-burst-streaks i) {
+    animation: vault-streak-burst var(--vault-streak-duration)
+      calc(var(--vault-streak-delay) - var(--vault-elapsed)) both;
   }
-  .vault-unlock-sparks i {
-    position: absolute;
-    left: 60%;
-    top: 49%;
-    width: 12px;
-    height: 2px;
-    border-radius: 50%;
-    background: var(--color-text-on-ink);
-    box-shadow: 0 0 5px 1px var(--weekly-vault-glow);
-    opacity: 0;
+  .vault-is-open :where(.vault-burst-stars i) {
+    animation: vault-star-burst var(--vault-star-duration)
+      calc(var(--vault-star-delay) - var(--vault-elapsed)) both;
   }
-  .vault-is-open .vault-unlock-sparks i {
-    animation: vault-spark-release 1.15s calc(0.68s + var(--spark-delay)) both;
+  .vault-is-open :where(.vault-burst-stars i)::before {
+    animation: vault-star-twinkle var(--vault-star-twinkle) ease-in-out
+      calc(var(--vault-star-delay) - var(--vault-elapsed)) var(--vault-star-twinkles) alternate both;
   }
   @keyframes vault-heavy-swing {
     0%,
@@ -20198,59 +20405,111 @@
       transform: scaleX(0.06);
     }
   }
-  @keyframes vault-overflow-light {
+  @keyframes vault-seam-throb {
     0% {
-      opacity: 0;
-    }
-    10% {
       opacity: 0.35;
-    }
-    22% {
-      opacity: 1;
-    }
-    40% {
-      opacity: 0.85;
-    }
-    70% {
-      opacity: 0.22;
+      transform: scale(0.98);
     }
     100% {
-      opacity: 0;
+      opacity: 0.8;
+      transform: scale(1.01);
     }
   }
-  @keyframes vault-ray-punch {
+  /* Halo: rushes up to full by the burst, breathes while the door swings,
+     then dims once the doorway is the light source. */
+  @keyframes vault-seam-charge {
     0% {
-      transform: scaleX(0.08) scaleY(0.2);
+      opacity: 0.45;
+      transform: scale(0.96);
+      animation-timing-function: var(--vault-ease-burst);
     }
-    22% {
-      transform: scaleX(1.15) scaleY(1);
+    28% {
+      opacity: 1;
+      transform: scale(1.02);
+      animation-timing-function: ease-in-out;
     }
-    45% {
-      transform: scaleX(0.9) scaleY(0.65);
+    46% {
+      opacity: 0.8;
+    }
+    64% {
+      opacity: 1;
+      transform: scale(1.05);
+      animation-timing-function: var(--vault-ease-settle);
     }
     100% {
-      transform: scaleX(0.48) scaleY(0.3);
+      opacity: 0;
+      transform: scale(1.1);
+    }
+  }
+  /* Seam line: a light igniting, two stutters then full. */
+  @keyframes vault-seam-ignite {
+    0% {
+      opacity: 0;
+    }
+    6% {
+      opacity: 0.45;
+    }
+    10% {
+      opacity: 0.15;
+    }
+    17% {
+      opacity: 0.8;
+    }
+    22% {
+      opacity: 0.5;
+    }
+    30% {
+      opacity: 1;
+    }
+    60% {
+      opacity: 0.9;
+    }
+    100% {
+      opacity: 0;
     }
   }
   @keyframes vault-core-flash {
     0% {
       opacity: 0;
-      transform: scaleX(0.1);
+      transform: scale(0.25);
+      animation-timing-function: var(--vault-ease-burst);
     }
-    18% {
+    14% {
+      opacity: 0.85;
+      transform: scale(1);
+      animation-timing-function: var(--vault-ease-settle);
+    }
+    40% {
       opacity: 0.45;
-      transform: scaleX(0.25);
-    }
-    32% {
-      opacity: 0.95;
-      transform: scaleX(1);
-    }
-    58% {
-      opacity: 0.35;
+      transform: scale(1.08);
     }
     100% {
       opacity: 0;
-      transform: scaleX(1);
+      transform: scale(1.22);
+    }
+  }
+  @keyframes vault-ray-drift {
+    from {
+      transform: translateY(-50%) rotate(var(--vault-ray-angle));
+    }
+    to {
+      transform: translateY(-50%) rotate(calc(var(--vault-ray-angle) + var(--vault-ray-drift)));
+    }
+  }
+  /* Stroke window: the head shoots out on the burst curve (the window slides
+     in from the centre), then the tail follows it out on the settle curve (the
+     window slides on past the tip) until nothing of the stroke remains. */
+  @keyframes vault-ray-sweep {
+    0% {
+      mask-position: 200% 0;
+      animation-timing-function: var(--vault-ease-burst);
+    }
+    34% {
+      mask-position: 40% 0;
+      animation-timing-function: var(--vault-ease-settle);
+    }
+    100% {
+      mask-position: -100% 0;
     }
   }
   @keyframes vault-light-shockwave {
@@ -20258,15 +20517,82 @@
       opacity: 0;
       transform: translate(-50%, -50%) scale(0.12);
     }
-    15% {
-      opacity: 0.8;
-    }
-    55% {
-      opacity: 0.35;
+    12% {
+      opacity: 0.9;
     }
     100% {
       opacity: 0;
-      transform: translate(-50%, -50%) scale(2.6);
+      transform: translate(-50%, -50%) scale(var(--vault-ring-scale));
+    }
+  }
+  /* Streak: shoots to its mark on the burst curve, flickers there, then goes. */
+  @keyframes vault-streak-burst {
+    0% {
+      opacity: 0;
+      transform: translate(0, 0) rotate(var(--vault-streak-angle)) scale(0.3);
+      animation-timing-function: var(--vault-ease-burst);
+    }
+    8% {
+      opacity: 1;
+      animation-timing-function: linear;
+    }
+    36% {
+      transform: translate(var(--vault-streak-x), var(--vault-streak-y))
+        rotate(var(--vault-streak-angle)) scale(1);
+      animation-timing-function: linear;
+    }
+    48% {
+      opacity: 0.55;
+    }
+    58% {
+      opacity: 0.95;
+    }
+    70% {
+      opacity: 0.4;
+    }
+    80% {
+      opacity: 0.8;
+    }
+    100% {
+      opacity: 0;
+      transform: translate(calc(var(--vault-streak-x) * 1.12), calc(var(--vault-streak-y) * 1.12))
+        rotate(var(--vault-streak-angle)) scale(0.85);
+    }
+  }
+  /* Star: bursts to its mark, keeps drifting outward and up, holds bright
+     for most of its life, then fades last. */
+  @keyframes vault-star-burst {
+    0% {
+      opacity: 0;
+      transform: translate(0, 0) rotate(0deg);
+      animation-timing-function: var(--vault-ease-burst);
+    }
+    7% {
+      opacity: 1;
+      animation-timing-function: linear;
+    }
+    34% {
+      transform: translate(var(--vault-star-x), var(--vault-star-y)) rotate(var(--vault-star-spin));
+      animation-timing-function: linear;
+    }
+    72% {
+      opacity: 0.9;
+      animation-timing-function: var(--vault-ease-settle);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(calc(var(--vault-star-x) * 1.08), calc(var(--vault-star-y) * 1.08 - 60%))
+        rotate(calc(var(--vault-star-spin) * 1.5));
+    }
+  }
+  @keyframes vault-star-twinkle {
+    0% {
+      opacity: 0.7;
+      transform: translate(-50%, -50%) scale(0.55) rotate(0deg);
+    }
+    100% {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1.15) rotate(18deg);
     }
   }
   @keyframes vault-latch-release {
@@ -20298,34 +20624,44 @@
       transform: translate(0.8px, 0.5px);
     }
   }
-  @keyframes vault-spark-release {
+  /* The loot pops from the middle of the doorway: it grows from the centre
+     (covering the strokes there) with a small overshoot, never a slide up. */
+  @keyframes vault-loot-reveal {
     0% {
+      visibility: hidden;
       opacity: 0;
-      transform: translate(0, 0) rotate(var(--spark-angle)) scaleX(0.2);
+      transform: scale(0.35);
+      animation-timing-function: var(--vault-ease-burst);
     }
-    12% {
+    1% {
+      visibility: visible;
+      opacity: 0;
+    }
+    45% {
       opacity: 1;
     }
-    65% {
-      opacity: 0.7;
+    70% {
+      transform: scale(1.06);
+      animation-timing-function: var(--vault-ease-settle);
     }
     100% {
-      opacity: 0;
-      transform: translate(var(--spark-x), var(--spark-y)) rotate(var(--spark-angle)) scaleX(0.15);
+      visibility: visible;
+      opacity: 1;
+      transform: scale(1);
     }
   }
   @keyframes vault-loot-arrival {
     0% {
       opacity: 0;
-      transform: translateY(15px) scale(0.65);
+      transform: scale(0.6);
     }
     60% {
       opacity: 1;
-      transform: translateY(-3px) scale(1.12);
+      transform: scale(1.14);
     }
     100% {
       opacity: 1;
-      transform: translateY(0) scale(1);
+      transform: scale(1);
     }
   }
   .weekly-earned .vault-is-open::after {
@@ -20341,42 +20677,33 @@
     clip-path: inset(50%);
     white-space: nowrap;
   }
+  /* Reduced motion: the host completes the reveal at once, so the open state
+     is the resting state; every layer under the trigger and the loot stay
+     still (the blanket selectors cover any layer added later). */
   @media (prefers-reduced-motion: reduce) {
     .vault-reveal-door,
-    .vault-reveal-loot,
     .weekly-earned .vault-is-open::after {
       transition: none;
     }
-    .vault-is-open .vault-reveal-door,
-    .vault-is-open .vault-door-latch,
-    .vault-is-open .vault-reveal-frame,
-    .vault-is-open .vault-reveal-loot > :first-child,
-    .vault-is-open .vault-unlock-sparks i,
-    .vault-is-open .vault-door-shading,
-    .vault-is-open .vault-door-shadow,
-    .vault-is-open .vault-light-spill,
-    .vault-is-open .vault-light-spill i::before,
-    .vault-is-open .vault-opening-flash,
-    .vault-is-open .vault-opening-ring {
+    .vault-is-open .vault-reveal-trigger,
+    .vault-is-open .vault-reveal-trigger *,
+    .vault-is-open .vault-reveal-trigger *::before,
+    .vault-is-open .vault-reveal-trigger *::after,
+    .vault-is-charging .vault-reveal-trigger *,
+    .vault-is-open .vault-reveal-loot,
+    .vault-is-open .vault-reveal-loot > :first-child {
       animation: none;
     }
-    .vault-is-open .vault-light-spill {
-      opacity: 0;
-    }
   }
-
-  .vault-is-revealed .vault-reveal-door,
-  .vault-is-revealed .vault-reveal-loot,
-  .vault-is-revealed .vault-reveal-loot > :first-child,
-  .vault-is-revealed .vault-door-latch,
-  .vault-is-revealed .vault-reveal-frame,
-  .vault-is-revealed .vault-light-spill,
-  .vault-is-revealed .vault-light-spill i::before,
-  .vault-is-revealed .vault-opening-flash,
-  .vault-is-revealed .vault-opening-ring,
-  .vault-is-revealed .vault-unlock-sparks i,
-  .vault-is-revealed .vault-door-shading,
-  .vault-is-revealed .vault-door-shadow {
+  /* Revealed (the host's timer, or a repaint of an already opened vault): no
+     layer replays, and the light layers rest at their invisible base. Both
+     classes in the selector so this outranks every open-state rule. */
+  .vault-is-open.vault-is-revealed .vault-reveal-trigger,
+  .vault-is-open.vault-is-revealed .vault-reveal-trigger *,
+  .vault-is-open.vault-is-revealed .vault-reveal-trigger *::before,
+  .vault-is-open.vault-is-revealed .vault-reveal-trigger *::after,
+  .vault-is-open.vault-is-revealed .vault-reveal-loot,
+  .vault-is-open.vault-is-revealed .vault-reveal-loot > :first-child {
     animation: none;
     transition: none;
   }
