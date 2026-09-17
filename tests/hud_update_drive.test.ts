@@ -1250,7 +1250,7 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
   {
     call: 'this.marketWindow.close',
     band: 'slow',
-    gate: 'this.marketWindow.isOpen && !this.nearbyMarketNpc()',
+    gate: "this.marketWindow.isOpen && !nearbyServiceNpc(this.sim, 'market')",
     surface: 'window',
     guard: { kind: 'callsite' },
     why: 'closes the market window when the player leaves the auctioneer',
@@ -1266,7 +1266,7 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
   {
     call: 'this.marketWindow.refreshIfChanged',
     band: 'slow',
-    gate: 'this.marketWindow.isOpen && !(!this.nearbyMarketNpc())',
+    gate: "this.marketWindow.isOpen && !(!nearbyServiceNpc(this.sim, 'market'))",
     surface: 'window',
     guard: { kind: 'module', module: 'market_window.ts', proof: SIG_RETURN },
     why: 'the market window',
