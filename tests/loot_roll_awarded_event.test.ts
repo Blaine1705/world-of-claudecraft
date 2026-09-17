@@ -10,7 +10,8 @@
 // the winner's pid on every grant path: a need/greed win, a direct master-loot
 // assignment, and a master roll converted to need/greed.
 import { describe, expect, it } from 'vitest';
-import { MOBS } from '../src/sim/data';
+import { bagCapacity } from '../src/sim/bags';
+import { ITEMS, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { assignMasterLoot, awardSharedLootItem, submitLootRoll } from '../src/sim/loot/loot_roll';
 import type { PlayerMeta } from '../src/sim/sim';
@@ -49,6 +50,16 @@ function deadCorpse(sim: Sim, tapper: number, recipients: number[], items: LootS
   mob.loot = { copper: 0, items };
   sim.entities.set(mob.id, mob);
   return mob;
+}
+
+function fillBags(sim: Sim, pid: number): void {
+  const m = playerMeta(sim, pid);
+  const cap = bagCapacity(m.bags);
+  const gearIds = Object.values(ITEMS)
+    .filter((d) => (d.kind === 'weapon' || d.kind === 'armor') && d.id !== ITEM)
+    .map((d) => d.id);
+  for (let i = 0; m.inventory.length < cap; i++) sim.addItem(gearIds[i % gearIds.length], 1, pid);
+  expect(m.inventory.length).toBe(cap);
 }
 
 function awarded(sim: Sim): Awarded[] {
@@ -113,6 +124,40 @@ describe('loot_roll: lootRollAwarded names the player who actually won', () => {
     submitLootRoll(sim.ctx, rollId, 'pass', c);
     expect(awarded(sim)).toEqual([]);
     expect(mob.loot?.items.some((s) => s.itemId === ITEM)).toBe(true);
+  });
+
+  it('fires for the winner even when full bags hold the item on the corpse for them', () => {
+    const { sim, a, b, c } = partyOfThree();
+    fillBags(sim, b);
+    const mob = deadCorpse(sim, a, [a, b, c], [{ itemId: ITEM, count: 1 }]);
+    awardSharedLootItem(sim.ctx, ITEM, mob, playerMeta(sim, a));
+    const rollId = rollIdOf(sim, 'lootRoll');
+    submitLootRoll(sim.ctx, rollId, 'need', b);
+    submitLootRoll(sim.ctx, rollId, 'pass', a);
+    submitLootRoll(sim.ctx, rollId, 'pass', c);
+    expect(sim.countItem(ITEM, b)).toBe(0);
+    expect(mob.loot?.items.some((s) => s.itemId === ITEM && s.personalFor?.[0] === b)).toBe(true);
+    expect(awarded(sim).map((e) => [e.rollId, e.pid])).toEqual([[rollId, b]]);
+  });
+
+  it('fires exactly once when the roll window EXPIRES with an undecided candidate', () => {
+    const { sim, a, b, c } = partyOfThree();
+    const mob = deadCorpse(sim, a, [a, b, c], [{ itemId: ITEM, count: 1 }]);
+    awardSharedLootItem(sim.ctx, ITEM, mob, playerMeta(sim, a));
+    const rollId = rollIdOf(sim, 'lootRoll');
+    submitLootRoll(sim.ctx, rollId, 'greed', a);
+    // b never answers. Age the roll to its deadline rather than ticking the
+    // whole world for a minute: the tick's expiry sweep then resolves it (an
+    // unanswered candidate counts as a pass) and later ticks find nothing left.
+    const roll = sim.ctx.pendingLootRolls.get(rollId);
+    if (!roll) throw new Error('expected the roll to be pending');
+    roll.expiresAt = sim.ctx.time;
+    const drained: Awarded[] = [];
+    for (let i = 0; i < 5; i++)
+      drained.push(...sim.tick().filter((e): e is Awarded => e.type === 'lootRollAwarded'));
+    expect(sim.ctx.pendingLootRolls.has(rollId)).toBe(false);
+    expect(sim.countItem(ITEM, a)).toBe(1);
+    expect(drained.map((e) => [e.rollId, e.pid])).toEqual([[rollId, a]]);
   });
 
   it('fires once for a direct master-loot assignment, naming the assignee', () => {

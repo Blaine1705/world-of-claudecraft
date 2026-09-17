@@ -830,9 +830,11 @@ export function assignMasterLoot(
 
 // The award-time signal (winner-scoped) that a roll granted its item: the one
 // event a consumer may read as "this player received the drop". Emitted by
-// both grant paths (the need/greed resolve and a direct master assignment)
-// immediately before grantOrHoldAwardedLoot, so a held-on-corpse grant (full
-// bags) still names its rightful owner.
+// both ROLL grant paths (the need/greed resolve and a direct master
+// assignment) immediately before grantOrHoldAwardedLoot, so a held-on-corpse
+// grant (full bags) still names its rightful owner. The no-roll award paths
+// (round-robin, looter-takes-all, a solo pickup) deliberately never emit it:
+// no roll happened, so there is no roll id to name.
 function emitLootRollAwarded(ctx: SimContext, roll: PendingLootRoll, winnerPid: number): void {
   ctx.emit({
     type: 'lootRollAwarded',
