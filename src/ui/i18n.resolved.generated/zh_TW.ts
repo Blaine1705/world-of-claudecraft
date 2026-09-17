@@ -2396,7 +2396,12 @@ export const zh_TW: EnTranslations = {
       "vendorGate": "需要與{faction}達到{tier}。",
       "tierReachedBanner": "與{faction}的聲望達到{tier}",
       "tierReachedSubtext": "陣營頭銜：{title}",
-      "tierReachedLine": "你與{faction}的聲望已達到{tier}。你的陣營頭銜現在是{title}。"
+      "tierReachedLine": "你與{faction}的聲望已達到{tier}。你的陣營頭銜現在是{title}。",
+      "mastery": "區域精通",
+      "masteryIntro": "在每個區域完成的世界任務數，永久保留：沒有每日連續要求，也不會被消耗。每達到一個里程碑都會記錄一項功績。",
+      "masteryNext": "下一個里程碑：{count}",
+      "masteryMaxed": "已達成全部里程碑",
+      "masteryReached": "{reached} / {total} 個里程碑"
     },
     "questLog": {
       "completed": "已完成",
@@ -2533,6 +2538,12 @@ export const zh_TW: EnTranslations = {
         "few": "{count}件傳說物品",
         "many": "{count}件傳說物品",
         "other": "{count}件傳說物品"
+      },
+      "worldQuestsCompletedInZone": {
+        "one": "已完成{count}個世界任務",
+        "few": "已完成{count}個世界任務",
+        "many": "已完成{count}個世界任務",
+        "other": "已完成{count}個世界任務"
       },
       "guildMembers": {
         "one": "你是{rank}，{count}名成員",
@@ -7443,7 +7454,9 @@ export const zh_TW: EnTranslations = {
       "readingHeading": "Where to read it",
       "readingBody": "The Reputation tab of the character sheet (C) shows each faction with its current standing, a bar toward the next tier, and the title that standing has earned you. The chat log reports every standing gain as it lands, and reaching a new tier shows a celebration banner on screen.",
       "deedsHeading": "Deeds",
-      "deedsBody": "The Book of Deeds keeps score of your standing too: reaching Trusted with a faction and reaching Champion with a faction each record a deed, and reaching Champion with all three is a deed of its own. Like every deed these are cosmetic, never power, and the Champion deeds grant a title you can wear."
+      "deedsBody": "The Book of Deeds keeps score of your standing too: reaching Trusted with a faction and reaching Champion with a faction each record a deed, and reaching Champion with all three is a deed of its own. Like every deed these are cosmetic, never power, and the Champion deeds grant a title you can wear.",
+      "masteryHeading": "Regional Mastery",
+      "masteryBody": "Every zone also keeps a permanent count of the world quests you have completed there. It is not a currency and nothing spends it: the number only ever climbs, there is no daily streak to keep, and if you come back after weeks away the next world quest simply adds one more. At set milestones the count records a deed in the Book of Deeds, so an old zone stays worth a visit long after your character has stopped leveling. The Reputation tab lists every zone with its count and the next milestone."
     },
     "deedsPage": {
       "intro": "功績之書記錄著你在這個世界所做的一切，從走出新手山谷的第一步，到王國所能提供的最艱難的戰鬥。一邊遊玩一邊贏得功績，佩戴它們授予的頭銜，看著你的名望不斷攀升。",

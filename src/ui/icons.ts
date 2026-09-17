@@ -5554,6 +5554,13 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'prog_church_order_champion',
   'prog_automatons_champion',
   'prog_faction_champion_all',
+  // Regional Mastery's world-quest ladder deeds use the exploration category
+  // crest pending art.
+  'exp_regional_mastery_10',
+  'exp_regional_mastery_25',
+  'exp_regional_mastery_50',
+  'exp_regional_mastery_100',
+  'exp_regional_mastery_250',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

@@ -6,7 +6,11 @@ import {
   STANDING_THRESHOLDS,
 } from '../src/sim/factions';
 import type { WorldQuestProgress } from '../src/sim/types';
-import { buildReputationRow, buildReputationView } from '../src/ui/hud/reputation/reputation_view';
+import {
+  buildRegionalMasteryRows,
+  buildReputationRow,
+  buildReputationView,
+} from '../src/ui/hud/reputation/reputation_view';
 
 const log = (rows: Array<[string, WorldQuestProgress['state']]>) =>
   new Map<string, WorldQuestProgress>(
@@ -20,6 +24,7 @@ describe('reputation view: one row per allied faction', () => {
       level: 20,
       worldQuestLog: new Map(),
       worldQuestExpiresAtMs: 0,
+      zoneCounts: {},
       nowMs: 0,
     });
     expect(view.rows.map((row) => row.factionId)).toEqual([...FACTION_IDS]);
@@ -77,6 +82,7 @@ describe('reputation view: the day summary', () => {
         ['wq_c', 'completed'],
       ]),
       worldQuestExpiresAtMs: 10_000,
+      zoneCounts: {},
       nowMs: 4_000,
     });
     expect(view.day).toEqual({ completed: 2, total: 3, resetsInMs: 6_000 });
@@ -96,6 +102,7 @@ describe('reputation view: the day summary', () => {
       level: 20,
       worldQuestLog: new Map(),
       worldQuestExpiresAtMs: 1_000,
+      zoneCounts: {},
       nowMs: 5_000,
     });
     expect(past.day.resetsInMs).toBe(0);
@@ -104,8 +111,51 @@ describe('reputation view: the day summary', () => {
       level: 20,
       worldQuestLog: new Map(),
       worldQuestExpiresAtMs: Number.NaN,
+      zoneCounts: {},
       nowMs: 5_000,
     });
     expect(unknown.day.resetsInMs).toBe(0);
+  });
+});
+
+describe('buildRegionalMasteryRows', () => {
+  it('lists every world-quest zone in faction order with its count and milestone rung', () => {
+    const rows = buildRegionalMasteryRows({ farshore_isle: 37, drakelands: 250, nowhere: 9 });
+    // Faction order: Rift Watch zones, then Church Order, then Automatons.
+    expect(rows.map((r) => r.factionId)).toEqual([
+      ...Array(5).fill('rift_watch'),
+      ...Array(5).fill('church_order'),
+      ...Array(4).fill('automatons'),
+    ]);
+    expect(rows).toHaveLength(14);
+    const farshore = rows.find((r) => r.zoneId === 'farshore_isle');
+    expect(farshore).toMatchObject({
+      count: 37,
+      reached: 2,
+      nextMilestone: 50,
+      progress: 12,
+      required: 25,
+      percent: 48,
+    });
+    const drakelands = rows.find((r) => r.zoneId === 'drakelands');
+    expect(drakelands).toMatchObject({ count: 250, reached: 5, nextMilestone: null, percent: 100 });
+    // A zone never credited sits on the first rung.
+    const fresh = rows.find((r) => r.zoneId === 'eastbrook_vale');
+    expect(fresh).toMatchObject({ count: 0, reached: 0, nextMilestone: 10, percent: 0 });
+    // The tutorial shore has no world quests and never appears.
+    expect(rows.some((r) => r.zoneId === 'proving_shore')).toBe(false);
+  });
+
+  it('rides the reputation view with the milestone count', () => {
+    const view = buildReputationView({
+      factions: {},
+      level: 20,
+      worldQuestLog: new Map(),
+      worldQuestExpiresAtMs: 0,
+      nowMs: 0,
+      zoneCounts: { palmreach: 10 },
+    });
+    expect(view.masteryMilestoneCount).toBe(5);
+    expect(view.mastery.find((r) => r.zoneId === 'palmreach')?.reached).toBe(1);
   });
 });

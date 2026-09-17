@@ -9,6 +9,7 @@ function worldStub(
   level = 20,
   log: Array<[string, WorldQuestProgress['state']]> = [],
   expiresAtMs = 0,
+  zoneCounts: Record<string, number> = {},
 ): IWorld {
   return {
     factions,
@@ -17,6 +18,7 @@ function worldStub(
       log.map(([questId, state]) => [questId, { questId, count: 0, state } as WorldQuestProgress]),
     ),
     worldQuestExpiresAtMs: expiresAtMs,
+    worldQuestZoneCounts: zoneCounts,
   } as unknown as IWorld;
 }
 
@@ -72,5 +74,27 @@ describe('reputation tab html', () => {
     const html = reputationTabHtml(worldStub({}), 0);
     expect(html).not.toContain('<script');
     expect(html).toContain('class="char-rep-legend"');
+  });
+
+  it('paints the Regional Mastery card: one row per zone with the permanent count and the next milestone', () => {
+    const html = reputationTabHtml(
+      worldStub({ rift_watch: 0 }, 20, [], 0, { farshore_isle: 37, drakelands: 250 }),
+      0,
+    );
+    expect(html).toContain('class="char-rep-mastery ui-card"');
+    expect(html).toContain('Regional Mastery');
+    expect(html.match(/class="char-rep-mastery-row/g)).toHaveLength(14);
+    expect(html).toContain('37 world quests completed');
+    expect(html).toContain('Next milestone at 50');
+    expect(html).toContain('2 / 5 milestones');
+    expect(html).toContain('Every milestone reached');
+    expect(html).toContain('5 / 5 milestones');
+    // A zone never credited reads zero, muted, on the first rung.
+    expect(html).toContain('class="char-rep-mastery-row is-empty"');
+    expect(html).toContain('0 world quests completed');
+    expect(html).toContain('Next milestone at 10');
+    // One completion reads singular.
+    const one = reputationTabHtml(worldStub({}, 20, [], 0, { palmreach: 1 }), 0);
+    expect(one).toContain('1 world quest completed');
   });
 });

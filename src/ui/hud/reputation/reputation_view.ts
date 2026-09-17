@@ -15,6 +15,11 @@ import {
   type StandingTier,
   standingProgress,
 } from '../../../sim/factions';
+import {
+  isWorldQuestZone,
+  REGIONAL_MASTERY_MILESTONES,
+  regionalMasteryProgress,
+} from '../../../sim/regional_mastery';
 import type { WorldQuestProgress } from '../../../sim/types';
 
 export interface ReputationRowView {
@@ -44,9 +49,27 @@ export interface ReputationDayView {
   readonly resetsInMs: number;
 }
 
+/** One zone's Regional Mastery: the permanent world-quest completion count
+ *  and where it sits on the milestone ladder. */
+export interface RegionalMasteryRowView {
+  readonly zoneId: string;
+  readonly factionId: FactionId;
+  readonly count: number;
+  /** Milestones passed, out of REGIONAL_MASTERY_MILESTONES.length. */
+  readonly reached: number;
+  readonly nextMilestone: number | null;
+  /** Count since the last milestone, and the rung's length. */
+  readonly progress: number;
+  readonly required: number;
+  readonly percent: number;
+}
+
 export interface ReputationView {
   readonly rows: readonly ReputationRowView[];
   readonly day: ReputationDayView;
+  /** Regional Mastery, one row per world-quest zone in faction order. */
+  readonly mastery: readonly RegionalMasteryRowView[];
+  readonly masteryMilestoneCount: number;
   /** Every tier in ascending order, for the legend. */
   readonly tiers: readonly StandingTier[];
 }
@@ -57,6 +80,34 @@ export interface ReputationViewInput {
   readonly worldQuestLog: ReadonlyMap<string, WorldQuestProgress>;
   readonly worldQuestExpiresAtMs: number;
   readonly nowMs: number;
+  /** Permanent per-zone world-quest completion counts (IWorld.worldQuestZoneCounts). */
+  readonly zoneCounts: Readonly<Record<string, number>>;
+}
+
+/** Regional Mastery rows: every world-quest zone, grouped by faction in
+ *  FACTION_IDS order and each faction's own zone order, so the list reads
+ *  like the standing cards above it. */
+export function buildRegionalMasteryRows(
+  zoneCounts: Readonly<Record<string, number>>,
+): RegionalMasteryRowView[] {
+  const rows: RegionalMasteryRowView[] = [];
+  for (const factionId of FACTION_IDS) {
+    for (const zoneId of FACTIONS[factionId].zones) {
+      if (!isWorldQuestZone(zoneId)) continue;
+      const p = regionalMasteryProgress(zoneCounts[zoneId] ?? 0);
+      rows.push({
+        zoneId,
+        factionId,
+        count: p.count,
+        reached: p.reached,
+        nextMilestone: p.nextMilestone,
+        progress: p.progress,
+        required: p.required,
+        percent: p.percent,
+      });
+    }
+  }
+  return rows;
 }
 
 export function buildReputationRow(
@@ -100,6 +151,8 @@ export function buildReputationView(input: ReputationViewInput): ReputationView 
   return {
     rows,
     day: { completed, total: input.worldQuestLog.size, resetsInMs },
+    mastery: buildRegionalMasteryRows(input.zoneCounts),
+    masteryMilestoneCount: REGIONAL_MASTERY_MILESTONES.length,
     tiers: STANDING_TIERS,
   };
 }

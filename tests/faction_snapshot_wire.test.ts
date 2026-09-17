@@ -52,6 +52,34 @@ describe('faction standing and reroll owner wire', () => {
     expect(target.worldQuestRerollCycle).toBe('');
   });
 
+  it('applies the Regional Mastery counts key and freezes the mirror', () => {
+    const target = { worldQuestZoneCounts: Object.freeze({}) };
+    applyFactionSelfWire(target, { wqzc: { eastbrook_vale: 12, frostveil: 1 } });
+    expect(target.worldQuestZoneCounts).toEqual({ eastbrook_vale: 12, frostveil: 1 });
+    expect(Object.isFrozen(target.worldQuestZoneCounts)).toBe(true);
+  });
+
+  it('wqzc omission retains the previous counts; junk keys and values are clamped', () => {
+    const target = { worldQuestZoneCounts: Object.freeze({ eastbrook_vale: 12 }) };
+    applyFactionSelfWire(target, { fac: { rift_watch: 1, church_order: 0, automatons: 0 } });
+    expect(target.worldQuestZoneCounts).toEqual({ eastbrook_vale: 12 });
+    applyFactionSelfWire(target, {
+      wqzc: {
+        eastbrook_vale: 3.9,
+        frostveil: -4,
+        drakelands: 0,
+        nightbloom: 'x',
+        not_a_zone: 50,
+        amberfall: Number.POSITIVE_INFINITY,
+      },
+    });
+    expect(target.worldQuestZoneCounts).toEqual({ eastbrook_vale: 3 });
+    expect(Object.isFrozen(target.worldQuestZoneCounts)).toBe(true);
+    // A non-object value is a clean empty map, never a throw or a stale keep.
+    applyFactionSelfWire(target, { wqzc: 'junk' });
+    expect(target.worldQuestZoneCounts).toEqual({});
+  });
+
   it('a ClientWorld self snapshot lands on the same IWorld members the offline Sim exposes', () => {
     const sim = new Sim({ seed: 7, playerClass: 'warrior' });
     const client = bareClient(1);
@@ -59,10 +87,17 @@ describe('faction standing and reroll owner wire', () => {
       fac: { rift_watch: 60, church_order: 0, automatons: 0 },
       wqrr: cycle,
       wqrep: {},
+      wqzc: { farshore_isle: 25 },
     });
     expect(Object.keys(client.factions).sort()).toEqual(Object.keys(sim.factions).sort());
     expect(client.factions.rift_watch).toBe(60);
     expect(client.worldQuestRerollCycle).toBe(cycle);
     expect(typeof sim.worldQuestRerollCycle).toBe(typeof client.worldQuestRerollCycle);
+    // Regional Mastery: both worlds expose a plain zoneId -> count record; the
+    // offline Sim's fresh character holds an empty one, the mirror what was wired.
+    expect(client.worldQuestZoneCounts).toEqual({ farshore_isle: 25 });
+    expect(sim.worldQuestZoneCounts).toEqual({});
+    expect(typeof sim.worldQuestZoneCounts).toBe(typeof client.worldQuestZoneCounts);
+    expect(Array.isArray(client.worldQuestZoneCounts)).toBe(false);
   });
 });

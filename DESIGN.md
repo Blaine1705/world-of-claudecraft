@@ -766,7 +766,7 @@ Every window adopts the grammar; these carry specific intent:
   Reputation, Currencies, Progression, Professions) beside the Cosmetics and Share Player
   Card actions. The Character tab keeps the paperdoll and seats the Offense, Defense and Specialization
   boards in a rail at its right that scrolls on the wheel; every other tab takes the whole
-  body: Reputation (`src/ui/hud/reputation/`, one card per faction with the standing pill
+  body: Reputation (`src/ui/hud/reputation/`, one card per faction with the standing pill, then the Regional Mastery card with every zone's permanent world-quest count
   and tier bar on the quality ramp), Currencies (`src/ui/hud/currencies/`, the activity
   currencies and the faction rows), Progression (milestones, title, Reliquary and Time
   Played) and Professions (the gathering and crafting boards). The Specialization board is

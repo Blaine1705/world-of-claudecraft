@@ -870,11 +870,15 @@ describe('real catalog integration', () => {
     // buildDeedsView + countsTowardCompletion directly (tsx, no full
     // compile), since the tree does not compile yet:
     // 300 deeds - 22 feats - 10 hidden = 268 visible to a fresh character.
-    expect(view.summary.visibleTotal).toBe(276);
+    // 276 with the eight world-quest deeds, 283 with the seven faction
+    // standing deeds, 288 with the five Regional Mastery deeds (all visible,
+    // none feat or hidden).
+    expect(view.summary.visibleTotal).toBe(288);
     // The bucket sum adds the feat-flagged rows back on top (hidden-unearned
     // deeds never enter a bucket at all, so only the 22 feats separate this
-    // from visibleTotal): 268 + 22 = 290.
-    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(298);
+    // from visibleTotal): 268 + 22 = 290, then 298, 305 and 310 by the same
+    // three appends.
+    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(310);
   });
 
   it('offers exactly the live catalog border deeds once they are earned', () => {

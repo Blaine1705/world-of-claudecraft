@@ -12742,6 +12742,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.commissionLegendaries.few': '{count}件傳說物品',
   'hudChrome.plurals.commissionLegendaries.many': '{count}件傳說物品',
   'hudChrome.plurals.commissionLegendaries.other': '{count}件傳說物品',
+  'hudChrome.plurals.worldQuestsCompletedInZone.one': '已完成{count}個世界任務',
+  'hudChrome.plurals.worldQuestsCompletedInZone.few': '已完成{count}個世界任務',
+  'hudChrome.plurals.worldQuestsCompletedInZone.many': '已完成{count}個世界任務',
+  'hudChrome.plurals.worldQuestsCompletedInZone.other': '已完成{count}個世界任務',
   'hudChrome.commissionBoard.statusOpen': '待接單',
   'hudChrome.commissionBoard.statusAccepted': '已接單',
   'hudChrome.commissionBoard.statusDelivered': '已交付',
@@ -16369,6 +16373,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reputation.title': '陣營頭銜',
   'hudChrome.reputation.legend': '聲望等級',
   'hudChrome.reputation.vendorGate': '需要與{faction}達到{tier}。',
+  'hudChrome.reputation.mastery': '區域精通',
+  'hudChrome.reputation.masteryIntro':
+    '在每個區域完成的世界任務數，永久保留：沒有每日連續要求，也不會被消耗。每達到一個里程碑都會記錄一項功績。',
+  'hudChrome.reputation.masteryNext': '下一個里程碑：{count}',
+  'hudChrome.reputation.masteryMaxed': '已達成全部里程碑',
+  'hudChrome.reputation.masteryReached': '{reached} / {total} 個里程碑',
   'hudChrome.reputation.tierReachedBanner': '與{faction}的聲望達到{tier}',
   'hudChrome.reputation.tierReachedSubtext': '陣營頭銜：{title}',
   'hudChrome.reputation.tierReachedLine':

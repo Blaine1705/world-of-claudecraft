@@ -2396,7 +2396,12 @@ export const ru_RU: EnTranslations = {
       "vendorGate": "Требуется {tier} с фракцией {faction}.",
       "tierReachedBanner": "Теперь {tier} с фракцией {faction}",
       "tierReachedSubtext": "Титул фракции: {title}",
-      "tierReachedLine": "Теперь у вас {tier} с фракцией {faction}. Ваш титул фракции: {title}."
+      "tierReachedLine": "Теперь у вас {tier} с фракцией {faction}. Ваш титул фракции: {title}.",
+      "mastery": "Мастерство региона",
+      "masteryIntro": "Мировые задания, выполненные в каждой зоне, сохраняются навсегда: ни ежедневных серий, ни трат. Каждый рубеж записывает деяние.",
+      "masteryNext": "Следующий рубеж: {count}",
+      "masteryMaxed": "Все рубежи достигнуты",
+      "masteryReached": "{reached} / {total} рубежей"
     },
     "questLog": {
       "completed": "Завершённые",
@@ -2533,6 +2538,12 @@ export const ru_RU: EnTranslations = {
         "few": "{count} легендарных предмета",
         "many": "{count} легендарных предметов",
         "other": "{count} легендарных предмета"
+      },
+      "worldQuestsCompletedInZone": {
+        "one": "{count} мировое задание выполнено",
+        "few": "{count} мировых задания выполнено",
+        "many": "{count} мировых заданий выполнено",
+        "other": "{count} мировых заданий выполнено"
       },
       "guildMembers": {
         "one": "вы {rank}, {count} участник",
@@ -7443,7 +7454,9 @@ export const ru_RU: EnTranslations = {
       "readingHeading": "Where to read it",
       "readingBody": "The Reputation tab of the character sheet (C) shows each faction with its current standing, a bar toward the next tier, and the title that standing has earned you. The chat log reports every standing gain as it lands, and reaching a new tier shows a celebration banner on screen.",
       "deedsHeading": "Deeds",
-      "deedsBody": "The Book of Deeds keeps score of your standing too: reaching Trusted with a faction and reaching Champion with a faction each record a deed, and reaching Champion with all three is a deed of its own. Like every deed these are cosmetic, never power, and the Champion deeds grant a title you can wear."
+      "deedsBody": "The Book of Deeds keeps score of your standing too: reaching Trusted with a faction and reaching Champion with a faction each record a deed, and reaching Champion with all three is a deed of its own. Like every deed these are cosmetic, never power, and the Champion deeds grant a title you can wear.",
+      "masteryHeading": "Regional Mastery",
+      "masteryBody": "Every zone also keeps a permanent count of the world quests you have completed there. It is not a currency and nothing spends it: the number only ever climbs, there is no daily streak to keep, and if you come back after weeks away the next world quest simply adds one more. At set milestones the count records a deed in the Book of Deeds, so an old zone stays worth a visit long after your character has stopped leveling. The Reputation tab lists every zone with its count and the next milestone."
     },
     "deedsPage": {
       "intro": "Книга деяний ведет счет всему, что вы совершили в этом мире, от первых шагов из начальной долины до самых тяжелых сражений, какие только может предложить королевство. Зарабатывайте деяния по ходу игры, носите дарованные ими звания и смотрите, как растет ваша Известность.",

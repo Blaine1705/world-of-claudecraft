@@ -1,10 +1,12 @@
-// Delta-safe decode for the faction standing and daily reroll owner keys. The
-// server emits them beside the world-quest family (server/quest_snapshot_wire.ts,
-// emitQuestSelfKeys); omission retains the previous mirror and a malformed value
-// is clamped by the same sanitizers the save/load boundary uses, so a hostile
-// or skewed snapshot can never leave the client holding out-of-range standing.
+// Delta-safe decode for the faction standing, daily reroll and Regional Mastery
+// owner keys. The server emits them beside the world-quest family
+// (server/quest_snapshot_wire.ts, emitQuestSelfKeys); omission retains the
+// previous mirror and a malformed value is clamped by the same sanitizers the
+// save/load boundary uses, so a hostile or skewed snapshot can never leave the
+// client holding out-of-range standing or counts.
 import type { FactionId } from '../sim/factions';
 import { sanitizeFactionReputation } from '../sim/factions';
+import { sanitizeZoneCompletionCounts } from '../sim/regional_mastery';
 import { sanitizeWorldQuestReplacements } from '../sim/world_quest_reroll';
 import { sanitizeWorldQuestCycle } from '../sim/world_quests';
 
@@ -12,12 +14,13 @@ export interface FactionSelfMirrors {
   factions: Readonly<Record<FactionId, number>>;
   worldQuestRerollCycle: string;
   worldQuestReplacements: Readonly<Record<string, string>>;
+  worldQuestZoneCounts: Readonly<Record<string, number>>;
 }
 
-/** Apply the `fac`, `wqrr` and `wqrep` self keys; each is independent. */
+/** Apply the `fac`, `wqrr`, `wqrep` and `wqzc` self keys; each is independent. */
 export function applyFactionSelfWire(
   target: Partial<FactionSelfMirrors> & { worldQuestCycle?: string },
-  self: { fac?: unknown; wqrr?: unknown; wqrep?: unknown },
+  self: { fac?: unknown; wqrr?: unknown; wqrep?: unknown; wqzc?: unknown },
 ): void {
   if (self.fac !== undefined) {
     target.factions = Object.freeze(sanitizeFactionReputation(self.fac));
@@ -31,5 +34,10 @@ export function applyFactionSelfWire(
     target.worldQuestReplacements = Object.freeze(
       sanitizeWorldQuestReplacements(self.wqrep, target.worldQuestCycle ?? ''),
     );
+  }
+  if (self.wqzc !== undefined) {
+    // Regional Mastery counts are cycle-independent: the same clamp the save
+    // boundary applies (world quest zones only, whole positive numbers).
+    target.worldQuestZoneCounts = Object.freeze(sanitizeZoneCompletionCounts(self.wqzc));
   }
 }

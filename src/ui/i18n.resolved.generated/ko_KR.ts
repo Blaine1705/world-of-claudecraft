@@ -2396,7 +2396,12 @@ export const ko_KR: EnTranslations = {
       "vendorGate": "{faction}과(와) {tier} 평판이 필요합니다.",
       "tierReachedBanner": "{faction}과(와) {tier} 평판 달성",
       "tierReachedSubtext": "진영 칭호: {title}",
-      "tierReachedLine": "{faction}과(와)의 평판이 {tier}에 도달했습니다. 진영 칭호가 {title}(으)로 바뀌었습니다."
+      "tierReachedLine": "{faction}과(와)의 평판이 {tier}에 도달했습니다. 진영 칭호가 {title}(으)로 바뀌었습니다.",
+      "mastery": "지역 숙련",
+      "masteryIntro": "각 지역에서 완료한 월드 퀘스트 수는 영구히 남습니다. 매일 이어 갈 필요도 없고 소모되지도 않습니다. 이정표에 도달할 때마다 업적이 기록됩니다.",
+      "masteryNext": "다음 이정표: {count}",
+      "masteryMaxed": "모든 이정표 달성",
+      "masteryReached": "{reached} / {total} 이정표"
     },
     "questLog": {
       "completed": "완료됨",
@@ -2533,6 +2538,12 @@ export const ko_KR: EnTranslations = {
         "few": "전설 아이템 {count}점",
         "many": "전설 아이템 {count}점",
         "other": "전설 아이템 {count}점"
+      },
+      "worldQuestsCompletedInZone": {
+        "one": "월드 퀘스트 {count}개 완료",
+        "few": "월드 퀘스트 {count}개 완료",
+        "many": "월드 퀘스트 {count}개 완료",
+        "other": "월드 퀘스트 {count}개 완료"
       },
       "guildMembers": {
         "one": "당신은 {rank}, {count}명 회원",
@@ -7443,7 +7454,9 @@ export const ko_KR: EnTranslations = {
       "readingHeading": "Where to read it",
       "readingBody": "The Reputation tab of the character sheet (C) shows each faction with its current standing, a bar toward the next tier, and the title that standing has earned you. The chat log reports every standing gain as it lands, and reaching a new tier shows a celebration banner on screen.",
       "deedsHeading": "Deeds",
-      "deedsBody": "The Book of Deeds keeps score of your standing too: reaching Trusted with a faction and reaching Champion with a faction each record a deed, and reaching Champion with all three is a deed of its own. Like every deed these are cosmetic, never power, and the Champion deeds grant a title you can wear."
+      "deedsBody": "The Book of Deeds keeps score of your standing too: reaching Trusted with a faction and reaching Champion with a faction each record a deed, and reaching Champion with all three is a deed of its own. Like every deed these are cosmetic, never power, and the Champion deeds grant a title you can wear.",
+      "masteryHeading": "Regional Mastery",
+      "masteryBody": "Every zone also keeps a permanent count of the world quests you have completed there. It is not a currency and nothing spends it: the number only ever climbs, there is no daily streak to keep, and if you come back after weeks away the next world quest simply adds one more. At set milestones the count records a deed in the Book of Deeds, so an old zone stays worth a visit long after your character has stopped leveling. The Reputation tab lists every zone with its count and the next milestone."
     },
     "deedsPage": {
       "intro": "업적의 서는 시작의 골짜기를 벗어나는 첫걸음부터 왕국이 내놓을 수 있는 가장 힘든 싸움까지, 당신이 이룬 모든 것을 세계가 기록해 두는 곳입니다. 플레이하며 업적을 얻고, 그것이 주는 칭호를 걸치고, 명성이 오르는 것을 지켜보세요.",

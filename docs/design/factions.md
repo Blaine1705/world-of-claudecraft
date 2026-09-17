@@ -64,6 +64,26 @@ and the character sheet shows the current title.
   tab; wearable titles come from the Champion deeds through the Book of Deeds
   title picker, like every other title.
 
+## Regional Mastery
+
+Every world-quest zone keeps a permanent count of the world quests the
+character completed there (`worldQuestZoneCounts` on the world-quest player
+state, incremented at the one credit site in `src/sim/world_quests.ts`,
+sanitized on load and mirrored online on the `wqzc` self key). Three rules from
+the design brief, all pinned by `tests/regional_mastery*.test.ts`:
+
+- The count is separate from anything spent: currency and the daily board come
+  and go, the count stays.
+- It never goes backwards and it needs no streak: a missed day changes nothing,
+  and after weeks away the next turn-in is simply one more.
+- Milestones (`REGIONAL_MASTERY_MILESTONES` in `src/sim/regional_mastery.ts`,
+  the single knob) each record a Book of Deeds entry through the
+  `regionalMasteryBest` meter (the best single zone). Further milestone rewards
+  can land later without touching the counter.
+
+The Reputation tab's Regional Mastery card lists every zone in faction order
+with its count, the milestones passed and the next milestone.
+
 ## Surfacing
 
 - **Reputation tab** of the character sheet (`src/ui/hud/reputation/`): one
