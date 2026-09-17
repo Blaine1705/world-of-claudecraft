@@ -18214,7 +18214,9 @@ export class Hud {
   /** What an untouched cross hotbar is filled from: this character's action bar,
    *  plus stance-style abilities, known but unbound and so unreachable on a pad. */
   crossHotbarSeed(): { bar: CrossHotbarOverlayAction[]; extras: string[] } {
-    return crossHotbarSeedActions(this.hotbarActions, this.sim.known);
+    // A spectated kit never seeds the pad bar (same freeze as syncSlotMap).
+    const known = this.sim.spectating !== null ? [] : this.sim.known;
+    return crossHotbarSeedActions(this.hotbarActions, known);
   }
 
   /** The bar's own arrange surface, whole rather than proxied method by method. */
