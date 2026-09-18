@@ -10,6 +10,7 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "guide.settingsPage.rowFrameRateCap",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -21,6 +22,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "es_ES": [
+    "guide.settingsPage.rowFrameRateCap",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -32,6 +34,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "fr_FR": [
+    "guide.settingsPage.rowFrameRateCap",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -43,6 +46,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "fr_CA": [
+    "guide.settingsPage.rowFrameRateCap",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -55,6 +59,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "guide.settingsPage.rowFrameRateCap",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -66,6 +71,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "de_DE": [
+    "guide.settingsPage.rowFrameRateCap",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -93,6 +99,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "pt_BR": [
+    "guide.settingsPage.rowFrameRateCap",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -108,6 +115,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "cs_CZ": [
+    "guide.settingsPage.rowFrameRateCap",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -119,6 +127,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "nl_NL": [
+    "guide.settingsPage.rowFrameRateCap",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -130,6 +139,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "pl_PL": [
+    "guide.settingsPage.rowFrameRateCap",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -141,6 +151,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "id_ID": [
+    "guide.settingsPage.rowFrameRateCap",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -152,6 +163,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "tr_TR": [
+    "guide.settingsPage.rowFrameRateCap",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -163,6 +175,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "sv_SE": [
+    "guide.settingsPage.rowFrameRateCap",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -174,6 +187,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "vi_VN": [
+    "guide.settingsPage.rowFrameRateCap",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -185,6 +199,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "da_DK": [
+    "guide.settingsPage.rowFrameRateCap",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",

@@ -7274,6 +7274,7 @@ export type TranslationKeyFlat =
   | 'guide.settingsPage.rowEffectsQuality'
   | 'guide.settingsPage.rowFieldOfView'
   | 'guide.settingsPage.rowFoliageDensity'
+  | 'guide.settingsPage.rowFrameRateCap'
   | 'guide.settingsPage.rowFrostedPanels'
   | 'guide.settingsPage.rowFullscreen'
   | 'guide.settingsPage.rowGraphicsQuality'

@@ -11214,7 +11214,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.rowWeather':
     'Ortam yağmur ve kar. Yalnızca atmosfer ve onu kapatmak fırtınalar sırasında biraz tasarruf sağlar.',
   'guide.settingsPage.tableFoot':
-    'FPS sınırı mı arıyorsun? Aranacak bir şey yok: kare temposu ekranını izler. Çizim mesafesi, Dünya Ayrıntısı kartındaki Görüş Mesafesi adlı kendi düğmesidir ve sen onu oynatana kadar her ön ayar onu senin için belirler.',
+    'Çizim mesafesi, Dünya Ayrıntısı kartındaki Görüş Mesafesi adlı kendi düğmesidir ve sen onu oynatana kadar her ön ayar onu senin için belirler.',
   'guide.settingsPage.tableHeading': 'Her grafik seçeneği açıklandı',
   'guide.settingsPage.tagReload': "Uygula'ya bas",
   'guide.settingsPage.value100': '%100',

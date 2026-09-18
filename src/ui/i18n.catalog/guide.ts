@@ -464,6 +464,8 @@ export const guideStrings = {
       'Ambient rain and snow. Atmosphere only, and switching it off saves a little during storms.',
     rowBrowserEffects:
       'How fancy the interface itself is allowed to be: glass blur, glow, animated menus. Auto matches your browser; the 3D world is untouched either way.',
+    rowFrameRateCap:
+      'A ceiling on how many images the game draws each second. A computer that cannot keep up with its display lands on an uneven rhythm; a steady 30 looks smoother than that, halves the work, and keeps the computer cooler. Display means no limit.',
     rowTerrainDetail: 'Rich, blended ground textures versus a simpler, faster terrain look.',
     rowFoliageDensity: 'How far and how thick the grass grows around your character.',
     rowEffectsQuality:
@@ -476,7 +478,7 @@ export const guideStrings = {
     rowPerfOverlay:
       'An on-screen readout of FPS, frame time, and more. Turn it on while you tune this page, then hide it again.',
     tableFoot:
-      'Looking for an FPS cap? There is nothing to hunt for: frame pacing follows your display. Draw distance is a dial of its own, View Distance, in the World Detail card, and each preset sets it for you until you move it.',
+      'Draw distance is a dial of its own, View Distance, in the World Detail card, and each preset sets it for you until you move it.',
     mobileTitle: 'On phones and tablets',
     mobileBody:
       'On a phone or tablet the game starts you on Low. Every touch device lands there on its first launch, on purpose, so you can get into the world and play; raise it yourself from the Graphics panel any time. On an Android browser the whole ladder is open to you and your choice sticks. On iPhone and iPad you can still pick the top presets and they take hold as soon as you press Apply, but the game sets you back to High the next time you launch, because iOS can end the tab while a scene that large is being built. The downloaded app is shorter still: its preset list stops at High and the per-system dials are hidden, because the app manages those itself.',
