@@ -1269,10 +1269,12 @@ const MONOLITHS: MonolithRow[] = [
     // Then the Discord OAuth flow (web popup, native handoff, and the in-game
     // link-error notice a failed relink now needs) moved out to
     // src/net/discord_oauth_flow.ts behind an injected deps bag; main.ts keeps
-    // only the deps bag and the one-time wiring calls. Measured after both
-    // extractions composed on the v0.44.0 line (wc -l < src/main.ts): 11173.
+    // only the deps bag and the one-time wiring calls. Delve self-motion
+    // prediction then adds one import/wiring line while keeping the module-shell
+    // and door clamp chain in src/sim/delves/geometry.ts. Measured after both
+    // changes composed on the v0.44.0 line (wc -l < src/main.ts): 11174.
     // Zero headroom.
-    ceiling: 11173,
+    ceiling: 11174,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
