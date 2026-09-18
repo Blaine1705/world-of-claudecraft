@@ -522,6 +522,7 @@ export const sv_SE: EnTranslations = {
       "offerQuantityTitle": "Offer {item}",
       "offerQuantityInput": "Quantity to offer",
       "offerQuantityConfirm": "Offer",
+      "offerQuantityAll": "Offer all",
       "woc": {
         "tabGold": "Guld",
         "tabWoc": "$WOC",

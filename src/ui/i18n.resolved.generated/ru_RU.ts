@@ -522,6 +522,7 @@ export const ru_RU: EnTranslations = {
       "offerQuantityTitle": "Предложить {item}",
       "offerQuantityInput": "Количество для предложения",
       "offerQuantityConfirm": "Предложить",
+      "offerQuantityAll": "Предложить всё",
       "woc": {
         "tabGold": "Золото",
         "tabWoc": "$WOC",

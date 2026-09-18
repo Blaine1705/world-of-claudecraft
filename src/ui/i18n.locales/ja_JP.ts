@@ -16177,6 +16177,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.offerQuantityTitle': '{item}を差し出す',
   'hudChrome.trade.offerQuantityInput': '差し出す数量',
   'hudChrome.trade.offerQuantityConfirm': '差し出す',
+  'hudChrome.trade.offerQuantityAll': 'すべて差し出す',
   'hudChrome.trade.woc.hintInsufficientBalance': '接続中のウォレットの $WOC 残高を超えています。',
   'hudChrome.trade.woc.priceLabel': '価格（USD）',
   'hudChrome.trade.woc.equivalent': '現在のレートで約 {tokens} $WOC',

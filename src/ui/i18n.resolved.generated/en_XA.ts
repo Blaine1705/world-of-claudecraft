@@ -522,6 +522,7 @@ export const en_XA: EnTranslations = {
       "offerQuantityTitle": "[Óƒƒéŕ {item}]",
       "offerQuantityInput": "[Ɋúáñţíţý ţó óƒƒéŕ]",
       "offerQuantityConfirm": "[Óƒƒéŕ]",
+      "offerQuantityAll": "[Óƒƒéŕ áļļ]",
       "woc": {
         "tabGold": "[Ĝóļð]",
         "tabWoc": "[$ŴÓÇ]",

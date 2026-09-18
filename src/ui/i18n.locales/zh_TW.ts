@@ -15378,6 +15378,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.offerQuantityTitle': '提供 {item}',
   'hudChrome.trade.offerQuantityInput': '要提供的數量',
   'hudChrome.trade.offerQuantityConfirm': '提供',
+  'hudChrome.trade.offerQuantityAll': '全部提供',
   'hudChrome.trade.woc.hintInsufficientBalance': '這超出了你已連接錢包持有的 $WOC 數量。',
   'hudChrome.trade.woc.priceLabel': '價格（美元）',
   'hudChrome.trade.woc.equivalent': '按目前匯率約為 {tokens} $WOC',

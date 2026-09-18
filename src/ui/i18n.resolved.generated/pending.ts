@@ -10,24 +10,28 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "hudChrome.trade.offerQuantityAll",
     "hudChrome.trade.offerQuantityConfirm",
     "hudChrome.trade.offerQuantityHint",
     "hudChrome.trade.offerQuantityInput",
     "hudChrome.trade.offerQuantityTitle"
   ],
   "es_ES": [
+    "hudChrome.trade.offerQuantityAll",
     "hudChrome.trade.offerQuantityConfirm",
     "hudChrome.trade.offerQuantityHint",
     "hudChrome.trade.offerQuantityInput",
     "hudChrome.trade.offerQuantityTitle"
   ],
   "fr_FR": [
+    "hudChrome.trade.offerQuantityAll",
     "hudChrome.trade.offerQuantityConfirm",
     "hudChrome.trade.offerQuantityHint",
     "hudChrome.trade.offerQuantityInput",
     "hudChrome.trade.offerQuantityTitle"
   ],
   "fr_CA": [
+    "hudChrome.trade.offerQuantityAll",
     "hudChrome.trade.offerQuantityConfirm",
     "hudChrome.trade.offerQuantityHint",
     "hudChrome.trade.offerQuantityInput",
@@ -35,12 +39,14 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "hudChrome.trade.offerQuantityAll",
     "hudChrome.trade.offerQuantityConfirm",
     "hudChrome.trade.offerQuantityHint",
     "hudChrome.trade.offerQuantityInput",
     "hudChrome.trade.offerQuantityTitle"
   ],
   "de_DE": [
+    "hudChrome.trade.offerQuantityAll",
     "hudChrome.trade.offerQuantityConfirm",
     "hudChrome.trade.offerQuantityHint",
     "hudChrome.trade.offerQuantityInput",
@@ -51,6 +57,7 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "hudChrome.trade.offerQuantityAll",
     "hudChrome.trade.offerQuantityConfirm",
     "hudChrome.trade.offerQuantityHint",
     "hudChrome.trade.offerQuantityInput",
@@ -58,48 +65,56 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "hudChrome.trade.offerQuantityAll",
     "hudChrome.trade.offerQuantityConfirm",
     "hudChrome.trade.offerQuantityHint",
     "hudChrome.trade.offerQuantityInput",
     "hudChrome.trade.offerQuantityTitle"
   ],
   "nl_NL": [
+    "hudChrome.trade.offerQuantityAll",
     "hudChrome.trade.offerQuantityConfirm",
     "hudChrome.trade.offerQuantityHint",
     "hudChrome.trade.offerQuantityInput",
     "hudChrome.trade.offerQuantityTitle"
   ],
   "pl_PL": [
+    "hudChrome.trade.offerQuantityAll",
     "hudChrome.trade.offerQuantityConfirm",
     "hudChrome.trade.offerQuantityHint",
     "hudChrome.trade.offerQuantityInput",
     "hudChrome.trade.offerQuantityTitle"
   ],
   "id_ID": [
+    "hudChrome.trade.offerQuantityAll",
     "hudChrome.trade.offerQuantityConfirm",
     "hudChrome.trade.offerQuantityHint",
     "hudChrome.trade.offerQuantityInput",
     "hudChrome.trade.offerQuantityTitle"
   ],
   "tr_TR": [
+    "hudChrome.trade.offerQuantityAll",
     "hudChrome.trade.offerQuantityConfirm",
     "hudChrome.trade.offerQuantityHint",
     "hudChrome.trade.offerQuantityInput",
     "hudChrome.trade.offerQuantityTitle"
   ],
   "sv_SE": [
+    "hudChrome.trade.offerQuantityAll",
     "hudChrome.trade.offerQuantityConfirm",
     "hudChrome.trade.offerQuantityHint",
     "hudChrome.trade.offerQuantityInput",
     "hudChrome.trade.offerQuantityTitle"
   ],
   "vi_VN": [
+    "hudChrome.trade.offerQuantityAll",
     "hudChrome.trade.offerQuantityConfirm",
     "hudChrome.trade.offerQuantityHint",
     "hudChrome.trade.offerQuantityInput",
     "hudChrome.trade.offerQuantityTitle"
   ],
   "da_DK": [
+    "hudChrome.trade.offerQuantityAll",
     "hudChrome.trade.offerQuantityConfirm",
     "hudChrome.trade.offerQuantityHint",
     "hudChrome.trade.offerQuantityInput",

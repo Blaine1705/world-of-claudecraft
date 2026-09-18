@@ -16134,6 +16134,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.offerQuantityTitle': '{item} 내놓기',
   'hudChrome.trade.offerQuantityInput': '내놓을 수량',
   'hudChrome.trade.offerQuantityConfirm': '내놓기',
+  'hudChrome.trade.offerQuantityAll': '모두 내놓기',
   'hudChrome.trade.woc.hintInsufficientBalance': '연결된 지갑의 $WOC 잔액보다 많습니다.',
   'hudChrome.trade.woc.priceLabel': '가격 (USD)',
   'hudChrome.trade.woc.equivalent': '현재 환율 기준 약 {tokens} $WOC',

@@ -522,6 +522,7 @@ export const da_DK: EnTranslations = {
       "offerQuantityTitle": "Offer {item}",
       "offerQuantityInput": "Quantity to offer",
       "offerQuantityConfirm": "Offer",
+      "offerQuantityAll": "Offer all",
       "woc": {
         "tabGold": "Guld",
         "tabWoc": "$WOC",

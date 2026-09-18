@@ -522,6 +522,7 @@ export const en: EnTranslations = {
       "offerQuantityTitle": "Offer {item}",
       "offerQuantityInput": "Quantity to offer",
       "offerQuantityConfirm": "Offer",
+      "offerQuantityAll": "Offer all",
       "woc": {
         "tabGold": "Gold",
         "tabWoc": "$WOC",

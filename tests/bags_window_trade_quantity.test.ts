@@ -180,6 +180,25 @@ describe('bags trade-mode offer quantity', () => {
     expect(h.root.hasAttribute('inert')).toBe(false);
   });
 
+  it('Offer all stages the whole ceiling in one press', () => {
+    const h = harness([HIDE], 20);
+    clickFirstCell(h.root, false);
+    const all = [...(prompt()?.querySelectorAll<HTMLButtonElement>(':scope > button') ?? [])];
+    expect(all.map((b) => b.textContent)).toEqual(['Offer', 'Offer all', 'Cancel']);
+    all[1].click();
+    expect(h.staged).toEqual([{ itemId: 'linen_scrap', count: 20 }]);
+    expect(prompt()).toBeNull();
+  });
+
+  it('Offer all still clamps to the LIVE headroom at submit', () => {
+    const h = harness([HIDE], 20);
+    clickFirstCell(h.root, false);
+    h.headroom.value = 9;
+    const all = prompt()?.querySelectorAll<HTMLButtonElement>(':scope > button')[1];
+    all?.click();
+    expect(h.staged).toEqual([{ itemId: 'linen_scrap', count: 9 }]);
+  });
+
   it('clamps a typed count above the LIVE headroom at submit', () => {
     const h = harness([HIDE], 20);
     clickFirstCell(h.root, false);
@@ -225,10 +244,11 @@ describe('bags trade-mode offer quantity', () => {
   it('cancel closes the prompt and stages nothing', () => {
     const h = harness([HIDE], 20);
     clickFirstCell(h.root, false);
-    const cancel = prompt()?.querySelector<HTMLButtonElement>(
-      ':scope > button.ui-btn:not(.ui-btn--red)',
+    // Cancel is the last of the prompt's own action buttons (Offer, Offer all, Cancel).
+    const cancel = [...(prompt()?.querySelectorAll<HTMLButtonElement>(':scope > button') ?? [])].at(
+      -1,
     );
-    expect(cancel).not.toBeNull();
+    expect(cancel?.textContent).toBe('Cancel');
     cancel?.click();
     expect(prompt()).toBeNull();
     expect(h.staged).toEqual([]);

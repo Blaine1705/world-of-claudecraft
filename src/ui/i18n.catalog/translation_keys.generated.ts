@@ -12233,6 +12233,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.townFocus.tierHint'
   | 'hudChrome.townFocus.title'
   | 'hudChrome.townFocus.townOnlyHint'
+  | 'hudChrome.trade.offerQuantityAll'
   | 'hudChrome.trade.offerQuantityConfirm'
   | 'hudChrome.trade.offerQuantityHint'
   | 'hudChrome.trade.offerQuantityInput'

@@ -2679,6 +2679,9 @@ export class BagsWindow {
         titleText: t('hudChrome.trade.offerQuantityTitle', { item: itemName }),
         inputAriaText: t('hudChrome.trade.offerQuantityInput'),
         confirmText: t('hudChrome.trade.offerQuantityConfirm'),
+        // One press stages every unit the offer can take (the prompt's own
+        // ceiling, clamped again to the live headroom at submit).
+        confirmAllText: t('hudChrome.trade.offerQuantityAll'),
         cancelText: t('itemUi.vendor.sellQuantityCancel'),
         maxCount,
         resolveCount: (requested) =>
