@@ -1402,7 +1402,7 @@ describe('perf reporter frame rate ceiling fields', () => {
     )!;
     expect(body.frameCapIntent).toBe(30);
     expect(body.cadenceDivisor).toBe(4);
-    expect(body.refreshHz).toBe(143.9);
+    expect(body.refreshHz).toBe(144);
     // 60 is the renderer's budget target in this snapshot; the ceiling wins.
     expect(body.targetFps).toBe(36);
     expect((body.rawSummary as { cadence: { divisor: number } }).cadence.divisor).toBe(4);

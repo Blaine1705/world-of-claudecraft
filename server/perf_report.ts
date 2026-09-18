@@ -12,6 +12,7 @@ import type { RateLimitOutcome } from './http/types';
 import { json, readBody } from './http_util';
 import {
   sanitizeBootPhases,
+  sanitizeCadence,
   sanitizePostRevealLinks,
   sanitizeShaderWarm,
   shaderWarmToken,
@@ -788,6 +789,9 @@ function rawSummary(value: unknown, devTraceAllowed = false): Record<string, unk
     const shaderWarm = sanitizeShaderWarm(parsed.shaderWarm);
     if (shaderWarm) parsed.shaderWarm = shaderWarm;
     else delete parsed.shaderWarm;
+    const cadence = sanitizeCadence(parsed.cadence);
+    if (cadence) parsed.cadence = cadence;
+    else delete parsed.cadence;
     // The prewarm summary rides through verbatim under the cap, bounded only
     // by the body cap, so its client-supplied LISTS are bounded here explicitly.
     // Without this the resume block's entries and failed-unit ids reach storage
@@ -887,7 +891,10 @@ export async function handlePerfReport(
     targetFps: intIn(body.targetFps, 0, 240, 0),
     frameCapIntent: frameCapIntentIn(body.frameCapIntent),
     cadenceDivisor: intIn(body.cadenceDivisor, 1, 16, 1),
-    refreshHz: Math.round(numberIn(body.refreshHz, 0, 1000, 0) * 10) / 10,
+    // Whole Hz: the fleet reads a display CLASS (60, 120, 144), and a finer
+    // estimate would be a stable per-display value on an endpoint that accepts
+    // anonymous reports.
+    refreshHz: Math.round(numberIn(body.refreshHz, 0, 1000, 0)),
     renderScale: numberIn(body.renderScale, 0.3, 1.5, 1),
     effectiveRenderScale: numberIn(body.effectiveRenderScale, 0.3, 1.5, 1),
     fpsAvg: numberIn(body.fpsAvg, 0, 300, 0),

@@ -350,7 +350,7 @@ export function frameCadenceBeaconBlock(): Record<string, number | string> {
     autoLateShare: Math.round(s.autoLateShare * 1000) / 1000,
     intent: s.intent,
     verdict: s.verdict,
-    refreshHz: Math.round(s.refreshHz * 10) / 10,
+    refreshHz: Math.round(s.refreshHz),
     divisor: s.divisor,
     targetIntervalMs: Math.round(s.targetIntervalMs * 10) / 10,
     missShare: Math.round(s.missShare * 1000) / 1000,
@@ -376,7 +376,7 @@ export function frameCadenceBeaconFieldsFrom(
   return {
     frameCapIntent: s.intent,
     cadenceDivisor: s.divisor,
-    refreshHz: Math.round(s.refreshHz * 10) / 10,
+    refreshHz: Math.round(s.refreshHz),
     targetFps: s.targetIntervalMs > 0 ? Math.round(1000 / s.targetIntervalMs) : budgetTargetFps,
   };
 }

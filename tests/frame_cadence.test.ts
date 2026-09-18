@@ -504,7 +504,7 @@ describe('frame cadence beacon fields', () => {
     expect(frameCadenceBeaconFieldsFrom(base, 60)).toEqual({
       frameCapIntent: 0,
       cadenceDivisor: 1,
-      refreshHz: 59.9,
+      refreshHz: 60,
       targetFps: 60,
     });
   });

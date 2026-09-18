@@ -2620,7 +2620,7 @@ describe('frame rate ceiling report fields', () => {
     return vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0];
   }
 
-  it('stores a paced ceiling as sent, the refresh rate at one decimal', async () => {
+  it('stores a paced ceiling as sent, the refresh rate in whole Hz', async () => {
     const stored = await storedFor(
       'cadence-paced',
       { frameCapIntent: 30, cadenceDivisor: 4, refreshHz: 143.86, targetFps: 36 },
@@ -2628,7 +2628,7 @@ describe('frame rate ceiling report fields', () => {
     );
     expect(stored.frameCapIntent).toBe(30);
     expect(stored.cadenceDivisor).toBe(4);
-    expect(stored.refreshHz).toBe(143.9);
+    expect(stored.refreshHz).toBe(144);
     expect(stored.targetFps).toBe(36);
   });
 

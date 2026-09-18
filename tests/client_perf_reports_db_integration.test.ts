@@ -118,7 +118,7 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
       shaderWarmRefusal: 'extension-drift:ext_roundtrip',
       frameCapIntent: 30,
       cadenceDivisor: 4,
-      refreshHz: 143.9,
+      refreshHz: 144,
     });
 
     const res = await db.pool.query('SELECT * FROM client_perf_reports WHERE session_id = $1', [
@@ -181,7 +181,7 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
     // Last in the column list: a slipped placeholder would land them elsewhere.
     expect(r.frame_cap_intent).toBe(30);
     expect(r.cadence_divisor).toBe(4);
-    expect(r.refresh_hz).toBeCloseTo(143.9, 3);
+    expect(r.refresh_hz).toBe(144);
   });
 
   it('serves the row back through clientPerfRaw with the dimensions and suggestion ids mapped', async () => {
@@ -207,7 +207,7 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
     expect(row?.targetFps).toBe(61);
     expect(row?.frameCapIntent).toBe(30);
     expect(row?.cadenceDivisor).toBe(4);
-    expect(row?.refreshHz).toBeCloseTo(143.9, 3);
+    expect(row?.refreshHz).toBe(144);
   });
 
   it('aggregates suggestionCounts through clientPerfSummary from the live rows', async () => {

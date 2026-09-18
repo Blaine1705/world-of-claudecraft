@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   sanitizeBootPhases,
+  sanitizeCadence,
   sanitizePostRevealLinks,
   sanitizeShaderWarm,
   shaderWarmToken,
@@ -291,6 +292,60 @@ describe('sanitizeShaderWarm', () => {
       holdWallMs: 0,
       releases: 0,
       abArm: '',
+    });
+  });
+});
+
+describe('sanitizeCadence', () => {
+  const block = {
+    mode: 'auto',
+    verdict: 'paced',
+    intent: 30,
+    refreshHz: 60,
+    divisor: 2,
+    targetIntervalMs: 33,
+    missShare: 0.0123,
+    autoLateShare: 0.4,
+    rendered: 1800,
+    skipped: 1800,
+  };
+
+  it('is undefined without a known mode', () => {
+    expect(sanitizeCadence(null)).toBeUndefined();
+    expect(sanitizeCadence([])).toBeUndefined();
+    expect(sanitizeCadence({ ...block, mode: 'turbo' })).toBeUndefined();
+    expect(sanitizeCadence({ ...block, mode: 7 })).toBeUndefined();
+  });
+
+  it('keeps a well-formed block, shares at three decimals', () => {
+    expect(sanitizeCadence(block)).toEqual({ ...block, missShare: 0.012 });
+  });
+
+  it('lets no client text or extra key through, and bounds every number', () => {
+    const out = sanitizeCadence({
+      mode: 'manual',
+      verdict: '<script>alert(1)</script>',
+      intent: 45,
+      refreshHz: 1e9,
+      divisor: 0,
+      targetIntervalMs: -5,
+      missShare: 7,
+      autoLateShare: 'NaN',
+      rendered: 1e12,
+      skipped: {},
+      note: 'x'.repeat(10_000),
+    });
+    expect(out).toEqual({
+      mode: 'manual',
+      verdict: 'unknown',
+      intent: 0,
+      refreshHz: 1000,
+      divisor: 1,
+      targetIntervalMs: 0,
+      missShare: 1,
+      autoLateShare: 0,
+      rendered: 50_000_000,
+      skipped: 0,
     });
   });
 });
