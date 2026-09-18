@@ -313,7 +313,7 @@ describe('frame cadence wiring', () => {
     expect(mean).toBeCloseTo(33.33, 0);
     // A spin would answer every 0.3 ms: about 3000 callbacks per second.
     const perSecond = r.callbacks / 30;
-    expect(perSecond).toBeLessThan(80);
+    expect(perSecond).toBeLessThan(45);
     expect(r.maxArmsPerCallback).toBe(1);
   });
 

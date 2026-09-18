@@ -5,8 +5,8 @@
 // integrates the real elapsed time, exactly as on a slower display.
 //
 // One chain, by construction: frame() runs only from the callback armed here,
-// and each run arms exactly once (a rAF, or a timer that then requests the
-// rAF). Changing the intent never arms anything.
+// and each run arms exactly once (a rAF, or, where the display shows no slots,
+// a timer that calls frame() itself). Changing the intent never arms anything.
 
 import { arrivalCoverActive } from '../render/arrival_cover';
 import { governorIsShedding, setChosenCadence } from '../render/chosen_cadence';
@@ -146,10 +146,10 @@ export class FrameCadenceWiring {
     // A timer fires late, never early, and by a lot where the host's timer
     // resolution is coarse (measured on Windows: frames landing a slot late).
     // The observed lateness, held as a slowly decaying maximum, comes off the
-    // next sleep; what is left of the interval is finished on rAF skips.
+    // next sleep, and a wake that is still early simply sleeps the remainder.
     const late = Math.max(0, this.deps.now() - this.timerDueAt);
     this.timerLateMs = Math.max(late, this.timerLateMs * TIMER_LATENESS_DECAY);
-    if (this.frameCb) this.deps.requestFrame(this.frameCb);
+    this.frameCb?.(this.deps.now());
   };
 
   constructor(private readonly deps: FrameCadenceDeps) {}
@@ -212,7 +212,7 @@ export class FrameCadenceWiring {
       this.stepAuto(now, true);
     } else this.skipped++;
     this.lastWasIdle = !render;
-    this.arm(frame, now, render);
+    this.arm(frame, now, render, gate.hidden);
     return !render;
   }
 
@@ -259,7 +259,7 @@ export class FrameCadenceWiring {
     return out;
   }
 
-  private arm(frame: FrameRequestCallback, now: number, rendered: boolean): void {
+  private arm(frame: FrameRequestCallback, now: number, rendered: boolean, hidden: boolean): void {
     // Paced: the skipped callback is the display's own slot, nothing to sleep.
     // Unpaced: a bare rAF re-fires at once, so sleeping is what stops a skipped
     // interval from spinning a core; the re-probe interval spins on purpose.
@@ -270,15 +270,18 @@ export class FrameCadenceWiring {
     // would stay unread for good. Once enough callbacks showed no lattice, sleep.
     const unread = this.estimator.verdict === 'unknown';
     this.unreadCallbacks = unread ? this.unreadCallbacks + 1 : 0;
-    if (this.cadence.paced || reprobe || (unread && this.unreadCallbacks < UNREAD_BEFORE_SLEEP)) {
+    // A hidden tab goes back to rAF, which the browser pauses there: a timer
+    // chain would keep rendering a page nobody sees, once a second.
+    const bareFrames = unread && this.unreadCallbacks < UNREAD_BEFORE_SLEEP;
+    if (this.cadence.paced || reprobe || bareFrames || hidden) {
       this.deps.requestFrame(frame);
       return;
     }
-    const sleep = frameCadenceSleepMs(this.cadence, now) - this.timerLateMs;
-    if (sleep < 1) {
-      this.deps.requestFrame(frame);
-      return;
-    }
+    // With no slots the timer itself starts the frame. Finishing an interval on
+    // rAF skips is not free there: behind a busy GPU an idle callback waits for
+    // the GPU like a real one, and each skip cost most of a frame (measured on
+    // a Windows HD 530: a ceiling of 60 ran at 37 where the open loop ran at 52).
+    const sleep = Math.max(0, frameCadenceSleepMs(this.cadence, now) - this.timerLateMs);
     this.armedByTimer = true;
     this.timerDueAt = this.deps.now() + sleep;
     this.deps.setTimer(this.onTimer, sleep);
