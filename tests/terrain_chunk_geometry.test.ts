@@ -384,7 +384,11 @@ describe('generated chunk geometry is stable', () => {
     // Second release/v0.43.0 merge into feature/world-quests: the handoff's
     // spaced givers compose with the branch's calm pads (shadow guards, freight
     // crate and wagon). Measured on the merged tree, twice in separate processes.
-    expect(digestOf(inRect)).toBe('606ee2407082adeef9f271d20e37f91c');
+    // Re-minted for the weekly emissary (Cham Pete at (-52, -108), a calm-anchor
+    // NPC like every other). Localization checked against the dense height
+    // atlas re-minted in the same commit: 7 points move (both lanes), all within
+    // 6.3 yd of the emissary, by at most 0.053 yd.
+    expect(digestOf(inRect)).toBe('7a4d432bff27b7850a8035a589be8358');
     // The gap super-chunk digest pin is gone with the gap chunks themselves
     // (the island claims the old vale gap cells); gapFill.length above pins
     // their absence.
