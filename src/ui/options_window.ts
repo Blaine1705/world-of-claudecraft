@@ -111,6 +111,7 @@ import {
   buildInterfaceUnlockRow,
 } from './options_interface_rows';
 import { buildOptionsMenuList, type OptionsMenuRoutedAction } from './options_main_menu_controller';
+import { optionsText } from './options_text_values';
 import {
   type BoolToggleControl,
   boolToggleNextValue,
@@ -987,12 +988,7 @@ export class OptionsWindow {
       // not take, polite for the one that just reports what is running.
       status.setAttribute('role', c.statusAlert ? 'alert' : 'status');
       if (!c.statusAlert) status.setAttribute('aria-live', 'polite');
-      const values: Record<string, string> = {};
-      for (const [name_, key_] of Object.entries(c.statusValueKeys ?? {})) values[name_] = t(key_);
-      for (const [name_, n] of Object.entries(c.statusNumbers ?? {}))
-        values[name_] = formatNumber(n);
-      status.textContent =
-        c.statusValueKeys || c.statusNumbers ? t(c.statusKey, values) : t(c.statusKey);
+      status.textContent = optionsText(c.statusKey, c.statusValueKeys, c.statusNumbers);
       row.appendChild(status);
     }
     parent.appendChild(row);
@@ -1008,9 +1004,7 @@ export class OptionsWindow {
     note.className = 'set-note';
     // The view names its placeholders as keys and this resolves them, so the
     // whole sentence including the value stays one translatable string.
-    const values: Record<string, string> = {};
-    for (const [name, key] of Object.entries(valueKeys ?? {})) values[name] = t(key);
-    note.textContent = valueKeys ? t(textKey, values) : t(textKey);
+    note.textContent = optionsText(textKey, valueKeys);
     parent.appendChild(note);
   }
 
