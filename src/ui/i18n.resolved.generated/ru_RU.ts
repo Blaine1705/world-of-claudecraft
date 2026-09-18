@@ -1418,6 +1418,8 @@ export const ru_RU: EnTranslations = {
     },
     "riftTracker": {
       "title": "Разлом",
+      "hoardTitle": "Buried Hoard",
+      "hoardGoal": "Defeat the hoard keeper",
       "floor": "Этаж {current} из {total}",
       "closesIn": "Разлом закроется через {time}",
       "clockMs": "{minutes}:{seconds}",
@@ -9432,6 +9434,9 @@ export const ru_RU: EnTranslations = {
       "pylonLit": "Рунный пилон вспыхивает ({lit}/{total}).",
       "wayDownOpens": "Путь вниз разверзается.",
       "exitOpens": "Разлом содрогается. Позади павших разверзается путь домой.",
+      "hoardEnter": "You climb down into {name}.",
+      "hoardExitOpens": "The hoard is yours. A way up opens behind the fallen.",
+      "hoardNotYours": "This hoard was dug up by another party.",
       "portalOpens": "В {zone} разверзся разлом ранга {tier}!",
       "portalSealed": "Разлом ранга {tier} в {zone} запечатан.",
       "portalCollapses": "Разлом ранга {tier} в {zone} обрушился.",

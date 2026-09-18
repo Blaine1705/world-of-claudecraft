@@ -48,7 +48,12 @@ export class RiftFloorTrackerController {
       element.style.display = 'none';
       return;
     }
-    const signature = JSON.stringify([model.floor, model.floorCount, model.timerSeconds]);
+    const signature = JSON.stringify([
+      model.floor,
+      model.floorCount,
+      model.timerSeconds,
+      model.hoard,
+    ]);
     if (signature === this.lastSignature) return;
     this.lastSignature = signature;
     element.style.display = 'block';
@@ -65,10 +70,12 @@ export class RiftFloorTrackerController {
         : `<div class="rt-obj ui-meta ui-num">${esc(
             t('hudChrome.riftTracker.closesIn', { time: this.clockText(model.timerSeconds) }),
           )}</div>`;
-    element.innerHTML =
-      `<div class="rt-header ui-cin">${esc(t('hudChrome.riftTracker.title'))}</div>` +
-      `<div class="rt-obj ui-meta ui-num">${esc(floorLine)}</div>` +
-      timerLine;
+    element.innerHTML = model.hoard
+      ? `<div class="rt-header ui-cin">${esc(t('hudChrome.riftTracker.hoardTitle'))}</div>` +
+        `<div class="rt-obj ui-meta">${esc(t('hudChrome.riftTracker.hoardGoal'))}</div>`
+      : `<div class="rt-header ui-cin">${esc(t('hudChrome.riftTracker.title'))}</div>` +
+        `<div class="rt-obj ui-meta ui-num">${esc(floorLine)}</div>` +
+        timerLine;
   }
 
   /** "H:MM:SS" past an hour (community rifts run up to six), else "M:SS". */

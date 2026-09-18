@@ -1418,6 +1418,8 @@ export const it_IT: EnTranslations = {
     },
     "riftTracker": {
       "title": "Squarcio",
+      "hoardTitle": "Buried Hoard",
+      "hoardGoal": "Defeat the hoard keeper",
       "floor": "Piano {current} di {total}",
       "closesIn": "Si chiude tra {time}",
       "clockMs": "{minutes}:{seconds}",
@@ -9432,6 +9434,9 @@ export const it_IT: EnTranslations = {
       "pylonLit": "Un pilone runico si accende ({lit}/{total}).",
       "wayDownOpens": "La via verso il basso si squarcia.",
       "exitOpens": "Lo squarcio trema. Una via verso casa si apre alle spalle dei caduti.",
+      "hoardEnter": "You climb down into {name}.",
+      "hoardExitOpens": "The hoard is yours. A way up opens behind the fallen.",
+      "hoardNotYours": "This hoard was dug up by another party.",
       "portalOpens": "Uno squarcio di rango {tier} si apre in {zone}!",
       "portalSealed": "Lo squarcio di rango {tier} in {zone} è stato sigillato.",
       "portalCollapses": "Lo squarcio di rango {tier} in {zone} collassa.",

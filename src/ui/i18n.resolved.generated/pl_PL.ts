@@ -1418,6 +1418,8 @@ export const pl_PL: EnTranslations = {
     },
     "riftTracker": {
       "title": "Szczelina",
+      "hoardTitle": "Buried Hoard",
+      "hoardGoal": "Defeat the hoard keeper",
       "floor": "Piętro {current} z {total}",
       "closesIn": "Zamyka się za {time}",
       "clockMs": "{minutes}:{seconds}",
@@ -9432,6 +9434,9 @@ export const pl_PL: EnTranslations = {
       "pylonLit": "Pylon run rozbłyska życiem ({lit}/{total}).",
       "wayDownOpens": "Droga w dół rozdziera się.",
       "exitOpens": "Szczelina drży. Droga do domu rozdziera się za poległymi.",
+      "hoardEnter": "You climb down into {name}.",
+      "hoardExitOpens": "The hoard is yours. A way up opens behind the fallen.",
+      "hoardNotYours": "This hoard was dug up by another party.",
       "portalOpens": "Szczelina rangi {tier} rozdziera się w {zone}!",
       "portalSealed": "Szczelina rangi {tier} w {zone} została zapieczętowana.",
       "portalCollapses": "Szczelina rangi {tier} w {zone} zapada się.",

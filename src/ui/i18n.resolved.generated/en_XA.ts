@@ -1418,6 +1418,8 @@ export const en_XA: EnTranslations = {
     },
     "riftTracker": {
       "title": "[Ŕíƒţ]",
+      "hoardTitle": "[Ɓúŕíéð Ĥóáŕð]",
+      "hoardGoal": "[Ðéƒéáţ ţĥé ĥóáŕð ķééþéŕ]",
       "floor": "[Ƒļóóŕ {current} óƒ {total}]",
       "closesIn": "[Çļóšéš íñ {time}]",
       "clockMs": "[{minutes}:{seconds}]",
@@ -9432,6 +9434,9 @@ export const en_XA: EnTranslations = {
       "pylonLit": "[Á ŕúñé þýļóñ ƒļáŕéš ţó ļíƒé ({lit}/{total}).]",
       "wayDownOpens": "[Ţĥé ŵáý ðóŵñ ţéáŕš óþéñ.]",
       "exitOpens": "[Ţĥé ŕíƒţ šĥúððéŕš. Á ŵáý ĥóɱé ţéáŕš óþéñ ƀéĥíñð ţĥé ƒáļļéñ.]",
+      "hoardEnter": "[Ýóú çļíɱƀ ðóŵñ íñţó {name}.]",
+      "hoardExitOpens": "[Ţĥé ĥóáŕð íš ýóúŕš. Á ŵáý úþ óþéñš ƀéĥíñð ţĥé ƒáļļéñ.]",
+      "hoardNotYours": "[Ţĥíš ĥóáŕð ŵáš ðúĝ úþ ƀý áñóţĥéŕ þáŕţý.]",
       "portalOpens": "[Á {tier}-ŕáñķ ŕíƒţ ţéáŕš óþéñ íñ {zone}!]",
       "portalSealed": "[Ţĥé {tier}-ŕáñķ ŕíƒţ íñ {zone} ĥáš ƀééñ šéáļéð.]",
       "portalCollapses": "[Ţĥé {tier}-ŕáñķ ŕíƒţ íñ {zone} çóļļáþšéš.]",

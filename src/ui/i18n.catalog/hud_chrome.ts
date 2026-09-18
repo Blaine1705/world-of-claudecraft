@@ -1572,6 +1572,9 @@ export const hudChromeStrings = {
   // separator stays a plain colon, like every other HUD clock (vcup, finder).
   riftTracker: {
     title: 'Rift',
+    // A Buried Hoard (a treasure map's vault) replaces the floor line with its goal.
+    hoardTitle: 'Buried Hoard',
+    hoardGoal: 'Defeat the hoard keeper',
     // {current}/{total} are 1-based floor numbers (e.g. "Floor 2 of 5").
     floor: 'Floor {current} of {total}',
     // {time} is a pre-built clock string (see clockMs/clockHms below). This is

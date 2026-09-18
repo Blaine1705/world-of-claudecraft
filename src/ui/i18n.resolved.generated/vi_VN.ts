@@ -1418,6 +1418,8 @@ export const vi_VN: EnTranslations = {
     },
     "riftTracker": {
       "title": "Rạn Nứt",
+      "hoardTitle": "Buried Hoard",
+      "hoardGoal": "Defeat the hoard keeper",
       "floor": "Tầng {current}/{total}",
       "closesIn": "Đóng sau {time}",
       "clockMs": "{minutes}:{seconds}",
@@ -9432,6 +9434,9 @@ export const vi_VN: EnTranslations = {
       "pylonLit": "Một trụ rune bùng sáng ({lit}/{total}).",
       "wayDownOpens": "Lối đi xuống xé toạc mở ra.",
       "exitOpens": "Rạn Nứt rung chuyển. Một lối về nhà xé toạc mở ra phía sau những kẻ đã ngã xuống.",
+      "hoardEnter": "You climb down into {name}.",
+      "hoardExitOpens": "The hoard is yours. A way up opens behind the fallen.",
+      "hoardNotYours": "This hoard was dug up by another party.",
       "portalOpens": "Một Rạn Nứt hạng {tier} xé toạc mở ra tại {zone}!",
       "portalSealed": "Rạn Nứt hạng {tier} tại {zone} đã bị niêm phong.",
       "portalCollapses": "Rạn Nứt hạng {tier} tại {zone} sụp đổ.",

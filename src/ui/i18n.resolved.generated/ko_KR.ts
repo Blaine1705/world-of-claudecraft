@@ -1418,6 +1418,8 @@ export const ko_KR: EnTranslations = {
     },
     "riftTracker": {
       "title": "균열",
+      "hoardTitle": "Buried Hoard",
+      "hoardGoal": "Defeat the hoard keeper",
       "floor": "{total}층 중 {current}층",
       "closesIn": "균열이 {time} 후 닫힙니다",
       "clockMs": "{minutes}:{seconds}",
@@ -9432,6 +9434,9 @@ export const ko_KR: EnTranslations = {
       "pylonLit": "룬 첨탑이 빛을 발합니다 ({lit}/{total}).",
       "wayDownOpens": "아래로 향하는 길이 찢겨 열립니다.",
       "exitOpens": "균열이 요동칩니다. 쓰러진 적 너머로 귀환의 길이 열립니다.",
+      "hoardEnter": "You climb down into {name}.",
+      "hoardExitOpens": "The hoard is yours. A way up opens behind the fallen.",
+      "hoardNotYours": "This hoard was dug up by another party.",
       "portalOpens": "{zone}에 {tier}등급 균열이 찢어져 열렸습니다!",
       "portalSealed": "{zone}의 {tier}등급 균열이 봉인되었습니다.",
       "portalCollapses": "{zone}의 {tier}등급 균열이 무너졌습니다.",

@@ -1418,6 +1418,8 @@ export const sv_SE: EnTranslations = {
     },
     "riftTracker": {
       "title": "Reva",
+      "hoardTitle": "Buried Hoard",
+      "hoardGoal": "Defeat the hoard keeper",
       "floor": "Våning {current} av {total}",
       "closesIn": "Stänger om {time}",
       "clockMs": "{minutes}:{seconds}",
@@ -9432,6 +9434,9 @@ export const sv_SE: EnTranslations = {
       "pylonLit": "En runpelare flammar till liv ({lit}/{total}).",
       "wayDownOpens": "Vägen ner rivs upp.",
       "exitOpens": "Revan skälver. En väg hem rivs upp bakom de fallna.",
+      "hoardEnter": "You climb down into {name}.",
+      "hoardExitOpens": "The hoard is yours. A way up opens behind the fallen.",
+      "hoardNotYours": "This hoard was dug up by another party.",
       "portalOpens": "En reva av grad {tier} rivs upp i {zone}!",
       "portalSealed": "Revan av grad {tier} i {zone} har förseglats.",
       "portalCollapses": "Revan av grad {tier} i {zone} kollapsar.",

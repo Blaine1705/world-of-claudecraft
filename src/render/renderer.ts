@@ -983,7 +983,7 @@ const BLOB_SHADOW_RANGE_SQ = CHARACTER_LOD_RANGE_SQ;
 // `onGround`, so the flag alone never fires the jump clip for the mirrored world.
 // Rift portal-family template ids (module-hoisted: createView is a hot path and
 // allocated this Set per view).
-const RIFT_PORTAL_IDS = new Set(['rift_portal', 'rift_descent', 'rift_exit']);
+const RIFT_PORTAL_IDS = new Set(['rift_portal', 'rift_descent', 'rift_exit', 'hoard_entrance']);
 
 const AIRBORNE_EPS = 0.4;
 /**
@@ -7888,7 +7888,8 @@ export class Renderer {
       const entering =
         e.templateId === 'dungeon_door' ||
         e.templateId === 'rift_portal' ||
-        e.templateId === 'rift_descent';
+        e.templateId === 'rift_descent' ||
+        e.templateId === 'hoard_entrance';
       // The overworld ranked portal AND the post-boss victory exit both get the
       // bespoke "gate" GLB (the exit is literally the way home tearing open); the
       // in-rift descent/pylons keep the procedural arch. Gate builder falls back to

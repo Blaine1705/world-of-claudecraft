@@ -1418,6 +1418,8 @@ export const zh_CN: EnTranslations = {
     },
     "riftTracker": {
       "title": "裂隙",
+      "hoardTitle": "Buried Hoard",
+      "hoardGoal": "Defeat the hoard keeper",
       "floor": "第 {current} 层，共 {total} 层",
       "closesIn": "裂隙将在 {time} 后关闭",
       "clockMs": "{minutes}:{seconds}",
@@ -9432,6 +9434,9 @@ export const zh_CN: EnTranslations = {
       "pylonLit": "一座符文尖塔亮起（{lit}/{total}）。",
       "wayDownOpens": "通往下层的裂口被撕开了。",
       "exitOpens": "裂隙震颤。一条归途在倒下的敌人身后撕裂开来。",
+      "hoardEnter": "You climb down into {name}.",
+      "hoardExitOpens": "The hoard is yours. A way up opens behind the fallen.",
+      "hoardNotYours": "This hoard was dug up by another party.",
       "portalOpens": "一道{tier}级裂隙在{zone}撕裂而开！",
       "portalSealed": "{zone}的{tier}级裂隙已被封印。",
       "portalCollapses": "{zone}的{tier}级裂隙坍塌了。",

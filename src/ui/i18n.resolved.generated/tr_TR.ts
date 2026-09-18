@@ -1418,6 +1418,8 @@ export const tr_TR: EnTranslations = {
     },
     "riftTracker": {
       "title": "Yarık",
+      "hoardTitle": "Buried Hoard",
+      "hoardGoal": "Defeat the hoard keeper",
       "floor": "Kat {current}/{total}",
       "closesIn": "{time} içinde kapanır",
       "clockMs": "{minutes}:{seconds}",
@@ -9432,6 +9434,9 @@ export const tr_TR: EnTranslations = {
       "pylonLit": "Bir rün sütunu hayat buluyor ({lit}/{total}).",
       "wayDownOpens": "Aşağıya giden yol açılıyor.",
       "exitOpens": "Yarık titriyor. Düşenlerin ardında eve giden bir yol açılıyor.",
+      "hoardEnter": "You climb down into {name}.",
+      "hoardExitOpens": "The hoard is yours. A way up opens behind the fallen.",
+      "hoardNotYours": "This hoard was dug up by another party.",
       "portalOpens": "{zone} bölgesinde {tier} dereceli bir Yarık açılıyor!",
       "portalSealed": "{zone} bölgesindeki {tier} dereceli Yarık mühürlendi.",
       "portalCollapses": "{zone} bölgesindeki {tier} dereceli Yarık çöküyor.",

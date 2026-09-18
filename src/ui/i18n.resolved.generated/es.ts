@@ -1418,6 +1418,8 @@ export const es: EnTranslations = {
     },
     "riftTracker": {
       "title": "Brecha",
+      "hoardTitle": "Buried Hoard",
+      "hoardGoal": "Defeat the hoard keeper",
       "floor": "Piso {current} de {total}",
       "closesIn": "Se cierra en {time}",
       "clockMs": "{minutes}:{seconds}",
@@ -9432,6 +9434,9 @@ export const es: EnTranslations = {
       "pylonLit": "Un pilar rúnico cobra vida ({lit}/{total}).",
       "wayDownOpens": "El camino hacia abajo se abre.",
       "exitOpens": "La brecha se estremece. Un camino a casa se abre tras los caídos.",
+      "hoardEnter": "You climb down into {name}.",
+      "hoardExitOpens": "The hoard is yours. A way up opens behind the fallen.",
+      "hoardNotYours": "This hoard was dug up by another party.",
       "portalOpens": "¡Una brecha de rango {tier} se abre en {zone}!",
       "portalSealed": "La brecha de rango {tier} en {zone} ha sido sellada.",
       "portalCollapses": "La brecha de rango {tier} en {zone} colapsa.",

@@ -1418,6 +1418,8 @@ export const da_DK: EnTranslations = {
     },
     "riftTracker": {
       "title": "Rift",
+      "hoardTitle": "Buried Hoard",
+      "hoardGoal": "Defeat the hoard keeper",
       "floor": "Etage {current} af {total}",
       "closesIn": "Lukker om {time}",
       "clockMs": "{minutes}:{seconds}",
@@ -9432,6 +9434,9 @@ export const da_DK: EnTranslations = {
       "pylonLit": "En runepylon blusser til live ({lit}/{total}).",
       "wayDownOpens": "Vejen ned river sig åben.",
       "exitOpens": "Riften ryster. En vej hjem river sig åben bag de faldne.",
+      "hoardEnter": "You climb down into {name}.",
+      "hoardExitOpens": "The hoard is yours. A way up opens behind the fallen.",
+      "hoardNotYours": "This hoard was dug up by another party.",
       "portalOpens": "En {tier}-rangs rift river sig åben i {zone}!",
       "portalSealed": "{tier}-rangs riften i {zone} er blevet forseglet.",
       "portalCollapses": "{tier}-rangs riften i {zone} kollapser.",

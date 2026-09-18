@@ -12,6 +12,7 @@
 
 import { clearRiftRegion, resolveMovement, setRiftRegion } from '../colliders';
 import { delveChestItemsForTier } from '../content/delves/lockpick_tiers';
+import { HOARD_MIN_LEVEL } from '../content/treasure_maps';
 import {
   DUNGEON_FLOOR_Y,
   isRiftPos,
@@ -59,6 +60,7 @@ import {
 import { generateRiftFloor, isSetPieceRift, riftLiftAt } from './rift_gen';
 import { riftLockpickAbort, tickRiftLockpick } from './rift_lockpick';
 import type { RiftInstance, RiftRoller } from './types';
+import { isRiftEntranceTemplate } from './vault_seed';
 
 const PORTAL_TRIGGER_RADIUS = 2.2; // walk this close to a rift portal to use it
 const PYLON_TRIGGER_RADIUS = 3.0; // walk this close to light a rune pylon
@@ -344,7 +346,7 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
     const mob = createMob(
       ctx.nextId++,
       riftRankTemplate(template, tuning, role),
-      spawn.level,
+      inst.vault ? Math.min(spawn.level, inst.vault.level) : spawn.level,
       ctx.groundPos(origin.x + spawn.x, origin.z + spawn.z),
     );
     if (spawn.name) mob.name = spawn.name;
@@ -568,12 +570,15 @@ export function enterRift(
   // Gated on the PORTAL path (walk-in + interaction click, which always pass
   // the portal entity); the direct programmatic call stays open for tests.
   // Throttled so standing inside the trigger radius does not spam per tick.
-  if (portal && r.e.level < RIFT_MIN_LEVEL) {
+  // A Buried Hoard opens from level 16 (the daily board's bracket) and its
+  // mobs never outlevel the map's owner (spawnRiftFloor), so its gate is lower.
+  const minLevel = portal?.vaultOwnerPid !== undefined ? HOARD_MIN_LEVEL : RIFT_MIN_LEVEL;
+  if (portal && r.e.level < minLevel) {
     if (ctx.time >= (r.e.riftDeniedAt ?? -Infinity) + 4) {
       r.e.riftDeniedAt = ctx.time;
       ctx.error(
         r.meta.entityId,
-        `Only adventurers of level ${RIFT_MIN_LEVEL} or higher may enter this rift.`,
+        `Only adventurers of level ${minLevel} or higher may enter this rift.`,
       );
     }
     return;
@@ -583,7 +588,7 @@ export function enterRift(
   if (portal && !mayEnterVaultPortal(ctx, portal, r.meta.entityId)) {
     if (ctx.time >= (r.e.riftDeniedAt ?? -Infinity) + 4) {
       r.e.riftDeniedAt = ctx.time;
-      ctx.error(r.meta.entityId, 'This vault was opened by another party.');
+      ctx.error(r.meta.entityId, 'This hoard was dug up by another party.');
     }
     return;
   }
@@ -790,7 +795,9 @@ export function enterRift(
   riftFx(ctx, p.pos.x, p.pos.z, 'arcane', 'burst', 'rift_portal_enter', r.meta.entityId);
   ctx.emit({
     type: 'log',
-    text: `You step through the rift into ${floor.name}.`,
+    text: inst.vault
+      ? `You climb down into ${floor.name}.`
+      : `You step through the rift into ${floor.name}.`,
     color: '#b9f',
     pid: r.meta.entityId,
   });
@@ -1229,7 +1236,7 @@ export function updateRiftTriggers(ctx: SimContext, p: Entity): void {
   if (ctx.riftPortalIds === null) {
     ctx.riftPortalIds = [];
     for (const e of ctx.entities.values()) {
-      if (e.templateId === 'rift_portal') ctx.riftPortalIds.push(e.id);
+      if (isRiftEntranceTemplate(e.templateId)) ctx.riftPortalIds.push(e.id);
     }
   }
   for (const portalId of ctx.riftPortalIds) {
@@ -1354,7 +1361,9 @@ function openExit(ctx: SimContext, inst: RiftInstance): void {
   for (const pid of instancePlayerIds(ctx, inst)) {
     ctx.emit({
       type: 'log',
-      text: 'The rift shudders. A way home tears open behind the fallen.',
+      text: inst.vault
+        ? 'The hoard is yours. A way up opens behind the fallen.'
+        : 'The rift shudders. A way home tears open behind the fallen.',
       color: '#fd7',
       pid,
     });

@@ -1418,6 +1418,8 @@ export const id_ID: EnTranslations = {
     },
     "riftTracker": {
       "title": "Rift",
+      "hoardTitle": "Buried Hoard",
+      "hoardGoal": "Defeat the hoard keeper",
       "floor": "Lantai {current} dari {total}",
       "closesIn": "Tutup dalam {time}",
       "clockMs": "{minutes}:{seconds}",
@@ -9432,6 +9434,9 @@ export const id_ID: EnTranslations = {
       "pylonLit": "Sebuah pilar rune menyala hidup ({lit}/{total}).",
       "wayDownOpens": "Jalan turun terkoyak terbuka.",
       "exitOpens": "Rift itu berguncang. Sebuah jalan pulang terkoyak terbuka di belakang yang tumbang.",
+      "hoardEnter": "You climb down into {name}.",
+      "hoardExitOpens": "The hoard is yours. A way up opens behind the fallen.",
+      "hoardNotYours": "This hoard was dug up by another party.",
       "portalOpens": "Sebuah rift peringkat {tier} terkoyak terbuka di {zone}!",
       "portalSealed": "Rift peringkat {tier} di {zone} telah tersegel.",
       "portalCollapses": "Rift peringkat {tier} di {zone} runtuh.",

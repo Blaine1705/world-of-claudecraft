@@ -36,7 +36,7 @@ describe('riftFloorTrackerModel', () => {
 
   it('reports the 1-based floor (issue #2655 worked example: floorIndex 1 of 5 -> "Floor 2 of 5")', () => {
     const model = riftFloorTrackerModel(world(floor({ floorIndex: 1, floorCount: 5 }), null));
-    expect(model).toEqual({ floor: 2, floorCount: 5, timerSeconds: null });
+    expect(model).toEqual({ floor: 2, floorCount: 5, timerSeconds: null, hoard: false });
   });
 
   it('reports the first floor as 1 of N', () => {

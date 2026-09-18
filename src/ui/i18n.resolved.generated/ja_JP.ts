@@ -1418,6 +1418,8 @@ export const ja_JP: EnTranslations = {
     },
     "riftTracker": {
       "title": "リフト",
+      "hoardTitle": "Buried Hoard",
+      "hoardGoal": "Defeat the hoard keeper",
       "floor": "フロア {current}/{total}",
       "closesIn": "リフトは{time}後に閉じます",
       "clockMs": "{minutes}:{seconds}",
@@ -9432,6 +9434,9 @@ export const ja_JP: EnTranslations = {
       "pylonLit": "ルーンの尖塔が光を放った（{lit}/{total}）。",
       "wayDownOpens": "下層への道が裂け開いた。",
       "exitOpens": "裂け目が震える。倒れた敵の後ろに帰り道が裂け開いた。",
+      "hoardEnter": "You climb down into {name}.",
+      "hoardExitOpens": "The hoard is yours. A way up opens behind the fallen.",
+      "hoardNotYours": "This hoard was dug up by another party.",
       "portalOpens": "{zone}に{tier}ランクの裂け目が裂け開いた！",
       "portalSealed": "{zone}の{tier}ランクの裂け目が封印された。",
       "portalCollapses": "{zone}の{tier}ランクの裂け目が崩れ落ちた。",

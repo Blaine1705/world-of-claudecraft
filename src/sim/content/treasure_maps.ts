@@ -55,6 +55,8 @@ export const TREASURE_MAP_UPGRADE_INKS: Readonly<Record<TreasureMapRarity, numbe
   { common: 1, rare: 3, epic: 8, legendary: 0 },
 );
 
+/** The lowest level a Buried Hoard admits (the daily board's higher bracket). */
+export const HOARD_MIN_LEVEL = 16;
 /** How close (yards) the reader must stand to the X to dig. */
 export const TREASURE_DIG_RADIUS = 12;
 /** A vault portal nobody entered closes after this long (seconds). */

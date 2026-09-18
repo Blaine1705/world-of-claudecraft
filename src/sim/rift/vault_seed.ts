@@ -22,3 +22,14 @@ export function vaultSeedTier(seed: number): VaultSizeTier | null {
 export function makeVaultSeed(tier: VaultSizeTier, random: number): number {
   return (VAULT_FLAG | (tier << 28) | (random & RANDOM_MASK)) >>> 0;
 }
+
+/** The Buried Hoard's entrance object: a Rift entrance under its own template,
+ *  so it renders and reads as a dug-open way down, never as a rift tear. */
+export const HOARD_ENTRANCE_TEMPLATE_ID = 'hoard_entrance';
+
+/** Whether an object template is a walk-in Rift entrance (a rift portal or a
+ *  Buried Hoard entrance). The portal registry, the interact paths and the
+ *  walk-in trigger all ask this one question. */
+export function isRiftEntranceTemplate(templateId: string | undefined): boolean {
+  return templateId === 'rift_portal' || templateId === HOARD_ENTRANCE_TEMPLATE_ID;
+}

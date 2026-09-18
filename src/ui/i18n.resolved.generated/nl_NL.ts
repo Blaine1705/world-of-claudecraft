@@ -1418,6 +1418,8 @@ export const nl_NL: EnTranslations = {
     },
     "riftTracker": {
       "title": "Rift",
+      "hoardTitle": "Buried Hoard",
+      "hoardGoal": "Defeat the hoard keeper",
       "floor": "Verdieping {current} van {total}",
       "closesIn": "Sluit over {time}",
       "clockMs": "{minutes}:{seconds}",
@@ -9432,6 +9434,9 @@ export const nl_NL: EnTranslations = {
       "pylonLit": "Een runenpyloon ontwaakt tot leven ({lit}/{total}).",
       "wayDownOpens": "De weg naar beneden scheurt open.",
       "exitOpens": "De rift beeft. Een weg naar huis scheurt open achter de gevallenen.",
+      "hoardEnter": "You climb down into {name}.",
+      "hoardExitOpens": "The hoard is yours. A way up opens behind the fallen.",
+      "hoardNotYours": "This hoard was dug up by another party.",
       "portalOpens": "Een {tier}-rangs rift scheurt open in {zone}!",
       "portalSealed": "De {tier}-rangs rift in {zone} is verzegeld.",
       "portalCollapses": "De {tier}-rangs rift in {zone} stort in.",

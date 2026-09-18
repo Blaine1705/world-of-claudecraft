@@ -1418,6 +1418,8 @@ export const fr_CA: EnTranslations = {
     },
     "riftTracker": {
       "title": "Faille",
+      "hoardTitle": "Buried Hoard",
+      "hoardGoal": "Defeat the hoard keeper",
       "floor": "Étage {current} sur {total}",
       "closesIn": "Se ferme dans {time}",
       "clockMs": "{minutes}:{seconds}",
@@ -9432,6 +9434,9 @@ export const fr_CA: EnTranslations = {
       "pylonLit": "Un pylône runique s'embrase ({lit}/{total}).",
       "wayDownOpens": "Le chemin vers le bas se déchire.",
       "exitOpens": "La faille frémit. Un chemin vers le foyer se déchire derrière les tombés.",
+      "hoardEnter": "You climb down into {name}.",
+      "hoardExitOpens": "The hoard is yours. A way up opens behind the fallen.",
+      "hoardNotYours": "This hoard was dug up by another party.",
       "portalOpens": "Une faille de rang {tier} se déchire dans {zone} !",
       "portalSealed": "La faille de rang {tier} dans {zone} a été scellée.",
       "portalCollapses": "La faille de rang {tier} dans {zone} s'effondre.",

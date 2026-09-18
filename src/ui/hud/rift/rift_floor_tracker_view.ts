@@ -20,6 +20,7 @@
 // (the same "no snapshot round trip" idiom as raidLockouts()), so simply
 // re-reading the model on a poll is enough to tick the countdown down live.
 
+import { vaultSeedTier } from '../../../sim/rift/vault_seed';
 import type { IWorld } from '../../../world_api';
 
 export interface RiftFloorTrackerModel {
@@ -30,6 +31,9 @@ export interface RiftFloorTrackerModel {
   /** Whole seconds remaining before the backing rift event stops admitting new
    *  parties, or null when there is no such event (a dev-spawned rift). */
   timerSeconds: number | null;
+  /** A Buried Hoard (a treasure map's one-room vault, src/sim/rift/vault_seed.ts):
+   *  the tracker names it as such and drops the floor line. */
+  hoard: boolean;
 }
 
 /** Null outside a rift (world.riftFloor is null). */
@@ -44,6 +48,7 @@ export function riftFloorTrackerModel(
     floor: floor.floorIndex + 1,
     floorCount: floor.floorCount,
     timerSeconds: wholeSeconds === null || wholeSeconds <= 0 ? null : wholeSeconds,
+    hoard: vaultSeedTier(floor.seed) !== null,
   };
 }
 

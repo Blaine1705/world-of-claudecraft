@@ -1,3 +1,4 @@
+import { isRiftEntranceTemplate } from './rift/vault_seed';
 import { vehicleStationByEntityId } from './vehicle_stations';
 import { enterVehicle } from './vehicles';
 // Interaction: looting, quest NPCs, ground objects. The three IWorldInteraction
@@ -467,7 +468,7 @@ export function interact(
           ctx.leaveDungeon(p.id);
           return;
         }
-        if (target.templateId === 'rift_portal' && target.riftSeed !== undefined) {
+        if (isRiftEntranceTemplate(target.templateId) && target.riftSeed !== undefined) {
           ctx.enterRift(target.riftSeed, target.riftBaseLevel ?? p.level, p.id, undefined, target);
           return;
         }
@@ -580,7 +581,7 @@ export function interact(
       ctx.leaveDungeon(p.id);
       return;
     }
-    if (obj.templateId === 'rift_portal' && obj.riftSeed !== undefined) {
+    if (isRiftEntranceTemplate(obj.templateId) && obj.riftSeed !== undefined) {
       ctx.enterRift(obj.riftSeed, obj.riftBaseLevel ?? p.level, p.id, undefined, obj);
       return;
     }

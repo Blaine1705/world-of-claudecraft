@@ -843,7 +843,8 @@ export function generateRiftPlan(seed: number, baseLevel: number): RiftPlan {
   return {
     seed,
     baseLevel,
-    name: `The ${noun} ${suffix}`,
+    // A Buried Hoard (vault_seed.ts) is named for what it is, never a rift.
+    name: vaultSeedTier(seed) !== null ? `The Buried ${noun} Hoard` : `The ${noun} ${suffix}`,
     themeId: bossTheme.id,
     floorCount,
   };
@@ -928,7 +929,10 @@ export function generateRiftFloor(
     floorIndex: clampedIndex,
     floorCount,
     isBoss,
-    name: `${theme.name} ${isBoss ? 'Sanctum' : 'Reaches'}: Depth ${clampedIndex + 1}`,
+    name:
+      vault !== null
+        ? `${theme.name} Buried Hoard`
+        : `${theme.name} ${isBoss ? 'Sanctum' : 'Reaches'}: Depth ${clampedIndex + 1}`,
     themeName: theme.name,
     layout: geo.layout,
     style,

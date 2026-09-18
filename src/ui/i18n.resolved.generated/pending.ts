@@ -306,6 +306,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reputation.titleLine",
     "hudChrome.reputation.today",
     "hudChrome.reputation.vendorGate",
+    "hudChrome.riftTracker.hoardGoal",
+    "hudChrome.riftTracker.hoardTitle",
     "hudChrome.treasureMap.close",
     "hudChrome.treasureMap.hint",
     "hudChrome.treasureMap.rarity.common",
@@ -605,7 +607,10 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.retry",
     "questUi.worldQuest.wispMaze.startHard",
     "questUi.worldQuest.wispMaze.startNormal",
-    "questUi.worldQuest.wispMaze.title"
+    "questUi.worldQuest.wispMaze.title",
+    "sim.rift.hoardEnter",
+    "sim.rift.hoardExitOpens",
+    "sim.rift.hoardNotYours"
   ],
   "es_ES": [
     "apiError.world_quests.unknown_board",
@@ -904,6 +909,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reputation.titleLine",
     "hudChrome.reputation.today",
     "hudChrome.reputation.vendorGate",
+    "hudChrome.riftTracker.hoardGoal",
+    "hudChrome.riftTracker.hoardTitle",
     "hudChrome.treasureMap.close",
     "hudChrome.treasureMap.hint",
     "hudChrome.treasureMap.rarity.common",
@@ -1203,7 +1210,10 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.retry",
     "questUi.worldQuest.wispMaze.startHard",
     "questUi.worldQuest.wispMaze.startNormal",
-    "questUi.worldQuest.wispMaze.title"
+    "questUi.worldQuest.wispMaze.title",
+    "sim.rift.hoardEnter",
+    "sim.rift.hoardExitOpens",
+    "sim.rift.hoardNotYours"
   ],
   "fr_FR": [
     "apiError.world_quests.unknown_board",
@@ -1524,6 +1534,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reputation.titleLine",
     "hudChrome.reputation.today",
     "hudChrome.reputation.vendorGate",
+    "hudChrome.riftTracker.hoardGoal",
+    "hudChrome.riftTracker.hoardTitle",
     "hudChrome.treasureMap.close",
     "hudChrome.treasureMap.hint",
     "hudChrome.treasureMap.rarity.common",
@@ -1885,7 +1897,10 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.retry",
     "questUi.worldQuest.wispMaze.startHard",
     "questUi.worldQuest.wispMaze.startNormal",
-    "questUi.worldQuest.wispMaze.title"
+    "questUi.worldQuest.wispMaze.title",
+    "sim.rift.hoardEnter",
+    "sim.rift.hoardExitOpens",
+    "sim.rift.hoardNotYours"
   ],
   "fr_CA": [
     "apiError.world_quests.unknown_board",
@@ -2206,6 +2221,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reputation.titleLine",
     "hudChrome.reputation.today",
     "hudChrome.reputation.vendorGate",
+    "hudChrome.riftTracker.hoardGoal",
+    "hudChrome.riftTracker.hoardTitle",
     "hudChrome.treasureMap.close",
     "hudChrome.treasureMap.hint",
     "hudChrome.treasureMap.rarity.common",
@@ -2567,7 +2584,10 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.retry",
     "questUi.worldQuest.wispMaze.startHard",
     "questUi.worldQuest.wispMaze.startNormal",
-    "questUi.worldQuest.wispMaze.title"
+    "questUi.worldQuest.wispMaze.title",
+    "sim.rift.hoardEnter",
+    "sim.rift.hoardExitOpens",
+    "sim.rift.hoardNotYours"
   ],
   "en_CA": [],
   "it_IT": [
@@ -2889,6 +2909,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reputation.titleLine",
     "hudChrome.reputation.today",
     "hudChrome.reputation.vendorGate",
+    "hudChrome.riftTracker.hoardGoal",
+    "hudChrome.riftTracker.hoardTitle",
     "hudChrome.treasureMap.close",
     "hudChrome.treasureMap.hint",
     "hudChrome.treasureMap.rarity.common",
@@ -3250,7 +3272,10 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.retry",
     "questUi.worldQuest.wispMaze.startHard",
     "questUi.worldQuest.wispMaze.startNormal",
-    "questUi.worldQuest.wispMaze.title"
+    "questUi.worldQuest.wispMaze.title",
+    "sim.rift.hoardEnter",
+    "sim.rift.hoardExitOpens",
+    "sim.rift.hoardNotYours"
   ],
   "de_DE": [
     "apiError.world_quests.unknown_board",
@@ -3571,6 +3596,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reputation.titleLine",
     "hudChrome.reputation.today",
     "hudChrome.reputation.vendorGate",
+    "hudChrome.riftTracker.hoardGoal",
+    "hudChrome.riftTracker.hoardTitle",
     "hudChrome.treasureMap.close",
     "hudChrome.treasureMap.hint",
     "hudChrome.treasureMap.rarity.common",
@@ -3932,7 +3959,10 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.retry",
     "questUi.worldQuest.wispMaze.startHard",
     "questUi.worldQuest.wispMaze.startNormal",
-    "questUi.worldQuest.wispMaze.title"
+    "questUi.worldQuest.wispMaze.title",
+    "sim.rift.hoardEnter",
+    "sim.rift.hoardExitOpens",
+    "sim.rift.hoardNotYours"
   ],
   "zh_CN": [
     "entities.items.allied_hearthstone.name",
@@ -3986,6 +4016,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reputation.progress",
     "hudChrome.reputation.questsDoneValue",
     "hudChrome.reputation.titleLine",
+    "hudChrome.riftTracker.hoardGoal",
+    "hudChrome.riftTracker.hoardTitle",
     "hudChrome.treasureMap.close",
     "hudChrome.treasureMap.hint",
     "hudChrome.treasureMap.rarity.common",
@@ -4015,7 +4047,10 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.puzzleTileAria",
     "questUi.worldQuest.puzzleTimer",
     "questUi.worldQuest.semanticSummary",
-    "questUi.worldQuest.semanticSummaryTimed"
+    "questUi.worldQuest.semanticSummaryTimed",
+    "sim.rift.hoardEnter",
+    "sim.rift.hoardExitOpens",
+    "sim.rift.hoardNotYours"
   ],
   "zh_TW": [
     "entities.items.allied_hearthstone.name",
@@ -4069,6 +4104,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reputation.progress",
     "hudChrome.reputation.questsDoneValue",
     "hudChrome.reputation.titleLine",
+    "hudChrome.riftTracker.hoardGoal",
+    "hudChrome.riftTracker.hoardTitle",
     "hudChrome.treasureMap.close",
     "hudChrome.treasureMap.hint",
     "hudChrome.treasureMap.rarity.common",
@@ -4098,7 +4135,10 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.puzzleTileAria",
     "questUi.worldQuest.puzzleTimer",
     "questUi.worldQuest.semanticSummary",
-    "questUi.worldQuest.semanticSummaryTimed"
+    "questUi.worldQuest.semanticSummaryTimed",
+    "sim.rift.hoardEnter",
+    "sim.rift.hoardExitOpens",
+    "sim.rift.hoardNotYours"
   ],
   "ko_KR": [
     "entities.items.allied_hearthstone.name",
@@ -4152,6 +4192,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reputation.progress",
     "hudChrome.reputation.questsDoneValue",
     "hudChrome.reputation.titleLine",
+    "hudChrome.riftTracker.hoardGoal",
+    "hudChrome.riftTracker.hoardTitle",
     "hudChrome.treasureMap.close",
     "hudChrome.treasureMap.hint",
     "hudChrome.treasureMap.rarity.common",
@@ -4181,7 +4223,10 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.puzzleTileAria",
     "questUi.worldQuest.puzzleTimer",
     "questUi.worldQuest.semanticSummary",
-    "questUi.worldQuest.semanticSummaryTimed"
+    "questUi.worldQuest.semanticSummaryTimed",
+    "sim.rift.hoardEnter",
+    "sim.rift.hoardExitOpens",
+    "sim.rift.hoardNotYours"
   ],
   "ja_JP": [
     "entities.items.allied_hearthstone.name",
@@ -4235,6 +4280,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reputation.progress",
     "hudChrome.reputation.questsDoneValue",
     "hudChrome.reputation.titleLine",
+    "hudChrome.riftTracker.hoardGoal",
+    "hudChrome.riftTracker.hoardTitle",
     "hudChrome.treasureMap.close",
     "hudChrome.treasureMap.hint",
     "hudChrome.treasureMap.rarity.common",
@@ -4264,7 +4311,10 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.puzzleTileAria",
     "questUi.worldQuest.puzzleTimer",
     "questUi.worldQuest.semanticSummary",
-    "questUi.worldQuest.semanticSummaryTimed"
+    "questUi.worldQuest.semanticSummaryTimed",
+    "sim.rift.hoardEnter",
+    "sim.rift.hoardExitOpens",
+    "sim.rift.hoardNotYours"
   ],
   "pt_BR": [
     "apiError.world_quests.unknown_board",
@@ -4585,6 +4635,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reputation.titleLine",
     "hudChrome.reputation.today",
     "hudChrome.reputation.vendorGate",
+    "hudChrome.riftTracker.hoardGoal",
+    "hudChrome.riftTracker.hoardTitle",
     "hudChrome.treasureMap.close",
     "hudChrome.treasureMap.hint",
     "hudChrome.treasureMap.rarity.common",
@@ -4946,7 +4998,10 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.retry",
     "questUi.worldQuest.wispMaze.startHard",
     "questUi.worldQuest.wispMaze.startNormal",
-    "questUi.worldQuest.wispMaze.title"
+    "questUi.worldQuest.wispMaze.title",
+    "sim.rift.hoardEnter",
+    "sim.rift.hoardExitOpens",
+    "sim.rift.hoardNotYours"
   ],
   "ru_RU": [
     "entities.items.allied_hearthstone.name",
@@ -5000,6 +5055,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reputation.progress",
     "hudChrome.reputation.questsDoneValue",
     "hudChrome.reputation.titleLine",
+    "hudChrome.riftTracker.hoardGoal",
+    "hudChrome.riftTracker.hoardTitle",
     "hudChrome.treasureMap.close",
     "hudChrome.treasureMap.hint",
     "hudChrome.treasureMap.rarity.common",
@@ -5029,7 +5086,10 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.puzzleTileAria",
     "questUi.worldQuest.puzzleTimer",
     "questUi.worldQuest.semanticSummary",
-    "questUi.worldQuest.semanticSummaryTimed"
+    "questUi.worldQuest.semanticSummaryTimed",
+    "sim.rift.hoardEnter",
+    "sim.rift.hoardExitOpens",
+    "sim.rift.hoardNotYours"
   ],
   "cs_CZ": [
     "apiError.world_quests.unknown_board",
@@ -5350,6 +5410,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reputation.titleLine",
     "hudChrome.reputation.today",
     "hudChrome.reputation.vendorGate",
+    "hudChrome.riftTracker.hoardGoal",
+    "hudChrome.riftTracker.hoardTitle",
     "hudChrome.treasureMap.close",
     "hudChrome.treasureMap.hint",
     "hudChrome.treasureMap.rarity.common",
@@ -5711,7 +5773,10 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.retry",
     "questUi.worldQuest.wispMaze.startHard",
     "questUi.worldQuest.wispMaze.startNormal",
-    "questUi.worldQuest.wispMaze.title"
+    "questUi.worldQuest.wispMaze.title",
+    "sim.rift.hoardEnter",
+    "sim.rift.hoardExitOpens",
+    "sim.rift.hoardNotYours"
   ],
   "nl_NL": [
     "apiError.world_quests.unknown_board",
@@ -6032,6 +6097,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reputation.titleLine",
     "hudChrome.reputation.today",
     "hudChrome.reputation.vendorGate",
+    "hudChrome.riftTracker.hoardGoal",
+    "hudChrome.riftTracker.hoardTitle",
     "hudChrome.treasureMap.close",
     "hudChrome.treasureMap.hint",
     "hudChrome.treasureMap.rarity.common",
@@ -6393,7 +6460,10 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.retry",
     "questUi.worldQuest.wispMaze.startHard",
     "questUi.worldQuest.wispMaze.startNormal",
-    "questUi.worldQuest.wispMaze.title"
+    "questUi.worldQuest.wispMaze.title",
+    "sim.rift.hoardEnter",
+    "sim.rift.hoardExitOpens",
+    "sim.rift.hoardNotYours"
   ],
   "pl_PL": [
     "apiError.world_quests.unknown_board",
@@ -6714,6 +6784,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reputation.titleLine",
     "hudChrome.reputation.today",
     "hudChrome.reputation.vendorGate",
+    "hudChrome.riftTracker.hoardGoal",
+    "hudChrome.riftTracker.hoardTitle",
     "hudChrome.treasureMap.close",
     "hudChrome.treasureMap.hint",
     "hudChrome.treasureMap.rarity.common",
@@ -7075,7 +7147,10 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.retry",
     "questUi.worldQuest.wispMaze.startHard",
     "questUi.worldQuest.wispMaze.startNormal",
-    "questUi.worldQuest.wispMaze.title"
+    "questUi.worldQuest.wispMaze.title",
+    "sim.rift.hoardEnter",
+    "sim.rift.hoardExitOpens",
+    "sim.rift.hoardNotYours"
   ],
   "id_ID": [
     "apiError.world_quests.unknown_board",
@@ -7396,6 +7471,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reputation.titleLine",
     "hudChrome.reputation.today",
     "hudChrome.reputation.vendorGate",
+    "hudChrome.riftTracker.hoardGoal",
+    "hudChrome.riftTracker.hoardTitle",
     "hudChrome.treasureMap.close",
     "hudChrome.treasureMap.hint",
     "hudChrome.treasureMap.rarity.common",
@@ -7757,7 +7834,10 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.retry",
     "questUi.worldQuest.wispMaze.startHard",
     "questUi.worldQuest.wispMaze.startNormal",
-    "questUi.worldQuest.wispMaze.title"
+    "questUi.worldQuest.wispMaze.title",
+    "sim.rift.hoardEnter",
+    "sim.rift.hoardExitOpens",
+    "sim.rift.hoardNotYours"
   ],
   "tr_TR": [
     "apiError.world_quests.unknown_board",
@@ -8078,6 +8158,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reputation.titleLine",
     "hudChrome.reputation.today",
     "hudChrome.reputation.vendorGate",
+    "hudChrome.riftTracker.hoardGoal",
+    "hudChrome.riftTracker.hoardTitle",
     "hudChrome.treasureMap.close",
     "hudChrome.treasureMap.hint",
     "hudChrome.treasureMap.rarity.common",
@@ -8439,7 +8521,10 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.retry",
     "questUi.worldQuest.wispMaze.startHard",
     "questUi.worldQuest.wispMaze.startNormal",
-    "questUi.worldQuest.wispMaze.title"
+    "questUi.worldQuest.wispMaze.title",
+    "sim.rift.hoardEnter",
+    "sim.rift.hoardExitOpens",
+    "sim.rift.hoardNotYours"
   ],
   "sv_SE": [
     "apiError.world_quests.unknown_board",
@@ -8760,6 +8845,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reputation.titleLine",
     "hudChrome.reputation.today",
     "hudChrome.reputation.vendorGate",
+    "hudChrome.riftTracker.hoardGoal",
+    "hudChrome.riftTracker.hoardTitle",
     "hudChrome.treasureMap.close",
     "hudChrome.treasureMap.hint",
     "hudChrome.treasureMap.rarity.common",
@@ -9121,7 +9208,10 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.retry",
     "questUi.worldQuest.wispMaze.startHard",
     "questUi.worldQuest.wispMaze.startNormal",
-    "questUi.worldQuest.wispMaze.title"
+    "questUi.worldQuest.wispMaze.title",
+    "sim.rift.hoardEnter",
+    "sim.rift.hoardExitOpens",
+    "sim.rift.hoardNotYours"
   ],
   "vi_VN": [
     "apiError.world_quests.unknown_board",
@@ -9442,6 +9532,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reputation.titleLine",
     "hudChrome.reputation.today",
     "hudChrome.reputation.vendorGate",
+    "hudChrome.riftTracker.hoardGoal",
+    "hudChrome.riftTracker.hoardTitle",
     "hudChrome.treasureMap.close",
     "hudChrome.treasureMap.hint",
     "hudChrome.treasureMap.rarity.common",
@@ -9803,7 +9895,10 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.retry",
     "questUi.worldQuest.wispMaze.startHard",
     "questUi.worldQuest.wispMaze.startNormal",
-    "questUi.worldQuest.wispMaze.title"
+    "questUi.worldQuest.wispMaze.title",
+    "sim.rift.hoardEnter",
+    "sim.rift.hoardExitOpens",
+    "sim.rift.hoardNotYours"
   ],
   "da_DK": [
     "apiError.world_quests.unknown_board",
@@ -10124,6 +10219,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reputation.titleLine",
     "hudChrome.reputation.today",
     "hudChrome.reputation.vendorGate",
+    "hudChrome.riftTracker.hoardGoal",
+    "hudChrome.riftTracker.hoardTitle",
     "hudChrome.treasureMap.close",
     "hudChrome.treasureMap.hint",
     "hudChrome.treasureMap.rarity.common",
@@ -10485,6 +10582,9 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.retry",
     "questUi.worldQuest.wispMaze.startHard",
     "questUi.worldQuest.wispMaze.startNormal",
-    "questUi.worldQuest.wispMaze.title"
+    "questUi.worldQuest.wispMaze.title",
+    "sim.rift.hoardEnter",
+    "sim.rift.hoardExitOpens",
+    "sim.rift.hoardNotYours"
   ]
 };

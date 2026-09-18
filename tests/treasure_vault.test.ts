@@ -99,7 +99,8 @@ describe('digging on the X', () => {
     expect(metaOf(sim).treasureMap).toBeNull();
     expect(ofType(evs, 'treasureVaultOpened')[0]).toMatchObject({ rarity: 'epic' });
     const portal = [...sim.entities.values()].find((e) => e.vaultOwnerPid !== undefined)!;
-    expect(portal.templateId).toBe('rift_portal');
+    // Its own template: a dug-open way down, never a rift tear.
+    expect(portal.templateId).toBe('hoard_entrance');
     expect(portal.vaultOwnerPid).toBe(sim.playerId);
     expect(portal.vaultRarity).toBe('epic');
     expect(portal.riftTier).toBe('A');
@@ -137,7 +138,12 @@ describe('the vault run', () => {
     const sim = makeSim();
     readAndDig(sim, 'common');
     const inst = enterVault(sim);
-    expect(inst.vault).toEqual({ rarity: 'common', ownerPid: sim.playerId, headCount: 1 });
+    expect(inst.vault).toEqual({
+      rarity: 'common',
+      ownerPid: sim.playerId,
+      headCount: 1,
+      level: sim.player.level,
+    });
     expect(inst.floorCount).toBe(1);
     // A straight fight: no puzzle pieces, gate or bonus cache on the floor.
     expect(inst.pylonIds).toEqual([]);
@@ -277,5 +283,28 @@ describe('the character save', () => {
     };
     const hostilePid = hostile.addPlayer('warrior', 'Junk', { state: junk as never });
     expect(hostile.meta(hostilePid)?.treasureMap).toBeNull();
+  });
+});
+
+describe('the level 16 bracket', () => {
+  it('a level 16 owner enters, and the hoard mobs never outlevel them', () => {
+    const sim = new Sim({
+      seed: 4242,
+      playerClass: 'warrior',
+      autoEquip: false,
+      devCommands: true,
+    });
+    sim.chat('/dev level 16', sim.player.id);
+    sim.drainEvents();
+    readAndDig(sim, 'legendary');
+    const portal = [...sim.entities.values()].find((e) => e.vaultOwnerPid !== undefined)!;
+    sim.player.pos = { ...portal.pos };
+    for (let i = 0; i < 3; i++) sim.tick();
+    const inst = sim.riftInstances.find((i) => i.partyKey !== null)!;
+    expect(inst).toBeDefined();
+    expect(inst.vault?.level).toBe(16);
+    const mobs = inst.mobIds.map((id) => sim.entities.get(id)!).filter(Boolean);
+    expect(mobs.length).toBeGreaterThan(10);
+    for (const mob of mobs) expect(mob.level).toBeLessThanOrEqual(16);
   });
 });

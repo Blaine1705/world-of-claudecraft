@@ -1418,6 +1418,8 @@ export const pt_BR: EnTranslations = {
     },
     "riftTracker": {
       "title": "Fenda",
+      "hoardTitle": "Buried Hoard",
+      "hoardGoal": "Defeat the hoard keeper",
       "floor": "Andar {current} de {total}",
       "closesIn": "Fecha em {time}",
       "clockMs": "{minutes}:{seconds}",
@@ -9432,6 +9434,9 @@ export const pt_BR: EnTranslations = {
       "pylonLit": "Um pilar rúnico se acende ({lit}/{total}).",
       "wayDownOpens": "O caminho para baixo se abre com um rasgão.",
       "exitOpens": "A fenda estremece. Um caminho para casa se abre atrás dos caídos.",
+      "hoardEnter": "You climb down into {name}.",
+      "hoardExitOpens": "The hoard is yours. A way up opens behind the fallen.",
+      "hoardNotYours": "This hoard was dug up by another party.",
       "portalOpens": "Uma fenda de nível {tier} se abre em {zone}!",
       "portalSealed": "A fenda de nível {tier} em {zone} foi selada.",
       "portalCollapses": "A fenda de nível {tier} em {zone} entra em colapso.",

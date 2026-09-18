@@ -45,7 +45,7 @@ import { riftFx } from './rift/fx';
 import { RIFT_RANK_BASE_LEVEL, type RiftRankTuning } from './rift/ranks';
 import { generateRiftPlan } from './rift/rift_gen';
 import type { RiftInstance } from './rift/types';
-import { makeVaultSeed, type VaultSizeTier } from './rift/vault_seed';
+import { HOARD_ENTRANCE_TEMPLATE_ID, makeVaultSeed, type VaultSizeTier } from './rift/vault_seed';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import type { Entity } from './types';
@@ -152,7 +152,7 @@ function spawnVaultPortal(
   const px = player.pos.x + Math.sin(player.facing) * 5;
   const pz = player.pos.z + Math.cos(player.facing) * 5;
   const portal = createGroundObject(ctx.nextId++, '', plan.name, ctx.groundPos(px, pz));
-  portal.templateId = 'rift_portal';
+  portal.templateId = HOARD_ENTRANCE_TEMPLATE_ID;
   portal.objectItemId = null;
   portal.lootable = true;
   portal.riftSeed = map.seed;
@@ -201,6 +201,7 @@ export function vaultForPortal(ctx: SimContext, portal: Entity | null): RiftInst
     rarity: portal.vaultRarity,
     ownerPid: portal.vaultOwnerPid,
     headCount: Math.max(1, Math.min(5, party?.members.length ?? 1)),
+    level: ctx.entities.get(portal.vaultOwnerPid)?.level ?? RIFT_RANK_BASE_LEVEL.C,
   };
 }
 

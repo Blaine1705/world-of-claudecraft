@@ -1418,6 +1418,8 @@ export const cs_CZ: EnTranslations = {
     },
     "riftTracker": {
       "title": "Trhlina",
+      "hoardTitle": "Buried Hoard",
+      "hoardGoal": "Defeat the hoard keeper",
       "floor": "Patro {current} z {total}",
       "closesIn": "Zavře se za {time}",
       "clockMs": "{minutes}:{seconds}",
@@ -9432,6 +9434,9 @@ export const cs_CZ: EnTranslations = {
       "pylonLit": "Runový pilíř vzplane k životu ({lit}/{total}).",
       "wayDownOpens": "Cesta dolů se protrhává.",
       "exitOpens": "Trhlina se zachvěje. Cesta domů se protrhne za padlými.",
+      "hoardEnter": "You climb down into {name}.",
+      "hoardExitOpens": "The hoard is yours. A way up opens behind the fallen.",
+      "hoardNotYours": "This hoard was dug up by another party.",
       "portalOpens": "Trhlina stupně {tier} se protrhává v {zone}!",
       "portalSealed": "Trhlina stupně {tier} v {zone} byla zapečetěna.",
       "portalCollapses": "Trhlina stupně {tier} v {zone} se hroutí.",

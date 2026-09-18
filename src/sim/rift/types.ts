@@ -329,7 +329,13 @@ export interface RiftInstance {
   /** Set when the run is a treasure vault (src/sim/treasure_vault.ts): the map's
    *  rarity, its owner, and the head count the mobs were scaled for. Null on
    *  every ordinary rift. */
-  vault: { rarity: TreasureMapRarity; ownerPid: number; headCount: number } | null;
+  vault: {
+    rarity: TreasureMapRarity;
+    ownerPid: number;
+    headCount: number;
+    /** The owner's level on entry: the hoard's mobs never exceed it. */
+    level: number;
+  } | null;
   /** The sealed reward cache the giga-boss drops (`rift_locked_chest`), opened via
    * the shared lockpicking minigame; null until the boss falls. */
   cacheId: number | null;

@@ -1418,6 +1418,8 @@ export const de_DE: EnTranslations = {
     },
     "riftTracker": {
       "title": "Riss",
+      "hoardTitle": "Buried Hoard",
+      "hoardGoal": "Defeat the hoard keeper",
       "floor": "Ebene {current} von {total}",
       "closesIn": "Schließt in {time}",
       "clockMs": "{minutes}:{seconds}",
@@ -9432,6 +9434,9 @@ export const de_DE: EnTranslations = {
       "pylonLit": "Ein Runenpylon erwacht flammend zum Leben ({lit}/{total}).",
       "wayDownOpens": "Der Weg hinab reißt auf.",
       "exitOpens": "Der Riss erzittert. Hinter den Gefallenen reißt ein Weg nach Hause auf.",
+      "hoardEnter": "You climb down into {name}.",
+      "hoardExitOpens": "The hoard is yours. A way up opens behind the fallen.",
+      "hoardNotYours": "This hoard was dug up by another party.",
       "portalOpens": "Ein Riss vom Rang {tier} reißt in {zone} auf!",
       "portalSealed": "Der Riss vom Rang {tier} in {zone} wurde versiegelt.",
       "portalCollapses": "Der Riss vom Rang {tier} in {zone} bricht zusammen.",

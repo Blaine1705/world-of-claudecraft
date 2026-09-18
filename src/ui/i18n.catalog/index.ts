@@ -902,6 +902,10 @@ export const en = {
       pylonLit: 'A rune pylon flares to life ({lit}/{total}).',
       wayDownOpens: 'The way down tears open.',
       exitOpens: 'The rift shudders. A way home tears open behind the fallen.',
+      // The Buried Hoard (a treasure map's vault) keeps its own entry and clear lines.
+      hoardEnter: 'You climb down into {name}.',
+      hoardExitOpens: 'The hoard is yours. A way up opens behind the fallen.',
+      hoardNotYours: 'This hoard was dug up by another party.',
       portalOpens: 'A {tier}-rank rift tears open in {zone}!',
       portalSealed: 'The {tier}-rank rift in {zone} has been sealed.',
       portalCollapses: 'The {tier}-rank rift in {zone} collapses.',
