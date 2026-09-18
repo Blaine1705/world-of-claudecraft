@@ -1822,7 +1822,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.frameRateCapStatusPaced':
     'Рисуется {fps} изображений в секунду на дисплее {hz} Гц.',
   'hudChrome.options.frameRateCapStatusUnpaced':
-    'Синхронизация с дисплеем выключена: рисуется {fps} изображений в секунду.',
+    'Ограничение: {fps} изображений в секунду.',
   'hudChrome.options.frameRateCapStatusInert':
     'Этот дисплей уже работает на этой частоте или ниже, поэтому предел ничего не меняет.',
   'hudChrome.options.shaderWarm': 'Фоновый прогрев шейдеров',

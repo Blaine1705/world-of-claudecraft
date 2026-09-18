@@ -79,7 +79,10 @@ export function configureFrameCadence(
   let divisor = 1;
   let slack = 0;
   let early = 0;
-  if (intent !== 0 && verdict === 'unpaced') {
+  if (intent !== 0 && verdict !== 'paced') {
+    // No slots to align to, or none visible: a plain time limiter. Under a
+    // paced display whose lattice cannot be read it still works, since rAF
+    // aligns itself; a late timer then costs a slot now and then.
     target = 1000 / intent;
     slack = target * UNPACED_LATE_SHARE;
     early = target * UNPACED_EARLY_SHARE;
@@ -96,7 +99,7 @@ export function configureFrameCadence(
   state.divisor = divisor;
   state.slackMs = slack;
   state.earlyMs = early;
-  state.paced = verdict !== 'unpaced';
+  state.paced = verdict === 'paced';
 }
 
 export function frameCadenceActive(state: FrameCadenceState): boolean {

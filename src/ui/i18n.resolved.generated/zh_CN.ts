@@ -1708,7 +1708,7 @@ export const zh_CN: EnTranslations = {
       "frameRateCapThirty": "30",
       "frameRateCapNote": "限制游戏每秒绘制的画面数量。如果电脑跟不上显示器的速度，较低的上限会让画面更平稳，也能让电脑更凉爽。上限会跟随你的显示器，因此实际数值可能与数字略有不同。自动：仅当这台电脑跟不上显示器时才降低上限，能跟上时再恢复（推荐）。显示器：不限制。",
       "frameRateCapStatusPaced": "正在 {hz} Hz 的显示器上每秒绘制 {fps} 帧。",
-      "frameRateCapStatusUnpaced": "显示同步已关闭：每秒绘制 {fps} 帧。",
+      "frameRateCapStatusUnpaced": "限制为每秒 {fps} 帧。",
       "frameRateCapStatusInert": "此显示器的刷新率已不高于该上限，因此上限不会带来任何变化。",
       "gpuBackend": "图形后端",
       "gpuBackendAuto": "自动",

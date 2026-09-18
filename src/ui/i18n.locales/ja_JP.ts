@@ -1805,7 +1805,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.frameRateCapStatusPaced':
     '{hz} Hz のディスプレイで毎秒 {fps} 枚を描画しています。',
   'hudChrome.options.frameRateCapStatusUnpaced':
-    'ディスプレイ同期はオフです。毎秒 {fps} 枚を描画しています。',
+    '毎秒 {fps} 枚に制限しています。',
   'hudChrome.options.frameRateCapStatusInert':
     'このディスプレイはすでにこの制限以下で動作しているため、制限による変化はありません。',
   'hudChrome.options.shaderWarm': 'シェーダー事前ウォームアップ ワーカー',

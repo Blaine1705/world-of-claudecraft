@@ -151,12 +151,14 @@ describe('frame cadence', () => {
     expect(frameCadenceShouldRender(c, 9 * slot)).toBe(true);
   });
 
-  it('is inert on a display already at the intent, and with no reading', () => {
+  it('is inert on a display already at the intent, and with no ceiling', () => {
     const c = createFrameCadence();
     configureFrameCadence(c, 30, 'paced', 1000 / 30);
     expect(c.targetIntervalMs).toBe(0);
+    // An unread display is not inert: the ceiling falls back to a time limiter.
     configureFrameCadence(c, 30, 'unknown', 0);
-    expect(c.targetIntervalMs).toBe(0);
+    expect(c.targetIntervalMs).toBeCloseTo(33.33, 1);
+    expect(c.paced).toBe(false);
     configureFrameCadence(c, 0, 'paced', 1000 / 144);
     expect(c.targetIntervalMs).toBe(0);
   });
@@ -177,6 +179,8 @@ describe('frame cadence', () => {
 function runHost(opts: {
   refreshMs: number | null;
   costMs: number | ((nowMs: number) => number);
+  /** Uncapped rAF only: how long an idle callback takes to come back. */
+  idleMs?: number | (() => number);
   seconds: number;
   intent: 0 | 30 | 60 | 'auto';
   governorShedding?: () => boolean;
@@ -198,7 +202,7 @@ function runHost(opts: {
   let callbacks = 0;
   const nextFrameAt = (from: number) =>
     opts.refreshMs === null
-      ? from + 0.3
+      ? from + (typeof opts.idleMs === 'function' ? opts.idleMs() : (opts.idleMs ?? 0.3))
       : (Math.floor(from / opts.refreshMs + 1e-9) + 1) * opts.refreshMs;
   const wiring = new FrameCadenceWiring({
     requestFrame: () => {
@@ -310,18 +314,24 @@ describe('frame cadence wiring', () => {
     expect(r.maxArmsPerCallback).toBe(1);
   });
 
-  it('finds an uncapped rAF whose jitter fits no lattice, through the probe burst', () => {
+  it('limits an uncapped rAF hidden behind a busy GPU, where no lattice can be read', () => {
+    // Measured on a Windows HD 530 with vsync off: idle callbacks are not
+    // answered at once there, they wait for the GPU like any other.
     let n = 0;
-    const costs = [2.6, 3.9, 3.1, 4.4, 2.9, 3.6, 5.2, 3.3];
+    let idle = 1;
+    const costs = [18.6, 23.9, 21.1, 26.4, 19.9, 22.6, 27.2, 20.3];
     const r = runHost({
       refreshMs: null,
-      get costMs() {
-        return costs[n++ % costs.length];
-      },
-      seconds: 40,
+      idleMs: () => 3 + ((idle = (idle * 7 + 3) % 11) / 11) * 4,
+      costMs: () => costs[n++ % costs.length],
+      seconds: 60,
       intent: 30,
-    } as Parameters<typeof runHost>[0]);
-    expect(r.wiring.snapshot().verdict).toBe('unpaced');
+    });
+    const mean = r.intervals.reduce((a, b) => a + b, 0) / r.intervals.length;
+    expect(mean).toBeGreaterThan(32);
+    expect(mean).toBeLessThan(36);
+    expect(r.wiring.snapshot().targetIntervalMs).toBeCloseTo(33.33, 1);
+    expect(r.callbacks / 60).toBeLessThan(80);
   });
 
   it('does not read its own timer cadence back as a display', () => {

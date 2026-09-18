@@ -1708,7 +1708,7 @@ export const en_CA: EnTranslations = {
       "frameRateCapThirty": "30",
       "frameRateCapNote": "Limits how many images the game draws each second. On a computer that cannot keep up with its display, a lower limit gives a steadier picture and keeps the computer cooler. The limit follows your display, so the real rate can differ a little from the number. Auto lowers the limit only when this computer cannot keep up with its display, and raises it back when it can. (Recommended). Display: no limit.",
       "frameRateCapStatusPaced": "Drawing {fps} images per second on a {hz} Hz display.",
-      "frameRateCapStatusUnpaced": "Display sync is off: drawing {fps} images per second.",
+      "frameRateCapStatusUnpaced": "Limiting to {fps} images per second.",
       "frameRateCapStatusInert": "This display already runs at or under this limit, so the limit changes nothing.",
       "gpuBackend": "Graphics Backend",
       "gpuBackendAuto": "Auto",

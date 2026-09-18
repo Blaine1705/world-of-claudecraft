@@ -88,12 +88,9 @@ export interface FrameCadenceSnapshot {
 /** Every this many rendered frames, one interval is finished on bare rAF skips
  *  even in timer mode, so an `unpaced` verdict can be taken back. */
 const UNPACED_REPROBE_FRAMES = 300;
-/** With a ceiling asked for and no display reading (jittery uncapped rAF fits no
- *  lattice, and a busy callback hides an uncapped loop behind its own cost), a
- *  short burst of do-nothing callbacks asks the question directly. Rare: on a
- *  paced display the burst is a visible hitch of this many slots. */
-const UNKNOWN_PROBE_CALLBACKS = 7;
-const UNKNOWN_PROBE_EVERY_CALLBACKS = 1800;
+/** Callbacks an unread display is given on bare rAF skips before the limiter
+ *  starts sleeping: several estimator recomputes' worth. */
+const UNREAD_BEFORE_SLEEP = 240;
 
 export function parseFrameCeilingIntent(search: string): FrameCeilingIntent | null {
   const raw = new URLSearchParams(search).get('fpscap');
@@ -132,8 +129,7 @@ export class FrameCadenceWiring {
   private rendered = 0;
   private skipped = 0;
   private reprobing = false;
-  private probeLeft = 0;
-  private sinceProbe = UNKNOWN_PROBE_EVERY_CALLBACKS - 120;
+  private unreadCallbacks = 0;
   private readonly autoFrame: FrameCadenceAutoFrame = {
     dtSeconds: 0,
     late: false,
@@ -187,12 +183,6 @@ export class FrameCadenceWiring {
     );
     const holdQuality = this.auto && (this.autoState.ceiling !== 0 || this.autoState.trial);
     this.deps.publish(this.cadence.targetIntervalMs, this.cadence.missShare, holdQuality);
-    if (!exempt && this.probing()) {
-      this.skipped++;
-      this.lastWasIdle = true;
-      this.deps.requestFrame(frame);
-      return true;
-    }
     if (exempt || !frameCadenceActive(this.cadence)) {
       if (exempt) frameCadenceNoteExemptRender(this.cadence, now);
       else {
@@ -241,20 +231,6 @@ export class FrameCadenceWiring {
     if (!this.autoState.trial) this.deps.autoMemory.save(refreshHz, this.autoState.ceiling);
   }
 
-  private probing(): boolean {
-    if (this.intent === 0 || this.estimator.verdict !== 'unknown') {
-      this.probeLeft = 0;
-      return false;
-    }
-    if (this.probeLeft === 0 && ++this.sinceProbe >= UNKNOWN_PROBE_EVERY_CALLBACKS) {
-      this.sinceProbe = 0;
-      this.probeLeft = UNKNOWN_PROBE_CALLBACKS;
-    }
-    if (this.probeLeft === 0) return false;
-    this.probeLeft--;
-    return true;
-  }
-
   snapshot(): FrameCadenceSnapshot {
     const out = this.snapshotOut;
     out.auto = this.auto;
@@ -277,7 +253,12 @@ export class FrameCadenceWiring {
     // interval from spinning a core; the re-probe interval spins on purpose.
     const reprobe = rendered ? this.rendered % UNPACED_REPROBE_FRAMES === 0 : this.reprobing;
     this.reprobing = reprobe;
-    if (this.cadence.paced || reprobe) {
+    // An unread display first gets bare rAF skips: a sleeping chain feeds the
+    // estimator nothing (timer deltas are never ingested), so a paced display
+    // would stay unread for good. Once enough callbacks showed no lattice, sleep.
+    const unread = this.estimator.verdict === 'unknown';
+    this.unreadCallbacks = unread ? this.unreadCallbacks + 1 : 0;
+    if (this.cadence.paced || reprobe || (unread && this.unreadCallbacks < UNREAD_BEFORE_SLEEP)) {
       this.deps.requestFrame(frame);
       return;
     }

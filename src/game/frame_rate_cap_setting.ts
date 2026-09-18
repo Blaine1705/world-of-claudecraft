@@ -43,9 +43,8 @@ export function frameRateCapReading(
   verdict: RefreshVerdict,
   refreshHz: number,
 ): FrameRateCapReading {
-  if (intent === 0 || verdict === 'unknown') return { kind: 'none' };
-  if (verdict === 'unpaced') return { kind: 'unpaced', fps: intent };
-  if (!(refreshHz > 0)) return { kind: 'none' };
+  if (intent === 0) return { kind: 'none' };
+  if (verdict !== 'paced' || !(refreshHz > 0)) return { kind: 'unpaced', fps: intent };
   const divisor = ceilingDivisor(refreshHz, intent);
   if (divisor === 1) return { kind: 'inert' };
   return { kind: 'paced', fps: Math.round(refreshHz / divisor), refreshHz: Math.round(refreshHz) };

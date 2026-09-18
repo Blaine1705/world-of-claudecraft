@@ -1795,7 +1795,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.frameRateCapStatusPaced':
     '{hz} Hz 디스플레이에서 초당 {fps}장을 그리고 있습니다.',
   'hudChrome.options.frameRateCapStatusUnpaced':
-    '디스플레이 동기화가 꺼져 있습니다. 초당 {fps}장을 그리고 있습니다.',
+    '초당 {fps}장으로 제한하고 있습니다.',
   'hudChrome.options.frameRateCapStatusInert':
     '이 디스플레이는 이미 이 제한 이하로 동작하므로 제한을 걸어도 달라지는 것이 없습니다.',
   'hudChrome.options.shaderWarm': '셰이더 사전 워밍업 워커',

@@ -6,8 +6,11 @@
 // base period), which is what a vsync-aligned rAF produces even on a machine that
 // misses slots. `unpaced`: rAF is uncapped (the vsync-off browser flags), seen
 // directly as an idle callback answered faster than any display could refresh.
-// `unknown`: not enough evidence, or timestamps too coarse to tell; every
-// consumer treats it as "do nothing".
+// `unknown`: no lattice to be seen (not enough evidence yet, timestamps too
+// coarse, or an uncapped rAF hidden behind a busy GPU: an idle callback is then
+// NOT answered at once, it waits for the GPU like any other). An explicit
+// ceiling falls back to a plain time limiter there; the automatic mode, which
+// needs slots to mean anything, does nothing.
 //
 // The one bound in here is the range of plausible display rates. It is a
 // property of displays, not a timing calibrated on a machine.
@@ -31,9 +34,12 @@ const LATTICE_FIT_SHARE = 0.85;
 /** A machine that never lands two callbacks on consecutive slots only shows
  *  multiples of the period (33 and 50 ms on a 60 Hz display), so the base is
  *  searched among the shortest delta divided by these. */
-const BASE_SUBDIVISIONS = 4;
+const BASE_SUBDIVISIONS = 3;
+const MULTIPLE_COUNTS = new Uint16Array(MAX_LATTICE_MULTIPLE + 1);
 /** A finer base replaces a coarser one only when it explains this much more. */
 const FINER_BASE_FIT_GAIN = 0.05;
+/** Consecutive recomputes with no lattice before a paced reading is withdrawn. */
+const LATTICE_MISSES_TO_UNKNOWN = 4;
 /** A new base must differ by this ratio to replace the published one. */
 const REFRESH_CHANGE_RATIO = 0.08;
 /** Idle callbacks answered faster than any display, in a row, to call rAF
@@ -53,6 +59,7 @@ export interface RefreshEstimatorState {
   refreshMs: number;
   fastIdleStreak: number;
   slowIdleStreak: number;
+  latticeMisses: number;
 }
 
 export function createRefreshEstimator(): RefreshEstimatorState {
@@ -66,6 +73,7 @@ export function createRefreshEstimator(): RefreshEstimatorState {
     refreshMs: 0,
     fastIdleStreak: 0,
     slowIdleStreak: 0,
+    latticeMisses: 0,
   };
 }
 
@@ -138,14 +146,28 @@ function recompute(state: RefreshEstimatorState): void {
     if (candidate > MAX_PLAUSIBLE_PERIOD_MS) continue;
     const fit = latticeFit(sorted, n, candidate);
     if (fit < LATTICE_FIT_SHARE) continue;
+    // A base nobody ever lands on is only credible when the deltas show two of
+    // its multiples (33 and 50 ms are two and three 60 Hz slots). A fine enough
+    // base "explains" anything, and would read an uncapped loop as a display.
+    if (k > 1 && !showsTwoMultiples(sorted, n, candidate)) continue;
     if (base === 0 || fit > baseFit + FINER_BASE_FIT_GAIN) {
       base = candidate;
       baseFit = fit;
     }
   }
-  // No lattice: coarse timestamps or an irregular source. A paced reading is
-  // kept (hysteresis toward paced); a never-established one stays unknown.
-  if (base === 0) return;
+  // No lattice: coarse timestamps, or a source with no slots at all. One miss
+  // is noise and the paced reading stands (hysteresis toward paced); a run of
+  // them is the answer. Measured on a Windows HD 530 with vsync off: a steady
+  // frame cost reads as a one-cluster lattice (a "39 Hz display"), and only the
+  // deltas that follow break it.
+  if (base === 0) {
+    if (++state.latticeMisses >= LATTICE_MISSES_TO_UNKNOWN && state.verdict === 'paced') {
+      state.verdict = 'unknown';
+      state.refreshMs = 0;
+    }
+    return;
+  }
+  state.latticeMisses = 0;
   const published = state.refreshMs;
   if (
     state.verdict !== 'paced' ||
@@ -171,6 +193,18 @@ function refineBase(sorted: Float64Array, n: number, candidate: number): number 
     slots += multiple;
   }
   return slots > 0 ? sum / slots : candidate;
+}
+
+function showsTwoMultiples(sorted: Float64Array, n: number, base: number): boolean {
+  const counts = MULTIPLE_COUNTS;
+  counts.fill(0);
+  for (let i = 0; i < n; i++) {
+    const multiple = Math.round(sorted[i] / base);
+    if (multiple >= 1 && multiple <= MAX_LATTICE_MULTIPLE) counts[multiple]++;
+  }
+  let seen = 0;
+  for (let m = 1; m <= MAX_LATTICE_MULTIPLE; m++) if (counts[m] >= n * 0.1) seen++;
+  return seen >= 2;
 }
 
 function latticeFit(sorted: Float64Array, n: number, base: number): number {

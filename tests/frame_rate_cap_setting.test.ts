@@ -50,9 +50,9 @@ describe('frame rate cap setting', () => {
     expect(frameRateCapReading(30, 'paced', 30)).toEqual({ kind: 'inert' });
   });
 
-  it('reads the plain limit when display sync is off, and nothing without a reading', () => {
+  it('reads the plain limit when the display cannot be read, and nothing with no limit', () => {
     expect(frameRateCapReading(30, 'unpaced', 0)).toEqual({ kind: 'unpaced', fps: 30 });
-    expect(frameRateCapReading(30, 'unknown', 0)).toEqual({ kind: 'none' });
+    expect(frameRateCapReading(30, 'unknown', 0)).toEqual({ kind: 'unpaced', fps: 30 });
     expect(frameRateCapReading(0, 'paced', 60)).toEqual({ kind: 'none' });
   });
 });
