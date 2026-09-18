@@ -16,7 +16,7 @@ import {
   type ShaderWarmSnapshot,
   shaderWarmSnapshot,
 } from '../render/shader_warm_client';
-import { frameCadenceOverlayLine } from './frame_cadence_wiring';
+import { frameCadenceHealth, frameCadenceOverlayLine } from './frame_cadence_wiring';
 import {
   createHeapSawtooth,
   type HeapFloorTrend,
@@ -29,6 +29,7 @@ import {
   type HitchForensicsState,
 } from './hitch_forensics';
 import type { PerfDiagnosticsPanel } from './perf_diagnostics_panel';
+import type { FrameHealthCadence } from './perf_frame_health_core';
 import { bindPerfPageVisibility } from './perf_page_visibility';
 import { NumberSampleRing, TimedNumberSampleRing } from './sample_ring';
 import { createWorstWindow, type WorstWindowSummary } from './worst_window';
@@ -45,6 +46,9 @@ export interface PerfSnapshot {
   // frame would fake a healthy fps and p95), so this counter is the only
   // evidence the skip is working.
   hiddenPresentSkips: number;
+  // The chosen frame rate ceiling (frame_cadence_wiring.ts), or null when the
+  // display paces the frames: what the frame-health readers judge against.
+  cadence: FrameHealthCadence | null;
   fps: number;
   frameMs: { avg: number; p50: number; p95: number; p99: number; max: number; long50: number };
   windows: {
@@ -1091,6 +1095,7 @@ export class PerfMonitor {
       visibleSeconds: round(visibleSeconds),
       frames: this.frames,
       hiddenPresentSkips: this.hiddenPresentSkips,
+      cadence: frameCadenceHealth(),
       fps: round(this.frames / visibleSeconds),
       frameMs: summarizeFrames(this.frameMs.toArray()),
       windows: {

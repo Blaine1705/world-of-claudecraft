@@ -38,7 +38,11 @@ describe('frame rate cap setting', () => {
       fps: 36,
       refreshHz: 144,
     });
-    expect(frameRateCapReading(60, 'paced', 144)).toEqual({ kind: 'paced', fps: 72, refreshHz: 144 });
+    expect(frameRateCapReading(60, 'paced', 144)).toEqual({
+      kind: 'paced',
+      fps: 72,
+      refreshHz: 144,
+    });
   });
 
   it('says so when the limit changes nothing on this display', () => {

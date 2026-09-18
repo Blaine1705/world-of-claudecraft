@@ -31,6 +31,7 @@ import {
   frameRateCapChoiceFromValue,
   frameRateCapReading,
 } from './frame_rate_cap_setting';
+import type { FrameHealthCadence } from './perf_frame_health_core';
 import { SETTINGS_CHANGE_EVENT, Settings } from './settings';
 
 /** The slice of the presentation gate input the ceiling yields to. */
@@ -286,4 +287,12 @@ export function frameRateCapRowReading(storedValue: number): FrameRateCapReading
   if (intent === null) return { kind: 'none' };
   const s = sharedFrameCadence().snapshot();
   return frameRateCapReading(intent, s.verdict, s.refreshHz);
+}
+
+/** The chosen cadence for the frame-health readers, or null when there is none.
+ *  A fresh small object per perf snapshot (1 Hz), never per frame. */
+export function frameCadenceHealth(): FrameHealthCadence | null {
+  const s = sharedFrameCadence().snapshot();
+  if (!(s.targetIntervalMs > 0)) return null;
+  return { targetIntervalMs: s.targetIntervalMs, missShare: s.missShare };
 }

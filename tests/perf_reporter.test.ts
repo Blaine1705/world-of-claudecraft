@@ -348,6 +348,7 @@ function snapshot(): PerfSnapshot {
     frames: 4800,
     fps: 60,
     hiddenPresentSkips: 0,
+    cadence: null,
     hitchForensics: [],
     postRevealLinks: null,
     shaderWarmAudit: shaderWarmAuditSnapshot(),
