@@ -181,6 +181,8 @@ function runHost(opts: {
   costMs: number | ((nowMs: number) => number);
   /** Uncapped rAF only: how long an idle callback takes to come back. */
   idleMs?: number | (() => number);
+  /** How late the host's timers fire (a coarse timer resolution). */
+  timerLateMs?: number;
   seconds: number;
   intent: 0 | 30 | 60 | 'auto';
   governorShedding?: () => boolean;
@@ -211,9 +213,10 @@ function runHost(opts: {
     },
     setTimer: (cb, ms) => {
       arms++;
-      host.pending = { at: now + ms, timer: true };
+      host.pending = { at: now + ms + (opts.timerLateMs ?? 0), timer: true };
       host.timerCb = cb;
     },
+    now: () => now,
     coverActive: opts.cover ?? (() => false),
     publish: (target, share, hold) => {
       published.target = target;
@@ -332,6 +335,26 @@ describe('frame cadence wiring', () => {
     expect(mean).toBeLessThan(36);
     expect(r.wiring.snapshot().targetIntervalMs).toBeCloseTo(33.33, 1);
     expect(r.callbacks / 60).toBeLessThan(80);
+  });
+
+  it('takes a coarse timer into account instead of landing every frame late', () => {
+    const r = runHost({ refreshMs: null, costMs: 5, seconds: 60, intent: 30, timerLateMs: 14 });
+    const mean = r.intervals.reduce((a, b) => a + b, 0) / r.intervals.length;
+    expect(mean).toBeCloseTo(33.33, 0);
+    expect(r.wiring.snapshot().missShare).toBeLessThan(0.02);
+  });
+
+  it('never reads a steady frame cost on an uncapped loop as a display', () => {
+    let n = 0;
+    const costs = [17.2, 18.4, 16.9, 19.1, 17.7, 18.8, 16.6, 18.1];
+    const r = runHost({
+      refreshMs: null,
+      idleMs: 3,
+      costMs: () => costs[n++ % costs.length],
+      seconds: 60,
+      intent: 0,
+    });
+    expect(r.wiring.snapshot().verdict).not.toBe('paced');
   });
 
   it('does not read its own timer cadence back as a display', () => {

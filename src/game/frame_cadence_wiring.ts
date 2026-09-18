@@ -56,6 +56,8 @@ export interface FrameCadenceGateView {
 export interface FrameCadenceDeps {
   requestFrame: (cb: FrameRequestCallback) => void;
   setTimer: (cb: () => void, ms: number) => void;
+  /** The clock the timer's lateness is measured on (performance.now). */
+  now: () => number;
   /** A loading curtain covers the world: frames are cheap there and the
    *  preparation lanes advance per frame, so skipping would lengthen loading. */
   coverActive: () => boolean;
@@ -88,6 +90,8 @@ export interface FrameCadenceSnapshot {
 /** Every this many rendered frames, one interval is finished on bare rAF skips
  *  even in timer mode, so an `unpaced` verdict can be taken back. */
 const UNPACED_REPROBE_FRAMES = 300;
+/** Per-timer decay of the remembered timer lateness. */
+const TIMER_LATENESS_DECAY = 0.99;
 /** Callbacks an unread display is given on bare rAF skips before the limiter
  *  starts sleeping: several estimator recomputes' worth. */
 const UNREAD_BEFORE_SLEEP = 240;
@@ -136,7 +140,15 @@ export class FrameCadenceWiring {
     refreshHz: 0,
     governorShedding: false,
   };
+  private timerDueAt = 0;
+  private timerLateMs = 0;
   private readonly onTimer = (): void => {
+    // A timer fires late, never early, and by a lot where the host's timer
+    // resolution is coarse (measured on Windows: frames landing a slot late).
+    // The observed lateness, held as a slowly decaying maximum, comes off the
+    // next sleep; what is left of the interval is finished on rAF skips.
+    const late = Math.max(0, this.deps.now() - this.timerDueAt);
+    this.timerLateMs = Math.max(late, this.timerLateMs * TIMER_LATENESS_DECAY);
     if (this.frameCb) this.deps.requestFrame(this.frameCb);
   };
 
@@ -262,12 +274,13 @@ export class FrameCadenceWiring {
       this.deps.requestFrame(frame);
       return;
     }
-    const sleep = frameCadenceSleepMs(this.cadence, now);
+    const sleep = frameCadenceSleepMs(this.cadence, now) - this.timerLateMs;
     if (sleep < 1) {
       this.deps.requestFrame(frame);
       return;
     }
     this.armedByTimer = true;
+    this.timerDueAt = this.deps.now() + sleep;
     this.deps.setTimer(this.onTimer, sleep);
   }
 }
@@ -296,6 +309,7 @@ export function sharedFrameCadence(): FrameCadenceWiring {
   const wiring = new FrameCadenceWiring({
     requestFrame: (cb) => requestAnimationFrame(cb),
     setTimer: (cb, ms) => setTimeout(cb, ms),
+    now: () => performance.now(),
     coverActive: arrivalCoverActive,
     publish: setChosenCadence,
     governorShedding: governorIsShedding,

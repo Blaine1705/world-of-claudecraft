@@ -146,10 +146,14 @@ function recompute(state: RefreshEstimatorState): void {
     if (candidate > MAX_PLAUSIBLE_PERIOD_MS) continue;
     const fit = latticeFit(sorted, n, candidate);
     if (fit < LATTICE_FIT_SHARE) continue;
-    // A base nobody ever lands on is only credible when the deltas show two of
-    // its multiples (33 and 50 ms are two and three 60 Hz slots). A fine enough
-    // base "explains" anything, and would read an uncapped loop as a display.
-    if (k > 1 && !showsTwoMultiples(sorted, n, candidate)) continue;
+    // A lattice needs proof it is one. Two observed multiples are proof (33 and
+    // 50 ms are two and three 60 Hz slots). A single cluster is only a display
+    // when it is as tight as a display's clock: a steady frame cost on an
+    // uncapped loop clusters too, loosely (read as "56.5 Hz" on a Windows HD 530
+    // with vsync off). And a fine enough base "explains" any deltas at all.
+    if (!showsTwoMultiples(sorted, n, candidate)) {
+      if (k > 1 || !tightSingleCluster(sorted, n, candidate)) continue;
+    }
     if (base === 0 || fit > baseFit + FINER_BASE_FIT_GAIN) {
       base = candidate;
       baseFit = fit;
@@ -205,6 +209,25 @@ function showsTwoMultiples(sorted: Float64Array, n: number, base: number): boole
   let seen = 0;
   for (let m = 1; m <= MAX_LATTICE_MULTIPLE; m++) if (counts[m] >= n * 0.1) seen++;
   return seen >= 2;
+}
+
+/** The deltas one period long, spread over less than this share of it. Wide
+ *  enough for 1 ms timestamp coarsening at 60 Hz (16 and 17 ms). */
+const DISPLAY_CLOCK_SPREAD = 0.08;
+
+function tightSingleCluster(sorted: Float64Array, n: number, base: number): boolean {
+  let first = -1;
+  let last = -1;
+  for (let i = 0; i < n; i++) {
+    if (Math.round(sorted[i] / base) !== 1) continue;
+    if (first < 0) first = i;
+    last = i;
+  }
+  if (first < 0) return false;
+  const span = last - first;
+  const lo = sorted[first + Math.floor(span * 0.1)];
+  const hi = sorted[first + Math.floor(span * 0.9)];
+  return hi - lo <= base * DISPLAY_CLOCK_SPREAD;
 }
 
 function latticeFit(sorted: Float64Array, n: number, base: number): number {
