@@ -9,8 +9,8 @@ import { materialSourceKey } from '../src/sim/material_sources';
 import {
   boundedMaterialSourceRows,
   materialFungibleUnitCount,
-  materialSourcesForDisplay,
   materialSourceSummary,
+  materialSourcesForDisplay,
   suppressesLegacyGatheredLine,
 } from '../src/ui/material_sources_view';
 
