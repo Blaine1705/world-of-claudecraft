@@ -9,25 +9,190 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.options.frameRateCap",
+    "hudChrome.options.frameRateCapAuto",
+    "hudChrome.options.frameRateCapDisplay",
+    "hudChrome.options.frameRateCapNote",
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapStatusInert",
+    "hudChrome.options.frameRateCapStatusPaced",
+    "hudChrome.options.frameRateCapStatusUnpaced",
+    "hudChrome.options.frameRateCapThirty"
+  ],
+  "es_ES": [
+    "hudChrome.options.frameRateCap",
+    "hudChrome.options.frameRateCapAuto",
+    "hudChrome.options.frameRateCapDisplay",
+    "hudChrome.options.frameRateCapNote",
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapStatusInert",
+    "hudChrome.options.frameRateCapStatusPaced",
+    "hudChrome.options.frameRateCapStatusUnpaced",
+    "hudChrome.options.frameRateCapThirty"
+  ],
+  "fr_FR": [
+    "hudChrome.options.frameRateCap",
+    "hudChrome.options.frameRateCapAuto",
+    "hudChrome.options.frameRateCapDisplay",
+    "hudChrome.options.frameRateCapNote",
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapStatusInert",
+    "hudChrome.options.frameRateCapStatusPaced",
+    "hudChrome.options.frameRateCapStatusUnpaced",
+    "hudChrome.options.frameRateCapThirty"
+  ],
+  "fr_CA": [
+    "hudChrome.options.frameRateCap",
+    "hudChrome.options.frameRateCapAuto",
+    "hudChrome.options.frameRateCapDisplay",
+    "hudChrome.options.frameRateCapNote",
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapStatusInert",
+    "hudChrome.options.frameRateCapStatusPaced",
+    "hudChrome.options.frameRateCapStatusUnpaced",
+    "hudChrome.options.frameRateCapThirty"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "hudChrome.options.frameRateCap",
+    "hudChrome.options.frameRateCapAuto",
+    "hudChrome.options.frameRateCapDisplay",
+    "hudChrome.options.frameRateCapNote",
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapStatusInert",
+    "hudChrome.options.frameRateCapStatusPaced",
+    "hudChrome.options.frameRateCapStatusUnpaced",
+    "hudChrome.options.frameRateCapThirty"
+  ],
+  "de_DE": [
+    "hudChrome.options.frameRateCap",
+    "hudChrome.options.frameRateCapAuto",
+    "hudChrome.options.frameRateCapDisplay",
+    "hudChrome.options.frameRateCapNote",
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapStatusInert",
+    "hudChrome.options.frameRateCapStatusPaced",
+    "hudChrome.options.frameRateCapStatusUnpaced",
+    "hudChrome.options.frameRateCapThirty"
+  ],
+  "zh_CN": [
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapThirty"
+  ],
+  "zh_TW": [
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapThirty"
+  ],
+  "ko_KR": [
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapThirty"
+  ],
+  "ja_JP": [
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapThirty"
+  ],
+  "pt_BR": [
+    "hudChrome.options.frameRateCap",
+    "hudChrome.options.frameRateCapAuto",
+    "hudChrome.options.frameRateCapDisplay",
+    "hudChrome.options.frameRateCapNote",
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapStatusInert",
+    "hudChrome.options.frameRateCapStatusPaced",
+    "hudChrome.options.frameRateCapStatusUnpaced",
+    "hudChrome.options.frameRateCapThirty"
+  ],
+  "ru_RU": [
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapThirty"
+  ],
+  "cs_CZ": [
+    "hudChrome.options.frameRateCap",
+    "hudChrome.options.frameRateCapAuto",
+    "hudChrome.options.frameRateCapDisplay",
+    "hudChrome.options.frameRateCapNote",
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapStatusInert",
+    "hudChrome.options.frameRateCapStatusPaced",
+    "hudChrome.options.frameRateCapStatusUnpaced",
+    "hudChrome.options.frameRateCapThirty"
+  ],
+  "nl_NL": [
+    "hudChrome.options.frameRateCap",
+    "hudChrome.options.frameRateCapAuto",
+    "hudChrome.options.frameRateCapDisplay",
+    "hudChrome.options.frameRateCapNote",
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapStatusInert",
+    "hudChrome.options.frameRateCapStatusPaced",
+    "hudChrome.options.frameRateCapStatusUnpaced",
+    "hudChrome.options.frameRateCapThirty"
+  ],
+  "pl_PL": [
+    "hudChrome.options.frameRateCap",
+    "hudChrome.options.frameRateCapAuto",
+    "hudChrome.options.frameRateCapDisplay",
+    "hudChrome.options.frameRateCapNote",
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapStatusInert",
+    "hudChrome.options.frameRateCapStatusPaced",
+    "hudChrome.options.frameRateCapStatusUnpaced",
+    "hudChrome.options.frameRateCapThirty"
+  ],
+  "id_ID": [
+    "hudChrome.options.frameRateCap",
+    "hudChrome.options.frameRateCapAuto",
+    "hudChrome.options.frameRateCapDisplay",
+    "hudChrome.options.frameRateCapNote",
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapStatusInert",
+    "hudChrome.options.frameRateCapStatusPaced",
+    "hudChrome.options.frameRateCapStatusUnpaced",
+    "hudChrome.options.frameRateCapThirty"
+  ],
+  "tr_TR": [
+    "hudChrome.options.frameRateCap",
+    "hudChrome.options.frameRateCapAuto",
+    "hudChrome.options.frameRateCapDisplay",
+    "hudChrome.options.frameRateCapNote",
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapStatusInert",
+    "hudChrome.options.frameRateCapStatusPaced",
+    "hudChrome.options.frameRateCapStatusUnpaced",
+    "hudChrome.options.frameRateCapThirty"
+  ],
+  "sv_SE": [
+    "hudChrome.options.frameRateCap",
+    "hudChrome.options.frameRateCapAuto",
+    "hudChrome.options.frameRateCapDisplay",
+    "hudChrome.options.frameRateCapNote",
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapStatusInert",
+    "hudChrome.options.frameRateCapStatusPaced",
+    "hudChrome.options.frameRateCapStatusUnpaced",
+    "hudChrome.options.frameRateCapThirty"
+  ],
+  "vi_VN": [
+    "hudChrome.options.frameRateCap",
+    "hudChrome.options.frameRateCapAuto",
+    "hudChrome.options.frameRateCapDisplay",
+    "hudChrome.options.frameRateCapNote",
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapStatusInert",
+    "hudChrome.options.frameRateCapStatusPaced",
+    "hudChrome.options.frameRateCapStatusUnpaced",
+    "hudChrome.options.frameRateCapThirty"
+  ],
+  "da_DK": [
+    "hudChrome.options.frameRateCap",
+    "hudChrome.options.frameRateCapAuto",
+    "hudChrome.options.frameRateCapDisplay",
+    "hudChrome.options.frameRateCapNote",
+    "hudChrome.options.frameRateCapSixty",
+    "hudChrome.options.frameRateCapStatusInert",
+    "hudChrome.options.frameRateCapStatusPaced",
+    "hudChrome.options.frameRateCapStatusUnpaced",
+    "hudChrome.options.frameRateCapThirty"
+  ]
 };

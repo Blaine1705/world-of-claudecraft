@@ -37,6 +37,7 @@ import {
   requestDesktopRestart,
 } from '../game/desktop_next_launch_settings';
 import { desktopDiscordPresenceSupported } from '../game/discord_presence';
+import { frameRateCapRowReading } from '../game/frame_cadence_wiring';
 import {
   GAMEPAD_CANCEL,
   GAMEPAD_CONFIRM,
@@ -988,7 +989,10 @@ export class OptionsWindow {
       if (!c.statusAlert) status.setAttribute('aria-live', 'polite');
       const values: Record<string, string> = {};
       for (const [name_, key_] of Object.entries(c.statusValueKeys ?? {})) values[name_] = t(key_);
-      status.textContent = c.statusValueKeys ? t(c.statusKey, values) : t(c.statusKey);
+      for (const [name_, n] of Object.entries(c.statusNumbers ?? {}))
+        values[name_] = formatNumber(n);
+      status.textContent =
+        c.statusValueKeys || c.statusNumbers ? t(c.statusKey, values) : t(c.statusKey);
       row.appendChild(status);
     }
     parent.appendChild(row);
@@ -1376,6 +1380,7 @@ export class OptionsWindow {
               // setting, so that host gets no row. The client's resolver owns
               // that rule; asking it is what keeps the two from drifting.
               shaderWarmChoice: shaderWarmChoiceAvailable(),
+              frameRateCapReadingFor: frameRateCapRowReading,
             },
           )
         : [];

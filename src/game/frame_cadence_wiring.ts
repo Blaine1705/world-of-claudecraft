@@ -25,6 +25,13 @@ import {
   frameCadenceShouldRender,
   frameCadenceSleepMs,
 } from './frame_cadence_core';
+import {
+  explicitCeilingIntent,
+  type FrameRateCapReading,
+  frameRateCapChoiceFromValue,
+  frameRateCapReading,
+} from './frame_rate_cap_setting';
+import { SETTINGS_CHANGE_EVENT, Settings } from './settings';
 
 /** The slice of the presentation gate input the ceiling yields to. */
 export interface FrameCadenceGateView {
@@ -202,22 +209,41 @@ export class FrameCadenceWiring {
 
 let shared: FrameCadenceWiring | null = null;
 
-/** The game client's one instance. `?fpscap=30|60|display` sets the intent and
- *  exposes a dev handle so a bench arm toggles it without a reload. */
+function storedIntent(): FrameCeilingIntent {
+  try {
+    const choice = frameRateCapChoiceFromValue(new Settings().get('frameRateCap'));
+    return explicitCeilingIntent(choice) ?? 0;
+  } catch {
+    return 0;
+  }
+}
+
+/**
+ * The game client's one instance. The intent is the player's stored setting,
+ * re-read on every settings broadcast (the row is live, and no rebuild key).
+ * `?fpscap=30|60|display` overrides it for the session: the bench arm, and the
+ * support kill switch. It also exposes a dev handle to toggle without a reload.
+ */
 export function sharedFrameCadence(): FrameCadenceWiring {
   if (shared) return shared;
-  shared = new FrameCadenceWiring({
+  const wiring = new FrameCadenceWiring({
     requestFrame: (cb) => requestAnimationFrame(cb),
     setTimer: (cb, ms) => setTimeout(cb, ms),
     coverActive: arrivalCoverActive,
     publish: setChosenCadence,
   });
+  shared = wiring;
   const fromUrl = typeof location === 'undefined' ? null : parseFrameCeilingIntent(location.search);
   if (fromUrl !== null) {
-    shared.setIntent(fromUrl);
-    (globalThis as { __wocFrameCadence?: FrameCadenceWiring }).__wocFrameCadence = shared;
+    wiring.setIntent(fromUrl);
+    (globalThis as { __wocFrameCadence?: FrameCadenceWiring }).__wocFrameCadence = wiring;
+    return wiring;
   }
-  return shared;
+  wiring.setIntent(storedIntent());
+  if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+    window.addEventListener(SETTINGS_CHANGE_EVENT, () => wiring.setIntent(storedIntent()));
+  }
+  return wiring;
 }
 
 /** frame()'s first statement in main.ts, in place of its bare re-arm. */
@@ -252,4 +278,12 @@ export function frameCadenceOverlayLine(): string {
   const target =
     s.targetIntervalMs > 0 ? `${s.targetIntervalMs.toFixed(1)}ms /${s.divisor}` : 'inert';
   return `cap ${cap}  ${s.verdict} ${s.refreshHz.toFixed(1)}Hz  ${target}  miss ${(s.missShare * 100).toFixed(1)}%  skip ${s.skipped}`;
+}
+
+/** The options row's reading for a stored value, on the display as read now. */
+export function frameRateCapRowReading(storedValue: number): FrameRateCapReading {
+  const intent = explicitCeilingIntent(frameRateCapChoiceFromValue(storedValue));
+  if (intent === null) return { kind: 'none' };
+  const s = sharedFrameCadence().snapshot();
+  return frameRateCapReading(intent, s.verdict, s.refreshHz);
 }

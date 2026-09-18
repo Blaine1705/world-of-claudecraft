@@ -1797,6 +1797,17 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.forceHighPerfGpu': '専用ゲーミングGPUを使用',
   'hudChrome.options.forceHighPerfGpuNote':
     '既定でオン：デスクトップ版はこのコンピューターの専用ゲーミングGPUを要求します。ゲームが起動しない、起動後に画面が真っ暗になる、またはノートパソコンの画面が映らない場合はオフにしてください。この設定は次回ゲームを起動したときに反映されます。',
+  'hudChrome.options.frameRateCap': 'フレームレート制限',
+  'hudChrome.options.frameRateCapAuto': '自動',
+  'hudChrome.options.frameRateCapDisplay': 'ディスプレイ',
+  'hudChrome.options.frameRateCapNote':
+    'ゲームが1秒間に描画する画像の数を制限します。ディスプレイの速度に追いつけないコンピューターでは、低い制限にすると映像がより安定し、本体の発熱も抑えられます。制限はディスプレイに合わせて決まるため、実際の値は数値と少し異なる場合があります。ディスプレイ：制限なし。自動：現時点ではディスプレイと同じです。',
+  'hudChrome.options.frameRateCapStatusPaced':
+    '{hz} Hz のディスプレイで毎秒 {fps} 枚を描画しています。',
+  'hudChrome.options.frameRateCapStatusUnpaced':
+    'ディスプレイ同期はオフです。毎秒 {fps} 枚を描画しています。',
+  'hudChrome.options.frameRateCapStatusInert':
+    'このディスプレイはすでにこの制限以下で動作しているため、制限による変化はありません。',
   'hudChrome.options.shaderWarm': 'シェーダー事前ウォームアップ ワーカー',
   'hudChrome.options.shaderWarmAuto': '自動',
   'hudChrome.options.shaderWarmOff': 'オフ',

@@ -1733,6 +1733,15 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.forceHighPerfGpu': '使用獨立遊戲顯示卡',
   'hudChrome.options.forceHighPerfGpuNote':
     '預設開啟：桌面版會向本機要求使用獨立遊戲顯示卡。若遊戲無法啟動、啟動後黑屏，或筆記型電腦螢幕沒有畫面，請關閉此選項。此設定會在下次啟動遊戲時生效。',
+  'hudChrome.options.frameRateCap': '影格率上限',
+  'hudChrome.options.frameRateCapAuto': '自動',
+  'hudChrome.options.frameRateCapDisplay': '顯示器',
+  'hudChrome.options.frameRateCapNote':
+    '限制遊戲每秒繪製的畫面數量。如果電腦跟不上顯示器的速度，較低的上限會讓畫面更平穩，也能讓電腦更涼爽。上限會跟隨你的顯示器，因此實際數值可能與數字略有不同。顯示器：不限制。自動：目前與「顯示器」相同。',
+  'hudChrome.options.frameRateCapStatusPaced': '正在 {hz} Hz 的顯示器上每秒繪製 {fps} 幀。',
+  'hudChrome.options.frameRateCapStatusUnpaced': '顯示同步已關閉：每秒繪製 {fps} 幀。',
+  'hudChrome.options.frameRateCapStatusInert':
+    '此顯示器的更新率已不高於該上限，因此上限不會帶來任何變化。',
   'hudChrome.options.shaderWarm': '著色器預熱工作執行緒',
   'hudChrome.options.shaderWarmAuto': '自動',
   'hudChrome.options.shaderWarmOff': '關閉',

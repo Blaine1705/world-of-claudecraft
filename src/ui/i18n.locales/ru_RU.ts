@@ -1811,6 +1811,20 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.forceHighPerfGpu': 'Использовать дискретную игровую видеокарту',
   'hudChrome.options.forceHighPerfGpuNote':
     'Включено по умолчанию: настольное приложение запрашивает у компьютера дискретную игровую видеокарту. Отключите, если игра не запускается, показывает черный экран или экран ноутбука гаснет. Настройка применится при следующем запуске игры.',
+  'hudChrome.options.frameRateCap':
+    'Ограничение частоты кадров',
+  'hudChrome.options.frameRateCapAuto':
+    'Авто',
+  'hudChrome.options.frameRateCapDisplay':
+    'Дисплей',
+  'hudChrome.options.frameRateCapNote':
+    'Ограничивает число изображений, которые игра рисует в секунду. На компьютере, который не успевает за своим дисплеем, более низкий предел делает картинку ровнее и снижает нагрев. Предел подстраивается под дисплей, поэтому реальное значение может немного отличаться от числа. Дисплей: без ограничения. Авто: пока то же, что и «Дисплей».',
+  'hudChrome.options.frameRateCapStatusPaced':
+    'Рисуется {fps} изображений в секунду на дисплее {hz} Гц.',
+  'hudChrome.options.frameRateCapStatusUnpaced':
+    'Синхронизация с дисплеем выключена: рисуется {fps} изображений в секунду.',
+  'hudChrome.options.frameRateCapStatusInert':
+    'Этот дисплей уже работает на этой частоте или ниже, поэтому предел ничего не меняет.',
   'hudChrome.options.shaderWarm': 'Фоновый прогрев шейдеров',
   'hudChrome.options.shaderWarmAuto': 'Авто',
   'hudChrome.options.shaderWarmOff': 'Выкл.',

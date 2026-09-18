@@ -1787,6 +1787,17 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.forceHighPerfGpu': '전용 게이밍 GPU 사용',
   'hudChrome.options.forceHighPerfGpuNote':
     '기본값 켜짐: 데스크톱 앱이 이 컴퓨터의 전용 게이밍 GPU를 요청합니다. 게임이 시작되지 않거나, 시작 후 검은 화면만 보이거나, 노트북 화면이 나오지 않으면 끄세요. 이 설정은 다음에 게임을 시작할 때 적용됩니다.',
+  'hudChrome.options.frameRateCap': '프레임 속도 제한',
+  'hudChrome.options.frameRateCapAuto': '자동',
+  'hudChrome.options.frameRateCapDisplay': '디스플레이',
+  'hudChrome.options.frameRateCapNote':
+    '게임이 초당 그리는 이미지 수를 제한합니다. 디스플레이 속도를 따라가지 못하는 컴퓨터에서는 제한을 낮추면 화면이 더 안정되고 컴퓨터 발열도 줄어듭니다. 제한은 디스플레이에 맞춰지므로 실제 값은 숫자와 조금 다를 수 있습니다. 디스플레이: 제한 없음. 자동: 현재는 디스플레이와 같습니다.',
+  'hudChrome.options.frameRateCapStatusPaced':
+    '{hz} Hz 디스플레이에서 초당 {fps}장을 그리고 있습니다.',
+  'hudChrome.options.frameRateCapStatusUnpaced':
+    '디스플레이 동기화가 꺼져 있습니다. 초당 {fps}장을 그리고 있습니다.',
+  'hudChrome.options.frameRateCapStatusInert':
+    '이 디스플레이는 이미 이 제한 이하로 동작하므로 제한을 걸어도 달라지는 것이 없습니다.',
   'hudChrome.options.shaderWarm': '셰이더 사전 워밍업 워커',
   'hudChrome.options.shaderWarmAuto': '자동',
   'hudChrome.options.shaderWarmOff': '끄기',
