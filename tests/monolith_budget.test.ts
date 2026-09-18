@@ -478,7 +478,12 @@ const MONOLITHS: MonolithRow[] = [
     // (with the quest tracker's identical existing port literal) behind a
     // shared trackerCollapseSettings factory in src/ui/tracker_collapse_settings.ts,
     // leaving both call sites one line each. Exact count, zero slack.
-    ceiling: 18299,
+    // Re-pinned to the exact composed v0.44.0 batch count after #4087's Town
+    // Focus pending HUD state and #4096's spectate action-bar hold merged
+    // beside #4099. The shared collapse-settings extraction still paid its
+    // own map work; this is the integrated release tree's measured zero-slack
+    // count (`wc -l < src/ui/hud.ts`).
+    ceiling: 18307,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
