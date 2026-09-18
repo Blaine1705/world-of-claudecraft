@@ -2103,6 +2103,16 @@
     text-overflow: clip;
     flex-shrink: 0;
   }
+  /* An instruction lesson tracks ONE objective, so the band's four-line budget
+     (sized for a quest list) is what clips it: the longest calligraphy round
+     instructions need five lines at the minimum strip width, six in Cyrillic
+     under Linux fallback fonts. Two extra lines of room, scoped to the lesson
+     so an ordinary quest list keeps its budget; the strip sits between the
+     move zone and the action ring, so the extra height meets neither.
+     Pinned by tests/browser/quest_strip.browser.test.ts. */
+  body.mobile-touch .quest-strip-objs:has(.quest-strip-obj.instruction) {
+    max-height: calc(var(--quest-strip-objs-max-height) + 2.6em);
+  }
   body.mobile-touch .quest-strip-more {
     opacity: 0.75;
   }
