@@ -2318,6 +2318,21 @@ export const en_XA: EnTranslations = {
       "crafting": "[Çŕáƒţíñĝ]",
       "openProfessions": "[Óþéñ Þŕóƒéššíóñš]"
     },
+    "treasureMap": {
+      "close": "[Çļóšé ţŕéášúŕé ɱáþ]",
+      "zone": "[Šóɱéŵĥéŕé íñ {zone}]",
+      "hint": "[Ƒíñð ţĥé ĝŕóúñð ţĥíš ɱáþ šĥóŵš, šţáñð óñ ţĥé Ẋ, áñð úšé ţĥé ɱáþ áĝáíñ ţó ðíĝ. Á ʋáúļţ óþéñš ƒóŕ ýóú áñð ýóúŕ þáŕţý.]",
+      "upgradeHeading": "[Ŕéðŕáŵ ţĥíš ɱáþ áš: {rarity}]",
+      "upgradeCost": "[{cost} {currency}]",
+      "balance": "[Ýóú ĥáʋé {amount}]",
+      "upgradeMaxed": "[Ñó çáŕţóĝŕáþĥéŕ çóúļð ƀéţţéŕ ţĥíš ɱáþ.]",
+      "rarity": {
+        "common": "[Çóɱɱóñ]",
+        "rare": "[Ŕáŕé]",
+        "epic": "[Éþíç]",
+        "legendary": "[Ļéĝéñðáŕý]"
+      }
+    },
     "currencies": {
       "intro": "[Ñóñé óƒ ţĥéšé ţáķé ƀáĝ šþáçé. Çóíñ šţáýš íñ ýóúŕ ƀáĝ áš áļŵáýš.]",
       "activities": "[Áçţíʋíţíéš]",
@@ -11584,7 +11599,14 @@ export const en_XA: EnTranslations = {
       "clueHuntStep": "[Çļúé {step} óƒ {total} šóļʋéð: {title}]",
       "clueHuntDone": "[Ţŕéášúŕé ĥúñţ çóɱþļéţé: {title}. Ţĥé çášķéţ íš ýóúŕš.]",
       "clueHuntAbandoned": "[Ţŕéášúŕé ĥúñţ áƀáñðóñéð: {title}]",
-      "clueCasketOpened": "[Ţĥé çášķéţ ĥóļðš {money} áñð {items}.]"
+      "clueCasketOpened": "[Ţĥé çášķéţ ĥóļðš {money} áñð {items}.]",
+      "treasureMapEarned": "[Éʋéŕý ŵóŕļð ɋúéšţ óƒ ţĥé ðáý íš ðóñé: ýóú ƒóúñð á {map}.]",
+      "treasureMapLost": "[Éʋéŕý ŵóŕļð ɋúéšţ óƒ ţĥé ðáý íš ðóñé, ƀúţ ýóúŕ ƀáĝš ĥáʋé ñó ŕóóɱ ƒóŕ ţĥé ţŕéášúŕé ɱáþ.]",
+      "treasureMapRead": "[Ýóú šţúðý ţĥé {map}. Ţĥé Ẋ ļíéš šóɱéŵĥéŕé íñ {zone}.]",
+      "treasureMapUpgraded": "[Ţĥé ɱáþ íš ŕéðŕáŵñ íñ ƒíñéŕ íñķ: íţ íš ñóŵ á {map}.]",
+      "treasureVaultOpened": "[Ţĥé ĝŕóúñð ĝíʋéš ŵáý. Á ʋáúļţ šţáñðš óþéñ ƀéƒóŕé ýóú.]",
+      "treasureVaultLooted": "[Ţĥé ʋáúļţ ĥóļðš {money} áñð {items}.]",
+      "treasureVaultCapped": "[Ýóú ĥáʋé šĥáŕéð íñ éñóúĝĥ ʋáúļţš ţóðáý; ţĥíš óñé þáýš ýóú ñóţĥíñĝ.]"
     },
     "errors": {
       "unavailable": "[Ţĥáţ ɋúéšţ íš ñóţ áʋáíļáƀļé.]",

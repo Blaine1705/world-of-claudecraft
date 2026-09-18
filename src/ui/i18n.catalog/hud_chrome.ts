@@ -2936,6 +2936,23 @@ export const hudChromeStrings = {
   // The Currencies tab (src/ui/hud/currencies/): every spendable balance that
   // is not coin. The faction rows stay pending until the World Quests scope's
   // Stage 2 chooses the currency model.
+  // The treasure map window (src/ui/hud/treasure/): the parchment a read map
+  // opens, and the faction-currency offer to raise it a rarity.
+  treasureMap: {
+    close: 'Close treasure map',
+    zone: 'Somewhere in {zone}',
+    hint: 'Find the ground this map shows, stand on the X, and use the map again to dig. A vault opens for you and your party.',
+    upgradeHeading: 'Redraw this map as: {rarity}',
+    upgradeCost: '{cost} {currency}',
+    balance: 'You have {amount}',
+    upgradeMaxed: 'No cartographer could better this map.',
+    rarity: {
+      common: 'Common',
+      rare: 'Rare',
+      epic: 'Epic',
+      legendary: 'Legendary',
+    },
+  },
   currencies: {
     intro: 'None of these take bag space. Coin stays in your bag as always.',
     activities: 'Activities',

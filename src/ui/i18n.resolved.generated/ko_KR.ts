@@ -2318,6 +2318,21 @@ export const ko_KR: EnTranslations = {
       "crafting": "제작",
       "openProfessions": "전문 기술 열기"
     },
+    "treasureMap": {
+      "close": "Close treasure map",
+      "zone": "Somewhere in {zone}",
+      "hint": "Find the ground this map shows, stand on the X, and use the map again to dig. A vault opens for you and your party.",
+      "upgradeHeading": "Redraw this map as: {rarity}",
+      "upgradeCost": "{cost} {currency}",
+      "balance": "You have {amount}",
+      "upgradeMaxed": "No cartographer could better this map.",
+      "rarity": {
+        "common": "Common",
+        "rare": "Rare",
+        "epic": "Epic",
+        "legendary": "Legendary"
+      }
+    },
     "currencies": {
       "intro": "모두 가방 칸을 차지하지 않습니다. 동전은 늘 그렇듯 가방에 있습니다.",
       "activities": "활동",
@@ -11584,7 +11599,14 @@ export const ko_KR: EnTranslations = {
       "clueHuntStep": "단서 {step}/{total} 해결: {title}",
       "clueHuntDone": "보물찾기 완료: {title}. 보물 상자는 당신 것입니다.",
       "clueHuntAbandoned": "보물찾기 포기: {title}",
-      "clueCasketOpened": "보물 상자에는 {money}과(와) {items}이(가) 들어 있었습니다."
+      "clueCasketOpened": "보물 상자에는 {money}과(와) {items}이(가) 들어 있었습니다.",
+      "treasureMapEarned": "Every world quest of the day is done: you found a {map}.",
+      "treasureMapLost": "Every world quest of the day is done, but your bags have no room for the treasure map.",
+      "treasureMapRead": "You study the {map}. The X lies somewhere in {zone}.",
+      "treasureMapUpgraded": "The map is redrawn in finer ink: it is now a {map}.",
+      "treasureVaultOpened": "The ground gives way. A vault stands open before you.",
+      "treasureVaultLooted": "The vault holds {money} and {items}.",
+      "treasureVaultCapped": "You have shared in enough vaults today; this one pays you nothing."
     },
     "errors": {
       "unavailable": "그 퀘스트는 이용할 수 없습니다.",

@@ -795,6 +795,9 @@
     --color-quality-rare: #0070dd;
     --color-quality-epic: #a335ee;
     --color-quality-legendary: #ff8000;
+    /* Treasure map parchment and its X (src/ui/hud/treasure/). */
+    --color-treasure-parchment: #d8c59a;
+    --color-treasure-ink: #a01818;
     /* Controller face-button glyph tints (the cross hotbar and pad prompts). */
     --color-pad-a: #5fbf5a;
     --color-pad-b: #e04b4b;

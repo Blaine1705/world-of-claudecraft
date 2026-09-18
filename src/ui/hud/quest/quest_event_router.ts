@@ -23,14 +23,20 @@ interface QuestEventHost {
   ): void;
   questDialog: { refresh(): void };
   worldQuestPuzzleWindow: { applyEventPresentation(presentation: QuestEventPresentation): void };
+  treasureMapWindow: { open(): void; refresh(): void };
 }
 
 /** Present one sim event through the quest channels. True when it was a quest event,
  *  so the HUD's per-event switch skips it. */
 export function applyQuestEventPresentation(hud: object, ev: SimEvent): boolean {
+  const h = hud as QuestEventHost;
+  // A read treasure map opens its parchment (a re-read has no log line, so
+  // this runs before the presentation check); an upgrade or a dig repaints it.
+  if (ev.type === 'treasureMapRead') h.treasureMapWindow.open();
+  else if (ev.type === 'treasureMapUpgraded' || ev.type === 'treasureVaultOpened')
+    h.treasureMapWindow.refresh();
   const questEvent = questEventPresentation(ev);
   if (!questEvent) return false;
-  const h = hud as QuestEventHost;
   if (questEvent.logText) h.log(questEvent.logText, HUD_LOG.PROGRESS);
   if (questEvent.flashText) h.questBanner.show(questEvent.flashText);
   if (questEvent.bannerText) h.showBanner(questEvent.bannerText);

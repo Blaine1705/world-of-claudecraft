@@ -2318,6 +2318,21 @@ export const zh_TW: EnTranslations = {
       "crafting": "製作",
       "openProfessions": "開啟專業"
     },
+    "treasureMap": {
+      "close": "Close treasure map",
+      "zone": "Somewhere in {zone}",
+      "hint": "Find the ground this map shows, stand on the X, and use the map again to dig. A vault opens for you and your party.",
+      "upgradeHeading": "Redraw this map as: {rarity}",
+      "upgradeCost": "{cost} {currency}",
+      "balance": "You have {amount}",
+      "upgradeMaxed": "No cartographer could better this map.",
+      "rarity": {
+        "common": "Common",
+        "rare": "Rare",
+        "epic": "Epic",
+        "legendary": "Legendary"
+      }
+    },
     "currencies": {
       "intro": "這些都不佔背包空間。金幣照舊放在背包裡。",
       "activities": "活動",
@@ -11584,7 +11599,14 @@ export const zh_TW: EnTranslations = {
       "clueHuntStep": "已解開第{step}/{total}條線索：{title}",
       "clueHuntDone": "尋寶完成：{title}。寶箱歸你了。",
       "clueHuntAbandoned": "已放棄尋寶：{title}",
-      "clueCasketOpened": "寶箱中有{money}和{items}。"
+      "clueCasketOpened": "寶箱中有{money}和{items}。",
+      "treasureMapEarned": "Every world quest of the day is done: you found a {map}.",
+      "treasureMapLost": "Every world quest of the day is done, but your bags have no room for the treasure map.",
+      "treasureMapRead": "You study the {map}. The X lies somewhere in {zone}.",
+      "treasureMapUpgraded": "The map is redrawn in finer ink: it is now a {map}.",
+      "treasureVaultOpened": "The ground gives way. A vault stands open before you.",
+      "treasureVaultLooted": "The vault holds {money} and {items}.",
+      "treasureVaultCapped": "You have shared in enough vaults today; this one pays you nothing."
     },
     "errors": {
       "unavailable": "該任務不可用。",

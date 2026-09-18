@@ -14,6 +14,7 @@ function fakeHud() {
     showBanner: vi.fn(),
     questDialog: { refresh: vi.fn() },
     worldQuestPuzzleWindow: { applyEventPresentation: vi.fn() },
+    treasureMapWindow: { open: vi.fn(), refresh: vi.fn() },
   };
 }
 

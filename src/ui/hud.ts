@@ -939,6 +939,7 @@ import { wocBalanceChipHtml } from './woc_balance_chip';
 import { promptWocMarketBrowserVisit, wocMarketToggleAction } from './woc_market_link';
 import { type WocMarketHooks, WocMarketWindow } from './woc_market_window';
 import { installWorldDropTarget } from './world_drop_target';
+import { TreasureMapWindow } from './hud/treasure';
 import { WorldQuestPuzzleWindow } from './world_quest_puzzle_window';
 import { formatXp, type XpBarView, xpBarView } from './xp_bar';
 import { XpBarPainter } from './xp_bar_painter';
@@ -6060,6 +6061,7 @@ export class Hud {
     insertQuestChatLink: (questId) => this.insertQuestChatLink(questId),
     showOnMap: (x, z) => this.showFinderOnMap(x, z),
   });
+  private readonly treasureMapWindow = new TreasureMapWindow({ world: () => this.sim });
   private readonly worldQuestPuzzleWindow = new WorldQuestPuzzleWindow({
     document,
     world: () => this.sim,

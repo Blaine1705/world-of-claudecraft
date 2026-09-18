@@ -2318,6 +2318,21 @@ export const ja_JP: EnTranslations = {
       "crafting": "製作",
       "openProfessions": "職業を開く"
     },
+    "treasureMap": {
+      "close": "Close treasure map",
+      "zone": "Somewhere in {zone}",
+      "hint": "Find the ground this map shows, stand on the X, and use the map again to dig. A vault opens for you and your party.",
+      "upgradeHeading": "Redraw this map as: {rarity}",
+      "upgradeCost": "{cost} {currency}",
+      "balance": "You have {amount}",
+      "upgradeMaxed": "No cartographer could better this map.",
+      "rarity": {
+        "common": "Common",
+        "rare": "Rare",
+        "epic": "Epic",
+        "legendary": "Legendary"
+      }
+    },
     "currencies": {
       "intro": "いずれもバッグの枠を使いません。コインはこれまで通りバッグにあります。",
       "activities": "アクティビティ",
@@ -11584,7 +11599,14 @@ export const ja_JP: EnTranslations = {
       "clueHuntStep": "手がかり{step}/{total}を解いた：{title}",
       "clueHuntDone": "宝探し完了：{title}。宝箱は君のものだ。",
       "clueHuntAbandoned": "宝探しを放棄：{title}",
-      "clueCasketOpened": "宝箱には{money}と{items}が入っていた。"
+      "clueCasketOpened": "宝箱には{money}と{items}が入っていた。",
+      "treasureMapEarned": "Every world quest of the day is done: you found a {map}.",
+      "treasureMapLost": "Every world quest of the day is done, but your bags have no room for the treasure map.",
+      "treasureMapRead": "You study the {map}. The X lies somewhere in {zone}.",
+      "treasureMapUpgraded": "The map is redrawn in finer ink: it is now a {map}.",
+      "treasureVaultOpened": "The ground gives way. A vault stands open before you.",
+      "treasureVaultLooted": "The vault holds {money} and {items}.",
+      "treasureVaultCapped": "You have shared in enough vaults today; this one pays you nothing."
     },
     "errors": {
       "unavailable": "そのクエストは利用できません。",

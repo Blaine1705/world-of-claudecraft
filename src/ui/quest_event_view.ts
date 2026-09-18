@@ -3,10 +3,15 @@
 // event-family switch here prevents the coordinator monolith from growing.
 
 import { CLUE_HUNTS_BY_ID } from '../sim/content/clue_hunts';
+import {
+  TREASURE_MAP_ITEM_IDS,
+  TREASURE_SITES_BY_ID,
+  type TreasureMapRarity,
+} from '../sim/content/treasure_maps';
 import { ITEMS, WORLD_QUESTS_BY_ID } from '../sim/data';
 import type { SimEvent } from '../sim/types';
 import { questTitle } from './entity_display_core';
-import { itemDisplayName } from './entity_i18n';
+import { itemDisplayName, zoneDisplayName } from './entity_i18n';
 import { cannonResultText } from './hud/vehicle/cannon_tactics_view';
 import { formatList, formatMoney, formatNumber, type TranslationKey, t } from './i18n';
 import { ownEntry } from './known_item';
@@ -157,9 +162,57 @@ export function questEventPresentation(event: SimEvent): QuestEventPresentation 
         }),
         sound: 'quest_complete',
       };
+    // Treasure maps and vaults (src/sim/treasure_vault.ts): ids only from the sim.
+    case 'treasureMapEarned':
+      return {
+        logText: t('questUi.logs.treasureMapEarned', { map: treasureMapName(event.rarity) }),
+        sound: 'quest_ready',
+      };
+    case 'treasureMapLost':
+      return { logText: t('questUi.logs.treasureMapLost') };
+    case 'treasureMapRead':
+      // A re-read only re-opens the window; the line is for the first read.
+      return event.fresh
+        ? {
+            logText: t('questUi.logs.treasureMapRead', {
+              map: treasureMapName(event.rarity),
+              zone: zoneDisplayName(TREASURE_SITES_BY_ID[event.siteId]?.zoneId ?? ''),
+            }),
+            sound: 'quest_accept',
+          }
+        : null;
+    case 'treasureMapUpgraded':
+      return {
+        logText: t('questUi.logs.treasureMapUpgraded', { map: treasureMapName(event.rarity) }),
+        sound: 'quest_ready',
+      };
+    case 'treasureVaultOpened': {
+      const text = t('questUi.logs.treasureVaultOpened');
+      return { bannerText: text, logText: text, sound: 'quest_complete' };
+    }
+    case 'treasureVaultLooted':
+      return event.capped
+        ? { logText: t('questUi.logs.treasureVaultCapped') }
+        : {
+            logText: t('questUi.logs.treasureVaultLooted', {
+              money: formatMoney(event.copper ?? 0),
+              items: formatList(
+                (event.itemIds ?? []).map((itemId) => {
+                  const def = ownEntry(ITEMS, itemId);
+                  return def ? itemDisplayName(def) : itemId;
+                }),
+              ),
+            }),
+            sound: 'quest_complete',
+          };
     default:
       return null;
   }
+}
+
+function treasureMapName(rarity: TreasureMapRarity): string {
+  const def = ownEntry(ITEMS, TREASURE_MAP_ITEM_IDS[rarity]);
+  return def ? itemDisplayName(def) : rarity;
 }
 
 /** The hunt's title from the clue catalog; a retired id reads as its raw id. */

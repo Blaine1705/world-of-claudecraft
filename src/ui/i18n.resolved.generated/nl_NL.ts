@@ -2318,6 +2318,21 @@ export const nl_NL: EnTranslations = {
       "crafting": "Knutselen",
       "openProfessions": "Open beroepen"
     },
+    "treasureMap": {
+      "close": "Close treasure map",
+      "zone": "Somewhere in {zone}",
+      "hint": "Find the ground this map shows, stand on the X, and use the map again to dig. A vault opens for you and your party.",
+      "upgradeHeading": "Redraw this map as: {rarity}",
+      "upgradeCost": "{cost} {currency}",
+      "balance": "You have {amount}",
+      "upgradeMaxed": "No cartographer could better this map.",
+      "rarity": {
+        "common": "Common",
+        "rare": "Rare",
+        "epic": "Epic",
+        "legendary": "Legendary"
+      }
+    },
     "currencies": {
       "intro": "None of these take bag space. Coin stays in your bag as always.",
       "activities": "Activities",
@@ -11584,7 +11599,14 @@ export const nl_NL: EnTranslations = {
       "clueHuntStep": "Clue {step} of {total} solved: {title}",
       "clueHuntDone": "Treasure hunt complete: {title}. The casket is yours.",
       "clueHuntAbandoned": "Treasure hunt abandoned: {title}",
-      "clueCasketOpened": "The casket holds {money} and {items}."
+      "clueCasketOpened": "The casket holds {money} and {items}.",
+      "treasureMapEarned": "Every world quest of the day is done: you found a {map}.",
+      "treasureMapLost": "Every world quest of the day is done, but your bags have no room for the treasure map.",
+      "treasureMapRead": "You study the {map}. The X lies somewhere in {zone}.",
+      "treasureMapUpgraded": "The map is redrawn in finer ink: it is now a {map}.",
+      "treasureVaultOpened": "The ground gives way. A vault stands open before you.",
+      "treasureVaultLooted": "The vault holds {money} and {items}.",
+      "treasureVaultCapped": "You have shared in enough vaults today; this one pays you nothing."
     },
     "errors": {
       "unavailable": "Die quest is niet beschikbaar.",

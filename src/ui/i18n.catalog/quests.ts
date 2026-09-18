@@ -446,6 +446,16 @@ const questStringsEn = {
       clueHuntDone: 'Treasure hunt complete: {title}. The casket is yours.',
       clueHuntAbandoned: 'Treasure hunt abandoned: {title}',
       clueCasketOpened: 'The casket holds {money} and {items}.',
+      // Treasure maps and vaults (src/sim/treasure_vault.ts). {map} is the
+      // map item's name, {zone} the zone the X lies in.
+      treasureMapEarned: 'Every world quest of the day is done: you found a {map}.',
+      treasureMapLost:
+        'Every world quest of the day is done, but your bags have no room for the treasure map.',
+      treasureMapRead: 'You study the {map}. The X lies somewhere in {zone}.',
+      treasureMapUpgraded: 'The map is redrawn in finer ink: it is now a {map}.',
+      treasureVaultOpened: 'The ground gives way. A vault stands open before you.',
+      treasureVaultLooted: 'The vault holds {money} and {items}.',
+      treasureVaultCapped: 'You have shared in enough vaults today; this one pays you nothing.',
     },
     errors: {
       unavailable: 'That quest is not available.',
