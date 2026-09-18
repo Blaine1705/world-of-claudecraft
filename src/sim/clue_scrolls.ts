@@ -18,6 +18,8 @@
 // English re-localized client-side by the sim_i18n matchers, like every other
 // sim refusal.
 
+import { TREASURE_MAP_ITEM_IDS } from './content/treasure_maps';
+import { rollTreasureMapRarity } from './treasure_vault';
 import { bagPools, canAddItem } from './bags';
 import {
   CLUE_HUNTS,
@@ -135,11 +137,15 @@ export function maybeAwardClueScroll(ctx: SimContext, meta: PlayerMeta, player: 
   if (!worldQuestSlateComplete(meta, player.level)) return;
   meta.clueScrollCycle = meta.worldQuestCycle;
   const pid = meta.entityId;
-  if (canHoldAnotherClueScroll(ctx, meta)) {
-    ctx.addItem(CLUE_SCROLL_ITEM_ID, 1, pid);
-    ctx.emit({ type: 'clueScrollEarned', pid });
+  // The board pays a treasure map of a rolled rarity (src/sim/treasure_vault.ts).
+  // The rarity is always drawn, so the rng sequence never depends on bag space.
+  const rarity = rollTreasureMapRarity(ctx);
+  const itemId = TREASURE_MAP_ITEM_IDS[rarity];
+  if (canAddItem(meta.inventory, bagPools(meta.bags), itemId, 1)) {
+    ctx.addItem(itemId, 1, pid);
+    ctx.emit({ type: 'treasureMapEarned', rarity, pid });
   } else {
-    ctx.emit({ type: 'clueScrollLost', pid });
+    ctx.emit({ type: 'treasureMapLost', pid });
   }
 }
 

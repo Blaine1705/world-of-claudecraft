@@ -30,6 +30,12 @@ import {
 } from '../professions/masterwrought_materials';
 import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
 import type { SimContext } from '../sim_context';
+import {
+  mayEnterVaultPortal,
+  payTreasureVault,
+  vaultForPortal,
+  vaultScaledTuning,
+} from '../treasure_vault';
 import { DT, dist2d, type Entity, type SimEvent, type Vec3 } from '../types';
 import { isInWaterBody } from '../world';
 import { riftFx } from './fx';
@@ -326,7 +332,9 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
   // descriptor's baseLevel, so every host regenerates it. Boss and trash take
   // DIFFERENT multipliers (rift/ranks.ts), so each spawn resolves its role first.
   const rank = riftRankForBaseLevel(inst.baseLevel);
-  const tuning = riftRankTuningFor(inst.baseLevel);
+  // A vault scales the rank tuning (balanced for a full party) to the head
+  // count its owner brought; an ordinary rift passes through unchanged.
+  const tuning = vaultScaledTuning(riftRankTuningFor(inst.baseLevel), inst.vault);
   for (const spawn of floor.spawns) {
     const template = MOBS[spawn.templateId];
     if (!template) continue;
@@ -567,6 +575,15 @@ export function enterRift(
     }
     return;
   }
+  // A treasure vault is private: only the map's owner and their party may
+  // step through (src/sim/treasure_vault.ts). Portal path only, like the gate above.
+  if (portal && !mayEnterVaultPortal(ctx, portal, r.meta.entityId)) {
+    if (ctx.time >= (r.e.riftDeniedAt ?? -Infinity) + 4) {
+      r.e.riftDeniedAt = ctx.time;
+      ctx.error(r.meta.entityId, 'This vault was opened by another party.');
+    }
+    return;
+  }
   const key = riftKeyFor(ctx, r.meta.entityId);
   const eventId = portal?.riftEventId ?? null;
   // Death rules (2026-07-21 S-raid playtest): a dead player (ghost) may enter
@@ -746,6 +763,7 @@ export function enterRift(
     inst.portalId = portal?.id ?? null;
     inst.rewarded = false;
     inst.progressed = false;
+    inst.vault = vaultForPortal(ctx, portal ?? null);
     markRiftEventActive(ctx, eventId);
     spawnRiftFloor(ctx, inst);
   }
@@ -1415,7 +1433,10 @@ function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | n
   inst.finishedAt = ctx.time;
   // Rank-gated payout on the corpse (every winning clear, ranked or dev): C a
   // guaranteed themed rare + coin, B/A/S the epic ladder. No Heroic Marks.
-  if (boss) addRiftClearGearLoot(ctx, boss, inst.baseLevel);
+  // A treasure vault pays its own table to every entrant instead (the rank
+  // gear ladder would make a daily map a raid-gear faucet).
+  if (inst.vault) payTreasureVault(ctx, inst.vault, participants);
+  else if (boss) addRiftClearGearLoot(ctx, boss, inst.baseLevel);
 
   // A cleared rift seals its way in: no LIVING entrant may ever walk into a
   // finished run and farm it (enterRift denies every one the moment the event

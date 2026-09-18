@@ -5,6 +5,7 @@ import type { MaterialComposition } from './material_sources';
 
 import type { ChatSenderFlair, StreamerLinks } from './account_flair';
 import type { MountKey } from './content/mounts';
+import type { TreasureMapProgress, TreasureMapRarity } from './content/treasure_maps';
 import type { CraftDef, GatheringProfessionId, ToolEffectId } from './content/professions';
 import type { RealmBuilderHonour } from './content/realm_builders';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
@@ -974,6 +975,8 @@ export type ItemUse =
   | { type: 'clueScroll' }
   // A Treasure Casket (src/sim/clue_casket.ts): consumed to pay the hunt's reward.
   | { type: 'clueCasket' }
+  /** A treasure map (src/sim/treasure_vault.ts): read it, then dig on the X. */
+  | { type: 'treasureMap'; rarity: TreasureMapRarity }
   // Starts the one-time hammer quest; the Ember is consumed by crafting.
   | { type: 'forgebreakerEmber' }
   | { type: 'mechChroma'; chromaId: string }
@@ -5746,6 +5749,12 @@ export interface Entity extends ClientMirroredEntityFields {
   // both hosts render above the portal and the Heroic Mark payout on sealing.
   // Absent on dev-spawned portals.
   riftTier?: RiftTier;
+  // Treasure vault portals (src/sim/treasure_vault.ts): the character whose map
+  // opened it (only they and their party may enter), the map's rarity, and the
+  // sim time the unentered portal closes.
+  vaultOwnerPid?: number;
+  vaultRarity?: TreasureMapRarity;
+  vaultExpiresAt?: number;
   // Sim time of the last "level too low" rift denial shown to this player, so
   // standing inside the portal trigger radius does not spam the toast per tick.
   riftDeniedAt?: number;
@@ -6712,6 +6721,20 @@ export type SimEvent = { pid?: number } & (
   | { type: 'clueHuntAbandoned'; huntId: string }
   /** One id per grant (the Heroic Marks stack appears once) plus the copper paid. */
   | { type: 'clueCasketOpened'; itemIds: string[]; copper: number }
+  // Treasure maps and vaults (src/sim/treasure_vault.ts). The sim emits ids
+  // only; the client resolves the prose and opens the map window on a read.
+  | { type: 'treasureMapEarned'; rarity: TreasureMapRarity }
+  | { type: 'treasureMapLost' }
+  | { type: 'treasureMapRead'; rarity: TreasureMapRarity; siteId: string; fresh: boolean }
+  | { type: 'treasureMapUpgraded'; rarity: TreasureMapRarity; factionId: string; cost: number }
+  | { type: 'treasureVaultOpened'; rarity: TreasureMapRarity }
+  | {
+      type: 'treasureVaultLooted';
+      rarity: TreasureMapRarity;
+      capped: boolean;
+      itemIds?: string[];
+      copper?: number;
+    }
   | {
       type: 'varkhulCallout';
       sourceId: number;

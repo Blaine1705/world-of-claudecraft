@@ -114,6 +114,10 @@ export interface CharacterState {
     clueHunt?: { huntId: string; step: number };
     clueScrollCycle?: string;
     clueCasketsOpened?: number;
+    // Treasure maps (src/sim/treasure_vault.ts), written only when set.
+    treasureMap?: { rarity: string; siteId: string; seed: number };
+    vaultGuestCycle?: string;
+    vaultGuestPayouts?: number;
   };
   // Faction standing (JSONB; optional so pre-reputation saves load cleanly).
   factions?: Partial<Record<string, number>>;

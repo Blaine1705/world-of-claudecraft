@@ -1,3 +1,5 @@
+import type { TreasureMapProgress } from './content/treasure_maps';
+import * as treasureVaultMod from './treasure_vault';
 import type {
   AccountCosmetics,
   ActionBarLayout,
@@ -2561,6 +2563,7 @@ export class Sim {
         tier: null,
         portalId: null,
         rewarded: false,
+        vault: null,
         progressed: false,
         seqResetAt: -Infinity,
         bossDeathZones: [],
@@ -4832,6 +4835,12 @@ export class Sim {
   abandonClueHunt(pid?: number): void {
     clueMod.abandonClueHunt(this.ctx, pid);
   }
+  get treasureMap(): Readonly<TreasureMapProgress> | null {
+    return this.primary.treasureMap;
+  }
+  upgradeTreasureMap(factionId: FactionId, pid = this.playerId): void {
+    treasureVaultMod.upgradeTreasureMap(this.ctx, pid, factionId);
+  }
   canRerollWorldQuest(questId: string, pid?: number): { canReroll: boolean; reason?: string } {
     const meta = pid !== undefined ? this.players.get(pid) : this.primary;
     if (!meta) return { canReroll: false, reason: 'Player not found.' };
@@ -6309,6 +6318,7 @@ export class Sim {
     tickRiftLockpicksImpl(this.ctx); // per-tick rift-cache lockpick step clock
     tickRiftBossDeathZonesImpl(this.ctx); // lethal boss zone fuses + detonation
     if (this.cfg.riftPortals) updateRiftPortalsImpl(this.ctx);
+    treasureVaultMod.updateVaultPortals(this.ctx);
     // Escort runs walk their NPC + watch ambush waves (rng-free; src/sim/escort.ts).
     updateEscortsImpl(this.ctx);
     lap?.('instances');

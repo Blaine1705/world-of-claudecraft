@@ -4,6 +4,7 @@
 
 import type { CharacterState } from './character_state';
 import { type ClueHuntProgress, sanitizeClueCasketsOpened, sanitizeClueHunt } from './clue_scrolls';
+import type { TreasureMapProgress } from './content/treasure_maps';
 import type { FactionId } from './factions';
 import {
   freshFactionCurrencies,
@@ -12,6 +13,7 @@ import {
   sanitizeFactionReputation,
 } from './factions';
 import type { PlayerMeta } from './sim';
+import { sanitizeTreasureMap, sanitizeVaultGuestPayouts } from './treasure_vault';
 import type { Entity, WorldQuestDef, WorldQuestProgress } from './types';
 import { WORLD_BOSSES } from './world_boss';
 import { sanitizeWorldQuestReplacements } from './world_quest_reroll';
@@ -53,6 +55,14 @@ export interface WorldQuestPlayerState {
   clueHunt: ClueHuntProgress | null;
   clueScrollCycle: string;
   clueCasketsOpened: number;
+  /**
+   * Treasure maps (src/sim/treasure_vault.ts): the map read and not yet dug up
+   * (null when none), and the guest vault payouts taken in `vaultGuestCycle`
+   * (the owner's own vaults never count). Cycle-independent like the hunt.
+   */
+  treasureMap: TreasureMapProgress | null;
+  vaultGuestCycle: string;
+  vaultGuestPayouts: number;
 }
 
 export interface WorldQuestRotationCache {
@@ -74,6 +84,9 @@ export function freshWorldQuestPlayerState(): WorldQuestPlayerState {
     clueHunt: null,
     clueScrollCycle: '',
     clueCasketsOpened: 0,
+    treasureMap: null,
+    vaultGuestCycle: '',
+    vaultGuestPayouts: 0,
   };
 }
 
@@ -123,6 +136,9 @@ export function restoreWorldQuestState(
   meta.clueHunt = sanitizeClueHunt(saved?.clueHunt);
   meta.clueScrollCycle = sanitizeWorldQuestCycle(saved?.clueScrollCycle);
   meta.clueCasketsOpened = sanitizeClueCasketsOpened(saved?.clueCasketsOpened);
+  meta.treasureMap = sanitizeTreasureMap(saved?.treasureMap);
+  meta.vaultGuestCycle = sanitizeWorldQuestCycle(saved?.vaultGuestCycle);
+  meta.vaultGuestPayouts = sanitizeVaultGuestPayouts(saved?.vaultGuestPayouts);
   if (saved) {
     meta.worldQuestCycle = sanitizeWorldQuestCycle(saved.cycle);
     if (typeof saved.rerollCycle === 'string' && saved.rerollCycle === meta.worldQuestCycle) {
@@ -159,6 +175,8 @@ export function savedWorldQuestState(meta: PlayerMeta): {
   const hasClueHunt = meta.clueHunt !== null && meta.clueHunt !== undefined;
   const hasClueCycle = typeof meta.clueScrollCycle === 'string' && meta.clueScrollCycle !== '';
   const hasCaskets = (meta.clueCasketsOpened ?? 0) > 0;
+  const hasTreasureMap = meta.treasureMap !== null && meta.treasureMap !== undefined;
+  const hasVaultGuest = (meta.vaultGuestPayouts ?? 0) > 0 && !!meta.vaultGuestCycle;
   if (
     !meta.worldQuestCycle &&
     meta.worldQuestLog.size === 0 &&
@@ -167,7 +185,9 @@ export function savedWorldQuestState(meta: PlayerMeta): {
     !hasReroll &&
     !hasClueHunt &&
     !hasClueCycle &&
-    !hasCaskets
+    !hasCaskets &&
+    !hasTreasureMap &&
+    !hasVaultGuest
   ) {
     return {};
   }
@@ -216,6 +236,10 @@ export function savedWorldQuestState(meta: PlayerMeta): {
       ...(hasClueHunt && meta.clueHunt ? { clueHunt: { ...meta.clueHunt } } : {}),
       ...(hasClueCycle ? { clueScrollCycle: meta.clueScrollCycle } : {}),
       ...(hasCaskets ? { clueCasketsOpened: meta.clueCasketsOpened } : {}),
+      ...(hasTreasureMap && meta.treasureMap ? { treasureMap: { ...meta.treasureMap } } : {}),
+      ...(hasVaultGuest
+        ? { vaultGuestCycle: meta.vaultGuestCycle, vaultGuestPayouts: meta.vaultGuestPayouts }
+        : {}),
     },
     ...(factionsObj ? { factions: factionsObj } : {}),
     ...(currenciesObj ? { factionCurrencies: currenciesObj } : {}),

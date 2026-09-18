@@ -93,6 +93,12 @@ export function emitQuestSelfKeys(emit: EmitSelfKey, sim: Sim, meta: PlayerMeta)
   // re-diffs it the tick it moves; the explicit null clears a finished or
   // abandoned hunt on the client.
   emit('cluh', meta.clueHunt);
+  // Treasure maps: the read map (rarity and site only; the vault seed stays
+  // server-side). Null clears it. Moves with wireRev like the hunt cursor.
+  emit(
+    'tmap',
+    meta.treasureMap ? { rarity: meta.treasureMap.rarity, siteId: meta.treasureMap.siteId } : null,
+  );
   emit('wqrr', meta.worldQuestRerollCycle);
   emit('wqrep', meta.worldQuestReplacements ?? {});
 }

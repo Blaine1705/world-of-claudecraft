@@ -1,3 +1,4 @@
+import type { TreasureMapRarity } from '../sim/content/treasure_maps';
 import type { FactionId } from '../sim/factions';
 import { freshFactionCurrencies, freshFactionReputation } from '../sim/factions';
 import type {
@@ -28,7 +29,8 @@ export type QuestWorldCommand =
   | { cmd: 'world_quest_shadow'; action: 'pickpocket' | 'leave'; targetId?: number }
   | { cmd: 'world_quest_start'; quest: string; difficulty: WorldQuestDifficulty }
   | { cmd: 'world_quest_reroll'; quest: string }
-  | { cmd: 'clue_hunt_abandon' };
+  | { cmd: 'clue_hunt_abandon' }
+  | { cmd: 'treasure_map_upgrade'; faction: FactionId };
 
 /** Cold owner mirrors shared by quest snapshots and world-boss map state. */
 export class QuestWorldWireState {
@@ -46,6 +48,8 @@ export class QuestWorldWireState {
   worldQuestRerollCycle = '';
   /** The active clue hunt mirrored from the `cluh` self key (null when none). */
   clueHunt: Readonly<{ huntId: string; step: number }> | null = null;
+  /** The read treasure map mirrored from the `tmap` self key (null when none). */
+  treasureMap: Readonly<{ rarity: TreasureMapRarity; siteId: string }> | null = null;
   private activeWorldBossIds = new Set<string>();
   private questWorldTransport: ((command: QuestWorldCommand) => void) | null = null;
   private questWorldRestBase = '';
@@ -134,6 +138,10 @@ export class QuestWorldWireState {
     this.sendQuestWorldCommand({ cmd: 'clue_hunt_abandon' });
   }
 
+  upgradeTreasureMap(factionId: FactionId): void {
+    this.sendQuestWorldCommand({ cmd: 'treasure_map_upgrade', faction: factionId });
+  }
+
   canRerollWorldQuest(questId: string): { canReroll: boolean; reason?: string } {
     if (!this.worldQuestCycle) {
       return { canReroll: false, reason: 'No active world quest cycle.' };
@@ -175,6 +183,7 @@ export class QuestWorldWireState {
     this.worldQuestReplacements = Object.freeze({});
     this.worldQuestRerollCycle = '';
     this.clueHunt = null;
+    this.treasureMap = null;
     this.nearbyWorldQuestTraces = [];
     this.activeWorldBossIds = new Set();
   }

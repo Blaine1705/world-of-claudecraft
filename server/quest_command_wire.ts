@@ -1,3 +1,4 @@
+import { FACTION_IDS, type FactionId } from '../src/sim/factions';
 import type { Sim } from '../src/sim/sim';
 import { isWorldQuestDifficulty } from '../src/sim/world_quest_activity';
 
@@ -78,6 +79,7 @@ const WORLD_QUEST_WIRE_COMMANDS = [
   'world_quest_start',
   'world_quest_reroll',
   'clue_hunt_abandon',
+  'treasure_map_upgrade',
 ] as const;
 export type WorldQuestWireCommand = (typeof WORLD_QUEST_WIRE_COMMANDS)[number];
 const WORLD_QUEST_WIRE_COMMAND_SET: ReadonlySet<unknown> = new Set(WORLD_QUEST_WIRE_COMMANDS);
@@ -119,5 +121,13 @@ export function dispatchWorldQuestWire(sim: Sim, msg: QuestWireMessage, pid: num
       break;
     case 'clue_hunt_abandon':
       sim.abandonClueHunt(pid);
+      break;
+    case 'treasure_map_upgrade':
+      if (
+        typeof msg.faction === 'string' &&
+        (FACTION_IDS as readonly string[]).includes(msg.faction)
+      ) {
+        sim.upgradeTreasureMap(msg.faction as FactionId, pid);
+      }
   }
 }

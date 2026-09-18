@@ -7,6 +7,7 @@
 //
 // Sim layer: no DOM/Three imports. This file is types only.
 
+import type { TreasureMapRarity } from '../content/treasure_maps';
 import type { DungeonLayout, InteriorStyle } from '../dungeon_layout';
 import type { LockSession } from '../lockpick';
 import type { DelveHazardZone, RiftTier } from '../types';
@@ -325,6 +326,10 @@ export interface RiftInstance {
   /** True once the final boss kill has paid out (gear + seal), so a slot that
    * lingers after the kill never double-pays. */
   rewarded: boolean;
+  /** Set when the run is a treasure vault (src/sim/treasure_vault.ts): the map's
+   *  rarity, its owner, and the head count the mobs were scaled for. Null on
+   *  every ordinary rift. */
+  vault: { rarity: TreasureMapRarity; ownerPid: number; headCount: number } | null;
   /** The sealed reward cache the giga-boss drops (`rift_locked_chest`), opened via
    * the shared lockpicking minigame; null until the boss falls. */
   cacheId: number | null;

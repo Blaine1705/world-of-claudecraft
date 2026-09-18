@@ -1,3 +1,4 @@
+import type { TreasureMapRarity } from '../sim/content/treasure_maps';
 import type { FactionId } from '../sim/factions';
 import type { QuestProgress, QuestState, WorldQuestProgress } from '../sim/types';
 import type { WorldQuestDifficulty } from '../sim/world_quest_activity';
@@ -52,6 +53,14 @@ export interface IWorldQuests {
   readonly clueHunt: Readonly<{ huntId: string; step: number }> | null;
   /** Drops the active clue hunt; returns nothing (the spent scroll stays spent). */
   abandonClueHunt(): void;
+  /**
+   * Treasure maps (src/sim/treasure_vault.ts): the map read and not yet dug up
+   * (its rarity and the dig site id, resolved through TREASURE_SITES_BY_ID), or
+   * null when none.
+   */
+  readonly treasureMap: Readonly<{ rarity: TreasureMapRarity; siteId: string }> | null;
+  /** Raises the read map one rarity, paid in the chosen faction's currency. */
+  upgradeTreasureMap(factionId: FactionId): void;
   canRerollWorldQuest?(questId: string): { canReroll: boolean; reason?: string };
   rerollWorldQuest?(questId: string): boolean;
   questState(questId: string): QuestState;
