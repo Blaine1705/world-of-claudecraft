@@ -38,6 +38,14 @@ describe('frame health window', () => {
     );
   });
 
+  it('keeps the advice coming when the automatic mode engaged the ceiling', () => {
+    const held = win(30, 34.5);
+    expect(isBadFrameWindow(held, { targetIntervalMs: 33.3, missShare: 0, auto: true })).toBe(true);
+    expect(isBadFrameWindow(held, { targetIntervalMs: 33.3, missShare: 0, auto: false })).toBe(
+      false,
+    );
+  });
+
   it('treats an inactive ceiling as none', () => {
     expect(isBadFrameWindow(win(30, 34.5), { targetIntervalMs: 0, missShare: 0 })).toBe(true);
     expect(isBadFrameWindow(win(30, 34.5), null)).toBe(true);

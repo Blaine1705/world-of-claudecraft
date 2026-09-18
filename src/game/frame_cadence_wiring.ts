@@ -4,6 +4,10 @@
 // returns before the frame clock is read and the next rendered frame
 // integrates the real elapsed time, exactly as on a slower display.
 //
+// The gate view it is handed is the one main.ts filled on the PREVIOUS callback
+// (the arm must stay the first statement, ahead of the gate refresh), so an
+// exemption starts or ends one callback late. Bounded by one interval.
+//
 // One chain, by construction: frame() runs only from the callback armed here,
 // and each run arms exactly once (a rAF, or, where the display shows no slots,
 // a timer that calls frame() itself). Changing the intent never arms anything.
@@ -134,6 +138,8 @@ export class FrameCadenceWiring {
   private skipped = 0;
   private reprobing = false;
   private unreadCallbacks = 0;
+  /** Whether the callback in flight has armed its successor yet. */
+  armedThisCallback = false;
   private readonly autoFrame: FrameCadenceAutoFrame = {
     dtSeconds: 0,
     late: false,
@@ -169,6 +175,7 @@ export class FrameCadenceWiring {
 
   /** Re-arm the loop and report whether this callback must do nothing. */
   armAndSkip(frame: FrameRequestCallback, now: number, gate: FrameCadenceGateView): boolean {
+    this.armedThisCallback = false;
     this.frameCb = frame;
     const delta = now - this.lastCallbackAt;
     const crossedTimer = this.armedByTimer;
@@ -187,14 +194,17 @@ export class FrameCadenceWiring {
     }
     this.wasExempt = exempt;
     this.lastCallbackAt = now;
-    configureFrameCadence(
-      this.cadence,
-      this.intent,
-      this.estimator.verdict,
-      this.estimator.refreshMs,
-    );
-    const holdQuality = this.auto && (this.autoState.ceiling !== 0 || this.autoState.trial);
-    this.deps.publish(this.cadence.targetIntervalMs, this.cadence.missShare, holdQuality);
+    // The automatic ceiling only means something on a display whose slots can be
+    // read; anywhere else Auto asks for nothing (an explicit choice still does).
+    const paced = this.estimator.verdict === 'paced';
+    const intent = this.auto && !paced ? 0 : this.intent;
+    configureFrameCadence(this.cadence, intent, this.estimator.verdict, this.estimator.refreshMs);
+    // Exempt callbacks are not paced, so nothing is published for them: the
+    // governor must read a slow arrival frame as what it is.
+    const holdQuality =
+      this.auto && paced && (this.autoState.ceiling !== 0 || this.autoState.trial);
+    if (exempt) this.deps.publish(0, 0, holdQuality);
+    else this.deps.publish(this.cadence.targetIntervalMs, this.cadence.missShare, holdQuality);
     if (exempt || !frameCadenceActive(this.cadence)) {
       if (exempt) frameCadenceNoteExemptRender(this.cadence, now);
       else {
@@ -202,7 +212,8 @@ export class FrameCadenceWiring {
         this.stepAuto(now, false);
       }
       this.lastWasIdle = false;
-      this.rendered++;
+      if (!exempt) this.rendered++;
+      this.armedThisCallback = true;
       this.deps.requestFrame(frame);
       return false;
     }
@@ -273,6 +284,7 @@ export class FrameCadenceWiring {
     // A hidden tab goes back to rAF, which the browser pauses there: a timer
     // chain would keep rendering a page nobody sees, once a second.
     const bareFrames = unread && this.unreadCallbacks < UNREAD_BEFORE_SLEEP;
+    this.armedThisCallback = true;
     if (this.cadence.paced || reprobe || bareFrames || hidden) {
       this.deps.requestFrame(frame);
       return;
@@ -338,7 +350,18 @@ export function armFrameAndSkip(
   now: number,
   gate: FrameCadenceGateView,
 ): boolean {
-  return sharedFrameCadence().armAndSkip(frame, now, gate);
+  // This replaced a bare requestAnimationFrame, which cannot throw. A throw in
+  // here with nothing armed would freeze the client for good, so the loop's
+  // survival never depends on the ceiling: re-arm plainly and render.
+  let wiring: FrameCadenceWiring | null = null;
+  try {
+    wiring = sharedFrameCadence();
+    return wiring.armAndSkip(frame, now, gate);
+  } catch (err) {
+    if (!wiring?.armedThisCallback) requestAnimationFrame(frame);
+    console.error('[frame-cadence] disabled for this callback', err);
+    return false;
+  }
 }
 
 /** The perf beacon's `cadence` block (rawSummary): what tells a chosen ceiling
@@ -408,5 +431,5 @@ export function frameRateCapRowReading(storedValue: number): FrameRateCapReading
 export function frameCadenceHealth(): FrameHealthCadence | null {
   const s = sharedFrameCadence().snapshot();
   if (!(s.targetIntervalMs > 0)) return null;
-  return { targetIntervalMs: s.targetIntervalMs, missShare: s.missShare };
+  return { targetIntervalMs: s.targetIntervalMs, missShare: s.missShare, auto: s.auto };
 }

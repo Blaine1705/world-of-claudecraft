@@ -204,6 +204,7 @@ import {
   chosenCadenceMissShare,
   frameLoadMs,
   noteGovernorShedding,
+  resetChosenCadenceForRenderer,
 } from './chosen_cadence';
 import { fogFarForBuiltGround, groundViewConeHalfAngle } from './chunk_residency_core';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
@@ -2117,6 +2118,7 @@ export class Renderer {
     // The lightweight material path does not preload HDR sky/water assets.
     // Keep the renderer's HDR/IBL branch aligned with that preload decision.
     this.lowGfx = !GFX.standardMaterials;
+    resetChosenCadenceForRenderer();
     this.renderBudgetGovernor = new RenderBudgetGovernor({
       tier: GFX.tier,
       budget: GFX.budget,
@@ -9334,7 +9336,7 @@ export class Renderer {
         this.gpuHitchCompileLifecycle?.records ?? null,
         residencyFar,
         frameLoadMs(Math.max(0, dt * 1000)),
-        this.renderBudgetState.externalFrameCap,
+        this.renderBudgetState.externalFrameCap || chosenCadenceMissShare() >= 0,
       );
       if (vista) {
         // Entry settle (one-shot, armed by farVistaReady behind the opaque
@@ -11967,7 +11969,7 @@ export class Renderer {
     if (this.hitchLogEnabled) {
       const sample = this.hitchAligner.atEnd(
         afterSubmit,
-        Math.min(250, Math.max(0, dt * 1000)),
+        frameLoadMs(Math.min(250, Math.max(0, dt * 1000))),
         framePhaseMs.submit,
         createdViews,
         framePhaseMs.total,

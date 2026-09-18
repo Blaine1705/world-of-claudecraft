@@ -30,7 +30,7 @@ const UNPACED_EARLY_SHARE = 0.1;
 /** How many refresh slots one rendered frame spans. 1 means the ceiling is
  *  inert on this display (the display already runs at or under the intent). */
 export function ceilingDivisor(refreshHz: number, intentFps: number): number {
-  if (!(refreshHz > 0) || !(intentFps > 0)) return 1;
+  if (!Number.isFinite(refreshHz) || !(refreshHz > 0) || !(intentFps > 0)) return 1;
   let divisor = 1;
   while (refreshHz / divisor > intentFps * CEILING_RATE_TOLERANCE) divisor++;
   while (divisor > 1 && refreshHz / divisor < MIN_CEILING_FPS) divisor--;

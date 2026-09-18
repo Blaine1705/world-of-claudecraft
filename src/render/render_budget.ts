@@ -602,6 +602,13 @@ export class RenderBudgetGovernor {
     // shedding does move is a GPU-bound frame, refused as a cap and shed
     // again under the normal rules. A latched cap, a probe or a refusal
     // lapses once the candidate has failed for a few consecutive frames.
+    // A ceiling that engages while a probe is in flight ends the probe without
+    // a verdict: the question it was asking (is a cap pacing these frames) is
+    // now answered by the client itself. The levels it shed come back; left to
+    // lapse, the probe would read the synthetic held reading as "shedding
+    // moved the cadence", refuse a cap nobody tested, and leave quality at the
+    // probe floors, which an automatic ceiling's recovery hold then freezes.
+    if (chosenCadence && this.capProbe) this.abandonCapProbe(sample);
     const externalFrameCapCandidate =
       !chosenCadence &&
       rawFramePressure >= 1 &&
@@ -806,6 +813,25 @@ export class RenderBudgetGovernor {
    *  minute of climbing); at the end of the restored dwell the two cadences
    *  decide: moved means shedding works (no cap, refused until the candidate
    *  lapses, the normal rules shed again), unmoved means the cap. */
+  private abandonCapProbe(sample: RenderBudgetSample): void {
+    const origin = this.capProbeOrigin;
+    if (origin && this.capProbe?.phase !== 'restored') {
+      this.levels.grass = origin.grass;
+      this.levels.foliage = origin.foliage;
+      this.levels.vfx = origin.vfx;
+      this.levels.lighting = origin.lighting;
+      this.levels.resolution = Math.min(
+        sample.maxRenderScale,
+        Math.max(sample.minRenderScale, origin.resolution),
+      );
+      this.restoreDetailAfterCapProbe(origin.detail);
+      if (this.pinnedPostLevel == null) this.levels.post = origin.post;
+    }
+    this.capProbe = null;
+    this.capProbeOrigin = null;
+    this.capMissFrames = 0;
+  }
+
   private advanceCapProbe(dt: number, minRenderScale: number, maxRenderScale: number): boolean {
     const probe = this.capProbe;
     if (!probe || probe.phase === 'shed') return false;

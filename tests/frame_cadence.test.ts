@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   createRefreshEstimator,
   noteRefreshDelta,
@@ -12,11 +12,13 @@ import {
   MIN_CEILING_FPS,
 } from '../src/game/frame_cadence_core';
 import {
+  armFrameAndSkip,
   type FrameCadenceGateView,
   type FrameCadenceSnapshot,
   FrameCadenceWiring,
   frameCadenceBeaconFieldsFrom,
   parseFrameCeilingIntent,
+  sharedFrameCadence,
 } from '../src/game/frame_cadence_wiring';
 
 const INPUT_TICK_MS = 50;
@@ -187,6 +189,7 @@ function runHost(opts: {
   intent: 0 | 30 | 60 | 'auto';
   governorShedding?: () => boolean;
   remembered?: 0 | 30 | 60 | null;
+  onFrame?: (nowMs: number, wiring: FrameCadenceWiring) => void;
   gate?: Partial<FrameCadenceGateView>;
   cover?: () => boolean;
 }) {
@@ -245,6 +248,7 @@ function runHost(opts: {
     maxArmsPerCallback = Math.max(maxArmsPerCallback, arms - before);
     if (skip) return;
     renderedAt.push(t);
+    opts.onFrame?.(t, wiring);
     const intentNow = wiring.snapshot().intent;
     if (intentLog.length === 0 || intentLog[intentLog.length - 1].intent !== intentNow) {
       intentLog.push({ at: t, intent: intentNow });
@@ -362,6 +366,61 @@ describe('frame cadence wiring', () => {
     const snap = r.wiring.snapshot();
     expect(snap.verdict).toBe('unpaced');
     expect(snap.targetIntervalMs).toBeCloseTo(33.33, 1);
+  });
+});
+
+describe('frame loop survival', () => {
+  it('keeps the loop alive when the ceiling is lifted while the limiter sleeps', () => {
+    // Timer mode is the one state where a pending setTimeout, not a rAF, holds
+    // the loop. Lifting the ceiling there must hand it back to rAF.
+    let lifted = false;
+    const r = runHost({
+      refreshMs: null,
+      costMs: 5,
+      seconds: 30,
+      intent: 30,
+      onFrame: (t, wiring) => {
+        if (!lifted && t > 15_000) {
+          lifted = true;
+          wiring.setIntent(0);
+        }
+      },
+    });
+    expect(lifted).toBe(true);
+    // Back to the open loop: far more than 30 frames per second at the end.
+    expect(r.intervals.length / 5).toBeGreaterThan(100);
+    expect(r.maxArmsPerCallback).toBe(1);
+  });
+
+  it('re-arms plainly and renders when the ceiling itself throws', () => {
+    const armed: FrameRequestCallback[] = [];
+    const g = globalThis as { requestAnimationFrame?: unknown };
+    const original = g.requestAnimationFrame;
+    g.requestAnimationFrame = (cb: FrameRequestCallback) => armed.push(cb);
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const thrown = vi.spyOn(sharedFrameCadence(), 'armAndSkip').mockImplementation(() => {
+      throw new Error('boom');
+    });
+    try {
+      const frame: FrameRequestCallback = () => {};
+      const gate = {
+        hidden: false,
+        desktopApp: false,
+        graphicsRebuildPaused: false,
+        worldDrawHeld: false,
+      };
+      expect(armFrameAndSkip(frame, 16, gate)).toBe(false);
+      expect(armed).toEqual([frame]);
+    } finally {
+      thrown.mockRestore();
+      errors.mockRestore();
+      g.requestAnimationFrame = original;
+    }
+  });
+
+  it('never loops on a non-finite display rate', () => {
+    expect(ceilingDivisor(Number.POSITIVE_INFINITY, 30)).toBe(1);
+    expect(ceilingDivisor(Number.NaN, 30)).toBe(1);
   });
 });
 

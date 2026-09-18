@@ -541,11 +541,13 @@ presentation latency, and it is bounded and stated: at most one chosen interval,
 at a ceiling of 30 on a 60 Hz display, which is what a 30 Hz display costs and well
 inside the redraw tolerance above (about 200 ms). The limit never paces under 24 images
 per second (`MIN_CEILING_FPS`), which also keeps a rendered interval under the 50 ms
-input tick. What a player DOES is not frame-paced at all: ability presses fire from the
-key event, and movement reaches the server as 50 ms wall-clock input ticks whatever the
+input tick. Most of what a player DOES is not frame-paced at all: keyboard and mouse
+ability presses fire from the key event, and movement reaches the server as 50 ms wall-clock input ticks whatever the
 frame rate, so movement speed is identical on every machine and at every limit; only
 how soon a change of movement intent is noticed follows the rendered frame, which is
-the same one-interval bound. A machine the limit is meant for already runs at that
+the same one-interval bound. A gamepad is the exception: it has no events, its buttons
+are polled once per rendered frame (`gamepad.poll` in `frame()`), so a pad press is also
+noticed up to one chosen interval later, again what a slower display costs. A machine the limit is meant for already runs at that
 rhythm, unevenly; the limit makes it even.
 
 The automatic mode is measurement-driven by design, like the governor's sheds: it

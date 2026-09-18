@@ -16,6 +16,8 @@ export interface FrameHealthWindow {
 export interface FrameHealthCadence {
   targetIntervalMs: number;
   missShare: number;
+  /** The automatic mode chose it: the machine could not hold its display. */
+  auto?: boolean;
 }
 
 const NOMINAL_FRAME_MS = 1000 / 60;
@@ -35,6 +37,10 @@ export function isBadFrameWindow(
 ): boolean {
   if (w.frames === 0) return false;
   const chosen = cadence && cadence.targetIntervalMs > 0 ? cadence : null;
+  // A ceiling the PLAYER picked is the goal. One the automatic mode engaged is
+  // evidence: this machine demonstrably missed its display, and the advice that
+  // would let it run at full cadence (a lower preset) must still reach them.
+  if (chosen?.auto) return true;
   const aimedMs = chosen ? chosen.targetIntervalMs : NOMINAL_FRAME_MS;
   if (w.fps < (1000 / aimedMs) * LOW_FPS_SHARE) return true;
   if (w.frameMs.p95 >= aimedMs * SLOW_P95_INTERVALS) return true;

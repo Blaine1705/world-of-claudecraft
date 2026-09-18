@@ -150,3 +150,23 @@ describe('governor under an automatic ceiling', () => {
     expect(r.degraded).toBe(true);
   });
 });
+
+describe('a ceiling engaging while a cap probe is in flight', () => {
+  it('restores what the probe shed and refuses nothing', () => {
+    const g = governor('low');
+    const before = { ...g.state().levels };
+    // A held 33 ms rhythm with an idle main thread opens the probe and sheds.
+    let shed = g.state();
+    for (let t = 0; t < 20 && shed.frameCapProbe !== 'shed'; t += 1 / 30) shed = g.update(sample());
+    expect(shed.frameCapProbe).toBe('shed');
+    for (let i = 0; i < 40; i++) shed = g.update(sample());
+    expect(shed.levels.foliage).toBeLessThan(before.foliage);
+    // The ceiling engages, with the automatic mode's recovery hold.
+    const engaged = run(g, 10, { chosenCadenceMissShare: 0, holdRecovery: true });
+    expect(engaged.state.frameCapProbe).toBe('idle');
+    expect(engaged.state.levels).toEqual(before);
+    // No refusal was earned: once the ceiling lifts the candidate may probe again.
+    const lifted = run(g, 20, {});
+    expect(lifted.probed).toBe(true);
+  });
+});

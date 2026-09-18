@@ -19,6 +19,12 @@ export function setChosenCadence(intervalMs: number, share: number, hold: boolea
   holdQuality = hold;
 }
 
+/** A new renderer starts with a governor that is not shedding: without this a
+ *  value left by the previous one would stop the automatic ceiling for good. */
+export function resetChosenCadenceForRenderer(): void {
+  governorShedding = false;
+}
+
 export function chosenCadenceHoldsQuality(): boolean {
   return holdQuality;
 }
