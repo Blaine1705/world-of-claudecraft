@@ -8888,6 +8888,39 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "minimalAt": 75,
           "zeroAt": 100
         }
+      },
+      {
+        "id": "schematic_clockwork_shock_bomb",
+        "name": "Clockwork Shock Bomb",
+        "skillReq": 40,
+        "tier": 1,
+        "station": "toolworks",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "iron_ore",
+            "name": "Iron Ore",
+            "count": 3
+          },
+          {
+            "itemId": "copper_ore",
+            "name": "Copper Ore",
+            "count": 4
+          }
+        ],
+        "output": {
+          "name": "Clockwork Shock Bomb",
+          "count": 1,
+          "quality": "rare"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        }
       }
     ]
   },
@@ -9660,6 +9693,77 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "name": "Lesser Healing Potion",
           "count": 1,
           "quality": "common"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        }
+      },
+      {
+        "id": "recipe_elixir_of_mana_regeneration",
+        "name": "Elixir of Mana Regeneration",
+        "skillReq": 40,
+        "tier": 1,
+        "station": "apothecary",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "silverleaf_herb",
+            "name": "Sheenleaf Herb",
+            "count": 3
+          },
+          {
+            "itemId": "glass_vial",
+            "name": "Glass Vial",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Elixir of Mana Regeneration",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        }
+      },
+      {
+        "id": "recipe_potion_of_invisibility",
+        "name": "Potion of Invisibility",
+        "skillReq": 40,
+        "tier": 1,
+        "station": "apothecary",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "goldleaf_herb",
+            "name": "Goldleaf Herb",
+            "count": 3
+          },
+          {
+            "itemId": "silverleaf_herb",
+            "name": "Sheenleaf Herb",
+            "count": 3
+          },
+          {
+            "itemId": "glass_vial",
+            "name": "Glass Vial",
+            "count": 1
+          }
+        ],
+        "output": {
+          "name": "Potion of Invisibility",
+          "count": 1,
+          "quality": "rare"
         },
         "combo": null,
         "oncePerDay": false,
@@ -12830,6 +12934,39 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "minimalAt": 150,
           "zeroAt": 175
         }
+      },
+      {
+        "id": "pattern_reinforced_armor_kit",
+        "name": "Reinforced Armor Kit",
+        "skillReq": 40,
+        "tier": 1,
+        "station": "tannery",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "rough_hide",
+            "name": "Rough Hide",
+            "count": 5
+          },
+          {
+            "itemId": "iron_ore",
+            "name": "Iron Ore",
+            "count": 3
+          }
+        ],
+        "output": {
+          "name": "Reinforced Armor Kit",
+          "count": 1,
+          "quality": "uncommon"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
+        }
       }
     ]
   },
@@ -15754,6 +15891,34 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 150,
           "minimalAt": 175,
           "zeroAt": 200
+        }
+      },
+      {
+        "id": "plans_dense_sharpening_stone",
+        "name": "Dense Sharpening Stone",
+        "skillReq": 40,
+        "tier": 1,
+        "station": "forge",
+        "acquisition": "drop",
+        "feeCopper": 0,
+        "materials": [
+          {
+            "itemId": "iron_ore",
+            "name": "Iron Ore",
+            "count": 4
+          }
+        ],
+        "output": {
+          "name": "Dense Sharpening Stone",
+          "count": 1,
+          "quality": "common"
+        },
+        "combo": null,
+        "oncePerDay": false,
+        "gain": {
+          "reducedAt": 50,
+          "minimalAt": 75,
+          "zeroAt": 100
         }
       }
     ]
@@ -19764,6 +19929,87 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
         {
           "stat": "sta",
           "value": 13
+        }
+      ]
+    },
+    {
+      "id": "enchant_offhand_spirit",
+      "slot": "offhand",
+      "tier": "base",
+      "skillReq": 40,
+      "perfectedOnly": false,
+      "requiresFormula": true,
+      "hasDescription": false,
+      "reagents": [
+        {
+          "itemId": "arcane_dust",
+          "name": "Chime Dust",
+          "count": 3
+        },
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 1
+        }
+      ],
+      "bonus": [
+        {
+          "stat": "spi",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "id": "enchant_feet_shadowstride",
+      "slot": "feet",
+      "tier": "base",
+      "skillReq": 40,
+      "perfectedOnly": false,
+      "requiresFormula": true,
+      "hasDescription": false,
+      "reagents": [
+        {
+          "itemId": "arcane_dust",
+          "name": "Chime Dust",
+          "count": 2
+        },
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 1
+        }
+      ],
+      "bonus": [
+        {
+          "stat": "agi",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "enchant_gloves_forged_might",
+      "slot": "gloves",
+      "tier": "base",
+      "skillReq": 40,
+      "perfectedOnly": false,
+      "requiresFormula": true,
+      "hasDescription": false,
+      "reagents": [
+        {
+          "itemId": "arcane_dust",
+          "name": "Chime Dust",
+          "count": 3
+        },
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 1
+        }
+      ],
+      "bonus": [
+        {
+          "stat": "str",
+          "value": 3
         }
       ]
     }

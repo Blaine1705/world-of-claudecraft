@@ -5,7 +5,12 @@
 import type { CharacterState } from './character_state';
 import { type ClueHuntProgress, sanitizeClueCasketsOpened, sanitizeClueHunt } from './clue_scrolls';
 import type { FactionId } from './factions';
-import { freshFactionReputation, sanitizeFactionReputation } from './factions';
+import {
+  freshFactionCurrencies,
+  freshFactionReputation,
+  sanitizeFactionCurrencies,
+  sanitizeFactionReputation,
+} from './factions';
 import type { PlayerMeta } from './sim';
 import type { Entity, WorldQuestDef, WorldQuestProgress } from './types';
 import { WORLD_BOSSES } from './world_boss';
@@ -31,6 +36,8 @@ export interface WorldQuestPlayerState {
   openWorldQuestPuzzleId: string | null;
   /** Persistent faction standing earned across world quests. */
   factions: Record<FactionId, number>;
+  /** Persistent spendable faction currencies earned from world quests. */
+  factionCurrencies: Record<FactionId, number>;
   /** The cycle for which the character used their single daily reroll. */
   worldQuestRerollCycle: string;
   /** Personal quest replacement: oldQuestId -> newQuestId for the current cycle. */
@@ -61,6 +68,7 @@ export function freshWorldQuestPlayerState(): WorldQuestPlayerState {
     worldQuestAreas: new Set(),
     openWorldQuestPuzzleId: null,
     factions: freshFactionReputation(),
+    factionCurrencies: freshFactionCurrencies(),
     worldQuestRerollCycle: '',
     worldQuestReplacements: {},
     clueHunt: null,
@@ -93,11 +101,17 @@ export function restoreWorldQuestState(
   meta: PlayerMeta,
   saved: CharacterState['worldQuests'],
   characterFactions?: CharacterState['factions'],
+  characterFactionCurrencies?: CharacterState['factionCurrencies'],
 ): void {
   meta.factions = freshFactionReputation();
   const rawFactions = characterFactions ?? saved?.factions;
   if (rawFactions) {
     meta.factions = sanitizeFactionReputation(rawFactions);
+  }
+  meta.factionCurrencies = freshFactionCurrencies();
+  const rawCurrencies = characterFactionCurrencies ?? saved?.factionCurrencies;
+  if (rawCurrencies) {
+    meta.factionCurrencies = sanitizeFactionCurrencies(rawCurrencies);
   }
   meta.worldQuestRerollCycle = '';
   meta.worldQuestReplacements = {};
@@ -133,8 +147,11 @@ export function restoreWorldQuestState(
 export function savedWorldQuestState(meta: PlayerMeta): {
   worldQuests?: CharacterState['worldQuests'];
   factions?: CharacterState['factions'];
+  factionCurrencies?: CharacterState['factionCurrencies'];
 } {
   const hasRep = meta.factions && Object.values(meta.factions).some((v) => v > 0);
+  const hasCurrencies =
+    meta.factionCurrencies && Object.values(meta.factionCurrencies).some((v) => v > 0);
   const hasReroll =
     meta.worldQuestRerollCycle && meta.worldQuestRerollCycle === meta.worldQuestCycle;
   const hasReplacements =
@@ -146,6 +163,7 @@ export function savedWorldQuestState(meta: PlayerMeta): {
     !meta.worldQuestCycle &&
     meta.worldQuestLog.size === 0 &&
     !hasRep &&
+    !hasCurrencies &&
     !hasReroll &&
     !hasClueHunt &&
     !hasClueCycle &&
@@ -154,6 +172,7 @@ export function savedWorldQuestState(meta: PlayerMeta): {
     return {};
   }
   const factionsObj = hasRep ? { ...meta.factions } : undefined;
+  const currenciesObj = hasCurrencies ? { ...meta.factionCurrencies } : undefined;
   return {
     worldQuests: {
       cycle: meta.worldQuestCycle,
@@ -191,6 +210,7 @@ export function savedWorldQuestState(meta: PlayerMeta): {
         }),
       ),
       ...(factionsObj ? { factions: factionsObj } : {}),
+      ...(currenciesObj ? { factionCurrencies: currenciesObj } : {}),
       ...(hasReroll ? { rerollCycle: meta.worldQuestRerollCycle } : {}),
       ...(hasReplacements ? { replacements: { ...meta.worldQuestReplacements } } : {}),
       ...(hasClueHunt && meta.clueHunt ? { clueHunt: { ...meta.clueHunt } } : {}),
@@ -198,6 +218,7 @@ export function savedWorldQuestState(meta: PlayerMeta): {
       ...(hasCaskets ? { clueCasketsOpened: meta.clueCasketsOpened } : {}),
     },
     ...(factionsObj ? { factions: factionsObj } : {}),
+    ...(currenciesObj ? { factionCurrencies: currenciesObj } : {}),
   };
 }
 

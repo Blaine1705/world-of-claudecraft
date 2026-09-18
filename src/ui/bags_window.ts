@@ -21,6 +21,7 @@ import { audio } from '../game/audio';
 import { BACKPACK_SLOTS, bagSlotsOf } from '../sim/bags';
 import { ITEMS, QUESTS } from '../sim/data';
 import { FIREBOTTLE_COOLDOWN_SECS, FIREBOTTLE_ITEM_ID } from '../sim/interactions/firebottle_hut';
+import { getItemCooldownDuration } from '../sim/content/item_cooldowns';
 import { baggedCopyAnchor } from '../sim/item_copy_anchor';
 import { itemCopyPin, type NamedSlotTarget } from '../sim/item_copy_ref';
 import { isItemLocked } from '../sim/item_lock';
@@ -283,6 +284,8 @@ export interface BagsWindowDeps extends PainterHostPresentation {
    *  handler consumed the use (nearest matching node + autorun stop); false
    *  falls back to the plain useItem command. */
   useGatherTool(item: ItemDef): boolean;
+  /** Arm ground targeting for ground-aimable consumables (e.g. shock bomb). */
+  startGroundAimForItem?(itemId: string): boolean;
   // Hotbar drag plumbing (cross-window drag state lives on the HUD).
   isHotbarItemId(itemId: string): boolean;
   setDragAction(action: { type: 'item'; id: string } | null): void;
@@ -1112,15 +1115,23 @@ export class BagsWindow {
       // per-frame driver, so the sweep is a self-contained CSS animation seeded from
       // the wired remaining seconds (world.player.firebottleCdRemaining), not a
       // per-frame-repainted --cd-fill like the action bar. Appended after the
-      // innerHTML build so the quest seal markup above is not overwritten.
-      if (item.id === FIREBOTTLE_ITEM_ID && world.player.firebottleCdRemaining > 0) {
-        const remaining = world.player.firebottleCdRemaining;
+      // Mid-cooldown items paint a draining curtain on their slot so the pacing
+      // is visible in the bag. The bag is a cold window with no per-frame driver, so
+      // the sweep is a self-contained CSS animation seeded from remaining seconds.
+      const itemCd =
+        world.player.cooldowns.get(item.id) ??
+        (item.id === FIREBOTTLE_ITEM_ID ? world.player.firebottleCdRemaining : 0);
+      const itemTotalCd =
+        getItemCooldownDuration(item.id) ||
+        (item.id === FIREBOTTLE_ITEM_ID ? FIREBOTTLE_COOLDOWN_SECS : itemCd);
+      if (itemCd > 0 && itemTotalCd > 0) {
+        const remaining = itemCd;
         const curtain = document.createElement('span');
         curtain.className = 'bag-cd-curtain';
         curtain.setAttribute('aria-hidden', 'true');
         curtain.style.setProperty(
           '--cd-start',
-          `${Math.min(100, (remaining / FIREBOTTLE_COOLDOWN_SECS) * 100)}%`,
+          `${Math.min(100, (remaining / itemTotalCd) * 100)}%`,
         );
         curtain.style.setProperty('--cd-dur', `${remaining}s`);
         row.appendChild(curtain);
@@ -1915,6 +1926,10 @@ export class BagsWindow {
         break;
       }
       case 'use': {
+        if (this.deps.startGroundAimForItem?.(s.itemId)) {
+          this.deps.hideTooltip();
+          break;
+        }
         // Gathering tools (#2343) route through the interact-style handler
         // (nearest matching node + autorun stop) when main.ts has wired it;
         // everything else, and any unwired host, keeps the plain useItem.

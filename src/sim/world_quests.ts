@@ -8,9 +8,12 @@ import { WISP_MAZE_QUEST_ID } from './content/world_quest_wisp_maze';
 import { WORLD_QUEST_MIN_LEVEL, WORLD_QUESTS, WORLD_QUESTS_BY_ID } from './content/world_quests';
 import { grantDeed } from './deeds';
 import {
+  awardFactionCurrency,
   awardFactionReputation,
+  factionCurrencyName,
   factionDisplayName,
   worldQuestFaction,
+  worldQuestFactionCurrencyReward,
   worldQuestStandingReward,
 } from './factions';
 import { formatMoney } from './format_money';
@@ -590,6 +593,16 @@ export function awardWorldQuest(ctx: SimContext, meta: PlayerMeta, quest: WorldQ
     ctx.emit({
       type: 'loot',
       text: `+${standingResult.gained} ${factionDisplayName(factionId)} Standing.`,
+      pid: meta.entityId,
+    });
+  }
+
+  const currencyAward = worldQuestFactionCurrencyReward(quest, player.level);
+  if (currencyAward > 0) {
+    awardFactionCurrency(meta, factionId, currencyAward);
+    ctx.emit({
+      type: 'loot',
+      text: `+${currencyAward} ${factionCurrencyName(factionId)}.`,
       pid: meta.entityId,
     });
   }

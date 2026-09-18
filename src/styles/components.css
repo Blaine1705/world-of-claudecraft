@@ -7711,10 +7711,13 @@
     font-size: 11px;
   }
   .vendor-item .vi-price .warfare-price,
-  .warfare-balance {
+  .vendor-item .vi-price .faction-currency-price,
+  .warfare-balance,
+  .faction-currency-balance {
     color: var(--gold);
   }
-  .warfare-balance {
+  .warfare-balance,
+  .faction-currency-balance {
     margin: 6px 5px;
     font-family: var(--title-font);
     font-size: 12px;
@@ -8415,7 +8418,8 @@
      in the language. Restated at the .warfare-price specificity because the
      gold honor color would otherwise outrank the .vi-price.unaffordable rule
      on the inner span. */
-  .vendor-item .vi-price .warfare-price.unaffordable {
+  .vendor-item .vi-price .warfare-price.unaffordable,
+  .vendor-item .vi-price .faction-currency-price.unaffordable {
     color: var(--color-text-error);
   }
   /* A piece the viewer already wears or carries. The tile still sells (a second

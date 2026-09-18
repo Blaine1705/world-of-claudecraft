@@ -16332,6 +16332,32 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_weapon_might': 'Grabado de arma: Poder',
   'hudChrome.enchantName.enchant_weapon_runed_edge': 'Grabado de arma: Filo rúnico',
   'hudChrome.enchantName.enchant_weapon_runed_focus': 'Grabado de arma: Concentración rúnica',
+  'hudChrome.enchantName.enchant_offhand_spirit': 'Grabado para mano izquierda: Espíritu',
+  'hudChrome.enchantName.enchant_feet_shadowstride': 'Grabado para botas: Paso sombrío',
+  'hudChrome.enchantName.enchant_gloves_forged_might': 'Grabado para guantes: Poder forjado',
+  'hudChrome.factionRewards.alliedHearthstoneUse':
+    'Uso: Te teletransporta al bastión de facción sintonizado. (10 s de lanzamiento, 15 min de reutilización)',
+  'hudChrome.factionRewards.alliedHearthstoneAttuned': 'Sintonizado con: {hub}',
+  'hudChrome.factionRewards.hub_none':
+    'Ninguno (Úsala cerca de un bastión de facción para sintonizarte)',
+  'hudChrome.factionRewards.hub_rift_watch': 'Refugio de la Brecha (La Guardia de la Brecha)',
+  'hudChrome.factionRewards.hub_church_order': 'Valle de Arroyo Este (La Orden de la Sagrada Luz)',
+  'hudChrome.factionRewards.hub_automatons': 'Confín Sur (La Fundición de Autómatas)',
+  'hudChrome.factionRewards.riftGliderUse':
+    'Uso: Despliega el planeador, ralentizando la caída durante 30 s. Aterrizar o recibir daño cancela el efecto. (2 min de reutilización)',
+  'hudChrome.factionRewards.targetDummyUse':
+    'Uso: Despliega un muñeco mecánico de entrenamiento en el mundo abierto durante 2 minutos para practicar combate. (5 min de reutilización)',
+  'hudChrome.factionRewards.battleStandardUse':
+    'Uso: Clava el estandarte de batalla del Alba Consagrada durante 5 minutos, aumentando notablemente la regeneración de salud y maná fuera de combate de todos los aliados cercanos. Permanecer cerca durante 10 segundos otorga Bendición del Alba (+5% a todas las estadísticas durante 30 min). (5 min de reutilización)',
+  'hudChrome.factionRewards.shockBombUse':
+    'Uso: Lanza una bomba de choque mecánica hasta a 30 m, infligiendo de 120 a 160 p. de daño de Naturaleza a los enemigos en un radio de 5 m. (1 min de reutilización)',
+  'hudChrome.factionRewards.invisibilityUse':
+    'Uso: Te envuelve en sigilo durante 6 s. (2 min de reutilización)',
+  'hudChrome.factionRewards.armorKitUse':
+    'Uso: Refuerza tu armadura de pecho, aumentando la armadura en 12 p. durante 1 hora.',
+  'hudChrome.factionRewards.sharpeningStoneUse':
+    'Uso: Afila tu arma de mano derecha, aumentando el poder de ataque en 6 p. durante 30 min.',
+  'hudChrome.factionRewards.manaElixirUse': 'Uso: Aumenta el espíritu en 6 p. durante 1 hora.',
   'hudChrome.enchanting.enchantSkillTooLow':
     'Tu habilidad de Encantamiento es demasiado baja para ese encantamiento.',
   'hudChrome.enchanting.notPerfected':

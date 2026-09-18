@@ -41,6 +41,7 @@ export function applyQuestSelfWire(
     wqexp?: unknown;
     wqlog?: unknown;
     fac?: unknown;
+    facCur?: unknown;
     wqrr?: unknown;
     wqrep?: unknown;
     cluh?: unknown;

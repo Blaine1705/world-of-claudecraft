@@ -2332,7 +2332,13 @@ export const es_ES: EnTranslations = {
       "walletNotLinked": "No wallet linked",
       "wocPreview": "Preview balance, not yet verified",
       "lifetime": "Lifetime {amount}",
-      "factionPending": "Faction currency: pending Stage 2"
+      "factionPending": "Faction currency: pending Stage 2",
+      "riftWatchMark": "Rift Watch Mark",
+      "riftWatchMarkNote": "World Quests in Rift Watch zones",
+      "churchOrderCrest": "Order Crest",
+      "churchOrderCrestNote": "World Quests in Church Order zones",
+      "automatonCog": "Automaton Cog",
+      "automatonCogNote": "World Quests in Automaton zones"
     },
     "reputation": {
       "intro": "All three factions progress at once: every world quest counts toward the faction of its zone.",
@@ -4625,10 +4631,29 @@ export const es_ES: EnTranslations = {
       "enchant_weapon_lucent_spellpower": "Grabado de arma: Poder con hechizos luminoso",
       "enchant_chest_lucent_stamina": "Grabado de pecho: Aguante luminoso",
       "enchant_feet_lucent_agility": "Grabado de botas: Agilidad luminosa",
-      "enchant_lucent_infusion": "Infusión luminosa"
+      "enchant_lucent_infusion": "Infusión luminosa",
+      "enchant_offhand_spirit": "Grabado para mano izquierda: Espíritu",
+      "enchant_feet_shadowstride": "Grabado para botas: Paso sombrío",
+      "enchant_gloves_forged_might": "Grabado para guantes: Poder forjado"
     },
     "enchantDescription": {
       "enchant_weapon_lastflame_zeal": "Tus ataques cuerpo a cuerpo que impactan pueden otorgar 50 de Fuerza durante 15 s y curarte 200 de salud. Se aplican los modificadores de curación. Cada golpe tiene una probabilidad del 1 % por cada 0,6 s de velocidad base del arma atacante. No tiene enfriamiento interno. Ambas manos comparten un solo beneficio; cualquier activación lo renueva y nunca se acumula. Los ataques a distancia no activan este efecto. Forma de lobo usa en su lugar su velocidad de golpe base de 1 s."
+    },
+    "factionRewards": {
+      "alliedHearthstoneUse": "Uso: Te teletransporta al bastión de facción sintonizado. (10 s de lanzamiento, 15 min de reutilización)",
+      "alliedHearthstoneAttuned": "Sintonizado con: {hub}",
+      "hub_none": "Ninguno (Úsala cerca de un bastión de facción para sintonizarte)",
+      "hub_rift_watch": "Refugio de la Brecha (La Guardia de la Brecha)",
+      "hub_church_order": "Valle de Arroyo Este (La Orden de la Sagrada Luz)",
+      "hub_automatons": "Confín Sur (La Fundición de Autómatas)",
+      "riftGliderUse": "Uso: Despliega el planeador, ralentizando la caída durante 30 s. Aterrizar o recibir daño cancela el efecto. (2 min de reutilización)",
+      "targetDummyUse": "Uso: Despliega un muñeco mecánico de entrenamiento en el mundo abierto durante 2 minutos para practicar combate. (5 min de reutilización)",
+      "battleStandardUse": "Uso: Clava el estandarte de batalla del Alba Consagrada durante 5 minutos, aumentando notablemente la regeneración de salud y maná fuera de combate de todos los aliados cercanos. Permanecer cerca durante 10 segundos otorga Bendición del Alba (+5% a todas las estadísticas durante 30 min). (5 min de reutilización)",
+      "shockBombUse": "Uso: Lanza una bomba de choque mecánica hasta a 30 m, infligiendo de 120 a 160 p. de daño de Naturaleza a los enemigos en un radio de 5 m. (1 min de reutilización)",
+      "invisibilityUse": "Uso: Te envuelve en sigilo durante 6 s. (2 min de reutilización)",
+      "armorKitUse": "Uso: Refuerza tu armadura de pecho, aumentando la armadura en 12 p. durante 1 hora.",
+      "sharpeningStoneUse": "Uso: Afila tu arma de mano derecha, aumentando el poder de ataque en 6 p. durante 30 min.",
+      "manaElixirUse": "Uso: Aumenta el espíritu en 6 p. durante 1 hora."
     },
     "professions": {
       "title": "Profesiones",
@@ -16489,6 +16514,60 @@ export const es_ES: EnTranslations = {
       },
       "stormhymn_chain_treads": {
         "name": "Botas de malla Himno de tormenta"
+      },
+      "allied_hearthstone": {
+        "name": "Allied Hearthstone"
+      },
+      "allied_vanguard_duffel": {
+        "name": "Allied Vanguard Duffel"
+      },
+      "rift_feather_glider": {
+        "name": "Rift Feather Glider"
+      },
+      "formula_enchant_feet_shadowstride": {
+        "name": "Formula: Enchant Boots - Shadowstride"
+      },
+      "recipe_potion_of_invisibility": {
+        "name": "Recipe: Potion of Invisibility"
+      },
+      "potion_of_invisibility": {
+        "name": "Potion of Invisibility"
+      },
+      "pattern_reinforced_armor_kit": {
+        "name": "Pattern: Reinforced Armor Kit"
+      },
+      "reinforced_armor_kit": {
+        "name": "Reinforced Armor Kit"
+      },
+      "dawn_battle_standard": {
+        "name": "Dawn Battle Standard"
+      },
+      "formula_enchant_offhand_spirit": {
+        "name": "Formula: Enchant Off-Hand - Spirit"
+      },
+      "recipe_elixir_of_mana_regeneration": {
+        "name": "Recipe: Elixir of Mana Regeneration"
+      },
+      "elixir_of_mana_regeneration": {
+        "name": "Elixir of Mana Regeneration"
+      },
+      "clockwork_target_dummy": {
+        "name": "Clockwork Target Dummy"
+      },
+      "schematic_clockwork_shock_bomb": {
+        "name": "Schematic: Clockwork Shock Bomb"
+      },
+      "clockwork_shock_bomb": {
+        "name": "Clockwork Shock Bomb"
+      },
+      "plans_dense_sharpening_stone": {
+        "name": "Plans: Dense Sharpening Stone"
+      },
+      "dense_sharpening_stone": {
+        "name": "Dense Sharpening Stone"
+      },
+      "formula_enchant_gloves_forged_might": {
+        "name": "Formula: Enchant Gloves - Forged Might"
       },
       "conjured_water4": {
         "name": "Agua de Manantial Invocada"

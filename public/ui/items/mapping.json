@@ -6850,6 +6850,39 @@
         "clue_scroll",
         "treasure_casket"
       ]
+    },
+    {
+      "batchId": "faction-rewards-icons-2026-09-17",
+      "source": "Deterministic SVG compositions rendered to WebP with Sharp (scripts/generate_faction_reward_icons.mjs); no image model",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "woc-item-icon-v1; existing painted item catalog (opaque dark vignette, warm top-left key, cool bottom-right shadow, centered silhouette with safe padding)",
+      "commonPrompt": "Not a text-to-image prompt: each icon is an authored SVG composition (per-item vector art over a three-stop radial ground) rasterized to an opaque 128x128 sRGB WebP. The exact vector source of every item is the ITEMS_TO_GENERATE table in scripts/generate_faction_reward_icons.mjs.",
+      "provenanceRecord": "scripts/generate_faction_reward_icons.mjs",
+      "itemIds": [
+        "allied_hearthstone",
+        "allied_vanguard_duffel",
+        "clockwork_shock_bomb",
+        "clockwork_target_dummy",
+        "dawn_battle_standard",
+        "dense_sharpening_stone",
+        "elixir_of_mana_regeneration",
+        "formula_enchant_feet_shadowstride",
+        "formula_enchant_gloves_forged_might",
+        "formula_enchant_offhand_spirit",
+        "pattern_reinforced_armor_kit",
+        "plans_dense_sharpening_stone",
+        "potion_of_invisibility",
+        "recipe_elixir_of_mana_regeneration",
+        "recipe_potion_of_invisibility",
+        "reinforced_armor_kit",
+        "rift_feather_glider",
+        "schematic_clockwork_shock_bomb"
+      ]
     }
   ]
 }

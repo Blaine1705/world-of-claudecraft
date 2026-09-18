@@ -2332,7 +2332,13 @@ export const ja_JP: EnTranslations = {
       "walletNotLinked": "ウォレット未連携",
       "wocPreview": "プレビュー残高（未検証）",
       "lifetime": "累計 {amount}",
-      "factionPending": "勢力通貨：第2段階で決定"
+      "factionPending": "勢力通貨：第2段階で決定",
+      "riftWatchMark": "Rift Watch Mark",
+      "riftWatchMarkNote": "World Quests in Rift Watch zones",
+      "churchOrderCrest": "Order Crest",
+      "churchOrderCrestNote": "World Quests in Church Order zones",
+      "automatonCog": "Automaton Cog",
+      "automatonCogNote": "World Quests in Automaton zones"
     },
     "reputation": {
       "intro": "3つの勢力は同時に進行します。各ワールドクエストは、その地域の勢力に加算されます。",
@@ -4625,10 +4631,29 @@ export const ja_JP: EnTranslations = {
       "enchant_weapon_lucent_spellpower": "武器銘刻：光輝の呪文威力",
       "enchant_chest_lucent_stamina": "胸銘刻：光輝のスタミナ",
       "enchant_feet_lucent_agility": "足銘刻：光輝の敏捷性",
-      "enchant_lucent_infusion": "光輝の注入"
+      "enchant_lucent_infusion": "光輝の注入",
+      "enchant_offhand_spirit": "Offhand Etching: Spirit",
+      "enchant_feet_shadowstride": "Boot Etching: Shadowstride",
+      "enchant_gloves_forged_might": "Glove Etching: Forged Might"
     },
     "enchantDescription": {
       "enchant_weapon_lastflame_zeal": "命中した近接攻撃は、確率で15秒間筋力を50増加させ、自分の体力を200回復する。回復量の補正が適用される。命中ごとの発動率は、攻撃した武器の基本速度0.6秒につき1%。内部クールダウンはない。強化は両手で共有され、どちらの手で発動しても持続時間が更新される。重複して積み重なることはない。遠隔攻撃では発動しない。狼形態では代わりに1秒の基本攻撃速度を使う。"
+    },
+    "factionRewards": {
+      "alliedHearthstoneUse": "Use: Teleports you to your attuned faction hub. (10 sec cast, 15 min cooldown)",
+      "alliedHearthstoneAttuned": "Attuned to: {hub}",
+      "hub_none": "None (Use near a faction hub to attune)",
+      "hub_rift_watch": "Drifthaven (The Rift Watch)",
+      "hub_church_order": "Eastbrook Vale (The Church of the Holy Light Order)",
+      "hub_automatons": "South Reach (The Automaton Foundry)",
+      "riftGliderUse": "Use: Unfolds the glider, slowing falling speed for 30 sec. Landing or taking damage cancels the effect. (2 min cooldown)",
+      "targetDummyUse": "Use: Deploys a mechanical target dummy in the open world for 2 minutes to practice combat abilities. (5 min cooldown)",
+      "battleStandardUse": "Use: Plants the Consecrated Dawn Battle Standard for 5 minutes, significantly increasing out-of-combat health and mana regeneration for all nearby allies. Remaining near it for 10 seconds also grants Blessing of the Dawn (+5% to all stats for 30 min). (5 min cooldown)",
+      "shockBombUse": "Use: Throws a shock bomb up to 30 yards, dealing 120 to 160 Nature damage to all enemies within 5 yards. (1 min cooldown)",
+      "invisibilityUse": "Use: Shrouds you in stealth for 6 sec. (2 min cooldown)",
+      "armorKitUse": "Use: Reinforces your chest armor, increasing Armor by 12 for 1 hour.",
+      "sharpeningStoneUse": "Use: Sharpens your main hand weapon, increasing Attack Power by 6 for 30 min.",
+      "manaElixirUse": "Use: Increases Spirit by 6 for 1 hour."
     },
     "professions": {
       "title": "専門技能",
@@ -16489,6 +16514,60 @@ export const ja_JP: EnTranslations = {
       },
       "stormhymn_chain_treads": {
         "name": "嵐の賛歌の鎖の靴"
+      },
+      "allied_hearthstone": {
+        "name": "Allied Hearthstone"
+      },
+      "allied_vanguard_duffel": {
+        "name": "Allied Vanguard Duffel"
+      },
+      "rift_feather_glider": {
+        "name": "Rift Feather Glider"
+      },
+      "formula_enchant_feet_shadowstride": {
+        "name": "Formula: Enchant Boots - Shadowstride"
+      },
+      "recipe_potion_of_invisibility": {
+        "name": "Recipe: Potion of Invisibility"
+      },
+      "potion_of_invisibility": {
+        "name": "Potion of Invisibility"
+      },
+      "pattern_reinforced_armor_kit": {
+        "name": "Pattern: Reinforced Armor Kit"
+      },
+      "reinforced_armor_kit": {
+        "name": "Reinforced Armor Kit"
+      },
+      "dawn_battle_standard": {
+        "name": "Dawn Battle Standard"
+      },
+      "formula_enchant_offhand_spirit": {
+        "name": "Formula: Enchant Off-Hand - Spirit"
+      },
+      "recipe_elixir_of_mana_regeneration": {
+        "name": "Recipe: Elixir of Mana Regeneration"
+      },
+      "elixir_of_mana_regeneration": {
+        "name": "Elixir of Mana Regeneration"
+      },
+      "clockwork_target_dummy": {
+        "name": "Clockwork Target Dummy"
+      },
+      "schematic_clockwork_shock_bomb": {
+        "name": "Schematic: Clockwork Shock Bomb"
+      },
+      "clockwork_shock_bomb": {
+        "name": "Clockwork Shock Bomb"
+      },
+      "plans_dense_sharpening_stone": {
+        "name": "Plans: Dense Sharpening Stone"
+      },
+      "dense_sharpening_stone": {
+        "name": "Dense Sharpening Stone"
+      },
+      "formula_enchant_gloves_forged_might": {
+        "name": "Formula: Enchant Gloves - Forged Might"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"

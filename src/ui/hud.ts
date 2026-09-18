@@ -59,6 +59,7 @@ import { bagPools } from '../sim/bags';
 import { warriorParryChance } from '../sim/combat/warrior_hit_table';
 import { DEEDS } from '../sim/content/deeds';
 import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
+import { vendorFactionForNpc } from '../sim/content/faction_vendors';
 import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
 import { CRUCIBLE_VENDOR_STOCK } from '../sim/content/ignivar_loot';
 import { isOnMountRaceStartPlatform, MOUNTS } from '../sim/content/mounts';
@@ -374,6 +375,7 @@ import { bindEmpoweredActionHold } from './hud/action_bar/empowered_hold';
 import {
   type AimPoint,
   quickGroundTarget,
+  resolveGroundAimAbility,
   selectedGroundAimPoint,
   shouldUseGroundAim,
   XHB_ONLY_AIM_SLOT,
@@ -456,6 +458,7 @@ import { DelveMapPainter } from './hud/delve/delve_map_painter';
 import { DelveTrackerController } from './hud/delve/delve_tracker_controller';
 import { LockpickController } from './hud/delve/lockpick_controller';
 import { RiteController } from './hud/delve/rite_controller';
+import { factionRewardTooltipLines } from './hud/faction_reward_tooltip_view';
 import { FiestaController } from './hud/fiesta/fiesta_controller';
 import { GuildBoardWindow } from './hud/guild_board';
 import { LootRollController } from './hud/loot/loot_roll_controller';
@@ -1374,7 +1377,7 @@ export class Hud {
   }
   private readonly playerGroundAim = new GroundAimController({
     player: () => this.sim.player,
-    resolveAbility: (id) => this.sim.known.find((k) => k.def.id === id) ?? null,
+    resolveAbility: (id) => resolveGroundAimAbility(this.sim.known, id),
     seedTargetPoint: () =>
       selectedGroundAimPoint(
         this.sim.player,
@@ -1382,7 +1385,10 @@ export class Hud {
         this.optionsHooks?.groundAimTargetAttackable,
       ),
     fallbackPoint: () => quickGroundTarget(this.sim.player, this.sim.entities),
-    castAt: (id, point) => this.sim.castAbilityAt(id, point),
+    castAt: (id, pt) =>
+      id === 'clockwork_shock_bomb'
+        ? this.sim.useItem(id, { aim: pt })
+        : this.sim.castAbilityAt(id, pt),
     clearReticle: () => this.renderer.setGroundAimReticle(null),
     projectPlacement: (id, point) => this.sim.groundAimPlacementPreview(id, point),
   });
@@ -1392,12 +1398,7 @@ export class Hud {
     sourceIndex: number | null;
     sourceAttackSlot?: boolean;
   } | null = null;
-  // Set while dragging an equipped piece out of the paperdoll onto the bags window.
   private dragUnequipSlot: EquipSlot | null = null;
-  // The mirror gesture: the bag stack currently being dragged OUT of the bags, read
-  // by its two drop targets (a paperdoll socket equips it, the world destroys it).
-  // The windows publish and read it through their deps; the state itself is a shared
-  // module, not another cross-window field cluster on this coordinator.
   private readonly itemDragState = new ItemDragState();
   private suppressNextActionClick = false;
   private optionsHooks: OptionsHooks | null = null;
@@ -5302,6 +5303,14 @@ export class Hud {
     sellConfirmPolicy: () => vendorSellConfirmPolicyFrom((k) => this.optionsHooks?.settings.get(k)),
     isHotbarItemId: (itemId) => this.isHotbarItemId(itemId),
     useGatherTool: (item) => this.gatherToolUseHook?.(item) ?? false,
+    startGroundAimForItem: (itemId) => {
+      const resolved = resolveGroundAimAbility(this.sim.known, itemId);
+      if (resolved && itemId === 'clockwork_shock_bomb') {
+        this.castPositionAbility(itemId, resolved, XHB_ONLY_AIM_SLOT);
+        return true;
+      }
+      return false;
+    },
     setDragAction: (action) => {
       this.dragAction = action ? { action, sourceIndex: null } : null;
     },
@@ -6728,15 +6737,11 @@ export class Hud {
     // useItem), from the pure sibling view so bags, bank, crafting, vendor,
     // and market all state what the elixir does.
     html += elixirTooltipLines(item);
-    // Recipe patterns (kind 'recipe'): what the pattern teaches, the craft
-    // skill it wants (red when unmet), and the trainer's own already-known
-    // line when this character has learned it. The viewer state is the
-    // existing craftingIdentity read, so bags, bank, mail, and market all
-    // state the same three lines offline and online. The read is gated on the
-    // kind rather than left to the core's own guard: the offline Sim rebuilds
-    // craftingIdentity (a copied skill record and a SORTED known-recipe list)
-    // on every call, so no other kind's hover should pay for it; the online
-    // ClientWorld read is a plain mirrored field and free either way.
+    html += factionRewardTooltipLines(
+      item,
+      (this.sim as { alliedHearthstoneAttunement?: FactionId }).alliedHearthstoneAttunement,
+    );
+    // Recipe patterns (kind 'recipe'): what the pattern teaches, skill req, and already-known line.
     if (item.kind === 'recipe') {
       html += recipePatternTooltipLines(item, this.sim.craftingIdentity);
     }
@@ -7504,10 +7509,7 @@ export class Hud {
     this.flashActionSlot(0);
   }
 
-  // Pad press edge for a cross hotbar cell. Routed through pressSlot when the bar
-  // holds the action, so a pad press gets the SAME semantics a key press does
-  // (reticle, empower charge, mouseover cast, the auto-attack QoL) rather than a
-  // second cast path that would drift from it; the release edge is releaseCrossHotbarAction.
+  // Pad press edge for a cross hotbar cell. Routed through pressSlot when the bar holds the action.
   pressCrossHotbarAction(action: { type: 'ability' | 'item'; id: string }): void {
     if (VehicleActionBarController.blocksPlayerActions(this.sim)) return;
     if (action.id === CROSS_HOTBAR_ATTACK_ID || action.type === 'item') {
@@ -7531,10 +7533,7 @@ export class Hud {
     this.empowerHold.releaseAction(action, this.sim, (slot) => this.flashActionSlot(slot));
   }
 
-  // Tap-shaped cross hotbar fire (no hold edge available). The bar is seeded from
-  // the action bar, so the slot lookup almost always hits; an action arranged onto
-  // the pad and nowhere else falls back to a plain cast (position abilities keep
-  // the reticle via the ability-id aim identity) or the shared item-use seam.
+  // Tap-shaped cross hotbar fire (no hold edge available).
   castCrossHotbarAction(action: { type: 'ability' | 'item'; id: string }): void {
     if (VehicleActionBarController.blocksPlayerActions(this.sim)) return;
     // Attack is the fixed slot-0 toggle, not something the sim can cast by id.
@@ -7573,26 +7572,24 @@ export class Hud {
       this.useHotbarItem(action.id);
       return;
     }
-    // A cell left holding an item this client cannot use is a stale binding, so
-    // refuse it out loud rather than eating the press.
+    // A cell holding an unusable item refuses out loud.
     this.showError(tSim('error.noItem'));
   }
 
-  // One decision for a position press (bar slots and the XHB-only fallback):
-  // enter aim when the reticle applies and the cast could start (alive, off
-  // cooldown; resources and the GCD change while aiming, so they never gate
-  // entry), else cast instantly. slotForAim is the re-press commit identity.
+  // Position press: enter aim when reticle applies and cast could start, else cast instantly.
   private castPositionAbility(
     abilityId: string,
     resolved: ResolvedAbility,
     slotForAim: number,
   ): void {
+    const cdReady =
+      abilityId === 'clockwork_shock_bomb'
+        ? (this.sim.player.cooldowns.get(abilityId) ?? 0) <= 0
+        : actionBarCooldownRemaining(this.sim.player, resolved) <= 0;
     this.playerGroundAim.pressPosition(
       abilityId,
       slotForAim,
-      this.groundReticleEnabled() &&
-        !this.sim.player.dead &&
-        actionBarCooldownRemaining(this.sim.player, resolved) <= 0,
+      this.groundReticleEnabled() && !this.sim.player.dead && cdReady,
       document.body.classList.contains('mobile-touch'),
     );
   }
@@ -7633,13 +7630,8 @@ export class Hud {
         if (resolved.def.targetMode === 'position' && !resolved.def.selfCentered) {
           this.castPositionAbility(action.id, resolved, barSlot);
         } else {
-          // Clique-style mouseover cast: a friendly (heal/buff) ability pressed
-          // while hovering a party frame lands on the hovered member instead of
-          // the current target; the sim validates and falls back if it went stale.
-          // Gated on the Interface option (mouseoverCast, on by default). A member
-          // outside this client's interest scope (a RELEASED ghost waits at the
-          // graveyard) still redirects on the party roster alone: see
-          // mouseover_cast_core.ts.
+          // Clique-style mouseover cast on party frame members when enabled;
+          // redirects to hovered member, falling back to current target if stale.
           const mouseoverPid = mouseoverCastTargetPid(this.hoveredPartyPid, resolved.def, {
             enabled: this.optionsHooks?.settings.get('mouseoverCast') ?? true,
             hasEntity: (pid) => this.sim.entities.has(pid),
@@ -7650,12 +7642,7 @@ export class Hud {
           } else {
             this.sim.castAbility(action.id);
           }
-          // Optional QoL: also engage auto-attack when the ability is an offensive
-          // attack, so white swings start without a separate Attack press. Gated on
-          // the player setting; abilityStartsAutoAttack skips heals/buffs and CC the
-          // swing would shatter. hasAutoAttackTarget keeps requiresTarget:false AOEs
-          // from tripping "Invalid attack target" and covers PvP player targets that
-          // never carry the mob-only `hostile` flag.
+          // Optional QoL: engage auto-attack when the ability is an offensive attack.
           const tid = this.sim.player.targetId;
           const target = tid !== null ? (this.sim.entities.get(tid) ?? null) : null;
           if (
@@ -7666,11 +7653,7 @@ export class Hud {
               isPvpHostileTarget(tid, this.sim.duelInfo, this.sim.arenaInfo, this.sim.bgInfo),
             )
           ) {
-            // A TIMED cast must not engage yet (the aggro-before-damage bug). The
-            // recorded id only ARMS once castStart below confirms this exact cast
-            // began (a refused cast never reaches it); see
-            // confirmPendingAutoAttackEngage for why that matters. Instants still
-            // engage at once since their damage lands this same tick.
+            // Timed casts defer engage until cast begins; instants start immediately.
             if (deferAutoAttackUntilCastEnd(resolved.castTime)) {
               this.pendingAutoAttackAbilityId = action.id;
             } else {
@@ -7680,22 +7663,32 @@ export class Hud {
         }
         this.flashActionSlot(barSlot);
       } else if (barSlot === 0 && this.freedAttackSlotAbility()) {
-        // The freed slot now visibly shows an assigned, named icon (dimmed) even
-        // while unusable, so a press must refuse out loud rather than eating the
-        // click silently, the same courtesy a stale item binding already gets
-        // (castCrossHotbarAction's tSim('error.noItem') a few dozen lines up).
         this.showError(t('abilityUi.tooltip.unavailable'));
       }
     } else if (action?.type === 'item' && this.isHotbarItemId(action.id)) {
       if (this.tradeOpen) return;
+      if (action.id === 'clockwork_shock_bomb') {
+        const resolved = resolveGroundAimAbility(this.sim.known, action.id);
+        if (resolved) {
+          if (this.isGroundAimActive()) {
+            if (this.groundAim.activeSlot() === barSlot) {
+              this.commitGroundAimAt();
+              this.flashActionSlot(barSlot);
+              return;
+            }
+            this.cancelGroundAim();
+          }
+          this.castPositionAbility(action.id, resolved, barSlot);
+          this.flashActionSlot(barSlot);
+          return;
+        }
+      }
       this.useHotbarItem(action.id);
       this.flashActionSlot(barSlot);
     }
   }
 
-  // The one item-use path a bar press takes, keyboard or pad: gathering tools
-  // route through the interact-style handler first (#2343); everything else
-  // (and fishing implements) keeps the plain useItem command.
+  // Item use path for bar presses: gathering tools route to handler, else plain useItem.
   private useHotbarItem(itemId: string): void {
     if (!this.tryGatherToolUse(itemId)) this.sim.useItem(itemId);
     if ($('#bags').style.display !== 'none') this.renderBags();
@@ -14893,6 +14886,8 @@ export class Hud {
           // from the mirrored clears map.
           gatheringProficiency: this.sim.gatheringProficiency,
           factions: this.sim.factions,
+          factionCurrencies: this.sim.factionCurrencies,
+          vendorFactionId: vendorFactionForNpc(npc.templateId),
         },
         this.vendorQtyMultiple,
       ),

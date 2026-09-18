@@ -1,5 +1,5 @@
 import type { FactionId } from '../sim/factions';
-import { freshFactionReputation } from '../sim/factions';
+import { freshFactionCurrencies, freshFactionReputation } from '../sim/factions';
 import type {
   CannonActionId,
   CannonPoint,
@@ -41,6 +41,7 @@ export class QuestWorldWireState {
   worldQuestLog: ReadonlyMap<string, WorldQuestProgress> = new Map();
   nearbyWorldQuestTraces: readonly NearbyWorldQuestTrace[] = [];
   factions: Readonly<Record<FactionId, number>> = freshFactionReputation();
+  factionCurrencies: Readonly<Record<FactionId, number>> = freshFactionCurrencies();
   worldQuestReplacements: Readonly<Record<string, string>> = Object.freeze({});
   worldQuestRerollCycle = '';
   /** The active clue hunt mirrored from the `cluh` self key (null when none). */
