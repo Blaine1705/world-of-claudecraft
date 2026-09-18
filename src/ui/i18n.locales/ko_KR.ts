@@ -5004,7 +5004,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.welcome':
     '테살리 대장이 간신히 하이워치 성벽을 지키고 있습니다.',
   'entities.zones.thornpeak_heights.welcomeDone':
-    '테살리 대장이 하이워치 성벽을 지키고 있습니다 - 결코 쉽지 않지만, 모험가들의 도움으로 이제는 감당할 만합니다.',
+    '테살리 대장이 하이워치 성벽을 지키고 있습니다 - 결코 쉽지 않지만, 당신 같은 모험가들의 도움으로 이제는 감당할 만합니다.',
   'entities.zones.thornpeak_heights.pois.0.label': '하이워치',
   'entities.zones.thornpeak_heights.pois.1.label': '추적자 산등성이',
   'entities.zones.thornpeak_heights.pois.2.label': '딥록 굴',

@@ -20336,7 +20336,7 @@ export const fr_CA: EnTranslations = {
       "thornpeak_heights": {
         "name": "Hauteurs de Thornpeak",
         "welcome": "La capitaine Thessaly tient le mur de Highwatch, à peine.",
-        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers it's now manageable.",
+        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers like you it's now manageable.",
         "pois": {
           "0": {
             "label": "Highwatch"

@@ -43,7 +43,7 @@ export const ZONE3_ZONE: ZoneDef = {
   ],
   welcome: 'Captain Thessaly holds the wall at Highwatch - barely.',
   welcomeDone:
-    "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers it's now manageable.",
+    "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers like you it's now manageable.",
 };
 
 // Mountain road from Fenbridge up to Highwatch, then spokes.

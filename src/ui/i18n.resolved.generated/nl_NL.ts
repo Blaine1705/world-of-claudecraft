@@ -20336,7 +20336,7 @@ export const nl_NL: EnTranslations = {
       "thornpeak_heights": {
         "name": "Doorntop-Hoogten",
         "welcome": "Kapitein Thessaly houdt de muur bij Hoogwacht, ternauwernood.",
-        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers it's now manageable.",
+        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers like you it's now manageable.",
         "pois": {
           "0": {
             "label": "Hoogwacht"

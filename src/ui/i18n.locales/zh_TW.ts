@@ -4835,7 +4835,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.name': '荊峰高地',
   'entities.zones.thornpeak_heights.welcome': '瑟薩莉隊長勉強守住高望城牆。',
   'entities.zones.thornpeak_heights.welcomeDone':
-    '瑟薩莉隊長守衛著高望城牆 - 從來都不輕鬆，但有了冒險者相助，如今總算應付得來。',
+    '瑟薩莉隊長守衛著高望城牆 - 從來都不輕鬆，但有了像你這樣的冒險者相助，如今總算應付得來。',
   'entities.zones.thornpeak_heights.pois.0.label': '高望',
   'entities.zones.thornpeak_heights.pois.1.label': '潛獵者山脊',
   'entities.zones.thornpeak_heights.pois.2.label': '深岩洞穴',

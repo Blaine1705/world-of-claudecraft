@@ -4832,7 +4832,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.name': '荆峰高地',
   'entities.zones.thornpeak_heights.welcome': '瑟萨莉队长勉强守住高望城墙。',
   'entities.zones.thornpeak_heights.welcomeDone':
-    '瑟萨莉队长守卫着高望城墙 - 从来都不轻松，但有了冒险者相助，如今总算应付得来。',
+    '瑟萨莉队长守卫着高望城墙 - 从来都不轻松，但有了像你这样的冒险者相助，如今总算应付得来。',
   'entities.zones.thornpeak_heights.pois.0.label': '高望',
   'entities.zones.thornpeak_heights.pois.1.label': '潜猎者山脊',
   'entities.zones.thornpeak_heights.pois.2.label': '深岩洞穴',

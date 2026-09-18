@@ -20336,7 +20336,7 @@ export const zh_CN: EnTranslations = {
       "thornpeak_heights": {
         "name": "荆峰高地",
         "welcome": "瑟萨莉队长勉强守住高望城墙。",
-        "welcomeDone": "瑟萨莉队长守卫着高望城墙 - 从来都不轻松，但有了冒险者相助，如今总算应付得来。",
+        "welcomeDone": "瑟萨莉队长守卫着高望城墙 - 从来都不轻松，但有了像你这样的冒险者相助，如今总算应付得来。",
         "pois": {
           "0": {
             "label": "高望"

@@ -5044,7 +5044,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.7.label': 'Затонувший бастион',
   'entities.zones.thornpeak_heights.name': 'Терновые высоты',
   'entities.zones.thornpeak_heights.welcome': 'Капитан Тессали едва удерживает стену Хайвотча.',
-  'entities.zones.thornpeak_heights.welcomeDone': 'Капитан Тессали удерживает стену Хайвотча - легко не бывает, но с помощью искателей приключений теперь это по силам.',
+  'entities.zones.thornpeak_heights.welcomeDone': 'Капитан Тессали удерживает стену Хайвотча - легко не бывает, но с помощью таких искателей приключений, как вы, теперь это по силам.',
   'entities.zones.thornpeak_heights.pois.0.label': 'Хайвотч',
   'entities.zones.thornpeak_heights.pois.1.label': 'Хребет охотника',
   'entities.zones.thornpeak_heights.pois.2.label': 'Норы Глубокоскалья',

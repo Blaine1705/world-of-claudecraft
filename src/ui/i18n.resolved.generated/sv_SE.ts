@@ -20336,7 +20336,7 @@ export const sv_SE: EnTranslations = {
       "thornpeak_heights": {
         "name": "Törntoppshöjderna",
         "welcome": "Kapten Thessaly håller muren vid Högvakten - knappt.",
-        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers it's now manageable.",
+        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers like you it's now manageable.",
         "pois": {
           "0": {
             "label": "Högvakten"

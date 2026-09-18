@@ -20336,7 +20336,7 @@ export const vi_VN: EnTranslations = {
       "thornpeak_heights": {
         "name": "Cao Nguyên Đỉnh Gai",
         "welcome": "Đội Trưởng Thessaly đang trấn giữ bức tường ở Vọng Đài Cao, vất vả lắm mới giữ nổi.",
-        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers it's now manageable.",
+        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers like you it's now manageable.",
         "pois": {
           "0": {
             "label": "Vọng Đài Cao"

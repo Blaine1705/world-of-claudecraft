@@ -20336,7 +20336,7 @@ export const pl_PL: EnTranslations = {
       "thornpeak_heights": {
         "name": "Wyżyny Ciernistego Szczytu",
         "welcome": "Kapitan Thessaly utrzymuje mur w Wysokiej Strażnicy, ledwie.",
-        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers it's now manageable.",
+        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers like you it's now manageable.",
         "pois": {
           "0": {
             "label": "Wysoka Strażnica"

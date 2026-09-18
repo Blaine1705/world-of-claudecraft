@@ -20336,7 +20336,7 @@ export const tr_TR: EnTranslations = {
       "thornpeak_heights": {
         "name": "Dikenzirve Tepeleri",
         "welcome": "Yüzbaşı Thessaly, Yüksek Gözcü'deki duvarı tutuyor, zar zor.",
-        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers it's now manageable.",
+        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers like you it's now manageable.",
         "pois": {
           "0": {
             "label": "Yüksek Gözcü"
