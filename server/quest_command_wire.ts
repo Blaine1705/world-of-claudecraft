@@ -89,6 +89,7 @@ const WORLD_QUEST_WIRE_COMMANDS = [
   'world_quest_reroll',
   'world_quest_weekly_choose',
   'world_quest_weekly_commend',
+  'clue_hunt_abandon',
 ] as const;
 export type WorldQuestWireCommand = (typeof WORLD_QUEST_WIRE_COMMANDS)[number];
 const WORLD_QUEST_WIRE_COMMAND_SET: ReadonlySet<unknown> = new Set(WORLD_QUEST_WIRE_COMMANDS);
@@ -133,5 +134,8 @@ export function dispatchWorldQuestWire(sim: Sim, msg: QuestWireMessage, pid: num
       break;
     case 'world_quest_accuse':
       accuseWorldQuestSuspectWire(sim, msg, pid);
+      break;
+    case 'clue_hunt_abandon':
+      sim.abandonClueHunt(pid);
   }
 }

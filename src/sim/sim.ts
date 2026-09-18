@@ -57,6 +57,7 @@ export type { CharacterState, PetState } from './character_state';
 
 import { type AccountEarner, type AccountLedger, freshAccountLedger } from './account_ledger';
 import { buildCivicServicePlacements } from './civic_service_placements';
+import * as clueMod from './clue_scrolls';
 import {
   allocRiftCollisionToken,
   moverHeight,
@@ -4812,6 +4813,12 @@ export class Sim {
   get worldQuestRerollCycle(): string {
     return this.primary.worldQuestRerollCycle;
   }
+  get clueHunt(): Readonly<{ huntId: string; step: number }> | null {
+    return this.primary.clueHunt;
+  }
+  abandonClueHunt(pid?: number): void {
+    clueMod.abandonClueHunt(this.ctx, pid);
+  }
   canRerollWorldQuest(questId: string, pid?: number): { canReroll: boolean; reason?: string } {
     const meta = pid !== undefined ? this.players.get(pid) : this.primary;
     if (!meta) return { canReroll: false, reason: 'Player not found.' };
@@ -9137,6 +9144,7 @@ export class Sim {
     // Book of Deeds: chronicler talks feed their visited mark; talking to any
     // other NPC resets the Saul consecutive-talk counter.
     deedsMod.onNpcTalkedForDeeds(this.ctx, meta, npc.templateId);
+    clueMod.onNpcTalkedForClueHunt(this.ctx, meta, p, npc);
     if (worldQuestMod.talkToWorldQuestInstructor(this.ctx, npc, meta, p)) return;
     if (weeklyQuestMod.talkToWeeklyEmissary(this.ctx, npc, meta, p)) return;
     if (this.interactNpcForQuests(npc, meta)) return;

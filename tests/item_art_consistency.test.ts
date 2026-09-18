@@ -840,7 +840,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // OSSBrain PR #3781 reconcile's two disjoint reins item definitions
     // (reins_goblin_rocket_sled, reins_rallycart_rxt) add two more: 1,301.
     // The wq-reputation merge's 15 faction quartermaster items: 1,320.
-    expect(Object.keys(ITEMS)).toHaveLength(1321);
+    // The Emissary's Cache chest: 1,322. The Clue Scroll items (clue_scroll,
+    // treasure_casket): 1,323.
+    expect(Object.keys(ITEMS)).toHaveLength(1323);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -999,9 +1001,12 @@ describe('item-art consistency accepted-art provenance', () => {
     // release/v0.43.0 merge: 1,287.
     // The faction quartermaster icons (faction-vendor-icons-2026-09-16, 15
     // SVG compositions) join at the wq-reputation merge: 1,302.
-    expect(new Set(currentOwnerIds).size).toBe(1303);
-    expect(shippingIds).toHaveLength(1303);
-    expect(Object.keys(ITEMS)).toHaveLength(1321);
+    // The Emissary's Cache chest (feature/weekly-quests): 1,303. The Clue
+    // Scroll icons (clue-scroll-icons-2026-09-17, two SVG compositions) join:
+    // 1,305.
+    expect(new Set(currentOwnerIds).size).toBe(1305);
+    expect(shippingIds).toHaveLength(1305);
+    expect(Object.keys(ITEMS)).toHaveLength(1323);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1064,6 +1069,12 @@ describe('item-art consistency accepted-art provenance', () => {
       'templar_dawn_shield',
       'vestments_of_the_acolyte',
     ]);
+    // The Clue Scroll items, one SVG batch (clue-scroll-icons-2026-09-17),
+    // additive beyond the chain the same way.
+    const clueScrollBatchIds = mapping.generatedBatches
+      .filter(({ batchId }) => batchId === 'clue-scroll-icons-2026-09-17')
+      .flatMap(({ itemIds }) => itemIds);
+    expect(sorted(clueScrollBatchIds)).toEqual(['clue_scroll', 'treasure_casket']);
     // The OSSBrain PR #3781 reconcile's two reins owners are additive beyond
     // this whole historical chain too, the same way the Field Kit is.
     expect(
@@ -1072,6 +1083,7 @@ describe('item-art consistency accepted-art provenance', () => {
         ...releaseBatchIds,
         ...worldQuestBatchIds,
         ...factionVendorBatchIds,
+        ...clueScrollBatchIds,
         'field_kit',
         'reins_goblin_rocket_sled',
         'reins_rallycart_rxt',
@@ -1239,8 +1251,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // The world-quest branch adds its 2 batches (world-quest-puzzle-activators and
     // world-quest-freight-icons, 2026-09-01) at the release/v0.43.0 merge = 33.
     // The wq-reputation merge adds the faction quartermaster icons' batch
-    // (faction-vendor-icons-2026-09-16) = 34.
-    expect(mapping.generatedBatches).toHaveLength(34);
+    // (faction-vendor-icons-2026-09-16) = 34. The Clue Scroll items add their
+    // batch (clue-scroll-icons-2026-09-17) = 35.
+    expect(mapping.generatedBatches).toHaveLength(35);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -1304,14 +1317,14 @@ describe('item-art consistency accepted-art provenance', () => {
     // rallycart-rxt-icon-2026-08-20), one id each: 753 + 2 = 755. The
     // world-quest branch's two batches add four ids at the release/v0.43.0
     // merge: 759. The faction quartermaster batch adds 15 at the
-    // wq-reputation merge: 774.
-    expect(priorGeneratedIds).toHaveLength(774);
+    // wq-reputation merge: 774. The Clue Scroll batch adds 2: 776.
+    expect(priorGeneratedIds).toHaveLength(776);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(1303);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1303);
+    expect(allCurrentOwnerIds).toHaveLength(1305);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1305);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1321,8 +1334,9 @@ describe('item-art consistency accepted-art provenance', () => {
     }).toEqual({
       entries: 44,
       // 755 + the world-quest branch's four batch ids (release/v0.43.0 merge)
-      // + the 15 faction quartermaster ids (wq-reputation merge) = 774.
-      priorGenerated: 774,
+      // + the 15 faction quartermaster ids (wq-reputation merge) = 774
+      // + the 2 Clue Scroll ids = 776.
+      priorGenerated: 776,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
       crucibleProfessions: 46,
@@ -1392,6 +1406,8 @@ describe('item-art consistency accepted-art provenance', () => {
                 'world-quest-freight-icons-2026-09-01',
                 // The faction quartermaster stock (wq-reputation merge).
                 'faction-vendor-icons-2026-09-16',
+                // The Clue Scroll items.
+                'clue-scroll-icons-2026-09-17',
               ].includes(batchId),
           )
           .flatMap(({ itemIds }) => itemIds),
@@ -1402,7 +1418,7 @@ describe('item-art consistency accepted-art provenance', () => {
         // beyond the historical chain like the Field Kit.
         'emissary_cache',
       ]),
-      'the dated catalog plus the release batches, the world-quest and faction-vendor batches, the Field Kit, the OSSBrain reins icons and the Emissary Cache is the full current catalog',
+      'the dated catalog plus the release batches, the world-quest, faction-vendor and clue-scroll batches, the Field Kit, the OSSBrain reins icons and the Emissary Cache is the full current catalog',
     ).toEqual(sorted(allCurrentOwnerIds));
     expect(batch?.provenanceRecords).toEqual([
       `${evidenceDir}/accepted-art.json`,
@@ -1532,10 +1548,11 @@ describe('item-art consistency accepted-art provenance', () => {
     // batch ids + 274 historical-audit batch ids + 165 Masterwrought-completion
     // batch ids + 46 Crucible-professions batch ids = 1283.
     // Plus the world-quest branch's four quest-item owners at the release/v0.43.0
-    // merge = 1302. Plus the weekly emissary's cache chest = 1303.
-    if (ownerIds.length !== 1303)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1303`);
-    if (fileIds.length !== 1303) violations.push(`shipping WebP count: ${fileIds.length} != 1303`);
+    // merge = 1302. Plus the weekly emissary's cache chest = 1303. Plus the two
+    // Clue Scroll owners = 1305.
+    if (ownerIds.length !== 1305)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1305`);
+    if (fileIds.length !== 1305) violations.push(`shipping WebP count: ${fileIds.length} != 1305`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

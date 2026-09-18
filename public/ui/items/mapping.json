@@ -6841,6 +6841,23 @@
         "templar_dawn_shield",
         "vestments_of_the_acolyte"
       ]
+    },
+    {
+      "batchId": "clue-scroll-icons-2026-09-17",
+      "source": "Deterministic SVG compositions rendered to WebP with Sharp (scripts/generate_clue_scroll_icons.mjs); no image model",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "woc-item-icon-v1; existing painted item catalog (opaque dark vignette, warm top-left key, cool bottom-right shadow, centered silhouette with safe padding)",
+      "commonPrompt": "Not a text-to-image prompt: each icon is an authored SVG composition (per-item vector art over a three-stop radial ground) rasterized to an opaque 128x128 sRGB WebP. The exact vector source of both items is the ITEMS_TO_GENERATE table in scripts/generate_clue_scroll_icons.mjs.",
+      "provenanceRecord": "docs/achievements/clue-scroll-icons-2026-09-17/",
+      "itemIds": [
+        "clue_scroll",
+        "treasure_casket"
+      ]
     }
   ]
 }

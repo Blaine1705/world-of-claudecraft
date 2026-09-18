@@ -1882,6 +1882,20 @@ export const guideStrings = {
     sideCryptTitle: 'The forgotten king',
     sideCryptBody:
       "High on the peaks runs a quieter mystery: old graves marked with a crown no record remembers. Read the dead, gather what they guarded, and unseal a tomb that was meant to stay shut. It is a detective's trail that opens the way to the realm's ten-player endgame raid.",
+    // Clue Scrolls (world quests, Stage 3): the treasure hunts the daily board can
+    // earn in the far zones. Spoiler-safe: no coordinates, no answers, no odds.
+    cluesTitle: 'Clue Scrolls',
+    cluesBody:
+      'Out in the far zones, the daily world-quest board hides one more reward for anyone who clears the whole slate: a Clue Scroll, and the treasure hunt written on it.',
+    cluesEarnTitle: 'Earning a scroll',
+    cluesEarnBody:
+      "Once your character is far enough along, completing every zone slot on the day's world-quest board hands you a Clue Scroll on top of the usual rewards. A rerolled slot counts once it is done; the always-open dailies are not required. You can hold a few scrolls at a time, so there is no need to spend one the day you earn it.",
+    cluesHuntTitle: 'Following the clues',
+    cluesHuntBody:
+      'Using a scroll starts a hunt: a short chain of riddles that shows in your quest tracker one step at a time. Each riddle points at something real in the world, a landmark to stand at, a person to talk to, an emote to perform somewhere, or a small errand to run, and the last one always asks you to dig. Only one hunt runs at a time, and it keeps your place across the daily reset and between sessions, so take your time.',
+    cluesCasketTitle: 'The casket',
+    cluesCasketBody:
+      'Solve the last clue and use the scroll on the spot it names to dig up a Treasure Casket; finishing the hunt also earns standing with the faction whose land hid it. Open the casket for coin and a stack of fine gathering materials. Now and then it holds a piece of gear or a few Heroic Marks, and very rarely Grumbol the Lanternback, a mount found nowhere else. Your first casket and your tenth are recorded in the Book of Deeds.',
     sideTempleTitle: 'The drowned temple',
     sideTempleBody:
       'A gate of pale light on a high tarn in the peaks opens onto a sunken shrine where a drowned cult still sings. Its short chain stands apart from the main story, a self-contained mystery for anyone who climbs to the shore, reads the warnings carved on the rocks, and goes down to see what they were for.',

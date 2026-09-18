@@ -443,6 +443,9 @@ export const RELIQUARY_HORIZON_TITLES = [
   'prog_rift_watch_champion',
   'prog_church_order_champion',
   'prog_automatons_champion',
+  // The Clue Scroll tenth-casket title (world quests, Stage 3): Treasure
+  // Hunter pages here per the locked titles-page rule.
+  'exp_clue_ten_caskets',
 ] as const;
 
 // Profession lifetime mark ids (Phase 7). Prefer existing visited namespaces

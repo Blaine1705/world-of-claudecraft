@@ -65,6 +65,7 @@ import {
   emptyPriestMarkerState,
   priestMarkerStateForAuras,
 } from '../src/sim/combat/priest/presentation';
+import { CLUE_HUNTS } from '../src/sim/content/clue_hunts';
 import { FARM_PATCHES } from '../src/sim/content/farm_patches';
 import { RETIRED_MOUNT_SKIN_IDS } from '../src/sim/content/mount_skins';
 import { MOUNT_RACE_START_PLATFORM, type MountKey } from '../src/sim/content/mounts';
@@ -139,6 +140,7 @@ const DELTA_KEYS = [
   'fac',
   'wqrr',
   'wqrep',
+  'cluh',
   'lockouts',
   'cds',
   'stats',
@@ -5557,6 +5559,7 @@ const ALL_DELTA_KEYS = [
   'cardDuel',
   'cbt',
   'cds',
+  'cluh',
   'copper',
   'corder',
   'corpse',
@@ -5691,6 +5694,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   bval: 'blockValue',
   cbt: 'inCombat',
   cds: 'cooldowns',
+  cluh: 'clueHunt',
   corder: 'commissionOrders',
   cosmetics: 'accountCosmetics',
   cprof: 'craftingIdentity',
@@ -5889,6 +5893,9 @@ function dirtyEveryDeltaField(): {
   });
   meta.questsDone.add('q_wolves');
   meta.worldQuestCycle = '2026-08-31';
+  // `cluh`: an active clue hunt on a shipped hunt id (the client decoder
+  // drops an id the pool does not know, so a made-up one would mirror null).
+  meta.clueHunt = { huntId: CLUE_HUNTS[0].id, step: 1 };
   server.sim.worldQuestExpiresAtMs = FAR_FUTURE_MS;
   meta.worldQuestLog.set('wq_eastbrook_bandits', {
     questId: 'wq_eastbrook_bandits',
@@ -6946,7 +6953,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 105 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 106 unique keys in sorted order', () => {
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
     // sheet's lifetime played-time key ptime, for 67, then +16: the static
@@ -6994,9 +7001,10 @@ describe('delta-key contract pins (anti-drift)', () => {
     // (wqday, wqexp, wqlog), the vehicle session and the world-boss liveness
     // key wba, for 100.
     // The faction standing (fac) and daily reroll (wqrr, wqrep) owner keys, for 103.
-    // The weekly emissary's wkq and wkexp self keys, for 105.
-    expect(ALL_DELTA_KEYS).toHaveLength(105);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(105);
+    // The weekly emissary's wkq and wkexp self keys, for 105, and the Clue
+    // Scrolls active-hunt key cluh, for 106.
+    expect(ALL_DELTA_KEYS).toHaveLength(106);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(106);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7161,8 +7169,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // the account ledger's acct key (server/deeds_wire.ts) makes it 95.
     // The World Quests branch adds its five self keys, for 100.
     // Plus the faction standing and daily reroll owner keys, for 103. The
-    // weekly emissary's wkq and wkexp self keys make 105.
-    expect(scraped.size).toBe(105);
+    // weekly emissary's wkq and wkexp self keys make 105, and the Clue Scrolls
+    // active-hunt key cluh 106.
+    expect(scraped.size).toBe(106);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

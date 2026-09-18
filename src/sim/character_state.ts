@@ -107,6 +107,13 @@ export interface CharacterState {
     factions?: Partial<Record<string, number>>;
     rerollCycle?: string;
     replacements?: Record<string, string>;
+    // Clue Scrolls (src/sim/clue_scrolls.ts). Each is optional and written
+    // only when set (a hunt in progress, a cycle that paid, a count above
+    // zero), so a character the feature never touched serializes
+    // byte-identically to a pre-feature save.
+    clueHunt?: { huntId: string; step: number };
+    clueScrollCycle?: string;
+    clueCasketsOpened?: number;
   };
   // Faction standing (JSONB; optional so pre-reputation saves load cleanly).
   factions?: Partial<Record<string, number>>;

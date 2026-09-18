@@ -2334,10 +2334,17 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // ids in the maximal character's deedStats.itemsDiscovered (sorted array
     // rows of `"<id>",`). MEASURED on the merged tree (55,601 to 55,959;
     // the deedStats row below moves 111 to 469 by the same 358).
-    // Plus 282 at the faction standing deeds (2026-09-17): the seven
-    // prog_*_trusted / prog_*_champion / prog_faction_champion_all ids in the
-    // maximal character's deeds row (the deeds row below moves 317 to 599 by
-    // the same 282). MEASURED on the tree (55,959 to 56,241).
+    // Plus 282 at the faction standing deeds: the seven prog_*_trusted /
+    // prog_*_champion / prog_faction_champion_all ids in the maximal
+    // character's deeds row (each `"<id>":"2026-08-08",`: 170 characters of
+    // ids plus 16 bytes of quoting, colon, date and comma per row). MEASURED
+    // (55,959 to 56,241; the deeds row below moves 317 to 599).
+    // Plus 105 at the Clue Scroll content: the two exp_clue_* deed ids in the
+    // deeds row (41 characters of ids plus 2 x 16 = 73) and the two clue item
+    // ids (clue_scroll, treasure_casket) in deedStats.itemsDiscovered (26
+    // characters of ids plus 2 x 3 = 32). Predicted from the literals BEFORE
+    // the run (56,241 to 56,346; the deeds row below moves 599 to 672 and
+    // deedStats 469 to 501).
     expect(counterfactualBytes - 156144).toBe(
       Object.values(fixtureDelta).reduce((sum, value) => sum + value, 0) +
         183 +
@@ -2349,8 +2356,11 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         // Plus 17 at the weekly emissary rebase: the Emissary's Cache id in the
         // maximal character's deedStats.itemsDiscovered (the deedStats row
         // below moves 469 to 486 by the same 17). MEASURED (56,241 to 56,258).
+        // Plus 105 at the Clue Scroll content (the two deed ids and the two
+        // item ids).
         282 +
-        17,
+        17 +
+        105,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2376,8 +2386,10 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // (+90) attributed in the +375 above. deedStats 111 -> 469 at the
       // wq-reputation merge: the faction quartermaster items (+358 above).
       // deeds 317 -> 599 at the faction standing deeds (+282 above); deedStats
-      // 469 -> 486 at the weekly emissary rebase (+17 above).
-    ).toEqual({ questsDone: 100, knownRecipes: 30, deeds: 599, deedStats: 486, reliquary: 80 });
+      // 469 -> 486 at the weekly emissary rebase (+17 above). deeds 599 -> 672
+      // and deedStats 486 -> 518 at the Clue Scroll content (+73 and +32 of the
+      // +105 above).
+    ).toEqual({ questsDone: 100, knownRecipes: 30, deeds: 672, deedStats: 518, reliquary: 80 });
     // Removing field_kit AND the Bramblehide release content reproduces the
     // pre-field-kit, pre-Bramblehide baseline WITH the hammer content still
     // applied: 3884 alone measured 209,261 here (hammer content absent); the
@@ -2397,8 +2409,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 210,148 -> 210,506 at the wq-reputation merge: the 15 faction
       // quartermaster item ids (+358, attributed above) stay here too.
       // 210,506 -> 210,788 at the faction standing deeds (+282), in the deeds
-      // row this counterfactual keeps; +17 at the weekly emissary rebase.
-    ).toBe(210805);
+      // row this counterfactual keeps; +17 at the weekly emissary rebase;
+      // +105 at the Clue Scroll content (the two deed ids and the two item ids).
+    ).toBe(210910);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 49-byte
@@ -2414,8 +2427,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 212,103 -> 212,385 at the faction standing deeds (+282, the seven ids).
       // 211,745 -> 212,103 at the wq-reputation merge (+358, the faction items).
       // 212,103 -> 212,385 at the faction standing deeds (+282); +17 at the
-      // weekly emissary rebase.
-    ).toBe(212402);
+      // weekly emissary rebase; +105 at the Clue Scroll content.
+    ).toBe(212507);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2479,8 +2492,14 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // 212,115. The mover is the seven faction standing deed ids in the maximal
     // character's deeds row (+282, attributed in the growth equation above).
     // Shifted +17 at the weekly emissary rebase: the held weekly pick row.
-    expect(bytes, reMint).toBeGreaterThan(212034);
-    expect(bytes, reMint).toBeLessThan(212415);
+    // RE-BASED at the Clue Scroll content: +105 (the two exp_clue_* deed ids in
+    // the deeds row, +73, and the two clue item ids in
+    // deedStats.itemsDiscovered, +32), both attributed in the growth equation
+    // above; no container or ceiling changed shape. On the quests integration
+    // branch: 212,519 bytes. Floor at measurement minus 380, edge at
+    // measurement plus one: 212,139..212,520.
+    expect(bytes, reMint).toBeGreaterThan(212139);
+    expect(bytes, reMint).toBeLessThan(212520);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

@@ -192,13 +192,15 @@ describe('title relics resolve the deed crest', () => {
     // quests, still art-pending) and the Crucible flawless title today.
     const pending = RELIQUARY_HORIZON_TITLES.filter((id) => deedImageUrl(`deed_${id}`) === null);
     // The three faction Champion titles (world quests, art-pending on the
-    // progression crest) follow them on the shelf.
+    // progression crest) follow them on the shelf, then the Clue Scroll
+    // Treasure Hunter title (art-pending on the exploration crest).
     expect(pending, 'artless shelf titles must be the pinned art-pending set').toEqual([
       'exp_arcane_calligraphy_gold',
       'dgn_varkhul_flawless',
       'prog_rift_watch_champion',
       'prog_church_order_champion',
       'prog_automatons_champion',
+      'exp_clue_ten_caskets',
     ]);
     for (const id of pending) expect(DEED_ART_PENDING.has(id), id).toBe(true);
     for (const id of RELIQUARY_HORIZON_TITLES) {

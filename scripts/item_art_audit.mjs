@@ -128,11 +128,14 @@ const build = await buildItemArtAudit({
     // --verify-only` against the merged tree.
     // + the World Quests branch merge (release/v0.43.0 sync): its two painted
     // puzzle activators and two Eastbrook freight icons join both counts.
-    // + the 15 faction quartermaster pieces (wq-reputation merge) and the
-    // weekly emissary's cache chest (feature/weekly-quests): 1303 owners over
-    // 1321 live definitions, measured on the tree.
-    catalogCount: 1303,
-    liveItemCount: 1321,
+    // + the 15 faction quartermaster items (faction-vendor-icons-2026-09-16),
+    // which landed without moving this block (1302 / 1320), + the weekly
+    // emissary's cache chest (feature/weekly-quests: 1303 / 1321), + the two
+    // Clue Scroll items (clue_scroll, treasure_casket; clue-scroll-icons-2026-09-17):
+    // 1305 / 1323 on the quests integration branch, measured with
+    // `node scripts/item_art_audit.mjs --verify-only`.
+    catalogCount: 1305,
+    liveItemCount: 1323,
     pendingArtCount: 0,
     generatedHeroicDefinitions: 78,
     heroicDefinitionsWithOwnWebp: 59,

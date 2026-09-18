@@ -51,6 +51,14 @@ export interface IWorldQuests {
   readonly worldQuestReplacements?: Readonly<Record<string, string>>;
   /** Cycle key for which the player used their daily world quest reroll. */
   readonly worldQuestRerollCycle?: string;
+  /**
+   * Clue Scrolls: the active treasure hunt (src/sim/clue_scrolls.ts), the
+   * authored hunt id plus the 0-based index of the step being solved, or null
+   * when none. The tracker resolves the clue text from clues.<huntId>.<step>.
+   */
+  readonly clueHunt: Readonly<{ huntId: string; step: number }> | null;
+  /** Drops the active clue hunt; returns nothing (the spent scroll stays spent). */
+  abandonClueHunt(): void;
   canRerollWorldQuest?(questId: string): { canReroll: boolean; reason?: string };
   rerollWorldQuest?(questId: string): boolean;
   questState(questId: string): QuestState;

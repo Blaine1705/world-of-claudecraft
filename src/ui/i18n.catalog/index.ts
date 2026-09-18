@@ -7,6 +7,7 @@ import { ITEM_SETS } from '../../sim/data';
 import { worldEntityText as worldNames } from '../world_entity_i18n';
 import { abilityStrings, classAbilityNames } from './abilities';
 import { apiErrorStrings } from './api_error';
+import { clueStrings } from './clues';
 import { editorStrings } from './editor';
 import { gameStrings } from './game';
 import { guideStrings } from './guide';
@@ -19,6 +20,7 @@ import { shellStrings } from './shell';
 
 export { abilityStrings, classAbilityNames } from './abilities';
 export { apiErrorStrings } from './api_error';
+export { clueStrings } from './clues';
 export { editorStrings } from './editor';
 export {
   gameStrings,
@@ -235,6 +237,8 @@ export const en = {
     goldenHarvest: '{finder} reaped a golden harvest!',
   },
   apiError: apiErrorStrings,
+  // Clue Scroll hunt titles and per-step riddles (src/ui/i18n.catalog/clues.ts).
+  clues: clueStrings,
   guide: guideStrings,
   editor: editorStrings,
   // Cosmetic skin-select event overlay. Rarity names reuse itemUi.quality.*.
@@ -1632,6 +1636,9 @@ export const en = {
       kings_signet: { name: "King's Signet" },
       event_skin_token: { name: 'Mysterious Cosmetic Cache' },
       emissary_cache: { name: "Emissary's Cache" },
+      // Clue Scrolls (world quests, Stage 3): the scroll and the casket it buries.
+      clue_scroll: { name: 'Clue Scroll' },
+      treasure_casket: { name: 'Treasure Casket' },
       heroic_mark: { name: 'Heroic Mark' },
       wyrmfall_core: { name: 'Wyrmfall Core' },
       sundered_essence: { name: 'Sundered Essence' },

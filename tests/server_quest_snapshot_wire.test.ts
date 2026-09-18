@@ -22,6 +22,7 @@ describe('quest snapshot wire', () => {
       worldQuestRerollCycle: 'wq1_1',
       worldQuestReplacements: { wq_test: 'wq_other' },
       weeklyQuest: null,
+      clueHunt: { huntId: 'hunt_test', step: 2 },
     } as unknown as PlayerMeta;
     const sim = {
       worldQuestExpiresAtMs: 1_893_542_400_000,
@@ -37,6 +38,7 @@ describe('quest snapshot wire', () => {
       ['wqexp', 1_893_542_400_000],
       ['wqlog', [worldQuest]],
       ['fac', meta.factions],
+      ['cluh', { huntId: 'hunt_test', step: 2 }],
       ['wqrr', meta.worldQuestRerollCycle],
       ['wqrep', { wq_test: 'wq_other' }],
       ['wkq', null],

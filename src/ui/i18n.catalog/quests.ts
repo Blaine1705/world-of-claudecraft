@@ -11,6 +11,8 @@ import {
 const questStringsEn = {
   questUi: {
     tracker: {
+      // The active Clue Scroll hunt's row: the title with the step tally.
+      clueHuntTitle: '{title} (clue {step} of {total})',
       title: 'Quests',
       complete: 'Complete',
       showOnMap: 'Show {name} on the map',
@@ -434,6 +436,16 @@ const questStringsEn = {
       completed: 'Quest completed: {name}',
       ready: '{name} ({status})',
       progress: '{label}: {current}/{total}',
+      // Clue Scrolls (world quests, Stage 3): the entitlement, the hunt and
+      // the casket. {title} is the hunt's title from the clues catalog.
+      clueScrollEarned: 'Every world quest of the day is done: a Clue Scroll is yours.',
+      clueScrollLost:
+        'Every world quest of the day is done, but you cannot hold another Clue Scroll.',
+      clueHuntStarted: 'Treasure hunt begun: {title}',
+      clueHuntStep: 'Clue {step} of {total} solved: {title}',
+      clueHuntDone: 'Treasure hunt complete: {title}. The casket is yours.',
+      clueHuntAbandoned: 'Treasure hunt abandoned: {title}',
+      clueCasketOpened: 'The casket holds {money} and {items}.',
     },
     errors: {
       unavailable: 'That quest is not available.',

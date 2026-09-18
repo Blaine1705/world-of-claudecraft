@@ -3270,6 +3270,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.match3Candy.star': 'シュガースター',
   'questUi.logs.accepted': 'クエスト受諾: {name}',
   'questUi.logs.worldQuestStarted': 'ワールドクエスト開始: {name}',
+  'questUi.logs.clueScrollEarned':
+    '今日のワールドクエストをすべて達成：手がかりの巻物を手に入れた。',
+  'questUi.logs.clueScrollLost':
+    '今日のワールドクエストをすべて達成したが、手がかりの巻物はこれ以上持てない。',
+  'questUi.logs.clueHuntStarted': '宝探し開始：{title}',
+  'questUi.logs.clueHuntStep': '手がかり{step}/{total}を解いた：{title}',
+  'questUi.logs.clueHuntDone': '宝探し完了：{title}。宝箱は君のものだ。',
+  'questUi.logs.clueHuntAbandoned': '宝探しを放棄：{title}',
+  'questUi.logs.clueCasketOpened': '宝箱には{money}と{items}が入っていた。',
+  'questUi.tracker.clueHuntTitle': '{title}（手がかり {step}/{total}）',
   'questUi.logs.abandoned': 'クエスト破棄: {name}',
   'questUi.logs.completed': 'クエスト完了: {name}',
   'questUi.logs.ready': '{name}（{status}）',
@@ -7881,6 +7891,19 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.questsPage.sagaValeBody':
     'イーストブルックでは死者が安らがず、その背後の印は、とうに滅んだと思われていた一派のものです。それを礼拝堂の地下墓所で働くグレイブコーラーまでたどれば、彼自身の書き物が北の沼へとあなたを導きます。',
   'guide.questsPage.sagaValeTitle': '渓谷：印に刻まれた名',
+  // The Clue Scrolls section of the Guide quests page (M16 non-Latin fills).
+  'guide.questsPage.cluesTitle': '手がかりの巻物',
+  'guide.questsPage.cluesBody':
+    '遠くの地域では、日替わりのワールドクエスト掲示板が、その日の枠をすべて片づけた者にもう一つの報酬を隠しています。手がかりの巻物と、そこに書かれた宝探しです。',
+  'guide.questsPage.cluesEarnTitle': '巻物を手に入れる',
+  'guide.questsPage.cluesEarnBody':
+    'キャラクターが十分に進んだら、その日のワールドクエスト掲示板の地域枠をすべて完了すると、通常の報酬に加えて手がかりの巻物が手に入ります。振り直した枠も終えれば数に入り、常時開いているデイリーは必要ありません。巻物は数枚まで持てるので、手に入れた日に使う必要はありません。',
+  'guide.questsPage.cluesHuntTitle': '手がかりをたどる',
+  'guide.questsPage.cluesHuntBody':
+    '巻物を使うと宝探しが始まります。短い謎かけの連なりが、クエストトラッカーに一つずつ表示されます。どの謎かけも世界に実在する何かを指しています。立つべきランドマーク、話すべき人物、どこかで行うエモート、あるいはちょっとした用事で、最後の一つは必ず「掘れ」と告げます。宝探しは一度に一つだけ進み、日次リセットをまたいでもセッションの間でも進み具合が保たれるので、ゆっくり取り組めます。',
+  'guide.questsPage.cluesCasketTitle': '小箱',
+  'guide.questsPage.cluesCasketBody':
+    '最後の謎かけを解き、それが示す場所で巻物を使うと、宝の小箱を掘り出せます。宝探しを終えると、その地を治める勢力の評判も得られます。小箱からは硬貨と上質な採集素材がまとまって出ます。時には装備品や英雄の証が入っていることもあり、ごくまれに、ここでしか手に入らない騎乗動物「ランタンバックのグルンボル」が見つかります。最初の小箱と十個目は功績の書に記録されます。',
   'guide.questsPage.sideCryptBody':
     '高地には、より静かな謎が走っています。どんな記録にも残らぬ冠が刻まれた古い墓です。死者を読み解き、彼らが守ってきたものを集め、閉ざされたままであるべき墓を解き放ちましょう。それは探偵の足取りであり、レルムの十人エンドゲームレイドへの道を開きます。',
   'guide.questsPage.sideCryptTitle': '忘れられた王',
@@ -17186,6 +17209,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.artificers_welding_cowl.name': '工匠の溶接フード',
   'entities.items.forgemaster_crag_cleaver.name': '鍛冶頭の岩壁の大鉈',
   'entities.items.champion_forged_loop.name': '勇者の鍛造の指輪',
+  // Clue Scrolls: the scroll and the casket (M16 non-Latin fills).
+  'entities.items.clue_scroll.name': '手がかりの巻物',
+  'entities.items.treasure_casket.name': '宝の小箱',
   'entities.npcs.npc_rift_watch_quartermaster.name': '需品係ヴェイレン',
   'entities.npcs.npc_rift_watch_quartermaster.title': '裂け目の監視団の補給係',
   'entities.npcs.npc_rift_watch_quartermaster.greeting':
@@ -17311,10 +17337,85 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.commendNote': '選んだ一つの勢力に評判{amount}、週に一度。',
   'hudChrome.weekly.commendClaimed': '今週の推挙は{faction}に贈られました。',
   'hudChrome.weekly.commendRewardLine': '選んだ勢力との評判{amount}',
+  'hudChrome.reputation.standingGained': '{faction}の評判 +{amount}',
   'hudChrome.reputation.tierReachedBanner': '{faction}との評判が{tier}になりました',
   'hudChrome.reputation.tierReachedSubtext': '勢力の称号：{title}',
   'hudChrome.reputation.tierReachedLine':
     '{faction}との評判が{tier}になりました。勢力の称号は{title}になりました。',
+  // Clue Scrolls (world quests, Stage 3): hunt titles, per-step riddles and the two item
+  // descriptions (M16 non-Latin fills; src/ui/i18n.catalog/clues.ts).
+  'clues.items.clue_scroll.desc':
+    'その日の地域枠をすべて終えて得た、封のされた謎かけ。使うと宝探しが始まり、最後の手がかりが「掘れ」と告げたら、隠された場所でもう一度使う。',
+  'clues.items.treasure_casket.desc':
+    '宝探しの最後に掘り出した、鍵のかかった小箱。使って開け、宝探しが埋めていたものを受け取る。',
+  'clues.hunt_drakelands_gate_ashes.title': '門前の灰',
+  'clues.hunt_drakelands_gate_ashes.0':
+    'ワームウォッチを出る道は西へ、門を守る古木の群れへと続く。ゲートウッドの森の下に立てば、道は始まる。',
+  'clues.hunt_drakelands_gate_ashes.1':
+    '遠い砂丘の見張りが、駐屯地の北、東の砂地に居座っている。斥候イェリンを見つけ、風が何を運んできたか尋ねよ。',
+  'clues.hunt_drakelands_gate_ashes.2':
+    '駐屯地の倉庫を守る者は、前の巡回からずっと食べていない。補給将校セラに 2 x 田舎パン を届けよ。',
+  'clues.hunt_drakelands_gate_ashes.3':
+    '燃えかすが砂丘へ流れ込むあたりの東、やや南に、灰が埋めたものを隠す焦げた地面がある。そこで巻物を使い、掘れ。',
+  'clues.hunt_frostveil_aurora_vigil.title': '階段の上の光',
+  'clues.hunt_frostveil_aurora_vigil.0':
+    '夜に踊る光へと段丘が登っていく場所、オーロラの階段にひざまずき、空に気づいてもらえ。',
+  'clues.hunt_frostveil_aurora_vigil.1':
+    '光を読む者が階段のすぐそばで待っている。オーロラ読みヴェイラに、空が綴ったものについて話を聞け。',
+  'clues.hunt_frostveil_aurora_vigil.2':
+    '咆哮のテラスの東、少し南で、雪があるべき以上に平らに積もっている。そこで巻物を使い、掘れ。',
+  'clues.hunt_amberfall_lantern_ferry.title': '湖上のランタン',
+  'clues.hunt_amberfall_lantern_ferry.0':
+    'ランタンミアの北の水際で、ランタンの渡し船を預かる者がどの灯りが消えたかを知っている。渡し守キャドウと話せ。',
+  'clues.hunt_amberfall_lantern_ferry.1':
+    '大いなる湖の北東で、町より古い一本の石が空にもたれている。傾いた石碑のそばに立て。',
+  'clues.hunt_amberfall_lantern_ferry.2':
+    '黄金の果樹園を守る者は手ずから木々に水をやり、自分は喉が渇いている。果樹園主ポメリーヌに 3 x 冷たい井戸水 を届けよ。',
+  'clues.hunt_amberfall_lantern_ferry.3':
+    'シンダーメイプルが赤く燃える丘の北東で、風の仕業ではない輪を落ち葉が描いている。そこで巻物を使い、掘れ。',
+  'clues.hunt_willowfen_fenwitch_salt.title': '沼の魔女の塩',
+  'clues.hunt_willowfen_fenwitch_salt.0':
+    'ウィローウィープの沼の魔女は、手ぶらで来る者とは口をきかない。マザー・セッジに 1 x 調理用の塩 を届けよ。',
+  'clues.hunt_willowfen_fenwitch_salt.1':
+    '沼が平らになり、空気が誰をも眠たくさせる場所、まどろみの浅瀬に立ち、魔女に言われたとおりため息をつけ。',
+  'clues.hunt_willowfen_fenwitch_salt.2':
+    '沼で光る池の南東に、一年じゅう乾いたままの小さな丘がある。そこで巻物を使い、掘れ。',
+  'clues.hunt_nightbloom_sleepless_vigil.title': '眠らぬ者の見張り',
+  'clues.hunt_nightbloom_sleepless_vigil.0':
+    'ムーンレストの北東、石たちが終わらぬ見張りを続ける場所、見張りの石環に立て。',
+  'clues.hunt_nightbloom_sleepless_vigil.1':
+    '見張り場の観測者は、他人が銭を数えるように星を数える。天文学者カシアンに、落ちた一つの星について話を聞け。',
+  'clues.hunt_nightbloom_sleepless_vigil.2':
+    '町の北に、眠る者が決して安らがぬ塚がある。不眠の塚に敬礼し、友が来たと眠る者に知らせよ。',
+  'clues.hunt_nightbloom_sleepless_vigil.3':
+    '宵闇の集まる花野の南東で、月光がむき出しの土の一画に溜まっている。そこで巻物を使い、掘れ。',
+  'clues.hunt_wraithwood_mournstone_candles.title': '哀石の蝋燭',
+  'clues.hunt_wraithwood_mournstone_candles.0':
+    'ギベットミアの蝋燭職人は、闇を恐れる者に光を売っている。寡婦タンジーに、ついに代金の払われなかった蝋燭について話を聞け。',
+  'clues.hunt_wraithwood_mournstone_candles.1':
+    '哀石の最後の司祭は祈りだけで断食を続けている。司祭クリールに 2 x 塩漬けの干し肉 を届けよ。',
+  'clues.hunt_wraithwood_mournstone_candles.2':
+    '町の北東、鴉たちを過ぎた先に、奇妙な実を自ら吊るす林間地がある。吊るしの林間地に立て。',
+  'clues.hunt_wraithwood_mournstone_candles.3':
+    '狩人が罠を仕掛けた広場の南東で、落ち葉が最近掘り返されている。そこで巻物を使い、掘れ。',
+  'clues.hunt_palmreach_sunken_idol.title': '神像の秘密',
+  'clues.hunt_palmreach_sunken_idol.0':
+    '密林の奥、潟の北西で、蔓が滝のように流れ落ちている。蔓垂の森に立て。',
+  'clues.hunt_palmreach_sunken_idol.1':
+    '密林へ入り、そして戻ってきた隠者が、垂れる蔓の近くに住んでいる。オクリムに、あの下で何を見たか話を聞け。',
+  'clues.hunt_palmreach_sunken_idol.2':
+    '東では、半ば沈んだ神像がなお見つめている。沈んだ神像の前でおびえよ、隠者が言った潜り手たちのように。',
+  'clues.hunt_palmreach_sunken_idol.3':
+    '密林が海へ口を開く場所の北東で、砂が潮の届く高さより高く盛られている。そこで巻物を使い、掘れ。',
+  'clues.hunt_evergarden_beacon_road.title': '灯台と花',
+  'clues.hunt_evergarden_beacon_road.0':
+    'ヘッジウィックの北の散歩道の花壇の庭師が、花壇が飢えていると言い張っている。農婦ヴァーベナに 2 x 堆肥 を届けよ。',
+  'clues.hunt_evergarden_beacon_road.1':
+    '庭園のはるか南東の隅で、粉屋のいない古い風車がまだ回っている。古い風車小屋のそばに立て。',
+  'clues.hunt_evergarden_beacon_road.2':
+    '道を南へ、境を越えてゲイルクレストへ入り、海岸まで出よ。古い灯台の番人、灯台守ブラムが最後の言葉を持っている。',
+  'clues.hunt_evergarden_beacon_road.3':
+    'オールドビーコンの北西、灯りから下る小道のすぐ脇で、芝が切り取られて元に戻されている。そこで巻物を使い、掘れ。',
   'hudChrome.questLog.completed': '完了済み',
   'hudChrome.questLog.zoneSummary': '{count}件（{ready}件完了）',
   'hudChrome.questLog.shiftHint':

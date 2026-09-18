@@ -3,6 +3,7 @@
 // here, behind explicit arguments.
 
 import type { CharacterState } from './character_state';
+import { type ClueHuntProgress, sanitizeClueCasketsOpened, sanitizeClueHunt } from './clue_scrolls';
 import type { FactionId } from './factions';
 import { freshFactionReputation, sanitizeFactionReputation } from './factions';
 import type { PlayerMeta } from './sim';
@@ -37,6 +38,17 @@ export interface WorldQuestPlayerState {
   worldQuestReplacements: Record<string, string>;
   /** The weekly emissary's pick (src/sim/weekly_quests.ts); null while none is taken. */
   weeklyQuest: WeeklyQuestProgress | null;
+  /**
+   * Clue Scrolls (src/sim/clue_scrolls.ts). The active hunt cursor (null when
+   * none); the world-quest cycle that already paid a scroll ('' when none);
+   * the lifetime Treasure Caskets opened (the clueCasketsOpened deed meter).
+   * None of the three is touched by a cycle rollover: a hunt survives the
+   * daily reset by design, and the paid-cycle mark is what makes the next
+   * day's slate a fresh entitlement.
+   */
+  clueHunt: ClueHuntProgress | null;
+  clueScrollCycle: string;
+  clueCasketsOpened: number;
 }
 
 export interface WorldQuestRotationCache {
@@ -55,6 +67,9 @@ export function freshWorldQuestPlayerState(): WorldQuestPlayerState {
     worldQuestRerollCycle: '',
     worldQuestReplacements: {},
     weeklyQuest: null,
+    clueHunt: null,
+    clueScrollCycle: '',
+    clueCasketsOpened: 0,
   };
 }
 
@@ -92,6 +107,14 @@ export function restoreWorldQuestState(
   meta.worldQuestRerollCycle = '';
   meta.worldQuestReplacements = {};
   meta.weeklyQuest = sanitizeWeeklyQuestProgress(savedWeekly);
+  // Clue Scrolls: cycle-independent, restored whatever the board holds. A hunt whose id
+  // is no longer in the pool restores to null (a retired hunt returns nothing,
+  // by design; sanitizeClueHunt says the same); the step is clamped to the
+  // hunt's length. The paid-cycle mark is kept whatever cycle it names: a
+  // stale one simply never matches the current cycle again.
+  meta.clueHunt = sanitizeClueHunt(saved?.clueHunt);
+  meta.clueScrollCycle = sanitizeWorldQuestCycle(saved?.clueScrollCycle);
+  meta.clueCasketsOpened = sanitizeClueCasketsOpened(saved?.clueCasketsOpened);
   if (saved) {
     meta.worldQuestCycle = sanitizeWorldQuestCycle(saved.cycle);
     if (typeof saved.rerollCycle === 'string' && saved.rerollCycle === meta.worldQuestCycle) {
@@ -125,7 +148,18 @@ export function savedWorldQuestState(meta: PlayerMeta): {
     meta.worldQuestRerollCycle && meta.worldQuestRerollCycle === meta.worldQuestCycle;
   const hasReplacements =
     hasReroll && meta.worldQuestReplacements && Object.keys(meta.worldQuestReplacements).length > 0;
-  if (!meta.worldQuestCycle && meta.worldQuestLog.size === 0 && !hasRep && !hasReroll) {
+  const hasClueHunt = meta.clueHunt !== null && meta.clueHunt !== undefined;
+  const hasClueCycle = typeof meta.clueScrollCycle === 'string' && meta.clueScrollCycle !== '';
+  const hasCaskets = (meta.clueCasketsOpened ?? 0) > 0;
+  if (
+    !meta.worldQuestCycle &&
+    meta.worldQuestLog.size === 0 &&
+    !hasRep &&
+    !hasReroll &&
+    !hasClueHunt &&
+    !hasClueCycle &&
+    !hasCaskets
+  ) {
     return weeklyPart;
   }
   const factionsObj = hasRep ? { ...meta.factions } : undefined;
@@ -169,6 +203,9 @@ export function savedWorldQuestState(meta: PlayerMeta): {
       ...(factionsObj ? { factions: factionsObj } : {}),
       ...(hasReroll ? { rerollCycle: meta.worldQuestRerollCycle } : {}),
       ...(hasReplacements ? { replacements: { ...meta.worldQuestReplacements } } : {}),
+      ...(hasClueHunt && meta.clueHunt ? { clueHunt: { ...meta.clueHunt } } : {}),
+      ...(hasClueCycle ? { clueScrollCycle: meta.clueScrollCycle } : {}),
+      ...(hasCaskets ? { clueCasketsOpened: meta.clueCasketsOpened } : {}),
     },
     ...(factionsObj ? { factions: factionsObj } : {}),
   };

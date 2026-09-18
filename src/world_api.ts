@@ -896,6 +896,8 @@ export const COMMAND_NAMES = [
   'world_quest_reroll',
   'world_quest_weekly_choose',
   'world_quest_weekly_commend',
+  // Clue Scrolls: drop the active treasure hunt (IWorldQuests.abandonClueHunt).
+  'clue_hunt_abandon',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -1007,6 +1009,7 @@ export const COMMAND_FACETS = {
   world_quest_glider_boost: 'IWorldQuests',
   world_quest_start: 'IWorldQuests',
   world_quest_reroll: 'IWorldQuests',
+  clue_hunt_abandon: 'IWorldQuests',
   // Ghost resurrection: run the spirit to its corpse, or accept the Spirit Healer's
   // resurrection (with Resurrection Sickness). Wire strings are snake_case by design.
   resurrect_corpse: 'IWorldCombat',

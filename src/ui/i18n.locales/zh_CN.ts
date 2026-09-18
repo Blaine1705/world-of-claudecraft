@@ -3132,6 +3132,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.match3Candy.star': '糖霜星',
   'questUi.logs.accepted': '已接受任务：{name}',
   'questUi.logs.worldQuestStarted': '世界任务已开始：{name}',
+  'questUi.logs.clueScrollEarned': '今日的世界任务已全部完成：你获得了一张线索卷轴。',
+  'questUi.logs.clueScrollLost': '今日的世界任务已全部完成，但你无法再持有更多线索卷轴。',
+  'questUi.logs.clueHuntStarted': '寻宝开始：{title}',
+  'questUi.logs.clueHuntStep': '已解开第{step}/{total}条线索：{title}',
+  'questUi.logs.clueHuntDone': '寻宝完成：{title}。宝箱归你了。',
+  'questUi.logs.clueHuntAbandoned': '已放弃寻宝：{title}',
+  'questUi.logs.clueCasketOpened': '宝箱中有{money}和{items}。',
+  'questUi.tracker.clueHuntTitle': '{title}（线索 {step}/{total}）',
   'questUi.logs.abandoned': '已放弃任务：{name}',
   'questUi.logs.completed': '已完成任务：{name}',
   'questUi.logs.ready': '{name}（{status}）',
@@ -7563,6 +7571,19 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.questsPage.sagaValeBody':
     '在东溪，死者无法安息，而其背后的印记属于一个早被认为已然消亡的教派。循迹追查到一名在礼拜堂地穴中作业的唤墓者，他自己的文书又将你指向北方的湿地。',
   'guide.questsPage.sagaValeTitle': '谷地：印玺上的一个名字',
+  // The Clue Scrolls section of the Guide quests page (M16 non-Latin fills).
+  'guide.questsPage.cluesTitle': '线索卷轴',
+  'guide.questsPage.cluesBody':
+    '在远方的区域，每日世界任务板为清空整个任务栏的人藏着另一份奖励：一张线索卷轴，以及写在上面的寻宝之旅。',
+  'guide.questsPage.cluesEarnTitle': '获得卷轴',
+  'guide.questsPage.cluesEarnBody':
+    '当你的角色足够强大后，完成当日世界任务板上的每一个区域栏位，就会在常规奖励之外得到一张线索卷轴。重掷的栏位完成后同样计数；始终开放的日常任务不作要求。你可以同时持有几张卷轴，因此不必在获得当天就用掉。',
+  'guide.questsPage.cluesHuntTitle': '跟随线索',
+  'guide.questsPage.cluesHuntBody':
+    '使用卷轴会开始一场寻宝：一连串简短的谜题，会在任务追踪器中逐步显示。每条谜题都指向世界中真实存在的东西：要站到的地标、要交谈的人、要在某处做出的表情，或是一件小差事，而最后一条总会让你挖掘。同一时间只能进行一场寻宝，它会跨越每日重置并在不同游戏时段之间保留你的进度，所以不必着急。',
+  'guide.questsPage.cluesCasketTitle': '宝匣',
+  'guide.questsPage.cluesCasketBody':
+    '解开最后一条线索，在它指明的地点使用卷轴，挖出一只宝藏匣；完成寻宝还能获得该地所属阵营的声望。打开它可以得到钱币和一批优质采集材料。偶尔还会有一件装备或几枚英雄徽记，极少数情况下会出现别处无法获得的坐骑“提灯背者格伦博”。你的第一只宝匣和第十只都会记入功绩之书。',
   'guide.questsPage.sideCryptBody':
     '在高耸的峰巅，潜藏着一桩更幽静的谜团：古老的坟墓刻着无人记得的王冠。读懂死者，收集他们守护之物，再开启一座本该长闭的陵墓。这是一条侦探般的线索，会为你开启通往这片位面十人终局团队副本之路。',
   'guide.questsPage.sideCryptTitle': '被遗忘的君王',
@@ -16330,6 +16351,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.artificers_welding_cowl.name': '工匠焊接兜帽',
   'entities.items.forgemaster_crag_cleaver.name': '锻造大师峭壁劈砍斧',
   'entities.items.champion_forged_loop.name': '勇士锻造指环',
+  // Clue Scrolls: the scroll and the casket (M16 non-Latin fills).
+  'entities.items.clue_scroll.name': '线索卷轴',
+  'entities.items.treasure_casket.name': '宝藏匣',
   'entities.npcs.npc_rift_watch_quartermaster.name': '军需官维伦',
   'entities.npcs.npc_rift_watch_quartermaster.title': '裂隙守望补给官',
   'entities.npcs.npc_rift_watch_quartermaster.greeting':
@@ -16452,10 +16476,82 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.commendNote': '{amount}点声望，赠予你选择的一个阵营，每周一次。',
   'hudChrome.weekly.commendClaimed': '本周的嘉奖已授予{faction}。',
   'hudChrome.weekly.commendRewardLine': '{amount}点声望，阵营由你选择',
+  'hudChrome.reputation.standingGained': '{faction}声望 +{amount}',
   'hudChrome.reputation.tierReachedBanner': '与{faction}的声望达到{tier}',
   'hudChrome.reputation.tierReachedSubtext': '阵营头衔：{title}',
   'hudChrome.reputation.tierReachedLine':
     '你与{faction}的声望已达到{tier}。你的阵营头衔现在是{title}。',
+  // Clue Scrolls (world quests, Stage 3): hunt titles, per-step riddles and the two item
+  // descriptions (M16 non-Latin fills; src/ui/i18n.catalog/clues.ts).
+  'clues.items.clue_scroll.desc':
+    '完成当日全部区域任务栏位后获得的密封谜题。使用它开始一场寻宝；当最后一条线索让你挖掘时，在隐秘地点再次使用。',
+  'clues.items.treasure_casket.desc':
+    '寻宝终点挖出的上锁宝匣。使用它打开匣子，领取这场寻宝埋藏的东西。',
+  'clues.hunt_drakelands_gate_ashes.title': '门前余烬',
+  'clues.hunt_drakelands_gate_ashes.0':
+    '出望龙哨的大路向西通入一片守着关门的古树林。站到门林之下，线索便开始了。',
+  'clues.hunt_drakelands_gate_ashes.1':
+    '一位远沙丘的守望者守在东边的沙地上，在驻军以北。找到斥候耶琳，问问风带来了什么。',
+  'clues.hunt_drakelands_gate_ashes.2':
+    '驻军仓库的守护者自上次巡逻以来就没吃过东西。给军需官塞拉带去 2 x 农家面包。',
+  'clues.hunt_drakelands_gate_ashes.3':
+    '在余烬堆成沙丘之处以东略偏南，一片焦土藏着灰烬掩埋的东西。在那里使用卷轴并挖掘。',
+  'clues.hunt_frostveil_aurora_vigil.title': '台阶上的极光',
+  'clues.hunt_frostveil_aurora_vigil.0':
+    '在台地向夜里舞动的光攀升之处，跪在极光台阶上，让天空注意到你。',
+  'clues.hunt_frostveil_aurora_vigil.1': '读光之人就等在台阶附近。和极光师薇拉谈谈天空拼出了什么。',
+  'clues.hunt_frostveil_aurora_vigil.2': '呼啸台地以东略偏南，积雪平得反常。在那里使用卷轴并挖掘。',
+  'clues.hunt_amberfall_lantern_ferry.title': '湖上灯火',
+  'clues.hunt_amberfall_lantern_ferry.0':
+    '在灯湖镇以北的水边，灯渡船的掌管者知道哪盏灯灭了。和渡船长卡多谈谈。',
+  'clues.hunt_amberfall_lantern_ferry.1':
+    '大湖东北方，一块比镇子还古老的孤石斜倚着天空。站到斜碑旁。',
+  'clues.hunt_amberfall_lantern_ferry.2':
+    '鎏金果园的守护者亲手浇灌果园，自己却渴得很。给果园主帕梅琳带去 3 x 冰凉井水。',
+  'clues.hunt_amberfall_lantern_ferry.3':
+    '烬枫烧得通红的山坡东北方，落叶围成一个不是风摆出来的圆圈。在那里使用卷轴并挖掘。',
+  'clues.hunt_willowfen_fenwitch_salt.title': '沼泽女巫的盐',
+  'clues.hunt_willowfen_fenwitch_salt.0':
+    '垂柳湾的沼泽女巫不会理睬空手而来的人。给莎草婆婆带去 1 x 烹饪用盐。',
+  'clues.hunt_willowfen_fenwitch_salt.1':
+    '在沼泽变得平坦、空气让人昏昏欲睡的地方，站在沉眠浅滩上叹气，就像女巫吩咐的那样。',
+  'clues.hunt_willowfen_fenwitch_salt.2':
+    '沼中闪光的水池东南方，有一处旱丘终年干燥。在那里使用卷轴并挖掘。',
+  'clues.hunt_nightbloom_sleepless_vigil.title': '不眠者的守望',
+  'clues.hunt_nightbloom_sleepless_vigil.0': '月栖镇东北方，石头守着永不结束的岗，站到守望石阵旁。',
+  'clues.hunt_nightbloom_sleepless_vigil.1':
+    '守望处的观星者数星星像别人数钱币一样。和天文学者卡西安谈谈那颗坠落的星。',
+  'clues.hunt_nightbloom_sleepless_vigil.2':
+    '镇子以北躺着一座古冢，里面的长眠者从不安息。向不眠古冢敬礼，让长眠者知道有朋友来了。',
+  'clues.hunt_nightbloom_sleepless_vigil.3':
+    '暮色聚集的花田东南方，月光积在一块光秃的泥土上。在那里使用卷轴并挖掘。',
+  'clues.hunt_wraithwood_mournstone_candles.title': '哀石的蜡烛',
+  'clues.hunt_wraithwood_mournstone_candles.0':
+    '绞湖镇的制烛人把光卖给怕黑的人。和遗孀坦茜谈谈那支从未付钱的蜡烛。',
+  'clues.hunt_wraithwood_mournstone_candles.1':
+    '哀石最后的牧师一直只靠祷告果腹。给牧师克里尔带去 2 x 盐渍肉干。',
+  'clues.hunt_wraithwood_mournstone_candles.2':
+    '镇子东北方，穿过乌鸦，有一片林地挂着它自己的怪异果实。站到吊影林地中。',
+  'clues.hunt_wraithwood_mournstone_candles.3':
+    '猎手设下陷阱的林隙东南方，落叶层最近被翻动过。在那里使用卷轴并挖掘。',
+  'clues.hunt_palmreach_sunken_idol.title': '神像的秘密',
+  'clues.hunt_palmreach_sunken_idol.0':
+    '在丛林深处、潟湖西北方，藤蔓像瀑布一样倾泻而下。站到垂藤林旁。',
+  'clues.hunt_palmreach_sunken_idol.1':
+    '一位走进丛林又走了出来的隐士住在垂藤附近。和奥克里姆谈谈他在下面看到了什么。',
+  'clues.hunt_palmreach_sunken_idol.2':
+    '往东，一尊神像半沉水中，仍在注视。在沉没神像前畏缩，就像隐士说的潜水者那样。',
+  'clues.hunt_palmreach_sunken_idol.3':
+    '丛林向大海张开的入口东北方，沙子堆得比潮水能到的地方还高。在那里使用卷轴并挖掘。',
+  'clues.hunt_evergarden_beacon_road.title': '灯塔与花',
+  'clues.hunt_evergarden_beacon_road.0':
+    '篱苑镇以北步道旁的花坛园丁发誓她的花床快饿死了。给农妇维贝娜带去 2 x 堆肥。',
+  'clues.hunt_evergarden_beacon_road.1':
+    '在花园的东南角落，一座老磨坊仍在为不存在的磨坊主转动。站到老磨坊旁。',
+  'clues.hunt_evergarden_beacon_road.2':
+    '沿大路向南越过边界进入疾风崖，一直走到海岸。老灯塔的守护者守灯人布拉姆掌握着最后一句话。',
+  'clues.hunt_evergarden_beacon_road.3':
+    '老灯塔西北方，就在从灯塔下来的小路旁，草皮被切开又铺了回去。在那里使用卷轴并挖掘。',
   'hudChrome.questLog.completed': '已完成',
   'hudChrome.questLog.zoneSummary': '{count}个（{ready}个可交付）',
   'hudChrome.questLog.shiftHint': '按住 Shift 点击任务可将其链接到聊天中。',

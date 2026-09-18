@@ -92,14 +92,18 @@ describe('deed_i18n English resolution', () => {
     // 308 at the release/v0.43.0 merge: plus the eight world-quest deeds.
     // 315 with the seven faction standing deeds (Trusted and Champion per
     // allied faction plus the all-factions meta), each with a name and desc.
-    expect(manifest.filter((row) => row.field === 'name').length).toBe(315);
+    // 317 with the two Clue Scroll casket deeds, each with a name and desc;
+    // the tenth carries the Treasure Hunter title.
+    expect(manifest.filter((row) => row.field === 'name').length).toBe(317);
     // 289 descs at the release/v0.43.0 merge: plus the eight world-quest deeds.
-    // 296 with the seven faction standing deeds.
-    expect(manifest.filter((row) => row.field === 'desc').length).toBe(296);
-    // 661 rows: 315 names + 296 descs + 50 titles (the three faction Champion
-    // titles Riftwarden, Dawnkeeper and Forgemaster join the 47).
-    expect(manifest.length).toBe(661);
-    expect(manifest.filter((row) => row.field === 'title').length).toBe(50);
+    // 296 with the seven faction standing deeds. 298 with the two Clue Scroll
+    // casket deeds.
+    expect(manifest.filter((row) => row.field === 'desc').length).toBe(298);
+    // 666 rows: 317 names + 298 descs + 51 titles (the three faction Champion
+    // titles Riftwarden, Dawnkeeper and Forgemaster join the 47, then the
+    // Clue Scroll Treasure Hunter title).
+    expect(manifest.length).toBe(666);
+    expect(manifest.filter((row) => row.field === 'title').length).toBe(51);
     expect(manifest.filter((row) => row.id === 'hid_forgebreaker')).toEqual([
       { id: 'hid_forgebreaker', field: 'name', source: 'A Spring Unchained' },
       {

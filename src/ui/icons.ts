@@ -5243,6 +5243,9 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'cyan_magenta_armor_plate',
   'event_skin_token',
   'emissary_cache',
+  // Clue Scrolls (world quests, Stage 3): the scroll and the casket.
+  'clue_scroll',
+  'treasure_casket',
   'forest_pink_armor_plate',
   'imperial_crimson_armor_plate',
   'imperial_gold_armor_plate',
@@ -5555,6 +5558,9 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'prog_church_order_champion',
   'prog_automatons_champion',
   'prog_faction_champion_all',
+  // Clue Scroll casket deeds use the exploration category crest pending art.
+  'exp_clue_first_casket',
+  'exp_clue_ten_caskets',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

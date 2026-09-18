@@ -846,15 +846,20 @@ describe('item-art audit builder', () => {
     // from `node scripts/item_art_audit.mjs --verify-only` run on the merged
     // tree, not invented or derived from either parent.
     // PR3941: measured again after retiring the five premium reins.
+    // Clue Scrolls (2026-09-17): measured again on the tree carrying the 15
+    // faction quartermaster items (which landed without moving this block)
+    // plus the two clue items (clue_scroll, treasure_casket): 1304 / 1322,
+    // the sha/bytes straight from `--verify-only` on this tree.
     expect(verified).toMatchObject({
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      // Re-minted at the weekly emissary rebase: the catalog now carries the 15
-      // faction quartermaster owners and the Emissary's Cache chest (1303 / 1321).
-      catalogSha256: 'e347107788203b8b58789cd97e39c8c9ab0871770e4e603696091cb82a5ca165',
-      catalogBytes: 709767,
+      // Re-minted on the quests integration branch: the catalog carries the 15
+      // faction quartermaster owners, the Emissary's Cache chest and the two
+      // Clue Scroll items (1305 / 1323).
+      catalogSha256: 'd41d1a47f8a01c48b612b257a550503997319a1ff7cd090f8cff2b1bf7ab47c6',
+      catalogBytes: 710773,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 1303,
-      liveItemCount: 1321,
+      catalogCount: 1305,
+      liveItemCount: 1323,
       generatedHeroicDefinitions: 78,
       heroicDefinitionsWithOwnWebp: 59,
       heroicWeaponArtAliases: 19,
@@ -872,7 +877,7 @@ describe('item-art audit builder', () => {
         identity: 31,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: 'a8e2e6a929d2f035776e4d542f83937823bc98a46d7ff97b2fc5d1f8d88573bf',
+      shippingCatalogSha256: 'f19748b98126115136a11b738eba3097a76b9c25732623407e71a4f902188fe4',
       machineChecksPassed: true,
       verdict: null,
     });

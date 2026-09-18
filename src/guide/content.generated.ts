@@ -5963,6 +5963,21 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "progression",
     "renown": 50,
     "feat": false
+  },
+  {
+    "id": "exp_clue_first_casket",
+    "name": "Treasure Found",
+    "category": "exploration",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "exp_clue_ten_caskets",
+    "name": "Treasure Hunter",
+    "category": "exploration",
+    "renown": 25,
+    "feat": false,
+    "rewardTitle": "Treasure Hunter"
   }
 ];
 
@@ -7284,6 +7299,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "title",
         "name": "Forgemaster"
+      },
+      {
+        "kind": "title",
+        "name": "Treasure Hunter"
       }
     ]
   },
