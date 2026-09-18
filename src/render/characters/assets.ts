@@ -30,6 +30,7 @@ import { type ArmorDyeSpec, attachArmorDye } from './armor_dye';
 import { backGripFor } from './back_grips';
 import { dequantizeAttribute } from './dequantize_attribute';
 import { coalesceFarBakeGroups, farBakeGroupRanges } from './far_bake_groups_core';
+import { padMissingUv } from './far_bake_uv_pad';
 import { type HandGrip, KAYKIT_SHIELD_ACCESSORIES, KAYKIT_SHIELD_GRIPS } from './held_item_grips';
 import { pruneHeldPropIdles, registerHeldPropIdle } from './held_prop_idle';
 import { composedLookReady } from './look_pieces';
@@ -2831,25 +2832,6 @@ export interface StaticPoseBake {
    *  the group draws. The identity map before coalescing, and the indirection a
    *  composed body resolves its per-character materials through. */
   slots: number[];
-}
-
-/**
- * Give every geometry in a far-bake set a `uv` attribute when at least one of
- * them has one, so mergeGeometries can fold them into one buffer WITHOUT the
- * mapped parts losing theirs. A part without uv (the modular face parts, a
- * colour-only prop) gets an all-zero Float32 uv of its own vertex count: it
- * never samples a map, so the value is inert, and Float32 matches what
- * dequantizeAttribute already made the real ones. A set where nothing carries
- * a uv is left alone (nothing to agree with). Exported for the test that pins
- * the atlas uv surviving the bake.
- */
-export function padMissingUv(geos: readonly THREE.BufferGeometry[]): void {
-  if (!geos.some((g) => g.getAttribute('uv'))) return;
-  for (const g of geos) {
-    if (g.getAttribute('uv')) continue;
-    const count = g.getAttribute('position')?.count ?? 0;
-    g.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(count * 2), 2));
-  }
 }
 
 /** Bake every visible mesh of a posed clone into one static BufferGeometry

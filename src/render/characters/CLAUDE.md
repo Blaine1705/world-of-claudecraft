@@ -364,8 +364,8 @@ per part.
     part set and minted on the first crossing into the far band; the colours are
     resolved per character from their own materials. Face/body sliders are not
     in that silhouette, deliberately. The bake merges atlas-mapped kit pieces
-    with colour-only face parts that ship NO uv: `padMissingUv` gives those an
-    inert zero uv so the merge keeps the kit's real uv (dropping uv from every
+    with colour-only face parts that ship NO uv: `far_bake_uv_pad.ts` gives those
+    an inert zero uv so the merge keeps the kit's real uv (dropping uv from every
     part instead made the frozen mesh sample one atlas texel, a flat untextured
     body at distance; `tests/far_bake_uv_pad.test.ts`).
     The bake hands back geometry GROUPS and each character resolves group N

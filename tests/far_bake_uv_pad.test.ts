@@ -1,18 +1,11 @@
-// The far-LOD bake must keep the uv of every part that has one, even when the
-// same body carries parts that have none.
-//
-// Why this matters: a composed (modular) body always mixes atlas-mapped kit
-// pieces with colour-only face parts (head, ears, eyes, mouth, brows) that ship
-// no uv at all. bakeStaticPose merges all of them into ONE far mesh, and
-// mergeGeometries needs the attribute sets to agree, so the bake used to
-// "resolve" a missing uv by deleting uv from EVERY part. The merged mesh then
-// had no uv attribute, and the kit's atlas material sampled the single texel
-// at uv (0,0) across the whole robe and hat: a flat, untextured body the
-// moment a peer or NPC crossed into the static band (the "NPCs lose their
-// textures" report; Chronicler Zenzie at night was the reproduction). The
-// fix pads the uv-less parts with an inert zero uv instead.
+// far_bake_uv_pad.ts: the far-LOD bake keeps the uv of every part that has
+// one, even when the same body carries parts that have none (the composed
+// body's colour-only face parts). Why it matters is the module header's; the
+// bake-level case below is the mutant proof against the old "delete uv from
+// every geo" arm in bakeStaticPose (characters/assets.ts).
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { padMissingUv } from '../src/render/characters/far_bake_uv_pad';
 
 type AssetsModule = typeof import('../src/render/characters/assets');
 
@@ -45,6 +38,32 @@ function faceMesh(): THREE.Mesh {
   return m;
 }
 
+describe('padMissingUv', () => {
+  it('gives uv-less parts a zero uv of their own vertex count and leaves mapped parts untouched', () => {
+    const kit = kitMesh().geometry;
+    const face = faceMesh().geometry;
+    padMissingUv([kit, face]);
+    expect(Array.from(kit.getAttribute('uv').array as Float32Array)).toEqual(Array.from(KIT_UV));
+    const padded = face.getAttribute('uv');
+    expect(padded).toBeDefined();
+    expect(padded.itemSize).toBe(2);
+    expect(padded.count).toBe(face.getAttribute('position').count);
+    expect(padded.array).toBeInstanceOf(Float32Array);
+    expect(Array.from(padded.array as Float32Array).every((v) => v === 0)).toBe(true);
+  });
+
+  it('leaves a set alone when no part carries a uv (nothing to agree with)', () => {
+    const a = faceMesh().geometry;
+    const b = faceMesh().geometry;
+    padMissingUv([a, b]);
+    expect(a.getAttribute('uv')).toBeUndefined();
+    expect(b.getAttribute('uv')).toBeUndefined();
+  });
+});
+
+// The bake itself, through the real prepareVisual path with the mocked loader
+// serving one two-mesh scene (a mapped kit beside a colour-only face part) for
+// every URL, the same idiom as the sibling character suites.
 const stubGltf = () => {
   const scene = new THREE.Group();
   scene.add(kitMesh());
@@ -70,36 +89,11 @@ afterEach(() => {
   vi.resetModules();
 });
 
-describe('padMissingUv', () => {
-  it('gives uv-less parts a zero uv of their own vertex count and leaves mapped parts untouched', async () => {
-    const { padMissingUv } = await loadAssets();
-    const kit = kitMesh().geometry;
-    const face = faceMesh().geometry;
-    padMissingUv([kit, face]);
-    expect(Array.from(kit.getAttribute('uv').array as Float32Array)).toEqual(Array.from(KIT_UV));
-    const padded = face.getAttribute('uv');
-    expect(padded).toBeDefined();
-    expect(padded.itemSize).toBe(2);
-    expect(padded.count).toBe(face.getAttribute('position').count);
-    expect(padded.array).toBeInstanceOf(Float32Array);
-    expect(Array.from(padded.array as Float32Array).every((v) => v === 0)).toBe(true);
-  });
-
-  it('leaves a set alone when no part carries a uv (nothing to agree with)', async () => {
-    const { padMissingUv } = await loadAssets();
-    const a = faceMesh().geometry;
-    const b = faceMesh().geometry;
-    padMissingUv([a, b]);
-    expect(a.getAttribute('uv')).toBeUndefined();
-    expect(b.getAttribute('uv')).toBeUndefined();
-  });
-});
-
 describe('far-LOD bake uv survival', () => {
   it('keeps the atlas uv of the mapped part when a colour-only part sits beside it', async () => {
     const assets = await loadAssets();
-    // A fixed-rig key whose bake walks every visible mesh of the stub scene
-    // (the mocked loader serves the same two-mesh scene for every URL).
+    // A fixed-rig key whose bake walks every visible mesh of the stub scene.
+    // Composed bodies reach the same bakeStaticPose through modularFarBake.
     const prep = assets.prepareVisual('mob_mushroom_pixie');
     const geo = prep.idleGeo;
     expect(geo).not.toBeNull();
@@ -114,5 +108,5 @@ describe('far-LOD bake uv survival', () => {
     const kitIndex = values.findIndex((_, i) => i % 2 === 0 && values[i] === needle);
     expect(kitIndex).toBeGreaterThanOrEqual(0);
     expect(values.slice(kitIndex, kitIndex + KIT_UV.length)).toEqual(Array.from(KIT_UV));
-  }, 20000);
+  });
 });
