@@ -10,6 +10,9 @@
 //   to quality that would then fail the next return trial;
 // - the descent is fast and the return is a timed trial whose wait doubles on
 //   every failure, so a machine that cannot hold full cadence stops being asked.
+//   A passed trial is on probation: load follows the scene (measured on the
+//   Iris Xe laptop, a 10 s trial can land on a light stretch of a heavy place),
+//   so a step back down before the probation ends counts as a failed trial.
 //
 // Pure: rendered frames in, the ceiling intent out. Every threshold is a share
 // of frames or a duration of play, never a frame time calibrated on a machine.
@@ -38,6 +41,11 @@ export interface FrameCadenceAutoState {
   windowLate: number;
   cleanSeconds: number;
   returnWaitS: number;
+  /** A trial passed, and the step up has not yet outlasted the wait it took. */
+  onProbation: boolean;
+  probationS: number;
+  /** The last closed window's late share: the reading behind the last decision. */
+  lastShare: number;
 }
 
 export function createFrameCadenceAuto(): FrameCadenceAutoState {
@@ -50,6 +58,9 @@ export function createFrameCadenceAuto(): FrameCadenceAutoState {
     windowLate: 0,
     cleanSeconds: 0,
     returnWaitS: AUTO_FIRST_RETURN_WAIT_S,
+    onProbation: false,
+    probationS: 0,
+    lastShare: 0,
   };
 }
 
@@ -118,13 +129,16 @@ export function stepFrameCadenceAuto(
   const share = state.windowLate / Math.max(1, state.windowFrames);
   resetWindow(state);
   if (!enough) return false;
+  state.lastShare = share;
 
   if (state.trial) {
     state.trial = false;
     state.cleanSeconds = 0;
     if (share < AUTO_CLEAN_SHARE) {
-      // Passed: the trial ceiling is now the settled one (and worth remembering).
-      state.returnWaitS = AUTO_FIRST_RETURN_WAIT_S;
+      // Passed: the trial ceiling is the settled one (and worth remembering), on
+      // probation for as long as the wait that earned it.
+      state.onProbation = true;
+      state.probationS = 0;
       return true;
     }
     state.returnWaitS = Math.min(AUTO_MAX_RETURN_WAIT_S, state.returnWaitS * 2);
@@ -137,8 +151,20 @@ export function stepFrameCadenceAuto(
     if (frame.governorShedding) return false;
     const down = autoStepDown(state.ceiling, frame.refreshHz);
     if (down === state.ceiling) return false;
+    if (state.onProbation) {
+      state.onProbation = false;
+      state.returnWaitS = Math.min(AUTO_MAX_RETURN_WAIT_S, state.returnWaitS * 2);
+    }
     state.ceiling = down;
     return true;
+  }
+
+  if (state.onProbation) {
+    state.probationS += seconds;
+    if (state.probationS >= state.returnWaitS) {
+      state.onProbation = false;
+      state.returnWaitS = AUTO_FIRST_RETURN_WAIT_S;
+    }
   }
 
   if (state.ceiling === 0) return false;

@@ -397,6 +397,7 @@ describe('automatic frame rate limit', () => {
     });
     expect(r.intentLog.map((e) => e.intent)).toEqual([0, 30, 0]);
     expect(r.saved).toEqual([30, 0]);
+    expect(r.wiring.snapshot().auto).toBe(true);
     expect(r.published.hold).toBe(false);
   });
 
@@ -412,6 +413,23 @@ describe('automatic frame rate limit', () => {
     expect(trials[1] - downs[1]).toBeLessThan(140_000);
     // A trial is never remembered: only the settled ceiling is.
     expect(r.saved).toEqual([30, 30, 30]);
+  });
+
+  it('stops yoyoing in a place whose load comes and goes: a quick step back down doubles the wait', () => {
+    // 50 s uneven, 25 s light, repeating: a trial regularly lands on a light stretch.
+    const slow = uneven(22, 12);
+    const r = runHost({
+      refreshMs: SLOT,
+      costMs: (t) => (t % 75_000 < 50_000 ? slow() : 6),
+      seconds: 1500,
+      intent: 'auto',
+    });
+    const downs = r.intentLog.filter((e) => e.intent === 30).map((e) => e.at);
+    const stays = downs.slice(1).map((t, i) => t - downs[i]);
+    expect(downs.length).toBeGreaterThanOrEqual(3);
+    // Each stay at the ceiling is longer than the one before, never a fixed beat.
+    expect(stays[stays.length - 1]).toBeGreaterThan(stays[0] * 2);
+    expect(downs.length).toBeLessThan(9);
   });
 
   it('starts at the remembered ceiling', () => {
@@ -437,6 +455,8 @@ describe('automatic frame rate limit', () => {
 describe('frame cadence beacon fields', () => {
   const base: FrameCadenceSnapshot = {
     auto: false,
+    autoTrial: false,
+    autoLateShare: 0,
     intent: 0,
     verdict: 'paced',
     refreshHz: 59.94,

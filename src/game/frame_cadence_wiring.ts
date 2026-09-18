@@ -71,6 +71,10 @@ export interface FrameCadenceDeps {
 export interface FrameCadenceSnapshot {
   /** Whether the automatic mode resolves the intent. */
   auto: boolean;
+  /** The automatic mode is on a return trial. */
+  autoTrial: boolean;
+  /** The late share of the automatic mode's last closed window. */
+  autoLateShare: number;
   intent: FrameCeilingIntent;
   verdict: RefreshVerdict;
   refreshHz: number;
@@ -105,6 +109,8 @@ export class FrameCadenceWiring {
   private readonly autoState = createFrameCadenceAuto();
   private readonly snapshotOut: FrameCadenceSnapshot = {
     auto: false,
+    autoTrial: false,
+    autoLateShare: 0,
     intent: 0,
     verdict: 'unknown',
     refreshHz: 0,
@@ -252,6 +258,8 @@ export class FrameCadenceWiring {
   snapshot(): FrameCadenceSnapshot {
     const out = this.snapshotOut;
     out.auto = this.auto;
+    out.autoTrial = this.auto && this.autoState.trial;
+    out.autoLateShare = this.autoState.lastShare;
     out.intent = this.intent;
     out.verdict = this.estimator.verdict;
     out.refreshHz = this.estimator.refreshMs > 0 ? 1000 / this.estimator.refreshMs : 0;
@@ -341,6 +349,7 @@ export function frameCadenceBeaconBlock(): Record<string, number | string> {
   const s = sharedFrameCadence().snapshot();
   return {
     mode: s.auto ? 'auto' : 'manual',
+    autoLateShare: Math.round(s.autoLateShare * 1000) / 1000,
     intent: s.intent,
     verdict: s.verdict,
     refreshHz: Math.round(s.refreshHz * 10) / 10,
@@ -381,7 +390,7 @@ export function frameCadenceBeaconFields(budgetTargetFps: number): FrameCadenceB
 /** One `?perf` overlay line (dev diagnostics, English like the rest of it). */
 export function frameCadenceOverlayLine(): string {
   const s = sharedFrameCadence().snapshot();
-  const cap = s.intent === 0 ? 'display' : String(s.intent);
+  const cap = `${s.auto ? (s.autoTrial ? 'auto-trial ' : 'auto ') : ''}${s.intent === 0 ? 'display' : s.intent}`;
   const target =
     s.targetIntervalMs > 0 ? `${s.targetIntervalMs.toFixed(1)}ms /${s.divisor}` : 'inert';
   return `cap ${cap}  ${s.verdict} ${s.refreshHz.toFixed(1)}Hz  ${target}  miss ${(s.missShare * 100).toFixed(1)}%  skip ${s.skipped}`;
