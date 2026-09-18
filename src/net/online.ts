@@ -2381,10 +2381,6 @@ export class ClientWorld extends ReconWireState implements IWorld {
       if (this.spectateExitPending) {
         this.playerId = this.ownPlayerId;
         this.cfg.playerClass = this.ownPlayerClass;
-        // cmd() drops every non-chat command while spectating (see below), so
-        // a preference toggled mid-spectate never reached the server; now
-        // that spectate has ended, re-push it the same way a reconnect does.
-        this.resendSessionPreferences();
       }
       Object.assign(this.moveInput, emptyMoveInput());
       this.mouselookFacing = null;
@@ -3277,6 +3273,10 @@ export class ClientWorld extends ReconWireState implements IWorld {
       if (this.spectateExitPending) {
         this.spectateExitPending = false;
         this.spectating = null; // own presentation rebuilt: the view is ours again
+        // cmd() drops every non-chat command while spectating, so wait until
+        // the held exit snapshot clears `spectating` before re-pushing any
+        // preference changed while watching another player.
+        this.resendSessionPreferences();
       }
       // --- IWorldParty: party roster + raid markers, delta-omitted self-decode
       // (keep the prior value when absent; `marks: null` clears on disband). ---
