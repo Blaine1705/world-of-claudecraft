@@ -7,11 +7,14 @@
 //
 // The fix plans the launch against the ground the leap will cross. A sweep
 // walks the backward line half a yard at a time, stopping where the kernel
-// would stop the body anyway (an unclimbable rise, a wall or a full-height
-// prop) so the landing point is the last spot the body can reach. The arc is
-// then the parabola from the feet to that landing point, lifted just enough to
-// clear everything sampled between them; flat and downhill ground plans the
-// exact launch the old code used, so nothing changes where the bug was absent.
+// would stop the body anyway (a face taller than the hop can carry over, a
+// wall or a full-height prop) so the landing point is the last spot the body
+// can reach. The arc is then the parabola from the feet to that landing point,
+// lifted just enough to clear everything sampled between them. Ground that
+// does not rise (level, downhill) plans the exact launch the old code used;
+// ground that rises by any amount takes the lifted branch, which lands on the
+// planned tick instead of the flat hop's one-tick-early undershoot, so a
+// near-level cast can differ from a level one by that tick (a 0.15-yard apex).
 //
 // Pure and host-agnostic: terrain, floor, and collision reads come in through
 // `TrailbreakSweepDeps`, so a Vitest can drive it over a synthetic hillside,
@@ -21,9 +24,10 @@ import { MANTLE_REACH } from '../colliders';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE } from '../pathfind';
 import { floorHeightAt } from '../physics';
 import { GRAVITY, JUMP_VELOCITY } from '../player_motion';
+import { walkedSteepnessAt } from '../ride_height';
 import type { SimContext } from '../sim_context';
 import { DT, type Entity, type Vec3 } from '../types';
-import { groundHeight, terrainSteepnessAt } from '../world';
+import { groundHeight } from '../world';
 
 /** Sweep resolution along the backward line, in yards. */
 export const TRAILBREAK_SWEEP_STEP = 0.5;
@@ -31,8 +35,11 @@ export const TRAILBREAK_SWEEP_STEP = 0.5;
  *  it the interior bump wins and the kernel simply lands the body on it early. */
 export const TRAILBREAK_FLIGHT_STRETCH = 2;
 /** The flat hop: JUMP_VELOCITY up, back on the ground after this many ticks.
- *  A function, not a module constant: the kernel constants arrive through the
- *  sim import cycle and are not initialised yet when this module evaluates. */
+ *  A function, not a module constant: when the live Sim loads, this module is
+ *  reached while player_motion.ts is still evaluating (its import graph leads
+ *  here), so a top-level read of its constants sees them uninitialised and a
+ *  module constant built from them is NaN (a pure test importing this module
+ *  directly never shows it; a `new Sim` does). */
 export function trailbreakFlatTicks(): number {
   return Math.round((2 * JUMP_VELOCITY) / GRAVITY / DT);
 }
@@ -94,15 +101,24 @@ export function planTrailbreakArc(
 
   // The sweep: every half-yard sample the body can reach, with the floor the
   // kernel would seat it on there. It stops at the first sample the kernel
-  // would refuse, exactly as the airborne body would be refused mid-flight:
-  // ground rising faster than the climb limit (a cliff face, a terrace wall)
-  // or a collision resolve that diverts the body (a building, a tree, a prop
-  // too tall to mantle; fences are ignored, the jumping body passes them).
+  // would refuse mid-flight: a collision resolve that diverts the body (a
+  // building, a tree, a prop too tall to mantle; fences are ignored, the
+  // jumping body passes them), or ground rising faster than the climb limit
+  // that the arc cannot simply fly over. The kernel gates an airborne body
+  // only on ground ABOVE its feet, so a short steep feature (a ditch's far
+  // bank, a kerb, a stair riser, a steepness-memo blip on a level shoulder)
+  // is footing the leap carries over, exactly as the flat hop always did; the
+  // plan below lifts the arc to clear it. What ends the sweep is a face that
+  // climbs more than MANTLE_REACH above the last WALKABLE footing (the hop's
+  // own reach: a cliff, a terrace wall) or a face that keeps climbing (a
+  // continuous unclimbable slope ratchets past that reach on its second
+  // sample), so the leap ends at the foot instead of launching up the face.
   let safeX = from.x;
   let safeZ = from.z;
   let safeFloor = from.y;
+  let walkableFloor = from.y;
   let previousGround = deps.groundAt(from.x, from.z);
-  const samples: { d: number; floor: number; propTop: boolean }[] = [];
+  const samples: { d: number; floor: number }[] = [];
   const steps = Math.max(1, Math.ceil(distance / TRAILBREAK_SWEEP_STEP));
   let reachedFull = false;
   for (let index = 1; index <= steps; index++) {
@@ -112,13 +128,11 @@ export function planTrailbreakArc(
     const step = Math.hypot(nextX - safeX, nextZ - safeZ);
     if (step < 1e-6) continue;
     const nextGround = deps.groundAt(nextX, nextZ);
-    if (
+    const unclimbable =
       nextGround > previousGround &&
       ((nextGround - previousGround) / step > PLAYER_MAX_CLIMB_SLOPE ||
-        deps.steepnessAt(nextX, nextZ) > PLAYER_MAX_CLIMB_SLOPE)
-    ) {
-      break;
-    }
+        deps.steepnessAt(nextX, nextZ) > PLAYER_MAX_CLIMB_SLOPE);
+    if (unclimbable && nextGround > Math.max(from.y, walkableFloor) + MANTLE_REACH) break;
     const resolved = deps.resolve(safeX, safeZ, nextX, nextZ);
     if (Math.hypot(resolved.x - nextX, resolved.z - nextZ) > DIVERT_EPSILON) break;
     safeX = resolved.x;
@@ -127,13 +141,9 @@ export function planTrailbreakArc(
     // A prop top within mantle reach of the last floor is footing the arc can
     // carry onto (the kernel's airborne support query reaches the same
     // MANTLE_REACH above the feet); anything taller was a wall to the resolve.
-    const ground = deps.groundAt(safeX, safeZ);
     safeFloor = deps.floorAt(safeX, safeZ, safeFloor + MANTLE_REACH);
-    samples.push({
-      d: Math.hypot(safeX - from.x, safeZ - from.z),
-      floor: safeFloor,
-      propTop: safeFloor > ground + 1e-6,
-    });
+    if (!unclimbable) walkableFloor = safeFloor;
+    samples.push({ d: Math.hypot(safeX - from.x, safeZ - from.z), floor: safeFloor });
     reachedFull = index === steps;
   }
 
@@ -160,9 +170,9 @@ export function planTrailbreakArc(
   // travel: the same hop arc as flat ground, riding the chord. Every interior
   // sample the chord does not already clear therefore needs T^2 large enough,
   // and the largest such need sets the flight (never shorter than the flat
-  // hop, capped at trailbreakMaxTicks()). Prop tops need MANTLE_REACH of
-  // clearance rather than a margin: within that reach the airborne support
-  // query mantles the body onto the top, which ends the leap.
+  // hop, capped at trailbreakMaxTicks()). A prop top needs the same margin as
+  // terrain: the airborne support query only mantles a body whose feet pass
+  // BELOW a top within MANTLE_REACH, so feet that clear the top fly on.
   const travel = reachedFull ? distance : last.d;
   const rise = last.floor - from.y;
   let neededSquared = 0;
@@ -170,8 +180,7 @@ export function planTrailbreakArc(
     if (sample === last) continue;
     const u = sample.d / travel;
     if (u <= 0 || u >= 1) continue;
-    const clearance = sample.propTop ? MANTLE_REACH : 0;
-    const excess = sample.floor - from.y - rise * u + clearance + TRAILBREAK_TERRAIN_CLEARANCE;
+    const excess = sample.floor - from.y - rise * u + TRAILBREAK_TERRAIN_CLEARANCE;
     if (excess <= 0) continue;
     neededSquared = Math.max(neededSquared, (2 * excess) / (GRAVITY * u * (1 - u)));
   }
@@ -211,14 +220,18 @@ export function planTrailbreakArc(
 
 /** The live binding: the Sim's own terrain, floor, and swept-collision reads
  *  (delve modules, doors, rift walls included), fences ignored the way the
- *  jumping body ignores them. The hunter must already be flagged airborne so
- *  the resolve grants the mantle lift the kernel grants mid-flight. */
+ *  jumping body ignores them, and the kernel's own walked-steepness view (a
+ *  stair band reads as its treads, not the carved ground under them). The
+ *  hunter must already be flagged airborne so the resolve grants the mantle
+ *  lift the kernel grants mid-flight; the resolve judges every sample at the
+ *  launch feet height, which is conservative (a low prop far up a hill may
+ *  read as a wall and shorten the leap) and never lets the body clip. */
 export function trailbreakArcFor(ctx: SimContext, hunter: Entity, distance: number): TrailbreakArc {
   const seed = ctx.cfg.seed;
   return planTrailbreakArc(
     {
       groundAt: (x, z) => groundHeight(x, z, seed),
-      steepnessAt: (x, z) => terrainSteepnessAt(x, z, seed),
+      steepnessAt: (x, z) => walkedSteepnessAt(x, z, seed),
       floorAt: (x, z, maxY) => floorHeightAt(seed, x, z, PLAYER_BODY_RADIUS, maxY),
       resolve: (fromX, fromZ, toX, toZ) =>
         ctx.resolveMove(fromX, fromZ, toX, toZ, PLAYER_BODY_RADIUS, hunter, true),

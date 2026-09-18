@@ -67,9 +67,11 @@ function fly(ground: Ground, launch: { vx: number; vz: number; vy: number }) {
     } else {
       x = nx;
     }
+    // The kernel's verticalPass samples the support with the feet height it
+    // ENTERED the tick with, then integrates and tests the landing.
+    const support = floorAt(x, y);
     vy -= GRAVITY * DT;
     y += vy * DT;
-    const support = floorAt(x, y);
     if (y <= support) {
       return { x, y: support, ticks: tick, minClearance };
     }
@@ -138,13 +140,30 @@ describe('planTrailbreakArc', () => {
     expect(landed.minClearance).toBeGreaterThan(0);
   });
 
-  it('clears a low prop top by the mantle reach instead of mantling onto it', () => {
+  it('flies over a low prop top the flat hop already clears, without mantling onto it', () => {
     const ground: Ground = {
       terrain: () => 0,
       prop: (d) => (d > 5 && d < 7 ? 0.8 : undefined),
     };
     const arc = planTrailbreakArc(deps(ground), FROM, FACING, DISTANCE);
+    expect(arc.lifted).toBe(false);
+    expect(arc.vy).toBe(JUMP_VELOCITY);
+    const landed = fly(ground, arc);
+    expect(landed.x).toBeGreaterThan(DISTANCE - 1);
+    expect(landed.y).toBeCloseTo(0, 6);
+  });
+
+  it('lifts over a prop top the descending flat hop would mantle onto, landing past it', () => {
+    // A crate late in the run, where the flat arc has already dropped under
+    // its top: the plan stretches the flight so the feet clear it.
+    const ground: Ground = {
+      terrain: () => 0,
+      prop: (d) => (d > 8 && d < 9.5 ? 0.8 : undefined),
+    };
+    const arc = planTrailbreakArc(deps(ground), FROM, FACING, DISTANCE);
     expect(arc.lifted).toBe(true);
+    expect(arc.flightTicks).toBeGreaterThan(trailbreakFlatTicks());
+    expect(arc.flightTicks).toBeLessThan(trailbreakMaxTicks());
     const landed = fly(ground, arc);
     expect(landed.x).toBeCloseTo(DISTANCE, 6);
     expect(landed.y).toBeCloseTo(0, 6);
@@ -190,6 +209,64 @@ describe('planTrailbreakArc', () => {
     expect(arc.distance).toBe(0);
     expect(arc.vx).toBe(0);
     expect(arc.vy).toBe(JUMP_VELOCITY);
+  });
+
+  it('never launches up a continuous unclimbable slope that rises within reach per step', () => {
+    // Slope 1.7: unclimbable, but each half-yard sample rises under the mantle
+    // reach. The second sample ratchets past the reach of the last walkable
+    // footing, so the leap ends at the very foot instead of soaring up it.
+    const slope = 1.7;
+    const ground: Ground = { terrain: (d) => Math.max(0, slope * d) };
+    const arc = planTrailbreakArc(deps(ground), FROM, FACING, DISTANCE);
+    expect(arc.distance).toBeLessThanOrEqual(0.5);
+    expect(arc.vy).toBeLessThan(JUMP_VELOCITY * 1.5);
+    const landed = fly(ground, arc);
+    expect(landed.x).toBeLessThanOrEqual(0.5);
+    expect(landed.y).toBeLessThan(1);
+  });
+
+  it('flies over a ditch with a steep far bank on level ground, launch unchanged', () => {
+    // A one-yard ditch from 4 to 6 yards with a bank steeper than the climb
+    // limit: below the launch feet, so the hop crosses it as it always did.
+    const ground: Ground = {
+      terrain: (d) => (d > 4 && d < 6 ? -1 + Math.max(0, (d - 5.5) * 2) : 0),
+    };
+    const arc = planTrailbreakArc(deps(ground), FROM, FACING, DISTANCE);
+    expect(arc.lifted).toBe(false);
+    expect(arc.distance).toBe(DISTANCE);
+    expect(arc.vy).toBe(JUMP_VELOCITY);
+    const landed = fly(ground, arc);
+    expect(landed.x).toBeGreaterThan(DISTANCE - 1);
+    expect(landed.y).toBeCloseTo(0, 6);
+  });
+
+  it('carries onto a kerb-height terrace behind a walkable approach', () => {
+    // A 0.8-yard riser (unclimbable on foot, within mantle reach of the
+    // ground before it) onto a level terrace: the arc lifts and lands on top.
+    const ground: Ground = { terrain: (d) => (d >= 6 ? 0.8 : 0) };
+    const arc = planTrailbreakArc(deps(ground), FROM, FACING, DISTANCE);
+    expect(arc.lifted).toBe(true);
+    expect(arc.distance).toBe(DISTANCE);
+    expect(arc.landing.y).toBeCloseTo(0.8, 9);
+    const landed = fly(ground, arc);
+    expect(landed.x).toBeCloseTo(DISTANCE, 6);
+    expect(landed.y).toBeCloseTo(0.8, 6);
+    expect(landed.minClearance).toBeGreaterThan(0);
+  });
+
+  it('ignores a steepness reading over ground that barely rises', () => {
+    // The kernel's steepness memo can read a level shoulder beside a riser as
+    // steep; a millimetre of rise under that reading is not a wall.
+    const ground: Ground = { terrain: (d) => 0.001 * d };
+    const arc = planTrailbreakArc(
+      { ...deps(ground), steepnessAt: () => PLAYER_MAX_CLIMB_SLOPE * 2 },
+      FROM,
+      FACING,
+      DISTANCE,
+    );
+    expect(arc.distance).toBe(DISTANCE);
+    const landed = fly(ground, arc);
+    expect(landed.x).toBeCloseTo(DISTANCE, 6);
   });
 
   it('caps the flight when no arc within the cap clears the bump', () => {

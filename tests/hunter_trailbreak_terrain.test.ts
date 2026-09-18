@@ -107,7 +107,7 @@ describe('Trailbreak over real terrain', () => {
     expect(p.pos.y - start.y).toBeGreaterThan(3);
   });
 
-  it('ends at the foot of an unclimbable face instead of beaching up it', () => {
+  it('lands safely against an unclimbable face: at its foot or up its ledge, never beyond it', () => {
     const x = -574;
     const z = -358;
     const backDir = 4.3197;
@@ -132,15 +132,23 @@ describe('Trailbreak over real terrain', () => {
     const sim = worldHunter();
     const p = hunterAt(sim, x, z, backDir);
     const start = { ...p.pos };
+    const hp = p.hp;
     sim.castAbility('trailbreak');
+    // The plan aims at the foot of the face: no soaring launch up it.
+    expect(p.vy).toBeLessThan(JUMP_VELOCITY * 2);
     flyUntilLanded(sim, p);
     const travelled = Math.hypot(p.pos.x - start.x, p.pos.z - start.z);
+    const faceTop = Math.max(...profile);
     expect(p.onGround).toBe(true);
-    // Stopped at the foot of the face (never past the first unclimbable step),
-    // and never lifted high enough to beach on it.
-    expect(travelled).toBeLessThanOrEqual((unclimbableAt + 1) * SAMPLE_STEP + 0.05);
-    expect(p.pos.y - start.y).toBeLessThan(1.5);
-    expect(p.pos.y).toBeCloseTo(groundHeight(p.pos.x, p.pos.z, WORLD_SEED), 3);
+    // The body ends seated on terrain, unhurt, and never beyond the face: at
+    // its foot, or on its top when the kernel's own ledge climb (the same
+    // mantle any jump into a ledge gets) pulls it up from the landing.
+    expect(travelled).toBeLessThanOrEqual((unclimbableAt + 1) * SAMPLE_STEP + 1);
+    expect(p.pos.y - start.y).toBeLessThanOrEqual(faceTop + 0.1);
+    // Seated on the slope (the kernel's slope glue may sit a millimetre off
+    // the centre sample on a pitched surface).
+    expect(p.pos.y).toBeCloseTo(groundHeight(p.pos.x, p.pos.z, WORLD_SEED), 2);
+    expect(p.hp).toBe(hp);
   });
 
   it('keeps the old launch exactly where the ground behind does not rise', () => {
