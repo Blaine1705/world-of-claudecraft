@@ -50,6 +50,8 @@ export interface FrameCadenceState {
   lastRenderedAtMs: number;
   /** Smoothed share of rendered frames that arrived a slot or more late. */
   missShare: number;
+  /** Whether the last rendered frame missed its chosen slot. */
+  lastLate: boolean;
 }
 
 export function createFrameCadence(): FrameCadenceState {
@@ -62,6 +64,7 @@ export function createFrameCadence(): FrameCadenceState {
     deadlineMs: 0,
     lastRenderedAtMs: 0,
     missShare: 0,
+    lastLate: false,
   };
 }
 
@@ -112,9 +115,10 @@ export function frameCadenceShouldRender(state: FrameCadenceState, nowMs: number
     return true;
   }
   if (nowMs < state.deadlineMs - state.earlyMs) return false;
+  state.lastLate =
+    state.lastRenderedAtMs > 0 && nowMs - state.lastRenderedAtMs > target + state.slackMs;
   if (state.lastRenderedAtMs > 0) {
-    const late = nowMs - state.lastRenderedAtMs > target + state.slackMs;
-    state.missShare += ((late ? 1 : 0) - state.missShare) * MISS_SHARE_ALPHA;
+    state.missShare += ((state.lastLate ? 1 : 0) - state.missShare) * MISS_SHARE_ALPHA;
   }
   // A late frame restarts the rhythm from itself: catching the old phase back
   // would follow a long interval with a short one, a second irregularity.

@@ -9,13 +9,24 @@
 // rAF). Changing the intent never arms anything.
 
 import { arrivalCoverActive } from '../render/arrival_cover';
-import { setChosenCadence } from '../render/chosen_cadence';
+import { governorIsShedding, setChosenCadence } from '../render/chosen_cadence';
 import {
   createRefreshEstimator,
   noteRefreshDelta,
   type RefreshVerdict,
   resetRefreshEstimatorWindow,
 } from './display_refresh_estimator_core';
+import {
+  createFrameCadenceAuto,
+  type FrameCadenceAutoFrame,
+  resetFrameCadenceAutoWindow,
+  restoreFrameCadenceAuto,
+  stepFrameCadenceAuto,
+} from './frame_cadence_auto_core';
+import {
+  type FrameCadenceAutoMemory,
+  localFrameCadenceAutoMemory,
+} from './frame_cadence_auto_memory';
 import {
   configureFrameCadence,
   createFrameCadence,
@@ -48,11 +59,18 @@ export interface FrameCadenceDeps {
   /** A loading curtain covers the world: frames are cheap there and the
    *  preparation lanes advance per frame, so skipping would lengthen loading. */
   coverActive: () => boolean;
-  /** Tell the renderer the chosen interval (0 for none) and its miss share. */
-  publish: (targetIntervalMs: number, missShare: number) => void;
+  /** Tell the renderer the chosen interval (0 for none), its miss share, and
+   *  whether the governor must hold its quality levels. */
+  publish: (targetIntervalMs: number, missShare: number, holdQuality: boolean) => void;
+  /** The quality governor is still shedding (the automatic mode waits for it). */
+  governorShedding: () => boolean;
+  /** The automatic mode's remembered ceiling, keyed by what would invalidate it. */
+  autoMemory: FrameCadenceAutoMemory;
 }
 
 export interface FrameCadenceSnapshot {
+  /** Whether the automatic mode resolves the intent. */
+  auto: boolean;
   intent: FrameCeilingIntent;
   verdict: RefreshVerdict;
   refreshHz: number;
@@ -84,7 +102,9 @@ export function parseFrameCeilingIntent(search: string): FrameCeilingIntent | nu
 export class FrameCadenceWiring {
   private readonly estimator = createRefreshEstimator();
   private readonly cadence = createFrameCadence();
+  private readonly autoState = createFrameCadenceAuto();
   private readonly snapshotOut: FrameCadenceSnapshot = {
+    auto: false,
     intent: 0,
     verdict: 'unknown',
     refreshHz: 0,
@@ -95,6 +115,9 @@ export class FrameCadenceWiring {
     skipped: 0,
   };
   private intent: FrameCeilingIntent = 0;
+  private auto = false;
+  private autoRestored = false;
+  private lastRenderAt = 0;
   private frameCb: FrameRequestCallback | null = null;
   private lastCallbackAt = 0;
   private lastWasIdle = false;
@@ -105,14 +128,29 @@ export class FrameCadenceWiring {
   private reprobing = false;
   private probeLeft = 0;
   private sinceProbe = UNKNOWN_PROBE_EVERY_CALLBACKS - 120;
+  private readonly autoFrame: FrameCadenceAutoFrame = {
+    dtSeconds: 0,
+    late: false,
+    refreshHz: 0,
+    governorShedding: false,
+  };
   private readonly onTimer = (): void => {
     if (this.frameCb) this.deps.requestFrame(this.frameCb);
   };
 
   constructor(private readonly deps: FrameCadenceDeps) {}
 
+  /** An explicit ceiling. It always wins: the automatic mode is switched off. */
   setIntent(intent: FrameCeilingIntent): void {
+    this.auto = false;
     this.intent = intent;
+  }
+
+  /** Let the automatic mode resolve the ceiling from what the machine holds. */
+  setAuto(): void {
+    if (this.auto) return;
+    this.auto = true;
+    this.intent = this.autoState.ceiling;
   }
 
   /** Re-arm the loop and report whether this callback must do nothing. */
@@ -126,8 +164,11 @@ export class FrameCadenceWiring {
       gate.graphicsRebuildPaused ||
       gate.worldDrawHeld ||
       this.deps.coverActive();
-    if (gate.hidden || exempt !== this.wasExempt) resetRefreshEstimatorWindow(this.estimator);
-    else if (this.lastCallbackAt > 0 && !crossedTimer) {
+    if (gate.hidden || exempt !== this.wasExempt) {
+      resetRefreshEstimatorWindow(this.estimator);
+      resetFrameCadenceAutoWindow(this.autoState);
+      this.lastRenderAt = 0;
+    } else if (this.lastCallbackAt > 0 && !crossedTimer) {
       noteRefreshDelta(this.estimator, delta, this.lastWasIdle);
     }
     this.wasExempt = exempt;
@@ -138,7 +179,8 @@ export class FrameCadenceWiring {
       this.estimator.verdict,
       this.estimator.refreshMs,
     );
-    this.deps.publish(this.cadence.targetIntervalMs, this.cadence.missShare);
+    const holdQuality = this.auto && (this.autoState.ceiling !== 0 || this.autoState.trial);
+    this.deps.publish(this.cadence.targetIntervalMs, this.cadence.missShare, holdQuality);
     if (!exempt && this.probing()) {
       this.skipped++;
       this.lastWasIdle = true;
@@ -147,18 +189,50 @@ export class FrameCadenceWiring {
     }
     if (exempt || !frameCadenceActive(this.cadence)) {
       if (exempt) frameCadenceNoteExemptRender(this.cadence, now);
-      else frameCadenceShouldRender(this.cadence, now);
+      else {
+        frameCadenceShouldRender(this.cadence, now);
+        this.stepAuto(now, false);
+      }
       this.lastWasIdle = false;
       this.rendered++;
       this.deps.requestFrame(frame);
       return false;
     }
     const render = frameCadenceShouldRender(this.cadence, now);
-    if (render) this.rendered++;
-    else this.skipped++;
+    if (render) {
+      this.rendered++;
+      this.stepAuto(now, true);
+    } else this.skipped++;
     this.lastWasIdle = !render;
     this.arm(frame, now, render);
     return !render;
+  }
+
+  /** Feed the automatic mode one rendered frame. Only a paced display is a
+   *  reading: without slots "late" has no meaning, so Auto stays where it is. */
+  private stepAuto(now: number, underCeiling: boolean): void {
+    const last = this.lastRenderAt;
+    this.lastRenderAt = now;
+    if (!this.auto || this.estimator.verdict !== 'paced' || last === 0) return;
+    const refreshMs = this.estimator.refreshMs;
+    const refreshHz = 1000 / refreshMs;
+    if (!this.autoRestored) {
+      this.autoRestored = true;
+      const remembered = this.deps.autoMemory.load(refreshHz);
+      if (remembered !== null && remembered !== this.autoState.ceiling) {
+        restoreFrameCadenceAuto(this.autoState, remembered);
+        this.intent = remembered;
+        return;
+      }
+    }
+    this.autoFrame.dtSeconds = (now - last) / 1000;
+    this.autoFrame.late = underCeiling ? this.cadence.lastLate : now - last > refreshMs * 1.5;
+    this.autoFrame.refreshHz = refreshHz;
+    this.autoFrame.governorShedding = this.deps.governorShedding();
+    if (!stepFrameCadenceAuto(this.autoState, this.autoFrame)) return;
+    this.intent = this.autoState.ceiling;
+    // A trial is a question, not an answer: only a settled ceiling is remembered.
+    if (!this.autoState.trial) this.deps.autoMemory.save(refreshHz, this.autoState.ceiling);
   }
 
   private probing(): boolean {
@@ -177,6 +251,7 @@ export class FrameCadenceWiring {
 
   snapshot(): FrameCadenceSnapshot {
     const out = this.snapshotOut;
+    out.auto = this.auto;
     out.intent = this.intent;
     out.verdict = this.estimator.verdict;
     out.refreshHz = this.estimator.refreshMs > 0 ? 1000 / this.estimator.refreshMs : 0;
@@ -210,13 +285,15 @@ export class FrameCadenceWiring {
 
 let shared: FrameCadenceWiring | null = null;
 
-function storedIntent(): FrameCeilingIntent {
+function applyStoredChoice(wiring: FrameCadenceWiring): void {
+  let intent: FrameCeilingIntent | null = 0;
   try {
-    const choice = frameRateCapChoiceFromValue(new Settings().get('frameRateCap'));
-    return explicitCeilingIntent(choice) ?? 0;
+    intent = explicitCeilingIntent(frameRateCapChoiceFromValue(new Settings().get('frameRateCap')));
   } catch {
-    return 0;
+    intent = 0;
   }
+  if (intent === null) wiring.setAuto();
+  else wiring.setIntent(intent);
 }
 
 /**
@@ -232,6 +309,8 @@ export function sharedFrameCadence(): FrameCadenceWiring {
     setTimer: (cb, ms) => setTimeout(cb, ms),
     coverActive: arrivalCoverActive,
     publish: setChosenCadence,
+    governorShedding: governorIsShedding,
+    autoMemory: localFrameCadenceAutoMemory,
   });
   shared = wiring;
   const fromUrl = typeof location === 'undefined' ? null : parseFrameCeilingIntent(location.search);
@@ -240,9 +319,9 @@ export function sharedFrameCadence(): FrameCadenceWiring {
     (globalThis as { __wocFrameCadence?: FrameCadenceWiring }).__wocFrameCadence = wiring;
     return wiring;
   }
-  wiring.setIntent(storedIntent());
+  applyStoredChoice(wiring);
   if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
-    window.addEventListener(SETTINGS_CHANGE_EVENT, () => wiring.setIntent(storedIntent()));
+    window.addEventListener(SETTINGS_CHANGE_EVENT, () => applyStoredChoice(wiring));
   }
   return wiring;
 }
@@ -261,6 +340,7 @@ export function armFrameAndSkip(
 export function frameCadenceBeaconBlock(): Record<string, number | string> {
   const s = sharedFrameCadence().snapshot();
   return {
+    mode: s.auto ? 'auto' : 'manual',
     intent: s.intent,
     verdict: s.verdict,
     refreshHz: Math.round(s.refreshHz * 10) / 10,
@@ -309,9 +389,10 @@ export function frameCadenceOverlayLine(): string {
 
 /** The options row's reading for a stored value, on the display as read now. */
 export function frameRateCapRowReading(storedValue: number): FrameRateCapReading {
-  const intent = explicitCeilingIntent(frameRateCapChoiceFromValue(storedValue));
-  if (intent === null) return { kind: 'none' };
   const s = sharedFrameCadence().snapshot();
+  const explicit = explicitCeilingIntent(frameRateCapChoiceFromValue(storedValue));
+  // Auto reads what it is doing right now, which is only known while it runs.
+  const intent = explicit ?? (s.auto ? s.intent : 0);
   return frameRateCapReading(intent, s.verdict, s.refreshHz);
 }
 

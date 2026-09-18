@@ -65,7 +65,7 @@ export const SETTING_RANGES = {
   // The frame rate ceiling (src/game/frame_rate_cap_setting.ts): 0 auto,
   // 1 display (no ceiling), 2 about 60, 3 about 30. An intent, never a display
   // rate: the divisor is re-derived from the measured display every session.
-  frameRateCap: { min: 0, max: 3, def: 1 },
+  frameRateCap: { min: 0, max: 3, def: 0 },
   // The desktop shell's graphics backend on Linux
   // (src/game/desktop_gpu_backend_sync.ts): 0 auto (one Vulkan trial),
   // 1 Vulkan, 2 OpenGL. Mirrors the shell prefs store; next launch.

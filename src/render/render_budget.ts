@@ -109,6 +109,10 @@ export interface RenderBudgetSample {
    *  ceiling), or NO_CHOSEN_CADENCE. While set it replaces the wall interval on
    *  the frame axis, and no external cap is looked for: the cadence is known. */
   chosenCadenceMissShare?: number;
+  /** The automatic frame rate ceiling is in force: recovery is held, so new
+   *  headroom goes to the cadence and not to quality that would fail its next
+   *  return trial (frame_cadence_auto_core.ts owns the hierarchy). */
+  holdRecovery?: boolean;
 }
 
 export interface RenderBudgetGovernorOptions {
@@ -745,6 +749,7 @@ export class RenderBudgetGovernor {
     // Measured headroom, the gate on ALL recovery: every clause is a real cost
     // reading, never inferred from wall cadence.
     const canRecover =
+      sample.holdRecovery !== true &&
       (this.externalFrameCap || this.frameMsEma <= this.budget.recoverFrameMs) &&
       totalMs <= this.budget.recoverFrameMs &&
       submitMs <= Math.max(8, this.budget.recoverFrameMs * 0.7) &&

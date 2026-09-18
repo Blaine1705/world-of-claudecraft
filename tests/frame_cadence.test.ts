@@ -176,9 +176,11 @@ describe('frame cadence', () => {
 // the next callback to the first slot after its cost) or an uncapped rAF.
 function runHost(opts: {
   refreshMs: number | null;
-  costMs: number;
+  costMs: number | ((nowMs: number) => number);
   seconds: number;
-  intent: 0 | 30 | 60;
+  intent: 0 | 30 | 60 | 'auto';
+  governorShedding?: () => boolean;
+  remembered?: 0 | 30 | 60 | null;
   gate?: Partial<FrameCadenceGateView>;
   cover?: () => boolean;
 }) {
@@ -190,7 +192,9 @@ function runHost(opts: {
   let arms = 0;
   let maxArmsPerCallback = 0;
   const renderedAt: number[] = [];
-  const published = { target: -1, share: -1 };
+  const published = { target: -1, share: -1, hold: false };
+  const saved: number[] = [];
+  const intentLog: Array<{ at: number; intent: number }> = [];
   let callbacks = 0;
   const nextFrameAt = (from: number) =>
     opts.refreshMs === null
@@ -207,12 +211,19 @@ function runHost(opts: {
       host.timerCb = cb;
     },
     coverActive: opts.cover ?? (() => false),
-    publish: (target, share) => {
+    publish: (target, share, hold) => {
       published.target = target;
       published.share = share;
+      published.hold = hold;
+    },
+    governorShedding: opts.governorShedding ?? (() => false),
+    autoMemory: {
+      load: () => opts.remembered ?? null,
+      save: (_hz, ceiling) => saved.push(ceiling),
     },
   });
-  wiring.setIntent(opts.intent);
+  if (opts.intent === 'auto') wiring.setAuto();
+  else wiring.setIntent(opts.intent);
   const gate: FrameCadenceGateView = {
     hidden: false,
     desktopApp: false,
@@ -227,7 +238,11 @@ function runHost(opts: {
     maxArmsPerCallback = Math.max(maxArmsPerCallback, arms - before);
     if (skip) return;
     renderedAt.push(t);
-    now = t + opts.costMs;
+    const intentNow = wiring.snapshot().intent;
+    if (intentLog.length === 0 || intentLog[intentLog.length - 1].intent !== intentNow) {
+      intentLog.push({ at: t, intent: intentNow });
+    }
+    now = t + (typeof opts.costMs === 'function' ? opts.costMs(t) : opts.costMs);
     if (host.pending && !host.pending.timer) host.pending = { at: nextFrameAt(now), timer: false };
   };
   host.pending = { at: nextFrameAt(0), timer: false };
@@ -241,7 +256,7 @@ function runHost(opts: {
   }
   const tail = renderedAt.filter((t) => t > (opts.seconds - 5) * 1000);
   const intervals = tail.slice(1).map((t, i) => t - tail[i]);
-  return { wiring, callbacks, intervals, maxArmsPerCallback, published };
+  return { wiring, callbacks, intervals, maxArmsPerCallback, published, saved, intentLog };
 }
 
 describe('frame cadence wiring', () => {
@@ -317,8 +332,111 @@ describe('frame cadence wiring', () => {
   });
 });
 
+describe('automatic frame rate limit', () => {
+  const SLOT = 1000 / 60;
+  // An uneven machine: frames alternate between one and two slots. (A machine
+  // that misses EVERY slot is already regular, reads as a slower display, and
+  // is rightly left alone.)
+  const uneven = (slow: number, fast: number) => {
+    let n = 0;
+    return () => (n++ % 2 === 0 ? slow : fast);
+  };
+
+  it('steps down to 30 on a 60 Hz machine that keeps missing its slot, and remembers it', () => {
+    const r = runHost({
+      refreshMs: SLOT,
+      costMs: uneven(22, 12),
+      seconds: 40,
+      intent: 'auto',
+    });
+    expect(r.intentLog.map((e) => e.intent)).toEqual([0, 30]);
+    expect(r.intentLog[1].at).toBeLessThan(35_000);
+    for (const i of r.intervals) expect(i).toBeCloseTo(33.33, 1);
+    expect(r.saved).toEqual([30]);
+    expect(r.published.hold).toBe(true);
+  });
+
+  it('leaves a machine that holds its display alone', () => {
+    const r = runHost({ refreshMs: SLOT, costMs: 9, seconds: 60, intent: 'auto' });
+    expect(r.intentLog.map((e) => e.intent)).toEqual([0]);
+    expect(r.published.hold).toBe(false);
+    expect(r.saved).toEqual([]);
+  });
+
+  it('waits for the quality governor: no step down while it is still shedding', () => {
+    const r = runHost({
+      refreshMs: SLOT,
+      costMs: uneven(22, 12),
+      seconds: 60,
+      intent: 'auto',
+      governorShedding: () => true,
+    });
+    expect(r.intentLog.map((e) => e.intent)).toEqual([0]);
+  });
+
+  it('goes through about 60 first on a 144 Hz display', () => {
+    const r = runHost({
+      refreshMs: 1000 / 144,
+      costMs: uneven(9, 4),
+      seconds: 40,
+      intent: 'auto',
+    });
+    expect(r.intentLog.map((e) => e.intent)).toEqual([0, 60]);
+    expect(r.wiring.snapshot().divisor).toBe(2);
+  });
+
+  it('returns to full cadence through a trial once the load is gone', () => {
+    const r = runHost({
+      refreshMs: SLOT,
+      costMs: (
+        (slow) => (t: number) =>
+          t < 40_000 ? slow() : 6
+      )(uneven(22, 12)),
+      seconds: 140,
+      intent: 'auto',
+    });
+    expect(r.intentLog.map((e) => e.intent)).toEqual([0, 30, 0]);
+    expect(r.saved).toEqual([30, 0]);
+    expect(r.published.hold).toBe(false);
+  });
+
+  it('falls back from a failed trial and doubles its wait', () => {
+    const r = runHost({ refreshMs: SLOT, costMs: uneven(22, 12), seconds: 330, intent: 'auto' });
+    const downs = r.intentLog.filter((e) => e.intent === 30).map((e) => e.at);
+    const trials = r.intentLog.filter((e, i) => i > 0 && e.intent === 0).map((e) => e.at);
+    expect(trials.length).toBe(2);
+    // First trial about 60 s after the descent, the second about 120 s after the fallback.
+    expect(trials[0] - downs[0]).toBeGreaterThan(55_000);
+    expect(trials[0] - downs[0]).toBeLessThan(80_000);
+    expect(trials[1] - downs[1]).toBeGreaterThan(115_000);
+    expect(trials[1] - downs[1]).toBeLessThan(140_000);
+    // A trial is never remembered: only the settled ceiling is.
+    expect(r.saved).toEqual([30, 30, 30]);
+  });
+
+  it('starts at the remembered ceiling', () => {
+    const r = runHost({
+      refreshMs: SLOT,
+      costMs: uneven(22, 12),
+      seconds: 10,
+      intent: 'auto',
+      remembered: 30,
+    });
+    expect(r.intentLog.map((e) => e.intent)).toEqual([0, 30]);
+    expect(r.intentLog[1].at).toBeLessThan(3_000);
+  });
+
+  it('is inert when rAF is uncapped, and an explicit choice switches it off', () => {
+    const unpaced = runHost({ refreshMs: null, costMs: 25, seconds: 60, intent: 'auto' });
+    expect(unpaced.intentLog.map((e) => e.intent)).toEqual([0]);
+    const explicit = runHost({ refreshMs: SLOT, costMs: uneven(22, 12), seconds: 60, intent: 0 });
+    expect(explicit.intentLog.map((e) => e.intent)).toEqual([0]);
+  });
+});
+
 describe('frame cadence beacon fields', () => {
   const base: FrameCadenceSnapshot = {
+    auto: false,
     intent: 0,
     verdict: 'paced',
     refreshHz: 59.94,

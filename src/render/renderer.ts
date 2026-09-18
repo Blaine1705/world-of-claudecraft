@@ -199,7 +199,12 @@ import { playerRangedAttackStartsAtLaunch } from './characters/skin_attack';
 import { CharacterVisualPool, characterVisualPoolKey } from './characters/visual_pool';
 import { shouldRetainPooledCharacterVisual } from './characters/visual_pool_policy';
 import { attackAbilityId, isSpinAttackAbility } from './characters/weapon_attack_style_core';
-import { chosenCadenceMissShare, frameLoadMs } from './chosen_cadence';
+import {
+  chosenCadenceHoldsQuality,
+  chosenCadenceMissShare,
+  frameLoadMs,
+  noteGovernorShedding,
+} from './chosen_cadence';
 import { fogFarForBuiltGround, groundViewConeHalfAngle } from './chunk_residency_core';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { buildCliffScree, type CliffScreeView } from './cliff_scree';
@@ -4602,6 +4607,7 @@ export class Renderer {
     sample.dt = dt;
     sample.frameMs = frameMs;
     sample.chosenCadenceMissShare = chosenCadenceMissShare();
+    sample.holdRecovery = chosenCadenceHoldsQuality();
     // Non-composer profiles read info.render live, where three's per-render
     // auto-reset drops the off-screen water-simulation passes: add them back
     // (1 draw call / 2 triangles per pass). Composer tiers pass drawSignal
@@ -4626,6 +4632,7 @@ export class Renderer {
     // preparation waits. The budget's frame boundary is fed in sync() instead,
     // where it lands on every frame rather than only on a presented one.
     this.gpuPrepBudget.notePressure(state.mode === 'degrading');
+    noteGovernorShedding(state.mode === 'degrading');
     this.frameMsEma = state.frameMsEma;
     this.adaptiveCooldown = state.cooldownSeconds;
     this.stableFrameTime = state.stableSeconds;

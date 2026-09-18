@@ -1791,7 +1791,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.frameRateCapAuto': '자동',
   'hudChrome.options.frameRateCapDisplay': '디스플레이',
   'hudChrome.options.frameRateCapNote':
-    '게임이 초당 그리는 이미지 수를 제한합니다. 디스플레이 속도를 따라가지 못하는 컴퓨터에서는 제한을 낮추면 화면이 더 안정되고 컴퓨터 발열도 줄어듭니다. 제한은 디스플레이에 맞춰지므로 실제 값은 숫자와 조금 다를 수 있습니다. 디스플레이: 제한 없음. 자동: 현재는 디스플레이와 같습니다.',
+    '게임이 초당 그리는 이미지 수를 제한합니다. 디스플레이 속도를 따라가지 못하는 컴퓨터에서는 제한을 낮추면 화면이 더 안정되고 컴퓨터 발열도 줄어듭니다. 제한은 디스플레이에 맞춰지므로 실제 값은 숫자와 조금 다를 수 있습니다. 자동: 이 컴퓨터가 디스플레이를 따라가지 못할 때만 제한을 낮추고, 따라갈 수 있게 되면 다시 올립니다(권장). 디스플레이: 제한 없음.',
   'hudChrome.options.frameRateCapStatusPaced':
     '{hz} Hz 디스플레이에서 초당 {fps}장을 그리고 있습니다.',
   'hudChrome.options.frameRateCapStatusUnpaced':

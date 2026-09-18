@@ -8,10 +8,29 @@ import { chosenCadenceLoadMs, NO_CHOSEN_CADENCE } from './chosen_cadence_pressur
 
 let chosenIntervalMs = 0;
 let missShare = NO_CHOSEN_CADENCE;
+let holdQuality = false;
+let governorShedding = false;
 
-export function setChosenCadence(intervalMs: number, share: number): void {
+/** `hold`: the automatic ceiling is in force (or on a return trial), so the
+ *  governor keeps its quality levels and the headroom goes to the cadence. */
+export function setChosenCadence(intervalMs: number, share: number, hold: boolean): void {
   chosenIntervalMs = intervalMs > 0 ? intervalMs : 0;
   missShare = chosenIntervalMs > 0 ? share : NO_CHOSEN_CADENCE;
+  holdQuality = hold;
+}
+
+export function chosenCadenceHoldsQuality(): boolean {
+  return holdQuality;
+}
+
+/** Written by the renderer after each governor update, read by the automatic
+ *  ceiling: quality is shed first, the ceiling waits its turn. */
+export function noteGovernorShedding(shedding: boolean): void {
+  governorShedding = shedding;
+}
+
+export function governorIsShedding(): boolean {
+  return governorShedding;
 }
 
 /** The chosen interval in ms, 0 when the display paces the frames. */

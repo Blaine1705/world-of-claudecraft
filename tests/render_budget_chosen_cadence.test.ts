@@ -119,3 +119,34 @@ describe('governor under a chosen cadence', () => {
     expect(costly.probed).toBe(false);
   });
 });
+
+describe('governor under an automatic ceiling', () => {
+  // The hierarchy of frame_cadence_auto_core.ts: while the automatic ceiling is
+  // in force the headroom goes to the cadence, so quality never climbs back and
+  // then fails the next return trial.
+  function shedThenRest(holdRecovery: boolean): number {
+    const g = governor('high');
+    run(g, 20, { chosenCadenceMissShare: 0.3 });
+    const shed = g.state().levels.foliage;
+    const rested = run(g, 120, {
+      chosenCadenceMissShare: 0,
+      holdRecovery,
+      totalMs: 6,
+      submitMs: 3,
+    });
+    return rested.state.levels.foliage - shed;
+  }
+
+  it('recovers quality at a held manual ceiling', () => {
+    expect(shedThenRest(false)).toBeGreaterThan(0);
+  });
+
+  it('holds its quality levels while the automatic ceiling asks it to', () => {
+    expect(shedThenRest(true)).toBe(0);
+  });
+
+  it('still sheds under the hold: only recovery is held', () => {
+    const r = run(governor('high'), 30, { chosenCadenceMissShare: 0.3, holdRecovery: true });
+    expect(r.degraded).toBe(true);
+  });
+});

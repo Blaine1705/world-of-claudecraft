@@ -1706,7 +1706,7 @@ export const zh_TW: EnTranslations = {
       "frameRateCapDisplay": "顯示器",
       "frameRateCapSixty": "60",
       "frameRateCapThirty": "30",
-      "frameRateCapNote": "限制遊戲每秒繪製的畫面數量。如果電腦跟不上顯示器的速度，較低的上限會讓畫面更平穩，也能讓電腦更涼爽。上限會跟隨你的顯示器，因此實際數值可能與數字略有不同。顯示器：不限制。自動：目前與「顯示器」相同。",
+      "frameRateCapNote": "限制遊戲每秒繪製的畫面數量。如果電腦跟不上顯示器的速度，較低的上限會讓畫面更平穩，也能讓電腦更涼爽。上限會跟隨你的顯示器，因此實際數值可能與數字略有不同。自動：僅當這台電腦跟不上顯示器時才降低上限，能跟上時再恢復（建議）。顯示器：不限制。",
       "frameRateCapStatusPaced": "正在 {hz} Hz 的顯示器上每秒繪製 {fps} 幀。",
       "frameRateCapStatusUnpaced": "顯示同步已關閉：每秒繪製 {fps} 幀。",
       "frameRateCapStatusInert": "此顯示器的更新率已不高於該上限，因此上限不會帶來任何變化。",

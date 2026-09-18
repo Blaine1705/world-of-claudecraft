@@ -1801,7 +1801,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.frameRateCapAuto': '自動',
   'hudChrome.options.frameRateCapDisplay': 'ディスプレイ',
   'hudChrome.options.frameRateCapNote':
-    'ゲームが1秒間に描画する画像の数を制限します。ディスプレイの速度に追いつけないコンピューターでは、低い制限にすると映像がより安定し、本体の発熱も抑えられます。制限はディスプレイに合わせて決まるため、実際の値は数値と少し異なる場合があります。ディスプレイ：制限なし。自動：現時点ではディスプレイと同じです。',
+    'ゲームが1秒間に描画する画像の数を制限します。ディスプレイの速度に追いつけないコンピューターでは、低い制限にすると映像がより安定し、本体の発熱も抑えられます。制限はディスプレイに合わせて決まるため、実際の値は数値と少し異なる場合があります。自動：このコンピューターがディスプレイに追いつけないときだけ制限を下げ、追いつけるようになれば元に戻します（推奨）。ディスプレイ：制限なし。',
   'hudChrome.options.frameRateCapStatusPaced':
     '{hz} Hz のディスプレイで毎秒 {fps} 枚を描画しています。',
   'hudChrome.options.frameRateCapStatusUnpaced':
