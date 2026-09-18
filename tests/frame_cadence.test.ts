@@ -3,6 +3,7 @@ import {
   createRefreshEstimator,
   noteRefreshDelta,
   type RefreshEstimatorState,
+  resetRefreshEstimatorWindow,
 } from '../src/game/display_refresh_estimator_core';
 import {
   ceilingDivisor,
@@ -18,6 +19,7 @@ import {
   FrameCadenceWiring,
   frameCadenceBeaconFieldsFrom,
   parseFrameCeilingIntent,
+  resolveFrameRateChoice,
   sharedFrameCadence,
 } from '../src/game/frame_cadence_wiring';
 
@@ -70,6 +72,41 @@ describe('display refresh estimator', () => {
     const jitter = [2.6, 3.9, 3.1, 4.4, 2.9, 3.6, 5.2, 3.3];
     feed(s, jitter, 60);
     expect(s.verdict).toBe('unknown');
+  });
+
+  it('keeps a paced reading through one recompute with no lattice, and withdraws it after a run', () => {
+    const s = createRefreshEstimator();
+    feed(s, [16.67], 200);
+    expect(s.verdict).toBe('paced');
+    const jitter = [2.6, 3.9, 3.1, 4.4, 2.9, 3.6, 5.2, 3.3];
+    const feedJitter = (count: number) => {
+      for (let i = 0; i < count; i++) noteRefreshDelta(s, jitter[i % jitter.length], false);
+    };
+    // A fresh window (a resume) holds only the jitter: the first recompute comes
+    // once it has enough samples, then one per recompute period.
+    resetRefreshEstimatorWindow(s);
+    feedJitter(45);
+    expect(s.latticeMisses).toBe(1);
+    expect(s.verdict).toBe('paced');
+    expect(1000 / s.refreshMs).toBeCloseTo(60, 0);
+    feedJitter(60);
+    expect(s.latticeMisses).toBe(3);
+    expect(s.verdict).toBe('paced');
+    feedJitter(30);
+    expect(s.verdict).toBe('unknown');
+    expect(s.refreshMs).toBe(0);
+  });
+
+  it('reads a single cluster as a display only when it is as tight as a display clock', () => {
+    const tight = createRefreshEstimator();
+    feed(tight, [16.6, 16.7], 100);
+    expect(tight.verdict).toBe('paced');
+    expect(1000 / tight.refreshMs).toBeCloseTo(60, 0);
+    // A steady frame cost on an uncapped loop clusters too, loosely.
+    const loose = createRefreshEstimator();
+    feed(loose, [19.6, 20.4, 21.3, 22.1, 20.0, 21.7, 19.9, 20.9], 25);
+    expect(loose.verdict).toBe('unknown');
+    expect(loose.refreshMs).toBe(0);
   });
 
   it('calls rAF uncapped only from idle callbacks answered faster than any display', () => {
@@ -189,6 +226,8 @@ function runHost(opts: {
   intent: 0 | 30 | 60 | 'auto';
   governorShedding?: () => boolean;
   remembered?: 0 | 30 | 60 | null;
+  /** Runs once after `intent` is applied: a later choice made on the same wiring. */
+  configure?: (wiring: FrameCadenceWiring) => void;
   onFrame?: (nowMs: number, wiring: FrameCadenceWiring) => void;
   gate?: Partial<FrameCadenceGateView>;
   cover?: () => boolean;
@@ -205,6 +244,7 @@ function runHost(opts: {
   const saved: number[] = [];
   const intentLog: Array<{ at: number; intent: number }> = [];
   let callbacks = 0;
+  let loads = 0;
   const nextFrameAt = (from: number) =>
     opts.refreshMs === null
       ? from + (typeof opts.idleMs === 'function' ? opts.idleMs() : (opts.idleMs ?? 0.3))
@@ -228,12 +268,16 @@ function runHost(opts: {
     },
     governorShedding: opts.governorShedding ?? (() => false),
     autoMemory: {
-      load: () => opts.remembered ?? null,
+      load: () => {
+        loads++;
+        return opts.remembered ?? null;
+      },
       save: (_hz, ceiling) => saved.push(ceiling),
     },
   });
   if (opts.intent === 'auto') wiring.setAuto();
   else wiring.setIntent(opts.intent);
+  opts.configure?.(wiring);
   const gate: FrameCadenceGateView = {
     hidden: false,
     desktopApp: false,
@@ -267,7 +311,25 @@ function runHost(opts: {
   }
   const tail = renderedAt.filter((t) => t > (opts.seconds - 5) * 1000);
   const intervals = tail.slice(1).map((t, i) => t - tail[i]);
-  return { wiring, callbacks, intervals, maxArmsPerCallback, published, saved, intentLog };
+  return { wiring, callbacks, intervals, maxArmsPerCallback, published, saved, intentLog, loads };
+}
+
+// An uncapped rAF hidden behind a busy GPU, under a ceiling of 30: jittered
+// frame costs, and idle callbacks answered slowly and unevenly.
+function busyGpuHost(): Parameters<typeof runHost>[0] {
+  let n = 0;
+  let idle = 1;
+  const costs = [18.6, 23.9, 21.1, 26.4, 19.9, 22.6, 27.2, 20.3];
+  return {
+    refreshMs: null,
+    idleMs: () => {
+      idle = (idle * 7 + 3) % 11;
+      return 3 + (idle / 11) * 4;
+    },
+    costMs: () => costs[n++ % costs.length],
+    seconds: 60,
+    intent: 30,
+  };
 }
 
 describe('frame cadence wiring', () => {
@@ -276,6 +338,31 @@ describe('frame cadence wiring', () => {
     expect(parseFrameCeilingIntent('?fpscap=30')).toBe(30);
     expect(parseFrameCeilingIntent('?fpscap=60')).toBe(60);
     expect(parseFrameCeilingIntent('?fpscap=display')).toBe(0);
+  });
+
+  it('resolves the stored choice, and lets the URL override win over any of them', () => {
+    const stored = (value: number) => resolveFrameRateChoice(value, '');
+    expect(stored(0)).toEqual({ auto: true, intent: 0, fromUrl: false });
+    expect(stored(1)).toEqual({ auto: false, intent: 0, fromUrl: false });
+    expect(stored(2)).toEqual({ auto: false, intent: 60, fromUrl: false });
+    expect(stored(3)).toEqual({ auto: false, intent: 30, fromUrl: false });
+    for (const value of [0, 1, 2, 3]) {
+      expect(resolveFrameRateChoice(value, '?fpscap=30')).toEqual({
+        auto: false,
+        intent: 30,
+        fromUrl: true,
+      });
+      expect(resolveFrameRateChoice(value, '?fpscap=60')).toEqual({
+        auto: false,
+        intent: 60,
+        fromUrl: true,
+      });
+      expect(resolveFrameRateChoice(value, '?fpscap=display')).toEqual({
+        auto: false,
+        intent: 0,
+        fromUrl: true,
+      });
+    }
   });
 
   it('holds a steady two-slot rhythm on a 60 Hz display', () => {
@@ -324,21 +411,62 @@ describe('frame cadence wiring', () => {
   it('limits an uncapped rAF hidden behind a busy GPU, where no lattice can be read', () => {
     // Measured on a Windows HD 530 with vsync off: idle callbacks are not
     // answered at once there, they wait for the GPU like any other.
-    let n = 0;
-    let idle = 1;
-    const costs = [18.6, 23.9, 21.1, 26.4, 19.9, 22.6, 27.2, 20.3];
-    const r = runHost({
-      refreshMs: null,
-      idleMs: () => 3 + ((idle = (idle * 7 + 3) % 11) / 11) * 4,
-      costMs: () => costs[n++ % costs.length],
-      seconds: 60,
-      intent: 30,
-    });
+    const r = runHost(busyGpuHost());
     const mean = r.intervals.reduce((a, b) => a + b, 0) / r.intervals.length;
     expect(mean).toBeGreaterThan(32);
     expect(mean).toBeLessThan(36);
     expect(r.wiring.snapshot().targetIntervalMs).toBeCloseTo(33.33, 1);
     expect(r.callbacks / 60).toBeLessThan(80);
+  });
+
+  it('never feeds a delta that crossed a timer sleep to the estimator', () => {
+    // The same host, read for what the estimator made of it: the limiter's own
+    // steady timer rhythm would read as a tight one-cluster "30 Hz display".
+    // Read on every frame, not at the end: a false reading makes the ceiling
+    // inert, the open loop's jitter then withdraws it, and the run ends unknown.
+    const verdicts = new Set<string>();
+    const rates = new Set<number>();
+    const r = runHost({
+      ...busyGpuHost(),
+      onFrame: (_t, wiring) => {
+        const snap = wiring.snapshot();
+        verdicts.add(snap.verdict);
+        rates.add(snap.refreshHz);
+      },
+    });
+    expect([...verdicts]).toEqual(['unknown']);
+    expect([...rates]).toEqual([0]);
+    const snap = r.wiring.snapshot();
+    expect(snap.verdict).toBe('unknown');
+    expect(snap.refreshHz).toBe(0);
+    expect(snap.rendered).toBeGreaterThan(1500);
+  });
+
+  it('starts pacing again the moment a loading cover lifts, without counting the cover as misses', () => {
+    const LIFT_MS = 5_000;
+    let last = 0;
+    let skippedUnderCover = -1;
+    const sharesAfterLift: number[] = [];
+    const r = runHost({
+      refreshMs: 1000 / 60,
+      // Slow frames under the cover: counted, each would be a missed slot.
+      costMs: (t) => (t < LIFT_MS ? 40 : 5),
+      seconds: 20,
+      intent: 30,
+      cover: () => last < LIFT_MS,
+      onFrame: (t, wiring) => {
+        last = t;
+        const snap = wiring.snapshot();
+        if (t < LIFT_MS) skippedUnderCover = snap.skipped;
+        else if (t < LIFT_MS + 2_000) sharesAfterLift.push(snap.missShare);
+      },
+    });
+    expect(skippedUnderCover).toBe(0);
+    expect(r.wiring.snapshot().skipped).toBeGreaterThan(400);
+    expect(sharesAfterLift.length).toBeGreaterThan(30);
+    for (const share of sharesAfterLift) expect(share).toBe(0);
+    expect(r.published.share).toBe(0);
+    for (const i of r.intervals) expect(i).toBeCloseTo(33.33, 1);
   });
 
   it('takes a coarse timer into account instead of landing every frame late', () => {
@@ -366,6 +494,45 @@ describe('frame cadence wiring', () => {
     const snap = r.wiring.snapshot();
     expect(snap.verdict).toBe('unpaced');
     expect(snap.targetIntervalMs).toBeCloseTo(33.33, 1);
+  });
+});
+
+describe('the shared instance', () => {
+  // A fresh module per case: the instance is a module singleton.
+  const bootWith = async (storedValue: number | null, search: string) => {
+    vi.resetModules();
+    vi.stubGlobal('location', { search });
+    vi.stubGlobal('localStorage', {
+      getItem: (key: string) =>
+        key === 'woc_settings' && storedValue !== null
+          ? JSON.stringify({ frameRateCap: storedValue })
+          : null,
+      setItem: () => {},
+      removeItem: () => {},
+    });
+    try {
+      const fresh = await import('../src/game/frame_cadence_wiring');
+      const snap = fresh.sharedFrameCadence().snapshot();
+      return { auto: snap.auto, intent: snap.intent };
+    } finally {
+      delete (globalThis as { __wocFrameCadence?: unknown }).__wocFrameCadence;
+      vi.unstubAllGlobals();
+      vi.resetModules();
+    }
+  };
+
+  it('boots on the stored choice, Auto for a player who never chose', async () => {
+    expect(await bootWith(null, '')).toEqual({ auto: true, intent: 0 });
+    expect(await bootWith(0, '')).toEqual({ auto: true, intent: 0 });
+    expect(await bootWith(1, '')).toEqual({ auto: false, intent: 0 });
+    expect(await bootWith(2, '')).toEqual({ auto: false, intent: 60 });
+    expect(await bootWith(3, '')).toEqual({ auto: false, intent: 30 });
+  });
+
+  it('boots on the URL override over any stored choice', async () => {
+    expect(await bootWith(0, '?fpscap=30')).toEqual({ auto: false, intent: 30 });
+    expect(await bootWith(3, '?fpscap=display')).toEqual({ auto: false, intent: 0 });
+    expect(await bootWith(0, '?fpscap=60')).toEqual({ auto: false, intent: 60 });
   });
 });
 
@@ -534,6 +701,84 @@ describe('automatic frame rate limit', () => {
     });
     expect(r.intentLog.map((e) => e.intent)).toEqual([0, 30]);
     expect(r.intentLog[1].at).toBeLessThan(3_000);
+  });
+
+  it.each([0, 30] as const)(
+    'an explicit choice of %i switches the automatic mode off for good',
+    (choice) => {
+      const r = runHost({
+        refreshMs: SLOT,
+        costMs: uneven(22, 12),
+        seconds: 60,
+        intent: 'auto',
+        configure: (wiring) => wiring.setIntent(choice),
+      });
+      expect(r.wiring.snapshot().auto).toBe(false);
+      expect(r.wiring.snapshot().intent).toBe(choice);
+      expect(r.intentLog.map((e) => e.intent)).toEqual([choice]);
+      expect(r.saved).toEqual([]);
+      expect(r.loads).toBe(0);
+      expect(r.published.hold).toBe(false);
+    },
+  );
+
+  it('asks for nothing where no display can be read, even with a remembered ceiling', () => {
+    const targets = new Set<number>();
+    const r = runHost({
+      refreshMs: null,
+      costMs: 25,
+      seconds: 60,
+      intent: 'auto',
+      remembered: 30,
+      onFrame: (_t, wiring) => targets.add(wiring.snapshot().targetIntervalMs),
+    });
+    expect([...targets]).toEqual([0]);
+    expect(r.published.target).toBe(0);
+    expect(r.wiring.snapshot().skipped).toBe(0);
+    expect(r.saved).toEqual([]);
+  });
+
+  it('drops its ceiling the moment the display stops showing slots, and keeps what it learned', () => {
+    // A 60 Hz display restored to 30, then rAF goes uncapped (the window moved
+    // to a vsync-off surface): the ceiling held is no longer asked for.
+    const host: Parameters<typeof runHost>[0] = {
+      refreshMs: SLOT,
+      costMs: 5,
+      seconds: 40,
+      intent: 'auto',
+      remembered: 30,
+      onFrame: (t) => {
+        if (t > 20_000) host.refreshMs = null;
+      },
+    };
+    const r = runHost(host);
+    const snap = r.wiring.snapshot();
+    expect(snap.verdict).toBe('unpaced');
+    expect(snap.auto).toBe(true);
+    expect(snap.intent).toBe(30);
+    expect(snap.targetIntervalMs).toBe(0);
+    expect(r.published.target).toBe(0);
+    expect(r.published.hold).toBe(false);
+  });
+
+  it('reads the remembered ceiling exactly once per session', () => {
+    const r = runHost({
+      refreshMs: SLOT,
+      costMs: uneven(22, 12),
+      seconds: 120,
+      intent: 'auto',
+      remembered: 30,
+    });
+    expect(r.loads).toBe(1);
+    const held = runHost({ refreshMs: SLOT, costMs: 9, seconds: 120, intent: 'auto' });
+    expect(held.loads).toBe(1);
+  });
+
+  it('restores a remembered "no ceiling" without writing it back', () => {
+    const r = runHost({ refreshMs: SLOT, costMs: 9, seconds: 60, intent: 'auto', remembered: 0 });
+    expect(r.loads).toBe(1);
+    expect(r.intentLog.map((e) => e.intent)).toEqual([0]);
+    expect(r.saved).toEqual([]);
   });
 
   it('is inert when rAF is uncapped, and an explicit choice switches it off', () => {

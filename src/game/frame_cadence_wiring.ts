@@ -42,6 +42,7 @@ import {
 } from './frame_cadence_core';
 import {
   explicitCeilingIntent,
+  FRAME_RATE_CAP_VALUES,
   type FrameRateCapReading,
   frameRateCapChoiceFromValue,
   frameRateCapReading,
@@ -302,15 +303,39 @@ export class FrameCadenceWiring {
 
 let shared: FrameCadenceWiring | null = null;
 
-function applyStoredChoice(wiring: FrameCadenceWiring): void {
-  let intent: FrameCeilingIntent | null = 0;
+/** What the ceiling is asked for at boot and on every settings broadcast. */
+export interface FrameRateChoice {
+  auto: boolean;
+  intent: FrameCeilingIntent;
+  fromUrl: boolean;
+}
+
+/** The stored setting value resolved against the session's `?fpscap=` override,
+ *  which always wins and is never the automatic mode. */
+export function resolveFrameRateChoice(storedValue: number, search: string): FrameRateChoice {
+  const fromUrl = parseFrameCeilingIntent(search);
+  if (fromUrl !== null) return { auto: false, intent: fromUrl, fromUrl: true };
+  const intent = explicitCeilingIntent(frameRateCapChoiceFromValue(storedValue));
+  return { auto: intent === null, intent: intent ?? 0, fromUrl: false };
+}
+
+function storedFrameRateCapValue(): number {
   try {
-    intent = explicitCeilingIntent(frameRateCapChoiceFromValue(new Settings().get('frameRateCap')));
+    return new Settings().get('frameRateCap');
   } catch {
-    intent = 0;
+    return FRAME_RATE_CAP_VALUES.display;
   }
-  if (intent === null) wiring.setAuto();
-  else wiring.setIntent(intent);
+}
+
+function applyStoredChoice(wiring: FrameCadenceWiring, search: string): FrameRateChoice {
+  const overridden = parseFrameCeilingIntent(search) !== null;
+  const choice = resolveFrameRateChoice(
+    overridden ? FRAME_RATE_CAP_VALUES.display : storedFrameRateCapValue(),
+    search,
+  );
+  if (choice.auto) wiring.setAuto();
+  else wiring.setIntent(choice.intent);
+  return choice;
 }
 
 /**
@@ -331,15 +356,13 @@ export function sharedFrameCadence(): FrameCadenceWiring {
     autoMemory: localFrameCadenceAutoMemory,
   });
   shared = wiring;
-  const fromUrl = typeof location === 'undefined' ? null : parseFrameCeilingIntent(location.search);
-  if (fromUrl !== null) {
-    wiring.setIntent(fromUrl);
+  const search = typeof location === 'undefined' ? '' : location.search;
+  if (applyStoredChoice(wiring, search).fromUrl) {
     (globalThis as { __wocFrameCadence?: FrameCadenceWiring }).__wocFrameCadence = wiring;
     return wiring;
   }
-  applyStoredChoice(wiring);
   if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
-    window.addEventListener(SETTINGS_CHANGE_EVENT, () => applyStoredChoice(wiring));
+    window.addEventListener(SETTINGS_CHANGE_EVENT, () => applyStoredChoice(wiring, ''));
   }
   return wiring;
 }

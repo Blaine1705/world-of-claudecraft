@@ -18,6 +18,14 @@ describe('frame rate cap setting', () => {
     expect(frameRateCapChoiceFromValue(Number.NaN)).toBe('display');
   });
 
+  it('defaults a player who never chose to Auto', () => {
+    expect(SETTING_RANGES.frameRateCap).toEqual({ min: 0, max: 3, def: 0 });
+    expect(frameRateCapChoiceFromValue(SETTING_RANGES.frameRateCap.def)).toBe('auto');
+    expect(
+      explicitCeilingIntent(frameRateCapChoiceFromValue(SETTING_RANGES.frameRateCap.def)),
+    ).toBe(null);
+  });
+
   it('covers exactly the stored range', () => {
     expect(SETTING_RANGES.frameRateCap.min).toBe(0);
     expect(SETTING_RANGES.frameRateCap.max).toBe(3);
