@@ -446,13 +446,15 @@ describe('ignivar loot: the 10 weapons', () => {
   });
 });
 
-describe('ignivar loot: the boss drop tables (one item per five raiders)', () => {
+describe('ignivar loot: the boss drop tables (one item per five raiders, plus the Heroic Robe)', () => {
   // The cadence rule (docs/prd/ignivar-raid-loot.md, "Boss loot tables"): a
-  // kill pays ONE item per five raiders on BOTH difficulties, two on the
-  // 10-player raid. Slot one is the boss's merged sigil partition; slot two is
-  // its Normal-only off-set partition, which a heroic claim skips
-  // (LootEntry.normalOnly) so the HEROIC_BOSS_LOOT exclusive partition pays in
-  // its place. Heroic therefore differs in WHICH items drop, never in how many.
+  // kill pays ONE item per five raiders, two on the 10-player raid. Slot one
+  // is the boss's merged sigil partition; slot two is its Normal-only off-set
+  // partition, which a heroic claim skips (LootEntry.normalOnly) so the
+  // HEROIC_BOSS_LOOT exclusive partition (weapons and shields only) pays in its
+  // place. A Heroic kill then pays ONE more guaranteed slot on top: the Robe
+  // sigil partition (2026-09-11 re-cut), so no Heroic kill can ever end with
+  // the same two-sigil haul a Normal kill pays.
   const groupsOf = (entries: readonly LootEntry[]) => {
     const groups = new Map<string, { ids: string[]; sum: number; normalOnly: Set<boolean> }>();
     for (const entry of entries) {
@@ -606,13 +608,17 @@ describe('ignivar loot: the boss drop tables (one item per five raiders)', () =>
     expect(tuning?.finalBossId).toBe(VARKHUL_BOSS_ID);
   });
 
-  it('Heroic appends are ONE exclusive slot per boss, Emberward at its absolute 3 percent', () => {
+  it('Heroic appends are TWO guaranteed slots per boss: exclusive gear, then the Robe sigil', () => {
+    // The 2026-09-11 re-cut: the Robe sigils left the exclusive partition
+    // (which once let a Heroic kill roll a second sigil and NO weapon, the
+    // "same loot as Normal" complaint) for their own guaranteed group, appended
+    // AFTER the exclusive group so the existing draw keeps its position.
     const ignivar = HEROIC_BOSS_LOOT[IGNIVAR_BOSS_ID] ?? [];
     const varkhul = HEROIC_BOSS_LOOT[VARKHUL_BOSS_ID] ?? [];
     const ignivarGroups = groupsOf(ignivar);
     const varkhulGroups = groupsOf(varkhul);
-    expect([...ignivarGroups.keys()]).toEqual(['ignivar_h_exclusive']);
-    expect([...varkhulGroups.keys()]).toEqual(['varkhul_h_exclusive']);
+    expect([...ignivarGroups.keys()]).toEqual(['ignivar_h_exclusive', 'ignivar_h_robe']);
+    expect([...varkhulGroups.keys()]).toEqual(['varkhul_h_exclusive', 'varkhul_h_robe']);
     const robes = ['sigil_anvil_chest', 'sigil_ember_chest', 'sigil_tempest_chest'];
     const ignivarWeapons = [
       'forgefathers_warhammer',
@@ -620,10 +626,12 @@ describe('ignivar loot: the boss drop tables (one item per five raiders)', () =>
       'springtouched_crozier',
       'wand_of_quenched_sparks',
     ];
-    expect(ignivarGroups.get('ignivar_h_exclusive')?.ids).toEqual([...robes, ...ignivarWeapons]);
-    expect(shareOf(ignivar, robes)).toBeCloseTo(0.5, 6);
-    expect(shareOf(ignivar, ignivarWeapons)).toBeCloseTo(0.5, 6);
-    expect(familyShares(ignivar, robes)).toEqual([0.17, 0.17, 0.16]);
+    expect(ignivarGroups.get('ignivar_h_exclusive')?.ids).toEqual(ignivarWeapons);
+    expect(ignivarGroups.get('ignivar_h_robe')?.ids).toEqual(robes);
+    expect(shareOf(ignivar, ignivarWeapons)).toBeCloseTo(1, 6);
+    // Both Robe partitions carry the merged-sigil family balance.
+    expect(familyShares(ignivar, robes)).toEqual([0.34, 0.33, 0.33]);
+    expect(familyShares(varkhul, robes)).toEqual([0.34, 0.33, 0.33]);
     const shields = ['bulwark_of_the_inner_crucible', 'ember_wardens_barrier', 'varkhul_emberward'];
     const varkhulWeapons = [
       'heart_of_the_end_greatblade',
@@ -632,19 +640,18 @@ describe('ignivar loot: the boss drop tables (one item per five raiders)', () =>
     ];
     const varkhulHeld = ['orb_of_the_last_spring', 'cinder_of_the_first_design'];
     expect(varkhulGroups.get('varkhul_h_exclusive')?.ids).toEqual([
-      ...robes,
       ...shields,
       ...varkhulWeapons,
       ...varkhulHeld,
     ]);
-    // The 2026-09-07 redistribution took the held offhands' 0.10 from the
-    // marquee weapons; the Robe and shield shares did not move.
-    expect(shareOf(varkhul, robes)).toBeCloseTo(0.35, 6);
-    expect(shareOf(varkhul, shields)).toBeCloseTo(0.3, 6);
-    expect(shareOf(varkhul, varkhulWeapons)).toBeCloseTo(0.25, 6);
+    expect(varkhulGroups.get('varkhul_h_robe')?.ids).toEqual(robes);
+    // The Robe has its own group; #3923 keeps held offhands in the exclusive
+    // gear slot by taking their 0.10 from the marquee weapons.
+    expect(shareOf(varkhul, shields)).toBeCloseTo(0.5, 6);
+    expect(shareOf(varkhul, varkhulWeapons)).toBeCloseTo(0.4, 6);
     expect(shareOf(varkhul, varkhulHeld)).toBeCloseTo(0.1, 6);
-    // The legendary's odds did not move with the re-cut: 3 percent per heroic
-    // Varkhul kill, exactly what the shipped shield group paid.
+    // The legendary's odds did not move with either re-cut: 3 percent per
+    // heroic Varkhul kill, exactly what the shipped shield group paid.
     expect(varkhul.find((entry) => entry.itemId === 'varkhul_emberward')).toMatchObject({
       chance: 0.03,
       rollGroup: 'varkhul_h_exclusive',
@@ -697,13 +704,15 @@ describe('ignivar loot: the boss drop tables (one item per five raiders)', () =>
       ['slagrender_cleaver', 0.09375],
     ]);
     expect(rowsOf(ignivarHeroic, 'ignivar_h_exclusive')).toEqual([
-      ['sigil_anvil_chest', 0.17],
-      ['sigil_ember_chest', 0.17],
-      ['sigil_tempest_chest', 0.16],
-      ['forgefathers_warhammer', 0.125],
-      ['anvilguard_blade', 0.125],
-      ['springtouched_crozier', 0.125],
-      ['wand_of_quenched_sparks', 0.125],
+      ['forgefathers_warhammer', 0.25],
+      ['anvilguard_blade', 0.25],
+      ['springtouched_crozier', 0.25],
+      ['wand_of_quenched_sparks', 0.25],
+    ]);
+    expect(rowsOf(ignivarHeroic, 'ignivar_h_robe')).toEqual([
+      ['sigil_anvil_chest', 0.34],
+      ['sigil_ember_chest', 0.33],
+      ['sigil_tempest_chest', 0.33],
     ]);
     expect(rowsOf(varkhul, 'varkhul_sigils')).toEqual([
       ['sigil_anvil_legs', 0.17],
@@ -730,18 +739,33 @@ describe('ignivar loot: the boss drop tables (one item per five raiders)', () =>
       ['loop_of_quiet_springs', 0.125],
     ]);
     expect(rowsOf(varkhulHeroic, 'varkhul_h_exclusive')).toEqual([
-      ['sigil_anvil_chest', 0.12],
-      ['sigil_ember_chest', 0.12],
-      ['sigil_tempest_chest', 0.11],
-      ['bulwark_of_the_inner_crucible', 0.135],
-      ['ember_wardens_barrier', 0.135],
+      ['bulwark_of_the_inner_crucible', 0.235],
+      ['ember_wardens_barrier', 0.235],
       ['varkhul_emberward', 0.03],
-      ['heart_of_the_end_greatblade', 0.09],
-      ['forgefire_spire', 0.08],
-      ['staff_of_the_last_spring', 0.08],
+      ['heart_of_the_end_greatblade', 0.14],
+      ['forgefire_spire', 0.13],
+      ['staff_of_the_last_spring', 0.13],
       ['orb_of_the_last_spring', 0.05],
       ['cinder_of_the_first_design', 0.05],
     ]);
+    expect(rowsOf(varkhulHeroic, 'varkhul_h_robe')).toEqual([
+      ['sigil_anvil_chest', 0.34],
+      ['sigil_ember_chest', 0.33],
+      ['sigil_tempest_chest', 0.33],
+    ]);
+    // Every partition sums to EXACTLY 1 in floating point (not just close):
+    // a 0.999... sum leaves the last row's tail unreachable.
+    for (const [entries, group] of [
+      [ignivarHeroic, 'ignivar_h_exclusive'],
+      [ignivarHeroic, 'ignivar_h_robe'],
+      [varkhulHeroic, 'varkhul_h_exclusive'],
+      [varkhulHeroic, 'varkhul_h_robe'],
+    ] as const) {
+      expect(
+        rowsOf(entries, group).reduce((sum, [, chance]) => sum + chance, 0),
+        group,
+      ).toBe(1);
+    }
     // Profession knowledge is its own 30% roll on both difficulties. It never
     // displaces either gear slot, changes an old weight, or joins the heroic pool.
     for (const entries of [ignivar, varkhul]) {
@@ -791,11 +815,13 @@ describe('ignivar loot: the boss drop tables (one item per five raiders)', () =>
     }
   });
 
-  it('a kill pays exactly one item per five raiders on BOTH difficulties, through the live roller', () => {
+  it('a kill pays one item per five raiders, plus the guaranteed Robe on Heroic, through the live roller', () => {
     // Rolls the real tables through rollLoot with and without a live heroic
     // claim (the same claim shape the roller reads in production), so the
     // cadence is pinned where it is paid, not just in the authored weights.
     // The crafting reagent and optional scroll ride outside the gear cadence.
+    // Heroic pays the Normal cadence plus exactly one Robe sigil, and its
+    // exclusive slot is always a weapon or shield: never a second sigil.
     const perKill = DUNGEON_DEFS[IGNIVAR_RAID_ARENA_ID].suggestedPlayers / 5;
     expect(perKill).toBe(2);
     expect(DUNGEON_DEFS[IGNIVAR_SECOND_WING_ID].suggestedPlayers).toBe(
@@ -818,7 +844,16 @@ describe('ignivar loot: the boss drop tables (one item per five raiders)', () =>
           .map((e) => e.itemId),
       );
       const offsetIds = new Set(base.filter((e) => e.normalOnly).map((e) => e.itemId));
-      const exclusiveIds = new Set((HEROIC_BOSS_LOOT[bossId] ?? []).map((e) => e.itemId));
+      const heroicRows = HEROIC_BOSS_LOOT[bossId] ?? [];
+      const robeIds = new Set(
+        heroicRows.filter((e) => e.rollGroup?.endsWith('_h_robe')).map((e) => e.itemId),
+      );
+      const exclusiveIds = new Set(
+        heroicRows.filter((e) => e.rollGroup?.endsWith('_h_exclusive')).map((e) => e.itemId),
+      );
+      expect(robeIds.size).toBe(3);
+      // The exclusive slot is gear only (weapons, shields): never a sigil token.
+      for (const id of exclusiveIds) expect(id, id).not.toMatch(/^sigil_/);
       for (const heroic of [false, true]) {
         let scrollKills = 0;
         for (let seed = 0; seed < 25; seed++) {
@@ -843,10 +878,11 @@ describe('ignivar loot: the boss drop tables (one item per five raiders)', () =>
           const label = `${bossId} ${heroic ? 'heroic' : 'normal'} seed ${seed}`;
           expect(scrolls.length, label).toBeLessThanOrEqual(1);
           scrollKills += scrolls.length;
-          expect(gear.length, label).toBe(perKill);
+          expect(gear.length, label).toBe(heroic ? perKill + 1 : perKill);
           expect(gear.filter((id) => sigilIds.has(id)).length, label).toBe(1);
           expect(gear.filter((id) => offsetIds.has(id)).length, label).toBe(heroic ? 0 : 1);
           expect(gear.filter((id) => exclusiveIds.has(id)).length, label).toBe(heroic ? 1 : 0);
+          expect(gear.filter((id) => robeIds.has(id)).length, label).toBe(heroic ? 1 : 0);
         }
         // These seeded samples exercise both branches while the two original
         // gear slots stay guaranteed on kills with and without a scroll.
