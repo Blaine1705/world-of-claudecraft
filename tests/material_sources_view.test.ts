@@ -9,6 +9,7 @@ import { materialSourceKey } from '../src/sim/material_sources';
 import {
   boundedMaterialSourceRows,
   materialFungibleUnitCount,
+  materialSourcesForDisplay,
   materialSourceSummary,
   suppressesLegacyGatheredLine,
 } from '../src/ui/material_sources_view';
@@ -223,6 +224,20 @@ describe('material fungible unit count (World Market sell-quantity cap)', () => 
       materialSources: [held(UNRECORDED, 1), held({ signer: '' }, 3)],
     };
     expect(materialFungibleUnitCount(slot)).toBe(1);
+  });
+
+  it('excludes an empty-string legacy signer even when display projects no row', () => {
+    // Display intentionally keeps the old no-row behavior for an empty signer,
+    // but the sell cap mirrors the sim's legacy projection, where signer: ''
+    // is its own non-plain payload bucket.
+    const slot = { itemId: 'copper_ore', count: 3, instance: { signer: '' } };
+    expect(materialSourcesForDisplay(slot)).toBeUndefined();
+    expect(materialFungibleUnitCount(slot)).toBe(0);
+  });
+
+  it('excludes locked legacy material stacks from the plain sell cap', () => {
+    const slot = { itemId: 'copper_ore', count: 4, instance: { locked: true } };
+    expect(materialFungibleUnitCount(slot)).toBe(0);
   });
 
   it('returns the plain slot count for a non-material item (no composition to exclude)', () => {

@@ -27,7 +27,7 @@
 // never looked up, never resolved against a live profile, and carry no account
 // data; the renderer escapes them.
 
-import { isMaterialItemId } from '../sim/material_ids';
+import { isMaterialItemId, materialItemIds } from '../sim/material_ids';
 import { materialSourceUnitPayload } from '../sim/material_inventory_units';
 import {
   isPremiumMaterialSource,
@@ -38,6 +38,7 @@ import {
   materialSourceKey,
   totalMaterialCount,
 } from '../sim/material_sources';
+import { normalizeMaterialStack } from '../sim/material_stack';
 import type { InvSlot } from '../sim/types';
 
 /** One displayed bucket. `kind` decides the wording, `premium` the marker. */
@@ -182,15 +183,20 @@ export function materialSourcesForDisplay(
  * apply sim-side (`material_inventory_units.ts`), so a surface offering a
  * sell/list quantity can never promise more than the sim will actually escrow.
  *
- * A non-material item, or a material stack with no recorded provenance at
- * all, has nothing to exclude and returns the plain stack count.
+ * Non-material items keep the legacy raw-count read. Material stacks are read
+ * through the same normalizer as the sim hub instead of through
+ * `materialSourcesForDisplay`, because display intentionally hides legacy
+ * empty-string signers while the sim still treats them as their own payload.
  */
 export function materialFungibleUnitCount(slot: MaterialSourceSlot): number {
-  const composition = materialSourcesForDisplay(slot);
-  if (composition === undefined) return slot.count;
+  if (!isMaterialItemId(slot.itemId)) return slot.count;
+  const normalized = normalizeMaterialStack(slot, materialItemIds());
+  if (!normalized.ok) return 0;
+  const materialSlot = normalized.value;
+  if (materialSlot.instance?.locked === true) return 0;
   let count = 0;
-  for (const bucket of composition) {
-    if (materialSourceUnitPayload(slot, bucket.source) === undefined) count += bucket.count;
+  for (const bucket of materialSlot.materialSources ?? []) {
+    if (materialSourceUnitPayload(materialSlot, bucket.source) === undefined) count += bucket.count;
   }
   return count;
 }
