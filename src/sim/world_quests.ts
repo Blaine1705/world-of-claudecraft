@@ -21,7 +21,6 @@ import {
   recordInteractObjectCredit,
   sanitizeCreditedObjects,
 } from './quests/interact_object_credit';
-import { zoneCompletionCount } from './regional_mastery';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import type {
@@ -626,13 +625,6 @@ function creditWorldQuest(
   if (meta.openWorldQuestPuzzleId === quest.id) meta.openWorldQuestPuzzleId = null;
   meta.worldQuestAreas.delete(quest.id);
   meta.counters.questsCompleted++;
-  // Regional Mastery: the permanent per-zone tally climbs by one per turn-in.
-  // The regionalMasteryBest meter reads this map with no narrow dirty key, so
-  // the credit site itself requests a full deeds pass (awardWorldQuest marks
-  // one too, but only while standing is still being gained).
-  meta.worldQuestZoneCounts[quest.zoneId] =
-    zoneCompletionCount(meta.worldQuestZoneCounts, quest.zoneId) + 1;
-  ctx.markDeedsDirty(meta.entityId);
   meta.unlockedMilestones.add(claimToken(meta.worldQuestCycle, quest.id));
   awardWorldQuest(ctx, meta, quest);
   // A plain quest's optional encore: a champion of the site for anyone to fight.

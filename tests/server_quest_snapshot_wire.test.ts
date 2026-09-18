@@ -21,7 +21,6 @@ describe('quest snapshot wire', () => {
       factions: { rift_watch: 30, church_order: 0, automatons: 0 },
       worldQuestRerollCycle: 'wq1_1',
       worldQuestReplacements: { wq_test: 'wq_other' },
-      worldQuestZoneCounts: { eastbrook_vale: 7 },
       weeklyQuest: null,
     } as unknown as PlayerMeta;
     const sim = {
@@ -38,7 +37,6 @@ describe('quest snapshot wire', () => {
       ['wqexp', 1_893_542_400_000],
       ['wqlog', [worldQuest]],
       ['fac', meta.factions],
-      ['wqzc', { eastbrook_vale: 7 }],
       ['wqrr', meta.worldQuestRerollCycle],
       ['wqrep', { wq_test: 'wq_other' }],
       ['wkq', null],

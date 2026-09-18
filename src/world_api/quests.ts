@@ -51,12 +51,6 @@ export interface IWorldQuests {
   readonly worldQuestReplacements?: Readonly<Record<string, string>>;
   /** Cycle key for which the player used their daily world quest reroll. */
   readonly worldQuestRerollCycle?: string;
-  /**
-   * Regional Mastery: permanent per-zone world quest completion counts
-   * (zoneId -> count). Only ever climbs; the rungs are REGIONAL_MASTERY_MILESTONES
-   * (src/sim/regional_mastery.ts). Empty for a character who has never turned one in.
-   */
-  readonly worldQuestZoneCounts: Readonly<Record<string, number>>;
   canRerollWorldQuest?(questId: string): { canReroll: boolean; reason?: string };
   rerollWorldQuest?(questId: string): boolean;
   questState(questId: string): QuestState;

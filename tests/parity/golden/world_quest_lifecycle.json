@@ -17,7 +17,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "bf70600e",
+      "state": "a415789c",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -97,7 +97,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -172,7 +171,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "9f1412f2",
+      "state": "05571970",
       "events": "8c718819",
       "rng": {
         "draws": 0,
@@ -263,7 +262,6 @@
             ]
           ],
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -338,7 +336,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "914f4b8c",
+      "state": "a6761c16",
       "events": "0bddbfcf",
       "rng": {
         "draws": 0,
@@ -429,7 +427,6 @@
             ]
           ],
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -514,7 +511,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "29938409",
+      "state": "39f7f71f",
       "events": "b148b641",
       "rng": {
         "draws": 0,
@@ -608,7 +605,6 @@
             ]
           ],
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -683,7 +679,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "26b0b7e5",
+      "state": "48fc465f",
       "events": "043d914d",
       "rng": {
         "draws": 0,
@@ -784,9 +780,6 @@
             ]
           ],
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {
-            "eastbrook_vale": 1
-          },
           "wyrmfallDaily": {}
         }
       ],
@@ -861,7 +854,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "a7a3e419",
+      "state": "8b68ecd0",
       "events": "a1378836",
       "rng": {
         "draws": 0,
@@ -990,11 +983,6 @@
             ]
           ],
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {
-            "eastbrook_vale": 1,
-            "mirefen_marsh": 1,
-            "palmreach": 1
-          },
           "wyrmfallDaily": {}
         }
       ],
@@ -1069,7 +1057,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "c2bf2f62",
+      "state": "92f206c7",
       "events": "f061f193",
       "rng": {
         "draws": 0,
@@ -1176,11 +1164,6 @@
             ]
           ],
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {
-            "eastbrook_vale": 1,
-            "mirefen_marsh": 1,
-            "palmreach": 1
-          },
           "wyrmfallDaily": {}
         }
       ],
@@ -1255,7 +1238,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "c2bf2f62",
+      "state": "92f206c7",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1362,11 +1345,6 @@
             ]
           ],
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {
-            "eastbrook_vale": 1,
-            "mirefen_marsh": 1,
-            "palmreach": 1
-          },
           "wyrmfallDaily": {}
         }
       ],

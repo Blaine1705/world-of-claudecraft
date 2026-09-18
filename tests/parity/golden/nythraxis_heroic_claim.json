@@ -31,7 +31,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1020,
-      "state": "e8ad9296",
+      "state": "60034d8c",
       "events": "bc873d79",
       "rng": {
         "draws": 1,
@@ -118,7 +118,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -198,7 +197,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -278,7 +276,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -358,7 +355,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -438,7 +434,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -750,7 +745,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1020,
-      "state": "eabb4977",
+      "state": "9fd9e129",
       "events": "c8643206",
       "rng": {
         "draws": 12,
@@ -939,7 +934,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {
             "sources": [
               "nythraxis_boss_arena:heroic"
@@ -1118,7 +1112,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {
             "sources": [
               "nythraxis_boss_arena:heroic"
@@ -1297,7 +1290,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {
             "sources": [
               "nythraxis_boss_arena:heroic"
@@ -1476,7 +1468,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {
             "sources": [
               "nythraxis_boss_arena:heroic"
@@ -1655,7 +1646,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {
             "sources": [
               "nythraxis_boss_arena:heroic"
@@ -2011,7 +2001,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1020,
-      "state": "eabb4977",
+      "state": "9fd9e129",
       "events": "741638a5",
       "rng": {
         "draws": 12,
@@ -2200,7 +2190,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {
             "sources": [
               "nythraxis_boss_arena:heroic"
@@ -2379,7 +2368,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {
             "sources": [
               "nythraxis_boss_arena:heroic"
@@ -2558,7 +2546,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {
             "sources": [
               "nythraxis_boss_arena:heroic"
@@ -2737,7 +2724,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {
             "sources": [
               "nythraxis_boss_arena:heroic"
@@ -2916,7 +2902,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {
             "sources": [
               "nythraxis_boss_arena:heroic"

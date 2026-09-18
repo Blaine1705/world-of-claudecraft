@@ -37,7 +37,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1020,
-      "state": "41c2a1a3",
+      "state": "733cbbc1",
       "events": "3835b1b2",
       "rng": {
         "draws": 4,
@@ -161,7 +161,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -273,7 +272,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -385,7 +383,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -497,7 +494,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -609,7 +605,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -958,7 +953,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 1020,
-      "state": "0d769e50",
+      "state": "672e3e66",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -969,7 +964,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1020,
-      "state": "2d77e3ee",
+      "state": "a4fcafa0",
       "events": "1eda88a5",
       "rng": {
         "draws": 4,
@@ -980,7 +975,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 1020,
-      "state": "b8f2d967",
+      "state": "34e29255",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -991,7 +986,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1020,
-      "state": "e3b92ff5",
+      "state": "f147b9b7",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -1002,7 +997,7 @@
       "tick": 42,
       "time": 2.1,
       "nextId": 1020,
-      "state": "9f1f06e5",
+      "state": "b7f74d87",
       "events": "741638a5",
       "rng": {
         "draws": 18,
@@ -1126,7 +1121,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -1238,7 +1232,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -1350,7 +1343,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -1462,7 +1454,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -1574,7 +1565,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -1926,7 +1916,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 1022,
-      "state": "3bdad4ea",
+      "state": "56bc2f2c",
       "events": "05b4613e",
       "rng": {
         "draws": 72,
@@ -1937,7 +1927,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1022,
-      "state": "73e5bb8d",
+      "state": "718a6c9f",
       "events": "2e13b5cc",
       "rng": {
         "draws": 135,
@@ -1948,7 +1938,7 @@
       "tick": 64,
       "time": 3.2,
       "nextId": 1022,
-      "state": "2a4117ba",
+      "state": "abef30e8",
       "events": "7e40c9fc",
       "rng": {
         "draws": 180,
@@ -2072,7 +2062,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -2184,7 +2173,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -2296,7 +2284,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -2410,7 +2397,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -2524,7 +2510,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -3011,7 +2996,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 1022,
-      "state": "69c11938",
+      "state": "d3f8d8c6",
       "events": "55e774d8",
       "rng": {
         "draws": 235,
@@ -3022,7 +3007,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1022,
-      "state": "ee1b69ea",
+      "state": "ac2c1c74",
       "events": "741638a5",
       "rng": {
         "draws": 325,
@@ -3033,7 +3018,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 1022,
-      "state": "67a9b254",
+      "state": "dfbf5bc2",
       "events": "38709e53",
       "rng": {
         "draws": 412,
@@ -3044,7 +3029,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1022,
-      "state": "9a50662a",
+      "state": "1bd6ecb4",
       "events": "741638a5",
       "rng": {
         "draws": 523,
@@ -3055,7 +3040,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 1022,
-      "state": "47e55da3",
+      "state": "1a18de89",
       "events": "aa1dcbdf",
       "rng": {
         "draws": 626,
@@ -3066,7 +3051,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1022,
-      "state": "3d44ebc3",
+      "state": "edca2d79",
       "events": "65b3515c",
       "rng": {
         "draws": 740,
@@ -3077,7 +3062,7 @@
       "tick": 130,
       "time": 6.5,
       "nextId": 1022,
-      "state": "da88f929",
+      "state": "36d89293",
       "events": "741638a5",
       "rng": {
         "draws": 863,
@@ -3088,7 +3073,7 @@
       "tick": 137,
       "time": 6.85,
       "nextId": 1022,
-      "state": "ff8ff433",
+      "state": "e8593b89",
       "events": "daf4d6f1",
       "rng": {
         "draws": 929,
@@ -3220,7 +3205,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -3339,7 +3323,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -3458,7 +3441,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -3577,7 +3559,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -3696,7 +3677,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -4111,7 +4091,7 @@
       "tick": 138,
       "time": 6.9,
       "nextId": 1023,
-      "state": "7273545a",
+      "state": "a7413764",
       "events": "cc026359",
       "rng": {
         "draws": 940,
@@ -4243,7 +4223,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -4362,7 +4341,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -4481,7 +4459,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -4600,7 +4577,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -4719,7 +4695,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -5353,7 +5328,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 1023,
-      "state": "d95ef6dc",
+      "state": "904c664a",
       "events": "741638a5",
       "rng": {
         "draws": 954,
@@ -5364,7 +5339,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 1023,
-      "state": "617df0e8",
+      "state": "9d4e98a6",
       "events": "741638a5",
       "rng": {
         "draws": 1053,
@@ -5375,7 +5350,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 1023,
-      "state": "7984cbac",
+      "state": "1d64163a",
       "events": "741638a5",
       "rng": {
         "draws": 1167,
@@ -5386,7 +5361,7 @@
       "tick": 170,
       "time": 8.5,
       "nextId": 1023,
-      "state": "3241c129",
+      "state": "dd66c443",
       "events": "741638a5",
       "rng": {
         "draws": 1282,
@@ -5397,7 +5372,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 1023,
-      "state": "b6e362d8",
+      "state": "ed240d36",
       "events": "741638a5",
       "rng": {
         "draws": 1439,
@@ -5408,7 +5383,7 @@
       "tick": 190,
       "time": 9.5,
       "nextId": 1023,
-      "state": "89b567e6",
+      "state": "8829d790",
       "events": "293d6438",
       "rng": {
         "draws": 1575,
@@ -5419,7 +5394,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 1023,
-      "state": "ddccb1d0",
+      "state": "910fd6de",
       "events": "38f95162",
       "rng": {
         "draws": 1702,
@@ -5430,7 +5405,7 @@
       "tick": 210,
       "time": 10.5,
       "nextId": 1023,
-      "state": "7358c5da",
+      "state": "999aece4",
       "events": "741638a5",
       "rng": {
         "draws": 1783,
@@ -5441,7 +5416,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 1023,
-      "state": "734a995b",
+      "state": "5ee63ae1",
       "events": "741638a5",
       "rng": {
         "draws": 1865,
@@ -5452,7 +5427,7 @@
       "tick": 230,
       "time": 11.5,
       "nextId": 1023,
-      "state": "3766ea4c",
+      "state": "f9284f9a",
       "events": "741638a5",
       "rng": {
         "draws": 1925,
@@ -5463,7 +5438,7 @@
       "tick": 240,
       "time": 12,
       "nextId": 1023,
-      "state": "a8a2666a",
+      "state": "f26cf854",
       "events": "73e9168c",
       "rng": {
         "draws": 1997,
@@ -5474,7 +5449,7 @@
       "tick": 250,
       "time": 12.5,
       "nextId": 1023,
-      "state": "96bb07be",
+      "state": "a1c5def8",
       "events": "741638a5",
       "rng": {
         "draws": 2078,
@@ -5485,7 +5460,7 @@
       "tick": 260,
       "time": 13,
       "nextId": 1023,
-      "state": "df912c98",
+      "state": "a239b6f6",
       "events": "259839b1",
       "rng": {
         "draws": 2179,
@@ -5496,7 +5471,7 @@
       "tick": 270,
       "time": 13.5,
       "nextId": 1023,
-      "state": "b49ea1ef",
+      "state": "50058fb5",
       "events": "741638a5",
       "rng": {
         "draws": 2261,
@@ -5507,7 +5482,7 @@
       "tick": 280,
       "time": 14,
       "nextId": 1023,
-      "state": "248dabe6",
+      "state": "c5077b90",
       "events": "741638a5",
       "rng": {
         "draws": 2353,
@@ -5518,7 +5493,7 @@
       "tick": 290,
       "time": 14.5,
       "nextId": 1023,
-      "state": "596d45b1",
+      "state": "1f146c3b",
       "events": "a6356614",
       "rng": {
         "draws": 2439,
@@ -5529,7 +5504,7 @@
       "tick": 298,
       "time": 14.9,
       "nextId": 1023,
-      "state": "b57e966f",
+      "state": "8a515035",
       "events": "741638a5",
       "rng": {
         "draws": 2512,
@@ -5661,7 +5636,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -5780,7 +5754,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -5899,7 +5872,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -6018,7 +5990,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -6137,7 +6108,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -6751,7 +6721,7 @@
       "tick": 299,
       "time": 14.95,
       "nextId": 1023,
-      "state": "8e28c7e7",
+      "state": "93c5509d",
       "events": "563dd785",
       "rng": {
         "draws": 2524,
@@ -6883,7 +6853,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -7002,7 +6971,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -7121,7 +7089,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -7240,7 +7207,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -7359,7 +7325,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -7985,7 +7950,7 @@
       "tick": 300,
       "time": 15,
       "nextId": 1023,
-      "state": "a5ae7253",
+      "state": "d3ba9f69",
       "events": "741638a5",
       "rng": {
         "draws": 2527,
@@ -7996,7 +7961,7 @@
       "tick": 310,
       "time": 15.5,
       "nextId": 1023,
-      "state": "0e659c30",
+      "state": "a7e472fe",
       "events": "741638a5",
       "rng": {
         "draws": 2605,
@@ -8007,7 +7972,7 @@
       "tick": 320,
       "time": 16,
       "nextId": 1023,
-      "state": "c4d9f4ec",
+      "state": "58aaf97a",
       "events": "741638a5",
       "rng": {
         "draws": 2708,
@@ -8018,7 +7983,7 @@
       "tick": 330,
       "time": 16.5,
       "nextId": 1023,
-      "state": "8eff5e53",
+      "state": "9a56ab69",
       "events": "741638a5",
       "rng": {
         "draws": 2819,
@@ -8029,7 +7994,7 @@
       "tick": 340,
       "time": 17,
       "nextId": 1023,
-      "state": "5fbcea0f",
+      "state": "5b414b95",
       "events": "5753174f",
       "rng": {
         "draws": 2923,
@@ -8040,7 +8005,7 @@
       "tick": 350,
       "time": 17.5,
       "nextId": 1023,
-      "state": "d18134d7",
+      "state": "6d68e42d",
       "events": "741638a5",
       "rng": {
         "draws": 3020,
@@ -8051,7 +8016,7 @@
       "tick": 360,
       "time": 18,
       "nextId": 1023,
-      "state": "260a3242",
+      "state": "c46c7cbc",
       "events": "741638a5",
       "rng": {
         "draws": 3096,
@@ -8062,7 +8027,7 @@
       "tick": 370,
       "time": 18.5,
       "nextId": 1023,
-      "state": "62ecc7ef",
+      "state": "1ad5c5b5",
       "events": "741638a5",
       "rng": {
         "draws": 3176,
@@ -8073,7 +8038,7 @@
       "tick": 380,
       "time": 19,
       "nextId": 1023,
-      "state": "4cf002a7",
+      "state": "9609ef5d",
       "events": "741638a5",
       "rng": {
         "draws": 3292,
@@ -8084,7 +8049,7 @@
       "tick": 390,
       "time": 19.5,
       "nextId": 1023,
-      "state": "6b8b3dae",
+      "state": "f6211348",
       "events": "741638a5",
       "rng": {
         "draws": 3392,
@@ -8095,7 +8060,7 @@
       "tick": 400,
       "time": 20,
       "nextId": 1023,
-      "state": "fc951141",
+      "state": "930e0aab",
       "events": "7e650c9a",
       "rng": {
         "draws": 3486,
@@ -8106,7 +8071,7 @@
       "tick": 410,
       "time": 20.5,
       "nextId": 1023,
-      "state": "70ec12fc",
+      "state": "2d38fcaa",
       "events": "741638a5",
       "rng": {
         "draws": 3588,
@@ -8117,7 +8082,7 @@
       "tick": 420,
       "time": 21,
       "nextId": 1023,
-      "state": "f5dbe2db",
+      "state": "3bf20861",
       "events": "5ae4975d",
       "rng": {
         "draws": 3659,
@@ -8128,7 +8093,7 @@
       "tick": 430,
       "time": 21.5,
       "nextId": 1023,
-      "state": "02d593c4",
+      "state": "36f1cc22",
       "events": "741638a5",
       "rng": {
         "draws": 3735,
@@ -8139,7 +8104,7 @@
       "tick": 440,
       "time": 22,
       "nextId": 1023,
-      "state": "b45a1a5d",
+      "state": "0713b2f7",
       "events": "741638a5",
       "rng": {
         "draws": 3804,
@@ -8150,7 +8115,7 @@
       "tick": 450,
       "time": 22.5,
       "nextId": 1023,
-      "state": "17f0fc2b",
+      "state": "cec19f11",
       "events": "2545b5c6",
       "rng": {
         "draws": 3891,
@@ -8161,7 +8126,7 @@
       "tick": 460,
       "time": 23,
       "nextId": 1023,
-      "state": "bac3a167",
+      "state": "61ed3bd1",
       "events": "4d62840f",
       "rng": {
         "draws": 3996,
@@ -8172,7 +8137,7 @@
       "tick": 470,
       "time": 23.5,
       "nextId": 1023,
-      "state": "bb577d02",
+      "state": "bce77f08",
       "events": "741638a5",
       "rng": {
         "draws": 4081,
@@ -8183,7 +8148,7 @@
       "tick": 480,
       "time": 24,
       "nextId": 1023,
-      "state": "276ed38b",
+      "state": "987d4365",
       "events": "741638a5",
       "rng": {
         "draws": 4173,
@@ -8194,7 +8159,7 @@
       "tick": 481,
       "time": 24.05,
       "nextId": 1023,
-      "state": "c1243899",
+      "state": "784a310f",
       "events": "0cb39b0c",
       "rng": {
         "draws": 4181,
@@ -8326,7 +8291,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -8445,7 +8409,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -8564,7 +8527,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -8683,7 +8645,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -8802,7 +8763,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -9373,7 +9333,7 @@
       "tick": 490,
       "time": 24.5,
       "nextId": 1023,
-      "state": "3b7345bd",
+      "state": "b81669c3",
       "events": "c79467af",
       "rng": {
         "draws": 4240,
@@ -9384,7 +9344,7 @@
       "tick": 500,
       "time": 25,
       "nextId": 1023,
-      "state": "82df0d55",
+      "state": "d6ecb04b",
       "events": "c79467af",
       "rng": {
         "draws": 4321,
@@ -9395,7 +9355,7 @@
       "tick": 510,
       "time": 25.5,
       "nextId": 1023,
-      "state": "c98a52e3",
+      "state": "8413f54d",
       "events": "c79467af",
       "rng": {
         "draws": 4400,
@@ -9406,7 +9366,7 @@
       "tick": 520,
       "time": 26,
       "nextId": 1023,
-      "state": "cc00ea7b",
+      "state": "7da80ef5",
       "events": "c79467af",
       "rng": {
         "draws": 4488,
@@ -9417,7 +9377,7 @@
       "tick": 530,
       "time": 26.5,
       "nextId": 1023,
-      "state": "ebc4eea1",
+      "state": "2b7f40a7",
       "events": "c79467af",
       "rng": {
         "draws": 4596,
@@ -9428,7 +9388,7 @@
       "tick": 540,
       "time": 27,
       "nextId": 1023,
-      "state": "cc756cb7",
+      "state": "19393501",
       "events": "c79467af",
       "rng": {
         "draws": 4682,
@@ -9439,7 +9399,7 @@
       "tick": 550,
       "time": 27.5,
       "nextId": 1023,
-      "state": "c4657e6f",
+      "state": "b093d969",
       "events": "c79467af",
       "rng": {
         "draws": 4771,
@@ -9450,7 +9410,7 @@
       "tick": 560,
       "time": 28,
       "nextId": 1023,
-      "state": "56b8cb97",
+      "state": "81f996a1",
       "events": "c79467af",
       "rng": {
         "draws": 4863,
@@ -9461,7 +9421,7 @@
       "tick": 570,
       "time": 28.5,
       "nextId": 1023,
-      "state": "82dccfa9",
+      "state": "81dfbf7f",
       "events": "c79467af",
       "rng": {
         "draws": 4950,
@@ -9472,7 +9432,7 @@
       "tick": 580,
       "time": 29,
       "nextId": 1023,
-      "state": "d29e2439",
+      "state": "bc02b6ef",
       "events": "c79467af",
       "rng": {
         "draws": 5053,
@@ -9483,7 +9443,7 @@
       "tick": 590,
       "time": 29.5,
       "nextId": 1023,
-      "state": "2be9cc00",
+      "state": "b24901f2",
       "events": "86ec0cd1",
       "rng": {
         "draws": 5125,
@@ -9494,7 +9454,7 @@
       "tick": 600,
       "time": 30,
       "nextId": 1023,
-      "state": "d774a4bc",
+      "state": "a795d22e",
       "events": "741638a5",
       "rng": {
         "draws": 5222,
@@ -9505,7 +9465,7 @@
       "tick": 601,
       "time": 30.05,
       "nextId": 1023,
-      "state": "1d2021b8",
+      "state": "42d5715a",
       "events": "741638a5",
       "rng": {
         "draws": 5234,
@@ -9637,7 +9597,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -9756,7 +9715,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -9875,7 +9833,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -9994,7 +9951,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -10113,7 +10069,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -10699,7 +10654,7 @@
       "tick": 610,
       "time": 30.5,
       "nextId": 1023,
-      "state": "4e370251",
+      "state": "54a9d6f7",
       "events": "741638a5",
       "rng": {
         "draws": 5310,
@@ -10710,7 +10665,7 @@
       "tick": 620,
       "time": 31,
       "nextId": 1023,
-      "state": "22bc0f75",
+      "state": "72bd9dab",
       "events": "741638a5",
       "rng": {
         "draws": 5393,
@@ -10721,7 +10676,7 @@
       "tick": 630,
       "time": 31.5,
       "nextId": 1023,
-      "state": "989638b7",
+      "state": "5baa2101",
       "events": "741638a5",
       "rng": {
         "draws": 5461,
@@ -10732,7 +10687,7 @@
       "tick": 640,
       "time": 32,
       "nextId": 1023,
-      "state": "bf731ac3",
+      "state": "e94382ed",
       "events": "741638a5",
       "rng": {
         "draws": 5546,
@@ -10743,7 +10698,7 @@
       "tick": 650,
       "time": 32.5,
       "nextId": 1023,
-      "state": "aebe7498",
+      "state": "83108d7a",
       "events": "741638a5",
       "rng": {
         "draws": 5633,
@@ -10754,7 +10709,7 @@
       "tick": 660,
       "time": 33,
       "nextId": 1023,
-      "state": "69932166",
+      "state": "f7a00bec",
       "events": "741638a5",
       "rng": {
         "draws": 5722,
@@ -10765,7 +10720,7 @@
       "tick": 670,
       "time": 33.5,
       "nextId": 1023,
-      "state": "a39230fc",
+      "state": "1f5d136e",
       "events": "741638a5",
       "rng": {
         "draws": 5804,
@@ -10776,7 +10731,7 @@
       "tick": 680,
       "time": 34,
       "nextId": 1023,
-      "state": "c3d28954",
+      "state": "9eafcf36",
       "events": "741638a5",
       "rng": {
         "draws": 5905,
@@ -10787,7 +10742,7 @@
       "tick": 690,
       "time": 34.5,
       "nextId": 1023,
-      "state": "a63f65cd",
+      "state": "99c4cdb3",
       "events": "541a1a77",
       "rng": {
         "draws": 5990,
@@ -10798,7 +10753,7 @@
       "tick": 700,
       "time": 35,
       "nextId": 1023,
-      "state": "b68a5616",
+      "state": "ba9e393c",
       "events": "741638a5",
       "rng": {
         "draws": 6067,
@@ -10809,7 +10764,7 @@
       "tick": 710,
       "time": 35.5,
       "nextId": 1023,
-      "state": "070ee552",
+      "state": "abf7cef8",
       "events": "6a85bc1d",
       "rng": {
         "draws": 6157,
@@ -10820,7 +10775,7 @@
       "tick": 720,
       "time": 36,
       "nextId": 1023,
-      "state": "b19a2442",
+      "state": "67b41c48",
       "events": "741638a5",
       "rng": {
         "draws": 6236,
@@ -10831,7 +10786,7 @@
       "tick": 730,
       "time": 36.5,
       "nextId": 1023,
-      "state": "56309806",
+      "state": "6da56acc",
       "events": "741638a5",
       "rng": {
         "draws": 6338,
@@ -10842,7 +10797,7 @@
       "tick": 740,
       "time": 37,
       "nextId": 1023,
-      "state": "1739eef8",
+      "state": "3d038e9a",
       "events": "741638a5",
       "rng": {
         "draws": 6438,
@@ -10853,7 +10808,7 @@
       "tick": 750,
       "time": 37.5,
       "nextId": 1023,
-      "state": "cdd5b42e",
+      "state": "3fc6a804",
       "events": "741638a5",
       "rng": {
         "draws": 6523,
@@ -10864,7 +10819,7 @@
       "tick": 760,
       "time": 38,
       "nextId": 1023,
-      "state": "48e1207e",
+      "state": "1852d574",
       "events": "1bec8d6e",
       "rng": {
         "draws": 6601,
@@ -10875,7 +10830,7 @@
       "tick": 770,
       "time": 38.5,
       "nextId": 1023,
-      "state": "40fdacf2",
+      "state": "c15f3c58",
       "events": "741638a5",
       "rng": {
         "draws": 6675,
@@ -10886,7 +10841,7 @@
       "tick": 780,
       "time": 39,
       "nextId": 1023,
-      "state": "272fb5e7",
+      "state": "e0601c51",
       "events": "741638a5",
       "rng": {
         "draws": 6760,
@@ -10897,7 +10852,7 @@
       "tick": 790,
       "time": 39.5,
       "nextId": 1023,
-      "state": "2537a4eb",
+      "state": "67195e05",
       "events": "741638a5",
       "rng": {
         "draws": 6851,
@@ -10908,7 +10863,7 @@
       "tick": 800,
       "time": 40,
       "nextId": 1023,
-      "state": "36a63fc5",
+      "state": "0508b15b",
       "events": "741638a5",
       "rng": {
         "draws": 6947,
@@ -10919,7 +10874,7 @@
       "tick": 802,
       "time": 40.1,
       "nextId": 1023,
-      "state": "ff9187af",
+      "state": "0a2a7fa9",
       "events": "741638a5",
       "rng": {
         "draws": 6960,
@@ -11051,7 +11006,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -11170,7 +11124,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -11289,7 +11242,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -11408,7 +11360,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -11527,7 +11478,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -12098,7 +12048,7 @@
       "tick": 810,
       "time": 40.5,
       "nextId": 1023,
-      "state": "411ee78d",
+      "state": "ba852373",
       "events": "8e2d6802",
       "rng": {
         "draws": 7021,
@@ -12109,7 +12059,7 @@
       "tick": 820,
       "time": 41,
       "nextId": 1023,
-      "state": "7ca39619",
+      "state": "a320f28f",
       "events": "741638a5",
       "rng": {
         "draws": 7121,
@@ -12120,7 +12070,7 @@
       "tick": 830,
       "time": 41.5,
       "nextId": 1023,
-      "state": "3b74857e",
+      "state": "8be27274",
       "events": "741638a5",
       "rng": {
         "draws": 7218,
@@ -12131,7 +12081,7 @@
       "tick": 840,
       "time": 42,
       "nextId": 1023,
-      "state": "75383b16",
+      "state": "3824563c",
       "events": "741638a5",
       "rng": {
         "draws": 7287,
@@ -12142,7 +12092,7 @@
       "tick": 850,
       "time": 42.5,
       "nextId": 1023,
-      "state": "a503cf2b",
+      "state": "40ea3e45",
       "events": "4d4f9691",
       "rng": {
         "draws": 7355,
@@ -12153,7 +12103,7 @@
       "tick": 860,
       "time": 43,
       "nextId": 1023,
-      "state": "e860dd67",
+      "state": "b92917d1",
       "events": "741638a5",
       "rng": {
         "draws": 7430,
@@ -12164,7 +12114,7 @@
       "tick": 870,
       "time": 43.5,
       "nextId": 1023,
-      "state": "c88bcc6f",
+      "state": "8b95f769",
       "events": "38125d75",
       "rng": {
         "draws": 7525,
@@ -12175,7 +12125,7 @@
       "tick": 880,
       "time": 44,
       "nextId": 1023,
-      "state": "2fad8734",
+      "state": "bf1b4556",
       "events": "741638a5",
       "rng": {
         "draws": 7613,
@@ -12186,7 +12136,7 @@
       "tick": 884,
       "time": 44.2,
       "nextId": 1023,
-      "state": "589a650e",
+      "state": "c2eda024",
       "events": "91eafb1a",
       "rng": {
         "draws": 7651,
@@ -12318,7 +12268,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -12437,7 +12386,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -12556,7 +12504,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -12675,7 +12622,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -12794,7 +12740,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -13392,7 +13337,7 @@
       "tick": 890,
       "time": 44.5,
       "nextId": 1023,
-      "state": "8fa91df8",
+      "state": "601f659a",
       "events": "741638a5",
       "rng": {
         "draws": 7706,
@@ -13403,7 +13348,7 @@
       "tick": 900,
       "time": 45,
       "nextId": 1023,
-      "state": "af4674fc",
+      "state": "dab6b76e",
       "events": "741638a5",
       "rng": {
         "draws": 7802,
@@ -13414,7 +13359,7 @@
       "tick": 910,
       "time": 45.5,
       "nextId": 1023,
-      "state": "deb1f891",
+      "state": "996cd737",
       "events": "741638a5",
       "rng": {
         "draws": 7883,
@@ -13425,7 +13370,7 @@
       "tick": 920,
       "time": 46,
       "nextId": 1023,
-      "state": "d58624f7",
+      "state": "acc7bf41",
       "events": "741638a5",
       "rng": {
         "draws": 7969,
@@ -13436,7 +13381,7 @@
       "tick": 930,
       "time": 46.5,
       "nextId": 1023,
-      "state": "e4416bb6",
+      "state": "6450339c",
       "events": "741638a5",
       "rng": {
         "draws": 8068,
@@ -13447,7 +13392,7 @@
       "tick": 940,
       "time": 47,
       "nextId": 1023,
-      "state": "8061a5de",
+      "state": "b6909494",
       "events": "741638a5",
       "rng": {
         "draws": 8154,
@@ -13458,7 +13403,7 @@
       "tick": 950,
       "time": 47.5,
       "nextId": 1023,
-      "state": "c4841841",
+      "state": "cb8c9087",
       "events": "741638a5",
       "rng": {
         "draws": 8254,
@@ -13469,7 +13414,7 @@
       "tick": 960,
       "time": 48,
       "nextId": 1023,
-      "state": "df58cd6d",
+      "state": "16aedf93",
       "events": "741638a5",
       "rng": {
         "draws": 8331,
@@ -13480,7 +13425,7 @@
       "tick": 970,
       "time": 48.5,
       "nextId": 1023,
-      "state": "1a4817b0",
+      "state": "ecb2ecc2",
       "events": "c63813f3",
       "rng": {
         "draws": 8411,
@@ -13491,7 +13436,7 @@
       "tick": 980,
       "time": 49,
       "nextId": 1023,
-      "state": "fad872d9",
+      "state": "dbc1244f",
       "events": "741638a5",
       "rng": {
         "draws": 8489,
@@ -13502,7 +13447,7 @@
       "tick": 985,
       "time": 49.25,
       "nextId": 1023,
-      "state": "5540c2b7",
+      "state": "d0b71b01",
       "events": "69e89a7a",
       "rng": {
         "draws": 8528,
@@ -13634,7 +13579,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -13753,7 +13697,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -13872,7 +13815,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -13991,7 +13933,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -14110,7 +14051,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -14708,7 +14648,7 @@
       "tick": 990,
       "time": 49.5,
       "nextId": 1023,
-      "state": "70062f8e",
+      "state": "f663c6a4",
       "events": "741638a5",
       "rng": {
         "draws": 8569,
@@ -14719,7 +14659,7 @@
       "tick": 1000,
       "time": 50,
       "nextId": 1023,
-      "state": "668faadc",
+      "state": "4309ac8e",
       "events": "76e7642d",
       "rng": {
         "draws": 8652,
@@ -14730,7 +14670,7 @@
       "tick": 1010,
       "time": 50.5,
       "nextId": 1023,
-      "state": "e15f4a8a",
+      "state": "21f47680",
       "events": "4615960f",
       "rng": {
         "draws": 8749,
@@ -14741,7 +14681,7 @@
       "tick": 1020,
       "time": 51,
       "nextId": 1023,
-      "state": "328e092f",
+      "state": "a240c529",
       "events": "741638a5",
       "rng": {
         "draws": 8829,
@@ -14752,7 +14692,7 @@
       "tick": 1030,
       "time": 51.5,
       "nextId": 1023,
-      "state": "cf6e56df",
+      "state": "4c8381f1",
       "events": "8a163597",
       "rng": {
         "draws": 8925,
@@ -14763,7 +14703,7 @@
       "tick": 1040,
       "time": 52,
       "nextId": 1023,
-      "state": "232a0f86",
+      "state": "da226f1c",
       "events": "741638a5",
       "rng": {
         "draws": 9029,
@@ -14774,7 +14714,7 @@
       "tick": 1050,
       "time": 52.5,
       "nextId": 1023,
-      "state": "9ae9a2e5",
+      "state": "be3ffd4f",
       "events": "37987016",
       "rng": {
         "draws": 9126,
@@ -14785,7 +14725,7 @@
       "tick": 1060,
       "time": 53,
       "nextId": 1023,
-      "state": "7fc9b4d1",
+      "state": "49f96a8b",
       "events": "741638a5",
       "rng": {
         "draws": 9221,
@@ -14796,7 +14736,7 @@
       "tick": 1070,
       "time": 53.5,
       "nextId": 1023,
-      "state": "80ae6dfe",
+      "state": "c3430bac",
       "events": "8e427be5",
       "rng": {
         "draws": 9309,
@@ -14807,7 +14747,7 @@
       "tick": 1080,
       "time": 54,
       "nextId": 1023,
-      "state": "7657b9ef",
+      "state": "d65b1df9",
       "events": "741638a5",
       "rng": {
         "draws": 9382,
@@ -14818,7 +14758,7 @@
       "tick": 1090,
       "time": 54.5,
       "nextId": 1023,
-      "state": "0145da5d",
+      "state": "be294763",
       "events": "2d9e89d5",
       "rng": {
         "draws": 9486,
@@ -14829,7 +14769,7 @@
       "tick": 1100,
       "time": 55,
       "nextId": 1023,
-      "state": "0f079454",
+      "state": "37cb34ee",
       "events": "741638a5",
       "rng": {
         "draws": 9546,
@@ -14840,7 +14780,7 @@
       "tick": 1110,
       "time": 55.5,
       "nextId": 1023,
-      "state": "6f5e4447",
+      "state": "9a6a2d21",
       "events": "abe59783",
       "rng": {
         "draws": 9647,
@@ -14851,7 +14791,7 @@
       "tick": 1120,
       "time": 56,
       "nextId": 1023,
-      "state": "9420ef1a",
+      "state": "c88254f8",
       "events": "741638a5",
       "rng": {
         "draws": 9729,
@@ -14862,7 +14802,7 @@
       "tick": 1130,
       "time": 56.5,
       "nextId": 1023,
-      "state": "69c3bd46",
+      "state": "cf6e03a4",
       "events": "59007fb0",
       "rng": {
         "draws": 9818,
@@ -14873,7 +14813,7 @@
       "tick": 1140,
       "time": 57,
       "nextId": 1023,
-      "state": "ca6bb22f",
+      "state": "ad35c899",
       "events": "b0fa2179",
       "rng": {
         "draws": 9902,
@@ -14884,7 +14824,7 @@
       "tick": 1146,
       "time": 57.3,
       "nextId": 1023,
-      "state": "5b56fbac",
+      "state": "8d2b37b6",
       "events": "f6a1ea1f",
       "rng": {
         "draws": 9947,
@@ -15016,7 +14956,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -15135,7 +15074,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -15254,7 +15192,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -15373,7 +15310,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -15492,7 +15428,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -16090,7 +16025,7 @@
       "tick": 1150,
       "time": 57.5,
       "nextId": 1023,
-      "state": "1f586107",
+      "state": "93944701",
       "events": "741638a5",
       "rng": {
         "draws": 9973,
@@ -16101,7 +16036,7 @@
       "tick": 1160,
       "time": 58,
       "nextId": 1023,
-      "state": "3d6a0524",
+      "state": "d111f63e",
       "events": "741638a5",
       "rng": {
         "draws": 10045,
@@ -16112,7 +16047,7 @@
       "tick": 1170,
       "time": 58.5,
       "nextId": 1023,
-      "state": "307d8510",
+      "state": "0e37a9ba",
       "events": "f6a1ea1f",
       "rng": {
         "draws": 10121,
@@ -16123,7 +16058,7 @@
       "tick": 1180,
       "time": 59,
       "nextId": 1023,
-      "state": "63d414c7",
+      "state": "472e3421",
       "events": "741638a5",
       "rng": {
         "draws": 10233,
@@ -16134,7 +16069,7 @@
       "tick": 1190,
       "time": 59.5,
       "nextId": 1023,
-      "state": "a285dccb",
+      "state": "7543d935",
       "events": "c0a1fd56",
       "rng": {
         "draws": 10336,
@@ -16145,7 +16080,7 @@
       "tick": 1200,
       "time": 60,
       "nextId": 1023,
-      "state": "b0be19e4",
+      "state": "5d1d09de",
       "events": "741638a5",
       "rng": {
         "draws": 10418,
@@ -16156,7 +16091,7 @@
       "tick": 1210,
       "time": 60.5,
       "nextId": 1023,
-      "state": "8de5edb2",
+      "state": "b440301c",
       "events": "37a6238f",
       "rng": {
         "draws": 10498,
@@ -16167,7 +16102,7 @@
       "tick": 1220,
       "time": 61,
       "nextId": 1023,
-      "state": "f55c84da",
+      "state": "a1352eb4",
       "events": "741638a5",
       "rng": {
         "draws": 10583,
@@ -16178,7 +16113,7 @@
       "tick": 1230,
       "time": 61.5,
       "nextId": 1023,
-      "state": "44bbea61",
+      "state": "b5f64667",
       "events": "d0f91a19",
       "rng": {
         "draws": 10677,
@@ -16189,7 +16124,7 @@
       "tick": 1240,
       "time": 62,
       "nextId": 1023,
-      "state": "86c72029",
+      "state": "ab1d0a3f",
       "events": "741638a5",
       "rng": {
         "draws": 10763,
@@ -16200,7 +16135,7 @@
       "tick": 1247,
       "time": 62.35,
       "nextId": 1023,
-      "state": "5f99eff7",
+      "state": "d9103731",
       "events": "6d0b8231",
       "rng": {
         "draws": 10823,
@@ -16332,7 +16267,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -16451,7 +16385,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -16570,7 +16503,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -16689,7 +16621,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -16808,7 +16739,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -17407,7 +17337,7 @@
       "tick": 1248,
       "time": 62.4,
       "nextId": 1023,
-      "state": "ac688171",
+      "state": "31ff6fbb",
       "events": "31ced149",
       "rng": {
         "draws": 10837,
@@ -17590,7 +17520,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {
             "date": "2099-06-25",
             "sources": [
@@ -17765,7 +17694,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {
             "date": "2099-06-25",
             "sources": [
@@ -17940,7 +17868,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {
             "date": "2099-06-25",
             "sources": [
@@ -18115,7 +18042,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {
             "date": "2099-06-25",
             "sources": [
@@ -18290,7 +18216,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {
             "date": "2099-06-25",
             "sources": [
@@ -18887,7 +18812,7 @@
       "tick": 1250,
       "time": 62.5,
       "nextId": 1023,
-      "state": "ae0a067b",
+      "state": "b13f17e1",
       "events": "741638a5",
       "rng": {
         "draws": 10856,
@@ -18898,7 +18823,7 @@
       "tick": 1260,
       "time": 63,
       "nextId": 1023,
-      "state": "a5a73241",
+      "state": "8f90ae2b",
       "events": "741638a5",
       "rng": {
         "draws": 10969,
@@ -18909,7 +18834,7 @@
       "tick": 1270,
       "time": 63.5,
       "nextId": 1023,
-      "state": "4d4f5606",
+      "state": "9f5752cc",
       "events": "741638a5",
       "rng": {
         "draws": 11051,
@@ -18920,7 +18845,7 @@
       "tick": 1280,
       "time": 64,
       "nextId": 1023,
-      "state": "d8eae36a",
+      "state": "165e9a70",
       "events": "741638a5",
       "rng": {
         "draws": 11141,
@@ -18931,7 +18856,7 @@
       "tick": 1290,
       "time": 64.5,
       "nextId": 1023,
-      "state": "b13af2fb",
+      "state": "77951061",
       "events": "741638a5",
       "rng": {
         "draws": 11235,
@@ -18942,7 +18867,7 @@
       "tick": 1300,
       "time": 65,
       "nextId": 1023,
-      "state": "733c9b3f",
+      "state": "18cc4565",
       "events": "741638a5",
       "rng": {
         "draws": 11332,
@@ -18953,7 +18878,7 @@
       "tick": 1308,
       "time": 65.4,
       "nextId": 1023,
-      "state": "1e3d7b19",
+      "state": "70a2bdf3",
       "events": "73c8d5ba",
       "rng": {
         "draws": 11388,
@@ -19136,7 +19061,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {
             "date": "2099-06-25",
             "sources": [
@@ -19311,7 +19235,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {
             "date": "2099-06-25",
             "sources": [
@@ -19486,7 +19409,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {
             "date": "2099-06-25",
             "sources": [
@@ -19661,7 +19583,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {
             "date": "2099-06-25",
             "sources": [
@@ -19836,7 +19757,6 @@
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {
             "date": "2099-06-25",
             "sources": [

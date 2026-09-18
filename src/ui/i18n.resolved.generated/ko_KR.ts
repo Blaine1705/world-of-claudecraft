@@ -2396,12 +2396,7 @@ export const ko_KR: EnTranslations = {
       "vendorGate": "{faction}과(와) {tier} 평판이 필요합니다.",
       "tierReachedBanner": "{faction}과(와) {tier} 평판 달성",
       "tierReachedSubtext": "진영 칭호: {title}",
-      "tierReachedLine": "{faction}과(와)의 평판이 {tier}에 도달했습니다. 진영 칭호가 {title}(으)로 바뀌었습니다.",
-      "mastery": "지역 숙련",
-      "masteryIntro": "각 지역에서 완료한 월드 퀘스트 수는 영구히 남습니다. 매일 이어 갈 필요도 없고 소모되지도 않습니다. 이정표에 도달할 때마다 업적이 기록됩니다.",
-      "masteryNext": "다음 이정표: {count}",
-      "masteryMaxed": "모든 이정표 달성",
-      "masteryReached": "{reached} / {total} 이정표"
+      "tierReachedLine": "{faction}과(와)의 평판이 {tier}에 도달했습니다. 진영 칭호가 {title}(으)로 바뀌었습니다."
     },
     "questLog": {
       "completed": "완료됨",
@@ -2538,12 +2533,6 @@ export const ko_KR: EnTranslations = {
         "few": "전설 아이템 {count}점",
         "many": "전설 아이템 {count}점",
         "other": "전설 아이템 {count}점"
-      },
-      "worldQuestsCompletedInZone": {
-        "one": "월드 퀘스트 {count}개 완료",
-        "few": "월드 퀘스트 {count}개 완료",
-        "many": "월드 퀘스트 {count}개 완료",
-        "other": "월드 퀘스트 {count}개 완료"
       },
       "guildMembers": {
         "one": "당신은 {rank}, {count}명 회원",
@@ -7510,9 +7499,7 @@ export const ko_KR: EnTranslations = {
       "readingHeading": "어디에서 확인하나",
       "readingBody": "캐릭터 창(C)의 평판 탭에 각 진영의 현재 평판, 다음 단계까지의 막대, 평판으로 얻은 칭호가 표시됩니다. 대화 기록은 평판을 얻을 때마다 알려 주고, 새 단계에 도달하면 화면에 축하 배너가 뜹니다.",
       "deedsHeading": "업적",
-      "deedsBody": "업적의 서도 평판을 기록합니다. 한 진영에서 신뢰에 도달하는 것과 한 진영에서 챔피언에 도달하는 것이 각각 업적으로 기록되고, 세 진영 모두에서 챔피언에 도달하면 별도의 업적이 됩니다. 다른 업적과 마찬가지로 이는 장식일 뿐 힘이 되지 않으며, 챔피언 업적은 착용할 수 있는 칭호를 줍니다.",
-      "masteryHeading": "지역 숙련",
-      "masteryBody": "각 지역은 그곳에서 완료한 월드 퀘스트 수도 영구히 기록합니다. 화폐가 아니며 아무것도 이를 소모하지 않습니다. 숫자는 오르기만 하고, 매일 이어 갈 필요도 없으며, 몇 주 만에 돌아와도 다음 월드 퀘스트가 하나 더해질 뿐입니다. 정해진 이정표에 도달하면 업적의 서에 업적이 기록되므로, 캐릭터가 레벨 업을 마친 지 오래여도 옛 지역은 여전히 들를 가치가 있습니다. 평판 탭에 각 지역의 수와 다음 이정표가 나열됩니다."
+      "deedsBody": "업적의 서도 평판을 기록합니다. 한 진영에서 신뢰에 도달하는 것과 한 진영에서 챔피언에 도달하는 것이 각각 업적으로 기록되고, 세 진영 모두에서 챔피언에 도달하면 별도의 업적이 됩니다. 다른 업적과 마찬가지로 이는 장식일 뿐 힘이 되지 않으며, 챔피언 업적은 착용할 수 있는 칭호를 줍니다."
     },
     "deedsPage": {
       "intro": "업적의 서는 시작의 골짜기를 벗어나는 첫걸음부터 왕국이 내놓을 수 있는 가장 힘든 싸움까지, 당신이 이룬 모든 것을 세계가 기록해 두는 곳입니다. 플레이하며 업적을 얻고, 그것이 주는 칭호를 걸치고, 명성이 오르는 것을 지켜보세요.",

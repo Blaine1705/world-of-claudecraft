@@ -1981,56 +1981,6 @@
     text-shadow: var(--title-shadow);
     color: var(--char-rep-tier, var(--color-text-light));
   }
-  /* Regional Mastery: one compact row per zone inside a single card, the
-     count as the headline and the standing bar family for the milestone rung. */
-  .char-rep-mastery {
-    padding: 10px 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-  .char-rep-mastery h3 {
-    margin: 0;
-    font-family: var(--font-display);
-    font-size: 13px;
-    line-height: 18px;
-    letter-spacing: 0.5px;
-    text-shadow: var(--title-shadow);
-    color: var(--color-accent);
-  }
-  .char-rep-mastery-intro {
-    margin: 0 0 2px;
-    font-size: 12px;
-    line-height: 16px;
-    color: var(--color-text-muted);
-  }
-  .char-rep-mastery-row {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    padding-top: 6px;
-    border-top: 1px solid var(--color-border-showcase);
-  }
-  .char-rep-mastery-row.is-empty .char-rep-name,
-  .char-rep-mastery-row.is-empty .char-rep-mastery-count {
-    color: var(--color-text-muted);
-  }
-  .char-rep-mastery-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: var(--spacing-sm);
-  }
-  .char-rep-mastery-count {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--color-text-light);
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
-  }
-  .char-rep-mastery-bar {
-    height: 6px;
-  }
   .char-rep-legend {
     display: flex;
     flex-wrap: wrap;

@@ -145,7 +145,6 @@ export const IWORLD_MEMBERS = [
   { name: 'factions', kind: 'data' },
   { name: 'worldQuestReplacements', kind: 'data' },
   { name: 'worldQuestRerollCycle', kind: 'data' },
-  { name: 'worldQuestZoneCounts', kind: 'data' },
   // --- commands + read-returning methods ---
   { name: 'canRerollWorldQuest', kind: 'method' },
   { name: 'rerollWorldQuest', kind: 'method' },
@@ -896,16 +895,14 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // and the account-wide Book of Deeds / Reliquary read halves. Counted
     // 402/116/286 on feature/wq-reputation: 397/113/284 plus factions,
     // worldQuestReplacements, worldQuestRerollCycle (+3 data), and canRerollWorldQuest,
-    // rerollWorldQuest (+2 methods). Counted 403/117/286 on
-    // feature/wq-regional-mastery: plus the Regional Mastery per-zone counts
-    // readout worldQuestZoneCounts (+1 data).
-    // Counted 406/119/287 on feature/weekly-quests rebased onto it: plus the
+    // rerollWorldQuest (+2 methods).
+    // Counted 405/118/287 on feature/weekly-quests rebased onto it: plus the
     // weekly emissary's weeklyQuest and weeklyQuestResetAtMs (+2 data) and
     // chooseWeeklyQuest (+1 method).
     // Plus the emissary's commendation claim commendWeeklyQuest (+1 method):
-    // 407/119/288.
-    expect(IWORLD_MEMBERS.length).toBe(407);
-    expect(DATA_MEMBERS.length).toBe(119);
+    // 406/118/288.
+    expect(IWORLD_MEMBERS.length).toBe(406);
+    expect(DATA_MEMBERS.length).toBe(118);
     expect(METHOD_MEMBERS.length).toBe(288);
   });
   it('has no duplicate member names', () => {
@@ -1322,7 +1319,6 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'worldQuestReplacements',
       'worldQuestRerollCycle',
       'worldQuestTime',
-      'worldQuestZoneCounts',
       'xp',
     ]);
   });
@@ -1446,7 +1442,6 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'worldQuestReplacements',
       'worldQuestRerollCycle',
       'worldQuestTime',
-      'worldQuestZoneCounts',
       'xp',
     ]);
   });
@@ -1981,7 +1976,6 @@ const FACET_QUESTS = [
   'factions',
   'worldQuestReplacements',
   'worldQuestRerollCycle',
-  'worldQuestZoneCounts',
   'canRerollWorldQuest',
   'rerollWorldQuest',
 ] as const satisfies readonly (keyof IWorldQuests)[];
@@ -2521,10 +2515,10 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    // Mirrors the IWORLD_MEMBERS.length pin above (407); this pin and the one above
+    // Mirrors the IWORLD_MEMBERS.length pin above (406); this pin and the one above
     // must always agree.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(407);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(407);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(406);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(406);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

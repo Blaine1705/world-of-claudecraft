@@ -4812,9 +4812,6 @@ export class Sim {
   get worldQuestRerollCycle(): string {
     return this.primary.worldQuestRerollCycle;
   }
-  get worldQuestZoneCounts(): Readonly<Record<string, number>> {
-    return this.primary.worldQuestZoneCounts;
-  }
   canRerollWorldQuest(questId: string, pid?: number): { canReroll: boolean; reason?: string } {
     const meta = pid !== undefined ? this.players.get(pid) : this.primary;
     if (!meta) return { canReroll: false, reason: 'Player not found.' };

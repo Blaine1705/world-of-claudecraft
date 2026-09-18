@@ -21,7 +21,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1011,
-      "state": "bf70600e",
+      "state": "a415789c",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -101,7 +101,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -176,7 +175,7 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 1011,
-      "state": "94e617ce",
+      "state": "fb652978",
       "events": "600fbb27",
       "rng": {
         "draws": 2,
@@ -304,7 +303,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {},
           "xp": 21
         }
@@ -381,7 +379,7 @@
       "tick": 104,
       "time": 5.2,
       "nextId": 1011,
-      "state": "566bcd78",
+      "state": "42d38292",
       "events": "f222566b",
       "rng": {
         "draws": 4,
@@ -535,7 +533,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {},
           "xp": 42
         }
@@ -612,7 +609,7 @@
       "tick": 500,
       "time": 25,
       "nextId": 1011,
-      "state": "ca64b7c5",
+      "state": "7fa1d15f",
       "events": "975cf7cd",
       "rng": {
         "draws": 18,
@@ -623,7 +620,7 @@
       "tick": 1000,
       "time": 50,
       "nextId": 1011,
-      "state": "4739799d",
+      "state": "940c0af3",
       "events": "e0e9383b",
       "rng": {
         "draws": 38,
@@ -634,7 +631,7 @@
       "tick": 1500,
       "time": 75,
       "nextId": 1011,
-      "state": "238a5389",
+      "state": "c5963b23",
       "events": "52583720",
       "rng": {
         "draws": 58,
@@ -645,7 +642,7 @@
       "tick": 2000,
       "time": 100,
       "nextId": 1011,
-      "state": "ec889c10",
+      "state": "43042b22",
       "events": "a65169dd",
       "rng": {
         "draws": 78,
@@ -656,7 +653,7 @@
       "tick": 2500,
       "time": 125,
       "nextId": 1011,
-      "state": "e0dc1893",
+      "state": "46bd9dc9",
       "events": "9c18b38d",
       "rng": {
         "draws": 96,
@@ -667,7 +664,7 @@
       "tick": 3000,
       "time": 150,
       "nextId": 1011,
-      "state": "ec781b19",
+      "state": "23d4b6e3",
       "events": "a65169dd",
       "rng": {
         "draws": 116,
@@ -678,7 +675,7 @@
       "tick": 3500,
       "time": 175,
       "nextId": 1011,
-      "state": "aa79d056",
+      "state": "68fbab04",
       "events": "31e4542a",
       "rng": {
         "draws": 136,
@@ -689,7 +686,7 @@
       "tick": 4000,
       "time": 200,
       "nextId": 1011,
-      "state": "f5797f21",
+      "state": "2900708b",
       "events": "16549bdd",
       "rng": {
         "draws": 156,
@@ -700,7 +697,7 @@
       "tick": 4500,
       "time": 225,
       "nextId": 1011,
-      "state": "7f4fb608",
+      "state": "7bb7f5de",
       "events": "ba8d7d9c",
       "rng": {
         "draws": 176,
@@ -711,7 +708,7 @@
       "tick": 5000,
       "time": 250,
       "nextId": 1011,
-      "state": "98efeb2d",
+      "state": "a5c8a9d7",
       "events": "972455e1",
       "rng": {
         "draws": 194,
@@ -722,7 +719,7 @@
       "tick": 5206,
       "time": 260.3,
       "nextId": 1011,
-      "state": "2c924828",
+      "state": "f76288b2",
       "events": "0de89e63",
       "rng": {
         "draws": 204,
@@ -916,7 +913,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {},
           "xp": 722
         }
@@ -993,7 +989,7 @@
       "tick": 5208,
       "time": 260.4,
       "nextId": 1011,
-      "state": "400f3049",
+      "state": "832c138b",
       "events": "741638a5",
       "rng": {
         "draws": 204,
@@ -1187,7 +1183,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {},
           "xp": 722
         }
