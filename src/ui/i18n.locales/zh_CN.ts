@@ -7581,7 +7581,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '使用卷轴会开始一场寻宝：一连串简短的谜题，会在任务追踪器中逐步显示。每条谜题都指向世界中真实存在的东西：要站到的地标、要交谈的人、要在某处做出的表情，或是一件小差事，而最后一条总会让你挖掘。同一时间只能进行一场寻宝，它会跨越每日重置并在不同游戏时段之间保留你的进度，所以不必着急。',
   'guide.questsPage.cluesCasketTitle': '宝匣',
   'guide.questsPage.cluesCasketBody':
-    '解开最后一条线索，在它指明的地点使用卷轴，挖出一只宝藏匣。打开它可以得到钱币、一件适合你职业的装备、几枚英雄徽记，偶尔还有只有宝匣才装得下的东西。你的第一只宝匣和第十只都会记入功绩之书。',
+    '解开最后一条线索，在它指明的地点使用卷轴，挖出一只宝藏匣；完成寻宝还能获得该地所属阵营的声望。打开它可以得到钱币和一批优质采集材料。偶尔还会有一件装备或几枚英雄徽记，极少数情况下会出现别处无法获得的坐骑“提灯背者格伦博”。你的第一只宝匣和第十只都会记入功绩之书。',
   'guide.questsPage.sideCryptBody':
     '在高耸的峰巅，潜藏着一桩更幽静的谜团：古老的坟墓刻着无人记得的王冠。读懂死者，收集他们守护之物，再开启一座本该长闭的陵墓。这是一条侦探般的线索，会为你开启通往这片位面十人终局团队副本之路。',
   'guide.questsPage.sideCryptTitle': '被遗忘的君王',
@@ -16421,6 +16421,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reputation.title': '阵营头衔',
   'hudChrome.reputation.legend': '声望等级',
   'hudChrome.reputation.vendorGate': '需要与{faction}达到{tier}。',
+  'hudChrome.reputation.standingGained': '{faction}声望 +{amount}',
   'hudChrome.reputation.tierReachedBanner': '与{faction}的声望达到{tier}',
   'hudChrome.reputation.tierReachedSubtext': '阵营头衔：{title}',
   'hudChrome.reputation.tierReachedLine':

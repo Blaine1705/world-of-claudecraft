@@ -7,7 +7,9 @@
 
 import { delveChestItemsForTier } from './content/delves/lockpick_tiers';
 import { HEROIC_MARK_ITEM_ID } from './content/dungeon_difficulty';
+import type { MountKey } from './content/mounts';
 import type { LootTier } from './lockpick';
+import { mountOwned } from './mounts';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import type { Entity } from './types';
@@ -18,19 +20,34 @@ import type { Entity } from './types';
  *  without rivalling a dungeon clear. Tune here, never inline. */
 export const CASKET_COPPER_BASE = 40_000;
 export const CASKET_COPPER_PER_LEVEL = 1_000;
-/** Heroic Marks every casket carries beside the piece. */
-export const CASKET_HEROIC_MARKS = 3;
-/** Odds of a rare second delve piece on top of the guaranteed one. */
-export const CASKET_RARE_SECOND_PIECE_CHANCE = 0.05;
-/** The delve chest ladder rung the casket draws from: its top. */
-export const CASKET_DELVE_TIER: LootTier = 'premium';
+/** Units of one top-tier gathered material every casket carries. */
+export const CASKET_MATERIAL_COUNT = 4;
+/** The material pool: the top gathering tier (ore, wood, herb) of the level 16
+ *  to 20 zones (src/sim/professions/gathering_materials.ts NODE_MATERIAL_TABLE). */
+export const CASKET_MATERIAL_POOL: readonly string[] = Object.freeze([
+  'thorium_ore',
+  'elderwood_log',
+  'sunpetal_herb',
+]);
+/** Odds of a piece of gear from the delve chest ladder. */
+export const CASKET_GEAR_CHANCE = 0.1;
+/** The delve chest ladder rung the gear roll draws from: its lowest. */
+export const CASKET_DELVE_TIER: LootTier = 'low';
+/** Odds of a small stack of Heroic Marks, and its size. */
+export const CASKET_HEROIC_MARK_CHANCE = 0.05;
+export const CASKET_HEROIC_MARKS = 2;
+/** The casket-exclusive mount (Grumbol the Lanternback): its reins and the odds
+ *  of rolling them. A character who already owns the mount rolls nothing here. */
+export const CASKET_MOUNT_REINS_ITEM_ID = 'reins_lanternback_troll';
+export const CASKET_MOUNT_KEY: MountKey = 'lanternback_troll';
+export const CASKET_MOUNT_CHANCE = 0.015;
 
 export function treasureCasketCopper(level: number): number {
   return CASKET_COPPER_BASE + CASKET_COPPER_PER_LEVEL * Math.max(1, Math.floor(level));
 }
 
-/** One piece from the class's top delve chest rung. The ladder answers a LIST
- *  (one entry for most archetypes, a fixed pair for the rogue/hunter one), so a
+/** One piece from the class's CASKET_DELVE_TIER delve chest rung. The ladder
+ *  answers a LIST (a fixed pair for some archetypes on some rungs), so a
  *  multi-entry answer is narrowed to one through the same rng. */
 function rollCasketPiece(ctx: SimContext, meta: PlayerMeta): { itemId: string; count: number } {
   const pieces = delveChestItemsForTier(CASKET_DELVE_TIER, meta.cls, ctx.rng);
@@ -39,10 +56,11 @@ function rollCasketPiece(ctx: SimContext, meta: PlayerMeta): { itemId: string; c
 
 /**
  * The `clueCasket` item-use arm (items.ts useItem, after the busy/dead gates):
- * spends the casket, then pays copper, one delve piece, the marks and the
- * rare second piece, bumps the lifetime count, requests a full deeds pass and
- * emits clueCasketOpened with the granted item ids (one entry per grant, so
- * the marks appear once) and the copper. The HUD paints the lines from the
+ * spends the casket, then pays copper and a stack of one top-tier material,
+ * and rolls the rare extras in a fixed order through ctx.rng (gear, marks, the
+ * mount), so every host draws the same sequence. Bumps the lifetime count,
+ * requests a full deeds pass and emits clueCasketOpened with the granted item
+ * ids (one entry per grant) and the copper. The HUD paints the lines from the
  * ids; no loot prose is emitted here beyond addItem's own receipt.
  */
 export function openTreasureCasket(
@@ -55,15 +73,23 @@ export function openTreasureCasket(
   consumeOneUnit();
   const copper = treasureCasketCopper(player.level);
   const itemIds: string[] = [];
-  const piece = rollCasketPiece(ctx, meta);
-  ctx.addItem(piece.itemId, piece.count, pid);
-  itemIds.push(piece.itemId);
-  ctx.addItem(HEROIC_MARK_ITEM_ID, CASKET_HEROIC_MARKS, pid);
-  itemIds.push(HEROIC_MARK_ITEM_ID);
-  if (ctx.rng.chance(CASKET_RARE_SECOND_PIECE_CHANCE)) {
-    const second = rollCasketPiece(ctx, meta);
-    ctx.addItem(second.itemId, second.count, pid);
-    itemIds.push(second.itemId);
+  const material = CASKET_MATERIAL_POOL[ctx.rng.int(0, CASKET_MATERIAL_POOL.length - 1)];
+  ctx.addItem(material, CASKET_MATERIAL_COUNT, pid);
+  itemIds.push(material);
+  if (ctx.rng.chance(CASKET_GEAR_CHANCE)) {
+    const piece = rollCasketPiece(ctx, meta);
+    ctx.addItem(piece.itemId, piece.count, pid);
+    itemIds.push(piece.itemId);
+  }
+  if (ctx.rng.chance(CASKET_HEROIC_MARK_CHANCE)) {
+    ctx.addItem(HEROIC_MARK_ITEM_ID, CASKET_HEROIC_MARKS, pid);
+    itemIds.push(HEROIC_MARK_ITEM_ID);
+  }
+  // The mount roll is always drawn (the rng sequence never depends on what
+  // the character owns); an owner simply receives nothing from it.
+  if (ctx.rng.chance(CASKET_MOUNT_CHANCE) && !mountOwned(meta, CASKET_MOUNT_KEY)) {
+    ctx.addItem(CASKET_MOUNT_REINS_ITEM_ID, 1, pid);
+    itemIds.push(CASKET_MOUNT_REINS_ITEM_ID);
   }
   meta.copper += copper;
   meta.clueCasketsOpened = (meta.clueCasketsOpened ?? 0) + 1;

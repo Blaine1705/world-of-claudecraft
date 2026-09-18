@@ -3017,6 +3017,9 @@ export const hudChromeStrings = {
     // The authoritative purchase refusal on a standing-gated vendor row
     // (src/sim/items.ts buyItem), re-localized by identity in sim_i18n.ts.
     vendorGate: 'Requires {tier} with {faction}.',
+    // The standing receipt a world quest turn-in or a finished clue hunt logs
+    // (src/sim/world_quests.ts, src/sim/clue_scrolls.ts), re-localized in sim_i18n.ts.
+    standingGained: '+{amount} {faction} Standing.',
     // The tier-reached celebration (src/ui/hud/reputation/): the plate, its
     // faction-title subtext, and the durable gold chat line.
     tierReachedBanner: 'Now {tier} with the {faction}',

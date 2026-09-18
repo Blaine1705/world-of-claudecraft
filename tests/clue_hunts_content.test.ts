@@ -8,6 +8,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { clueHuntFaction } from '../src/sim/clue_scrolls';
 import {
   CLUE_HUNTS,
   CLUE_HUNTS_BY_ID,
@@ -385,5 +386,15 @@ describe('clue scroll items and deeds (the content records this feature carries)
     expect(RELIQUARY_HORIZON_TITLES).toContain('exp_clue_ten_caskets');
     expect(DEED_ART_PENDING.has('exp_clue_first_casket')).toBe(true);
     expect(DEED_ART_PENDING.has('exp_clue_ten_caskets')).toBe(true);
+  });
+});
+
+describe('clue hunt starter pool: the standing a finished hunt pays', () => {
+  it('every hunt digs in a zone a faction owns, so the finish always pays standing', () => {
+    for (const hunt of CLUE_HUNTS) {
+      expect(clueHuntFaction(hunt), `${hunt.id} pays a faction`).not.toBeNull();
+    }
+    // The pool spreads across all three factions, not just one.
+    expect(new Set(CLUE_HUNTS.map((hunt) => clueHuntFaction(hunt))).size).toBe(3);
   });
 });

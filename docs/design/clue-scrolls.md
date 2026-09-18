@@ -46,11 +46,21 @@ design contract; the anchors are `src/sim/clue_scrolls.ts` (the engine),
 
 ## The casket
 
+- Finishing a hunt pays `CLUE_HUNT_STANDING` with the faction that owns the
+  zone of its last step (every authored hunt ends with a dig in a faction's
+  land), under the cap for the character's level.
 - The last step hands a Treasure Casket (`TREASURE_CASKET_ITEM_ID`), a
-  soulbound usable item. Opening it pays copper scaled by level, one piece
-  from the delve chest ladder for the owner's class, a few Heroic Marks, and
-  a rare second roll from the treasure-only table
-  (`src/sim/clue_casket.ts`); the odds are pinned by test.
+  soulbound usable item. Because a scroll can be earned every day, the
+  casket's ordinary value is deliberately modest: copper scaled by level and a
+  stack of one top-tier gathering material. The extras are rare, rolled in a
+  fixed order through the sim's `Rng`: a piece from the lowest delve chest
+  rung for the owner's class, a small stack of Heroic Marks, and Grumbol the
+  Lanternback (`reins_lanternback_troll`), a mount the casket is the only
+  source of. Every odd and count is a named constant in
+  `src/sim/clue_casket.ts`, a working rule to tune in playtests, and pinned by
+  test. The mount roll is always drawn; a character who already owns the
+  mount receives nothing from it, so the rng sequence never depends on the
+  collection.
 - Treasure-exclusive rewards stay separate from ordinary world-quest rewards
   and quartermaster stock. Deeds mark the first casket and the tenth, and the
   tenth grants a title.

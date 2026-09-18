@@ -2394,6 +2394,7 @@ export const it_IT: EnTranslations = {
       "titleLine": "{faction} . {tier}",
       "legend": "Standing tiers",
       "vendorGate": "Requires {tier} with {faction}.",
+      "standingGained": "+{amount} {faction} Standing.",
       "tierReachedBanner": "Now {tier} with the {faction}",
       "tierReachedSubtext": "Faction title: {title}",
       "tierReachedLine": "You are now {tier} with the {faction}. Your faction title is now {title}."
@@ -7318,7 +7319,7 @@ export const it_IT: EnTranslations = {
       "cluesHuntTitle": "Following the clues",
       "cluesHuntBody": "Using a scroll starts a hunt: a short chain of riddles that shows in your quest tracker one step at a time. Each riddle points at something real in the world, a landmark to stand at, a person to talk to, an emote to perform somewhere, or a small errand to run, and the last one always asks you to dig. Only one hunt runs at a time, and it keeps your place across the daily reset and between sessions, so take your time.",
       "cluesCasketTitle": "The casket",
-      "cluesCasketBody": "Solve the last clue and use the scroll on the spot it names to dig up a Treasure Casket. Open it for coin, a piece of gear for your class, a few marks, and now and then something only a casket can hold. Your first casket and your tenth are recorded in the Book of Deeds.",
+      "cluesCasketBody": "Solve the last clue and use the scroll on the spot it names to dig up a Treasure Casket; finishing the hunt also earns standing with the faction whose land hid it. Open the casket for coin and a stack of fine gathering materials. Now and then it holds a piece of gear or a few Heroic Marks, and very rarely Grumbol the Lanternback, a mount found nowhere else. Your first casket and your tenth are recorded in the Book of Deeds.",
       "sideTempleTitle": "Il Tempio Annegato",
       "sideTempleBody": "Un cancello di pallida luce su un alto laghetto montano tra le vette si apre su un santuario sommerso dove un culto annegato canta ancora. La sua breve catena di missioni resta separata dalla storia principale, un mistero a sé stante per chiunque salga fino alla riva, legga gli avvertimenti incisi sulle rocce e scenda a scoprire a cosa servissero.",
       "availableTitle": "Perché un PNG non ha nulla per te",

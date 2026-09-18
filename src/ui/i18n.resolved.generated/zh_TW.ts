@@ -2394,6 +2394,7 @@ export const zh_TW: EnTranslations = {
       "titleLine": "{faction} . {tier}",
       "legend": "聲望等級",
       "vendorGate": "需要與{faction}達到{tier}。",
+      "standingGained": "{faction}聲望 +{amount}",
       "tierReachedBanner": "與{faction}的聲望達到{tier}",
       "tierReachedSubtext": "陣營頭銜：{title}",
       "tierReachedLine": "你與{faction}的聲望已達到{tier}。你的陣營頭銜現在是{title}。"
@@ -7318,7 +7319,7 @@ export const zh_TW: EnTranslations = {
       "cluesHuntTitle": "跟隨線索",
       "cluesHuntBody": "使用卷軸會開始一場尋寶：一連串簡短的謎題，會在任務追蹤器中逐步顯示。每條謎題都指向世界中真實存在的東西：要站到的地標、要交談的人、要在某處做出的表情，或是一件小差事，而最後一條總會要你挖掘。同一時間只能進行一場尋寶，它會跨越每日重置並在不同遊戲時段之間保留你的進度，所以不必著急。",
       "cluesCasketTitle": "寶匣",
-      "cluesCasketBody": "解開最後一條線索，在它指明的地點使用卷軸，挖出一只寶藏匣。打開它可以得到錢幣、一件適合你職業的裝備、幾枚英雄徽記，偶爾還有只有寶匣才裝得下的東西。你的第一只寶匣和第十只都會記入功績之書。",
+      "cluesCasketBody": "解開最後一條線索，在它指明的地點使用卷軸，挖出一只寶藏匣；完成尋寶還能獲得該地所屬陣營的聲望。打開它可以得到錢幣和一批優質採集材料。偶爾還會有一件裝備或幾枚英雄徽記，極少數情況下會出現別處無法獲得的坐騎「提燈背者格倫博」。你的第一只寶匣和第十只都會記入功績之書。",
       "sideTempleTitle": "沉沒的神殿",
       "sideTempleBody": "高峰之上一座高山湖泊中，一道蒼白光芒構成的門扉，通往一座沉沒的神殿，那裡有一群溺亡的邪教徒仍在歌唱。它那條短短的任務鏈獨立於主線故事之外，是一樁自成一體的謎團，獻給每一個攀上湖岸、讀懂刻在岩石上的警語，並下去一探那些警語究竟所為何來的人。",
       "availableTitle": "為什麼這位 NPC 沒有東西給你",

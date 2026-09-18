@@ -16720,6 +16720,22 @@ const RULES: Rule[] = [
       });
     },
   },
+  // Standing receipt (src/sim/world_quests.ts turn-in, src/sim/clue_scrolls.ts
+  // finished hunt): the amount and the faction's English name, resolved back to
+  // its id so the catalog carries the words.
+  {
+    re: /^\+(\S+) (.+) Standing\.$/,
+    build: (m) => {
+      const faction = FACTION_IDS.find((id) => FACTIONS[id].name === m[2]);
+      const amount = Number(m[1]);
+      return t('hudChrome.reputation.standingGained', {
+        amount: Number.isFinite(amount) ? formatNumber(amount, { maximumFractionDigits: 0 }) : m[1],
+        faction: faction
+          ? t(`hudChrome.reputation.faction.${faction}` as TranslationKey)
+          : m[2],
+      });
+    },
+  },
   {
     re: /^Your Umbral Anchor is out of range\.$/,
     build: () =>

@@ -12277,6 +12277,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.reputation.questsDoneValue'
   | 'hudChrome.reputation.resetsIn'
   | 'hudChrome.reputation.resetsUnknown'
+  | 'hudChrome.reputation.standingGained'
   | 'hudChrome.reputation.tier.champion'
   | 'hudChrome.reputation.tier.proven'
   | 'hudChrome.reputation.tier.recognized'

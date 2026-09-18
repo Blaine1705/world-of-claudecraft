@@ -7901,7 +7901,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '巻物を使うと宝探しが始まります。短い謎かけの連なりが、クエストトラッカーに一つずつ表示されます。どの謎かけも世界に実在する何かを指しています。立つべきランドマーク、話すべき人物、どこかで行うエモート、あるいはちょっとした用事で、最後の一つは必ず「掘れ」と告げます。宝探しは一度に一つだけ進み、日次リセットをまたいでもセッションの間でも進み具合が保たれるので、ゆっくり取り組めます。',
   'guide.questsPage.cluesCasketTitle': '小箱',
   'guide.questsPage.cluesCasketBody':
-    '最後の謎かけを解き、それが示す場所で巻物を使うと、宝の小箱を掘り出せます。開ければ硬貨、自分のクラス向けの装備一つ、いくらかの英雄の証、そして時おり小箱にしか入っていないものが手に入ります。最初の小箱と十個目は功績の書に記録されます。',
+    '最後の謎かけを解き、それが示す場所で巻物を使うと、宝の小箱を掘り出せます。宝探しを終えると、その地を治める勢力の評判も得られます。小箱からは硬貨と上質な採集素材がまとまって出ます。時には装備品や英雄の証が入っていることもあり、ごくまれに、ここでしか手に入らない騎乗動物「ランタンバックのグルンボル」が見つかります。最初の小箱と十個目は功績の書に記録されます。',
   'guide.questsPage.sideCryptBody':
     '高地には、より静かな謎が走っています。どんな記録にも残らぬ冠が刻まれた古い墓です。死者を読み解き、彼らが守ってきたものを集め、閉ざされたままであるべき墓を解き放ちましょう。それは探偵の足取りであり、レルムの十人エンドゲームレイドへの道を開きます。',
   'guide.questsPage.sideCryptTitle': '忘れられた王',
@@ -17281,6 +17281,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reputation.title': '勢力の称号',
   'hudChrome.reputation.legend': '評判の段階',
   'hudChrome.reputation.vendorGate': '{faction}との評判が{tier}以上必要です。',
+  'hudChrome.reputation.standingGained': '{faction}の評判 +{amount}',
   'hudChrome.reputation.tierReachedBanner': '{faction}との評判が{tier}になりました',
   'hudChrome.reputation.tierReachedSubtext': '勢力の称号：{title}',
   'hudChrome.reputation.tierReachedLine':

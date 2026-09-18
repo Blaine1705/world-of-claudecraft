@@ -437,17 +437,16 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noVendorSell: true,
     sellValue: 0,
   },
-  // Developer-only mount, on the same terms as the tank above (DEVELOPER_MOUNTS
-  // in content/mounts.ts): no vendor, quest, creature, heroic, or Rift source,
-  // and soulbound so a dev grant cannot be traded into the economy. Use
-  // /dev mounts or /dev give reins_lanternback_troll.
+  // The Treasure Casket's rare mount (src/sim/clue_casket.ts), its sole
+  // source. A player mount like every other: unbound reins that trade, mail
+  // and list, with the vendor path closed (sellValue 0).
   reins_lanternback_troll: {
     id: 'reins_lanternback_troll',
     name: "Lamplighter's Yoke: Grumbol",
     kind: 'mount',
     mount: 'lanternback_troll',
     quality: 'epic',
-    soulbound: true,
+    noVendorSell: true,
     noDiscard: true,
     sellValue: 0,
   },

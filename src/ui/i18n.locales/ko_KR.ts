@@ -7882,7 +7882,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '두루마리를 사용하면 보물찾기가 시작됩니다. 짧은 수수께끼의 연쇄가 임무 추적기에 한 단계씩 표시됩니다. 각 수수께끼는 세상에 실제로 있는 무언가를 가리킵니다. 서야 할 명소, 이야기할 사람, 어딘가에서 해야 할 감정 표현, 또는 작은 심부름이며, 마지막 단서는 언제나 파라고 합니다. 보물찾기는 한 번에 하나만 진행되고, 일일 초기화를 지나도 접속 사이에도 진행 상황이 유지되니 천천히 하셔도 됩니다.',
   'guide.questsPage.cluesCasketTitle': '보물 상자',
   'guide.questsPage.cluesCasketBody':
-    '마지막 단서를 풀고 그것이 가리키는 자리에서 두루마리를 사용하면 보물 상자를 파낼 수 있습니다. 열면 동전, 자기 직업에 맞는 장비 한 점, 영웅의 징표 몇 개, 그리고 이따금 상자에서만 나오는 무언가를 얻습니다. 첫 번째 상자와 열 번째 상자는 업적의 서에 기록됩니다.',
+    "마지막 단서를 풀고 단서가 가리키는 곳에서 두루마리를 사용하면 보물 상자를 파낼 수 있습니다. 보물찾기를 마치면 그 땅을 다스리는 세력의 평판도 얻습니다. 상자를 열면 주화와 고급 채집 재료 묶음이 나옵니다. 가끔 장비나 영웅의 징표가 들어 있고, 아주 드물게 다른 곳에서는 얻을 수 없는 탈것인 '등불지기 그룸볼'이 나옵니다. 첫 번째 상자와 열 번째 상자는 업적의 서에 기록됩니다.",
   'guide.questsPage.sideCryptBody':
     '봉우리 높은 곳에 한층 조용한 수수께끼가 흐릅니다. 어떤 기록에도 남지 않은 왕관이 새겨진 오래된 무덤들이지요. 죽은 자를 읽고, 그들이 지키던 것을 모아, 닫힌 채로 두려던 무덤의 봉인을 푸세요. 서버의 10인 최종 공격대로 가는 길을 여는 추리의 자취입니다.',
   'guide.questsPage.sideCryptTitle': '잊힌 왕',
@@ -17247,6 +17247,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reputation.title': '세력 칭호',
   'hudChrome.reputation.legend': '평판 단계',
   'hudChrome.reputation.vendorGate': '{faction}과(와) {tier} 평판이 필요합니다.',
+  'hudChrome.reputation.standingGained': '{faction} 평판 +{amount}',
   'hudChrome.reputation.tierReachedBanner': '{faction}과(와) {tier} 평판 달성',
   'hudChrome.reputation.tierReachedSubtext': '진영 칭호: {title}',
   'hudChrome.reputation.tierReachedLine':

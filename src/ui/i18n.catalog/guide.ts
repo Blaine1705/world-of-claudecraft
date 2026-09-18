@@ -1895,7 +1895,7 @@ export const guideStrings = {
       'Using a scroll starts a hunt: a short chain of riddles that shows in your quest tracker one step at a time. Each riddle points at something real in the world, a landmark to stand at, a person to talk to, an emote to perform somewhere, or a small errand to run, and the last one always asks you to dig. Only one hunt runs at a time, and it keeps your place across the daily reset and between sessions, so take your time.',
     cluesCasketTitle: 'The casket',
     cluesCasketBody:
-      'Solve the last clue and use the scroll on the spot it names to dig up a Treasure Casket. Open it for coin, a piece of gear for your class, a few marks, and now and then something only a casket can hold. Your first casket and your tenth are recorded in the Book of Deeds.',
+      'Solve the last clue and use the scroll on the spot it names to dig up a Treasure Casket; finishing the hunt also earns standing with the faction whose land hid it. Open the casket for coin and a stack of fine gathering materials. Now and then it holds a piece of gear or a few Heroic Marks, and very rarely Grumbol the Lanternback, a mount found nowhere else. Your first casket and your tenth are recorded in the Book of Deeds.',
     sideTempleTitle: 'The drowned temple',
     sideTempleBody:
       'A gate of pale light on a high tarn in the peaks opens onto a sunken shrine where a drowned cult still sings. Its short chain stands apart from the main story, a self-contained mystery for anyone who climbs to the shore, reads the warnings carved on the rocks, and goes down to see what they were for.',

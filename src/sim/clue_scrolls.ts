@@ -30,6 +30,12 @@ import {
   TREASURE_CASKET_ITEM_ID,
 } from './content/clue_hunts';
 import { zoneAt } from './data';
+import {
+  awardFactionReputation,
+  type FactionId,
+  factionDisplayName,
+  factionForZone,
+} from './factions';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { dist2d, type Entity, INTERACT_RANGE } from './types';
@@ -188,8 +194,37 @@ export function advanceClueHunt(ctx: SimContext, meta: PlayerMeta): void {
     meta.clueHunt = null;
     ctx.addItem(TREASURE_CASKET_ITEM_ID, 1, pid);
     ctx.emit({ type: 'clueHuntDone', huntId: active.def.id, pid });
+    awardClueHuntStanding(ctx, meta, active.def);
   }
   meta.wireRev++;
+}
+
+/** Standing a finished hunt pays the faction whose land hid the treasure. A
+ *  WORKING RULE: under two higher-band world quests (80 to 100 each), so the
+ *  hunt tops up a day's faction progress without becoming its main source. */
+export const CLUE_HUNT_STANDING = 150;
+
+/** The faction a hunt pays: the owner of the zone its last step sits in (every
+ *  authored hunt ends with a dig). Null for a zone no faction owns. */
+export function clueHuntFaction(def: ClueHuntDef): FactionId | null {
+  const last = def.steps[def.steps.length - 1];
+  return last && 'zoneId' in last ? factionForZone(last.zoneId) : null;
+}
+
+function awardClueHuntStanding(ctx: SimContext, meta: PlayerMeta, def: ClueHuntDef): void {
+  const factionId = clueHuntFaction(def);
+  const player = ctx.entities.get(meta.entityId);
+  if (!factionId || !player) return;
+  const result = awardFactionReputation(meta, factionId, CLUE_HUNT_STANDING, player.level);
+  if (result.gained <= 0) return;
+  // Standing feeds the prog_<faction>_* meter deeds (no narrow dirty key), and
+  // the receipt reuses the world-quest standing line the client re-localizes.
+  ctx.markDeedsDirty(meta.entityId);
+  ctx.emit({
+    type: 'loot',
+    text: `+${result.gained} ${factionDisplayName(factionId)} Standing.`,
+    pid: meta.entityId,
+  });
 }
 
 /** Starts `def` at step 0 (the scroll draw and the /dev clue hunt arm share it). */

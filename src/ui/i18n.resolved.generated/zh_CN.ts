@@ -2394,6 +2394,7 @@ export const zh_CN: EnTranslations = {
       "titleLine": "{faction} . {tier}",
       "legend": "声望等级",
       "vendorGate": "需要与{faction}达到{tier}。",
+      "standingGained": "{faction}声望 +{amount}",
       "tierReachedBanner": "与{faction}的声望达到{tier}",
       "tierReachedSubtext": "阵营头衔：{title}",
       "tierReachedLine": "你与{faction}的声望已达到{tier}。你的阵营头衔现在是{title}。"
@@ -7318,7 +7319,7 @@ export const zh_CN: EnTranslations = {
       "cluesHuntTitle": "跟随线索",
       "cluesHuntBody": "使用卷轴会开始一场寻宝：一连串简短的谜题，会在任务追踪器中逐步显示。每条谜题都指向世界中真实存在的东西：要站到的地标、要交谈的人、要在某处做出的表情，或是一件小差事，而最后一条总会让你挖掘。同一时间只能进行一场寻宝，它会跨越每日重置并在不同游戏时段之间保留你的进度，所以不必着急。",
       "cluesCasketTitle": "宝匣",
-      "cluesCasketBody": "解开最后一条线索，在它指明的地点使用卷轴，挖出一只宝藏匣。打开它可以得到钱币、一件适合你职业的装备、几枚英雄徽记，偶尔还有只有宝匣才装得下的东西。你的第一只宝匣和第十只都会记入功绩之书。",
+      "cluesCasketBody": "解开最后一条线索，在它指明的地点使用卷轴，挖出一只宝藏匣；完成寻宝还能获得该地所属阵营的声望。打开它可以得到钱币和一批优质采集材料。偶尔还会有一件装备或几枚英雄徽记，极少数情况下会出现别处无法获得的坐骑“提灯背者格伦博”。你的第一只宝匣和第十只都会记入功绩之书。",
       "sideTempleTitle": "溺没的神庙",
       "sideTempleBody": "高耸峰巅上一座高山湖泊之上，一道苍白光芒的传送门，通往一座沉没的神龛，那里仍有溺亡的邪教在歌唱。它那条短小的任务链独立于主线之外，是一桩自成一体的谜团，留给每一个攀上湖岸、读懂刻在岩石上的警告、并下潜去探明其缘由的人。",
       "availableTitle": "为什么这个 NPC 没有任务给你",

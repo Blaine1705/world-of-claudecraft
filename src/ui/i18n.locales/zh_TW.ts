@@ -7581,7 +7581,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '使用卷軸會開始一場尋寶：一連串簡短的謎題，會在任務追蹤器中逐步顯示。每條謎題都指向世界中真實存在的東西：要站到的地標、要交談的人、要在某處做出的表情，或是一件小差事，而最後一條總會要你挖掘。同一時間只能進行一場尋寶，它會跨越每日重置並在不同遊戲時段之間保留你的進度，所以不必著急。',
   'guide.questsPage.cluesCasketTitle': '寶匣',
   'guide.questsPage.cluesCasketBody':
-    '解開最後一條線索，在它指明的地點使用卷軸，挖出一只寶藏匣。打開它可以得到錢幣、一件適合你職業的裝備、幾枚英雄徽記，偶爾還有只有寶匣才裝得下的東西。你的第一只寶匣和第十只都會記入功績之書。',
+    '解開最後一條線索，在它指明的地點使用卷軸，挖出一只寶藏匣；完成尋寶還能獲得該地所屬陣營的聲望。打開它可以得到錢幣和一批優質採集材料。偶爾還會有一件裝備或幾枚英雄徽記，極少數情況下會出現別處無法獲得的坐騎「提燈背者格倫博」。你的第一只寶匣和第十只都會記入功績之書。',
   'guide.questsPage.sideCryptBody':
     '在群峰高處流傳著一樁更為靜謐的謎團：古老的墳墓上刻著一頂無任何記載記得的王冠。讀懂亡者，蒐集他們所守護之物，解封一座本應永遠緊閉的陵墓。這是一條偵探般的線索，為你開啟通往這個王國十人終局團隊副本的道路。',
   'guide.questsPage.sideCryptTitle': '被遺忘的國王',
@@ -16429,6 +16429,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reputation.title': '陣營頭銜',
   'hudChrome.reputation.legend': '聲望等級',
   'hudChrome.reputation.vendorGate': '需要與{faction}達到{tier}。',
+  'hudChrome.reputation.standingGained': '{faction}聲望 +{amount}',
   'hudChrome.reputation.tierReachedBanner': '與{faction}的聲望達到{tier}',
   'hudChrome.reputation.tierReachedSubtext': '陣營頭銜：{title}',
   'hudChrome.reputation.tierReachedLine':

@@ -2394,6 +2394,7 @@ export const es: EnTranslations = {
       "titleLine": "{faction} . {tier}",
       "legend": "Standing tiers",
       "vendorGate": "Requires {tier} with {faction}.",
+      "standingGained": "+{amount} {faction} Standing.",
       "tierReachedBanner": "Now {tier} with the {faction}",
       "tierReachedSubtext": "Faction title: {title}",
       "tierReachedLine": "You are now {tier} with the {faction}. Your faction title is now {title}."
@@ -7318,7 +7319,7 @@ export const es: EnTranslations = {
       "cluesHuntTitle": "Following the clues",
       "cluesHuntBody": "Using a scroll starts a hunt: a short chain of riddles that shows in your quest tracker one step at a time. Each riddle points at something real in the world, a landmark to stand at, a person to talk to, an emote to perform somewhere, or a small errand to run, and the last one always asks you to dig. Only one hunt runs at a time, and it keeps your place across the daily reset and between sessions, so take your time.",
       "cluesCasketTitle": "The casket",
-      "cluesCasketBody": "Solve the last clue and use the scroll on the spot it names to dig up a Treasure Casket. Open it for coin, a piece of gear for your class, a few marks, and now and then something only a casket can hold. Your first casket and your tenth are recorded in the Book of Deeds.",
+      "cluesCasketBody": "Solve the last clue and use the scroll on the spot it names to dig up a Treasure Casket; finishing the hunt also earns standing with the faction whose land hid it. Open the casket for coin and a stack of fine gathering materials. Now and then it holds a piece of gear or a few Heroic Marks, and very rarely Grumbol the Lanternback, a mount found nowhere else. Your first casket and your tenth are recorded in the Book of Deeds.",
       "sideTempleTitle": "El Templo Ahogado",
       "sideTempleBody": "Una puerta de luz pálida sobre un lago de montaña en las cumbres se abre a un santuario hundido donde un culto ahogado aún canta. Su breve cadena de misiones queda aparte de la historia principal, un misterio autónomo para quien suba hasta la orilla, lea las advertencias talladas en las rocas y baje a ver para qué servían.",
       "availableTitle": "Por qué un PNJ no tiene nada para ti",

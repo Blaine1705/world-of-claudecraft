@@ -9,13 +9,20 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   CASKET_COPPER_BASE,
   CASKET_COPPER_PER_LEVEL,
+  CASKET_GEAR_CHANCE,
+  CASKET_HEROIC_MARK_CHANCE,
   CASKET_HEROIC_MARKS,
-  CASKET_RARE_SECOND_PIECE_CHANCE,
+  CASKET_MATERIAL_COUNT,
+  CASKET_MATERIAL_POOL,
+  CASKET_MOUNT_CHANCE,
+  CASKET_MOUNT_REINS_ITEM_ID,
   openTreasureCasket,
   treasureCasketCopper,
 } from '../src/sim/clue_casket';
 import {
+  CLUE_HUNT_STANDING,
   CLUE_HUNT_TEST_POOL,
+  clueHuntFaction,
   maybeAwardClueScroll,
   sanitizeClueHunt,
   worldQuestSlateComplete,
@@ -591,6 +598,8 @@ describe('the dig step (using the scroll on the spot)', () => {
     // On the spot.
     placeAt(sim, DIG_SPOT.x + 2, DIG_SPOT.z - 2);
     const rev = meta.wireRev;
+    const standingBefore = meta.factions?.automatons ?? 0;
+    const riftBefore = meta.factions?.rift_watch ?? 0;
     sim.useItem(CLUE_SCROLL_ITEM_ID);
     evs = sim.drainEvents();
     expect(meta.clueHunt).toBeNull();
@@ -598,8 +607,14 @@ describe('the dig step (using the scroll on the spot)', () => {
     expect(sim.countItem(CLUE_SCROLL_ITEM_ID)).toBe(1);
     expect(sim.countItem(TREASURE_CASKET_ITEM_ID)).toBe(1);
     expect(meta.wireRev).toBeGreaterThan(rev);
-    // Emit order: the step, the casket receipt, then done.
-    expect(evs.map((ev) => ev.type)).toEqual(['clueHuntStep', 'loot', 'clueHuntDone']);
+    // Emit order: the step, the casket receipt, done, then the standing receipt.
+    expect(evs.map((ev) => ev.type)).toEqual(['clueHuntStep', 'loot', 'clueHuntDone', 'loot']);
+    // The hunt digs in the Drakelands, so the automaton faction is paid, and
+    // only it.
+    expect(clueHuntFaction(TEST_HUNT)).toBe('automatons');
+    expect((meta.factions?.automatons ?? 0) - standingBefore).toBe(CLUE_HUNT_STANDING);
+    expect(meta.factions?.rift_watch ?? 0).toBe(riftBefore);
+    expect(ofType(evs, 'loot')[1].text).toBe(`+${CLUE_HUNT_STANDING} Automatons Standing.`);
     expect(ofType(evs, 'clueHuntStep')[0]).toEqual({
       type: 'clueHuntStep',
       huntId: TEST_HUNT.id,
@@ -657,8 +672,7 @@ describe('abandon', () => {
 // The casket
 
 describe('the Treasure Casket', () => {
-  it('pays the copper formula, one delve piece, the marks, bumps the count and marks deeds dirty', () => {
-    // autoEquip off: the plate piece must stay in the bags to be counted.
+  it('pays the copper formula and a stack of one top-tier material, bumps the count and marks deeds dirty', () => {
     const sim = huntSim(4711, 20, false);
     const meta = metaOf(sim);
     sim.addItem(TREASURE_CASKET_ITEM_ID, 1);
@@ -670,17 +684,14 @@ describe('the Treasure Casket', () => {
     expect(sim.countItem(TREASURE_CASKET_ITEM_ID)).toBe(0);
     expect(meta.copper - copperBefore).toBe(CASKET_COPPER_BASE + CASKET_COPPER_PER_LEVEL * 20);
     expect(treasureCasketCopper(20)).toBe(60_000);
-    expect(sim.countItem(HEROIC_MARK_ITEM_ID)).toBe(CASKET_HEROIC_MARKS);
     const opened = ofType(evs, 'clueCasketOpened');
     expect(opened).toHaveLength(1);
     expect(opened[0].copper).toBe(60_000);
     expect(opened[0].pid).toBe(sim.playerId);
-    // A warrior's top delve rung: one of the two premium plate pieces.
-    const piece = opened[0].itemIds[0];
-    expect(['deacon_reliquary_helm', 'reliquary_plate_chest']).toContain(piece);
-    expect(sim.countItem(piece)).toBe(1);
-    expect(opened[0].itemIds[1]).toBe(HEROIC_MARK_ITEM_ID);
-    expect(opened[0].itemIds.length).toBeLessThanOrEqual(3);
+    // The guaranteed grant comes first: one material from the pool, stacked.
+    const material = opened[0].itemIds[0];
+    expect(CASKET_MATERIAL_POOL).toContain(material);
+    expect(sim.countItem(material)).toBe(CASKET_MATERIAL_COUNT);
     expect(meta.clueCasketsOpened).toBe(1);
     expect(sim.ctx.deedDirtyPids.has(sim.playerId)).toBe(true);
     // The count is what the deed meter reads, and the first-casket deed lands.
@@ -694,36 +705,97 @@ describe('the Treasure Casket', () => {
     expect(METER_DIRTY_KEYS.clueCasketsOpened).toEqual([]);
   });
 
-  it('rolls the rare second piece at CASKET_RARE_SECOND_PIECE_CHANCE', () => {
-    // A fake ctx around a real Rng: the payout is a pure function of the
-    // rng, so the odds are pinned across seeds without a Sim per roll.
-    let second = 0;
-    const TRIALS = 2000;
+  // A fake ctx around a real Rng: the payout is a pure function of the rng,
+  // so the odds are pinned across seeds without a Sim per roll.
+  function openWithSeed(seed: number, ownedReins = false) {
+    const grants: { itemId: string; count: number }[] = [];
+    const emits: SimEvent[] = [];
+    const meta = {
+      entityId: 1,
+      cls: 'mage',
+      copper: 0,
+      clueCasketsOpened: 4,
+      inventory: ownedReins ? [{ itemId: CASKET_MOUNT_REINS_ITEM_ID, count: 1 }] : [],
+      bank: { inventory: [] },
+    } as unknown as PlayerMeta;
+    const ctx = {
+      rng: new Rng(seed),
+      addItem: (itemId: string, count: number) => grants.push({ itemId, count }),
+      emit: (ev: SimEvent) => emits.push(ev),
+      markDeedsDirty: vi.fn(),
+    } as unknown as SimContext;
+    let spent = 0;
+    openTreasureCasket(ctx, meta, { level: 17 } as Entity, () => spent++);
+    return { grants, emits, meta, ctx, spent };
+  }
+
+  it('rolls gear, marks and the Lanternback at their pinned odds, in a fixed order', () => {
+    expect(CASKET_GEAR_CHANCE).toBe(0.1);
+    expect(CASKET_HEROIC_MARK_CHANCE).toBe(0.05);
+    expect(CASKET_MOUNT_CHANCE).toBe(0.015);
+    const TRIALS = 6000;
+    let gear = 0;
+    let marks = 0;
+    let mount = 0;
+    const materials = new Set<string>();
     for (let seed = 1; seed <= TRIALS; seed++) {
-      const grants: string[] = [];
-      const emits: SimEvent[] = [];
-      const meta = { entityId: 1, cls: 'mage', copper: 0, clueCasketsOpened: 4 } as PlayerMeta;
-      const ctx = {
-        rng: new Rng(seed),
-        addItem: (itemId: string) => grants.push(itemId),
-        emit: (ev: SimEvent) => emits.push(ev),
-        markDeedsDirty: vi.fn(),
-      } as unknown as SimContext;
-      let spent = 0;
-      openTreasureCasket(ctx, meta, { level: 17 } as Entity, () => spent++);
+      const { grants, emits, meta, ctx, spent } = openWithSeed(seed);
       expect(spent).toBe(1);
       expect(meta.copper).toBe(CASKET_COPPER_BASE + CASKET_COPPER_PER_LEVEL * 17);
       expect(meta.clueCasketsOpened).toBe(5);
       expect(ctx.markDeedsDirty).toHaveBeenCalledWith(1);
       const opened = ofType(emits, 'clueCasketOpened')[0];
-      expect(opened.itemIds).toEqual(grants);
-      expect(['varric_shadow_cowl', 'reliquary_cloth_chest']).toContain(grants[0]);
-      expect(grants[1]).toBe(HEROIC_MARK_ITEM_ID);
-      if (grants.length === 3) second++;
+      expect(opened.itemIds).toEqual(grants.map((g) => g.itemId));
+      // Always first: the material stack.
+      expect(CASKET_MATERIAL_POOL).toContain(grants[0].itemId);
+      expect(grants[0].count).toBe(CASKET_MATERIAL_COUNT);
+      materials.add(grants[0].itemId);
+      // Then the extras, each at most once and in gear, marks, mount order.
+      const rest = grants.slice(1).map((g) => g.itemId);
+      const kinds = rest.map((id) =>
+        id === HEROIC_MARK_ITEM_ID ? 'marks' : id === CASKET_MOUNT_REINS_ITEM_ID ? 'mount' : 'gear',
+      );
+      expect(
+        [...kinds].sort(
+          (x, y) => ['gear', 'marks', 'mount'].indexOf(x) - ['gear', 'marks', 'mount'].indexOf(y),
+        ),
+      ).toEqual(kinds);
+      expect(new Set(kinds).size).toBe(kinds.length);
+      for (const g of grants.slice(1)) {
+        if (g.itemId === HEROIC_MARK_ITEM_ID) {
+          expect(g.count).toBe(CASKET_HEROIC_MARKS);
+          marks++;
+        } else if (g.itemId === CASKET_MOUNT_REINS_ITEM_ID) {
+          expect(g.count).toBe(1);
+          mount++;
+        } else {
+          // A caster's lowest delve rung: one of the two reliquary pieces.
+          expect(['reliquary_legs', 'reliquary_shoulder']).toContain(g.itemId);
+          gear++;
+        }
+      }
     }
-    const rate = second / TRIALS;
-    expect(rate).toBeGreaterThan(CASKET_RARE_SECOND_PIECE_CHANCE - 0.02);
-    expect(rate).toBeLessThan(CASKET_RARE_SECOND_PIECE_CHANCE + 0.02);
+    expect([...materials].sort()).toEqual([...CASKET_MATERIAL_POOL].sort());
+    expect(gear / TRIALS).toBeGreaterThan(CASKET_GEAR_CHANCE - 0.02);
+    expect(gear / TRIALS).toBeLessThan(CASKET_GEAR_CHANCE + 0.02);
+    expect(marks / TRIALS).toBeGreaterThan(CASKET_HEROIC_MARK_CHANCE - 0.015);
+    expect(marks / TRIALS).toBeLessThan(CASKET_HEROIC_MARK_CHANCE + 0.015);
+    expect(mount / TRIALS).toBeGreaterThan(CASKET_MOUNT_CHANCE - 0.008);
+    expect(mount / TRIALS).toBeLessThan(CASKET_MOUNT_CHANCE + 0.008);
+  });
+
+  it('never hands the Lanternback to an owner, and draws the same rng sequence either way', () => {
+    let rolledMount = 0;
+    for (let seed = 1; seed <= 3000; seed++) {
+      const fresh = openWithSeed(seed).grants.map((g) => g.itemId);
+      const owner = openWithSeed(seed, true).grants.map((g) => g.itemId);
+      expect(owner).not.toContain(CASKET_MOUNT_REINS_ITEM_ID);
+      // The owner's grants are the fresh grants minus the reins: the mount
+      // roll is always drawn, so every other outcome matches seed for seed.
+      expect(owner).toEqual(fresh.filter((id) => id !== CASKET_MOUNT_REINS_ITEM_ID));
+      if (fresh.includes(CASKET_MOUNT_REINS_ITEM_ID)) rolledMount++;
+    }
+    expect(rolledMount).toBeGreaterThan(0);
   });
 });
 
