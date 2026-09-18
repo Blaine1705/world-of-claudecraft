@@ -179,7 +179,7 @@ describe('stackSizeTooltipLine', () => {
       path.join(__dirname, '../src/ui/stack_size_tooltip_view.ts'),
       'utf8',
     ).replace(/^\s*\/\/.*$/gm, '');
-    expect(viewSrc).toContain('${esc(text)}');
+    expect(viewSrc).toContain('$' + '{esc(text)}');
   });
 
   it('Hud.itemTooltip composes the max-stack line (method-scoped source pin)', () => {

@@ -180,9 +180,7 @@ describe('linkDiscordToAccount', () => {
     );
     expect(ok).toBe(false);
     const insert = calls.find((c) => c.sql.includes('INSERT INTO discord_links'));
-    expect(insert!.sql).toContain(
-      'WHERE discord_links.discord_user_id = EXCLUDED.discord_user_id',
-    );
+    expect(insert!.sql).toContain('WHERE discord_links.discord_user_id = EXCLUDED.discord_user_id');
   });
 });
 
