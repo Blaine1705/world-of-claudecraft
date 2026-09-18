@@ -27,7 +27,11 @@
 import { afflictionPossessionEmpowers } from '../../../sim/combat/affliction';
 import { aetherDartsProcGlowActive } from '../../../sim/combat/chronomancy';
 import { destructionProcGlowActive, ruinAmountFromAuras } from '../../../sim/combat/destruction';
-import { naturesBoonArmedFor } from '../../../sim/combat/druid_natures_boon';
+import {
+  NATURES_BOON_ID,
+  naturesBoonArmedFor,
+  naturesBoonFormAllows,
+} from '../../../sim/combat/druid_natures_boon';
 import {
   freeCostAuraActive,
   nextCastCheapMultiplierFromAuras,
@@ -405,7 +409,16 @@ function hasEmpoweringAura(
 ): boolean {
   if (!auras) return false;
   for (const aura of auras) {
-    if (auraCanEmpowerAbility(aura, ability)) return true;
+    if (!auraCanEmpowerAbility(aura, ability)) continue;
+    // Nature's Boon is the one empower aura whose scope is narrowed further by
+    // the druid's FORM: its bear-only member (Oakhide) is refused out of Bruin
+    // Form by the cast gate AND by the free-cost tail, so the empowered
+    // highlight has to ask the same predicate. Without this the bar promises a
+    // free Oakhide to a Cat Form druid that the sim then refuses, which is the
+    // exact affordance-versus-behavior split the passive's form gate exists to
+    // avoid. Keyed on the aura id so no other empower aura changes behavior.
+    if (aura.id === NATURES_BOON_ID && !naturesBoonFormAllows(auras, ability.def.id)) continue;
+    return true;
   }
   return false;
 }

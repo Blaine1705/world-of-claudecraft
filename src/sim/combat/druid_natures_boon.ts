@@ -1,9 +1,10 @@
 // Nature's Boon, the Wildfang autoattack passive (v0.43 feral pass).
 //
-// Every LANDED melee auto-attack a committed feral druid makes has a 10%
-// chance to arm one free spell for 10 seconds. The armed window covers BOTH
-// spells at once and the player chooses which to spend it on: whichever of
-// Wildbloom or Lunar Tempest is cast first consumes it, and the other reverts.
+// Every LANDED melee auto-attack a committed feral druid makes has a 1-in-15
+// chance to arm one free spell for 10 seconds, which at Cat Form's fixed 1.0
+// sec swing reads as about one proc every 15 seconds. The armed window covers
+// BOTH members at once and the player chooses which to spend it on: whichever
+// of Wildbloom or Oakhide is cast first consumes it, and the other reverts.
 //
 // Two things make the window worth having in a form, and both are deliberate:
 //
@@ -26,7 +27,7 @@
 // the hook sits rather than a check inside it, so it is pinned by a test
 // rather than restated here as a guard that could never fire.
 //
-// Determinism: the 10% roll is drawn ONLY after the feral-druid gate has
+// Determinism: the 1-in-15 roll is drawn ONLY after the feral-druid gate has
 // passed, so a non-feral player's rng stream stays byte-identical (the
 // Cinderbark 2pc precedent in druid_engines.ts). It is one draw per landed
 // MELEE auto-attack, never per ability swing and never per wand bolt.
@@ -64,8 +65,9 @@ export const NATURES_BOON_ABILITIES: readonly string[] = ['rejuvenation', 'barks
 /** Members the window only pays for while the druid is a bear. Oakhide is a
  *  Bruin mitigation cooldown, so a free one out of Bruin Form would be a free
  *  caster-form armor buff instead of the tank payoff it is meant to be. The
- *  action bar asks the same predicate, so the golden rim on Oakhide appears in
- *  Bruin Form and nowhere else. */
+ *  action bar asks the same predicate on BOTH of its highlights, so the golden
+ *  rim and the empowered treatment on Oakhide appear in Bruin Form and nowhere
+ *  else. */
 const NATURES_BOON_BEAR_ONLY: ReadonlySet<string> = new Set(['barkskin']);
 const BEAR_FORM_KIND = 'form_bear';
 function boonAbilityList(): string[] {
@@ -80,9 +82,13 @@ interface BoonAura {
 }
 
 /** Does the druid's current form allow the window to pay for this ability?
- *  True for every member but the bear-only ones, which need Bruin Form. The
- *  cast gate, the free-cost tail and the action bar's rim all ask this, so a
- *  caster-form Oakhide is refused the window in all three at once. */
+ *  True for every member but the bear-only ones, which need Bruin Form.
+ *  FOUR consumers ask it, and every one of them has to: the cast gate, the
+ *  free-cost tail, the action bar's golden rim, and the bar's generic
+ *  `empowered` highlight (that fourth one was missed once, and a Cat Form bar
+ *  advertised a free Oakhide the cast gate then refused). Any new surface that
+ *  reads the window asks this too, or it promises a cast the sim will not
+ *  honour. */
 export function naturesBoonFormAllows(
   auras: readonly { kind: string }[],
   abilityId: string,
@@ -159,8 +165,9 @@ function armNaturesBoon(ctx: SimContext, player: Entity): void {
   });
 }
 
-/** The landed-auto-attack hook (combat/auto_attack.ts). Rolls the 10% only for
- *  a committed feral druid; everybody else returns before touching the rng. */
+/** The landed-auto-attack hook (combat/auto_attack.ts). Rolls the 1-in-15 only
+ *  for a committed feral druid; everybody else returns before touching the
+ *  rng. */
 export function naturesBoonOnAutoAttack(ctx: SimContext, player: Entity): void {
   if (!isWildfangDruid(ctx, player)) return;
   if (!ctx.rng.chance(NATURES_BOON_CHANCE)) return;
