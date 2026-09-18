@@ -518,6 +518,10 @@ export const ru_RU: EnTranslations = {
     },
     "trade": {
       "windowClosed": "Окно обмена закрыто.",
+      "offerPartialHint": "Shift+клик, чтобы предложить часть",
+      "offerQuantityTitle": "Предложить {item}",
+      "offerQuantityInput": "Количество для предложения",
+      "offerQuantityConfirm": "Предложить",
       "woc": {
         "tabGold": "Золото",
         "tabWoc": "$WOC",

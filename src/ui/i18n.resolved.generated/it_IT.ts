@@ -518,6 +518,10 @@ export const it_IT: EnTranslations = {
     },
     "trade": {
       "windowClosed": "Finestra di scambio chiusa.",
+      "offerPartialHint": "Shift-click to offer a partial amount",
+      "offerQuantityTitle": "Offer {item}",
+      "offerQuantityInput": "Quantity to offer",
+      "offerQuantityConfirm": "Offer",
       "woc": {
         "tabGold": "Oro",
         "tabWoc": "$WOC",

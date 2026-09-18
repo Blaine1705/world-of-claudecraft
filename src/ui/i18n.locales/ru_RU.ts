@@ -16395,6 +16395,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.thornhollowPage.backfillNote':
     'Занять место по добору намеренно ничем не грозит: вы попадаете в счет, к которому не имели отношения, поэтому матч не тронет ваш рейтинг ни при победе, ни при поражении, а уход из такого матча ничего не стоит. Предложение перестает приходить и тогда, когда матч подошел к концу настолько, что новый боец уже ничего не изменит, так что вас никогда не посадят в чужую развязку.',
   'hudChrome.trade.windowClosed': 'Окно обмена закрыто.',
+  'hudChrome.trade.offerPartialHint': 'Shift+клик, чтобы предложить часть',
+  'hudChrome.trade.offerQuantityTitle': 'Предложить {item}',
+  'hudChrome.trade.offerQuantityInput': 'Количество для предложения',
+  'hudChrome.trade.offerQuantityConfirm': 'Предложить',
   'hudChrome.trade.woc.hintInsufficientBalance':
     'Это больше $WOC, чем есть в подключённом кошельке.',
   'hudChrome.trade.woc.priceLabel': 'Цена в долларах',

@@ -518,6 +518,10 @@ export const es: EnTranslations = {
     },
     "trade": {
       "windowClosed": "Ventana de comercio cerrada.",
+      "offerPartialHint": "Shift-click to offer a partial amount",
+      "offerQuantityTitle": "Offer {item}",
+      "offerQuantityInput": "Quantity to offer",
+      "offerQuantityConfirm": "Offer",
       "woc": {
         "tabGold": "Oro",
         "tabWoc": "$WOC",

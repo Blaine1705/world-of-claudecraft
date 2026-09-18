@@ -518,6 +518,10 @@ export const nl_NL: EnTranslations = {
     },
     "trade": {
       "windowClosed": "Ruilvenster gesloten.",
+      "offerPartialHint": "Shift-click to offer a partial amount",
+      "offerQuantityTitle": "Offer {item}",
+      "offerQuantityInput": "Quantity to offer",
+      "offerQuantityConfirm": "Offer",
       "woc": {
         "tabGold": "Goud",
         "tabWoc": "$WOC",

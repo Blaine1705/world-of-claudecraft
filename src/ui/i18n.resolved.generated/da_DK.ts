@@ -518,6 +518,10 @@ export const da_DK: EnTranslations = {
     },
     "trade": {
       "windowClosed": "Handelsvinduet er lukket.",
+      "offerPartialHint": "Shift-click to offer a partial amount",
+      "offerQuantityTitle": "Offer {item}",
+      "offerQuantityInput": "Quantity to offer",
+      "offerQuantityConfirm": "Offer",
       "woc": {
         "tabGold": "Guld",
         "tabWoc": "$WOC",

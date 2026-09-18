@@ -518,6 +518,10 @@ export const ko_KR: EnTranslations = {
     },
     "trade": {
       "windowClosed": "거래 창이 닫혔습니다.",
+      "offerPartialHint": "Shift+클릭하여 일부만 내놓기",
+      "offerQuantityTitle": "{item} 내놓기",
+      "offerQuantityInput": "내놓을 수량",
+      "offerQuantityConfirm": "내놓기",
       "woc": {
         "tabGold": "금화",
         "tabWoc": "$WOC",

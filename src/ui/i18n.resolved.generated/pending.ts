@@ -9,25 +9,100 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.trade.offerPartialHint",
+    "hudChrome.trade.offerQuantityConfirm",
+    "hudChrome.trade.offerQuantityInput",
+    "hudChrome.trade.offerQuantityTitle"
+  ],
+  "es_ES": [
+    "hudChrome.trade.offerPartialHint",
+    "hudChrome.trade.offerQuantityConfirm",
+    "hudChrome.trade.offerQuantityInput",
+    "hudChrome.trade.offerQuantityTitle"
+  ],
+  "fr_FR": [
+    "hudChrome.trade.offerPartialHint",
+    "hudChrome.trade.offerQuantityConfirm",
+    "hudChrome.trade.offerQuantityInput",
+    "hudChrome.trade.offerQuantityTitle"
+  ],
+  "fr_CA": [
+    "hudChrome.trade.offerPartialHint",
+    "hudChrome.trade.offerQuantityConfirm",
+    "hudChrome.trade.offerQuantityInput",
+    "hudChrome.trade.offerQuantityTitle"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.trade.offerPartialHint",
+    "hudChrome.trade.offerQuantityConfirm",
+    "hudChrome.trade.offerQuantityInput",
+    "hudChrome.trade.offerQuantityTitle"
+  ],
+  "de_DE": [
+    "hudChrome.trade.offerPartialHint",
+    "hudChrome.trade.offerQuantityConfirm",
+    "hudChrome.trade.offerQuantityInput",
+    "hudChrome.trade.offerQuantityTitle"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.trade.offerPartialHint",
+    "hudChrome.trade.offerQuantityConfirm",
+    "hudChrome.trade.offerQuantityInput",
+    "hudChrome.trade.offerQuantityTitle"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.trade.offerPartialHint",
+    "hudChrome.trade.offerQuantityConfirm",
+    "hudChrome.trade.offerQuantityInput",
+    "hudChrome.trade.offerQuantityTitle"
+  ],
+  "nl_NL": [
+    "hudChrome.trade.offerPartialHint",
+    "hudChrome.trade.offerQuantityConfirm",
+    "hudChrome.trade.offerQuantityInput",
+    "hudChrome.trade.offerQuantityTitle"
+  ],
+  "pl_PL": [
+    "hudChrome.trade.offerPartialHint",
+    "hudChrome.trade.offerQuantityConfirm",
+    "hudChrome.trade.offerQuantityInput",
+    "hudChrome.trade.offerQuantityTitle"
+  ],
+  "id_ID": [
+    "hudChrome.trade.offerPartialHint",
+    "hudChrome.trade.offerQuantityConfirm",
+    "hudChrome.trade.offerQuantityInput",
+    "hudChrome.trade.offerQuantityTitle"
+  ],
+  "tr_TR": [
+    "hudChrome.trade.offerPartialHint",
+    "hudChrome.trade.offerQuantityConfirm",
+    "hudChrome.trade.offerQuantityInput",
+    "hudChrome.trade.offerQuantityTitle"
+  ],
+  "sv_SE": [
+    "hudChrome.trade.offerPartialHint",
+    "hudChrome.trade.offerQuantityConfirm",
+    "hudChrome.trade.offerQuantityInput",
+    "hudChrome.trade.offerQuantityTitle"
+  ],
+  "vi_VN": [
+    "hudChrome.trade.offerPartialHint",
+    "hudChrome.trade.offerQuantityConfirm",
+    "hudChrome.trade.offerQuantityInput",
+    "hudChrome.trade.offerQuantityTitle"
+  ],
+  "da_DK": [
+    "hudChrome.trade.offerPartialHint",
+    "hudChrome.trade.offerQuantityConfirm",
+    "hudChrome.trade.offerQuantityInput",
+    "hudChrome.trade.offerQuantityTitle"
+  ]
 };

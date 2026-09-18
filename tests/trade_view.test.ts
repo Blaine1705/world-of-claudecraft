@@ -10,7 +10,15 @@ import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import type { InvSlot } from '../src/sim/types';
 import { itemDisplayName } from '../src/ui/entity_i18n';
-import { buildTradeItemRow, tradeOfferCeiling, tradeRowTooltipTarget } from '../src/ui/trade_view';
+import {
+  buildTradeItemRow,
+  resolveTradeOfferSubmit,
+  stageTradeOffer,
+  TRADE_OFFER_MAX_LINES,
+  tradeOfferCeiling,
+  tradeOfferHeadroom,
+  tradeRowTooltipTarget,
+} from '../src/ui/trade_view';
 
 describe('tradeOfferCeiling (trade offer stepper cap)', () => {
   it('sums an item split across multiple bag slots instead of capping at one slot', () => {
@@ -42,6 +50,91 @@ describe('tradeOfferCeiling (trade offer stepper cap)', () => {
   it('returns 0 when the item is not held at all', () => {
     const inventory: InvSlot[] = [{ itemId: 'mat_linen_cloth', count: 20 }];
     expect(tradeOfferCeiling(inventory, 'mat_wool_cloth')).toBe(0);
+  });
+});
+
+describe('tradeOfferHeadroom (offer-quantity prompt ceiling)', () => {
+  const inventory: InvSlot[] = [
+    { itemId: 'mat_linen_cloth', count: 20 },
+    { itemId: 'mat_linen_cloth', count: 5 },
+    { itemId: 'mat_wool_cloth', count: 3 },
+  ];
+
+  it('is the summed held total minus what the offer already carries', () => {
+    expect(tradeOfferHeadroom([], inventory, 'mat_linen_cloth')).toBe(25);
+    expect(
+      tradeOfferHeadroom([{ itemId: 'mat_linen_cloth', count: 10 }], inventory, 'mat_linen_cloth'),
+    ).toBe(15);
+    expect(
+      tradeOfferHeadroom([{ itemId: 'mat_linen_cloth', count: 25 }], inventory, 'mat_linen_cloth'),
+    ).toBe(0);
+  });
+
+  it('never goes negative when the bags shrank under a staged line', () => {
+    expect(
+      tradeOfferHeadroom([{ itemId: 'mat_wool_cloth', count: 9 }], inventory, 'mat_wool_cloth'),
+    ).toBe(0);
+  });
+
+  it('is 0 for a NEW line once the offer holds the sim line cap', () => {
+    const full: InvSlot[] = Array.from({ length: TRADE_OFFER_MAX_LINES }, (_, i) => ({
+      itemId: `filler_${i}`,
+      count: 1,
+    }));
+    expect(tradeOfferHeadroom(full, inventory, 'mat_linen_cloth')).toBe(0);
+    // An EXISTING line can still grow at the cap.
+    full[0] = { itemId: 'mat_linen_cloth', count: 1 };
+    expect(tradeOfferHeadroom(full, inventory, 'mat_linen_cloth')).toBe(24);
+  });
+});
+
+describe('stageTradeOffer (counted stage, the plain click and the prompt)', () => {
+  const inventory: InvSlot[] = [
+    { itemId: 'mat_linen_cloth', count: 20 },
+    { itemId: 'mat_linen_cloth', count: 5 },
+  ];
+
+  it('stages a new line with the requested count and reports it', () => {
+    const staged: InvSlot[] = [];
+    expect(stageTradeOffer(staged, inventory, 'mat_linen_cloth', 12)).toBe(12);
+    expect(staged).toEqual([{ itemId: 'mat_linen_cloth', count: 12 }]);
+  });
+
+  it('grows an existing line in place (the Hud-owned live object)', () => {
+    const line = { itemId: 'mat_linen_cloth', count: 3 };
+    const staged: InvSlot[] = [line];
+    expect(stageTradeOffer(staged, inventory, 'mat_linen_cloth', 1)).toBe(1);
+    expect(staged[0]).toBe(line);
+    expect(line.count).toBe(4);
+  });
+
+  it('clamps to the summed held total and reports only what fit', () => {
+    const staged: InvSlot[] = [{ itemId: 'mat_linen_cloth', count: 20 }];
+    expect(stageTradeOffer(staged, inventory, 'mat_linen_cloth', 50)).toBe(5);
+    expect(staged).toEqual([{ itemId: 'mat_linen_cloth', count: 25 }]);
+  });
+
+  it('stages nothing (and says so) when no room is left or the count is empty', () => {
+    const staged: InvSlot[] = [{ itemId: 'mat_linen_cloth', count: 25 }];
+    expect(stageTradeOffer(staged, inventory, 'mat_linen_cloth', 1)).toBe(0);
+    expect(stageTradeOffer([], inventory, 'mat_linen_cloth', 0)).toBe(0);
+    expect(stageTradeOffer([], inventory, 'mat_wool_cloth', 4)).toBe(0);
+    expect(staged).toEqual([{ itemId: 'mat_linen_cloth', count: 25 }]);
+  });
+});
+
+describe('resolveTradeOfferSubmit (the prompt stale guard)', () => {
+  it('refuses when nothing fits any more (trade closed, stack gone, line full)', () => {
+    expect(resolveTradeOfferSubmit(0, 5)).toBeNull();
+    expect(resolveTradeOfferSubmit(-1, 5)).toBeNull();
+  });
+
+  it('clamps the typed count into [1, live headroom]', () => {
+    expect(resolveTradeOfferSubmit(10, 4)).toBe(4);
+    expect(resolveTradeOfferSubmit(10, 40)).toBe(10);
+    expect(resolveTradeOfferSubmit(10, 0)).toBe(1);
+    expect(resolveTradeOfferSubmit(10, Number.NaN)).toBe(1);
+    expect(resolveTradeOfferSubmit(10, 2.9)).toBe(2);
   });
 });
 

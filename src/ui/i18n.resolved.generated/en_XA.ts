@@ -518,6 +518,10 @@ export const en_XA: EnTranslations = {
     },
     "trade": {
       "windowClosed": "[Ţŕáðé ŵíñðóŵ çļóšéð.]",
+      "offerPartialHint": "[Šĥíƒţ-çļíçķ ţó óƒƒéŕ á þáŕţíáļ áɱóúñţ]",
+      "offerQuantityTitle": "[Óƒƒéŕ {item}]",
+      "offerQuantityInput": "[Ɋúáñţíţý ţó óƒƒéŕ]",
+      "offerQuantityConfirm": "[Óƒƒéŕ]",
       "woc": {
         "tabGold": "[Ĝóļð]",
         "tabWoc": "[$ŴÓÇ]",

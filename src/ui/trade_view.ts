@@ -31,6 +31,53 @@ export function tradeOfferCeiling(inventory: InvSlot[], itemId: string): number 
   return countRawInSlots(inventory, itemId);
 }
 
+/** The most offer LINES one side of a gold trade may stage (the sim's own
+ *  `items.slice(0, 6)` cap in src/sim/social/trade.ts tradeSetOffer). */
+export const TRADE_OFFER_MAX_LINES = 6;
+
+/** How many more units of `itemId` the player may still stage into the
+ *  offer: the summed held total (tradeOfferCeiling) minus what the offer
+ *  already carries, and 0 when a NEW line would exceed the line cap. This is
+ *  the shift-click quantity prompt's ceiling (bags_window.ts) and the guard
+ *  every stage runs, so the two can never disagree about what fits. */
+export function tradeOfferHeadroom(
+  staged: InvSlot[],
+  inventory: InvSlot[],
+  itemId: string,
+): number {
+  const existing = staged.find((s) => s.itemId === itemId);
+  if (!existing && staged.length >= TRADE_OFFER_MAX_LINES) return 0;
+  return Math.max(0, tradeOfferCeiling(inventory, itemId) - (existing?.count ?? 0));
+}
+
+/** Stage `count` more units of `itemId` into the offer, clamped to the
+ *  headroom above, mutating `staged` IN PLACE (the Hud-owned live object the
+ *  trade controller also mutates). Returns the number of units actually
+ *  added (0 when nothing fit: the caller then skips the offer push). */
+export function stageTradeOffer(
+  staged: InvSlot[],
+  inventory: InvSlot[],
+  itemId: string,
+  count: number,
+): number {
+  const room = tradeOfferHeadroom(staged, inventory, itemId);
+  const added = Math.min(room, Math.max(0, Math.floor(count)));
+  if (added < 1) return 0;
+  const existing = staged.find((s) => s.itemId === itemId);
+  if (existing) existing.count += added;
+  else staged.push({ itemId, count: added });
+  return added;
+}
+
+/** Re-resolve the trade quantity prompt at submit against the LIVE headroom
+ *  (the bank family's stale-prompt guard, bank_quantity_prompt.ts): null
+ *  REFUSES when nothing fits any more (the trade closed, the stack left the
+ *  bags, the line filled up), else the requested count clamped to [1, room]. */
+export function resolveTradeOfferSubmit(liveHeadroom: number, requested: number): number | null {
+  if (liveHeadroom < 1) return null;
+  return Math.max(1, Math.min(liveHeadroom, Math.floor(requested) || 0));
+}
+
 /** One offer row, resolved for rendering. `item` is undefined for an id this
  *  bundle cannot resolve; the label then shows the raw id and the painter must
  *  swap its icon for the unknown-item fallback rather than dereferencing. */
