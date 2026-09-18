@@ -874,6 +874,22 @@ For off-box safety, sync the directory to S3 occasionally:
   while the worker was standing down after a release, which were refused at
   once and hid nothing. For D3D11 `auto` sessions `raw_summary.shaderWarm.mode`
   also shifts during the experiment: the `off` arm resolves to `off`.
+  `woc_client_cadence_reports_total` (same module, same stored gameplay reports)
+  is the frame rate ceiling cut: `frame_cap` is the ceiling the player chose
+  (`none`, `30`, `60`) and `cadence` is `reduced` when the client renders fewer
+  frames than the display offers on purpose (a cadence divisor above one, or a
+  ceiling with no display reading, which is the unpaced limiter), `full`
+  otherwise. Six series, pre-registered at zero. The fps and p95 series carry
+  no such label (their label sets are a pinned contract), so read a fleet-wide
+  rise in slow frames against this share first. The SQL drill-down is three
+  client_perf_reports columns, `frame_cap_intent` (0, 30 or 60),
+  `cadence_divisor` (1 to 16, 1 = ceiling inert) and `refresh_hz` (0 =
+  unknown), which survive the shed ladder where `raw_summary.cadence` (intent,
+  verdict, refreshHz, divisor, targetIntervalMs, missShare, rendered, skipped)
+  can be dropped. A session with `cadence_divisor > 1` or `frame_cap_intent <> 0`
+  renders slowly ON PURPOSE: split it out before reading `frame_p95_ms` or
+  `fps_avg`. From the same release on, `target_fps` is the effective target
+  (the ceiling's own rate while it is active).
   `raw_summary` itself is capped in bytes by a priority shed ladder
   (`server/perf_report_shed.ts`): an oversized report loses its biggest,
   least diagnostic blocks one rung at a time and records them under

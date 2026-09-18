@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { shaderWarmToken } from '../server/perf_report_entry_blocks';
 import { RAW_SUMMARY_KNOWN_KEYS } from '../server/perf_report_shed';
+import { sharedFrameCadence } from '../src/game/frame_cadence_wiring';
 import { loadSpan, resetLoadProfile } from '../src/game/load_profiler';
 import type { PerfMonitor, PerfSnapshot } from '../src/game/perf';
 import { jitteredPerfReportDelay } from '../src/game/perf_report_schedule';
@@ -1360,6 +1361,48 @@ describe('perf reporter payload', () => {
       (body.rawSummary as { rendererDiagnostics?: { enabled?: boolean } }).rendererDiagnostics
         ?.enabled,
     ).toBe(false);
+  });
+});
+
+describe('perf reporter frame rate ceiling fields', () => {
+  beforeEach(() => installBrowserGlobals());
+  afterEach(() => vi.restoreAllMocks());
+
+  it('reports no ceiling and the renderer budget target by default', () => {
+    const base = snapshot();
+    const snap: PerfSnapshot = {
+      ...base,
+      renderer: { ...base.renderer!, budget: { ...base.renderer!.budget, targetFps: 45 } },
+    };
+    const body = perfReporterInternalsForTest.payloadFromSnapshot(snap, new Settings(), 's', 1)!;
+    expect(body.frameCapIntent).toBe(0);
+    expect(body.cadenceDivisor).toBe(1);
+    expect(body.targetFps).toBe(45);
+  });
+
+  it('reports the chosen ceiling and its effective target as typed fields', () => {
+    vi.spyOn(sharedFrameCadence(), 'snapshot').mockReturnValue({
+      intent: 30,
+      verdict: 'paced',
+      refreshHz: 143.86,
+      divisor: 4,
+      targetIntervalMs: 4000 / 143.86,
+      missShare: 0.01,
+      rendered: 900,
+      skipped: 2700,
+    });
+    const body = perfReporterInternalsForTest.payloadFromSnapshot(
+      snapshot(),
+      new Settings(),
+      's',
+      1,
+    )!;
+    expect(body.frameCapIntent).toBe(30);
+    expect(body.cadenceDivisor).toBe(4);
+    expect(body.refreshHz).toBe(143.9);
+    // 60 is the renderer's budget target in this snapshot; the ceiling wins.
+    expect(body.targetFps).toBe(36);
+    expect((body.rawSummary as { cadence: { divisor: number } }).cadence.divisor).toBe(4);
   });
 });
 

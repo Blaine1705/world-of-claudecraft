@@ -2,7 +2,7 @@ import { apiUrl } from '../client_origin';
 import { graphicsPresetLabel } from '../render/gfx';
 import { isSoftwareRendererName } from '../render/software_renderer';
 import { crowdBucketLabel } from './crowd_bucket';
-import { frameCadenceBeaconBlock } from './frame_cadence_wiring';
+import { frameCadenceBeaconBlock, frameCadenceBeaconFields } from './frame_cadence_wiring';
 import { createGpuAdapterProbe } from './gpu_adapter_probe';
 import { collectLoadSpans } from './load_profiler';
 import { localDevPerfTraceEnabled, type PerfMonitor, type PerfSnapshot } from './perf';
@@ -582,6 +582,7 @@ function payloadFromSnapshot(
   // beside it) stays local: this is the fleet's answer to "did the worker run
   // on this backend, and what retired it when it did not".
   const shaderWarm = shaderWarmBeaconSummary(snapshot.shaderWarm);
+  const cadence = frameCadenceBeaconFields(renderer.budget.targetFps);
   return {
     schemaVersion: PERF_REPORT_SCHEMA_VERSION,
     releaseVersion: __APP_VERSION__,
@@ -597,7 +598,12 @@ function payloadFromSnapshot(
     // refused it", which a NOT NULL column can hold and a null cannot.
     shaderWarmWorkerActive: shaderWarm.active,
     shaderWarmRefusal: shaderWarm.refusal ?? '',
-    targetFps: renderer.budget.targetFps,
+    // Typed for the same reason: a session that renders slowly on purpose has
+    // to stay separable from a struggling one after raw_summary is shed.
+    targetFps: cadence.targetFps,
+    frameCapIntent: cadence.frameCapIntent,
+    cadenceDivisor: cadence.cadenceDivisor,
+    refreshHz: cadence.refreshHz,
     renderScale: renderer.renderScale,
     effectiveRenderScale: renderer.effectiveRenderScale,
     fpsAvg: snapshot.fps,

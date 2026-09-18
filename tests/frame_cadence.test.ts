@@ -13,7 +13,9 @@ import {
 } from '../src/game/frame_cadence_core';
 import {
   type FrameCadenceGateView,
+  type FrameCadenceSnapshot,
   FrameCadenceWiring,
+  frameCadenceBeaconFieldsFrom,
   parseFrameCeilingIntent,
 } from '../src/game/frame_cadence_wiring';
 
@@ -312,5 +314,59 @@ describe('frame cadence wiring', () => {
     const snap = r.wiring.snapshot();
     expect(snap.verdict).toBe('unpaced');
     expect(snap.targetIntervalMs).toBeCloseTo(33.33, 1);
+  });
+});
+
+describe('frame cadence beacon fields', () => {
+  const base: FrameCadenceSnapshot = {
+    intent: 0,
+    verdict: 'paced',
+    refreshHz: 59.94,
+    divisor: 1,
+    targetIntervalMs: 0,
+    missShare: 0,
+    rendered: 0,
+    skipped: 0,
+  };
+
+  it('reports the renderer budget target while the ceiling is inert', () => {
+    expect(frameCadenceBeaconFieldsFrom(base, 60)).toEqual({
+      frameCapIntent: 0,
+      cadenceDivisor: 1,
+      refreshHz: 59.9,
+      targetFps: 60,
+    });
+  });
+
+  it('reports the effective target of a paced ceiling: 144 Hz over four slots is 36', () => {
+    const s = {
+      ...base,
+      intent: 30 as const,
+      refreshHz: 144,
+      divisor: 4,
+      targetIntervalMs: 4000 / 144,
+    };
+    expect(frameCadenceBeaconFieldsFrom(s, 60)).toEqual({
+      frameCapIntent: 30,
+      cadenceDivisor: 4,
+      refreshHz: 144,
+      targetFps: 36,
+    });
+  });
+
+  it('reports the unpaced limiter as its own rate with no display reading', () => {
+    const s = {
+      ...base,
+      intent: 30 as const,
+      verdict: 'unpaced' as const,
+      refreshHz: 0,
+      targetIntervalMs: 1000 / 30,
+    };
+    expect(frameCadenceBeaconFieldsFrom(s, 120)).toEqual({
+      frameCapIntent: 30,
+      cadenceDivisor: 1,
+      refreshHz: 0,
+      targetFps: 30,
+    });
   });
 });

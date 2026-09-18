@@ -133,6 +133,13 @@ function intIn(value: unknown, min: number, max: number, fallback: number): numb
   return Math.floor(numberIn(value, min, max, fallback));
 }
 
+/** The frame rate ceiling is a closed choice: anything else reads as none. The
+ *  range is wide on purpose, a tight one would clamp 9000 onto 60. */
+function frameCapIntentIn(value: unknown): number {
+  const n = intIn(value, 0, 1000, 0);
+  return n === 30 || n === 60 ? n : 0;
+}
+
 function nullableNumberIn(value: unknown, min: number, max: number): number | null {
   if (value === null || value === undefined || value === '') return null;
   const n = typeof value === 'number' ? value : Number(value);
@@ -878,6 +885,9 @@ export async function handlePerfReport(
     shaderWarmWorkerActive: Boolean(body.shaderWarmWorkerActive),
     shaderWarmRefusal: shaderWarmToken(body.shaderWarmRefusal),
     targetFps: intIn(body.targetFps, 0, 240, 0),
+    frameCapIntent: frameCapIntentIn(body.frameCapIntent),
+    cadenceDivisor: intIn(body.cadenceDivisor, 1, 16, 1),
+    refreshHz: Math.round(numberIn(body.refreshHz, 0, 1000, 0) * 10) / 10,
     renderScale: numberIn(body.renderScale, 0.3, 1.5, 1),
     effectiveRenderScale: numberIn(body.effectiveRenderScale, 0.3, 1.5, 1),
     fpsAvg: numberIn(body.fpsAvg, 0, 300, 0),

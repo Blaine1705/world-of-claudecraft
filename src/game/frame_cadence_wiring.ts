@@ -272,6 +272,32 @@ export function frameCadenceBeaconBlock(): Record<string, number | string> {
   };
 }
 
+export interface FrameCadenceBeaconFields {
+  frameCapIntent: FrameCeilingIntent;
+  cadenceDivisor: number;
+  refreshHz: number;
+  targetFps: number;
+}
+
+/** The beacon's typed cadence fields, which the server stores as columns: the
+ *  `cadence` block above is shed under a size squeeze, these are not. The
+ *  target is the effective one, the ceiling's own rate while it is active. */
+export function frameCadenceBeaconFieldsFrom(
+  s: FrameCadenceSnapshot,
+  budgetTargetFps: number,
+): FrameCadenceBeaconFields {
+  return {
+    frameCapIntent: s.intent,
+    cadenceDivisor: s.divisor,
+    refreshHz: Math.round(s.refreshHz * 10) / 10,
+    targetFps: s.targetIntervalMs > 0 ? Math.round(1000 / s.targetIntervalMs) : budgetTargetFps,
+  };
+}
+
+export function frameCadenceBeaconFields(budgetTargetFps: number): FrameCadenceBeaconFields {
+  return frameCadenceBeaconFieldsFrom(sharedFrameCadence().snapshot(), budgetTargetFps);
+}
+
 /** One `?perf` overlay line (dev diagnostics, English like the rest of it). */
 export function frameCadenceOverlayLine(): string {
   const s = sharedFrameCadence().snapshot();

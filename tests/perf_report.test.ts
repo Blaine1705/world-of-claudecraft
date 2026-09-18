@@ -2612,6 +2612,74 @@ describe('desktop shell marker', () => {
   });
 });
 
+describe('frame rate ceiling report fields', () => {
+  async function storedFor(sessionId: string, fields: Record<string, unknown>, ip: string) {
+    const res = fakeRes();
+    await handlePerfReport(fakeReq({ sessionId, ...fields }, { remoteAddress: ip }), res);
+    expect(res.statusCode).toBe(200);
+    return vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0];
+  }
+
+  it('stores a paced ceiling as sent, the refresh rate at one decimal', async () => {
+    const stored = await storedFor(
+      'cadence-paced',
+      { frameCapIntent: 30, cadenceDivisor: 4, refreshHz: 143.86, targetFps: 36 },
+      '198.51.100.110',
+    );
+    expect(stored.frameCapIntent).toBe(30);
+    expect(stored.cadenceDivisor).toBe(4);
+    expect(stored.refreshHz).toBe(143.9);
+    expect(stored.targetFps).toBe(36);
+  });
+
+  it('accepts 60 and reads every intent outside the closed choice as none', async () => {
+    expect(
+      (await storedFor('cadence-60', { frameCapIntent: 60 }, '198.51.100.111')).frameCapIntent,
+    ).toBe(60);
+    expect(
+      (await storedFor('cadence-45', { frameCapIntent: 45 }, '198.51.100.112')).frameCapIntent,
+    ).toBe(0);
+    expect(
+      (await storedFor('cadence-neg', { frameCapIntent: -30 }, '198.51.100.113')).frameCapIntent,
+    ).toBe(0);
+    expect(
+      (await storedFor('cadence-big', { frameCapIntent: 9000 }, '198.51.100.114')).frameCapIntent,
+    ).toBe(0);
+    expect(
+      (await storedFor('cadence-text', { frameCapIntent: 'thirty' }, '198.51.100.115'))
+        .frameCapIntent,
+    ).toBe(0);
+  });
+
+  it('clamps the divisor into 1 to 16', async () => {
+    expect(
+      (await storedFor('cadence-d0', { cadenceDivisor: 0 }, '198.51.100.116')).cadenceDivisor,
+    ).toBe(1);
+    expect(
+      (await storedFor('cadence-d99', { cadenceDivisor: 99 }, '198.51.100.117')).cadenceDivisor,
+    ).toBe(16);
+  });
+
+  it('clamps the refresh rate into 0 to 1000', async () => {
+    expect((await storedFor('cadence-r-neg', { refreshHz: -60 }, '198.51.100.118')).refreshHz).toBe(
+      0,
+    );
+    expect(
+      (await storedFor('cadence-r-big', { refreshHz: 5000 }, '198.51.100.119')).refreshHz,
+    ).toBe(1000);
+    expect(
+      (await storedFor('cadence-r-nan', { refreshHz: 'fast' }, '198.51.100.120')).refreshHz,
+    ).toBe(0);
+  });
+
+  it('defaults an older client to no ceiling, every refresh, display unknown', async () => {
+    const stored = await storedFor('cadence-absent', {}, '198.51.100.121');
+    expect(stored.frameCapIntent).toBe(0);
+    expect(stored.cadenceDivisor).toBe(1);
+    expect(stored.refreshHz).toBe(0);
+  });
+});
+
 describe('shader warm-up report fields', () => {
   it('stores the worker state as a coerced boolean and a bounded refusal token', async () => {
     const res = fakeRes();
