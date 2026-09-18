@@ -1270,11 +1270,12 @@ const MONOLITHS: MonolithRow[] = [
     // link-error notice a failed relink now needs) moved out to
     // src/net/discord_oauth_flow.ts behind an injected deps bag; main.ts keeps
     // only the deps bag and the one-time wiring calls. Delve self-motion
-    // prediction then adds one import/wiring line while keeping the module-shell
-    // and door clamp chain in src/sim/delves/geometry.ts. Measured after both
-    // changes composed on the v0.44.0 line (wc -l < src/main.ts): 11174.
+    // prediction then adds one import/wiring line plus the frame-scratch state
+    // needed to keep its module-shell and door clamp data off the rAF allocation
+    // path. Measured after formatting those changes on the v0.44.0 line
+    // (wc -l < src/main.ts): 11181.
     // Zero headroom.
-    ceiling: 11174,
+    ceiling: 11181,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

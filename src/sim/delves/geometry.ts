@@ -179,12 +179,28 @@ export function delveDoorClampSolidsFromEntities(
   entities: Iterable<Pick<Entity, 'templateId' | 'pos' | 'hp'>>,
 ): DelveDoorClampSolid[] {
   const out: DelveDoorClampSolid[] = [];
+  delveDoorClampSolidsFromEntitiesInto(entities, out);
+  return out;
+}
+
+export function delveDoorClampSolidsFromEntitiesInto(
+  entities: Iterable<Pick<Entity, 'templateId' | 'pos' | 'hp'>>,
+  out: DelveDoorClampSolid[],
+): DelveDoorClampSolid[] {
+  let i = 0;
   for (const e of entities) {
     if (!e.templateId.startsWith('delve_')) continue;
     const kind = e.templateId.slice('delve_'.length);
     if (!isDelveDoorClampKind(kind)) continue;
-    out.push({ kind, x: e.pos.x, z: e.pos.z, hp: e.hp });
+    const solid = out[i] ?? { kind, x: 0, z: 0, hp: 0 };
+    solid.kind = kind;
+    solid.x = e.pos.x;
+    solid.z = e.pos.z;
+    solid.hp = e.hp;
+    out[i] = solid;
+    i++;
   }
+  out.length = i;
   return out;
 }
 
@@ -199,15 +215,32 @@ export interface DelveMotionState {
   delveSolids: readonly DelveDoorClampSolid[];
 }
 
+export interface MutableDelveMotionState {
+  delveRun: DelveRunInfo | null;
+  delveSolids: DelveDoorClampSolid[];
+}
+
 export function delveMotionState(net: {
   delveRun: DelveRunInfo | null;
   entities: ReadonlyMap<number, Pick<Entity, 'templateId' | 'pos' | 'hp'>>;
 }): DelveMotionState {
-  const delveRun = net.delveRun;
-  const delveSolids = delveRun
-    ? delveDoorClampSolidsFromEntities(net.entities.values())
-    : EMPTY_DELVE_SOLIDS;
-  return { delveRun, delveSolids };
+  return refreshDelveMotionState({ delveRun: null, delveSolids: [] }, net);
+}
+
+export function refreshDelveMotionState(
+  out: MutableDelveMotionState,
+  net: {
+    delveRun: DelveRunInfo | null;
+    entities: ReadonlyMap<number, Pick<Entity, 'templateId' | 'pos' | 'hp'>>;
+  },
+): DelveMotionState {
+  out.delveRun = net.delveRun;
+  if (out.delveRun) {
+    delveDoorClampSolidsFromEntitiesInto(net.entities.values(), out.delveSolids);
+    return out;
+  }
+  out.delveSolids.length = 0;
+  return out;
 }
 
 /** Bundles the rift-floor descriptor in beside the delve state above for
@@ -220,5 +253,20 @@ export function instancedMotionState(
   riftFloor: RiftFloorView | null,
   delve: DelveMotionState,
 ): DelveMotionState & { riftFloor: RiftFloorView | null } {
-  return { riftFloor, delveRun: delve.delveRun, delveSolids: delve.delveSolids };
+  return refreshInstancedMotionState(
+    { riftFloor: null, delveRun: null, delveSolids: EMPTY_DELVE_SOLIDS },
+    riftFloor,
+    delve,
+  );
+}
+
+export function refreshInstancedMotionState(
+  out: DelveMotionState & { riftFloor: RiftFloorView | null },
+  riftFloor: RiftFloorView | null,
+  delve: DelveMotionState,
+): DelveMotionState & { riftFloor: RiftFloorView | null } {
+  out.riftFloor = riftFloor;
+  out.delveRun = delve.delveRun;
+  out.delveSolids = delve.delveSolids;
+  return out;
 }

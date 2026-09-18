@@ -16,6 +16,7 @@ import {
   DELVE_WALL_SOLID_R,
   type DelveDoorClampSolid,
   delveDoorClampSolidsFromEntities,
+  delveDoorClampSolidsFromEntitiesInto,
 } from '../src/sim/delves/geometry';
 import { clampDelveDoors } from '../src/sim/delves/runs';
 import { PLAYER_BODY_RADIUS } from '../src/sim/pathfind';
@@ -101,6 +102,21 @@ describe('delveDoorClampSolidsFromEntities', () => {
 
   it('an empty roster yields an empty solids list', () => {
     expect(delveDoorClampSolidsFromEntities([])).toEqual([]);
+  });
+
+  it('can refresh a reusable solids list without reallocating solid slots', () => {
+    const out: DelveDoorClampSolid[] = [{ kind: 'locked_door', x: 1, z: 2, hp: 3 }];
+    const firstSlot = out[0];
+    const refreshed = delveDoorClampSolidsFromEntitiesInto(
+      [ent({ templateId: 'delve_drowned_reliquary', pos: { x: 4, y: 0, z: 5 }, hp: 6 })],
+      out,
+    );
+    expect(refreshed).toBe(out);
+    expect(out[0]).toBe(firstSlot);
+    expect(out).toEqual([{ kind: 'drowned_reliquary', x: 4, z: 5, hp: 6 }]);
+
+    delveDoorClampSolidsFromEntitiesInto([ent({ templateId: 'delve_pressure_plate' })], out);
+    expect(out).toEqual([]);
   });
 });
 
