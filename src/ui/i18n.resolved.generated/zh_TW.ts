@@ -518,7 +518,7 @@ export const zh_TW: EnTranslations = {
     },
     "trade": {
       "windowClosed": "交易視窗已關閉。",
-      "offerPartialHint": "Shift+點擊提供部分數量",
+      "offerQuantityHint": "將詢問你要提供的數量",
       "offerQuantityTitle": "提供 {item}",
       "offerQuantityInput": "要提供的數量",
       "offerQuantityConfirm": "提供",

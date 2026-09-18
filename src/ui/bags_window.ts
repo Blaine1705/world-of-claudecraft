@@ -18,7 +18,7 @@
 // (not a literal white hex).
 
 import { audio } from '../game/audio';
-import { BACKPACK_SLOTS, bagSlotsOf } from '../sim/bags';
+import { BACKPACK_SLOTS, bagSlotsOf, stackSizeOf } from '../sim/bags';
 import { ITEMS, QUESTS } from '../sim/data';
 import { FIREBOTTLE_COOLDOWN_SECS, FIREBOTTLE_ITEM_ID } from '../sim/interactions/firebottle_hut';
 import { baggedCopyAnchor } from '../sim/item_copy_anchor';
@@ -1755,11 +1755,11 @@ export class BagsWindow {
         this.deps.showError(t('hudChrome.itemSoulbound'));
         return;
       case 'trade': {
-        // Shift-click on a splittable stack opens the offer-quantity prompt
-        // (the bank withdraw prompt's trade twin) instead of staging one unit
-        // per click; a plain click keeps the one-unit stage.
+        // A click on a splittable stack opens the offer-quantity prompt (the
+        // bank withdraw prompt's trade twin) instead of staging one unit per
+        // click; a single unit or an instanced copy stages directly.
         const headroom = this.deps.tradeOfferHeadroom(s.itemId);
-        if (ev.shiftKey && tradeOfferOpensPrompt(s, headroom)) {
+        if (tradeOfferOpensPrompt(s, headroom)) {
           this.showTradeQuantityPrompt(s.itemId, headroom);
           break;
         }
@@ -1987,13 +1987,13 @@ export class BagsWindow {
       const link = bagShiftLinks(mode)
         ? `<div class="tt-sub">${esc(t('hudChrome.itemShare.linkHint'))}</div>`
         : '';
-      // Advertise the shift-click offer-quantity prompt on the trade-offer
-      // hint arm only (a blocked soulbound copy never shows it), and only when
-      // the prompt would actually open (a splittable stack with room left).
+      // Say that the click will ask for a quantity, on the trade-offer hint
+      // arm only (a blocked soulbound copy never shows it) and only when the
+      // prompt would actually open (a splittable stack with room left).
       const tradePartial =
         key === 'itemUi.tooltip.clickTradeOffer' &&
         tradeOfferOpensPrompt(s, this.deps.tradeOfferHeadroom(s.itemId))
-          ? `<div class="tt-sub">${esc(t('hudChrome.trade.offerPartialHint'))}</div>`
+          ? `<div class="tt-sub">${esc(t('hudChrome.trade.offerQuantityHint'))}</div>`
           : '';
       // The stack's own per-unit provenance travels with it: the card lists
       // each contributor and how many of their units are in THIS stack. Through
@@ -2639,9 +2639,10 @@ export class BagsWindow {
     );
   }
 
-  // The offer-quantity prompt (shift-click a splittable stack while a trade is
-  // open): the bank withdraw prompt's trade twin. The shared builder
-  // (bank_quantity_prompt.ts) owns the chrome; this owns the trade closures:
+  // The offer-quantity prompt (click a splittable stack while a trade is
+  // open): the bank withdraw prompt's trade twin, with the vault's whole-stack
+  // step pair around the unit pair. The shared builder (bank_quantity_prompt.ts)
+  // owns the chrome; this owns the trade closures:
   // the ceiling is the LIVE headroom the HUD reports (held total minus what the
   // offer already carries), the submit re-resolves that headroom so a prompt
   // left open across a closed trade or a spent stack refuses instead of staging
@@ -2655,6 +2656,11 @@ export class BagsWindow {
     // can go back to it; the always-present close button is the fallback for
     // a row that left the bags under the prompt.
     const opener = document.activeElement as HTMLElement | null;
+    // One big press moves a whole bag stack (the item's stack size), the
+    // vault withdraw prompt's rule, so 45 held is two presses and a nudge.
+    const stepSize = stackSizeOf(item);
+    const stepCount = formatNumber(stepSize, { maximumFractionDigits: 0 });
+    const unitCount = formatNumber(1, { maximumFractionDigits: 0 });
     showQuantityPrompt(
       {
         installPromptDialog: (prompt, opener, close) =>
@@ -2663,6 +2669,13 @@ export class BagsWindow {
       },
       {
         className: 'trade-offer-prompt',
+        step: {
+          size: stepSize,
+          downAriaText: t('hudChrome.bank.quantityStepDownAria', { count: stepCount }),
+          upAriaText: t('hudChrome.bank.quantityStepUpAria', { count: stepCount }),
+          unitDownAriaText: t('hudChrome.bank.quantityStepDownAria', { count: unitCount }),
+          unitUpAriaText: t('hudChrome.bank.quantityStepUpAria', { count: unitCount }),
+        },
         titleText: t('hudChrome.trade.offerQuantityTitle', { item: itemName }),
         inputAriaText: t('hudChrome.trade.offerQuantityInput'),
         confirmText: t('hudChrome.trade.offerQuantityConfirm'),

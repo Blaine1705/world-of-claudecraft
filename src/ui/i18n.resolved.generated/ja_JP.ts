@@ -518,7 +518,7 @@ export const ja_JP: EnTranslations = {
     },
     "trade": {
       "windowClosed": "取引ウィンドウを閉じました。",
-      "offerPartialHint": "Shift+クリックで一部だけ差し出す",
+      "offerQuantityHint": "差し出す数量を選べます",
       "offerQuantityTitle": "{item}を差し出す",
       "offerQuantityInput": "差し出す数量",
       "offerQuantityConfirm": "差し出す",

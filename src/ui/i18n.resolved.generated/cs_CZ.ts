@@ -518,7 +518,7 @@ export const cs_CZ: EnTranslations = {
     },
     "trade": {
       "windowClosed": "Okno výměny bylo zavřeno.",
-      "offerPartialHint": "Shift-click to offer a partial amount",
+      "offerQuantityHint": "You will be asked how many to offer",
       "offerQuantityTitle": "Offer {item}",
       "offerQuantityInput": "Quantity to offer",
       "offerQuantityConfirm": "Offer",

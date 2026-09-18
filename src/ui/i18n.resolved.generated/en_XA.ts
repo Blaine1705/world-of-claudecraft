@@ -518,7 +518,7 @@ export const en_XA: EnTranslations = {
     },
     "trade": {
       "windowClosed": "[Ţŕáðé ŵíñðóŵ çļóšéð.]",
-      "offerPartialHint": "[Šĥíƒţ-çļíçķ ţó óƒƒéŕ á þáŕţíáļ áɱóúñţ]",
+      "offerQuantityHint": "[Ýóú ŵíļļ ƀé ášķéð ĥóŵ ɱáñý ţó óƒƒéŕ]",
       "offerQuantityTitle": "[Óƒƒéŕ {item}]",
       "offerQuantityInput": "[Ɋúáñţíţý ţó óƒƒéŕ]",
       "offerQuantityConfirm": "[Óƒƒéŕ]",

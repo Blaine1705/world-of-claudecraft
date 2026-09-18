@@ -16173,7 +16173,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.thornhollowPage.backfillNote':
     '補充の席は意図的に危険のないものになっています。あなたが飛び込むのは自分が関わっていない戦況なので、勝っても負けてもこの試合があなたの戦場レーティングに触れることはなく、途中で抜けても何も負いません。試合が終わりに近づき、来たところで結果を変えられない頃合いになると誘い自体が届かなくなるので、他人の幕引きに座らされることはありません。',
   'hudChrome.trade.windowClosed': '取引ウィンドウを閉じました。',
-  'hudChrome.trade.offerPartialHint': 'Shift+クリックで一部だけ差し出す',
+  'hudChrome.trade.offerQuantityHint': '差し出す数量を選べます',
   'hudChrome.trade.offerQuantityTitle': '{item}を差し出す',
   'hudChrome.trade.offerQuantityInput': '差し出す数量',
   'hudChrome.trade.offerQuantityConfirm': '差し出す',

@@ -15367,7 +15367,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.thornhollowPage.backfillNote':
     '接下补位的席位是刻意不带风险的：你落入的是一份与你无关的比分，因此无论胜负，这场比赛都不会触动你的战场评分，中途离开也不欠任何代价。当一场比赛已接近尾声、新来者再也无法改变结果时，邀请也就不再发出，所以你绝不会被安置进别人的结局里。',
   'hudChrome.trade.windowClosed': '交易窗口已关闭。',
-  'hudChrome.trade.offerPartialHint': 'Shift+点击提供部分数量',
+  'hudChrome.trade.offerQuantityHint': '将询问你要提供的数量',
   'hudChrome.trade.offerQuantityTitle': '提供 {item}',
   'hudChrome.trade.offerQuantityInput': '要提供的数量',
   'hudChrome.trade.offerQuantityConfirm': '提供',

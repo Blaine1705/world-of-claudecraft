@@ -518,7 +518,7 @@ export const tr_TR: EnTranslations = {
     },
     "trade": {
       "windowClosed": "Takas penceresi kapandı.",
-      "offerPartialHint": "Shift-click to offer a partial amount",
+      "offerQuantityHint": "You will be asked how many to offer",
       "offerQuantityTitle": "Offer {item}",
       "offerQuantityInput": "Quantity to offer",
       "offerQuantityConfirm": "Offer",

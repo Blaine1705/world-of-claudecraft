@@ -518,7 +518,7 @@ export const pl_PL: EnTranslations = {
     },
     "trade": {
       "windowClosed": "Okno wymiany zostało zamknięte.",
-      "offerPartialHint": "Shift-click to offer a partial amount",
+      "offerQuantityHint": "You will be asked how many to offer",
       "offerQuantityTitle": "Offer {item}",
       "offerQuantityInput": "Quantity to offer",
       "offerQuantityConfirm": "Offer",

@@ -242,11 +242,13 @@ export const hudChromeStrings = {
     // en-only domain, and a completed sale should not wait on twenty locale
     // blocks to stop calling itself cancelled.
     windowClosed: 'Trade window closed.',
-    // The bags-side offer-quantity prompt (shift-click a splittable stack while
-    // a trade is open): the bank withdraw prompt's trade twin, so the hint and
-    // the prompt copy mirror hudChrome.bank.withdrawPartialHint and
-    // withdrawQuantity*; the cancel reuses itemUi.vendor.sellQuantityCancel.
-    offerPartialHint: 'Shift-click to offer a partial amount',
+    // The bags-side offer-quantity prompt (click a splittable stack while a
+    // trade is open): the bank withdraw prompt's trade twin, so the prompt
+    // copy mirrors hudChrome.bank.withdrawQuantity*, its step buttons reuse
+    // hudChrome.bank.quantityStep*Aria, and the cancel reuses
+    // itemUi.vendor.sellQuantityCancel. The hint rides under
+    // itemUi.tooltip.clickTradeOffer on the stacks that get the prompt.
+    offerQuantityHint: 'You will be asked how many to offer',
     offerQuantityTitle: 'Offer {item}',
     offerQuantityInput: 'Quantity to offer',
     offerQuantityConfirm: 'Offer',

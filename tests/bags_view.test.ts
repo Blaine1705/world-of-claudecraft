@@ -109,9 +109,9 @@ const lookup: ItemLookup = (id) => ITEMS[id];
 describe('bagShiftLinks', () => {
   it('links to chat in every mode except at a vendor (split-stack owns shift there)', () => {
     expect(bagShiftLinks(NO_MODE)).toBe(true);
-    // An open trade gives shift to the offer-quantity prompt (the bank
-    // withdraw prompt's trade twin), exactly like the deposit modes below.
-    expect(bagShiftLinks({ ...NO_MODE, tradeOpen: true })).toBe(false);
+    // An open trade keeps the link: its offer-quantity prompt opens on the
+    // PLAIN click (tradeOfferOpensPrompt), so shift stays free here.
+    expect(bagShiftLinks({ ...NO_MODE, tradeOpen: true })).toBe(true);
     expect(bagShiftLinks({ ...NO_MODE, marketSell: true })).toBe(true);
     expect(bagShiftLinks({ ...NO_MODE, petFeed: true })).toBe(true);
     expect(bagShiftLinks({ ...NO_MODE, vendorOpen: true })).toBe(false);
@@ -876,23 +876,10 @@ describe('bag mode chain order pin (insertion guard)', () => {
     expect(bagShiftLinks({ ...ALL_MODES, vendorOpen: false })).toBe(false);
     expect(bagShiftLinks({ ...ALL_MODES, bankDeposit: false })).toBe(false);
     expect(bagShiftLinks({ ...ALL_MODES, vendorOpen: false, bankDeposit: false })).toBe(false);
-    // An open trade owns shift too (the offer-quantity prompt), so clearing
-    // every bank mode and the vendor still leaves it owned until the trade
-    // closes as well.
     expect(
       bagShiftLinks({
         ...ALL_MODES,
         vendorOpen: false,
-        bankDeposit: false,
-        guildBankDeposit: false,
-        vaultDeposit: false,
-      }),
-    ).toBe(false);
-    expect(
-      bagShiftLinks({
-        ...ALL_MODES,
-        vendorOpen: false,
-        tradeOpen: false,
         bankDeposit: false,
         guildBankDeposit: false,
         vaultDeposit: false,

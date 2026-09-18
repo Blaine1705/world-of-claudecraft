@@ -518,7 +518,7 @@ export const id_ID: EnTranslations = {
     },
     "trade": {
       "windowClosed": "Jendela perdagangan ditutup.",
-      "offerPartialHint": "Shift-click to offer a partial amount",
+      "offerQuantityHint": "You will be asked how many to offer",
       "offerQuantityTitle": "Offer {item}",
       "offerQuantityInput": "Quantity to offer",
       "offerQuantityConfirm": "Offer",

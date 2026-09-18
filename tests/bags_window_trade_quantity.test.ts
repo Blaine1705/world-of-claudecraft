@@ -1,11 +1,12 @@
 // @vitest-environment happy-dom
 // Drives the real bags painter through the trade-mode click paths: a plain
-// click on a stack still stages ONE unit, while a shift-click on a splittable
-// stack opens the offer-quantity prompt (the bank withdraw prompt's trade
-// twin, built by the shared bank_quantity_prompt.ts) whose confirm stages the
-// typed count through the same addItemToTrade dep. The prompt re-resolves the
-// LIVE headroom at submit and refuses (stages nothing) when the trade closed
-// or the stack left the bags underneath it.
+// click on a splittable stack opens the offer-quantity prompt (the bank
+// withdraw prompt's trade twin, built by the shared bank_quantity_prompt.ts,
+// with the vault's whole-stack step pair around the unit pair) whose confirm
+// stages the typed count through the same addItemToTrade dep; a single unit
+// or an instanced copy stages directly, and shift-click keeps its chat link.
+// The prompt re-resolves the LIVE headroom at submit and refuses (stages
+// nothing) when the trade closed or the stack left the bags underneath it.
 import { afterEach, describe, expect, it } from 'vitest';
 import type { InvSlot } from '../src/sim/types';
 import { BagsWindow, type BagsWindowDeps } from '../src/ui/bags_window';
@@ -107,7 +108,10 @@ function submit(count: string): void {
   const input = p?.querySelector<HTMLInputElement>('input.prompt-number');
   expect(input).not.toBeNull();
   if (input) input.value = count;
-  const confirm = p?.querySelector<HTMLButtonElement>('button.ui-btn--red');
+  // The shared dialog recipe restyles EVERY button in the prompt (the step
+  // buttons included), so the confirm is the prompt's own first direct-child
+  // button, not the first red one.
+  const confirm = p?.querySelector<HTMLButtonElement>(':scope > button.ui-btn--red');
   expect(confirm).not.toBeNull();
   confirm?.click();
 }
@@ -119,16 +123,9 @@ afterEach(() => {
 });
 
 describe('bags trade-mode offer quantity', () => {
-  it('a plain click still stages one unit and opens no prompt', () => {
+  it('a plain click on a splittable stack opens the prompt instead of staging', () => {
     const h = harness([HIDE], 20);
     clickFirstCell(h.root, false);
-    expect(h.staged).toEqual([{ itemId: 'linen_scrap', count: undefined }]);
-    expect(prompt()).toBeNull();
-  });
-
-  it('a shift-click on a splittable stack opens the prompt instead of a chat link', () => {
-    const h = harness([HIDE], 20);
-    clickFirstCell(h.root, true);
     expect(prompt()).not.toBeNull();
     expect(h.staged).toEqual([]);
     expect(h.links).toEqual([]);
@@ -140,9 +137,43 @@ describe('bags trade-mode offer quantity', () => {
     expect(h.root.hasAttribute('inert')).toBe(true);
   });
 
+  it('carries the vault-style step buttons: a unit pair inside a whole-stack pair', () => {
+    const h = harness([HIDE], 45);
+    clickFirstCell(h.root, false);
+    const p = prompt();
+    const steps = [...(p?.querySelectorAll<HTMLButtonElement>('.prompt-steps button') ?? [])];
+    // Reading order: -stack, -1, (input), +1, +stack; linen scrap stacks at 20.
+    expect(steps.map((b) => b.textContent)).toEqual(['-20', '−', '+', '+20']);
+    expect(steps.map((b) => b.classList.contains('prompt-step-big'))).toEqual([
+      true,
+      false,
+      false,
+      true,
+    ]);
+    const input = p?.querySelector<HTMLInputElement>('input.prompt-number');
+    // Seeded at the floor: both down buttons start disabled.
+    expect(steps[0].disabled).toBe(true);
+    expect(steps[1].disabled).toBe(true);
+    steps[3].click();
+    expect(input?.value).toBe('21');
+    steps[2].click();
+    expect(input?.value).toBe('22');
+    steps[3].click();
+    expect(input?.value).toBe('42');
+    // The last big press clamps onto the bound and the up pair disables there.
+    steps[3].click();
+    expect(input?.value).toBe('45');
+    expect(steps[2].disabled).toBe(true);
+    expect(steps[3].disabled).toBe(true);
+    steps[1].click();
+    expect(input?.value).toBe('44');
+    steps[0].click();
+    expect(input?.value).toBe('24');
+  });
+
   it('confirming stages the typed count through addItemToTrade and closes', () => {
     const h = harness([HIDE], 20);
-    clickFirstCell(h.root, true);
+    clickFirstCell(h.root, false);
     submit('12');
     expect(h.staged).toEqual([{ itemId: 'linen_scrap', count: 12 }]);
     expect(prompt()).toBeNull();
@@ -151,7 +182,7 @@ describe('bags trade-mode offer quantity', () => {
 
   it('clamps a typed count above the LIVE headroom at submit', () => {
     const h = harness([HIDE], 20);
-    clickFirstCell(h.root, true);
+    clickFirstCell(h.root, false);
     // The offer grew under the prompt (a plain click on another copy): only
     // 7 more fit now, whatever the input's max said when it opened.
     h.headroom.value = 7;
@@ -161,7 +192,7 @@ describe('bags trade-mode offer quantity', () => {
 
   it('refuses a stale prompt (no room left at submit) without staging', () => {
     const h = harness([HIDE], 20);
-    clickFirstCell(h.root, true);
+    clickFirstCell(h.root, false);
     h.headroom.value = 0;
     submit('5');
     expect(h.staged).toEqual([]);
@@ -169,24 +200,34 @@ describe('bags trade-mode offer quantity', () => {
     expect(h.root.hasAttribute('inert')).toBe(false);
   });
 
-  it('a shift-click with room for only one unit just stages it (no prompt)', () => {
+  it('a click with room for only one unit just stages it (no prompt)', () => {
     const h = harness([HIDE], 1);
-    clickFirstCell(h.root, true);
+    clickFirstCell(h.root, false);
     expect(prompt()).toBeNull();
     expect(h.staged).toEqual([{ itemId: 'linen_scrap', count: undefined }]);
   });
 
-  it('a shift-click on an instanced copy stages it as itself (no prompt)', () => {
+  it('a click on an instanced copy stages it as itself (no prompt)', () => {
     const h = harness([{ itemId: 'worn_sword', count: 1, instance: { enchant: 'x' } as never }], 3);
-    clickFirstCell(h.root, true);
+    clickFirstCell(h.root, false);
     expect(prompt()).toBeNull();
     expect(h.staged).toEqual([{ itemId: 'worn_sword', count: undefined }]);
   });
 
-  it('cancel closes the prompt and stages nothing', () => {
+  it('shift-click keeps the chat link and opens no prompt', () => {
     const h = harness([HIDE], 20);
     clickFirstCell(h.root, true);
-    const cancel = prompt()?.querySelector<HTMLButtonElement>('button.ui-btn:not(.ui-btn--red)');
+    expect(prompt()).toBeNull();
+    expect(h.staged).toEqual([]);
+    expect(h.links).toEqual(['linen_scrap']);
+  });
+
+  it('cancel closes the prompt and stages nothing', () => {
+    const h = harness([HIDE], 20);
+    clickFirstCell(h.root, false);
+    const cancel = prompt()?.querySelector<HTMLButtonElement>(
+      ':scope > button.ui-btn:not(.ui-btn--red)',
+    );
     expect(cancel).not.toBeNull();
     cancel?.click();
     expect(prompt()).toBeNull();

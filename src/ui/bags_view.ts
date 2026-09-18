@@ -345,25 +345,19 @@ export function vendorSellIsInstant(
  *  `bankOpen` is deliberately NOT in this list, unlike every other consumer of
  *  it: the gate here is "does something else already own shift-click", and on a
  *  bank view with no deposit target there is no split prompt to collide with.
- *  An open trade gives shift to its offer-quantity prompt (tradeOfferOpensPrompt)
- *  the same way. Linking a stack into chat is inert and available on every
- *  other surface, so the reading view keeps it. */
+ *  Linking a stack into chat is inert and available on every other surface, so
+ *  the reading view keeps it. */
 export function bagShiftLinks(mode: BagMode): boolean {
-  return (
-    !mode.vendorOpen &&
-    !mode.tradeOpen &&
-    !mode.bankDeposit &&
-    !mode.guildBankDeposit &&
-    !mode.vaultDeposit
-  );
+  return !mode.vendorOpen && !mode.bankDeposit && !mode.guildBankDeposit && !mode.vaultDeposit;
 }
 
-/** Whether a shift-click in trade mode opens the offer-quantity prompt (the
- *  bank withdraw prompt's trade twin) rather than staging one unit. Only a
- *  fungible stack with room for MORE than one further unit earns the prompt
- *  (`headroom` is the live tradeOfferHeadroom: held total minus already
- *  staged); an instanced copy stages as itself, exactly like the deposit rule
- *  (bankDepositOpensPrompt), and a single remaining unit just stages. */
+/** Whether a click in trade mode opens the offer-quantity prompt (the bank
+ *  withdraw prompt's trade twin, with the vault's stack step buttons) rather
+ *  than staging one unit. Only a fungible stack with room for MORE than one
+ *  further unit earns the prompt (`headroom` is the live tradeOfferHeadroom:
+ *  held total minus already staged); an instanced copy stages as itself,
+ *  exactly like the deposit rule (bankDepositOpensPrompt), and a single
+ *  remaining unit just stages. Shift-click keeps its chat link here. */
 export function tradeOfferOpensPrompt(slot: InvSlot, headroom: number): boolean {
   return !slot.instance && headroom > 1;
 }

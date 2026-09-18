@@ -518,7 +518,7 @@ export const vi_VN: EnTranslations = {
     },
     "trade": {
       "windowClosed": "Cửa sổ giao dịch đã đóng.",
-      "offerPartialHint": "Shift-click to offer a partial amount",
+      "offerQuantityHint": "You will be asked how many to offer",
       "offerQuantityTitle": "Offer {item}",
       "offerQuantityInput": "Quantity to offer",
       "offerQuantityConfirm": "Offer",
