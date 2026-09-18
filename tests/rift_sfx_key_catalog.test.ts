@@ -16,7 +16,11 @@ import { tsFilesUnder } from './helpers/ts_files_under';
 
 const RIFT_DIR = path.join(__dirname, '../src/sim/rift');
 const SIM_DIR = path.join(__dirname, '../src/sim');
-const EXTRA_SCAN_FILES = [path.join(__dirname, '../src/sim/dev_commands.ts')];
+const EXTRA_SCAN_FILES = [
+  path.join(__dirname, '../src/sim/dev_commands.ts'),
+  // The treasure vault portal reuses the rift portal spawn cue.
+  path.join(__dirname, '../src/sim/treasure_vault.ts'),
+];
 
 // riftFx(ctx, x, z, school, fx, sfxKey?, pid?): school and fx are drawn from
 // small fixed vocabularies, so any OTHER quoted string literal inside a

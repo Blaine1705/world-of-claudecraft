@@ -17,6 +17,7 @@ import {
 } from '../src/sim/content/treasure_maps';
 import { RIFT_RANK_BASE_LEVEL, riftRankTuningFor } from '../src/sim/rift/ranks';
 import { riftFloorCount } from '../src/sim/rift/rift_gen';
+import { vaultSeedTier } from '../src/sim/rift/vault_seed';
 import { Sim } from '../src/sim/sim';
 import { vaultScaledTuning } from '../src/sim/treasure_vault';
 import type { SimEvent } from '../src/sim/types';
@@ -62,7 +63,9 @@ describe('reading a treasure map', () => {
     const evs = sim.drainEvents();
     expect(meta.treasureMap?.rarity).toBe('rare');
     expect(TREASURE_SITES_BY_ID[meta.treasureMap!.siteId]).toBeDefined();
-    expect(riftFloorCount(meta.treasureMap!.seed, RIFT_RANK_BASE_LEVEL.B)).toBe(3);
+    // One room with the boss at the end, sized by the rarity (tier 1 = rare).
+    expect(riftFloorCount(meta.treasureMap!.seed, RIFT_RANK_BASE_LEVEL.B)).toBe(1);
+    expect(vaultSeedTier(meta.treasureMap!.seed)).toBe(1);
     expect(sim.countItem(TREASURE_MAP_ITEM_IDS.rare)).toBe(1);
     expect(meta.wireRev).toBeGreaterThan(rev);
     expect(sim.treasureMap).toEqual(meta.treasureMap);
@@ -135,7 +138,7 @@ describe('the vault run', () => {
     readAndDig(sim, 'common');
     const inst = enterVault(sim);
     expect(inst.vault).toEqual({ rarity: 'common', ownerPid: sim.playerId, headCount: 1 });
-    expect(inst.floorCount).toBe(3);
+    expect(inst.floorCount).toBe(1);
     // A straight fight: no puzzle pieces, gate or bonus cache on the floor.
     expect(inst.pylonIds).toEqual([]);
     expect(inst.boulderIds).toEqual([]);

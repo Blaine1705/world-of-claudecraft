@@ -43,8 +43,9 @@ import { createGroundObject } from './entity';
 import { mountOwned } from './mounts';
 import { riftFx } from './rift/fx';
 import { RIFT_RANK_BASE_LEVEL, type RiftRankTuning } from './rift/ranks';
-import { generateRiftPlan, isSetPieceSeed, riftFloorCount } from './rift/rift_gen';
+import { generateRiftPlan } from './rift/rift_gen';
 import type { RiftInstance } from './rift/types';
+import { makeVaultSeed, type VaultSizeTier } from './rift/vault_seed';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import type { Entity } from './types';
@@ -52,11 +53,6 @@ import type { Entity } from './types';
 const CASKET_MATERIAL_POOL = ['thorium_ore', 'elderwood_log', 'sunpetal_herb'] as const;
 const VAULT_MOUNT_REINS_ITEM_ID = 'reins_lanternback_troll';
 const VAULT_MOUNT_KEY = 'lanternback_troll';
-/** The shortest procedural Rift (src/sim/rift/rift_gen.ts MIN_FLOORS): a vault
- *  is a short errand, so its seed is searched until the plan is this long. */
-const VAULT_FLOOR_COUNT = 3;
-const VAULT_SEED_SEARCH_LIMIT = 256;
-
 // ---------------------------------------------------------------------------
 // Save boundary
 
@@ -87,17 +83,12 @@ export function rollTreasureMapRarity(ctx: SimContext): TreasureMapRarity {
   return 'common';
 }
 
-/** A Rift seed whose plan at this rarity's rank is VAULT_FLOOR_COUNT floors
- *  long and never the authored set piece. Deterministic: one rng draw, then a
- *  pure search both hosts would repeat identically from the same seed. */
+/** A vault seed for this rarity (src/sim/rift/vault_seed.ts): the rarity is the
+ *  room's size tier, so every host regenerates the same one-room vault from the
+ *  seed alone. One rng draw. */
 function pickVaultSeed(ctx: SimContext, rarity: TreasureMapRarity): number {
-  const baseLevel = RIFT_RANK_BASE_LEVEL[TREASURE_MAP_RIFT_TIER[rarity]];
-  let seed = ctx.rng.int(1, 0x7fffffff) >>> 0;
-  for (let i = 0; i < VAULT_SEED_SEARCH_LIMIT; i++) {
-    if (!isSetPieceSeed(seed) && riftFloorCount(seed, baseLevel) === VAULT_FLOOR_COUNT) break;
-    seed = (seed + 1) >>> 0;
-  }
-  return seed;
+  const tier = TREASURE_MAP_RARITIES.indexOf(rarity) as VaultSizeTier;
+  return makeVaultSeed(tier, ctx.rng.int(0, 0x0fffffff));
 }
 
 // ---------------------------------------------------------------------------
