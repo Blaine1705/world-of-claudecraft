@@ -980,18 +980,18 @@ describe('the 2026-09-07 Heroic redistribution (docs/prd/ignivar-raid-loot.md)',
     expect(floorNoWeapon + 30).toBeGreaterThanOrEqual(meleeCap);
   });
 
-  it('the redistribution kept the Robe chase and Emberward exactly where they were', () => {
+  it('the redistribution keeps the guaranteed Robe chase and Emberward exactly where they were', () => {
     const ignivar = HEROIC_BOSS_LOOT[IGNIVAR_BOSS_ID] ?? [];
     const varkhul = HEROIC_BOSS_LOOT[VARKHUL_BOSS_ID] ?? [];
     const share = (rows: readonly LootEntry[], pred: (id: string) => boolean) =>
       rows.reduce((s, e) => s + (e.itemId && pred(e.itemId) ? e.chance : 0), 0);
     const isRobe = (id: string) => id.endsWith('_chest');
-    expect(share(ignivar, isRobe)).toBeCloseTo(0.5, 6);
-    expect(share(varkhul, isRobe)).toBeCloseTo(0.35, 6);
+    expect(share(ignivar, isRobe)).toBeCloseTo(1, 6);
+    expect(share(varkhul, isRobe)).toBeCloseTo(1, 6);
     expect(varkhul.find((e) => e.itemId === 'varkhul_emberward')?.chance).toBe(0.03);
-    // Both exclusive partitions still sum to exactly 1 in table order, so a
-    // Heroic kill still pays exactly one exclusive item (no bonus, no gap).
-    for (const rows of [ignivar, varkhul]) expect(rows.reduce((s, e) => s + e.chance, 0)).toBe(1);
+    // Each boss now has a gear group and a Robe group, both guaranteed, so a
+    // Heroic kill pays exactly two heroic appends (no gap).
+    for (const rows of [ignivar, varkhul]) expect(rows.reduce((s, e) => s + e.chance, 0)).toBe(2);
   });
 });
 

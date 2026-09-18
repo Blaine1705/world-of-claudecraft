@@ -109,7 +109,11 @@ describe('ClientWorld spectate exit hold', () => {
 
     wire.applySnapshot({ t: 'snap', ents: [], self: playerWire(1, 'Me', 'warrior') });
     expect(world.spectating).toBeNull();
-    expect(sentCommands()).toContainEqual({ cmd: 'stopAutoAttackOnTargetSwitch', enabled: true });
+    expect(sentCommands()).toContainEqual({
+      t: 'cmd',
+      cmd: 'stopAutoAttackOnTargetSwitch',
+      enabled: true,
+    });
   });
 
   it('a reconnect hello clears the hold with the rest of the spectate swap', () => {
