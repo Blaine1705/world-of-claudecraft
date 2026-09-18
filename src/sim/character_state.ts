@@ -106,10 +106,6 @@ export interface CharacterState {
     factions?: Partial<Record<string, number>>;
     rerollCycle?: string;
     replacements?: Record<string, string>;
-    // Regional Mastery: permanent per-zone completion counts (zoneId -> count).
-    // Optional and written only when non-empty, so a character who has never
-    // turned in a world quest serializes byte-identically to a pre-feature save.
-    zoneCounts?: Record<string, number>;
     // Clue Scrolls (src/sim/clue_scrolls.ts). Each is optional and written
     // only when set (a hunt in progress, a cycle that paid, a count above
     // zero), so a character the feature never touched serializes

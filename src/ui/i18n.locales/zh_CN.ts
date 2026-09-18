@@ -1551,9 +1551,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.factionsPage.readingBody':
     '角色面板（C）的声望页会显示每个阵营的当前声望、通往下一等级的进度条，以及声望为你赢得的头衔。聊天记录会在每次获得声望时报告，达到新等级时屏幕上还会显示庆祝横幅。',
   'guide.factionsPage.deedsHeading': '功绩',
-  'guide.factionsPage.masteryHeading': '区域精通',
-  'guide.factionsPage.masteryBody':
-    '每个区域还会永久记录你在那里完成的世界任务数。它不是货币，也不会被花掉：这个数字只会上升，不需要每日连续登录，哪怕几周后再回来，下一个世界任务也只是再加一。达到设定的里程碑时，这个计数会在功绩之书中记录一项功绩，因此即便你的角色早已不再升级，旧区域依然值得一去。声望页会列出每个区域的计数和下一个里程碑。',
   'guide.factionsPage.deedsBody':
     '功绩之书也会记录你的声望：与某个阵营达到信任、与某个阵营达到冠军各记为一项功绩，与三个阵营都达到冠军则是另一项功绩。和所有功绩一样，它们只是装饰，从不带来战力，而冠军功绩会授予一个可佩戴的头衔。',
   'guide.thornhollowPage.heading': '荆谷原野',
@@ -12799,10 +12796,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.commissionLegendaries.few': '{count}件传说物品',
   'hudChrome.plurals.commissionLegendaries.many': '{count}件传说物品',
   'hudChrome.plurals.commissionLegendaries.other': '{count}件传说物品',
-  'hudChrome.plurals.worldQuestsCompletedInZone.one': '已完成{count}个世界任务',
-  'hudChrome.plurals.worldQuestsCompletedInZone.few': '已完成{count}个世界任务',
-  'hudChrome.plurals.worldQuestsCompletedInZone.many': '已完成{count}个世界任务',
-  'hudChrome.plurals.worldQuestsCompletedInZone.other': '已完成{count}个世界任务',
   'hudChrome.commissionBoard.statusOpen': '待接单',
   'hudChrome.commissionBoard.statusAccepted': '已接单',
   'hudChrome.commissionBoard.statusDelivered': '已交付',
@@ -16428,12 +16421,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reputation.title': '阵营头衔',
   'hudChrome.reputation.legend': '声望等级',
   'hudChrome.reputation.vendorGate': '需要与{faction}达到{tier}。',
-  'hudChrome.reputation.mastery': '区域精通',
-  'hudChrome.reputation.masteryIntro':
-    '在每个区域完成的世界任务数，永久保留：没有每日连续要求，也不会被消耗。每达到一个里程碑都会记录一项功绩。',
-  'hudChrome.reputation.masteryNext': '下一个里程碑：{count}',
-  'hudChrome.reputation.masteryMaxed': '已达成全部里程碑',
-  'hudChrome.reputation.masteryReached': '{reached} / {total} 个里程碑',
   'hudChrome.reputation.tierReachedBanner': '与{faction}的声望达到{tier}',
   'hudChrome.reputation.tierReachedSubtext': '阵营头衔：{title}',
   'hudChrome.reputation.tierReachedLine':

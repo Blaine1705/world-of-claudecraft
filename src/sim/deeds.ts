@@ -33,7 +33,6 @@ import { GATHERING_PROFESSION_IDS } from './content/professions';
 import { pointsSpent } from './content/talents';
 import { ITEMS, MOBS, zoneAt } from './data';
 import { LAUNCH_PAPERDOLL_SLOTS } from './launch_paperdoll_slots';
-import { bestZoneCompletionCount } from './regional_mastery';
 import {
   accountReliquaryOwnership,
   isHorizonsTitleDeed,
@@ -915,10 +914,6 @@ export const METER_DIRTY_KEYS: Record<DeedMeterId, readonly string[]> = {
   standingRiftWatch: [],
   standingChurchOrder: [],
   standingAutomatons: [],
-  // Reads the top-level PlayerMeta.worldQuestZoneCounts map, never a deedStats
-  // ledger, so no narrow key could name it; the one writer (the world-quest
-  // credit site in world_quests.ts) marks a full pass right after the increment.
-  regionalMasteryBest: [],
   // Reads the top-level PlayerMeta.clueCasketsOpened count, never a deedStats
   // ledger, so no narrow key could name it; the one writer (the casket open
   // site in clue_casket.ts) marks a full pass right after the increment.
@@ -1040,9 +1035,6 @@ const METERS: Record<DeedMeterId, (meta: PlayerMeta) => number> = {
   standingRiftWatch: (m) => m.factions?.rift_watch ?? 0,
   standingChurchOrder: (m) => m.factions?.church_order ?? 0,
   standingAutomatons: (m) => m.factions?.automatons ?? 0,
-  // The best single zone's world quest completion count (the "in a single
-  // zone" ladder). Tolerates a missing map for the same legacy-save reason.
-  regionalMasteryBest: (m) => bestZoneCompletionCount(m.worldQuestZoneCounts),
   // Lifetime Treasure Caskets opened. Tolerates a missing field the same way.
   clueCasketsOpened: (m) => m.clueCasketsOpened ?? 0,
   vcupWins: (m) => m.vcupWins,

@@ -3022,14 +3022,6 @@ export const hudChromeStrings = {
     tierReachedBanner: 'Now {tier} with the {faction}',
     tierReachedSubtext: 'Faction title: {title}',
     tierReachedLine: 'You are now {tier} with the {faction}. Your faction title is now {title}.',
-    // Regional Mastery: the permanent per-zone world-quest completion count
-    // and its milestone ladder (src/sim/regional_mastery.ts).
-    mastery: 'Regional Mastery',
-    masteryIntro:
-      'World quests completed in each zone, kept for good: no daily streak, nothing spent. Each milestone records a deed.',
-    masteryNext: 'Next milestone at {count}',
-    masteryMaxed: 'Every milestone reached',
-    masteryReached: '{reached} / {total} milestones',
   },
   questLog: {
     completed: 'Completed',
@@ -3247,14 +3239,6 @@ export const hudChromeStrings = {
       few: '{count} legendaries',
       many: '{count} legendaries',
       other: '{count} legendaries',
-    },
-    // Regional Mastery rows on the Reputation tab: the permanent per-zone
-    // world-quest completion count.
-    worldQuestsCompletedInZone: {
-      one: '{count} world quest completed',
-      few: '{count} world quests completed',
-      many: '{count} world quests completed',
-      other: '{count} world quests completed',
     },
     guildMembers: {
       one: 'your guild rank is {rank}; {count} member',

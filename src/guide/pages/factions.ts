@@ -33,7 +33,6 @@ export const factions: GuidePage = {
         ${section('guide.factionsPage.quartermastersHeading', p('guide.factionsPage.quartermastersBody'))}
         ${section('guide.factionsPage.readingHeading', p('guide.factionsPage.readingBody'))}
         ${section('guide.factionsPage.deedsHeading', p('guide.factionsPage.deedsBody'))}
-        ${section('guide.factionsPage.masteryHeading', p('guide.factionsPage.masteryBody'))}
         ${related([
           { href: hrefFor('quests'), key: 'guide.nav.quests' },
           { href: hrefFor('economy'), key: 'guide.nav.economy' },

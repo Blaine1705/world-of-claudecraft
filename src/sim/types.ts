@@ -9011,10 +9011,6 @@ export type DeedMeterId =
   | 'standingRiftWatch'
   | 'standingChurchOrder'
   | 'standingAutomatons'
-  // Regional Mastery: the highest per-zone world quest completion count
-  // (PlayerMeta.worldQuestZoneCounts, src/sim/regional_mastery.ts). The map
-  // only ever climbs, so a milestone once reached is never lost.
-  | 'regionalMasteryBest'
   // Clue Scrolls: lifetime Treasure Caskets opened (PlayerMeta.clueCasketsOpened,
   // src/sim/clue_casket.ts). Only ever climbs.
   | 'clueCasketsOpened';

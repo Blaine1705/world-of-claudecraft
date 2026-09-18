@@ -2320,9 +2320,6 @@ export const guideStrings = {
     deedsHeading: 'Deeds',
     deedsBody:
       'The Book of Deeds keeps score of your standing too: reaching Trusted with a faction and reaching Champion with a faction each record a deed, and reaching Champion with all three is a deed of its own. Like every deed these are cosmetic, never power, and the Champion deeds grant a title you can wear.',
-    masteryHeading: 'Regional Mastery',
-    masteryBody:
-      'Every zone also keeps a permanent count of the world quests you have completed there. It is not a currency and nothing spends it: the number only ever climbs, there is no daily streak to keep, and if you come back after weeks away the next world quest simply adds one more. At set milestones the count records a deed in the Book of Deeds, so an old zone stays worth a visit long after your character has stopped leveling. The Reputation tab lists every zone with its count and the next milestone.',
   },
   deedsPage: {
     intro:

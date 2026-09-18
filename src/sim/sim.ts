@@ -4812,9 +4812,6 @@ export class Sim {
   get worldQuestRerollCycle(): string {
     return this.primary.worldQuestRerollCycle;
   }
-  get worldQuestZoneCounts(): Readonly<Record<string, number>> {
-    return this.primary.worldQuestZoneCounts;
-  }
   get clueHunt(): Readonly<{ huntId: string; step: number }> | null {
     return this.primary.clueHunt;
   }

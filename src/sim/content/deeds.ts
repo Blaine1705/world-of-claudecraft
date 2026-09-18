@@ -9,7 +9,6 @@
 // stable forever).
 
 import { STANDING_THRESHOLDS } from '../factions';
-import { REGIONAL_MASTERY_MILESTONES } from '../regional_mastery';
 import type { DeedDef } from '../types';
 import { FARM_CROP_IDS } from './farm_crops';
 
@@ -3541,70 +3540,6 @@ export const DEEDS: Record<string, DeedDef> = {
         'prog_church_order_champion',
         'prog_automatons_champion',
       ],
-    },
-  },
-  // Regional Mastery: the permanent per-zone world quest completion ladder
-  // (src/sim/regional_mastery.ts). The meter reads the best single zone, so
-  // spreading turn-ins across zones never counts; the rungs are the milestone
-  // list itself. Cosmetic only, no title.
-  exp_regional_mastery_10: {
-    id: 'exp_regional_mastery_10',
-    name: 'Regional Regular',
-    desc: 'Complete 10 world quests in a single zone.',
-    category: 'exploration',
-    renown: 5,
-    trigger: {
-      kind: 'meter',
-      meter: 'regionalMasteryBest',
-      amount: REGIONAL_MASTERY_MILESTONES[0],
-    },
-  },
-  exp_regional_mastery_25: {
-    id: 'exp_regional_mastery_25',
-    name: 'Regional Fixture',
-    desc: 'Complete 25 world quests in a single zone.',
-    category: 'exploration',
-    renown: 10,
-    trigger: {
-      kind: 'meter',
-      meter: 'regionalMasteryBest',
-      amount: REGIONAL_MASTERY_MILESTONES[1],
-    },
-  },
-  exp_regional_mastery_50: {
-    id: 'exp_regional_mastery_50',
-    name: 'Regional Veteran',
-    desc: 'Complete 50 world quests in a single zone.',
-    category: 'exploration',
-    renown: 10,
-    trigger: {
-      kind: 'meter',
-      meter: 'regionalMasteryBest',
-      amount: REGIONAL_MASTERY_MILESTONES[2],
-    },
-  },
-  exp_regional_mastery_100: {
-    id: 'exp_regional_mastery_100',
-    name: 'Regional Master',
-    desc: 'Complete 100 world quests in a single zone.',
-    category: 'exploration',
-    renown: 25,
-    trigger: {
-      kind: 'meter',
-      meter: 'regionalMasteryBest',
-      amount: REGIONAL_MASTERY_MILESTONES[3],
-    },
-  },
-  exp_regional_mastery_250: {
-    id: 'exp_regional_mastery_250',
-    name: 'Regional Legend',
-    desc: 'Complete 250 world quests in a single zone.',
-    category: 'exploration',
-    renown: 50,
-    trigger: {
-      kind: 'meter',
-      meter: 'regionalMasteryBest',
-      amount: REGIONAL_MASTERY_MILESTONES[4],
     },
   },
   // Clue Scrolls (world quests, Stage 3; docs/design/clue-scrolls.md): the

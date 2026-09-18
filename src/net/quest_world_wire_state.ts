@@ -43,7 +43,6 @@ export class QuestWorldWireState {
   factions: Readonly<Record<FactionId, number>> = freshFactionReputation();
   worldQuestReplacements: Readonly<Record<string, string>> = Object.freeze({});
   worldQuestRerollCycle = '';
-  worldQuestZoneCounts: Readonly<Record<string, number>> = Object.freeze({});
   /** The active clue hunt mirrored from the `cluh` self key (null when none). */
   clueHunt: Readonly<{ huntId: string; step: number }> | null = null;
   private activeWorldBossIds = new Set<string>();
@@ -174,7 +173,6 @@ export class QuestWorldWireState {
     this.worldQuestLog = new Map();
     this.worldQuestReplacements = Object.freeze({});
     this.worldQuestRerollCycle = '';
-    this.worldQuestZoneCounts = Object.freeze({});
     this.clueHunt = null;
     this.nearbyWorldQuestTraces = [];
     this.activeWorldBossIds = new Set();

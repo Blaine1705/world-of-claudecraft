@@ -6,13 +6,9 @@
 import type { FactionId, StandingTier } from '../../../sim/factions';
 import type { IWorld } from '../../../world_api';
 import { esc } from '../../esc';
-import { formatNumber, type TranslationKey, t, tPlural } from '../../i18n';
+import { formatNumber, type TranslationKey, t } from '../../i18n';
 import { worldQuestTimeRemainingText } from '../../world_quest_view';
-import {
-  buildReputationView,
-  type RegionalMasteryRowView,
-  type ReputationRowView,
-} from './reputation_view';
+import { buildReputationView, type ReputationRowView } from './reputation_view';
 
 const factionNameKey = (id: FactionId): TranslationKey =>
   `hudChrome.reputation.faction.${id}` as TranslationKey;
@@ -51,23 +47,6 @@ function rowHtml(row: ReputationRowView): string {
   return `<section class="char-rep-row ui-card char-rep-tier-${esc(row.tier)}"><div class="char-rep-head"><span class="char-rep-crest" aria-hidden="true"></span><span class="char-rep-copy"><b class="char-rep-name">${esc(t(factionNameKey(row.factionId)))}</b><span class="char-rep-hub">${esc(hub)}</span></span><span class="char-rep-pill">${esc(tierLabel)}</span></div><div class="char-rep-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${row.percent}" aria-label="${esc(t(factionNameKey(row.factionId)))}"><span style="--char-rep-pct:${row.percent}%"></span></div><div class="char-rep-foot"><span class="char-rep-progress">${esc(progress)}</span>${footer}</div></section>`;
 }
 
-// One Regional Mastery row: the zone, its faction, the permanent completion
-// count, the milestone tally and a slim bar to the next milestone. The count
-// is the headline (it never resets, so it is the number a player keeps).
-function masteryRowHtml(row: RegionalMasteryRowView, milestoneCount: number): string {
-  const count = tPlural('hudChrome.plurals.worldQuestsCompletedInZone', row.count);
-  const next =
-    row.nextMilestone === null
-      ? t('hudChrome.reputation.masteryMaxed')
-      : t('hudChrome.reputation.masteryNext', { count: whole(row.nextMilestone) });
-  const reached = t('hudChrome.reputation.masteryReached', {
-    reached: whole(row.reached),
-    total: whole(milestoneCount),
-  });
-  const zone = t(zoneNameKey(row.zoneId));
-  return `<div class="char-rep-mastery-row${row.count === 0 ? ' is-empty' : ''}"><div class="char-rep-mastery-head"><span class="char-rep-copy"><b class="char-rep-name">${esc(zone)}</b><span class="char-rep-hub">${esc(t(factionNameKey(row.factionId)))}</span></span><span class="char-rep-mastery-count">${esc(count)}</span></div><div class="char-rep-bar char-rep-mastery-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${row.percent}" aria-label="${esc(zone)}"><span style="--char-rep-pct:${row.percent}%"></span></div><div class="char-rep-foot"><span class="char-rep-progress">${esc(reached)}</span><span class="char-rep-next">${esc(next)}</span></div></div>`;
-}
-
 /** The whole sidebar body for the Reputation tab. `nowMs` is the window's clock. */
 export function reputationTabHtml(world: IWorld, nowMs: number): string {
   const view = buildReputationView({
@@ -76,7 +55,6 @@ export function reputationTabHtml(world: IWorld, nowMs: number): string {
     worldQuestLog: world.worldQuestLog,
     worldQuestExpiresAtMs: world.worldQuestExpiresAtMs,
     nowMs,
-    zoneCounts: world.worldQuestZoneCounts,
   });
   const rows = view.rows.map(rowHtml).join('');
   const legend = view.tiers
@@ -94,6 +72,5 @@ export function reputationTabHtml(world: IWorld, nowMs: number): string {
   const title = best
     ? `<section class="char-rep-title ui-card"><h3>${esc(t('hudChrome.reputation.title'))}</h3><b class="char-rep-tier-${esc(best.tier)}">${esc(t(factionTitleKey(best.factionId, best.tier)))}</b><span class="char-rep-hub">${esc(t('hudChrome.reputation.titleLine', { faction: t(factionNameKey(best.factionId)), tier: t(tierKey(best.tier)) }))}</span></section>`
     : '';
-  const mastery = `<section class="char-rep-mastery ui-card"><h3>${esc(t('hudChrome.reputation.mastery'))}</h3><p class="char-rep-mastery-intro">${esc(t('hudChrome.reputation.masteryIntro'))}</p>${view.mastery.map((row) => masteryRowHtml(row, view.masteryMilestoneCount)).join('')}</section>`;
-  return `<div class="char-rep"><p class="char-rep-intro">${esc(t('hudChrome.reputation.intro'))}</p>${rows}${today}${title}${mastery}<div class="char-rep-legend" aria-label="${esc(t('hudChrome.reputation.legend'))}">${legend}</div></div>`;
+  return `<div class="char-rep"><p class="char-rep-intro">${esc(t('hudChrome.reputation.intro'))}</p>${rows}${today}${title}<div class="char-rep-legend" aria-label="${esc(t('hudChrome.reputation.legend'))}">${legend}</div></div>`;
 }

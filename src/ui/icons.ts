@@ -5557,13 +5557,6 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'prog_church_order_champion',
   'prog_automatons_champion',
   'prog_faction_champion_all',
-  // Regional Mastery's world-quest ladder deeds use the exploration category
-  // crest pending art.
-  'exp_regional_mastery_10',
-  'exp_regional_mastery_25',
-  'exp_regional_mastery_50',
-  'exp_regional_mastery_100',
-  'exp_regional_mastery_250',
   // Clue Scroll casket deeds use the exploration category crest pending art.
   'exp_clue_first_casket',
   'exp_clue_ten_caskets',

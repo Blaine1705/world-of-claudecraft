@@ -43,12 +43,6 @@ export interface IWorldQuests {
   /** Cycle key for which the player used their daily world quest reroll. */
   readonly worldQuestRerollCycle?: string;
   /**
-   * Regional Mastery: permanent per-zone world quest completion counts
-   * (zoneId -> count). Only ever climbs; the rungs are REGIONAL_MASTERY_MILESTONES
-   * (src/sim/regional_mastery.ts). Empty for a character who has never turned one in.
-   */
-  readonly worldQuestZoneCounts: Readonly<Record<string, number>>;
-  /**
    * Clue Scrolls: the active treasure hunt (src/sim/clue_scrolls.ts), the
    * authored hunt id plus the 0-based index of the step being solved, or null
    * when none. The tracker resolves the clue text from clues.<huntId>.<step>.

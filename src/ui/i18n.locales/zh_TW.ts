@@ -1552,9 +1552,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.factionsPage.readingBody':
     '角色面板（C）的聲望頁會顯示每個陣營的當前聲望、通往下一等級的進度條，以及聲望為你贏得的頭銜。聊天記錄會在每次獲得聲望時報告，達到新等級時螢幕上還會顯示慶祝橫幅。',
   'guide.factionsPage.deedsHeading': '功績',
-  'guide.factionsPage.masteryHeading': '區域精通',
-  'guide.factionsPage.masteryBody':
-    '每個區域還會永久記錄你在那裡完成的世界任務數。它不是貨幣，也不會被花掉：這個數字只會上升，不需要每日連續登入，哪怕幾週後再回來，下一個世界任務也只是再加一。達到設定的里程碑時，這個計數會在功績之書中記錄一項功績，因此即便你的角色早已不再升級，舊區域依然值得一去。聲望頁會列出每個區域的計數和下一個里程碑。',
   'guide.factionsPage.deedsBody':
     '功績之書也會記錄你的聲望：與某個陣營達到信任、與某個陣營達到冠軍各記為一項功績，與三個陣營都達到冠軍則是另一項功績。和所有功績一樣，它們只是裝飾，從不帶來戰力，而冠軍功績會授予一個可佩戴的頭銜。',
   'guide.thornhollowPage.heading': '荊谷原野',
@@ -12802,10 +12799,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.commissionLegendaries.few': '{count}件傳說物品',
   'hudChrome.plurals.commissionLegendaries.many': '{count}件傳說物品',
   'hudChrome.plurals.commissionLegendaries.other': '{count}件傳說物品',
-  'hudChrome.plurals.worldQuestsCompletedInZone.one': '已完成{count}個世界任務',
-  'hudChrome.plurals.worldQuestsCompletedInZone.few': '已完成{count}個世界任務',
-  'hudChrome.plurals.worldQuestsCompletedInZone.many': '已完成{count}個世界任務',
-  'hudChrome.plurals.worldQuestsCompletedInZone.other': '已完成{count}個世界任務',
   'hudChrome.commissionBoard.statusOpen': '待接單',
   'hudChrome.commissionBoard.statusAccepted': '已接單',
   'hudChrome.commissionBoard.statusDelivered': '已交付',
@@ -16436,12 +16429,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reputation.title': '陣營頭銜',
   'hudChrome.reputation.legend': '聲望等級',
   'hudChrome.reputation.vendorGate': '需要與{faction}達到{tier}。',
-  'hudChrome.reputation.mastery': '區域精通',
-  'hudChrome.reputation.masteryIntro':
-    '在每個區域完成的世界任務數，永久保留：沒有每日連續要求，也不會被消耗。每達到一個里程碑都會記錄一項功績。',
-  'hudChrome.reputation.masteryNext': '下一個里程碑：{count}',
-  'hudChrome.reputation.masteryMaxed': '已達成全部里程碑',
-  'hudChrome.reputation.masteryReached': '{reached} / {total} 個里程碑',
   'hudChrome.reputation.tierReachedBanner': '與{faction}的聲望達到{tier}',
   'hudChrome.reputation.tierReachedSubtext': '陣營頭銜：{title}',
   'hudChrome.reputation.tierReachedLine':
