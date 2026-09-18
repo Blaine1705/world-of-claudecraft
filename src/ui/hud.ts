@@ -887,6 +887,7 @@ import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
 import { bindTouchDoubleTap, bindTouchTap } from './touch_tap';
 import { buildTownFocusView, stepTownFocus, townFocusRenderSig } from './town_focus_view';
 import { renderTownFocusWindow } from './town_focus_window';
+import { trackerCollapseSettings } from './tracker_collapse_settings';
 import { wireTrackerHeader } from './tracker_header_wiring';
 import { installTrackerStackAnchor } from './tracker_stack_anchor';
 import { tradeOfferCeiling } from './trade_view';
@@ -2341,6 +2342,7 @@ export class Hud {
       click: () => audio.click(),
       onRepaintMap: () => this.repaintOpenMap(),
       onShowRoute: (route) => this.showFinderOnMap(route.x, route.z),
+      settings: trackerCollapseSettings(() => this.optionsHooks, 'mapAtlasSidebarCollapsed'),
     });
     this.fiesta = new FiestaController({
       document,
@@ -2363,14 +2365,7 @@ export class Hud {
       element: $('#qt-body'),
       document,
       world: () => this.sim,
-      settings: {
-        available: () => this.optionsHooks !== null,
-        collapsed: () =>
-          (this.optionsHooks?.settings.get('questTrackerCollapsed') ?? false) === true,
-        setCollapsed: (collapsed) => {
-          this.optionsHooks?.settings.set('questTrackerCollapsed', collapsed);
-        },
-      },
+      settings: trackerCollapseSettings(() => this.optionsHooks, 'questTrackerCollapsed'),
       questTitle,
       objectiveLabel: questObjectiveLabel,
       click: () => audio.click(),

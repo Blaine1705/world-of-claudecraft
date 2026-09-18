@@ -5398,7 +5398,9 @@ export const nl_NL: EnTranslations = {
         "herb": "Kruid",
         "mail": "Mail",
         "passage": "Passage"
-      }
+      },
+      "collapseHint": "Collapse map sidebar",
+      "expandHint": "Expand map sidebar"
     },
     "arenaGate": {
       "minLevelNote": "Vereist niveau {level}"

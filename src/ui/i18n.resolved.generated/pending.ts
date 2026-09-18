@@ -11,28 +11,40 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "hudChrome.townFocus.pendingLine",
-    "hudChrome.townFocus.preferenceHint"
+    "hudChrome.townFocus.preferenceHint",
+    "hudChrome.mapAtlas.collapseHint",
+    "hudChrome.mapAtlas.expandHint"
   ],
   "es_ES": [
     "hudChrome.townFocus.pendingLine",
-    "hudChrome.townFocus.preferenceHint"
+    "hudChrome.townFocus.preferenceHint",
+    "hudChrome.mapAtlas.collapseHint",
+    "hudChrome.mapAtlas.expandHint"
   ],
   "fr_FR": [
     "hudChrome.townFocus.pendingLine",
-    "hudChrome.townFocus.preferenceHint"
+    "hudChrome.townFocus.preferenceHint",
+    "hudChrome.mapAtlas.collapseHint",
+    "hudChrome.mapAtlas.expandHint"
   ],
   "fr_CA": [
     "hudChrome.townFocus.pendingLine",
-    "hudChrome.townFocus.preferenceHint"
+    "hudChrome.townFocus.preferenceHint",
+    "hudChrome.mapAtlas.collapseHint",
+    "hudChrome.mapAtlas.expandHint"
   ],
   "en_CA": [],
   "it_IT": [
     "hudChrome.townFocus.pendingLine",
-    "hudChrome.townFocus.preferenceHint"
+    "hudChrome.townFocus.preferenceHint",
+    "hudChrome.mapAtlas.collapseHint",
+    "hudChrome.mapAtlas.expandHint"
   ],
   "de_DE": [
     "hudChrome.townFocus.pendingLine",
-    "hudChrome.townFocus.preferenceHint"
+    "hudChrome.townFocus.preferenceHint",
+    "hudChrome.mapAtlas.collapseHint",
+    "hudChrome.mapAtlas.expandHint"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -40,39 +52,57 @@ export const pending: Record<string, readonly string[]> = {
   "ja_JP": [],
   "pt_BR": [
     "hudChrome.townFocus.pendingLine",
-    "hudChrome.townFocus.preferenceHint"
+    "hudChrome.townFocus.preferenceHint",
+    "hudChrome.mapAtlas.collapseHint",
+    "hudChrome.mapAtlas.expandHint"
   ],
   "ru_RU": [],
   "cs_CZ": [
     "hudChrome.townFocus.pendingLine",
-    "hudChrome.townFocus.preferenceHint"
+    "hudChrome.townFocus.preferenceHint",
+    "hudChrome.mapAtlas.collapseHint",
+    "hudChrome.mapAtlas.expandHint"
   ],
   "nl_NL": [
     "hudChrome.townFocus.pendingLine",
-    "hudChrome.townFocus.preferenceHint"
+    "hudChrome.townFocus.preferenceHint",
+    "hudChrome.mapAtlas.collapseHint",
+    "hudChrome.mapAtlas.expandHint"
   ],
   "pl_PL": [
     "hudChrome.townFocus.pendingLine",
-    "hudChrome.townFocus.preferenceHint"
+    "hudChrome.townFocus.preferenceHint",
+    "hudChrome.mapAtlas.collapseHint",
+    "hudChrome.mapAtlas.expandHint"
   ],
   "id_ID": [
     "hudChrome.townFocus.pendingLine",
-    "hudChrome.townFocus.preferenceHint"
+    "hudChrome.townFocus.preferenceHint",
+    "hudChrome.mapAtlas.collapseHint",
+    "hudChrome.mapAtlas.expandHint"
   ],
   "tr_TR": [
     "hudChrome.townFocus.pendingLine",
-    "hudChrome.townFocus.preferenceHint"
+    "hudChrome.townFocus.preferenceHint",
+    "hudChrome.mapAtlas.collapseHint",
+    "hudChrome.mapAtlas.expandHint"
   ],
   "sv_SE": [
     "hudChrome.townFocus.pendingLine",
-    "hudChrome.townFocus.preferenceHint"
+    "hudChrome.townFocus.preferenceHint",
+    "hudChrome.mapAtlas.collapseHint",
+    "hudChrome.mapAtlas.expandHint"
   ],
   "vi_VN": [
     "hudChrome.townFocus.pendingLine",
-    "hudChrome.townFocus.preferenceHint"
+    "hudChrome.townFocus.preferenceHint",
+    "hudChrome.mapAtlas.collapseHint",
+    "hudChrome.mapAtlas.expandHint"
   ],
   "da_DK": [
     "hudChrome.townFocus.pendingLine",
-    "hudChrome.townFocus.preferenceHint"
+    "hudChrome.townFocus.preferenceHint",
+    "hudChrome.mapAtlas.collapseHint",
+    "hudChrome.mapAtlas.expandHint"
   ]
 };
