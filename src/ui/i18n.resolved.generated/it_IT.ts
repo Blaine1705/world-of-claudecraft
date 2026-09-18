@@ -388,6 +388,7 @@ export const it_IT: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Risorgi al cadavere",
       "resurrectAtHealer": "Il Custode Pallido (Mal di resurrezione)",
+      "ghostHint": "Run to your body or talk to the Pale Keeper to revive",
       "spiritHealerAlive": "Il Custode Pallido veglia sui morti. Tu sei ancora tra i vivi.",
       "healerConfirmTitle": "Accettare il Mal di resurrezione?",
       "healerConfirmBody": "Il Custode Pallido ti farà rivivere qui, ma il Mal di resurrezione riduce tutti i tuoi attributi del 75%, per un massimo di 10 minuti ai livelli più alti. Riportare il tuo spirito al tuo cadavere ti fa rivivere senza penalità.",

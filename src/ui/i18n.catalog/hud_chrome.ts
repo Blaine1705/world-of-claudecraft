@@ -73,7 +73,13 @@ export const hudChromeStrings = {
   // ghost-state additions shown once the spirit has been released.
   death: {
     resurrectAtCorpse: 'Resurrect at Corpse',
+    // RETIRED in place: the ghost prompt's Pale Keeper button is gone (the ghost
+    // talks to the Keeper instead). The key stays, already filled in all 20
+    // locales, per the hud.core.mobileTarget retired-but-translated precedent.
     resurrectAtHealer: "The Pale Keeper (Keeper's Toll)",
+    // The standing top-of-screen line for the whole ghost run (#ghost-hint).
+    // WORDY by M16, so the five non-Latin overlays carry real fills.
+    ghostHint: 'Run to your body or talk to the Pale Keeper to revive',
     spiritHealerAlive: 'The Pale Keeper watches over the dead. You are still among the living.',
     // Confirm dialog gating the Pale Keeper revive (the corpse run stays one-tap:
     // it carries no penalty, so a confirm there would only add friction).

@@ -388,6 +388,7 @@ export const ko_KR: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "시신에서 부활",
       "resurrectAtHealer": "영혼 치유사 (부활의 후유증)",
+      "ghostHint": "당신의 시신으로 달려가거나 영혼 치유사에게 말을 걸어 부활하세요",
       "spiritHealerAlive": "영혼 치유사는 죽은 자를 지킵니다. 당신은 아직 산 자입니다.",
       "healerConfirmTitle": "부활의 후유증을 감수하시겠습니까?",
       "healerConfirmBody": "영혼 치유사가 이 자리에서 부활시켜 주지만, 부활의 후유증으로 모든 능력치가 75% 감소하며 높은 레벨에서는 최대 10분간 지속됩니다. 영혼이 시신까지 걸어가서 부활하면 아무런 불이익이 없습니다.",

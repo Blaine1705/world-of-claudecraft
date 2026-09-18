@@ -24,7 +24,7 @@ describe('death controller hint', () => {
     expect(deathControllerConfirmLabel([{ button: GP.A, action: 'jump' }], 'xbox')).toBeNull();
   });
 
-  it('paints the live cap onto all three localized death buttons', () => {
+  it('paints the live cap onto both localized death buttons', () => {
     const attrs = new Map<string, string>();
     const button = {
       setAttribute: (name: string, value: string) => attrs.set(name, value),

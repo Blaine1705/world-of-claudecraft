@@ -1079,11 +1079,11 @@ const ABSENT_TARGET_DESCRIPTOR: UnitFrameDescriptor = {
 };
 // The HUD's i18n + number-formatting surface, handed to the pure stat-tooltip
 // view so it can render localized breakdowns without importing the i18n runtime.
-// Ghost-mode display thresholds, mirroring src/sim/spirit.ts (CORPSE_REZ_RANGE and
-// SPIRIT_HEALER_RANGE). The server re-validates both ranges; these only decide whether
-// the death-overlay resurrect buttons are shown, so keep them in sync.
+// Ghost-mode display threshold, mirroring src/sim/spirit.ts CORPSE_REZ_RANGE. The
+// server re-validates the range; this only decides whether the ghost prompt's corpse
+// button is shown, so keep it in sync. (The Pale Keeper's raise is reached by talking
+// to the Keeper, so no healer range is mirrored here any more.)
 const GHOST_CORPSE_REZ_RANGE = 35;
-const GHOST_HEALER_RANGE = 8;
 
 const STAT_VIEW_DEPS: StatTooltipI18n = {
   t: (key, params) => t(key as TranslationKey, params),
@@ -1609,7 +1609,8 @@ export class Hud {
   private guildInvitePromptEl: HTMLElement | null = null;
   private promptSequence = 0;
   private resurrectCorpseBtnEl = $('#resurrect-corpse-btn');
-  private resurrectHealerBtnEl = $('#resurrect-healer-btn');
+  // The standing top-of-screen ghost line (both ways back); shown for a ghost only.
+  private ghostHintEl = $('#ghost-hint');
   // Cached once (was re-queried every frame): the near-death screen-edge overlay.
   private lowHealthVignetteEl = document.getElementById('low-health-vignette');
   private hotWriteCache: SingleSlotCache = new WeakMap(); // WeakMap rationale: painter_host.ts
@@ -2689,7 +2690,6 @@ export class Hud {
       this.sim.releaseSpirit();
     });
     bindTouchTap(this.resurrectCorpseBtnEl, () => this.sim.resurrectAtCorpse());
-    bindTouchTap(this.resurrectHealerBtnEl, () => this.requestSpiritHealerResurrect());
     document.addEventListener('pointerdown', (ev) => {
       const target = ev.target as Node | null;
       if (!target) return;
@@ -9491,7 +9491,9 @@ export class Hud {
     // Death UI. A fresh corpse (dead, spirit not yet released) gets the full-screen
     // Release overlay (a corpse cannot move, so a modal is fine; suppressed in arena).
     // A ghost runs FREELY (no blocking overlay) and the world drains to greyscale; a
-    // A small prompt appears only in corpse/Healer reach; the server re-checks both ranges.
+    // A small prompt appears only in corpse reach (the server re-checks the range); the
+    // Pale Keeper's raise is reached by talking to the Keeper, and a standing top line
+    // names both ways back for the whole ghost run.
     const ghost = p.dead && p.ghost;
     const deadInArena = p.dead && !!this.sim.arenaInfo?.match;
     // A battleground corpse releases like the open world, so the Release modal shows;
@@ -9502,22 +9504,10 @@ export class Hud {
     if (!p.dead) this.closeResurrectionPrompt();
     document.body.classList.toggle('spirit-mode', ghost);
     this.setDisplay(this.deathOverlayEl, p.dead && !ghost && !deadInArena ? 'flex' : 'none');
+    this.setDisplay(this.ghostHintEl, ghost && !ghostInBgMatch ? '' : 'none');
     if (ghost && !ghostInBgMatch) {
       const corpseInRange = !!p.corpsePos && dist2d(p.pos, p.corpsePos) <= GHOST_CORPSE_REZ_RANGE;
-      let healerNearby = false;
-      for (const ent of this.sim.entities.values()) {
-        if (
-          ent.kind === 'npc' &&
-          ent.templateId === 'spirit_healer' &&
-          dist2d(ent.pos, p.pos) <= GHOST_HEALER_RANGE
-        ) {
-          healerNearby = true;
-          break;
-        }
-      }
-      this.setDisplay(this.ghostPromptEl, corpseInRange || healerNearby ? 'flex' : 'none');
-      this.setDisplay(this.resurrectCorpseBtnEl, corpseInRange ? '' : 'none');
-      this.setDisplay(this.resurrectHealerBtnEl, healerNearby ? '' : 'none');
+      this.setDisplay(this.ghostPromptEl, corpseInRange ? 'flex' : 'none');
     } else {
       this.setDisplay(this.ghostPromptEl, 'none');
     }
@@ -16645,9 +16635,9 @@ export class Hud {
   // attributes -75%, level-scaled up to 10 minutes), so it confirms first; the
   // penalty-free corpse run stays one tap. OK sends the exact pre-existing
   // command; cancel/Escape sends nothing. Public because every entry point to
-  // the revive routes through this one gate: the ghost-prompt button, the
-  // world-click on the Pale Keeper (game/interactions.ts), and the interact
-  // key (game/nearby_interaction.ts).
+  // the revive routes through this one gate: the world-click on the Pale Keeper
+  // (game/interactions.ts) and the interact key (game/nearby_interaction.ts).
+  // The ghost prompt no longer carries a Keeper button: the ghost talks to the Keeper.
   requestSpiritHealerResurrect(): void {
     this.confirmDialog(
       t('hudChrome.death.healerConfirmTitle'),

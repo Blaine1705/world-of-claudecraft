@@ -8696,6 +8696,32 @@
   #ghost-prompt .btn {
     pointer-events: auto;
   }
+  /* Ghost hint: the standing top-center line for the whole ghost run ("run to
+     your body or talk to the Pale Keeper"). Sits under the compass strip in the
+     #arena-status band and reads like the zone banner (light text, no plate),
+     pointer-inert so it never eats a click meant for the world. */
+  #ghost-hint {
+    --color-text-light: var(--color-white);
+    position: absolute;
+    left: 50%;
+    top: 74px;
+    transform: translateX(-50%);
+    display: none;
+    width: max-content;
+    max-width: calc(100vw - 48px);
+    box-sizing: border-box;
+    color: var(--color-text-light);
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 1.2;
+    text-align: center;
+    letter-spacing: 0.5px;
+    text-shadow:
+      0 0 14px color-mix(in srgb, var(--color-keyline) 53%, transparent),
+      1px 1px 4px var(--color-keyline);
+    pointer-events: none;
+    z-index: 30;
+  }
   /* Interact affordance: a small, NON-BLOCKING line shown only while an interact
      press is ambiguous between two farming targets in reach (a placed feast over
      a garden bed). Sits just above the ghost prompt's band and below the action

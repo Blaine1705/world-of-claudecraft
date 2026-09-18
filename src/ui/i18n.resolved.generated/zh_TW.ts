@@ -388,6 +388,7 @@ export const zh_TW: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "在屍體旁復活",
       "resurrectAtHealer": "靈魂醫者（復活虛弱）",
+      "ghostHint": "跑回你的屍體，或與靈魂醫者交談以復活",
       "spiritHealerAlive": "靈魂醫者只看護逝者。你仍是生者。",
       "healerConfirmTitle": "接受復活虛弱？",
       "healerConfirmBody": "靈魂醫者可以就地復活你，但復活虛弱會使你的全部屬性降低75%，高等級時最長持續10分鐘。讓靈魂返回屍體復活則沒有任何懲罰。",

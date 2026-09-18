@@ -388,6 +388,7 @@ export const vi_VN: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Hồi Sinh Tại Xác Chết",
       "resurrectAtHealer": "Người Canh Giữ Nhợt Nhạt (Cái Giá của Người Canh Giữ)",
+      "ghostHint": "Run to your body or talk to the Pale Keeper to revive",
       "spiritHealerAlive": "Người Canh Giữ Nhợt Nhạt trông nom kẻ chết. Bạn vẫn còn ở giữa cõi sống.",
       "healerConfirmTitle": "Chấp nhận Cái Giá của Người Canh Giữ?",
       "healerConfirmBody": "Người Canh Giữ Nhợt Nhạt sẽ hồi sinh bạn tại đây, nhưng Cái Giá của Người Canh Giữ sẽ giảm 75% tất cả thuộc tính của bạn trong tối đa 10 phút ở cấp độ cao hơn. Đưa linh hồn của bạn trở lại xác chết sẽ hồi sinh bạn mà không bị phạt.",

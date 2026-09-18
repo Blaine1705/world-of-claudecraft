@@ -388,6 +388,7 @@ export const sv_SE: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Återuppstå vid liket",
       "resurrectAtHealer": "Den bleka väktaren (Väktartullen)",
+      "ghostHint": "Run to your body or talk to the Pale Keeper to revive",
       "spiritHealerAlive": "Den bleka väktaren vakar över de döda. Du är fortfarande bland de levande.",
       "healerConfirmTitle": "Acceptera Väktartullen?",
       "healerConfirmBody": "Den bleka väktaren återupplivar dig här, men Väktartullen minskar alla dina egenskaper med 75 % i upp till 10 minuter på högre nivåer. Går du som ande tillbaka till din kropp återupplivas du utan påföljd.",

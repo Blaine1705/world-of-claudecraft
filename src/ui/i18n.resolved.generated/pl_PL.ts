@@ -388,6 +388,7 @@ export const pl_PL: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Odrodź się przy zwłokach",
       "resurrectAtHealer": "Blady Strażnik (Myto Strażnika)",
+      "ghostHint": "Run to your body or talk to the Pale Keeper to revive",
       "spiritHealerAlive": "Blady Strażnik czuwa nad umarłymi. Ty wciąż jesteś wśród żywych.",
       "healerConfirmTitle": "Przyjąć Myto Strażnika?",
       "healerConfirmBody": "Blady Strażnik wskrzesi cię tutaj, ale Myto Strażnika zmniejsza wszystkie twoje atrybuty o 75% na maksymalnie 10 minut na wyższych poziomach. Odprowadzenie ducha z powrotem do zwłok ożywia cię bez kary.",

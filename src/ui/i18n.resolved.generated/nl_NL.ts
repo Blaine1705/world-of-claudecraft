@@ -388,6 +388,7 @@ export const nl_NL: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Herrijs bij je lijk",
       "resurrectAtHealer": "De Bleke Hoeder (Tol van de Hoeder)",
+      "ghostHint": "Run to your body or talk to the Pale Keeper to revive",
       "spiritHealerAlive": "De Bleke Hoeder waakt over de doden. Jij bent nog onder de levenden.",
       "healerConfirmTitle": "De Tol van de Hoeder accepteren?",
       "healerConfirmBody": "De Bleke Hoeder wekt je hier tot leven, maar de Tol van de Hoeder vermindert al je eigenschappen met 75%, op hogere niveaus tot wel 10 minuten lang. Loop je als geest terug naar je lichaam, dan herleef je zonder straf.",

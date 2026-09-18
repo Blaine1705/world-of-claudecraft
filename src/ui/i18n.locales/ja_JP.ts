@@ -4424,6 +4424,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.death.healerConfirmAccept': '復活する',
   'hudChrome.death.healerConfirmCancel': 'キャンセル',
   'hudChrome.death.spiritHealerAlive': '霊魂の癒し手は死者を見守っている。あなたはまだ生者だ。',
+  'hudChrome.death.ghostHint': '自分の遺体まで走るか、霊魂の癒し手に話しかけて復活しよう',
   'entities.npcs.spirit_healer.name': '霊魂の癒し手',
   'entities.npcs.spirit_healer.title': '死者の番人',
   'entities.npcs.spirit_healer.greeting':

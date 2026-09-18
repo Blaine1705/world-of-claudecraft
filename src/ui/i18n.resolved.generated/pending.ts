@@ -9,25 +9,55 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.death.ghostHint"
+  ],
+  "es_ES": [
+    "hudChrome.death.ghostHint"
+  ],
+  "fr_FR": [
+    "hudChrome.death.ghostHint"
+  ],
+  "fr_CA": [
+    "hudChrome.death.ghostHint"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.death.ghostHint"
+  ],
+  "de_DE": [
+    "hudChrome.death.ghostHint"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.death.ghostHint"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.death.ghostHint"
+  ],
+  "nl_NL": [
+    "hudChrome.death.ghostHint"
+  ],
+  "pl_PL": [
+    "hudChrome.death.ghostHint"
+  ],
+  "id_ID": [
+    "hudChrome.death.ghostHint"
+  ],
+  "tr_TR": [
+    "hudChrome.death.ghostHint"
+  ],
+  "sv_SE": [
+    "hudChrome.death.ghostHint"
+  ],
+  "vi_VN": [
+    "hudChrome.death.ghostHint"
+  ],
+  "da_DK": [
+    "hudChrome.death.ghostHint"
+  ]
 };

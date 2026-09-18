@@ -388,6 +388,7 @@ export const da_DK: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Genopstå ved liget",
       "resurrectAtHealer": "Den Blege Vogter (Vogterens Klokke)",
+      "ghostHint": "Run to your body or talk to the Pale Keeper to revive",
       "spiritHealerAlive": "Den Blege Vogter våger over de døde. Du er stadig blandt de levende.",
       "healerConfirmTitle": "Vil du acceptere Vogterens Klokke?",
       "healerConfirmBody": "Den Blege Vogter genopliver dig her, men Vogterens Klokke reducerer alle dine egenskaber med 75 % i op til 10 minutter på højere niveauer. Går du som ånd tilbage til dit lig, genoplives du uden straf.",

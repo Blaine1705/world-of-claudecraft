@@ -388,6 +388,7 @@ export const ja_JP: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "亡骸で復活",
       "resurrectAtHealer": "霊魂の癒し手（復活の後遺症）",
+      "ghostHint": "自分の遺体まで走るか、霊魂の癒し手に話しかけて復活しよう",
       "spiritHealerAlive": "霊魂の癒し手は死者を見守っている。あなたはまだ生者だ。",
       "healerConfirmTitle": "復活の後遺症を受けますか？",
       "healerConfirmBody": "霊魂の癒し手はこの場で復活させてくれますが、復活の後遺症により全属性が75%低下します。高レベルでは最長10分間続きます。魂を遺体まで戻せばペナルティなしで復活できます。",

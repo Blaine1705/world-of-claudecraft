@@ -388,6 +388,7 @@ export const en_CA: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Resurrect at Corpse",
       "resurrectAtHealer": "The Pale Keeper (Keeper's Toll)",
+      "ghostHint": "Run to your body or talk to the Pale Keeper to revive",
       "spiritHealerAlive": "The Pale Keeper watches over the dead. You are still among the living.",
       "healerConfirmTitle": "Accept the Keeper's Toll?",
       "healerConfirmBody": "The Pale Keeper will revive you here, but the Keeper's Toll reduces all of your attributes by 75%, for up to 10 minutes at higher levels. Walking your spirit back to your corpse revives you with no penalty.",

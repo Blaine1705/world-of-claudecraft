@@ -9608,6 +9608,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.dawnholdMap.story.ground'
   | 'hudChrome.dawnholdMap.story.solar'
   | 'hudChrome.dawnholdMap.title'
+  | 'hudChrome.death.ghostHint'
   | 'hudChrome.death.healerConfirmAccept'
   | 'hudChrome.death.healerConfirmBody'
   | 'hudChrome.death.healerConfirmCancel'

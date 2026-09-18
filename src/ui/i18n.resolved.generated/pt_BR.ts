@@ -388,6 +388,7 @@ export const pt_BR: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "Ressuscitar no Cadáver",
       "resurrectAtHealer": "O Guardião Pálido (Tributo do Guardião)",
+      "ghostHint": "Run to your body or talk to the Pale Keeper to revive",
       "spiritHealerAlive": "O Guardião Pálido vela pelos mortos. Você ainda está entre os vivos.",
       "healerConfirmTitle": "Aceitar o Tributo do Guardião?",
       "healerConfirmBody": "O Guardião Pálido irá reanimá-lo aqui, mas o Tributo do Guardião reduz todos os seus atributos em 75%, por até 10 minutos em níveis mais altos. Levar seu espírito de volta ao seu cadáver o revive sem penalidade.",

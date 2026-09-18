@@ -388,6 +388,7 @@ export const zh_CN: EnTranslations = {
     "death": {
       "resurrectAtCorpse": "在尸体旁复活",
       "resurrectAtHealer": "灵魂医者（复活后遗症）",
+      "ghostHint": "跑回你的尸体，或与灵魂医者交谈以复活",
       "spiritHealerAlive": "灵魂医者只看护逝者。你仍是生者。",
       "healerConfirmTitle": "接受复活后遗症？",
       "healerConfirmBody": "灵魂医者可以就地复活你，但复活后遗症会使你的全部属性降低75%，高等级时最长持续10分钟。让灵魂返回尸体复活则没有任何惩罚。",
