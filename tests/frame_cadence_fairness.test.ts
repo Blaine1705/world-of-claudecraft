@@ -17,6 +17,8 @@ const READS_GRAPHICS_TIER = /ui_effects_profile|ui_tier_knobs|graphicsPreset|fxT
 const CADENCE_MODULES = [
   'src/game/frame_cadence_core.ts',
   'src/game/frame_cadence_auto_core.ts',
+  'src/game/frame_cadence_calm_core.ts',
+  'src/game/frame_cadence_surface_core.ts',
   'src/game/frame_cadence_wiring.ts',
   'src/game/display_refresh_estimator_core.ts',
   'src/game/frame_rate_cap_setting.ts',

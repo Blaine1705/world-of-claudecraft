@@ -203,6 +203,7 @@ import {
   chosenCadenceHoldsQuality,
   chosenCadenceMissShare,
   frameLoadMs,
+  noteCadenceProbeContext,
   noteGovernorShedding,
   resetChosenCadenceForRenderer,
 } from './chosen_cadence';
@@ -4635,6 +4636,10 @@ export class Renderer {
     // where it lands on every frame rather than only on a presented one.
     this.gpuPrepBudget.notePressure(state.mode === 'degrading');
     noteGovernorShedding(state.mode === 'degrading');
+    noteCadenceProbeContext(
+      this.renderBudgetGovernor.atBaseline(sample.maxRenderScale),
+      this.sim.player.inCombat,
+    );
     this.frameMsEma = state.frameMsEma;
     this.adaptiveCooldown = state.cooldownSeconds;
     this.stableFrameTime = state.stableSeconds;

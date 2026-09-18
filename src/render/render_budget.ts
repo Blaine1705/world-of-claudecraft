@@ -1004,6 +1004,26 @@ export class RenderBudgetGovernor {
     return changed ? 'changed' : eligible ? 'exhausted' : 'idle';
   }
 
+  /** Everything pressure took is back and nothing is moving: what recover()'s
+   *  first phase restores sits at its baseline, render scale at its maximum.
+   *  The automatic frame rate ceiling reads it as its headroom evidence. A
+   *  disabled governor never took anything. */
+  atBaseline(maxRenderScale: number): boolean {
+    if (!this.enabled) return true;
+    if (this.mode !== 'stable' || this.reason !== 'stable') return false;
+    const eps = 0.001;
+    return (
+      this.levels.grass >= this.bands.grass.baseline - eps &&
+      this.levels.lighting >= this.bands.lighting.baseline - eps &&
+      this.levels.vfx >= this.bands.vfx.baseline - eps &&
+      this.levels.foliage >= this.bands.foliage.baseline - eps &&
+      (this.pinnedPostLevel != null ||
+        !this.postShedChain ||
+        this.levels.post >= this.bands.post.baseline - eps) &&
+      this.levels.resolution >= maxRenderScale - eps
+    );
+  }
+
   /** Phase A restores what pressure took, quality buckets before render scale, and runs on
    * measured headroom alone. Phase B climbs past the baselines and additionally needs scene
    * density under the draw caps. Returning false claims nothing: no cooldown, no mode change. */

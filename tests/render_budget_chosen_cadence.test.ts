@@ -170,3 +170,39 @@ describe('a ceiling engaging while a cap probe is in flight', () => {
     expect(lifted.probed).toBe(true);
   });
 });
+
+describe('the governor at baseline (the automatic ceiling headroom evidence)', () => {
+  it('is at baseline once settled with nothing shed', () => {
+    const g = governor('medium');
+    run(g, 5, { chosenCadenceMissShare: 0 });
+    expect(g.atBaseline(1)).toBe(true);
+  });
+
+  it('is not at baseline while shedding, nor once floored, nor before quality is back', () => {
+    const g = governor('medium');
+    const shed = run(g, 60, { chosenCadenceMissShare: 0.5 });
+    expect(shed.degraded).toBe(true);
+    expect(g.atBaseline(1)).toBe(false);
+    // The rhythm holds again, but recovery is held: the levels stay shed.
+    run(g, 120, { chosenCadenceMissShare: 0, holdRecovery: true });
+    expect(g.atBaseline(1)).toBe(false);
+    // Released, the governor climbs back, and only then reads as at baseline.
+    run(g, 600, { chosenCadenceMissShare: 0 });
+    expect(g.atBaseline(1)).toBe(true);
+  });
+
+  it('is not at baseline with render scale still under its maximum', () => {
+    const g = governor('medium');
+    run(g, 5, { chosenCadenceMissShare: 0 });
+    expect(g.atBaseline(1.5)).toBe(false);
+  });
+
+  it('a disabled governor never took anything', () => {
+    const g = new RenderBudgetGovernor({
+      tier: 'low',
+      budget: GFX_BUDGETS.low,
+      enabled: false,
+    });
+    expect(g.atBaseline(1)).toBe(true);
+  });
+});

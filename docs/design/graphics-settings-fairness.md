@@ -552,7 +552,13 @@ rhythm, unevenly; the limit makes it even.
 
 The automatic mode is measurement-driven by design, like the governor's sheds: it
 lowers the limit only on a machine that demonstrably misses its display's slots, and a
-player's explicit choice always wins over it. The static-preset rule still holds in
+player's explicit choice always wins over it. Once it has settled it holds: the limit
+then changes only on something the player did (a preset, the render scale, the display,
+the window's size class, choosing Auto again), downward when the rhythm in force is
+demonstrably missed, or through a small per-session budget of probes that last a few
+frames. The one gameplay reading it takes, `player.inCombat`, only ever POSTPONES a
+probe: a fight never changes what is drawn or when, it only keeps the automatic mode
+from spending frames during one (`src/game/frame_cadence_calm_core.ts`). The static-preset rule still holds in
 full for the HUD: the limit is never an input of `src/game/ui_effects_profile.ts` or
 `src/game/ui_tier_knobs.ts`, so no HUD knob can ever move with it.
 

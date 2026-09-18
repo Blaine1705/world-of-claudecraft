@@ -1383,8 +1383,15 @@ describe('perf reporter frame rate ceiling fields', () => {
   it('reports the chosen ceiling and its effective target as typed fields', () => {
     vi.spyOn(sharedFrameCadence(), 'snapshot').mockReturnValue({
       auto: false,
-      autoTrial: false,
+      autoPhase: 'off',
+      autoConfirmed: false,
+      autoFailStreak: 0,
       autoLateShare: 0,
+      autoDescents: 0,
+      autoProbes: 0,
+      autoProbesFailed: 0,
+      autoProbesInconclusive: 0,
+      autoFirstCeilingS: -1,
       intent: 30,
       verdict: 'paced',
       refreshHz: 143.86,

@@ -5,6 +5,7 @@ import {
   type RefreshEstimatorState,
   resetRefreshEstimatorWindow,
 } from '../src/game/display_refresh_estimator_core';
+import type { FrameCadenceAutoRecord } from '../src/game/frame_cadence_auto_core';
 import {
   ceilingDivisor,
   configureFrameCadence,
@@ -225,12 +226,16 @@ function runHost(opts: {
   seconds: number;
   intent: 0 | 30 | 60 | 'auto';
   governorShedding?: () => boolean;
-  remembered?: 0 | 30 | 60 | null;
+  governorAtBaseline?: () => boolean;
+  inCombat?: (nowMs: number) => boolean;
+  surfacePixels?: (nowMs: number) => number;
+  settingsSignature?: (nowMs: number) => string;
+  remembered?: 0 | 30 | 60 | FrameCadenceAutoRecord | null;
   /** Runs once after `intent` is applied: a later choice made on the same wiring. */
   configure?: (wiring: FrameCadenceWiring) => void;
   onFrame?: (nowMs: number, wiring: FrameCadenceWiring) => void;
   gate?: Partial<FrameCadenceGateView>;
-  cover?: () => boolean;
+  cover?: (nowMs: number) => boolean;
 }) {
   let now = 0;
   const host: { pending: { at: number; timer: boolean } | null; timerCb: (() => void) | null } = {
@@ -241,7 +246,12 @@ function runHost(opts: {
   let maxArmsPerCallback = 0;
   const renderedAt: number[] = [];
   const published = { target: -1, share: -1, hold: false };
-  const saved: number[] = [];
+  const saved: FrameCadenceAutoRecord[] = [];
+  let clears = 0;
+  let remembered: FrameCadenceAutoRecord | null =
+    typeof opts.remembered === 'number'
+      ? { ceiling: opts.remembered, confirmed: true, failStreak: 0 }
+      : (opts.remembered ?? null);
   const intentLog: Array<{ at: number; intent: number }> = [];
   let callbacks = 0;
   let loads = 0;
@@ -260,19 +270,27 @@ function runHost(opts: {
       host.timerCb = cb;
     },
     now: () => now,
-    coverActive: opts.cover ?? (() => false),
+    coverActive: () => opts.cover?.(now) ?? false,
     publish: (target, share, hold) => {
       published.target = target;
       published.share = share;
       published.hold = hold;
     },
     governorShedding: opts.governorShedding ?? (() => false),
+    governorAtBaseline: opts.governorAtBaseline ?? (() => false),
+    inCombat: () => opts.inCombat?.(now) ?? false,
+    surfacePixels: () => opts.surfacePixels?.(now) ?? 1920 * 1080,
     autoMemory: {
       load: () => {
         loads++;
-        return opts.remembered ?? null;
+        return remembered;
       },
-      save: (_hz, ceiling) => saved.push(ceiling),
+      save: (_hz, record) => saved.push({ ...record }),
+      clear: () => {
+        clears++;
+        remembered = null;
+      },
+      settingsSignature: () => opts.settingsSignature?.(now) ?? 'same',
     },
   });
   if (opts.intent === 'auto') wiring.setAuto();
@@ -311,7 +329,18 @@ function runHost(opts: {
   }
   const tail = renderedAt.filter((t) => t > (opts.seconds - 5) * 1000);
   const intervals = tail.slice(1).map((t, i) => t - tail[i]);
-  return { wiring, callbacks, intervals, maxArmsPerCallback, published, saved, intentLog, loads };
+  return {
+    wiring,
+    callbacks,
+    intervals,
+    renderedAt,
+    maxArmsPerCallback,
+    published,
+    saved,
+    clears,
+    intentLog,
+    loads,
+  };
 }
 
 // An uncapped rAF hidden behind a busy GPU, under a ceiling of 30: jittered
@@ -600,26 +629,141 @@ describe('automatic frame rate limit', () => {
     let n = 0;
     return () => (n++ % 2 === 0 ? slow : fast);
   };
+  const intents = (r: ReturnType<typeof runHost>) => r.intentLog.map((e) => e.intent);
+  /** The self-initiated stays above the held ceiling, as [start, end] in ms. */
+  const excursions = (r: ReturnType<typeof runHost>, seconds: number): Array<[number, number]> =>
+    r.intentLog
+      .map((e, i) => ({ ...e, end: r.intentLog[i + 1]?.at ?? seconds * 1000 }))
+      .filter((e, i) => i > 0 && e.intent === 0)
+      .map((e) => [e.at, e.end]);
+  const SETTLED_AT_30: FrameCadenceAutoRecord = { ceiling: 30, confirmed: true, failStreak: 1 };
+  const PROVISIONAL_AT_30: FrameCadenceAutoRecord = {
+    ceiling: 30,
+    confirmed: false,
+    failStreak: 0,
+  };
 
-  it('steps down to 30 on a 60 Hz machine that keeps missing its slot, and remembers it', () => {
-    const r = runHost({
-      refreshMs: SLOT,
-      costMs: uneven(22, 12),
-      seconds: 40,
-      intent: 'auto',
-    });
-    expect(r.intentLog.map((e) => e.intent)).toEqual([0, 30]);
-    expect(r.intentLog[1].at).toBeLessThan(35_000);
+  it('a weak machine, first session: 30 within seconds, one sub-second probe, then it holds', () => {
+    const seconds = 400;
+    const r = runHost({ refreshMs: SLOT, costMs: uneven(22, 12), seconds, intent: 'auto' });
+    expect(intents(r)).toEqual([0, 30, 0, 30]);
+    expect(r.intentLog[1].at).toBeLessThan(8_000);
+    const [[start, end]] = excursions(r, seconds);
+    expect(start - r.intentLog[1].at).toBeGreaterThan(55_000);
+    expect(end - start).toBeLessThan(1_000);
+    const longAfterSettle = r.renderedAt
+      .slice(1)
+      .filter((t, i) => t > 10_000 && t - r.renderedAt[i] > 40).length;
+    expect(longAfterSettle).toBeLessThanOrEqual(3);
     for (const i of r.intervals) expect(i).toBeCloseTo(33.33, 1);
-    expect(r.saved).toEqual([30]);
+    expect(r.saved[r.saved.length - 1]).toEqual(SETTLED_AT_30);
+    // Settled: the headroom at 30 goes to quality.
+    expect(r.published.hold).toBe(false);
+  });
+
+  it('holds the quality levels while the verdict is still provisional', () => {
+    const r = runHost({ refreshMs: SLOT, costMs: uneven(22, 12), seconds: 30, intent: 'auto' });
+    expect(intents(r)).toEqual([0, 30]);
+    expect(r.saved).toEqual([{ ceiling: 30, confirmed: false, failStreak: 0 }]);
     expect(r.published.hold).toBe(true);
   });
 
-  it('leaves a machine that holds its display alone', () => {
-    const r = runHost({ refreshMs: SLOT, costMs: 9, seconds: 60, intent: 'auto' });
-    expect(r.intentLog.map((e) => e.intent)).toEqual([0]);
-    expect(r.published.hold).toBe(false);
+  it('a weak machine, second session: the remembered verdict holds for half an hour, untouched', () => {
+    const r = runHost({
+      refreshMs: SLOT,
+      costMs: uneven(22, 12),
+      seconds: 1800,
+      intent: 'auto',
+      remembered: SETTLED_AT_30,
+    });
+    expect(intents(r)).toEqual([0, 30]);
+    expect(r.intentLog[1].at).toBeLessThan(3_000);
     expect(r.saved).toEqual([]);
+    expect(r.published.hold).toBe(false);
+  });
+
+  it('never probes in combat, nor in the seconds after it', () => {
+    const seconds = 300;
+    const r = runHost({
+      refreshMs: SLOT,
+      costMs: uneven(22, 12),
+      seconds,
+      intent: 'auto',
+      remembered: PROVISIONAL_AT_30,
+      inCombat: (t) => t < 200_000,
+    });
+    const [[start]] = excursions(r, seconds);
+    expect(start).toBeGreaterThan(209_000);
+    expect(start).toBeLessThan(220_000);
+  });
+
+  it('cancels a probe the moment a fight starts, and the fight costs it nothing', () => {
+    let probeAt = -1;
+    const r = runHost({
+      refreshMs: SLOT,
+      costMs: 5,
+      seconds: 100,
+      intent: 'auto',
+      remembered: PROVISIONAL_AT_30,
+      onFrame: (t, wiring) => {
+        if (probeAt < 0 && wiring.snapshot().autoPhase === 'probe') probeAt = t;
+      },
+      inCombat: (t) => probeAt >= 0 && t >= probeAt && t < probeAt + 5_000,
+    });
+    const snap = r.wiring.snapshot();
+    expect(snap.autoProbesInconclusive).toBe(1);
+    expect(snap.autoProbesFailed).toBe(0);
+    // Asked again once calm, and this machine holds: it ends at full cadence.
+    expect(snap.autoProbes).toBe(2);
+    expect(snap.intent).toBe(0);
+  });
+
+  it('never probes right after a loading cover', () => {
+    const seconds = 300;
+    const r = runHost({
+      refreshMs: SLOT,
+      costMs: uneven(22, 12),
+      seconds,
+      intent: 'auto',
+      remembered: PROVISIONAL_AT_30,
+      // A short cover every 8 s, the last one ending at 192.5 s: until then the
+      // loop is never 300 rendered frames (10 s at the ceiling) clear of one.
+      cover: (t) => t < 200_000 && t % 8_000 < 500,
+    });
+    const [[start]] = excursions(r, seconds);
+    expect(start).toBeGreaterThan(202_400);
+    expect(start).toBeLessThan(215_000);
+  });
+
+  it('returns to full cadence for good once the load is really gone', () => {
+    const r = runHost({
+      refreshMs: SLOT,
+      costMs: (
+        (slow) => (t: number) =>
+          t < 40_000 ? slow() : 6
+      )(uneven(22, 12)),
+      seconds: 320,
+      intent: 'auto',
+    });
+    expect(intents(r)).toEqual([0, 30, 0]);
+    expect(r.saved[r.saved.length - 1]).toEqual({ ceiling: 0, confirmed: false, failStreak: 0 });
+    expect(r.wiring.snapshot().autoPhase).toBe('observe');
+    expect(r.published.hold).toBe(false);
+  });
+
+  it('a place whose load comes and goes costs at most two excursions in 25 minutes', () => {
+    // 50 s uneven, 25 s light, repeating: a probe can land on a light stretch.
+    const seconds = 1500;
+    const slow = uneven(22, 12);
+    const r = runHost({
+      refreshMs: SLOT,
+      costMs: (t) => (t % 75_000 < 50_000 ? slow() : 6),
+      seconds,
+      intent: 'auto',
+      governorAtBaseline: () => true,
+    });
+    expect(excursions(r, seconds).length).toBeLessThanOrEqual(2);
+    expect(r.wiring.snapshot().intent).toBe(30);
   });
 
   it('waits for the quality governor: no step down while it is still shedding', () => {
@@ -630,7 +774,7 @@ describe('automatic frame rate limit', () => {
       intent: 'auto',
       governorShedding: () => true,
     });
-    expect(r.intentLog.map((e) => e.intent)).toEqual([0]);
+    expect(intents(r)).toEqual([0]);
   });
 
   it('goes through about 60 first on a 144 Hz display', () => {
@@ -640,55 +784,75 @@ describe('automatic frame rate limit', () => {
       seconds: 40,
       intent: 'auto',
     });
-    expect(r.intentLog.map((e) => e.intent)).toEqual([0, 60]);
+    expect(intents(r)).toEqual([0, 60]);
     expect(r.wiring.snapshot().divisor).toBe(2);
   });
 
-  it('returns to full cadence through a trial once the load is gone', () => {
-    const r = runHost({
-      refreshMs: SLOT,
-      costMs: (
-        (slow) => (t: number) =>
-          t < 40_000 ? slow() : 6
-      )(uneven(22, 12)),
-      seconds: 140,
-      intent: 'auto',
-    });
-    expect(r.intentLog.map((e) => e.intent)).toEqual([0, 30, 0]);
-    expect(r.saved).toEqual([30, 0]);
-    expect(r.wiring.snapshot().auto).toBe(true);
+  it('leaves a machine that holds its display alone', () => {
+    const r = runHost({ refreshMs: SLOT, costMs: 9, seconds: 700, intent: 'auto' });
+    expect(intents(r)).toEqual([0]);
     expect(r.published.hold).toBe(false);
+    expect(r.saved).toEqual([]);
   });
 
-  it('falls back from a failed trial and doubles its wait', () => {
-    const r = runHost({ refreshMs: SLOT, costMs: uneven(22, 12), seconds: 330, intent: 'auto' });
-    const downs = r.intentLog.filter((e) => e.intent === 30).map((e) => e.at);
-    const trials = r.intentLog.filter((e, i) => i > 0 && e.intent === 0).map((e) => e.at);
-    expect(trials.length).toBe(2);
-    // First trial about 60 s after the descent, the second about 120 s after the fallback.
-    expect(trials[0] - downs[0]).toBeGreaterThan(55_000);
-    expect(trials[0] - downs[0]).toBeLessThan(80_000);
-    expect(trials[1] - downs[1]).toBeGreaterThan(115_000);
-    expect(trials[1] - downs[1]).toBeLessThan(140_000);
-    // A trial is never remembered: only the settled ceiling is.
-    expect(r.saved).toEqual([30, 30, 30]);
-  });
-
-  it('stops yoyoing in a place whose load comes and goes: a quick step back down doubles the wait', () => {
-    // 50 s uneven, 25 s light, repeating: a trial regularly lands on a light stretch.
-    const slow = uneven(22, 12);
+  it.each([
+    [
+      'a settings change the verdict was formed on',
+      { settingsSignature: (t: number) => (t < 20_000 ? 'a' : 'b') },
+    ],
+    [
+      'a window of another size class',
+      { surfacePixels: (t: number) => (t < 20_000 ? 800 * 600 : 2560 * 1440) },
+    ],
+  ] as const)('%s re-opens the question and forgets the stored verdict', (_label, change) => {
     const r = runHost({
       refreshMs: SLOT,
-      costMs: (t) => (t % 75_000 < 50_000 ? slow() : 6),
-      seconds: 1500,
+      costMs: 6,
+      seconds: 60,
       intent: 'auto',
+      remembered: SETTLED_AT_30,
+      onFrame: (_t, wiring) => wiring.noteSettingsChanged(),
+      ...change,
     });
-    const downs = r.intentLog.filter((e) => e.intent === 30).map((e) => e.at);
-    const stays = downs.slice(1).map((t, i) => t - downs[i]);
-    expect(downs.length).toBeGreaterThanOrEqual(3);
-    // Each stay at the ceiling is longer than the one before, never a fixed beat.
-    expect(stays[stays.length - 1]).toBeGreaterThan(stays[0] * 2);
-    expect(downs.length).toBeLessThan(9);
+    expect(intents(r)).toEqual([0, 30, 0]);
+    expect(r.intentLog[2].at).toBeGreaterThan(20_000);
+    expect(r.intentLog[2].at).toBeLessThan(23_000);
+    expect(r.clears).toBe(1);
+    expect(r.wiring.snapshot().autoPhase).toBe('observe');
+  });
+
+  it('an ordinary resize changes nothing', () => {
+    const r = runHost({
+      refreshMs: SLOT,
+      costMs: 6,
+      seconds: 60,
+      intent: 'auto',
+      remembered: SETTLED_AT_30,
+      surfacePixels: (t) => (t < 20_000 ? 1920 * 1080 : 1600 * 900),
+    });
+    expect(intents(r)).toEqual([0, 30]);
+    expect(r.clears).toBe(0);
+  });
+
+  it('choosing Auto again after an explicit choice re-evaluates now', () => {
+    let done = false;
+    const r = runHost({
+      refreshMs: SLOT,
+      costMs: 6,
+      seconds: 60,
+      intent: 'auto',
+      remembered: SETTLED_AT_30,
+      onFrame: (t, wiring) => {
+        if (done || t < 20_000) return;
+        done = true;
+        wiring.setIntent(60);
+        wiring.setAuto();
+      },
+    });
+    expect(r.wiring.snapshot().auto).toBe(true);
+    expect(r.wiring.snapshot().intent).toBe(0);
+    expect(r.wiring.snapshot().autoPhase).toBe('observe');
+    expect(r.clears).toBe(1);
   });
 
   it('starts at the remembered ceiling', () => {
@@ -699,7 +863,7 @@ describe('automatic frame rate limit', () => {
       intent: 'auto',
       remembered: 30,
     });
-    expect(r.intentLog.map((e) => e.intent)).toEqual([0, 30]);
+    expect(intents(r)).toEqual([0, 30]);
     expect(r.intentLog[1].at).toBeLessThan(3_000);
   });
 
@@ -714,8 +878,9 @@ describe('automatic frame rate limit', () => {
         configure: (wiring) => wiring.setIntent(choice),
       });
       expect(r.wiring.snapshot().auto).toBe(false);
+      expect(r.wiring.snapshot().autoPhase).toBe('off');
       expect(r.wiring.snapshot().intent).toBe(choice);
-      expect(r.intentLog.map((e) => e.intent)).toEqual([choice]);
+      expect(intents(r)).toEqual([choice]);
       expect(r.saved).toEqual([]);
       expect(r.loads).toBe(0);
       expect(r.published.hold).toBe(false);
@@ -761,7 +926,7 @@ describe('automatic frame rate limit', () => {
     expect(r.published.hold).toBe(false);
   });
 
-  it('reads the remembered ceiling exactly once per session', () => {
+  it('reads the remembered verdict exactly once per session', () => {
     const r = runHost({
       refreshMs: SLOT,
       costMs: uneven(22, 12),
@@ -777,23 +942,30 @@ describe('automatic frame rate limit', () => {
   it('restores a remembered "no ceiling" without writing it back', () => {
     const r = runHost({ refreshMs: SLOT, costMs: 9, seconds: 60, intent: 'auto', remembered: 0 });
     expect(r.loads).toBe(1);
-    expect(r.intentLog.map((e) => e.intent)).toEqual([0]);
+    expect(intents(r)).toEqual([0]);
     expect(r.saved).toEqual([]);
   });
 
   it('is inert when rAF is uncapped, and an explicit choice switches it off', () => {
     const unpaced = runHost({ refreshMs: null, costMs: 25, seconds: 60, intent: 'auto' });
-    expect(unpaced.intentLog.map((e) => e.intent)).toEqual([0]);
+    expect(intents(unpaced)).toEqual([0]);
     const explicit = runHost({ refreshMs: SLOT, costMs: uneven(22, 12), seconds: 60, intent: 0 });
-    expect(explicit.intentLog.map((e) => e.intent)).toEqual([0]);
+    expect(intents(explicit)).toEqual([0]);
   });
 });
 
 describe('frame cadence beacon fields', () => {
   const base: FrameCadenceSnapshot = {
     auto: false,
-    autoTrial: false,
+    autoPhase: 'off',
+    autoConfirmed: false,
+    autoFailStreak: 0,
     autoLateShare: 0,
+    autoDescents: 0,
+    autoProbes: 0,
+    autoProbesFailed: 0,
+    autoProbesInconclusive: 0,
+    autoFirstCeilingS: -1,
     intent: 0,
     verdict: 'paced',
     refreshHz: 59.94,

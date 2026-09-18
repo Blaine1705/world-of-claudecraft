@@ -1,10 +1,13 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
+  cadencePlayerInCombat,
   chosenCadenceHoldsQuality,
   chosenCadenceIntervalMs,
   chosenCadenceMissShare,
   frameLoadMs,
+  governorIsAtBaseline,
   governorIsShedding,
+  noteCadenceProbeContext,
   noteGovernorShedding,
   resetChosenCadenceForRenderer,
   setChosenCadence,
@@ -47,6 +50,19 @@ describe('chosen cadence signal', () => {
     expect(governorIsShedding()).toBe(true);
     resetChosenCadenceForRenderer();
     expect(governorIsShedding()).toBe(false);
+  });
+
+  it('carries the probe context until a new renderer clears it', () => {
+    expect(governorIsAtBaseline()).toBe(false);
+    expect(cadencePlayerInCombat()).toBe(false);
+    noteCadenceProbeContext(true, true);
+    expect(governorIsAtBaseline()).toBe(true);
+    expect(cadencePlayerInCombat()).toBe(true);
+    noteCadenceProbeContext(true, false);
+    expect(cadencePlayerInCombat()).toBe(false);
+    // A value left by the previous renderer must never read as headroom.
+    resetChosenCadenceForRenderer();
+    expect(governorIsAtBaseline()).toBe(false);
   });
 
   it('reads a frame interval as load: nominal plus the lateness under a cadence, raw without', () => {

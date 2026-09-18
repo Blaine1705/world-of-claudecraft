@@ -13,7 +13,12 @@
 // a timer that calls frame() itself). Changing the intent never arms anything.
 
 import { arrivalCoverActive } from '../render/arrival_cover';
-import { governorIsShedding, setChosenCadence } from '../render/chosen_cadence';
+import {
+  cadencePlayerInCombat,
+  governorIsAtBaseline,
+  governorIsShedding,
+  setChosenCadence,
+} from '../render/chosen_cadence';
 import {
   createRefreshEstimator,
   noteRefreshDelta,
@@ -21,8 +26,13 @@ import {
   resetRefreshEstimatorWindow,
 } from './display_refresh_estimator_core';
 import {
+  AUTO_CHECKPOINT_FRAMES,
   createFrameCadenceAuto,
   type FrameCadenceAutoFrame,
+  type FrameCadenceAutoPhase,
+  frameCadenceAutoHoldsQuality,
+  frameCadenceAutoRecord,
+  invalidateFrameCadenceAuto,
   resetFrameCadenceAutoWindow,
   restoreFrameCadenceAuto,
   stepFrameCadenceAuto,
@@ -31,6 +41,7 @@ import {
   type FrameCadenceAutoMemory,
   localFrameCadenceAutoMemory,
 } from './frame_cadence_auto_memory';
+import { createFrameCadenceCalm, stepFrameCadenceCalm } from './frame_cadence_calm_core';
 import {
   configureFrameCadence,
   createFrameCadence,
@@ -40,6 +51,7 @@ import {
   frameCadenceShouldRender,
   frameCadenceSleepMs,
 } from './frame_cadence_core';
+import { surfaceClassChanged } from './frame_cadence_surface_core';
 import {
   explicitCeilingIntent,
   FRAME_RATE_CAP_VALUES,
@@ -71,17 +83,31 @@ export interface FrameCadenceDeps {
   publish: (targetIntervalMs: number, missShare: number, holdQuality: boolean) => void;
   /** The quality governor is still shedding (the automatic mode waits for it). */
   governorShedding: () => boolean;
-  /** The automatic mode's remembered ceiling, keyed by what would invalidate it. */
+  /** The governor restored its baseline quality: the automatic mode's headroom evidence. */
+  governorAtBaseline: () => boolean;
+  /** The player is in a fight: the automatic mode never probes then. */
+  inCombat: () => boolean;
+  /** The drawn surface in device pixels, 0 when unknown. */
+  surfacePixels: () => number;
+  /** The automatic mode's remembered verdict, keyed by what would invalidate it. */
   autoMemory: FrameCadenceAutoMemory;
 }
 
 export interface FrameCadenceSnapshot {
   /** Whether the automatic mode resolves the intent. */
   auto: boolean;
-  /** The automatic mode is on a return trial. */
-  autoTrial: boolean;
-  /** The late share of the automatic mode's last closed window. */
+  /** Where the automatic mode stands, 'off' under an explicit choice. */
+  autoPhase: FrameCadenceAutoPhase | 'off';
+  autoConfirmed: boolean;
+  autoFailStreak: number;
+  /** The late share behind the automatic mode's last decision. */
   autoLateShare: number;
+  autoDescents: number;
+  autoProbes: number;
+  autoProbesFailed: number;
+  autoProbesInconclusive: number;
+  /** Seconds of play before the session's first automatic descent, -1 for none. */
+  autoFirstCeilingS: number;
   intent: FrameCeilingIntent;
   verdict: RefreshVerdict;
   refreshHz: number;
@@ -115,8 +141,15 @@ export class FrameCadenceWiring {
   private readonly autoState = createFrameCadenceAuto();
   private readonly snapshotOut: FrameCadenceSnapshot = {
     auto: false,
-    autoTrial: false,
+    autoPhase: 'off',
+    autoConfirmed: false,
+    autoFailStreak: 0,
     autoLateShare: 0,
+    autoDescents: 0,
+    autoProbes: 0,
+    autoProbesFailed: 0,
+    autoProbesInconclusive: 0,
+    autoFirstCeilingS: -1,
     intent: 0,
     verdict: 'unknown',
     refreshHz: 0,
@@ -129,6 +162,14 @@ export class FrameCadenceWiring {
   private intent: FrameCeilingIntent = 0;
   private auto = false;
   private autoRestored = false;
+  /** The player left Auto for an explicit choice: choosing it again re-evaluates. */
+  private leftAuto = false;
+  private readonly calm = createFrameCadenceCalm();
+  private framesSinceExempt = 0;
+  private refreshClass = 0;
+  private surfaceRef = 0;
+  private surfacePollIn = 0;
+  private settingsSignature: string | null = null;
   private lastRenderAt = 0;
   private frameCb: FrameRequestCallback | null = null;
   private lastCallbackAt = 0;
@@ -146,6 +187,9 @@ export class FrameCadenceWiring {
     late: false,
     refreshHz: 0,
     governorShedding: false,
+    governorAtBaseline: false,
+    calm: false,
+    framesSinceExempt: 0,
   };
   private timerDueAt = 0;
   private timerLateMs = 0;
@@ -163,15 +207,37 @@ export class FrameCadenceWiring {
 
   /** An explicit ceiling. It always wins: the automatic mode is switched off. */
   setIntent(intent: FrameCeilingIntent): void {
+    if (this.auto) this.leftAuto = true;
     this.auto = false;
     this.intent = intent;
   }
 
-  /** Let the automatic mode resolve the ceiling from what the machine holds. */
+  /** Let the automatic mode resolve the ceiling from what the machine holds.
+   *  Choosing it again after an explicit choice means "re-evaluate now". */
   setAuto(): void {
     if (this.auto) return;
     this.auto = true;
+    if (this.leftAuto) this.invalidateAuto(true);
+    this.leftAuto = false;
     this.intent = this.autoState.ceiling;
+  }
+
+  /** A settings broadcast: a change to what the verdict was formed on (the
+   *  memory owns which settings those are) re-opens the question. */
+  noteSettingsChanged(): void {
+    const signature = this.deps.autoMemory.settingsSignature();
+    const before = this.settingsSignature;
+    this.settingsSignature = signature;
+    if (before !== null && before !== signature) this.invalidateAuto(true);
+  }
+
+  /** Forget the automatic verdict and observe again. `forget` also drops the
+   *  stored one: the change happened under the same memory key. */
+  private invalidateAuto(forget: boolean): void {
+    invalidateFrameCadenceAuto(this.autoState);
+    if (forget) this.deps.autoMemory.clear();
+    this.autoRestored = false;
+    if (this.auto) this.intent = 0;
   }
 
   /** Re-arm the loop and report whether this callback must do nothing. */
@@ -188,7 +254,7 @@ export class FrameCadenceWiring {
       this.deps.coverActive();
     if (gate.hidden || exempt !== this.wasExempt) {
       resetRefreshEstimatorWindow(this.estimator);
-      resetFrameCadenceAutoWindow(this.autoState);
+      this.dropAutoReadings();
       this.lastRenderAt = 0;
     } else if (this.lastCallbackAt > 0 && !crossedTimer) {
       noteRefreshDelta(this.estimator, delta, this.lastWasIdle);
@@ -202,8 +268,8 @@ export class FrameCadenceWiring {
     configureFrameCadence(this.cadence, intent, this.estimator.verdict, this.estimator.refreshMs);
     // Exempt callbacks are not paced, so nothing is published for them: the
     // governor must read a slow arrival frame as what it is.
-    const holdQuality =
-      this.auto && paced && (this.autoState.ceiling !== 0 || this.autoState.trial);
+    const holdQuality = this.auto && paced && frameCadenceAutoHoldsQuality(this.autoState);
+    if (exempt) this.framesSinceExempt = 0;
     if (exempt) this.deps.publish(0, 0, holdQuality);
     else this.deps.publish(this.cadence.targetIntervalMs, this.cadence.missShare, holdQuality);
     if (exempt || !frameCadenceActive(this.cadence)) {
@@ -233,33 +299,82 @@ export class FrameCadenceWiring {
   private stepAuto(now: number, underCeiling: boolean): void {
     const last = this.lastRenderAt;
     this.lastRenderAt = now;
-    if (!this.auto || this.estimator.verdict !== 'paced' || last === 0) return;
+    this.framesSinceExempt++;
+    if (!this.auto) return;
+    if (this.estimator.verdict !== 'paced') {
+      if (this.autoState.recentCount > 0 || this.autoState.phase === 'probe') {
+        this.dropAutoReadings();
+      }
+      return;
+    }
+    if (last === 0) return;
     const refreshMs = this.estimator.refreshMs;
     const refreshHz = 1000 / refreshMs;
+    if (this.playerChangedTheSurface(refreshHz)) return;
     if (!this.autoRestored) {
       this.autoRestored = true;
       const remembered = this.deps.autoMemory.load(refreshHz);
-      if (remembered !== null && remembered !== this.autoState.ceiling) {
+      if (remembered !== null && remembered.ceiling !== 0) {
         restoreFrameCadenceAuto(this.autoState, remembered);
-        this.intent = remembered;
+        this.intent = remembered.ceiling;
         return;
       }
     }
-    this.autoFrame.dtSeconds = (now - last) / 1000;
+    const dtSeconds = (now - last) / 1000;
+    this.autoFrame.dtSeconds = dtSeconds;
     this.autoFrame.late = underCeiling ? this.cadence.lastLate : now - last > refreshMs * 1.5;
     this.autoFrame.refreshHz = refreshHz;
     this.autoFrame.governorShedding = this.deps.governorShedding();
+    this.autoFrame.governorAtBaseline = this.deps.governorAtBaseline();
+    this.autoFrame.calm = stepFrameCadenceCalm(this.calm, this.deps.inCombat(), dtSeconds);
+    this.autoFrame.framesSinceExempt = this.framesSinceExempt;
     if (!stepFrameCadenceAuto(this.autoState, this.autoFrame)) return;
     this.intent = this.autoState.ceiling;
-    // A trial is a question, not an answer: only a settled ceiling is remembered.
-    if (!this.autoState.trial) this.deps.autoMemory.save(refreshHz, this.autoState.ceiling);
+    // A probe is a question, not an answer: the record is the verdict behind it.
+    this.deps.autoMemory.save(refreshHz, frameCadenceAutoRecord(this.autoState));
+  }
+
+  /** Readings that straddle an exempt span, a hidden tab or an unread display
+   *  are dropped, and a probe in flight there is cancelled. */
+  private dropAutoReadings(): void {
+    if (resetFrameCadenceAutoWindow(this.autoState) && this.auto) {
+      this.intent = this.autoState.ceiling;
+    }
+  }
+
+  /** Another display class, or a window of another size class: the verdict was
+   *  formed on something else. The remembered one for a display seen before is
+   *  kept (its key differs); a resize happened under the same key. */
+  private playerChangedTheSurface(refreshHz: number): boolean {
+    const refreshClass = Math.round(refreshHz / 5) * 5;
+    const displayChanged = this.refreshClass !== 0 && refreshClass !== this.refreshClass;
+    this.refreshClass = refreshClass;
+    if (displayChanged) {
+      this.invalidateAuto(false);
+      return true;
+    }
+    if (--this.surfacePollIn > 0) return false;
+    this.surfacePollIn = AUTO_CHECKPOINT_FRAMES;
+    const pixels = this.deps.surfacePixels();
+    if (this.surfaceRef === 0) this.surfaceRef = pixels;
+    if (!surfaceClassChanged(this.surfaceRef, pixels)) return false;
+    this.surfaceRef = pixels;
+    this.invalidateAuto(true);
+    return true;
   }
 
   snapshot(): FrameCadenceSnapshot {
     const out = this.snapshotOut;
     out.auto = this.auto;
-    out.autoTrial = this.auto && this.autoState.trial;
+    out.autoPhase = this.auto ? this.autoState.phase : 'off';
+    out.autoConfirmed = this.auto && this.autoState.confirmed;
+    out.autoFailStreak = this.autoState.failStreak;
     out.autoLateShare = this.autoState.lastShare;
+    out.autoDescents = this.autoState.descents;
+    out.autoProbes = this.autoState.probesStarted;
+    out.autoProbesFailed = this.autoState.probesFailed;
+    out.autoProbesInconclusive = this.autoState.probesInconclusive;
+    out.autoFirstCeilingS = this.autoState.firstCeilingS;
     out.intent = this.intent;
     out.verdict = this.estimator.verdict;
     out.refreshHz = this.estimator.refreshMs > 0 ? 1000 / this.estimator.refreshMs : 0;
@@ -353,6 +468,12 @@ export function sharedFrameCadence(): FrameCadenceWiring {
     coverActive: arrivalCoverActive,
     publish: setChosenCadence,
     governorShedding: governorIsShedding,
+    governorAtBaseline: governorIsAtBaseline,
+    inCombat: cadencePlayerInCombat,
+    surfacePixels: () =>
+      typeof window === 'undefined'
+        ? 0
+        : window.innerWidth * window.innerHeight * (window.devicePixelRatio || 1) ** 2,
     autoMemory: localFrameCadenceAutoMemory,
   });
   shared = wiring;
@@ -362,7 +483,11 @@ export function sharedFrameCadence(): FrameCadenceWiring {
     return wiring;
   }
   if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
-    window.addEventListener(SETTINGS_CHANGE_EVENT, () => applyStoredChoice(wiring, ''));
+    wiring.noteSettingsChanged();
+    window.addEventListener(SETTINGS_CHANGE_EVENT, () => {
+      applyStoredChoice(wiring, '');
+      wiring.noteSettingsChanged();
+    });
   }
   return wiring;
 }
@@ -393,7 +518,15 @@ export function frameCadenceBeaconBlock(): Record<string, number | string> {
   const s = sharedFrameCadence().snapshot();
   return {
     mode: s.auto ? 'auto' : 'manual',
+    autoPhase: s.autoPhase,
+    autoConfirmed: s.autoConfirmed ? 1 : 0,
+    autoFailStreak: s.autoFailStreak,
     autoLateShare: Math.round(s.autoLateShare * 1000) / 1000,
+    autoDescents: s.autoDescents,
+    autoProbes: s.autoProbes,
+    autoProbesFailed: s.autoProbesFailed,
+    autoProbesInconclusive: s.autoProbesInconclusive,
+    autoFirstCeilingS: Math.round(s.autoFirstCeilingS),
     intent: s.intent,
     verdict: s.verdict,
     refreshHz: Math.round(s.refreshHz),
@@ -434,7 +567,8 @@ export function frameCadenceBeaconFields(budgetTargetFps: number): FrameCadenceB
 /** One `?perf` overlay line (dev diagnostics, English like the rest of it). */
 export function frameCadenceOverlayLine(): string {
   const s = sharedFrameCadence().snapshot();
-  const cap = `${s.auto ? (s.autoTrial ? 'auto-trial ' : 'auto ') : ''}${s.intent === 0 ? 'display' : s.intent}`;
+  const phase = s.autoPhase === 'held' && !s.autoConfirmed ? 'settling' : s.autoPhase;
+  const cap = `${s.auto ? `auto-${phase} ` : ''}${s.intent === 0 ? 'display' : s.intent}`;
   const target =
     s.targetIntervalMs > 0 ? `${s.targetIntervalMs.toFixed(1)}ms /${s.divisor}` : 'inert';
   return `cap ${cap}  ${s.verdict} ${s.refreshHz.toFixed(1)}Hz  ${target}  miss ${(s.missShare * 100).toFixed(1)}%  skip ${s.skipped}`;

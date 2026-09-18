@@ -1,86 +1,223 @@
-// The automatic Frame Rate Limit: it lowers the ceiling only on a machine that
-// demonstrably cannot hold its display's rhythm, and raises it back slowly.
+// The automatic Frame Rate Limit: settle, then hold. It lowers the ceiling only
+// on a machine that demonstrably cannot hold its display's rhythm, and after a
+// settle phase it leaves the cadence alone: the player wants a stable rhythm
+// more than the last frames per second.
+//
+// The contract. Once settled, the cadence changes only:
+// - because of something the player did (the wiring invalidates the verdict);
+// - downward, when the rhythm in force is demonstrably missed;
+// - through a small per-session budget of self-initiated probes, each aborted
+//   within a handful of frames, never in combat or near a loading transition,
+//   and only on positive evidence of headroom.
+// A failed verdict is remembered across sessions (the wiring owns the storage).
 //
 // Two controllers share the frame: the quality governor (render_budget.ts) and
-// this one. Their hierarchy is what keeps them from chasing each other:
-// - quality is shed first: the ceiling only steps down once the governor has
-//   stopped shedding and the rhythm is still uneven;
-// - while an automatic ceiling is active the governor holds its quality levels
-//   (the wiring publishes the hold), so new headroom goes to the cadence, never
-//   to quality that would then fail the next return trial;
-// - the descent is fast and the return is a timed trial whose wait doubles on
-//   every failure, so a machine that cannot hold full cadence stops being asked.
-//   A passed trial is on probation: load follows the scene (measured on the
-//   Iris Xe laptop, a 10 s trial can land on a light stretch of a heavy place),
-//   so a step back down before the probation ends counts as a failed trial.
+// this one. Quality is shed first: the ceiling only steps down once the governor
+// has stopped shedding. While a verdict is still being formed (a provisional
+// hold, a probe, the probation after a passed probe) the governor holds its
+// levels, so a probe measures the scene and not quality that just came back.
+// In a CONFIRMED hold the headroom goes to quality: the governor judges the
+// chosen cadence through its miss share and restores what that cadence carries.
+// That is also what makes the headroom evidence mean something: a machine that
+// cannot restore its baseline quality at the ceiling has nothing left for a
+// faster cadence, and is never asked.
 //
 // Pure: rendered frames in, the ceiling intent out. Every threshold is a share
-// of frames or a duration of play, never a frame time calibrated on a machine.
+// of frames, a count of frames or a duration of play, never a frame time
+// calibrated on a machine.
 
 import { ceilingDivisor, type FrameCeilingIntent } from './frame_cadence_core';
 
-/** A window is uneven from this share of late frames (the Iris Xe laptop reads
- *  39 to 50 percent on the preset it cannot hold, 0 to 2 on the one it can). */
+/** A watch window is uneven from this share of late frames (the Iris Xe laptop
+ *  reads 39 to 50 percent on the preset it cannot hold, 0 to 2 on the one it can). */
 export const AUTO_UNEVEN_SHARE = 0.15;
-/** A window is clean, and a return trial is passed, under this share. */
+/** A checkpoint is clean under this share. */
 export const AUTO_CLEAN_SHARE = 0.05;
+/** Unmistakable: this share of the last AUTO_RECENT_FRAMES steps down at the
+ *  next checkpoint, without waiting for the watch window to close. */
+export const AUTO_FLAGRANT_SHARE = 0.3;
+export const AUTO_RECENT_FRAMES = 120;
+export const AUTO_CHECKPOINT_FRAMES = 60;
 export const AUTO_WATCH_WINDOW_S = 15;
-export const AUTO_TRIAL_WINDOW_S = 10;
-export const AUTO_FIRST_RETURN_WAIT_S = 60;
-export const AUTO_MAX_RETURN_WAIT_S = 960;
-/** Fewer frames than this in a window is a stall or a pause, not a reading. */
+/** A descent this early in the observation is provisional: the first minute of
+ *  a session is its heaviest, so it earns one confirming probe. */
+export const AUTO_SETTLE_S = 60;
+export const AUTO_CONFIRM_CLEAN_S = 60;
+export const AUTO_PROBE_FRAMES = 90;
+/** A probe fails on this late frame: about a third of a second on the measured
+ *  machines, where a full window of proof cost ten seconds of stutter. */
+export const AUTO_PROBE_LATE_LIMIT = 3;
+export const AUTO_PROBATION_S = 120;
+export const AUTO_EVIDENCE_RUN_S = 600;
+export const AUTO_MAX_FAIL_DOUBLINGS = 4;
+export const AUTO_PROBES_PER_SESSION = 2;
+export const AUTO_INCONCLUSIVE_PER_SESSION = 3;
+/** Rendered frames a probe keeps away from an exempt callback (a loading
+ *  cover, a held world draw): the frames after one still pay for the arrival. */
+export const AUTO_FRAMES_CLEAR_OF_EXEMPTION = 300;
+/** Fewer frames than this in a watch window is a stall or a pause, not a reading. */
 const MIN_WINDOW_FRAMES = 60;
 
+export type FrameCadenceAutoPhase = 'observe' | 'held' | 'probe' | 'probation';
+
 export interface FrameCadenceAutoState {
+  phase: FrameCadenceAutoPhase;
   ceiling: FrameCeilingIntent;
-  trial: boolean;
-  /** The ceiling a failed trial falls back to. */
-  trialFrom: FrameCeilingIntent;
+  /** A held ceiling is a settled verdict (false: provisional, one probe owed). */
+  confirmed: boolean;
+  /** Probes failed in a row: doubles the evidence run the next one needs. */
+  failStreak: number;
+  probesLeft: number;
+  inconclusiveLeft: number;
+  /** Seconds of play since the observation began. */
+  observeS: number;
+  /** The ceiling a failed probe, or a fallback on probation, returns to. */
+  probeFrom: FrameCeilingIntent;
+  probeConfirmedBefore: boolean;
+  probeFrames: number;
+  probeLate: number;
+  probationS: number;
+  /** Clean seconds in a provisional hold, toward its confirming probe. */
+  cleanS: number;
+  /** The continuous evidence run of a confirmed hold. */
+  evidenceS: number;
+  recent: Uint8Array;
+  recentAt: number;
+  recentCount: number;
+  recentLate: number;
+  checkpointFrames: number;
+  checkpointLate: number;
+  checkpointSeconds: number;
   windowSeconds: number;
   windowFrames: number;
   windowLate: number;
-  cleanSeconds: number;
-  returnWaitS: number;
-  /** A trial passed, and the step up has not yet outlasted the wait it took. */
-  onProbation: boolean;
-  probationS: number;
-  /** The last closed window's late share: the reading behind the last decision. */
+  /** The late share behind the last decision (a window, a checkpoint or a probe). */
   lastShare: number;
+  /** Session counters for the perf beacon. */
+  descents: number;
+  probesStarted: number;
+  probesFailed: number;
+  probesInconclusive: number;
+  playS: number;
+  /** Seconds of play before the first descent of the session, -1 for none. */
+  firstCeilingS: number;
+}
+
+export interface FrameCadenceAutoRecord {
+  ceiling: FrameCeilingIntent;
+  confirmed: boolean;
+  failStreak: number;
 }
 
 export function createFrameCadenceAuto(): FrameCadenceAutoState {
   return {
+    phase: 'observe',
     ceiling: 0,
-    trial: false,
-    trialFrom: 0,
+    confirmed: false,
+    failStreak: 0,
+    probesLeft: AUTO_PROBES_PER_SESSION,
+    inconclusiveLeft: AUTO_INCONCLUSIVE_PER_SESSION,
+    observeS: 0,
+    probeFrom: 0,
+    probeConfirmedBefore: false,
+    probeFrames: 0,
+    probeLate: 0,
+    probationS: 0,
+    cleanS: 0,
+    evidenceS: 0,
+    recent: new Uint8Array(AUTO_RECENT_FRAMES),
+    recentAt: 0,
+    recentCount: 0,
+    recentLate: 0,
+    checkpointFrames: 0,
+    checkpointLate: 0,
+    checkpointSeconds: 0,
     windowSeconds: 0,
     windowFrames: 0,
     windowLate: 0,
-    cleanSeconds: 0,
-    returnWaitS: AUTO_FIRST_RETURN_WAIT_S,
-    onProbation: false,
-    probationS: 0,
     lastShare: 0,
+    descents: 0,
+    probesStarted: 0,
+    probesFailed: 0,
+    probesInconclusive: 0,
+    playS: 0,
+    firstCeilingS: -1,
   };
 }
 
-/** Start the session at a remembered ceiling (the wiring owns the storage). */
+/** What is worth remembering of the state, for the wiring to store. */
+export function frameCadenceAutoRecord(state: FrameCadenceAutoState): FrameCadenceAutoRecord {
+  const probing = state.phase === 'probe' || state.phase === 'probation';
+  return {
+    ceiling: probing ? state.probeFrom : state.ceiling,
+    confirmed: probing ? true : state.confirmed,
+    failStreak: state.failStreak,
+  };
+}
+
+/** Start the session on a remembered verdict. A confirmed one starts with the
+ *  quality released and owes no probe until a full evidence run. */
 export function restoreFrameCadenceAuto(
   state: FrameCadenceAutoState,
-  ceiling: FrameCeilingIntent,
+  record: FrameCadenceAutoRecord,
 ): void {
-  state.ceiling = ceiling;
-  resetWindow(state);
-  state.trial = false;
-  state.cleanSeconds = 0;
+  clearReadings(state);
+  state.ceiling = record.ceiling;
+  state.failStreak = Math.max(0, Math.min(AUTO_MAX_FAIL_DOUBLINGS, Math.floor(record.failStreak)));
+  state.cleanS = 0;
+  state.evidenceS = 0;
+  if (record.ceiling === 0) {
+    state.phase = 'observe';
+    state.confirmed = false;
+    return;
+  }
+  state.phase = 'held';
+  state.confirmed = record.confirmed;
 }
 
-/** Drop the window in flight: a loading cover, a hidden span, a display change. */
-export function resetFrameCadenceAutoWindow(state: FrameCadenceAutoState): void {
-  resetWindow(state);
+/** The player changed what the verdict was formed on (a preset, the render
+ *  scale, the display, the window's size class, choosing Auto again): observe
+ *  from scratch, on the fast rule, with one probe given back. */
+export function invalidateFrameCadenceAuto(state: FrameCadenceAutoState): void {
+  clearReadings(state);
+  state.phase = 'observe';
+  state.ceiling = 0;
+  state.confirmed = false;
+  state.failStreak = 0;
+  state.observeS = 0;
+  state.cleanS = 0;
+  state.evidenceS = 0;
+  state.probesLeft = Math.min(AUTO_PROBES_PER_SESSION, state.probesLeft + 1);
 }
 
-function resetWindow(state: FrameCadenceAutoState): void {
+/**
+ * An exempt span began or ended (a loading cover, a hidden tab, a held world
+ * draw): the readings in flight straddle it and are dropped, the evidence run
+ * is broken, and a probe in flight is cancelled as inconclusive. Returns true
+ * when that changed the ceiling.
+ */
+export function resetFrameCadenceAutoWindow(state: FrameCadenceAutoState): boolean {
+  clearReadings(state);
+  state.evidenceS = 0;
+  if (state.phase !== 'probe') return false;
+  cancelProbe(state);
+  return true;
+}
+
+/** The governor must hold its quality levels: a verdict is being formed. */
+export function frameCadenceAutoHoldsQuality(state: FrameCadenceAutoState): boolean {
+  if (state.phase === 'probe' || state.phase === 'probation') return true;
+  return state.phase === 'held' && !state.confirmed;
+}
+
+function clearReadings(state: FrameCadenceAutoState): void {
+  state.recentAt = 0;
+  state.recentCount = 0;
+  state.recentLate = 0;
+  state.recent.fill(0);
+  state.checkpointFrames = 0;
+  state.checkpointLate = 0;
+  state.checkpointSeconds = 0;
   state.windowSeconds = 0;
   state.windowFrames = 0;
   state.windowLate = 0;
@@ -107,72 +244,201 @@ export interface FrameCadenceAutoFrame {
   refreshHz: number;
   /** The quality governor is still shedding: its turn, not ours. */
   governorShedding: boolean;
+  /** The governor has restored its baseline quality and is idle. */
+  governorAtBaseline: boolean;
+  /** Out of combat for a while: a probe may cost a few frames now. */
+  calm: boolean;
+  /** Rendered frames since the last exempt callback. */
+  framesSinceExempt: number;
+}
+
+function cancelProbe(state: FrameCadenceAutoState): void {
+  state.phase = 'held';
+  state.ceiling = state.probeFrom;
+  state.confirmed = state.probeConfirmedBefore;
+  state.probesInconclusive++;
+  state.inconclusiveLeft--;
+  // An inconclusive probe answered nothing, so it is not spent, up to a point.
+  if (state.inconclusiveLeft > 0) state.probesLeft++;
+  else state.probesLeft = 0;
+  clearReadings(state);
+}
+
+function failProbe(state: FrameCadenceAutoState): void {
+  state.phase = 'held';
+  state.ceiling = state.probeFrom;
+  state.confirmed = true;
+  state.failStreak = Math.min(AUTO_MAX_FAIL_DOUBLINGS, state.failStreak + 1);
+  state.probesFailed++;
+  state.cleanS = 0;
+  state.evidenceS = 0;
+  clearReadings(state);
+}
+
+function stepDown(state: FrameCadenceAutoState, refreshHz: number): boolean {
+  const down = autoStepDown(state.ceiling, refreshHz);
+  if (down === state.ceiling) return false;
+  if (state.phase === 'observe') state.confirmed = state.observeS >= AUTO_SETTLE_S;
+  state.phase = 'held';
+  state.ceiling = down;
+  state.cleanS = 0;
+  state.evidenceS = 0;
+  state.descents++;
+  if (state.firstCeilingS < 0) state.firstCeilingS = state.playS;
+  clearReadings(state);
+  return true;
+}
+
+function probeAllowed(state: FrameCadenceAutoState, frame: FrameCadenceAutoFrame): boolean {
+  return (
+    frame.calm &&
+    !frame.governorShedding &&
+    frame.framesSinceExempt >= AUTO_FRAMES_CLEAR_OF_EXEMPTION &&
+    state.recentCount >= AUTO_RECENT_FRAMES &&
+    state.recentLate === 0
+  );
+}
+
+function startProbe(state: FrameCadenceAutoState, refreshHz: number): void {
+  state.probeFrom = state.ceiling;
+  state.probeConfirmedBefore = state.confirmed;
+  state.phase = 'probe';
+  state.ceiling = autoStepUp(state.ceiling, refreshHz);
+  state.probeFrames = 0;
+  state.probeLate = 0;
+  state.probesLeft--;
+  state.probesStarted++;
+  // The run that earned the probe is kept: a cancelled probe stays due.
+  clearReadings(state);
+}
+
+function evidenceRunS(state: FrameCadenceAutoState): number {
+  return AUTO_EVIDENCE_RUN_S * 2 ** Math.min(AUTO_MAX_FAIL_DOUBLINGS, state.failStreak);
 }
 
 /**
  * Feed one rendered frame (paced display only; the wiring feeds nothing when
- * the display is unread or rAF is uncapped). Returns true when the ceiling
- * changed or a trial settled it.
+ * the display is unread or rAF is uncapped). Returns true when the ceiling or
+ * the remembered verdict changed.
  */
 export function stepFrameCadenceAuto(
   state: FrameCadenceAutoState,
   frame: FrameCadenceAutoFrame,
 ): boolean {
   if (!(frame.dtSeconds > 0) || !(frame.refreshHz > 0)) return false;
-  state.windowSeconds += frame.dtSeconds;
-  state.windowFrames++;
-  if (frame.late) state.windowLate++;
-  const length = state.trial ? AUTO_TRIAL_WINDOW_S : AUTO_WATCH_WINDOW_S;
-  if (state.windowSeconds < length) return false;
-  const seconds = state.windowSeconds;
-  const enough = state.windowFrames >= MIN_WINDOW_FRAMES;
-  const share = state.windowLate / Math.max(1, state.windowFrames);
-  resetWindow(state);
-  if (!enough) return false;
-  state.lastShare = share;
+  state.playS += frame.dtSeconds;
 
-  if (state.trial) {
-    state.trial = false;
-    state.cleanSeconds = 0;
-    if (share < AUTO_CLEAN_SHARE) {
-      // Passed: the trial ceiling is the settled one (and worth remembering), on
-      // probation for as long as the wait that earned it.
-      state.onProbation = true;
-      state.probationS = 0;
+  if (state.phase === 'probe') {
+    if (!frame.calm) {
+      cancelProbe(state);
       return true;
     }
-    state.returnWaitS = Math.min(AUTO_MAX_RETURN_WAIT_S, state.returnWaitS * 2);
-    state.ceiling = state.trialFrom;
+    state.probeFrames++;
+    if (frame.late) state.probeLate++;
+    if (state.probeLate >= AUTO_PROBE_LATE_LIMIT) {
+      state.lastShare = state.probeLate / state.probeFrames;
+      failProbe(state);
+      return true;
+    }
+    if (state.probeFrames < AUTO_PROBE_FRAMES) return false;
+    state.lastShare = state.probeLate / state.probeFrames;
+    state.phase = 'probation';
+    state.probationS = 0;
+    clearReadings(state);
     return true;
   }
 
-  if (share >= AUTO_UNEVEN_SHARE) {
-    state.cleanSeconds = 0;
+  if (state.phase === 'observe') state.observeS += frame.dtSeconds;
+  if (state.phase === 'probation') state.probationS += frame.dtSeconds;
+
+  const slot = state.recentAt;
+  state.recentLate += (frame.late ? 1 : 0) - state.recent[slot];
+  state.recent[slot] = frame.late ? 1 : 0;
+  state.recentAt = (slot + 1) % AUTO_RECENT_FRAMES;
+  if (state.recentCount < AUTO_RECENT_FRAMES) state.recentCount++;
+  state.checkpointFrames++;
+  state.checkpointSeconds += frame.dtSeconds;
+  state.windowSeconds += frame.dtSeconds;
+  state.windowFrames++;
+  if (frame.late) {
+    state.checkpointLate++;
+    state.windowLate++;
+  }
+
+  let uneven = false;
+  if (state.windowSeconds >= AUTO_WATCH_WINDOW_S) {
+    const share = state.windowLate / Math.max(1, state.windowFrames);
+    const enough = state.windowFrames >= MIN_WINDOW_FRAMES;
+    state.windowSeconds = 0;
+    state.windowFrames = 0;
+    state.windowLate = 0;
+    if (enough) {
+      state.lastShare = share;
+      uneven = share >= AUTO_UNEVEN_SHARE;
+    }
+  }
+
+  const checkpoint = state.checkpointFrames >= AUTO_CHECKPOINT_FRAMES;
+  const seconds = state.checkpointSeconds;
+  const clean = state.checkpointLate / Math.max(1, state.checkpointFrames) < AUTO_CLEAN_SHARE;
+  if (checkpoint) {
+    state.checkpointFrames = 0;
+    state.checkpointLate = 0;
+    state.checkpointSeconds = 0;
+  }
+  if (checkpoint && state.recentCount >= AUTO_RECENT_FRAMES) {
+    const share = state.recentLate / AUTO_RECENT_FRAMES;
+    if (share >= AUTO_FLAGRANT_SHARE) {
+      state.lastShare = share;
+      uneven = true;
+    }
+  }
+
+  if (uneven) {
+    state.cleanS = 0;
+    state.evidenceS = 0;
+    // On probation the step up is ours to take back: no waiting for the governor.
+    if (state.phase === 'probation') {
+      failProbe(state);
+      return true;
+    }
     if (frame.governorShedding) return false;
-    const down = autoStepDown(state.ceiling, frame.refreshHz);
-    if (down === state.ceiling) return false;
-    if (state.onProbation) {
-      state.onProbation = false;
-      state.returnWaitS = Math.min(AUTO_MAX_RETURN_WAIT_S, state.returnWaitS * 2);
-    }
-    state.ceiling = down;
+    return stepDown(state, frame.refreshHz);
+  }
+
+  if (!checkpoint) return false;
+
+  if (state.phase === 'probation') {
+    if (state.probationS < AUTO_PROBATION_S) return false;
+    // The step up held: it is the settled verdict now.
+    state.failStreak = 0;
+    state.cleanS = 0;
+    state.evidenceS = 0;
+    state.phase = state.ceiling === 0 ? 'observe' : 'held';
+    state.confirmed = state.ceiling !== 0;
+    // A later descent from here is an ordinary one, not a first-minute one.
+    state.observeS = AUTO_SETTLE_S;
     return true;
   }
 
-  if (state.onProbation) {
-    state.probationS += seconds;
-    if (state.probationS >= state.returnWaitS) {
-      state.onProbation = false;
-      state.returnWaitS = AUTO_FIRST_RETURN_WAIT_S;
+  if (state.phase !== 'held') return false;
+
+  if (!state.confirmed) {
+    state.cleanS = clean ? state.cleanS + seconds : 0;
+    if (state.cleanS < AUTO_CONFIRM_CLEAN_S) return false;
+    if (state.probesLeft <= 0) {
+      state.confirmed = true;
+      return true;
     }
+    if (!probeAllowed(state, frame)) return false;
+    startProbe(state, frame.refreshHz);
+    return true;
   }
 
-  if (state.ceiling === 0) return false;
-  state.cleanSeconds = share < AUTO_CLEAN_SHARE ? state.cleanSeconds + seconds : 0;
-  if (state.cleanSeconds < state.returnWaitS) return false;
-  state.trial = true;
-  state.trialFrom = state.ceiling;
-  state.cleanSeconds = 0;
-  state.ceiling = autoStepUp(state.ceiling, frame.refreshHz);
+  const evidence = clean && frame.governorAtBaseline && !frame.governorShedding;
+  state.evidenceS = evidence ? state.evidenceS + seconds : 0;
+  if (state.probesLeft <= 0 || state.evidenceS < evidenceRunS(state)) return false;
+  if (!probeAllowed(state, frame)) return false;
+  startProbe(state, frame.refreshHz);
   return true;
 }

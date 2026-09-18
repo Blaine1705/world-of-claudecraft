@@ -10,9 +10,11 @@ let chosenIntervalMs = 0;
 let missShare = NO_CHOSEN_CADENCE;
 let holdQuality = false;
 let governorShedding = false;
+let governorAtBaseline = false;
+let playerInCombat = false;
 
-/** `hold`: the automatic ceiling is in force (or on a return trial), so the
- *  governor keeps its quality levels and the headroom goes to the cadence. */
+/** `hold`: the automatic ceiling is still forming its verdict (a provisional
+ *  hold, a probe, a probation), so the governor keeps its quality levels. */
 export function setChosenCadence(intervalMs: number, share: number, hold: boolean): void {
   chosenIntervalMs = intervalMs > 0 ? intervalMs : 0;
   missShare = chosenIntervalMs > 0 ? share : NO_CHOSEN_CADENCE;
@@ -23,6 +25,8 @@ export function setChosenCadence(intervalMs: number, share: number, hold: boolea
  *  value left by the previous one would stop the automatic ceiling for good. */
 export function resetChosenCadenceForRenderer(): void {
   governorShedding = false;
+  governorAtBaseline = false;
+  playerInCombat = false;
 }
 
 export function chosenCadenceHoldsQuality(): boolean {
@@ -33,6 +37,22 @@ export function chosenCadenceHoldsQuality(): boolean {
  *  ceiling: quality is shed first, the ceiling waits its turn. */
 export function noteGovernorShedding(shedding: boolean): void {
   governorShedding = shedding;
+}
+
+/** The renderer's other two readings for the automatic ceiling: the governor
+ *  has restored its baseline quality (the headroom evidence a probe needs), and
+ *  the player is in a fight (no probe then). */
+export function noteCadenceProbeContext(atBaseline: boolean, inCombat: boolean): void {
+  governorAtBaseline = atBaseline;
+  playerInCombat = inCombat;
+}
+
+export function governorIsAtBaseline(): boolean {
+  return governorAtBaseline;
+}
+
+export function cadencePlayerInCombat(): boolean {
+  return playerInCombat;
 }
 
 export function governorIsShedding(): boolean {
