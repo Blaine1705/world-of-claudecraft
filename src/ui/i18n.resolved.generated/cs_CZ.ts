@@ -2396,12 +2396,7 @@ export const cs_CZ: EnTranslations = {
       "vendorGate": "Requires {tier} with {faction}.",
       "tierReachedBanner": "Now {tier} with the {faction}",
       "tierReachedSubtext": "Faction title: {title}",
-      "tierReachedLine": "You are now {tier} with the {faction}. Your faction title is now {title}.",
-      "mastery": "Regional Mastery",
-      "masteryIntro": "World quests completed in each zone, kept for good: no daily streak, nothing spent. Each milestone records a deed.",
-      "masteryNext": "Next milestone at {count}",
-      "masteryMaxed": "Every milestone reached",
-      "masteryReached": "{reached} / {total} milestones"
+      "tierReachedLine": "You are now {tier} with the {faction}. Your faction title is now {title}."
     },
     "questLog": {
       "completed": "Dokončeno",
@@ -2538,12 +2533,6 @@ export const cs_CZ: EnTranslations = {
         "few": "{count} legendární předměty",
         "many": "{count} legendárních předmětů",
         "other": "{count} legendárního předmětu"
-      },
-      "worldQuestsCompletedInZone": {
-        "one": "{count} world quest completed",
-        "few": "{count} world quests completed",
-        "many": "{count} world quests completed",
-        "other": "{count} world quests completed"
       },
       "guildMembers": {
         "one": "jste {rank}, {count} člen",
@@ -7454,9 +7443,7 @@ export const cs_CZ: EnTranslations = {
       "readingHeading": "Where to read it",
       "readingBody": "The Reputation tab of the character sheet (C) shows each faction with its current standing, a bar toward the next tier, and the title that standing has earned you. The chat log reports every standing gain as it lands, and reaching a new tier shows a celebration banner on screen.",
       "deedsHeading": "Deeds",
-      "deedsBody": "The Book of Deeds keeps score of your standing too: reaching Trusted with a faction and reaching Champion with a faction each record a deed, and reaching Champion with all three is a deed of its own. Like every deed these are cosmetic, never power, and the Champion deeds grant a title you can wear.",
-      "masteryHeading": "Regional Mastery",
-      "masteryBody": "Every zone also keeps a permanent count of the world quests you have completed there. It is not a currency and nothing spends it: the number only ever climbs, there is no daily streak to keep, and if you come back after weeks away the next world quest simply adds one more. At set milestones the count records a deed in the Book of Deeds, so an old zone stays worth a visit long after your character has stopped leveling. The Reputation tab lists every zone with its count and the next milestone."
+      "deedsBody": "The Book of Deeds keeps score of your standing too: reaching Trusted with a faction and reaching Champion with a faction each record a deed, and reaching Champion with all three is a deed of its own. Like every deed these are cosmetic, never power, and the Champion deeds grant a title you can wear."
     },
     "deedsPage": {
       "intro": "Kniha skutků je místo, kde si svět počítá vše, co máš za sebou: od prvních kroků z počátečního údolí až po nejtěžší boje, jaké říše nabízí. Vykonávej skutky při hraní, nos tituly, které ti udělí, a sleduj, jak tvůj věhlas roste.",

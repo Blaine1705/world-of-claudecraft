@@ -1608,9 +1608,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.factionsPage.readingBody':
     'キャラクターシート（C）の評判タブに、各勢力の現在の評判、次の段階までのバー、評判で得た称号が表示されます。チャットログは評判を得るたびに報告し、新しい段階に達すると画面に祝いのバナーが出ます。',
   'guide.factionsPage.deedsHeading': '偉業',
-  'guide.factionsPage.masteryHeading': '地域の熟達',
-  'guide.factionsPage.masteryBody':
-    '各ゾーンには、そこで完了したワールドクエストの数が永久に記録されます。通貨ではなく、何かに使われることもありません。数字は増えるだけで、毎日続ける必要もなく、数週間ぶりに戻っても次のワールドクエストが一つ加わるだけです。定められた節目に達すると偉業の書に偉業が記録されるので、キャラクターのレベル上げが終わって久しくても、古いゾーンを訪れる価値が残ります。評判タブには各ゾーンの数と次の節目が並びます。',
   'guide.factionsPage.deedsBody':
     '偉業の書も評判を記録します。ある勢力で信頼に達すること、ある勢力でチャンピオンに達することがそれぞれ偉業として記録され、三勢力すべてでチャンピオンに達することは独自の偉業です。他の偉業と同じく、これらは見た目だけで力にはならず、チャンピオンの偉業は身に着けられる称号を授けます。',
   'guide.thornhollowPage.heading': 'ソーンホロウ平原',
@@ -13439,10 +13436,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.commissionLegendaries.few': '伝説の品{count}点',
   'hudChrome.plurals.commissionLegendaries.many': '伝説の品{count}点',
   'hudChrome.plurals.commissionLegendaries.other': '伝説の品{count}点',
-  'hudChrome.plurals.worldQuestsCompletedInZone.one': 'ワールドクエスト{count}件完了',
-  'hudChrome.plurals.worldQuestsCompletedInZone.few': 'ワールドクエスト{count}件完了',
-  'hudChrome.plurals.worldQuestsCompletedInZone.many': 'ワールドクエスト{count}件完了',
-  'hudChrome.plurals.worldQuestsCompletedInZone.other': 'ワールドクエスト{count}件完了',
   'hudChrome.commissionBoard.statusOpen': '募集中',
   'hudChrome.commissionBoard.statusAccepted': '引き受け済み',
   'hudChrome.commissionBoard.statusDelivered': '納品済み',
@@ -17262,12 +17255,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reputation.title': '勢力の称号',
   'hudChrome.reputation.legend': '評判の段階',
   'hudChrome.reputation.vendorGate': '{faction}との評判が{tier}以上必要です。',
-  'hudChrome.reputation.mastery': '地域の熟達',
-  'hudChrome.reputation.masteryIntro':
-    '各ゾーンで完了したワールドクエストの数は永久に残ります。連続ログインは不要で、消費されることもありません。節目ごとに偉業が記録されます。',
-  'hudChrome.reputation.masteryNext': '次の節目：{count}',
-  'hudChrome.reputation.masteryMaxed': 'すべての節目を達成',
-  'hudChrome.reputation.masteryReached': '{reached} / {total} の節目',
   'hudChrome.reputation.tierReachedBanner': '{faction}との評判が{tier}になりました',
   'hudChrome.reputation.tierReachedSubtext': '勢力の称号：{title}',
   'hudChrome.reputation.tierReachedLine':

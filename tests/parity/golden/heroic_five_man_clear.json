@@ -31,7 +31,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1037,
-      "state": "57b5cb30",
+      "state": "2013df32",
       "events": "d25cd5af",
       "rng": {
         "draws": 21,
@@ -115,7 +115,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -195,7 +194,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -275,7 +273,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -355,7 +352,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -435,7 +431,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -761,7 +756,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1037,
-      "state": "d9be8836",
+      "state": "392653bc",
       "events": "ddfc942f",
       "rng": {
         "draws": 62,
@@ -948,7 +943,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {
             "sources": [
               "gravewyrm_sanctum:heroic"
@@ -1135,7 +1129,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {
             "sources": [
               "gravewyrm_sanctum:heroic"
@@ -1315,7 +1308,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {
             "sources": [
               "gravewyrm_sanctum:heroic"
@@ -1495,7 +1487,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {
             "sources": [
               "gravewyrm_sanctum:heroic"
@@ -1675,7 +1666,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {
             "sources": [
               "gravewyrm_sanctum:heroic"
@@ -2034,7 +2024,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1037,
-      "state": "d9be8836",
+      "state": "392653bc",
       "events": "741638a5",
       "rng": {
         "draws": 62,
@@ -2221,7 +2211,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {
             "sources": [
               "gravewyrm_sanctum:heroic"
@@ -2408,7 +2397,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {
             "sources": [
               "gravewyrm_sanctum:heroic"
@@ -2588,7 +2576,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {
             "sources": [
               "gravewyrm_sanctum:heroic"
@@ -2768,7 +2755,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {
             "sources": [
               "gravewyrm_sanctum:heroic"
@@ -2948,7 +2934,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {
             "sources": [
               "gravewyrm_sanctum:heroic"

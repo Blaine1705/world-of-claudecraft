@@ -5,7 +5,6 @@
 import type { CharacterState } from './character_state';
 import type { FactionId } from './factions';
 import { freshFactionReputation, sanitizeFactionReputation } from './factions';
-import { sanitizeZoneCompletionCounts } from './regional_mastery';
 import type { PlayerMeta } from './sim';
 import type { Entity, WorldQuestDef, WorldQuestProgress } from './types';
 import { WORLD_BOSSES } from './world_boss';
@@ -35,12 +34,6 @@ export interface WorldQuestPlayerState {
   worldQuestRerollCycle: string;
   /** Personal quest replacement: oldQuestId -> newQuestId for the current cycle. */
   worldQuestReplacements: Record<string, string>;
-  /**
-   * Regional Mastery: permanent per-zone world quest completion counts, keyed
-   * by WorldQuestDef.zoneId. Only ever climbs (a turn-in adds one); never
-   * reset by a rollover, a reroll, or a missed day (src/sim/regional_mastery.ts).
-   */
-  worldQuestZoneCounts: Record<string, number>;
 }
 
 export interface WorldQuestRotationCache {
@@ -58,7 +51,6 @@ export function freshWorldQuestPlayerState(): WorldQuestPlayerState {
     factions: freshFactionReputation(),
     worldQuestRerollCycle: '',
     worldQuestReplacements: {},
-    worldQuestZoneCounts: {},
   };
 }
 
@@ -94,9 +86,6 @@ export function restoreWorldQuestState(
   }
   meta.worldQuestRerollCycle = '';
   meta.worldQuestReplacements = {};
-  // The mastery counts outlive every cycle: restored whatever the board holds
-  // (a legacy save without the field restores to an empty map).
-  meta.worldQuestZoneCounts = sanitizeZoneCompletionCounts(saved?.zoneCounts);
   if (saved) {
     meta.worldQuestCycle = sanitizeWorldQuestCycle(saved.cycle);
     if (typeof saved.rerollCycle === 'string' && saved.rerollCycle === meta.worldQuestCycle) {
@@ -127,17 +116,7 @@ export function savedWorldQuestState(meta: PlayerMeta): {
     meta.worldQuestRerollCycle && meta.worldQuestRerollCycle === meta.worldQuestCycle;
   const hasReplacements =
     hasReroll && meta.worldQuestReplacements && Object.keys(meta.worldQuestReplacements).length > 0;
-  const hasZoneCounts =
-    meta.worldQuestZoneCounts !== undefined && Object.keys(meta.worldQuestZoneCounts).length > 0;
-  if (
-    !meta.worldQuestCycle &&
-    meta.worldQuestLog.size === 0 &&
-    !hasRep &&
-    !hasReroll &&
-    !hasZoneCounts
-  ) {
-    return {};
-  }
+  if (!meta.worldQuestCycle && meta.worldQuestLog.size === 0 && !hasRep && !hasReroll) return {};
   const factionsObj = hasRep ? { ...meta.factions } : undefined;
   return {
     worldQuests: {
@@ -178,7 +157,6 @@ export function savedWorldQuestState(meta: PlayerMeta): {
       ...(factionsObj ? { factions: factionsObj } : {}),
       ...(hasReroll ? { rerollCycle: meta.worldQuestRerollCycle } : {}),
       ...(hasReplacements ? { replacements: { ...meta.worldQuestReplacements } } : {}),
-      ...(hasZoneCounts ? { zoneCounts: { ...meta.worldQuestZoneCounts } } : {}),
     },
     ...(factionsObj ? { factions: factionsObj } : {}),
   };

@@ -8991,11 +8991,7 @@ export type DeedMeterId =
   // tier once reached is never lost.
   | 'standingRiftWatch'
   | 'standingChurchOrder'
-  | 'standingAutomatons'
-  // Regional Mastery: the highest per-zone world quest completion count
-  // (PlayerMeta.worldQuestZoneCounts, src/sim/regional_mastery.ts). The map
-  // only ever climbs, so a milestone once reached is never lost.
-  | 'regionalMasteryBest';
+  | 'standingAutomatons';
 
 // Boolean predicates over already-persisted state (see the flag table in
 // deeds.ts). Like meters, they retro-grant on load.

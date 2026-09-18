@@ -28,7 +28,7 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 1013,
-      "state": "ba313f61",
+      "state": "f3f222a5",
       "events": "e4e5ded3",
       "rng": {
         "draws": 2,
@@ -116,7 +116,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         },
         {
@@ -214,7 +213,6 @@
             "stock": {}
           },
           "worldQuestReplacements": {},
-          "worldQuestZoneCounts": {},
           "wyrmfallDaily": {}
         }
       ],

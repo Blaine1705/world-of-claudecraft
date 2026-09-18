@@ -142,10 +142,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // release's 300 plus the branch's eight world-quest exploration deeds.
     // 315 / 3495 with the seven faction standing deeds (three Trusted at 5,
     // three Champion at 25, and the all-factions meta at 50: +140).
-    // 320 / 3595 with the five Regional Mastery exploration deeds (the per-zone
-    // world quest ladder at 5, 10, 10, 25 and 50: +100).
-    expect(DEED_ORDER.length).toBe(320);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3595);
+    expect(DEED_ORDER.length).toBe(315);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3495);
   });
 
   it('ships the audited per-category counts', () => {
@@ -182,9 +180,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // +2 bank socket ladder deeds (soc_strongbox_outfitter,
       // soc_four_bags_deep; Bank Storage phase 06).
       social: 20,
-      // +5 the Regional Mastery per-zone world quest ladder
-      // (exp_regional_mastery_10 through _250).
-      exploration: 24,
+      exploration: 19,
       feat: 3,
       hidden: 10,
     });
@@ -396,13 +392,6 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'prog_church_order_champion',
       'prog_automatons_champion',
       'prog_faction_champion_all',
-      // The Regional Mastery ladder: five meter deeds on regionalMasteryBest,
-      // one per REGIONAL_MASTERY_MILESTONES rung, appended last.
-      'exp_regional_mastery_10',
-      'exp_regional_mastery_25',
-      'exp_regional_mastery_50',
-      'exp_regional_mastery_100',
-      'exp_regional_mastery_250',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -1020,13 +1009,7 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // the afe535f4... literal rotated down into PRE_APPEND_CATALOG_SHA256 and
   // the proof below reproduces it exactly. No shipped trigger or renown
   // value was touched.
-  // Re-baselined for the five appended Regional Mastery deeds (the
-  // exp_regional_mastery_* ladder on the new regionalMasteryBest meter, one
-  // per REGIONAL_MASTERY_MILESTONES rung), re-minted THE AUDITABLE WAY: the
-  // 2b8d9d03... literal rotated down into PRE_APPEND_CATALOG_SHA256 and the
-  // proof below reproduces it exactly. No shipped trigger or renown value
-  // was touched.
-  const FROZEN_CATALOG_SHA256 = '4c6954a08a0a3b6c098e0bfaae30452743903af2d739f2ff1251071737212fac';
+  const FROZEN_CATALOG_SHA256 = '2b8d9d03740487fde602cfb2c610880747113a59c98539eab242e498840c422a';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1081,21 +1064,18 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // must reproduce the release catalogue exactly.
   //
   // The faction standing ladder appends seven deeds after exp_wisp_maze; the
-  // previous mint is that merge's afe535f4... literal, and stripping the
-  // seven reproduced it exactly.
-  //
-  // The Regional Mastery ladder appends five deeds after
-  // prog_faction_champion_all; the previous mint is the faction ladder's
-  // 2b8d9d03... literal (rotated down here), and stripping the five must
-  // reproduce it exactly.
+  // previous mint is that merge's afe535f4... literal (rotated down here),
+  // and stripping the seven must reproduce it exactly.
   const PRE_APPEND_CATALOG_SHA256 =
-    '2b8d9d03740487fde602cfb2c610880747113a59c98539eab242e498840c422a';
+    'afe535f45c2b87e267e29dd1d11207395d0c0a5e41980f728b106f58a33bf686';
   const APPENDED_SINCE: readonly string[] = [
-    'exp_regional_mastery_10',
-    'exp_regional_mastery_25',
-    'exp_regional_mastery_50',
-    'exp_regional_mastery_100',
-    'exp_regional_mastery_250',
+    'prog_rift_watch_trusted',
+    'prog_church_order_trusted',
+    'prog_automatons_trusted',
+    'prog_rift_watch_champion',
+    'prog_church_order_champion',
+    'prog_automatons_champion',
+    'prog_faction_champion_all',
   ];
 
   it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
@@ -1103,13 +1083,13 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
     for (const id of APPENDED_SINCE) {
       expect(DEED_ORDER.includes(id), `${id} is in the live catalog`).toBe(true);
     }
-    // The Regional Mastery ladder sits at the true tail after the faction
-    // standing block. Pin its two predecessors too: this is an append into a
-    // known seat, never a scattered insert or a retro-edit (the digest below
+    // The faction standing ladder sits at the true tail after the world-quest
+    // block. Pin its two predecessors too: this is an append into a known
+    // seat, never a scattered insert or a retro-edit (the digest below
     // proves it).
     expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
-      'prog_automatons_champion',
-      'prog_faction_champion_all',
+      'exp_duskweave_dispatches',
+      'exp_wisp_maze',
       ...APPENDED_SINCE,
     ]);
     const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
@@ -1327,9 +1307,9 @@ describe('table shape', () => {
     // final entry). The Roots' Bramblehide set collection appends behind the
     // raid block (whose flawless task was the previous final entry).
     // The one-time Forgebreaker quest's hidden celebration appends after it,
-    // then the world-quest block, then the faction standing ladder, then the
-    // Regional Mastery ladder whose 250-turn-in rung is the final entry.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('exp_regional_mastery_250');
+    // then the world-quest block, then the faction standing ladder whose
+    // all-factions meta is the final entry.
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('prog_faction_champion_all');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

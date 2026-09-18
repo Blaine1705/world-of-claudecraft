@@ -42,7 +42,6 @@ export class QuestWorldWireState {
   factions: Readonly<Record<FactionId, number>> = freshFactionReputation();
   worldQuestReplacements: Readonly<Record<string, string>> = Object.freeze({});
   worldQuestRerollCycle = '';
-  worldQuestZoneCounts: Readonly<Record<string, number>> = Object.freeze({});
   private activeWorldBossIds = new Set<string>();
   private questWorldTransport: ((command: QuestWorldCommand) => void) | null = null;
   private questWorldRestBase = '';
@@ -167,7 +166,6 @@ export class QuestWorldWireState {
     this.worldQuestLog = new Map();
     this.worldQuestReplacements = Object.freeze({});
     this.worldQuestRerollCycle = '';
-    this.worldQuestZoneCounts = Object.freeze({});
     this.nearbyWorldQuestTraces = [];
     this.activeWorldBossIds = new Set();
   }

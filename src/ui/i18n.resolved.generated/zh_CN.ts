@@ -2396,12 +2396,7 @@ export const zh_CN: EnTranslations = {
       "vendorGate": "需要与{faction}达到{tier}。",
       "tierReachedBanner": "与{faction}的声望达到{tier}",
       "tierReachedSubtext": "阵营头衔：{title}",
-      "tierReachedLine": "你与{faction}的声望已达到{tier}。你的阵营头衔现在是{title}。",
-      "mastery": "区域精通",
-      "masteryIntro": "在每个区域完成的世界任务数，永久保留：没有每日连续要求，也不会被消耗。每达到一个里程碑都会记录一项功绩。",
-      "masteryNext": "下一个里程碑：{count}",
-      "masteryMaxed": "已达成全部里程碑",
-      "masteryReached": "{reached} / {total} 个里程碑"
+      "tierReachedLine": "你与{faction}的声望已达到{tier}。你的阵营头衔现在是{title}。"
     },
     "questLog": {
       "completed": "已完成",
@@ -2538,12 +2533,6 @@ export const zh_CN: EnTranslations = {
         "few": "{count}件传说物品",
         "many": "{count}件传说物品",
         "other": "{count}件传说物品"
-      },
-      "worldQuestsCompletedInZone": {
-        "one": "已完成{count}个世界任务",
-        "few": "已完成{count}个世界任务",
-        "many": "已完成{count}个世界任务",
-        "other": "已完成{count}个世界任务"
       },
       "guildMembers": {
         "one": "你是{rank}，{count}名成员",
@@ -7454,9 +7443,7 @@ export const zh_CN: EnTranslations = {
       "readingHeading": "在哪里查看",
       "readingBody": "角色面板（C）的声望页会显示每个阵营的当前声望、通往下一等级的进度条，以及声望为你赢得的头衔。聊天记录会在每次获得声望时报告，达到新等级时屏幕上还会显示庆祝横幅。",
       "deedsHeading": "功绩",
-      "deedsBody": "功绩之书也会记录你的声望：与某个阵营达到信任、与某个阵营达到冠军各记为一项功绩，与三个阵营都达到冠军则是另一项功绩。和所有功绩一样，它们只是装饰，从不带来战力，而冠军功绩会授予一个可佩戴的头衔。",
-      "masteryHeading": "区域精通",
-      "masteryBody": "每个区域还会永久记录你在那里完成的世界任务数。它不是货币，也不会被花掉：这个数字只会上升，不需要每日连续登录，哪怕几周后再回来，下一个世界任务也只是再加一。达到设定的里程碑时，这个计数会在功绩之书中记录一项功绩，因此即便你的角色早已不再升级，旧区域依然值得一去。声望页会列出每个区域的计数和下一个里程碑。"
+      "deedsBody": "功绩之书也会记录你的声望：与某个阵营达到信任、与某个阵营达到冠军各记为一项功绩，与三个阵营都达到冠军则是另一项功绩。和所有功绩一样，它们只是装饰，从不带来战力，而冠军功绩会授予一个可佩戴的头衔。"
     },
     "deedsPage": {
       "intro": "功绩之书记录着你在这个世界所做的一切，从走出新手山谷的第一步，到王国所能提供的最艰难的战斗。一边游玩一边赢得功绩，佩戴它们授予的头衔，看着你的名望不断攀升。",
