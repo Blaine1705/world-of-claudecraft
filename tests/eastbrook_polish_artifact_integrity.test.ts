@@ -1384,7 +1384,10 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // Re-minted at the third release/v0.43.0 merge into feature/world-quests
   // (the hotfix-line renderer leaf composed with the branch's guidance wiring).
   // No capture was retaken.
-  'e9216c460d8656182ec22c88fa7c685ee3009647cdac328ad9621e03d5b5ca57';
+  // Re-minted for the Weekly Vault (PR 4052) landing on the quests integration
+  // branch: the town runtime leaf composes the stone vault hall and the
+  // authoritative layout gains the weeklyVault site. No capture was retaken.
+  '352e5782b1ef3c9409ce1425019989099b21ea85f914b818eb82df77ae2cfb57';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
@@ -1397,7 +1400,10 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted at the third release/v0.43.0 merge into feature/world-quests
   // (the hotfix-line renderer leaf composed with the branch's guidance wiring).
   // No capture was retaken.
-  'cb3585ee0788cbaa3befd04c3c0971ea7a4cbd165c741e81bbb8d3391748c119';
+  // Re-minted for the Weekly Vault (PR 4052) landing on the quests integration
+  // branch: the town runtime leaf composes the stone vault hall and the
+  // authoritative layout gains the weeklyVault site. No capture was retaken.
+  'bea0d79289e8d54b957c89ce057d6a5c3f35d523db13aba66858f6ddb50d3163';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2772,7 +2778,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // again over the re-swept evidence. No capture was retaken.
       // Third release/v0.43.0 merge into feature/world-quests: recomputed LAST
       // again over the re-swept evidence. No capture was retaken.
-    ).toBe('99ebc1ece3554d5946158a424745558226bec1f680b72d5f5e7867c4cb132614');
+      // Weekly Vault (PR 4052) landing on the quests integration branch:
+      // recomputed LAST again over the re-swept evidence. No capture was retaken.
+    ).toBe('690f100e8a8d6c3add4578c5efbb581207a764a4eeae01a4c37aedadb96fe375');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

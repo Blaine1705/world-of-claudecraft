@@ -10,6 +10,23 @@ import { type OccluderFadeMat, occluderFadeRecordFor } from './occluder_fade';
 // Pinned against the generated geometry by weekly_vault_building.test.ts.
 export const WEEKLY_VAULT_TRIANGLES = 4572;
 
+/** Bakes one flat color into the geometry's vertex colors so the hall rides the
+ *  town's material contract (a white material times the vertex color, the idiom
+ *  eastbrook_town.ts uses for every procedural mesh; the Low-tier audit in
+ *  tests/eastbrook_surface_atlas.test.ts walks every town mesh for it). */
+function paintVertexColor(geometry: THREE.BufferGeometry, hex: number): THREE.BufferGeometry {
+  const count = geometry.getAttribute('position').count;
+  const tint = new THREE.Color(hex);
+  const colors = new Float32Array(count * 3);
+  for (let index = 0; index < count; index++) {
+    colors[index * 3] = tint.r;
+    colors[index * 3 + 1] = tint.g;
+    colors[index * 3 + 2] = tint.b;
+  }
+  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  return geometry;
+}
+
 /** Door assembly reused by the independent stone hall. */
 function buildVaultDoor(frontZ: number, mats: OccluderFadeMat[]): THREE.Group {
   const root = new THREE.Group();
@@ -66,9 +83,11 @@ function buildVaultDoor(frontZ: number, mats: OccluderFadeMat[]): THREE.Group {
     { parts: brass, color: 0xc4a15b, metalness: 0.75, roughness: 0.35 },
   ];
   for (const { parts, color, metalness, roughness } of groups) {
-    const geometry = mergeGeometries(parts, false)!;
+    const geometry = paintVertexColor(mergeGeometries(parts, false)!, color);
     for (const part of parts) part.dispose();
-    const material = cloneMaterialWithHooks(surfaceMat({ color, metalness, roughness }));
+    const material = cloneMaterialWithHooks(
+      surfaceMat({ color: 0xffffff, vertexColors: true, metalness, roughness }),
+    );
     const mesh = new THREE.Mesh(geometry, material);
     mesh.castShadow = true;
     mesh.receiveShadow = true;
@@ -192,11 +211,12 @@ export function buildEastbrookWeeklyVault(groundAt: (x: number, z: number) => nu
   for (const x of [-3, -2, -1, 1, 2, 3]) box(4, 0.25, 0.25, 0.13, x, 8.7, 5.83);
   for (const [index, geometries] of parts.entries()) {
     const soups = geometries.map((g) => (g.index ? g.toNonIndexed() : g));
-    const geometry = mergeGeometries(soups, false)!;
+    const geometry = paintVertexColor(mergeGeometries(soups, false)!, colors[index]);
     for (const part of new Set([...geometries, ...soups])) part.dispose();
     const material = cloneMaterialWithHooks(
       surfaceMat({
-        color: colors[index],
+        color: 0xffffff,
+        vertexColors: true,
         roughness: index === 4 ? 0.4 : 0.92,
         metalness: index === 4 ? 0.65 : 0,
       }),

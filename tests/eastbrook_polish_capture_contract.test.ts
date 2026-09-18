@@ -690,7 +690,10 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // Re-minted at the third release/v0.43.0 merge into feature/world-quests
   // (the hotfix-line renderer leaf composed with the branch's guidance wiring).
   // No capture was retaken.
-  'cb3585ee0788cbaa3befd04c3c0971ea7a4cbd165c741e81bbb8d3391748c119';
+  // Re-minted for the Weekly Vault (PR 4052) landing on the quests integration
+  // branch: the town runtime leaf composes the stone vault hall and the
+  // authoritative layout gains the weeklyVault site. No capture was retaken.
+  'bea0d79289e8d54b957c89ce057d6a5c3f35d523db13aba66858f6ddb50d3163';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

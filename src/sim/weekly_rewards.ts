@@ -23,7 +23,10 @@ import {
   type PlayerClass,
 } from './types';
 
-export const WEEKLY_KEEPER_ENTITY_ID = 1_000_000_004;
+// Reserved singleton id (the 1_000_000_x band; see STATIC_WORLD_SERVICE_ENTITY_ID_MIN
+// in types.ts): 1_000_000_004 went to the Last Keep spirit healer while this branch was
+// in flight, so the keeper takes the next free slot. The healing dummies start at _010.
+export const WEEKLY_KEEPER_ENTITY_ID = 1_000_000_005;
 export const WEEKLY_KEEPER_ID = 'eastbrook_vault_keeper';
 export const WEEKLY_POOL_IDS = [
   'raid',

@@ -494,6 +494,12 @@ const ANSWERED: readonly AnsweredSurface[] = [
     why: 'the listing ids, prices and the active tab; render() carries no self-gate. lastSellPriceRefSig (issue 3043) is the Sell tab price reference: render() rebuilds it via renderSell -> sellPriceRefHtml with the CURRENT language, the same full-rebuild path that already answers lastSig. searchEcho is answered DIFFERENTLY and deliberately: it memoizes the typed-to-sent Browse search translation, whose resolution reads localized item names, so it keys the active language into the memo itself (LANGUAGE_KEYED below verifies that structurally) rather than riding this arm. A repaint cannot fix it: the stale value is the string the client SENDS to the server, so it has to be re-resolved rather than re-painted',
   },
   {
+    file: 'weekly_rewards_window.ts',
+    memos: ['lastSignature'],
+    answer: 'this.bankWindow.render',
+    why: 'the Weekly Vault pane (PR 4052) is a TAB of the bank window, not a window of its own: lastSignature digests the vault ledger, the ready weeks, the claim flag and the reset edge, none of them text. bankWindow.render() rebuilds the rewards tab through WeeklyRewardsTab.renderInto, which re-reads every t() label and re-latches the signature in the current language, so the bank arm answers it',
+  },
+  {
     file: 'weekly_quests_window.ts',
     memos: ['lastSig'],
     answer: 'this.weeklyQuestsWindow.relocalize',
