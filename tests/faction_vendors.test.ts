@@ -20,19 +20,19 @@ describe('Faction Vendors & Reroll NPC content', () => {
     expect(qmRift).toBeDefined();
     expect(qmRift.name).toBe('Quartermaster Vaelen');
     expect(qmRift.title).toBe('Rift Watch Provisioner');
-    expect(qmRift.vendorItems?.length).toBe(11);
+    expect(qmRift.vendorItems?.length).toBe(12);
 
     const qmChurch = NPCS.npc_church_order_quartermaster;
     expect(qmChurch).toBeDefined();
     expect(qmChurch.name).toBe('Templar Althea');
     expect(qmChurch.title).toBe('Church Order Quartermaster');
-    expect(qmChurch.vendorItems?.length).toBe(10);
+    expect(qmChurch.vendorItems?.length).toBe(11);
 
     const qmAuto = NPCS.npc_automaton_quartermaster;
     expect(qmAuto).toBeDefined();
     expect(qmAuto.name).toBe('Artificer Tobrin');
     expect(qmAuto.title).toBe('Automaton Requisitioner');
-    expect(qmAuto.vendorItems?.length).toBe(11);
+    expect(qmAuto.vendorItems?.length).toBe(12);
 
     const taskmaster = NPCS.npc_wq_taskmaster;
     expect(taskmaster).toBeDefined();

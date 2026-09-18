@@ -8,7 +8,8 @@
 //     the owner and their party may enter and the run pays no Rift ladder;
 //   - the vault scales the Rift rank tuning to the head count its owner brought
 //     and, when the boss falls, pays every entrant the rarity's table;
-//   - a read map can be raised one rarity at a time for faction currency.
+//   - a read map can be redrawn one rarity finer with Cartographer's Ink, which
+//     the faction quartermasters sell for their currency.
 //
 // State lives on PlayerMeta (treasureMap, vaultGuestCycle, vaultGuestPayouts)
 // behind the world-quest save. Every roll draws from ctx.rng in a fixed order.
@@ -17,6 +18,7 @@ import { treasureCasketCopper } from './clue_casket';
 import { delveChestItemsForTier } from './content/delves/lockpick_tiers';
 import { HEROIC_MARK_ITEM_ID } from './content/dungeon_difficulty';
 import {
+  CARTOGRAPHERS_INK_ITEM_ID,
   isTreasureMapRarity,
   nextTreasureMapRarity,
   TREASURE_DIG_RADIUS,
@@ -24,7 +26,7 @@ import {
   TREASURE_MAP_ITEM_IDS,
   TREASURE_MAP_RARITIES,
   TREASURE_MAP_RIFT_TIER,
-  TREASURE_MAP_UPGRADE_COST,
+  TREASURE_MAP_UPGRADE_INKS,
   TREASURE_SITES,
   TREASURE_SITES_BY_ID,
   type TreasureMapProgress,
@@ -38,7 +40,6 @@ import {
 } from './content/treasure_maps';
 import { zoneAt } from './data';
 import { createGroundObject } from './entity';
-import { FACTION_IDS, type FactionId } from './factions';
 import { mountOwned } from './mounts';
 import { riftFx } from './rift/fx';
 import { RIFT_RANK_BASE_LEVEL, type RiftRankTuning } from './rift/ranks';
@@ -299,14 +300,14 @@ function payOne(
 }
 
 // ---------------------------------------------------------------------------
-// Raising a map's rarity for faction currency
+// Cartographer's Ink (the `cartographersInk` item-use arm): redraws the read
+// map one rarity finer. The ink is bought from a faction quartermaster.
 
-export function upgradeTreasureMap(ctx: SimContext, pid: number, factionId: FactionId): void {
-  const meta = ctx.players.get(pid);
-  const map = meta?.treasureMap;
-  if (!meta || !(FACTION_IDS as readonly string[]).includes(factionId)) return;
+export function useCartographersInk(ctx: SimContext, meta: PlayerMeta): void {
+  const pid = meta.entityId;
+  const map = meta.treasureMap;
   if (!map) {
-    ctx.error(pid, 'Read a treasure map first.');
+    ctx.error(pid, 'Read the treasure map you want to redraw first.');
     return;
   }
   const next = nextTreasureMapRarity(map.rarity);
@@ -314,20 +315,19 @@ export function upgradeTreasureMap(ctx: SimContext, pid: number, factionId: Fact
     ctx.error(pid, 'This map cannot be improved any further.');
     return;
   }
-  const cost = TREASURE_MAP_UPGRADE_COST[map.rarity];
-  const balance = meta.factionCurrencies?.[factionId] ?? 0;
-  if (balance < cost) {
-    ctx.error(pid, 'You do not have enough of that faction currency.');
+  const inks = TREASURE_MAP_UPGRADE_INKS[map.rarity];
+  if (ctx.countItem(CARTOGRAPHERS_INK_ITEM_ID, pid) < inks) {
+    ctx.error(pid, `Redrawing this map takes ${inks} Cartographer's Ink.`);
     return;
   }
   if (ctx.countItem(TREASURE_MAP_ITEM_IDS[map.rarity], pid) < 1) {
     ctx.error(pid, 'You no longer hold that treasure map.');
     return;
   }
+  ctx.removeItem(CARTOGRAPHERS_INK_ITEM_ID, inks, pid);
   ctx.removeItem(TREASURE_MAP_ITEM_IDS[map.rarity], 1, pid);
   ctx.addItem(TREASURE_MAP_ITEM_IDS[next], 1, pid);
-  meta.factionCurrencies[factionId] = balance - cost;
   meta.treasureMap = { rarity: next, siteId: map.siteId, seed: pickVaultSeed(ctx, next) };
   meta.wireRev++;
-  ctx.emit({ type: 'treasureMapUpgraded', rarity: next, factionId, cost, pid });
+  ctx.emit({ type: 'treasureMapUpgraded', rarity: next, inks, pid });
 }

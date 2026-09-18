@@ -1977,6 +1977,25 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noMarketList: true,
     noDiscard: false,
   },
+  // Cartographer's Ink (content/treasure_maps.ts): every faction quartermaster
+  // sells it for their currency; using it redraws the READ treasure map one
+  // rarity finer (1, 3 or 8 inks by the map's current rarity).
+  cartographers_ink: {
+    id: 'cartographers_ink',
+    name: "Cartographer's Ink",
+    kind: 'quest',
+    quality: 'uncommon',
+    use: { type: 'cartographersInk' },
+    stackSize: 20,
+    // Faction stock rule (tests/faction_vendors.test.ts): priced in currency
+    // only (buyValue 0) with a token sell value; noVendorSell keeps it unsold.
+    buyValue: 0,
+    sellValue: 1,
+    soulbound: true,
+    noVendorSell: true,
+    noMarketList: true,
+    noDiscard: false,
+  },
   // The casket the last step of a hunt hands over; opening it pays the
   // treasure table (src/sim/clue_casket.ts). Bound to the digger like the
   // Emissary's Cache, one per bag slot so a stack never hides a second roll.

@@ -29,8 +29,7 @@ export type QuestWorldCommand =
   | { cmd: 'world_quest_shadow'; action: 'pickpocket' | 'leave'; targetId?: number }
   | { cmd: 'world_quest_start'; quest: string; difficulty: WorldQuestDifficulty }
   | { cmd: 'world_quest_reroll'; quest: string }
-  | { cmd: 'clue_hunt_abandon' }
-  | { cmd: 'treasure_map_upgrade'; faction: FactionId };
+  | { cmd: 'clue_hunt_abandon' };
 
 /** Cold owner mirrors shared by quest snapshots and world-boss map state. */
 export class QuestWorldWireState {
@@ -136,10 +135,6 @@ export class QuestWorldWireState {
 
   abandonClueHunt(): void {
     this.sendQuestWorldCommand({ cmd: 'clue_hunt_abandon' });
-  }
-
-  upgradeTreasureMap(factionId: FactionId): void {
-    this.sendQuestWorldCommand({ cmd: 'treasure_map_upgrade', faction: factionId });
   }
 
   canRerollWorldQuest(questId: string): { canReroll: boolean; reason?: string } {

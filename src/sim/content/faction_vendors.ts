@@ -178,6 +178,13 @@ export const FACTION_VENDOR_GATES: Readonly<Record<string, FactionVendorGate>> =
   }),
 
   // Allied Cross-Faction Vanguard Rewards
+  // Cartographer's Ink (content/treasure_maps.ts): stocked by all three, paid
+  // in the active quartermaster's currency, open from the first standing tier.
+  cartographers_ink: Object.freeze({
+    standingTier: 'recognized',
+    requiredStanding: STANDING_THRESHOLDS.recognized,
+    currencyCost: 60,
+  }),
   allied_hearthstone: Object.freeze({
     standingTier: 'vanguard',
     requiredStanding: STANDING_THRESHOLDS.vanguard,
@@ -591,6 +598,7 @@ export const FACTION_VENDOR_NPCS: Record<string, NpcDef> = {
       'recipe_potion_of_invisibility',
       'pattern_reinforced_armor_kit',
       'riftwarden_voidblade',
+      'cartographers_ink',
       'allied_hearthstone',
       'allied_vanguard_duffel',
       'champion_rift_band',
@@ -616,6 +624,7 @@ export const FACTION_VENDOR_NPCS: Record<string, NpcDef> = {
       'formula_enchant_offhand_spirit',
       'recipe_elixir_of_mana_regeneration',
       'dawnkeeper_consecrated_mace',
+      'cartographers_ink',
       'allied_hearthstone',
       'allied_vanguard_duffel',
       'champion_dawn_medallion',
@@ -642,6 +651,7 @@ export const FACTION_VENDOR_NPCS: Record<string, NpcDef> = {
       'plans_dense_sharpening_stone',
       'formula_enchant_gloves_forged_might',
       'forgemaster_crag_cleaver',
+      'cartographers_ink',
       'allied_hearthstone',
       'allied_vanguard_duffel',
       'champion_forged_loop',

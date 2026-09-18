@@ -321,7 +321,9 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
   inst.lockpick = null;
   inst.gateId = null;
   inst.switchId = null;
-  inst.gateOpen = floor.gate === null;
+  // A treasure vault is a straight fight: no floor puzzle, no gate, no bonus
+  // cache (its payout is the boss's, src/sim/treasure_vault.ts).
+  inst.gateOpen = floor.gate === null || inst.vault !== null;
   inst.minibossId = null;
   inst.orbId = null;
   inst.orbActive = false;
@@ -392,6 +394,7 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
   };
 
   for (const obj of floor.objects) {
+    if (inst.vault && obj.kind !== 'descent') continue;
     switch (obj.kind) {
       case 'descent':
         // Spawned only once the floor is cleared (see updateRiftInstances).
@@ -1334,7 +1337,8 @@ function openExit(ctx: SimContext, inst: RiftInstance): void {
   // scan targets it; the pick, not a grab, opens it (see interaction.ts + rift_lockpick).
   // COMPLETION loot, so race losers get the egress but no cache (maintainer
   // decision, 2026-07-30: a loser keeps only what dropped off the mobs).
-  if (inst.outcome !== 'lost') {
+  // A vault's payout is the boss's alone: no sealed lockpick cache either.
+  if (inst.outcome !== 'lost' && !inst.vault) {
     const cache = createGroundObject(
       ctx.nextId++,
       '',
@@ -1837,8 +1841,9 @@ export function updateRiftInstances(ctx: SimContext): void {
     if (floor.isBoss) {
       // Clears are claimed AFTER this loop, in boss-death order (see below).
     } else if (!inst.descentOpen) {
-      const puzzleDone =
-        floor.puzzle.kind === 'rune_pylons'
+      const puzzleDone = inst.vault
+        ? true
+        : floor.puzzle.kind === 'rune_pylons'
           ? inst.litPylons.size >= inst.pylonTotal
           : inst.puzzleSolved;
       if (trashCleared(ctx, inst) && puzzleDone) openDescent(ctx, inst);

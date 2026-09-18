@@ -4838,9 +4838,6 @@ export class Sim {
   get treasureMap(): Readonly<TreasureMapProgress> | null {
     return this.primary.treasureMap;
   }
-  upgradeTreasureMap(factionId: FactionId, pid = this.playerId): void {
-    treasureVaultMod.upgradeTreasureMap(this.ctx, pid, factionId);
-  }
   canRerollWorldQuest(questId: string, pid?: number): { canReroll: boolean; reason?: string } {
     const meta = pid !== undefined ? this.players.get(pid) : this.primary;
     if (!meta) return { canReroll: false, reason: 'Player not found.' };

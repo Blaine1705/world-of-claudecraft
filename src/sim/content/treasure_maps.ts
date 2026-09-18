@@ -7,7 +7,6 @@
 // Data-as-code. The engine is src/sim/treasure_vault.ts; every number below is
 // a WORKING RULE to tune in playtests, never a classic-era formula.
 
-import type { FactionId } from '../factions';
 import type { LootTier } from '../lockpick';
 import type { RiftTier } from '../types';
 
@@ -45,10 +44,15 @@ export function nextTreasureMapRarity(rarity: TreasureMapRarity): TreasureMapRar
   return TREASURE_MAP_RARITIES[index + 1] ?? null;
 }
 
-/** Faction currency (any one faction's, the player picks) to raise a map one
- *  rarity. A higher-band world quest pays 10, so a full day is about 140. */
-export const TREASURE_MAP_UPGRADE_COST: Readonly<Record<TreasureMapRarity, number>> = Object.freeze(
-  { common: 60, rare: 180, epic: 450, legendary: 0 },
+/** Cartographer's Ink: sold by every faction quartermaster for their own
+ *  currency (src/sim/content/faction_vendors.ts); using it redraws the READ map
+ *  one rarity finer. A higher-band world quest pays 10 currency, so a full day
+ *  is about 140: two inks. */
+export const CARTOGRAPHERS_INK_ITEM_ID = 'cartographers_ink';
+export const CARTOGRAPHERS_INK_CURRENCY_COST = 60;
+/** Inks one redraw spends, by the map's CURRENT rarity. */
+export const TREASURE_MAP_UPGRADE_INKS: Readonly<Record<TreasureMapRarity, number>> = Object.freeze(
+  { common: 1, rare: 3, epic: 8, legendary: 0 },
 );
 
 /** How close (yards) the reader must stand to the X to dig. */
@@ -169,6 +173,3 @@ export interface TreasureMapProgress {
    *  upgrade, since the floor count depends on the rank). */
   seed: number;
 }
-
-/** Faction ids a map upgrade may be paid in (all three). */
-export type TreasureMapUpgradeFaction = FactionId;

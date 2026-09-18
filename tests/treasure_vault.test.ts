@@ -4,15 +4,17 @@
 // boss pays every entrant the rarity's table, and a read map can be raised a
 // rarity for faction currency.
 import { describe, expect, it } from 'vitest';
+import { FACTION_VENDOR_GATES } from '../src/sim/content/faction_vendors';
 import {
+  CARTOGRAPHERS_INK_CURRENCY_COST,
+  CARTOGRAPHERS_INK_ITEM_ID,
   TREASURE_MAP_ITEM_IDS,
-  TREASURE_MAP_UPGRADE_COST,
+  TREASURE_MAP_UPGRADE_INKS,
   TREASURE_SITES_BY_ID,
   VAULT_PAYOUTS,
   vaultDamageFactor,
   vaultHealthFactor,
 } from '../src/sim/content/treasure_maps';
-import { awardFactionCurrency } from '../src/sim/factions';
 import { RIFT_RANK_BASE_LEVEL, riftRankTuningFor } from '../src/sim/rift/ranks';
 import { riftFloorCount } from '../src/sim/rift/rift_gen';
 import { Sim } from '../src/sim/sim';
@@ -134,6 +136,13 @@ describe('the vault run', () => {
     const inst = enterVault(sim);
     expect(inst.vault).toEqual({ rarity: 'common', ownerPid: sim.playerId, headCount: 1 });
     expect(inst.floorCount).toBe(3);
+    // A straight fight: no puzzle pieces, gate or bonus cache on the floor.
+    expect(inst.pylonIds).toEqual([]);
+    expect(inst.boulderIds).toEqual([]);
+    expect(inst.gateOpen).toBe(true);
+    expect(inst.objectIds.some((id) => sim.entities.get(id)?.templateId === 'rift_treasure')).toBe(
+      false,
+    );
     const base = riftRankTuningFor(inst.baseLevel);
     const scaled = vaultScaledTuning(base, inst.vault);
     expect(scaled.healthMultiplier).toBeCloseTo(base.healthMultiplier * vaultHealthFactor(1));
@@ -154,8 +163,7 @@ describe('the vault run', () => {
           e.dead = true;
         }
       }
-      inst.litPylons = new Set(inst.pylonIds);
-      inst.puzzleSolved = true;
+      // No puzzle is forced here: a vault floor opens on the kills alone.
       for (let i = 0; i < 21; i++) {
         sim.player.hp = sim.player.maxHp;
         sim.tick();
@@ -193,43 +201,53 @@ describe('the vault run', () => {
   });
 });
 
-describe('raising a map for faction currency', () => {
-  it('swaps the item, charges the chosen faction and re-seeds the vault', () => {
+describe("redrawing a map with Cartographer's Ink", () => {
+  it('spends the inks, swaps the item and re-seeds the vault', () => {
     const sim = makeSim();
     const meta = metaOf(sim);
-    sim.addItem(TREASURE_MAP_ITEM_IDS.common, 1);
-    sim.useItem(TREASURE_MAP_ITEM_IDS.common);
+    sim.addItem(TREASURE_MAP_ITEM_IDS.rare, 1);
+    sim.useItem(TREASURE_MAP_ITEM_IDS.rare);
     const siteId = meta.treasureMap!.siteId;
-    awardFactionCurrency(meta, 'church_order', TREASURE_MAP_UPGRADE_COST.common + 5);
+    sim.addItem(CARTOGRAPHERS_INK_ITEM_ID, TREASURE_MAP_UPGRADE_INKS.rare + 1);
     sim.drainEvents();
-    sim.upgradeTreasureMap('church_order');
+    sim.useItem(CARTOGRAPHERS_INK_ITEM_ID);
     const evs = sim.drainEvents();
-    expect(meta.treasureMap).toMatchObject({ rarity: 'rare', siteId });
-    expect(sim.countItem(TREASURE_MAP_ITEM_IDS.common)).toBe(0);
-    expect(sim.countItem(TREASURE_MAP_ITEM_IDS.rare)).toBe(1);
-    expect(meta.factionCurrencies.church_order).toBe(5);
+    expect(meta.treasureMap).toMatchObject({ rarity: 'epic', siteId });
+    expect(sim.countItem(TREASURE_MAP_ITEM_IDS.rare)).toBe(0);
+    expect(sim.countItem(TREASURE_MAP_ITEM_IDS.epic)).toBe(1);
+    expect(sim.countItem(CARTOGRAPHERS_INK_ITEM_ID)).toBe(1);
     expect(ofType(evs, 'treasureMapUpgraded')[0]).toMatchObject({
-      rarity: 'rare',
-      factionId: 'church_order',
-      cost: TREASURE_MAP_UPGRADE_COST.common,
+      rarity: 'epic',
+      inks: TREASURE_MAP_UPGRADE_INKS.rare,
     });
   });
 
-  it('refuses without a read map, without the currency, and at the top rarity', () => {
+  it('refuses without a read map, without enough ink, and at the top rarity', () => {
     const sim = makeSim();
     const meta = metaOf(sim);
     const errors = () => ofType(sim.drainEvents(), 'error').map((ev) => ev.text);
-    sim.upgradeTreasureMap('rift_watch');
-    expect(errors()).toEqual(['Read a treasure map first.']);
+    sim.addItem(CARTOGRAPHERS_INK_ITEM_ID, 2);
+    sim.drainEvents();
+    sim.useItem(CARTOGRAPHERS_INK_ITEM_ID);
+    expect(errors()).toEqual(['Read the treasure map you want to redraw first.']);
     sim.addItem(TREASURE_MAP_ITEM_IDS.legendary, 1);
     sim.useItem(TREASURE_MAP_ITEM_IDS.legendary);
     sim.drainEvents();
-    sim.upgradeTreasureMap('rift_watch');
+    sim.useItem(CARTOGRAPHERS_INK_ITEM_ID);
     expect(errors()).toEqual(['This map cannot be improved any further.']);
     meta.treasureMap = { ...meta.treasureMap!, rarity: 'rare' };
-    sim.upgradeTreasureMap('rift_watch');
-    expect(errors()).toEqual(['You do not have enough of that faction currency.']);
+    sim.useItem(CARTOGRAPHERS_INK_ITEM_ID);
+    expect(errors()).toEqual(["Redrawing this map takes 3 Cartographer's Ink."]);
     expect(meta.treasureMap?.rarity).toBe('rare');
+    expect(sim.countItem(CARTOGRAPHERS_INK_ITEM_ID)).toBe(2);
+  });
+
+  it('every faction quartermaster stocks the ink for their own currency', () => {
+    expect(FACTION_VENDOR_GATES.cartographers_ink).toMatchObject({
+      standingTier: 'recognized',
+      currencyCost: CARTOGRAPHERS_INK_CURRENCY_COST,
+    });
+    expect(FACTION_VENDOR_GATES.cartographers_ink.factionId).toBeUndefined();
   });
 });
 

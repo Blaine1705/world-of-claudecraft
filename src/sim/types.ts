@@ -977,6 +977,8 @@ export type ItemUse =
   | { type: 'clueCasket' }
   /** A treasure map (src/sim/treasure_vault.ts): read it, then dig on the X. */
   | { type: 'treasureMap'; rarity: TreasureMapRarity }
+  /** Cartographer's Ink: redraws the read treasure map one rarity finer. */
+  | { type: 'cartographersInk' }
   // Starts the one-time hammer quest; the Ember is consumed by crafting.
   | { type: 'forgebreakerEmber' }
   | { type: 'mechChroma'; chromaId: string }
@@ -6726,7 +6728,7 @@ export type SimEvent = { pid?: number } & (
   | { type: 'treasureMapEarned'; rarity: TreasureMapRarity }
   | { type: 'treasureMapLost' }
   | { type: 'treasureMapRead'; rarity: TreasureMapRarity; siteId: string; fresh: boolean }
-  | { type: 'treasureMapUpgraded'; rarity: TreasureMapRarity; factionId: string; cost: number }
+  | { type: 'treasureMapUpgraded'; rarity: TreasureMapRarity; inks: number }
   | { type: 'treasureVaultOpened'; rarity: TreasureMapRarity }
   | {
       type: 'treasureVaultLooted';

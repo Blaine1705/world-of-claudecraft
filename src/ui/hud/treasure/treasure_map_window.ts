@@ -1,13 +1,15 @@
 // Treasure map window (#treasure-map-window): the parchment a read treasure map
 // opens (src/sim/treasure_vault.ts emits treasureMapRead). A thin DOM consumer of
 // treasure_map_view.ts: the cropped terrain plate with the X, the digging hint,
-// and the faction-currency offer to raise the map a rarity. Self-mounting: the
+// and what redrawing it a rarity finer would take. Self-mounting: the
 // panel is created beside the other windows on first open, so the static HTML
 // entries stay untouched. Cold chrome, painted only on open and on a click.
 
-import { TREASURE_MAP_ITEM_IDS } from '../../../sim/content/treasure_maps';
+import {
+  CARTOGRAPHERS_INK_ITEM_ID,
+  TREASURE_MAP_ITEM_IDS,
+} from '../../../sim/content/treasure_maps';
 import { ITEMS } from '../../../sim/data';
-import type { FactionId } from '../../../sim/factions';
 import type { IWorld } from '../../../world_api';
 import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName, zoneDisplayName } from '../../entity_i18n';
@@ -18,15 +20,10 @@ import { svgIcon } from '../../ui_icons';
 import { treasureMapModel } from './treasure_map_view';
 
 export interface TreasureMapWindowDeps {
-  world(): Pick<IWorld, 'treasureMap' | 'factionCurrencies' | 'upgradeTreasureMap'>;
+  world(): Pick<IWorld, 'treasureMap' | 'inventory'>;
 }
 
 const NUM0 = { maximumFractionDigits: 0 } as const;
-const CURRENCY_KEY: Record<FactionId, TranslationKey> = {
-  rift_watch: 'hudChrome.currencies.riftWatchMark',
-  church_order: 'hudChrome.currencies.churchOrderCrest',
-  automatons: 'hudChrome.currencies.automatonCog',
-};
 const pct = (fraction: number) => `${(fraction * 100).toFixed(2)}%`;
 
 export class TreasureMapWindow {
@@ -63,7 +60,12 @@ export class TreasureMapWindow {
   }
 
   private render(): void {
-    const model = treasureMapModel(this.deps.world());
+    const world = this.deps.world();
+    const inks = world.inventory.reduce(
+      (sum, slot) => sum + (slot?.itemId === CARTOGRAPHERS_INK_ITEM_ID ? slot.count : 0),
+      0,
+    );
+    const model = treasureMapModel(world, inks);
     const el = this.panel();
     if (!model) {
       this.close();
@@ -77,26 +79,16 @@ export class TreasureMapWindow {
       `background-image:url('${model.plateUrl}');` +
       `width:${pct(model.plateScaleX)};height:${pct(model.plateScaleY)};` +
       `left:${pct(model.plateOffsetX)};top:${pct(model.plateOffsetY)};`;
+    // The redraw itself happens by using Cartographer's Ink (sold by the
+    // faction quartermasters); the parchment only says what it would take.
     const upgrade = model.upgrade
-      ? `<div class="tmap-upgrade"><div class="tmap-upgrade-head">${esc(
-          t('hudChrome.treasureMap.upgradeHeading', {
+      ? `<div class="tmap-upgrade">${esc(
+          t('hudChrome.treasureMap.upgradeNote', {
             rarity: t(`hudChrome.treasureMap.rarity.${model.upgrade.next}` as TranslationKey),
+            inks: formatNumber(model.upgrade.inks, NUM0),
+            held: formatNumber(model.upgrade.held, NUM0),
           }),
-        )}</div><div class="tmap-upgrade-row">${model.upgrade.factions
-          .map(
-            (f) =>
-              `<button type="button" class="tmap-upgrade-btn" data-faction="${f.factionId}"${
-                f.affordable ? '' : ' disabled'
-              }><span class="tmap-cost">${esc(
-                t('hudChrome.treasureMap.upgradeCost', {
-                  cost: formatNumber(model.upgrade?.cost ?? 0, NUM0),
-                  currency: t(CURRENCY_KEY[f.factionId]),
-                }),
-              )}</span><span class="tmap-balance">${esc(
-                t('hudChrome.treasureMap.balance', { amount: formatNumber(f.balance, NUM0) }),
-              )}</span></button>`,
-          )
-          .join('')}</div></div>`
+        )}</div>`
       : `<div class="tmap-upgrade tmap-maxed">${esc(t('hudChrome.treasureMap.upgradeMaxed'))}</div>`;
     markDialogRoot(el, { label: title });
     el.dataset.rarity = model.rarity;
@@ -114,10 +106,5 @@ export class TreasureMapWindow {
       upgrade;
     el.style.display = 'block';
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
-    el.querySelectorAll<HTMLElement>('[data-faction]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        this.deps.world().upgradeTreasureMap(btn.dataset.faction as FactionId);
-      });
-    });
   }
 }

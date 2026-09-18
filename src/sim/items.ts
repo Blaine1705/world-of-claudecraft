@@ -1,4 +1,4 @@
-import { useTreasureMap } from './treasure_vault';
+import { useCartographersInk, useTreasureMap } from './treasure_vault';
 import { gliderActionsLocked } from './glider_action_lock';
 import { shadowActionsLocked } from './shadow_action_lock';
 // Inventory items + vendor: the player-facing equip/use/discard and buy/sell/buyback
@@ -995,6 +995,10 @@ export function useItem(
   // clicked copy is the one spent, like every consumable arm here.
   if (def.use?.type === 'clueScroll') {
     useClueScroll(ctx, meta, p, consumeOneUnit);
+    return;
+  }
+  if (def.use?.type === 'cartographersInk') {
+    useCartographersInk(ctx, meta);
     return;
   }
   if (def.use?.type === 'treasureMap') {

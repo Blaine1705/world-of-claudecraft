@@ -6,22 +6,22 @@
 
 import {
   nextTreasureMapRarity,
-  TREASURE_MAP_UPGRADE_COST,
+  TREASURE_MAP_UPGRADE_INKS,
   TREASURE_SITES_BY_ID,
   type TreasureMapRarity,
 } from '../../../sim/content/treasure_maps';
 import { ZONES } from '../../../sim/data';
-import { FACTION_IDS, type FactionId } from '../../../sim/factions';
 import type { IWorld } from '../../../world_api';
 import { mapZoneRegion } from '../../map_terrain';
 
 /** World yards across the parchment's crop. */
 export const TREASURE_MAP_CROP_YARDS = 320;
 
+/** What redrawing the map a rarity finer takes (null at the top rarity). */
 export interface TreasureMapUpgradeOffer {
   next: TreasureMapRarity;
-  cost: number;
-  factions: { factionId: FactionId; balance: number; affordable: boolean }[];
+  inks: number;
+  held: number;
 }
 
 export interface TreasureMapModel {
@@ -53,7 +53,8 @@ function siteJitter(siteId: string): { jx: number; jz: number } {
 }
 
 export function treasureMapModel(
-  world: Pick<IWorld, 'treasureMap' | 'factionCurrencies'>,
+  world: Pick<IWorld, 'treasureMap'>,
+  inksHeld = 0,
 ): TreasureMapModel | null {
   const map = world.treasureMap;
   const site = map ? TREASURE_SITES_BY_ID[map.siteId] : undefined;
@@ -69,7 +70,6 @@ export function treasureMapModel(
   const cropMinX = clamp(site.x - crop / 2 + jx * crop * 0.28, region.minX, region.maxX - crop);
   const cropMaxZ = clamp(site.z + crop / 2 + jz * crop * 0.28, region.minZ + crop, region.maxZ);
   const next = nextTreasureMapRarity(map.rarity);
-  const cost = TREASURE_MAP_UPGRADE_COST[map.rarity];
   return {
     rarity: map.rarity,
     zoneId: zone.id,
@@ -81,14 +81,7 @@ export function treasureMapModel(
     markX: (site.x - cropMinX) / crop,
     markY: (cropMaxZ - site.z) / crop,
     upgrade: next
-      ? {
-          next,
-          cost,
-          factions: FACTION_IDS.map((factionId) => {
-            const balance = world.factionCurrencies?.[factionId] ?? 0;
-            return { factionId, balance, affordable: balance >= cost };
-          }),
-        }
+      ? { next, inks: TREASURE_MAP_UPGRADE_INKS[map.rarity], held: Math.max(0, inksHeld) }
       : null,
   };
 }

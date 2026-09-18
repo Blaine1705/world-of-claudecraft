@@ -2942,9 +2942,8 @@ export const hudChromeStrings = {
     close: 'Close treasure map',
     zone: 'Somewhere in {zone}',
     hint: 'Find the ground this map shows, stand on the X, and use the map again to dig. A vault opens for you and your party.',
-    upgradeHeading: 'Redraw this map as: {rarity}',
-    upgradeCost: '{cost} {currency}',
-    balance: 'You have {amount}',
+    upgradeNote:
+      "Redrawing it as a {rarity} map takes {inks} Cartographer's Ink (you hold {held}). The faction quartermasters sell it.",
     upgradeMaxed: 'No cartographer could better this map.',
     rarity: {
       common: 'Common',

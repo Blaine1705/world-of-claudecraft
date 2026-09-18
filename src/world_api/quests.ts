@@ -59,8 +59,6 @@ export interface IWorldQuests {
    * null when none.
    */
   readonly treasureMap: Readonly<{ rarity: TreasureMapRarity; siteId: string }> | null;
-  /** Raises the read map one rarity, paid in the chosen faction's currency. */
-  upgradeTreasureMap(factionId: FactionId): void;
   canRerollWorldQuest?(questId: string): { canReroll: boolean; reason?: string };
   rerollWorldQuest?(questId: string): boolean;
   questState(questId: string): QuestState;
