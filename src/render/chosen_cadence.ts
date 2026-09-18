@@ -14,6 +14,11 @@ export function setChosenCadence(intervalMs: number, share: number): void {
   missShare = chosenIntervalMs > 0 ? share : NO_CHOSEN_CADENCE;
 }
 
+/** The chosen interval in ms, 0 when the display paces the frames. */
+export function chosenCadenceIntervalMs(): number {
+  return chosenIntervalMs;
+}
+
 export function chosenCadenceMissShare(): number {
   return missShare;
 }
