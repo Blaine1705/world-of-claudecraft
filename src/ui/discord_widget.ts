@@ -191,8 +191,9 @@ export function renderDiscordWidget(
   el.querySelector<HTMLElement>('[data-action="link"]')?.addEventListener('click', () =>
     deps.onLink(),
   );
-  // Relink reuses the exact same link flow: the server upserts the existing
-  // link row on a matching Discord id, refreshing its stored username/avatar.
+  // Relink starts the normal in-game OAuth flow, but the server accepts it only
+  // as a same-Discord refresh. Moving to a different Discord id requires unlink
+  // plus the explicit keep-account reauth path.
   el.querySelector<HTMLElement>('[data-action="relink"]')?.addEventListener('click', () =>
     deps.onLink(),
   );
