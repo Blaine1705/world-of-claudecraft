@@ -1571,6 +1571,31 @@ describe('delta snapshots', () => {
     expect(lastSnap(fc.sent).self.target).toBeNull();
   });
 
+  it("acks a lane-dropped 'target' command without running it, so the mirror yields to the server", () => {
+    // The fold sits at receipt, ahead of the lane verdict: a command the flood
+    // defense drops still advances the ack, and the client's hold then adopts
+    // the server's unchanged target from that snapshot (a command that never
+    // ran has no other correct outcome). Pinned by stubbing the lane verdict.
+    const other = joinServer(server, fakeWs(), 2, 'Other', 'mage');
+    // biome-ignore lint/suspicious/noExplicitAny: consumeLane is a private dispatcher method
+    const priv = server as any;
+    const realConsumeLane = priv.consumeLane;
+    priv.consumeLane = (s: unknown, lane: string, nowSec: number) =>
+      lane === 'command' ? false : realConsumeLane.call(server, s, lane, nowSec);
+    try {
+      server.handleMessage(
+        session,
+        JSON.stringify({ t: 'cmd', cmd: 'target', id: other.pid, seq: 12 }),
+      );
+    } finally {
+      priv.consumeLane = realConsumeLane;
+    }
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.ack).toBe(12);
+    expect(snap.self.target).toBeNull();
+  });
+
   it('adds the consumed client tick beside the legacy ack only for movement v2', () => {
     const v2Server = new GameServer();
     const v2Client = fakeWs();

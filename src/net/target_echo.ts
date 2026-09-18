@@ -19,8 +19,10 @@
 // that snapshot on. The earlier idiom released on a snapshot COUNT (three, about
 // 150 ms of self snapshots), which on any link with a longer round trip
 // reverted to the previous target before the echo arrived: the bounce. The count
-// survives only as the last-resort valve below, for a command whose seq is never
-// acked (it never went out, or a server that predates the seq).
+// survives only as the last-resort valve below, for a seq nothing ever covers
+// (the command never reached the server and no later input frame was sent; a
+// server that predates the seq still covers it with the next input frame's ack,
+// since the stream is ordered).
 //
 // Same display-only-optimism contract as `pendingQuestCommands` /
 // quest_state_optimistic.ts: the server stays authoritative; this only changes
@@ -30,27 +32,25 @@
 export interface PendingTargetEcho {
   /** The optimistic id the mirror keeps displaying (null for a deselect). */
   id: number | null;
-  /** The input seq the 'target' command carried, or null when it carried none
-   *  (spectating, so cmd() dropped it) and only the valve can release the hold. */
-  seq: number | null;
+  /** The input seq the 'target' command carried. */
+  seq: number;
   /** Self snapshots left before the valve yields to the server value regardless. */
   snapshotsLeft: number;
 }
 
 /**
  * How many self snapshots a pending target echo may hold the optimistic value
- * when no ack ever covers its seq (the reconcile valve: a command that never
- * went out, or a server that does not fold command seqs, must still never leave
+ * when no ack ever covers its seq (the reconcile valve: a hold must never leave
  * a stuck target). Self snapshots broadcast once per 50 ms server loop callback,
- * so this spans about two seconds, well past any playable round trip; on a
- * seq-folding server the ack releases the hold within one round trip and the
- * valve never fires. A snapshot COUNT rather than wall-clock keeps the valve
- * deterministic in tests (and needs no clock at all in the decode path).
+ * so this spans about two seconds, well past any playable round trip; with the
+ * ack in play the hold releases within one round trip and the valve never
+ * fires. A snapshot COUNT rather than wall-clock keeps the valve deterministic
+ * in tests (and needs no clock at all in the decode path).
  */
 export const TARGET_ECHO_SNAPSHOT_BUDGET = 40;
 
 /** Arm a hold for a 'target' command that was just sent (last write wins). */
-export function armTargetEcho(id: number | null, seq: number | null): PendingTargetEcho {
+export function armTargetEcho(id: number | null, seq: number): PendingTargetEcho {
   return { id, seq, snapshotsLeft: TARGET_ECHO_SNAPSHOT_BUDGET };
 }
 
@@ -70,6 +70,10 @@ export interface SelfTargetResolution {
  * decode counts toward the valve (`countStale`), so one snapshot never burns two
  * units of the budget. The self decode also runs after the snapshot's ack has
  * been folded, so it is the site that sees the release.
+ *
+ * Deliberately no release on the id merely matching: A -> B -> A in quick
+ * succession would release on the stale pre-command snapshot (A) and then show
+ * the intermediate B echo, a bounce. Only the ack of the LAST command releases.
  */
 export function resolveSelfTarget(
   pending: PendingTargetEcho | null,
@@ -78,15 +82,10 @@ export function resolveSelfTarget(
   countStale: boolean,
 ): SelfTargetResolution {
   if (!pending) return { targetId: serverTarget, pending: null };
-  if (pending.seq !== null) {
-    // The server has processed the command: this snapshot's value is its verdict
-    // (the echo or a refusal). Resume normal mirroring so a LATER server-initiated
-    // change (target death, out of interest) applies again.
-    if (ackedInputSeq >= pending.seq) return { targetId: serverTarget, pending: null };
-  } else if (serverTarget === pending.id) {
-    // No seq to wait on: the echo itself is the only confirmation available.
-    return { targetId: serverTarget, pending: null };
-  }
+  // The server has processed the command: this snapshot's value is its verdict
+  // (the echo or a refusal). Resume normal mirroring so a LATER server-initiated
+  // change (target death, out of interest) applies again.
+  if (ackedInputSeq >= pending.seq) return { targetId: serverTarget, pending: null };
   if (countStale) {
     pending.snapshotsLeft -= 1;
     // Reconciliation valve: nothing ever acked the command. Server authority wins.

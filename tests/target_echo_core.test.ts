@@ -57,12 +57,6 @@ describe('resolveSelfTarget', () => {
     expect(resolveSelfTarget(pending, 77, 6, true)).toEqual({ targetId: 77, pending: null });
   });
 
-  it('without a seq (the command carried none), the echo itself releases', () => {
-    const pending = armTargetEcho(88, null);
-    expect(resolveSelfTarget(pending, 77, 100, true).targetId).toBe(88);
-    expect(resolveSelfTarget(pending, 88, 100, true)).toEqual({ targetId: 88, pending: null });
-  });
-
   it('a deselect hold (id null) is confirmed by a null echo, not by the ack alone being absent', () => {
     const pending = armTargetEcho(null, 3);
     expect(resolveSelfTarget(pending, 77, 2, true).targetId).toBeNull();

@@ -57,6 +57,10 @@ tested sibling module here, never as more methods on `online.ts`. Exemplars
   itself) and deliberately bucket-agnostic: `src/net` never imports `src/game`;
   `src/main.ts` is the junction that drains the digest into the perf monitor once per
   animation frame.
+- `target_echo.ts`: the pure decision behind the `pendingTargetEcho` optimism (scope in
+  Never, below): the optimistic target holds until the first snapshot whose input `ack`
+  covers the `target` command's `seq`, with a snapshot-count valve for a seq nothing ever
+  covers (`tests/target_echo_core.test.ts`; the wiring in `tests/target_echo_client.test.ts`).
 - `quest_state_optimistic.ts`: the pure resolution behind the `pendingQuestCommands`
   optimism (scope in Never, below): while a `turnin` is in flight, prerequisite checks
   treat that quest as done, so a follow-up quest appears in the same gossip re-render

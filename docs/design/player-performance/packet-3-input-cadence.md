@@ -246,9 +246,11 @@ R9. Gap-aware echo accounting, resolved into a server-side seq-gap counter. The 
     never books a giant gap. The fold lives in server/input_seq.ts and is shared with
     the one seq-bearing command, the client's 'target' (it draws from the same
     counter so the online mirror can read a covering ack as "built after my
-    command", src/net/target_echo.ts); folding it at receipt keeps the high-water an
-    in-order receipt mark for the whole socket, so a command seq never reads as a
-    gap on the next input frame. The CLIENT-side surfacing of drops (a beacon field
+    command", src/net/target_echo.ts); folding it at receipt (post-parse, ahead of
+    the lane verdict) keeps the high-water an in-order receipt mark for the whole
+    socket, so a parsed command seq never reads as a gap on the next input frame.
+    A command shed by the PRE-parse gate does book one gap there, the same as a
+    shed input frame: the counter is the parsed-stream share of the drops. The CLIENT-side surfacing of drops (a beacon field
     riding packet 0's net-pipeline plumbing) is DEFERRED until packet 0 merges; the
     server counter plus /metrics is the fleet visibility this packet ships.
 R10. Dedicated kick reason with matcher lockstep, enforced by byte pins (the S3

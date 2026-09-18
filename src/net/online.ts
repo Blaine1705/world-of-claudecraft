@@ -3539,24 +3539,25 @@ export class ClientWorld extends ReconWireState implements IWorld {
     // Armed only when the optimistic write actually happened, and never while
     // spectating: cmd() drops non-chat commands in spectate, so no echo would
     // ever arrive to release the hold on the spectated player's mirror.
-    const spectating = typeof this.spectating === 'string';
     // The command rides the input seq stream (server/game.ts folds a command's
     // seq into the same lastInputSeq the self snapshot acks), so the mirror can
-    // tell a snapshot built after the command from a stale in-flight one. Drawn
-    // only when the command will go out: cmd() drops it in spectate, and a hole
-    // in the seq stream would read server-side as a lost frame.
-    const seq = spectating ? null : ++this.inputSeq;
+    // tell a snapshot built after the command from a stale in-flight one. Not
+    // drawn in spectate, where cmd() drops the command: a hole in the seq stream
+    // reads server-side as a lost frame. (A send rawCmd drops on a closed socket
+    // burns a seq harmlessly: the input frames behind it drop the same way, and
+    // the reconnect hello restarts both counters.)
+    const seq = typeof this.spectating === 'string' ? null : ++this.inputSeq;
     const p = this.entities.get(this.playerId);
     if (p) {
       if (id === null) {
         p.targetId = null;
         // last write wins: a newer call replaces any older pending record
-        if (!spectating) this.pendingTargetEcho = armTargetEcho(null, seq);
+        if (seq !== null) this.pendingTargetEcho = armTargetEcho(null, seq);
       } else {
         const e = this.entities.get(id);
         if (e && (!e.dead || deadTargetSelectable(e, this.playerId))) {
           p.targetId = id;
-          if (!spectating) this.pendingTargetEcho = armTargetEcho(id, seq);
+          if (seq !== null) this.pendingTargetEcho = armTargetEcho(id, seq);
         }
       }
     }
