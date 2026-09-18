@@ -40,8 +40,14 @@ export function bruinRushWindowTargetId(actor: Pick<Entity, 'auras'>): number | 
 
 // The cast arm: a landed Rush cast opens (or restarts) the window on its target.
 export function openBruinRushWindow(ctx: SimContext, player: Entity, target: Entity): void {
+  // A re-open inside a live window (unreachable under the 15 sec Rush
+  // cooldown, kept honest anyway) fades the old one exactly as every other
+  // removal of this aura does, so the combat log and parses never miss it.
   const existing = ownedWindow(player);
-  if (existing) player.auras.splice(player.auras.indexOf(existing), 1);
+  if (existing) {
+    player.auras.splice(player.auras.indexOf(existing), 1);
+    ctx.emit({ type: 'aura', targetId: player.id, name: existing.name, gained: false });
+  }
   ctx.applyAura(player, {
     id: BRUIN_RUSH_WINDOW_ID,
     name: 'Bruin Rush',

@@ -239,8 +239,11 @@ describe('Pin, the Bruin Rush to Cat Form rider', () => {
     expect(target.dead).toBe(true);
     sim.tick();
     expect(player.chargeTargetId).toBeNull();
+    // The kill leaves the druid in combat, so the window is still there: drained,
+    // not re-armed.
     const after = aura(player, BRUIN_RUSH_WINDOW_ID);
-    if (after) expect(after.remaining).toBeLessThan(beforeDeath);
+    expect(after).toBeDefined();
+    expect(after?.remaining ?? 0).toBeLessThan(beforeDeath);
   });
 
   it('makes Cat Form free inside the 3 sec window and Pins the Rush target', () => {
