@@ -20259,7 +20259,7 @@ export const tr_TR: EnTranslations = {
       "eastbrook_vale": {
         "name": "Doğudere Vadisi",
         "welcome": "Kasabada Mareşal Redbrook'u bul, senin için işi var.",
-        "welcomeDone": "Marshal Redbrook has no more work for you - Eastbrook rests easier for it.",
+        "welcomeDone": "A quaint seaside town where adventurers come to start their journey.",
         "pois": {
           "0": {
             "label": "Doğudere"
@@ -20305,7 +20305,7 @@ export const tr_TR: EnTranslations = {
       "mirefen_marsh": {
         "name": "Mirefen Bataklığı",
         "welcome": "Bataklık Köprüsü kapısında Muhafız Fenwick'e rapor ver.",
-        "welcomeDone": "Warden Fenwick has no more orders for you - the Fenbridge gate holds thanks to you.",
+        "welcomeDone": "A settlement sitting deep within the marshy swamplands.",
         "pois": {
           "0": {
             "label": "Bataklık Köprüsü"
@@ -20336,7 +20336,7 @@ export const tr_TR: EnTranslations = {
       "thornpeak_heights": {
         "name": "Dikenzirve Tepeleri",
         "welcome": "Yüzbaşı Thessaly, Yüksek Gözcü'deki duvarı tutuyor, zar zor.",
-        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - easily now, thanks to you.",
+        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers it's now manageable.",
         "pois": {
           "0": {
             "label": "Yüksek Gözcü"

@@ -42,12 +42,12 @@ describe('zoneEntryLine', () => {
     const allDone = world({}, 'done');
     expect(townQuestIds(eastbrook).length).toBeGreaterThan(3);
     expect(zoneEntryLine(eastbrook, allDone)).toBe(
-      'Marshal Redbrook has no more work for you - Eastbrook rests easier for it.',
+      'A quaint seaside town where adventurers come to start their journey.',
     );
     setLanguage('zh_CN');
     const zh = expectDefined(zoneEntryLine(eastbrook, allDone));
-    expect(zh).not.toContain('no more work');
-    expect(zh).toContain('雷德布鲁克元帅');
+    expect(zh).not.toContain('seaside');
+    expect(zh).toContain('海滨小镇');
   });
 
   it('every authored town-done line has a real fill in all five non-Latin locales', async () => {
