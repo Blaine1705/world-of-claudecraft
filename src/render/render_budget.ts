@@ -1,3 +1,4 @@
+import { chosenCadenceFrameMs, NO_CHOSEN_CADENCE } from './chosen_cadence_pressure_core';
 import { GFX_BUCKET_BANDS, type GfxBucketBands, type GfxRuntimeBudget, type GfxTier } from './gfx';
 import {
   type PostShedChain,
@@ -104,6 +105,10 @@ export interface RenderBudgetSample {
   createdViews: number;
   minRenderScale: number;
   maxRenderScale: number;
+  /** Share of frames missing the client's own chosen cadence (the frame rate
+   *  ceiling), or NO_CHOSEN_CADENCE. While set it replaces the wall interval on
+   *  the frame axis, and no external cap is looked for: the cadence is known. */
+  chosenCadenceMissShare?: number;
 }
 
 export interface RenderBudgetGovernorOptions {
@@ -519,7 +524,11 @@ export class RenderBudgetGovernor {
 
   update(sample: RenderBudgetSample, out?: RenderBudgetState): RenderBudgetState {
     if (!Number.isFinite(sample.dt) || sample.dt <= 0) return this.state(out);
-    const frameMs = Math.min(250, Math.max(0, sample.frameMs));
+    const chosenMissShare = sample.chosenCadenceMissShare ?? NO_CHOSEN_CADENCE;
+    const chosenCadence = chosenMissShare >= 0;
+    const frameMs = chosenCadence
+      ? chosenCadenceFrameMs(chosenMissShare, this.budget.dropFrameMs, this.budget.recoverFrameMs)
+      : Math.min(250, Math.max(0, sample.frameMs));
     const totalMs = Math.min(250, Math.max(0, sample.totalMs));
     const rawSubmitMs = Math.max(0, sample.submitMs);
     const submitMs = Math.min(250, rawSubmitMs);
@@ -590,6 +599,7 @@ export class RenderBudgetGovernor {
     // again under the normal rules. A latched cap, a probe or a refusal
     // lapses once the candidate has failed for a few consecutive frames.
     const externalFrameCapCandidate =
+      !chosenCadence &&
       rawFramePressure >= 1 &&
       cadenceMs >= EXTERNAL_FRAME_CAP_MIN_MS &&
       cadenceMs <= EXTERNAL_FRAME_CAP_MAX_MS &&

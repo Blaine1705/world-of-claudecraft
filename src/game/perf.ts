@@ -1,5 +1,6 @@
 import type { NetPipelineSummary } from '../net/net_pipeline_stats';
 import { type AssetTimingSnapshot, assetTimingSnapshot } from '../render/assets/stats';
+import { frameLoadMs } from '../render/chosen_cadence';
 import { gpuTimerOverlayLines } from '../render/gpu_timer_probe_core';
 import { postRevealLinksSnapshot } from '../render/live_program_watch';
 import type { PostRevealLinksSnapshot } from '../render/post_reveal_links_core';
@@ -15,6 +16,7 @@ import {
   type ShaderWarmSnapshot,
   shaderWarmSnapshot,
 } from '../render/shader_warm_client';
+import { frameCadenceOverlayLine } from './frame_cadence_wiring';
 import {
   createHeapSawtooth,
   type HeapFloorTrend,
@@ -549,7 +551,7 @@ export class PerfMonitor {
     this.lastFrameMs = ms;
     this.frameMs.push(ms);
     // The warm worker's pause signal rides the same reading.
-    noteShaderWarmFrameMs(ms);
+    noteShaderWarmFrameMs(frameLoadMs(ms));
     this.frameWindow.push(now, ms);
     this.frameWindow.pruneBefore(now - MAX_WINDOW_MS);
   }
@@ -1320,6 +1322,7 @@ export class PerfMonitor {
         ? `net ${net.connected ? 'up' : 'down'} snap ${net.snapInterval}ms age ${net.lastSnapAge}ms a ${net.alpha}`
         : 'net offline',
       ...(hitchLine ? [hitchLine] : []),
+      frameCadenceOverlayLine(),
       ...gpuTimerOverlayLines(r?.gpuTimer),
       ...censusLines,
       'click: copy json',

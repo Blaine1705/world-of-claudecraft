@@ -777,6 +777,7 @@ const RENDER_PURE_CORES = [
   'src/render/character_effects_core.ts',
   'src/render/character_presentation_core.ts',
   'src/render/character_view_core.ts',
+  'src/render/chosen_cadence_pressure_core.ts',
   'src/render/chunk_residency_core.ts',
   'src/render/cliff_scree_core.ts',
   'src/render/dashed_ring_core.ts',
