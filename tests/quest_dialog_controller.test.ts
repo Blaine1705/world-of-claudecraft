@@ -10,6 +10,7 @@ import {
 import { DELVES, NPCS, QUESTS, STATIONS } from '../src/sim/data';
 import { CHRONICLER_TEMPLATE_IDS } from '../src/sim/deeds';
 import type { Entity } from '../src/sim/types';
+import { WEEKLY_KEEPER_ENTITY_ID, WEEKLY_KEEPER_ID } from '../src/sim/weekly_rewards';
 import { craftNameText } from '../src/ui/char_window';
 import type { FocusTrapHandle } from '../src/ui/focus_manager';
 import { QuestDialogController } from '../src/ui/hud/quest/quest_dialog_controller';
@@ -299,6 +300,14 @@ describe('QuestDialogController', () => {
     expect(row.getAttribute('aria-label')).toBe(
       t('questUi.dialog.repeatableQuestAria', { name: `quest:${workOrder.id}` }),
     );
+  });
+
+  it('routes the Weekly Vault Keeper through authoritative interaction without gossip', () => {
+    const keeper = harness(npc(WEEKLY_KEEPER_ENTITY_ID, WEEKLY_KEEPER_ID));
+    keeper.controller.open(WEEKLY_KEEPER_ENTITY_ID);
+    expect(keeper.targetEntity).toHaveBeenCalledWith(WEEKLY_KEEPER_ENTITY_ID);
+    expect(keeper.interact).toHaveBeenCalledTimes(1);
+    expect(keeper.element.style.display).not.toBe('block');
   });
 
   it('routes bankers and chroniclers through authoritative interaction without gossip', () => {

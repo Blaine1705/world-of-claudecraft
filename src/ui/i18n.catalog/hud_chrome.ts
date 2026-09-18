@@ -10,9 +10,11 @@
 import { armoryCollectionStrings, armorySkinStrings } from './armory';
 import { cosmeticsStrings } from './cosmetics';
 import { professionTrainerStrings } from './profession_trainers';
+import { weeklyRewardStrings } from './weekly_rewards';
 
 export const hudChromeStrings = {
   professionTrainers: professionTrainerStrings,
+  weeklyRewards: weeklyRewardStrings,
   materialStackSelectionUnavailable: 'That material selection is no longer available.',
   vehicle: {
     title: 'North Watch Cannon',

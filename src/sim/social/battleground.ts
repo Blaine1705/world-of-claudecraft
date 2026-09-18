@@ -49,6 +49,7 @@ import type { SimContext } from '../sim_context';
 import { settleTeleportArrival } from '../teleport_arrival';
 import { type Aura, DT, type Entity, type Vec3 } from '../types';
 import { onBattlegroundMatchForWeeklyQuests } from '../weekly_quests';
+import { recordWeeklyPvpWin } from '../weekly_rewards';
 import { eloDelta, snapshotArenaReturnPools } from './arena';
 import { bgBackfillSeat, pickBgBackfillGroup } from './battleground_backfill';
 import { recordBgOutcome } from './battleground_outcomes';
@@ -2028,6 +2029,8 @@ function resolveBgResult(
         else if (won) meta.bgWins++;
         else meta.bgLosses++;
       }
+      if (won && match.rated && !match.devEnded && reason !== 'forfeit')
+        recordWeeklyPvpWin(ctx, pid);
       let firstWinBonus = 0;
       if (match.rated && reason !== 'forfeit') {
         firstWinBonus = awardBattlegroundHonor(

@@ -5638,6 +5638,7 @@ const ALL_DELTA_KEYS = [
   'vehicle',
   'wba',
   'weapon',
+  'weeklyRewards',
   'wkexp',
   'wkq',
   'wqday',
@@ -5760,6 +5761,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   tslot: 'toolEffectSlots',
   vault: 'vaultInfo',
   vehicle: 'vehicleSession',
+  weeklyRewards: 'weeklyRewardInfo',
   wkexp: 'weeklyQuestResetAtMs',
   wkq: 'weeklyQuest',
   wqday: 'worldQuestCycle',
@@ -6334,7 +6336,8 @@ describe('full self-state snapshot delta fixture', () => {
       // gated null: the two keys are mutually exclusive on one player by
       // design. Its non-null arrival (and the by-reference mirror) is pinned
       // in tests/vault_wire.test.ts instead.
-      if (key === 'cvault') {
+      // This fixture stands at a different banker; the weekly keeper gate stays closed.
+      if (key === 'cvault' || key === 'weeklyRewards') {
         expect(snap.self[key], 'self.cvault must arrive as the explicit gated null').toBeNull();
         continue;
       }
@@ -6953,7 +6956,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 106 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 107 unique keys in sorted order', () => {
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
     // sheet's lifetime played-time key ptime, for 67, then +16: the static
@@ -7003,8 +7006,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The faction standing (fac) and daily reroll (wqrr, wqrep) owner keys, for 103.
     // The weekly emissary's wkq and wkexp self keys, for 105, and the Clue
     // Scrolls active-hunt key cluh, for 106.
-    expect(ALL_DELTA_KEYS).toHaveLength(106);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(106);
+    // The Weekly Vault's weeklyRewards self key (PR 4052), for 107.
+    expect(ALL_DELTA_KEYS).toHaveLength(107);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(107);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7171,7 +7175,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     // Plus the faction standing and daily reroll owner keys, for 103. The
     // weekly emissary's wkq and wkexp self keys make 105, and the Clue Scrolls
     // active-hunt key cluh 106.
-    expect(scraped.size).toBe(106);
+    // The Weekly Vault's weeklyRewards self key (PR 4052) makes 107.
+    expect(scraped.size).toBe(107);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

@@ -898,6 +898,8 @@ export const COMMAND_NAMES = [
   'world_quest_weekly_commend',
   // Clue Scrolls: drop the active treasure hunt (IWorldQuests.abandonClueHunt).
   'clue_hunt_abandon',
+  'weekly_reward_claim',
+  'weekly_reward_open',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -990,6 +992,8 @@ export type WorldFacet =
   | 'IWorldVehicles';
 
 export const COMMAND_FACETS = {
+  weekly_reward_claim: 'IWorldBank',
+  weekly_reward_open: 'IWorldBank',
   // IWorldCombat: ability casts, auto-attack, spirit release.
   cast: 'IWorldCombat',
   castSlot: 'IWorldCombat',

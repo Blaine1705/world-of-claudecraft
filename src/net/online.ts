@@ -1,6 +1,7 @@
 import type { MaterialComposition } from '../sim/material_sources';
 import type { MaterialStackSelection } from '../sim/material_stack_selection';
 import { materialStorageTransferPayload } from './material_storage_command';
+import { decodeWeeklyRewardInfo, sendWeekly, type WeeklyRewardInfo } from './weekly_rewards_wire';
 
 // Online play: REST auth client + WebSocket world mirror.
 
@@ -195,7 +196,7 @@ import { anchorFields } from './anchor_fields';
 import { apiErrorFromBody } from './api_error';
 import { applyAuraWire, type ClientWireAura, snapshotCarriesAuras } from './aura_wire_decode';
 import { computeBackoffDelay } from './backoff';
-import { applyBankSelfWire } from './bank_snapshot_wire';
+import { applyBankSelfWire, applyGuildBankSelfWire } from './bank_snapshot_wire';
 import { blankEntity } from './blank_entity';
 import { applyBookOfDeedsWire } from './book_wire';
 import {
@@ -1323,6 +1324,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // `self` block can ever carry it (and only while a banker gates it, like
   // bankInfo above), which leaves this null away from a bursar. ---
   vaultInfo: VaultInfo | null = null;
+  weeklyRewardInfo: WeeklyRewardInfo | null = null;
   // --- IWorldBank: the craft-from-vault stock view (Bank Storage Phase 04),
   // mirrored from the snapshot self (`s.cvault`, delta-omitted). Owner-only
   // like vaultInfo, but gated on the craft-draw context predicate instead of
@@ -3285,26 +3287,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
       // module, where the delta contract, the by-reference adoption rationale,
       // and each key's malformed policy (vault clears, the rest retain) live.
       applyBankSelfWire(this, s);
-      // `guildBank` follows the same delta contract; the server encodes null
-      // away from a banker, on death, and outside a guild (the proximity +
-      // membership gate lives in sim guildBankInfoFor; any rank sees it, the
-      // snapshot's canEdit flag marks officer-plus).
-      if (s.guildBank !== undefined) {
-        // BOTH EDGES of the gate reset the activity log, not just the losing
-        // one. Losing it (walked away, died, left or switched guild)
-        // invalidates the rows: they are one guild's history
-        // read under a membership this client may no longer hold, so they are
-        // dropped rather than left to paint into the next pane that opens.
-        // REGAINING it
-        // has to reset too, because the answer this client is holding was taken
-        // while the gate was shut: a member who opened the log away from the
-        // banker got a `refused`, and without this the pane went on saying
-        // refused for the rest of the TTL after they walked up. Re-arming on
-        // the transition makes it self-correct in one frame.
-        const hadGate = this.guildBankInfo !== null;
-        this.guildBankInfo = s.guildBank;
-        if (hadGate !== (this.guildBankInfo !== null)) this.guildBankLogMirror.reset();
-      }
+      if (s.weeklyRewards !== undefined)
+        this.weeklyRewardInfo = decodeWeeklyRewardInfo(s.weeklyRewards);
+      applyGuildBankSelfWire(this, s, () => this.guildBankLogMirror.reset());
       // --- IWorldDeeds / IWorldReliquary / account-ledger self-decode
       // (`deeds`/`dstats`/`reliq`/`acct` heavy-gated, `renown`/`atitle`/
       // `aborder` per-tick diffed, all delta-omitted): src/net/book_wire.ts. ---
@@ -4741,6 +4726,12 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
   vaultDepositAll(): void {
     this.cmd({ cmd: 'vault_deposit_all' });
+  }
+  claimWeeklyReward(choice: string): void {
+    sendWeekly(this.weeklyRewardInfo, choice, 'claim', (m) => this.cmd(m));
+  }
+  openWeeklyReward(choice: string): void {
+    sendWeekly(this.weeklyRewardInfo, choice, 'open', (m) => this.cmd(m));
   }
   vaultBuyUpgrade(): void {
     this.cmd({ cmd: 'vault_buy_upgrade' });

@@ -28,6 +28,7 @@ import type {
   WeeklyQuestProgress,
   WorldQuestProgress,
 } from './types';
+import type { WeeklyRewardState } from './weekly_rewards';
 
 // Persistable character state (stored as JSONB server-side). The arena fields
 // are optional so characters saved before the Ashen Coliseum existed load
@@ -96,6 +97,8 @@ export interface CharacterState {
   // defaulting to the empty locked vault). sanitizeVaultState is the one load path
   // (never destroys stock; tolerates an over-capacity count).
   vault?: SavedMaterialsVaultState;
+  // Forward-only persistence: pre-feature binaries drop this field on save.
+  weeklyRewards?: WeeklyRewardState;
   vendorBuyback?: InvSlot[];
   questLog: QuestProgress[];
   questsDone: string[];

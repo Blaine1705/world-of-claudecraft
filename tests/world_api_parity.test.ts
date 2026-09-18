@@ -362,6 +362,9 @@ export const IWORLD_MEMBERS = [
   { name: 'bankUnsocketBag', kind: 'method' },
   // --- Materials Vault (same facet, same bursars): proximity-gated stock read +
   //     deposit/withdraw/buy-upgrade commands ---
+  { name: 'weeklyRewardInfo', kind: 'data' },
+  { name: 'claimWeeklyReward', kind: 'method' },
+  { name: 'openWeeklyReward', kind: 'method' },
   { name: 'vaultInfo', kind: 'data' },
   { name: 'vaultDeposit', kind: 'method' },
   { name: 'vaultWithdraw', kind: 'method' },
@@ -906,9 +909,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // Plus feature/clue-scrolls' active clue hunt readout clueHunt (+1 data)
     // and abandonClueHunt (+1 method) on the quests integration branch:
     // 408/119/289.
-    expect(IWORLD_MEMBERS.length).toBe(408);
-    expect(DATA_MEMBERS.length).toBe(119);
-    expect(METHOD_MEMBERS.length).toBe(289);
+    // Plus the Weekly Vault's weeklyRewardInfo (+1 data), claimWeeklyReward and
+    // openWeeklyReward (+2 methods; PR 4052): 411/120/291.
+    expect(IWORLD_MEMBERS.length).toBe(411);
+    expect(DATA_MEMBERS.length).toBe(120);
+    expect(METHOD_MEMBERS.length).toBe(291);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -997,6 +1002,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'chooseWeeklyQuest',
       'civicServicePlacements',
       'claimEventSkin',
+      'claimWeeklyReward',
       'clearGatheringGoal',
       'clearMarker',
       'clueHunt',
@@ -1166,6 +1172,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'nodeHarvestableByMe',
       'nodeRespawnSeconds',
       'openCommissionOrder',
+      'openWeeklyReward',
       'ownedMounts',
       'partyAccept',
       'partyDecline',
@@ -1316,6 +1323,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'vendorBuyback',
       'weeklyQuest',
       'weeklyQuestResetAtMs',
+      'weeklyRewardInfo',
       'whoInfo',
       'whoRequest',
       'worldBossActive',
@@ -1443,6 +1451,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'vendorBuyback',
       'weeklyQuest',
       'weeklyQuestResetAtMs',
+      'weeklyRewardInfo',
       'whoInfo',
       'worldQuestCycle',
       'worldQuestExpiresAtMs',
@@ -1504,6 +1513,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'chat',
       'chooseWeeklyQuest',
       'claimEventSkin',
+      'claimWeeklyReward',
       'clearGatheringGoal',
       'clearMarker',
       'collectDelveChestLoot',
@@ -1627,6 +1637,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'nodeHarvestableByMe',
       'nodeRespawnSeconds',
       'openCommissionOrder',
+      'openWeeklyReward',
       'ownedMounts',
       'partyAccept',
       'partyDecline',
@@ -2180,6 +2191,9 @@ const FACET_MAIL = [
 type _ExhaustMail = AssertNever<Exclude<keyof IWorldMail, (typeof FACET_MAIL)[number]>>;
 
 const FACET_BANK = [
+  'weeklyRewardInfo',
+  'claimWeeklyReward',
+  'openWeeklyReward',
   'bankInfo',
   'bankPurchasedSlots',
   'bankDeposit',
@@ -2526,10 +2540,10 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    // Mirrors the IWORLD_MEMBERS.length pin above (408); this pin and the one above
+    // Mirrors the IWORLD_MEMBERS.length pin above (411); this pin and the one above
     // must always agree.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(408);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(408);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(411);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(411);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

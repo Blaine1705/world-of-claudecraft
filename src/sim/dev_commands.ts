@@ -7,6 +7,7 @@ import { DUNGEONS, getActiveWorldContent, ITEMS, MOBS, NPCS, WORLD_QUESTS_BY_ID 
 import { equipBestInSlotForDev } from './dev/bis_gear';
 import { displacePlayerForDev } from './dev/dev_displace';
 import { devTownList, resolveDevTown } from './dev/town_teleport';
+import { prepareWeeklyVaultPlaytest } from './dev/weekly_vault_playtest';
 import { handleDevClueCommand } from './dev_clue_scrolls';
 import { applyDevKit } from './dev_kit';
 import { armWeeklyQuestForDev } from './dev_weekly_quest';
@@ -164,6 +165,11 @@ export function handleDevChat(
   raw: string,
   pid: number,
 ): SentChat | null | undefined {
+  const weeklyVaultMatch = /^\/dev\s+weeklyvault(?:\s+(rollover))?\s*$/i.exec(raw);
+  if (weeklyVaultMatch) {
+    prepareWeeklyVaultPlaytest(ctx, pid, !!weeklyVaultMatch[1]);
+    return null;
+  }
   const levelMatch = /^\/(?:dev\s+level|devlevel)\s+(\d+)\s*$/i.exec(raw);
   if (levelMatch) {
     const level = Number(levelMatch[1]);
