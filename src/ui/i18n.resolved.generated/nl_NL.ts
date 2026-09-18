@@ -2317,9 +2317,6 @@ export const nl_NL: EnTranslations = {
     "tips": {
       "joinChannels": "Tip: typ /join world of /join lfg om te chatten met spelers over de hele wereld."
     },
-    "zoneEntry": {
-      "townQuestsDone": "The folk of {zone} have no more tasks for you. Well done."
-    },
     "itemHeroicTag": "[HELDHAFTIG]",
     "itemHeroicLabel": "Heroïsch",
     "itemSoulbound": "Zielsgebonden",
@@ -20262,6 +20259,7 @@ export const nl_NL: EnTranslations = {
       "eastbrook_vale": {
         "name": "Oostbeekdal",
         "welcome": "Zoek Maarschalk Redbrook in de stad, hij heeft werk voor je.",
+        "welcomeDone": "Marshal Redbrook has no more work for you - Eastbrook rests easier for it.",
         "pois": {
           "0": {
             "label": "Oostbeek"
@@ -20307,6 +20305,7 @@ export const nl_NL: EnTranslations = {
       "mirefen_marsh": {
         "name": "Slijkveenmoeras",
         "welcome": "Meld je bij Wachter Fenwick bij de poort van Veenbrug.",
+        "welcomeDone": "Warden Fenwick has no more orders for you - the Fenbridge gate holds thanks to you.",
         "pois": {
           "0": {
             "label": "Veenbrug"
@@ -20337,6 +20336,7 @@ export const nl_NL: EnTranslations = {
       "thornpeak_heights": {
         "name": "Doorntop-Hoogten",
         "welcome": "Kapitein Thessaly houdt de muur bij Hoogwacht, ternauwernood.",
+        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - easily now, thanks to you.",
         "pois": {
           "0": {
             "label": "Hoogwacht"

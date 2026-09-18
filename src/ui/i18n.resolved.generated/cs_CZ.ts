@@ -2317,9 +2317,6 @@ export const cs_CZ: EnTranslations = {
     "tips": {
       "joinChannels": "Tip: napiš /join world nebo /join lfg a chatuj s hráči napříč světem."
     },
-    "zoneEntry": {
-      "townQuestsDone": "The folk of {zone} have no more tasks for you. Well done."
-    },
     "itemHeroicTag": "[HRDINSKÉ]",
     "itemHeroicLabel": "Hrdinský",
     "itemSoulbound": "Vázáno na duši",
@@ -20262,6 +20259,7 @@ export const cs_CZ: EnTranslations = {
       "eastbrook_vale": {
         "name": "Eastbrookské údolí",
         "welcome": "Najdi ve městě maršála Redbrooka, má pro tebe práci.",
+        "welcomeDone": "Marshal Redbrook has no more work for you - Eastbrook rests easier for it.",
         "pois": {
           "0": {
             "label": "Eastbrook"
@@ -20307,6 +20305,7 @@ export const cs_CZ: EnTranslations = {
       "mirefen_marsh": {
         "name": "Mirefenský močál",
         "welcome": "Ohlas se u strážce Fenwicka u brány Fenbridge.",
+        "welcomeDone": "Warden Fenwick has no more orders for you - the Fenbridge gate holds thanks to you.",
         "pois": {
           "0": {
             "label": "Fenbridge"
@@ -20337,6 +20336,7 @@ export const cs_CZ: EnTranslations = {
       "thornpeak_heights": {
         "name": "Thornpeakské výšiny",
         "welcome": "Kapitánka Thessaly drží zeď u Highwatche, ale sotva.",
+        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - easily now, thanks to you.",
         "pois": {
           "0": {
             "label": "Highwatch"

@@ -2317,9 +2317,6 @@ export const sv_SE: EnTranslations = {
     "tips": {
       "joinChannels": "Tips: skriv /join world eller /join lfg för att chatta med spelare över hela världen."
     },
-    "zoneEntry": {
-      "townQuestsDone": "The folk of {zone} have no more tasks for you. Well done."
-    },
     "itemHeroicTag": "[HEROISK]",
     "itemHeroicLabel": "Heroisk",
     "itemSoulbound": "Själabunden",
@@ -20262,6 +20259,7 @@ export const sv_SE: EnTranslations = {
       "eastbrook_vale": {
         "name": "Östbäcksdalen",
         "welcome": "Hitta marskalk Redbrook i staden - han har arbete åt dig.",
+        "welcomeDone": "Marshal Redbrook has no more work for you - Eastbrook rests easier for it.",
         "pois": {
           "0": {
             "label": "Östbäck"
@@ -20307,6 +20305,7 @@ export const sv_SE: EnTranslations = {
       "mirefen_marsh": {
         "name": "Dykärrsträsket",
         "welcome": "Anmäl dig hos väktare Fenwick vid Kärrbrons port.",
+        "welcomeDone": "Warden Fenwick has no more orders for you - the Fenbridge gate holds thanks to you.",
         "pois": {
           "0": {
             "label": "Kärrbron"
@@ -20337,6 +20336,7 @@ export const sv_SE: EnTranslations = {
       "thornpeak_heights": {
         "name": "Törntoppshöjderna",
         "welcome": "Kapten Thessaly håller muren vid Högvakten - knappt.",
+        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - easily now, thanks to you.",
         "pois": {
           "0": {
             "label": "Högvakten"

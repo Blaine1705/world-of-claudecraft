@@ -2,7 +2,8 @@
 // localized zone welcome while the welcome quest is on offer, the localized
 // town-done line once every town quest (src/sim/town_quests.ts) is turned in,
 // and null in between. The zh_CN case proves the town-done line is a real
-// translated fill, not English leaking through the fallback.
+// translated fill, not English leaking through the fallback, and the last
+// case pins all five non-Latin fills for every authored line (M16).
 import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { ZONES } from '../src/sim/data';
 import { townQuestIds } from '../src/sim/town_quests';
@@ -37,15 +38,28 @@ describe('zoneEntryLine', () => {
     expect(zoneEntryLine(eastbrook, world({ q_wolves: 'done' }, 'available'))).toBeNull();
   });
 
-  it('is the localized town-done line once every town quest is turned in', () => {
+  it("is the zone's own town-done line once every town quest is turned in", () => {
     const allDone = world({}, 'done');
     expect(townQuestIds(eastbrook).length).toBeGreaterThan(3);
     expect(zoneEntryLine(eastbrook, allDone)).toBe(
-      'The folk of Eastbrook Vale have no more tasks for you. Well done.',
+      'Marshal Redbrook has no more work for you - Eastbrook rests easier for it.',
     );
     setLanguage('zh_CN');
     const zh = expectDefined(zoneEntryLine(eastbrook, allDone));
-    expect(zh).not.toContain('no more tasks');
-    expect(zh).toContain('干得好');
+    expect(zh).not.toContain('no more work');
+    expect(zh).toContain('雷德布鲁克元帅');
+  });
+
+  it('every authored town-done line has a real fill in all five non-Latin locales', async () => {
+    const authored = ZONES.filter((z) => z.welcomeDone !== undefined);
+    expect(authored.length).toBe(3);
+    for (const lang of ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'] as const) {
+      await ensureLocaleLoaded(lang);
+      setLanguage(lang);
+      for (const z of authored) {
+        const line = expectDefined(zoneEntryLine(z, world({}, 'done')));
+        expect(line, `${lang} ${z.id}`).not.toBe(z.welcomeDone);
+      }
+    }
   });
 });

@@ -2950,11 +2950,6 @@ export const hudChromeStrings = {
   tips: {
     joinChannels: 'Tip: type /join world or /join lfg to chat with players across the world.',
   },
-  // The zone-entry chat line once every town quest of the zone is turned in
-  // (sim/town_quests.ts; the trainers' work orders never hold it open).
-  zoneEntry: {
-    townQuestsDone: 'The folk of {zone} have no more tasks for you. Well done.',
-  },
   // Item-set (tier set) tooltip block. The set name and per-tier bonus text come
   // from content/item_sets.ts via entity_i18n; these two are the surrounding
   // chrome, with `name`/`bonus` spliced in already-localized.

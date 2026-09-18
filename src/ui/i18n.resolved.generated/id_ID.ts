@@ -2317,9 +2317,6 @@ export const id_ID: EnTranslations = {
     "tips": {
       "joinChannels": "Tips: ketik /join world atau /join lfg untuk mengobrol dengan pemain di seluruh dunia."
     },
-    "zoneEntry": {
-      "townQuestsDone": "The folk of {zone} have no more tasks for you. Well done."
-    },
     "itemHeroicTag": "[HEROIK]",
     "itemHeroicLabel": "Heroik",
     "itemSoulbound": "Terikat Jiwa",
@@ -20262,6 +20259,7 @@ export const id_ID: EnTranslations = {
       "eastbrook_vale": {
         "name": "Lembah Eastbrook",
         "welcome": "Temui Marsekal Redbrook di kota, ia punya tugas untukmu.",
+        "welcomeDone": "Marshal Redbrook has no more work for you - Eastbrook rests easier for it.",
         "pois": {
           "0": {
             "label": "Eastbrook"
@@ -20307,6 +20305,7 @@ export const id_ID: EnTranslations = {
       "mirefen_marsh": {
         "name": "Rawa Mirefen",
         "welcome": "Lapor pada Warden Fenwick di gerbang Jembatan Rawa.",
+        "welcomeDone": "Warden Fenwick has no more orders for you - the Fenbridge gate holds thanks to you.",
         "pois": {
           "0": {
             "label": "Jembatan Rawa"
@@ -20337,6 +20336,7 @@ export const id_ID: EnTranslations = {
       "thornpeak_heights": {
         "name": "Dataran Tinggi Thornpeak",
         "welcome": "Kapten Thessaly mempertahankan tembok di Menara Pengawas, nyaris saja.",
+        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - easily now, thanks to you.",
         "pois": {
           "0": {
             "label": "Menara Pengawas"

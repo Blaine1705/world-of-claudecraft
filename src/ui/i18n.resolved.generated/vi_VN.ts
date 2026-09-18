@@ -2317,9 +2317,6 @@ export const vi_VN: EnTranslations = {
     "tips": {
       "joinChannels": "Mẹo: gõ /join world hoặc /join lfg để trò chuyện với người chơi khắp thế giới."
     },
-    "zoneEntry": {
-      "townQuestsDone": "The folk of {zone} have no more tasks for you. Well done."
-    },
     "itemHeroicTag": "[ANH HÙNG]",
     "itemHeroicLabel": "Anh Hùng",
     "itemSoulbound": "Ràng Buộc Linh Hồn",
@@ -20262,6 +20259,7 @@ export const vi_VN: EnTranslations = {
       "eastbrook_vale": {
         "name": "Thung Lũng Đông Khê",
         "welcome": "Hãy tìm Thống Chế Redbrook trong thị trấn, ông ấy có việc cho ngươi.",
+        "welcomeDone": "Marshal Redbrook has no more work for you - Eastbrook rests easier for it.",
         "pois": {
           "0": {
             "label": "Đông Khê"
@@ -20307,6 +20305,7 @@ export const vi_VN: EnTranslations = {
       "mirefen_marsh": {
         "name": "Đầm Lầy Bùn Sâu",
         "welcome": "Hãy trình diện Hộ Vệ Fenwick tại cổng Cầu Đầm.",
+        "welcomeDone": "Warden Fenwick has no more orders for you - the Fenbridge gate holds thanks to you.",
         "pois": {
           "0": {
             "label": "Cầu Đầm"
@@ -20337,6 +20336,7 @@ export const vi_VN: EnTranslations = {
       "thornpeak_heights": {
         "name": "Cao Nguyên Đỉnh Gai",
         "welcome": "Đội Trưởng Thessaly đang trấn giữ bức tường ở Vọng Đài Cao, vất vả lắm mới giữ nổi.",
+        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - easily now, thanks to you.",
         "pois": {
           "0": {
             "label": "Vọng Đài Cao"

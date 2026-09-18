@@ -2317,9 +2317,6 @@ export const ru_RU: EnTranslations = {
     "tips": {
       "joinChannels": "Совет: введите /join world или /join lfg, чтобы общаться с игроками по всему миру."
     },
-    "zoneEntry": {
-      "townQuestsDone": "У жителей {zone} больше нет для вас поручений. Отличная работа."
-    },
     "itemHeroicTag": "[ГЕРОИЧЕСКИЙ]",
     "itemHeroicLabel": "Героический",
     "itemSoulbound": "Персональный",
@@ -20262,6 +20259,7 @@ export const ru_RU: EnTranslations = {
       "eastbrook_vale": {
         "name": "Истврукская долина",
         "welcome": "Найдите в городе маршала Редбрука: у него есть для вас работа.",
+        "welcomeDone": "У маршала Редбрука больше нет для вас работы - Истбруку стало спокойнее благодаря вам.",
         "pois": {
           "0": {
             "label": "Истврук"
@@ -20307,6 +20305,7 @@ export const ru_RU: EnTranslations = {
       "mirefen_marsh": {
         "name": "Мирефенская топь",
         "welcome": "Доложите стражу Фенвику у ворот Фенбриджа.",
+        "welcomeDone": "У стража Фенвика больше нет для вас приказов - ворота Фенбриджа стоят благодаря вам.",
         "pois": {
           "0": {
             "label": "Фенбридж"
@@ -20337,6 +20336,7 @@ export const ru_RU: EnTranslations = {
       "thornpeak_heights": {
         "name": "Терновые высоты",
         "welcome": "Капитан Тессали едва удерживает стену Хайвотча.",
+        "welcomeDone": "Капитан Тессали удерживает стену Хайвотча - теперь без труда, благодаря вам.",
         "pois": {
           "0": {
             "label": "Хайвотч"

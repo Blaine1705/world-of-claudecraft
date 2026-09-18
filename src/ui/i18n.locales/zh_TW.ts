@@ -1800,7 +1800,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.talents.gearRestored': '已從此配置恢復 {n} 件裝備。',
   'hudChrome.talents.defaultBuildName': '配置 {n}',
   'hudChrome.tips.joinChannels': '提示：輸入 /join world 或 /join lfg 可與全世界的玩家聊天。',
-  'hudChrome.zoneEntry.townQuestsDone': '{zone} 的居民已沒有更多任務交給你了。做得好。',
   'meta.builtOn': '建置於 {date}',
   'realmTypes.normal': '一般',
   'realmTypes.pvp': 'PvP',
@@ -4813,6 +4812,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_tarn_waders.objectives.0.label': '微光湖涉者已被擊殺',
   'entities.zones.eastbrook_vale.name': '東溪谷',
   'entities.zones.eastbrook_vale.welcome': '去鎮上找雷德布魯克元帥，他有任務交給你。',
+  'entities.zones.eastbrook_vale.welcomeDone':
+    '雷德布魯克元帥已沒有任務交給你了 - 東溪因你而安寧。',
   'entities.zones.eastbrook_vale.pois.0.label': '東溪',
   'entities.zones.eastbrook_vale.pois.1.label': '狼徑',
   'entities.zones.eastbrook_vale.pois.2.label': '野豬草地',
@@ -4823,6 +4824,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.zones.eastbrook_vale.pois.7.label': '倒塌禮拜堂',
   'entities.zones.mirefen_marsh.name': '泥沼濕地',
   'entities.zones.mirefen_marsh.welcome': '到芬橋大門向守望者芬威克報到。',
+  'entities.zones.mirefen_marsh.welcomeDone':
+    '守望者芬威克已沒有命令交給你了 - 芬橋大門因你而屹立。',
   'entities.zones.mirefen_marsh.pois.0.label': '芬橋',
   'entities.zones.mirefen_marsh.pois.1.label': '潛伏者蘆葦地',
   'entities.zones.mirefen_marsh.pois.2.label': '深沼淺灘',
@@ -4833,6 +4836,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.7.label': '沉沒堡壘',
   'entities.zones.thornpeak_heights.name': '荊峰高地',
   'entities.zones.thornpeak_heights.welcome': '瑟薩莉隊長勉強守住高望城牆。',
+  'entities.zones.thornpeak_heights.welcomeDone':
+    '瑟薩莉隊長守住了高望城牆 - 如今輕鬆自如，多虧了你。',
   'entities.zones.thornpeak_heights.pois.0.label': '高望',
   'entities.zones.thornpeak_heights.pois.1.label': '潛獵者山脊',
   'entities.zones.thornpeak_heights.pois.2.label': '深岩洞穴',

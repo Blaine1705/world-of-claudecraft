@@ -2317,9 +2317,6 @@ export const ja_JP: EnTranslations = {
     "tips": {
       "joinChannels": "ヒント：/join world または /join lfg と入力すると、ワールド全体のプレイヤーとチャットできます。"
     },
-    "zoneEntry": {
-      "townQuestsDone": "{zone}の人々からの依頼はもうありません。お見事です。"
-    },
     "itemHeroicTag": "[ヒロイック]",
     "itemHeroicLabel": "ヒロイック",
     "itemSoulbound": "魂縛",
@@ -20262,6 +20259,7 @@ export const ja_JP: EnTranslations = {
       "eastbrook_vale": {
         "name": "イーストブルック渓谷",
         "welcome": "町のレッドブルック元帥を訪ねてください。あなたに頼みたい仕事があります。",
+        "welcomeDone": "レッドブルック元帥からの仕事はもうありません - イーストブルックはあなたのおかげで安らかです。",
         "pois": {
           "0": {
             "label": "イーストブルック"
@@ -20307,6 +20305,7 @@ export const ja_JP: EnTranslations = {
       "mirefen_marsh": {
         "name": "マイアフェン湿地",
         "welcome": "フェンブリッジの門で番人フェンウィックに報告してください。",
+        "welcomeDone": "番人フェンウィックからの命令はもうありません - フェンブリッジの門はあなたのおかげで持ちこたえています。",
         "pois": {
           "0": {
             "label": "フェンブリッジ"
@@ -20337,6 +20336,7 @@ export const ja_JP: EnTranslations = {
       "thornpeak_heights": {
         "name": "ソーンピーク高地",
         "welcome": "テサリー隊長がかろうじてハイウォッチの壁を保っています。",
+        "welcomeDone": "テサリー隊長がハイウォッチの壁を保っています - 今は余裕をもって、あなたのおかげで。",
         "pois": {
           "0": {
             "label": "ハイウォッチ"

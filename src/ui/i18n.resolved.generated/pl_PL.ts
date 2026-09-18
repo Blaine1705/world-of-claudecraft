@@ -2317,9 +2317,6 @@ export const pl_PL: EnTranslations = {
     "tips": {
       "joinChannels": "Wskazówka: wpisz /join world lub /join lfg, aby rozmawiać z graczami z całego świata."
     },
-    "zoneEntry": {
-      "townQuestsDone": "The folk of {zone} have no more tasks for you. Well done."
-    },
     "itemHeroicTag": "[HEROICZNY]",
     "itemHeroicLabel": "Heroiczny",
     "itemSoulbound": "Związany z duszą",
@@ -20262,6 +20259,7 @@ export const pl_PL: EnTranslations = {
       "eastbrook_vale": {
         "name": "Dolina Wschodniego Strumienia",
         "welcome": "Odszukaj Marszałka Redbrooka w mieście, ma dla ciebie zadanie.",
+        "welcomeDone": "Marshal Redbrook has no more work for you - Eastbrook rests easier for it.",
         "pois": {
           "0": {
             "label": "Eastbrook"
@@ -20307,6 +20305,7 @@ export const pl_PL: EnTranslations = {
       "mirefen_marsh": {
         "name": "Trzęsawisko Mokrzawia",
         "welcome": "Zamelduj się u Strażnika Fenwicka przy bramie Mostu na Trzęsawisku.",
+        "welcomeDone": "Warden Fenwick has no more orders for you - the Fenbridge gate holds thanks to you.",
         "pois": {
           "0": {
             "label": "Most na Trzęsawisku"
@@ -20337,6 +20336,7 @@ export const pl_PL: EnTranslations = {
       "thornpeak_heights": {
         "name": "Wyżyny Ciernistego Szczytu",
         "welcome": "Kapitan Thessaly utrzymuje mur w Wysokiej Strażnicy, ledwie.",
+        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - easily now, thanks to you.",
         "pois": {
           "0": {
             "label": "Wysoka Strażnica"

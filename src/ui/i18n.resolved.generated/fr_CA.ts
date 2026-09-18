@@ -2317,9 +2317,6 @@ export const fr_CA: EnTranslations = {
     "tips": {
       "joinChannels": "Conseil : tapez /join world ou /join lfg pour discuter avec les joueurs du monde entier."
     },
-    "zoneEntry": {
-      "townQuestsDone": "The folk of {zone} have no more tasks for you. Well done."
-    },
     "itemHeroicTag": "[HÉROÏQUE]",
     "itemHeroicLabel": "Héroïque",
     "itemSoulbound": "Lié à l’âme",
@@ -20262,6 +20259,7 @@ export const fr_CA: EnTranslations = {
       "eastbrook_vale": {
         "name": "Val d'Eastbrook",
         "welcome": "Trouvez le maréchal Redbrook en ville: il a du travail pour vous.",
+        "welcomeDone": "Marshal Redbrook has no more work for you - Eastbrook rests easier for it.",
         "pois": {
           "0": {
             "label": "Eastbrook"
@@ -20307,6 +20305,7 @@ export const fr_CA: EnTranslations = {
       "mirefen_marsh": {
         "name": "Marais de Mirefen",
         "welcome": "Présentez-vous au gardien Fenwick à la porte de Fenbridge.",
+        "welcomeDone": "Warden Fenwick has no more orders for you - the Fenbridge gate holds thanks to you.",
         "pois": {
           "0": {
             "label": "Fenbridge"
@@ -20337,6 +20336,7 @@ export const fr_CA: EnTranslations = {
       "thornpeak_heights": {
         "name": "Hauteurs de Thornpeak",
         "welcome": "La capitaine Thessaly tient le mur de Highwatch, à peine.",
+        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - easily now, thanks to you.",
         "pois": {
           "0": {
             "label": "Highwatch"

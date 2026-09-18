@@ -1860,8 +1860,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.talents.defaultBuildName': '빌드 {n}',
   'hudChrome.tips.joinChannels':
     '팁: /join world 또는 /join lfg를 입력하면 월드 전역의 플레이어와 대화할 수 있습니다.',
-  'hudChrome.zoneEntry.townQuestsDone':
-    '{zone}의 주민들에게는 더 이상 맡길 일이 없습니다. 잘하셨습니다.',
   'meta.builtOn': '{date} 빌드',
   'realmTypes.normal': '일반',
   'realmTypes.pvp': 'PvP',
@@ -4981,6 +4979,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.eastbrook_vale.name': '이스트브룩 골짜기',
   'entities.zones.eastbrook_vale.welcome':
     '마을의 레드브룩 원수를 찾아가십시오. 그가 당신에게 맡길 일이 있습니다.',
+  'entities.zones.eastbrook_vale.welcomeDone':
+    '레드브룩 원수가 맡길 일은 더 이상 없습니다 - 이스트브룩은 당신 덕분에 한결 평온합니다.',
   'entities.zones.eastbrook_vale.pois.0.label': '이스트브룩',
   'entities.zones.eastbrook_vale.pois.1.label': '늑대길',
   'entities.zones.eastbrook_vale.pois.2.label': '멧돼지 초원',
@@ -4991,6 +4991,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.eastbrook_vale.pois.7.label': '무너진 예배당',
   'entities.zones.mirefen_marsh.name': '마이어펜 습지',
   'entities.zones.mirefen_marsh.welcome': '펜브리지 문에서 감시관 펜윅에게 보고하십시오.',
+  'entities.zones.mirefen_marsh.welcomeDone':
+    '감시관 펜윅의 명령은 더 이상 없습니다 - 펜브리지 문은 당신 덕분에 굳건합니다.',
   'entities.zones.mirefen_marsh.pois.0.label': '펜브리지',
   'entities.zones.mirefen_marsh.pois.1.label': '배회자 갈대밭',
   'entities.zones.mirefen_marsh.pois.2.label': '딥펜 얕은 물',
@@ -5002,6 +5004,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.name': '쏜피크 고지',
   'entities.zones.thornpeak_heights.welcome':
     '테살리 대장이 간신히 하이워치 성벽을 지키고 있습니다.',
+  'entities.zones.thornpeak_heights.welcomeDone':
+    '테살리 대장이 하이워치 성벽을 지키고 있습니다 - 이제는 여유롭게, 당신 덕분입니다.',
   'entities.zones.thornpeak_heights.pois.0.label': '하이워치',
   'entities.zones.thornpeak_heights.pois.1.label': '추적자 산등성이',
   'entities.zones.thornpeak_heights.pois.2.label': '딥록 굴',

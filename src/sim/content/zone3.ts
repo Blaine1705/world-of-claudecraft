@@ -42,6 +42,7 @@ export const ZONE3_ZONE: ZoneDef = {
     { x: 0, z: 880, label: 'Gravewyrm Sanctum', id: 'gravewyrm_sanctum' },
   ],
   welcome: 'Captain Thessaly holds the wall at Highwatch - barely.',
+  welcomeDone: 'Captain Thessaly holds the wall at Highwatch - easily now, thanks to you.',
 };
 
 // Mountain road from Fenbridge up to Highwatch, then spokes.

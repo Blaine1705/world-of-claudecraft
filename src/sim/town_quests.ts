@@ -15,8 +15,10 @@
 //
 // zoneEntryHint is the one decision the HUD's zone-entry chat line reads: the
 // zone's welcome hint while its welcome quest is still on offer (the legacy
-// data.ts zoneWelcomeText rule, unchanged), the "town done" line once every
-// counted town quest is turned in, nothing in between. Pure leaf: no Sim,
+// data.ts zoneWelcomeText rule, unchanged), the zone's own "town done" line
+// (ZoneDef.welcomeDone, authored only for the zones whose welcome names the
+// town's questgiver) once every counted town quest is turned in, nothing in
+// between. A zone without welcomeDone never reads town_done. Pure leaf: no Sim,
 // no SimContext; the quest state comes in as a callback so the offline Sim and
 // the online mirror resolve it the same way.
 import { PROFESSION_TRAINERS } from './content/profession_trainers';
@@ -90,6 +92,8 @@ export function zoneEntryHint(
   questState: (questId: string) => QuestState,
   playerClass: PlayerClass | undefined,
 ): ZoneEntryHint | null {
-  if (townQuestsComplete(zone, questState, playerClass)) return 'town_done';
+  if (zone.welcomeDone !== undefined && townQuestsComplete(zone, questState, playerClass)) {
+    return 'town_done';
+  }
   return zoneWelcomeText(zone, questState) === null ? null : 'welcome';
 }

@@ -1,9 +1,9 @@
 // Pins src/sim/town_quests.ts: which quests count as a zone's TOWN quests
 // (given or turned in inside the hub circle, not a profession trainer's, not
-// repeatable),
-// when a town reads as complete, and the zone-entry hint the HUD's chat line
-// resolves from it (welcome while the welcome quest is on offer, town_done once
-// every counted quest is turned in, nothing in between).
+// repeatable), when a town reads as complete, and the zone-entry hint the HUD's
+// chat line resolves from it (welcome while the welcome quest is on offer,
+// town_done once every counted quest is turned in AND the zone authors a
+// welcomeDone line, nothing in between).
 import { describe, expect, it } from 'vitest';
 import { PROFESSION_TRAINERS } from '../src/sim/content/profession_trainers';
 import { NPCS, QUESTS, ZONES, zoneAt } from '../src/sim/data';
@@ -157,6 +157,22 @@ describe('zoneEntryHint on a live Sim', () => {
     expect(zoneEntryHint(fenbridge, questState, sim.cfg.playerClass)).toBe('welcome');
     markDone(sim, townQuestIds(fenbridge));
     expect(zoneEntryHint(fenbridge, questState, sim.cfg.playerClass)).toBe('town_done');
+  });
+
+  it('only the three founding zones author a town-done line; no other zone reads town_done', () => {
+    expect(ZONES.filter((z) => z.welcomeDone !== undefined).map((z) => z.id)).toEqual([
+      'eastbrook_vale',
+      'mirefen_marsh',
+      'thornpeak_heights',
+    ]);
+    const frostveil = zone('frostveil');
+    const sim = makeSim();
+    const questState = (id: string) => sim.questState(id);
+    markDone(sim, townQuestIds(frostveil));
+    expect(townQuestsComplete(frostveil, questState, sim.cfg.playerClass)).toBe(true);
+    // Its welcome quest is a border breadcrumb that markDone covered too, so
+    // the welcome rule has gone quiet: the entry stays silent, never town_done.
+    expect(zoneEntryHint(frostveil, questState, sim.cfg.playerClass)).toBeNull();
   });
 
   it('trainer work stays out of the decision: a finished town with untouched trainers reads town_done', () => {

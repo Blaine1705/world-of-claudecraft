@@ -2317,9 +2317,6 @@ export const tr_TR: EnTranslations = {
     "tips": {
       "joinChannels": "İpucu: Dünya genelindeki oyuncularla sohbet etmek için /join world ya da /join lfg yaz."
     },
-    "zoneEntry": {
-      "townQuestsDone": "The folk of {zone} have no more tasks for you. Well done."
-    },
     "itemHeroicTag": "[KAHRAMANCA]",
     "itemHeroicLabel": "Heroik",
     "itemSoulbound": "Ruha Bağlı",
@@ -20262,6 +20259,7 @@ export const tr_TR: EnTranslations = {
       "eastbrook_vale": {
         "name": "Doğudere Vadisi",
         "welcome": "Kasabada Mareşal Redbrook'u bul, senin için işi var.",
+        "welcomeDone": "Marshal Redbrook has no more work for you - Eastbrook rests easier for it.",
         "pois": {
           "0": {
             "label": "Doğudere"
@@ -20307,6 +20305,7 @@ export const tr_TR: EnTranslations = {
       "mirefen_marsh": {
         "name": "Mirefen Bataklığı",
         "welcome": "Bataklık Köprüsü kapısında Muhafız Fenwick'e rapor ver.",
+        "welcomeDone": "Warden Fenwick has no more orders for you - the Fenbridge gate holds thanks to you.",
         "pois": {
           "0": {
             "label": "Bataklık Köprüsü"
@@ -20337,6 +20336,7 @@ export const tr_TR: EnTranslations = {
       "thornpeak_heights": {
         "name": "Dikenzirve Tepeleri",
         "welcome": "Yüzbaşı Thessaly, Yüksek Gözcü'deki duvarı tutuyor, zar zor.",
+        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - easily now, thanks to you.",
         "pois": {
           "0": {
             "label": "Yüksek Gözcü"

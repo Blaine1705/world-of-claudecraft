@@ -2317,9 +2317,6 @@ export const zh_CN: EnTranslations = {
     "tips": {
       "joinChannels": "提示：输入 /join world 或 /join lfg，与全服玩家聊天。"
     },
-    "zoneEntry": {
-      "townQuestsDone": "{zone} 的居民已没有更多任务交给你了。干得好。"
-    },
     "itemHeroicTag": "[英雄]",
     "itemHeroicLabel": "英雄",
     "itemSoulbound": "灵魂绑定",
@@ -20262,6 +20259,7 @@ export const zh_CN: EnTranslations = {
       "eastbrook_vale": {
         "name": "东溪谷",
         "welcome": "去镇上找雷德布鲁克元帅，他有任务交给你。",
+        "welcomeDone": "雷德布鲁克元帅已没有任务交给你了 - 东溪因你而安宁。",
         "pois": {
           "0": {
             "label": "东溪"
@@ -20307,6 +20305,7 @@ export const zh_CN: EnTranslations = {
       "mirefen_marsh": {
         "name": "泥沼湿地",
         "welcome": "到芬桥大门向守望者芬威克报到。",
+        "welcomeDone": "守望者芬威克已没有命令交给你了 - 芬桥大门因你而屹立。",
         "pois": {
           "0": {
             "label": "芬桥"
@@ -20337,6 +20336,7 @@ export const zh_CN: EnTranslations = {
       "thornpeak_heights": {
         "name": "荆峰高地",
         "welcome": "瑟萨莉队长勉强守住高望城墙。",
+        "welcomeDone": "瑟萨莉队长守住了高望城墙 - 如今轻松自如，多亏了你。",
         "pois": {
           "0": {
             "label": "高望"
