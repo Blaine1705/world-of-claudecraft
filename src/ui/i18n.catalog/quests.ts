@@ -453,9 +453,9 @@ const questStringsEn = {
         'Every world quest of the day is done, but your bags have no room for the treasure map.',
       treasureMapRead: 'You study the {map}. The X lies somewhere in {zone}.',
       treasureMapUpgraded: 'The map is redrawn in finer ink: it is now a {map}.',
-      treasureVaultOpened: 'The ground gives way. A vault stands open before you.',
-      treasureVaultLooted: 'The vault holds {money} and {items}.',
-      treasureVaultCapped: 'You have shared in enough vaults today; this one pays you nothing.',
+      treasureVaultOpened: 'The ground gives way. A buried hoard lies open before you.',
+      treasureVaultLooted: 'The hoard holds {money} and {items}.',
+      treasureVaultCapped: 'You have shared in enough hoards today; this one pays you nothing.',
     },
     errors: {
       unavailable: 'That quest is not available.',

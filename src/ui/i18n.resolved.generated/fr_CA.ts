@@ -2323,7 +2323,7 @@ export const fr_CA: EnTranslations = {
     "treasureMap": {
       "close": "Close treasure map",
       "zone": "Somewhere in {zone}",
-      "hint": "Find the ground this map shows, stand on the X, and use the map again to dig. A vault opens for you and your party.",
+      "hint": "Find the ground this map shows, stand on the X, and use the map again to dig. A buried hoard opens for you and your party.",
       "upgradeNote": "Redrawing it as a {rarity} map takes {inks} Cartographer's Ink (you hold {held}). The faction quartermasters sell it.",
       "upgradeMaxed": "No cartographer could better this map.",
       "rarity": {
@@ -11607,9 +11607,9 @@ export const fr_CA: EnTranslations = {
       "treasureMapLost": "Every world quest of the day is done, but your bags have no room for the treasure map.",
       "treasureMapRead": "You study the {map}. The X lies somewhere in {zone}.",
       "treasureMapUpgraded": "The map is redrawn in finer ink: it is now a {map}.",
-      "treasureVaultOpened": "The ground gives way. A vault stands open before you.",
-      "treasureVaultLooted": "The vault holds {money} and {items}.",
-      "treasureVaultCapped": "You have shared in enough vaults today; this one pays you nothing."
+      "treasureVaultOpened": "The ground gives way. A buried hoard lies open before you.",
+      "treasureVaultLooted": "The hoard holds {money} and {items}.",
+      "treasureVaultCapped": "You have shared in enough hoards today; this one pays you nothing."
     },
     "errors": {
       "unavailable": "Cette quête n'est pas disponible.",
