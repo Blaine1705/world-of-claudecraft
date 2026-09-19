@@ -46,7 +46,7 @@ export function isBadFrameWindow(
   // display, and the advice that would let it run at full cadence (a lower
   // preset) must still reach them. A faster automatic ceiling (a steady 72 on a
   // 144 Hz display) is a good session and reads like a chosen one.
-  if (chosen?.auto && 1000 / chosen.targetIntervalMs <= AUTO_EVIDENCE_UP_TO_FPS + 1e-6) return true;
+  if (chosen?.auto && chosen.targetIntervalMs >= 1000 / AUTO_EVIDENCE_UP_TO_FPS) return true;
   const aimedMs = chosen ? chosen.targetIntervalMs : NOMINAL_FRAME_MS;
   if (w.fps < (1000 / aimedMs) * LOW_FPS_SHARE) return true;
   if (w.frameMs.p95 >= aimedMs * SLOW_P95_INTERVALS) return true;

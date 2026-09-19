@@ -156,13 +156,16 @@ describe('ceiling divisor', () => {
     expect(rate(360)).toBe(72);
   });
 
+  it('pins the floor rate: the chosen interval must stay under the 50 ms input tick', () => {
+    expect(MIN_CEILING_FPS).toBe(24);
+  });
+
   it('never paces a frame past one input tick', () => {
     for (let hz = 24; hz <= 500; hz++) {
       for (const intent of [30, 60]) {
         const divisor = ceilingDivisor(hz, intent);
         if (divisor === 1) continue;
         expect(hz / divisor).toBeGreaterThanOrEqual(24);
-        expect(MIN_CEILING_FPS).toBe(24);
         expect((1000 / hz) * divisor).toBeLessThan(INPUT_TICK_MS);
       }
     }
@@ -933,8 +936,11 @@ describe('automatic frame rate limit', () => {
         hitched = true;
         return 1_100;
       },
-      seconds: 400,
+      // Long past a full evidence run at baseline: with no budget left the hold
+      // stays for the session, by design (nothing is stored, the governor is free).
+      seconds: 1500,
       intent: 'auto',
+      governorAtBaseline: () => true,
       remembered: PROVISIONAL_AT_30,
       onFrame: (_t, wiring) => {
         const now = wiring.snapshot().autoPhase === 'probe';
@@ -944,7 +950,10 @@ describe('automatic frame rate limit', () => {
     });
     const snap = r.wiring.snapshot();
     expect(snap.autoProbesInconclusive).toBe(3);
+    expect(snap.autoProbes).toBe(3);
     expect(snap.autoProbesFailed).toBe(0);
+    // The fleet must be able to tell this hold from a probed one.
+    expect(snap.autoConfirmed).toBe(false);
     expect(snap.intent).toBe(30);
     expect(r.published.hold).toBe(false);
     expect(r.saved).toEqual([]);

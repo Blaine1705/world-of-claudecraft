@@ -535,9 +535,10 @@ the preset only SCOPES what the automatic mode remembers, in
 `src/game/frame_cadence_auto_memory.ts`, because a verdict learned on Ultra must not be
 reused on Low) and it is not a governor
 bucket (it removes no richness itself; while the automatic mode is still forming a
-verdict it does hold the governor's RECOVERY, so richness the governor already shed stays
-shed a little longer, cosmetic only and bounded: a provisional hold ends within 300 s of
-play, a probe within 90 frames, a probation within 120 s); it changes how often the whole picture is
+verdict it does hold the governor's RECOVERY, so richness the governor already shed
+stays shed a little longer, cosmetic only and bounded: a provisional hold ends within
+300 s of readable play, a probe within 90 frames, a probation within 120 s of
+readable play); it changes how often the whole picture is
 redrawn, exactly as a slower display would.
 
 Why it is fair. Nothing a player reads is hidden, thinned or delayed relative to the

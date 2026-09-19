@@ -299,6 +299,41 @@ describe('the confirming probe of a provisional hold', () => {
     expect(s.phase).toBe('probe');
   });
 
+  it('stays unprobed one rung down: an inherited confirmation is not a verdict to remember', () => {
+    const s = createFrameCadenceAuto();
+    restoreFrameCadenceAuto(s, { ceiling: 60, confirmed: false, failStreak: 0 });
+    const hz = { refreshHz: 144 };
+    // Settled for want of a probe, in a fight that never ends.
+    play(s, 400, { ...hz, calm: false, untilChange: true });
+    expect(s.confirmed).toBe(true);
+    expect(frameCadenceAutoRecord(s).confirmed).toBe(false);
+    // A watch-window descent (one in six late: never the fast rule) keeps the
+    // confirmation it inherited, and keeps it unprobed.
+    play(s, 40, { ...hz, calm: false, lateEvery: 6, untilChange: true });
+    expect(s.ceiling).toBe(30);
+    expect(s.confirmed).toBe(true);
+    expect(frameCadenceAutoRecord(s)).toEqual({ ceiling: 30, confirmed: false, failStreak: 0 });
+    // The same descent from a genuinely settled hold is a verdict.
+    const settled = createFrameCadenceAuto();
+    restoreFrameCadenceAuto(settled, { ceiling: 60, confirmed: true, failStreak: 0 });
+    play(settled, 40, { ...hz, lateEvery: 6, untilChange: true });
+    expect(frameCadenceAutoRecord(settled)).toEqual({
+      ceiling: 30,
+      confirmed: true,
+      failStreak: 0,
+    });
+  });
+
+  it('is bounded at the bottom rung too, on a stream that stays uneven', () => {
+    const s = heldAt30(false);
+    const changes = play(s, 900, { lateEvery: 3 });
+    expect(changes.length).toBe(1);
+    expect(changes[0]).toBeGreaterThan(299);
+    expect(changes[0]).toBeLessThan(305);
+    expect(frameCadenceAutoHoldsQuality(s)).toBe(false);
+    expect(frameCadenceAutoRecord(s).confirmed).toBe(false);
+  });
+
   it('settles without a probe once the session budget is spent', () => {
     const s = heldAt30(false);
     s.probesLeft = 0;

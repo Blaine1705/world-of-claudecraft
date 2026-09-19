@@ -399,7 +399,7 @@ export class FrameCadenceWiring {
     const out = this.snapshotOut;
     out.auto = this.auto;
     out.autoPhase = this.auto ? this.autoState.phase : 'off';
-    out.autoConfirmed = this.auto && this.autoState.confirmed;
+    out.autoConfirmed = this.auto && this.autoState.confirmed && !this.autoState.unprobed;
     out.autoFailStreak = this.autoState.failStreak;
     out.autoLateShare = this.autoState.lastShare;
     out.autoDescents = this.autoState.descents;

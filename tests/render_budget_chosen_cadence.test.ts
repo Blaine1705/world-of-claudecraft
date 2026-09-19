@@ -227,7 +227,9 @@ describe('a ceiling engaging on a probe that had nothing to shed', () => {
     const before = { ...g.state().levels };
     // A real disaster first: the ladder is driven to its floors.
     const floored = run(g, 120, { frameMs: 70, dt: 0.07, totalMs: 60, submitMs: 30 });
-    expect(floored.state.levels.foliage).toBeLessThan(before.foliage);
+    for (const bucket of ['grass', 'foliage', 'lighting', 'vfx'] as const) {
+      expect(floored.state.levels[bucket]).toBeLessThan(before[bucket]);
+    }
     // Then a held 33 ms rhythm with an idle main thread opens a probe that
     // sheds nothing and reaches its restored dwell on the baselines.
     let s = g.state();

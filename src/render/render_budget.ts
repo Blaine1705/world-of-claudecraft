@@ -807,9 +807,10 @@ export class RenderBudgetGovernor {
   }
 
   /** A chosen cadence engaged while a cap probe was in flight: the probe is
-   *  dropped and what it shed comes back. A probe can lose its origin (a
-   *  submit stall during a dwell sheds for real and clears it): the band
-   *  baselines stand in, as they do in advanceCapProbe. */
+   *  dropped and what it shed comes back. A probe that lost its origin (a
+   *  submit stall during a dwell sheds for real and clears it) or that shed
+   *  nothing (the session was already at the floors) gets the band baselines,
+   *  as it does in advanceCapProbe. */
   private abandonCapProbe(sample: RenderBudgetSample): void {
     // The same choice advanceCapProbe makes for the same state: a probe that
     // shed nothing (the session was already at the floors) has an origin equal to

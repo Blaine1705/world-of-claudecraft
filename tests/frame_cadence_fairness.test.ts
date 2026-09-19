@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { tsFilesUnder } from './helpers/ts_files_under';
@@ -29,14 +30,18 @@ const CADENCE_MODULES = [
 ];
 const TIER_RESOLVERS = ['src/game/ui_effects_profile.ts', 'src/game/ui_tier_knobs.ts'];
 
+// By basename, so a module moved into a subdirectory stays in the scan. The
+// two names outside the frame_cadence prefix are part of the cluster too.
+const CLUSTER_GAME = /^(frame_cadence|display_refresh_estimator_core|frame_rate_cap_setting)/;
+
 describe('frame rate limit fairness', () => {
   it('scans every module of the cadence cluster: a new one cannot stay out of the list', () => {
     const cluster = [
       ...tsFilesUnder(fileURLToPath(new URL('../src/game', import.meta.url)))
-        .filter((f) => /^frame_cadence/.test(f.file))
+        .filter((f) => CLUSTER_GAME.test(basename(f.file)))
         .map((f) => `src/game/${f.file}`),
       ...tsFilesUnder(fileURLToPath(new URL('../src/render', import.meta.url)))
-        .filter((f) => /^chosen_cadence/.test(f.file))
+        .filter((f) => /^chosen_cadence/.test(basename(f.file)))
         .map((f) => `src/render/${f.file}`),
     ];
     expect(cluster.length).toBeGreaterThanOrEqual(8);

@@ -22,6 +22,11 @@
 // cannot restore its baseline quality at the ceiling has nothing left for a
 // faster cadence, and is never asked.
 //
+// Readings that straddle a stall of a second or more are dropped (they are not
+// readings), so the rules need whole bursts of play between stalls: the floor
+// is the 120-frame recent ring. A machine stalling every second or two is read
+// as paced and never limited; every three seconds or more, it is.
+//
 // Pure: rendered frames in, the ceiling intent out. Every threshold is a share
 // of frames, a count of frames or a duration of play, never a frame time
 // calibrated on a machine.
@@ -48,7 +53,10 @@ export const AUTO_WATCH_WINDOW_S = 15;
 export const AUTO_SETTLE_S = 60;
 export const AUTO_CONFIRM_CLEAN_S = 60;
 /** A provisional hold freezes the governor's recovery, so it is bounded: past
- *  this much play without its clean minute, the descent stands as settled. */
+ *  this much READABLE play without its probe, the descent stands as settled.
+ *  Readable: the clock advances at checkpoints, and a checkpoint needs 60 frames
+ *  clear of exempt spans, so covers every few seconds stall it (as they stall
+ *  the 120 s probation clock). */
 export const AUTO_PROVISIONAL_MAX_S = 300;
 /** A checkpoint counts toward a confirmed hold's evidence run under this
  *  share: the governor's own allowed miss share, since released it refills
@@ -204,6 +212,7 @@ export function restoreFrameCadenceAuto(
   state.failStreak = Math.max(0, Math.min(AUTO_MAX_FAIL_DOUBLINGS, Math.floor(record.failStreak)));
   state.cleanS = 0;
   state.evidenceS = 0;
+  state.unprobed = false;
   if (record.ceiling === 0) {
     state.phase = 'observe';
     state.confirmed = false;
@@ -327,7 +336,8 @@ function stepDown(state: FrameCadenceAutoState, refreshHz: number, fastRule: boo
   if (fastRule) state.confirmed = false;
   else if (state.phase === 'observe') state.confirmed = state.observeS >= AUTO_SETTLE_S;
   if (!state.confirmed) state.provisionalS = 0;
-  state.unprobed = false;
+  // A confirmation inherited from an unprobed hold is still unprobed one rung down.
+  state.unprobed = state.unprobed && state.confirmed;
   state.flagrantStreak = 0;
   state.phase = 'held';
   state.ceiling = down;
@@ -336,6 +346,19 @@ function stepDown(state: FrameCadenceAutoState, refreshHz: number, fastRule: boo
   state.descents++;
   if (state.firstCeilingS < 0) state.firstCeilingS = state.playS;
   clearReadings(state);
+  return true;
+}
+
+/** No probe came: none left this session, or none could start for the whole
+ *  bound (a long fight, a stream that never gave a clean minute). The hold
+ *  settles so the governor gets its recovery back, but UNPROBED, which the
+ *  record never calls confirmed. With no budget left it then stays for the
+ *  session (only an invalidation gives a probe back): three cancelled probes
+ *  can hold a capable machine until its next session, and nothing is stored. */
+function settleUnprobedIfOverdue(state: FrameCadenceAutoState, noBudget: boolean): boolean {
+  if (!noBudget && state.provisionalS < AUTO_PROVISIONAL_MAX_S) return false;
+  state.confirmed = true;
+  state.unprobed = true;
   return true;
 }
 
@@ -451,6 +474,9 @@ export function stepFrameCadenceAuto(
     } else state.flagrantStreak = 0;
   }
 
+  const provisional = state.phase === 'held' && !state.confirmed;
+  if (checkpoint && provisional) state.provisionalS += seconds;
+
   if (uneven) {
     state.cleanS = 0;
     state.evidenceS = 0;
@@ -461,7 +487,10 @@ export function stepFrameCadenceAuto(
     }
     const governorHadItsTurn = state.flagrantStreak >= AUTO_FLAGRANT_CHECKPOINTS_BEFORE_GOVERNOR;
     if (frame.governorShedding && !governorHadItsTurn) return false;
-    return stepDown(state, frame.refreshHz, fastRule);
+    if (stepDown(state, frame.refreshHz, fastRule)) return true;
+    // At the bottom rung there is nowhere to go, and the bound still applies: a
+    // machine uneven even there must not keep the governor's recovery frozen.
+    return provisional && settleUnprobedIfOverdue(state, false);
   }
 
   if (!checkpoint) return false;
@@ -484,20 +513,12 @@ export function stepFrameCadenceAuto(
 
   if (!state.confirmed) {
     state.cleanS = clean ? state.cleanS + seconds : 0;
-    state.provisionalS += seconds;
     const due = state.cleanS >= AUTO_CONFIRM_CLEAN_S;
     if (due && state.probesLeft > 0 && probeAllowed(state, frame)) {
       startProbe(state, frame.refreshHz);
       return true;
     }
-    // No probe came: none left this session, or none allowed for the whole bound
-    // (a long fight, a run of loading covers). The hold settles so the governor
-    // gets its recovery back, but unprobed, which the record never calls confirmed.
-    const noBudget = due && state.probesLeft <= 0;
-    if (!noBudget && state.provisionalS < AUTO_PROVISIONAL_MAX_S) return false;
-    state.confirmed = true;
-    state.unprobed = true;
-    return true;
+    return settleUnprobedIfOverdue(state, due && state.probesLeft <= 0);
   }
 
   const evidence =
