@@ -163,6 +163,15 @@ for (const mobile of [false, true]) {
           },
         };
       });
+      const shouldBeOutdoor = rarity === 'epic' || rarity === 'legendary';
+      if (shouldBeOutdoor !== Boolean(renderState.outdoorZone)) {
+        throw new Error(
+          `${rarity} ${zone} expected ${shouldBeOutdoor ? 'an outdoor valley' : 'a cave'}`,
+        );
+      }
+      if (renderState.outdoorZone && renderState.outdoorZone !== zone) {
+        throw new Error(`${rarity} ${zone} rendered as ${renderState.outdoorZone}`);
+      }
       if (renderState.groupName) {
         await page.waitForFunction(
           (name) => window.__game.renderer.scene.getObjectByName(name) !== undefined,
@@ -187,6 +196,13 @@ for (const mobile of [false, true]) {
               haze: material?.userData?.wocZoneHaze ?? false,
             };
           })(),
+          sky: (() => {
+            const material = window.__game.renderer.sky.material;
+            return {
+              type: material?.type,
+              color: material?.color?.getHexString(),
+            };
+          })(),
           settledFogState: window.__game.renderer.fogState,
           settledSun: window.__game.renderer.sun.intensity,
           sunColor: window.__game.renderer.sun.color.getHexString(),
@@ -209,10 +225,14 @@ for (const mobile of [false, true]) {
           input.blur();
         }, phase);
         await delay(2500);
-        const kind = renderState.outdoorZone ? `${rarity}-${zone}` : 'common-cave-amberfall';
+        const cycle = await page.evaluate(() => {
+          const material = window.__game.renderer.sky.material;
+          return { skyColor: material?.color?.getHexString() ?? null };
+        });
+        const kind = shouldBeOutdoor ? `${rarity}-${zone}` : `common-cave-${zone}`;
         const file = `${out}/${kind}-${phase}-${mobile ? 'landscape-phone-low' : 'desktop-ultra'}.png`;
         await page.screenshot({ path: file });
-        console.log(JSON.stringify({ file, ...state, ...renderState }));
+        console.log(JSON.stringify({ file, ...state, ...renderState, ...cycle }));
       }
     }
   } finally {

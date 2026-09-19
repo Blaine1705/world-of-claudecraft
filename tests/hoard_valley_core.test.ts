@@ -6,7 +6,9 @@ import {
   hoardValleyProfile,
   hoardValleyRevealZ,
   hoardValleySpanAtZ,
+  hoardValleySurfaceTint,
 } from '../src/render/hoard_valley_core';
+import { VAULT_ZONE_IDS } from '../src/sim/rift/vault_seed';
 
 const layout: HoardValleyLayoutInput = {
   zMin: -19,
@@ -29,7 +31,17 @@ const layout: HoardValleyLayoutInput = {
 };
 
 describe('hoard valley visual plan', () => {
+  it('keeps authored surfaces readable while cooling them at midnight', () => {
+    expect(hoardValleySurfaceTint({ fog: [1, 1, 1], nightAmt: 0 })).toEqual([1, 1, 1]);
+    const midnight = hoardValleySurfaceTint({ fog: [0.14, 0.2, 0.32], nightAmt: 1 });
+    expect(midnight[0]).toBeGreaterThanOrEqual(0.75);
+    expect(midnight[1]).toBeGreaterThanOrEqual(0.82);
+    expect(midnight[2]).toBeGreaterThanOrEqual(0.93);
+    expect(midnight[2]).toBeGreaterThan(midnight[0]);
+  });
+
   it('owns a distinct ground, fog and dressing identity for every dig-site zone', () => {
+    expect([...HOARD_VALLEY_ZONE_IDS].sort()).toEqual([...VAULT_ZONE_IDS].sort());
     expect(HOARD_VALLEY_ZONE_IDS).toHaveLength(8);
     expect(new Set(HOARD_VALLEY_ZONE_IDS.map((id) => hoardValleyProfile(id).biome)).size).toBe(8);
     expect(new Set(HOARD_VALLEY_ZONE_IDS.map((id) => hoardValleyProfile(id).ground)).size).toBe(8);

@@ -6,6 +6,7 @@
 import * as THREE from 'three';
 import { resolveUiEffectsProfile, type UiEffectsProfile } from '../game/ui_effects_profile';
 import type { RiftFloorPlan } from '../sim/rift/types';
+import { type DayNightGrade, duskWarmAmount, nightSkyDesat } from './day_night_core';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import type { GfxTier } from './gfx';
 import {
@@ -13,10 +14,12 @@ import {
   type HoardValleyDressingKind,
   type HoardValleyDressingPlacement,
   type HoardValleyPlan,
+  hoardValleySurfaceTint,
   isHoardValleyZoneId,
 } from './hoard_valley_core';
 import { setRenderCategory } from './renderer_diagnostics';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
+import type { SkyView } from './sky';
 
 export type HoardValleyEffectsProfile = Pick<UiEffectsProfile, 'tier' | 'heavyShadows'>;
 
@@ -34,6 +37,7 @@ export interface HoardValleyBuildOptions {
   plan: RiftFloorPlan;
   offset: { x: number; y: number; z: number };
   effectsProfile: HoardValleyEffectsProfile;
+  prepareEnvironment?: () => Promise<unknown>;
 }
 
 export interface HoardValleyView {
@@ -50,6 +54,7 @@ let spireGeometry: THREE.ConeGeometry | null = null;
 let branchGeometry: THREE.BoxGeometry | null = null;
 let bloomGeometry: THREE.OctahedronGeometry | null = null;
 let valleyMaterial: THREE.MeshBasicMaterial | null = null;
+let valleyShadowMaterial: THREE.ShadowMaterial | null = null;
 
 function paintFacets<T extends THREE.BufferGeometry>(geometry: T): T {
   const normals = geometry.getAttribute('normal');
@@ -94,9 +99,31 @@ function coloredMaterial(name: string): THREE.Material {
   return valleyMaterial;
 }
 
-/** Grade the hand-painted facet fill with the same live tint as the valley fog. */
-export function updateHoardValleyDayNight(grade: { fog: readonly [number, number, number] }): void {
-  valleyMaterial?.color.setRGB(grade.fog[0], grade.fog[1], grade.fog[2]);
+/** Grade the hand-painted facet fill with a readable version of the live night tint. */
+export function updateHoardValleyDayNight(grade: {
+  fog: readonly [number, number, number];
+  nightAmt: number;
+}): void {
+  const tint = hoardValleySurfaceTint(grade);
+  valleyMaterial?.color.setRGB(tint[0], tint[1], tint[2]);
+}
+
+/** Low keeps the cheap sky but still follows the valley's live day/night clock. */
+export function updateHoardValleySkyDayNight(
+  sky: Pick<SkyView, 'dome' | 'setDayNight' | 'setCycle'>,
+  grade: DayNightGrade,
+  sunDir: THREE.Vector3,
+): void {
+  sky.setDayNight(grade.sky);
+  sky.setCycle(sunDir, duskWarmAmount(sunDir.y), nightSkyDesat(grade.nightAmt));
+  const material = sky.dome.material;
+  if (!Array.isArray(material) && material.type === 'MeshBasicMaterial') {
+    (material as THREE.MeshBasicMaterial).color.setRGB(
+      Math.max(0.18, grade.sky[0]),
+      Math.max(0.22, grade.sky[1]),
+      Math.max(0.38, grade.sky[2]),
+    );
+  }
 }
 
 function writeInstance(
@@ -115,23 +142,21 @@ function writeInstance(
   mesh.setColorAt(index, new THREE.Color(color));
 }
 
-function finishInstances(mesh: THREE.InstancedMesh, shadows: boolean): THREE.InstancedMesh {
+function finishInstances(
+  mesh: THREE.InstancedMesh,
+  castShadow: boolean,
+  receiveShadow = false,
+): THREE.InstancedMesh {
   mesh.instanceMatrix.needsUpdate = true;
   if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-  mesh.castShadow = shadows;
-  mesh.receiveShadow = shadows;
+  mesh.castShadow = castShadow;
+  mesh.receiveShadow = receiveShadow;
   mesh.computeBoundingBox();
   mesh.computeBoundingSphere();
   return mesh;
 }
 
-function buildGround(plan: HoardValleyPlan, shadows: boolean): THREE.InstancedMesh {
-  const mesh = new THREE.InstancedMesh(
-    sharedGeometries().ground,
-    coloredMaterial('HoardValleyGround'),
-    plan.ground.length,
-  );
-  mesh.name = 'HoardValleyGround';
+function writeGroundInstances(mesh: THREE.InstancedMesh, plan: HoardValleyPlan): void {
   const matrix = new THREE.Matrix4();
   const quaternion = new THREE.Quaternion();
   const rotation = new THREE.Euler();
@@ -150,7 +175,35 @@ function buildGround(plan: HoardValleyPlan, shadows: boolean): THREE.InstancedMe
       quaternion,
     );
   }
-  return finishInstances(mesh, shadows);
+}
+
+function buildGround(plan: HoardValleyPlan, shadows: boolean): THREE.Group {
+  const group = new THREE.Group();
+  group.name = 'HoardValleyGroundLayer';
+  const mesh = new THREE.InstancedMesh(
+    sharedGeometries().ground,
+    coloredMaterial('HoardValleyGround'),
+    plan.ground.length,
+  );
+  mesh.name = 'HoardValleyGround';
+  writeGroundInstances(mesh, plan);
+  group.add(finishInstances(mesh, false));
+  if (shadows) {
+    valleyShadowMaterial ??= markSharedMaterial(
+      new THREE.ShadowMaterial({ color: 0x13202a, opacity: 0.2, depthWrite: false }),
+    );
+    const catcher = new THREE.InstancedMesh(
+      sharedGeometries().ground,
+      valleyShadowMaterial,
+      plan.ground.length,
+    );
+    catcher.name = 'HoardValleyGroundShadows';
+    writeGroundInstances(catcher, plan);
+    catcher.position.y = 0.012;
+    catcher.renderOrder = 1;
+    group.add(finishInstances(catcher, false, true));
+  }
+  return group;
 }
 
 function buildCliffs(plan: HoardValleyPlan, shadows: boolean): THREE.InstancedMesh {
@@ -373,10 +426,15 @@ class HoardValleyViewImpl implements HoardValleyView {
     this.group.userData.hoardValleyRevealZ = outdoor.valleyStartZ ?? visualPlan.revealZ;
     setRenderCategory(this.group, 'dungeon');
     valleyOwners.set(this.group, this);
+    const environmentReady = options.prepareEnvironment?.().catch(() => undefined);
+    const compileGate = environmentReady
+      ? (target: THREE.Object3D) =>
+          Promise.all([environmentReady, options.compileGate?.(target)]).then(() => undefined)
+      : options.compileGate;
     this.readyForEntry = attachSceneGroupGated(
       options.scene,
       this.group,
-      options.compileGate,
+      compileGate,
       () => this.disposed,
     ).catch(() => {
       // Retirement cancels an in-flight gate. The owner has already detached it.

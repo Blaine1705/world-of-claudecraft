@@ -40,6 +40,28 @@ export interface HoardValleyZoneProfile {
   dressing: HoardValleyDressingKind;
 }
 
+export interface HoardValleyDayNightGrade {
+  fog: readonly [number, number, number];
+  nightAmt: number;
+}
+
+/**
+ * MeshBasic keeps valley colors stable across presets, so its material tint
+ * carries only the cool night grade. Keep most authored albedo at midnight:
+ * combat silhouettes and telegraphs need a readable floor even without lamps.
+ */
+export function hoardValleySurfaceTint(
+  grade: HoardValleyDayNightGrade,
+): readonly [number, number, number] {
+  const night = Math.max(0, Math.min(1, grade.nightAmt));
+  const target: readonly [number, number, number] = [
+    0.72 + Math.max(0, Math.min(1, grade.fog[0])) * 0.28,
+    0.78 + Math.max(0, Math.min(1, grade.fog[1])) * 0.22,
+    0.9 + Math.max(0, Math.min(1, grade.fog[2])) * 0.1,
+  ];
+  return [1 + (target[0] - 1) * night, 1 + (target[1] - 1) * night, 1 + (target[2] - 1) * night];
+}
+
 export const HOARD_VALLEY_ZONE_PROFILES: Record<HoardValleyZoneId, HoardValleyZoneProfile> = {
   amberfall: {
     biome: 'amber',

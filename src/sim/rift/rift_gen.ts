@@ -911,12 +911,7 @@ export function generateRiftFloor(
   const rollers = planRollers(rng, geo, isBoss, iceZone !== null, hazards.length > 0);
   const platform = outdoorZone
     ? null
-    : planPlatform(
-        rng,
-        geo,
-        isBoss,
-        rollers.length > 0 || iceZone !== null || hazards.length > 0,
-      );
+    : planPlatform(rng, geo, isBoss, rollers.length > 0 || iceZone !== null || hazards.length > 0);
   // A switch-gate is the mechanic for a subset of otherwise-plain floors (no puzzle,
   // hazard, roller, ice, or platform), so exactly one headline mechanic reads.
   const gate =

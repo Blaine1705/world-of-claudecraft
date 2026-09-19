@@ -56,6 +56,7 @@ import {
 const MAX_DEV_SPAWNS = 20;
 const DEV_SPAWN_RADIUS = 4;
 const DEV_SPAWN_RING_SIZE = 8;
+const MAX_ORDINARY_RIFT_SEED = 1_000_000_000;
 
 function clampInteger(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, Math.floor(value)));
@@ -898,7 +899,17 @@ export function handleDevChat(
   if (portalMatch) {
     const e = ctx.entities.get(pid);
     if (!e) return null;
-    let seed = (portalMatch[1] ? Number(portalMatch[1]) : ctx.rng.int(1, 1_000_000_000)) >>> 0;
+    const suppliedSeed = portalMatch[1] ? Number(portalMatch[1]) : null;
+    if (
+      suppliedSeed !== null &&
+      (!Number.isSafeInteger(suppliedSeed) ||
+        suppliedSeed < 1 ||
+        suppliedSeed > MAX_ORDINARY_RIFT_SEED)
+    ) {
+      ctx.error(pid, `[dev] Portal seed must be between 1 and ${MAX_ORDINARY_RIFT_SEED}.`);
+      return null;
+    }
+    let seed = suppliedSeed ?? ctx.rng.int(1, MAX_ORDINARY_RIFT_SEED);
     const kind = portalMatch[4]?.toLowerCase();
     if (kind) {
       const wantSetPiece = kind === 'infernal' || kind === 'citadel';

@@ -71,17 +71,17 @@ export function makeVaultSeed(
   random: number,
   metadata?: VaultSeedMetadata,
 ): number {
-  if (!metadata)
-    return (LEGACY_VAULT_FLAG | (tier << 28) | (random & LEGACY_RANDOM_MASK)) >>> 0;
+  if (!metadata) return (LEGACY_VAULT_FLAG | (tier << 28) | (random & LEGACY_RANDOM_MASK)) >>> 0;
   const zoneIndex = VAULT_ZONE_IDS.indexOf(metadata.zoneId);
   if (zoneIndex < 0) throw new Error(`Unknown vault zone: ${metadata.zoneId}`);
   return (
-    METADATA_VAULT_FLAG |
-    (tier << 28) |
-    (metadata.open ? OPEN_FLAG : 0) |
-    (zoneIndex << ZONE_SHIFT) |
-    (random & METADATA_RANDOM_MASK)
-  ) >>> 0;
+    (METADATA_VAULT_FLAG |
+      (tier << 28) |
+      (metadata.open ? OPEN_FLAG : 0) |
+      (zoneIndex << ZONE_SHIFT) |
+      (random & METADATA_RANDOM_MASK)) >>>
+    0
+  );
 }
 
 /** The Buried Hoard's entrance object: a Rift entrance under its own template,

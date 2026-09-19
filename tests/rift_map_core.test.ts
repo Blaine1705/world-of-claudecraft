@@ -9,8 +9,8 @@ import {
   riftFloorMapKey,
   riftLayoutBounds,
   riftLocalToCanvas,
-  riftMapValleyGround,
   riftMapTransform,
+  riftMapValleyGround,
 } from '../src/ui/hud/rift/rift_map_core';
 import { mapWindowMode } from '../src/ui/map_window_view';
 import { minimapMode } from '../src/ui/minimap_markers';

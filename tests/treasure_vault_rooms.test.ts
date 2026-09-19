@@ -7,7 +7,6 @@ import { describe, expect, it } from 'vitest';
 import { TREASURE_SITES } from '../src/sim/content/treasure_maps';
 import { RIFT_REGION_HALF_X, RIFT_REGION_HALF_Z } from '../src/sim/data';
 import { polygonIsStarShaped, polygonSelfIntersects } from '../src/sim/geometry2d';
-import { Rng } from '../src/sim/rng';
 import { buildHoardValleyLayout } from '../src/sim/rift/hoard_valley';
 import { RIFT_RANK_BASE_LEVEL } from '../src/sim/rift/ranks';
 import { generateRiftFloor, isSetPieceSeed, riftFloorCount } from '../src/sim/rift/rift_gen';
@@ -20,6 +19,7 @@ import {
   vaultSeedTier,
   vaultSeedZone,
 } from '../src/sim/rift/vault_seed';
+import { Rng } from '../src/sim/rng';
 
 const TIERS: VaultSizeTier[] = [0, 1, 2, 3];
 const LEVELS = [
@@ -66,6 +66,20 @@ describe('vault seeds', () => {
       }
     }
     expect(OPEN_HOARD_RARITIES).toEqual(['epic', 'legendary']);
+  });
+
+  it('pins the metadata bit layout and treats unknown zone indexes as caves', () => {
+    const seed = makeVaultSeed(3, 0x123456, { open: true, zoneId: 'galecrest' });
+    expect(seed).toBe(0x7b923456);
+    expect(vaultSeedTier(seed)).toBe(3);
+    expect(vaultSeedOpen(seed)).toBe(true);
+    expect(vaultSeedZone(seed)).toBe('galecrest');
+
+    const unknownZoneSeed = 0x4f800001;
+    expect(vaultSeedTier(unknownZoneSeed)).toBe(0);
+    expect(vaultSeedOpen(unknownZoneSeed)).toBe(true);
+    expect(vaultSeedZone(unknownZoneSeed)).toBeNull();
+    expect(generateRiftFloor(unknownZoneSeed, LEVELS[0], 0).outdoor).toBeUndefined();
   });
 });
 
@@ -188,6 +202,13 @@ describe('the hidden valley vault', () => {
     expect(second.colliders).toEqual(first.colliders);
     expect(second.gorgeEndZ).toBe(first.gorgeEndZ);
     expect(second.valleyStartZ).toBe(first.valleyStartZ);
+  });
+
+  it('regenerates the complete floor after the floor-plan cache evicts it', () => {
+    const seed = makeVaultSeed(3, 12345, { open: true, zoneId: 'palmreach' });
+    const first = JSON.stringify(generateRiftFloor(seed, LEVELS[3], 0));
+    for (let i = 0; i < 140; i++) generateRiftFloor(100_000 + i, LEVELS[0], 0);
+    expect(JSON.stringify(generateRiftFloor(seed, LEVELS[3], 0))).toBe(first);
   });
 
   it('keeps metadata cave hoards on the original room generator', () => {

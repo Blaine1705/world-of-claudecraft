@@ -1,10 +1,11 @@
 import * as THREE from 'three';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   buildHoardValley,
   disposeHoardValleyGroup,
   resolveHoardValleyEffectsProfile,
   updateHoardValleyDayNight,
+  updateHoardValleySkyDayNight,
 } from '../src/render/hoard_valley';
 import type { RiftFloorPlan } from '../src/sim/rift/types';
 
@@ -61,6 +62,27 @@ function floorPlan(): RiftFloorPlan {
 }
 
 describe('hoard valley painter', () => {
+  it('grades the basic low-preset sky through the live night cycle', () => {
+    const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const setDayNight = vi.fn();
+    const setCycle = vi.fn();
+    updateHoardValleySkyDayNight(
+      { dome: new THREE.Mesh(new THREE.SphereGeometry(1), material), setDayNight, setCycle },
+      {
+        lightScale: 0.2,
+        ambientScale: 0.3,
+        sky: [0.08, 0.12, 0.24],
+        fog: [0.14, 0.2, 0.32],
+        farScale: 0.8,
+        nightAmt: 1,
+      },
+      new THREE.Vector3(0, -1, 0),
+    );
+    expect(material.color.toArray()).toEqual([0.18, 0.22, 0.38]);
+    expect(setDayNight).toHaveBeenCalledWith([0.08, 0.12, 0.24]);
+    expect(setCycle).toHaveBeenCalledOnce();
+  });
+
   it('attaches hidden through the GPU compile gate and seats at the instance offset', async () => {
     const scene = new THREE.Scene();
     let release = (): void => {};
@@ -87,6 +109,33 @@ describe('hoard valley painter', () => {
     view.dispose();
   });
 
+  it('holds reveal for both environment preparation and shader compilation', async () => {
+    const scene = new THREE.Scene();
+    let releaseEnvironment = (): void => {};
+    let releaseCompile = (): void => {};
+    const view = buildHoardValley({
+      scene,
+      prepareEnvironment: () =>
+        new Promise<void>((resolve) => {
+          releaseEnvironment = resolve;
+        }),
+      compileGate: () =>
+        new Promise<void>((resolve) => {
+          releaseCompile = resolve;
+        }),
+      plan: floorPlan(),
+      offset: { x: 0, y: 0, z: 0 },
+      effectsProfile: resolveHoardValleyEffectsProfile('high'),
+    });
+    releaseCompile();
+    await Promise.resolve();
+    expect(view.group.visible).toBe(false);
+    releaseEnvironment();
+    await view.readyForEntry;
+    expect(view.group.visible).toBe(true);
+    view.dispose();
+  });
+
   it('builds shared-resource instancing for the ground, boundary and zone props', async () => {
     const scene = new THREE.Scene();
     const view = buildHoardValley({
@@ -95,23 +144,42 @@ describe('hoard valley painter', () => {
       offset: { x: 0, y: 0, z: 0 },
       effectsProfile: resolveHoardValleyEffectsProfile('ultra'),
     });
+    const secondView = buildHoardValley({
+      scene,
+      plan: floorPlan(),
+      offset: { x: 80, y: 0, z: 0 },
+      effectsProfile: resolveHoardValleyEffectsProfile('ultra'),
+    });
     await view.readyForEntry;
+    await secondView.readyForEntry;
     const instances: THREE.InstancedMesh[] = [];
+    const secondInstances: THREE.InstancedMesh[] = [];
     view.group.traverse((object) => {
       if (object instanceof THREE.InstancedMesh) instances.push(object);
     });
+    secondView.group.traverse((object) => {
+      if (object instanceof THREE.InstancedMesh) secondInstances.push(object);
+    });
     expect(instances.map((mesh) => mesh.name)).toContain('HoardValleyGround');
     expect(instances.map((mesh) => mesh.name)).toContain('HoardValleyBoundaryCliffs');
-    expect(instances.length).toBeLessThanOrEqual(5);
+    expect(instances.length).toBeLessThanOrEqual(6);
     for (const mesh of instances) {
       expect(mesh.geometry.userData.sharedRendererResource).toBe(true);
       expect((mesh.material as THREE.Material).userData.sharedRendererResource).toBe(true);
       expect(mesh.geometry.getAttribute('color')).toBeDefined();
     }
-    updateHoardValleyDayNight({ fog: [0.14, 0.2, 0.32] });
+    expect(secondInstances.map((mesh) => mesh.name)).toEqual(instances.map((mesh) => mesh.name));
+    for (let i = 0; i < instances.length; i++) {
+      expect(secondInstances[i].geometry).toBe(instances[i].geometry);
+      expect(secondInstances[i].material).toBe(instances[i].material);
+    }
+    expect(instances.some((mesh) => mesh.name === 'HoardValleyGroundShadows')).toBe(true);
+    updateHoardValleyDayNight({ fog: [0.14, 0.2, 0.32], nightAmt: 1 });
     const material = instances[0].material as THREE.MeshBasicMaterial;
-    expect(material.color.toArray()).toEqual([0.14, 0.2, 0.32]);
-    updateHoardValleyDayNight({ fog: [1, 1, 1] });
+    expect(material.color.r).toBeGreaterThanOrEqual(0.75);
+    expect(material.color.b).toBeGreaterThan(material.color.r);
+    updateHoardValleyDayNight({ fog: [1, 1, 1], nightAmt: 0 });
+    secondView.dispose();
     view.dispose();
   });
 
@@ -125,6 +193,7 @@ describe('hoard valley painter', () => {
     });
     await view.readyForEntry;
     const ground = view.group.getObjectByName('HoardValleyGround') as THREE.InstancedMesh;
+    expect(view.group.getObjectByName('HoardValleyGroundShadows')).toBeUndefined();
     let disposed = false;
     ground.addEventListener('dispose', () => {
       disposed = true;

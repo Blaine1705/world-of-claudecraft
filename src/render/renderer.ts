@@ -394,11 +394,9 @@ import {
   disposeHoardValleyGroup,
   resolveHoardValleyEffectsProfile,
   updateHoardValleyDayNight,
+  updateHoardValleySkyDayNight,
 } from './hoard_valley';
-import {
-  type HoardValleyEnvironment,
-  resolveHoardValleyEnvironment,
-} from './hoard_valley_environment';
+import { resolveHoardValleyEnvironment } from './hoard_valley_environment';
 import { buildHollowGates, type HollowGatesView } from './hollow_gates';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { idleSlot } from './idle_queue';
@@ -5049,7 +5047,7 @@ export class Renderer {
     // it there left a black void above the ramparts).
     this.sky.visible = isOpenAirFogState(this.fogState);
     if (this.sky.visible) {
-      const valleySky = this.hoardValleyEnvironment?.sky;
+      const valleySky = resolveHoardValleyEnvironment(this.sim.riftFloor)?.sky;
       this.skyView.setCameraPos(
         valleySky?.x ?? this.camera.position.x,
         valleySky?.z ?? this.camera.position.z,
@@ -8767,7 +8765,6 @@ export class Renderer {
   // Re-applied rift fog is keyed by the floor descriptor (seed:floorIndex) so a
   // descent (same 'rift' fogState, different palette) still refreshes the fog.
   private riftFogKey: string | null = null;
-  private hoardValleyEnvironment: HoardValleyEnvironment | null = null;
   // Cached with riftFogKey: whether the current rift floor is an authored set
   // piece, so the per-frame lighting read avoids regenerating the floor.
   private riftFogAuthored = false;
@@ -9099,7 +9096,6 @@ export class Renderer {
     this.vistaEntrySettlePending = false;
     const riftFloor = inside && isRiftPos(px) ? this.sim.riftFloor : null;
     const valley = resolveHoardValleyEnvironment(riftFloor);
-    this.hoardValleyEnvironment = valley;
     const biome = valley?.profile.biome ?? zoneBiomeAt(this.sim.player.pos.x, pz);
     // Per-biome god-ray strength, eased over about half a second so a border
     // crossing fades the shafts with the rest of the ambience.
@@ -9224,6 +9220,16 @@ export class Renderer {
                     plan: floor,
                     offset: { x: o.x, y: 0, z: o.z },
                     effectsProfile: resolveHoardValleyEffectsProfile(GFX.effectsTier),
+                    prepareEnvironment:
+                      valley && GFX.standardMaterials
+                        ? () =>
+                            this.prepareZoneSky(
+                              zoneAt(valley.sky.x, valley.sky.z),
+                              valley.sky.x,
+                              valley.sky.z,
+                              false,
+                            )
+                        : undefined,
                   }).group,
                 )
               : this.ensureDungeons().buildInterior(floor.style.kit, o.x, o.z, {
@@ -9390,7 +9396,10 @@ export class Renderer {
       dt,
       ZONE_ENVIRONMENT_RESPONSE,
     );
-    if (valley) updateHoardValleyDayNight(this.dnGrade);
+    if (valley) {
+      updateHoardValleyDayNight(this.dnGrade);
+      updateHoardValleySkyDayNight(this.skyView, this.dnGrade, this.sunDir);
+    }
     // Every open-air state follows the live grade. Thornhollow keeps its
     // authored fog range while sharing the overworld's color and light grade.
     if (usesLiveDayNightLighting(desired)) {
@@ -11877,7 +11886,7 @@ export class Renderer {
     this.sky.position.set(this.camera.position.x, 0, this.camera.position.z);
     this.sky.visible = isOpenAirFogState(this.fogState);
     if (this.sky.visible) {
-      const valleySky = this.hoardValleyEnvironment?.sky;
+      const valleySky = resolveHoardValleyEnvironment(this.sim.riftFloor)?.sky;
       this.skyView.setCameraPos(
         valleySky?.x ?? this.camera.position.x,
         valleySky?.z ?? this.camera.position.z,

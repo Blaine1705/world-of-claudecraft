@@ -126,6 +126,7 @@ try {
   });
 
   await new Promise((resolve) => setTimeout(resolve, 8000));
+  await profiler.sample({ ms: 5000, label: 'legendary-valley-warmup' });
   const sample = await profiler.sample({ ms: sampleMs, label: 'legendary-valley-low-landscape' });
   const evidence = {
     measuredAt: new Date().toISOString(),
@@ -133,6 +134,7 @@ try {
     graphicsPreset: 'low',
     adaptiveGovernor: false,
     browserMode: 'headed-real-gpu',
+    warmupMs: 5000,
     sampleMs,
     machine: {
       platform: os.platform(),
