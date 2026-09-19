@@ -45,11 +45,11 @@ function inTown(seed = 21) {
   const internals = sim as unknown as SimInternals;
   const pid = sim.addPlayer('warrior', 'Alpha');
   sim.tick();
-  const e = internals.entities.get(pid)!;
+  const e = requireEntity(internals, pid);
   e.pos = { x: ZONE1.hub.x, y: 0, z: ZONE1.hub.z };
   e.prevPos = { ...e.pos };
   sim.drainEvents();
-  return { sim, internals, pid, meta: internals.players.get(pid)! };
+  return { sim, internals, pid, meta: requirePlayerMeta(internals, pid) };
 }
 
 function noticesOf(sim: Sim): string[] {
@@ -64,6 +64,34 @@ function requirePendingTownFocus(meta: PlayerMeta): PendingTownFocus {
   expect(pending).not.toBeNull();
   if (!pending) throw new Error('expected pending Town Focus re-spec');
   return pending;
+}
+
+function requireEntity(internals: SimInternals, pid: number): Entity {
+  const entity = internals.entities.get(pid);
+  expect(entity).toBeDefined();
+  if (!entity) throw new Error(`expected entity ${pid}`);
+  return entity;
+}
+
+function requirePlayerMeta(internals: SimInternals, pid: number): PlayerMeta {
+  const meta = internals.players.get(pid);
+  expect(meta).toBeDefined();
+  if (!meta) throw new Error(`expected player meta ${pid}`);
+  return meta;
+}
+
+function requireCharacterState(state: CharacterState | null | undefined): CharacterState {
+  expect(state).toBeDefined();
+  if (!state) throw new Error('expected serialized character state');
+  return state;
+}
+
+function requirePendingTownFocusView(
+  view: ReturnType<typeof townFocusPendingView>,
+): NonNullable<ReturnType<typeof townFocusPendingView>> {
+  expect(view).not.toBeNull();
+  if (!view) throw new Error('expected pending Town Focus view');
+  return view;
 }
 
 // ---------------------------------------------------------------------------
@@ -166,7 +194,7 @@ describe('town_focus_pending leaf', () => {
     expect(townFocusPendingView(undefined, 100)).toBeNull();
     // Cloned, never the live allocation: a panel draft mutating its rows
     // must not reach into the queue.
-    const view = townFocusPendingView(pending, 100)!;
+    const view = requirePendingTownFocusView(townFocusPendingView(pending, 100));
     expect(view.allocation).not.toBe(pending.allocation);
   });
 
@@ -197,7 +225,7 @@ describe('a queued town-focus re-spec through real Sim persistence', () => {
     expect(sim.townFocusFor(pid)).toEqual({});
     // Wait out part of it on the first Sim.
     sim.time = 200;
-    const state = sim.serializeCharacter(pid)!;
+    const state = requireCharacterState(sim.serializeCharacter(pid));
     expect(state.pendingTownFocus).toEqual({
       allocation: { silk: 10 },
       remainingSeconds: 10 * TIME_PER_POINT_S - 200,
@@ -222,7 +250,9 @@ describe('a queued town-focus re-spec through real Sim persistence', () => {
     expect(reloaded.townFocusFor(pid2)).toEqual({ silk: 10 });
     expect(reloaded.townFocusPendingFor(pid2)).toBeNull();
     // Resolved on the new Sim exactly once: a second save carries nothing.
-    expect(Object.hasOwn(reloaded.serializeCharacter(pid2)!, 'pendingTownFocus')).toBe(false);
+    expect(
+      Object.hasOwn(requireCharacterState(reloaded.serializeCharacter(pid2)), 'pendingTownFocus'),
+    ).toBe(false);
   });
 
   it('a JSON round trip (the JSONB column shape) keeps the queue', () => {
@@ -239,7 +269,7 @@ describe('a queued town-focus re-spec through real Sim persistence', () => {
 
   it('a pre-feature save (no key) and an idle player both load with nothing queued', () => {
     const { sim, pid } = inTown();
-    const state = sim.serializeCharacter(pid)!;
+    const state = requireCharacterState(sim.serializeCharacter(pid));
     expect(Object.hasOwn(state, 'pendingTownFocus')).toBe(false);
     const reloaded = new Sim({ seed: 5, playerClass: 'warrior', noPlayer: true });
     const pid2 = reloaded.addPlayer('warrior', 'Alpha', { state });
@@ -249,13 +279,15 @@ describe('a queued town-focus re-spec through real Sim persistence', () => {
   it('a malformed persisted queue loads as nothing queued and does not poison the save', () => {
     const { sim, pid } = inTown();
     const junk = {
-      ...sim.serializeCharacter(pid)!,
+      ...requireCharacterState(sim.serializeCharacter(pid)),
       pendingTownFocus: { allocation: { silk: 1 }, remainingSeconds: 'soon' },
     } as unknown as CharacterState;
     const reloaded = new Sim({ seed: 6, playerClass: 'warrior', noPlayer: true });
     const pid2 = reloaded.addPlayer('warrior', 'Alpha', { state: junk });
     expect(reloaded.townFocusPendingFor(pid2)).toBeNull();
-    expect(Object.hasOwn(reloaded.serializeCharacter(pid2)!, 'pendingTownFocus')).toBe(false);
+    expect(
+      Object.hasOwn(requireCharacterState(reloaded.serializeCharacter(pid2)), 'pendingTownFocus'),
+    ).toBe(false);
   });
 
   it('a reloaded paid queue still re-checks affordability at resolution', () => {
@@ -263,14 +295,14 @@ describe('a queued town-focus re-spec through real Sim persistence', () => {
     meta.copper = 1000;
     sim.addItem('arcane_dust', 10, pid);
     sim.setTownFocus({ hide: 2 }, 'timeAndPartial', pid);
-    const state = sim.serializeCharacter(pid)!;
+    const state = requireCharacterState(sim.serializeCharacter(pid));
     expect(state.pendingTownFocus).toMatchObject({ coin: 10, materials: 2 });
 
     const reloaded = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true });
     const pid2 = reloaded.addPlayer('warrior', 'Alpha', { state });
     // Spend the purse before it resolves: the reload must cancel, not charge
     // into the negative.
-    (reloaded as unknown as SimInternals).players.get(pid2)!.copper = 0;
+    requirePlayerMeta(reloaded as unknown as SimInternals, pid2).copper = 0;
     reloaded.time = 1000;
     reloaded.drainEvents();
     const ticked = reloaded.tick().map((ev) => (ev as { text?: string }).text);
@@ -379,7 +411,7 @@ describe('IWorld townFocusPending', () => {
   it('the Sim primary-player getter mirrors the per-pid reader', () => {
     const sim = new Sim({ seed: 9, playerClass: 'warrior' });
     const pid = sim.playerId;
-    const e = sim.entities.get(pid)!;
+    const e = requireEntity(sim as unknown as SimInternals, pid);
     e.pos = sim.groundPos(ZONE1.hub.x, ZONE1.hub.z);
     e.prevPos = { ...e.pos };
     expect(sim.townFocusPending).toBeNull();
