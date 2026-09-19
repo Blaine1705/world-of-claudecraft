@@ -6883,6 +6883,26 @@
         "rift_feather_glider",
         "schematic_clockwork_shock_bomb"
       ]
+    },
+    {
+      "batchId": "buried-hoard-treasure-maps-2026-09-19",
+      "source": "OpenAI built-in image generation, one dedicated generation per rarity; reviewed and normalized locally",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "clue_scroll.webp controlled scroll readability and small-size composition; linen_pouch.webp and eastbrook_buckler.webp controlled the hand-painted material treatment, lighting, dark vignette and focal edges. firebottle.webp controlled the ink bottle silhouette and contained liquid rendering.",
+      "commonPrompt": "Premium hand-painted classic fantasy MMORPG inventory art for the Buried Hoard treasure map family on an opaque dark painted vignette. Each map rarity keeps the parchment and red X silhouette while gaining distinct cord, seal and metalwork. Cartographer's Ink uses a stout blue-black ink bottle, quill and blank parchment strip. Warm top-left key light, cool deep shadow, safe margins, no text, UI border, watermark, transparency, person, chest, portal or crop.",
+      "provenanceRecord": "docs/achievements/buried-hoard-treasure-maps-2026-09-19/accepted-art.json",
+      "itemIds": [
+        "cartographers_ink",
+        "treasure_map_common",
+        "treasure_map_rare",
+        "treasure_map_epic",
+        "treasure_map_legendary"
+      ]
     }
   ]
 }
