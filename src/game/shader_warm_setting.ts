@@ -32,11 +32,15 @@ let subscribed = false;
  *  runs at the client's first policy call, so it must answer with the store
  *  that holds the player's current value.
  *
- *  The row is LIVE, and `shaderWarm` is not a graphics rebuild key, so nothing
- *  else re-reads it: the settings broadcast (Settings.save, one per persisted
- *  write) is what tells the client the player moved the row, so switching to
- *  Off retires the worker and its second WebGL2 context in the same session
- *  instead of at the next start. */
+ *  While the options row is withdrawn (shader_warm_client_core.ts,
+ *  SHADER_WARM_OPTION_OFFERED) the worker reads every stored value as `auto`
+ *  and the subscription below changes nothing; the character-select corpus
+ *  still reads the value registered here. Once the row is offered it is LIVE,
+ *  and `shaderWarm` is not a graphics rebuild key, so nothing else re-reads
+ *  it: the settings broadcast (Settings.save, one per persisted write) is what
+ *  tells the client the player moved the row, so switching to Off retires the
+ *  worker and its second WebGL2 context in the same session instead of at the
+ *  next start. */
 export function registerShaderWarmSetting(readValue: () => number): void {
   setShaderWarmStoredSettingSource(() => {
     try {

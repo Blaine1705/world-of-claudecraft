@@ -267,7 +267,8 @@ function workerStoredSetting(): string | null {
 }
 
 /** The stored option as registered, for the character-select corpus
- *  (src/game/shader_cache_warmup.ts), which honours the same Off. */
+ *  (src/game/shader_cache_warmup.ts), which honours a stored Off even while
+ *  the options row is withdrawn and the worker reads the value as `auto`. */
 export function storedShaderWarmSetting(): string | null {
   return storedSettingSource();
 }

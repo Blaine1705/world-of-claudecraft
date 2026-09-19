@@ -248,11 +248,12 @@ export interface OptionsEnv {
    *  launch keeps it. Outranks the reading above: a player must not leave the
    *  panel believing a pick took when the shell never stored it. */
   desktopGpuBackendWriteFailed?: boolean;
-  /** Whether the shader warm-up worker is a real choice on this host. False on
-   *  iOS, where shaderWarmModeFor() forces the worker off whatever the setting
-   *  (a second WebGL2 context is a per-process memory ceiling risk on
-   *  phone-class WebKit), so the row and its note would both be lies. Absent
-   *  means yes, which is what every non-iOS caller wants. */
+  /** Whether the shader warm-up worker is a real choice on this host
+   *  (shaderWarmChoiceAvailable). False everywhere while the row is withdrawn
+   *  (SHADER_WARM_OPTION_OFFERED), and always on iOS, where shaderWarmModeFor()
+   *  forces the worker off whatever the setting (a second WebGL2 context is a
+   *  per-process memory ceiling risk on phone-class WebKit), so the row and its
+   *  note would both be lies. Absent means yes. */
   shaderWarmChoice?: boolean;
   /** What a stored frame rate ceiling does on the display as it reads right
    *  now (src/game/frame_rate_cap_setting.ts frameRateCapReading): the rate is
@@ -706,9 +707,10 @@ export function buildGraphicsSections(
     capRow.statusKey = 'hudChrome.options.frameRateCapStatusInert';
   }
   system.push(capRow, note('hudChrome.options.frameRateCapNote'));
-  // iOS forces the worker off whatever the setting says, so the row would be a
-  // control that changes nothing under a note promising On is forced
-  // everywhere. Absent means yes: every other host keeps the pair byte for byte.
+  // The caller says whether the row is a real choice (withdrawn everywhere
+  // today; never on iOS, which forces the worker off whatever the setting). A
+  // row that changes nothing under a note promising otherwise is left out.
+  // Absent means yes, for a caller that owns no such rule.
   if (env.shaderWarmChoice !== false) {
     system.push(
       choice(s, 'shaderWarm', 'hudChrome.options.shaderWarm', shaderWarmOptions),
