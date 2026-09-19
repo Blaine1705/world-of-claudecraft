@@ -60,6 +60,7 @@ export interface HostDiagRunResult {
 }
 
 export declare const APP_EXE_NAME_RE: RegExp;
+export declare const BROWSER_EXE_NAMES: readonly string[];
 export declare const GAME_INFO_KEYS: readonly string[];
 export declare const GPU_INFO_TIMEOUT_MS: number;
 export declare const HOST_DIAG_KIND: string;

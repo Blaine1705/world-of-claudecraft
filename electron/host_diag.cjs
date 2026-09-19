@@ -160,30 +160,39 @@ function sha256Hex(bytes) {
 }
 
 /**
+ * The web browsers the tool also looks at. The game is played in a browser too,
+ * and a player who reports a slow browser session is asked to send this same
+ * report: what answers them is the NVIDIA profile and the Windows per-app GPU
+ * preference of THEIR BROWSER (a driver-shipped browser profile can override a
+ * global "prefer maximum performance"), plus the browsers collector (installed
+ * version, hardware acceleration switched off). A fixed list, written here.
+ */
+const BROWSER_EXE_NAMES = Object.freeze([
+  'chrome.exe',
+  'msedge.exe',
+  'firefox.exe',
+  'brave.exe',
+  'opera.exe',
+]);
+
+/**
  * The FIXED argv. No shell, no string command line, no option value that came
- * from anywhere but this file, with the single audited exception of the exe name
- * (APP_EXE_NAME_RE above), which is replaced by the tool's `_none_` sentinel
+ * from anywhere but this file, with the single audited exception of the app's
+ * own exe name (APP_EXE_NAME_RE above), which is simply left out of the list
  * when it does not match.
  * -StdoutJson keeps the report in this process (nothing is written where the
  * player did not ask for it); the default Snapshot mode keeps the run at about
  * 5 s with no live sampling.
  *
- * `-Skip browsers` always. The game does not run in a web browser, so that
- * collector answers nothing here, and it is the one collector that reads files
- * inside a browser profile directory: a read this shell has no reason to
- * perform. The collector stays in the tool for standalone use (SCHEMA.md), it
- * just never rides in the shipped run.
- *
- * `-Apps _none_` rather than an omitted -Apps when the exe name is rejected or
- * absent. Omitting it would fall back to the script's OWN default list, which is
- * the five browser executables: the tool would then look up NVIDIA profiles and
- * Windows GPU preferences for programs the player never asked about. `_none_` is
- * the sentinel the script filters out (an empty app list), so the lookup is for
- * this game or for nothing.
+ * -Apps is ALWAYS passed explicitly (the tool splits it on commas): this game
+ * first, then BROWSER_EXE_NAMES. The list the player is told about is the one
+ * written in this file, never the tool's own default.
  */
 function buildHostDiagArgs({ scriptPath, appExeName } = {}) {
-  const usableExeName =
-    typeof appExeName === 'string' && APP_EXE_NAME_RE.test(appExeName) ? appExeName : '_none_';
+  const apps =
+    typeof appExeName === 'string' && APP_EXE_NAME_RE.test(appExeName)
+      ? [appExeName, ...BROWSER_EXE_NAMES]
+      : [...BROWSER_EXE_NAMES];
   return [
     '-NoProfile',
     '-NonInteractive',
@@ -192,10 +201,8 @@ function buildHostDiagArgs({ scriptPath, appExeName } = {}) {
     '-File',
     String(scriptPath ?? ''),
     '-StdoutJson',
-    '-Skip',
-    'browsers',
     '-Apps',
-    usableExeName,
+    apps.join(','),
   ];
 }
 
@@ -803,6 +810,7 @@ async function saveHostDiagFile(text, deps = {}) {
 
 module.exports = {
   APP_EXE_NAME_RE,
+  BROWSER_EXE_NAMES,
   GAME_INFO_KEYS,
   GPU_INFO_TIMEOUT_MS,
   HOST_DIAG_KIND,

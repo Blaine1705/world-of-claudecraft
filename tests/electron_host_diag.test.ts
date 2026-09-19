@@ -8,6 +8,7 @@ import {
   APP_EXE_NAME_RE,
   appExeNameFor,
   assembleHostDiagReport,
+  BROWSER_EXE_NAMES,
   buildHostDiagArgs,
   collectElectronHostInfo,
   flattenSwitchPairs,
@@ -118,7 +119,7 @@ describe('powershellExe / hostDiagScriptPath', () => {
 });
 
 describe('buildHostDiagArgs (the FIXED argv)', () => {
-  it('pins the exact argv, in order, with the app exe name appended', () => {
+  it('pins the exact argv, in order: this game first, then the fixed browser list', () => {
     expect(
       buildHostDiagArgs({ scriptPath: SCRIPT, appExeName: 'World of ClaudeCraft.exe' }),
     ).toEqual([
@@ -129,30 +130,31 @@ describe('buildHostDiagArgs (the FIXED argv)', () => {
       '-File',
       SCRIPT,
       '-StdoutJson',
-      '-Skip',
-      'browsers',
       '-Apps',
-      'World of ClaudeCraft.exe',
+      'World of ClaudeCraft.exe,chrome.exe,msedge.exe,firefox.exe,brave.exe,opera.exe',
     ]);
   });
 
-  it('always skips the browsers collector, whatever the exe name is', () => {
-    // The game is not a web browser, so that collector answers nothing here, and
-    // it is the one collector that reads inside a browser profile directory: a
-    // read this shell has no reason to perform. It stays in the tool for
-    // standalone use; it never rides in the shipped run.
+  it('never skips the browsers collector: browser players send this same report', () => {
+    // The game is played in a web browser too. What answers a slow browser
+    // session is the browser's own NVIDIA profile and Windows GPU preference plus
+    // the browsers collector, so neither may quietly drop out of the shipped run.
+    expect(BROWSER_EXE_NAMES).toEqual([
+      'chrome.exe',
+      'msedge.exe',
+      'firefox.exe',
+      'brave.exe',
+      'opera.exe',
+    ]);
     for (const appExeName of ['World of ClaudeCraft.exe', 'nope', undefined]) {
       const args = buildHostDiagArgs({ scriptPath: SCRIPT, appExeName });
-      expect(args[args.indexOf('-Skip') + 1], `for ${String(appExeName)}`).toBe('browsers');
+      expect(args, `for ${String(appExeName)}`).not.toContain('-Skip');
     }
   });
 
-  it('passes the _none_ sentinel rather than a name it cannot vouch for', () => {
-    // Never sanitized, and never OMITTED either: dropping -Apps would hand the
-    // run to the script's OWN default list, which is the five browser
-    // executables, so the tool would look up NVIDIA profiles and Windows GPU
-    // preferences for programs the player never asked about. '_none_' is the
-    // sentinel the script filters to an empty app list.
+  it('leaves out a name it cannot vouch for and keeps the explicit browser list', () => {
+    // Never sanitized, and -Apps is never OMITTED either: the list the player is
+    // told about is the one written in host_diag.cjs, not the tool's own default.
     for (const name of [
       '..\\..\\evil.exe',
       'C:\\Windows\\System32\\cmd.exe',
@@ -160,6 +162,7 @@ describe('buildHostDiagArgs (the FIXED argv)', () => {
       '"quoted".exe',
       '   .exe',
       'game.exe; calc.exe',
+      'game.exe,calc.exe',
       `${'x'.repeat(61)}.exe`,
       'game.bat',
       'game',
@@ -176,15 +179,14 @@ describe('buildHostDiagArgs (the FIXED argv)', () => {
         '-File',
         SCRIPT,
         '-StdoutJson',
-        '-Skip',
-        'browsers',
         '-Apps',
-        '_none_',
+        'chrome.exe,msedge.exe,firefox.exe,brave.exe,opera.exe',
       ]);
     }
     const noName = buildHostDiagArgs({ scriptPath: SCRIPT });
-    expect(noName).toContain('-Apps');
-    expect(noName[noName.indexOf('-Apps') + 1]).toBe('_none_');
+    expect(noName[noName.indexOf('-Apps') + 1]).toBe(
+      'chrome.exe,msedge.exe,firefox.exe,brave.exe,opera.exe',
+    );
   });
 
   it('accepts the real shipped exe names and refuses a path or a quote', () => {
@@ -255,10 +257,8 @@ describe('runNativeHostDiag', () => {
       '-File',
       SCRIPT,
       '-StdoutJson',
-      '-Skip',
-      'browsers',
       '-Apps',
-      'World of ClaudeCraft.exe',
+      'World of ClaudeCraft.exe,chrome.exe,msedge.exe,firefox.exe,brave.exe,opera.exe',
     ]);
     // toEqual on the WHOLE object: an added `shell: true`, a dropped
     // windowsHide (a console window flashing over a full-screen game), or a

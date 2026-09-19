@@ -1746,6 +1746,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hostDiag.containsDisplays': 'ディスプレイ構成: 画面の数、解像度、リフレッシュレート。',
   'hudChrome.hostDiag.containsPrograms':
     'プロセッサーとメモリを最も多く使用しているプログラムの名前。',
+  'hudChrome.hostDiag.containsBrowsers':
+    'インストールされているウェブブラウザーとそのバージョン、ハードウェアアクセラレーションが有効かどうか。',
   'hudChrome.hostDiag.containsGame':
     'ゲームとランチャーのバージョン、現在のグラフィック設定とゾーン、そしてこのレポートをゲームがすでに送信しているパフォーマンスデータと照合するためのセッションコード。',
   'hudChrome.hostDiag.privacy':

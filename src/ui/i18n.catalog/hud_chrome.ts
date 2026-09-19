@@ -3253,6 +3253,8 @@ export const hudChromeStrings = {
     containsNvidia: 'NVIDIA Control Panel settings, when that software is installed.',
     containsDisplays: 'Your display setup: how many screens, their size, and their refresh rate.',
     containsPrograms: 'The names of the programs using the most processor time and memory.',
+    containsBrowsers:
+      'Which web browsers are installed, their version, and whether hardware acceleration is turned on.',
     containsGame:
       'Game and launcher versions, your current graphics settings and zone, and a session code that lets us match this report with the performance data the game already sends.',
     privacy:

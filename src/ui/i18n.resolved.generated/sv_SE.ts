@@ -2529,6 +2529,7 @@ export const sv_SE: EnTranslations = {
       "containsNvidia": "NVIDIA Control Panel settings, when that software is installed.",
       "containsDisplays": "Your display setup: how many screens, their size, and their refresh rate.",
       "containsPrograms": "The names of the programs using the most processor time and memory.",
+      "containsBrowsers": "Which web browsers are installed, their version, and whether hardware acceleration is turned on.",
       "containsGame": "Game and launcher versions, your current graphics settings and zone, and a session code that lets us match this report with the performance data the game already sends.",
       "privacy": "It does not include your files, your user name, or your account details. Your computer name is not included: a random code takes its place. Nothing is sent automatically: the report is a file saved on your computer, and you choose who gets it.",
       "create": "Create report",

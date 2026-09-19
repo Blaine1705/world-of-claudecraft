@@ -1733,6 +1733,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hostDiag.containsNvidia': 'NVIDIA 제어판 설정(해당 소프트웨어가 설치된 경우).',
   'hudChrome.hostDiag.containsDisplays': '디스플레이 구성: 화면 수, 해상도, 주사율.',
   'hudChrome.hostDiag.containsPrograms': '프로세서와 메모리를 가장 많이 사용하는 프로그램의 이름.',
+  'hudChrome.hostDiag.containsBrowsers': '설치된 웹 브라우저와 그 버전, 하드웨어 가속 사용 여부.',
   'hudChrome.hostDiag.containsGame':
     '게임 및 런처 버전, 현재 그래픽 설정과 지역, 그리고 이 보고서를 게임이 이미 전송하는 성능 데이터와 연결해 주는 세션 코드.',
   'hudChrome.hostDiag.privacy':

@@ -68,6 +68,7 @@ const CONTENTS_KEYS: readonly TranslationKey[] = [
   'hudChrome.hostDiag.containsNvidia',
   'hudChrome.hostDiag.containsDisplays',
   'hudChrome.hostDiag.containsPrograms',
+  'hudChrome.hostDiag.containsBrowsers',
   'hudChrome.hostDiag.containsGame',
 ];
 

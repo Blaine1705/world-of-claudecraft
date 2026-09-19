@@ -1682,6 +1682,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hostDiag.containsNvidia': 'NVIDIA 控制面板設定（如果已安裝該軟體）。',
   'hudChrome.hostDiag.containsDisplays': '顯示器配置：螢幕數量、解析度和更新率。',
   'hudChrome.hostDiag.containsPrograms': '佔用處理器和記憶體最多的程式名稱。',
+  'hudChrome.hostDiag.containsBrowsers': '已安裝的網頁瀏覽器及其版本，以及是否開啟了硬體加速。',
   'hudChrome.hostDiag.containsGame':
     '遊戲和啟動器版本、目前的圖形設定和區域，以及一組工作階段代碼，用來將這份報告與遊戲已經傳送的效能資料對應起來。',
   'hudChrome.hostDiag.privacy':

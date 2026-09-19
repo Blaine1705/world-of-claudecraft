@@ -10338,6 +10338,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.harvestPreference.title'
   | 'hudChrome.harvestPreference.unknownMaterial'
   | 'hudChrome.hostDiag.busy'
+  | 'hudChrome.hostDiag.containsBrowsers'
   | 'hudChrome.hostDiag.containsDisplays'
   | 'hudChrome.hostDiag.containsGame'
   | 'hudChrome.hostDiag.containsHardware'

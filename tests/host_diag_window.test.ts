@@ -101,6 +101,7 @@ describe('host_diag_window: structure', () => {
       t('hudChrome.hostDiag.containsNvidia'),
       t('hudChrome.hostDiag.containsDisplays'),
       t('hudChrome.hostDiag.containsPrograms'),
+      t('hudChrome.hostDiag.containsBrowsers'),
       t('hudChrome.hostDiag.containsGame'),
     ]);
     // The two lines that manage the player's expectations: nothing is uploaded,

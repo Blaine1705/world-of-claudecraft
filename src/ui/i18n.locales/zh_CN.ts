@@ -1680,6 +1680,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hostDiag.containsNvidia': 'NVIDIA 控制面板设置（如果已安装该软件）。',
   'hudChrome.hostDiag.containsDisplays': '显示器配置：屏幕数量、分辨率和刷新率。',
   'hudChrome.hostDiag.containsPrograms': '占用处理器和内存最多的程序的名称。',
+  'hudChrome.hostDiag.containsBrowsers': '已安装的网页浏览器及其版本，以及是否开启了硬件加速。',
   'hudChrome.hostDiag.containsGame':
     '游戏和启动器版本、当前的图形设置和区域，以及一个会话代码，用于将这份报告与游戏已经发送的性能数据对应起来。',
   'hudChrome.hostDiag.privacy':

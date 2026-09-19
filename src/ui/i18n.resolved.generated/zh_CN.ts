@@ -2529,6 +2529,7 @@ export const zh_CN: EnTranslations = {
       "containsNvidia": "NVIDIA 控制面板设置（如果已安装该软件）。",
       "containsDisplays": "显示器配置：屏幕数量、分辨率和刷新率。",
       "containsPrograms": "占用处理器和内存最多的程序的名称。",
+      "containsBrowsers": "已安装的网页浏览器及其版本，以及是否开启了硬件加速。",
       "containsGame": "游戏和启动器版本、当前的图形设置和区域，以及一个会话代码，用于将这份报告与游戏已经发送的性能数据对应起来。",
       "privacy": "报告不包含你的文件、用户名或账号信息。你的电脑名称也不会包含在内，而是由一个随机代码代替。不会自动发送任何内容：报告是保存在你电脑上的一个文件，由你决定发给谁。",
       "create": "创建报告",
