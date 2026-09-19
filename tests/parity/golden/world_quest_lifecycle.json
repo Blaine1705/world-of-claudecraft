@@ -679,8 +679,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "75c4f6e1",
-      "events": "043d914d",
+      "state": "ee2dacea",
+      "events": "2e9e090a",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -710,6 +710,7 @@
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
+          "copper": 3100,
           "counters": {
             "questProgress": 6,
             "questsCompleted": 1,
@@ -868,8 +869,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "1ca05a2c",
-      "events": "a1378836",
+      "state": "a761d62d",
+      "events": "0de17699",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -899,11 +900,11 @@
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 6000,
+          "copper": 9300,
           "counters": {
             "questProgress": 22,
             "questsCompleted": 3,
-            "xpGained": 2784
+            "xpGained": 8352
           },
           "craftDaily": {},
           "craftSkills": {},
@@ -949,7 +950,7 @@
               "itemId": "rift_essence"
             }
           ],
-          "lifetimeXp": 169984,
+          "lifetimeXp": 175552,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
@@ -1085,7 +1086,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "f8ed87eb",
+      "state": "93c48bea",
       "events": "f061f193",
       "rng": {
         "draws": 0,
@@ -1116,11 +1117,11 @@
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 6000,
+          "copper": 9300,
           "counters": {
             "questProgress": 22,
             "questsCompleted": 3,
-            "xpGained": 2784
+            "xpGained": 8352
           },
           "craftDaily": {},
           "craftSkills": {},
@@ -1166,7 +1167,7 @@
               "itemId": "rift_essence"
             }
           ],
-          "lifetimeXp": 169984,
+          "lifetimeXp": 175552,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
@@ -1280,7 +1281,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "f8ed87eb",
+      "state": "93c48bea",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1311,11 +1312,11 @@
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 6000,
+          "copper": 9300,
           "counters": {
             "questProgress": 22,
             "questsCompleted": 3,
-            "xpGained": 2784
+            "xpGained": 8352
           },
           "craftDaily": {},
           "craftSkills": {},
@@ -1361,7 +1362,7 @@
               "itemId": "rift_essence"
             }
           ],
-          "lifetimeXp": 169984,
+          "lifetimeXp": 175552,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
