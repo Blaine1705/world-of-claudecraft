@@ -10800,7 +10800,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.rowWeather':
     "Pioggia ambientale e neve. Solo atmosfera e spegnendolo si risparmia un po' durante i temporali.",
   'guide.settingsPage.tableFoot':
-    "Cerchi un limite di FPS? Non c'è nulla da cercare: la cadenza dei fotogrammi segue il tuo schermo. La distanza di disegno è una manopola a sé, Distanza visiva, nella scheda Dettaglio del mondo, e ogni preset la imposta per te finché non la sposti tu.",
+    'La distanza di disegno è una manopola a sé, Distanza visiva, nella scheda Dettaglio del mondo, e ogni preset la imposta per te finché non la sposti tu.',
   'guide.settingsPage.tableHeading': 'Ogni opzione grafica, spiegata',
   'guide.settingsPage.tagReload': 'premi Applica',
   'guide.settingsPage.value100': '100%',

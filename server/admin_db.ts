@@ -501,6 +501,9 @@ export interface PerfRawRow {
   gfxTier: string;
   autoGovernor: boolean;
   targetFps: number;
+  frameCapIntent: number;
+  cadenceDivisor: number;
+  refreshHz: number;
   renderScale: number;
   effectiveRenderScale: number;
   fpsAvg: number;
@@ -744,6 +747,7 @@ export async function clientPerfRaw(
     `SELECT
        id, created_at, release_version, build_id, session_id, account_id, character_id, realm,
        graphics_preset, gfx_tier, auto_governor, target_fps, render_scale, effective_render_scale,
+       frame_cap_intent, cadence_divisor, refresh_hz,
        fps_avg, frame_p95_ms, frame_p99_ms, long_frame_count,
        renderer_calls, renderer_triangles, renderer_textures, renderer_programs, context_lost_count,
        long_task_count, long_task_p95_ms, memory_used_mb, memory_limit_mb,
@@ -772,6 +776,9 @@ export async function clientPerfRaw(
     gfxTier: r.gfx_tier,
     autoGovernor: r.auto_governor,
     targetFps: r.target_fps,
+    frameCapIntent: r.frame_cap_intent,
+    cadenceDivisor: r.cadence_divisor,
+    refreshHz: r.refresh_hz,
     renderScale: r.render_scale,
     effectiveRenderScale: r.effective_render_scale,
     fpsAvg: r.fps_avg,

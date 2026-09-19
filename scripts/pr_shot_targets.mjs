@@ -142,6 +142,14 @@ const advancedLowMixSeed = async (page) => {
 
 // Controller layout evidence needs the cross hotbar enabled, PlayStation glyphs,
 // and the reported remap already staged: Cross jumps while Triangle is unbound.
+// The Frame Rate Limit row at 30, on the standing lowest preset, so its status
+// line (the rate really obtained on this display) is part of the shot.
+const frameRateLimitSeed = async (page) => {
+  await page.evaluateOnNewDocument(
+    `try { const k = 'woc_settings'; const s = JSON.parse(localStorage.getItem(k) || '{}'); s.graphicsPreset = 1; s.graphicsDefaultApplied = true; s.frameRateCap = 3; localStorage.setItem(k, JSON.stringify(s)); } catch {}`,
+  );
+};
+
 // Seed before boot so both the manager and the options painter read one state.
 const controllerRemapSeed = async (page) => {
   await lowGraphicsSeed(page);
@@ -10060,6 +10068,41 @@ export const TARGETS = [
           .querySelector('[data-focus-key="shadowQuality:1"]')
           ?.scrollIntoView({ block: 'center' });
       });
+      return { clip: '#options-menu' };
+    },
+  },
+  {
+    key: 'graphics-options-frame-rate-limit',
+    label: 'Graphics options panel (System card, Frame Rate Limit row)',
+    when: ['game/frame_rate_cap_setting', 'game/frame_cadence'],
+    variants: [
+      { key: 'desktop', beforeLoad: frameRateLimitSeed },
+      { key: 'mobile', mobile: true, beforeLoad: frameRateLimitSeed },
+    ],
+    async capture(page) {
+      await dismissArrivalGreeting(page);
+      // The row states what the limit does on the display as measured, and the
+      // reading needs a few seconds of frames before it exists.
+      await wait(4000);
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        const hud = window.__game?.hud;
+        if (!hud) return;
+        const win = document.querySelector('#options-menu');
+        if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
+        hud.toggleOptionsMenu();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="graphics"]')?.click();
+      });
+      const open = await pollForSize(page, '#options-menu .set-rows');
+      if (!open) return {};
+      // On a base without the row the System card itself is the "before".
+      await page.evaluate(() => {
+        const row =
+          document.querySelector('[data-focus-key="frameRateCap:0"]') ??
+          document.querySelector('[data-focus-key="browserEffects:0"]');
+        row?.scrollIntoView({ block: 'center' });
+      });
+      await wait(300);
       return { clip: '#options-menu' };
     },
   },

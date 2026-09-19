@@ -120,4 +120,16 @@ ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS shader_warm_refusal TEX
 -- honest answer for every row older than the desktop shell itself. No index:
 -- the reads that split on it aggregate over a created_at window.
 ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS desktop_shell BOOLEAN NOT NULL DEFAULT FALSE;
+-- The frame rate ceiling the player chose: a session that renders at about 30
+-- fps ON PURPOSE must stay separable from a struggling machine, and the
+-- raw_summary.cadence block that also says so is shed under a size squeeze.
+-- frame_cap_intent is 0 (none), 30 or 60; cadence_divisor is how many display
+-- refresh slots one rendered frame spans (1 = ceiling inert); refresh_hz is
+-- the client's estimate of the display rate in WHOLE Hz (an INT on purpose:
+-- a finer reading would fingerprint the display) (0 = unknown, which with an intent
+-- set is the unpaced limiter). target_fps is the effective target from the
+-- same release on. Pre-column rows read as no ceiling, which is what they had.
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS frame_cap_intent INT NOT NULL DEFAULT 0;
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS cadence_divisor INT NOT NULL DEFAULT 1;
+ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS refresh_hz INT NOT NULL DEFAULT 0;
 `;

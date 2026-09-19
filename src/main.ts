@@ -94,6 +94,7 @@ import {
   suspendActiveEntryDiagnostics,
 } from './game/entry_diagnostics';
 import { ferryPrewarmTargetFor } from './game/ferry_prewarm';
+import { armFrameAndSkip } from './game/frame_cadence_wiring';
 import { createGameRenderer, validateGameRenderer } from './game/game_renderer';
 import { GamepadManager } from './game/gamepad';
 import { createGamepadActivityNotifier } from './game/gamepad_activity_notify';
@@ -572,8 +573,7 @@ import {
   needsWalletReauth,
   walletChangeErrorText,
 } from './ui/wallet_reauth_prompt';
-import type { IWorld } from './world_api';
-import { ONLINE_WORLD_INCOMPATIBLE_MESSAGE } from './world_api';
+import { type IWorld, ONLINE_WORLD_INCOMPATIBLE_MESSAGE } from './world_api';
 
 const CLICK_MOVE_TURN_RATE = 4.2; // rad/sec; responsive turning while the camera stays decoupled from click spam
 const CLICK_MOVE_WAYPOINT_STOP = 0.8; // yards; intermediate A* corners should roll through, not stutter-stop
@@ -4226,7 +4226,7 @@ async function startGame(
   // synchronously before returning a shared frozen decision.
   const gateInput = newPresentationGateInput(DESKTOP_APP);
   function frame(now: number): void {
-    requestAnimationFrame(frame);
+    if (armFrameAndSkip(frame, now, gateInput)) return;
     // The desktop shell keeps rAF running while hidden (backgroundThrottling is
     // off), so document.hidden never flips there and the shell push is the only
     // truthful hidden signal.

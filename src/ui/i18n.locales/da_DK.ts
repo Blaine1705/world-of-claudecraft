@@ -10525,7 +10525,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.rowWeather':
     'Omgivende regn og sne. Kun atmosfære, og at slukke for den sparer lidt under storme.',
   'guide.settingsPage.tableFoot':
-    'Leder du efter et FPS-loft? Der er ingenting at lede efter: billedtakten følger din skærm. Tegneafstanden er en knap for sig, Synsafstand, i kortet Verdensdetaljer, og hver forudindstilling sætter den for dig, indtil du selv flytter den.',
+    'Tegneafstanden er en knap for sig, Synsafstand, i kortet Verdensdetaljer, og hver forudindstilling sætter den for dig, indtil du selv flytter den.',
   'guide.settingsPage.tableHeading': 'Hver grafikmulighed, forklaret',
   'guide.settingsPage.tagReload': 'tryk på Anvend',
   'guide.settingsPage.value100': '100 %',

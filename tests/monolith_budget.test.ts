@@ -503,7 +503,11 @@ const MONOLITHS: MonolithRow[] = [
     // Interface entry that joined it) moved to
     // src/ui/options_main_menu_controller.ts; the window keeps only the
     // routing and the touch gate. Exact count, zero slack.
-    ceiling: 2831,
+    // LOWERED 2831 -> 2830 when the placeholder resolver the choice status line
+    // and the notes both carried moved to src/ui/options_text_values.ts (the
+    // Frame Rate Limit row and its numeric status line arrived in the same
+    // change). Exact count, zero slack.
+    ceiling: 2830,
     seam: 'a pure view model (src/ui/options_view.ts) painted with the shared settings_controls.ts builders; sub-panels as sibling modules',
   },
   {
