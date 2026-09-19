@@ -6,7 +6,8 @@ import type { HoardBossCue, HoardBossState, RiftInstance } from './types';
 
 export const HOARD_SWEEP_RANGE = 13;
 export const HOARD_SWEEP_HALF_ANGLE = Math.PI * 0.31;
-export const HOARD_SWEEP_WINDUP_SEC = 1.45;
+export const HOARD_SWEEP_WINDUP_SEC = 2.4;
+export const HOARD_SWEEP_ENRAGED_WINDUP_SEC = 2;
 export const HOARD_MARK_RADIUS = 3;
 export const HOARD_MARK_WINDUP_SEC = 2.1;
 export const HOARD_MARK_ENRAGED_WINDUP_SEC = 1.65;
@@ -220,7 +221,9 @@ function startSweep(
   inst: RiftInstance,
   boss: Entity,
   state: HoardBossState,
+  enraged: boolean,
 ): void {
+  const duration = enraged ? HOARD_SWEEP_ENRAGED_WINDUP_SEC : HOARD_SWEEP_WINDUP_SEC;
   const cue: HoardBossCue = {
     id: state.nextCueId++,
     kind: 'sweep',
@@ -229,8 +232,8 @@ function startSweep(
     facing: boss.facing,
     radius: HOARD_SWEEP_RANGE,
     halfAngle: HOARD_SWEEP_HALF_ANGLE,
-    remaining: HOARD_SWEEP_WINDUP_SEC,
-    total: HOARD_SWEEP_WINDUP_SEC,
+    remaining: duration,
+    total: duration,
   };
   state.cues.push(cue);
   emitCue(ctx, inst, cue);
@@ -284,14 +287,14 @@ export function tickHoardBossMechanics(ctx: SimContext): void {
     if (!inst.hoardBoss) inst.hoardBoss = createState();
     const state = inst.hoardBoss;
     tickCues(ctx, inst, boss, state);
+    if (state.cues.some((cue) => cue.kind === 'sweep' || cue.phase === 'warning')) continue;
     state.sweepTimer -= DT;
     state.markTimer -= DT;
-    if (state.cues.some((cue) => cue.kind === 'sweep' || cue.phase === 'warning')) continue;
     const mechanic = nextHoardBossMechanic(state.sweepTimer, state.markTimer);
     if (!mechanic) continue;
     const enraged = boss.hp / Math.max(1, boss.maxHp) <= 0.3;
     if (mechanic === 'sweep') {
-      startSweep(ctx, inst, boss, state);
+      startSweep(ctx, inst, boss, state, enraged);
       state.sweepTimer = enraged ? HOARD_SWEEP_ENRAGED_EVERY_SEC : HOARD_SWEEP_EVERY_SEC;
       continue;
     }

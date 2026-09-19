@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
-import { HoardBossFx } from '../src/render/hoard_boss_fx';
+import { HOARD_SWEEP_BANDS_NAME, HoardBossFx } from '../src/render/hoard_boss_fx';
 import type { HoardBossCueView } from '../src/world_api/dungeons';
 
 function cue(overrides: Partial<HoardBossCueView> = {}): HoardBossCueView {
@@ -75,6 +75,8 @@ describe('Buried Hoard boss actionable cues', () => {
     ]);
     const sweep = object(scene, 'hoard-boss-sweep');
     expect(sweep.visible).toBe(true);
+    const bands = object(sweep, HOARD_SWEEP_BANDS_NAME) as THREE.Mesh<THREE.BufferGeometry>;
+    expect(bands.geometry.getAttribute('position').count).toBe((40 + 1) * 2 * 4);
     expect(sweep.userData.halfAngle).toBeCloseTo(0.42);
     expect(verticalRange(sweep)).toBeGreaterThan(1);
     const position = (sweep.children[0] as THREE.Mesh<THREE.BufferGeometry>).geometry.getAttribute(

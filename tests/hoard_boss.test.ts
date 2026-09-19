@@ -6,6 +6,7 @@ import {
   HOARD_MARK_HAZARD_SEC,
   HOARD_MARK_HAZARD_TICK_SEC,
   HOARD_MARK_WINDUP_SEC,
+  HOARD_SWEEP_ENRAGED_WINDUP_SEC,
   HOARD_SWEEP_HALF_ANGLE,
   HOARD_SWEEP_RANGE,
   HOARD_SWEEP_WINDUP_SEC,
@@ -219,6 +220,24 @@ describe('Buried Hoard boss encounter', () => {
       type: 'hoardBossCueClear',
       pid: sim.player.id,
     });
+  });
+
+  it('keeps two seconds of frontal reaction time during the final phase', () => {
+    const { sim, inst, boss } = makeEncounter();
+    tickHoardBossMechanics(sim.ctx);
+    sim.drainEvents();
+    boss.hp = Math.floor(boss.maxHp * 0.29);
+    hoardState(inst).sweepTimer = 0;
+    hoardState(inst).markTimer = 99;
+    tickHoardBossMechanics(sim.ctx);
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({
+        type: 'hoardBossCue',
+        kind: 'sweep',
+        durationSecs: HOARD_SWEEP_ENRAGED_WINDUP_SEC,
+      }),
+    );
+    expect(HOARD_SWEEP_ENRAGED_WINDUP_SEC).toBeGreaterThanOrEqual(2);
   });
 
   it('switches the recurring mark cadence at the exact 30 percent boundary', () => {
