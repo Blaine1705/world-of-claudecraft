@@ -393,6 +393,7 @@ import {
   buildHoardValley,
   disposeHoardValleyGroup,
   resolveHoardValleyEffectsProfile,
+  updateHoardValleyDayNight,
 } from './hoard_valley';
 import {
   type HoardValleyEnvironment,
@@ -9389,6 +9390,7 @@ export class Renderer {
       dt,
       ZONE_ENVIRONMENT_RESPONSE,
     );
+    if (valley) updateHoardValleyDayNight(this.dnGrade);
     // Every open-air state follows the live grade. Thornhollow keeps its
     // authored fog range while sharing the overworld's color and light grade.
     if (usesLiveDayNightLighting(desired)) {

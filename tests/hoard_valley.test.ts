@@ -4,6 +4,7 @@ import {
   buildHoardValley,
   disposeHoardValleyGroup,
   resolveHoardValleyEffectsProfile,
+  updateHoardValleyDayNight,
 } from '../src/render/hoard_valley';
 import type { RiftFloorPlan } from '../src/sim/rift/types';
 
@@ -105,7 +106,12 @@ describe('hoard valley painter', () => {
     for (const mesh of instances) {
       expect(mesh.geometry.userData.sharedRendererResource).toBe(true);
       expect((mesh.material as THREE.Material).userData.sharedRendererResource).toBe(true);
+      expect(mesh.geometry.getAttribute('color')).toBeDefined();
     }
+    updateHoardValleyDayNight({ fog: [0.14, 0.2, 0.32] });
+    const material = instances[0].material as THREE.MeshBasicMaterial;
+    expect(material.color.toArray()).toEqual([0.14, 0.2, 0.32]);
+    updateHoardValleyDayNight({ fog: [1, 1, 1] });
     view.dispose();
   });
 

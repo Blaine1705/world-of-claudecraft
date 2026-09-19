@@ -8,7 +8,6 @@ import { resolveUiEffectsProfile, type UiEffectsProfile } from '../game/ui_effec
 import type { RiftFloorPlan } from '../sim/rift/types';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import type { GfxTier } from './gfx';
-import { surfaceMat } from './gfx';
 import {
   buildHoardValleyPlan,
   type HoardValleyDressingKind,
@@ -17,7 +16,7 @@ import {
   isHoardValleyZoneId,
 } from './hoard_valley_core';
 import { setRenderCategory } from './renderer_diagnostics';
-import { markSharedGeometry } from './shared_resource';
+import { markSharedGeometry, markSharedMaterial } from './shared_resource';
 
 export type HoardValleyEffectsProfile = Pick<UiEffectsProfile, 'tier' | 'heavyShadows'>;
 
@@ -50,15 +49,32 @@ let crownGeometry: THREE.DodecahedronGeometry | null = null;
 let spireGeometry: THREE.ConeGeometry | null = null;
 let branchGeometry: THREE.BoxGeometry | null = null;
 let bloomGeometry: THREE.OctahedronGeometry | null = null;
+let valleyMaterial: THREE.MeshBasicMaterial | null = null;
+
+function paintFacets<T extends THREE.BufferGeometry>(geometry: T): T {
+  const normals = geometry.getAttribute('normal');
+  const colors = new Float32Array(normals.count * 3);
+  for (let i = 0; i < normals.count; i++) {
+    const shade = Math.max(
+      0.5,
+      Math.min(1, 0.68 + Math.max(0, normals.getY(i)) * 0.25 + normals.getX(i) * 0.07),
+    );
+    colors[i * 3] = shade;
+    colors[i * 3 + 1] = shade;
+    colors[i * 3 + 2] = shade;
+  }
+  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  return geometry;
+}
 
 function sharedGeometries() {
-  groundGeometry ??= markSharedGeometry(new THREE.BoxGeometry(1, 1, 1));
-  cliffGeometry ??= markSharedGeometry(new THREE.DodecahedronGeometry(1, 0));
-  trunkGeometry ??= markSharedGeometry(new THREE.CylinderGeometry(0.38, 0.62, 4.8, 6));
-  crownGeometry ??= markSharedGeometry(new THREE.DodecahedronGeometry(1, 0));
-  spireGeometry ??= markSharedGeometry(new THREE.ConeGeometry(1, 4.5, 6));
-  branchGeometry ??= markSharedGeometry(new THREE.BoxGeometry(0.32, 3.6, 0.32));
-  bloomGeometry ??= markSharedGeometry(new THREE.OctahedronGeometry(0.7, 0));
+  groundGeometry ??= markSharedGeometry(paintFacets(new THREE.BoxGeometry(1, 1, 1)));
+  cliffGeometry ??= markSharedGeometry(paintFacets(new THREE.DodecahedronGeometry(1, 0)));
+  trunkGeometry ??= markSharedGeometry(paintFacets(new THREE.CylinderGeometry(0.38, 0.62, 4.8, 6)));
+  crownGeometry ??= markSharedGeometry(paintFacets(new THREE.DodecahedronGeometry(1, 0)));
+  spireGeometry ??= markSharedGeometry(paintFacets(new THREE.ConeGeometry(1, 4.5, 6)));
+  branchGeometry ??= markSharedGeometry(paintFacets(new THREE.BoxGeometry(0.32, 3.6, 0.32)));
+  bloomGeometry ??= markSharedGeometry(paintFacets(new THREE.OctahedronGeometry(0.7, 0)));
   return {
     ground: groundGeometry,
     cliff: cliffGeometry,
@@ -71,15 +87,16 @@ function sharedGeometries() {
 }
 
 function coloredMaterial(name: string): THREE.Material {
-  const material = surfaceMat({
-    color: 0xffffff,
-    vertexColors: true,
-    flatShading: true,
-    roughness: 0.93,
-    metalness: 0.01,
-  });
-  if (!material.name) material.name = name;
-  return material;
+  valleyMaterial ??= markSharedMaterial(
+    new THREE.MeshBasicMaterial({ color: 0xffffff, vertexColors: true, fog: true }),
+  );
+  if (!valleyMaterial.name) valleyMaterial.name = name;
+  return valleyMaterial;
+}
+
+/** Grade the hand-painted facet fill with the same live tint as the valley fog. */
+export function updateHoardValleyDayNight(grade: { fog: readonly [number, number, number] }): void {
+  valleyMaterial?.color.setRGB(grade.fog[0], grade.fog[1], grade.fog[2]);
 }
 
 function writeInstance(
@@ -125,7 +142,7 @@ function buildGround(plan: HoardValleyPlan, shadows: boolean): THREE.InstancedMe
     writeInstance(
       mesh,
       i,
-      position.set(strip.x, -0.16, strip.z),
+      position.set(strip.x, -0.12, strip.z),
       rotation.set(0, 0, 0),
       scale.set(strip.halfX * 2, 0.32, strip.halfZ * 2),
       strip.color,
