@@ -1077,7 +1077,9 @@ const MONOLITHS: MonolithRow[] = [
     // retire hooks to src/sim/loot/bop_trade_persistence.ts (main, v0.42.1),
     // composed with the release's own extractions above. Exact merged count,
     // zero slack.
-    ceiling: 11822,
+    // Rift slot initialization now lives in rift/instance_state.ts, shared by
+    // ordinary rifts and treasure hoards. The coordinator retains slot ownership.
+    ceiling: 11790,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

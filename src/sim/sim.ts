@@ -1,5 +1,3 @@
-import type { TreasureMapProgress } from './content/treasure_maps';
-import * as treasureVaultMod from './treasure_vault';
 import type {
   AccountCosmetics,
   ActionBarLayout,
@@ -50,8 +48,10 @@ import * as bankSocketsMod from './bank_sockets';
 import { extractTradableCopyImpl, grantTradableCopyImpl } from './broker_custody';
 import { campSpawnOffset } from './camp_scatter';
 import type { CharacterState, PetState } from './character_state';
+import type { TreasureMapProgress } from './content/treasure_maps';
 import type { FactionId } from './factions';
 import type { ItemCopyAnchor } from './item_copy_anchor';
+import * as treasureVaultMod from './treasure_vault';
 import type { CannonActionId, CannonPoint, VehicleSession } from './types';
 import * as vehicleMod from './vehicles';
 
@@ -741,6 +741,7 @@ import {
   onRecipeCraftedForQuests,
 } from './quests/quest_credit';
 import { migrateRestoredQuestProgress } from './quests/quest_progress_migration';
+import { createRiftInstance } from './rift/instance_state';
 import { type NaturalRiftPortal, updateRiftPortals as updateRiftPortalsImpl } from './rift/portals';
 import {
   type RiftForgeResult,
@@ -2518,56 +2519,7 @@ export class Sim {
 
     // Procedural rift instance pool (empty until a portal is entered).
     for (let i = 0; i < RIFT_SLOT_COUNT; i++) {
-      this.riftInstances.push({
-        slot: i,
-        instanceId: 0,
-        eventId: null,
-        partyKey: null,
-        memberIds: new Set(),
-        startedAt: 0,
-        finishedAt: null,
-        outcome: 'abandoned',
-        upgrade: null,
-        seed: 0,
-        baseLevel: 1,
-        floorIndex: 0,
-        floorCount: 0,
-        mobIds: [],
-        objectIds: [],
-        bossId: null,
-        bossDiedAtTick: null,
-        exitId: null,
-        descentAt: null,
-        descentId: null,
-        descentOpen: false,
-        pylonIds: [],
-        litPylons: new Set(),
-        pylonTotal: 0,
-        puzzleSolved: false,
-        boulderIds: [],
-        boulderPads: [],
-        seqRuneIds: [],
-        seqStep: 0,
-        beaconId: null,
-        rollerIds: [],
-        cacheId: null,
-        lockpick: null,
-        gateId: null,
-        switchId: null,
-        gateOpen: true,
-        minibossId: null,
-        orbId: null,
-        orbActive: false,
-        returnPos: { x: 0, z: 0 },
-        emptyFor: 0,
-        tier: null,
-        portalId: null,
-        rewarded: false,
-        vault: null,
-        progressed: false,
-        seqResetAt: -Infinity,
-        bossDeathZones: [],
-      });
+      this.riftInstances.push(createRiftInstance(i));
     }
 
     // Noticeboard collision reads the active WorldContent registry, so spawn

@@ -143,6 +143,7 @@ export const IWORLD_MEMBERS = [
   { name: 'worldQuestReplacements', kind: 'data' },
   { name: 'worldQuestRerollCycle', kind: 'data' },
   { name: 'clueHunt', kind: 'data' },
+  { name: 'treasureMap', kind: 'data' },
   // --- commands + read-returning methods ---
   { name: 'canRerollWorldQuest', kind: 'method' },
   { name: 'rerollWorldQuest', kind: 'method' },
@@ -897,8 +898,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // rerollWorldQuest (+2 methods). Plus the faction currency balances
     // factionCurrencies (+1 data). Counted 405/118/287 with the active clue
     // hunt readout clueHunt (+1 data) and abandonClueHunt (+1 method).
-    expect(IWORLD_MEMBERS.length).toBe(405);
-    expect(DATA_MEMBERS.length).toBe(118);
+    // The read treasureMap adds one data member, for 406/119/287.
+    expect(IWORLD_MEMBERS.length).toBe(406);
+    expect(DATA_MEMBERS.length).toBe(119);
     expect(METHOD_MEMBERS.length).toBe(287);
   });
   it('has no duplicate member names', () => {
@@ -1287,6 +1289,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'tradeRequest',
       'tradeSetOffer',
       'trainRecipe',
+      'treasureMap',
       'turnInQuest',
       'unbindItem',
       'unequipBag',
@@ -1426,6 +1429,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'toolEffectSlots',
       'townFocus',
       'tradeInfo',
+      'treasureMap',
       'unlockedMilestones',
       'vaultInfo',
       'vehicleSession',
@@ -1969,6 +1973,7 @@ const FACET_QUESTS = [
   'worldQuestRerollCycle',
   'canRerollWorldQuest',
   'rerollWorldQuest',
+  'treasureMap',
   'clueHunt',
   'abandonClueHunt',
 ] as const satisfies readonly (keyof IWorldQuests)[];
@@ -2508,10 +2513,10 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    // Mirrors the IWORLD_MEMBERS.length pin above (405); this pin and the one above
+    // Mirrors the IWORLD_MEMBERS.length pin above (406); this pin and the one above
     // must always agree.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(405);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(405);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(406);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(406);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

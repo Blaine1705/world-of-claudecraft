@@ -1389,6 +1389,7 @@ function identityFields(e: Entity): Record<string, unknown> {
   if (e.border) out.border = e.border; // Book of Deeds nameplate border (a deed id; the client resolves the slug)
   if (e.dungeonId) out.dgn = e.dungeonId;
   if (e.riftTier) out.rt = e.riftTier; // ranked rift portal badge (render-only)
+  if (e.vaultRarity) out.vr = e.vaultRarity; // buried-hoard rarity (render-only)
   if (e.objectItemId) out.obj = e.objectItemId;
   if (e.scale !== 1) out.sc = e.scale;
   if (e.color !== 0xffffff) out.c = e.color;

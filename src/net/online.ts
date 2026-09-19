@@ -2770,6 +2770,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         e.color = w.c ?? 0xffffff;
         e.dungeonId = w.dgn ?? null;
         e.riftTier = typeof w.rt === 'string' ? (w.rt as RiftTier) : undefined; // rift rank badge
+        e.vaultRarity = ['common', 'rare', 'epic', 'legendary'].includes(w.vr) ? w.vr : undefined;
         e.objectItemId = w.obj ?? null;
         e.guild = w.gd ?? '';
         e.pledgeGuild = w.pg ?? '';
