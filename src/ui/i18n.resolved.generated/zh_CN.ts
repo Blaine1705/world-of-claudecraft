@@ -5966,7 +5966,7 @@ export const zh_CN: EnTranslations = {
       "rewards": "奖励",
       "alsoReceive": "你还将获得：",
       "tally": "{count} / {required}",
-      "cacheDesc": "开启后获得一件你职业可用的普通团队副本装备（不含套装），外加{count}个{item}。",
+      "cacheDesc": "开启后获得一件你职业可用的装备，来自英雄地下城或上一个团队副本（尼思拉克西斯，普通），外加{count}个{item}。",
       "dialogNote": "同一时间只能有一项每周委托生效。它{reset}",
       "accept": "接受",
       "decline": "拒绝",

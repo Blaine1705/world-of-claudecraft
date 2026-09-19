@@ -5966,7 +5966,7 @@ export const ja_JP: EnTranslations = {
       "rewards": "報酬",
       "alsoReceive": "さらに受け取れるもの：",
       "tally": "{count} / {required}",
-      "cacheDesc": "開けると自分のクラスが装備できるノーマルレイド装備が一つ（ティアセットは除く）と、{item} x {count}が手に入ります。",
+      "cacheDesc": "開けると、ヒロイックダンジョンか前のレイド（ナイスラクシス、ノーマル）から、自分のクラスが使える装備が一つと、{item} x {count}が手に入ります。",
       "dialogNote": "週間の任務は同時に一つしか受けられません。{reset}",
       "accept": "受諾",
       "decline": "辞退",

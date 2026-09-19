@@ -71,7 +71,7 @@ describe('weekly quests view', () => {
     expect(dialog.rewardMoney).toBe(formatMoney(weeklyQuestRewardCopper(12)));
     expect(dialog.rewardItem).toBe("Emissary's Cache");
     expect(dialog.rewardItemIcon).toBe('ui/items/emissary_cache.webp');
-    expect(dialog.rewardItemDesc).toContain('Normal raid piece');
+    expect(dialog.rewardItemDesc).toContain('Heroic dungeon or the previous raid');
     expect(dialog.rewardItemDesc).toContain(`${EMISSARY_CACHE_MARKS} x Heroic Mark`);
     expect(dialog.note).toContain('resets in 3 days.');
     expect(dialog.art).toBe('ui/weekly/raid.webp');

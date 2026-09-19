@@ -17512,7 +17512,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.rewards': 'Награды',
   'hudChrome.weekly.alsoReceive': 'Вы также получите:',
   'hudChrome.weekly.tally': '{count} / {required}',
-  'hudChrome.weekly.cacheDesc': 'Открывается в один предмет из обычного рейда для вашего класса (никогда не часть комплекта), плюс {item} x {count}.',
+  'hudChrome.weekly.cacheDesc': 'Открывается в один предмет для вашего класса из героического подземелья или прошлого рейда (Нитраксис, обычный), плюс {item} x {count}.',
   'hudChrome.weekly.dialogNote': 'Активным может быть только одно еженедельное поручение. Оно {reset}',
   'hudChrome.weekly.accept': 'Принять',
   'hudChrome.weekly.decline': 'Отклонить',

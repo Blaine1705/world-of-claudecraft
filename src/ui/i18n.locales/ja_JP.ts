@@ -17305,8 +17305,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.rewards': '報酬',
   'hudChrome.weekly.alsoReceive': 'さらに受け取れるもの：',
   'hudChrome.weekly.tally': '{count} / {required}',
-  'hudChrome.weekly.cacheDesc':
-    '開けると自分のクラスが装備できるノーマルレイド装備が一つ（ティアセットは除く）と、{item} x {count}が手に入ります。',
+  'hudChrome.weekly.cacheDesc': '開けると、ヒロイックダンジョンか前のレイド（ナイスラクシス、ノーマル）から、自分のクラスが使える装備が一つと、{item} x {count}が手に入ります。',
   'hudChrome.weekly.dialogNote': '週間の任務は同時に一つしか受けられません。{reset}',
   'hudChrome.weekly.accept': '受諾',
   'hudChrome.weekly.decline': '辞退',

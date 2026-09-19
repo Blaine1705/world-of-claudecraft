@@ -5966,7 +5966,7 @@ export const ko_KR: EnTranslations = {
       "rewards": "보상",
       "alsoReceive": "추가로 받는 것:",
       "tally": "{count} / {required}",
-      "cacheDesc": "열면 직업에 맞는 일반 공격대 장비 하나(티어 세트 제외)와 {item} x {count}를 얻습니다.",
+      "cacheDesc": "열면 영웅 던전이나 이전 공격대(나이트락시스, 일반)에서 직업에 맞는 장비 하나와 {item} x {count}를 얻습니다.",
       "dialogNote": "주간 임무는 동시에 하나만 활성화됩니다. {reset}",
       "accept": "수락",
       "decline": "거절",
