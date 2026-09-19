@@ -53,8 +53,8 @@ import { priestActionGlowActive } from '../../../sim/combat/priest/presentation'
 import { mendingCurrentTargetCapped } from '../../../sim/combat/shaman_spiritmend';
 import { flowStateDiscountedCost } from '../../../sim/combat/shaman_talents';
 import { thundercallPayoffGlowActive } from '../../../sim/combat/shaman_thundercall';
-import { countRawInSlots } from '../../../sim/item_lock';
 import { getItemCooldownDuration } from '../../../sim/content/item_cooldowns';
+import { countRawInSlots } from '../../../sim/item_lock';
 import { isAscensionEmpoweredAbility } from '../../../sim/paladin_devotion';
 import {
   type AbilityDef,
@@ -544,7 +544,7 @@ export function createActionBarView(
           const directCd = player.cooldowns.get(item.id) ?? 0;
           const cdRemaining = potionCd > 0 ? potionCd : directCd;
           const baseCd = getItemCooldownDuration(item.id);
-          const totalCd = potionCd > 0 ? POTION_COOLDOWN : (baseCd > 0 ? baseCd : cdRemaining);
+          const totalCd = potionCd > 0 ? POTION_COOLDOWN : baseCd > 0 ? baseCd : cdRemaining;
 
           slot.kind = 'item';
           slot.abilityId = null;
@@ -556,15 +556,14 @@ export function createActionBarView(
             cdRemaining > 0
               ? Math.min(
                   MAX_COOLDOWN_PERCENT,
-                  (cdRemaining / Math.max(COOLDOWN_DENOM_FLOOR, totalCd)) *
-                    MAX_COOLDOWN_PERCENT,
+                  (cdRemaining / Math.max(COOLDOWN_DENOM_FLOOR, totalCd)) * MAX_COOLDOWN_PERCENT,
                 )
               : 0;
           slot.cdText =
             cdRemaining > COOLDOWN_TEXT_THRESHOLD
-              ? (cdRemaining >= 60
-                  ? `${Math.ceil(cdRemaining / 60)}m`
-                  : deps.formatCount(Math.ceil(cdRemaining)))
+              ? cdRemaining >= 60
+                ? `${Math.ceil(cdRemaining / 60)}m`
+                : deps.formatCount(Math.ceil(cdRemaining))
               : '';
           slot.count = deps.formatCount(count);
           slot.isCharges = false;

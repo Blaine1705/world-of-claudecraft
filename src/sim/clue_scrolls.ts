@@ -18,8 +18,6 @@
 // English re-localized client-side by the sim_i18n matchers, like every other
 // sim refusal.
 
-import { TREASURE_MAP_ITEM_IDS } from './content/treasure_maps';
-import { rollTreasureMapRarity } from './treasure_vault';
 import { bagPools, canAddItem } from './bags';
 import {
   CLUE_HUNTS,
@@ -31,6 +29,7 @@ import {
   type ClueStepDef,
   TREASURE_CASKET_ITEM_ID,
 } from './content/clue_hunts';
+import { TREASURE_MAP_ITEM_IDS } from './content/treasure_maps';
 import { zoneAt } from './data';
 import {
   awardFactionReputation,
@@ -40,6 +39,7 @@ import {
 } from './factions';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
+import { rollTreasureMapRarity } from './treasure_vault';
 import { dist2d, type Entity, INTERACT_RANGE } from './types';
 import { playerActiveWorldQuests } from './world_quest_reroll';
 import { ALWAYS_ACTIVE_WORLD_QUEST_IDS } from './world_quest_rotation';

@@ -22,10 +22,7 @@ const ICONS = [
 
 async function main() {
   for (const icon of ICONS) {
-    await sharp(icon.src)
-      .resize(128, 128)
-      .webp({ quality: 90 })
-      .toFile(icon.dest);
+    await sharp(icon.src).resize(128, 128).webp({ quality: 90 }).toFile(icon.dest);
     console.log(`Generated ${path.basename(icon.dest)}`);
   }
 }

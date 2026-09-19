@@ -419,9 +419,10 @@ export function useClockworkShockBomb(
 
   ctx.emit({
     type: 'log',
-    text: hitCount > 0
-      ? `The Clockwork Shock Bomb detonates with an electric blast, striking ${hitCount} enemies!`
-      : 'The Clockwork Shock Bomb detonates with an electric blast!',
+    text:
+      hitCount > 0
+        ? `The Clockwork Shock Bomb detonates with an electric blast, striking ${hitCount} enemies!`
+        : 'The Clockwork Shock Bomb detonates with an electric blast!',
     color: '#ffd700',
     pid: meta.entityId,
   });

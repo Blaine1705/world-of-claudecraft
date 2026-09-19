@@ -19,9 +19,9 @@
 
 import { audio } from '../game/audio';
 import { BACKPACK_SLOTS, bagSlotsOf } from '../sim/bags';
+import { getItemCooldownDuration } from '../sim/content/item_cooldowns';
 import { ITEMS, QUESTS } from '../sim/data';
 import { FIREBOTTLE_COOLDOWN_SECS, FIREBOTTLE_ITEM_ID } from '../sim/interactions/firebottle_hut';
-import { getItemCooldownDuration } from '../sim/content/item_cooldowns';
 import { baggedCopyAnchor } from '../sim/item_copy_anchor';
 import { itemCopyPin, type NamedSlotTarget } from '../sim/item_copy_ref';
 import { isItemLocked } from '../sim/item_lock';

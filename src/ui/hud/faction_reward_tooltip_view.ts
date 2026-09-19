@@ -3,10 +3,7 @@ import { esc } from '../esc';
 import { t } from '../i18n';
 
 /** Tooltip description lines for allied faction rewards and consumables. */
-export function factionRewardTooltipLines(
-  item: ItemDef,
-  attunement?: string | null,
-): string {
+export function factionRewardTooltipLines(item: ItemDef, attunement?: string | null): string {
   if (item.id === 'allied_hearthstone') {
     const hubKey = attunement
       ? `hudChrome.factionRewards.hub_${attunement}`

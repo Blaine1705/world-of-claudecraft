@@ -45,8 +45,7 @@ const SCHOOL_AND_FX_LITERALS = new Set([
 function extractRiftFxCallArgs(src: string): string[] {
   const calls: string[] = [];
   const callRe = /riftFx\(/g;
-  let match: RegExpExecArray | null;
-  while ((match = callRe.exec(src))) {
+  for (const match of src.matchAll(callRe)) {
     const start = match.index + match[0].length;
     let depth = 1;
     let i = start;

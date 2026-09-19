@@ -32,10 +32,10 @@ import { doorPortalPreloadInternalsForTest } from '../src/render/door_portal';
 import { eastbrookGrandArmouryInternalsForTest } from '../src/render/eastbrook_grand_armoury';
 import { farmPatchesPreloadInternalsForTest } from '../src/render/farm_patches';
 import { fishPreloadInternalsForTest } from '../src/render/fish';
-import { hoardEntrancePreloadInternalsForTest } from '../src/render/hoard_entrance';
 import { galeFeaturesPreloadInternalsForTest } from '../src/render/gale_features';
 import { gardenFeaturesPreloadInternalsForTest } from '../src/render/garden_features';
 import { gatherNodePreloadInternalsForTest } from '../src/render/gather_nodes';
+import { hoardEntrancePreloadInternalsForTest } from '../src/render/hoard_entrance';
 import { ignivarEnvPropsInternalsForTest } from '../src/render/ignivar_env_props';
 import { mailboxPreloadInternalsForTest } from '../src/render/mailbox';
 import { propPreloadInternalsForTest } from '../src/render/props';
@@ -493,7 +493,8 @@ async function expectArmouryGlbContract(
 
 describe('GLB-replacement asset preload sets resolve to real, manifested files', () => {
   it('buried hoard entrance asset', () => {
-    for (const url of hoardEntrancePreloadInternalsForTest.urls) expectAssetExistsAndManifested(url);
+    for (const url of hoardEntrancePreloadInternalsForTest.urls)
+      expectAssetExistsAndManifested(url);
   });
   it('leaping fish asset', () => {
     expectAssetExistsAndManifested(fishPreloadInternalsForTest.fishAssetUrl);

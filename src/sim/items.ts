@@ -1,6 +1,6 @@
-import { useCartographersInk, useTreasureMap } from './treasure_vault';
 import { gliderActionsLocked } from './glider_action_lock';
 import { shadowActionsLocked } from './shadow_action_lock';
+import { useCartographersInk, useTreasureMap } from './treasure_vault';
 // Inventory items + vendor: the player-facing equip/use/discard and buy/sell/buyback
 // command bodies. Extracted from sim.ts (session W2) as a pure MOVE behind SimContext,
 // exactly as PR #943 did for market.ts / loot/loot_roll.ts, and aligned to the
