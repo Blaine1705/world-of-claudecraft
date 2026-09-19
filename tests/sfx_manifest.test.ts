@@ -164,14 +164,17 @@ describe('buildManifest', () => {
     expect(manifest).toContain('cast_lightning_bolt');
   });
 
-  it('keeps the merged catalog, all 34 mount cues, and all 92 UI cues in one 319-key inventory', () => {
+  it('keeps the merged catalog, hoard cues, all 34 mount cues, and all 92 UI cues in one 321-key inventory', () => {
     // Combine the release farming/crafting cues with the candidate mount cues.
-    // Counts measured from SFX: 319 total, 92 UI, 34 mount. A mount may share
+    // Counts measured from SFX: 321 total, 92 UI, 34 mount. A mount may share
     // player footfalls or have several cues, so this is not a mount count.
     // 319 = the 299-key release inventory plus the 20 player-selectable aura
     // proc alerts (src/game/aura_cue_catalog.ts), which are all ui_aura_ keys.
+    // The two Buried Hoard cues bring that total to 321.
     const keys = new Set(SFX.map((entry) => entry.key));
-    expect(keys.size).toBe(319);
+    expect(keys.size).toBe(321);
+    expect(keys.has('hoard_entrance_open')).toBe(true);
+    expect(keys.has('hoard_entrance_hum')).toBe(true);
     expect([...keys].filter((key) => key.startsWith('ui_aura_'))).toHaveLength(20);
     expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(92);
     expect([...keys].filter((key) => key.startsWith('mount_'))).toHaveLength(34);
@@ -267,7 +270,7 @@ describe('buildManifest', () => {
     // purely filesystem-discovered.
     const mobFamilyKeys = [...keys].filter((key) => key.startsWith('mob_'));
     expect(mobFamilyKeys).toHaveLength(65); // 13 families x 5 actions
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(319);
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(321);
   });
 });
 
