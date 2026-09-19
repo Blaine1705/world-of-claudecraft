@@ -66,3 +66,56 @@ export function actionBarBindPrompt(input: {
 }): ActionBarBindPrompt | null {
   return keybindConflictPrompt({ key: input.key, other: input.other, action: input.slot });
 }
+
+/** A box in HUD author px (the #ui zoom already divided out). */
+export interface ActionBarBindBox {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+}
+
+/** How far above the bottom edge the banner sits when no bar has a box to
+ *  anchor to (every bar hidden, or the touch layout): clear of the stock docked
+ *  bar plus the player frame beneath it. */
+export const ACTION_BAR_BIND_BANNER_FALLBACK_LIFT = 200;
+
+/**
+ * Where the banner goes, in HUD author px: centred on the primary bar (the
+ * first box) and lifted `gap` above the TOPMOST visible bar, so it never sits
+ * on the second or third bar stacked above the primary one (their slots are
+ * rebind targets too, and a banner over them left those keys unbindable). When
+ * there is no room above, it drops `gap` below the lowest bar instead. Every
+ * bar is measured live (never assumed docked in #actionbar-stack) because
+ * Interface Unlock reparents a moved bar to the HUD root. With no bar box at
+ * all the banner takes the stock bottom-centre seat. Clamped `gap` inside the
+ * viewport on every edge.
+ */
+export function actionBarBindBannerPlacement(args: {
+  bars: readonly ActionBarBindBox[];
+  banner: { width: number; height: number };
+  viewport: { width: number; height: number };
+  gap?: number;
+}): { left: number; top: number } {
+  const gap = args.gap ?? 8;
+  const { banner, viewport, bars } = args;
+  let left: number;
+  let top: number;
+  const primary = bars[0];
+  if (primary) {
+    const topmost = Math.min(...bars.map((b) => b.top));
+    const lowest = Math.max(...bars.map((b) => b.top + b.height));
+    left = primary.left + primary.width / 2 - banner.width / 2;
+    top = topmost - gap - banner.height;
+    if (top < gap) top = lowest + gap;
+  } else {
+    left = (viewport.width - banner.width) / 2;
+    top = viewport.height - banner.height - ACTION_BAR_BIND_BANNER_FALLBACK_LIFT;
+  }
+  const maxLeft = Math.max(gap, viewport.width - banner.width - gap);
+  const maxTop = Math.max(gap, viewport.height - banner.height - gap);
+  return {
+    left: Math.min(Math.max(left, gap), maxLeft),
+    top: Math.min(Math.max(top, gap), maxTop),
+  };
+}
