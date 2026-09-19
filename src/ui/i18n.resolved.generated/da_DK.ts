@@ -10482,6 +10482,7 @@ export const da_DK: EnTranslations = {
         "dungeonExit": "Fangehulsudgang",
         "delveEntrance": "Delve-indgang: {name}",
         "worldPassage": "Passage til {zone}",
+        "hoardEntrance": "Buried Hoard entrance",
         "riftEntrance": "Rift-indgang: {name}",
         "hostileEnemy": "Fjendtligt mål",
         "aggressiveEnemy": "Fjende angriber dig",

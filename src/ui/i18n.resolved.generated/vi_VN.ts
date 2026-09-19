@@ -10482,6 +10482,7 @@ export const vi_VN: EnTranslations = {
         "dungeonExit": "Lối ra hầm ngục",
         "delveEntrance": "Lối vào hang sâu: {name}",
         "worldPassage": "Lối sang {zone}",
+        "hoardEntrance": "Buried Hoard entrance",
         "riftEntrance": "Lối vào Rạn Nứt: {name}",
         "hostileEnemy": "Kẻ địch",
         "aggressiveEnemy": "Kẻ địch đang tấn công bạn",

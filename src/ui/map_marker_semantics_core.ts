@@ -6,6 +6,7 @@ import type { RiftTier } from '../sim/types';
 
 export type MapMarkerSemantic =
   | { kind: 'dungeon'; role: 'entrance' | 'exit' }
+  | { kind: 'hoard-entrance' }
   | { kind: 'rift-entrance'; rank: RiftTier | null }
   | { kind: 'rift-descent' }
   | { kind: 'rift-return'; route: 'beacon' | 'egress'; rank: RiftTier | null }
@@ -75,6 +76,8 @@ export function classifyMapObjectMarker(
       return { kind: 'dungeon', role: 'entrance' };
     case 'dungeon_exit':
       return { kind: 'dungeon', role: 'exit' };
+    case 'hoard_entrance':
+      return { kind: 'hoard-entrance' };
     case 'rift_portal':
       return { kind: 'rift-entrance', rank: entity.riftTier ?? null };
     case 'rift_descent':
@@ -157,6 +160,7 @@ export function mapMarkerSemanticLayer(semantic: MapMarkerSemantic): MapMarkerSe
     case 'rift-reward':
     case 'delve-reward':
       return 'reward';
+    case 'hoard-entrance':
     case 'dungeon':
     case 'rift-entrance':
     case 'rift-descent':

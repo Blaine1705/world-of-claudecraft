@@ -10482,6 +10482,7 @@ export const sv_SE: EnTranslations = {
         "dungeonExit": "Fängelsehålsutgång",
         "delveEntrance": "Delve-ingång: {name}",
         "worldPassage": "Passage till {zone}",
+        "hoardEntrance": "Buried Hoard entrance",
         "riftEntrance": "Ingång till revan: {name}",
         "hostileEnemy": "Fientligt mål",
         "aggressiveEnemy": "Fiende angriper dig",

@@ -10482,6 +10482,7 @@ export const nl_NL: EnTranslations = {
         "dungeonExit": "Kerkeruitgang",
         "delveEntrance": "Delve-ingang: {name}",
         "worldPassage": "Doorgang naar {zone}",
+        "hoardEntrance": "Buried Hoard entrance",
         "riftEntrance": "Rift-ingang: {name}",
         "hostileEnemy": "Vijandig doelwit",
         "aggressiveEnemy": "Vijand valt je aan",

@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'hud.core.mapMarkerLabels.hoardEntrance': '埋藏寶藏入口',
   'questUi.worldQuest.puzzleRetry': '重試',
   'questUi.worldQuest.puzzleTimerAria': '剩餘時間：{seconds} 秒',
   'questUi.worldQuest.startQuest': '開始世界任務',

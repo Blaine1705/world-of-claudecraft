@@ -10482,6 +10482,7 @@ export const en_XA: EnTranslations = {
         "dungeonExit": "[Ðúñĝéóñ éẋíţ]",
         "delveEntrance": "[Ðéļʋé éñţŕáñçé: {name}]",
         "worldPassage": "[Þáššáĝé ţó {zone}]",
+        "hoardEntrance": "[Ɓúŕíéð Ĥóáŕð éñţŕáñçé]",
         "riftEntrance": "[Ŕíƒţ éñţŕáñçé: {name}]",
         "hostileEnemy": "[Ĥóšţíļé éñéɱý]",
         "aggressiveEnemy": "[Éñéɱý áţţáçķíñĝ ýóú]",

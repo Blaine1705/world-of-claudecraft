@@ -10482,6 +10482,7 @@ export const zh_CN: EnTranslations = {
         "dungeonExit": "地下城出口",
         "delveEntrance": "探秘入口：{name}",
         "worldPassage": "通往{zone}的通道",
+        "hoardEntrance": "埋藏宝藏入口",
         "riftEntrance": "裂隙入口：{name}",
         "hostileEnemy": "敌对目标",
         "aggressiveEnemy": "正在攻击你的敌人",

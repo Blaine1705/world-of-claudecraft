@@ -7943,6 +7943,7 @@ export type TranslationKeyFlat =
   | 'hud.core.mapMarkerLabels.gateOpen'
   | 'hud.core.mapMarkerLabels.gateSealed'
   | 'hud.core.mapMarkerLabels.guildMember'
+  | 'hud.core.mapMarkerLabels.hoardEntrance'
   | 'hud.core.mapMarkerLabels.hostileEnemy'
   | 'hud.core.mapMarkerLabels.iceGoal'
   | 'hud.core.mapMarkerLabels.lootableEnemy'

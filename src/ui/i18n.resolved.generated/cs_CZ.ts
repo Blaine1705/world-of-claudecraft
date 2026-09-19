@@ -10482,6 +10482,7 @@ export const cs_CZ: EnTranslations = {
         "dungeonExit": "Východ z dungeonu",
         "delveEntrance": "Vstup do výpravy: {name}",
         "worldPassage": "Průchod do oblasti: {zone}",
+        "hoardEntrance": "Buried Hoard entrance",
         "riftEntrance": "Vstup do trhliny: {name}",
         "hostileEnemy": "Nepřátelská jednotka",
         "aggressiveEnemy": "Nepřítel, který na tebe útočí",

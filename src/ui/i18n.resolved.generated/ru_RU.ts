@@ -10482,6 +10482,7 @@ export const ru_RU: EnTranslations = {
         "dungeonExit": "Выход из подземелья",
         "delveEntrance": "Вход в вылазку: {name}",
         "worldPassage": "Проход в {zone}",
+        "hoardEntrance": "Вход в зарытую сокровищницу",
         "riftEntrance": "Вход в разлом: {name}",
         "hostileEnemy": "Враждебный противник",
         "aggressiveEnemy": "Атакующий вас противник",

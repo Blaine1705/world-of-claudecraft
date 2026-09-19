@@ -10482,6 +10482,7 @@ export const ko_KR: EnTranslations = {
         "dungeonExit": "던전 출구",
         "delveEntrance": "탐굴 입구: {name}",
         "worldPassage": "{zone}(으)로 가는 통로",
+        "hoardEntrance": "묻힌 보물 창고 입구",
         "riftEntrance": "균열 입구: {name}",
         "hostileEnemy": "적대 대상",
         "aggressiveEnemy": "당신을 공격 중인 적",

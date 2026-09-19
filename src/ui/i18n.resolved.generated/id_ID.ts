@@ -10482,6 +10482,7 @@ export const id_ID: EnTranslations = {
         "dungeonExit": "Pintu keluar dungeon",
         "delveEntrance": "Pintu masuk delve: {name}",
         "worldPassage": "Jalur menuju {zone}",
+        "hoardEntrance": "Buried Hoard entrance",
         "riftEntrance": "Pintu masuk Rift: {name}",
         "hostileEnemy": "Musuh yang siap menyerang",
         "aggressiveEnemy": "Musuh yang menyerangmu",

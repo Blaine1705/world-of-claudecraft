@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hud.core.mapMarkerLabels.hoardEntrance': 'Вход в зарытую сокровищницу',
   'questUi.worldQuest.puzzleRetry': 'Повторить',
   'questUi.worldQuest.puzzleTimerAria': 'Осталось времени: {seconds} сек.',
   'questUi.worldQuest.startQuest': 'Начать локальное задание',

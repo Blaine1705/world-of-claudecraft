@@ -109,7 +109,15 @@ export interface RiftStaticGeometry {
 
 export type RiftObjectSemantic = Exclude<
   MapMarkerSemantic,
-  { kind: 'dungeon' | 'rift-entrance' | 'delve-passage' | 'delve-surface' | 'delve-reward' }
+  {
+    kind:
+      | 'dungeon'
+      | 'rift-entrance'
+      | 'hoard-entrance'
+      | 'delve-passage'
+      | 'delve-surface'
+      | 'delve-reward';
+  }
 >;
 
 export interface RiftMobMarker extends RiftMapPoint {

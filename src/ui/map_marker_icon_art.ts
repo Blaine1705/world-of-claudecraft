@@ -506,6 +506,7 @@ export function semanticMapMarkerArt(semantic: MapMarkerSemantic): SemanticMapMa
       return semantic.rank ? RIFT_EGRESS_RANKED[semantic.rank] : RIFT_EGRESS_UNRANKED;
     case 'rift-reward':
       return RIFT_REWARD_ART[semantic.reward][semantic.state];
+    case 'hoard-entrance':
     case 'rift-mechanic':
       // Mechanic markers use the semantic painter's allocation-free procedural
       // vocabulary. This generated family is intentionally navigation/reward only.

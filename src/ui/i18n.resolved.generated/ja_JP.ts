@@ -10482,6 +10482,7 @@ export const ja_JP: EnTranslations = {
         "dungeonExit": "ダンジョン出口",
         "delveEntrance": "デルヴ入口：{name}",
         "worldPassage": "{zone}への通路",
+        "hoardEntrance": "埋もれた宝物庫の入口",
         "riftEntrance": "リフト入口：{name}",
         "hostileEnemy": "敵対対象",
         "aggressiveEnemy": "あなたを攻撃中の敵",

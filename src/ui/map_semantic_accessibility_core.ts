@@ -31,7 +31,10 @@ import type {
   MapWorldQuestMarker,
 } from './map_window_view';
 
-export type MapInstanceSemantic = Exclude<MapMarkerSemantic, { kind: 'dungeon' | 'rift-entrance' }>;
+export type MapInstanceSemantic = Exclude<
+  MapMarkerSemantic,
+  { kind: 'dungeon' | 'rift-entrance' | 'hoard-entrance' }
+>;
 
 export type MapMarkerDirection =
   | 'center'
@@ -297,6 +300,7 @@ export type MapSemanticLabelId =
   | 'dungeonExit'
   | 'delveEntrance'
   | 'worldPassage'
+  | 'hoardEntrance'
   | 'riftEntrance'
   | 'hostileEnemy'
   | 'aggressiveEnemy'
@@ -383,6 +387,7 @@ function mapSummaryCategory(label: MapSemanticLabelId): MapSummaryCategory {
     case 'dungeonExit':
     case 'delveEntrance':
     case 'worldPassage':
+    case 'hoardEntrance':
     case 'riftEntrance':
     case 'riftDescent':
     case 'riftReturnBeacon':
@@ -1061,6 +1066,7 @@ export class MapSemanticAccessibilityCore {
         this.add(marker.mx, marker.my, 'delveEntrance', 'delve', marker.delveId);
       else if (marker.kind === 'world-passage')
         this.add(marker.mx, marker.my, 'worldPassage', 'zone', marker.destinationZoneId);
+      else if (marker.kind === 'hoard-entrance') this.add(marker.mx, marker.my, 'hoardEntrance');
       else
         this.add(marker.mx, marker.my, 'riftEntrance', 'rift', marker.name, 0, marker.rank ?? '');
     }
@@ -1181,6 +1187,7 @@ export class MapSemanticAccessibilityCore {
       return this.labelText('delveEntrance', 'delve', marker.delveId);
     if (marker.kind === 'world-passage')
       return this.labelText('worldPassage', 'zone', marker.destinationZoneId);
+    if (marker.kind === 'hoard-entrance') return this.labelText('hoardEntrance', 'none', '');
     return this.labelText('riftEntrance', 'rift', marker.name, marker.rank ?? '');
   }
 

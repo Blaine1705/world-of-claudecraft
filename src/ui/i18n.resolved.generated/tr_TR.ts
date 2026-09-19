@@ -10482,6 +10482,7 @@ export const tr_TR: EnTranslations = {
         "dungeonExit": "Zindan çıkışı",
         "delveEntrance": "Mağara seferi girişi: {name}",
         "worldPassage": "{zone} bölgesine geçit",
+        "hoardEntrance": "Buried Hoard entrance",
         "riftEntrance": "Yarık girişi: {name}",
         "hostileEnemy": "Düşman",
         "aggressiveEnemy": "Sana saldıran düşman",

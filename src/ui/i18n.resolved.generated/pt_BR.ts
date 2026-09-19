@@ -10482,6 +10482,7 @@ export const pt_BR: EnTranslations = {
         "dungeonExit": "Saída da masmorra",
         "delveEntrance": "Entrada da incursão: {name}",
         "worldPassage": "Passagem para {zone}",
+        "hoardEntrance": "Buried Hoard entrance",
         "riftEntrance": "Entrada da fenda: {name}",
         "hostileEnemy": "Inimigo hostil",
         "aggressiveEnemy": "Inimigo atacando você",
