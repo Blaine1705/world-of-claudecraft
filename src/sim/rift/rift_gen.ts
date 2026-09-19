@@ -27,6 +27,7 @@ import { polygonIsStarShaped, polygonSelfIntersects, polygonSignedArea } from '.
 import { Rng } from '../rng';
 import { authoredLiftAt } from './authored';
 import { riftMinSpawnZ } from './entry_clearance';
+import { buildHoardValleyLayout } from './hoard_valley';
 import { RIFT_RANK_BASE_LEVEL, riftFloorLevel, riftHeroicTuningFor } from './ranks';
 import { buildStyle, mixSeed } from './style';
 import type {
@@ -41,7 +42,7 @@ import type {
   RiftUpgradeManifest,
 } from './types';
 import { applyRiftUpgrade } from './upgrade';
-import { type VaultSizeTier, vaultSeedTier } from './vault_seed';
+import { type VaultSizeTier, vaultSeedOpen, vaultSeedTier, vaultSeedZone } from './vault_seed';
 
 // ---- Tuning -----------------------------------------------------------------
 const MIN_FLOORS = 3;
@@ -166,6 +167,10 @@ interface GeneratedGeometry {
    * are kept inside it). For a rectangle this is a constant. */
   halfWidthAt: (z: number) => number;
   archetype: string;
+  /** Outdoor hoards keep every encounter beyond the gorge reveal. */
+  spawnStartZ?: number;
+  gorgeEndZ?: number;
+  valleyStartZ?: number;
 }
 
 // Room silhouettes. Each is a symmetric half-width PROFILE over the room length
@@ -440,7 +445,7 @@ function planSpawns(
   // The band start absorbs the per-spawn jitter so the whole first pack sits beyond it.
   const minSpawnZ = riftMinSpawnZ(entryZFor(layout));
   const rawStartZ = layout.zMin + 22;
-  const packStartZ = Math.max(rawStartZ, minSpawnZ + PACK_Z_JITTER);
+  const packStartZ = Math.max(rawStartZ, minSpawnZ + PACK_Z_JITTER, geo.spawnStartZ ?? -Infinity);
   const packEndZ = layout.dais.z - (isBoss ? 22 : 14);
   const packGap = rng.pick([16, 18, 20]);
   // packCount stays keyed to the ORIGINAL band start, so pushing the packs back off the
@@ -889,7 +894,11 @@ export function generateRiftFloor(
   const rng = new Rng(mixSeed(seed, 0xf100 + clampedIndex));
 
   const vault = vaultSeedTier(seed);
-  const geo = buildLayout(rng, clampedIndex, isBoss, vault);
+  const outdoorZone = vaultSeedOpen(seed) ? vaultSeedZone(seed) : null;
+  const geo =
+    vault !== null && outdoorZone !== null
+      ? buildHoardValleyLayout(rng, vault)
+      : buildLayout(rng, clampedIndex, isBoss, vault);
   const style = buildStyle(rng, theme);
   const floorLevel = floorLevelFor(baseLevel, clampedIndex);
   const puzzle = planPuzzle(rng, isBoss);
@@ -900,12 +909,14 @@ export function generateRiftFloor(
   const objects = planObjects(rng, geo, isBoss, puzzle, iceZone);
   const hazards = planHazards(rng, geo, isBoss, iceZone !== null);
   const rollers = planRollers(rng, geo, isBoss, iceZone !== null, hazards.length > 0);
-  const platform = planPlatform(
-    rng,
-    geo,
-    isBoss,
-    rollers.length > 0 || iceZone !== null || hazards.length > 0,
-  );
+  const platform = outdoorZone
+    ? null
+    : planPlatform(
+        rng,
+        geo,
+        isBoss,
+        rollers.length > 0 || iceZone !== null || hazards.length > 0,
+      );
   // A switch-gate is the mechanic for a subset of otherwise-plain floors (no puzzle,
   // hazard, roller, ice, or platform), so exactly one headline mechanic reads.
   const gate =
@@ -936,6 +947,15 @@ export function generateRiftFloor(
     themeName: theme.name,
     layout: geo.layout,
     style,
+    ...(outdoorZone && geo.gorgeEndZ !== undefined && geo.valleyStartZ !== undefined
+      ? {
+          outdoor: {
+            zoneId: outdoorZone,
+            gorgeEndZ: geo.gorgeEndZ,
+            valleyStartZ: geo.valleyStartZ,
+          },
+        }
+      : {}),
     entry: { x: 0, z: entryZFor(geo.layout) },
     spawns,
     objects,

@@ -11,6 +11,7 @@ import type { TreasureMapRarity } from '../content/treasure_maps';
 import type { DungeonLayout, InteriorStyle } from '../dungeon_layout';
 import type { LockSession } from '../lockpick';
 import type { DelveHazardZone, RiftTier } from '../types';
+import type { VaultZoneId } from './vault_seed';
 
 export type RiftEventStatus = 'open' | 'active' | 'cleared' | 'collapsed';
 export type RiftInstanceOutcome = 'active' | 'won' | 'lost' | 'abandoned';
@@ -217,6 +218,9 @@ export interface RiftFloorPlan {
   themeName: string;
   layout: DungeonLayout;
   style: InteriorStyle;
+  /** Outdoor Buried Hoards reproduce the map's dig-site biome. The reveal
+   * markers let render and UI stage the narrow gorge opening into the basin. */
+  outdoor?: { zoneId: VaultZoneId; gorgeEndZ: number; valleyStartZ: number };
   /** Player arrival point, instance-local (just inside the entrance porch). */
   entry: { x: number; z: number };
   spawns: RiftSpawn[];

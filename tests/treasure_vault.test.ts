@@ -17,7 +17,7 @@ import {
 } from '../src/sim/content/treasure_maps';
 import { RIFT_RANK_BASE_LEVEL, riftRankTuningFor } from '../src/sim/rift/ranks';
 import { riftFloorCount } from '../src/sim/rift/rift_gen';
-import { vaultSeedTier } from '../src/sim/rift/vault_seed';
+import { vaultSeedOpen, vaultSeedTier, vaultSeedZone } from '../src/sim/rift/vault_seed';
 import { Sim } from '../src/sim/sim';
 import { vaultScaledTuning } from '../src/sim/treasure_vault';
 import type { SimEvent } from '../src/sim/types';
@@ -66,6 +66,10 @@ describe('reading a treasure map', () => {
     // One room with the boss at the end, sized by the rarity (tier 1 = rare).
     expect(riftFloorCount(meta.treasureMap!.seed, RIFT_RANK_BASE_LEVEL.B)).toBe(1);
     expect(vaultSeedTier(meta.treasureMap!.seed)).toBe(1);
+    expect(vaultSeedOpen(meta.treasureMap!.seed)).toBe(false);
+    expect(vaultSeedZone(meta.treasureMap!.seed)).toBe(
+      TREASURE_SITES_BY_ID[meta.treasureMap!.siteId].zoneId,
+    );
     expect(sim.countItem(TREASURE_MAP_ITEM_IDS.rare)).toBe(1);
     expect(meta.wireRev).toBeGreaterThan(rev);
     expect(sim.treasureMap).toEqual(meta.treasureMap);
@@ -230,6 +234,8 @@ describe("redrawing a map with Cartographer's Ink", () => {
     sim.useItem(CARTOGRAPHERS_INK_ITEM_ID);
     const evs = sim.drainEvents();
     expect(meta.treasureMap).toMatchObject({ rarity: 'epic', siteId });
+    expect(vaultSeedOpen(meta.treasureMap!.seed)).toBe(true);
+    expect(vaultSeedZone(meta.treasureMap!.seed)).toBe(TREASURE_SITES_BY_ID[siteId].zoneId);
     expect(sim.countItem(TREASURE_MAP_ITEM_IDS.rare)).toBe(0);
     expect(sim.countItem(TREASURE_MAP_ITEM_IDS.epic)).toBe(1);
     expect(sim.countItem(CARTOGRAPHERS_INK_ITEM_ID)).toBe(1);

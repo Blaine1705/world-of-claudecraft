@@ -44,7 +44,13 @@ import { mountOwned } from './mounts';
 import { RIFT_RANK_BASE_LEVEL, type RiftRankTuning } from './rift/ranks';
 import { generateRiftPlan } from './rift/rift_gen';
 import type { RiftInstance } from './rift/types';
-import { HOARD_ENTRANCE_TEMPLATE_ID, makeVaultSeed, type VaultSizeTier } from './rift/vault_seed';
+import {
+  HOARD_ENTRANCE_TEMPLATE_ID,
+  isVaultZoneId,
+  makeVaultSeed,
+  OPEN_HOARD_RARITIES,
+  type VaultSizeTier,
+} from './rift/vault_seed';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { findHoardEntrancePosition } from './treasure_vault_placement';
@@ -87,9 +93,14 @@ export function rollTreasureMapRarity(ctx: SimContext): TreasureMapRarity {
 /** A vault seed for this rarity (src/sim/rift/vault_seed.ts): the rarity is the
  *  room's size tier, so every host regenerates the same one-room vault from the
  *  seed alone. One rng draw. */
-function pickVaultSeed(ctx: SimContext, rarity: TreasureMapRarity): number {
+function pickVaultSeed(ctx: SimContext, rarity: TreasureMapRarity, zoneId: string): number {
   const tier = TREASURE_MAP_RARITIES.indexOf(rarity) as VaultSizeTier;
-  return makeVaultSeed(tier, ctx.rng.int(0, 0x0fffffff));
+  if (!isVaultZoneId(zoneId))
+    throw new Error(`Treasure site uses an unknown vault zone: ${zoneId}`);
+  return makeVaultSeed(tier, ctx.rng.int(0, 0x007fffff), {
+    open: (OPEN_HOARD_RARITIES as readonly string[]).includes(rarity),
+    zoneId,
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -119,7 +130,7 @@ export function useTreasureMap(
   const active = meta.treasureMap;
   if (!active) {
     const site = TREASURE_SITES[ctx.rng.int(0, TREASURE_SITES.length - 1)];
-    meta.treasureMap = { rarity, siteId: site.id, seed: pickVaultSeed(ctx, rarity) };
+    meta.treasureMap = { rarity, siteId: site.id, seed: pickVaultSeed(ctx, rarity, site.zoneId) };
     meta.wireRev++;
     ctx.emit({ type: 'treasureMapRead', rarity, siteId: site.id, fresh: true, pid });
     return;
@@ -331,7 +342,12 @@ export function useCartographersInk(ctx: SimContext, meta: PlayerMeta): void {
   ctx.removeItem(CARTOGRAPHERS_INK_ITEM_ID, inks, pid);
   ctx.removeItem(TREASURE_MAP_ITEM_IDS[map.rarity], 1, pid);
   ctx.addItem(TREASURE_MAP_ITEM_IDS[next], 1, pid);
-  meta.treasureMap = { rarity: next, siteId: map.siteId, seed: pickVaultSeed(ctx, next) };
+  const site = TREASURE_SITES_BY_ID[map.siteId];
+  meta.treasureMap = {
+    rarity: next,
+    siteId: map.siteId,
+    seed: pickVaultSeed(ctx, next, site.zoneId),
+  };
   meta.wireRev++;
   ctx.emit({ type: 'treasureMapUpgraded', rarity: next, inks, pid });
 }
