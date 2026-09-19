@@ -132,8 +132,11 @@ const build = await buildItemArtAudit({
     // which landed without moving this block (1302 / 1320), + the two Clue
     // Scroll items (clue_scroll, treasure_casket; clue-scroll-icons-2026-09-17):
     // 1304 / 1322, measured with `node scripts/item_art_audit.mjs --verify-only`.
-    catalogCount: 1304,
-    liveItemCount: 1322,
+    // + the 18 faction reward paintings and the five Buried Hoard map-family
+    // paintings: 1327 catalog records and 1345 live definitions, measured with
+    // the same verifier run.
+    catalogCount: 1327,
+    liveItemCount: 1345,
     pendingArtCount: 0,
     generatedHeroicDefinitions: 78,
     heroicDefinitionsWithOwnWebp: 59,
