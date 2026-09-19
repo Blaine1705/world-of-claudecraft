@@ -30,6 +30,7 @@ import {
   SHADER_WARM_EVIDENCE_LINKS,
   SHADER_WARM_EXPIRED_SHARE_BREAKER,
   SHADER_WARM_HOLD_WINDOW,
+  SHADER_WARM_OPTION_OFFERED,
   SHADER_WARM_RELEASE_BREAKER,
   SHADER_WARM_TIMEOUT_BREAKER,
 } from '../src/render/shader_warm_client_core';
@@ -130,6 +131,7 @@ interface StartOptions {
   imminent?: boolean;
   armed?: boolean;
   now?: () => number;
+  optionOffered?: boolean;
 }
 
 /** Reset the client onto fake workers and a fake timer, then make the first
@@ -154,6 +156,7 @@ function start(options: StartOptions = {}) {
       };
     },
     now: options.now,
+    optionOffered: options.optionOffered,
   });
   if (options.armed !== false) armShaderWarm();
   const stub = contextStub(options.granted ?? GRANTED);
@@ -1582,7 +1585,7 @@ describe('the cannot-serve rule: giving up on the worker own evidence', () => {
     let stored = 'all';
     setShaderWarmStoredSettingSource(() => stored);
     try {
-      const { worker, ready } = start({ search: '', now: () => clock });
+      const { worker, ready } = start({ search: '', now: () => clock, optionOffered: true });
       ready();
       windowOfFour(worker());
       for (let burst = 0; burst < SHADER_WARM_RELEASE_BREAKER; burst++) {
@@ -2174,14 +2177,52 @@ describe('the registered stored-option source', () => {
 });
 
 describe('whether the player is offered a shader warm-up choice at all', () => {
-  it('refuses the platform the mode resolver refuses, and offers it everywhere else', () => {
-    // The options window drops its row on the answer, so the rule has to be
-    // the resolver's own: iOS is off whatever the setting (a second WebGL2
-    // context is a per-process memory ceiling risk on phone-class WebKit),
-    // and Android keeps the explicit arm even though `auto` reads off there.
+  it('offers the row nowhere while the option is withdrawn', () => {
+    // The options window drops its row on the answer.
+    expect(SHADER_WARM_OPTION_OFFERED).toBe(false);
     expect(shaderWarmChoiceAvailable('ios')).toBe(false);
-    expect(shaderWarmChoiceAvailable('android')).toBe(true);
-    expect(shaderWarmChoiceAvailable('other')).toBe(true);
+    expect(shaderWarmChoiceAvailable('android')).toBe(false);
+    expect(shaderWarmChoiceAvailable('other')).toBe(false);
+  });
+
+  it('refuses the platform the mode resolver refuses once the option is offered again', () => {
+    // The rule has to be the resolver's own: iOS is off whatever the setting
+    // (a second WebGL2 context is a per-process memory ceiling risk on
+    // phone-class WebKit), and Android keeps the explicit arm even though
+    // `auto` reads off there.
+    expect(shaderWarmChoiceAvailable('ios', true)).toBe(false);
+    expect(shaderWarmChoiceAvailable('android', true)).toBe(true);
+    expect(shaderWarmChoiceAvailable('other', true)).toBe(true);
+  });
+
+  it('reads a registered store as auto while the row is withdrawn: nobody can undo an On', () => {
+    setShaderWarmStoredSettingSource(() => 'all');
+    try {
+      let spawned = 0;
+      resetShaderWarmForTest({
+        spawn: () => {
+          spawned++;
+          return fakeWorker();
+        },
+        search: '',
+      });
+      armShaderWarm();
+      shaderWarmDecide(contextStub(GRANTED).context, GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
+      expect(shaderWarmSnapshot()).toMatchObject({ setting: 'auto', mode: 'off', worker: 'idle' });
+      expect(spawned).toBe(0);
+      // The corpus arm still sees what the player stored.
+      expect(storedShaderWarmSetting()).toBe('all');
+      // The query pin is the way in.
+      resetShaderWarmForTest({ spawn: () => fakeWorker(), search: '?shaderwarm=all' });
+      expect(shaderWarmSnapshot()).toMatchObject({ setting: 'all', mode: 'all' });
+    } finally {
+      setShaderWarmStoredSettingSource(() => null);
+    }
+  });
+
+  it('keeps an entry that registered no store OFF, never auto', () => {
+    resetShaderWarmForTest({ search: '' });
+    expect(shaderWarmSnapshot().setting).toBe('off');
   });
 });
 

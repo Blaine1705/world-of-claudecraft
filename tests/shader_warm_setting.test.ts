@@ -46,14 +46,22 @@ describe('shaderWarmSettingFromValue', () => {
 });
 
 describe('registerShaderWarmSetting', () => {
-  it('hands the client the stored option, read at configure time', () => {
+  it('hands the client the stored option, read at configure time, once the row is offered', () => {
     let stored: number = SHADER_WARM_SETTING_VALUES.off;
     registerShaderWarmSetting(() => stored);
-    resetShaderWarmForTest({ search: '' });
+    resetShaderWarmForTest({ search: '', optionOffered: true });
     expect(shaderWarmSnapshot().setting).toBe('off');
     stored = SHADER_WARM_SETTING_VALUES.on;
-    resetShaderWarmForTest({ search: '' });
+    resetShaderWarmForTest({ search: '', optionOffered: true });
     expect(shaderWarmSnapshot().setting).toBe('all');
+  });
+
+  it('reads every stored value as auto while the row is withdrawn, the shipped state', () => {
+    for (const value of Object.values(SHADER_WARM_SETTING_VALUES)) {
+      registerShaderWarmSetting(() => value);
+      resetShaderWarmForTest({ search: '' });
+      expect(shaderWarmSnapshot().setting).toBe('auto');
+    }
   });
 
   it('lets a probe query pin an arm over the stored option', () => {
@@ -133,6 +141,7 @@ describe('the shader warm row is live', () => {
     resetShaderWarmForTest({
       search: '',
       platform: 'other',
+      optionOffered: true,
       spawn: () => {
         const worker = fakeWorker();
         workers.push(worker);
@@ -253,7 +262,7 @@ describe('the shader warm row is live', () => {
     // through retireAndForgetWorker clears the refusal, so it is re-asserted.
     let stored: number = SHADER_WARM_SETTING_VALUES.off;
     registerShaderWarmSetting(() => stored);
-    resetShaderWarmForTest({ search: '', platform: 'ios' });
+    resetShaderWarmForTest({ search: '', platform: 'ios', optionOffered: true });
     expect(shaderWarmSnapshot()).toMatchObject({ setting: 'off', refusal: null });
 
     stored = SHADER_WARM_SETTING_VALUES.on;
@@ -278,7 +287,7 @@ describe('the shader warm row is live', () => {
     };
     registerShaderWarmSetting(readValue);
     registerShaderWarmSetting(readValue);
-    resetShaderWarmForTest({ search: '', platform: 'other' });
+    resetShaderWarmForTest({ search: '', platform: 'other', optionOffered: true });
 
     reads = 0;
     stored = SHADER_WARM_SETTING_VALUES.off;

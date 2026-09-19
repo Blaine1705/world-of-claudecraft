@@ -20,6 +20,7 @@ import {
   SHADER_WARM_FAILED_PROGRAMS_KEPT,
   SHADER_WARM_FRAME_PERIOD_MS,
   SHADER_WARM_HOLD_WINDOW,
+  SHADER_WARM_OPTION_OFFERED,
   SHADER_WARM_PAUSE_ABOVE_MS,
   SHADER_WARM_RELEASE_BREAKER,
   SHADER_WARM_RESUME_BELOW_MS,
@@ -33,6 +34,7 @@ import {
   shaderWarmDecision,
   shaderWarmLinkEvidence,
   shaderWarmModeFor,
+  shaderWarmStoredForWorker,
 } from '../src/render/shader_warm_client_core';
 
 /** The queue's floors, as the host hands them in (GPU_WORK_PRIORITY
@@ -207,6 +209,28 @@ describe('shaderWarmModeFor', () => {
     expect(shaderWarmModeFor('auto', 'metal', 'ios')).toBe('off');
     expect(shaderWarmModeFor('all', 'metal', 'other')).toBe('all');
     expect(shaderWarmModeFor('all', 'd3d11', 'other')).toBe('all');
+  });
+});
+
+describe('shaderWarmStoredForWorker', () => {
+  it('ships with the options row withdrawn', () => {
+    expect(SHADER_WARM_OPTION_OFFERED).toBe(false);
+  });
+
+  it('reads any stored value as auto while the row is withdrawn, and keeps none as none', () => {
+    for (const stored of ['all', 'off', 'auto', 'reveal', 'garbage']) {
+      expect(shaderWarmStoredForWorker(stored)).toBe('auto');
+      expect(shaderWarmStoredForWorker(stored, false)).toBe('auto');
+    }
+    // An entry that registered no store reads OFF downstream, never auto.
+    expect(shaderWarmStoredForWorker(null)).toBeNull();
+    expect(readShaderWarmSetting('', shaderWarmStoredForWorker(null))).toBe('off');
+  });
+
+  it('hands the stored value through once the row is offered', () => {
+    expect(shaderWarmStoredForWorker('all', true)).toBe('all');
+    expect(shaderWarmStoredForWorker('off', true)).toBe('off');
+    expect(shaderWarmStoredForWorker(null, true)).toBeNull();
   });
 });
 

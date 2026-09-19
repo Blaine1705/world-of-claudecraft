@@ -22,8 +22,9 @@
 // the setting is `auto` by default (the mode follows the GPU backend, see
 // shaderWarmModeFor, and today that is off on every backend), `off` never
 // asks the worker, `all` holds every gate below the actionable floor (the
-// policy above; the stored option On resolves to it), `reveal` is the probe arm that exempts the live
-// view (the arm the step-3 cells ran, kept so a probe can price the
+// policy above; the stored option On resolves to it while the row is offered,
+// SHADER_WARM_OPTION_OFFERED), `reveal` is the probe arm that exempts the
+// live view (the arm the step-3 cells ran, kept so a probe can price the
 // live-view hold on its own); `?shaderwarm=` pins any of them.
 
 import { type GpuBackendClass, workerWorthWarming } from './gpu_backend_class_core';
@@ -335,6 +336,24 @@ export function readShaderWarmReadyDeadline(search: string, fallbackMs: number):
   if (!match) return fallbackMs;
   const value = Number(decodeURIComponent(match[1] ?? ''));
   return Number.isFinite(value) && value > 0 ? value : fallbackMs;
+}
+
+/** Whether the options window offers the Shader Warm-up row. Withdrawn while
+ *  no backend is measured worth the worker: the stored value stays where it
+ *  is, so a player's choice comes back with the row, but it does not drive the
+ *  worker meanwhile (a stored On nobody can turn off again would run a worker
+ *  for good). The `?shaderwarm=` pin stays the way in. */
+export const SHADER_WARM_OPTION_OFFERED = false;
+
+/** What the worker reads of the stored option: the value while the row is
+ *  offered, `auto` while it is withdrawn. No store at all stays none, so an
+ *  entry that never registered one keeps reading OFF. */
+export function shaderWarmStoredForWorker(
+  stored: string | null,
+  offered: boolean = SHADER_WARM_OPTION_OFFERED,
+): string | null {
+  if (stored === null || offered) return stored;
+  return 'auto';
 }
 
 /** `?shaderwarm=auto|off|reveal|all` pins an arm for a probe and wins over

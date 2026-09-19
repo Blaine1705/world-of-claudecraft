@@ -35,6 +35,7 @@ import {
   readShaderWarmReadyDeadline,
   readShaderWarmSetting,
   SHADER_WARM_EXPIRED_SHARE_BREAKER,
+  SHADER_WARM_OPTION_OFFERED,
   SHADER_WARM_RELEASE_BREAKER,
   SHADER_WARM_TIMEOUT_BREAKER,
   type ShaderWarmBypass,
@@ -50,6 +51,7 @@ import {
   shaderWarmDecision,
   shaderWarmLinkEvidence,
   shaderWarmModeFor,
+  shaderWarmStoredForWorker,
 } from './shader_warm_client_core';
 import type { ShaderWarmSource, ShaderWarmWorkerMessage } from './shader_warm_protocol';
 import {
@@ -125,6 +127,9 @@ export interface ShaderWarmClientDeps {
   schedule?: (callback: () => void, ms: number) => () => void;
   /** Injectable clock, for the breaker's progress check. */
   now?: () => number;
+  /** Whether the options row is offered (SHADER_WARM_OPTION_OFFERED): a suite
+   *  passes true to exercise the live row while it is withdrawn. */
+  optionOffered?: boolean;
 }
 
 /** How long a worker the gates stand down for may stay silent before it is
@@ -167,6 +172,7 @@ const state = {
   spawn: null as (() => WorkerLike | null) | null,
   schedule: null as ShaderWarmClientDeps['schedule'] | null,
   now: null as (() => number) | null,
+  optionOffered: SHADER_WARM_OPTION_OFFERED as boolean,
   readyDeadlineMs: SHADER_WARM_READY_DEADLINE_MS,
   /** The query string configure resolved against; a later re-read of the
    *  stored option has to honour the same `?shaderwarm=` pin. */
@@ -256,6 +262,10 @@ export function setShaderWarmStoredSettingSource(source: () => string | null): v
   storedSettingSource = source;
 }
 
+function workerStoredSetting(): string | null {
+  return shaderWarmStoredForWorker(storedSettingSource(), state.optionOffered);
+}
+
 /** The stored option as registered, for the character-select corpus
  *  (src/game/shader_cache_warmup.ts), which honours the same Off. */
 export function storedShaderWarmSetting(): string | null {
@@ -268,9 +278,10 @@ export function storedShaderWarmSetting(): string | null {
 export function configureShaderWarm(deps: ShaderWarmClientDeps = {}): void {
   const search = deps.search ?? currentSearch();
   state.search = search;
+  state.optionOffered = deps.optionOffered ?? SHADER_WARM_OPTION_OFFERED;
   state.setting = readShaderWarmSetting(
     search,
-    deps.stored !== undefined ? deps.stored : storedSettingSource(),
+    deps.stored !== undefined ? deps.stored : workerStoredSetting(),
   );
   state.readyDeadlineMs = readShaderWarmReadyDeadline(search, SHADER_WARM_READY_DEADLINE_MS);
   state.backend = null;
@@ -296,8 +307,9 @@ function defaultPlatform(): ShaderWarmPlatform {
  *  than re-deriving the platform rule of its own: one rule, one place. */
 export function shaderWarmChoiceAvailable(
   platform: ShaderWarmPlatform = defaultPlatform(),
+  offered: boolean = SHADER_WARM_OPTION_OFFERED,
 ): boolean {
-  return shaderWarmModeFor('all', null, platform) !== 'off';
+  return offered && shaderWarmModeFor('all', null, platform) !== 'off';
 }
 
 function onWorkerMessage(event: MessageEvent<ShaderWarmWorkerMessage>): void {
@@ -863,7 +875,7 @@ export function noteShaderWarmSettingChanged(): void {
   // Before the first policy call there is nothing to change: configure reads
   // the store itself.
   if (!state.spawn) return;
-  const setting = readShaderWarmSetting(state.search, storedSettingSource());
+  const setting = readShaderWarmSetting(state.search, workerStoredSetting());
   if (setting === state.setting) return;
   state.setting = setting;
   resolveMode();

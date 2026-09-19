@@ -873,8 +873,8 @@ For off-box safety, sync the directory to S3 occasionally:
   names that experiment's `on` arm). The `held` and `heldReleased` counts include holds a gate asked for
   while the worker was standing down after a release, which were refused at
   once and hid nothing. From 0.44.0 on an `auto` session reads `mode` `off` on
-  every backend, so `shader_warm_active` is true only for a player who set the
-  option On (or pinned `?shaderwarm=`).
+  every backend, and the options row is withdrawn (a stored On reads as `auto`), so
+  `shader_warm_active` is true only on a session that pinned `?shaderwarm=`.
   `woc_client_cadence_reports_total` (same module, same stored gameplay reports)
   is the frame rate ceiling cut: `frame_cap` is the ceiling the player chose
   (`none`, `30`, `60`) and `cadence` is `reduced` when the client renders fewer

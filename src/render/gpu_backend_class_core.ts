@@ -41,8 +41,9 @@ export function compilesOffThread(backend: GpuBackendClass): boolean {
 
 /** Backends where `auto` starts the warm worker: it must compile off the
  *  presenting thread AND be MEASURED worth its cost in the field. None is
- *  today, so `auto` leaves the worker off everywhere and only the explicit
- *  setting starts it. D3D11 was the one candidate (on a bench a heavy program
+ *  today, so `auto` leaves the worker off everywhere and only a `?shaderwarm=`
+ *  pin starts it (the options row is withdrawn meanwhile,
+ *  SHADER_WARM_OPTION_OFFERED). D3D11 was the one candidate (on a bench a heavy program
  *  links cold in 315 to 689 ms and in 50 to 117 after the worker, RTX 3060,
  *  2026-08-30) and the 0.43 fleet experiment, half the D3D11 profiles with
  *  the worker and half without, found no gain it could detect on any start or

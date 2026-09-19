@@ -689,8 +689,11 @@ GPU work signs. Each rule names its seam and its guard.
   `shader_warm_client_core.ts`) resolves a MODE from the player's option and the
   backend class (`gpu_backend_class_core.ts`, read off the renderer string): `auto`
   is `all` only on a backend a FIELD measurement showed worth the worker, and none is
-  today (`WORKER_WORTH_BACKENDS` is empty, so `auto` is `off` everywhere and only the
-  explicit On starts the worker): D3D11 passed on a bench and the 0.43 fleet experiment
+  today (`WORKER_WORTH_BACKENDS` is empty, so `auto` is `off` everywhere. The options row is
+  withdrawn meanwhile (`SHADER_WARM_OPTION_OFFERED`): the stored value is kept for the
+  row's return but reads as `auto` for the worker, because a stored On nobody can turn
+  off would run a worker for good, while the character-select corpus still honours a
+  stored Off; only a `?shaderwarm=` pin starts the worker): D3D11 passed on a bench and the 0.43 fleet experiment
   (half the D3D11 profiles with the worker, half without) found no gain it could detect;
   Metal reads like Vulkan on its one datapoint and has no in-game measurement; it is
   `off` on every OpenGL and GLES class,

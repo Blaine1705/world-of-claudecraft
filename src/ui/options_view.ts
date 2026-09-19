@@ -386,9 +386,9 @@ const frameRateCapOptions: ChoiceOption[] = [
   { value: 3, labelKey: 'hudChrome.options.frameRateCapThirty' },
 ];
 
-// The shader warm-up worker: auto follows the GPU backend, which today leaves
-// it off everywhere (WORKER_WORTH_BACKENDS), so only On starts it; the stored
-// numbers are src/game/shader_warm_setting.ts SHADER_WARM_SETTING_VALUES.
+// The shader warm-up worker row, withdrawn everywhere today (the caller passes
+// shaderWarmChoice false, shader_warm_client_core.ts SHADER_WARM_OPTION_OFFERED);
+// the stored numbers are src/game/shader_warm_setting.ts SHADER_WARM_SETTING_VALUES.
 const shaderWarmOptions: ChoiceOption[] = [
   { value: 0, labelKey: 'hudChrome.options.shaderWarmAuto' },
   { value: 1, labelKey: 'hudChrome.options.shaderWarmOff' },
