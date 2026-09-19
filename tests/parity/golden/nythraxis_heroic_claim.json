@@ -745,7 +745,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1020,
-      "state": "9fd9e129",
+      "state": "6cb819ee",
       "events": "c8643206",
       "rng": {
         "draws": 12,
@@ -933,6 +933,19 @@
           "vault": {
             "stock": {}
           },
+          "weeklyRewards": {
+            "raidUnlocks": [
+              2,
+              0,
+              0
+            ],
+            "raids": [
+              2,
+              0,
+              0
+            ],
+            "resetAtMs": 604800000
+          },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
             "sources": [
@@ -1110,6 +1123,19 @@
           "townFocus": {},
           "vault": {
             "stock": {}
+          },
+          "weeklyRewards": {
+            "raidUnlocks": [
+              2,
+              0,
+              0
+            ],
+            "raids": [
+              2,
+              0,
+              0
+            ],
+            "resetAtMs": 604800000
           },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
@@ -1289,6 +1315,19 @@
           "vault": {
             "stock": {}
           },
+          "weeklyRewards": {
+            "raidUnlocks": [
+              2,
+              0,
+              0
+            ],
+            "raids": [
+              2,
+              0,
+              0
+            ],
+            "resetAtMs": 604800000
+          },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
             "sources": [
@@ -1467,6 +1506,19 @@
           "vault": {
             "stock": {}
           },
+          "weeklyRewards": {
+            "raidUnlocks": [
+              2,
+              0,
+              0
+            ],
+            "raids": [
+              2,
+              0,
+              0
+            ],
+            "resetAtMs": 604800000
+          },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
             "sources": [
@@ -1644,6 +1696,19 @@
           "townFocus": {},
           "vault": {
             "stock": {}
+          },
+          "weeklyRewards": {
+            "raidUnlocks": [
+              2,
+              0,
+              0
+            ],
+            "raids": [
+              2,
+              0,
+              0
+            ],
+            "resetAtMs": 604800000
           },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
@@ -2001,7 +2066,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1020,
-      "state": "9fd9e129",
+      "state": "6cb819ee",
       "events": "741638a5",
       "rng": {
         "draws": 12,
@@ -2189,6 +2254,19 @@
           "vault": {
             "stock": {}
           },
+          "weeklyRewards": {
+            "raidUnlocks": [
+              2,
+              0,
+              0
+            ],
+            "raids": [
+              2,
+              0,
+              0
+            ],
+            "resetAtMs": 604800000
+          },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
             "sources": [
@@ -2366,6 +2444,19 @@
           "townFocus": {},
           "vault": {
             "stock": {}
+          },
+          "weeklyRewards": {
+            "raidUnlocks": [
+              2,
+              0,
+              0
+            ],
+            "raids": [
+              2,
+              0,
+              0
+            ],
+            "resetAtMs": 604800000
           },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
@@ -2545,6 +2636,19 @@
           "vault": {
             "stock": {}
           },
+          "weeklyRewards": {
+            "raidUnlocks": [
+              2,
+              0,
+              0
+            ],
+            "raids": [
+              2,
+              0,
+              0
+            ],
+            "resetAtMs": 604800000
+          },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
             "sources": [
@@ -2723,6 +2827,19 @@
           "vault": {
             "stock": {}
           },
+          "weeklyRewards": {
+            "raidUnlocks": [
+              2,
+              0,
+              0
+            ],
+            "raids": [
+              2,
+              0,
+              0
+            ],
+            "resetAtMs": 604800000
+          },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
             "sources": [
@@ -2900,6 +3017,19 @@
           "townFocus": {},
           "vault": {
             "stock": {}
+          },
+          "weeklyRewards": {
+            "raidUnlocks": [
+              2,
+              0,
+              0
+            ],
+            "raids": [
+              2,
+              0,
+              0
+            ],
+            "resetAtMs": 604800000
           },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {

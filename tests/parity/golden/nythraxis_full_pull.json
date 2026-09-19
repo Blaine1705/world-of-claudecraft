@@ -17337,7 +17337,7 @@
       "tick": 1248,
       "time": 62.4,
       "nextId": 1023,
-      "state": "31ff6fbb",
+      "state": "be2d6286",
       "events": "31ced149",
       "rng": {
         "draws": 10837,
@@ -17518,6 +17518,19 @@
           "vault": {
             "stock": {}
           },
+          "weeklyRewards": {
+            "raidUnlocks": [
+              1,
+              0,
+              0
+            ],
+            "raids": [
+              1,
+              0,
+              0
+            ],
+            "resetAtMs": 604862349
+          },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
@@ -17691,6 +17704,19 @@
           "townFocus": {},
           "vault": {
             "stock": {}
+          },
+          "weeklyRewards": {
+            "raidUnlocks": [
+              1,
+              0,
+              0
+            ],
+            "raids": [
+              1,
+              0,
+              0
+            ],
+            "resetAtMs": 604862349
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
@@ -17866,6 +17892,19 @@
           "vault": {
             "stock": {}
           },
+          "weeklyRewards": {
+            "raidUnlocks": [
+              1,
+              0,
+              0
+            ],
+            "raids": [
+              1,
+              0,
+              0
+            ],
+            "resetAtMs": 604862349
+          },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
@@ -18040,6 +18079,19 @@
           "vault": {
             "stock": {}
           },
+          "weeklyRewards": {
+            "raidUnlocks": [
+              1,
+              0,
+              0
+            ],
+            "raids": [
+              1,
+              0,
+              0
+            ],
+            "resetAtMs": 604862349
+          },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
@@ -18213,6 +18265,19 @@
           "townFocus": {},
           "vault": {
             "stock": {}
+          },
+          "weeklyRewards": {
+            "raidUnlocks": [
+              1,
+              0,
+              0
+            ],
+            "raids": [
+              1,
+              0,
+              0
+            ],
+            "resetAtMs": 604862349
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
@@ -18812,7 +18877,7 @@
       "tick": 1250,
       "time": 62.5,
       "nextId": 1023,
-      "state": "b13f17e1",
+      "state": "87c8ff4c",
       "events": "741638a5",
       "rng": {
         "draws": 10856,
@@ -18823,7 +18888,7 @@
       "tick": 1260,
       "time": 63,
       "nextId": 1023,
-      "state": "8f90ae2b",
+      "state": "65167216",
       "events": "741638a5",
       "rng": {
         "draws": 10969,
@@ -18834,7 +18899,7 @@
       "tick": 1270,
       "time": 63.5,
       "nextId": 1023,
-      "state": "9f5752cc",
+      "state": "67126009",
       "events": "741638a5",
       "rng": {
         "draws": 11051,
@@ -18845,7 +18910,7 @@
       "tick": 1280,
       "time": 64,
       "nextId": 1023,
-      "state": "165e9a70",
+      "state": "d64d92ed",
       "events": "741638a5",
       "rng": {
         "draws": 11141,
@@ -18856,7 +18921,7 @@
       "tick": 1290,
       "time": 64.5,
       "nextId": 1023,
-      "state": "77951061",
+      "state": "535e33cc",
       "events": "741638a5",
       "rng": {
         "draws": 11235,
@@ -18867,7 +18932,7 @@
       "tick": 1300,
       "time": 65,
       "nextId": 1023,
-      "state": "18cc4565",
+      "state": "b3f92d00",
       "events": "741638a5",
       "rng": {
         "draws": 11332,
@@ -18878,7 +18943,7 @@
       "tick": 1308,
       "time": 65.4,
       "nextId": 1023,
-      "state": "70a2bdf3",
+      "state": "d9244fae",
       "events": "73c8d5ba",
       "rng": {
         "draws": 11388,
@@ -19059,6 +19124,19 @@
           "vault": {
             "stock": {}
           },
+          "weeklyRewards": {
+            "raidUnlocks": [
+              1,
+              0,
+              0
+            ],
+            "raids": [
+              1,
+              0,
+              0
+            ],
+            "resetAtMs": 604862349
+          },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
@@ -19232,6 +19310,19 @@
           "townFocus": {},
           "vault": {
             "stock": {}
+          },
+          "weeklyRewards": {
+            "raidUnlocks": [
+              1,
+              0,
+              0
+            ],
+            "raids": [
+              1,
+              0,
+              0
+            ],
+            "resetAtMs": 604862349
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
@@ -19407,6 +19498,19 @@
           "vault": {
             "stock": {}
           },
+          "weeklyRewards": {
+            "raidUnlocks": [
+              1,
+              0,
+              0
+            ],
+            "raids": [
+              1,
+              0,
+              0
+            ],
+            "resetAtMs": 604862349
+          },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
@@ -19581,6 +19685,19 @@
           "vault": {
             "stock": {}
           },
+          "weeklyRewards": {
+            "raidUnlocks": [
+              1,
+              0,
+              0
+            ],
+            "raids": [
+              1,
+              0,
+              0
+            ],
+            "resetAtMs": 604862349
+          },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
@@ -19754,6 +19871,19 @@
           "townFocus": {},
           "vault": {
             "stock": {}
+          },
+          "weeklyRewards": {
+            "raidUnlocks": [
+              1,
+              0,
+              0
+            ],
+            "raids": [
+              1,
+              0,
+              0
+            ],
+            "resetAtMs": 604862349
           },
           "worldQuestCycle": "wq1_26596",
           "worldQuestReplacements": {},

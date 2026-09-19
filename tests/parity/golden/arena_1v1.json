@@ -73,7 +73,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 1012,
-      "state": "bec29447",
+      "state": "58ba7ddd",
       "events": "7b881f5b",
       "rng": {
         "draws": 781,
@@ -84,7 +84,7 @@
       "tick": 142,
       "time": 7.1,
       "nextId": 1012,
-      "state": "13d9420a",
+      "state": "62df2278",
       "events": "741638a5",
       "rng": {
         "draws": 959,
@@ -201,6 +201,20 @@
           "townFocus": {},
           "vault": {
             "stock": {}
+          },
+          "weeklyRewards": {
+            "pvp": 1,
+            "raidUnlocks": [
+              0,
+              0,
+              0
+            ],
+            "raids": [
+              0,
+              0,
+              0
+            ],
+            "resetAtMs": 604805049
           },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
