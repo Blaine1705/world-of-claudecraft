@@ -5192,6 +5192,12 @@
     display: flex;
     margin-top: 10px;
   }
+  /* Busy state is aria-disabled (keyboard focus survives a run), so it borrows
+     the .btn:disabled family look explicitly. */
+  .hostdiag-action .btn[aria-disabled="true"] {
+    filter: grayscale(1) brightness(0.7);
+    cursor: default;
+  }
   .hostdiag-live {
     min-height: 18px;
     margin-top: 8px;
@@ -5203,9 +5209,6 @@
   }
   .hostdiag-live.is-info .hostdiag-message {
     color: var(--color-text-light);
-  }
-  .hostdiag-live.is-warning .hostdiag-message {
-    color: var(--color-accent);
   }
   .hostdiag-live.is-error .hostdiag-message {
     color: var(--color-text-error);

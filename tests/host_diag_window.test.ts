@@ -142,7 +142,8 @@ describe('host_diag_window: a run', () => {
     const host = mount();
     const btn = createButton(host);
     btn.click();
-    expect(btn.disabled, 'no second run while one is in flight').toBe(true);
+    expect(btn.getAttribute('aria-disabled'), 'busy while one is in flight').toBe('true');
+    expect(btn.disabled, 'never natively disabled: that would drop keyboard focus').toBe(false);
     expect(btn.getAttribute('aria-busy')).toBe('true');
     expect(live(host).textContent).toContain(t('hudChrome.hostDiag.running'));
     // A press while busy must not reach the bridge again.
@@ -150,7 +151,7 @@ describe('host_diag_window: a run', () => {
     expect(bridge.calls).toHaveLength(1);
 
     await bridge.settle({ status: 'saved', nativeStatus: 'ok', fileName: 'report.json' });
-    expect(btn.disabled, 'the button is usable again after a completed run').toBe(false);
+    expect(btn.getAttribute('aria-disabled'), 'usable again after a completed run').toBe('false');
     expect(btn.getAttribute('aria-busy')).toBe('false');
     // Focus stays put because the button is never rebuilt.
     expect(host.body.contains(btn)).toBe(true);

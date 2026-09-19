@@ -165,7 +165,7 @@ export const shellStrings = {
       // these ride the same push as the crash strings above
       // (src/game/desktop_shell_strings.ts -> DEFAULT_SHELL_STRINGS).
       hostDiag: {
-        saveTitle: 'Save host diagnostic',
+        saveTitle: 'Save system report',
         saveButton: 'Save',
         // The label of the format row in the dialog's type dropdown.
         fileType: 'JSON file',

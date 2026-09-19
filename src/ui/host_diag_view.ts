@@ -14,7 +14,7 @@ import type { TranslationKey } from './i18n.catalog';
 export type HostDiagPhase = 'idle' | 'running' | 'result';
 
 /** The render-model's tone vocabulary, which the painter maps to a CSS class. */
-export type HostDiagTone = 'success' | 'info' | 'warning' | 'error';
+export type HostDiagTone = 'success' | 'info' | 'error';
 
 export interface HostDiagResultModel {
   tone: HostDiagTone;

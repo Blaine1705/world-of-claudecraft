@@ -949,16 +949,30 @@ cannot read a file inside an archive. `build.files` therefore excludes the `win/
 sources, a second copy of the script and the directory's `.md` files, while
 `dist/manifest.json` stays INSIDE the asar on purpose.
 
-That split is the security model. The shipped NSIS installer is per-user, so its
-install directory is writable by anything running as that player: malware that
-cannot touch the asar (covered by the `onlyLoadAppFromAsar` and
-`enableEmbeddedAsarIntegrityValidation` fuses in the build block above) can still
-swap the loose `.ps1`. So the shell reads the script's bytes, hashes them, compares
-the digest to the in-asar manifest, and spawns nothing unless they match; a mismatch
-or an unreadable file answers `native.status: "unavailable"` with the reason, and the
-player still gets the Electron half. The spawn is a fixed argv array through
-`powershell.exe` resolved absolutely from `%SystemRoot%`, never a shell, with the run
-capped at 120 s and stdout at 2 MB.
+That split is the integrity model. The shipped NSIS installer is per-user, so its
+install directory is writable by anything running as that player: the `.ps1` is a
+loose file where the asar is not (the asar is covered by the `onlyLoadAppFromAsar`
+and `enableEmbeddedAsarIntegrityValidation` fuses in the build block above). So the
+shell reads the script's bytes, hashes them, compares the digest to the in-asar
+manifest, and spawns nothing unless they match; a mismatch or an unreadable file
+answers `native.status: "unavailable"` with the reason, and the player still gets the
+Electron half. The spawn is a fixed argv array through `powershell.exe` resolved
+absolutely from `%SystemRoot%`, never a shell, with the run capped at 120 s and stdout
+at 2 MB.
+
+Be precise about what that check buys, because it is easy to overclaim:
+
+- **It does defeat** a script that was corrupted (a partial update, a truncated
+  download), one an antivirus quarantined and something later restored wrong, and one
+  swapped passively at rest (a stale or tampered install directory, a file dropped
+  there by something that is no longer running). Those are the realistic cases, and
+  they are the ones the manifest catches.
+- **It does not defeat** a verify-then-spawn race. Malware already running as the
+  player can swap the file between the hash read and the moment PowerShell opens it,
+  and no arrangement of read-then-spawn inside one process closes that window. It is
+  also not the threat to design against: such malware already owns the player's
+  account, so editing a diagnostic script is a strictly worse option than what it can
+  already do directly.
 
 ### Rebuilding it
 
@@ -968,14 +982,20 @@ runs `scripts/host_diag_build.mjs --check` right after the vendor bundle, so a s
 `dist/` fails the desktop build instead of shipping a diagnostic the shell would
 refuse to run (`tests/host_diag_bundle.test.ts` pins the same check in CI).
 
-### Signing the script (future work, order matters)
+### Signing the script (the stronger control, and order matters)
 
-Authenticode-signing the `.ps1` is optional and not done today: the tool runs under
+Authenticode-signing the `.ps1` is not done today: the tool runs under
 `-ExecutionPolicy Bypass`, so no policy needs a signature, and the hash pin is what
-the shell trusts. If a release ever signs it, the signing step must run in the
-release pipeline BEFORE the manifest hash is computed, because signing appends a
-signature block and so changes the bytes; signing after the build would produce
-exactly the `hash-mismatch` the check exists to catch.
+the shell trusts. Signing is nonetheless the stronger control to add next, for exactly
+the reason the previous section gives: a signature is validated by Windows when the
+file is loaded, not by this process against a copy of the bytes read beforehand, so it
+has no verify-then-use gap to lose. It also removes the shape heuristic engines
+dislike (see the checklist below).
+
+If a release signs it, the signing step must run in the release pipeline BEFORE the
+manifest hash is computed, because signing appends a signature block and so changes
+the bytes; signing after the build would produce exactly the `hash-mismatch` the check
+exists to catch.
 
 ### Antivirus test checklist (per release, Windows)
 

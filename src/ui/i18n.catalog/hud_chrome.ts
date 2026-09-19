@@ -3247,14 +3247,16 @@ export const hudChromeStrings = {
     intro:
       'If the game runs badly on this computer, create a system report and send it to the support team. It describes this computer and how the game is set up, so we can see what is holding the frame rate back.',
     containsTitle: 'What the report contains',
-    containsHardware: 'Hardware and drivers: processor, memory, and graphics cards.',
-    containsWindows: 'Windows power and graphics settings.',
+    containsHardware:
+      'Hardware and drivers: computer make and model, processor, memory, graphics cards, and free disk space.',
+    containsWindows: 'Windows version, power and battery state, and graphics settings.',
     containsNvidia: 'NVIDIA Control Panel settings, when that software is installed.',
     containsDisplays: 'Your display setup: how many screens, their size, and their refresh rate.',
     containsPrograms: 'The names of the programs using the most processor time and memory.',
-    containsGame: 'Game and launcher versions, and your current graphics settings.',
+    containsGame:
+      'Game and launcher versions, your current graphics settings and zone, and a session code that lets us match this report with the performance data the game already sends.',
     privacy:
-      'It does not include your files, your user name, or your account details. Your computer name is replaced by an anonymous code. Nothing is sent automatically: the report is a file saved on your computer, and you choose who gets it.',
+      'It does not include your files, your user name, or your account details. Your computer name is not included: a random code takes its place. Nothing is sent automatically: the report is a file saved on your computer, and you choose who gets it.',
     create: 'Create report',
     running: 'Collecting system details... this takes a few seconds.',
     saved: 'Report saved as {fileName}.',

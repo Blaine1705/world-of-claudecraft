@@ -66,7 +66,7 @@ describe('host-diag: the committed dist is what the sources build', () => {
     });
     // Not a self-comparison: these are the literal values the sources carry today,
     // so a silent version bump without a rebuild cannot slip through.
-    expect(meta).toEqual({ toolVersion: '0.3.0', schemaVersion: 2 });
+    expect(meta).toEqual({ toolVersion: '0.3.1', schemaVersion: 2 });
   });
 
   it('ships UTF-8 with a BOM and CRLF only (Windows PowerShell 5.1 reads BOM-less as ANSI)', () => {
@@ -143,6 +143,73 @@ describe('host-diag: the bundle is the shipping form, not the dev tree', () => {
       const firstLine = file.text.split(/\r?\n/)[0];
       expect(FRESH_TEXT.split(firstLine).length - 1).toBe(1);
     }
+  });
+});
+
+// The privacy rules the orchestrator enforces are PowerShell, so vitest cannot run
+// them; what it can do is pin the two structural properties whose loss is exactly
+// how the earlier bugs happened. Both are asserted on FRESH_TEXT, the shipped
+// bundle, not just the source, so a bundler that dropped the region fails too.
+describe('host-diag: the privacy structure the scrubber depends on', () => {
+  it('runs the bare-word redaction on EVERY string, not only path-shaped ones', () => {
+    // The bug: Protect-DiagObject's string arm tested `-match '\\|%'` and returned
+    // an unmatched string UNTOUCHED, so the user-name / machine-name redaction
+    // never reached plain prose ("access denied for <user>"), a device name, or a
+    // profile name. The fast path is legitimate for the PATH rewrites alone.
+    const objectFn = /function Protect-DiagObject[\s\S]*?\n(?=function |\$|# -)/.exec(FRESH_TEXT);
+    expect(objectFn, 'Protect-DiagObject not found in the bundle').not.toBeNull();
+    const stringArm = /if \(\$Value -is \[string\]\) \{(.*)\}/.exec(String(objectFn?.[0]));
+    expect(stringArm, 'the string arm of Protect-DiagObject changed shape').not.toBeNull();
+    const arm = String(stringArm?.[1]);
+    // Both branches scrub: the matched one fully, the other at least the words.
+    expect(arm).toContain('Protect-DiagText');
+    expect(arm).toContain('Protect-DiagWords');
+    // The regression itself: no branch may hand back the raw value.
+    expect(arm).not.toMatch(/else\s*\{\s*return \$Value\s*\}/);
+  });
+
+  it('keeps the word patterns and the path rewrites in separate functions', () => {
+    // Protect-DiagWords must not do path work and must not be the fast-path gate;
+    // Protect-DiagText stays the full scrub the error messages go through.
+    expect(FRESH_TEXT).toMatch(/^function Protect-DiagWords\b/m);
+    expect(FRESH_TEXT).toMatch(/^function Protect-DiagPaths\b/m);
+    expect(FRESH_TEXT).toMatch(/^function Protect-DiagText\b/m);
+    expect(FRESH_TEXT).toContain('$script:ScrubWords');
+    // Operators only: a .NET method call here would throw under Constrained
+    // Language Mode, where this scrubber still has to run.
+    const words = /function Protect-DiagWords[\s\S]*?\n\}/.exec(FRESH_TEXT);
+    expect(String(words?.[0])).toContain("-replace $re, '%REDACTED%'");
+    expect(String(words?.[0])).not.toMatch(/\[[A-Za-z.]+\]::/);
+  });
+
+  it('mints `computer` as a random per-report code, never from the machine name', () => {
+    // A truncated hash of COMPUTERNAME is a pseudonym a dictionary reverses, and
+    // this file is mailed to a stranger (SCHEMA.md, "Privacy").
+    const block = /\$computer = 'pc-unknown'[\s\S]*?\n\} catch \{ \}/.exec(FRESH_TEXT);
+    expect(block, 'the computer-code block changed shape').not.toBeNull();
+    const text = String(block?.[0]);
+    expect(text).toContain('New-Guid');
+    expect(text).not.toContain('SHA256');
+    expect(text).not.toContain('ComputeHash');
+    // -NoAnonymize is the ONLY arm that may still read the machine name.
+    expect(text).toMatch(/if \(\$NoAnonymize\) \{ \$env:COMPUTERNAME \}/);
+    expect(text.split('$env:COMPUTERNAME').length - 1).toBe(1);
+  });
+
+  it('sweeps stale worker fragments at startup, bounded and best-effort', () => {
+    // A run the caller killed leaves %TEMP%\hostdiag-<guid>-<name>.json behind.
+    const sweep = /\$staleBefore = [\s\S]*?\n\} catch \{ \}/.exec(FRESH_TEXT);
+    expect(sweep, 'the stale-residue sweep is missing').not.toBeNull();
+    const text = String(sweep?.[0]);
+    expect(text).toContain("-Filter 'hostdiag-*.json'");
+    // Strictly older than the cutoff, or a concurrent run's live fragments go too.
+    expect(text).toContain('New-TimeSpan -Minutes 10');
+    expect(text).toContain('$old.LastWriteTime -lt $staleBefore');
+    // It must never be able to fail the run.
+    expect(text).toContain('Remove-Item');
+    expect(text).toContain('-ErrorAction SilentlyContinue');
+    // Orchestrator only: the sweep sits AFTER the worker-mode block's exit.
+    expect(FRESH_TEXT.indexOf('if ($Worker) {')).toBeLessThan(FRESH_TEXT.indexOf('$staleBefore'));
   });
 });
 

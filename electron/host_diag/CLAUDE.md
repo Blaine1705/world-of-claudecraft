@@ -17,8 +17,10 @@ truth. The contract (options, envelope, every collector's `data`) lives in `SCHE
 - **Read-only, no admin rights, no interaction, no verdict.** It collects; the analysis is
   server-side. A collector that would write, elevate or prompt does not belong here.
 - **Privacy**: no serial number, no user name, no user path. Every string leaving a collector
-  goes through `Protect-DiagText` / `Protect-DiagObject`; the machine name is hashed unless
-  `-NoAnonymize`. See `SCHEMA.md` "Privacy".
+  goes through `Protect-DiagObject`, whose two halves are deliberately asymmetric: the path
+  rewrites run only on a string holding `\` or `%`, the bare-word redaction of the user and
+  machine name runs on EVERY string. The report's `computer` is a random per-report code, not
+  derived from the machine name, unless `-NoAnonymize`. See `SCHEMA.md` "Privacy".
 - **Constrained Language Mode**: outside a `try` block the orchestrator uses only cmdlets,
   operators and property reads, because every .NET method call throws under WDAC/AppLocker and
   a JSON document must still come out. In the non-native collectors prefer `Get-DiagRound`
@@ -29,6 +31,12 @@ truth. The contract (options, envelope, every collector's `data`) lives in `SCHE
   PowerShell 5.1 on any locale, and the bundle's bytes are pinned. `win/**` is `-text` in
   `.gitattributes`, so git never normalizes these files: `tests/host_diag_bundle.test.ts` is what
   keeps them LF. The generated bundle is CRLF, normalized by the bundler.
+- **`Add-Type` compiles, and that is what an engine sees.** `Initialize-DiagNative` hands the
+  C# in `win/lib/*.cs` to `Add-Type`, which shells out to `csc.exe` and writes a DLL into
+  `%TEMP%`. A game spawning PowerShell that compiles code into the temp folder is a known
+  antivirus and EDR heuristic, so a first false-positive report starts there: check whether the
+  engine flagged the compile rather than the script, and note that the non-native collectors
+  keep working when `Add-Type` is blocked.
 - **The tool names itself `host-diag`**: `tool.name`, the `HOSTDIAG_*` test hooks, the
   `HostDiag.*` C# namespaces, the `@@HOSTDIAG...@@` splice markers and the `host-diag-*` output
   file prefix. The collector and helper functions stay neutral (`Get-Diag*`, `Protect-Diag*`).

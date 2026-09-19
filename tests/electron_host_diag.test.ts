@@ -129,14 +129,30 @@ describe('buildHostDiagArgs (the FIXED argv)', () => {
       '-File',
       SCRIPT,
       '-StdoutJson',
+      '-Skip',
+      'browsers',
       '-Apps',
       'World of ClaudeCraft.exe',
     ]);
   });
 
-  it('omits -Apps entirely rather than passing a name it cannot vouch for', () => {
-    // Dropped, never sanitized: the tool's own default app list applies, and
-    // nothing unexpected reaches argv.
+  it('always skips the browsers collector, whatever the exe name is', () => {
+    // The game is not a web browser, so that collector answers nothing here, and
+    // it is the one collector that reads inside a browser profile directory: a
+    // read this shell has no reason to perform. It stays in the tool for
+    // standalone use; it never rides in the shipped run.
+    for (const appExeName of ['World of ClaudeCraft.exe', 'nope', undefined]) {
+      const args = buildHostDiagArgs({ scriptPath: SCRIPT, appExeName });
+      expect(args[args.indexOf('-Skip') + 1], `for ${String(appExeName)}`).toBe('browsers');
+    }
+  });
+
+  it('passes the _none_ sentinel rather than a name it cannot vouch for', () => {
+    // Never sanitized, and never OMITTED either: dropping -Apps would hand the
+    // run to the script's OWN default list, which is the five browser
+    // executables, so the tool would look up NVIDIA profiles and Windows GPU
+    // preferences for programs the player never asked about. '_none_' is the
+    // sentinel the script filters to an empty app list.
     for (const name of [
       '..\\..\\evil.exe',
       'C:\\Windows\\System32\\cmd.exe',
@@ -160,9 +176,15 @@ describe('buildHostDiagArgs (the FIXED argv)', () => {
         '-File',
         SCRIPT,
         '-StdoutJson',
+        '-Skip',
+        'browsers',
+        '-Apps',
+        '_none_',
       ]);
     }
-    expect(buildHostDiagArgs({ scriptPath: SCRIPT })).not.toContain('-Apps');
+    const noName = buildHostDiagArgs({ scriptPath: SCRIPT });
+    expect(noName).toContain('-Apps');
+    expect(noName[noName.indexOf('-Apps') + 1]).toBe('_none_');
   });
 
   it('accepts the real shipped exe names and refuses a path or a quote', () => {
@@ -233,6 +255,8 @@ describe('runNativeHostDiag', () => {
       '-File',
       SCRIPT,
       '-StdoutJson',
+      '-Skip',
+      'browsers',
       '-Apps',
       'World of ClaudeCraft.exe',
     ]);
@@ -856,6 +880,10 @@ describe('runHostDiag (the IPC handler is wiring only)', () => {
     expect(options.filters).toEqual([
       { name: DEFAULT_SHELL_STRINGS.hostDiagFileType, extensions: ['json'] },
     ]);
+    // createDirectory so the player can make a folder for the file they are
+    // about to mail; showOverwriteConfirmation because the suggested name is
+    // only second-resolution, so a save back onto an earlier report must ask.
+    expect(options.properties).toEqual(['createDirectory', 'showOverwriteConfirmation']);
     expect(h.showItemInFolder).toHaveBeenCalledWith('C:\\Users\\player\\Documents\\diag.json');
   });
 

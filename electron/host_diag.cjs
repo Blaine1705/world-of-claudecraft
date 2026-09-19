@@ -18,15 +18,33 @@
 //      valid JSON document, so this module only has to bound it and refuse a
 //      document it cannot recognize.
 //
-// Why the hash check before the spawn. The .ps1 ships OUTSIDE the asar
-// (extraResources -> <resourcesPath>/host-diag/HostDiag.ps1) because PowerShell
-// cannot read a file inside an archive, and the shipped NSIS install is
-// per-user, so its install directory is writable by every process running as
-// that player: malware that cannot touch a fuse-protected asar can still swap
-// that one script. The manifest it is compared against (dist/manifest.json)
-// stays INSIDE the asar, under embedded-asar integrity validation, so the pin
-// travels with the app and the script does not. Mismatch or missing means the
-// script is NEVER spawned; the player gets the Electron half alone.
+// Why the hash check before the spawn, and what it does NOT buy. The .ps1 ships
+// OUTSIDE the asar (extraResources -> <resourcesPath>/host-diag/HostDiag.ps1)
+// because PowerShell cannot read a file inside an archive, and the shipped NSIS
+// install is per-user, so its install directory is writable by every process
+// running as that player: a script that a fuse-protected asar would have covered
+// is here a loose file. The manifest it is compared against
+// (dist/manifest.json) stays INSIDE the asar, under embedded-asar integrity
+// validation, so the pin travels with the app and the script does not. Mismatch
+// or missing means the script is NEVER spawned; the player gets the Electron
+// half alone.
+//
+// What that defeats: a script that is CORRUPTED (a partial update, a truncated
+// download), one an antivirus quarantined and something later restored wrong,
+// and one swapped PASSIVELY AT REST (an old or tampered install directory, a
+// file dropped there by something no longer running). Those are the realistic
+// cases, and they are the ones the manifest catches.
+//
+// What it does NOT defeat: a verify-then-spawn race. Malware already running as
+// the player can swap the file between the hash read here and the moment
+// PowerShell opens it, and this check cannot close that window. It is also not
+// worth pretending otherwise: such malware already owns the account, so it has
+// far better options than editing a diagnostic script. The stronger control is
+// not a tighter check here but Authenticode-signing the .ps1 in the release
+// pipeline (signing BEFORE the manifest hash is computed, since the signature
+// block changes the bytes), so Windows itself validates the file at load time
+// rather than this process validating a copy of it beforehand. See
+// docs/desktop-release.md, "Host diagnostic".
 //
 // Everything here is pure or dependency-injected through a `deps = {}` bag, in
 // the same house style as electron/gpu_preference.cjs and
@@ -144,13 +162,29 @@ function sha256Hex(bytes) {
 /**
  * The FIXED argv. No shell, no string command line, no option value that came
  * from anywhere but this file, with the single audited exception of the exe name
- * (APP_EXE_NAME_RE above), which is omitted entirely when it does not match.
+ * (APP_EXE_NAME_RE above), which is replaced by the tool's `_none_` sentinel
+ * when it does not match.
  * -StdoutJson keeps the report in this process (nothing is written where the
  * player did not ask for it); the default Snapshot mode keeps the run at about
  * 5 s with no live sampling.
+ *
+ * `-Skip browsers` always. The game does not run in a web browser, so that
+ * collector answers nothing here, and it is the one collector that reads files
+ * inside a browser profile directory: a read this shell has no reason to
+ * perform. The collector stays in the tool for standalone use (SCHEMA.md), it
+ * just never rides in the shipped run.
+ *
+ * `-Apps _none_` rather than an omitted -Apps when the exe name is rejected or
+ * absent. Omitting it would fall back to the script's OWN default list, which is
+ * the five browser executables: the tool would then look up NVIDIA profiles and
+ * Windows GPU preferences for programs the player never asked about. `_none_` is
+ * the sentinel the script filters out (an empty app list), so the lookup is for
+ * this game or for nothing.
  */
 function buildHostDiagArgs({ scriptPath, appExeName } = {}) {
-  const args = [
+  const usableExeName =
+    typeof appExeName === 'string' && APP_EXE_NAME_RE.test(appExeName) ? appExeName : '_none_';
+  return [
     '-NoProfile',
     '-NonInteractive',
     '-ExecutionPolicy',
@@ -158,11 +192,11 @@ function buildHostDiagArgs({ scriptPath, appExeName } = {}) {
     '-File',
     String(scriptPath ?? ''),
     '-StdoutJson',
+    '-Skip',
+    'browsers',
+    '-Apps',
+    usableExeName,
   ];
-  if (typeof appExeName === 'string' && APP_EXE_NAME_RE.test(appExeName)) {
-    args.push('-Apps', appExeName);
-  }
-  return args;
 }
 
 /** The app's own exe name for -Apps, or null when it is not a plain name. */
@@ -739,6 +773,11 @@ async function saveHostDiagFile(text, deps = {}) {
       buttonLabel: strings.hostDiagSaveButton,
       defaultPath: defaultDir ? nodePath.join(defaultDir, fileName) : fileName,
       filters: [{ name: strings.hostDiagFileType, extensions: ['json'] }],
+      // createDirectory: the player may want a folder for the file they are
+      // about to mail; showOverwriteConfirmation: the suggested name is
+      // second-resolution, so a second report in the same second, or a save
+      // back onto an earlier one, must ask before it clobbers.
+      properties: ['createDirectory', 'showOverwriteConfirmation'],
     });
   } catch {
     return { status: 'error' };

@@ -12,8 +12,9 @@
 //
 // COLD by contract: no requestAnimationFrame, no interval, no forced-reflow
 // layout read. The run is a single awaited bridge call, so the busy state is two
-// class writes rather than a driver, and the button is never rebuilt, which is
-// what keeps keyboard focus on it across a completed run.
+// class writes rather than a driver. The button is never rebuilt and never
+// natively disabled (aria-disabled plus a click guard), which is what keeps
+// keyboard focus on it across a run.
 
 import { audio } from '../game/audio';
 import {
@@ -164,7 +165,7 @@ export function renderHostDiagPanel(
 
   note(body, t('hudChrome.hostDiag.sendHint'));
 
-  const TONE_CLASSES = ['is-success', 'is-info', 'is-warning', 'is-error'] as const;
+  const TONE_CLASSES = ['is-success', 'is-info', 'is-error'] as const;
   const paintResult = (model: HostDiagResultModel | null): void => {
     for (const cls of TONE_CLASSES) live.classList.remove(cls);
     if (!model) {
@@ -183,7 +184,10 @@ export function renderHostDiagPanel(
   let state: HostDiagState = hostDiagIdle();
   const paint = (): void => {
     const running = state.phase === 'running';
-    create.disabled = running;
+    // aria-disabled, not `disabled`: disabling the focused element drops keyboard
+    // focus to the body, so a keyboard player would have to tab back after every
+    // run. The click handler's own phase guard is what blocks a second run.
+    create.setAttribute('aria-disabled', String(running));
     create.setAttribute('aria-busy', String(running));
     if (running) {
       for (const cls of TONE_CLASSES) live.classList.remove(cls);

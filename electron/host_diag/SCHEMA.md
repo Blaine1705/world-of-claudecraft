@@ -24,7 +24,7 @@ powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File HostDiag
 | `-StdoutJson` | (off) | JSON on stdout (UTF-8), nothing else, no file |
 | `-Summary` | (off) | also writes a readable `.txt` (what the player can review before sending) |
 | `-Quiet` | (off) | no progress output |
-| `-NoAnonymize` | (off) | keeps the real machine name (otherwise `pc-<hash>`) |
+| `-NoAnonymize` | (off) | keeps the real machine name (otherwise a random `pc-<10 hex>` code, see `computer` below) |
 | `-CollectorTimeoutSeconds <5..600>` | 60 | maximum delay per collector (Sample mode adds `-SampleSeconds` to it) |
 | `-InProcess` | (off) | debug: no process isolation |
 
@@ -61,7 +61,7 @@ Exit codes: `0` all good, `1` at least one collector in error (the JSON is still
 ```json
 {
   "schemaVersion": 2,
-  "tool": { "name": "host-diag", "version": "0.3.0" },
+  "tool": { "name": "host-diag", "version": "0.3.1" },
   "generatedAt": "ISO-8601", "mode": "Snapshot|Sample",
   "computer": "pc-041569db9d", "apps": ["chrome.exe"],
   "host": { "powershell": "5.1...", "bitness": 64, "languageMode": "FullLanguage", "culture": "fr-FR", "isolation": "process|none" },
@@ -71,6 +71,12 @@ Exit codes: `0` all good, `1` at least one collector in error (the JSON is still
   }
 }
 ```
+
+`computer` is a **random code minted for THIS report** (`pc-` plus 10 hex characters from a fresh
+GUID), not a value derived from the machine name: it changes on every run, so it identifies
+nothing and two reports cannot be matched through it. With `-NoAnonymize` it is the real machine
+name instead, and `pc-unknown` is the fallback when even the draw fails. To correlate several
+reports from one player, use the session code the game itself sends, never this field.
 
 `error` carries the error message (`status=error`) or the skip reason (`status=skipped`). The messages
 are **localized** (the language of the player's Windows): for server-side matching, use `errorType`
@@ -118,7 +124,18 @@ Undocumented internal driver flags (no known base value) are omitted unless the 
 ## Privacy
 
 No serial number, no user name, no user path (paths reduced to the exe name),
-machine name hashed by default, processes reduced to aggregated names, browser profiles: a single key read.
+processes reduced to aggregated names, browser profiles: a single key read.
+
+The machine name is **not** in the report by default and **not** encoded in it either: `computer`
+is a random per-report code (see the envelope above), so there is nothing to reverse. An earlier
+version carried a truncated hash of the machine name, which a dictionary of plausible names
+reverses; that is gone.
+
+Every string a collector returns passes `Protect-DiagObject`. Two halves, and the distinction
+matters: the **path rewrites** (`%USERPROFILE%`, `%LOCALAPPDATA%`, ...) run only on a string that
+holds a `\` or a `%`, since nothing else can contain a path, while the **bare-word redaction** of
+the user name and the machine name runs on **every** string, because those appear in plain prose,
+in a device name or in a profile name with no path punctuation anywhere.
 
 ## Development
 

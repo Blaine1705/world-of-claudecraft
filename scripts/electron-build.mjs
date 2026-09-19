@@ -118,8 +118,11 @@ buildElectronVendor();
 // stale dist/ would package a diagnostic that can never run, and nothing at
 // runtime could tell the player why, so freshness is a build GATE here rather
 // than a warning: the same check as `node scripts/host_diag_build.mjs --check`,
-// which exits non-zero and so stops the build through run() above.
-run(process.execPath, [path.join(root, 'scripts', 'host_diag_build.mjs'), '--check']);
+// which exits non-zero and so stops the build through run() above. `node` by
+// name and a root-relative script path: run() goes through cmd.exe on Windows
+// and quotes only ARGUMENTS, so process.execPath under "C:\Program Files" would
+// split at the space.
+run('node', ['scripts/host_diag_build.mjs', '--check']);
 
 // Derive the per-channel electron-builder config from package.json's "build"
 // block and hand it over as an explicit --config file (which REPLACES the

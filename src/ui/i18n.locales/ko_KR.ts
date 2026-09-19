@@ -1725,31 +1725,32 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bugReport.failed': '버그 신고를 보낼 수 없습니다. 다시 시도해 주세요.',
   'hudChrome.hostDiag.title': '시스템 보고서',
   'hudChrome.hostDiag.intro':
-    '이 코퓨턼에서 게임이 원활하게 실행되지 않으면 시스템 보고서를 만들어 지원 팀에 보내 주세요. 이 코퓨턼의 구성과 게임 설정이 기록되므로 프레임 속도를 떨어뜨리는 원인을 확인할 수 있습니다.',
+    '이 컴퓨터에서 게임이 원활하게 실행되지 않는다면 시스템 보고서를 만들어 지원팀에 보내 주세요. 보고서에는 이 컴퓨터의 사양과 게임 설정이 담겨 있어, 프레임 속도를 떨어뜨리는 원인을 파악하는 데 도움이 됩니다.',
   'hudChrome.hostDiag.containsTitle': '보고서에 포함되는 내용',
-  'hudChrome.hostDiag.containsHardware': '하드웨어와 드라이버: 프로세서, 메모리, 그래픽 카드.',
-  'hudChrome.hostDiag.containsWindows': 'Windows 전원 및 그래픽 설정.',
-  'hudChrome.hostDiag.containsNvidia': 'NVIDIA 제어패널이 설치된 경우 해당 설정.',
-  'hudChrome.hostDiag.containsDisplays': '디스프레이 구성: 화면 수, 크기, 주사울.',
-  'hudChrome.hostDiag.containsPrograms':
-    '프로세서 시간과 메모리를 가장 많이 사용하는 프로그램 이름.',
-  'hudChrome.hostDiag.containsGame': '게임과 런춘러 버전, 그리고 현재 그래픽 설정.',
+  'hudChrome.hostDiag.containsHardware':
+    '하드웨어 및 드라이버: 컴퓨터 제조사와 모델, 프로세서, 메모리, 그래픽 카드, 남은 디스크 공간.',
+  'hudChrome.hostDiag.containsWindows': 'Windows 버전, 전원 및 배터리 상태, 그래픽 설정.',
+  'hudChrome.hostDiag.containsNvidia': 'NVIDIA 제어판 설정(해당 소프트웨어가 설치된 경우).',
+  'hudChrome.hostDiag.containsDisplays': '디스플레이 구성: 화면 수, 해상도, 주사율.',
+  'hudChrome.hostDiag.containsPrograms': '프로세서와 메모리를 가장 많이 사용하는 프로그램의 이름.',
+  'hudChrome.hostDiag.containsGame':
+    '게임 및 런처 버전, 현재 그래픽 설정과 지역, 그리고 이 보고서를 게임이 이미 전송하는 성능 데이터와 연결해 주는 세션 코드.',
   'hudChrome.hostDiag.privacy':
-    '파일, 사용자 이름, 계정 정보는 포함되지 않습니다. 코퓨턼 이름은 이명 코드로 대십됩니다. 자동으로 전소되는 것은 없습니다. 보고서는 코퓨턼에 저장되는 파일이며, 누구에게 보낼지는 직접 결정합니다.',
+    '파일, 사용자 이름, 계정 정보는 포함되지 않습니다. 컴퓨터 이름도 포함되지 않으며, 무작위 코드로 대체됩니다. 자동으로 전송되는 것은 없습니다. 보고서는 컴퓨터에 저장되는 파일이며, 누구에게 보낼지는 직접 결정합니다.',
   'hudChrome.hostDiag.create': '보고서 만들기',
-  'hudChrome.hostDiag.running': '시스템 정보를 수집하고 있습니다. 몇 초 걸립니다.',
-  'hudChrome.hostDiag.saved': '보고서를 {fileName}(으)로 장하였습니다.',
-  'hudChrome.hostDiag.savedNoName': '보고서를 장하였습니다.',
+  'hudChrome.hostDiag.running': '시스템 정보를 수집하는 중... 몇 초 정도 걸립니다.',
+  'hudChrome.hostDiag.saved': '보고서가 {fileName}(으)로 저장되었습니다.',
+  'hudChrome.hostDiag.savedNoName': '보고서가 저장되었습니다.',
   'hudChrome.hostDiag.detailPartial':
-    '일부 정보는 수집할 수 없었습니다. 그래도 보고서는 도움이 됩니다.',
+    '일부 정보를 수집하지 못했습니다. 그래도 보고서는 유용합니다.',
   'hudChrome.hostDiag.detailUnavailable':
-    'Windows 시스템 검사 파일이 없거나 변경되어 기본 정보만 포함되었습니다. 게임을 다시 설지하면 복원됩니다.',
+    'Windows 시스템 검사 도구가 없거나 변경되어 기본 정보만 포함되었습니다. 게임을 다시 설치하면 복구됩니다.',
   'hudChrome.hostDiag.detailNativeError':
     'Windows 시스템 검사를 실행할 수 없어 기본 정보만 포함되었습니다.',
-  'hudChrome.hostDiag.busy': '이미 보고서를 만들고 있습니다.',
-  'hudChrome.hostDiag.failed': '보고서를 만들 수 없습니다. 다시 시도해 주세요.',
+  'hudChrome.hostDiag.busy': '이미 보고서를 만드는 중입니다.',
+  'hudChrome.hostDiag.failed': '보고서를 만들지 못했습니다. 다시 시도해 주세요.',
   'hudChrome.hostDiag.sendHint':
-    '장한 파일을 Discord로 지원 팀에 보내거나 지원 요정에 첨부해 주세요.',
+    '저장된 파일을 Discord에서 지원팀에 보내거나 지원 요청에 첨부해 주세요.',
   'hudChrome.keybinds.emoteWheel': '감정 표현 휠',
   'hudChrome.keybinds.sheathe': '무기 넣기/빼기',
   'hudChrome.keybinds.hideInterface': '인터페이스 숨기기',
@@ -9236,7 +9237,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.reload': '다시 불러오기',
   'desktop.crash.quit': '종료',
   'desktop.titlebar.exitGame': '게임 종료',
-  'desktop.hostDiag.saveTitle': '호스트 진단 저장',
+  'desktop.hostDiag.saveTitle': '시스템 보고서 저장',
   'desktop.hostDiag.saveButton': '저장',
   'desktop.hostDiag.fileType': 'JSON 파일',
   'desktop.crash.fatalBody': 'World of ClaudeCraft에 예기치 않은 오류가 발생하여 종료해야 합니다.',

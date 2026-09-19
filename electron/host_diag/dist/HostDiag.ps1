@@ -43,7 +43,7 @@ param(
 # method call / New-Object throws; the orchestrator must still emit a JSON there.
 # ==============================================================================
 $ErrorActionPreference = 'Stop'
-$ToolVersion = '0.3.0'
+$ToolVersion = '0.3.1'
 $SchemaVersion = 2
 $FullLanguage = "$($ExecutionContext.SessionState.LanguageMode)" -eq 'FullLanguage'
 $SelfPath = $MyInvocation.MyCommand.Path
@@ -1619,24 +1619,42 @@ function Get-DiagElapsedMs($since) {
 
 # Privacy: error texts and notes come from exceptions and may quote user paths. Every string
 # leaving a collector goes through this. Operators only (works in Constrained Language Mode).
+# Two independent jobs, split on purpose (see Protect-DiagObject):
+#   Protect-DiagPaths - rewrites a user path to a token. Only a string holding '\' or '%' can
+#                       contain one, so that test is a sound fast path for THIS half.
+#   Protect-DiagWords - redacts the bare user name / machine name. Those appear in plain prose
+#                       ("access denied for mathieu"), in a device name, in a profile name: no
+#                       backslash and no percent in sight, so this half must run on EVERY string.
 $script:ScrubPairs = @()
 foreach ($pair in @(
         @($env:LOCALAPPDATA, '%LOCALAPPDATA%'), @($env:APPDATA, '%APPDATA%'), @($env:TEMP, '%TEMP%'),
         @($env:USERPROFILE, '%USERPROFILE%'), @($(if ($SelfPath) { Split-Path -Parent $SelfPath }), '%SCRIPTDIR%'))) {
     if ($pair[0]) { $script:ScrubPairs += , @(($pair[0] -replace '([\\\.\^\$\|\?\*\+\(\)\[\]\{\}])', '\$1'), $pair[1]) }
 }
-function Protect-DiagText([string]$Text) {
+# Built once: a per-string rebuild of these two patterns would run on every scrubbed value.
+$script:ScrubWords = @()
+foreach ($word in @($env:USERNAME, $env:COMPUTERNAME)) {
+    if ($word -and $word.Length -ge 3) { $script:ScrubWords += ('(?i)\b' + ($word -replace '([\\\.\^\$\|\?\*\+\(\)\[\]\{\}])', '\$1') + '\b') }
+}
+function Protect-DiagPaths([string]$Text) {
     if (-not $Text) { return $Text }
     foreach ($pair in $script:ScrubPairs) { $Text = $Text -replace $pair[0], $pair[1] }
-    $Text = $Text -replace '(?i)[a-z]:\\Users\\[^\\''"<>|:*?\r\n]+', '%USERPROFILE%'
-    foreach ($word in @($env:USERNAME, $env:COMPUTERNAME)) {
-        if ($word -and $word.Length -ge 3) { $Text = $Text -replace ('(?i)\b' + ($word -replace '([\\\.\^\$\|\?\*\+\(\)\[\]\{\}])', '\$1') + '\b'), '%REDACTED%' }
-    }
+    return ($Text -replace '(?i)[a-z]:\\Users\\[^\\''"<>|:*?\r\n]+', '%USERPROFILE%')
+}
+function Protect-DiagWords([string]$Text) {
+    if (-not $Text) { return $Text }
+    foreach ($re in $script:ScrubWords) { $Text = $Text -replace $re, '%REDACTED%' }
     return $Text
+}
+# The full scrub, in that order: rewrite the paths first, then redact whatever bare word
+# survived. What every error message and note goes through.
+function Protect-DiagText([string]$Text) {
+    return (Protect-DiagWords (Protect-DiagPaths $Text))
 }
 function Protect-DiagObject($Value, [int]$Depth = 0) {
     if ($null -eq $Value -or $Depth -gt 12) { return $Value }
-    if ($Value -is [string]) { if ($Value -match '\\|%') { return (Protect-DiagText $Value) } else { return $Value } }
+    # Every string gets the bare-word redaction; only a path-shaped one pays for the rewrites.
+    if ($Value -is [string]) { if ($Value -match '\\|%') { return (Protect-DiagText $Value) } else { return (Protect-DiagWords $Value) } }
     if ($Value -is [System.Collections.IDictionary]) {
         foreach ($k in @($Value.Keys)) { $Value[$k] = Protect-DiagObject $Value[$k] ($Depth + 1) }
         return $Value
@@ -1724,6 +1742,21 @@ if ($Worker) {
 }
 
 # ------------------------------------------------------------
+# Stale worker residue. Complete-DiagWorker deletes each fragment in its finally block, but a
+# run the caller KILLED (Electron's 120 s cap, the console closed, a reboot) never reaches it,
+# and %TEMP%\hostdiag-<guid>-<collector>.json is left behind. Orchestrator only, once, and
+# strictly older than 10 minutes so a concurrent run's live fragments are never touched.
+# Entirely best-effort: a locked file, a redirected TEMP, a missing folder all just mean the
+# residue stays, which costs a few KB and nothing else.
+# ------------------------------------------------------------
+try {
+    $staleBefore = (Get-Date) - (New-TimeSpan -Minutes 10)
+    foreach ($old in @(Get-ChildItem -LiteralPath $env:TEMP -Filter 'hostdiag-*.json' -File -Force -ErrorAction SilentlyContinue)) {
+        if ($old.LastWriteTime -lt $staleBefore) { Remove-Item -LiteralPath $old.FullName -Force -ErrorAction SilentlyContinue }
+    }
+} catch { }
+
+# ------------------------------------------------------------
 # Isolation: each collector runs in its own child process with a timeout, so that a native
 # crash (access violation inside a driver DLL) or a hang (stuck WMI query) only loses THAT
 # collector. try/catch alone cannot protect against those two.
@@ -1777,11 +1810,16 @@ function Complete-DiagWorker($w, [bool]$timedOut) {
 # ------------------------------------------------------------
 # Main. Whatever happens, a JSON document comes out.
 # ------------------------------------------------------------
+# The report's machine label. NOT derived from the computer name: a truncated SHA-256 of a
+# name is a pseudonym anyone can reverse by hashing a dictionary of plausible names (and the
+# default Windows name is DESKTOP-<7 chars> from a tiny alphabet), and this file is mailed to
+# a stranger. A fresh random code per report tells a reader nothing about the machine, which
+# is all that is wanted here: two reports from one player are correlated by the session code
+# the game already sends, not by this field.
 $computer = 'pc-unknown'
 try {
     $computer = if ($NoAnonymize) { $env:COMPUTERNAME } else {
-        $sha = [Security.Cryptography.SHA256]::Create()
-        'pc-' + ([BitConverter]::ToString($sha.ComputeHash([Text.Encoding]::UTF8.GetBytes("$env:COMPUTERNAME"))) -replace '-', '').Substring(0, 10).ToLower()
+        'pc-' + (("$(New-Guid)" -replace '-', '') -replace '^(.{10}).*$', '$1')
     }
 } catch { }
 

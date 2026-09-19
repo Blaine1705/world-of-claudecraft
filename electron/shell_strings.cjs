@@ -28,7 +28,7 @@ const DEFAULT_SHELL_STRINGS = {
   // Same contract as the crash strings above, for the same reason: the dialog is
   // a native OS surface the main process opens, so the renderer pushes the
   // localized text and these English values are only the pre-push fallback.
-  hostDiagSaveTitle: 'Save host diagnostic',
+  hostDiagSaveTitle: 'Save system report',
   hostDiagSaveButton: 'Save',
   hostDiagFileType: 'JSON file',
 };
