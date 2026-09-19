@@ -1,11 +1,11 @@
 ﻿<#
 .SYNOPSIS
-    PC diagnostic for game performance issues (Windows native layer).
+    Host diagnostic for game performance issues (Windows native layer).
     Runs independent collectors and writes one versioned JSON file.
     READ-ONLY, no admin rights, no interaction. See SCHEMA.md.
 
 .EXAMPLE
-    powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File Invoke-PcDiag.ps1 -OutDir C:\temp
+    powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File Invoke-HostDiag.ps1 -OutDir C:\temp
 .EXAMPLE
     ... -Mode Sample -SampleSeconds 30 -Apps chrome.exe,MyGame.exe
 #>
@@ -43,7 +43,7 @@ param(
 # method call / New-Object throws; the orchestrator must still emit a JSON there.
 # ==============================================================================
 $ErrorActionPreference = 'Stop'
-$ToolVersion = '0.2.0'
+$ToolVersion = '0.3.0'
 $SchemaVersion = 2
 $FullLanguage = "$($ExecutionContext.SessionState.LanguageMode)" -eq 'FullLanguage'
 $SelfPath = $MyInvocation.MyCommand.Path
@@ -53,7 +53,7 @@ $SelfPath = $MyInvocation.MyCommand.Path
 # System32 are redirected, so half of the data would be wrong. Relaunch as 64-bit.
 # Start-Process -NoNewWindow hands our stdout/stderr handles to the child untouched.
 # ------------------------------------------------------------
-if ($env:PROCESSOR_ARCHITEW6432 -and -not $Worker -and $SelfPath -and -not $env:PCDIAG_NO_RELAUNCH) {
+if ($env:PROCESSOR_ARCHITEW6432 -and -not $Worker -and $SelfPath -and -not $env:HOSTDIAG_NO_RELAUNCH) {
     $relaunched = $false; $code = 0
     try {
         $native = Join-Path $env:windir 'sysnative\WindowsPowerShell\v1.0\powershell.exe'
@@ -64,7 +64,7 @@ if ($env:PROCESSOR_ARCHITEW6432 -and -not $Worker -and $SelfPath -and -not $env:
                 if ($v -is [switch]) { if ($v) { $argList += "-$k" } }
                 else { $argList += "-$k"; $argList += "`"$(@($v) -join ',')`"" }
             }
-            $env:PCDIAG_NO_RELAUNCH = '1'
+            $env:HOSTDIAG_NO_RELAUNCH = '1'
             $p = Start-Process -FilePath $native -ArgumentList $argList -NoNewWindow -Wait -PassThru
             $code = $p.ExitCode; $relaunched = $true
         }
@@ -77,12 +77,12 @@ $Apps = @($Apps | ForEach-Object { $_ -split ',' } | ForEach-Object { $_.Trim() 
 $Only = @($Only | ForEach-Object { $_ -split ',' } | ForEach-Object { $_.Trim().ToLower() } | Where-Object { $_ })
 $Skip = @($Skip | ForEach-Object { $_ -split ',' } | ForEach-Object { $_.Trim().ToLower() } | Where-Object { $_ })
 
-#region INLINED BY build.ps1 - do not edit, edit the sources instead
+#region INLINED BY scripts/host_diag_build.mjs - do not edit, edit the sources instead
 $script:NativeSources = @(
 @'
 // NVIDIA driver settings (DRS) reader, via nvapi. READ-ONLY.
 // C# 5 only (PowerShell 5.1 compiler): no $"", no ?., no out var.
-namespace PcDiag.Nv
+namespace HostDiag.Nv
 {
     using System;
     using System.Collections.Generic;
@@ -583,7 +583,7 @@ namespace PcDiag.Nv
 @'
 // Windows power / display / performance-counter helpers. READ-ONLY.
 // C# 5 only (PowerShell 5.1 compiler): no $"", no ?., no out var.
-namespace PcDiag.Sys
+namespace HostDiag.Sys
 {
     using System;
     using System.Collections.Generic;
@@ -857,7 +857,7 @@ function Format-DiagSummary {
     $c = $Report.collectors
     function Sect($name) { if ($c[$name] -and $c[$name].status -eq 'ok') { $c[$name].data } }
 
-    $out.Add("pc-diag $($Report.tool.version) - $($Report.generatedAt) - mode $($Report.mode) - $($Report.computer)")
+    $out.Add("host-diag $($Report.tool.version) - $($Report.generatedAt) - mode $($Report.mode) - $($Report.computer)")
     $out.Add('')
     foreach ($name in $c.Keys) {
         $e = $c[$name]
@@ -1006,7 +1006,7 @@ function Get-DiagDisplay {
     param($Ctx)
 
     Initialize-DiagNative
-    $displays = @([PcDiag.Sys.Display]::Get() | ForEach-Object {
+    $displays = @([HostDiag.Sys.Display]::Get() | ForEach-Object {
         [ordered]@{
             device        = $_.Device
             adapter       = $_.Adapter
@@ -1187,7 +1187,7 @@ function Get-DiagNvidia {
     param($Ctx)
 
     Initialize-DiagNative
-    $r = [PcDiag.Nv.Dumper]::Run([string[]]$Ctx.Apps, [string[]]@())
+    $r = [HostDiag.Nv.Dumper]::Run([string[]]$Ctx.Apps, [string[]]@())
     if (-not $r.Success) { throw "NVAPI failed at [$($r.FailedStep)] status=$($r.Status): $($r.Error)" }
 
     function Label([string]$IdHex, [string]$Value) {
@@ -1296,7 +1296,7 @@ function Get-DiagPower {
     try { Initialize-DiagNative } catch { $nativeError = "$($_.Exception.Message)" }
 
     if (-not $nativeError) {
-        $p = [PcDiag.Sys.Power]::Get()
+        $p = [HostDiag.Sys.Power]::Get()
         $hasBattery = $p.StatusOk -and $p.BatteryFlag -ne 255 -and -not ($p.BatteryFlag -band 128)
         return [ordered]@{
             source       = 'native'
@@ -1402,7 +1402,7 @@ function Get-DiagSampling {
         [ordered]@{ min = [math]::Round($m.Minimum, 1); avg = [math]::Round($m.Average, 1); max = [math]::Round($m.Maximum, 1) }
     }
 
-    $q = New-Object PcDiag.Sys.PdhQuery
+    $q = New-Object HostDiag.Sys.PdhQuery
     try {
         # English counter paths on purpose: PDH resolves them on any Windows language.
         [void]$q.Add('cpuUtil', '\Processor Information(_Total)\% Processor Utility')
@@ -1584,10 +1584,10 @@ function Initialize-DiagNative {
     if ($script:NativeState -eq 'ok') { return }
     if ($script:NativeState) { throw $script:NativeState }
     try {
-        if (-not ('PcDiag.Sys.Power' -as [type])) {
+        if (-not ('HostDiag.Sys.Power' -as [type])) {
             Add-Type -Language CSharp -TypeDefinition ($script:NativeSources -join "`n")
         }
-        [PcDiag.Sys.Runtime]::DisableCrashDialogs()      # a native crash must not pop a Windows error box
+        [HostDiag.Sys.Runtime]::DisableCrashDialogs()      # a native crash must not pop a Windows error box
         $script:NativeState = 'ok'
     } catch {
         $script:NativeState = "Native helpers unavailable (LanguageMode=$($ExecutionContext.SessionState.LanguageMode)): $($_.Exception.Message)"
@@ -1680,9 +1680,9 @@ function Invoke-DiagCollector($c) {
     $t0 = Get-Date
     try {
         # Test hooks (environment variables are inherited by worker processes).
-        if ($env:PCDIAG_TEST_FAIL  -eq $c.Name) { throw 'injected failure (PCDIAG_TEST_FAIL)' }
-        if ($env:PCDIAG_TEST_HANG  -eq $c.Name) { Start-Sleep -Seconds 3600 }
-        if ($env:PCDIAG_TEST_CRASH -eq $c.Name) { [Environment]::FailFast('injected crash (PCDIAG_TEST_CRASH)') }
+        if ($env:HOSTDIAG_TEST_FAIL  -eq $c.Name) { throw 'injected failure (HOSTDIAG_TEST_FAIL)' }
+        if ($env:HOSTDIAG_TEST_HANG  -eq $c.Name) { Start-Sleep -Seconds 3600 }
+        if ($env:HOSTDIAG_TEST_CRASH -eq $c.Name) { [Environment]::FailFast('injected crash (HOSTDIAG_TEST_CRASH)') }
         $reason = $null
         if ($c.Condition) { $reason = & $c.Condition }
         if ($reason) { $entry.status = 'skipped'; $entry.error = "$reason" }
@@ -1735,7 +1735,7 @@ $Isolate = $FullLanguage -and (-not $InProcess) -and $SelfPath -and $HostExe
 
 function Start-DiagWorker($c) {
     $appsArg = if ($Apps.Count) { $Apps -join ',' } else { '_none_' }
-    $result  = Join-Path $env:TEMP ("pcdiag-{0}-{1}.json" -f [guid]::NewGuid().ToString('N'), $c.Name)
+    $result  = Join-Path $env:TEMP ("hostdiag-{0}-{1}.json" -f [guid]::NewGuid().ToString('N'), $c.Name)
     $psi = New-Object Diagnostics.ProcessStartInfo
     $psi.FileName  = $HostExe
     $psi.Arguments = "-NoProfile -NonInteractive -ExecutionPolicy Bypass -File `"$SelfPath`" -Worker $($c.Name) -ResultFile `"$result`" -ParentPid $PID -Apps `"$appsArg`" -Mode $Mode -SampleSeconds $SampleSeconds"
@@ -1792,7 +1792,7 @@ if (-not $FullLanguage) { $warnings += 'restricted PowerShell language mode: no 
 
 $report = [ordered]@{
     schemaVersion = $SchemaVersion
-    tool          = [ordered]@{ name = 'pc-diag'; version = $ToolVersion }
+    tool          = [ordered]@{ name = 'host-diag'; version = $ToolVersion }
     generatedAt   = Get-Date -Format 'o'
     mode          = $Mode
     computer      = $computer
@@ -1862,7 +1862,7 @@ foreach ($c in $Registry) {
     $e = $entries[$c.Name]
     if (-not $e) { $e = [ordered]@{ status = 'error'; durationMs = 0; error = 'not run (orchestrator failure)'; errorType = $null; data = $null }; $entries[$c.Name] = $e }
     if ($e.status -eq 'ok') { $ran++ } elseif ($e.status -eq 'error') { $failed++ }
-    $report.collectors[$c.Name] = if ($rawJson[$c.Name]) { "@@PCDIAG:$($c.Name)@@" } else { $e }
+    $report.collectors[$c.Name] = if ($rawJson[$c.Name]) { "@@HOSTDIAG:$($c.Name)@@" } else { $e }
 }
 # 0 = all good, 1 = partial, 2 = nothing usable (includes "everything skipped", e.g. a typo in -Only).
 $exit = if ($report.fatalError -or $ran -eq 0) { 2 } elseif ($failed -gt 0) { 1 } else { 0 }
@@ -1870,7 +1870,7 @@ $exit = if ($report.fatalError -or $ran -eq 0) { 2 } elseif ($failed -gt 0) { 1 
 $json = $null
 try {
     $json = $report | ConvertTo-Json -Depth 12
-    foreach ($name in @($rawJson.Keys)) { $json = $json -replace [regex]::Escape("`"@@PCDIAG:$name@@`""), ($rawJson[$name] -replace '\$', '$$$$') }
+    foreach ($name in @($rawJson.Keys)) { $json = $json -replace [regex]::Escape("`"@@HOSTDIAG:$name@@`""), ($rawJson[$name] -replace '\$', '$$$$') }
 } catch {
     $exit = 2
     $json = '{"schemaVersion":' + $SchemaVersion + ',"fatalError":"report serialization failed","collectors":{}}'
@@ -1889,7 +1889,7 @@ if (-not $StdoutJson) {
     foreach ($dir in $candidates) {
         try {
             if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Force $dir | Out-Null }
-            $base = Join-Path $dir ("pc-diag-{0}-{1}" -f $computer, (Get-Date -Format 'yyyyMMdd-HHmmss'))
+            $base = Join-Path $dir ("host-diag-{0}-{1}" -f $computer, (Get-Date -Format 'yyyyMMdd-HHmmss'))
             Write-DiagTextFile "$base.json" $json
             Write-DiagProgress "Written: $base.json"
             $written = $true
@@ -1908,7 +1908,7 @@ if (-not $written) {
     # -StdoutJson, or nowhere to write: the JSON is the ONLY thing on stdout, after this marker line.
     if (-not $StdoutJson) { $exit = 2 }
     try { [Console]::OutputEncoding = New-Object Text.UTF8Encoding($false) } catch { }
-    if (-not $StdoutJson) { Write-Output '@@PCDIAG-JSON@@' }
+    if (-not $StdoutJson) { Write-Output '@@HOSTDIAG-JSON@@' }
     Write-Output $json
 }
 exit $exit

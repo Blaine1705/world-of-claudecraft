@@ -17,7 +17,7 @@ function Get-DiagSampling {
         [ordered]@{ min = [math]::Round($m.Minimum, 1); avg = [math]::Round($m.Average, 1); max = [math]::Round($m.Maximum, 1) }
     }
 
-    $q = New-Object PcDiag.Sys.PdhQuery
+    $q = New-Object HostDiag.Sys.PdhQuery
     try {
         # English counter paths on purpose: PDH resolves them on any Windows language.
         [void]$q.Add('cpuUtil', '\Processor Information(_Total)\% Processor Utility')

@@ -7,7 +7,7 @@ The host diagnostic (Windows layer): a standalone PowerShell tool that collects 
 configuration behind a game performance complaint. This directory is its single source of
 truth. The contract (options, envelope, every collector's `data`) lives in `SCHEMA.md`.
 
-- `win/Invoke-PcDiag.ps1`: the orchestrator plus the collector `$Registry`.
+- `win/Invoke-HostDiag.ps1`: the orchestrator plus the collector `$Registry`.
 - `win/collectors/*.ps1`: one `Get-Diag<Name>($Ctx)` per collector, returning an ordered hashtable.
 - `win/lib/*.cs`: the native helpers (C# 5, `using` inside the namespace: the files are concatenated).
 - `win/lib/Summary.ps1`: `Format-DiagSummary`, the human-readable `.txt` view.
@@ -25,8 +25,13 @@ truth. The contract (options, envelope, every collector's `data`) lives in `SCHE
   over `[math]::Round`.
 - **Whatever happens, a valid JSON document comes out**, and one broken collector never takes
   another down (see `SCHEMA.md` "Fault tolerance").
-- **Pure ASCII** in every file under `win/`, no BOM. The tool runs under Windows PowerShell 5.1
-  on any locale, and the bundle's bytes are pinned.
+- **Pure ASCII and LF-only** in every file under `win/`, no BOM. The tool runs under Windows
+  PowerShell 5.1 on any locale, and the bundle's bytes are pinned. `win/**` is `-text` in
+  `.gitattributes`, so git never normalizes these files: `tests/host_diag_bundle.test.ts` is what
+  keeps them LF. The generated bundle is CRLF, normalized by the bundler.
+- **The tool names itself `host-diag`**: `tool.name`, the `HOSTDIAG_*` test hooks, the
+  `HostDiag.*` C# namespaces, the `@@HOSTDIAG...@@` splice markers and the `host-diag-*` output
+  file prefix. The collector and helper functions stay neutral (`Get-Diag*`, `Protect-Diag*`).
 
 ## Who consumes it
 `electron/host_diag.cjs` is the ONLY consumer. It resolves `dist/HostDiag.ps1` (packaged:
@@ -40,8 +45,9 @@ antivirus checklist live in `docs/desktop-release.md`, "Host diagnostic".
 ## Building
 - Never hand-edit `dist/`. Run `npm run host-diag:build` (`scripts/host_diag_build.mjs` over the
   pure bundler `scripts/lib/host_diag_bundle.mjs`) and commit the result.
-- Freshness, the ASCII rule and the bundle's shape are pinned by `tests/host_diag_bundle.test.ts`;
-  `node scripts/host_diag_build.mjs --check` is the same check as a CLI.
-- The tool still identifies itself as `pc-diag` internally (`tool.name`, the `PCDIAG_*` test hooks,
-  the `PcDiag.*` C# namespaces, the output file prefix). Deliberate: those identifiers are renamed
-  on their own schedule, not with the repo-side layout.
+- Freshness, the ASCII and LF rules and the bundle's shape are pinned by
+  `tests/host_diag_bundle.test.ts`; `node scripts/host_diag_build.mjs --check` is the same check
+  as a CLI.
+- `$ToolVersion` in the orchestrator is the single source of the manifest's `toolVersion`: bump it
+  whenever the tool's behavior or its self-reported identity changes, and rebuild. `$SchemaVersion`
+  moves only with the envelope contract in `SCHEMA.md`.

@@ -1,6 +1,6 @@
 {
   "file": "HostDiag.ps1",
-  "sha256": "ae1b859e1e2dbab3b635e9352c9939dcd272f0a92f3156124dab2e600c23f4f3",
-  "toolVersion": "0.2.0",
+  "sha256": "25df1dff048a073f677c83c8d0cc87497c45f841b9b8ba8b91239dc9d8524011",
+  "toolVersion": "0.3.0",
   "schemaVersion": 2
 }

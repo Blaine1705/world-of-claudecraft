@@ -6,7 +6,7 @@ function Format-DiagSummary {
     $c = $Report.collectors
     function Sect($name) { if ($c[$name] -and $c[$name].status -eq 'ok') { $c[$name].data } }
 
-    $out.Add("pc-diag $($Report.tool.version) - $($Report.generatedAt) - mode $($Report.mode) - $($Report.computer)")
+    $out.Add("host-diag $($Report.tool.version) - $($Report.generatedAt) - mode $($Report.mode) - $($Report.computer)")
     $out.Add('')
     foreach ($name in $c.Keys) {
         $e = $c[$name]

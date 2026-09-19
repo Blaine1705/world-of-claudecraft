@@ -6,10 +6,6 @@
 // whole transform from synthetic inputs. The CLI (scripts/host_diag_build.mjs)
 // owns reading and writing.
 //
-// The Windows tool still calls itself "pc-diag" internally (tool.name, the
-// PCDIAG_* test hooks, the PcDiag.* C# namespaces): those identifiers are part
-// of the byte-faithful sources and are renamed on their own schedule, not here.
-//
 // Faithfulness contract (each step below mirrors one step of the original
 // build.ps1, and the committed dist is pinned to the exact bytes):
 //   - the orchestrator's `#region BUILD:INCLUDES ... #endregion` dev loader is
@@ -20,18 +16,18 @@
 //     under a `# ---- <dir>\<name> ----` marker, in name order;
 //   - every embedded body is right-trimmed.
 // One deliberate departure: every line ending in the output is CRLF. The
-// sandbox sources are mixed (two files CRLF, the rest LF) and its build.ps1
-// carried that mix into the bundle, which makes the shipped bytes depend on
-// how the sources were checked out. Windows PowerShell 5.1 reads either, so
-// the bundle is normalized instead.
+// sources are LF (pinned by tests/host_diag_bundle.test.ts) and the original
+// build.ps1 carried whatever mix it was handed into the bundle, which makes the
+// shipped bytes depend on how the sources were checked out. Windows PowerShell
+// 5.1 reads either, so the bundle is normalized instead.
 
 import { createHash } from 'node:crypto';
 
-/** The marker comment the inlined region opens with. Kept verbatim from the
- *  original build.ps1 so the committed bundle stays comparable, line for line,
- *  with the tool's upstream output. */
+/** The marker comment the inlined region opens with. It names the builder that
+ *  actually produces the bundle, so a reader of dist/HostDiag.ps1 is pointed at
+ *  this repo's build step rather than at the original sandbox's build.ps1. */
 export const INCLUDES_HEADER =
-  '#region INLINED BY build.ps1 - do not edit, edit the sources instead';
+  '#region INLINED BY scripts/host_diag_build.mjs - do not edit, edit the sources instead';
 
 /** The dev-time loader in the orchestrator, replaced at build time. Non-greedy,
  *  exactly like the `(?s)#region BUILD:INCLUDES.*?#endregion` pattern it ports. */
@@ -102,7 +98,7 @@ export function bundleHostDiag({
 } = {}) {
   const main = toCrlf(orchestrator ?? '');
   if (!INCLUDES_REGION.test(main)) {
-    throw new Error('host-diag: BUILD:INCLUDES region not found in Invoke-PcDiag.ps1');
+    throw new Error('host-diag: BUILD:INCLUDES region not found in Invoke-HostDiag.ps1');
   }
   const region = buildIncludesRegion({ csFiles, libPsFiles, collectorPsFiles });
   // A function replacement, so `$&` and friends inside the region stay literal

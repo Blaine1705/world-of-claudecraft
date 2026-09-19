@@ -15,7 +15,7 @@ function Get-DiagNvidia {
     param($Ctx)
 
     Initialize-DiagNative
-    $r = [PcDiag.Nv.Dumper]::Run([string[]]$Ctx.Apps, [string[]]@())
+    $r = [HostDiag.Nv.Dumper]::Run([string[]]$Ctx.Apps, [string[]]@())
     if (-not $r.Success) { throw "NVAPI failed at [$($r.FailedStep)] status=$($r.Status): $($r.Error)" }
 
     function Label([string]$IdHex, [string]$Value) {

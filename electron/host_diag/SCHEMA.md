@@ -4,10 +4,9 @@ Windows layer of the host diagnostic. Read-only, no admin rights, no interaction
 compatible with Windows PowerShell 5.1 (32 and 64 bit). No verdicts: the script collects,
 the analysis happens server-side.
 
-The Windows tool still identifies itself as `pc-diag` internally (the `tool.name` field, the
-`PCDIAG_*` test hooks, the `PcDiag.*` C# namespaces, the `@@PCDIAG-JSON@@` marker and the
-`pc-diag-*` output file prefix). That internal naming is unchanged on purpose and is not part of
-the repo-side layout.
+The tool names itself `host-diag` throughout: the `tool.name` field, the `HOSTDIAG_*` test hooks,
+the `HostDiag.*` C# namespaces, the `@@HOSTDIAG-JSON@@` marker and the `host-diag-*` output file
+prefix.
 
 ## Invocation
 
@@ -17,7 +16,7 @@ powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File HostDiag
 
 | Option | Default | Role |
 |---|---|---|
-| `-OutDir <dir>` | the script folder | where to write `pc-diag-<machine>-<date>.json`. If not writable: falls back to `%TEMP%` (the real path is printed in the progress output) |
+| `-OutDir <dir>` | the script folder | where to write `host-diag-<machine>-<date>.json`. If not writable: falls back to `%TEMP%` (the real path is printed in the progress output) |
 | `-Apps a.exe,b.exe` | chrome, msedge, firefox, brave, opera | executables of interest: NVIDIA profile, Windows GPU preference, GPU usage in Sample mode. **Add the game's Electron exe here.** |
 | `-Mode Snapshot` or `-Mode Sample` | Snapshot | Sample = Snapshot plus live measurements |
 | `-SampleSeconds <3..300>` | 20 | measurement duration (1 point per second) |
@@ -44,11 +43,11 @@ Phase 1 runs in parallel, then `processes`, then `sampling` alone (so we do not 
 | 32-bit PowerShell on 64-bit Windows | automatic relaunch as 64-bit (otherwise registry and DLLs are redirected, so the data would be wrong) |
 | restricted PowerShell (Constrained Language Mode: WDAC, AppLocker) | no isolation and no native code (`display`, `nvidia`, `sampling` report an error, `power` falls back to CIM), the rest keeps working, and `warnings` says so |
 | error in the orchestrator itself | `fatalError` is filled in, JSON is emitted anyway, exit code 2 |
-| output folder not writable | falls back to `%TEMP%`; if that also fails: a `@@PCDIAG-JSON@@` line followed by the JSON on stdout, exit code 2 |
+| output folder not writable | falls back to `%TEMP%`; if that also fails: a `@@HOSTDIAG-JSON@@` line followed by the JSON on stdout, exit code 2 |
 | `-Only` / `-Skip` with an unknown name | reported in `warnings`; exit code 2 if nothing runs any more |
 
 In every case a valid JSON document comes out, and the other collectors are unaffected.
-Test hooks: `PCDIAG_TEST_FAIL`, `PCDIAG_TEST_HANG`, `PCDIAG_TEST_CRASH` = `<collector>`.
+Test hooks: `HOSTDIAG_TEST_FAIL`, `HOSTDIAG_TEST_HANG`, `HOSTDIAG_TEST_CRASH` = `<collector>`.
 
 Progress (stdout, one line per collector): `[name] status  durationMs  error`.
 
@@ -62,7 +61,7 @@ Exit codes: `0` all good, `1` at least one collector in error (the JSON is still
 ```json
 {
   "schemaVersion": 2,
-  "tool": { "name": "pc-diag", "version": "0.2.0" },
+  "tool": { "name": "host-diag", "version": "0.3.0" },
   "generatedAt": "ISO-8601", "mode": "Snapshot|Sample",
   "computer": "pc-041569db9d", "apps": ["chrome.exe"],
   "host": { "powershell": "5.1...", "bitness": 64, "languageMode": "FullLanguage", "culture": "fr-FR", "isolation": "process|none" },
@@ -123,7 +122,7 @@ machine name hashed by default, processes reduced to aggregated names, browser p
 
 ## Development
 
-Sources: `win/Invoke-PcDiag.ps1` (orchestrator plus the collector registry), `win/collectors/*.ps1`
+Sources: `win/Invoke-HostDiag.ps1` (orchestrator plus the collector registry), `win/collectors/*.ps1`
 (one `Get-Diag<Name>($Ctx)` function returning an ordered hashtable), `win/lib/*.cs` (native code, C# 5,
 with `using` inside the namespace because the files are concatenated), `win/lib/Summary.ps1`.
 Keep every source in pure ASCII.

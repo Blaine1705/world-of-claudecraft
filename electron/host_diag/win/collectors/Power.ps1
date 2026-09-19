@@ -18,7 +18,7 @@ function Get-DiagPower {
     try { Initialize-DiagNative } catch { $nativeError = "$($_.Exception.Message)" }
 
     if (-not $nativeError) {
-        $p = [PcDiag.Sys.Power]::Get()
+        $p = [HostDiag.Sys.Power]::Get()
         $hasBattery = $p.StatusOk -and $p.BatteryFlag -ne 255 -and -not ($p.BatteryFlag -band 128)
         return [ordered]@{
             source       = 'native'

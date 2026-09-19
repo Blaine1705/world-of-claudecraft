@@ -39,7 +39,7 @@ const SCRIPT = 'C:\\Program Files\\World of ClaudeCraft\\resources\\host-diag\\H
  *  electron/host_diag/SCHEMA.md (numeric schemaVersion + object collectors). */
 const REPORT = {
   schemaVersion: 2,
-  tool: { name: 'pc-diag', version: '0.2.0' },
+  tool: { name: 'host-diag', version: '0.3.0' },
   collectors: { system: { status: 'ok', durationMs: 12, data: { isLaptop: true } } },
 };
 

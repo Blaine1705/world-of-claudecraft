@@ -1,6 +1,6 @@
 // Windows power / display / performance-counter helpers. READ-ONLY.
 // C# 5 only (PowerShell 5.1 compiler): no $"", no ?., no out var.
-namespace PcDiag.Sys
+namespace HostDiag.Sys
 {
     using System;
     using System.Collections.Generic;

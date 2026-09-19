@@ -1,7 +1,8 @@
 // Pins the host diagnostic bundle (electron/host_diag/) four ways: the committed
-// dist really is what the committed sources build, the sources stay pure ASCII,
-// the bundle is the SHIPPING form (no dev loader, every registered collector
-// present), and the pure bundler's own contract holds on synthetic inputs.
+// dist really is what the committed sources build, the sources stay pure ASCII
+// and LF-only, the bundle is the SHIPPING form (no dev loader, every registered
+// collector present), and the pure bundler's own contract holds on synthetic
+// inputs.
 import { readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
@@ -22,7 +23,7 @@ const listDir = (rel: string, suffix: string) =>
     .filter((name) => name.endsWith(suffix))
     .map((name) => ({ name, text: readText(`${rel}/${name}`) }));
 
-const ORCHESTRATOR = readText('win/Invoke-PcDiag.ps1');
+const ORCHESTRATOR = readText('win/Invoke-HostDiag.ps1');
 const FRESH_BYTES = toShippedBytes(
   bundleHostDiag({
     orchestrator: ORCHESTRATOR,
@@ -65,7 +66,7 @@ describe('host-diag: the committed dist is what the sources build', () => {
     });
     // Not a self-comparison: these are the literal values the sources carry today,
     // so a silent version bump without a rebuild cannot slip through.
-    expect(meta).toEqual({ toolVersion: '0.2.0', schemaVersion: 2 });
+    expect(meta).toEqual({ toolVersion: '0.3.0', schemaVersion: 2 });
   });
 
   it('ships UTF-8 with a BOM and CRLF only (Windows PowerShell 5.1 reads BOM-less as ANSI)', () => {
@@ -77,10 +78,10 @@ describe('host-diag: the committed dist is what the sources build', () => {
   });
 });
 
-describe('host-diag: the sources stay pure ASCII', () => {
+describe('host-diag: the sources stay pure ASCII and LF-only', () => {
   it('finds every file under win/, including nested folders', () => {
     const files = winFiles();
-    expect(files).toContain('win/Invoke-PcDiag.ps1');
+    expect(files).toContain('win/Invoke-HostDiag.ps1');
     expect(files).toContain('win/lib/NvDrs.cs');
     expect(files).toContain('win/collectors/Sampling.ps1');
     // Vacuity floor: the real tree is one orchestrator, three lib files and nine
@@ -95,6 +96,16 @@ describe('host-diag: the sources stay pure ASCII', () => {
       offset < 0 ? '' : JSON.stringify(bytes.subarray(offset, offset + 24).toString());
     expect(offset, `${rel}: non-ASCII byte at offset ${offset}, near ${context}`).toBe(-1);
   });
+
+  // The sources arrived from their sandbox with mixed line endings and are marked
+  // `-text` in .gitattributes, so git will never normalize them for us: the only
+  // thing keeping the tree uniform is this pin. The BUNDLE is still CRLF (the
+  // bundler normalizes its output), which the dist tests above check separately.
+  it.each(winFiles())('%s is LF-only (no CR byte)', (rel) => {
+    const bytes = readBytes(rel);
+    const offset = bytes.indexOf(0x0d);
+    expect(offset, `${rel}: CR byte at offset ${offset}; convert the file to LF`).toBe(-1);
+  });
 });
 
 describe('host-diag: the bundle is the shipping form, not the dev tree', () => {
@@ -103,6 +114,12 @@ describe('host-diag: the bundle is the shipping form, not the dev tree', () => {
     expect(FRESH_TEXT).not.toContain("Get-Content (Join-Path $PSScriptRoot 'lib\\");
     expect(FRESH_TEXT).not.toContain("Get-ChildItem (Join-Path $PSScriptRoot 'collectors\\");
     expect(FRESH_TEXT).toContain(INCLUDES_HEADER);
+    // The literal header, not just the exported constant: the region must point a
+    // reader at this repo's builder, never at the sandbox's build.ps1.
+    expect(INCLUDES_HEADER).toBe(
+      '#region INLINED BY scripts/host_diag_build.mjs - do not edit, edit the sources instead',
+    );
+    expect(FRESH_TEXT).not.toContain('build.ps1 - do not edit');
     // The dev loader IS still what the committed orchestrator carries, so the
     // absences above are a real substitution, not a coincidence.
     expect(ORCHESTRATOR).toContain('#region BUILD:INCLUDES');

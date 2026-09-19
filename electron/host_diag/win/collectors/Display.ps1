@@ -2,7 +2,7 @@ function Get-DiagDisplay {
     param($Ctx)
 
     Initialize-DiagNative
-    $displays = @([PcDiag.Sys.Display]::Get() | ForEach-Object {
+    $displays = @([HostDiag.Sys.Display]::Get() | ForEach-Object {
         [ordered]@{
             device        = $_.Device
             adapter       = $_.Adapter

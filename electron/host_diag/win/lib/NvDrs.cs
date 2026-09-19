@@ -1,6 +1,6 @@
 // NVIDIA driver settings (DRS) reader, via nvapi. READ-ONLY.
 // C# 5 only (PowerShell 5.1 compiler): no $"", no ?., no out var.
-namespace PcDiag.Nv
+namespace HostDiag.Nv
 {
     using System;
     using System.Collections.Generic;

@@ -32,7 +32,7 @@ const readDirFiles = (dir, suffix) =>
 /** Reads the committed sources and returns the exact bytes dist/HostDiag.ps1
  *  should hold, plus the manifest that pins them. */
 function buildHostDiag() {
-  const orchestrator = readFileSync(join(WIN_DIR, 'Invoke-PcDiag.ps1'), 'utf8');
+  const orchestrator = readFileSync(join(WIN_DIR, 'Invoke-HostDiag.ps1'), 'utf8');
   const bytes = toShippedBytes(
     bundleHostDiag({
       orchestrator,
