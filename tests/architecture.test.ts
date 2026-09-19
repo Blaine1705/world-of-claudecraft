@@ -723,6 +723,7 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
   'src/render/hoard_entrance_core.ts',
+  'src/render/hoard_valley_core.ts',
   'src/render/tree_hide_index_core.ts',
   'src/render/view_candidate_scan_core.ts',
   'src/render/wisp_maze_core.ts',

@@ -1,0 +1,391 @@
+// Chunky, low-draw open-air scenery for Epic and Legendary Buried Hoards.
+// Simulation owns the shell and all collision. This module covers that shell
+// with natural scenery and protects its first scene attachment with the shared
+// shader compile gate.
+
+import * as THREE from 'three';
+import { resolveUiEffectsProfile, type UiEffectsProfile } from '../game/ui_effects_profile';
+import type { RiftFloorPlan } from '../sim/rift/types';
+import { attachSceneGroupGated } from './gated_scene_attach';
+import type { GfxTier } from './gfx';
+import { surfaceMat } from './gfx';
+import {
+  buildHoardValleyPlan,
+  type HoardValleyDressingKind,
+  type HoardValleyDressingPlacement,
+  type HoardValleyPlan,
+  isHoardValleyZoneId,
+} from './hoard_valley_core';
+import { setRenderCategory } from './renderer_diagnostics';
+import { markSharedGeometry } from './shared_resource';
+
+export type HoardValleyEffectsProfile = Pick<UiEffectsProfile, 'tier' | 'heavyShadows'>;
+
+export function resolveHoardValleyEffectsProfile(effectsTier: GfxTier): HoardValleyEffectsProfile {
+  return resolveUiEffectsProfile({
+    presetLabel: effectsTier,
+    effectsQuality: effectsTier === 'low' ? 0 : 1,
+    reduceMotion: false,
+  });
+}
+
+export interface HoardValleyBuildOptions {
+  scene: THREE.Object3D;
+  compileGate?: (target: THREE.Object3D) => Promise<unknown>;
+  plan: RiftFloorPlan;
+  offset: { x: number; y: number; z: number };
+  effectsProfile: HoardValleyEffectsProfile;
+}
+
+export interface HoardValleyView {
+  readonly group: THREE.Group;
+  readonly readyForEntry: Promise<void>;
+  dispose(): void;
+}
+
+let groundGeometry: THREE.BoxGeometry | null = null;
+let cliffGeometry: THREE.DodecahedronGeometry | null = null;
+let trunkGeometry: THREE.CylinderGeometry | null = null;
+let crownGeometry: THREE.DodecahedronGeometry | null = null;
+let spireGeometry: THREE.ConeGeometry | null = null;
+let branchGeometry: THREE.BoxGeometry | null = null;
+let bloomGeometry: THREE.OctahedronGeometry | null = null;
+
+function sharedGeometries() {
+  groundGeometry ??= markSharedGeometry(new THREE.BoxGeometry(1, 1, 1));
+  cliffGeometry ??= markSharedGeometry(new THREE.DodecahedronGeometry(1, 0));
+  trunkGeometry ??= markSharedGeometry(new THREE.CylinderGeometry(0.38, 0.62, 4.8, 6));
+  crownGeometry ??= markSharedGeometry(new THREE.DodecahedronGeometry(1, 0));
+  spireGeometry ??= markSharedGeometry(new THREE.ConeGeometry(1, 4.5, 6));
+  branchGeometry ??= markSharedGeometry(new THREE.BoxGeometry(0.32, 3.6, 0.32));
+  bloomGeometry ??= markSharedGeometry(new THREE.OctahedronGeometry(0.7, 0));
+  return {
+    ground: groundGeometry,
+    cliff: cliffGeometry,
+    trunk: trunkGeometry,
+    crown: crownGeometry,
+    spire: spireGeometry,
+    branch: branchGeometry,
+    bloom: bloomGeometry,
+  };
+}
+
+function coloredMaterial(name: string): THREE.Material {
+  const material = surfaceMat({
+    color: 0xffffff,
+    vertexColors: true,
+    flatShading: true,
+    roughness: 0.93,
+    metalness: 0.01,
+  });
+  if (!material.name) material.name = name;
+  return material;
+}
+
+function writeInstance(
+  mesh: THREE.InstancedMesh,
+  index: number,
+  position: THREE.Vector3,
+  rotation: THREE.Euler,
+  scale: THREE.Vector3,
+  color: number,
+  matrix: THREE.Matrix4,
+  quaternion: THREE.Quaternion,
+): void {
+  quaternion.setFromEuler(rotation);
+  matrix.compose(position, quaternion, scale);
+  mesh.setMatrixAt(index, matrix);
+  mesh.setColorAt(index, new THREE.Color(color));
+}
+
+function finishInstances(mesh: THREE.InstancedMesh, shadows: boolean): THREE.InstancedMesh {
+  mesh.instanceMatrix.needsUpdate = true;
+  if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+  mesh.castShadow = shadows;
+  mesh.receiveShadow = shadows;
+  mesh.computeBoundingBox();
+  mesh.computeBoundingSphere();
+  return mesh;
+}
+
+function buildGround(plan: HoardValleyPlan, shadows: boolean): THREE.InstancedMesh {
+  const mesh = new THREE.InstancedMesh(
+    sharedGeometries().ground,
+    coloredMaterial('HoardValleyGround'),
+    plan.ground.length,
+  );
+  mesh.name = 'HoardValleyGround';
+  const matrix = new THREE.Matrix4();
+  const quaternion = new THREE.Quaternion();
+  const rotation = new THREE.Euler();
+  const position = new THREE.Vector3();
+  const scale = new THREE.Vector3();
+  for (let i = 0; i < plan.ground.length; i++) {
+    const strip = plan.ground[i];
+    writeInstance(
+      mesh,
+      i,
+      position.set(strip.x, -0.16, strip.z),
+      rotation.set(0, 0, 0),
+      scale.set(strip.halfX * 2, 0.32, strip.halfZ * 2),
+      strip.color,
+      matrix,
+      quaternion,
+    );
+  }
+  return finishInstances(mesh, shadows);
+}
+
+function buildCliffs(plan: HoardValleyPlan, shadows: boolean): THREE.InstancedMesh {
+  const mesh = new THREE.InstancedMesh(
+    sharedGeometries().cliff,
+    coloredMaterial('HoardValleyCliffs'),
+    plan.cliffs.length,
+  );
+  mesh.name = 'HoardValleyBoundaryCliffs';
+  const matrix = new THREE.Matrix4();
+  const quaternion = new THREE.Quaternion();
+  const position = new THREE.Vector3();
+  const scale = new THREE.Vector3();
+  const rotation = new THREE.Euler();
+  for (let i = 0; i < plan.cliffs.length; i++) {
+    const rock = plan.cliffs[i];
+    writeInstance(
+      mesh,
+      i,
+      position.set(rock.x, rock.scaleY * 0.74 - 0.7, rock.z),
+      rotation.set(0, rock.yaw, (i % 2 ? -1 : 1) * 0.08),
+      scale.set(rock.scaleX, rock.scaleY, rock.scaleZ),
+      rock.color,
+      matrix,
+      quaternion,
+    );
+  }
+  return finishInstances(mesh, shadows);
+}
+
+interface DressingPose {
+  baseGeometry: THREE.BufferGeometry;
+  accentGeometry: THREE.BufferGeometry;
+  basePosition: THREE.Vector3;
+  accentPosition: THREE.Vector3;
+  baseRotation: THREE.Euler;
+  accentRotation: THREE.Euler;
+  baseScale: THREE.Vector3;
+  accentScale: THREE.Vector3;
+}
+
+function dressingPose(placement: HoardValleyDressingPlacement, index: number): DressingPose {
+  const geometry = sharedGeometries();
+  const scale = placement.scale;
+  const basePosition = new THREE.Vector3(placement.x, placement.y, placement.z);
+  const accentPosition = new THREE.Vector3(placement.x, placement.y, placement.z);
+  const baseRotation = new THREE.Euler(0, placement.yaw, 0);
+  const accentRotation = new THREE.Euler(0, placement.yaw + index * 0.37, 0);
+  const baseScale = new THREE.Vector3(scale, scale, scale);
+  const accentScale = new THREE.Vector3(scale, scale, scale);
+  let baseGeometry: THREE.BufferGeometry = geometry.trunk;
+  let accentGeometry: THREE.BufferGeometry = geometry.crown;
+
+  switch (placement.kind) {
+    case 'autumn_tree':
+      basePosition.y = 2.35 * scale;
+      accentPosition.y = 5.3 * scale;
+      baseScale.set(scale, scale, scale);
+      accentScale.set(2.2 * scale, 1.55 * scale, 2 * scale);
+      break;
+    case 'palm':
+      basePosition.y = 2.55 * scale;
+      baseRotation.z = (index % 2 ? -1 : 1) * 0.09;
+      accentPosition.set(placement.x, 5.5 * scale, placement.z);
+      accentScale.set(2.75 * scale, 0.42 * scale, 2.2 * scale);
+      break;
+    case 'dead_tree':
+      accentGeometry = geometry.branch;
+      basePosition.y = 2.25 * scale;
+      accentPosition.set(placement.x + 0.7 * scale, 4.4 * scale, placement.z);
+      accentRotation.set(0.35, placement.yaw, -0.72);
+      accentScale.set(scale, scale, scale);
+      break;
+    case 'basalt_spire':
+      baseGeometry = geometry.spire;
+      accentGeometry = geometry.spire;
+      basePosition.y = 2.1 * scale;
+      accentPosition.set(placement.x + 1.15 * scale, 1.35 * scale, placement.z + 0.5 * scale);
+      baseScale.set(0.9 * scale, 1.2 * scale, 0.9 * scale);
+      accentScale.set(0.55 * scale, 0.72 * scale, 0.55 * scale);
+      break;
+    case 'ice_spire':
+      baseGeometry = geometry.spire;
+      accentGeometry = geometry.spire;
+      basePosition.y = 2.15 * scale;
+      accentPosition.set(placement.x - 1.05 * scale, 1.45 * scale, placement.z + 0.7 * scale);
+      baseRotation.z = 0.08;
+      accentRotation.z = -0.18;
+      baseScale.set(0.78 * scale, 1.25 * scale, 0.78 * scale);
+      accentScale.set(0.52 * scale, 0.78 * scale, 0.52 * scale);
+      break;
+    case 'windswept_grass':
+      baseGeometry = geometry.branch;
+      accentGeometry = geometry.branch;
+      basePosition.y = 0.8 * scale;
+      accentPosition.set(placement.x + 0.55 * scale, 0.65 * scale, placement.z + 0.3 * scale);
+      baseRotation.z = -0.55;
+      accentRotation.z = -0.72;
+      baseScale.set(0.45 * scale, 0.52 * scale, 0.45 * scale);
+      accentScale.set(0.35 * scale, 0.4 * scale, 0.35 * scale);
+      break;
+    case 'reeds':
+      baseGeometry = geometry.branch;
+      accentGeometry = geometry.branch;
+      basePosition.y = 0.95 * scale;
+      accentPosition.set(placement.x + 0.52 * scale, 0.78 * scale, placement.z - 0.3 * scale);
+      baseScale.set(0.3 * scale, 0.58 * scale, 0.3 * scale);
+      accentScale.set(0.25 * scale, 0.46 * scale, 0.25 * scale);
+      break;
+    case 'moon_bloom':
+      baseGeometry = geometry.branch;
+      accentGeometry = geometry.bloom;
+      basePosition.y = 0.9 * scale;
+      accentPosition.y = 1.85 * scale;
+      baseScale.set(0.3 * scale, 0.56 * scale, 0.3 * scale);
+      accentScale.set(0.85 * scale, 0.7 * scale, 0.85 * scale);
+      break;
+  }
+  return {
+    baseGeometry,
+    accentGeometry,
+    basePosition,
+    accentPosition,
+    baseRotation,
+    accentRotation,
+    baseScale,
+    accentScale,
+  };
+}
+
+function addDressingKind(
+  group: THREE.Group,
+  plan: HoardValleyPlan,
+  kind: HoardValleyDressingKind,
+  placements: HoardValleyDressingPlacement[],
+  shadows: boolean,
+): void {
+  if (placements.length === 0) return;
+  const first = dressingPose(placements[0], 0);
+  const base = new THREE.InstancedMesh(
+    first.baseGeometry,
+    coloredMaterial(`HoardValleyDressing:${kind}:base`),
+    placements.length,
+  );
+  const accent = new THREE.InstancedMesh(
+    first.accentGeometry,
+    coloredMaterial(`HoardValleyDressing:${kind}:accent`),
+    placements.length,
+  );
+  base.name = `HoardValleyDressingBase:${kind}`;
+  accent.name = `HoardValleyDressingAccent:${kind}`;
+  const matrix = new THREE.Matrix4();
+  const quaternion = new THREE.Quaternion();
+  for (let i = 0; i < placements.length; i++) {
+    const pose = dressingPose(placements[i], i);
+    writeInstance(
+      base,
+      i,
+      pose.basePosition,
+      pose.baseRotation,
+      pose.baseScale,
+      plan.zone.trunk,
+      matrix,
+      quaternion,
+    );
+    writeInstance(
+      accent,
+      i,
+      pose.accentPosition,
+      pose.accentRotation,
+      pose.accentScale,
+      plan.zone.accent,
+      matrix,
+      quaternion,
+    );
+  }
+  group.add(finishInstances(base, shadows), finishInstances(accent, shadows));
+}
+
+function buildDressing(plan: HoardValleyPlan, shadows: boolean): THREE.Group {
+  const group = new THREE.Group();
+  group.name = 'HoardValleyZoneDressing';
+  const byKind = new Map<HoardValleyDressingKind, HoardValleyDressingPlacement[]>();
+  for (const placement of plan.dressing) {
+    const values = byKind.get(placement.kind) ?? [];
+    values.push(placement);
+    byKind.set(placement.kind, values);
+  }
+  for (const [kind, placements] of byKind) addDressingKind(group, plan, kind, placements, shadows);
+  return group;
+}
+
+const valleyOwners = new WeakMap<THREE.Group, HoardValleyViewImpl>();
+
+class HoardValleyViewImpl implements HoardValleyView {
+  readonly group: THREE.Group;
+  readonly readyForEntry: Promise<void>;
+  private disposed = false;
+
+  constructor(options: HoardValleyBuildOptions) {
+    const outdoor = options.plan.outdoor;
+    if (!outdoor || !isHoardValleyZoneId(outdoor.zoneId)) {
+      throw new Error('Hoard valley requires a floor plan with a known outdoor zone');
+    }
+    const low = options.effectsProfile.tier === 'low';
+    const visualPlan = buildHoardValleyPlan({
+      layout: options.plan.layout,
+      zoneId: outdoor.zoneId,
+      seed: options.plan.seed,
+      low,
+    });
+    const shadows = !low && options.effectsProfile.heavyShadows;
+    this.group = new THREE.Group();
+    this.group.name = `hoard-valley:${outdoor.zoneId}`;
+    this.group.position.set(options.offset.x, options.offset.y, options.offset.z);
+    this.group.add(buildGround(visualPlan, shadows));
+    this.group.add(buildCliffs(visualPlan, shadows));
+    this.group.add(buildDressing(visualPlan, shadows));
+    this.group.userData.hoardValleyZoneId = outdoor.zoneId;
+    this.group.userData.hoardValleyRevealZ = outdoor.valleyStartZ ?? visualPlan.revealZ;
+    setRenderCategory(this.group, 'dungeon');
+    valleyOwners.set(this.group, this);
+    this.readyForEntry = attachSceneGroupGated(
+      options.scene,
+      this.group,
+      options.compileGate,
+      () => this.disposed,
+    ).catch(() => {
+      // Retirement cancels an in-flight gate. The owner has already detached it.
+    });
+  }
+
+  dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
+    this.group.parent?.remove(this.group);
+    this.group.traverse((object) => {
+      if (object instanceof THREE.InstancedMesh) object.dispose();
+    });
+    this.group.clear();
+    valleyOwners.delete(this.group);
+  }
+}
+
+export function buildHoardValley(options: HoardValleyBuildOptions): HoardValleyView {
+  return new HoardValleyViewImpl(options);
+}
+
+/** Retirement adapter for renderer registries that retain only the scene group. */
+export function disposeHoardValleyGroup(group: THREE.Group): boolean {
+  const owner = valleyOwners.get(group);
+  if (!owner) return false;
+  owner.dispose();
+  return true;
+}
