@@ -2520,6 +2520,28 @@ export const de_DE: EnTranslations = {
       "rateLimited": "Du hast kürzlich mehrere Meldungen gesendet. Bitte warte einen Moment, bevor du eine weitere sendest.",
       "failed": "Die Fehlermeldung konnte nicht gesendet werden. Bitte versuche es erneut."
     },
+    "hostDiag": {
+      "title": "System Report",
+      "intro": "If the game runs badly on this computer, create a system report and send it to the support team. It describes this computer and how the game is set up, so we can see what is holding the frame rate back.",
+      "containsTitle": "What the report contains",
+      "containsHardware": "Hardware and drivers: processor, memory, and graphics cards.",
+      "containsWindows": "Windows power and graphics settings.",
+      "containsNvidia": "NVIDIA Control Panel settings, when that software is installed.",
+      "containsDisplays": "Your display setup: how many screens, their size, and their refresh rate.",
+      "containsPrograms": "The names of the programs using the most processor time and memory.",
+      "containsGame": "Game and launcher versions, and your current graphics settings.",
+      "privacy": "It does not include your files, your user name, or your account details. Your computer name is replaced by an anonymous code. Nothing is sent automatically: the report is a file saved on your computer, and you choose who gets it.",
+      "create": "Create report",
+      "running": "Collecting system details... this takes a few seconds.",
+      "saved": "Report saved as {fileName}.",
+      "savedNoName": "Report saved.",
+      "detailPartial": "Some details could not be collected. The report is still useful.",
+      "detailUnavailable": "The Windows system scan is missing or was changed, so only basic details were included. Reinstalling the game restores it.",
+      "detailNativeError": "The Windows system scan could not run, so only basic details were included.",
+      "busy": "A report is already being created.",
+      "failed": "The report could not be created. Please try again.",
+      "sendHint": "Send the saved file to the support team on Discord or attach it to your support request."
+    },
     "paperdoll": {
       "unequipAria": "{item} ablegen",
       "unequipHint": "Klicke auf ×, Rechtsklick oder in die Taschen ziehen zum Ablegen",

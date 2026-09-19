@@ -1033,7 +1033,7 @@ export interface BugReportPayload {
 export interface BugReportHooks {
   // Submit a captured bug report to the server. Resolves on success (screenshotStored
   // is false when the server dropped the screenshot), rejects with a server error
-  // message the hud maps via localizeBugReportError.
+  // message the ui maps via bugReportErrorText.
   submit(payload: BugReportPayload): Promise<{ screenshotStored: boolean }>;
   // Grab a JPEG data URL of the current frame asynchronously, or null if capture
   // failed/unavailable. Encoding must not block the options window's main thread.

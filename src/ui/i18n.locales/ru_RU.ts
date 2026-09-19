@@ -1747,6 +1747,37 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bugReport.rateLimited':
     'Вы недавно отправили несколько отчётов. Подождите немного перед следующим.',
   'hudChrome.bugReport.failed': 'Не удалось отправить отчёт об ошибке. Попробуйте снова.',
+  'hudChrome.hostDiag.title': 'Отчет о системе',
+  'hudChrome.hostDiag.intro':
+    'Если игра работает плохо на этом компьютере, создайте отчет о системе и отправьте его в службу поддержки. В нем описан этот компьютер и настройки игры, так что мы сможем увидеть, что мешает частоте кадров.',
+  'hudChrome.hostDiag.containsTitle': 'Что входит в отчет',
+  'hudChrome.hostDiag.containsHardware':
+    'Оборудование и драйверы: процессор, память и видеокарты.',
+  'hudChrome.hostDiag.containsWindows': 'Настройки электропитания и графики в Windows.',
+  'hudChrome.hostDiag.containsNvidia':
+    'Настройки панели управления NVIDIA, если она установлена.',
+  'hudChrome.hostDiag.containsDisplays':
+    'Конфигурация дисплеев: количество экранов, их размер и частота обновления.',
+  'hudChrome.hostDiag.containsPrograms':
+    'Названия программ, которые расходуют больше всего процессорного времени и памяти.',
+  'hudChrome.hostDiag.containsGame':
+    'Версии игры и лаунчера, а также текущие настройки графики.',
+  'hudChrome.hostDiag.privacy':
+    'В отчет не входят ваши файлы, имя пользователя и данные учетной записи. Имя компьютера заменяется анонимным кодом. Ничего не отправляется автоматически: отчет это файл, сохраненный на вашем компьютере, и вы сами решаете, кто его получит.',
+  'hudChrome.hostDiag.create': 'Создать отчет',
+  'hudChrome.hostDiag.running': 'Сбор сведений о системе, это займет несколько секунд.',
+  'hudChrome.hostDiag.saved': 'Отчет сохранен как {fileName}.',
+  'hudChrome.hostDiag.savedNoName': 'Отчет сохранен.',
+  'hudChrome.hostDiag.detailPartial':
+    'Некоторые сведения собрать не удалось. Отчет все равно полезен.',
+  'hudChrome.hostDiag.detailUnavailable':
+    'Модуль проверки системы Windows отсутствует или изменен, поэтому в отчет вошли только основные сведения. Переустановка игры восстановит его.',
+  'hudChrome.hostDiag.detailNativeError':
+    'Не удалось запустить проверку системы Windows, поэтому в отчет вошли только основные сведения.',
+  'hudChrome.hostDiag.busy': 'Отчет уже создается.',
+  'hudChrome.hostDiag.failed': 'Не удалось создать отчет. Попробуйте еще раз.',
+  'hudChrome.hostDiag.sendHint':
+    'Отправьте сохраненный файл в службу поддержки через Discord или приложите его к своему обращению.',
   'hudChrome.keybinds.emoteWheel': 'Колесо эмоций',
   'hudChrome.keybinds.sheathe': 'Убрать/обнажить оружие',
   'hudChrome.keybinds.hideInterface': 'Скрыть интерфейс',

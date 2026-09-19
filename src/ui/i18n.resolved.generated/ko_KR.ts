@@ -2520,6 +2520,28 @@ export const ko_KR: EnTranslations = {
       "rateLimited": "최근에 여러 건의 신고를 보냈습니다. 잠시 후 다시 보내 주세요.",
       "failed": "버그 신고를 보낼 수 없습니다. 다시 시도해 주세요."
     },
+    "hostDiag": {
+      "title": "시스템 보고서",
+      "intro": "이 코퓨턼에서 게임이 원활하게 실행되지 않으면 시스템 보고서를 만들어 지원 팀에 보내 주세요. 이 코퓨턼의 구성과 게임 설정이 기록되므로 프레임 속도를 떨어뜨리는 원인을 확인할 수 있습니다.",
+      "containsTitle": "보고서에 포함되는 내용",
+      "containsHardware": "하드웨어와 드라이버: 프로세서, 메모리, 그래픽 카드.",
+      "containsWindows": "Windows 전원 및 그래픽 설정.",
+      "containsNvidia": "NVIDIA 제어패널이 설치된 경우 해당 설정.",
+      "containsDisplays": "디스프레이 구성: 화면 수, 크기, 주사울.",
+      "containsPrograms": "프로세서 시간과 메모리를 가장 많이 사용하는 프로그램 이름.",
+      "containsGame": "게임과 런춘러 버전, 그리고 현재 그래픽 설정.",
+      "privacy": "파일, 사용자 이름, 계정 정보는 포함되지 않습니다. 코퓨턼 이름은 이명 코드로 대십됩니다. 자동으로 전소되는 것은 없습니다. 보고서는 코퓨턼에 저장되는 파일이며, 누구에게 보낼지는 직접 결정합니다.",
+      "create": "보고서 만들기",
+      "running": "시스템 정보를 수집하고 있습니다. 몇 초 걸립니다.",
+      "saved": "보고서를 {fileName}(으)로 장하였습니다.",
+      "savedNoName": "보고서를 장하였습니다.",
+      "detailPartial": "일부 정보는 수집할 수 없었습니다. 그래도 보고서는 도움이 됩니다.",
+      "detailUnavailable": "Windows 시스템 검사 파일이 없거나 변경되어 기본 정보만 포함되었습니다. 게임을 다시 설지하면 복원됩니다.",
+      "detailNativeError": "Windows 시스템 검사를 실행할 수 없어 기본 정보만 포함되었습니다.",
+      "busy": "이미 보고서를 만들고 있습니다.",
+      "failed": "보고서를 만들 수 없습니다. 다시 시도해 주세요.",
+      "sendHint": "장한 파일을 Discord로 지원 팀에 보내거나 지원 요정에 첨부해 주세요."
+    },
     "paperdoll": {
       "unequipAria": "{item} 장착 해제",
       "unequipHint": "× 클릭, 우클릭 또는 가방으로 드래그하여 장착 해제",

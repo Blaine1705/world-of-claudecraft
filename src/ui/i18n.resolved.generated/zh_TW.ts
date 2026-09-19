@@ -2520,6 +2520,28 @@ export const zh_TW: EnTranslations = {
       "rateLimited": "你最近已傳送多份回報。請稍候再傳送。",
       "failed": "無法傳送錯誤回報。請重試。"
     },
+    "hostDiag": {
+      "title": "系統報告",
+      "intro": "如果遊戲在這台電腦上執行不順，請產生一份系統報告並寄給支援團隊。報告會說明這台電腦的配備以及遊戲的設定，方便我們查出幀率受限的原因。",
+      "containsTitle": "報告包含的内容",
+      "containsHardware": "硬體與驅動程式：處理器、記憶體和顯示卡。",
+      "containsWindows": "Windows 的電源與圖形設定。",
+      "containsNvidia": "若已安裝 NVIDIA 控制面板，則包含其設定。",
+      "containsDisplays": "你的顯示器配置：螢幕數量、尺寸和更新率。",
+      "containsPrograms": "占用處理器時間和記憶體最多的程式名稱。",
+      "containsGame": "遊戲與啟動器版本，以及你目前的圖形設定。",
+      "privacy": "報告不包含你的檔案、使用者名稱或帳號資料。你的電腦名稱會被替換為匆名代碼。報告不會自動上傳：它只是一個儲存在你電腦上的檔案，由你決定寄給誰。",
+      "create": "產生報告",
+      "running": "正在收集系統資訊，需要幾秒鐘。",
+      "saved": "報告已儲存為 {fileName}。",
+      "savedNoName": "報告已儲存。",
+      "detailPartial": "部分資訊未能收集到。該報告仍然可用。",
+      "detailUnavailable": "Windows 系統掃描程式遺失或已被修改，因此報告只包含基本資訊。重新安裝遊戲即可修復。",
+      "detailNativeError": "Windows 系統掃描無法執行，因此報告只包含基本資訊。",
+      "busy": "已有一份報告正在產生中。",
+      "failed": "無法產生報告，請重試。",
+      "sendHint": "請將儲存的檔案透過 Discord 寄給支援團隊，或附在你的支援請求中。"
+    },
     "paperdoll": {
       "unequipAria": "卸下 {item}",
       "unequipHint": "點擊 ×、右鍵點擊或拖曳至背包以卸下",

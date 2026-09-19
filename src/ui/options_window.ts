@@ -31,6 +31,7 @@ import {
   onDesktopGpuBackendWriteFailed,
 } from '../game/desktop_gpu_backend_sync';
 import { desktopGpuPrefSupported } from '../game/desktop_gpu_pref_sync';
+import { hostDiagAvailable } from '../game/desktop_host_diag';
 import {
   desktopRestartSupported,
   pendingRestartKeys,
@@ -78,11 +79,13 @@ import { desktopBridge } from '../runtime';
 import type { IWorld } from '../world_api';
 import { appVersionInfo } from './app_version';
 import { type AuraOverlayHooks, AuraOverlaySettingsPanel } from './aura_overlay_settings';
+import { bugReportErrorText } from './bug_report_error_text';
 import { controllerDeviceStatusView } from './controller_options_view';
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
 import type { FocusTrapHandle } from './focus_manager';
 import { captureFocusKey, findFocusKey, restoreFirstEnabled } from './focus_restore';
+import { renderHostDiagPanel } from './host_diag_window';
 import type { BugReportHooks, GraphicsApplyOutcome, OptionsHooks } from './hud';
 import type { ChatClock } from './hud/chat/chat_timestamp';
 import {
@@ -584,6 +587,12 @@ export class OptionsWindow {
       case 'performance':
         this.renderPerformance();
         break;
+      case 'hostdiag':
+        renderHostDiagPanel(this.viewShell(t('hudChrome.hostDiag.title'), 'set-rows'), this.deps, {
+          back: () => this.goBack(),
+          close: () => this.close(),
+        });
+        break;
       case 'transfer':
         this.renderTransfer();
         break;
@@ -659,6 +668,7 @@ export class OptionsWindow {
     const scroll = this.viewShell(t('hud.options.gameMenu'));
     const entries = buildOptionsMenu({
       bugReportAvailable: this.deps.bugReport() !== null,
+      hostDiagAvailable: hostDiagAvailable(),
       // Frame editing is desktop-only: the same gate as the Frames tab's row,
       // and the same union that raises the touch HUD (mobile_controls
       // setActive), which is what Hud.toggleInterfaceUnlock refuses on.
@@ -2118,7 +2128,7 @@ export class OptionsWindow {
           })
           .catch((err: unknown) => {
             submit.disabled = false;
-            error.textContent = this.localizeBugReportError(err);
+            error.textContent = bugReportErrorText(err);
           });
       });
     });
@@ -2129,17 +2139,6 @@ export class OptionsWindow {
       ?.addEventListener('click', () => this.close());
     // Focus the description so a keyboard/screen-reader user lands in the field.
     window.setTimeout(() => desc.focus(), 0);
-  }
-
-  private localizeBugReportError(err: unknown): string {
-    const text = err instanceof Error ? err.message : '';
-    const keyByMessage: Record<string, TranslationKey> = {
-      'describe the bug': 'hudChrome.bugReport.describeFirst',
-      'bug report too large': 'hudChrome.bugReport.tooLarge',
-      'too many bug reports, try again later': 'hudChrome.bugReport.rateLimited',
-    };
-    const key = keyByMessage[text.toLowerCase()];
-    return key ? t(key) : t('hudChrome.bugReport.failed');
   }
 
   // -------------------------------------------------------------------------

@@ -474,6 +474,7 @@ export type OptionsPanelId =
   | 'auras'
   | 'audio'
   | 'performance'
+  | 'hostdiag'
   | 'transfer'
   | 'bugreport';
 
@@ -497,6 +498,12 @@ export interface OptionsMenuOpts {
   /** The "Report a Bug" row is online-only (it needs an authoritative server
    *  to receive the report). */
   bugReportAvailable: boolean;
+  /** The "System Report" row is desktop-shell-only: it needs the Electron
+   *  bridge's runHostDiag, which shipped after the login trio, so an older
+   *  installed shell exposes the bridge WITHOUT it. Unlike the bug-report row
+   *  above it is NOT online-gated: the file is saved locally and mailed by the
+   *  player, so an offline session with a performance problem can make one. */
+  hostDiagAvailable: boolean;
   /** Frame editing is desktop-only (every gesture refuses touch layouts), so
    *  the touch HUD omits the Unlock Interface row: the same gate the Frames
    *  tab's row sits behind, and the predicate Hud.toggleInterfaceUnlock
@@ -526,6 +533,16 @@ export function buildOptionsMenu(opts: OptionsMenuOpts): OptionsMenuEntry[] {
     { labelKey: 'hudChrome.auraOverlay.title', action: { kind: 'goto', view: 'auras' } },
     { labelKey: 'hud.options.audio', action: { kind: 'goto', view: 'audio' } },
     { labelKey: 'hudChrome.perf.title', action: { kind: 'goto', view: 'performance' } },
+  );
+  // Directly after Performance, which is where a player hunting a frame-rate
+  // problem already is; gated on the desktop shell being able to produce the
+  // file at all (see hostDiagAvailable above).
+  if (opts.hostDiagAvailable)
+    entries.push({
+      labelKey: 'hudChrome.hostDiag.title',
+      action: { kind: 'goto', view: 'hostdiag' },
+    });
+  entries.push(
     // Full settings export/import: its own sub-panel, since the code it carries
     // spans every family (the Interface tab's rows carry only their own).
     { labelKey: 'hudChrome.fullTransfer.menu', action: { kind: 'goto', view: 'transfer' } },

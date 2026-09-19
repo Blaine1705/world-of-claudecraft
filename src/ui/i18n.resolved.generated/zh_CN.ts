@@ -2520,6 +2520,28 @@ export const zh_CN: EnTranslations = {
       "rateLimited": "你最近已发送多份报告。请稍后再发送。",
       "failed": "无法发送错误报告。请重试。"
     },
+    "hostDiag": {
+      "title": "系统报告",
+      "intro": "如果游戏在这台电脑上运行不畅，请生成一份系统报告并发送给支持团队。报告会说明这台电脑的配置以及游戏的设置情况，方便我们查明帧率受限的原因。",
+      "containsTitle": "报告包含的内容",
+      "containsHardware": "硬件与驱动：处理器、内存和显卡。",
+      "containsWindows": "Windows 的电源与图形设置。",
+      "containsNvidia": "若已安装 NVIDIA 控制面板，则包含其设置。",
+      "containsDisplays": "你的显示器配置：屏幕数量、尺寸和刷新率。",
+      "containsPrograms": "占用处理器时间和内存最多的程序名称。",
+      "containsGame": "游戏与启动器版本，以及你当前的图形设置。",
+      "privacy": "报告不包含你的文件、用户名或账号信息。你的计算机名会被替换为匆名代码。报告不会自动上传：它只是一个保存在你电脑上的文件，由你决定发送给谁。",
+      "create": "生成报告",
+      "running": "正在收集系统信息，需要几秒钟。",
+      "saved": "报告已保存为 {fileName}。",
+      "savedNoName": "报告已保存。",
+      "detailPartial": "部分信息未能收集到。该报告仍然可用。",
+      "detailUnavailable": "Windows 系统扫描程序缺失或已被修改，因此报告只包含基本信息。重新安装游戏即可修复。",
+      "detailNativeError": "Windows 系统扫描无法运行，因此报告只包含基本信息。",
+      "busy": "已有一份报告正在生成中。",
+      "failed": "无法生成报告，请重试。",
+      "sendHint": "请将保存的文件通过 Discord 发送给支持团队，或附在你的支持请求中。"
+    },
     "paperdoll": {
       "unequipAria": "卸下 {item}",
       "unequipHint": "点击 ×、右键点击或拖到背包以卸下",

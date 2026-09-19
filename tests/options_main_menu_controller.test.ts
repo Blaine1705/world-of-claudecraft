@@ -20,6 +20,7 @@ import { buildOptionsMenu, type OptionsMenuEntry } from '../src/ui/options_view'
 
 const DESKTOP_MENU = {
   bugReportAvailable: true,
+  hostDiagAvailable: false,
   interfaceUnlockAvailable: true,
   interfaceUnlocked: false,
 };

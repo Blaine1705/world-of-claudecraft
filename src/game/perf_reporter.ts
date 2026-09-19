@@ -139,6 +139,24 @@ function devTraceLog(status: PerfReporterStatus, level: 'debug' | 'warn', messag
   console[level](`[perf-report] ${message}`);
 }
 
+/**
+ * The perf-report session id this session is already tagging its reports with,
+ * or null when none has been minted (the reporter is disabled, or has not
+ * started yet). READ-ONLY on purpose: it never mints one, so asking cannot
+ * create an id that no report will ever carry.
+ *
+ * The smallest seam the System Report panel needed: that panel copies the id
+ * into the saved diagnostic file, which is what lets a support engineer join
+ * one player's file to the automatic performance reports from the same session.
+ */
+export function perfReportSessionId(): string | null {
+  try {
+    return sessionStorage.getItem(SESSION_KEY) || null;
+  } catch {
+    return null;
+  }
+}
+
 function storedSessionId(): string {
   try {
     const existing = sessionStorage.getItem(SESSION_KEY);
