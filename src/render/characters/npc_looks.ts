@@ -2291,6 +2291,24 @@ export const NPC_LOOKS: Record<string, NpcLookDef> = {
   },
   // === World quests: instructors and the Fenbridge watch ==================
   // Elian: a silver-haired scholar whose open face stays visible above his book.
+  // The Vault Keeper (PR 4052): the Weekly Vault's custodian at the stone hall
+  // by the harbour road, a clean-shaven steward in bank gold with a clerk's
+  // ledger, deliberately plainer than the Gilded Strongbox's bursar.
+  eastbrook_vault_keeper: {
+    app: {
+      gender: 'male',
+      hair: 'sweptback',
+      ...hair(34, 0.18, 0.62),
+      brows: 'arched',
+      eyeShape: 'almond',
+      ...eyes(205, 0.4, 0.45),
+      ...skin(24, 0.42, 0.52),
+      face: face({ cheeks: 0.05, chin: -0.05 }),
+      outfit: 'gold',
+    },
+    worn: kit('rogue'),
+    props: 'tome',
+  },
   // Cham Pete: the weekly emissary on the Eastbrook green, a
   // hooded ledger-keeper in the town's violet.
   weekly_emissary: {

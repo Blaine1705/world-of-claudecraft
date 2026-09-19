@@ -388,7 +388,14 @@ describe('generated chunk geometry is stable', () => {
     // NPC like every other). Localization checked against the dense height
     // atlas re-minted in the same commit: 7 points move (both lanes), all within
     // 6.3 yd of the emissary, by at most 0.053 yd.
-    expect(digestOf(inRect)).toBe('7a4d432bff27b7850a8035a589be8358');
+    // Re-minted for the Weekly Vault (PR 4052) landing on the quests integration
+    // branch: the stone hall's late terrain pad at (21, -119) and the coast road
+    // re-threaded around its western entrance regrade the harbour-quarter
+    // chunks. Probed on both trees with a 4 yd lattice: every moved height sits
+    // inside x 0..64, z -148..-20 (up to 1.7 yd at the hall footprint, under
+    // 0.02 yd along the re-threaded road), nothing moves outside the town.
+    // Measured on the merged tree; CI shard 1 read the same digest.
+    expect(digestOf(inRect)).toBe('1e7016bd350ee0bdf0e26b87c8029b0a');
     // The gap super-chunk digest pin is gone with the gap chunks themselves
     // (the island claims the old vale gap cells); gapFill.length above pins
     // their absence.

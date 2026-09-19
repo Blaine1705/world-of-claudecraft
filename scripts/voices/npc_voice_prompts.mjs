@@ -1130,6 +1130,10 @@ export const VOICE_ALIAS = {
   // The weekly emissary keeps the Vale's ledger of deeds: the same civic,
   // matter-of-fact register as the foreman until a voice of his own is cast.
   weekly_emissary: 'foreman_odell',
+  // The Weekly Vault keeper (PR 4052) guards a bank-gold strongroom by the
+  // harbour road: the Gilded Strongbox bursar's discreet baritone is the
+  // register, until a voice of his own is cast.
+  eastbrook_vault_keeper: 'bursar_fernando',
   brother_aldric_fen: 'brother_aldric',
   brother_aldric_highwatch: 'brother_aldric',
   brother_aldric_raid: 'brother_aldric',
