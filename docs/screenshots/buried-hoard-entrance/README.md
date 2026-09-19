@@ -27,6 +27,8 @@ Captures use no-aggro; existing vegetation and wildlife remain visible.
 
 The model and sound source provenance is in
 `docs/design/buried-hoard-entrance/asset-provenance.md` and `CREDITS.md`.
+See [QA.md](QA.md) for implementation files, exact validation commands, results
+and remaining limits.
 The dark opening is a shallow occluding mesh, with terrain-conforming earth and
 light spill, rather than a destructive edit to the shared terrain.
 
