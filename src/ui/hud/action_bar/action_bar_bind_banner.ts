@@ -13,7 +13,7 @@
 import { audio } from '../../../game/audio';
 import { t } from '../../i18n';
 import { getUiScale } from '../../ui_scale';
-import { draggedWindowPosition } from '../../window_drag_core';
+import { draggedWindowPosition, type WindowDragBounds } from '../../window_drag_core';
 import {
   type ActionBarBindBox,
   type ActionBarBindState,
@@ -32,6 +32,11 @@ export const ACTION_BAR_BIND_BANNER_ANCHORS: readonly string[] = [
   '#cross-hotbar',
   '#stancebar',
   '#petbar',
+  // The cast and swing bars sit directly above the stack: actionable signals
+  // the banner must not hide either.
+  '#castbar',
+  '#swingbar',
+  '#swingbar-offhand',
 ];
 
 /** Build the banner, append it to `parent` (the HUD root), place it clear of
@@ -92,11 +97,27 @@ function anchorBox(root: HTMLElement, selector: string, scale: number): ActionBa
   };
 }
 
+function liveScale(): number {
+  const s = getUiScale();
+  return s > 0 ? s : 1;
+}
+
+/** The VISIBLE HUD region in author px: the window box divided by the UI
+ *  scale. Not the #ui client box, which keeps its full author width under a
+ *  scale above 1 and is clipped by the viewport (overflow hidden), so a clamp
+ *  against it could park the banner off screen. */
+function visibleViewport(uiRoot: HTMLElement, scale: number): { width: number; height: number } {
+  const w = uiRoot.ownerDocument.defaultView;
+  return {
+    width: (w?.innerWidth || uiRoot.clientWidth) / scale,
+    height: (w?.innerHeight || uiRoot.clientHeight) / scale,
+  };
+}
+
 /** Position a connected banner against the live bars (inline left/top in HUD
- *  author px, the same space the banner's own offset size and the #ui client
- *  box are already in). */
+ *  author px, the same space the banner's own offset size is already in). */
 export function placeActionBarBindBanner(el: HTMLElement, uiRoot: HTMLElement): void {
-  const scale = getUiScale() > 0 ? getUiScale() : 1;
+  const scale = liveScale();
   const bars: ActionBarBindBox[] = [];
   for (const sel of ACTION_BAR_BIND_BANNER_ANCHORS) {
     const box = anchorBox(uiRoot, sel, scale);
@@ -105,45 +126,134 @@ export function placeActionBarBindBanner(el: HTMLElement, uiRoot: HTMLElement): 
   const placed = actionBarBindBannerPlacement({
     bars,
     banner: { width: el.offsetWidth, height: el.offsetHeight },
-    viewport: { width: uiRoot.clientWidth, height: uiRoot.clientHeight },
+    viewport: visibleViewport(uiRoot, scale),
   });
   el.style.left = `${placed.left}px`;
   el.style.top = `${placed.top}px`;
 }
 
-/** Drag the banner by its plate (never by its buttons): the player can move it
- *  off any slot it still covers. Pointer coordinates are visual px; the shared
- *  window-drag geometry converts them to author px and keeps the banner inside
- *  the HUD root. */
+/** How far one arrow press nudges the banner, in author px (Shift: four times). */
+export const ACTION_BAR_BIND_BANNER_NUDGE = 8;
+
+/**
+ * Drag the banner by its plate (never by its buttons), so the player can move
+ * it off any slot it still covers; a keyboard player nudges it with the arrow
+ * keys while Reset or Done has focus. The drag session measures ONCE at
+ * pointerdown (size, scale, viewport) and writes one left/top per animation
+ * frame, so pointermove never reads layout. Pointer coordinates are visual px;
+ * the shared window-drag geometry converts them to author px and keeps the
+ * banner inside the visible region. Only the pointer that started the drag can
+ * move or end it. The banner also re-places itself against the bars when the
+ * window resizes, until the player has moved it by hand.
+ */
 export function bindActionBarBindBannerDrag(el: HTMLElement, uiRoot: HTMLElement): void {
-  let grab: { x: number; y: number } | null = null;
+  type Session = {
+    pointerId: number;
+    grabX: number;
+    grabY: number;
+    bounds: WindowDragBounds;
+    frame: number;
+    pointer: { x: number; y: number } | null;
+  };
+  let session: Session | null = null;
+  let moved = false;
+  const bounds = (): WindowDragBounds => {
+    const scale = liveScale();
+    const vp = visibleViewport(uiRoot, scale);
+    return {
+      scale,
+      viewportWidth: vp.width,
+      viewportHeight: vp.height,
+      windowWidth: el.offsetWidth,
+      windowHeight: el.offsetHeight,
+    };
+  };
+  const write = (pos: { left: number; top: number }) => {
+    el.style.left = `${pos.left}px`;
+    el.style.top = `${pos.top}px`;
+    moved = true;
+  };
+  const flush = () => {
+    if (!session) return;
+    session.frame = 0;
+    if (!session.pointer) return;
+    write(
+      draggedWindowPosition(
+        {
+          pointerX: session.pointer.x,
+          pointerY: session.pointer.y,
+          grabOffsetX: session.grabX,
+          grabOffsetY: session.grabY,
+        },
+        session.bounds,
+      ),
+    );
+  };
   el.addEventListener('pointerdown', (e) => {
-    if (e.button !== 0 || (e.target instanceof Element && e.target.closest('button'))) return;
+    if (session || e.button !== 0) return;
+    if (e.target instanceof Element && e.target.closest('button')) return;
     const r = el.getBoundingClientRect();
-    grab = { x: e.clientX - r.left, y: e.clientY - r.top };
-    el.setPointerCapture?.(e.pointerId);
+    session = {
+      pointerId: e.pointerId,
+      grabX: e.clientX - r.left,
+      grabY: e.clientY - r.top,
+      bounds: bounds(),
+      frame: 0,
+      pointer: null,
+    };
+    try {
+      el.setPointerCapture(e.pointerId);
+    } catch {
+      // A synthetic or legacy pointer with no capture: the drag still follows
+      // moves over the plate itself.
+    }
     e.preventDefault();
   });
   el.addEventListener('pointermove', (e) => {
-    if (!grab) return;
-    const pos = draggedWindowPosition(
-      { pointerX: e.clientX, pointerY: e.clientY, grabOffsetX: grab.x, grabOffsetY: grab.y },
-      {
-        scale: getUiScale(),
-        viewportWidth: uiRoot.clientWidth,
-        viewportHeight: uiRoot.clientHeight,
-        windowWidth: el.offsetWidth,
-        windowHeight: el.offsetHeight,
-      },
-    );
-    el.style.left = `${pos.left}px`;
-    el.style.top = `${pos.top}px`;
+    if (!session || e.pointerId !== session.pointerId) return;
+    session.pointer = { x: e.clientX, y: e.clientY };
+    const raf = uiRoot.ownerDocument.defaultView?.requestAnimationFrame;
+    if (!raf) {
+      flush();
+      return;
+    }
+    if (!session.frame) session.frame = raf(flush);
   });
-  const drop = () => {
-    grab = null;
+  const drop = (e: PointerEvent) => {
+    if (!session || e.pointerId !== session.pointerId) return;
+    flush();
+    session = null;
   };
   el.addEventListener('pointerup', drop);
   el.addEventListener('pointercancel', drop);
+  el.addEventListener('keydown', (e) => {
+    const step = (e.shiftKey ? 4 : 1) * ACTION_BAR_BIND_BANNER_NUDGE;
+    const dx = e.key === 'ArrowLeft' ? -step : e.key === 'ArrowRight' ? step : 0;
+    const dy = e.key === 'ArrowUp' ? -step : e.key === 'ArrowDown' ? step : 0;
+    if (!dx && !dy) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const b = bounds();
+    // Current seat in author px; the grab offset is zero so the pointer IS the
+    // new visual origin.
+    const left = (Number.parseFloat(el.style.left) || 0) + dx;
+    const top = (Number.parseFloat(el.style.top) || 0) + dy;
+    write(
+      draggedWindowPosition(
+        { pointerX: left * b.scale, pointerY: top * b.scale, grabOffsetX: 0, grabOffsetY: 0 },
+        b,
+      ),
+    );
+  });
+  const win = uiRoot.ownerDocument.defaultView;
+  const onResize = () => {
+    if (!el.isConnected) {
+      win?.removeEventListener('resize', onResize);
+      return;
+    }
+    if (!moved) placeActionBarBindBanner(el, uiRoot);
+  };
+  win?.addEventListener('resize', onResize);
 }
 
 /** Paint the status line for the mode's current state. */
