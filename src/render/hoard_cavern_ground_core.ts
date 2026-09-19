@@ -1,8 +1,8 @@
 import {
-  hoardValleyRevealZ,
-  hoardValleySpanAtZ,
   type HoardValleyLayoutInput,
   type HoardValleyZoneProfile,
+  hoardValleyRevealZ,
+  hoardValleySpanAtZ,
 } from './hoard_valley_core';
 
 export interface HoardCavernGroundPlan {

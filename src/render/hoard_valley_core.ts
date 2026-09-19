@@ -387,7 +387,8 @@ function buildDressing(
   const depth = layout.zMax - layout.zMin;
   const target = low ? 10 : Math.min(46, 20 + Math.round(depth / 7));
   const placements: HoardValleyDressingPlacement[] = [];
-  for (let attempt = 0; attempt < target * 12 && placements.length < target; attempt++) {
+  // Both presets search the same candidate stream so their first ten hero anchors agree.
+  for (let attempt = 0; attempt < 46 * 12 && placements.length < target; attempt++) {
     const z = layout.zMin + 13 + hash(seed, attempt, 31) * Math.max(1, depth - 22);
     const side = hash(seed, attempt, 32) < 0.5 ? -1 : 1;
     const span = hoardValleySpanAtZ(layout, z);

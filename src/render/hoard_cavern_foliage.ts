@@ -75,6 +75,22 @@ function bake(scene: THREE.Group): Model {
           }),
         );
         material.name = original.name;
+        if (/leav/i.test(original.name)) {
+          // Green albedo multiplied by orange becomes olive. Preserve the painted
+          // texture's value before the autumn instance tint supplies its new hue.
+          material.onBeforeCompile = (shader) => {
+            shader.fragmentShader = shader.fragmentShader.replace(
+              '#include <map_fragment>',
+              `#include <map_fragment>
+              #ifdef USE_COLOR
+                if (vColor.r > vColor.g * 1.4) {
+                  diffuseColor.rgb = vec3(max(diffuseColor.r, max(diffuseColor.g, diffuseColor.b)));
+                }
+              #endif`,
+            );
+          };
+          material.customProgramCacheKey = () => 'hoard-cavern-seasonal-leaves-v1';
+        }
         materialColors.set(material, material.color.clone());
         material.color.multiply(currentTint);
         materials.set(original, material);

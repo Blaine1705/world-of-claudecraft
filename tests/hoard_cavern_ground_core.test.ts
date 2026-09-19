@@ -4,8 +4,8 @@ import {
   hoardCavernGroundSample,
 } from '../src/render/hoard_cavern_ground_core';
 import {
-  HOARD_VALLEY_ZONE_PROFILES as zones,
   type HoardValleyLayoutInput,
+  HOARD_VALLEY_ZONE_PROFILES as zones,
 } from '../src/render/hoard_valley_core';
 
 const layout: HoardValleyLayoutInput = {

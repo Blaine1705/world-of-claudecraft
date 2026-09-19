@@ -92,8 +92,10 @@ describe('hoard cavern foliage', () => {
     expect(b.castShadow).toBe(false);
   });
 
-  it('keeps trunks and crowns clear of the fight spine and avoids tree clusters', () => {
-    seedTree();
+  it('keeps rotated broad crowns clear of the fight spine and avoids tree clusters', () => {
+    const source = new THREE.Group();
+    source.add(new THREE.Mesh(new THREE.BoxGeometry(8, 8, 8), new THREE.MeshStandardMaterial()));
+    assets.seedScene('/models/foliage/oak_1_field.glb', source);
     const p = plan();
     const mesh = buildHoardCavernFoliage(p, false).children[0] as THREE.InstancedMesh;
     expect(mesh.count).toBeLessThanOrEqual(6);
@@ -104,6 +106,13 @@ describe('hoard cavern foliage', () => {
       const position = new THREE.Vector3().setFromMatrixPosition(matrix);
       expect(Math.abs(position.x)).toBeGreaterThan(p.centerClearHalfWidth + 1);
       expect(position.z).toBeGreaterThanOrEqual(p.revealZ);
+      const vertices = mesh.geometry.getAttribute('position');
+      for (let vertex = 0; vertex < vertices.count; vertex++) {
+        const world = new THREE.Vector3()
+          .fromBufferAttribute(vertices, vertex)
+          .applyMatrix4(matrix);
+        expect(Math.abs(world.x)).toBeGreaterThanOrEqual(8);
+      }
       for (const other of positions) expect(position.distanceTo(other)).toBeGreaterThanOrEqual(10);
       positions.push(position);
     }

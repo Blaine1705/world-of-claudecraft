@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { buildHoardCavernShellPlan, hoardCavernRoofVisible } from '../src/render/hoard_cavern_core';
+import {
+  buildHoardCavernShellPlan,
+  hoardCavernSceneryVisible,
+} from '../src/render/hoard_cavern_core';
 import { buildHoardValleyPlan, type HoardValleyLayoutInput } from '../src/render/hoard_valley_core';
 
 const layout: HoardValleyLayoutInput = {
@@ -24,11 +27,17 @@ describe('collapsed hoard cavern', () => {
     const origin = { x: 10000, y: -3, z: 400 };
     const bounds = { min: { x: -12, y: 13, z: -20 }, max: { x: 12, y: 18, z: 0 } };
     const target = { x: 10000, y: 0, z: 390 };
-    expect(hoardCavernRoofVisible({ x: 10000, y: 20, z: 390 }, target, origin, bounds)).toBe(false);
-    expect(hoardCavernRoofVisible({ x: 10018, y: 25, z: 370 }, target, origin, bounds)).toBe(false);
-    expect(hoardCavernRoofVisible({ x: 10000, y: 4, z: 382 }, target, origin, bounds)).toBe(true);
+    expect(hoardCavernSceneryVisible({ x: 10000, y: 20, z: 390 }, target, origin, bounds)).toBe(
+      false,
+    );
+    expect(hoardCavernSceneryVisible({ x: 10018, y: 25, z: 370 }, target, origin, bounds)).toBe(
+      false,
+    );
+    expect(hoardCavernSceneryVisible({ x: 10000, y: 4, z: 382 }, target, origin, bounds)).toBe(
+      true,
+    );
     expect(
-      hoardCavernRoofVisible({ x: 10000, y: 25, z: 430 }, { ...target, z: 435 }, origin, bounds),
+      hoardCavernSceneryVisible({ x: 10000, y: 25, z: 430 }, { ...target, z: 435 }, origin, bounds),
     ).toBe(true);
   });
   const valley = buildHoardValleyPlan({ layout, zoneId: 'amberfall', seed: 123, low: false });

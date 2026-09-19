@@ -197,12 +197,43 @@ describe('hoard valley painter', () => {
     const ground = view.group.getObjectByName('HoardValleyGround') as THREE.Mesh;
     expect(view.group.getObjectByName('HoardValleyGroundShadows')).toBeUndefined();
     let disposed = false;
+    let instancesDisposed = false;
+    let sharedDisposed = false;
+    const cliffs = view.group.getObjectByName('HoardValleyBoundaryCliffs') as THREE.InstancedMesh;
+    cliffs.addEventListener('dispose', () => {
+      instancesDisposed = true;
+    });
+    cliffs.geometry.addEventListener('dispose', () => {
+      sharedDisposed = true;
+    });
     ground.geometry.addEventListener('dispose', () => {
       disposed = true;
     });
     expect(disposeHoardValleyGroup(view.group)).toBe(true);
     expect(disposed).toBe(true);
+    expect(instancesDisposed).toBe(true);
+    expect(sharedDisposed).toBe(false);
     expect(scene.children).not.toContain(view.group);
     expect(disposeHoardValleyGroup(view.group)).toBe(false);
+  });
+
+  it('cuts away the actual entry roof at an offset and restores it below the ceiling', async () => {
+    const view = buildHoardValley({
+      scene: new THREE.Scene(),
+      plan: floorPlan(),
+      offset: { x: 10000, y: -3, z: 400 },
+      effectsProfile: resolveHoardValleyEffectsProfile('low'),
+    });
+    await view.readyForEntry;
+    const roof = view.group.getObjectByName('HoardCavernEntryRoof');
+    const grade = { fog: [1, 1, 1] as const, nightAmt: 0 };
+    const target = new THREE.Vector3(10000, -1, 390);
+    updateHoardValleyDayNight(grade, new THREE.Vector3(10000, 25, 390), target);
+    expect(roof?.visible).toBe(false);
+    updateHoardValleyDayNight(grade, new THREE.Vector3(10000, 4, 382), target);
+    expect(roof?.visible).toBe(true);
+    view.dispose();
+    updateHoardValleyDayNight(grade, new THREE.Vector3(10000, 25, 390), target);
+    expect(roof?.visible).toBe(true);
   });
 });

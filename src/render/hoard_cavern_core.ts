@@ -24,9 +24,10 @@ interface Point3 {
   y: number;
   z: number;
 }
+const AXES = ['x', 'y', 'z'] as const;
 
 /** Keep the underside while walking underneath; cut away only an obstructing roof. */
-export function hoardCavernRoofVisible(
+export function hoardCavernSceneryVisible(
   camera: Point3,
   target: Point3,
   origin: Point3,
@@ -34,7 +35,7 @@ export function hoardCavernRoofVisible(
 ): boolean {
   let near = 0;
   let far = 1;
-  for (const axis of ['x', 'y', 'z'] as const) {
+  for (const axis of AXES) {
     const start = camera[axis] - origin[axis];
     const delta = target[axis] - camera[axis];
     const min = bounds.min[axis] - 0.5;

@@ -9,7 +9,8 @@ import type { RiftFloorPlan } from '../sim/rift/types';
 import { type DayNightGrade, duskWarmAmount, nightSkyDesat } from './day_night_core';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import type { GfxTier } from './gfx';
-import { hoardCavernRoofVisible } from './hoard_cavern_core';
+import { hoardCavernSceneryVisible } from './hoard_cavern_core';
+import { buildHoardCavernCutaway } from './hoard_cavern_cutaway';
 import { buildHoardCavernFoliage, updateHoardCavernFoliageTint } from './hoard_cavern_foliage';
 import { buildHoardCavernGround } from './hoard_cavern_ground';
 import { buildHoardCavernShell, hoardCavernRockGeometry } from './hoard_cavern_shell';
@@ -362,6 +363,7 @@ class HoardValleyViewImpl implements HoardValleyView {
   private disposed = false;
   private readonly disposeGround: () => void;
   private readonly roof: THREE.InstancedMesh | undefined;
+  private readonly updateSceneryCamera: (camera: THREE.Vector3, target: THREE.Vector3) => void;
 
   constructor(options: HoardValleyBuildOptions) {
     const outdoor = options.plan.outdoor;
@@ -400,6 +402,7 @@ class HoardValleyViewImpl implements HoardValleyView {
     this.group.add(buildDressing(visualPlan, shadows));
     this.group.add(buildHoardCavernFoliage(visualPlan, shadows));
     this.roof = this.group.getObjectByName('HoardCavernEntryRoof') as THREE.InstancedMesh;
+    this.updateSceneryCamera = buildHoardCavernCutaway(this.group);
     activeValleys.add(this);
     this.group.userData.hoardValleyZoneId = outdoor.zoneId;
     this.group.userData.hoardValleyRevealZ = outdoor.valleyStartZ ?? visualPlan.revealZ;
@@ -421,8 +424,9 @@ class HoardValleyViewImpl implements HoardValleyView {
   }
 
   updateCamera(camera: THREE.Vector3, target: THREE.Vector3): void {
+    this.updateSceneryCamera(camera, target);
     if (this.roof?.boundingBox)
-      this.roof.visible = hoardCavernRoofVisible(
+      this.roof.visible = hoardCavernSceneryVisible(
         camera,
         target,
         this.group.position,
