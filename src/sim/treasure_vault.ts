@@ -47,7 +47,9 @@ import type { RiftInstance } from './rift/types';
 import { HOARD_ENTRANCE_TEMPLATE_ID, makeVaultSeed, type VaultSizeTier } from './rift/vault_seed';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
+import { findHoardEntrancePosition } from './treasure_vault_placement';
 import type { Entity } from './types';
+import { waterLevelAt } from './world';
 
 const CASKET_MATERIAL_POOL = ['thorium_ore', 'elderwood_log', 'sunpetal_herb'] as const;
 const VAULT_MOUNT_REINS_ITEM_ID = 'reins_lanternback_troll';
@@ -130,10 +132,13 @@ export function useTreasureMap(
     ctx.emit({ type: 'treasureMapRead', rarity, siteId: active.siteId, fresh: false, pid });
     return;
   }
+  if (!spawnVaultPortal(ctx, player, pid, active)) {
+    ctx.emit({ type: 'treasureMapRead', rarity, siteId: active.siteId, fresh: false, pid });
+    return;
+  }
   consumeOneUnit();
   meta.treasureMap = null;
   meta.wireRev++;
-  spawnVaultPortal(ctx, player, pid, active);
   ctx.emit({ type: 'treasureVaultOpened', rarity, pid });
 }
 
@@ -142,15 +147,15 @@ function spawnVaultPortal(
   player: Entity,
   ownerPid: number,
   map: TreasureMapProgress,
-): void {
+): boolean {
+  const position = findHoardEntrancePosition(player.pos, player.facing, ctx.groundPos, (x, z) =>
+    waterLevelAt(x, z, ctx.cfg.seed),
+  );
+  if (!position) return false;
   const tier = TREASURE_MAP_RIFT_TIER[map.rarity];
   const baseLevel = RIFT_RANK_BASE_LEVEL[tier];
   const plan = generateRiftPlan(map.seed, baseLevel);
-  // A few yards ahead of the digger, so the walk-in trigger never fires on
-  // the spot they are standing on.
-  const px = player.pos.x + Math.sin(player.facing) * 5;
-  const pz = player.pos.z + Math.cos(player.facing) * 5;
-  const portal = createGroundObject(ctx.nextId++, '', plan.name, ctx.groundPos(px, pz));
+  const portal = createGroundObject(ctx.nextId++, '', plan.name, position);
   portal.templateId = HOARD_ENTRANCE_TEMPLATE_ID;
   portal.objectItemId = null;
   portal.lootable = true;
@@ -160,7 +165,7 @@ function spawnVaultPortal(
   portal.vaultOwnerPid = ownerPid;
   portal.vaultRarity = map.rarity;
   portal.vaultExpiresAt = ctx.time + VAULT_PORTAL_LIFETIME;
-  portal.facing = player.facing + Math.PI;
+  portal.facing = Math.atan2(player.pos.x - position.x, player.pos.z - position.z);
   ctx.addEntity(portal);
   ctx.emit({
     type: 'spellfxAt',
@@ -170,6 +175,7 @@ function spawnVaultPortal(
     fx: 'hoardDig',
     sfxKey: 'hoard_entrance_open',
   });
+  return true;
 }
 
 /** Once a second: an unentered vault portal past its lifetime closes. A portal
