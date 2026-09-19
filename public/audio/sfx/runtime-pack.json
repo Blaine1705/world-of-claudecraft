@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "25f1e98d41749404d47f80110cb3f5d3af3689689d3f30b04c348d62cb18bf11",
-  "catalogHash": "77475257efebc1f4fb73a47d810c561da4f01be17a790982bc80b5ff5e06789b",
+  "bundleId": "c2016d044a7eac65212b624747d8dc948405e97b7c6bf56c89a20433a39f0590",
+  "catalogHash": "df853d41995ab72113b3ce1aca072eb3f0b875f566de6192f56d9645e21efa30",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -830,6 +830,30 @@
         }
       ],
       "gain": 1.840772,
+      "playbackRate": 1
+    },
+    "hoard_entrance_hum": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/hoard_entrance_hum.mp3?v=2ccf53e3d2f1",
+          "bytes": 193768,
+          "sha256": "2ccf53e3d2f1edf709b79256cb444026754d61e33b26c1fcbff74fc98c3847b4"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "hoard_entrance_open": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/hoard_entrance_open.mp3?v=7824ebb0d227",
+          "bytes": 41422,
+          "sha256": "7824ebb0d227b96f200fd3f5a2c13c30a56bca0ca72fa1cb35c88973c386c5ec"
+        }
+      ],
+      "gain": 1,
       "playbackRate": 1
     },
     "ice_block": {

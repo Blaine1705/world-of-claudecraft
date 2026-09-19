@@ -1139,6 +1139,10 @@ export const SFX = [
   // salvage.ts), separate from disenchant's rare+ arcane-materials path.
   { key: 'ui_craft_salvage', custom: true },
 
+  // Buried Hoard: locally authored earth/wood reveal and a warm resonant bed.
+  { key: 'hoard_entrance_open', custom: true },
+  { key: 'hoard_entrance_hum', custom: true, loop: true },
+
   // --- Rift mechanics (custom recordings, src/sim/rift/) --------------------
   // World-anchored one-shots and point-source loops for the procedural Rift
   // dungeon's headline floor mechanics (src/sim/rift/runs.ts, portals.ts),

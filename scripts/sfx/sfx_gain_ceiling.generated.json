@@ -609,6 +609,28 @@
       }
     ]
   },
+  "hoard_entrance_hum": {
+    "ceilingDb": 15.3,
+    "tracks": [
+      {
+        "filename": "hoard_entrance_hum.mp3",
+        "sha256": "2ccf53e3d2f1edf709b79256cb444026754d61e33b26c1fcbff74fc98c3847b4",
+        "size": 193768,
+        "peakDb": -16.3
+      }
+    ]
+  },
+  "hoard_entrance_open": {
+    "ceilingDb": 5.5,
+    "tracks": [
+      {
+        "filename": "hoard_entrance_open.mp3",
+        "sha256": "7824ebb0d227b96f200fd3f5a2c13c30a56bca0ca72fa1cb35c88973c386c5ec",
+        "size": 41422,
+        "peakDb": -6.5
+      }
+    ]
+  },
   "ice_block": {
     "ceilingDb": 6.3,
     "tracks": [

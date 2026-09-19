@@ -394,3 +394,10 @@ MIT License covering the source code.
 If you are unsure whether you may use an asset, or you want permission for
 something this file marks as restricted, ask first: tony@levystreet.com.
 | Ley Beam Alignment celestial frame and crystal heart (`public/ui/minigames/ley-*-v1.webp`) | World of ClaudeCraft | Project art generated with OpenAI built-in image generation, optimized to WebP; [provenance and prompts](docs/screenshots/ley-beam-v1/art-provenance.md) | Project asset | With the project only |
+
+### Buried Hoard entrance
+
+- `public/models/props/hoard_entrance.glb`: original procedural model authored for
+  World of ClaudeCraft from the user design brief, 2026-09-19. No third-party model
+  or image reference. Source and deterministic exporter: `scripts/assets/hoard_entrance/`.
+  Provenance: `docs/design/buried-hoard-entrance/asset-provenance.md`.
