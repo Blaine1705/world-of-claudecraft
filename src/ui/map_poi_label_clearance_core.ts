@@ -12,17 +12,22 @@
 
 import type { MapMarkerProfile } from './map_marker_profile_core';
 
-/** Cap height of the POI label font per marker profile, in canvas pixels.
- *  Mirrors map_window_painter's per-profile labelFont sizes ('bold 13px' /
- *  'bold 20px'); the label band is [my - height, my] because the sprite cache
- *  draws with an alphabetic baseline at my. */
+/** Em size of the POI label font per marker profile, in canvas pixels (a
+ *  conservative stand-in for the ascent band). Mirrors map_window_painter's
+ *  per-profile labelFont sizes ('bold 13px' / 'bold 20px'), pinned by
+ *  tests/map_poi_label_clearance.test.ts; the label band is [my - height, my]
+ *  because the sprite cache draws with an alphabetic baseline at my. Scope:
+ *  POI labels only (portal names and ally names are not routed through here). */
 export const MAP_POI_LABEL_HEIGHT_BY_PROFILE = Object.freeze({
   standard: 13,
   compact: 20,
 } as const satisfies Readonly<Record<MapMarkerProfile, number>>);
 
-/** Breathing room between a lifted label's baseline and the badge edge. */
-export const MAP_POI_LABEL_BADGE_GAP = 2;
+/** Room between a lifted label's BASELINE and the badge edge: descenders
+ *  (about 0.21 em, 4.2 px at the compact 20 px) plus half the label outline
+ *  (up to 2.25 px compact) still paint below the baseline, so the gap is sized
+ *  to keep a name like "Reliquary" (q, y) clear of the badge on both profiles. */
+export const MAP_POI_LABEL_BADGE_GAP = 8;
 
 export interface PoiLabelAnchor {
   mx: number;
@@ -55,24 +60,27 @@ export function poiLabelTouchesBadge(
   return labelBottom > badgeTop && labelTop < badgeBottom;
 }
 
-/** Return the label anchors with every badge-covered label moved clear of the
- *  first badge it touches. Above the badge by default; below it when the lifted
- *  band would leave the canvas top. Untouched labels are returned as-is (same
- *  object), so a caller can tell which ones moved. */
+/** Return every label with a painter-only `labelMy`: the baseline the text is
+ *  drawn at. It equals `my` (the authored projection, which the screen-reader
+ *  map summary keeps announcing) unless the label band touches a badge, in
+ *  which case it is moved clear of the first badge it touches: above the badge
+ *  by default, below it when the lifted band would leave the canvas top. */
 export function clearPoiLabelsOffBadges<T extends PoiLabelAnchor>(
   labels: readonly T[],
   badges: readonly BadgeFootprint[],
   badgeSize: number,
   labelHeight: number,
-): T[] {
-  if (badges.length === 0) return labels.slice();
+): (T & { labelMy: number })[] {
   const half = badgeSize / 2;
   return labels.map((label) => {
+    // First touching badge only: no shipped zone stacks two navigation badges
+    // on one named place, and a lifted label that lands on a second badge is
+    // an accepted bound rather than a search.
     const badge = badges.find((b) => poiLabelTouchesBadge(label, b, badgeSize, labelHeight));
-    if (!badge) return label;
+    if (!badge) return { ...label, labelMy: label.my };
     const above = badge.my - half - MAP_POI_LABEL_BADGE_GAP;
-    const my =
+    const labelMy =
       above - labelHeight >= 0 ? above : badge.my + half + MAP_POI_LABEL_BADGE_GAP + labelHeight;
-    return { ...label, my };
+    return { ...label, labelMy };
   });
 }
