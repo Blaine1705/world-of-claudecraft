@@ -59,6 +59,13 @@ function noticesOf(sim: Sim): string[] {
     .map((ev) => (ev as { text: string }).text);
 }
 
+function requirePendingTownFocus(meta: PlayerMeta): PendingTownFocus {
+  const pending = meta.pendingTownFocus;
+  expect(pending).not.toBeNull();
+  if (!pending) throw new Error('expected pending Town Focus re-spec');
+  return pending;
+}
+
 // ---------------------------------------------------------------------------
 // 1. The pure leaf.
 // ---------------------------------------------------------------------------
@@ -284,13 +291,13 @@ describe('re-saving a queued allocation', () => {
     const { sim, pid, meta } = inTown();
     sim.time = 0;
     sim.setTownFocus({ silk: 10 }, 'time', pid);
-    const readyAt = meta.pendingTownFocus!.readyAtTime;
+    const readyAt = requirePendingTownFocus(meta).readyAtTime;
     expect(readyAt).toBe(10 * TIME_PER_POINT_S);
     sim.drainEvents();
 
     sim.time = 300;
     sim.setTownFocus({ silk: 10 }, 'time', pid);
-    expect(meta.pendingTownFocus!.readyAtTime).toBe(readyAt);
+    expect(requirePendingTownFocus(meta).readyAtTime).toBe(readyAt);
     // The notice reports the wait actually LEFT, not a fresh full duration.
     expect(noticesOf(sim)).toEqual([`Your focus re-spec will complete in ${readyAt - 300}s.`]);
   });
@@ -298,10 +305,10 @@ describe('re-saving a queued allocation', () => {
   it('re-saving the same allocation with the rows in another order is still the same allocation', () => {
     const { sim, pid, meta } = inTown();
     sim.setTownFocus({ silk: 4, hide: 6 }, 'time', pid);
-    const readyAt = meta.pendingTownFocus!.readyAtTime;
+    const readyAt = requirePendingTownFocus(meta).readyAtTime;
     sim.time = 50;
     sim.setTownFocus({ hide: 6, silk: 4 }, 'time', pid);
-    expect(meta.pendingTownFocus!.readyAtTime).toBe(readyAt);
+    expect(requirePendingTownFocus(meta).readyAtTime).toBe(readyAt);
   });
 
   it('a FASTER tier for the same allocation re-queues sooner (and re-prices)', () => {
@@ -309,9 +316,9 @@ describe('re-saving a queued allocation', () => {
     meta.copper = 1000;
     sim.addItem('arcane_dust', 20, pid);
     sim.setTownFocus({ silk: 10 }, 'time', pid);
-    const slow = meta.pendingTownFocus!.readyAtTime;
+    const slow = requirePendingTownFocus(meta).readyAtTime;
     sim.setTownFocus({ silk: 10 }, 'timeAndPartial', pid);
-    const fast = meta.pendingTownFocus!;
+    const fast = requirePendingTownFocus(meta);
     expect(fast.readyAtTime).toBeLessThan(slow);
     expect(fast.readyAtTime).toBe(
       sim.time + (10 * RESPEC_TIER_CONFIG.timeAndPartial.durationMsPerPoint) / 1000,
@@ -325,7 +332,7 @@ describe('re-saving a queued allocation', () => {
     meta.copper = 1000;
     sim.addItem('arcane_dust', 20, pid);
     sim.setTownFocus({ silk: 10 }, 'timeAndPartial', pid);
-    const fast = meta.pendingTownFocus!;
+    const fast = requirePendingTownFocus(meta);
     sim.setTownFocus({ silk: 10 }, 'time', pid);
     expect(meta.pendingTownFocus).toEqual(fast);
   });
@@ -335,8 +342,9 @@ describe('re-saving a queued allocation', () => {
     sim.setTownFocus({ silk: 10 }, 'time', pid);
     sim.time = 100;
     sim.setTownFocus({ silk: 9, hide: 1 }, 'time', pid);
-    expect(meta.pendingTownFocus!.allocation).toEqual({ silk: 9, hide: 1 });
-    expect(meta.pendingTownFocus!.readyAtTime).toBe(100 + 10 * TIME_PER_POINT_S);
+    const pending = requirePendingTownFocus(meta);
+    expect(pending.allocation).toEqual({ silk: 9, hide: 1 });
+    expect(pending.readyAtTime).toBe(100 + 10 * TIME_PER_POINT_S);
   });
 
   it('the instant tier still supersedes a queued re-spec', () => {
