@@ -14,6 +14,9 @@ import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.core.mapMarkerLabels.hoardEntrance': 'Вход в зарытую сокровищницу',
+  'hud.core.mapMarkerLabels.hoardReturnEntrance': 'Обратный вход в сокровищницу',
+  'sim.rift.hoardExitOpens': 'Сокровища ваши. Вернитесь ко входу, чтобы выбраться наружу.',
+  'sim.rift.hoardStepBack': 'Вы выбираетесь наружу через вход в сокровищницу.',
   'questUi.worldQuest.puzzleRetry': 'Повторить',
   'questUi.worldQuest.puzzleTimerAria': 'Осталось времени: {seconds} сек.',
   'questUi.worldQuest.startQuest': 'Начать локальное задание',

@@ -2437,7 +2437,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         this.applyRiftStateEvent(ev as SimEvent);
         this.applyRiftDeathZoneSpawnEvent(ev as SimEvent);
         this.applyRiftDeathZoneClearEvent(ev as SimEvent);
-        this.hoardBossCueMirror.apply(ev as SimEvent);
+        this.hoardBossCueMirror?.apply(ev as SimEvent);
         this.applyMasterworkEvent(ev as SimEvent);
         this.applyDisenchantResultEvent(ev as SimEvent);
         this.applyEnchantResultEvent(ev as SimEvent);
@@ -4946,7 +4946,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     return out;
   }
   hoardBossCues(): import('../world_api/dungeons').HoardBossCueView[] {
-    return this.hoardBossCueMirror.views();
+    return this.hoardBossCueMirror?.views() ?? [];
   }
   // Milliseconds remaining before the current rift's backing world event stops
   // admitting new parties (null outside a rift, or for a dev-spawned rift). See the

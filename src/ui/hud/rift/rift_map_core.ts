@@ -560,6 +560,9 @@ function cachedRiftObjectSemantic(
   semanticCache: Map<string, MapMarkerSemantic | null>,
   riftExitCache: Map<RiftTier | null, MapMarkerSemantic | null>,
 ): RiftObjectSemantic | null {
+  if (entity.templateId === 'hoard_entrance') {
+    return { kind: 'rift-return', route: 'hoard', rank: null };
+  }
   if (entity.templateId === 'rift_exit') {
     const rank = entity.riftTier ?? null;
     const cached = riftExitCache.get(rank);

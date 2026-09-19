@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
+import { MOBS } from '../src/sim/data';
+import { runMobSwingAffixes } from '../src/sim/mob/mob_swing';
 import {
+  HOARD_BONE_WAVE_COUNT,
+  HOARD_BROOD_EGG_COUNT,
+  HOARD_BROOD_HATCH_HP,
   HOARD_MARK_ENRAGED_EVERY_SEC,
   HOARD_MARK_ENRAGED_WINDUP_SEC,
   HOARD_MARK_EVERY_SEC,
@@ -8,10 +13,13 @@ import {
   HOARD_MARK_WINDUP_SEC,
   HOARD_SWEEP_ENRAGED_WINDUP_SEC,
   HOARD_SWEEP_HALF_ANGLE,
+  HOARD_SWEEP_METEOR_COUNT,
   HOARD_SWEEP_RANGE,
   HOARD_SWEEP_WINDUP_SEC,
+  hoardBossKit,
   hoardMarkTargetCount,
   hoardMarkTargets,
+  hoardSweepMeteorPoints,
   nextHoardBossMechanic,
   pointInHoardSweep,
   tickHoardBossMechanics,
@@ -71,6 +79,12 @@ function tickMechanic(sim: Sim, seconds: number): SimEvent[] {
 }
 
 describe('Buried Hoard boss pure decisions', () => {
+  it('assigns bespoke kits only to the skeleton and spider bosses', () => {
+    expect(hoardBossKit('rift_boss_necro')).toBe('bone-legion');
+    expect(hoardBossKit('rift_boss_venom')).toBe('brood');
+    expect(hoardBossKit('rift_boss_ember')).toBe('frontal');
+  });
+
   it('scales marks with living party size and rotates targets without rng', () => {
     expect([1, 2, 3, 4, 5].map(hoardMarkTargetCount)).toEqual([1, 1, 2, 2, 3]);
     expect(hoardMarkTargets([10, 20, 30, 40, 50], 0)).toEqual({
@@ -92,9 +106,175 @@ describe('Buried Hoard boss pure decisions', () => {
     expect(pointInHoardSweep({ x: 0, z: 0 }, 0, { x: HOARD_SWEEP_RANGE + 1, z: 0 })).toBe(false);
     expect(HOARD_SWEEP_HALF_ANGLE).toBeLessThan(Math.PI / 2);
   });
+
+  it('places the reused meteor falls deterministically inside the frontal', () => {
+    const cue = {
+      x: 12,
+      z: -8,
+      facing: 0.7,
+      radius: HOARD_SWEEP_RANGE,
+      halfAngle: HOARD_SWEEP_HALF_ANGLE,
+    };
+    const first = hoardSweepMeteorPoints(cue);
+    expect(first).toHaveLength(HOARD_SWEEP_METEOR_COUNT);
+    expect(hoardSweepMeteorPoints(cue)).toEqual(first);
+    for (const point of first) expect(pointInHoardSweep(cue, cue.facing, point)).toBe(true);
+  });
 });
 
 describe('Buried Hoard boss encounter', () => {
+  it('replaces the skeleton frontal with two necromancy portal waves', () => {
+    const { sim, inst, boss } = makeEncounter();
+    boss.templateId = 'rift_boss_necro';
+    tickHoardBossMechanics(sim.ctx);
+    sim.drainEvents();
+    hoardState(inst).sweepTimer = 0;
+    hoardState(inst).markTimer = 99;
+    boss.hp = Math.floor(boss.maxHp * 0.69);
+    tickHoardBossMechanics(sim.ctx);
+    let events = sim.drainEvents();
+    expect(events).toContainEqual(
+      expect.objectContaining({
+        type: 'spellfxAt',
+        ability: 'Hoard Bone Legion',
+        fx: 'burst',
+        sourceId: boss.id,
+      }),
+    );
+    expect(events.some((event) => event.type === 'hoardBossCue' && event.kind === 'sweep')).toBe(
+      false,
+    );
+    expect(
+      boss.summonedIds.filter((id) => sim.entities.get(id)?.templateId === 'rift_bonewalker'),
+    ).toHaveLength(HOARD_BONE_WAVE_COUNT);
+
+    boss.hp = Math.floor(boss.maxHp * 0.34);
+    tickHoardBossMechanics(sim.ctx);
+    events = sim.drainEvents();
+    expect(
+      events.filter((event) => event.type === 'spellfxAt' && event.ability === 'Hoard Bone Legion'),
+    ).toHaveLength(1);
+    expect(
+      boss.summonedIds.filter((id) => sim.entities.get(id)?.templateId === 'rift_bonewalker'),
+    ).toHaveLength(HOARD_BONE_WAVE_COUNT * 2);
+  });
+
+  it('surrounds the spider with eggs that hatch once at half health', () => {
+    const { sim, inst, boss } = makeEncounter();
+    boss.templateId = 'rift_boss_venom';
+    tickHoardBossMechanics(sim.ctx);
+    sim.drainEvents();
+    const eggIds = boss.summonedIds.filter(
+      (id) => sim.entities.get(id)?.templateId === 'spider_egg_sac',
+    );
+    expect(eggIds).toHaveLength(HOARD_BROOD_EGG_COUNT);
+    for (const [index, id] of eggIds.entries()) {
+      const egg = sim.entities.get(id);
+      expect(egg?.damageImmune).toBe(true);
+      expect(
+        Math.hypot((egg?.pos.x ?? 0) - boss.spawnPos.x, (egg?.pos.z ?? 0) - boss.spawnPos.z),
+      ).toBeCloseTo(index % 2 === 0 ? 5.2 : 6.1, 4);
+    }
+    expect(MOBS.rift_boss_venom.stackPoison).toBeDefined();
+    expect(MOBS.rift_boss_venom.ensnare).toBeDefined();
+    expect(HOARD_BROOD_HATCH_HP).toBe(0.5);
+
+    hoardState(inst).sweepTimer = 0;
+    hoardState(inst).markTimer = 99;
+    boss.hp = Math.floor(boss.maxHp * 0.5) + 1;
+    tickHoardBossMechanics(sim.ctx);
+    expect(eggIds.every((id) => sim.entities.has(id))).toBe(true);
+    expect(
+      boss.summonedIds.filter((id) => sim.entities.get(id)?.templateId === 'rift_spawnling'),
+    ).toHaveLength(0);
+
+    boss.hp = Math.floor(boss.maxHp * 0.5);
+    tickHoardBossMechanics(sim.ctx);
+    const events = sim.drainEvents();
+    expect(events.some((event) => event.type === 'hoardBossCue' && event.kind === 'sweep')).toBe(
+      false,
+    );
+    for (const id of eggIds) expect(sim.entities.has(id)).toBe(false);
+    expect(
+      boss.summonedIds.filter((id) => sim.entities.get(id)?.templateId === 'rift_spawnling'),
+    ).toHaveLength(HOARD_BROOD_EGG_COUNT);
+
+    tickHoardBossMechanics(sim.ctx);
+    expect(
+      boss.summonedIds.filter((id) => sim.entities.get(id)?.templateId === 'rift_spawnling'),
+    ).toHaveLength(HOARD_BROOD_EGG_COUNT);
+  });
+
+  it('removes unhatched eggs without spawning adds when a lethal hit skips the threshold', () => {
+    const { sim, boss } = makeEncounter();
+    boss.templateId = 'rift_boss_venom';
+    tickHoardBossMechanics(sim.ctx);
+    const eggIds = boss.summonedIds.filter(
+      (id) => sim.entities.get(id)?.templateId === 'spider_egg_sac',
+    );
+    expect(eggIds).toHaveLength(4);
+    boss.hp = 0;
+    boss.dead = true;
+    tickHoardBossMechanics(sim.ctx);
+    expect(eggIds.every((id) => !sim.entities.has(id))).toBe(true);
+    expect(
+      boss.summonedIds.some((id) => sim.entities.get(id)?.templateId === 'rift_spawnling'),
+    ).toBe(false);
+  });
+
+  it('applies the spider poison and root through the live mob affix path', () => {
+    const { sim, boss } = makeEncounter();
+    boss.templateId = 'rift_boss_venom';
+    const originalChance = sim.ctx.rng.chance;
+    sim.ctx.rng.chance = () => true;
+    try {
+      runMobSwingAffixes(sim.ctx, boss, sim.player, { dealt: 1, crit: false, rawDmg: 1 });
+    } finally {
+      sim.ctx.rng.chance = originalChance;
+    }
+    expect(sim.player.auras).toContainEqual(
+      expect.objectContaining({
+        id: 'stackpoison_rift_boss_venom',
+        name: 'Deadly Venom',
+        kind: 'dot',
+        stacks: 1,
+        school: 'nature',
+      }),
+    );
+    expect(sim.player.auras).toContainEqual(
+      expect.objectContaining({
+        id: 'ensnare_rift_boss_venom',
+        name: 'Web',
+        kind: 'root',
+        school: 'nature',
+      }),
+    );
+  });
+
+  it('regenerates the same skeleton and spider summon traces from the same seed', () => {
+    const trace = (templateId: 'rift_boss_necro' | 'rift_boss_venom'): unknown => {
+      const { sim, boss } = makeEncounter();
+      boss.templateId = templateId;
+      tickHoardBossMechanics(sim.ctx);
+      sim.drainEvents();
+      boss.hp = Math.floor(boss.maxHp * (templateId === 'rift_boss_necro' ? 0.34 : 0.5));
+      tickHoardBossMechanics(sim.ctx);
+      return {
+        firedSummons: boss.firedSummons,
+        summons: boss.summonedIds.map((id) => {
+          const summon = sim.entities.get(id);
+          return summon && { templateId: summon.templateId, pos: summon.pos };
+        }),
+        effects: sim
+          .drainEvents()
+          .filter((event) => event.type === 'spellfxAt')
+          .map(({ type, ...event }) => event),
+      };
+    };
+    expect(trace('rift_boss_necro')).toEqual(trace('rift_boss_necro'));
+    expect(trace('rift_boss_venom')).toEqual(trace('rift_boss_venom'));
+  });
+
   it('telegraphs a frontal sweep, then damages only the snapshotted cone', () => {
     const { sim, inst, boss } = makeEncounter();
     expect(boss.riftMechanicLimit).toBe(0);
@@ -110,9 +290,15 @@ describe('Buried Hoard boss encounter', () => {
       radius: HOARD_SWEEP_RANGE,
       durationSecs: HOARD_SWEEP_WINDUP_SEC,
     });
+    expect(
+      warningEvents.filter((event) => event.type === 'spellfxAt' && event.fx === 'meteorFall'),
+    ).toHaveLength(HOARD_SWEEP_METEOR_COUNT);
     expect(inst.hoardBoss?.cues).toHaveLength(1);
-    tickMechanic(sim, HOARD_SWEEP_WINDUP_SEC);
+    const impactEvents = tickMechanic(sim, HOARD_SWEEP_WINDUP_SEC);
     expect(sim.player.hp).toBe(hpBefore - Math.round(sim.player.maxHp * 0.24));
+    expect(
+      impactEvents.filter((event) => event.type === 'spellfxAt' && event.fx === 'meteorImpact'),
+    ).toHaveLength(HOARD_SWEEP_METEOR_COUNT);
     expect(inst.hoardBoss?.cues).toHaveLength(0);
   });
 

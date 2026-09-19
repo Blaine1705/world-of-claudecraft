@@ -1,14 +1,16 @@
 import * as THREE from 'three';
+import { HOARD_SWEEP_HALF_ANGLE, HOARD_SWEEP_RANGE } from '../sim/rift/hoard_boss';
 import type { HoardBossCueView } from '../world_api/dungeons';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import { hoardCueVisualPlan } from './hoard_boss_fx_core';
+import {
+  buildIgnivarFrontalTelegraph,
+  syncIgnivarFrontalTelegraph,
+} from './ignivar_frontal_telegraph';
 
 const SLOT_COUNT = 8;
 const SEGMENTS = 40;
-const SWEEP_BAND_COUNT = 4;
 const LIFT = 0.1;
-
-export const HOARD_SWEEP_BANDS_NAME = 'hoard-boss-sweep-warning-bands';
 
 interface CueSlot {
   group: THREE.Group;
@@ -16,10 +18,6 @@ interface CueSlot {
   markWarning: THREE.Group;
   markHazard: THREE.Group;
   countdown: THREE.Mesh;
-  sweepBands: THREE.Mesh;
-  sweepFill: THREE.BufferGeometry;
-  sweepBorder: THREE.BufferGeometry;
-  sweepBandGeometry: THREE.BufferGeometry;
   markDisc: THREE.BufferGeometry;
   markRing: THREE.BufferGeometry;
   slashA: THREE.BufferGeometry;
@@ -63,31 +61,6 @@ function ringGeometry(): THREE.BufferGeometry {
     indices.push(inner, inner + 1, inner + 2, inner + 1, inner + 3, inner + 2);
   }
   return geometry((SEGMENTS + 1) * 2, indices);
-}
-
-function wedgeBorderGeometry(): THREE.BufferGeometry {
-  const indices: number[] = [];
-  for (let index = 0; index < SEGMENTS; index++) {
-    const inner = index * 2;
-    indices.push(inner, inner + 1, inner + 2, inner + 1, inner + 3, inner + 2);
-  }
-  const sides = (SEGMENTS + 1) * 2;
-  indices.push(sides, sides + 1, sides + 2, sides + 1, sides + 3, sides + 2);
-  indices.push(sides + 4, sides + 5, sides + 6, sides + 5, sides + 7, sides + 6);
-  return geometry(sides + 8, indices);
-}
-
-function wedgeBandsGeometry(): THREE.BufferGeometry {
-  const indices: number[] = [];
-  const bandVertices = (SEGMENTS + 1) * 2;
-  for (let band = 0; band < SWEEP_BAND_COUNT; band++) {
-    const offset = band * bandVertices;
-    for (let index = 0; index < SEGMENTS; index++) {
-      const inner = offset + index * 2;
-      indices.push(inner, inner + 1, inner + 2, inner + 1, inner + 3, inner + 2);
-    }
-  }
-  return geometry(bandVertices * SWEEP_BAND_COUNT, indices);
 }
 
 function quadGeometry(): THREE.BufferGeometry {
@@ -191,108 +164,6 @@ function writeSlash(
   target.computeBoundingSphere();
 }
 
-function writeWedge(
-  fill: THREE.BufferGeometry,
-  border: THREE.BufferGeometry,
-  bands: THREE.BufferGeometry,
-  cue: HoardBossCueView,
-  centerY: number,
-  groundY: (x: number, z: number) => number,
-): void {
-  const facing = cue.facing ?? 0;
-  const halfAngle = cue.halfAngle ?? 0;
-  const fillPosition = positionAttribute(fill);
-  setLocalVertex(fillPosition, 0, 0, 0, centerY, cue.x, cue.z, groundY);
-  for (let index = 0; index <= SEGMENTS; index++) {
-    const angle = facing - halfAngle + (index / SEGMENTS) * halfAngle * 2;
-    setLocalVertex(
-      fillPosition,
-      index + 1,
-      Math.sin(angle) * cue.radius,
-      Math.cos(angle) * cue.radius,
-      centerY,
-      cue.x,
-      cue.z,
-      groundY,
-    );
-  }
-  fillPosition.needsUpdate = true;
-  fill.computeBoundingSphere();
-
-  const borderPosition = positionAttribute(border);
-  for (let index = 0; index <= SEGMENTS; index++) {
-    const angle = facing - halfAngle + (index / SEGMENTS) * halfAngle * 2;
-    for (let edge = 0; edge < 2; edge++) {
-      const radius = cue.radius * (edge === 0 ? 0.94 : 1);
-      setLocalVertex(
-        borderPosition,
-        index * 2 + edge,
-        Math.sin(angle) * radius,
-        Math.cos(angle) * radius,
-        centerY,
-        cue.x,
-        cue.z,
-        groundY,
-      );
-    }
-  }
-  const firstSide = (SEGMENTS + 1) * 2;
-  for (let side = 0; side < 2; side++) {
-    const angle = facing + (side === 0 ? -halfAngle : halfAngle);
-    const tangentX = Math.cos(angle) * cue.radius * 0.025;
-    const tangentZ = -Math.sin(angle) * cue.radius * 0.025;
-    const endX = Math.sin(angle) * cue.radius;
-    const endZ = Math.cos(angle) * cue.radius;
-    const vertices = [
-      [-tangentX, -tangentZ],
-      [tangentX, tangentZ],
-      [endX - tangentX, endZ - tangentZ],
-      [endX + tangentX, endZ + tangentZ],
-    ];
-    for (let index = 0; index < vertices.length; index++) {
-      const [dx, dz] = vertices[index];
-      setLocalVertex(
-        borderPosition,
-        firstSide + side * 4 + index,
-        dx,
-        dz,
-        centerY,
-        cue.x,
-        cue.z,
-        groundY,
-      );
-    }
-  }
-  borderPosition.needsUpdate = true;
-  border.computeBoundingSphere();
-
-  const bandPosition = positionAttribute(bands);
-  const bandVertices = (SEGMENTS + 1) * 2;
-  for (let band = 0; band < SWEEP_BAND_COUNT; band++) {
-    const outerRadius = cue.radius * (0.26 + band * 0.18);
-    const innerRadius = outerRadius - cue.radius * 0.035;
-    const offset = band * bandVertices;
-    for (let index = 0; index <= SEGMENTS; index++) {
-      const angle = facing - halfAngle + (index / SEGMENTS) * halfAngle * 2;
-      for (let edge = 0; edge < 2; edge++) {
-        const radius = edge === 0 ? innerRadius : outerRadius;
-        setLocalVertex(
-          bandPosition,
-          offset + index * 2 + edge,
-          Math.sin(angle) * radius,
-          Math.cos(angle) * radius,
-          centerY,
-          cue.x,
-          cue.z,
-          groundY,
-        );
-      }
-    }
-  }
-  bandPosition.needsUpdate = true;
-  bands.computeBoundingSphere();
-}
-
 /** Pooled, terrain-draped presentation for the Hoard boss's actionable cues. */
 export class HoardBossFx {
   readonly readyForEntry: Promise<void>;
@@ -312,18 +183,12 @@ export class HoardBossFx {
     this.root.userData.renderCategory = 'ui3d';
     this.root.userData.actionable = true;
 
-    const sweepFillMaterial = material(0xc75a16, 0.28);
-    const sweepEdgeMaterial = material(0xffc44d, 0.95, true);
-    const sweepBandMaterial = material(0xff7a1a, 0.58, true);
     const markFillMaterial = material(0xd56b12, 0.24);
     const markGoldMaterial = material(0xffcf55, 0.96, true);
     const markCountdownMaterial = material(0xffa52f, 0.34, true);
     const hazardFillMaterial = material(0x7f1e0d, 0.38);
     const hazardEdgeMaterial = material(0xff6b20, 0.8, true);
     this.materials = [
-      sweepFillMaterial,
-      sweepEdgeMaterial,
-      sweepBandMaterial,
       markFillMaterial,
       markGoldMaterial,
       markCountdownMaterial,
@@ -331,36 +196,30 @@ export class HoardBossFx {
       hazardEdgeMaterial,
     ];
 
+    const sweepTemplate = buildIgnivarFrontalTelegraph({
+      range: HOARD_SWEEP_RANGE,
+      halfAngle: HOARD_SWEEP_HALF_ANGLE,
+    });
+    sweepTemplate.visible = true;
+    sweepTemplate.traverse((node) => {
+      const mesh = node as THREE.Mesh;
+      if (!mesh.geometry || !mesh.material) return;
+      this.geometries.push(mesh.geometry);
+      if (Array.isArray(mesh.material)) this.materials.push(...mesh.material);
+      else this.materials.push(mesh.material);
+    });
+
     for (let index = 0; index < SLOT_COUNT; index++) {
-      const sweepFill = fanGeometry();
-      const sweepBorder = wedgeBorderGeometry();
-      const sweepBandGeometry = wedgeBandsGeometry();
       const markDisc = fanGeometry();
       const markRing = ringGeometry();
       const slashA = quadGeometry();
       const slashB = quadGeometry();
-      this.geometries.push(
-        sweepFill,
-        sweepBorder,
-        sweepBandGeometry,
-        markDisc,
-        markRing,
-        slashA,
-        slashB,
-      );
+      this.geometries.push(markDisc, markRing, slashA, slashB);
 
       const group = new THREE.Group();
       group.name = `hoard-boss-cue-${index}`;
-      const sweep = new THREE.Group();
+      const sweep = sweepTemplate.clone(true);
       sweep.name = 'hoard-boss-sweep';
-      const sweepArea = new THREE.Mesh(sweepFill, sweepFillMaterial);
-      const sweepRim = new THREE.Mesh(sweepBorder, sweepEdgeMaterial);
-      const sweepBands = new THREE.Mesh(sweepBandGeometry, sweepBandMaterial);
-      sweepBands.name = HOARD_SWEEP_BANDS_NAME;
-      sweepArea.renderOrder = 18;
-      sweepBands.renderOrder = 19;
-      sweepRim.renderOrder = 20;
-      sweep.add(sweepArea, sweepBands, sweepRim);
 
       const markWarning = new THREE.Group();
       markWarning.name = 'hoard-boss-mark-warning';
@@ -396,10 +255,6 @@ export class HoardBossFx {
         markWarning,
         markHazard,
         countdown,
-        sweepBands,
-        sweepFill,
-        sweepBorder,
-        sweepBandGeometry,
         markDisc,
         markRing,
         slashA,
@@ -453,9 +308,7 @@ export class HoardBossFx {
       const elapsed = Math.max(0, cue.total - cue.remaining);
       const plan = hoardCueVisualPlan(cue.remaining, cue.total, elapsed);
       if (cue.kind === 'sweep') {
-        slot.sweep.scale.set(plan.pulseScale, 1, plan.pulseScale);
-        const bandScale = 0.985 + plan.progress * 0.015;
-        slot.sweepBands.scale.set(bandScale, 1, bandScale);
+        syncIgnivarFrontalTelegraph(slot.sweep, true, plan.progress, 1, _dt);
       } else if (cue.phase === 'warning') {
         slot.markWarning.scale.set(plan.pulseScale, 1, plan.pulseScale);
         slot.countdown.scale.set(plan.countdownScale, 1, plan.countdownScale);
@@ -497,14 +350,7 @@ export class HoardBossFx {
     if (signature === slot.terrainSignature) return;
     slot.terrainSignature = signature;
     if (cue.kind === 'sweep') {
-      writeWedge(
-        slot.sweepFill,
-        slot.sweepBorder,
-        slot.sweepBandGeometry,
-        cue,
-        centerY,
-        this.groundY,
-      );
+      slot.sweep.rotation.y = cue.facing ?? 0;
       slot.sweep.userData.halfAngle = cue.halfAngle;
       return;
     }

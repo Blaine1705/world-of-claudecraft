@@ -9,7 +9,7 @@ export type MapMarkerSemantic =
   | { kind: 'hoard-entrance' }
   | { kind: 'rift-entrance'; rank: RiftTier | null }
   | { kind: 'rift-descent' }
-  | { kind: 'rift-return'; route: 'beacon' | 'egress'; rank: RiftTier | null }
+  | { kind: 'rift-return'; route: 'beacon' | 'egress' | 'hoard'; rank: RiftTier | null }
   | { kind: 'rift-reward'; reward: 'treasure' | 'cache'; state: RiftRewardState }
   | RiftMechanicSemantic
   | { kind: 'delve-passage'; state: 'sealed' | 'open' }

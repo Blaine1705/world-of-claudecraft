@@ -15,6 +15,7 @@ import {
   vaultDamageFactor,
   vaultHealthFactor,
 } from '../src/sim/content/treasure_maps';
+import { isRiftPos } from '../src/sim/data';
 import { RIFT_RANK_BASE_LEVEL, riftRankTuningFor } from '../src/sim/rift/ranks';
 import { riftFloorCount } from '../src/sim/rift/rift_gen';
 import { vaultSeedOpen, vaultSeedTier, vaultSeedZone } from '../src/sim/rift/vault_seed';
@@ -161,6 +162,14 @@ describe('the vault run', () => {
     expect(inst.pylonIds).toEqual([]);
     expect(inst.boulderIds).toEqual([]);
     expect(inst.gateOpen).toBe(true);
+    expect(inst.beaconId).not.toBeNull();
+    if (inst.beaconId === null) throw new Error('missing Hoard return entrance id');
+    const beaconId = inst.beaconId;
+    expect(sim.entities.get(beaconId)?.templateId).toBe('hoard_entrance');
+    expect(sim.entities.get(beaconId)?.vaultRarity).toBe('common');
+    expect(inst.objectIds.some((id) => sim.entities.get(id)?.templateId === 'rift_beacon')).toBe(
+      false,
+    );
     expect(inst.objectIds.some((id) => sim.entities.get(id)?.templateId === 'rift_treasure')).toBe(
       false,
     );
@@ -219,6 +228,26 @@ describe('the vault run', () => {
     );
     expect(meta.clueCasketsOpened).toBe(1);
     expect(inst.rewarded).toBe(true);
+    expect(inst.exitId).toBe(inst.beaconId);
+    if (inst.exitId === null) throw new Error('missing completed Hoard exit id');
+    expect(sim.entities.get(inst.exitId)?.templateId).toBe('hoard_entrance');
+    expect([...sim.entities.values()].some((entity) => entity.templateId === 'rift_exit')).toBe(
+      false,
+    );
+    expect(ofType(evs, 'log')).toContainEqual(
+      expect.objectContaining({
+        text: 'The hoard is yours. Return to the entrance to climb out.',
+      }),
+    );
+    const entrance = sim.entities.get(beaconId);
+    if (!entrance) throw new Error('missing Hoard return entrance');
+    sim.player.pos = { ...entrance.pos };
+    sim.player.prevPos = { ...entrance.pos };
+    const exitEvents = sim.tick();
+    expect(isRiftPos(sim.player.pos.x)).toBe(false);
+    expect(ofType(exitEvents, 'log')).toContainEqual(
+      expect.objectContaining({ text: 'You climb back out through the hoard entrance.' }),
+    );
   });
 });
 

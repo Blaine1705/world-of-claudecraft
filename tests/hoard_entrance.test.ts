@@ -152,4 +152,24 @@ describe('buried hoard body ownership and reveal', () => {
     ).body;
     expect(calm.getObjectByName('HatchAssembly')!.rotation.x).toBe(-1.42);
   });
+
+  it('builds the interior return hatch already open without replaying the dig reveal', () => {
+    const body = buildHoardEntrance(
+      entity,
+      () => 3,
+      () => false,
+      asset(),
+      true,
+    ).body;
+    expect(body.userData.alreadyOpen).toBe(true);
+    const hatch = body.getObjectByName('HatchAssembly')!;
+    expect(hatch.rotation.x).toBe(-1.42);
+    const driver = body.children[1].children[0].children[0] as THREE.Mesh;
+    const draw = driver.onBeforeRender as () => void;
+    sharedUniforms.uTime.value = 200;
+    draw();
+    sharedUniforms.uTime.value = 200.1;
+    draw();
+    expect(hatch.rotation.x).toBe(-1.42);
+  });
 });

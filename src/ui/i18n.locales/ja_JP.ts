@@ -14,6 +14,9 @@ import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.core.mapMarkerLabels.hoardEntrance': '埋もれた宝物庫の入口',
+  'hud.core.mapMarkerLabels.hoardReturnEntrance': '財宝庫の帰還口',
+  'sim.rift.hoardExitOpens': '財宝はあなたのものです。入口に戻って外へ登ってください。',
+  'sim.rift.hoardStepBack': '財宝庫の入口から地上へ戻った。',
   'questUi.worldQuest.puzzleRetry': 'もう一度',
   'questUi.worldQuest.puzzleTimerAria': '残り時間：{seconds}秒',
   'questUi.worldQuest.startQuest': 'ワールドクエストを開始',

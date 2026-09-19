@@ -230,6 +230,19 @@ function drawSemanticFallback(
     return;
   }
   if (semantic.kind === 'rift-return') {
+    if (semantic.route === 'hoard') {
+      for (let pass = 0; pass < 2; pass++) {
+        ctx.strokeStyle = pass === 0 ? colors.outline : colors.reward;
+        ctx.lineWidth = outlineWidth * (pass === 0 ? 4 : 2);
+        ctx.beginPath();
+        ctx.moveTo(marker.cx - radius, marker.cy - radius);
+        ctx.lineTo(marker.cx + radius, marker.cy + radius);
+        ctx.moveTo(marker.cx + radius, marker.cy - radius);
+        ctx.lineTo(marker.cx - radius, marker.cy + radius);
+        ctx.stroke();
+      }
+      return;
+    }
     ctx.beginPath();
     ctx.arc(marker.cx, marker.cy, radius, 0, FULL_CIRCLE);
     ctx.stroke();

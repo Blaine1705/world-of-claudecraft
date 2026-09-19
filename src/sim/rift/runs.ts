@@ -458,7 +458,16 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
 
   // The always-available "way out": a beacon at the floor entry. Walking onto it
   // (or clicking it) returns you to the overworld, so a run is never a trap.
-  inst.beaconId = spawnObj('rift_beacon', 'Rift Beacon', floor.entry.x, floor.entry.z - 3);
+  inst.beaconId = spawnObj(
+    inst.vault ? 'hoard_entrance' : 'rift_beacon',
+    inst.vault ? 'Buried Hoard entrance' : 'Rift Beacon',
+    floor.entry.x,
+    floor.entry.z - 3,
+  );
+  if (inst.vault) {
+    const hatch = ctx.entities.get(inst.beaconId);
+    if (hatch) hatch.vaultRarity = inst.vault.rarity;
+  }
 
   // Rolling-boulder hazards: one entity per lane, staggered along it by `phase`.
   for (const roller of floor.rollers) {
@@ -918,7 +927,9 @@ export function leaveRift(ctx: SimContext, pid?: number): void {
   forceExitRiftPlayer(ctx, inst, r.meta.entityId, false);
   ctx.emit({
     type: 'log',
-    text: 'You step back through the rift.',
+    text: inst.vault
+      ? 'You climb back out through the hoard entrance.'
+      : 'You step back through the rift.',
     color: '#b9f',
     pid: r.meta.entityId,
   });
@@ -1331,6 +1342,18 @@ export function riftOpenTreasure(ctx: SimContext, objectId: number, pid?: number
 
 function openExit(ctx: SimContext, inst: RiftInstance): void {
   if (inst.exitId !== null) return;
+  if (inst.vault) {
+    inst.exitId = inst.beaconId;
+    for (const pid of instancePlayerIds(ctx, inst)) {
+      ctx.emit({
+        type: 'log',
+        text: 'The hoard is yours. Return to the entrance to climb out.',
+        color: '#fd7',
+        pid,
+      });
+    }
+    return;
+  }
   const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
   const floor = floorForInstance(inst);
   const chest = floor.objects.find((o) => o.kind === 'chest');
@@ -1372,9 +1395,7 @@ function openExit(ctx: SimContext, inst: RiftInstance): void {
   for (const pid of instancePlayerIds(ctx, inst)) {
     ctx.emit({
       type: 'log',
-      text: inst.vault
-        ? 'The hoard is yours. A way up opens behind the fallen.'
-        : 'The rift shudders. A way home tears open behind the fallen.',
+      text: 'The rift shudders. A way home tears open behind the fallen.',
       color: '#fd7',
       pid,
     });

@@ -14,6 +14,9 @@ import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.core.mapMarkerLabels.hoardEntrance': '묻힌 보물 창고 입구',
+  'hud.core.mapMarkerLabels.hoardReturnEntrance': '보물 귀환 입구',
+  'sim.rift.hoardExitOpens': '보물은 당신의 것입니다. 입구로 돌아가 밖으로 올라가세요.',
+  'sim.rift.hoardStepBack': '보물 입구를 통해 지상으로 올라왔습니다.',
   'questUi.worldQuest.puzzleRetry': '다시 시도',
   'questUi.worldQuest.puzzleTimerAria': '남은 시간: {seconds}초',
   'questUi.worldQuest.startQuest': '전역 퀘스트 시작',

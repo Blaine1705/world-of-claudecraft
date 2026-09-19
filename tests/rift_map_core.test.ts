@@ -515,6 +515,27 @@ describe('rift map live model', () => {
     ]);
   });
 
+  it('shows the Hoard entry hatch as its own return marker inside the floor', () => {
+    const model = createRiftMapView().build(
+      worldWith([
+        {
+          id: 7,
+          kind: 'object',
+          templateId: 'hoard_entrance',
+          pos: { x: VIEW.origin.x, y: 0, z: VIEW.origin.z - 8 },
+        },
+      ]),
+      162,
+      8,
+      'Buried Hoard',
+    );
+    expect(model?.objects).toEqual([
+      expect.objectContaining({
+        semantic: { kind: 'rift-return', route: 'hoard', rank: null },
+      }),
+    ]);
+  });
+
   it('matches an interest-pruned mirror and hides distant enemy, mechanic, reward, and route state', () => {
     const mob = (id: number, localZ: number) => ({
       id,

@@ -224,7 +224,7 @@ import {
   movingHoldoutActive,
   showsStaticFarMesh,
 } from './crowd_lod';
-import { daisVisualLift, groundCueY } from './dais_lift';
+import { groundCueY } from './dais_lift';
 import { buildDawnholdFeatures, type DawnholdFeaturesView } from './dawnhold_features';
 import { currentDayNightPhase, currentLunarPhase, dayNightPhaseOverride } from './day_night_clock';
 import {
@@ -259,7 +259,7 @@ import { buildDoorBody, buildRiftGateBody, buildRiftPuzzleProp } from './door_po
 import { watchDevicePixelRatio } from './dpr_watch';
 import { DrainChannelStopLatch, drainChannelVisualPlan } from './drain_channel_visual_core';
 import { createLogicalFrameDrawStats, type LogicalFrameDrawStats } from './draw_stats_core';
-import { DungeonInteriors, dungeonDaisHasRaisedPlatform, ensureDungeonAssets } from './dungeon';
+import { DungeonInteriors, ensureDungeonAssets } from './dungeon';
 import { DynamicEntityAmbienceSources } from './dynamic_entity_ambience';
 import {
   dynamicResolutionAllocationScale,
@@ -686,6 +686,7 @@ import type { RevealGateCore } from './reveal_gate_core';
 import { type RickshawMountViewState, updateRollingMountLoop } from './rickshaw_mount';
 import { FOOT_RUN_SPEED, updateRiddenMountAudio } from './ridden_mount_audio';
 import { createRiderAnchor, syncRiderAnchor } from './rider_anchor';
+import { createRiftAwareGroundSampler } from './rift_ground_sample';
 import { buildRiftRankBadge } from './rift_rank';
 import { syncRigMatrixFreeze, unfreezeRigMatrices } from './rig_visibility_freeze';
 import { RingOfFrostVisuals } from './ring_of_frost_visual';
@@ -1957,7 +1958,10 @@ export class Renderer {
 
   // seed-bound ground sampler, built once so per-frame drape updates
   // allocate no closure.
-  private groundSample = (x: number, z: number): number => groundHeight(x, z, this.sim.cfg.seed);
+  private groundSample = createRiftAwareGroundSampler(
+    () => this.sim.cfg.seed,
+    () => this.sim.riftFloor,
+  );
   /** Bound once: the puff runs per landing and must not allocate a closure. */
   private surfaceAtForPuff = (x: number, z: number, y: number) => this.surfaceAt(x, z, y);
   private selectionDrapeSupportY = 0;
@@ -2920,7 +2924,7 @@ export class Renderer {
     // (meteor_landing_burst.ts: the spec painter in the cue's school, else fire).
     this.mageGroundFx = new MageGroundFx(
       this.scene,
-      (x, z) => groundHeight(x, z, this.sim.cfg.seed),
+      this.groundSample,
       (x, z, meteor) =>
         meteorLandingBurst(this.abilityVfx, this.vfx, this.sim.cfg.seed, x, z, meteor),
     );
@@ -2953,9 +2957,7 @@ export class Renderer {
     this.necromancyGroundFx = new NecromancyGroundFx(this.scene, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
     );
-    this.necromancyArmyPortalFx = new NecromancyArmyPortalFx(this.scene, (x, z) =>
-      groundHeight(x, z, this.sim.cfg.seed),
-    );
+    this.necromancyArmyPortalFx = new NecromancyArmyPortalFx(this.scene, this.groundSample);
     this.abyssalRiftFx = new AbyssalRiftFx(this.scene, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
     );
@@ -2969,27 +2971,11 @@ export class Renderer {
         riftDeathZoneGeneration !== this.lifecycleGeneration
       )
         return;
-      this.riftDeathZoneVisuals = new RiftDeathZoneVisuals(this.scene, (x, z) => {
-        const base = groundHeight(x, z, this.sim.cfg.seed);
-        // Add the rift platform lift so rings on elevated sanctum boss arenas
-        // sit on the arena floor, not under it (same pattern as entity ground
-        // and the camera clamp), PLUS the raised boss dais: the dais is a
-        // render-only platform the sim keeps flat, so without daisVisualLift a
-        // ring under the tanked boss hides beneath the foundation blocks (the
-        // playtest's invisible aoe circles). Mirrors placeDais's raised
-        // decision exactly (style.daisRaised override, else the kit default).
-        const rf = this.sim.riftFloor;
-        if (rf) {
-          const floor = generateRiftFloor(rf.seed, rf.baseLevel, rf.floorIndex, rf.upgrade);
-          const lx = x - rf.origin.x;
-          const lz = z - rf.origin.z;
-          const raised = floor.style.daisRaised ?? dungeonDaisHasRaisedPlatform(floor.style.kit);
-          return (
-            base + riftLiftAt(floor, lx, lz) + daisVisualLift(floor.layout, raised, lx, lz)
-          );
-        }
-        return base;
-      }, this.worldCompileGate());
+      this.riftDeathZoneVisuals = new RiftDeathZoneVisuals(
+        this.scene,
+        this.groundSample,
+        this.worldCompileGate(),
+      );
     });
     this.temporalHourglassGroundVisuals = new TemporalHourglassGroundVisuals(this.scene, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
@@ -7910,7 +7896,12 @@ export class Renderer {
       // in-rift descent/pylons and a missing gate asset keep the procedural arch.
       const asGate = e.templateId === 'rift_portal' || e.templateId === 'rift_exit';
       const built =
-        hoardEntrance(e, this.groundSample, () => this.reducedMotion()) ??
+        hoardEntrance(
+          e,
+          this.groundSample,
+          () => this.reducedMotion(),
+          this.sim.riftFloor !== null,
+        ) ??
         (asGate ? buildRiftGateBody(this.lowGfx, e.riftTier) : null) ??
         buildDoorBody(entering, e.dungeonId, this.lowGfx);
       body = built.body;

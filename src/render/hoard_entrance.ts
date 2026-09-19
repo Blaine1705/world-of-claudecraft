@@ -33,9 +33,10 @@ export function hoardEntrance(
   entity: Entity,
   ground: (x: number, z: number) => number,
   reducedMotion: () => boolean,
+  alreadyOpen = false,
 ) {
   return entity.templateId === 'hoard_entrance'
-    ? buildHoardEntrance(entity, ground, reducedMotion)
+    ? buildHoardEntrance(entity, ground, reducedMotion, source, alreadyOpen)
     : null;
 }
 
@@ -101,6 +102,7 @@ export function buildHoardEntrance(
   ground: (x: number, z: number) => number,
   reducedMotion: () => boolean,
   asset: THREE.Group | undefined = source,
+  alreadyOpen = false,
 ): { body: THREE.Group; portal?: THREE.Mesh } {
   const fx = resolveUiEffectsProfile({
     presetLabel: GFX.tier,
@@ -160,7 +162,7 @@ export function buildHoardEntrance(
     node.material = Array.isArray(node.material) ? node.material.map(tint) : tint(node.material);
   });
   const hatch = model.getObjectByName('HatchAssembly');
-  if (hatch) hatch.rotation.x = reducedMotion() ? -1.42 : 0;
+  if (hatch) hatch.rotation.x = reducedMotion() || alreadyOpen ? -1.42 : 0;
   const effects = new THREE.Group();
   effects.position.y = base - entity.pos.y + 0.08;
   body.add(effects);
@@ -233,7 +235,7 @@ export function buildHoardEntrance(
     }
   let start = -1,
     last = -1;
-  let lightAlpha = 0;
+  let lightAlpha = alreadyOpen ? 1 : 0;
   const motePose = { x: 0, y: 0, z: 0, scale: 0 };
   for (const light of lights)
     light.onBeforeRender = () => {
@@ -251,7 +253,7 @@ export function buildHoardEntrance(
     if (start < 0) start = time;
     const age = time - start,
       calm = reducedMotion();
-    const pose = hoardRevealPose(age, calm);
+    const pose = alreadyOpen ? { hatch: 1, light: 1, earth: 0 } : hoardRevealPose(age, calm);
     if (hatch) hatch.rotation.x = -1.42 * pose.hatch;
     rim.scale.setScalar(hoardRimScale(profile.rarity, time, calm));
     lightAlpha = pose.light;
@@ -267,10 +269,11 @@ export function buildHoardEntrance(
         pose.earth * (2 + (i % 3)),
         Math.sin(a) * (1.15 + pose.earth),
       );
-      dirt[i].visible = !calm && age < 0.65;
+      dirt[i].visible = !alreadyOpen && !calm && age < 0.65;
     }
     body.updateMatrixWorld(true);
   };
   body.userData.hoardRarity = profile.rarity;
+  body.userData.alreadyOpen = alreadyOpen;
   return { body };
 }

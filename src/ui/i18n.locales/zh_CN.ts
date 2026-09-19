@@ -14,6 +14,9 @@ import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.core.mapMarkerLabels.hoardEntrance': '埋藏宝藏入口',
+  'hud.core.mapMarkerLabels.hoardReturnEntrance': '宝藏返回入口',
+  'sim.rift.hoardExitOpens': '宝藏已经属于你。返回入口并爬出去。',
+  'sim.rift.hoardStepBack': '你从宝藏入口爬回了地面。',
   'questUi.worldQuest.puzzleRetry': '重试',
   'questUi.worldQuest.puzzleTimerAria': '剩余时间：{seconds} 秒',
   'questUi.worldQuest.startQuest': '开始世界任务',

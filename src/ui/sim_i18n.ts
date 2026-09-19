@@ -17367,6 +17367,10 @@ const RULES: Rule[] = [
     build: (m) => t('sim.rift.descendFloor', { name: m[1] }),
   },
   { re: /^You step back through the rift\.$/, build: () => t('sim.rift.stepBack') },
+  {
+    re: /^You climb back out through the hoard entrance\.$/,
+    build: () => t('sim.rift.hoardStepBack'),
+  },
   // The Buried Hoard's own entry and clear lines (src/sim/rift/runs.ts, vault arm).
   { re: /^This hoard was dug up by another party\.$/, build: () => t('sim.rift.hoardNotYours') },
   {
@@ -17374,7 +17378,7 @@ const RULES: Rule[] = [
     build: (m) => t('sim.rift.hoardEnter', { name: m[1] }),
   },
   {
-    re: /^The hoard is yours\. A way up opens behind the fallen\.$/,
+    re: /^The hoard is yours\. Return to the entrance to climb out\.$/,
     build: () => t('sim.rift.hoardExitOpens'),
   },
   {

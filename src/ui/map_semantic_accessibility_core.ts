@@ -317,6 +317,7 @@ export type MapSemanticLabelId =
   | 'riftDescent'
   | 'riftReturnBeacon'
   | 'riftReturnExit'
+  | 'hoardReturnEntrance'
   | 'riftTreasureAvailable'
   | 'riftTreasureLocked'
   | 'riftTreasureOpened'
@@ -392,6 +393,7 @@ function mapSummaryCategory(label: MapSemanticLabelId): MapSummaryCategory {
     case 'riftDescent':
     case 'riftReturnBeacon':
     case 'riftReturnExit':
+    case 'hoardReturnEntrance':
     case 'delvePassageSealed':
     case 'delvePassageOpen':
     case 'delveSurfaceExit':
@@ -489,7 +491,11 @@ export function mapSemanticLabelId(semantic: MapInstanceSemantic): MapSemanticLa
     case 'rift-descent':
       return 'riftDescent';
     case 'rift-return':
-      return semantic.route === 'beacon' ? 'riftReturnBeacon' : 'riftReturnExit';
+      return semantic.route === 'beacon'
+        ? 'riftReturnBeacon'
+        : semantic.route === 'hoard'
+          ? 'hoardReturnEntrance'
+          : 'riftReturnExit';
     case 'rift-reward':
       if (semantic.reward === 'treasure') {
         if (semantic.state === 'available') return 'riftTreasureAvailable';

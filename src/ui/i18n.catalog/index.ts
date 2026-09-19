@@ -904,7 +904,8 @@ export const en = {
       exitOpens: 'The rift shudders. A way home tears open behind the fallen.',
       // The Buried Hoard (a treasure map's vault) keeps its own entry and clear lines.
       hoardEnter: 'You climb down into {name}.',
-      hoardExitOpens: 'The hoard is yours. A way up opens behind the fallen.',
+      hoardExitOpens: 'The hoard is yours. Return to the entrance to climb out.',
+      hoardStepBack: 'You climb back out through the hoard entrance.',
       hoardNotYours: 'This hoard was dug up by another party.',
       portalOpens: 'A {tier}-rank rift tears open in {zone}!',
       portalSealed: 'The {tier}-rank rift in {zone} has been sealed.',

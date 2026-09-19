@@ -198,6 +198,7 @@ export const pending: Record<string, readonly string[]> = {
     "hud.core.mapMarkerLabels.activeWorldQuest",
     "hud.core.mapMarkerLabels.availableWorldQuest",
     "hud.core.mapMarkerLabels.hoardEntrance",
+    "hud.core.mapMarkerLabels.hoardReturnEntrance",
     "hud.core.mapMarkerLabels.worldBoss",
     "hudChrome.auraEffect.carryingFreight",
     "hudChrome.charSidebar.character",
@@ -611,7 +612,8 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.title",
     "sim.rift.hoardEnter",
     "sim.rift.hoardExitOpens",
-    "sim.rift.hoardNotYours"
+    "sim.rift.hoardNotYours",
+    "sim.rift.hoardStepBack"
   ],
   "es_ES": [
     "apiError.world_quests.unknown_board",
@@ -802,6 +804,7 @@ export const pending: Record<string, readonly string[]> = {
     "hud.core.mapMarkerLabels.activeWorldQuest",
     "hud.core.mapMarkerLabels.availableWorldQuest",
     "hud.core.mapMarkerLabels.hoardEntrance",
+    "hud.core.mapMarkerLabels.hoardReturnEntrance",
     "hud.core.mapMarkerLabels.worldBoss",
     "hudChrome.auraEffect.carryingFreight",
     "hudChrome.charSidebar.character",
@@ -1215,7 +1218,8 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.title",
     "sim.rift.hoardEnter",
     "sim.rift.hoardExitOpens",
-    "sim.rift.hoardNotYours"
+    "sim.rift.hoardNotYours",
+    "sim.rift.hoardStepBack"
   ],
   "fr_FR": [
     "apiError.world_quests.unknown_board",
@@ -1411,6 +1415,7 @@ export const pending: Record<string, readonly string[]> = {
     "hud.core.mapMarkerLabels.activeWorldQuest",
     "hud.core.mapMarkerLabels.availableWorldQuest",
     "hud.core.mapMarkerLabels.hoardEntrance",
+    "hud.core.mapMarkerLabels.hoardReturnEntrance",
     "hud.core.mapMarkerLabels.worldBoss",
     "hudChrome.auraEffect.carryingFreight",
     "hudChrome.charSidebar.character",
@@ -1903,7 +1908,8 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.title",
     "sim.rift.hoardEnter",
     "sim.rift.hoardExitOpens",
-    "sim.rift.hoardNotYours"
+    "sim.rift.hoardNotYours",
+    "sim.rift.hoardStepBack"
   ],
   "fr_CA": [
     "apiError.world_quests.unknown_board",
@@ -2099,6 +2105,7 @@ export const pending: Record<string, readonly string[]> = {
     "hud.core.mapMarkerLabels.activeWorldQuest",
     "hud.core.mapMarkerLabels.availableWorldQuest",
     "hud.core.mapMarkerLabels.hoardEntrance",
+    "hud.core.mapMarkerLabels.hoardReturnEntrance",
     "hud.core.mapMarkerLabels.worldBoss",
     "hudChrome.auraEffect.carryingFreight",
     "hudChrome.charSidebar.character",
@@ -2591,7 +2598,8 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.title",
     "sim.rift.hoardEnter",
     "sim.rift.hoardExitOpens",
-    "sim.rift.hoardNotYours"
+    "sim.rift.hoardNotYours",
+    "sim.rift.hoardStepBack"
   ],
   "en_CA": [],
   "it_IT": [
@@ -2788,6 +2796,7 @@ export const pending: Record<string, readonly string[]> = {
     "hud.core.mapMarkerLabels.activeWorldQuest",
     "hud.core.mapMarkerLabels.availableWorldQuest",
     "hud.core.mapMarkerLabels.hoardEntrance",
+    "hud.core.mapMarkerLabels.hoardReturnEntrance",
     "hud.core.mapMarkerLabels.worldBoss",
     "hudChrome.auraEffect.carryingFreight",
     "hudChrome.charSidebar.character",
@@ -3280,7 +3289,8 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.title",
     "sim.rift.hoardEnter",
     "sim.rift.hoardExitOpens",
-    "sim.rift.hoardNotYours"
+    "sim.rift.hoardNotYours",
+    "sim.rift.hoardStepBack"
   ],
   "de_DE": [
     "apiError.world_quests.unknown_board",
@@ -3476,6 +3486,7 @@ export const pending: Record<string, readonly string[]> = {
     "hud.core.mapMarkerLabels.activeWorldQuest",
     "hud.core.mapMarkerLabels.availableWorldQuest",
     "hud.core.mapMarkerLabels.hoardEntrance",
+    "hud.core.mapMarkerLabels.hoardReturnEntrance",
     "hud.core.mapMarkerLabels.worldBoss",
     "hudChrome.auraEffect.carryingFreight",
     "hudChrome.charSidebar.character",
@@ -3968,7 +3979,8 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.title",
     "sim.rift.hoardEnter",
     "sim.rift.hoardExitOpens",
-    "sim.rift.hoardNotYours"
+    "sim.rift.hoardNotYours",
+    "sim.rift.hoardStepBack"
   ],
   "zh_CN": [
     "entities.items.allied_hearthstone.name",
@@ -4055,7 +4067,6 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.semanticSummary",
     "questUi.worldQuest.semanticSummaryTimed",
     "sim.rift.hoardEnter",
-    "sim.rift.hoardExitOpens",
     "sim.rift.hoardNotYours"
   ],
   "zh_TW": [
@@ -4143,7 +4154,6 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.semanticSummary",
     "questUi.worldQuest.semanticSummaryTimed",
     "sim.rift.hoardEnter",
-    "sim.rift.hoardExitOpens",
     "sim.rift.hoardNotYours"
   ],
   "ko_KR": [
@@ -4231,7 +4241,6 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.semanticSummary",
     "questUi.worldQuest.semanticSummaryTimed",
     "sim.rift.hoardEnter",
-    "sim.rift.hoardExitOpens",
     "sim.rift.hoardNotYours"
   ],
   "ja_JP": [
@@ -4319,7 +4328,6 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.semanticSummary",
     "questUi.worldQuest.semanticSummaryTimed",
     "sim.rift.hoardEnter",
-    "sim.rift.hoardExitOpens",
     "sim.rift.hoardNotYours"
   ],
   "pt_BR": [
@@ -4516,6 +4524,7 @@ export const pending: Record<string, readonly string[]> = {
     "hud.core.mapMarkerLabels.activeWorldQuest",
     "hud.core.mapMarkerLabels.availableWorldQuest",
     "hud.core.mapMarkerLabels.hoardEntrance",
+    "hud.core.mapMarkerLabels.hoardReturnEntrance",
     "hud.core.mapMarkerLabels.worldBoss",
     "hudChrome.auraEffect.carryingFreight",
     "hudChrome.charSidebar.character",
@@ -5008,7 +5017,8 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.title",
     "sim.rift.hoardEnter",
     "sim.rift.hoardExitOpens",
-    "sim.rift.hoardNotYours"
+    "sim.rift.hoardNotYours",
+    "sim.rift.hoardStepBack"
   ],
   "ru_RU": [
     "entities.items.allied_hearthstone.name",
@@ -5095,7 +5105,6 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.semanticSummary",
     "questUi.worldQuest.semanticSummaryTimed",
     "sim.rift.hoardEnter",
-    "sim.rift.hoardExitOpens",
     "sim.rift.hoardNotYours"
   ],
   "cs_CZ": [
@@ -5292,6 +5301,7 @@ export const pending: Record<string, readonly string[]> = {
     "hud.core.mapMarkerLabels.activeWorldQuest",
     "hud.core.mapMarkerLabels.availableWorldQuest",
     "hud.core.mapMarkerLabels.hoardEntrance",
+    "hud.core.mapMarkerLabels.hoardReturnEntrance",
     "hud.core.mapMarkerLabels.worldBoss",
     "hudChrome.auraEffect.carryingFreight",
     "hudChrome.charSidebar.character",
@@ -5784,7 +5794,8 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.title",
     "sim.rift.hoardEnter",
     "sim.rift.hoardExitOpens",
-    "sim.rift.hoardNotYours"
+    "sim.rift.hoardNotYours",
+    "sim.rift.hoardStepBack"
   ],
   "nl_NL": [
     "apiError.world_quests.unknown_board",
@@ -5980,6 +5991,7 @@ export const pending: Record<string, readonly string[]> = {
     "hud.core.mapMarkerLabels.activeWorldQuest",
     "hud.core.mapMarkerLabels.availableWorldQuest",
     "hud.core.mapMarkerLabels.hoardEntrance",
+    "hud.core.mapMarkerLabels.hoardReturnEntrance",
     "hud.core.mapMarkerLabels.worldBoss",
     "hudChrome.auraEffect.carryingFreight",
     "hudChrome.charSidebar.character",
@@ -6472,7 +6484,8 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.title",
     "sim.rift.hoardEnter",
     "sim.rift.hoardExitOpens",
-    "sim.rift.hoardNotYours"
+    "sim.rift.hoardNotYours",
+    "sim.rift.hoardStepBack"
   ],
   "pl_PL": [
     "apiError.world_quests.unknown_board",
@@ -6668,6 +6681,7 @@ export const pending: Record<string, readonly string[]> = {
     "hud.core.mapMarkerLabels.activeWorldQuest",
     "hud.core.mapMarkerLabels.availableWorldQuest",
     "hud.core.mapMarkerLabels.hoardEntrance",
+    "hud.core.mapMarkerLabels.hoardReturnEntrance",
     "hud.core.mapMarkerLabels.worldBoss",
     "hudChrome.auraEffect.carryingFreight",
     "hudChrome.charSidebar.character",
@@ -7160,7 +7174,8 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.title",
     "sim.rift.hoardEnter",
     "sim.rift.hoardExitOpens",
-    "sim.rift.hoardNotYours"
+    "sim.rift.hoardNotYours",
+    "sim.rift.hoardStepBack"
   ],
   "id_ID": [
     "apiError.world_quests.unknown_board",
@@ -7356,6 +7371,7 @@ export const pending: Record<string, readonly string[]> = {
     "hud.core.mapMarkerLabels.activeWorldQuest",
     "hud.core.mapMarkerLabels.availableWorldQuest",
     "hud.core.mapMarkerLabels.hoardEntrance",
+    "hud.core.mapMarkerLabels.hoardReturnEntrance",
     "hud.core.mapMarkerLabels.worldBoss",
     "hudChrome.auraEffect.carryingFreight",
     "hudChrome.charSidebar.character",
@@ -7848,7 +7864,8 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.title",
     "sim.rift.hoardEnter",
     "sim.rift.hoardExitOpens",
-    "sim.rift.hoardNotYours"
+    "sim.rift.hoardNotYours",
+    "sim.rift.hoardStepBack"
   ],
   "tr_TR": [
     "apiError.world_quests.unknown_board",
@@ -8044,6 +8061,7 @@ export const pending: Record<string, readonly string[]> = {
     "hud.core.mapMarkerLabels.activeWorldQuest",
     "hud.core.mapMarkerLabels.availableWorldQuest",
     "hud.core.mapMarkerLabels.hoardEntrance",
+    "hud.core.mapMarkerLabels.hoardReturnEntrance",
     "hud.core.mapMarkerLabels.worldBoss",
     "hudChrome.auraEffect.carryingFreight",
     "hudChrome.charSidebar.character",
@@ -8536,7 +8554,8 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.title",
     "sim.rift.hoardEnter",
     "sim.rift.hoardExitOpens",
-    "sim.rift.hoardNotYours"
+    "sim.rift.hoardNotYours",
+    "sim.rift.hoardStepBack"
   ],
   "sv_SE": [
     "apiError.world_quests.unknown_board",
@@ -8732,6 +8751,7 @@ export const pending: Record<string, readonly string[]> = {
     "hud.core.mapMarkerLabels.activeWorldQuest",
     "hud.core.mapMarkerLabels.availableWorldQuest",
     "hud.core.mapMarkerLabels.hoardEntrance",
+    "hud.core.mapMarkerLabels.hoardReturnEntrance",
     "hud.core.mapMarkerLabels.worldBoss",
     "hudChrome.auraEffect.carryingFreight",
     "hudChrome.charSidebar.character",
@@ -9224,7 +9244,8 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.title",
     "sim.rift.hoardEnter",
     "sim.rift.hoardExitOpens",
-    "sim.rift.hoardNotYours"
+    "sim.rift.hoardNotYours",
+    "sim.rift.hoardStepBack"
   ],
   "vi_VN": [
     "apiError.world_quests.unknown_board",
@@ -9420,6 +9441,7 @@ export const pending: Record<string, readonly string[]> = {
     "hud.core.mapMarkerLabels.activeWorldQuest",
     "hud.core.mapMarkerLabels.availableWorldQuest",
     "hud.core.mapMarkerLabels.hoardEntrance",
+    "hud.core.mapMarkerLabels.hoardReturnEntrance",
     "hud.core.mapMarkerLabels.worldBoss",
     "hudChrome.auraEffect.carryingFreight",
     "hudChrome.charSidebar.character",
@@ -9912,7 +9934,8 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.title",
     "sim.rift.hoardEnter",
     "sim.rift.hoardExitOpens",
-    "sim.rift.hoardNotYours"
+    "sim.rift.hoardNotYours",
+    "sim.rift.hoardStepBack"
   ],
   "da_DK": [
     "apiError.world_quests.unknown_board",
@@ -10108,6 +10131,7 @@ export const pending: Record<string, readonly string[]> = {
     "hud.core.mapMarkerLabels.activeWorldQuest",
     "hud.core.mapMarkerLabels.availableWorldQuest",
     "hud.core.mapMarkerLabels.hoardEntrance",
+    "hud.core.mapMarkerLabels.hoardReturnEntrance",
     "hud.core.mapMarkerLabels.worldBoss",
     "hudChrome.auraEffect.carryingFreight",
     "hudChrome.charSidebar.character",
@@ -10600,6 +10624,7 @@ export const pending: Record<string, readonly string[]> = {
     "questUi.worldQuest.wispMaze.title",
     "sim.rift.hoardEnter",
     "sim.rift.hoardExitOpens",
-    "sim.rift.hoardNotYours"
+    "sim.rift.hoardNotYours",
+    "sim.rift.hoardStepBack"
   ]
 };
