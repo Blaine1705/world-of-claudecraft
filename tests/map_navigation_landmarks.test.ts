@@ -131,5 +131,12 @@ describe('live rift zone-map visibility', () => {
     const hoard = { kind: 'object', templateId: 'hoard_entrance', pos: { ...player } };
     expect(classifyNearbyLiveZoneMapEntrance(hoard, player)).toBe('hoard-entrance');
     expect(isNearbyLiveRiftZoneMapEntity(hoard, player)).toBe(false);
+    hoard.pos.x = player.x + 80;
+    expect(classifyNearbyLiveZoneMapEntrance(hoard, player)).toBe('hoard-entrance');
+    hoard.pos.x = player.x + 80.01;
+    expect(classifyNearbyLiveZoneMapEntrance(hoard, player)).toBeNull();
+    expect(
+      classifyNearbyLiveZoneMapEntrance({ ...hoard, kind: 'mob', pos: player }, player),
+    ).toBeNull();
   });
 });
