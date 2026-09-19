@@ -329,6 +329,13 @@ describe('sanitizeCadence', () => {
     expect(sanitizeCadence(block)).toEqual({ ...block, missShare: 0.012 });
   });
 
+  it.each(['off', 'observe', 'held', 'probe', 'probation'])(
+    'keeps the automatic phase %s',
+    (phase) => {
+      expect(sanitizeCadence({ ...block, autoPhase: phase })?.autoPhase).toBe(phase);
+    },
+  );
+
   it('lets no client text or extra key through, and bounds every number', () => {
     const out = sanitizeCadence({
       mode: 'manual',

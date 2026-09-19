@@ -1010,7 +1010,9 @@ export class RenderBudgetGovernor {
    *  disabled governor never took anything. */
   atBaseline(maxRenderScale: number): boolean {
     if (!this.enabled) return true;
-    if (this.mode !== 'stable' || this.reason !== 'stable') return false;
+    // A recover step is a one-frame reading of a governor that is doing well.
+    if (this.mode === 'degrading') return false;
+    if (this.reason !== 'stable' && this.reason !== 'recover') return false;
     const eps = 0.001;
     return (
       this.levels.grass >= this.bands.grass.baseline - eps &&

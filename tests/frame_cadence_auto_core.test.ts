@@ -74,6 +74,16 @@ const probing = (): FrameCadenceAutoState => {
   return s;
 };
 
+describe('the tuning, pinned to literals so a test below cannot move with it', () => {
+  it('is what the design says', () => {
+    expect(AUTO_PROBES_PER_SESSION).toBe(2);
+    expect(AUTO_EVIDENCE_RUN_S).toBe(600);
+    expect(AUTO_PROBE_FRAMES).toBe(90);
+    expect(AUTO_PROBATION_S).toBe(120);
+    expect(AUTO_FRAMES_CLEAR_OF_EXEMPTION).toBe(300);
+  });
+});
+
 describe('the ladder', () => {
   it('skips a step that changes nothing on the display', () => {
     expect(autoStepDown(0, 60)).toBe(30);
@@ -116,11 +126,23 @@ describe('the descent', () => {
     expect(frameCadenceAutoHoldsQuality(s)).toBe(false);
   });
 
-  it('waits for the governor to stop shedding, on both rules', () => {
+  it('gives the governor its turn on a flagrant stream, for three checkpoints and no more', () => {
     const s = createFrameCadenceAuto();
-    expect(play(s, 60, { lateEvery: 2, shedding: true })).toEqual([]);
+    // The ring fills at frame 120 (the first flagrant checkpoint), so the third
+    // one in a row is frame 240: 4 s at 60 Hz.
+    const changes = play(s, 60, { lateEvery: 2, shedding: true, untilChange: true });
+    expect(changes[0]).toBeCloseTo(4, 1);
+    expect(s.ceiling).toBe(30);
+    const free = createFrameCadenceAuto();
+    expect(play(free, 60, { lateEvery: 2, untilChange: true })[0]).toBeCloseTo(2, 1);
+  });
+
+  it('waits for the governor on the watch window too, not only on a flagrant stream', () => {
+    const s = createFrameCadenceAuto();
+    // 20 percent late: uneven, never flagrant.
+    expect(play(s, 50, { lateEvery: 5, shedding: true })).toEqual([]);
     expect(s.ceiling).toBe(0);
-    expect(play(s, 3, { lateEvery: 2 }).length).toBe(1);
+    expect(play(s, 20, { lateEvery: 5, untilChange: true }).length).toBe(1);
     expect(s.ceiling).toBe(30);
   });
 
@@ -172,10 +194,17 @@ describe('the confirming probe of a provisional hold', () => {
     expect(frameCadenceAutoRecord(s)).toEqual({ ceiling: 30, confirmed: true, failStreak: 1 });
   });
 
+  it('holds the quality levels and never remembers its own ceiling', () => {
+    const s = probing();
+    expect(s.ceiling).toBe(0);
+    expect(frameCadenceAutoHoldsQuality(s)).toBe(true);
+    expect(frameCadenceAutoRecord(s)).toEqual({ ceiling: 30, confirmed: false, failStreak: 0 });
+  });
+
   it('passes at the frame count with two late frames, into probation', () => {
     const s = probing();
     const changes = play(s, 10, { lateEvery: 40, untilChange: true });
-    expect(changes[0]).toBeCloseTo(AUTO_PROBE_FRAMES / 60, 5);
+    expect(changes[0]).toBeCloseTo(1.5, 5);
     expect(s.phase).toBe('probation');
     expect(s.ceiling).toBe(0);
     // The remembered verdict is still the one behind the probe.
@@ -187,12 +216,30 @@ describe('the confirming probe of a provisional hold', () => {
     ['in combat', { calm: false }],
     ['right after an exempt span', { framesSinceExempt: AUTO_FRAMES_CLEAR_OF_EXEMPTION - 1 }],
     ['while the governor sheds', { shedding: true }],
-    ['with a late frame in the recent ring', { lateEvery: 100 }],
   ] as const)('is deferred %s, and starts once that clears', (_label, feed) => {
     const s = heldAt30(false);
     expect(play(s, 200, feed)).toEqual([]);
     expect(s.phase).toBe('held');
     expect(play(s, 5, { untilChange: true }).length).toBe(1);
+    expect(s.phase).toBe('probe');
+  });
+
+  it('settles without a probe after five minutes that never gave it a clean minute', () => {
+    const s = heldAt30(false);
+    // 1 late frame in 12 (8 percent): never clean, never uneven.
+    const changes = play(s, 400, { lateEvery: 12, untilChange: true });
+    expect(changes[0]).toBeGreaterThan(299);
+    expect(changes[0]).toBeLessThan(303);
+    expect(s.phase).toBe('held');
+    expect(s.confirmed).toBe(true);
+    expect(s.probesStarted).toBe(0);
+    expect(frameCadenceAutoHoldsQuality(s)).toBe(false);
+  });
+
+  it('tolerates a stray late frame in the recent ring when it starts', () => {
+    const s = heldAt30(false);
+    // 1 in 40 (2.5 percent): clean checkpoints, a ring that is never spotless.
+    expect(play(s, 70, { lateEvery: 40, untilChange: true })[0]).toBeLessThan(63);
     expect(s.phase).toBe('probe');
   });
 
@@ -250,14 +297,33 @@ describe('probation', () => {
 
   it('ends in a settled full cadence, which a later descent does not make provisional', () => {
     const s = onProbation();
-    const changes = play(s, AUTO_PROBATION_S + 2);
+    const changes = play(s, 125);
     expect(changes.length).toBe(1);
+    expect(changes[0]).toBeGreaterThan(118);
     expect(s.phase).toBe('observe');
     expect(frameCadenceAutoRecord(s)).toEqual({ ceiling: 0, confirmed: false, failStreak: 0 });
     expect(frameCadenceAutoHoldsQuality(s)).toBe(false);
     play(s, 5, { lateEvery: 2 });
     expect(s.ceiling).toBe(30);
     expect(s.confirmed).toBe(true);
+  });
+
+  it('ends in a confirmed hold one rung up on a fast display, with the fail streak cleared', () => {
+    const s = createFrameCadenceAuto();
+    restoreFrameCadenceAuto(s, { ceiling: 30, confirmed: true, failStreak: 2 });
+    const feed = { refreshHz: 144, atBaseline: true, untilChange: true };
+    play(s, 4 * 600 + 20, feed);
+    expect(s.phase).toBe('probe');
+    expect(s.ceiling).toBe(60);
+    play(s, 5, feed);
+    expect(s.phase).toBe('probation');
+    expect(s.failStreak).toBe(2);
+    play(s, 125, feed);
+    expect(s.phase).toBe('held');
+    expect(s.ceiling).toBe(60);
+    expect(s.confirmed).toBe(true);
+    expect(s.failStreak).toBe(0);
+    expect(frameCadenceAutoRecord(s)).toEqual({ ceiling: 60, confirmed: true, failStreak: 0 });
   });
 });
 
@@ -277,7 +343,8 @@ describe('a confirmed hold', () => {
     const fresh = heldAt30(true);
     const first = play(fresh, AUTO_EVIDENCE_RUN_S + 10, { atBaseline: true, untilChange: true });
     expect(first.length).toBe(1);
-    expect(first[0]).toBeGreaterThan(AUTO_EVIDENCE_RUN_S);
+    expect(first[0]).toBeGreaterThan(600);
+    expect(first[0]).toBeLessThan(606);
 
     const failedTwice = heldAt30(true, 2);
     expect(play(failedTwice, 4 * AUTO_EVIDENCE_RUN_S - 10, { atBaseline: true })).toEqual([]);
@@ -285,15 +352,26 @@ describe('a confirmed hold', () => {
     expect(failedTwice.phase).toBe('probe');
   });
 
-  it('caps the doubling', () => {
+  it('clamps a restored fail streak', () => {
     const s = heldAt30(true, 99);
     expect(s.failStreak).toBe(4);
+  });
+
+  it('builds its evidence at the miss share a released governor settles on', () => {
+    const s = heldAt30(true);
+    // 1 in 15 (6.7 percent): over the clean share, under the governor's own line.
+    const changes = play(s, 700, { atBaseline: true, lateEvery: 15 });
+    expect(changes).toEqual([]);
+    expect(s.evidenceS).toBeGreaterThan(600);
+    // The probe then waits for a calmer stretch of the ring.
+    expect(play(s, 10, { atBaseline: true, untilChange: true }).length).toBe(1);
+    expect(s.phase).toBe('probe');
   });
 
   it('restarts the evidence run on an unclean checkpoint, a governor move or an exempt span', () => {
     for (const breakIt of [
       // Long enough to contain a whole checkpoint.
-      (s: FrameCadenceAutoState) => void play(s, 4.1, { atBaseline: true, lateEvery: 10 }),
+      (s: FrameCadenceAutoState) => void play(s, 4.1, { atBaseline: true, lateEvery: 8 }),
       (s: FrameCadenceAutoState) => void play(s, 4.1, { atBaseline: false }),
       (s: FrameCadenceAutoState) => void resetFrameCadenceAutoWindow(s),
     ]) {
@@ -319,8 +397,8 @@ describe('a confirmed hold', () => {
       play(s, 16 * AUTO_EVIDENCE_RUN_S + 100, { atBaseline: true, untilChange: true });
       if (s.phase === 'probe') play(s, 1, { lateEvery: 1, untilChange: true });
     }
-    expect(s.probesStarted).toBe(AUTO_PROBES_PER_SESSION);
-    expect(s.failStreak).toBe(AUTO_PROBES_PER_SESSION);
+    expect(s.probesStarted).toBe(2);
+    expect(s.failStreak).toBe(2);
   });
 });
 

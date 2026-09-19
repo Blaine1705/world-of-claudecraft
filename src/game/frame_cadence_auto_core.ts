@@ -37,12 +37,23 @@ export const AUTO_CLEAN_SHARE = 0.05;
  *  next checkpoint, without waiting for the watch window to close. */
 export const AUTO_FLAGRANT_SHARE = 0.3;
 export const AUTO_RECENT_FRAMES = 120;
+/** The governor goes first, but not for ever: a stream still flagrant at this
+ *  many checkpoints in a row steps down while it sheds (measured on a Windows
+ *  HD 530: its shedding ran 16 s and changed nothing the player could see). */
+export const AUTO_FLAGRANT_CHECKPOINTS_BEFORE_GOVERNOR = 3;
 export const AUTO_CHECKPOINT_FRAMES = 60;
 export const AUTO_WATCH_WINDOW_S = 15;
 /** A descent this early in the observation is provisional: the first minute of
  *  a session is its heaviest, so it earns one confirming probe. */
 export const AUTO_SETTLE_S = 60;
 export const AUTO_CONFIRM_CLEAN_S = 60;
+/** A provisional hold freezes the governor's recovery, so it is bounded: past
+ *  this much play without its clean minute, the descent stands as settled. */
+export const AUTO_PROVISIONAL_MAX_S = 300;
+/** A checkpoint counts toward a confirmed hold's evidence run under this
+ *  share: the governor's own allowed miss share, since released it refills
+ *  quality up to just under that line and a stricter one would never be met. */
+export const AUTO_EVIDENCE_SHARE = 0.1;
 export const AUTO_PROBE_FRAMES = 90;
 /** A probe fails on this late frame: about a third of a second on the measured
  *  machines, where a full window of proof cost ten seconds of stutter. */
@@ -79,6 +90,10 @@ export interface FrameCadenceAutoState {
   probationS: number;
   /** Clean seconds in a provisional hold, toward its confirming probe. */
   cleanS: number;
+  /** Seconds of play a provisional hold has lasted. */
+  provisionalS: number;
+  /** Checkpoints in a row that read flagrant. */
+  flagrantStreak: number;
   /** The continuous evidence run of a confirmed hold. */
   evidenceS: number;
   recent: Uint8Array;
@@ -124,6 +139,8 @@ export function createFrameCadenceAuto(): FrameCadenceAutoState {
     probeLate: 0,
     probationS: 0,
     cleanS: 0,
+    provisionalS: 0,
+    flagrantStreak: 0,
     evidenceS: 0,
     recent: new Uint8Array(AUTO_RECENT_FRAMES),
     recentAt: 0,
@@ -150,7 +167,11 @@ export function frameCadenceAutoRecord(state: FrameCadenceAutoState): FrameCaden
   const probing = state.phase === 'probe' || state.phase === 'probation';
   return {
     ceiling: probing ? state.probeFrom : state.ceiling,
-    confirmed: probing ? true : state.confirmed,
+    // A probe in flight answered nothing yet; a passed one settles what it left.
+    confirmed:
+      state.phase === 'probe'
+        ? state.probeConfirmedBefore
+        : state.phase === 'probation' || state.confirmed,
     failStreak: state.failStreak,
   };
 }
@@ -173,6 +194,7 @@ export function restoreFrameCadenceAuto(
   }
   state.phase = 'held';
   state.confirmed = record.confirmed;
+  state.provisionalS = 0;
 }
 
 /** The player changed what the verdict was formed on (a preset, the render
@@ -278,7 +300,11 @@ function failProbe(state: FrameCadenceAutoState): void {
 function stepDown(state: FrameCadenceAutoState, refreshHz: number): boolean {
   const down = autoStepDown(state.ceiling, refreshHz);
   if (down === state.ceiling) return false;
-  if (state.phase === 'observe') state.confirmed = state.observeS >= AUTO_SETTLE_S;
+  if (state.phase === 'observe') {
+    state.confirmed = state.observeS >= AUTO_SETTLE_S;
+    state.provisionalS = 0;
+  }
+  state.flagrantStreak = 0;
   state.phase = 'held';
   state.ceiling = down;
   state.cleanS = 0;
@@ -295,7 +321,7 @@ function probeAllowed(state: FrameCadenceAutoState, frame: FrameCadenceAutoFrame
     !frame.governorShedding &&
     frame.framesSinceExempt >= AUTO_FRAMES_CLEAR_OF_EXEMPTION &&
     state.recentCount >= AUTO_RECENT_FRAMES &&
-    state.recentLate === 0
+    state.recentLate / AUTO_RECENT_FRAMES < AUTO_CLEAN_SHARE
   );
 }
 
@@ -380,7 +406,8 @@ export function stepFrameCadenceAuto(
 
   const checkpoint = state.checkpointFrames >= AUTO_CHECKPOINT_FRAMES;
   const seconds = state.checkpointSeconds;
-  const clean = state.checkpointLate / Math.max(1, state.checkpointFrames) < AUTO_CLEAN_SHARE;
+  const checkpointShare = state.checkpointLate / Math.max(1, state.checkpointFrames);
+  const clean = checkpointShare < AUTO_CLEAN_SHARE;
   if (checkpoint) {
     state.checkpointFrames = 0;
     state.checkpointLate = 0;
@@ -390,8 +417,9 @@ export function stepFrameCadenceAuto(
     const share = state.recentLate / AUTO_RECENT_FRAMES;
     if (share >= AUTO_FLAGRANT_SHARE) {
       state.lastShare = share;
+      state.flagrantStreak++;
       uneven = true;
-    }
+    } else state.flagrantStreak = 0;
   }
 
   if (uneven) {
@@ -402,7 +430,8 @@ export function stepFrameCadenceAuto(
       failProbe(state);
       return true;
     }
-    if (frame.governorShedding) return false;
+    const governorHadItsTurn = state.flagrantStreak >= AUTO_FLAGRANT_CHECKPOINTS_BEFORE_GOVERNOR;
+    if (frame.governorShedding && !governorHadItsTurn) return false;
     return stepDown(state, frame.refreshHz);
   }
 
@@ -425,8 +454,10 @@ export function stepFrameCadenceAuto(
 
   if (!state.confirmed) {
     state.cleanS = clean ? state.cleanS + seconds : 0;
-    if (state.cleanS < AUTO_CONFIRM_CLEAN_S) return false;
-    if (state.probesLeft <= 0) {
+    state.provisionalS += seconds;
+    const due = state.cleanS >= AUTO_CONFIRM_CLEAN_S;
+    if (!due && state.provisionalS < AUTO_PROVISIONAL_MAX_S) return false;
+    if (!due || state.probesLeft <= 0) {
       state.confirmed = true;
       return true;
     }
@@ -435,7 +466,8 @@ export function stepFrameCadenceAuto(
     return true;
   }
 
-  const evidence = clean && frame.governorAtBaseline && !frame.governorShedding;
+  const evidence =
+    checkpointShare < AUTO_EVIDENCE_SHARE && frame.governorAtBaseline && !frame.governorShedding;
   state.evidenceS = evidence ? state.evidenceS + seconds : 0;
   if (state.probesLeft <= 0 || state.evidenceS < evidenceRunS(state)) return false;
   if (!probeAllowed(state, frame)) return false;

@@ -766,15 +766,68 @@ describe('automatic frame rate limit', () => {
     expect(r.wiring.snapshot().intent).toBe(30);
   });
 
-  it('waits for the quality governor: no step down while it is still shedding', () => {
-    const r = runHost({
+  it('gives the quality governor its turn, a few seconds and no more', () => {
+    const shed = runHost({
       refreshMs: SLOT,
       costMs: uneven(22, 12),
       seconds: 60,
       intent: 'auto',
       governorShedding: () => true,
     });
-    expect(intents(r)).toEqual([0]);
+    const free = runHost({ refreshMs: SLOT, costMs: uneven(22, 12), seconds: 60, intent: 'auto' });
+    expect(intents(shed)).toEqual([0, 30]);
+    const waited = shed.intentLog[1].at - free.intentLog[1].at;
+    expect(waited).toBeGreaterThan(2_500);
+    expect(waited).toBeLessThan(4_000);
+  });
+
+  it('a probe cancelled by a loading cover leaves the stored verdict provisional', () => {
+    let probeAt = -1;
+    const r = runHost({
+      refreshMs: SLOT,
+      costMs: 5,
+      seconds: 75,
+      intent: 'auto',
+      remembered: PROVISIONAL_AT_30,
+      onFrame: (t, wiring) => {
+        if (probeAt < 0 && wiring.snapshot().autoPhase === 'probe') probeAt = t;
+      },
+      cover: (t) => probeAt >= 0 && t >= probeAt && t < probeAt + 1_000,
+    });
+    expect(probeAt).toBeGreaterThan(0);
+    expect(r.wiring.snapshot().autoProbesInconclusive).toBe(1);
+    // Neither the probe's own ceiling nor a confirmation it never earned is stored.
+    expect(r.saved.length).toBeGreaterThanOrEqual(2);
+    for (const record of r.saved) expect(record).toEqual(PROVISIONAL_AT_30);
+  });
+
+  it('another display class re-opens the question and keeps the stored verdict', () => {
+    const host: Parameters<typeof runHost>[0] = {
+      refreshMs: SLOT,
+      costMs: 3,
+      seconds: 60,
+      intent: 'auto',
+      remembered: SETTLED_AT_30,
+      onFrame: (t) => {
+        if (t > 20_000) host.refreshMs = 1000 / 144;
+      },
+    };
+    const r = runHost(host);
+    expect(r.wiring.snapshot().refreshHz).toBeGreaterThan(140);
+    expect(r.clears).toBe(0);
+    expect(r.loads).toBe(2);
+  });
+
+  it('reports the automatic mode through the snapshot and the beacon block', () => {
+    const r = runHost({ refreshMs: SLOT, costMs: uneven(22, 12), seconds: 120, intent: 'auto' });
+    const snap = r.wiring.snapshot();
+    expect(snap.autoDescents).toBe(1);
+    expect(snap.autoProbes).toBe(1);
+    expect(snap.autoProbesFailed).toBe(1);
+    expect(snap.autoFailStreak).toBe(1);
+    expect(snap.autoConfirmed).toBe(true);
+    expect(snap.autoFirstCeilingS).toBeGreaterThan(1);
+    expect(snap.autoFirstCeilingS).toBeLessThan(8);
   });
 
   it('goes through about 60 first on a 144 Hz display', () => {

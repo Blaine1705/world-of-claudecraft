@@ -337,8 +337,13 @@ export class FrameCadenceWiring {
   /** Readings that straddle an exempt span, a hidden tab or an unread display
    *  are dropped, and a probe in flight there is cancelled. */
   private dropAutoReadings(): void {
-    if (resetFrameCadenceAutoWindow(this.autoState) && this.auto) {
-      this.intent = this.autoState.ceiling;
+    if (!resetFrameCadenceAutoWindow(this.autoState)) return;
+    if (this.auto) this.intent = this.autoState.ceiling;
+    if (this.estimator.refreshMs > 0) {
+      this.deps.autoMemory.save(
+        1000 / this.estimator.refreshMs,
+        frameCadenceAutoRecord(this.autoState),
+      );
     }
   }
 
@@ -346,7 +351,10 @@ export class FrameCadenceWiring {
    *  formed on something else. The remembered one for a display seen before is
    *  kept (its key differs); a resize happened under the same key. */
   private playerChangedTheSurface(refreshHz: number): boolean {
-    const refreshClass = Math.round(refreshHz / 5) * 5;
+    // The estimate is smoothed and can hover on a class edge (a VRR panel): the
+    // class only changes once the reading is clearly inside another one.
+    const held = this.refreshClass !== 0 && Math.abs(refreshHz - this.refreshClass) <= 4;
+    const refreshClass = held ? this.refreshClass : Math.round(refreshHz / 5) * 5;
     const displayChanged = this.refreshClass !== 0 && refreshClass !== this.refreshClass;
     this.refreshClass = refreshClass;
     if (displayChanged) {

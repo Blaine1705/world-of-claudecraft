@@ -17,7 +17,7 @@ import { NO_CHOSEN_CADENCE } from '../src/render/chosen_cadence_pressure_core';
 describe('chosen cadence signal', () => {
   beforeEach(() => {
     setChosenCadence(0, 0, false);
-    noteGovernorShedding(false);
+    noteGovernorShedding(false, 100);
   });
 
   it('publishes no cadence for a zero interval, whatever share came with it', () => {
@@ -43,8 +43,18 @@ describe('chosen cadence signal', () => {
 
   it('carries the governor shedding flag until a new renderer clears it', () => {
     expect(governorIsShedding()).toBe(false);
-    noteGovernorShedding(true);
+    noteGovernorShedding(true, 0.016);
     expect(governorIsShedding()).toBe(true);
+    // The governor pulses: one shedding frame, then a cooldown of about a second
+    // read as stable. The reading bridges it, and lapses 3 s after the last step.
+    noteGovernorShedding(false, 1.4);
+    expect(governorIsShedding()).toBe(true);
+    noteGovernorShedding(true, 0.016);
+    noteGovernorShedding(false, 2.9);
+    expect(governorIsShedding()).toBe(true);
+    noteGovernorShedding(false, 0.2);
+    expect(governorIsShedding()).toBe(false);
+    noteGovernorShedding(true, 0.016);
     // The cadence publish never touches it: only the renderer writes this flag.
     setChosenCadence(0, 0, false);
     expect(governorIsShedding()).toBe(true);

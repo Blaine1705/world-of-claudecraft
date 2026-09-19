@@ -4635,7 +4635,7 @@ export class Renderer {
     // preparation waits. The budget's frame boundary is fed in sync() instead,
     // where it lands on every frame rather than only on a presented one.
     this.gpuPrepBudget.notePressure(state.mode === 'degrading');
-    noteGovernorShedding(state.mode === 'degrading');
+    noteGovernorShedding(state.mode === 'degrading', dt);
     noteCadenceProbeContext(
       this.renderBudgetGovernor.atBaseline(sample.maxRenderScale),
       this.sim.player.inCombat,

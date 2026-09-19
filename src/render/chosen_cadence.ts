@@ -7,9 +7,13 @@
 import { chosenCadenceLoadMs, NO_CHOSEN_CADENCE } from './chosen_cadence_pressure_core';
 
 let chosenIntervalMs = 0;
+/** Longer than any tier's shed cooldown (gfx.ts budgets), so consecutive steps
+ *  of one descent read as one shedding span. Play time, not a machine reading. */
+export const GOVERNOR_SHEDDING_HOLD_S = 3;
+
 let missShare = NO_CHOSEN_CADENCE;
 let holdQuality = false;
-let governorShedding = false;
+let governorSheddingForS = 0;
 let governorAtBaseline = false;
 let playerInCombat = false;
 
@@ -24,7 +28,7 @@ export function setChosenCadence(intervalMs: number, share: number, hold: boolea
 /** A new renderer starts with a governor that is not shedding: without this a
  *  value left by the previous one would stop the automatic ceiling for good. */
 export function resetChosenCadenceForRenderer(): void {
-  governorShedding = false;
+  governorSheddingForS = 0;
   governorAtBaseline = false;
   playerInCombat = false;
 }
@@ -35,8 +39,12 @@ export function chosenCadenceHoldsQuality(): boolean {
 
 /** Written by the renderer after each governor update, read by the automatic
  *  ceiling: quality is shed first, the ceiling waits its turn. */
-export function noteGovernorShedding(shedding: boolean): void {
-  governorShedding = shedding;
+export function noteGovernorShedding(shedding: boolean, dtSeconds: number): void {
+  // The governor reads as shedding only on the frame a step fires, then cools
+  // down for about a second before the next one: a whole descent of its ladder
+  // is a pulse train. The reading is held across those gaps.
+  if (shedding) governorSheddingForS = GOVERNOR_SHEDDING_HOLD_S;
+  else if (dtSeconds > 0) governorSheddingForS = Math.max(0, governorSheddingForS - dtSeconds);
 }
 
 /** The renderer's other two readings for the automatic ceiling: the governor
@@ -56,7 +64,7 @@ export function cadencePlayerInCombat(): boolean {
 }
 
 export function governorIsShedding(): boolean {
-  return governorShedding;
+  return governorSheddingForS > 0;
 }
 
 /** The chosen interval in ms, 0 when the display paces the frames. */
