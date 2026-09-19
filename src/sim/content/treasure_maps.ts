@@ -98,7 +98,7 @@ export interface VaultPayoutDef {
 }
 
 /** What a cleared vault pays each entrant, by the map's rarity. The mount odds
- *  average about 1.5% across the drop weights above. */
+ *  average about 1.3% across the drop weights above. */
 export const VAULT_PAYOUTS: Readonly<Record<TreasureMapRarity, VaultPayoutDef>> = Object.freeze({
   common: {
     copperMult: 1,
@@ -127,7 +127,7 @@ export const VAULT_PAYOUTS: Readonly<Record<TreasureMapRarity, VaultPayoutDef>> 
     gearTier: 'premium',
     markChance: 0.25,
     marks: 3,
-    mountChance: 0.04,
+    mountChance: 0.025,
     nextMapChance: 0.05,
   },
   legendary: {
@@ -137,7 +137,7 @@ export const VAULT_PAYOUTS: Readonly<Record<TreasureMapRarity, VaultPayoutDef>> 
     gearTier: 'premium',
     markChance: 1,
     marks: 5,
-    mountChance: 0.15,
+    mountChance: 0.05,
     nextMapChance: 0,
   },
 });
