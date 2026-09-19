@@ -111,8 +111,9 @@ function fakeWorker() {
 
 const CONTEXT = { getContextAttributes: () => null, getExtension: () => null };
 
-/** A context whose renderer string names the one backend `auto` warms on
- *  (gpu_backend_class_core.ts, WORKER_WORTH_BACKENDS). */
+/** A context whose renderer string names D3D11, the backend `auto` warmed on
+ *  until the 0.43 fleet experiment (gpu_backend_class_core.ts,
+ *  WORKER_WORTH_BACKENDS). */
 const D3D11_CONTEXT = {
   getContextAttributes: () => null,
   getExtension: (name: string) =>
@@ -229,21 +230,21 @@ describe('the shader warm row is live', () => {
     expect(workers).toHaveLength(1);
   });
 
-  it('keeps the worker when Auto lands on a backend it is worth on', () => {
+  it('retires the worker when the row moves from On to Auto, D3D11 included', () => {
     let stored: number = SHADER_WARM_SETTING_VALUES.on;
     const workers = armWorker(() => stored, D3D11_CONTEXT);
+    expect(shaderWarmSnapshot()).toMatchObject({ mode: 'all', worker: 'ready' });
 
     stored = SHADER_WARM_SETTING_VALUES.auto;
     window.dispatchEvent(new Event(SETTINGS_CHANGE_EVENT));
 
     expect(shaderWarmSnapshot()).toMatchObject({
       setting: 'auto',
-      mode: 'all',
+      mode: 'off',
       backend: 'd3d11',
-      worker: 'ready',
     });
-    expect(workers[0].terminations).toBe(0);
-    expect(shaderWarmAvailable()).toBe(true);
+    expect(workers[0].terminations).toBe(1);
+    expect(shaderWarmAvailable()).toBe(false);
   });
 
   it('re-latches the iOS refusal when the row moves off Off there', () => {

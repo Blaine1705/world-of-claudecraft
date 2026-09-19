@@ -2,10 +2,10 @@
 // (Settings keeps numbers and booleans only) mapped to the worker client's
 // setting, and the registration that lets the client read it without
 // reaching into persistence itself (src/render/shader_warm_client.ts,
-// setShaderWarmStoredSettingSource). `auto` follows the GPU backend; `on` is
-// the full policy (`all`: the live view waits behind its stand-in too); the
-// probe-only `reveal` arm stays a query-string arm and is never a stored
-// option.
+// setShaderWarmStoredSettingSource). `auto` follows the GPU backend (off on
+// all of them today); `on` is the full policy (`all`: the live view waits
+// behind its stand-in too); the probe-only `reveal` arm stays a query-string
+// arm and is never a stored option.
 
 import {
   noteShaderWarmSettingChanged,
