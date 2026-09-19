@@ -389,6 +389,15 @@ import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
 import { usedJsHeapMb } from './heap_sample';
 import { createHitchFrameAligner } from './hitch_frame_align_core';
 import { hoardEntrance } from './hoard_entrance';
+import {
+  buildHoardValley,
+  disposeHoardValleyGroup,
+  resolveHoardValleyEffectsProfile,
+} from './hoard_valley';
+import {
+  type HoardValleyEnvironment,
+  resolveHoardValleyEnvironment,
+} from './hoard_valley_environment';
 import { buildHollowGates, type HollowGatesView } from './hollow_gates';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { idleSlot } from './idle_queue';
@@ -5039,7 +5048,12 @@ export class Renderer {
     // it there left a black void above the ramparts).
     this.sky.visible = isOpenAirFogState(this.fogState);
     if (this.sky.visible) {
-      this.skyView.setCameraPos(this.camera.position.x, this.camera.position.z, dt);
+      const valleySky = this.hoardValleyEnvironment?.sky;
+      this.skyView.setCameraPos(
+        valleySky?.x ?? this.camera.position.x,
+        valleySky?.z ?? this.camera.position.z,
+        dt,
+      );
       if (!this.lowGfx) {
         this.skyView.setDayNight(this.dnGrade.sky);
         this.skyView.setCycle(
@@ -8752,6 +8766,7 @@ export class Renderer {
   // Re-applied rift fog is keyed by the floor descriptor (seed:floorIndex) so a
   // descent (same 'rift' fogState, different palette) still refreshes the fog.
   private riftFogKey: string | null = null;
+  private hoardValleyEnvironment: HoardValleyEnvironment | null = null;
   // Cached with riftFogKey: whether the current rift floor is an authored set
   // piece, so the per-frame lighting read avoids regenerating the floor.
   private riftFogAuthored = false;
@@ -8759,6 +8774,7 @@ export class Renderer {
 
   /** Drop a retired interior's scene nodes, registries, and owned resources. */
   private retireInteriorGroup(group: THREE.Group): void {
+    if (disposeHoardValleyGroup(group)) return;
     this.scene.remove(group);
     this.releaseInteriorExternalRefs(group);
     const resourceErrors = this.dungeons?.disposeInteriorResources(group).errors;
@@ -9080,7 +9096,10 @@ export class Renderer {
     // transition when the player later walks outside).
     const settleVistaEntry = this.vistaEntrySettlePending;
     this.vistaEntrySettlePending = false;
-    const biome = zoneBiomeAt(this.sim.player.pos.x, pz);
+    const riftFloor = inside && isRiftPos(px) ? this.sim.riftFloor : null;
+    const valley = resolveHoardValleyEnvironment(riftFloor);
+    this.hoardValleyEnvironment = valley;
+    const biome = valley?.profile.biome ?? zoneBiomeAt(this.sim.player.pos.x, pz);
     // Per-biome god-ray strength, eased over about half a second so a border
     // crossing fades the shafts with the rest of the ambience.
     const shaftTarget = Renderer.BIOME_GOD_RAYS[biome] ?? 1;
@@ -9196,15 +9215,25 @@ export class Renderer {
           if (Math.abs(px - o.x) < 200 && Math.abs(pz - o.z) < 250) {
             this.builtInteriors.add(key);
             const floor = generateRiftFloor(rf.seed, rf.baseLevel, rf.floorIndex, rf.upgrade);
-            void this.ensureDungeons()
-              .buildInterior(floor.style.kit, o.x, o.z, {
-                layout: floor.layout,
-                style: floor.style,
-                hazards: floor.hazards,
-                hazardStyle: 'lava',
-                iceZone: floor.iceZone,
-                platform: floor.platform,
-              })
+            const build = floor.outdoor
+              ? Promise.resolve(
+                  buildHoardValley({
+                    scene: this.scene,
+                    compileGate: this.worldCompileGate(),
+                    plan: floor,
+                    offset: { x: o.x, y: 0, z: o.z },
+                    effectsProfile: resolveHoardValleyEffectsProfile(GFX.effectsTier),
+                  }).group,
+                )
+              : this.ensureDungeons().buildInterior(floor.style.kit, o.x, o.z, {
+                  layout: floor.layout,
+                  style: floor.style,
+                  hazards: floor.hazards,
+                  hazardStyle: 'lava',
+                  iceZone: floor.iceZone,
+                  platform: floor.platform,
+                });
+            void build
               .then((group) => {
                 for (const [staleKey, staleGroup] of this.riftInteriorGroups) {
                   if (staleKey === key) continue;
@@ -9241,12 +9270,11 @@ export class Renderer {
     // fog_scene_state.ts's to own, the fog twin of interior_light_rig.ts.
     const fogScene = resolveFogScene(inside, px, camY, this.camera.position, this.sim.cfg.seed);
     encounterPrewarm.setEncounterPrewarmInterior(this, fogScene.interior ?? null);
-    const desired = fogScene.desired;
+    const desired = valley ? 'hoardValley' : fogScene.desired;
     const fog = this.scene.fog as THREE.Fog;
     // Procedural rift: dynamic fog from the generated floor style, re-applied when
     // the floor changes (descent keeps fogState='rift' but swaps the palette).
-    const riftFloor = inside && isRiftPos(px) ? this.sim.riftFloor : null;
-    if (riftFloor) {
+    if (riftFloor && !valley) {
       const fogKey = `${riftFloor.contentHash}:${riftFloor.floorIndex}`;
       if (fogKey !== this.riftFogKey) {
         this.riftFogKey = fogKey;
@@ -9271,7 +9299,7 @@ export class Renderer {
     this.riftFogKey = null;
     if (desired !== this.fogState) {
       this.fogState = desired;
-      applyFogScenePreset(desired, fog, () => this.outdoorFogPreset());
+      applyFogScenePreset(desired, fog, () => valley?.fog ?? this.outdoorFogPreset());
       // interiors must not leak daylight: drop sun + sky ambient + IBL
       // underground so the torch point lights own the scene; restore outside.
       // The rim glow cranks up instead, silhouettes must split from the murk.
@@ -9366,7 +9394,9 @@ export class Renderer {
     if (usesLiveDayNightLighting(desired)) {
       const g = this.dnGrade;
       const preset =
-        desired === 'battleground' ? Renderer.BATTLEGROUND_FOG : this.outdoorFogPreset();
+        desired === 'battleground'
+          ? Renderer.BATTLEGROUND_FOG
+          : (valley?.fog ?? this.outdoorFogPreset());
       const k = transitionAlpha(dt, ZONE_ENVIRONMENT_RESPONSE);
       if (this.lowGfx) return;
       // fog color: the biome hue multiplied by the day/night color (a dark
@@ -11845,7 +11875,12 @@ export class Renderer {
     this.sky.position.set(this.camera.position.x, 0, this.camera.position.z);
     this.sky.visible = isOpenAirFogState(this.fogState);
     if (this.sky.visible) {
-      this.skyView.setCameraPos(this.camera.position.x, this.camera.position.z, dt);
+      const valleySky = this.hoardValleyEnvironment?.sky;
+      this.skyView.setCameraPos(
+        valleySky?.x ?? this.camera.position.x,
+        valleySky?.z ?? this.camera.position.z,
+        dt,
+      );
       if (!this.lowGfx) {
         this.skyView.setDayNight(this.dnGrade.sky);
         this.skyView.setCycle(
