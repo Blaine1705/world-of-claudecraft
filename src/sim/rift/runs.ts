@@ -40,6 +40,7 @@ import {
 import { DT, dist2d, type Entity, type SimEvent, type Vec3 } from '../types';
 import { isInWaterBody } from '../world';
 import { riftFx } from './fx';
+import { hoardBossCueViews, tickHoardBossMechanics } from './hoard_boss';
 import {
   RIFT_LOOT_RECOVERY_GRACE,
   RIFT_MIN_LEVEL,
@@ -267,6 +268,7 @@ function buildRiftStateEvent(
     name: floor.name,
     themeName: floor.themeName,
     tier: inst.tier,
+    hoardCues: active && inst.hoardBoss?.cues.length ? hoardBossCueViews(inst) : undefined,
     expiresAtMs,
   };
 }
@@ -287,8 +289,15 @@ export function riftStateEventFor(ctx: SimContext, pid: number): RiftStateEvent 
   const p = ctx.entities.get(pid);
   if (!p || !isRiftPos(p.pos.x)) return null;
   const inst = riftInstanceAtPos(ctx, p.pos);
-  if (!inst || !inst.memberIds.has(pid)) return null;
+  if (!inst?.memberIds.has(pid)) return null;
   return buildRiftStateEvent(ctx, pid, inst, true);
+}
+
+export function hoardBossCueViewsForPlayer(ctx: SimContext, pid: number) {
+  const player = ctx.entities.get(pid);
+  if (!player) return [];
+  const inst = riftInstanceAtPos(ctx, player.pos);
+  return inst?.hoardBoss && inst.partyKey !== null ? hoardBossCueViews(inst) : [];
 }
 
 // ---- Floor spawn / teardown -------------------------------------------------
@@ -329,6 +338,7 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
   inst.minibossId = null;
   inst.orbId = null;
   inst.orbActive = false;
+  delete inst.hoardBoss;
 
   // Every rank is stat-scaled: a spawn-time stat transform plus the per-entity
   // mechanic multipliers, mirroring instances/difficulty.ts. C takes the
@@ -369,7 +379,7 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
       // kit SIZE, not about letting mechanics stack).
       mob.riftMechanicSpacing = RIFT_MECHANIC_SPACING_SEC;
       if (!isSetPieceRift(inst.seed, inst.baseLevel)) {
-        mob.riftMechanicLimit = RIFT_RANK_MECHANIC_BUDGET[rank];
+        mob.riftMechanicLimit = inst.vault && spawn.boss ? 0 : RIFT_RANK_MECHANIC_BUDGET[rank];
       }
     }
     // Per-run re-grade: a fresh tint (and a little scale variance) so the same
@@ -518,6 +528,7 @@ function freeRiftFloorEntities(ctx: SimContext, inst: RiftInstance): void {
   inst.minibossId = null;
   inst.orbId = null;
   inst.orbActive = false;
+  delete inst.hoardBoss;
   clearRiftBossDeathZones(ctx, inst);
 }
 
@@ -1781,6 +1792,7 @@ export function updateRiftInstances(ctx: SimContext): void {
       clearRiftBossDeathZones(ctx, inst);
     }
   }
+  tickHoardBossMechanics(ctx);
   if (ctx.tickCount % 20 !== 0) return; // once a second
   for (const inst of ctx.riftInstances) {
     if (inst.partyKey === null) continue;

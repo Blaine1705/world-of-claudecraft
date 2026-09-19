@@ -759,6 +759,7 @@ import {
 import {
   advanceRiftRollers as advanceRiftRollersImpl,
   enterRift as enterRiftImpl,
+  hoardBossCueViewsForPlayer,
   leaveRift as leaveRiftImpl,
   liftRiftEntities as liftRiftEntitiesImpl,
   riftInstanceAtPos,
@@ -11394,8 +11395,7 @@ export class Sim {
     return runsMod.delveDailyWire(this.ctx, pid);
   }
 
-  // The primary player's active procedural Rift floor (offline IWorld read). The
-  // renderer regenerates geometry/style from this descriptor; null outside a rift.
+  // The primary player's active procedural Rift floor for the offline IWorld read.
   get riftFloor(): import('../world_api/dungeons').RiftFloorView | null {
     // The renderer reads this per frame (camera clamp, per-entity ground
     // reference): cache the derived view per tick instead of reallocating it
@@ -11405,10 +11405,8 @@ export class Sim {
     this.riftFloorView = buildRiftFloorView(this.ctx);
     return this.riftFloorView;
   }
-
   private riftFloorViewTick = -1;
   private riftFloorView: import('../world_api/dungeons').RiftFloorView | null = null;
-
   riftBossDeathZones(): import('../world_api/dungeons').RiftBossDeathZoneView[] {
     const p = this.entities.get(this.primaryId);
     if (!p) return [];
@@ -11416,9 +11414,11 @@ export class Sim {
     if (!inst || inst.partyKey === null) return [];
     return inst.bossDeathZones;
   }
-
-  // Milliseconds remaining before the current rift's backing world event stops
-  // admitting new parties (null outside a rift, or for a dev-spawned rift with no
+  hoardBossCues(): import('../world_api/dungeons').HoardBossCueView[] {
+    return hoardBossCueViewsForPlayer(this.ctx, this.primaryId);
+  }
+  // Milliseconds remaining before the current rift's backing event stops admitting
+  // parties (null outside a rift, or for a dev-spawned rift with no
   // backing RiftEvent). Sim-clock arithmetic only (event.expiresAt and this.time are
   // both sim-clock seconds), recomputed fresh on every call so a repeated read ticks
   // down like raidLockouts() does, with no caching to go stale between ticks.

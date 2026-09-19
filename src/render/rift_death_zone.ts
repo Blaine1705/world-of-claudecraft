@@ -16,7 +16,8 @@
 // zone; per-frame work is opacity writes and one scale write).
 
 import * as THREE from 'three';
-import type { RiftBossDeathZoneView } from '../world_api/dungeons';
+import type { HoardBossCueView, RiftBossDeathZoneView } from '../world_api/dungeons';
+import { HoardBossFx } from './hoard_boss_fx';
 import {
   deathZonePlan,
   deathZonePulseSpeed,
@@ -56,17 +57,22 @@ interface ZoneVisual {
  * other ground-ring systems (ringOfFrostVisuals, etc.). */
 export class RiftDeathZoneVisuals {
   private readonly zones = new Map<string, ZoneVisual>();
+  private readonly hoardBossFx: HoardBossFx;
 
   constructor(
     private readonly scene: THREE.Scene,
     private readonly groundY: (x: number, z: number) => number,
-  ) {}
+    compileGate?: (target: THREE.Object3D) => Promise<unknown>,
+  ) {
+    this.hoardBossFx = new HoardBossFx(scene, groundY, compileGate);
+  }
 
   /** Called each frame with the current zone list from IWorld.riftBossDeathZones().
    * Zones are keyed by position + radius (short-lived, so a simple position key
    * is sufficient; two coincident zones on the same tick are collapsed, which is
    * fine for gameplay). */
-  sync(zones: readonly RiftBossDeathZoneView[]): void {
+  sync(zones: readonly RiftBossDeathZoneView[], hoardCues: readonly HoardBossCueView[] = []): void {
+    this.hoardBossFx.sync(hoardCues);
     const seen = new Set<string>();
     for (const z of zones) {
       const key = `${z.x.toFixed(1)}:${z.z.toFixed(1)}:${z.radius.toFixed(1)}`;
@@ -93,6 +99,7 @@ export class RiftDeathZoneVisuals {
 
   /** Called each frame with the elapsed frame time in seconds. */
   update(dt: number): void {
+    this.hoardBossFx.update(dt);
     for (const visual of this.zones.values()) {
       visual.phase = (visual.phase + dt * deathZonePulseSpeed(visual.remaining)) % (Math.PI * 2);
       const plan = deathZonePlan(visual.phase, visual.remaining, visual.total);
@@ -105,6 +112,11 @@ export class RiftDeathZoneVisuals {
       const [sx, sy, sz] = deathZoneSweepScale(plan.sweepFraction);
       visual.sweep.scale.set(sx, sy, sz);
     }
+  }
+
+  dispose(): void {
+    this.sync([]);
+    this.hoardBossFx.dispose();
   }
 
   private create(key: string, zone: RiftBossDeathZoneView): void {

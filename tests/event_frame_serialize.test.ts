@@ -376,6 +376,34 @@ describe('routeEvents frame bytes and session mutations', () => {
     expect(fFar.sent).toEqual([]);
   });
 
+  it('delivers a Buried Hoard cue only to its instance member', () => {
+    const server = new GameServer();
+    const fNear = fakeWs();
+    const near = joinServer(server, fNear, 1, 'Near');
+    const fFar = fakeWs();
+    joinServer(server, fFar, 2, 'Far');
+    const nearPos = entityPos(server, near.pid);
+    fNear.sent.length = 0;
+    fFar.sent.length = 0;
+    const cue: SimEvent = {
+      type: 'hoardBossCue',
+      pid: near.pid,
+      instanceId: 19,
+      cueId: 7,
+      kind: 'sweep',
+      phase: 'warning',
+      x: nearPos.x,
+      z: nearPos.z,
+      radius: 13,
+      durationSecs: 1.45,
+      facing: 1.2,
+      halfAngle: Math.PI * 0.31,
+    };
+    routeRaw(server, [cue]);
+    expect(fNear.sent).toEqual([eventsFrame(cue)]);
+    expect(fFar.sent).toEqual([]);
+  });
+
   it('serializes a high-volume mixed batch byte-identically across a 20+ session crowd', () => {
     const server = new GameServer();
     const crowd: { fc: FakeClient; session: ClientSession }[] = [];

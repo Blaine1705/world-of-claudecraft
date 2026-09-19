@@ -885,6 +885,8 @@ const baseEnTable = {
   'aura.riftCorrode': 'Corrode',
   'aura.riftCrush': 'Crush',
   'mechanic.riftPitsteelSweep': 'Pitsteel Sweep',
+  'mechanic.hoardSweep': 'Hoard Sweep',
+  'mechanic.hoardBuriedMark': 'Buried Mark',
   'aura.riftSearingBrand': 'Searing Brand',
   'aura.riftPactRot': 'Pact Rot',
   // Rift boss headline mechanics (the rank-gated runners in
@@ -14107,6 +14109,8 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Chains of the Forge': 'aura.ignivarForgeChains',
   "Maker's Brand": 'aura.varkhulMakersBrand',
   "Forgefather's Sweep": 'mechanic.varkhulForgefatherSweep',
+  'Hoard Sweep': 'mechanic.hoardSweep',
+  'Buried Mark': 'mechanic.hoardBuriedMark',
   'Cinder Orbs': 'mechanic.varkhulCinderOrbs',
   'Red-hot Metal': 'aura.varkhulRedHotMetal',
   'Red-hot Metal Barrier': 'aura.varkhulRedHotMetalBarrier',

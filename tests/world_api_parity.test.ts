@@ -462,6 +462,7 @@ export const IWORLD_MEMBERS = [
   { name: 'riftFloor', kind: 'data' }, // active procedural rift floor (null outside)
   { name: 'riftCollisionToken', kind: 'data' }, // per-Sim rift collision registry key
   { name: 'riftBossDeathZones', kind: 'method' }, // live lethal zones on the boss floor
+  { name: 'hoardBossCues', kind: 'method' }, // live Buried Hoard boss telegraphs
   { name: 'riftEventMsRemaining', kind: 'method' }, // ms until the rift event stops admitting parties
   { name: 'dungeonDifficulty', kind: 'method' }, // read-returning
   { name: 'setDungeonDifficulty', kind: 'method' },
@@ -898,10 +899,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // rerollWorldQuest (+2 methods). Plus the faction currency balances
     // factionCurrencies (+1 data). Counted 405/118/287 with the active clue
     // hunt readout clueHunt (+1 data) and abandonClueHunt (+1 method).
-    // The read treasureMap adds one data member, for 406/119/287.
-    expect(IWORLD_MEMBERS.length).toBe(406);
+    // The read treasureMap adds one data member, then Hoard cues add one method.
+    expect(IWORLD_MEMBERS.length).toBe(407);
     expect(DATA_MEMBERS.length).toBe(119);
-    expect(METHOD_MEMBERS.length).toBe(287);
+    expect(METHOD_MEMBERS.length).toBe(288);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -1099,6 +1100,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'harvestNode',
       'harvestPreference',
       'healPet',
+      'hoardBossCues',
       'hobbyCraft',
       'honor',
       'ignoreAdd',
@@ -1577,6 +1579,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'harvestCrop',
       'harvestNode',
       'healPet',
+      'hoardBossCues',
       'ignoreAdd',
       'ignoreRemove',
       'interact',
@@ -2206,6 +2209,7 @@ const FACET_DUNGEONS = [
   'riftFloor',
   'riftCollisionToken',
   'riftBossDeathZones',
+  'hoardBossCues',
   'riftEventMsRemaining',
   'dungeonDifficulty',
   'setDungeonDifficulty',
@@ -2513,10 +2517,10 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    // Mirrors the IWORLD_MEMBERS.length pin above (406); this pin and the one above
+    // Mirrors the IWORLD_MEMBERS.length pin above (407); this pin and the one above
     // must always agree.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(406);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(406);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(407);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(407);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

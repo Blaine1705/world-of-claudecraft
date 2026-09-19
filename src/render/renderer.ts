@@ -2989,7 +2989,7 @@ export class Renderer {
           );
         }
         return base;
-      });
+      }, this.worldCompileGate());
     });
     this.temporalHourglassGroundVisuals = new TemporalHourglassGroundVisuals(this.scene, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
@@ -5023,7 +5023,7 @@ export class Renderer {
     this.ringOfFrostVisuals.sync(this.sim.activeFrostRings);
     this.ringOfFrostVisuals.update(dt);
     if (this.riftDeathZoneVisuals) {
-      this.riftDeathZoneVisuals.sync(this.sim.riftBossDeathZones());
+      this.riftDeathZoneVisuals.sync(this.sim.riftBossDeathZones(), this.sim.hoardBossCues());
       this.riftDeathZoneVisuals.update(dt);
     }
     this.farmPatchVisuals?.drive(this.sim, dt, this.sim.entities.has(this.sim.playerId));
@@ -11664,7 +11664,7 @@ export class Renderer {
     this.ringOfFrostVisuals.sync(this.sim.activeFrostRings);
     this.ringOfFrostVisuals.update(dt);
     if (this.riftDeathZoneVisuals) {
-      this.riftDeathZoneVisuals.sync(this.sim.riftBossDeathZones());
+      this.riftDeathZoneVisuals.sync(this.sim.riftBossDeathZones(), this.sim.hoardBossCues());
       this.riftDeathZoneVisuals.update(dt);
     }
     this.farmPatchVisuals?.drive(this.sim, dt);
@@ -12189,6 +12189,7 @@ export class Renderer {
     this.worldGuidance?.dispose();
     this.varkhulForgestormVisuals?.dispose();
     this.nythraxisMechanicVisuals?.dispose();
+    this.riftDeathZoneVisuals?.dispose();
     this.blobShadows?.dispose();
   }
 

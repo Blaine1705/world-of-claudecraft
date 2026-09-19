@@ -7866,6 +7866,19 @@ export type SimEvent = { pid?: number } & (
       name: string;
       themeName: string;
       tier: RiftTier | null;
+      hoardCues?: Array<{
+        instanceId: number;
+        cueId: number;
+        kind: 'sweep' | 'mark';
+        phase: 'warning' | 'hazard';
+        x: number;
+        z: number;
+        radius: number;
+        remaining: number;
+        total: number;
+        facing?: number;
+        halfAngle?: number;
+      }>;
       // Epoch-ms deadline (via ctx.lockoutNowMs, the same conversion
       // rift/persistence.ts uses for save/load) after which the rift's backing
       // world event stops admitting new parties. Null for a dev-spawned rift
@@ -8131,6 +8144,21 @@ export type SimEvent = { pid?: number } & (
   // phantom "about to detonate" telegraph for the rest of the fuse. Personal
   // (pid = each instance member) so delivery never depends on interest radius.
   | { type: 'riftDeathZoneClear'; pid: number }
+  | {
+      type: 'hoardBossCue';
+      pid: number;
+      instanceId: number;
+      cueId: number;
+      kind: 'sweep' | 'mark';
+      phase: 'warning' | 'hazard';
+      x: number;
+      z: number;
+      radius: number;
+      durationSecs: number;
+      facing?: number;
+      halfAngle?: number;
+    }
+  | { type: 'hoardBossCueClear'; pid: number }
   // Trend nudge (Professions 2.0): a soft, at-most-once-per-window
   // reminder that an unattuned crafter's skills are leaning toward an adjacent
   // pair (professions/prof_nudges.ts). Personal (pid = the crafter) and

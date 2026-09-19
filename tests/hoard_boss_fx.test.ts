@@ -1,0 +1,94 @@
+import * as THREE from 'three';
+import { describe, expect, it } from 'vitest';
+import { HoardBossFx } from '../src/render/hoard_boss_fx';
+import type { HoardBossCueView } from '../src/world_api/dungeons';
+
+function cue(overrides: Partial<HoardBossCueView> = {}): HoardBossCueView {
+  return {
+    instanceId: 4,
+    cueId: 1,
+    kind: 'mark',
+    phase: 'warning',
+    x: 12,
+    z: 34,
+    radius: 3,
+    remaining: 2,
+    total: 2,
+    ...overrides,
+  };
+}
+
+function object(root: THREE.Object3D, name: string): THREE.Object3D {
+  const found = root.getObjectByName(name);
+  if (!found) throw new Error(`Missing ${name}`);
+  return found;
+}
+
+function verticalRange(target: THREE.Object3D): number {
+  const mesh = target.children[0] as THREE.Mesh<THREE.BufferGeometry>;
+  const position = mesh.geometry.getAttribute('position');
+  let min = Number.POSITIVE_INFINITY;
+  let max = Number.NEGATIVE_INFINITY;
+  for (let index = 0; index < position.count; index++) {
+    min = Math.min(min, position.getY(index));
+    max = Math.max(max, position.getY(index));
+  }
+  return max - min;
+}
+
+describe('Buried Hoard boss actionable cues', () => {
+  it('pools a terrain-draped X and turns it into its lingering hazard', async () => {
+    const scene = new THREE.Scene();
+    const visuals = new HoardBossFx(scene, (x) => 7 + x * 0.2);
+    await visuals.readyForEntry;
+    visuals.sync([cue()]);
+    const root = object(scene, 'hoard-boss-actionable-cues');
+    const warning = object(root, 'hoard-boss-mark-warning');
+    expect(warning.visible).toBe(true);
+    expect(warning.parent?.position).toMatchObject({ x: 12, y: 9.4, z: 34 });
+    expect(verticalRange(warning)).toBeGreaterThan(0.5);
+    visuals.update(1);
+    expect(warning.scale.x).toBeGreaterThan(0.95);
+
+    visuals.sync([cue({ phase: 'hazard', remaining: 1.8 })]);
+    expect(warning.visible).toBe(false);
+    expect(object(root, 'hoard-boss-mark-hazard').visible).toBe(true);
+    visuals.sync([]);
+    expect(root.children.every((slot) => !slot.visible)).toBe(true);
+    visuals.dispose();
+    expect(scene.getObjectByName('hoard-boss-actionable-cues')).toBeUndefined();
+  });
+
+  it('drapes the authoritative sweep radius, facing, and half angle over terrain', async () => {
+    const scene = new THREE.Scene();
+    const visuals = new HoardBossFx(scene, (x, z) => x * 0.16 + z * 0.08);
+    await visuals.readyForEntry;
+    visuals.sync([
+      cue({
+        kind: 'sweep',
+        radius: 13,
+        facing: 1.2,
+        halfAngle: 0.42,
+        remaining: 1.45,
+        total: 1.45,
+      }),
+    ]);
+    const sweep = object(scene, 'hoard-boss-sweep');
+    expect(sweep.visible).toBe(true);
+    expect(sweep.userData.halfAngle).toBeCloseTo(0.42);
+    expect(verticalRange(sweep)).toBeGreaterThan(1);
+    const position = (sweep.children[0] as THREE.Mesh<THREE.BufferGeometry>).geometry.getAttribute(
+      'position',
+    );
+    const leftAngle = Math.atan2(position.getX(1), position.getZ(1));
+    const rightAngle = Math.atan2(
+      position.getX(position.count - 1),
+      position.getZ(position.count - 1),
+    );
+    expect(leftAngle).toBeCloseTo(1.2 - 0.42);
+    expect(rightAngle).toBeCloseTo(1.2 + 0.42);
+    visuals.update(0.3);
+    expect(sweep.scale.x).toBeGreaterThan(0.95);
+    visuals.dispose();
+  });
+});

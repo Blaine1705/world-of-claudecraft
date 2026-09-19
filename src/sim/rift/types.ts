@@ -356,6 +356,40 @@ export interface RiftInstance {
    * to the boss's cast time; at zero it detonates (lethal to anyone inside `radius`).
    * Cleared on boss death or floor reset. */
   bossDeathZones: Array<{ x: number; z: number; radius: number; remaining: number; total: number }>;
+  /** Runtime-only Buried Hoard boss kit. Ordinary Rifts never create it. */
+  hoardBoss?: HoardBossState;
+}
+
+export type HoardBossCue =
+  | {
+      id: number;
+      kind: 'sweep';
+      x: number;
+      z: number;
+      facing: number;
+      radius: number;
+      halfAngle: number;
+      remaining: number;
+      total: number;
+    }
+  | {
+      id: number;
+      kind: 'mark';
+      phase: 'warning' | 'hazard';
+      x: number;
+      z: number;
+      radius: number;
+      remaining: number;
+      total: number;
+      pulseTimer?: number;
+    };
+
+export interface HoardBossState {
+  sweepTimer: number;
+  markTimer: number;
+  targetCursor: number;
+  nextCueId: number;
+  cues: HoardBossCue[];
 }
 
 /** The rift as a whole (derived from the descriptor's seed + baseLevel), used for

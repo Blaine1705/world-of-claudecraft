@@ -216,6 +216,7 @@ import { reanchorDecision } from './entity_reanchor';
 import { applyGroundTelegraphSnapshot } from './ground_telegraph_wire';
 import { GuildBankLogMirror } from './guild_bank_log_mirror';
 import { decodeGuildBoardPage, emptyGuildBoardPage, guildBoardPath } from './guild_board_wire';
+import { HoardBossCueMirror } from './hoard_boss_cue_mirror';
 import { foldInputAck } from './input_ack';
 import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
 import { inputSignature } from './input_signature';
@@ -1425,6 +1426,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     expiresAtMs: number;
     totalSecs: number;
   }> = [];
+  private readonly hoardBossCueMirror = new HoardBossCueMirror(() => performance.now());
   // Lockpicking: rebuilt from the lockpick* events (there is no snapshot field).
   // Holds only the fog-windowed cells the server discloses.
   lockpickState: LockpickView | null = null;
@@ -2435,6 +2437,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         this.applyRiftStateEvent(ev as SimEvent);
         this.applyRiftDeathZoneSpawnEvent(ev as SimEvent);
         this.applyRiftDeathZoneClearEvent(ev as SimEvent);
+        this.hoardBossCueMirror.apply(ev as SimEvent);
         this.applyMasterworkEvent(ev as SimEvent);
         this.applyDisenchantResultEvent(ev as SimEvent);
         this.applyEnchantResultEvent(ev as SimEvent);
@@ -4941,6 +4944,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
       }
     }
     return out;
+  }
+  hoardBossCues(): import('../world_api/dungeons').HoardBossCueView[] {
+    return this.hoardBossCueMirror.views();
   }
   // Milliseconds remaining before the current rift's backing world event stops
   // admitting new parties (null outside a rift, or for a dev-spawned rift). See the
