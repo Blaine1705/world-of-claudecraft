@@ -195,7 +195,16 @@
       "!dist/merch.html",
       "!dist/links.html",
       "!dist/CLAUDE.md",
-      "!dist/guide-stills/**"
+      "!dist/guide-stills/**",
+      "!electron/host_diag/win/**",
+      "!electron/host_diag/dist/HostDiag.ps1",
+      "!electron/host_diag/*.md"
+    ],
+    "extraResources": [
+      {
+        "from": "electron/host_diag/dist/HostDiag.ps1",
+        "to": "host-diag/HostDiag.ps1"
+      }
     ],
     "directories": {
       "buildResources": "build",

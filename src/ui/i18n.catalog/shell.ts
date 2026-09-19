@@ -160,6 +160,16 @@ export const shellStrings = {
         quit: 'Quit',
         fatalBody: 'World of ClaudeCraft hit an unexpected error and needs to close.',
       },
+      // The host diagnostic's native save dialog (electron/host_diag.cjs): the
+      // shell opens an OS file dialog, which has no i18n runtime of its own, so
+      // these ride the same push as the crash strings above
+      // (src/game/desktop_shell_strings.ts -> DEFAULT_SHELL_STRINGS).
+      hostDiag: {
+        saveTitle: 'Save host diagnostic',
+        saveButton: 'Save',
+        // The label of the format row in the dialog's type dropdown.
+        fileType: 'JSON file',
+      },
       // Borderless-mode title-bar control (index.html / play.html pre-game
       // headers): the only way out when the shell hides the native window
       // controls. Namespaced `titlebar`, never `window`, so the key never reads

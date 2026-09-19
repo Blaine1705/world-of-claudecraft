@@ -9874,6 +9874,11 @@ export const ru_RU: EnTranslations = {
       "quit": "Выйти",
       "fatalBody": "World of ClaudeCraft столкнулась с непредвиденной ошибкой и будет закрыта."
     },
+    "hostDiag": {
+      "saveTitle": "Сохранить диагностику системы",
+      "saveButton": "Сохранить",
+      "fileType": "Файл JSON"
+    },
     "titlebar": {
       "exitGame": "Выйти из игры"
     }

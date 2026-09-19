@@ -924,6 +924,77 @@ product exist. Coding and merge stay dark-safe without those credentials.
   inside the OS-sandboxed renderer (sandbox and context isolation stay on), not the
   main process; the cache holds application bytecode only, never player data.
 
+## Host diagnostic
+
+The player-triggered machine report: the shell collects one JSON file the player
+saves and sends to support. Two halves, one file (`electron/host_diag.cjs`, whose
+behavior is pinned by `tests/electron_host_diag.test.ts`):
+
+- **Every platform**: whitelisted Electron readings (versions, CPU and memory,
+  `getAppMetrics` per process, the displays, battery, `getGPUFeatureStatus`, a
+  reduced `getGPUInfo`) plus the shell's own launch decisions (distribution, the
+  GPU-force flags, the backend rung). No user name, no path, no machine name and no
+  raw API object rides along: every field passes a fixed key list or a type filter.
+- **Windows only**: the JSON printed by the shipped PowerShell tool, whose contract
+  is `electron/host_diag/SCHEMA.md`. That layer is where a performance complaint is
+  usually answered (NVIDIA profile, Windows per-app GPU preference, power mode,
+  single-channel memory, hybrid adapters). Off Windows the file says
+  `native.status: "unsupported-platform"` rather than hiding the gap.
+
+### What ships where, and the hash check
+
+`build.extraResources` copies `electron/host_diag/dist/HostDiag.ps1` to
+`<resourcesPath>/host-diag/HostDiag.ps1`, OUTSIDE the asar, because PowerShell
+cannot read a file inside an archive. `build.files` therefore excludes the `win/`
+sources, a second copy of the script and the directory's `.md` files, while
+`dist/manifest.json` stays INSIDE the asar on purpose.
+
+That split is the security model. The shipped NSIS installer is per-user, so its
+install directory is writable by anything running as that player: malware that
+cannot touch the asar (covered by the `onlyLoadAppFromAsar` and
+`enableEmbeddedAsarIntegrityValidation` fuses in the build block above) can still
+swap the loose `.ps1`. So the shell reads the script's bytes, hashes them, compares
+the digest to the in-asar manifest, and spawns nothing unless they match; a mismatch
+or an unreadable file answers `native.status: "unavailable"` with the reason, and the
+player still gets the Electron half. The spawn is a fixed argv array through
+`powershell.exe` resolved absolutely from `%SystemRoot%`, never a shell, with the run
+capped at 120 s and stdout at 2 MB.
+
+### Rebuilding it
+
+Edit the sources under `electron/host_diag/win/`, run `npm run host-diag:build`, and
+commit `dist/`. Freshness is a build GATE, not a warning: `scripts/electron-build.mjs`
+runs `scripts/host_diag_build.mjs --check` right after the vendor bundle, so a stale
+`dist/` fails the desktop build instead of shipping a diagnostic the shell would
+refuse to run (`tests/host_diag_bundle.test.ts` pins the same check in CI).
+
+### Signing the script (future work, order matters)
+
+Authenticode-signing the `.ps1` is optional and not done today: the tool runs under
+`-ExecutionPolicy Bypass`, so no policy needs a signature, and the hash pin is what
+the shell trusts. If a release ever signs it, the signing step must run in the
+release pipeline BEFORE the manifest hash is computed, because signing appends a
+signature block and so changes the bytes; signing after the build would produce
+exactly the `hash-mismatch` the check exists to catch.
+
+### Antivirus test checklist (per release, Windows)
+
+A signed installer carrying an unsigned PowerShell script that spawns PowerShell at
+runtime is the shape heuristic engines dislike, so verify by hand:
+
+1. On-demand scan of `electron/host_diag/dist/HostDiag.ps1` and of the built
+   installer with Microsoft Defender (plus one third-party engine where available):
+   both clean, nothing quarantined.
+2. Install with real-time protection ON: no block, no prompt, and the script is
+   present at `<install dir>\resources\host-diag\HostDiag.ps1` afterward.
+3. Click-to-run: trigger the diagnostic in the game, confirm no console window
+   flashes over the game, the save dialog appears, the saved file carries
+   `native.status: "ok"` or `"partial"`, and the log shows one
+   `[diag] host diagnostic` line.
+4. If an engine does quarantine the script, confirm the shell degrades cleanly:
+   `native.status: "unavailable"`, reason `missing`, and the Electron half still
+   saved.
+
 ## Post-release verification checklist (each OS, each channel)
 
 1. Fresh install, launch: window appears, no Gatekeeper/SmartScreen block (signed

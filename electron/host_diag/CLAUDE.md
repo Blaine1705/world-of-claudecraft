@@ -28,6 +28,15 @@ truth. The contract (options, envelope, every collector's `data`) lives in `SCHE
 - **Pure ASCII** in every file under `win/`, no BOM. The tool runs under Windows PowerShell 5.1
   on any locale, and the bundle's bytes are pinned.
 
+## Who consumes it
+`electron/host_diag.cjs` is the ONLY consumer. It resolves `dist/HostDiag.ps1` (packaged:
+`<resourcesPath>/host-diag/`, outside the asar, because PowerShell cannot read a file inside
+one; dev: this checkout), verifies the bytes against `dist/manifest.json`, which stays INSIDE
+the asar, and spawns the script only on a match, with a fixed argv, `-StdoutJson`, and a
+bounded runtime and output. Nothing else in the shell reads this directory, and no player ever
+invokes the tool by hand. The packaging split, the hash rationale and the per-release
+antivirus checklist live in `docs/desktop-release.md`, "Host diagnostic".
+
 ## Building
 - Never hand-edit `dist/`. Run `npm run host-diag:build` (`scripts/host_diag_build.mjs` over the
   pure bundler `scripts/lib/host_diag_bundle.mjs`) and commit the result.

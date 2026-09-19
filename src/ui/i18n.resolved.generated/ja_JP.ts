@@ -9874,6 +9874,11 @@ export const ja_JP: EnTranslations = {
       "quit": "終了",
       "fatalBody": "World of ClaudeCraft で予期しないエラーが発生したため、終了します。"
     },
+    "hostDiag": {
+      "saveTitle": "ホスト診断を保存",
+      "saveButton": "保存",
+      "fileType": "JSON ファイル"
+    },
     "titlebar": {
       "exitGame": "ゲームを終了"
     }

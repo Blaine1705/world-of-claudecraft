@@ -9874,6 +9874,11 @@ export const cs_CZ: EnTranslations = {
       "quit": "Ukončit",
       "fatalBody": "World of ClaudeCraft narazil na neočekávanou chybu a musí se zavřít."
     },
+    "hostDiag": {
+      "saveTitle": "Save host diagnostic",
+      "saveButton": "Save",
+      "fileType": "JSON file"
+    },
     "titlebar": {
       "exitGame": "Ukončit hru"
     }

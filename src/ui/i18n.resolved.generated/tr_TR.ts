@@ -9874,6 +9874,11 @@ export const tr_TR: EnTranslations = {
       "quit": "Çık",
       "fatalBody": "World of ClaudeCraft beklenmeyen bir hatayla karşılaştı ve kapatılması gerekiyor."
     },
+    "hostDiag": {
+      "saveTitle": "Save host diagnostic",
+      "saveButton": "Save",
+      "fileType": "JSON file"
+    },
     "titlebar": {
       "exitGame": "Oyundan Çık"
     }

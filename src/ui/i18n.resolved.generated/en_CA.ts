@@ -9874,6 +9874,11 @@ export const en_CA: EnTranslations = {
       "quit": "Quit",
       "fatalBody": "World of ClaudeCraft hit an unexpected error and needs to close."
     },
+    "hostDiag": {
+      "saveTitle": "Save host diagnostic",
+      "saveButton": "Save",
+      "fileType": "JSON file"
+    },
     "titlebar": {
       "exitGame": "Exit Game"
     }

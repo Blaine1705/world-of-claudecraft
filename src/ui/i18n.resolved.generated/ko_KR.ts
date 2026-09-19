@@ -9874,6 +9874,11 @@ export const ko_KR: EnTranslations = {
       "quit": "종료",
       "fatalBody": "World of ClaudeCraft에 예기치 않은 오류가 발생하여 종료해야 합니다."
     },
+    "hostDiag": {
+      "saveTitle": "호스트 진단 저장",
+      "saveButton": "저장",
+      "fileType": "JSON 파일"
+    },
     "titlebar": {
       "exitGame": "게임 종료"
     }

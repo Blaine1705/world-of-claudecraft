@@ -10,6 +10,9 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "desktop.hostDiag.fileType",
+    "desktop.hostDiag.saveButton",
+    "desktop.hostDiag.saveTitle",
     "guide.settingsPage.rowFrameRateCap",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
@@ -22,6 +25,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "es_ES": [
+    "desktop.hostDiag.fileType",
+    "desktop.hostDiag.saveButton",
+    "desktop.hostDiag.saveTitle",
     "guide.settingsPage.rowFrameRateCap",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
@@ -34,6 +40,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "fr_FR": [
+    "desktop.hostDiag.fileType",
+    "desktop.hostDiag.saveButton",
+    "desktop.hostDiag.saveTitle",
     "guide.settingsPage.rowFrameRateCap",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
@@ -46,6 +55,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "fr_CA": [
+    "desktop.hostDiag.fileType",
+    "desktop.hostDiag.saveButton",
+    "desktop.hostDiag.saveTitle",
     "guide.settingsPage.rowFrameRateCap",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
@@ -59,6 +71,9 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "desktop.hostDiag.fileType",
+    "desktop.hostDiag.saveButton",
+    "desktop.hostDiag.saveTitle",
     "guide.settingsPage.rowFrameRateCap",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
@@ -71,6 +86,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "de_DE": [
+    "desktop.hostDiag.fileType",
+    "desktop.hostDiag.saveButton",
+    "desktop.hostDiag.saveTitle",
     "guide.settingsPage.rowFrameRateCap",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
@@ -99,6 +117,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "pt_BR": [
+    "desktop.hostDiag.fileType",
+    "desktop.hostDiag.saveButton",
+    "desktop.hostDiag.saveTitle",
     "guide.settingsPage.rowFrameRateCap",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
@@ -115,6 +136,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "cs_CZ": [
+    "desktop.hostDiag.fileType",
+    "desktop.hostDiag.saveButton",
+    "desktop.hostDiag.saveTitle",
     "guide.settingsPage.rowFrameRateCap",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
@@ -127,6 +151,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "nl_NL": [
+    "desktop.hostDiag.fileType",
+    "desktop.hostDiag.saveButton",
+    "desktop.hostDiag.saveTitle",
     "guide.settingsPage.rowFrameRateCap",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
@@ -139,6 +166,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "pl_PL": [
+    "desktop.hostDiag.fileType",
+    "desktop.hostDiag.saveButton",
+    "desktop.hostDiag.saveTitle",
     "guide.settingsPage.rowFrameRateCap",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
@@ -151,6 +181,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "id_ID": [
+    "desktop.hostDiag.fileType",
+    "desktop.hostDiag.saveButton",
+    "desktop.hostDiag.saveTitle",
     "guide.settingsPage.rowFrameRateCap",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
@@ -163,6 +196,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "tr_TR": [
+    "desktop.hostDiag.fileType",
+    "desktop.hostDiag.saveButton",
+    "desktop.hostDiag.saveTitle",
     "guide.settingsPage.rowFrameRateCap",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
@@ -175,6 +211,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "sv_SE": [
+    "desktop.hostDiag.fileType",
+    "desktop.hostDiag.saveButton",
+    "desktop.hostDiag.saveTitle",
     "guide.settingsPage.rowFrameRateCap",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
@@ -187,6 +226,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "vi_VN": [
+    "desktop.hostDiag.fileType",
+    "desktop.hostDiag.saveButton",
+    "desktop.hostDiag.saveTitle",
     "guide.settingsPage.rowFrameRateCap",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
@@ -199,6 +241,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapThirty"
   ],
   "da_DK": [
+    "desktop.hostDiag.fileType",
+    "desktop.hostDiag.saveButton",
+    "desktop.hostDiag.saveTitle",
     "guide.settingsPage.rowFrameRateCap",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",

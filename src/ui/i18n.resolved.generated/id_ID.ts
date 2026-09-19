@@ -9874,6 +9874,11 @@ export const id_ID: EnTranslations = {
       "quit": "Keluar",
       "fatalBody": "World of ClaudeCraft mengalami kesalahan tak terduga dan perlu ditutup."
     },
+    "hostDiag": {
+      "saveTitle": "Save host diagnostic",
+      "saveButton": "Save",
+      "fileType": "JSON file"
+    },
     "titlebar": {
       "exitGame": "Keluar dari Gim"
     }

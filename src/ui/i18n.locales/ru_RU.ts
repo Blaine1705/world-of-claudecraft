@@ -9396,6 +9396,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.reload': 'Перезагрузить',
   'desktop.crash.quit': 'Выйти',
   'desktop.titlebar.exitGame': 'Выйти из игры',
+  'desktop.hostDiag.saveTitle': 'Сохранить диагностику системы',
+  'desktop.hostDiag.saveButton': 'Сохранить',
+  'desktop.hostDiag.fileType': 'Файл JSON',
   'desktop.crash.fatalBody':
     'World of ClaudeCraft столкнулась с непредвиденной ошибкой и будет закрыта.',
   'gpuNotice.bodyDesktop':

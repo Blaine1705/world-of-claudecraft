@@ -9874,6 +9874,11 @@ export const zh_TW: EnTranslations = {
       "quit": "離開",
       "fatalBody": "World of ClaudeCraft 發生未預期的錯誤，必須關閉。"
     },
+    "hostDiag": {
+      "saveTitle": "儲存主機診斷",
+      "saveButton": "儲存",
+      "fileType": "JSON 檔案"
+    },
     "titlebar": {
       "exitGame": "離開遊戲"
     }

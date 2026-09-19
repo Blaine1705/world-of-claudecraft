@@ -9874,6 +9874,11 @@ export const en_XA: EnTranslations = {
       "quit": "[Ɋúíţ]",
       "fatalBody": "[Ŵóŕļð óƒ ÇļáúðéÇŕáƒţ ĥíţ áñ úñéẋþéçţéð éŕŕóŕ áñð ñééðš ţó çļóšé.]"
     },
+    "hostDiag": {
+      "saveTitle": "[Šáʋé ĥóšţ ðíáĝñóšţíç]",
+      "saveButton": "[Šáʋé]",
+      "fileType": "[ĴŠÓÑ ƒíļé]"
+    },
     "titlebar": {
       "exitGame": "[Éẋíţ Ĝáɱé]"
     }

@@ -150,6 +150,37 @@ export interface DesktopLaunchSettings {
   gpuBackend: DesktopGpuBackendSetting;
 }
 
+/** The game's own context for a host diagnostic: a small, fixed set of scalars
+ *  the shell copies into the saved file beside its own readings. Every field is
+ *  optional (the panel sends what it knows) and the shell drops anything else,
+ *  so nothing that identifies the player may be added here: the player mails
+ *  this file to support. */
+export interface DesktopHostDiagGameInfo {
+  sessionId?: string;
+  releaseVersion?: string;
+  buildId?: string;
+  graphicsPreset?: string;
+  gfxTier?: string | number;
+  glRenderer?: string;
+  glVendor?: string;
+  renderScale?: number;
+  targetFps?: number;
+  zone?: string;
+  locale?: string;
+}
+
+/** What the shell answers a host-diagnostic request with. `status` is the SAVE's
+ *  fate ('cancelled' is the player closing the dialog, 'busy' a second request
+ *  while one run is still in flight), `nativeStatus` is how the Windows
+ *  PowerShell layer fared ('unsupported-platform' off Windows, 'unavailable'
+ *  when the shipped script is missing or fails its hash check), and `fileName`
+ *  is the saved file's BASE name: the shell never hands back a path. */
+export interface DesktopHostDiagResult {
+  status: 'saved' | 'cancelled' | 'busy' | 'error';
+  nativeStatus: 'ok' | 'partial' | 'unsupported-platform' | 'unavailable' | 'error' | null;
+  fileName?: string;
+}
+
 export interface DesktopBridge {
   openBrowserLogin(): Promise<void>;
   takeLoginCode(): Promise<string | null>;
@@ -243,6 +274,12 @@ export interface DesktopBridge {
   // post-trio methods.
   getDisplayMode?(): Promise<DesktopDisplayMode>;
   setDisplayMode?(mode: DesktopDisplayMode): Promise<boolean>;
+  // Collects the host diagnostic and lets the player save it as one JSON file
+  // for support: the shell's own readings plus, on Windows, the shipped
+  // PowerShell tool's report. Resolves once the save dialog is answered, which
+  // can be a while (the native layer takes a few seconds and the player then
+  // picks a folder). Absent on older shells: feature-check before use.
+  runHostDiag?(game: DesktopHostDiagGameInfo): Promise<DesktopHostDiagResult>;
   // Gracefully exits the desktop application through the shell's normal quit
   // lifecycle. Absent on older shells: feature-check before use.
   quitApp?(): Promise<boolean>;

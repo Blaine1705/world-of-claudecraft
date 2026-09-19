@@ -8847,6 +8847,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.reload': '重新加载',
   'desktop.crash.quit': '退出',
   'desktop.titlebar.exitGame': '退出游戏',
+  'desktop.hostDiag.saveTitle': '保存主机诊断',
+  'desktop.hostDiag.saveButton': '保存',
+  'desktop.hostDiag.fileType': 'JSON 文件',
   'desktop.crash.fatalBody': 'World of ClaudeCraft 遇到意外错误，需要关闭。',
   'gpuNotice.bodyDesktop':
     '游戏正在没有 GPU 加速的情况下运行，会非常缓慢。请更新显卡驱动后重启游戏。在 Windows 上，还请在 设置 > 系统 > 显示 > 显示卡 中将本游戏设为“高性能”。',

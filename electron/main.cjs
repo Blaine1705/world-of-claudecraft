@@ -7,6 +7,7 @@ const {
   Menu,
   net,
   Notification,
+  powerMonitor,
   powerSaveBlocker,
   protocol,
   screen,
@@ -65,6 +66,7 @@ const {
   shouldLogConsoleLevel,
 } = require('./diagnostics.cjs');
 const { initLogging } = require('./logging.cjs');
+const { flattenSwitchPairs, runHostDiag } = require('./host_diag.cjs');
 const { DEFAULT_SHELL_STRINGS, sanitizeShellStrings } = require('./shell_strings.cjs');
 const { registerLinuxUrlHandler } = require('./linux_url_handler.cjs');
 const { allowGpuUnderSteamOverlay } = require('./steam_overlay_guard.cjs');
@@ -1309,6 +1311,63 @@ ipcMain.handle('desktop-set-display-mode', (event, mode) => {
 ipcMain.handle('desktop-get-display-mode', (event) => {
   if (!trustedSender(event)) return 'borderless';
   return desktopPrefs.displayMode;
+});
+
+// The shell's own state for the host diagnostic: the decisions this launch made
+// that a performance report has to be read against, as plain scalars (the module
+// drops anything else). Built here because main.cjs is where they already sit in
+// hand, and no reading of the machine happens in it.
+function hostDiagShellState() {
+  const backend = gpuBackendState();
+  return {
+    distribution: desktopConfig.distribution,
+    isPackaged: app.isPackaged,
+    // The discrete-GPU force ran unless one of these two says otherwise, in
+    // which case neither of its switches (HIGH_PERF_GPU_SWITCHES) was appended.
+    gpuForceOptOut: desktopPrefs.gpuForceOptOut === true,
+    gpuForceDisabledByEnv,
+    gpuBackendSetting: backend.setting,
+    gpuBackendActive: backend.active,
+    gpuBackendRequestedUnavailable: backend.requestedUnavailable,
+    gpuBackendAutoCapped: backend.autoCapped,
+    gpuBackendLaunchRung: gpuBackendLaunch.rung,
+    gpuBackendLaunchReason: gpuBackendLaunch.reason,
+    gpuBackendPolicyWhy: gpuPolicy.why,
+    gpuVulkanSwitches:
+      gpuBackendLaunch.backend === 'vulkan' ? flattenSwitchPairs(gpuPolicy.vulkanSwitches) : '',
+    displayMode: desktopPrefs.displayMode,
+  };
+}
+
+// The player-triggered host diagnostic: one JSON file they save and send to
+// support (electron/host_diag.cjs owns all of it, the native PowerShell layer
+// included). Wiring only here. The renderer learns the status, the native half's
+// status, and the BASE file name, never the path it was saved to.
+ipcMain.handle('desktop-host-diag-run', async (event, game) => {
+  if (!trustedSender(event)) return { status: 'error', nativeStatus: null };
+  const run = await runHostDiag({
+    app,
+    screen,
+    powerMonitor,
+    dialog,
+    shell,
+    window: mainWindow && !mainWindow.isDestroyed() ? mainWindow : null,
+    strings: getShellStrings(),
+    shellState: hostDiagShellState(),
+    channel: desktopConfig.distribution,
+    game,
+  });
+  log.info('[diag] host diagnostic', {
+    status: run.status,
+    nativeStatus: run.nativeStatus,
+    durationMs: run.durationMs,
+    bytes: run.bytes,
+  });
+  return {
+    status: run.status,
+    nativeStatus: run.nativeStatus,
+    ...(run.fileName ? { fileName: run.fileName } : {}),
+  };
 });
 
 // Exit the application through Electron's normal quit lifecycle. This lets

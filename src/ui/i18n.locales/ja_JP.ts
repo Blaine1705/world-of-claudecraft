@@ -9218,6 +9218,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.reload': '再読み込み',
   'desktop.crash.quit': '終了',
   'desktop.titlebar.exitGame': 'ゲームを終了',
+  'desktop.hostDiag.saveTitle': 'ホスト診断を保存',
+  'desktop.hostDiag.saveButton': '保存',
+  'desktop.hostDiag.fileType': 'JSON ファイル',
   'desktop.crash.fatalBody': 'World of ClaudeCraft で予期しないエラーが発生したため、終了します。',
   'gpuNotice.bodyDesktop':
     'ゲームがGPUアクセラレーションなしで動作しているため、非常に重くなります。グラフィックドライバーを更新してから、ゲームを再起動してください。Windowsでは、設定 > システム > ディスプレイ > グラフィック でこのゲームを「高パフォーマンス」に設定してください。',

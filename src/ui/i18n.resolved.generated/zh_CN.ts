@@ -9874,6 +9874,11 @@ export const zh_CN: EnTranslations = {
       "quit": "退出",
       "fatalBody": "World of ClaudeCraft 遇到意外错误，需要关闭。"
     },
+    "hostDiag": {
+      "saveTitle": "保存主机诊断",
+      "saveButton": "保存",
+      "fileType": "JSON 文件"
+    },
     "titlebar": {
       "exitGame": "退出游戏"
     }

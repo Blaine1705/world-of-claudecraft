@@ -8847,6 +8847,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.reload': '重新載入',
   'desktop.crash.quit': '離開',
   'desktop.titlebar.exitGame': '離開遊戲',
+  'desktop.hostDiag.saveTitle': '儲存主機診斷',
+  'desktop.hostDiag.saveButton': '儲存',
+  'desktop.hostDiag.fileType': 'JSON 檔案',
   'desktop.crash.fatalBody': 'World of ClaudeCraft 發生未預期的錯誤，必須關閉。',
   'gpuNotice.bodyDesktop':
     '遊戲目前在沒有 GPU 加速的情況下執行，會非常緩慢。請更新顯示卡驅動程式後重新啟動遊戲。在 Windows 上，還請在 設定 > 系統 > 顯示器 > 顯示卡 中將本遊戲設為「高效能」。',

@@ -9874,6 +9874,11 @@ export const nl_NL: EnTranslations = {
       "quit": "Afsluiten",
       "fatalBody": "World of ClaudeCraft is op een onverwachte fout gestuit en moet worden afgesloten."
     },
+    "hostDiag": {
+      "saveTitle": "Save host diagnostic",
+      "saveButton": "Save",
+      "fileType": "JSON file"
+    },
     "titlebar": {
       "exitGame": "Spel afsluiten"
     }

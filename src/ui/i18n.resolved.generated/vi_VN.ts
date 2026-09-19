@@ -9874,6 +9874,11 @@ export const vi_VN: EnTranslations = {
       "quit": "Thoát",
       "fatalBody": "World of ClaudeCraft gặp lỗi không mong muốn và cần đóng lại."
     },
+    "hostDiag": {
+      "saveTitle": "Save host diagnostic",
+      "saveButton": "Save",
+      "fileType": "JSON file"
+    },
     "titlebar": {
       "exitGame": "Thoát trò chơi"
     }

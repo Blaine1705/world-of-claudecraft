@@ -44,6 +44,7 @@ describe('electron IPC channel contract (preload <-> main)', () => {
         'desktop-get-gpu-backend',
         'desktop-get-gpu-force-opt-out',
         'desktop-get-launch-settings',
+        'desktop-host-diag-run',
         'desktop-login-open-browser',
         'desktop-restart-app',
         'desktop-login-take-code',
@@ -687,6 +688,7 @@ describe('electron IPC channel contract (preload <-> main)', () => {
       'getDisplayMode',
       'setDisplayMode',
       'notifyGamepadActivity',
+      'runHostDiag',
       'showNotification',
       'setDiscordActivity',
       'setDiscordPresenceEnabled',
@@ -750,6 +752,49 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     // The platform answer is a synchronous VALUE, not a round trip: the
     // options row is gated on it when the window opens.
     expect(preload).toContain("hasGpuBackendChoice: process.platform === 'linux',");
+  });
+
+  it('the host-diagnostic handler gates the sender first and answers no path', () => {
+    // The one path from the page to a process spawn and a file write, so the
+    // gate, the thin wiring, and the shape of the answer are all pinned. The
+    // logic itself lives in electron/host_diag.cjs
+    // (tests/electron_host_diag.test.ts executes it).
+    const main = stripComments(read('electron/main.cjs'));
+    const start = main.indexOf("ipcMain.handle('desktop-host-diag-run'");
+    expect(start).toBeGreaterThan(-1);
+    const end = main.indexOf('\n});', start);
+    expect(end).toBeGreaterThan(start);
+    const body = main.slice(start, end);
+    expect(body).toContain(
+      "if (!trustedSender(event)) return { status: 'error', nativeStatus: null };",
+    );
+    expect(body).not.toContain('if (trustedSender(event))');
+    // The collection is the module's, not an inline copy in main.cjs.
+    expect(body).toContain('await runHostDiag({');
+    expect(body).toContain('strings: getShellStrings(),');
+    expect(body).toContain('shellState: hostDiagShellState(),');
+    // One log line per run: status, native status, duration, size. Never content.
+    expect(body).toContain("log.info('[diag] host diagnostic', {");
+    // The renderer is told the base name at most, never the path the module
+    // wrote to, and nothing else the module returns.
+    expect(body).toContain('...(run.fileName ? { fileName: run.fileName } : {}),');
+    expect(body).not.toContain('filePath');
+    expect(body).not.toContain('run.bytes,\n  };');
+    const gateAt = body.indexOf('trustedSender(event)');
+    expect(gateAt).toBeLessThan(body.indexOf('runHostDiag('));
+
+    // The shell state handed over is plain data main already has, and it must
+    // not reach for a reading of its own here.
+    const stateAt = main.indexOf('function hostDiagShellState() {');
+    expect(stateAt).toBeGreaterThan(-1);
+    const state = main.slice(stateAt, main.indexOf('\n}', stateAt));
+    expect(state).toContain('distribution: desktopConfig.distribution,');
+    expect(state).toContain('gpuForceOptOut: desktopPrefs.gpuForceOptOut === true,');
+    expect(state).toContain('gpuBackendLaunchRung: gpuBackendLaunch.rung,');
+
+    // The preload pre-sanitizes to the same whitelist and invokes THIS channel.
+    expect(preload).toContain("ipcRenderer.invoke('desktop-host-diag-run', clean);");
+    expect(preload).toContain("if (typeof value === 'string') clean[key] = value.slice(0, 128);");
   });
 
   it('exposes app quit as an argument-free capability', () => {
