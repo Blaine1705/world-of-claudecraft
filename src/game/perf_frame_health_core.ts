@@ -24,8 +24,8 @@ const NOMINAL_FRAME_MS = 1000 / 60;
 /** A window is bad under this share of the aimed rate (45 of 60). */
 const LOW_FPS_SHARE = 0.75;
 /** The slow line on an unlimited 60 Hz display (45 fps): an automatic ceiling
- *  under it is evidence of a struggling machine, one above it is not. */
-const AUTO_EVIDENCE_BELOW_FPS = (1000 / NOMINAL_FRAME_MS) * LOW_FPS_SHARE;
+ *  at or under it is evidence of a struggling machine, one above it is not. */
+const AUTO_EVIDENCE_UP_TO_FPS = 60 * LOW_FPS_SHARE;
 /** ... or with a p95 past this many aimed intervals (28 ms of 16.7). */
 const SLOW_P95_INTERVALS = 1.68;
 /** Frames of 50 ms or more, the rule with no ceiling: three in a window. */
@@ -46,7 +46,7 @@ export function isBadFrameWindow(
   // display, and the advice that would let it run at full cadence (a lower
   // preset) must still reach them. A faster automatic ceiling (a steady 72 on a
   // 144 Hz display) is a good session and reads like a chosen one.
-  if (chosen?.auto && 1000 / chosen.targetIntervalMs < AUTO_EVIDENCE_BELOW_FPS) return true;
+  if (chosen?.auto && 1000 / chosen.targetIntervalMs <= AUTO_EVIDENCE_UP_TO_FPS + 1e-6) return true;
   const aimedMs = chosen ? chosen.targetIntervalMs : NOMINAL_FRAME_MS;
   if (w.fps < (1000 / aimedMs) * LOW_FPS_SHARE) return true;
   if (w.frameMs.p95 >= aimedMs * SLOW_P95_INTERVALS) return true;

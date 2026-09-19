@@ -32,6 +32,7 @@ import {
   type FrameCadenceAutoPhase,
   frameCadenceAutoHoldsQuality,
   frameCadenceAutoRecord,
+  frameCadencePlaySeconds,
   invalidateFrameCadenceAuto,
   resetFrameCadenceAutoWindow,
   restoreFrameCadenceAuto,
@@ -121,15 +122,13 @@ export interface FrameCadenceSnapshot {
 /** Every this many rendered frames, one interval is finished on bare rAF skips
  *  even in timer mode, so an `unpaced` verdict can be taken back. */
 const UNPACED_REPROBE_FRAMES = 300;
-/** Per-timer decay of the remembered timer lateness. */
-const TIMER_LATENESS_DECAY = 0.99;
+/** Per-timer decay of the remembered timer lateness: the maximum of the last
+ *  ten timers or so. An overestimate makes every sleep end early and the rest of
+ *  the interval is then spent on zero-length timers, so it must not linger. */
+const TIMER_LATENESS_DECAY = 0.9;
 /** Callbacks an unread display is given on bare rAF skips before the limiter
  *  starts sleeping: several estimator recomputes' worth. */
 const UNREAD_BEFORE_SLEEP = 240;
-/** The frame clock's own clamp (main.ts caps its dt at a quarter second). */
-const AUTO_MAX_FRAME_MS = 250;
-/** An interval this long was not play: a hidden tab, a suspend, a long stall. */
-const AUTO_GAP_IS_NOT_PLAY_MS = 1000;
 
 export function parseFrameCeilingIntent(search: string): FrameCeilingIntent | null {
   const raw = new URLSearchParams(search).get('fpscap');
@@ -204,10 +203,11 @@ export class FrameCadenceWiring {
     // The observed lateness, held as a slowly decaying maximum, comes off the
     // next sleep, and a wake that is still early simply sleeps the remainder.
     const late = Math.max(0, this.deps.now() - this.timerDueAt);
-    // Capped at one interval: a single throttled tick of a second would otherwise
-    // hold the sleep at zero for hundreds of timers.
+    // Capped at half an interval, so a sleep is never under the other half: one
+    // throttled tick of a second would otherwise hold the sleep at zero for
+    // hundreds of timers, each waking early, skipping and re-arming.
     this.timerLateMs = Math.min(
-      this.cadence.targetIntervalMs,
+      this.cadence.targetIntervalMs / 2,
       Math.max(late, this.timerLateMs * TIMER_LATENESS_DECAY),
     );
     this.frameCb?.(this.deps.now());
@@ -333,12 +333,13 @@ export class FrameCadenceWiring {
     // A web tab that hides stops rAF at once, and the resume callback still holds
     // the previous gate view, so the hidden span arrives here as one interval (an
     // OS suspend or a long stall likewise). It is no play time and no reading.
-    if (now - last > AUTO_GAP_IS_NOT_PLAY_MS) {
-      this.framesSinceExempt = 0;
+    // The 300-frame clearance is NOT restarted: it prices an arrival, and a gap
+    // is not one (a machine whose defect is long stalls must still be read).
+    const dtSeconds = frameCadencePlaySeconds(now - last);
+    if (dtSeconds < 0) {
       this.dropAutoReadings();
       return;
     }
-    const dtSeconds = Math.min(now - last, AUTO_MAX_FRAME_MS) / 1000;
     this.autoFrame.dtSeconds = dtSeconds;
     this.autoFrame.late = underCeiling ? this.cadence.lastLate : now - last > refreshMs * 1.5;
     this.autoFrame.refreshHz = refreshHz;
@@ -355,6 +356,8 @@ export class FrameCadenceWiring {
    *  answer (the record is the verdict behind it), and a provisional descent is
    *  a few seconds of evidence: neither may pin the next session. */
   private rememberVerdict(refreshHz: number): void {
+    const phase = this.autoState.phase;
+    if (phase === 'probe' || phase === 'probation') return;
     const record = frameCadenceAutoRecord(this.autoState);
     if (record.ceiling !== 0 && !record.confirmed) return;
     this.deps.autoMemory.save(refreshHz, record);
@@ -441,9 +444,9 @@ export class FrameCadenceWiring {
     // the GPU like a real one, and each skip cost most of a frame (measured on
     // a Windows HD 530: a ceiling of 60 ran at 37 where the open loop ran at 52).
     const sleep = Math.max(0, frameCadenceSleepMs(this.cadence, now) - this.timerLateMs);
-    this.armedByTimer = true;
     this.timerDueAt = this.deps.now() + sleep;
     this.deps.setTimer(this.onTimer, sleep);
+    this.armedByTimer = true;
     this.armedThisCallback = true;
   }
 }

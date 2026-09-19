@@ -811,7 +811,13 @@ export class RenderBudgetGovernor {
    *  submit stall during a dwell sheds for real and clears it): the band
    *  baselines stand in, as they do in advanceCapProbe. */
   private abandonCapProbe(sample: RenderBudgetSample): void {
-    const origin = this.capProbeOrigin ?? this.capProbeBaselines(sample.maxRenderScale);
+    // The same choice advanceCapProbe makes for the same state: a probe that
+    // shed nothing (the session was already at the floors) has an origin equal to
+    // the floors, and the baselines are what a paced session holds.
+    const origin =
+      this.capProbeOrigin && this.capProbe?.shedMoved
+        ? this.capProbeOrigin
+        : this.capProbeBaselines(sample.maxRenderScale);
     if (this.capProbe) {
       this.levels.grass = origin.grass;
       this.levels.foliage = origin.foliage;

@@ -1,5 +1,7 @@
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { tsFilesUnder } from './helpers/ts_files_under';
 
 // docs/design/graphics-settings-fairness.md, "The Frame Rate Limit is a pacing
 // choice, not a tier knob": the limit and the HUD tier resolvers must never
@@ -28,6 +30,23 @@ const CADENCE_MODULES = [
 const TIER_RESOLVERS = ['src/game/ui_effects_profile.ts', 'src/game/ui_tier_knobs.ts'];
 
 describe('frame rate limit fairness', () => {
+  it('scans every module of the cadence cluster: a new one cannot stay out of the list', () => {
+    const cluster = [
+      ...tsFilesUnder(fileURLToPath(new URL('../src/game', import.meta.url)))
+        .filter((f) => /^frame_cadence/.test(f.file))
+        .map((f) => `src/game/${f.file}`),
+      ...tsFilesUnder(fileURLToPath(new URL('../src/render', import.meta.url)))
+        .filter((f) => /^chosen_cadence/.test(f.file))
+        .map((f) => `src/render/${f.file}`),
+    ];
+    expect(cluster.length).toBeGreaterThanOrEqual(8);
+    // The memory is the one carve-out, pinned by its own case below.
+    const unlisted = cluster.filter(
+      (f) => !CADENCE_MODULES.includes(f) && f !== 'src/game/frame_cadence_auto_memory.ts',
+    );
+    expect(unlisted).toEqual([]);
+  });
+
   it.each(TIER_RESOLVERS)('%s never reads the frame rate limit', (path) => {
     expect(code(path)).not.toMatch(READS_FRAME_RATE_LIMIT);
   });
@@ -43,7 +62,8 @@ describe('frame rate limit fairness', () => {
       "preset = new Settings().get('graphicsPreset');",
       "return `${settings.get('graphicsPreset')}|${settings.get('renderScale')}`;",
     ]);
-    // Neither read can reach a ceiling: the module never names one.
+    // The two literal reads above are the guard. This is only a cheap tripwire
+    // for the obvious forms of a ceiling decided here.
     expect(source).not.toMatch(/ceiling\s*=\s*(30|60)|return\s+(30|60)\b/);
   });
 

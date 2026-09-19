@@ -12,6 +12,7 @@ import {
   type FrameCadenceAutoState,
   frameCadenceAutoHoldsQuality,
   frameCadenceAutoRecord,
+  frameCadencePlaySeconds,
   invalidateFrameCadenceAuto,
   resetFrameCadenceAutoWindow,
   restoreFrameCadenceAuto,
@@ -73,6 +74,19 @@ const probing = (): FrameCadenceAutoState => {
   expect(s.phase).toBe('probe');
   return s;
 };
+
+describe('play time', () => {
+  it('credits a quarter second at most, and nothing for a gap', () => {
+    expect(frameCadencePlaySeconds(16.7)).toBeCloseTo(0.0167, 4);
+    expect(frameCadencePlaySeconds(600)).toBe(0.25);
+    expect(frameCadencePlaySeconds(999)).toBe(0.25);
+    // A background-throttled timer fires at exactly one second.
+    expect(frameCadencePlaySeconds(1000)).toBe(-1);
+    expect(frameCadencePlaySeconds(360_000)).toBe(-1);
+    expect(frameCadencePlaySeconds(0)).toBe(0);
+    expect(frameCadencePlaySeconds(Number.NaN)).toBe(0);
+  });
+});
 
 describe('the tuning, pinned to literals so a test below cannot move with it', () => {
   it('is what the design says', () => {
@@ -231,8 +245,9 @@ describe('the confirming probe of a provisional hold', () => {
     expect(changes[0]).toBeCloseTo(1.5, 5);
     expect(s.phase).toBe('probation');
     expect(s.ceiling).toBe(0);
-    // The remembered verdict is still the one behind the probe.
-    expect(frameCadenceAutoRecord(s)).toEqual({ ceiling: 30, confirmed: true, failStreak: 0 });
+    // A passed probe says nothing yet about the ceiling it left: the record is
+    // still the one behind it, provisional, which the wiring never stores.
+    expect(frameCadenceAutoRecord(s)).toEqual({ ceiling: 30, confirmed: false, failStreak: 0 });
     expect(frameCadenceAutoHoldsQuality(s)).toBe(true);
   });
 
@@ -257,6 +272,24 @@ describe('the confirming probe of a provisional hold', () => {
     expect(s.confirmed).toBe(true);
     expect(s.probesStarted).toBe(0);
     expect(frameCadenceAutoHoldsQuality(s)).toBe(false);
+    // Settled for the governor's sake only: never a verdict to remember.
+    expect(frameCadenceAutoRecord(s).confirmed).toBe(false);
+  });
+
+  it('is bounded in a fight that never ends: the hold settles unprobed and frees the governor', () => {
+    const s = heldAt30(false);
+    const changes = play(s, 800, { calm: false });
+    expect(changes.length).toBe(1);
+    expect(changes[0]).toBeGreaterThan(299);
+    expect(changes[0]).toBeLessThan(303);
+    expect(s.probesStarted).toBe(0);
+    expect(frameCadenceAutoHoldsQuality(s)).toBe(false);
+    expect(frameCadenceAutoRecord(s).confirmed).toBe(false);
+    // A failed probe later is a real verdict, and is remembered as one.
+    play(s, 700, { atBaseline: true, untilChange: true });
+    expect(s.phase).toBe('probe');
+    play(s, 1, { lateEvery: 1, untilChange: true });
+    expect(frameCadenceAutoRecord(s)).toEqual({ ceiling: 30, confirmed: true, failStreak: 1 });
   });
 
   it('tolerates a stray late frame in the recent ring when it starts', () => {
@@ -273,6 +306,8 @@ describe('the confirming probe of a provisional hold', () => {
     expect(s.phase).toBe('held');
     expect(s.confirmed).toBe(true);
     expect(s.probesStarted).toBe(0);
+    // Its clean minute was measured AT the ceiling: not a verdict to remember.
+    expect(frameCadenceAutoRecord(s).confirmed).toBe(false);
   });
 
   it('is cancelled as inconclusive by combat, without spending the budget', () => {

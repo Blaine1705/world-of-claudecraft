@@ -55,6 +55,10 @@ describe('frame health window', () => {
     expect(
       isBadFrameWindow(steady60, { targetIntervalMs: 1000 / 60, missShare: 0, auto: true }),
     ).toBe(false);
+    // The line itself is evidence: 60 asked for on a 90 Hz display is exactly 45.
+    expect(
+      isBadFrameWindow(win(45, 22.4), { targetIntervalMs: 1000 / 45, missShare: 0, auto: true }),
+    ).toBe(true);
     // It still answers to the chosen-cadence rules.
     expect(
       isBadFrameWindow(steady72, { targetIntervalMs: 1000 / 72, missShare: 0.2, auto: true }),

@@ -69,6 +69,19 @@ export const AUTO_FRAMES_CLEAR_OF_EXEMPTION = 300;
 /** Fewer frames than this in a watch window is a stall or a pause, not a reading. */
 const MIN_WINDOW_FRAMES = 60;
 
+/** The frame clock's own clamp (main.ts caps its dt at a quarter second). */
+const MAX_FRAME_PLAY_MS = 250;
+/** An interval this long was not play: a hidden tab, a suspend, a long stall. */
+const GAP_IS_NOT_PLAY_MS = 1000;
+
+/** The play time one rendered interval is credited, in seconds, or -1 when the
+ *  interval was no play at all and its readings must be dropped. */
+export function frameCadencePlaySeconds(intervalMs: number): number {
+  if (!(intervalMs > 0)) return 0;
+  if (intervalMs >= GAP_IS_NOT_PLAY_MS) return -1;
+  return Math.min(intervalMs, MAX_FRAME_PLAY_MS) / 1000;
+}
+
 export type FrameCadenceAutoPhase = 'observe' | 'held' | 'probe' | 'probation';
 
 export interface FrameCadenceAutoState {
@@ -76,6 +89,11 @@ export interface FrameCadenceAutoState {
   ceiling: FrameCeilingIntent;
   /** A held ceiling is a settled verdict (false: provisional, one probe owed). */
   confirmed: boolean;
+  /** Settled for want of a probe (no budget left, or none allowed for too long):
+   *  enough to release the governor, never enough to outlive the session. Its
+   *  clean minute was measured AT the ceiling, so it does not say the ceiling
+   *  is needed. */
+  unprobed: boolean;
   /** Probes failed in a row: doubles the evidence run the next one needs. */
   failStreak: number;
   probesLeft: number;
@@ -129,6 +147,7 @@ export function createFrameCadenceAuto(): FrameCadenceAutoState {
     phase: 'observe',
     ceiling: 0,
     confirmed: false,
+    unprobed: false,
     failStreak: 0,
     probesLeft: AUTO_PROBES_PER_SESSION,
     inconclusiveLeft: AUTO_INCONCLUSIVE_PER_SESSION,
@@ -167,11 +186,9 @@ export function frameCadenceAutoRecord(state: FrameCadenceAutoState): FrameCaden
   const probing = state.phase === 'probe' || state.phase === 'probation';
   return {
     ceiling: probing ? state.probeFrom : state.ceiling,
-    // A probe in flight answered nothing yet; a passed one settles what it left.
-    confirmed:
-      state.phase === 'probe'
-        ? state.probeConfirmedBefore
-        : state.phase === 'probation' || state.confirmed,
+    // A probe, in flight or passed and on probation, says nothing yet about the
+    // ceiling it left: the record stays the one behind it.
+    confirmed: (probing ? state.probeConfirmedBefore : state.confirmed) && !state.unprobed,
     failStreak: state.failStreak,
   };
 }
@@ -194,6 +211,7 @@ export function restoreFrameCadenceAuto(
   }
   state.phase = 'held';
   state.confirmed = record.confirmed;
+  state.unprobed = false;
   state.provisionalS = 0;
 }
 
@@ -205,6 +223,7 @@ export function invalidateFrameCadenceAuto(state: FrameCadenceAutoState): void {
   state.phase = 'observe';
   state.ceiling = 0;
   state.confirmed = false;
+  state.unprobed = false;
   state.failStreak = 0;
   state.observeS = 0;
   state.cleanS = 0;
@@ -290,6 +309,7 @@ function failProbe(state: FrameCadenceAutoState): void {
   state.phase = 'held';
   state.ceiling = state.probeFrom;
   state.confirmed = true;
+  state.unprobed = false;
   state.failStreak = Math.min(AUTO_MAX_FAIL_DOUBLINGS, state.failStreak + 1);
   state.probesFailed++;
   state.cleanS = 0;
@@ -307,6 +327,7 @@ function stepDown(state: FrameCadenceAutoState, refreshHz: number, fastRule: boo
   if (fastRule) state.confirmed = false;
   else if (state.phase === 'observe') state.confirmed = state.observeS >= AUTO_SETTLE_S;
   if (!state.confirmed) state.provisionalS = 0;
+  state.unprobed = false;
   state.flagrantStreak = 0;
   state.phase = 'held';
   state.ceiling = down;
@@ -453,6 +474,7 @@ export function stepFrameCadenceAuto(
     state.evidenceS = 0;
     state.phase = state.ceiling === 0 ? 'observe' : 'held';
     state.confirmed = state.ceiling !== 0;
+    state.unprobed = false;
     // A later descent from here is an ordinary one, not a first-minute one.
     state.observeS = AUTO_SETTLE_S;
     return true;
@@ -464,13 +486,17 @@ export function stepFrameCadenceAuto(
     state.cleanS = clean ? state.cleanS + seconds : 0;
     state.provisionalS += seconds;
     const due = state.cleanS >= AUTO_CONFIRM_CLEAN_S;
-    if (!due && state.provisionalS < AUTO_PROVISIONAL_MAX_S) return false;
-    if (!due || state.probesLeft <= 0) {
-      state.confirmed = true;
+    if (due && state.probesLeft > 0 && probeAllowed(state, frame)) {
+      startProbe(state, frame.refreshHz);
       return true;
     }
-    if (!probeAllowed(state, frame)) return false;
-    startProbe(state, frame.refreshHz);
+    // No probe came: none left this session, or none allowed for the whole bound
+    // (a long fight, a run of loading covers). The hold settles so the governor
+    // gets its recovery back, but unprobed, which the record never calls confirmed.
+    const noBudget = due && state.probesLeft <= 0;
+    if (!noBudget && state.provisionalS < AUTO_PROVISIONAL_MAX_S) return false;
+    state.confirmed = true;
+    state.unprobed = true;
     return true;
   }
 

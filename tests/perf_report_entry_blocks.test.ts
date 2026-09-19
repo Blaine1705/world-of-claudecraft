@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  CADENCE_VERDICTS,
   sanitizeBootPhases,
   sanitizeCadence,
   sanitizePostRevealLinks,
@@ -329,8 +330,12 @@ describe('sanitizeCadence', () => {
     expect(sanitizeCadence(block)).toEqual({ ...block, missShare: 0.012 });
   });
 
-  it.each(['unknown', 'paced', 'unpaced'])('keeps the display verdict %s', (verdict) => {
-    expect(sanitizeCadence({ ...block, verdict })?.verdict).toBe(verdict);
+  it('keeps the closed vocabulary of display verdicts', () => {
+    // `unknown` is also the fallback, so only the literal list pins it.
+    expect(CADENCE_VERDICTS).toEqual(['unknown', 'paced', 'unpaced']);
+    for (const verdict of ['paced', 'unpaced']) {
+      expect(sanitizeCadence({ ...block, verdict })?.verdict).toBe(verdict);
+    }
   });
 
   it.each(['off', 'observe', 'held', 'probe', 'probation'])(

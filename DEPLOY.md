@@ -894,7 +894,8 @@ For off-box safety, sync the directory to S3 occasionally:
   release on for a reason unrelated to client health: compare rungs within a
   release, never across this one. The cadence label `reduced` also covers an
   explicit ceiling with no display reading, which on a 60 Hz display with a
-  ceiling of 60 reduces nothing: read its share as an upper bound. A session with `cadence_divisor > 1` or `frame_cap_intent <> 0`
+  ceiling of 60 reduces nothing: read its share as an upper bound. A session
+  with `cadence_divisor > 1` or `frame_cap_intent <> 0`
   renders slowly ON PURPOSE: split it out before reading `frame_p95_ms` or
   `fps_avg`. From the same release on, `target_fps` is the effective target
   (the ceiling's own rate while it is active): its meaning changes at this

@@ -205,7 +205,7 @@ const CADENCE_MODES = ['auto', 'manual'];
 const CADENCE_AUTO_PHASES = ['off', 'observe', 'held', 'probe', 'probation'];
 // Per-session counts of the automatic mode's moves: a handful by design.
 const CADENCE_AUTO_MOVES_MAX = 1000;
-const CADENCE_VERDICTS = ['unknown', 'paced', 'unpaced'];
+export const CADENCE_VERDICTS = ['unknown', 'paced', 'unpaced'];
 // A session's callback count: a day at 500 Hz, past any real tab.
 const CALLBACKS_MAX = 50_000_000;
 

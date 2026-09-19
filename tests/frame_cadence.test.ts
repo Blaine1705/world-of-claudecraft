@@ -162,6 +162,7 @@ describe('ceiling divisor', () => {
         const divisor = ceilingDivisor(hz, intent);
         if (divisor === 1) continue;
         expect(hz / divisor).toBeGreaterThanOrEqual(24);
+        expect(MIN_CEILING_FPS).toBe(24);
         expect((1000 / hz) * divisor).toBeLessThan(INPUT_TICK_MS);
       }
     }
@@ -222,7 +223,7 @@ function runHost(opts: {
   /** Uncapped rAF only: how long an idle callback takes to come back. */
   idleMs?: number | (() => number);
   /** How late the host's timers fire (a coarse timer resolution). */
-  timerLateMs?: number;
+  timerLateMs?: number | ((nowMs: number) => number);
   seconds: number;
   intent: 0 | 30 | 60 | 'auto';
   governorShedding?: () => boolean;
@@ -268,7 +269,9 @@ function runHost(opts: {
     setTimer: (cb, ms) => {
       arms++;
       timerArms++;
-      host.pending = { at: now + ms + (opts.timerLateMs ?? 0), timer: true };
+      const late =
+        typeof opts.timerLateMs === 'function' ? opts.timerLateMs(now) : opts.timerLateMs;
+      host.pending = { at: now + ms + (late ?? 0), timer: true };
       host.timerCb = cb;
     },
     now: () => now,
@@ -621,6 +624,34 @@ describe('frame loop survival', () => {
     }
   });
 
+  it('does not arm a second chain when the throw came after the arm', () => {
+    const armed: FrameRequestCallback[] = [];
+    const g = globalThis as { requestAnimationFrame?: unknown };
+    const original = g.requestAnimationFrame;
+    g.requestAnimationFrame = (cb: FrameRequestCallback) => armed.push(cb);
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const shared = sharedFrameCadence();
+    const thrown = vi.spyOn(shared, 'armAndSkip').mockImplementation(() => {
+      shared.armedThisCallback = true;
+      throw new Error('boom after the arm');
+    });
+    try {
+      const gate = {
+        hidden: false,
+        desktopApp: false,
+        graphicsRebuildPaused: false,
+        worldDrawHeld: false,
+      };
+      expect(armFrameAndSkip(() => {}, 16, gate)).toBe(false);
+      expect(armed).toEqual([]);
+    } finally {
+      shared.armedThisCallback = false;
+      thrown.mockRestore();
+      errors.mockRestore();
+      g.requestAnimationFrame = original;
+    }
+  });
+
   it('logs a persistent failure once, not at display rate', () => {
     const g = globalThis as { requestAnimationFrame?: unknown };
     const original = g.requestAnimationFrame;
@@ -696,6 +727,30 @@ describe('frame loop survival', () => {
     },
   );
 
+  it('one throttled timer tick does not leave the limiter waking for nothing', () => {
+    const host = (throttleOnce: boolean): Parameters<typeof runHost>[0] => {
+      let throttled = !throttleOnce;
+      return {
+        refreshMs: null,
+        costMs: 5,
+        seconds: 60,
+        intent: 30,
+        timerLateMs: (t) => {
+          if (throttled || t < 20_000) return 0;
+          throttled = true;
+          return 1_000;
+        },
+      };
+    };
+    const steady = runHost(host(false));
+    const r = runHost(host(true));
+    for (const i of r.intervals) expect(i).toBeCloseTo(33.33, 0);
+    // Remembered for long, or uncapped, that one second of lateness ends every
+    // sleep early for hundreds of frames, and the rest of each interval is spent
+    // on zero-length timers (measured here: about 2900 extra callbacks).
+    expect(r.callbacks - steady.callbacks).toBeLessThan(300);
+  });
+
   it('a hidden web tab goes back to rAF, which the browser pauses: no timer chain renders it', () => {
     const shown = runHost({ ...busyGpuHost(), seconds: 20 });
     expect(shown.timerArms).toBeGreaterThan(100);
@@ -738,6 +793,7 @@ describe('automatic frame rate limit', () => {
     expect(intents(r)).toEqual([0, 30, 0, 30]);
     // 300 frames clear of the entry cover, then 120 frames of evidence.
     expect(r.intentLog[1].at).toBeLessThan(12_000);
+    expect(r.intentLog[1].at).toBeGreaterThan(8_000);
     const [[start, end]] = excursions(r, seconds);
     expect(start - r.intentLog[1].at).toBeGreaterThan(55_000);
     expect(end - start).toBeLessThan(1_000);
@@ -866,6 +922,53 @@ describe('automatic frame rate limit', () => {
     expect(fighting.intentLog).toEqual(calm.intentLog);
   });
 
+  it('three cancelled probes settle the hold for the governor and store nothing', () => {
+    // A capable machine with a 1.1 s hitch inside each confirming probe.
+    let inProbe = false;
+    let hitched = false;
+    const r = runHost({
+      refreshMs: SLOT,
+      costMs: () => {
+        if (!inProbe || hitched) return 5;
+        hitched = true;
+        return 1_100;
+      },
+      seconds: 400,
+      intent: 'auto',
+      remembered: PROVISIONAL_AT_30,
+      onFrame: (_t, wiring) => {
+        const now = wiring.snapshot().autoPhase === 'probe';
+        if (!now) hitched = false;
+        inProbe = now;
+      },
+    });
+    const snap = r.wiring.snapshot();
+    expect(snap.autoProbesInconclusive).toBe(3);
+    expect(snap.autoProbesFailed).toBe(0);
+    expect(snap.intent).toBe(30);
+    expect(r.published.hold).toBe(false);
+    expect(r.saved).toEqual([]);
+  });
+
+  it('still reads a weak machine whose play is cut by long stalls', () => {
+    // A 1.2 s stall every 8 s: each one drops the readings in flight, but it is
+    // not an arrival, so the 300-frame clearance is not restarted by it.
+    const slow = uneven(22, 12);
+    let nextStall = 8_000;
+    const r = runHost({
+      refreshMs: SLOT,
+      costMs: (t) => {
+        if (t < nextStall) return slow();
+        nextStall += 8_000;
+        return 1_200;
+      },
+      seconds: 60,
+      intent: 'auto',
+    });
+    expect(intents(r)).toEqual([0, 30]);
+    expect(r.intentLog[1].at).toBeLessThan(20_000);
+  });
+
   it('never probes right after a loading cover', () => {
     const seconds = 300;
     const r = runHost({
@@ -895,7 +998,9 @@ describe('automatic frame rate limit', () => {
       intent: 'auto',
     });
     expect(intents(r)).toEqual([0, 30, 0]);
-    expect(r.saved[r.saved.length - 1]).toEqual({ ceiling: 0, confirmed: false, failStreak: 0 });
+    // Nothing is stored on the way: a session that ends ten seconds into the
+    // probation must not start the next one held at the ceiling the probe left.
+    expect(r.saved).toEqual([{ ceiling: 0, confirmed: false, failStreak: 0 }]);
     expect(r.wiring.snapshot().autoPhase).toBe('observe');
     expect(r.published.hold).toBe(false);
   });
@@ -976,6 +1081,7 @@ describe('automatic frame rate limit', () => {
     expect(snap.autoConfirmed).toBe(true);
     expect(snap.autoFirstCeilingS).toBeGreaterThan(1);
     expect(snap.autoFirstCeilingS).toBeLessThan(12);
+    expect(snap.autoFirstCeilingS).toBeGreaterThan(8);
   });
 
   it('goes through about 60 first on a 144 Hz display', () => {

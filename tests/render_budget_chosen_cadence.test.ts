@@ -221,6 +221,32 @@ describe('a ceiling engaging while a cap probe lost its origin', () => {
   });
 });
 
+describe('a ceiling engaging on a probe that had nothing to shed', () => {
+  it('installs the band baselines, like the probe itself does, never the floors back', () => {
+    const g = governor('low');
+    const before = { ...g.state().levels };
+    // A real disaster first: the ladder is driven to its floors.
+    const floored = run(g, 120, { frameMs: 70, dt: 0.07, totalMs: 60, submitMs: 30 });
+    expect(floored.state.levels.foliage).toBeLessThan(before.foliage);
+    // Then a held 33 ms rhythm with an idle main thread opens a probe that
+    // sheds nothing and reaches its restored dwell on the baselines.
+    let s = g.state();
+    for (let t = 0; t < 240 && s.frameCapProbe !== 'restored'; t += 1 / 30) s = g.update(sample());
+    expect(s.frameCapProbe).toBe('restored');
+    expect(s.levels).toEqual(before);
+    // Read on the engaging frame itself: what the abandon wrote, before the
+    // governor's own later steps.
+    const engaged = g.update(sample({ chosenCadenceMissShare: 0, holdRecovery: true }));
+    expect(engaged.frameCapProbe).toBe('idle');
+    // (The same update may already take one ordinary step off a bucket; the
+    // floors written back would read 0.5 here, not the baselines.)
+    expect(engaged.levels.grass).toBe(before.grass);
+    expect(engaged.levels.foliage).toBe(before.foliage);
+    expect(engaged.levels.lighting).toBe(before.lighting);
+    expect(engaged.levels.vfx).toBeGreaterThan(floored.state.levels.vfx + 0.1);
+  });
+});
+
 describe('the governor at baseline (the automatic ceiling headroom evidence)', () => {
   it('is at baseline once settled with nothing shed', () => {
     const g = governor('medium');
