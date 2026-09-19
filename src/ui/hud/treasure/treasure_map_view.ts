@@ -68,6 +68,7 @@ export function treasureMapModel(
   // Slide the crop so the X sits off-centre, then keep it inside the plate.
   const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
   const cropMinX = clamp(site.x - crop / 2 + jx * crop * 0.28, region.minX, region.maxX - crop);
+  const cropMaxX = cropMinX + crop;
   const cropMaxZ = clamp(site.z + crop / 2 + jz * crop * 0.28, region.minZ + crop, region.maxZ);
   const next = nextTreasureMapRarity(map.rarity);
   return {
@@ -76,9 +77,12 @@ export function treasureMapModel(
     plateUrl: `/map_bg/${zone.id}.webp`,
     plateScaleX: spanX / crop,
     plateScaleY: spanZ / crop,
-    plateOffsetX: -(cropMinX - region.minX) / crop,
+    // The baked terrain plate is mirrored horizontally by design: +X is on
+    // the left (map_terrain.ts). Measure both crop and mark from maxX so the
+    // parchment X identifies the same world coordinate the sim validates.
+    plateOffsetX: -(region.maxX - cropMaxX) / crop,
     plateOffsetY: -(region.maxZ - cropMaxZ) / crop,
-    markX: (site.x - cropMinX) / crop,
+    markX: (cropMaxX - site.x) / crop,
     markY: (cropMaxZ - site.z) / crop,
     upgrade: next
       ? { next, inks: TREASURE_MAP_UPGRADE_INKS[map.rarity], held: Math.max(0, inksHeld) }
