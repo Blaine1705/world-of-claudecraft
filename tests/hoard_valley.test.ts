@@ -160,7 +160,9 @@ describe('hoard valley painter', () => {
     secondView.group.traverse((object) => {
       if (object instanceof THREE.InstancedMesh) secondInstances.push(object);
     });
-    expect(instances.map((mesh) => mesh.name)).toContain('HoardValleyGround');
+    expect(view.group.getObjectByName('HoardValleyGround')).toBeInstanceOf(THREE.Mesh);
+    expect(instances.map((mesh) => mesh.name)).toContain('HoardCavernCornice');
+    expect(instances.map((mesh) => mesh.name)).toContain('HoardCavernHangingRoots');
     expect(instances.map((mesh) => mesh.name)).toContain('HoardValleyBoundaryCliffs');
     expect(instances.length).toBeLessThanOrEqual(6);
     for (const mesh of instances) {
@@ -173,7 +175,7 @@ describe('hoard valley painter', () => {
       expect(secondInstances[i].geometry).toBe(instances[i].geometry);
       expect(secondInstances[i].material).toBe(instances[i].material);
     }
-    expect(instances.some((mesh) => mesh.name === 'HoardValleyGroundShadows')).toBe(true);
+    expect(view.group.getObjectByName('HoardValleyGroundShadows')).toBeDefined();
     updateHoardValleyDayNight({ fog: [0.14, 0.2, 0.32], nightAmt: 1 });
     const material = instances[0].material as THREE.MeshBasicMaterial;
     expect(material.color.r).toBeGreaterThanOrEqual(0.75);
@@ -192,10 +194,10 @@ describe('hoard valley painter', () => {
       effectsProfile: resolveHoardValleyEffectsProfile('low'),
     });
     await view.readyForEntry;
-    const ground = view.group.getObjectByName('HoardValleyGround') as THREE.InstancedMesh;
+    const ground = view.group.getObjectByName('HoardValleyGround') as THREE.Mesh;
     expect(view.group.getObjectByName('HoardValleyGroundShadows')).toBeUndefined();
     let disposed = false;
-    ground.addEventListener('dispose', () => {
+    ground.geometry.addEventListener('dispose', () => {
       disposed = true;
     });
     expect(disposeHoardValleyGroup(view.group)).toBe(true);

@@ -9,6 +9,10 @@ import type { RiftFloorPlan } from '../sim/rift/types';
 import { type DayNightGrade, duskWarmAmount, nightSkyDesat } from './day_night_core';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import type { GfxTier } from './gfx';
+import { hoardCavernRoofVisible } from './hoard_cavern_core';
+import { buildHoardCavernFoliage, updateHoardCavernFoliageTint } from './hoard_cavern_foliage';
+import { buildHoardCavernGround } from './hoard_cavern_ground';
+import { buildHoardCavernShell, hoardCavernRockGeometry } from './hoard_cavern_shell';
 import {
   buildHoardValleyPlan,
   type HoardValleyDressingKind,
@@ -46,15 +50,13 @@ export interface HoardValleyView {
   dispose(): void;
 }
 
-let groundGeometry: THREE.BoxGeometry | null = null;
-let cliffGeometry: THREE.DodecahedronGeometry | null = null;
+let cliffGeometry: THREE.BufferGeometry | null = null;
 let trunkGeometry: THREE.CylinderGeometry | null = null;
 let crownGeometry: THREE.DodecahedronGeometry | null = null;
 let spireGeometry: THREE.ConeGeometry | null = null;
 let branchGeometry: THREE.BoxGeometry | null = null;
 let bloomGeometry: THREE.OctahedronGeometry | null = null;
 let valleyMaterial: THREE.MeshBasicMaterial | null = null;
-let valleyShadowMaterial: THREE.ShadowMaterial | null = null;
 
 function paintFacets<T extends THREE.BufferGeometry>(geometry: T): T {
   const normals = geometry.getAttribute('normal');
@@ -73,15 +75,13 @@ function paintFacets<T extends THREE.BufferGeometry>(geometry: T): T {
 }
 
 function sharedGeometries() {
-  groundGeometry ??= markSharedGeometry(paintFacets(new THREE.BoxGeometry(1, 1, 1)));
-  cliffGeometry ??= markSharedGeometry(paintFacets(new THREE.DodecahedronGeometry(1, 0)));
+  cliffGeometry ??= hoardCavernRockGeometry();
   trunkGeometry ??= markSharedGeometry(paintFacets(new THREE.CylinderGeometry(0.38, 0.62, 4.8, 6)));
   crownGeometry ??= markSharedGeometry(paintFacets(new THREE.DodecahedronGeometry(1, 0)));
   spireGeometry ??= markSharedGeometry(paintFacets(new THREE.ConeGeometry(1, 4.5, 6)));
   branchGeometry ??= markSharedGeometry(paintFacets(new THREE.BoxGeometry(0.32, 3.6, 0.32)));
   bloomGeometry ??= markSharedGeometry(paintFacets(new THREE.OctahedronGeometry(0.7, 0)));
   return {
-    ground: groundGeometry,
     cliff: cliffGeometry,
     trunk: trunkGeometry,
     crown: crownGeometry,
@@ -91,7 +91,7 @@ function sharedGeometries() {
   };
 }
 
-function coloredMaterial(name: string): THREE.Material {
+function coloredMaterial(name: string): THREE.MeshBasicMaterial {
   valleyMaterial ??= markSharedMaterial(
     new THREE.MeshBasicMaterial({ color: 0xffffff, vertexColors: true, fog: true }),
   );
@@ -100,12 +100,18 @@ function coloredMaterial(name: string): THREE.Material {
 }
 
 /** Grade the hand-painted facet fill with a readable version of the live night tint. */
-export function updateHoardValleyDayNight(grade: {
-  fog: readonly [number, number, number];
-  nightAmt: number;
-}): void {
+export function updateHoardValleyDayNight(
+  grade: {
+    fog: readonly [number, number, number];
+    nightAmt: number;
+  },
+  camera?: THREE.Vector3,
+  target?: THREE.Vector3,
+): void {
   const tint = hoardValleySurfaceTint(grade);
   valleyMaterial?.color.setRGB(tint[0], tint[1], tint[2]);
+  updateHoardCavernFoliageTint(tint);
+  if (camera && target) for (const view of activeValleys) view.updateCamera(camera, target);
 }
 
 /** Low keeps the cheap sky but still follows the valley's live day/night clock. */
@@ -154,56 +160,6 @@ function finishInstances(
   mesh.computeBoundingBox();
   mesh.computeBoundingSphere();
   return mesh;
-}
-
-function writeGroundInstances(mesh: THREE.InstancedMesh, plan: HoardValleyPlan): void {
-  const matrix = new THREE.Matrix4();
-  const quaternion = new THREE.Quaternion();
-  const rotation = new THREE.Euler();
-  const position = new THREE.Vector3();
-  const scale = new THREE.Vector3();
-  for (let i = 0; i < plan.ground.length; i++) {
-    const strip = plan.ground[i];
-    writeInstance(
-      mesh,
-      i,
-      position.set(strip.x, -0.12, strip.z),
-      rotation.set(0, 0, 0),
-      scale.set(strip.halfX * 2, 0.32, strip.halfZ * 2),
-      strip.color,
-      matrix,
-      quaternion,
-    );
-  }
-}
-
-function buildGround(plan: HoardValleyPlan, shadows: boolean): THREE.Group {
-  const group = new THREE.Group();
-  group.name = 'HoardValleyGroundLayer';
-  const mesh = new THREE.InstancedMesh(
-    sharedGeometries().ground,
-    coloredMaterial('HoardValleyGround'),
-    plan.ground.length,
-  );
-  mesh.name = 'HoardValleyGround';
-  writeGroundInstances(mesh, plan);
-  group.add(finishInstances(mesh, false));
-  if (shadows) {
-    valleyShadowMaterial ??= markSharedMaterial(
-      new THREE.ShadowMaterial({ color: 0x13202a, opacity: 0.2, depthWrite: false }),
-    );
-    const catcher = new THREE.InstancedMesh(
-      sharedGeometries().ground,
-      valleyShadowMaterial,
-      plan.ground.length,
-    );
-    catcher.name = 'HoardValleyGroundShadows';
-    writeGroundInstances(catcher, plan);
-    catcher.position.y = 0.012;
-    catcher.renderOrder = 1;
-    group.add(finishInstances(catcher, false, true));
-  }
-  return group;
 }
 
 function buildCliffs(plan: HoardValleyPlan, shadows: boolean): THREE.InstancedMesh {
@@ -388,6 +344,7 @@ function buildDressing(plan: HoardValleyPlan, shadows: boolean): THREE.Group {
   group.name = 'HoardValleyZoneDressing';
   const byKind = new Map<HoardValleyDressingKind, HoardValleyDressingPlacement[]>();
   for (const placement of plan.dressing) {
+    if (['autumn_tree', 'palm', 'dead_tree'].includes(placement.kind)) continue;
     const values = byKind.get(placement.kind) ?? [];
     values.push(placement);
     byKind.set(placement.kind, values);
@@ -397,11 +354,14 @@ function buildDressing(plan: HoardValleyPlan, shadows: boolean): THREE.Group {
 }
 
 const valleyOwners = new WeakMap<THREE.Group, HoardValleyViewImpl>();
+const activeValleys = new Set<HoardValleyViewImpl>();
 
 class HoardValleyViewImpl implements HoardValleyView {
   readonly group: THREE.Group;
   readonly readyForEntry: Promise<void>;
   private disposed = false;
+  private readonly disposeGround: () => void;
+  private readonly roof: THREE.InstancedMesh | undefined;
 
   constructor(options: HoardValleyBuildOptions) {
     const outdoor = options.plan.outdoor;
@@ -419,9 +379,28 @@ class HoardValleyViewImpl implements HoardValleyView {
     this.group = new THREE.Group();
     this.group.name = `hoard-valley:${outdoor.zoneId}`;
     this.group.position.set(options.offset.x, options.offset.y, options.offset.z);
-    this.group.add(buildGround(visualPlan, shadows));
+    const ground = buildHoardCavernGround(
+      options.plan.layout,
+      visualPlan.zone,
+      options.plan.seed,
+      coloredMaterial('HoardCavernGround'),
+      shadows,
+    );
+    this.disposeGround = ground.dispose;
+    this.group.add(ground.group);
     this.group.add(buildCliffs(visualPlan, shadows));
+    this.group.add(
+      buildHoardCavernShell(
+        options.plan.layout,
+        visualPlan,
+        coloredMaterial('HoardCavern'),
+        shadows,
+      ),
+    );
     this.group.add(buildDressing(visualPlan, shadows));
+    this.group.add(buildHoardCavernFoliage(visualPlan, shadows));
+    this.roof = this.group.getObjectByName('HoardCavernEntryRoof') as THREE.InstancedMesh;
+    activeValleys.add(this);
     this.group.userData.hoardValleyZoneId = outdoor.zoneId;
     this.group.userData.hoardValleyRevealZ = outdoor.valleyStartZ ?? visualPlan.revealZ;
     setRenderCategory(this.group, 'dungeon');
@@ -441,13 +420,25 @@ class HoardValleyViewImpl implements HoardValleyView {
     });
   }
 
+  updateCamera(camera: THREE.Vector3, target: THREE.Vector3): void {
+    if (this.roof?.boundingBox)
+      this.roof.visible = hoardCavernRoofVisible(
+        camera,
+        target,
+        this.group.position,
+        this.roof.boundingBox,
+      );
+  }
+
   dispose(): void {
     if (this.disposed) return;
     this.disposed = true;
+    activeValleys.delete(this);
     this.group.parent?.remove(this.group);
     this.group.traverse((object) => {
       if (object instanceof THREE.InstancedMesh) object.dispose();
     });
+    this.disposeGround();
     this.group.clear();
     valleyOwners.delete(this.group);
   }

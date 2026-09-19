@@ -9397,7 +9397,7 @@ export class Renderer {
       ZONE_ENVIRONMENT_RESPONSE,
     );
     if (valley) {
-      updateHoardValleyDayNight(this.dnGrade);
+      updateHoardValleyDayNight(this.dnGrade, this.camera.position, this.cameraLookAt);
       updateHoardValleySkyDayNight(this.skyView, this.dnGrade, this.sunDir);
     }
     // Every open-air state follows the live grade. Thornhollow keeps its

@@ -349,7 +349,7 @@ function buildCliffs(
           y: 1.5 + hash(seed, index, 13) * 1.1,
           z: baseZ + nz * (row * 2.7 + stagger * 0.25) + (dz / length) * stagger,
           scaleX: scale * (0.9 + hash(seed, index, 14) * 0.65),
-          scaleY: scale * (1.5 + hash(seed, index, 15) * 1.2) * heightBoost,
+          scaleY: scale * (2.3 + hash(seed, index, 15) * 1.3) * heightBoost,
           scaleZ: scale * (0.8 + hash(seed, index, 16) * 0.55),
           yaw: hash(seed, index, 17) * Math.PI * 2,
           color: mixColor(zone.cliff, zone.cliffLight, 0.08 + hash(seed, index, 18) * 0.4),
