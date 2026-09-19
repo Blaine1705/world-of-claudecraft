@@ -56,7 +56,7 @@ function lightMaterial(color: number, shaft = false): THREE.ShaderMaterial {
         vertexShader:
           'varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }',
         fragmentShader: `varying vec2 vUv; uniform vec3 tint; uniform float alpha;
-        void main(){ float edge = ${shaft ? 'pow(sin(vUv.x*3.14159265),2.)*pow(1.-vUv.y,2.)*.16' : 'pow(max(0.,1.-length((vUv-.5)*2.)),2.)*.55'};
+        void main(){ float edge = ${shaft ? 'pow(max(0.,sin(vUv.x*3.14159265)),2.)*pow(max(0.,1.-vUv.y),2.)*.16' : 'pow(max(0.,1.-length((vUv-.5)*2.)),2.)*.55'};
           gl_FragColor=vec4(tint,edge*alpha);
           #include <tonemapping_fragment>
           #include <colorspace_fragment>
