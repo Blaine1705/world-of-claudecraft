@@ -6,7 +6,12 @@ import { BROWSER_PATH } from '../../browser_path.mjs';
 import { enterOfflineGame } from '../../enter_offline_game.mjs';
 import { suppressGpuNotice } from '../../lib/gpu_notice_suppress.mjs';
 
-const out = 'docs/screenshots/buried-hoard-valley';
+// biome-ignore lint/suspicious/noUndeclaredEnvVars: Capture output override.
+const out = process.env.SHOTS_DIR ?? 'docs/screenshots/buried-hoard-valley';
+// biome-ignore lint/suspicious/noUndeclaredEnvVars: Select the cave entry or open basin for review.
+const basinView = process.env.CAVERN_VIEW === 'basin';
+// biome-ignore lint/suspicious/noUndeclaredEnvVars: Opt-in gameplay camera regression capture.
+const cameraCheck = process.env.CAMERA_CHECK === '1';
 const url = process.env.GAME_URL ?? 'http://localhost:5182';
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const cases = [
@@ -39,7 +44,16 @@ for (const mobile of [false, true]) {
   });
   try {
     const page = await browser.newPage();
+    const shaderErrors = [];
     page.on('pageerror', (error) => console.error(`pageerror: ${error.message}`));
+    page.on('console', (message) => {
+      if (
+        message.type() === 'error' &&
+        /Shader Error|VALIDATE_STATUS|shader.*compil/i.test(message.text())
+      ) {
+        shaderErrors.push(message.text());
+      }
+    });
     await suppressGpuNotice(page);
     if (mobile) {
       await page.emulate({
@@ -124,7 +138,7 @@ for (const mobile of [false, true]) {
         () => getComputedStyle(document.querySelector('#loading-screen')).display === 'none',
         { timeout: 180000 },
       );
-      const renderState = await page.evaluate(async () => {
+      const renderState = await page.evaluate(async (basin) => {
         const game = window.__game;
         const sim = game.sim;
         const view = sim.riftFloor;
@@ -133,7 +147,8 @@ for (const mobile of [false, true]) {
         const origin = view.origin;
         const vector = (x, y, z) => game.renderer.camera.position.clone().set(x, y, z);
         if (floor.outdoor) {
-          const playerZ = origin.z + floor.outdoor.gorgeEndZ - 5;
+          const playerZ =
+            origin.z + (basin ? floor.outdoor.valleyStartZ + 20 : floor.outdoor.gorgeEndZ - 5);
           sim.player.pos.x = origin.x;
           sim.player.pos.z = playerZ;
           sim.player.prevPos.x = origin.x;
@@ -141,7 +156,11 @@ for (const mobile of [false, true]) {
           sim.player.facing = 0;
           game.renderer.editorCam = {
             pos: vector(origin.x + 2, 10, playerZ - 12),
-            target: vector(origin.x, 2.4, origin.z + floor.outdoor.valleyStartZ + 31),
+            target: vector(
+              origin.x,
+              2.4,
+              basin ? playerZ + 35 : origin.z + floor.outdoor.valleyStartZ + 31,
+            ),
           };
         } else {
           game.renderer.editorCam = {
@@ -162,7 +181,7 @@ for (const mobile of [false, true]) {
             environment: game.renderer.scene.environmentIntensity,
           },
         };
-      });
+      }, basinView);
       const shouldBeOutdoor = rarity === 'epic' || rarity === 'legendary';
       if (shouldBeOutdoor !== Boolean(renderState.outdoorZone)) {
         throw new Error(
@@ -234,6 +253,50 @@ for (const mobile of [false, true]) {
         await page.screenshot({ path: file });
         console.log(JSON.stringify({ file, ...state, ...renderState, ...cycle }));
       }
+      if (cameraCheck && shouldBeOutdoor) {
+        for (const [label, yaw, pitch, dist] of [
+          ['arrival', 0, 0.32, 12],
+          ['raised-north', 0, 0.95, 30],
+          ['raised-east', Math.PI / 2, 0.95, 30],
+          ['raised-south', Math.PI, 0.95, 30],
+          ['raised-west', -Math.PI / 2, 0.95, 30],
+        ]) {
+          await page.evaluate(
+            async ({ yaw, pitch, dist }) => {
+              const { sim, renderer, input } = window.__game;
+              const view = sim.riftFloor;
+              const { generateRiftFloor } = await import('/src/sim/rift/rift_gen.ts');
+              const floor = generateRiftFloor(
+                view.seed,
+                view.baseLevel,
+                view.floorIndex,
+                view.upgrade,
+              );
+              sim.player.pos.x = view.origin.x + floor.entry.x;
+              sim.player.pos.z = view.origin.z + floor.entry.z;
+              Object.assign(sim.player.prevPos, sim.player.pos);
+              renderer.editorCam = null;
+              input.camYaw = yaw;
+              input.camPitch = pitch;
+              input.camDist = dist;
+            },
+            { yaw, pitch, dist },
+          );
+          await delay(3000);
+          const camera = await page.evaluate(() => {
+            const renderer = window.__game.renderer;
+            return {
+              position: renderer.camera.position.toArray(),
+              target: renderer.cameraLookAt.toArray(),
+              roofVisible: renderer.scene.getObjectByName('HoardCavernEntryRoof')?.visible,
+            };
+          });
+          const file = `${out}/camera-${label}-${mobile ? 'landscape-phone-low' : 'desktop-ultra'}.png`;
+          await page.screenshot({ path: file });
+          console.log(JSON.stringify({ file, camera }));
+        }
+      }
+      if (shaderErrors.length) throw new Error(`Shader compilation failed: ${shaderErrors[0]}`);
     }
   } finally {
     await browser.close();

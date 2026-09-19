@@ -3,9 +3,12 @@
 // 25 planned enemies, then enters that valley through the normal treasure-map flow.
 import { mkdirSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
+import { dirname } from 'node:path';
 import { Profiler } from '../../profiler/harness.mjs';
 
-const outputPath = 'docs/screenshots/buried-hoard-valley/performance-low-landscape.json';
+// biome-ignore lint/suspicious/noUndeclaredEnvVars: Performance evidence output override.
+const outputPath =
+  process.env.PERF_OUTPUT ?? 'docs/screenshots/buried-hoard-valley/performance-low-landscape.json';
 // biome-ignore lint/suspicious/noUndeclaredEnvVars: Performance CLI input is not a Turbo task dependency.
 const sampleMs = Number(process.env.SAMPLE_MS ?? 10000);
 const profiler = new Profiler({
@@ -104,7 +107,7 @@ try {
     const { generateRiftFloor } = await import('/src/sim/rift/rift_gen.ts');
     const floor = generateRiftFloor(view.seed, view.baseLevel, view.floorIndex, view.upgrade);
     const origin = view.origin;
-    const playerZ = origin.z + floor.outdoor.gorgeEndZ - 5;
+    const playerZ = origin.z + floor.outdoor.valleyStartZ + 20;
     sim.player.pos.x = origin.x;
     sim.player.pos.z = playerZ;
     sim.player.prevPos.x = origin.x;
@@ -112,9 +115,7 @@ try {
     sim.player.facing = 0;
     game.renderer.editorCam = {
       pos: game.renderer.camera.position.clone().set(origin.x + 2, 10, playerZ - 12),
-      target: game.renderer.camera.position
-        .clone()
-        .set(origin.x, 2.4, origin.z + floor.outdoor.valleyStartZ + 31),
+      target: game.renderer.camera.position.clone().set(origin.x, 2.4, playerZ + 35),
     };
     game.renderer.camera.position.copy(game.renderer.editorCam.pos);
     game.renderer.cameraLookAt.copy(game.renderer.editorCam.target);
@@ -128,6 +129,34 @@ try {
   await new Promise((resolve) => setTimeout(resolve, 8000));
   await profiler.sample({ ms: 5000, label: 'legendary-valley-warmup' });
   const sample = await profiler.sample({ ms: sampleMs, label: 'legendary-valley-low-landscape' });
+  await profiler.page.evaluate(async () => {
+    const { sim, renderer, input } = window.__game;
+    const view = sim.riftFloor;
+    const { generateRiftFloor } = await import('/src/sim/rift/rift_gen.ts');
+    const floor = generateRiftFloor(view.seed, view.baseLevel, view.floorIndex, view.upgrade);
+    sim.player.pos.x = view.origin.x;
+    sim.player.pos.z = view.origin.z + floor.entry.z;
+    Object.assign(sim.player.prevPos, sim.player.pos);
+    renderer.editorCam = null;
+    input.camPitch = 0.95;
+    input.camDist = 30;
+    const start = performance.now();
+    window.__cavernOrbit = true;
+    const orbit = () => {
+      if (!window.__cavernOrbit) return;
+      input.camYaw = (performance.now() - start) / 2500;
+      requestAnimationFrame(orbit);
+    };
+    orbit();
+  });
+  await new Promise((resolve) => setTimeout(resolve, 3000));
+  const orbitSample = await profiler.sample({
+    ms: sampleMs,
+    label: 'legendary-cavern-camera-orbit',
+  });
+  await profiler.page.evaluate(() => {
+    window.__cavernOrbit = false;
+  });
   const evidence = {
     measuredAt: new Date().toISOString(),
     viewport: { width: 844, height: 390, deviceScaleFactor: 1 },
@@ -145,8 +174,9 @@ try {
     },
     valley: { ...setup, ...live },
     sample,
+    orbitSample,
   };
-  mkdirSync('docs/screenshots/buried-hoard-valley', { recursive: true });
+  mkdirSync(dirname(outputPath), { recursive: true });
   writeFileSync(outputPath, `${JSON.stringify(evidence, null, 2)}\n`);
   console.log(
     JSON.stringify({ outputPath, valley: evidence.valley, frame: sample.frame }, null, 2),
